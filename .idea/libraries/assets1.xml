@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="assets1">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/node_modules/.pnpm/sst@2.8.5/node_modules/zip-local/tests/assets/hello.zip!/" />
+      <root url="jar://$PROJECT_DIR$/node_modules/.pnpm/sst@2.8.5/node_modules/zip-local/tests/assets/zip-slip.zip!/" />
+      <root url="jar://$PROJECT_DIR$/node_modules/.pnpm/sst@2.8.5/node_modules/zip-local/tests/assets/folders.zip!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

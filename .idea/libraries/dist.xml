@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="dist">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/.sst/dist/asset.b7acbced09fe16b5565856f955f37856bca950ada85120657823fcc404181be6.zip!/" />
+      <root url="jar://$PROJECT_DIR$/.sst/dist/asset.53c3944df540c539db25b67ff0f4bfd7558ce01990b1eb0b20baa773faac30b9.zip!/" />
+      <root url="jar://$PROJECT_DIR$/.sst/dist/asset.c33f77e71bef2fbd8299fa87f0d89b792b981d73e22dba92b2dd13caec415dfc.zip!/" />
+      <root url="jar://$PROJECT_DIR$/.sst/dist/asset.845d276cf7263171ad75a3c8f259fd967f37462ed6120eab818bd72e89ca48be.zip!/" />
+      <root url="jar://$PROJECT_DIR$/.sst/dist/asset.8baf18bd29caf4aac5f11659c8e623ef08b9453df391d592a50944c3d204453d.zip!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
