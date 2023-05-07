@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name=".cache">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/.sst/dist/.cache/f6779deb60a7150c104c55243ea0e12c57acd3cc437773cfa9c8884fb1222a3d.zip!/" />
+      <root url="jar://$PROJECT_DIR$/.sst/dist/.cache/2d7d260e3c4a004b3d3fe9b29180177fc86ccd4459291be5dbb2109dfca096a7.zip!/" />
+      <root url="jar://$PROJECT_DIR$/.sst/dist/.cache/fd3bf9520f5e9fabb0d6798663d620ae6c54c9442688e54f8b892b319010e777.zip!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
