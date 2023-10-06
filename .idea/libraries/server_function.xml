@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="server-function">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/.sst/artifacts/SsrFunction-ServerFunction-c85fd91836a00928df6df85c4a84656e2b708199dc/server-function.zip!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>
