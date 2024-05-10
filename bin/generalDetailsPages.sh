@@ -1,18 +1,20 @@
-#!/usr/bin/env bash
+#!/usr/bin/env bash 
 
 export TEMPDIR=`mktemp -d`
 export CWD=`pwd`
+find $CWD/src/content/generals/ -iname '*.yaml' | grep -v  '_' > ${TEMPDIR}/list;
+wc -l ${TEMPDIR}/list
 
-for i in $CWD/src/content/generals/[A-Z]*.yaml; do
-  echo $i;
-  j=`basename $i .yaml`;
+cat ${TEMPDIR}/list | while IFS= read -r file ; do
+  echo "${file}";
+  j=`basename "$file" .yaml`;
   OUTPUT="$TEMPDIR/$j.mdx"
-  TITLE=$(grep -m 1 name src/content/generals/$j.yaml | cut -d ':' -f 2-)
+  TITLE=$(grep -m 1 name "${file}" | cut -d ':' -f 2-)
   shopt -s extglob
   TITLE="${TITLE##*( )}"
   shopt -u extglob
-  NAME=$(echo "$TITLE" | tr -s [:blank:] '_' | tr -d  '.')
-  echo '---' > $OUTPUT
+  NAME=$(echo "$TITLE" | tr -s [:blank:] )
+  echo '---' > "$OUTPUT"
 
   {
     echo "title: $TITLE" ;
@@ -20,10 +22,9 @@ for i in $CWD/src/content/generals/[A-Z]*.yaml; do
     echo '---';
     echo 'import General from "../../../../components/General.astro"';
     echo ' '
-    echo "<General generalEntry='$NAME'/>"
+    echo "<General generalEntry='$j'/>"
   } >> "$OUTPUT"
-done
+done 
 
-mv $TEMPDIR/*.mdx $CWD/src/content/docs/generals/details/
-rm -rf ${TEMPDIR}
-
+mv ${TEMPDIR}/*.mdx $CWD/src/content/docs/generals/details/
+#rm -rf ${TEMPDIR}
