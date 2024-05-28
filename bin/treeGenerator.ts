@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
-import * as fs from 'fs';
 import * as path from 'path';
 import * as process from 'process';
 import { rimraf } from 'rimraf';
@@ -21,7 +20,7 @@ const Proot =  path.resolve(path.join(process.cwd(),'../..')) + '/';
 const doc_base = 'content/en/';
 const source = path.join(process.cwd(),'../../content/en/')
 
-const content_dirs:Set<string> = new Set();
+const content_dirs = new Set<string>();
 
 for (const file of readAllFiles(source)) {
   content_dirs.add(path.dirname(file.replace(Proot,'').replace(doc_base,'')));
