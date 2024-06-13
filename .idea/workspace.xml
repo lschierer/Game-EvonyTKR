@@ -5,17 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="34a2dfdf-3b30-4a48-8e41-bbb8d65207da" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/components/general/buffComputers/TKRTipsRanking/Details/MayorDeAttackDetail.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/components/general/buffComputers/TKRTipsRanking/Details/MayorDefenseDetail.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/components/general/buffComputers/TKRTipsRanking/Details/MayorHPDetail.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/general/buffComputers/TKRTipsRanking/Details/MayorAttackDetail.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/general/buffComputers/TKRTipsRanking/Details/MayorAttackDetail.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/general/buffComputers/TKRTipsRanking/Details/MayorDeDefenseDetail.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/general/buffComputers/TKRTipsRanking/Details/MayorDeDefenseDetail.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/general/buffComputers/TKRTipsRanking/Details/MayorDeHPDetail.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/general/buffComputers/TKRTipsRanking/Details/MayorDeHPDetail.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/general/buffComputers/TKRTipsRanking/Details/SkillBook_SingleScore.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/general/buffComputers/TKRTipsRanking/Details/SkillBook_SingleScore.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/general/buffComputers/TKRTipsRanking/Details/Speciality_SingleScope.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/general/buffComputers/TKRTipsRanking/Details/Speciality_SingleScope.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/general/buffComputers/TKRTipsRanking/MayorDetail.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/general/buffComputers/TKRTipsRanking/MayorDetail.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/content/docs/generals/mayors.mdx" beforeDir="false" afterPath="$PROJECT_DIR$/src/content/docs/generals/mayors.mdx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -35,6 +25,7 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "ASKED_ADD_EXTERNAL_FILES": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "git-widget-placeholder": "generals__db2",
@@ -67,7 +58,7 @@
       <option name="presentableId" value="Default" />
       <updated>1718229169910</updated>
       <workItem from="1718229171011" duration="7663000" />
-      <workItem from="1718236859762" duration="18401000" />
+      <workItem from="1718236859762" duration="22676000" />
     </task>
     <servers />
   </component>
