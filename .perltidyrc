@@ -1,0 +1,36 @@
+# https://github.com/menozero/perltidy-prettier-style
+
+-w      # show all warnings
+# -utf8
+# -ole=unix
+# -it=2
+
+#-l=80  # Prettier print-width
+-i=2    # Prettier tab-width (default 4)
+#-ci=2  # default
+
+-fsb='# prettier-ignore-start'
+-fse='# prettier-ignore-end'
+
+# horizontal
+-nsfs   # no space for semicolon in for
+-tso    # tight secret operators
+-pt=2   # Prettier paren tightness (default 1)
+-sbt=2  # Prettier square bracket tightness (default 1)
+#-bt=1  # Prettier brace tightness
+-bbt=1  # Prettier block brace tightness (default 0)
+-bar    # opening brace always on right
+
+# vertical
+#-iob   # ? ignore old breakpoints
+#-vt=0  # vertical tightness
+-ce     # Prettier cuddled else
+-wn     # weld nested containers
+-sot    # stack opening tokens
+#-mbl=1 # Prettier maximum consecutive blank lines
+
+# comments
+-nbbc   # no blanks before comments (?)
+-isbc   # indent (only) spaced block comments
+# TODO need more tests with comments
+
