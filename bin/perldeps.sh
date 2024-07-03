@@ -13,3 +13,7 @@ cpanm install Module::Starter
 cpanm install Module::Build
 cpanm install Software::License
 cpanm install Software::License::CC_BY_4_0
+cpanm install Dist::Zilla
+cpanm install Dist::Zilla::Plugin::Git
+cpanm install Pod::Weaver
+cpanm install Pod::Elemental::Transformer::List.
