@@ -18,3 +18,8 @@ cpanm install Dist::Zilla::Plugin::Git
 cpanm install Dist::Zilla::PluginBundle::Git
 cpanm install Pod::Weaver
 cpanm install Pod::Elemental::Transformer
+cpanm install Pod::Elemental::Transformer::List
+
+# for the website
+cpanm install Plack
+cpanm install Mojolicious
