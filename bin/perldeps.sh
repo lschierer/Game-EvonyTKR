@@ -8,7 +8,17 @@ cpanm install JSON::PP
 cpanm install Cpanel::JSON::XS # not actually a part of Cpanel, but named for them because they sponsor it.
 cpanm install JSON::MaybeXS
 
-# Modules required for Testing do not seem to be auto installed reliably
+#these modules are sensitive on OSX
+cpanm install -n Net::SSLeay
+cpanm install -n IO::Socket::SSL
+cpanm install -n LWP::Protocol::https
+
+#Mail::Sendmail tests require zen.spamhaus.org to like you.  This is unlikely on a workstation.
+cpanm install -n Mail::Sendmail
+
+# This is for testing, it wasn't detected automatically
+cpanm install Test::Pod
+cpanm install Test::Pod::Coverage
 cpanm install Test2::Tools::Process
 
 # for building modules
@@ -25,9 +35,15 @@ cpanm install Pod::Elemental::Transformer::List
 
 # for the website
 cpanm install Plack
-cpanm install Mojolicious\\
+cpanm install Mojolicious
 
 # for ikiwiki
 cpanm install DateTime::Format::ISO8601
 cpanm install FFI::CheckLib
+# shellcheck disable=SC2155
+export CURDIR=`pwd`
+cd packages/ikiwiki || exit
+PERL5LIB=`pwd` PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'CPAN::Shell->install("Bundle::IkiWiki")'
+PERL5LIB=`pwd` PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'CPAN::Shell->install("Bundle::IkiWiki::Extras")'
+cd "${CURDIR}" || exit
 
