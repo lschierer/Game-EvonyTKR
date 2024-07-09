@@ -8,6 +8,9 @@ cpanm install JSON::PP
 cpanm install Cpanel::JSON::XS # not actually a part of Cpanel, but named for them because they sponsor it.
 cpanm install JSON::MaybeXS
 
+# Modules required for Testing do not seem to be auto installed reliably
+cpanm install Test2::Tools::Process
+
 # for building modules
 cpanm install Module::Starter
 cpanm install Module::Build
@@ -22,4 +25,9 @@ cpanm install Pod::Elemental::Transformer::List
 
 # for the website
 cpanm install Plack
-cpanm install Mojolicious
+cpanm install Mojolicious\\
+
+# for ikiwiki
+cpanm install DateTime::Format::ISO8601
+cpanm install FFI::CheckLib
+
