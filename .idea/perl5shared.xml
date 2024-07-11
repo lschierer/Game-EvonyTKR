@@ -9,5 +9,6 @@
         <major>38</major>
       </PerlVersion>
     </option>
+    <option name="PERL_CRITIC_ENABLED" value="true" />
   </component>
 </project>
