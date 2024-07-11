@@ -2,6 +2,11 @@
 <module type="JAVA_MODULE" version="4">
   <component name="NewModuleRootManager" inherit-compiler-output="true">
     <exclude-output />
+    <perl5>
+      <path value="file://$MODULE_DIR$/packages/frontend/lib" type="perl-library" />
+      <path value="file://$MODULE_DIR$/packages/frontend/templates" type="mojo-template" />
+      <path value="file://$MODULE_DIR$/src/EvonyPerl/lib" type="perl-library" />
+    </perl5>
     <content url="file://$MODULE_DIR$">
       <excludeFolder url="file://$MODULE_DIR$/.astro" />
       <excludeFolder url="file://$MODULE_DIR$/.sst" />
