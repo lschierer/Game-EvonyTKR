@@ -1,0 +1,58 @@
+name: 01HGKZACGC0AYAHS0Y64XGRNK8
+members:
+  - Antara
+  - Harold III
+  - Henry V
+  - Jumong
+  - Minamoto no Yoshitsune
+  - Subutai
+others:
+  - Elektra
+  - Elektra (Dragon God)
+  - Vladimir the Great
+  - Winfield Scott
+  - Louis IX
+  - Li Shimin
+  - Idunn
+  - Idunn (Siege)
+books:
+  - book:
+      name: Ranged Attack Increase
+      level: '1'
+      buff:
+        - attribute: Attack
+          class: Archers
+          value:
+            number: 10
+            unit: percentage
+    condition: all the time
+  - book:
+      name: Ranged Attack Increase
+      level: '2'
+      buff:
+        - attribute: Attack
+          class: Archers
+          value:
+            number: 15
+            unit: percentage
+    condition: all the time
+  - book:
+      name: Ranged Attack Increase
+      level: '3'
+      buff:
+        - attribute: Attack
+          class: Archers
+          value:
+            number: 20
+            unit: percentage
+    condition: all the time
+  - book:
+      name: Ranged Attack Increase
+      level: '4'
+      buff:
+        - attribute: Attack
+          class: Archers
+          value:
+            number: 25
+            unit: percentage
+    condition: all the time

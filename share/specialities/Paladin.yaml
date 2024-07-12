@@ -1,0 +1,73 @@
+---
+name: Paladin
+levels:
+  - level: Green
+    buff:
+      - attribute: Attack
+        class: Mounted
+        value:
+          number: 2
+          unit: percentage
+      - attribute: Attack
+        class: Archers
+        condition:
+          - Reduces_Enemy
+        value:
+          number: 2
+          unit: percentage
+  - level: Blue
+    buff:
+      - attribute: Attack
+        class: Mounted
+        value:
+          number: 3
+          unit: percentage
+      - attribute: Attack
+        class: Archers
+        condition:
+          - Reduces_Enemy
+        value:
+          number: 2
+          unit: percentage
+  - level: Purple
+    buff:
+      - attribute: Attack
+        class: Mounted
+        value:
+          number: 5
+          unit: percentage
+      - attribute: Attack
+        class: Archers
+        condition:
+          - Reduces_Enemy
+        value:
+          number: 4
+          unit: percentage
+  - level: Orange
+    buff:
+      - attribute: Attack
+        class: Mounted
+        value:
+          number: 5
+          unit: percentage
+      - attribute: Attack
+        class: Archers
+        condition:
+          - Reduces_Enemy
+        value:
+          number: 4
+          unit: percentage
+  - level: Gold
+    buff:
+      - attribute: Attack
+        class: Mounted
+        value:
+          number: 10
+          unit: percentage
+      - attribute: Attack
+        class: Archers
+        condition:
+          - Reduces_Enemy
+        value:
+          number: 8
+          unit: percentage

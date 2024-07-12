@@ -1,0 +1,95 @@
+name: 01HGKYRFD3XP10X55VSXMBNPMB
+members:
+  - Ii Naomasa
+others:
+  - Laudon
+  - Prince Eugene
+  - Martinus
+  - Martinus (Dragon God)
+  - Li Jing
+  - Robert Guiscard
+  - Washington
+  - Xiang Yu
+  - Honda Tadakatsu
+  - Khalid
+books:
+  - book:
+      name: Mounted Attack Increase
+      level: '1'
+      buff:
+        - attribute: Attack
+          class: Mounted
+          value:
+            number: 10
+            unit: percentage
+    condition: all the time
+  - book:
+      name: Mounted Attack Increase
+      level: '2'
+      buff:
+        - attribute: Attack
+          class: Mounted
+          value:
+            number: 15
+            unit: percentage
+    condition: all the time
+  - book:
+      name: Mounted Attack Increase
+      level: '3'
+      buff:
+        - attribute: Attack
+          class: Mounted
+          value:
+            number: 20
+            unit: percentage
+    condition: all the time
+  - book:
+      name: Mounted Attack Increase
+      level: '4'
+      buff:
+        - attribute: Attack
+          class: Mounted
+          value:
+            number: 25
+            unit: percentage
+    condition: all the time
+  - book:
+      name: Mounted HP Increase
+      level: '1'
+      buff:
+        - attribute: HP
+          class: Mounted
+          value:
+            number: 10
+            unit: percentage
+    condition: all the time
+  - book:
+      name: Mounted HP Increase
+      level: '2'
+      buff:
+        - attribute: HP
+          class: Mounted
+          value:
+            number: 15
+            unit: percentage
+    condition: all the time
+  - book:
+      name: Mounted HP Increase
+      level: '3'
+      buff:
+        - attribute: HP
+          class: Mounted
+          value:
+            number: 20
+            unit: percentage
+    condition: all the time
+  - book:
+      name: Mounted HP Increase
+      level: '4'
+      buff:
+        - attribute: HP
+          class: Mounted
+          value:
+            number: 25
+            unit: percentage
+    condition: all the time

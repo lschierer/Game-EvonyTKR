@@ -1,0 +1,85 @@
+name: John Hunyadi
+generals:
+  - Matthias I
+  - Jadwiga
+  - Suleiman the Magnificent
+attributes:
+- category: War Covenant
+  type: personal
+  buff:
+  - attribute: HP
+    class: Archers
+    value:
+      number: 5
+      unit: percentage
+  - attribute: HP
+    class: Siege
+    value:
+      number: 5
+      unit: percentage
+- category: Cooperation Covenant
+  type: passive
+  buff:
+  - attribute: Deserter Capacity
+    value:
+      number: 10
+      unit: percentage
+- category: Peace Covenant
+  type: personal
+  buff:
+  - attribute: Attack
+    class: Siege
+    value:
+      number: 5
+      unit: percentage
+- category: Faith Covenant
+  type: passive
+  buff:
+  - attribute: HP
+    class: Archers
+    condition:
+    - Enemy
+    value:
+      number: 8
+      unit: percentage
+  - attribute: HP
+    class: Siege
+    condition:
+    - Enemy
+    value:
+      number: 8
+      unit: percentage
+- category: Honor Covenant
+  type: personal
+  buff:
+  - attribute: Attack
+    class: Archers
+    condition:
+    - When_Rallying
+    value:
+      number: 5
+      unit: percentage
+  - attribute: Attack
+    class: Siege
+    condition:
+    - When_Rallying
+    value:
+      number: 5
+      unit: percentage
+  - attribute: Attack
+    class: Siege
+    condition:
+    - When_Rallying
+    value:
+      number: 10
+      unit: percentage
+- category: Civilization Covenant
+  type: personal
+  buff:
+  - attribute: Attack
+    class: Siege
+    condition:
+    - Marching
+    value:
+      number: 15
+      unit: percentage

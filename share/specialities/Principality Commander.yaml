@@ -1,0 +1,118 @@
+---
+name: Principality Commander
+levels:
+  - level: 'Green'
+    buff:
+      - attribute: Attack
+        condition:
+          - brings_a_dragon
+        class: Ground
+        value:
+          number: 3
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - brings_a_dragon
+        class: Ground
+        value:
+          number: 2
+          unit: percentage
+      - attribute: HP
+        condition:
+          - brings_a_dragon
+        class: Ground
+        value:
+          number: 2
+          unit: percentage
+  - level: 'Blue'
+    buff:
+      - attribute: Attack
+        condition:
+          - brings_a_dragon
+        class: Ground
+        value:
+          number: 3
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - brings_a_dragon
+        class: Ground
+        value:
+          number: 3
+          unit: percentage
+      - attribute: HP
+        condition:
+          - brings_a_dragon
+        class: Ground
+        value:
+          number: 3
+          unit: percentage
+  - level: 'Purple'
+    buff:
+      - attribute: Attack
+        condition:
+          - brings_a_dragon
+        class: Ground
+        value:
+          number: 6
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - brings_a_dragon
+        class: Ground
+        value:
+          number: 5
+          unit: percentage
+      - attribute: HP
+        condition:
+          - brings_a_dragon
+        class: Ground
+        value:
+          number: 5
+          unit: percentage
+  - level: 'Orange'
+    buff:
+      - attribute: Attack
+        condition:
+          - brings_a_dragon
+        class: Ground
+        value:
+          number: 6
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - brings_a_dragon
+        class: Ground
+        value:
+          number: 5
+          unit: percentage
+      - attribute: HP
+        condition:
+          - brings_a_dragon
+        class: Ground
+        value:
+          number: 5
+          unit: percentage
+  - level: 'Gold'
+    buff:
+      - attribute: Attack
+        condition:
+          - brings_a_dragon
+        class: Ground
+        value:
+          number: 12
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - brings_a_dragon
+        class: Ground
+        value:
+          number: 10
+          unit: percentage
+      - attribute: HP
+        condition:
+          - brings_a_dragon
+        class: Ground
+        value:
+          number: 10
+          unit: percentage

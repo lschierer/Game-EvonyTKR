@@ -1,0 +1,117 @@
+name: Godfrey of Bouillon
+generals:
+- Richard the Lionheart
+- Baldwin IV
+- Philip II
+attributes:
+- category: War Covenant
+  type: personal
+  buff:
+  - attribute: Defense
+    class: Archers
+    value:
+      number: 5
+      unit: percentage
+- category: War Covenant
+  type: passive
+  buff:
+  - attribute: Training Capacity
+    class: Archers
+    value:
+      number: 5
+      unit: percentage
+- category: Cooperation Covenant
+  type: personal
+  buff:
+  - attribute: Attack
+    class: Archers
+    condition:
+    - Defending
+    value:
+      number: 10
+      unit: percentage
+- category: Peace Covenant
+  type: personal
+  buff:
+  - attribute: Marching_Speed
+    value:
+      number: 15
+      unit: percentage
+- category: Peace Covenant
+  type: passive
+  buff:
+  - attribute: Attack
+    class: Archers
+    value:
+      number: 5
+      unit: percentage
+  - attribute: Attack
+    class: Siege
+    value:
+      number: 5
+      unit: percentage
+- category: Faith Covenant
+  type: personal
+  buff:
+  - attribute: Attack
+    class: Archers
+    condition:
+    - Defending
+    value:
+      number: 10
+      unit: percentage
+  - attribute: Defense
+    class: Archers
+    condition:
+    - Defending
+    value:
+      number: 15
+      unit: percentage
+- category: Honor Covenant
+  type: personal
+  buff:
+  - attribute: HP
+    class: Archers
+    condition:
+    - In_City
+    value:
+      number: 10
+      unit: percentage
+  - attribute: HP
+    class: Siege
+    condition:
+    - In_City
+    value:
+      number: 10
+      unit: percentage
+- category: Civilization Covenant
+  type: personal
+  buff:
+  - attribute: Attack
+    class: Archers
+    condition:
+    - In_City
+    value:
+      number: 5
+      unit: percentage
+  - attribute: Attack
+    class: Siege
+    condition:
+    - In_City
+    value:
+      number: 5
+      unit: percentage
+  - attribute: Defense
+    class: Archers
+    condition:
+    - In_City
+    value:
+      number: 5
+      unit: percentage
+  - attribute: Defense
+    class: Siege
+    condition:
+    - In_City
+    value:
+      number: 5
+      unit: percentage

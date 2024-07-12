@@ -1,0 +1,63 @@
+---
+name: Battle of Mantinea
+levels:
+  - level: 'Green'
+    buff:
+      - attribute: HP
+        class: Ground
+        value:
+          number: 3
+          unit: percentage
+      - attribute: HP
+        class: Mounted
+        value:
+          number: 2
+          unit: percentage
+  - level: 'Blue'
+    buff:
+      - attribute: HP
+        class: Ground
+        value:
+          number: 3
+          unit: percentage
+      - attribute: HP
+        class: Mounted
+        value:
+          number: 2
+          unit: percentage
+  - level: 'Purple'
+    buff:
+      - attribute: HP
+        class: Ground
+        value:
+          number: 6
+          unit: percentage
+      - attribute: HP
+        class: Mounted
+        value:
+          number: 4
+          unit: percentage
+  - level: 'Orange'
+    buff:
+      - attribute: HP
+        class: Ground
+        value:
+          number: 6
+          unit: percentage
+      - attribute: HP
+        class: Mounted
+        value:
+          number: 4
+          unit: percentage
+  - level: 'Gold'
+    buff:
+      - attribute: HP
+        class: Ground
+        value:
+          number: 12
+          unit: percentage
+      - attribute: HP
+        class: Mounted
+        value:
+          number: 8
+          unit: percentage

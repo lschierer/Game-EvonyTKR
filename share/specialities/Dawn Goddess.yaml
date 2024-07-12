@@ -1,0 +1,117 @@
+---
+name: Dawn Goddess
+levels:
+  - level: 'Green'
+    buff:
+      - attribute: Attack
+        condition:
+          - When_Defending_Outside_The_Main_City
+        class: Ground
+        value:
+          number: 5
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - When_Defending_Outside_The_Main_City
+        class: Ground
+        value:
+          number: 5
+          unit: percentage
+      - attribute: HP
+        condition:
+          - When_Defending_Outside_The_Main_City
+        value:
+          number: 4
+          unit: percentage
+  - level: 'Blue'
+    buff:
+      - attribute: Attack
+        condition:
+          - When_Defending_Outside_The_Main_City
+        class: Ground
+        value:
+          number: 5
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - When_Defending_Outside_The_Main_City
+        class: Ground
+        value:
+          number: 5
+          unit: percentage
+      - attribute: HP
+        condition:
+          - When_Defending_Outside_The_Main_City
+        class: Ground
+        value:
+          number: 4
+          unit: percentage
+  - level: 'Purple'
+    buff:
+      - attribute: Attack
+        condition:
+          - When_Defending_Outside_The_Main_City
+        class: Ground
+        value:
+          number: 10
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - When_Defending_Outside_The_Main_City
+        class: Ground
+        value:
+          number: 10
+          unit: percentage
+      - attribute: HP
+        condition:
+          - When_Defending_Outside_The_Main_City
+        class: Ground
+        value:
+          number: 8
+          unit: percentage
+  - level: 'Orange'
+    buff:
+      - attribute: Attack
+        condition:
+          - When_Defending_Outside_The_Main_City
+        class: Ground
+        value:
+          number: 10
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - When_Defending_Outside_The_Main_City
+        class: Ground
+        value:
+          number: 10
+          unit: percentage
+      - attribute: HP
+        condition:
+          - When_Defending_Outside_The_Main_City
+        class: Ground
+        value:
+          number: 8
+          unit: percentage
+  - level: 'Gold'
+    buff:
+      - attribute: Attack
+        condition:
+          - When_Defending_Outside_The_Main_City
+        class: Ground
+        value:
+          number: 20
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - When_Defending_Outside_The_Main_City
+        class: Ground
+        value:
+          number: 20
+          unit: percentage
+      - attribute: HP
+        condition:
+          - When_Defending_Outside_The_Main_City
+        class: Ground
+        value:
+          number: 16
+          unit: percentage

@@ -1,0 +1,78 @@
+name: Totila
+generals:
+- Arminius
+- Charles XII
+- Pyrrhus
+attributes:
+- category: War Covenant
+  type: personal
+  buff:
+  - attribute: Marching_Speed
+    value:
+      number: 10
+      unit: percentage
+- category: Cooperation Covenant
+  type: personal
+  buff:
+  - attribute: Defense
+    class: Ground
+    condition:
+    - When_Rallying
+    value:
+      number: 10
+      unit: percentage
+- category: Peace Covenant
+  type: passive
+  buff:
+  - attribute: Training_Speed
+    class: Ground
+    value:
+      number: 5
+      unit: percentage
+- category: Faith Covenant
+  type: personal
+  buff:
+  - attribute: Attack
+    class: Ground
+    condition:
+    - When_Rallying
+    value:
+      number: 10
+      unit: percentage
+- category: Faith Covenant
+  type: passive
+  buff:
+  - attribute: Attack
+    class: Archers
+    condition:
+      - Enemy
+    value:
+      number: 10
+      unit: percentage
+- category: Honor Covenant
+  type: personal
+  buff:
+  - attribute: Attack
+    class: Ground
+    condition:
+    - Marching
+    value:
+      number: 10
+      unit: percentage
+- category: Civilization Covenant
+  type: personal
+  buff:
+  - attribute: Defense
+    class: Ground
+    condition:
+    - Marching
+    value:
+      number: 10
+      unit: percentage
+  - attribute: HP
+    class: Ground
+    condition:
+    - Marching
+    value:
+      number: 10
+      unit: percentage

@@ -1,0 +1,71 @@
+name: Suchet
+generals:
+  - Napoleon
+  - Soult
+  - Louis IX
+attributes:
+- category: War Covenant
+  type: personal
+  buff:
+  - attribute: Attack
+    class: Ground
+    value:
+      number: 5
+      unit: percentage
+- category: War Covenant
+  type: passive
+  buff:
+  - attribute: Training Capacity
+    class: Ground
+    value:
+      number: 5
+      unit: percentage
+- category: Cooperation Covenant
+  type: passive
+  buff:
+  - attribute: Deserter Capacity
+    value:
+      number: 10
+      unit: percentage
+- category: Peace Covenant
+  type: personal
+  buff:
+  - attribute: Defense
+    class: Ground
+    value:
+      number: 10
+      unit: percentage
+- category: Faith Covenant
+  type: personal
+  buff:
+  - attribute: Defense
+    class: Ground
+    condition:
+    - When_Rallying
+    value:
+      number: 10
+      unit: percentage
+- category: Honor Covenant
+  type: personal
+  buff:
+  - attribute: Attack
+    class: Ground
+    condition:
+    - When_Rallying
+    value:
+      number: 15
+      unit: percentage
+- category: Civilization Covenant
+  type: personal
+  buff:
+  - attribute: Attack
+    class: Ground
+    condition:
+    - Marching
+    value:
+      number: 10
+      unit: percentage
+  - attribute: March_Size_Capacity
+    value:
+      number: 5
+      unit: percentage

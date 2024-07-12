@@ -1,0 +1,48 @@
+name: 01HGKXXRT5ARNCK525NRWQXQNR
+members:
+  - Kleos
+others:
+  - Zucca
+  - Petronas
+  - John Churchill
+  - Philip II
+  - Napoleon
+  - Genghis Khan
+  - King Arthur
+books:
+- book:
+    name: March Size Increase
+    level: '1'
+    buff:
+      - attribute: March_Size_Capacity
+        value:
+          number: 3
+          unit: percentage
+  condition: when not mine
+- book:
+    name: March Size Increase
+    level: '2'
+    buff:
+      - attribute: March_Size_Capacity
+        value:
+          number: 6
+          unit: percentage
+  condition: when not mine
+- book:
+    name: March Size Increase
+    level: '3'
+    buff:
+      - attribute: March_Size_Capacity
+        value:
+          number: 9
+          unit: percentage
+  condition: when not mine
+- book:
+    name: March Size Increase
+    level: '4'
+    buff:
+      - attribute: March_Size_Capacity
+        value:
+          number: 12
+          unit: percentage
+  condition: when not mine

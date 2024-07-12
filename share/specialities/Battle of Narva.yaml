@@ -1,0 +1,153 @@
+---
+name: Battle of Narva
+levels:
+  - level: Green
+    buff:
+      - attribute: Attack
+        condition:
+          - Attacking
+        class: Siege
+        value:
+          number: 2
+          unit: percentage
+      - attribute: Attack
+        condition:
+          - Attacking
+        class: Archers
+        value:
+          number: 2
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - Marching
+        class: Archers
+        value:
+          number: 1
+          unit: percentage
+      - attribute: HP
+        condition:
+          - Marching
+        class: Archers
+        value:
+          number: 1
+          unit: percentage
+  - level: Blue
+    buff:
+      - attribute: Attack
+        condition:
+          - Attacking
+        class: Siege
+        value:
+          number: 3
+          unit: percentage
+      - attribute: Attack
+        condition:
+          - Attacking
+        class: Archers
+        value:
+          number: 3
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - Marching
+        class: Archers
+        value:
+          number: 1
+          unit: percentage
+      - attribute: HP
+        condition:
+          - Marching
+        class: Archers
+        value:
+          number: 1
+          unit: percentage
+  - level: Purple
+    buff:
+      - attribute: Attack
+        condition:
+          - Attacking
+        class: Siege
+        value:
+          number: 8
+          unit: percentage
+      - attribute: Attack
+        condition:
+          - Attacking
+        class: Archers
+        value:
+          number: 8
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - Marching
+        class: Archers
+        value:
+          number: 2
+          unit: percentage
+      - attribute: HP
+        condition:
+          - Marching
+        class: Archers
+        value:
+          number: 2
+          unit: percentage
+  - level: Orange
+    buff:
+      - attribute: Attack
+        condition:
+          - Attacking
+        class: Siege
+        value:
+          number: 8
+          unit: percentage
+      - attribute: Attack
+        condition:
+          - Attacking
+        class: Archers
+        value:
+          number: 8
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - Marching
+        class: Archers
+        value:
+          number: 2
+          unit: percentage
+      - attribute: HP
+        condition:
+          - Marching
+        class: Archers
+        value:
+          number: 2
+          unit: percentage
+  - level: Gold
+    buff:
+      - attribute: Attack
+        condition:
+          - Attacking
+        class: Siege
+        value:
+          number: 14
+          unit: percentage
+      - attribute: Attack
+        condition:
+          - Attacking
+        class: Archers
+        value:
+          number: 14
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - Marching
+        class: Archers
+        value:
+          number: 4
+          unit: percentage
+      - attribute: HP
+        condition:
+          - Marching
+        class: Archers
+        value:
+          number: 4
+          unit: percentage

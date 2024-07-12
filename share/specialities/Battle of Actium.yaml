@@ -1,0 +1,118 @@
+---
+name: Battle of Actium
+levels:
+  - level: 'Green'
+    buff:
+      - attribute: Attack
+        condition:
+          - Marching
+        class: Archers
+        value:
+          number: 4
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - Attacking
+        class: Siege
+        value:
+          number: 4
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - Attacking
+        class: Archers
+        value:
+          number: 4
+          unit: percentage
+  - level: 'Blue'
+    buff:
+      - attribute: Attack
+        condition:
+          - Marching
+        class: Archers
+        value:
+          number: 4
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - Attacking
+        class: Siege
+        value:
+          number: 4
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - Attacking
+        class: Archers
+        value:
+          number: 4
+          unit: percentage
+  - level: 'Purple'
+    buff:
+      - attribute: Attack
+        condition:
+          - Marching
+        class: Archers
+        value:
+          number: 8
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - Attacking
+        class: Siege
+        value:
+          number: 8
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - Attacking
+        class: Archers
+        value:
+          number: 8
+          unit: percentage
+  - level: 'Orange'
+    buff:
+      - attribute: Attack
+        condition:
+          - Marching
+        class: Archers
+        value:
+          number: 8
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - Attacking
+        class: Siege
+        value:
+          number: 8
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - Attacking
+        class: Archers
+        value:
+          number: 8
+          unit: percentage
+  - level: 'Gold'
+    buff:
+      - attribute: Attack
+        condition:
+          - Marching
+        class: Archers
+        value:
+          number: 16
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - Attacking
+        class: Siege
+        value:
+          number: 16
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - Attacking
+        class: Archers
+        value:
+          number: 16
+          unit: percentage

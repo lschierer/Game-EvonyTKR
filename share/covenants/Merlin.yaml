@@ -1,0 +1,75 @@
+name: Merlin
+generals:
+- King Arthur
+- Alfred the Great
+- Beowulf
+attributes:
+- category: War Covenant
+  type: personal
+  buff:
+  - attribute: March_Size_Capacity
+    value:
+      number: 5
+      unit: percentage
+- category: Cooperation Covenant
+  type: personal
+  buff:
+  - attribute: HP
+    class: Archers
+    condition:
+    - Marching
+    value:
+      number: 10
+      unit: percentage
+- category: Peace Covenant
+  type: passive
+  buff:
+  - attribute: Training_Speed
+    class: Archers
+    value:
+      number: 5
+      unit: percentage
+- category: Faith Covenant
+  type: personal
+  buff:
+  - attribute: Defense
+    class: Archers
+    condition:
+    - When_Rallying
+    value:
+      number: 10
+      unit: percentage
+- category: Faith Covenant
+  type: passive
+  buff:
+  - attribute: Marching_Speed
+    value:
+      number: 10
+      unit: percentage
+- category: Honor Covenant
+  type: personal
+  buff:
+  - attribute: HP
+    class: Archers
+    condition:
+    - When_Rallying
+    value:
+      number: 5
+      unit: percentage
+- category: Civilization Covenant
+  type: personal
+  buff:
+  - attribute: Attack
+    class: Archers
+    condition:
+    - Marching
+    value:
+      number: 5
+      unit: percentage
+  - attribute: Defense
+    class: Archers
+    condition:
+    - Marching
+    value:
+      number: 5
+      unit: percentage

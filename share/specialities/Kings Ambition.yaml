@@ -1,0 +1,43 @@
+---
+name: King's Ambition
+levels:
+  - level: Green
+    buff:
+      - attribute: Death_to_Soul
+        condition:
+          - In_Main_City
+        value:
+          number: 1
+          unit: percentage
+  - level: Blue
+    buff:
+      - attribute: Death_to_Soul
+        condition:
+          - In_Main_City
+        value:
+          number: 1
+          unit: percentage
+  - level: Purple
+    buff:
+      - attribute: Death_to_Soul
+        condition:
+          - In_Main_City
+        value:
+          number: 1
+          unit: percentage
+  - level: Orange
+    buff:
+      - attribute: Death_to_Soul
+        condition:
+          - In_Main_City
+        value:
+          number: 2
+          unit: percentage
+  - level: Gold
+    buff:
+      - attribute: Death_to_Soul
+        condition:
+          - In_Main_City
+        value:
+          number: 4
+          unit: percentage

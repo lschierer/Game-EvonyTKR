@@ -1,0 +1,54 @@
+name: 01HHE55GYM266T9M3AN0VFSFZN
+members:
+  - Mu Guiying
+  - Raimondo
+  - Raimondo (Odyssey)
+  - Surena
+  - Emperor Qin Shihuang
+others:
+  - Septimius Serverus
+  - William Wallace
+  - Khalid
+  - My Guiying
+books:
+  - book:
+      name: Siege Attack Increase
+      level: '1'
+      buff:
+        - attribute: Attack
+          class: Siege
+          value:
+            number: 10
+            unit: percentage
+    condition: all the time
+  - book:
+      name: Siege Attack Increase
+      level: '2'
+      buff:
+        - attribute: Attack
+          class: Siege
+          value:
+            number: 15
+            unit: percentage
+    condition: all the time
+  - book:
+      name: Siege Attack Increase
+      level: '3'
+      buff:
+        - attribute: Attack
+          class: Siege
+          value:
+            number: 20
+            unit: percentage
+    condition: all the time
+  - book:
+      name: Siege Attack Increase
+      level: '4'
+      buff:
+        - attribute: Attack
+          class: Siege
+          value:
+            number: 25
+            unit: percentage
+    condition: all the time
+
