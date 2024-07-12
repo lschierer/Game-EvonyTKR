@@ -1,0 +1,92 @@
+name: 01HKVDRS2MHZSAX58NQCZTTKEP
+members:
+  - Li Shimin
+others:
+  - Elektra
+  - Elektra (Dragon God)
+  - Vladimir the Great
+  - Idunn
+  - Idunn (Siege)
+  - Winfield Scott
+  - Louis IX
+  - Prince Rhaeger
+  - Eleanor
+  - King Arthur
+  - Genghis Khan
+books:
+  - book:
+      name: Ranged Attack Increase
+      level: '1'
+      buff:
+        - attribute: Attack
+          class: Archers
+          value:
+            number: 10
+            unit: percentage
+    condition: when not mine
+  - book:
+      name: Ranged Attack Increase
+      level: '2'
+      buff:
+        - attribute: Attack
+          class: Archers
+          value:
+            number: 15
+            unit: percentage
+    condition: when not mine
+  - book:
+      name: Ranged Attack Increase
+      level: '3'
+      buff:
+        - attribute: Attack
+          class: Archers
+          value:
+            number: 20
+            unit: percentage
+    condition: when not mine
+  - book:
+      name: Ranged Attack Increase
+      level: '4'
+      buff:
+        - attribute: Attack
+          class: Archers
+          value:
+            number: 25
+            unit: percentage
+    condition: when not mine
+  - book:
+      name: March Size Increase
+      level: '1'
+      buff:
+        - attribute: March_Size_Capacity
+          value:
+            number: 3
+            unit: percentage
+    condition: all the time
+  - book:
+      name: March Size Increase
+      level: '2'
+      buff:
+        - attribute: March_Size_Capacity
+          value:
+            number: 6
+            unit: percentage
+    condition: all the time
+  - book:
+      name: March Size Increase
+      level: '3'
+      buff:
+        - attribute: March_Size_Capacity
+          value:
+            number: 9
+            unit: percentage
+    condition: all the time
+  - book:
+      name: March Size Increase
+      level: '4'
+      buff:
+        - attribute: March_Size_Capacity
+          value:
+            number: 12
+            unit: percentage
+    condition: all the time

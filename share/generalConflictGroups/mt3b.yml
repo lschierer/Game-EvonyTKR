@@ -1,0 +1,57 @@
+name: 01J0482FT3VJT4GSQN74F2FR9T
+members:
+- André Masséna
+- Washington Prime
+others:
+- George A. Custer
+- Barbarossa
+- Ii Naomasa
+- Honda Tadakatsu
+- Khalid
+- Laudon
+- Prince Eugene
+- Martinus
+- Li Jing
+- Robert Guiscard
+- Washington
+- Xiang Yu
+- Isabella
+- King Arthur
+- Genghis Khan
+books:
+  - book:
+      name: March Size Increase
+      level: '1'
+      buff:
+        - attribute: March_Size_Capacity
+          value:
+            number: 3
+            unit: percentage
+    condition: when not mine
+  - book:
+      name: March Size Increase
+      level: '2'
+      buff:
+        - attribute: March_Size_Capacity
+          value:
+            number: 6
+            unit: percentage
+    condition: when not mine
+  - book:
+      name: March Size Increase
+      level: '3'
+      buff:
+        - attribute: March_Size_Capacity
+          value:
+            number: 9
+            unit: percentage
+    condition: when not mine
+  - book:
+      name: March Size Increase
+      level: '4'
+      buff:
+        - attribute: March_Size_Capacity
+          value:
+            number: 12
+            unit: percentage
+    condition: when not mine

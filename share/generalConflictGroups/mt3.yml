@@ -1,0 +1,55 @@
+name: 01HGKYREYA79MNMCQ2B6MBV3N0
+members:
+  - Laudon
+  - Prince Eugene
+  - Martinus
+  - Martinus (Dragon God)
+  - Li Jing
+  - Washington
+  - Robert Guiscard
+  - Xiang Yu
+others:
+  - Ii Naomasa
+  - Honda Tadakatsu
+  - Khalid
+books:
+  - book:
+      name: Mounted Attack Increase
+      level: '1'
+      buff:
+        - attribute: Attack
+          class: Mounted
+          value:
+            number: 10
+            unit: percentage
+    condition: all the time
+  - book:
+      name: Mounted Attack Increase
+      level: '2'
+      buff:
+        - attribute: Attack
+          class: Mounted
+          value:
+            number: 15
+            unit: percentage
+    condition: all the time
+  - book:
+      name: Mounted Attack Increase
+      level: '3'
+      buff:
+        - attribute: Attack
+          class: Mounted
+          value:
+            number: 20
+            unit: percentage
+    condition: all the time
+  - book:
+      name: Mounted Attack Increase
+      level: '4'
+      buff:
+        - attribute: Attack
+          class: Mounted
+          value:
+            number: 25
+            unit: percentage
+    condition: all the time

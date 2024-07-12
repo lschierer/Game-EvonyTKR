@@ -1,0 +1,80 @@
+name: Napoleon Prime
+generals:
+  - Napoleon
+  - André Masséna
+  - Soult
+attributes:
+- category: War Covenant
+  type: personal
+  buff:
+  - attribute: Attack
+    class: Mounted
+    condition:
+    - Against Monsters
+    value:
+      number: 12
+      unit: percentage
+- category: Cooperation Covenant
+  type: personal
+  buff:
+  - attribute: March_Size_Capacity
+    value:
+      number: 5
+      unit: percentage
+- category: Peace Covenant
+  type: personal
+  buff:
+  - attribute: HP
+    class: Mounted
+    condition:
+    - When_Rallying
+    value:
+      number: 8
+      unit: percentage
+- category: Faith Covenant
+  type: passive
+  buff:
+  - attribute: Training_Speed
+    class: Mounted
+    value:
+      number: 10
+      unit: percentage
+  - attribute: Training Capacity
+    class: Mounted
+    value:
+      number: 15
+      unit: percentage
+- category: Honor Covenant
+  type: personal
+  buff:
+  - attribute: Attack
+    class: Mounted
+    condition:
+    - Attacking
+    value:
+      number: 8
+      unit: percentage
+  - attribute: Attack
+    class: Ground
+    condition:
+    - Attacking
+    value:
+      number: 8
+      unit: percentage
+- category: Civilization Covenant
+  type: personal
+  buff:
+  - attribute: Attack
+    class: Mounted
+    condition:
+    - Marching
+    value:
+      number: 12
+      unit: percentage
+  - attribute: Attack
+    class: Mounted
+    condition:
+    - When_Rallying
+    value:
+      number: 15
+      unit: percentage

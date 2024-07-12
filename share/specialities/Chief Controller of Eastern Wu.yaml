@@ -1,0 +1,88 @@
+---
+name: Chief Controller of Eastern Wu
+levels:
+  - level: Green
+    buff:
+      - attribute: Attack
+        class: Ground
+        value:
+          number: 4
+          unit: percentage
+      - attribute: Defense
+        class: Ground
+        value:
+          number: 3
+          unit: percentage
+      - attribute: Defense
+        class: Mounted
+        value:
+          number: 3
+          unit: percentage
+  - level: Blue
+    buff:
+      - attribute: Attack
+        class: Ground
+        value:
+          number: 4
+          unit: percentage
+      - attribute: Defense
+        class: Ground
+        value:
+          number: 4
+          unit: percentage
+      - attribute: Defense
+        class: Mounted
+        value:
+          number: 4
+          unit: percentage
+  - level: Purple
+    buff:
+      - attribute: Attack
+        class: Ground
+        value:
+          number: 8
+          unit: percentage
+      - attribute: Defense
+        class: Ground
+        value:
+          number: 7
+          unit: percentage
+      - attribute: Defense
+        class: Mounted
+        value:
+          number: 7
+          unit: percentage
+  - level: Orange
+    buff:
+      - attribute: Attack
+        class: Ground
+        value:
+          number: 8
+          unit: percentage
+      - attribute: Defense
+        class: Ground
+        value:
+          number: 7
+          unit: percentage
+      - attribute: Defense
+        class: Mounted
+        value:
+          number: 7
+          unit: percentage
+  - level: Orange
+    buff:
+      - attribute: Attack
+        class: Ground
+        value:
+          number: 16
+          unit: percentage
+      - attribute: Defense
+        class: Ground
+        value:
+          number: 14
+          unit: percentage
+      - attribute: Defense
+        class: Mounted
+        value:
+          number: 14
+          unit: percentage

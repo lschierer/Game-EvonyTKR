@@ -1,0 +1,153 @@
+---
+name: Light of Wisdom
+levels:
+  - level: 'Green'
+    buff:
+      - attribute: Attack
+        condition:
+          - Marching
+        class: Archers
+        value:
+          number: 4
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - Marching
+        class: Archers
+        value:
+          number: 3
+          unit: percentage
+      - attribute: HP
+        condition:
+          - Attacking
+        class: Archers
+        value:
+          number: 1
+          unit: percentage
+      - attribute: HP
+        condition:
+          - Attacking
+        class: Siege
+        value:
+          number: 1
+          unit: percentage
+  - level: 'Blue'
+    buff:
+      - attribute: Attack
+        condition:
+          - Marching
+        class: Archers
+        value:
+          number: 4
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - Marching
+        class: Archers
+        value:
+          number: 3
+          unit: percentage
+      - attribute: HP
+        condition:
+          - Attacking
+        class: Archers
+        value:
+          number: 2
+          unit: percentage
+      - attribute: HP
+        condition:
+          - Attacking
+        class: Siege
+        value:
+          number: 2
+          unit: percentage
+  - level: 'Purple'
+    buff:
+      - attribute: Attack
+        condition:
+          - Marching
+        class: Archers
+        value:
+          number: 8
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - Marching
+        class: Archers
+        value:
+          number: 6
+          unit: percentage
+      - attribute: HP
+        condition:
+          - Attacking
+        class: Archers
+        value:
+          number: 3
+          unit: percentage
+      - attribute: HP
+        condition:
+          - Attacking
+        class: Siege
+        value:
+          number: 3
+          unit: percentage
+  - level: 'Orange'
+    buff:
+      - attribute: Attack
+        condition:
+          - Marching
+        class: Archers
+        value:
+          number: 8
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - Marching
+        class: Archers
+        value:
+          number: 6
+          unit: percentage
+      - attribute: HP
+        condition:
+          - Attacking
+        class: Archers
+        value:
+          number: 3
+          unit: percentage
+      - attribute: HP
+        condition:
+          - Attacking
+        class: Siege
+        value:
+          number: 3
+          unit: percentage
+  - level: 'Gold'
+    buff:
+      - attribute: Attack
+        condition:
+          - Marching
+        class: Archers
+        value:
+          number: 16
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - Marching
+        class: Archers
+        value:
+          number: 12
+          unit: percentage
+      - attribute: HP
+        condition:
+          - Attacking
+        class: Archers
+        value:
+          number: 6
+          unit: percentage
+      - attribute: HP
+        condition:
+          - Attacking
+        class: Siege
+        value:
+          number: 6
+          unit: percentage

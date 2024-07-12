@@ -1,0 +1,66 @@
+name: Washington Prime
+generals:
+- Washington
+- Casimir Pulaski
+- Nathanael Greene
+attributes:
+- category: War Covenant
+  type: personal
+  buff:
+  - attribute: Marching_Speed
+    value:
+      number: 10
+      unit: percentage
+- category: Cooperation Covenant
+  type: personal
+  buff:
+  - attribute: Defense
+    class: Mounted
+    condition:
+    - When_Rallying
+    value:
+      number: 10
+      unit: percentage
+- category: Peace Covenant
+  type: passive
+  buff:
+  - attribute: Training Capacity
+    class: Mounted
+    value:
+      number: 10
+      unit: percentage
+- category: Faith Covenant
+  type: personal
+  buff:
+  - attribute: Defense
+    class: Mounted
+    value:
+      number: 10
+      unit: percentage
+- category: Faith Covenant
+  type: passive
+  buff:
+  - attribute: Attack
+    class: Mounted
+    value:
+      number: 10
+      unit: percentage
+- category: Honor Covenant
+  type: personal
+  buff:
+  - attribute: Death_to_Wounded
+    value:
+      number: 5
+      unit: percentage
+- category: Civilization Covenant
+  type: personal
+  buff:
+  - attribute: HP
+    class: Mounted
+    value:
+      number: 10
+      unit: percentage
+  - attribute: March_Size_Capacity
+    value:
+      number: 5
+      unit: percentage

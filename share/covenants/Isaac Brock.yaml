@@ -1,0 +1,100 @@
+name: Isaac Brock
+generals:
+- Edward the Black Prince
+- William Marshal
+- John Churchill
+attributes:
+- category: War Covenant
+  type: personal
+  buff:
+  - attribute: Attack
+    condition:
+    - In_City
+    value:
+      number: 5
+      unit: percentage
+- category: Cooperation Covenant
+  type: passive
+  buff:
+  - attribute: Death_to_Soul
+    condition:
+    - In_Main_City
+    value:
+      number: 10
+      unit: percentage
+- category: Peace Covenant
+  type: personal
+  buff:
+  - attribute: HP
+    condition:
+    - In_City
+    value:
+      number: 5
+      unit: percentage
+- category: Peace Covenant
+  type: passive
+  buff:
+  - attribute: Defense
+    condition:
+    - In_City
+    value:
+      number: 5
+      unit: percentage
+- category: Faith Covenant
+  type: personal
+  buff:
+  - attribute: HP
+    class: Ground
+    condition:
+    - In_City
+    value:
+      number: 10
+      unit: percentage
+  - attribute: Defense
+    class: Ground
+    condition:
+    - In_City
+    value:
+      number: 10
+      unit: percentage
+- category: Honor Covenant
+  type: personal
+  buff:
+  - attribute: Defense
+    class: Ground
+    condition:
+    - In_City
+    value:
+      number: 5
+      unit: percentage
+  - attribute: Defense
+    class: Mounted
+    condition:
+    - In_City
+    value:
+      number: 5
+      unit: percentage
+  - attribute: HP
+    class: Ground
+    condition:
+    - In_City
+    value:
+      number: 5
+      unit: percentage
+  - attribute: HP
+    class: Mounted
+    condition:
+    - In_City
+    value:
+      number: 5
+      unit: percentage
+- category: Civilization Covenant
+  type: personal
+  buff:
+  - attribute: Attack
+    class: Ground
+    condition:
+    - In_City
+    value:
+      number: 30
+      unit: percentage

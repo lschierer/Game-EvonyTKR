@@ -1,0 +1,99 @@
+name: André Masséna
+generals:
+  - Roland
+  - Turenne
+  - Betrand du Guesclin
+attributes:
+- category: War Covenant
+  type: personal
+  buff:
+  - attribute: Defense
+    condition:
+    - Reduces Monster
+    value:
+      number: 8
+      unit: percentage
+- category: Cooperation Covenant
+  type: passive
+  buff:
+  - attribute: Marching_Speed
+    value:
+      number: 15
+      unit: percentage
+- category: Peace Covenant
+  type: personal
+  buff:
+  - attribute: Defense
+    class: Mounted
+    condition:
+    - When_Rallying
+    value:
+      number: 10
+      unit: percentage
+  - attribute: Attack
+    class: Mounted
+    condition:
+    - Marching
+    value:
+      number: 10
+      unit: percentage
+- category: Faith Covenant
+  type: passive
+  buff:
+  - attribute: Attack
+    class: Archers
+    condition:
+    - Enemy
+    value:
+      number: 5
+      unit: percentage
+  - attribute: Attack
+    class: Siege
+    condition:
+    - Enemy
+    value:
+      number: 5
+      unit: percentage
+- category: Honor Covenant
+  type: personal
+  buff:
+  - attribute: Attack
+    class: Archers
+    condition:
+    - Enemy
+    - Attacking
+    value:
+      number: 5
+      unit: percentage
+  - attribute: Attack
+    class: Siege
+    condition:
+    - Enemy
+    - Attacking
+    value:
+      number: 5
+      unit: percentage
+- category: Civilization Covenant
+  type: personal
+  buff:
+  - attribute: Attack
+    class: Ground
+    condition:
+    - When_Rallying
+    value:
+      number: 10
+      unit: percentage
+  - attribute: Attack
+    class: Mounted
+    condition:
+    - When_Rallying
+    value:
+      number: 10
+      unit: percentage
+  - attribute: Attack
+    class: Mounted
+    condition:
+    - When_Rallying
+    value:
+      number: 10
+      unit: percentage

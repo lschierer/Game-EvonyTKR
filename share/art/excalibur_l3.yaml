@@ -1,0 +1,26 @@
+---
+art:
+  name: Excalibur
+  level: '1'
+  buff:
+    - attribute: Attack
+      condition:
+        - Marching
+      class: Mounted
+      value:
+        number: 25
+        unit: percentage
+    - attribute: Defense
+      condition:
+        - Marching
+      class: Mounted
+      value:
+        number: 25
+        unit: percentage
+    - attribute: HP
+      condition:
+        - Marching
+      class: Mounted
+      value:
+        number: 25
+        unit: percentage

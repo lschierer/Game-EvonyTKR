@@ -1,0 +1,44 @@
+name: 01HP34D6PR00VY31NQ79JWE4P1
+members:
+  - Alessandra
+others:
+  - Suchet
+  - Genghis Khan
+  - King Arthur
+books:
+  - book:
+      name: March Size Increase
+      level: '1'
+      buff:
+        - attribute: March_Size_Capacity
+          value:
+            number: 3
+            unit: percentage
+    condition: when not mine
+  - book:
+      name: March Size Increase
+      level: '2'
+      buff:
+        - attribute: March_Size_Capacity
+          value:
+            number: 6
+            unit: percentage
+    condition: when not mine
+  - book:
+      name: March Size Increase
+      level: '3'
+      buff:
+        - attribute: March_Size_Capacity
+          value:
+            number: 9
+            unit: percentage
+    condition: when not mine
+  - book:
+      name: March Size Increase
+      level: '4'
+      buff:
+        - attribute: March_Size_Capacity
+          value:
+            number: 12
+            unit: percentage
+    condition: when not mine
