@@ -1,0 +1,76 @@
+name: Theodosius I
+generals:
+  - Nero
+  - Septimius Severus
+  - Aurelian
+attributes:
+  - category: War Covenant
+    type: personal
+    buff:
+      - attribute: Death_to_Wounded
+        condition:
+          - Attacking
+        value:
+          number: 5
+          unit: percentage
+  - category: Cooperation Covenant
+    type: personal
+    buff:
+      - attribute: Marching_Speed
+        value:
+          number: 10
+          unit: percentage
+  - category: Peace Covenant
+    type: passive
+    buff:
+      - attribute: Training Capacity
+        class: Siege
+        value:
+          number: 10
+          unit: percentage
+  - category: Faith Covenant
+    type: personal
+    buff:
+      - attribute: Defense
+        class: Siege
+        condition:
+          - Marching
+        value:
+          number: 10
+          unit: percentage
+  - category: Faith Covenant
+    type: passive
+    buff:
+      - attribute: Training_Speed
+        class: Siege
+        value:
+          number: 10
+          unit: percentage
+  - category: Honor Covenant
+    type: personal
+    buff:
+      - attribute: Attack
+        class: Siege
+        condition:
+          - Marching
+        value:
+          number: 10
+          unit: percentage
+  - category: Civilization Covenant
+    type: personal
+    buff:
+      - attribute: HP
+        class: Siege
+        condition:
+          - Marching
+        value:
+          number: 10
+          unit: percentage
+      - attribute: Attack
+        class: Siege
+        condition:
+          - Defending
+        value:
+          number: 5
+          unit: percentage
+
