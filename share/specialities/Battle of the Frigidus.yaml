@@ -1,0 +1,118 @@
+---
+name: Battle of the Frigidus
+levels:
+  - level: Green
+    buff:
+      - attribute: Attack
+        condition:
+          - Marching
+        class: Siege
+        value:
+          number: 4
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - Marching
+        class: Siege
+        value:
+          number: 2
+          unit: percentage
+      - attribute: HP
+        condition:
+          - Marching
+        class: Siege
+        value:
+          number: 2
+          unit: percentage
+  - level: Blue
+    buff:
+      - attribute: Attack
+        condition:
+          - Marching
+        class: Siege
+        value:
+          number: 4
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - Marching
+        class: Siege
+        value:
+          number: 3
+          unit: percentage
+      - attribute: HP
+        condition:
+          - Marching
+        class: Siege
+        value:
+          number: 3
+          unit: percentage
+  - level: Purple
+    buff:
+      - attribute: Attack
+        condition:
+          - Marching
+        class: Siege
+        value:
+          number: 8
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - Marching
+        class: Siege
+        value:
+          number: 5
+          unit: percentage
+      - attribute: HP
+        condition:
+          - Marching
+        class: Siege
+        value:
+          number: 5
+          unit: percentage
+  - level: Orange
+    buff:
+      - attribute: Attack
+        condition:
+          - Marching
+        class: Siege
+        value:
+          number: 8
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - Marching
+        class: Siege
+        value:
+          number: 5
+          unit: percentage
+      - attribute: HP
+        condition:
+          - Marching
+        class: Siege
+        value:
+          number: 5
+          unit: percentage
+  - level: Gold
+    buff:
+      - attribute: Attack
+        condition:
+          - Marching
+        class: Siege
+        value:
+          number: 16
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - Marching
+        class: Siege
+        value:
+          number: 10
+          unit: percentage
+      - attribute: HP
+        condition:
+          - Marching
+        class: Siege
+        value:
+          number: 10
+          unit: percentage
