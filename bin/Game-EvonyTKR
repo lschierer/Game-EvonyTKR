@@ -1,9 +1,14 @@
 #!/usr/bin/perl
+#PODNAME: Game::EvonyTKR
+use 5.38.0;
+use strict;
+use warnings;
 use Game::EvonyTKR;
-
-Game::EvonyTKR->run;
 
 =head1 NAME
 
 Game::EvonyTKR - wrapper for the Game::EvonyTKR distribution
 
+=cut
+
+Game::EvonyTKR->run;
