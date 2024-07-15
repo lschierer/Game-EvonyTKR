@@ -1,0 +1,9 @@
+#!/usr/bin/perl
+use Game::EvonyTKR;
+
+Game::EvonyTKR->run;
+
+=head1 NAME
+
+Game::EvonyTKR - wrapper for the Game::EvonyTKR distribution
+
