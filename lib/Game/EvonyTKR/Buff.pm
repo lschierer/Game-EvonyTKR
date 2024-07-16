@@ -5,6 +5,7 @@ use File::ShareDir ':ALL';
 use YAML::XS;
 use Moose::Util::TypeConstraints;
 use Data::Dumper qw(Dumper);
+use Game::EvonyTKR::Buff::Value;
 use namespace::autoclean;
 
 # PODNAME: Game::EvonyTKR::Buff
@@ -71,7 +72,10 @@ has 'condition' => (
     isa => 'buffCondition'
 );
 
-
+has 'value' => (
+    is  => 'ro',
+    isa => 'Game::EvonyTKR::Buff::Value'
+);
  
 # methods
 
