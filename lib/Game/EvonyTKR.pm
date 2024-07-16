@@ -1,12 +1,12 @@
+package Game::EvonyTKR;
 use 5.38.0;
 use strict;
 use warnings;
-package Game::EvonyTKR;
+
 use base qw(App::Cmd::Simple);
+use namespace::autoclean;
 
-=head1 NAME
-
-Game::EvonyTKR - Perl Modules providing utilities for players of Evony The King's Return.
+# ABSTRACT: Perl Modules providing utilities for players of Evony The King's Return.
 
 =head1 DESCRIPTION
 
