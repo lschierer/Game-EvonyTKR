@@ -1,12 +1,13 @@
-package Game::EvonyTKR::Buff::Value;
-use 5.38.0;
-use Moose;
-use Moose::Util::TypeConstraints;
-use Data::Dumper qw(Dumper);
-use strict;
-use warnings;
-use namespace::autoclean;
+use 5.40.0;
+use experimental 'class';
 
+class Game::EvonyTKR::Buff::Value {
+
+use Types::Standard qw(is_Int Int Str is_Str);
+use Types::Common::Numeric qw(PositiveOrZeroInt);
+use Type::Utils "is"; 
+use namespace::autoclean;
+# PODNAME: Game::EvonyTKR::Buff::Value
 # ABSTRACT: Values for Evony TKR Buffs
 
 =head1 SYNOPSIS
@@ -25,25 +26,31 @@ before they are then added together.
 
 =cut
 
-# extends, roles, attributes, etc.
+  field $number :reader :param //= 0;
 
-subtype 'ValueType'
-  => as Str
-  => where {
-    $_ eq 'flat' or $_ eq 'percentage'
+  ADJUST {
+    my @errors;
+    is_Int($number) or push @errors => "number must be an integer, not $number.
+    ";
+    PositiveOrZeroInt->check($number) or push @errors => "number must be positive, not $number";
+    if (@errors) {
+            die join ', ' => @errors;
+        }
   }
-  => message {
-    "($_) is not a valid ValueType.  Valid values are 'flat' and 'percentage'."
-  };
 
-has 'number' => (
-  is  => 'ro',
-  isa => 'Int'
-);
+  field $unit :reader :param //= 'percentage';
 
-has 'unit' => (
-  is  => 'ro',
-  isa => 'ValueType'
-);
+  ADJUST {
+    my @errors;
+    is_Str($unit) or push @errors => "unit must be a string, not $unit.";
+    ($unit =~ /^(percentage|flat)$/) or push @errors => "unit must match 'percentage' or 'unit' not '$unit'.";
+    if (@errors) {
+            die join ', ' => @errors;
+        }
+  }
+
+}
+
+
 
 1;

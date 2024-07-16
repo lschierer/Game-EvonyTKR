@@ -1,12 +1,13 @@
-package Game::EvonyTKR::Buff;
-use 5.38.0;
-use Moose;
-use File::ShareDir ':ALL';
-use YAML::XS;
-use Moose::Util::TypeConstraints;
-use Data::Dumper qw(Dumper);
-use Game::EvonyTKR::Buff::Value;
+use 5.40.0;
+use experimental qw(class);
+
+class Game::EvonyTKR::Buff {
+use Game::EvonyTKR::Buff::Data;
+use Types::Standard qw(is_Int Int Str is_Str);
+use Types::Common::Numeric qw(PositiveOrZeroInt);
+use Type::Utils "is"; 
 use namespace::autoclean;
+# PODNAME: Game::EvonyTKR::Buff
 
 # PODNAME: Game::EvonyTKR::Buff
 
@@ -27,101 +28,72 @@ Buffs are most commonly I<calculated> as if all buffs came from generals.  This 
 
 =cut
 
-# extends, roles, attributes, etc.
+my $classData = Game::EvonyTKR::Buff::Data->new();
+my @BuffAttributes;
+my @BuffConditions;
+my @BuffClasses;
 
-my @BuffAttributes = _initialize_attributes(); 
-my @BuffConditions = _initialize_conditions();
-my @BuffClasses = _initialize_classes();
+ADJUST {
+  if(!(defined @BuffAttributes)) {
+    $classData->set_BuffAttributes();
+    @BuffAttributes = $classData->BuffAttributes();
+  }
 
-subtype 'buffAttribute'
-    => as Str
-    => where {
-        (
-            grep {/^$_/} @BuffAttributes  
-        )
-    };
+  if(!(defined @BuffConditions)) {
+    $classData->set_BuffConditions();
+    @BuffConditions = $classData->BuffConditions();
+  }
+  
+  if(!(defined @BuffClasses)) {
+    $classData->set_BuffClasses();
+    @BuffClasses = $classData->BuffClasses();
+  }
+}
 
-subtype 'buffCondition'
-    => as Str
-    => where {
-        (
-            grep {/^$_/} @BuffConditions  
-        )
-    };
+field $attribute :reader :param;
 
-subtype 'buffClass'
-    => as Str
-    => where {
-        (
-            grep {/^$_/} @BuffClasses
-        )
-    };
+field $class :reader :param  //= 'All Troops';
 
-has 'attribute' => (
-    is => 'ro',
-    isa => 'buffAttribute'
-);
+method has_class {
+  if(defined $class) {
+    if($class !~ /All/i) {
+      return true;
+    }
+  }
+  return 0;
+}
 
-has 'class' => (
-    is => 'ro',
-    isa => 'BuffCondition'
-);
+field @condition :reader ;
 
-has 'condition' => (
-    is => 'ro',
-    isa => 'buffCondition'
-);
+method set_condition ($nc) {
+  if(is_Str($nc)) {
+    if(!(defined @BuffConditions)){
+      $classData->set_BuffConditions();
+      @BuffConditions = $classData->BuffConditions();
+    }
+    if(grep {/^$nc$/} @BuffConditions) {
+      if(!(grep {/^$nc$/} @condition)) {
+        push @condition, $nc;
+      }
+    }
+  }
+}
 
-has 'value' => (
-    is  => 'ro',
-    isa => 'Game::EvonyTKR::Buff::Value'
-);
+method has_condition {
+  if(scalar @condition >= 1) {
+    return true;
+  }
+  return 0;
+}
+
+field $value :reader;
+
+}
+
  
 # methods
 
-sub _initialize_attributes {
-    my $self = shift;
-    my $data_location = dist_file('Game-EvonyTKR', 'buff/attributes.yaml');
-    open (my $DATA, '<', $data_location) or die $!;
-    my $yaml = do { local $/; <$DATA> };
-    my $data = Load $yaml; 
-    close $DATA;
 
-    my @BuffAttributes = $data->{'attributes'};   
-
-    return @BuffAttributes;
-    
-}
-
-sub _initialize_conditions {
-    my $self = shift;
-    my $data_location = dist_file('Game-EvonyTKR', 'buff/conditions.yaml');
-    open (my $DATA, '<', $data_location) or die $!;
-    my $yaml = do { local $/; <$DATA> };
-    my $data = Load $yaml; 
-    close $DATA;
-
-    my @BuffConditions = $data->{'conditions'};   
-
-    return @BuffConditions;
-    
-}
-
-sub _initialize_classes {
-    my $self = shift;
-    my $data_location = dist_file('Game-EvonyTKR', 'buff/classes.yaml');
-    open (my $DATA, '<', $data_location) or die $!;
-    my $yaml = do { local $/; <$DATA> };
-    my $data = Load $yaml; 
-    close $DATA;
-
-    my @BuffClasses = $data->{'classes'};   
-
-    return @BuffClasses;
-    
-}
-
-__PACKAGE__->meta->make_immutable;
  
 1;
 
