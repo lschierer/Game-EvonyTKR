@@ -1,17 +1,18 @@
-use strict;
-use warnings;
-use v5.38.0;
+package TestsFor::Game::EvonyTKR::Buff::Value;
+use 5.40.0;
 
-use Test::Most 'die', tests => 7; 
+use Test::Most; 
 
 use Game::EvonyTKR::Buff::Value;
 
- my $v = Game::EvonyTKR::Buff::Value->new();
- isa_ok($v, 'Game::EvonyTKR::Buff::Value');
+my $v = Game::EvonyTKR::Buff::Value->new();
+is $v->number, 0, 'default number is 0';
+is $v->unit, 'percentage', 'default unit is percentage';
 
  my $value = Game::EvonyTKR::Buff::Value->new (
     number  => 15,
     unit    => 'percentage'
   );
-explain 'I was just created:  ', $value;
 isa_ok($value, 'Game::EvonyTKR::Buff::Value');
+
+done_testing;
