@@ -2,6 +2,10 @@ use 5.38.0;
 package Game::EvonyTKR::Buff;
 use Moose;
 use File::ShareDir ':ALL';
+use YAML::XS;
+use Moose::Util::TypeConstraints;
+use Data::Dumper qw(Dumper);
+
 use namespace::autoclean;
 # PODNAME: Game::EvonyTKR::Buff
 
@@ -24,6 +28,9 @@ Buffs are most commonly I<calculated> as if all buffs came from generals.  This 
 
 # extends, roles, attributes, etc.
 
+my @BuffAttributes; 
+
+
 has 'attribute' => (
     is => 'ro'
 );
@@ -39,6 +46,17 @@ has 'condition' => (
 
  
 # methods
+
+sub initialize_attributes {
+    my $self = shift;
+    my $data_location = dist_file('Game-EvonyTKR-Buff', 'buff/attributes.yaml');
+    open (my $DATA, '<', $data_location) or die $!;
+    my $yaml = do { local $/; <$DATA> };
+    my $data = Load $yaml; 
+
+    say Dumper $data;
+   
+}
 
 __PACKAGE__->meta->make_immutable;
  
