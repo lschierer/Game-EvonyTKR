@@ -29,11 +29,30 @@ Buffs are most commonly I<calculated> as if all buffs came from generals.  This 
 # extends, roles, attributes, etc.
 
 my @BuffAttributes = _initialize_attributes(); 
+my @BuffConditions = _initialize_conditions();
+my @BuffClasses = _initialize_classes();
+
 subtype 'buffAttribute'
     => as Str
     => where {
         (
-            grep(/^$_/, @BuffAttributes) 
+            grep {/^$_/} @BuffAttributes  
+        )
+    };
+
+subtype 'buffCondition'
+    => as Str
+    => where {
+        (
+            grep {/^$_/} @BuffConditions  
+        )
+    };
+
+subtype 'buffClass'
+    => as Str
+    => where {
+        (
+            grep {/^$_/} @BuffClasses
         )
     };
 
@@ -43,11 +62,13 @@ has 'attribute' => (
 );
 
 has 'class' => (
-    is => 'ro'
+    is => 'ro',
+    isa => 'BuffCondition'
 );
 
 has 'condition' => (
-    is => 'ro'
+    is => 'ro',
+    isa => 'buffCondition'
 );
 
 
@@ -60,6 +81,7 @@ sub _initialize_attributes {
     open (my $DATA, '<', $data_location) or die $!;
     my $yaml = do { local $/; <$DATA> };
     my $data = Load $yaml; 
+    close $DATA;
 
     my @BuffAttributes = $data->{'attributes'};   
 
@@ -67,9 +89,35 @@ sub _initialize_attributes {
     
 }
 
+sub _initialize_conditions {
+    my $self = shift;
+    my $data_location = dist_file('Game-EvonyTKR', 'buff/conditions.yaml');
+    open (my $DATA, '<', $data_location) or die $!;
+    my $yaml = do { local $/; <$DATA> };
+    my $data = Load $yaml; 
+    close $DATA;
+
+    my @BuffConditions = $data->{'conditions'};   
+
+    return @BuffConditions;
+    
+}
+
+sub _initialize_classes {
+    my $self = shift;
+    my $data_location = dist_file('Game-EvonyTKR', 'buff/classes.yaml');
+    open (my $DATA, '<', $data_location) or die $!;
+    my $yaml = do { local $/; <$DATA> };
+    my $data = Load $yaml; 
+    close $DATA;
+
+    my @BuffClasses = $data->{'classes'};   
+
+    return @BuffClasses;
+    
+}
+
 __PACKAGE__->meta->make_immutable;
  
 1;
 
-__DATA__
-@@ attributes
