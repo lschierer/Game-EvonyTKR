@@ -11,4 +11,4 @@ Game::EvonyTKR - wrapper for the Game::EvonyTKR distribution
 
 =cut
 
-Game::EvonyTKR::Buff->initialize_attributes;
+Game::EvonyTKR::Buff->new();
