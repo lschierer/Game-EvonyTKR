@@ -3,7 +3,7 @@
 use 5.38.0;
 use strict;
 use warnings;
-use Game::EvonyTKR;
+use Game::EvonyTKR::Buff;
 
 =head1 NAME
 
@@ -11,4 +11,4 @@ Game::EvonyTKR - wrapper for the Game::EvonyTKR distribution
 
 =cut
 
-Game::EvonyTKR->run;
+Game::EvonyTKR::Buff->initialize_attributes;
