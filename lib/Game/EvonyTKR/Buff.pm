@@ -1,12 +1,12 @@
-use 5.38.0;
 package Game::EvonyTKR::Buff;
+use 5.38.0;
 use Moose;
 use File::ShareDir ':ALL';
 use YAML::XS;
 use Moose::Util::TypeConstraints;
 use Data::Dumper qw(Dumper);
-
 use namespace::autoclean;
+
 # PODNAME: Game::EvonyTKR::Buff
 
 # ABSTRACT: Buff and Debuff primatives 
@@ -28,11 +28,10 @@ Buffs are most commonly I<calculated> as if all buffs came from generals.  This 
 
 # extends, roles, attributes, etc.
 
-my @BuffAttributes; 
+my @BuffAttributes = _initialize_attributes(); 
 subtype 'buffAttribute'
     => as Str
     => where {
-        $Self->_initialize_attributes;
         (
             grep(/^$_/, @BuffAttributes) 
         )
@@ -62,7 +61,9 @@ sub _initialize_attributes {
     my $yaml = do { local $/; <$DATA> };
     my $data = Load $yaml; 
 
-    @BuffAttributes = $data->{'attributes'};   
+    my @BuffAttributes = $data->{'attributes'};   
+
+    return @BuffAttributes;
     
 }
 
