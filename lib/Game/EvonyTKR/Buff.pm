@@ -29,10 +29,18 @@ Buffs are most commonly I<calculated> as if all buffs came from generals.  This 
 # extends, roles, attributes, etc.
 
 my @BuffAttributes; 
-
+subtype 'buffAttribute'
+    => as Str
+    => where {
+        $Self->_initialize_attributes;
+        (
+            grep(/^$_/, @BuffAttributes) 
+        )
+    };
 
 has 'attribute' => (
-    is => 'ro'
+    is => 'ro',
+    isa => 'buffAttribute'
 );
 
 has 'class' => (
@@ -47,15 +55,15 @@ has 'condition' => (
  
 # methods
 
-sub initialize_attributes {
+sub _initialize_attributes {
     my $self = shift;
-    my $data_location = dist_file('Game-EvonyTKR-Buff', 'buff/attributes.yaml');
+    my $data_location = dist_file('Game-EvonyTKR', 'buff/attributes.yaml');
     open (my $DATA, '<', $data_location) or die $!;
     my $yaml = do { local $/; <$DATA> };
     my $data = Load $yaml; 
 
-    say Dumper $data;
-   
+    @BuffAttributes = $data->{'attributes'};   
+    
 }
 
 __PACKAGE__->meta->make_immutable;
