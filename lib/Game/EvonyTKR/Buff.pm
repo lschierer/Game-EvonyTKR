@@ -34,17 +34,17 @@ my @BuffConditions;
 my @BuffClasses;
 
 ADJUST {
-  if(!(defined @BuffAttributes)) {
+  if(!(@BuffAttributes)) {
     $classData->set_BuffAttributes();
     @BuffAttributes = $classData->BuffAttributes();
   }
 
-  if(!(defined @BuffConditions)) {
+  if(!(@BuffConditions)) {
     $classData->set_BuffConditions();
     @BuffConditions = $classData->BuffConditions();
   }
   
-  if(!(defined @BuffClasses)) {
+  if(!(@BuffClasses)) {
     $classData->set_BuffClasses();
     @BuffClasses = $classData->BuffClasses();
   }
@@ -67,7 +67,7 @@ field @condition :reader ;
 
 method set_condition ($nc) {
   if(is_Str($nc)) {
-    if(!(defined @BuffConditions)){
+    if(!(@BuffConditions)){
       $classData->set_BuffConditions();
       @BuffConditions = $classData->BuffConditions();
     }

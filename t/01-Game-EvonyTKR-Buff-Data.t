@@ -2,6 +2,7 @@ package TestsFor::Game::EvonyTKR::Buff::Data;
 use 5.40.0;
 
 use Test::Most; 
+use Test::File::ShareDir::Object::Dist;
 
 use Game::EvonyTKR::Buff::Data;
 
@@ -15,4 +16,4 @@ ok(scalar @attributes >= 20, "Attribute Initialization");
 my $attack = grep {/^Attack$/} @attributes;
 ok($attack == 1, "Attack is in the Attribute list");
 
-done_testing;
+done_testing();
