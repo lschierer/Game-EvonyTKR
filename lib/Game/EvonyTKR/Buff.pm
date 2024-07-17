@@ -86,7 +86,7 @@ method has_condition {
   return 0;
 }
 
-field $value :reader;
+field $value :reader :param;
 
 }
 
