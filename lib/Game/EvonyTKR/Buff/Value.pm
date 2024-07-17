@@ -3,10 +3,10 @@ use experimental 'class';
 
 class Game::EvonyTKR::Buff::Value {
 
-use Types::Standard qw(is_Int Int Str is_Str);
-use Types::Common::Numeric qw(PositiveOrZeroInt);
-use Type::Utils "is"; 
-use namespace::autoclean;
+  use Types::Standard        qw(is_Int Int Str is_Str);
+  use Types::Common::Numeric qw(PositiveOrZeroInt);
+  use Type::Utils "is";
+  use namespace::autoclean;
 # PODNAME: Game::EvonyTKR::Buff::Value
 # ABSTRACT: Values for Evony TKR Buffs
 
@@ -32,10 +32,11 @@ before they are then added together.
     my @errors;
     is_Int($number) or push @errors => "number must be an integer, not $number.
     ";
-    PositiveOrZeroInt->check($number) or push @errors => "number must be positive, not $number";
+    PositiveOrZeroInt->check($number)
+      or push @errors => "number must be positive, not $number";
     if (@errors) {
-            die join ', ' => @errors;
-        }
+      die join ', ' => @errors;
+    }
   }
 
   field $unit :reader :param //= 'percentage';
@@ -43,14 +44,13 @@ before they are then added together.
   ADJUST {
     my @errors;
     is_Str($unit) or push @errors => "unit must be a string, not $unit.";
-    ($unit =~ /^(percentage|flat)$/) or push @errors => "unit must match 'percentage' or 'unit' not '$unit'.";
+    ($unit =~ /^(percentage|flat)$/)
+      or push @errors => "unit must match 'percentage' or 'unit' not '$unit'.";
     if (@errors) {
-            die join ', ' => @errors;
-        }
+      die join ', ' => @errors;
+    }
   }
 
 }
-
-
 
 1;
