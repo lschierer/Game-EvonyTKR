@@ -33,6 +33,7 @@ This base class implements the attributes and methods common to all Generals, bu
     } 
   }
 
+
   field $leadership :reader :param;
 
   ADJUST {
@@ -127,12 +128,29 @@ This base class implements the attributes and methods common to all Generals, bu
     my @errors;
     is_Int($level) or push @errors => "level must be an integer, not $level";
     PositiveOrZeroInt->check($level) or push @errors => "level must be positive, not $level";
-    IntRange[1, 45]->check($level) or push @errors => "level must be between 1 and 45 inclusive";
+    #using $Type->check() seems cleaner, but for the IntRange type causes an unblessed reference error. the is() function avoids that.  Reminder to follow up on that. 
+    is(IntRange[1, 45],$level) or push @errors => "level must be between 1 and 45 inclusive";
 
     if (@errors) {
       die join ', ' => @errors;
     }
   }
 
+  method effective_leadership() {
+    return $level * $leadership_increment + $leadership;
+  }
+
+  method effective_attack() {
+    return $level * $attack_increment + $attack;
+  }
+
+  method effective_defense() {
+    return $level * $defense_increment + $defense;
+  }
+
+  method effective_politics() {
+    return $level * politics_increment + $politics_increment;
+  }
+  
 }
 1;

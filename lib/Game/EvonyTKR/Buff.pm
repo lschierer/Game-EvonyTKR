@@ -9,8 +9,6 @@ use Type::Utils "is";
 use namespace::autoclean;
 # PODNAME: Game::EvonyTKR::Buff
 
-# PODNAME: Game::EvonyTKR::Buff
-
 # ABSTRACT: Buff and Debuff primatives 
 
 =head1 SYNOPSIS
