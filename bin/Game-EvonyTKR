@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #PODNAME: Game::EvonyTKR
-use 5.38.0;
+use 5.40.0;
 use strict;
 use warnings;
 use Game::EvonyTKR::Buff;
@@ -11,4 +11,4 @@ Game::EvonyTKR - wrapper for the Game::EvonyTKR distribution
 
 =cut
 
-Game::EvonyTKR::Buff->new();
+Game::EvonyTKR->new();

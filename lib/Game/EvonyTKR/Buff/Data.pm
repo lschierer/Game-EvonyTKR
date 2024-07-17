@@ -6,6 +6,7 @@ class Game::EvonyTKR::Buff::Data {
 use Types::Standard qw(is_Int Int Str is_Str);
 use Types::Common::Numeric qw(PositiveOrZeroInt);
 use Type::Utils "is"; 
+use File::ShareDir ':ALL';
 use YAML::XS;
 use namespace::autoclean;
 
