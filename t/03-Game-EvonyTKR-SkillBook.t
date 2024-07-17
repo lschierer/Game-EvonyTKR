@@ -11,4 +11,5 @@ my $sb = Game::EvonyTKR::SkillBook->new(
 );
 isa_ok($sb, 'Game::EvonyTKR::SkillBook');
 
+
 done_testing();

@@ -32,6 +32,9 @@ ok(scalar $buff->condition() == 1, "Duplicate Condition rejected");
 $buff->set_condition('Enemy');
 ok(scalar $buff->condition() == 2, "Second Condition did not overwrite");
 
+my $cr = $buff->compare($buff);
+ok($cr, 'Self comparision worked');
+
 $obj->clear;
 
-done_testing;
+done_testing();

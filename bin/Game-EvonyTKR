@@ -4,6 +4,8 @@ use 5.40.0;
 use strict;
 use warnings;
 use Game::EvonyTKR::Buff;
+use Game::EvonyTKR::Buff::Value;
+use Game::EvonyTKR::SkillBook;
 
 =head1 NAME
 
@@ -11,4 +13,20 @@ Game::EvonyTKR - wrapper for the Game::EvonyTKR distribution
 
 =cut
 
-Game::EvonyTKR->new();
+my $v = Game::EvonyTKR::Buff::Value->new(
+    number  => 10,
+);
+my $buff = Game::EvonyTKR::Buff->new(
+    attribute   => 'Attack',
+    value       => $v
+);
+
+say $buff->compare($buff);
+
+my $sb = Game::EvonyTKR::SkillBook->new(
+    name    => 'New Book 1'
+);
+
+$sb->add_buff($buff);
+
+
