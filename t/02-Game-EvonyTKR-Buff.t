@@ -17,11 +17,20 @@ my $value = Game::EvonyTKR::Buff::Value->new (
     number  => 15,
     unit    => 'percentage'
   );
-my @conditions = ('Attacking');
 my $buff = Game::EvonyTKR::Buff->new(
   attribute => 'Attack',
+  value => $value
 );
 isa_ok($buff, 'Game::EvonyTKR::Buff');
+
+$buff->set_condition('Attacking');
+ok($buff->has_condition(), "1 Buff Condition Set");
+
+$buff->set_condition('Attacking');
+ok(scalar $buff->condition() == 1, "Duplicate Condition rejected");
+
+$buff->set_condition('Enemy');
+ok(scalar $buff->condition() == 2, "Second Condition did not overwrite");
 
 $obj->clear;
 
