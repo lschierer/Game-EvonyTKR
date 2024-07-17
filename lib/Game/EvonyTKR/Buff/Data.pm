@@ -23,11 +23,7 @@ use namespace::autoclean;
 
 =cut
 
-  field @BuffAttributes;
-
-  method BuffAttributes {
-    return @BuffAttributes;
-  }
+  field @BuffAttributes :reader;
 
   method set_BuffAttributes {
     my $data_location = dist_file('Game-EvonyTKR', 'buff/attributes.yaml');
@@ -38,11 +34,7 @@ use namespace::autoclean;
     @BuffAttributes = @{ $data->{'attributes'} };
   }
 
-  field @BuffConditions;
-
-  method BuffConditions {
-    return @BuffConditions;
-  }
+  field @BuffConditions :reader;
 
   method set_BuffConditions {
     my $data_location = dist_file('Game-EvonyTKR', 'buff/conditions.yaml');
@@ -53,11 +45,7 @@ use namespace::autoclean;
     @BuffConditions = @{ $data->{'conditions'} };
   }
 
-  field @BuffClasses;
-
-  method BuffClasses {
-    return @BuffClasses;
-  }
+  field @BuffClasses :reader;
 
   method set_BuffClasses {
     my $data_location = dist_file('Game-EvonyTKR', 'buff/classes.yaml');
