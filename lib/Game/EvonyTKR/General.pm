@@ -2,10 +2,11 @@ use v5.40.0;
 use experimental qw(class);
 
 class Game::EvonyTKR::General {
-use Types::Common qw( t is_Num is_Str is_Int);
-use Type::Utils "is"; 
-use Game::EvonyTKR::SkillBook::Special;
-use namespace::autoclean;
+  use Carp;
+  use Types::Common qw( t is_Num is_Str is_Int);
+  use Type::Utils "is"; 
+  use Game::EvonyTKR::SkillBook::Special;
+  use namespace::autoclean;
 # PODNAME: Game::EvonyTKR::General
 
 # ABSTRACT: Module for processing information about Evony TKR Generals.
@@ -146,7 +147,7 @@ This base class implements the attributes and methods common to all Generals, bu
     my $pInt = t('PositiveOrZeroInt');
     is_Int($level) or push @errors => "level must be an integer, not $level";
     $pInt->check($level) or push @errors => "level must be positive, not $level";
-    $type = t('IntRange[1, 45]');
+    my $type = t('IntRange[1, 45]');
     $type->check($level) or push @errors => "level must be between 1 and 45 inclusive";
 
     if (@errors) {
@@ -176,14 +177,11 @@ This base class implements the attributes and methods common to all Generals, bu
     my @errors;
     my $type = blessed $builtInBook;
     if($type ne 'Game::EvonyTKR::SkillBook::Special'){
-      my $type = blessed $builtInBook;
       push @errors => 'builtInBook must be a SkillBook::Special, not $type';
       if (@errors) {
         die join ', ' => @errors;
       }
     }
-
   }
-
 }
 1;

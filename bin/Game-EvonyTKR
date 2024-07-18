@@ -3,6 +3,7 @@
 use v5.40.0;
 use strict;
 use warnings;
+use Carp;
 use Game::EvonyTKR::Buff;
 use Game::EvonyTKR::Buff::Value;
 use Game::EvonyTKR::SkillBook::Special;
@@ -40,5 +41,5 @@ my $g = Game::EvonyTKR::General->new(
   defense_increment     => 0.1,
   politics              => 1.0,
   politics_increment    => 0.1,
-  builtInBook           => $sb
+  builtInBook           => $sb,
 );
