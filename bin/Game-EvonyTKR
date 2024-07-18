@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Game::EvonyTKR::Buff;
 use Game::EvonyTKR::Buff::Value;
-use Game::EvonyTKR::SkillBook;
+use Game::EvonyTKR::SkillBook::Special;
 use Game::EvonyTKR::General;
 
 =head1 NAME
@@ -24,7 +24,7 @@ my $buff = Game::EvonyTKR::Buff->new(
 
 say $buff->compare($buff);
 
-my $sb = Game::EvonyTKR::SkillBook->new(
+my $sb = Game::EvonyTKR::SkillBook::Special->new(
     name    => 'New Book 1'
 );
 
