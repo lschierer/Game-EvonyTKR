@@ -1,14 +1,14 @@
 use v5.40.0;
 use experimental qw(class);
 
-class Game::EvonyTKR::Buff::EvaluationMultipliers {
+class Game::EvonyTKR::Buff::EvaluationMultipliers::Mayor {
   use Carp;
   use Types::Common qw( t is_Num is_Str is_Int);
   use Type::Utils "is"; 
   use namespace::autoclean;
-# PODNAME: Game::EvonyTKR::Buff::EvaluationMultipliers
+# PODNAME: Game::EvonyTKR::Buff::EvaluationMultipliers::Mayor
 
-# ABSTRACT: Module for processing information about Evony TKR Generals.
+# ABSTRACT: Game::EvonyTKR::Buff Evaluation Multipliers for Mayor use cases.
 
 =head1 SYNOPSIS
 
@@ -20,33 +20,12 @@ class Game::EvonyTKR::Buff::EvaluationMultipliers {
 
 =head1 DESCRIPTION
 
-This ought to be a role, but that is not yet implemented in perl Corinna.
+See Game::EvonyTKR::Buff::EvaluationMultipliers for a general description.
 
-For now a Game::EvonyTKR::General has-a (set of) Game::EvonyTKR::Buff::EvaluationMultipliers rather than :does Game::EvonyTKR::Buff:Evaluation which is what I wanted.  
+This provides the base overrides for the Mayor use cases. 
 
-This is intended as an abstract class, but again, those are not implemented in Corinna yet.  I'm not sure if this will save me time or cost me time as a result. 
-
-Default values come from https://www.evonyanswers.com/post/evony-answers-attribute-methodology-explanation as of 2024-07-18, except the
-defaults for the debuffs, which I do intend to use from that site, but cannot apply here, because they are totally custom per troop type to account for the 
-in-game biases between troops of different classes.
-
-This value has the generic versions, or what would happen if you had generals that had no conditions on their debuffs.  That is, the general does I<not> say any of 
-
-=over
-
-=item * when attacking
-
-=item * when reinforcing
-
-=item * when the main defense general
-
-=back
-
-or any of the variety of other things that get read in as conditions by Game::EvonyTKR::Buff - except that it I<does> have entries for generic debuffs, with, as I said, bogus values. 
-
-While EvonyAnswers chose to organize this into Objects for Offensive, Toughness, Troop Preservation, and the corresponding Debuffs, I have gone with a flatter list to allow for greater flexibility as some of these do not apply at all to certain situations, and to take advantage of the currently limited state of perl Corinna. 
-
-I recognize that the flat list of attributes is an anti-pattern, and that a hash is typically recommended, but with this pattern, I can take advantage of Corinna's built in type checking and method generation capabilities to the maximal extent currently implemented. 
+I have left values in place for most of the buffs on the theory that this
+helps keep the Mayor's troops alive, and thus keeps the Mayor's debuffs in play.   However, since you only need one troop of any type for a debuff to be effective, you do not care *which* troop class that one troop is from, and thus one troop buff is just as good as another. A generic buff is still slightly better than a specific buff in that it helps keep three (Sub Cities do not have siege) troops alive instead of just one.  Siege buffs are unfortunately worthless.
 
 =cut 
 
@@ -67,7 +46,7 @@ I recognize that the flat list of attributes is an anti-pattern, and that a hash
  
 the Attack Buff with no conditions or class attribute. 
 =cut 
-  field $GenericAttack :reader :param //= 2.14833;
+  field $GenericAttack :reader  = 0.33333;
 
   ADJUST {
     my @errors;
@@ -80,66 +59,12 @@ the Attack Buff with no conditions or class attribute.
     }
   }
 
-=item GroundAttack
- 
-the Attack Buff with no conditions but with Ground Class attribute. 
-=cut 
-  
-  field $GroundAttack :reader :param //= 0.11111;
-
-  ADJUST {
-    my @errors;
-    my $pNum = t('PositiveOrZeroNum');
-    $pNum->check($GroundAttack) or push @errors => "GroundAttack must be a Positive Number, not $GroundAttack";
-    my $range = t('IntRange[0, 10]');
-    $range->check($GroundAttack) or push @errors => "GroundAttack must be within the range 0-10 inclusive, not $GroundAttack";
-    if (@errors) {
-      croak join ', ' => @errors;
-    }
-  }
-
-=item MountedAttack
- 
-the Attack Buff with no conditions but with Mounted Class attribute. 
-=cut 
-
-  field $MountedAttack :reader :param //= 0.11111;
-
-  ADJUST {
-    my @errors;
-    my $pNum = t('PositiveOrZeroNum');
-    $pNum->check($MountedAttack) or push @errors => "MountedAttack must be a Positive Number, not $MountedAttack";
-    my $range = t('IntRange[0, 10]');
-    $range->check($MountedAttack) or push @errors => "MountedAttack must be within the range 0-10 inclusive, not $MountedAttack";
-    if (@errors) {
-      croak join ', ' => @errors;
-    }
-  }
-
-=item RangedAttack
- 
-the Attack Buff with no conditions but with Ranged Class attribute. 
-=cut 
-
-  field $RangedAttack :reader :param //= 0.11111;
-
-  ADJUST {
-    my @errors;
-    my $pNum = t('PositiveOrZeroNum');
-    $pNum->check($RangedAttack) or push @errors => "RangedAttack must be a Positive Number, not $RangedAttack";
-    my $range = t('IntRange[0, 10]');
-    $range->check($RangedAttack) or push @errors => "RangedAttack must be within the range 0-10 inclusive, not $RangedAttack";
-    if (@errors) {
-      croak join ', ' => @errors;
-    }
-  }
-
 =item SiegeAttack
  
 the Attack Buff with no conditions but with Siege Class attribute. 
 =cut 
 
-  field $SiegeAttack :reader :param //= 0.11111;
+  field $SiegeAttack :reader = 0;
 
   ADJUST {
     my @errors;
@@ -152,11 +77,12 @@ the Attack Buff with no conditions but with Siege Class attribute.
     }
   }
 
+
 =item GenericDefense
  
 the Defense Buff with no conditions or class attribute. 
 =cut 
-  field $GenericDefense :reader :param //= 1.55391;
+  field $GenericDefense :reader  = 0.66668;
 
   ADJUST {
     my @errors;
@@ -169,66 +95,12 @@ the Defense Buff with no conditions or class attribute.
     }
   }
 
-=item GroundDefense
- 
-the Defense Buff with no conditions but with Ground Class attribute. 
-=cut 
-  
-  field $GroundDefense :reader :param //= 0.16667;
-
-  ADJUST {
-    my @errors;
-    my $pNum = t('PositiveOrZeroNum');
-    $pNum->check($GroundDefense) or push @errors => "GroundDefense must be a Positive Number, not $GroundDefense";
-    my $range = t('IntRange[0, 10]');
-    $range->check($GroundDefense) or push @errors => "GroundDefense must be within the range 0-10 inclusive, not $GroundDefense";
-    if (@errors) {
-      croak join ', ' => @errors;
-    }
-  }
-
-=item MountedDefense
- 
-the Defense Buff with no conditions but with Mounted Class attribute. 
-=cut 
-
-  field $MountedDefense :reader :param //= 0.16667;
-
-  ADJUST {
-    my @errors;
-    my $pNum = t('PositiveOrZeroNum');
-    $pNum->check($MountedDefense) or push @errors => "MountedDefense must be a Positive Number, not $MountedDefense";
-    my $range = t('IntRange[0, 10]');
-    $range->check($MountedDefense) or push @errors => "MountedDefense must be within the range 0-10 inclusive, not $MountedDefense";
-    if (@errors) {
-      croak join ', ' => @errors;
-    }
-  }
-
-=item RangedDefense
- 
-the Defense Buff with no conditions but with Ranged Class attribute. 
-=cut 
-
-  field $RangedDefense :reader :param //= 0.16667;
-
-  ADJUST {
-    my @errors;
-    my $pNum = t('PositiveOrZeroNum');
-    $pNum->check($RangedDefense) or push @errors => "RangedDefense must be a Positive Number, not $RangedDefense";
-    my $range = t('IntRange[0, 10]');
-    $range->check($RangedDefense) or push @errors => "RangedDefense must be within the range 0-10 inclusive, not $RangedDefense";
-    if (@errors) {
-      croak join ', ' => @errors;
-    }
-  }
-
 =item SiegeDefense
  
 the Defense Buff with no conditions but with Siege Class attribute. 
 =cut 
 
-  field $SiegeDefense :reader :param //= 0.16667;
+  field $SiegeDefense :reader = 0;
 
   ADJUST {
     my @errors;
@@ -245,7 +117,7 @@ the Defense Buff with no conditions but with Siege Class attribute.
  
 the HP Buff with no conditions or class attribute. 
 =cut 
-  field $GenericHP :reader :param //= 1.67101;
+  field $GenericHP :reader  = 0.66668;
 
   ADJUST {
     my @errors;
@@ -258,66 +130,12 @@ the HP Buff with no conditions or class attribute.
     }
   }
 
-=item GroundHP
- 
-the HP Buff with no conditions but with Ground Class attribute. 
-=cut 
-  
-  field $GroundHP :reader :param //= 0.16667;
-
-  ADJUST {
-    my @errors;
-    my $pNum = t('PositiveOrZeroNum');
-    $pNum->check($GroundHP) or push @errors => "GroundHP must be a Positive Number, not $GroundHP";
-    my $range = t('IntRange[0, 10]');
-    $range->check($GroundHP) or push @errors => "GroundHP must be within the range 0-10 inclusive, not $GroundHP";
-    if (@errors) {
-      croak join ', ' => @errors;
-    }
-  }
-
-=item MountedHP
- 
-the HP Buff with no conditions but with Mounted Class attribute. 
-=cut 
-
-  field $MountedHP :reader :param //= 0.16667;
-
-  ADJUST {
-    my @errors;
-    my $pNum = t('PositiveOrZeroNum');
-    $pNum->check($MountedHP) or push @errors => "MountedHP must be a Positive Number, not $MountedHP";
-    my $range = t('IntRange[0, 10]');
-    $range->check($MountedHP) or push @errors => "MountedHP must be within the range 0-10 inclusive, not $MountedHP";
-    if (@errors) {
-      croak join ', ' => @errors;
-    }
-  }
-
-=item RangedHP
- 
-the HP Buff with no conditions but with Ranged Class attribute. 
-=cut 
-
-  field $RangedHP :reader :param //= 0.16667;
-
-  ADJUST {
-    my @errors;
-    my $pNum = t('PositiveOrZeroNum');
-    $pNum->check($RangedHP) or push @errors => "RangedHP must be a Positive Number, not $RangedHP";
-    my $range = t('IntRange[0, 10]');
-    $range->check($RangedHP) or push @errors => "RangedHP must be within the range 0-10 inclusive, not $RangedHP";
-    if (@errors) {
-      croak join ', ' => @errors;
-    }
-  }
-
 =item SiegeHP
  
 the HP Buff with no conditions but with Siege Class attribute. 
 =cut 
 
-  field $SiegeHP :reader :param //= 0.16667;
+  field $SiegeHP :reader :param //= 0;
 
   ADJUST {
     my @errors;
@@ -330,48 +148,12 @@ the HP Buff with no conditions but with Siege Class attribute.
     }
   }
 
-=item GroundSpeed 
-
-the Ground (In-Battle Movement) Speed Buff with no conditions. 
-=cut 
-
-  field $GroundSpeed :reader :param //= 0.16667;
-
-  ADJUST {
-    my @errors;
-    my $pNum = t('PositiveOrZeroNum');
-    $pNum->check($GroundSpeed) or push @errors => "GroundSpeed must be a Positive Number, not $GroundSpeed";
-    my $range = t('IntRange[0, 10]');
-    $range->check($GroundSpeed) or push @errors => "GroundSpeed must be within the range 0-10 inclusive, not $GroundSpeed";
-    if (@errors) {
-      croak join ', ' => @errors;
-    }
-  }
-
-=item MountedSpeed 
-
-the Mounted (In-Battle Movement) Speed Buff with no conditions. 
-=cut 
-
-  field $MountedSpeed :reader :param //= 0.16667;
-
-  ADJUST {
-    my @errors;
-    my $pNum = t('PositiveOrZeroNum');
-    $pNum->check($MountedSpeed) or push @errors => "MountedSpeed must be a Positive Number, not $MountedSpeed";
-    my $range = t('IntRange[0, 10]');
-    $range->check($MountedSpeed) or push @errors => "MountedSpeed must be within the range 0-10 inclusive, not $MountedSpeed";
-    if (@errors) {
-      croak join ', ' => @errors;
-    }
-  }
-
 =item MarchSizeIncrease 
 
 the March Size Increase Buff with no conditions. 
 =cut 
 
-  field $MarchSizeIncrease :reader :param //= 2.66667;
+  field $MarchSizeIncrease :reader = 0;
 
   ADJUST {
     my @errors;
@@ -389,7 +171,7 @@ the March Size Increase Buff with no conditions.
 the Rally Size Increase Buff with no conditions. 
 =cut 
 
-  field $RallySizeIncrease :reader :param //= 0.50000;
+  field $RallySizeIncrease :reader = 0;
 
   ADJUST {
     my @errors;
@@ -402,88 +184,13 @@ the Rally Size Increase Buff with no conditions.
     }
   }
 
-=item RangedRangeIncrease 
-
-The Ranged Range Increase Buff with no conditions (in other words, how far away can a ranged troop hit something).
-This defaults to zero with the assumption that everyone is appropriately using the skill books and armor, and thus it cancels out.  I dislike that, as it would lead an uninformed player to disvalue the books and armor and get slaughtered. 
-=cut 
-
-  field $RangedRangeIncrease :reader :param //= 0;
-
-  ADJUST {
-    my @errors;
-    my $pNum = t('PositiveOrZeroNum');
-    $pNum->check($RangedRangeIncrease) or push @errors => "RangedRangeIncrease must be a Positive Number, not $RangedRangeIncrease";
-    my $range = t('IntRange[0, 10]');
-    $range->check($RangedRangeIncrease) or push @errors => "RangedRangeIncrease must be within the range 0-10 inclusive, not $RangedRangeIncrease";
-    if (@errors) {
-      croak join ', ' => @errors;
-    }
-  }
-
-=item SiegeRangeIncrease 
-
-The Siege Range Increase Buff with no conditions (in other words, how far away can a Siege Machine hit something).
-This defaults to zero with the assumption that everyone is appropriately using the skill books and armor, and thus it cancels out.  I dislike that, as it would lead an uninformed player to disvalue the books and armor and get slaughtered. 
-=cut 
-
-  field $SiegeRangeIncrease :reader :param //= 0;
-
-  ADJUST {
-    my @errors;
-    my $pNum = t('PositiveOrZeroNum');
-    $pNum->check($SiegeRangeIncrease) or push @errors => "SiegeRangeIncrease must be a Positive Number, not $SiegeRangeIncrease";
-    my $range = t('IntRange[0, 10]');
-    $range->check($SiegeRangeIncrease) or push @errors => "SiegeRangeIncrease must be within the range 0-10 inclusive, not $SiegeRangeIncrease";
-    if (@errors) {
-      croak join ', ' => @errors;
-    }
-  }
-
-=item Death2Wounded 
-
-the Troop Death into Wounded Buff with no conditions. 
-=cut 
-
-  field $Death2Wounded :reader :param //= 0.25555;
-
-  ADJUST {
-    my @errors;
-    my $pNum = t('PositiveOrZeroNum');
-    $pNum->check($Death2Wounded) or push @errors => "Death2Wounded must be a Positive Number, not $Death2Wounded";
-    my $range = t('IntRange[0, 10]');
-    $range->check($Death2Wounded) or push @errors => "Death2Wounded must be within the range 0-10 inclusive, not $Death2Wounded";
-    if (@errors) {
-      croak join ', ' => @errors;
-    }
-  }
-
-=item Death2Souls 
-
-the Troop Death into Souls Buff with no conditions. 
-=cut 
-
-  field $Death2Souls :reader :param //= 0.12555;
-
-  ADJUST {
-    my @errors;
-    my $pNum = t('PositiveOrZeroNum');
-    $pNum->check($Death2Souls) or push @errors => "Death2Souls must be a Positive Number, not $Death2Souls";
-    my $range = t('IntRange[0, 10]');
-    $range->check($Death2Souls) or push @errors => "Death2Souls must be within the range 0-10 inclusive, not $Death2Souls";
-    if (@errors) {
-      croak join ', ' => @errors;
-    }
-  }
-
-
 ##### Debuffs 
 
 =item GenericAttackDebuff
  
 the AttackDebuff with no conditions or class attribute. 
 =cut 
-  field $GenericAttackDebuff :reader :param //= 0.1;
+  field $GenericAttackDebuff :reader :param //= 2;
 
   ADJUST {
     my @errors;
@@ -501,7 +208,7 @@ the AttackDebuff with no conditions or class attribute.
 the AttackDebuff with no conditions but with Ground Class attribute. 
 =cut 
   
-  field $GroundAttackDebuff :reader :param //= 0.1;
+  field $GroundAttackDebuff :reader :param //= 2;
 
   ADJUST {
     my @errors;
@@ -519,7 +226,7 @@ the AttackDebuff with no conditions but with Ground Class attribute.
 the AttackDebuff with no conditions but with Mounted Class attribute. 
 =cut 
 
-  field $MountedAttackDebuff :reader :param //= 0.1;
+  field $MountedAttackDebuff :reader :param //= 2;
 
   ADJUST {
     my @errors;
@@ -537,7 +244,7 @@ the AttackDebuff with no conditions but with Mounted Class attribute.
 the AttackDebuffDebuff with no conditions but with Ranged Class attribute. 
 =cut 
 
-  field $RangedAttackDebuff :reader :param //= 0.1;
+  field $RangedAttackDebuff :reader :param //= 2;
 
   ADJUST {
     my @errors;
@@ -555,7 +262,7 @@ the AttackDebuffDebuff with no conditions but with Ranged Class attribute.
 the AttackDebuffDebuff with no conditions but with Siege Class attribute. 
 =cut 
 
-  field $SiegeAttackDebuff :reader :param //= 0.1;
+  field $SiegeAttackDebuff :reader :param //= 0;
 
   ADJUST {
     my @errors;
@@ -572,7 +279,7 @@ the AttackDebuffDebuff with no conditions but with Siege Class attribute.
  
 the DefenseDebuff with no conditions or class attribute. 
 =cut 
-  field $GenericDefenseDebuff :reader :param //= 0.1;
+  field $GenericDefenseDebuff :reader :param //= 2;
 
   ADJUST {
     my @errors;
@@ -590,7 +297,7 @@ the DefenseDebuff with no conditions or class attribute.
 the DefenseDebuff with no conditions but with Ground Class attribute. 
 =cut 
   
-  field $GroundDefenseDebuff :reader :param //= 0.1;
+  field $GroundDefenseDebuff :reader :param //= 2;
 
   ADJUST {
     my @errors;
@@ -608,7 +315,7 @@ the DefenseDebuff with no conditions but with Ground Class attribute.
 the DefenseDebuff with no conditions but with Mounted Class attribute. 
 =cut 
 
-  field $MountedDefenseDebuff :reader :param //= 0.1;
+  field $MountedDefenseDebuff :reader :param //= 2;
 
   ADJUST {
     my @errors;
@@ -626,7 +333,7 @@ the DefenseDebuff with no conditions but with Mounted Class attribute.
 the DefenseDebuff with no conditions but with Ranged Class attribute. 
 =cut 
 
-  field $RangedDefenseDebuff :reader :param //= 0.1;
+  field $RangedDefenseDebuff :reader :param //= 2;
 
   ADJUST {
     my @errors;
@@ -644,7 +351,7 @@ the DefenseDebuff with no conditions but with Ranged Class attribute.
 the DefenseDebuff with no conditions but with Siege Class attribute. 
 =cut 
 
-  field $SiegeDefenseDebuff :reader :param //= 0.1;
+  field $SiegeDefenseDebuff :reader :param //= 2;
 
   ADJUST {
     my @errors;
@@ -661,7 +368,7 @@ the DefenseDebuff with no conditions but with Siege Class attribute.
  
 the HPDebuff with no conditions or class attribute. 
 =cut 
-  field $GenericHPDebuff :reader :param //= 0.1;
+  field $GenericHPDebuff :reader :param //= 2;
 
   ADJUST {
     my @errors;
@@ -679,7 +386,7 @@ the HPDebuff with no conditions or class attribute.
 the HPDebuff with no conditions but with Ground Class attribute. 
 =cut 
   
-  field $GroundHPDebuff :reader :param //= 0.1;
+  field $GroundHPDebuff :reader :param //= 2;
 
   ADJUST {
     my @errors;
@@ -697,7 +404,7 @@ the HPDebuff with no conditions but with Ground Class attribute.
 the HPDebuff with no conditions but with Mounted Class attribute. 
 =cut 
 
-  field $MountedHPDebuff :reader :param //= 0.1;
+  field $MountedHPDebuff :reader :param //= 2;
 
   ADJUST {
     my @errors;
@@ -715,7 +422,7 @@ the HPDebuff with no conditions but with Mounted Class attribute.
 the HPDebuff with no conditions but with Ranged Class attribute. 
 =cut 
 
-  field $RangedHPDebuff :reader :param //= 0.1;
+  field $RangedHPDebuff :reader :param //= 2;
 
   ADJUST {
     my @errors;
@@ -733,7 +440,7 @@ the HPDebuff with no conditions but with Ranged Class attribute.
 the HPDebuff with no conditions but with Siege Class attribute. 
 =cut 
 
-  field $SiegeHPDebuff :reader :param //= 0.1;
+  field $SiegeHPDebuff :reader :param //= 2;
 
   ADJUST {
     my @errors;
@@ -751,7 +458,7 @@ the HPDebuff with no conditions but with Siege Class attribute.
 the Troop Death into Wounded Debuff with no conditions. 
 =cut 
 
-  field $Death2WoundedDebuff :reader :param //= 0.1;
+  field $Death2WoundedDebuff :reader :param //= 1;
 
   ADJUST {
     my @errors;
@@ -769,7 +476,7 @@ the Troop Death into Wounded Debuff with no conditions.
 the Troop Death into Souls Debuff with no conditions. 
 =cut 
 
-  field $Death2SoulsDebuff :reader :param //= 0.1;
+  field $Death2SoulsDebuff :reader :param //= 1;
 
   ADJUST {
     my @errors;
