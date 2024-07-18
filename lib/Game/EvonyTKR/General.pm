@@ -6,6 +6,7 @@ class Game::EvonyTKR::General {
   use Types::Common qw( t is_Num is_Str is_Int);
   use Type::Utils "is"; 
   use Game::EvonyTKR::SkillBook::Special;
+  use Game::EvonyTKR::Buff::EvaluationMultipliers;
   use namespace::autoclean;
 # PODNAME: Game::EvonyTKR::General
 
@@ -178,6 +179,19 @@ This base class implements the attributes and methods common to all Generals, bu
     my $type = blessed $builtInBook;
     if($type ne 'Game::EvonyTKR::SkillBook::Special'){
       push @errors => "builtInBook must be a Game::EvonyTKR::SkillBook::Special, not $type";
+      if (@errors) {
+        die join ', ' => @errors;
+      }
+    }
+  }
+
+  field $BuffMultipliers :reader :param //= Game::EvonyTKR::Buff::EvaluationMultipliers->new();
+
+  ADJUST {
+    my @errors;
+    my $type = blessed $BuffMultipliers;
+    if($type ne 'Game::EvonyTKR::Buff::EvaluationMultipliers'){
+      push @errors => "BuffMultipliers must be a Game::EvonyTKR::Buff::EvaluationMultipliers, not $type";
       if (@errors) {
         die join ', ' => @errors;
       }
