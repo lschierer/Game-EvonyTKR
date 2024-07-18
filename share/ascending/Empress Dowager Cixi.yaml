@@ -1,0 +1,136 @@
+---
+ascending:
+- level: '1red'
+  buff:
+    - attribute: Defense
+      condition:
+        - Enemy
+      class: Ground
+      value:
+        number: -10
+        unit: percentage
+    - attribute: Defense
+      condition:
+        - Enemy
+      class: Mounted
+      value:
+        number: -10
+        unit: percentage
+    - attribute: HP
+      condition:
+        - Enemy
+      class: Ground
+      value:
+        number: -10
+        unit: percentage
+    - attribute: HP
+      condition:
+        - Enemy
+      class: Mounted
+      value:
+        number: -10
+        unit: percentage
+- level: '2red'
+  buff:
+    - attribute: Defense
+      condition:
+        - Enemy
+      class: Ground
+      value:
+        number: -15
+        unit: percentage
+    - attribute: Defense
+      condition:
+        - Enemy
+      class: Mounted
+      value:
+        number: -15
+        unit: percentage
+    - attribute: SubCity_Training_Speed
+      condition:
+        - When_City_Mayor_for_this_SubCity
+      value:
+        number: 15
+        unit: percentage
+- level: '3red'
+  buff:
+    - attribute: Defense
+      condition:
+        - Enemy
+      class: Ground
+      value:
+        number: -15
+        unit: percentage
+    - attribute: Defense
+      condition:
+        - Enemy
+      class: Mounted
+      value:
+        number: -15
+        unit: percentage
+    - attribute: Death_to_Wounded
+      condition:
+        - When_City_Mayor_for_this_SubCity
+      value:
+        number: 10
+        unit: percentage
+- level: '4red'
+  buff:
+    - attribute: Attack
+      condition:
+        - Enemy
+      class: Ground
+      value:
+        number: -10
+        unit: percentage
+    - attribute: Attack
+      condition:
+        - Enemy
+      class: Mounted
+      value:
+        number: -10
+        unit: percentage
+    - attribute: HP
+      condition:
+        - Enemy
+      class: Ground
+      value:
+        number: -15
+        unit: percentage
+    - attribute: HP
+      condition:
+        - Enemy
+      class: Mounted
+      value:
+        number: -15
+        unit: percentage
+- level: '5red'
+  buff:
+    - attribute: Attack
+      condition:
+        - Enemy
+      class: Ground
+      value:
+        number: -10
+        unit: percentage
+    - attribute: Attack
+      condition:
+        - Enemy
+      class: Mounted
+      value:
+        number: -10
+        unit: percentage
+    - attribute: HP
+      condition:
+        - Enemy
+      class: Ground
+      value:
+        number: -15
+        unit: percentage
+    - attribute: HP
+      condition:
+        - Enemy
+      class: Mounted
+      value:
+        number: -15
+        unit: percentage

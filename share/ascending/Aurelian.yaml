@@ -1,0 +1,104 @@
+---
+ascending:
+- level: '1red'
+  buff:
+    - condition:
+        - Marching
+      attribute: Defense
+      class: Ground
+      value:
+        number: 10
+        unit: percentage
+    - condition:
+        - Marching
+      attribute: Defense
+      class: Mounted
+      value:
+        number: 10
+        unit: percentage
+    - condition:
+        - Marching
+      attribute: HP
+      class: Ground
+      value:
+        number: 10
+        unit: percentage
+    - condition:
+        - Marching
+      attribute: HP
+      class: Mounted
+      value:
+        number: 10
+        unit: percentage
+- level: '2red'
+  buff:
+    - condition:
+        - Enemy_In_City
+      attribute: Wounded_to_Death
+      value:
+        number: 10
+        unit: percentage
+- level: '3red'
+  buff:
+    - condition:
+        - Attacking
+      attribute: Defense
+      class: Ground
+      value:
+        number: 10
+        unit: percentage
+    - condition:
+        - Attacking
+      attribute: HP
+      class: Ground
+      value:
+        number: 10
+        unit: percentage
+    - condition:
+        - Attacking
+      attribute: March_Size_Capacity
+      value:
+        number: 8
+        unit: percentage
+- level: '4red'
+  buff:
+    - condition:
+        - Marching
+      class: Ground
+      attribute: Attack
+      value:
+        number: 15
+        unit: percentage
+    - condition:
+        - Marching
+      class: Ground
+      attribute: Defense
+      value:
+        number: 25
+        unit: percentage
+    - condition:
+        - Marching
+      class: Mounted
+      attribute: Defense
+      value:
+        number: 25
+        unit: percentage
+- level: '5red'
+  buff:
+    - condition:
+        - Marching
+      class: Ground
+      attribute: Attack
+      value:
+        number: 20
+        unit: percentage
+    - class: Ground
+      attribute: Defense
+      value:
+        number: 20
+        unit: percentage
+    - class: Ground
+      attribute: HP
+      value:
+        number: 20
+        unit: percentage

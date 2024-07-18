@@ -1,0 +1,92 @@
+---
+ascending:
+- level: '1red'
+  buff:
+    - attribute: Attack
+      condition:
+        - leading_the_army_to_attack
+      class: Mounted
+      value:
+        number: 10
+        unit: percentage
+    - attribute: Defense
+      condition:
+        - leading_the_army_to_attack
+      class: Mounted
+      value:
+        number: 10
+        unit: percentage
+    - attribute: Defense
+      condition:
+        - leading_the_army_to_attack
+      class: Ground
+      value:
+        number: 10
+        unit: percentage
+- level: '2red'
+  buff:
+    - attribute: Wounded_to_Death
+      condition:
+        - Enemy_In_City
+      value:
+        number: 10
+        unit: percentage
+- level: '3red'
+  buff:
+    - attribute: March_Size_Capacity
+      value:
+        number: 14
+        unit: percentage
+- level: '4red'
+  buff:
+    - attribute: HP
+      condition:
+        - leading_the_army_to_attack
+      class: Mounted
+      value:
+        number: 20
+        unit: percentage
+    - attribute: HP
+      condition:
+        - leading_the_army_to_attack
+      class: Ground
+      value:
+        number: 20
+        unit: percentage
+- level: '5red'
+  buff:
+    - attribute: Attack
+      condition:
+        - leading_the_army_to_attack
+      class: Mounted
+      value:
+        number: 15
+        unit: percentage
+    - attribute: Defense
+      condition:
+        - leading_the_army_to_attack
+      class: Mounted
+      value:
+        number: 10
+        unit: percentage
+    - attribute: HP
+      condition:
+        - leading_the_army_to_attack
+      class: Mounted
+      value:
+        number: 10
+        unit: percentage
+    - attribute: Defense
+      condition:
+        - leading_the_army_to_attack
+      class: Ground
+      value:
+        number: 10
+        unit: percentage
+    - attribute: HP
+      condition:
+        - leading_the_army_to_attack
+      class: Ground
+      value:
+        number: 10
+        unit: percentage

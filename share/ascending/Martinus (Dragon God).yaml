@@ -1,0 +1,46 @@
+---
+ascending:
+- level: '1red'
+  buff:
+    - attribute: Attack
+      class: Mounted
+      value:
+        number: 10
+        unit: percentage
+- level: '2red'
+  buff:
+    - attribute: Wounded_to_Death
+      condition:
+        - Enemy_In_City
+      value:
+        number: 8
+        unit: percentage
+- level: '3red'
+  buff:
+    - attribute: Rally_Capacity
+      condition:
+        - When_Rallying
+      value:
+        number: 6
+        unit: percentage
+- level: '4red'
+  buff:
+    - attribute: HP
+      class: Mounted
+      value:
+        number: 35
+        unit: percentage
+- level: '5red'
+  buff:
+    - attribute: Attack
+      class: Mounted
+      value:
+        number: 5
+        unit: percentage
+    - attribute: Attack
+      class: Mounted
+      condition:
+        - dragon_to_the_attack
+      value:
+        number: 20
+        unit: percentage

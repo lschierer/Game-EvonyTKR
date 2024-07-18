@@ -1,0 +1,101 @@
+---
+ascending:
+- level: '1red'
+  buff:
+    - attribute: Attack
+      condition:
+        - Marching
+      class: Siege
+      value:
+        number: 10
+        unit: percentage
+    - attribute: HP
+      condition:
+        - Marching
+      class: Archers
+      value:
+        number: 10
+        unit: percentage
+    - attribute: HP
+      condition:
+        - Marching
+      class: Siege
+      value:
+        number: 10
+        unit: percentage
+- level: '2red'
+  buff:
+    - attribute: Wounded_to_Death
+      condition:
+        - Enemy_In_City
+      value:
+        number: 10
+        unit: percentage
+- level: '3red'
+  buff:
+    - attribute: HP
+      condition:
+        - Attacking
+      class: Archers
+      value:
+        number: 10
+        unit: percentage
+    - attribute: HP
+      condition:
+        - Attacking
+      class: Siege
+      value:
+        number: 10
+        unit: percentage
+    - attribute: March_Size_Capacity
+      condition:
+        - Attacking
+      value:
+        number: 10
+        unit: percentage
+- level: '4red'
+  buff:
+    - attribute: Attack
+      condition:
+        - Marching
+      class: Archers
+      value:
+        number: 10
+        unit: percentage
+    - attribute: Attack
+      condition:
+        - Marching
+      class: Siege
+      value:
+        number: 10
+        unit: percentage
+    - attribute: HP
+      condition:
+        - Attacking
+      class: Archers
+      value:
+        number: 20
+        unit: percentage
+    - attribute: HP
+      condition:
+        - Attacking
+      class: Siege
+      value:
+        number: 20
+        unit: percentage
+- level: '5red'
+  buff:
+    - attribute: Attack
+      condition:
+        - Marching
+      class: Siege
+      value:
+        number: 20
+        unit: percentage
+    - attribute: Defense
+      condition:
+        - Marching
+      class: Siege
+      value:
+        number: 20
+        unit: percentage

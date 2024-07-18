@@ -1,0 +1,96 @@
+---
+ascending:
+- level: '1red'
+  buff:
+    - attribute: Defense
+      class: Archers
+      value:
+        number: 15
+        unit: percentage
+    - attribute: HP
+      class: Archers
+      value:
+        number: 15
+        unit: percentage
+    - attribute: Attack
+      condition:
+        - When_Defending_Outside_The_Main_City
+      class: Archers
+      value:
+        number: 10
+        unit: percentage
+- level: '2red'
+  buff:
+    - attribute: Death_to_Wounded
+      condition:
+        - When_Defending_Outside_The_Main_City
+      value:
+        number: 8
+        unit: percentage
+    - attribute: Defense
+      condition:
+        - When_Defending_Outside_The_Main_City
+      class: Archers
+      value:
+        number: 15
+        unit: percentage
+- level: '3red'
+  buff:
+    - attribute: March_Size_Capacity
+      value:
+        number: 10
+        unit: percentage
+    - attribute: Attack
+      condition:
+        - When_Defending_Outside_The_Main_City
+      class: Archers
+      value:
+        number: 15
+        unit: percentage
+- level: '4red'
+  buff:
+    - attribute: HP
+      class: Archers
+      value:
+        number: 30
+        unit: percentage
+    - attribute: HP
+      class: Siege
+      value:
+        number: 30
+        unit: percentage
+    - attribute: Defense
+      condition:
+        - When_Defending_Outside_The_Main_City
+      class: Archers
+      value:
+        number: 25
+        unit: percentage
+    - attribute: HP
+      condition:
+        - When_Defending_Outside_The_Main_City
+      class: Archers
+      value:
+        number: 25
+        unit: percentage
+- level: '5red'
+  buff:
+    - attribute: Attack
+      class: Archers
+      value:
+        number: 35
+        unit: percentage
+    - attribute: Attack
+      condition:
+        - When_Defending_Outside_The_Main_City
+      class: Archers
+      value:
+        number: 35
+        unit: percentage
+    - attribute: Defense
+      condition:
+        - When_Defending_Outside_The_Main_City
+      class: Archers
+      value:
+        number: 35
+        unit: percentage
