@@ -1,5 +1,5 @@
 package TestsFor::Game::EvonyTKR::Buff;
-use 5.40.0;
+use v5.40.0;
 
 use Test::Most; 
 use Test::File::ShareDir::Object::Dist;

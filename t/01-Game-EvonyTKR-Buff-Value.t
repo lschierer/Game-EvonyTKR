@@ -1,5 +1,5 @@
 package TestsFor::Game::EvonyTKR::Buff::Value;
-use 5.40.0;
+use v5.40.0;
 
 use Test::Most; 
 

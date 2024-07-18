@@ -1,5 +1,5 @@
 package Game::EvonyTKR;
-use 5.40.0;
+use v5.40.0;
 use strict;
 use warnings;
 
