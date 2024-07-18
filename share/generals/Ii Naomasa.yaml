@@ -1,0 +1,72 @@
+---
+general:
+  name: Ii Naomasa
+  display: summary
+  level: '1'
+  stars: '5red'
+  leadership: 120
+  leadership_increment: 9.00
+  attack: 121
+  attack_increment: 8.94
+  defense: 117
+  defense_increment: 8.91
+  politics: 102
+  politics_increment: 8.52
+  score_as: Mounted
+  books:
+    - Red Demon
+  ascending:
+    - level: '1red'
+      buff:
+        - attribute: HP
+          class: Mounted
+          value:
+            number: 20
+            unit: percentage
+    - level: '2red'
+      buff:
+        - attribute: Wounded_to_Death
+          condition:
+            - Enemy_In_City
+          value:
+            number: 10
+            unit: percentage
+    - level: '3red'
+      buff:
+        - attribute: March_Size_Capacity
+          value:
+            number: 6
+            unit: percentage
+        - 'attribute:': Attack
+          class: Mounted
+          value:
+            number: 10
+            unit: percentage
+    - level: '4red'
+      buff:
+        - attribute: Attack
+          class: Mounted
+          value:
+            number: 5
+            unit: percentage
+        - attribute: HP
+          class: Mounted
+          value:
+            number: 30
+            unit: percentage
+    - level: '5red'
+      buff:
+        - attribute: March_Size_Capacity
+          value:
+            number: 8
+            unit: percentage
+        - attribute: Attack
+          class: Mounted
+          value:
+            number: 20
+            unit: percentage
+  specialities:
+    - Mounted Troop Defense
+    - Suppress
+    - Mounted Troop Ares
+    - Siege of Odawara

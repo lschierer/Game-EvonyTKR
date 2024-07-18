@@ -1,0 +1,93 @@
+---
+general:
+  name: Nathanael Greene
+  display: summary
+  leadership: 101
+  leadership_increment: 8.37
+  attack: 103
+  attack_increment: 8.22
+  defense: 102
+  defense_increment: 7.91
+  politics: 105
+  politics_increment: 8.16
+  stars: '5red'
+  level: '1'
+  score_as: Mounted
+  books:
+    - Strategy Expert
+  ascending:
+    - level: '1red'
+      buff:
+        - attribute: Attack
+          condition:
+            - Against Monsters
+          value:
+            number: 5
+            unit: percentage
+        - attribute: Defense
+          condition:
+            - Against Monsters
+          value:
+            number: 10
+            unit: percentage
+    - level: '2red'
+      buff:
+        - attribute: Defense
+          condition:
+            - Reduces Monster
+          value:
+            number: -10
+            unit: percentage
+        - attribute: HP
+          condition:
+            - Against Monsters
+          value:
+            number: 15
+            unit: percentage
+    - level: '3red'
+      buff:
+        - attribute: Attack
+          condition:
+            - Reduces Monster
+          value:
+            number: 10
+            unit: percentage
+        - attribute: Defense
+          condition:
+            - Against Monsters
+          value:
+            number: 15
+            unit: percentage
+    - level: '4red'
+      buff:
+        - attribute: Attack
+          condition:
+            - Against Monsters
+          value:
+            number: 5
+            unit: percentage
+        - attribute: HP
+          condition:
+            - Against Monsters
+          value:
+            number: 15
+            unit: percentage
+    - level: '5red'
+      buff:
+        - attribute: Attack
+          condition:
+            - Against Monsters
+          value:
+            number: 10
+            unit: percentage
+        - attribute: Defense
+          condition:
+            - Against Monsters
+          value:
+            number: 10
+            unit: percentage
+  specialities:
+    - Mounted Troop Formation
+    - Sabotage
+    - Unparalleled Leader
+    - Battle of Cowpens

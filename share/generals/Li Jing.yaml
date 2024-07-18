@@ -1,0 +1,80 @@
+---
+general:
+  name: Li Jing
+  display: summary
+  leadership: 109
+  leadership_increment: 8.98
+  attack: 117
+  attack_increment: 8.65
+  defense: 107
+  defense_increment: 8.58
+  politics: 102
+  politics_increment: 8.44
+  stars: '5red'
+  level: '1'
+  score_as: Mounted
+  books:
+    - Win by Surprise Attacks
+  specialities:
+    - Mounted Troop Formation
+    - Strike
+    - Mounted Troop Ares
+    - Conquest of the Eastern Turks
+  ascending:
+    - level: '1red'
+      buff:
+        - attribute: Attack
+          class: Mounted
+          value:
+            number: 5
+            unit: percentage
+        - attribute: Defense
+          class: Mounted
+          value:
+            number: 10
+            unit: percentage
+    - level: '2red'
+      buff:
+        - attribute: Death_to_Wounded
+          condition:
+            - leading_the_army_to_attack
+          value:
+            number: 8
+            unit: percentage
+    - level: '3red'
+      buff:
+        - attribute: Rally_Capacity
+          condition:
+            - When_Rallying
+          value:
+            number: 6
+            unit: percentage
+    - level: '4red'
+      buff:
+        - attribute: Attack
+          class: Mounted
+          value:
+            number: 10
+            unit: percentage
+        - attribute: HP
+          class: Mounted
+          value:
+            number: 20
+            unit: percentage
+    - level: '5red'
+      buff:
+        - attribute: Attack
+          class: Mounted
+          value:
+            number: 10
+            unit: percentage
+        - attribute: Defense
+          class: Mounted
+          value:
+            number: 10
+            unit: percentage
+        - attribute: HP
+          class: Mounted
+          value:
+            number: 10
+            unit: percentage

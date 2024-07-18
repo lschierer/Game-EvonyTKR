@@ -1,0 +1,85 @@
+---
+general:
+  name: Roland
+  display: summary
+  score_as: Mounted
+  stars: '5red'
+  leadership: 105
+  leadership_increment: 8.55
+  attack: 118
+  attack_increment: 8.91
+  defense: 117
+  defense_increment: 9.05
+  politics: 100
+  politics_increment: 8.35
+  level: '1'
+  books:
+    - Glory Knight
+  ascending:
+    - level: '1red'
+      buff:
+        - attribute: Attack
+          condition:
+            - Marching
+          class: Mounted
+          value:
+            number: 15
+            unit: percentage
+    - level: '2red'
+      buff:
+        - attribute: Death_to_Wounded
+          condition:
+            - Marching
+          value:
+            number: 8
+            unit: percentage
+    - level: '3red'
+      buff:
+        - attribute: March_Size_Capacity
+          value:
+            number: 10
+            unit: percentage
+    - level: '4red'
+      buff:
+        - attribute: HP
+          class: Mounted
+          condition:
+            - Marching
+          value:
+            number: 25
+            unit: percentage
+        - attribute: Defense
+          class: Mounted
+          condition:
+            - Marching
+          value:
+            number: 25
+            unit: percentage
+    - level: '5red'
+      buff:
+        - attribute: HP
+          class: Mounted
+          condition:
+            - Marching
+          value:
+            number: 15
+            unit: percentage
+        - attribute: Defense
+          class: Mounted
+          condition:
+            - Marching
+          value:
+            number: 15
+            unit: percentage
+        - attribute: Attack
+          class: Mounted
+          condition:
+            - Marching
+          value:
+            number: 15
+            unit: percentage
+  specialities:
+    - Mounted Troop Formation
+    - Annihilation
+    - Mounted Troop Ares
+    - Paladin

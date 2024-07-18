@@ -1,0 +1,110 @@
+---
+general:
+  name: Laudon
+  display: summary
+  leadership: 117
+  leadership_increment: 8.82
+  attack: 118
+  attack_increment: 9.12
+  defense: 113
+  defense_increment: 8.76
+  politics: 108
+  politics_increment: 8.74
+  stars: '5red'
+  level: '1'
+  score_as: Mounted
+  warnings:
+    - Laudon is incompatible with the Mounted Troop Attack Level 4 Skillbook
+  books:
+    - Silesian Wars
+  ascending:
+    - level: '1red'
+      buff:
+        - attribute: Attack
+          class: Mounted
+          value:
+            number: 5
+            unit: percentage
+        - attribute: Attack
+          class: Ground
+          value:
+            number: 5
+            unit: percentage
+        - attribute: Defense
+          class: Mounted
+          value:
+            number: 5
+            unit: percentage
+        - attribute: HP
+          class: Ground
+          value:
+            number: 5
+            unit: percentage
+        - attribute: Attack
+          class: Mounted
+          value:
+            number: 5
+            unit: percentage
+        - attribute: HP
+          class: Ground
+          value:
+            number: 5
+            unit: percentage
+    - level: '2red'
+      buff:
+        - attribute: Death_to_Wounded
+          condition:
+            - Marching
+          value:
+            number: 10
+            unit: percentage
+    - level: '3red'
+      buff:
+        - attribute: March_Size_Capacity
+          value:
+            number: 14
+            unit: percentage
+    - level: '4red'
+      buff:
+        - attribute: Attack
+          class: Mounted
+          value:
+            number: 10
+            unit: percentage
+        - attribute: Attack
+          class: Ground
+          value:
+            number: 10
+            unit: percentage
+        - attribute: Defense
+          class: Mounted
+          value:
+            number: 20
+            unit: percentage
+        - attribute: Defense
+          class: Ground
+          value:
+            number: 20
+            unit: percentage
+    - level: '5red'
+      buff:
+        - attribute: Attack
+          class: Mounted
+          value:
+            number: 25
+            unit: percentage
+        - attribute: Defense
+          class: Mounted
+          value:
+            number: 10
+            unit: percentage
+        - attribute: HP
+          class: Mounted
+          value:
+            number: 10
+            unit: percentage
+  specialities:
+    - Mounted Troop Defense
+    - Strike
+    - Mounted Troop Ares
+    - Field Marshal of Austria

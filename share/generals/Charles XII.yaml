@@ -1,0 +1,136 @@
+---
+general:
+  name: Charles XII
+  display: summary
+  leadership: 112
+  leadership_increment: 8.82
+  attack: 121
+  attack_increment: 8.94
+  defense: 120
+  defense_increment: 9.08
+  politics: 104
+  politics_increment: 8.57
+  stars: '5red'
+  level: '1'
+  score_as: Archers
+  books:
+    - Great Northern War
+  specialities:
+    - Ranged Troop Formation
+    - Bash
+    - Ranged Troop Ares
+    - Battle of Narva
+  ascending:
+    - level: '1red'
+      buff:
+        - attribute: Attack
+          condition:
+            - Marching
+          class: Archers
+          value:
+            number: 5
+            unit: percentage
+        - attribute: Attack
+          condition:
+            - Marching
+          class: Siege
+          value:
+            number: 5
+            unit: percentage
+        - attribute: Defense
+          condition:
+            - Marching
+          class: Archers
+          value:
+            number: 15
+            unit: percentage
+        - attribute: Defense
+          condition:
+            - Marching
+          class: Siege
+          value:
+            number: 15
+            unit: percentage
+    - level: '2red'
+      buff:
+        - attribute: Wounded_to_Death
+          condition:
+            - Enemy_In_City
+          value:
+            number: 10
+            unit: percentage
+    - level: '3red'
+      buff:
+        - attribute: Defense
+          condition:
+            - Attacking
+          class: Archers
+          value:
+            number: 10
+            unit: percentage
+        - attribute: Defense
+          condition:
+            - Attacking
+          class: Siege
+          value:
+            number: 15
+            unit: percentage
+        - attribute: March_Size_Capacity
+          condition:
+            - Attacking
+          value:
+            number: 6
+            unit: percentage
+    - level: '4red'
+      buff:
+        - attribute: Attack
+          condition:
+            - Marching
+          class: Archers
+          value:
+            number: 10
+            unit: percentage
+        - attribute: Attack
+          condition:
+            - Marching
+          class: Siege
+          value:
+            number: 10
+            unit: percentage
+        - attribute: Defense
+          condition:
+            - Marching
+          class: Archers
+          value:
+            number: 20
+            unit: percentage
+        - attribute: Defense
+          condition:
+            - Marching
+          class: Siege
+          value:
+            number: 20
+            unit: percentage
+    - level: '5red'
+      buff:
+        - attribute: Attack
+          condition:
+            - Marching
+          class: Archers
+          value:
+            number: 15
+            unit: percentage
+        - attribute: Defense
+          condition:
+            - Marching
+          class: Archers
+          value:
+            number: 25
+            unit: percentage
+        - attribute: HP
+          condition:
+            - Marching
+          class: Archers
+          value:
+            number: 25
+            unit: percentage

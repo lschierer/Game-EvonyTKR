@@ -1,0 +1,117 @@
+---
+general:
+  name: Idunn (Siege)
+  display: summary
+  leadership: 117
+  leadership_increment: 8.82
+  attack: 122
+  attack_increment: 9.1
+  defense: 120
+  defense_increment: 8.96
+  politics: 103
+  politics_increment: 8.68
+  stars: '5red'
+  level: '1'
+  score_as: Siege
+  books:
+    - Golden Apple
+  specialities:
+    - Ranged Troop Defense
+    - Siege
+    - Ranged Troop Ares
+    - Love and Hatred
+  ascending:
+    - level: '1red'
+      buff:
+        - attribute: Defense
+          class: Archers
+          value:
+            number: 15
+            unit: percentage
+        - attribute: HP
+          class: Archers
+          value:
+            number: 15
+            unit: percentage
+        - attribute: Attack
+          condition:
+            - When_Defending_Outside_The_Main_City
+          class: Archers
+          value:
+            number: 10
+            unit: percentage
+    - level: '2red'
+      buff:
+        - attribute: Death_to_Wounded
+          condition:
+            - When_Defending_Outside_The_Main_City
+          value:
+            number: 8
+            unit: percentage
+        - attribute: Defense
+          condition:
+            - When_Defending_Outside_The_Main_City
+          class: Archers
+          value:
+            number: 15
+            unit: percentage
+    - level: '3red'
+      buff:
+        - attribute: March_Size_Capacity
+          value:
+            number: 10
+            unit: percentage
+        - attribute: Attack
+          condition:
+            - When_Defending_Outside_The_Main_City
+          class: Archers
+          value:
+            number: 15
+            unit: percentage
+    - level: '4red'
+      buff:
+        - attribute: HP
+          class: Archers
+          value:
+            number: 30
+            unit: percentage
+        - attribute: HP
+          class: Siege
+          value:
+            number: 30
+            unit: percentage
+        - attribute: Defense
+          condition:
+            - When_Defending_Outside_The_Main_City
+          class: Archers
+          value:
+            number: 25
+            unit: percentage
+        - attribute: HP
+          condition:
+            - When_Defending_Outside_The_Main_City
+          class: Archers
+          value:
+            number: 25
+            unit: percentage
+    - level: '5red'
+      buff:
+        - attribute: Attack
+          class: Archers
+          value:
+            number: 35
+            unit: percentage
+        - attribute: Attack
+          condition:
+            - When_Defending_Outside_The_Main_City
+          class: Archers
+          value:
+            number: 35
+            unit: percentage
+        - attribute: Defense
+          condition:
+            - When_Defending_Outside_The_Main_City
+          class: Archers
+          value:
+            number: 35
+            unit: percentage

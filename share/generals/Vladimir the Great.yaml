@@ -1,0 +1,79 @@
+---
+general:
+  name: Vladimir the Great
+  display: summary
+  leadership: 113
+  leadership_increment: 8.69
+  attack: 105
+  attack_increment: 8.23
+  defense: 106
+  defense_increment: 8.66
+  politics: 115
+  politics_increment: 9.04
+  stars: '5red'
+  level: '45'
+  score_as: Archers
+  books:
+    - Dignity of Grand Prince
+  specialities:
+    - Ranged Troop Assault
+    - Siege
+    - Ranged Troop Ares
+    - Grand Duke of Kievan Rus
+  ascending:
+    - level: 1red
+      buff:
+        - attribute: Attack
+          condition:
+            - Enemy
+          value:
+            number: 5
+            unit: percentage
+    - level: 2red
+      buff:
+        - attribute: Death_to_Wounded
+          condition:
+            - Marching
+          value:
+            number: 8
+            unit: percentage
+    - level: 3red
+      buff:
+        - attribute: March_Size_Capacity
+          value:
+            number: 10
+            unit: percentage
+    - level: 4red
+      buff:
+        - attribute: Attack
+          class: Archers
+          value:
+            number: 5
+            unit: percentage
+        - attribute: Defense
+          class: Archers
+          value:
+            number: 10
+            unit: percentage
+        - attribute: HP
+          class: Archers
+          value:
+            number: 10
+            unit: percentage
+    - level: 5red
+      buff:
+        - attribute: Attack
+          class: Archers
+          value:
+            number: 10
+            unit: percentage
+        - attribute: Defense
+          class: Archers
+          value:
+            number: 10
+            unit: percentage
+        - attribute: HP
+          class: Archers
+          value:
+            number: 10
+            unit: percentage

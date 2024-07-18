@@ -1,0 +1,93 @@
+---
+general:
+  name: Sweyn Forkbeard
+  display: summary
+  leadership: 124
+  leadership_increment: 9.15
+  attack: 115
+  attack_increment: 8.82
+  defense: 117
+  defense_increment: 8.87
+  politics: 109
+  politics_increment: 8.69
+  stars: '5red'
+  level: '1'
+  score_as: Ground
+  books:
+    - Viking King
+  specialities:
+    - Ground Troop Defense
+    - Formation
+    - Ground Troop Ares
+    - Battle of Svolder
+  ascending:
+    - level: '1red'
+      buff:
+        - attribute: Attack
+          class: Ground
+          value:
+            number: 10
+            unit: percentage
+        - attribute: HP
+          class: Ground
+          value:
+            number: 15
+            unit: percentage
+    - level: '2red'
+      buff:
+        - attribute: Death_to_Wounded
+          condition:
+            - Marching
+          value:
+            number: 10
+            unit: percentage
+    - level: '3red'
+      buff:
+        - attribute: Defense
+          class: Mounted
+          value:
+            number: 10
+            unit: percentage
+        - attribute: Defense
+          class: Ground
+          value:
+            number: 10
+            unit: percentage
+        - attribute: March_Size_Capacity
+          value:
+            number: 8
+            unit: percentage
+    - level: '4red'
+      buff:
+        - attribute: Attack
+          class: Mounted
+          value:
+            number: 10
+            unit: percentage
+        - attribute: Attack
+          class: Ground
+          value:
+            number: 10
+            unit: percentage
+        - attribute: Defense
+          class: Mounted
+          value:
+            number: 15
+            unit: percentage
+        - attribute: Defense
+          class: Ground
+          value:
+            number: 15
+            unit: percentage
+    - level: '5red'
+      buff:
+        - attribute: Attack
+          class: Ground
+          value:
+            number: 30
+            unit: percentage
+        - attribute: Defense
+          class: Ground
+          value:
+            number: 35
+            unit: percentage

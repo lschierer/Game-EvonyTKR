@@ -1,0 +1,122 @@
+---
+general:
+  name: John Churchill
+  display: summary
+  leadership: 120
+  leadership_increment: 9.02
+  attack: 121
+  attack_increment: 9.03
+  defense: 116
+  defense_increment: 8.77
+  politics: 104
+  politics_increment: 8.55
+  stars: '5red'
+  level: '1'
+  score_as: Siege
+  books:
+    - Duke of Marlborough
+  specialities:
+    - Siege Machine Assault
+    - Siege
+    - Siege Machine Ares
+    - Battle of Blenheim
+  ascending:
+    - level: '1red'
+      buff:
+        - attribute: Attack
+          condition:
+            - Marching
+          class: Siege
+          value:
+            number: 10
+            unit: percentage
+        - attribute: HP
+          condition:
+            - Marching
+          class: Archers
+          value:
+            number: 10
+            unit: percentage
+        - attribute: HP
+          condition:
+            - Marching
+          class: Siege
+          value:
+            number: 10
+            unit: percentage
+    - level: '2red'
+      buff:
+        - attribute: Wounded_to_Death
+          condition:
+            - Enemy_In_City
+          value:
+            number: 10
+            unit: percentage
+    - level: '3red'
+      buff:
+        - attribute: HP
+          condition:
+            - Attacking
+          class: Archers
+          value:
+            number: 10
+            unit: percentage
+        - attribute: HP
+          condition:
+            - Attacking
+          class: Siege
+          value:
+            number: 10
+            unit: percentage
+        - attribute: March_Size_Capacity
+          condition:
+            - Attacking
+          value:
+            number: 10
+            unit: percentage
+    - level: '4red'
+      buff:
+        - attribute: Attack
+          condition:
+            - Marching
+          class: Archers
+          value:
+            number: 10
+            unit: percentage
+        - attribute: Attack
+          condition:
+            - Marching
+          class: Siege
+          value:
+            number: 10
+            unit: percentage
+        - attribute: HP
+          condition:
+            - Attacking
+          class: Archers
+          value:
+            number: 20
+            unit: percentage
+        - attribute: HP
+          condition:
+            - Attacking
+          class: Siege
+          value:
+            number: 20
+            unit: percentage
+    - level: '5red'
+      buff:
+        - attribute: Attack
+          condition:
+            - Marching
+          class: Siege
+          value:
+            number: 20
+            unit: percentage
+        - attribute: Defense
+          condition:
+            - Marching
+          class: Siege
+          value:
+            number: 20
+            unit: percentage

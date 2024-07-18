@@ -1,0 +1,92 @@
+---
+general:
+  name: Gaius Octavius
+  display: summary
+  score_as: Mounted
+  stars: '5red'
+  leadership: 116
+  leadership_increment: 9.18
+  attack: 115
+  attack_increment: 8.83
+  defense: 113
+  defense_increment: 9.02
+  politics: 115
+  politics_increment: 8.45
+  level: '1'
+  books:
+    - Augustus
+  ascending:
+    - level: '1red'
+      buff:
+        - attribute: Attack
+          class: Archers
+          condition:
+            - Marching
+          value:
+            number: 10
+            unit: percentage
+        - attribute: Defense
+          class: Mounted
+          condition:
+            - Marching
+          value:
+            number: 20
+            unit: percentage
+    - level: '2red'
+      buff:
+        - attribute: Wounded_to_Death
+          condition:
+            - Enemy_In_City
+          value:
+            number: 10
+            unit: percentage
+    - level: '3red'
+      buff:
+        - attribute: March_Size_Capacity
+          value:
+            number: 14
+            unit: percentage
+    - level: '4red'
+      buff:
+        - attribute: Attack
+          class: Archers
+          condition:
+            - Marching
+          value:
+            number: 20
+            unit: percentage
+        - attribute: HP
+          class: Mounted
+          condition:
+            - Marching
+          value:
+            number: 20
+            unit: percentage
+    - level: '5red'
+      buff:
+        - attribute: Attack
+          class: Mounted
+          condition:
+            - Marching
+          value:
+            number: 20
+            unit: percentage
+        - attribute: Defense
+          condition:
+            - Marching
+          class: Mounted
+          value:
+            number: 15
+            unit: percentage
+        - attribute: HP
+          condition:
+            - Marching
+          class: Mounted
+          value:
+            number: 15
+            unit: percentage
+  specialities:
+    - Mounted Troop Assault
+    - Annihilation
+    - War God
+    - Battle of Actium

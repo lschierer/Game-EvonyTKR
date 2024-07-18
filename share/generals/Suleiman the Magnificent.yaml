@@ -1,0 +1,69 @@
+---
+general:
+  name: Suleiman the Magnificent
+  display: summary
+  leadership: 112
+  leadership_increment: 8.73
+  attack: 109
+  attack_increment: 8.37
+  defense: 107
+  defense_increment: 8.62
+  politics: 108
+  politics_increment: 8.82
+  stars: '5red'
+  level: '1'
+  score_as: Siege
+  specialities:
+    - Siege Machine Assault
+    - Sabotage
+    - Siege Machine Ares
+    - Battle of Rhode Island
+  books:
+    - Indefectible Emperor
+  ascending:
+    - level: '1red'
+      buff:
+        - attribute: Defense
+          condition:
+            - Reduces_Enemy
+          value:
+            number: -10
+            unit: percentage
+    - level: '2red'
+      buff:
+        - attribute: Death_to_Wounded
+          condition:
+            - leading_the_army_to_attack
+          value:
+            number: 8
+            unit: percentage
+    - level: '3red'
+      buff:
+        - attribute: March_Size_Capacity
+          value:
+            number: 12
+            unit: percentage
+    - level: '4red'
+      buff:
+        - attribute: Defense
+          class: Archers
+          value:
+            number: 10
+            unit: percentage
+        - attribute: Defense
+          class: Siege
+          value:
+            number: 10
+            unit: percentage
+    - level: '5red'
+      buff:
+        - attribute: Attack
+          class: Archers
+          value:
+            number: 10
+            unit: percentage
+        - attribute: Attack
+          class: Siege
+          value:
+            number: 10
+            unit: percentage

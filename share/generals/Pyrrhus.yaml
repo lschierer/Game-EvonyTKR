@@ -1,0 +1,103 @@
+---
+general:
+  name: Pyrrhus
+  display: summary
+  score_as: Ground
+  level: '1'
+  stars: '5red'
+  leadership: 119
+  leadership_increment: 9.02
+  attack: 117
+  attack_increment: 8.92
+  defense: 121
+  defense_increment: 8.78
+  politics: 107
+  politics_increment: 8.69
+  specialities:
+    - Ground Troop Defense
+    - Annihilation
+    - Ground Troop Ares
+    - Pyrrhic Victory
+  ascending:
+    - level: '1red'
+      buff:
+        - attribute: Attack
+          class: Ground
+          value:
+            number: 10
+            unit: percentage
+        - attribute: HP
+          class: Ground
+          value:
+            number: 10
+            unit: percentage
+        - attribute: HP
+          class: Mounted
+          value:
+            number: 10
+            unit: percentage
+    - level: '2red'
+      buff:
+        - attribute: Death_to_Wounded
+          condition:
+            - Marching
+          value:
+            number: 10
+            unit: percentage
+    - level: '3red'
+      buff:
+        - attribute: Rally_Capacity
+          condition:
+            - When_Rallying
+          value:
+            number: 8
+            unit: percentage
+    - level: '4red'
+      buff:
+        - attribute: Attack
+          class: Mounted
+          condition:
+            - Marching
+          value:
+            number: 15
+            unit: percentage
+        - attribute: Attack
+          class: Ground
+          condition:
+            - Marching
+          value:
+            number: 15
+            unit: percentage
+        - attribute: Defense
+          class: Mounted
+          condition:
+            - Marching
+          value:
+            number: 15
+            unit: percentage
+        - attribute: Defense
+          class: Ground
+          condition:
+            - Marching
+          value:
+            number: 15
+            unit: percentage
+    - level: '5red'
+      buff:
+        - attribute: Attack
+          class: Ground
+          value:
+            number: 25
+            unit: percentage
+        - attribute: Defense
+          class: Ground
+          value:
+            number: 15
+            unit: percentage
+        - attribute: HP
+          class: Ground
+          value:
+            number: 15
+            unit: percentage
+  books:
+    - Pyrrhic War

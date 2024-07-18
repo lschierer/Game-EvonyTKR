@@ -1,0 +1,93 @@
+---
+general:
+  name: Edward III
+  display: summary
+  leadership: 121
+  leadership_increment: 8.88
+  attack: 119
+  attack_increment: 8.91
+  defense: 114
+  defense_increment: 9.02
+  politics: 105
+  politics_increment: 8.57
+  stars: '5red'
+  level: '1'
+  score_as: Archers
+  books:
+    - Knights of the Garter
+  specialities:
+    - Ranged Troop Assault
+    - Bash
+    - Ranged Troop Ares
+    - Battle of Crecy
+  ascending:
+    - level: '1red'
+      buff:
+        - attribute: Defense
+          class: Archers
+          value:
+            number: 8
+            unit: percentage
+        - attribute: Defense
+          class: Siege
+          value:
+            number: 8
+            unit: percentage
+        - attribute: HP
+          class: Archers
+          value:
+            number: 8
+            unit: percentage
+        - attribute: HP
+          class: Siege
+          value:
+            number: 8
+            unit: percentage
+    - level: '2red'
+      buff:
+        - attribute: Death_to_Wounded
+          condition:
+            - Marching
+          value:
+            number: 10
+            unit: percentage
+    - level: '3red'
+      buff:
+        - attribute: March_Size_Capacity
+          value:
+            number: 6
+            unit: percentage
+        - attribute: Attack
+          class: Archers
+          value:
+            number: 10
+            unit: percentage
+    - level: '4red'
+      buff:
+        - attribute: Attack
+          class: Archers
+          value:
+            number: 10
+            unit: percentage
+        - attribute: Attack
+          class: Siege
+          value:
+            number: 10
+            unit: percentage
+        - attribute: Defense
+          class: Archers
+          value:
+            number: 15
+            unit: percentage
+    - level: '5red'
+      buff:
+        - attribute: Attack
+          class: Archers
+          value:
+            number: 20
+            unit: percentage
+        - attribute: HP
+          class: Archers
+          value:
+            number: 20
+            unit: percentage

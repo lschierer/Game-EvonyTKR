@@ -1,0 +1,87 @@
+---
+general:
+  name: Zhao Yun
+  display: summary
+  score_as: Mounted
+  leadership: 113
+  leadership_increment: 8.95
+  attack: 119
+  attack_increment: 9.01
+  defense: 118
+  defense_increment: 9.05
+  politics: 110
+  politics_increment: 8.35
+  stars: '5red'
+  level: '1'
+  books:
+    - Undefeatable General
+  ascending:
+    - level: '1red'
+      buff:
+        - condition:
+            - leading_the_army_to_attack
+          attribute: Attack
+          class: Mounted
+          value:
+            number: 15
+            unit: percentage
+        - attribute: Defense
+          class: Mounted
+          condition:
+            - leading_the_army_to_attack
+          value:
+            number: 10
+            unit: percentage
+    - level: '2red'
+      buff:
+        - attribute: Wounded_to_Death
+          condition:
+            - Enemy_In_City
+          value:
+            number: 10
+            unit: percentage
+    - level: '3red'
+      buff:
+        - attribute: Rally_Capacity
+          condition:
+            - When_Rallying
+          value:
+            number: 8
+            unit: percentage
+    - level: '4red'
+      buff:
+        - attribute: Defense
+          condition:
+            - Marching
+          class: Mounted
+          value:
+            number: 15
+            unit: percentage
+        - attribute: HP
+          condition:
+            - Marching
+          class: Mounted
+          value:
+            number: 15
+            unit: percentage
+    - level: '5red'
+      buff:
+        - attribute: Attack
+          condition:
+            - leading_the_army_to_attack
+          class: Mounted
+          value:
+            number: 25
+            unit: percentage
+        - attribute: Defense
+          condition:
+            - leading_the_army_to_attack
+          class: Mounted
+          value:
+            number: 20
+            unit: percentage
+  specialities:
+    - Mounted Troop Formation
+    - Annihilation
+    - Mounted Troop Ares
+    - Battle of Han River

@@ -1,0 +1,129 @@
+---
+general:
+  name: Napoleon Prime
+  display: summary
+  leadership: 119
+  leadership_increment: 8.83
+  attack: 124
+  attack_increment: 9.04
+  defense: 121
+  defense_increment: 9.01
+  politics: 113
+  politics_increment: 8.62
+  stars: '5red'
+  level: '1'
+  score_as: Mounted
+  books:
+    - Napoleonic Wars
+  specialities:
+    - Mounted Troop Formation
+    - Strike
+    - Mounted Troop Ares
+    - Bonaparte Dynasty
+  ascending:
+    - level: '1red'
+      buff:
+        - attribute: Attack
+          condition:
+            - Marching
+          class: Ground
+          value:
+            number: 10
+            unit: percentage
+        - attribute: Attack
+          condition:
+            - Marching
+          class: Mounted
+          value:
+            number: 10
+            unit: percentage
+        - attribute: Defense
+          condition:
+            - Marching
+          class: Ground
+          value:
+            number: 5
+            unit: percentage
+        - attribute: HP
+          condition:
+            - Marching
+          class: Ground
+          value:
+            number: 5
+            unit: percentage
+        - attribute: Defense
+          condition:
+            - Marching
+          class: Mounted
+          value:
+            number: 5
+            unit: percentage
+        - attribute: HP
+          condition:
+            - Marching
+          class: Mounted
+          value:
+            number: 5
+            unit: percentage
+    - level: '2red'
+      buff:
+        - attribute: Death_to_Wounded
+          condition:
+            - Marching
+          value:
+            number: 10
+            unit: percentage
+    - level: '3red'
+      buff:
+        - attribute: Attack
+          condition:
+            - Marching
+          class: Ground
+          value:
+            number: 15
+            unit: percentage
+        - attribute: Attack
+          condition:
+            - Marching
+          class: Mounted
+          value:
+            number: 15
+            unit: percentage
+        - attribute: March_Size_Capacity
+          condition:
+            - Marching
+          value:
+            number: 8
+            unit: percentage
+    - level: '4red'
+      buff:
+        - attribute: Defense
+          condition:
+            - Marching
+          class: Mounted
+          value:
+            number: 25
+            unit: percentage
+        - attribute: HP
+          condition:
+            - Marching
+          class: Mounted
+          value:
+            number: 30
+            unit: percentage
+    - level: '5red'
+      buff:
+        - attribute: Attack
+          condition:
+            - Marching
+          class: Mounted
+          value:
+            number: 35
+            unit: percentage
+        - attribute: Defense
+          condition:
+            - Marching
+          class: Mounted
+          value:
+            number: 30
+            unit: percentage

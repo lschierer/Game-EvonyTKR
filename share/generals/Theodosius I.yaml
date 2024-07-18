@@ -1,0 +1,98 @@
+---
+general:
+  name: Theodosius I
+  display: summary
+  leadership: 123
+  leadership_increment: 8.91
+  attack: 132
+  attack_increment: 9.31
+  defense: 118
+  defense_increment: 8.73
+  politics: 106
+  politics_increment: 8.08
+  stars: '5red'
+  score_as: Siege
+  books:
+    - Theodosius the Great
+  specialities:
+    - Siege Machine Formation
+    - Bash
+    - Siege Machine Ares
+    - Battle of the Frigidus
+  ascending:
+    - level: '1red'
+      buff:
+        - attribute: Attack
+          class: Siege
+          condition:
+            - Marching
+          value:
+            number: 10
+            unit: percentage
+        - attribute: Defense
+          class: Siege
+          condition:
+            - Marching
+          value:
+            number: 15
+            unit: percentage
+    - level: '2red'
+      buff:
+        - attribute: Death_to_Wounded
+          condition:
+            - Marching
+          value:
+            number: 10
+            unit: percentage
+    - level: '3red'
+      buff:
+        - attribute: HP
+          class: Siege
+          condition:
+            - Marching
+          value:
+            number: 10
+            unit: percentage
+        - attribute: March_Size_Capacity
+          value:
+            number: 5
+            unit: percentage
+    - level: '4red'
+      buff:
+        - attribute: Attack
+          class: Siege
+          condition:
+            - Marching
+          value:
+            number: 15
+            unit: percentage
+        - attribute: Defense
+          class: Siege
+          condition:
+            - Marching
+          value:
+            number: 15
+            unit: percentage
+    - level: '5red'
+      buff:
+        - attribute: Attack
+          class: Siege
+          condition:
+            - Marching
+          value:
+            number: 20
+            unit: percentage
+        - attribute: Defense
+          class: Seige
+          condition:
+            - Marching
+          value:
+            number: 20
+            unit: percentage
+        - attribute: HP
+          class: Siege
+          condition:
+            - Marching
+          value:
+            number: 20
+            unit: percentage

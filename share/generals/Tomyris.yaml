@@ -1,0 +1,127 @@
+---
+general:
+  name: Tomyris
+  display: summary
+  leadership: 112
+  leadership_increment: 9.11
+  attack: 108
+  attack_increment: 8.55
+  defense: 116
+  defense_increment: 9.22
+  politics: 114
+  politics_increment: 8.34
+  stars: '5red'
+  level: '1'
+  score_as: Archers
+  books:
+    - Queen of Revenge
+  specialities:
+    - Ranged Troop Assault
+    - Bash
+    - Ranged Troop Ares
+    - Queen of Nomadic
+  ascending:
+    - level: '1red'
+      buff:
+        - attribute: Defense
+          condition:
+            - Marching
+          class: Archers
+          value:
+            number: 10
+            unit: percentage
+        - attribute: Defense
+          condition:
+            - Marching
+          class: Siege
+          value:
+            number: 10
+            unit: percentage
+        - attribute: HP
+          condition:
+            - Marching
+          class: Archers
+          value:
+            number: 15
+            unit: percentage
+        - attribute: HP
+          condition:
+            - Marching
+          class: Siege
+          value:
+            number: 15
+            unit: percentage
+    - level: '2red'
+      buff:
+        - attribute: Wounded_to_Death
+          condition:
+            - Enemy_In_City
+          value:
+            number: 10
+            unit: percentage
+    - level: '3red'
+      buff:
+        - attribute: March_Size_Capacity
+          value:
+            number: 14
+            unit: percentage
+    - level: '4red'
+      buff:
+        - attribute: Attack
+          condition:
+            - Marching
+          class: Archers
+          value:
+            number: 15
+            unit: percentage
+        - attribute: HP
+          condition:
+            - Marching
+          class: Archers
+          value:
+            number: 20
+            unit: percentage
+        - attribute: HP
+          condition:
+            - Marching
+          class: Siege
+          value:
+            number: 20
+            unit: percentage
+    - level: '5red'
+      buff:
+        - attribute: Attack
+          condition:
+            - Marching
+          class: Archers
+          value:
+            number: 15
+            unit: percentage
+        - attribute: Defense
+          condition:
+            - Marching
+          class: Archers
+          value:
+            number: 10
+            unit: percentage
+        - attribute: Defense
+          condition:
+            - Marching
+          class: Siege
+          value:
+            number: 10
+            unit: percentage
+        - attribute: HP
+          condition:
+            - Marching
+          class: Archers
+          value:
+            number: 10
+            unit: percentage
+        - attribute: HP
+          condition:
+            - Marching
+          class: Siege
+          value:
+            number: 10
+            unit: percentage

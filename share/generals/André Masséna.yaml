@@ -1,0 +1,79 @@
+---
+general:
+  name: André Masséna
+  display: summary
+  leadership: 117
+  leadership_increment: 8.75
+  attack: 120
+  attack_increment: 9.04
+  defense: 115
+  defense_increment: 8.95
+  politics: 110
+  politics_increment: 8.69
+  stars: '5red'
+  level: '1'
+  score_as: Mounted
+  books:
+    - Dear Child of Victory
+  specialities:
+    - Mounted Troop Assault
+    - Annihilation
+    - Mounted Troop Ares
+    - Prince of Essling
+  ascending:
+    - level: '1red'
+      buff:
+        - attribute: Attack
+          class: Mounted
+          value:
+            number: 10
+            unit: percentage
+        - attribute: Defense
+          class: Mounted
+          value:
+            number: 10
+            unit: percentage
+    - level: '2red'
+      buff:
+        - attribute: Wounded_to_Death
+          condition:
+            - Enemy_In_City
+          value:
+            number: 10
+            unit: percentage
+    - level: '3red'
+      buff:
+        - attribute: Attack
+          class: Ground
+          value:
+            number: 15
+            unit: percentage
+        - attribute: Attack
+          class: Mounted
+          value:
+            number: 15
+            unit: percentage
+    - level: '4red'
+      buff:
+        - attribute: Defense
+          class: Mounted
+          value:
+            number: 55
+            unit: percentage
+    - level: '5red'
+      buff:
+        - attribute: Attack
+          class: Mounted
+          value:
+            number: 25
+            unit: percentage
+        - attribute: HP
+          class: Mounted
+          value:
+            number: 15
+            unit: percentage
+        - attribute: Defense
+          class: Mounted
+          value:
+            number: 15
+            unit: percentage

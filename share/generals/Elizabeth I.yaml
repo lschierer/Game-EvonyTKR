@@ -1,0 +1,93 @@
+---
+general:
+  name: Elizabeth I
+  display: summary
+  leadership: 115
+  leadership_increment: 8.73
+  attack: 113
+  attack_increment: 8.72
+  defense: 112
+  defense_increment: 8.65
+  politics: 120
+  politics_increment: 9.25
+  stars: '5red'
+  level: '45'
+  score_as: Archers
+  books:
+    - Hammer of the Gauls - Elizabeth I
+  specialities:
+    - Ranged Troop Formation
+    - Annihilation
+    - Ranged Troop Ares
+    - Golden Age
+  ascending:
+    - level: '1red'
+      buff:
+        - attribute: Defense
+          class: Archers
+          value:
+            number: 5
+            unit: percentage
+        - attribute: Defense
+          class: Siege
+          value:
+            number: 5
+            unit: percentage
+        - attribute: HP
+          class: Archers
+          value:
+            number: 10
+            unit: percentage
+        - attribute: HP
+          class: Siege
+          value:
+            number: 10
+            unit: percentage
+    - level: '2red'
+      buff:
+        - attribute: Death_to_Wounded
+          condition:
+            - leading_the_army_to_attack
+          value:
+            number: 10
+            unit: percentage
+    - level: '3red'
+      buff:
+        - attribute: March_Size_Capacity
+          value:
+            number: 14
+            unit: percentage
+    - level: '4red'
+      buff:
+        - attribute: Defense
+          class: Archers
+          value:
+            number: 15
+            unit: percentage
+        - attribute: Defense
+          class: Siege
+          value:
+            number: 15
+            unit: percentage
+        - attribute: HP
+          class: Archers
+          value:
+            number: 10
+            unit: percentage
+        - attribute: HP
+          class: Siege
+          value:
+            number: 10
+            unit: percentage
+    - level: '5red'
+      buff:
+        - attribute: Attack
+          class: Archers
+          value:
+            number: 15
+            unit: percentage
+        - attribute: Attack
+          class: Siege
+          value:
+            number: 15
+            unit: percentage

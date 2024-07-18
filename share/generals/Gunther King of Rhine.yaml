@@ -1,0 +1,127 @@
+---
+general:
+  name: Gunther King of Rhine
+  display: summary
+  leadership: 125
+  leadership_increment: 9.19
+  attack: 121
+  attack_increment: 9.08
+  defense: 118
+  defense_increment: 8.95
+  politics: 105
+  politics_increment: 8.35
+  stars: '5red'
+  level: '1'
+  score_as: Siege
+  books:
+    - The King of Atlis
+    - King of Rhine
+  specialities:
+    - Siege Machine Formation
+    - Bash
+    - Siege Machine Ares
+    - Rhine Flame Axe
+  ascending:
+    - level: '1red'
+      buff:
+        - attribute: Attack
+          condition:
+            - Marching
+          class: Siege
+          value:
+            number: 15
+            unit: percentage
+        - attribute: HP
+          condition:
+            - Marching
+          class: Siege
+          value:
+            number: 10
+            unit: percentage
+    - level: '2red'
+      buff:
+        - attribute: Death_to_Wounded
+          condition:
+            - Marching
+          value:
+            number: 8
+            unit: percentage
+    - level: '3red'
+      buff:
+        - attribute: HP
+          condition:
+            - Marching
+          class: Archers
+          value:
+            number: 15
+            unit: percentage
+        - attribute: HP
+          condition:
+            - Marching
+          class: Siege
+          value:
+            number: 15
+            unit: percentage
+        - attribute: Defense
+          condition:
+            - Marching
+          class: Archers
+          value:
+            number: 15
+            unit: percentage
+        - attribute: Defense
+          condition:
+            - Marching
+          class: Siege
+          value:
+            number: 15
+            unit: percentage
+    - level: '4red'
+      buff:
+        - attribute: Attack
+          class: Siege
+          value:
+            number: 30
+            unit: percentage
+        - attribute: Defense
+          class: Siege
+          value:
+            number: 15
+            unit: percentage
+    - level: '5red'
+      buff:
+        - attribute: Attack
+          condition:
+            - Marching
+          class: Siege
+          value:
+            number: 30
+            unit: percentage
+        - attribute: Defense
+          condition:
+            - Marching
+          class: Archers
+          value:
+            number: 15
+            unit: percentage
+        - attribute: Defense
+          condition:
+            - Marching
+          class: Siege
+          value:
+            number: 15
+            unit: percentage
+        - attribute: HP
+          condition:
+            - Marching
+          class: Archers
+          value:
+            number: 15
+            unit: percentage
+        - attribute: HP
+          condition:
+            - Marching
+          class: Siege
+          value:
+            number: 15
+            unit: percentage
