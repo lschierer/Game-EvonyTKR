@@ -185,17 +185,20 @@ This base class implements the attributes and methods common to all Generals, bu
     }
   }
 
-  field $BuffMultipliers :reader :param //= Game::EvonyTKR::Buff::EvaluationMultipliers->new();
+  use constant DEFAULT_BUFF_MULTIPLIERS => Game::EvonyTKR::Buff::EvaluationMultipliers->new();
+  
+  field $BuffMultipliers :reader :param //= __CLASS__->DEFAULT_BUFF_MULTIPLIERS;
 
-  ADJUST {
-    my @errors;
-    my $type = blessed $BuffMultipliers;
-    if($type ne 'Game::EvonyTKR::Buff::EvaluationMultipliers'){
-      push @errors => "BuffMultipliers must be a Game::EvonyTKR::Buff::EvaluationMultipliers, not $type";
-      if (@errors) {
-        die join ', ' => @errors;
-      }
-    }
-  }
+  #ADJUST {
+  #  my @errors;
+  #  my $type = blessed $BuffMultipliers;
+  #  if($type ne 'Game::EvonyTKR::Buff::EvaluationMultipliers'){
+  #    push @errors => "BuffMultipliers must be a Game::EvonyTKR::Buff::EvaluationMultipliers, not $type";
+  #    if (@errors) {
+  #      die join ', ' => @errors;
+  #    }
+  #  }
+  #}
+
 }
 1;
