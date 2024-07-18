@@ -73,7 +73,7 @@ the Attack Buff with no conditions or class attribute.
     my @errors;
     my $pNum = t('PositiveOrZeroNum');
     $pNum->check($GenericAttack) or push @errors => "GenericAttack must be a Positive Number, not $GenericAttack";
-    my $range = t('IntRange[0, 10]');
+    my $range = t('NumRange[0, 10]');
     $range->check($GenericAttack) or push @errors => "GenericAttack must be within the range 0-10 inclusive, not $GenericAttack";
     if (@errors) {
       croak join ', ' => @errors;
@@ -91,7 +91,7 @@ the Attack Buff with no conditions but with Ground Class attribute.
     my @errors;
     my $pNum = t('PositiveOrZeroNum');
     $pNum->check($GroundAttack) or push @errors => "GroundAttack must be a Positive Number, not $GroundAttack";
-    my $range = t('IntRange[0, 10]');
+    my $range = t('NumRange[0, 10]');
     $range->check($GroundAttack) or push @errors => "GroundAttack must be within the range 0-10 inclusive, not $GroundAttack";
     if (@errors) {
       croak join ', ' => @errors;
@@ -109,7 +109,7 @@ the Attack Buff with no conditions but with Mounted Class attribute.
     my @errors;
     my $pNum = t('PositiveOrZeroNum');
     $pNum->check($MountedAttack) or push @errors => "MountedAttack must be a Positive Number, not $MountedAttack";
-    my $range = t('IntRange[0, 10]');
+    my $range = t('NumRange[0, 10]');
     $range->check($MountedAttack) or push @errors => "MountedAttack must be within the range 0-10 inclusive, not $MountedAttack";
     if (@errors) {
       croak join ', ' => @errors;
@@ -127,7 +127,7 @@ the Attack Buff with no conditions but with Ranged Class attribute.
     my @errors;
     my $pNum = t('PositiveOrZeroNum');
     $pNum->check($RangedAttack) or push @errors => "RangedAttack must be a Positive Number, not $RangedAttack";
-    my $range = t('IntRange[0, 10]');
+    my $range = t('NumRange[0, 10]');
     $range->check($RangedAttack) or push @errors => "RangedAttack must be within the range 0-10 inclusive, not $RangedAttack";
     if (@errors) {
       croak join ', ' => @errors;
@@ -145,7 +145,7 @@ the Attack Buff with no conditions but with Siege Class attribute.
     my @errors;
     my $pNum = t('PositiveOrZeroNum');
     $pNum->check($SiegeAttack) or push @errors => "SiegeAttack must be a Positive Number, not $SiegeAttack";
-    my $range = t('IntRange[0, 10]');
+    my $range = t('NumRange[0, 10]');
     $range->check($SiegeAttack) or push @errors => "SiegeAttack must be within the range 0-10 inclusive, not $SiegeAttack";
     if (@errors) {
       croak join ', ' => @errors;
@@ -162,7 +162,7 @@ the Defense Buff with no conditions or class attribute.
     my @errors;
     my $pNum = t('PositiveOrZeroNum');
     $pNum->check($GenericDefense) or push @errors => "GenericDefense must be a Positive Number, not $GenericDefense";
-    my $range = t('IntRange[0, 10]');
+    my $range = t('NumRange[0, 10]');
     $range->check($GenericDefense) or push @errors => "GenericDefense must be within the range 0-10 inclusive, not $GenericDefense";
     if (@errors) {
       croak join ', ' => @errors;
@@ -180,7 +180,7 @@ the Defense Buff with no conditions but with Ground Class attribute.
     my @errors;
     my $pNum = t('PositiveOrZeroNum');
     $pNum->check($GroundDefense) or push @errors => "GroundDefense must be a Positive Number, not $GroundDefense";
-    my $range = t('IntRange[0, 10]');
+    my $range = t('NumRange[0, 10]');
     $range->check($GroundDefense) or push @errors => "GroundDefense must be within the range 0-10 inclusive, not $GroundDefense";
     if (@errors) {
       croak join ', ' => @errors;
@@ -198,7 +198,7 @@ the Defense Buff with no conditions but with Mounted Class attribute.
     my @errors;
     my $pNum = t('PositiveOrZeroNum');
     $pNum->check($MountedDefense) or push @errors => "MountedDefense must be a Positive Number, not $MountedDefense";
-    my $range = t('IntRange[0, 10]');
+    my $range = t('NumRange[0, 10]');
     $range->check($MountedDefense) or push @errors => "MountedDefense must be within the range 0-10 inclusive, not $MountedDefense";
     if (@errors) {
       croak join ', ' => @errors;
@@ -216,7 +216,7 @@ the Defense Buff with no conditions but with Ranged Class attribute.
     my @errors;
     my $pNum = t('PositiveOrZeroNum');
     $pNum->check($RangedDefense) or push @errors => "RangedDefense must be a Positive Number, not $RangedDefense";
-    my $range = t('IntRange[0, 10]');
+    my $range = t('NumRange[0, 10]');
     $range->check($RangedDefense) or push @errors => "RangedDefense must be within the range 0-10 inclusive, not $RangedDefense";
     if (@errors) {
       croak join ', ' => @errors;
@@ -234,7 +234,7 @@ the Defense Buff with no conditions but with Siege Class attribute.
     my @errors;
     my $pNum = t('PositiveOrZeroNum');
     $pNum->check($SiegeDefense) or push @errors => "SiegeDefense must be a Positive Number, not $SiegeDefense";
-    my $range = t('IntRange[0, 10]');
+    my $range = t('NumRange[0, 10]');
     $range->check($SiegeDefense) or push @errors => "SiegeDefense must be within the range 0-10 inclusive, not $SiegeDefense";
     if (@errors) {
       croak join ', ' => @errors;
@@ -251,7 +251,7 @@ the HP Buff with no conditions or class attribute.
     my @errors;
     my $pNum = t('PositiveOrZeroNum');
     $pNum->check($GenericHP) or push @errors => "GenericHP must be a Positive Number, not $GenericHP";
-    my $range = t('IntRange[0, 10]');
+    my $range = t('NumRange[0, 10]');
     $range->check($GenericHP) or push @errors => "GenericHP must be within the range 0-10 inclusive, not $GenericHP";
     if (@errors) {
       croak join ', ' => @errors;
@@ -269,7 +269,7 @@ the HP Buff with no conditions but with Ground Class attribute.
     my @errors;
     my $pNum = t('PositiveOrZeroNum');
     $pNum->check($GroundHP) or push @errors => "GroundHP must be a Positive Number, not $GroundHP";
-    my $range = t('IntRange[0, 10]');
+    my $range = t('NumRange[0, 10]');
     $range->check($GroundHP) or push @errors => "GroundHP must be within the range 0-10 inclusive, not $GroundHP";
     if (@errors) {
       croak join ', ' => @errors;
@@ -287,7 +287,7 @@ the HP Buff with no conditions but with Mounted Class attribute.
     my @errors;
     my $pNum = t('PositiveOrZeroNum');
     $pNum->check($MountedHP) or push @errors => "MountedHP must be a Positive Number, not $MountedHP";
-    my $range = t('IntRange[0, 10]');
+    my $range = t('NumRange[0, 10]');
     $range->check($MountedHP) or push @errors => "MountedHP must be within the range 0-10 inclusive, not $MountedHP";
     if (@errors) {
       croak join ', ' => @errors;
@@ -305,7 +305,7 @@ the HP Buff with no conditions but with Ranged Class attribute.
     my @errors;
     my $pNum = t('PositiveOrZeroNum');
     $pNum->check($RangedHP) or push @errors => "RangedHP must be a Positive Number, not $RangedHP";
-    my $range = t('IntRange[0, 10]');
+    my $range = t('NumRange[0, 10]');
     $range->check($RangedHP) or push @errors => "RangedHP must be within the range 0-10 inclusive, not $RangedHP";
     if (@errors) {
       croak join ', ' => @errors;
@@ -323,7 +323,7 @@ the HP Buff with no conditions but with Siege Class attribute.
     my @errors;
     my $pNum = t('PositiveOrZeroNum');
     $pNum->check($SiegeHP) or push @errors => "SiegeHP must be a Positive Number, not $SiegeHP";
-    my $range = t('IntRange[0, 10]');
+    my $range = t('NumRange[0, 10]');
     $range->check($SiegeHP) or push @errors => "SiegeHP must be within the range 0-10 inclusive, not $SiegeHP";
     if (@errors) {
       croak join ', ' => @errors;
@@ -333,15 +333,16 @@ the HP Buff with no conditions but with Siege Class attribute.
 =item GroundSpeed 
 
 the Ground (In-Battle Movement) Speed Buff with no conditions. 
+This defaults to zero because we do not know the troop type yet. 
 =cut 
 
-  field $GroundSpeed :reader :param //= 0.16667;
+  field $GroundSpeed :reader :param //= 0;
 
   ADJUST {
     my @errors;
     my $pNum = t('PositiveOrZeroNum');
     $pNum->check($GroundSpeed) or push @errors => "GroundSpeed must be a Positive Number, not $GroundSpeed";
-    my $range = t('IntRange[0, 10]');
+    my $range = t('NumRange[0, 10]');
     $range->check($GroundSpeed) or push @errors => "GroundSpeed must be within the range 0-10 inclusive, not $GroundSpeed";
     if (@errors) {
       croak join ', ' => @errors;
@@ -351,15 +352,16 @@ the Ground (In-Battle Movement) Speed Buff with no conditions.
 =item MountedSpeed 
 
 the Mounted (In-Battle Movement) Speed Buff with no conditions. 
+This defaults to zero because we do not know the troop type yet. 
 =cut 
 
-  field $MountedSpeed :reader :param //= 0.16667;
+  field $MountedSpeed :reader :param //= 0;
 
   ADJUST {
     my @errors;
     my $pNum = t('PositiveOrZeroNum');
     $pNum->check($MountedSpeed) or push @errors => "MountedSpeed must be a Positive Number, not $MountedSpeed";
-    my $range = t('IntRange[0, 10]');
+    my $range = t('NumRange[0, 10]');
     $range->check($MountedSpeed) or push @errors => "MountedSpeed must be within the range 0-10 inclusive, not $MountedSpeed";
     if (@errors) {
       croak join ', ' => @errors;
@@ -377,7 +379,7 @@ the March Size Increase Buff with no conditions.
     my @errors;
     my $pNum = t('PositiveOrZeroNum');
     $pNum->check($MarchSizeIncrease) or push @errors => "MarchSizeIncrease must be a Positive Number, not $MarchSizeIncrease";
-    my $range = t('IntRange[0, 10]');
+    my $range = t('NumRange[0, 10]');
     $range->check($MarchSizeIncrease) or push @errors => "MarchSizeIncrease must be within the range 0-10 inclusive, not $MarchSizeIncrease";
     if (@errors) {
       croak join ', ' => @errors;
@@ -395,7 +397,7 @@ the Rally Size Increase Buff with no conditions.
     my @errors;
     my $pNum = t('PositiveOrZeroNum');
     $pNum->check($RallySizeIncrease) or push @errors => "RallySizeIncrease must be a Positive Number, not $RallySizeIncrease";
-    my $range = t('IntRange[0, 10]');
+    my $range = t('NumRange[0, 10]');
     $range->check($RallySizeIncrease) or push @errors => "RallySizeIncrease must be within the range 0-10 inclusive, not $RallySizeIncrease";
     if (@errors) {
       croak join ', ' => @errors;
@@ -405,7 +407,7 @@ the Rally Size Increase Buff with no conditions.
 =item RangedRangeIncrease 
 
 The Ranged Range Increase Buff with no conditions (in other words, how far away can a ranged troop hit something).
-This defaults to zero with the assumption that everyone is appropriately using the skill books and armor, and thus it cancels out.  I dislike that, as it would lead an uninformed player to disvalue the books and armor and get slaughtered. 
+This defaults to zero because we do not know the troop type yet. 
 =cut 
 
   field $RangedRangeIncrease :reader :param //= 0;
@@ -414,8 +416,29 @@ This defaults to zero with the assumption that everyone is appropriately using t
     my @errors;
     my $pNum = t('PositiveOrZeroNum');
     $pNum->check($RangedRangeIncrease) or push @errors => "RangedRangeIncrease must be a Positive Number, not $RangedRangeIncrease";
-    my $range = t('IntRange[0, 10]');
+    my $range = t('NumRange[0, 10]');
     $range->check($RangedRangeIncrease) or push @errors => "RangedRangeIncrease must be within the range 0-10 inclusive, not $RangedRangeIncrease";
+    if (@errors) {
+      croak join ', ' => @errors;
+    }
+  }
+
+=item FlatSiegeRangeIncrease 
+
+There are two versions of this buff, this one is for flat increases.
+The Flat Siege Range Increase Buff with no conditions (in other words, how far away can a Siege Machine hit something).  
+This defaults to zero because we do not know the troop type yet. 
+
+=cut 
+
+  field $FlatSiegeRangeIncrease :reader :param //= 0;
+
+  ADJUST {
+    my @errors;
+    my $pNum = t('PositiveOrZeroNum');
+    $pNum->check($FlatSiegeRangeIncrease) or push @errors => "FlatSiegeRangeIncrease must be a Positive Number, not $FlatSiegeRangeIncrease";
+    my $range = t('NumRange[0, 10]');
+    $range->check($FlatSiegeRangeIncrease) or push @errors => "FlatSiegeRangeIncrease must be within the range 0-10 inclusive, not $FlatSiegeRangeIncrease";
     if (@errors) {
       croak join ', ' => @errors;
     }
@@ -423,8 +446,10 @@ This defaults to zero with the assumption that everyone is appropriately using t
 
 =item SiegeRangeIncrease 
 
+There are two versions of this buff, this one is for percentage increases.
 The Siege Range Increase Buff with no conditions (in other words, how far away can a Siege Machine hit something).
-This defaults to zero with the assumption that everyone is appropriately using the skill books and armor, and thus it cancels out.  I dislike that, as it would lead an uninformed player to disvalue the books and armor and get slaughtered. 
+This defaults to zero because we do not know the troop type yet. 
+
 =cut 
 
   field $SiegeRangeIncrease :reader :param //= 0;
@@ -433,25 +458,29 @@ This defaults to zero with the assumption that everyone is appropriately using t
     my @errors;
     my $pNum = t('PositiveOrZeroNum');
     $pNum->check($SiegeRangeIncrease) or push @errors => "SiegeRangeIncrease must be a Positive Number, not $SiegeRangeIncrease";
-    my $range = t('IntRange[0, 10]');
+    my $range = t('NumRange[0, 10]');
     $range->check($SiegeRangeIncrease) or push @errors => "SiegeRangeIncrease must be within the range 0-10 inclusive, not $SiegeRangeIncrease";
     if (@errors) {
       croak join ', ' => @errors;
     }
   }
 
+
 =item Death2Wounded 
 
 the Troop Death into Wounded Buff with no conditions. 
+The original at EvonyAnswers splits this into two, one for when there is
+an "Attacking" condition, and one with twice the value when there isn't. 
+I am using the value from the "Attacking" version, because you will not actually get twice the value of the other in any _single_ senario, he values it more becuase it is used in more situations.  I am handling that with subclasses instead. 
 =cut 
 
-  field $Death2Wounded :reader :param //= 0.25555;
+  field $Death2Wounded :reader :param //= 0.12555;
 
   ADJUST {
     my @errors;
     my $pNum = t('PositiveOrZeroNum');
     $pNum->check($Death2Wounded) or push @errors => "Death2Wounded must be a Positive Number, not $Death2Wounded";
-    my $range = t('IntRange[0, 10]');
+    my $range = t('NumRange[0, 10]');
     $range->check($Death2Wounded) or push @errors => "Death2Wounded must be within the range 0-10 inclusive, not $Death2Wounded";
     if (@errors) {
       croak join ', ' => @errors;
@@ -469,7 +498,7 @@ the Troop Death into Souls Buff with no conditions.
     my @errors;
     my $pNum = t('PositiveOrZeroNum');
     $pNum->check($Death2Souls) or push @errors => "Death2Souls must be a Positive Number, not $Death2Souls";
-    my $range = t('IntRange[0, 10]');
+    my $range = t('NumRange[0, 10]');
     $range->check($Death2Souls) or push @errors => "Death2Souls must be within the range 0-10 inclusive, not $Death2Souls";
     if (@errors) {
       croak join ', ' => @errors;
@@ -489,7 +518,7 @@ the AttackDebuff with no conditions or class attribute.
     my @errors;
     my $pNum = t('PositiveOrZeroNum');
     $pNum->check($GenericAttackDebuff) or push @errors => "GenericAttackDebuff must be a Positive Number, not $GenericAttackDebuff";
-    my $range = t('IntRange[0, 10]');
+    my $range = t('NumRange[0, 10]');
     $range->check($GenericAttackDebuff) or push @errors => "GenericAttackDebuff must be within the range 0-10 inclusive, not $GenericAttackDebuff";
     if (@errors) {
       croak join ', ' => @errors;
@@ -507,7 +536,7 @@ the AttackDebuff with no conditions but with Ground Class attribute.
     my @errors;
     my $pNum = t('PositiveOrZeroNum');
     $pNum->check($GroundAttackDebuff) or push @errors => "GroundAttackDebuff must be a Positive Number, not $GroundAttackDebuff";
-    my $range = t('IntRange[0, 10]');
+    my $range = t('NumRange[0, 10]');
     $range->check($GroundAttackDebuff) or push @errors => "GroundAttackDebuff must be within the range 0-10 inclusive, not $GroundAttackDebuff";
     if (@errors) {
       croak join ', ' => @errors;
@@ -525,7 +554,7 @@ the AttackDebuff with no conditions but with Mounted Class attribute.
     my @errors;
     my $pNum = t('PositiveOrZeroNum');
     $pNum->check($MountedAttackDebuff) or push @errors => "MountedAttackDebuff must be a Positive Number, not $MountedAttackDebuff";
-    my $range = t('IntRange[0, 10]');
+    my $range = t('NumRange[0, 10]');
     $range->check($MountedAttackDebuff) or push @errors => "MountedAttackDebuff must be within the range 0-10 inclusive, not $MountedAttackDebuff";
     if (@errors) {
       croak join ', ' => @errors;
@@ -543,7 +572,7 @@ the AttackDebuffDebuff with no conditions but with Ranged Class attribute.
     my @errors;
     my $pNum = t('PositiveOrZeroNum');
     $pNum->check($RangedAttackDebuff) or push @errors => "RangedAttackDebuff must be a Positive Number, not $RangedAttackDebuff";
-    my $range = t('IntRange[0, 10]');
+    my $range = t('NumRange[0, 10]');
     $range->check($RangedAttackDebuff) or push @errors => "RangedAttackDebuff must be within the range 0-10 inclusive, not $RangedAttackDebuff";
     if (@errors) {
       croak join ', ' => @errors;
@@ -561,7 +590,7 @@ the AttackDebuffDebuff with no conditions but with Siege Class attribute.
     my @errors;
     my $pNum = t('PositiveOrZeroNum');
     $pNum->check($SiegeAttackDebuff) or push @errors => "SiegeAttackDebuff must be a Positive Number, not $SiegeAttackDebuff";
-    my $range = t('IntRange[0, 10]');
+    my $range = t('NumRange[0, 10]');
     $range->check($SiegeAttackDebuff) or push @errors => "SiegeAttackDebuff must be within the range 0-10 inclusive, not $SiegeAttackDebuff";
     if (@errors) {
       croak join ', ' => @errors;
@@ -578,7 +607,7 @@ the DefenseDebuff with no conditions or class attribute.
     my @errors;
     my $pNum = t('PositiveOrZeroNum');
     $pNum->check($GenericDefenseDebuff) or push @errors => "GenericDefenseDebuff must be a Positive Number, not $GenericDefenseDebuff";
-    my $range = t('IntRange[0, 10]');
+    my $range = t('NumRange[0, 10]');
     $range->check($GenericDefenseDebuff) or push @errors => "GenericDefenseDebuff must be within the range 0-10 inclusive, not $GenericDefenseDebuff";
     if (@errors) {
       croak join ', ' => @errors;
@@ -596,7 +625,7 @@ the DefenseDebuff with no conditions but with Ground Class attribute.
     my @errors;
     my $pNum = t('PositiveOrZeroNum');
     $pNum->check($GroundDefenseDebuff) or push @errors => "GroundDefenseDebuff must be a Positive Number, not $GroundDefenseDebuff";
-    my $range = t('IntRange[0, 10]');
+    my $range = t('NumRange[0, 10]');
     $range->check($GroundDefenseDebuff) or push @errors => "GroundDefenseDebuff must be within the range 0-10 inclusive, not $GroundDefenseDebuff";
     if (@errors) {
       croak join ', ' => @errors;
@@ -614,7 +643,7 @@ the DefenseDebuff with no conditions but with Mounted Class attribute.
     my @errors;
     my $pNum = t('PositiveOrZeroNum');
     $pNum->check($MountedDefenseDebuff) or push @errors => "MountedDefenseDebuff must be a Positive Number, not $MountedDefenseDebuff";
-    my $range = t('IntRange[0, 10]');
+    my $range = t('NumRange[0, 10]');
     $range->check($MountedDefenseDebuff) or push @errors => "MountedDefenseDebuff must be within the range 0-10 inclusive, not $MountedDefenseDebuff";
     if (@errors) {
       croak join ', ' => @errors;
@@ -632,7 +661,7 @@ the DefenseDebuff with no conditions but with Ranged Class attribute.
     my @errors;
     my $pNum = t('PositiveOrZeroNum');
     $pNum->check($RangedDefenseDebuff) or push @errors => "RangedDefenseDebuff must be a Positive Number, not $RangedDefenseDebuff";
-    my $range = t('IntRange[0, 10]');
+    my $range = t('NumRange[0, 10]');
     $range->check($RangedDefenseDebuff) or push @errors => "RangedDefenseDebuff must be within the range 0-10 inclusive, not $RangedDefenseDebuff";
     if (@errors) {
       croak join ', ' => @errors;
@@ -650,7 +679,7 @@ the DefenseDebuff with no conditions but with Siege Class attribute.
     my @errors;
     my $pNum = t('PositiveOrZeroNum');
     $pNum->check($SiegeDefenseDebuff) or push @errors => "SiegeDefenseDebuff must be a Positive Number, not $SiegeDefenseDebuff";
-    my $range = t('IntRange[0, 10]');
+    my $range = t('NumRange[0, 10]');
     $range->check($SiegeDefenseDebuff) or push @errors => "SiegeDefenseDebuff must be within the range 0-10 inclusive, not $SiegeDefenseDebuff";
     if (@errors) {
       croak join ', ' => @errors;
@@ -667,7 +696,7 @@ the HPDebuff with no conditions or class attribute.
     my @errors;
     my $pNum = t('PositiveOrZeroNum');
     $pNum->check($GenericHPDebuff) or push @errors => "GenericHPDebuff must be a Positive Number, not $GenericHPDebuff";
-    my $range = t('IntRange[0, 10]');
+    my $range = t('NumRange[0, 10]');
     $range->check($GenericHPDebuff) or push @errors => "GenericHPDebuff must be within the range 0-10 inclusive, not $GenericHPDebuff";
     if (@errors) {
       croak join ', ' => @errors;
@@ -685,7 +714,7 @@ the HPDebuff with no conditions but with Ground Class attribute.
     my @errors;
     my $pNum = t('PositiveOrZeroNum');
     $pNum->check($GroundHPDebuff) or push @errors => "GroundHPDebuff must be a Positive Number, not $GroundHPDebuff";
-    my $range = t('IntRange[0, 10]');
+    my $range = t('NumRange[0, 10]');
     $range->check($GroundHPDebuff) or push @errors => "GroundHPDebuff must be within the range 0-10 inclusive, not $GroundHPDebuff";
     if (@errors) {
       croak join ', ' => @errors;
@@ -703,7 +732,7 @@ the HPDebuff with no conditions but with Mounted Class attribute.
     my @errors;
     my $pNum = t('PositiveOrZeroNum');
     $pNum->check($MountedHPDebuff) or push @errors => "MountedHPDebuff must be a Positive Number, not $MountedHPDebuff";
-    my $range = t('IntRange[0, 10]');
+    my $range = t('NumRange[0, 10]');
     $range->check($MountedHPDebuff) or push @errors => "MountedHPDebuff must be within the range 0-10 inclusive, not $MountedHPDebuff";
     if (@errors) {
       croak join ', ' => @errors;
@@ -721,7 +750,7 @@ the HPDebuff with no conditions but with Ranged Class attribute.
     my @errors;
     my $pNum = t('PositiveOrZeroNum');
     $pNum->check($RangedHPDebuff) or push @errors => "RangedHPDebuff must be a Positive Number, not $RangedHPDebuff";
-    my $range = t('IntRange[0, 10]');
+    my $range = t('NumRange[0, 10]');
     $range->check($RangedHPDebuff) or push @errors => "RangedHPDebuff must be within the range 0-10 inclusive, not $RangedHPDebuff";
     if (@errors) {
       croak join ', ' => @errors;
@@ -739,7 +768,7 @@ the HPDebuff with no conditions but with Siege Class attribute.
     my @errors;
     my $pNum = t('PositiveOrZeroNum');
     $pNum->check($SiegeHPDebuff) or push @errors => "SiegeHPDebuff must be a Positive Number, not $SiegeHPDebuff";
-    my $range = t('IntRange[0, 10]');
+    my $range = t('NumRange[0, 10]');
     $range->check($SiegeHPDebuff) or push @errors => "SiegeHPDebuff must be within the range 0-10 inclusive, not $SiegeHPDebuff";
     if (@errors) {
       croak join ', ' => @errors;
@@ -757,7 +786,7 @@ the Troop Death into Wounded Debuff with no conditions.
     my @errors;
     my $pNum = t('PositiveOrZeroNum');
     $pNum->check($Death2WoundedDebuff) or push @errors => "Death2WoundedDebuff must be a Positive Number, not $Death2WoundedDebuff";
-    my $range = t('IntRange[0, 10]');
+    my $range = t('NumRange[0, 10]');
     $range->check($Death2WoundedDebuff) or push @errors => "Death2WoundedDebuff must be within the range 0-10 inclusive, not $Death2WoundedDebuff";
     if (@errors) {
       croak join ', ' => @errors;
@@ -775,7 +804,7 @@ the Troop Death into Souls Debuff with no conditions.
     my @errors;
     my $pNum = t('PositiveOrZeroNum');
     $pNum->check($Death2SoulsDebuff) or push @errors => "Death2SoulsDebuff must be a Positive Number, not $Death2SoulsDebuff";
-    my $range = t('IntRange[0, 10]');
+    my $range = t('NumRange[0, 10]');
     $range->check($Death2SoulsDebuff) or push @errors => "Death2SoulsDebuff must be within the range 0-10 inclusive, not $Death2SoulsDebuff";
     if (@errors) {
       croak join ', ' => @errors;
