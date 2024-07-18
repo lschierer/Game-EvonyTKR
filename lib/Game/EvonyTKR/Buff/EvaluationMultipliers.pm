@@ -12,11 +12,11 @@ class Game::EvonyTKR::Buff::EvaluationMultipliers {
 
 =head1 SYNOPSIS
 
-=for comment Brief examples of using the module.
+=item comment Brief examples of using the module.
 
 =head1 DESCRIPTION
 
-=for This ought to be a role, but that is not yet implemented in perl Corinna.
+=item This ought to be a role, but that is not yet implemented in perl Corinna.
 
 For now a Game::EvonyTKR::General has-a (set of) Game::EvonyTKR::Buff::EvaluationMultipliers rather than :does Game::EvonyTKR::Buff:Evaluation which is what I wanted.  
 
@@ -56,6 +56,8 @@ I recognize that the flat list of attributes is an anti-pattern, and that a hash
   }
   
 =head1 Attributes 
+
+=over
 
 =item GenericAttack 
 the Attack Buff with no conditions or class attribute. 
@@ -736,6 +738,7 @@ the Troop Death into Souls Debuff with no conditions.
     }
   }
 
-
+=back
+=cut
 }
 1;
