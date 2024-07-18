@@ -1,0 +1,93 @@
+---
+general:
+  name: Subutai
+  display: summary
+  leadership: 115
+  leadership_increment: 8.82
+  attack: 120
+  attack_increment: 9.01
+  defense: 112
+  defense_increment: 8.82
+  politics: 111
+  politics_increment: 8.76
+  stars: '5red'
+  level: '1'
+  score_as: Archers
+  books:
+    - Mongol Conquest
+  specialities:
+    - Ranged Troop Formation
+    - Siege
+    - Ranged Troop Ares
+    - Battle of Mohi
+  ascending:
+    - level: '1red'
+      buff:
+        - attribute: Attack
+          class: Archers
+          value:
+            number: 10
+            unit: percentage
+        - attribute: Attack
+          class: Siege
+          value:
+            number: 10
+            unit: percentage
+    - level: '2red'
+      buff:
+        - attribute: Death_to_Wounded
+          condition:
+            - Marching
+          value:
+            number: 10
+            unit: percentage
+    - level: '3red'
+      buff:
+        - attribute: Defense
+          class: Archers
+          value:
+            number: 10
+            unit: percentage
+        - attribute: Defense
+          class: Siege
+          value:
+            number: 10
+            unit: percentage
+        - attribute: March_Size_Capacity
+          value:
+            number: 8
+            unit: percentage
+    - level: '4red'
+      buff:
+        - attribute: Defense
+          class: Archers
+          value:
+            number: 20
+            unit: percentage
+        - attribute: Defense
+          class: Siege
+          value:
+            number: 20
+            unit: percentage
+        - attribute: HP
+          class: Archers
+          value:
+            number: 15
+            unit: percentage
+        - attribute: HP
+          class: Siege
+          value:
+            number: 15
+            unit: percentage
+    - level: '5red'
+      buff:
+        - attribute: Attack
+          class: Archers
+          value:
+            number: 25
+            unit: percentage
+        - attribute: Defense
+          class: Archers
+          value:
+            number: 20
+            unit: percentage

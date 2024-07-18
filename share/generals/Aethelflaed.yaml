@@ -1,0 +1,107 @@
+---
+general:
+  name: Aethelflaed
+  level: '1'
+  display: summary
+  note:
+    - severity: info
+      text: >
+        The Mounted Troops' Attack Skill Book may, however, be used.
+  score_as: Mounted
+  stars: '5red'
+  leadership: 112
+  leadership_increment: 8.94
+  attack: 107
+  attack_increment: 8.78
+  defense: 115
+  defense_increment: 9.12
+  politics: 113
+  politics_increment: 8.44
+  books:
+    - Lady of the Mercians
+  ascending:
+    - level: '1red'
+      buff:
+        - attribute: HP
+          condition:
+            - Against Monsters
+          class: Mounted
+          value:
+            number: 30
+            unit: percentage
+        - attribute: Defense
+          condition:
+            - Against Monsters
+          class: Mounted
+          value:
+            number: 10
+            unit: percentage
+    - level: '2red'
+      buff:
+        - attribute: Defense
+          condition:
+            - Reduces Monster
+          value:
+            number: -10
+            unit: percentage
+        - attribute: HP
+          condition:
+            - Against Monsters
+          value:
+            number: 15
+            unit: percentage
+    - level: '3red'
+      buff:
+        - attribute: Attack
+          condition:
+            - Reduces Monster
+          value:
+            number: -10
+            unit: percentage
+        - attribute: Defense
+          condition:
+            - Against Monsters
+          value:
+            number: 20
+            unit: percentage
+    - level: '4red'
+      buff:
+        - attribute: Attack
+          condition:
+            - Against Monsters
+          class: Mounted
+          value:
+            number: 15
+            unit: percentage
+        - attribute: HP
+          condition:
+            - Against Monsters
+          value:
+            number: 20
+            unit: percentage
+    - level: '5red'
+      buff:
+        - attribute: Attack
+          condition:
+            - Against Monsters
+          class: Mounted
+          value:
+            number: 20
+            unit: percentage
+        - attribute: Defense
+          condition:
+            - Against Monsters
+          value:
+            number: 10
+            unit: percentage
+        - attribute: HP
+          condition:
+            - Against Monsters
+          value:
+            number: 10
+            unit: percentage
+  specialities:
+    - Hunter
+    - Fortune
+    - Mounted Troop Ares
+    - Lord of the Mercians

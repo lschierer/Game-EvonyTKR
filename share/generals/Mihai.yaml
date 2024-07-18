@@ -1,0 +1,106 @@
+---
+general:
+  name: Mihai
+  display: summary
+  leadership: 118
+  leadership_increment: 8.82
+  attack: 120
+  attack_increment: 9.05
+  defense: 117
+  defense_increment: 8.87
+  politics: 106
+  politics_increment: 8.69
+  stars: '5red'
+  level: '1'
+  score_as: Archers
+  books:
+    - Battle of Selimbar
+  ascending:
+    - level: '1red'
+      buff:
+        - attribute: Attack
+          condition:
+            - Marching
+          class: Archers
+          value:
+            number: 10
+            unit: percentage
+        - attribute: Defense
+          condition:
+            - Marching
+          class: Archers
+          value:
+            number: 15
+            unit: percentage
+        - attribute: Defense
+          condition:
+            - Marching
+          class: Siege
+          value:
+            number: 15
+            unit: percentage
+    - level: '2red'
+      buff:
+        - attribute: Death_to_Wounded
+          condition:
+            - Marching
+          value:
+            number: 8
+            unit: percentage
+    - level: '3red'
+      buff:
+        - attribute: March_Size_Capacity
+          value:
+            number: 10
+            unit: percentage
+        - attribute: HP
+          condition:
+            - Attacking
+          class: Archers
+          value:
+            number: 20
+            unit: percentage
+    - level: '4red'
+      buff:
+        - attribute: Attack
+          condition:
+            - Attacking
+          class: Archers
+          value:
+            number: 15
+            unit: percentage
+        - attribute: Attack
+          condition:
+            - Attacking
+          class: Siege
+          value:
+            number: 15
+            unit: percentage
+        - attribute: HP
+          condition:
+            - Attacking
+          class: Archers
+          value:
+            number: 25
+            unit: percentage
+    - level: '5red'
+      buff:
+        - attribute: Attack
+          condition:
+            - Marching
+          class: Archers
+          value:
+            number: 25
+            unit: percentage
+        - attribute: Defense
+          condition:
+            - Marching
+          class: Archers
+          value:
+            number: 35
+            unit: percentage
+  specialities:
+    - Ranged Troop Assault
+    - Bash
+    - Ranged Troop Ares
+    - Romanian Ruler

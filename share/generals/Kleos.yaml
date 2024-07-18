@@ -1,0 +1,129 @@
+---
+general:
+  name: Kleos
+  display: summary
+  leadership: 119
+  leadership_increment: 8.97
+  attack: 118
+  attack_increment: 8.91
+  defense: 112
+  defense_increment: 8.79
+  politics: 112
+  politics_increment: 8.72
+  stars: '5red'
+  level: '1'
+  score_as: Siege
+  books:
+    - Holy War of Yadirah
+  specialities:
+    - Siege Troop Defense
+    - Bash
+    - Siege Machine Ares
+    - Demigod Hero
+  ascending:
+    - level: '1red'
+      buff:
+        - attribute: Defense
+          condition:
+            - Marching
+          class: Archers
+          value:
+            number: 15
+            unit: percentage
+        - attribute: HP
+          condition:
+            - Marching
+          class: Archers
+          value:
+            number: 15
+            unit: percentage
+        - attribute: Defense
+          condition:
+            - Marching
+          class: Siege
+          value:
+            number: 15
+            unit: percentage
+        - attribute: HP
+          condition:
+            - Marching
+          class: Siege
+          value:
+            number: 15
+            unit: percentage
+    - level: '2red'
+      buff:
+        - attribute: Wounded_to_Death
+          condition:
+            - Enemy_In_City
+          value:
+            number: 10
+            unit: percentage
+    - level: '3red'
+      buff:
+        - attribute: Attack
+          condition:
+            - Marching
+          class: Archers
+          value:
+            number: 5
+            unit: percentage
+        - attribute: Attack
+          condition:
+            - Marching
+          class: Siege
+          value:
+            number: 5
+            unit: percentage
+        - attribute: Rally_Capacity
+          condition:
+            - When_Rallying
+          value:
+            number: 6
+            unit: percentage
+    - level: '4red'
+      buff:
+        - attribute: Attack
+          condition:
+            - Marching
+          class: Archers
+          value:
+            number: 10
+            unit: percentage
+        - attribute: Attack
+          condition:
+            - Marching
+          class: Siege
+          value:
+            number: 10
+            unit: percentage
+        - attribute: Defense
+          condition:
+            - Marching
+          class: Siege
+          value:
+            number: 25
+            unit: percentage
+    - level: '5red'
+      buff:
+        - attribute: Attack
+          condition:
+            - Marching
+          class: Archers
+          value:
+            number: 20
+            unit: percentage
+        - attribute: Attack
+          condition:
+            - Marching
+          class: Siege
+          value:
+            number: 20
+            unit: percentage
+        - attribute: HP
+          condition:
+            - Marching
+          class: Siege
+          value:
+            number: 25
+            unit: percentage

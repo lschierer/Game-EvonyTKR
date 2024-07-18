@@ -1,0 +1,86 @@
+---
+general:
+  name: Maria Theresa
+  display: summary
+  leadership: 110
+  leadership_increment: 8.64
+  attack: 123
+  attack_increment: 8.85
+  defense: 107
+  defense_increment: 8.91
+  politics: 112
+  politics_increment: 8.49
+  stars: '5red'
+  level: '1'
+  score_as: Mounted
+  books:
+    - Queen of Hungary
+  ascending:
+    - level: '1red'
+      buff:
+        - attribute: 'Double Items Drop Rate'
+          condition:
+            - Against Monsters
+          value:
+            number: 10
+            unit: percentage
+        - attribute: Marching_Speed_to_Monsters
+          condition:
+            - Against Monsters
+          value:
+            number: 5
+            unit: percentage
+    - level: '2red'
+      buff:
+        - attribute: Attack
+          condition:
+            - Reduces Monster
+          value:
+            number: -10
+            unit: percentage
+        - attribute: Marching_Speed_to_Monsters
+          condition:
+            - Against Monsters
+          value:
+            number: 10
+            unit: percentage
+    - level: '3red'
+      buff:
+        - attribute: March_Size_Capacity
+          value:
+            number: 10
+            unit: percentage
+        - attribute: Stamina_cost
+          condition:
+            - Against Monsters
+          value:
+            number: -5
+            unit: percentage
+    - level: '4red'
+      buff:
+        - attribute: Attack
+          condition:
+            - Against Monsters
+          class: Mounted
+          value:
+            number: 30
+            unit: percentage
+    - level: '5red'
+      buff:
+        - attribute: 'Double Items Drop Rate'
+          condition:
+            - Against Monsters
+          value:
+            number: 10
+            unit: percentage
+        - attribute: Stamina_cost
+          condition:
+            - Against Monsters
+          value:
+            number: -5
+            unit: percentage
+  specialities:
+    - Hunter
+    - Strike
+    - Mounted Troop Ares
+    - War of Succession

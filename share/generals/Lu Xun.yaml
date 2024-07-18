@@ -1,0 +1,106 @@
+---
+general:
+  name: Lu Xun
+  display: summary
+  stars: '5red'
+  level: '1'
+  score_as: Ground
+  leadership: 116
+  leadership_increment: 8.94
+  attack: 121
+  attack_increment: 9.07
+  defense: 118
+  defense_increment: 8.79
+  politics: 107
+  politics_increment: 8.62
+  books:
+    - Battle of Xiaoting
+  specialities:
+    - Ground Troop Defense
+    - Formation
+    - Ground Troop Ares
+    - Chief Controller of Eastern Wu
+  ascending:
+    - level: '1red'
+      buff:
+        - attribute: Attack
+          class: Ground
+          condition:
+            - Marching
+          value:
+            number: 15
+            unit: percentage
+        - attribute: HP
+          class: Ground
+          condition:
+            - Marching
+          value:
+            number: 10
+            unit: percentage
+        - attribute: HP
+          class: Mounted
+          condition:
+            - Marching
+          value:
+            number: 10
+            unit: percentage
+    - level: '2red'
+      buff:
+        - attribute: Death_to_Wounded
+          condition:
+            - Marching
+          value:
+            number: 10
+            unit: percentage
+    - level: '3red'
+      buff:
+        - attribute: March_Size_Capacity
+          value:
+            number: 14
+            unit: percentage
+    - level: '4red'
+      buff:
+        - attribute: Attack
+          class: Ground
+          condition:
+            - Marching
+          value:
+            number: 10
+            unit: percentage
+        - attribute: Attack
+          class: Mounted
+          condition:
+            - Marching
+          value:
+            number: 10
+            unit: percentage
+        - attribute: Defense
+          class: Ground
+          condition:
+            - Marching
+          value:
+            number: 25
+            unit: percentage
+        - attribute: Defense
+          class: Mounted
+          condition:
+            - Marching
+          value:
+            number: 25
+            unit: percentage
+    - level: '5red'
+      buff:
+        - attribute: Attack
+          class: Ground
+          condition:
+            - Attacking
+          value:
+            number: 25
+            unit: percentage
+        - attribute: Defense
+          class: Ground
+          condition:
+            - Attacking
+          value:
+            number: 30
+            unit: percentage

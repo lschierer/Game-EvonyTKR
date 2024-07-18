@@ -1,0 +1,80 @@
+---
+general:
+  name: Ramesses II
+  display: summary
+  leadership: 113
+  leadership_increment: 8.75
+  attack: 111
+  attack_increment: 8.79
+  defense: 106
+  defense_increment: 8.56
+  politics: 112
+  politics_increment: 8.75
+  stars: '5red'
+  level: '1'
+  score_as: Siege
+  books:
+    - Great Pharaoh
+  specialities:
+    - Siege Machine Formation
+    - Bash
+    - Siege Machine Ares
+    - Battle of Kadesh
+  ascending:
+    - level: '1red'
+      buff:
+        - attribute: Attack
+          class: Siege
+          value:
+            number: 10
+            unit: percentage
+        - attribute: Defense
+          class: Ground
+          value:
+            number: 10
+            unit: percentage
+    - level: '2red'
+      buff:
+        - attribute: Death_to_Wounded
+          condition:
+            - leading_the_army_to_attack
+          value:
+            number: 10
+            unit: percentage
+    - level: '3red'
+      buff:
+        - attribute: Rally_Capacity
+          condition:
+            - When_Rallying
+          value:
+            number: 8
+            unit: percentage
+    - level: '4red'
+      buff:
+        - attribute: Attack
+          class: Siege
+          value:
+            number: 10
+            unit: percentage
+        - attribute: HP
+          class: Ground
+          value:
+            number: 10
+            unit: percentage
+    - level: '5red'
+      buff:
+        - attribute: Attack
+          class: Siege
+          value:
+            number: 10
+            unit: percentage
+        - attribute: Defense
+          class: Siege
+          value:
+            number: 15
+            unit: percentage
+        - attribute: HP
+          class: Siege
+          value:
+            number: 15
+            unit: percentage

@@ -1,0 +1,88 @@
+---
+general:
+  name: Prince Eugene
+  display: summary
+  leadership: 120
+  leadership_increment: 9.15
+  attack: 118
+  attack_increment: 8.86
+  defense: 117
+  defense_increment: 8.77
+  politics: 105
+  politics_increment: 8.55
+  stars: '5red'
+  level: '1'
+  score_as: Mounted
+  books:
+    - Battle of Zenta
+  specialities:
+    - Mounted Troop Formation
+    - Annihilation
+    - Mounted Troop Ares
+    - Ode to Knight
+  ascending:
+    - level: '1red'
+      buff:
+        - attribute: Attack
+          class: Mounted
+          value:
+            number: 5
+            unit: percentage
+        - attribute: Defense
+          class: Mounted
+          value:
+            number: 10
+            unit: percentage
+        - attribute: HP
+          class: Mounted
+          value:
+            number: 10
+            unit: percentage
+    - level: '2red'
+      buff:
+        - attribute: Death_to_Wounded
+          condition:
+            - leading_the_army_to_attack
+          value:
+            number: 10
+            unit: percentage
+    - level: '3red'
+      buff:
+        - attribute: March_Size_Capacity
+          value:
+            number: 12
+            unit: percentage
+    - level: '4red'
+      buff:
+        - attribute: Attack
+          class: Mounted
+          value:
+            number: 10
+            unit: percentage
+        - attribute: HP
+          class: Mounted
+          value:
+            number: 10
+            unit: percentage
+        - attribute: HP
+          class: Ground
+          value:
+            number: 10
+            unit: percentage
+    - level: '5red'
+      buff:
+        - attribute: Attack
+          class: Mounted
+          value:
+            number: 15
+            unit: percentage
+        - attribute: Defense
+          class: Mounted
+          value:
+            number: 10
+            unit: percentage
+        - attribute: HP
+          class: Mounted
+          value:
+            number: 10
+            unit: percentage
