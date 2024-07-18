@@ -5,9 +5,9 @@ use Test::Most;
 use Test::File::ShareDir::Object::Dist;
 
 use Game::EvonyTKR::General;
-use Game::EvonyTKR::SkillBook::Special;
+use Game::EvonyTKR::SkillBook;
 
-my $sb = Game::EvonyTKR::SkillBook::Special->new(
+my $sb = Game::EvonyTKR::SkillBook->new(
   name  => 'Test Book 1'
 );
 

@@ -4,7 +4,7 @@ use experimental qw(class);
 class Game::EvonyTKR::General {
 use Types::Common qw( t is_Num is_Str is_Int);
 use Type::Utils "is"; 
-use Game::EvonyTKR::SkillBook::Special;
+use Game::EvonyTKR::SkillBook;
 use namespace::autoclean;
 # PODNAME: Game::EvonyTKR::General
 
@@ -175,9 +175,9 @@ This base class implements the attributes and methods common to all Generals, bu
   ADJUST {
     my @errors;
     my $type = blessed $builtInBook;
-    if($type ne 'Game::EvonyTKR::SkillBook::Special'){
+    if($type ne 'Game::EvonyTKR::SkillBook'){
       my $type = blessed $builtInBook;
-      push @errors => 'builtInBook must be a SkillBook::Special, not $type';
+      push @errors => 'builtInBook must be a SkillBook, not $type';
       if (@errors) {
         die join ', ' => @errors;
       }
