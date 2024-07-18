@@ -1,4 +1,4 @@
-use 5.40.0;
+use v5.40.0;
 use experimental 'class';
 
 class Game::EvonyTKR::Buff::Value {

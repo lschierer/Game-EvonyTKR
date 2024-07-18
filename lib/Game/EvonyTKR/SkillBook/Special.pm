@@ -1,4 +1,4 @@
-use 5.40.0;
+use v5.40.0;
 use experimental qw(class);
 
 class Game::EvonyTKR::SkillBook::Special :isa(Game::EvonyTKR::SkillBook) {
@@ -7,6 +7,7 @@ class Game::EvonyTKR::SkillBook::Special :isa(Game::EvonyTKR::SkillBook) {
   use Type::Utils "is"; 
   use Game::EvonyTKR::Buff;
   use namespace::autoclean;
+  use Game::EvonyTKR::SkillBook;
 # PODNAME: Game::EvonyTKR::SkillBook::Special
 
 # ABSTRACT: Module for processing information about Evony TKR SkillBooks Built-in to each General.

@@ -1,4 +1,4 @@
-use 5.40.0;
+use v5.40.0;
 use experimental qw(class);
 
 class Game::EvonyTKR::Buff {
