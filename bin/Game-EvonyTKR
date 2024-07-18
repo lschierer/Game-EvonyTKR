@@ -5,7 +5,8 @@ use strict;
 use warnings;
 use Game::EvonyTKR::Buff;
 use Game::EvonyTKR::Buff::Value;
-use Game::EvonyTKR::SkillBook;
+use Game::EvonyTKR::SkillBook::Special;
+use Game::EvonyTKR::General;
 
 =head1 NAME
 
@@ -23,10 +24,21 @@ my $buff = Game::EvonyTKR::Buff->new(
 
 say $buff->compare($buff);
 
-my $sb = Game::EvonyTKR::SkillBook->new(
+my $sb = Game::EvonyTKR::SkillBook::Special->new(
     name    => 'New Book 1'
 );
 
 $sb->add_buff($buff);
 
-
+my $g = Game::EvonyTKR::General->new(
+  name                  => 'Test General',
+  leadership            => 1.0,
+  leadership_increment  => 0.1,
+  attack                => 1.0,
+  attack_increment      => 0.1,
+  defense               => 1.0,
+  defense_increment     => 0.1,
+  politics              => 1.0,
+  politics_increment    => 0.1,
+  builtInBook           => $sb
+);

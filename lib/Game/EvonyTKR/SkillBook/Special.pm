@@ -34,6 +34,10 @@ While there is no particular logic here, by requiring this class, I ensure that 
     }
   }
 
+  method is_builtin() {
+    return 1;
+  }
+  
 }
 
 1;
