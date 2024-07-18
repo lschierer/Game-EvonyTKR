@@ -31,7 +31,7 @@ in which ways is not always entirely reliable, and these modules will, at times,
     }
   }
 
-  field $BuffMultipliers :reader :param //= Game::EvonyTKR::Buff::EvaluationMultipliers->new(
+  use constant DEFAULT_BUFF_MULTIPLIERS => Game::EvonyTKR::Buff::EvaluationMultipliers->new(
     SiegeAttack             => 2.87400,
     GroundSpeed             => 0,
     MountedSpeed            => 0,
@@ -60,17 +60,6 @@ in which ways is not always entirely reliable, and these modules will, at times,
     Death2WoundedDebuff     => 0.12555,
     Death2SoulsDebuff       => 0.12555,
   );
-
-  ADJUST {
-    my @errors;
-    my $type = blessed $BuffMultipliers;
-    if($type ne 'Game::EvonyTKR::Buff::EvaluationMultipliers'){
-      push @errors => "BuffMultipliers must be a Game::EvonyTKR::Buff::EvaluationMultipliers, not $type";
-      if (@errors) {
-        die join ', ' => @errors;
-      }
-    }
-  }
 
   method is_ground_general() {
     return 0;
