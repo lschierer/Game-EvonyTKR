@@ -1,0 +1,72 @@
+---
+ascending:
+- level: '1red'
+  buff:
+    - attribute: Attack
+      condition:
+        - Against Monsters
+      value:
+        number: 5
+        unit: percentage
+    - attribute: Defense
+      condition:
+        - Against Monsters
+      value:
+        number: 10
+        unit: percentage
+- level: '2red'
+  buff:
+    - attribute: Defense
+      condition:
+        - Reduces Monster
+      value:
+        number: -10
+        unit: percentage
+    - attribute: HP
+      condition:
+        - Against Monsters
+      value:
+        number: 15
+        unit: percentage
+- level: '3red'
+  buff:
+    - attribute: Attack
+      condition:
+        - Reduces Monster
+      value:
+        number: 10
+        unit: percentage
+    - attribute: Defense
+      condition:
+        - Against Monsters
+      value:
+        number: 15
+        unit: percentage
+- level: '4red'
+  buff:
+    - attribute: Attack
+      condition:
+        - Against Monsters
+      value:
+        number: 5
+        unit: percentage
+    - attribute: HP
+      condition:
+        - Against Monsters
+      value:
+        number: 15
+        unit: percentage
+- level: '5red'
+  buff:
+    - attribute: Attack
+      condition:
+        - Against Monsters
+      value:
+        number: 10
+        unit: percentage
+    - attribute: Defense
+      condition:
+        - Against Monsters
+      value:
+        number: 10
+        unit: percentage

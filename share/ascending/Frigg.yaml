@@ -1,0 +1,72 @@
+---
+ascending:
+- level: '1red'
+  buff:
+    - attribute: Attack
+      class: Ground
+      value:
+        number: 10
+        unit: percentage
+    - attribute: HP
+      class: Ground
+      value:
+        number: 10
+        unit: percentage
+- level: '2red'
+  buff:
+    - attribute: Death_to_Wounded
+      condition:
+        - Marching
+      value:
+        number: 8
+        unit: percentage
+- level: '3red'
+  buff:
+    - attribute: Defense
+      class: Ground
+      value:
+        number: 10
+        unit: percentage
+    - attribute: Defense
+      class: Mounted
+      value:
+        number: 10
+        unit: percentage
+    - attribute: HP
+      class: Ground
+      value:
+        number: 10
+        unit: percentage
+    - attribute: HP
+      class: Mounted
+      value:
+        number: 10
+        unit: percentage
+- level: '4red'
+  buff:
+    - attribute: Attack
+      class: Ground
+      value:
+        number: 20
+        unit: percentage
+    - attribute: Defense
+      class: Ground
+      value:
+        number: 20
+        unit: percentage
+- level: '5red'
+  buff:
+    - attribute: Attack
+      class: Ground
+      value:
+        number: 20
+        unit: percentage
+    - attribute: HP
+      class: Ground
+      value:
+        number: 20
+        unit: percentage
+    - attribute: March_Size_Capacity
+      value:
+        number: 5
+        unit: percentage

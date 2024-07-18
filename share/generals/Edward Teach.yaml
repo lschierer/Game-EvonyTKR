@@ -16,54 +16,8 @@ general:
   books:
     - Queen Annes Revenge
   specialities:
-  - Siege Machine Formation
-  - Bash
-  - Siege Machine Ares
-  - Blackbeard
-  ascending:
-    - level: '1red'
-      buff:
-        - attribute: Attack
-          class: Siege
-          value:
-            number: 5
-            unit: percentage
-        - attribute: Defense
-          class: Siege
-          value:
-            number: 15
-            unit: percentage
-    - level: '2red'
-      buff:
-        - attribute: Death_to_Wounded
-          condition:
-            - Marching
-          value:
-            number: 8
-            unit: percentage
-    - level: '3red'
-      buff:
-        - attribute: Attack
-          class: Siege
-          value:
-            number: 5
-            unit: percentage
-        - attribute: Rally_Capacity
-          condition:
-            - When_Rallying
-          value:
-            number: 8
-            unit: percentage
-    - level: '4red'
-      buff:
-        - attribute: Attack
-          class: Siege
-          value:
-            number: 25
-            unit: percentage
-        - attribute: Defense
-          class: Siege
-          value:
-            number: 25
-            unit: percentage
-  
+    - Siege Machine Formation
+    - Bash
+    - Siege Machine Ares
+    - Blackbeard
+  ascending: true
