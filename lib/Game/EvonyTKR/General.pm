@@ -177,7 +177,7 @@ This base class implements the attributes and methods common to all Generals, bu
     my @errors;
     my $type = blessed $builtInBook;
     if($type ne 'Game::EvonyTKR::SkillBook::Special'){
-      push @errors => 'builtInBook must be a SkillBook::Special, not $type';
+      push @errors => "builtInBook must be a Game::EvonyTKR::SkillBook::Special, not $type";
       if (@errors) {
         die join ', ' => @errors;
       }
