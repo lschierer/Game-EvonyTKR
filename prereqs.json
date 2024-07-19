@@ -12,6 +12,10 @@
          "File::ShareDir" : "0",
          "File::Slurp" : "0",
          "File::Spec" : "0",
+         "Game::EvonyTKR::General::Ground" : "0",
+         "Game::EvonyTKR::General::Mounted" : "0",
+         "Game::EvonyTKR::General::Ranged" : "0",
+         "Game::EvonyTKR::General::Siege" : "0",
          "Game::EvonyTKR::SkillBook::Special" : "0",
          "PPI::Document" : "0",
          "Pod::Weaver" : "0",
@@ -29,7 +33,7 @@
    },
    "test" : {
       "requires" : {
-         "Game::EvonyTKR::General::Siege" : "0",
+         "Test::Distribution" : "0",
          "Test::File::ShareDir::Object::Dist" : "0",
          "Test::Most" : "0"
       }

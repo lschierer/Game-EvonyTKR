@@ -3,7 +3,7 @@
    "author" : [
       "Luke Schierer <luke@schierer.org>"
    ],
-   "dynamic_config" : 0,
+   "dynamic_config" : "1",
    "generated_by" : "App::ModuleBuildTiny version 0.047",
    "license" : [
       "unrestricted",
@@ -15,6 +15,11 @@
    },
    "name" : "Game-EvonyTKR",
    "prereqs" : {
+      "build" : {
+         "requires" : {
+            "App::podweaver" : "0"
+         }
+      },
       "configure" : {
          "requires" : {
             "Module::Build::Tiny" : "0.039"
@@ -31,8 +36,15 @@
             "Carp" : "0",
             "Data::Dumper" : "0",
             "File::ShareDir" : "0",
+            "File::Slurp" : "0",
             "File::Spec" : "0",
+            "Game::EvonyTKR::General::Ground" : "0",
+            "Game::EvonyTKR::General::Mounted" : "0",
+            "Game::EvonyTKR::General::Ranged" : "0",
+            "Game::EvonyTKR::General::Siege" : "0",
             "Game::EvonyTKR::SkillBook::Special" : "0",
+            "PPI::Document" : "0",
+            "Pod::Weaver" : "0",
             "Software::License::CC_BY_4_0" : "0",
             "Type::Utils" : "0",
             "Types::Common" : "0",
@@ -47,16 +59,22 @@
       },
       "test" : {
          "requires" : {
-            "Game::EvonyTKR::General::Siege" : "0",
             "Test::File::ShareDir::Object::Dist" : "0",
-            "Test::Most" : "0"
+            "Test::Most" : "0",
+            "TestsFor::Game::EvonyTKR::Buff" : "0",
+            "TestsFor::Game::EvonyTKR::Buff::Data" : "0",
+            "TestsFor::Game::EvonyTKR::Buff::Value" : "0",
+            "TestsFor::Game::EvonyTKR::General" : "0",
+            "TestsFor::Game::EvonyTKR::General::Siege" : "0",
+            "TestsFor::Game::EvonyTKR::SkillBook" : "0",
+            "TestsFor::Game::EvonyTKR::SkillBook::Special" : "0"
          }
       }
    },
    "provides" : {
       "Game::EvonyTKR" : {
          "file" : "lib/Game/EvonyTKR.pm",
-         "version" : "v0.0.3"
+         "version" : "v0.0.7"
       },
       "Game::EvonyTKR::Buff" : {
          "file" : "lib/Game/EvonyTKR/Buff.pm"
@@ -88,11 +106,15 @@
       "Game::EvonyTKR::General" : {
          "file" : "lib/Game/EvonyTKR/General.pm"
       },
+      "Game::EvonyTKR::GeneratePod" : {
+         "file" : "lib/Game/EvonyTKR/GeneratePod.pm",
+         "version" : "v0.0.7"
+      },
       "Game::EvonyTKR::SkillBook" : {
          "file" : "lib/Game/EvonyTKR/SkillBook.pm"
       }
    },
-   "release_status" : "stable",
+   "release_status" : "testing",
    "resources" : {
       "bugtracker" : {
          "web" : "https://github.com/lschierer/EvonyTKRTips.sst/issues"
@@ -103,12 +125,7 @@
          "web" : "https://github.com/lschierer/EvonyTKRTips.sst/"
       }
    },
-   "version" : "v0.0.3",
-   "x_build" : {
-      "requires" : [
-         "App::podweaver"
-      ]
-   },
+   "version" : "v0.0.7",
    "x_serialization_backend" : "JSON::PP version 4.16",
    "x_spdx_expression" : null
 }

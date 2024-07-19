@@ -8,7 +8,10 @@ use File::ShareDir ':ALL';
 use File::Spec;
 use YAML::XS;
 use Data::Dumper;
-use Game::EvonyTKR::General;
+use Game::EvonyTKR::General::Ground;
+use Game::EvonyTKR::General::Mounted;
+use Game::EvonyTKR::General::Ranged;
+use Game::EvonyTKR::General::Siege;
 use Game::EvonyTKR::SkillBook::Special;
 use Game::EvonyTKR::Buff;
 use Game::EvonyTKR::Buff::Value;
@@ -16,7 +19,7 @@ use namespace::autoclean;
 
 # ABSTRACT: Perl Modules providing utilities for players of Evony The King's Return.
 
-our $VERSION = 'v0.0.3';
+our $VERSION = 'v0.0.7'; # TRIAL
 
 =head1 AUTHOR 
 
@@ -114,8 +117,21 @@ sub read_generals {
       } else {
         croak "$data_filename is not found or cannot be read."
       }
-      
-      $generals{$name} = Game::EvonyTKR::General->new(
+      my $generalClass;
+      for($rb-{'score_as'}) {
+        if (/Ground/) {
+          $generalClass = Game::EvonyTKR::General::Ground;
+        } elsif (/Mounted/) {
+          $generalClass = Game::EvonyTKR::General::Mounted;
+        } elsif (/Ranged/ || /Archers/) {
+          $generalClass = Game::EvonyTKR::General::Ranged;
+        } elsif (/Siege/) {
+          $generalClass = Game::EvonyTKR::General::Siege;
+        } else {
+          croak "unknown general type $_";
+        }
+      }
+      $generals{$name} = $generalClass->new(
         name                  => $data->{'general'}->{'name'},
         leadership            => $data->{'general'}->{'leadership'},
         leadership_increment  => $data->{'general'}->{'leadership_increment'},
