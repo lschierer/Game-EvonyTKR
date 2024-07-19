@@ -2,21 +2,21 @@
 name: Undefeatable General
 buff:
   - attribute: Attack
-    class: Ground
+    class: Ground Troops
     condition:
       - leading_the_army_to_attack
     value:
       number: 30
       unit: percentage
   - attribute: Attack
-    class: Mounted
+    class: Mounted Troops
     condition:
       - leading_the_army_to_attack
     value:
       number: 30
       unit: percentage
   - attribute: HP
-    class: Mounted
+    class: Mounted Troops
     condition:
       - leading_the_army_to_attack
     value:

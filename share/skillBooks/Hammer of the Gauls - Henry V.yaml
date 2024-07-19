@@ -2,17 +2,17 @@
 name: Hammer of the Gauls
 buff:
   - attribute: Attack
-    class: Archers
+    class: Ranged Troops
     value:
       number: 30
       unit: percentage
   - attribute: Defense
-    class: Archers
+    class: Ranged Troops
     value:
       number: 10
       unit: percentage
   - attribute: HP
-    class: Archers
+    class: Ranged Troops
     value:
       number: 10
       unit: percentage

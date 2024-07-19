@@ -2,14 +2,14 @@
 name: Dragon God - Martinus
 buff:
   - attribute: Attack
-    class: Mounted
+    class: Mounted Troops
     condition:
       - brings_a_dragon
     value:
       number: 10
       unit: percentage
   - attribute: Defense
-    class: Mounted
+    class: Mounted Troops
     condition:
       - brings_a_dragon
     value:

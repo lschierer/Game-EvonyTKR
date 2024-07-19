@@ -4,7 +4,7 @@ buff:
   - attribute: Attack
     condition:
       - leading_the_army_to_attack
-    class: Archers
+    class: Ranged Troops
     value:
       number: 35
       unit: percentage

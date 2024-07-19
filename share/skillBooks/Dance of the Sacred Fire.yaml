@@ -2,28 +2,28 @@
 name: Dance of the Sacred Fire
 buff:
   - attribute: Attack
-    class: Mounted
+    class: Mounted Troops
     condition:
       - leading_the_army_to_attack
     value:
       number: 45
       unit: percentage
   - attribute: Defense
-    class: Mounted
+    class: Mounted Troops
     condition:
       - leading_the_army_to_attack
     value:
       number: 45
       unit: percentage
   - attribute: HP
-    class: Mounted
+    class: Mounted Troops
     condition:
       - brings_dragon_or_beast_to_attack
     value:
       number: 40
       unit: percentage
   - attribute: HP
-    class: Ground
+    class: Ground Troops
     condition:
       - brings_dragon_or_beast_to_attack
     value:

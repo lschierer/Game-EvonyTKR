@@ -4,7 +4,7 @@ buff:
   - attribute: Attack
     condition:
       - leading_the_army_to_attack
-    class: Mounted
+    class: Mounted Troops
     value:
       number: 25
       unit: percentage

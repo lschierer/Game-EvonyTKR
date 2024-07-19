@@ -4,21 +4,21 @@ buff:
   - attribute: HP
     condition:
       - Marching
-    class: Siege
+    class: Siege Machines
     value:
       number: 10
       unit: percentage
   - attribute: Attack
     condition:
       - Enemy
-    class: Archers
+    class: Ranged Troops
     value:
       number: 10
       unit: percentage
   - attribute: Attack
     condition:
       - Enemy
-    class: Siege
+    class: Siege Machines
     value:
       number: 10
       unit: percentage

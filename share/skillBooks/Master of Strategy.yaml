@@ -2,19 +2,19 @@
 name: Master of Strategy
 buff:
   - attribute: Attack
-    class: Mounted
+    class: Mounted Troops
     value:
       number: 15
       unit: percentage
   - attribute: Attack
-    class: Ground
+    class: Ground Troops
     value:
       number: 15
       unit: percentage
   - attribute: Attack
     condition:
       - leading_the_army_to_attack
-    class: Mounted
+    class: Mounted Troops
     value:
       number: 20
       unit: percentage

@@ -2,17 +2,17 @@
 name: Knights of the Garter
 buff:
   - attribute: Attack
-    class: Archers
+    class: Ranged Troops
     value:
       number: 25
       unit: percentage
   - attribute: Attack
-    class: Siege
+    class: Siege Machines
     value:
       number: 25
       unit: percentage
   - attribute: Defense
-    class: Archers
+    class: Ranged Troops
     value:
       number: 15
       unit: percentage

@@ -2,7 +2,7 @@
 name: Bohemian Pioneer
 buff:
   - attribute: Attack
-    class: Archers
+    class: Ranged Troops
     condition:
       - leading_the_army_to_attack
     value:

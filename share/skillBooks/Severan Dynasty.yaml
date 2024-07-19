@@ -2,12 +2,12 @@
 name: Severan Dynasty
 buff:
   - attribute: Attack
-    class: Siege
+    class: Siege Machines
     value:
       number: 35
       unit: percentage
   - attribute: HP
-    class: Siege
+    class: Siege Machines
     value:
       number: 20
       unit: percentage

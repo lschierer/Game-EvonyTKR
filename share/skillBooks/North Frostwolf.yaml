@@ -4,28 +4,28 @@ buff:
   - attribute: Attack
     condition:
       - leading_the_army_to_attack
-    class: Ground
+    class: Ground Troops
     value:
       number: 15
       unit: percentage
   - attribute: Attack
     condition:
       - dragon_to_the_attack
-    class: Ground
+    class: Ground Troops
     value:
       number: 25
       unit: percentage
   - attribute: Defense
     condition:
       - dragon_to_the_attack
-    class: Ground
+    class: Ground Troops
     value:
       number: 25
       unit: percentage
   - attribute: HP
     condition:
       - dragon_to_the_attack
-    class: Ground
+    class: Ground Troops
     value:
       number: 25
       unit: percentage

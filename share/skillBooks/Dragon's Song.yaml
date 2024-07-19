@@ -2,14 +2,14 @@
 name: Dragon's Song
 buff:
   - attribute: HP
-    class: Ground
+    class: Ground Troops
     condition:
       - leading_the_army_to_attack
     value:
       number: 30
       unit: percentage
   - attribute: HP
-    class: Mounted
+    class: Mounted Troops
     condition:
       - leading_the_army_to_attack
     value:
@@ -18,7 +18,7 @@ buff:
   - attribute: Attack
     condition:
       - dragon_to_the_attack
-    class: Ground
+    class: Ground Troops
     value:
       number: 30
       unit: percentage

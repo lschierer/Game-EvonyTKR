@@ -2,7 +2,7 @@
 name: Dear Child of Victory
 buff:
   - attribute: Attack
-    class: Mounted
+    class: Mounted Troops
     value:
       number: 45
       unit: percentage
