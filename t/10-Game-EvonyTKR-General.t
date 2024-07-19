@@ -21,6 +21,7 @@ my $g = Game::EvonyTKR::General->new(
   defense_increment     => 0.1,
   politics              => 1.0,
   politics_increment    => 0.1,
+  builtInBook           => $sb,
 );
 isa_ok($g, 'Game::EvonyTKR::General');
 
@@ -42,6 +43,7 @@ dies_ok (
       politics              => 1.0,
       politics_increment    => 0.1,
       level                 => -50,
+      builtInBook           => $sb,
     );
   }, 'Creating General with invalid level fails'
 );
@@ -58,6 +60,7 @@ dies_ok (
       defense_increment     => 0.1,
       politics              => 1.0,
       politics_increment    => 0.1,
+      builtInBook           => $sb,
     );
   }, 'Creating General with negative leadership fails'
 );
