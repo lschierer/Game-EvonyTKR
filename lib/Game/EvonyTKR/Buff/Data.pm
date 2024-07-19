@@ -13,10 +13,6 @@ use namespace::autoclean;
 # PODNAME: Game::EvonyTKR::Buff::Data
 # ABSTRACT: Data files for Game::EvonyTKR::Buff
 
-=head1 SYNOPSIS
-
-=for comment Brief examples of using the module.
-
 =head1 DESCRIPTION
 
 =for due to the encapsulation and initialization order requirements, even if the perlclass feature had already implemented the :common attribute, things marked as common would not be initialized in time for other parameters to validate against them.  Thus I need a ::Data class that users can initialize first. 

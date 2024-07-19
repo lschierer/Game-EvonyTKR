@@ -5,3 +5,6 @@ license:
   - CC_BY_4_0
 author:
   - Luke Schierer <luke@schierer.org>
+build:
+  requires:
+    - App::podweaver

@@ -6,17 +6,10 @@ class Game::EvonyTKR::Buff::EvaluationMultipliers::Attacking {
   use Types::Common qw( t is_Num is_Str is_Int);
   use Type::Utils "is"; 
   use namespace::autoclean;
+
 # PODNAME: Game::EvonyTKR::Buff::EvaluationMultipliers::Attacking
 
 # ABSTRACT: Game::EvonyTKR::Buff Evaluation Multipliers for Attacking use cases.
-
-=head1 SYNOPSIS
-
-=over
-
-=item comment Brief examples of using the module.
-
-=back
 
 =head1 DESCRIPTION
 
@@ -35,9 +28,6 @@ This provides the base overrides for the Attacking use cases.
     }
   }
   
-=head1 Attributes 
-
-
-=cut
 }
 1;
+

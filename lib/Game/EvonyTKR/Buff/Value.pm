@@ -8,11 +8,8 @@ class Game::EvonyTKR::Buff::Value {
   use Type::Utils "is";
   use namespace::autoclean;
 # PODNAME: Game::EvonyTKR::Buff::Value
+
 # ABSTRACT: Values for Evony TKR Buffs
-
-=head1 SYNOPSIS
-
-=for comment Brief examples of using the module.
 
 =head1 DESCRIPTION
 

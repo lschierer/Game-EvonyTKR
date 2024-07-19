@@ -1,0 +1,58 @@
+---
+ascending:
+- level: '1red'
+  buff:
+    - attribute: Attack
+      class: Mounted
+      value:
+        number: 10
+        unit: percentage
+    - attribute: Defense
+      class: Mounted
+      value:
+        number: 10
+        unit: percentage
+- level: '2red'
+  buff:
+    - attribute: Wounded_to_Death
+      condition:
+        - Enemy_In_City
+      value:
+        number: 10
+        unit: percentage
+- level: '3red'
+  buff:
+    - attribute: Attack
+      class: Ground
+      value:
+        number: 15
+        unit: percentage
+    - attribute: Attack
+      class: Mounted
+      value:
+        number: 15
+        unit: percentage
+- level: '4red'
+  buff:
+    - attribute: Defense
+      class: Mounted
+      value:
+        number: 55
+        unit: percentage
+- level: '5red'
+  buff:
+    - attribute: Attack
+      class: Mounted
+      value:
+        number: 25
+        unit: percentage
+    - attribute: HP
+      class: Mounted
+      value:
+        number: 15
+        unit: percentage
+    - attribute: Defense
+      class: Mounted
+      value:
+        number: 15
+        unit: percentage

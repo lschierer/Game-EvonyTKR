@@ -12,10 +12,6 @@ class Game::EvonyTKR::General {
 
 # ABSTRACT: Module for processing information about Evony TKR Generals.
 
-=head1 SYNOPSIS
-
-=for comment Brief examples of using the module.
-
 =head1 DESCRIPTION
 
 =for Generals in Evony TKR are one of the more complicated and simultaneously
@@ -34,6 +30,10 @@ This base class implements the attributes and methods common to all Generals, bu
     }
   }
 
+=attr name
+
+the general's name, which will also be the key by which we find the general.
+=cut
   field $name :reader :param;
 
   ADJUST {
@@ -44,7 +44,10 @@ This base class implements the attributes and methods common to all Generals, bu
     } 
   }
 
+=attr leadership
 
+this is the base value for leadership, one of the four basic attributes of a general. 
+=cut
   field $leadership :reader :param;
 
   ADJUST {
@@ -57,6 +60,10 @@ This base class implements the attributes and methods common to all Generals, bu
     }
   } 
 
+=attr leadership_increment
+
+by how much does the effective value of leadership (as opposed to its base value) increase with each level gained? 
+=cut
   field $leadership_increment :reader :param;
 
   ADJUST {
@@ -69,6 +76,10 @@ This base class implements the attributes and methods common to all Generals, bu
     }
   }
 
+=attr attack
+
+this is the base value for attack, one of the four basic attributes of a general. 
+=cut
   field $attack :reader :param;
 
   ADJUST {
@@ -81,6 +92,10 @@ This base class implements the attributes and methods common to all Generals, bu
     }
   } 
 
+=attr attack_increment
+
+by how much does the effective value of attack (as opposed to its base value) increase with each level gained? 
+=cut
   field $attack_increment :reader :param;
 
   ADJUST {
@@ -93,6 +108,10 @@ This base class implements the attributes and methods common to all Generals, bu
     }
   }
 
+=attr defense
+
+this is the base value for defense, one of the four basic attributes of a general. 
+=cut
   field $defense :reader :param;
 
   ADJUST {
@@ -105,6 +124,10 @@ This base class implements the attributes and methods common to all Generals, bu
     }
   } 
 
+=attr defense_increment
+
+by how much does the effective value of defense (as opposed to its base value) increase with each level gained? 
+=cut
   field $defense_increment :reader :param;
 
   ADJUST {
@@ -117,6 +140,10 @@ This base class implements the attributes and methods common to all Generals, bu
     }
   }
 
+=attr politics
+
+this is the base value for politics, one of the four basic attributes of a general. 
+=cut
   field $politics :reader :param;
 
   ADJUST {
@@ -129,6 +156,10 @@ This base class implements the attributes and methods common to all Generals, bu
     }
   } 
 
+=attr politics_increment
+
+by how much does the effective value of politics (as opposed to its base value) increase with each level gained? 
+=cut
   field $politics_increment :reader :param;
 
   ADJUST {
@@ -141,6 +172,10 @@ This base class implements the attributes and methods common to all Generals, bu
     }
   }
 
+=attr level
+
+generals start at level 1 and can grow to level 45.  Thier effective statistics increase as they do so by the increments listed in the _increment versions of each attribute. 
+=cut
   field $level :reader :param //= 45;
 
   ADJUST {
@@ -156,22 +191,42 @@ This base class implements the attributes and methods common to all Generals, bu
     }
   }
 
+=method effective_leadership()
+
+returns the value that a user of this general at this investment level will experience for leadership.
+=cut
   method effective_leadership() {
     return $level * $leadership_increment + $leadership;
   }
 
+=method effective_attack()
+
+returns the value that a user of this general at this investment level will experience for attack.
+=cut
   method effective_attack() {
     return $level * $attack_increment + $attack;
   }
 
+=method effective_defense()
+
+returns the value that a user of this general at this investment level will experience for defense.
+=cut
   method effective_defense() {
     return $level * $defense_increment + $defense;
   }
 
+=method effective_politics()
+
+returns the value that a user of this general at this investment level will experience for politics.
+=cut
   method effective_politics() {
     return $level * politics_increment + $politics_increment;
   }
 
+=attr builtInBook
+
+each general comes with one Game::EvonyTKR::SkillBook built in.  This will be an instance of the ::Special variety of SkillBook. 
+=cut
   field $builtInBook :reader :param;
 
   ADJUST {
@@ -187,6 +242,10 @@ This base class implements the attributes and methods common to all Generals, bu
 
   use constant DEFAULT_BUFF_MULTIPLIERS => Game::EvonyTKR::Buff::EvaluationMultipliers->new();
   
+=attr BuffMultipliers
+
+when evaluating generals, not all buffs are equally important.  Nor are these scaling factors constant across the game, but rather differ both by type of general and by situation.  Tihs contains the scaling factors for this general.
+=cut
   field $BuffMultipliers :reader :param //= __CLASS__->DEFAULT_BUFF_MULTIPLIERS;
 
   ADJUST {

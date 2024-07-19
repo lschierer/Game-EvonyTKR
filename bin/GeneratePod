@@ -1,0 +1,9 @@
+#!/usr/bin/env perl 
+# PODNAME: GeneratePod
+# ABSTRACT: CLI for Game::EvonyTKR::GeneratePod
+use v5.40.0;
+use Carp;
+use lib './lib';
+use Game::EvonyTKR::GeneratePod;
+
+Game::EvonyTKR::GeneratePod->execute();

@@ -1,6 +1,7 @@
 package Game::EvonyTKR;
 use v5.40.0;
 use Carp;
+require Software::License::CC_BY_4_0;
 
 use base qw(App::Cmd::Simple);
 use File::ShareDir ':ALL';
@@ -15,24 +16,27 @@ use namespace::autoclean;
 
 # ABSTRACT: Perl Modules providing utilities for players of Evony The King's Return.
 
+our $VERSION = 'v0.0.3';
+
+=head1 AUTHOR 
+
+Luke Schierer
+
 =head1 DESCRIPTION
+This distribution aims to help players create and process the wealth of data that Evony The King's Return dumps on users with next to no organization, documentation, or built in tools to handle. 
 
-Serious players of the game will find themselves needing to do reasonably complex analysis to make optimal choices about
+This module will (eventually) help players of the game needing to make reasonably complex analysis to make optimal choices about each of these:
 
-=over
+=for :list 
 
-=item * Which generals to invest time and resources in
+* L<Which generals to invest time and resources in>
 
-=item * How to best pair generals for different senarios
+* L<How to best pair generals for different senarios>
 
-=item * The effects of Armor, Spiritual Beats, and Dragons on buffs and debuffs
+* L<The effects of Armor, Spiritual Beats, and Dragons on buffs and debuffs>
 
-=item * Calculating your total buffs and debuffs in different senarios given the
-ever increasing number of sources for these buffs and debuffs
+* L<Calculating your total buffs and debuffs in different senarios given the ever increasing number of sources for these buffs and debuffs>
 
-=back
-
-This distribution aims to help players create and process this wealth of data. 
 =cut
 
 sub opt_spec {
@@ -129,3 +133,21 @@ sub read_generals {
 }
 
 1;
+
+=head1 NAME
+
+Game::EvonyTKR - Perl Modules providing utilities for players of Evony The King's Return.
+
+=head1 AUTHOR
+
+Luke Schierer <luke@schierer.org>
+
+=head1 COPYRIGHT
+
+This software is copyright (c) 2024 by Luke Schierer. 
+
+This is free software, licensed under:
+Creative Commons Attribution 4.0 International License 
+
+
+=cut
