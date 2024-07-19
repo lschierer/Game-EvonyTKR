@@ -1,9 +1,14 @@
 package Game::EvonyTKR;
 use v5.40.0;
-use strict;
-use warnings;
+use Carp;
 
 use base qw(App::Cmd::Simple);
+use File::ShareDir ':ALL';
+use File::Spec;
+use YAML::XS;
+use Data::Dumper;
+use Game::EvonyTKR::General;
+use Game::EvonyTKR::SkillBook::Special;
 use namespace::autoclean;
 
 # ABSTRACT: Perl Modules providing utilities for players of Evony The King's Return.
@@ -47,8 +52,46 @@ sub execute {
   if ($opt->{option1}) {
       # do option 1 stuff
   } else {
-      # do regular stuff
+    my %generals = read_generals();
+    say "start";
+    say Dumper(%generals);
+    say "done";
   }
+}
+
+sub read_generals {
+  my ($self, $opt, $args) = @_;
+  my $debug = 0;
+  if($debug) { say "read_generals";}
+  my $general_share = File::Spec->catfile(dist_dir('Game-EvonyTKR', 'generals'),"generals");
+  my @found = grep { -T -s -r } glob("$general_share/*.yaml");
+  if($debug) {
+    say "$general_share";
+    say scalar @found;
+  }
+  my %generals;
+  foreach my $tg (@found) {
+    if(defined($tg)) {
+      open(my ($fh), '<', $tg) or croak "$!";
+      my $yaml = do { local $/; <$fh> };
+      my $data = Load $yaml;
+      close $fh;
+      my $name = $data->{'general'}->{'name'};
+      if($debug) {say Dumper($name);}
+      $generals{$name} = Game::EvonyTKR::General->new(
+        name                  => $data->{'general'}->{'name'},
+        leadership            => $data->{'general'}->{'leadership'},
+        leadership_increment  => $data->{'general'}->{'leadership_increment'},
+        attack                => $data->{'general'}->{'attack'},
+        attack_increment      => $data->{'general'}->{'attack_increment'},
+        defense               => $data->{'general'}->{'defense'},
+        defense_increment     => $data->{'general'}->{'defense_increment'},
+        politics              => $data->{'general'}->{'politics'},
+        politics_increment    => $data->{'general'}->{'politics_increment'},
+      );
+    }
+  }
+  return %generals;
 }
 
 1;
