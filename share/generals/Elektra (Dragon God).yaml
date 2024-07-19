@@ -13,9 +13,10 @@ general:
   stars: '5red'
   level: '1'
   score_as: Archers
+  extra:
+    - Dragon God - Elektra
   books:
     - Blood Restrain
-    - Dragon God - Elektra
   ascending: true
   specialities:
     - Ranged Troop Assault
