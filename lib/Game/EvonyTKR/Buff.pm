@@ -6,6 +6,7 @@ class Game::EvonyTKR::Buff {
   use Types::Standard qw(is_Int Int Str is_Str);
   use Types::Common::Numeric qw(PositiveOrZeroInt);
   use Type::Utils "is"; 
+  use Carp;
   use namespace::autoclean;
 # PODNAME: Game::EvonyTKR::Buff
 
@@ -32,17 +33,17 @@ Buffs are most commonly I<calculated> as if all buffs came from generals.  This 
   my @BuffClasses;
 
   ADJUST {
-    if(!(@BuffAttributes)) {
+    if(scalar @BuffAttributes == 0) {
       $classData->set_BuffAttributes();
       @BuffAttributes = $classData->BuffAttributes();
     }
 
-    if(!(@BuffConditions)) {
+    if(scalar @BuffConditions == 0) {
       $classData->set_BuffConditions();
       @BuffConditions = $classData->BuffConditions();
     }
     
-    if(!(@BuffClasses)) {
+    if(scalar @BuffClasses == 0) {
       $classData->set_BuffClasses();
       @BuffClasses = $classData->BuffClasses();
     }
@@ -50,11 +51,23 @@ Buffs are most commonly I<calculated> as if all buffs came from generals.  This 
 
   field $attribute :reader :param;
 
-  field $class :reader :param  //= 'All Troops';
+  field $buffClass :reader :param  //= 'All Troops';
 
-  method has_class {
-    if(defined $class) {
-      if($class !~ /All/i) {
+  ADJUST {
+    if(scalar @BuffClasses == 0) {
+      $classData->set_BuffClasses();
+      @BuffClasses = $classData->BuffClasses();
+    }
+    if(scalar @BuffClasses == 0) {
+      croak "no classes loaded";
+    } elsif (! grep {/^$buffClass$/} @BuffClasses){
+      croak "$buffClass is an invalid class."
+    }
+  }
+
+  method has_buffClass {
+    if(defined $buffClass) {
+      if($buffClass !~ /All/i) {
         return true;
       }
     }
@@ -65,14 +78,18 @@ Buffs are most commonly I<calculated> as if all buffs came from generals.  This 
 
   method set_condition ($nc) {
     if(is_Str($nc)) {
-      if(!(@BuffConditions)){
+      if(scalar @BuffConditions == 0){
         $classData->set_BuffConditions();
         @BuffConditions = $classData->BuffConditions();
       }
-      if(grep {/^$nc$/} @BuffConditions) {
+      if(scalar @BuffConditions == 0){
+        croak 'No conditions';
+      } elsif (grep {/^$nc$/} @BuffConditions) {
         if(!(grep {/^$nc$/} @condition)) {
           push @condition, $nc;
         }
+      } else {
+        croak '$nc is an invalid condition';
       }
     }
   }
@@ -104,15 +121,15 @@ as this Game::EvonyTKR::Buff.  It is written with a particular style to aid in d
     } elsif($other->value()->unit() ne $value->unit) {
       $code = -4;
     } elsif(
-      ($self->has_class() && (not $other->has_class())) || 
-      ((not $self->has_class()) && $other->has_class())) {
+      ($self->has_buffClass() && (not $other->has_buffClass())) || 
+      ((not $self->has_buffClass()) && $other->has_buffClass())) {
         $code = -5;
       }elsif(
       ($self->has_condition() && (not $other->has_condition())) ||
       ((not $self->has_condition()) && $other->has_condition())
     ) {
       $code = -6;
-    }elsif($class ne $other->class()) {
+    }elsif($buffClass ne $other->buffClass()) {
       $code = -7;
     }
     if( $code >= 0) {

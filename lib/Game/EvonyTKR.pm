@@ -9,6 +9,8 @@ use YAML::XS;
 use Data::Dumper;
 use Game::EvonyTKR::General;
 use Game::EvonyTKR::SkillBook::Special;
+use Game::EvonyTKR::Buff;
+use Game::EvonyTKR::Buff::Value;
 use namespace::autoclean;
 
 # ABSTRACT: Perl Modules providing utilities for players of Evony The King's Return.
@@ -54,16 +56,17 @@ sub execute {
   } else {
     my %generals = read_generals();
     say "start";
-    say Dumper(%generals);
+    say scalar %generals;
     say "done";
   }
 }
 
 sub read_generals {
   my ($self, $opt, $args) = @_;
-  my $debug = 0;
+  my $debug = 1;
   if($debug) { say "read_generals";}
-  my $general_share = File::Spec->catfile(dist_dir('Game-EvonyTKR', 'generals'),"generals");
+  my $general_share = File::Spec->catfile(dist_dir('Game-EvonyTKR'),"generals");
+  my $book_share = File::Spec->catfile(dist_dir('Game-EvonyTKR'),"skillBooks");
   my @found = grep { -T -s -r } glob("$general_share/*.yaml");
   if($debug) {
     say "$general_share";
@@ -78,6 +81,36 @@ sub read_generals {
       close $fh;
       my $name = $data->{'general'}->{'name'};
       if($debug) {say Dumper($name);}
+      my $bookName = $data->{'general'}->{'books'}[0].".yaml";
+      my $sb = Game::EvonyTKR::SkillBook::Special->new(
+        name  => $bookName
+      );
+      my $data_filename = File::Spec->catfile($book_share, $bookName);
+      if( -T -s -r $data_filename ) {
+        open(my ($bh), '<', $data_filename) or croak "$!";
+        my $bookyaml = do { local $/; <$bh> };
+        my $bookData = Load $bookyaml;
+        close $bh;
+        my @buffs = @{ $bookData->{'buff'} };
+        foreach my $rb (@buffs) {
+          my $v = Game::EvonyTKR::Buff::Value->new(
+            number      => $rb->{'number'},
+            unit        => $rb->{'unit'},
+          );
+          my $b = Game::EvonyTKR::Buff->new(
+            attribute  => $rb->{'attribute'},
+            value      => $v,
+            buffClass   => $rb->{'class'},
+          );
+          foreach my $rc ($rb->{'condition'}) {
+            $b->set_condition($rc);
+          }
+          $sb->add_buff($b);
+        }
+      } else {
+        croak "$data_filename is not found or cannot be read."
+      }
+      
       $generals{$name} = Game::EvonyTKR::General->new(
         name                  => $data->{'general'}->{'name'},
         leadership            => $data->{'general'}->{'leadership'},
@@ -88,6 +121,7 @@ sub read_generals {
         defense_increment     => $data->{'general'}->{'defense_increment'},
         politics              => $data->{'general'}->{'politics'},
         politics_increment    => $data->{'general'}->{'politics_increment'},
+        builtInBook           => $sb,
       );
     }
   }
