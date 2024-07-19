@@ -1,6 +1,6 @@
 ---
 general:
-  name: Pallas Legend of Sanctuary
+  name: Pallas (Legend of Sanctuary)
   display: summary
   leadership: 113
   leadership_increment: 8.8
@@ -13,9 +13,10 @@ general:
   stars: '5red'
   level: '1'
   score_as: Siege
+  extra:
+    - Legend of Sanctuary
   books:
     - Guard of Owl and Serpent
-    - Legend of Sanctuary
   specialities:
     - Siege Machine Formation
     - Siege

@@ -13,9 +13,10 @@ general:
   stars: '5red'
   level: '1'
   score_as: Siege
+  extra:
+    - Odyssey - Raimondo
   books:
     - The Military Art
-    - Odyssey - Raimondo
   ascending: true
   specialities:
     - Siege Machine Formation

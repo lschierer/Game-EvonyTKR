@@ -1,6 +1,6 @@
 ---
 general:
-  name: Gunther King of Rhine
+  name: Gunther (King of Rhine)
   display: summary
   leadership: 125
   leadership_increment: 9.19
@@ -13,9 +13,10 @@ general:
   stars: '5red'
   level: '1'
   score_as: Siege
+  extra:
+    - King of Rhine
   books:
     - The King of Atlis
-    - King of Rhine
   specialities:
     - Siege Machine Formation
     - Bash

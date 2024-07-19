@@ -13,9 +13,10 @@ general:
   politics: 100
   politics_increment: 8.05
   level: '1'
+  extra:
+    - Dragon God - Martinus
   books:
     - The Dragon Wakes
-    - Dragon God - Martinus
   ascending: true
   specialities:
     - Mounted Troop Assault
