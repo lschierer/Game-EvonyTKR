@@ -1,0 +1,7 @@
+resources:
+  bugtracker:
+    web: https://github.com/lschierer/EvonyTKRTips.sst/issues
+license:
+  - CC_BY_4_0
+author:
+  - Luke Schierer <luke@schierer.org>
