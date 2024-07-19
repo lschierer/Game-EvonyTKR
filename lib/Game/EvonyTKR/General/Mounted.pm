@@ -1,19 +1,19 @@
 use v5.40.0;
 use experimental qw(class);
 
-class Game::EvonyTKR::General::Siege :isa(Game::EvonyTKR::General) {
+class Game::EvonyTKR::General::Mounted :isa(Game::EvonyTKR::General) {
   use Carp;
   use Types::Common qw( t is_Num is_Str is_Int);
   use Type::Utils "is"; 
   use namespace::autoclean;
   use Game::EvonyTKR::General;
-# PODNAME: Game::EvonyTKR::General::Ground
+# PODNAME: Game::EvonyTKR::General::Mounted
 
-# ABSTRACT: Module for processing information about Evony TKR Ground Specialists.
+# ABSTRACT: Module for processing information about Evony TKR Mounted Specialists.
 
 =head1 DESCRIPTION
 
-=for Out of all Game::EvonyTKR::General instances, some are specialize in enhancing Ground Troops.  The in-game notation for which Generals specialize 
+=for Out of all Game::EvonyTKR::General instances, some are specialize in enhancing Mounted Troops.  The in-game notation for which Generals specialize 
 in which ways is not always entirely reliable, and these modules will, at times, and for particular generals, deviate from it.  Rather, it will rely on the data files provided.  
 
 =cut 
