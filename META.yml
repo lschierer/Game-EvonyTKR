@@ -1,0 +1,69 @@
+---
+abstract: "Perl Modules providing utilities for players of Evony The King's Return."
+author:
+  - 'Luke Schierer <luke@schierer.org>'
+build_requires:
+  Game::EvonyTKR::General::Siege: '0'
+  Test::File::ShareDir::Object::Dist: '0'
+  Test::Most: '0'
+configure_requires:
+  Module::Build::Tiny: '0.039'
+dynamic_config: 0
+generated_by: 'App::ModuleBuildTiny version 0.047, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Game-EvonyTKR
+provides:
+  Game::EvonyTKR:
+    file: lib/Game/EvonyTKR.pm
+    version: v0.0.3
+  Game::EvonyTKR::Buff:
+    file: lib/Game/EvonyTKR/Buff.pm
+  Game::EvonyTKR::Buff::Data:
+    file: lib/Game/EvonyTKR/Buff/Data.pm
+  Game::EvonyTKR::Buff::EvaluationMultipliers:
+    file: lib/Game/EvonyTKR/Buff/EvaluationMultipliers.pm
+  Game::EvonyTKR::Buff::EvaluationMultipliers::Attacking:
+    file: lib/Game/EvonyTKR/Buff/EvaluationMultipliers/Attacking.pm
+  Game::EvonyTKR::Buff::EvaluationMultipliers::Mayor:
+    file: lib/Game/EvonyTKR/Buff/EvaluationMultipliers/Mayor.pm
+  Game::EvonyTKR::Buff::EvaluationMultipliers::Monster:
+    file: lib/Game/EvonyTKR/Buff/EvaluationMultipliers/Monster.pm
+  Game::EvonyTKR::Buff::EvaluationMultipliers::Reinforcing:
+    file: lib/Game/EvonyTKR/Buff/EvaluationMultipliers/Reinforcing.pm
+  Game::EvonyTKR::Buff::EvaluationMultipliers::Wall:
+    file: lib/Game/EvonyTKR/Buff/EvaluationMultipliers/Wall.pm
+  Game::EvonyTKR::Buff::Value:
+    file: lib/Game/EvonyTKR/Buff/Value.pm
+  Game::EvonyTKR::General:
+    file: lib/Game/EvonyTKR/General.pm
+  Game::EvonyTKR::SkillBook:
+    file: lib/Game/EvonyTKR/SkillBook.pm
+requires:
+  App::Cmd::Simple: '0'
+  Carp: '0'
+  Data::Dumper: '0'
+  File::ShareDir: '0'
+  File::Spec: '0'
+  Game::EvonyTKR::SkillBook::Special: '0'
+  Software::License::CC_BY_4_0: '0'
+  Type::Utils: '0'
+  Types::Common: '0'
+  Types::Common::Numeric: '0'
+  Types::Standard: '0'
+  YAML::XS: '0'
+  base: '0'
+  experimental: '0'
+  namespace::autoclean: '0'
+  perl: v5.40.0
+resources:
+  bugtracker: https://github.com/lschierer/EvonyTKRTips.sst/issues
+  repository: https://github.com/lschierer/EvonyTKRTips.sst.git
+version: v0.0.3
+x_build:
+  requires:
+    - App::podweaver
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_spdx_expression: ~
