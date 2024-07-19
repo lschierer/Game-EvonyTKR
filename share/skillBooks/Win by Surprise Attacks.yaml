@@ -2,7 +2,7 @@
 name: Win by Surprise Attacks
 buff:
   - attribute: Attack
-    class: Mounted
+    class: Mounted Troops
     value:
       number: 35
       unit: percentage

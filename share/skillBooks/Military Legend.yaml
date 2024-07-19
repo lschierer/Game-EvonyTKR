@@ -2,17 +2,17 @@
 name: Military Legend
 buff:
   - attribute: Attack
-    class: Ground
+    class: Ground Troops
     value:
       number: 30
       unit: percentage
   - attribute: HP
-    class: Ground
+    class: Ground Troops
     value:
       number: 15
       unit: percentage
   - attribute: HP
-    class: Mounted
+    class: Mounted Troops
     value:
       number: 15
       unit: percentage

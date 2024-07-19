@@ -2,14 +2,14 @@
 name: Roman Emperor
 buff:
 - attribute: Attack
-  class: Ground
+  class: Ground Troops
   condition:
   - Enemy
   value:
     number: 20
     unit: percentage
 - attribute: Attack
-  class: Mounted
+  class: Mounted Troops
   condition:
   - Enemy
   value:

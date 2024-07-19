@@ -2,17 +2,17 @@
 name: Crossing the River Rhine
 buff:
   - attribute: Attack
-    class: Ground
+    class: Ground Troops
     value:
       number: 35
       unit: percentage
   - attribute: Defense
-    class: Ground
+    class: Ground Troops
     value:
       number: 35
       unit: percentage
   - attribute: Defense
-    class: Mounted
+    class: Mounted Troops
     value:
       number: 35
       unit: percentage

@@ -2,7 +2,7 @@
 name: Dragon God - Elektra
 buff:
   - attribute: Attack
-    class: Archers
+    class: Ranged Troops
     condition:
       - brings_a_dragon
     value:
@@ -11,7 +11,7 @@ buff:
   - attribute: HP
     condition:
       - brings_a_dragon
-    class: Archers
+    class: Ranged Troops
     value:
       number: 15
       unit: percentage

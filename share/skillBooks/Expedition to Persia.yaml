@@ -2,14 +2,14 @@
 name: Expedition to Persia
 buff:
   - attribute: Attack
-    class: Ground
+    class: Ground Troops
     value:
       number: 10
       unit: percentage
   - attribute: Attack
     condition:
       - leading_the_army_to_attack
-    class: Ground
+    class: Ground Troops
     value:
       number: 25
       unit: percentage

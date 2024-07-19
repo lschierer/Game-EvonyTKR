@@ -2,17 +2,17 @@
 name: Mongol Conquest
 buff:
   - attribute: Attack
-    class: Archers
+    class: Ranged Troops
     value:
       number: 40
       unit: percentage
   - attribute: Defense
-    class: Archers
+    class: Ranged Troops
     value:
       number: 20
       unit: percentage
   - attribute: HP
-    class: Archers
+    class: Ranged Troops
     value:
       number: 20
       unit: percentage

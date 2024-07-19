@@ -2,17 +2,17 @@
 name: Hammer of the Gauls - Elizabeth I
 buff:
   - attribute: Attack
-    class: Archers
+    class: Ranged Troops
     value:
       number: 15
       unit: percentage
   - attribute: Attack
-    class: Siege
+    class: Siege Machines
     value:
       number: 15
       unit: percentage
   - attribute: Attack
-    class: Archers
+    class: Ranged Troops
     condition:
       - Enemy
     value:

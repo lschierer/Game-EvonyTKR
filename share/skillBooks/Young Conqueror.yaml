@@ -2,12 +2,12 @@
 name: Young Conqueror
 buff:
   - attribute: Attack
-    class: Mounted
+    class: Mounted Troops
     value:
       number: 35
       unit: percentage
   - attribute: Attack
-    class: Ground
+    class: Ground Troops
     value:
       number: 35
       unit: percentage

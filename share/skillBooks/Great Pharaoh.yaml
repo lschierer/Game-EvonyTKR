@@ -2,17 +2,17 @@
 name: Great Pharaoh
 buff:
   - attribute: Attack
-    class: Siege
+    class: Siege Machines
     value:
       number: 20
       unit: percentage
   - attribute: Defense
-    class: Siege
+    class: Siege Machines
     value:
       number: 20
       unit: percentage
   - attribute: HP
-    class: Ground
+    class: Ground Troops
     value:
       number: 10
       unit: percentage

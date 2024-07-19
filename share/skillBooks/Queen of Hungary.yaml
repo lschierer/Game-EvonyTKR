@@ -4,21 +4,21 @@ buff:
   - attribute: Attack
     condition:
       - Against Monsters
-    class: Mounted
+    class: Mounted Troops
     value:
       number: 45
       unit: percentage
   - attribute: Defense
     condition:
       - Against Monsters
-    class: Mounted
+    class: Mounted Troops
     value:
       number: 45
       unit: percentage
   - attribute: HP
     condition:
       - Against Monsters
-    class: Mounted
+    class: Mounted Troops
     value:
       number: 45
       unit: percentage

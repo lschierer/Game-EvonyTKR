@@ -2,17 +2,17 @@
 name: Prophecy Key
 buff:
   - attribute: Attack
-    class: Ground
+    class: Ground Troops
     value:
       number: 45
       unit: percentage
   - attribute: Defense
-    class: Ground
+    class: Ground Troops
     value:
       number: 35
       unit: percentage
   - attribute: HP
-    class: Ground
+    class: Ground Troops
     value:
       number: 35
       unit: percentage

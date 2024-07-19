@@ -2,12 +2,12 @@
 name: Red Demon
 buff:
   - attribute: Attack
-    class: Mounted
+    class: Mounted Troops
     value:
       number: 25
       unit: percentage
   - attribute: HP
-    class: Mounted
+    class: Mounted Troops
     value:
       number: 40
       unit: percentage

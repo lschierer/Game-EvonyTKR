@@ -2,14 +2,14 @@
 name: Augustus
 buff:
   - attribute: Attack
-    class: Mounted
+    class: Mounted Troops
     condition:
       - leading_the_army_to_attack
     value:
       number: 40
       unit: percentage
   - attribute: Attack
-    class: Archers
+    class: Ranged Troops
     condition:
       - leading_the_army_to_attack
     value:

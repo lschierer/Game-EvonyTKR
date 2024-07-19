@@ -4,7 +4,7 @@ buff:
   - attribute: Attack
     condition:
       - leading_the_army_to_attack
-    class: Ground
+    class: Ground Troops
     value:
       number: 20
       unit: percentage

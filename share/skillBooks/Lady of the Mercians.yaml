@@ -3,7 +3,7 @@ buff:
   - attribute: Attack
     condition:
       - Against Monsters
-    class: Mounted
+    class: Mounted Troops
     value:
       number: 55
       unit: percentage

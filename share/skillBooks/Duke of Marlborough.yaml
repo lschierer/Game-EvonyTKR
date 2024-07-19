@@ -4,7 +4,7 @@ buff:
   - attribute: Attack
     condition:
       - leading_the_army_to_attack
-    class: Siege
+    class: Siege Machines
     value:
       number: 30
       unit: percentage

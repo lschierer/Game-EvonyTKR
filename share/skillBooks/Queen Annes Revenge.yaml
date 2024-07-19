@@ -2,26 +2,26 @@
 name: Queen Annes Revenge
 buff:
   - attribute: Attack
-    class: Siege
+    class: Siege Machines
     value:
       number: 30
       unit: percentage
   - attribute: Defense
-    class: Siege
+    class: Siege Machines
     value:
       number: 30
       unit: percentage
   - attribute: Attack
     condition:
       - brings_dragon_or_beast_to_attack
-    class: Siege
+    class: Siege Machines
     value:
       number: 10
       unit: percentage
   - attribute: Attack
     condition:
       - brings_dragon_or_beast_to_attack
-    class: Archers
+    class: Ranged Troops
     value:
       number: 10
       unit: percentage

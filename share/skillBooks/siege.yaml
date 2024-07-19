@@ -4,7 +4,7 @@ books:
     level: '1'
     buff:
       - attribute: Attack
-        class: Siege
+        class: Siege Machines
         value:
           number: 10
           unit: percentage
@@ -12,7 +12,7 @@ books:
     level: '2'
     buff:
       - attribute: Attack
-        class: Siege
+        class: Siege Machines
         value:
           number: 15
           unit: percentage
@@ -20,7 +20,7 @@ books:
     level: '3'
     buff:
       - attribute: Attack
-        class: Siege
+        class: Siege Machines
         value:
           number: 20
           unit: percentage
@@ -28,7 +28,7 @@ books:
     level: '4'
     buff:
       - attribute: Attack
-        class: Siege
+        class: Siege Machines
         value:
           number: 25
           unit: percentage
@@ -36,7 +36,7 @@ books:
     level: '1'
     buff:
       - attribute: HP
-        class: Siege
+        class: Siege Machines
         value:
           number: 10
           unit: percentage
@@ -44,7 +44,7 @@ books:
     level: '2'
     buff:
       - attribute: HP
-        class: Siege
+        class: Siege Machines
         value:
           number: 15
           unit: percentage
@@ -52,7 +52,7 @@ books:
     level: '3'
     buff:
       - attribute: HP
-        class: Siege
+        class: Siege Machines
         value:
           number: 20
           unit: percentage
@@ -60,7 +60,7 @@ books:
     level: '4'
     buff:
       - attribute: HP
-        class: Siege
+        class: Siege Machines
         value:
           number: 25
           unit: percentage

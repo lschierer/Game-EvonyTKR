@@ -8,7 +8,7 @@ buff:
       number: 10
       unit: percentage
   - attribute: Attack
-    class: Archers
+    class: Ranged Troops
     value:
       number: 20
       unit: percentage

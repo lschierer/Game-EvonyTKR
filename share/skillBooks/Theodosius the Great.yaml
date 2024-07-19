@@ -2,14 +2,14 @@
 name: Theodosius the Great
 buff:
   - attribute: Attack
-    class: Siege
+    class: Siege Machines
     condition:
       - leading_the_army_to_attack
     value:
       number: 45
       unit: percentage
   - attribute: Defense
-    class: Siege
+    class: Siege Machines
     condition:
       - leading_the_army_to_attack
     value:

@@ -4,21 +4,21 @@ buff:
   - attribute: Attack
     condition:
       - leading_the_army_to_attack
-    class: Siege
+    class: Siege Machines
     value:
       number: 40
       unit: percentage
   - attribute: Defense
     condition:
       - leading_the_army_to_attack
-    class: Archers
+    class: Ranged Troops
     value:
       number: 20
       unit: percentage
   - attribute: Defense
     condition:
       - leading_the_army_to_attack
-    class: Siege
+    class: Siege Machines
     value:
       number: 20
       unit: percentage

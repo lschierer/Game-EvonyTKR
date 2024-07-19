@@ -2,7 +2,7 @@
 name: Heroism
 buff:
   - attribute: Attack
-    class: Archers
+    class: Ranged Troops
     value:
       number: 35
       unit: percentage
