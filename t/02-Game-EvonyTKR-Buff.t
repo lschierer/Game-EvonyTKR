@@ -32,8 +32,31 @@ ok(scalar $buff->condition() == 1, "Duplicate Condition rejected");
 $buff->set_condition('Enemy');
 ok(scalar $buff->condition() == 2, "Second Condition did not overwrite");
 
+dies_ok (
+  sub {
+    $buff->set_condition('bogus');
+  }, 'Setting a bogus condition fails'
+);
+
 my $cr = $buff->compare($buff);
 ok($cr, 'Self comparision worked');
+
+my $buff2 = Game::EvonyTKR::Buff->new(
+  attribute => 'Attack',
+  value     => $value,
+  buffClass => 'Ground Troops',
+);
+isa_ok($buff, 'Game::EvonyTKR::Buff');
+
+dies_ok(
+  sub {
+    $b = Game::EvonyTKR::Buff->new(
+      attribute => 'Attack',
+      value     => $value,
+      buffClass => 'bogus',
+    );
+  }, 'Setting a bogus buffClass fails'
+);
 
 $obj->clear;
 
