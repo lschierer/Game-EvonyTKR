@@ -172,33 +172,23 @@ This base class implements the attributes and methods common to all Generals, bu
     return $level * politics_increment + $politics_increment;
   }
 
-  field $builtInBook :reader :param;
+  field @builtInBook :reader; 
 
-  ADJUST {
-    my @errors;
-    my $type = blessed $builtInBook;
-    if($type ne 'Game::EvonyTKR::SkillBook::Special'){
-      push @errors => "builtInBook must be a Game::EvonyTKR::SkillBook::Special, not $type";
-      if (@errors) {
-        die join ', ' => @errors;
-      }
-    }
-  }
 
   use constant DEFAULT_BUFF_MULTIPLIERS => Game::EvonyTKR::Buff::EvaluationMultipliers->new();
   
   field $BuffMultipliers :reader :param //= __CLASS__->DEFAULT_BUFF_MULTIPLIERS;
 
-  #ADJUST {
-  #  my @errors;
-  #  my $type = blessed $BuffMultipliers;
-  #  if($type ne 'Game::EvonyTKR::Buff::EvaluationMultipliers'){
-  #    push @errors => "BuffMultipliers must be a Game::EvonyTKR::Buff::EvaluationMultipliers, not $type";
-  #    if (@errors) {
-  #      die join ', ' => @errors;
-  #    }
-  #  }
-  #}
+  ADJUST {
+    my @errors;
+    my $type = blessed $BuffMultipliers;
+    if($type ne 'Game::EvonyTKR::Buff::EvaluationMultipliers'){
+      push @errors => "BuffMultipliers must be a Game::EvonyTKR::Buff::EvaluationMultipliers, not $type";
+      if (@errors) {
+        die join ', ' => @errors;
+      }
+    }
+  }
 
 }
 1;
