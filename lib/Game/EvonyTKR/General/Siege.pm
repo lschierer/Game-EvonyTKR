@@ -11,10 +11,6 @@ class Game::EvonyTKR::General::Siege :isa(Game::EvonyTKR::General) {
 
 # ABSTRACT: Module for processing information about Evony TKR Siege Specialists.
 
-=head1 SYNOPSIS
-
-=for comment Brief examples of using the module.
-
 =head1 DESCRIPTION
 
 =for Out of all Game::EvonyTKR::General instances, some are specialize in enhancing Siege Machines.  The in-game notation for which Generals specialize 

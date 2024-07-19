@@ -12,10 +12,6 @@ class Game::EvonyTKR::Buff {
 
 # ABSTRACT: Buff and Debuff primatives 
 
-=head1 SYNOPSIS
-
-=for comment Brief examples of using the module.
-
 =head1 DESCRIPTION
 
 =for A Buff is an attribute that modifies various attributes in Evony TKR

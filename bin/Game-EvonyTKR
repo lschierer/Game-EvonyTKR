@@ -1,15 +1,12 @@
-#!/usr/bin/perl
-#PODNAME: Game::EvonyTKR
+#!/usr/bin/env perl 
+# PODNAME: Game::EvonyTKR
+# ABSTRACT: Run/Execute the library with defaults. 
 use v5.40.0;
 use strict;
 use warnings;
 use Carp;
 use Game::EvonyTKR;
 
-=head1 NAME
-
-Game::EvonyTKR - wrapper for the Game::EvonyTKR distribution
-
-=cut
 
 Game::EvonyTKR->execute();
+

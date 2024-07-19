@@ -11,10 +11,6 @@ class Game::EvonyTKR::SkillBook {
 
 # ABSTRACT: Module for processing information about Evony TKR SkillBooks.
 
-=head1 SYNOPSIS
-
-=for comment Brief examples of using the module.
-
 =head1 DESCRIPTION
 
 =for SkillBooks one of several ways that a General can provide Buffs for Troops.
@@ -32,6 +28,10 @@ This is the base class, providing common methods for all SkillBooks.  You should
     }
   }
 
+=attr name
+
+each SkillBook has a name
+=cut
   field $name :reader :param;
 
   ADJUST {
@@ -42,6 +42,10 @@ This is the base class, providing common methods for all SkillBooks.  You should
     }
   }
 
+=attr buffs
+
+each SkillBook has one or more Game::EvonyTKR:Buffs
+=cut
   field @buffs :reader;
 
   method add_buff($nb) {

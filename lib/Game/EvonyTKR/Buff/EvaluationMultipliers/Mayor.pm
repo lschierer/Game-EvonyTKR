@@ -38,11 +38,8 @@ helps keep the Mayor's troops alive, and thus keeps the Mayor's debuffs in play.
     }
   }
   
-=head1 Attributes 
 
-=over
-
-=item GenericAttack
+=attr GenericAttack
  
 the Attack Buff with no conditions or class attribute. 
 =cut 
@@ -59,7 +56,7 @@ the Attack Buff with no conditions or class attribute.
     }
   }
 
-=item SiegeAttack
+=attr SiegeAttack
  
 the Attack Buff with no conditions but with Siege Class attribute. 
 =cut 
@@ -78,7 +75,7 @@ the Attack Buff with no conditions but with Siege Class attribute.
   }
 
 
-=item GenericDefense
+=attr GenericDefense
  
 the Defense Buff with no conditions or class attribute. 
 =cut 
@@ -95,7 +92,7 @@ the Defense Buff with no conditions or class attribute.
     }
   }
 
-=item SiegeDefense
+=attr SiegeDefense
  
 the Defense Buff with no conditions but with Siege Class attribute. 
 =cut 
@@ -113,7 +110,7 @@ the Defense Buff with no conditions but with Siege Class attribute.
     }
   }
 
-=item GenericHP
+=attr GenericHP
  
 the HP Buff with no conditions or class attribute. 
 =cut 
@@ -130,7 +127,7 @@ the HP Buff with no conditions or class attribute.
     }
   }
 
-=item SiegeHP
+=attr SiegeHP
  
 the HP Buff with no conditions but with Siege Class attribute. 
 =cut 
@@ -148,7 +145,7 @@ the HP Buff with no conditions but with Siege Class attribute.
     }
   }
 
-=item MarchSizeIncrease 
+=attr MarchSizeIncrease 
 
 the March Size Increase Buff with no conditions. 
 =cut 
@@ -166,7 +163,7 @@ the March Size Increase Buff with no conditions.
     }
   }
 
-=item RallySizeIncrease 
+=attr RallySizeIncrease 
 
 the Rally Size Increase Buff with no conditions. 
 =cut 
@@ -184,9 +181,9 @@ the Rally Size Increase Buff with no conditions.
     }
   }
 
-##### Debuffs 
+=head3 Debuffs 
 
-=item GenericAttackDebuff
+=attr GenericAttackDebuff
  
 the AttackDebuff with no conditions or class attribute. 
 =cut 
@@ -203,7 +200,7 @@ the AttackDebuff with no conditions or class attribute.
     }
   }
 
-=item GroundAttackDebuff
+=attr GroundAttackDebuff
  
 the AttackDebuff with no conditions but with Ground Class attribute. 
 =cut 
@@ -221,7 +218,7 @@ the AttackDebuff with no conditions but with Ground Class attribute.
     }
   }
 
-=item MountedAttackDebuff
+=attr MountedAttackDebuff
  
 the AttackDebuff with no conditions but with Mounted Class attribute. 
 =cut 
@@ -239,7 +236,7 @@ the AttackDebuff with no conditions but with Mounted Class attribute.
     }
   }
 
-=item RangedAttackDebuff
+=attr RangedAttackDebuff
  
 the AttackDebuffDebuff with no conditions but with Ranged Class attribute. 
 =cut 
@@ -257,7 +254,7 @@ the AttackDebuffDebuff with no conditions but with Ranged Class attribute.
     }
   }
 
-=item SiegeAttackDebuff
+=attr SiegeAttackDebuff
  
 the AttackDebuffDebuff with no conditions but with Siege Class attribute. 
 =cut 
@@ -275,7 +272,7 @@ the AttackDebuffDebuff with no conditions but with Siege Class attribute.
     }
   }
 
-=item GenericDefenseDebuff
+=attr GenericDefenseDebuff
  
 the DefenseDebuff with no conditions or class attribute. 
 =cut 
@@ -292,7 +289,7 @@ the DefenseDebuff with no conditions or class attribute.
     }
   }
 
-=item GroundDefenseDebuff
+=attr GroundDefenseDebuff
  
 the DefenseDebuff with no conditions but with Ground Class attribute. 
 =cut 
@@ -310,7 +307,7 @@ the DefenseDebuff with no conditions but with Ground Class attribute.
     }
   }
 
-=item MountedDefenseDebuff
+=attr MountedDefenseDebuff
  
 the DefenseDebuff with no conditions but with Mounted Class attribute. 
 =cut 
@@ -328,7 +325,7 @@ the DefenseDebuff with no conditions but with Mounted Class attribute.
     }
   }
 
-=item RangedDefenseDebuff
+=attr RangedDefenseDebuff
  
 the DefenseDebuff with no conditions but with Ranged Class attribute. 
 =cut 
@@ -346,7 +343,7 @@ the DefenseDebuff with no conditions but with Ranged Class attribute.
     }
   }
 
-=item SiegeDefenseDebuff
+=attr SiegeDefenseDebuff
  
 the DefenseDebuff with no conditions but with Siege Class attribute. 
 =cut 
@@ -364,7 +361,7 @@ the DefenseDebuff with no conditions but with Siege Class attribute.
     }
   }
 
-=item GenericHPDebuff
+=attr GenericHPDebuff
  
 the HPDebuff with no conditions or class attribute. 
 =cut 
@@ -381,7 +378,7 @@ the HPDebuff with no conditions or class attribute.
     }
   }
 
-=item GroundHPDebuff
+=attr GroundHPDebuff
  
 the HPDebuff with no conditions but with Ground Class attribute. 
 =cut 
@@ -399,7 +396,7 @@ the HPDebuff with no conditions but with Ground Class attribute.
     }
   }
 
-=item MountedHPDebuff
+=attr MountedHPDebuff
  
 the HPDebuff with no conditions but with Mounted Class attribute. 
 =cut 
@@ -417,7 +414,7 @@ the HPDebuff with no conditions but with Mounted Class attribute.
     }
   }
 
-=item RangedHPDebuff
+=attr RangedHPDebuff
  
 the HPDebuff with no conditions but with Ranged Class attribute. 
 =cut 
@@ -435,7 +432,7 @@ the HPDebuff with no conditions but with Ranged Class attribute.
     }
   }
 
-=item SiegeHPDebuff
+=attr SiegeHPDebuff
  
 the HPDebuff with no conditions but with Siege Class attribute. 
 =cut 
@@ -453,7 +450,7 @@ the HPDebuff with no conditions but with Siege Class attribute.
     }
   }
 
-=item Death2WoundedDebuff 
+=attr Death2WoundedDebuff 
 
 the Troop Death into Wounded Debuff with no conditions. 
 =cut 
@@ -471,7 +468,7 @@ the Troop Death into Wounded Debuff with no conditions.
     }
   }
 
-=item Death2SoulsDebuff 
+=attr Death2SoulsDebuff 
 
 the Troop Death into Souls Debuff with no conditions. 
 =cut 

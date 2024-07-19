@@ -10,19 +10,9 @@ class Game::EvonyTKR::Buff::EvaluationMultipliers {
 
 # ABSTRACT: Module for processing information about Evony TKR Generals.
 
-=head1 SYNOPSIS
-
-=over
-
-=item comment Brief examples of using the module.
-
-=back
-
 =head1 DESCRIPTION
 
-This ought to be a role, but that is not yet implemented in perl Corinna.
-
-For now a Game::EvonyTKR::General has-a (set of) Game::EvonyTKR::Buff::EvaluationMultipliers rather than :does Game::EvonyTKR::Buff:Evaluation which is what I wanted.  
+=for For now a Game::EvonyTKR::General has-a (set of) Game::EvonyTKR::Buff::EvaluationMultipliers rather than :does Game::EvonyTKR::Buff:Evaluation which is what I wanted.  This design choice was forced because roles are not yet implemented in perl Corinna.
 
 This is intended as an abstract class, but again, those are not implemented in Corinna yet.  I'm not sure if this will save me time or cost me time as a result. 
 
@@ -32,15 +22,13 @@ in-game biases between troops of different classes.
 
 This value has the generic versions, or what would happen if you had generals that had no conditions on their debuffs.  That is, the general does I<not> say any of 
 
-=over
+=for :list
 
-=item * when attacking
+* L<when attacking>
 
-=item * when reinforcing
+* L<when reinforcing>
 
-=item * when the main defense general
-
-=back
+* L<when the main defense general>
 
 or any of the variety of other things that get read in as conditions by Game::EvonyTKR::Buff - except that it I<does> have entries for generic debuffs, with, as I said, bogus values. 
 
@@ -63,7 +51,7 @@ I recognize that the flat list of attributes is an anti-pattern, and that a hash
 
 =over
 
-=item GenericAttack
+=attr GenericAttack
  
 the Attack Buff with no conditions or class attribute. 
 =cut 
@@ -80,7 +68,7 @@ the Attack Buff with no conditions or class attribute.
     }
   }
 
-=item GroundAttack
+=attr GroundAttack
  
 the Attack Buff with no conditions but with Ground Class attribute. 
 =cut 
@@ -98,7 +86,7 @@ the Attack Buff with no conditions but with Ground Class attribute.
     }
   }
 
-=item MountedAttack
+=attr MountedAttack
  
 the Attack Buff with no conditions but with Mounted Class attribute. 
 =cut 
@@ -116,7 +104,7 @@ the Attack Buff with no conditions but with Mounted Class attribute.
     }
   }
 
-=item RangedAttack
+=attr RangedAttack
  
 the Attack Buff with no conditions but with Ranged Class attribute. 
 =cut 
@@ -134,7 +122,7 @@ the Attack Buff with no conditions but with Ranged Class attribute.
     }
   }
 
-=item SiegeAttack
+=attr SiegeAttack
  
 the Attack Buff with no conditions but with Siege Class attribute. 
 =cut 
@@ -152,7 +140,7 @@ the Attack Buff with no conditions but with Siege Class attribute.
     }
   }
 
-=item GenericDefense
+=attr GenericDefense
  
 the Defense Buff with no conditions or class attribute. 
 =cut 
@@ -169,7 +157,7 @@ the Defense Buff with no conditions or class attribute.
     }
   }
 
-=item GroundDefense
+=attr GroundDefense
  
 the Defense Buff with no conditions but with Ground Class attribute. 
 =cut 
@@ -187,7 +175,7 @@ the Defense Buff with no conditions but with Ground Class attribute.
     }
   }
 
-=item MountedDefense
+=attr MountedDefense
  
 the Defense Buff with no conditions but with Mounted Class attribute. 
 =cut 
@@ -205,7 +193,7 @@ the Defense Buff with no conditions but with Mounted Class attribute.
     }
   }
 
-=item RangedDefense
+=attr RangedDefense
  
 the Defense Buff with no conditions but with Ranged Class attribute. 
 =cut 
@@ -223,7 +211,7 @@ the Defense Buff with no conditions but with Ranged Class attribute.
     }
   }
 
-=item SiegeDefense
+=attr SiegeDefense
  
 the Defense Buff with no conditions but with Siege Class attribute. 
 =cut 
@@ -241,7 +229,7 @@ the Defense Buff with no conditions but with Siege Class attribute.
     }
   }
 
-=item GenericHP
+=attr GenericHP
  
 the HP Buff with no conditions or class attribute. 
 =cut 
@@ -258,7 +246,7 @@ the HP Buff with no conditions or class attribute.
     }
   }
 
-=item GroundHP
+=attr GroundHP
  
 the HP Buff with no conditions but with Ground Class attribute. 
 =cut 
@@ -276,7 +264,7 @@ the HP Buff with no conditions but with Ground Class attribute.
     }
   }
 
-=item MountedHP
+=attr MountedHP
  
 the HP Buff with no conditions but with Mounted Class attribute. 
 =cut 
@@ -294,7 +282,7 @@ the HP Buff with no conditions but with Mounted Class attribute.
     }
   }
 
-=item RangedHP
+=attr RangedHP
  
 the HP Buff with no conditions but with Ranged Class attribute. 
 =cut 
@@ -312,7 +300,7 @@ the HP Buff with no conditions but with Ranged Class attribute.
     }
   }
 
-=item SiegeHP
+=attr SiegeHP
  
 the HP Buff with no conditions but with Siege Class attribute. 
 =cut 
@@ -330,7 +318,7 @@ the HP Buff with no conditions but with Siege Class attribute.
     }
   }
 
-=item GroundSpeed 
+=attr GroundSpeed 
 
 the Ground (In-Battle Movement) Speed Buff with no conditions. 
 This defaults to zero because we do not know the troop type yet. 
@@ -349,7 +337,7 @@ This defaults to zero because we do not know the troop type yet.
     }
   }
 
-=item MountedSpeed 
+=attr MountedSpeed 
 
 the Mounted (In-Battle Movement) Speed Buff with no conditions. 
 This defaults to zero because we do not know the troop type yet. 
@@ -368,7 +356,7 @@ This defaults to zero because we do not know the troop type yet.
     }
   }
 
-=item MarchSizeIncrease 
+=attr MarchSizeIncrease 
 
 the March Size Increase Buff with no conditions. 
 =cut 
@@ -386,7 +374,7 @@ the March Size Increase Buff with no conditions.
     }
   }
 
-=item RallySizeIncrease 
+=attr RallySizeIncrease 
 
 the Rally Size Increase Buff with no conditions. 
 =cut 
@@ -404,7 +392,7 @@ the Rally Size Increase Buff with no conditions.
     }
   }
 
-=item RangedRangeIncrease 
+=attr RangedRangeIncrease 
 
 The Ranged Range Increase Buff with no conditions (in other words, how far away can a ranged troop hit something).
 This defaults to zero because we do not know the troop type yet. 
@@ -423,7 +411,7 @@ This defaults to zero because we do not know the troop type yet.
     }
   }
 
-=item FlatSiegeRangeIncrease 
+=attr FlatSiegeRangeIncrease 
 
 There are two versions of this buff, this one is for flat increases.
 The Flat Siege Range Increase Buff with no conditions (in other words, how far away can a Siege Machine hit something).  
@@ -444,7 +432,7 @@ This defaults to zero because we do not know the troop type yet.
     }
   }
 
-=item SiegeRangeIncrease 
+=attr SiegeRangeIncrease 
 
 There are two versions of this buff, this one is for percentage increases.
 The Siege Range Increase Buff with no conditions (in other words, how far away can a Siege Machine hit something).
@@ -466,7 +454,7 @@ This defaults to zero because we do not know the troop type yet.
   }
 
 
-=item Death2Wounded 
+=attr Death2Wounded 
 
 the Troop Death into Wounded Buff with no conditions. 
 The original at EvonyAnswers splits this into two, one for when there is
@@ -487,7 +475,7 @@ I am using the value from the "Attacking" version, because you will not actually
     }
   }
 
-=item Death2Souls 
+=attr Death2Souls 
 
 the Troop Death into Souls Buff with no conditions. 
 =cut 
@@ -506,9 +494,9 @@ the Troop Death into Souls Buff with no conditions.
   }
 
 
-##### Debuffs 
+=head3 Debuffs 
 
-=item GenericAttackDebuff
+=attr GenericAttackDebuff
  
 the AttackDebuff with no conditions or class attribute. 
 =cut 
@@ -525,7 +513,7 @@ the AttackDebuff with no conditions or class attribute.
     }
   }
 
-=item GroundAttackDebuff
+=attr GroundAttackDebuff
  
 the AttackDebuff with no conditions but with Ground Class attribute. 
 =cut 
@@ -543,7 +531,7 @@ the AttackDebuff with no conditions but with Ground Class attribute.
     }
   }
 
-=item MountedAttackDebuff
+=attr MountedAttackDebuff
  
 the AttackDebuff with no conditions but with Mounted Class attribute. 
 =cut 
@@ -561,7 +549,7 @@ the AttackDebuff with no conditions but with Mounted Class attribute.
     }
   }
 
-=item RangedAttackDebuff
+=attr RangedAttackDebuff
  
 the AttackDebuffDebuff with no conditions but with Ranged Class attribute. 
 =cut 
@@ -579,7 +567,7 @@ the AttackDebuffDebuff with no conditions but with Ranged Class attribute.
     }
   }
 
-=item SiegeAttackDebuff
+=attr SiegeAttackDebuff
  
 the AttackDebuffDebuff with no conditions but with Siege Class attribute. 
 =cut 
@@ -597,7 +585,7 @@ the AttackDebuffDebuff with no conditions but with Siege Class attribute.
     }
   }
 
-=item GenericDefenseDebuff
+=attr GenericDefenseDebuff
  
 the DefenseDebuff with no conditions or class attribute. 
 =cut 
@@ -614,7 +602,7 @@ the DefenseDebuff with no conditions or class attribute.
     }
   }
 
-=item GroundDefenseDebuff
+=attr GroundDefenseDebuff
  
 the DefenseDebuff with no conditions but with Ground Class attribute. 
 =cut 
@@ -632,7 +620,7 @@ the DefenseDebuff with no conditions but with Ground Class attribute.
     }
   }
 
-=item MountedDefenseDebuff
+=attr MountedDefenseDebuff
  
 the DefenseDebuff with no conditions but with Mounted Class attribute. 
 =cut 
@@ -650,7 +638,7 @@ the DefenseDebuff with no conditions but with Mounted Class attribute.
     }
   }
 
-=item RangedDefenseDebuff
+=attr RangedDefenseDebuff
  
 the DefenseDebuff with no conditions but with Ranged Class attribute. 
 =cut 
@@ -668,7 +656,7 @@ the DefenseDebuff with no conditions but with Ranged Class attribute.
     }
   }
 
-=item SiegeDefenseDebuff
+=attr SiegeDefenseDebuff
  
 the DefenseDebuff with no conditions but with Siege Class attribute. 
 =cut 
@@ -686,7 +674,7 @@ the DefenseDebuff with no conditions but with Siege Class attribute.
     }
   }
 
-=item GenericHPDebuff
+=attr GenericHPDebuff
  
 the HPDebuff with no conditions or class attribute. 
 =cut 
@@ -703,7 +691,7 @@ the HPDebuff with no conditions or class attribute.
     }
   }
 
-=item GroundHPDebuff
+=attr GroundHPDebuff
  
 the HPDebuff with no conditions but with Ground Class attribute. 
 =cut 
@@ -721,7 +709,7 @@ the HPDebuff with no conditions but with Ground Class attribute.
     }
   }
 
-=item MountedHPDebuff
+=attr MountedHPDebuff
  
 the HPDebuff with no conditions but with Mounted Class attribute. 
 =cut 
@@ -739,7 +727,7 @@ the HPDebuff with no conditions but with Mounted Class attribute.
     }
   }
 
-=item RangedHPDebuff
+=attr RangedHPDebuff
  
 the HPDebuff with no conditions but with Ranged Class attribute. 
 =cut 
@@ -757,7 +745,7 @@ the HPDebuff with no conditions but with Ranged Class attribute.
     }
   }
 
-=item SiegeHPDebuff
+=attr SiegeHPDebuff
  
 the HPDebuff with no conditions but with Siege Class attribute. 
 =cut 
@@ -775,7 +763,7 @@ the HPDebuff with no conditions but with Siege Class attribute.
     }
   }
 
-=item Death2WoundedDebuff 
+=attr Death2WoundedDebuff 
 
 the Troop Death into Wounded Debuff with no conditions. 
 =cut 
@@ -793,7 +781,7 @@ the Troop Death into Wounded Debuff with no conditions.
     }
   }
 
-=item Death2SoulsDebuff 
+=attr Death2SoulsDebuff 
 
 the Troop Death into Souls Debuff with no conditions. 
 =cut 
