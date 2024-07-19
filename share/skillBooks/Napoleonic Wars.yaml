@@ -1,0 +1,24 @@
+---
+name: Napoleonic Wars
+buff:
+  - attribute: Attack
+    condition:
+      - leading_the_army_to_attack
+    class: Mounted
+    value:
+      number: 50
+      unit: percentage
+  - attribute: Defense
+    condition:
+      - brings_dragon_or_beast_to_attack
+    class: Mounted
+    value:
+      number: 30
+      unit: percentage
+  - attribute: HP
+    condition:
+      - brings_dragon_or_beast_to_attack
+    class: Mounted
+    value:
+      number: 30
+      unit: percentage

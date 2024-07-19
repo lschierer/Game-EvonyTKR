@@ -1,0 +1,14 @@
+---
+name: Dignity of Grand Prince
+buff:
+  - attribute: Attack
+    condition:
+      - Reduces_Enemy
+    value:
+      number: 10
+      unit: percentage
+  - attribute: Attack
+    class: Archers
+    value:
+      number: 20
+      unit: percentage

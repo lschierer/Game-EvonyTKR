@@ -1,0 +1,23 @@
+---
+name: Holy War of Yadirah
+buff:
+  - attribute: Attack
+    condition:
+      - leading_the_army_to_attack
+    class: Siege
+    value:
+      number: 40
+      unit: percentage
+  - attribute: HP
+    condition:
+      - leading_the_army_to_attack
+    class: Siege
+    value:
+      number: 40
+      unit: percentage
+  - attribute: March_Size_Capacity
+    condition:
+      - leading_the_army_to_attack
+    value:
+      number: 12
+      unit: percentage

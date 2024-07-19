@@ -1,0 +1,24 @@
+---
+name: Glory Knight
+buff:
+  - attribute: Attack
+    class: Mounted
+    condition:
+      - leading_the_army_to_attack
+    value:
+      number: 30
+      unit: percentage
+  - attribute: Defense
+    class: Mounted
+    condition:
+      - leading_the_army_to_attack
+    value:
+      number: 15
+      unit: percentage
+  - attribute: HP
+    class: Mounted
+    condition:
+      - leading_the_army_to_attack
+    value:
+      number: 15
+      unit: percentage

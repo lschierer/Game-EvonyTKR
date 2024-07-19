@@ -1,0 +1,23 @@
+---
+name: Eagle of Snowfield
+buff:
+  - attribute: March_Size_Capacity
+    condition:
+      - leading_the_army_to_attack
+    value:
+      number: 8
+      unit: percentage
+  - attribute: Attack
+    condition:
+      - leading_the_army_to_attack
+    class: Ground
+    value:
+      number: 30
+      unit: percentage
+  - attribute: HP
+    condition:
+      - leading_the_army_to_attack
+    class: Ground
+    value:
+      number: 30
+      unit: percentage

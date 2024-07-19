@@ -1,0 +1,8 @@
+---
+name: Heroism
+buff:
+  - attribute: Attack
+    class: Archers
+    value:
+      number: 35
+      unit: percentage

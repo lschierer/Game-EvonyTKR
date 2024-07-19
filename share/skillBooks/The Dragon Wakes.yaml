@@ -1,0 +1,15 @@
+---
+name: The Dragon Wakes
+buff:
+  - attribute: Attack
+    class: Mounted
+    value:
+      number: 25
+      unit: percentage
+  - attribute: Attack
+    condition:
+      - dragon_to_the_attack
+    class: Mounted
+    value:
+      number: 15
+      unit: percentage

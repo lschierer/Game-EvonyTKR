@@ -1,0 +1,18 @@
+---
+name: Silesian Wars
+buff:
+  - attribute: Attack
+    class: Mounted
+    value:
+      number: 40
+      unit: percentage
+  - attribute: HP
+    class: Mounted
+    value:
+      number: 15
+      unit: percentage
+  - attribute: Defense
+    class: Mounted
+    value:
+      number: 15
+      unit: percentage

@@ -1,0 +1,30 @@
+---
+name: Queen of Hungary
+buff:
+  - attribute: Attack
+    condition:
+      - Against Monsters
+    class: Mounted
+    value:
+      number: 45
+      unit: percentage
+  - attribute: Defense
+    condition:
+      - Against Monsters
+    class: Mounted
+    value:
+      number: 45
+      unit: percentage
+  - attribute: HP
+    condition:
+      - Against Monsters
+    class: Mounted
+    value:
+      number: 45
+      unit: percentage
+  - attribute: Stamina_cost
+    condition:
+      - Against Monsters
+    value:
+      number: 20
+      unit: percentage

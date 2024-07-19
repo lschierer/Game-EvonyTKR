@@ -1,0 +1,38 @@
+---
+name: Blessing of Siren
+buff:
+  - attribute: Attack
+    condition:
+      - leading_the_army_to_attack
+    class: Archers
+    value:
+      number: 25
+      unit: percentage
+  - attribute: Attack
+    condition:
+      - brings_dragon_or_beast_to_attack
+    class: Archers
+    value:
+      number: 15
+      unit: percentage
+  - attribute: Attack
+    condition:
+      - brings_dragon_or_beast_to_attack
+    class: Siege
+    value:
+      number: 15
+      unit: percentage
+  - attribute: Defense
+    condition:
+      - brings_dragon_or_beast_to_attack
+    class: Archers
+    value:
+      number: 15
+      unit: percentage
+  - attribute: Defense
+    condition:
+      - brings_dragon_or_beast_to_attack
+    class: Siege
+    value:
+      number: 15
+      unit: percentage

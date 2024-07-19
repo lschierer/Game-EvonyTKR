@@ -1,0 +1,8 @@
+---
+name: Win by Surprise Attacks
+buff:
+  - attribute: Attack
+    class: Mounted
+    value:
+      number: 35
+      unit: percentage

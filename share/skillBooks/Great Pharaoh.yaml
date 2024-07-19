@@ -1,0 +1,18 @@
+---
+name: Great Pharaoh
+buff:
+  - attribute: Attack
+    class: Siege
+    value:
+      number: 20
+      unit: percentage
+  - attribute: Defense
+    class: Siege
+    value:
+      number: 20
+      unit: percentage
+  - attribute: HP
+    class: Ground
+    value:
+      number: 10
+      unit: percentage

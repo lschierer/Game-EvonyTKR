@@ -1,0 +1,18 @@
+---
+name: Knights of the Garter
+buff:
+  - attribute: Attack
+    class: Archers
+    value:
+      number: 25
+      unit: percentage
+  - attribute: Attack
+    class: Siege
+    value:
+      number: 25
+      unit: percentage
+  - attribute: Defense
+    class: Archers
+    value:
+      number: 15
+      unit: percentage

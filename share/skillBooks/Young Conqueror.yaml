@@ -1,0 +1,13 @@
+---
+name: Young Conqueror
+buff:
+  - attribute: Attack
+    class: Mounted
+    value:
+      number: 35
+      unit: percentage
+  - attribute: Attack
+    class: Ground
+    value:
+      number: 35
+      unit: percentage

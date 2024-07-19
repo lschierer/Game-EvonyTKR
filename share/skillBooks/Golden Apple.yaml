@@ -1,0 +1,36 @@
+---
+name: Golden Apple
+buff:
+  - attribute: Defense
+    condition:
+      - When_Defending_Outside_The_Main_City
+    class: Archers
+    value:
+      number: 35
+      unit: percentage
+  - attribute: Defense
+    condition:
+      - When_Defending_Outside_The_Main_City
+    class: Siege
+    value:
+      number: 35
+      unit: percentage
+  - attribute: Defense
+    condition:
+      - When_Defending_Outside_The_Main_City
+    class: Siege
+    value:
+      number: 35
+      unit: percentage
+  - attribute: HP
+    condition:
+      - When_Defending_Outside_The_Main_City
+    class: Siege
+    value:
+      number: 35
+      unit: percentage
+  - attribute: Attack
+    class: Archers
+    value:
+      number: 45
+      unit: percentage

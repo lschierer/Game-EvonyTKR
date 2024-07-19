@@ -1,0 +1,23 @@
+---
+name: Theodosius the Great
+buff:
+  - attribute: Attack
+    class: Siege
+    condition:
+      - leading_the_army_to_attack
+    value:
+      number: 45
+      unit: percentage
+  - attribute: Defense
+    class: Siege
+    condition:
+      - leading_the_army_to_attack
+    value:
+      number: 45
+      unit: percentage
+  - attribute: March_Size_Capacity
+    condition:
+      - leading_the_army_to_attack
+    value:
+      number: 8
+      unit: percentage
