@@ -1,0 +1,37 @@
+{
+   "configure" : {
+      "requires" : {
+         "Module::Build::Tiny" : "0.039"
+      }
+   },
+   "runtime" : {
+      "requires" : {
+         "App::Cmd::Simple" : "0",
+         "Carp" : "0",
+         "Data::Dumper" : "0",
+         "File::ShareDir" : "0",
+         "File::Slurp" : "0",
+         "File::Spec" : "0",
+         "Game::EvonyTKR::SkillBook::Special" : "0",
+         "PPI::Document" : "0",
+         "Pod::Weaver" : "0",
+         "Software::License::CC_BY_4_0" : "0",
+         "Type::Utils" : "0",
+         "Types::Common" : "0",
+         "Types::Common::Numeric" : "0",
+         "Types::Standard" : "0",
+         "YAML::XS" : "0",
+         "base" : "0",
+         "experimental" : "0",
+         "namespace::autoclean" : "0",
+         "perl" : "v5.40.0"
+      }
+   },
+   "test" : {
+      "requires" : {
+         "Game::EvonyTKR::General::Siege" : "0",
+         "Test::File::ShareDir::Object::Dist" : "0",
+         "Test::Most" : "0"
+      }
+   }
+}
