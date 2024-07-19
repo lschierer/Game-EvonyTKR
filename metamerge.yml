@@ -1,3 +1,4 @@
+dynamic_config: 1
 resources:
   bugtracker:
     web: https://github.com/lschierer/EvonyTKRTips.sst/issues
@@ -5,6 +6,4 @@ license:
   - CC_BY_4_0
 author:
   - Luke Schierer <luke@schierer.org>
-build:
-  requires:
-    - App::podweaver
+  

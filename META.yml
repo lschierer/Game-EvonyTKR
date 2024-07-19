@@ -3,12 +3,19 @@ abstract: "Perl Modules providing utilities for players of Evony The King's Retu
 author:
   - 'Luke Schierer <luke@schierer.org>'
 build_requires:
-  Game::EvonyTKR::General::Siege: '0'
+  App::podweaver: '0'
   Test::File::ShareDir::Object::Dist: '0'
   Test::Most: '0'
+  TestsFor::Game::EvonyTKR::Buff: '0'
+  TestsFor::Game::EvonyTKR::Buff::Data: '0'
+  TestsFor::Game::EvonyTKR::Buff::Value: '0'
+  TestsFor::Game::EvonyTKR::General: '0'
+  TestsFor::Game::EvonyTKR::General::Siege: '0'
+  TestsFor::Game::EvonyTKR::SkillBook: '0'
+  TestsFor::Game::EvonyTKR::SkillBook::Special: '0'
 configure_requires:
   Module::Build::Tiny: '0.039'
-dynamic_config: 0
+dynamic_config: '1'
 generated_by: 'App::ModuleBuildTiny version 0.047, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
@@ -18,7 +25,7 @@ name: Game-EvonyTKR
 provides:
   Game::EvonyTKR:
     file: lib/Game/EvonyTKR.pm
-    version: v0.0.3
+    version: v0.0.7
   Game::EvonyTKR::Buff:
     file: lib/Game/EvonyTKR/Buff.pm
   Game::EvonyTKR::Buff::Data:
@@ -39,6 +46,9 @@ provides:
     file: lib/Game/EvonyTKR/Buff/Value.pm
   Game::EvonyTKR::General:
     file: lib/Game/EvonyTKR/General.pm
+  Game::EvonyTKR::GeneratePod:
+    file: lib/Game/EvonyTKR/GeneratePod.pm
+    version: v0.0.7
   Game::EvonyTKR::SkillBook:
     file: lib/Game/EvonyTKR/SkillBook.pm
 requires:
@@ -46,8 +56,15 @@ requires:
   Carp: '0'
   Data::Dumper: '0'
   File::ShareDir: '0'
+  File::Slurp: '0'
   File::Spec: '0'
+  Game::EvonyTKR::General::Ground: '0'
+  Game::EvonyTKR::General::Mounted: '0'
+  Game::EvonyTKR::General::Ranged: '0'
+  Game::EvonyTKR::General::Siege: '0'
   Game::EvonyTKR::SkillBook::Special: '0'
+  PPI::Document: '0'
+  Pod::Weaver: '0'
   Software::License::CC_BY_4_0: '0'
   Type::Utils: '0'
   Types::Common: '0'
@@ -61,9 +78,6 @@ requires:
 resources:
   bugtracker: https://github.com/lschierer/EvonyTKRTips.sst/issues
   repository: https://github.com/lschierer/EvonyTKRTips.sst.git
-version: v0.0.3
-x_build:
-  requires:
-    - App::podweaver
+version: v0.0.7
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_spdx_expression: ~

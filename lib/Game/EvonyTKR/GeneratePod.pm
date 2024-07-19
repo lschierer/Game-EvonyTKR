@@ -7,7 +7,7 @@ use PPI::Document;
 use namespace::autoclean;
 # ABSTRACT: Generate POD docs for Game::EvonyTKR distribution
 
-our $VERSION = 'v0.0.3';
+our $VERSION = 'v0.0.7'; # TRIAL
 
 sub opt_spec {
   return (["version|v", "print version"],);
