@@ -1,0 +1,13 @@
+---
+name: Red Demon
+buff:
+  - attribute: Attack
+    class: Mounted
+    value:
+      number: 25
+      unit: percentage
+  - attribute: HP
+    class: Mounted
+    value:
+      number: 40
+      unit: percentage

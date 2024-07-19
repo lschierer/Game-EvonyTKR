@@ -1,0 +1,18 @@
+---
+name: Battle of Zenta
+buff:
+  - attribute: Attack
+    class: Mounted
+    value:
+      number: 35
+      unit: percentage
+  - attribute: Defense
+    class: Mounted
+    value:
+      number: 10
+      unit: percentage
+  - attribute: HP
+    class: Mounted
+    value:
+      number: 10
+      unit: percentage

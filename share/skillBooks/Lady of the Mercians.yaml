@@ -1,0 +1,9 @@
+name: Lady of the Mercians
+buff:
+  - attribute: Attack
+    condition:
+      - Against Monsters
+    class: Mounted
+    value:
+      number: 55
+      unit: percentage

@@ -1,0 +1,20 @@
+---
+name: Hammer of the Gauls - Elizabeth I
+buff:
+  - attribute: Attack
+    class: Archers
+    value:
+      number: 15
+      unit: percentage
+  - attribute: Attack
+    class: Siege
+    value:
+      number: 15
+      unit: percentage
+  - attribute: Attack
+    class: Archers
+    condition:
+      - Enemy
+    value:
+      number: 15
+      unit: percentage

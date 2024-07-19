@@ -1,0 +1,24 @@
+---
+name: Supreme Power
+buff:
+  - attribute: Attack
+    class: Siege
+    condition:
+      - leading_the_army_to_attack
+    value:
+      number: 40
+      unit: percentage
+  - attribute: HP
+    class: Archers
+    condition:
+      - leading_the_army_to_attack
+    value:
+      number: 35
+      unit: percentage
+  - attribute: HP
+    class: Siege
+    condition:
+      - leading_the_army_to_attack
+    value:
+      number: 35
+      unit: percentage

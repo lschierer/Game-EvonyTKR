@@ -1,0 +1,23 @@
+---
+name: King of Jerusalem
+buff:
+  - attribute: Attack
+    class: Archers
+    value:
+      number: 40
+      unit: percentage
+  - attribute: HP
+    class: Archers
+    value:
+      number: 40
+      unit: percentage
+  - attribute: Defense
+    class: Archers
+    value:
+      number: 10
+      unit: percentage
+  - attribute: Defense
+    class: Siege
+    value:
+      number: 10
+      unit: percentage

@@ -1,0 +1,12 @@
+---
+name: Dear Child of Victory
+buff:
+  - attribute: Attack
+    class: Mounted
+    value:
+      number: 45
+      unit: percentage
+  - attribute: March_Size_Capacity
+    value:
+      number: 12
+      unit: percentage

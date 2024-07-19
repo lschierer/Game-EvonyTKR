@@ -1,0 +1,31 @@
+---
+name: Gothic Sword
+buff:
+  - attribute: Attack
+    class: Ground
+    condition:
+      - leading_the_army_to_attack
+    value:
+      number: 45
+      unit: percentage
+  - attribute: Defense
+    class: Ground
+    condition:
+      - leading_the_army_to_attack
+    value:
+      number: 45
+      unit: percentage
+  - attribute: HP
+    class: Ground
+    condition:
+      - leading_the_army_to_attack
+    value:
+      number: 30
+      unit: percentage
+  - attribute: HP
+    class: Mounted
+    condition:
+      - leading_the_army_to_attack
+    value:
+      number: 30
+      unit: percentage

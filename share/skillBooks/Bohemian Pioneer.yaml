@@ -1,0 +1,16 @@
+---
+name: Bohemian Pioneer
+buff:
+  - attribute: Attack
+    class: Archers
+    condition:
+      - leading_the_army_to_attack
+    value:
+      number: 10
+      unit: percentage
+  - attribute: Rally_Capacity
+    condition:
+      - When_Rallying
+    value:
+      number: 10
+      unit: percentage

@@ -1,0 +1,13 @@
+---
+name: Gwanggaeto-taewang
+buff:
+  - attribute: Attack
+    class: Archers
+    value:
+      number: 20
+      unit: percentage
+  - attribute: Attack
+    class: Siege
+    value:
+      number: 20
+      unit: percentage

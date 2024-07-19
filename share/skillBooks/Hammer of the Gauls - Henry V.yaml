@@ -1,0 +1,18 @@
+---
+name: Hammer of the Gauls
+buff:
+  - attribute: Attack
+    class: Archers
+    value:
+      number: 30
+      unit: percentage
+  - attribute: Defense
+    class: Archers
+    value:
+      number: 10
+      unit: percentage
+  - attribute: HP
+    class: Archers
+    value:
+      number: 10
+      unit: percentage

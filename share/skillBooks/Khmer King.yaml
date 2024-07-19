@@ -1,0 +1,38 @@
+---
+name: Khmer King
+buff:
+  - attribute: Attack
+    condition:
+      - leading_the_army_to_attack
+    class: Mounted
+    value:
+      number: 45
+      unit: percentage
+  - attribute: Defense
+    condition:
+      - leading_the_army_to_attack
+    class: Ground
+    value:
+      number: 25
+      unit: percentage
+  - attribute: Defense
+    condition:
+      - leading_the_army_to_attack
+    class: Mounted
+    value:
+      number: 25
+      unit: percentage
+  - attribute: HP
+    condition:
+      - leading_the_army_to_attack
+    class: Ground
+    value:
+      number: 25
+      unit: percentage
+  - attribute: HP
+    condition:
+      - leading_the_army_to_attack
+    class: Mounted
+    value:
+      number: 25
+      unit: percentage

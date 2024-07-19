@@ -1,0 +1,18 @@
+---
+name: Praetorian Guard
+buff:
+  - attribute: Attack
+    class: Ground
+    value:
+      number: 15
+      unit: percentage
+  - attribute: Defense
+    class: Ground
+    value:
+      number: 15
+      unit: percentage
+  - attribute: HP
+    class: Ground
+    value:
+      number: 20
+      unit: percentage

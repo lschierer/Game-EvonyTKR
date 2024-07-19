@@ -1,0 +1,66 @@
+---
+books:
+  - name: Siege Attack
+    level: '1'
+    buff:
+      - attribute: Attack
+        class: Siege
+        value:
+          number: 10
+          unit: percentage
+  - name: Siege Attack
+    level: '2'
+    buff:
+      - attribute: Attack
+        class: Siege
+        value:
+          number: 15
+          unit: percentage
+  - name: Siege Attack
+    level: '3'
+    buff:
+      - attribute: Attack
+        class: Siege
+        value:
+          number: 20
+          unit: percentage
+  - name: Siege Attack
+    level: '4'
+    buff:
+      - attribute: Attack
+        class: Siege
+        value:
+          number: 25
+          unit: percentage
+  - name: Siege HP
+    level: '1'
+    buff:
+      - attribute: HP
+        class: Siege
+        value:
+          number: 10
+          unit: percentage
+  - name: Siege HP
+    level: '2'
+    buff:
+      - attribute: HP
+        class: Siege
+        value:
+          number: 15
+          unit: percentage
+  - name: Siege HP
+    level: '3'
+    buff:
+      - attribute: HP
+        class: Siege
+        value:
+          number: 20
+          unit: percentage
+  - name: Siege HP
+    level: '4'
+    buff:
+      - attribute: HP
+        class: Siege
+        value:
+          number: 25
+          unit: percentage

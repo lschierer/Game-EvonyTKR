@@ -1,0 +1,17 @@
+---
+name: Augustus
+buff:
+  - attribute: Attack
+    class: Mounted
+    condition:
+      - leading_the_army_to_attack
+    value:
+      number: 40
+      unit: percentage
+  - attribute: Attack
+    class: Archers
+    condition:
+      - leading_the_army_to_attack
+    value:
+      number: 15
+      unit: percentage

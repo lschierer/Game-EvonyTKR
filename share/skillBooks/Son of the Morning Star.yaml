@@ -1,0 +1,15 @@
+---
+name: Son of the Morning Star
+buff:
+  - attribute: March_Size_Capacity
+    condition:
+      - leading_the_army_to_attack
+    value:
+      number: 10
+      unit: percentage
+  - attribute: Attack
+    condition:
+      - leading_the_army_to_attack
+    value:
+      number: 40
+      unit: percentage

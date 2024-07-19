@@ -1,0 +1,7 @@
+---
+name: Khentii Worship
+buff:
+  - attribute: March_Time
+    value:
+      number: 20
+      unit: percentage

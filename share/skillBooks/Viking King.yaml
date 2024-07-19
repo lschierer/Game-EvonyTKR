@@ -1,0 +1,23 @@
+---
+name: Viking King
+buff:
+  - attribute: Attack
+    class: Ground
+    value:
+      number: 40
+      unit: percentage
+  - attribute: HP
+    class: Ground
+    value:
+      number: 40
+      unit: percentage
+  - attribute: Defense
+    class: Ground
+    value:
+      number: 10
+      unit: percentage
+  - attribute: Defense
+    class: Mounted
+    value:
+      number: 10
+      unit: percentage

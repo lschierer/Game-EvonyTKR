@@ -1,0 +1,24 @@
+---
+name: Odyssey - Douglas
+buff:
+  - attribute: Attack
+    condition:
+      - Marching
+    class: Archers
+    value:
+      number: 10
+      unit: percentage
+  - attribute: Defense
+    condition:
+      - Enemy
+    class: Ground
+    value:
+      number: 20
+      unit: percentage
+  - attribute: Defense
+    condition:
+      - Enemy
+    class: Mounted
+    value:
+      number: 20
+      unit: percentage

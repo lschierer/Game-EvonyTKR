@@ -1,0 +1,9 @@
+---
+name: Domination
+buff:
+- attribute: SubCity Gold Production
+  condition:
+  - When_City_Mayor_for_this_SubCity
+  value:
+    number: 75
+    unit: percentage

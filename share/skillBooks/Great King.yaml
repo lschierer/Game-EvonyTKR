@@ -1,0 +1,17 @@
+---
+name: Great King
+buff:
+  - attribute: Attack
+    condition:
+      - leading_the_army_to_attack
+    class: Archers
+    value:
+      number: 30
+      unit: percentage
+  - attribute: Attack
+    condition:
+      - leading_the_army_to_attack
+    class: Siege
+    value:
+      number: 20
+      unit: percentage

@@ -1,0 +1,17 @@
+---
+name: Invincible Pharaoh
+buff:
+  - attribute: Attack
+    condition:
+      - leading_the_army_to_attack
+    class: Archers
+    value:
+      number: 30
+      unit: percentage
+  - attribute: HP
+    condition:
+      - leading_the_army_to_attack
+    class: Ground
+    value:
+      number: 25
+      unit: percentage

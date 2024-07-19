@@ -1,0 +1,23 @@
+---
+name: Duke of Albufera
+buff:
+  - attribute: Attack
+    class: Ground
+    value:
+      number: 45
+      unit: percentage
+  - attribute: HP
+    class: Ground
+    value:
+      number: 45
+      unit: percentage
+  - attribute: Defense
+    class: Ground
+    value:
+      number: 25
+      unit: percentage
+  - attribute: Defense
+    class: Mounted
+    value:
+      number: 25
+      unit: percentage
