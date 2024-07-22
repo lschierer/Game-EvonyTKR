@@ -1,7 +1,6 @@
 package Game::EvonyTKR;
 use v5.40.0;
 use Carp;
-require Software::License::CC_BY_4_0;
 
 use base qw(App::Cmd::Simple);
 use File::ShareDir ':ALL';
@@ -17,30 +16,7 @@ use Game::EvonyTKR::Buff;
 use Game::EvonyTKR::Buff::Value;
 use namespace::autoclean;
 
-# ABSTRACT: Perl Modules providing utilities for players of Evony The King's Return.
-
-our $VERSION = 'v0.0.7'; # TRIAL
-
-=head1 AUTHOR 
-
-Luke Schierer
-
-=head1 DESCRIPTION
-This distribution aims to help players create and process the wealth of data that Evony The King's Return dumps on users with next to no organization, documentation, or built in tools to handle. 
-
-This module will (eventually) help players of the game needing to make reasonably complex analysis to make optimal choices about each of these:
-
-=for :list 
-
-* L<Which generals to invest time and resources in>
-
-* L<How to best pair generals for different senarios>
-
-* L<The effects of Armor, Spiritual Beats, and Dragons on buffs and debuffs>
-
-* L<Calculating your total buffs and debuffs in different senarios given the ever increasing number of sources for these buffs and debuffs>
-
-=cut
+our $VERSION = 'v0.00.1';
 
 sub opt_spec {
   return (
@@ -72,8 +48,8 @@ sub read_generals {
   my ($self, $opt, $args) = @_;
   my $debug = 1;
   if($debug) { say "read_generals";}
-  my $general_share = File::Spec->catfile(dist_dir('Game-EvonyTKR'),"generals");
-  my $book_share = File::Spec->catfile(dist_dir('Game-EvonyTKR'),"skillBooks");
+  my $general_share = File::Spec->catfile(dist_dir('Game-EvonyTKR'), 'generals');
+  my $book_share = File::Spec->catfile(dist_dir('Game-EvonyTKR'), 'skillBooks');
   my @found = grep { -T -s -r } glob("$general_share/*.yaml");
   if($debug) {
     say "$general_share";
@@ -148,22 +124,48 @@ sub read_generals {
   return %generals;
 }
 
+
 1;
+__END__
+
+=encoding utf-8
 
 =head1 NAME
 
-Game::EvonyTKR - Perl Modules providing utilities for players of Evony The King's Return.
+Game::EvonyTKR - Perl Modules providing utilities for players of Evony The King's Return
+
+=head1 SYNOPSIS
+
+  use Game::EvonyTKR;
+
+  Game::EvonyTKR->execute();
+
+=head1 DESCRIPTION
+
+This distribution aims to help players create and process the wealth of data that Evony The King's Return dumps on users with next to no organization, documentation, or built in tools to handle. 
+
+This module will (eventually) help players of the game needing to make reasonably complex analysis to make optimal choices about each of these:
+
+=for :list 
+
+* L<Which generals to invest time and resources in>
+
+* L<How to best pair generals for different senarios>
+
+* L<The effects of Armor, Spiritual Beats, and Dragons on buffs and debuffs>
+
+* L<Calculating your total buffs and debuffs in different senarios given the ever increasing number of sources for these buffs and debuffs>
+
+
 
 =head1 AUTHOR
 
-Luke Schierer <luke@schierer.org>
+Luke Schierer E<lt>luke@schierer.orgE<gt>
 
 =head1 COPYRIGHT
 
-This software is copyright (c) 2024 by Luke Schierer. 
+Copyright 2024- Luke Schierer
 
-This is free software, licensed under:
-Creative Commons Attribution 4.0 International License 
-
+=head1 SEE ALSO
 
 =cut
