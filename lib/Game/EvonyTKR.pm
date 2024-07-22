@@ -1,6 +1,8 @@
 package Game::EvonyTKR;
 use v5.40.0;
+use utf8;
 use Carp;
+use experimental qw(class);
 
 use base qw(App::Cmd::Simple);
 use File::ShareDir ':ALL';
@@ -93,21 +95,34 @@ sub read_generals {
       } else {
         croak "$data_filename is not found or cannot be read."
       }
-      my $generalClass;
-      for($rb-{'score_as'}) {
-        if (/Ground/) {
-          $generalClass = Game::EvonyTKR::General::Ground;
-        } elsif (/Mounted/) {
-          $generalClass = Game::EvonyTKR::General::Mounted;
-        } elsif (/Ranged/ || /Archers/) {
-          $generalClass = Game::EvonyTKR::General::Ranged;
-        } elsif (/Siege/) {
-          $generalClass = Game::EvonyTKR::General::Siege;
-        } else {
-          croak "unknown general type $_";
-        }
+
+      my %generalClass = (
+        'Ground'  => 'Game::EvonyTKR::General::Ground',
+        'Mounted' => 'Game::EvonyTKR::General::Mounted',
+        'Ranged'  => 'Game::EvonyTKR::General::Ranged',
+        'Siege'   => 'Game::EvonyTKR::General::Siege',
+      );
+      
+      my $generalClassKey;
+
+      my $scoreType = $data->{'general'}->{'score_as'};
+      
+      if ($scoreType =~ /Ground/) {
+        $generalClassKey = 'Ground';
+      } elsif ($scoreType =~ /Mounted/) {
+        $generalClassKey = 'Mounted';
+      } elsif ($scoreType =~ /Ranged/ || $scoreType =~ /Archers/) {
+        $generalClassKey = 'Ranged';
+      } elsif ($scoreType =~ /Siege/) {
+        $generalClassKey = 'Siege';
+      } elsif ($scoreType =~ /Mayor/) {
+        next;
+      } 
+      else {
+        croak $data->{'general'}->{'name'} . " is of unknown general type $_";
       }
-      $generals{$name} = $generalClass->new(
+    
+      $generals{$name} = $generalClass{$generalClassKey}->new(
         name                  => $data->{'general'}->{'name'},
         leadership            => $data->{'general'}->{'leadership'},
         leadership_increment  => $data->{'general'}->{'leadership_increment'},
