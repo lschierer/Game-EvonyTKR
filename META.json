@@ -1,5 +1,5 @@
 {
-   "abstract" : "Blah blah blah",
+   "abstract" : "Perl Modules providing utilities for players of Evony The King's Return",
    "author" : [
       "Your Name <your@email.com>"
    ],
@@ -37,22 +37,36 @@
       },
       "runtime" : {
          "requires" : {
-            "perl" : "5.012"
+            "Carp" : "0",
+            "Data::Dumper" : "0",
+            "File::ShareDir" : "0",
+            "File::Slurp" : "0",
+            "File::Spec" : "0",
+            "PPI::Document" : "0",
+            "Pod::Weaver" : "0",
+            "Type::Utils" : "0",
+            "Types::Common::Numeric" : "0",
+            "Types::Standard" : "0",
+            "YAML::XS" : "0",
+            "base" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "v5.40.0"
          }
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.96"
+            "Test::More" : "0.96",
+            "Test::Most" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.01",
+   "version" : "v0.00.1",
    "x_contributors" : [
-      "Luke Schierer <lschiere@amazon.com>"
+      "Luke Schierer <luke@schierer.org>"
    ],
    "x_generated_by_perl" : "v5.40.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
-   "x_static_install" : 1
+   "x_static_install" : 0
 }
 
