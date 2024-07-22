@@ -61,6 +61,17 @@
       }
    },
    "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/lschierer/Game-EvonyTKR/issues"
+      },
+      "homepage" : "https://github.com/lschierer/Game-EvonyTKR",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/lschierer/Game-EvonyTKR.git",
+         "web" : "https://github.com/lschierer/Game-EvonyTKR"
+      }
+   },
    "version" : "v0.00.1",
    "x_contributors" : [
       "Luke Schierer <luke@schierer.org>"
