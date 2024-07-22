@@ -1,131 +1,58 @@
 {
-   "abstract" : "Perl Modules providing utilities for players of Evony The King's Return.",
+   "abstract" : "Blah blah blah",
    "author" : [
-      "Luke Schierer <luke@schierer.org>"
+      "Your Name <your@email.com>"
    ],
-   "dynamic_config" : "1",
-   "generated_by" : "App::ModuleBuildTiny version 0.047",
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.22, Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unrestricted",
-      "unknown"
+      "unrestricted"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
       "version" : 2
    },
    "name" : "Game-EvonyTKR",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "App::podweaver" : "0"
-         }
-      },
       "configure" : {
          "requires" : {
-            "Module::Build::Tiny" : "0.039"
+            "Module::Build::Tiny" : "0.034"
          }
       },
       "develop" : {
          "requires" : {
-            "App::ModuleBuildTiny" : "0.047"
+            "Dist::Milla" : "v1.0.22",
+            "Test::Pod" : "1.41"
          }
       },
       "runtime" : {
          "requires" : {
-            "App::Cmd::Simple" : "0",
-            "Carp" : "0",
-            "Data::Dumper" : "0",
-            "File::ShareDir" : "0",
-            "File::Slurp" : "0",
-            "File::Spec" : "0",
-            "Game::EvonyTKR::General::Ground" : "0",
-            "Game::EvonyTKR::General::Mounted" : "0",
-            "Game::EvonyTKR::General::Ranged" : "0",
-            "Game::EvonyTKR::General::Siege" : "0",
-            "Game::EvonyTKR::SkillBook::Special" : "0",
-            "PPI::Document" : "0",
-            "Pod::Weaver" : "0",
-            "Software::License::CC_BY_4_0" : "0",
-            "Type::Utils" : "0",
-            "Types::Common" : "0",
-            "Types::Common::Numeric" : "0",
-            "Types::Standard" : "0",
-            "YAML::XS" : "0",
-            "base" : "0",
-            "experimental" : "0",
-            "namespace::autoclean" : "0",
-            "perl" : "v5.40.0"
+            "perl" : "5.012"
          }
       },
       "test" : {
          "requires" : {
-            "Test::File::ShareDir::Object::Dist" : "0",
-            "Test::Most" : "0",
-            "TestsFor::Game::EvonyTKR::Buff" : "0",
-            "TestsFor::Game::EvonyTKR::Buff::Data" : "0",
-            "TestsFor::Game::EvonyTKR::Buff::Value" : "0",
-            "TestsFor::Game::EvonyTKR::General" : "0",
-            "TestsFor::Game::EvonyTKR::General::Siege" : "0",
-            "TestsFor::Game::EvonyTKR::SkillBook" : "0",
-            "TestsFor::Game::EvonyTKR::SkillBook::Special" : "0"
+            "Test::More" : "0.96"
          }
       }
    },
-   "provides" : {
-      "Game::EvonyTKR" : {
-         "file" : "lib/Game/EvonyTKR.pm",
-         "version" : "v0.0.7"
-      },
-      "Game::EvonyTKR::Buff" : {
-         "file" : "lib/Game/EvonyTKR/Buff.pm"
-      },
-      "Game::EvonyTKR::Buff::Data" : {
-         "file" : "lib/Game/EvonyTKR/Buff/Data.pm"
-      },
-      "Game::EvonyTKR::Buff::EvaluationMultipliers" : {
-         "file" : "lib/Game/EvonyTKR/Buff/EvaluationMultipliers.pm"
-      },
-      "Game::EvonyTKR::Buff::EvaluationMultipliers::Attacking" : {
-         "file" : "lib/Game/EvonyTKR/Buff/EvaluationMultipliers/Attacking.pm"
-      },
-      "Game::EvonyTKR::Buff::EvaluationMultipliers::Mayor" : {
-         "file" : "lib/Game/EvonyTKR/Buff/EvaluationMultipliers/Mayor.pm"
-      },
-      "Game::EvonyTKR::Buff::EvaluationMultipliers::Monster" : {
-         "file" : "lib/Game/EvonyTKR/Buff/EvaluationMultipliers/Monster.pm"
-      },
-      "Game::EvonyTKR::Buff::EvaluationMultipliers::Reinforcing" : {
-         "file" : "lib/Game/EvonyTKR/Buff/EvaluationMultipliers/Reinforcing.pm"
-      },
-      "Game::EvonyTKR::Buff::EvaluationMultipliers::Wall" : {
-         "file" : "lib/Game/EvonyTKR/Buff/EvaluationMultipliers/Wall.pm"
-      },
-      "Game::EvonyTKR::Buff::Value" : {
-         "file" : "lib/Game/EvonyTKR/Buff/Value.pm"
-      },
-      "Game::EvonyTKR::General" : {
-         "file" : "lib/Game/EvonyTKR/General.pm"
-      },
-      "Game::EvonyTKR::GeneratePod" : {
-         "file" : "lib/Game/EvonyTKR/GeneratePod.pm",
-         "version" : "v0.0.7"
-      },
-      "Game::EvonyTKR::SkillBook" : {
-         "file" : "lib/Game/EvonyTKR/SkillBook.pm"
-      }
-   },
-   "release_status" : "testing",
-   "resources" : {
-      "bugtracker" : {
-         "web" : "https://github.com/lschierer/EvonyTKRTips.sst/issues"
-      },
-      "repository" : {
-         "type" : "git",
-         "url" : "https://github.com/lschierer/EvonyTKRTips.sst.git",
-         "web" : "https://github.com/lschierer/EvonyTKRTips.sst/"
-      }
-   },
-   "version" : "v0.0.7",
-   "x_serialization_backend" : "JSON::PP version 4.16",
-   "x_spdx_expression" : null
+   "release_status" : "stable",
+   "version" : "0.01",
+   "x_contributors" : [
+      "Luke Schierer <lschiere@amazon.com>"
+   ],
+   "x_generated_by_perl" : "v5.40.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
+   "x_static_install" : 1
 }
+
