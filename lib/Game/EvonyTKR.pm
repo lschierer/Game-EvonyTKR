@@ -1,6 +1,6 @@
 package Game::EvonyTKR;
 use v5.40.0;
-use utf8;
+use utf8::all;
 
 use Carp;
 use experimental qw(class);
@@ -63,7 +63,7 @@ sub read_generals {
   my %generals;
   foreach my $tg (@found) {
     if(defined($tg)) {
-      open(my ($fh), '<:utf8', $tg) or croak "$!";
+      open(my ($fh), '<', $tg) or croak "$!";
       my $yaml = do { local $/; <$fh> };
       my $data = Load $yaml;
       close $fh;
@@ -75,7 +75,7 @@ sub read_generals {
       );
       my $data_filename = File::Spec->catfile($book_share, $bookName);
       if( -T -s -r $data_filename ) {
-        open(my ($bh), '<:utf8', $data_filename) or croak "$!";
+        open(my ($bh), '<', $data_filename) or croak "$!";
         my $bookyaml = do { local $/; <$bh> };
         my $bookData = Load $bookyaml;
         close $bh;
