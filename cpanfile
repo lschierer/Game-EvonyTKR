@@ -3,6 +3,7 @@ requires 'utf8::all', '0';
 requires "Carp", "0";
 requires "Clone", '0';
 requires "Data::Dumper", "0";
+requires "Devel::Peek", '0',
 requires "File::ShareDir", "0";
 requires "File::Slurp", "0";
 requires "File::Spec", "0";
