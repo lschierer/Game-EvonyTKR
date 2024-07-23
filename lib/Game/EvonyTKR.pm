@@ -8,8 +8,8 @@ use experimental qw(class);
 use base qw(App::Cmd::Simple);
 use File::ShareDir ':ALL';
 use File::Spec;
-use YAML::XS;
-use Data::Dumper;
+use YAML::XS qw{LoadFile Load};
+use Devel::Peek;
 use Game::EvonyTKR::General::Ground;
 use Game::EvonyTKR::General::Mounted;
 use Game::EvonyTKR::General::Ranged;
@@ -45,6 +45,9 @@ sub execute {
     my %generals = read_generals();
     say "start";
     say scalar %generals;
+    #my $pairCreator = Game::EvonyTKR::General::Pair::Creator->new();
+    #$pairCreator->set_generals(%generals);
+    #$pairCreator->getConflictData();
     say "done";
   }
 }
@@ -64,9 +67,7 @@ sub read_generals {
   foreach my $tg (@found) {
     if(defined($tg)) {
       open(my ($fh), '<', $tg) or croak "$!";
-      my $yaml = do { local $/; <$fh> };
-      my $data = Load $yaml;
-      close $fh;
+      my $data = LoadFile($tg);
       my $name = $data->{'general'}->{'name'};
       if($debug) {say $name;}
       my $bookName = $data->{'general'}->{'books'}[0].".yaml";
@@ -75,10 +76,7 @@ sub read_generals {
       );
       my $data_filename = File::Spec->catfile($book_share, $bookName);
       if( -T -s -r $data_filename ) {
-        open(my ($bh), '<', $data_filename) or croak "$!";
-        my $bookyaml = do { local $/; <$bh> };
-        my $bookData = Load $bookyaml;
-        close $bh;
+        my $bookData = LoadFile($data_filename);
         my @buffs = @{ $bookData->{'buff'} };
         foreach my $rb (@buffs) {
           my $v = Game::EvonyTKR::Buff::Value->new(
