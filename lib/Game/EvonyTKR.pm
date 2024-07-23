@@ -1,6 +1,7 @@
 package Game::EvonyTKR;
 use v5.40.0;
 use utf8;
+
 use Carp;
 use experimental qw(class);
 
@@ -16,6 +17,7 @@ use Game::EvonyTKR::General::Siege;
 use Game::EvonyTKR::SkillBook::Special;
 use Game::EvonyTKR::Buff;
 use Game::EvonyTKR::Buff::Value;
+use Game::EvonyTKR::General::Pair::Creator;
 use namespace::autoclean;
 
 our $VERSION = 'v0.00.1';
@@ -35,7 +37,8 @@ sub validate_args {
 
 sub execute {
   my ($self, $opt, $args) = @_;
-
+  binmode(STDOUT, ":encoding(UTF-8)"); # apparently not the same thing as "use utf8;"  
+  binmode(STDIN, ":encoding(UTF-8)"); # apparently not the same thing as "use utf8;"  
   if ($opt->{option1}) {
       # do option 1 stuff
   } else {
@@ -60,19 +63,19 @@ sub read_generals {
   my %generals;
   foreach my $tg (@found) {
     if(defined($tg)) {
-      open(my ($fh), '<', $tg) or croak "$!";
+      open(my ($fh), '<:raw', $tg) or croak "$!";
       my $yaml = do { local $/; <$fh> };
       my $data = Load $yaml;
       close $fh;
       my $name = $data->{'general'}->{'name'};
-      if($debug) {say Dumper($name);}
+      if($debug) {say $name;}
       my $bookName = $data->{'general'}->{'books'}[0].".yaml";
       my $sb = Game::EvonyTKR::SkillBook::Special->new(
         name  => $bookName
       );
       my $data_filename = File::Spec->catfile($book_share, $bookName);
       if( -T -s -r $data_filename ) {
-        open(my ($bh), '<', $data_filename) or croak "$!";
+        open(my ($bh), '<:raw', $data_filename) or croak "$!";
         my $bookyaml = do { local $/; <$bh> };
         my $bookData = Load $bookyaml;
         close $bh;
