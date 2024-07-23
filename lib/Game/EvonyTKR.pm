@@ -45,9 +45,9 @@ sub execute {
     my %generals = read_generals();
     say "start";
     say scalar %generals;
-    #my $pairCreator = Game::EvonyTKR::General::Pair::Creator->new();
-    #$pairCreator->set_generals(%generals);
-    #$pairCreator->getConflictData();
+    my $pairCreator = Game::EvonyTKR::General::Pair::Creator->new();
+    $pairCreator->set_generals(%generals);
+    $pairCreator->getConflictData();
     say "done";
   }
 }
