@@ -23,7 +23,7 @@ use namespace::autoclean;
 
   method set_BuffAttributes {
     my $data_location = dist_file('Game-EvonyTKR', 'buff/attributes.yaml');
-    open(my $DATA, '<:raw', $data_location) or die $!;
+    open(my $DATA, '<:utf8', $data_location) or die $!;
     my $yaml = do { local $/; <$DATA> };
     my $data = Load $yaml;
     close $DATA;
