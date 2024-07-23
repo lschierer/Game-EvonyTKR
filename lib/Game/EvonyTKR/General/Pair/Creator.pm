@@ -2,7 +2,7 @@ use v5.40.0;
 use experimental qw(class);
 use utf8::all;
 
-class Game::EvonyTKR::General::Pair {
+class Game::EvonyTKR::General::Pair::Creator {
   use Carp;
   use Clone 'clone';
   use Types::Common qw( t is_Num is_Str is_Int);
@@ -15,7 +15,9 @@ class Game::EvonyTKR::General::Pair {
   use Game::EvonyTKR::SkillBook::Special;
   use Game::EvonyTKR::Buff::EvaluationMultipliers;
   use namespace::autoclean;
-  
+
+  my $debug = 1;  
+
   my $distData = File::HomeDir->my_dist_data( 'Game-Evony', { create => 1 } );
   my $dbPath = File::Spec->catfile($distData, "db");
   ADJUST {
@@ -24,9 +26,10 @@ class Game::EvonyTKR::General::Pair {
     }
   }
   my $db;
+  my $dbFile = File::Spec->catfile($dbPath, 'pairs.db');
   ADJUST {
     $db = DBM::Deep->new(
-    files     => $dbPath,
+    file      => $dbFile,
     locking   => 1,
     autoflush => 1,
     );
@@ -36,15 +39,23 @@ class Game::EvonyTKR::General::Pair {
   field %generals :reader; 
 
   method set_generals( %ng ) {
+    
     if(scalar %ng >= 1) {
-      %generals = %{ clone (\%ng)}; 
+      if($debug) {
+        say "hashRef is " . \%ng;
+        say "size is " . scalar %ng;
+      }
+       %generals = %ng;
     }
   }
   
-  sub getConflictData() {
-    my $debug = 1;
-    my $data_location = dist_file('Game-EvonyTKR', 'generalConflictGroups');
-    while (my $file = glob($data_location.'*.yaml')) {
+  method getConflictData() {
+    
+    my $data_location = File::Spec->catfile(
+        dist_dir('Game-EvonyTKR'), 
+        'generalConflictGroups'
+      );
+    while (my $file = glob(File::Spec->catfile($data_location,'*.yaml'))) {
       if ($debug) {
         say $file;
       }
