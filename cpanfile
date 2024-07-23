@@ -1,5 +1,6 @@
 requires 'perl', '5.40.0';
 requires "Carp", "0";
+requires "Clone", '0';
 requires "Data::Dumper", "0";
 requires "File::ShareDir", "0";
 requires "File::Slurp", "0";
