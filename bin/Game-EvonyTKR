@@ -6,6 +6,7 @@ use strict;
 use warnings;
 use Carp;
 use Game::EvonyTKR;
+use utf8::all;
 
 
 Game::EvonyTKR->execute();
