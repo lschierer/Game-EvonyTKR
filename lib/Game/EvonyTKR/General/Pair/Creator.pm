@@ -1,5 +1,6 @@
 use v5.40.0;
 use experimental qw(class);
+use utf8::all;
 
 class Game::EvonyTKR::General::Pair {
   use Carp;
@@ -14,15 +15,7 @@ class Game::EvonyTKR::General::Pair {
   use Game::EvonyTKR::SkillBook::Special;
   use Game::EvonyTKR::Buff::EvaluationMultipliers;
   use namespace::autoclean;
-  # PODNAME: Game::EvonyTKR::General::Pair
-  # ABSTRACT: Manage Game::EvonyTKR::Generals as Pairs
-
-=head1 DESCRIPTION
-
-takes a hash of Game::EvonyTKR::General class objects and creates Game::EvonyTKR::General::Pair class objects. 
-
-=cut
-
+  
   my $distData = File::HomeDir->my_dist_data( 'Game-Evony', { create => 1 } );
   my $dbPath = File::Spec->catfile($distData, "db");
   ADJUST {
@@ -40,10 +33,6 @@ takes a hash of Game::EvonyTKR::General class objects and creates Game::EvonyTKR
   }
 
 
-=attr generals
-
-a hash of the generals to pair, using the name of the generals as the key. 
-=cut
   field %generals :reader; 
 
   method set_generals( %ng ) {
@@ -63,4 +52,19 @@ a hash of the generals to pair, using the name of the generals as the key.
   }
 
 };
-1
+1;
+__END__
+
+# PODNAME: Game::EvonyTKR::General::Pair
+# ABSTRACT: Manage Game::EvonyTKR::Generals as Pairs
+
+=head1 DESCRIPTION
+
+takes a hash of Game::EvonyTKR::General class objects and creates Game::EvonyTKR::General::Pair class objects. 
+
+=cut
+
+=attr generals
+
+a hash of the generals to pair, using the name of the generals as the key. 
+=cut
