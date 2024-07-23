@@ -10,6 +10,7 @@ use File::ShareDir ':ALL';
 use File::Spec;
 use YAML::XS qw{LoadFile Load};
 use Devel::Peek;
+use Game::EvonyTKR::General::Pair::Creator;
 use Game::EvonyTKR::General::Ground;
 use Game::EvonyTKR::General::Mounted;
 use Game::EvonyTKR::General::Ranged;
@@ -17,7 +18,6 @@ use Game::EvonyTKR::General::Siege;
 use Game::EvonyTKR::SkillBook::Special;
 use Game::EvonyTKR::Buff;
 use Game::EvonyTKR::Buff::Value;
-use Game::EvonyTKR::General::Pair::Creator;
 use namespace::autoclean;
 
 our $VERSION = 'v0.00.1';
