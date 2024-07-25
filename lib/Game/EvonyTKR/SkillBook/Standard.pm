@@ -6,6 +6,7 @@ class Game::EvonyTKR::SkillBook::Standard :isa(Game::EvonyTKR::SkillBook) {
   use Types::Common qw( t);
   use Type::Utils "is"; 
   use Game::EvonyTKR::Buff;
+  use Carp;
   use namespace::autoclean;
 
   # from Type::Registry, this will save me from some of the struggles I have had with some types having blessed references and others not. 
