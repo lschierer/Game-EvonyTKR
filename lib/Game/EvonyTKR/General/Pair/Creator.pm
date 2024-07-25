@@ -11,7 +11,9 @@ class Game::EvonyTKR::General::Pair::Creator {
   use File::HomeDir;
   use File::Spec;
   use File::Path qw(make_path);
-  use DBM::Deep;  
+  use DBM::Deep; 
+  use Data::Dumper;
+  use YAML::XS qw{LoadFile Load};
   use Game::EvonyTKR::SkillBook::Special;
   use Game::EvonyTKR::Buff::EvaluationMultipliers;
   use namespace::autoclean;
@@ -58,6 +60,28 @@ class Game::EvonyTKR::General::Pair::Creator {
     while (my $file = glob(File::Spec->catfile($data_location,'*.yaml'))) {
       if ($debug) {
         say $file;
+      }
+      my $conflictGroup = LoadFile($file);
+      if($debug) {
+        say 'start of ' . $file;
+        say Dumper($conflictGroup);
+      }
+      if($debug) {
+        say Dumper($conflictGroup->{'members'});
+      }
+      foreach (@{$conflictGroup->{'members'}}) {
+        my $entryName = $_;
+        $db->put($entryName, {}) unless $db->get($entryName);
+        $db->get($entryName)->put('conflicts', [
+          grep (!/$entryName/, (@{$conflictGroup->{'members'}}, @{$conflictGroup->{'others'}}))
+        ]);
+        if($debug) {
+          say "conflicts are: ";
+          say Dumper( $db->get($entryName)->get('conflicts'));
+        }
+      }
+      if($debug) {
+        say "end of $file";
       }
     }
   }
