@@ -8,6 +8,13 @@ class Game::EvonyTKR::SkillBook::Standard :isa(Game::EvonyTKR::SkillBook) {
   use Game::EvonyTKR::Buff;
   use Carp;
   use namespace::autoclean;
+  use overload 
+    '<=>' => \&comparison,
+    'cmp' => \&comparison,
+    'eq'  => \&equality,
+    '=='  => \&equality,
+    'ne'  => \&inequality,
+    '!='  => \&inequality;
 
   # from Type::Registry, this will save me from some of the struggles I have had with some types having blessed references and others not. 
   ADJUST {
@@ -30,6 +37,49 @@ class Game::EvonyTKR::SkillBook::Standard :isa(Game::EvonyTKR::SkillBook) {
       croak join ', ' => @errors;
     }
   }
+
+  method comparison($a, $b, $reversed = 0) {
+    if(blessed $a ne 'Game::EvonyTKR::SkillBook::Standard') {
+      croak '$a is not a Game::EvonyTKR::SkillBook::Standard';
+    }
+    if(blessed $b ne 'Game::EvonyTKR::SkillBook::Standard') {
+      croak '$b is not a Game::EvonyTKR::SkillBook::Standard';
+    }
+    if($a->name() eq $b->name()) {
+      return $a->level() <=> $b->level();
+    } else {
+      return $a->name() cmp $b->name();
+    }
+  }
+
+  method equality ($a, $b, $reversed = 0) {
+    if(blessed $a ne 'Game::EvonyTKR::SkillBook::Standard') {
+      croak '$a is not a Game::EvonyTKR::SkillBook::Standard';
+    }
+    if(blessed $b ne 'Game::EvonyTKR::SkillBook::Standard') {
+      croak '$b is not a Game::EvonyTKR::SkillBook::Standard';
+    }
+    if($a->name() eq $b->name()) {
+      return $a->level() == $b->level();
+    } else {
+      return 0;
+    }
+  }
+
+  method inequality ($a, $b, $reversed = 0) {
+    if(blessed $a ne 'Game::EvonyTKR::SkillBook::Standard') {
+      croak '$a is not a Game::EvonyTKR::SkillBook::Standard';
+    }
+    if(blessed $b ne 'Game::EvonyTKR::SkillBook::Standard') {
+      croak '$b is not a Game::EvonyTKR::SkillBook::Standard';
+    }
+    if($a->name() ne $b->name()) {
+      return $a->level() != $b->level();
+    } else {
+      return 0;
+    }
+  }
+
   
 }
 

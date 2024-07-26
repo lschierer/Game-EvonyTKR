@@ -80,16 +80,26 @@ class Game::EvonyTKR::General::Pair::Creator {
           say "conflicts are: ";
           say Dumper( $db->get($entryName)->get('conflicts'));
         }
-        foreach (@{$conflictGroup-{'books'}}) {
+        foreach (@{$conflictGroup->{'books'}}) {
           my $entryRef = $_;
+          my $newName = $entryRef->{'book1'}->{'name'};
+          my $newLevel = $entryRef->{'book1'}->{'level'};
+          if(
+            defined $newName && 
+            length($newName) > 1 && 
+            defined $newLevel &&
+            1 <= $newLevel <= 4
+          ) {
+            
           
-          db->get($entryName)->put('conflictingBooks', []) unless db->get($entryName)->get('conflictingBooks');
-          my $sb = Game::EvonyTKR::SkillBook::Standard->new(
-            name  => $entryRef->{'book1'}->{'name'},
-            level => $entryRef->{'book1'}->{'level'},
-          );
-          unless(){
-            push @{db->get($entryName)->get('conflictingBooks')}, $sb ;
+            $db->get($entryName)->put('conflictingBooks', []) unless $db->get($entryName)->get('conflictingBooks');
+            my $sb = Game::EvonyTKR::SkillBook::Standard->new(
+              name  => $entryRef->{'book1'}->{'name'},
+              level => ,
+            );
+            unless(grep {$sb eq $_} @{$db->get($entryName)->get('conflictingBooks')}){
+              push @{$db->get($entryName)->get('conflictingBooks')}, $sb ;
+            }
           }
           
         }
