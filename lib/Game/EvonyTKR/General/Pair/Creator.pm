@@ -13,7 +13,8 @@ class Game::EvonyTKR::General::Pair::Creator {
   use File::Path qw(make_path);
   use DBM::Deep; 
   use Data::Dumper;
-  use YAML::XS qw{LoadFile Load};
+  use YAML::PP::LibYAML;
+  use List::MoreUtils;
   use Game::EvonyTKR::SkillBook::Special;
   use Game::EvonyTKR::SkillBook::Standard;
   use Game::EvonyTKR::Buff::EvaluationMultipliers;
@@ -53,7 +54,8 @@ class Game::EvonyTKR::General::Pair::Creator {
   }
   
   method getConflictData() {
-    
+    my $yp = YAML::PP::LibYAML->new();
+
     my $data_location = File::Spec->catfile(
         dist_dir('Game-EvonyTKR'), 
         'generalConflictGroups'
@@ -62,48 +64,111 @@ class Game::EvonyTKR::General::Pair::Creator {
       if ($debug) {
         say $file;
       }
-      my $conflictGroup = LoadFile($file);
+      my $conflictGroup = $yp->load_file($file);
+
       if($debug) {
         say 'start of ' . $file;
         say Dumper($conflictGroup);
       }
-      if($debug) {
+      if($debug >= 2 ) {
+        print "members are: ";
         say Dumper($conflictGroup->{'members'});
       }
-      foreach (@{$conflictGroup->{'members'}}) {
-        my $entryName = $_;
-        $db->put($entryName, {}) unless $db->get($entryName);
-        $db->get($entryName)->put('conflicts', [
-          grep (!/$entryName/, (@{$conflictGroup->{'members'}}, @{$conflictGroup->{'others'}}))
-        ]);
-        if($debug) {
-          say "conflicts are: ";
-          say Dumper( $db->get($entryName)->get('conflicts'));
-        }
-        foreach (@{$conflictGroup->{'books'}}) {
-          my $entryRef = $_;
-          my $newName = $entryRef->{'book1'}->{'name'};
-          my $newLevel = $entryRef->{'book1'}->{'level'};
-          if(
-            defined $newName && 
-            length($newName) > 1 && 
-            defined $newLevel &&
-            1 <= $newLevel <= 4
-          ) {
-            
+      my $groupName = $conflictGroup->{'name'};
+      if($debug >= 2) {
+        print "name is: ";
+        say $groupName;
+      }
+      $db->put($groupName, {}) unless $db->get($groupName);
+      $db->get($groupName)->put('members', []) unless $db->get($groupName)->get('members');
+      $db->get($groupName)->put('others', []) unless $db->get($groupName)->get('others');
+
+      my @members = (@{$conflictGroup->{'members'}});
+      my @others;
+      if(exists $conflictGroup->{'others'}){
+        @others = (@{$conflictGroup->{'others'}});
+      }
+      my @books;
+      if(exists $conflictGroup->{'books'}) {
+         @books = (@{$conflictGroup->{'books'}});
+      } 
+
+      if($debug >= 3) {
+        print "members are: ";
+        print Dumper( @members);
+        print "there are ";
+        print scalar @members;
+        say " members in the list";
+      }
+      if(scalar @members >= 1) {
+        foreach (@members) {
+          my $entryName = $_;
           
-            $db->get($entryName)->put('conflictingBooks', []) unless $db->get($entryName)->get('conflictingBooks');
-            my $sb = Game::EvonyTKR::SkillBook::Standard->new(
-              name  => $entryRef->{'book1'}->{'name'},
-              level => ,
-            );
-            unless(grep {$sb eq $_} @{$db->get($entryName)->get('conflictingBooks')}){
-              push @{$db->get($entryName)->get('conflictingBooks')}, $sb ;
+          unless(grep {
+            $entryName eq $_
+            } @{$db->get($groupName)->get('members')}
+            ){
+            push @{$db->get($groupName)->get('members')}, $entryName;
+          }
+
+          $db->put($entryName, {}) unless $db->get($entryName);
+
+          $db->get($entryName)->put('conflicts', [
+            ($conflictGroup->{'name'}, )
+          ]);
+          
+          if(scalar @others >= 1){
+            foreach(@others) {
+              my $other = $_;
+              unless(grep {
+                  $other eq $_
+                } @{$db->get($groupName)->get('others')}
+                ){
+                  push @{$db->get($groupName)->get('others')}, $other;
+                }
+
+              unless(grep {
+                  $other eq $_
+                } @{$db->get($entryName)->get('conflicts')}
+                ){
+                  push @{$db->get($entryName)->get('conflicts')}, $other;
+                }
             }
           }
-          
+
+          if($debug >=2) {
+            say "conflicts are: ";
+            say Dumper( $db->get($entryName)->get('conflicts'));
+          }
+
+          if(scalar @books >= 1) {
+            foreach (@{$conflictGroup->{'books'}}) {
+              my $entryRef = $_;
+              my $newName = $entryRef->{'book1'}->{'name'};
+              my $newLevel = $entryRef->{'book1'}->{'level'};
+              if(
+                defined $newName && 
+                length($newName) > 1 && 
+                defined $newLevel &&
+                1 <= $newLevel <= 4
+              ) {
+                $db->get($entryName)->put('conflictingBooks', []) unless $db->get($entryName)->get('conflictingBooks');
+                my $sb = Game::EvonyTKR::SkillBook::Standard->new(
+                  name  => $entryRef->{'book1'}->{'name'},
+                  level => ,
+                );
+                unless(grep {$sb eq $_} @{$db->get($entryName)->get('conflictingBooks')}){
+                  push @{$db->get($entryName)->get('conflictingBooks')}, $sb ;
+                }
+              }
+              
+            }
+          }
         }
+      } else {
+        croak "no members in the list for '$file'";
       }
+      
       if($debug) {
         say "end of $file";
       }
