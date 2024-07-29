@@ -3,49 +3,22 @@ members:
   - William Wallace
   - Khalid
 others:
-  - Raimondo
-  - Raimondo (Odyssey)
-  - Surena
-  - Mu Guiying
-  - Emperor Qin Shihuang
+  - 01HHE55GYM266T9M3AN0VFSFZN
+  - 01HGKZ108TB88BJG9YKKGJDJWF
 books:
   - book:
       name: Siege Attack Increase
-      level: '1'
-      buff:
-        - attribute: Attack
-          class: Siege
-          value:
-            number: 10
-            unit: percentage
+      level: 1
     condition: when not mine
   - book:
       name: Siege Attack Increase
-      level: '2'
-      buff:
-        - attribute: Attack
-          class: Siege
-          value:
-            number: 15
-            unit: percentage
+      level: 2
     condition: when not mine
   - book:
       name: Siege Attack Increase
-      level: '3'
-      buff:
-        - attribute: Attack
-          class: Siege
-          value:
-            number: 20
-            unit: percentage
+      level: 3
     condition: when not mine
   - book:
       name: Siege Attack Increase
-      level: '4'
-      buff:
-        - attribute: Attack
-          class: Siege
-          value:
-            number: 25
-            unit: percentage
+      level: 4
     condition: when not mine

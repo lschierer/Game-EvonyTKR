@@ -10,7 +10,7 @@ others:
 books:
 - book:
     name: Siege Attack Increase
-    level: '1'
+    level: 1
     buff:
       - attribute: Attack
         class: Siege
@@ -20,7 +20,7 @@ books:
   condition: when not mine
 - book:
     name: Siege Attack Increase
-    level: '2'
+    level: 2
     buff:
       - attribute: Attack
         class: Siege
@@ -30,7 +30,7 @@ books:
   condition: when not mine
 - book:
     name: Siege Attack Increase
-    level: '3'
+    level: 3
     buff:
       - attribute: Attack
         class: Siege
@@ -40,7 +40,7 @@ books:
   condition: when not mine
 - book:
     name: Siege Attack Increase
-    level: '4'
+    level: 4
     buff:
       - attribute: Attack
         class: Siege

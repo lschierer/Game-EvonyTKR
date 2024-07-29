@@ -12,7 +12,7 @@ others:
 books:
 - book:
     name: March Size Increase
-    level: '1'
+    level: 1
     buff:
       - attribute: March_Size_Capacity
         value:
@@ -21,7 +21,7 @@ books:
   condition: when not mine
 - book:
     name: March Size Increase
-    level: '2'
+    level: 2
     buff:
       - attribute: March_Size_Capacity
         value:
@@ -30,7 +30,7 @@ books:
   condition: when not mine
 - book:
     name: March Size Increase
-    level: '3'
+    level: 3
     buff:
       - attribute: March_Size_Capacity
         value:
@@ -39,7 +39,7 @@ books:
   condition: when not mine
 - book:
     name: March Size Increase
-    level: '4'
+    level: 4
     buff:
       - attribute: March_Size_Capacity
         value:

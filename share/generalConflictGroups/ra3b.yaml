@@ -2,99 +2,42 @@ name: 01HY61QCTFDT8VCY748BWEPZWM
 members:
   - Louis IX
 others:
-  - Antara
-  - Edward III
-  - Edward the Black Prince
-  - Elektra
-  - Elektra (Dragon God)
-  - Harold III
-  - Henry V
-  - Idunn
-  - Idunn (Siege)
-  - Jumong
-  - Li Shimin
-  - Minamoto no Yoshitsune
-  - Subutai
-  - Vladimir the Great
-  - Winfield Scott
+  - 01HES969S8E146GSF5ES358GWD
+  - 01HKVDKZTWXMEVWN2TEGJ5B3KE
+  - 01HKVDRS2MHZSAX58NQCZTTKEP
+  - 01HGKZACGC0AYAHS0Y64XGRNK8
+  - 01HJV8VNDFA3HQ8TTPA0J8ZDA4
+  - 01HES9NAW7F7H96HXANGG0SNAX
 books:
   - book:
       name: Ranged Attack Increase
-      level: '1'
-      buff:
-        - attribute: Attack
-          class: Archers
-          value:
-            number: 10
-            unit: percentage
-    condition: when not mine
+      level: 1
+    condition: all the time
   - book:
       name: Ranged Attack Increase
-      level: '2'
-      buff:
-        - attribute: Attack
-          class: Archers
-          value:
-            number: 15
-            unit: percentage
-    condition: when not mine
+      level: 2
+    condition: all the time
   - book:
       name: Ranged Attack Increase
-      level: '3'
-      buff:
-        - attribute: Attack
-          class: Archers
-          value:
-            number: 20
-            unit: percentage
-    condition: when not mine
+      level: 3
+    condition: all the time
   - book:
       name: Ranged Attack Increase
-      level: '4'
-      buff:
-        - attribute: Attack
-          class: Archers
-          value:
-            number: 25
-            unit: percentage
+      level: 4
+    condition: all the time
+  - book:
+      name: Ranged Defense Increase
+      level: 1
     condition: when not mine
   - book:
       name: Ranged Defense Increase
-      level: '1'
-      buff:
-        - attribute: Defense
-          class: Archers
-          value:
-            number: 10
-            unit: percentage
+      level: 2
     condition: when not mine
   - book:
       name: Ranged Defense Increase
-      level: '2'
-      buff:
-        - attribute: Defense
-          class: Archers
-          value:
-            number: 15
-            unit: percentage
+      level: 3
     condition: when not mine
   - book:
       name: Ranged Defense Increase
-      level: '3'
-      buff:
-        - attribute: Defense
-          class: Archers
-          value:
-            number: 20
-            unit: percentage
-    condition: when not mine
-  - book:
-      name: Ranged Defense Increase
-      level: '4'
-      buff:
-        - attribute: Defense
-          class: Archers
-          value:
-            number: 25
-            unit: percentage
+      level: 4
     condition: when not mine

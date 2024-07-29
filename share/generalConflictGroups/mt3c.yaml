@@ -1,0 +1,25 @@
+name: 01J401B7EQA0F7M7M3K4V6413T
+members:
+  - Honda Tadakatsu
+  - Khalid
+others:
+  - 01HGKYREYA79MNMCQ2B6MBV3N0
+  - 01HGKYRFD3XP10X55VSXMBNPMB
+  - 01J0482FT3VJT4GSQN74F2FR9T
+books:
+  - book:
+      name: Mounted Attack Increase
+      level: 1
+    condition: when not mine
+  - book:
+      name: Mounted Attack Increase
+      level: 2
+    condition: when not mine
+  - book:
+      name: Mounted Attack Increase
+      level: 3
+    condition: when not mine
+  - book:
+      name: Mounted Attack Increase
+      level: 4
+    condition: when not mine

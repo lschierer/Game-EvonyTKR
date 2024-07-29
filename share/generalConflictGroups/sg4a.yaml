@@ -1,42 +1,25 @@
-name: 01HPAJZZ5Q573K488SA2H9ZJQW
+name: 01J400JZ72M5A3RKJ50DA604K7
 members:
   - Isabella I
 others:
-  - Ulysses S. Grant
+  - 01HPAKR6A1YQ3RKXRZF29SRXDQ
+  - 01HPAK3MANZXT0FYCM9BV81YPZ
+  - 01J403Q06NKJW5RQPY3G8YMD4B
+  - 01HGKYRN4Y9B5JHDXSPJ7CTDR5
 books:
   - book:
       name: March Size Increase
-      level: '1'
-      buff:
-        - attribute: March_Size_Capacity
-          value:
-            number: 3
-            unit: percentage
+      level: 1
     condition: when not mine
   - book:
       name: March Size Increase
-      level: '2'
-      buff:
-        - attribute: March_Size_Capacity
-          value:
-            number: 6
-            unit: percentage
+      level: 2
     condition: when not mine
   - book:
       name: March Size Increase
-      level: '3'
-      buff:
-        - attribute: March_Size_Capacity
-          value:
-            number: 9
-            unit: percentage
+      level: 3
     condition: when not mine
   - book:
       name: March Size Increase
-      level: '4'
-      buff:
-        - attribute: March_Size_Capacity
-          value:
-            number: 12
-            unit: percentage
+      level: 4
     condition: when not mine

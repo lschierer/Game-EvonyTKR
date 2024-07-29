@@ -2,94 +2,39 @@ name: 01HGKYRFD3XP10X55VSXMBNPMB
 members:
   - Ii Naomasa
 others:
-  - Laudon
-  - Prince Eugene
-  - Martinus
-  - Martinus (Dragon God)
-  - Li Jing
-  - Robert Guiscard
-  - Washington
-  - Xiang Yu
-  - Honda Tadakatsu
-  - Khalid
+  - 01HGKYREYA79MNMCQ2B6MBV3N0
+  - 01J0482FT3VJT4GSQN74F2FR9T
+  - 01J401B7EQA0F7M7M3K4V6413T
 books:
   - book:
       name: Mounted Attack Increase
-      level: '1'
-      buff:
-        - attribute: Attack
-          class: Mounted
-          value:
-            number: 10
-            unit: percentage
+      level: 1
     condition: all the time
   - book:
       name: Mounted Attack Increase
-      level: '2'
-      buff:
-        - attribute: Attack
-          class: Mounted
-          value:
-            number: 15
-            unit: percentage
+      level: 2
     condition: all the time
   - book:
       name: Mounted Attack Increase
-      level: '3'
-      buff:
-        - attribute: Attack
-          class: Mounted
-          value:
-            number: 20
-            unit: percentage
+      level: 3
     condition: all the time
   - book:
       name: Mounted Attack Increase
-      level: '4'
-      buff:
-        - attribute: Attack
-          class: Mounted
-          value:
-            number: 25
-            unit: percentage
+      level: 4
     condition: all the time
   - book:
       name: Mounted HP Increase
-      level: '1'
-      buff:
-        - attribute: HP
-          class: Mounted
-          value:
-            number: 10
-            unit: percentage
-    condition: all the time
+      level: 1
+    condition: when not mine
   - book:
       name: Mounted HP Increase
-      level: '2'
-      buff:
-        - attribute: HP
-          class: Mounted
-          value:
-            number: 15
-            unit: percentage
-    condition: all the time
+      level: 2
+    condition: when not mine
   - book:
       name: Mounted HP Increase
-      level: '3'
-      buff:
-        - attribute: HP
-          class: Mounted
-          value:
-            number: 20
-            unit: percentage
-    condition: all the time
+      level: 3
+    condition: when not mine
   - book:
       name: Mounted HP Increase
-      level: '4'
-      buff:
-        - attribute: HP
-          class: Mounted
-          value:
-            number: 25
-            unit: percentage
-    condition: all the time
+      level: 4
+    condition: when not mine

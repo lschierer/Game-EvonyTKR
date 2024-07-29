@@ -9,47 +9,23 @@ members:
   - Robert Guiscard
   - Xiang Yu
 others:
-  - Ii Naomasa
-  - Honda Tadakatsu
-  - Khalid
+  - 01HGKYRFD3XP10X55VSXMBNPMB
+  - 01J0482FT3VJT4GSQN74F2FR9T
+  - 01J401B7EQA0F7M7M3K4V6413T
 books:
   - book:
       name: Mounted Attack Increase
-      level: '1'
-      buff:
-        - attribute: Attack
-          class: Mounted
-          value:
-            number: 10
-            unit: percentage
+      level: 1
     condition: all the time
   - book:
       name: Mounted Attack Increase
-      level: '2'
-      buff:
-        - attribute: Attack
-          class: Mounted
-          value:
-            number: 15
-            unit: percentage
+      level: 2
     condition: all the time
   - book:
       name: Mounted Attack Increase
-      level: '3'
-      buff:
-        - attribute: Attack
-          class: Mounted
-          value:
-            number: 20
-            unit: percentage
+      level: 3
     condition: all the time
   - book:
       name: Mounted Attack Increase
-      level: '4'
-      buff:
-        - attribute: Attack
-          class: Mounted
-          value:
-            number: 25
-            unit: percentage
+      level: 4
     condition: all the time
