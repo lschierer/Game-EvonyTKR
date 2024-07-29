@@ -1,0 +1,25 @@
+name: 01J3ZR79GPF225174Z56NEJ12X
+members:
+  - Matthias I
+others:
+  - 01HES949ATG9BJQDA0K73VN88T
+  - 01HKVDRS2MHZSAX58NQCZTTKEP
+  - 01HES9RYB0QPCVF1ZGNB43KNFT
+  - 01HGKYRN4Y9B5JHDXSPJ7CTDR5
+books:
+  - book:
+      name: March Size Increase
+      level: 1
+    condition: when not mine
+  - book:
+      name: March Size Increase
+      level: 2
+    condition: when not mine
+  - book:
+      name: March Size Increase
+      level: 3
+    condition: when not mine
+  - book:
+      name: March Size Increase
+      level: 4
+    condition: when not mine

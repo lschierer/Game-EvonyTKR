@@ -1,0 +1,25 @@
+name: 01J400NM917X7CM5QBJ7423ZA9
+members:
+  - Washington Prime
+others:
+  - 01HPNDFH9P4Z5KEKM3JZH78Z7T
+  - 01J400JZ72M5A3RKJ50DA604K7
+  - 01J0482FT3VJT4GSQN74F2FR9T
+  - 01HGKYRN4Y9B5JHDXSPJ7CTDR5
+books:
+  - book:
+      name: March Size Increase
+      level: 1
+    condition: when not mine
+  - book:
+      name: March Size Increase
+      level: 2
+    condition: when not mine
+  - book:
+      name: March Size Increase
+      level: 3
+    condition: when not mine
+  - book:
+      name: March Size Increase
+      level: 4
+    condition: when not mine

@@ -2,52 +2,26 @@ name: 01HKVDKZTWXMEVWN2TEGJ5B3KE
 members:
   - Winfield Scott
 others:
-  - Elektra
-  - Elektra (Dragon God)
-  - Vladimir the Great
-  - Idunn
-  - Idunn (Siege)
-  - Li Shimin
-  - Louis IX
-  - Prince Rhaeger
+  - 01HES969S8E146GSF5ES358GWD
+  - 01HKVDRS2MHZSAX58NQCZTTKEP
+  - 01HGKZACGC0AYAHS0Y64XGRNK8
+  - 01HJV8VNDFA3HQ8TTPA0J8ZDA4
+  - 01HY61QCTFDT8VCY748BWEPZWM
+  - 01J0497Z8QVG459GS746FMQHGE
 books:
   - book:
       name: Ranged Attack Increase
-      level: '1'
-      buff:
-        - attribute: Attack
-          class: Archers
-          value:
-            number: 10
-            unit: percentage
+      level: 1
     condition: when not mine
   - book:
       name: Ranged Attack Increase
-      level: '2'
-      buff:
-        - attribute: Attack
-          class: Archers
-          value:
-            number: 15
-            unit: percentage
+      level: 2
     condition: when not mine
   - book:
       name: Ranged Attack Increase
-      level: '3'
-      buff:
-        - attribute: Attack
-          class: Archers
-          value:
-            number: 20
-            unit: percentage
+      level: 3
     condition: when not mine
   - book:
       name: Ranged Attack Increase
-      level: '4'
-      buff:
-        - attribute: Attack
-          class: Archers
-          value:
-            number: 25
-            unit: percentage
+      level: 4
     condition: when not mine

@@ -1,50 +1,25 @@
 name: 01HFAN5ZMCSHAWD028MCRBCV8F
 members:
-  - Turenne
+  - Frigg
   - Soult
   - Epaminondas
   - Oda Nobunaga
-  - Frigg
 others:
-  - Sweyn Forkbeard
+  - 01J3ZZ386H9YKRZM9W3GHJYVYB
 books:
   - book:
       name: Ground Attack Increase
-      level: '1'
-      buff:
-        - attribute: Attack
-          class: Ground
-          value:
-            number: 10
-            unit: percentage
+      level: 1
     condition: all the time
   - book:
       name: Ground Attack Increase
-      level: '2'
-      buff:
-        - attribute: Attack
-          class: Ground
-          value:
-            number: 15
-            unit: percentage
+      level: 2
     condition: all the time
   - book:
       name: Ground Attack Increase
-      level: '3'
-      buff:
-        - attribute: Attack
-          class: Ground
-          value:
-            number: 20
-            unit: percentage
+      level: 3
     condition: all the time
   - book:
       name: Ground Attack Increase
-      level: '4'
-      buff:
-        - attribute: Attack
-          class: Ground
-          value:
-            number: 25
-            unit: percentage
+      level: 4
     condition: all the time

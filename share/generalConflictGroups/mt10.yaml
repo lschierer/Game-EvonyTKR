@@ -5,49 +5,17 @@ members:
 books:
   - book:
       name: Monster Mounted Attack Increase
-      level: '1'
-      buff:
-        - attribute: Attack
-          condition:
-            - Against Monsters
-          class: Mounted
-          value:
-            number: 15
-            unit: percentage
+      level: 1
     condition: all the time
   - book:
       name: Monster Mounted Attack Increase
-      level: '2'
-      buff:
-        - attribute: Attack
-          condition:
-            - Against Monsters
-          class: Mounted
-          value:
-            number: 25
-            unit: percentage
+      level: 2
     condition: all the time
   - book:
       name: Monster Mounted Attack Increase
-      level: '3'
-      buff:
-        - attribute: Attack
-          condition:
-            - Against Monsters
-          class: Mounted
-          value:
-            number: 35
-            unit: percentage
+      level: 3
     condition: all the time
   - book:
       name: Monster Mounted Attack Increase
-      level: '4'
-      buff:
-        - attribute: Attack
-          condition:
-            - Against Monsters
-          class: Mounted
-          value:
-            number: 45
-            unit: percentage
+      level: 4
     condition: all the time
