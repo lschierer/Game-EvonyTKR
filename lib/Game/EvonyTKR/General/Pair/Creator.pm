@@ -179,8 +179,9 @@ class Game::EvonyTKR::General::Pair::Creator {
 1;
 __END__
 
-# PODNAME: Game::EvonyTKR::General::Pair
-# ABSTRACT: Manage Game::EvonyTKR::Generals as Pairs
+# PODNAME: Game::EvonyTKR::General::Pair::Creator
+
+# ABSTRACT: Read in shared YAML data to create pairs
 
 =head1 DESCRIPTION
 
