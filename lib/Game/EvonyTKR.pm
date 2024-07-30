@@ -144,11 +144,12 @@ sub read_generals {
 1;
 __END__
 
+# PODNAME: Game::EvonyTKR 
+
+# ABSTRACT: Perl Modules providing utilities for players of Evony The King's Return
+
+
 =encoding utf-8
-
-=head1 NAME
-
-Game::EvonyTKR - Perl Modules providing utilities for players of Evony The King's Return
 
 =head1 SYNOPSIS
 
@@ -174,14 +175,3 @@ This module will (eventually) help players of the game needing to make reasonabl
 
 
 
-=head1 AUTHOR
-
-Luke Schierer E<lt>luke@schierer.orgE<gt>
-
-=head1 COPYRIGHT
-
-Copyright 2024- Luke Schierer
-
-=head1 SEE ALSO
-
-=cut

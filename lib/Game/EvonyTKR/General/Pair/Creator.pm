@@ -3,6 +3,7 @@ use experimental qw(class);
 use utf8::all;
 
 class Game::EvonyTKR::General::Pair::Creator {
+# PODNAME: Game::EvonyTKR::General::Pair::Creator
   use Carp;
   use Clone 'clone';
   use Types::Common qw( t is_Num is_Str is_Int);
@@ -179,7 +180,6 @@ class Game::EvonyTKR::General::Pair::Creator {
 1;
 __END__
 
-# PODNAME: Game::EvonyTKR::General::Pair::Creator
 
 # ABSTRACT: Read in shared YAML data to create pairs
 

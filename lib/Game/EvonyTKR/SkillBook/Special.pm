@@ -2,6 +2,8 @@ use v5.40.0;
 use experimental qw(class);
 
 class Game::EvonyTKR::SkillBook::Special :isa(Game::EvonyTKR::SkillBook) {
+# PODNAME: Game::EvonyTKR::SkillBook::Special
+
   use Types::Standard qw(is_Int Int Num is_Num Str is_Str);
   use Types::Common qw( t);
   use Type::Utils "is"; 
@@ -29,7 +31,6 @@ class Game::EvonyTKR::SkillBook::Special :isa(Game::EvonyTKR::SkillBook) {
 1;
 __END__
 
-# PODNAME: Game::EvonyTKR::SkillBook::Special
 
 # ABSTRACT: Module for processing information about Evony TKR SkillBooks Built-in to each General.
 
