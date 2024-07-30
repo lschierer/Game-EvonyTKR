@@ -9,6 +9,13 @@ class Game::EvonyTKR::General {
   use Game::EvonyTKR::Buff::EvaluationMultipliers;
   use namespace::autoclean;
 # PODNAME: Game::EvonyTKR::General
+use overload 
+    '<=>' => \&_comparison,
+    'cmp' => \&_comparison,
+    'eq'  => \&_equality,
+    '=='  => \&_equality,
+    'ne'  => \&_inequality,
+    '!='  => \&_inequality;
 
 # ABSTRACT: Module for processing information about Evony TKR Generals.
 
@@ -259,5 +266,38 @@ when evaluating generals, not all buffs are equally important.  Nor are these sc
     }
   }
 
+=method _comparison
+
+This simply compares on the General's name.  I can envison doing something based on a computed power score.
+=cut
+  method _comparison($other, $swap = 0) {
+    if(not exists $other->name) {
+      croak '$other has no name method';
+    }
+    return $self->name() cmp $other->name();
+  }
+
+=method _equality
+
+This simply compares on the General's name.  If the names are the same, then the user of the class ought not
+create a second General with different attributes. 
+=cut
+  method _equality ($other, $swap = 0) { 
+    if(not exists $other->name) {
+      croak '$other has no name method';
+    }
+    return $self->name() eq $other->name();
+  }
+
+=method _inequality
+
+This simply compares on the General's name.  It is a strict inverse of the _equality, for convience. 
+=cut
+  method _inequality ($other, $swap = 0) { 
+    if(not exists $other->name) {
+      croak '$other has no name method';
+    }
+    return $self->name() ne $other->name();
+  }
 }
 1;

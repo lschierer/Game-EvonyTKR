@@ -14,6 +14,7 @@ class Game::EvonyTKR::General::Pair::Creator {
   use File::Path qw(make_path);
   use DBM::Deep; 
   use Data::Dumper;
+  use Hash::Map;
   use YAML::PP::LibYAML;
   use List::MoreUtils;
   use Game::EvonyTKR::SkillBook::Special;
@@ -51,9 +52,52 @@ class Game::EvonyTKR::General::Pair::Creator {
         say "size is " . scalar %ng;
       }
        %generals = %ng;
+       while (my ($key, $value) = $sg->each_source()) {
+
+       }
     }
   }
-  
+
+=method getPairs()
+
+this method presupposes that set_generals has already been called. It returns 
+an array of Generals that do not conflict. 
+If there are insufficient generals to make pairs, it returns 0 (false).
+
+This assumes that the Generals are hashed by their names.  
+=cut
+  method getPairs() {
+    if(scalar %generals >= 2 ) {
+      my %pairs;
+      @pairs{'ground'} = ();
+      @pairs{'mounted'} = ();
+      @pairs{'ranged'} = ();
+      @pairs{'siege'} = ();
+      @pairs{'wall'} = ();
+      my $sg1 = Hash::Map->new();
+      my $sg2 = $sg1->clone_source();
+      $sg->set_source(%generals);
+      while ( my ($key1, $value1) = $sg1->each_source ) { 
+        while ( my ($key2, $value2) = $sg2->each_source ) { 
+          if($value1->name() ne $value2->name()) {
+            if($value1->is_ground_general() and $value2->is_ground_general()){
+              unless(@pairs{'ground'}) 
+            }
+          }
+      }
+      }
+    }
+    return 0
+  }
+
+=method getConflictData()
+
+I am including this here for now at least because I am honestly unsure where to put it. 
+Conflict data needs to be read in somewhere, and is really only useful when *creating* pairs. 
+Once the pairs exist, you no longer need to know if generals conflict - you have your pairs.
+Attempting to pair generals on the fly is generally massively inefficient. 
+=cut
+
   method getConflictData() {
     my $yp = YAML::PP::LibYAML->new();
 
