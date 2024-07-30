@@ -1,0 +1,88 @@
+---
+ascending:
+  - level: 1red
+    buff:
+      - attribute: Attack
+        class: Ranged
+        condition:
+          - Marching
+        value:
+          number: 15
+          unit: percentage
+      - attribute: Defense
+        class: Ranged
+        condition:
+          - Marching
+        value:
+          number: 10
+          unit: percentage
+  - level: 2red
+    buff:
+      - attribute: Death_to_Wounded
+        condition:
+          - Marching
+        value:
+          number: 8
+          unit: percentage
+  - level: 3red
+    buff:
+      - attribute: March_Size_Capacity
+        condition:
+          - Attacking
+        value:
+          number: 8
+          unit: percentage
+      - attribute: HP
+        class: Ranged
+        condition:
+          - Attacking
+        value:
+          number: 10
+          unit: percentage
+  - level: 4red
+    buff:
+      - attribute: Attack
+        class: Ranged
+        condition:
+          - Marching
+        value:
+          number: 10
+          unit: percentage
+      - attribute: Defense
+        class: Ranged
+        condition:
+          - Marching
+        value:
+          number: 10
+          unit: percentage
+      - attribute: HP
+        class: Ranged
+        condition:
+          - Marching
+        value:
+          number: 10
+          unit: percentage
+  - level: 5red
+    buff:
+      - attribute: Attack
+        class: Ranged
+        condition:
+          - Marching
+        value:
+          number: 35
+          unit: percentage
+      - attribute: Defense
+        class: Ranged
+        condition:
+          - Marching
+        value:
+          number: 20
+          unit: percentage
+      - attribute: HP
+        class: Ranged
+        condition:
+          - Marching
+        value:
+          number: 20
+          unit: percentage
+      

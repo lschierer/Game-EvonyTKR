@@ -1,0 +1,31 @@
+---
+name: Unstoppable Force
+buff:
+  - attribute: Attack
+    class: Ranged
+    condition:
+      - leading_the_army_to_attack
+    value:
+      number: 45
+      unit: percentage
+  - attribute: Defense
+    class: Ranged
+    condition:
+      - leading_the_army_to_attack
+    value:
+      number: 45
+      unit: percentage
+  - attribute: HP
+    class: Ranged
+    condition:
+      - brings_dragon_or_beast_to_attack
+    value:
+      number: 35
+      unit: percentage
+  - attribute: HP
+    class: Siege
+    condition:
+      - brings_dragon_or_beast_to_attack
+    value:
+      number: 35
+      unit: percentage
