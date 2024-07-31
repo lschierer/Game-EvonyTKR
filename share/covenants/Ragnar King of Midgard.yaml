@@ -8,7 +8,7 @@ attributes:
     type: personal
     buff:
       - attribute: Attack
-        class: Ranged
+        class: Ranged Troops
         condition: 
           - Marching
         value:
@@ -25,7 +25,7 @@ attributes:
     type: passive
     buff:
       - attribute: Training Capacity
-        class: Ranged
+        class: Ranged Troops
         value:
           number: 10
           unit: percentage
@@ -33,7 +33,7 @@ attributes:
     type: personal
     buff:
       - attribute: Defense
-        class: Ranged
+        class: Ranged Troops
         condition:
           - Marching
         value:
@@ -43,7 +43,7 @@ attributes:
     type: passive
     buff:
       - attribute: Attack
-        class: Ranged
+        class: Ranged Troops
         condition:
           - When_Rallying
         value:
@@ -53,7 +53,7 @@ attributes:
     type: personal
     buff:
       - attribute: HP
-        class: Ranged
+        class: Ranged Troops
         condition:
           - Marching
         value:
@@ -63,14 +63,14 @@ attributes:
     type: personal
     buff:
       - attribute: Attack
-        class: Ranged
+        class: Ranged Troops
         condition:
           - Marching
         value:
           number: 5
           unit: percentage
       - attribute: Defense
-        class: Ranged
+        class: Ranged Troops
         condition:
           - Marching
         value:

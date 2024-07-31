@@ -4,21 +4,21 @@ levels:
   - level: Green
     buff:
       - attribute: Attack
-        class: Ranged
+        class: Ranged Troops
         condition:
           - Marching
         value:
           number: 4
           unit: percentage
       - attribute: Defense
-        class: Ranged
+        class: Ranged Troops
         condition:
           - Marching
         value:
           number: 2
           unit: percentage
       - attribute: HP
-        class: Ranged
+        class: Ranged Troops
         condition:
           - Marching
         value:
@@ -27,21 +27,21 @@ levels:
   - level: Blue
     buff:
       - attribute: Attack
-        class: Ranged
+        class: Ranged Troops
         condition:
           - Marching
         value:
           number: 5
           unit: percentage
       - attribute: Defense
-        class: Ranged
+        class: Ranged Troops
         condition:
           - Marching
         value:
           number: 3
           unit: percentage
       - attribute: HP
-        class: Ranged
+        class: Ranged Troops
         condition:
           - Marching
         value:
@@ -50,21 +50,21 @@ levels:
   - level: Purple
     buff:
       - attribute: Attack
-        class: Ranged
+        class: Ranged Troops
         condition:
           - Marching
         value:
           number: 9
           unit: percentage
       - attribute: Defense
-        class: Ranged
+        class: Ranged Troops
         condition:
           - Marching
         value:
           number: 5
           unit: percentage
       - attribute: HP
-        class: Ranged
+        class: Ranged Troops
         condition:
           - Marching
         value:
@@ -73,21 +73,21 @@ levels:
   - level: Orange
     buff:
       - attribute: Attack
-        class: Ranged
+        class: Ranged Troops
         condition:
           - Marching
         value:
           number: 9
           unit: percentage
       - attribute: Defense
-        class: Ranged
+        class: Ranged Troops
         condition:
           - Marching
         value:
           number: 5
           unit: percentage
       - attribute: HP
-        class: Ranged
+        class: Ranged Troops
         condition:
           - Marching
         value:
@@ -96,21 +96,21 @@ levels:
   - level: Gold
     buff:
       - attribute: Attack
-        class: Ranged
+        class: Ranged Troops
         condition:
           - Marching
         value:
           number: 18
           unit: percentage
       - attribute: Defense
-        class: Ranged
+        class: Ranged Troops
         condition:
           - Marching
         value:
           number: 10
           unit: percentage
       - attribute: HP
-        class: Ranged
+        class: Ranged Troops
         condition:
           - Marching
         value:
