@@ -20,8 +20,6 @@ use Game::EvonyTKR::Buff;
 use Game::EvonyTKR::Buff::Value;
 use namespace::autoclean;
 
-our $VERSION = 'v0.00.1';
-
 sub opt_spec {
   return (
     [ "option1|a",  "do option 1" ],
@@ -148,30 +146,28 @@ __END__
 
 # ABSTRACT: Perl Modules providing utilities for players of Evony The King's Return
 
-
-=encoding utf-8
-
 =head1 SYNOPSIS
 
   use Game::EvonyTKR;
 
   Game::EvonyTKR->execute();
+=cut
 
 =head1 DESCRIPTION
 
-This distribution aims to help players create and process the wealth of data that Evony The King's Return dumps on users with next to no organization, documentation, or built in tools to handle. 
+This distribution aims to help players create and process the wealth of data that _Evony The King's Return_ dumps on users with next to no organization, documentation, or built-in tools to handle. 
 
 This module will (eventually) help players of the game needing to make reasonably complex analysis to make optimal choices about each of these:
 
 =for :list 
 
-* L<Which generals to invest time and resources in>
+* Which generals to invest time and resources in
 
-* L<How to best pair generals for different senarios>
+* How to best pair generals for different senarios
 
-* L<The effects of Armor, Spiritual Beats, and Dragons on buffs and debuffs>
+* The effects of Armor, Spiritual Beats, and Dragons on buffs and debuffs
 
-* L<Calculating your total buffs and debuffs in different senarios given the ever increasing number of sources for these buffs and debuffs>
+* Calculating your total buffs and debuffs in different senarios given the ever increasing number of sources for these buffs and debuffs
 
 
 

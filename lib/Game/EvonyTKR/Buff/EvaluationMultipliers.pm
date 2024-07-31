@@ -12,7 +12,7 @@ class Game::EvonyTKR::Buff::EvaluationMultipliers {
 
 =head1 DESCRIPTION
 
-=for For now a Game::EvonyTKR::General has-a (set of) Game::EvonyTKR::Buff::EvaluationMultipliers rather than :does Game::EvonyTKR::Buff:Evaluation which is what I wanted.  This design choice was forced because roles are not yet implemented in perl Corinna.
+For now a Game::EvonyTKR::General has-a (set of) Game::EvonyTKR::Buff::EvaluationMultipliers rather than :does Game::EvonyTKR::Buff:Evaluation which is what I wanted.  This design choice was forced because roles are not yet implemented in perl Corinna.
 
 This is intended as an abstract class, but again, those are not implemented in Corinna yet.  I'm not sure if this will save me time or cost me time as a result. 
 
@@ -24,11 +24,11 @@ This value has the generic versions, or what would happen if you had generals th
 
 =for :list
 
-* L<when attacking>
+* when attacking
 
-* L<when reinforcing>
+* when reinforcing
 
-* L<when the main defense general>
+* when the main defense general
 
 or any of the variety of other things that get read in as conditions by Game::EvonyTKR::Buff - except that it I<does> have entries for generic debuffs, with, as I said, bogus values. 
 
@@ -47,9 +47,6 @@ I recognize that the flat list of attributes is an anti-pattern, and that a hash
     }
   }
   
-=head1 Attributes 
-
-=over
 
 =attr GenericAttack
  
@@ -798,9 +795,5 @@ the Troop Death into Souls Debuff with no conditions.
       croak join ', ' => @errors;
     }
   }
-
-=back
-
-=cut
 }
 1;

@@ -7,6 +7,15 @@ class Game::EvonyTKR::Buff {
   use Types::Common::Numeric qw(PositiveOrZeroInt);
   use Type::Utils "is"; 
   use Carp;
+  use Class::ISA; 
+  use Util::Any -all;
+  use overload 
+    '<=>' => \&compare,
+    'cmp' => \&compare,
+    'eq'  => \&_equality,
+    '=='  => \&_equality,
+    'ne'  => \&_inequality,
+    '!='  => \&_inequality;
   use namespace::autoclean;
 # PODNAME: Game::EvonyTKR::Buff
 
@@ -14,7 +23,7 @@ class Game::EvonyTKR::Buff {
 
 =head1 DESCRIPTION
 
-=for A Buff is an attribute that modifies various attributes in Evony TKR
+A Buff is an attribute that modifies various attributes in Evony TKR
 
 Buffs can be positive or negative.  When negative, they are commonly referred to
 as "Debuffs," however the game internals make very little distinction between a positive and negative buff. 
@@ -99,13 +108,15 @@ Buffs are most commonly I<calculated> as if all buffs came from generals.  This 
 
   field $value :reader :param;
 
-=head2 method compare($other)
+=method compare($other, $swap)
 
 this function returns true if the $other is logically the same
 as this Game::EvonyTKR::Buff.  It is written with a particular style to aid in debugging it should I ever suspect I've done it wrong.  Rather than attempting to return immediately, I have written each test to store a unique negative value then I return false if my stored value has been set negative anywhere in the overall function.  This way, by setting $debug to a truthy value, the function will inform me via the "say" statement at the bottom which test determined the difference.   The function defaults to truthy.
+
+$swap is currently unused, but will eventually handle the case someone somehow calls the <=> operator backwards, which is apparently possible. 
 =cut 
 
-  method compare($other) {
+  method compare($other, $swap = 0) {
     my $debug = 0; #set to 1 to debug this function
     my $code = 1;
     if(blessed $other ne 'Game::EvonyTKR::Buff') {
@@ -157,6 +168,30 @@ as this Game::EvonyTKR::Buff.  It is written with a particular style to aid in d
     return @difference;
   }
 
+  method _equality($other, $swap = 0){
+    my $otherClass = blessed $other;
+    my @classList = Class::ISA::self_and_super_path($otherClass);
+    if(none {$_ eq 'Game::EvonyTKR::Buff'} @classList) {
+      croak '$other is not a Game::EvonyTKR::Buff'
+    }
+    if($self->compare($other) == 0) {
+      return 1
+    }
+    return 0;
+  }
+
+  method _inequality($other, $swap = 0){
+    my $otherClass = blessed $other;
+    my @classList = Class::ISA::self_and_super_path($otherClass);
+    if(none {$_ eq 'Game::EvonyTKR::Buff'} @classList) {
+      croak '$other is not a Game::EvonyTKR::Buff'
+    }
+    if($self->compare($other) != 0) {
+      return 1
+    }
+    return 0;
+  }
+  
 }
  
 1;

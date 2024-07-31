@@ -23,7 +23,7 @@ use overload
 
 =head1 DESCRIPTION
 
-=for Generals in Evony TKR are one of the more complicated and simultaneously
+Generals in Evony TKR are one of the more complicated and simultaneously
 most frequently changing things that a player must make decisions about.  
 
 This base class implements the attributes and methods common to all Generals, but should not be used directly.  Rather sub classes should be created for each of the crtical use cases in the game.  If the decision of which general to use does not require customized logic, it almost certainly is not critical enough to need particular consideration here either.  
@@ -296,7 +296,7 @@ when evaluating generals, not all buffs are equally important.  Nor are these sc
     return 0;
   }
 
-=method _comparison
+=method <=>
 
 This simply compares on the General's name.  I can envison doing something based on a computed power score.
 =cut
@@ -309,7 +309,7 @@ This simply compares on the General's name.  I can envison doing something based
     return $self->name() cmp $other->name();
   }
 
-=method _equality
+=method eq
 
 This simply compares on the General's name.  If the names are the same, then the user of the class ought not
 create a second General with different attributes. 
@@ -323,7 +323,7 @@ create a second General with different attributes.
     return $self->name() eq $other->name();
   }
 
-=method _inequality
+=method ne
 
 This simply compares on the General's name.  It is a strict inverse of the _equality, for convience. 
 =cut
