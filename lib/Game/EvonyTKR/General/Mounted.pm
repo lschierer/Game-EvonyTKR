@@ -105,7 +105,7 @@ in which ways is not always entirely reliable, and these modules will, at times,
     return 0;
   }
 
-=method _comparison
+=method <=>
 
 This compares on the General's name only currently. 
 
@@ -121,7 +121,7 @@ I can envison doing something based on a computed power score.
     return $self->name() cmp $other->name();
   }
 
-=method _equality
+=method eq
 
 This compares on the General's name and on the bools I set up. 
 I am checking the bools because I have at least one general I have purposefully put in twice to eval in two different roles. 
@@ -141,7 +141,7 @@ I am checking the bools because I have at least one general I have purposefully 
     return 0;
   }
 
-=method _inequality
+=method ne
 
 This compares on the General's name and on the bools I set up. 
 I am checking the bools because I have at least one general I have purposefully put in twice to eval in two different roles. 
