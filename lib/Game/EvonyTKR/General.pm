@@ -3,8 +3,10 @@ use experimental qw(class);
 
 class Game::EvonyTKR::General {
   use Carp;
+  use Class::ISA;
   use Types::Common qw( t is_Num is_Str is_Int);
   use Type::Utils "is"; 
+  use Util::Any -all;
   use Game::EvonyTKR::SkillBook::Special;
   use Game::EvonyTKR::Buff::EvaluationMultipliers;
   use namespace::autoclean;
@@ -266,13 +268,43 @@ when evaluating generals, not all buffs are equally important.  Nor are these sc
     }
   }
 
+  method is_ground_general() {
+    return 0;
+  }
+
+  method is_mounted_general() {
+    return 0;
+  }
+
+  method is_ranged_general() {
+    return 0;
+  }
+
+  method is_siege_general() {
+    return 0;
+  }
+
+  method is_wall_general() {
+    return 0;
+  }
+
+  method is_mayor() {
+    return 0;
+  }
+
+  method is_officer() {
+    return 0;
+  }
+
 =method _comparison
 
 This simply compares on the General's name.  I can envison doing something based on a computed power score.
 =cut
   method _comparison($other, $swap = 0) {
-    if(not exists $other->name) {
-      croak '$other has no name method';
+    my $otherClass = blessed $other;
+    my @classList = Class::ISA::self_and_super_path($otherClass);
+    if(none {$_ eq 'Game::EvonyTKR::General'} @classList) {
+      croak '$other is not a Game::EvonyTKR::General'
     }
     return $self->name() cmp $other->name();
   }
@@ -283,8 +315,10 @@ This simply compares on the General's name.  If the names are the same, then the
 create a second General with different attributes. 
 =cut
   method _equality ($other, $swap = 0) { 
-    if(not exists $other->name) {
-      croak '$other has no name method';
+    my $otherClass = blessed $other;
+    my @classList = Class::ISA::self_and_super_path($otherClass);
+    if(none {$_ eq 'Game::EvonyTKR::General'} @classList) {
+      croak '$other is not a Game::EvonyTKR::General'
     }
     return $self->name() eq $other->name();
   }
@@ -294,8 +328,10 @@ create a second General with different attributes.
 This simply compares on the General's name.  It is a strict inverse of the _equality, for convience. 
 =cut
   method _inequality ($other, $swap = 0) { 
-    if(not exists $other->name) {
-      croak '$other has no name method';
+    my $otherClass = blessed $other;
+    my @classList = Class::ISA::self_and_super_path($otherClass);
+    if(none {$_ eq 'Game::EvonyTKR::General'} @classList) {
+      croak '$other is not a Game::EvonyTKR::General'
     }
     return $self->name() ne $other->name();
   }
