@@ -5,6 +5,8 @@ class Game::EvonyTKR::General::Ranged :isa(Game::EvonyTKR::General) {
   use Carp;
   use Types::Common qw( t is_Num is_Str is_Int);
   use Type::Utils "is"; 
+  use Class::ISA; 
+  use Util::Any -all;
   use namespace::autoclean;
   use Game::EvonyTKR::General;
   use overload 
@@ -105,8 +107,10 @@ This compares on the General's name only currently.
 I can envison doing something based on a computed power score.
 =cut
   method _comparison($other, $swap = 0) {
-    if(not exists $other->name) {
-      croak '$other has no name method';
+    my $otherClass = blessed $other;
+    my @classList = Class::ISA::self_and_super_path($otherClass);
+    if(none {$_ eq 'Game::EvonyTKR::General'} @classList) {
+      croak '$other is not a Game::EvonyTKR::General'
     }
 
     return $self->name() cmp $other->name();
@@ -119,13 +123,12 @@ I am checking the bools because I have at least one general I have purposefully 
 
 =cut
   method _equality ($other, $swap = 0) { 
-    if(not exists $other->name) {
-      croak '$other has no name method';
+    my $otherClass = blessed $other;
+    my @classList = Class::ISA::self_and_super_path($otherClass);
+    if(none {$_ eq 'Game::EvonyTKR::General'} @classList) {
+      croak '$other is not a Game::EvonyTKR::General'
     }
     if($self->name() eq $other->name()) {
-      if(not exists $other->is_ranged_general) {
-        croak '$other has no is_ranged_general method'
-      }
       if($self->is_ranged_general() == $other->is_ranged_general()){
         return 1;
       }
@@ -139,13 +142,12 @@ This compares on the General's name and on the bools I set up.
 I am checking the bools because I have at least one general I have purposefully put in twice to eval in two different roles. 
 =cut
   method _inequality ($other, $swap = 0) { 
-    if(not exists $other->name) {
-      croak '$other has no name method';
+    my $otherClass = blessed $other;
+    my @classList = Class::ISA::self_and_super_path($otherClass);
+    if(none {$_ eq 'Game::EvonyTKR::General'} @classList) {
+      croak '$other is not a Game::EvonyTKR::General'
     }
     if($self->name() eq $other->name()) {
-      if(not exists $other->is_ranged_general) {
-        croak '$other has no is_ranged_general method'
-      }
       if($self->is_ranged_general() == $other->is_ranged_general()){
         return 0;
       }

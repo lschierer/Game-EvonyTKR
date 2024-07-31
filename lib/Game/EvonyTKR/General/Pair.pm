@@ -5,6 +5,7 @@ class Game::EvonyTKR::General::Pair {
   use Carp;
   use Types::Common qw( t is_Num is_Str is_Int);
   use Type::Utils "is"; 
+  use Util::Any -all;
   use Game::EvonyTKR::SkillBook::Special;
   use Game::EvonyTKR::General;
   use Game::EvonyTKR::Buff::EvaluationMultipliers;
@@ -29,18 +30,52 @@ class Game::EvonyTKR::General::Pair {
 
   field $primary :reader :param;
 
+  field $secondary :reader :param;
+
   ADJUST {
     my @errors;
-    if(blessed $primary ne )
+    my $primaryClass = blessed $primary;
+    my @GeneralClasses = (
+      'Game::EvonyTKR::General',
+      'Game::EvonyTKR::General::Ground',
+      'Game::EvonyTKR::General::Mounted',
+      'Game::EvonyTKR::General::Ranged',
+      'Game::EvonyTKR::General::Siege',
+    );
+    if(none { $_ eq $primaryClass} @GeneralClasses) {
+      push @errors => "primary must be a Game::EvonyTKR::General or subclass no $primaryClass";
+    }
+    my $secondaryClass = blessed $secondary;
+    if(none { $_ eq $secondaryClass} @GeneralClasses) {
+      push @errors => "primary must be a Game::EvonyTKR::General or subclass no $primaryClass";
+    }
+    if (@errors) {
+      croak join ', ' => @errors;
+    }
   }
 
 
   method _equality ($other, $swap = 0) {
-    if(exists $other->name){
-      
+    if(blessed $other eq Game::EvonyTKR::General::Pair) {
+      if($self->primary() eq $other->primary()) {
+        return $self->secondary() eq $other->secondary();
+      }
+    }else {
+      croak "other must be a 'Game::EvonyTKR::General::Pair' not a " . blessed $other;
     }
+    return 0;
   }
   
+  method _inequality($other, $swap = 0) {
+    if(blessed $other eq Game::EvonyTKR::General::Pair) {
+      if($self->primary() eq $other->primary()) {
+        return $self->secondary() ne $other->secondary();
+      }
+    }else {
+      croak "other must be a 'Game::EvonyTKR::General::Pair' not a " . blessed $other;
+    }
+    return 1;
+  }
 
 };
 1

@@ -6,6 +6,7 @@ class Game::EvonyTKR::General::Pair::Creator {
 # PODNAME: Game::EvonyTKR::General::Pair::Creator
   use Carp;
   use Clone 'clone';
+  use Class::ISA;
   use Types::Common qw( t is_Num is_Str is_Int);
   use Type::Utils "is"; 
   use File::ShareDir ':ALL';
@@ -52,9 +53,6 @@ class Game::EvonyTKR::General::Pair::Creator {
         say "size is " . scalar %ng;
       }
        %generals = %ng;
-       while (my ($key, $value) = $sg->each_source()) {
-
-       }
     }
   }
 
@@ -76,12 +74,11 @@ This assumes that the Generals are hashed by their names.
       @pairs{'wall'} = ();
       my $sg1 = Hash::Map->new();
       my $sg2 = $sg1->clone_source();
-      $sg->set_source(%generals);
+      $sg1->set_source(%generals);
       while ( my ($key1, $value1) = $sg1->each_source ) { 
         while ( my ($key2, $value2) = $sg2->each_source ) { 
           if($value1->name() ne $value2->name()) {
             if($value1->is_ground_general() and $value2->is_ground_general()){
-              unless(@pairs{'ground'}) 
             }
           }
       }
