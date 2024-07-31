@@ -7,6 +7,13 @@ class Game::EvonyTKR::General::Mounted :isa(Game::EvonyTKR::General) {
   use Type::Utils "is"; 
   use namespace::autoclean;
   use Game::EvonyTKR::General;
+  use overload 
+    '<=>' => \&_comparison,
+    'cmp' => \&_comparison,
+    'eq'  => \&_equality,
+    '=='  => \&_equality,
+    'ne'  => \&_inequality,
+    '!='  => \&_inequality;
 # PODNAME: Game::EvonyTKR::General::Mounted
 
 # ABSTRACT: Module for processing information about Evony TKR Mounted Specialists.
@@ -72,8 +79,8 @@ in which ways is not always entirely reliable, and these modules will, at times,
     return 0;
   }
 
-  method is_ground_mounted() {
-    return 0;
+  method is_mounted_general() {
+    return 1;
   }
 
   method is_ranged_general() {
@@ -81,7 +88,7 @@ in which ways is not always entirely reliable, and these modules will, at times,
   }
 
   method is_siege_general() {
-    return 1;
+    return 0;
   }
 
   method is_wall_general() {
@@ -96,6 +103,60 @@ in which ways is not always entirely reliable, and these modules will, at times,
     return 0;
   }
 
+=method _comparison
+
+This compares on the General's name only currently. 
+
+I can envison doing something based on a computed power score.
+=cut
+  method _comparison($other, $swap = 0) {
+    if(not exists $other->name) {
+      croak '$other has no name method';
+    }
+
+    return $self->name() cmp $other->name();
+  }
+
+=method _equality
+
+This compares on the General's name and on the bools I set up. 
+I am checking the bools because I have at least one general I have purposefully put in twice to eval in two different roles. 
+
+=cut
+  method _equality ($other, $swap = 0) { 
+    if(not exists $other->name) {
+      croak '$other has no name method';
+    }
+    if($self->name() eq $other->name()) {
+      if(not exists $other->is_mounted_general) {
+        croak '$other has no is_mounted_general method'
+      }
+      if($self->is_mounted_general() == $other->is_mounted_general()){
+        return 1;
+      }
+    }
+    return 0;
+  }
+
+=method _inequality
+
+This compares on the General's name and on the bools I set up. 
+I am checking the bools because I have at least one general I have purposefully put in twice to eval in two different roles. 
+=cut
+  method _inequality ($other, $swap = 0) { 
+    if(not exists $other->name) {
+      croak '$other has no name method';
+    }
+    if($self->name() eq $other->name()) {
+      if(not exists $other->is_mounted_general) {
+        croak '$other has no is_mounted_general method'
+      }
+      if($self->is_mounted_general() == $other->is_mounted_general()){
+        return 0;
+      }
+    }
+    return 1;
+  }
 }
 
 1;
