@@ -1,7 +1,7 @@
 package TestsFor::Game::EvonyTKR::Buff::Data;
 use v5.40.0;
 
-use Test::Most; 
+use Test::Most;
 use Test::File::ShareDir::Object::Dist;
 
 use Game::EvonyTKR::Buff::Data;
