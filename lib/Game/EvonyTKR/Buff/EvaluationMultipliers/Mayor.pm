@@ -10,25 +10,6 @@ class Game::EvonyTKR::Buff::EvaluationMultipliers::Mayor {
 
 # ABSTRACT: Game::EvonyTKR::Buff Evaluation Multipliers for Mayor use cases.
 
-=head1 SYNOPSIS
-
-=over
-
-=item comment Brief examples of using the module.
-
-=back
-
-=head1 DESCRIPTION
-
-See Game::EvonyTKR::Buff::EvaluationMultipliers for a general description.
-
-This provides the base overrides for the Mayor use cases. 
-
-I have left values in place for most of the buffs on the theory that this
-helps keep the Mayor's troops alive, and thus keeps the Mayor's debuffs in play.   However, since you only need one troop of any type for a debuff to be effective, you do not care *which* troop class that one troop is from, and thus one troop buff is just as good as another. A generic buff is still slightly better than a specific buff in that it helps keep three (Sub Cities do not have siege) troops alive instead of just one.  Siege buffs are unfortunately worthless.
-
-=cut 
-
   # from Type::Registry, this will save me from some of the struggles I have had with some types having blessed references and others not. 
   ADJUST {
     if(!(t->simple_lookup("Num"))) {
@@ -486,8 +467,23 @@ the Troop Death into Souls Debuff with no conditions.
     }
   }
 
-=back
-
-=cut
 }
 1;
+
+__END__
+
+=head1 DESCRIPTION
+
+See Game::EvonyTKR::Buff::EvaluationMultipliers for a general description.
+
+This provides the base overrides for the Mayor use cases. 
+
+I have left values in place for most of the buffs on the theory that this
+helps keep the Mayor's troops alive, and thus keeps the Mayor's debuffs in play.   However, since you only need one troop of any type for a debuff to be effective, you do not care *which* troop class that one troop is from, and thus one troop buff is just as good as another. A generic buff is still slightly better than a specific buff in that it helps keep three (Sub Cities do not have siege) troops alive instead of just one.  Siege buffs are unfortunately worthless.
+
+=cut 
+
+=method new()
+
+auto generated constructor for this class
+=cut
