@@ -1,5 +1,7 @@
 use v5.40.0;
 use experimental qw(class);
+use utf8::all;
+
 
 class Game::EvonyTKR::Buff {
   use Game::EvonyTKR::Buff::Data;
