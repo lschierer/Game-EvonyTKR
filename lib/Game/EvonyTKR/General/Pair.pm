@@ -56,7 +56,7 @@ class Game::EvonyTKR::General::Pair {
 
 
   method _equality ($other, $swap = 0) {
-    if(blessed $other eq Game::EvonyTKR::General::Pair) {
+    if(blessed $other eq 'Game::EvonyTKR::General::Pair') {
       if($self->primary() eq $other->primary()) {
         return $self->secondary() eq $other->secondary();
       }
@@ -67,7 +67,7 @@ class Game::EvonyTKR::General::Pair {
   }
 
   method _inequality($other, $swap = 0) {
-    if(blessed $other eq Game::EvonyTKR::General::Pair) {
+    if(blessed $other eq 'Game::EvonyTKR::General::Pair') {
       if($self->primary() eq $other->primary()) {
         return $self->secondary() ne $other->secondary();
       }
