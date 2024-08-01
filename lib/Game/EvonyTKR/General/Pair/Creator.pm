@@ -9,17 +9,20 @@ class Game::EvonyTKR::General::Pair::Creator {
   use Class::ISA;
   use Types::Common qw( t is_Num is_Str is_Int);
   use Type::Utils "is";
+  use Util::Any -all;
   use File::ShareDir ':ALL';
   use File::HomeDir;
   use File::Spec;
   use File::Path qw(make_path);
   use DBM::Deep;
-  use Data::Dumper;
+  use Data::Printer;
   use Hash::Map;
   use YAML::PP::LibYAML;
   use List::MoreUtils;
   use Game::EvonyTKR::SkillBook::Special;
   use Game::EvonyTKR::SkillBook::Standard;
+  use Game::EvonyTKR::Buff::Data;
+  use Game::EvonyTKR::General::Pair;
   use Game::EvonyTKR::Buff::EvaluationMultipliers;
   use namespace::autoclean;
 
@@ -27,6 +30,14 @@ class Game::EvonyTKR::General::Pair::Creator {
 
   my $distData = File::HomeDir->my_dist_data( 'Game-Evony', { create => 1 } );
   my $dbPath = File::Spec->catfile($distData, "db");
+
+  # some constants
+  field $classData = Game::EvonyTKR::Buff::Data->new();
+
+  ADJUST {
+    $classData->set_BuffClasses();
+  }
+
   ADJUST {
     if(! -r -w  -x -o -d $dbPath) {
       make_path($dbPath,"0770");
@@ -63,28 +74,59 @@ an array of Generals that do not conflict.
 If there are insufficient generals to make pairs, it returns 0 (false).
 
 This assumes that the Generals are hashed by their names.
+
+if getConflictData has not been called, it will not consider conflicts. 
 =cut
   method getPairs() {
     if(scalar %generals >= 2 ) {
       my %pairs;
-      @pairs{'ground'} = ();
-      @pairs{'mounted'} = ();
-      @pairs{'ranged'} = ();
-      @pairs{'siege'} = ();
-      @pairs{'wall'} = ();
       my $sg1 = Hash::Map->new();
-      my $sg2 = $sg1->clone_source();
       $sg1->set_source(%generals);
+
+      my $sg2 = Hash::Map->new();
+      $sg2->set_source(%generals);
+      
       while ( my ($key1, $value1) = $sg1->each_source ) {
+        if($debug) {
+          say "looking for pairs for $key1";
+        }
         while ( my ($key2, $value2) = $sg2->each_source ) {
+          if($debug) {
+            say "testing $key2 against $key1";
+          }
           if($value1->name() ne $value2->name()) {
+            my @conflicts = @{$db->get($value1->name())->get('conflicts') };
+            say "?????";
+            say p @conflicts;
+            say "?????";
+            my $key = 'unknown';
+            my @BuffClasses = $classData->BuffClasses();
             if($value1->is_ground_general() and $value2->is_ground_general()){
+              $key = first { $_ =~ qr/ground/i } @BuffClasses;
+            } elsif ($value1->is_mounted_general() and $value2->is_mounted_general()) {
+              $key = first {$_ =~ qr/mounted/i } @BuffClasses;
+            } elsif ($value1->is_ranged_general() and $value2->is_ranged_general()) {
+              $key = first {$_ =~ qr/ranged/i } @BuffClasses;
+            } elsif($value1->is_siege_general() and $value2->is_siege_general()){
+               $key = first {$_ =~ qr/siege/i } @BuffClasses;
+            }
+            my $pair = Game::EvonyTKR::General::Pair->new(
+                primary   => $value1,
+                secondary => $value2,
+              );
+            if($key ne 'unknown') {
+              if(defined $key && $key ne '') {
+                push @{ $pairs{$key} }, $pair;
+              } else {
+                croak "bad key '$key'"
+              }
             }
           }
+        }
       }
-      }
+      return %pairs;
     }
-    return 0
+    croak "Cannot operate without generals."; 
   }
 
 =method getConflictData()
@@ -110,11 +152,11 @@ Attempting to pair generals on the fly is generally massively inefficient.
 
       if($debug) {
         say 'start of ' . $file;
-        say Dumper($conflictGroup);
+        say p($conflictGroup);
       }
       if($debug >= 2 ) {
         print "members are: ";
-        say Dumper($conflictGroup->{'members'});
+        say p($conflictGroup->{'members'});
       }
       my $groupName = $conflictGroup->{'name'};
       if($debug >= 2) {
@@ -137,7 +179,7 @@ Attempting to pair generals on the fly is generally massively inefficient.
 
       if($debug >= 3) {
         print "members are: ";
-        print Dumper( @members);
+        print p( @members);
         print "there are ";
         print scalar @members;
         say " members in the list";
@@ -146,8 +188,8 @@ Attempting to pair generals on the fly is generally massively inefficient.
         foreach (@members) {
           my $entryName = $_;
 
-          unless(grep {
-            $entryName eq $_
+          unless(any {
+            $_ =~ qr/$entryName/
             } @{$db->get($groupName)->get('members')}
             ){
             push @{$db->get($groupName)->get('members')}, $entryName;
@@ -162,8 +204,8 @@ Attempting to pair generals on the fly is generally massively inefficient.
           if(scalar @others >= 1){
             foreach(@others) {
               my $other = $_;
-              unless(grep {
-                  $other eq $_
+              unless(any {
+                 $_ =~ qr/$other/
                 } @{$db->get($groupName)->get('others')}
                 ){
                   push @{$db->get($groupName)->get('others')}, $other;
@@ -180,7 +222,7 @@ Attempting to pair generals on the fly is generally massively inefficient.
 
           if($debug >=2) {
             say "conflicts are: ";
-            say Dumper( $db->get($entryName)->get('conflicts'));
+            say p( $db->get($entryName)->get('conflicts'));
           }
 
           if(scalar @books >= 1) {

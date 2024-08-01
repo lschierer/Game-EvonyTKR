@@ -13,10 +13,11 @@ class Game::EvonyTKR::General::Pair {
   # PODNAME: Game::EvonyTKR::General::Pair
   # ABSTRACT: Manage Game::EvonyTKR::Generals as Pairs
   use overload
-    'eq'  => \&_equality,
-    '=='  => \&_equality,
-    'ne'  => \&_inequality,
-    '!='  => \&_inequality;
+    'eq'        => \&_equality,
+    '=='        => \&_equality,
+    'ne'        => \&_inequality,
+    '!='        => \&_inequality,
+    "fallback"  => 1;
 
 
   # from Type::Registry, this will save me from some of the struggles I have had with some types having blessed references and others not.
