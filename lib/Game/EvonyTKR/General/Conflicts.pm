@@ -25,7 +25,7 @@ class Game::EvonyTKR::General::Conflicts {
   use Game::EvonyTKR::Buff::EvaluationMultipliers;
   use namespace::autoclean;
 
-  my $debug = 1;
+  my $debug = 0;
 
   my $distData = File::HomeDir->my_dist_data( 'Game-Evony', { create => 1 } );
   my $dbPath = File::Spec->catfile($distData, "db");
@@ -59,21 +59,30 @@ returns the conflicts for a Game::EvonyTKR::General with name $name
 =cut
 
   method getConflictsByName( $name ) {
+    if($debug) {
+      print "starting getConflictsByName";
+    }
     if(not defined $name or $name eq '') {
       croak "name must be defined, not '$name'";
     }
+    if($debug) {
+      print " for $name\n";
+    }
     my @conflicts;
-    if(exists $db{$name}) {
-      
-      for $cn (@{ $db{$name}}){
-        for $i (@{ $db{$cn}}) {
-          if($debug) {
-            say "found conflicting name $i for $name";
+    if( $db->exists($name)) {
+      if($db->get($name)->exists('conflicts')){
+        my @nc = @{$db->get($name)->get('conflicts')} ;
+        for my $ci (@nc) {
+          if($db->exists($ci)) {
+            my @cg = @{$db->get($ci)->get('members')};
+            push @conflicts, @cg;
           }
-          push @conflicts, $i;
         }
       }
     } 
+    if($debug){
+      say scalar @conflicts;
+    }
     return @conflicts;
   }
 

@@ -62,9 +62,9 @@ sub execute {
         my @pairGroup = @{$pairs{$bc}};
         say "$bc: " . scalar @pairGroup;
         for my $gp (@pairGroup) {
-          print "|primary: " . $gp->primary()->name();
-          print "|secondary: " . $gp->secondary()->name();
-          print "|\n";
+          #print "|primary: " . $gp->primary()->name();
+          #print "|secondary: " . $gp->secondary()->name();
+          #print "|\n";
         }
         say "-----";
       } else {
