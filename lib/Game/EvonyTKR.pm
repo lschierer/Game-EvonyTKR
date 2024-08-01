@@ -35,8 +35,8 @@ sub validate_args {
 
 sub execute {
   my ($self, $opt, $args) = @_;
-  binmode(STDOUT, ":encoding(UTF-8)"); # apparently not the same thing as "use utf8;"  
-  binmode(STDIN, ":encoding(UTF-8)"); # apparently not the same thing as "use utf8;"  
+  binmode(STDOUT, ":encoding(UTF-8)"); # apparently not the same thing as "use utf8;"
+  binmode(STDIN, ":encoding(UTF-8)"); # apparently not the same thing as "use utf8;"
   if ($opt->{option1}) {
       # do option 1 stuff
   } else {
@@ -101,11 +101,11 @@ sub read_generals {
         'Ranged'  => 'Game::EvonyTKR::General::Ranged',
         'Siege'   => 'Game::EvonyTKR::General::Siege',
       );
-      
+
       my $generalClassKey;
 
       my $scoreType = $data->{'general'}->{'score_as'};
-      
+
       if ($scoreType =~ /Ground/) {
         $generalClassKey = 'Ground';
       } elsif ($scoreType =~ /Mounted/) {
@@ -116,11 +116,11 @@ sub read_generals {
         $generalClassKey = 'Siege';
       } elsif ($scoreType =~ /Mayor/) {
         next;
-      } 
+      }
       else {
         croak $data->{'general'}->{'name'} . " is of unknown general type $_";
       }
-    
+
       $generals{$name} = $generalClass{$generalClassKey}->new(
         name                  => $data->{'general'}->{'name'},
         leadership            => $data->{'general'}->{'leadership'},
@@ -142,7 +142,7 @@ sub read_generals {
 1;
 __END__
 
-# PODNAME: Game::EvonyTKR 
+# PODNAME: Game::EvonyTKR
 
 # ABSTRACT: Perl Modules providing utilities for players of Evony The King's Return
 
@@ -155,11 +155,11 @@ __END__
 
 =head1 DESCRIPTION
 
-This distribution aims to help players create and process the wealth of data that _Evony The King's Return_ dumps on users with next to no organization, documentation, or built-in tools to handle. 
+This distribution aims to help players create and process the wealth of data that _Evony The King's Return_ dumps on users with next to no organization, documentation, or built-in tools to handle.
 
 This module will (eventually) help players of the game needing to make reasonably complex analysis to make optimal choices about each of these:
 
-=for :list 
+=for :list
 
 * Which generals to invest time and resources in
 

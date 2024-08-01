@@ -6,13 +6,13 @@ class Game::EvonyTKR::SkillBook {
 
   use Types::Standard qw(is_Int Int Num is_Num Str is_Str);
   use Types::Common qw( t);
-  use Type::Utils "is"; 
+  use Type::Utils "is";
   use Game::EvonyTKR::Buff;
   use Carp;
   use namespace::autoclean;
 
 
-  # from Type::Registry, this will save me from some of the struggles I have had with some types having blessed references and others not. 
+  # from Type::Registry, this will save me from some of the struggles I have had with some types having blessed references and others not.
   ADJUST {
     if(!(t->simple_lookup("Num"))) {
       t->add_types(
@@ -61,9 +61,9 @@ __END__
 
 =for SkillBooks one of several ways that a General can provide Buffs for Troops.
 
-This is the base class, providing common methods for all SkillBooks.  You should probably be using either the SkillBook::Standard or the SkilllBook::Special subclass instead. 
+This is the base class, providing common methods for all SkillBooks.  You should probably be using either the SkillBook::Standard or the SkilllBook::Special subclass instead.
 
-=cut 
+=cut
 
 =attr name
 
@@ -77,8 +77,8 @@ each SkillBook has one or more Game::EvonyTKR:Buffs
 
 =method add_buff($nb)
 
-This method takes a Game::EvonyTKR::Buff as its sole parameter and adds it as one of the buffs this SkillBook provides. 
+This method takes a Game::EvonyTKR::Buff as its sole parameter and adds it as one of the buffs this SkillBook provides.
 
-One of the interesting properties of the buffs being an optional field in the class is that when seeking to record conflicting books, I do not care what buffs the books provide, simply enough to I<identify> them.  This facilitates that. 
-=cut 
+One of the interesting properties of the buffs being an optional field in the class is that when seeking to record conflicting books, I do not care what buffs the books provide, simply enough to I<identify> them.  This facilitates that.
+=cut
 

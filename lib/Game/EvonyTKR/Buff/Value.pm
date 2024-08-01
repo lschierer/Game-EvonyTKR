@@ -13,7 +13,7 @@ class Game::EvonyTKR::Buff::Value {
 
 =attr $number
 
-the numeric value as an Integer for Buff.  Defaults to 0. 
+the numeric value as an Integer for Buff.  Defaults to 0.
 =cut
 =method number()
 
@@ -34,8 +34,8 @@ the auto generated getter for the $number attribute
 
 =attr $unit
 
-this string value will reject anything other than the litteral values 'percentage' and 'flat'. 
-It defaults to 'percentage'.  
+this string value will reject anything other than the litteral values 'percentage' and 'flat'.
+It defaults to 'percentage'.
 =cut
 =method unit()
 
@@ -67,7 +67,7 @@ Flat buffs are simply added to the attribute they enhance.  To date, I am unawar
 
 Percentage based buffs are multiplied against the base value for that attribute.  Thus if you have multiple percentage
 based buffs, you are not going to experience exponential growth, since each will be multiplied against the same base value
-before they are then added together. 
+before they are then added together.
 
 =cut
 

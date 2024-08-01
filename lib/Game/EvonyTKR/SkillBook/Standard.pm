@@ -6,11 +6,11 @@ class Game::EvonyTKR::SkillBook::Standard :isa(Game::EvonyTKR::SkillBook) {
 
   use Types::Standard qw(is_Int Int Num is_Num Str is_Str);
   use Types::Common qw( t);
-  use Type::Utils "is"; 
+  use Type::Utils "is";
   use Game::EvonyTKR::Buff;
   use Carp;
   use namespace::autoclean;
-  use overload 
+  use overload
     '<=>' => \&_comparison,
     'cmp' => \&_comparison,
     'eq'  => \&_equality,
@@ -18,7 +18,7 @@ class Game::EvonyTKR::SkillBook::Standard :isa(Game::EvonyTKR::SkillBook) {
     'ne'  => \&_inequality,
     '!='  => \&_inequality;
 
-  # from Type::Registry, this will save me from some of the struggles I have had with some types having blessed references and others not. 
+  # from Type::Registry, this will save me from some of the struggles I have had with some types having blessed references and others not.
   ADJUST {
     if(!(t->simple_lookup("Num"))) {
       t->add_types(
@@ -73,7 +73,7 @@ class Game::EvonyTKR::SkillBook::Standard :isa(Game::EvonyTKR::SkillBook) {
     }
   }
 
-  
+
 }
 
 1;
@@ -86,15 +86,15 @@ __END__
 
 =for SkillBooks one of several ways that a General can provide Buffs for Troops.
 
-The SkillBook::Standard class is for the SkillBooks are I<not> intrinsic to a particular General, but rather the ones which are manually added by the user.  This includes both the ones that can be won for free and the premium ones that must be purchased in packs.  
+The SkillBook::Standard class is for the SkillBooks are I<not> intrinsic to a particular General, but rather the ones which are manually added by the user.  This includes both the ones that can be won for free and the premium ones that must be purchased in packs.
 
-=cut 
+=cut
 
 =attr $level
 
-One of the primary differences between ::Standard and ::Special books is that all ::Standard books have a level attribute.  Higher level books automatically overright lower level books of the same name when added to a General. That is, a General can have at most one SkillBook that has a given name attribute, despite the fact that ::Standard SkillBooks are only I<uniquely> identified when you provide both name and level attributes.  
+One of the primary differences between ::Standard and ::Special books is that all ::Standard books have a level attribute.  Higher level books automatically overright lower level books of the same name when added to a General. That is, a General can have at most one SkillBook that has a given name attribute, despite the fact that ::Standard SkillBooks are only I<uniquely> identified when you provide both name and level attributes.
 
-A SkillBook::Standard's level must be between 1 and 4, inclusive. 
+A SkillBook::Standard's level must be between 1 and 4, inclusive.
 =cut
 
 
