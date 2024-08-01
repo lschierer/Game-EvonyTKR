@@ -27,7 +27,7 @@ class Game::EvonyTKR::General::Pair::Creator {
   use Game::EvonyTKR::Buff::EvaluationMultipliers;
   use namespace::autoclean;
 
-  my $debug = 1;
+  my $debug = 0;
 
   my $distData = File::HomeDir->my_dist_data( 'Game-Evony', { create => 1 } );
   my $dbPath = File::Spec->catfile($distData, "db");
