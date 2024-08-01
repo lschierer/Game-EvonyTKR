@@ -8,8 +8,11 @@ use Data::Printer;
 use base qw(App::Cmd::Simple);
 use File::ShareDir ':ALL';
 use File::Spec;
+use File::HomeDir;
+use File::Path qw(make_path);
 use YAML::XS qw{LoadFile Load};
 use Devel::Peek;
+use Log::Log4perl;
 use Game::EvonyTKR::General::Pair::Creator;
 use Game::EvonyTKR::General::Pair;
 use Game::EvonyTKR::General::Ground;
@@ -28,6 +31,26 @@ sub opt_spec {
   );
 }
 
+sub getLogfileName() {
+  my $home      = File::HomeDir->my_home;
+  my $logDir    = File::Spec->catfile($home , 'var/log/Perl/dist/Game-Evony/');
+  return File::Spec->catfile($logDir, 'system.log');
+}
+
+sub configure_logging() {
+  Log::Log4perl::Config->allow_code('safe');
+  Log::Log4perl::Config->utf( 1 );
+  my $logConfLocation = dist_file('Game-EvonyTKR', 'log4perl.conf');
+  my $home      = File::HomeDir->my_home;
+  my $logDir = File::Spec->catfile($home, 'var/log/Perl/dist/Game-Evony/');
+  if(! -r -w  -x -o -d $logDir) {
+      make_path($logDir,"0770");
+    }
+  Log::Log4perl::init( $logConfLocation );
+  my $logger = Log::Log4perl->get_logger;
+
+}
+
 sub validate_args {
   my ($self, $opt, $args) = @_;
 
@@ -37,6 +60,7 @@ sub validate_args {
 
 sub execute {
   my ($self, $opt, $args) = @_;
+  configure_logging();
   binmode(STDOUT, ":encoding(UTF-8)"); # apparently not the same thing as "use utf8;"
   binmode(STDIN, ":encoding(UTF-8)"); # apparently not the same thing as "use utf8;"
   if ($opt->{option1}) {
