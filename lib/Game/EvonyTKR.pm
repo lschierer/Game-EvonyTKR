@@ -4,13 +4,14 @@ use utf8::all;
 
 use Carp;
 use experimental qw(class);
-
+use Data::Printer;
 use base qw(App::Cmd::Simple);
 use File::ShareDir ':ALL';
 use File::Spec;
 use YAML::XS qw{LoadFile Load};
 use Devel::Peek;
 use Game::EvonyTKR::General::Pair::Creator;
+use Game::EvonyTKR::General::Pair;
 use Game::EvonyTKR::General::Ground;
 use Game::EvonyTKR::General::Mounted;
 use Game::EvonyTKR::General::Ranged;
@@ -18,6 +19,7 @@ use Game::EvonyTKR::General::Siege;
 use Game::EvonyTKR::SkillBook::Special;
 use Game::EvonyTKR::Buff;
 use Game::EvonyTKR::Buff::Value;
+use Game::EvonyTKR::Buff::Data;
 use namespace::autoclean;
 
 sub opt_spec {
@@ -41,11 +43,33 @@ sub execute {
       # do option 1 stuff
   } else {
     my %generals = read_generals();
+    my $classData = Game::EvonyTKR::Buff::Data->new();
+    $classData->set_BuffClasses();
+    my @BuffClasses = $classData->BuffClasses();
+    if(scalar @BuffClasses == 0) {
+      croak 'error loading BuffClasses';
+    }
     say "start";
     say scalar %generals;
     my $pairCreator = Game::EvonyTKR::General::Pair::Creator->new();
     $pairCreator->set_generals(%generals);
     $pairCreator->getConflictData();
+    my %pairs = $pairCreator->getPairs();
+    
+    for my $bc (@BuffClasses) {
+      if(exists $pairs{$bc}) {
+        my @pairGroup = @{$pairs{$bc}};
+        say "$bc: " . scalar @pairGroup;
+        for my $gp (@pairGroup) {
+          print "|primary: " . $gp->primary()->name();
+          print "|secondary: " . $gp->secondary()->name();
+          print "|\n";
+        }
+        say "-----";
+      } else {
+        say "$bc: no pairs";
+      }
+    }
     say "done";
   }
 }
