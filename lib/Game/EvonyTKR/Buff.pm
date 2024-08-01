@@ -5,11 +5,11 @@ class Game::EvonyTKR::Buff {
   use Game::EvonyTKR::Buff::Data;
   use Types::Standard qw(is_Int Int Str is_Str);
   use Types::Common::Numeric qw(PositiveOrZeroInt);
-  use Type::Utils "is"; 
+  use Type::Utils "is";
   use Carp;
-  use Class::ISA; 
+  use Class::ISA;
   use Util::Any -all;
-  use overload 
+  use overload
     '<=>' => \&compare,
     'cmp' => \&compare,
     'eq'  => \&_equality,
@@ -19,16 +19,16 @@ class Game::EvonyTKR::Buff {
   use namespace::autoclean;
 # PODNAME: Game::EvonyTKR::Buff
 
-# ABSTRACT: Buff and Debuff primatives 
+# ABSTRACT: Buff and Debuff primatives
 
 =head1 DESCRIPTION
 
 A Buff is an attribute that modifies various attributes in Evony TKR
 
 Buffs can be positive or negative.  When negative, they are commonly referred to
-as "Debuffs," however the game internals make very little distinction between a positive and negative buff. 
+as "Debuffs," however the game internals make very little distinction between a positive and negative buff.
 
-Buffs are most commonly I<calculated> as if all buffs came from generals.  This is not true, buffs come from a variety of sources, and this module forms the primative for use in any of them. 
+Buffs are most commonly I<calculated> as if all buffs came from generals.  This is not true, buffs come from a variety of sources, and this module forms the primative for use in any of them.
 
 =cut
 
@@ -47,7 +47,7 @@ Buffs are most commonly I<calculated> as if all buffs came from generals.  This 
       $classData->set_BuffConditions();
       @BuffConditions = $classData->BuffConditions();
     }
-    
+
     if(scalar @BuffClasses == 0) {
       $classData->set_BuffClasses();
       @BuffClasses = $classData->BuffClasses();
@@ -113,8 +113,8 @@ Buffs are most commonly I<calculated> as if all buffs came from generals.  This 
 this function returns true if the $other is logically the same
 as this Game::EvonyTKR::Buff.  It is written with a particular style to aid in debugging it should I ever suspect I've done it wrong.  Rather than attempting to return immediately, I have written each test to store a unique negative value then I return false if my stored value has been set negative anywhere in the overall function.  This way, by setting $debug to a truthy value, the function will inform me via the "say" statement at the bottom which test determined the difference.   The function defaults to truthy.
 
-$swap is currently unused, but will eventually handle the case someone somehow calls the <=> operator backwards, which is apparently possible. 
-=cut 
+$swap is currently unused, but will eventually handle the case someone somehow calls the <=> operator backwards, which is apparently possible.
+=cut
 
   method compare($other, $swap = 0) {
     my $debug = 0; #set to 1 to debug this function
@@ -128,7 +128,7 @@ $swap is currently unused, but will eventually handle the case someone somehow c
     } elsif($other->value()->unit() ne $value->unit) {
       $code = -4;
     } elsif(
-      ($self->has_buffClass() && (not $other->has_buffClass())) || 
+      ($self->has_buffClass() && (not $other->has_buffClass())) ||
       ((not $self->has_buffClass()) && $other->has_buffClass())) {
         $code = -5;
       }elsif(
@@ -140,10 +140,10 @@ $swap is currently unused, but will eventually handle the case someone somehow c
       $code = -7;
     }
     if( $code >= 0) {
-      # I cannot use an else-if pattern for this because 
+      # I cannot use an else-if pattern for this because
       # the precoditions for testing are not in place,
       # are expensive to gather, and need not be gathered at all
-      # if I can detect false without doing so. 
+      # if I can detect false without doing so.
       my @other_condition = $other->condition();
       my @diff = condition_difference(\@condition, \@other_condition);
       if(scalar @diff != 0) {
@@ -191,8 +191,8 @@ $swap is currently unused, but will eventually handle the case someone somehow c
     }
     return 0;
   }
-  
+
 }
- 
+
 1;
 

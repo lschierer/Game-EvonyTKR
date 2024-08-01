@@ -4,13 +4,13 @@ use experimental qw(class);
 class Game::EvonyTKR::Buff::EvaluationMultipliers::Mayor {
   use Carp;
   use Types::Common qw( t is_Num is_Str is_Int);
-  use Type::Utils "is"; 
+  use Type::Utils "is";
   use namespace::autoclean;
 # PODNAME: Game::EvonyTKR::Buff::EvaluationMultipliers::Mayor
 
 # ABSTRACT: Game::EvonyTKR::Buff Evaluation Multipliers for Mayor use cases.
 
-  # from Type::Registry, this will save me from some of the struggles I have had with some types having blessed references and others not. 
+  # from Type::Registry, this will save me from some of the struggles I have had with some types having blessed references and others not.
   ADJUST {
     if(!(t->simple_lookup("Num"))) {
       t->add_types(
@@ -18,12 +18,12 @@ class Game::EvonyTKR::Buff::EvaluationMultipliers::Mayor {
       );
     }
   }
-  
+
 
 =attr GenericAttack
- 
-the Attack Buff with no conditions or class attribute. 
-=cut 
+
+the Attack Buff with no conditions or class attribute.
+=cut
   field $GenericAttack :reader  = 0.33333;
 
   ADJUST {
@@ -38,9 +38,9 @@ the Attack Buff with no conditions or class attribute.
   }
 
 =attr SiegeAttack
- 
-the Attack Buff with no conditions but with Siege Class attribute. 
-=cut 
+
+the Attack Buff with no conditions but with Siege Class attribute.
+=cut
 
   field $SiegeAttack :reader = 0;
 
@@ -57,9 +57,9 @@ the Attack Buff with no conditions but with Siege Class attribute.
 
 
 =attr GenericDefense
- 
-the Defense Buff with no conditions or class attribute. 
-=cut 
+
+the Defense Buff with no conditions or class attribute.
+=cut
   field $GenericDefense :reader  = 0.66668;
 
   ADJUST {
@@ -74,9 +74,9 @@ the Defense Buff with no conditions or class attribute.
   }
 
 =attr SiegeDefense
- 
-the Defense Buff with no conditions but with Siege Class attribute. 
-=cut 
+
+the Defense Buff with no conditions but with Siege Class attribute.
+=cut
 
   field $SiegeDefense :reader = 0;
 
@@ -92,9 +92,9 @@ the Defense Buff with no conditions but with Siege Class attribute.
   }
 
 =attr GenericHP
- 
-the HP Buff with no conditions or class attribute. 
-=cut 
+
+the HP Buff with no conditions or class attribute.
+=cut
   field $GenericHP :reader  = 0.66668;
 
   ADJUST {
@@ -109,9 +109,9 @@ the HP Buff with no conditions or class attribute.
   }
 
 =attr SiegeHP
- 
-the HP Buff with no conditions but with Siege Class attribute. 
-=cut 
+
+the HP Buff with no conditions but with Siege Class attribute.
+=cut
 
   field $SiegeHP :reader :param //= 0;
 
@@ -126,10 +126,10 @@ the HP Buff with no conditions but with Siege Class attribute.
     }
   }
 
-=attr MarchSizeIncrease 
+=attr MarchSizeIncrease
 
-the March Size Increase Buff with no conditions. 
-=cut 
+the March Size Increase Buff with no conditions.
+=cut
 
   field $MarchSizeIncrease :reader = 0;
 
@@ -144,10 +144,10 @@ the March Size Increase Buff with no conditions.
     }
   }
 
-=attr RallySizeIncrease 
+=attr RallySizeIncrease
 
-the Rally Size Increase Buff with no conditions. 
-=cut 
+the Rally Size Increase Buff with no conditions.
+=cut
 
   field $RallySizeIncrease :reader = 0;
 
@@ -162,12 +162,12 @@ the Rally Size Increase Buff with no conditions.
     }
   }
 
-=head3 Debuffs 
+=head3 Debuffs
 
 =attr GenericAttackDebuff
- 
-the AttackDebuff with no conditions or class attribute. 
-=cut 
+
+the AttackDebuff with no conditions or class attribute.
+=cut
   field $GenericAttackDebuff :reader :param //= 2;
 
   ADJUST {
@@ -182,10 +182,10 @@ the AttackDebuff with no conditions or class attribute.
   }
 
 =attr GroundAttackDebuff
- 
-the AttackDebuff with no conditions but with Ground Class attribute. 
-=cut 
-  
+
+the AttackDebuff with no conditions but with Ground Class attribute.
+=cut
+
   field $GroundAttackDebuff :reader :param //= 2;
 
   ADJUST {
@@ -200,9 +200,9 @@ the AttackDebuff with no conditions but with Ground Class attribute.
   }
 
 =attr MountedAttackDebuff
- 
-the AttackDebuff with no conditions but with Mounted Class attribute. 
-=cut 
+
+the AttackDebuff with no conditions but with Mounted Class attribute.
+=cut
 
   field $MountedAttackDebuff :reader :param //= 2;
 
@@ -218,9 +218,9 @@ the AttackDebuff with no conditions but with Mounted Class attribute.
   }
 
 =attr RangedAttackDebuff
- 
-the AttackDebuffDebuff with no conditions but with Ranged Class attribute. 
-=cut 
+
+the AttackDebuffDebuff with no conditions but with Ranged Class attribute.
+=cut
 
   field $RangedAttackDebuff :reader :param //= 2;
 
@@ -236,9 +236,9 @@ the AttackDebuffDebuff with no conditions but with Ranged Class attribute.
   }
 
 =attr SiegeAttackDebuff
- 
-the AttackDebuffDebuff with no conditions but with Siege Class attribute. 
-=cut 
+
+the AttackDebuffDebuff with no conditions but with Siege Class attribute.
+=cut
 
   field $SiegeAttackDebuff :reader :param //= 0;
 
@@ -254,9 +254,9 @@ the AttackDebuffDebuff with no conditions but with Siege Class attribute.
   }
 
 =attr GenericDefenseDebuff
- 
-the DefenseDebuff with no conditions or class attribute. 
-=cut 
+
+the DefenseDebuff with no conditions or class attribute.
+=cut
   field $GenericDefenseDebuff :reader :param //= 2;
 
   ADJUST {
@@ -271,10 +271,10 @@ the DefenseDebuff with no conditions or class attribute.
   }
 
 =attr GroundDefenseDebuff
- 
-the DefenseDebuff with no conditions but with Ground Class attribute. 
-=cut 
-  
+
+the DefenseDebuff with no conditions but with Ground Class attribute.
+=cut
+
   field $GroundDefenseDebuff :reader :param //= 2;
 
   ADJUST {
@@ -289,9 +289,9 @@ the DefenseDebuff with no conditions but with Ground Class attribute.
   }
 
 =attr MountedDefenseDebuff
- 
-the DefenseDebuff with no conditions but with Mounted Class attribute. 
-=cut 
+
+the DefenseDebuff with no conditions but with Mounted Class attribute.
+=cut
 
   field $MountedDefenseDebuff :reader :param //= 2;
 
@@ -307,9 +307,9 @@ the DefenseDebuff with no conditions but with Mounted Class attribute.
   }
 
 =attr RangedDefenseDebuff
- 
-the DefenseDebuff with no conditions but with Ranged Class attribute. 
-=cut 
+
+the DefenseDebuff with no conditions but with Ranged Class attribute.
+=cut
 
   field $RangedDefenseDebuff :reader :param //= 2;
 
@@ -325,9 +325,9 @@ the DefenseDebuff with no conditions but with Ranged Class attribute.
   }
 
 =attr SiegeDefenseDebuff
- 
-the DefenseDebuff with no conditions but with Siege Class attribute. 
-=cut 
+
+the DefenseDebuff with no conditions but with Siege Class attribute.
+=cut
 
   field $SiegeDefenseDebuff :reader :param //= 2;
 
@@ -343,9 +343,9 @@ the DefenseDebuff with no conditions but with Siege Class attribute.
   }
 
 =attr GenericHPDebuff
- 
-the HPDebuff with no conditions or class attribute. 
-=cut 
+
+the HPDebuff with no conditions or class attribute.
+=cut
   field $GenericHPDebuff :reader :param //= 2;
 
   ADJUST {
@@ -360,10 +360,10 @@ the HPDebuff with no conditions or class attribute.
   }
 
 =attr GroundHPDebuff
- 
-the HPDebuff with no conditions but with Ground Class attribute. 
-=cut 
-  
+
+the HPDebuff with no conditions but with Ground Class attribute.
+=cut
+
   field $GroundHPDebuff :reader :param //= 2;
 
   ADJUST {
@@ -378,9 +378,9 @@ the HPDebuff with no conditions but with Ground Class attribute.
   }
 
 =attr MountedHPDebuff
- 
-the HPDebuff with no conditions but with Mounted Class attribute. 
-=cut 
+
+the HPDebuff with no conditions but with Mounted Class attribute.
+=cut
 
   field $MountedHPDebuff :reader :param //= 2;
 
@@ -396,9 +396,9 @@ the HPDebuff with no conditions but with Mounted Class attribute.
   }
 
 =attr RangedHPDebuff
- 
-the HPDebuff with no conditions but with Ranged Class attribute. 
-=cut 
+
+the HPDebuff with no conditions but with Ranged Class attribute.
+=cut
 
   field $RangedHPDebuff :reader :param //= 2;
 
@@ -414,9 +414,9 @@ the HPDebuff with no conditions but with Ranged Class attribute.
   }
 
 =attr SiegeHPDebuff
- 
-the HPDebuff with no conditions but with Siege Class attribute. 
-=cut 
+
+the HPDebuff with no conditions but with Siege Class attribute.
+=cut
 
   field $SiegeHPDebuff :reader :param //= 2;
 
@@ -431,10 +431,10 @@ the HPDebuff with no conditions but with Siege Class attribute.
     }
   }
 
-=attr Death2WoundedDebuff 
+=attr Death2WoundedDebuff
 
-the Troop Death into Wounded Debuff with no conditions. 
-=cut 
+the Troop Death into Wounded Debuff with no conditions.
+=cut
 
   field $Death2WoundedDebuff :reader :param //= 1;
 
@@ -449,10 +449,10 @@ the Troop Death into Wounded Debuff with no conditions.
     }
   }
 
-=attr Death2SoulsDebuff 
+=attr Death2SoulsDebuff
 
-the Troop Death into Souls Debuff with no conditions. 
-=cut 
+the Troop Death into Souls Debuff with no conditions.
+=cut
 
   field $Death2SoulsDebuff :reader :param //= 1;
 
@@ -476,12 +476,12 @@ __END__
 
 See Game::EvonyTKR::Buff::EvaluationMultipliers for a general description.
 
-This provides the base overrides for the Mayor use cases. 
+This provides the base overrides for the Mayor use cases.
 
 I have left values in place for most of the buffs on the theory that this
 helps keep the Mayor's troops alive, and thus keeps the Mayor's debuffs in play.   However, since you only need one troop of any type for a debuff to be effective, you do not care *which* troop class that one troop is from, and thus one troop buff is just as good as another. A generic buff is still slightly better than a specific buff in that it helps keep three (Sub Cities do not have siege) troops alive instead of just one.  Siege buffs are unfortunately worthless.
 
-=cut 
+=cut
 
 =method new()
 

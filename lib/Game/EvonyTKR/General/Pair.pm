@@ -4,7 +4,7 @@ use experimental qw(class);
 class Game::EvonyTKR::General::Pair {
   use Carp;
   use Types::Common qw( t is_Num is_Str is_Int);
-  use Type::Utils "is"; 
+  use Type::Utils "is";
   use Util::Any -all;
   use Game::EvonyTKR::SkillBook::Special;
   use Game::EvonyTKR::General;
@@ -12,14 +12,14 @@ class Game::EvonyTKR::General::Pair {
   use namespace::autoclean;
   # PODNAME: Game::EvonyTKR::General::Pair
   # ABSTRACT: Manage Game::EvonyTKR::Generals as Pairs
-  use overload 
+  use overload
     'eq'  => \&_equality,
     '=='  => \&_equality,
     'ne'  => \&_inequality,
     '!='  => \&_inequality;
 
 
-  # from Type::Registry, this will save me from some of the struggles I have had with some types having blessed references and others not. 
+  # from Type::Registry, this will save me from some of the struggles I have had with some types having blessed references and others not.
   ADJUST {
     if(!(t->simple_lookup("Num"))) {
       t->add_types(
@@ -65,7 +65,7 @@ class Game::EvonyTKR::General::Pair {
     }
     return 0;
   }
-  
+
   method _inequality($other, $swap = 0) {
     if(blessed $other eq Game::EvonyTKR::General::Pair) {
       if($self->primary() eq $other->primary()) {

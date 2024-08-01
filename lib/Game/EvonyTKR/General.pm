@@ -5,13 +5,13 @@ class Game::EvonyTKR::General {
   use Carp;
   use Class::ISA;
   use Types::Common qw( t is_Num is_Str is_Int);
-  use Type::Utils "is"; 
+  use Type::Utils "is";
   use Util::Any -all;
   use Game::EvonyTKR::SkillBook::Special;
   use Game::EvonyTKR::Buff::EvaluationMultipliers;
   use namespace::autoclean;
 # PODNAME: Game::EvonyTKR::General
-use overload 
+use overload
     '<=>' => \&_comparison,
     'cmp' => \&_comparison,
     'eq'  => \&_equality,
@@ -24,13 +24,13 @@ use overload
 =head1 DESCRIPTION
 
 Generals in Evony TKR are one of the more complicated and simultaneously
-most frequently changing things that a player must make decisions about.  
+most frequently changing things that a player must make decisions about.
 
-This base class implements the attributes and methods common to all Generals, but should not be used directly.  Rather sub classes should be created for each of the crtical use cases in the game.  If the decision of which general to use does not require customized logic, it almost certainly is not critical enough to need particular consideration here either.  
+This base class implements the attributes and methods common to all Generals, but should not be used directly.  Rather sub classes should be created for each of the crtical use cases in the game.  If the decision of which general to use does not require customized logic, it almost certainly is not critical enough to need particular consideration here either.
 
-=cut 
+=cut
 
-  # from Type::Registry, this will save me from some of the struggles I have had with some types having blessed references and others not. 
+  # from Type::Registry, this will save me from some of the struggles I have had with some types having blessed references and others not.
   ADJUST {
     if(!(t->simple_lookup("Num"))) {
       t->add_types(
@@ -50,12 +50,12 @@ the general's name, which will also be the key by which we find the general.
     is_Str($name) or push @errors => "name must be a string, not $name";
     if (@errors) {
       die join ', ' => @errors;
-    } 
+    }
   }
 
 =attr leadership
 
-this is the base value for leadership, one of the four basic attributes of a general. 
+this is the base value for leadership, one of the four basic attributes of a general.
 =cut
   field $leadership :reader :param;
 
@@ -67,11 +67,11 @@ this is the base value for leadership, one of the four basic attributes of a gen
     if (@errors) {
       die join ', ' => @errors;
     }
-  } 
+  }
 
 =attr leadership_increment
 
-by how much does the effective value of leadership (as opposed to its base value) increase with each level gained? 
+by how much does the effective value of leadership (as opposed to its base value) increase with each level gained?
 =cut
   field $leadership_increment :reader :param;
 
@@ -87,7 +87,7 @@ by how much does the effective value of leadership (as opposed to its base value
 
 =attr attack
 
-this is the base value for attack, one of the four basic attributes of a general. 
+this is the base value for attack, one of the four basic attributes of a general.
 =cut
   field $attack :reader :param;
 
@@ -99,11 +99,11 @@ this is the base value for attack, one of the four basic attributes of a general
     if (@errors) {
       die join ', ' => @errors;
     }
-  } 
+  }
 
 =attr attack_increment
 
-by how much does the effective value of attack (as opposed to its base value) increase with each level gained? 
+by how much does the effective value of attack (as opposed to its base value) increase with each level gained?
 =cut
   field $attack_increment :reader :param;
 
@@ -119,7 +119,7 @@ by how much does the effective value of attack (as opposed to its base value) in
 
 =attr defense
 
-this is the base value for defense, one of the four basic attributes of a general. 
+this is the base value for defense, one of the four basic attributes of a general.
 =cut
   field $defense :reader :param;
 
@@ -131,11 +131,11 @@ this is the base value for defense, one of the four basic attributes of a genera
     if (@errors) {
       die join ', ' => @errors;
     }
-  } 
+  }
 
 =attr defense_increment
 
-by how much does the effective value of defense (as opposed to its base value) increase with each level gained? 
+by how much does the effective value of defense (as opposed to its base value) increase with each level gained?
 =cut
   field $defense_increment :reader :param;
 
@@ -151,7 +151,7 @@ by how much does the effective value of defense (as opposed to its base value) i
 
 =attr politics
 
-this is the base value for politics, one of the four basic attributes of a general. 
+this is the base value for politics, one of the four basic attributes of a general.
 =cut
   field $politics :reader :param;
 
@@ -163,11 +163,11 @@ this is the base value for politics, one of the four basic attributes of a gener
     if (@errors) {
       die join ', ' => @errors;
     }
-  } 
+  }
 
 =attr politics_increment
 
-by how much does the effective value of politics (as opposed to its base value) increase with each level gained? 
+by how much does the effective value of politics (as opposed to its base value) increase with each level gained?
 =cut
   field $politics_increment :reader :param;
 
@@ -183,7 +183,7 @@ by how much does the effective value of politics (as opposed to its base value) 
 
 =attr level
 
-generals start at level 1 and can grow to level 45.  Thier effective statistics increase as they do so by the increments listed in the _increment versions of each attribute. 
+generals start at level 1 and can grow to level 45.  Thier effective statistics increase as they do so by the increments listed in the _increment versions of each attribute.
 =cut
   field $level :reader :param //= 45;
 
@@ -234,7 +234,7 @@ returns the value that a user of this general at this investment level will expe
 
 =attr builtInBook
 
-each general comes with one Game::EvonyTKR::SkillBook built in.  This will be an instance of the ::Special variety of SkillBook. 
+each general comes with one Game::EvonyTKR::SkillBook built in.  This will be an instance of the ::Special variety of SkillBook.
 =cut
   field $builtInBook :reader :param;
 
@@ -250,7 +250,7 @@ each general comes with one Game::EvonyTKR::SkillBook built in.  This will be an
   }
 
   use constant DEFAULT_BUFF_MULTIPLIERS => Game::EvonyTKR::Buff::EvaluationMultipliers->new();
-  
+
 =attr BuffMultipliers
 
 when evaluating generals, not all buffs are equally important.  Nor are these scaling factors constant across the game, but rather differ both by type of general and by situation.  Tihs contains the scaling factors for this general.
@@ -312,9 +312,9 @@ This simply compares on the General's name.  I can envison doing something based
 =method eq
 
 This simply compares on the General's name.  If the names are the same, then the user of the class ought not
-create a second General with different attributes. 
+create a second General with different attributes.
 =cut
-  method _equality ($other, $swap = 0) { 
+  method _equality ($other, $swap = 0) {
     my $otherClass = blessed $other;
     my @classList = Class::ISA::self_and_super_path($otherClass);
     if(none {$_ eq 'Game::EvonyTKR::General'} @classList) {
@@ -325,9 +325,9 @@ create a second General with different attributes.
 
 =method ne
 
-This simply compares on the General's name.  It is a strict inverse of the _equality, for convience. 
+This simply compares on the General's name.  It is a strict inverse of the _equality, for convience.
 =cut
-  method _inequality ($other, $swap = 0) { 
+  method _inequality ($other, $swap = 0) {
     my $otherClass = blessed $other;
     my @classList = Class::ISA::self_and_super_path($otherClass);
     if(none {$_ eq 'Game::EvonyTKR::General'} @classList) {

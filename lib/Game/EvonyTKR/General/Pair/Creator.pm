@@ -8,12 +8,12 @@ class Game::EvonyTKR::General::Pair::Creator {
   use Clone 'clone';
   use Class::ISA;
   use Types::Common qw( t is_Num is_Str is_Int);
-  use Type::Utils "is"; 
+  use Type::Utils "is";
   use File::ShareDir ':ALL';
   use File::HomeDir;
   use File::Spec;
   use File::Path qw(make_path);
-  use DBM::Deep; 
+  use DBM::Deep;
   use Data::Dumper;
   use Hash::Map;
   use YAML::PP::LibYAML;
@@ -23,7 +23,7 @@ class Game::EvonyTKR::General::Pair::Creator {
   use Game::EvonyTKR::Buff::EvaluationMultipliers;
   use namespace::autoclean;
 
-  my $debug = 1;  
+  my $debug = 1;
 
   my $distData = File::HomeDir->my_dist_data( 'Game-Evony', { create => 1 } );
   my $dbPath = File::Spec->catfile($distData, "db");
@@ -43,10 +43,10 @@ class Game::EvonyTKR::General::Pair::Creator {
   }
 
 
-  field %generals :reader; 
+  field %generals :reader;
 
   method set_generals( %ng ) {
-    
+
     if(scalar %ng >= 1) {
       if($debug) {
         say "hashRef is " . \%ng;
@@ -58,11 +58,11 @@ class Game::EvonyTKR::General::Pair::Creator {
 
 =method getPairs()
 
-this method presupposes that set_generals has already been called. It returns 
-an array of Generals that do not conflict. 
+this method presupposes that set_generals has already been called. It returns
+an array of Generals that do not conflict.
 If there are insufficient generals to make pairs, it returns 0 (false).
 
-This assumes that the Generals are hashed by their names.  
+This assumes that the Generals are hashed by their names.
 =cut
   method getPairs() {
     if(scalar %generals >= 2 ) {
@@ -75,8 +75,8 @@ This assumes that the Generals are hashed by their names.
       my $sg1 = Hash::Map->new();
       my $sg2 = $sg1->clone_source();
       $sg1->set_source(%generals);
-      while ( my ($key1, $value1) = $sg1->each_source ) { 
-        while ( my ($key2, $value2) = $sg2->each_source ) { 
+      while ( my ($key1, $value1) = $sg1->each_source ) {
+        while ( my ($key2, $value2) = $sg2->each_source ) {
           if($value1->name() ne $value2->name()) {
             if($value1->is_ground_general() and $value2->is_ground_general()){
             }
@@ -89,17 +89,17 @@ This assumes that the Generals are hashed by their names.
 
 =method getConflictData()
 
-I am including this here for now at least because I am honestly unsure where to put it. 
-Conflict data needs to be read in somewhere, and is really only useful when *creating* pairs. 
+I am including this here for now at least because I am honestly unsure where to put it.
+Conflict data needs to be read in somewhere, and is really only useful when *creating* pairs.
 Once the pairs exist, you no longer need to know if generals conflict - you have your pairs.
-Attempting to pair generals on the fly is generally massively inefficient. 
+Attempting to pair generals on the fly is generally massively inefficient.
 =cut
 
   method getConflictData() {
     my $yp = YAML::PP::LibYAML->new();
 
     my $data_location = File::Spec->catfile(
-        dist_dir('Game-EvonyTKR'), 
+        dist_dir('Game-EvonyTKR'),
         'generalConflictGroups'
       );
     while (my $file = glob(File::Spec->catfile($data_location,'*.yaml'))) {
@@ -133,7 +133,7 @@ Attempting to pair generals on the fly is generally massively inefficient.
       my @books;
       if(exists $conflictGroup->{'books'}) {
          @books = (@{$conflictGroup->{'books'}});
-      } 
+      }
 
       if($debug >= 3) {
         print "members are: ";
@@ -145,7 +145,7 @@ Attempting to pair generals on the fly is generally massively inefficient.
       if(scalar @members >= 1) {
         foreach (@members) {
           my $entryName = $_;
-          
+
           unless(grep {
             $entryName eq $_
             } @{$db->get($groupName)->get('members')}
@@ -158,7 +158,7 @@ Attempting to pair generals on the fly is generally massively inefficient.
           $db->get($entryName)->put('conflicts', [
             ($conflictGroup->{'name'}, )
           ]);
-          
+
           if(scalar @others >= 1){
             foreach(@others) {
               my $other = $_;
@@ -189,8 +189,8 @@ Attempting to pair generals on the fly is generally massively inefficient.
               my $newName = $entryRef->{'book1'}->{'name'};
               my $newLevel = $entryRef->{'book1'}->{'level'};
               if(
-                defined $newName && 
-                length($newName) > 1 && 
+                defined $newName &&
+                length($newName) > 1 &&
                 defined $newLevel &&
                 1 <= $newLevel <= 4
               ) {
@@ -203,14 +203,14 @@ Attempting to pair generals on the fly is generally massively inefficient.
                   push @{$db->get($entryName)->get('conflictingBooks')}, $sb ;
                 }
               }
-              
+
             }
           }
         }
       } else {
         croak "no members in the list for '$file'";
       }
-      
+
       if($debug) {
         say "end of $file";
       }
@@ -226,27 +226,27 @@ __END__
 
 =head1 DESCRIPTION
 
-takes a hash of Game::EvonyTKR::General class objects and creates Game::EvonyTKR::General::Pair class objects. 
+takes a hash of Game::EvonyTKR::General class objects and creates Game::EvonyTKR::General::Pair class objects.
 
 =head2 Conflict Database
 
 This creates a database of conflict information for the overall distribution.  In doing so, I faced several constraints.
 
-=for :list 
+=for :list
 
 * L<A general might conflict with a SkillBook::Standard level 1 but not a SkillBook::Standard level 4 of the same name>
 
 * L<While in general my ratings are based on the excelent work done by EvonyAnswers, as new Generals come out, the contents of each conflict group frequently change.>
 
-I do not want to have to deal with finding and moving generals within the existing database from one group to another when a new general causes all the groups to shift around.  It is actually much easier to maintain effectively a unique group per general, *except* when you have to update that many yaml files by hand just to add one name to the conflicts for each general.  It is then that the groups are convient.  But in practice, whenever I've tried to *parse* the groups in code, it gets really inefficient really fast, because I have to iterate all groups to find which one contains the general I want as a primary member, then compute his/her conflicts from there.  
+I do not want to have to deal with finding and moving generals within the existing database from one group to another when a new general causes all the groups to shift around.  It is actually much easier to maintain effectively a unique group per general, *except* when you have to update that many yaml files by hand just to add one name to the conflicts for each general.  It is then that the groups are convient.  But in practice, whenever I've tried to *parse* the groups in code, it gets really inefficient really fast, because I have to iterate all groups to find which one contains the general I want as a primary member, then compute his/her conflicts from there.
 
-This way, I can simply look up the general's conflicts with the chained ->get() operators on the database.  Its incredibly efficient from an information retrivial standpoint, which is what the library needs to do most of the time.  This creator class thus attempts to bridge the gap.  I can maintain yaml files by EvonyAnswers groups, but will create the database hashed by individual general for processing.  
+This way, I can simply look up the general's conflicts with the chained ->get() operators on the database.  Its incredibly efficient from an information retrivial standpoint, which is what the library needs to do most of the time.  This creator class thus attempts to bridge the gap.  I can maintain yaml files by EvonyAnswers groups, but will create the database hashed by individual general for processing.
 
-This does mean when EvonyAnswers inevitiably rejiggers the groups, I still have to shift all those yaml files around, so a future optimization will be to change hte "others" section to a series of references to other groups. This will reduce the number of edits hugely. 
+This does mean when EvonyAnswers inevitiably rejiggers the groups, I still have to shift all those yaml files around, so a future optimization will be to change hte "others" section to a series of references to other groups. This will reduce the number of edits hugely.
 
 =cut
 
 =attr generals
 
-a hash of the generals to pair, using the name of the generals as the key. 
+a hash of the generals to pair, using the name of the generals as the key.
 =cut

@@ -4,13 +4,13 @@ use experimental qw(class);
 class Game::EvonyTKR::Buff::EvaluationMultipliers {
   use Carp;
   use Types::Common qw( t is_Num is_Str is_Int);
-  use Type::Utils "is"; 
+  use Type::Utils "is";
   use namespace::autoclean;
 # PODNAME: Game::EvonyTKR::Buff::EvaluationMultipliers
 
 # ABSTRACT: Module for processing information about Evony TKR Generals.
 
-  # from Type::Registry, this will save me from some of the struggles I have had with some types having blessed references and others not. 
+  # from Type::Registry, this will save me from some of the struggles I have had with some types having blessed references and others not.
   ADJUST {
     if(!(t->simple_lookup("Num"))) {
       t->add_types(
@@ -18,12 +18,12 @@ class Game::EvonyTKR::Buff::EvaluationMultipliers {
       );
     }
   }
-  
+
 
 =attr GenericAttack
- 
-the Attack Buff with no conditions or class attribute. 
-=cut 
+
+the Attack Buff with no conditions or class attribute.
+=cut
   field $GenericAttack :reader :param //= 2.14833;
 
   ADJUST {
@@ -38,10 +38,10 @@ the Attack Buff with no conditions or class attribute.
   }
 
 =attr GroundAttack
- 
-the Attack Buff with no conditions but with Ground Class attribute. 
-=cut 
-  
+
+the Attack Buff with no conditions but with Ground Class attribute.
+=cut
+
   field $GroundAttack :reader :param //= 0.11111;
 
   ADJUST {
@@ -56,9 +56,9 @@ the Attack Buff with no conditions but with Ground Class attribute.
   }
 
 =attr MountedAttack
- 
-the Attack Buff with no conditions but with Mounted Class attribute. 
-=cut 
+
+the Attack Buff with no conditions but with Mounted Class attribute.
+=cut
 
   field $MountedAttack :reader :param //= 0.11111;
 
@@ -74,9 +74,9 @@ the Attack Buff with no conditions but with Mounted Class attribute.
   }
 
 =attr RangedAttack
- 
-the Attack Buff with no conditions but with Ranged Class attribute. 
-=cut 
+
+the Attack Buff with no conditions but with Ranged Class attribute.
+=cut
 
   field $RangedAttack :reader :param //= 0.11111;
 
@@ -92,9 +92,9 @@ the Attack Buff with no conditions but with Ranged Class attribute.
   }
 
 =attr SiegeAttack
- 
-the Attack Buff with no conditions but with Siege Class attribute. 
-=cut 
+
+the Attack Buff with no conditions but with Siege Class attribute.
+=cut
 
   field $SiegeAttack :reader :param //= 0.11111;
 
@@ -110,9 +110,9 @@ the Attack Buff with no conditions but with Siege Class attribute.
   }
 
 =attr GenericDefense
- 
-the Defense Buff with no conditions or class attribute. 
-=cut 
+
+the Defense Buff with no conditions or class attribute.
+=cut
   field $GenericDefense :reader :param //= 1.55391;
 
   ADJUST {
@@ -127,10 +127,10 @@ the Defense Buff with no conditions or class attribute.
   }
 
 =attr GroundDefense
- 
-the Defense Buff with no conditions but with Ground Class attribute. 
-=cut 
-  
+
+the Defense Buff with no conditions but with Ground Class attribute.
+=cut
+
   field $GroundDefense :reader :param //= 0.16667;
 
   ADJUST {
@@ -145,9 +145,9 @@ the Defense Buff with no conditions but with Ground Class attribute.
   }
 
 =attr MountedDefense
- 
-the Defense Buff with no conditions but with Mounted Class attribute. 
-=cut 
+
+the Defense Buff with no conditions but with Mounted Class attribute.
+=cut
 
   field $MountedDefense :reader :param //= 0.16667;
 
@@ -163,9 +163,9 @@ the Defense Buff with no conditions but with Mounted Class attribute.
   }
 
 =attr RangedDefense
- 
-the Defense Buff with no conditions but with Ranged Class attribute. 
-=cut 
+
+the Defense Buff with no conditions but with Ranged Class attribute.
+=cut
 
   field $RangedDefense :reader :param //= 0.16667;
 
@@ -181,9 +181,9 @@ the Defense Buff with no conditions but with Ranged Class attribute.
   }
 
 =attr SiegeDefense
- 
-the Defense Buff with no conditions but with Siege Class attribute. 
-=cut 
+
+the Defense Buff with no conditions but with Siege Class attribute.
+=cut
 
   field $SiegeDefense :reader :param //= 0.16667;
 
@@ -199,9 +199,9 @@ the Defense Buff with no conditions but with Siege Class attribute.
   }
 
 =attr GenericHP
- 
-the HP Buff with no conditions or class attribute. 
-=cut 
+
+the HP Buff with no conditions or class attribute.
+=cut
   field $GenericHP :reader :param //= 1.67101;
 
   ADJUST {
@@ -216,10 +216,10 @@ the HP Buff with no conditions or class attribute.
   }
 
 =attr GroundHP
- 
-the HP Buff with no conditions but with Ground Class attribute. 
-=cut 
-  
+
+the HP Buff with no conditions but with Ground Class attribute.
+=cut
+
   field $GroundHP :reader :param //= 0.16667;
 
   ADJUST {
@@ -234,9 +234,9 @@ the HP Buff with no conditions but with Ground Class attribute.
   }
 
 =attr MountedHP
- 
-the HP Buff with no conditions but with Mounted Class attribute. 
-=cut 
+
+the HP Buff with no conditions but with Mounted Class attribute.
+=cut
 
   field $MountedHP :reader :param //= 0.16667;
 
@@ -252,9 +252,9 @@ the HP Buff with no conditions but with Mounted Class attribute.
   }
 
 =attr RangedHP
- 
-the HP Buff with no conditions but with Ranged Class attribute. 
-=cut 
+
+the HP Buff with no conditions but with Ranged Class attribute.
+=cut
 
   field $RangedHP :reader :param //= 0.16667;
 
@@ -270,9 +270,9 @@ the HP Buff with no conditions but with Ranged Class attribute.
   }
 
 =attr SiegeHP
- 
-the HP Buff with no conditions but with Siege Class attribute. 
-=cut 
+
+the HP Buff with no conditions but with Siege Class attribute.
+=cut
 
   field $SiegeHP :reader :param //= 0.16667;
 
@@ -287,11 +287,11 @@ the HP Buff with no conditions but with Siege Class attribute.
     }
   }
 
-=attr GroundSpeed 
+=attr GroundSpeed
 
-the Ground (In-Battle Movement) Speed Buff with no conditions. 
-This defaults to zero because we do not know the troop type yet. 
-=cut 
+the Ground (In-Battle Movement) Speed Buff with no conditions.
+This defaults to zero because we do not know the troop type yet.
+=cut
 
   field $GroundSpeed :reader :param //= 0;
 
@@ -306,11 +306,11 @@ This defaults to zero because we do not know the troop type yet.
     }
   }
 
-=attr MountedSpeed 
+=attr MountedSpeed
 
-the Mounted (In-Battle Movement) Speed Buff with no conditions. 
-This defaults to zero because we do not know the troop type yet. 
-=cut 
+the Mounted (In-Battle Movement) Speed Buff with no conditions.
+This defaults to zero because we do not know the troop type yet.
+=cut
 
   field $MountedSpeed :reader :param //= 0;
 
@@ -325,10 +325,10 @@ This defaults to zero because we do not know the troop type yet.
     }
   }
 
-=attr MarchSizeIncrease 
+=attr MarchSizeIncrease
 
-the March Size Increase Buff with no conditions. 
-=cut 
+the March Size Increase Buff with no conditions.
+=cut
 
   field $MarchSizeIncrease :reader :param //= 2.66667;
 
@@ -343,10 +343,10 @@ the March Size Increase Buff with no conditions.
     }
   }
 
-=attr RallySizeIncrease 
+=attr RallySizeIncrease
 
-the Rally Size Increase Buff with no conditions. 
-=cut 
+the Rally Size Increase Buff with no conditions.
+=cut
 
   field $RallySizeIncrease :reader :param //= 0.50000;
 
@@ -361,11 +361,11 @@ the Rally Size Increase Buff with no conditions.
     }
   }
 
-=attr RangedRangeIncrease 
+=attr RangedRangeIncrease
 
 The Ranged Range Increase Buff with no conditions (in other words, how far away can a ranged troop hit something).
-This defaults to zero because we do not know the troop type yet. 
-=cut 
+This defaults to zero because we do not know the troop type yet.
+=cut
 
   field $RangedRangeIncrease :reader :param //= 0;
 
@@ -380,13 +380,13 @@ This defaults to zero because we do not know the troop type yet.
     }
   }
 
-=attr FlatSiegeRangeIncrease 
+=attr FlatSiegeRangeIncrease
 
 There are two versions of this buff, this one is for flat increases.
-The Flat Siege Range Increase Buff with no conditions (in other words, how far away can a Siege Machine hit something).  
-This defaults to zero because we do not know the troop type yet. 
+The Flat Siege Range Increase Buff with no conditions (in other words, how far away can a Siege Machine hit something).
+This defaults to zero because we do not know the troop type yet.
 
-=cut 
+=cut
 
   field $FlatSiegeRangeIncrease :reader :param //= 0;
 
@@ -401,13 +401,13 @@ This defaults to zero because we do not know the troop type yet.
     }
   }
 
-=attr SiegeRangeIncrease 
+=attr SiegeRangeIncrease
 
 There are two versions of this buff, this one is for percentage increases.
 The Siege Range Increase Buff with no conditions (in other words, how far away can a Siege Machine hit something).
-This defaults to zero because we do not know the troop type yet. 
+This defaults to zero because we do not know the troop type yet.
 
-=cut 
+=cut
 
   field $SiegeRangeIncrease :reader :param //= 0;
 
@@ -423,13 +423,13 @@ This defaults to zero because we do not know the troop type yet.
   }
 
 
-=attr Death2Wounded 
+=attr Death2Wounded
 
-the Troop Death into Wounded Buff with no conditions. 
+the Troop Death into Wounded Buff with no conditions.
 The original at EvonyAnswers splits this into two, one for when there is
-an "Attacking" condition, and one with twice the value when there isn't. 
-I am using the value from the "Attacking" version, because you will not actually get twice the value of the other in any _single_ senario, he values it more becuase it is used in more situations.  I am handling that with subclasses instead. 
-=cut 
+an "Attacking" condition, and one with twice the value when there isn't.
+I am using the value from the "Attacking" version, because you will not actually get twice the value of the other in any _single_ senario, he values it more becuase it is used in more situations.  I am handling that with subclasses instead.
+=cut
 
   field $Death2Wounded :reader :param //= 0.12555;
 
@@ -444,10 +444,10 @@ I am using the value from the "Attacking" version, because you will not actually
     }
   }
 
-=attr Death2Souls 
+=attr Death2Souls
 
-the Troop Death into Souls Buff with no conditions. 
-=cut 
+the Troop Death into Souls Buff with no conditions.
+=cut
 
   field $Death2Souls :reader :param //= 0.12555;
 
@@ -463,12 +463,12 @@ the Troop Death into Souls Buff with no conditions.
   }
 
 
-=head3 Debuffs 
+=head3 Debuffs
 
 =attr GenericAttackDebuff
- 
-the AttackDebuff with no conditions or class attribute. 
-=cut 
+
+the AttackDebuff with no conditions or class attribute.
+=cut
   field $GenericAttackDebuff :reader :param //= 0.1;
 
   ADJUST {
@@ -483,10 +483,10 @@ the AttackDebuff with no conditions or class attribute.
   }
 
 =attr GroundAttackDebuff
- 
-the AttackDebuff with no conditions but with Ground Class attribute. 
-=cut 
-  
+
+the AttackDebuff with no conditions but with Ground Class attribute.
+=cut
+
   field $GroundAttackDebuff :reader :param //= 0.1;
 
   ADJUST {
@@ -501,9 +501,9 @@ the AttackDebuff with no conditions but with Ground Class attribute.
   }
 
 =attr MountedAttackDebuff
- 
-the AttackDebuff with no conditions but with Mounted Class attribute. 
-=cut 
+
+the AttackDebuff with no conditions but with Mounted Class attribute.
+=cut
 
   field $MountedAttackDebuff :reader :param //= 0.1;
 
@@ -519,9 +519,9 @@ the AttackDebuff with no conditions but with Mounted Class attribute.
   }
 
 =attr RangedAttackDebuff
- 
-the AttackDebuffDebuff with no conditions but with Ranged Class attribute. 
-=cut 
+
+the AttackDebuffDebuff with no conditions but with Ranged Class attribute.
+=cut
 
   field $RangedAttackDebuff :reader :param //= 0.1;
 
@@ -537,9 +537,9 @@ the AttackDebuffDebuff with no conditions but with Ranged Class attribute.
   }
 
 =attr SiegeAttackDebuff
- 
-the AttackDebuffDebuff with no conditions but with Siege Class attribute. 
-=cut 
+
+the AttackDebuffDebuff with no conditions but with Siege Class attribute.
+=cut
 
   field $SiegeAttackDebuff :reader :param //= 0.1;
 
@@ -555,9 +555,9 @@ the AttackDebuffDebuff with no conditions but with Siege Class attribute.
   }
 
 =attr GenericDefenseDebuff
- 
-the DefenseDebuff with no conditions or class attribute. 
-=cut 
+
+the DefenseDebuff with no conditions or class attribute.
+=cut
   field $GenericDefenseDebuff :reader :param //= 0.1;
 
   ADJUST {
@@ -572,10 +572,10 @@ the DefenseDebuff with no conditions or class attribute.
   }
 
 =attr GroundDefenseDebuff
- 
-the DefenseDebuff with no conditions but with Ground Class attribute. 
-=cut 
-  
+
+the DefenseDebuff with no conditions but with Ground Class attribute.
+=cut
+
   field $GroundDefenseDebuff :reader :param //= 0.1;
 
   ADJUST {
@@ -590,9 +590,9 @@ the DefenseDebuff with no conditions but with Ground Class attribute.
   }
 
 =attr MountedDefenseDebuff
- 
-the DefenseDebuff with no conditions but with Mounted Class attribute. 
-=cut 
+
+the DefenseDebuff with no conditions but with Mounted Class attribute.
+=cut
 
   field $MountedDefenseDebuff :reader :param //= 0.1;
 
@@ -608,9 +608,9 @@ the DefenseDebuff with no conditions but with Mounted Class attribute.
   }
 
 =attr RangedDefenseDebuff
- 
-the DefenseDebuff with no conditions but with Ranged Class attribute. 
-=cut 
+
+the DefenseDebuff with no conditions but with Ranged Class attribute.
+=cut
 
   field $RangedDefenseDebuff :reader :param //= 0.1;
 
@@ -626,9 +626,9 @@ the DefenseDebuff with no conditions but with Ranged Class attribute.
   }
 
 =attr SiegeDefenseDebuff
- 
-the DefenseDebuff with no conditions but with Siege Class attribute. 
-=cut 
+
+the DefenseDebuff with no conditions but with Siege Class attribute.
+=cut
 
   field $SiegeDefenseDebuff :reader :param //= 0.1;
 
@@ -644,9 +644,9 @@ the DefenseDebuff with no conditions but with Siege Class attribute.
   }
 
 =attr GenericHPDebuff
- 
-the HPDebuff with no conditions or class attribute. 
-=cut 
+
+the HPDebuff with no conditions or class attribute.
+=cut
   field $GenericHPDebuff :reader :param //= 0.1;
 
   ADJUST {
@@ -661,10 +661,10 @@ the HPDebuff with no conditions or class attribute.
   }
 
 =attr GroundHPDebuff
- 
-the HPDebuff with no conditions but with Ground Class attribute. 
-=cut 
-  
+
+the HPDebuff with no conditions but with Ground Class attribute.
+=cut
+
   field $GroundHPDebuff :reader :param //= 0.1;
 
   ADJUST {
@@ -679,9 +679,9 @@ the HPDebuff with no conditions but with Ground Class attribute.
   }
 
 =attr MountedHPDebuff
- 
-the HPDebuff with no conditions but with Mounted Class attribute. 
-=cut 
+
+the HPDebuff with no conditions but with Mounted Class attribute.
+=cut
 
   field $MountedHPDebuff :reader :param //= 0.1;
 
@@ -697,9 +697,9 @@ the HPDebuff with no conditions but with Mounted Class attribute.
   }
 
 =attr RangedHPDebuff
- 
-the HPDebuff with no conditions but with Ranged Class attribute. 
-=cut 
+
+the HPDebuff with no conditions but with Ranged Class attribute.
+=cut
 
   field $RangedHPDebuff :reader :param //= 0.1;
 
@@ -715,9 +715,9 @@ the HPDebuff with no conditions but with Ranged Class attribute.
   }
 
 =attr SiegeHPDebuff
- 
-the HPDebuff with no conditions but with Siege Class attribute. 
-=cut 
+
+the HPDebuff with no conditions but with Siege Class attribute.
+=cut
 
   field $SiegeHPDebuff :reader :param //= 0.1;
 
@@ -732,10 +732,10 @@ the HPDebuff with no conditions but with Siege Class attribute.
     }
   }
 
-=attr Death2WoundedDebuff 
+=attr Death2WoundedDebuff
 
-the Troop Death into Wounded Debuff with no conditions. 
-=cut 
+the Troop Death into Wounded Debuff with no conditions.
+=cut
 
   field $Death2WoundedDebuff :reader :param //= 0.1;
 
@@ -750,10 +750,10 @@ the Troop Death into Wounded Debuff with no conditions.
     }
   }
 
-=attr Death2SoulsDebuff 
+=attr Death2SoulsDebuff
 
-the Troop Death into Souls Debuff with no conditions. 
-=cut 
+the Troop Death into Souls Debuff with no conditions.
+=cut
 
   field $Death2SoulsDebuff :reader :param //= 0.1;
 
@@ -776,13 +776,13 @@ __END__
 
 For now a Game::EvonyTKR::General has-a (set of) Game::EvonyTKR::Buff::EvaluationMultipliers rather than :does Game::EvonyTKR::Buff:Evaluation which is what I wanted.  This design choice was forced because roles are not yet implemented in perl Corinna.
 
-This is intended as an abstract class, but again, those are not implemented in Corinna yet.  I'm not sure if this will save me time or cost me time as a result. 
+This is intended as an abstract class, but again, those are not implemented in Corinna yet.  I'm not sure if this will save me time or cost me time as a result.
 
 Default values come from https://www.evonyanswers.com/post/evony-answers-attribute-methodology-explanation as of 2024-07-18, except the
-defaults for the debuffs, which I do intend to use from that site, but cannot apply here, because they are totally custom per troop type to account for the 
+defaults for the debuffs, which I do intend to use from that site, but cannot apply here, because they are totally custom per troop type to account for the
 in-game biases between troops of different classes.
 
-This value has the generic versions, or what would happen if you had generals that had no conditions on their debuffs.  That is, the general does I<not> say any of 
+This value has the generic versions, or what would happen if you had generals that had no conditions on their debuffs.  That is, the general does I<not> say any of
 
 =for :list
 
@@ -792,13 +792,13 @@ This value has the generic versions, or what would happen if you had generals th
 
 * when the main defense general
 
-or any of the variety of other things that get read in as conditions by Game::EvonyTKR::Buff - except that it I<does> have entries for generic debuffs, with, as I said, bogus values. 
+or any of the variety of other things that get read in as conditions by Game::EvonyTKR::Buff - except that it I<does> have entries for generic debuffs, with, as I said, bogus values.
 
-While EvonyAnswers chose to organize this into Objects for Offensive, Toughness, Troop Preservation, and the corresponding Debuffs, I have gone with a flatter list to allow for greater flexibility as some of these do not apply at all to certain situations, and to take advantage of the currently limited state of perl Corinna. 
+While EvonyAnswers chose to organize this into Objects for Offensive, Toughness, Troop Preservation, and the corresponding Debuffs, I have gone with a flatter list to allow for greater flexibility as some of these do not apply at all to certain situations, and to take advantage of the currently limited state of perl Corinna.
 
-I recognize that the flat list of attributes is an anti-pattern, and that a hash is typically recommended, but with this pattern, I can take advantage of Corinna's built in type checking and method generation capabilities to the maximal extent currently implemented. 
+I recognize that the flat list of attributes is an anti-pattern, and that a hash is typically recommended, but with this pattern, I can take advantage of Corinna's built in type checking and method generation capabilities to the maximal extent currently implemented.
 
-=cut 
+=cut
 
 =method new()
 
