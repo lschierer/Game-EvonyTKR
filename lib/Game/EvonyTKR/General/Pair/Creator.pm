@@ -27,7 +27,7 @@ class Game::EvonyTKR::General::Pair::Creator {
   use Game::EvonyTKR::Buff::EvaluationMultipliers;
   use namespace::autoclean;
 
-  my $debug = 0;
+  my $debug = 1;
 
   my $distData = File::HomeDir->my_dist_data( 'Game-Evony', { create => 1 } );
   my $dbPath = File::Spec->catfile($distData, "db");
@@ -83,6 +83,12 @@ it will not consider conflicts.
           }
           if($value1->name() ne $value2->name()) {
             my @conflicts = $conflicData->getConflictsByName($value1->name());
+            if(scalar @conflicts >= 1) {
+              if( any { $_ =~ qr/$value2->name()/} @conflicts) {
+                say "found conflict between " . $value1->name() . " and " . $value2->name();
+                next;
+              }
+            }
             my $key = 'unknown';
             my @BuffClasses = $classData->BuffClasses();
             if($value1->is_ground_general() and $value2->is_ground_general()){
@@ -107,6 +113,7 @@ it will not consider conflicts.
             }
           }
         }
+        
       }
       return %pairs;
     }

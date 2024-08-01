@@ -10,12 +10,13 @@ class Game::EvonyTKR::General::Ranged :isa(Game::EvonyTKR::General) {
   use namespace::autoclean;
   use Game::EvonyTKR::General;
   use overload
-    '<=>' => \&_comparison,
-    'cmp' => \&_comparison,
-    'eq'  => \&_equality,
-    '=='  => \&_equality,
-    'ne'  => \&_inequality,
-    '!='  => \&_inequality;
+    '<=>'       => \&_comparison,
+    'cmp'       => \&_comparison,
+    'eq'        => \&_equality,
+    '=='        => \&_equality,
+    'ne'        => \&_inequality,
+    '!='        => \&_inequality,
+    "fallback"  => 1;
 # PODNAME: Game::EvonyTKR::General::Ranged
 
 # ABSTRACT: Module for processing information about Evony TKR Ranged Specialists.
