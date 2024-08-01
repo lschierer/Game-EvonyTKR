@@ -44,6 +44,8 @@ sub execute {
   } else {
     my %generals = read_generals();
     my $classData = Game::EvonyTKR::Buff::Data->new();
+    my $conflicData = Game::EvonyTKR::General::Conflicts->new();
+    $conflicData->initializeConflictDB();
     $classData->set_BuffClasses();
     my @BuffClasses = $classData->BuffClasses();
     if(scalar @BuffClasses == 0) {
@@ -53,7 +55,6 @@ sub execute {
     say scalar %generals;
     my $pairCreator = Game::EvonyTKR::General::Pair::Creator->new();
     $pairCreator->set_generals(%generals);
-    $pairCreator->getConflictData();
     my %pairs = $pairCreator->getPairs();
     
     for my $bc (@BuffClasses) {

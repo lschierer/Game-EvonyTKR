@@ -22,6 +22,7 @@ class Game::EvonyTKR::General::Pair::Creator {
   use Game::EvonyTKR::SkillBook::Special;
   use Game::EvonyTKR::SkillBook::Standard;
   use Game::EvonyTKR::Buff::Data;
+  use Game::EvonyTKR::General::Conflicts;
   use Game::EvonyTKR::General::Pair;
   use Game::EvonyTKR::Buff::EvaluationMultipliers;
   use namespace::autoclean;
@@ -33,26 +34,11 @@ class Game::EvonyTKR::General::Pair::Creator {
 
   # some constants
   field $classData = Game::EvonyTKR::Buff::Data->new();
+  field $conflicData = Game::EvonyTKR::General::Conflicts->new();
 
   ADJUST {
     $classData->set_BuffClasses();
   }
-
-  ADJUST {
-    if(! -r -w  -x -o -d $dbPath) {
-      make_path($dbPath,"0770");
-    }
-  }
-  my $db;
-  my $dbFile = File::Spec->catfile($dbPath, 'pairs.db');
-  ADJUST {
-    $db = DBM::Deep->new(
-    file      => $dbFile,
-    locking   => 1,
-    autoflush => 1,
-    );
-  }
-
 
   field %generals :reader;
 
@@ -75,7 +61,8 @@ If there are insufficient generals to make pairs, it returns 0 (false).
 
 This assumes that the Generals are hashed by their names.
 
-if getConflictData has not been called, it will not consider conflicts. 
+if conflicts have not been intialized in the Game::EvonyTKR::General::Conflicts class, 
+it will not consider conflicts. 
 =cut
   method getPairs() {
     if(scalar %generals >= 2 ) {
@@ -95,10 +82,7 @@ if getConflictData has not been called, it will not consider conflicts.
             say "testing $key2 against $key1";
           }
           if($value1->name() ne $value2->name()) {
-            my @conflicts = @{$db->get($value1->name())->get('conflicts') };
-            say "?????";
-            say p @conflicts;
-            say "?????";
+            my @conflicts = $conflicData->getConflictsByName($value1->name());
             my $key = 'unknown';
             my @BuffClasses = $classData->BuffClasses();
             if($value1->is_ground_general() and $value2->is_ground_general()){
@@ -127,136 +111,6 @@ if getConflictData has not been called, it will not consider conflicts.
       return %pairs;
     }
     croak "Cannot operate without generals."; 
-  }
-
-=method getConflictData()
-
-I am including this here for now at least because I am honestly unsure where to put it.
-Conflict data needs to be read in somewhere, and is really only useful when *creating* pairs.
-Once the pairs exist, you no longer need to know if generals conflict - you have your pairs.
-Attempting to pair generals on the fly is generally massively inefficient.
-=cut
-
-  method getConflictData() {
-    my $yp = YAML::PP::LibYAML->new();
-
-    my $data_location = File::Spec->catfile(
-        dist_dir('Game-EvonyTKR'),
-        'generalConflictGroups'
-      );
-    while (my $file = glob(File::Spec->catfile($data_location,'*.yaml'))) {
-      if ($debug) {
-        say $file;
-      }
-      my $conflictGroup = $yp->load_file($file);
-
-      if($debug) {
-        say 'start of ' . $file;
-        say p($conflictGroup);
-      }
-      if($debug >= 2 ) {
-        print "members are: ";
-        say p($conflictGroup->{'members'});
-      }
-      my $groupName = $conflictGroup->{'name'};
-      if($debug >= 2) {
-        print "name is: ";
-        say $groupName;
-      }
-      $db->put($groupName, {}) unless $db->get($groupName);
-      $db->get($groupName)->put('members', []) unless $db->get($groupName)->get('members');
-      $db->get($groupName)->put('others', []) unless $db->get($groupName)->get('others');
-
-      my @members = (@{$conflictGroup->{'members'}});
-      my @others;
-      if(exists $conflictGroup->{'others'}){
-        @others = (@{$conflictGroup->{'others'}});
-      }
-      my @books;
-      if(exists $conflictGroup->{'books'}) {
-         @books = (@{$conflictGroup->{'books'}});
-      }
-
-      if($debug >= 3) {
-        print "members are: ";
-        print p( @members);
-        print "there are ";
-        print scalar @members;
-        say " members in the list";
-      }
-      if(scalar @members >= 1) {
-        foreach (@members) {
-          my $entryName = $_;
-
-          unless(any {
-            $_ =~ qr/$entryName/
-            } @{$db->get($groupName)->get('members')}
-            ){
-            push @{$db->get($groupName)->get('members')}, $entryName;
-          }
-
-          $db->put($entryName, {}) unless $db->get($entryName);
-
-          $db->get($entryName)->put('conflicts', [
-            ($conflictGroup->{'name'}, )
-          ]);
-
-          if(scalar @others >= 1){
-            foreach(@others) {
-              my $other = $_;
-              unless(any {
-                 $_ =~ qr/$other/
-                } @{$db->get($groupName)->get('others')}
-                ){
-                  push @{$db->get($groupName)->get('others')}, $other;
-                }
-
-              unless(grep {
-                  $other eq $_
-                } @{$db->get($entryName)->get('conflicts')}
-                ){
-                  push @{$db->get($entryName)->get('conflicts')}, $other;
-                }
-            }
-          }
-
-          if($debug >=2) {
-            say "conflicts are: ";
-            say p( $db->get($entryName)->get('conflicts'));
-          }
-
-          if(scalar @books >= 1) {
-            foreach (@{$conflictGroup->{'books'}}) {
-              my $entryRef = $_;
-              my $newName = $entryRef->{'book1'}->{'name'};
-              my $newLevel = $entryRef->{'book1'}->{'level'};
-              if(
-                defined $newName &&
-                length($newName) > 1 &&
-                defined $newLevel &&
-                1 <= $newLevel <= 4
-              ) {
-                $db->get($entryName)->put('conflictingBooks', []) unless $db->get($entryName)->get('conflictingBooks');
-                my $sb = Game::EvonyTKR::SkillBook::Standard->new(
-                  name  => $entryRef->{'book1'}->{'name'},
-                  level => ,
-                );
-                unless(grep {$sb eq $_} @{$db->get($entryName)->get('conflictingBooks')}){
-                  push @{$db->get($entryName)->get('conflictingBooks')}, $sb ;
-                }
-              }
-
-            }
-          }
-        }
-      } else {
-        croak "no members in the list for '$file'";
-      }
-
-      if($debug) {
-        say "end of $file";
-      }
-    }
   }
 
 };
