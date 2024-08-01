@@ -1,7 +1,7 @@
 package TestsFor::Game::EvonyTKR::Buff::Value;
 use v5.40.0;
 
-use Test::Most; 
+use Test::Most;
 
 use Game::EvonyTKR::Buff::Value;
 

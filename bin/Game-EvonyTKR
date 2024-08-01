@@ -1,6 +1,6 @@
-#!/usr/bin/env perl 
+#!/usr/bin/env perl
 # PODNAME: Game::EvonyTKR
-# ABSTRACT: Run/Execute the library with defaults. 
+# ABSTRACT: Run/Execute the library with defaults.
 use v5.40.0;
 use strict;
 use warnings;
