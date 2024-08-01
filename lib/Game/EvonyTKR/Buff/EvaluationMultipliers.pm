@@ -10,34 +10,6 @@ class Game::EvonyTKR::Buff::EvaluationMultipliers {
 
 # ABSTRACT: Module for processing information about Evony TKR Generals.
 
-=head1 DESCRIPTION
-
-For now a Game::EvonyTKR::General has-a (set of) Game::EvonyTKR::Buff::EvaluationMultipliers rather than :does Game::EvonyTKR::Buff:Evaluation which is what I wanted.  This design choice was forced because roles are not yet implemented in perl Corinna.
-
-This is intended as an abstract class, but again, those are not implemented in Corinna yet.  I'm not sure if this will save me time or cost me time as a result. 
-
-Default values come from https://www.evonyanswers.com/post/evony-answers-attribute-methodology-explanation as of 2024-07-18, except the
-defaults for the debuffs, which I do intend to use from that site, but cannot apply here, because they are totally custom per troop type to account for the 
-in-game biases between troops of different classes.
-
-This value has the generic versions, or what would happen if you had generals that had no conditions on their debuffs.  That is, the general does I<not> say any of 
-
-=for :list
-
-* when attacking
-
-* when reinforcing
-
-* when the main defense general
-
-or any of the variety of other things that get read in as conditions by Game::EvonyTKR::Buff - except that it I<does> have entries for generic debuffs, with, as I said, bogus values. 
-
-While EvonyAnswers chose to organize this into Objects for Offensive, Toughness, Troop Preservation, and the corresponding Debuffs, I have gone with a flatter list to allow for greater flexibility as some of these do not apply at all to certain situations, and to take advantage of the currently limited state of perl Corinna. 
-
-I recognize that the flat list of attributes is an anti-pattern, and that a hash is typically recommended, but with this pattern, I can take advantage of Corinna's built in type checking and method generation capabilities to the maximal extent currently implemented. 
-
-=cut 
-
   # from Type::Registry, this will save me from some of the struggles I have had with some types having blessed references and others not. 
   ADJUST {
     if(!(t->simple_lookup("Num"))) {
@@ -797,3 +769,38 @@ the Troop Death into Souls Debuff with no conditions.
   }
 }
 1;
+
+__END__
+
+=head1 DESCRIPTION
+
+For now a Game::EvonyTKR::General has-a (set of) Game::EvonyTKR::Buff::EvaluationMultipliers rather than :does Game::EvonyTKR::Buff:Evaluation which is what I wanted.  This design choice was forced because roles are not yet implemented in perl Corinna.
+
+This is intended as an abstract class, but again, those are not implemented in Corinna yet.  I'm not sure if this will save me time or cost me time as a result. 
+
+Default values come from https://www.evonyanswers.com/post/evony-answers-attribute-methodology-explanation as of 2024-07-18, except the
+defaults for the debuffs, which I do intend to use from that site, but cannot apply here, because they are totally custom per troop type to account for the 
+in-game biases between troops of different classes.
+
+This value has the generic versions, or what would happen if you had generals that had no conditions on their debuffs.  That is, the general does I<not> say any of 
+
+=for :list
+
+* when attacking
+
+* when reinforcing
+
+* when the main defense general
+
+or any of the variety of other things that get read in as conditions by Game::EvonyTKR::Buff - except that it I<does> have entries for generic debuffs, with, as I said, bogus values. 
+
+While EvonyAnswers chose to organize this into Objects for Offensive, Toughness, Troop Preservation, and the corresponding Debuffs, I have gone with a flatter list to allow for greater flexibility as some of these do not apply at all to certain situations, and to take advantage of the currently limited state of perl Corinna. 
+
+I recognize that the flat list of attributes is an anti-pattern, and that a hash is typically recommended, but with this pattern, I can take advantage of Corinna's built in type checking and method generation capabilities to the maximal extent currently implemented. 
+
+=cut 
+
+=method new()
+
+auto generated constructor for this class
+=cut
