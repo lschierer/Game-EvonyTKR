@@ -6,4 +6,5 @@ MYMETA.*
 !META.json
 /.prove
 *.tdy
+.vscode
 
