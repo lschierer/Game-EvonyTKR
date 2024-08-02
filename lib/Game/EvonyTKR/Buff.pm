@@ -3,7 +3,7 @@ use experimental qw(class);
 use utf8::all;
 
 
-class Game::EvonyTKR::Buff {
+class Game::EvonyTKR::Buff :isa(Game::EvonyTKR::Logger) {
   use Game::EvonyTKR::Buff::Data;
   use Types::Standard qw(is_Int Int Str is_Str);
   use Types::Common::Numeric qw(PositiveOrZeroInt);
@@ -11,6 +11,7 @@ class Game::EvonyTKR::Buff {
   use Carp;
   use Class::ISA;
   use Util::Any -all;
+  use namespace::autoclean;
   use overload
     '<=>' => \&compare,
     'cmp' => \&compare,
@@ -18,21 +19,9 @@ class Game::EvonyTKR::Buff {
     '=='  => \&_equality,
     'ne'  => \&_inequality,
     '!='  => \&_inequality;
-  use namespace::autoclean;
 # PODNAME: Game::EvonyTKR::Buff
 
 # ABSTRACT: Buff and Debuff primatives
-
-=head1 DESCRIPTION
-
-A Buff is an attribute that modifies various attributes in Evony TKR
-
-Buffs can be positive or negative.  When negative, they are commonly referred to
-as "Debuffs," however the game internals make very little distinction between a positive and negative buff.
-
-Buffs are most commonly I<calculated> as if all buffs came from generals.  This is not true, buffs come from a variety of sources, and this module forms the primative for use in any of them.
-
-=cut
 
   my $classData = Game::EvonyTKR::Buff::Data->new();
   my @BuffAttributes;
@@ -60,6 +49,10 @@ Buffs are most commonly I<calculated> as if all buffs came from generals.  This 
 
   field $buffClass :reader :param  //= 'All Troops';
 
+  field @condition :reader ;
+
+  field $value :reader :param;
+
   ADJUST {
     if(scalar @BuffClasses == 0) {
       $classData->set_BuffClasses();
@@ -68,7 +61,7 @@ Buffs are most commonly I<calculated> as if all buffs came from generals.  This 
     if(scalar @BuffClasses == 0) {
       croak "no classes loaded";
     } elsif (! grep {/^$buffClass$/} @BuffClasses){
-      croak "$buffClass is an invalid class."
+      croak "$buffClass is an invalid class";
     }
   }
 
@@ -80,8 +73,6 @@ Buffs are most commonly I<calculated> as if all buffs came from generals.  This 
     }
     return 0;
   }
-
-  field @condition :reader ;
 
   method set_condition ($nc) {
     if(is_Str($nc)) {
@@ -108,18 +99,8 @@ Buffs are most commonly I<calculated> as if all buffs came from generals.  This 
     return 0;
   }
 
-  field $value :reader :param;
-
-=method compare($other, $swap)
-
-this function returns true if the $other is logically the same
-as this Game::EvonyTKR::Buff.  It is written with a particular style to aid in debugging it should I ever suspect I've done it wrong.  Rather than attempting to return immediately, I have written each test to store a unique negative value then I return false if my stored value has been set negative anywhere in the overall function.  This way, by setting $debug to a truthy value, the function will inform me via the "say" statement at the bottom which test determined the difference.   The function defaults to truthy.
-
-$swap is currently unused, but will eventually handle the case someone somehow calls the <=> operator backwards, which is apparently possible.
-=cut
-
   method compare($other, $swap = 0) {
-    my $debug = 0; #set to 1 to debug this function
+    
     my $code = 1;
     if(blessed $other ne 'Game::EvonyTKR::Buff') {
       $code = -1;
@@ -152,9 +133,7 @@ $swap is currently unused, but will eventually handle the case someone somehow c
         $code = -8;
       }
     }
-    if($debug) {
-      say $code;
-    }
+    $self->logger()->trace($code);
     return ($code > 0);
   }
 
@@ -197,4 +176,25 @@ $swap is currently unused, but will eventually handle the case someone somehow c
 }
 
 1;
+
+__END__
+
+=head1 DESCRIPTION
+
+A Buff is an attribute that modifies various attributes in Evony TKR
+
+Buffs can be positive or negative.  When negative, they are commonly referred to
+as "Debuffs," however the game internals make very little distinction between a positive and negative buff.
+
+Buffs are most commonly I<calculated> as if all buffs came from generals.  This is not true, buffs come from a variety of sources, and this module forms the primative for use in any of them.
+
+=cut
+
+=method compare($other, $swap)
+
+this function returns true if the $other is logically the same
+as this Game::EvonyTKR::Buff.  It is written with a particular style to aid in debugging it should I ever suspect I've done it wrong.  Rather than attempting to return immediately, I have written each test to store a unique negative value then I return false if my stored value has been set negative anywhere in the overall function.  This way, by setting $debug to a truthy value, the function will inform me via the "say" statement at the bottom which test determined the difference.   The function defaults to truthy.
+
+$swap is currently unused, but will eventually handle the case someone somehow calls the <=> operator backwards, which is apparently possible.
+=cut
 
