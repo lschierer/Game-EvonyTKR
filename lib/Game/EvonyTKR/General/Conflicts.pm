@@ -26,8 +26,6 @@ class Game::EvonyTKR::General::Conflicts :isa(Game::EvonyTKR::Logger) {
   use namespace::autoclean;
   use Game::EvonyTKR::Logger;
 
-  my $debug = 0;
-
   my $distData = File::HomeDir->my_dist_data( 'Game-Evony', { create => 1 } );
   my $dbPath = File::Spec->catfile($distData, "db");
 
@@ -64,7 +62,7 @@ returns the conflicts for a Game::EvonyTKR::General with name $name
     if(not defined $name or $name eq '') {
       croak "name must be defined, not '$name'";
     }
-    $self->logger()->info("start getConflictsByName for $name");
+    $self->logger()->trace("start getConflictsByName for $name");
     my @conflicts;
     if( $db->exists($name)) {
       if($db->get($name)->exists('conflicts')){
@@ -77,10 +75,8 @@ returns the conflicts for a Game::EvonyTKR::General with name $name
         }
       }
     } 
-    if($debug){
-      say scalar @conflicts;
-    }
-    $self->logger()->info('end getConflictsByName');
+    $self->logger()->info(scalar @conflicts . " conflicts for $name");
+    $self->logger()->trace('end getConflictsByName');
     return @conflicts;
   }
 
