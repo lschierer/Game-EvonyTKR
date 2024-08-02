@@ -2,7 +2,8 @@
 general:
   name: Mordred
   display: summary
-  score_as: Mounted
+  score_as:
+   - Mounted
   stars: '5red'
   leadership: 119
   leadership_increment: 8.91

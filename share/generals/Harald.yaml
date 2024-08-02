@@ -12,7 +12,8 @@ general:
   politics_increment: 8.64
   stars: '5red'
   level: '1'
-  score_as: Mayor
+  score_as:
+   - Mayor
   books:
     - King of the Vikings
   specialities:

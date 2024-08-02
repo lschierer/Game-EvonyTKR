@@ -12,7 +12,8 @@ general:
   politics_increment: 8.61
   stars: '5red'
   level: '1'
-  score_as: Mounted
+  score_as:
+   - Mounted
   books:
     - Conqueror at Sea
   specialities:

@@ -2,7 +2,8 @@
 general:
   name: Aurelian
   display: summary
-  score_as: Ground
+  score_as:
+   - Ground
   leadership: 118
   leadership_increment: 9.01
   attack: 120

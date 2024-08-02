@@ -2,7 +2,8 @@
 general:
   name: Poligenus
   display: summary
-  score_as: Mounted
+  score_as:
+   - Mounted
   attack: 121
   attack_increment: 9.04
   leadership: 111

@@ -12,7 +12,8 @@ general:
   politics_increment: 8.35
   stars: '5red'
   level: '1'
-  score_as: Siege
+  score_as:
+   - Siege
   books:
     - The King of Atlis
   specialities:

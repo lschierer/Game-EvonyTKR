@@ -2,7 +2,8 @@
 general:
   name: Zhao Yun
   display: summary
-  score_as: Mounted
+  score_as:
+   - Mounted
   leadership: 113
   leadership_increment: 8.95
   attack: 119

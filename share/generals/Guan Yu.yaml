@@ -12,7 +12,8 @@ general:
   politics_increment: 8.25
   stars: '5red'
   level: '1'
-  score_as: Ground
+  score_as:
+   - Ground
   books:
     - Saint of War
   specialities:

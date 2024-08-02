@@ -3,7 +3,8 @@ general:
   name: Ragnar
   level: '1'
   display: summary
-  score_as: Archers
+  score_as:
+   - Archers
   stars: '5red'
   leadership: 124
   leadership_increment: 8.88

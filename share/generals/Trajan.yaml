@@ -12,7 +12,8 @@ general:
   politics_increment: 8.34
   stars: '5red'
   level: '1'
-  score_as: Ground
+  score_as:
+   - Ground
   books:
     - Praetorian Guard
   specialities:
