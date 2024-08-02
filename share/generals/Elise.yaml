@@ -16,6 +16,8 @@ general:
   level: '1'
   books:
     - Dragon's Song
+  extra:
+    - Odyssey - Elise
   ascending: true
   specialities:
     - Ground Troop Assault

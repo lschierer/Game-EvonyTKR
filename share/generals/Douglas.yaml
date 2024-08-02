@@ -11,9 +11,10 @@ general:
   politics: 102
   politics_increment: 8.59
   stars: '5red'
-  level: '45'
   score_as:
    - Archers
+  extra:
+    - Odyssey - Douglas
   books:
     - Blessing of Siren
   specialities:
