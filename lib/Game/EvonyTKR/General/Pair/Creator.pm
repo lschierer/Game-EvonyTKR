@@ -76,14 +76,15 @@ it will not consider conflicts.
       
       while ( my ($key1, $value1) = $sg1->each_source ) {
         $self->logger()->info( "looking for pairs for $key1");
-        
+        my @conflicts = $conflicData->getConflictsByName($value1->name());
         while ( my ($key2, $value2) = $sg2->each_source ) {
           $self->logger()->debug("testing $key2 against $key1");
 
           if($value1->name() ne $value2->name()) {
-            my @conflicts = $conflicData->getConflictsByName($value1->name());
+            
             if(scalar @conflicts >= 1) {
-              if( any { $_ =~ qr/$value2->name()/} @conflicts) {
+              my $name2 = $value2->name();
+              if( any { $_ =~ qr/$name2/} @conflicts) {
                 $self->logger()->info("found conflict between " . $value1->name() . " and " . $value2->name());
                 next;
               }
