@@ -12,6 +12,7 @@ use File::HomeDir;
 use File::Path qw(make_path);
 use File::Touch;
 use YAML::XS qw{LoadFile Load};
+use Util::Any -all;
 use Devel::Peek;
 use Game::EvonyTKR::Logger;
 use Game::EvonyTKR::General::Pair::Creator;
@@ -135,26 +136,30 @@ sub read_generals($logger) {
         'Siege'   => 'Game::EvonyTKR::General::Siege',
       );
 
-      my $generalClassKey;
+      my @generalClassKey;
 
-      my $scoreType = $data->{'general'}->{'score_as'};
-
-      if ($scoreType =~ /Ground/) {
-        $generalClassKey = 'Ground';
-      } elsif ($scoreType =~ /Mounted/) {
-        $generalClassKey = 'Mounted';
-      } elsif ($scoreType =~ /Ranged/ || $scoreType =~ /Archers/) {
-        $generalClassKey = 'Ranged';
-      } elsif ($scoreType =~ /Siege/) {
-        $generalClassKey = 'Siege';
-      } elsif ($scoreType =~ /Mayor/) {
+      my @scoreType = @{ $data->{'general'}->{'score_as'} };
+      if (any {$_ =~ /Ground/ } @scoreType) {
+        push @generalClassKey => 'Ground';
+      } 
+      if (any {$_ =~ /Mounted/ } @scoreType) {
+        push @generalClassKey => 'Mounted';
+      } 
+      if (any {$_ =~ /Ranged/ or $_ =~ /Archers/ } @scoreType) {
+        push @generalClassKey => 'Ranged';
+      } 
+      if (any {$_ =~ /Siege/ } @scoreType) {
+        push @generalClassKey => 'Siege';
+      } 
+      if (any {$_ =~ /Mayor/ } @scoreType) {
         next;
       }
-      else {
-        croak $data->{'general'}->{'name'} . " is of unknown general type $_";
+      if (scalar @generalClassKey != scalar @scoreType) {
+        croak $data->{'general'}->{'name'} . " is of unknown general type " . p @scoreType;
       }
 
-      $generals{$name} = $generalClass{$generalClassKey}->new(
+      for (@generalClassKey){
+        $generals{$name} = $generalClass{$_}->new(
         name                  => $data->{'general'}->{'name'},
         leadership            => $data->{'general'}->{'leadership'},
         leadership_increment  => $data->{'general'}->{'leadership_increment'},
@@ -166,6 +171,9 @@ sub read_generals($logger) {
         politics_increment    => $data->{'general'}->{'politics_increment'},
         builtInBook           => $sb,
       );
+      $logger->debug("added ". np $generals{$name});
+      }
+    
     }
   }
   return %generals;
