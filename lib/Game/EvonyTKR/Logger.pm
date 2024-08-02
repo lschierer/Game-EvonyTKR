@@ -30,19 +30,18 @@ class Game::EvonyTKR::Logger {
   }
 
   method _logInit() {
-    my $conf = qq(
-      log4perl.rootLogger                 = DEBUG, logFile
+    my %conf = (
+      "log4perl.rootLogger"                 => "DEBUG, logFile",
 
-      log4perl.appender.logFile           = Log::Log4perl::Appender::File
-      log4perl.appender.logFile.utf8      = 1
-      log4perl.appender.logFile.filename  = $location
-      log4perl.appender.logFile.mode      = append
-      log4perl.appender.logFile.layout    = Log::Log4perl::Layout::PatternLayout
-      log4perl.appender.logFile.layout.ConversionPattern = [%p] (%C line %L) %m%n
-
+      "log4perl.appender.logFile"           => "Log::Log4perl::Appender::File",
+      "log4perl.appender.logFile.utf8"      => 1,
+      "log4perl.appender.logFile.filename"  => $location,
+      "log4perl.appender.logFile.mode"      => "append",
+      "log4perl.appender.logFile.layout"    => "Log::Log4perl::Layout::PatternLayout",
+      "log4perl.appender.logFile.layout.ConversionPattern" => "[%p] %d (%C line %L) %m%n",
     );
     # ... passed as a reference to init()
-    Log::Log4perl::init( \$conf );
+    Log::Log4perl::init( \%conf );
   }
 
   method _getLogfileName($name = 'system.log') {
