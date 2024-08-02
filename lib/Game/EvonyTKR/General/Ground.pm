@@ -5,7 +5,6 @@ class Game::EvonyTKR::General::Ground :isa(Game::EvonyTKR::General) {
   use Carp;
   use Types::Common qw( t is_Num is_Str is_Int);
   use Type::Utils "is";
-  use Class::ISA;
   use Util::Any -all;
   use namespace::autoclean;
   use Game::EvonyTKR::General;
@@ -104,8 +103,8 @@ I can envison doing something based on a computed power score.
 =cut
   method _comparison($other, $swap = 0) {
     my $otherClass = blessed $other;
-    my @classList = Class::ISA::self_and_super_path($otherClass);
-    if(none {$_ eq 'Game::EvonyTKR::General'} @classList) {
+    my @classList = split(/::/, $otherClass);
+    if($classList[2] ne 'General') {
       croak '$other is not a Game::EvonyTKR::General'
     }
 
@@ -120,8 +119,8 @@ I am checking the bools because I have at least one general I have purposefully 
 =cut
   method _equality ($other, $swap = 0) {
     my $otherClass = blessed $other;
-    my @classList = Class::ISA::self_and_super_path($otherClass);
-    if(none {$_ eq 'Game::EvonyTKR::General'} @classList) {
+    my @classList = split(/::/, $otherClass);
+    if($classList[2] ne 'General') {
       croak '$other is not a Game::EvonyTKR::General'
     }
     if($self->name() eq $other->name()) {
@@ -139,8 +138,8 @@ I am checking the bools because I have at least one general I have purposefully 
 =cut
   method _inequality ($other, $swap = 0) {
     my $otherClass = blessed $other;
-    my @classList = Class::ISA::self_and_super_path($otherClass);
-    if(none {$_ eq 'Game::EvonyTKR::General'} @classList) {
+    my @classList = split(/::/, $otherClass);
+    if($classList[2] ne 'General') {
       croak '$other is not a Game::EvonyTKR::General'
     }
     if($self->name() eq $other->name()) {
