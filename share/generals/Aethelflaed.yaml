@@ -7,7 +7,8 @@ general:
     - severity: info
       text: >
         The Mounted Troops' Attack Skill Book may, however, be used.
-  score_as: Mounted
+  score_as:
+   - Mounted
   stars: '5red'
   leadership: 112
   leadership_increment: 8.94

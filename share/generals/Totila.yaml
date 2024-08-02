@@ -12,7 +12,8 @@ general:
   politics_increment: 8.33
   stars: '5red'
   level: '45'
-  score_as: Ground
+  score_as:
+   - Ground
   books:
     - Gothic Sword
   specialities:

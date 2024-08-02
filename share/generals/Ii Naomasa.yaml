@@ -12,7 +12,8 @@ general:
   defense_increment: 8.91
   politics: 102
   politics_increment: 8.52
-  score_as: Mounted
+  score_as:
+   - Mounted
   books:
     - Red Demon
   ascending: true

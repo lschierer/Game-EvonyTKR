@@ -12,7 +12,8 @@ general:
   politics_increment: 9.25
   stars: '5red'
   level: '45'
-  score_as: Archers
+  score_as:
+   - Archers
   books:
     - Hammer of the Gauls - Elizabeth I
   specialities:
