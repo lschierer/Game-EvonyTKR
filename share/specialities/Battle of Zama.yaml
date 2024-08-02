@@ -6,14 +6,14 @@ levels:
       - attribute: HP
         condition:
           - Marching
-        class: Ground
+        class: Ground Troops
         value:
           number: 3
           unit: percentage
       - attribute: Defense
         condition:
           - Marching
-        class: Ground
+        class: Ground Troops
         value:
           number: 3
           unit: percentage
@@ -28,14 +28,14 @@ levels:
       - attribute: HP
         condition:
           - Marching
-        class: Ground
+        class: Ground Troops
         value:
           number: 3
           unit: percentage
       - attribute: Defense
         condition:
           - Marching
-        class: Ground
+        class: Ground Troops
         value:
           number: 3
           unit: percentage
@@ -50,14 +50,14 @@ levels:
       - attribute: HP
         condition:
           - Marching
-        class: Ground
+        class: Ground Troops
         value:
           number: 5
           unit: percentage
       - attribute: Defense
         condition:
           - Marching
-        class: Ground
+        class: Ground Troops
         value:
           number: 5
           unit: percentage
@@ -72,14 +72,14 @@ levels:
       - attribute: HP
         condition:
           - Marching
-        class: Ground
+        class: Ground Troops
         value:
           number: 5
           unit: percentage
       - attribute: Defense
         condition:
           - Marching
-        class: Ground
+        class: Ground Troops
         value:
           number: 5
           unit: percentage
@@ -94,14 +94,14 @@ levels:
       - attribute: HP
         condition:
           - Marching
-        class: Ground
+        class: Ground Troops
         value:
           number: 10
           unit: percentage
       - attribute: Defense
         condition:
           - Marching
-        class: Ground
+        class: Ground Troops
         value:
           number: 10
           unit: percentage

@@ -6,14 +6,14 @@ levels:
       - attribute: Attack
         condition:
           - Marching
-        class: Siege
+        class: Siege Machines
         value:
           number: 3
           unit: percentage
       - attribute: Defense
         condition:
           - Attacking
-        class: Siege
+        class: Siege Machines
         value:
           number: 3
           unit: percentage
@@ -34,7 +34,7 @@ levels:
       - attribute: HP
         condition:
           - Enemy
-        class: Siege
+        class: Siege Machines
         value:
           number: 2
           unit: percentage
@@ -43,14 +43,14 @@ levels:
       - attribute: Attack
         condition:
           - Marching
-        class: Siege
+        class: Siege Machines
         value:
           number: 4
           unit: percentage
       - attribute: Defense
         condition:
           - Attacking
-        class: Siege
+        class: Siege Machines
         value:
           number: 3
           unit: percentage
@@ -71,7 +71,7 @@ levels:
       - attribute: HP
         condition:
           - Enemy
-        class: Siege
+        class: Siege Machines
         value:
           number: 3
           unit: percentage
@@ -80,14 +80,14 @@ levels:
       - attribute: Attack
         condition:
           - Marching
-        class: Siege
+        class: Siege Machines
         value:
           number: 7
           unit: percentage
       - attribute: Defense
         condition:
           - Attacking
-        class: Siege
+        class: Siege Machines
         value:
           number: 6
           unit: percentage
@@ -108,7 +108,7 @@ levels:
       - attribute: HP
         condition:
           - Enemy
-        class: Siege
+        class: Siege Machines
         value:
           number: 5
           unit: percentage
@@ -117,14 +117,14 @@ levels:
       - attribute: Attack
         condition:
           - Marching
-        class: Siege
+        class: Siege Machines
         value:
           number: 7
           unit: percentage
       - attribute: Defense
         condition:
           - Attacking
-        class: Siege
+        class: Siege Machines
         value:
           number: 6
           unit: percentage
@@ -145,7 +145,7 @@ levels:
       - attribute: HP
         condition:
           - Enemy
-        class: Siege
+        class: Siege Machines
         value:
           number: 5
           unit: percentage
@@ -154,14 +154,14 @@ levels:
       - attribute: Attack
         condition:
           - Marching
-        class: Siege
+        class: Siege Machines
         value:
           number: 14
           unit: percentage
       - attribute: Defense
         condition:
           - Attacking
-        class: Siege
+        class: Siege Machines
         value:
           number: 12
           unit: percentage
@@ -182,7 +182,7 @@ levels:
       - attribute: HP
         condition:
           - Enemy
-        class: Siege
+        class: Siege Machines
         value:
           number: 10
           unit: percentage

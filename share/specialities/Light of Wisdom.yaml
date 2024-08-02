@@ -27,7 +27,7 @@ levels:
       - attribute: HP
         condition:
           - Attacking
-        class: Siege
+        class: Siege Machines
         value:
           number: 1
           unit: percentage
@@ -57,7 +57,7 @@ levels:
       - attribute: HP
         condition:
           - Attacking
-        class: Siege
+        class: Siege Machines
         value:
           number: 2
           unit: percentage
@@ -87,7 +87,7 @@ levels:
       - attribute: HP
         condition:
           - Attacking
-        class: Siege
+        class: Siege Machines
         value:
           number: 3
           unit: percentage
@@ -117,7 +117,7 @@ levels:
       - attribute: HP
         condition:
           - Attacking
-        class: Siege
+        class: Siege Machines
         value:
           number: 3
           unit: percentage
@@ -147,7 +147,7 @@ levels:
       - attribute: HP
         condition:
           - Attacking
-        class: Siege
+        class: Siege Machines
         value:
           number: 6
           unit: percentage

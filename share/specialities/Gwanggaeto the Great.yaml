@@ -9,7 +9,7 @@ levels:
           number: 2
           unit: percentage
       - attribute: Attack
-        class: Siege
+        class: Siege Machines
         value:
           number: 2
           unit: percentage
@@ -19,7 +19,7 @@ levels:
           number: 1
           unit: percentage
       - attribute: Defense
-        class: Siege
+        class: Siege Machines
         value:
           number: 1
           unit: percentage
@@ -31,7 +31,7 @@ levels:
           number: 2
           unit: percentage
       - attribute: Attack
-        class: Siege
+        class: Siege Machines
         value:
           number: 2
           unit: percentage
@@ -41,7 +41,7 @@ levels:
           number: 1
           unit: percentage
       - attribute: Defense
-        class: Siege
+        class: Siege Machines
         value:
           number: 1
           unit: percentage
@@ -53,7 +53,7 @@ levels:
           number: 3
           unit: percentage
       - attribute: Attack
-        class: Siege
+        class: Siege Machines
         value:
           number: 3
           unit: percentage
@@ -63,7 +63,7 @@ levels:
           number: 2
           unit: percentage
       - attribute: Defense
-        class: Siege
+        class: Siege Machines
         value:
           number: 2
           unit: percentage
@@ -75,7 +75,7 @@ levels:
           number: 3
           unit: percentage
       - attribute: Attack
-        class: Siege
+        class: Siege Machines
         value:
           number: 3
           unit: percentage
@@ -85,7 +85,7 @@ levels:
           number: 2
           unit: percentage
       - attribute: Defense
-        class: Siege
+        class: Siege Machines
         value:
           number: 2
           unit: percentage
@@ -97,7 +97,7 @@ levels:
           number: 6
           unit: percentage
       - attribute: Attack
-        class: Siege
+        class: Siege Machines
         value:
           number: 6
           unit: percentage
@@ -107,7 +107,7 @@ levels:
           number: 4
           unit: percentage
       - attribute: Defense
-        class: Siege
+        class: Siege Machines
         value:
           number: 4
           unit: percentage

@@ -6,28 +6,28 @@ levels:
       - attribute: Attack
         condition:
           - Attacking
-        class: Mounted
+        class: Mounted Troops
         value:
           number: 2
           unit: percentage
       - attribute: Attack
         condition:
           - Attacking
-        class: Ground
+        class: Ground Troops
         value:
           number: 2
           unit: percentage
       - attribute: Defense
         condition:
           - Attacking
-        class: Mounted
+        class: Mounted Troops
         value:
           number: 2
           unit: percentage
       - attribute: Defense
         condition:
           - Attacking
-        class: Ground
+        class: Ground Troops
         value:
           number: 2
           unit: percentage
@@ -36,28 +36,28 @@ levels:
       - attribute: Attack
         condition:
           - Attacking
-        class: Mounted
+        class: Mounted Troops
         value:
           number: 2
           unit: percentage
       - attribute: Attack
         condition:
           - Attacking
-        class: Ground
+        class: Ground Troops
         value:
           number: 2
           unit: percentage
       - attribute: Defense
         condition:
           - Attacking
-        class: Mounted
+        class: Mounted Troops
         value:
           number: 2
           unit: percentage
       - attribute: Defense
         condition:
           - Attacking
-        class: Ground
+        class: Ground Troops
         value:
           number: 2
           unit: percentage
@@ -66,28 +66,28 @@ levels:
       - attribute: Attack
         condition:
           - Attacking
-        class: Mounted
+        class: Mounted Troops
         value:
           number: 4
           unit: percentage
       - attribute: Attack
         condition:
           - Attacking
-        class: Ground
+        class: Ground Troops
         value:
           number: 4
           unit: percentage
       - attribute: Defense
         condition:
           - Attacking
-        class: Mounted
+        class: Mounted Troops
         value:
           number: 4
           unit: percentage
       - attribute: Defense
         condition:
           - Attacking
-        class: Ground
+        class: Ground Troops
         value:
           number: 4
           unit: percentage
@@ -96,28 +96,28 @@ levels:
       - attribute: Attack
         condition:
           - Attacking
-        class: Mounted
+        class: Mounted Troops
         value:
           number: 4
           unit: percentage
       - attribute: Attack
         condition:
           - Attacking
-        class: Ground
+        class: Ground Troops
         value:
           number: 4
           unit: percentage
       - attribute: Defense
         condition:
           - Attacking
-        class: Mounted
+        class: Mounted Troops
         value:
           number: 4
           unit: percentage
       - attribute: Defense
         condition:
           - Attacking
-        class: Ground
+        class: Ground Troops
         value:
           number: 4
           unit: percentage
@@ -126,28 +126,28 @@ levels:
       - attribute: Attack
         condition:
           - Attacking
-        class: Mounted
+        class: Mounted Troops
         value:
           number: 8
           unit: percentage
       - attribute: Attack
         condition:
           - Attacking
-        class: Ground
+        class: Ground Troops
         value:
           number: 8
           unit: percentage
       - attribute: Defense
         condition:
           - Attacking
-        class: Mounted
+        class: Mounted Troops
         value:
           number: 8
           unit: percentage
       - attribute: Defense
         condition:
           - Attacking
-        class: Ground
+        class: Ground Troops
         value:
           number: 8
           unit: percentage

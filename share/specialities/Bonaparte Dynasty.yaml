@@ -6,14 +6,14 @@ levels:
       - attribute: Attack
         condition:
           - dragon_to_the_attack
-        class: Mounted
+        class: Mounted Troops
         value:
           number: 4
           unit: percentage
       - attribute: Defense
         condition:
           - dragon_to_the_attack
-        class: Mounted
+        class: Mounted Troops
         value:
           number: 3
           unit: percentage
@@ -27,7 +27,7 @@ levels:
       - attribute: Attack
         condition:
           - Reduces_Enemy_with_a_Dragon
-        class: Siege
+        class: Siege Machines
         value:
           number: 1
           unit: percentage
@@ -36,14 +36,14 @@ levels:
       - attribute: Attack
         condition:
           - dragon_to_the_attack
-        class: Mounted
+        class: Mounted Troops
         value:
           number: 4
           unit: percentage
       - attribute: Defense
         condition:
           - dragon_to_the_attack
-        class: Mounted
+        class: Mounted Troops
         value:
           number: 3
           unit: percentage
@@ -57,7 +57,7 @@ levels:
       - attribute: Attack
         condition:
           - Reduces_Enemy_with_a_Dragon
-        class: Siege
+        class: Siege Machines
         value:
           number: 2
           unit: percentage
@@ -66,14 +66,14 @@ levels:
       - attribute: Attack
         condition:
           - dragon_to_the_attack
-        class: Mounted
+        class: Mounted Troops
         value:
           number: 8
           unit: percentage
       - attribute: Defense
         condition:
           - dragon_to_the_attack
-        class: Mounted
+        class: Mounted Troops
         value:
           number: 6
           unit: percentage
@@ -87,7 +87,7 @@ levels:
       - attribute: Attack
         condition:
           - Reduces_Enemy_with_a_Dragon
-        class: Siege
+        class: Siege Machines
         value:
           number: 3
           unit: percentage
@@ -96,14 +96,14 @@ levels:
       - attribute: Attack
         condition:
           - dragon_to_the_attack
-        class: Mounted
+        class: Mounted Troops
         value:
           number: 8
           unit: percentage
       - attribute: Defense
         condition:
           - dragon_to_the_attack
-        class: Mounted
+        class: Mounted Troops
         value:
           number: 6
           unit: percentage
@@ -117,7 +117,7 @@ levels:
       - attribute: Attack
         condition:
           - Reduces_Enemy_with_a_Dragon
-        class: Siege
+        class: Siege Machines
         value:
           number: 3
           unit: percentage
@@ -126,14 +126,14 @@ levels:
       - attribute: Attack
         condition:
           - dragon_to_the_attack
-        class: Mounted
+        class: Mounted Troops
         value:
           number: 16
           unit: percentage
       - attribute: Defense
         condition:
           - dragon_to_the_attack
-        class: Mounted
+        class: Mounted Troops
         value:
           number: 12
           unit: percentage
@@ -147,7 +147,7 @@ levels:
       - attribute: Attack
         condition:
           - Reduces_Enemy_with_a_Dragon
-        class: Siege
+        class: Siege Machines
         value:
           number: 6
           unit: percentage

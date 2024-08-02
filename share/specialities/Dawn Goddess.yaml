@@ -6,14 +6,14 @@ levels:
       - attribute: Attack
         condition:
           - When_Defending_Outside_The_Main_City
-        class: Ground
+        class: Ground Troops
         value:
           number: 5
           unit: percentage
       - attribute: Defense
         condition:
           - When_Defending_Outside_The_Main_City
-        class: Ground
+        class: Ground Troops
         value:
           number: 5
           unit: percentage
@@ -28,21 +28,21 @@ levels:
       - attribute: Attack
         condition:
           - When_Defending_Outside_The_Main_City
-        class: Ground
+        class: Ground Troops
         value:
           number: 5
           unit: percentage
       - attribute: Defense
         condition:
           - When_Defending_Outside_The_Main_City
-        class: Ground
+        class: Ground Troops
         value:
           number: 5
           unit: percentage
       - attribute: HP
         condition:
           - When_Defending_Outside_The_Main_City
-        class: Ground
+        class: Ground Troops
         value:
           number: 4
           unit: percentage
@@ -51,21 +51,21 @@ levels:
       - attribute: Attack
         condition:
           - When_Defending_Outside_The_Main_City
-        class: Ground
+        class: Ground Troops
         value:
           number: 10
           unit: percentage
       - attribute: Defense
         condition:
           - When_Defending_Outside_The_Main_City
-        class: Ground
+        class: Ground Troops
         value:
           number: 10
           unit: percentage
       - attribute: HP
         condition:
           - When_Defending_Outside_The_Main_City
-        class: Ground
+        class: Ground Troops
         value:
           number: 8
           unit: percentage
@@ -74,21 +74,21 @@ levels:
       - attribute: Attack
         condition:
           - When_Defending_Outside_The_Main_City
-        class: Ground
+        class: Ground Troops
         value:
           number: 10
           unit: percentage
       - attribute: Defense
         condition:
           - When_Defending_Outside_The_Main_City
-        class: Ground
+        class: Ground Troops
         value:
           number: 10
           unit: percentage
       - attribute: HP
         condition:
           - When_Defending_Outside_The_Main_City
-        class: Ground
+        class: Ground Troops
         value:
           number: 8
           unit: percentage
@@ -97,21 +97,21 @@ levels:
       - attribute: Attack
         condition:
           - When_Defending_Outside_The_Main_City
-        class: Ground
+        class: Ground Troops
         value:
           number: 20
           unit: percentage
       - attribute: Defense
         condition:
           - When_Defending_Outside_The_Main_City
-        class: Ground
+        class: Ground Troops
         value:
           number: 20
           unit: percentage
       - attribute: HP
         condition:
           - When_Defending_Outside_The_Main_City
-        class: Ground
+        class: Ground Troops
         value:
           number: 16
           unit: percentage

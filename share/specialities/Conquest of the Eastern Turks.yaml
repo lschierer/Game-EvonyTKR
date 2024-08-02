@@ -6,7 +6,7 @@ levels:
       - attribute: Attack
         condition:
           - Attacking
-        class: Mounted
+        class: Mounted Troops
         value:
           number: 3
           unit: percentage
@@ -21,7 +21,7 @@ levels:
       - attribute: Attack
         condition:
           - Attacking
-        class: Mounted
+        class: Mounted Troops
         value:
           number: 3
           unit: percentage
@@ -36,7 +36,7 @@ levels:
       - attribute: Attack
         condition:
           - Attacking
-        class: Mounted
+        class: Mounted Troops
         value:
           number: 6
           unit: percentage
@@ -57,7 +57,7 @@ levels:
       - attribute: Attack
         condition:
           - Attacking
-        class: Mounted
+        class: Mounted Troops
         value:
           number: 6
           unit: percentage
@@ -66,7 +66,7 @@ levels:
       - attribute: Attack
         condition:
           - Attacking
-        class: Mounted
+        class: Mounted Troops
         value:
           number: 12
           unit: percentage

@@ -4,7 +4,7 @@ levels:
   - level: 'Green'
     buff:
       - attribute: Attack
-        class: Siege
+        class: Siege Machines
         value:
           number: 3
           unit: percentage
@@ -17,7 +17,7 @@ levels:
   - level: 'Blue'
     buff:
       - attribute: Attack
-        class: Siege
+        class: Siege Machines
         value:
           number: 3
           unit: percentage
@@ -30,7 +30,7 @@ levels:
   - level: 'Purple'
     buff:
       - attribute: Attack
-        class: Siege
+        class: Siege Machines
         value:
           number: 6
           unit: percentage
@@ -43,7 +43,7 @@ levels:
   - level: 'Orange'
     buff:
       - attribute: Attack
-        class: Siege
+        class: Siege Machines
         value:
           number: 6
           unit: percentage
@@ -56,7 +56,7 @@ levels:
   - level: 'Gold'
     buff:
       - attribute: Attack
-        class: Siege
+        class: Siege Machines
         value:
           number: 12
           unit: percentage

@@ -4,28 +4,28 @@ levels:
   - level: Green
     buff:
       - attribute: Attack
-        class: Mounted
+        class: Mounted Troops
         condition:
           - Against Monsters
         value:
           number: 3
           unit: percentage
       - attribute: Attack
-        class: Ground
+        class: Ground Troops
         condition:
           - Against Monsters
         value:
           number: 3
           unit: percentage
       - attribute: Defense
-        class: Mounted
+        class: Mounted Troops
         condition:
           - Against Monsters
         value:
           number: 3
           unit: percentage
       - attribute: Defense
-        class: Ground
+        class: Ground Troops
         condition:
           - Against Monsters
         value:
@@ -34,28 +34,28 @@ levels:
   - level: Blue
     buff:
       - attribute: Attack
-        class: Mounted
+        class: Mounted Troops
         condition:
           - Against Monsters
         value:
           number: 3
           unit: percentage
       - attribute: Attack
-        class: Ground
+        class: Ground Troops
         condition:
           - Against Monsters
         value:
           number: 3
           unit: percentage
       - attribute: Defense
-        class: Mounted
+        class: Mounted Troops
         condition:
           - Against Monsters
         value:
           number: 3
           unit: percentage
       - attribute: Defense
-        class: Ground
+        class: Ground Troops
         condition:
           - Against Monsters
         value:
@@ -64,28 +64,28 @@ levels:
   - level: Purple
     buff:
       - attribute: Attack
-        class: Mounted
+        class: Mounted Troops
         condition:
           - Against Monsters
         value:
           number: 6
           unit: percentage
       - attribute: Attack
-        class: Ground
+        class: Ground Troops
         condition:
           - Against Monsters
         value:
           number: 6
           unit: percentage
       - attribute: Defense
-        class: Mounted
+        class: Mounted Troops
         condition:
           - Against Monsters
         value:
           number: 6
           unit: percentage
       - attribute: Defense
-        class: Ground
+        class: Ground Troops
         condition:
           - Against Monsters
         value:
@@ -94,28 +94,28 @@ levels:
   - level: Orange
     buff:
       - attribute: Attack
-        class: Mounted
+        class: Mounted Troops
         condition:
           - Against Monsters
         value:
           number: 6
           unit: percentage
       - attribute: Attack
-        class: Ground
+        class: Ground Troops
         condition:
           - Against Monsters
         value:
           number: 6
           unit: percentage
       - attribute: Defense
-        class: Mounted
+        class: Mounted Troops
         condition:
           - Against Monsters
         value:
           number: 6
           unit: percentage
       - attribute: Defense
-        class: Ground
+        class: Ground Troops
         condition:
           - Against Monsters
         value:
@@ -124,28 +124,28 @@ levels:
   - level: Gold
     buff:
       - attribute: Attack
-        class: Mounted
+        class: Mounted Troops
         condition:
           - Against Monsters
         value:
           number: 12
           unit: percentage
       - attribute: Attack
-        class: Ground
+        class: Ground Troops
         condition:
           - Against Monsters
         value:
           number: 12
           unit: percentage
       - attribute: Defense
-        class: Mounted
+        class: Mounted Troops
         condition:
           - Against Monsters
         value:
           number: 12
           unit: percentage
       - attribute: Defense
-        class: Ground
+        class: Ground Troops
         condition:
           - Against Monsters
         value:
