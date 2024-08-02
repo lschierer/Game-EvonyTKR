@@ -10,14 +10,14 @@ levels:
           number: 1
           unit: percentage
       - attribute: HP
-        class: Ground
+        class: Ground Troops
         condition:
           - Enemy
         value:
           number: 1
           unit: percentage
       - attribute: HP
-        class: Mounted
+        class: Mounted Troops
         condition:
           - Enemy
         value:
@@ -32,14 +32,14 @@ levels:
           number: 1
           unit: percentage
       - attribute: HP
-        class: Ground
+        class: Ground Troops
         condition:
           - Enemy
         value:
           number: 1
           unit: percentage
       - attribute: HP
-        class: Mounted
+        class: Mounted Troops
         condition:
           - Enemy
         value:
@@ -54,14 +54,14 @@ levels:
           number: 2
           unit: percentage
       - attribute: HP
-        class: Ground
+        class: Ground Troops
         condition:
           - Enemy
         value:
           number: 2
           unit: percentage
       - attribute: HP
-        class: Mounted
+        class: Mounted Troops
         condition:
           - Enemy
         value:
@@ -76,14 +76,14 @@ levels:
           number: 2
           unit: percentage
       - attribute: HP
-        class: Ground
+        class: Ground Troops
         condition:
           - Enemy
         value:
           number: 2
           unit: percentage
       - attribute: HP
-        class: Mounted
+        class: Mounted Troops
         condition:
           - Enemy
         value:
@@ -98,14 +98,14 @@ levels:
           number: 4
           unit: percentage
       - attribute: HP
-        class: Ground
+        class: Ground Troops
         condition:
           - Enemy
         value:
           number: 4
           unit: percentage
       - attribute: HP
-        class: Mounted
+        class: Mounted Troops
         condition:
           - Enemy
         value:

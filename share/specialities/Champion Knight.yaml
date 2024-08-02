@@ -4,7 +4,7 @@ levels:
   - level: Green
     buff:
       - attribute: Attack
-        class: Mounted
+        class: Mounted Troops
         condition:
           - dragon_to_the_attack
         value:
@@ -13,7 +13,7 @@ levels:
   - level: Blue
     buff:
       - attribute: Attack
-        class: Mounted
+        class: Mounted Troops
         condition:
           - dragon_to_the_attack
         value:
@@ -22,7 +22,7 @@ levels:
   - level: Purple
     buff:
       - attribute: Attack
-        class: Mounted
+        class: Mounted Troops
         condition:
           - dragon_to_the_attack
         value:
@@ -31,7 +31,7 @@ levels:
   - level: Orange
     buff:
       - attribute: Attack
-        class: Mounted
+        class: Mounted Troops
         condition:
           - dragon_to_the_attack
         value:
@@ -40,7 +40,7 @@ levels:
   - level: Gold
     buff:
       - attribute: Attack
-        class: Mounted
+        class: Mounted Troops
         condition:
           - dragon_to_the_attack
         value:

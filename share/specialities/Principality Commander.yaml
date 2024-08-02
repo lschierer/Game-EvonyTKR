@@ -6,21 +6,21 @@ levels:
       - attribute: Attack
         condition:
           - brings_a_dragon
-        class: Ground
+        class: Ground Troops
         value:
           number: 3
           unit: percentage
       - attribute: Defense
         condition:
           - brings_a_dragon
-        class: Ground
+        class: Ground Troops
         value:
           number: 2
           unit: percentage
       - attribute: HP
         condition:
           - brings_a_dragon
-        class: Ground
+        class: Ground Troops
         value:
           number: 2
           unit: percentage
@@ -29,21 +29,21 @@ levels:
       - attribute: Attack
         condition:
           - brings_a_dragon
-        class: Ground
+        class: Ground Troops
         value:
           number: 3
           unit: percentage
       - attribute: Defense
         condition:
           - brings_a_dragon
-        class: Ground
+        class: Ground Troops
         value:
           number: 3
           unit: percentage
       - attribute: HP
         condition:
           - brings_a_dragon
-        class: Ground
+        class: Ground Troops
         value:
           number: 3
           unit: percentage
@@ -52,21 +52,21 @@ levels:
       - attribute: Attack
         condition:
           - brings_a_dragon
-        class: Ground
+        class: Ground Troops
         value:
           number: 6
           unit: percentage
       - attribute: Defense
         condition:
           - brings_a_dragon
-        class: Ground
+        class: Ground Troops
         value:
           number: 5
           unit: percentage
       - attribute: HP
         condition:
           - brings_a_dragon
-        class: Ground
+        class: Ground Troops
         value:
           number: 5
           unit: percentage
@@ -75,21 +75,21 @@ levels:
       - attribute: Attack
         condition:
           - brings_a_dragon
-        class: Ground
+        class: Ground Troops
         value:
           number: 6
           unit: percentage
       - attribute: Defense
         condition:
           - brings_a_dragon
-        class: Ground
+        class: Ground Troops
         value:
           number: 5
           unit: percentage
       - attribute: HP
         condition:
           - brings_a_dragon
-        class: Ground
+        class: Ground Troops
         value:
           number: 5
           unit: percentage
@@ -98,21 +98,21 @@ levels:
       - attribute: Attack
         condition:
           - brings_a_dragon
-        class: Ground
+        class: Ground Troops
         value:
           number: 12
           unit: percentage
       - attribute: Defense
         condition:
           - brings_a_dragon
-        class: Ground
+        class: Ground Troops
         value:
           number: 10
           unit: percentage
       - attribute: HP
         condition:
           - brings_a_dragon
-        class: Ground
+        class: Ground Troops
         value:
           number: 10
           unit: percentage

@@ -19,7 +19,7 @@ levels:
           number: 1
           unit: percentage
       - attribute: HP
-        class: Siege
+        class: Siege Machines
         value:
           number: 1
           unit: percentage
@@ -36,7 +36,7 @@ levels:
           number: 2
           unit: percentage
       - attribute: HP
-        class: Siege
+        class: Siege Machines
         value:
           number: 1
           unit: percentage
@@ -58,7 +58,7 @@ levels:
           number: 4
           unit: percentage
       - attribute: HP
-        class: Siege
+        class: Siege Machines
         value:
           number: 2
           unit: percentage
@@ -80,7 +80,7 @@ levels:
           number: 4
           unit: percentage
       - attribute: HP
-        class: Siege
+        class: Siege Machines
         value:
           number: 2
           unit: percentage
@@ -107,7 +107,7 @@ levels:
           number: 4
           unit: percentage
       - attribute: HP
-        class: Siege
+        class: Siege Machines
         value:
           number: 4
           unit: percentage

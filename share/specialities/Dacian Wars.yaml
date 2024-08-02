@@ -4,12 +4,12 @@ levels:
   - level: Green
     buff:
       - attribute: Attack
-        class: Ground
+        class: Ground Troops
         value:
           number: 2
           unit: percentage
       - attribute: HP
-        class: Ground
+        class: Ground Troops
         value:
           number: 2
           unit: percentage
@@ -20,12 +20,12 @@ levels:
   - level: Blue
     buff:
       - attribute: Attack
-        class: Ground
+        class: Ground Troops
         value:
           number: 2
           unit: percentage
       - attribute: HP
-        class: Ground
+        class: Ground Troops
         value:
           number: 2
           unit: percentage
@@ -36,12 +36,12 @@ levels:
   - level: Purple
     buff:
       - attribute: Attack
-        class: Ground
+        class: Ground Troops
         value:
           number: 3
           unit: percentage
       - attribute: HP
-        class: Ground
+        class: Ground Troops
         value:
           number: 3
           unit: percentage
@@ -52,12 +52,12 @@ levels:
   - level: Orange
     buff:
       - attribute: Attack
-        class: Ground
+        class: Ground Troops
         value:
           number: 3
           unit: percentage
       - attribute: HP
-        class: Ground
+        class: Ground Troops
         value:
           number: 3
           unit: percentage
@@ -68,12 +68,12 @@ levels:
   - level: Gold
     buff:
       - attribute: Attack
-        class: Ground
+        class: Ground Troops
         value:
           number: 6
           unit: percentage
       - attribute: HP
-        class: Ground
+        class: Ground Troops
         value:
           number: 6
           unit: percentage

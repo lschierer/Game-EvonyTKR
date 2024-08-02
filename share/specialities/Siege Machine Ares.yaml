@@ -4,68 +4,68 @@ levels:
   - level: Green
     buff:
       - attribute: Attack
-        class: Siege
+        class: Siege Machines
         value:
           number: 1
           unit: percentage
       - attribute: HP
-        class: Siege
+        class: Siege Machines
         value:
           number: 1
           unit: percentage
       - attribute: Defense
-        class: Siege
+        class: Siege Machines
         value:
           number: 1
           unit: percentage
   - level: Blue
     buff:
       - attribute: Attack
-        class: Siege
+        class: Siege Machines
         value:
           number: 1
           unit: percentage
       - attribute: HP
-        class: Siege
+        class: Siege Machines
         value:
           number: 1
           unit: percentage
       - attribute: Defense
-        class: Siege
+        class: Siege Machines
         value:
           number: 1
           unit: percentage
   - level: Purple
     buff:
       - attribute: Attack
-        class: Siege
+        class: Siege Machines
         value:
           number: 2
           unit: percentage
       - attribute: HP
-        class: Siege
+        class: Siege Machines
         value:
           number: 2
           unit: percentage
       - attribute: Defense
-        class: Siege
+        class: Siege Machines
         value:
           number: 2
           unit: percentage
   - level: Gold
     buff:
       - attribute: Attack
-        class: Siege
+        class: Siege Machines
         value:
           number: 4
           unit: percentage
       - attribute: Defense
-        class: Siege
+        class: Siege Machines
         value:
           number: 4
           unit: percentage
       - attribute: HP
-        class: Siege
+        class: Siege Machines
         value:
           number: 4
           unit: percentage

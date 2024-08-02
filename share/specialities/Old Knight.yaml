@@ -13,7 +13,7 @@ levels:
       - attribute: Defense
         condition:
           - Attacking
-        class: Siege
+        class: Siege Machines
         value:
           number: 4
           unit: percentage
@@ -36,7 +36,7 @@ levels:
       - attribute: Defense
         condition:
           - Attacking
-        class: Siege
+        class: Siege Machines
         value:
           number: 4
           unit: percentage
@@ -59,7 +59,7 @@ levels:
       - attribute: Defense
         condition:
           - Attacking
-        class: Siege
+        class: Siege Machines
         value:
           number: 8
           unit: percentage
@@ -82,7 +82,7 @@ levels:
       - attribute: Defense
         condition:
           - Attacking
-        class: Siege
+        class: Siege Machines
         value:
           number: 8
           unit: percentage
@@ -105,7 +105,7 @@ levels:
       - attribute: Defense
         condition:
           - Attacking
-        class: Siege
+        class: Siege Machines
         value:
           number: 16
           unit: percentage

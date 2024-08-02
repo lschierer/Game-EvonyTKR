@@ -4,28 +4,28 @@ levels:
   - level: Green
     buff:
       - attribute: Attack
-        class: Ground
+        class: Ground Troops
         condition:
           - Enemy
         value:
           number: 0
           unit: percentage
       - attribute: Attack
-        class: Mounted
+        class: Mounted Troops
         condition:
           - Enemy
         value:
           number: 0
           unit: percentage
       - attribute: Attack
-        class: Ground
+        class: Ground Troops
         condition:
           - When_City_Mayor_for_this_SubCity
         value:
           number: 0
           unit: percentage
       - attribute: Attack
-        class: Mounted
+        class: Mounted Troops
         condition:
           - When_City_Mayor_for_this_SubCity
         value:
@@ -34,28 +34,28 @@ levels:
   - level: Blue
     buff:
       - attribute: Attack
-        class: Ground
+        class: Ground Troops
         condition:
           - Enemy
         value:
           number: 0
           unit: percentage
       - attribute: Attack
-        class: Mounted
+        class: Mounted Troops
         condition:
           - Enemy
         value:
           number: 0
           unit: percentage
       - attribute: Attack
-        class: Ground
+        class: Ground Troops
         condition:
           - When_City_Mayor_for_this_SubCity
         value:
           number: 0
           unit: percentage
       - attribute: Attack
-        class: Mounted
+        class: Mounted Troops
         condition:
           - When_City_Mayor_for_this_SubCity
         value:
@@ -64,28 +64,28 @@ levels:
   - level: Purple
     buff:
       - attribute: Attack
-        class: Ground
+        class: Ground Troops
         condition:
           - Enemy
         value:
           number: 0
           unit: percentage
       - attribute: Attack
-        class: Mounted
+        class: Mounted Troops
         condition:
           - Enemy
         value:
           number: 0
           unit: percentage
       - attribute: Attack
-        class: Ground
+        class: Ground Troops
         condition:
           - When_City_Mayor_for_this_SubCity
         value:
           number: 0
           unit: percentage
       - attribute: Attack
-        class: Mounted
+        class: Mounted Troops
         condition:
           - When_City_Mayor_for_this_SubCity
         value:
@@ -94,28 +94,28 @@ levels:
   - level: Orange
     buff:
       - attribute: Attack
-        class: Ground
+        class: Ground Troops
         condition:
           - Enemy
         value:
           number: 0
           unit: percentage
       - attribute: Attack
-        class: Mounted
+        class: Mounted Troops
         condition:
           - Enemy
         value:
           number: 0
           unit: percentage
       - attribute: Attack
-        class: Ground
+        class: Ground Troops
         condition:
           - When_City_Mayor_for_this_SubCity
         value:
           number: 0
           unit: percentage
       - attribute: Attack
-        class: Mounted
+        class: Mounted Troops
         condition:
           - When_City_Mayor_for_this_SubCity
         value:
@@ -124,28 +124,28 @@ levels:
   - level: Gold
     buff:
       - attribute: Attack
-        class: Ground
+        class: Ground Troops
         condition:
           - Enemy
         value:
           number: 20
           unit: percentage
       - attribute: Attack
-        class: Mounted
+        class: Mounted Troops
         condition:
           - Enemy
         value:
           number: 20
           unit: percentage
       - attribute: Attack
-        class: Ground
+        class: Ground Troops
         condition:
           - When_City_Mayor_for_this_SubCity
         value:
           number: 10
           unit: percentage
       - attribute: Attack
-        class: Mounted
+        class: Mounted Troops
         condition:
           - When_City_Mayor_for_this_SubCity
         value:
