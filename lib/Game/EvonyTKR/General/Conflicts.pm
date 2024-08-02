@@ -2,7 +2,7 @@ use v5.40.0;
 use experimental qw(class);
 use utf8::all;
 
-class Game::EvonyTKR::General::Conflicts {
+class Game::EvonyTKR::General::Conflicts :isa(Game::EvonyTKR::Logger) {
 # PODNAME: Game::EvonyTKR::General::Conflicts
   use Carp;
   use Clone 'clone';
@@ -24,6 +24,7 @@ class Game::EvonyTKR::General::Conflicts {
   use Game::EvonyTKR::Buff::Data;
   use Game::EvonyTKR::Buff::EvaluationMultipliers;
   use namespace::autoclean;
+  use Game::EvonyTKR::Logger;
 
   my $debug = 0;
 
@@ -37,7 +38,7 @@ class Game::EvonyTKR::General::Conflicts {
     $classData->set_BuffClasses();
   }
 
-  ADJUST {
+  ADJUST {  
     if(! -r -w  -x -o -d $dbPath) {
       make_path($dbPath,"0770");
     }
@@ -59,15 +60,11 @@ returns the conflicts for a Game::EvonyTKR::General with name $name
 =cut
 
   method getConflictsByName( $name ) {
-    if($debug) {
-      print "starting getConflictsByName";
-    }
+    
     if(not defined $name or $name eq '') {
       croak "name must be defined, not '$name'";
     }
-    if($debug) {
-      print " for $name\n";
-    }
+    $self->logger()->info("start getConflictsByName for $name");
     my @conflicts;
     if( $db->exists($name)) {
       if($db->get($name)->exists('conflicts')){
@@ -83,6 +80,7 @@ returns the conflicts for a Game::EvonyTKR::General with name $name
     if($debug){
       say scalar @conflicts;
     }
+    $self->logger()->info('end getConflictsByName');
     return @conflicts;
   }
 
@@ -104,24 +102,15 @@ distribution's dist_data directory.
         'generalConflictGroups'
       );
     while (my $file = glob(File::Spec->catfile($data_location,'*.yaml'))) {
-      if ($debug) {
-        say $file;
-      }
+      $self->logger()->info("start of $file");
       my $conflictGroup = $yp->load_file($file);
+      $self->logger()->debug("start of $file");
+      $self->logger()->info(sub { np($conflictGroup) });
+      $self->logger()->debug("members are: " . np($conflictGroup->{'members'}));      
 
-      if($debug) {
-        say 'start of ' . $file;
-        say p($conflictGroup);
-      }
-      if($debug >= 2 ) {
-        print "members are: ";
-        say p($conflictGroup->{'members'});
-      }
       my $groupName = $conflictGroup->{'name'};
-      if($debug >= 2) {
-        print "name is: ";
-        say $groupName;
-      }
+      $self->logger()->debug("name is: $groupName");
+      
       $db->put($groupName, {}) unless $db->get($groupName);
       $db->get($groupName)->put('members', []) unless $db->get($groupName)->get('members');
       $db->get($groupName)->put('others', []) unless $db->get($groupName)->get('others');
@@ -136,13 +125,9 @@ distribution's dist_data directory.
          @books = (@{$conflictGroup->{'books'}});
       }
 
-      if($debug >= 3) {
-        print "members are: ";
-        print p( @members);
-        print "there are ";
-        print scalar @members;
-        say " members in the list";
-      }
+      $self->logger()->trace("members are: " . np( @members));
+      $self->logger()->trace("there are " . scalar @members . " members in the list");
+      
       if(scalar @members >= 1) {
         foreach (@members) {
           my $entryName = $_;
@@ -179,10 +164,7 @@ distribution's dist_data directory.
             }
           }
 
-          if($debug >=2) {
-            say "conflicts are: ";
-            say p( $db->get($entryName)->get('conflicts'));
-          }
+          $self->logger()->debug("conflicts are: " . np( $db->get($entryName)->get('conflicts')));
 
           if(scalar @books >= 1) {
             foreach (@{$conflictGroup->{'books'}}) {
@@ -212,9 +194,8 @@ distribution's dist_data directory.
         croak "no members in the list for '$file'";
       }
 
-      if($debug) {
-        say "end of $file";
-      }
+      $self->logger()->debug("end of $file");
+      
     }
   }
 

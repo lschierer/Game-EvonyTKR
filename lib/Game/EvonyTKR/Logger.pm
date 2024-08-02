@@ -56,7 +56,6 @@ class Game::EvonyTKR::Logger {
       touch($logFile);
       chmod(0600, $logFile);
     } 
-    say "Logging to $logFile";
     return $logFile;
   }
 

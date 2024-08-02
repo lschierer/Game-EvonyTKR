@@ -10,9 +10,10 @@ use File::ShareDir ':ALL';
 use File::Spec;
 use File::HomeDir;
 use File::Path qw(make_path);
+use File::Touch;
 use YAML::XS qw{LoadFile Load};
 use Devel::Peek;
-use Log::Log4perl;
+use Game::EvonyTKR::Logger;
 use Game::EvonyTKR::General::Pair::Creator;
 use Game::EvonyTKR::General::Pair;
 use Game::EvonyTKR::General::Ground;
@@ -31,25 +32,7 @@ sub opt_spec {
   );
 }
 
-sub getLogfileName() {
-  my $home      = File::HomeDir->my_home;
-  my $logDir    = File::Spec->catfile($home , 'var/log/Perl/dist/Game-Evony/');
-  return File::Spec->catfile($logDir, 'system.log');
-}
 
-sub configure_logging() {
-  Log::Log4perl::Config->allow_code('safe');
-  Log::Log4perl::Config->utf( 1 );
-  my $logConfLocation = dist_file('Game-EvonyTKR', 'log4perl.conf');
-  my $home      = File::HomeDir->my_home;
-  my $logDir = File::Spec->catfile($home, 'var/log/Perl/dist/Game-Evony/');
-  if(! -r -w  -x -o -d $logDir) {
-      make_path($logDir,"0770");
-    }
-  Log::Log4perl::init( $logConfLocation );
-  my $logger = Log::Log4perl->get_logger;
-
-}
 
 sub validate_args {
   my ($self, $opt, $args) = @_;
@@ -60,13 +43,15 @@ sub validate_args {
 
 sub execute {
   my ($self, $opt, $args) = @_;
-  configure_logging();
   binmode(STDOUT, ":encoding(UTF-8)"); # apparently not the same thing as "use utf8;"
   binmode(STDIN, ":encoding(UTF-8)"); # apparently not the same thing as "use utf8;"
   if ($opt->{option1}) {
       # do option 1 stuff
   } else {
-    my %generals = read_generals();
+
+    my $logController = Game::EvonyTKR::Logger->new();
+    my $logger = $logController->logger();
+    my %generals = read_generals($logger);
     my $classData = Game::EvonyTKR::Buff::Data->new();
     my $conflicData = Game::EvonyTKR::General::Conflicts->new();
     $conflicData->initializeConflictDB();
@@ -75,8 +60,8 @@ sub execute {
     if(scalar @BuffClasses == 0) {
       croak 'error loading BuffClasses';
     }
-    say "start";
-    say scalar %generals;
+    $logger->info("start");
+    $logger->info(sub {np %generals });
     my $pairCreator = Game::EvonyTKR::General::Pair::Creator->new();
     $pairCreator->set_generals(%generals);
     my %pairs = $pairCreator->getPairs();
@@ -84,39 +69,38 @@ sub execute {
     for my $bc (@BuffClasses) {
       if(exists $pairs{$bc}) {
         my @pairGroup = @{$pairs{$bc}};
-        say "$bc: " . scalar @pairGroup;
+        $logger->info("$bc: " . scalar @pairGroup);
         for my $gp (@pairGroup) {
-          #print "|primary: " . $gp->primary()->name();
-          #print "|secondary: " . $gp->secondary()->name();
-          #print "|\n";
+          $logger->trace("primary: " . $gp->primary()->name());
+          $logger->trace("secondary: " . $gp->secondary()->name())
+        
         }
-        say "-----";
+        
       } else {
-        say "$bc: no pairs";
+        $logger->info("$bc: no pairs");
       }
     }
-    say "done";
+    $logger->info("done");
   }
 }
 
-sub read_generals {
-  my ($self, $opt, $args) = @_;
-  my $debug = 1;
-  if($debug) { say "read_generals";}
+sub read_generals($logger) {
+  
+
+  $logger->info("read_generals");
   my $general_share = File::Spec->catfile(dist_dir('Game-EvonyTKR'), 'generals');
   my $book_share = File::Spec->catfile(dist_dir('Game-EvonyTKR'), 'skillBooks');
   my @found = grep { -T -s -r } glob("$general_share/*.yaml");
-  if($debug) {
-    say "$general_share";
-    say scalar @found;
-  }
+  $logger->info("$general_share");
+  $logger->info(scalar @found);
+    
   my %generals;
   foreach my $tg (@found) {
     if(defined($tg)) {
       open(my ($fh), '<', $tg) or croak "$!";
       my $data = LoadFile($tg);
       my $name = $data->{'general'}->{'name'};
-      if($debug) {say $name;}
+      $logger->info($name);
       my $bookName = $data->{'general'}->{'books'}[0].".yaml";
       my $sb = Game::EvonyTKR::SkillBook::Special->new(
         name  => $bookName
@@ -186,7 +170,6 @@ sub read_generals {
   }
   return %generals;
 }
-
 
 1;
 __END__

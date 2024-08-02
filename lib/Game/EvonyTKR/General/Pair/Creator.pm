@@ -2,7 +2,7 @@ use v5.40.0;
 use experimental qw(class);
 use utf8::all;
 
-class Game::EvonyTKR::General::Pair::Creator {
+class Game::EvonyTKR::General::Pair::Creator :isa(Game::EvonyTKR::Logger) {
 # PODNAME: Game::EvonyTKR::General::Pair::Creator
   use Carp;
   use Clone 'clone';
@@ -26,6 +26,8 @@ class Game::EvonyTKR::General::Pair::Creator {
   use Game::EvonyTKR::General::Pair;
   use Game::EvonyTKR::Buff::EvaluationMultipliers;
   use namespace::autoclean;
+  use Game::EvonyTKR::Logger;
+
 
   my $debug = 1;
 
@@ -45,10 +47,9 @@ class Game::EvonyTKR::General::Pair::Creator {
   method set_generals( %ng ) {
 
     if(scalar %ng >= 1) {
-      if($debug) {
-        say "hashRef is " . \%ng;
-        say "size is " . scalar %ng;
-      }
+      $self->logger()->debug("hashRef is " . \%ng);
+      $self->logger()->debug("size is " . scalar %ng);
+
        %generals = %ng;
     }
   }
@@ -74,18 +75,16 @@ it will not consider conflicts.
       $sg2->set_source(%generals);
       
       while ( my ($key1, $value1) = $sg1->each_source ) {
-        if($debug) {
-          say "looking for pairs for $key1";
-        }
+        $self->logger()->info( "looking for pairs for $key1");
+        
         while ( my ($key2, $value2) = $sg2->each_source ) {
-          if($debug) {
-            say "testing $key2 against $key1";
-          }
+          $self->logger()->debug("testing $key2 against $key1");
+
           if($value1->name() ne $value2->name()) {
             my @conflicts = $conflicData->getConflictsByName($value1->name());
             if(scalar @conflicts >= 1) {
               if( any { $_ =~ qr/$value2->name()/} @conflicts) {
-                say "found conflict between " . $value1->name() . " and " . $value2->name();
+                $self->logger()->info("found conflict between " . $value1->name() . " and " . $value2->name());
                 next;
               }
             }
