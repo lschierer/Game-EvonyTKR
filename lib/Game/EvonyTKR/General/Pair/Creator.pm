@@ -106,11 +106,14 @@ it will not consider conflicts.
               );
             if($key ne 'unknown') {
               if(defined $key && $key ne '') {
+                $self->logger()->debug("$key1 and $key2 are both $key");
                 push @{ $pairs{$key} }, $pair;
               } else {
                 croak "bad key '$key'"
               }
             }
+          } else {
+            $self->logger()->debug("$key1 and $key2 are the same, rejecting");
           }
         }
         
