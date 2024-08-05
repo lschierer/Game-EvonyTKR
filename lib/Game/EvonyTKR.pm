@@ -22,6 +22,7 @@ use Game::EvonyTKR::General::Mounted;
 use Game::EvonyTKR::General::Ranged;
 use Game::EvonyTKR::General::Siege;
 use Game::EvonyTKR::SkillBook::Special;
+use Game::EvonyTKR::Speciality;
 use Game::EvonyTKR::Buff;
 use Game::EvonyTKR::Buff::Value;
 use Game::EvonyTKR::Buff::Data;
@@ -158,14 +159,15 @@ sub read_generals($logger) {
           builtInBook           => $sb,
         );
         for (@books) {
-          my $tbName = $_.'.yaml';
-          if($tbName eq /$bookName/ ) {
+          my $tbName = $_;
+          my $tbAsFile = $tbName.'.yaml';
+          if($tbAsFile eq /$bookName/ ) {
             next;
           }
           my $tb = Game::EvonyTKR::SkillBook::Special->new(
             name  => $tbName
           );
-          $tb = getBookData($tb, $tbName);
+          $tb = getBookData($tb, $tbName.'.yaml');
           $generals{$name}->addAnotherBook($tb);
         }
         $logger->debug("added ". np $generals{$name});
@@ -176,11 +178,6 @@ sub read_generals($logger) {
   return %generals;
 }
 
-=method getBookData($sb, $bookName)
-$sb is a Game::EvonyTKR::SkillBook
-$bookname is the YAML file containing its data. 
-This populates the skill book with the data. 
-=cut
 sub getBookData($sb, $bookName) {
   my $book_share = File::Spec->catfile(dist_dir('Game-EvonyTKR'), 'skillBooks');
   my $data_filename = File::Spec->catfile($book_share, $bookName);
@@ -189,8 +186,8 @@ sub getBookData($sb, $bookName) {
     my @buffs = @{ $bookData->{'buff'} };
     foreach my $rb (@buffs) {
       my $v = Game::EvonyTKR::Buff::Value->new(
-        number      => $rb->{'number'},
-        unit        => $rb->{'unit'},
+        number      => $rb->{'value'}->{'number'},
+        unit        => $rb->{'value'}->{'unit'},
       );
       if(exists $rb->{'class'}) {
         my $b = Game::EvonyTKR::Buff->new(
@@ -252,3 +249,8 @@ This module will (eventually) help players of the game needing to make reasonabl
 
 
 
+=method getBookData($sb, $bookName)
+$sb is a Game::EvonyTKR::SkillBook
+$bookname is the YAML file containing its data. 
+This populates the skill book with the data. 
+=cut
