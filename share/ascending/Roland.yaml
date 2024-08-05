@@ -5,7 +5,7 @@ ascending:
     - attribute: Attack
       condition:
         - Marching
-      class: Mounted
+      class: Mounted Troops
       value:
         number: 15
         unit: percentage
@@ -26,14 +26,14 @@ ascending:
 - level: '4red'
   buff:
     - attribute: HP
-      class: Mounted
+      class: Mounted Troops
       condition:
         - Marching
       value:
         number: 25
         unit: percentage
     - attribute: Defense
-      class: Mounted
+      class: Mounted Troops
       condition:
         - Marching
       value:
@@ -42,21 +42,21 @@ ascending:
 - level: '5red'
   buff:
     - attribute: HP
-      class: Mounted
+      class: Mounted Troops
       condition:
         - Marching
       value:
         number: 15
         unit: percentage
     - attribute: Defense
-      class: Mounted
+      class: Mounted Troops
       condition:
         - Marching
       value:
         number: 15
         unit: percentage
     - attribute: Attack
-      class: Mounted
+      class: Mounted Troops
       condition:
         - Marching
       value:

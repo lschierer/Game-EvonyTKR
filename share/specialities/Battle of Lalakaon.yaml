@@ -14,7 +14,7 @@ levels:
           number: 2
           unit: percentage
       - attribute: HP
-        class: Archers
+        class: Ranged Troops
         value:
           number: 2
           unit: percentage
@@ -26,7 +26,7 @@ levels:
           number: 3
           unit: percentage
       - attribute: HP
-        class: Archers
+        class: Ranged Troops
         value:
           number: 2
           unit: percentage
@@ -48,7 +48,7 @@ levels:
           number: 3
           unit: percentage
       - attribute: HP
-        class: Archers
+        class: Ranged Troops
         value:
           number: 3
           unit: percentage
@@ -65,7 +65,7 @@ levels:
           number: 3
           unit: percentage
       - attribute: HP
-        class: Archers
+        class: Ranged Troops
         value:
           number: 3
           unit: percentage
@@ -82,7 +82,7 @@ levels:
           number: 5
           unit: percentage
       - attribute: HP
-        class: Archers
+        class: Ranged Troops
         value:
           number: 5
           unit: percentage

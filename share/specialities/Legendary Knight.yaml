@@ -1,63 +1,63 @@
 ---
-name: Ranged Troop Formation
+name: Legendary Knight
 levels:
   - level: Green
     buff:
       - attribute: Attack
-        class: Ranged Troops
+        condition:
+          - Enemy
         value:
-          number: 2
+          number: 1
           unit: percentage
-      - attribute: Defense
-        class: Ranged Troops
+      - attribute: March_Size_Capacity
         value:
           number: 1
           unit: percentage
   - level: Blue
     buff:
       - attribute: Attack
-        class: Ranged Troops
+        condition:
+          - Enemy
         value:
           number: 1
           unit: percentage
-      - attribute: Defense
-        class: Ranged Troops
+      - attribute: March_Size_Capacity
         value:
           number: 1
           unit: percentage
   - level: Purple
     buff:
       - attribute: Attack
-        class: Ranged Troops
+        condition:
+          - Enemy
         value:
-          number: 2
+          number: 1
           unit: percentage
-      - attribute: Defense
-        class: Ranged Troops
+      - attribute: March_Size_Capacity
         value:
           number: 2
           unit: percentage
   - level: Orange
     buff:
       - attribute: Attack
-        class: Ranged Troops
+        condition:
+          - Enemy
+        value:
+          number: 1
+          unit: percentage
+      - attribute: March_Size_Capacity
         value:
           number: 2
           unit: percentage
-      - attribute: Defense
-        class: Ranged Troops
-        value:
-          number: 2
-          unit: percentage
-  - level: Gold
+  - level: Purple
     buff:
       - attribute: Attack
-        class: Ranged Troops
+        condition:
+          - Enemy
         value:
-          number: 4
+          number: 2
           unit: percentage
-      - attribute: Defense
-        class: Ranged Troops
+      - attribute: March_Size_Capacity
         value:
           number: 4
           unit: percentage

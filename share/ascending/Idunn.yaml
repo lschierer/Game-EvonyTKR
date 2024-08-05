@@ -3,19 +3,19 @@ ascending:
 - level: '1red'
   buff:
     - attribute: Defense
-      class: Archers
+      class: Ranged Troops
       value:
         number: 15
         unit: percentage
     - attribute: HP
-      class: Archers
+      class: Ranged Troops
       value:
         number: 15
         unit: percentage
     - attribute: Attack
       condition:
         - When_Defending_Outside_The_Main_City
-      class: Archers
+      class: Ranged Troops
       value:
         number: 10
         unit: percentage
@@ -30,7 +30,7 @@ ascending:
     - attribute: Defense
       condition:
         - When_Defending_Outside_The_Main_City
-      class: Archers
+      class: Ranged Troops
       value:
         number: 15
         unit: percentage
@@ -43,54 +43,54 @@ ascending:
     - attribute: Attack
       condition:
         - When_Defending_Outside_The_Main_City
-      class: Archers
+      class: Ranged Troops
       value:
         number: 15
         unit: percentage
 - level: '4red'
   buff:
     - attribute: HP
-      class: Archers
+      class: Ranged Troops
       value:
         number: 30
         unit: percentage
     - attribute: HP
-      class: Siege
+      class: Siege Machines
       value:
         number: 30
         unit: percentage
     - attribute: Defense
       condition:
         - When_Defending_Outside_The_Main_City
-      class: Archers
+      class: Ranged Troops
       value:
         number: 25
         unit: percentage
     - attribute: HP
       condition:
         - When_Defending_Outside_The_Main_City
-      class: Archers
+      class: Ranged Troops
       value:
         number: 25
         unit: percentage
 - level: '5red'
   buff:
     - attribute: Attack
-      class: Archers
+      class: Ranged Troops
       value:
         number: 35
         unit: percentage
     - attribute: Attack
       condition:
         - When_Defending_Outside_The_Main_City
-      class: Archers
+      class: Ranged Troops
       value:
         number: 35
         unit: percentage
     - attribute: Defense
       condition:
         - When_Defending_Outside_The_Main_City
-      class: Archers
+      class: Ranged Troops
       value:
         number: 35
         unit: percentage

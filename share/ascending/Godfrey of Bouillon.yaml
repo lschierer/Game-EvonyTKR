@@ -3,12 +3,12 @@ ascending:
 - level: '1red'
   buff:
     - attribute: Attack
-      class: Archers
+      class: Ranged Troops
       value:
         number: 10
         unit: percentage
     - attribute: Defense
-      class: Archers
+      class: Ranged Troops
       value:
         number: 15
         unit: percentage
@@ -29,29 +29,29 @@ ascending:
 - level: '4red'
   buff:
     - attribute: Defense
-      class: Archers
+      class: Ranged Troops
       value:
         number: 30
         unit: percentage
     - attribute: HP
-      class: Archers
+      class: Ranged Troops
       value:
         number: 30
         unit: percentage
 - level: '5red'
   buff:
     - attribute: Attack
-      class: Archers
+      class: Ranged Troops
       value:
         number: 25
         unit: percentage
     - attribute: Defense
-      class: Archers
+      class: Ranged Troops
       value:
         number: 15
         unit: percentage
     - attribute: HP
-      class: Archers
+      class: Ranged Troops
       value:
         number: 15
         unit: percentage

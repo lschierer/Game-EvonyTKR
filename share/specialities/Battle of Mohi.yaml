@@ -4,12 +4,12 @@ levels:
   - level: 'Green'
     buff:
       - attribute: Attack
-        class: Archers
+        class: Ranged Troops
         value:
           number: 3
           unit: percentage
       - attribute: Defense
-        class: Archers
+        class: Ranged Troops
         value:
           number: 2
           unit: percentage
@@ -21,12 +21,12 @@ levels:
   - level: 'Blue'
     buff:
       - attribute: Attack
-        class: Archers
+        class: Ranged Troops
         value:
           number: 4
           unit: percentage
       - attribute: Defense
-        class: Archers
+        class: Ranged Troops
         value:
           number: 3
           unit: percentage
@@ -38,12 +38,12 @@ levels:
   - level: 'Purple'
     buff:
       - attribute: Attack
-        class: Archers
+        class: Ranged Troops
         value:
           number: 7
           unit: percentage
       - attribute: Defense
-        class: Archers
+        class: Ranged Troops
         value:
           number: 5
           unit: percentage
@@ -55,12 +55,12 @@ levels:
   - level: 'Orange'
     buff:
       - attribute: Attack
-        class: Archers
+        class: Ranged Troops
         value:
           number: 7
           unit: percentage
       - attribute: Defense
-        class: Archers
+        class: Ranged Troops
         value:
           number: 5
           unit: percentage
@@ -72,12 +72,12 @@ levels:
   - level: 'Gold'
     buff:
       - attribute: Attack
-        class: Archers
+        class: Ranged Troops
         value:
           number: 14
           unit: percentage
       - attribute: Defense
-        class: Archers
+        class: Ranged Troops
         value:
           number: 10
           unit: percentage

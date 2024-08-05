@@ -3,14 +3,14 @@ ascending:
 - level: '1red'
   buff:
     - attribute: Attack
-      class: Archers
+      class: Ranged Troops
       condition:
         - Enemy
       value:
         number: 15
         unit: percentage
     - attribute: Attack
-      class: Siege
+      class: Siege Machines
       condition:
         - Enemy
       value:
@@ -21,14 +21,14 @@ ascending:
     - attribute: Defense
       condition:
         - Enemy
-      class: Archers
+      class: Ranged Troops
       value:
         number: 5
         unit: percentage
     - attribute: Defense
       condition:
         - Enemy
-      class: Siege
+      class: Siege Machines
       value:
         number: 5
         unit: percentage
@@ -43,14 +43,14 @@ ascending:
     - attribute: HP
       condition:
         - Enemy
-      class: Archers
+      class: Ranged Troops
       value:
         number: 5
         unit: percentage
     - attribute: HP
       condition:
         - Enemy
-      class: Siege
+      class: Siege Machines
       value:
         number: 5
         unit: percentage
@@ -71,21 +71,21 @@ ascending:
 - level: '5red'
   buff:
     - attribute: Attack
-      class: Archers
+      class: Ranged Troops
       condition:
         - Enemy
       value:
         number: 20
         unit: percentage
     - attribute: Defense
-      class: Archers
+      class: Ranged Troops
       condition:
         - Enemy
       value:
         number: 15
         unit: percentage
     - attribute: HP
-      class: Archers
+      class: Ranged Troops
       condition:
         - Enemy
       value:

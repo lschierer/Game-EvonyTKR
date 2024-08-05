@@ -5,12 +5,12 @@ ascending:
     - condition:
         - leading_the_army_to_attack
       attribute: Attack
-      class: Mounted
+      class: Mounted Troops
       value:
         number: 15
         unit: percentage
     - attribute: Defense
-      class: Mounted
+      class: Mounted Troops
       condition:
         - leading_the_army_to_attack
       value:
@@ -37,14 +37,14 @@ ascending:
     - attribute: Defense
       condition:
         - Marching
-      class: Mounted
+      class: Mounted Troops
       value:
         number: 15
         unit: percentage
     - attribute: HP
       condition:
         - Marching
-      class: Mounted
+      class: Mounted Troops
       value:
         number: 15
         unit: percentage
@@ -53,14 +53,14 @@ ascending:
     - attribute: Attack
       condition:
         - leading_the_army_to_attack
-      class: Mounted
+      class: Mounted Troops
       value:
         number: 25
         unit: percentage
     - attribute: Defense
       condition:
         - leading_the_army_to_attack
-      class: Mounted
+      class: Mounted Troops
       value:
         number: 20
         unit: percentage

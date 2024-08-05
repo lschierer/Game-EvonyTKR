@@ -5,14 +5,14 @@ ascending:
     - attribute: Defense
       condition:
         - Marching
-      class: Mounted
+      class: Mounted Troops
       value:
         number: 15
         unit: percentage
     - attribute: HP
       condition:
         - Marching
-      class: Mounted
+      class: Mounted Troops
       value:
         number: 15
         unit: percentage
@@ -37,14 +37,14 @@ ascending:
     - attribute: Attack
       condition:
         - Marching
-      class: Mounted
+      class: Mounted Troops
       value:
         number: 15
         unit: percentage
     - attribute: Defense
       condition:
         - Marching
-      class: Mounted
+      class: Mounted Troops
       value:
         number: 20
         unit: percentage
@@ -53,14 +53,14 @@ ascending:
     - attribute: Attack
       condition:
         - Marching
-      class: Mounted
+      class: Mounted Troops
       value:
         number: 20
         unit: percentage
     - attribute: HP
       condition:
         - Marching
-      class: Mounted
+      class: Mounted Troops
       value:
         number: 20
         unit: percentage

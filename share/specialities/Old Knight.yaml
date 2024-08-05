@@ -6,7 +6,7 @@ levels:
       - attribute: Attack
         condition:
           - Marching
-        class: Archers
+        class: Ranged Troops
         value:
           number: 3
           unit: percentage
@@ -20,7 +20,7 @@ levels:
       - attribute: Defense
         condition:
           - Attacking
-        class: Archers
+        class: Ranged Troops
         value:
           number: 4
           unit: percentage
@@ -29,7 +29,7 @@ levels:
       - attribute: Attack
         condition:
           - Marching
-        class: Archers
+        class: Ranged Troops
         value:
           number: 4
           unit: percentage
@@ -43,7 +43,7 @@ levels:
       - attribute: Defense
         condition:
           - Attacking
-        class: Archers
+        class: Ranged Troops
         value:
           number: 4
           unit: percentage
@@ -52,7 +52,7 @@ levels:
       - attribute: Attack
         condition:
           - Marching
-        class: Archers
+        class: Ranged Troops
         value:
           number: 6
           unit: percentage
@@ -66,7 +66,7 @@ levels:
       - attribute: Defense
         condition:
           - Attacking
-        class: Archers
+        class: Ranged Troops
         value:
           number: 8
           unit: percentage
@@ -75,7 +75,7 @@ levels:
       - attribute: Attack
         condition:
           - Marching
-        class: Archers
+        class: Ranged Troops
         value:
           number: 7
           unit: percentage
@@ -89,7 +89,7 @@ levels:
       - attribute: Defense
         condition:
           - Attacking
-        class: Archers
+        class: Ranged Troops
         value:
           number: 8
           unit: percentage
@@ -98,7 +98,7 @@ levels:
       - attribute: Attack
         condition:
           - Marching
-        class: Archers
+        class: Ranged Troops
         value:
           number: 15
           unit: percentage
@@ -112,7 +112,7 @@ levels:
       - attribute: Defense
         condition:
           - Attacking
-        class: Archers
+        class: Ranged Troops
         value:
           number: 16
           unit: percentage

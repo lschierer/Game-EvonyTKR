@@ -6,7 +6,7 @@ levels:
       - attribute: Attack
         condition:
           - Marching
-        class: Archers
+        class: Ranged Troops
         value:
           number: 3
           unit: percentage
@@ -22,7 +22,7 @@ levels:
       - attribute: Attack
         condition:
           - Marching
-        class: Archers
+        class: Ranged Troops
         value:
           number: 3
           unit: percentage
@@ -38,7 +38,7 @@ levels:
       - attribute: Attack
         condition:
           - Marching
-        class: Archers
+        class: Ranged Troops
         value:
           number: 5
           unit: percentage
@@ -54,7 +54,7 @@ levels:
       - attribute: Attack
         condition:
           - Marching
-        class: Archers
+        class: Ranged Troops
         value:
           number: 5
           unit: percentage
@@ -70,7 +70,7 @@ levels:
       - attribute: Attack
         condition:
           - Marching
-        class: Archers
+        class: Ranged Troops
         value:
           number: 10
           unit: percentage

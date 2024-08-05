@@ -5,14 +5,14 @@ ascending:
     - attribute: Attack
       condition:
         - Reinforcing
-      class: Archers
+      class: Ranged Troops
       value:
         number: 15
         unit: percentage
     - attribute: Defense
       condition:
         - Reinforcing
-      class: Ground
+      class: Ground Troops
       value:
         number: 10
         unit: percentage
@@ -21,14 +21,14 @@ ascending:
     - attribute: Defense
       condition:
         - Reinforcing
-      class: Ground
+      class: Ground Troops
       value:
         number: 15
         unit: percentage
     - attribute: HP
       condition:
         - Reinforcing
-      class: Ground
+      class: Ground Troops
       value:
         number: 15
         unit: percentage
@@ -43,14 +43,14 @@ ascending:
     - attribute: Attack
       condition:
         - Reinforcing
-      class: Archers
+      class: Ranged Troops
       value:
         number: 10
         unit: percentage
     - attribute: HP
       condition:
         - Reinforcing
-      class: Ground
+      class: Ground Troops
       value:
         number: 20
         unit: percentage
@@ -59,21 +59,21 @@ ascending:
     - attribute: Attack
       condition:
         - Reinforcing
-      class: Archers
+      class: Ranged Troops
       value:
         number: 15
         unit: percentage
     - attribute: Defense
       condition:
         - Reinforcing
-      class: Ground
+      class: Ground Troops
       value:
         number: 15
         unit: percentage
     - attribute: HP
       condition:
         - Reinforcing
-      class: Ground
+      class: Ground Troops
       value:
         number: 15
         unit: percentage

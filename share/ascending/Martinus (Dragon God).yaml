@@ -3,7 +3,7 @@ ascending:
 - level: '1red'
   buff:
     - attribute: Attack
-      class: Mounted
+      class: Mounted Troops
       value:
         number: 10
         unit: percentage
@@ -26,19 +26,19 @@ ascending:
 - level: '4red'
   buff:
     - attribute: HP
-      class: Mounted
+      class: Mounted Troops
       value:
         number: 35
         unit: percentage
 - level: '5red'
   buff:
     - attribute: Attack
-      class: Mounted
+      class: Mounted Troops
       value:
         number: 5
         unit: percentage
     - attribute: Attack
-      class: Mounted
+      class: Mounted Troops
       condition:
         - dragon_to_the_attack
       value:

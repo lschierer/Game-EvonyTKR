@@ -5,28 +5,28 @@ ascending:
     - condition:
         - Marching
       attribute: Defense
-      class: Ground
+      class: Ground Troops
       value:
         number: 10
         unit: percentage
     - condition:
         - Marching
       attribute: Defense
-      class: Mounted
+      class: Mounted Troops
       value:
         number: 10
         unit: percentage
     - condition:
         - Marching
       attribute: HP
-      class: Ground
+      class: Ground Troops
       value:
         number: 10
         unit: percentage
     - condition:
         - Marching
       attribute: HP
-      class: Mounted
+      class: Mounted Troops
       value:
         number: 10
         unit: percentage
@@ -43,14 +43,14 @@ ascending:
     - condition:
         - Attacking
       attribute: Defense
-      class: Ground
+      class: Ground Troops
       value:
         number: 10
         unit: percentage
     - condition:
         - Attacking
       attribute: HP
-      class: Ground
+      class: Ground Troops
       value:
         number: 10
         unit: percentage
@@ -64,21 +64,21 @@ ascending:
   buff:
     - condition:
         - Marching
-      class: Ground
+      class: Ground Troops
       attribute: Attack
       value:
         number: 15
         unit: percentage
     - condition:
         - Marching
-      class: Ground
+      class: Ground Troops
       attribute: Defense
       value:
         number: 25
         unit: percentage
     - condition:
         - Marching
-      class: Mounted
+      class: Mounted Troops
       attribute: Defense
       value:
         number: 25
@@ -87,17 +87,17 @@ ascending:
   buff:
     - condition:
         - Marching
-      class: Ground
+      class: Ground Troops
       attribute: Attack
       value:
         number: 20
         unit: percentage
-    - class: Ground
+    - class: Ground Troops
       attribute: Defense
       value:
         number: 20
         unit: percentage
-    - class: Ground
+    - class: Ground Troops
       attribute: HP
       value:
         number: 20

@@ -5,34 +5,34 @@ ascending:
     - attribute: Attack
       condition:
         - Marching
-      class: Ground
+      class: Ground Troops
       value:
         number: 5
         unit: percentage
     - attribute: Attack
       condition:
         - Marching
-      class: Mounted
+      class: Mounted Troops
       value:
         number: 5
         unit: percentage
     - attribute: Defense
-      class: Ground
+      class: Ground Troops
       value:
         number: 5
         unit: percentage
     - attribute: Defense
-      class: Mounted
+      class: Mounted Troops
       value:
         number: 5
         unit: percentage
     - attribute: HP
-      class: Ground
+      class: Ground Troops
       value:
         number: 5
         unit: percentage
     - attribute: HP
-      class: Mounted
+      class: Mounted Troops
       value:
         number: 5
         unit: percentage
@@ -49,7 +49,7 @@ ascending:
     - attribute: Attack
       condition:
         - Attacking
-      class: Mounted
+      class: Mounted Troops
       value:
         number: 10
         unit: percentage
@@ -64,28 +64,28 @@ ascending:
     - attribute: Defense
       condition:
         - Marching
-      class: Ground
+      class: Ground Troops
       value:
         number: 20
         unit: percentage
     - attribute: Defense
       condition:
         - Marching
-      class: Mounted
+      class: Mounted Troops
       value:
         number: 20
         unit: percentage
     - attribute: HP
       condition:
         - Marching
-      class: Ground
+      class: Ground Troops
       value:
         number: 20
         unit: percentage
     - attribute: HP
       condition:
         - Marching
-      class: Mounted
+      class: Mounted Troops
       value:
         number: 20
         unit: percentage
@@ -94,21 +94,21 @@ ascending:
     - attribute: Attack
       condition:
         - Marching
-      class: Mounted
+      class: Mounted Troops
       value:
         number: 30
         unit: percentage
     - attribute: Defense
       condition:
         - Marching
-      class: Mounted
+      class: Mounted Troops
       value:
         number: 25
         unit: percentage
     - attribute: HP
       condition:
         - Marching
-      class: Mounted
+      class: Mounted Troops
       value:
         number: 25
         unit: percentage

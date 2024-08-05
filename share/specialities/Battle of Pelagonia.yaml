@@ -4,17 +4,17 @@ levels:
   - level: 'Green'
     buff:
       - attribute: Attack
-        class: Archers
+        class: Ranged Troops
         value:
           number: 4
           unit: percentage
       - attribute: Defense
-        class: Archers
+        class: Ranged Troops
         value:
           number: 2
           unit: percentage
       - attribute: HP
-        class: Archers
+        class: Ranged Troops
         value:
           number: 1
           unit: percentage
@@ -26,12 +26,12 @@ levels:
   - level: 'Blue'
     buff:
       - attribute: Attack
-        class: Archers
+        class: Ranged Troops
         value:
           number: 4
           unit: percentage
       - attribute: Defense
-        class: Archers
+        class: Ranged Troops
         value:
           number: 2
           unit: percentage
@@ -41,19 +41,19 @@ levels:
           number: 1
           unit: percentage
       - attribute: HP
-        class: Archers
+        class: Ranged Troops
         value:
           number: 1
           unit: percentage
   - level: 'Purple'
     buff:
       - attribute: Attack
-        class: Archers
+        class: Ranged Troops
         value:
           number: 8
           unit: percentage
       - attribute: Defense
-        class: Archers
+        class: Ranged Troops
         value:
           number: 4
           unit: percentage
@@ -63,19 +63,19 @@ levels:
           number: 2
           unit: percentage
       - attribute: HP
-        class: Archers
+        class: Ranged Troops
         value:
           number: 2
           unit: percentage
   - level: 'Orange'
     buff:
       - attribute: Attack
-        class: Archers
+        class: Ranged Troops
         value:
           number: 8
           unit: percentage
       - attribute: Defense
-        class: Archers
+        class: Ranged Troops
         value:
           number: 4
           unit: percentage
@@ -85,24 +85,24 @@ levels:
           number: 2
           unit: percentage
       - attribute: HP
-        class: Archers
+        class: Ranged Troops
         value:
           number: 2
           unit: percentage
   - level: 'Gold'
     buff:
       - attribute: Attack
-        class: Archers
+        class: Ranged Troops
         value:
           number: 16
           unit: percentage
       - attribute: Defense
-        class: Archers
+        class: Ranged Troops
         value:
           number: 8
           unit: percentage
       - attribute: HP
-        class: Archers
+        class: Ranged Troops
         value:
           number: 4
           unit: percentage
