@@ -3,14 +3,14 @@ ascending:
 - level: '1red'
   buff:
     - attribute: Attack
-      class: Archers
+      class: Ranged Troops
       condition:
         - Marching
       value:
         number: 10
         unit: percentage
     - attribute: Defense
-      class: Mounted
+      class: Mounted Troops
       condition:
         - Marching
       value:
@@ -33,14 +33,14 @@ ascending:
 - level: '4red'
   buff:
     - attribute: Attack
-      class: Archers
+      class: Ranged Troops
       condition:
         - Marching
       value:
         number: 20
         unit: percentage
     - attribute: HP
-      class: Mounted
+      class: Mounted Troops
       condition:
         - Marching
       value:
@@ -49,7 +49,7 @@ ascending:
 - level: '5red'
   buff:
     - attribute: Attack
-      class: Mounted
+      class: Mounted Troops
       condition:
         - Marching
       value:
@@ -58,14 +58,14 @@ ascending:
     - attribute: Defense
       condition:
         - Marching
-      class: Mounted
+      class: Mounted Troops
       value:
         number: 15
         unit: percentage
     - attribute: HP
       condition:
         - Marching
-      class: Mounted
+      class: Mounted Troops
       value:
         number: 15
         unit: percentage

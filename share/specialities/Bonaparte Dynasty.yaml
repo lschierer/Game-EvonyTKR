@@ -20,7 +20,7 @@ levels:
       - attribute: Attack
         condition:
           - Reduces_Enemy_with_a_Dragon
-        class: Archers
+        class: Ranged Troops
         value:
           number: 1
           unit: percentage
@@ -50,7 +50,7 @@ levels:
       - attribute: Attack
         condition:
           - Reduces_Enemy_with_a_Dragon
-        class: Archers
+        class: Ranged Troops
         value:
           number: 2
           unit: percentage
@@ -80,7 +80,7 @@ levels:
       - attribute: Attack
         condition:
           - Reduces_Enemy_with_a_Dragon
-        class: Archers
+        class: Ranged Troops
         value:
           number: 3
           unit: percentage
@@ -110,7 +110,7 @@ levels:
       - attribute: Attack
         condition:
           - Reduces_Enemy_with_a_Dragon
-        class: Archers
+        class: Ranged Troops
         value:
           number: 3
           unit: percentage
@@ -140,7 +140,7 @@ levels:
       - attribute: Attack
         condition:
           - Reduces_Enemy_with_a_Dragon
-        class: Archers
+        class: Ranged Troops
         value:
           number: 6
           unit: percentage

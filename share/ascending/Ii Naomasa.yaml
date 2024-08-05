@@ -3,7 +3,7 @@ ascending:
 - level: '1red'
   buff:
     - attribute: HP
-      class: Mounted
+      class: Mounted Troops
       value:
         number: 20
         unit: percentage
@@ -22,19 +22,19 @@ ascending:
         number: 6
         unit: percentage
     - 'attribute:': Attack
-      class: Mounted
+      class: Mounted Troops
       value:
         number: 10
         unit: percentage
 - level: '4red'
   buff:
     - attribute: Attack
-      class: Mounted
+      class: Mounted Troops
       value:
         number: 5
         unit: percentage
     - attribute: HP
-      class: Mounted
+      class: Mounted Troops
       value:
         number: 30
         unit: percentage
@@ -45,7 +45,7 @@ ascending:
         number: 8
         unit: percentage
     - attribute: Attack
-      class: Mounted
+      class: Mounted Troops
       value:
         number: 20
         unit: percentage

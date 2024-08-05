@@ -11,7 +11,7 @@ levels:
       - attribute: Defense
         condition:
           - Reduces_Enemy_in_Attack
-        class: Archers
+        class: Ranged Troops
         value:
           number: 3
           unit: percentage
@@ -25,7 +25,7 @@ levels:
       - attribute: Defense
         condition:
           - Reduces_Enemy_in_Attack
-        class: Archers
+        class: Ranged Troops
         value:
           number: 3
           unit: percentage
@@ -39,7 +39,7 @@ levels:
       - attribute: Defense
         condition:
           - Reduces_Enemy_in_Attack
-        class: Archers
+        class: Ranged Troops
         value:
           number: 6
           unit: percentage
@@ -53,7 +53,7 @@ levels:
       - attribute: Defense
         condition:
           - Reduces_Enemy_in_Attack
-        class: Archers
+        class: Ranged Troops
         value:
           number: 6
           unit: percentage
@@ -67,7 +67,7 @@ levels:
       - attribute: Defense
         condition:
           - Reduces_Enemy_in_Attack
-        class: Archers
+        class: Ranged Troops
         value:
           number: 12
           unit: percentage

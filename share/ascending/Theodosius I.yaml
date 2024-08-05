@@ -3,14 +3,14 @@ ascending:
 - level: '1red'
   buff:
     - attribute: Attack
-      class: Siege
+      class: Siege Machines
       condition:
         - Marching
       value:
         number: 10
         unit: percentage
     - attribute: Defense
-      class: Siege
+      class: Siege Machines
       condition:
         - Marching
       value:
@@ -27,7 +27,7 @@ ascending:
 - level: '3red'
   buff:
     - attribute: HP
-      class: Siege
+      class: Siege Machines
       condition:
         - Marching
       value:
@@ -40,14 +40,14 @@ ascending:
 - level: '4red'
   buff:
     - attribute: Attack
-      class: Siege
+      class: Siege Machines
       condition:
         - Marching
       value:
         number: 15
         unit: percentage
     - attribute: Defense
-      class: Siege
+      class: Siege Machines
       condition:
         - Marching
       value:
@@ -56,7 +56,7 @@ ascending:
 - level: '5red'
   buff:
     - attribute: Attack
-      class: Siege
+      class: Siege Machines
       condition:
         - Marching
       value:
@@ -70,7 +70,7 @@ ascending:
         number: 20
         unit: percentage
     - attribute: HP
-      class: Siege
+      class: Siege Machines
       condition:
         - Marching
       value:

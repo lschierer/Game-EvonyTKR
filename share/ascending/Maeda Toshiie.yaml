@@ -3,14 +3,14 @@ ascending:
 - level: '1red'
   buff:
     - attribute: Attack
-      class: Ground
+      class: Ground Troops
       condition:
         - leading_the_army_to_attack
       value:
         number: 5
         unit: percentage
     - attribute: Defense
-      class: Ground
+      class: Ground Troops
       condition:
         - leading_the_army_to_attack
       value:
@@ -37,28 +37,28 @@ ascending:
     - attribute: Attack
       condition:
         - Marching
-      class: Mounted
+      class: Mounted Troops
       value:
         number: 10
         unit: percentage
     - attribute: Attack
       condition:
         - Marching
-      class: Ground
+      class: Ground Troops
       value:
         number: 10
         unit: percentage
     - attribute: Defense
       condition:
         - Marching
-      class: Mounted
+      class: Mounted Troops
       value:
         number: 20
         unit: percentage
     - attribute: Defense
       condition:
         - Marching
-      class: Ground
+      class: Ground Troops
       value:
         number: 20
         unit: percentage
@@ -67,21 +67,21 @@ ascending:
     - attribute: Attack
       condition:
         - Marching
-      class: Ground
+      class: Ground Troops
       value:
         number: 15
         unit: percentage
     - attribute: HP
       condition:
         - Marching
-      class: Ground
+      class: Ground Troops
       value:
         number: 20
         unit: percentage
     - attribute: HP
       condition:
         - Marching
-      class: Mounted
+      class: Mounted Troops
       value:
         number: 20
         unit: percentage

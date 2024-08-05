@@ -5,14 +5,14 @@ ascending:
     - attribute: HP
       condition:
         - Against Monsters
-      class: Mounted
+      class: Mounted Troops
       value:
         number: 30
         unit: percentage
     - attribute: Defense
       condition:
         - Against Monsters
-      class: Mounted
+      class: Mounted Troops
       value:
         number: 10
         unit: percentage
@@ -49,7 +49,7 @@ ascending:
     - attribute: Attack
       condition:
         - Against Monsters
-      class: Mounted
+      class: Mounted Troops
       value:
         number: 15
         unit: percentage
@@ -64,7 +64,7 @@ ascending:
     - attribute: Attack
       condition:
         - Against Monsters
-      class: Mounted
+      class: Mounted Troops
       value:
         number: 20
         unit: percentage

@@ -5,14 +5,14 @@ ascending:
     - attribute: Attack
       condition:
         - Marching
-      class: Archers
+      class: Ranged Troops
       value:
         number: 5
         unit: percentage
     - attribute: Defense
       condition:
         - Marching
-      class: Archers
+      class: Ranged Troops
       value:
         number: 10
         unit: percentage
@@ -35,21 +35,21 @@ ascending:
     - attribute: Attack
       condition:
         - Marching
-      class: Mounted
+      class: Mounted Troops
       value:
         number: 5
         unit: percentage
     - attribute: Attack
       condition:
         - Marching
-      class: Mounted
+      class: Mounted Troops
       value:
         number: 5
         unit: percentage
     - attribute: Defense
       condition:
         - Marching
-      class: Archers
+      class: Ranged Troops
       value:
         number: 30
         unit: percentage
@@ -58,21 +58,21 @@ ascending:
     - attribute: Attack
       condition:
         - Marching
-      class: Mounted
+      class: Mounted Troops
       value:
         number: 8
         unit: percentage
     - attribute: Attack
       condition:
         - Marching
-      class: Archers
+      class: Ranged Troops
       value:
         number: 5
         unit: percentage
     - attribute: Attack
       condition:
         - dragon_to_the_attack
-      class: Archers
+      class: Ranged Troops
       value:
         number: 20
         unit: percentage

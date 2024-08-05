@@ -20,14 +20,14 @@ levels:
       - attribute: Defense
         condition:
           - Attacking
-        class: Archers
+        class: Ranged Troops
         value:
           number: 3
           unit: percentage
       - attribute: HP
         condition:
           - Enemy
-        class: Archers
+        class: Ranged Troops
         value:
           number: 2
           unit: percentage
@@ -57,14 +57,14 @@ levels:
       - attribute: Defense
         condition:
           - Attacking
-        class: Archers
+        class: Ranged Troops
         value:
           number: 3
           unit: percentage
       - attribute: HP
         condition:
           - Enemy
-        class: Archers
+        class: Ranged Troops
         value:
           number: 3
           unit: percentage
@@ -94,14 +94,14 @@ levels:
       - attribute: Defense
         condition:
           - Attacking
-        class: Archers
+        class: Ranged Troops
         value:
           number: 6
           unit: percentage
       - attribute: HP
         condition:
           - Enemy
-        class: Archers
+        class: Ranged Troops
         value:
           number: 5
           unit: percentage
@@ -131,14 +131,14 @@ levels:
       - attribute: Defense
         condition:
           - Attacking
-        class: Archers
+        class: Ranged Troops
         value:
           number: 6
           unit: percentage
       - attribute: HP
         condition:
           - Enemy
-        class: Archers
+        class: Ranged Troops
         value:
           number: 5
           unit: percentage
@@ -168,14 +168,14 @@ levels:
       - attribute: Defense
         condition:
           - Attacking
-        class: Archers
+        class: Ranged Troops
         value:
           number: 12
           unit: percentage
       - attribute: HP
         condition:
           - Enemy
-        class: Archers
+        class: Ranged Troops
         value:
           number: 10
           unit: percentage

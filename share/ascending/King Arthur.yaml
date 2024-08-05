@@ -1,0 +1,59 @@
+---
+ascending:
+  - level: '1red'
+    buff:
+      - attribute: Attack
+        class: Mounted Troops
+        condition:
+          - Marching
+        value:
+          number: 20
+          unit: percentage
+  - level: '2red'
+    buff:
+      - attribute: Wounded_to_Death
+        condition:
+          - Marching
+        value:
+          number: 8
+          unit: percentage
+  - level: '3red'
+    buff:
+      - attribute: Rally_Capacity
+        condition:
+          - When_Rallying
+        value:
+          number: 8
+          unit: percentage
+  - level: '4red'
+    buff:
+      - attribute: Defense
+        class: Mounted Troops
+        condition:
+          - Marching
+        value:
+          number: 20
+          unit: percentage
+      - attribute: HP
+        class: Mounted Troops
+        condition:
+          - Marching
+        value:
+          number: 20
+          unit: percentage
+  - level: '5red'
+    buff:
+      - attribute: Attack
+        class: Mounted Troops
+        condition:
+          - Marching
+        value:
+          number: 15
+          unit: percentage
+      - attribute: Attack
+        class: Ranged
+        condition:
+          - Marching
+        value:
+          number: 15
+          unit: percentage

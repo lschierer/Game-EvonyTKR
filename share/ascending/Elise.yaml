@@ -5,21 +5,21 @@ ascending:
     - attribute: HP
       condition:
         - Marching
-      class: Ground
+      class: Ground Troops
       value:
         number: 10
         unit: percentage
     - attribute: HP
       condition:
         - Marching
-      class: Mounted
+      class: Mounted Troops
       value:
         number: 10
         unit: percentage
     - attribute: Attack
       condition:
         - dragon_to_the_attack
-      class: Ground
+      class: Ground Troops
       value:
         number: 15
         unit: percentage
@@ -38,7 +38,7 @@ ascending:
 - level: '3red'
   buff:
     - attribute: Defense
-      class: Ground
+      class: Ground Troops
       condition:
         - Marching
       value:
@@ -47,21 +47,21 @@ ascending:
 - level: '4red'
   buff:
     - attribute: HP
-      class: Mounted
+      class: Mounted Troops
       condition:
         - leading_the_army_to_attack
       value:
         number: 10
         unit: percentage
     - attribute: HP
-      class: Ground
+      class: Ground Troops
       condition:
         - leading_the_army_to_attack
       value:
         number: 10
         unit: percentage
     - attribute: Defense
-      class: Ground
+      class: Ground Troops
       condition:
         - leading_the_army_to_attack
       value:
@@ -70,7 +70,7 @@ ascending:
     - attribute: Attack
       condition:
         - dragon_to_the_attack
-      class: Ground
+      class: Ground Troops
       value:
         number: 20
         unit: percentage

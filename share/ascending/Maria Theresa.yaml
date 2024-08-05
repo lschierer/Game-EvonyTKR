@@ -45,7 +45,7 @@ ascending:
     - attribute: Attack
       condition:
         - Against Monsters
-      class: Mounted
+      class: Mounted Troops
       value:
         number: 30
         unit: percentage

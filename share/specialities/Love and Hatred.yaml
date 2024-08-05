@@ -6,21 +6,21 @@ levels:
       - attribute: Attack
         condition:
           - When_Defending_Outside_The_Main_City
-        class: Archers
+        class: Ranged Troops
         value:
           number: 4
           unit: percentage
       - attribute: Defense
         condition:
           - When_Defending_Outside_The_Main_City
-        class: Archers
+        class: Ranged Troops
         value:
           number: 4
           unit: percentage
       - attribute: HP
         condition:
           - When_Defending_Outside_The_Main_City
-        class: Archers
+        class: Ranged Troops
         value:
           number: 5
           unit: percentage
@@ -29,21 +29,21 @@ levels:
       - attribute: Attack
         condition:
           - When_Defending_Outside_The_Main_City
-        class: Archers
+        class: Ranged Troops
         value:
           number: 5
           unit: percentage
       - attribute: Defense
         condition:
           - When_Defending_Outside_The_Main_City
-        class: Archers
+        class: Ranged Troops
         value:
           number: 5
           unit: percentage
       - attribute: HP
         condition:
           - When_Defending_Outside_The_Main_City
-        class: Archers
+        class: Ranged Troops
         value:
           number: 5
           unit: percentage
@@ -52,21 +52,21 @@ levels:
       - attribute: Attack
         condition:
           - When_Defending_Outside_The_Main_City
-        class: Archers
+        class: Ranged Troops
         value:
           number: 9
           unit: percentage
       - attribute: Defense
         condition:
           - When_Defending_Outside_The_Main_City
-        class: Archers
+        class: Ranged Troops
         value:
           number: 9
           unit: percentage
       - attribute: HP
         condition:
           - When_Defending_Outside_The_Main_City
-        class: Archers
+        class: Ranged Troops
         value:
           number: 10
           unit: percentage
@@ -75,21 +75,21 @@ levels:
       - attribute: Attack
         condition:
           - When_Defending_Outside_The_Main_City
-        class: Archers
+        class: Ranged Troops
         value:
           number: 9
           unit: percentage
       - attribute: Defense
         condition:
           - When_Defending_Outside_The_Main_City
-        class: Archers
+        class: Ranged Troops
         value:
           number: 9
           unit: percentage
       - attribute: HP
         condition:
           - When_Defending_Outside_The_Main_City
-        class: Archers
+        class: Ranged Troops
         value:
           number: 10
           unit: percentage
@@ -98,21 +98,21 @@ levels:
       - attribute: Attack
         condition:
           - When_Defending_Outside_The_Main_City
-        class: Archers
+        class: Ranged Troops
         value:
           number: 18
           unit: percentage
       - attribute: Defense
         condition:
           - When_Defending_Outside_The_Main_City
-        class: Archers
+        class: Ranged Troops
         value:
           number: 18
           unit: percentage
       - attribute: HP
         condition:
           - When_Defending_Outside_The_Main_City
-        class: Archers
+        class: Ranged Troops
         value:
           number: 20
           unit: percentage
