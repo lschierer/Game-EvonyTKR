@@ -4,7 +4,7 @@ use experimental qw(class);
 class Game::EvonyTKR::General {
   use Carp;
   use Types::Common qw( t is_Num is_Str is_Int);
-  use Type::Utils "is";
+  use Type::Utils qw(is enum);
   use Util::Any -all;
   use Data::Printer;
   use Game::EvonyTKR::SkillBook::Special;
@@ -58,6 +58,10 @@ use overload
 
   field $level :reader :param //= 45;
 
+  field $ascending :reader :param //= true;
+
+  field $stars :reader :param //= '5red';
+
   use constant DEFAULT_BUFF_MULTIPLIERS => Game::EvonyTKR::Buff::EvaluationMultipliers->new();
 
   field $BuffMultipliers :reader :param //= __CLASS__->DEFAULT_BUFF_MULTIPLIERS;
@@ -77,6 +81,34 @@ use overload
 
   field @otherBooks :reader;
 
+  field $starsValues = enum [
+    'None',
+    '1purple',
+    '2purple',
+    '3purple',
+    '4purple',
+    '5purple',
+    '1red',
+    '2red',
+    '3red',
+    '4red',
+    '5red',
+  ];
+
+  field %BasicAESAdjustment = (
+    'None'    => 0,
+    '1purple' => 0,
+    '2purple' => 0,
+    '3purple' => 0,
+    '4purple' => 0,
+    '5purple' => 0,
+    '1red'    => 10,
+    '2red'    => 20,
+    '3red'    => 30,
+    '4red'    => 40,
+    '5red'    => 50,
+  );
+
   ADJUST {
     my @errors;
     my $type = blessed $builtInBook;
@@ -90,7 +122,15 @@ use overload
 
   ADJUST {
     my @errors;
-    my $type = t('PositiveOrZeroNum');
+    
+    my $type = t('Bool');
+    $type->check($ascending) or push @errors => "ascending must be a bool, not $ascending";
+
+    my $check = $starsValues->compiled_check;
+    my $prettyenum = np @{ $starsValues->values }; 
+    $check->($stars) or push @errors => "stars must be one of the $prettyenum not $stars";
+
+    $type = t('PositiveOrZeroNum');
     is_Num($leadership) or push @errors => "leadership must be a number, not $leadership";
     $type->check($leadership) or push @errors => "leadership must be positive, not $leadership";
 
@@ -126,19 +166,103 @@ use overload
   }
 
   method effective_leadership() {
-    return $level * $leadership_increment + $leadership;
+    my $AES_adjustment = 0;
+
+    if($ascending){
+      my @values = $starsValues->values();
+      for my $value (@values){
+        if($stars eq $value) {
+          $AES_adjustment = $BasicAESAdjustment{$stars};
+          last;
+        }
+      }
+    }
+
+    my $step1 = $level * $leadership_increment + $leadership;
+    my $step2 = $step1 + 500;
+    my $step3 = $step2 + $AES_adjustment;
+    my $step4;
+    if($step3 < 900) {
+      $step4 = $step3 * 0.1;
+    } else {
+      $step4 = 90 + ($step3 - 900) * 0.2;
+    }
+    return $step4;
   }
 
   method effective_attack() {
-    return $level * $attack_increment + $attack;
+    my $AES_adjustment = 0;
+
+    if($ascending){
+      my @values = $starsValues->values();
+      for my $value (@values){
+        if($stars eq $value) {
+          $AES_adjustment = $BasicAESAdjustment{$stars};
+          last;
+        }
+      }
+    }
+
+    my $step1 = $level * $attack_increment + $attack;
+    my $step2 = $step1 + 500;
+    my $step3 = $step2 + $AES_adjustment;
+    my $step4;
+    if($step3 < 900) {
+      $step4 = $step3 * 0.1;
+    } else {
+      $step4 = 90 + ($step3 - 900) * 0.2;
+    }
+    return $step4;
   }
 
   method effective_defense() {
-    return $level * $defense_increment + $defense;
+    my $AES_adjustment = 0;
+
+    if($ascending){
+      my @values = $starsValues->values();
+      for my $value (@values){
+        if($stars eq $value) {
+          $AES_adjustment = $BasicAESAdjustment{$stars};
+          last;
+        }
+      }
+    }
+
+    my $step1 = $level * $defense_increment + $defense;
+    my $step2 = $step1 + 500;
+    my $step3 = $step2 + $AES_adjustment;
+    my $step4;
+    if($step3 < 900) {
+      $step4 = $step3 * 0.1;
+    } else {
+      $step4 = 90 + ($step3 - 900) * 0.2;
+    }
+    return $step4;
   }
 
   method effective_politics() {
-    return $level * politics_increment + $politics_increment;
+    my $AES_adjustment = 0;
+
+    if($ascending){
+      my @values = $starsValues->values();
+      for my $value (@values){
+        if($stars eq $value) {
+          $AES_adjustment = $BasicAESAdjustment{$stars};
+          last;
+        }
+      }
+    }
+
+    my $step1 = $level * $politics_increment + $politics;
+    my $step2 = $step1 + 500;
+    my $step3 = $step2 + $AES_adjustment;
+    my $step4;
+    if($step3 < 900) {
+      $step4 = $step3 * 0.1;
+    } else {
+      $step4 = 90 + ($step3 - 900) * 0.2;
+    }
+    return $step4;
   }
 
   method is_ground_general() {
@@ -294,6 +418,29 @@ generals start at level 1 and can grow to level 45.  Thier effective statistics 
 
 This returns the level at which the general is currently being evaluated. 
 =cut
+
+=method ascending()
+
+This returns true or false, for whether or not the general can be ascended. 
+=cut
+
+=method stars()
+
+This returns one of the values 
+'None'
+'1purple'
+'2purple'
+'3purple'
+'4purple'
+'5purple'
+'1red'
+'2red'
+'3red'
+'4red'
+'5red'
+
+to indicate at what level of ascension the general is being evaluated at. 
+=cut 
 
 =method builtInBook
 
