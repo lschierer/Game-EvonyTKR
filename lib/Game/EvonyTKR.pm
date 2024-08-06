@@ -75,9 +75,7 @@ sub execute {
         for my $gp (@pairGroup) {
           $logger->trace("primary: " . $gp->primary()->name());
           $logger->trace("secondary: " . $gp->secondary()->name())
-        
         }
-        
       } else {
         $logger->info("$bc: no pairs");
       }
@@ -88,7 +86,6 @@ sub execute {
 
 sub read_generals($logger) {
   
-
   $logger->info("read_generals");
   my $general_share = File::Spec->catfile(dist_dir('Game-EvonyTKR'), 'generals');
   
