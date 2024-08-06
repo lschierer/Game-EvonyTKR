@@ -102,27 +102,34 @@ class Game::EvonyTKR::Buff :isa(Game::EvonyTKR::Logger) {
   method compare($other, $swap = 0) {
     
     my $code = 1;
-    if(blessed $other ne 'Game::EvonyTKR::Buff') {
+    my $otherClass = blessed $other;
+    if(not defined $otherClass){
+      croak "otherClass is not defined";
+    }
+    $self->logger()->trace("comparing against a object of type $otherClass");
+    if(not defined $other ){
+      $code = -1
+    } elsif ($otherClass ne 'Game::EvonyTKR::Buff') {
       $code = -1;
-    } elsif($other->attribute() ne $attribute) {
+    } elsif ($other->attribute() ne $attribute) {
       $code = -2;
-    } elsif($other->value()->number() != $value->number) {
+    } elsif ($other->value()->number() != $value->number) {
       $code = -3;
-    } elsif($other->value()->unit() ne $value->unit) {
+    } elsif ($other->value()->unit() ne $value->unit) {
       $code = -4;
-    } elsif(
+    } elsif (
       ($self->has_buffClass() && (not $other->has_buffClass())) ||
       ((not $self->has_buffClass()) && $other->has_buffClass())) {
         $code = -5;
-      }elsif(
+      } elsif (
       ($self->has_condition() && (not $other->has_condition())) ||
       ((not $self->has_condition()) && $other->has_condition())
     ) {
       $code = -6;
-    }elsif($buffClass ne $other->buffClass()) {
+    } elsif ($buffClass ne $other->buffClass()) {
       $code = -7;
     }
-    if( $code >= 0) {
+    if ( $code >= 0) {
       # I cannot use an else-if pattern for this because
       # the precoditions for testing are not in place,
       # are expensive to gather, and need not be gathered at all

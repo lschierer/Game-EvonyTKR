@@ -1,18 +1,21 @@
 use v5.40.0;
 use experimental qw(class);
 
-class Game::EvonyTKR::Speciality :isa('Game::EvonyTKR::Logger') {
+class Game::EvonyTKR::Speciality :isa(Game::EvonyTKR::Logger) {
 # PODNAME: Game::EvonyTKR::Speciality
 
   use Types::Standard qw(is_Int Int Num is_Num Str is_Str);
   use Types::Common qw( t);
   use Type::Utils qw(is enum);
   use Carp;
+  use Data::Dumper;
   use Data::Printer;
   use File::ShareDir ':ALL';
   use File::Spec;
   use Game::EvonyTKR::Buff;
   use Game::EvonyTKR::Buff::Value;
+  use List::MoreUtils;
+  use Util::Any -all;
   use YAML::XS qw{LoadFile Load};
   use namespace::autoclean;
   use Game::EvonyTKR::Logger;
@@ -51,7 +54,7 @@ class Game::EvonyTKR::Speciality :isa('Game::EvonyTKR::Logger') {
 
   ADJUST {
     my @lv = $levels->values();
-    for $tl (@lv){
+    for my $tl (@lv){
       $Buffs{$tl} = ();
     }
     my @errors;
@@ -77,7 +80,7 @@ class Game::EvonyTKR::Speciality :isa('Game::EvonyTKR::Logger') {
     }
     my @levelValues = $levels->values();
 
-    for $tl (@levelValues) {
+    for my $tl (@levelValues) {
       if($level eq 'None'){
         # Level None never has any buffs, this was a mistake. 
         last;
@@ -112,17 +115,19 @@ class Game::EvonyTKR::Speciality :isa('Game::EvonyTKR::Logger') {
       my $data = LoadFile($FileWithPath);
       my @fileLevels = @{ $data->{'levels'}};
       foreach my $fl (@fileLevels){
-        my @flBuffs = $fl->{'buff'};
+        my @flBuffs = @{ $fl->{'buff'} };
         foreach my $flb (@flBuffs) {
           my $v;
           my $b;
-          if(exists $flb->{'value'}) {
+          my @flKeys = keys %{$flb};
+          
+          if(any {$_ eq 'value'} @flKeys) {
             $self->logger()->debug("SpecialityFileName has a buff with a value");
             $v = Game::EvonyTKR::Buff::Value->new(
               number  => $flb->{'value'}->{'number'},
               unit    => $flb->{'value'}->{'unit'},
             );
-            if(exists $flb->{'class'}) {
+            if(any {$_ eq 'class'} @flKeys) {
               $b = Game::EvonyTKR::Buff->new(
                 attribute  => $flb->{'attribute'},
                 value      => $v,
@@ -138,9 +143,13 @@ class Game::EvonyTKR::Speciality :isa('Game::EvonyTKR::Logger') {
             $self->logger()->warn("SpecialityFileName has a buff without a value");
           }
           if(defined $b) {
-            foreach my $flc ($flb->{'condition'}){
-              $b->set_condition($flc);
+            if(any {$_ eq 'condition'} @flKeys) {
+              my @conditions = @{ $flb->{'condition'} };
+              foreach my $flc (@conditions){
+                $b->set_condition($flc);
+              }
             }
+            
             $self->logger()->info("Adding buff from $SpecialityFileName to " . $fl->{'level'});
             push @{ $Buffs{$fl->{'level'}} }, $b;
           }else {
