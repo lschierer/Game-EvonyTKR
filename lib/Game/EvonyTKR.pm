@@ -114,7 +114,7 @@ sub read_generals($logger) {
         name  => $bookName
       );
       
-      $sb = getBookData($sb, $bookName);
+      $sb->readFromFile();
 
       my %generalClass = (
         'Ground'  => 'Game::EvonyTKR::General::Ground',
@@ -167,7 +167,7 @@ sub read_generals($logger) {
           my $tb = Game::EvonyTKR::SkillBook::Special->new(
             name  => $tbName
           );
-          $tb = getBookData($tb, $tbName.'.yaml');
+          $tb->readFromFile();
           $generals{$name}->addAnotherBook($tb);
         }
         $logger->debug("added ". np $generals{$name});
@@ -176,45 +176,6 @@ sub read_generals($logger) {
     }
   }
   return %generals;
-}
-
-sub getBookData($sb, $bookName) {
-  my $book_share = File::Spec->catfile(dist_dir('Game-EvonyTKR'), 'skillBooks');
-  my $data_filename = File::Spec->catfile($book_share, $bookName);
-  if( -T -s -r $data_filename ) {
-    my $bookData = LoadFile($data_filename);
-    my @buffs = @{ $bookData->{'buff'} };
-    foreach my $rb (@buffs) {
-      my $v = Game::EvonyTKR::Buff::Value->new(
-        number      => $rb->{'value'}->{'number'},
-        unit        => $rb->{'value'}->{'unit'},
-      );
-      if(exists $rb->{'class'}) {
-        my $b = Game::EvonyTKR::Buff->new(
-          attribute  => $rb->{'attribute'},
-          value      => $v,
-          buffClass   => $rb->{'class'},
-        );  
-      } else {
-        my $b = Game::EvonyTKR::Buff->new(
-          attribute  => $rb->{'attribute'},
-          value      => $v,
-        );
-      }
-      my $b = Game::EvonyTKR::Buff->new(
-        attribute  => $rb->{'attribute'},
-        value      => $v,
-        buffClass   => $rb->{'class'},
-      );
-      foreach my $rc ($rb->{'condition'}) {
-        $b->set_condition($rc);
-      }
-      $sb->add_buff($b);
-    }
-  } else {
-    croak "$data_filename is not found or cannot be read."
-  }
-  return $sb;
 }
 
 1;
