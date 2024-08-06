@@ -151,7 +151,7 @@ class Game::EvonyTKR::Speciality :isa(Game::EvonyTKR::Logger) {
             }
             
             $self->logger()->info("Adding buff from $SpecialityFileName to " . $fl->{'level'});
-            push @{ $Buffs{$fl->{'level'}} }, $b;
+            $self->add_buff($fl->{'level'}, $b);
           }else {
             $self->logger()->warn('No buff defined');
           }
