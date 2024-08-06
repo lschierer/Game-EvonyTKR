@@ -22,7 +22,7 @@ use Game::EvonyTKR::General::Mounted;
 use Game::EvonyTKR::General::Ranged;
 use Game::EvonyTKR::General::Siege;
 use Game::EvonyTKR::SkillBook::Special;
-use Game::EvonyTKR::Speciality;
+use Game::EvonyTKR::Specality;
 use Game::EvonyTKR::Buff;
 use Game::EvonyTKR::Buff::Value;
 use Game::EvonyTKR::Buff::Data;

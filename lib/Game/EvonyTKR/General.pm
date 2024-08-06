@@ -1,7 +1,7 @@
 use v5.40.0;
 use experimental qw(class);
 
-class Game::EvonyTKR::General {
+class Game::EvonyTKR::General :isa(Game::EvonyTKR::Logger){
   use Carp;
   use Types::Common qw( t is_Num is_Str is_Int);
   use Type::Utils qw(is enum);
