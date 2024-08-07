@@ -58,6 +58,8 @@ use overload
 
   field $level :reader :param //= 45;
 
+  field @specialities :reader;
+
   field $ascending :reader :param //= true;
 
   field $stars :reader :param //= '5red';
@@ -303,8 +305,18 @@ use overload
       croak "Attempt to add $bookClass which is not a 'Game::EvonyTKR::SkillBook::Special' to $name";
     }
     push @otherBooks, $newBook;
+    $self->logger()->debug("added SkillBook " . $newBook->name() . " to $name");
   }
 
+  method addSpeciality($newSpeciality) {
+    my $specialityClass = blessed $newSpeciality;
+    my @classList = split(/::/, $specialityClass);
+    if($classList[2] ne 'Speciality'){
+      croak "Attemp to add $specialityClass which is not a 'Game::EvonyTKR::Speciality' to $name";
+    }
+    push @specialities, $newSpeciality;
+    $self->logger()->debug("added Speciality " . $newSpeciality->name() . " to $name");
+  }
   method _comparison($other, $swap = 0) {
     my $otherClass = blessed $other;
     my @classList = split(/::/, $otherClass);
@@ -396,7 +408,6 @@ Returns the amount by which the effective value of defense (as opposed to its ba
 returns the value that a user of this general at this investment level will experience for defense.
 =cut
 
-
 =method politics
 
 Returns the base value for politics, one of the four basic attributes of a general.
@@ -417,6 +428,18 @@ returns the value that a user of this general at this investment level will expe
 generals start at level 1 and can grow to level 45.  Thier effective statistics increase as they do so by the increments listed in the _increment versions of each attribute.
 
 This returns the level at which the general is currently being evaluated. 
+=cut
+
+=method specialities()
+
+This returns the array of Game::EvonyTKR::Speciality instances associated with this General
+=cut
+
+=method addSpeciality($newSpeciality) 
+
+Used to add a Game::EvonyTKR::Speciality to this General.  
+
+Todo:  Once Game::EvonyTKR::Speciality overloads comparison operators, use them to ensure uniqueness. 
 =cut
 
 =method ascending()

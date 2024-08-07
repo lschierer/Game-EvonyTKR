@@ -21,6 +21,7 @@ use Game::EvonyTKR::General::Ground;
 use Game::EvonyTKR::General::Mounted;
 use Game::EvonyTKR::General::Ranged;
 use Game::EvonyTKR::General::Siege;
+use Game::EvonyTKR::Ascending;
 use Game::EvonyTKR::SkillBook::Special;
 use Game::EvonyTKR::Specality;
 use Game::EvonyTKR::Buff;
@@ -103,14 +104,16 @@ sub read_generals($logger) {
       my $name = $data->{'general'}->{'name'};
       $logger->info($name);
       my @books = @{ $data->{'general'}->{'books'} };
+      my @SpecialityNames = @{ $data->{'general'}->{'specialities'}};
+      
       if(exists $data->{'general'}->{'extra'} ) {
         push @books, @{ $data->{'general'}->{'extra'} };
       }
-      my $bookName = $books[0].".yaml";
+
+      my $bookName = $books[0];
       my $sb = Game::EvonyTKR::SkillBook::Special->new(
         name  => $bookName
       );
-      
       $sb->readFromFile();
 
       my %generalClass = (
@@ -157,8 +160,7 @@ sub read_generals($logger) {
         );
         for (@books) {
           my $tbName = $_;
-          my $tbAsFile = $tbName.'.yaml';
-          if($tbAsFile eq /$bookName/ ) {
+          if($tbName eq /$bookName/ ) {
             next;
           }
           my $tb = Game::EvonyTKR::SkillBook::Special->new(
@@ -166,6 +168,14 @@ sub read_generals($logger) {
           );
           $tb->readFromFile();
           $generals{$name}->addAnotherBook($tb);
+        }
+        for (@SpecialityNames) {
+          my $sn = $_;
+          my $tsi = Game::EvonyTKR::Specality->new(
+            name => $sn,
+          );
+          $tsi->readFromFile();
+          $generals{$name}->
         }
         $logger->debug("added ". np $generals{$name});
       }
