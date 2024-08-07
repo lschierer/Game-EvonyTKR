@@ -1,16 +1,22 @@
 #!/usr/bin/env perl
-# PODNAME: Game::EvonyTKR::Rest
+# PODNAME: Game::EvonyTKR::Main
 # ABSTRACT: Dancer2 REST API wrapper
 
 use strict;
 use warnings;
 use FindBin;
+use Log::Log4perl qw(get_logger);
+use Log::Log4perl::Level ();
 use lib "$FindBin::Bin/../lib";
 
+use Game::EvonyTKR::Logger;
 
+my $logController = Game::EvonyTKR::Logger->new();
+my $logger = $logController->logger();
 # use this block if you don't need middleware, and only have a single target Dancer app to run here
 use Game::EvonyTKR::REST;
 
+$logger->info('Starting Game::EvonyTKR::REST');
 Game::EvonyTKR::REST->to_app;
 
 =begin comment

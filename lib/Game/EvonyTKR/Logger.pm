@@ -24,27 +24,32 @@ class Game::EvonyTKR::Logger {
   field $location: reader;
 
   ADJUST {
-    $location = $self->_getLogfileName();
-    $self->_logInit();
+    if(not Log::Log4perl::initialized()) {
+      $location = $self->getLogfileName();
+      $self->_logInit();
+    }
     $logger = Log::Log4perl->get_logger("Game::EvonyTKR");
   }
 
   method _logInit() {
     my %conf = (
-      "log4perl.rootLogger"                 => "DEBUG, logFile",
+      "log4perl.rootLogger"                   => "ALL, logFile",
 
-      "log4perl.appender.logFile"           => "Log::Log4perl::Appender::File",
-      "log4perl.appender.logFile.utf8"      => 1,
-      "log4perl.appender.logFile.filename"  => $location,
-      "log4perl.appender.logFile.mode"      => "append",
-      "log4perl.appender.logFile.layout"    => "Log::Log4perl::Layout::PatternLayout",
+      "log4perl.appender.logFile"             => "Log::Log4perl::Appender::File",
+      "log4perl.appender.logFile.utf8"        => 1,
+      "log4perl.appender.logFile.filename"    => $location,
+      "log4perl.appender.Logfile.DatePattern" => "yyyy-MM-dd",
+      "log4perl.appender.Logfile.TZ"          => "UTC",
+      "log4perl.appender.logFile.mode"        => "append",
+      "log4perl.appender.logFile.layout"      => "Log::Log4perl::Layout::PatternLayout",
       "log4perl.appender.logFile.layout.ConversionPattern" => "[%p] %d (%C line %L) %m%n",
     );
     # ... passed as a reference to init()
     Log::Log4perl::init( \%conf );
+  
   }
 
-  method _getLogfileName($name = 'system.log') {
+  method getLogfileName($name = 'system.log') {
     my $home      = File::HomeDir->my_home;
     my $logDir    = File::Spec->catdir($home , 'var/log/Perl/dist/Game-Evony/');
     if(! -r -w  -x -o -d $logDir) {

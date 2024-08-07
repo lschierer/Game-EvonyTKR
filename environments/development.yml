@@ -4,7 +4,11 @@
 # console: log messages to STDOUT (your console where you started the
 #          application server)
 # file:    log message to a file in log/
-logger: "console"
+logger: log4perl
+engines:
+   logger:
+      log4perl:
+         config_file: share/log4perl.conf
 
 # the log level for this environment
 # core is the lowest, it shows Dancer2's core log messages as well as yours

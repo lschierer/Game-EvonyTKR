@@ -1,10 +1,11 @@
 # configuration file for production environment
 
-# only log warning and error messsages
-log: "warning"
-
-# log message to a file in logs/
-logger: "file"
+logger: log4perl
+log: warning
+engines:
+   logger:
+      log4perl:
+         config_file: share/log4perl.conf
 
 # hide errors
 show_stacktrace: 0

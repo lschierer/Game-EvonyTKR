@@ -2,12 +2,38 @@
 # PODNAME: Game::EvonyTKR
 # ABSTRACT: Run/Execute the library with defaults.
 use v5.40.0;
+use utf8::all;
 use strict;
 use warnings;
 use Carp;
+use FindBin;
+use Log::Log4perl qw(get_logger);
+use Log::Log4perl::Level ();
+use lib "$FindBin::Bin/../lib";
+
 use Game::EvonyTKR;
-use utf8::all;
+use Game::EvonyTKR::Logger;
+
+use namespace::autoclean;
+
+use Plack::Runner;
 
 
-Game::EvonyTKR->execute();
+package main;
 
+my $logController = Game::EvonyTKR::Logger->new();
+my $logger = $logController->logger();
+
+use Game::EvonyTKR::REST;
+
+$logger->info('Starting Game::EvonyTKR::REST');
+
+# Copied from the plackup script, which I am not using because I need to initialize log4perl myself. 
+my $runner = Plack::Runner->new;
+$runner->parse_options(@ARGV);
+$runner->run(Game::EvonyTKR::REST->to_app());
+
+
+sub getLogfileName() {
+    return $logger->getLogfileName();
+}

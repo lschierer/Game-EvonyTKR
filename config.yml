@@ -11,9 +11,6 @@ appname: "Game::EvonyTKR::REST"
 # views/layouts/main.tt)
 layout: "main"
 
-logger: 'file'
-log: 'core'
-
 # when the charset is set to UTF-8 Dancer2 will handle for you
 # all the magic of encoding and decoding. You should not care
 # about unicode within your app when this setting is set (recommended).

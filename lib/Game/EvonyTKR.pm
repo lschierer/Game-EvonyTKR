@@ -14,19 +14,19 @@ use File::Touch;
 use YAML::XS qw{LoadFile Load};
 use Util::Any -all;
 use Devel::Peek;
-use Game::EvonyTKR::Logger;
-use Game::EvonyTKR::General::Pair::Creator;
-use Game::EvonyTKR::General::Pair;
+use Game::EvonyTKR::Ascending;
+use Game::EvonyTKR::Buff;
+use Game::EvonyTKR::Buff::Data;
+use Game::EvonyTKR::Buff::Value;
 use Game::EvonyTKR::General::Ground;
 use Game::EvonyTKR::General::Mounted;
+use Game::EvonyTKR::General::Pair;
+use Game::EvonyTKR::General::Pair::Creator;
 use Game::EvonyTKR::General::Ranged;
 use Game::EvonyTKR::General::Siege;
-use Game::EvonyTKR::Ascending;
+use Game::EvonyTKR::Logger;
 use Game::EvonyTKR::SkillBook::Special;
 use Game::EvonyTKR::Specality;
-use Game::EvonyTKR::Buff;
-use Game::EvonyTKR::Buff::Value;
-use Game::EvonyTKR::Buff::Data;
 use namespace::autoclean;
 
 sub opt_spec {
@@ -35,6 +35,10 @@ sub opt_spec {
   );
 }
 
+sub getLogfileName() {
+    my $logger = Game::EvonyTKR::Logger->new();
+    return $logger->getLogfileName();
+}
 
 
 sub validate_args {
@@ -175,7 +179,6 @@ sub read_generals($logger) {
             name => $sn,
           );
           $tsi->readFromFile();
-          $generals{$name}->
         }
         $logger->debug("added ". np $generals{$name});
       }
