@@ -3,8 +3,8 @@ use utf8::all;
 use Carp;
 use experimental qw(class);
 use Data::Printer;
-use File::ShareDir ':ALL';
 use File::Spec;
+use File::ShareDir qw{ dist_dir dist_file };
 use File::HomeDir;
 use File::Path qw(make_path);
 use File::Touch;
@@ -26,8 +26,18 @@ get '/' => sub {
 };
 
 get '/generals' => sub {
-  
+  my %generals = read_generals();
   status_ok('success');
 };
+
+sub read_generals() {
+  info 'starting read_generals';
+  my $general_share = File::Spec->catfile(File::ShareDir::dist_dir('Game-EvonyTKR'), 'generals');
+
+  my @found = grep { -T -s -r } glob("$general_share/*.yaml");
+  my $message = "general_share: " . scalar @found;
+  info "general_share '$general_share' contained " . scalar @found . " generals";
+  
+}
 
 true;
