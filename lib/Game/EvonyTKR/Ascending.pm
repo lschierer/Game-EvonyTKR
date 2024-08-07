@@ -109,7 +109,7 @@ class Game::EvonyTKR::Ascending :isa(Game::EvonyTKR::Logger) {
     return 1;
   }
 
-  method readFromFile() {
+  method readFromFile($name) {
     my $AscendingFileName = $name . '.yaml';
     $self->logger()->debug("about to get $AscendingFileName");
     my $AscendingShare = File::Spec->catfile(dist_dir('Game-EvonyTKR'), 'ascending');
