@@ -1,11 +1,16 @@
 # configuration file for production environment
 
 logger: log4perl
-log: warning
 engines:
    logger:
       log4perl:
-         config_file: share/log4perl.conf
+        category: Game::EvonyTKR::Dancer2
+
+# the log level for this environment
+# core is the lowest, it shows Dancer2's core log messages as well as yours
+# (debug, info, warning and error)
+log: info
+
 
 # hide errors
 show_stacktrace: 0
