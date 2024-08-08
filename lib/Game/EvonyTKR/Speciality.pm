@@ -74,8 +74,8 @@ class Game::EvonyTKR::Speciality :isa(Game::EvonyTKR::Logger) {
     if(blessed $nb ne 'Game::EvonyTKR::Buff'){
       return 0;
     } 
-    my $t = $levels->compiled_check();
-    if(not $t->check($level)) {
+    my $tcheck = $levels->compiled_check();
+    if(none { $tcheck->($_) } ($level)) {
       return 0;
     }
     my @levelValues = $levels->values();
