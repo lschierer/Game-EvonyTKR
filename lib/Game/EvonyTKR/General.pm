@@ -9,6 +9,7 @@ class Game::EvonyTKR::General :isa(Game::EvonyTKR::Logger){
   use Data::Printer;
   use Game::EvonyTKR::SkillBook::Special;
   use Game::EvonyTKR::Buff::EvaluationMultipliers;
+  use Game::EvonyTKR::Ascending;
   use namespace::autoclean;
 # PODNAME: Game::EvonyTKR::General
 use overload
@@ -61,6 +62,8 @@ use overload
   field @specialities :reader;
 
   field $ascending :reader :param //= true;
+
+  field $ascendingAttributes :reader :param //= Game::EvonyTKR::Ascending->new();
 
   field $stars :reader :param //= '5red';
 

@@ -14,7 +14,6 @@ use Devel::Peek;
 use FindBin ':ALL';
 use Log::Log4perl;
 use Game::EvonyTKR::REST::Generals;
-use namespace::autoclean;
 
 package Game::EvonyTKR::REST;
 use Dancer2;
