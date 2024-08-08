@@ -1,17 +1,15 @@
 use v5.40.0;
 use utf8::all;
-use experimental qw(class);
-use Carp;
+use experimental qw{class};
 use Data::Printer;
-use File::Spec;
-use File::ShareDir qw{ dist_dir dist_file };
-use File::HomeDir;
-use File::Path qw(make_path);
-use File::Touch;
-use YAML::XS qw{LoadFile Load};
-use Util::Any -all;
 use Devel::Peek;
+use File::HomeDir;
+use File::Path qw{ make_path };
+use File::ShareDir qw{ dist_dir dist_file };
+use File::Spec;
+use File::Touch;
 use Log::Log4perl;
+
 use Game::EvonyTKR::General::Ground;
 use Game::EvonyTKR::General::Mounted;
 use Game::EvonyTKR::General::Ranged;
@@ -21,7 +19,12 @@ use Game::EvonyTKR::Speciality;
 use Game::EvonyTKR::Ascending;
 
 package Game::EvonyTKR::Web::General {
+  use Carp;
+  use Util::Any -all;
+  use YAML::XS qw{ LoadFile Load };
+  use namespace::autoclean;
   use Dancer2 appname => 'Game::EvonyTKR';
+  
 # ABSTRACT: Route Handler for the /generals route. 
 
   my %generals;
@@ -29,6 +32,7 @@ package Game::EvonyTKR::Web::General {
   my $logger = Log::Log4perl::get_logger('Game::EvonyTKR::Web::General');
 
   prefix '/general' => sub {
+    get  ''     => \&_get;
     prefix '/by_id' => sub {
       get  ''     => \&_get;
       put  '/:id' => \&_put;
@@ -36,7 +40,7 @@ package Game::EvonyTKR::Web::General {
     };
   };
 
-  sub get($json = 0; $yaml = 0) {
+  sub _get($json = 0, $yaml = 0) {
     _read_generals();
 
   }
@@ -50,7 +54,7 @@ package Game::EvonyTKR::Web::General {
     $logger->info("general_share '$general_share' contained " . scalar @found . " generals");
     
     foreach my $tg (@found) {
-      open(my ($fh), '<', $tg) or croak "$!";
+      open(my ($fh), '<', $tg) or $logger->logcroak("$!");
       my $data = LoadFile($tg);
       my $name = $data->{'general'}->{'name'};
       $logger->info($name);
@@ -100,7 +104,7 @@ package Game::EvonyTKR::Web::General {
         next;
       }
       if (scalar @generalClassKey != scalar @scoreType) {
-        croak $data->{'general'}->{'name'} . " is of unknown general type " . p @scoreType;
+        $logger->logcroak( $data->{'general'}->{'name'} . " is of unknown general type " . Data::Printer::np @scoreType);
       }
 
       for (@generalClassKey){
@@ -142,7 +146,7 @@ package Game::EvonyTKR::Web::General {
           $generals{$name}->ascendingAttributes()->readFromFile($name);
         }
 
-        $logger->debug("added ". np $generals{$name});
+        $logger->debug("added ". Data::Printer::np $generals{$name});
       }
 
 

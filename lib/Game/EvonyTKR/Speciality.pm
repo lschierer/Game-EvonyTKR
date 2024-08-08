@@ -42,8 +42,8 @@ class Game::EvonyTKR::Speciality :isa(Game::EvonyTKR::Logger) {
 
   field %Buffs :reader;
   field $levels = enum [
-    'None',
     'Green',
+    'None',
     'Blue',
     'Purple',
     'Orange',

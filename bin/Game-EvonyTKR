@@ -27,14 +27,14 @@ package main;
 _logInit();
 my $logger = get_logger('Game::EvonyTKR');
 
-use Game::EvonyTKR::REST;
+use Game::EvonyTKR::Web;
 
-$logger->info('Starting Game::EvonyTKR::REST');
+$logger->info('Starting Game::EvonyTKR::Web');
 
 # Copied from the plackup script, which I am not using because I need to initialize log4perl myself. 
 my $runner = Plack::Runner->new;
 $runner->parse_options(@ARGV);
-$runner->run(Game::EvonyTKR::REST->to_app());
+$runner->run(Game::EvonyTKR::Web->to_app());
 
 sub _logInit() {
     my $home      = File::HomeDir->my_home;

@@ -1,5 +1,5 @@
 FROM perl:latest
-WORKDIR /srv/Game::EvonyTKR::REST
+WORKDIR /srv/Game::EvonyTKR
 COPY . .
 RUN cpanm --installdeps --notest --with-feature=accelerate .
 EXPOSE 4000
