@@ -26,6 +26,9 @@ class Game::EvonyTKR::Logger {
   field $location: reader;
 
   ADJUST {
+    if(not defined $category) {
+      $category = __CLASS__;
+    }
     $logger = Log::Log4perl->get_logger($category);
   }
 
