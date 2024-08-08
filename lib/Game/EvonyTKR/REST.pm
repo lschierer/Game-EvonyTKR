@@ -13,6 +13,7 @@ use Util::Any -all;
 use Devel::Peek;
 use FindBin ':ALL';
 use Log::Log4perl;
+use Game::EvonyTKR::REST::Generals;
 use namespace::autoclean;
 
 package Game::EvonyTKR::REST;
@@ -26,18 +27,11 @@ get '/' => sub {
 };
 
 get '/generals' => sub {
-  my %generals = read_generals();
+  my $handler = Game::EvonyTKR::REST::Generals->new();
+  $handler->read_generals();
   status_ok('success');
 };
 
-sub read_generals() {
-  info 'starting read_generals';
-  my $general_share = File::Spec->catfile(File::ShareDir::dist_dir('Game-EvonyTKR'), 'generals');
 
-  my @found = grep { -T -s -r } glob("$general_share/*.yaml");
-  my $message = "general_share: " . scalar @found;
-  info "general_share '$general_share' contained " . scalar @found . " generals";
-  
-}
 
 true;
