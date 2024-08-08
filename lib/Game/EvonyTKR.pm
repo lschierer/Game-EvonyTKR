@@ -26,7 +26,7 @@ use Game::EvonyTKR::General::Ranged;
 use Game::EvonyTKR::General::Siege;
 use Game::EvonyTKR::Logger;
 use Game::EvonyTKR::SkillBook::Special;
-use Game::EvonyTKR::Specality;
+use Game::EvonyTKR::Speciality;
 use namespace::autoclean;
 
 sub opt_spec {
@@ -175,7 +175,7 @@ sub read_generals($logger) {
         }
         for (@SpecialityNames) {
           my $sn = $_;
-          my $tsi = Game::EvonyTKR::Specality->new(
+          my $tsi = Game::EvonyTKR::Speciality->new(
             name => $sn,
           );
           $tsi->readFromFile();
