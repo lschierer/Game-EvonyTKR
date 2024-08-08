@@ -13,11 +13,10 @@ use Util::Any -all;
 use Devel::Peek;
 use FindBin ':ALL';
 use Log::Log4perl;
-use Game::EvonyTKR::REST::Generals;
+use Game::EvonyTKR::Web::General;
 
-package Game::EvonyTKR::REST;
-use Dancer2;
-use Dancer2::Plugin::REST;
+package Game::EvonyTKR::Web;
+use Dancer2 appname => 'Game::EvonyTKR';
 
 prepare_serializer_for_format;
 
@@ -25,12 +24,10 @@ get '/' => sub {
   status_ok('success');
 };
 
-get '/generals' => sub {
-  my $handler = Game::EvonyTKR::REST::Generals->new();
-  $handler->read_generals();
-  status_ok('success');
+prefix '/general' => sub {
+  get ''  => sub {
+    my $handler = Game::EvonyTKR::Web::General::get();
+  };
 };
-
-
 
 true;
