@@ -14,6 +14,9 @@ use File::Touch;
 use YAML::XS qw{LoadFile Load};
 use Util::Any -all;
 use Devel::Peek;
+
+use FindBin;
+use lib "$FindBin::Bin/../../lib";
 use Game::EvonyTKR::Ascending;
 use Game::EvonyTKR::Buff;
 use Game::EvonyTKR::Buff::Data;
@@ -27,7 +30,7 @@ use Game::EvonyTKR::General::Siege;
 use Game::EvonyTKR::Logger;
 use Game::EvonyTKR::SkillBook::Special;
 use Game::EvonyTKR::Speciality;
-use namespace::autoclean;
+use namespace::clean;
 
 sub opt_spec {
   return (

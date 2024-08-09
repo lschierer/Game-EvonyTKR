@@ -5,7 +5,7 @@
 # === Basic configuration ===
 
 # Your application's name
-appname: "Game::EvonyTKR::REST"
+appname: "Game::EvonyTKR"
 
 # The default layout to use for your application (located in
 # views/layouts/main.tt)
@@ -16,7 +16,6 @@ layout: "main"
 # about unicode within your app when this setting is set (recommended).
 charset: "UTF-8"
 
-serializer: "JSON"
 
 # === Engines ===
 #

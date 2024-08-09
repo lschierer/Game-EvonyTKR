@@ -11,7 +11,6 @@ engines:
 # (debug, info, warning and error)
 log: info
 
-
 # hide errors
 show_stacktrace: 0
 
