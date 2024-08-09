@@ -1,6 +1,6 @@
 use v5.40.0;
 use utf8::all;
-use experimental qw{class};
+use experimental qw{class defer};
 use Data::Printer;
 use Devel::Peek;
 use File::HomeDir;
@@ -19,29 +19,61 @@ use Game::EvonyTKR::Speciality;
 use Game::EvonyTKR::Ascending;
 
 package Game::EvonyTKR::Web::General {
+# ABSTRACT: Route Handler for the /generals route. 
   use Carp;
   use Util::Any -all;
   use YAML::XS qw{ LoadFile Load };
-  use namespace::autoclean;
+  use namespace::clean;
   use Dancer2 appname => 'Game::EvonyTKR';
   
-# ABSTRACT: Route Handler for the /generals route. 
-
   my %generals;
-
   my $logger = Log::Log4perl::get_logger('Game::EvonyTKR::Web::General');
 
+  sub _init {
+    my $gencount = scalar keys %generals;
+    if($gencount == 0) {
+      _read_generals();
+      $gencount = scalar keys %generals;
+      $logger->debug("After Reading, I have $gencount generals available.");
+    }else {
+      $logger->debug("I have $gencount generals available.");
+    }
+  }
+
   prefix '/general' => sub {
-    get  ''     => \&_get;
+    prefix '/all'    => sub {
+      get ''  => \&_all;
+    };
     prefix '/by_id' => sub {
-      get  ''     => \&_get;
-      put  '/:id' => \&_put;
-      del  '/:id' => \&_del;
+      get '/:id'  => \&_by_id;
     };
   };
 
-  sub _get($json = 0, $yaml = 0) {
-    _read_generals();
+  sub _all {
+    _init();
+    my @data;
+    while (my ($key, $value) = each %generals) {
+      push @data, $value->toHashRef();
+    }
+    return \@data;
+  }
+
+  sub _by_id {
+    _init();
+    my $id = route_parameters->get('id');
+    if(exists $generals{$id}) {
+      my $general = $generals{$id};
+      my $level = query_parameters->get('level');
+      $logger->debug("Query level is '$level'");
+      if(defined $level) {
+        $general->setLevel(0 + $level);
+      }
+      return $general->toHashRef();
+    } else {
+      return {
+        general => "Not Found"
+      }
+    }
 
   }
 
