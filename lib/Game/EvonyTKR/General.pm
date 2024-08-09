@@ -10,6 +10,7 @@ class Game::EvonyTKR::General :isa(Game::EvonyTKR::Logger){
   use Game::EvonyTKR::SkillBook::Special;
   use Game::EvonyTKR::Buff::EvaluationMultipliers;
   use Game::EvonyTKR::Ascending;
+  use JSON::MaybeXS;
   use namespace::autoclean;
 # PODNAME: Game::EvonyTKR::General
 use overload
@@ -18,7 +19,8 @@ use overload
     'eq'  => \&_equality,
     '=='  => \&_equality,
     'ne'  => \&_inequality,
-    '!='  => \&_inequality;
+    '!='  => \&_inequality,
+    '""'  => \&_toString;
 
 # ABSTRACT: Module for processing information about Evony TKR Generals.
 
@@ -170,104 +172,55 @@ use overload
     }
   }
 
-  method effective_leadership() {
+  method _adjustBasicAttribute($attribute, $attribute_increment) {
     my $AES_adjustment = 0;
 
     if($ascending){
+      $self->logger()->trace($self->name() . " is ascended");
       my @values = $starsValues->values();
       for my $value (@values){
         if($stars eq $value) {
+          $self->logger()->trace($self->name() . " has '$stars' stars");
           $AES_adjustment = $BasicAESAdjustment{$stars};
+          $self->logger()->trace($self->name() . " gets an adjustment of '$AES_adjustment'");
           last;
         }
       }
     }
-
-    my $step1 = $level * $leadership_increment + $leadership;
-    my $step2 = $step1 + 500;
-    my $step3 = $step2 + $AES_adjustment;
-    my $step4;
-    if($step3 < 900) {
-      $step4 = $step3 * 0.1;
+    $self->logger()->trace("for " . $self->name() . " level is $level, attribute_increment is $attribute_increment, attack is $attack");
+    my $step = $level * $attribute_increment + $attribute;
+    $self->logger()->trace("step1 for " . $self->name() . " is $step");
+    $step = $step + 500;
+    $self->logger()->trace("step2 for " . $self->name() . " is $step");
+    $step = $step + $AES_adjustment;
+    $self->logger()->trace("step3 for " . $self->name() . " is $step");
+    if($step < 900) {
+      $step = $step * 0.1;
     } else {
-      $step4 = 90 + ($step3 - 900) * 0.2;
+      $step = 90 + ($step - 900) * 0.2;
     }
-    return $step4;
+    $self->logger()->trace("step4 for " . $self->name() . " is $step");
+    return $step;
+  }
+
+  method effective_leadership() {
+    $self->logger()->trace('computing effective_leadership for ' . $self->name());
+    return $self->_adjustBasicAttribute($self->leadership(), $self->leadership_increment());
   }
 
   method effective_attack() {
-    my $AES_adjustment = 0;
-
-    if($ascending){
-      my @values = $starsValues->values();
-      for my $value (@values){
-        if($stars eq $value) {
-          $AES_adjustment = $BasicAESAdjustment{$stars};
-          last;
-        }
-      }
-    }
-
-    my $step1 = $level * $attack_increment + $attack;
-    my $step2 = $step1 + 500;
-    my $step3 = $step2 + $AES_adjustment;
-    my $step4;
-    if($step3 < 900) {
-      $step4 = $step3 * 0.1;
-    } else {
-      $step4 = 90 + ($step3 - 900) * 0.2;
-    }
-    return $step4;
+    $self->logger()->trace('computing effective_attack for ' . $self->name());
+    return $self->_adjustBasicAttribute($self->attack(), $self->attack_increment());
   }
 
   method effective_defense() {
-    my $AES_adjustment = 0;
-
-    if($ascending){
-      my @values = $starsValues->values();
-      for my $value (@values){
-        if($stars eq $value) {
-          $AES_adjustment = $BasicAESAdjustment{$stars};
-          last;
-        }
-      }
-    }
-
-    my $step1 = $level * $defense_increment + $defense;
-    my $step2 = $step1 + 500;
-    my $step3 = $step2 + $AES_adjustment;
-    my $step4;
-    if($step3 < 900) {
-      $step4 = $step3 * 0.1;
-    } else {
-      $step4 = 90 + ($step3 - 900) * 0.2;
-    }
-    return $step4;
+    $self->logger()->trace('computing effective_defense for ' . $self->name());
+    return $self->_adjustBasicAttribute($self->defense(), $self->defense_increment());
   }
 
   method effective_politics() {
-    my $AES_adjustment = 0;
-
-    if($ascending){
-      my @values = $starsValues->values();
-      for my $value (@values){
-        if($stars eq $value) {
-          $AES_adjustment = $BasicAESAdjustment{$stars};
-          last;
-        }
-      }
-    }
-
-    my $step1 = $level * $politics_increment + $politics;
-    my $step2 = $step1 + 500;
-    my $step3 = $step2 + $AES_adjustment;
-    my $step4;
-    if($step3 < 900) {
-      $step4 = $step3 * 0.1;
-    } else {
-      $step4 = 90 + ($step3 - 900) * 0.2;
-    }
-    return $step4;
+    $self->logger()->trace('computing effective_politics for ' . $self->name());
+    return $self->_adjustBasicAttribute($self->politics(), $self->politics_increment());
   }
 
   method is_ground_general() {
@@ -320,6 +273,47 @@ use overload
     push @specialities, $newSpeciality;
     $self->logger()->debug("added Speciality " . $newSpeciality->name() . " to $name");
   }
+
+  method setLevel( $newLevel ) {
+    if(is_Int($newLevel) ) {
+      my $type = t('IntRange[1, 45]');
+      if( $type->check($newLevel)) {
+        $level = $newLevel;
+      }
+    }
+  }
+
+  method toHashRef( $verbose = 0) {
+    if($verbose) {
+      return {
+        name                  => $name,
+        level                 => $level,
+        leadership            => $self->leadership(),
+        leadership_increment  => $self->leadership_increment(),
+        attack                => $self->attack(),
+        attack_increment      => $self->attack_increment(),
+        defense               => $self->defense(),
+        defense_increment     => $self->defense_increment(),
+        politics              => $self->politics(),
+        politics_increment    => $self->politics_increment(),
+      };
+    } else {
+      return {
+        name        => $name,
+        level                 => $level,
+        leadership  => $self->effective_leadership(),
+        attack      => $self->effective_attack(),
+        defense     => $self->effective_defense(),
+        politics    => $self->effective_politics(),
+      };
+    }
+  }
+
+  method _toString {
+    my $json = JSON::MaybeXS->new(utf8 => 1);
+    return $json->encode($self->toHashRef());
+  }
+
   method _comparison($other, $swap = 0) {
     my $otherClass = blessed $other;
     my @classList = split(/::/, $otherClass);
@@ -495,6 +489,15 @@ This allows you to populate the otherBooks field with the buffs provided by the 
 
 when evaluating generals, not all buffs are equally important.  Nor are these scaling factors constant across the game, but rather differ both by type of general and by situation.  
 This returns the scaling factors for this general.
+=cut
+
+=method toHashRef
+
+In typescript, you can run almost any object through JSON.stringify() and get something usable. This method is essentially what would happen if you ran a Game::EvonyTKR::General through JSON.stringify() to get a JSON representation of it, but then immediately read it back in with JSON.parse into a perl hash (instead of allowing it to be detected as an object), with all the top level things in the JSON being the keys of the hash. 
+=cut
+
+=method ""
+This returns as a string the results of JSON encoding the results of the Hash produced by the toHashRef function.
 =cut
 
 =method <=>

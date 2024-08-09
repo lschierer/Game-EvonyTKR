@@ -15,6 +15,7 @@ class Game::EvonyTKR::General::Ground :isa(Game::EvonyTKR::General) {
     '=='        => \&_equality,
     'ne'        => \&_inequality,
     '!='        => \&_inequality,
+    '""'        => \&Game::EvonyTKR::General::_toString,
     "fallback"  => 1;
 # PODNAME: Game::EvonyTKR::General::Ground
 
