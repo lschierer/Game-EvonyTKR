@@ -67,7 +67,7 @@ use overload
 
   field $ascendingAttributes :reader :param //= Game::EvonyTKR::Ascending->new();
 
-  field $stars :reader :param //= '5red';
+  field $stars :reader :param //= '5Red';
 
   use constant DEFAULT_BUFF_MULTIPLIERS => Game::EvonyTKR::Buff::EvaluationMultipliers->new();
 
@@ -90,30 +90,30 @@ use overload
 
   field $starsValues = enum [
     'None',
-    '1purple',
-    '2purple',
-    '3purple',
-    '4purple',
-    '5purple',
-    '1red',
-    '2red',
-    '3red',
-    '4red',
-    '5red',
+    '1Purple',
+    '2Purple',
+    '3Purple',
+    '4Purple',
+    '5Purple',
+    '1Red',
+    '2Red',
+    '3Red',
+    '4Red',
+    '5Red',
   ];
 
   field %BasicAESAdjustment = (
     'None'    => 0,
-    '1purple' => 0,
-    '2purple' => 0,
-    '3purple' => 0,
-    '4purple' => 0,
-    '5purple' => 0,
-    '1red'    => 10,
-    '2red'    => 20,
-    '3red'    => 30,
-    '4red'    => 40,
-    '5red'    => 50,
+    '1Purple' => 0,
+    '2Purple' => 0,
+    '3Purple' => 0,
+    '4Purple' => 0,
+    '5Purple' => 0,
+    '1Red'    => 10,
+    '2Red'    => 20,
+    '3Red'    => 30,
+    '4Red'    => 40,
+    '5Red'    => 50,
   );
 
   ADJUST {
@@ -177,14 +177,17 @@ use overload
 
     if($ascending){
       $self->logger()->trace($self->name() . " is ascended");
-      my @values = $starsValues->values();
+      my @values = @{ $starsValues->values()};
       for my $value (@values){
-        if($stars eq $value) {
-          $self->logger()->trace($self->name() . " has '$stars' stars");
-          $AES_adjustment = $BasicAESAdjustment{$stars};
+        if($stars =~ /$value/i ) {
+          $self->logger()->trace($self->name() . " has '$stars' stars (matched $value)");
+          $AES_adjustment =$BasicAESAdjustment{$stars};
           $self->logger()->trace($self->name() . " gets an adjustment of '$AES_adjustment'");
           last;
         }
+      }
+      if($AES_adjustment == 0) {
+        $self->logger()->trace($self->name() . " did not match any value for stars $stars from values " . np @values);
       }
     }
     $self->logger()->trace("for " . $self->name() . " level is $level, attribute_increment is $attribute_increment, attack is $attack");
@@ -448,16 +451,16 @@ This returns true or false, for whether or not the general can be ascended.
 
 This returns one of the values 
 'None'
-'1purple'
-'2purple'
-'3purple'
-'4purple'
-'5purple'
-'1red'
-'2red'
-'3red'
-'4red'
-'5red'
+'1Purple'
+'2Purple'
+'3Purple'
+'4Purple'
+'5Purple'
+'1Red'
+'2Red'
+'3Red'
+'4Red'
+'5Red'
 
 to indicate at what level of ascension the general is being evaluated at. 
 =cut 
