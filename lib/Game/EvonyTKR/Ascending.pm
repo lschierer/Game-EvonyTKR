@@ -71,7 +71,7 @@ class Game::EvonyTKR::Ascending :isa(Game::EvonyTKR::Logger) {
       return 0;
     } 
     my $t = $levels->compiled_check();
-    if(not $t->check($level)) {
+    if(not $t->($level)) {
       return 0;
     }
     my @levelValues = $levels->values();

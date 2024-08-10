@@ -105,11 +105,8 @@ package Game::EvonyTKR::Web::General {
       $sb->readFromFile();
 
       my $ascendingToggle;
-      if( $data->{'general'}->{'ascending'} =~ /true/i){
-        $ascendingToggle = 1;
-      } else {
-        $ascendingToggle = 0;
-      }
+      $logger->trace("ascending for $name is " . $data->{'general'}->{'ascending'} );
+      $ascendingToggle = $data->{'general'}->{'ascending'};
 
       my %generalClass = (
         'Ground'  => 'Game::EvonyTKR::General::Ground',
