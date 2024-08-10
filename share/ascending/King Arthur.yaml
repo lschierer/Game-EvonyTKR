@@ -51,7 +51,7 @@ ascending:
           number: 15
           unit: percentage
       - attribute: Attack
-        class: Ranged
+        class: Ranged Troops
         condition:
           - Marching
         value:

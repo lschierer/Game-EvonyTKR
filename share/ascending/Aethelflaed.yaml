@@ -22,7 +22,7 @@ ascending:
       condition:
         - Reduces Monster
       value:
-        number: -10
+        number: 10
         unit: percentage
     - attribute: HP
       condition:
@@ -36,7 +36,7 @@ ascending:
       condition:
         - Reduces Monster
       value:
-        number: -10
+        number: 10
         unit: percentage
     - attribute: Defense
       condition:

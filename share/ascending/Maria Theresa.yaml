@@ -20,7 +20,7 @@ ascending:
       condition:
         - Reduces Monster
       value:
-        number: -10
+        number: 10
         unit: percentage
     - attribute: Marching_Speed_to_Monsters
       condition:
