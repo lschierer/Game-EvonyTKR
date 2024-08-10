@@ -1,6 +1,6 @@
 ---
 ascending:
-- level: '1red'
+- level: '1Red'
   buff:
     - attribute: Defense
       condition:
@@ -30,7 +30,7 @@ ascending:
       value:
         number: 20
         unit: percentage
-- level: '2red'
+- level: '2Red'
   buff:
     - attribute: Death_to_Wounded
       condition:
@@ -38,7 +38,7 @@ ascending:
       value:
         number: 10
         unit: percentage
-- level: '3red'
+- level: '3Red'
   buff:
     - attribute: Attack
       condition:
@@ -53,7 +53,7 @@ ascending:
       value:
         number: 10
         unit: percentage
-- level: '4red'
+- level: '4Red'
   buff:
     - attribute: Attack
       condition:
@@ -76,7 +76,7 @@ ascending:
       value:
         number: 25
         unit: percentage
-- level: '5red'
+- level: '5Red'
   buff:
     - attribute: Attack
       condition:

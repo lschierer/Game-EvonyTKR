@@ -13,7 +13,7 @@ general:
   politics: 105
   politics_increment: 8.57
   level: '1'
-  stars: '5red'
+  stars: '5Red'
   books:
     - Restorer of the World
   specialities:

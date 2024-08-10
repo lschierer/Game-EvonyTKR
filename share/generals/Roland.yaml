@@ -4,7 +4,7 @@ general:
   display: summary
   score_as:
    - Mounted
-  stars: '5red'
+  stars: '5Red'
   leadership: 105
   leadership_increment: 8.55
   attack: 118

@@ -1,6 +1,6 @@
 ---
 ascending:
-- level: '1red'
+- level: '1Red'
   buff:
     - attribute: HP
       condition:
@@ -23,7 +23,7 @@ ascending:
       value:
         number: 15
         unit: percentage
-- level: '2red'
+- level: '2Red'
   buff:
     - attribute: Wounded_to_Death
       condition:
@@ -35,7 +35,7 @@ ascending:
       value:
         number: 14
         unit: percentage
-- level: '3red'
+- level: '3Red'
   buff:
     - attribute: Defense
       class: Ground Troops
@@ -44,7 +44,7 @@ ascending:
       value:
         number: 60
         unit: percentage
-- level: '4red'
+- level: '4Red'
   buff:
     - attribute: HP
       class: Mounted Troops

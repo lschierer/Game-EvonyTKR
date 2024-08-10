@@ -12,7 +12,7 @@ general:
   defense_increment: 9.05
   politics: 110
   politics_increment: 8.35
-  stars: '5red'
+  stars: '5Red'
   level: '1'
   books:
     - Undefeatable General

@@ -1,6 +1,6 @@
 ---
 ascending:
-- level: '1red'
+- level: '1Red'
   buff:
     - attribute: Defense
       condition:
@@ -30,21 +30,21 @@ ascending:
       value:
         number: 10
         unit: percentage
-- level: '2red'
+- level: '2Red'
   buff:
     - attribute: Defense
       condition:
         - Enemy
       class: Ground Troops
       value:
-        number: -15
+        number: 15
         unit: percentage
     - attribute: Defense
       condition:
         - Enemy
       class: Mounted Troops
       value:
-        number: -15
+        number: 15
         unit: percentage
     - attribute: SubCity_Training_Speed
       condition:
@@ -52,21 +52,21 @@ ascending:
       value:
         number: 15
         unit: percentage
-- level: '3red'
+- level: '3Red'
   buff:
     - attribute: Defense
       condition:
         - Enemy
       class: Ground Troops
       value:
-        number: -15
+        number: 15
         unit: percentage
     - attribute: Defense
       condition:
         - Enemy
       class: Mounted Troops
       value:
-        number: -15
+        number: 15
         unit: percentage
     - attribute: Death_to_Wounded
       condition:
@@ -74,7 +74,7 @@ ascending:
       value:
         number: 10
         unit: percentage
-- level: '4red'
+- level: '4Red'
   buff:
     - attribute: Attack
       condition:
@@ -95,16 +95,16 @@ ascending:
         - Enemy
       class: Ground Troops
       value:
-        number: -15
+        number: 15
         unit: percentage
     - attribute: HP
       condition:
         - Enemy
       class: Mounted Troops
       value:
-        number: -15
+        number: 15
         unit: percentage
-- level: '5red'
+- level: '5Red'
   buff:
     - attribute: Attack
       condition:
@@ -125,12 +125,12 @@ ascending:
         - Enemy
       class: Ground Troops
       value:
-        number: -15
+        number: 15
         unit: percentage
     - attribute: HP
       condition:
         - Enemy
       class: Mounted Troops
       value:
-        number: -15
+        number: 15
         unit: percentage

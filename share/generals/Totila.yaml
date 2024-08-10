@@ -10,7 +10,7 @@ general:
   defense_increment: 8.96
   politics: 106
   politics_increment: 8.33
-  stars: '5red'
+  stars: '5Red'
   level: '45'
   score_as:
    - Ground

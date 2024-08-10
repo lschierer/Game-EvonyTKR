@@ -3,7 +3,7 @@ general:
   name: Ii Naomasa
   display: summary
   level: '1'
-  stars: '5red'
+  stars: '5Red'
   leadership: 120
   leadership_increment: 9.00
   attack: 121

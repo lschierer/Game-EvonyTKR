@@ -10,7 +10,7 @@ general:
   defense_increment: 8.88
   politics: 102
   politics_increment: 8.59
-  stars: '5red'
+  stars: '5Red'
   score_as:
    - Archers
   extra:

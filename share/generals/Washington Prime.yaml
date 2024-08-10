@@ -13,7 +13,7 @@ general:
   politics: 102
   politics_increment: 8.22
   level: '45'
-  stars: '5red'
+  stars: '5Red'
   books:
     - General of the Armies
   specialities:

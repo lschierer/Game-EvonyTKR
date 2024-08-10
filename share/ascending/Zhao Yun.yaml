@@ -1,6 +1,6 @@
 ---
 ascending:
-- level: '1red'
+- level: '1Red'
   buff:
     - condition:
         - leading_the_army_to_attack
@@ -16,7 +16,7 @@ ascending:
       value:
         number: 10
         unit: percentage
-- level: '2red'
+- level: '2Red'
   buff:
     - attribute: Wounded_to_Death
       condition:
@@ -24,7 +24,7 @@ ascending:
       value:
         number: 10
         unit: percentage
-- level: '3red'
+- level: '3Red'
   buff:
     - attribute: Rally_Capacity
       condition:
@@ -32,7 +32,7 @@ ascending:
       value:
         number: 8
         unit: percentage
-- level: '4red'
+- level: '4Red'
   buff:
     - attribute: Defense
       condition:
@@ -48,7 +48,7 @@ ascending:
       value:
         number: 15
         unit: percentage
-- level: '5red'
+- level: '5Red'
   buff:
     - attribute: Attack
       condition:

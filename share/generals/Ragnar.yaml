@@ -5,7 +5,7 @@ general:
   display: summary
   score_as:
    - Archers
-  stars: '5red'
+  stars: '5Red'
   leadership: 124
   leadership_increment: 8.88
   attack: 135

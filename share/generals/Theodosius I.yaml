@@ -10,7 +10,7 @@ general:
   defense_increment: 8.73
   politics: 106
   politics_increment: 8.08
-  stars: '5red'
+  stars: '5Red'
   score_as:
    - Siege
   books:

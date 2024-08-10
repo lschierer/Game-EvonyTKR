@@ -3,7 +3,7 @@ general:
   name: Turenne
   display: summary
   level: '1'
-  stars: '5red'
+  stars: '5Red'
   score_as:
    - Ground
   leadership: 125

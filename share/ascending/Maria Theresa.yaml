@@ -1,6 +1,6 @@
 ---
 ascending:
-- level: '1red'
+- level: '1Red'
   buff:
     - attribute: 'Double Items Drop Rate'
       condition:
@@ -14,7 +14,7 @@ ascending:
       value:
         number: 5
         unit: percentage
-- level: '2red'
+- level: '2Red'
   buff:
     - attribute: Attack
       condition:
@@ -28,7 +28,7 @@ ascending:
       value:
         number: 10
         unit: percentage
-- level: '3red'
+- level: '3Red'
   buff:
     - attribute: March_Size_Capacity
       value:
@@ -38,9 +38,9 @@ ascending:
       condition:
         - Against Monsters
       value:
-        number: -5
+        number: 5
         unit: percentage
-- level: '4red'
+- level: '4Red'
   buff:
     - attribute: Attack
       condition:
@@ -49,7 +49,7 @@ ascending:
       value:
         number: 30
         unit: percentage
-- level: '5red'
+- level: '5Red'
   buff:
     - attribute: 'Double Items Drop Rate'
       condition:
@@ -61,5 +61,5 @@ ascending:
       condition:
         - Against Monsters
       value:
-        number: -5
+        number: 5
         unit: percentage

@@ -12,7 +12,7 @@ general:
   attack_increment: 9.11
   politics: 113
   politics_increment: 8.26
-  stars: '5red'
+  stars: '5Red'
   level: '1'
   books:
     - Dragon's Song

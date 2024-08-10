@@ -1,6 +1,6 @@
 ---
 ascending:
-- level: '1red'
+- level: '1Red'
   buff:
     - attribute: Defense
       class: Ranged Troops
@@ -22,7 +22,7 @@ ascending:
       value:
         number: 10
         unit: percentage
-- level: '2red'
+- level: '2Red'
   buff:
     - attribute: Death_to_Wounded
       condition:
@@ -30,13 +30,13 @@ ascending:
       value:
         number: 8
         unit: percentage
-- level: '3red'
+- level: '3Red'
   buff:
     - attribute: March_Size_Capacity
       value:
         number: 10
         unit: percentage
-- level: '4red'
+- level: '4Red'
   buff:
     - attribute: Defense
       class: Ranged Troops
@@ -58,7 +58,7 @@ ascending:
       value:
         number: 10
         unit: percentage
-- level: '5red'
+- level: '5Red'
   buff:
     - attribute: Attack
       class: Ranged Troops

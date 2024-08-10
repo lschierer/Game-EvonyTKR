@@ -5,7 +5,7 @@ general:
   display: summary
   score_as: 
     - Mounted
-  stars: '5red'
+  stars: '5Red'
   leadership: 115
   attack: 109
   defense: 105

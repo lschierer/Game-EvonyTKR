@@ -5,7 +5,7 @@ general:
   score_as:
    - Ground
   level: '1'
-  stars: '5red'
+  stars: '5Red'
   leadership: 119
   leadership_increment: 9.02
   attack: 117

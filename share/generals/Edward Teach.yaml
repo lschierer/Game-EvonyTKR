@@ -5,7 +5,7 @@ general:
   score_as:
    - Siege
   level: '1'
-  stars: '5red'
+  stars: '5Red'
   leadership: 117
   leadership_increment: 8.71
   attack: 119
