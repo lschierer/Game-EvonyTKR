@@ -14,12 +14,15 @@ class Game::EvonyTKR::Ascending :isa(Game::EvonyTKR::Logger) {
   use File::Spec;
   use Game::EvonyTKR::Buff;
   use Game::EvonyTKR::Buff::Value;
+  use JSON::MaybeXS;
   use List::MoreUtils;
   use Util::Any -all;
   use YAML::XS qw{LoadFile Load};
   use namespace::autoclean;
   use Game::EvonyTKR::Logger;
-
+  use overload
+    '""'        => \&_toString,
+    "fallback"  => 1;
 
   # from Type::Registry, this will save me from some of the struggles I have had with some types having blessed references and others not.
   ADJUST {
@@ -107,6 +110,24 @@ class Game::EvonyTKR::Ascending :isa(Game::EvonyTKR::Logger) {
       }
     }
     return 1;
+  }
+
+  method toHashRef( $verbose = 0) {
+    my $returnRef = {};
+    my @values = @{ $levels->values()};
+    if($verbose) {
+      for my $key ( keys %Buffs) {
+        $returnRef->{$key} = $Buffs{$key};
+      }
+    } else {
+      $returnRef->{$activeLevel} = $Buffs{$activeLevel};
+    }
+    return $returnRef;
+  }
+
+  method _toString {
+    my $json = JSON::MaybeXS->new(utf8 => 1);
+    return $json->encode($self->toHashRef());
   }
 
   method readFromFile($name) {

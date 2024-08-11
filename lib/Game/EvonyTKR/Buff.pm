@@ -4,6 +4,9 @@ use utf8::all;
 
 
 class Game::EvonyTKR::Buff :isa(Game::EvonyTKR::Logger) {
+# PODNAME: Game::EvonyTKR::Buff
+
+# ABSTRACT: Buff and Debuff primatives
   use Game::EvonyTKR::Buff::Data;
   use Types::Standard qw(is_Int Int Str is_Str);
   use Types::Common::Numeric qw(PositiveOrZeroInt);
@@ -18,10 +21,8 @@ class Game::EvonyTKR::Buff :isa(Game::EvonyTKR::Logger) {
     'eq'  => \&_equality,
     '=='  => \&_equality,
     'ne'  => \&_inequality,
-    '!='  => \&_inequality;
-# PODNAME: Game::EvonyTKR::Buff
-
-# ABSTRACT: Buff and Debuff primatives
+    '!='  => \&_inequality,
+    '""'  => \&_toString;
 
   my $classData = Game::EvonyTKR::Buff::Data->new();
   my @BuffAttributes;
@@ -142,6 +143,30 @@ class Game::EvonyTKR::Buff :isa(Game::EvonyTKR::Logger) {
     }
     $self->logger()->trace($code);
     return ($code > 0);
+  }
+
+  method toHashRef() {
+    my $returnRef = {};
+    $returnRef->{'attribute'} = $self->attribute();
+    $returnRef->{'value'} = {
+      number  => $self->value()->number(),
+      unit    => $self->value()->unit(),
+    };
+    
+    if($self->buffClass() !~ /All Troops/i ) {
+      $returnRef->{'class'} = $self->buffClass();
+    }
+
+    my @_conditions = $self->condition();
+    if(scalar @_conditions) {
+      $returnRef->{'condition'} = @_conditions;
+    }
+    return $returnRef;
+  }
+
+  method _toString {
+    my $json = JSON::MaybeXS->new(utf8 => 1);
+    return $json->encode($self->toHashRef());
   }
 
   sub condition_difference($one, $two) {
