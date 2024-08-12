@@ -100,7 +100,7 @@ class Game::EvonyTKR::SkillBook :isa(Game::EvonyTKR::Logger) {
               $b->set_condition($sbc);
             }
           }
-          $self->logger()->info("Addint buff from SkillBook $name");
+          $self->logger()->info("Adding buff from SkillBook $name");
           push @buffs, $b;
         } else {
           $self->logger()->warn("No buff defined in readFromFile for $name");
