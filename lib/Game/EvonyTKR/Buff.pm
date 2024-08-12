@@ -13,7 +13,9 @@ class Game::EvonyTKR::Buff :isa(Game::EvonyTKR::Logger) {
   use Type::Utils "is";
   use Carp;
   use Class::ISA;
+  use Data::Printer;
   use Util::Any -all;
+  use Array::Utils qw(:all);
   use namespace::autoclean;
   use overload
     '<=>' => \&compare,
@@ -54,15 +56,17 @@ class Game::EvonyTKR::Buff :isa(Game::EvonyTKR::Logger) {
 
   field $value :reader :param;
 
+  field $inherited :reader :param //= 0;
+
   ADJUST {
     if(scalar @BuffClasses == 0) {
       $classData->set_BuffClasses();
       @BuffClasses = $classData->BuffClasses();
     }
     if(scalar @BuffClasses == 0) {
-      croak "no classes loaded";
+      $self->logger()->logcroak("no classes loaded");
     } elsif (! grep {/^$buffClass$/} @BuffClasses){
-      croak "$buffClass is an invalid class";
+      $self->logger()->logcroak("$buffClass is an invalid class");
     }
   }
 
@@ -75,6 +79,11 @@ class Game::EvonyTKR::Buff :isa(Game::EvonyTKR::Logger) {
     return 0;
   }
 
+  method toggleInherited {
+    $self->logger()->trace("Toggling inherited value for " . np $self);
+    $inherited = not $inherited;
+  }
+
   method set_condition ($nc) {
     if(is_Str($nc)) {
       if(scalar @BuffConditions == 0){
@@ -82,13 +91,13 @@ class Game::EvonyTKR::Buff :isa(Game::EvonyTKR::Logger) {
         @BuffConditions = $classData->BuffConditions();
       }
       if(scalar @BuffConditions == 0){
-        croak 'No conditions';
+        $self->logger()->logcroak('No conditions');
       } elsif (grep {/^$nc$/} @BuffConditions) {
         if(!(grep {/^$nc$/} @condition)) {
           push @condition, $nc;
         }
       } else {
-        croak '$nc is an invalid condition';
+        $self->logger()->logcroak( "$nc is an invalid condition");
       }
     }
   }
@@ -101,48 +110,56 @@ class Game::EvonyTKR::Buff :isa(Game::EvonyTKR::Logger) {
   }
 
   method compare($other, $swap = 0) {
-    
-    my $code = 1;
     my $otherClass = blessed $other;
     if(not defined $otherClass){
-      croak "otherClass is not defined";
+      $self->logger()->logcroak( "otherClass is not defined");
     }
     $self->logger()->trace("comparing against a object of type $otherClass");
     if(not defined $other ){
-      $code = -1
+      return 0;
     } elsif ($otherClass ne 'Game::EvonyTKR::Buff') {
-      $code = -1;
-    } elsif ($other->attribute() ne $attribute) {
-      $code = -2;
-    } elsif ($other->value()->number() != $value->number) {
-      $code = -3;
-    } elsif ($other->value()->unit() ne $value->unit) {
-      $code = -4;
-    } elsif (
-      ($self->has_buffClass() && (not $other->has_buffClass())) ||
-      ((not $self->has_buffClass()) && $other->has_buffClass())) {
-        $code = -5;
-      } elsif (
-      ($self->has_condition() && (not $other->has_condition())) ||
-      ((not $self->has_condition()) && $other->has_condition())
-    ) {
-      $code = -6;
-    } elsif ($buffClass ne $other->buffClass()) {
-      $code = -7;
-    }
-    if ( $code >= 0) {
-      # I cannot use an else-if pattern for this because
-      # the precoditions for testing are not in place,
-      # are expensive to gather, and need not be gathered at all
-      # if I can detect false without doing so.
-      my @other_condition = $other->condition();
-      my @diff = condition_difference(\@condition, \@other_condition);
-      if(scalar @diff != 0) {
-        $code = -8;
+      return 0;
+    } else {
+      if ($other->attribute() ne $attribute) {
+        $self->logger()->trace("$attribute ne " . $other->attribute());
+        return 0;
+      }
+      if ($other->value()->number() != $value->number()) {
+        $self->logger()->trace($value->number() . " != " . $other->value()->number());
+        return 0;
+      }
+      if ($other->value()->unit() ne $value->unit()) {
+        $self->logger()->trace($value->unit() . " ne " . $other->value()->unit());
+        return 0;
+      }  
+      if (
+        ($self->has_buffClass() && (not $other->has_buffClass())) ||
+        ((not $self->has_buffClass()) && $other->has_buffClass())) {
+          $self->logger()->trace($self->has_buffClass() . " and not " . $other->has_buffClass());
+          return 0;
+        } elsif (
+        ($self->has_condition() && (not $other->has_condition())) ||
+        ((not $self->has_condition()) && $other->has_condition())
+      ) {
+        $self->logger()->trace($self->has_condition() . " and not " . $other->has_condition());
+        return 0;
+      } else {
+        my $otherClass = $other->buffClass();
+        if($buffClass ne $otherClass) {
+          $self->logger()->trace("$otherClass ne $buffClass");
+          return 0;
+        }
+        my @other_condition = $other->condition();
+        if( array_diff(@condition, @other_condition) ) {
+          $self->logger()->trace("condition arrays differ");
+          $self->logger()->trace("my conditions are " . np @condition);
+          $self->logger()->trace("their conditions are " . np @other_condition);
+          return 0;
+        }
       }
     }
-    $self->logger()->trace($code);
-    return ($code > 0);
+    $self->logger()->trace("ran out of things to test, they must be the same");
+    return 1;
   }
 
   method toHashRef() {
@@ -159,8 +176,9 @@ class Game::EvonyTKR::Buff :isa(Game::EvonyTKR::Logger) {
 
     my @_conditions = $self->condition();
     if(scalar @_conditions) {
-      $returnRef->{'condition'} = @_conditions;
+      $returnRef->{'condition'} = \@_conditions;
     }
+    $returnRef->{'inherited'} = $self->inherited();
     return $returnRef;
   }
 
@@ -169,27 +187,19 @@ class Game::EvonyTKR::Buff :isa(Game::EvonyTKR::Logger) {
     return $json->encode($self->toHashRef());
   }
 
-  sub condition_difference($one, $two) {
-    # lifted from https://perldoc.perl.org/perlfaq4#How-do-I-compute-the-difference-of-two-arrays%3f-How-do-I-compute-the-intersection-of-two-arrays
-    my (@union, @intersection, @difference);
-    my %count;
-    foreach my $element (@$one, @$two) { $count{$element}++ }
-    foreach my $element (keys %count) {
-        push @union, $element;
-        push @{ $count{$element} > 1 ? \@intersection : \@difference }, $element;
-    }
-    return @difference;
-  }
-
   method _equality($other, $swap = 0){
     my $otherClass = blessed $other;
     my @classList = Class::ISA::self_and_super_path($otherClass);
     if(none {$_ eq 'Game::EvonyTKR::Buff'} @classList) {
-      croak '$other is not a Game::EvonyTKR::Buff'
+      $self->logger()->logcroak('$other is not a Game::EvonyTKR::Buff'); 
     }
-    if($self->compare($other) == 0) {
+    my $result = $self->compare($other);
+    $self->logger()->trace("compare functionr returned $result");
+    if($result) {
+      $self->logger()->trace("_equality returning true for result '$result'");
       return 1
     }
+    $self->logger()->trace("_equality returning false for result '$result'");
     return 0;
   }
 
@@ -197,7 +207,7 @@ class Game::EvonyTKR::Buff :isa(Game::EvonyTKR::Logger) {
     my $otherClass = blessed $other;
     my @classList = Class::ISA::self_and_super_path($otherClass);
     if(none {$_ eq 'Game::EvonyTKR::Buff'} @classList) {
-      croak '$other is not a Game::EvonyTKR::Buff'
+      $self->logger()->logcroak('$other is not a Game::EvonyTKR::Buff'); 
     }
     if($self->compare($other) != 0) {
       return 1
@@ -230,3 +240,12 @@ as this Game::EvonyTKR::Buff.  It is written with a particular style to aid in d
 $swap is currently unused, but will eventually handle the case someone somehow calls the <=> operator backwards, which is apparently possible.
 =cut
 
+=method inherited
+
+this function is used to indicate that the Buff in question should not be exported when computing level at a time values as opposed to cumulative values, as it has been inherited from some other place. 
+=cut
+
+=method toggleInherited
+
+This toggles the value of the inherirted field.
+=cut
