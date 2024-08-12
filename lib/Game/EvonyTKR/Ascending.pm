@@ -52,7 +52,7 @@ class Game::EvonyTKR::Ascending :isa(Game::EvonyTKR::Logger) {
   field $activeLevel :reader :param //= 'None';
 
   ADJUST {
-    my @lv = $levels->values();
+    my @lv = @{$levels->values()};
     for my $tl (@lv){
       $Buffs{$tl} = ();
     }
@@ -69,7 +69,7 @@ class Game::EvonyTKR::Ascending :isa(Game::EvonyTKR::Logger) {
     }
   }
 
-  method add_buff($level, $nb) {
+  method add_buff($level, $nb, $inherited = 0) {
     if(blessed $nb ne 'Game::EvonyTKR::Buff'){
       return 0;
     } 
@@ -77,8 +77,8 @@ class Game::EvonyTKR::Ascending :isa(Game::EvonyTKR::Logger) {
     if(not $t->($level)) {
       return 0;
     }
-    my @levelValues = $levels->values();
-
+    
+    my @levelValues = @{$levels->values()};
     for my $tl (@levelValues) {
       if($level eq 'None'){
         # Level None never has any buffs, this was a mistake. 
@@ -88,23 +88,50 @@ class Game::EvonyTKR::Ascending :isa(Game::EvonyTKR::Logger) {
         next;
       }
       if($tl eq $level) {
-        push @{$Buffs{$tl} }, $nb;
+        if($inherited ){
+          my $copy;
+          if($nb->has_buffClass()) {
+            $copy = Game::EvonyTKR::Buff->new(
+              attribute => $nb->attribute(),
+              value     => $nb->value(),
+              buffClass => $nb->buffClass(),
+              inherited => 1,
+            );
+          } else {
+            $copy = Game::EvonyTKR::Buff->new(
+              attribute => $nb->attribute(),
+              value     => $nb->value(),
+              inherited => 1,
+            );
+          }
+          if($nb->has_condition()){
+            for my $c ($nb->condition()) {
+              $copy->set_condition($c);
+            }
+          }
+          $self->logger->trace("Adding inherited buff at level $tl" . np $copy);
+          push @{$Buffs{$tl} }, $copy;
+          
+        } else {
+          $self->logger->trace("Adding uninherited buff at level $tl" . np $nb);
+          push @{$Buffs{$tl} }, $nb;
+        }
         if ($tl eq '1Purple') {
-          $self->add_buff('2Purple', $nb);
+          $self->add_buff('2Purple', $nb, 1);
         } elsif ($tl eq '2Purple') {
-          $self->add_buff('3Purple', $nb);
+          $self->add_buff('3Purple', $nb, 1);
         } elsif ($tl eq '3Purple') {
-          $self->add_buff('4Purple', $nb);
+          $self->add_buff('4Purple', $nb, 1);
         } elsif ($tl eq '4Purple') {
-          $self->add_buff('5Purple', $nb);
+          $self->add_buff('5Purple', $nb, 1);
         } elsif ($tl eq '1Red') {
-          $self->add_buff('2Red', $nb);
+          $self->add_buff('2Red', $nb, 1);
         } elsif ($tl eq '2Red') {
-          $self->add_buff('3Red', $nb);
+          $self->add_buff('3Red', $nb, 1);
         } elsif ($tl eq '3Red') {
-          $self->add_buff('4Red', $nb);
+          $self->add_buff('4Red', $nb, 1 );
         } elsif ($tl eq '4Red') {
-          $self->add_buff('5Red', $nb);
+          $self->add_buff('5Red', $nb, 1 );
         }
         last;
       }
@@ -113,14 +140,34 @@ class Game::EvonyTKR::Ascending :isa(Game::EvonyTKR::Logger) {
   }
 
   method toHashRef( $verbose = 0) {
+    $self->logger()->trace("Starting toHashRef for Ascending, verbose is $verbose");
     my $returnRef = {};
     my @values = @{ $levels->values()};
     if($verbose) {
-      for my $key ( keys %Buffs) {
-        $returnRef->{$key} = $Buffs{$key};
+      # I initially thought to test for duplicate buffs.  This fails because
+      # Generals (see Dmitry) can *have* duplicate buffs.  Instead I created
+      # the inherited field for Buffs. 
+      for my $key (sort keys %Buffs ) {
+        $self->logger()->trace("processing $key");
+        for my $thisBuff ( @{ $Buffs{$key} } ) { 
+          if(not $thisBuff->inherited()) {
+            $self->logger()->trace("found unique buff for $key " . np $thisBuff); 
+            push @{ $returnRef->{$key} }, $thisBuff->toHashRef();
+          } else {
+            if($thisBuff->inherited()) {
+              $self->logger()->trace("found inherited buff at $key " . np $thisBuff);
+            }
+          }
+        }
       }
     } else {
-      $returnRef->{$activeLevel} = $Buffs{$activeLevel};
+      $self->logger()->debug("activeLevel is $activeLevel");
+      $self->logger()->debug(exists $Buffs{$activeLevel} ? 
+        "'$activeLevel' is a valid key" : 
+        "'$activeLevel' is not a valid key");
+      for my $thisBuff ( @{ $Buffs{$activeLevel} } ) { 
+        push @{ $returnRef->{$activeLevel} }, $thisBuff->toHashRef();
+      }
     }
     return $returnRef;
   }
@@ -147,7 +194,7 @@ class Game::EvonyTKR::Ascending :isa(Game::EvonyTKR::Logger) {
           my @flKeys = keys %{$flb};
           
           if(any {$_ eq 'value'} @flKeys) {
-            $self->logger()->debug("AscendingFileName has a buff with a value");
+            $self->logger()->debug("$AscendingFileName has a buff with a value");
             $v = Game::EvonyTKR::Buff::Value->new(
               number  => $flb->{'value'}->{'number'},
               unit    => $flb->{'value'}->{'unit'},
@@ -165,7 +212,7 @@ class Game::EvonyTKR::Ascending :isa(Game::EvonyTKR::Logger) {
               );
             }
           }else {
-            $self->logger()->warn("AscendingFileName has a buff without a value");
+            $self->logger()->warn("$AscendingFileName has a buff without a value");
           }
           if(defined $b) {
             if(any {$_ eq 'condition'} @flKeys) {

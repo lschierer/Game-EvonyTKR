@@ -67,8 +67,6 @@ use overload
 
   field $ascendingAttributes :reader :param //= Game::EvonyTKR::Ascending->new();
 
-  field $stars :reader :param //= '5Red';
-
   use constant DEFAULT_BUFF_MULTIPLIERS => Game::EvonyTKR::Buff::EvaluationMultipliers->new();
 
   field $BuffMultipliers :reader :param //= __CLASS__->DEFAULT_BUFF_MULTIPLIERS;
@@ -87,20 +85,6 @@ use overload
   field $builtInBook :reader :param;
 
   field @otherBooks :reader;
-
-  field $starsValues = enum [
-    'None',
-    '1Purple',
-    '2Purple',
-    '3Purple',
-    '4Purple',
-    '5Purple',
-    '1Red',
-    '2Red',
-    '3Red',
-    '4Red',
-    '5Red',
-  ];
 
   field %BasicAESAdjustment = (
     'None'    => 0,
@@ -132,10 +116,6 @@ use overload
     
     my $type = t('Bool');
     $type->check($ascending) or push @errors => "ascending must be a bool, not $ascending";
-
-    my $check = $starsValues->compiled_check;
-    my $prettyenum = np @{ $starsValues->values }; 
-    $check->($stars) or push @errors => "stars must be one of the $prettyenum not $stars";
 
     $type = t('PositiveOrZeroNum');
     is_Num($leadership) or push @errors => "leadership must be a number, not $leadership";
@@ -177,17 +157,10 @@ use overload
 
     if($ascending){
       $self->logger()->trace($self->name() . " is ascended");
-      my @values = @{ $starsValues->values()};
-      for my $value (@values){
-        if($stars =~ /$value/i ) {
-          $self->logger()->trace($self->name() . " has '$stars' stars (matched $value)");
-          $AES_adjustment =$BasicAESAdjustment{$stars};
-          $self->logger()->trace($self->name() . " gets an adjustment of '$AES_adjustment'");
-          last;
-        }
-      }
+      my $stars = $ascendingAttributes->activeLevel();
+      $AES_adjustment =$BasicAESAdjustment{$stars};
       if($AES_adjustment == 0) {
-        $self->logger()->trace($self->name() . " did not match any value for stars $stars from values " . np @values);
+        $self->logger()->trace($self->name() . " did not match any value for stars $stars in BasicAESAdjustment: " . np %BasicAESAdjustment );
       }
     }
     $self->logger()->trace("for " . $self->name() . " level is $level, attribute_increment is $attribute_increment, attack is $attack");
@@ -299,16 +272,16 @@ use overload
         defense_increment     => $self->defense_increment(),
         politics              => $self->politics(),
         politics_increment    => $self->politics_increment(),
-        ascendingAttributes   => $self->ascendingAttributes()->toHashRef(verbose => 1),
+        ascendingAttributes   => $self->ascendingAttributes()->toHashRef(1),
       };
     } else {
       return {
-        name        => $name,
+        name                  => $name,
         level                 => $level,
-        leadership  => $self->effective_leadership(),
-        attack      => $self->effective_attack(),
-        defense     => $self->effective_defense(),
-        politics    => $self->effective_politics(),
+        leadership            => $self->effective_leadership(),
+        attack                => $self->effective_attack(),
+        defense               => $self->effective_defense(),
+        politics              => $self->effective_politics(),
         ascendingAttributes   => $self->ascendingAttributes()->toHashRef(),
       };
     }
@@ -448,24 +421,6 @@ Todo:  Once Game::EvonyTKR::Speciality overloads comparison operators, use them 
 
 This returns true or false, for whether or not the general can be ascended. 
 =cut
-
-=method stars()
-
-This returns one of the values 
-'None'
-'1Purple'
-'2Purple'
-'3Purple'
-'4Purple'
-'5Purple'
-'1Red'
-'2Red'
-'3Red'
-'4Red'
-'5Red'
-
-to indicate at what level of ascension the general is being evaluated at. 
-=cut 
 
 =method builtInBook
 

@@ -105,6 +105,7 @@ package Game::EvonyTKR::Web::Root {
           allow_blessed   => 1,
           allow_nonref    => 1,
           allow_tags      => 1,
+          canonical       => 1,
           convert_blessed => 1,
           max_depth       => 5,
           pretty          => 0,
