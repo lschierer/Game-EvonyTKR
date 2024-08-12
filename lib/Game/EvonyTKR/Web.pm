@@ -95,7 +95,7 @@ true;
 package Game::EvonyTKR::Web::Root {
   use namespace::clean;
   use FindBin;
-  use lib "$FindBin::Bin/../../lib";
+  use lib "$FindBin::Bin/../../../lib";
   use Dancer2 appname => 'Game::EvonyTKR';
   use Game::EvonyTKR::Web::General;
 
