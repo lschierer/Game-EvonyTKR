@@ -4,7 +4,8 @@ use experimental qw(class defer);
 use Carp;
 
 use FindBin;
-use lib "$FindBin::Bin/../../lib";
+use lib "$FindBin::Bin/../../../lib";
+use Game::EvonyTKR::Logger;
 
 use Log::Log4perl;
 
@@ -33,18 +34,23 @@ package Game::EvonyTKR::Web {
     binmode(STDOUT, ":encoding(UTF-8)"); # apparently not the same thing as "use utf8;"
     binmode(STDIN, ":encoding(UTF-8)"); # apparently not the same thing as "use utf8;"
     
-    my $logfile = _logInit();
-    my $logger = Log::Log4perl::get_logger('Game::EvonyTKR');
-    $logger->debug("Logging initialized with logfile $logfile");
-
+    
     my @DancerOpts;
+    my $env = 'production';
     if($opt->{env}){
-      my $env = $opt->{'env'};
+      $env = $opt->{'env'};
       push @DancerOpts, qw{ -E };
       push @DancerOpts, $env;
       if($env =~ /development/i ) {
         push @DancerOpts, qw{ -L Shotgun };
       }
+    }
+
+    my $logConf = _logInit($env);
+    my $logger = Log::Log4perl::get_logger('Web');
+    $logger->debug("Logging initialized with logfile $logConf");
+
+    if(scalar @DancerOpts >= 1) {
       $logger->debug("options are " . np @DancerOpts);
     }
 
@@ -57,7 +63,7 @@ package Game::EvonyTKR::Web {
 
   }
 
-  sub _logInit() {
+  sub _logInit($env) {
     my $home   = File::HomeDir->my_home;
     my $logDir = File::Spec->catdir($home, 'var/log/Perl/dist/Game-Evony/');
     if (!-r -w -x -o -d $logDir) {
@@ -68,24 +74,42 @@ package Game::EvonyTKR::Web {
       File::Touch::touch($logFile);
       chmod(0600, $logFile);
     }
+    my $SystemLogger = Game::EvonyTKR::Logger->new();
+    my $logFile2 = $SystemLogger->getLogfileName();
+
+    my %logLevel = (
+      development => 'ALL',
+      production  => 'INFO',
+    );
+
+    my $level = $logLevel{$env};
 
     my %conf = (
-      "log4perl.rootLogger" => "ALL, logFile",
+      "log4perl.category.Game.EvonyTKR"       =>  "$level, logFile2",
+      "log4perl.category.Web"   => "$level, logFile",
+      "log4perl.category.Dancer2"             => "$level, logFile",
 
-      "log4perl.appender.logFile"          => "Log::Log4perl::Appender::File",
-      "log4perl.appender.logFile.utf8"     => 1,
-      "log4perl.appender.logFile.filename" => $logFile,
+      "log4perl.appender.logFile"             => "Log::Log4perl::Appender::File",
+      "log4perl.appender.logFile.utf8"        => 1,
+      "log4perl.appender.logFile.filename"    => $logFile,
       "log4perl.appender.Logfile.DatePattern" => "yyyy-MM-dd",
       "log4perl.appender.Logfile.TZ"          => "UTC",
       "log4perl.appender.logFile.mode"        => "append",
-      "log4perl.appender.logFile.layout"      =>
-        "Log::Log4perl::Layout::PatternLayout",
-      "log4perl.appender.logFile.layout.ConversionPattern" =>
-        "[%p] %d (%C line %L) %m%n",
+      "log4perl.appender.logFile.layout"      => "Log::Log4perl::Layout::PatternLayout",
+      "log4perl.appender.logFile.layout.ConversionPattern" => "[%p] %d (%C line %L) %m%n",
+
+      "log4perl.appender.logFile2"             => "Log::Log4perl::Appender::File",
+      "log4perl.appender.logFile2.utf8"        => 1,
+      "log4perl.appender.logFile2.filename"    => $logFile2,
+      "log4perl.appender.logFile2.DatePattern" => "yyyy-MM-dd",
+      "log4perl.appender.logFile2.TZ"          => "UTC",
+      "log4perl.appender.logFile2.mode"        => "append",
+      "log4perl.appender.logFile2.layout"      => "Log::Log4perl::Layout::PatternLayout",
+      "log4perl.appender.logFile2.layout.ConversionPattern" => "[%p] %d (%C line %L) %m%n",
     );
     # ... passed as a reference to init()
     Log::Log4perl::init(\%conf);
-    return $logFile;
+    return np %conf;
   }
 
 }
