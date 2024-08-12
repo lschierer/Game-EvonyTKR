@@ -158,9 +158,11 @@ use overload
     if($ascending){
       $self->logger()->trace($self->name() . " is ascended");
       my $stars = $ascendingAttributes->activeLevel();
-      $AES_adjustment =$BasicAESAdjustment{$stars};
-      if($AES_adjustment == 0) {
-        $self->logger()->trace($self->name() . " did not match any value for stars $stars in BasicAESAdjustment: " . np %BasicAESAdjustment );
+      if(not $stars =~ /None/i) {
+        $AES_adjustment =$BasicAESAdjustment{$stars};
+        if($AES_adjustment == 0) {
+          $self->logger()->trace($self->name() . " did not match any value for stars $stars in BasicAESAdjustment: " . np %BasicAESAdjustment );
+        }
       }
     }
     $self->logger()->trace("for " . $self->name() . " level is $level, attribute_increment is $attribute_increment, attack is $attack");
