@@ -27,7 +27,7 @@ package Game::EvonyTKR::Web::General {
   use Dancer2 appname => 'Game::EvonyTKR';
 
   my %generals;
-  my $logger = Log::Log4perl::get_logger('Game::EvonyTKR::Web::General');
+  my $logger = Log::Log4perl::get_logger('Web::General');
 
   sub _init {
     my $gencount = scalar keys %generals;
