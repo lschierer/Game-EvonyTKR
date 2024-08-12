@@ -63,11 +63,20 @@ package Game::EvonyTKR::Web::General {
     my $id = route_parameters->get('id');
     if(exists $generals{$id}) {
       my $general = $generals{$id};
+
       my $level = query_parameters->get('level');
       $logger->debug("Query level is '$level'");
       if(defined $level) {
         $general->setLevel(0 + $level);
       }
+
+      my $ascendingLevel = query_parameters->get('ascendingLevel');
+      $logger->debug("Query ascendingLevel is '$ascendingLevel'");
+      if(defined $ascendingLevel) {
+        if($ascendingLevel =~ /[1-5](Red|Purple))
+        $general->ascendingAttributes()->setActiveLevel()
+      }
+
       return $general->toHashRef();
     } else {
       return {

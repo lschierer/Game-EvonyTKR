@@ -299,6 +299,7 @@ use overload
         defense_increment     => $self->defense_increment(),
         politics              => $self->politics(),
         politics_increment    => $self->politics_increment(),
+        ascendingAttributes   => $self->ascendingAttributes()->toHashRef(verbose => 1),
       };
     } else {
       return {
@@ -308,6 +309,7 @@ use overload
         attack      => $self->effective_attack(),
         defense     => $self->effective_defense(),
         politics    => $self->effective_politics(),
+        ascendingAttributes   => $self->ascendingAttributes()->toHashRef(),
       };
     }
   }
