@@ -5,14 +5,14 @@ ascending:
     - attribute: HP
       condition:
         - Marching
-      class: Ground Troops
+      class: Mounted Troops
       value:
         number: 10
         unit: percentage
     - attribute: HP
       condition:
         - Marching
-      class: Mounted Troops
+      class: Ground Troops
       value:
         number: 10
         unit: percentage
@@ -31,11 +31,13 @@ ascending:
       value:
         number: 10
         unit: percentage
+- level: '3Red'
+  buff:
     - attribute: March_Size_Capacity
       value:
         number: 14
         unit: percentage
-- level: '3Red'
+- level: '4Red'
   buff:
     - attribute: Defense
       class: Ground Troops
@@ -44,33 +46,30 @@ ascending:
       value:
         number: 60
         unit: percentage
-- level: '4Red'
+- level: '5Red'
   buff:
     - attribute: HP
+      class: Mounted Troops
+      value:
+        number: 10
+        unit: percentage
+    - attribute: HP
+      class: Ground Troops
+      value:
+        number: 10
+        unit: percentage
+    - attribute: Defense
       class: Mounted Troops
       condition:
         - leading_the_army_to_attack
       value:
         number: 10
         unit: percentage
-    - attribute: HP
-      class: Ground Troops
-      condition:
-        - leading_the_army_to_attack
-      value:
-        number: 10
-        unit: percentage
-    - attribute: Defense
-      class: Ground Troops
-      condition:
-        - leading_the_army_to_attack
-      value:
-        number: 10
-        unit: percentage
     - attribute: Attack
+      class: Ground Troops
       condition:
         - dragon_to_the_attack
-      class: Ground Troops
       value:
         number: 20
         unit: percentage
+    
