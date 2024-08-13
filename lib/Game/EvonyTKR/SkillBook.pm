@@ -15,10 +15,13 @@ class Game::EvonyTKR::SkillBook :isa(Game::EvonyTKR::Logger) {
   use Game::EvonyTKR::Buff;
   use Game::EvonyTKR::Buff::Value;
   use List::MoreUtils;
+  use JSON::MaybeXS;
   use Util::Any -all;
   use YAML::XS qw{LoadFile Load};
   use namespace::autoclean;
-
+  use overload
+    '""'        => \&_toString,
+    "fallback"  => 1;
 
   # from Type::Registry, this will save me from some of the struggles I have had with some types having blessed references and others not.
   ADJUST {
@@ -56,6 +59,21 @@ class Game::EvonyTKR::SkillBook :isa(Game::EvonyTKR::Logger) {
       }
     }
     push @buffs, $nb;
+  }
+
+  method toHashRef() {
+    $self->logger()->trace("starting toHashRef for $name");
+    my $returnRef = {};
+    $returnRef->{'name'} = $name;
+    for my $tb (@buffs) {
+      push @{ $returnRef->{'buffs'} }, $tb->toHashRef();
+    }
+    return $returnRef;
+  }
+
+  method _toString {
+    my $json = JSON::MaybeXS->new(utf8 => 1);
+    return $json->encode($self->toHashRef());
   }
 
   method readFromFile() {
