@@ -70,6 +70,20 @@ package Game::EvonyTKR::Web::General {
         $general->setLevel(0+ $level);
       }
 
+      my @specialityLevels = qw( None None None None None );
+      for my $sl (1..4) {
+        my $sp = query_parameters->get("specialityLevel$sl");
+        if (defined $sp) {
+          my @lv = $general->specialityLevels();
+          if(any {$_ =~ /$sp/i} @lv) {
+            $logger->debug("setting $sp at specialityLevel$sl for $id");
+            $general->changeActiveSpecialityLevel($sl, $sp);
+          } else {
+            $logger->warn("invalid specialityLevel $sp at $sl for $id");
+            $logger->warn("valid values are " . Data::Printer::np @lv);
+          }
+        }
+      }
       my $ascendingLevel = query_parameters->get('ascendingLevel');
       $logger->debug("Query ascendingLevel is '$ascendingLevel'");
       if (defined $ascendingLevel) {

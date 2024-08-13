@@ -270,6 +270,54 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Logger) {
     return 0;
   }
 
+  method specialityLevels {
+    my $sl = first { defined($_) } @specialities;
+    return @{ $sl->levels()->values() };
+  }
+
+  method changeActiveSpecialityLevel($specialityNumber, $newLevel) {
+    my $type = t('PositiveOrZeroInt');
+    if($type->check($specialityNumber) ) {
+      $type = t('IntRange[1, 4]');
+      if($type->check($specialityNumber)) {
+        $specialityNumber--;
+        my @lv = $self->specialityLevels();
+        if (any { $_ =~ $newLevel} @lv){
+          # I am ready to actually do work
+          if($specialityNumber == 3)  {
+            my @otherLevels;
+            for my $l (0..3) {
+              push @otherLevels, $specialities[$l]->activeLevel();
+            }
+            if(any {$_ !~ /Gold/i } @otherLevels) {
+              $self->logger()->debug("detected that one of the first 3 is not Gold.  Setting #4 to None.");
+              $specialities[3]->setActiveLevel('None');
+            } else {
+              $self->logger()->debug("detected that the first 3 are all Gold.  Setting #4 to $newLevel as requested.");
+              $specialities[3]->setActiveLevel($newLevel);
+            }
+          } else {
+            if ($newLevel !~ /Gold/i ) {
+              $self->logger()->debug("Detectected that $newLevel for " . $specialityNumber + 1 . "is not Gold.  Ensuring #4 is None.");
+              $specialities[3]->setActiveLevel('None');
+              $specialities[$specialityNumber]->setActiveLevel($newLevel);
+            } else {
+              $specialities[$specialityNumber]->setActiveLevel($newLevel);
+              $self->logger()->debug("Detectected that $newLevel for " . $specialityNumber + 1 . "is Gold.  Recursive Call for #4 just in case.");
+              $self->changeActiveSpecialityLevel(4,'Green');
+            }
+          }
+        } else {
+          $self->logger()->warn("detected invalid Speciality level $newLevel for " . $specialityNumber +1 . "in $name");
+        }
+      } else {
+        $self->logger()->warn("detected invalid speciality number $specialityNumber for $name");
+      }
+    } else {
+      $self->logger()->warn("detected invalid speciality number $specialityNumber for $name");
+    }
+  }
+
   method addAnotherBook($newBook) {
     my $bookClass = blessed $newBook;
     my @classList = split(/::/, $bookClass);
@@ -311,6 +359,10 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Logger) {
     for my $ob (@otherBooks) {
       push @sbRefs, $ob->toHashRef();
     }
+    my @specialityRefs;
+    for my $sp (@specialities) {
+      push @specialityRefs, $sp->toHashRef($verbose);
+    }
     if ($verbose) {
       return {
         name                 => $name,
@@ -328,20 +380,22 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Logger) {
           $self->builtInBook->toHashRef() :
           {},
         otherBooks           => \@sbRefs,
+        specialities         => \@specialityRefs,
       };
     } else {
       return {
-        name                => $name,
-        level               => $level,
-        leadership          => $self->effective_leadership(),
-        attack              => $self->effective_attack(),
-        defense             => $self->effective_defense(),
-        politics            => $self->effective_politics(),
-        ascendingAttributes => $self->ascendingAttributes()->toHashRef(),
-        builtInBook         => defined $self->builtInBook ? 
+        name                 => $name,
+        level                => $level,
+        leadership_increment => $self->effective_leadership(),
+        attack               => $self->effective_attack(),
+        defense              => $self->effective_defense(),
+        politics             => $self->effective_politics(),
+        ascendingAttributes  => $self->ascendingAttributes()->toHashRef(),
+        builtInBook          => defined $self->builtInBook ? 
           $self->builtInBook->toHashRef() :
           {},
-        otherBooks          => \@sbRefs,
+        otherBooks           => \@sbRefs,
+        specialities         => \@specialityRefs,
       };
     }
   }
@@ -433,6 +487,7 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Logger) {
         my $sn  = $_;
         my $tsi = Game::EvonyTKR::Speciality->new(name => $sn,);
         $tsi->readFromFile();
+        $self->addSpeciality($tsi);
       }
 
       if ($ascending) {
@@ -543,6 +598,20 @@ This returns the array of Game::EvonyTKR::Speciality instances associated with t
 Used to add a Game::EvonyTKR::Speciality to this General.  
 
 Todo:  Once Game::EvonyTKR::Speciality overloads comparison operators, use them to ensure uniqueness. 
+=cut
+
+=method changeActiveSpecialityLevel($specialityLevel, $newLevel)
+
+This takes a number 1-4 indicating which to work on and a level from the options in Game::EvonyTKR::Speciality
+It handles the situation that the 4th speciality can only be set if the other 3 are all Gold, and will automatically be Green once that is true.
+
+TODO: handle the 5th special. 
+
+=cut
+
+=method specialityLevels()
+
+convience method to get the list of speciality levels when you do not know if any specialities are loaded.
 =cut
 
 =method ascending()

@@ -19,7 +19,9 @@ class Game::EvonyTKR::Speciality :isa(Game::EvonyTKR::Logger) {
   use YAML::XS qw{LoadFile Load};
   use namespace::autoclean;
   use Game::EvonyTKR::Logger;
-
+  use overload
+    '""'        => \&_toString,
+    "fallback"  => 1;
 
   # from Type::Registry, this will save me from some of the struggles I have had with some types having blessed references and others not.
   ADJUST {
@@ -41,7 +43,7 @@ class Game::EvonyTKR::Speciality :isa(Game::EvonyTKR::Logger) {
   }
 
   field %Buffs :reader;
-  field $levels = enum [
+  field $levels :reader = enum [
     'Green',
     'None',
     'Blue',
@@ -53,7 +55,7 @@ class Game::EvonyTKR::Speciality :isa(Game::EvonyTKR::Logger) {
   field $activeLevel :reader :param //= 'None';
 
   ADJUST {
-    my @lv = $levels->values();
+    my @lv = @{ $levels->values()} ;
     for my $tl (@lv){
       $Buffs{$tl} = ();
     }
@@ -70,7 +72,7 @@ class Game::EvonyTKR::Speciality :isa(Game::EvonyTKR::Logger) {
     }
   }
 
-  method add_buff($level, $nb) {
+  method add_buff($level, $nb, $inherited = 0) {
     if(blessed $nb ne 'Game::EvonyTKR::Buff'){
       return 0;
     } 
@@ -78,8 +80,8 @@ class Game::EvonyTKR::Speciality :isa(Game::EvonyTKR::Logger) {
     if(none { $tcheck->($_) } ($level)) {
       return 0;
     }
-    my @levelValues = $levels->values();
 
+    my @levelValues = @{$levels->values()};
     for my $tl (@levelValues) {
       if($level eq 'None'){
         # Level None never has any buffs, this was a mistake. 
@@ -89,20 +91,87 @@ class Game::EvonyTKR::Speciality :isa(Game::EvonyTKR::Logger) {
         next;
       }
       if($tl eq $level) {
-        push @{$Buffs{$tl} }, $nb;
+        if($inherited) {
+          my $copy;
+          if($nb->has_buffClass()) {
+            $copy = Game::EvonyTKR::Buff->new(
+              attribute => $nb->attribute(),
+              value     => $nb->value(),
+              buffClass => $nb->buffClass(),
+              inherited => 1,
+            );
+          } else {
+            $copy = Game::EvonyTKR::Buff->new(
+              attribute => $nb->attribute(),
+              value     => $nb->value(),
+              inherited => 1,
+            );
+          }
+          if($nb->has_condition()){
+            for my $c ($nb->condition()) {
+              $copy->set_condition($c);
+            }
+          }
+          $self->logger->trace("Adding inherited buff at level $tl" . np $copy);
+          push @{$Buffs{$tl}}, $copy;
+        } else {
+          $self->logger->trace("Adding uninherited buff at level $tl" . np $nb);
+          push @{$Buffs{$tl} }, $nb;
+        }
         if ($tl eq 'Green') {
-          $self->add_buff('Blue', $nb);
+          $self->add_buff('Blue', $nb, 1);
         } elsif ($tl eq 'Blue') {
-          $self->add_buff('Purple', $nb);
+          $self->add_buff('Purple', $nb, 1);
         } elsif ($tl eq 'Purple') {
-          $self->add_buff('Orange', $nb);
+          $self->add_buff('Orange', $nb, 1);
         } elsif ($tl eq 'Orange') {
-          $self->add_buff('Gold', $nb);
+          $self->add_buff('Gold', $nb, 1);
         }
         last;
       }
     }
     return 1;
+  }
+
+  method toHashRef( $verbose = 0) {
+    $self->logger()->trace("Starting toHashRef for Speciality, verbose is $verbose");
+    my $returnRef = {
+      name        => $self->name(),
+      activeLevel => $self->activeLevel(),
+    };
+    my @values = @{ $levels->values()};
+    if($verbose) {
+      # I initially thought to test for duplicate buffs.  This fails because
+      # Generals (see Dmitry) can *have* duplicate buffs.  Instead I created
+      # the inherited field for Buffs. 
+      for my $key (sort keys %Buffs ) {
+        $self->logger()->trace("processing $key");
+        for my $thisBuff ( @{ $Buffs{$key} } ) { 
+          if(not $thisBuff->inherited()) {
+            $self->logger()->trace("found unique buff for $key " . np $thisBuff); 
+            push @{ $returnRef->{$key} }, $thisBuff->toHashRef();
+          } else {
+            if($thisBuff->inherited()) {
+              $self->logger()->trace("found inherited buff at $key " . np $thisBuff);
+            }
+          }
+        }
+      }
+    } else {
+      $self->logger()->debug("activeLevel is $activeLevel");
+      $self->logger()->debug(exists $Buffs{$activeLevel} ? 
+        "'$activeLevel' is a valid key" : 
+        "'$activeLevel' is not a valid key");
+      for my $thisBuff ( @{ $Buffs{$activeLevel} } ) { 
+        push @{ $returnRef->{$activeLevel} }, $thisBuff->toHashRef();
+      }
+    }
+    return $returnRef;
+  }
+
+  method _toString {
+    my $json = JSON::MaybeXS->new(utf8 => 1);
+    return $json->encode($self->toHashRef());
   }
 
   method readFromFile() {
