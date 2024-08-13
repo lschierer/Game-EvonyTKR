@@ -1,7 +1,8 @@
 use v5.40.0;
 use experimental qw(class);
 use utf8::all;
-
+use FindBin;
+use lib "$FindBin::Bin/../../../lib";
 
 class Game::EvonyTKR::Buff :isa(Game::EvonyTKR::Logger) {
 # PODNAME: Game::EvonyTKR::Buff

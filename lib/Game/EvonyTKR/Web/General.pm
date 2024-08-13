@@ -10,6 +10,8 @@ use File::Spec;
 use File::Touch;
 use Log::Log4perl;
 
+use FindBin;
+use lib "$FindBin::Bin/../../../../lib";
 use Game::EvonyTKR::General::Ground;
 use Game::EvonyTKR::General::Mounted;
 use Game::EvonyTKR::General::Ranged;

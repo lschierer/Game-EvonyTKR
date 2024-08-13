@@ -1,5 +1,7 @@
 use v5.40.0;
 use experimental qw(class);
+use FindBin;
+use lib "$FindBin::Bin/../../../lib";
 
 class Game::EvonyTKR::Ascending :isa(Game::EvonyTKR::Logger) {
 # PODNAME: Game::EvonyTKR::Ascending

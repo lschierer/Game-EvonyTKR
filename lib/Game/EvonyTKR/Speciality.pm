@@ -1,5 +1,7 @@
 use v5.40.0;
 use experimental qw(class);
+use FindBin;
+use lib "$FindBin::Bin/../../../lib";
 
 class Game::EvonyTKR::Speciality :isa(Game::EvonyTKR::Logger) {
 # PODNAME: Game::EvonyTKR::Speciality
@@ -112,10 +114,10 @@ class Game::EvonyTKR::Speciality :isa(Game::EvonyTKR::Logger) {
               $copy->set_condition($c);
             }
           }
-          $self->logger->trace("Adding inherited buff at level $tl" . np $copy);
+          $self->logger()->trace("Adding inherited buff at level $tl" . np $copy);
           push @{$Buffs{$tl}}, $copy;
         } else {
-          $self->logger->trace("Adding uninherited buff at level $tl" . np $nb);
+          $self->logger()->trace("Adding uninherited buff at level $tl" . np $nb);
           push @{$Buffs{$tl} }, $nb;
         }
         if ($tl eq 'Green') {

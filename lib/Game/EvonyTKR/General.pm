@@ -1,5 +1,7 @@
 use v5.40.0;
 use experimental qw(class);
+use FindBin;
+use lib "$FindBin::Bin/../../../lib";
 
 class Game::EvonyTKR::General : isa(Game::EvonyTKR::Logger) {
   use Carp;
@@ -9,6 +11,7 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Logger) {
   use Data::Printer;
   use File::ShareDir ':ALL';
   use File::Spec;
+  use Game::EvonyTKR::Covenant;
   use Game::EvonyTKR::SkillBook::Special;
   use Game::EvonyTKR::Buff::EvaluationMultipliers;
   use Game::EvonyTKR::Ascending;
@@ -34,7 +37,7 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Logger) {
     }
   }
 
-  field $name : reader : param;
+  field $name :reader : param;
 
   ADJUST {
     my @errors;
@@ -44,34 +47,36 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Logger) {
     }
   }
 
-  field $leadership : reader = 0;
+  field $leadership :reader = 0;
 
-  field $leadership_increment : reader = 0;
+  field $leadership_increment :reader = 0;
 
-  field $attack : reader = 0;
+  field $attack :reader = 0;
 
-  field $attack_increment : reader = 0;
+  field $attack_increment :reader = 0;
 
-  field $defense : reader = 0;
+  field $defense :reader = 0;
 
-  field $defense_increment : reader = 0;
+  field $defense_increment :reader = 0;
 
-  field $politics : reader = 0;
+  field $politics :reader = 0;
 
-  field $politics_increment : reader = 0;
+  field $politics_increment :reader = 0;
 
-  field $level : reader : param //= 45;
+  field $level :reader : param //= 45;
 
-  field @specialities : reader;
+  field @specialities :reader;
 
-  field $ascending : reader : param //= true;
+  field $ascending :reader : param //= true;
 
-  field $ascendingAttributes : reader : param //=
+  field $ascendingAttributes :reader : param //=
     Game::EvonyTKR::Ascending->new();
 
-  field $builtInBook : reader;
+  field $builtInBook :reader;
 
-  field @otherBooks : reader;
+  field @otherBooks :reader;
+
+  field $hasCovenant :reader = false;
 
   field %BasicAESAdjustment = (
     'None'    => 0,
@@ -90,7 +95,7 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Logger) {
   use constant DEFAULT_BUFF_MULTIPLIERS =>
     Game::EvonyTKR::Buff::EvaluationMultipliers->new();
 
-  field $BuffMultipliers : reader : param //=
+  field $BuffMultipliers :reader : param //=
     __CLASS__->DEFAULT_BUFF_MULTIPLIERS;
 
   ADJUST {
@@ -112,6 +117,14 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Logger) {
     }
     $self->logger()->trace("adding builtInBook with type $type and name " . $newBook->name());
     $builtInBook = $newBook;
+  }
+
+  method setCovenant($ce) {
+    if($ce) {
+      $hasCovenant = 1;
+    } else {
+      $hasCovenant = 0;
+    }
   }
 
   method _validation {
@@ -375,6 +388,7 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Logger) {
         defense_increment    => $self->defense_increment(),
         politics             => $self->politics(),
         politics_increment   => $self->politics_increment(),
+        hasCovenant          => $self->hasCovenant(),
         ascendingAttributes  => $self->ascendingAttributes()->toHashRef(1),
         builtInBook          => defined $self->builtInBook ? 
           $self->builtInBook->toHashRef() :
@@ -390,6 +404,7 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Logger) {
         attack               => $self->effective_attack(),
         defense              => $self->effective_defense(),
         politics             => $self->effective_politics(),
+        hasCovenant          => $self->hasCovenant(),
         ascendingAttributes  => $self->ascendingAttributes()->toHashRef(),
         builtInBook          => defined $self->builtInBook ? 
           $self->builtInBook->toHashRef() :
@@ -450,15 +465,12 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Logger) {
       $politics           = $data->{'general'}->{'politics'};
       $politics_increment = $data->{'general'}->{'politics_increment'};
 
-
-      
       my @SpecialityNames = @{ $data->{'general'}->{'specialities'} };
       my @otherBookNames;
       if (exists $data->{'general'}->{'extra'}) {
         push @otherBookNames, @{ $data->{'general'}->{'extra'} };
       }
       
-
       my $bookName = $data->{'general'}->{'book'};
       if(defined $bookName) {
         $self->logger()->trace("primary skill book for $name is $bookName");
@@ -498,6 +510,15 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Logger) {
       $self->logger()
         ->debug("details populated for " . Data::Printer::np $name);
 
+      my $covenantShare = File::Spec->catfile(dist_dir('Game-EvonyTKR'), 'covenants');
+      my $CovenantFile = File::Spec->catfile($covenantShare, $fileName);
+      if ( -T -s -r $CovenantFile) {
+        $hasCovenant = 1;
+        my $covenant = Game::EvonyTKR::Covenant->new(
+          primary => $self,
+        );
+        $covenant->readFromFile();
+      }
     }
 
   }
@@ -648,6 +669,16 @@ when evaluating generals, not all buffs are equally important.  Nor are these sc
 This returns the scaling factors for this general.
 =cut
 
+=method setCovenant($ce) 
+
+if $ce is true, sets the value of hasCovenant to true. If $ce is false, sets hasCovenant to false.
+=cut
+
+=method hasCovenant()
+
+returns true if the General has a corresponding Game::EvonyTKR::Covenant
+=cut
+
 =method toHashRef
 
 In typescript, you can run almost any object through JSON.stringify() and get something usable. This method is essentially what would happen if you ran a Game::EvonyTKR::General through JSON.stringify() to get a JSON representation of it, but then immediately read it back in with JSON.parse into a perl hash (instead of allowing it to be detected as an object), with all the top level things in the JSON being the keys of the hash. 
@@ -672,3 +703,4 @@ create a second General with different attributes.
 
 This simply compares on the General's name.  It is a strict inverse of the _equality, for convience.
 =cut
+
