@@ -3,63 +3,63 @@ generals:
   - Napoleon
   - Soult
   - Louis IX
-attributes:
-- category: War Covenant
+levels:
+- category: War
   type: personal
   buff:
   - attribute: Attack
-    class: Ground
+    class: Ground Troops
     value:
       number: 5
       unit: percentage
-- category: War Covenant
+- category: War
   type: passive
   buff:
   - attribute: Training Capacity
-    class: Ground
+    class: Ground Troops
     value:
       number: 5
       unit: percentage
-- category: Cooperation Covenant
+- category: Cooperation
   type: passive
   buff:
   - attribute: Deserter Capacity
     value:
       number: 10
       unit: percentage
-- category: Peace Covenant
+- category: Peace
   type: personal
   buff:
   - attribute: Defense
-    class: Ground
+    class: Ground Troops
     value:
       number: 10
       unit: percentage
-- category: Faith Covenant
+- category: Faith
   type: personal
   buff:
   - attribute: Defense
-    class: Ground
+    class: Ground Troops
     condition:
     - When_Rallying
     value:
       number: 10
       unit: percentage
-- category: Honor Covenant
+- category: Honor
   type: personal
   buff:
   - attribute: Attack
-    class: Ground
+    class: Ground Troops
     condition:
     - When_Rallying
     value:
       number: 15
       unit: percentage
-- category: Civilization Covenant
+- category: Civilization
   type: personal
   buff:
   - attribute: Attack
-    class: Ground
+    class: Ground Troops
     condition:
     - Marching
     value:

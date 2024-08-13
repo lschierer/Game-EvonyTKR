@@ -3,8 +3,8 @@ generals:
   - Caesar
   - Gaius Octavius
   - Mark Antony
-attributes:
-- category: War Covenant
+levels:
+- category: War
   type: personal
   buff:
   - attribute: Resources Production
@@ -12,33 +12,33 @@ attributes:
       number: 5
       unit: percentage
   - attribute: HP
-    class: Archers
+    class: Ranged Troops
     value:
       number: 5
       unit: percentage
   - attribute: HP
-    class: Siege
+    class: Siege Machines
     value:
       number: 5
       unit: percentage
-- category: Peace Covenant
+- category: Peace
   type: passive
   buff:
   - attribute: Training Capacity
-    class: Archers
+    class: Ranged Troops
     value:
       number: 10
       unit: percentage
-- category: Faith Covenant
+- category: Faith
   type: personal
   buff:
   - attribute: Defense
-    class: Archers
+    class: Ranged Troops
     value:
       number: 5
       unit: percentage
   - attribute: Defense
-    class: Siege
+    class: Siege Machines
     value:
       number: 5
       unit: percentage
@@ -46,35 +46,35 @@ attributes:
     value:
       number: 15
       unit: percentage
-- category: Honor Covenant
+- category: Honor
   type: personal
   buff:
   - attribute: Attack
-    class: Archers
+    class: Ranged Troops
     condition:
     - When_Rallying
     value:
       number: 5
       unit: percentage
   - attribute: Attack
-    class: Siege
+    class: Siege Machines
     condition:
     - When_Rallying
     value:
       number: 5
       unit: percentage
   - attribute: Attack
-    class: Siege
+    class: Siege Machines
     condition:
     - When_Rallying
     value:
       number: 10
       unit: percentage
-- category: Civilization Covenant
+- category: Civilization
   type: personal
   buff:
   - attribute: Attack
-    class: Archers
+    class: Ranged Troops
     condition:
     - Marching
     value:

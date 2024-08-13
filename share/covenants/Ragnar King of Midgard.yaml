@@ -3,8 +3,8 @@ generals:
   - Sigurd
   - Cnut the Great
   - Harald
-attributes:
-  - category: War Covenant
+levels:
+  - category: War
     type: personal
     buff:
       - attribute: Attack
@@ -14,14 +14,14 @@ attributes:
         value:
           number: 5
           unit: percentage
-  - category: Cooperation Covenant
+  - category: Cooperation
     type: personal
     buff:
       - attribute: Marching_Speed
         value:
           number: 10
           unit: percentage
-  - category: Peace Covenant
+  - category: Peace
     type: passive
     buff:
       - attribute: Training Capacity
@@ -29,7 +29,7 @@ attributes:
         value:
           number: 10
           unit: percentage
-  - category: Faith Covenant
+  - category: Faith
     type: personal
     buff:
       - attribute: Defense
@@ -39,7 +39,7 @@ attributes:
         value:
           number: 5
           unit: percentage
-  - category: Faith Covenant
+  - category: Faith
     type: passive
     buff:
       - attribute: Attack
@@ -49,7 +49,7 @@ attributes:
         value:
           number: 10
           unit: percentage
-  - category: Honor Covenant
+  - category: Honor
     type: personal
     buff:
       - attribute: HP
@@ -59,7 +59,7 @@ attributes:
         value:
           number: 10
           unit: percentage
-  - category: Civilization Covenant
+  - category: Civilization
     type: personal
     buff:
       - attribute: Attack

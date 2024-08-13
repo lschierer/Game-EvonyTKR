@@ -3,8 +3,8 @@ generals:
 - Edward the Black Prince
 - William Marshal
 - John Churchill
-attributes:
-- category: War Covenant
+levels:
+- category: War
   type: personal
   buff:
   - attribute: Attack
@@ -13,7 +13,7 @@ attributes:
     value:
       number: 5
       unit: percentage
-- category: Cooperation Covenant
+- category: Cooperation
   type: passive
   buff:
   - attribute: Death_to_Soul
@@ -22,7 +22,7 @@ attributes:
     value:
       number: 10
       unit: percentage
-- category: Peace Covenant
+- category: Peace
   type: personal
   buff:
   - attribute: HP
@@ -31,7 +31,7 @@ attributes:
     value:
       number: 5
       unit: percentage
-- category: Peace Covenant
+- category: Peace
   type: passive
   buff:
   - attribute: Defense
@@ -40,59 +40,59 @@ attributes:
     value:
       number: 5
       unit: percentage
-- category: Faith Covenant
+- category: Faith
   type: personal
   buff:
   - attribute: HP
-    class: Ground
+    class: Ground Troops
     condition:
     - In_City
     value:
       number: 10
       unit: percentage
   - attribute: Defense
-    class: Ground
+    class: Ground Troops
     condition:
     - In_City
     value:
       number: 10
       unit: percentage
-- category: Honor Covenant
+- category: Honor
   type: personal
   buff:
   - attribute: Defense
-    class: Ground
+    class: Ground Troops
     condition:
     - In_City
     value:
       number: 5
       unit: percentage
   - attribute: Defense
-    class: Mounted
+    class: Mounted Troops
     condition:
     - In_City
     value:
       number: 5
       unit: percentage
   - attribute: HP
-    class: Ground
+    class: Ground Troops
     condition:
     - In_City
     value:
       number: 5
       unit: percentage
   - attribute: HP
-    class: Mounted
+    class: Mounted Troops
     condition:
     - In_City
     value:
       number: 5
       unit: percentage
-- category: Civilization Covenant
+- category: Civilization
   type: personal
   buff:
   - attribute: Attack
-    class: Ground
+    class: Ground Troops
     condition:
     - In_City
     value:

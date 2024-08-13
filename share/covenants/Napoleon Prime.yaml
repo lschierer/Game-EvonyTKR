@@ -3,76 +3,76 @@ generals:
   - Napoleon
   - André Masséna
   - Soult
-attributes:
-- category: War Covenant
+levels:
+- category: War
   type: personal
   buff:
   - attribute: Attack
-    class: Mounted
+    class: Mounted Troops
     condition:
     - Against Monsters
     value:
       number: 12
       unit: percentage
-- category: Cooperation Covenant
+- category: Cooperation
   type: personal
   buff:
   - attribute: March_Size_Capacity
     value:
       number: 5
       unit: percentage
-- category: Peace Covenant
+- category: Peace
   type: personal
   buff:
   - attribute: HP
-    class: Mounted
+    class: Mounted Troops
     condition:
     - When_Rallying
     value:
       number: 8
       unit: percentage
-- category: Faith Covenant
+- category: Faith
   type: passive
   buff:
   - attribute: Training_Speed
-    class: Mounted
+    class: Mounted Troops
     value:
       number: 10
       unit: percentage
   - attribute: Training Capacity
-    class: Mounted
+    class: Mounted Troops
     value:
       number: 15
       unit: percentage
-- category: Honor Covenant
+- category: Honor
   type: personal
   buff:
   - attribute: Attack
-    class: Mounted
+    class: Mounted Troops
     condition:
     - Attacking
     value:
       number: 8
       unit: percentage
   - attribute: Attack
-    class: Ground
+    class: Ground Troops
     condition:
     - Attacking
     value:
       number: 8
       unit: percentage
-- category: Civilization Covenant
+- category: Civilization
   type: personal
   buff:
   - attribute: Attack
-    class: Mounted
+    class: Mounted Troops
     condition:
     - Marching
     value:
       number: 12
       unit: percentage
   - attribute: Attack
-    class: Mounted
+    class: Mounted Troops
     condition:
     - When_Rallying
     value:

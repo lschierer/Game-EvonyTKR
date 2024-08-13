@@ -3,78 +3,78 @@ generals:
   - Elektra
   - Yue Fei
   - Guan Yu
-attributes:
-- category: War Covenant
+levels:
+- category: War
   type: personal
   buff:
   - attribute: Attack
-    class: Siege
+    class: Siege Machines
     value:
       number: 5
       unit: percentage
-- category: Cooperation Covenant
+- category: Cooperation
   type: personal
   buff:
   - attribute: Defense
-    class: Siege
+    class: Siege Machines
     value:
       number: 5
       unit: percentage
-- category: Cooperation Covenant
+- category: Cooperation
   type: passive
   buff:
   - attribute: Hospital Capacity
     value:
       number: 5
       unit: percentage
-- category: Peace Covenant
+- category: Peace
   type: personal
   buff:
   - attribute: Defense
-    class: Siege
+    class: Siege Machines
     condition:
     - When_Rallying
     value:
       number: 10
       unit: percentage
-- category: Peace Covenant
+- category: Peace
   type: passive
   buff:
   - attribute: Training Capacity
-    class: Siege
+    class: Siege Machines
     value:
       number: 10
       unit: percentage
-- category: Faith Covenant
+- category: Faith
   type: personal
   buff:
   - attribute: HP
-    class: Siege
+    class: Siege Machines
     condition:
     - When_Rallying
     value:
       number: 10
       unit: percentage
   - attribute: HP
-    class: Siege
+    class: Siege Machines
     value:
       number: 5
       unit: percentage
-- category: Honor Covenant
+- category: Honor
   type: personal
   buff:
   - attribute: Attack
-    class: Siege
+    class: Siege Machines
     condition:
     - When_Rallying
     value:
       number: 15
       unit: percentage
-- category: Civilization Covenant
+- category: Civilization
   type: personal
   buff:
   - attribute: Attack
-    class: Siege
+    class: Siege Machines
     condition:
     - Marching
     value:

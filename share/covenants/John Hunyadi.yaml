@@ -3,81 +3,81 @@ generals:
   - Matthias I
   - Jadwiga
   - Suleiman the Magnificent
-attributes:
-- category: War Covenant
+levels:
+- category: War
   type: personal
   buff:
   - attribute: HP
-    class: Archers
+    class: Ranged Troops
     value:
       number: 5
       unit: percentage
   - attribute: HP
-    class: Siege
+    class: Siege Machines
     value:
       number: 5
       unit: percentage
-- category: Cooperation Covenant
+- category: Cooperation
   type: passive
   buff:
   - attribute: Deserter Capacity
     value:
       number: 10
       unit: percentage
-- category: Peace Covenant
+- category: Peace
   type: personal
   buff:
   - attribute: Attack
-    class: Siege
+    class: Siege Machines
     value:
       number: 5
       unit: percentage
-- category: Faith Covenant
+- category: Faith
   type: passive
   buff:
   - attribute: HP
-    class: Archers
+    class: Ranged Troops
     condition:
     - Enemy
     value:
       number: 8
       unit: percentage
   - attribute: HP
-    class: Siege
+    class: Siege Machines
     condition:
     - Enemy
     value:
       number: 8
       unit: percentage
-- category: Honor Covenant
+- category: Honor
   type: personal
   buff:
   - attribute: Attack
-    class: Archers
+    class: Ranged Troops
     condition:
     - When_Rallying
     value:
       number: 5
       unit: percentage
   - attribute: Attack
-    class: Siege
+    class: Siege Machines
     condition:
     - When_Rallying
     value:
       number: 5
       unit: percentage
   - attribute: Attack
-    class: Siege
+    class: Siege Machines
     condition:
     - When_Rallying
     value:
       number: 10
       unit: percentage
-- category: Civilization Covenant
+- category: Civilization
   type: personal
   buff:
   - attribute: Attack
-    class: Siege
+    class: Siege Machines
     condition:
     - Marching
     value:
