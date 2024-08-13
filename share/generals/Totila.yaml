@@ -14,8 +14,7 @@ general:
   level: '45'
   score_as:
    - Ground
-  books:
-    - Gothic Sword
+  book: Gothic Sword
   specialities:
     - Ground Troop Defense
     - Annihilation

@@ -15,8 +15,7 @@ general:
   score_as:
     - Archers
     - Siege
-  books:
-    - Golden Apple
+  book: Golden Apple
   specialities:
     - Ranged Troop Defense
     - Siege

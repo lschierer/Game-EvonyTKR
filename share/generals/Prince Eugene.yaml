@@ -14,8 +14,7 @@ general:
   level: '1'
   score_as:
    - Mounted
-  books:
-    - Battle of Zenta
+  book: Battle of Zenta
   specialities:
     - Mounted Troop Formation
     - Annihilation

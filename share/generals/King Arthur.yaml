@@ -14,8 +14,7 @@ general:
   attack_increment: 8.14
   defense_increment: 8.25
   politics_increment: 7.33
-  books:
-    - Caliburn
+  book: Caliburn
   specialities:
     - Mounted Troop Formation
     - Bash

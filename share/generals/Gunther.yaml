@@ -16,8 +16,7 @@ general:
    - Siege
   extra:
     - King of Rhine
-  books:
-    - The King of Atlis
+  book: The King of Atlis
   specialities:
     - Siege Machine Formation
     - Bash

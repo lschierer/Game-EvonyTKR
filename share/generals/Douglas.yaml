@@ -15,8 +15,7 @@ general:
    - Archers
   extra:
     - Odyssey - Douglas
-  books:
-    - Blessing of Siren
+  book: Blessing of Siren
   specialities:
     - Ranged Troop Assault
     - Siege

@@ -14,8 +14,7 @@ general:
   politics: 95
   politics_increment: 8.29
   level: '1'
-  books:
-    - Master of Strategy
+  book: Master of Strategy
   ascending: true
   specialities:
     - Mounted Troop Assault

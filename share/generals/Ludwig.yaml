@@ -14,8 +14,7 @@ general:
   level: '1'
   score_as:
    - Ground
-  books:
-    - North Frostwolf
+  book: North Frostwolf
   specialities:
     - Ground Troop Formation
     - Annihilation

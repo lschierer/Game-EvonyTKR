@@ -19,6 +19,5 @@ general:
     - Sabotage
     - Siege Machine Ares
     - Battle of Rhode Island
-  books:
-    - Indefectible Emperor
+  book: Indefectible Emperor
   ascending: true

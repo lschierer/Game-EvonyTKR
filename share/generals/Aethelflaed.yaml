@@ -18,8 +18,7 @@ general:
   defense_increment: 9.12
   politics: 113
   politics_increment: 8.44
-  books:
-    - Lady of the Mercians
+  book: Lady of the Mercians
   ascending: true
   specialities:
     - Hunter

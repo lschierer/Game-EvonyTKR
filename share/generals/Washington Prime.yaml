@@ -14,8 +14,7 @@ general:
   politics_increment: 8.22
   level: '45'
   stars: '5Red'
-  books:
-    - General of the Armies
+  book: General of the Armies
   specialities:
     - Mounted Troop Formation
     - Annihilation

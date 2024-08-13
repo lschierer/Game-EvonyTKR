@@ -14,8 +14,7 @@ general:
   level: '1'
   score_as:
    - Ground
-  books:
-    - Saint of War
+  book: Saint of War
   specialities:
     - Ground Troop Assault
     - Annihilation

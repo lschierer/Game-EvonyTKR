@@ -14,8 +14,7 @@ general:
   politics_increment: 8.57
   level: '1'
   stars: '5Red'
-  books:
-    - Restorer of the World
+  book: Restorer of the World
   specialities:
     - Ground Troop Formation
     - Sabotage

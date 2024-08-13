@@ -16,8 +16,7 @@ general:
   level: '1'
   extra:
     - Dragon God - Martinus
-  books:
-    - The Dragon Wakes
+  book: The Dragon Wakes
   ascending: true
   specialities:
     - Mounted Troop Assault

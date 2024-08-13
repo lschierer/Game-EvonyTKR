@@ -14,8 +14,7 @@ general:
   politics_increment: 8.35
   stars: '5Red'
   level: '1'
-  books:
-    - Undefeatable General
+  book: Undefeatable General
   ascending: true
   specialities:
     - Mounted Troop Formation

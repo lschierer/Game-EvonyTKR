@@ -14,8 +14,7 @@ general:
   level: '1'
   score_as:
    - Ground
-  books:
-    - Military Legend
+  book: Military Legend
   specialities:
     - Ground Troop Assault
     - Formation

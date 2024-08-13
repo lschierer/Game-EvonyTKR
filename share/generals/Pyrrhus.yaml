@@ -20,5 +20,4 @@ general:
     - Ground Troop Ares
     - Pyrrhic Victory
   ascending: true
-  books:
-    - Pyrrhic War
+  book: Pyrrhic War

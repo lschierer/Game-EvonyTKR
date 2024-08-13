@@ -14,8 +14,7 @@ general:
   level: '1'
   score_as:
    - Mayor
-  books:
-    - King of the Vikings
+  book: King of the Vikings
   specialities:
     - Siege Machine Assault
     - Sabotage

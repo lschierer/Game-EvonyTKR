@@ -14,8 +14,7 @@ general:
   politics: 108
   politics_increment: 8.53
   level: '1'
-  books:
-    - Knight of Treachery
+  book: Knight of Treachery
   ascending: true
   specialities:
     - Mounted Troop Formation

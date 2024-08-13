@@ -14,8 +14,7 @@ general:
   level: '45'
   score_as:
    - Archers
-  books:
-    - Dignity of Grand Prince
+  book: Dignity of Grand Prince
   specialities:
     - Ranged Troop Assault
     - Siege

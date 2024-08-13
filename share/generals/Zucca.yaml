@@ -19,6 +19,5 @@ general:
     - Siege
     - Siege Machine Ares
     - Golden Throne
-  books:
-    - Supreme Power
+  book: Supreme Power
   ascending: true

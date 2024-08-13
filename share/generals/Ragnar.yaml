@@ -16,8 +16,7 @@ general:
   politics_increment: 7.96
   extra:
     - King of Midgard
-  books:
-    - Unstoppable Force
+  book: Unstoppable Force
   specialities:
     - Ranged Troop Formation
     - Siege

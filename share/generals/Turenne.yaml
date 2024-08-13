@@ -14,8 +14,7 @@ general:
   defense_increment: 8.76
   politics: 107
   politics_increment: 8.64
-  books:
-    - Crossing the River Rhine
+  book: Crossing the River Rhine
   ascending: true
   specialities:
     - Ground Troop Assault

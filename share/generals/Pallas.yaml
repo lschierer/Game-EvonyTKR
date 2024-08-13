@@ -16,8 +16,7 @@ general:
    - Siege
   extra:
     - Legend of Sanctuary
-  books:
-    - Guard of Owl and Serpent
+  book: Guard of Owl and Serpent
   specialities:
     - Siege Machine Formation
     - Siege

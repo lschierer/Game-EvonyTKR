@@ -14,8 +14,7 @@ general:
   defense_increment: 8.74
   politics: 107
   politics_increment: 8.58
-  books:
-    - Son of the Morning Star
+  book: Son of the Morning Star
   ascending: true
   specialities:
     - Mounted Troop Defense

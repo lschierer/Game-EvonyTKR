@@ -14,8 +14,7 @@ general:
   politics: 115
   politics_increment: 8.45
   level: '1'
-  books:
-    - Augustus
+  book: Augustus
   ascending: true
   specialities:
     - Mounted Troop Assault

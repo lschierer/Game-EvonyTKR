@@ -20,5 +20,4 @@ general:
     - Siege Machine Ares
     - Battle of Lugdunum
   ascending: true
-  books:
-    - Severan Dynasty
+  book: Severan Dynasty

@@ -13,8 +13,7 @@ general:
   stars: '5Red'
   score_as:
    - Siege
-  books:
-    - Theodosius the Great
+  book: Theodosius the Great
   specialities:
     - Siege Machine Formation
     - Bash

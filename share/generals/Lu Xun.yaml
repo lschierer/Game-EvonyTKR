@@ -14,8 +14,7 @@ general:
   defense_increment: 8.79
   politics: 107
   politics_increment: 8.62
-  books:
-    - Battle of Xiaoting
+  book: Battle of Xiaoting
   specialities:
     - Ground Troop Defense
     - Formation

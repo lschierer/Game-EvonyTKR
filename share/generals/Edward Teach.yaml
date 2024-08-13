@@ -14,8 +14,7 @@ general:
   defense_increment: 9.00
   politics: 108
   politics_increment: 8.65
-  books:
-    - Queen Annes Revenge
+  book: Queen Annes Revenge
   specialities:
     - Siege Machine Formation
     - Bash

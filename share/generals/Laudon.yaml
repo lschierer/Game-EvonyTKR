@@ -16,8 +16,7 @@ general:
    - Mounted
   warnings:
     - Laudon is incompatible with the Mounted Troop Attack Level 4 Skillbook
-  books:
-    - Silesian Wars
+  book: Silesian Wars
   ascending: true
   specialities:
     - Mounted Troop Defense

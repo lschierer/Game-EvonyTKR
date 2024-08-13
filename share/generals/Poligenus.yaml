@@ -14,8 +14,7 @@ general:
   politics_increment: 8.66
   level: '1'
   stars: '5Red'
-  books:
-    - Foresight
+  book: Foresight
   specialities:
     - Mounted Troop Assault
     - Strike

@@ -14,8 +14,7 @@ general:
   level: '45'
   score_as:
    - Archers
-  books:
-    - Hammer of the Gauls - Elizabeth I
+  book: Hammer of the Gauls - Elizabeth I
   specialities:
     - Ranged Troop Formation
     - Annihilation

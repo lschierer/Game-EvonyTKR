@@ -14,8 +14,7 @@ general:
   politics: 100
   politics_increment: 8.35
   level: '1'
-  books:
-    - Glory Knight
+  book: Glory Knight
   ascending: true
   specialities:
     - Mounted Troop Formation

@@ -16,8 +16,7 @@ general:
    - Archers
   extra:
     - Dragon God - Elektra
-  books:
-    - Blood Restrain
+  book: Blood Restrain
   ascending: true
   specialities:
     - Ranged Troop Assault

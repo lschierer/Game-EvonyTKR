@@ -14,8 +14,7 @@ general:
   level: '1'
   score_as:
    - Archers
-  books:
-    - Heroism
+  book: Heroism
   specialities:
     - Ranged Troop Defense
     - Bash

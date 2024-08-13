@@ -14,8 +14,7 @@ general:
   politics_increment: 8.52
   score_as:
    - Mounted
-  books:
-    - Red Demon
+  book: Red Demon
   ascending: true
   specialities:
     - Mounted Troop Defense

@@ -14,8 +14,7 @@ general:
   politics_increment: 8.26
   stars: '5Red'
   level: '1'
-  books:
-    - Dragon's Song
+  book: Dragon's Song
   extra:
     - Odyssey - Elise
   ascending: true

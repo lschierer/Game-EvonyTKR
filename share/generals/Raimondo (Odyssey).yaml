@@ -16,8 +16,7 @@ general:
    - Siege
   extra:
     - Odyssey - Raimondo
-  books:
-    - The Military Art
+  book: The Military Art
   ascending: true
   specialities:
     - Siege Machine Formation
