@@ -111,23 +111,7 @@ package Game::EvonyTKR::Web::General {
       my $data = LoadFile($tg);
       my $name = $data->{'general'}->{'name'};
       $logger->info($name);
-      my @bookNames       = @{ $data->{'general'}->{'books'} };
-      my @SpecialityNames = @{ $data->{'general'}->{'specialities'} };
-
-      if (exists $data->{'general'}->{'extra'}) {
-        push @bookNames, @{ $data->{'general'}->{'extra'} };
-      }
-
-      my $bookName = $bookNames[0];
-      $logger->trace("primary skill book for $name is $bookName");
-      my $sb = Game::EvonyTKR::SkillBook::Special->new(name => $bookName);
-      $sb->readFromFile();
-
-      my $ascendingToggle;
-      $logger->trace(
-        "ascending for $name is " . $data->{'general'}->{'ascending'});
-      $ascendingToggle = $data->{'general'}->{'ascending'};
-
+      
       my %generalClass = (
         'Ground'  => 'Game::EvonyTKR::General::Ground',
         'Mounted' => 'Game::EvonyTKR::General::Mounted',
@@ -161,37 +145,11 @@ package Game::EvonyTKR::Web::General {
       for (@generalClassKey) {
         $generals{$name} = $generalClass{$_}->new(
           name                 => $data->{'general'}->{'name'},
-          leadership           => $data->{'general'}->{'leadership'},
-          leadership_increment => $data->{'general'}->{'leadership_increment'},
-          attack               => $data->{'general'}->{'attack'},
-          attack_increment     => $data->{'general'}->{'attack_increment'},
-          defense              => $data->{'general'}->{'defense'},
-          defense_increment    => $data->{'general'}->{'defense_increment'},
-          politics             => $data->{'general'}->{'politics'},
-          politics_increment   => $data->{'general'}->{'politics_increment'},
-          builtInBook          => $sb,
-          ascending            => $ascendingToggle,
         );
+        
+        $logger->debug("created " . $generals{$name});
 
-        for (@bookNames) {
-          my $tbName = $_;
-          if ($tbName eq /$bookName/) {
-            next;
-          }
-          my $tb = Game::EvonyTKR::SkillBook::Special->new(name => $tbName);
-          $tb->readFromFile();
-          $generals{$name}->addAnotherBook($tb);
-        }
-
-        for (@SpecialityNames) {
-          my $sn  = $_;
-          my $tsi = Game::EvonyTKR::Speciality->new(name => $sn,);
-          $tsi->readFromFile();
-        }
-
-        if ($ascendingToggle) {
-          $generals{$name}->ascendingAttributes()->readFromFile($name);
-        }
+        $generals{$name}->readFromFile();
 
         $logger->debug("added " . Data::Printer::np $generals{$name});
       }

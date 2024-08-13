@@ -1,19 +1,22 @@
 use v5.40.0;
 use experimental qw(class);
 
-class Game::EvonyTKR::General :isa(Game::EvonyTKR::Logger){
+class Game::EvonyTKR::General : isa(Game::EvonyTKR::Logger) {
   use Carp;
   use Types::Common qw( t is_Num is_Str is_Int);
-  use Type::Utils qw(is enum);
+  use Type::Utils   qw(is enum);
   use Util::Any -all;
   use Data::Printer;
+  use File::ShareDir ':ALL';
+  use File::Spec;
   use Game::EvonyTKR::SkillBook::Special;
   use Game::EvonyTKR::Buff::EvaluationMultipliers;
   use Game::EvonyTKR::Ascending;
   use JSON::MaybeXS;
+  use YAML::XS qw{LoadFile Load};
   use namespace::autoclean;
 # PODNAME: Game::EvonyTKR::General
-use overload
+  use overload
     '<=>' => \&_comparison,
     'cmp' => \&_comparison,
     'eq'  => \&_equality,
@@ -24,16 +27,14 @@ use overload
 
 # ABSTRACT: Module for processing information about Evony TKR Generals.
 
-  # from Type::Registry, this will save me from some of the struggles I have had with some types having blessed references and others not.
+# from Type::Registry, this will save me from some of the struggles I have had with some types having blessed references and others not.
   ADJUST {
-    if(!(t->simple_lookup("Num"))) {
-      t->add_types(
-      -Common
-      );
+    if (!(t->simple_lookup("Num"))) {
+      t->add_types(-Common);
     }
   }
 
-  field $name :reader :param;
+  field $name : reader : param;
 
   ADJUST {
     my @errors;
@@ -43,48 +44,34 @@ use overload
     }
   }
 
-  field $leadership :reader :param;
+  field $leadership : reader = 0;
 
-  field $leadership_increment :reader :param;
+  field $leadership_increment : reader;
 
-  field $attack :reader :param;
+  field $attack : reader = 0;
 
-  field $attack_increment :reader :param;
+  field $attack_increment : reader;
 
-  field $defense :reader :param;
+  field $defense : reader = 0;
 
-  field $defense_increment :reader :param;
+  field $defense_increment : reader;
 
-  field $politics :reader :param;
+  field $politics : reader = 0;
 
-  field $politics_increment :reader :param;
+  field $politics_increment : reader =0;
 
-  field $level :reader :param //= 45;
+  field $level : reader : param //= 45;
 
-  field @specialities :reader;
+  field @specialities : reader =0;
 
-  field $ascending :reader :param //= true;
+  field $ascending : reader : param //= true;
 
-  field $ascendingAttributes :reader :param //= Game::EvonyTKR::Ascending->new();
+  field $ascendingAttributes : reader : param //=
+    Game::EvonyTKR::Ascending->new();
 
-  use constant DEFAULT_BUFF_MULTIPLIERS => Game::EvonyTKR::Buff::EvaluationMultipliers->new();
+  field $builtInBook : reader;
 
-  field $BuffMultipliers :reader :param //= __CLASS__->DEFAULT_BUFF_MULTIPLIERS;
-
-  ADJUST {
-    my @errors;
-    my $type = blessed $BuffMultipliers;
-    if($type ne 'Game::EvonyTKR::Buff::EvaluationMultipliers'){
-      push @errors => "BuffMultipliers must be a Game::EvonyTKR::Buff::EvaluationMultipliers, not $type";
-      if (@errors) {
-        die join ', ' => @errors;
-      }
-    }
-  }
-
-  field $builtInBook :reader :param;
-
-  field @otherBooks :reader;
+  field @otherBooks : reader;
 
   field %BasicAESAdjustment = (
     'None'    => 0,
@@ -100,52 +87,93 @@ use overload
     '5Red'    => 50,
   );
 
+  use constant DEFAULT_BUFF_MULTIPLIERS =>
+    Game::EvonyTKR::Buff::EvaluationMultipliers->new();
+
+  field $BuffMultipliers : reader : param //=
+    __CLASS__->DEFAULT_BUFF_MULTIPLIERS;
+
   ADJUST {
     my @errors;
-    my $type = blessed $builtInBook;
-    if($type ne 'Game::EvonyTKR::SkillBook::Special'){
-      push @errors => "builtInBook must be a Game::EvonyTKR::SkillBook::Special, not $type";
+    my $type = blessed $BuffMultipliers;
+    if ($type ne 'Game::EvonyTKR::Buff::EvaluationMultipliers') {
+      push @errors =>
+"BuffMultipliers must be a Game::EvonyTKR::Buff::EvaluationMultipliers, not $type";
       if (@errors) {
         die join ', ' => @errors;
       }
     }
   }
 
-  ADJUST {
+  method addBuildInBook($newBook) {
+    my $type = blessed $newBook;
+    if ($type ne 'Game::EvonyTKR::SkillBook::Special') {
+      $self->logger()->logcroak("builtInBook must be a Game::EvonyTKR::SkillBook::Special, not $type");
+    }
+    $self->logger()->trace("adding builtInBook with type $type and name " . $newBook->name());
+    $builtInBook = $newBook;
+  }
+
+  method _validation {
     my @errors;
-    
+
     my $type = t('Bool');
-    $type->check($ascending) or push @errors => "ascending must be a bool, not $ascending";
+    $type->check($ascending)
+      or push @errors => "ascending must be a bool, not $ascending";
 
     $type = t('PositiveOrZeroNum');
-    is_Num($leadership) or push @errors => "leadership must be a number, not $leadership";
-    $type->check($leadership) or push @errors => "leadership must be positive, not $leadership";
+    is_Num($leadership)
+      or push @errors => "leadership must be a number, not $leadership";
+    $type->check($leadership)
+      or push @errors => "leadership must be positive, not $leadership";
 
-    is_Num($leadership_increment) or push @errors => "leadership_increment must be a number, not $leadership_increment";
-    $type->check($leadership_increment) or push @errors => "leadership_increment must be positive, not $leadership_increment";
-    
+    is_Num($leadership_increment)
+      or push @errors =>
+      "leadership_increment must be a number, not $leadership_increment";
+    $type->check($leadership_increment)
+      or push @errors =>
+      "leadership_increment must be positive, not $leadership_increment";
+
     is_Num($attack) or push @errors => "attack must be a number, not $attack";
-    $type->check($attack) or push @errors => "attack must be positive, not $attack";
-    
-    is_Num($attack_increment) or push @errors => "attack_increment must be a number, not $attack_increment";
-    $type->check($attack_increment) or push @errors => "attack_increment must be positive, not $attack_increment";
-    
-    is_Num($defense) or push @errors => "defense must be a number, not $defense";
-    $type->check($defense) or push @errors => "defense must be positive, not $defense";
-    
-    is_Num($defense_increment) or push @errors => "defense_increment must be a number, not $defense_increment";
-    $type->check($defense_increment) or push @errors => "defense_increment must be positive, not $defense_increment";
-    
-    is_Num($politics) or push @errors => "politics must be a number, not $politics";
-    
-    is_Num($politics_increment) or push @errors => "politics_increment must be a number, not $politics_increment";
-    $type->check($politics_increment) or push @errors => "politics_increment must be positive, not $politics_increment";
-    
+    $type->check($attack)
+      or push @errors => "attack must be positive, not $attack";
+
+    is_Num($attack_increment)
+      or push @errors =>
+      "attack_increment must be a number, not $attack_increment";
+    $type->check($attack_increment)
+      or push @errors =>
+      "attack_increment must be positive, not $attack_increment";
+
+    is_Num($defense)
+      or push @errors => "defense must be a number, not $defense";
+    $type->check($defense)
+      or push @errors => "defense must be positive, not $defense";
+
+    is_Num($defense_increment)
+      or push @errors =>
+      "defense_increment must be a number, not $defense_increment";
+    $type->check($defense_increment)
+      or push @errors =>
+      "defense_increment must be positive, not $defense_increment";
+
+    is_Num($politics)
+      or push @errors => "politics must be a number, not $politics";
+
+    is_Num($politics_increment)
+      or push @errors =>
+      "politics_increment must be a number, not $politics_increment";
+    $type->check($politics_increment)
+      or push @errors =>
+      "politics_increment must be positive, not $politics_increment";
+
     my $pInt = t('PositiveOrZeroInt');
     is_Int($level) or push @errors => "level must be an integer, not $level";
-    $pInt->check($level) or push @errors => "level must be positive, not $level";
+    $pInt->check($level)
+      or push @errors => "level must be positive, not $level";
     $type = t('IntRange[1, 45]');
-    $type->check($level) or push @errors => "level must be between 1 and 45 inclusive";
+    $type->check($level)
+      or push @errors => "level must be between 1 and 45 inclusive";
 
     if (@errors) {
       die join ', ' => @errors;
@@ -155,24 +183,32 @@ use overload
   method _adjustBasicAttribute($attribute, $attribute_increment) {
     my $AES_adjustment = 0;
 
-    if($ascending){
+    if ($ascending) {
       $self->logger()->trace($self->name() . " is ascended");
       my $stars = $ascendingAttributes->activeLevel();
-      if(not $stars =~ /None/i) {
-        $AES_adjustment =$BasicAESAdjustment{$stars};
-        if($AES_adjustment == 0) {
-          $self->logger()->trace($self->name() . " did not match any value for stars $stars in BasicAESAdjustment: " . np %BasicAESAdjustment );
+      if (not $stars =~ /None/i) {
+        $AES_adjustment = $BasicAESAdjustment{$stars};
+        if ($AES_adjustment == 0) {
+          $self->logger()
+            ->trace($self->name()
+              . " did not match any value for stars $stars in BasicAESAdjustment: "
+              . np %BasicAESAdjustment);
         }
       }
     }
-    $self->logger()->trace("for " . $self->name() . " level is $level, attribute_increment is $attribute_increment, attack is $attack");
+    $self->logger()
+      ->trace("for "
+        . $self->name()
+        . " level is $level, attribute_increment is $attribute_increment, attack is $attack"
+      );
     my $step = $level * $attribute_increment + $attribute;
     $self->logger()->trace("step1 for " . $self->name() . " is $step");
     $step = $step + 500;
     $self->logger()->trace("step2 for " . $self->name() . " is $step");
     $step = $step + $AES_adjustment;
     $self->logger()->trace("step3 for " . $self->name() . " is $step");
-    if($step < 900) {
+
+    if ($step < 900) {
       $step = $step * 0.1;
     } else {
       $step = 90 + ($step - 900) * 0.2;
@@ -182,23 +218,28 @@ use overload
   }
 
   method effective_leadership() {
-    $self->logger()->trace('computing effective_leadership for ' . $self->name());
-    return $self->_adjustBasicAttribute($self->leadership(), $self->leadership_increment());
+    $self->logger()
+      ->trace('computing effective_leadership for ' . $self->name());
+    return $self->_adjustBasicAttribute($self->leadership(),
+      $self->leadership_increment());
   }
 
   method effective_attack() {
     $self->logger()->trace('computing effective_attack for ' . $self->name());
-    return $self->_adjustBasicAttribute($self->attack(), $self->attack_increment());
+    return $self->_adjustBasicAttribute($self->attack(),
+      $self->attack_increment());
   }
 
   method effective_defense() {
     $self->logger()->trace('computing effective_defense for ' . $self->name());
-    return $self->_adjustBasicAttribute($self->defense(), $self->defense_increment());
+    return $self->_adjustBasicAttribute($self->defense(),
+      $self->defense_increment());
   }
 
   method effective_politics() {
     $self->logger()->trace('computing effective_politics for ' . $self->name());
-    return $self->_adjustBasicAttribute($self->politics(), $self->politics_increment());
+    return $self->_adjustBasicAttribute($self->politics(),
+      $self->politics_increment());
   }
 
   method is_ground_general() {
@@ -232,11 +273,13 @@ use overload
   method addAnotherBook($newBook) {
     my $bookClass = blessed $newBook;
     my @classList = split(/::/, $bookClass);
-    if($classList[2] ne 'SkillBook'){
-      croak "Attempt to add $bookClass which is not a 'Game::EvonyTKR::SkillBook' to $name";
+    if ($classList[2] ne 'SkillBook') {
+      croak
+"Attempt to add $bookClass which is not a 'Game::EvonyTKR::SkillBook' to $name";
     }
-    if($bookClass ne 'Game::EvonyTKR::SkillBook::Special') {
-      croak "Attempt to add $bookClass which is not a 'Game::EvonyTKR::SkillBook::Special' to $name";
+    if ($bookClass ne 'Game::EvonyTKR::SkillBook::Special') {
+      croak
+"Attempt to add $bookClass which is not a 'Game::EvonyTKR::SkillBook::Special' to $name";
     }
     push @otherBooks, $newBook;
     $self->logger()->debug("added SkillBook " . $newBook->name() . " to $name");
@@ -244,47 +287,61 @@ use overload
 
   method addSpeciality($newSpeciality) {
     my $specialityClass = blessed $newSpeciality;
-    my @classList = split(/::/, $specialityClass);
-    if($classList[2] ne 'Speciality'){
-      croak "Attemp to add $specialityClass which is not a 'Game::EvonyTKR::Speciality' to $name";
+    my @classList       = split(/::/, $specialityClass);
+    if ($classList[2] ne 'Speciality') {
+      croak
+"Attemp to add $specialityClass which is not a 'Game::EvonyTKR::Speciality' to $name";
     }
     push @specialities, $newSpeciality;
-    $self->logger()->debug("added Speciality " . $newSpeciality->name() . " to $name");
+    $self->logger()
+      ->debug("added Speciality " . $newSpeciality->name() . " to $name");
   }
 
-  method setLevel( $newLevel ) {
-    if(is_Int($newLevel) ) {
+  method setLevel($newLevel) {
+    if (is_Int($newLevel)) {
       my $type = t('IntRange[1, 45]');
-      if( $type->check($newLevel)) {
+      if ($type->check($newLevel)) {
         $level = $newLevel;
       }
     }
   }
 
-  method toHashRef( $verbose = 0) {
-    if($verbose) {
+  method toHashRef($verbose = 0) {
+    my @sbRefs;
+    for my $ob (@otherBooks) {
+      push @sbRefs, $ob->toHashRef($verbose);
+    }
+    if ($verbose) {
       return {
-        name                  => $name,
-        level                 => $level,
-        leadership            => $self->leadership(),
-        leadership_increment  => $self->leadership_increment(),
-        attack                => $self->attack(),
-        attack_increment      => $self->attack_increment(),
-        defense               => $self->defense(),
-        defense_increment     => $self->defense_increment(),
-        politics              => $self->politics(),
-        politics_increment    => $self->politics_increment(),
-        ascendingAttributes   => $self->ascendingAttributes()->toHashRef(1),
+        name                 => $name,
+        level                => $level,
+        leadership           => $self->leadership(),
+        leadership_increment => $self->leadership_increment(),
+        attack               => $self->attack(),
+        attack_increment     => $self->attack_increment(),
+        defense              => $self->defense(),
+        defense_increment    => $self->defense_increment(),
+        politics             => $self->politics(),
+        politics_increment   => $self->politics_increment(),
+        ascendingAttributes  => $self->ascendingAttributes()->toHashRef(1),
+        builtInBook          => defined $self->builtInBook ? 
+          $self->builtInBook->toHashRef(1) :
+          {},
+        otherBooks           => \@sbRefs,
       };
     } else {
       return {
-        name                  => $name,
-        level                 => $level,
-        leadership            => $self->effective_leadership(),
-        attack                => $self->effective_attack(),
-        defense               => $self->effective_defense(),
-        politics              => $self->effective_politics(),
-        ascendingAttributes   => $self->ascendingAttributes()->toHashRef(),
+        name                => $name,
+        level               => $level,
+        leadership          => $self->effective_leadership(),
+        attack              => $self->effective_attack(),
+        defense             => $self->effective_defense(),
+        politics            => $self->effective_politics(),
+        ascendingAttributes => $self->ascendingAttributes()->toHashRef(),
+        builtInBook         => defined $self->builtInBook ? 
+          $self->builtInBook->toHashRef(1) :
+          {},
+        otherBooks          => \@sbRefs,
       };
     }
   }
@@ -296,8 +353,8 @@ use overload
 
   method _comparison($other, $swap = 0) {
     my $otherClass = blessed $other;
-    my @classList = split(/::/, $otherClass);
-    if($classList[2] ne 'General') {
+    my @classList  = split(/::/, $otherClass);
+    if ($classList[2] ne 'General') {
       my $od = p $other;
       croak "$od is not a Game::EvonyTKR::General";
     }
@@ -306,21 +363,90 @@ use overload
 
   method _equality ($other, $swap = 0) {
     my $otherClass = blessed $other;
-    my @classList = split(/::/, $otherClass);
-    if($classList[2] ne 'General') {
-      croak '$other is not a Game::EvonyTKR::General'
+    my @classList  = split(/::/, $otherClass);
+    if ($classList[2] ne 'General') {
+      croak '$other is not a Game::EvonyTKR::General';
     }
     return $self->name() eq $other->name();
   }
 
   method _inequality ($other, $swap = 0) {
     my $otherClass = blessed $other;
-    my @classList = split(/::/, $otherClass);
-    if($classList[2] ne 'General') {
-      croak '$other is not a Game::EvonyTKR::General'
+    my @classList  = split(/::/, $otherClass);
+    if ($classList[2] ne 'General') {
+      croak '$other is not a Game::EvonyTKR::General';
     }
     return $self->name() ne $other->name();
   }
+
+  method readFromFile() {
+    my $fileName = $name . '.yaml';
+    my $generalShare =
+      File::Spec->catfile(dist_dir('Game-EvonyTKR'), 'generals');
+    my $FileWithPath = File::Spec->catfile($generalShare, $fileName);
+    if (-T -s -r $FileWithPath) {
+      $self->logger()->debug("$fileName exists as expected");
+      my $data              = LoadFile($FileWithPath);
+      $leadership           = $data->{'general'}->{'leadership'};
+      $leadership_increment = $data->{'general'}->{'leadership_increment'};
+      $attack           = $data->{'general'}->{'attack'};
+      $attack_increment = $data->{'general'}->{'attack_increment'};
+      $defense           = $data->{'general'}->{'defense'};
+      $defense_increment = $data->{'general'}->{'defense_increment'};
+      $politics           = $data->{'general'}->{'politics'};
+      $politics_increment = $data->{'general'}->{'politics_increment'};
+
+
+      
+      my @SpecialityNames = @{ $data->{'general'}->{'specialities'} };
+      my @otherBookNames;
+      if (exists $data->{'general'}->{'extra'}) {
+        push @otherBookNames, @{ $data->{'general'}->{'extra'} };
+      }
+      
+
+      my $bookName = $data->{'general'}->{'book'};
+      if(defined $bookName) {
+        $self->logger()->trace("primary skill book for $name is $bookName");
+        my $sb = Game::EvonyTKR::SkillBook::Special->new(name => $bookName);
+        $sb->readFromFile();
+        $self->addBuildInBook($sb);
+      } else {
+        $self->logger()->logcroak("failed to find primary skill book for $name");
+      }
+      
+      $self->logger()
+        ->trace("ascending for $name is " . $data->{'general'}->{'ascending'});
+      $ascending = $data->{'general'}->{'ascending'};
+
+      for (@otherBookNames) {
+        my $tbName = $_;
+        if ($tbName =~ /$bookName/i) {
+          next;
+        }
+        my $tb = Game::EvonyTKR::SkillBook::Special->new(name => $tbName);
+        $tb->readFromFile();
+        $self->addAnotherBook($tb);
+      }
+
+      for (@SpecialityNames) {
+        my $sn  = $_;
+        my $tsi = Game::EvonyTKR::Speciality->new(name => $sn,);
+        $tsi->readFromFile();
+      }
+
+      if ($ascending) {
+        $self->ascendingAttributes()->readFromFile($name);
+      }
+
+      $self->_validation();
+      $self->logger()
+        ->debug("details populated for " . Data::Printer::np $name);
+
+    }
+
+  }
+
 }
 1;
 
