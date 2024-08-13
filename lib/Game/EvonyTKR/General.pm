@@ -46,23 +46,23 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Logger) {
 
   field $leadership : reader = 0;
 
-  field $leadership_increment : reader;
+  field $leadership_increment : reader = 0;
 
   field $attack : reader = 0;
 
-  field $attack_increment : reader;
+  field $attack_increment : reader = 0;
 
   field $defense : reader = 0;
 
-  field $defense_increment : reader;
+  field $defense_increment : reader = 0;
 
   field $politics : reader = 0;
 
-  field $politics_increment : reader =0;
+  field $politics_increment : reader = 0;
 
   field $level : reader : param //= 45;
 
-  field @specialities : reader =0;
+  field @specialities : reader;
 
   field $ascending : reader : param //= true;
 
@@ -309,7 +309,7 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Logger) {
   method toHashRef($verbose = 0) {
     my @sbRefs;
     for my $ob (@otherBooks) {
-      push @sbRefs, $ob->toHashRef($verbose);
+      push @sbRefs, $ob->toHashRef();
     }
     if ($verbose) {
       return {
@@ -325,7 +325,7 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Logger) {
         politics_increment   => $self->politics_increment(),
         ascendingAttributes  => $self->ascendingAttributes()->toHashRef(1),
         builtInBook          => defined $self->builtInBook ? 
-          $self->builtInBook->toHashRef(1) :
+          $self->builtInBook->toHashRef() :
           {},
         otherBooks           => \@sbRefs,
       };
@@ -339,7 +339,7 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Logger) {
         politics            => $self->effective_politics(),
         ascendingAttributes => $self->ascendingAttributes()->toHashRef(),
         builtInBook         => defined $self->builtInBook ? 
-          $self->builtInBook->toHashRef(1) :
+          $self->builtInBook->toHashRef() :
           {},
         otherBooks          => \@sbRefs,
       };
