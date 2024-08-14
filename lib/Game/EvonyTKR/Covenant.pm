@@ -16,7 +16,6 @@ class Game::EvonyTKR::Covenant :isa(Game::EvonyTKR::Logger) {
   use File::Spec;
   use Game::EvonyTKR::Buff;
   use Game::EvonyTKR::Buff::Value;
-  use Hash::Util;
   use List::MoreUtils;
   use Util::Any -all;
   use YAML::XS qw{LoadFile Load};

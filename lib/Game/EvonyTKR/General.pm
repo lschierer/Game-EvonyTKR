@@ -13,7 +13,7 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Logger) {
   use File::Spec;
   use Game::EvonyTKR::Covenant;
   use Game::EvonyTKR::SkillBook::Special;
-  use Game::EvonyTKR::Buff::EvaluationMultipliers;
+  use Game::EvonyTKR::Buff::EvaluationMultipliers::Attacking;
   use Game::EvonyTKR::Ascending;
   use JSON::MaybeXS;
   use YAML::XS qw{LoadFile Load};
@@ -46,6 +46,8 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Logger) {
       die join ', ' => @errors;
     }
   }
+
+  field $_generalType :reader = 'All Troops';
 
   field $leadership :reader = 0;
 
@@ -92,24 +94,87 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Logger) {
     '5Red'    => 50,
   );
 
-  use constant DEFAULT_BUFF_MULTIPLIERS =>
-    Game::EvonyTKR::Buff::EvaluationMultipliers->new();
-
-  field $BuffMultipliers :reader : param //=
-    __CLASS__->DEFAULT_BUFF_MULTIPLIERS;
-
   ADJUST {
-    my @errors;
-    my $type = blessed $BuffMultipliers;
-    if ($type ne 'Game::EvonyTKR::Buff::EvaluationMultipliers') {
-      push @errors =>
-"BuffMultipliers must be a Game::EvonyTKR::Buff::EvaluationMultipliers, not $type";
-      if (@errors) {
-        die join ', ' => @errors;
-      }
-    }
+    lock_keys(%BasicAESAdjustment);
   }
 
+  method getEvAnsScoreAsPrimary( $situation ){
+    my $BuffMultipliers;
+    my $resultRef = {
+      'BAS'           => {},
+      'BSS'           => {},
+      '4SB'           => {},
+      'CVS'           => {},
+      'SPS'           => {},
+      'AES'           => {},
+      'SKS'           => {},
+      'Attack'        => {},
+      'Toughness'     => {},
+      'Preservation'  => {},
+    };
+    if($situation =~ /Attacking/i) {
+      $BuffMultipliers = Game::EvonyTKR::Buff::EvaluationMultipliers::Attacking->new();
+    }
+    else {
+      $self->logger()->error("Unsupported situation $situation");
+      return 0;
+    }
+    
+    # Attack Buffs 
+    $resultRef->{'BAS'}->{'Attack'} = 
+      $self->effective_attack() * $BuffMultipliers->getMultiplierForBuff(
+        'Attack',
+        $self->generalType()
+      );
+    
+    $resultRef->{'BAS'}->{'Defense'} = 
+      $self->effective_attack() * $BuffMultipliers->getMultiplierForBuff(
+        'Defense',
+        $self->generalType()
+      );
+
+    $resultRef->{'BAS'}->{'Leadershp'} = 
+      $self->effective_attack() * $BuffMultipliers->getMultiplierForBuff(
+        'HP',
+        $self->generalType()
+      );
+    
+    $resultRef->{'BAS'}->{'Politics'} = 
+      $self->effective_attack() * $BuffMultipliers->getMultiplierForBuff(
+        'Death to Wounded',
+        $self->generalType()
+      );
+    
+    for my $key ( keys %{$resultRef->{'BAS'}}) {
+      $resultRef->{'BAS'}->{'Overall'} += $resultRef->{'BAS'}->{$key};
+    }
+    
+    $resultRef->{'Attack'}->{'BAS'} += $resultRef->{'BAS'}->{'Attack'};
+
+    $resultRef->{'Toughness'}->{'BAS'} += $resultRef->{'BAS'}->{'Defense'};
+
+    $resultRef->{'Toughness'}->{'BAS'} += $resultRef->{'BAS'}->{'Leadershp'};
+
+    $resultRef->{'Preservation'}->{'BAS'} += $resultRef->{'BAS'}->{'Politics'};
+
+    for my $key ( keys %{$resultRef->{'Attack'}}) {
+      $resultRef->{'Attack'}->{'Overall'} += $resultRef->{'Attack'}->{$key};
+    }
+
+    for my $key ( keys %{$resultRef->{'Toughness'}}) {
+      $resultRef->{'Toughness'}->{'Overall'} += $resultRef->{'Toughness'}->{$key};
+    }
+
+    for my $key ( keys %{$resultRef->{'Preservation'}}) {
+      $resultRef->{'Preservation'}->{'Overall'} += $resultRef->{'Preservation'}->{$key};
+    }
+    return $resultRef;
+  }
+
+  method generalType() {
+    return $self->_generalType
+  }
+  
   method addBuildInBook($newBook) {
     my $type = blessed $newBook;
     if ($type ne 'Game::EvonyTKR::SkillBook::Special') {
@@ -255,34 +320,6 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Logger) {
       $self->politics_increment());
   }
 
-  method is_ground_general() {
-    return 0;
-  }
-
-  method is_mounted_general() {
-    return 0;
-  }
-
-  method is_ranged_general() {
-    return 0;
-  }
-
-  method is_siege_general() {
-    return 0;
-  }
-
-  method is_wall_general() {
-    return 0;
-  }
-
-  method is_mayor() {
-    return 0;
-  }
-
-  method is_officer() {
-    return 0;
-  }
-
   method specialityLevels {
     my $sl = first { defined($_) } @specialities;
     return @{ $sl->levels()->values() };
@@ -335,12 +372,10 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Logger) {
     my $bookClass = blessed $newBook;
     my @classList = split(/::/, $bookClass);
     if ($classList[2] ne 'SkillBook') {
-      croak
-"Attempt to add $bookClass which is not a 'Game::EvonyTKR::SkillBook' to $name";
+      $self->logger()->logcroak("Attempt to add $bookClass which is not a 'Game::EvonyTKR::SkillBook' to $name");
     }
     if ($bookClass ne 'Game::EvonyTKR::SkillBook::Special') {
-      croak
-"Attempt to add $bookClass which is not a 'Game::EvonyTKR::SkillBook::Special' to $name";
+      $self->logger()->croak("Attempt to add $bookClass which is not a 'Game::EvonyTKR::SkillBook::Special' to $name");
     }
     push @otherBooks, $newBook;
     $self->logger()->debug("added SkillBook " . $newBook->name() . " to $name");
@@ -395,22 +430,28 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Logger) {
           {},
         otherBooks           => \@sbRefs,
         specialities         => \@specialityRefs,
+        EvAnsScores           => {
+          AttackingAsPrimary  => $self->getEvAnsScoreAsPrimary('Attacking'),
+        },
       };
     } else {
       return {
-        name                 => $name,
-        level                => $level,
-        leadership_increment => $self->effective_leadership(),
-        attack               => $self->effective_attack(),
-        defense              => $self->effective_defense(),
-        politics             => $self->effective_politics(),
-        hasCovenant          => $self->hasCovenant(),
-        ascendingAttributes  => $self->ascendingAttributes()->toHashRef(),
-        builtInBook          => defined $self->builtInBook ? 
+        name                  => $name,
+        level                 => $level,
+        leadership_increment  => $self->effective_leadership(),
+        attack                => $self->effective_attack(),
+        defense               => $self->effective_defense(),
+        politics              => $self->effective_politics(),
+        hasCovenant           => $self->hasCovenant(),
+        ascendingAttributes   => $self->ascendingAttributes()->toHashRef(),
+        builtInBook           => defined $self->builtInBook ? 
           $self->builtInBook->toHashRef() :
           {},
-        otherBooks           => \@sbRefs,
-        specialities         => \@specialityRefs,
+        otherBooks            => \@sbRefs,
+        specialities          => \@specialityRefs,
+        EvAnsScores           => {
+          AttackingAsPrimary  => $self->getEvAnsScoreAsPrimary('Attacking'),
+        },
       };
     }
   }
@@ -434,18 +475,22 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Logger) {
     my $otherClass = blessed $other;
     my @classList  = split(/::/, $otherClass);
     if ($classList[2] ne 'General') {
-      croak '$other is not a Game::EvonyTKR::General';
+      $self->logger()->error('$other is not a Game::EvonyTKR::General');
+      return 0;
     }
-    return $self->name() eq $other->name();
+    if(__CLASS__->generalType() eq $other->generalType()) {
+      return $self->name() eq $other->name();
+    }
   }
 
   method _inequality ($other, $swap = 0) {
     my $otherClass = blessed $other;
     my @classList  = split(/::/, $otherClass);
     if ($classList[2] ne 'General') {
-      croak '$other is not a Game::EvonyTKR::General';
+      $self->logger()->error('$other is not a Game::EvonyTKR::General');
+      return 0;
     }
-    return $self->name() ne $other->name();
+    return not $self eq $other;
   }
 
   method readFromFile() {
@@ -662,12 +707,6 @@ This allows you to populate the otherBooks field with the buffs provided by the 
 =cut
 
 =method 
-
-=method BuffMultipliers
-
-when evaluating generals, not all buffs are equally important.  Nor are these scaling factors constant across the game, but rather differ both by type of general and by situation.  
-This returns the scaling factors for this general.
-=cut
 
 =method setCovenant($ce) 
 
