@@ -172,8 +172,7 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Logger) {
     my $BuffMultipliers;
     my $resultRef = {
       'BAS'           => {},
-      'BSS'           => {},
-      'SBS'      => {},
+      'SBS'           => {},
       'CVS'           => {},
       'SPS'           => {},
       'AES'           => {},
@@ -214,6 +213,20 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Logger) {
     for my $key (keys %{$resultRef->{'SBS'}}) {
       if( $key ne 'Overall') {
         $resultRef->{'SBS'}->{'Overall'} += $resultRef->{'SBS'}->{$key};
+      }
+    }
+
+    for my $sp (@specialities) {
+      $sp->getEvAnsScore(
+        $self->name(),
+        $resultRef,
+        $BuffMultipliers,
+        $self->generalType(),
+      );
+    }
+    for my $key (keys %{$resultRef->{'SPS'}}) {
+      if( $key ne 'Overall') {
+        $resultRef->{'SPS'}->{'Overall'} += $resultRef->{'SPS'}->{$key};
       }
     }
 

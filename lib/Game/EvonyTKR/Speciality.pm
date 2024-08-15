@@ -5,7 +5,7 @@ use lib "$FindBin::Bin/../../../lib";
 
 class Game::EvonyTKR::Speciality :isa(Game::EvonyTKR::Logger) {
 # PODNAME: Game::EvonyTKR::Speciality
-
+  use builtin  qw(indexed);
   use Types::Standard qw(is_Int Int Num is_Num Str is_Str);
   use Types::Common qw( t);
   use Type::Utils qw(is enum);
@@ -133,6 +133,34 @@ class Game::EvonyTKR::Speciality :isa(Game::EvonyTKR::Logger) {
       }
     }
     return 1;
+  }
+
+  method getEvAnsScore($name, $resultRef, $BuffMultipliers, $GeneralBias) {
+    my @ab = @{$Buffs{$activeLevel}};
+    my $bc = scalar @ab;
+    $self->logger()->debug("getEvAnsScore for $name found $bc buffs at $activeLevel");
+    if($bc > 0) {
+      for my ($i, $thisBuff) ( indexed(@ab) ) { 
+        my $result = $thisBuff->getEvAnsScore(
+          $name,
+          $BuffMultipliers,
+          $GeneralBias,
+          );
+        $self->logger()->debug("getEvAnsScore for $name recieved $result from getEvAnsScore for buff $i");
+        my $category = $BuffMultipliers->EvAnsCategory($thisBuff);
+        if(not defined $category) {
+          $self->logger()->warn("getEvAnsScore for $name found no category returned for " . np $thisBuff);
+          $category = 'Unused';
+        }else {
+          $self->logger()->debug("getEvAnsScore for $name found category $category for " . np $thisBuff);
+        }
+        $resultRef->{'SPS'}->{$category} += $result;
+        $self->logger()->debug("getEvAnsScore for $name; $category currently has value: " . $resultRef->{'SPS'}->{$category});
+        $resultRef->{$category}->{'SPS'} += $result;
+        $self->logger()->trace("getEvAnsScore for $name; $category -> SPS  currently has value: " . $resultRef->{$category}->{'SPS'});
+        
+      }
+    } 
   }
 
   method toHashRef( $verbose = 0) {
