@@ -31,7 +31,7 @@ levels:
         value:
           number: 2
           unit: percentage
-      - attribute: Marching_Speed_to_Monsters
+      - attribute: Marching Speed to Monsters
         condition:
           - Against Monsters
         value:
@@ -67,7 +67,7 @@ levels:
         value:
           number: 3
           unit: percentage
-      - attribute: Marching_Speed_to_Monsters
+      - attribute: Marching Speed to Monsters
         condition:
           - Against Monsters
         value:
@@ -103,7 +103,7 @@ levels:
         value:
           number: 5
           unit: percentage
-      - attribute: Marching_Speed_to_Monsters
+      - attribute: Marching Speed to Monsters
         condition:
           - Against Monsters
         value:
@@ -139,7 +139,7 @@ levels:
         value:
           number: 5
           unit: percentage
-      - attribute: Marching_Speed_to_Monsters
+      - attribute: Marching Speed to Monsters
         condition:
           - Against Monsters
         value:
@@ -175,7 +175,7 @@ levels:
         value:
           number: 10
           unit: percentage
-      - attribute: Marching_Speed_to_Monsters
+      - attribute: Marching Speed to Monsters
         condition:
           - Against Monsters
         value:

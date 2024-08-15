@@ -27,7 +27,7 @@ levels:
 - category: Cooperation
   type: passive
   buff:
-  - attribute: Training_Speed
+  - attribute: Training Speed
     value:
       number: 5
       unit: percentage
@@ -91,7 +91,7 @@ levels:
     value:
       number: 10
       unit: percentage
-  - attribute: March_Size_Capacity
+  - attribute: March Size Capacity
     value:
       number: 5
       unit: percentage

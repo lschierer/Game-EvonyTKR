@@ -14,7 +14,7 @@ ascending:
         unit: percentage
 - level: '2Red'
   buff:
-    - attribute: Death_to_Wounded
+    - attribute: Death to Wounded
       condition:
         - Marching
       value:
@@ -27,7 +27,7 @@ ascending:
       value:
         number: 15
         unit: percentage
-    - attribute: Rally_Capacity
+    - attribute: Rally Capacity
       condition:
         - When_Rallying
       value:

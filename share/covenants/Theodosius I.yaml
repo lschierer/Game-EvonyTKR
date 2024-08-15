@@ -7,7 +7,7 @@ levels:
   - category: War
     type: personal
     buff:
-      - attribute: Death_to_Wounded
+      - attribute: Death to Wounded
         condition:
           - Attacking
         value:
@@ -16,7 +16,7 @@ levels:
   - category: Cooperation
     type: personal
     buff:
-      - attribute: Marching_Speed
+      - attribute: Marching Speed
         value:
           number: 10
           unit: percentage
@@ -41,7 +41,7 @@ levels:
   - category: Faith
     type: passive
     buff:
-      - attribute: Training_Speed
+      - attribute: Training Speed
         class: Siege Machines
         value:
           number: 10

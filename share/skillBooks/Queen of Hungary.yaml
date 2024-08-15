@@ -22,7 +22,7 @@ buff:
     value:
       number: 45
       unit: percentage
-  - attribute: Stamina_cost
+  - attribute: Stamina cost
     condition:
       - Against Monsters
     value:

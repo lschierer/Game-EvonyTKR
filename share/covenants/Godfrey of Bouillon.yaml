@@ -33,7 +33,7 @@ levels:
 - category: Peace
   type: personal
   buff:
-  - attribute: Marching_Speed
+  - attribute: Marching Speed
     value:
       number: 15
       unit: percentage

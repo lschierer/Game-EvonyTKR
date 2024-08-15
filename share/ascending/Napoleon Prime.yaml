@@ -46,7 +46,7 @@ ascending:
         unit: percentage
 - level: '2Red'
   buff:
-    - attribute: Death_to_Wounded
+    - attribute: Death to Wounded
       condition:
         - Marching
       value:
@@ -68,7 +68,7 @@ ascending:
       value:
         number: 15
         unit: percentage
-    - attribute: March_Size_Capacity
+    - attribute: March Size Capacity
       condition:
         - Marching
       value:

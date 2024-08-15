@@ -7,7 +7,7 @@ levels:
 - category: War
   type: personal
   buff:
-  - attribute: Wounded_to_Death
+  - attribute: Wounded to Death
     condition:
     - Enemy
     - Attacking
@@ -34,7 +34,7 @@ levels:
 - category: Peace
   type: passive
   buff:
-  - attribute: Training_Speed
+  - attribute: Training Speed
     class: Siege Machines
     value:
       number: 5
@@ -42,7 +42,7 @@ levels:
 - category: Faith
   type: personal
   buff:
-  - attribute: March_Size_Capacity
+  - attribute: March Size Capacity
     value:
       number: 10
       unit: percentage

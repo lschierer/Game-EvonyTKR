@@ -17,7 +17,7 @@ levels:
 - category: Cooperation
   type: personal
   buff:
-  - attribute: March_Size_Capacity
+  - attribute: March Size Capacity
     value:
       number: 5
       unit: percentage
@@ -34,7 +34,7 @@ levels:
 - category: Faith
   type: passive
   buff:
-  - attribute: Training_Speed
+  - attribute: Training Speed
     class: Mounted Troops
     value:
       number: 10

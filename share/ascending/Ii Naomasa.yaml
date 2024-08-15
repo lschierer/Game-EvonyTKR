@@ -9,7 +9,7 @@ ascending:
         unit: percentage
 - level: '2Red'
   buff:
-    - attribute: Wounded_to_Death
+    - attribute: Wounded to Death
       condition:
         - Enemy_In_City
       value:
@@ -17,7 +17,7 @@ ascending:
         unit: percentage
 - level: '3Red'
   buff:
-    - attribute: March_Size_Capacity
+    - attribute: March Size Capacity
       value:
         number: 6
         unit: percentage
@@ -40,7 +40,7 @@ ascending:
         unit: percentage
 - level: '5Red'
   buff:
-    - attribute: March_Size_Capacity
+    - attribute: March Size Capacity
       value:
         number: 8
         unit: percentage

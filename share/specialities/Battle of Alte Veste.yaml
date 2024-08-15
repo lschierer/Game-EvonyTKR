@@ -8,7 +8,7 @@ levels:
         value:
           number: 4
           unit: percentage
-      - attribute: Rally_Capacity
+      - attribute: Rally Capacity
         value:
           number: 1
           unit: percentage
@@ -19,7 +19,7 @@ levels:
         value:
           number: 4
           unit: percentage
-      - attribute: Rally_Capacity
+      - attribute: Rally Capacity
         value:
           number: 1
           unit: percentage
@@ -30,7 +30,7 @@ levels:
         value:
           number: 8
           unit: percentage
-      - attribute: Rally_Capacity
+      - attribute: Rally Capacity
         value:
           number: 1
           unit: percentage
@@ -41,7 +41,7 @@ levels:
         value:
           number: 8
           unit: percentage
-      - attribute: Rally_Capacity
+      - attribute: Rally Capacity
         value:
           number: 1
           unit: percentage
@@ -52,7 +52,7 @@ levels:
         value:
           number: 16
           unit: percentage
-      - attribute: Rally_Capacity
+      - attribute: Rally Capacity
         value:
           number: 1
           unit: percentage

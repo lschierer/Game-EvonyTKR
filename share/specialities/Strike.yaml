@@ -3,7 +3,7 @@ name: Strike
 levels:
   - level: Green
     buff:
-      - attribute: Marching_Speed
+      - attribute: Marching Speed
         value:
           number: 1
           unit: percentage
@@ -16,7 +16,7 @@ levels:
           unit: percentage
   - level: Blue
     buff:
-      - attribute: Marching_Speed
+      - attribute: Marching Speed
         value:
           number: 1
           unit: percentage
@@ -29,7 +29,7 @@ levels:
           unit: percentage
   - level: Purple
     buff:
-      - attribute: Marching_Speed
+      - attribute: Marching Speed
         value:
           number: 2
           unit: percentage
@@ -42,7 +42,7 @@ levels:
           unit: percentage
   - level: Orange
     buff:
-      - attribute: Marching_Speed
+      - attribute: Marching Speed
         value:
           number: 2
           unit: percentage
@@ -55,7 +55,7 @@ levels:
           unit: percentage
   - level: Gold
     buff:
-      - attribute: Marching_Speed
+      - attribute: Marching Speed
         value:
           number: 4
           unit: percentage

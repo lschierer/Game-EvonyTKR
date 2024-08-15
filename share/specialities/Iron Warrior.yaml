@@ -3,7 +3,7 @@ name: Iron Warrior
 levels:
   - level: 'Green'
     buff:
-      - attribute: Wounded_to_Death
+      - attribute: Wounded to Death
         condition:
           - Enemy
         value:
@@ -11,7 +11,7 @@ levels:
           unit: percentage
   - level: 'Blue'
     buff:
-      - attribute: Wounded_to_Death
+      - attribute: Wounded to Death
         condition:
           - Enemy
         value:
@@ -19,7 +19,7 @@ levels:
           unit: percentage
   - level: 'Purple'
     buff:
-      - attribute: Wounded_to_Death
+      - attribute: Wounded to Death
         condition:
           - Enemy
         value:
@@ -27,7 +27,7 @@ levels:
           unit: percentage
   - level: 'Orange'
     buff:
-      - attribute: Wounded_to_Death
+      - attribute: Wounded to Death
         condition:
           - Enemy
         value:
@@ -35,7 +35,7 @@ levels:
           unit: percentage
   - level: 'Gold'
     buff:
-      - attribute: Wounded_to_Death
+      - attribute: Wounded to Death
         condition:
           - Enemy
         value:

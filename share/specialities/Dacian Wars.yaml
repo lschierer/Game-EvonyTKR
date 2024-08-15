@@ -13,7 +13,7 @@ levels:
         value:
           number: 2
           unit: percentage
-      - attribute: March_Size_Capacity
+      - attribute: March Size Capacity
         value:
           number: 1
           unit: percentage
@@ -29,7 +29,7 @@ levels:
         value:
           number: 2
           unit: percentage
-      - attribute: March_Size_Capacity
+      - attribute: March Size Capacity
         value:
           number: 1
           unit: percentage
@@ -45,7 +45,7 @@ levels:
         value:
           number: 3
           unit: percentage
-      - attribute: March_Size_Capacity
+      - attribute: March Size Capacity
         value:
           number: 2
           unit: percentage
@@ -61,7 +61,7 @@ levels:
         value:
           number: 3
           unit: percentage
-      - attribute: March_Size_Capacity
+      - attribute: March Size Capacity
         value:
           number: 2
           unit: percentage
@@ -77,7 +77,7 @@ levels:
         value:
           number: 6
           unit: percentage
-      - attribute: March_Size_Capacity
+      - attribute: March Size Capacity
         value:
           number: 4
           unit: percentage

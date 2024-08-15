@@ -7,7 +7,7 @@ levels:
 - category: War
   type: personal
   buff:
-  - attribute: March_Size_Capacity
+  - attribute: March Size Capacity
     value:
       number: 5
       unit: percentage
@@ -24,7 +24,7 @@ levels:
 - category: Peace
   type: passive
   buff:
-  - attribute: Training_Speed
+  - attribute: Training Speed
     class: Ranged Troops
     value:
       number: 5
@@ -42,7 +42,7 @@ levels:
 - category: Faith
   type: passive
   buff:
-  - attribute: Marching_Speed
+  - attribute: Marching Speed
     value:
       number: 10
       unit: percentage

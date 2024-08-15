@@ -1,7 +1,7 @@
 ---
 name: Strategy Expert
 buff:
-  - attribute: Stamina_cost
+  - attribute: Stamina cost
     condition:
       - Against Monsters
     value:

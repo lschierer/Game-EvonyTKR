@@ -21,7 +21,7 @@ ascending:
         unit: percentage
 - level: '2Red'
   buff:
-    - attribute: Death_to_Wounded
+    - attribute: Death to Wounded
       condition:
         - When_Defending_Outside_The_Main_City
       value:
@@ -36,7 +36,7 @@ ascending:
         unit: percentage
 - level: '3Red'
   buff:
-    - attribute: March_Size_Capacity
+    - attribute: March Size Capacity
       value:
         number: 10
         unit: percentage

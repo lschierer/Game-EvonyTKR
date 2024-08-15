@@ -14,7 +14,7 @@ ascending:
         unit: percentage
 - level: '2Red'
   buff:
-    - attribute: Wounded_to_Death
+    - attribute: Wounded to Death
       condition:
         - Enemy_In_City
       value:

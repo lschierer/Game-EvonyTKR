@@ -42,7 +42,7 @@ levels:
     value:
       number: 5
       unit: percentage
-  - attribute: Marching_Speed
+  - attribute: Marching Speed
     value:
       number: 15
       unit: percentage

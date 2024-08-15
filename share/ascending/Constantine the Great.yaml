@@ -46,7 +46,7 @@ ascending:
       value:
         number: 15
         unit: percentage
-    - attribute: SubCity_Training_Speed
+    - attribute: SubCity_Training Speed
       condition:
         - When_City_Mayor_for_this_SubCity
       value:

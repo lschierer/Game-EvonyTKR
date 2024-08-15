@@ -10,7 +10,7 @@ levels:
         value:
           number: 3
           unit: percentage
-      - attribute: Death_to_Wounded
+      - attribute: Death to Wounded
         condition:
           - Attacking
         value:
@@ -25,7 +25,7 @@ levels:
         value:
           number: 3
           unit: percentage
-      - attribute: Death_to_Wounded
+      - attribute: Death to Wounded
         condition:
           - Attacking
         value:
@@ -40,7 +40,7 @@ levels:
         value:
           number: 6
           unit: percentage
-      - attribute: Death_to_Wounded
+      - attribute: Death to Wounded
         condition:
           - Attacking
         value:
@@ -48,7 +48,7 @@ levels:
           unit: percentage
   - level: 'Orange'
     buff:
-      - attribute: Death_to_Wounded
+      - attribute: Death to Wounded
         condition:
           - Attacking
         value:
@@ -70,7 +70,7 @@ levels:
         value:
           number: 12
           unit: percentage
-      - attribute: Death_to_Wounded
+      - attribute: Death to Wounded
         condition:
           - Attacking
         value:

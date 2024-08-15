@@ -18,7 +18,7 @@ ascending:
         unit: percentage
 - level: '2Red'
   buff:
-    - attribute: Death_to_Wounded
+    - attribute: Death to Wounded
       condition:
         - Marching
       value:

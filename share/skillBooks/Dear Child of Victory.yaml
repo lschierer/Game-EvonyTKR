@@ -6,7 +6,7 @@ buff:
     value:
       number: 45
       unit: percentage
-  - attribute: March_Size_Capacity
+  - attribute: March Size Capacity
     value:
       number: 12
       unit: percentage

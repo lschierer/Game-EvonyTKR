@@ -3,7 +3,7 @@ name: Battle of Mobei
 levels:
   - level: 'Green'
     buff:
-      - attribute: March_Time
+      - attribute: March Time
         value:
           number: 1
           unit: percentage
@@ -16,7 +16,7 @@ levels:
           unit: percentage
   - level: 'Blue'
     buff:
-      - attribute: March_Time
+      - attribute: March Time
         value:
           number: 1
           unit: percentage
@@ -29,7 +29,7 @@ levels:
           unit: percentage
   - level: 'Purple'
     buff:
-      - attribute: March_Time
+      - attribute: March Time
         value:
           number: 2
           unit: percentage
@@ -42,7 +42,7 @@ levels:
           unit: percentage
   - level: 'Orange'
     buff:
-      - attribute: March_Time
+      - attribute: March Time
         value:
           number: 2
           unit: percentage
@@ -55,7 +55,7 @@ levels:
           unit: percentage
   - level: 'Gold'
     buff:
-      - attribute: March_Time
+      - attribute: March Time
         value:
           number: 4
           unit: percentage

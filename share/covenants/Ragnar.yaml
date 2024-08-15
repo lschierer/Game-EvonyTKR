@@ -17,7 +17,7 @@ levels:
   - category: Cooperation
     type: personal
     buff:
-      - attribute: Marching_Speed
+      - attribute: Marching Speed
         value:
           number: 10
           unit: percentage

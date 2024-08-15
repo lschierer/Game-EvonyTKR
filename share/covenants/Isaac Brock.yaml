@@ -16,7 +16,7 @@ levels:
 - category: Cooperation
   type: passive
   buff:
-  - attribute: Death_to_Soul
+  - attribute: Death to Soul
     condition:
     - In_Main_City
     value:

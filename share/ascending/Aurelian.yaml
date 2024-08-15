@@ -34,7 +34,7 @@ ascending:
   buff:
     - condition:
         - Enemy_In_City
-      attribute: Wounded_to_Death
+      attribute: Wounded to Death
       value:
         number: 10
         unit: percentage
@@ -56,7 +56,7 @@ ascending:
         unit: percentage
     - condition:
         - Attacking
-      attribute: March_Size_Capacity
+      attribute: March Size Capacity
       value:
         number: 8
         unit: percentage

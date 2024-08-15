@@ -8,7 +8,7 @@ buff:
     value:
       number: 10
       unit: percentage
-  - attribute: Rally_Capacity
+  - attribute: Rally Capacity
     condition:
       - When_Rallying
     value:

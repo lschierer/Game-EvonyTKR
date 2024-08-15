@@ -65,7 +65,7 @@ levels:
     value:
       number: 10
       unit: percentage
-  - attribute: March_Size_Capacity
+  - attribute: March Size Capacity
     value:
       number: 5
       unit: percentage

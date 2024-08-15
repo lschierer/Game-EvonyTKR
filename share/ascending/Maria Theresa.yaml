@@ -8,7 +8,7 @@ ascending:
       value:
         number: 10
         unit: percentage
-    - attribute: Marching_Speed_to_Monsters
+    - attribute: Marching Speed to Monsters
       condition:
         - Against Monsters
       value:
@@ -22,7 +22,7 @@ ascending:
       value:
         number: 10
         unit: percentage
-    - attribute: Marching_Speed_to_Monsters
+    - attribute: Marching Speed to Monsters
       condition:
         - Against Monsters
       value:
@@ -30,7 +30,7 @@ ascending:
         unit: percentage
 - level: '3Red'
   buff:
-    - attribute: March_Size_Capacity
+    - attribute: March Size Capacity
       value:
         number: 10
         unit: percentage

@@ -51,7 +51,7 @@ levels:
 - category: Peace
   type: passive
   buff:
-  - attribute: Marching_Speed
+  - attribute: Marching Speed
     value:
       number: 15
       unit: percentage
@@ -89,7 +89,7 @@ levels:
 - category: Honor
   type: personal
   buff:
-  - attribute: March_Size_Capacity
+  - attribute: March Size Capacity
     value:
       number: 8
       unit: percentage
