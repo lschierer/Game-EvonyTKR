@@ -124,6 +124,7 @@ package Game::EvonyTKR::Web::General {
 
     foreach my $tg (@found) {
       open(my ($fh), '<', $tg) or $logger->logcroak("$!");
+      close $fh;
       my $data = LoadFile($tg);
       my $name = $data->{'general'}->{'name'};
       $logger->info($name);

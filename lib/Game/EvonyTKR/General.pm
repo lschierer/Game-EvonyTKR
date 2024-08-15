@@ -237,6 +237,7 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Logger) {
         $BuffMultipliers,
         $self->generalType(),
       );
+
       for my $key (keys %{$resultRef->{'AES'}}) {
         if( $key ne 'Overall') {
           $resultRef->{'AES'}->{'Overall'} += $resultRef->{'AES'}->{$key};
@@ -245,6 +246,10 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Logger) {
     }
     else {
       $resultRef->{'AES'}->{'Overall'} += 0;
+    }
+
+    if($hasCovenant){
+      
     }
 
     for my $key ( keys %{$resultRef->{'Attack'}}) {
@@ -653,15 +658,6 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Logger) {
       $self->logger()
         ->debug("details populated for " . Data::Printer::np $name);
 
-      my $covenantShare = File::Spec->catfile(dist_dir('Game-EvonyTKR'), 'covenants');
-      my $CovenantFile = File::Spec->catfile($covenantShare, $fileName);
-      if ( -T -s -r $CovenantFile) {
-        $hasCovenant = 1;
-        my $covenant = Game::EvonyTKR::Covenant->new(
-          primary => $self,
-        );
-        $covenant->readFromFile();
-      }
     }
 
   }

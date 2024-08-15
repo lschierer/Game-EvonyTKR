@@ -148,6 +148,73 @@ class Game::EvonyTKR::Covenant :isa(Game::EvonyTKR::Logger) {
     return 1;
   }
 
+  method activeBuffs() {
+    my @cla = @{$CovenantLevels->values()};
+    my $powerLevel = 0;
+    $powerLevel += $primary->effective_attack();
+    $powerLevel += $primary->effective_defense();
+    $powerLevel += $primary->effective_leadership();
+    $powerLevel += $primary->effective_politics();
+    for my $key (@{keys %secondary}) {
+      $powerLevel += $secondary{$key}->effective_attack();
+      $powerLevel += $secondary{$key}->effective_defense();
+      $powerLevel += $secondary{$key}->effective_leadership();
+      $powerLevel += $secondary{$key}->effective_politics();
+    }
+    $self->logger()->debug(sprintf("Covenant for %s: effective powerLevel is %.5f", $primary->name(), $powerLevel));
+    for my ($i, $clk) (indexed(@cla)) {
+      my $cl = $Buffs{$clk};
+      if($cl->{'activated'}){
+        if($cl->{'activationLevel'} <= $powerLevel) {
+          return @{$cl->{'buffs'}};
+        }
+        else {
+          $self->logger()->debug(sprintf(
+            "Covenant for %s: effective powerLevel is %.5f, required power is %d", 
+            $primary->name(), 
+            $powerLevel,
+            $cl->{'activationLevel'},
+          ));
+        }
+      } else {
+        $self->logger()->debug(sprintf(
+          "Covenant for %s: level %s is not active", 
+          $primary->name(), 
+          $cla[$i]
+        ));
+      }
+    }
+    return ();
+  }
+
+  method getEvAnsScore($name, $resultRef, $BuffMultipliers, $GeneralBias) {
+    my @ab = $self->activeBuffs();
+    my $bc = scalar @ab;
+    $self->logger()->debug("getEvAnsScore for $name found $bc buffs");
+    if($bc > 0) {
+      for my ($i, $thisBuff) ( indexed(@ab) ) { 
+        my $result = $thisBuff->getEvAnsScore(
+          $name,
+          $BuffMultipliers,
+          $GeneralBias,
+          );
+        $self->logger()->debug("getEvAnsScore for $name recieved $result from getEvAnsScore for buff $i");
+        my $category = $BuffMultipliers->EvAnsCategory($thisBuff);
+        if(not defined $category) {
+          $self->logger()->warn("getEvAnsScore for $name found no category returned for " . np $thisBuff);
+          $category = 'Unused';
+        }else {
+          $self->logger()->debug("getEvAnsScore for $name found category $category for " . np $thisBuff);
+        }
+        $resultRef->{'SPS'}->{$category} += $result;
+        $self->logger()->debug("getEvAnsScore for $name; $category currently has value: " . $resultRef->{'SPS'}->{$category});
+        $resultRef->{$category}->{'SPS'} += $result;
+        $self->logger()->trace("getEvAnsScore for $name; $category -> SPS  currently has value: " . $resultRef->{$category}->{'SPS'});
+        
+      }
+    } 
+  }
+
   method toHashRef( $verbose = 0) {
     $self->logger()->trace("Starting toHashRef for Covenant, verbose is $verbose");
     my $returnRef = {
@@ -231,15 +298,15 @@ class Game::EvonyTKR::Covenant :isa(Game::EvonyTKR::Logger) {
                 }
               }
             }
-
+            $self->addBuff($value, $b);
             $self->logger()->info("$CovenantFile at $value adds buff " . np $b);
           }
-
         }
-        
       }
     }
-
+    else {
+      $self->logger()->error("cannot find $CovenantFile");
+    }
   }
 
 };
