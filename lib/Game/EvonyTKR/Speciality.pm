@@ -194,11 +194,15 @@ class Game::EvonyTKR::Speciality :isa(Game::EvonyTKR::Logger) {
           
           if(any {$_ eq 'value'} @flKeys) {
             $self->logger()->debug("SpecialityFileName has a buff with a value");
+            if(not exists $flb->{'attribute'}) {
+              $self->logger()->logcroak("attribute is not defined in a buff for $SpecialityFileName");
+            }
             $v = Game::EvonyTKR::Buff::Value->new(
               number  => $flb->{'value'}->{'number'},
               unit    => $flb->{'value'}->{'unit'},
             );
             if(any {$_ eq 'class'} @flKeys) {
+              
               $b = Game::EvonyTKR::Buff->new(
                 attribute  => $flb->{'attribute'},
                 value      => $v,

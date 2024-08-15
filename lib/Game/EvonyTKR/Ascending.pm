@@ -197,6 +197,9 @@ class Game::EvonyTKR::Ascending :isa(Game::EvonyTKR::Logger) {
           
           if(any {$_ eq 'value'} @flKeys) {
             $self->logger()->debug("$AscendingFileName has a buff with a value");
+            if(not defined $flb->{'attribute'}) {
+              $self->logger()->logcroak("attribute is not defined for $AscendingFileName");
+            }
             $v = Game::EvonyTKR::Buff::Value->new(
               number  => $flb->{'value'}->{'number'},
               unit    => $flb->{'value'}->{'unit'},
