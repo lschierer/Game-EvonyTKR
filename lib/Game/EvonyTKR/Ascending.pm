@@ -141,6 +141,34 @@ class Game::EvonyTKR::Ascending :isa(Game::EvonyTKR::Logger) {
     return 1;
   }
 
+  method getEvAnsScore($name, $resultRef, $BuffMultipliers, $GeneralBias) {
+    my @ab = @{$Buffs{$activeLevel}};
+    my $bc = scalar @ab;
+    $self->logger()->debug("getEvAnsScore for $name found $bc buffs at $activeLevel");
+    if($bc > 0) {
+      for my ($i, $thisBuff) ( indexed(@ab) ) { 
+        my $result = $thisBuff->getEvAnsScore(
+          $name,
+          $BuffMultipliers,
+          $GeneralBias,
+          );
+        $self->logger()->debug("getEvAnsScore for $name recieved $result from getEvAnsScore for buff $i");
+        my $category = $BuffMultipliers->EvAnsCategory($thisBuff);
+        if(not defined $category) {
+          $self->logger()->warn("getEvAnsScore for $name found no category returned for " . np $thisBuff);
+          $category = 'Unused';
+        }else {
+          $self->logger()->debug("getEvAnsScore for $name found category $category for " . np $thisBuff);
+        }
+        $resultRef->{'AES'}->{$category} += $result;
+        $self->logger()->debug("getEvAnsScore for $name; $category currently has value: " . $resultRef->{'AES'}->{$category});
+        $resultRef->{$category}->{'AES'} += $result;
+        $self->logger()->trace("getEvAnsScore for $name; $category -> AES  currently has value: " . $resultRef->{$category}->{'AES'});
+        
+      }
+    } 
+  }
+
   method toHashRef( $verbose = 0) {
     $self->logger()->trace("Starting toHashRef for Ascending, verbose is $verbose");
     my $returnRef = {};

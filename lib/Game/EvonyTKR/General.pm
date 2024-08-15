@@ -230,6 +230,23 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Logger) {
       }
     }
 
+    if($ascending){
+      $ascendingAttributes->getEvAnsScore(
+        $self->name(),
+        $resultRef,
+        $BuffMultipliers,
+        $self->generalType(),
+      );
+      for my $key (keys %{$resultRef->{'AES'}}) {
+        if( $key ne 'Overall') {
+          $resultRef->{'AES'}->{'Overall'} += $resultRef->{'AES'}->{$key};
+        }
+      }
+    }
+    else {
+      $resultRef->{'AES'}->{'Overall'} += 0;
+    }
+
     for my $key ( keys %{$resultRef->{'Attack'}}) {
       $resultRef->{'Attack'}->{'Overall'} += $resultRef->{'Attack'}->{$key};
     }
