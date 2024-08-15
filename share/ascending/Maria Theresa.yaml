@@ -34,7 +34,7 @@ ascending:
       value:
         number: 10
         unit: percentage
-    - attribute: Stamina_cost
+    - attribute: Stamina cost
       condition:
         - Against Monsters
       value:
@@ -57,7 +57,7 @@ ascending:
       value:
         number: 10
         unit: percentage
-    - attribute: Stamina_cost
+    - attribute: Stamina cost
       condition:
         - Against Monsters
       value:

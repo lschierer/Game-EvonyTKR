@@ -21,7 +21,7 @@ ascending:
       value:
         number: 6
         unit: percentage
-    - 'attribute:': Attack
+    - attribute: Attack
       class: Mounted Troops
       value:
         number: 10

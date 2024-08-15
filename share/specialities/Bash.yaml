@@ -3,7 +3,7 @@ name: Bash
 levels:
   - level: Green
     buff:
-      - levels: Attack
+      - attribute: Attack
         class: Ranged Troops
         value:
           number: 1
