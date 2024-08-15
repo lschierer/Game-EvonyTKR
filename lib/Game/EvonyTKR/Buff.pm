@@ -60,15 +60,62 @@ class Game::EvonyTKR::Buff :isa(Game::EvonyTKR::Logger) {
   field $inherited :reader :param //= 0;
 
   ADJUST {
+    if(not defined $attribute) {
+      $self->logger()->logcroak('Attribute must be defined');
+    } else {
+      if(scalar @BuffAttributes == 0){
+        $classData->set_BuffAttributes();
+        @BuffAttributes = $classData->BuffAttributes();
+      }
+      if(scalar @BuffAttributes == 0) {
+        $self->logger()->logcroak('no attributes loaded');
+      } elsif (none {$_ =~ /^$attribute$/} @BuffAttributes) {
+        $self->logger()->logcroak("$attribute is an invalid attribute");
+      }
+    }
+
     if(scalar @BuffClasses == 0) {
       $classData->set_BuffClasses();
       @BuffClasses = $classData->BuffClasses();
     }
     if(scalar @BuffClasses == 0) {
       $self->logger()->logcroak("no classes loaded");
-    } elsif (! grep {/^$buffClass$/} @BuffClasses){
+    } elsif (none {$_ =~ /^$buffClass$/ } @BuffClasses){
       $self->logger()->logcroak("$buffClass is an invalid class");
     }
+  }
+
+  method getEvAnsScore($name, $BuffMultipliers, $GeneralBias) {
+    $self->logger()->trace("starting getEvAnsScore for $name with $GeneralBias");
+    if(any {$_ =~ /$GeneralBias/i} @BuffClasses) {
+      if(any {
+        my $tc = $_;
+        any { $_ =~ /$tc/i} $BuffMultipliers->debuffConditions()
+      } @condition) {
+        $self->logger()->debug("Detected a debuff for $name in " . np @condition);
+        return $value->number() * 
+          $BuffMultipliers->getMultiplierForDebuff(
+            $self->attribute(),
+            $GeneralBias,
+            $self->buffClass(),
+            $self->value()->unit(),
+          );
+      }
+      else {
+        $self->logger()->debug("Detected a buff for $name in " . np @condition);
+        return $value->number() * 
+          $BuffMultipliers->getMultiplierForBuff(
+            $self->attribute(),
+            $GeneralBias,
+            $self->buffClass(),
+            $self->value()->unit(),
+          );
+      }
+    }
+    else {
+      $self->logger()->error("GeneralBias $GeneralBias for $name is invalid.");
+    }
+    return 0;
   }
 
   method has_buffClass {
@@ -249,4 +296,15 @@ this function is used to indicate that the Buff in question should not be export
 =method toggleInherited
 
 This toggles the value of the inherirted field.
+=cut
+
+=method getEvAnsScore($name, $BuffMultipliers, $GeneralBias)
+
+$name is simply a string used to help identify entries in logs.
+
+$BuffMultipliers must contain an instance of a I<child class> of Game::EvonyTKR::Buff::EvaluationMultipliers
+
+$GeneralBias must contain a valid instane of a class from Game::EvonyTKR::Buff::Data
+
+returns the EvAnsScore for this buff for a general with the provided bias.
 =cut

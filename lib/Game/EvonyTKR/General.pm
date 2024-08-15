@@ -4,6 +4,7 @@ use FindBin;
 use lib "$FindBin::Bin/../../../lib";
 
 class Game::EvonyTKR::General : isa(Game::EvonyTKR::Logger) {
+  use builtin qw(indexed);
   use Carp;
   use Types::Common qw( t is_Num is_Str is_Int);
   use Type::Utils   qw(is enum);
@@ -98,29 +99,8 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Logger) {
     lock_keys(%BasicAESAdjustment);
   }
 
-  method getEvAnsScoreAsPrimary( $situation ){
-    my $BuffMultipliers;
-    my $resultRef = {
-      'BAS'           => {},
-      'BSS'           => {},
-      '4SB'           => {},
-      'CVS'           => {},
-      'SPS'           => {},
-      'AES'           => {},
-      'SKS'           => {},
-      'Attack'        => {},
-      'Toughness'     => {},
-      'Preservation'  => {},
-    };
-    if($situation =~ /Attacking/i) {
-      $BuffMultipliers = Game::EvonyTKR::Buff::EvaluationMultipliers::Attacking->new();
-    }
-    else {
-      $self->logger()->error("Unsupported situation $situation");
-      return 0;
-    }
-    
-    # Attack Buffs 
+  method _getEvAns4BasicAttributes($resultRef, $BuffMultipliers) {
+
     $resultRef->{'BAS'}->{'Attack'} = 
       $self->effective_attack() * $BuffMultipliers->getMultiplierForBuff(
         'Attack',
@@ -128,19 +108,19 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Logger) {
       );
     
     $resultRef->{'BAS'}->{'Defense'} = 
-      $self->effective_attack() * $BuffMultipliers->getMultiplierForBuff(
+      $self->effective_defense() * $BuffMultipliers->getMultiplierForBuff(
         'Defense',
         $self->generalType()
       );
 
     $resultRef->{'BAS'}->{'Leadershp'} = 
-      $self->effective_attack() * $BuffMultipliers->getMultiplierForBuff(
+      $self->effective_leadership() * $BuffMultipliers->getMultiplierForBuff(
         'HP',
         $self->generalType()
       );
     
     $resultRef->{'BAS'}->{'Politics'} = 
-      $self->effective_attack() * $BuffMultipliers->getMultiplierForBuff(
+      $self->effective_politics() * $BuffMultipliers->getMultiplierForBuff(
         'Death to Wounded',
         $self->generalType()
       );
@@ -156,6 +136,86 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Logger) {
     $resultRef->{'Toughness'}->{'BAS'} += $resultRef->{'BAS'}->{'Leadershp'};
 
     $resultRef->{'Preservation'}->{'BAS'} += $resultRef->{'BAS'}->{'Politics'};
+
+  }
+
+  method getEvAnsScoreAsPrimary( $situation ) {
+    my $resultRef = $self->computeEvansScoreComponents($situation);
+    my $BAS = exists $resultRef->{'BAS'}->{'Overall'} ? $resultRef->{'BAS'}->{'Overall'} : 0;
+    my $BSS = exists $resultRef->{'BSS'}->{'Overall'} ? $resultRef->{'BSS'}->{'Overall'} : 0;
+    my $SBS = exists $resultRef->{'SBS'}->{'Overall'} ? $resultRef->{'SBS'}->{'Overall'} : 0;
+    my $CVS = exists $resultRef->{'CVS'}->{'Overall'} ? $resultRef->{'CVS'}->{'Overall'} : 0;
+    my $SPS = exists $resultRef->{'SPS'}->{'Overall'} ? $resultRef->{'SPS'}->{'Overall'} : 0;
+    my $AES = exists $resultRef->{'AES'}->{'Overall'} ? $resultRef->{'AES'}->{'Overall'} : 0;
+    my $TLGS = $BAS + $BSS + $SBS + $CVS + $SPS + $AES;
+    $self->logger()->trace("BAS for $name is " . $BAS);
+    $self->logger()->trace("BSS for $name is " . $BSS);    
+    $self->logger()->trace("SBS for $name is " . $SBS);
+    $self->logger()->trace("CVS for $name is " . $CVS);
+    $self->logger()->trace("SPS for $name is " . $SPS);
+    $self->logger()->trace("AES for $name is " . $AES);
+    $self->logger()->info("TLGS as Primary for $name is $TLGS");
+    return $TLGS;
+  }
+
+  method getEvAnsScoreAsSecondary( $situation ) {
+    my $resultRef = $self->computeEvansScoreComponents($situation);
+    my $TLGS = $resultRef->{'BSS'}->{'Overall'} +
+      $resultRef->{'SBS'}->{'Overall'} +
+      $resultRef->{'CVS'}->{'Overall'} +
+      $resultRef->{'SPS'}->{'Overall'};
+    $self->logger()->info("TLGS as Secondary for $name is $TLGS");
+    return $TLGS;
+  }
+
+  method computeEvansScoreComponents( $situation ){
+    my $BuffMultipliers;
+    my $resultRef = {
+      'BAS'           => {},
+      'BSS'           => {},
+      'SBS'      => {},
+      'CVS'           => {},
+      'SPS'           => {},
+      'AES'           => {},
+      'Attack'        => {},
+      'Toughness'     => {},
+      'Preservation'  => {},
+    };
+    if($situation =~ /Attacking/i) {
+      $BuffMultipliers = Game::EvonyTKR::Buff::EvaluationMultipliers::Attacking->new();
+    }
+    else {
+      $self->logger()->error("Unsupported situation $situation");
+      return 0;
+    }
+    
+    $self->_getEvAns4BasicAttributes($resultRef, $BuffMultipliers);
+
+    if(defined $builtInBook) {
+      $builtInBook->getEvAnsScore(
+        $self->name(),
+        $resultRef,
+        $BuffMultipliers,
+        $self->generalType(),
+      );
+    }
+
+    if(scalar @otherBooks >= 1) {
+      for my $book (@otherBooks) {
+        $book->getEvAnsScore(
+          $self->name(),
+          $resultRef,
+          $BuffMultipliers,
+          $self->generalType(),
+        );
+      }
+    }
+
+    for my $key (keys %{$resultRef->{'SBS'}}) {
+      if( $key ne 'Overall') {
+        $resultRef->{'SBS'}->{'Overall'} += $resultRef->{'SBS'}->{$key};
+      }
+    }
 
     for my $key ( keys %{$resultRef->{'Attack'}}) {
       $resultRef->{'Attack'}->{'Overall'} += $resultRef->{'Attack'}->{$key};
@@ -327,35 +387,40 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Logger) {
 
   method changeActiveSpecialityLevel($specialityNumber, $newLevel) {
     my $type = t('PositiveOrZeroInt');
-    if($type->check($specialityNumber) ) {
+    if ($type->check($specialityNumber) ) {
       $type = t('IntRange[1, 4]');
-      if($type->check($specialityNumber)) {
+      if ($type->check($specialityNumber)) {
         $specialityNumber--;
         my @lv = $self->specialityLevels();
         if (any { $_ =~ $newLevel} @lv){
           # I am ready to actually do work
-          if($specialityNumber == 3)  {
-            my @otherLevels;
-            for my $l (0..3) {
-              push @otherLevels, $specialities[$l]->activeLevel();
+          if($specialityNumber == 3) {
+            my @otherLevels = ();
+            for my ($l, $v) (indexed(@specialities)) {
+              if($l < 4 ) {
+                push @otherLevels, $v->activeLevel();
+                if($v->activeLevel() !~ /Gold/i) {
+                  $self->logger()->debug("detected that one of the first 3 is not Gold.  Setting #4 to None.");
+                  $specialities[3]->setActiveLevel('None');
+                }
+              }
             }
-            if(any {$_ !~ /Gold/i } @otherLevels) {
-              $self->logger()->debug("detected that one of the first 3 is not Gold.  Setting #4 to None.");
-              $specialities[3]->setActiveLevel('None');
-            } else {
+            if(all {$_ =~ /Gold/i } @otherLevels) {
               $self->logger()->debug("detected that the first 3 are all Gold.  Setting #4 to $newLevel as requested.");
               $specialities[3]->setActiveLevel($newLevel);
-            }
-          } else {
-            if ($newLevel !~ /Gold/i ) {
-              $self->logger()->debug("Detectected that $newLevel for " . $specialityNumber + 1 . "is not Gold.  Ensuring #4 is None.");
+            } 
+          } 
+          elsif ($newLevel !~ /Gold/i ) {
+            if ($specialityNumber != 3) {
+              $self->logger()->debug("Detectected that $newLevel for " . ($specialityNumber + 1) . " is not Gold.  Ensuring #4 is None.");
               $specialities[3]->setActiveLevel('None');
-              $specialities[$specialityNumber]->setActiveLevel($newLevel);
-            } else {
-              $specialities[$specialityNumber]->setActiveLevel($newLevel);
-              $self->logger()->debug("Detectected that $newLevel for " . $specialityNumber + 1 . "is Gold.  Recursive Call for #4 just in case.");
-              $self->changeActiveSpecialityLevel(4,'Green');
             }
+            $specialities[$specialityNumber]->setActiveLevel($newLevel);
+          } 
+          else {
+            $specialities[$specialityNumber]->setActiveLevel($newLevel);
+            $self->logger()->debug("Detectected that $newLevel for " . ($specialityNumber + 1) . " is Gold.  Recursive Call for #4 just in case.");
+            $self->changeActiveSpecialityLevel(4,'Green');
           }
         } else {
           $self->logger()->warn("detected invalid Speciality level $newLevel for " . $specialityNumber +1 . "in $name");
@@ -432,6 +497,9 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Logger) {
         specialities         => \@specialityRefs,
         EvAnsScores           => {
           AttackingAsPrimary  => $self->getEvAnsScoreAsPrimary('Attacking'),
+        },
+        ComponentScores       => {
+          Attacking           => $self->computeEvansScoreComponents('Attacking'),
         },
       };
     } else {

@@ -1,9 +1,11 @@
 use v5.40.0;
 use experimental qw(class);
+use FindBin;
+use lib "$FindBin::Bin/../../../lib";
 
 class Game::EvonyTKR::SkillBook :isa(Game::EvonyTKR::Logger) {
 # PODNAME: Game::EvonyTKR::SkillBook
-
+  use builtin qw(indexed);
   use Types::Standard qw(is_Int Int Num is_Num Str is_Str);
   use Types::Common qw( t);
   use Type::Utils "is";
@@ -43,6 +45,24 @@ class Game::EvonyTKR::SkillBook :isa(Game::EvonyTKR::Logger) {
   }
 
   field @buffs :reader;
+
+  method getEvAnsScore($name, $resultRef, $BuffMultipliers, $GeneralBias) {
+    for my ($i, $b) (indexed(@buffs)) {
+      my $result = $b->getEvAnsScore(
+        $name,
+        $BuffMultipliers,
+        $GeneralBias,
+        );
+      $self->logger()->debug("recieved $result from getEvAnsScore for buff $i");
+      my $category = $BuffMultipliers->EvAnsCategory($b);
+      if(not defined $category) {
+        $self->logger()->warn("no category returned for " . np $b);
+        $category = 'Unused';
+      }
+      $resultRef->{'SBS'}->{$category} += $result;
+      $resultRef->{$category}->{'SBS'} += $result;
+    }
+  }
 
   method add_buff($nb) {
     if(blessed $nb ne 'Game::EvonyTKR::Buff'){
@@ -159,3 +179,19 @@ This method takes a Game::EvonyTKR::Buff as its sole parameter and adds it as on
 One of the interesting properties of the buffs being an optional field in the class is that when seeking to record conflicting books, I do not care what buffs the books provide, simply enough to I<identify> them.  This facilitates that.
 =cut
 
+=method getEvAnsScore($name, $resultRef, $BuffMultipliers, $GeneralBias) 
+
+$name is simply a string used to help identify records in logs.
+
+$resultRef is a fairly complicated HashRef of HashRefs. 
+This method will write to $resultRef->{'SBS'}
+
+the key for that hash comes from L<https://www.evonyanswers.com/post/evony-answers-attribute-methodology-explanation>
+where Game::EvonyTKR::SkillBook scores end up in what EvAns calls the BSS, 4SB and the SKS categories.  I've combined them in my implementation. 
+
+$BuffMultipliers must contain an instance of a I<child class> of Game::EvonyTKR::Buff::EvaluationMultipliers
+
+$GeneralBias must contain a valid instane of a class from Game::EvonyTKR::Buff::Data
+
+There is no return value, the result is writen directly into the resultref parameter as noted above.
+=cut
