@@ -104,7 +104,7 @@ class Game::EvonyTKR::SkillBook :isa(Game::EvonyTKR::Logger) {
       $self->logger()->debug("$SkillBookFileName exists as expected");
       my $data = LoadFile($FileWithPath);
       my @dataBuffs = @{ $data->{'buff'}};
-      $self->logger()->debug("$name has " . scalar @buffs . " buffs");
+      $self->logger()->debug("$name has " . scalar @dataBuffs . " buffs in the file");
       for my $sbb (@dataBuffs) {
         my $v;
         my $b;
@@ -138,12 +138,13 @@ class Game::EvonyTKR::SkillBook :isa(Game::EvonyTKR::Logger) {
               $b->set_condition($sbc);
             }
           }
-          $self->logger()->info("Adding buff from SkillBook $name");
+          $self->logger()->info("from SkillBook $name; Adding buff " . np $b);
           push @buffs, $b;
         } else {
           $self->logger()->warn("No buff defined in readFromFile for $name");
         }
       }
+      $self->logger()->debug("$name has " . scalar @buffs . " buffs after reading all in");
     }
   }
 }
@@ -189,7 +190,7 @@ This method will write to $resultRef->{'SBS'}
 the key for that hash comes from L<https://www.evonyanswers.com/post/evony-answers-attribute-methodology-explanation>
 where Game::EvonyTKR::SkillBook scores end up in what EvAns calls the BSS, 4SB and the SKS categories.  I've combined them in my implementation. 
 
-$BuffMultipliers must contain an instance of a I<child class> of Game::EvonyTKR::Buff::EvaluationMultipliers
+$BuffMultipliers must contain an instance of a I<child class> of Game::EvonyTKR::Buff::EvaluationData
 
 $GeneralBias must contain a valid instane of a class from Game::EvonyTKR::Buff::Data
 
