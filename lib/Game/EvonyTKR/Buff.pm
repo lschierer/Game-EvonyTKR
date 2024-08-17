@@ -29,7 +29,7 @@ class Game::EvonyTKR::Buff :isa(Game::EvonyTKR::Logger) {
 
   my $classData = Game::EvonyTKR::Buff::Data->new();
   my @BuffAttributes;
-  my @BuffConditions;
+  my @AllConditions;
   my @BuffClasses;
 
   ADJUST {
@@ -38,13 +38,11 @@ class Game::EvonyTKR::Buff :isa(Game::EvonyTKR::Logger) {
       @BuffAttributes = $classData->BuffAttributes();
     }
 
-    if(scalar @BuffConditions == 0) {
-      $classData->set_BuffConditions();
-      @BuffConditions = $classData->BuffConditions();
+    if(scalar @AllConditions == 0) {
+      @AllConditions = $classData->AllConditions();
     }
 
     if(scalar @BuffClasses == 0) {
-      $classData->set_BuffClasses();
       @BuffClasses = $classData->BuffClasses();
     }
   }
@@ -81,20 +79,20 @@ class Game::EvonyTKR::Buff :isa(Game::EvonyTKR::Logger) {
     if(scalar @BuffClasses == 0) {
       $self->logger()->logcroak("no classes loaded");
     } elsif (none {$_ =~ /^$buffClass$/ } @BuffClasses){
-      $self->logger()->logcroak("$buffClass is an invalid class");
+      $self->logger()->logcroak("$buffClass is an invalid class, valid options are " . np @BuffClasses);
     }
   }
 
-  method getEvAnsScore($name, $BuffMultipliers, $GeneralBias) {
+  method getEvAnsScore($name, $EvalData, $GeneralBias) {
     $self->logger()->trace("starting getEvAnsScore for $name with $GeneralBias");
     if(any {$_ =~ /$GeneralBias/i} @BuffClasses) {
       if(any {
         my $tc = $_;
-        any { $_ =~ /$tc/i} $BuffMultipliers->debuffConditions()
+        any { $_ =~ /$tc/i} $EvalData->RelevantDebuffConditions()
       } @condition) {
         $self->logger()->debug("Detected a debuff for $name in " . np @condition);
         return $value->number() * 
-          $BuffMultipliers->getMultiplierForDebuff(
+          $EvalData->getMultiplierForDebuff(
             $self->attribute(),
             $GeneralBias,
             $self->buffClass(),
@@ -103,13 +101,23 @@ class Game::EvonyTKR::Buff :isa(Game::EvonyTKR::Logger) {
       }
       else {
         $self->logger()->debug("Detected a buff for $name in " . np @condition);
-        return $value->number() * 
-          $BuffMultipliers->getMultiplierForBuff(
+        if(any {
+          my $tc = $_;
+          any { $_ =~ /^$tc$/i } $EvalData->RelevantBuffConditions()
+        } @condition) {
+          return $value->number() * 
+          $EvalData->getMultiplierForBuff(
             $self->attribute(),
             $GeneralBias,
             $self->buffClass(),
             $self->value()->unit(),
           );
+        }
+        else {
+          $self->logger()->debug("buff for $name has a condition that disqualifies it from applying");
+          $self->logger()->trace("buff conditions: " . np @condition);
+          $self->logger()->trace("qualifying conditions: ". np $EvalData->RelevantBuffConditions());
+        }
       }
     }
     else {
@@ -134,18 +142,18 @@ class Game::EvonyTKR::Buff :isa(Game::EvonyTKR::Logger) {
 
   method set_condition ($nc) {
     if(is_Str($nc)) {
-      if(scalar @BuffConditions == 0){
-        $classData->set_BuffConditions();
-        @BuffConditions = $classData->BuffConditions();
+      if(scalar @AllConditions == 0){
+        $classData->collateConditions();
+        @AllConditions = $classData->AllConditions();
       }
-      if(scalar @BuffConditions == 0){
+      if(scalar @AllConditions == 0){
         $self->logger()->logcroak('No conditions');
-      } elsif (grep {/^$nc$/} @BuffConditions) {
+      } elsif (grep {/^$nc$/} @AllConditions) {
         if(!(grep {/^$nc$/} @condition)) {
           push @condition, $nc;
         }
       } else {
-        $self->logger()->logcroak( "$nc is an invalid condition");
+        $self->logger()->logcroak( "$nc is an invalid condition, valid conditions are " . np @AllConditions);
       }
     }
   }
@@ -298,11 +306,11 @@ this function is used to indicate that the Buff in question should not be export
 This toggles the value of the inherirted field.
 =cut
 
-=method getEvAnsScore($name, $BuffMultipliers, $GeneralBias)
+=method getEvAnsScore($name, $EvalData, $GeneralBias)
 
 $name is simply a string used to help identify entries in logs.
 
-$BuffMultipliers must contain an instance of a I<child class> of Game::EvonyTKR::Buff::EvaluationMultipliers
+$EvalData must contain an instance of a I<child class> of Game::EvonyTKR::Buff::EvaluationData
 
 $GeneralBias must contain a valid instane of a class from Game::EvonyTKR::Buff::Data
 

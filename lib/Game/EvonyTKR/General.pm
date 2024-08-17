@@ -14,7 +14,8 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Logger) {
   use File::Spec;
   use Game::EvonyTKR::Covenant;
   use Game::EvonyTKR::SkillBook::Special;
-  use Game::EvonyTKR::Buff::EvaluationMultipliers::Attacking;
+  use Game::EvonyTKR::Buff::Data::EvaluationData::Attacking;
+  use Game::EvonyTKR::Buff::Data::EvaluationData::Monster;
   use Game::EvonyTKR::Ascending;
   use JSON::MaybeXS;
   use YAML::XS qw{LoadFile Load};
@@ -142,14 +143,12 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Logger) {
   method getEvAnsScoreAsPrimary( $situation ) {
     my $resultRef = $self->computeEvansScoreComponents($situation);
     my $BAS = exists $resultRef->{'BAS'}->{'Overall'} ? $resultRef->{'BAS'}->{'Overall'} : 0;
-    my $BSS = exists $resultRef->{'BSS'}->{'Overall'} ? $resultRef->{'BSS'}->{'Overall'} : 0;
     my $SBS = exists $resultRef->{'SBS'}->{'Overall'} ? $resultRef->{'SBS'}->{'Overall'} : 0;
     my $CVS = exists $resultRef->{'CVS'}->{'Overall'} ? $resultRef->{'CVS'}->{'Overall'} : 0;
     my $SPS = exists $resultRef->{'SPS'}->{'Overall'} ? $resultRef->{'SPS'}->{'Overall'} : 0;
     my $AES = exists $resultRef->{'AES'}->{'Overall'} ? $resultRef->{'AES'}->{'Overall'} : 0;
-    my $TLGS = $BAS + $BSS + $SBS + $CVS + $SPS + $AES;
+    my $TLGS = $BAS + $SBS + $CVS + $SPS + $AES;
     $self->logger()->trace("BAS for $name is " . $BAS);
-    $self->logger()->trace("BSS for $name is " . $BSS);    
     $self->logger()->trace("SBS for $name is " . $SBS);
     $self->logger()->trace("CVS for $name is " . $CVS);
     $self->logger()->trace("SPS for $name is " . $SPS);
@@ -160,15 +159,19 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Logger) {
 
   method getEvAnsScoreAsSecondary( $situation ) {
     my $resultRef = $self->computeEvansScoreComponents($situation);
-    my $TLGS = $resultRef->{'BSS'}->{'Overall'} +
-      $resultRef->{'SBS'}->{'Overall'} +
-      $resultRef->{'CVS'}->{'Overall'} +
-      $resultRef->{'SPS'}->{'Overall'};
+    my $SBS = exists $resultRef->{'SBS'}->{'Overall'} ? $resultRef->{'SBS'}->{'Overall'} : 0;
+    my $CVS = exists $resultRef->{'CVS'}->{'Overall'} ? $resultRef->{'CVS'}->{'Overall'} : 0;
+    my $SPS = exists $resultRef->{'SPS'}->{'Overall'} ? $resultRef->{'SPS'}->{'Overall'} : 0;
+    my $TLGS = $SBS + $CVS + $SPS;
+    $self->logger()->trace("SBS for $name is " . $SBS);
+    $self->logger()->trace("CVS for $name is " . $CVS);
+    $self->logger()->trace("SPS for $name is " . $SPS);
     $self->logger()->info("TLGS as Secondary for $name is $TLGS");
     return $TLGS;
   }
 
   method computeEvansScoreComponents( $situation ){
+    $self->logger()->trace("computeEvansScoreComponents for $name with $situation");
     my $BuffMultipliers;
     my $resultRef = {
       'BAS'           => {},
@@ -181,7 +184,10 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Logger) {
       'Preservation'  => {},
     };
     if($situation =~ /Attacking/i) {
-      $BuffMultipliers = Game::EvonyTKR::Buff::EvaluationMultipliers::Attacking->new();
+      $BuffMultipliers = Game::EvonyTKR::Buff::Data::EvaluationData::Attacking->new();
+    }
+    elsif ($situation =~ /Monster/i ) {
+      $BuffMultipliers = Game::EvonyTKR::Buff::Data::EvaluationData::Monster->new();
     }
     else {
       $self->logger()->error("Unsupported situation $situation");
@@ -372,7 +378,7 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Logger) {
     $self->logger()
       ->trace("for "
         . $self->name()
-        . " level is $level, attribute_increment is $attribute_increment, attack is $attack"
+        . " level is $level, attribute_increment is $attribute_increment,  attribute is $attribute"
       );
     my $step = $level * $attribute_increment + $attribute;
     $self->logger()->trace("step1 for " . $self->name() . " is $step");
@@ -531,10 +537,14 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Logger) {
         otherBooks           => \@sbRefs,
         specialities         => \@specialityRefs,
         EvAnsScores           => {
-          AttackingAsPrimary  => $self->getEvAnsScoreAsPrimary('Attacking'),
+          AttackingAsPrimary    => $self->getEvAnsScoreAsPrimary('Attacking'),
+          AttackingAsSecondary  => $self->getEvAnsScoreAsSecondary('Attacking'),
+          MonsterAsPrimary      => $self->getEvAnsScoreAsPrimary('Monster'),
+          MonsterAsSecondary    => $self->getEvAnsScoreAsSecondary('Monster'),
         },
         ComponentScores       => {
-          Attacking           => $self->computeEvansScoreComponents('Attacking'),
+          Attacking             => $self->computeEvansScoreComponents('Attacking'),
+          Monster               => $self->computeEvansScoreComponents('Monster'),
         },
       };
     } else {
@@ -553,7 +563,8 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Logger) {
         otherBooks            => \@sbRefs,
         specialities          => \@specialityRefs,
         EvAnsScores           => {
-          AttackingAsPrimary  => $self->getEvAnsScoreAsPrimary('Attacking'),
+          AttackingAsPrimary    => $self->getEvAnsScoreAsPrimary('Attacking'),
+          AttackingAsSecondary  => $self->getEvAnsScoreAsSecondary('Attacking'),
         },
       };
     }
@@ -612,6 +623,18 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Logger) {
       $defense_increment = $data->{'general'}->{'defense_increment'};
       $politics           = $data->{'general'}->{'politics'};
       $politics_increment = $data->{'general'}->{'politics_increment'};
+
+      $self->logger()->trace(sprintf(
+        "for $name: leadership: %d, li: %d, attack: %d, ai: %d, defense: %d, di: %d, politics: %d, pi: %d",
+        $leadership,
+        $leadership_increment,
+        $attack,
+        $attack_increment,
+        $defense,
+        $defense_increment,
+        $politics,
+        $politics_increment,
+      ));
 
       my @SpecialityNames = @{ $data->{'general'}->{'specialities'} };
       my @otherBookNames;

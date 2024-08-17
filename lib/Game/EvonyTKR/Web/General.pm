@@ -67,9 +67,12 @@ package Game::EvonyTKR::Web::General {
       my $general = $generals{$id};
 
       my $level = query_parameters->get('level');
-      $logger->debug("Query level is '$level'");
       if (defined $level) {
+        $logger->debug("Query level is '$level'");
         $general->setLevel(0+ $level);
+      }
+      else {
+        $logger->debug("Query level is not defined.");
       }
 
       my @specialityLevels = qw( None None None None None );
@@ -87,8 +90,9 @@ package Game::EvonyTKR::Web::General {
         }
       }
       my $ascendingLevel = query_parameters->get('ascendingLevel');
-      $logger->debug("Query ascendingLevel is '$ascendingLevel'");
+      
       if (defined $ascendingLevel) {
+        $logger->debug("Query ascendingLevel is '$ascendingLevel'");
         if ($ascendingLevel =~ /[1-5](Red|Purple)/) {
           $logger->trace("setting $ascendingLevel");
           $general->ascendingAttributes()->setActiveLevel($ascendingLevel);
@@ -96,6 +100,9 @@ package Game::EvonyTKR::Web::General {
           $logger->warn(
             "Detected bad input '$ascendingLevel' reading ascendingLevel");
         }
+      }
+      else {
+        $logger->debug("Query ascendingLevel is not defined.");
       }
 
       my $verbose = query_parameters->get('verbose');
