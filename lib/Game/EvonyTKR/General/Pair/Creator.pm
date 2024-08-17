@@ -1,6 +1,8 @@
 use v5.40.0;
 use experimental qw(class);
 use utf8::all;
+use FindBin;
+use lib "$FindBin::Bin/../../../../../lib";
 
 class Game::EvonyTKR::General::Pair::Creator :isa(Game::EvonyTKR::Logger) {
 # PODNAME: Game::EvonyTKR::General::Pair::Creator
@@ -24,7 +26,6 @@ class Game::EvonyTKR::General::Pair::Creator :isa(Game::EvonyTKR::Logger) {
   use Game::EvonyTKR::Buff::Data;
   use Game::EvonyTKR::General::Conflicts;
   use Game::EvonyTKR::General::Pair;
-  use Game::EvonyTKR::Buff::EvaluationMultipliers;
   use namespace::autoclean;
   use Game::EvonyTKR::Logger;
 
@@ -37,10 +38,6 @@ class Game::EvonyTKR::General::Pair::Creator :isa(Game::EvonyTKR::Logger) {
   # some constants
   field $classData = Game::EvonyTKR::Buff::Data->new();
   field $conflicData = Game::EvonyTKR::General::Conflicts->new();
-
-  ADJUST {
-    $classData->set_BuffClasses();
-  }
 
   field %generals :reader;
 

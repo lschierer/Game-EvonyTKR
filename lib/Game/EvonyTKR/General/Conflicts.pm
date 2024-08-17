@@ -1,6 +1,8 @@
 use v5.40.0;
 use experimental qw(class);
 use utf8::all;
+use FindBin;
+use lib "$FindBin::Bin/../../../../lib";
 
 class Game::EvonyTKR::General::Conflicts :isa(Game::EvonyTKR::Logger) {
 # PODNAME: Game::EvonyTKR::General::Conflicts
@@ -22,7 +24,7 @@ class Game::EvonyTKR::General::Conflicts :isa(Game::EvonyTKR::Logger) {
   use Game::EvonyTKR::SkillBook::Special;
   use Game::EvonyTKR::SkillBook::Standard;
   use Game::EvonyTKR::Buff::Data;
-  use Game::EvonyTKR::Buff::EvaluationMultipliers;
+  use Game::EvonyTKR::Buff::EvaluationData;
   use namespace::autoclean;
   use Game::EvonyTKR::Logger;
 
@@ -31,10 +33,6 @@ class Game::EvonyTKR::General::Conflicts :isa(Game::EvonyTKR::Logger) {
 
   # some constants
   field $classData = Game::EvonyTKR::Buff::Data->new();
-
-  ADJUST {
-    $classData->set_BuffClasses();
-  }
 
   ADJUST {  
     if(! -r -w  -x -o -d $dbPath) {

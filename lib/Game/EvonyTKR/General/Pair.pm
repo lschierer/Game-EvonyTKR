@@ -1,5 +1,7 @@
 use v5.40.0;
 use experimental qw(class);
+use FindBin;
+use lib "$FindBin::Bin/../../../../lib";
 
 class Game::EvonyTKR::General::Pair {
   use Carp;
@@ -7,8 +9,8 @@ class Game::EvonyTKR::General::Pair {
   use Type::Utils "is";
   use Util::Any -all;
   use Game::EvonyTKR::SkillBook::Special;
+  use Game::EvonyTKR::Buff::EvaluationData;
   use Game::EvonyTKR::General;
-  use Game::EvonyTKR::Buff::EvaluationMultipliers;
   use namespace::autoclean;
   # PODNAME: Game::EvonyTKR::General::Pair
   # ABSTRACT: Manage Game::EvonyTKR::Generals as Pairs
@@ -18,7 +20,6 @@ class Game::EvonyTKR::General::Pair {
     'ne'        => \&_inequality,
     '!='        => \&_inequality,
     "fallback"  => 1;
-
 
   # from Type::Registry, this will save me from some of the struggles I have had with some types having blessed references and others not.
   ADJUST {
