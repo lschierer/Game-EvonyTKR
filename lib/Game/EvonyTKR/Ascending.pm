@@ -209,11 +209,11 @@ class Game::EvonyTKR::Ascending :isa(Game::EvonyTKR::Logger) {
 
   method readFromFile($name) {
     my $AscendingFileName = $name . '.yaml';
-    $self->logger()->debug("about to get $AscendingFileName");
+    $self->logger()->debug("about to get AscendingFile: $AscendingFileName");
     my $AscendingShare = File::Spec->catfile(dist_dir('Game-EvonyTKR'), 'ascending');
     my $FileWithPath = File::Spec->catfile($AscendingShare, $AscendingFileName);
     if( -T -s -r $FileWithPath ) {
-      $self->logger()->debug("$AscendingFileName exists as expected");
+      $self->logger()->debug("AscendingFile $AscendingFileName exists as expected");
       my $data = LoadFile($FileWithPath);
       my @fileLevels = @{ $data->{'ascending'}};
       foreach my $fl (@fileLevels){
