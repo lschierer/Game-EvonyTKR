@@ -17,7 +17,7 @@ levels:
   - attribute: Defense
     class: Ground Troops
     condition:
-    - When_Rallying
+    - When Rallying
     value:
       number: 10
       unit: percentage
@@ -35,7 +35,7 @@ levels:
   - attribute: Attack
     class: Ground Troops
     condition:
-    - When_Rallying
+    - When Rallying
     value:
       number: 10
       unit: percentage

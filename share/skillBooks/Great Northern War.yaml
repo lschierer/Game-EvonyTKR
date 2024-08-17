@@ -3,27 +3,27 @@ name: Great Northern War
 buff:
   - attribute: Attack
     condition:
-      - leading_the_army_to_attack
+      - leading the army to attack
     class: Ranged Troops
     value:
       number: 40
       unit: percentage
   - attribute: March Size Capacity
     condition:
-      - leading_the_army_to_attack
+      - leading the army to attack
     value:
       number: 10
       unit: percentage
   - attribute: Defense
     condition:
-      - leading_the_army_to_attack
+      - leading the army to attack
     class: Siege Machines
     value:
       number: 10
       unit: percentage
   - attribute: Defense
     condition:
-      - leading_the_army_to_attack
+      - leading the army to attack
     class: Ranged Troops
     value:
       number: 10

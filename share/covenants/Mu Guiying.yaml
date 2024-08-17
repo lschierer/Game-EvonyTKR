@@ -33,7 +33,7 @@ levels:
   - attribute: Defense
     class: Siege Machines
     condition:
-    - When_Rallying
+    - When Rallying
     value:
       number: 10
       unit: percentage
@@ -51,7 +51,7 @@ levels:
   - attribute: HP
     class: Siege Machines
     condition:
-    - When_Rallying
+    - When Rallying
     value:
       number: 10
       unit: percentage
@@ -66,7 +66,7 @@ levels:
   - attribute: Attack
     class: Siege Machines
     condition:
-    - When_Rallying
+    - When Rallying
     value:
       number: 15
       unit: percentage

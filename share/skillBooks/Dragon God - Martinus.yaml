@@ -4,14 +4,14 @@ buff:
   - attribute: Attack
     class: Mounted Troops
     condition:
-      - brings_a_dragon
+      - brings a dragon
     value:
       number: 10
       unit: percentage
   - attribute: Defense
     class: Mounted Troops
     condition:
-      - brings_a_dragon
+      - brings a dragon
     value:
       number: 10
       unit: percentage

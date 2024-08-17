@@ -3,42 +3,42 @@ name: Guard of Owl and Serpent
 buff:
   - attribute: Attack
     condition:
-      - leading_the_army_to_attack
+      - leading the army to attack
     class: Siege Machines
     value:
       number: 35
       unit: percentage
   - attribute: Defense
     condition:
-      - leading_the_army_to_attack
+      - leading the army to attack
     class: Siege Machines
     value:
       number: 35
       unit: percentage
   - attribute: Attack
     condition:
-      - brings_dragon_or_beast_to_attack
+      - brings dragon or beast to attack
     class: Ranged Troops
     value:
       number: 10
       unit: percentage
   - attribute: HP
     condition:
-      - brings_dragon_or_beast_to_attack
+      - brings dragon or beast to attack
     class: Ranged Troops
     value:
       number: 10
       unit: percentage
   - attribute: Attack
     condition:
-      - brings_dragon_or_beast_to_attack
+      - brings dragon or beast to attack
     class: Siege Machines
     value:
       number: 10
       unit: percentage
   - attribute: HP
     condition:
-      - brings_dragon_or_beast_to_attack
+      - brings dragon or beast to attack
     class: Siege Machines
     value:
       number: 10

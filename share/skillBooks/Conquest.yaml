@@ -3,14 +3,14 @@ name: Conquest
 buff:
   - attribute: Attack
     condition:
-      - leading_the_army_to_attack
+      - leading the army to attack
     class: Ground Troops
     value:
       number: 20
       unit: percentage
   - attribute: Rally Capacity
     condition:
-      - When_Rallying
+      - When Rallying
     value:
       number: 15
       unit: percentage

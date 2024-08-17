@@ -9,7 +9,7 @@ levels:
   buff:
   - attribute: Attack
     condition:
-    - In_City
+    - In City
     value:
       number: 5
       unit: percentage
@@ -18,7 +18,7 @@ levels:
   buff:
   - attribute: Death to Soul
     condition:
-    - In_Main_City
+    - In Main City
     value:
       number: 10
       unit: percentage
@@ -27,7 +27,7 @@ levels:
   buff:
   - attribute: HP
     condition:
-    - In_City
+    - In City
     value:
       number: 5
       unit: percentage
@@ -36,7 +36,7 @@ levels:
   buff:
   - attribute: Defense
     condition:
-    - In_City
+    - In City
     value:
       number: 5
       unit: percentage
@@ -46,14 +46,14 @@ levels:
   - attribute: HP
     class: Ground Troops
     condition:
-    - In_City
+    - In City
     value:
       number: 10
       unit: percentage
   - attribute: Defense
     class: Ground Troops
     condition:
-    - In_City
+    - In City
     value:
       number: 10
       unit: percentage
@@ -63,28 +63,28 @@ levels:
   - attribute: Defense
     class: Ground Troops
     condition:
-    - In_City
+    - In City
     value:
       number: 5
       unit: percentage
   - attribute: Defense
     class: Mounted Troops
     condition:
-    - In_City
+    - In City
     value:
       number: 5
       unit: percentage
   - attribute: HP
     class: Ground Troops
     condition:
-    - In_City
+    - In City
     value:
       number: 5
       unit: percentage
   - attribute: HP
     class: Mounted Troops
     condition:
-    - In_City
+    - In City
     value:
       number: 5
       unit: percentage
@@ -94,7 +94,7 @@ levels:
   - attribute: Attack
     class: Ground Troops
     condition:
-    - In_City
+    - In City
     value:
       number: 30
       unit: percentage

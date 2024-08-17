@@ -6,7 +6,7 @@ levels:
       - attribute: Attack
         class: Mounted Troops
         condition:
-          - dragon_to_the_attack
+          - dragon to the attack
         value:
           number: 5
           unit: percentage
@@ -15,7 +15,7 @@ levels:
       - attribute: Attack
         class: Mounted Troops
         condition:
-          - dragon_to_the_attack
+          - dragon to the attack
         value:
           number: 5
           unit: percentage
@@ -24,7 +24,7 @@ levels:
       - attribute: Attack
         class: Mounted Troops
         condition:
-          - dragon_to_the_attack
+          - dragon to the attack
         value:
           number: 9
           unit: percentage
@@ -33,7 +33,7 @@ levels:
       - attribute: Attack
         class: Mounted Troops
         condition:
-          - dragon_to_the_attack
+          - dragon to the attack
         value:
           number: 9
           unit: percentage
@@ -42,7 +42,7 @@ levels:
       - attribute: Attack
         class: Mounted Troops
         condition:
-          - dragon_to_the_attack
+          - dragon to the attack
         value:
           number: 18
           unit: percentage

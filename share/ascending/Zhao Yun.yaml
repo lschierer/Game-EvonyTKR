@@ -3,7 +3,7 @@ ascending:
 - level: '1Red'
   buff:
     - condition:
-        - leading_the_army_to_attack
+        - leading the army to attack
       attribute: Attack
       class: Mounted Troops
       value:
@@ -12,7 +12,7 @@ ascending:
     - attribute: Defense
       class: Mounted Troops
       condition:
-        - leading_the_army_to_attack
+        - leading the army to attack
       value:
         number: 10
         unit: percentage
@@ -20,7 +20,7 @@ ascending:
   buff:
     - attribute: Wounded to Death
       condition:
-        - Enemy_In_City
+        - Enemy In City
       value:
         number: 10
         unit: percentage
@@ -28,7 +28,7 @@ ascending:
   buff:
     - attribute: Rally Capacity
       condition:
-        - When_Rallying
+        - When Rallying
       value:
         number: 8
         unit: percentage
@@ -52,14 +52,14 @@ ascending:
   buff:
     - attribute: Attack
       condition:
-        - leading_the_army_to_attack
+        - leading the army to attack
       class: Mounted Troops
       value:
         number: 25
         unit: percentage
     - attribute: Defense
       condition:
-        - leading_the_army_to_attack
+        - leading the army to attack
       class: Mounted Troops
       value:
         number: 20

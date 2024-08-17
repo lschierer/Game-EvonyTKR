@@ -11,7 +11,7 @@ ascending:
   buff:
     - attribute: Wounded to Death
       condition:
-        - Enemy_In_City
+        - Enemy In City
       value:
         number: 8
         unit: percentage
@@ -19,7 +19,7 @@ ascending:
   buff:
     - attribute: Rally Capacity
       condition:
-        - When_Rallying
+        - When Rallying
       value:
         number: 6
         unit: percentage
@@ -40,7 +40,7 @@ ascending:
     - attribute: Attack
       class: Mounted Troops
       condition:
-        - dragon_to_the_attack
+        - dragon to the attack
       value:
         number: 20
         unit: percentage

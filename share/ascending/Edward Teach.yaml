@@ -29,7 +29,7 @@ ascending:
         unit: percentage
     - attribute: Rally Capacity
       condition:
-        - When_Rallying
+        - When Rallying
       value:
         number: 8
         unit: percentage

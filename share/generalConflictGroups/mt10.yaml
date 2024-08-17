@@ -4,18 +4,18 @@ members:
   - Caesar
 books:
   - book:
-      name: Monster Mounted Attack Increase
+      name: MonstersMounted Attack Increase
       level: 1
     condition: all the time
   - book:
-      name: Monster Mounted Attack Increase
+      name: MonstersMounted Attack Increase
       level: 2
     condition: all the time
   - book:
-      name: Monster Mounted Attack Increase
+      name: MonstersMounted Attack Increase
       level: 3
     condition: all the time
   - book:
-      name: Monster Mounted Attack Increase
+      name: MonstersMounted Attack Increase
       level: 4
     condition: all the time

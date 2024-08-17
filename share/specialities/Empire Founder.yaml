@@ -5,7 +5,7 @@ levels:
     buff:
       - attribute: SubCity Construction Speed
         condition:
-          - When_City_Mayor_for_this_SubCity
+          - When City Mayor for this SubCity
         value:
           number: 0
           unit: percentage
@@ -13,7 +13,7 @@ levels:
     buff:
       - attribute: SubCity Construction Speed
         condition:
-          - When_City_Mayor_for_this_SubCity
+          - When City Mayor for this SubCity
         value:
           number: 0
           unit: percentage
@@ -21,7 +21,7 @@ levels:
     buff:
       - attribute: SubCity Construction Speed
         condition:
-          - When_City_Mayor_for_this_SubCity
+          - When City Mayor for this SubCity
         value:
           number: 0
           unit: percentage
@@ -29,7 +29,7 @@ levels:
     buff:
       - attribute: SubCity Construction Speed
         condition:
-          - When_City_Mayor_for_this_SubCity
+          - When City Mayor for this SubCity
         value:
           number: 0
           unit: percentage
@@ -37,7 +37,7 @@ levels:
     buff:
       - attribute: SubCity Construction Speed
         condition:
-          - When_City_Mayor_for_this_SubCity
+          - When City Mayor for this SubCity
         value:
           number: 80
           unit: percentage

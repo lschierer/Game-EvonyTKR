@@ -19,8 +19,9 @@ ascending:
 - level: '2Red'
   buff:
     - attribute: Defense
+      class: Monsters
       condition:
-        - Reduces Monster
+        - Reduces 
       value:
         number: 10
         unit: percentage
@@ -33,8 +34,9 @@ ascending:
 - level: '3Red'
   buff:
     - attribute: Attack
+      class: Monsters
       condition:
-        - Reduces Monster
+        - Reduces 
       value:
         number: 10
         unit: percentage

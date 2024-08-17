@@ -4,28 +4,28 @@ ascending:
   buff:
     - attribute: Attack
       condition:
-        - leading_the_army_to_attack
+        - leading the army to attack
       class: Mounted Troops
       value:
         number: 10
         unit: percentage
     - attribute: Attack
       condition:
-        - leading_the_army_to_attack
+        - leading the army to attack
       class: Ground Troops
       value:
         number: 10
         unit: percentage
     - attribute: Defense
       condition:
-        - leading_the_army_to_attack
+        - leading the army to attack
       class: Mounted Troops
       value:
         number: 10
         unit: percentage
     - attribute: Defense
       condition:
-        - leading_the_army_to_attack
+        - leading the army to attack
       class: Ground Troops
       value:
         number: 10
@@ -34,7 +34,7 @@ ascending:
   buff:
     - attribute: Death to Wounded
       condition:
-        - leading_the_army_to_attack
+        - leading the army to attack
       value:
         number: 10
         unit: percentage
@@ -42,7 +42,7 @@ ascending:
   buff:
     - attribute: Rally Capacity
       condition:
-        - When_Rallying
+        - When Rallying
       value:
         number: 8
         unit: percentage
@@ -50,28 +50,28 @@ ascending:
   buff:
     - attribute: Attack
       condition:
-        - leading_the_army_to_attack
+        - leading the army to attack
       class: Mounted Troops
       value:
         number: 10
         unit: percentage
     - attribute: Attack
       condition:
-        - leading_the_army_to_attack
+        - leading the army to attack
       class: Ground Troops
       value:
         number: 10
         unit: percentage
     - attribute: HP
       condition:
-        - leading_the_army_to_attack
+        - leading the army to attack
       class: Mounted Troops
       value:
         number: 10
         unit: percentage
     - attribute: HP
       condition:
-        - leading_the_army_to_attack
+        - leading the army to attack
       class: Ground Troops
       value:
         number: 10
@@ -80,42 +80,42 @@ ascending:
   buff:
     - attribute: Attack
       condition:
-        - leading_the_army_to_attack
+        - leading the army to attack
       class: Mounted Troops
       value:
         number: 10
         unit: percentage
     - attribute: Attack
       condition:
-        - leading_the_army_to_attack
+        - leading the army to attack
       class: Ground Troops
       value:
         number: 10
         unit: percentage
     - attribute: Defense
       condition:
-        - leading_the_army_to_attack
+        - leading the army to attack
       class: Mounted Troops
       value:
         number: 10
         unit: percentage
     - attribute: Defense
       condition:
-        - leading_the_army_to_attack
+        - leading the army to attack
       class: Ground Troops
       value:
         number: 10
         unit: percentage
     - attribute: HP
       condition:
-        - leading_the_army_to_attack
+        - leading the army to attack
       class: Mounted Troops
       value:
         number: 10
         unit: percentage
     - attribute: HP
       condition:
-        - leading_the_army_to_attack
+        - leading the army to attack
       class: Ground Troops
       value:
         number: 10

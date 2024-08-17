@@ -3,14 +3,14 @@ name: Conqueror at Sea
 buff:
   - attribute: Attack
     condition:
-      - leading_the_army_to_attack
+      - leading the army to attack
     class: Mounted Troops
     value:
       number: 25
       unit: percentage
   - attribute: Rally Capacity
     condition:
-      - When_Rallying
+      - When Rallying
     value:
       number: 10
       unit: percentage

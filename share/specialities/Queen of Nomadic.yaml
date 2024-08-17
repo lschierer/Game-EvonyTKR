@@ -19,7 +19,7 @@ levels:
           unit: percentage
       - attribute: Rally Capacity
         condition:
-          - When_Rallying
+          - When Rallying
         value:
           number: 1
           unit: percentage
@@ -41,7 +41,7 @@ levels:
           unit: percentage
       - attribute: Rally Capacity
         condition:
-          - When_Rallying
+          - When Rallying
         value:
           number: 1
           unit: percentage
@@ -63,7 +63,7 @@ levels:
           unit: percentage
       - attribute: Rally Capacity
         condition:
-          - When_Rallying
+          - When Rallying
         value:
           number: 1
           unit: percentage
@@ -85,7 +85,7 @@ levels:
           unit: percentage
       - attribute: Rally Capacity
         condition:
-          - When_Rallying
+          - When Rallying
         value:
           number: 1
           unit: percentage
@@ -107,7 +107,7 @@ levels:
           unit: percentage
       - attribute: Rally Capacity
         condition:
-          - When_Rallying
+          - When Rallying
         value:
           number: 1
           unit: percentage

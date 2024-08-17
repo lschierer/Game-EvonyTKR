@@ -27,7 +27,7 @@ ascending:
   buff:
     - attribute: Wounded to Death
       condition:
-        - Enemy_In_City
+        - Enemy In City
       value:
         number: 10
         unit: percentage

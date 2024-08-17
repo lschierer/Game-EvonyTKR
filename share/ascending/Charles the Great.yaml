@@ -32,9 +32,9 @@ ascending:
       value:
         number: 5
         unit: percentage
-    - attribute: SubCity_Training Speed
+    - attribute: SubCity Training Speed
       condition:
-        - When_City_Mayor_for_this_SubCity
+        - When City Mayor for this SubCity
       value:
         number: 30
         unit: percentage
@@ -56,7 +56,7 @@ ascending:
         unit: percentage
     - attribute: Death to Survival
       condition:
-        - When_City_Mayor_for_this_SubCity
+        - When City Mayor for this SubCity
       value:
         number: 20
         unit: percentage

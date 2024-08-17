@@ -20,7 +20,7 @@ ascending:
   buff:
     - attribute: Death to Wounded
       condition:
-        - leading_the_army_to_attack
+        - leading the army to attack
       value:
         number: 10
         unit: percentage

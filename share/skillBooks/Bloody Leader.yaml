@@ -3,13 +3,13 @@ name: Bloody Leader
 buff:
   - attribute: March Size Capacity
     condition:
-      - leading_the_army_to_attack
+      - leading the army to attack
     value:
       number: 10
       unit: percentage
   - attribute: Attack
     condition:
-      - leading_the_army_to_attack
+      - leading the army to attack
     class: Mounted Troops
     value:
       number: 15

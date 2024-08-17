@@ -13,14 +13,14 @@ buff:
       unit: percentage
   - attribute: Attack
     condition:
-      - brings_dragon_or_beast_to_attack
+      - brings dragon or beast to attack
     class: Siege Machines
     value:
       number: 10
       unit: percentage
   - attribute: Attack
     condition:
-      - brings_dragon_or_beast_to_attack
+      - brings dragon or beast to attack
     class: Ranged Troops
     value:
       number: 10

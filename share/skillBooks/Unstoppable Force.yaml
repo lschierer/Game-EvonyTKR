@@ -4,28 +4,28 @@ buff:
   - attribute: Attack
     class: Ranged Troops
     condition:
-      - leading_the_army_to_attack
+      - leading the army to attack
     value:
       number: 45
       unit: percentage
   - attribute: Defense
     class: Ranged Troops
     condition:
-      - leading_the_army_to_attack
+      - leading the army to attack
     value:
       number: 45
       unit: percentage
   - attribute: HP
     class: Ranged Troops
     condition:
-      - brings_dragon_or_beast_to_attack
+      - brings dragon or beast to attack
     value:
       number: 35
       unit: percentage
   - attribute: HP
     class: Siege Machines
     condition:
-      - brings_dragon_or_beast_to_attack
+      - brings dragon or beast to attack
     value:
       number: 35
       unit: percentage

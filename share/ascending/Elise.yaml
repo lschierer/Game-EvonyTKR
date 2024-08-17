@@ -18,7 +18,7 @@ ascending:
         unit: percentage
     - attribute: Attack
       condition:
-        - dragon_to_the_attack
+        - dragon to the attack
       class: Ground Troops
       value:
         number: 15
@@ -27,7 +27,7 @@ ascending:
   buff:
     - attribute: Wounded to Death
       condition:
-        - Enemy_In_City
+        - Enemy In City
       value:
         number: 10
         unit: percentage
@@ -61,14 +61,14 @@ ascending:
     - attribute: Defense
       class: Mounted Troops
       condition:
-        - leading_the_army_to_attack
+        - leading the army to attack
       value:
         number: 10
         unit: percentage
     - attribute: Attack
       class: Ground Troops
       condition:
-        - dragon_to_the_attack
+        - dragon to the attack
       value:
         number: 20
         unit: percentage

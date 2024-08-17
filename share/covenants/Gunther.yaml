@@ -20,14 +20,14 @@ levels:
   - attribute: Defense
     class: Ranged Troops
     condition:
-    - When_Rallying
+    - When Rallying
     value:
       number: 5
       unit: percentage
   - attribute: Defense
     class: Siege Machines
     condition:
-    - When_Rallying
+    - When Rallying
     value:
       number: 5
       unit: percentage

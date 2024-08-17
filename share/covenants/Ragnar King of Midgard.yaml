@@ -45,7 +45,7 @@ levels:
       - attribute: Attack
         class: Ranged Troops
         condition:
-          - When_Rallying
+          - When Rallying
         value:
           number: 10
           unit: percentage

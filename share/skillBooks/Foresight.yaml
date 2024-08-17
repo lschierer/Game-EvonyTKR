@@ -3,7 +3,7 @@ name: Foresight
 buff:
   - attribute: Attack
     condition:
-      - leading_the_army_to_attack
+      - leading the army to attack
     class: Mounted Troops
     value:
       number: 40
@@ -14,14 +14,14 @@ buff:
       number: 40
       unit: percentage
   - condition:
-      - leading_the_army_to_attack
+      - leading the army to attack
     attribute: Defense
     class: Mounted Troops
     value:
       number: 25
       unit: percentage
   - condition:
-      - leading_the_army_to_attack
+      - leading the army to attack
     attribute: HP
     class: Mounted Troops
     value:

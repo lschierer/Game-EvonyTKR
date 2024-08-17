@@ -8,7 +8,7 @@ buff:
       unit: percentage
   - attribute: Attack
     condition:
-      - dragon_to_the_attack
+      - dragon to the attack
     class: Mounted Troops
     value:
       number: 15

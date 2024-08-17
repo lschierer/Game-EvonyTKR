@@ -2,21 +2,21 @@
 name: Restorer of the World
 buff:
   - condition:
-      - leading_the_army_to_attack
+      - leading the army to attack
     class: Ground Troops
     attribute: Attack
     value:
       number: 40
       unit: percentage
   - condition:
-      - leading_the_army_to_attack
+      - leading the army to attack
     class: Ground Troops
     attribute: HP
     value:
       number: 35
       unit: percentage
   - condition:
-      - leading_the_army_to_attack
+      - leading the army to attack
     class: Mounted Troops
     attribute: HP
     value:

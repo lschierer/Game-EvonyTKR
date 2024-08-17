@@ -8,8 +8,9 @@ levels:
   type: personal
   buff:
   - attribute: Defense
+    class: Monsters
     condition:
-    - Reduces Monster
+    - Reduces 
     value:
       number: 10
       unit: percentage

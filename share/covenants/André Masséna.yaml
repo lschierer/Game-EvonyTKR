@@ -8,8 +8,9 @@ levels:
   type: personal
   buff:
   - attribute: Defense
+    class: Monsters
     condition:
-    - Reduces Monster
+    - Reduces 
     value:
       number: 8
       unit: percentage
@@ -26,7 +27,7 @@ levels:
   - attribute: Defense
     class: Mounted Troops
     condition:
-    - When_Rallying
+    - When Rallying
     value:
       number: 10
       unit: percentage
@@ -79,21 +80,21 @@ levels:
   - attribute: Attack
     class: Ground Troops
     condition:
-    - When_Rallying
+    - When Rallying
     value:
       number: 10
       unit: percentage
   - attribute: Attack
     class: Mounted Troops
     condition:
-    - When_Rallying
+    - When Rallying
     value:
       number: 10
       unit: percentage
   - attribute: Attack
     class: Mounted Troops
     condition:
-    - When_Rallying
+    - When Rallying
     value:
       number: 10
       unit: percentage

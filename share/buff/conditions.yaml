@@ -3,24 +3,24 @@ conditions:
   - Against Monsters
   - Attacking
   - Defending
-  - During_SvS
+  - During SvS
   - Enemy
-  - Enemy_In_City
-  - In_City
-  - In_Main_City
+  - Enemy In City
+  - In City
+  - In Main City
   - Marching
-  - Reduces_Enemy
-  - Reduces_Enemy_in_Attack
-  - Reduces_Enemy_with_a_Dragon
-  - Reduces Monster
+  - Reduces Enemy
+  - Reduces Enemy in Attack
+  - Reduces Enemy with a Dragon
+  - Reduces Monsters
   - Reinforcing
-  - When_City_Mayor
-  - When_City_Mayor_for_this_SubCity
-  - When_Defending_Outside_The_Main_City
-  - When_Rallying
-  - When_The_Main_Defense_General
-  - When_an_officer
-  - brings_a_dragon
-  - brings_dragon_or_beast_to_attack
-  - dragon_to_the_attack
-  - leading_the_army_to_attack
+  - When City Mayor
+  - When City Mayor for this SubCity
+  - When Defending Outside The Main City
+  - When Rallying
+  - When The Main Defense General
+  - When an officer
+  - brings a dragon
+  - brings dragon or beast to attack
+  - dragon to the attack
+  - leading the army to attack

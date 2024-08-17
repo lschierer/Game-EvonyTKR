@@ -30,7 +30,7 @@ levels:
   - attribute: Defense
     class: Siege Machines
     condition:
-    - When_Rallying
+    - When Rallying
     value:
       number: 10
       unit: percentage

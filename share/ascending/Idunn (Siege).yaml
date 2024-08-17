@@ -14,7 +14,7 @@ ascending:
         unit: percentage
     - attribute: Attack
       condition:
-        - When_Defending_Outside_The_Main_City
+        - When Defending Outside The Main City
       class: Ranged Troops
       value:
         number: 10
@@ -23,13 +23,13 @@ ascending:
   buff:
     - attribute: Death to Wounded
       condition:
-        - When_Defending_Outside_The_Main_City
+        - When Defending Outside The Main City
       value:
         number: 8
         unit: percentage
     - attribute: Defense
       condition:
-        - When_Defending_Outside_The_Main_City
+        - When Defending Outside The Main City
       class: Ranged Troops
       value:
         number: 15
@@ -42,7 +42,7 @@ ascending:
         unit: percentage
     - attribute: Attack
       condition:
-        - When_Defending_Outside_The_Main_City
+        - When Defending Outside The Main City
       class: Ranged Troops
       value:
         number: 15
@@ -61,14 +61,14 @@ ascending:
         unit: percentage
     - attribute: Defense
       condition:
-        - When_Defending_Outside_The_Main_City
+        - When Defending Outside The Main City
       class: Ranged Troops
       value:
         number: 25
         unit: percentage
     - attribute: HP
       condition:
-        - When_Defending_Outside_The_Main_City
+        - When Defending Outside The Main City
       class: Ranged Troops
       value:
         number: 25
@@ -82,14 +82,14 @@ ascending:
         unit: percentage
     - attribute: Attack
       condition:
-        - When_Defending_Outside_The_Main_City
+        - When Defending Outside The Main City
       class: Ranged Troops
       value:
         number: 35
         unit: percentage
     - attribute: Defense
       condition:
-        - When_Defending_Outside_The_Main_City
+        - When Defending Outside The Main City
       class: Ranged Troops
       value:
         number: 35

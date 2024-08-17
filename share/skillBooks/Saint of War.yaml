@@ -3,21 +3,21 @@ name: Saint of War
 buff:
   - attribute: Attack
     condition:
-      - leading_the_army_to_attack
+      - leading the army to attack
     class: Ground Troops
     value:
       number: 30
       unit: percentage
   - attribute: HP
     condition:
-      - leading_the_army_to_attack
+      - leading the army to attack
     class: Ground Troops
     value:
       number: 20
       unit: percentage
   - attribute: HP
     condition:
-      - leading_the_army_to_attack
+      - leading the army to attack
     class: Mounted Troops
     value:
       number: 20

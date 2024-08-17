@@ -3,41 +3,46 @@ name: Hunter
 levels:
   - level: Green
     buff:
-      - condition:
-          - Reduces Monster
-        attribute: Attack
+      - attribute: Attack
+        class: Monsters
+        condition:
+          - Reduces 
         value:
           number: 1
           unit: percentage
   - level: Blue
     buff:
-      - condition:
-          - Reduces Monster
-        attribute: Attack
+      - attribute: Attack
+        condition:
+          - Reduces 
+        class: Monsters
         value:
           number: 2
           unit: percentage
   - level: Purple
     buff:
-      - condition:
-          - Reduces Monster
-        attribute: Attack
+      - attribute: Attack
+        class: Monsters
+        condition:
+          - Reduces 
         value:
           number: 3
           unit: percentage
   - level: Orange
     buff:
-      - condition:
-          - Reduces Monster
-        attribute: Attack
+      - attribute: Attack
+        class: Monsters
+        condition:
+          - Reduces 
         value:
           number: 3
           unit: percentage
   - level: Gold
     buff:
-      - condition:
-          - Reduces Monster
-        attribute: Attack
+      - attribute: Attack
+        class: Monsters
+        condition:
+          - Reduces 
         value:
           number: 6
           unit: percentage

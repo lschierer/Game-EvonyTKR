@@ -4,20 +4,20 @@ buff:
   - attribute: HP
     class: Ground Troops
     condition:
-      - leading_the_army_to_attack
+      - leading the army to attack
     value:
       number: 30
       unit: percentage
   - attribute: HP
     class: Mounted Troops
     condition:
-      - leading_the_army_to_attack
+      - leading the army to attack
     value:
       number: 30
       unit: percentage
   - attribute: Attack
     condition:
-      - dragon_to_the_attack
+      - dragon to the attack
     class: Ground Troops
     value:
       number: 30

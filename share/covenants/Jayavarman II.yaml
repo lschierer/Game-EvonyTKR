@@ -20,7 +20,7 @@ levels:
   - attribute: Defense
     class: Mounted Troops
     condition:
-    - When_Rallying
+    - When Rallying
     value:
       number: 5
       unit: percentage
@@ -62,14 +62,14 @@ levels:
   - attribute: HP
     class: Mounted Troops
     condition:
-    - When_Rallying
+    - When Rallying
     value:
       number: 10
       unit: percentage
   - attribute: Attack
     class: Mounted Troops
     condition:
-    - When_Rallying
+    - When Rallying
     value:
       number: 5
       unit: percentage

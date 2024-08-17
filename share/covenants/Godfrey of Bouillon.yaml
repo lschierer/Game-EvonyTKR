@@ -73,14 +73,14 @@ levels:
   - attribute: HP
     class: Ranged Troops
     condition:
-    - In_City
+    - In City
     value:
       number: 10
       unit: percentage
   - attribute: HP
     class: Siege Machines
     condition:
-    - In_City
+    - In City
     value:
       number: 10
       unit: percentage
@@ -90,28 +90,28 @@ levels:
   - attribute: Attack
     class: Ranged Troops
     condition:
-    - In_City
+    - In City
     value:
       number: 5
       unit: percentage
   - attribute: Attack
     class: Siege Machines
     condition:
-    - In_City
+    - In City
     value:
       number: 5
       unit: percentage
   - attribute: Defense
     class: Ranged Troops
     condition:
-    - In_City
+    - In City
     value:
       number: 5
       unit: percentage
   - attribute: Defense
     class: Siege Machines
     condition:
-    - In_City
+    - In City
     value:
       number: 5
       unit: percentage

@@ -4,13 +4,13 @@ buff:
   - attribute: Attack
     class: Ranged Troops
     condition:
-      - leading_the_army_to_attack
+      - leading the army to attack
     value:
       number: 10
       unit: percentage
   - attribute: Rally Capacity
     condition:
-      - When_Rallying
+      - When Rallying
     value:
       number: 10
       unit: percentage
