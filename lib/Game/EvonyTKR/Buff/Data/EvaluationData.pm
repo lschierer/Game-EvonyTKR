@@ -1,9 +1,10 @@
 use v5.40.0;
 use experimental qw(class);
 use FindBin;
-use lib "$FindBin::Bin/../../../../lib";
+use lib "$FindBin::Bin/../../../../../lib";
 
-class Game::EvonyTKR::Buff::EvaluationMultipliers :isa(Game::EvonyTKR::Logger) {
+class Game::EvonyTKR::Buff::Data::EvaluationData 
+  :isa(Game::EvonyTKR::Buff::Data) {
   use Carp;
   use Data::Printer;
   use Types::Common qw( t is_Num is_Str is_Int);
@@ -11,7 +12,7 @@ class Game::EvonyTKR::Buff::EvaluationMultipliers :isa(Game::EvonyTKR::Logger) {
   use Util::Any -all;
   use Game::EvonyTKR::Buff::Data;
   use namespace::autoclean;
-# PODNAME: Game::EvonyTKR::Buff::EvaluationMultipliers
+# PODNAME: Game::EvonyTKR::Buff::EvaluationData
 
 # ABSTRACT: Module for processing information about Evony TKR Generals.
 
@@ -24,36 +25,11 @@ class Game::EvonyTKR::Buff::EvaluationMultipliers :isa(Game::EvonyTKR::Logger) {
     }
   }
 
-  my $classData = Game::EvonyTKR::Buff::Data->new();
-  field @BuffAttributes :reader;
-  field @BuffConditions :reader;
-  field @BuffClasses :reader;
-
   ADJUST {
-    if(scalar @BuffAttributes == 0) {
-      $classData->set_BuffAttributes();
-      @BuffAttributes = $classData->BuffAttributes();
-    }
-
-    if(scalar @BuffConditions == 0) {
-      $classData->set_BuffConditions();
-      @BuffConditions = $classData->BuffConditions();
-    }
-
-    if(scalar @BuffClasses == 0) {
-      $classData->set_BuffClasses();
-      @BuffClasses = $classData->BuffClasses();
+    if(scalar $self->BuffAttributes() == 0) {
+      $self->set_BuffAttributes();
     }
   }
-
-  field @debuffConditions :reader = (
-    'Enemy',
-    'Enemy_In_City',
-    'Reduces_Enemy',
-    'Reduces_Enemy_in_Attack',
-    'Reduces_Enemy_with_a_Dragon',
-    'Reduces Monster',
-  );
 
   method getMultiplierForBuff {
     $self->logcroak("getMultiplierForBuff not implemented, parent called");
@@ -161,7 +137,7 @@ auto generated constructor for this class
 returns an array of supported attributes that a Game::EvonyTKR::Buff can have
 =cut
 
-=method BuffConditions()
+=method AllConditions()
 
 returns an array of supported conditions that a Game::EvonyTKR::Buff can have
 =cut
@@ -171,7 +147,7 @@ returns an array of supported conditions that a Game::EvonyTKR::Buff can have
 returns an array of supported troop classes that a Game::EvonyTKR::Buff can have
 =cut
 
-=method debuffConditions()
+=method deAllConditions()
 
 returns an array of those conditions that are Debuffs rather than Buffs.
 =cut

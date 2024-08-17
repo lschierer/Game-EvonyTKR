@@ -1,8 +1,10 @@
-use v5.40.0;
 use experimental 'class';
 use utf8::all;
+use FindBin;
+use lib "$FindBin::Bin/../../../../lib";
 
-class Game::EvonyTKR::Buff::Data {
+class Game::EvonyTKR::Buff::Data 
+  :isa(Game::EvonyTKR::Logger) {
 
 use Types::Standard qw(is_Int Int Str is_Str);
 use Types::Common::Numeric qw(PositiveOrZeroInt);
@@ -14,17 +16,36 @@ use namespace::autoclean;
 # PODNAME: Game::EvonyTKR::Buff::Data
 # ABSTRACT: Data files for Game::EvonyTKR::Buff
 
-=head1 DESCRIPTION
+field @buffConditions :reader = (
+    'Against Monsters',
+    'Attacking',
+    'Defending',
+    'During SvS',
+    'In City',
+    'In Main City',
+    'Marching',
+    'Reinforcing',
+    'When City Mayor',
+    'When City Mayor for this SubCity',
+    'When Defending Outside The Main City',
+    'When Rallying',
+    'When The Main Defense General',
+    'When an officer',
+    'brings a dragon',
+    'brings dragon or beast to attack',
+    'dragon to the attack',
+    'leading the army to attack',
+  );
 
-Due to the encapsulation and initialization order requirements, even if the perlclass feature had already implemented the :common attribute, things marked as common would not be initialized in time for other parameters to validate against them.  Thus I need a ::Data class that users can initialize first.
+  field @debuffConditions :reader = (
+    'Enemy',
+    'Enemy In City',
+    'Reduces Enemy',
+    'Reduces Enemy in Attack',
+    'Reduces Enemy with a Dragon',
+    'Reduces',
+  );
 
-=cut
-
-=attr BuffAttributes
-Array Attribute.
-
-A buff will have exactly one attribute from this list of possible Attributes.  This list is effeectively attempting to replace having an enum.
-=cut
 
   field @BuffAttributes :reader;
 
@@ -41,49 +62,20 @@ get the possible attributes from the yaml data file in the shared directory and 
     @BuffAttributes = @{ $data->{'attributes'} };
   }
 
-=attr BuffConditions
-Array attribute.
-
-A buff will have one or more conditions from this list of Conditioons.  This list is effectively attempting to replace having an emum.
-=cut
-  field @BuffConditions :reader;
-
-=method set_BuffConditions()
-
-read the possible conditions from the yaml file in the shared directory into memory
-=cut
-  method set_BuffConditions {
-    my $data_location = dist_file('Game-EvonyTKR', 'buff/conditions.yaml');
-    open(my $DATA, '<', $data_location) or die $!;
-    my $yaml = do { local $/; <$DATA> };
-    my $data = Load $yaml;
-    close $DATA;
-    @BuffConditions = @{ $data->{'conditions'} };
+  method AllConditions() {
+    return  ( @buffConditions, @debuffConditions);
   }
-
-=attr BuffClasses
-Array attribute.
-
-A buff will affect either exactly one or All classes of troops. This is attempting to replace having an enum.
-=cut
-  field @BuffClasses :reader;
-
-=method set_BuffClasses()
-
-read the possible troop classes from the yaml file in the shared directory into memory.
-=cut
-  method set_BuffClasses {
-    my $data_location = dist_file('Game-EvonyTKR', 'buff/classes.yaml');
-    open(my $DATA, '<', $data_location) or die $!;
-    my $yaml = do { local $/; <$DATA> };
-    my $data = Load $yaml;
-    close $DATA;
-
-    @BuffClasses = @{ $data->{'classes'} };
-  }
+  
+  field @BuffClasses :reader = (
+    'Ground Troops',
+    'Mounted Troops',
+    'Ranged Troops',
+    'Siege Machines',
+    'All Troops',
+    'Monsters',
+  );
 
 }
-
 1;
 
 __END__
@@ -91,4 +83,39 @@ __END__
 =method new()
 
 instantiate the shared data helper functions.
+=cut
+
+=head1 DESCRIPTION
+
+Due to the encapsulation and initialization order requirements, even if the perlclass feature had already implemented the :common attribute, things marked as common would not be initialized in time for other parameters to validate against them.  Thus I need a ::Data class that users can initialize first.
+
+=cut
+
+=method buffConditions
+
+returns those conditions that are only relevant to Buffs.
+=cut
+
+=method debuffConditions
+
+returns those conditions that are only relevant to Debuffs.
+=cut
+
+=method BuffAttributes
+
+Returns an array of possible attributes such that each buff will have exactly one attribute from this list of possible Attributes.  This list is effectively attempting to replace having an enum.
+=cut
+
+=method AllConditions
+
+A buff will have one or more conditions from this list of Conditioons.  This list is effectively attempting to replace having an emum.
+
+This includes both Buff and Debuff conditions. see buffConditions() and debuffConditions().
+=cut
+
+=method BuffClasses
+
+A *buff* will affect either exactly one or All classes of troops. This is attempting to replace having an enum.
+
+A *General* can have more than one Class from this list.  That is because General Classes and Buff classes are the same values, but used totally differently. 
 =cut
