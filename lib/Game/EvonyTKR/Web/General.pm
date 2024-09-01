@@ -25,46 +25,69 @@ package Game::EvonyTKR::Web::General {
   use Carp;
   use Util::Any -all;
   use YAML::XS qw{ LoadFile Load };
+  use Game::EvonyTKR::Web::Store;
   use namespace::clean;
   use Dancer2 appname => 'Game::EvonyTKR';
+  use Dancer2::Plugin::REST;
 
-  my %generals;
+  my $store;
   my $logger = Log::Log4perl::get_logger('Web::General');
 
   sub _init {
-    my $gencount = scalar keys %generals;
+    $store = Game::EvonyTKR::Web::Store::get_store();
+    if(not exists $$store{'generals'} ) {
+      $$store{'generals'} = {};
+    }
+    my $gencount = scalar keys %{$store->{'generals'}};
     if ($gencount == 0) {
       _read_generals();
-      $gencount = scalar keys %generals;
+      $gencount = scalar keys %{$store->{'generals'}};
       $logger->debug("After Reading, I have $gencount generals available.");
     } else {
-      $logger->debug("I have $gencount generals available.");
+      $logger->debug("I have $gencount generals already available; reading unnecessary");
     }
   }
 
-  prefix '/general' => sub {
-    prefix '/all' => sub {
-      get '' => \&_all;
-    };
-    prefix '/by_id' => sub {
-      get '/:id' => \&_by_id;
-    };
+  prefix '/generals' => sub {
+    get '/details' => \&_all;
+    get '/list'    => \&_list;
   };
+
+  prefix '/general' => sub {
+    get '/:id'  => \&_by_id;
+  };
+
+  sub _list {
+    _init();
+    my @list;
+    while (my ($key, $value) = each %{$store->{'generals'}}) {
+      push @list, $value->name();
+    }
+    return \@list;
+  }
 
   sub _all {
     _init();
-    my @data;
-    while (my ($key, $value) = each %generals) {
-      push @data, $value->toHashRef();
+    my @data = ();
+    $logger->debug("sub _all has " . scalar %{$store->{'generals'}} . " generals");
+
+    while (my ($key, $value) = each %{$store->{'generals'}}) {
+      $logger->trace("getting data for ". $value->name());
+      my $name = $value->name();
+      my $hashedGeneral = $value->toHashRef();
+      $logger->trace("$name has a hashed size of " . scalar %$hashedGeneral);
+      push @data, $hashedGeneral;
     }
-    return \@data;
+    $logger->debug('returning data array with size ' . scalar @data);
+    #$logger->debug(Data::Printer::np @data);
+    return \@data ;
   }
 
   sub _by_id {
     _init();
     my $id = route_parameters->get('id');
-    if (exists $generals{$id}) {
-      my $general = $generals{$id};
+    if (exists $store->{'generals'}->{$id} ) {
+      my $general = $store->{'generals'}->{$id};
 
       my $level = query_parameters->get('level');
       if (defined $level) {
@@ -90,7 +113,7 @@ package Game::EvonyTKR::Web::General {
         }
       }
       my $ascendingLevel = query_parameters->get('ascendingLevel');
-      
+
       if (defined $ascendingLevel) {
         $logger->debug("Query ascendingLevel is '$ascendingLevel'");
         if ($ascendingLevel =~ /[1-5](Red|Purple)/) {
@@ -107,14 +130,13 @@ package Game::EvonyTKR::Web::General {
 
       my $verbose = query_parameters->get('verbose');
       if(defined $verbose and $verbose ){
-        return $general->toHashRef( 1);  
+        return $general->toHashRef( 1);
       } else {
         return $general->toHashRef();
       }
     } else {
       return { general => "Not Found" };
     }
-
   }
 
   sub _read_generals() {
@@ -135,7 +157,7 @@ package Game::EvonyTKR::Web::General {
       my $data = LoadFile($tg);
       my $name = $data->{'general'}->{'name'};
       $logger->info($name);
-      
+
       my %generalClass = (
         'Ground'  => 'Game::EvonyTKR::General::Ground',
         'Mounted' => 'Game::EvonyTKR::General::Mounted',
@@ -146,18 +168,23 @@ package Game::EvonyTKR::Web::General {
       my @generalClassKey;
       my @scoreType = @{ $data->{'general'}->{'score_as'} };
       if (any { $_ =~ /Ground/ } @scoreType) {
+        $logger->trace('this can be a Ground General');
         push @generalClassKey => 'Ground';
       }
       if (any { $_ =~ /Mounted/ } @scoreType) {
+        $logger->trace('this can be a Mounted General');
         push @generalClassKey => 'Mounted';
       }
       if (any { $_ =~ /Ranged/ or $_ =~ /Archers/ } @scoreType) {
+        $logger->trace('this can be a Ranged General');
         push @generalClassKey => 'Ranged';
       }
       if (any { $_ =~ /Siege/ } @scoreType) {
+        $logger->trace('this can be a Siege General');
         push @generalClassKey => 'Siege';
       }
       if (any { $_ =~ /Mayor/ } @scoreType) {
+        $logger->trace('this can be a Mayor');
         next;
       }
       if (scalar @generalClassKey != scalar @scoreType) {
@@ -166,16 +193,28 @@ package Game::EvonyTKR::Web::General {
             . Data::Printer::np @scoreType);
       }
 
-      for (@generalClassKey) {
-        $generals{$name} = $generalClass{$_}->new(
-          name                 => $data->{'general'}->{'name'},
+      if(scalar @generalClassKey == 0 ) {
+        $logger->logcroak($data->{'general'}->{'name'} .
+          ' has no general classes at all');
+      }
+      else {
+        $logger->trace( $data->{'general'}->{'name'} .
+          ' has ' . scalar @generalClassKey .
+          'classes.'
         );
-        
-        $logger->debug("created " . $generals{$name});
+      }
 
-        $generals{$name}->readFromFile();
+      for (@generalClassKey) {
+        my $thisClass = $_;
+        $store->{'generals'}->{$name} = $generalClass{$thisClass}->new(
+          name => $data->{'general'}->{'name'},
+        );
 
-        $logger->debug("added " . Data::Printer::np $generals{$name});
+        $logger->debug("created " . $name);
+
+        $store->{'generals'}->{$name}->readFromFile();
+
+        $logger->debug("added " . Data::Printer::np $store->{'generals'}->{$name});
       }
 
     }

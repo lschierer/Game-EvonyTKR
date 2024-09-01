@@ -9,13 +9,12 @@ use Game::EvonyTKR::Logger;
 
 use Log::Log4perl;
 
-
 package Game::EvonyTKR::Web {
+  use Data::Printer;
   use Util::Any -all;
   use namespace::clean;
   use parent qw(App::Cmd::Simple);
-  use Data::Printer;
-  
+
   sub opt_spec {
     return (
       [ "env|E=s",  "set the plack Environment" ],,
@@ -33,8 +32,7 @@ package Game::EvonyTKR::Web {
     my ($self, $opt, $args) = @_;
     binmode(STDOUT, ":encoding(UTF-8)"); # apparently not the same thing as "use utf8;"
     binmode(STDIN, ":encoding(UTF-8)"); # apparently not the same thing as "use utf8;"
-    
-    
+
     my @DancerOpts;
     my $env = 'production';
     if($opt->{env}){
@@ -121,6 +119,7 @@ package Game::EvonyTKR::Web::Root {
   use FindBin;
   use lib "$FindBin::Bin/../../../lib";
   use Dancer2 appname => 'Game::EvonyTKR';
+  use Dancer2::Plugin::REST;
   use Game::EvonyTKR::Web::General;
 
   set engines => {
@@ -131,7 +130,7 @@ package Game::EvonyTKR::Web::Root {
           allow_tags      => 1,
           canonical       => 1,
           convert_blessed => 1,
-          max_depth       => 6,
+          max_depth       => 7,
           pretty          => 0,
           utf8            => 1,
         }
