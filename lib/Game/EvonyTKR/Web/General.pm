@@ -1,47 +1,52 @@
 use v5.40.0;
 use utf8::all;
 use experimental qw{class defer};
-use Data::Printer;
-use Devel::Peek;
-use File::HomeDir;
-use File::Path     qw{ make_path };
-use File::ShareDir qw{ dist_dir dist_file };
-use File::Spec;
-use File::Touch;
-use Log::Log4perl;
-
 use FindBin;
 use lib "$FindBin::Bin/../../../../lib";
-use Game::EvonyTKR::General::Ground;
-use Game::EvonyTKR::General::Mounted;
-use Game::EvonyTKR::General::Ranged;
-use Game::EvonyTKR::General::Siege;
-use Game::EvonyTKR::SkillBook::Special;
-use Game::EvonyTKR::Speciality;
-use Game::EvonyTKR::Ascending;
 
 package Game::EvonyTKR::Web::General {
 # ABSTRACT: Route Handler for the /generals route.
   use Carp;
+  use Data::Printer;
+  use Devel::Peek;
+  use File::HomeDir;
+  use File::Path     qw{ make_path };
+  use File::ShareDir qw{ dist_dir dist_file };
+  use File::Spec;
+  use File::Touch;
+  use Game::EvonyTKR::Ascending;
+  use Game::EvonyTKR::General::Ground;
+  use Game::EvonyTKR::General::Mounted;
+  use Game::EvonyTKR::General::Ranged;
+  use Game::EvonyTKR::General::Siege;
+  use Game::EvonyTKR::SkillBook::Special;
+  use Game::EvonyTKR::Speciality;
+  use Game::EvonyTKR::Web::Store;
+  use Log::Log4perl;
   use Util::Any -all;
   use YAML::XS qw{ LoadFile Load };
-  use Game::EvonyTKR::Web::Store;
   use namespace::clean;
   use Dancer2 appname => 'Game::EvonyTKR';
   use Dancer2::Plugin::REST;
+  use Game::EvonyTKR::Web::General::Pair;
 
   my $store;
+  my $generals;
   my $logger = Log::Log4perl::get_logger('Web::General');
 
   sub _init {
     $store = Game::EvonyTKR::Web::Store::get_store();
     if(not exists $$store{'generals'} ) {
-      $$store{'generals'} = {};
+      $store->{'generals'} = {};
+      $logger->trace('store now holds' . np $store);
     }
-    my $gencount = scalar keys %{$store->{'generals'}};
+    $generals = $store->{'generals'};
+    $logger->trace('generals now holds ' . np $generals);
+    $logger->trace('generals now holds ' . np %$generals);
+    my $gencount = scalar keys %$generals;
     if ($gencount == 0) {
       _read_generals();
-      $gencount = scalar keys %{$store->{'generals'}};
+      $gencount = scalar keys %$generals;
       $logger->debug("After Reading, I have $gencount generals available.");
     } else {
       $logger->debug("I have $gencount generals already available; reading unnecessary");
@@ -60,7 +65,7 @@ package Game::EvonyTKR::Web::General {
   sub _list {
     _init();
     my @list;
-    while (my ($key, $value) = each %{$store->{'generals'}}) {
+    while (my ($key, $value) = each %$generals) {
       push @list, $value->name();
     }
     return \@list;
@@ -69,9 +74,9 @@ package Game::EvonyTKR::Web::General {
   sub _all {
     _init();
     my @data = ();
-    $logger->debug("sub _all has " . scalar %{$store->{'generals'}} . " generals");
+    $logger->debug("sub _all has " . scalar %$generals . " generals");
 
-    while (my ($key, $value) = each %{$store->{'generals'}}) {
+    while (my ($key, $value) = each %$generals) {
       $logger->trace("getting data for ". $value->name());
       my $name = $value->name();
       my $hashedGeneral = $value->toHashRef();
@@ -86,8 +91,8 @@ package Game::EvonyTKR::Web::General {
   sub _by_id {
     _init();
     my $id = route_parameters->get('id');
-    if (exists $store->{'generals'}->{$id} ) {
-      my $general = $store->{'generals'}->{$id};
+    if (exists $generals->{$id} ) {
+      my $general = $generals->{$id};
 
       my $level = query_parameters->get('level');
       if (defined $level) {
@@ -206,7 +211,7 @@ package Game::EvonyTKR::Web::General {
 
       for (@generalClassKey) {
         my $thisClass = $_;
-        $store->{'generals'}->{$name} = $generalClass{$thisClass}->new(
+        $generals->{$name} = $generalClass{$thisClass}->new(
           name => $data->{'general'}->{'name'},
         );
 
