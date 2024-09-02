@@ -91,7 +91,7 @@ class Game::EvonyTKR::Buff :isa(Game::EvonyTKR::Logger) {
         any { $_ =~ /$tc/i} $EvalData->RelevantDebuffConditions()
       } @condition) {
         $self->logger()->debug("Detected a debuff for $name in " . np @condition);
-        return $value->number() * 
+        return $value->number() *
           $EvalData->getMultiplierForDebuff(
             $self->attribute(),
             $GeneralBias,
@@ -100,23 +100,38 @@ class Game::EvonyTKR::Buff :isa(Game::EvonyTKR::Logger) {
           );
       }
       else {
-        $self->logger()->debug("Detected a buff for $name in " . np @condition);
-        if(any {
+        my $debugCondition = np @condition;
+        $self->logger()->debug(
+          "Detected a buff for $name in '$debugCondition'"
+          );
+        if(scalar @condition) {
+         if(any {
           my $tc = $_;
           any { $_ =~ /^$tc$/i } $EvalData->RelevantBuffConditions()
-        } @condition) {
-          return $value->number() * 
-          $EvalData->getMultiplierForBuff(
-            $self->attribute(),
-            $GeneralBias,
-            $self->buffClass(),
-            $self->value()->unit(),
-          );
+          } @condition) {
+            return $value->number() *
+            $EvalData->getMultiplierForBuff(
+              $self->attribute(),
+              $GeneralBias,
+              $self->buffClass(),
+              $self->value()->unit(),
+            );
+          }
+          else {
+            $self->logger()->debug("buff for $name has a condition that disqualifies it from applying");
+            $self->logger()->trace("buff conditions: " . np @condition);
+            $self->logger()->trace("qualifying conditions: ". np $EvalData->RelevantBuffConditions());
+          }
         }
         else {
-          $self->logger()->debug("buff for $name has a condition that disqualifies it from applying");
-          $self->logger()->trace("buff conditions: " . np @condition);
-          $self->logger()->trace("qualifying conditions: ". np $EvalData->RelevantBuffConditions());
+          $self->logger()->trace('buff has no conditions');
+          return $value->number() *
+            $EvalData->getMultiplierForBuff(
+              $self->attribute(),
+              $GeneralBias,
+              $self->buffClass(),
+              $self->value()->unit(),
+            );
         }
       }
     }
@@ -187,7 +202,7 @@ class Game::EvonyTKR::Buff :isa(Game::EvonyTKR::Logger) {
       if ($other->value()->unit() ne $value->unit()) {
         $self->logger()->trace($value->unit() . " ne " . $other->value()->unit());
         return 0;
-      }  
+      }
       if (
         ($self->has_buffClass() && (not $other->has_buffClass())) ||
         ((not $self->has_buffClass()) && $other->has_buffClass())) {
@@ -225,7 +240,7 @@ class Game::EvonyTKR::Buff :isa(Game::EvonyTKR::Logger) {
       number  => $self->value()->number(),
       unit    => $self->value()->unit(),
     };
-    
+
     if($self->buffClass() !~ /All Troops/i ) {
       $returnRef->{'class'} = $self->buffClass();
     }
@@ -247,7 +262,7 @@ class Game::EvonyTKR::Buff :isa(Game::EvonyTKR::Logger) {
     my $otherClass = blessed $other;
     my @classList = Class::ISA::self_and_super_path($otherClass);
     if(none {$_ eq 'Game::EvonyTKR::Buff'} @classList) {
-      $self->logger()->logcroak('$other is not a Game::EvonyTKR::Buff'); 
+      $self->logger()->logcroak('$other is not a Game::EvonyTKR::Buff');
     }
     my $result = $self->compare($other);
     $self->logger()->trace("compare functionr returned $result");
@@ -263,7 +278,7 @@ class Game::EvonyTKR::Buff :isa(Game::EvonyTKR::Logger) {
     my $otherClass = blessed $other;
     my @classList = Class::ISA::self_and_super_path($otherClass);
     if(none {$_ eq 'Game::EvonyTKR::Buff'} @classList) {
-      $self->logger()->logcroak('$other is not a Game::EvonyTKR::Buff'); 
+      $self->logger()->logcroak('$other is not a Game::EvonyTKR::Buff');
     }
     if($self->compare($other) != 0) {
       return 1
@@ -298,7 +313,7 @@ $swap is currently unused, but will eventually handle the case someone somehow c
 
 =method inherited
 
-this function is used to indicate that the Buff in question should not be exported when computing level at a time values as opposed to cumulative values, as it has been inherited from some other place. 
+this function is used to indicate that the Buff in question should not be exported when computing level at a time values as opposed to cumulative values, as it has been inherited from some other place.
 =cut
 
 =method toggleInherited
