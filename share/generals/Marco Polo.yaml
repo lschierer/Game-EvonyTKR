@@ -1,0 +1,21 @@
+---
+general:
+  name: Marco Polo
+  leadership: 111
+  leadership_increment: 8.32
+  attack: 145
+  attack_increment: 9.62
+  defense: 122
+  defense_increment: 8.78
+  politics: 101
+  politics_increment: 7.78
+  stars: '5Red'
+  score_as:
+   - Mounted
+  book: Ride the Waves
+  specialities:
+    - Mounted Troop Formation
+    - Annihilation
+    - Mounted Troop Ares
+    - The Million
+  ascending: true

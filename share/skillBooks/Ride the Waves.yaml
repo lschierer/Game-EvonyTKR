@@ -1,0 +1,22 @@
+---
+name: Ride the Waves
+buff:
+  - attribute: Attack
+    class: Mounted Troops
+    value:
+      number: 45
+      unit: percentage
+  - attribute: Defense
+    class: Mounted Troops
+    condition:
+      - leading the army to attack
+    value:
+      number: 40
+      unit: percentage
+  - attribute: HP
+    class: Mounted Troops
+    condition:
+      - leading the army to attack
+    value:
+      number: 40
+      unit: percentage
