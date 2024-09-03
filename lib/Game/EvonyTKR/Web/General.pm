@@ -34,6 +34,15 @@ package Game::EvonyTKR::Web::General {
   my $generals;
   my $logger = Log::Log4perl::get_logger('Web::General');
 
+  prefix '/generals' => sub {
+    get '/details' => \&_all;
+    get '/list'    => \&_list;
+  };
+
+  prefix '/general' => sub {
+    get '/:id'  => \&_by_id;
+  };
+
   sub _init {
     $store = Game::EvonyTKR::Web::Store::get_store();
     if(not exists $$store{'generals'} ) {
@@ -52,15 +61,6 @@ package Game::EvonyTKR::Web::General {
       $logger->debug("I have $gencount generals already available; reading unnecessary");
     }
   }
-
-  prefix '/generals' => sub {
-    get '/details' => \&_all;
-    get '/list'    => \&_list;
-  };
-
-  prefix '/general' => sub {
-    get '/:id'  => \&_by_id;
-  };
 
   sub _list {
     _init();
@@ -172,23 +172,23 @@ package Game::EvonyTKR::Web::General {
 
       my @generalClassKey;
       my @scoreType = @{ $data->{'general'}->{'score_as'} };
-      if (any { $_ =~ /Ground/ } @scoreType) {
+      if (any { $_ =~ /Ground/i } @scoreType) {
         $logger->trace('this can be a Ground General');
         push @generalClassKey => 'Ground';
       }
-      if (any { $_ =~ /Mounted/ } @scoreType) {
+      if (any { $_ =~ /Mounted/i } @scoreType) {
         $logger->trace('this can be a Mounted General');
         push @generalClassKey => 'Mounted';
       }
-      if (any { $_ =~ /Ranged/ or $_ =~ /Archers/ } @scoreType) {
+      if (any { $_ =~ /Ranged/i or $_ =~ /Archers/i } @scoreType) {
         $logger->trace('this can be a Ranged General');
         push @generalClassKey => 'Ranged';
       }
-      if (any { $_ =~ /Siege/ } @scoreType) {
+      if (any { $_ =~ /Siege/i } @scoreType) {
         $logger->trace('this can be a Siege General');
         push @generalClassKey => 'Siege';
       }
-      if (any { $_ =~ /Mayor/ } @scoreType) {
+      if (any { $_ =~ /Mayor/i } @scoreType) {
         $logger->trace('this can be a Mayor');
         next;
       }

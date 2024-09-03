@@ -15,6 +15,7 @@ package Game::EvonyTKR::Web::General::Pair {
   use File::Spec;
   use File::Touch;
   use Game::EvonyTKR::Ascending;
+  use Game::EvonyTKR::Buff::Data;
   use Game::EvonyTKR::General::Pair;
   use Game::EvonyTKR::General::Pair::Creator;
   use Game::EvonyTKR::General::Ground;
@@ -23,6 +24,7 @@ package Game::EvonyTKR::Web::General::Pair {
   use Game::EvonyTKR::General::Siege;
   use Game::EvonyTKR::SkillBook::Special;
   use Game::EvonyTKR::Speciality;
+  use Game::EvonyTKR::Web::General;
   use Game::EvonyTKR::Web::Store;
   use Log::Log4perl;
   use Util::Any -all;
@@ -32,31 +34,54 @@ package Game::EvonyTKR::Web::General::Pair {
   use Dancer2::Plugin::REST;
 
   my $store;
+  my $pairs;
+  my $generals;
+  my $data = Game::EvonyTKR::Buff::Data->new();
   my $logger = Log::Log4perl::get_logger('Web::General');
+
+  prefix '/generals'              => sub {
+    prefix '/pair'                => sub {
+      prefix '/list'              => sub {
+        get ''                    => \&_list;
+        get '/details'            => \&_details;
+      };
+      get '/:primary/:secondary'  => \&_specificPair;
+    };
+  };
 
   sub _init {
     $store = Game::EvonyTKR::Web::Store::get_store();
     if(not exists $$store{'pairs'} ) {
-      ${$store->{'pairs'}} = {};
-      if(exists $$store{'generals'}) {
-        if(scalar %{$store->{'generals'}} >= 2 ) {
+      $store->{'pairs'} = {};
+      $pairs = $store->{'pairs'};
+
+      if(not exists $store->{'generals'}) {
+        Game::EvonyTKR::Web::General::_init();
+      }
+
+      if(exists $store->{'generals'}) {
+        $generals = $store->{'generals'};
+        if( scalar %$generals < 2 ) {
+          $logger->debug("cannot create pairs with only one general");
+        }
+        else {
+
           my $pairCreator = Game::EvonyTKR::General::Pair::Creator->new();
 
           #todo: figure out conflicts
 
-          $pairCreator->set_source(%{$store->{'generals'}});
-          my %pairs = $pairCreator.getPairs();
+          $pairCreator->set_generals(%$generals);
+          my %pairs = $pairCreator->getPairs();
+          my @buffClasses = $data->BuffClasses();
+          my @GeneralKeys = $data->GeneralKeys();
           while (my ($key, $value) = each %pairs) {
-            if(exists $store->{'generals'}->{$key}) {
-                $store->{pairs}->{$key} = $value;
+            if(any { $_ =~ /$key/i } @GeneralKeys) {
+                $pairs->{$key} = $value;
             }
             else {
               $logger->debug("not using key $key when inializing pairs.");
             }
           }
-        }
-        else {
-          $logger->debug("cannot create pairs with only one general");
         }
       }
       else {
@@ -65,16 +90,33 @@ package Game::EvonyTKR::Web::General::Pair {
     }
   }
 
-  prefix '/pair' => sub {
-    get '/list'                 => \&_list;
-    get '/:primary/:secondary'  => \&_specificPair;
-  };
+  sub _details {
+    $logger->trace('calling _list from _details');
+    _listWorker(1);
+  }
 
   sub _list {
+    _listWorker();
+  }
+
+  sub _listWorker($verbose = 0) {
+    $logger->trace("in _listWorker, verbose is set to $verbose");
     _init();
     my @list;
-    while (my ($key, $value) = each %{$store->{'pairs'}}) {
-      push @list, $value;
+    my @GeneralKeys = $data->GeneralKeys();
+    for my $key (@GeneralKeys) {
+      $logger->debug("key of pairs is $key");
+      #$logger->debug('which points to ' . np $pairs->{$key});
+      if(exists $pairs->{$key}) {
+        my @subList = @{$pairs->{$key}};
+        for my $entry (@subList) {
+          $logger->debug('entry is ' . np $entry);
+          push @list, $entry->toHashRef($verbose);
+        }
+      }
+      else {
+        $logger->trace("$key does not exist in $pairs");
+      }
     }
     return \@list;
   }
