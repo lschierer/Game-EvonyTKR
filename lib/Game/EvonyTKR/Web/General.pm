@@ -23,7 +23,7 @@ package Game::EvonyTKR::Web::General {
   use Game::EvonyTKR::Speciality;
   use Game::EvonyTKR::Web::Store;
   use Log::Log4perl;
-  use Util::Any -all;
+  use Util::Any ':all';
   use YAML::XS qw{ LoadFile Load };
   use namespace::clean;
   use Dancer2 appname => 'Game::EvonyTKR';
@@ -38,7 +38,7 @@ package Game::EvonyTKR::Web::General {
   my $logger = Log::Log4perl::get_logger('Web::General');
 
   prefix '/generals' => sub {
-    get '/details' => \&_all;
+    get '/details' => \&_details;
     get '/list'    => \&_list;
   };
 
@@ -76,7 +76,7 @@ package Game::EvonyTKR::Web::General {
     return \@list;
   }
 
-  sub _all {
+  sub _details {
     _init();
     my @data = ();
     $logger->debug("sub _all has " . scalar %$generals . " generals");

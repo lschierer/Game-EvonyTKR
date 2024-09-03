@@ -28,7 +28,7 @@ package Game::EvonyTKR::Web::General::Pair {
   require Game::EvonyTKR::Web::General;
   use Game::EvonyTKR::Web::Store;
   use Log::Log4perl;
-  use Util::Any -all;
+  use Util::Any ':all';
   use YAML::XS qw{ LoadFile Load };
   use namespace::clean;
   use Dancer2 appname => 'Game::EvonyTKR';

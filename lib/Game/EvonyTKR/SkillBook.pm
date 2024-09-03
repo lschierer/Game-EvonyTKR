@@ -191,7 +191,7 @@ This method will write to $resultRef->{'SBS'}
 the key for that hash comes from L<https://www.evonyanswers.com/post/evony-answers-attribute-methodology-explanation>
 where Game::EvonyTKR::SkillBook scores end up in what EvAns calls the BSS, 4SB and the SKS categories.  I've combined them in my implementation. 
 
-$BuffMultipliers must contain an instance of a I<child class> of Game::EvonyTKR::Buff::EvaluationData
+$BuffMultipliers must contain an instance of a I<child class> of Game::EvonyTKR::Buff::Data::EvaluationData
 
 $GeneralBias must contain a valid instane of a class from Game::EvonyTKR::Buff::Data
 

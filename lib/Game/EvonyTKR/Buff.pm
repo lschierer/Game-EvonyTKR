@@ -342,7 +342,7 @@ This toggles the value of the inherirted field.
 
 $name is simply a string used to help identify entries in logs.
 
-$EvalData must contain an instance of a I<child class> of Game::EvonyTKR::Buff::EvaluationData
+$EvalData must contain an instance of a I<child class> of Game::EvonyTKR::Buff::Data::EvaluationData
 
 $GeneralBias must contain a valid instane of a class from Game::EvonyTKR::Buff::Data
 
