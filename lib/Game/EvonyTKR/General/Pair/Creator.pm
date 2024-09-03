@@ -101,8 +101,9 @@ it will not consider conflicts.
               my $gk = first {$_ =~ /$key/i } @GeneralKeys;
               if(defined($gk)){
                 $self->logger()->trace("pushing pair with '$gk'");
+                my $nameKey = $value1->name();
                 push @{ $pairs{$gk} }, $pair;
-                push @{ $pairs{$value1->name()} }, $pair;
+                push @{ $pairs{$nameKey} }, $pair;
               }
               else {
                 $self->logger()->logcroak(

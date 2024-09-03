@@ -6,6 +6,7 @@ use lib "$FindBin::Bin/../../../../lib";
 
 package Game::EvonyTKR::Web::General::Pair {
 # ABSTRACT: Route Handler for the /general/pair route.
+  use Array::Diff;
   use Carp;
   use Data::Printer;
   use Devel::Peek;
@@ -71,22 +72,60 @@ package Game::EvonyTKR::Web::General::Pair {
           #todo: figure out conflicts
 
           $pairCreator->set_generals(%$generals);
-          my %pairs = $pairCreator->getPairs();
-          my @buffClasses = $data->BuffClasses();
-          my @GeneralKeys = $data->GeneralKeys();
-          while (my ($key, $value) = each %pairs) {
-            if(any { $_ =~ /$key/i } @GeneralKeys) {
-                $pairs->{$key} = $value;
-            }
-            else {
-              $logger->debug("not using key $key when inializing pairs.");
-            }
+          my %result = $pairCreator->getPairs();
+
+          while (my ($key, $value) = each %result) {
+            $pairs->{$key} = $value;
           }
         }
       }
       else {
         $logger->debug("no generals loaded yet")
       }
+    }
+  }
+
+  sub _specificPair {
+    _init();
+    my $primaryName = route_parameters->get('primary');
+    my $secondaryName = route_parameters->get('secondary');
+
+
+    if(not exists $generals->{$primaryName}) {
+      status_400({
+        error => "$primaryName is not a valid General Id"
+      });
+    }
+    elsif (not exists $generals->{$secondaryName}) {
+      status_400({
+        error => "$secondaryName is not a valid General Id"
+      });
+    }
+    elsif (not exists $pairs->{$primaryName}) {
+      my @GeneralKeys = $data->GeneralKeys();
+      my @pk = keys %$pairs;
+      my $diff = Array::Diff->diff(\@GeneralKeys, \@pk);
+      my @available = $diff->added();
+      $logger->error(sprintf(
+        '%s has no available pairs. valid options are %s',
+        $primaryName,
+        np @pk
+      ));
+      status_400({
+        error => "$primaryName has no available pairs."
+      });
+    }
+    else {
+      my @gp = @{$pairs->{$primaryName}};
+      for my $thisPair (@gp) {
+        if($thisPair->secondary->name() eq $secondaryName) {
+          return $thisPair->toHashRef(1);
+          last();
+        }
+      }
+      status_400({
+        "No pair for $primaryName with secondary general $secondaryName found.",
+      });
     }
   }
 
@@ -121,10 +160,6 @@ package Game::EvonyTKR::Web::General::Pair {
     return \@list;
   }
 
-  sub __specificPair {
-    _init();
-
-  }
 }
 
 true;
