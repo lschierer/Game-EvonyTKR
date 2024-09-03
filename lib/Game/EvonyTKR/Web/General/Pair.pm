@@ -2,7 +2,7 @@ use v5.40.0;
 use utf8::all;
 use experimental qw{class defer};
 use FindBin;
-use lib "$FindBin::Bin/../../../../lib";
+use lib "$FindBin::Bin/../../../../../lib";
 
 package Game::EvonyTKR::Web::General::Pair {
 # ABSTRACT: Route Handler for the /general/pair route.
@@ -25,7 +25,7 @@ package Game::EvonyTKR::Web::General::Pair {
   use Game::EvonyTKR::General::Siege;
   use Game::EvonyTKR::SkillBook::Special;
   use Game::EvonyTKR::Speciality;
-  use Game::EvonyTKR::Web::General;
+  require Game::EvonyTKR::Web::General;
   use Game::EvonyTKR::Web::Store;
   use Log::Log4perl;
   use Util::Any -all;
@@ -37,32 +37,32 @@ package Game::EvonyTKR::Web::General::Pair {
   my $store;
   my $pairs;
   my $generals;
-  my $data = Game::EvonyTKR::Buff::Data->new();
+  my $data   = Game::EvonyTKR::Buff::Data->new();
   my $logger = Log::Log4perl::get_logger('Web::General');
 
-  prefix '/generals'              => sub {
-    prefix '/pair'                => sub {
-      prefix '/list'              => sub {
-        get ''                    => \&_list;
-        get '/details'            => \&_details;
+  prefix '/generals' => sub {
+    prefix '/pair' => sub {
+      prefix '/list' => sub {
+        get ''         => \&_list;
+        get '/details' => \&_details;
       };
-      get '/:primary/:secondary'  => \&_specificPair;
+      get '/:primary/:secondary' => \&_specificPair;
     };
   };
 
-  sub _init {
+  sub _initPairs {
     $store = Game::EvonyTKR::Web::Store::get_store();
-    if(not exists $$store{'pairs'} ) {
+    if (not exists $$store{'pairs'}) {
       $store->{'pairs'} = {};
       $pairs = $store->{'pairs'};
 
-      if(not exists $store->{'generals'}) {
+      if (not exists $store->{'generals'}) {
         Game::EvonyTKR::Web::General::_init();
       }
 
-      if(exists $store->{'generals'}) {
+      if (exists $store->{'generals'}) {
         $generals = $store->{'generals'};
-        if( scalar %$generals < 2 ) {
+        if (scalar %$generals < 2) {
           $logger->debug("cannot create pairs with only one general");
         }
         else {
@@ -80,18 +80,17 @@ package Game::EvonyTKR::Web::General::Pair {
         }
       }
       else {
-        $logger->debug("no generals loaded yet")
+        $logger->debug("no generals loaded yet");
       }
     }
   }
 
   sub _specificPair {
-    _init();
-    my $primaryName = route_parameters->get('primary');
+    _initPairs();
+    my $primaryName   = route_parameters->get('primary');
     my $secondaryName = route_parameters->get('secondary');
 
-
-    if(not exists $generals->{$primaryName}) {
+    if (not exists $generals->{$primaryName}) {
       status_400({
         error => "$primaryName is not a valid General Id"
       });
@@ -103,22 +102,21 @@ package Game::EvonyTKR::Web::General::Pair {
     }
     elsif (not exists $pairs->{$primaryName}) {
       my @GeneralKeys = $data->GeneralKeys();
-      my @pk = keys %$pairs;
-      my $diff = Array::Diff->diff(\@GeneralKeys, \@pk);
-      my @available = $diff->added();
+      my @pk          = keys %$pairs;
+      my $diff        = Array::Diff->diff(\@GeneralKeys, \@pk);
+      my @available   = $diff->added();
       $logger->error(sprintf(
         '%s has no available pairs. valid options are %s',
-        $primaryName,
-        np @pk
+        $primaryName, Data::Printer::np @pk
       ));
       status_400({
         error => "$primaryName has no available pairs."
       });
     }
     else {
-      my @gp = @{$pairs->{$primaryName}};
+      my @gp = @{ $pairs->{$primaryName} };
       for my $thisPair (@gp) {
-        if($thisPair->secondary->name() eq $secondaryName) {
+        if ($thisPair->secondary->name() eq $secondaryName) {
           return $thisPair->toHashRef(1);
           last();
         }
@@ -140,14 +138,14 @@ package Game::EvonyTKR::Web::General::Pair {
 
   sub _listWorker($verbose = 0) {
     $logger->trace("in _listWorker, verbose is set to $verbose");
-    _init();
+    _initPairs();
     my @list;
     my @GeneralKeys = $data->GeneralKeys();
     for my $key (@GeneralKeys) {
       $logger->debug("key of pairs is $key");
       #$logger->debug('which points to ' . np $pairs->{$key});
-      if(exists $pairs->{$key}) {
-        my @subList = @{$pairs->{$key}};
+      if (exists $pairs->{$key}) {
+        my @subList = @{ $pairs->{$key} };
         for my $entry (@subList) {
           $logger->debug('entry is ' . np $entry);
           push @list, $entry->toHashRef($verbose);

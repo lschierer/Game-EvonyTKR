@@ -3,7 +3,7 @@ use experimental qw(class);
 use FindBin;
 use lib "$FindBin::Bin/../../../../lib";
 
-class Game::EvonyTKR::General::Siege :isa(Game::EvonyTKR::General) {
+class Game::EvonyTKR::General::Siege : isa(Game::EvonyTKR::General) {
   use Carp;
   use Types::Common qw( t is_Num is_Str is_Int);
   use Type::Utils "is";
@@ -11,14 +11,14 @@ class Game::EvonyTKR::General::Siege :isa(Game::EvonyTKR::General) {
   use namespace::autoclean;
   use Game::EvonyTKR::General;
   use overload
-    '<=>'       => \&Game::EvonyTKR::General::_comparison,
-    'cmp'       => \&Game::EvonyTKR::General::_comparison,
-    'eq'        => \&Game::EvonyTKR::General::_equality,
-    '=='        => \&Game::EvonyTKR::General::_equality,
-    'ne'        => \&Game::EvonyTKR::General::_inequality,
-    '!='        => \&Game::EvonyTKR::General::_inequality,
-    '""'        => \&Game::EvonyTKR::General::_toString,
-    "fallback"  => 1;
+    '<=>'      => \&Game::EvonyTKR::General::_comparison,
+    'cmp'      => \&Game::EvonyTKR::General::_comparison,
+    'eq'       => \&Game::EvonyTKR::General::_equality,
+    '=='       => \&Game::EvonyTKR::General::_equality,
+    'ne'       => \&Game::EvonyTKR::General::_inequality,
+    '!='       => \&Game::EvonyTKR::General::_inequality,
+    '""'       => \&Game::EvonyTKR::General::_toString,
+    "fallback" => 1;
 # PODNAME: Game::EvonyTKR::General::Siege
 
 # ABSTRACT: Module for processing information about Evony TKR Ground Specialists.
@@ -30,16 +30,14 @@ in which ways is not always entirely reliable, and these modules will, at times,
 
 =cut
 
-  # from Type::Registry, this will save me from some of the struggles I have had with some types having blessed references and others not.
+# from Type::Registry, this will save me from some of the struggles I have had with some types having blessed references and others not.
   ADJUST {
-    if(!(t->simple_lookup("Num"))) {
-      t->add_types(
-      -Common
-      );
+    if (!(t->simple_lookup("Num"))) {
+      t->add_types(-Common);
     }
   }
 
-  field $_generalType :reader = 'Siege Machines';
+  field $_generalType : reader = 'Siege Machines';
 
 }
 

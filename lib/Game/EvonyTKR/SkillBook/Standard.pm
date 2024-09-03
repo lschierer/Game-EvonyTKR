@@ -1,11 +1,11 @@
 use v5.40.0;
 use experimental qw(class);
 
-class Game::EvonyTKR::SkillBook::Standard :isa(Game::EvonyTKR::SkillBook) {
+class Game::EvonyTKR::SkillBook::Standard : isa(Game::EvonyTKR::SkillBook) {
 # PODNAME: Game::EvonyTKR::SkillBook::Standard
 
   use Types::Standard qw(is_Int Int Num is_Num Str is_Str);
-  use Types::Common qw( t);
+  use Types::Common   qw( t);
   use Type::Utils "is";
   use Game::EvonyTKR::Buff;
   use Carp;
@@ -18,61 +18,64 @@ class Game::EvonyTKR::SkillBook::Standard :isa(Game::EvonyTKR::SkillBook) {
     'ne'  => \&_inequality,
     '!='  => \&_inequality;
 
-  # from Type::Registry, this will save me from some of the struggles I have had with some types having blessed references and others not.
+# from Type::Registry, this will save me from some of the struggles I have had with some types having blessed references and others not.
   ADJUST {
-    if(!(t->simple_lookup("Num"))) {
-      t->add_types(
-      -Common
-      );
+    if (!(t->simple_lookup("Num"))) {
+      t->add_types(-Common);
     }
   }
 
-  field $level :reader :param //= 1;
+  field $level : reader : param //= 1;
 
   ADJUST {
     my @errors;
     my $pInt = t('PositiveOrZeroInt');
-    $pInt->check($level) or push @errors => "Level must be a Positive Integer, not $level";
+    $pInt->check($level)
+      or push @errors => "Level must be a Positive Integer, not $level";
     my $range = t('NumRange[1, 4]');
-    $range->check($level) or push @errors => "Level must be within the range 1-4 inclusive, not $level";
+    $range->check($level)
+      or push @errors =>
+      "Level must be within the range 1-4 inclusive, not $level";
     if (@errors) {
       croak join ', ' => @errors;
     }
   }
 
   method _comparison($other, $swap = 0) {
-    if(blessed $other ne 'Game::EvonyTKR::SkillBook::Standard') {
+    if (blessed $other ne 'Game::EvonyTKR::SkillBook::Standard') {
       croak '$other is not a Game::EvonyTKR::SkillBook::Standard';
     }
-    if($self->name() eq $other->name()) {
+    if ($self->name() eq $other->name()) {
       return $level <=> $other->level();
-    } else {
+    }
+    else {
       return $self->name() cmp $other->name();
     }
   }
 
   method _equality ($other, $swap = 0) {
-    if(blessed $other ne 'Game::EvonyTKR::SkillBook::Standard') {
+    if (blessed $other ne 'Game::EvonyTKR::SkillBook::Standard') {
       croak '$other is not a Game::EvonyTKR::SkillBook::Standard';
     }
-    if($self->name() eq $other->name()) {
+    if ($self->name() eq $other->name()) {
       return $level == $other->level();
-    } else {
+    }
+    else {
       return 0;
     }
   }
 
   method _inequality ($other, $swap = 0) {
-    if(blessed $other ne 'Game::EvonyTKR::SkillBook::Standard') {
+    if (blessed $other ne 'Game::EvonyTKR::SkillBook::Standard') {
       croak '$other is not a Game::EvonyTKR::SkillBook::Standard';
     }
-    if($self->name() ne $other->name()) {
+    if ($self->name() ne $other->name()) {
       return $level != $other->level();
-    } else {
+    }
+    else {
       return 0;
     }
   }
-
 
 }
 

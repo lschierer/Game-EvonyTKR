@@ -4,12 +4,12 @@ use utf8::all;
 use FindBin;
 use lib "$FindBin::Bin/../../../lib";
 
-class Game::EvonyTKR::Buff :isa(Game::EvonyTKR::Logger) {
+class Game::EvonyTKR::Buff : isa(Game::EvonyTKR::Logger) {
 # PODNAME: Game::EvonyTKR::Buff
 
 # ABSTRACT: Buff and Debuff primatives
   use Game::EvonyTKR::Buff::Data;
-  use Types::Standard qw(is_Int Int Str is_Str);
+  use Types::Standard        qw(is_Int Int Str is_Str);
   use Types::Common::Numeric qw(PositiveOrZeroInt);
   use Type::Utils "is";
   use Carp;
@@ -33,105 +33,111 @@ class Game::EvonyTKR::Buff :isa(Game::EvonyTKR::Logger) {
   my @BuffClasses;
 
   ADJUST {
-    if(scalar @BuffAttributes == 0) {
+    if (scalar @BuffAttributes == 0) {
       $classData->set_BuffAttributes();
       @BuffAttributes = $classData->BuffAttributes();
     }
 
-    if(scalar @AllConditions == 0) {
+    if (scalar @AllConditions == 0) {
       @AllConditions = $classData->AllConditions();
     }
 
-    if(scalar @BuffClasses == 0) {
+    if (scalar @BuffClasses == 0) {
       @BuffClasses = $classData->BuffClasses();
     }
   }
 
-  field $attribute :reader :param;
+  field $attribute : reader : param;
 
-  field $buffClass :reader :param  //= 'All Troops';
+  field $buffClass : reader : param //= 'All Troops';
 
-  field @condition :reader ;
+  field @condition : reader;
 
-  field $value :reader :param;
+  field $value : reader : param;
 
-  field $inherited :reader :param //= 0;
+  field $inherited : reader : param //= 0;
 
   ADJUST {
-    if(not defined $attribute) {
+    if (not defined $attribute) {
       $self->logger()->logcroak('Attribute must be defined');
-    } else {
-      if(scalar @BuffAttributes == 0){
+    }
+    else {
+      if (scalar @BuffAttributes == 0) {
         $classData->set_BuffAttributes();
         @BuffAttributes = $classData->BuffAttributes();
       }
-      if(scalar @BuffAttributes == 0) {
+      if (scalar @BuffAttributes == 0) {
         $self->logger()->logcroak('no attributes loaded');
-      } elsif (none {$_ =~ /^$attribute$/} @BuffAttributes) {
+      }
+      elsif (none { $_ =~ /^$attribute$/ } @BuffAttributes) {
         $self->logger()->logcroak("$attribute is an invalid attribute");
       }
     }
 
-    if(scalar @BuffClasses == 0) {
+    if (scalar @BuffClasses == 0) {
       $classData->set_BuffClasses();
       @BuffClasses = $classData->BuffClasses();
     }
-    if(scalar @BuffClasses == 0) {
+    if (scalar @BuffClasses == 0) {
       $self->logger()->logcroak("no classes loaded");
-    } elsif (none {$_ =~ /^$buffClass$/ } @BuffClasses){
-      $self->logger()->logcroak("$buffClass is an invalid class, valid options are " . np @BuffClasses);
+    }
+    elsif (none { $_ =~ /^$buffClass$/ } @BuffClasses) {
+      $self->logger()
+        ->logcroak(
+        "$buffClass is an invalid class, valid options are " . np @BuffClasses);
     }
   }
 
   method getEvAnsScore($name, $EvalData, $GeneralBias) {
-    $self->logger()->trace("starting getEvAnsScore for $name with $GeneralBias");
-    if(any {$_ =~ /$GeneralBias/i} @BuffClasses) {
-      if(any {
-        my $tc = $_;
-        any { $_ =~ /$tc/i} $EvalData->RelevantDebuffConditions()
-      } @condition) {
-        $self->logger()->debug("Detected a debuff for $name in " . np @condition);
-        return $value->number() *
-          $EvalData->getMultiplierForDebuff(
-            $self->attribute(),
-            $GeneralBias,
-            $self->buffClass(),
-            $self->value()->unit(),
-          );
+    $self->logger()
+      ->trace("starting getEvAnsScore for $name with $GeneralBias");
+    if (any { $_ =~ /$GeneralBias/i } @BuffClasses) {
+      if (
+        any {
+          my $tc = $_;
+          any { $_ =~ /$tc/i } $EvalData->RelevantDebuffConditions()
+        } @condition
+      ) {
+        $self->logger()
+          ->debug("Detected a debuff for $name in " . np @condition);
+        return $value->number() * $EvalData->getMultiplierForDebuff(
+          $self->attribute(), $GeneralBias,
+          $self->buffClass(), $self->value()->unit(),
+        );
       }
       else {
         my $debugCondition = np @condition;
-        $self->logger()->debug(
-          "Detected a buff for $name in '$debugCondition'"
-          );
-        if(scalar @condition) {
-         if(any {
-          my $tc = $_;
-          any { $_ =~ /^$tc$/i } $EvalData->RelevantBuffConditions()
-          } @condition) {
-            return $value->number() *
-            $EvalData->getMultiplierForBuff(
-              $self->attribute(),
-              $GeneralBias,
-              $self->buffClass(),
-              $self->value()->unit(),
+        $self->logger()
+          ->debug("Detected a buff for $name in '$debugCondition'");
+        if (scalar @condition) {
+          if (
+            any {
+              my $tc = $_;
+              any { $_ =~ /^$tc$/i } $EvalData->RelevantBuffConditions()
+            } @condition
+          ) {
+            return $value->number() * $EvalData->getMultiplierForBuff(
+              $self->attribute(), $GeneralBias,
+              $self->buffClass(), $self->value()->unit(),
             );
           }
           else {
-            $self->logger()->debug("buff for $name has a condition that disqualifies it from applying");
+            $self->logger()
+              ->debug(
+"buff for $name has a condition that disqualifies it from applying"
+              );
             $self->logger()->trace("buff conditions: " . np @condition);
-            $self->logger()->trace("qualifying conditions: ". np $EvalData->RelevantBuffConditions());
+            $self->logger()
+              ->trace("qualifying conditions: "
+                . np $EvalData->RelevantBuffConditions());
           }
         }
         else {
           $self->logger()->trace('buff has no conditions');
-          return $value->number() *
-            $EvalData->getMultiplierForBuff(
-              $self->attribute(),
-              $GeneralBias,
-              $self->buffClass(),
-              $self->value()->unit(),
-            );
+          return $value->number() * $EvalData->getMultiplierForBuff(
+            $self->attribute(), $GeneralBias,
+            $self->buffClass(), $self->value()->unit(),
+          );
         }
       }
     }
@@ -142,8 +148,8 @@ class Game::EvonyTKR::Buff :isa(Game::EvonyTKR::Logger) {
   }
 
   method has_buffClass {
-    if(defined $buffClass) {
-      if($buffClass !~ /All/i) {
+    if (defined $buffClass) {
+      if ($buffClass !~ /All/i) {
         return true;
       }
     }
@@ -156,25 +162,29 @@ class Game::EvonyTKR::Buff :isa(Game::EvonyTKR::Logger) {
   }
 
   method set_condition ($nc) {
-    if(is_Str($nc)) {
-      if(scalar @AllConditions == 0){
+    if (is_Str($nc)) {
+      if (scalar @AllConditions == 0) {
         $classData->collateConditions();
         @AllConditions = $classData->AllConditions();
       }
-      if(scalar @AllConditions == 0){
+      if (scalar @AllConditions == 0) {
         $self->logger()->logcroak('No conditions');
-      } elsif (grep {/^$nc$/} @AllConditions) {
-        if(!(grep {/^$nc$/} @condition)) {
+      }
+      elsif (grep {/^$nc$/} @AllConditions) {
+        if (!(grep {/^$nc$/} @condition)) {
           push @condition, $nc;
         }
-      } else {
-        $self->logger()->logcroak( "$nc is an invalid condition, valid conditions are " . np @AllConditions);
+      }
+      else {
+        $self->logger()
+          ->logcroak("$nc is an invalid condition, valid conditions are "
+            . np @AllConditions);
       }
     }
   }
 
   method has_condition {
-    if(scalar @condition >= 1) {
+    if (scalar @condition >= 1) {
       return true;
     }
     return 0;
@@ -182,46 +192,53 @@ class Game::EvonyTKR::Buff :isa(Game::EvonyTKR::Logger) {
 
   method compare($other, $swap = 0) {
     my $otherClass = blessed $other;
-    if(not defined $otherClass){
-      $self->logger()->logcroak( "otherClass is not defined");
+    if (not defined $otherClass) {
+      $self->logger()->logcroak("otherClass is not defined");
     }
     $self->logger()->trace("comparing against a object of type $otherClass");
-    if(not defined $other ){
+    if (not defined $other) {
       return 0;
-    } elsif ($otherClass ne 'Game::EvonyTKR::Buff') {
+    }
+    elsif ($otherClass ne 'Game::EvonyTKR::Buff') {
       return 0;
-    } else {
+    }
+    else {
       if ($other->attribute() ne $attribute) {
         $self->logger()->trace("$attribute ne " . $other->attribute());
         return 0;
       }
       if ($other->value()->number() != $value->number()) {
-        $self->logger()->trace($value->number() . " != " . $other->value()->number());
+        $self->logger()
+          ->trace($value->number() . " != " . $other->value()->number());
         return 0;
       }
       if ($other->value()->unit() ne $value->unit()) {
-        $self->logger()->trace($value->unit() . " ne " . $other->value()->unit());
+        $self->logger()
+          ->trace($value->unit() . " ne " . $other->value()->unit());
         return 0;
       }
-      if (
-        ($self->has_buffClass() && (not $other->has_buffClass())) ||
-        ((not $self->has_buffClass()) && $other->has_buffClass())) {
-          $self->logger()->trace($self->has_buffClass() . " and not " . $other->has_buffClass());
-          return 0;
-        } elsif (
-        ($self->has_condition() && (not $other->has_condition())) ||
-        ((not $self->has_condition()) && $other->has_condition())
-      ) {
-        $self->logger()->trace($self->has_condition() . " and not " . $other->has_condition());
+      if ( ($self->has_buffClass() && (not $other->has_buffClass()))
+        || ((not $self->has_buffClass()) && $other->has_buffClass())) {
+        $self->logger()
+          ->trace(
+          $self->has_buffClass() . " and not " . $other->has_buffClass());
         return 0;
-      } else {
+      }
+      elsif (($self->has_condition() && (not $other->has_condition()))
+        || ((not $self->has_condition()) && $other->has_condition())) {
+        $self->logger()
+          ->trace(
+          $self->has_condition() . " and not " . $other->has_condition());
+        return 0;
+      }
+      else {
         my $otherClass = $other->buffClass();
-        if($buffClass ne $otherClass) {
+        if ($buffClass ne $otherClass) {
           $self->logger()->trace("$otherClass ne $buffClass");
           return 0;
         }
         my @other_condition = $other->condition();
-        if( array_diff(@condition, @other_condition) ) {
+        if (array_diff(@condition, @other_condition)) {
           $self->logger()->trace("condition arrays differ");
           $self->logger()->trace("my conditions are " . np @condition);
           $self->logger()->trace("their conditions are " . np @other_condition);
@@ -236,17 +253,17 @@ class Game::EvonyTKR::Buff :isa(Game::EvonyTKR::Logger) {
   method toHashRef() {
     my $returnRef = {};
     $returnRef->{'attribute'} = $self->attribute();
-    $returnRef->{'value'} = {
-      number  => $self->value()->number(),
-      unit    => $self->value()->unit(),
+    $returnRef->{'value'}     = {
+      number => $self->value()->number(),
+      unit   => $self->value()->unit(),
     };
 
-    if($self->buffClass() !~ /All Troops/i ) {
+    if ($self->buffClass() !~ /All Troops/i) {
       $returnRef->{'class'} = $self->buffClass();
     }
 
     my @_conditions = $self->condition();
-    if(scalar @_conditions) {
+    if (scalar @_conditions) {
       $returnRef->{'condition'} = \@_conditions;
     }
     $returnRef->{'inherited'} = $self->inherited();
@@ -258,30 +275,30 @@ class Game::EvonyTKR::Buff :isa(Game::EvonyTKR::Logger) {
     return $json->encode($self->toHashRef());
   }
 
-  method _equality($other, $swap = 0){
+  method _equality($other, $swap = 0) {
     my $otherClass = blessed $other;
-    my @classList = Class::ISA::self_and_super_path($otherClass);
-    if(none {$_ eq 'Game::EvonyTKR::Buff'} @classList) {
+    my @classList  = Class::ISA::self_and_super_path($otherClass);
+    if (none { $_ eq 'Game::EvonyTKR::Buff' } @classList) {
       $self->logger()->logcroak('$other is not a Game::EvonyTKR::Buff');
     }
     my $result = $self->compare($other);
     $self->logger()->trace("compare functionr returned $result");
-    if($result) {
+    if ($result) {
       $self->logger()->trace("_equality returning true for result '$result'");
-      return 1
+      return 1;
     }
     $self->logger()->trace("_equality returning false for result '$result'");
     return 0;
   }
 
-  method _inequality($other, $swap = 0){
+  method _inequality($other, $swap = 0) {
     my $otherClass = blessed $other;
-    my @classList = Class::ISA::self_and_super_path($otherClass);
-    if(none {$_ eq 'Game::EvonyTKR::Buff'} @classList) {
+    my @classList  = Class::ISA::self_and_super_path($otherClass);
+    if (none { $_ eq 'Game::EvonyTKR::Buff' } @classList) {
       $self->logger()->logcroak('$other is not a Game::EvonyTKR::Buff');
     }
-    if($self->compare($other) != 0) {
-      return 1
+    if ($self->compare($other) != 0) {
+      return 1;
     }
     return 0;
   }

@@ -3,11 +3,11 @@ use experimental qw(class);
 use FindBin;
 use lib "$FindBin::Bin/../../../lib";
 
-class Game::EvonyTKR::SkillBook :isa(Game::EvonyTKR::Logger) {
+class Game::EvonyTKR::SkillBook : isa(Game::EvonyTKR::Logger) {
 # PODNAME: Game::EvonyTKR::SkillBook
-  use builtin qw(indexed);
+  use builtin         qw(indexed);
   use Types::Standard qw(is_Int Int Num is_Num Str is_Str);
-  use Types::Common qw( t);
+  use Types::Common   qw( t);
   use Type::Utils "is";
   use Carp;
   use Data::Dumper;
@@ -22,19 +22,17 @@ class Game::EvonyTKR::SkillBook :isa(Game::EvonyTKR::Logger) {
   use YAML::XS qw{LoadFile Load};
   use namespace::autoclean;
   use overload
-    '""'        => \&_toString,
-    "fallback"  => 1;
+    '""'       => \&_toString,
+    "fallback" => 1;
 
-  # from Type::Registry, this will save me from some of the struggles I have had with some types having blessed references and others not.
+# from Type::Registry, this will save me from some of the struggles I have had with some types having blessed references and others not.
   ADJUST {
-    if(!(t->simple_lookup("Num"))) {
-      t->add_types(
-      -Common
-      );
+    if (!(t->simple_lookup("Num"))) {
+      t->add_types(-Common);
     }
   }
 
- field $name :reader :param;
+  field $name : reader : param;
 
   ADJUST {
     my @errors;
@@ -44,18 +42,14 @@ class Game::EvonyTKR::SkillBook :isa(Game::EvonyTKR::Logger) {
     }
   }
 
-  field @buffs :reader;
+  field @buffs : reader;
 
   method getEvAnsScore($name, $resultRef, $BuffMultipliers, $GeneralBias) {
     for my ($i, $b) (indexed(@buffs)) {
-      my $result = $b->getEvAnsScore(
-        $name,
-        $BuffMultipliers,
-        $GeneralBias,
-        );
+      my $result = $b->getEvAnsScore($name, $BuffMultipliers, $GeneralBias,);
       $self->logger()->debug("recieved $result from getEvAnsScore for buff $i");
       my $category = $BuffMultipliers->EvAnsCategory($b);
-      if(not defined $category) {
+      if (not defined $category) {
         $self->logger()->warn("no category returned for " . np $b);
         $category = 'Unused';
       }
@@ -65,16 +59,17 @@ class Game::EvonyTKR::SkillBook :isa(Game::EvonyTKR::Logger) {
   }
 
   method add_buff($nb) {
-    if(blessed $nb ne 'Game::EvonyTKR::Buff'){
+    if (blessed $nb ne 'Game::EvonyTKR::Buff') {
       return 0;
-    } elsif (scalar @buffs >= 1){
+    }
+    elsif (scalar @buffs >= 1) {
       my $found_match = 0;
-      foreach(@buffs) {
-        if(not $nb->compare($_)) {
+      foreach (@buffs) {
+        if (not $nb->compare($_)) {
           $found_match = 1;
         }
       }
-      if($found_match) {
+      if ($found_match) {
         return 0;
       }
     }
@@ -98,53 +93,59 @@ class Game::EvonyTKR::SkillBook :isa(Game::EvonyTKR::Logger) {
 
   method readFromFile() {
     my $SkillBookFileName = $name . '.yaml';
-    my $SkillBookShare = File::Spec->catfile(dist_dir('Game-EvonyTKR'), 'skillbooks');
+    my $SkillBookShare =
+      File::Spec->catfile(dist_dir('Game-EvonyTKR'), 'skillbooks');
     my $FileWithPath = File::Spec->catfile($SkillBookShare, $SkillBookFileName);
-    if( -T -s -r $FileWithPath ) {
+    if (-T -s -r $FileWithPath) {
       $self->logger()->debug("$SkillBookFileName exists as expected");
-      my $data = LoadFile($FileWithPath);
-      my @dataBuffs = @{ $data->{'buff'}};
-      $self->logger()->debug("$name has " . scalar @dataBuffs . " buffs in the file");
+      my $data      = LoadFile($FileWithPath);
+      my @dataBuffs = @{ $data->{'buff'} };
+      $self->logger()
+        ->debug("$name has " . scalar @dataBuffs . " buffs in the file");
       for my $sbb (@dataBuffs) {
         my $v;
         my $b;
         my @sbKeys = keys %{$sbb};
-        
-        if(any {$_ eq 'value'} @sbKeys) {
+
+        if (any { $_ eq 'value' } @sbKeys) {
           $self->logger()->debug("SkillBook $name has a buff with a value");
           $v = Game::EvonyTKR::Buff::Value->new(
-              number  => $sbb->{'value'}->{'number'},
-              unit    => $sbb->{'value'}->{'unit'},
-            );
-          if(any {$_ eq 'class'} @sbKeys) {
+            number => $sbb->{'value'}->{'number'},
+            unit   => $sbb->{'value'}->{'unit'},
+          );
+          if (any { $_ eq 'class' } @sbKeys) {
             $b = Game::EvonyTKR::Buff->new(
-              attribute     => $sbb->{'attribute'},
-              value        => $v,
-              buffClass    => $sbb->{'class'},
-            );
-          } else {
-            $b = Game::EvonyTKR::Buff->new(
-              attribute     => $sbb->{'attribute'},
-              value        => $v,
+              attribute => $sbb->{'attribute'},
+              value     => $v,
+              buffClass => $sbb->{'class'},
             );
           }
-        } else {
+          else {
+            $b = Game::EvonyTKR::Buff->new(
+              attribute => $sbb->{'attribute'},
+              value     => $v,
+            );
+          }
+        }
+        else {
           $self->logger()->warn("SkillBook $name has a buff with no value.");
         }
-        if(defined $b) {
-          if(any {$_ eq 'condition'} @sbKeys) {
-            my @conditions = @{ $sbb->{condition}};
+        if (defined $b) {
+          if (any { $_ eq 'condition' } @sbKeys) {
+            my @conditions = @{ $sbb->{condition} };
             foreach my $sbc (@conditions) {
               $b->set_condition($sbc);
             }
           }
           $self->logger()->info("from SkillBook $name; Adding buff " . np $b);
           push @buffs, $b;
-        } else {
+        }
+        else {
           $self->logger()->warn("No buff defined in readFromFile for $name");
         }
       }
-      $self->logger()->debug("$name has " . scalar @buffs . " buffs after reading all in");
+      $self->logger()
+        ->debug("$name has " . scalar @buffs . " buffs after reading all in");
     }
   }
 }

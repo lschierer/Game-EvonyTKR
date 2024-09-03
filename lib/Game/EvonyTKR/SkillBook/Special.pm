@@ -3,26 +3,24 @@ use experimental qw(class);
 use FindBin;
 use lib "$FindBin::Bin/../../../../lib";
 
-class Game::EvonyTKR::SkillBook::Special :isa(Game::EvonyTKR::SkillBook) {
+class Game::EvonyTKR::SkillBook::Special : isa(Game::EvonyTKR::SkillBook) {
 # PODNAME: Game::EvonyTKR::SkillBook::Special
 
   use Types::Standard qw(is_Int Int Num is_Num Str is_Str);
-  use Types::Common qw( t);
+  use Types::Common   qw( t);
   use Type::Utils "is";
   use Game::EvonyTKR::Buff;
   use Carp;
   use namespace::autoclean;
 
-  # from Type::Registry, this will save me from some of the struggles I have had with some types having blessed references and others not.
+# from Type::Registry, this will save me from some of the struggles I have had with some types having blessed references and others not.
   ADJUST {
-    if(!(t->simple_lookup("Num"))) {
-      t->add_types(
-      -Common
-      );
+    if (!(t->simple_lookup("Num"))) {
+      t->add_types(-Common);
     }
   }
 
-  field $builtIn :reader :param //= 1;
+  field $builtIn : reader : param //= 1;
 
   method is_built_in() {
     return 1;

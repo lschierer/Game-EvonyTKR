@@ -51,28 +51,28 @@ package Game::EvonyTKR::Web::Covenants {
     if ($covenantCount == 0) {
       _read_covenants();
       $covenantCount = scalar keys %covenants;
-      $logger->debug("After Reading, I have $covenantCount covenants available.");
-    } else {
+      $logger->debug(
+        "After Reading, I have $covenantCount covenants available.");
+    }
+    else {
       $logger->debug("I have $covenantCount covenants available.");
     }
   }
 
   sub _read_covenants() {
     $logger->info('starting read_covenants');
-    my $covenantShare = File::Spec->catfile(dist_dir('Game-EvonyTKR'), 'covenants');
+    my $covenantShare =
+      File::Spec->catfile(dist_dir('Game-EvonyTKR'), 'covenants');
 
     my @found = grep { -T -s -r } glob("$covenantShare/*.yaml");
     $logger->info(sprintf(
-      "%s contained %d generals.",
-      $covenantShare,
-      scalar @found,
-      ));
+      "%s contained %d generals.", $covenantShare, scalar @found,));
 
     for my $tc (@found) {
       open(my ($fh), '<', $tc) or $logger->logcroak("$!");
       close $fh;
       my $data = LoadFile($tc);
-      
+
     }
   }
 

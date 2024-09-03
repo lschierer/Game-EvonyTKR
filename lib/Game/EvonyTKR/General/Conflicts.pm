@@ -4,7 +4,7 @@ use utf8::all;
 use FindBin;
 use lib "$FindBin::Bin/../../../../lib";
 
-class Game::EvonyTKR::General::Conflicts :isa(Game::EvonyTKR::Logger) {
+class Game::EvonyTKR::General::Conflicts : isa(Game::EvonyTKR::Logger) {
 # PODNAME: Game::EvonyTKR::General::Conflicts
   use Carp;
   use Clone 'clone';
@@ -27,15 +27,15 @@ class Game::EvonyTKR::General::Conflicts :isa(Game::EvonyTKR::Logger) {
   use namespace::autoclean;
   use Game::EvonyTKR::Logger;
 
-  my $distData = File::HomeDir->my_dist_data( 'Game-Evony', { create => 1 } );
-  my $dbPath = File::Spec->catfile($distData, "db");
+  my $distData = File::HomeDir->my_dist_data('Game-Evony', { create => 1 });
+  my $dbPath   = File::Spec->catfile($distData, "db");
 
   # some constants
   field $classData = Game::EvonyTKR::Buff::Data->new();
 
   ADJUST {
-    if(! -r -w  -x -o -d $dbPath) {
-      make_path($dbPath,"0770");
+    if (!-r -w -x -o -d $dbPath) {
+      make_path($dbPath, "0770");
     }
   }
 
@@ -43,9 +43,9 @@ class Game::EvonyTKR::General::Conflicts :isa(Game::EvonyTKR::Logger) {
   my $dbFile = File::Spec->catfile($dbPath, 'conflicts.db');
   ADJUST {
     $db = DBM::Deep->new(
-    file      => $dbFile,
-    locking   => 1,
-    autoflush => 1,
+      file      => $dbFile,
+      locking   => 1,
+      autoflush => 1,
     );
   }
 
@@ -54,19 +54,19 @@ class Game::EvonyTKR::General::Conflicts :isa(Game::EvonyTKR::Logger) {
 returns the conflicts for a Game::EvonyTKR::General with name $name
 =cut
 
-  method getConflictsByName( $name ) {
+  method getConflictsByName($name) {
 
-    if(not defined $name or $name eq '') {
+    if (not defined $name or $name eq '') {
       croak "name must be defined, not '$name'";
     }
     $self->logger()->trace("start getConflictsByName for $name");
     my @conflicts;
-    if( $db->exists($name)) {
-      if($db->get($name)->exists('conflicts')){
-        my @nc = @{$db->get($name)->get('conflicts')} ;
+    if ($db->exists($name)) {
+      if ($db->get($name)->exists('conflicts')) {
+        my @nc = @{ $db->get($name)->get('conflicts') };
         for my $ci (@nc) {
-          if($db->exists($ci)) {
-            my @cg = @{$db->get($ci)->get('members')};
+          if ($db->exists($ci)) {
+            my @cg = @{ $db->get($ci)->get('members') };
             push @conflicts, @cg;
           }
         }
@@ -90,11 +90,9 @@ distribution's dist_data directory.
   method initializeConflictDB() {
     my $yp = YAML::PP::LibYAML->new();
 
-    my $data_location = File::Spec->catfile(
-        dist_dir('Game-EvonyTKR'),
-        'generalConflictGroups'
-      );
-    while (my $file = glob(File::Spec->catfile($data_location,'*.yaml'))) {
+    my $data_location =
+      File::Spec->catfile(dist_dir('Game-EvonyTKR'), 'generalConflictGroups');
+    while (my $file = glob(File::Spec->catfile($data_location, '*.yaml'))) {
       $self->logger()->info("start of $file");
       my $conflictGroup = $yp->load_file($file);
       $self->logger()->debug("start of $file");
@@ -105,85 +103,82 @@ distribution's dist_data directory.
       $self->logger()->debug("name is: $groupName");
 
       $db->put($groupName, {}) unless $db->get($groupName);
-      $db->get($groupName)->put('members', []) unless $db->get($groupName)->get('members');
-      $db->get($groupName)->put('others', []) unless $db->get($groupName)->get('others');
+      $db->get($groupName)->put('members', [])
+        unless $db->get($groupName)->get('members');
+      $db->get($groupName)->put('others', [])
+        unless $db->get($groupName)->get('others');
 
-      my @members = (@{$conflictGroup->{'members'}});
+      my @members = (@{ $conflictGroup->{'members'} });
       my @others;
-      if(exists $conflictGroup->{'others'}){
-        @others = (@{$conflictGroup->{'others'}});
+      if (exists $conflictGroup->{'others'}) {
+        @others = (@{ $conflictGroup->{'others'} });
       }
       my @books;
-      if(exists $conflictGroup->{'books'}) {
-         @books = (@{$conflictGroup->{'books'}});
+      if (exists $conflictGroup->{'books'}) {
+        @books = (@{ $conflictGroup->{'books'} });
       }
 
-      $self->logger()->trace("members are: " . np( @members));
-      $self->logger()->trace("there are " . scalar @members . " members in the list");
+      $self->logger()->trace("members are: " . np(@members));
+      $self->logger()
+        ->trace("there are " . scalar @members . " members in the list");
 
-      if(scalar @members >= 1) {
+      if (scalar @members >= 1) {
         foreach (@members) {
           my $entryName = $_;
 
-          unless(any {
-            $_ =~ qr/$entryName/
-            } @{$db->get($groupName)->get('members')}
-            ){
-            push @{$db->get($groupName)->get('members')}, $entryName;
+          unless (any { $_ =~ qr/$entryName/ }
+            @{ $db->get($groupName)->get('members') }) {
+            push @{ $db->get($groupName)->get('members') }, $entryName;
           }
 
           $db->put($entryName, {}) unless $db->get($entryName);
 
-          $db->get($entryName)->put('conflicts', [
-            ($conflictGroup->{'name'}, )
-          ]);
+          $db->get($entryName)->put('conflicts', [($conflictGroup->{'name'},)]);
 
-          if(scalar @others >= 1){
-            foreach(@others) {
+          if (scalar @others >= 1) {
+            foreach (@others) {
               my $other = $_;
-              unless(any {
-                 $_ =~ qr/$other/
-                } @{$db->get($groupName)->get('others')}
-                ){
-                  push @{$db->get($groupName)->get('others')}, $other;
-                }
+              unless (any { $_ =~ qr/$other/ }
+                @{ $db->get($groupName)->get('others') }) {
+                push @{ $db->get($groupName)->get('others') }, $other;
+              }
 
-              unless(grep {
-                  $other eq $_
-                } @{$db->get($entryName)->get('conflicts')}
-                ){
-                  push @{$db->get($entryName)->get('conflicts')}, $other;
-                }
+              unless (grep { $other eq $_ }
+                @{ $db->get($entryName)->get('conflicts') }) {
+                push @{ $db->get($entryName)->get('conflicts') }, $other;
+              }
             }
           }
 
-          $self->logger()->debug("conflicts are: " . np( $db->get($entryName)->get('conflicts')));
+          $self->logger()
+            ->debug(
+            "conflicts are: " . np($db->get($entryName)->get('conflicts')));
 
-          if(scalar @books >= 1) {
-            foreach (@{$conflictGroup->{'books'}}) {
+          if (scalar @books >= 1) {
+            foreach (@{ $conflictGroup->{'books'} }) {
               my $entryRef = $_;
-              my $newName = $entryRef->{'book1'}->{'name'};
+              my $newName  = $entryRef->{'book1'}->{'name'};
               my $newLevel = $entryRef->{'book1'}->{'level'};
-              if(
-                defined $newName &&
-                length($newName) > 1 &&
-                defined $newLevel &&
-                1 <= $newLevel <= 4
-              ) {
-                $db->get($entryName)->put('conflictingBooks', []) unless $db->get($entryName)->get('conflictingBooks');
+              if ( defined $newName
+                && length($newName) > 1
+                && defined $newLevel
+                && 1 <= $newLevel <= 4) {
+                $db->get($entryName)->put('conflictingBooks', [])
+                  unless $db->get($entryName)->get('conflictingBooks');
                 my $sb = Game::EvonyTKR::SkillBook::Standard->new(
                   name  => $entryRef->{'book1'}->{'name'},
-                  level => ,
+                  level => $entryRef->{'book1'}->{'level'},
                 );
-                unless(grep {$sb eq $_} @{$db->get($entryName)->get('conflictingBooks')}){
-                  push @{$db->get($entryName)->get('conflictingBooks')}, $sb ;
+                unless (grep { $sb eq $_ }
+                  @{ $db->get($entryName)->get('conflictingBooks') }) {
+                  push @{ $db->get($entryName)->get('conflictingBooks') }, $sb;
                 }
               }
-
             }
           }
         }
-      } else {
+      }
+      else {
         croak "no members in the list for '$file'";
       }
 

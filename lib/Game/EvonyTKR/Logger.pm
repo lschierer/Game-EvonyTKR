@@ -19,30 +19,30 @@ class Game::EvonyTKR::Logger {
   use Log::Log4perl;
   use namespace::autoclean;
 
-  field $category :reader :param = __CLASS__;
+  field $category : reader : param = __CLASS__;
 
-  field $logger :reader;
+  field $logger : reader;
 
-  field $location: reader;
+  field $location : reader;
 
   ADJUST {
-    if(not defined $category) {
+    if (not defined $category) {
       $category = __CLASS__;
     }
     $logger = Log::Log4perl->get_logger($category);
   }
 
   method getLogfileName($name = 'system.log') {
-    my $home      = File::HomeDir->my_home;
-    my $logDir    = File::Spec->catdir($home , 'var/log/Perl/dist/Game-Evony/');
-    if(! -r -w  -x -o -d $logDir) {
-        make_path($logDir,"0770");
-      }
-    my $logFile   = File::Spec->catfile($logDir, $name);
-    if( ! -e $logFile) {
+    my $home   = File::HomeDir->my_home;
+    my $logDir = File::Spec->catdir($home, 'var/log/Perl/dist/Game-Evony/');
+    if (!-r -w -x -o -d $logDir) {
+      make_path($logDir, "0770");
+    }
+    my $logFile = File::Spec->catfile($logDir, $name);
+    if (!-e $logFile) {
       touch($logFile);
       chmod(0600, $logFile);
-    } 
+    }
     return $logFile;
   }
 

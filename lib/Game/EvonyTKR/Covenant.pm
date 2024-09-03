@@ -3,12 +3,12 @@ use experimental qw(class);
 use FindBin;
 use lib "$FindBin::Bin/../../../lib";
 
-class Game::EvonyTKR::Covenant :isa(Game::EvonyTKR::Logger) {
+class Game::EvonyTKR::Covenant : isa(Game::EvonyTKR::Logger) {
 # PODNAME: Game::EvonyTKR::Covenant
-  use builtin qw(indexed);
+  use builtin         qw(indexed);
   use Types::Standard qw(is_Int Int Num is_Num Str is_Str);
-  use Types::Common qw( t);
-  use Type::Utils qw(is enum);
+  use Types::Common   qw( t);
+  use Type::Utils     qw(is enum);
   use Carp;
   use Data::Dumper;
   use Data::Printer;
@@ -22,45 +22,37 @@ class Game::EvonyTKR::Covenant :isa(Game::EvonyTKR::Logger) {
   use namespace::autoclean;
   use Game::EvonyTKR::Logger;
   use overload
-    '""'        => \&_toString,
-    "fallback"  => 1;
+    '""'       => \&_toString,
+    "fallback" => 1;
 
-  # from Type::Registry, this will save me from some of the struggles I have had with some types having blessed references and others not.
+# from Type::Registry, this will save me from some of the struggles I have had with some types having blessed references and others not.
   ADJUST {
-    if(!(t->simple_lookup("Num"))) {
-      t->add_types(
-      -Common
-      );
+    if (!(t->simple_lookup("Num"))) {
+      t->add_types(-Common);
     }
   }
 
-  field $primary :reader :param;
+  field $primary : reader : param;
 
-  field %secondary :reader;
+  field %secondary : reader;
 
-  field @secondaryKeys :reader = qw( one two three );
+  field @secondaryKeys : reader = qw( one two three );
 
   ADJUST {
-    #I really want just the three generals in this hash. 
+    #I really want just the three generals in this hash.
     lock_keys_plus(%secondary, @secondaryKeys);
   }
 
-  field %Buffs :reader;
+  field %Buffs : reader;
 
-  field $CovenantLevels = enum [
-    'War',
-    'Cooperation',
-    'Peace',
-    'Faith',
-    'Honor',
-    'Civilization',
-  ];
+  field $CovenantLevels =
+    enum ['War', 'Cooperation', 'Peace', 'Faith', 'Honor', 'Civilization',];
 
   ADJUST {
-    #Covenants only have these levels. 
-    my @levels = @{$CovenantLevels->values()};
+    #Covenants only have these levels.
+    my @levels = @{ $CovenantLevels->values() };
     lock_keys_plus(%Buffs, @levels);
-    for my ($index, $lv) (indexed(@levels)){
+    for my ($index, $lv) (indexed(@levels)) {
       my $al = 10000 + $index * 2 * 1000;
       $self->logger()->trace("setting activationLevel for $lv to $al");
       $Buffs{$lv} = {
@@ -71,36 +63,40 @@ class Game::EvonyTKR::Covenant :isa(Game::EvonyTKR::Logger) {
   }
 
   method setSecondary ($position, $general) {
-    if(any {$_ =~ /$position/i} @secondaryKeys) {
+    if (any { $_ =~ /$position/i } @secondaryKeys) {
       my $generalClass = blessed $general;
-      my @classList  = split(/::/, $generalClass);
-      if($classList[2] =~ /General/ ) {
+      my @classList    = split(/::/, $generalClass);
+      if ($classList[2] =~ /General/) {
         $secondary{$position} = $general;
-      } 
-      else {
-        $self->logger()->logcroak("$generalClass is not a subclass of Game::EvonyTKR::General");
       }
-    } 
+      else {
+        $self->logger()
+          ->logcroak(
+          "$generalClass is not a subclass of Game::EvonyTKR::General");
+      }
+    }
     else {
-      $self->logger()->logwarn("$position is not a valid position, must be one of " . np @secondaryKeys);
+      $self->logger()
+        ->logwarn("$position is not a valid position, must be one of "
+          . np @secondaryKeys);
     }
   }
 
   method addBuff($level, $nb, $inherited = 0) {
-    if(blessed $nb ne 'Game::EvonyTKR::Buff'){
+    if (blessed $nb ne 'Game::EvonyTKR::Buff') {
       return 0;
-    } 
+    }
     my $tcheck = $CovenantLevels->compiled_check();
-    if(none { $tcheck->($_) } ($CovenantLevels)) {
+    if (none { $tcheck->($_) } ($CovenantLevels)) {
       return 0;
     }
 
-    my @levelValues = @{$CovenantLevels->values()};
+    my @levelValues = @{ $CovenantLevels->values() };
     for my $tl (@levelValues) {
       if ($tl eq $level) {
-        if($inherited) {
+        if ($inherited) {
           my $copy;
-          if($nb->has_buffClass()) {
+          if ($nb->has_buffClass()) {
             $copy = Game::EvonyTKR::Buff->new(
               attribute => $nb->attribute(),
               value     => $nb->value(),
@@ -115,31 +111,33 @@ class Game::EvonyTKR::Covenant :isa(Game::EvonyTKR::Logger) {
               inherited => 1,
             );
           }
-          if($nb->has_condition()) {
+          if ($nb->has_condition()) {
             for my $c ($nb->condition()) {
               $copy->set_condition($c);
             }
           }
-          $self->logger()->trace("Adding inherited buff at level $tl " . np $copy);
-          push @{$Buffs{$tl}->{'buffs'}}, $copy;
+          $self->logger()
+            ->trace("Adding inherited buff at level $tl " . np $copy);
+          push @{ $Buffs{$tl}->{'buffs'} }, $copy;
         }
         else {
-          $self->logger()->trace("Adding uninherited buff at level $tl " . np $nb);
-          push @{$Buffs{$tl}->{'buffs'}}, $nb;
+          $self->logger()
+            ->trace("Adding uninherited buff at level $tl " . np $nb);
+          push @{ $Buffs{$tl}->{'buffs'} }, $nb;
         }
         if ($tl eq 'War') {
           $self->addBuff('Cooperation', $nb, 1);
         }
-        elsif ($tl eq 'Cooperation' ) {
+        elsif ($tl eq 'Cooperation') {
           $self->addBuff('Peace', $nb, 1);
         }
-        elsif ($tl eq 'Peace' ) {
+        elsif ($tl eq 'Peace') {
           $self->addBuff('Faith', $nb, 1);
         }
-        elsif ($tl eq 'Faith' ) {
+        elsif ($tl eq 'Faith') {
           $self->addBuff('Honor', $nb, 1);
         }
-        elsif ($tl eq 'Honor' ) {
+        elsif ($tl eq 'Honor') {
           $self->addBuff('Civilization', $nb, 1);
         }
         last;
@@ -149,38 +147,41 @@ class Game::EvonyTKR::Covenant :isa(Game::EvonyTKR::Logger) {
   }
 
   method activeBuffs() {
-    my @cla = @{$CovenantLevels->values()};
+    my @cla        = @{ $CovenantLevels->values() };
     my $powerLevel = 0;
     $powerLevel += $primary->effective_attack();
     $powerLevel += $primary->effective_defense();
     $powerLevel += $primary->effective_leadership();
     $powerLevel += $primary->effective_politics();
-    for my $key (@{keys %secondary}) {
+    for my $key (@{ keys %secondary }) {
       $powerLevel += $secondary{$key}->effective_attack();
       $powerLevel += $secondary{$key}->effective_defense();
       $powerLevel += $secondary{$key}->effective_leadership();
       $powerLevel += $secondary{$key}->effective_politics();
     }
-    $self->logger()->debug(sprintf("Covenant for %s: effective powerLevel is %.5f", $primary->name(), $powerLevel));
+    $self->logger()->debug(
+      sprintf(
+        "Covenant for %s: effective powerLevel is %.5f",
+        $primary->name(), $powerLevel
+      )
+    );
     for my ($i, $clk) (indexed(@cla)) {
       my $cl = $Buffs{$clk};
-      if($cl->{'activated'}){
-        if($cl->{'activationLevel'} <= $powerLevel) {
-          return @{$cl->{'buffs'}};
+      if ($cl->{'activated'}) {
+        if ($cl->{'activationLevel'} <= $powerLevel) {
+          return @{ $cl->{'buffs'} };
         }
         else {
           $self->logger()->debug(sprintf(
-            "Covenant for %s: effective powerLevel is %.5f, required power is %d", 
-            $primary->name(), 
-            $powerLevel,
-            $cl->{'activationLevel'},
+"Covenant for %s: effective powerLevel is %.5f, required power is %d",
+            $primary->name(), $powerLevel, $cl->{'activationLevel'},
           ));
         }
-      } else {
+      }
+      else {
         $self->logger()->debug(sprintf(
-          "Covenant for %s: level %s is not active", 
-          $primary->name(), 
-          $cla[$i]
+          "Covenant for %s: level %s is not active",
+          $primary->name(), $cla[$i]
         ));
       }
     }
@@ -191,40 +192,51 @@ class Game::EvonyTKR::Covenant :isa(Game::EvonyTKR::Logger) {
     my @ab = $self->activeBuffs();
     my $bc = scalar @ab;
     $self->logger()->debug("getEvAnsScore for $name found $bc buffs");
-    if($bc > 0) {
-      for my ($i, $thisBuff) ( indexed(@ab) ) { 
-        my $result = $thisBuff->getEvAnsScore(
-          $name,
-          $BuffMultipliers,
-          $GeneralBias,
+    if ($bc > 0) {
+      for my ($i, $thisBuff) (indexed(@ab)) {
+        my $result =
+          $thisBuff->getEvAnsScore($name, $BuffMultipliers, $GeneralBias,);
+        $self->logger()
+          ->debug(
+"getEvAnsScore for $name recieved $result from getEvAnsScore for buff $i"
           );
-        $self->logger()->debug("getEvAnsScore for $name recieved $result from getEvAnsScore for buff $i");
         my $category = $BuffMultipliers->EvAnsCategory($thisBuff);
-        if(not defined $category) {
-          $self->logger()->warn("getEvAnsScore for $name found no category returned for " . np $thisBuff);
+        if (not defined $category) {
+          $self->logger()
+            ->warn("getEvAnsScore for $name found no category returned for "
+              . np $thisBuff);
           $category = 'Unused';
-        }else {
-          $self->logger()->debug("getEvAnsScore for $name found category $category for " . np $thisBuff);
+        }
+        else {
+          $self->logger()
+            ->debug("getEvAnsScore for $name found category $category for "
+              . np $thisBuff);
         }
         $resultRef->{'SPS'}->{$category} += $result;
-        $self->logger()->debug("getEvAnsScore for $name; $category currently has value: " . $resultRef->{'SPS'}->{$category});
+        $self->logger()
+          ->debug("getEvAnsScore for $name; $category currently has value: "
+            . $resultRef->{'SPS'}->{$category});
         $resultRef->{$category}->{'SPS'} += $result;
-        $self->logger()->trace("getEvAnsScore for $name; $category -> SPS  currently has value: " . $resultRef->{$category}->{'SPS'});
-        
+        $self->logger()
+          ->trace(
+          "getEvAnsScore for $name; $category -> SPS  currently has value: "
+            . $resultRef->{$category}->{'SPS'});
+
       }
-    } 
+    }
   }
 
-  method toHashRef( $verbose = 0) {
-    $self->logger()->trace("Starting toHashRef for Covenant, verbose is $verbose");
+  method toHashRef($verbose = 0) {
+    $self->logger()
+      ->trace("Starting toHashRef for Covenant, verbose is $verbose");
     my $returnRef = {
       primary   => $primary->name(),
       secondary => {
-        one     => $secondary{'one'},
-        two     => $secondary{'two'},
-        three   => $secondary{'three'},
+        one   => $secondary{'one'},
+        two   => $secondary{'two'},
+        three => $secondary{'three'},
       },
-    }
+    };
   }
 
   method _toString {
@@ -235,28 +247,32 @@ class Game::EvonyTKR::Covenant :isa(Game::EvonyTKR::Logger) {
   method readFromFile() {
     my $CovenantFile = $primary->name() . '.yaml';
     $self->logger()->debug("about to get $CovenantFile");
-    my $CovenantShare = File::Spec->catfile(dist_dir('Game-EvonyTKR'), 'covenants');
+    my $CovenantShare =
+      File::Spec->catfile(dist_dir('Game-EvonyTKR'), 'covenants');
     my $FileWithPath = File::Spec->catfile($CovenantShare, $CovenantFile);
-    if( -T -s -r $FileWithPath ) {
+    if (-T -s -r $FileWithPath) {
       $self->logger()->debug("$CovenantFile exists as expected");
       my $data = LoadFile($FileWithPath);
 
-      my @fileGenerals = @{$data->{'generals'}};
-      if(scalar @fileGenerals != 3) {
-        $self->logger()->logcroak("Wrong number of generals in covenant for " . $primary->name());
+      my @fileGenerals = @{ $data->{'generals'} };
+      if (scalar @fileGenerals != 3) {
+        $self->logger()
+          ->logcroak(
+          "Wrong number of generals in covenant for " . $primary->name());
       }
       else {
-        $secondary{'one'} = $fileGenerals[0];
-        $secondary{'two'} = $fileGenerals[1];
+        $secondary{'one'}   = $fileGenerals[0];
+        $secondary{'two'}   = $fileGenerals[1];
         $secondary{'three'} = $fileGenerals[2];
       }
-      my @levels = @{$CovenantLevels->values()};
-      my @fileLevels = @{ $data->{'levels'}};
-      
+      my @levels     = @{ $CovenantLevels->values() };
+      my @fileLevels = @{ $data->{'levels'} };
+
       for my ($index, $entry) (indexed(@fileLevels)) {
         my $value = $entry->{'category'};
-        if(none {$_ eq $entry->{'category'}} @levels) {
-          $self->logger()->logcroak("$value is invalid; expected one of " . np @levels);
+        if (none { $_ eq $entry->{'category'} } @levels) {
+          $self->logger()
+            ->logcroak("$value is invalid; expected one of " . np @levels);
         }
         else {
           $Buffs{$value}->{'type'} = $entry->{type};
@@ -268,19 +284,21 @@ class Game::EvonyTKR::Covenant :isa(Game::EvonyTKR::Logger) {
             my $b;
 
             my @ebKeys = keys %{$eb};
-            if(any {$_ eq 'value'} @ebKeys) {
-              $self->logger()->debug("$CovenantFile at $value has a buff with a value");
+            if (any { $_ eq 'value' } @ebKeys) {
+              $self->logger()
+                ->debug("$CovenantFile at $value has a buff with a value");
               $v = Game::EvonyTKR::Buff::Value->new(
-                number  => $eb->{'value'}->{'number'},
-                unit    => $eb->{'value'}->{'unit'},
+                number => $eb->{'value'}->{'number'},
+                unit   => $eb->{'value'}->{'unit'},
               );
-              if(any {$_ =~ /class/i} @ebKeys) {
+              if (any { $_ =~ /class/i } @ebKeys) {
                 $b = Game::EvonyTKR::Buff->new(
                   attribute => $eb->{'attribute'},
                   value     => $v,
                   buffClass => $eb->{'class'},
                 );
-              } else {
+              }
+              else {
                 $b = Game::EvonyTKR::Buff->new(
                   attribute => $eb->{'attribute'},
                   value     => $v,
@@ -288,11 +306,12 @@ class Game::EvonyTKR::Covenant :isa(Game::EvonyTKR::Logger) {
               }
             }
             else {
-              $self->logger()->warn("$CovenantFile at $value has a buff without a value");
+              $self->logger()
+                ->warn("$CovenantFile at $value has a buff without a value");
             }
-            if(defined $b) {
-              if(any {$_ eq 'condition'} @ebKeys) {
-                my @conditions = @{ $eb->{'condition'}};
+            if (defined $b) {
+              if (any { $_ eq 'condition' } @ebKeys) {
+                my @conditions = @{ $eb->{'condition'} };
                 for my $ebc (@conditions) {
                   $b->set_condition($ebc);
                 }

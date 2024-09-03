@@ -28,6 +28,9 @@ package Game::EvonyTKR::Web::General {
   use namespace::clean;
   use Dancer2 appname => 'Game::EvonyTKR';
   use Dancer2::Plugin::REST;
+  use FindBin;
+  use lib "$FindBin::Bin/../../../../lib";
+
   use Game::EvonyTKR::Web::General::Pair;
 
   my $store;
@@ -40,12 +43,12 @@ package Game::EvonyTKR::Web::General {
   };
 
   prefix '/general' => sub {
-    get '/:id'  => \&_by_id;
+    get '/:id' => \&_by_id;
   };
 
   sub _init {
     $store = Game::EvonyTKR::Web::Store::get_store();
-    if(not exists $$store{'generals'} ) {
+    if (not exists $$store{'generals'}) {
       $store->{'generals'} = {};
       $logger->trace('store now holds' . np $store);
     }
@@ -57,8 +60,10 @@ package Game::EvonyTKR::Web::General {
       _read_generals();
       $gencount = scalar keys %$generals;
       $logger->debug("After Reading, I have $gencount generals available.");
-    } else {
-      $logger->debug("I have $gencount generals already available; reading unnecessary");
+    }
+    else {
+      $logger->debug(
+        "I have $gencount generals already available; reading unnecessary");
     }
   }
 
@@ -77,21 +82,21 @@ package Game::EvonyTKR::Web::General {
     $logger->debug("sub _all has " . scalar %$generals . " generals");
 
     while (my ($key, $value) = each %$generals) {
-      $logger->trace("getting data for ". $value->name());
-      my $name = $value->name();
+      $logger->trace("getting data for " . $value->name());
+      my $name          = $value->name();
       my $hashedGeneral = $value->toHashRef();
       $logger->trace("$name has a hashed size of " . scalar %$hashedGeneral);
       push @data, $hashedGeneral;
     }
     $logger->debug('returning data array with size ' . scalar @data);
     #$logger->debug(Data::Printer::np @data);
-    return \@data ;
+    return \@data;
   }
 
   sub _by_id {
     _init();
     my $id = route_parameters->get('id');
-    if (exists $generals->{$id} ) {
+    if (exists $generals->{$id}) {
       my $general = $generals->{$id};
 
       my $level = query_parameters->get('level');
@@ -104,14 +109,15 @@ package Game::EvonyTKR::Web::General {
       }
 
       my @specialityLevels = qw( None None None None None );
-      for my $sl (1..4) {
+      for my $sl (1 .. 4) {
         my $sp = query_parameters->get("specialityLevel$sl");
         if (defined $sp) {
           my @lv = $general->specialityLevels();
-          if(any {$_ =~ /$sp/i} @lv) {
+          if (any { $_ =~ /$sp/i } @lv) {
             $logger->debug("setting $sp at specialityLevel$sl for $id");
             $general->changeActiveSpecialityLevel($sl, $sp);
-          } else {
+          }
+          else {
             $logger->warn("invalid specialityLevel $sp at $sl for $id");
             $logger->warn("valid values are " . Data::Printer::np @lv);
           }
@@ -124,7 +130,8 @@ package Game::EvonyTKR::Web::General {
         if ($ascendingLevel =~ /[1-5](Red|Purple)/) {
           $logger->trace("setting $ascendingLevel");
           $general->ascendingAttributes()->setActiveLevel($ascendingLevel);
-        } else {
+        }
+        else {
           $logger->warn(
             "Detected bad input '$ascendingLevel' reading ascendingLevel");
         }
@@ -134,12 +141,14 @@ package Game::EvonyTKR::Web::General {
       }
 
       my $verbose = query_parameters->get('verbose');
-      if(defined $verbose and $verbose ){
-        return $general->toHashRef( 1);
-      } else {
+      if (defined $verbose and $verbose) {
+        return $general->toHashRef(1);
+      }
+      else {
         return $general->toHashRef();
       }
-    } else {
+    }
+    else {
       return { general => "Not Found" };
     }
   }
@@ -198,28 +207,27 @@ package Game::EvonyTKR::Web::General {
             . Data::Printer::np @scoreType);
       }
 
-      if(scalar @generalClassKey == 0 ) {
-        $logger->logcroak($data->{'general'}->{'name'} .
-          ' has no general classes at all');
+      if (scalar @generalClassKey == 0) {
+        $logger->logcroak(
+          $data->{'general'}->{'name'} . ' has no general classes at all');
       }
       else {
-        $logger->trace( $data->{'general'}->{'name'} .
-          ' has ' . scalar @generalClassKey .
-          'classes.'
-        );
+        $logger->trace($data->{'general'}->{'name'} . ' has '
+            . scalar @generalClassKey
+            . 'classes.');
       }
 
       for (@generalClassKey) {
         my $thisClass = $_;
-        $generals->{$name} = $generalClass{$thisClass}->new(
-          name => $data->{'general'}->{'name'},
-        );
+        $generals->{$name} =
+          $generalClass{$thisClass}->new(name => $data->{'general'}->{'name'},);
 
         $logger->debug("created " . $name);
 
         $store->{'generals'}->{$name}->readFromFile();
 
-        $logger->debug("added " . Data::Printer::np $store->{'generals'}->{$name});
+        $logger->debug(
+          "added " . Data::Printer::np $store->{'generals'}->{$name});
       }
 
     }

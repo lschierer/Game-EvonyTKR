@@ -5,6 +5,7 @@ use FindBin;
 use lib "$FindBin::Bin/../../../../lib";
 
 package Game::EvonyTKR::Web::Store {
+#ABSTRACT: Common in-memory data storage for the Dancer2 instance for the Game::EvonyTKR distribution
   use Carp;
   use Data::Printer;
   use Game::EvonyTKR::Logger;
@@ -15,13 +16,13 @@ package Game::EvonyTKR::Web::Store {
   my $store;
 
   sub _init_store {
-    if(not defined($store)) {
+    if (not defined($store)) {
       $store = {};
     }
   }
 
   sub get_store {
-    if(not defined($store)) {
+    if (not defined($store)) {
       _init_store();
     }
     return $store;

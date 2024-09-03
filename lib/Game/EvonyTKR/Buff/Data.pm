@@ -4,19 +4,19 @@ use FindBin;
 use lib "$FindBin::Bin/../../../../lib";
 
 class Game::EvonyTKR::Buff::Data
-  :isa(Game::EvonyTKR::Logger) {
+  : isa(Game::EvonyTKR::Logger) {
 
-use Types::Standard qw(is_Int Int Str is_Str);
-use Types::Common::Numeric qw(PositiveOrZeroInt);
-use Type::Utils "is";
-use File::ShareDir ':ALL';
-use YAML::XS;
-use namespace::autoclean;
+  use Types::Standard        qw(is_Int Int Str is_Str);
+  use Types::Common::Numeric qw(PositiveOrZeroInt);
+  use Type::Utils "is";
+  use File::ShareDir ':ALL';
+  use YAML::XS;
+  use namespace::autoclean;
 
 # PODNAME: Game::EvonyTKR::Buff::Data
 # ABSTRACT: Data files for Game::EvonyTKR::Buff
 
-field @buffConditions :reader = (
+  field @buffConditions : reader = (
     'Against Monsters',
     'Attacking',
     'Defending',
@@ -37,7 +37,7 @@ field @buffConditions :reader = (
     'leading the army to attack',
   );
 
-  field @debuffConditions :reader = (
+  field @debuffConditions : reader = (
     'Enemy',
     'Enemy In City',
     'Reduces Enemy',
@@ -46,13 +46,13 @@ field @buffConditions :reader = (
     'Reduces',
   );
 
-
-  field @BuffAttributes :reader;
+  field @BuffAttributes : reader;
 
 =method set_BuffAttributes()
 
 get the possible attributes from the yaml data file in the shared directory and load them into memory.
 =cut
+
   method set_BuffAttributes {
     my $data_location = dist_file('Game-EvonyTKR', 'buff/attributes.yaml');
     open(my $DATA, '<', $data_location) or die $!;
@@ -63,10 +63,10 @@ get the possible attributes from the yaml data file in the shared directory and 
   }
 
   method AllConditions() {
-    return  ( @buffConditions, @debuffConditions);
+    return (@buffConditions, @debuffConditions);
   }
 
-  field @BuffClasses :reader = (
+  field @BuffClasses : reader = (
     'Ground Troops',
     'Mounted Troops',
     'Ranged Troops',
@@ -75,7 +75,7 @@ get the possible attributes from the yaml data file in the shared directory and 
     'Monsters',
   );
 
-  field @GeneralKeys :reader = (
+  field @GeneralKeys : reader = (
     'Ground Troops',
     'Mayor',
     'Mounted Troops',

@@ -10,12 +10,10 @@ class Game::EvonyTKR::Buff::EvaluationMultipliers::Wall {
 
 # ABSTRACT: Game::EvonyTKR::Buff Evaluation Multipliers for Wall use cases.
 
-  # from Type::Registry, this will save me from some of the struggles I have had with some types having blessed references and others not.
+# from Type::Registry, this will save me from some of the struggles I have had with some types having blessed references and others not.
   ADJUST {
-    if(!(t->simple_lookup("Num"))) {
-      t->add_types(
-      -Common
-      );
+    if (!(t->simple_lookup("Num"))) {
+      t->add_types(-Common);
     }
   }
 
@@ -23,6 +21,7 @@ class Game::EvonyTKR::Buff::EvaluationMultipliers::Wall {
 
 
 =cut
+
 }
 1;
 

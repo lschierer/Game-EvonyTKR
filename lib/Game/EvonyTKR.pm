@@ -33,16 +33,13 @@ use Game::EvonyTKR::Speciality;
 use namespace::clean;
 
 sub opt_spec {
-  return (
-    [ "option1|a",  "do option 1" ],
-  );
+  return (["option1|a", "do option 1"],);
 }
 
 sub getLogfileName() {
-    my $logger = Game::EvonyTKR::Logger->new();
-    return $logger->getLogfileName();
+  my $logger = Game::EvonyTKR::Logger->new();
+  return $logger->getLogfileName();
 }
-
 
 sub validate_args {
   my ($self, $opt, $args) = @_;
@@ -53,38 +50,43 @@ sub validate_args {
 
 sub execute {
   my ($self, $opt, $args) = @_;
-  binmode(STDOUT, ":encoding(UTF-8)"); # apparently not the same thing as "use utf8;"
-  binmode(STDIN, ":encoding(UTF-8)"); # apparently not the same thing as "use utf8;"
+  binmode(STDOUT, ":encoding(UTF-8)")
+    ;    # apparently not the same thing as "use utf8;"
+  binmode(STDIN, ":encoding(UTF-8)")
+    ;    # apparently not the same thing as "use utf8;"
   if ($opt->{option1}) {
-      # do option 1 stuff
-  } else {
+    # do option 1 stuff
+  }
+  else {
 
     my $logController = Game::EvonyTKR::Logger->new();
-    my $logger = $logController->logger();
-    my %generals = read_generals($logger);
-    my $classData = Game::EvonyTKR::Buff::Data->new();
-    my $conflicData = Game::EvonyTKR::General::Conflicts->new();
+    my $logger        = $logController->logger();
+    my %generals      = read_generals($logger);
+    my $classData     = Game::EvonyTKR::Buff::Data->new();
+    my $conflicData   = Game::EvonyTKR::General::Conflicts->new();
     $conflicData->initializeConflictDB();
     $classData->set_BuffClasses();
     my @BuffClasses = $classData->BuffClasses();
-    if(scalar @BuffClasses == 0) {
+
+    if (scalar @BuffClasses == 0) {
       croak 'error loading BuffClasses';
     }
     $logger->info("start");
-    $logger->info(sub {np %generals });
+    $logger->info(sub { np %generals });
     my $pairCreator = Game::EvonyTKR::General::Pair::Creator->new();
     $pairCreator->set_generals(%generals);
     my %pairs = $pairCreator->getPairs();
-    
+
     for my $bc (@BuffClasses) {
-      if(exists $pairs{$bc}) {
-        my @pairGroup = @{$pairs{$bc}};
+      if (exists $pairs{$bc}) {
+        my @pairGroup = @{ $pairs{$bc} };
         $logger->info("$bc: " . scalar @pairGroup);
         for my $gp (@pairGroup) {
           $logger->trace("primary: " . $gp->primary()->name());
-          $logger->trace("secondary: " . $gp->secondary()->name())
+          $logger->trace("secondary: " . $gp->secondary()->name());
         }
-      } else {
+      }
+      else {
         $logger->info("$bc: no pairs");
       }
     }
@@ -93,34 +95,35 @@ sub execute {
 }
 
 sub read_generals($logger) {
-  
+
   $logger->info("read_generals");
-  my $general_share = File::Spec->catfile(dist_dir('Game-EvonyTKR'), 'generals');
-  
-  my $special_share = File::Spec->catfile(dist_dir('Game-EvonyTKR'), 'specialities');
-  my $ascending_share = File::Spec->catfile(dist_dir('Game-EvonyTKR'), 'ascending');
+  my $general_share =
+    File::Spec->catfile(dist_dir('Game-EvonyTKR'), 'generals');
+
+  my $special_share =
+    File::Spec->catfile(dist_dir('Game-EvonyTKR'), 'specialities');
+  my $ascending_share =
+    File::Spec->catfile(dist_dir('Game-EvonyTKR'), 'ascending');
   my @found = grep { -T -s -r } glob("$general_share/*.yaml");
   $logger->info("$general_share");
   $logger->info(scalar @found);
-    
+
   my %generals;
   foreach my $tg (@found) {
-    if(defined($tg)) {
+    if (defined($tg)) {
       open(my ($fh), '<', $tg) or croak "$!";
       my $data = LoadFile($tg);
       my $name = $data->{'general'}->{'name'};
       $logger->info($name);
-      my @books = @{ $data->{'general'}->{'books'} };
-      my @SpecialityNames = @{ $data->{'general'}->{'specialities'}};
-      
-      if(exists $data->{'general'}->{'extra'} ) {
+      my @books           = @{ $data->{'general'}->{'books'} };
+      my @SpecialityNames = @{ $data->{'general'}->{'specialities'} };
+
+      if (exists $data->{'general'}->{'extra'}) {
         push @books, @{ $data->{'general'}->{'extra'} };
       }
 
       my $bookName = $books[0];
-      my $sb = Game::EvonyTKR::SkillBook::Special->new(
-        name  => $bookName
-      );
+      my $sb       = Game::EvonyTKR::SkillBook::Special->new(name => $bookName);
       $sb->readFromFile();
 
       my %generalClass = (
@@ -133,59 +136,57 @@ sub read_generals($logger) {
       my @generalClassKey;
 
       my @scoreType = @{ $data->{'general'}->{'score_as'} };
-      if (any {$_ =~ /Ground/ } @scoreType) {
+      if (any { $_ =~ /Ground/ } @scoreType) {
         push @generalClassKey => 'Ground';
-      } 
-      if (any {$_ =~ /Mounted/ } @scoreType) {
+      }
+      if (any { $_ =~ /Mounted/ } @scoreType) {
         push @generalClassKey => 'Mounted';
-      } 
-      if (any {$_ =~ /Ranged/ or $_ =~ /Archers/ } @scoreType) {
+      }
+      if (any { $_ =~ /Ranged/ or $_ =~ /Archers/ } @scoreType) {
         push @generalClassKey => 'Ranged';
-      } 
-      if (any {$_ =~ /Siege/ } @scoreType) {
+      }
+      if (any { $_ =~ /Siege/ } @scoreType) {
         push @generalClassKey => 'Siege';
-      } 
-      if (any {$_ =~ /Mayor/ } @scoreType) {
+      }
+      if (any { $_ =~ /Mayor/ } @scoreType) {
         next;
       }
       if (scalar @generalClassKey != scalar @scoreType) {
-        croak $data->{'general'}->{'name'} . " is of unknown general type " . p @scoreType;
+        croak $data->{'general'}->{'name'}
+          . " is of unknown general type "
+          . p @scoreType;
       }
 
-      for (@generalClassKey){
+      for (@generalClassKey) {
         $generals{$name} = $generalClass{$_}->new(
-          name                  => $data->{'general'}->{'name'},
-          leadership            => $data->{'general'}->{'leadership'},
-          leadership_increment  => $data->{'general'}->{'leadership_increment'},
-          attack                => $data->{'general'}->{'attack'},
-          attack_increment      => $data->{'general'}->{'attack_increment'},
-          defense               => $data->{'general'}->{'defense'},
-          defense_increment     => $data->{'general'}->{'defense_increment'},
-          politics              => $data->{'general'}->{'politics'},
-          politics_increment    => $data->{'general'}->{'politics_increment'},
-          builtInBook           => $sb,
+          name                 => $data->{'general'}->{'name'},
+          leadership           => $data->{'general'}->{'leadership'},
+          leadership_increment => $data->{'general'}->{'leadership_increment'},
+          attack               => $data->{'general'}->{'attack'},
+          attack_increment     => $data->{'general'}->{'attack_increment'},
+          defense              => $data->{'general'}->{'defense'},
+          defense_increment    => $data->{'general'}->{'defense_increment'},
+          politics             => $data->{'general'}->{'politics'},
+          politics_increment   => $data->{'general'}->{'politics_increment'},
+          builtInBook          => $sb,
         );
         for (@books) {
           my $tbName = $_;
-          if($tbName eq /$bookName/ ) {
+          if ($tbName eq /$bookName/) {
             next;
           }
-          my $tb = Game::EvonyTKR::SkillBook::Special->new(
-            name  => $tbName
-          );
+          my $tb = Game::EvonyTKR::SkillBook::Special->new(name => $tbName);
           $tb->readFromFile();
           $generals{$name}->addAnotherBook($tb);
         }
         for (@SpecialityNames) {
-          my $sn = $_;
-          my $tsi = Game::EvonyTKR::Speciality->new(
-            name => $sn,
-          );
+          my $sn  = $_;
+          my $tsi = Game::EvonyTKR::Speciality->new(name => $sn,);
           $tsi->readFromFile();
         }
-        $logger->debug("added ". np $generals{$name});
+        $logger->debug("added " . np $generals{$name});
       }
-    
+
     }
   }
   return %generals;

@@ -244,7 +244,7 @@ class Game::EvonyTKR::Buff::Data::EvaluationData::Monster :
     'Healing Speed'     => 0.0,
     'Hospital Capacity' => 0.0,
 
-    'Leadership' => 0.0,       # EvAns has no direct mapping to this.
+    'Leadership' => 0.0,     # EvAns has no direct mapping to this.
     'Load'       => 0.0,
 
     'March Size Capacity'        => 0.0,
@@ -253,11 +253,11 @@ class Game::EvonyTKR::Buff::Data::EvaluationData::Monster :
     'Marching Speed to Monsters' => 0.01,
     'Monster Attack'             => 3,
 
-    'Politics' => 0.0,         # EvAns has no direct mapping to this.
+    'Politics' => 0.0,       # EvAns has no direct mapping to this.
 
     'Rally Capacity' => 0.0,
     'Range'          =>
-      0.0,   # while it might be interesting, I have never seen a debuff on range.
+      0.0, # while it might be interesting, I have never seen a debuff on range.
     'Resources Production' => 0.0,
 
     'Stamina cost'               => 0.01,
@@ -299,21 +299,25 @@ class Game::EvonyTKR::Buff::Data::EvaluationData::Monster :
                 ) {
                   $returnValue =
                     $BuffMultipliers{'Attack'}->{$GeneralBias}->{$BuffBias};
-                } else {
+                }
+                else {
                   $self->logger()
                     ->error(
 "BuffMultipliers{Attack}->{$GeneralBias} does not contain $BuffBias"
                     );
                 }
-              } else {
+              }
+              else {
                 $self->logger()
                   ->error(
                   "BuffMultipliers{Attack} does not contain $GeneralBias");
               }
-            } else {
+            }
+            else {
               $self->logger()->error("BuffMultipliers does not contain Attack");
             }
-          } elsif ($attribute =~ /Defense/i) {
+          }
+          elsif ($attribute =~ /Defense/i) {
             if (exists $BuffMultipliers{'Defense'}) {
               if (exists $BuffMultipliers{'Defense'}->{$GeneralBias}) {
                 if (
@@ -321,68 +325,76 @@ class Game::EvonyTKR::Buff::Data::EvaluationData::Monster :
                   ->{$BuffBias}) {
                   $returnValue =
                     $BuffMultipliers{'Defense'}->{$GeneralBias}->{$BuffBias};
-                } else {
+                }
+                else {
                   $self->logger()
                     ->error(
 "BuffMultipliers{Defense}->{$GeneralBias} does not contain $BuffBias"
                     );
                 }
-              } else {
+              }
+              else {
                 $self->logger()
                   ->error(
                   "BuffMultipliers{Defense} does not contain $GeneralBias");
               }
-            } else {
+            }
+            else {
               $self->logger()
                 ->error("BuffMultipliers does not contain Defense");
             }
-          } elsif ($attribute =~ /HP/i) {
+          }
+          elsif ($attribute =~ /HP/i) {
             if (exists $BuffMultipliers{'HP'}) {
               if (exists $BuffMultipliers{'HP'}->{$GeneralBias}) {
                 if (exists $BuffMultipliers{'HP'}->{$GeneralBias}->{$BuffBias})
                 {
                   $returnValue =
                     $BuffMultipliers{'HP'}->{$GeneralBias}->{$BuffBias};
-                } else {
+                }
+                else {
                   $self->logger()
                     ->error(
 "BuffMultipliers{HP}->{$GeneralBias} does not contain $BuffBias"
                     );
                 }
-              } else {
+              }
+              else {
                 $self->logger()
                   ->error("BuffMultipliers{HP} does not contain $GeneralBias");
               }
-            } else {
+            }
+            else {
               $self->logger()->error("BuffMultipliers does not contain HP");
             }
-          } elsif ($attribute =~ /Range/i) {
+          }
+          elsif ($attribute =~ /Range/i) {
             if (exists $BuffMultipliers{'Range'}) {
               $returnValue = $BuffMultipliers{'Range'};
-            } else {
+            }
+            else {
               $self->logger()->error("BuffMultipliers does not contain Range");
             }
-          } else {
+          }
+          else {
             $returnValue = $BuffMultipliers{$attribute};
           }
-        } else {
+        }
+        else {
           $self->logger()->error("$BuffBias is invalid.");
         }
-      } else {
+      }
+      else {
         $self->logger()->error("$GeneralBias is invalid.");
       }
-    } else {
+    }
+    else {
       $self->logger()->error("$attribute is invalid");
     }
-    $self->logger()
-      ->info(sprintf(
-        "getMultiplierForBuff for %s with %s, %s, %s returns '%d'",
-        $attribute,
-        $attribute,
-        $BuffBias,
-        $unit,
-        $returnValue
-      ));
+    $self->logger()->info(sprintf(
+      "getMultiplierForBuff for %s with %s, %s, %s returns '%d'",
+      $attribute, $attribute, $BuffBias, $unit, $returnValue
+    ));
     return $returnValue;
   }
 
@@ -409,59 +421,68 @@ class Game::EvonyTKR::Buff::Data::EvaluationData::Monster :
             if (exists $DebuffMultipliers{'Attack'}) {
               if (exists $DebuffMultipliers{'Attack'}->{$GeneralBias}) {
                 $returnValue = $DebuffMultipliers{'Attack'}->{$GeneralBias};
-              } else {
+              }
+              else {
                 $self->logger()
                   ->error(
                   "DebuffMultipliers{Attack} does not contain $GeneralBias");
               }
-            } else {
-              $self->logger()->error("DebuffMultipliers does not contain Attack");
             }
-          } elsif ($attribute =~ /Defense/i) {
+            else {
+              $self->logger()
+                ->error("DebuffMultipliers does not contain Attack");
+            }
+          }
+          elsif ($attribute =~ /Defense/i) {
             if (exists $DebuffMultipliers{'Defense'}) {
               if (exists $DebuffMultipliers{'Defense'}->{$GeneralBias}) {
                 $returnValue = $DebuffMultipliers{'Defense'}->{$GeneralBias};
-              } else {
+              }
+              else {
                 $self->logger()
                   ->error(
                   "DebuffMultipliers{Defense} does not contain $GeneralBias");
               }
-            } else {
+            }
+            else {
               $self->logger()
                 ->error("DebuffMultipliers does not contain Defense");
             }
-          } elsif ($attribute =~ /HP/i) {
+          }
+          elsif ($attribute =~ /HP/i) {
             if (exists $DebuffMultipliers{'HP'}) {
               if (exists $DebuffMultipliers{'HP'}->{$GeneralBias}) {
                 $returnValue = $DebuffMultipliers{'HP'}->{$GeneralBias};
-              } else {
-                $self->logger()
-                  ->error("DebuffMultipliers{HP} does not contain $GeneralBias");
               }
-            } else {
+              else {
+                $self->logger()
+                  ->error(
+                  "DebuffMultipliers{HP} does not contain $GeneralBias");
+              }
+            }
+            else {
               $self->logger()->error("DebuffMultipliers does not contain HP");
             }
-          } else {
+          }
+          else {
             $returnValue = $DebuffMultipliers{$attribute};
           }
-        } else {
+        }
+        else {
           $self->logger()->error("$BuffBias is invalid.");
         }
-      } else {
+      }
+      else {
         $self->logger()->error("$GeneralBias is invalid.");
       }
-    } else {
+    }
+    else {
       $self->logger()->error("$attribute is invalid");
     }
-    $self->logger()
-      ->info(sprintf(
-        "getMultiplierForDebuff for %s with %s, %s, %s returns '%d'",
-        $attribute,
-        $attribute,
-        $BuffBias,
-        $unit,
-        $returnValue
-      ));
+    $self->logger()->info(sprintf(
+      "getMultiplierForDebuff for %s with %s, %s, %s returns '%d'",
+      $attribute, $attribute, $BuffBias, $unit, $returnValue
+    ));
     return $returnValue;
   }
 }

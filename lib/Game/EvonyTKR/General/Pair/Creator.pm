@@ -4,7 +4,7 @@ use utf8::all;
 use FindBin;
 use lib "$FindBin::Bin/../../../../../lib";
 
-class Game::EvonyTKR::General::Pair::Creator :isa(Game::EvonyTKR::Logger) {
+class Game::EvonyTKR::General::Pair::Creator : isa(Game::EvonyTKR::Logger) {
 # PODNAME: Game::EvonyTKR::General::Pair::Creator
   use Array::Utils qw(:all);
   use Carp;
@@ -30,25 +30,24 @@ class Game::EvonyTKR::General::Pair::Creator :isa(Game::EvonyTKR::Logger) {
   use namespace::autoclean;
   use Game::EvonyTKR::Logger;
 
-
   my $debug = 1;
 
-  my $distData = File::HomeDir->my_dist_data( 'Game-Evony', { create => 1 } );
-  my $dbPath = File::Spec->catfile($distData, "db");
+  my $distData = File::HomeDir->my_dist_data('Game-Evony', { create => 1 });
+  my $dbPath   = File::Spec->catfile($distData, "db");
 
   # some constants
-  field $classData = Game::EvonyTKR::Buff::Data->new();
+  field $classData   = Game::EvonyTKR::Buff::Data->new();
   field $conflicData = Game::EvonyTKR::General::Conflicts->new();
 
-  field %generals :reader;
+  field %generals : reader;
 
-  method set_generals( %ng ) {
+  method set_generals(%ng) {
 
-    if(scalar %ng >= 1) {
+    if (scalar %ng >= 1) {
       $self->logger()->debug("hashRef is " . \%ng);
       $self->logger()->debug("size is " . scalar %ng);
 
-       %generals = %ng;
+      %generals = %ng;
     }
   }
 
@@ -63,9 +62,10 @@ This assumes that the Generals are hashed by their names.
 if conflicts have not been intialized in the Game::EvonyTKR::General::Conflicts class,
 it will not consider conflicts.
 =cut
+
   method getPairs() {
     my @GeneralKeys = $classData->GeneralKeys();
-    if(scalar %generals >= 2 ) {
+    if (scalar %generals >= 2) {
       my %pairs;
       my $sg1 = Hash::Map->new();
       $sg1->set_source(%generals);
@@ -73,56 +73,62 @@ it will not consider conflicts.
       my $sg2 = Hash::Map->new();
       $sg2->set_source(%generals);
 
-      while ( my ($key1, $value1) = $sg1->each_source ) {
-        $self->logger()->info( "looking for pairs for $key1");
+      while (my ($key1, $value1) = $sg1->each_source) {
+        $self->logger()->info("looking for pairs for $key1");
         my @conflicts = $conflicData->getConflictsByName($value1->name());
-        while ( my ($key2, $value2) = $sg2->each_source ) {
+        while (my ($key2, $value2) = $sg2->each_source) {
           $self->logger()->debug("testing $key2 against $key1");
 
-          if($value1->name() ne $value2->name()) {
+          if ($value1->name() ne $value2->name()) {
 
-            if(scalar @conflicts >= 1) {
+            if (scalar @conflicts >= 1) {
               my $name2 = $value2->name();
-              if( any { $_ =~ qr/$name2/} @conflicts) {
-                $self->logger()->info("found conflict between " . $value1->name() . " and " . $value2->name());
+              if (any { $_ =~ qr/$name2/ } @conflicts) {
+                $self->logger()
+                  ->info("found conflict between "
+                    . $value1->name() . " and "
+                    . $value2->name());
                 next;
               }
             }
 
-            if( $value1->generalType() eq $value2->generalType() ) {
-              my $key = $value1->generalType();
+            if ($value1->generalType() eq $value2->generalType()) {
+              my $key  = $value1->generalType();
               my $pair = Game::EvonyTKR::General::Pair->new(
                 primary   => $value1,
                 secondary => $value2,
               );
-              $self->logger()->debug($value1->name() .
-                ' and ' . $value2->name() .
-                "are both $key");
-              my $gk = first {$_ =~ /$key/i } @GeneralKeys;
-              if(defined($gk)){
+              $self->logger()
+                ->debug(
+                $value1->name() . ' and ' . $value2->name() . "are both $key");
+              my $gk = first { $_ =~ /$key/i } @GeneralKeys;
+              if (defined($gk)) {
                 $self->logger()->trace("pushing pair with '$gk'");
                 my $nameKey = $value1->name();
-                push @{ $pairs{$gk} }, $pair;
+                push @{ $pairs{$gk} },      $pair;
                 push @{ $pairs{$nameKey} }, $pair;
               }
               else {
-                $self->logger()->logcroak(
-                  "$key is not a valid key, must be one of " .
-                  np @GeneralKeys
-                );
+                $self->logger()
+                  ->logcroak(
+                  "$key is not a valid key, must be one of " . np @GeneralKeys);
               }
             }
             else {
               $self->logger()->debug(sprintf(
                 '%s and %s have different generalTypes: %s and %s; rejecting.',
-                $value1->name(),
-                $value2->name(),
-                $value1->generalType(),
-                $value2->generalType(),
+                $value1->name(),        $value2->name(),
+                $value1->generalType(), $value2->generalType(),
               ));
             }
-          } else {
-            $self->logger()->debug(sprintf('%s is the same as %s, rejecting.', $value1->name(), $value2->name()));
+          }
+          else {
+            $self->logger()->debug(
+              sprintf(
+                '%s is the same as %s, rejecting.',
+                $value1->name(), $value2->name()
+              )
+            );
           }
         }
 
