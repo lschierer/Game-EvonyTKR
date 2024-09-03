@@ -9,7 +9,7 @@ class Game::EvonyTKR::General::Pair {
   use Type::Utils "is";
   use Util::Any -all;
   use Game::EvonyTKR::SkillBook::Special;
-  use Game::EvonyTKR::Buff::EvaluationData;
+  use Game::EvonyTKR::Buff::Data;
   use Game::EvonyTKR::General;
   use namespace::autoclean;
   # PODNAME: Game::EvonyTKR::General::Pair
@@ -19,6 +19,7 @@ class Game::EvonyTKR::General::Pair {
     '=='        => \&_equality,
     'ne'        => \&_inequality,
     '!='        => \&_inequality,
+    '""'        => \&_toString;
     "fallback"  => 1;
 
   # from Type::Registry, this will save me from some of the struggles I have had with some types having blessed references and others not.
@@ -56,6 +57,30 @@ class Game::EvonyTKR::General::Pair {
     }
   }
 
+  method toHashRef($verbose = 0) {
+    if (not $verbose) {
+      return {
+        primary   => {
+          name    => $primary->name(),
+        },
+        secondary => {
+          name    => $secondary->name(),
+        },
+      };
+    }
+    else {
+      return {
+        verbose   => true,
+        primary   => $primary->toHashRef(),
+        secondary => $secondary->toHashRef(),
+      };
+    }
+  }
+
+  method _toString {
+    my $json = JSON::MaybeXS->new(utf8 => 1);
+    return $json->encode($self->toHashRef());
+  }
 
   method _equality ($other, $swap = 0) {
     if(blessed $other eq 'Game::EvonyTKR::General::Pair') {
