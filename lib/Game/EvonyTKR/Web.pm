@@ -130,7 +130,7 @@ package Game::EvonyTKR::Web::Root {
           allow_tags      => 1,
           canonical       => 1,
           convert_blessed => 1,
-          max_depth       => 7,
+          max_depth       => 8,
           pretty          => 0,
           utf8            => 1,
         }
