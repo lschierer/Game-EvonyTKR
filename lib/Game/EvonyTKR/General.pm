@@ -14,8 +14,8 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Logger) {
   use File::Spec;
   use Game::EvonyTKR::Covenant;
   use Game::EvonyTKR::SkillBook::Special;
-  use Game::EvonyTKR::Buff::Data::EvaluationData::Attacking;
-  use Game::EvonyTKR::Buff::Data::EvaluationData::Monster;
+  require Game::EvonyTKR::Buff::Data::EvaluationData::Attacking;
+  require Game::EvonyTKR::Buff::Data::EvaluationData::Monster;
   use Game::EvonyTKR::Ascending;
   use JSON::MaybeXS;
   use YAML::XS qw{LoadFile Load};
@@ -559,7 +559,7 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Logger) {
     }
     if ($verbose) {
       return {
-        name                 => $name,
+        id                   => $name,
         level                => $level,
         leadership           => $self->leadership(),
         leadership_increment => $self->leadership_increment(),
@@ -590,7 +590,7 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Logger) {
     }
     else {
       return {
-        name                 => $name,
+        id                   => $name,
         level                => $level,
         leadership_increment => $self->effective_leadership(),
         attack               => $self->effective_attack(),
