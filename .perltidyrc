@@ -24,7 +24,7 @@
 # vertical
 #-iob   # ? ignore old breakpoints
 #-vt=0  # vertical tightness
--ce     # Prettier cuddled else
+-nce     # Prettier no cuddled else
 -wn     # weld nested containers
 -sot    # stack opening tokens
 #-mbl=1 # Prettier maximum consecutive blank lines
