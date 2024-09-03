@@ -3,7 +3,7 @@ use utf8::all;
 use FindBin;
 use lib "$FindBin::Bin/../../../../lib";
 
-class Game::EvonyTKR::Buff::Data 
+class Game::EvonyTKR::Buff::Data
   :isa(Game::EvonyTKR::Logger) {
 
 use Types::Standard qw(is_Int Int Str is_Str);
@@ -65,7 +65,7 @@ get the possible attributes from the yaml data file in the shared directory and 
   method AllConditions() {
     return  ( @buffConditions, @debuffConditions);
   }
-  
+
   field @BuffClasses :reader = (
     'Ground Troops',
     'Mounted Troops',
@@ -73,6 +73,16 @@ get the possible attributes from the yaml data file in the shared directory and 
     'Siege Machines',
     'All Troops',
     'Monsters',
+  );
+
+  field @GeneralKeys :reader = (
+    'Ground Troops',
+    'Mayor',
+    'Mounted Troops',
+    'Officer',
+    'Ranged Troops',
+    'Siege Machines',
+    'Wall',
   );
 
 }
@@ -117,5 +127,5 @@ This includes both Buff and Debuff conditions. see buffConditions() and debuffCo
 
 A *buff* will affect either exactly one or All classes of troops. This is attempting to replace having an enum.
 
-A *General* can have more than one Class from this list.  That is because General Classes and Buff classes are the same values, but used totally differently. 
+A *General* can have more than one Class from this list.  That is because General Classes and Buff classes are the same values, but used totally differently.
 =cut

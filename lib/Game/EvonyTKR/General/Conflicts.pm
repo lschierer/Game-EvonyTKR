@@ -24,7 +24,6 @@ class Game::EvonyTKR::General::Conflicts :isa(Game::EvonyTKR::Logger) {
   use Game::EvonyTKR::SkillBook::Special;
   use Game::EvonyTKR::SkillBook::Standard;
   use Game::EvonyTKR::Buff::Data;
-  use Game::EvonyTKR::Buff::EvaluationData;
   use namespace::autoclean;
   use Game::EvonyTKR::Logger;
 
@@ -34,7 +33,7 @@ class Game::EvonyTKR::General::Conflicts :isa(Game::EvonyTKR::Logger) {
   # some constants
   field $classData = Game::EvonyTKR::Buff::Data->new();
 
-  ADJUST {  
+  ADJUST {
     if(! -r -w  -x -o -d $dbPath) {
       make_path($dbPath,"0770");
     }
@@ -56,7 +55,7 @@ returns the conflicts for a Game::EvonyTKR::General with name $name
 =cut
 
   method getConflictsByName( $name ) {
-    
+
     if(not defined $name or $name eq '') {
       croak "name must be defined, not '$name'";
     }
@@ -72,7 +71,7 @@ returns the conflicts for a Game::EvonyTKR::General with name $name
           }
         }
       }
-    } 
+    }
     $self->logger()->info(scalar @conflicts . " conflicts for $name");
     $self->logger()->trace('end getConflictsByName');
     return @conflicts;
@@ -83,8 +82,8 @@ returns the conflicts for a Game::EvonyTKR::General with name $name
 I am including this here for now at least because I am honestly unsure where to put it.
 Conflict data needs to be read in somewhere.
 
-This is called to initialize the conflict Database from the yaml files distributed in the 
-distribution's dist_data directory.  
+This is called to initialize the conflict Database from the yaml files distributed in the
+distribution's dist_data directory.
 
 =cut
 
@@ -100,11 +99,11 @@ distribution's dist_data directory.
       my $conflictGroup = $yp->load_file($file);
       $self->logger()->debug("start of $file");
       $self->logger()->info(sub { np($conflictGroup) });
-      $self->logger()->debug("members are: " . np($conflictGroup->{'members'}));      
+      $self->logger()->debug("members are: " . np($conflictGroup->{'members'}));
 
       my $groupName = $conflictGroup->{'name'};
       $self->logger()->debug("name is: $groupName");
-      
+
       $db->put($groupName, {}) unless $db->get($groupName);
       $db->get($groupName)->put('members', []) unless $db->get($groupName)->get('members');
       $db->get($groupName)->put('others', []) unless $db->get($groupName)->get('others');
@@ -121,7 +120,7 @@ distribution's dist_data directory.
 
       $self->logger()->trace("members are: " . np( @members));
       $self->logger()->trace("there are " . scalar @members . " members in the list");
-      
+
       if(scalar @members >= 1) {
         foreach (@members) {
           my $entryName = $_;
@@ -189,7 +188,7 @@ distribution's dist_data directory.
       }
 
       $self->logger()->debug("end of $file");
-      
+
     }
   }
 
@@ -202,7 +201,7 @@ __END__
 
 =head1 DESCRIPTION
 
-As I worked with trying to create pairs of Game::EvonyTKR:General class objects, I eventually realized that the conflict data itself needed its own class.  I am storying that data in a database so that I can query it rather than having to either pass a relatively huge data structure around or recreate it when needed. 
+As I worked with trying to create pairs of Game::EvonyTKR:General class objects, I eventually realized that the conflict data itself needed its own class.  I am storying that data in a database so that I can query it rather than having to either pass a relatively huge data structure around or recreate it when needed.
 
 =head2 Conflict Database
 
@@ -210,7 +209,7 @@ This creates a database of conflict information for the overall distribution.  I
 
 =for :list
 
-* A general might conflict with a SkillBook::Standard level 1 but not a 
+* A general might conflict with a SkillBook::Standard level 1 but not a
   SkillBook::Standard level 4 of the same name
 
 * While in general my ratings are based on the excelent work done by

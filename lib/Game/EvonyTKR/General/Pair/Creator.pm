@@ -6,6 +6,7 @@ use lib "$FindBin::Bin/../../../../../lib";
 
 class Game::EvonyTKR::General::Pair::Creator :isa(Game::EvonyTKR::Logger) {
 # PODNAME: Game::EvonyTKR::General::Pair::Creator
+  use Array::Utils qw(:all);
   use Carp;
   use Clone 'clone';
   use Class::ISA;
@@ -59,10 +60,11 @@ If there are insufficient generals to make pairs, it returns 0 (false).
 
 This assumes that the Generals are hashed by their names.
 
-if conflicts have not been intialized in the Game::EvonyTKR::General::Conflicts class, 
-it will not consider conflicts. 
+if conflicts have not been intialized in the Game::EvonyTKR::General::Conflicts class,
+it will not consider conflicts.
 =cut
   method getPairs() {
+    my @GeneralKeys = $classData->GeneralKeys();
     if(scalar %generals >= 2 ) {
       my %pairs;
       my $sg1 = Hash::Map->new();
@@ -70,7 +72,7 @@ it will not consider conflicts.
 
       my $sg2 = Hash::Map->new();
       $sg2->set_source(%generals);
-      
+
       while ( my ($key1, $value1) = $sg1->each_source ) {
         $self->logger()->info( "looking for pairs for $key1");
         my @conflicts = $conflicData->getConflictsByName($value1->name());
@@ -78,7 +80,7 @@ it will not consider conflicts.
           $self->logger()->debug("testing $key2 against $key1");
 
           if($value1->name() ne $value2->name()) {
-            
+
             if(scalar @conflicts >= 1) {
               my $name2 = $value2->name();
               if( any { $_ =~ qr/$name2/} @conflicts) {
@@ -86,38 +88,47 @@ it will not consider conflicts.
                 next;
               }
             }
-            my $key = 'unknown';
-            my @BuffClasses = $classData->BuffClasses();
-            if($value1->is_ground_general() and $value2->is_ground_general()){
-              $key = first { $_ =~ qr/ground/i } @BuffClasses;
-            } elsif ($value1->is_mounted_general() and $value2->is_mounted_general()) {
-              $key = first {$_ =~ qr/mounted/i } @BuffClasses;
-            } elsif ($value1->is_ranged_general() and $value2->is_ranged_general()) {
-              $key = first {$_ =~ qr/ranged/i } @BuffClasses;
-            } elsif($value1->is_siege_general() and $value2->is_siege_general()){
-               $key = first {$_ =~ qr/siege/i } @BuffClasses;
-            }
-            my $pair = Game::EvonyTKR::General::Pair->new(
+
+            if( $value1->generalType() eq $value2->generalType() ) {
+              my $key = $value1->generalType();
+              my $pair = Game::EvonyTKR::General::Pair->new(
                 primary   => $value1,
                 secondary => $value2,
               );
-            if($key ne 'unknown') {
-              if(defined $key && $key ne '') {
-                $self->logger()->debug("$key1 and $key2 are both $key");
-                push @{ $pairs{$key} }, $pair;
-              } else {
-                croak "bad key '$key'"
+              $self->logger()->debug($value1->name() .
+                ' and ' . $value2->name() .
+                "are both $key");
+              my $gk = first {$_ =~ /$key/i } @GeneralKeys;
+              if(defined($gk)){
+                $self->logger()->trace("pushing pair with '$gk'");
+                push @{ $pairs{$gk} }, $pair;
+                push @{ $pairs{$value1->name()} }, $pair;
+              }
+              else {
+                $self->logger()->logcroak(
+                  "$key is not a valid key, must be one of " .
+                  np @GeneralKeys
+                );
               }
             }
+            else {
+              $self->logger()->debug(sprintf(
+                '%s and %s have different generalTypes: %s and %s; rejecting.',
+                $value1->name(),
+                $value2->name(),
+                $value1->generalType(),
+                $value2->generalType(),
+              ));
+            }
           } else {
-            $self->logger()->debug("$key1 and $key2 are the same, rejecting");
+            $self->logger()->debug(sprintf('%s is the same as %s, rejecting.', $value1->name(), $value2->name()));
           }
         }
-        
+
       }
       return %pairs;
     }
-    croak "Cannot operate without generals."; 
+    croak "Cannot operate without generals.";
   }
 
 };
