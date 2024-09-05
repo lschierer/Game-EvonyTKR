@@ -559,7 +559,7 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Logger) {
     }
     if ($verbose) {
       return {
-        id                   => $name,
+        name                   => $name,
         level                => $level,
         leadership           => $self->leadership(),
         leadership_increment => $self->leadership_increment(),
