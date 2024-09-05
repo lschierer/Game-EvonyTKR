@@ -1,7 +1,7 @@
 ---
 books:
   - name: Siege Attack
-    level: '1'
+    level: 1
     buff:
       - attribute: Attack
         class: Siege Machines
@@ -9,7 +9,7 @@ books:
           number: 10
           unit: percentage
   - name: Siege Attack
-    level: '2'
+    level: 2
     buff:
       - attribute: Attack
         class: Siege Machines
@@ -17,7 +17,7 @@ books:
           number: 15
           unit: percentage
   - name: Siege Attack
-    level: '3'
+    level: 3
     buff:
       - attribute: Attack
         class: Siege Machines
@@ -25,7 +25,7 @@ books:
           number: 20
           unit: percentage
   - name: Siege Attack
-    level: '4'
+    level: 4
     buff:
       - attribute: Attack
         class: Siege Machines
@@ -33,7 +33,7 @@ books:
           number: 25
           unit: percentage
   - name: Siege HP
-    level: '1'
+    level: 1
     buff:
       - attribute: HP
         class: Siege Machines
@@ -41,7 +41,7 @@ books:
           number: 10
           unit: percentage
   - name: Siege HP
-    level: '2'
+    level: 2
     buff:
       - attribute: HP
         class: Siege Machines
@@ -49,7 +49,7 @@ books:
           number: 15
           unit: percentage
   - name: Siege HP
-    level: '3'
+    level: 3
     buff:
       - attribute: HP
         class: Siege Machines
@@ -57,9 +57,49 @@ books:
           number: 20
           unit: percentage
   - name: Siege HP
-    level: '4'
+    level: 4
     buff:
       - attribute: HP
+        class: Siege Machines
+        value:
+          number: 25
+          unit: percentage
+  - name: Siege Attack
+    level: 4
+    buff:
+      - attribute: Attack
+        class: Siege Machines
+        value:
+          number: 25
+          unit: percentage
+  - name: Siege Defense
+    level: 1
+    buff:
+      - attribute: Defense
+        class: Siege Machines
+        value:
+          number: 10
+          unit: percentage
+  - name: Siege Defense
+    level: 2
+    buff:
+      - attribute: Defense
+        class: Siege Machines
+        value:
+          number: 15
+          unit: percentage
+  - name: Siege Defense
+    level: 3
+    buff:
+      - attribute: Defense
+        class: Siege Machines
+        value:
+          number: 20
+          unit: percentage
+  - name: Siege Defense
+    level: 4
+    buff:
+      - attribute: Defense
         class: Siege Machines
         value:
           number: 25
