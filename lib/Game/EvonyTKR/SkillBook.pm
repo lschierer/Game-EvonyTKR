@@ -32,7 +32,7 @@ class Game::EvonyTKR::SkillBook : isa(Game::EvonyTKR::Logger) {
     }
   }
 
-  field $name : reader : param;
+  field $name :reader : param;
 
   ADJUST {
     my @errors;
@@ -41,6 +41,8 @@ class Game::EvonyTKR::SkillBook : isa(Game::EvonyTKR::Logger) {
       die join ', ' => @errors;
     }
   }
+
+  field $text :reader;
 
   field @buffs : reader;
 
@@ -56,6 +58,12 @@ class Game::EvonyTKR::SkillBook : isa(Game::EvonyTKR::Logger) {
       $resultRef->{'SBS'}->{$category} += $result;
       $resultRef->{$category}->{'SBS'} += $result;
     }
+  }
+
+  method set_text($nt ='') {
+    is_Str($nt) or $self->logger()->logcroak("text must be a string, not $nt");
+
+    $text = $nt;
   }
 
   method add_buff($nb) {
@@ -76,12 +84,15 @@ class Game::EvonyTKR::SkillBook : isa(Game::EvonyTKR::Logger) {
     push @buffs, $nb;
   }
 
-  method toHashRef() {
+  method toHashRef($verbose = 0) {
     $self->logger()->trace("starting toHashRef for $name");
     my $returnRef = {};
     $returnRef->{'name'} = $name;
-    for my $tb (@buffs) {
-      push @{ $returnRef->{'buffs'} }, $tb->toHashRef();
+    $returnRef->{'text'} = $text;
+    if($verbose) {  
+      for my $tb (@buffs) {
+        push @{ $returnRef->{'buffs'} }, $tb->toHashRef();
+      } 
     }
     return $returnRef;
   }
@@ -91,63 +102,6 @@ class Game::EvonyTKR::SkillBook : isa(Game::EvonyTKR::Logger) {
     return $json->encode($self->toHashRef());
   }
 
-  method readFromFile() {
-    my $SkillBookFileName = $name . '.yaml';
-    my $SkillBookShare =
-      File::Spec->catfile(dist_dir('Game-EvonyTKR'), 'skillbooks');
-    my $FileWithPath = File::Spec->catfile($SkillBookShare, $SkillBookFileName);
-    if (-T -s -r $FileWithPath) {
-      $self->logger()->debug("$SkillBookFileName exists as expected");
-      my $data      = LoadFile($FileWithPath);
-      my @dataBuffs = @{ $data->{'buff'} };
-      $self->logger()
-        ->debug("$name has " . scalar @dataBuffs . " buffs in the file");
-      for my $sbb (@dataBuffs) {
-        my $v;
-        my $b;
-        my @sbKeys = keys %{$sbb};
-
-        if (any { $_ eq 'value' } @sbKeys) {
-          $self->logger()->debug("SkillBook $name has a buff with a value");
-          $v = Game::EvonyTKR::Buff::Value->new(
-            number => $sbb->{'value'}->{'number'},
-            unit   => $sbb->{'value'}->{'unit'},
-          );
-          if (any { $_ eq 'class' } @sbKeys) {
-            $b = Game::EvonyTKR::Buff->new(
-              attribute => $sbb->{'attribute'},
-              value     => $v,
-              buffClass => $sbb->{'class'},
-            );
-          }
-          else {
-            $b = Game::EvonyTKR::Buff->new(
-              attribute => $sbb->{'attribute'},
-              value     => $v,
-            );
-          }
-        }
-        else {
-          $self->logger()->warn("SkillBook $name has a buff with no value.");
-        }
-        if (defined $b) {
-          if (any { $_ eq 'condition' } @sbKeys) {
-            my @conditions = @{ $sbb->{condition} };
-            foreach my $sbc (@conditions) {
-              $b->set_condition($sbc);
-            }
-          }
-          $self->logger()->info("from SkillBook $name; Adding buff " . np $b);
-          push @buffs, $b;
-        }
-        else {
-          $self->logger()->warn("No buff defined in readFromFile for $name");
-        }
-      }
-      $self->logger()
-        ->debug("$name has " . scalar @buffs . " buffs after reading all in");
-    }
-  }
 }
 
 1;
@@ -164,12 +118,17 @@ This is the base class, providing common methods for all SkillBooks.  You should
 
 =cut
 
-=attr name
+=method name
 
 each SkillBook has a name
 =cut
 
-=attr buffs
+=method text
+
+returns the human text that the game actually provides, if recorded here.
+=cut
+
+=method buffs
 
 each SkillBook has one or more Game::EvonyTKR:Buffs
 =cut

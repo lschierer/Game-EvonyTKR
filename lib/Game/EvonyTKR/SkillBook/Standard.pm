@@ -1,5 +1,7 @@
 use v5.40.0;
 use experimental qw(class);
+use FindBin;
+use lib "$FindBin::Bin/../../../../lib";
 
 class Game::EvonyTKR::SkillBook::Standard : isa(Game::EvonyTKR::SkillBook) {
 # PODNAME: Game::EvonyTKR::SkillBook::Standard
@@ -39,6 +41,20 @@ class Game::EvonyTKR::SkillBook::Standard : isa(Game::EvonyTKR::SkillBook) {
     if (@errors) {
       croak join ', ' => @errors;
     }
+  }
+
+  method toHashRef($verbose = 0) {
+    $self->logger()->trace("starting toHashRef for " . $self->name());
+    my $returnRef = {};
+    $returnRef->{'name'} = $self->name();
+    $returnRef->{'level'} = $self->level();
+    $returnRef->{'text'} = $self->text();
+    if($verbose) {  
+      for my $tb ($self->buffs()) {
+        push @{ $returnRef->{'buffs'} }, $tb->toHashRef();
+      } 
+    }
+    return $returnRef;
   }
 
   method _comparison($other, $swap = 0) {
