@@ -126,6 +126,7 @@ package Game::EvonyTKR::Web::Root {
   use Dancer2 appname => 'Game::EvonyTKR';
   use Dancer2::Plugin::REST;
   use Game::EvonyTKR::Web::General;
+  use Game::EvonyTKR::Web::SkillBook;
 
   set engines => {
     serializer => {
