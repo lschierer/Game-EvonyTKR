@@ -5,7 +5,7 @@ use FindBin;
 use lib "$FindBin::Bin/../../../../lib";
 
 package Game::EvonyTKR::Web::General {
-# ABSTRACT: Route Handler for the /generals route.
+# ABSTRACT: Route Handler for the /general and /generals routes.
   use Carp;
   use Data::Printer;
   use Devel::Peek;
@@ -26,11 +26,11 @@ package Game::EvonyTKR::Web::General {
   use Util::Any ':all';
   use YAML::XS qw{ LoadFile Load };
   use namespace::clean;
-  use Dancer2 appname => 'Game::EvonyTKR';
-  use Dancer2::Plugin::REST;
   use FindBin;
   use lib "$FindBin::Bin/../../../../lib";
-
+  use Dancer2 appname => 'Game::EvonyTKR';
+  use Dancer2::Plugin::REST;
+  
   use Game::EvonyTKR::Web::General::Pair;
 
   my $store;
@@ -80,12 +80,56 @@ package Game::EvonyTKR::Web::General {
     _init();
     my @data = ();
     $logger->debug("sub _all has " . scalar %$generals . " generals");
-
+    
+    my $verbose = query_parameters->get('verbose');
+    if (defined $verbose) {
+      if($verbose ne 'false') {
+        $verbose = 1;
+      }
+      else {
+        $verbose = 0;
+      }      
+    }
+    else {
+      $verbose = 0;
+    }
+    my $level = query_parameters->get('level');
+    my $ascendingLevel;
+    if (query_parameters->get('ascendingLevel') =~ /([1-5](Red|Purple))/) {
+      $ascendingLevel = $1;
+    }
+    else {
+      $ascendingLevel = 'None';
+    }
+    
     while (my ($key, $value) = each %$generals) {
+      # allowable specialityLevels may vary per general
+      my @specialityLevels = qw( None None None None None );
+      
       $logger->trace("getting data for " . $value->name());
       my $name          = $value->name();
-      my $hashedGeneral = $value->toHashRef();
+      
+      $value->setLevel($level);
+      $value->ascendingAttributes()->setActiveLevel($ascendingLevel);
+      
+      for my $sl (1 .. 4) {
+        my $sp = query_parameters->get("specialityLevel$sl");
+        if (defined $sp) {
+          my @lv = $value->specialityLevels();
+          if (any { $_ =~ /$sp/i } @lv) {
+            $logger->debug("setting $sp at specialityLevel$sl for " . $value->name());
+            $value->changeActiveSpecialityLevel($sl, $sp);
+          }
+          else {
+            $logger->warn("invalid specialityLevel $sp at $sl for " . $value->name());
+            $logger->warn("valid values are " . Data::Printer::np @lv);
+          }
+        }
+      }
+
+      my $hashedGeneral = $value->toHashRef($verbose);
       $logger->trace("$name has a hashed size of " . scalar %$hashedGeneral);
+      $hashedGeneral->{'id'} = $hashedGeneral->{'name'};
       push @data, $hashedGeneral;
     }
     $logger->debug('returning data array with size ' . scalar @data);
@@ -106,6 +150,19 @@ package Game::EvonyTKR::Web::General {
       }
       else {
         $logger->debug("Query level is not defined.");
+      }
+
+      my $verbose = query_parameters->get('verbose');
+      if (defined $verbose) {
+        if($verbose ne 'false') {
+          $verbose = 1;
+        }
+        else {
+          $verbose = 0;
+        }      
+      }
+      else {
+        $verbose = 0;
       }
 
       my @specialityLevels = qw( None None None None None );
@@ -139,14 +196,8 @@ package Game::EvonyTKR::Web::General {
       else {
         $logger->debug("Query ascendingLevel is not defined.");
       }
-
-      my $verbose = query_parameters->get('verbose');
-      if (defined $verbose and $verbose) {
-        return $general->toHashRef(1);
-      }
-      else {
-        return $general->toHashRef();
-      }
+      
+      return $general->toHashRef($verbose);
     }
     else {
       return { general => "Not Found" };
