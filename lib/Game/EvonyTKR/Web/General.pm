@@ -5,7 +5,7 @@ use FindBin;
 use lib "$FindBin::Bin/../../../../lib";
 
 package Game::EvonyTKR::Web::General {
-# ABSTRACT: Route Handler for the /general and /generals routes.
+# ABSTRACT: Route Handler for the /general and routes.
   use Carp;
   use Data::Printer;
   use Devel::Peek;
@@ -37,13 +37,14 @@ package Game::EvonyTKR::Web::General {
   my $generals;
   my $logger = Log::Log4perl::get_logger('Web::General');
 
-  prefix '/generals' => sub {
-    get '/details' => \&_details;
-    get '/list'    => \&_list;
-  };
-
-  prefix '/general' => sub {
-    get '/:id' => \&_by_id;
+  prefix '/general'       => sub {
+    get '/:id'            => \&_by_id;
+    prefix '/list'        => sub {
+      get ''              => \&_list;
+      prefix '/details'   => sub {
+        get ''            => \&_details;
+      };
+    };
   };
 
   sub _init {

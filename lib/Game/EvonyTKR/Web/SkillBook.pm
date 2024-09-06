@@ -117,13 +117,21 @@ package Game::EvonyTKR::Web::SkillBook {
     _init();
 
     my $verbose = query_parameters->get('verbose');
-    if(not defined($verbose)) {
+    if (defined $verbose) {
+      if($verbose ne 'false') {
+        $verbose = 1;
+      }
+      else {
+        $verbose = 0;
+      }      
+    }
+    else {
       $verbose = 0;
     }
 
     my $id = route_parameters->get('id');
     if(exists $store->{'skillbooks'}->{'special'}->{$id}){
-      return status_ok($store->{'skillbooks'}->{'special'}->{$id}->toHashRef());
+      return status_ok($store->{'skillbooks'}->{'special'}->{$id}->toHashRef($verbose));
     }
     else {
       return status_400("SkillBook with name '$id' is not available.");
