@@ -68,17 +68,16 @@ class Game::EvonyTKR::SkillBook : isa(Game::EvonyTKR::Logger) {
 
   method add_buff($nb) {
     if (blessed $nb ne 'Game::EvonyTKR::Buff') {
+      $self->logger()->warn("refusing to add something that is not a 'Game::EvonyTKR::Buff' to $name");
       return 0;
     }
     elsif (scalar @buffs >= 1) {
       my $found_match = 0;
       foreach (@buffs) {
-        if (not $nb->compare($_)) {
-          $found_match = 1;
+        if ($_ == $nb) {
+          $self->logger()->warn("refusing to add duplicate buff to skillbook $name");
+          return 0;
         }
-      }
-      if ($found_match) {
-        return 0;
       }
     }
     push @buffs, $nb;
