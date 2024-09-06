@@ -63,10 +63,11 @@ class Game::EvonyTKR::SkillBook::Special : isa(Game::EvonyTKR::SkillBook) {
         $self->set_text('Original Text Not Available.');
       }
 
-      my @dataBuffs = @{ $data->{'buff'} };
+      my @dataBuffs = @{$data->{'buff'} };
       $self->logger()
         ->debug("$name has " . scalar @dataBuffs . " buffs in the file");
-      for my $sbb (@dataBuffs) {
+      while (my ($index, $sbb) = each @dataBuffs) {
+        $self->logger()->trace(sprintf('iteration %d for SkillBook %s', $index, $name));
         my $v;
         my $b;
         my @sbKeys = keys %{$sbb};
@@ -103,6 +104,8 @@ class Game::EvonyTKR::SkillBook::Special : isa(Game::EvonyTKR::SkillBook) {
           }
           $self->logger()->info("from SkillBook $name; Adding buff " . np $b);
           $self->add_buff($b);
+          $self->logger()->trace(sprintf('%s has %d buffs after add buff ',
+            $self->name(), scalar $self->buffs(), ) . np $b);
         }
         else {
           $self->logger()->warn("No buff defined in readFromFile for $name");
