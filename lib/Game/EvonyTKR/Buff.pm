@@ -205,49 +205,62 @@ class Game::EvonyTKR::Buff : isa(Game::EvonyTKR::Logger) {
     else {
       if ($other->attribute() ne $attribute) {
         $self->logger()->trace("$attribute ne " . $other->attribute());
-        return 0;
+        return $attribute cmp $other->attribute();
       }
       if ($other->value()->number() != $value->number()) {
         $self->logger()
           ->trace($value->number() . " != " . $other->value()->number());
-        return 0;
+        return $value->number() <=> $other->value()->number();
       }
       if ($other->value()->unit() ne $value->unit()) {
         $self->logger()
           ->trace($value->unit() . " ne " . $other->value()->unit());
-        return 0;
+        return $value->unit() cmp $other->value()->unit();
       }
-      if ( ($self->has_buffClass() && (not $other->has_buffClass()))
-        || ((not $self->has_buffClass()) && $other->has_buffClass())) {
-        $self->logger()
-          ->trace(
-          $self->has_buffClass() . " and not " . $other->has_buffClass());
-        return 0;
-      }
-      elsif (($self->has_condition() && (not $other->has_condition()))
-        || ((not $self->has_condition()) && $other->has_condition())) {
-        $self->logger()
-          ->trace(
-          $self->has_condition() . " and not " . $other->has_condition());
-        return 0;
-      }
-      else {
-        my $otherClass = $other->buffClass();
-        if ($buffClass ne $otherClass) {
-          $self->logger()->trace("$otherClass ne $buffClass");
-          return 0;
+      if ($self->has_buffClass() && ($other->has_buffClass())) {
+        $self->logger()->trace('both have classes');
+        if( $self->buffClass() ne $other->buffClass()){
+          return $self->buffClass() cmp $other->buffClass();
         }
-        my @other_condition = $other->condition();
-        if (array_diff(@condition, @other_condition)) {
-          $self->logger()->trace("condition arrays differ");
-          $self->logger()->trace("my conditions are " . np @condition);
-          $self->logger()->trace("their conditions are " . np @other_condition);
-          return 0;
+      }
+      elsif($self->has_buffClass()) {
+        $self->logger()->trace('only I have a class');
+        return 1;
+      }
+      elsif($other->has_buffClass()) {
+        $self->logger()->trace('only the other has a class');
+        return -1;
+      }
+      elsif ($self->has_condition() && $other->has_condition()) {
+        $self->logger()->trace('both have conditions');
+        
+        my @cone = sort $self->condition();
+        my $sizeone = scalar @cone;
+        my @ctwo = sort $other->condition();
+        my $sizetwo = scalar @ctwo;
+
+        if($sizeone == $sizetwo) {
+          $self->logger()->trace('both have the same number of conditions');
+          for my $index (0..$#cone) {
+            my $c1 = $cone[$index];
+            my $c2 = $ctwo[$index];
+            if($c1 ne $c2) {
+              return $c1 cmp $c2
+            }
+          }
         }
+      }
+      elsif ($self->has_condition()) {
+        $self->logger()->trace('only I have conditions');
+        return -1;
+      }
+      elsif ($other->has_condition()) {
+        $self->logger()->trace('only the other has conditions');
+        return 1;
       }
     }
     $self->logger()->trace("ran out of things to test, they must be the same");
-    return 1;
+    return 0;
   }
 
   method toHashRef() {
@@ -282,13 +295,13 @@ class Game::EvonyTKR::Buff : isa(Game::EvonyTKR::Logger) {
       $self->logger()->logcroak('$other is not a Game::EvonyTKR::Buff');
     }
     my $result = $self->compare($other);
-    $self->logger()->trace("compare functionr returned $result");
+    $self->logger()->trace("compare function returned $result");
     if ($result) {
       $self->logger()->trace("_equality returning true for result '$result'");
-      return 1;
+      return 0;
     }
     $self->logger()->trace("_equality returning false for result '$result'");
-    return 0;
+    return 1;
   }
 
   method _inequality($other, $swap = 0) {
@@ -297,9 +310,13 @@ class Game::EvonyTKR::Buff : isa(Game::EvonyTKR::Logger) {
     if (none { $_ eq 'Game::EvonyTKR::Buff' } @classList) {
       $self->logger()->logcroak('$other is not a Game::EvonyTKR::Buff');
     }
-    if ($self->compare($other) != 0) {
+    my $result = $self->compare($other);
+    $self->logger()->trace("compare function returned $result");
+    if ($result) {
+      $self->logger()->trace("_inequality returning true for result '$result'");
       return 1;
     }
+    $self->logger()->trace("_inequality returning false for result '$result'");
     return 0;
   }
 
