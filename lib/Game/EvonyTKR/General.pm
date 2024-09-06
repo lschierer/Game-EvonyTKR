@@ -551,7 +551,8 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Logger) {
   method toHashRef($verbose = 0) {
     my @sbRefs;
     for my $ob (@otherBooks) {
-      push @sbRefs, $ob->toHashRef();
+      push @sbRefs, $ob->toHashRef($verbose);
+      $self->logger()->trace('General toHashRef @sbRefs ' . np @sbRefs);
     }
     my @specialityRefs;
     for my $sp (@specialities) {
@@ -572,7 +573,7 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Logger) {
         hasCovenant          => $self->hasCovenant(),
         ascendingAttributes  => $self->ascendingAttributes()->toHashRef(1),
         builtInBook          => defined $self->builtInBook
-        ? $self->builtInBook->toHashRef()
+        ? $self->builtInBook->toHashRef($verbose)
         : {},
         otherBooks   => \@sbRefs,
         specialities => \@specialityRefs,
