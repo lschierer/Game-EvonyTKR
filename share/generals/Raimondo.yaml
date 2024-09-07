@@ -15,6 +15,8 @@ general:
   score_as:
    - Siege
   book: The Military Art
+  extra:
+    - Odyssey - Raimondo
   ascending: true
   specialities:
     - Siege Machine Formation
