@@ -52,6 +52,23 @@ levels:
         value:
           number: 2
           unit: percentage
+  - level: Orange
+    buff:
+      - attribute: Attack
+        class: Siege Machines
+        value:
+          number: 2
+          unit: percentage
+      - attribute: HP
+        class: Siege Machines
+        value:
+          number: 2
+          unit: percentage
+      - attribute: Defense
+        class: Siege Machines
+        value:
+          number: 2
+          unit: percentage
   - level: Gold
     buff:
       - attribute: Attack
