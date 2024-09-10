@@ -44,6 +44,7 @@ package Game::EvonyTKR::Web {
         push @DancerOpts, qw{ -L Shotgun };
       }
     }
+    push @DancerOpts, qw{ -S Starman };
 
     my $logConf = _logInit($env);
     my $logger  = Log::Log4perl::get_logger('Web');
