@@ -13,6 +13,7 @@ use File::Touch;
 use Log::Log4perl        qw(get_logger);
 use Log::Log4perl::Level ();
 
+require Starman;
 require Plack::Loader::Shotgun;
 use Plack::Runner;
 use namespace::clean;
