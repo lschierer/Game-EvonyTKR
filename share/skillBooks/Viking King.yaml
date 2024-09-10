@@ -1,5 +1,6 @@
 ---
 name: Viking King
+text: Increases ground troops’ attack and HP by 40% and ground troops and mounted troops’ defense by 10% when General is leading the army.
 buff:
   - attribute: Attack
     class: Ground Troops

@@ -1,5 +1,6 @@
 ---
 name: Master of Strategy
+text: Increases ground troops and mounted troops’ attack by 15% and increases mounted troops’ attack by another 20% when General is leading the army to attack.
 buff:
   - attribute: Attack
     class: Mounted Troops

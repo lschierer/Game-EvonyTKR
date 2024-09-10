@@ -1,9 +1,8 @@
 ---
 name: Bloody Leader
+text: Increases the March Size by 10% and mounted troops’ attack by 15% when General is leading the army to attack.
 buff:
   - attribute: March Size Capacity
-    condition:
-      - leading the army to attack
     value:
       number: 10
       unit: percentage

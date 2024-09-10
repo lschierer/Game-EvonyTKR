@@ -1,0 +1,92 @@
+---
+ascending:
+  - level: '1Red'
+    buff:
+      - attribute: Attack
+        class: Mounted Troop
+        condition:
+          - Marching
+        value:
+          number: 10
+          unit: percentage
+      - attribute: Defense
+        class: Ranged Troop
+        condition:
+          - Marching
+        value:
+          number: 10
+          unit: percentage
+      - attribute: Defense
+        class: Siege Machine
+        condition:
+          - Marching
+        value:
+          number: 10
+          unit: percentage
+  - level: '2Red'
+    buff:
+      - attrbute: Wounded to Death
+        condition:
+          - Enemy In City
+        value:
+          number: 10
+          unit: percentage
+  - level: '3Red'
+    buff: 
+      - attribute: March Size Capacity
+        value:
+          number: 14
+          unit: percentage
+  - level: '4Red'
+    buff:
+      - attribute: Attack
+        class: Mounted Troops
+        condition:
+          - Marching
+        value:
+          number: 15
+          unit: percentage
+      - attribute: HP
+        class: Ranged Troops
+        condition:
+          - Marching
+        value:
+          number: 15
+          unit: percentage
+      - attribute: HP
+        class: Siege Machine
+        condition:
+          - Marching
+        value:
+          number: 15
+          unit: percentage
+  - level: '5Red'
+    buff:
+      - attribute: Attack
+        class: Ranged Troops
+        condition:
+          - Marching
+        value:
+          number: 15
+          unit: percentage
+      - attribute: Attack
+        class: Siege Machines
+        condition:
+          - Marching
+        value:
+          number: 15
+          unit: percentage
+      - attribute: Defense
+        class: Mounted Troops
+        condition:
+          - Marching
+        value:
+          number: 10
+          unit: percentage
+      - attribute: HP
+        class: Mounted Troops
+        condition:
+          - Marching
+        value:
+          number: 10
+          unit: percentage

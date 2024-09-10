@@ -1,5 +1,6 @@
 ---
 name: Conqueror at Sea
+text: Increases mounted troops’ attack by 25% when General is leading the army to attack. Increases Rally Capacity by 10% when General is leading the army to launch Alliance War.
 buff:
   - attribute: Attack
     condition:

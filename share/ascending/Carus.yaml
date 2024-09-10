@@ -5,7 +5,6 @@ ascending:
     - attribute: Attack
       condition:
         - Marching
-      class: Ground Troops
       value:
         number: 5
         unit: percentage
@@ -35,16 +34,16 @@ ascending:
 - level: '4Red'
   buff:
     - attribute: Attack
+      class: Ground Troops
       condition:
         - Marching
-      class: Ground Troops
       value:
         number: 20
         unit: percentage
     - attribute: HP
+      class: Ground Troops
       condition:
         - Marching
-      class: Ground Troops
       value:
         number: 20
         unit: percentage

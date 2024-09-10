@@ -1,5 +1,6 @@
 ---
 name: Augustus
+text: Increases mounted troops’ attack by 40% and ranged troops’ attack by 15% when General is leading the army to attack.
 buff:
   - attribute: Attack
     class: Mounted Troops
