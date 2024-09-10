@@ -28,10 +28,9 @@ package Game::EvonyTKR::Web::General {
   use namespace::clean;
   use FindBin;
   use lib "$FindBin::Bin/../../../../lib";
+  use Game::EvonyTKR::Web::General::Pair;
   use Dancer2 appname => 'Game::EvonyTKR';
   use Dancer2::Plugin::REST;
-  
-  use Game::EvonyTKR::Web::General::Pair;
 
   my $store;
   my $generals;
@@ -51,11 +50,11 @@ package Game::EvonyTKR::Web::General {
     $store = Game::EvonyTKR::Web::Store::get_store();
     if (not exists $$store{'generals'}) {
       $store->{'generals'} = {};
-      $logger->trace('store now holds' . np $store);
+      $logger->trace('store now holds' . Data::Printer::np $store);
     }
     $generals = $store->{'generals'};
-    $logger->trace('generals now holds ' . np $generals);
-    $logger->trace('generals now holds ' . np %$generals);
+    $logger->trace('generals now holds ' . Data::Printer::np $generals);
+    $logger->trace('generals now holds ' . Data::Printer::np %$generals);
     my $gencount = scalar keys %$generals;
     if ($gencount == 0) {
       _read_generals();

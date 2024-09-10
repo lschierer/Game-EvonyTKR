@@ -20,7 +20,6 @@ class Game::EvonyTKR::General::Pair {
     'ne' => \&_inequality,
     '!=' => \&_inequality,
     '""' => \&_toString;
-  "fallback" => 1;
 
 # from Type::Registry, this will save me from some of the struggles I have had with some types having blessed references and others not.
   ADJUST {
