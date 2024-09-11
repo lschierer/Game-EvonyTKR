@@ -39,7 +39,7 @@ dies_ok (
 );
 
 my $cr = $buff->compare($buff);
-ok($cr, 'Self comparision worked');
+ok($cr == 0, 'Self comparision worked');
 
 my $buff2 = Game::EvonyTKR::Buff->new(
   attribute => 'Attack',
