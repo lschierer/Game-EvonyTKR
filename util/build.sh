@@ -21,7 +21,6 @@ for i in `grep authordep dist.ini  | cut -d ' ' -f 3`; do
     echo;
 done
 
-
 echo '---- author deps complete ----';
 
 ${DZIL} listdeps --missing | sort |grep -v ^builtin | ${CPANM} --installdeps --notest --with-feature=accelerate 
