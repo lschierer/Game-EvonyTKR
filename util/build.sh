@@ -1,5 +1,7 @@
 #!/bin/sh -x 
 
+
+
 CPANM=`which cpanm`;
 echo ${CPANM};
 
