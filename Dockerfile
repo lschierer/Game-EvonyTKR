@@ -1,11 +1,13 @@
-FROM perl:latest AS build
-WORKDIR /srv/Game::EvonyTKR
+FROM arm64v8/perl:5.40.0 AS build
+WORKDIR /src/
 COPY . .
-RUN ./bin/build.sh
-RUN dzil install 
+RUN ./scripts/build.sh
 FROM perl:latest AS deploy
-COPY . .
-COPY --from=build ./GAME-EVONYTKR-*.tar.gz .
+WORKDIR /src
+COPY --from=build /src/Game-EvonyTKR-*.tar.gz .
 RUN tar zxvf *.tar.gz
-RUN cd Game-EvonyTKR-* && perl Build.PL
+WORKDIR /src/Game-EvonyTKR
+RUN tar zxf ../*.tar.gz -C . --strip-components=1
+RUN perl Build.PL
+WORKDIR /srv/
 EXPOSE 8080
