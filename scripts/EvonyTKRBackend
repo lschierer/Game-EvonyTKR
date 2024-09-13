@@ -1,0 +1,16 @@
+#!/usr/bin/env perl
+# PODNAME: Game::EvonyTKR::Main
+# ABSTRACT: Dancer2 REST API wrapper
+use v5.40.0;
+use utf8::all;
+use strict;
+use warnings;
+use Carp;
+
+require Game::EvonyTKR::Web;
+
+package main {
+  Game::EvonyTKR::Web->run;
+}
+
+__END__
