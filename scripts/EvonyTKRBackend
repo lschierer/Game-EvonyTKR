@@ -10,7 +10,7 @@ use Carp;
 require Game::EvonyTKR::Web;
 
 package main {
-  Game::EvonyTKR::Web->run;
+  Game::EvonyTKR::Web->import->run;
 }
 
 __END__

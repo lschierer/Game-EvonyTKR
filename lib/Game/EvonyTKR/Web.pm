@@ -14,6 +14,7 @@ package Game::EvonyTKR::Web {
 # VERSION
   use Data::Printer;
   use Util::Any -all;
+  use Plack::Runner;
   use Game::EvonyTKR::Web::Root;
   use namespace::clean;
   use parent qw(App::Cmd::Simple);
