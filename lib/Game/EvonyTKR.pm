@@ -1,4 +1,5 @@
 package Game::EvonyTKR;
+# VERSION
 use v5.40.0;
 use utf8::all;
 
@@ -48,48 +49,73 @@ sub validate_args {
   $self->usage_error("No args allowed") if @$args;
 }
 
+sub _logInit() {
+    my $home   = File::HomeDir->my_home;
+    my $logDir = File::Spec->catdir($home, 'var/log/Perl/dist/Game-Evony/');
+    if (!-r -w -x -o -d $logDir) {
+      make_path($logDir, "0770");
+    }
+    my $logFile = File::Spec->catfile($logDir, 'dancer2.log');
+    if (!-e $logFile) {
+      File::Touch::touch($logFile);
+      chmod(0600, $logFile);
+    }
+    my $SystemLogger = Game::EvonyTKR::Logger->new();
+    my $logFile2     = $SystemLogger->getLogfileName();
+
+    my %logLevel = (
+      development => 'ALL',
+      production  => 'INFO',
+    );
+
+    my $level = $logLevel{'production'};
+
+    my %conf = (
+      "log4perl.category.Game.EvonyTKR" => "$level, logFile2",
+      
+      "log4perl.appender.logFile"          => "Log::Log4perl::Appender::File",
+      "log4perl.appender.logFile.utf8"     => 1,
+      "log4perl.appender.logFile.filename" => $logFile,
+      "log4perl.appender.Logfile.DatePattern" => "yyyy-MM-dd",
+      "log4perl.appender.Logfile.TZ"          => "UTC",
+      "log4perl.appender.logFile.mode"        => "append",
+      "log4perl.appender.logFile.layout"      =>
+        "Log::Log4perl::Layout::PatternLayout",
+      "log4perl.appender.logFile.layout.ConversionPattern" =>
+        "[%p] %d (%C line %L) %m%n",
+
+      "log4perl.appender.logFile2"          => "Log::Log4perl::Appender::File",
+      "log4perl.appender.logFile2.utf8"     => 1,
+      "log4perl.appender.logFile2.filename" => $logFile2,
+      "log4perl.appender.logFile2.DatePattern" => "yyyy-MM-dd",
+      "log4perl.appender.logFile2.TZ"          => "UTC",
+      "log4perl.appender.logFile2.mode"        => "append",
+      "log4perl.appender.logFile2.layout"      =>
+        "Log::Log4perl::Layout::PatternLayout",
+      "log4perl.appender.logFile2.layout.ConversionPattern" =>
+        "[%p] %d (%C line %L) %m%n",
+    );
+    # ... passed as a reference to init()
+    Log::Log4perl::init(\%conf);
+    return np %conf;
+  }
+
 sub execute {
   my ($self, $opt, $args) = @_;
   binmode(STDOUT, ":encoding(UTF-8)")
     ;    # apparently not the same thing as "use utf8;"
   binmode(STDIN, ":encoding(UTF-8)")
     ;    # apparently not the same thing as "use utf8;"
+  _logInit();
+  my $logController = Game::EvonyTKR::Logger->new();
+  my $logger        = $logController->logger();
+  
   if ($opt->{option1}) {
     # do option 1 stuff
   }
   else {
-
-    my $logController = Game::EvonyTKR::Logger->new();
-    my $logger        = $logController->logger();
-    my %generals      = read_generals($logger);
-    my $classData     = Game::EvonyTKR::Buff::Data->new();
-    my $conflicData   = Game::EvonyTKR::General::Conflicts->new();
-    $conflicData->initializeConflictDB();
-    $classData->set_BuffClasses();
-    my @BuffClasses = $classData->BuffClasses();
-
-    if (scalar @BuffClasses == 0) {
-      croak 'error loading BuffClasses';
-    }
-    $logger->info("start");
-    $logger->info(sub { np %generals });
-    my $pairCreator = Game::EvonyTKR::General::Pair::Creator->new();
-    $pairCreator->set_generals(%generals);
-    my %pairs = $pairCreator->getPairs();
-
-    for my $bc (@BuffClasses) {
-      if (exists $pairs{$bc}) {
-        my @pairGroup = @{ $pairs{$bc} };
-        $logger->info("$bc: " . scalar @pairGroup);
-        for my $gp (@pairGroup) {
-          $logger->trace("primary: " . $gp->primary()->name());
-          $logger->trace("secondary: " . $gp->secondary()->name());
-        }
-      }
-      else {
-        $logger->info("$bc: no pairs");
-      }
-    }
+    $logger->info("$VERSION");
+    say "$VERSION";
     $logger->info("done");
   }
 }
