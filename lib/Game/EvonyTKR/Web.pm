@@ -11,6 +11,7 @@ use Log::Log4perl;
 
 package Game::EvonyTKR::Web {
 # ABSTRACT: Dancer2 package providing REST wrappers for the content created by this distribution
+# VERSION
   use Data::Printer;
   use Util::Any -all;
   use Game::EvonyTKR::Web::Root;
@@ -34,7 +35,9 @@ package Game::EvonyTKR::Web {
       ;    # apparently not the same thing as "use utf8;"
     binmode(STDIN, ":encoding(UTF-8)")
       ;    # apparently not the same thing as "use utf8;"
-
+    if ($opt->{version}) {
+      return "$VERSION";
+    }
     my @DancerOpts;
     my $env = 'production';
     if ($opt->{env}) {
@@ -45,6 +48,7 @@ package Game::EvonyTKR::Web {
         push @DancerOpts, qw{ -L Shotgun };
       }
     }
+    
     push @DancerOpts, qw{ -S Starman };
 
     my $logConf = _logInit($env);
