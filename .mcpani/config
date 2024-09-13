@@ -1,0 +1,5 @@
+local: ../../var/mirrors/minicpan/
+remote: ftp://ftp.cpan.org/pub/CPAN ftp://ftp.kernel.org/pub/CPAN
+repository: ./var/mymodules
+passive: yes
+dirmode: 0755
