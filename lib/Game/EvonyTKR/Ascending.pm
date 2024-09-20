@@ -63,10 +63,14 @@ class Game::EvonyTKR::Ascending : isa(Game::EvonyTKR::Logger) {
 
   method add_buff($level, $nb, $inherited = 0) {
     if (blessed $nb ne 'Game::EvonyTKR::Buff') {
+      $self->logger()->warn('attempt to add something not a buff');
+      $self->logger()->warn('it was a ' . blessed $nb);
       return 0;
     }
     my $t = $levels->compiled_check();
     if (not $t->($level)) {
+      my $prettyLevels = np @{ $levels->values() };
+      $self->logger()->warn("$level is not a valid option from $prettyLevels" );
       return 0;
     }
 
@@ -80,6 +84,9 @@ class Game::EvonyTKR::Ascending : isa(Game::EvonyTKR::Logger) {
         next;
       }
       if ($tl eq $level) {
+        $self->logger()->trace(sprintf(
+          'buff matches %s', $level
+        ));
         if ($inherited) {
           my $copy;
           if ($nb->has_buffClass()) {
@@ -102,38 +109,57 @@ class Game::EvonyTKR::Ascending : isa(Game::EvonyTKR::Logger) {
               $copy->set_condition($c);
             }
           }
-          $self->logger->trace("Adding inherited buff at level $tl" . np $copy);
+  
           push @{ $Buffs{$tl} }, $copy;
-
+          $self->logger()->trace(sprintf(
+            'after adding inherited buff %s at level %s, I have %d buffs.',
+            $tl,
+            np $copy,
+            scalar @{ $Buffs{$tl}},
+          ));
         }
         else {
-          $self->logger->trace("Adding uninherited buff at level $tl" . np $nb);
           push @{ $Buffs{$tl} }, $nb;
+          $self->logger()->trace(sprintf(
+            'after adding uninherited buff %s at level %s, I have %d buffs.',
+            $tl,
+            np $nb,
+            scalar @{ $Buffs{$tl}},
+          ));
         }
         if ($tl eq '1Purple') {
+          $self->logger()->trace('finished 1Purple, call for 2Purple');
           $self->add_buff('2Purple', $nb, 1);
         }
         elsif ($tl eq '2Purple') {
+          $self->logger()->trace('finished 2Purple, call for 3Purple');
           $self->add_buff('3Purple', $nb, 1);
         }
         elsif ($tl eq '3Purple') {
+          $self->logger()->trace('finished 3Purple, call for 4Purple');
           $self->add_buff('4Purple', $nb, 1);
         }
         elsif ($tl eq '4Purple') {
+          $self->logger()->trace('finished 4Purple, call for 5Purple');
           $self->add_buff('5Purple', $nb, 1);
         }
         elsif ($tl eq '1Red') {
+          $self->logger()->trace('finished 1Red, call for 2red');
           $self->add_buff('2Red', $nb, 1);
         }
         elsif ($tl eq '2Red') {
+          $self->logger()->trace('finished 2Red, call for 3red');
           $self->add_buff('3Red', $nb, 1);
         }
         elsif ($tl eq '3Red') {
+          $self->logger()->trace('finished 3Red, call for 4red');
           $self->add_buff('4Red', $nb, 1);
         }
         elsif ($tl eq '4Red') {
+          $self->logger()->trace('finished 4Red, call for 5red');
           $self->add_buff('5Red', $nb, 1);
         }
+        $self->logger()->trace("$level totally complete");
         last;
       }
     }
@@ -190,17 +216,20 @@ class Game::EvonyTKR::Ascending : isa(Game::EvonyTKR::Logger) {
       # the inherited field for Buffs.
       for my $key (sort keys %Buffs) {
         $self->logger()->trace("processing $key");
+        $self->logger()->trace(sprintf(
+          'there are %d buffs present for %s',
+          scalar @{ $Buffs{$key}},
+          $key
+        ));
         for my $thisBuff (@{ $Buffs{$key} }) {
           if (not $thisBuff->inherited()) {
-            $self->logger()
-              ->trace("found unique buff for $key " . np $thisBuff);
+            $self->logger()->trace(sprintf(
+              'found unique buff for %s: "%s"', 
+              $key, np $thisBuff));
             push @{ $returnRef->{$key} }, $thisBuff->toHashRef();
           }
           else {
-            if ($thisBuff->inherited()) {
-              $self->logger()
-                ->trace("found inherited buff at $key " . np $thisBuff);
-            }
+            $self->logger()->trace("found inherited buff at $key " . np $thisBuff);  
           }
         }
       }
@@ -245,7 +274,7 @@ class Game::EvonyTKR::Ascending : isa(Game::EvonyTKR::Logger) {
           if (any { $_ eq 'value' } @flKeys) {
             $self->logger()
               ->debug("$AscendingFileName has a buff with a value");
-            if (not defined $flb->{'attribute'}) {
+            if (not exists $flb->{'attribute'}) {
               $self->logger()
                 ->logcroak("attribute is not defined for $AscendingFileName");
             }
