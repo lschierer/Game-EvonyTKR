@@ -108,7 +108,7 @@ class Game::EvonyTKR::Buff : isa(Game::EvonyTKR::Logger) {
       else {
         my $debugCondition = np @condition;
         $self->logger()
-          ->debug("Detected a buff for $name in '$debugCondition'");
+          ->debug("condition array '$debugCondition' indicates this is a buff");
         if (scalar @condition) {
           if (
             any {
