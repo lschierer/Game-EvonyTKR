@@ -111,20 +111,24 @@ class Game::EvonyTKR::Ascending : isa(Game::EvonyTKR::Logger) {
           }
   
           push @{ $Buffs{$tl} }, $copy;
+          my $printableBuff = np $copy;
+          my $buffCount = scalar @{ $Buffs{$tl}};
           $self->logger()->trace(sprintf(
             'after adding inherited buff %s at level %s, I have %d buffs.',
             $tl,
-            np $copy,
-            scalar @{ $Buffs{$tl}},
+            $printableBuff,
+            $buffCount,
           ));
         }
         else {
           push @{ $Buffs{$tl} }, $nb;
+          my $printableBuff = np $nb;
+          my $buffCount = scalar @{ $Buffs{$tl}};
           $self->logger()->trace(sprintf(
             'after adding uninherited buff %s at level %s, I have %d buffs.',
             $tl,
-            np $nb,
-            scalar @{ $Buffs{$tl}},
+            $printableBuff,
+            $buffCount,
           ));
         }
         if ($tl eq '1Purple') {
