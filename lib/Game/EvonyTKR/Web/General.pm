@@ -37,13 +37,14 @@ package Game::EvonyTKR::Web::General {
   my $logger = Log::Log4perl::get_logger('Web::General');
 
   prefix '/general'       => sub {
-    get '/:id'            => \&_by_id;
     prefix '/list'        => sub {
       get ''              => \&_list;
+      get '/'             => \&_list;
       prefix '/details'   => sub {
         get ''            => \&_details;
       };
     };
+    get '/:id'            => \&_by_id;
   };
 
   sub _init {
@@ -69,9 +70,25 @@ package Game::EvonyTKR::Web::General {
 
   sub _list {
     _init();
+    $logger->debug('_list function called');
+
+    my $withTypes = query_parameters->get('types');
+    if(defined $withTypes) {
+      if($withTypes ne 'false') {
+        $withTypes = 1;
+      }
+    }
     my @list;
     while (my ($key, $value) = each %$generals) {
-      push @list, $value->name();
+      if($withTypes) {
+        push @list, {
+          name => $value->name(),
+          type => $value->generalType(),
+        };
+      }
+      else {
+        push @list, $value->name();
+      }
     }
     return \@list;
   }
