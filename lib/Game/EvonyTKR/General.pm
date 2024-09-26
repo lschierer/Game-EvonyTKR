@@ -14,6 +14,7 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Logger) {
   use File::Spec;
   use Game::EvonyTKR::Covenant;
   use Game::EvonyTKR::SkillBook::Special;
+  use Game::EvonyTKR::Speciality;
   require Game::EvonyTKR::Buff::Data::EvaluationData::Attacking;
   require Game::EvonyTKR::Buff::Data::EvaluationData::Monster;
   use Game::EvonyTKR::Ascending;
@@ -548,20 +549,44 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Logger) {
   }
 
   method toHashRef($verbose = 0) {
+    my $returnRef = {
+        name                   => $name,
+        level                => $level,
+      };
+
+    $self->logger()->trace("add covenant info to returnRef for $name");
+    $returnRef->{hasCovenant} = $self->hasCovenant();
+
+    $self->logger()->trace("add book stuff to returnRef for $name");
+    $returnRef->{builtInBook} = defined $self->builtInBook
+      ? $self->builtInBook->toHashRef($verbose)
+      : {};
+
     my @sbRefs;
     for my $ob (@otherBooks) {
       push @sbRefs, $ob->toHashRef($verbose);
       $self->logger()->trace('General toHashRef @sbRefs ' . np @sbRefs);
     }
+    $returnRef->{otherBooks} = \@sbRefs;
+
+    $self->logger()->trace("add specialities to returnRef for $name");
     my @specialityRefs;
     for my $sp (@specialities) {
       push @specialityRefs, $sp->toHashRef($verbose);
     }
+    $returnRef->{specialities} = \@specialityRefs;
+
+    $self->logger()->trace("add ascending attributes to returnRef for $name");
+    $returnRef->{ascendingAttributes} = $self->ascendingAttributes()->toHashRef($verbose);
+
+    $returnRef->{EvAnsScores} = {
+          AttackingAsPrimary   => $self->getEvAnsScoreAsPrimary('Attacking'),
+          AttackingAsSecondary => $self->getEvAnsScoreAsSecondary('Attacking'),
+          MonsterAsPrimary     => $self->getEvAnsScoreAsPrimary('Monster'),
+          MonsterAsSecondary   => $self->getEvAnsScoreAsSecondary('Monster'),
+        };
     if ($verbose) {
-      my $returnRef = {
-        name                   => $name,
-        level                => $level,
-      };
+      
       $self->logger()->trace("add basic attributes to returnRef for $name");
       $returnRef->{leadership}            = $self->leadership();
       $returnRef->{leadership_increment}  = $self->leadership_increment();
@@ -572,28 +597,8 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Logger) {
       $returnRef->{politics}              = $self->politics();
       $returnRef->{politics_increment}    = $self->politics_increment();
 
-      $self->logger()->trace("add book stuff to returnRef for $name");
-      $returnRef->{builtInBook} = defined $self->builtInBook
-        ? $self->builtInBook->toHashRef($verbose)
-        : {};
-      $returnRef->{otherBooks} = \@sbRefs;
-
-      $self->logger()->trace("add specialities to returnRef for $name");
-      $returnRef->{specialities} = \@specialityRefs;
-
-      $self->logger()->trace("add ascending attributes to returnRef for $name");
-      $returnRef->{ascendingAttributes} = $self->ascendingAttributes()->toHashRef(1);
-
-      $self->logger()->trace("add covenant info to returnRef for $name");
-      $returnRef->{hasCovenant} = $self->hasCovenant();
-
       $self->logger()->trace("add scores info to returnRef for $name");
-      $returnRef->{EvAnsScores} = {
-          AttackingAsPrimary   => $self->getEvAnsScoreAsPrimary('Attacking'),
-          AttackingAsSecondary => $self->getEvAnsScoreAsSecondary('Attacking'),
-          MonsterAsPrimary     => $self->getEvAnsScoreAsPrimary('Monster'),
-          MonsterAsSecondary   => $self->getEvAnsScoreAsSecondary('Monster'),
-        };
+      
       $returnRef->{ComponentScores} = {
           Attacking => $self->computeEvansScoreComponents('Attacking'),
           Monster   => $self->computeEvansScoreComponents('Monster'),
@@ -601,28 +606,19 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Logger) {
       return $returnRef;
     }
     else {
-      return {
-        id                   => $name,
-        level                => $level,
-        leadership_increment => $self->effective_leadership(),
-        attack               => $self->effective_attack(),
-        defense              => $self->effective_defense(),
-        politics             => $self->effective_politics(),
-        hasCovenant          => $self->hasCovenant(),
-        ascendingAttributes  => $self->ascendingAttributes()->toHashRef(),
-        builtInBook          => defined $self->builtInBook
-        ? $self->builtInBook->toHashRef()
-        : {},
-        otherBooks   => \@sbRefs,
-        specialities => \@specialityRefs,
-        EvAnsScores  => {
-          AttackingAsPrimary   => $self->getEvAnsScoreAsPrimary('Attacking'),
-          AttackingAsSecondary => $self->getEvAnsScoreAsSecondary('Attacking'),
-        },
-      };
+      $returnRef->{leadership} = $self->effective_leadership();
+      $returnRef->{attack} = $self->effective_attack();
+      $returnRef->{defense} = $self->effective_defense();
+      $returnRef->{politics} = $self->effective_politics();
+      $returnRef->{ascendingAttributes} = $self->ascendingAttributes()->toHashRef();
+      
+      return $returnRef;
     }
   }
-
+  method TO_JSON {
+    my $json = JSON::MaybeXS->new(utf8 => 1);
+    return $json->encode($self->toHashRef());
+  }
   method _toString {
     my $json = JSON::MaybeXS->new(utf8 => 1);
     return $json->encode($self->toHashRef());
