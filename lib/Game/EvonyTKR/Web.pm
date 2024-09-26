@@ -3,6 +3,7 @@ use experimental qw(class);
 use utf8::all;
 use File::ShareDir ':ALL';
 use File::Spec;
+use Data::Printer;
 use namespace::autoclean;
 
 package Game::EvonyTKR::Web {
@@ -10,9 +11,13 @@ package Game::EvonyTKR::Web {
   use Carp;
   use Mojo::Base 'Mojolicious', -signatures;
   use Mojo::File::Share qw(dist_dir dist_file);
+  use Log::Log4perl::Level;
   use FindBin;
   use lib "$FindBin::Bin/../../../lib";
   use Game::EvonyTKR::Web::Logger;
+  use Game::EvonyTKR::Logger::Config;
+
+  my $logLevel = 'INFO';
 
   # This method will run once at server start
   sub startup ($self) {
@@ -22,6 +27,10 @@ package Game::EvonyTKR::Web {
     my $confFile = 
       File::Spec->catfile($dist_dir, 'game-evony_t_k_r-web.yml');
     
+    my $logConf = new Game::EvonyTKR::Logger::Config;
+    my $logPath = $logConf->path();
+    $logLevel = $self->mode() eq 'production' ? 'INFO' : 'TRACE';
+
     # Load configuration from config file
     my $config = $self->plugins->register_plugin(
       'Mojolicious::Plugin::NotYAMLConfig',
@@ -29,15 +38,16 @@ package Game::EvonyTKR::Web {
 
     my $wlog = Game::EvonyTKR::Web::Logger->new(
       category  => 'Web',
-      level     => $self->mode() eq 'production' ? 'info' : 'trace',
     );
-    $wlog->logInit();
+    $wlog->logInit($self->mode());
     $self->log($wlog->logger());
-
+    
     # Configure the application
     if(my $secrets = $config->{secrets}) {
       $self->secrets($secrets);
     }
+
+    $self->renderer->paths([File::Spec->catfile($dist_dir, 'templates')]);
 
     # Router
     my $r = $self->routes;
