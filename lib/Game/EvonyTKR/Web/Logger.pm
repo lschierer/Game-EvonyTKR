@@ -67,12 +67,14 @@ class Game::EvonyTKR::Web::Logger {
     );
 
     my %conf = (
-      "log4perl.category.Game.EvonyTKR" => "$level, logFile2",
-      "log4perl.category.Web"           => "$level, logFile",
+      "log4perl.rootLogger"                   => "$level, logFile",
+      "log4perl.category.Web"                 => "$level, logFile",
+      "log4perl.category.Game.EvonyTKR"       => "$level, logFile2",
+      "log4perl.category.Game.EvonyTKR.Web"   => "$level, logFile",
 
-      "log4perl.appender.logFile"          => "Log::Log4perl::Appender::File",
-      "log4perl.appender.logFile.utf8"     => 1,
-      "log4perl.appender.logFile.filename" => $logFile,
+      "log4perl.appender.logFile"             => "Log::Log4perl::Appender::File",
+      "log4perl.appender.logFile.utf8"        => 1,
+      "log4perl.appender.logFile.filename"    => $logFile,
       "log4perl.appender.Logfile.DatePattern" => "yyyy-MM-dd",
       "log4perl.appender.Logfile.TZ"          => "UTC",
       "log4perl.appender.logFile.mode"        => "append",
@@ -91,6 +93,11 @@ class Game::EvonyTKR::Web::Logger {
         "Log::Log4perl::Layout::PatternLayout",
       "log4perl.appender.logFile2.layout.ConversionPattern" =>
         "[%p] %d (%C line %L) %m%n",
+
+      "log4perl.appender.SCREEN"                          => 
+        "Log::Log4perl::Appender::Screen",
+      "log4perl.appender.SCREEN.layout"                   => "PatternLayout",
+      "log4perl.appender.SCREEN.layout.ConversionPattern" => "[%d] [mojo] [%p] %m%n",
     );
 
     $logger = MojoX::Log::Log4perl->new(\%conf);
