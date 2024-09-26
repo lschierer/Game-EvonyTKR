@@ -16,9 +16,9 @@ class Game::EvonyTKR::Web::Logger {
   use File::Path qw(make_path);
   use File::Touch;
   use Game::EvonyTKR::Logger;
-  use MojoX::Log::Log4perl;
   use Util::Any -all;
   use namespace::autoclean;
+  use MojoX::Log::Log4perl;
  
   field $category : reader : param = __CLASS__;
 
@@ -34,8 +34,6 @@ class Game::EvonyTKR::Web::Logger {
     debug
     trace
   );
-
-  my $internal_l4p = Game::EvonyTKR::Logger->new();
 
   ADJUST {
     if (not defined $category) {
@@ -71,7 +69,6 @@ class Game::EvonyTKR::Web::Logger {
     my %conf = (
       "log4perl.category.Game.EvonyTKR" => "$level, logFile2",
       "log4perl.category.Web"           => "$level, logFile",
-      "log4perl.category.Dancer2"       => "$level, logFile",
 
       "log4perl.appender.logFile"          => "Log::Log4perl::Appender::File",
       "log4perl.appender.logFile.utf8"     => 1,
@@ -95,6 +92,8 @@ class Game::EvonyTKR::Web::Logger {
       "log4perl.appender.logFile2.layout.ConversionPattern" =>
         "[%p] %d (%C line %L) %m%n",
     );
+
+    $logger = MojoX::Log::Log4perl->new(\%conf);
     # ... passed as a reference to init()
     return Data::Printer::np %conf;
   }
