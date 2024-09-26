@@ -36,6 +36,9 @@ package Game::EvonyTKR::Web {
 
     # Normal route to controller
     $r->get('/')->to('Example#welcome');
+
+    $self->plugin('Game::EvonyTKR::Web::Routes::General', $r);
+
   }
 
 }
