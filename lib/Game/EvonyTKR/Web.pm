@@ -52,6 +52,9 @@ package Game::EvonyTKR::Web {
     # Router
     my $r = $self->routes;
 
+    #let me use the DefaultHelpers
+    $self->plugin('DefaultHelpers');
+
     # Normal route to controller
     $r->get('/')->to('Example#welcome');
 
