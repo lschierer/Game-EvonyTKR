@@ -9,6 +9,8 @@ package Game::EvonyTKR::Web::Routes::General {
 
   sub register ($self, $app, $r) {
 
+    my $logger = $app->log;
+
     my $generalRoutes = $r->any('/general')->to(
       namespace   => 'Game::EvonyTKR::Web::Controller',
       controller  => 'General',
@@ -28,6 +30,7 @@ package Game::EvonyTKR::Web::Routes::General {
       action      => 'generalById',
     );
     
+    $logger->trace('Web::Routes::General->register() complete');
   }
 
 }

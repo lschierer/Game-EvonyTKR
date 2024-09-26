@@ -51,3 +51,5 @@ package Game::EvonyTKR::Web {
 
 }
 1;
+
+__END__
