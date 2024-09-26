@@ -25,7 +25,7 @@ package Game::EvonyTKR::Web::Routes::General {
       action      => 'list'
       );
     
-    $generalRoutes->get('/:id' => [format => ['text', 'json']])->to(
+    $generalRoutes->get('/:id' => [format => ['txt', 'json']])->to(
       format      => undef,
       action      => 'generalById',
     );

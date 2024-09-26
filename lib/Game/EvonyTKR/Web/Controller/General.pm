@@ -25,7 +25,7 @@ package Game::EvonyTKR::Web::Controller::General {
 
   sub generalById($self) {
     my $id = $self->param('id');
-    $self->render(text => "General '$id' requested.");
+    $self->render();
   }
 }
 1;
