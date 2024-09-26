@@ -6,18 +6,18 @@ use lib "$FindBin::Bin/../../../lib";
 
 class Game::EvonyTKR::Buff : isa(Game::EvonyTKR::Logger) {
 # PODNAME: Game::EvonyTKR::Buff
-
 # ABSTRACT: Buff and Debuff primatives
   use Game::EvonyTKR::Buff::Data;
   use Types::Standard        qw(is_Int Int Str is_Str);
   use Types::Common::Numeric qw(PositiveOrZeroInt);
   use Type::Utils "is";
   use Carp;
-  use Class::ISA;
   use Data::Printer;
   use Util::Any -all;
   use Array::Utils qw(:all);
   use namespace::autoclean;
+  use FindBin;
+  use lib "$FindBin::Bin/../../../lib";
   use overload
     '<=>' => \&compare,
     'cmp' => \&compare,
@@ -290,8 +290,8 @@ class Game::EvonyTKR::Buff : isa(Game::EvonyTKR::Logger) {
 
   method _equality($other, $swap = 0) {
     my $otherClass = blessed $other;
-    my @classList  = Class::ISA::self_and_super_path($otherClass);
-    if (none { $_ eq 'Game::EvonyTKR::Buff' } @classList) {
+    my @classList  = split(/::/, $otherClass);
+    if ($classList[2] ne 'Buff') {
       $self->logger()->logcroak('$other is not a Game::EvonyTKR::Buff');
     }
     my $result = $self->compare($other);
@@ -306,8 +306,8 @@ class Game::EvonyTKR::Buff : isa(Game::EvonyTKR::Logger) {
 
   method _inequality($other, $swap = 0) {
     my $otherClass = blessed $other;
-    my @classList  = Class::ISA::self_and_super_path($otherClass);
-    if (none { $_ eq 'Game::EvonyTKR::Buff' } @classList) {
+    my @classList  = split(/::/, $otherClass);
+    if ($classList[2] ne 'Buff') {
       $self->logger()->logcroak('$other is not a Game::EvonyTKR::Buff');
     }
     my $result = $self->compare($other);
