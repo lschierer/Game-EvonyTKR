@@ -1,20 +1,19 @@
 use experimental 'class';
 use utf8::all;
-use FindBin;
-use lib "$FindBin::Bin/../../../../lib";
+use File::FindLib 'lib';
 
-class Game::EvonyTKR::Buff::Data
+class Game::EvonyTKR::Data
   : isa(Game::EvonyTKR::Logger) {
-
+# PODNAME: Game::EvonyTKR::Data
+# VERSION
+  use Carp;
   use Types::Standard        qw(is_Int Int Str is_Str);
   use Types::Common::Numeric qw(PositiveOrZeroInt);
   use Type::Utils "is";
   use File::ShareDir ':ALL';
   use YAML::XS;
   use namespace::autoclean;
-
-# PODNAME: Game::EvonyTKR::Buff::Data
-# ABSTRACT: Data files for Game::EvonyTKR::Buff
+  use File::FindLib 'lib';
 
   field @buffConditions : reader = (
     'Against Monsters',
@@ -85,10 +84,20 @@ get the possible attributes from the yaml data file in the shared directory and 
     'Wall',
   );
 
+  field %generalClass :reader = (
+    'Ground'  => 'Game::EvonyTKR::General::Ground',
+    'Mounted' => 'Game::EvonyTKR::General::Mounted',
+    'Ranged'  => 'Game::EvonyTKR::General::Ranged',
+    'Siege'   => 'Game::EvonyTKR::General::Siege',
+  );
+  
+
 }
 1;
 
 __END__
+
+# ABSTRACT: Runtime Data values for Game::EvonyTKR
 
 =method new()
 

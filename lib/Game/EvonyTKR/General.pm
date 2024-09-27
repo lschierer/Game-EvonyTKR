@@ -1,735 +1,704 @@
 use v5.40.0;
 use experimental qw(class);
-use FindBin;
-use lib "$FindBin::Bin/../../../lib";
+use File::FindLib 'lib';
 
 class Game::EvonyTKR::General : isa(Game::EvonyTKR::Logger) {
-  use builtin qw(indexed);
-  use Carp;
-  use Types::Common qw( t is_Num is_Str is_Int);
-  use Type::Utils   qw(is enum);
-  use Util::Any -all;
-  use Data::Printer;
-  use File::ShareDir ':ALL';
-  use File::Spec;
-  use Game::EvonyTKR::Covenant;
-  use Game::EvonyTKR::SkillBook::Special;
-  use Game::EvonyTKR::Speciality;
-  require Game::EvonyTKR::Buff::Data::EvaluationData::Attacking;
-  require Game::EvonyTKR::Buff::Data::EvaluationData::Monster;
-  use Game::EvonyTKR::Ascending;
-  use JSON::MaybeXS;
-  use YAML::XS qw{LoadFile Load};
-  use namespace::autoclean;
 # PODNAME: Game::EvonyTKR::General
-  use overload
-    '<=>' => \&_comparison,
-    'cmp' => \&_comparison,
-    'eq'  => \&_equality,
-    '=='  => \&_equality,
-    'ne'  => \&_inequality,
-    '!='  => \&_inequality,
-    '""'  => \&_toString;
-
 # ABSTRACT: Module for processing information about Evony TKR Generals.
+# VERSION
+    use builtin qw(indexed);
+    use Carp;
+    use Types::Common qw( t is_Num is_Str is_Int);
+    use Type::Utils   qw(is enum);
+    use Util::Any -all;
+    use Data::Printer;
+    use File::ShareDir ':ALL';
+    use File::Spec;
+    use Game::EvonyTKR::Covenant;
+    use Game::EvonyTKR::SkillBook::Special;
+    use Game::EvonyTKR::Speciality;
+    require Game::EvonyTKR::Buff::EvaluationData::Attacking;
+    require Game::EvonyTKR::Buff::EvaluationData::Monster;
+    use Game::EvonyTKR::Ascending;
+    use JSON::MaybeXS;
+    use YAML::XS qw{LoadFile Load};
+    use namespace::autoclean;
+    use File::FindLib 'lib';
+    use overload
+      '<=>' => \&_comparison,
+      'cmp' => \&_comparison,
+      'eq'  => \&_equality,
+      '=='  => \&_equality,
+      'ne'  => \&_inequality,
+      '!='  => \&_inequality,
+      '""'  => \&_toString;
 
 # from Type::Registry, this will save me from some of the struggles I have had with some types having blessed references and others not.
-  ADJUST {
-    if (!(t->simple_lookup("Num"))) {
-      t->add_types(-Common);
-    }
-  }
-
-  field $name : reader : param;
-
-  ADJUST {
-    my @errors;
-    is_Str($name) or push @errors => "name must be a string, not $name";
-    if (@errors) {
-      die join ', ' => @errors;
-    }
-  }
-
-  field $_generalType : reader = 'All Troops';
-
-  field $leadership : reader = 0;
-
-  field $leadership_increment : reader = 0;
-
-  field $attack : reader = 0;
-
-  field $attack_increment : reader = 0;
-
-  field $defense : reader = 0;
-
-  field $defense_increment : reader = 0;
-
-  field $politics : reader = 0;
-
-  field $politics_increment : reader = 0;
-
-  field $level : reader : param //= 45;
-
-  field @specialities : reader;
-
-  field $ascending : reader : param //= true;
-
-  field $ascendingAttributes :reader  //= Game::EvonyTKR::Ascending->new();
-
-  field $builtInBook : reader;
-
-  field @otherBooks : reader;
-
-  field $hasCovenant : reader = false;
-
-  field %BasicAESAdjustment = (
-    'None'    => 0,
-    '1Purple' => 0,
-    '2Purple' => 0,
-    '3Purple' => 0,
-    '4Purple' => 0,
-    '5Purple' => 0,
-    '1Red'    => 10,
-    '2Red'    => 20,
-    '3Red'    => 30,
-    '4Red'    => 40,
-    '5Red'    => 50,
-  );
-
-  ADJUST {
-    lock_keys(%BasicAESAdjustment);
-  }
-
-  method _getEvAns4BasicAttributes($resultRef, $BuffMultipliers) {
-
-    $resultRef->{'BAS'}->{'Attack'} =
-      $self->effective_attack() *
-      $BuffMultipliers->getMultiplierForBuff('Attack', $self->generalType());
-
-    $resultRef->{'BAS'}->{'Defense'} =
-      $self->effective_defense() *
-      $BuffMultipliers->getMultiplierForBuff('Defense', $self->generalType());
-
-    $resultRef->{'BAS'}->{'Leadershp'} =
-      $self->effective_leadership() *
-      $BuffMultipliers->getMultiplierForBuff('HP', $self->generalType());
-
-    $resultRef->{'BAS'}->{'Politics'} =
-      $self->effective_politics() *
-      $BuffMultipliers->getMultiplierForBuff('Death to Wounded',
-      $self->generalType());
-
-    for my $key (keys %{ $resultRef->{'BAS'} }) {
-      $resultRef->{'BAS'}->{'Overall'} += $resultRef->{'BAS'}->{$key};
-    }
-
-    $resultRef->{'Attack'}->{'BAS'} += $resultRef->{'BAS'}->{'Attack'};
-
-    $resultRef->{'Toughness'}->{'BAS'} += $resultRef->{'BAS'}->{'Defense'};
-
-    $resultRef->{'Toughness'}->{'BAS'} += $resultRef->{'BAS'}->{'Leadershp'};
-
-    $resultRef->{'Preservation'}->{'BAS'} += $resultRef->{'BAS'}->{'Politics'};
-
-  }
-
-  method getEvAnsScoreAsPrimary($situation) {
-    my $resultRef = $self->computeEvansScoreComponents($situation);
-    my $BAS =
-      exists $resultRef->{'BAS'}->{'Overall'}
-      ? $resultRef->{'BAS'}->{'Overall'}
-      : 0;
-    my $SBS =
-      exists $resultRef->{'SBS'}->{'Overall'}
-      ? $resultRef->{'SBS'}->{'Overall'}
-      : 0;
-    my $CVS =
-      exists $resultRef->{'CVS'}->{'Overall'}
-      ? $resultRef->{'CVS'}->{'Overall'}
-      : 0;
-    my $SPS =
-      exists $resultRef->{'SPS'}->{'Overall'}
-      ? $resultRef->{'SPS'}->{'Overall'}
-      : 0;
-    my $AES =
-      exists $resultRef->{'AES'}->{'Overall'}
-      ? $resultRef->{'AES'}->{'Overall'}
-      : 0;
-    my $TLGS = $BAS + $SBS + $CVS + $SPS + $AES;
-    $self->logger()->trace("BAS for $name is " . $BAS);
-    $self->logger()->trace("SBS for $name is " . $SBS);
-    $self->logger()->trace("CVS for $name is " . $CVS);
-    $self->logger()->trace("SPS for $name is " . $SPS);
-    $self->logger()->trace("AES for $name is " . $AES);
-    $self->logger()->info("TLGS as Primary for $name is $TLGS");
-    return $TLGS;
-  }
-
-  method getEvAnsScoreAsSecondary($situation) {
-    my $resultRef = $self->computeEvansScoreComponents($situation);
-    my $SBS =
-      exists $resultRef->{'SBS'}->{'Overall'}
-      ? $resultRef->{'SBS'}->{'Overall'}
-      : 0;
-    my $CVS =
-      exists $resultRef->{'CVS'}->{'Overall'}
-      ? $resultRef->{'CVS'}->{'Overall'}
-      : 0;
-    my $SPS =
-      exists $resultRef->{'SPS'}->{'Overall'}
-      ? $resultRef->{'SPS'}->{'Overall'}
-      : 0;
-    my $TLGS = $SBS + $CVS + $SPS;
-    $self->logger()->trace("SBS for $name is " . $SBS);
-    $self->logger()->trace("CVS for $name is " . $CVS);
-    $self->logger()->trace("SPS for $name is " . $SPS);
-    $self->logger()->info("TLGS as Secondary for $name is $TLGS");
-    return $TLGS;
-  }
-
-  method computeEvansScoreComponents($situation) {
-    $self->logger()
-      ->trace("computeEvansScoreComponents for $name with $situation");
-    my $BuffMultipliers;
-    my $resultRef = {
-      'BAS'          => {},
-      'SBS'          => {},
-      'CVS'          => {},
-      'SPS'          => {},
-      'AES'          => {},
-      'Attack'       => {},
-      'Toughness'    => {},
-      'Preservation' => {},
-    };
-    if ($situation =~ /Attacking/i) {
-      $BuffMultipliers =
-        Game::EvonyTKR::Buff::Data::EvaluationData::Attacking->new();
-    }
-    elsif ($situation =~ /Monster/i) {
-      $BuffMultipliers =
-        Game::EvonyTKR::Buff::Data::EvaluationData::Monster->new();
-    }
-    else {
-      $self->logger()->error("Unsupported situation $situation");
-      return 0;
-    }
-
-    $self->_getEvAns4BasicAttributes($resultRef, $BuffMultipliers);
-
-    if (defined $builtInBook) {
-      $builtInBook->getEvAnsScore($self->name(), $resultRef, $BuffMultipliers,
-        $self->generalType(),);
-    }
-
-    if (scalar @otherBooks >= 1) {
-      for my $book (@otherBooks) {
-        $book->getEvAnsScore($self->name(), $resultRef, $BuffMultipliers,
-          $self->generalType(),);
-      }
-    }
-
-    for my $key (keys %{ $resultRef->{'SBS'} }) {
-      if ($key ne 'Overall') {
-        $resultRef->{'SBS'}->{'Overall'} += $resultRef->{'SBS'}->{$key};
-      }
-    }
-
-    for my $sp (@specialities) {
-      $sp->getEvAnsScore($self->name(), $resultRef, $BuffMultipliers,
-        $self->generalType(),);
-    }
-    for my $key (keys %{ $resultRef->{'SPS'} }) {
-      if ($key ne 'Overall') {
-        $resultRef->{'SPS'}->{'Overall'} += $resultRef->{'SPS'}->{$key};
-      }
-    }
-
-    if ($ascending) {
-      $ascendingAttributes->getEvAnsScore($self->name(), $resultRef,
-        $BuffMultipliers, $self->generalType(),);
-
-      for my $key (keys %{ $resultRef->{'AES'} }) {
-        if ($key ne 'Overall') {
-          $resultRef->{'AES'}->{'Overall'} += $resultRef->{'AES'}->{$key};
+    ADJUST {
+        if ( !( t->simple_lookup("Num") ) ) {
+            t->add_types( -Common );
         }
-      }
-    }
-    else {
-      $resultRef->{'AES'}->{'Overall'} += 0;
     }
 
-    if ($hasCovenant) {
+    field $name : reader : param;
 
-    }
-
-    for my $key (keys %{ $resultRef->{'Attack'} }) {
-      $resultRef->{'Attack'}->{'Overall'} += $resultRef->{'Attack'}->{$key};
-    }
-
-    for my $key (keys %{ $resultRef->{'Toughness'} }) {
-      $resultRef->{'Toughness'}->{'Overall'} +=
-        $resultRef->{'Toughness'}->{$key};
-    }
-
-    for my $key (keys %{ $resultRef->{'Preservation'} }) {
-      $resultRef->{'Preservation'}->{'Overall'} +=
-        $resultRef->{'Preservation'}->{$key};
-    }
-    return $resultRef;
-  }
-
-  method generalType() {
-    return $self->_generalType;
-  }
-
-  method addBuildInBook($newBook) {
-    my $type = blessed $newBook;
-    if ($type ne 'Game::EvonyTKR::SkillBook::Special') {
-      $self->logger()
-        ->logcroak(
-        "builtInBook must be a Game::EvonyTKR::SkillBook::Special, not $type");
-    }
-    $self->logger()
-      ->trace(
-      "adding builtInBook with type $type and name " . $newBook->name());
-    $builtInBook = $newBook;
-  }
-
-  method setCovenant($ce) {
-    if ($ce) {
-      $hasCovenant = 1;
-    }
-    else {
-      $hasCovenant = 0;
-    }
-  }
-
-  method _validation {
-    my @errors;
-
-    my $type = t('Bool');
-    $type->check($ascending)
-      or push @errors => "ascending must be a bool, not $ascending";
-
-    $type = t('PositiveOrZeroNum');
-    is_Num($leadership)
-      or push @errors => "leadership must be a number, not $leadership";
-    $type->check($leadership)
-      or push @errors => "leadership must be positive, not $leadership";
-
-    is_Num($leadership_increment)
-      or push @errors =>
-      "leadership_increment must be a number, not $leadership_increment";
-    $type->check($leadership_increment)
-      or push @errors =>
-      "leadership_increment must be positive, not $leadership_increment";
-
-    is_Num($attack) or push @errors => "attack must be a number, not $attack";
-    $type->check($attack)
-      or push @errors => "attack must be positive, not $attack";
-
-    is_Num($attack_increment)
-      or push @errors =>
-      "attack_increment must be a number, not $attack_increment";
-    $type->check($attack_increment)
-      or push @errors =>
-      "attack_increment must be positive, not $attack_increment";
-
-    is_Num($defense)
-      or push @errors => "defense must be a number, not $defense";
-    $type->check($defense)
-      or push @errors => "defense must be positive, not $defense";
-
-    is_Num($defense_increment)
-      or push @errors =>
-      "defense_increment must be a number, not $defense_increment";
-    $type->check($defense_increment)
-      or push @errors =>
-      "defense_increment must be positive, not $defense_increment";
-
-    is_Num($politics)
-      or push @errors => "politics must be a number, not $politics";
-
-    is_Num($politics_increment)
-      or push @errors =>
-      "politics_increment must be a number, not $politics_increment";
-    $type->check($politics_increment)
-      or push @errors =>
-      "politics_increment must be positive, not $politics_increment";
-
-    my $pInt = t('PositiveOrZeroInt');
-    is_Int($level) or push @errors => "level must be an integer, not $level";
-    $pInt->check($level)
-      or push @errors => "level must be positive, not $level";
-    $type = t('IntRange[1, 45]');
-    $type->check($level)
-      or push @errors => "level must be between 1 and 45 inclusive";
-
-    if (@errors) {
-      die join ', ' => @errors;
-    }
-  }
-
-  method _adjustBasicAttribute($attribute, $attribute_increment) {
-    my $AES_adjustment = 0;
-
-    if ($ascending) {
-      $self->logger()->trace($self->name() . " is ascended");
-      my $stars = $ascendingAttributes->activeLevel();
-      if (not $stars =~ /None/i) {
-        $AES_adjustment = $BasicAESAdjustment{$stars};
-        if ($AES_adjustment == 0) {
-          $self->logger()
-            ->trace($self->name()
-              . " did not match any value for stars $stars in BasicAESAdjustment: "
-              . np %BasicAESAdjustment);
+    ADJUST {
+        my @errors;
+        is_Str($name) or push @errors => "name must be a string, not $name";
+        if (@errors) {
+            die join ', ' => @errors;
         }
-      }
     }
-    $self->logger()
-      ->trace("for "
-        . $self->name()
-        . " level is $level, attribute_increment is $attribute_increment,  attribute is $attribute"
-      );
-    my $step = $level * $attribute_increment + $attribute;
-    $self->logger()->trace("step1 for " . $self->name() . " is $step");
-    $step = $step + 500;
-    $self->logger()->trace("step2 for " . $self->name() . " is $step");
-    $step = $step + $AES_adjustment;
-    $self->logger()->trace("step3 for " . $self->name() . " is $step");
 
-    if ($step < 900) {
-      $step = $step * 0.1;
+    field $_generalType : reader = 'All Troops';
+
+    field $leadership : reader = 0;
+
+    field $leadership_increment : reader = 0;
+
+    field $attack : reader = 0;
+
+    field $attack_increment : reader = 0;
+
+    field $defense : reader = 0;
+
+    field $defense_increment : reader = 0;
+
+    field $politics : reader = 0;
+
+    field $politics_increment : reader = 0;
+
+    field $level : reader : param //= 45;
+
+    field @specialities : reader;
+
+    field $ascending : reader : param //= true;
+
+    field $ascendingAttributes : reader //= Game::EvonyTKR::Ascending->new();
+
+    field $builtInBook : reader;
+
+    field @otherBooks : reader;
+
+    field $hasCovenant : reader = false;
+
+    field %BasicAESAdjustment = (
+        'None'    => 0,
+        '1Purple' => 0,
+        '2Purple' => 0,
+        '3Purple' => 0,
+        '4Purple' => 0,
+        '5Purple' => 0,
+        '1Red'    => 10,
+        '2Red'    => 20,
+        '3Red'    => 30,
+        '4Red'    => 40,
+        '5Red'    => 50,
+    );
+
+    ADJUST {
+        lock_keys(%BasicAESAdjustment);
     }
-    else {
-      $step = 90 + ($step - 900) * 0.2;
+
+    method _getEvAns4BasicAttributes( $resultRef, $BuffMultipliers ) {
+
+        $resultRef->{'BAS'}->{'Attack'} =
+          $self->effective_attack() *
+          $BuffMultipliers->getMultiplierForBuff( 'Attack',
+            $self->generalType() );
+
+        $resultRef->{'BAS'}->{'Defense'} =
+          $self->effective_defense() *
+          $BuffMultipliers->getMultiplierForBuff( 'Defense',
+            $self->generalType() );
+
+        $resultRef->{'BAS'}->{'Leadershp'} =
+          $self->effective_leadership() *
+          $BuffMultipliers->getMultiplierForBuff( 'HP', $self->generalType() );
+
+        $resultRef->{'BAS'}->{'Politics'} =
+          $self->effective_politics() *
+          $BuffMultipliers->getMultiplierForBuff( 'Death to Wounded',
+            $self->generalType() );
+
+        for my $key ( keys %{ $resultRef->{'BAS'} } ) {
+            $resultRef->{'BAS'}->{'Overall'} += $resultRef->{'BAS'}->{$key};
+        }
+
+        $resultRef->{'Attack'}->{'BAS'} += $resultRef->{'BAS'}->{'Attack'};
+
+        $resultRef->{'Toughness'}->{'BAS'} += $resultRef->{'BAS'}->{'Defense'};
+
+        $resultRef->{'Toughness'}->{'BAS'} +=
+          $resultRef->{'BAS'}->{'Leadershp'};
+
+        $resultRef->{'Preservation'}->{'BAS'} +=
+          $resultRef->{'BAS'}->{'Politics'};
+
     }
-    $self->logger()->trace("step4 for " . $self->name() . " is $step");
-    return $step;
-  }
 
-  method effective_leadership() {
-    $self->logger()
-      ->trace('computing effective_leadership for ' . $self->name());
-    return $self->_adjustBasicAttribute($self->leadership(),
-      $self->leadership_increment());
-  }
+    method getEvAnsScoreAsPrimary($situation) {
+        my $resultRef = $self->computeEvansScoreComponents($situation);
+        my $BAS =
+          exists $resultRef->{'BAS'}->{'Overall'}
+          ? $resultRef->{'BAS'}->{'Overall'}
+          : 0;
+        my $SBS =
+          exists $resultRef->{'SBS'}->{'Overall'}
+          ? $resultRef->{'SBS'}->{'Overall'}
+          : 0;
+        my $CVS =
+          exists $resultRef->{'CVS'}->{'Overall'}
+          ? $resultRef->{'CVS'}->{'Overall'}
+          : 0;
+        my $SPS =
+          exists $resultRef->{'SPS'}->{'Overall'}
+          ? $resultRef->{'SPS'}->{'Overall'}
+          : 0;
+        my $AES =
+          exists $resultRef->{'AES'}->{'Overall'}
+          ? $resultRef->{'AES'}->{'Overall'}
+          : 0;
+        my $TLGS = $BAS + $SBS + $CVS + $SPS + $AES;
+        $self->logger()->trace( "BAS for $name is " . $BAS );
+        $self->logger()->trace( "SBS for $name is " . $SBS );
+        $self->logger()->trace( "CVS for $name is " . $CVS );
+        $self->logger()->trace( "SPS for $name is " . $SPS );
+        $self->logger()->trace( "AES for $name is " . $AES );
+        $self->logger()->info("TLGS as Primary for $name is $TLGS");
+        return $TLGS;
+    }
 
-  method effective_attack() {
-    $self->logger()->trace('computing effective_attack for ' . $self->name());
-    return $self->_adjustBasicAttribute($self->attack(),
-      $self->attack_increment());
-  }
+    method getEvAnsScoreAsSecondary($situation) {
+        my $resultRef = $self->computeEvansScoreComponents($situation);
+        my $SBS =
+          exists $resultRef->{'SBS'}->{'Overall'}
+          ? $resultRef->{'SBS'}->{'Overall'}
+          : 0;
+        my $CVS =
+          exists $resultRef->{'CVS'}->{'Overall'}
+          ? $resultRef->{'CVS'}->{'Overall'}
+          : 0;
+        my $SPS =
+          exists $resultRef->{'SPS'}->{'Overall'}
+          ? $resultRef->{'SPS'}->{'Overall'}
+          : 0;
+        my $TLGS = $SBS + $CVS + $SPS;
+        $self->logger()->trace( "SBS for $name is " . $SBS );
+        $self->logger()->trace( "CVS for $name is " . $CVS );
+        $self->logger()->trace( "SPS for $name is " . $SPS );
+        $self->logger()->info("TLGS as Secondary for $name is $TLGS");
+        return $TLGS;
+    }
 
-  method effective_defense() {
-    $self->logger()->trace('computing effective_defense for ' . $self->name());
-    return $self->_adjustBasicAttribute($self->defense(),
-      $self->defense_increment());
-  }
-
-  method effective_politics() {
-    $self->logger()->trace('computing effective_politics for ' . $self->name());
-    return $self->_adjustBasicAttribute($self->politics(),
-      $self->politics_increment());
-  }
-
-  method specialityLevels {
-    my $sl = first { defined($_) } @specialities;
-    return @{ $sl->levels()->values() };
-  }
-
-  method changeActiveSpecialityLevel($specialityNumber, $newLevel) {
-    my $type = t('PositiveOrZeroInt');
-    if ($type->check($specialityNumber)) {
-      $type = t('IntRange[1, 4]');
-      if ($type->check($specialityNumber)) {
-        $specialityNumber--;
-        my @lv = $self->specialityLevels();
-        if (any { $_ =~ $newLevel } @lv) {
-          # I am ready to actually do work
-          if ($specialityNumber == 3) {
-            my @otherLevels = ();
-            for my ($l, $v) (indexed(@specialities)) {
-              if ($l < 4) {
-                push @otherLevels, $v->activeLevel();
-                if ($v->activeLevel() !~ /Gold/i) {
-                  $self->logger()
-                    ->debug(
-"detected that one of the first 3 is not Gold.  Setting #4 to None."
-                    );
-                  $specialities[3]->setActiveLevel('None');
-                }
-              }
-            }
-            if (all { $_ =~ /Gold/i } @otherLevels) {
-              $self->logger()
-                ->debug(
-"detected that the first 3 are all Gold.  Setting #4 to $newLevel as requested."
-                );
-              $specialities[3]->setActiveLevel($newLevel);
-            }
-          }
-          elsif ($newLevel !~ /Gold/i) {
-            if ($specialityNumber != 3) {
-              $self->logger()
-                ->debug("Detectected that $newLevel for "
-                  . ($specialityNumber + 1)
-                  . " is not Gold.  Ensuring #4 is None.");
-              $specialities[3]->setActiveLevel('None');
-            }
-            $specialities[$specialityNumber]->setActiveLevel($newLevel);
-          }
-          else {
-            $specialities[$specialityNumber]->setActiveLevel($newLevel);
-            $self->logger()
-              ->debug("Detectected that $newLevel for "
-                . ($specialityNumber + 1)
-                . " is Gold.  Recursive Call for #4 just in case.");
-            $self->changeActiveSpecialityLevel(4, 'Green');
-          }
+    method computeEvansScoreComponents($situation) {
+        $self->logger()
+          ->trace("computeEvansScoreComponents for $name with $situation");
+        my $BuffMultipliers;
+        my $resultRef = {
+            'BAS'          => {},
+            'SBS'          => {},
+            'CVS'          => {},
+            'SPS'          => {},
+            'AES'          => {},
+            'Attack'       => {},
+            'Toughness'    => {},
+            'Preservation' => {},
+        };
+        if ( $situation =~ /Attacking/i ) {
+            $BuffMultipliers =
+              Game::EvonyTKR::Buff::EvaluationData::Attacking->new();
+        }
+        elsif ( $situation =~ /Monster/i ) {
+            $BuffMultipliers =
+              Game::EvonyTKR::Buff::EvaluationData::Monster->new();
         }
         else {
-          $self->logger()
-            ->warn("detected invalid Speciality level $newLevel for "
-              . $specialityNumber + 1
-              . "in $name");
+            $self->logger()->error("Unsupported situation $situation");
+            return 0;
         }
-      }
-      else {
-        $self->logger()
-          ->warn(
-          "detected invalid speciality number $specialityNumber for $name");
-      }
-    }
-    else {
-      $self->logger()
-        ->warn(
-        "detected invalid speciality number $specialityNumber for $name");
-    }
-  }
 
-  method addAnotherBook($newBook) {
-    my $bookClass = blessed $newBook;
-    my @classList = split(/::/, $bookClass);
-    if ($classList[2] ne 'SkillBook') {
-      $self->logger()
-        ->logcroak(
+        $self->_getEvAns4BasicAttributes( $resultRef, $BuffMultipliers );
+
+        if ( defined $builtInBook ) {
+            $builtInBook->getEvAnsScore(
+                $self->name(),    $resultRef,
+                $BuffMultipliers, $self->generalType(),
+            );
+        }
+
+        if ( scalar @otherBooks >= 1 ) {
+            for my $book (@otherBooks) {
+                $book->getEvAnsScore(
+                    $self->name(),    $resultRef,
+                    $BuffMultipliers, $self->generalType(),
+                );
+            }
+        }
+
+        for my $key ( keys %{ $resultRef->{'SBS'} } ) {
+            if ( $key ne 'Overall' ) {
+                $resultRef->{'SBS'}->{'Overall'} += $resultRef->{'SBS'}->{$key};
+            }
+        }
+
+        for my $sp (@specialities) {
+            $sp->getEvAnsScore(
+                $self->name(),    $resultRef,
+                $BuffMultipliers, $self->generalType(),
+            );
+        }
+        for my $key ( keys %{ $resultRef->{'SPS'} } ) {
+            if ( $key ne 'Overall' ) {
+                $resultRef->{'SPS'}->{'Overall'} += $resultRef->{'SPS'}->{$key};
+            }
+        }
+
+        if ($ascending) {
+            $ascendingAttributes->getEvAnsScore(
+                $self->name(),    $resultRef,
+                $BuffMultipliers, $self->generalType(),
+            );
+
+            for my $key ( keys %{ $resultRef->{'AES'} } ) {
+                if ( $key ne 'Overall' ) {
+                    $resultRef->{'AES'}->{'Overall'} +=
+                      $resultRef->{'AES'}->{$key};
+                }
+            }
+        }
+        else {
+            $resultRef->{'AES'}->{'Overall'} += 0;
+        }
+
+        if ($hasCovenant) {
+
+        }
+
+        for my $key ( keys %{ $resultRef->{'Attack'} } ) {
+            $resultRef->{'Attack'}->{'Overall'} +=
+              $resultRef->{'Attack'}->{$key};
+        }
+
+        for my $key ( keys %{ $resultRef->{'Toughness'} } ) {
+            $resultRef->{'Toughness'}->{'Overall'} +=
+              $resultRef->{'Toughness'}->{$key};
+        }
+
+        for my $key ( keys %{ $resultRef->{'Preservation'} } ) {
+            $resultRef->{'Preservation'}->{'Overall'} +=
+              $resultRef->{'Preservation'}->{$key};
+        }
+        return $resultRef;
+    }
+
+    method generalType() {
+        $self->logger()->debug(
+            sprintf(
+                '%s is of type %s with class %s',
+                $name, $self->_generalType, blessed $self,
+            )
+        );
+        return $self->_generalType;
+    }
+
+    method addBuildInBook($newBook) {
+        my $type = blessed $newBook;
+        if ( $type ne 'Game::EvonyTKR::SkillBook::Special' ) {
+            $self->logger()
+              ->logcroak(
+"builtInBook must be a Game::EvonyTKR::SkillBook::Special, not $type"
+              );
+        }
+        $self->logger()
+          ->trace(
+            "adding builtInBook with type $type and name " . $newBook->name() );
+        $builtInBook = $newBook;
+    }
+
+    method setCovenant($ce) {
+        if ($ce) {
+            $hasCovenant = 1;
+        }
+        else {
+            $hasCovenant = 0;
+        }
+    }
+
+    method _validation {
+        my @errors;
+
+        my $type = t('Bool');
+        $type->check($ascending)
+          or push @errors => "ascending must be a bool, not $ascending";
+
+        $type = t('PositiveOrZeroNum');
+        is_Num($leadership)
+          or push @errors => "leadership must be a number, not $leadership";
+        $type->check($leadership)
+          or push @errors => "leadership must be positive, not $leadership";
+
+        is_Num($leadership_increment)
+          or push @errors =>
+          "leadership_increment must be a number, not $leadership_increment";
+        $type->check($leadership_increment)
+          or push @errors =>
+          "leadership_increment must be positive, not $leadership_increment";
+
+        is_Num($attack)
+          or push @errors => "attack must be a number, not $attack";
+        $type->check($attack)
+          or push @errors => "attack must be positive, not $attack";
+
+        is_Num($attack_increment)
+          or push @errors =>
+          "attack_increment must be a number, not $attack_increment";
+        $type->check($attack_increment)
+          or push @errors =>
+          "attack_increment must be positive, not $attack_increment";
+
+        is_Num($defense)
+          or push @errors => "defense must be a number, not $defense";
+        $type->check($defense)
+          or push @errors => "defense must be positive, not $defense";
+
+        is_Num($defense_increment)
+          or push @errors =>
+          "defense_increment must be a number, not $defense_increment";
+        $type->check($defense_increment)
+          or push @errors =>
+          "defense_increment must be positive, not $defense_increment";
+
+        is_Num($politics)
+          or push @errors => "politics must be a number, not $politics";
+
+        is_Num($politics_increment)
+          or push @errors =>
+          "politics_increment must be a number, not $politics_increment";
+        $type->check($politics_increment)
+          or push @errors =>
+          "politics_increment must be positive, not $politics_increment";
+
+        my $pInt = t('PositiveOrZeroInt');
+        is_Int($level)
+          or push @errors => "level must be an integer, not $level";
+        $pInt->check($level)
+          or push @errors => "level must be positive, not $level";
+        $type = t('IntRange[1, 45]');
+        $type->check($level)
+          or push @errors => "level must be between 1 and 45 inclusive";
+
+        if (@errors) {
+            die join ', ' => @errors;
+        }
+    }
+
+    method _adjustBasicAttribute( $attribute, $attribute_increment ) {
+        my $AES_adjustment = 0;
+
+        if ($ascending) {
+            $self->logger()->trace( $self->name() . " is ascended" );
+            my $stars = $ascendingAttributes->activeLevel();
+            if ( not $stars =~ /None/i ) {
+                $AES_adjustment = $BasicAESAdjustment{$stars};
+                if ( $AES_adjustment == 0 ) {
+                    $self->logger()
+                      ->trace( $self->name()
+                          . " did not match any value for stars $stars in BasicAESAdjustment: "
+                          . np %BasicAESAdjustment );
+                }
+            }
+        }
+        $self->logger()
+          ->trace( "for "
+              . $self->name()
+              . " level is $level, attribute_increment is $attribute_increment,  attribute is $attribute"
+          );
+        my $step = $level * $attribute_increment + $attribute;
+        $self->logger()->trace( "step1 for " . $self->name() . " is $step" );
+        $step = $step + 500;
+        $self->logger()->trace( "step2 for " . $self->name() . " is $step" );
+        $step = $step + $AES_adjustment;
+        $self->logger()->trace( "step3 for " . $self->name() . " is $step" );
+
+        if ( $step < 900 ) {
+            $step = $step * 0.1;
+        }
+        else {
+            $step = 90 + ( $step - 900 ) * 0.2;
+        }
+        $self->logger()->trace( "step4 for " . $self->name() . " is $step" );
+        return $step;
+    }
+
+    method effective_leadership() {
+        $self->logger()
+          ->trace( 'computing effective_leadership for ' . $self->name() );
+        return $self->_adjustBasicAttribute( $self->leadership(),
+            $self->leadership_increment() );
+    }
+
+    method effective_attack() {
+        $self->logger()
+          ->trace( 'computing effective_attack for ' . $self->name() );
+        return $self->_adjustBasicAttribute( $self->attack(),
+            $self->attack_increment() );
+    }
+
+    method effective_defense() {
+        $self->logger()
+          ->trace( 'computing effective_defense for ' . $self->name() );
+        return $self->_adjustBasicAttribute( $self->defense(),
+            $self->defense_increment() );
+    }
+
+    method effective_politics() {
+        $self->logger()
+          ->trace( 'computing effective_politics for ' . $self->name() );
+        return $self->_adjustBasicAttribute( $self->politics(),
+            $self->politics_increment() );
+    }
+
+    method specialityLevels {
+        my $sl = first { defined($_) } @specialities;
+        return @{ $sl->levels()->values() };
+    }
+
+    method changeActiveSpecialityLevel( $specialityNumber, $newLevel ) {
+        my $type = t('PositiveOrZeroInt');
+        if ( $type->check($specialityNumber) ) {
+            $type = t('IntRange[1, 4]');
+            if ( $type->check($specialityNumber) ) {
+                $specialityNumber--;
+                my @lv = $self->specialityLevels();
+                if ( any { $_ =~ $newLevel } @lv ) {
+
+                    # I am ready to actually do work
+                    if ( $specialityNumber == 3 ) {
+                        my @otherLevels = ();
+                        for my ( $l, $v ) ( indexed(@specialities) ) {
+                            if ( $l < 4 ) {
+                                push @otherLevels, $v->activeLevel();
+                                if ( $v->activeLevel() !~ /Gold/i ) {
+                                    $self->logger()
+                                      ->debug(
+"detected that one of the first 3 is not Gold.  Setting #4 to None."
+                                      );
+                                    $specialities[3]->setActiveLevel('None');
+                                }
+                            }
+                        }
+                        if ( all { $_ =~ /Gold/i } @otherLevels ) {
+                            $self->logger()
+                              ->debug(
+"detected that the first 3 are all Gold.  Setting #4 to $newLevel as requested."
+                              );
+                            $specialities[3]->setActiveLevel($newLevel);
+                        }
+                    }
+                    elsif ( $newLevel !~ /Gold/i ) {
+                        if ( $specialityNumber != 3 ) {
+                            $self->logger()
+                              ->debug( "Detectected that $newLevel for "
+                                  . ( $specialityNumber + 1 )
+                                  . " is not Gold.  Ensuring #4 is None." );
+                            $specialities[3]->setActiveLevel('None');
+                        }
+                        $specialities[$specialityNumber]
+                          ->setActiveLevel($newLevel);
+                    }
+                    else {
+                        $specialities[$specialityNumber]
+                          ->setActiveLevel($newLevel);
+                        $self->logger()
+                          ->debug( "Detectected that $newLevel for "
+                              . ( $specialityNumber + 1 )
+                              . " is Gold.  Recursive Call for #4 just in case."
+                          );
+                        $self->changeActiveSpecialityLevel( 4, 'Green' );
+                    }
+                }
+                else {
+                    $self->logger()
+                      ->warn( "detected invalid Speciality level $newLevel for "
+                          . $specialityNumber + 1
+                          . "in $name" );
+                }
+            }
+            else {
+                $self->logger()
+                  ->warn(
+"detected invalid speciality number $specialityNumber for $name"
+                  );
+            }
+        }
+        else {
+            $self->logger()
+              ->warn(
+                "detected invalid speciality number $specialityNumber for $name"
+              );
+        }
+    }
+
+    method addAnotherBook($newBook) {
+        my $bookClass = blessed $newBook;
+        my @classList = split( /::/, $bookClass );
+        if ( $classList[2] ne 'SkillBook' ) {
+            $self->logger()
+              ->logcroak(
 "Attempt to add $bookClass which is not a 'Game::EvonyTKR::SkillBook' to $name"
-        );
-    }
-    if ($bookClass ne 'Game::EvonyTKR::SkillBook::Special') {
-      $self->logger()
-        ->croak(
-"Attempt to add $bookClass which is not a 'Game::EvonyTKR::SkillBook::Special' to $name"
-        );
-    }
-    push @otherBooks, $newBook;
-    $self->logger()->debug("added SkillBook " . $newBook->name() . " to $name");
-  }
-
-  method addSpeciality($newSpeciality) {
-    my $specialityClass = blessed $newSpeciality;
-    my @classList       = split(/::/, $specialityClass);
-    if ($classList[2] ne 'Speciality') {
-      croak
-"Attemp to add $specialityClass which is not a 'Game::EvonyTKR::Speciality' to $name";
-    }
-    push @specialities, $newSpeciality;
-    $self->logger()
-      ->debug("added Speciality " . $newSpeciality->name() . " to $name");
-  }
-
-  method setLevel($newLevel) {
-    if (is_Int($newLevel)) {
-      my $type = t('IntRange[1, 45]');
-      if ($type->check($newLevel)) {
-        $level = $newLevel;
-      }
-    }
-  }
-
-  method toHashRef($verbose = 0) {
-    my $returnRef = {
-        name                   => $name,
-        level                => $level,
-      };
-
-    $self->logger()->trace("add covenant info to returnRef for $name");
-    $returnRef->{hasCovenant} = $self->hasCovenant();
-
-    $self->logger()->trace("add book stuff to returnRef for $name");
-    $returnRef->{builtInBook} = defined $self->builtInBook
-      ? $self->builtInBook->toHashRef($verbose)
-      : {};
-
-    my @sbRefs;
-    for my $ob (@otherBooks) {
-      push @sbRefs, $ob->toHashRef($verbose);
-      $self->logger()->trace('General toHashRef @sbRefs ' . np @sbRefs);
-    }
-    $returnRef->{otherBooks} = \@sbRefs;
-
-    $self->logger()->trace("add specialities to returnRef for $name");
-    my @specialityRefs;
-    for my $sp (@specialities) {
-      push @specialityRefs, $sp->toHashRef($verbose);
-    }
-    $returnRef->{specialities} = \@specialityRefs;
-
-    $self->logger()->trace("add ascending attributes to returnRef for $name");
-    $returnRef->{ascendingAttributes} = $self->ascendingAttributes()->toHashRef($verbose);
-
-    $returnRef->{EvAnsScores} = {
-          AttackingAsPrimary   => $self->getEvAnsScoreAsPrimary('Attacking'),
-          AttackingAsSecondary => $self->getEvAnsScoreAsSecondary('Attacking'),
-          MonsterAsPrimary     => $self->getEvAnsScoreAsPrimary('Monster'),
-          MonsterAsSecondary   => $self->getEvAnsScoreAsSecondary('Monster'),
-        };
-    if ($verbose) {
-      
-      $self->logger()->trace("add basic attributes to returnRef for $name");
-      $returnRef->{leadership}            = $self->leadership();
-      $returnRef->{leadership_increment}  = $self->leadership_increment();
-      $returnRef->{attack}                = $self->attack();
-      $returnRef->{attack_increment}      = $self->attack_increment();
-      $returnRef->{defense}               = $self->defense();
-      $returnRef->{defense_increment}     = $self->defense_increment();
-      $returnRef->{politics}              = $self->politics();
-      $returnRef->{politics_increment}    = $self->politics_increment();
-
-      $self->logger()->trace("add scores info to returnRef for $name");
-      
-      $returnRef->{ComponentScores} = {
-          Attacking => $self->computeEvansScoreComponents('Attacking'),
-          Monster   => $self->computeEvansScoreComponents('Monster'),
-        };
-      return $returnRef;
-    }
-    else {
-      $returnRef->{leadership} = $self->effective_leadership();
-      $returnRef->{attack} = $self->effective_attack();
-      $returnRef->{defense} = $self->effective_defense();
-      $returnRef->{politics} = $self->effective_politics();
-      $returnRef->{ascendingAttributes} = $self->ascendingAttributes()->toHashRef();
-      
-      return $returnRef;
-    }
-  }
-  method TO_JSON {
-    my $json = JSON::MaybeXS->new(utf8 => 1);
-    return $json->encode($self->toHashRef());
-  }
-  method _toString {
-    my $json = JSON::MaybeXS->new(utf8 => 1);
-    return $json->encode($self->toHashRef());
-  }
-
-  method _comparison($other, $swap = 0) {
-    my $otherClass = blessed $other;
-    my @classList  = split(/::/, $otherClass);
-    if ($classList[2] ne 'General') {
-      my $od = p $other;
-      croak "$od is not a Game::EvonyTKR::General";
-    }
-    return $self->name() cmp $other->name();
-  }
-
-  method _equality ($other, $swap = 0) {
-    my $otherClass = blessed $other;
-    my @classList  = split(/::/, $otherClass);
-    if ($classList[2] ne 'General') {
-      $self->logger()->error('$other is not a Game::EvonyTKR::General');
-      return 0;
-    }
-    if (__CLASS__->generalType() eq $other->generalType()) {
-      return $self->name() eq $other->name();
-    }
-  }
-
-  method _inequality ($other, $swap = 0) {
-    my $otherClass = blessed $other;
-    my @classList  = split(/::/, $otherClass);
-    if ($classList[2] ne 'General') {
-      $self->logger()->error('$other is not a Game::EvonyTKR::General');
-      return 0;
-    }
-    return not $self eq $other;
-  }
-
-  method readFromFile() {
-    my $fileName = $name . '.yaml';
-    my $generalShare =
-      File::Spec->catfile(dist_dir('Game-EvonyTKR'), 'generals');
-    my $FileWithPath = File::Spec->catfile($generalShare, $fileName);
-    if (-T -s -r $FileWithPath) {
-      $self->logger()->debug("$fileName exists as expected");
-      my $data = LoadFile($FileWithPath);
-      $leadership           = $data->{'general'}->{'leadership'};
-      $leadership_increment = $data->{'general'}->{'leadership_increment'};
-      $attack               = $data->{'general'}->{'attack'};
-      $attack_increment     = $data->{'general'}->{'attack_increment'};
-      $defense              = $data->{'general'}->{'defense'};
-      $defense_increment    = $data->{'general'}->{'defense_increment'};
-      $politics             = $data->{'general'}->{'politics'};
-      $politics_increment   = $data->{'general'}->{'politics_increment'};
-
-      $self->logger()->trace(sprintf(
-"for $name: leadership: %d, li: %d, attack: %d, ai: %d, defense: %d, di: %d, politics: %d, pi: %d",
-        $leadership,       $leadership_increment, $attack,
-        $attack_increment, $defense,              $defense_increment,
-        $politics,         $politics_increment,
-      ));
-
-      my @SpecialityNames = @{ $data->{'general'}->{'specialities'} };
-      my @otherBookNames;
-      if (exists $data->{'general'}->{'extra'}) {
-        push @otherBookNames, @{ $data->{'general'}->{'extra'} };
-      }
-
-      my $bookName = $data->{'general'}->{'book'};
-      if (defined $bookName) {
-        $self->logger()->trace("primary skill book for $name is $bookName");
-        my $sb = Game::EvonyTKR::SkillBook::Special->new(name => $bookName);
-        $sb->readFromFile();
-        $self->addBuildInBook($sb);
-      }
-      else {
-        $self->logger()
-          ->logcroak("failed to find primary skill book for $name");
-      }
-
-      $self->logger()
-        ->trace("ascending for $name is " . $data->{'general'}->{'ascending'});
-      $ascending = $data->{'general'}->{'ascending'};
-
-      for (@otherBookNames) {
-        my $tbName = $_;
-        if ($tbName =~ /$bookName/i) {
-          next;
+              );
         }
-        my $tb = Game::EvonyTKR::SkillBook::Special->new(name => $tbName);
-        $tb->readFromFile();
-        $self->addAnotherBook($tb);
-      }
-
-      for (@SpecialityNames) {
-        my $sn  = $_;
-        my $tsi = Game::EvonyTKR::Speciality->new(name => $sn,);
-        $tsi->readFromFile();
-        $self->addSpeciality($tsi);
-      }
-
-      if ($ascending) {
-        $self->ascendingAttributes()->readFromFile($name);
-      }
-
-      $self->_validation();
-      $self->logger()
-        ->debug("details populated for " . Data::Printer::np $name);
-
+        if ( $bookClass ne 'Game::EvonyTKR::SkillBook::Special' ) {
+            $self->logger()
+              ->croak(
+"Attempt to add $bookClass which is not a 'Game::EvonyTKR::SkillBook::Special' to $name"
+              );
+        }
+        push @otherBooks, $newBook;
+        $self->logger()
+          ->debug( "added SkillBook " . $newBook->name() . " to $name" );
     }
 
-  }
+    method addSpeciality($newSpeciality) {
+        my $specialityClass = blessed $newSpeciality;
+        my @classList       = split( /::/, $specialityClass );
+        if ( $classList[2] ne 'Speciality' ) {
+            croak
+"Attemp to add $specialityClass which is not a 'Game::EvonyTKR::Speciality' to $name";
+        }
+        push @specialities, $newSpeciality;
+        $self->logger()
+          ->debug( "added Speciality " . $newSpeciality->name() . " to $name" );
+    }
+
+    method setLevel($newLevel) {
+        if ( is_Int($newLevel) ) {
+            my $type = t('IntRange[1, 45]');
+            if ( $type->check($newLevel) ) {
+                $level = $newLevel;
+            }
+        }
+    }
+
+    method toHashRef( $verbose = 0 ) {
+        my $returnRef = {
+            name  => $name,
+            level => $level,
+            type  => $self->generalType(),
+        };
+
+        $self->logger()->trace("add covenant info to returnRef for $name");
+        $returnRef->{hasCovenant} = $self->hasCovenant();
+
+        $self->logger()->trace("add book stuff to returnRef for $name");
+        $returnRef->{builtInBook} =
+          defined $self->builtInBook
+          ? $self->builtInBook->toHashRef($verbose)
+          : {};
+
+        my @sbRefs;
+        for my $ob (@otherBooks) {
+            push @sbRefs, $ob->toHashRef($verbose);
+            $self->logger()->trace( 'General toHashRef @sbRefs ' . np @sbRefs );
+        }
+        $returnRef->{otherBooks} = \@sbRefs;
+
+        $self->logger()->trace("add specialities to returnRef for $name");
+        my @specialityRefs;
+        for my $sp (@specialities) {
+            push @specialityRefs, $sp->toHashRef($verbose);
+        }
+        $returnRef->{specialities} = \@specialityRefs;
+
+        $self->logger()
+          ->trace("add ascending attributes to returnRef for $name");
+        $returnRef->{ascendingAttributes} =
+          $self->ascendingAttributes()->toHashRef($verbose);
+
+        $returnRef->{EvAnsScores} = {
+            AttackingAsPrimary   => $self->getEvAnsScoreAsPrimary('Attacking'),
+            AttackingAsSecondary =>
+              $self->getEvAnsScoreAsSecondary('Attacking'),
+            MonsterAsPrimary   => $self->getEvAnsScoreAsPrimary('Monster'),
+            MonsterAsSecondary => $self->getEvAnsScoreAsSecondary('Monster'),
+        };
+        if ($verbose) {
+
+            $self->logger()
+              ->trace("add basic attributes to returnRef for $name");
+            $returnRef->{basicAttributes} = {
+                leadership           => $self->leadership(),
+                leadership_increment => $self->leadership_increment(),
+                attack               => $self->attack(),
+                attack_increment     => $self->attack_increment(),
+                defense              => $self->defense(),
+                defense_increment    => $self->defense_increment(),
+                politics             => $self->politics(),
+                politics_increment   => $self->politics_increment(),
+            };
+
+            $self->logger()->trace("add scores info to returnRef for $name");
+
+            $returnRef->{ComponentScores} = {
+                Attacking => $self->computeEvansScoreComponents('Attacking'),
+                Monster   => $self->computeEvansScoreComponents('Monster'),
+            };
+            return $returnRef;
+        }
+        else {
+            $returnRef->{basicAttributes} = {
+                leadership => $self->effective_leadership(),
+                attack     => $self->effective_attack(),
+                defense    => $self->effective_defense(),
+                politics   => $self->effective_politics(),
+            };
+
+            return $returnRef;
+        }
+    }
+
+    method TO_JSON {
+        my $json = JSON::MaybeXS->new( utf8 => 1 );
+        return $json->encode( $self->toHashRef() );
+    }
+
+    method _toString {
+        my $json = JSON::MaybeXS->new( utf8 => 1 );
+        return $json->encode( $self->toHashRef() );
+    }
+
+    method _comparison( $other, $swap = 0 ) {
+        my $otherClass = blessed $other;
+        my @classList  = split( /::/, $otherClass );
+        if ( $classList[2] ne 'General' ) {
+            my $od = p $other;
+            croak "$od is not a Game::EvonyTKR::General";
+        }
+        return $self->name() cmp $other->name();
+    }
+
+    method _equality ( $other, $swap = 0 ) {
+        my $otherClass = blessed $other;
+        my @classList  = split( /::/, $otherClass );
+        if ( $classList[2] ne 'General' ) {
+            $self->logger()->error('$other is not a Game::EvonyTKR::General');
+            return 0;
+        }
+        if ( __CLASS__->generalType() eq $other->generalType() ) {
+            return $self->name() eq $other->name();
+        }
+    }
+
+    method _inequality ( $other, $swap = 0 ) {
+        my $otherClass = blessed $other;
+        my @classList  = split( /::/, $otherClass );
+        if ( $classList[2] ne 'General' ) {
+            $self->logger()->error('$other is not a Game::EvonyTKR::General');
+            return 0;
+        }
+        return not $self eq $other;
+    }
 
 }
 1;
@@ -905,4 +874,3 @@ create a second General with different attributes.
 
 This simply compares on the General's name.  It is a strict inverse of the _equality, for convience.
 =cut
-

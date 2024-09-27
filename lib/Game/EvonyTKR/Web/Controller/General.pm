@@ -43,8 +43,15 @@ package Game::EvonyTKR::Web::Controller::General {
       my $gc = blessed($general);
       my @gcl = split(/::/, $gc);
       if($gcl[2] =~ /general/i) {
-        
-        my $generalHashRef = $general->toHashRef();
+
+        my $verbose = $self->param('verbose');
+        if(defined $verbose and $verbose ne 'false'){
+          $verbose = 1;
+        }
+        else {
+          $verbose = 0;
+        }
+        my $generalHashRef = $general->toHashRef($verbose);
         
         $self->respond_to(
           json  => {json => $generalHashRef} ,
