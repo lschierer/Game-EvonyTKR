@@ -13,6 +13,7 @@ class Game::EvonyTKR::Web::Model::General :isa(Game::EvonyTKR::Web::Logger) {
   use File::Spec;
   use Util::Any ':all';
   use Game::EvonyTKR::General;
+  use Game::EvonyTKR::Data;
   use namespace::autoclean;
 # VERSION
   use FindBin;
@@ -28,11 +29,22 @@ class Game::EvonyTKR::Web::Model::General :isa(Game::EvonyTKR::Web::Logger) {
       return 0;
     }
 
-    if (not exists($generals->{$ng->name()})) {
-      $generals->{$ng->name()} = $ng;
-      $generals->{$ng->generalType()}->{$ng->name()} = $ng;
+    if ( not exists( $generals->{ $ng->generalType() } ) ) {
+      $generals->{ $ng->generalType() } = [ $ng->generalType() ];
+    }
+    
+    if ( not exists( $generals->{ $ng->generalType() }->{ $ng->name() } ) ) {
+      $generals->{ $ng->generalType() }->{ $ng->name() } = $ng;
+
+      if(not exists $generals->{ $ng->name() } ) {
+        $generals->{ $ng->name() } = [ $ng->generalType() ];
+      }
+      else {
+        push @{ $generals->{ $ng->name() } }, $ng->generalType();
+      }
       return 1;
     }
+    
     return 0;
   }
 
@@ -47,10 +59,17 @@ class Game::EvonyTKR::Web::Model::General :isa(Game::EvonyTKR::Web::Logger) {
     delete $generals->${$rg->generalType()}->{$rg->name()};
   }
 
-  method get_by_id($name) {
+  method get_by_id($name, $type = undef) {
     if(exists $generals->{$name}) {
-      my $g = $generals->{$name};
-      my $gc = blessed $g;
+      if(defined $type and any {$_ =~ $type } @{$generals->{$name}}) {
+        if(exists $generals->{$type}->{$name}){
+          return $generals->{$type}->{$name};
+        }
+      }
+      else {
+
+      }
+        
       my @gcl = split(/::/, $gc);
       if($gcl[2] !~ /general/i ) { 
         $self->logger()->logwarn("$name refers to a type of general, not a single general");
@@ -95,6 +114,123 @@ class Game::EvonyTKR::Web::Model::General :isa(Game::EvonyTKR::Web::Logger) {
       }
     }
   }
+
+
+
+  method readFromFile($name) {
+        my $fileName = $name . '.yaml';
+        my $generalShare =
+          File::Spec->catfile( dist_dir('Game-EvonyTKR'), 'generals' );
+        my $FileWithPath = File::Spec->catfile( $generalShare, $fileName );
+        if ( -T -s -r $FileWithPath ) {
+            $self->logger()->debug("$fileName exists as expected");
+            my $data = LoadFile($FileWithPath);
+            my $leadership = $data->{'general'}->{'leadership'};
+            my $leadership_increment =
+              $data->{'general'}->{'leadership_increment'};
+            my $attack             = $data->{'general'}->{'attack'};
+            my $attack_increment   = $data->{'general'}->{'attack_increment'};
+            my $defense            = $data->{'general'}->{'defense'};
+            my $defense_increment  = $data->{'general'}->{'defense_increment'};
+            my $politics           = $data->{'general'}->{'politics'};
+            my $politics_increment = $data->{'general'}->{'politics_increment'};
+
+            $self->logger()->trace(
+                sprintf(
+'for %s: leadership: %d, li: %d, attack: %d, ai: %d, defense: %d, di: %d, politics: %d, pi: %d',
+                    $name,   $leadership,          $leadership_increment,
+                    $attack, $attack_increment,    $defense,
+                    $defense_increment, $politics, $politics_increment,
+                )
+            );
+
+            my @SpecialityNames = @{ $data->{'general'}->{'specialities'} };
+            my @otherBookNames;
+            if ( exists $data->{'general'}->{'extra'} ) {
+                push @otherBookNames, @{ $data->{'general'}->{'extra'} };
+            }
+
+            my $bookName = $data->{'general'}->{'book'};
+            if ( defined $bookName ) {
+                $self->logger()
+                  ->trace("primary skill book for $name is $bookName");
+                my $sb =
+                  Game::EvonyTKR::SkillBook::Special->new( name => $bookName );
+                $sb->readFromFile();
+                $self->addBuildInBook($sb);
+            }
+            else {
+                $self->logger()
+                  ->logcroak("failed to find primary skill book for $name");
+            }
+
+            $self->logger()
+              ->trace(sprintf('ascending for %s is %s', $name, $data->{'general'}->{'ascending'},));
+            my $ascending = $data->{'general'}->{'ascending'};
+
+            my @generalClassKey;
+            my @scoreType = @{ $data->{'general'}->{'score_as'} };
+            if(any {$_ =~ /Ground/ } @scoreType) {
+              push @generalClassKey, 'Ground';
+            }
+            if(any {$_ =~ /Mounted/ }@scoreType) {
+              push @generalClassKey, 'Mounted';
+            }
+            if(any {$_ =~ /Ranged/ } @scoreType) {
+              push @generalClassKey, 'Mounted';
+            }
+            if(any {$_ =~ /Siege/ } @scoreType) {
+              push @generalClassKey, 'Mounted';
+            }
+            if(any {$_ =~ /Mayor/ } @scoreType) {
+              push @generalClassKey, 'Mounted';
+            }
+
+            if (scalar @generalClassKey != scalar @scoreType) {
+              $self->logger()->error(sprintf('%s is of unknown general type %s.',
+              $data->{'general'}->{'name'}, Data::Printer::np @scoreType));
+            }
+
+            for (@generalClassKey) {
+              $self->add_general($generalClass{$_}->new(
+                name => $data->{'general'}->{'name'},
+              ));
+              
+              $self->logger()->debug(sprintf('created %s', $generals->{$name}));
+
+              $$self->logger()->debug(sprintf('added %s', 
+                Data::Printer::np $generals->{$name} ));
+            }
+
+            for (@otherBookNames) {
+                my $tbName = $_;
+                if ( $tbName =~ /$bookName/i ) {
+                    next;
+                }
+                my $tb =
+                  Game::EvonyTKR::SkillBook::Special->new( name => $tbName );
+                $tb->readFromFile();
+                $generals->{$name}->addAnotherBook($tb);
+            }
+
+            for (@SpecialityNames) {
+                my $sn  = $_;
+                my $tsi = Game::EvonyTKR::Speciality->new( name => $sn, );
+                $tsi->readFromFile();
+                $generals->{$name}->addSpeciality($tsi);
+            }
+
+            if ($ascending) {
+                $generals->{$name}->ascendingAttributes()->readFromFile($name);
+            }
+
+            $generals->{$name}->_validation();
+            $self->logger()
+              ->debug( "details populated for " . Data::Printer::np $name );
+
+        }
+
+    }
 
 }
 1;
