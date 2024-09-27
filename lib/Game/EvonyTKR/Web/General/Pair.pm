@@ -5,7 +5,7 @@ use FindBin;
 use lib "$FindBin::Bin/../../../../../lib";
 
 package Game::EvonyTKR::Web::General::Pair {
-# ABSTRACT: Route Handler for the /general/pair route.
+# VERSION
   use Array::Diff;
   use Carp;
   use Data::Printer;
@@ -16,7 +16,7 @@ package Game::EvonyTKR::Web::General::Pair {
   use File::Spec;
   use File::Touch;
   use Game::EvonyTKR::Ascending;
-  use Game::EvonyTKR::Buff::Data;
+  use Game::EvonyTKR::Data;
   use Game::EvonyTKR::General::Pair;
   use Game::EvonyTKR::General::Pair::Creator;
   use Game::EvonyTKR::General::Ground;
@@ -37,7 +37,7 @@ package Game::EvonyTKR::Web::General::Pair {
   my $store;
   my $pairs;
   my $generals;
-  my $data   = Game::EvonyTKR::Buff::Data->new();
+  my $data   = Game::EvonyTKR::Data->new();
   my $logger = Log::Log4perl::get_logger('Web::General');
 
   prefix '/generals' => sub {
@@ -161,3 +161,6 @@ package Game::EvonyTKR::Web::General::Pair {
 }
 
 true;
+
+__END__
+# ABSTRACT: Route Handler for the /general/pair route.

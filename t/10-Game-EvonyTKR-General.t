@@ -1,5 +1,6 @@
 package TestsFor::Game::EvonyTKR::General;
 use v5.40.0;
+use File::FindLib 'lib';
 
 use Test::Most;
 use Test::File::ShareDir::Object::Dist;

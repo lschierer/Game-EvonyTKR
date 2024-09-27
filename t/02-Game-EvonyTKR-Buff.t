@@ -1,11 +1,12 @@
 package TestsFor::Game::EvonyTKR::Buff;
 use v5.40.0;
+use File::FindLib 'lib';
 
 use Test::Most;
 use Test::File::ShareDir::Object::Dist;
 use Game::EvonyTKR::Buff;
-use Game::EvonyTKR::Buff::Data;
 use Game::EvonyTKR::Buff::Value;
+use Game::EvonyTKR::Data;
 
 my $obj = Test::File::ShareDir::Object::Dist->new(
   dists => { "Game-EvonyTKR" => "share/" }

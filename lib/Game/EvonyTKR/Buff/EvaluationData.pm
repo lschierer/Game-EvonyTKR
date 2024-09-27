@@ -1,16 +1,16 @@
 use v5.40.0;
 use experimental qw(class);
-use FindBin;
-use lib "$FindBin::Bin/../../../../../lib";
+use File::FindLib 'lib';
 
-class Game::EvonyTKR::Buff::Data::EvaluationData
-  : isa(Game::EvonyTKR::Buff::Data) {
+
+class Game::EvonyTKR::Buff::EvaluationData
+  : isa(Game::EvonyTKR::Data) {
   use Carp;
   use Data::Printer;
   use Types::Common qw( t is_Num is_Str is_Int);
   use Type::Utils   qw(is enum);
   use Util::Any -all;
-  use Game::EvonyTKR::Buff::Data;
+  use Game::EvonyTKR::Data;
   use namespace::autoclean;
 # PODNAME: Game::EvonyTKR::Buff::EvaluationData
 
@@ -22,7 +22,7 @@ class Game::EvonyTKR::Buff::Data::EvaluationData
       t->add_types(-Common);
     }
   }
-
+  
   ADJUST {
     if (scalar $self->BuffAttributes() == 0) {
       $self->set_BuffAttributes();

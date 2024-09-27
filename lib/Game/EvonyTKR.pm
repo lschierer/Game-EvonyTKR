@@ -16,12 +16,11 @@ use YAML::XS qw{LoadFile Load};
 use Util::Any -all;
 use Devel::Peek;
 
-use FindBin;
-use lib "$FindBin::Bin/../../lib";
+use File::FindLib 'lib';
 use Game::EvonyTKR::Ascending;
 use Game::EvonyTKR::Buff;
-use Game::EvonyTKR::Buff::Data;
 use Game::EvonyTKR::Buff::Value;
+use Game::EvonyTKR::Data;
 use Game::EvonyTKR::General::Ground;
 use Game::EvonyTKR::General::Mounted;
 use Game::EvonyTKR::General::Pair;

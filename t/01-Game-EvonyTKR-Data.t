@@ -1,13 +1,14 @@
-package TestsFor::Game::EvonyTKR::Buff::Data;
+package TestsFor::Game::EvonyTKR::Data;
 use v5.40.0;
+use File::FindLib 'lib';
 
 use Test::Most;
 use Test::File::ShareDir::Object::Dist;
 
-use Game::EvonyTKR::Buff::Data;
+use Game::EvonyTKR::Data;
 
-my $d = Game::EvonyTKR::Buff::Data->new();
-isa_ok($d, 'Game::EvonyTKR::Buff::Data');
+my $d = Game::EvonyTKR::Data->new();
+isa_ok($d, 'Game::EvonyTKR::Data');
 
 $d->set_BuffAttributes();
 my @attributes = $d->BuffAttributes();

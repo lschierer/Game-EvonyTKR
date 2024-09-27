@@ -1,22 +1,22 @@
 use v5.40.0;
 use experimental qw(class);
-use FindBin;
-use lib "$FindBin::Bin/../../../../lib";
+use File::FindLib 'lib';
 
 class Game::EvonyTKR::SkillBook::Special : isa(Game::EvonyTKR::SkillBook) {
 # PODNAME: Game::EvonyTKR::SkillBook::Special
+# VERSION
+  use Carp;
   use Data::Dumper;
   use Data::Printer;
   use File::ShareDir ':ALL';
   use File::Spec;
-  use Types::Standard qw(is_Int Int Num is_Num Str is_Str);
-  use Types::Common   qw( t);
-  use Type::Utils "is";
+  use Game::EvonyTKR::Buff;
   use List::MoreUtils;
+  use Type::Utils "is";
+  use Types::Common   qw( t);
+  use Types::Standard qw(is_Int Int Num is_Num Str is_Str);
   use Util::Any -all;
   use YAML::XS qw{LoadFile Load};
-  use Game::EvonyTKR::Buff;
-  use Carp;
   use namespace::autoclean;
 
 # from Type::Registry, this will save me from some of the struggles I have had with some types having blessed references and others not.
