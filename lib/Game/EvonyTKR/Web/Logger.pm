@@ -4,7 +4,7 @@ use utf8::all;
 use FindBin;
 use lib "$FindBin::Bin/../../../../lib";
 
-class Game::EvonyTKR::Web::Logger {
+class Game::EvonyTKR::Web::Logger :isa(Game::EvonyTKR::Logger) {
 # PODNAME: Game::EvonyTKR::Logger
 # ABSTRACT: Set up and manage logging for the distribution
 
@@ -19,13 +19,11 @@ class Game::EvonyTKR::Web::Logger {
   use Game::EvonyTKR::Logger::Config;
   use Util::Any -all;
   use namespace::autoclean;
+  use FindBin;
+  use lib "$FindBin::Bin/../../../../lib";
   use MojoX::Log::Log4perl;
  
-  field $category : reader : param = __CLASS__;
-
-  field $logger : reader;
-
-  field $systemLog: reader;
+  field $webLogger: reader;
 
   field $confFile :reader;
 
@@ -38,15 +36,6 @@ class Game::EvonyTKR::Web::Logger {
     trace
   );
 
-  ADJUST {
-    if (not defined $category) {
-      $category = __CLASS__;
-    }
-
-  }
-
-
-  
   method logInit($mode = 'production') {
     my $home   = File::HomeDir->my_home;
     my $logDir = File::Spec->catdir($home, 'var/log/Perl/dist/Game-Evony/');
@@ -66,9 +55,8 @@ class Game::EvonyTKR::Web::Logger {
     }
     my $logConf = Game::EvonyTKR::Logger::Config->new();
     $confFile = $logConf->path($mode);
-    $logger = MojoX::Log::Log4perl->new($confFile, 10);
-    $systemLog = Game::EvonyTKR::Logger->new();
-
+    $webLogger = MojoX::Log::Log4perl->new($confFile, 10);
+    $self->get_logger();
   }
 } 
 1;
