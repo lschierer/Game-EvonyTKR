@@ -6,8 +6,8 @@ use lib "$FindBin::Bin/../../../lib";
 
 class Game::EvonyTKR::Buff : isa(Game::EvonyTKR::Logger) {
 # PODNAME: Game::EvonyTKR::Buff
-# ABSTRACT: Buff and Debuff primatives
-  use Game::EvonyTKR::Buff::Data;
+# VERSION
+  use Game::EvonyTKR::Data;
   use Types::Standard        qw(is_Int Int Str is_Str);
   use Types::Common::Numeric qw(PositiveOrZeroInt);
   use Type::Utils "is";
@@ -27,7 +27,7 @@ class Game::EvonyTKR::Buff : isa(Game::EvonyTKR::Logger) {
     '!='  => \&_inequality,
     '""'  => \&_toString;
 
-  my $classData = Game::EvonyTKR::Buff::Data->new();
+  my $classData = Game::EvonyTKR::Data->new();
   my @BuffAttributes;
   my @AllConditions;
   my @BuffClasses;
@@ -326,6 +326,8 @@ class Game::EvonyTKR::Buff : isa(Game::EvonyTKR::Logger) {
 
 __END__
 
+# ABSTRACT: Buff and Debuff primatives
+
 =head1 DESCRIPTION
 
 A Buff is an attribute that modifies various attributes in Evony TKR
@@ -359,9 +361,9 @@ This toggles the value of the inherirted field.
 
 $name is simply a string used to help identify entries in logs.
 
-$EvalData must contain an instance of a I<child class> of Game::EvonyTKR::Buff::Data::EvaluationData
+$EvalData must contain an instance of a I<child class> of Game::EvonyTKR::Buff::EvaluationData
 
-$GeneralBias must contain a valid instane of a class from Game::EvonyTKR::Buff::Data
+$GeneralBias must contain a valid instane of a class from Game::EvonyTKR::Data
 
 returns the EvAnsScore for this buff for a general with the provided bias.
 =cut

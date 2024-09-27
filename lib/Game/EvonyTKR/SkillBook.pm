@@ -1,10 +1,10 @@
 use v5.40.0;
 use experimental qw(class);
-use FindBin;
-use lib "$FindBin::Bin/../../../lib";
+use File::FindLib 'lib';
 
 class Game::EvonyTKR::SkillBook : isa(Game::EvonyTKR::Logger) {
 # PODNAME: Game::EvonyTKR::SkillBook
+# VERSION
   use builtin         qw(indexed);
   use Types::Standard qw(is_Int Int Num is_Num Str is_Str);
   use Types::Common   qw( t);
@@ -149,7 +149,7 @@ This method will write to $resultRef->{'SBS'}
 the key for that hash comes from L<https://www.evonyanswers.com/post/evony-answers-attribute-methodology-explanation>
 where Game::EvonyTKR::SkillBook scores end up in what EvAns calls the BSS, 4SB and the SKS categories.  I've combined them in my implementation. 
 
-$BuffMultipliers must contain an instance of a I<child class> of Game::EvonyTKR::Buff::Data::EvaluationData
+$BuffMultipliers must contain an instance of a I<child class> of Game::EvonyTKR::Buff::EvaluationData
 
 $GeneralBias must contain a valid instane of a class from Game::EvonyTKR::Buff::Data
 

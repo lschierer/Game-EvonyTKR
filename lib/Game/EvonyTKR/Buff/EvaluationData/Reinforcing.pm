@@ -1,12 +1,12 @@
 use v5.40.0;
 use experimental qw(class);
 
-class Game::EvonyTKR::Buff::Data::EvaluationData::Reinforcing {
+class Game::EvonyTKR::Buff::EvaluationData::Reinforcing {
   use Carp;
   use Types::Common qw( t is_Num is_Str is_Int);
   use Type::Utils "is";
   use namespace::autoclean;
-# PODNAME: Game::EvonyTKR::Buff::Data::EvaluationData::Reinforcing
+# PODNAME: Game::EvonyTKR::Buff::EvaluationData::Reinforcing
 
 # ABSTRACT: Game::EvonyTKR::Buff Evaluation Multipliers for Reinforcing use cases.
 

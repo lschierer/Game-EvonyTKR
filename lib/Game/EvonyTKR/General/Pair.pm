@@ -1,7 +1,6 @@
 use v5.40.0;
 use experimental qw(class);
-use FindBin;
-use lib "$FindBin::Bin/../../../../lib";
+use File::FindLib 'lib';
 
 class Game::EvonyTKR::General::Pair {
   use Carp;
@@ -9,7 +8,7 @@ class Game::EvonyTKR::General::Pair {
   use Type::Utils "is";
   use Util::Any -all;
   use Game::EvonyTKR::SkillBook::Special;
-  use Game::EvonyTKR::Buff::Data;
+  use Game::EvonyTKR::Data;
   use Game::EvonyTKR::General;
   use namespace::autoclean;
   # PODNAME: Game::EvonyTKR::General::Pair

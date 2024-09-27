@@ -1,11 +1,11 @@
 use v5.40.0;
 use experimental qw(class);
 use utf8::all;
-use FindBin;
-use lib "$FindBin::Bin/../../../../../lib";
+use File::FindLib 'lib';
 
 class Game::EvonyTKR::General::Pair::Creator : isa(Game::EvonyTKR::Logger) {
 # PODNAME: Game::EvonyTKR::General::Pair::Creator
+# VERSION
   use Array::Utils qw(:all);
   use Carp;
   use Clone 'clone';
@@ -24,7 +24,7 @@ class Game::EvonyTKR::General::Pair::Creator : isa(Game::EvonyTKR::Logger) {
   use List::MoreUtils;
   use Game::EvonyTKR::SkillBook::Special;
   use Game::EvonyTKR::SkillBook::Standard;
-  use Game::EvonyTKR::Buff::Data;
+  use Game::EvonyTKR::Data;
   use Game::EvonyTKR::General::Conflicts;
   use Game::EvonyTKR::General::Pair;
   use namespace::autoclean;
@@ -36,7 +36,7 @@ class Game::EvonyTKR::General::Pair::Creator : isa(Game::EvonyTKR::Logger) {
   my $dbPath   = File::Spec->catfile($distData, "db");
 
   # some constants
-  field $classData   = Game::EvonyTKR::Buff::Data->new();
+  field $classData   = Game::EvonyTKR::Data->new();
   field $conflicData = Game::EvonyTKR::General::Conflicts->new();
 
   field %generals : reader;

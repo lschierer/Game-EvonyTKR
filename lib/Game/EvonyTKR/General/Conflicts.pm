@@ -1,8 +1,7 @@
 use v5.40.0;
 use experimental qw(class);
 use utf8::all;
-use FindBin;
-use lib "$FindBin::Bin/../../../../lib";
+use File::FindLib 'lib';
 
 class Game::EvonyTKR::General::Conflicts : isa(Game::EvonyTKR::Logger) {
 # PODNAME: Game::EvonyTKR::General::Conflicts
@@ -23,7 +22,7 @@ class Game::EvonyTKR::General::Conflicts : isa(Game::EvonyTKR::Logger) {
   use List::MoreUtils;
   use Game::EvonyTKR::SkillBook::Special;
   use Game::EvonyTKR::SkillBook::Standard;
-  use Game::EvonyTKR::Buff::Data;
+  use Game::EvonyTKR::Data;
   use namespace::autoclean;
   use Game::EvonyTKR::Logger;
 
