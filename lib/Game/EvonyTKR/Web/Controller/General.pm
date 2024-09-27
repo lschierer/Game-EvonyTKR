@@ -12,11 +12,15 @@ package Game::EvonyTKR::Web::Controller::General {
   use File::Spec;
   use Util::Any ':all';
   use Game::EvonyTKR::General;
-  use namespace::clean;
+  use Game::EvonyTKR::Web::Model::General;
+  use namespace::autoclean;
+# VERSION
   use FindBin;
   use lib "$FindBin::Bin/../../../../../lib";
   use Mojo::Base 'Mojolicious::Controller', -signatures;
   use Mojo::JSON qw(decode_json encode_json);
+
+  my $generalModel = Game::EvonyTKR::Web::Model::General->new();
 
   sub index ($self) {
     $self->render(text => "Generals index Page");
@@ -26,32 +30,34 @@ package Game::EvonyTKR::Web::Controller::General {
     $self->render(text => "Generals List Pages");
   }
 
+
   sub generalById($self) {
     my $id = $self->param('id');
     $self->log()->trace("looking for $id in generalById");
-    
-    my $generalShare =
-      File::Spec->catfile(
-        File::ShareDir::dist_dir('Game-EvonyTKR'), 'generals');
-    my $FileWithPath = File::Spec->catfile($generalShare, "$id.yaml");
-
-    if( -T -s -r $FileWithPath) {
-      $self->log()->trace("found $id in generalById");
-      my $general = Game::EvonyTKR::General->new(
-        name  => $id,
-      );
-      $general->readFromFile();
-      my $generalHashRef = $general->toHashRef();
-
-      $self->respond_to(
-        json  => {json => $generalHashRef} ,
-        any   => { data => '', status => 204},
-      );
+    if(not defined $generalModel) {
+      $generalModel = Game::EvonyTKR::Web::Model::General->new();
     }
-    else {
-      $self->reply->not_found();
+    my $general = $generalModel->get_by_id($id);
+
+    if(defined $general){
+      my $gc = blessed($general);
+      my @gcl = split(/::/, $gc);
+      if($gcl[2] =~ /general/i) {
+        
+        my $generalHashRef = $general->toHashRef();
+        
+        $self->respond_to(
+          json  => {json => $generalHashRef} ,
+          any   => { data => '', status => 204},
+        );
+        return;
+      }
+      else {
+        $self->log()->error("general is defined but not a General");
+      }
     }
-    
+    $self->reply->not_found();
   }
+  
 }
 1;
