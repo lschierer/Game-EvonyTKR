@@ -18,6 +18,8 @@ class Game::EvonyTKR::Logger {
   use File::Touch;
   use Log::Log4perl;
   use namespace::autoclean;
+# VERSION
+
 
   field $category : reader : param = __CLASS__;
 
@@ -26,10 +28,15 @@ class Game::EvonyTKR::Logger {
   field $location : reader;
 
   ADJUST {
+    $self->get_logger();
+  }
+
+  method get_logger() {
     if (not defined $category) {
       $category = __CLASS__;
     }
     $logger = Log::Log4perl->get_logger($category);
+    return $logger;
   }
 
   method getLogfileName($name = 'system.log') {

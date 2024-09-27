@@ -40,7 +40,7 @@ package Game::EvonyTKR::Web {
       category  => 'Web',
     );
     $wlog->logInit($self->mode());
-    $self->log($wlog->logger());
+    $self->log($wlog->webLogger());
     
     # Configure the application
     if(my $secrets = $config->{secrets}) {
