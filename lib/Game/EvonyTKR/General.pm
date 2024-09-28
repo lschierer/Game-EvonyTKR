@@ -302,7 +302,7 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Logger) {
         return $self->_generalType;
     }
 
-    method addBuildInBook($newBook) {
+    method addBuiltInBook($newBook) {
         my $type = blessed $newBook;
         if ( $type ne 'Game::EvonyTKR::SkillBook::Special' ) {
             $self->logger()
@@ -325,7 +325,7 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Logger) {
         }
     }
 
-    method _validation {
+    method validation {
         my @errors;
 
         my $type = t('Bool');

@@ -4,8 +4,6 @@ use File::FindLib 'lib';
 
 class Game::EvonyTKR::Data
   : isa(Game::EvonyTKR::Logger) {
-# PODNAME: Game::EvonyTKR::Data
-# VERSION
   use Carp;
   use Types::Standard        qw(is_Int Int Str is_Str);
   use Types::Common::Numeric qw(PositiveOrZeroInt);
@@ -13,6 +11,8 @@ class Game::EvonyTKR::Data
   use File::ShareDir ':ALL';
   use YAML::XS;
   use namespace::autoclean;
+# PODNAME: Game::EvonyTKR::Data
+# VERSION
   use File::FindLib 'lib';
 
   field @buffConditions : reader = (
