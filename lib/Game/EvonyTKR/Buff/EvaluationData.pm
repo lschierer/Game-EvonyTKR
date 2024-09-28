@@ -13,8 +13,7 @@ class Game::EvonyTKR::Buff::EvaluationData
   use Game::EvonyTKR::Data;
   use namespace::autoclean;
 # PODNAME: Game::EvonyTKR::Buff::EvaluationData
-
-# ABSTRACT: Module for processing information about Evony TKR Generals.
+# VERSION
 
 # from Type::Registry, this will save me from some of the struggles I have had with some types having blessed references and others not.
   ADJUST {
@@ -119,6 +118,7 @@ class Game::EvonyTKR::Buff::EvaluationData
 1;
 
 __END__
+# ABSTRACT: Module for processing information about Evony TKR Generals.
 
 =head1 DESCRIPTION
 

@@ -24,7 +24,6 @@ package Game::EvonyTKR::Web::General {
   use Game::EvonyTKR::Web::Store;
   use Log::Log4perl;
   use Util::Any ':all';
-  use YAML::XS qw{ LoadFile Load };
   use namespace::clean;
   use FindBin;
   use lib "$FindBin::Bin/../../../../lib";

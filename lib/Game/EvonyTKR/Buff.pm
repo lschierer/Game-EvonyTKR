@@ -5,8 +5,6 @@ use FindBin;
 use lib "$FindBin::Bin/../../../lib";
 
 class Game::EvonyTKR::Buff : isa(Game::EvonyTKR::Logger) {
-# PODNAME: Game::EvonyTKR::Buff
-# VERSION
   use Game::EvonyTKR::Data;
   use Types::Standard        qw(is_Int Int Str is_Str);
   use Types::Common::Numeric qw(PositiveOrZeroInt);
@@ -16,6 +14,8 @@ class Game::EvonyTKR::Buff : isa(Game::EvonyTKR::Logger) {
   use Util::Any -all;
   use Array::Utils qw(:all);
   use namespace::autoclean;
+# PODNAME: Game::EvonyTKR::Buff
+# VERSION
   use FindBin;
   use lib "$FindBin::Bin/../../../lib";
   use overload
