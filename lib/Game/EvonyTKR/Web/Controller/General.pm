@@ -57,20 +57,51 @@ package Game::EvonyTKR::Web::Controller::General {
     return @specialityLevels;
   }
 
+  sub _ascendingParamHelper($c, $name) {
+    my $ascendingLevel = $c->param('ascendingLevel');
+    if (defined $ascendingLevel) {
+      $c->log()->debug("Query ascendingLevel is '$ascendingLevel'");
+      if ($ascendingLevel =~ /[1-5](Red|Purple)/) {
+        $c->log()->trace("returning $ascendingLevel");
+        return $ascendingLevel;
+      }
+      else {
+        $c->log()
+          ->warn("Detected bad input '$ascendingLevel' reading ascendingLevel");
+      }
+    }
+    else {
+      $c->log()->debug("Query ascendingLevel is not defined.");
+    }
+  }
+
   sub generalById {
     my ($self) = @_;
     $self->log()->trace("get in Controller::General");
+
     my $id = $self->param('id');
     $self->log()->trace("looking for $id in generalById");
+
     if (not defined $generalModel) {
+      #this should be unnecessary and never actually be reached.
       $generalModel = Game::EvonyTKR::Web::Model::General->new();
     }
     my $general = $generalModel->get_by_id($id);
 
-    if (defined $general) {
+    if (not defined $general) {
+      $self->log()->error('no id from Model');
+      $self->reply->not_found();
+    }
+    else {
       my $gc  = blessed $general;
       my @gcl = split(/::/, $gc);
-      if ($gcl[2] =~ /general/i) {
+      if ($gcl[2] !~ /general/i) {
+        $self->log()
+          ->error(
+          sprintf('general is a %s instead of a general', blessed $general));
+        $self->reply->not_found();
+      }
+      else {
         $self->log()->trace('general found');
         my $verbose = $self->param('verbose');
         if (defined $verbose and $verbose ne 'false') {
@@ -80,12 +111,24 @@ package Game::EvonyTKR::Web::Controller::General {
           $verbose = 0;
         }
 
-        my @specialityLevels = _specialityParamHelper($self, $id,);
+        my $level = $self->param('level');
+        if (defined $level) {
+          $self->log()->debug("Query level is '$level'");
+          $general->setLevel(0+ $level);
+        }
+        else {
+          $self->log()->debug("Query level is not defined.");
+        }
+
+        my @specialityLevels = $self->_specialityParamHelper($id,);
         foreach my $i (0 .. $#specialityLevels) {
           my $sp = $specialityLevels[$i];
           my $sl = $i + 1;
           $general->changeActiveSpecialityLevel($sl, $sp);
         }
+
+        my $ascendingLevel = $self->_ascendingParamHelper($id);
+        $general->ascendingAttributes()->setActiveLevel($ascendingLevel);
 
         my $generalHashRef = $general->toHashRef($verbose);
 
@@ -95,14 +138,7 @@ package Game::EvonyTKR::Web::Controller::General {
         );
         return;
       }
-      else {
-        $self->log()
-          ->error(
-          sprintf('general is a %s instead of a general', blessed $general));
-      }
     }
-    $self->log()->error('no id from Model');
-    $self->reply->not_found();
   }
 
 }

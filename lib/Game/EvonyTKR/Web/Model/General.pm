@@ -82,8 +82,10 @@ class Game::EvonyTKR::Web::Model::General : isa(Game::EvonyTKR::Web::Logger) {
 
   method get_by_id($name, $type = undef) {
     if (exists $generals->{$name}) {
-      $self->logger()->trace(sprintf('looking for cached general %s with type %s', 
-        $name, defined $type ? $type : 'undefined'));
+      $self->logger()->trace(sprintf(
+        'looking for cached general %s with type %s',
+        $name, defined $type ? $type : 'undefined'
+      ));
       if (defined $type) {
         $self->logger()->trace('and type is defined');
         if (any { $_ =~ $type } @{ $generals->{$name} }) {
@@ -91,19 +93,22 @@ class Game::EvonyTKR::Web::Model::General : isa(Game::EvonyTKR::Web::Logger) {
         }
       }
       else {
-        $self->logger()->trace('type undefined looking for cached general, returning first available.');
+        $self->logger()
+          ->trace(
+          'type undefined looking for cached general, returning first available.'
+          );
         for my $key ($EvonyData->GeneralKeys()) {
           if (exists $generals->{$key} and exists $generals->{$key}->{$name}) {
-            $self->logger()->trace(sprintf('found general %s within type %s', $name, 
-              $key));
+            $self->logger()
+              ->trace(sprintf('found general %s within type %s', $name, $key));
             return $generals->{$key}->{$name};
           }
         }
       }
     }
     else {
-      $self->logger()->trace(sprintf('searching for general %s of unknown type', 
-          $name));
+      $self->logger()
+        ->trace(sprintf('searching for general %s of unknown type', $name));
       my $generalShare =
         File::Spec->catfile(File::ShareDir::dist_dir('Game-EvonyTKR'),
         'generals');
@@ -161,7 +166,7 @@ class Game::EvonyTKR::Web::Model::General : isa(Game::EvonyTKR::Web::Logger) {
       my $politics_increment = $yamlData->{'general'}->{'politics_increment'};
 
       $self->logger()->trace(sprintf(
-'for %s: leadership: %d, li: %d, attack: %d, ai: %d, defense: %d, di: %d, politics: %d, pi: %d',
+        'for %s: leadership: %d, li: %d, attack: %d, ai: %d, defense: %d, di: %d, politics: %d, pi: %d',
         $name,              $leadership,       $leadership_increment,
         $attack,            $attack_increment, $defense,
         $defense_increment, $politics,         $politics_increment,
@@ -173,33 +178,34 @@ class Game::EvonyTKR::Web::Model::General : isa(Game::EvonyTKR::Web::Logger) {
         push @otherBookNames, @{ $yamlData->{'general'}->{'extra'} };
       }
 
-      $self->logger()->trace(
-        sprintf(
-          'ascending for %s is %s',
-          $name, $yamlData->{'general'}->{'ascending'},
-        )
-      );
+      $self->logger()->trace(sprintf(
+        'ascending for %s is %s',
+        $name, $yamlData->{'general'}->{'ascending'},
+      ));
       my $ascending = $yamlData->{'general'}->{'ascending'};
 
       my @generalClassKey;
       my @scoreType = @{ $yamlData->{'general'}->{'score_as'} };
-      my $first = first { index($_, 'Ground') != -1 } @scoreType;
+      my $first     = first { index($_, 'Ground') != -1 } @scoreType;
       if (defined $first) {
-        push @generalClassKey, first { index($_, 'Ground') != -1 } $EvonyData->GeneralKeys();
+        push @generalClassKey,
+          first { index($_, 'Ground') != -1 } $EvonyData->GeneralKeys();
       }
       $first = first { index($_, 'Mounted') != -1 } @scoreType;
       if (defined $first) {
         push @generalClassKey, $first;
       }
-      $first = first { index($_, 'Archers') != -1  } @scoreType;
+      $first = first { index($_, 'Archers') != -1 } @scoreType;
       if (defined $first) {
-        push @generalClassKey, first { index($_, 'Ranged') != -1 } $EvonyData->GeneralKeys();
+        push @generalClassKey,
+          first { index($_, 'Ranged') != -1 } $EvonyData->GeneralKeys();
       }
-      $first = first { index($_, 'Siege') != -1  } @scoreType;
+      $first = first { index($_, 'Siege') != -1 } @scoreType;
       if (defined $first) {
-        push @generalClassKey,  first { index($_, 'Siege') != -1 } $EvonyData->GeneralKeys();
+        push @generalClassKey,
+          first { index($_, 'Siege') != -1 } $EvonyData->GeneralKeys();
       }
-      $first = first { index($_, 'Mayor') != -1  } @scoreType;
+      $first = first { index($_, 'Mayor') != -1 } @scoreType;
       if (defined $first) {
         continue;
       }
@@ -213,12 +219,16 @@ class Game::EvonyTKR::Web::Model::General : isa(Game::EvonyTKR::Web::Logger) {
       }
       my %constructors = $EvonyData->generalClass();
       for (@generalClassKey) {
-        if(not defined $constructors{$_}) {
-          $self->logger()->error(sprintf('constructor for %s does not exist creating generals for %s', $_, $name));
+        if (not defined $constructors{$_}) {
+          $self->logger()->error(sprintf(
+            'constructor for %s does not exist creating generals for %s',
+            $_, $name
+          ));
           next;
         }
         else {
-          $self->logger()->trace(sprintf('using constructor %s for %s', $_, $name));
+          $self->logger()
+            ->trace(sprintf('using constructor %s for %s', $_, $name));
         }
         my $general =
           $constructors{$_}->new(name => $yamlData->{'general'}->{'name'},);
@@ -259,17 +269,17 @@ class Game::EvonyTKR::Web::Model::General : isa(Game::EvonyTKR::Web::Logger) {
 
         $general->validation();
 
-        if($self->add_general($general)) {
+        if ($self->add_general($general)) {
           $self->logger()
-          ->debug(sprintf('created %s', Data::Printer::np $generals->{$name}));
+            ->debug(
+            sprintf('created %s', Data::Printer::np $generals->{$name}));
 
           $self->logger()
-            ->debug(sprintf('added %s', Data::Printer::np $generals->{$name}));  
+            ->debug(sprintf('added %s', Data::Printer::np $generals->{$name}));
         }
       }
-      if(scalar $generals->{$name}) {
-        $self->logger()
-        ->debug("details populated for $name");
+      if (scalar $generals->{$name}) {
+        $self->logger()->debug("details populated for $name");
         return 1;
       }
     }
