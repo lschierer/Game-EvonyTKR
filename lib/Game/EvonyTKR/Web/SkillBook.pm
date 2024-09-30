@@ -36,19 +36,19 @@ package Game::EvonyTKR::Web::SkillBook {
   my $logger = Log::Log4perl::get_logger('Web::General');
 
   prefix '/skillbook' => sub {
-    prefix '/list'    => sub {
-      get ''          => \&_list;
-      get '/details'  => \&_details;
+    prefix '/list' => sub {
+      get ''         => \&_list;
+      get '/details' => \&_details;
     };
-    get '/:id'  => \&_singleSkillBook;
+    get '/:id' => \&_singleSkillBook;
   };
 
   sub _init {
     $store = Game::EvonyTKR::Web::Store::get_store();
     if (not exists $$store{'skillbooks'}) {
       $store->{'skillbooks'} = {
-        'standard'  => {},
-        'special'   => {},
+        'standard' => {},
+        'special'  => {},
       };
       _read_skillBooks();
       $logger->trace('store now holds' . np $store);
@@ -57,16 +57,17 @@ package Game::EvonyTKR::Web::SkillBook {
 
   sub _list {
     _init();
-    my $bookCount += scalar keys %{$store->{'skillbooks'}->{'special'}};
-    $bookCount += scalar keys %{$store->{'skillbooks'}->{'standard'}};
-    if($bookCount <= 0 ) {
+    my $bookCount += scalar keys %{ $store->{'skillbooks'}->{'special'} };
+    $bookCount += scalar keys %{ $store->{'skillbooks'}->{'standard'} };
+    if ($bookCount <= 0) {
       return status_400('no SkillBooks Available');
     }
     my @returnList = ();
-    push @returnList, keys %{$store->{'skillbooks'}->{'special'}};
-    for my $bookName (keys %{$store->{'skillbooks'}->{'standard'}}) {
-      for my $bookLevel (keys %{$store->{'skillbooks'}->{'standard'}->{$bookName}}) {
-        if($bookLevel =~ /level-(\d)+/i){
+    push @returnList, keys %{ $store->{'skillbooks'}->{'special'} };
+    for my $bookName (keys %{ $store->{'skillbooks'}->{'standard'} }) {
+      for my $bookLevel (
+        keys %{ $store->{'skillbooks'}->{'standard'}->{$bookName} }) {
+        if ($bookLevel =~ /level-(\d)+/i) {
           push @returnList, "$bookName Level $1";
         }
       }
@@ -76,20 +77,20 @@ package Game::EvonyTKR::Web::SkillBook {
 
   sub _details {
     _init();
-    my $bookCount += scalar keys %{$store->{'skillbooks'}->{'special'}};
-    $bookCount += scalar keys %{$store->{'skillbooks'}->{'standard'}};
-    if($bookCount <= 0 ) {
+    my $bookCount += scalar keys %{ $store->{'skillbooks'}->{'special'} };
+    $bookCount += scalar keys %{ $store->{'skillbooks'}->{'standard'} };
+    if ($bookCount <= 0) {
       return status_400('no SkillBooks Available');
     }
 
     my $verbose = query_parameters->get('verbose');
     if (defined $verbose) {
-      if($verbose ne 'false') {
+      if ($verbose ne 'false') {
         $verbose = 1;
       }
       else {
         $verbose = 0;
-      }      
+      }
     }
     else {
       $verbose = 0;
@@ -97,16 +98,19 @@ package Game::EvonyTKR::Web::SkillBook {
 
     my @returnList = ();
 
-    for my $book (keys %{$store->{'skillbooks'}->{'special'}}) {
+    for my $book (keys %{ $store->{'skillbooks'}->{'special'} }) {
       my $r = $store->{'skillbooks'}->{'special'}->{$book}->toHashRef($verbose);
       $r->{'id'} = $r->{'name'};
       push @returnList, $r;
     }
 
-    for my $bookName (keys %{$store->{'skillbooks'}->{'standard'}}) {
-      for my $bookLevel (keys %{$store->{'skillbooks'}->{'standard'}->{$bookName}}) {
-        my $r = $store->{'skillbooks'}->{'standard'}->{$bookName}->{$bookLevel}->toHashRef($verbose);
-        $r->{'id'} = sprintf('%s %s',$bookName, $bookLevel =~ s/level-/Level /r);
+    for my $bookName (keys %{ $store->{'skillbooks'}->{'standard'} }) {
+      for my $bookLevel (
+        keys %{ $store->{'skillbooks'}->{'standard'}->{$bookName} }) {
+        my $r = $store->{'skillbooks'}->{'standard'}->{$bookName}->{$bookLevel}
+          ->toHashRef($verbose);
+        $r->{'id'} =
+          sprintf('%s %s', $bookName, $bookLevel =~ s/level-/Level /r);
         push @returnList, $r;
       }
     }
@@ -118,20 +122,21 @@ package Game::EvonyTKR::Web::SkillBook {
 
     my $verbose = query_parameters->get('verbose');
     if (defined $verbose) {
-      if($verbose ne 'false') {
+      if ($verbose ne 'false') {
         $verbose = 1;
       }
       else {
         $verbose = 0;
-      }      
+      }
     }
     else {
       $verbose = 0;
     }
 
     my $id = route_parameters->get('id');
-    if(exists $store->{'skillbooks'}->{'special'}->{$id}){
-      return status_ok($store->{'skillbooks'}->{'special'}->{$id}->toHashRef($verbose));
+    if (exists $store->{'skillbooks'}->{'special'}->{$id}) {
+      return status_ok(
+        $store->{'skillbooks'}->{'special'}->{$id}->toHashRef($verbose));
     }
     else {
       return status_400("SkillBook with name '$id' is not available.");
@@ -140,22 +145,22 @@ package Game::EvonyTKR::Web::SkillBook {
 
   sub _read_skillBooks() {
     $logger->info('starting _read_skillBooks');
-    
+
     my $share = File::Spec->catfile(File::ShareDir::dist_dir('Game-EvonyTKR'),
       'skillBooks');
     my @found = grep { -T -s -r } glob("$share/*.yaml");
     $logger->info(sprintf('found %d skillbooks in %s.', scalar @found, $share));
 
     for my $tsbf (@found) {
-      #I am essentially just testing that I *can* open the file in a more loggable way. 
+#I am essentially just testing that I *can* open the file in a more loggable way.
       open(my ($fh), '<', $tsbf) or $logger->logcroak("$!");
       close $fh;
-      
+
       #then I get the data for real with the Yaml library
       my $data = LoadFile($tsbf);
 
-      if(exists $data->{'books'}) {
-        my @books = @{$data->{'books'}};
+      if (exists $data->{'books'}) {
+        my @books = @{ $data->{'books'} };
         for my $tbe (@books) {
           $logger->info("$tsbf contains standard SkillBooks");
           if (exists $tbe->{'name'}) {
@@ -163,19 +168,23 @@ package Game::EvonyTKR::Web::SkillBook {
             if (exists $tbe->{'level'}) {
               my $level = $tbe->{'level'};
               if (exists $tbe->{'buff'}) {
-                my @tbeBuffs = @{$tbe->{'buff'}};
-                if(not (defined($name) and defined($level) and (scalar @tbeBuffs > 0))) {
-                  $logger->logcroak("something went wrong setting values for book in $tsbf");
+                my @tbeBuffs = @{ $tbe->{'buff'} };
+                if (
+                  not(  defined($name)
+                    and defined($level)
+                    and (scalar @tbeBuffs > 0))
+                ) {
+                  $logger->logcroak(
+                    "something went wrong setting values for book in $tsbf");
                 }
                 my $tsb = Game::EvonyTKR::SkillBook::Standard->new(
-                  name => $name,
+                  name  => $name,
                   level => $level,
                 );
 
-                $logger->debug(sprintf('%s level %d has %d buffs', 
-                  $name,
-                  $level,
-                  scalar @tbeBuffs,
+                $logger->debug(sprintf(
+                  '%s level %d has %d buffs',
+                  $name, $level, scalar @tbeBuffs,
                 ));
 
                 for my $tbeb (@tbeBuffs) {
@@ -183,14 +192,16 @@ package Game::EvonyTKR::Web::SkillBook {
                   my $b;
                   my @tbebKeys = keys %{$tbeb};
 
-                  if (any {$_ eq 'value'} @tbebKeys) {
-                    $logger->debug(sprintf('Skillbook %s level %d has a buff with a value',
-                      $name, $level, ));
+                  if (any { $_ eq 'value' } @tbebKeys) {
+                    $logger->debug(sprintf(
+                      'Skillbook %s level %d has a buff with a value',
+                      $name, $level,
+                    ));
                     $v = Game::EvonyTKR::Buff::Value->new(
                       number => $tbeb->{'value'}->{'number'},
                       unit   => $tbeb->{'value'}->{'unit'},
                     );
-                    if (any {$_ eq 'class'} @tbebKeys) {
+                    if (any { $_ eq 'class' } @tbebKeys) {
                       $b = Game::EvonyTKR::Buff->new(
                         attribute => $tbeb->{'attribute'},
                         value     => $v,
@@ -205,12 +216,14 @@ package Game::EvonyTKR::Web::SkillBook {
                     }
                   }
                   else {
-                    $logger->warn(sprintf('Skillbook %s level %d has a buff with no value.',
-                      $name, $level, ));
+                    $logger->warn(sprintf(
+                      'Skillbook %s level %d has a buff with no value.',
+                      $name, $level,
+                    ));
                   }
                   if (defined($b)) {
-                    if (any {$_ eq 'condition'} @tbebKeys) {
-                      my @conditions = @{$tbeb->{'condition'}};
+                    if (any { $_ eq 'condition' } @tbebKeys) {
+                      my @conditions = @{ $tbeb->{'condition'} };
                       for my $tbebc (@conditions) {
                         $b->set_condition($tbebc);
                       }
@@ -218,9 +231,12 @@ package Game::EvonyTKR::Web::SkillBook {
                     $tsb->add_buff($b);
                   }
                 }
-                $logger->info(sprintf('adding standard skillbook %s level %d.',
-                  $name, $level, ));
-                $store->{'skillbooks'}->{'standard'}->{$name}->{"level-$level"} = $tsb;
+                $logger->info(sprintf(
+                  'adding standard skillbook %s level %d.',
+                  $name, $level,
+                ));
+                $store->{'skillbooks'}->{'standard'}->{$name}->{"level-$level"}
+                  = $tsb;
               }
               else {
                 $logger->warn("No buff defined for a book in $tsbf");
@@ -237,11 +253,9 @@ package Game::EvonyTKR::Web::SkillBook {
       }
       elsif (exists $data->{'name'}) {
         my $name = $data->{'name'};
-        if(defined $name) {
+        if (defined $name) {
           $logger->info($name);
-          my $tsb = Game::EvonyTKR::SkillBook::Special->new(
-            name => $name,
-          );
+          my $tsb = Game::EvonyTKR::SkillBook::Special->new(name => $name,);
           $tsb->readFromFile();
           $store->{'skillbooks'}->{'special'}->{$name} = $tsb;
         }

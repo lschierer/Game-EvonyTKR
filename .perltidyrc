@@ -20,6 +20,7 @@
 #-bt=1  # Prettier brace tightness
 -bbt=1  # Prettier block brace tightness (default 0)
 -bar    # opening brace always on right
+-nolq   # do not outdent long quotes
 
 # vertical
 #-iob   # ? ignore old breakpoints

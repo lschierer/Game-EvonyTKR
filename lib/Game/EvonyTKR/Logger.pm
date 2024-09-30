@@ -20,7 +20,6 @@ class Game::EvonyTKR::Logger {
   use namespace::autoclean;
 # VERSION
 
-
   field $category : reader : param = __CLASS__;
 
   field $logger : reader;

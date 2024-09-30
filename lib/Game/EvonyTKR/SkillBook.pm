@@ -32,7 +32,7 @@ class Game::EvonyTKR::SkillBook : isa(Game::EvonyTKR::Logger) {
     }
   }
 
-  field $name :reader : param;
+  field $name : reader : param;
 
   ADJUST {
     my @errors;
@@ -42,7 +42,7 @@ class Game::EvonyTKR::SkillBook : isa(Game::EvonyTKR::Logger) {
     }
   }
 
-  field $text :reader;
+  field $text : reader;
 
   field @buffs : reader;
 
@@ -60,7 +60,7 @@ class Game::EvonyTKR::SkillBook : isa(Game::EvonyTKR::Logger) {
     }
   }
 
-  method set_text($nt ='') {
+  method set_text($nt = '') {
     is_Str($nt) or $self->logger()->logcroak("text must be a string, not $nt");
 
     $text = $nt;
@@ -68,14 +68,18 @@ class Game::EvonyTKR::SkillBook : isa(Game::EvonyTKR::Logger) {
 
   method add_buff($nb) {
     if (blessed $nb ne 'Game::EvonyTKR::Buff') {
-      $self->logger()->warn("refusing to add something that is not a 'Game::EvonyTKR::Buff' to $name");
+      $self->logger()
+        ->warn(
+        "refusing to add something that is not a 'Game::EvonyTKR::Buff' to $name"
+        );
       return 0;
     }
     elsif (scalar @buffs >= 1) {
       my $found_match = 0;
       foreach (@buffs) {
         if ($_ == $nb) {
-          $self->logger()->warn("refusing to add duplicate buff to skillbook $name");
+          $self->logger()
+            ->warn("refusing to add duplicate buff to skillbook $name");
           return 0;
         }
       }
@@ -88,10 +92,10 @@ class Game::EvonyTKR::SkillBook : isa(Game::EvonyTKR::Logger) {
     my $returnRef = {};
     $returnRef->{'name'} = $name;
     $returnRef->{'text'} = $text;
-    if($verbose) {  
+    if ($verbose) {
       for my $tb (@buffs) {
         push @{ $returnRef->{'buffs'} }, $tb->toHashRef();
-      } 
+      }
     }
     return $returnRef;
   }

@@ -27,9 +27,7 @@ package Game::EvonyTKR::Logger::Config {
   );
 
   sub new ($class, $m = 'production') {
-    my $self = {
-      mode => $m,
-    };
+    my $self = { mode => $m, };
     bless $self, $class;
   }
 
@@ -38,17 +36,17 @@ package Game::EvonyTKR::Logger::Config {
     if ($m ne $self->{mode}) {
       $self->{mode} = $m;
     }
-    if($self->{mode} eq 'production') {
-      $confFile = File::Spec->catfile(
-       File::ShareDir::dist_dir('Game-EvonyTKR'), 'log4perl.conf');
+    if ($self->{mode} eq 'production') {
+      $confFile = File::Spec->catfile(File::ShareDir::dist_dir('Game-EvonyTKR'),
+        'log4perl.conf');
 
     }
     else {
       my $mode = $self->{mode};
-      $confFile = File::Spec->catfile(
-        File::ShareDir::dist_dir('Game-EvonyTKR'), "log4perl.$mode.conf");
+      $confFile = File::Spec->catfile(File::ShareDir::dist_dir('Game-EvonyTKR'),
+        "log4perl.$mode.conf");
     }
-    if(! -T -s -r $confFile) {
+    if (!-T -s -r $confFile) {
       croak("$confFile does not exist");
     }
     return $confFile;

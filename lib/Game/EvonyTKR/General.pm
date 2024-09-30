@@ -558,14 +558,15 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Data) {
     my @classList       = split(/::/, $specialityClass);
     if ($classList[2] ne 'Speciality') {
       croak
-      "Attemp to add $specialityClass which is not a 'Game::EvonyTKR::Speciality' to $name";
+        "Attemp to add $specialityClass which is not a 'Game::EvonyTKR::Speciality' to $name";
     }
     push @specialities, $newSpeciality;
     $self->logger()
       ->debug("added Speciality " . $newSpeciality->name() . " to $name");
-    $self->logger()
-      ->trace(sprintf('this results in %d specialities for %s',
-      scalar @specialities, $name));
+    $self->logger()->trace(sprintf(
+      'this results in %d specialities for %s',
+      scalar @specialities, $name
+    ));
   }
 
   method setLevel($newLevel) {

@@ -2,7 +2,6 @@ use v5.40.0;
 use experimental qw(class);
 use File::FindLib 'lib';
 
-
 class Game::EvonyTKR::Buff::EvaluationData
   : isa(Game::EvonyTKR::Data) {
   use Carp;
@@ -21,7 +20,7 @@ class Game::EvonyTKR::Buff::EvaluationData
       t->add_types(-Common);
     }
   }
-  
+
   ADJUST {
     if (scalar $self->BuffAttributes() == 0) {
       $self->set_BuffAttributes();

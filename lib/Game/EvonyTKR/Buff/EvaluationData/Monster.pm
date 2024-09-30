@@ -287,7 +287,7 @@ class Game::EvonyTKR::Buff::EvaluationData::Monster :
         if (any { $_ =~ /$BuffBias/i } $self->RelevantClasses()) {
           $self->logger()
             ->debug(
-"getMultiplierForBuff for $attribute with $GeneralBias, $BuffBias, $unit"
+            "getMultiplierForBuff for $attribute with $GeneralBias, $BuffBias, $unit"
             );
           if ($attribute =~ /Attack/i) {
             if (exists $BuffMultipliers{'Attack'}) {
@@ -301,7 +301,7 @@ class Game::EvonyTKR::Buff::EvaluationData::Monster :
                 else {
                   $self->logger()
                     ->error(
-"BuffMultipliers{Attack}->{$GeneralBias} does not contain $BuffBias"
+                    "BuffMultipliers{Attack}->{$GeneralBias} does not contain $BuffBias"
                     );
                 }
               }
@@ -327,7 +327,7 @@ class Game::EvonyTKR::Buff::EvaluationData::Monster :
                 else {
                   $self->logger()
                     ->error(
-"BuffMultipliers{Defense}->{$GeneralBias} does not contain $BuffBias"
+                    "BuffMultipliers{Defense}->{$GeneralBias} does not contain $BuffBias"
                     );
                 }
               }
@@ -353,7 +353,7 @@ class Game::EvonyTKR::Buff::EvaluationData::Monster :
                 else {
                   $self->logger()
                     ->error(
-"BuffMultipliers{HP}->{$GeneralBias} does not contain $BuffBias"
+                    "BuffMultipliers{HP}->{$GeneralBias} does not contain $BuffBias"
                     );
                 }
               }
@@ -413,7 +413,7 @@ class Game::EvonyTKR::Buff::EvaluationData::Monster :
         if (any { $_ =~ /$BuffBias/i } $self->RelevantClasses()) {
           $self->logger()
             ->debug(
-"getMultiplierForDebuff for $attribute with $GeneralBias, $BuffBias, $unit"
+            "getMultiplierForDebuff for $attribute with $GeneralBias, $BuffBias, $unit"
             );
           if ($attribute =~ /Attack/i) {
             if (exists $DebuffMultipliers{'Attack'}) {
