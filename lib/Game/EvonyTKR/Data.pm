@@ -4,6 +4,7 @@ use File::FindLib 'lib';
 
 class Game::EvonyTKR::Data
   : isa(Game::EvonyTKR::Logger) {
+# PODNAME: Game::EvonyTKR::Data
   use Carp;
   use Types::Standard        qw(is_Int Int Str is_Str);
   use Types::Common::Numeric qw(PositiveOrZeroInt);
@@ -14,7 +15,6 @@ class Game::EvonyTKR::Data
   use X500::DN;
   use UUID qw(uuid5);
   use namespace::autoclean;
-# PODNAME: Game::EvonyTKR::Data
 # VERSION
   use File::FindLib 'lib';
 
@@ -50,11 +50,6 @@ class Game::EvonyTKR::Data
 
   field @BuffAttributes : reader;
 
-=method set_BuffAttributes()
-
-get the possible attributes from the yaml data file in the shared directory and load them into memory.
-=cut
-
   method set_BuffAttributes {
     my $data_location = dist_file('Game-EvonyTKR', 'buff/attributes.yaml');
     open(my $DATA, '<', $data_location) or die $!;
@@ -87,14 +82,15 @@ get the possible attributes from the yaml data file in the shared directory and 
     'Wall',
   );
 
+  #keys should come from @GeneralKeys above. 
   field %generalClass :reader = (
-    'Ground'  => 'Game::EvonyTKR::General::Ground',
-    'Mounted' => 'Game::EvonyTKR::General::Mounted',
-    'Ranged'  => 'Game::EvonyTKR::General::Ranged',
-    'Siege'   => 'Game::EvonyTKR::General::Siege',
+    'Ground Troops'  => 'Game::EvonyTKR::General::Ground',
+    'Mounted Troops' => 'Game::EvonyTKR::General::Mounted',
+    'Ranged Troops'  => 'Game::EvonyTKR::General::Ranged',
+    'Siege Machines'   => 'Game::EvonyTKR::General::Siege',
   );
   
-  field $specialityLevels :reader = enum ['None', 'Green', 'Blue', 'Purple', 'Orange', 'Gold',];
+  field $specialityLevels :reader = enum [qw( None Green Blue Purple Orange Gold)];
 
   field $globalDN :reader = new X500::DN (
     new X500::RDN('OU'  => 'EvonyTKR'), 
@@ -157,3 +153,9 @@ A *buff* will affect either exactly one or All classes of troops. This is attemp
 
 A *General* can have more than one Class from this list.  That is because General Classes and Buff classes are the same values, but used totally differently.
 =cut
+
+=method set_BuffAttributes()
+
+get the possible attributes from the yaml data file in the shared directory and load them into memory.
+=cut
+
