@@ -25,31 +25,28 @@ package Game::EvonyTKR::Web {
 
     my $dist_dir = dist_dir('Game-EvonyTKR');
 
-    my $confFile = 
-      File::Spec->catfile($dist_dir, 'game-evony_t_k_r-web.yml');
-    
+    my $confFile = File::Spec->catfile($dist_dir, 'game-evony_t_k_r-web.yml');
+
     my $logConf = new Game::EvonyTKR::Logger::Config;
     my $logPath = $logConf->path();
     $logLevel = $self->mode() eq 'production' ? 'INFO' : 'TRACE';
 
     # Load configuration from config file
-    my $config = $self->plugins->register_plugin(
-      'Mojolicious::Plugin::NotYAMLConfig',
-      Mojolicious->new, {file => $confFile} );
+    my $config =
+      $self->plugins->register_plugin('Mojolicious::Plugin::NotYAMLConfig',
+      Mojolicious->new, { file => $confFile });
 
-    my $wlog = Game::EvonyTKR::Web::Logger->new(
-      category  => 'Web',
-    );
+    my $wlog = Game::EvonyTKR::Web::Logger->new(category => 'Web',);
     $wlog->logInit($self->mode());
     $self->log($wlog->webLogger());
-    
+
     # Configure the application
-    if(my $secrets = $config->{secrets}) {
+    if (my $secrets = $config->{secrets}) {
       $self->secrets($secrets);
     }
 
     $self->renderer->paths([File::Spec->catfile($dist_dir, 'templates')]);
-    
+
     # Router
     my $r = $self->routes;
     $r->namespaces(['Game::EvonyTKR::Web::Controller']);
@@ -60,7 +57,7 @@ package Game::EvonyTKR::Web {
     # Normal route to controller
     $r->get('/')->to('Example#welcome');
     $self->plugin('Game::EvonyTKR::Web::Routes::General', $r);
-    
+
     $self->log()->info('start up complete');
   }
 

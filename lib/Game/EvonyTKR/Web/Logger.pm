@@ -3,7 +3,7 @@ use experimental qw(class);
 use utf8::all;
 use File::FindLib 'lib';
 
-class Game::EvonyTKR::Web::Logger :isa(Game::EvonyTKR::Logger) {
+class Game::EvonyTKR::Web::Logger : isa(Game::EvonyTKR::Logger) {
 # PODNAME: Game::EvonyTKR::Logger
 
   use Carp;
@@ -20,10 +20,10 @@ class Game::EvonyTKR::Web::Logger :isa(Game::EvonyTKR::Logger) {
 # VERSION
   use File::FindLib 'lib';
   use MojoX::Log::Log4perl;
- 
-  field $webLogger: reader;
 
-  field $confFile :reader;
+  field $webLogger : reader;
+
+  field $confFile : reader;
 
   field @logLevels = qw(
     fatal
@@ -52,11 +52,11 @@ class Game::EvonyTKR::Web::Logger :isa(Game::EvonyTKR::Logger) {
       chmod(0600, $rootLog);
     }
     my $logConf = Game::EvonyTKR::Logger::Config->new();
-    $confFile = $logConf->path($mode);
+    $confFile  = $logConf->path($mode);
     $webLogger = MojoX::Log::Log4perl->new($confFile, 10);
     $self->get_logger();
   }
-} 
+}
 1;
 __END__
 

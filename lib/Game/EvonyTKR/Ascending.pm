@@ -71,7 +71,7 @@ class Game::EvonyTKR::Ascending : isa(Game::EvonyTKR::Logger) {
     my $t = $levels->compiled_check();
     if (not $t->($level)) {
       my $prettyLevels = np @{ $levels->values() };
-      $self->logger()->warn("$level is not a valid option from $prettyLevels" );
+      $self->logger()->warn("$level is not a valid option from $prettyLevels");
       return 0;
     }
 
@@ -85,9 +85,7 @@ class Game::EvonyTKR::Ascending : isa(Game::EvonyTKR::Logger) {
         next;
       }
       if ($tl eq $level) {
-        $self->logger()->trace(sprintf(
-          'buff matches %s', $level
-        ));
+        $self->logger()->trace(sprintf('buff matches %s', $level));
         if ($inherited) {
           my $copy;
           if ($nb->has_buffClass()) {
@@ -110,26 +108,22 @@ class Game::EvonyTKR::Ascending : isa(Game::EvonyTKR::Logger) {
               $copy->set_condition($c);
             }
           }
-  
+
           push @{ $Buffs{$tl} }, $copy;
           my $printableBuff = np $copy;
-          my $buffCount = scalar @{ $Buffs{$tl}};
+          my $buffCount     = scalar @{ $Buffs{$tl} };
           $self->logger()->trace(sprintf(
             'after adding inherited buff %s at level %s, I have %d buffs.',
-            $tl,
-            $printableBuff,
-            $buffCount,
+            $tl, $printableBuff, $buffCount,
           ));
         }
         else {
           push @{ $Buffs{$tl} }, $nb;
           my $printableBuff = np $nb;
-          my $buffCount = scalar @{ $Buffs{$tl}};
+          my $buffCount     = scalar @{ $Buffs{$tl} };
           $self->logger()->trace(sprintf(
             'after adding uninherited buff %s at level %s, I have %d buffs.',
-            $tl,
-            $printableBuff,
-            $buffCount,
+            $tl, $printableBuff, $buffCount,
           ));
         }
         if ($tl eq '1Purple') {
@@ -182,7 +176,7 @@ class Game::EvonyTKR::Ascending : isa(Game::EvonyTKR::Logger) {
           $thisBuff->getEvAnsScore($name, $BuffMultipliers, $GeneralBias,);
         $self->logger()
           ->debug(
-"getEvAnsScore for $name recieved $result from getEvAnsScore for buff $i"
+          "getEvAnsScore for $name recieved $result from getEvAnsScore for buff $i"
           );
         my $category = $BuffMultipliers->EvAnsCategory($thisBuff);
         if (not defined $category) {
@@ -223,18 +217,18 @@ class Game::EvonyTKR::Ascending : isa(Game::EvonyTKR::Logger) {
         $self->logger()->trace("processing $key");
         $self->logger()->trace(sprintf(
           'there are %d buffs present for %s',
-          scalar @{ $Buffs{$key}},
-          $key
+          scalar @{ $Buffs{$key} }, $key
         ));
         for my $thisBuff (@{ $Buffs{$key} }) {
           if (not $thisBuff->inherited()) {
-            $self->logger()->trace(sprintf(
-              'found unique buff for %s: "%s"', 
-              $key, np $thisBuff));
+            $self->logger()
+              ->trace(sprintf(
+              'found unique buff for %s: "%s"', $key, np $thisBuff));
             push @{ $returnRef->{$key} }, $thisBuff->toHashRef();
           }
           else {
-            $self->logger()->trace("found inherited buff at $key " . np $thisBuff);  
+            $self->logger()
+              ->trace("found inherited buff at $key " . np $thisBuff);
           }
         }
       }

@@ -41,12 +41,12 @@ class Game::EvonyTKR::General::Pair {
     );
     if (none { $_ eq $primaryClass } @GeneralClasses) {
       push @errors =>
-"primary must be a Game::EvonyTKR::General or subclass no $primaryClass";
+        "primary must be a Game::EvonyTKR::General or subclass no $primaryClass";
     }
     my $secondaryClass = blessed $secondary;
     if (none { $_ eq $secondaryClass } @GeneralClasses) {
       push @errors =>
-"primary must be a Game::EvonyTKR::General or subclass no $primaryClass";
+        "primary must be a Game::EvonyTKR::General or subclass no $primaryClass";
     }
     if (@errors) {
       croak join ', ' => @errors;

@@ -46,13 +46,13 @@ class Game::EvonyTKR::SkillBook::Standard : isa(Game::EvonyTKR::SkillBook) {
   method toHashRef($verbose = 0) {
     $self->logger()->trace("starting toHashRef for " . $self->name());
     my $returnRef = {};
-    $returnRef->{'name'} = $self->name();
+    $returnRef->{'name'}  = $self->name();
     $returnRef->{'level'} = $self->level();
-    $returnRef->{'text'} = $self->text();
-    if($verbose) {  
+    $returnRef->{'text'}  = $self->text();
+    if ($verbose) {
       for my $tb ($self->buffs()) {
         push @{ $returnRef->{'buffs'} }, $tb->toHashRef();
-      } 
+      }
     }
     return $returnRef;
   }

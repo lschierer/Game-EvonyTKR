@@ -123,12 +123,10 @@ it will not consider conflicts.
             }
           }
           else {
-            $self->logger()->debug(
-              sprintf(
-                '%s is the same as %s, rejecting.',
-                $value1->name(), $value2->name()
-              )
-            );
+            $self->logger()->debug(sprintf(
+              '%s is the same as %s, rejecting.',
+              $value1->name(), $value2->name()
+            ));
           }
         }
 

@@ -124,7 +124,7 @@ class Game::EvonyTKR::Buff : isa(Game::EvonyTKR::Logger) {
           else {
             $self->logger()
               ->debug(
-"buff for $name has a condition that disqualifies it from applying"
+              "buff for $name has a condition that disqualifies it from applying"
               );
             $self->logger()->trace("buff conditions: " . np @condition);
             $self->logger()
@@ -219,33 +219,33 @@ class Game::EvonyTKR::Buff : isa(Game::EvonyTKR::Logger) {
       }
       if ($self->has_buffClass() && ($other->has_buffClass())) {
         $self->logger()->trace('both have classes');
-        if( $self->buffClass() ne $other->buffClass()){
+        if ($self->buffClass() ne $other->buffClass()) {
           return $self->buffClass() cmp $other->buffClass();
         }
       }
-      elsif($self->has_buffClass()) {
+      elsif ($self->has_buffClass()) {
         $self->logger()->trace('only I have a class');
         return 1;
       }
-      elsif($other->has_buffClass()) {
+      elsif ($other->has_buffClass()) {
         $self->logger()->trace('only the other has a class');
         return -1;
       }
       elsif ($self->has_condition() && $other->has_condition()) {
         $self->logger()->trace('both have conditions');
-        
-        my @cone = sort $self->condition();
+
+        my @cone    = sort $self->condition();
         my $sizeone = scalar @cone;
-        my @ctwo = sort $other->condition();
+        my @ctwo    = sort $other->condition();
         my $sizetwo = scalar @ctwo;
 
-        if($sizeone == $sizetwo) {
+        if ($sizeone == $sizetwo) {
           $self->logger()->trace('both have the same number of conditions');
-          for my $index (0..$#cone) {
+          for my $index (0 .. $#cone) {
             my $c1 = $cone[$index];
             my $c2 = $ctwo[$index];
-            if($c1 ne $c2) {
-              return $c1 cmp $c2
+            if ($c1 ne $c2) {
+              return $c1 cmp $c2;
             }
           }
         }

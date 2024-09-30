@@ -14,13 +14,13 @@ class Game::EvonyTKR::General::Ground : isa(Game::EvonyTKR::General) {
   use namespace::autoclean;
   use Game::EvonyTKR::General;
   use overload
-    '<=>'      => \&Game::EvonyTKR::General::_comparison,
-    'cmp'      => \&Game::EvonyTKR::General::_comparison,
-    'eq'       => \&Game::EvonyTKR::General::_equality,
-    '=='       => \&Game::EvonyTKR::General::_equality,
-    'ne'       => \&Game::EvonyTKR::General::_inequality,
-    '!='       => \&Game::EvonyTKR::General::_inequality,
-    '""'       => \&Game::EvonyTKR::General::_toString;
+    '<=>' => \&Game::EvonyTKR::General::_comparison,
+    'cmp' => \&Game::EvonyTKR::General::_comparison,
+    'eq'  => \&Game::EvonyTKR::General::_equality,
+    '=='  => \&Game::EvonyTKR::General::_equality,
+    'ne'  => \&Game::EvonyTKR::General::_inequality,
+    '!='  => \&Game::EvonyTKR::General::_inequality,
+    '""'  => \&Game::EvonyTKR::General::_toString;
 
 # from Type::Registry, this will save me from some of the struggles I have had with some types having blessed references and others not.
   ADJUST {

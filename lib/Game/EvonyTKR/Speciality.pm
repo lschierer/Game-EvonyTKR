@@ -20,7 +20,7 @@ class Game::EvonyTKR::Speciality : isa(Game::EvonyTKR::Logger) {
   use YAML::XS qw{LoadFile Load};
   use namespace::autoclean;
 # PODNAME: Game::EvonyTKR::Speciality
-# VERSION 
+# VERSION
   use Game::EvonyTKR::Logger;
   use overload
     '""'       => \&_toString,
@@ -35,7 +35,7 @@ class Game::EvonyTKR::Speciality : isa(Game::EvonyTKR::Logger) {
 
   field $name : reader : param;
 
-  field $EvonyData :reader = Game::EvonyTKR::Data->new();
+  field $EvonyData : reader = Game::EvonyTKR::Data->new();
 
   ADJUST {
     my @errors;
@@ -69,8 +69,10 @@ class Game::EvonyTKR::Speciality : isa(Game::EvonyTKR::Logger) {
       $activeLevel = $newLevel;
     }
     else {
-      $self->logger()->warn(sprintf('%s is not a valid level, options are %s',
-      $newLevel, Data::Printer::np $levels->values()));
+      $self->logger()->warn(sprintf(
+        '%s is not a valid level, options are %s',
+        $newLevel, Data::Printer::np $levels->values()
+      ));
     }
   }
 
@@ -153,7 +155,7 @@ class Game::EvonyTKR::Speciality : isa(Game::EvonyTKR::Logger) {
           $thisBuff->getEvAnsScore($name, $BuffMultipliers, $GeneralBias,);
         $self->logger()
           ->debug(
-"getEvAnsScore for $name recieved $result from getEvAnsScore for buff $i"
+          "getEvAnsScore for $name recieved $result from getEvAnsScore for buff $i"
           );
         my $category = $BuffMultipliers->EvAnsCategory($thisBuff);
         if (not defined $category) {

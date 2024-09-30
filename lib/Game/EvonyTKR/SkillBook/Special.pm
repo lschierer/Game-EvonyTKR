@@ -38,36 +38,37 @@ class Game::EvonyTKR::SkillBook::Special : isa(Game::EvonyTKR::SkillBook) {
     my $returnRef = {};
     $returnRef->{'name'} = $name;
     $returnRef->{'text'} = $self->text();
-    if($verbose) {  
+    if ($verbose) {
       for my $tb ($self->buffs()) {
         push @{ $returnRef->{'buffs'} }, $tb->toHashRef();
-      } 
+      }
     }
     return $returnRef;
   }
 
   method readFromFile() {
-    my $name = $self->name();
+    my $name              = $self->name();
     my $SkillBookFileName = $name . '.yaml';
     my $SkillBookShare =
       File::Spec->catfile(dist_dir('Game-EvonyTKR'), 'skillbooks');
     my $FileWithPath = File::Spec->catfile($SkillBookShare, $SkillBookFileName);
     if (-T -s -r $FileWithPath) {
       $self->logger()->debug("$SkillBookFileName exists as expected");
-      my $data      = LoadFile($FileWithPath);
+      my $data = LoadFile($FileWithPath);
 
-      if(exists $data->{'text'}) {
+      if (exists $data->{'text'}) {
         $self->set_text($data->{'text'});
       }
       else {
         $self->set_text('Original Text Not Available.');
       }
 
-      my @dataBuffs = @{$data->{'buff'} };
+      my @dataBuffs = @{ $data->{'buff'} };
       $self->logger()
         ->debug("$name has " . scalar @dataBuffs . " buffs in the file");
       while (my ($index, $sbb) = each @dataBuffs) {
-        $self->logger()->trace(sprintf('iteration %d for SkillBook %s', $index, $name));
+        $self->logger()
+          ->trace(sprintf('iteration %d for SkillBook %s', $index, $name));
         my $v;
         my $b;
         my @sbKeys = keys %{$sbb};
@@ -104,15 +105,21 @@ class Game::EvonyTKR::SkillBook::Special : isa(Game::EvonyTKR::SkillBook) {
           }
           $self->logger()->info("from SkillBook $name; Adding buff " . np $b);
           $self->add_buff($b);
-          $self->logger()->trace(sprintf('%s has %d buffs after add buff ',
-            $self->name(), scalar $self->buffs(), ) . np $b);
+          $self->logger()->trace(
+            sprintf(
+              '%s has %d buffs after add buff ',
+              $self->name(), scalar $self->buffs(),
+              )
+              . np $b
+          );
         }
         else {
           $self->logger()->warn("No buff defined in readFromFile for $name");
         }
       }
       $self->logger()
-        ->debug("$name has " . scalar $self->buffs() . " buffs after reading all in");
+        ->debug(
+        "$name has " . scalar $self->buffs() . " buffs after reading all in");
     }
   }
 

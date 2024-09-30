@@ -22,7 +22,6 @@ class Game::EvonyTKR::Buff::Value {
     }
   }
 
-
   field $unit : reader : param //= 'percentage';
 
   ADJUST {

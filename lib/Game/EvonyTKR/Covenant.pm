@@ -159,12 +159,10 @@ class Game::EvonyTKR::Covenant : isa(Game::EvonyTKR::Logger) {
       $powerLevel += $secondary{$key}->effective_leadership();
       $powerLevel += $secondary{$key}->effective_politics();
     }
-    $self->logger()->debug(
-      sprintf(
-        "Covenant for %s: effective powerLevel is %.5f",
-        $primary->name(), $powerLevel
-      )
-    );
+    $self->logger()->debug(sprintf(
+      "Covenant for %s: effective powerLevel is %.5f",
+      $primary->name(), $powerLevel
+    ));
     for my ($i, $clk) (indexed(@cla)) {
       my $cl = $Buffs{$clk};
       if ($cl->{'activated'}) {
@@ -173,7 +171,7 @@ class Game::EvonyTKR::Covenant : isa(Game::EvonyTKR::Logger) {
         }
         else {
           $self->logger()->debug(sprintf(
-"Covenant for %s: effective powerLevel is %.5f, required power is %d",
+            "Covenant for %s: effective powerLevel is %.5f, required power is %d",
             $primary->name(), $powerLevel, $cl->{'activationLevel'},
           ));
         }
@@ -198,7 +196,7 @@ class Game::EvonyTKR::Covenant : isa(Game::EvonyTKR::Logger) {
           $thisBuff->getEvAnsScore($name, $BuffMultipliers, $GeneralBias,);
         $self->logger()
           ->debug(
-"getEvAnsScore for $name recieved $result from getEvAnsScore for buff $i"
+          "getEvAnsScore for $name recieved $result from getEvAnsScore for buff $i"
           );
         my $category = $BuffMultipliers->EvAnsCategory($thisBuff);
         if (not defined $category) {
