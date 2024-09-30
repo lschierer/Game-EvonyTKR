@@ -14,17 +14,13 @@ package Game::EvonyTKR::Web::Routes::General {
     my $generalRoutes = $r->any('/general')->to(
       namespace   => 'Game::EvonyTKR::Web::Controller',
       controller  => 'General',
-      action      => 'index',
+      action      => 'list',
     );
 
     $generalRoutes->get('/')->to(
-      action      => 'index'
-      );
-        
-    $generalRoutes->get('/list')->to(
       action      => 'list'
       );
-    
+        
     $generalRoutes->get('/:id' => [format => ['txt', 'json']])->to(
       format      => undef,
       action      => 'generalById',

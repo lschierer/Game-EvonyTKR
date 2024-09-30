@@ -4,16 +4,17 @@ use utf8::all;
 use File::ShareDir ':ALL';
 use File::Spec;
 use Data::Printer;
+require Mojolicious::Routes;
 use namespace::autoclean;
 
 package Game::EvonyTKR::Web {
 # ABSTRACT: package providing REST wrappers for the content created by this distribution
   use Carp;
   use Mojo::Base 'Mojolicious', -signatures;
+  use Mojolicious::Routes::Route;
   use Mojo::File::Share qw(dist_dir dist_file);
   use Log::Log4perl::Level;
-  use FindBin;
-  use lib "$FindBin::Bin/../../../lib";
+  use File::FindLib 'lib';
   use Game::EvonyTKR::Web::Logger;
   use Game::EvonyTKR::Logger::Config;
 
@@ -48,17 +49,18 @@ package Game::EvonyTKR::Web {
     }
 
     $self->renderer->paths([File::Spec->catfile($dist_dir, 'templates')]);
-
+    
     # Router
     my $r = $self->routes;
+    $r->namespaces(['Game::EvonyTKR::Web::Controller']);
 
     #let me use the DefaultHelpers
     $self->plugin('DefaultHelpers');
 
     # Normal route to controller
     $r->get('/')->to('Example#welcome');
-
     $self->plugin('Game::EvonyTKR::Web::Routes::General', $r);
+    
     $self->log()->info('start up complete');
   }
 

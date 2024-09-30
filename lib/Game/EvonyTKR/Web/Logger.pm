@@ -1,12 +1,10 @@
 use v5.40.0;
 use experimental qw(class);
 use utf8::all;
-use FindBin;
-use lib "$FindBin::Bin/../../../../lib";
+use File::FindLib 'lib';
 
 class Game::EvonyTKR::Web::Logger :isa(Game::EvonyTKR::Logger) {
 # PODNAME: Game::EvonyTKR::Logger
-# ABSTRACT: Set up and manage logging for the distribution
 
   use Carp;
   use Data::Printer;
@@ -19,8 +17,8 @@ class Game::EvonyTKR::Web::Logger :isa(Game::EvonyTKR::Logger) {
   use Game::EvonyTKR::Logger::Config;
   use Util::Any -all;
   use namespace::autoclean;
-  use FindBin;
-  use lib "$FindBin::Bin/../../../../lib";
+# VERSION
+  use File::FindLib 'lib';
   use MojoX::Log::Log4perl;
  
   field $webLogger: reader;
@@ -62,3 +60,4 @@ class Game::EvonyTKR::Web::Logger :isa(Game::EvonyTKR::Logger) {
 1;
 __END__
 
+# ABSTRACT: Set up and manage logging for the distribution

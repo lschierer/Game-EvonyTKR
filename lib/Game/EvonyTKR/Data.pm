@@ -7,9 +7,12 @@ class Game::EvonyTKR::Data
   use Carp;
   use Types::Standard        qw(is_Int Int Str is_Str);
   use Types::Common::Numeric qw(PositiveOrZeroInt);
-  use Type::Utils "is";
+  use Type::Utils     qw(is enum);
   use File::ShareDir ':ALL';
   use YAML::XS;
+  use X500::RDN;
+  use X500::DN;
+  use UUID qw(uuid5);
   use namespace::autoclean;
 # PODNAME: Game::EvonyTKR::Data
 # VERSION
@@ -91,6 +94,22 @@ get the possible attributes from the yaml data file in the shared directory and 
     'Siege'   => 'Game::EvonyTKR::General::Siege',
   );
   
+  field $specialityLevels :reader = enum ['None', 'Green', 'Blue', 'Purple', 'Orange', 'Gold',];
+
+  field $globalDN :reader = new X500::DN (
+    new X500::RDN('OU'  => 'EvonyTKR'), 
+    new X500::RDN('OU'  => 'Game'),
+    new X500::RDN('OU'  => 'module'),
+    new X500::RDN('dc'  => 'Perl'),
+    new X500::RDN('dc'  => 'org'),
+    );
+
+  field $UUID5_base :reader;
+
+  ADJUST {
+    my $ns_base = uuid5( dns => 'perl.org' );
+    $UUID5_base  = uuid5($ns_base, $globalDN->getX500String());
+  }
 
 }
 1;

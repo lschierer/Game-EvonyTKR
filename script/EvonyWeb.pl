@@ -3,8 +3,8 @@ use v5.40.0;
 use experimental qw(class);
 use utf8::all;
 
-
 package main {
+# VERSION
   use Carp;
   use Mojo::File qw(curfile);
   use lib curfile->dirname->sibling('lib')->to_string;

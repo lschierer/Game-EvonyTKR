@@ -1,10 +1,8 @@
 use v5.40.0;
 use experimental qw(class);
-use FindBin;
-use lib "$FindBin::Bin/../../../lib";
+use File::FindLib 'lib';
 
 class Game::EvonyTKR::Speciality : isa(Game::EvonyTKR::Logger) {
-# PODNAME: Game::EvonyTKR::Speciality
   use builtin         qw(indexed);
   use Types::Standard qw(is_Int Int Num is_Num Str is_Str);
   use Types::Common   qw( t);
@@ -16,10 +14,13 @@ class Game::EvonyTKR::Speciality : isa(Game::EvonyTKR::Logger) {
   use File::Spec;
   use Game::EvonyTKR::Buff;
   use Game::EvonyTKR::Buff::Value;
+  use Game::EvonyTKR::Data;
   use List::MoreUtils;
   use Util::Any -all;
   use YAML::XS qw{LoadFile Load};
   use namespace::autoclean;
+# PODNAME: Game::EvonyTKR::Speciality
+# VERSION 
   use Game::EvonyTKR::Logger;
   use overload
     '""'       => \&_toString,
@@ -34,6 +35,8 @@ class Game::EvonyTKR::Speciality : isa(Game::EvonyTKR::Logger) {
 
   field $name : reader : param;
 
+  field $EvonyData :reader = Game::EvonyTKR::Data->new();
+
   ADJUST {
     my @errors;
     is_Str($name) or push @errors => "name must be a string, not $name";
@@ -43,8 +46,7 @@ class Game::EvonyTKR::Speciality : isa(Game::EvonyTKR::Logger) {
   }
 
   field %Buffs : reader;
-  field $levels : reader =
-    enum ['Green', 'None', 'Blue', 'Purple', 'Orange', 'Gold',];
+  field $levels : reader = $EvonyData->specialityLevels();
 
   field $activeLevel : reader : param //= 'None';
 

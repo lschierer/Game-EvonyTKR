@@ -10,12 +10,14 @@ class Game::EvonyTKR::Web::Model::General :isa(Game::EvonyTKR::Web::Logger) {
   use File::ShareDir ':ALL';
   use File::Spec;
   use Util::Any ':all';
+  use Game::EvonyTKR::Data;
   use Game::EvonyTKR::General;
   use Game::EvonyTKR::General::Ground;
   use Game::EvonyTKR::General::Mounted;
   use Game::EvonyTKR::General::Ranged;
   use Game::EvonyTKR::General::Siege;
   use Game::EvonyTKR::Data;
+  use X500::RDN;
   use YAML::XS qw{ LoadFile Load };
   use namespace::autoclean;
 # PODNAME: Game::EvonyTKR::Web::Model::General
@@ -126,7 +128,13 @@ class Game::EvonyTKR::Web::Model::General :isa(Game::EvonyTKR::Web::Logger) {
     }
   }
 
-
+  method generate_RDN($n, $t, $u) {
+    return new X500::DN(
+      new X500::RDN('SERIALNUMBER'  => $u),
+      new X500::RDN('CN'  => $n),
+      $EvonyData->globalDN()->getRDNs(),
+      );
+  }
 
   method readFromFile($name) {
         my $fileName = $name . '.yaml';
@@ -190,7 +198,7 @@ class Game::EvonyTKR::Web::Model::General :isa(Game::EvonyTKR::Web::Logger) {
             my %constructors = $EvonyData->generalClass();
             for (@generalClassKey) {
               my $general = $constructors{$_}->new(
-                name => $yamlData->{'general'}->{'name'},
+                name  => $yamlData->{'general'}->{'name'},
               );
               
               
