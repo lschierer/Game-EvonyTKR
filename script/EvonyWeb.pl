@@ -14,9 +14,4 @@ package main {
   # Start command line interface for application
   Mojolicious::Commands->start_app('Game::EvonyTKR::Web');
 
-  sub getLogDir {
-    my $logConf = Game::EvonyTKR::Logger::Config->new();
-    my $ld = $logConf->getLogDir(); 
-    return $ld;
-  }
 }
