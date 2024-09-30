@@ -15,12 +15,14 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Logger) {
     use File::ShareDir ':ALL';
     use File::Spec;
     use Game::EvonyTKR::Covenant;
+    use Game::EvonyTKR::Data;
     use Game::EvonyTKR::SkillBook::Special;
     use Game::EvonyTKR::Speciality;
     require Game::EvonyTKR::Buff::EvaluationData::Attacking;
     require Game::EvonyTKR::Buff::EvaluationData::Monster;
     use Game::EvonyTKR::Ascending;
     use JSON::MaybeXS;
+    use UUID qw(uuid5);
     use YAML::XS qw{LoadFile Load};
     use namespace::autoclean;
     use File::FindLib 'lib';
@@ -42,6 +44,8 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Logger) {
 
     field $name : reader : param;
 
+    field $EvonyData = Game::EvonyTKR::Data->new();
+
     ADJUST {
         my @errors;
         is_Str($name) or push @errors => "name must be a string, not $name";
@@ -49,6 +53,8 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Logger) {
             die join ', ' => @errors;
         }
     }
+
+    field $uuid :reader = uuid5($EvonyData->UUID5_base(), $name);
 
     field $_generalType : reader = 'All Troops';
 
@@ -460,8 +466,7 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Logger) {
     }
 
     method specialityLevels {
-        my $sl = first { defined($_) } @specialities;
-        return @{ $sl->levels()->values() };
+        return $EvonyData->specialityLevels()->values();
     }
 
     method changeActiveSpecialityLevel( $specialityNumber, $newLevel ) {
