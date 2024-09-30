@@ -654,7 +654,7 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Data) {
 
   method TO_JSON {
     my $json = JSON::MaybeXS->new(utf8 => 1);
-    return $json->encode($self->toHashRef());
+    return $self->toHashRef();
   }
 
   method _toString {

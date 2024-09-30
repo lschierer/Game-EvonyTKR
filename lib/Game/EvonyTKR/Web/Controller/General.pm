@@ -23,9 +23,38 @@ package Game::EvonyTKR::Web::Controller::General {
 
   my $EvonyData = Game::EvonyTKR::Data->new();
 
+  sub index {
+    my ($self) = @_;
+    my $text = "Generals Pages";
+    $self->respond_to(
+      txt   => { text   => $text},
+      html  => sub {
+        $self->render(text => $text);
+      },
+      any   => { data   => '', status => 204 },
+    );
+    return;
+  }
+
   sub list {
     my ($self) = @_;
-    $self->render(text => "Generals List Pages");
+    my $jsonResponse = {};
+    if(defined $generalModel){
+      for my $type ($EvonyData->GeneralKeys()) {
+        if(defined $generalModel->generals()->{$type}) {
+          $jsonResponse->{$type} = $generalModel->generals()->{$type};
+        }
+      }
+    }
+    $self->respond_to(
+      txt   => {text  => "Generals List Pages" },
+      json  => {json  => $jsonResponse },
+      html  => sub {
+        $self->render(text => 'General List Pages');
+      },
+      any  => { data  => '', status => 204 },
+    );
+    return;
   }
 
   sub _specialityParamHelper($c, $name) {
