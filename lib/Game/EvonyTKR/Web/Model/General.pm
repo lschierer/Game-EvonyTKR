@@ -83,7 +83,7 @@ class Game::EvonyTKR::Web::Model::General : isa(Game::EvonyTKR::Web::Logger) {
   method get_by_id($name, $type = undef) {
     if (exists $generals->{$name}) {
       $self->logger()->trace(sprintf('looking for cached general %s with type %s', 
-        $name, $type));
+        $name, defined $type ? $type : 'undefined'));
       if (defined $type) {
         $self->logger()->trace('and type is defined');
         if (any { $_ =~ $type } @{ $generals->{$name} }) {
