@@ -21,6 +21,7 @@ class Game::EvonyTKR::Ascending : isa(Game::EvonyTKR::Logger) {
   use Util::Any -all;
   use YAML::XS qw{LoadFile Load};
   use namespace::autoclean;
+# VERSION
   use Game::EvonyTKR::Logger;
   use overload
     '""'       => \&_toString,

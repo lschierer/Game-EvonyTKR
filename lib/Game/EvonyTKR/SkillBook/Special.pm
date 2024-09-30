@@ -4,7 +4,6 @@ use File::FindLib 'lib';
 
 class Game::EvonyTKR::SkillBook::Special : isa(Game::EvonyTKR::SkillBook) {
 # PODNAME: Game::EvonyTKR::SkillBook::Special
-# VERSION
   use Carp;
   use Data::Dumper;
   use Data::Printer;
@@ -18,6 +17,7 @@ class Game::EvonyTKR::SkillBook::Special : isa(Game::EvonyTKR::SkillBook) {
   use Util::Any -all;
   use YAML::XS qw{LoadFile Load};
   use namespace::autoclean;
+# VERSION
 
 # from Type::Registry, this will save me from some of the struggles I have had with some types having blessed references and others not.
   ADJUST {

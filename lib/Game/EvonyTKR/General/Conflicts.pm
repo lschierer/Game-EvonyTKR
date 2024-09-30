@@ -24,6 +24,7 @@ class Game::EvonyTKR::General::Conflicts : isa(Game::EvonyTKR::Logger) {
   use Game::EvonyTKR::SkillBook::Standard;
   use Game::EvonyTKR::Data;
   use namespace::autoclean;
+# VERSION
   use Game::EvonyTKR::Logger;
 
   my $distData = File::HomeDir->my_dist_data('Game-Evony', { create => 1 });

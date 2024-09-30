@@ -1,8 +1,7 @@
 use v5.40.0;
 use utf8::all;
 use experimental qw{class defer};
-use FindBin;
-use lib "$FindBin::Bin/../../../../../lib";
+use File::FindLib 'lib';
 
 package Game::EvonyTKR::Web::General::Pair {
 # VERSION

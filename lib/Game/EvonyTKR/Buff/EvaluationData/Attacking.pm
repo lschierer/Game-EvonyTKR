@@ -4,6 +4,8 @@ use File::FindLib 'lib';
 
 class Game::EvonyTKR::Buff::EvaluationData::Attacking :
   isa(Game::EvonyTKR::Buff::EvaluationData) {
+# PODNAME: Game::EvonyTKR::Buff::EvaluationData::Attacking
+
   use Carp;
   use Data::Printer;
   use Types::Common qw( t is_Num is_Str is_Int);
@@ -12,9 +14,7 @@ class Game::EvonyTKR::Buff::EvaluationData::Attacking :
   use Game::EvonyTKR::Data;
   use namespace::autoclean;
 
-# PODNAME: Game::EvonyTKR::Buff::EvaluationData::Attacking
-
-# ABSTRACT: Game::EvonyTKR::Buff Evaluation Data for Attacking use cases.
+# VERSION
 
 # from Type::Registry, this will save me from some of the struggles I have had with some types having blessed references and others not.
   ADJUST {
@@ -618,6 +618,8 @@ class Game::EvonyTKR::Buff::EvaluationData::Attacking :
 1;
 
 __END__
+
+# ABSTRACT: Game::EvonyTKR::Buff Evaluation Data for Attacking use cases.
 
 =head1 DESCRIPTION
 

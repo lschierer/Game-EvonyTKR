@@ -35,15 +35,15 @@ package Game::EvonyTKR::Web::General {
   my $generals;
   my $logger = Log::Log4perl::get_logger('Web::General');
 
-  prefix '/general'       => sub {
-    prefix '/list'        => sub {
-      get ''              => \&_list;
-      get '/'             => \&_list;
-      prefix '/details'   => sub {
-        get ''            => \&_details;
+  prefix '/general' => sub {
+    prefix '/list' => sub {
+      get ''  => \&_list;
+      get '/' => \&_list;
+      prefix '/details' => sub {
+        get '' => \&_details;
       };
     };
-    get '/:id'            => \&_by_id;
+    get '/:id' => \&_by_id;
   };
 
   sub _init {
@@ -72,18 +72,19 @@ package Game::EvonyTKR::Web::General {
     $logger->debug('_list function called');
 
     my $withTypes = query_parameters->get('types');
-    if(defined $withTypes) {
-      if($withTypes ne 'false') {
+    if (defined $withTypes) {
+      if ($withTypes ne 'false') {
         $withTypes = 1;
       }
     }
     my @list;
     while (my ($key, $value) = each %$generals) {
-      if($withTypes) {
-        push @list, {
+      if ($withTypes) {
+        push @list,
+          {
           name => $value->name(),
           type => $value->generalType(),
-        };
+          };
       }
       else {
         push @list, $value->name();
@@ -96,15 +97,15 @@ package Game::EvonyTKR::Web::General {
     _init();
     my @data = ();
     $logger->debug("sub _all has " . scalar %$generals . " generals");
-    
+
     my $verbose = query_parameters->get('verbose');
     if (defined $verbose) {
-      if($verbose ne 'false') {
+      if ($verbose ne 'false') {
         $verbose = 1;
       }
       else {
         $verbose = 0;
-      }      
+      }
     }
     else {
       $verbose = 0;
@@ -117,27 +118,29 @@ package Game::EvonyTKR::Web::General {
     else {
       $ascendingLevel = 'None';
     }
-    
+
     while (my ($key, $value) = each %$generals) {
       # allowable specialityLevels may vary per general
       my @specialityLevels = qw( None None None None None );
-      
+
       $logger->trace("getting data for " . $value->name());
-      my $name          = $value->name();
-      
+      my $name = $value->name();
+
       $value->setLevel($level);
       $value->ascendingAttributes()->setActiveLevel($ascendingLevel);
-      
+
       for my $sl (1 .. 4) {
         my $sp = query_parameters->get("specialityLevel$sl");
         if (defined $sp) {
           my @lv = $value->specialityLevels();
           if (any { $_ =~ /$sp/i } @lv) {
-            $logger->debug("setting $sp at specialityLevel$sl for " . $value->name());
+            $logger->debug(
+              "setting $sp at specialityLevel$sl for " . $value->name());
             $value->changeActiveSpecialityLevel($sl, $sp);
           }
           else {
-            $logger->warn("invalid specialityLevel $sp at $sl for " . $value->name());
+            $logger->warn(
+              "invalid specialityLevel $sp at $sl for " . $value->name());
             $logger->warn("valid values are " . Data::Printer::np @lv);
           }
         }
@@ -170,12 +173,12 @@ package Game::EvonyTKR::Web::General {
 
       my $verbose = query_parameters->get('verbose');
       if (defined $verbose) {
-        if($verbose ne 'false') {
+        if ($verbose ne 'false') {
           $verbose = 1;
         }
         else {
           $verbose = 0;
-        }      
+        }
       }
       else {
         $verbose = 0;
@@ -212,7 +215,7 @@ package Game::EvonyTKR::Web::General {
       else {
         $logger->debug("Query ascendingLevel is not defined.");
       }
-      
+
       return $general->toHashRef($verbose);
     }
     else {
