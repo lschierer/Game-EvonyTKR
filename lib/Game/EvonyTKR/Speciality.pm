@@ -68,6 +68,10 @@ class Game::EvonyTKR::Speciality : isa(Game::EvonyTKR::Logger) {
     if ($t->($newLevel)) {
       $activeLevel = $newLevel;
     }
+    else {
+      $self->logger()->warn(sprintf('%s is not a valid level, options are %s',
+      $newLevel, Data::Printer::np $levels->values()));
+    }
   }
 
   method add_buff($level, $nb, $inherited = 0) {
