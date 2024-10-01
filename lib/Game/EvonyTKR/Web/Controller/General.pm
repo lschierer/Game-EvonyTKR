@@ -12,6 +12,7 @@ package Game::EvonyTKR::Web::Controller::General {
   use Game::EvonyTKR::Data;
   use Game::EvonyTKR::General;
   use Game::EvonyTKR::Web::Model::General;
+  use HTML::FromANSI;
   use namespace::autoclean;
 
 # VERSION
@@ -47,10 +48,10 @@ package Game::EvonyTKR::Web::Controller::General {
       }
     }
     $self->respond_to(
-      txt   => {text  => "Generals List Pages" },
+      txt   => {text  => Data::Printer::np($jsonResponse, indent => 2)  },
       json  => {json  => $jsonResponse },
       html  => sub {
-        $self->render(text => 'General List Pages');
+        $self->render(text  => ansi2html(Data::Printer::np($jsonResponse, indent => 4, colored => 0) ));
       },
       any  => { data  => '', status => 204 },
     );
@@ -162,8 +163,12 @@ package Game::EvonyTKR::Web::Controller::General {
         my $generalHashRef = $general->toHashRef($verbose);
 
         $self->respond_to(
-          json => { json => $generalHashRef },
-          any  => { data => '', status => 204 },
+          json  => { json => $generalHashRef },
+          html  => {
+            text       => ansi2html(Data::Printer::np(
+              $generalHashRef, indent => 4, colored => 0)),
+          },
+          any   => { data => '', status => 204 },
         );
         return;
       }
