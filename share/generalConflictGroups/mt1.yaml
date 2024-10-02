@@ -1,4 +1,4 @@
-name: 01HNP2VSPGA7AWKN10M2ABCR3G
+name: mt1
 members:
   - Jayavarman II
   - Lysander
@@ -6,7 +6,7 @@ members:
   - Bertrand du Guesclin
   - Cyrus the Great
 others:
-  - 01HPNDFH9P4Z5KEKM3JZH78Z7T
-  - 01HPNDQ4D8BADN1GWD6EAWRK7B
-  - 01HPNDW5NNX2YBJW5B8X2YA2CR
-  - 01HGKYRDEFYMQF984BMKHSND79
+  - mt1a
+  - mt1b
+  - mt1c
+  - mt2b

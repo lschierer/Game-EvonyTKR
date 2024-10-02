@@ -1,13 +1,13 @@
-name: 01J0482FT3VJT4GSQN74F2FR9T
+name: mt3b
 members:
   - André Masséna
 others:
-  - 01HGKYREYA79MNMCQ2B6MBV3N0
-  - 01HGKYRFD3XP10X55VSXMBNPMB
-  - 01J401B7EQA0F7M7M3K4V6413T
-  - 01J400JZ72M5A3RKJ50DA604K7
-  - 01J400NM917X7CM5QBJ7423ZA9
-  - 01HGKYRN4Y9B5JHDXSPJ7CTDR5
+  - mt3
+  - mt3a
+  - mt3c
+  - mt4a
+  - mt9
+  - ms1
 books:
   - book:
       name: March Size Increase

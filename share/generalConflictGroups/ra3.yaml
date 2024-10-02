@@ -1,4 +1,4 @@
-name: 01HGKZACGC0AYAHS0Y64XGRNK8
+name: ra3
 members:
   - Antara
   - Harold III
@@ -7,11 +7,11 @@ members:
   - Minamoto no Yoshitsune
   - Subutai
 others:
-  - 01HES969S8E146GSF5ES358GWD
-  - 01HKVDKZTWXMEVWN2TEGJ5B3KE
-  - 01HKVDRS2MHZSAX58NQCZTTKEP
-  - 01HJV8VNDFA3HQ8TTPA0J8ZDA4
-  - 01HY61QCTFDT8VCY748BWEPZWM
+  - ra2
+  - ra2a
+  - ra2b
+  - ra3a
+  - ra3b
 books:
   - book:
       name: Ranged Attack Increase
