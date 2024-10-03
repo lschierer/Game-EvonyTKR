@@ -1,15 +1,15 @@
-name: 01HPNDFH9P4Z5KEKM3JZH78Z7T
+name: mt1a
 members:
   - George A. Custer
   - Barbarossa
 others:
-  - 01HNP2VSPGA7AWKN10M2ABCR3G
-  - 01HPNDQ4D8BADN1GWD6EAWRK7B
-  - 01HPNDW5NNX2YBJW5B8X2YA2CR
-  - 01J0482FT3VJT4GSQN74F2FR9T
-  - 01J400JZ72M5A3RKJ50DA604K7
-  - 01J400NM917X7CM5QBJ7423ZA9
-  - 01HGKYRN4Y9B5JHDXSPJ7CTDR5
+  - mt1
+  - mt1b
+  - mt1c
+  - mt3b
+  - mt4a
+  - mt9
+  - ms1
 books:
   - book:
       name: March Size Increase

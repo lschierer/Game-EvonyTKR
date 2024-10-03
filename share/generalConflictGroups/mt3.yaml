@@ -1,4 +1,4 @@
-name: 01HGKYREYA79MNMCQ2B6MBV3N0
+name: mt3
 members:
   - Laudon
   - Prince Eugene
@@ -8,9 +8,9 @@ members:
   - Robert Guiscard
   - Xiang Yu
 others:
-  - 01HGKYRFD3XP10X55VSXMBNPMB
-  - 01J0482FT3VJT4GSQN74F2FR9T
-  - 01J401B7EQA0F7M7M3K4V6413T
+  - mt3a
+  - mt3b
+  - mt3c
 books:
   - book:
       name: Mounted Attack Increase

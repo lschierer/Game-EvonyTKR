@@ -36,6 +36,9 @@ package Game::EvonyTKR::Web {
       $self->plugins->register_plugin('Mojolicious::Plugin::NotYAMLConfig',
       Mojolicious->new, { file => $confFile });
 
+    #log request parameters at least in development mode
+    $self->plugin('ParamLogger', level => 'info');
+
     my $wlog = Game::EvonyTKR::Web::Logger->new(category => 'Web',);
     $wlog->logInit($self->mode());
     $self->log($wlog->webLogger());
