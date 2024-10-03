@@ -1,9 +1,9 @@
-name: 01HGKZ108TB88BJG9YKKGJDJWF
+name: sg3a
 members:
   - Septimius Severus
 others:
-  - 01HHE55GYM266T9M3AN0VFSFZN
-  - 01HPAJVBGBGTR4JB8R728YHACN
+  - sg3
+  - sg3b
 books:
   - book:
       name: Siege Attack Increase

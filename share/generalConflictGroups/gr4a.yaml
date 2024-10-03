@@ -1,10 +1,10 @@
-name: 01HGMDZ3RKQCZ65ZNJFZT2GMK4
+name: gr4a
 members:
   - Robert the Bruce
 others:
-  - 01HGMDRGS3DCNQVMEHVN9GFG2P
-  - 01HP2TR3PTFK066SAASGKZ3QZP
-  - 01HP349Y2SBSFWNBE3NQSJQS25
+  - gr4
+  - gr4b
+  - gr5a
 books:
   - book:
       name: Ground HP Increase

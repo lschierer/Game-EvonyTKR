@@ -1,7 +1,6 @@
 use v5.40.0;
 use experimental qw(class);
-use FindBin;
-use lib "$FindBin::Bin/../../../../../lib";
+use File::FindLib 'lib';
 
 class Game::EvonyTKR::Web::Model::General : isa(Game::EvonyTKR::Web::Logger) {
   use Carp;
@@ -16,14 +15,12 @@ class Game::EvonyTKR::Web::Model::General : isa(Game::EvonyTKR::Web::Logger) {
   use Game::EvonyTKR::General::Mounted;
   use Game::EvonyTKR::General::Ranged;
   use Game::EvonyTKR::General::Siege;
-  use Game::EvonyTKR::Data;
   use X500::RDN;
   use YAML::XS qw{ LoadFile Load };
   use namespace::autoclean;
 # PODNAME: Game::EvonyTKR::Web::Model::General
 # VERSION
-  use FindBin;
-  use lib "$FindBin::Bin/../../../../../lib";
+  use File::FindLib 'lib';
 
   field $generals : reader;
 
