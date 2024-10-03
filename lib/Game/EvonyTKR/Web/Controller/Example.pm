@@ -1,6 +1,7 @@
 package Game::EvonyTKR::Web::Controller::Example;
+# ABSTRACT: to be replaced
 use Mojo::Base 'Mojolicious::Controller', -signatures;
-
+# VERSION
 # This action will render a template
 sub welcome ($self) {
 

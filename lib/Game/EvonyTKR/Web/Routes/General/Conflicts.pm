@@ -2,7 +2,7 @@ use v5.40.0;
 use experimental qw(class);
 use File::FindLib 'lib';
 
-package Game::EvonyTKR::Web::Routes::General {
+package Game::EvonyTKR::Web::Routes::Conflicts {
 # ABSTRACT: define /general routes
   use Mojo::Base 'Mojolicious::Plugin', -signatures;
 
@@ -10,22 +10,22 @@ package Game::EvonyTKR::Web::Routes::General {
 
     my $logger = $app->log;
 
-    my $generalRoutes = $r->any('/general')->to(
+    my $routes = $r->any('/conflicts')->to(
       namespace  => 'Game::EvonyTKR::Web::Controller',
-      controller => 'General',
+      controller => 'Conflicts',
     );
     
-    $generalRoutes->get('/' => [format => ['html','txt', 'json']])->to(
+    $routes->get('/' => [format => ['html','txt', 'json']])->to(
       format => 'html',
       action => 'index'
       );
 
-    $generalRoutes->get('/list' => [format => ['html','txt', 'json']])->to(
+    $routes->get('/list' => [format => ['html','txt', 'json']])->to(
       format => 'txt',
       action => 'list'
       );
 
-    $generalRoutes->get('/named/:id' => [format => ['html','txt', 'json']])->to(
+    $routes->get('/named/:id' => [format => ['html','txt', 'json']])->to(
       format => undef,
       action => 'generalById',
     );
