@@ -105,7 +105,7 @@ package Game::EvonyTKR::Web::Controller::General {
     }
   }
 
-  sub generalById {
+  sub GetGeneral {
     my ($self) = @_;
     $self->log()->trace("get in Controller::General");
 
