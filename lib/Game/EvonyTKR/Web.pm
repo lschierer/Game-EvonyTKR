@@ -23,6 +23,11 @@ package Game::EvonyTKR::Web {
   # This method will run once at server start
   sub startup ($self) {
 
+    my $home = Mojo::Home->new;
+    $home->detect;
+
+    say "$home";
+
     my $dist_dir = dist_dir('Game-EvonyTKR');
 
     my $confFile = File::Spec->catfile($dist_dir, 'game-evony_t_k_r-web.yml');
@@ -59,8 +64,11 @@ package Game::EvonyTKR::Web {
 
     # Normal route to controller
     $r->get('/')->to('Example#welcome');
-    $self->plugin('Game::EvonyTKR::Web::Routes::General', $r);
-
+    
+    $self->plugin("OpenAPI", {
+      url => dist_file('openapi.schema.json')->path(),
+    });
+    
     $self->log()->info('start up complete');
   }
 

@@ -18,6 +18,39 @@ class Game::EvonyTKR::Data
 # VERSION
   use File::FindLib 'lib';
 
+  field @buffAttributes :reader = (
+    "Attack",
+    "Attack Speed",
+    "Death to Survival",
+    "Death to Soul",
+    "Death to Wounded",
+    "Defense",
+    "Deserter Capacity",
+    "Double Items Drop Rate",
+    "HP",
+    "Healing Speed",
+    "Hospital Capacity",
+    "Leadership",
+    "Load",
+    "March Size Capacity",
+    "March Time",
+    "Marching Speed",
+    "Marching Speed to Monsters",
+    "MonstersAttack",
+    "Politics",
+    "Rally Capacity",
+    "Range",
+    "Resources Production",
+    "Stamina cost",
+    "SubCity Construction Speed",
+    "SubCity Gold Production",
+    "SubCity Training Speed",
+    "SubCity Troop Capacity",
+    "Training Capacity",
+    "Training Speed",
+    "Wounded to Death",
+  );
+  
   field @buffConditions : reader = (
     'Against Monsters',
     'Attacking',
