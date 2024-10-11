@@ -1,0 +1,36 @@
+---
+openapi: 3.1.0
+info:
+  version: '2024-10-03'
+  title: Evony TKR API
+  description: Allow users to obtain information on Generals, General Pairs, General Conflicts, General SkillBooks, General Specialities, and related information for Evony TKR.
+  contact:
+    name: Luke Schierer
+    url: https://github.com/lschiere
+servers:
+  - url: '/api/v1'
+    description: Version One API
+paths:
+  '/generals':
+    get:
+      summary: Get a list of Generals
+      tags:
+        - Generals
+        - List
+      operationId: list
+      x-mojo-name: list
+      x-mojo-to:
+        controller: General
+        action: list
+      responses:
+        '200':
+          description: General List Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  general_data:
+                    type: object
+                    items:
+                      type: object
