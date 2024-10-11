@@ -62,13 +62,19 @@ package Game::EvonyTKR::Web {
     #let me use the DefaultHelpers
     $self->plugin('DefaultHelpers');
 
+    $self->plugin("OpenAPI", {
+      url => $self->home()->rel_file('share/openapi.schema.yaml'),
+    });
+
+    $self->plugin(SwaggerUI => {
+      route => $self->routes()->any('api'),
+      url   => '/api/v1',
+      title => 'Evony TKR Tips API'
+    });
+
     # Normal route to controller
     $r->get('/')->to('Example#welcome');
-    
-    $self->plugin("OpenAPI", {
-      url => dist_file('openapi.schema.json')->path(),
-    });
-    
+
     $self->log()->info('start up complete');
   }
 
