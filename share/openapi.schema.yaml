@@ -1,12 +1,18 @@
 ---
 openapi: 3.1.0
 info:
-  version: '2024-10-03'
   title: Evony TKR API
-  description: Allow users to obtain information on Generals, General Pairs, General Conflicts, General SkillBooks, General Specialities, and related information for Evony TKR.
+  version: 3.1.0
+  description: |
+    Allow users to obtain information on Generals, General Pairs, General
+    Conflicts, General SkillBooks, General Specialities, and related information
+    for Evony TKR
   contact:
     name: Luke Schierer
-    url: https://github.com/lschiere
+    url: https://github.com/lschierer
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
 servers:
   - url: '/api/v1'
     description: Version One API
@@ -24,13 +30,276 @@ paths:
         action: list
       responses:
         '200':
-          description: General List Response
+          description: list 200 response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GeneralList'
+        '400':
+          description: list 400 response
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  general_data:
-                    type: object
-                    items:
-                      type: object
+                  message:
+                    type: string
+
+components:
+  schemas:
+    AscendingAttribute:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/Buff'
+      propertyNames:
+        $ref: '#/components/schemas/AscendingLevels'
+    AscendingLevels:
+      type: string
+      enum:
+        - None
+        - 1Purple
+        - 2Purple
+        - 3Purple
+        - 4Purple
+        - 5Purple
+        - 1Red
+        - 2Red
+        - 3Red
+        - 4Red
+        - 5Red
+    BasicAttributes:
+      type: object
+      properties:
+        attack:
+          type: number
+          format: float
+        attack_base:
+          type: number
+          format: float
+        attack_increment:
+          type: number
+          format: float
+        defense:
+          type: number
+          format: float
+        defense_base:
+          type: number
+          format: float
+        defense_increment:
+          type: number
+          format: float
+        leadership:
+          type: number
+          format: float
+        leadership_base:
+          type: number
+          format: float
+        leadership_increment:
+          type: number
+          format: float
+        politics:
+          type: number
+          format: float
+        politics_base:
+          type: number
+          format: float
+        politics_increment:
+          type: number
+          format: float
+      required:
+        - attack
+        - defense
+        - leadership
+        - politics
+    Book:
+      type: object
+      properties:
+        buffs:
+          type: array
+          items:
+            $ref: '#/components/schemas/Buff'
+        name:
+          type: string
+        level:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 4
+      required:
+        - name
+        - buffs
+    Buff:
+      type: object
+      properties:
+        marchSizeIncrease:
+          type: number
+          format: float
+        attackIncrease:
+          type: number
+          format: float
+        DefenseIncreae:
+          type: number
+          format: float
+        HPIncrease:
+          type: number
+          format: float
+        GroundAttackDebuff:
+          type: number
+          format: float
+        RangedAttackDebuff:
+          type: number
+          format: float
+        MountedAttakDebuff:
+          type: number
+          format: float
+        SiegeAttackDebuff:
+          type: number
+          format: float
+        OverallAttackDebuff:
+          type: number
+          format: float
+        GroundToughnessDebuff:
+          type: number
+          format: float
+        RangedToughnessDebuff:
+          type: number
+          format: float
+        MountedToughnessDebuff:
+          type: number
+          format: float
+        SiegeToughnessDebuff:
+          type: number
+          format: float
+        OverallToughnessDebuff:
+          type: number
+          format: float
+    General:
+      type: object
+      description: Models a General in Evony TKR
+      properties:
+        name:
+          type: string
+          pattern: ^([^0-9]+)$
+        level:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 45
+        hasCovenant:
+          type: boolean
+        type:
+          $ref: '#/components/schemas/GeneralKeys'
+        basicAttributes:
+          $ref: '#/components/schemas/BasicAttributes'
+        ascending:
+          type: boolean
+        builtInBook:
+          type: string
+        otherBooks:
+          type: array
+          items:
+            type: string
+        Specialities:
+          type: array
+          minItems: 3
+          maxItems: 5
+          items:
+            type: string
+        EvAnsScores:
+          $ref: '#/components/schemas/EvAnsScores'
+        componentScores:
+          $ref: '#/components/schemas/ComponentScores'
+      required:
+        - name
+    GeneralList:
+      type: array
+      items:
+        $ref: '#/components/schemas/General'
+    GeneralKeys:
+      type: string
+      enum:
+        - Ground Troops
+        - Mayor
+        - Mounted Troops
+        - Officer
+        - Ranged Troops
+        - Siege Machines
+        - Wall
+    EvAnsScores:
+      type: object
+      properties:
+        AttackingAsPrimary:
+          type: number
+          format: float
+        AttackingAsSecondary:
+          type: number
+          format: float
+        MonsterAsPrimary:
+          type: number
+          format: float
+        MonsterAsSecondary:
+          type: number
+          format: float
+    ComponentScores:
+      type: object
+      properties:
+        AttackingPrimary:
+          $ref: '#/components/schemas/SituationBuffs'
+        ReinforcingPrimary:
+          $ref: '#/components/schemas/SituationBuffs'
+        AttackingSecondary:
+          $ref: '#/components/schemas/SituationBuffs'
+        ReinforcingSecondary:
+          $ref: '#/components/schemas/SituationBuffs'
+    SituationBuffs:
+      type: object
+      properties:
+        BasicAttributeTotal:
+          $ref: '#/components/schemas/Buff'
+        BuiltinBook:
+          $ref: '#/components/schemas/Buff'
+        CivilizationCovenant:
+          $ref: '#/components/schemas/Buff'
+        CooperationCovenant:
+          $ref: '#/components/schemas/Buff'
+        FaithCovenant:
+          $ref: '#/components/schemas/Buff'
+        HonorCovenant:
+          $ref: '#/components/schemas/Buff'
+        PeaceCovenant:
+          $ref: '#/components/schemas/Buff'
+        WarCovenant:
+          $ref: '#/components/schemas/Buff'
+        Speciality1:
+          $ref: '#/components/schemas/Buff'
+        Speciality2:
+          $ref: '#/components/schemas/Buff'
+        Speciality3:
+          $ref: '#/components/schemas/Buff'
+        Speciality4:
+          $ref: '#/components/schemas/Buff'
+        Speciality5:
+          $ref: '#/components/schemas/Buff'
+        Ascending:
+          $ref: '#/components/schemas/Buff'
+        OtherBooks:
+          $ref: '#/components/schemas/Buff'
+      required:
+        - BuiltinBook
+    Speciality:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/Buff'
+      propertyNames:
+        $ref: '#/components/schemas/SpecialityLevels'
+    SpecialityLevels:
+      type: string
+      enum:
+        - None
+        - Green
+        - Blue
+        - Purple
+        - Orange
+        - Gold
