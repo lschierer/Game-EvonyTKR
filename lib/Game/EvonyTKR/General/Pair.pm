@@ -12,7 +12,7 @@ class Game::EvonyTKR::General::Pair {
   use Game::EvonyTKR::General;
   use namespace::autoclean;
   # PODNAME: Game::EvonyTKR::General::Pair
-  # ABSTRACT: Manage Game::EvonyTKR::Generals as Pairs
+  # ABSTRACT: Manage Game::EvonyTKR::General instances as Pairs
   use overload
     'eq' => \&_equality,
     '==' => \&_equality,

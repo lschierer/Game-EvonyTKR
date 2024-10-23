@@ -2,7 +2,7 @@ use v5.40.0;
 use experimental qw(class);
 use File::FindLib 'lib';
 
-class Game::EvonyTKR::Web::Model::General : isa(Game::EvonyTKR::Web::Logger) {
+class Game::EvonyTKR::Web::Model::Generals : isa(Game::EvonyTKR::Web::Logger) {
   use Carp;
   use Data::Printer;
   use Devel::Peek;

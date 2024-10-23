@@ -2,7 +2,7 @@ use v5.40.0;
 use experimental qw(class);
 use File::FindLib 'lib';
 
-package Game::EvonyTKR::Web::Controller::General::Conflicts { 
+package Game::EvonyTKR::Web::Controller::General::Conflicts {
   use Carp;
   use Data::Printer;
   use Devel::Peek;
@@ -11,7 +11,7 @@ package Game::EvonyTKR::Web::Controller::General::Conflicts {
   use Util::Any ':all';
   use Game::EvonyTKR::Data;
   use Game::EvonyTKR::General;
-  use Game::EvonyTKR::Web::Model::General::Conflicts;
+  use Game::EvonyTKR::Web::Model::Generals::Conflicts;
   use HTML::FromANSI;
   use namespace::autoclean;
 # VERSION

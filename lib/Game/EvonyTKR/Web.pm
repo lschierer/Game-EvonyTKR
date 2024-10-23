@@ -9,6 +9,8 @@ use namespace::autoclean;
 
 package Game::EvonyTKR::Web {
 # ABSTRACT: package providing REST wrappers for the content created by this distribution
+
+  use feature 'try';
   use Carp;
   use Mojo::Base 'Mojolicious', -signatures;
   use Mojolicious::Routes::Route;
@@ -17,6 +19,9 @@ package Game::EvonyTKR::Web {
   use File::FindLib 'lib';
   use Game::EvonyTKR::Web::Logger;
   use Game::EvonyTKR::Logger::Config;
+  use OpenAPI::Modern;
+  use JSON::Schema::Modern;
+  use YAML::XS qw{ LoadFile Load };
 
   my $logLevel = 'INFO';
 
@@ -62,20 +67,30 @@ package Game::EvonyTKR::Web {
     #let me use the DefaultHelpers
     $self->plugin('DefaultHelpers');
 
-    $self->plugin("OpenAPI", {
-      url => $self->home()->rel_file('share/openapi.schema.yaml'),
+    $self->config({
+      openapi => {
+        document_filename   => File::Spec->catfile($dist_dir, "openapi.schema.yaml"),
+        after_response      => \&log_responses,
+      }
     });
 
-    $self->plugin(SwaggerUI => {
-      route => $self->routes()->any('api'),
-      url   => '/api/v1',
-      title => 'Evony TKR Tips API'
-    });
+    $self->plugin('OpenAPI::Modern', $self->config->{openapi});
 
+    $self->plugin('Game::EvonyTKR::Web::Routes::Generals', $r);
     # Normal route to controller
     $r->get('/')->to('Example#welcome');
 
     $self->log()->info('start up complete');
+  }
+
+  sub log_responses($controller) {
+    my $result = $controller->validate_response();
+    if($result) {
+      $controller->log()->debug("response is valid");
+    }
+    else {
+      $controller->log()->error("response is invalid", $result)
+    }
   }
 
 }
