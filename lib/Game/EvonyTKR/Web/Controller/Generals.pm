@@ -2,7 +2,7 @@ use v5.40.0;
 use experimental qw(class);
 use File::FindLib 'lib';
 
-package Game::EvonyTKR::Web::Controller::General {
+package Game::EvonyTKR::Web::Controller::Generals {
   use Carp;
   use Data::Printer;
   use Devel::Peek;
@@ -11,16 +11,15 @@ package Game::EvonyTKR::Web::Controller::General {
   use Util::Any ':all';
   use Game::EvonyTKR::Data;
   use Game::EvonyTKR::General;
-  use Game::EvonyTKR::Web::Model::General;
+  use Game::EvonyTKR::Web::Model::Generals;
   use HTML::FromANSI;
   use namespace::autoclean;
-
+  use Mojo::Base 'Mojolicious::Controller', -strict, -signatures;
 # VERSION
   use File::FindLib 'lib';
-  use Mojo::Base 'Mojolicious::Controller', -strict, -signatures;
   use Mojo::JSON qw(decode_json encode_json);
 
-  my $generalModel = Game::EvonyTKR::Web::Model::General->new();
+  my $generalModel = Game::EvonyTKR::Web::Model::Generals->new();
 
   my $EvonyData = Game::EvonyTKR::Data->new();
 
@@ -114,7 +113,7 @@ package Game::EvonyTKR::Web::Controller::General {
 
     if (not defined $generalModel) {
       #this should be unnecessary and never actually be reached.
-      $generalModel = Game::EvonyTKR::Web::Model::General->new();
+      $generalModel = Game::EvonyTKR::Web::Model::Generals->new();
     }
     my $general = $generalModel->get_by_id($id);
 

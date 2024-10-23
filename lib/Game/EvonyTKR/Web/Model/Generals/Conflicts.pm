@@ -2,7 +2,7 @@ use v5.40.0;
 use experimental qw(class);
 use File::FindLib 'lib';
 
-class Game::EvonyTKR::Web::Model::General::Conflicts : isa(Game::EvonyTKR::Web::Logger) {
+class Game::EvonyTKR::Web::Model::Generals::Conflicts : isa(Game::EvonyTKR::Web::Logger) {
   use Carp;
   use Data::Printer;
   use Devel::Peek;
@@ -12,12 +12,12 @@ class Game::EvonyTKR::Web::Model::General::Conflicts : isa(Game::EvonyTKR::Web::
   use Util::Any ':all';
   use Game::EvonyTKR::Data;
   use Game::EvonyTKR::General;
-  use Game::EvonyTKR::Web::Model::General;
+  use Game::EvonyTKR::Web::Model::Generals;
   use UUID     qw(uuid5);
   use X500::DN;
   use YAML::XS qw{ LoadFile Load };
   use namespace::autoclean;
-# PODNAME: Game::EvonyTKR::Web::Model::General::Conflicts
+# PODNAME: Game::EvonyTKR::Web::Model::Generals::Conflicts
 # VERSION
   use File::FindLib 'lib';
 
@@ -25,7 +25,7 @@ class Game::EvonyTKR::Web::Model::General::Conflicts : isa(Game::EvonyTKR::Web::
 
   field $EvonyData = Game::EvonyTKR::Data->new();
 
-  field $generalModel = Game::EvonyTKR::Web::Model::General->new();
+  field $generalModel = Game::EvonyTKR::Web::Model::Generals->new();
 
   method init() {
     my $yp = YAML::PP::LibYAML->new();
@@ -36,7 +36,7 @@ class Game::EvonyTKR::Web::Model::General::Conflicts : isa(Game::EvonyTKR::Web::
       $self->logger()->trace("start of $file");
 
       my $cgData = $yp->load_file($file);
-      
+
       my $name;
       my $filename = basename($file, qr/\.[^.]*/);
       if( $filename eq $cgData->{'name'}){
@@ -79,7 +79,7 @@ class Game::EvonyTKR::Web::Model::General::Conflicts : isa(Game::EvonyTKR::Web::
         Data::Printer::np $cgData->{'books'},
         Data::Printer::np @books,));
 
-      #todo: similar for loop to add in skill books, once I have a model for them. 
+      #todo: similar for loop to add in skill books, once I have a model for them.
       # except like others below, books might not exist so check the size of the scalar
 
       my @others = $cgData->{'others'};
@@ -93,7 +93,7 @@ class Game::EvonyTKR::Web::Model::General::Conflicts : isa(Game::EvonyTKR::Web::
           if(defined $entry) {
             # add both sides of the relationship since I cannot be sure that
             # the other will exist at all when the first is read in
-            # the add function ensures no duplicates. 
+            # the add function ensures no duplicates.
             $entry->add_related_conflict($cg);
             $cg->add_related_conflict($entry);
           }
@@ -101,7 +101,7 @@ class Game::EvonyTKR::Web::Model::General::Conflicts : isa(Game::EvonyTKR::Web::
       }
       push @$conflcits, $cg;
     }
-  }  
+  }
 
 }
 1;
@@ -109,4 +109,3 @@ class Game::EvonyTKR::Web::Model::General::Conflicts : isa(Game::EvonyTKR::Web::
 __END__
 
 # ABSTRACT: Representation of the set of conflicts between one general and other items within Evony
-
