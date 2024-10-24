@@ -109,7 +109,7 @@ package Game::EvonyTKR::Web::Controller::Generals {
     $self->log()->trace("get in Controller::General");
 
     my $id = $self->param('id');
-    $self->log()->trace("looking for $id in generalById");
+    $self->log()->trace("looking for $id in GetGeneral");
 
     if (not defined $generalModel) {
       #this should be unnecessary and never actually be reached.
