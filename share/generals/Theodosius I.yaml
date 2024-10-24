@@ -11,8 +11,8 @@ general:
   politics: 106
   politics_increment: 8.08
   stars: '5Red'
-  score_as:
-   - Siege
+  type:
+   - siege_specialist
   book: Theodosius the Great
   specialities:
     - Siege Machine Formation

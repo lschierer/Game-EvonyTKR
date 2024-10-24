@@ -10,8 +10,8 @@ general:
   politics: 101
   politics_increment: 7.78
   stars: '5Red'
-  score_as:
-   - Mounted
+  type:
+   - mounted_specialist
   book: Ride the Waves
   specialities:
     - Mounted Troop Formation

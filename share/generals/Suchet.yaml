@@ -12,8 +12,8 @@ general:
   politics_increment: 8.61
   stars: '5Red'
   level: '1'
-  score_as:
-   - Ground
+  type:
+   - ground_specialist
   book: Duke of Albufera
   specialities:
     - Ground Troop Assault

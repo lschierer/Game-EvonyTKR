@@ -2,8 +2,8 @@
 general:
   name: Washington Prime
   display: summary
-  score_as:
-   - Mounted
+  type:
+   - mounted_specialist
   attack: 128
   attack_increment: 9.02
   leadership: 126

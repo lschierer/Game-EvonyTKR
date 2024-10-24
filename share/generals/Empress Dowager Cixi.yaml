@@ -12,8 +12,7 @@ general:
   politics_increment: 7.89
   stars: '5Red'
   level: '1'
-  score_as:
-   - Mayor
+  type: mayor
   book: Curses
   specialities:
     - Mounted Troop Defense

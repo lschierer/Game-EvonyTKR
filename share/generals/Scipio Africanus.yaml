@@ -12,8 +12,8 @@ general:
   politics_increment: 8.75
   stars: '5Red'
   level: '1'
-  score_as:
-   - Ground
+  type:
+   - ground_specialist
   book: Conqueror
   specialities:
     - Ground Troop Assault

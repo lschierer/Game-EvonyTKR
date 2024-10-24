@@ -12,8 +12,7 @@ general:
   politics_increment: 9.15
   stars: '5Red'
   level: '1'
-  score_as:
-   - Mayor
+  type: mayor
   book: Roman Emperor
   specialities:
     - Mounted Troop Formation

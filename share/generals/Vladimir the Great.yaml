@@ -12,8 +12,8 @@ general:
   politics_increment: 9.04
   stars: '5Red'
   level: '45'
-  score_as:
-   - Archers
+  type:
+   - ranged_specialist
   book: Dignity of Grand Prince
   specialities:
     - Ranged Troop Assault

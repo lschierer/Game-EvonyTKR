@@ -11,8 +11,8 @@ general:
   politics: 113
   politics_increment: 8.25
   stars: '5Red'
-  score_as:
-   - Ground
+  type:
+   - ground_specialist
   book: Athenian Phalanx
   specialities:
     - Ground Troop Defense

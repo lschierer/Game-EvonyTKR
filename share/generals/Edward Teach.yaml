@@ -2,8 +2,8 @@
 general:
   name: Edward Teach
   display: summary
-  score_as:
-   - Siege
+  type:
+   - siege_specialist
   level: '1'
   stars: '5Red'
   leadership: 117
