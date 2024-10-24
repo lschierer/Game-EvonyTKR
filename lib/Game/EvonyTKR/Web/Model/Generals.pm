@@ -77,7 +77,7 @@ class Game::EvonyTKR::Web::Model::Generals : isa(Game::EvonyTKR::Web::Logger) {
     delete $generals->${ $rg->generalType() }->{ $rg->name() };
   }
 
-  method get_by_id($name, $type = undef) {
+  method get_by_name($name, $type = undef) {
     if (exists $generals->{$name}) {
       $self->logger()->trace(sprintf(
         'looking for cached general %s with type %s',
@@ -114,7 +114,7 @@ class Game::EvonyTKR::Web::Model::Generals : isa(Game::EvonyTKR::Web::Logger) {
       if (-T -s -r $FileWithPath) {
         $self->logger()->trace("found $name.yaml in get_by_id");
         if ($self->readFromFile($name)) {
-          return $self->get_by_id($name);
+          return $self->get_by_name($name);
         }
       }
     }
