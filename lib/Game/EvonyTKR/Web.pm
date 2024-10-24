@@ -73,7 +73,7 @@ package Game::EvonyTKR::Web {
     $self->plugin('DefaultHelpers');
 
     my $OpenAPISchemaFilename = File::Spec->catfile($dist_dir, "openapi.schema.yaml");
-    my $OpenAPISchema = get_openapi($OpenAPISchemaFilename);
+    #my $OpenAPISchema = get_openapi($OpenAPISchemaFilename);
     $self->config({
       openapi => {
         document_filename   => $OpenAPISchemaFilename,
@@ -81,7 +81,7 @@ package Game::EvonyTKR::Web {
       }
     });
 
-    $self->plugin('OpenAPI::Modern', $self->config->{openapi});
+    #$self->plugin('OpenAPI::Modern', $self->config->{openapi});
 
     $self->plugin('Game::EvonyTKR::Web::Routes::Generals', $r);
     # Normal route to controller
