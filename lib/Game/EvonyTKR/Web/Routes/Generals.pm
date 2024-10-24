@@ -26,14 +26,15 @@ package Game::EvonyTKR::Web::Routes::Generals {
       );
 
     my $namedID = $generalRoutes->under('/named/'  => sub ($c) {
-      $c->log()->trace(`in generalRoutes namedID under clause`);
-      my $result = $c->openapi->validate_request($c->req);
+      $logger->trace('in generalRoutes namedID under clause');
+      my $result = true; #$c->openapi->validate_request($c->req);
       if(!$result) {
-        $c->log()->warn('invalid request recieved',);
+        $logger->warn('invalid request recieved',);
         $c->respond_to(
           any => { data  => 'Invalid Request', status => 404 }
         );
       }
+      return 1;
     });
 
     $namedID->get('/:name' => [format => ['html','txt', 'json']])->to(

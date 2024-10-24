@@ -5,6 +5,7 @@ use utf8::all;
 use YAML::XS qw{ LoadFile Load };
 use OpenAPI::Modern;
 use File::Share qw(dist_dir dist_file);
+use Data::Printer;
 
 my $OpenAPISchemaCache;
 my $dist_dir = dist_dir('Game-EvonyTKR');
@@ -22,9 +23,12 @@ sub get_openapi ($openapi_filename) {
     my $openapi_file = Path::Tiny::path($openapi_filename);
     my $openapi;
     if ($newTemp or $serialized_file->stat->mtime < $openapi_file->stat->mtime) {
+      my $loadedFile = LoadFile($openapi_file);
+      say Data::Printer::p($loadedFile);
+
       $openapi = OpenAPI::Modern->new(
         openapi_uri => '/',
-        openapi_schema => Load($openapi_file->slurp_raw), # your openapi document
+        openapi_schema => $loadedFile, # your openapi document
       );
       my $frozen = Sereal::Encoder->new({ freeze_callbacks => 1 })->encode($openapi);
       $serialized_file->spew_raw($frozen);
