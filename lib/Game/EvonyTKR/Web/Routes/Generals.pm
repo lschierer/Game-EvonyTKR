@@ -10,7 +10,7 @@ package Game::EvonyTKR::Web::Routes::Generals {
 
     my $logger = $app->log;
 
-    my $generalRoutes = $r->any('/general')->to(
+    my $generalRoutes = $r->any('/generals')->to(
       namespace  => 'Game::EvonyTKR::Web::Controller',
       controller => 'Generals',
     );
@@ -26,15 +26,17 @@ package Game::EvonyTKR::Web::Routes::Generals {
       );
 
     my $namedID = $generalRoutes->under('/named/'  => sub ($c) {
+      $c->log()->trace(`in generalRoutes namedID under clause`);
       my $result = $c->openapi->validate_request($c->req);
       if(!$result) {
+        $c->log()->warn('invalid request recieved',);
         $c->respond_to(
           any => { data  => 'Invalid Request', status => 404 }
         );
       }
     });
 
-    $namedID->get('/:id' => [format => ['html','txt', 'json']])->to(
+    $namedID->get('/:name' => [format => ['html','txt', 'json']])->to(
       format => undef,
       action => 'GetGeneral',
     );

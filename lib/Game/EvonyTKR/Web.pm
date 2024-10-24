@@ -84,13 +84,13 @@ package Game::EvonyTKR::Web {
   }
 
   sub log_responses($controller) {
-    my $result = $controller->validate_response();
-    if($result) {
-      $controller->log()->debug("response is valid");
-    }
-    else {
-      $controller->log()->error("response is invalid", $result)
-    }
+    #my $result = $controller->validate_response();
+    #if($result) {
+    #  $controller->log()->debug("response is valid");
+    #}
+    #else {
+    #  $controller->log()->error("response is invalid", $result)
+    #}
   }
 
 }

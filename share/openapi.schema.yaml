@@ -1,228 +1,326 @@
 openapi: 3.1.0
 info:
-  description: >
-    Allow users to obtain information on Generals, General Pairs, General
-    Conflicts, General SkillBooks, General Specialities, and related 
-    information for Evony TKR
-  title: Evony TKR API
   version: 0.0.2
+  title: Evony TKR API
+  description: |
+    Allow users to obtain information on Generals, General Pairs, General Conflicts, General SkillBooks, General Specialities, and related  information for Evony TKR
+paths:
+  /generals:
+    get:
+      tags:
+        - generals
+      summary: Get all Generals
+      description: |
+        a summary listing of all available generals
+      operationId: getAllGenerals
+      responses:
+        '200':
+          description: OK - Successful request with response body
+          content:
+            application/json:
+              schema:
+                type: object
+                title: GetAllGeneralsOk
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/GeneralSummary'
+                required:
+                  - data
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerErrror'
+  '/generals/named/{name}':
+    get:
+      tags:
+        - generals
+      summary: Get a General by Name
+      description: 'Returns the general with the matching name. '
+      operationId: getAGeneralByName
+      parameters:
+        - name: verbose
+          in: query
+          description: return verbose results
+          required: false
+          allowReserved: false
+          style: form
+          explode: true
+          schema:
+            type: boolean
+        - name: level
+          in: query
+          description: set the level of the general you want information about
+          required: false
+          allowReserved: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+        - $ref: '#/components/parameters/name'
+        - $ref: '#/components/parameters/name'
+      responses:
+        '200':
+          description: OK - Successful request with response body
+          content:
+            application/json:
+              schema:
+                type: object
+                title: GetAGeneralByNameOk
+                properties:
+                  data:
+                    $ref: '#/components/schemas/General'
+                required:
+                  - data
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerErrror'
+tags:
+  - name: generals
+    description: |
+      items dealing with generals
 components:
   parameters:
     name:
-      in: path
       name: name
+      in: path
+      description: |
+        the name of the General
       required: true
       schema:
         type: string
   responses:
     BadRequest:
+      description: The server could not understand the request due to invalid syntax. The client should modify the request and try again.
       content:
         application/json:
           schema:
+            type: object
             properties:
               errors:
+                type: array
                 items:
+                  type: object
                   properties:
                     message:
                       type: string
                   required:
                     - message
-                  type: object
-                type: array
               message:
                 type: string
             required:
               - message
-            type: object
-      description: The server could not understand the request due to invalid syntax. The client should modify the request and try again.
     InternalServerErrror:
+      description: The server encountered an unexpected condition that prevented it from fulfilling the request. Report the issue to the support team if it persists.
       content:
         application/json:
           schema:
+            type: object
             properties:
               message:
                 type: string
             required:
               - message
-            type: object
-      description: The server encountered an unexpected condition that prevented it from fulfilling the request. Report the issue to the support team if it persists.
     NoContent:
+      description: 'The request was successful, but there is no content to return in the response.'
       content:
         application/json:
           schema:
             type: 'null'
-      description: The request was successful, but there is no content to return in the response.
     NotFound:
+      description: The server cannot find the requested resource. The endpoint may be invalid or the resource may no longer exist.
       content:
         application/json:
           schema:
+            type: object
             properties:
               message:
                 type: string
             required:
               - message
-            type: object
-      description: The server cannot find the requested resource. The endpoint may be invalid or the resource may no longer exist.
   schemas:
+    GeneralSummary:
+      type: object
+      description: The minimal information necessary to find a General
+      properties:
+        name:
+          type: string
+        type:
+          oneOf:
+            - $ref: '#/components/schemas/GeneralEvaluationTypes'
+            - type: array
+              items:
+                $ref: '#/components/schemas/GeneralEvaluationTypes'
+      x-fiddle-dto-info:
+        baseSchemaName: General
+    GeneralEvaluationTypes:
+      type: string
+      enum:
+        - Ground_Specialist
+        - Ranged_Specialist
+        - Mounted_Specialist
+        - Siege_Specialist
+        - Mayor
+        - Wall_General
+        - Officer
+    General:
+      type: object
+      properties:
+        ascending:
+          oneOf:
+            - type: boolean
+            - $ref: '#/components/schemas/Ascending'
+            - $ref: '#/components/schemas/AscendingSummary'
+        basicAttributes:
+          oneOf:
+            - $ref: '#/components/schemas/BasicAttributes'
+            - $ref: '#/components/schemas/BasicAttributesSummary'
+        builtInBook:
+          oneOf:
+            - type: string
+            - $ref: '#/components/schemas/BuiltinBook'
+        level:
+          type: integer
+          minimum: 1
+          maximum: 45
+        name:
+          type: string
+        otherBooks:
+          oneOf:
+            - type: array
+              items:
+                type: string
+            - type: array
+              items:
+                $ref: '#/components/schemas/StandardBook'
+        skin:
+          oneOf:
+            - type: string
+            - $ref: '#/components/schemas/Skin'
+        specialities:
+          oneOf:
+            - type: array
+              items:
+                type: string
+            - type: array
+              items:
+                $ref: '#/components/schemas/Speciality'
+            - type: array
+              items:
+                $ref: '#/components/schemas/SpecialityEffect'
+        type:
+          oneOf:
+            - $ref: '#/components/schemas/GeneralEvaluationTypes'
+            - type: array
+              items:
+                $ref: '#/components/schemas/GeneralEvaluationTypes'
+      required:
+        - ascending
+        - basicAttributes
+        - builtInBook
+        - level
+        - name
+        - specialities
+        - type
     Ascending:
+      type: object
       description: The overall effeects of Ascending a General
       properties:
         activeLevel:
           $ref: '#/components/schemas/AscendingLevelNames'
         levels:
+          type: array
           items:
             $ref: '#/components/schemas/AscendingLevel'
-          type: array
       required:
         - levels
-      type: object
-    AscendingLevel:
-      description: The effect of one star of ascending
-      properties:
-        buffs:
-          items:
-            $ref: '#/components/schemas/Buff'
-          type: array
-        level:
-          $ref: '#/components/schemas/AscendingLevelNames'
-      required:
-        - level
-        - buffs
-      type: object
     AscendingLevelNames:
-      description: >
+      description: |
         A general Ascends as either a Red or a Purple General but not both.
       oneOf:
         - $ref: '#/components/schemas/RedGeneralAscendingLevels'
         - $ref: '#/components/schemas/PurpleGeneralAscendingLevels'
-    AscendingSummary:
-      description: >
-        The buffs provided foor a general ascended at a particualr
-        number of stars.
+    RedGeneralAscendingLevels:
+      type: string
+      enum:
+        - None
+        - 1Red
+        - 2Red
+        - 3Red
+        - 4Red
+        - 5Red
+      description: AscendingLevels for Red Generals
+      default: None
+    PurpleGeneralAscendingLevels:
+      type: string
+      enum:
+        - None
+        - 1Purple
+        - 2Purple
+        - 3Purple
+        - 4Purple
+        - 5Purple
+      description: Ascending Levels for Purple Generals
+      default: None
+    AscendingLevel:
+      type: object
+      description: The effect of one star of ascending
       properties:
-        activeLevel:
-          $ref: '#/components/schemas/AscendingLevelNames'
         buffs:
+          type: array
           items:
             $ref: '#/components/schemas/Buff'
-          type: array
+        level:
+          $ref: '#/components/schemas/AscendingLevelNames'
       required:
-        - activeLevel
         - buffs
-      type: object
-      x-fiddle-dto-info:
-        baseSchemaName: Ascending
-    BasicAttributes:
-      description: ''
-      properties:
-        Attack:
-          $ref: '#/components/schemas/BasicAttributesObject'
-        Defense:
-          $ref: '#/components/schemas/BasicAttributesObject'
-        Leadership:
-          $ref: '#/components/schemas/BasicAttributesObject'
-        Politics:
-          $ref: '#/components/schemas/BasicAttributesObject'
-      required:
-        - Attack
-        - Defense
-        - Leadership
-        - Politics
-      type: object
-    BasicAttributesObject:
-      description: ''
-      properties:
-        Base:
-          format: float
-          minimum: 0
-          type: number
-        Increment:
-          format: float
-          minimum: 0
-          type: number
-        Total:
-          format: float
-          minimum: 0
-          type: number
-      required:
-        - Base
-        - Increment
-        - Total
-      type: object
-    BasicAttributesObjectSummary:
-      description: A simplified representation of a BasicAttributesObject, typically used in list views.
-      properties:
-        Base:
-          type: number
-        Increment:
-          type: number
-        Total:
-          type: number
-      type: object
-      x-fiddle-dto-info:
-        baseSchemaName: BasicAttributesObject
-    BasicAttributesSummary:
-      description: 'A summary of the values that the basic attributes have at a particular level, after they have been computed for that level. '
-      properties:
-        Attack:
-          $ref: '#/components/schemas/BasicAttributesObjectSummary'
-        Defense:
-          $ref: '#/components/schemas/BasicAttributesObjectSummary'
-        Leadership:
-          $ref: '#/components/schemas/BasicAttributesObjectSummary'
-        Politics:
-          $ref: '#/components/schemas/BasicAttributesObjectSummary'
-      required:
-        - Attack
-        - Defense
-        - Leadership
-        - Politics
-      type: object
-      x-fiddle-dto-info:
-        baseSchemaName: BasicAttributes
+        - level
     Buff:
-      description: ''
+      type: object
       properties:
         attribute:
           oneOf:
             - $ref: '#/components/schemas/BuffAttributes'
-            - items:
+            - type: array
+              items:
                 $ref: '#/components/schemas/BuffAttributes'
-              type: array
         conditions:
           oneOf:
             - $ref: '#/components/schemas/Condition'
-            - items:
+            - type: array
+              items:
                 $ref: '#/components/schemas/Condition'
-              type: array
         passive:
-          default: null
           type: boolean
+          default: false
         value:
+          type: object
           properties:
             number:
+              type: number
               format: float
               minimum: 0
-              type: number
             unit:
-              default: percentage
-              description: ''
+              type: string
               enum:
                 - flat
                 - percentage
-              type: string
+              default: percentage
           required:
-            - unit
             - number
-          type: object
+            - unit
       required:
         - attribute
         - value
-      type: object
     BuffAttributes:
-      description: ''
       oneOf:
-        - description: The many possible attributes that can be buffed
+        - type: string
           enum:
             - Attack
             - Attack_Speed
@@ -253,9 +351,20 @@ components:
             - Training_Capacity
             - Training_Speed
             - Wounded_to_Death
-          type: string
+          description: The many possible attributes that can be buffed
+    Condition:
+      description: 'A condition is essentially an adverb for a Buff object. '
+      oneOf:
+        - anyOf:
+            - $ref: '#/components/schemas/BuffCondition'
+            - $ref: '#/components/schemas/DebuffConditions'
+        - type: array
+          items:
+            anyOf:
+              - $ref: '#/components/schemas/BuffCondition'
+              - $ref: '#/components/schemas/DebuffConditions'
     BuffCondition:
-      description: Some Buffs apply only conditionally
+      type: string
       enum:
         - Against_Monsters
         - Attacking
@@ -276,33 +385,9 @@ components:
         - Brings_a_Dragon_or_Spirital_Beast
         - Brings_a_Dragon_or_Spritial_Beast_to_the_Attack
         - Leading_the_Army_to_Attack
-      type: string
-    BuiltinBook:
-      description: 'A General''s Builtin Book '
-      properties:
-        buffs:
-          items:
-            $ref: '#/components/schemas/Buff'
-          type: array
-        name:
-          type: string
-      required:
-        - name
-        - buffs
-      type: object
-    Condition:
-      description: 'A condition is essentially an adverb for a Buff object. '
-      oneOf:
-        - anyOf:
-            - $ref: '#/components/schemas/BuffCondition'
-            - $ref: '#/components/schemas/DebuffConditions'
-        - items:
-            anyOf:
-              - $ref: '#/components/schemas/BuffCondition'
-              - $ref: '#/components/schemas/DebuffConditions'
-          type: array
+      description: Some Buffs apply only conditionally
     DebuffConditions:
-      description: Some Buffs are in fact Debuffs
+      type: string
       enum:
         - Enemy
         - Enemy_in_City
@@ -311,178 +396,153 @@ components:
         - Reduces_Enemy_with_a_Dragon
         - Reduces_Enemy_with_a_Dragon_or_Spiritual_Beast
         - Reduces
-      type: string
-    General:
-      description: ''
+      description: Some Buffs are in fact Debuffs
+    AscendingSummary:
+      type: object
+      description: |
+        The buffs provided foor a general ascended at a particualr number of stars.
       properties:
-        ascending:
-          oneOf:
-            - type: boolean
-            - $ref: '#/components/schemas/Ascending'
-            - $ref: '#/components/schemas/AscendingSummary'
-        basicAttributes:
-          oneOf:
-            - $ref: '#/components/schemas/BasicAttributes'
-            - $ref: '#/components/schemas/BasicAttributesSummary'
-        builtInBook:
-          oneOf:
-            - type: string
-            - $ref: '#/components/schemas/BuiltinBook'
-        level:
-          maximum: 45
-          minimum: 1
-          type: integer
-        name:
-          type: string
-        otherBooks:
-          oneOf:
-            - items:
-                type: string
-              type: array
-            - items:
-                $ref: '#/components/schemas/StandardBook'
-              type: array
-        skin:
-          oneOf:
-            - type: string
-            - $ref: '#/components/schemas/Skin'
-        specialities:
-          oneOf:
-            - items:
-                type: string
-              type: array
-            - items:
-                $ref: '#/components/schemas/Speciality'
-              type: array
-            - items:
-                $ref: '#/components/schemas/SpecialityEffect'
-              type: array
-        type:
-          oneOf:
-            - $ref: '#/components/schemas/GeneralEvaluationTypes'
-            - items:
-                $ref: '#/components/schemas/GeneralEvaluationTypes'
-              type: array
+        activeLevel:
+          $ref: '#/components/schemas/AscendingLevelNames'
+        buffs:
+          type: array
+          items:
+            $ref: '#/components/schemas/Buff'
       required:
-        - name
-        - level
-        - builtInBook
-        - type
-        - specialities
-        - ascending
-        - basicAttributes
+        - activeLevel
+        - buffs
+      x-fiddle-dto-info:
+        baseSchemaName: Ascending
+    BasicAttributes:
       type: object
-    GeneralEvaluationTypes:
-      description: ''
-      enum:
-        - Ground_Specialist
-        - Ranged_Specialist
-        - Mounted_Specialist
-        - Siege_Specialist
-        - Mayor
-        - Wall_General
-        - Officer
-      type: string
-    GeneralSummary:
-      description: The minimal information necessary to find a General
       properties:
+        Attack:
+          $ref: '#/components/schemas/BasicAttributesObject'
+        Defense:
+          $ref: '#/components/schemas/BasicAttributesObject'
+        Leadership:
+          $ref: '#/components/schemas/BasicAttributesObject'
+        Politics:
+          $ref: '#/components/schemas/BasicAttributesObject'
+      required:
+        - Attack
+        - Defense
+        - Leadership
+        - Politics
+    BasicAttributesObject:
+      type: object
+      properties:
+        Base:
+          type: number
+          format: float
+          minimum: 0
+        Increment:
+          type: number
+          format: float
+          minimum: 0
+        Total:
+          type: number
+          format: float
+          minimum: 0
+      required:
+        - Base
+        - Increment
+        - Total
+    BasicAttributesSummary:
+      type: object
+      description: 'A summary of the values that the basic attributes have at a particular level, after they have been computed for that level. '
+      properties:
+        Attack:
+          $ref: '#/components/schemas/BasicAttributesObjectSummary'
+        Defense:
+          $ref: '#/components/schemas/BasicAttributesObjectSummary'
+        Leadership:
+          $ref: '#/components/schemas/BasicAttributesObjectSummary'
+        Politics:
+          $ref: '#/components/schemas/BasicAttributesObjectSummary'
+      required:
+        - Attack
+        - Defense
+        - Leadership
+        - Politics
+      x-fiddle-dto-info:
+        baseSchemaName: BasicAttributes
+    BasicAttributesObjectSummary:
+      type: object
+      description: 'A simplified representation of a BasicAttributesObject, typically used in list views.'
+      properties:
+        Base:
+          type: number
+        Increment:
+          type: number
+        Total:
+          type: number
+      x-fiddle-dto-info:
+        baseSchemaName: BasicAttributesObject
+    BuiltinBook:
+      type: object
+      description: "A General's Builtin Book "
+      properties:
+        buffs:
+          type: array
+          items:
+            $ref: '#/components/schemas/Buff'
         name:
           type: string
-        type:
-          oneOf:
-            - $ref: '#/components/schemas/GeneralEvaluationTypes'
-            - items:
-                $ref: '#/components/schemas/GeneralEvaluationTypes'
-              type: array
+      required:
+        - buffs
+        - name
+    StandardBook:
       type: object
-      x-fiddle-dto-info:
-        baseSchemaName: General
-    PurpleGeneralAscendingLevels:
-      default: None
-      description: Ascending Levels for Purple Generals
-      enum:
-        - None
-        - 1Purple
-        - 2Purple
-        - 3Purple
-        - 4Purple
-        - 5Purple
-      type: string
-    RedGeneralAscendingLevels:
-      default: None
-      description: AscendingLevels for Red Generals
-      enum:
-        - None
-        - 1Red
-        - 2Red
-        - 3Red
-        - 4Red
-        - 5Red
-      type: string
+      description: Standard Books that can be added to a General
+      properties:
+        buffs:
+          type: array
+          items:
+            $ref: '#/components/schemas/Buff'
+        level:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 4
+        name:
+          type: string
+      required:
+        - buffs
+        - level
+        - name
     Skin:
+      type: object
       description: Some generals have Skins or alternate outfits that add buffs
       properties:
         activeBuffs:
+          type: array
           items:
             $ref: '#/components/schemas/Buff'
-          type: array
         name:
           type: string
         passiveBuffs:
+          type: array
           items:
             $ref: '#/components/schemas/Buff'
-          type: array
       required:
         - name
-      type: object
     Speciality:
+      type: object
       properties:
         activeLevel:
           $ref: '#/components/schemas/SpecialityLevelNames'
         levels:
+          type: array
           items:
             $ref: '#/components/schemas/SpecialityLevel'
-          type: array
         name:
           type: string
       required:
-        - name
         - levels
-      type: object
-    SpecialityEffect:
-      description: The Effective Buff Provided by a Speciality at a particular level
-      properties:
-        activeLevel:
-          oneOf:
-            - $ref: '#/components/schemas/SpecialityLevelNames'
-        buff:
-          items:
-            $ref: '#/components/schemas/Buff'
-          type: array
-        name:
-          type: string
-      required:
-        - activeLevel
-        - buff
-      type: object
-      x-fiddle-dto-info:
-        baseSchemaName: Speciality
-    SpecialityLevel:
-      description: ''
-      properties:
-        Buffs:
-          items:
-            $ref: '#/components/schemas/Buff'
-          type: array
-        level:
-          $ref: '#/components/schemas/SpecialityLevelNames'
-      required:
-        - level
-        - Buffs
-      type: object
+        - name
     SpecialityLevelNames:
-      default: None
-      description: ''
+      type: string
       enum:
         - None
         - Green
@@ -490,99 +550,34 @@ components:
         - Purple
         - Orange
         - Gold
-      type: string
-    StandardBook:
-      description: Standard Books that can be added to a General
+      default: None
+    SpecialityLevel:
+      type: object
       properties:
-        buffs:
+        Buffs:
+          type: array
           items:
             $ref: '#/components/schemas/Buff'
-          type: array
         level:
-          format: int32
-          maximum: 4
-          minimum: 1
-          type: integer
+          $ref: '#/components/schemas/SpecialityLevelNames'
+      required:
+        - Buffs
+        - level
+    SpecialityEffect:
+      type: object
+      description: The Effective Buff Provided by a Speciality at a particular level
+      properties:
+        activeLevel:
+          oneOf:
+            - $ref: '#/components/schemas/SpecialityLevelNames'
+        buff:
+          type: array
+          items:
+            $ref: '#/components/schemas/Buff'
         name:
           type: string
       required:
-        - name
-        - level
-        - buffs
-      type: object
-paths:
-  /generals:
-    get:
-      operationId: getAllGenerals
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                properties:
-                  data:
-                    items:
-                      $ref: '#/components/schemas/GeneralSummary'
-                    type: array
-                required:
-                  - data
-                title: GetAllGeneralsOk
-                type: object
-          description: OK - Successful request with response body
-        '204':
-          $ref: '#/components/responses/NoContent'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '500':
-          $ref: '#/components/responses/InternalServerErrror'
-      summary: Get all Generals
-      tags:
-        - generals
-  /generals/{name}:
-    get:
-      description: 'Returns the general with the matching name. '
-      operationId: getAGeneralByName
-      parameters:
-        - $ref: '#/components/parameters/name'
-        - allowReserved: false
-          description: return verbose results
-          explode: true
-          in: query
-          name: verbose
-          required: false
-          schema:
-            type: boolean
-          style: form
-        - allowReserved: false
-          description: set the level of the general you want information about
-          explode: true
-          in: query
-          name: level
-          required: false
-          schema:
-            type: integer
-          style: form
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                properties:
-                  data:
-                    $ref: '#/components/schemas/General'
-                required:
-                  - data
-                title: GetAGeneralByNameOk
-                type: object
-          description: OK - Successful request with response body
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerErrror'
-      summary: Get a General by Name
-      tags:
-        - generals
-tags:
-  - name: generals
+        - activeLevel
+        - buff
+      x-fiddle-dto-info:
+        baseSchemaName: Speciality
