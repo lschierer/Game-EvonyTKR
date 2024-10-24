@@ -3,7 +3,9 @@ use experimental qw(class);
 use utf8::all;
 use File::ShareDir ':ALL';
 use File::Spec;
+use File::Temp;
 use Data::Printer;
+use Sereal;
 require Mojolicious::Routes;
 use namespace::autoclean;
 
@@ -11,12 +13,14 @@ package Game::EvonyTKR::Web {
 # ABSTRACT: package providing REST wrappers for the content created by this distribution
 
   use feature 'try';
+  use File::FindLib 'lib';
   use Carp;
   use Mojo::Base 'Mojolicious', -signatures;
   use Mojolicious::Routes::Route;
   use Mojo::File::Share qw(dist_dir dist_file);
+  use Mojo::JSON qw(decode_json encode_json);
   use Log::Log4perl::Level;
-  use File::FindLib 'lib';
+
   use Game::EvonyTKR::Web::Logger;
   use Game::EvonyTKR::Logger::Config;
   use OpenAPI::Modern;
@@ -24,6 +28,7 @@ package Game::EvonyTKR::Web {
   use YAML::XS qw{ LoadFile Load };
 
   my $logLevel = 'INFO';
+  my $OpenAPISchemaCache;
 
   # This method will run once at server start
   sub startup ($self) {
@@ -67,9 +72,11 @@ package Game::EvonyTKR::Web {
     #let me use the DefaultHelpers
     $self->plugin('DefaultHelpers');
 
+    my $OpenAPISchemaFilename = File::Spec->catfile($dist_dir, "openapi.schema.yaml");
+    my $OpenAPISchema = get_openapi($OpenAPISchemaFilename);
     $self->config({
       openapi => {
-        document_filename   => File::Spec->catfile($dist_dir, "openapi.schema.yaml"),
+        document_filename   => $OpenAPISchemaFilename,
         after_response      => \&log_responses,
       }
     });
@@ -91,6 +98,31 @@ package Game::EvonyTKR::Web {
     #else {
     #  $controller->log()->error("response is invalid", $result)
     #}
+  }
+
+  sub get_openapi ($openapi_filename) {
+    my $newTemp = 0;
+    if(not defined($OpenAPISchemaCache)) {
+      $OpenAPISchemaCache = File::Temp->new();
+      $newTemp = true;
+    }
+    my $serialized_file = Path::Tiny::path($OpenAPISchemaCache);
+    my $openapi_file = Path::Tiny::path($openapi_filename);
+    my $openapi;
+    if ($newTemp or $serialized_file->stat->mtime < $openapi_file->stat->mtime) {
+      $openapi = OpenAPI::Modern->new(
+        openapi_uri => '/',
+        openapi_schema => Load($openapi_file->slurp_raw), # your openapi document
+      );
+      my $frozen = Sereal::Encoder->new({ freeze_callbacks => 1 })->encode($openapi);
+      $serialized_file->spew_raw($frozen);
+    }
+    else {
+      my $frozen = $serialized_file->slurp_raw;
+      $openapi = Sereal::Decoder->new->decode($frozen);
+    }
+
+    return $openapi;
   }
 
 }
