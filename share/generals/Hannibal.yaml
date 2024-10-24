@@ -2,8 +2,8 @@
 general:
   name: Hannibal
   display: summary
-  score_as:
-   - Mounted
+  type:
+   - mounted_specialist
   stars: '5Red'
   leadership: 120
   leadership_increment: 9.15

@@ -12,8 +12,8 @@ general:
   defense_increment: 8.91
   politics: 102
   politics_increment: 8.52
-  score_as:
-   - Mounted
+  type:
+   - mounted_specialist
   book: Red Demon
   ascending: true
   specialities:

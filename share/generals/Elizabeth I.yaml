@@ -12,8 +12,8 @@ general:
   politics_increment: 9.25
   stars: '5Red'
   level: '45'
-  score_as:
-   - Archers
+  type:
+   - ranged_specialist
   book: Hammer of the Gauls - Elizabeth I
   specialities:
     - Ranged Troop Formation
