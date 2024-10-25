@@ -19,53 +19,53 @@ class Game::EvonyTKR::Data
   use File::FindLib 'lib';
 
   field @buffAttributes :reader = (
-    "Attack",
-    "Attack Speed",
-    "Death to Survival",
-    "Death to Soul",
-    "Death to Wounded",
-    "Defense",
-    "Deserter Capacity",
-    "Double Items Drop Rate",
-    "HP",
-    "Healing Speed",
-    "Hospital Capacity",
-    "Leadership",
-    "Load",
-    "March Size Capacity",
-    "March Time",
-    "Marching Speed",
-    "Marching Speed to Monsters",
-    "MonstersAttack",
-    "Politics",
-    "Rally Capacity",
-    "Range",
-    "Resources Production",
-    "Stamina cost",
-    "SubCity Construction Speed",
-    "SubCity Gold Production",
-    "SubCity Training Speed",
-    "SubCity Troop Capacity",
-    "Training Capacity",
-    "Training Speed",
-    "Wounded to Death",
+    "attack",
+    "attack speed",
+    "death to survival",
+    "death to soul",
+    "death to wounded",
+    "defense",
+    "deserter capacity",
+    "double items drop rate",
+    "hp",
+    "healing speed",
+    "hospital capacity",
+    "leadership",
+    "load",
+    "march size capacity",
+    "march time",
+    "marching speed",
+    "marching speed to monsters",
+    "monstersattack",
+    "politics",
+    "rally capacity",
+    "range",
+    "resources production",
+    "stamina cost",
+    "subcity construction speed",
+    "subcity gold production",
+    "subcity training speed",
+    "subcity troop capacity",
+    "training capacity",
+    "training speed",
+    "wounded to death",
   );
 
   field @buffConditions : reader = (
-    'Against Monsters',
-    'Attacking',
-    'Defending',
-    'During SvS',
-    'In City',
-    'In Main City',
-    'Marching',
-    'Reinforcing',
-    'When City Mayor',
-    'When City Mayor for this SubCity',
-    'When Defending Outside The Main City',
-    'When Rallying',
-    'When The Main Defense General',
-    'When an officer',
+    'against monsters',
+    'attacking',
+    'defending',
+    'during svs',
+    'in city',
+    'in main city',
+    'marching',
+    'reinforcing',
+    'when city mayor',
+    'when city mayor for this subcity',
+    'when defending outside the main city',
+    'when rallying',
+    'when the main defense general',
+    'when an officer',
     'brings a dragon',
     'brings dragon or beast to attack',
     'dragon to the attack',
@@ -73,12 +73,12 @@ class Game::EvonyTKR::Data
   );
 
   field @debuffConditions : reader = (
-    'Enemy',
-    'Enemy In City',
-    'Reduces Enemy',
-    'Reduces Enemy in Attack',
-    'Reduces Enemy with a Dragon',
-    'Reduces',
+    'enemy',
+    'enemy in city',
+    'reduces enemy',
+    'reduces enemy in attack',
+    'reduces enemy with a dragon',
+    'reduces',
   );
 
   field @BuffAttributes : reader;
@@ -105,15 +105,15 @@ class Game::EvonyTKR::Data
     'Monsters',
   );
 
-  field @GeneralKeys : reader = (
-    'Ground Troops',
-    'Mayor',
-    'Mounted Troops',
-    'Officer',
-    'Ranged Troops',
-    'Siege Machines',
-    'Wall',
-  );
+  field @GeneralKeys : reader = (qw(
+    ground_specialist
+    mounted_specialist
+    ranged_specialist
+    siege_specialist
+    mayor
+    officer
+    wall
+  ));
 
   #keys should come from @GeneralKeys above.
   field %generalClass : reader = (
@@ -124,7 +124,7 @@ class Game::EvonyTKR::Data
   );
 
   field $specialityLevels : reader =
-    enum [qw( None Green Blue Purple Orange Gold)];
+    enum [qw( none green blue purple orange gold)];
 
   field $globalDN : reader = new X500::DN(
     new X500::RDN('OU' => 'EvonyTKR'),
