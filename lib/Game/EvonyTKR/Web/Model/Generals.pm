@@ -1,6 +1,7 @@
 use v5.40.0;
 use experimental qw(class);
 use File::FindLib 'lib';
+use YAML::PP;
 
 class Game::EvonyTKR::Web::Model::Generals : isa(Game::EvonyTKR::Web::Logger) {
   use Carp;
@@ -16,7 +17,6 @@ class Game::EvonyTKR::Web::Model::Generals : isa(Game::EvonyTKR::Web::Logger) {
   use Game::EvonyTKR::General::Ranged;
   use Game::EvonyTKR::General::Siege;
   use X500::RDN;
-  use YAML::XS qw{ LoadFile Load };
   use namespace::autoclean;
 # PODNAME: Game::EvonyTKR::Web::Model::General
 # VERSION
@@ -145,13 +145,14 @@ class Game::EvonyTKR::Web::Model::Generals : isa(Game::EvonyTKR::Web::Logger) {
   }
 
   method readFromFile($name) {
+    my $ypp = YAML::PP->new(boolean => 'JSON::PP');
     my $fileName = $name . '.yaml';
     my $generalShare =
       File::Spec->catfile(dist_dir('Game-EvonyTKR'), 'generals');
     my $FileWithPath = File::Spec->catfile($generalShare, $fileName);
     if (-T -s -r $FileWithPath) {
       $self->logger()->debug("$fileName exists as expected");
-      my $yamlData   = LoadFile($FileWithPath);
+      my $yamlData   = $ypp->load_file($FileWithPath);
       my $leadership = $yamlData->{'general'}->{'leadership'};
       my $leadership_increment =
         $yamlData->{'general'}->{'leadership_increment'};
@@ -182,29 +183,12 @@ class Game::EvonyTKR::Web::Model::Generals : isa(Game::EvonyTKR::Web::Logger) {
       my $ascending = $yamlData->{'general'}->{'ascending'};
 
       my @generalClassKey;
-      my @scoreType = @{ $yamlData->{'general'}->{'score_as'} };
-      my $first     = first { index($_, 'Ground') != -1 } @scoreType;
-      if (defined $first) {
-        push @generalClassKey,
-          first { index($_, 'Ground') != -1 } $EvonyData->GeneralKeys();
-      }
-      $first = first { index($_, 'Mounted') != -1 } @scoreType;
-      if (defined $first) {
-        push @generalClassKey, $first;
-      }
-      $first = first { index($_, 'Archers') != -1 } @scoreType;
-      if (defined $first) {
-        push @generalClassKey,
-          first { index($_, 'Ranged') != -1 } $EvonyData->GeneralKeys();
-      }
-      $first = first { index($_, 'Siege') != -1 } @scoreType;
-      if (defined $first) {
-        push @generalClassKey,
-          first { index($_, 'Siege') != -1 } $EvonyData->GeneralKeys();
-      }
-      $first = first { index($_, 'Mayor') != -1 } @scoreType;
-      if (defined $first) {
-        continue;
+      my @scoreType = @{ $yamlData->{'general'}->{'type'} };
+      for my $gt (qw(ground_specialist mounted_specialist ranged_specialist siege_specialist mayor officer )) {
+        my $first = first { index($_, $gt) != -1 } @scoreType;
+        if (defined $first) {
+          push @generalClassKey, $first;
+        }
       }
 
       if (scalar @generalClassKey != scalar @scoreType) {

@@ -50,7 +50,7 @@ class Game::EvonyTKR::Data
     "Training Speed",
     "Wounded to Death",
   );
-  
+
   field @buffConditions : reader = (
     'Against Monsters',
     'Attacking',
@@ -117,10 +117,10 @@ class Game::EvonyTKR::Data
 
   #keys should come from @GeneralKeys above.
   field %generalClass : reader = (
-    'Ground Troops'  => 'Game::EvonyTKR::General::Ground',
-    'Mounted Troops' => 'Game::EvonyTKR::General::Mounted',
-    'Ranged Troops'  => 'Game::EvonyTKR::General::Ranged',
-    'Siege Machines' => 'Game::EvonyTKR::General::Siege',
+    'ground_specialist'   => 'Game::EvonyTKR::General::Ground',
+    'mounted_specialist'  => 'Game::EvonyTKR::General::Mounted',
+    'ranged_specialist'   => 'Game::EvonyTKR::General::Ranged',
+    'siege_specialist'    => 'Game::EvonyTKR::General::Siege',
   );
 
   field $specialityLevels : reader =
@@ -192,4 +192,3 @@ A *General* can have more than one Class from this list.  That is because Genera
 
 get the possible attributes from the yaml data file in the shared directory and load them into memory.
 =cut
-

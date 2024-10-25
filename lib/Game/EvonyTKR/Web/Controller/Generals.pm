@@ -117,12 +117,13 @@ package Game::EvonyTKR::Web::Controller::Generals {
     }
     my $general = $generalModel->get_by_name($nameParam);
 
-    if (not defined $general) {
+    if (not defined $general or not $general) {
       $self->log()->error('no id from Model');
       $self->reply->not_found();
     }
     else {
       my $gc  = blessed $general;
+      say "general is " . Data::Printer::p $general;
       my @gcl = split(/::/, $gc);
       if ($gcl[2] !~ /general/i) {
         $self->log()

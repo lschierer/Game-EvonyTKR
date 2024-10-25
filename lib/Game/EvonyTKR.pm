@@ -12,7 +12,6 @@ use File::Spec;
 use File::HomeDir;
 use File::Path qw(make_path);
 use File::Touch;
-use YAML::XS qw{LoadFile Load};
 use Util::Any -all;
 use Devel::Peek;
 
@@ -30,6 +29,7 @@ use Game::EvonyTKR::General::Siege;
 use Game::EvonyTKR::Logger;
 use Game::EvonyTKR::SkillBook::Special;
 use Game::EvonyTKR::Speciality;
+use YAML::PP;
 use namespace::clean;
 
 sub opt_spec {
@@ -136,8 +136,9 @@ sub read_generals($logger) {
   my %generals;
   foreach my $tg (@found) {
     if (defined($tg)) {
+      my $ypp = YAML::PP->new();
       open(my ($fh), '<', $tg) or croak "$!";
-      my $data = LoadFile($tg);
+      my $data = $ypp->load_file($tg);
       my $name = $data->{'general'}->{'name'};
       $logger->info($name);
       my @books           = @{ $data->{'general'}->{'books'} };
@@ -251,6 +252,6 @@ This module will (eventually) help players of the game needing to make reasonabl
 
 =method getBookData($sb, $bookName)
 $sb is a Game::EvonyTKR::SkillBook
-$bookname is the YAML file containing its data. 
-This populates the skill book with the data. 
+$bookname is the YAML file containing its data.
+This populates the skill book with the data.
 =cut

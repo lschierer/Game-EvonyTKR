@@ -6,6 +6,7 @@ use File::Spec;
 use File::Temp;
 use Data::Printer;
 use Sereal;
+use YAML::PP;
 require Mojolicious::Routes;
 use namespace::autoclean;
 
@@ -25,7 +26,6 @@ package Game::EvonyTKR::Web {
   use Game::EvonyTKR::Logger::Config;
   use OpenAPI::Modern;
   use JSON::Schema::Modern;
-  use YAML::XS qw{ LoadFile Load };
 
   my $logLevel = 'INFO';
   my $OpenAPISchemaCache;
@@ -73,7 +73,7 @@ package Game::EvonyTKR::Web {
     $self->plugin('DefaultHelpers');
 
     my $OpenAPISchemaFilename = File::Spec->catfile($dist_dir, "openapi.schema.yaml");
-    #my $OpenAPISchema = get_openapi($OpenAPISchemaFilename);
+    my $OpenAPISchema = get_openapi($OpenAPISchemaFilename);
     $self->config({
       openapi => {
         document_filename   => $OpenAPISchemaFilename,
@@ -81,7 +81,7 @@ package Game::EvonyTKR::Web {
       }
     });
 
-    #$self->plugin('OpenAPI::Modern', $self->config->{openapi});
+    $self->plugin('OpenAPI::Modern', $self->config->{openapi});
 
     $self->plugin('Game::EvonyTKR::Web::Routes::Generals', $r);
     # Normal route to controller
@@ -101,6 +101,7 @@ package Game::EvonyTKR::Web {
   }
 
   sub get_openapi ($openapi_filename) {
+    my $ypp = YAML::PP->new(boolean => 'JSON::PP');
     my $newTemp = 0;
     if(not defined($OpenAPISchemaCache)) {
       $OpenAPISchemaCache = File::Temp->new();
@@ -112,7 +113,7 @@ package Game::EvonyTKR::Web {
     if ($newTemp or $serialized_file->stat->mtime < $openapi_file->stat->mtime) {
       $openapi = OpenAPI::Modern->new(
         openapi_uri => '/',
-        openapi_schema => Load($openapi_file->slurp_raw), # your openapi document
+        openapi_schema => $ypp->load_file($openapi_file), # your openapi document
       );
       my $frozen = Sereal::Encoder->new({ freeze_callbacks => 1 })->encode($openapi);
       $serialized_file->spew_raw($frozen);
