@@ -17,6 +17,7 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Data) {
   use Game::EvonyTKR::Data;
   use Game::EvonyTKR::SkillBook::Special;
   use Game::EvonyTKR::Speciality;
+  use Game::EvonyTKR::BasicAttributes;
   require Game::EvonyTKR::Buff::EvaluationData::Attacking;
   require Game::EvonyTKR::Buff::EvaluationData::Monster;
   use Game::EvonyTKR::Ascending;
@@ -61,21 +62,7 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Data) {
 
   field $_generalType : reader = 'All Troops';
 
-  field $leadership : reader = 0;
-
-  field $leadership_increment : reader = 0;
-
-  field $attack : reader = 0;
-
-  field $attack_increment : reader = 0;
-
-  field $defense : reader = 0;
-
-  field $defense_increment : reader = 0;
-
-  field $politics : reader = 0;
-
-  field $politics_increment : reader = 0;
+  field $basic_attributes :reader =
 
   field $level : reader : param //= 45;
 
@@ -85,29 +72,15 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Data) {
 
   field $ascendingAttributes : reader //= Game::EvonyTKR::Ascending->new();
 
-  field $builtInBook : reader;
+  field $built_in_book : reader;
 
-  field @otherBooks : reader;
+  field @other_books : reader;
 
   field $hasCovenant : reader = false;
 
-  field %BasicAESAdjustment = (
-    'None'    => 0,
-    '1Purple' => 0,
-    '2Purple' => 0,
-    '3Purple' => 0,
-    '4Purple' => 0,
-    '5Purple' => 0,
-    '1Red'    => 10,
-    '2Red'    => 20,
-    '3Red'    => 30,
-    '4Red'    => 40,
-    '5Red'    => 50,
-  );
 
-  ADJUST {
-    lock_keys(%BasicAESAdjustment);
-  }
+
+
 
   method _getEvAns4BasicAttributes($resultRef, $BuffMultipliers) {
 
@@ -225,13 +198,13 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Data) {
 
     $self->_getEvAns4BasicAttributes($resultRef, $BuffMultipliers);
 
-    if (defined $builtInBook) {
-      $builtInBook->getEvAnsScore($self->name(), $resultRef,
+    if (defined $built_in_book) {
+      $built_in_book->getEvAnsScore($self->name(), $resultRef,
         $BuffMultipliers, $self->generalType(),);
     }
 
-    if (scalar @otherBooks >= 1) {
-      for my $book (@otherBooks) {
+    if (scalar @other_books >= 1) {
+      for my $book (@other_books) {
         $book->getEvAnsScore($self->name(), $resultRef,
           $BuffMultipliers, $self->generalType(),);
       }
@@ -297,17 +270,17 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Data) {
     return $self->_generalType;
   }
 
-  method addBuiltInBook($newBook) {
+  method addbuilt_in_book($newBook) {
     my $type = blessed $newBook;
     if ($type ne 'Game::EvonyTKR::SkillBook::Special') {
       $self->logger()
         ->logcroak(
-        "builtInBook must be a Game::EvonyTKR::SkillBook::Special, not $type");
+        "built_in_book must be a Game::EvonyTKR::SkillBook::Special, not $type");
     }
     $self->logger()
       ->trace(
-      "adding builtInBook with type $type and name " . $newBook->name());
-    $builtInBook = $newBook;
+      "adding built_in_book with type $type and name " . $newBook->name());
+    $built_in_book = $newBook;
   }
 
   method setCovenant($ce) {
@@ -385,44 +358,6 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Data) {
     if (@errors) {
       die join ', ' => @errors;
     }
-  }
-
-  method _adjustBasicAttribute($attribute, $attribute_increment) {
-    my $AES_adjustment = 0;
-
-    if ($ascending) {
-      $self->logger()->trace($self->name() . " is ascended");
-      my $stars = $ascendingAttributes->activeLevel();
-      if (not $stars =~ /None/i) {
-        $AES_adjustment = $BasicAESAdjustment{$stars};
-        if ($AES_adjustment == 0) {
-          $self->logger()
-            ->trace($self->name()
-              . " did not match any value for stars $stars in BasicAESAdjustment: "
-              . np %BasicAESAdjustment);
-        }
-      }
-    }
-    $self->logger()
-      ->trace("for "
-        . $self->name()
-        . " level is $level, attribute_increment is $attribute_increment,  attribute is $attribute"
-      );
-    my $step = $level * $attribute_increment + $attribute;
-    $self->logger()->trace("step1 for " . $self->name() . " is $step");
-    $step = $step + 500;
-    $self->logger()->trace("step2 for " . $self->name() . " is $step");
-    $step = $step + $AES_adjustment;
-    $self->logger()->trace("step3 for " . $self->name() . " is $step");
-
-    if ($step < 900) {
-      $step = $step * 0.1;
-    }
-    else {
-      $step = 90 + ($step - 900) * 0.2;
-    }
-    $self->logger()->trace("step4 for " . $self->name() . " is $step");
-    return $step;
   }
 
   method effective_leadership() {
@@ -549,7 +484,7 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Data) {
         "Attempt to add $bookClass which is not a 'Game::EvonyTKR::SkillBook::Special' to $name"
         );
     }
-    push @otherBooks, $newBook;
+    push @other_books, $newBook;
     $self->logger()->debug("added SkillBook " . $newBook->name() . " to $name");
   }
 
@@ -589,17 +524,17 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Data) {
     $returnRef->{hasCovenant} = $self->hasCovenant();
 
     $self->logger()->trace("add book stuff to returnRef for $name");
-    $returnRef->{builtInBook} =
-      defined $self->builtInBook
-      ? $self->builtInBook->toHashRef($verbose)
+    $returnRef->{built_in_book} =
+      defined $self->built_in_book
+      ? $self->built_in_book->toHashRef($verbose)
       : {};
 
     my @sbRefs;
-    for my $ob (@otherBooks) {
+    for my $ob (@other_books) {
       push @sbRefs, $ob->toHashRef($verbose);
       $self->logger()->trace('General toHashRef @sbRefs ' . np @sbRefs);
     }
-    $returnRef->{otherBooks} = \@sbRefs;
+    $returnRef->{other_books} = \@sbRefs;
 
     $self->logger()->trace("add specialities to returnRef for $name");
     my @specialityRefs;
@@ -612,40 +547,38 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Data) {
     $returnRef->{ascendingAttributes} =
       $self->ascendingAttributes()->toHashRef($verbose);
 
-    $returnRef->{EvAnsScores} = {
-      AttackingAsPrimary   => $self->getEvAnsScoreAsPrimary('Attacking'),
-      AttackingAsSecondary => $self->getEvAnsScoreAsSecondary('Attacking'),
-      MonsterAsPrimary     => $self->getEvAnsScoreAsPrimary('Monster'),
-      MonsterAsSecondary   => $self->getEvAnsScoreAsSecondary('Monster'),
-    };
-    if ($verbose) {
-
-      $self->logger()->trace("add basic attributes to returnRef for $name");
-      $returnRef->{basicAttributes} = {
-        leadership           => $self->leadership(),
-        leadership_increment => $self->leadership_increment(),
-        attack               => $self->attack(),
-        attack_increment     => $self->attack_increment(),
-        defense              => $self->defense(),
-        defense_increment    => $self->defense_increment(),
-        politics             => $self->politics(),
-        politics_increment   => $self->politics_increment(),
-      };
-
+    if($verbose) {
       $self->logger()->trace("add scores info to returnRef for $name");
-
+      $returnRef->{EvAnsScores} = {
+        AttackingAsPrimary   => $self->getEvAnsScoreAsPrimary('Attacking'),
+        AttackingAsSecondary => $self->getEvAnsScoreAsSecondary('Attacking'),
+        MonsterAsPrimary     => $self->getEvAnsScoreAsPrimary('Monster'),
+        MonsterAsSecondary   => $self->getEvAnsScoreAsSecondary('Monster'),
+      };
       $returnRef->{ComponentScores} = {
         Attacking => $self->computeEvansScoreComponents('Attacking'),
         Monster   => $self->computeEvansScoreComponents('Monster'),
       };
-      return $returnRef;
+    }
+
+    if ($verbose) {
+      $self->logger()->trace("add basic attributes to returnRef for $name");
+      $returnRef->{basic_attributes} => $self->basic_attributes();
     }
     else {
       $returnRef->{basicAttributes} = {
-        leadership => $self->effective_leadership(),
-        attack     => $self->effective_attack(),
-        defense    => $self->effective_defense(),
-        politics   => $self->effective_politics(),
+        leadership  => {
+          total     => $self->effective_leadership(),
+        },
+        attack      => {
+          total     => $self->effective_attack(),
+        },
+        defense     => {
+          total     => $self->effective_defense(),
+        },
+        politics    => {
+          total     => $self->effective_politics(),
+        },
       };
 
       return $returnRef;
@@ -778,7 +711,7 @@ returns the value that a user of this general at this investment level will expe
 
 generals start at level 1 and can grow to level 45.  Thier effective statistics increase as they do so by the increments listed in the _increment versions of each attribute.
 
-This returns the level at which the general is currently being evaluated. 
+This returns the level at which the general is currently being evaluated.
 =cut
 
 =method specialities()
@@ -786,11 +719,11 @@ This returns the level at which the general is currently being evaluated.
 This returns the array of Game::EvonyTKR::Speciality instances associated with this General
 =cut
 
-=method addSpeciality($newSpeciality) 
+=method addSpeciality($newSpeciality)
 
-Used to add a Game::EvonyTKR::Speciality to this General.  
+Used to add a Game::EvonyTKR::Speciality to this General.
 
-Todo:  Once Game::EvonyTKR::Speciality overloads comparison operators, use them to ensure uniqueness. 
+Todo:  Once Game::EvonyTKR::Speciality overloads comparison operators, use them to ensure uniqueness.
 =cut
 
 =method changeActiveSpecialityLevel($specialityLevel, $newLevel)
@@ -798,39 +731,39 @@ Todo:  Once Game::EvonyTKR::Speciality overloads comparison operators, use them 
 This takes a number 1-4 indicating which to work on and a level from the options in Game::EvonyTKR::Speciality
 It handles the situation that the 4th speciality can only be set if the other 3 are all Gold, and will automatically be Green once that is true.
 
-TODO: handle the 5th special. 
+TODO: handle the 5th special.
 
 =cut
 
 =method ascending()
 
-This returns true or false, for whether or not the general can be ascended. 
+This returns true or false, for whether or not the general can be ascended.
 =cut
 
-=method builtInBook
+=method built_in_book
 
 each general comes with one Game::EvonyTKR::SkillBook built in.  This will be an instance of the ::Special variety of SkillBook.
 
 This returns this book.
 =cut
 
-=method otherBooks
+=method other_books
 
 Some generals have other Game::EvonyTKR::SkillBooks of type ::Special beyond the one universally
-built in. Or rather, I have chosen to represnt the extra buffs given by a general's "skin" or 
-optional outfit as if it were a second ::SkillBook::Special. 
+built in. Or rather, I have chosen to represnt the extra buffs given by a general's "skin" or
+optional outfit as if it were a second ::SkillBook::Special.
 
 Books added here can optionally influence calculations.
 =cut
 
 =method addAnotherBook($newBook)
 
-This allows you to populate the otherBooks field with the buffs provided by the extra skins.
+This allows you to populate the other_books field with the buffs provided by the extra skins.
 =cut
 
-=method 
+=method
 
-=method setCovenant($ce) 
+=method setCovenant($ce)
 
 if $ce is true, sets the value of hasCovenant to true. If $ce is false, sets hasCovenant to false.
 =cut
@@ -842,7 +775,7 @@ returns true if the General has a corresponding Game::EvonyTKR::Covenant
 
 =method toHashRef
 
-In typescript, you can run almost any object through JSON.stringify() and get something usable. This method is essentially what would happen if you ran a Game::EvonyTKR::General through JSON.stringify() to get a JSON representation of it, but then immediately read it back in with JSON.parse into a perl hash (instead of allowing it to be detected as an object), with all the top level things in the JSON being the keys of the hash. 
+In typescript, you can run almost any object through JSON.stringify() and get something usable. This method is essentially what would happen if you ran a Game::EvonyTKR::General through JSON.stringify() to get a JSON representation of it, but then immediately read it back in with JSON.parse into a perl hash (instead of allowing it to be detected as an object), with all the top level things in the JSON being the keys of the hash.
 =cut
 
 =method ""

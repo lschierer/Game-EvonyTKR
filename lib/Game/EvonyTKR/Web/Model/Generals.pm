@@ -153,15 +153,23 @@ class Game::EvonyTKR::Web::Model::Generals : isa(Game::EvonyTKR::Web::Logger) {
     if (-T -s -r $FileWithPath) {
       $self->logger()->debug("$fileName exists as expected");
       my $yamlData   = $ypp->load_file($FileWithPath);
-      my $leadership = $yamlData->{'general'}->{'leadership'};
+
+      my $leadership =
+        $yamlData->{'general'}->{'basic_attributes'}->{'leadership'}->{'base'};
       my $leadership_increment =
-        $yamlData->{'general'}->{'leadership_increment'};
-      my $attack             = $yamlData->{'general'}->{'attack'};
-      my $attack_increment   = $yamlData->{'general'}->{'attack_increment'};
-      my $defense            = $yamlData->{'general'}->{'defense'};
-      my $defense_increment  = $yamlData->{'general'}->{'defense_increment'};
-      my $politics           = $yamlData->{'general'}->{'politics'};
-      my $politics_increment = $yamlData->{'general'}->{'politics_increment'};
+        $yamlData->{'general'}->{'basic_attributes'}->{'leadership'}->{'increment'};
+      my $attack =
+        $yamlData->{'general'}->{'basic_attributes'}->{'attack'}->{'base'};
+      my $attack_increment =
+        $yamlData->{'general'}->{'basic_attributes'}->{'attack'}->{'increment'};
+        my $defense =
+          $yamlData->{'general'}->{'basic_attributes'}->{'defense'}->{'base'};
+        my $defense_increment =
+          $yamlData->{'general'}->{'basic_attributes'}->{'defense'}->{'increment'};
+        my $politics =
+          $yamlData->{'general'}->{'basic_attributes'}->{'politics'}->{'base'};
+        my $politics_increment =
+          $yamlData->{'general'}->{'basic_attributes'}->{'politics'}->{'increment'};
 
       $self->logger()->trace(sprintf(
         'for %s: leadership: %d, li: %d, attack: %d, ai: %d, defense: %d, di: %d, politics: %d, pi: %d',

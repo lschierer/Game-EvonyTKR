@@ -4,7 +4,6 @@ use utf8::all;
 use File::ShareDir ':ALL';
 use File::Spec;
 use File::Temp;
-use Data::Printer;
 use Sereal;
 use YAML::PP;
 require Mojolicious::Routes;
@@ -91,13 +90,13 @@ package Game::EvonyTKR::Web {
   }
 
   sub log_responses($controller) {
-    #my $result = $controller->validate_response();
-    #if($result) {
-    #  $controller->log()->debug("response is valid");
-    #}
-    #else {
-    #  $controller->log()->error("response is invalid", $result)
-    #}
+    my $result = $controller->validate_response();
+    if($result) {
+      $controller->app->log()->debug("response is valid");
+    }
+    else {
+      $controller->app->log()->error("response is invalid", $result)
+    }
   }
 
   sub get_openapi ($openapi_filename) {

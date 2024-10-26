@@ -29,7 +29,7 @@ class Game::EvonyTKR::General::Ground : isa(Game::EvonyTKR::General) {
     }
   }
 
-  field $_generalType : reader = 'Ground Troops';
+  field $_generalType : reader = 'ground_specialist';
 
 }
 

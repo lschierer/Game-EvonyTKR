@@ -123,7 +123,6 @@ package Game::EvonyTKR::Web::Controller::Generals {
     }
     else {
       my $gc  = blessed $general;
-      say "general is " . Data::Printer::p $general;
       my @gcl = split(/::/, $gc);
       if ($gcl[2] !~ /general/i) {
         $self->log()
@@ -160,8 +159,8 @@ package Game::EvonyTKR::Web::Controller::Generals {
         my $ascendingLevel = $self->_ascendingParamHelper($nameParam);
         $general->ascendingAttributes()->setActiveLevel($ascendingLevel);
 
-        my $generalHashRef = $general->toHashRef($verbose);
-
+        my $generalHashRef = {};
+        $$generalHashRef{'data'} = $general->toHashRef($verbose);
         $self->respond_to(
           json  => { json => $generalHashRef },
           html  => {
