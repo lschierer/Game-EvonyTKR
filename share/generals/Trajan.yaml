@@ -1,23 +1,27 @@
 ---
 general:
-  name: Trajan
-  display: summary
-  leadership: 118
-  leadership_increment: 9.23
-  attack: 109
-  attack_increment: 7.85
-  defense: 120
-  defense_increment: 9.05
-  politics: 113
-  politics_increment: 8.34
-  stars: '5Red'
-  level: '1'
-  type:
-   - ground_specialist
-  book: Praetorian Guard
-  specialities:
-    - Ground Troop Assault
-    - Formation
-    - Ground Troop Ares
-    - Dacian Wars
   ascending: true
+  basic_attributes:
+    attack:
+      base: 109
+      increment: 7.85
+    defense:
+      base: 120
+      increment: 9.05
+    leadership:
+      base: 118
+      increment: 9.23
+    politics:
+      base: 113
+      increment: 8.34
+  book: Praetorian Guard
+  display: summary
+  name: Trajan
+  specialities:
+  - Ground Troop Assault
+  - Formation
+  - Ground Troop Ares
+  - Dacian Wars
+  stars: red5
+  type:
+  - ground_specialist

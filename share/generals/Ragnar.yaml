@@ -1,26 +1,29 @@
 ---
 general:
-  name: Ragnar
-  level: '1'
-  display: summary
-  type:
-   - ranged_specialist
-  stars: '5Red'
-  leadership: 124
-  leadership_increment: 8.88
-  attack: 135
-  attack_increment: 9.36
-  defense: 118
-  defense_increment: 8.22
-  politics: 100
-  politics_increment: 7.96
-  extra:
-    - King of Midgard
-  book: Unstoppable Force
-  specialities:
-    - Ranged Troop Formation
-    - Siege
-    - Ranged Troop Ares
-    - Viking Leader
   ascending: true
-        
+  basic_attributes:
+    attack:
+      base: 135
+      increment: 9.36
+    defense:
+      base: 118
+      increment: 8.22
+    leadership:
+      base: 124
+      increment: 8.88
+    politics:
+      base: 100
+      increment: 7.96
+  book: Unstoppable Force
+  display: summary
+  extra:
+  - King of Midgard
+  name: Ragnar
+  specialities:
+  - Ranged Troop Formation
+  - Siege
+  - Ranged Troop Ares
+  - Viking Leader
+  stars: red5
+  type:
+  - ranged_specialist

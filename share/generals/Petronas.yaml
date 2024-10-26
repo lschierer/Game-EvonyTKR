@@ -1,23 +1,27 @@
 ---
 general:
-  name: Petronas
-  display: summary
-  leadership: 118
-  leadership_increment: 9.01
-  attack: 122
-  attack_increment: 9.02
-  defense: 110
-  defense_increment: 8.75
-  politics: 110
-  politics_increment: 8.59
-  stars: '5Red'
-  level: '1'
-  type:
-   - siege_specialist
-  book: Byzantine Commander
-  specialities:
-    - Siege Machine Assault
-    - Bash
-    - Siege Machine Ares
-    - Battle of Lalakaon
   ascending: true
+  basic_attributes:
+    attack:
+      base: 122
+      increment: 9.02
+    defense:
+      base: 110
+      increment: 8.75
+    leadership:
+      base: 118
+      increment: 9.01
+    politics:
+      base: 110
+      increment: 8.59
+  book: Byzantine Commander
+  display: summary
+  name: Petronas
+  specialities:
+  - Siege Machine Assault
+  - Bash
+  - Siege Machine Ares
+  - Battle of Lalakaon
+  stars: red5
+  type:
+  - siege_specialist

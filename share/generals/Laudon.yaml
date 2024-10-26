@@ -1,25 +1,29 @@
 ---
 general:
-  name: Laudon
-  display: summary
-  leadership: 117
-  leadership_increment: 8.82
-  attack: 118
-  attack_increment: 9.12
-  defense: 113
-  defense_increment: 8.76
-  politics: 108
-  politics_increment: 8.74
-  stars: '5Red'
-  level: '1'
-  type:
-   - mounted_specialist
-  warnings:
-    - Laudon is incompatible with the Mounted Troop Attack Level 4 Skillbook
-  book: Silesian Wars
   ascending: true
+  basic_attributes:
+    attack:
+      base: 118
+      increment: 9.12
+    defense:
+      base: 113
+      increment: 8.76
+    leadership:
+      base: 117
+      increment: 8.82
+    politics:
+      base: 108
+      increment: 8.74
+  book: Silesian Wars
+  display: summary
+  name: Laudon
   specialities:
-    - Mounted Troop Defense
-    - Strike
-    - Mounted Troop Ares
-    - Field Marshal of Austria
+  - Mounted Troop Defense
+  - Strike
+  - Mounted Troop Ares
+  - Field Marshal of Austria
+  stars: red5
+  type:
+  - mounted_specialist
+  warnings:
+  - Laudon is incompatible with the Mounted Troop Attack Level 4 Skillbook

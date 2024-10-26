@@ -1,23 +1,27 @@
 ---
 general:
-  name: Surena
-  display: summary
-  leadership: 117
-  leadership_increment: 9.06
-  attack: 119
-  attack_increment: 8.91
-  defense: 116
-  defense_increment: 8.83
-  politics: 108
-  politics_increment: 8.55
-  stars: '5Red'
-  level: '1'
-  type:
-   - siege_specialist
-  book: Shield of Parthians
-  specialities:
-    - Siege Machine Assault
-    - Siege
-    - Siege Machine Ares
-    - Battle of Carrhae
   ascending: true
+  basic_attributes:
+    attack:
+      base: 119
+      increment: 8.91
+    defense:
+      base: 116
+      increment: 8.83
+    leadership:
+      base: 117
+      increment: 9.06
+    politics:
+      base: 108
+      increment: 8.55
+  book: Shield of Parthians
+  display: summary
+  name: Surena
+  specialities:
+  - Siege Machine Assault
+  - Siege
+  - Siege Machine Ares
+  - Battle of Carrhae
+  stars: red5
+  type:
+  - siege_specialist

@@ -1,23 +1,27 @@
 ---
 general:
-  name: Septimius Severus
-  display: summary
-  leadership: 118
-  leadership_increment: 8.92
-  attack: 122
-  attack_increment: 9
-  defense: 118
-  defense_increment: 8.95
-  politics: 102
-  politics_increment: 8.51
-  stars: '5Red'
-  level: '1'
-  type:
-   - siege_specialist
-  specialities:
-    - Siege Machine Formation
-    - Siege
-    - Siege Machine Ares
-    - Battle of Lugdunum
   ascending: true
+  basic_attributes:
+    attack:
+      base: 122
+      increment: 9
+    defense:
+      base: 118
+      increment: 8.95
+    leadership:
+      base: 118
+      increment: 8.92
+    politics:
+      base: 102
+      increment: 8.51
   book: Severan Dynasty
+  display: summary
+  name: Septimius Severus
+  specialities:
+  - Siege Machine Formation
+  - Siege
+  - Siege Machine Ares
+  - Battle of Lugdunum
+  stars: red5
+  type:
+  - siege_specialist

@@ -1,22 +1,27 @@
 ---
 general:
-  name: Theodosius I
-  display: summary
-  leadership: 123
-  leadership_increment: 8.91
-  attack: 132
-  attack_increment: 9.31
-  defense: 118
-  defense_increment: 8.73
-  politics: 106
-  politics_increment: 8.08
-  stars: '5Red'
-  type:
-   - siege_specialist
-  book: Theodosius the Great
-  specialities:
-    - Siege Machine Formation
-    - Bash
-    - Siege Machine Ares
-    - Battle of the Frigidus
   ascending: true
+  basic_attributes:
+    attack:
+      base: 132
+      increment: 9.31
+    defense:
+      base: 118
+      increment: 8.73
+    leadership:
+      base: 123
+      increment: 8.91
+    politics:
+      base: 106
+      increment: 8.08
+  book: Theodosius the Great
+  display: summary
+  name: Theodosius I
+  specialities:
+  - Siege Machine Formation
+  - Bash
+  - Siege Machine Ares
+  - Battle of the Frigidus
+  stars: red5
+  type:
+  - siege_specialist

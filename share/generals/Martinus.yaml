@@ -1,25 +1,29 @@
 ---
 general:
-  name: Martinus
-  display: summary
-  type:
-   - mounted_specialist
-  stars: '5Red'
-  leadership: 114
-  leadership_increment: 9.24
-  attack: 120
-  attack_increment: 8.85
-  defense: 115
-  defense_increment: 8.65
-  politics: 100
-  politics_increment: 8.05
-  level: '1'
-  extra:
-    - Dragon God - Martinus
-  book: The Dragon Wakes
   ascending: true
+  basic_attributes:
+    attack:
+      base: 120
+      increment: 8.85
+    defense:
+      base: 115
+      increment: 8.65
+    leadership:
+      base: 114
+      increment: 9.24
+    politics:
+      base: 100
+      increment: 8.05
+  book: The Dragon Wakes
+  display: summary
+  extra:
+  - Dragon God - Martinus
+  name: Martinus
   specialities:
-    - Mounted Troop Assault
-    - Strike
-    - Mounted Troop Ares
-    - Champion Knight
+  - Mounted Troop Assault
+  - Strike
+  - Mounted Troop Ares
+  - Champion Knight
+  stars: red5
+  type:
+  - mounted_specialist

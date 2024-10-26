@@ -1,23 +1,27 @@
 ---
 general:
-  name: Suchet
-  display: summary
-  leadership: 120
-  leadership_increment: 9.28
-  attack: 116
-  attack_increment: 8.94
-  defense: 112
-  defense_increment: 8.82
-  politics: 109
-  politics_increment: 8.61
-  stars: '5Red'
-  level: '1'
-  type:
-   - ground_specialist
-  book: Duke of Albufera
-  specialities:
-    - Ground Troop Assault
-    - Annihilation
-    - War God
-    - Siege of Tarragona
   ascending: true
+  basic_attributes:
+    attack:
+      base: 116
+      increment: 8.94
+    defense:
+      base: 112
+      increment: 8.82
+    leadership:
+      base: 120
+      increment: 9.28
+    politics:
+      base: 109
+      increment: 8.61
+  book: Duke of Albufera
+  display: summary
+  name: Suchet
+  specialities:
+  - Ground Troop Assault
+  - Annihilation
+  - War God
+  - Siege of Tarragona
+  stars: red5
+  type:
+  - ground_specialist

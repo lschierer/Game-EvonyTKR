@@ -1,23 +1,27 @@
 ---
 general:
-  name: Lysander
-  display: summary
-  leadership: 116
-  leadership_increment: 8.91
-  attack: 115
-  attack_increment: 8.85
-  defense: 117
-  defense_increment: 8.97
-  politics: 112
-  politics_increment: 8.61
-  stars: '5Red'
-  level: '1'
-  type:
-   - mounted_specialist
-  book: Conqueror at Sea
-  specialities:
-    - Mounted Troop Assault
-    - Formation
-    - Mounted Troop Ares
-    - Battle of Aegospotami
   ascending: true
+  basic_attributes:
+    attack:
+      base: 115
+      increment: 8.85
+    defense:
+      base: 117
+      increment: 8.97
+    leadership:
+      base: 116
+      increment: 8.91
+    politics:
+      base: 112
+      increment: 8.61
+  book: Conqueror at Sea
+  display: summary
+  name: Lysander
+  specialities:
+  - Mounted Troop Assault
+  - Formation
+  - Mounted Troop Ares
+  - Battle of Aegospotami
+  stars: red5
+  type:
+  - mounted_specialist

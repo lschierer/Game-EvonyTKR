@@ -1,38 +1,38 @@
 ---
-name: Battle of Edington
 levels:
-  - level: Green
-    buff:
-      - attribute: Attack
-        class: Ranged Troops
-        value:
-          number: 3
-          unit: percentage
-  - level: Blue
-    buff:
-      - attribute: Attack
-        class: Ranged Troops
-        value:
-          number: 4
-          unit: percentage
-  - level: Purple
-    buff:
-      - attribute: Attack
-        class: Ranged Troops
-        value:
-          number: 7
-          unit: percentage
-  - level: Orange
-    buff:
-      - attribute: Attack
-        class: Ranged Troops
-        value:
-          number: 7
-          unit: percentage
-  - level: Gold
-    buff:
-      - attribute: Attack
-        class: Ranged Troops
-        value:
-          number: 14
-          unit: percentage
+- buff:
+  - attribute: Attack
+    class: Ranged Troops
+    value:
+      number: 3
+      unit: percentage
+  level: green
+- buff:
+  - attribute: Attack
+    class: Ranged Troops
+    value:
+      number: 4
+      unit: percentage
+  level: blue
+- buff:
+  - attribute: Attack
+    class: Ranged Troops
+    value:
+      number: 7
+      unit: percentage
+  level: purple
+- buff:
+  - attribute: Attack
+    class: Ranged Troops
+    value:
+      number: 7
+      unit: percentage
+  level: orange
+- buff:
+  - attribute: Attack
+    class: Ranged Troops
+    value:
+      number: 14
+      unit: percentage
+  level: gold
+name: Battle of Edington

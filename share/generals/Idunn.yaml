@@ -1,24 +1,28 @@
 ---
 general:
-  name: Idunn
-  display: summary
-  leadership: 117
-  leadership_increment: 8.82
-  attack: 122
-  attack_increment: 9.1
-  defense: 120
-  defense_increment: 8.96
-  politics: 103
-  politics_increment: 8.68
-  stars: '5Red'
-  level: '1'
-  type:
-    - ranged_specialist
-    - siege_specialist
-  book: Golden Apple
-  specialities:
-    - Ranged Troop Defense
-    - Siege
-    - Ranged Troop Ares
-    - Love and Hatred
   ascending: true
+  basic_attributes:
+    attack:
+      base: 122
+      increment: 9.1
+    defense:
+      base: 120
+      increment: 8.96
+    leadership:
+      base: 117
+      increment: 8.82
+    politics:
+      base: 103
+      increment: 8.68
+  book: Golden Apple
+  display: summary
+  name: Idunn
+  specialities:
+  - Ranged Troop Defense
+  - Siege
+  - Ranged Troop Ares
+  - Love and Hatred
+  stars: red5
+  type:
+  - ranged_specialist
+  - siege_specialist

@@ -1,23 +1,27 @@
 ---
 general:
-  name: Vladimir the Great
-  display: summary
-  leadership: 113
-  leadership_increment: 8.69
-  attack: 105
-  attack_increment: 8.23
-  defense: 106
-  defense_increment: 8.66
-  politics: 115
-  politics_increment: 9.04
-  stars: '5Red'
-  level: '45'
-  type:
-   - ranged_specialist
-  book: Dignity of Grand Prince
-  specialities:
-    - Ranged Troop Assault
-    - Siege
-    - Ranged Troop Ares
-    - Grand Duke of Kievan Rus
   ascending: true
+  basic_attributes:
+    attack:
+      base: 105
+      increment: 8.23
+    defense:
+      base: 106
+      increment: 8.66
+    leadership:
+      base: 113
+      increment: 8.69
+    politics:
+      base: 115
+      increment: 9.04
+  book: Dignity of Grand Prince
+  display: summary
+  name: Vladimir the Great
+  specialities:
+  - Ranged Troop Assault
+  - Siege
+  - Ranged Troop Ares
+  - Grand Duke of Kievan Rus
+  stars: red5
+  type:
+  - ranged_specialist

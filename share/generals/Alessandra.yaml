@@ -1,23 +1,27 @@
 ---
 general:
-  name: Alessandra
-  display: summary
-  leadership: 119
-  leadership_increment: 8.91
-  attack: 115
-  attack_increment: 8.87
-  defense: 122
-  defense_increment: 9.04
-  politics: 104
-  politics_increment: 8.56
-  stars: '5Red'
-  level: '1'
-  type:
-   - ground_specialist
-  book: Eagle of Snowfield
-  specialities:
-    - Ground Troop Defense
-    - Formation
-    - Ground Troop Ares
-    - Wild Hunt Valkyrie
   ascending: true
+  basic_attributes:
+    attack:
+      base: 115
+      increment: 8.87
+    defense:
+      base: 122
+      increment: 9.04
+    leadership:
+      base: 119
+      increment: 8.91
+    politics:
+      base: 104
+      increment: 8.56
+  book: Eagle of Snowfield
+  display: summary
+  name: Alessandra
+  specialities:
+  - Ground Troop Defense
+  - Formation
+  - Ground Troop Ares
+  - Wild Hunt Valkyrie
+  stars: red5
+  type:
+  - ground_specialist

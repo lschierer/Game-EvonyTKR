@@ -1,81 +1,81 @@
 ---
-name: Dragontamer
 levels:
-  - level: Green
-    buff:
-      - attribute: Attack
-        condition:
-          - brings a dragon
-        class: Ground Troops
-        value:
-          number: 3
-          unit: percentage
-      - attribute: HP
-        condition:
-          - brings a dragon
-        class: Ground Troops
-        value:
-          number: 3
-          unit: percentage
-  - level: Blue
-    buff:
-      - attribute: Attack
-        condition:
-          - brings a dragon
-        class: Ground Troops
-        value:
-          number: 3
-          unit: percentage
-      - attribute: HP
-        condition:
-          - brings a dragon
-        class: Ground Troops
-        value:
-          number: 3
-          unit: percentage
-  - level: Purple
-    buff:
-      - attribute: Attack
-        condition:
-          - brings a dragon
-        class: Ground Troops
-        value:
-          number: 6
-          unit: percentage
-      - attribute: HP
-        class: Ground Troops
-        value:
-          number: 6
-          unit: percentage
-  - level: Orange
-    buff:
-      - attribute: Attack
-        condition:
-          - brings a dragon
-        class: Ground Troops
-        value:
-          number: 6
-          unit: percentage
-      - attribute: HP
-        condition:
-          - brings a dragon
-        class: Ground Troops
-        value:
-          number: 6
-          unit: percentage
-  - level: Gold
-    buff:
-      - attribute: Attack
-        condition:
-          - brings a dragon
-        class: Ground Troops
-        value:
-          number: 12
-          unit: percentage
-      - attribute: HP
-        condition:
-          - brings a dragon
-        class: Ground Troops
-        value:
-          number: 12
-          unit: percentage
+- buff:
+  - attribute: Attack
+    class: Ground Troops
+    condition:
+    - brings_a_dragon
+    value:
+      number: 3
+      unit: percentage
+  - attribute: HP
+    class: Ground Troops
+    condition:
+    - brings_a_dragon
+    value:
+      number: 3
+      unit: percentage
+  level: green
+- buff:
+  - attribute: Attack
+    class: Ground Troops
+    condition:
+    - brings_a_dragon
+    value:
+      number: 3
+      unit: percentage
+  - attribute: HP
+    class: Ground Troops
+    condition:
+    - brings_a_dragon
+    value:
+      number: 3
+      unit: percentage
+  level: blue
+- buff:
+  - attribute: Attack
+    class: Ground Troops
+    condition:
+    - brings_a_dragon
+    value:
+      number: 6
+      unit: percentage
+  - attribute: HP
+    class: Ground Troops
+    value:
+      number: 6
+      unit: percentage
+  level: purple
+- buff:
+  - attribute: Attack
+    class: Ground Troops
+    condition:
+    - brings_a_dragon
+    value:
+      number: 6
+      unit: percentage
+  - attribute: HP
+    class: Ground Troops
+    condition:
+    - brings_a_dragon
+    value:
+      number: 6
+      unit: percentage
+  level: orange
+- buff:
+  - attribute: Attack
+    class: Ground Troops
+    condition:
+    - brings_a_dragon
+    value:
+      number: 12
+      unit: percentage
+  - attribute: HP
+    class: Ground Troops
+    condition:
+    - brings_a_dragon
+    value:
+      number: 12
+      unit: percentage
+  level: gold
+name: Dragontamer

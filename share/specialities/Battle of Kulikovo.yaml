@@ -1,73 +1,73 @@
 ---
-name: Battle of Kulikovo
 levels:
-  - level: 'Green'
-    buff:
-      - attribute: Attack
-        condition:
-          - Reinforcing
-        value:
-          number: 2
-          unit: percentage
-      - attribute: HP
-        condition:
-          - Reinforcing
-        value:
-          number: 2
-          unit: percentage
-  - level: 'Blue'
-    buff:
-      - attribute: Attack
-        condition:
-          - Reinforcing
-        value:
-          number: 2
-          unit: percentage
-      - attribute: HP
-        condition:
-          - Reinforcing
-        value:
-          number: 2
-          unit: percentage
-  - level: 'Purple'
-    buff:
-      - attribute: Attack
-        condition:
-          - Reinforcing
-        value:
-          number: 3
-          unit: percentage
-      - attribute: HP
-        condition:
-          - Reinforcing
-        value:
-          number: 3
-          unit: percentage
-  - level: 'Orange'
-    buff:
-      - attribute: Attack
-        condition:
-          - Reinforcing
-        value:
-          number: 3
-          unit: percentage
-      - attribute: HP
-        condition:
-          - Reinforcing
-        value:
-          number: 3
-          unit: percentage
-  - level: 'Gold'
-    buff:
-      - attribute: Attack
-        condition:
-          - Reinforcing
-        value:
-          number: 6
-          unit: percentage
-      - attribute: HP
-        condition:
-          - Reinforcing
-        value:
-          number: 6
-          unit: percentage
+- buff:
+  - attribute: Attack
+    condition:
+    - reinforcing
+    value:
+      number: 2
+      unit: percentage
+  - attribute: HP
+    condition:
+    - reinforcing
+    value:
+      number: 2
+      unit: percentage
+  level: green
+- buff:
+  - attribute: Attack
+    condition:
+    - reinforcing
+    value:
+      number: 2
+      unit: percentage
+  - attribute: HP
+    condition:
+    - reinforcing
+    value:
+      number: 2
+      unit: percentage
+  level: blue
+- buff:
+  - attribute: Attack
+    condition:
+    - reinforcing
+    value:
+      number: 3
+      unit: percentage
+  - attribute: HP
+    condition:
+    - reinforcing
+    value:
+      number: 3
+      unit: percentage
+  level: purple
+- buff:
+  - attribute: Attack
+    condition:
+    - reinforcing
+    value:
+      number: 3
+      unit: percentage
+  - attribute: HP
+    condition:
+    - reinforcing
+    value:
+      number: 3
+      unit: percentage
+  level: orange
+- buff:
+  - attribute: Attack
+    condition:
+    - reinforcing
+    value:
+      number: 6
+      unit: percentage
+  - attribute: HP
+    condition:
+    - reinforcing
+    value:
+      number: 6
+      unit: percentage
+  level: gold
+name: Battle of Kulikovo

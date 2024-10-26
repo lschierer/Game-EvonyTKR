@@ -1,188 +1,188 @@
 ---
-name: Rhine Flame Axe
 levels:
-  - level: Green
-    buff:
-      - attribute: Attack
-        condition:
-          - Marching
-        class: Siege Machines
-        value:
-          number: 4
-          unit: percentage
-      - attribute: Defense
-        condition:
-          - Attacking
-        class: Siege Machines
-        value:
-          number: 2
-          unit: percentage
-      - attribute: Defense
-        condition:
-          - Attacking
-        class: Ranged Troops
-        value:
-          number: 2
-          unit: percentage
-      - attribute: HP
-        condition:
-          - Attacking
-        class: Ranged Troops
-        value:
-          number: 2
-          unit: percentage
-      - attribute: HP
-        condition:
-          - Attacking
-        class: Siege Machines
-        value:
-          number: 2
-          unit: percentage
-  - level: Blue
-    buff:
-      - attribute: Attack
-        condition:
-          - Marching
-        class: Siege Machines
-        value:
-          number: 4
-          unit: percentage
-      - attribute: Defense
-        condition:
-          - Attacking
-        class: Siege Machines
-        value:
-          number: 3
-          unit: percentage
-      - attribute: Defense
-        condition:
-          - Attacking
-        class: Ranged Troops
-        value:
-          number: 3
-          unit: percentage
-      - attribute: HP
-        condition:
-          - Attacking
-        class: Ranged Troops
-        value:
-          number: 3
-          unit: percentage
-      - attribute: HP
-        condition:
-          - Attacking
-        class: Siege Machines
-        value:
-          number: 3
-          unit: percentage
-  - level: Purple
-    buff:
-      - attribute: Attack
-        condition:
-          - Marching
-        class: Siege Machines
-        value:
-          number: 8
-          unit: percentage
-      - attribute: Defense
-        condition:
-          - Attacking
-        class: Siege Machines
-        value:
-          number: 5
-          unit: percentage
-      - attribute: Defense
-        condition:
-          - Attacking
-        class: Ranged Troops
-        value:
-          number: 5
-          unit: percentage
-      - attribute: HP
-        condition:
-          - Attacking
-        class: Ranged Troops
-        value:
-          number: 5
-          unit: percentage
-      - attribute: HP
-        condition:
-          - Attacking
-        class: Siege Machines
-        value:
-          number: 5
-          unit: percentage
-  - level: Orange
-    buff:
-      - attribute: Attack
-        condition:
-          - Marching
-        class: Siege Machines
-        value:
-          number: 8
-          unit: percentage
-      - attribute: Defense
-        condition:
-          - Attacking
-        class: Siege Machines
-        value:
-          number: 5
-          unit: percentage
-      - attribute: Defense
-        condition:
-          - Attacking
-        class: Ranged Troops
-        value:
-          number: 5
-          unit: percentage
-      - attribute: HP
-        condition:
-          - Attacking
-        class: Ranged Troops
-        value:
-          number: 5
-          unit: percentage
-      - attribute: HP
-        condition:
-          - Attacking
-        class: Siege Machines
-        value:
-          number: 5
-          unit: percentage
-  - level: Gold
-    buff:
-      - attribute: Attack
-        condition:
-          - Marching
-        class: Siege Machines
-        value:
-          number: 16
-          unit: percentage
-      - attribute: Defense
-        condition:
-          - Attacking
-        class: Siege Machines
-        value:
-          number: 10
-          unit: percentage
-      - attribute: Defense
-        condition:
-          - Attacking
-        class: Ranged Troops
-        value:
-          number: 10
-          unit: percentage
-      - attribute: HP
-        condition:
-          - Attacking
-        class: Ranged Troops
-        value:
-          number: 10
-          unit: percentage
-      - attribute: HP
-        condition:
-          - Attacking
-        class: Siege Machines
-        value:
-          number: 10
-          unit: percentage
+- buff:
+  - attribute: Attack
+    class: Siege Machines
+    condition:
+    - marching
+    value:
+      number: 4
+      unit: percentage
+  - attribute: Defense
+    class: Siege Machines
+    condition:
+    - attacking
+    value:
+      number: 2
+      unit: percentage
+  - attribute: Defense
+    class: Ranged Troops
+    condition:
+    - attacking
+    value:
+      number: 2
+      unit: percentage
+  - attribute: HP
+    class: Ranged Troops
+    condition:
+    - attacking
+    value:
+      number: 2
+      unit: percentage
+  - attribute: HP
+    class: Siege Machines
+    condition:
+    - attacking
+    value:
+      number: 2
+      unit: percentage
+  level: green
+- buff:
+  - attribute: Attack
+    class: Siege Machines
+    condition:
+    - marching
+    value:
+      number: 4
+      unit: percentage
+  - attribute: Defense
+    class: Siege Machines
+    condition:
+    - attacking
+    value:
+      number: 3
+      unit: percentage
+  - attribute: Defense
+    class: Ranged Troops
+    condition:
+    - attacking
+    value:
+      number: 3
+      unit: percentage
+  - attribute: HP
+    class: Ranged Troops
+    condition:
+    - attacking
+    value:
+      number: 3
+      unit: percentage
+  - attribute: HP
+    class: Siege Machines
+    condition:
+    - attacking
+    value:
+      number: 3
+      unit: percentage
+  level: blue
+- buff:
+  - attribute: Attack
+    class: Siege Machines
+    condition:
+    - marching
+    value:
+      number: 8
+      unit: percentage
+  - attribute: Defense
+    class: Siege Machines
+    condition:
+    - attacking
+    value:
+      number: 5
+      unit: percentage
+  - attribute: Defense
+    class: Ranged Troops
+    condition:
+    - attacking
+    value:
+      number: 5
+      unit: percentage
+  - attribute: HP
+    class: Ranged Troops
+    condition:
+    - attacking
+    value:
+      number: 5
+      unit: percentage
+  - attribute: HP
+    class: Siege Machines
+    condition:
+    - attacking
+    value:
+      number: 5
+      unit: percentage
+  level: purple
+- buff:
+  - attribute: Attack
+    class: Siege Machines
+    condition:
+    - marching
+    value:
+      number: 8
+      unit: percentage
+  - attribute: Defense
+    class: Siege Machines
+    condition:
+    - attacking
+    value:
+      number: 5
+      unit: percentage
+  - attribute: Defense
+    class: Ranged Troops
+    condition:
+    - attacking
+    value:
+      number: 5
+      unit: percentage
+  - attribute: HP
+    class: Ranged Troops
+    condition:
+    - attacking
+    value:
+      number: 5
+      unit: percentage
+  - attribute: HP
+    class: Siege Machines
+    condition:
+    - attacking
+    value:
+      number: 5
+      unit: percentage
+  level: orange
+- buff:
+  - attribute: Attack
+    class: Siege Machines
+    condition:
+    - marching
+    value:
+      number: 16
+      unit: percentage
+  - attribute: Defense
+    class: Siege Machines
+    condition:
+    - attacking
+    value:
+      number: 10
+      unit: percentage
+  - attribute: Defense
+    class: Ranged Troops
+    condition:
+    - attacking
+    value:
+      number: 10
+      unit: percentage
+  - attribute: HP
+    class: Ranged Troops
+    condition:
+    - attacking
+    value:
+      number: 10
+      unit: percentage
+  - attribute: HP
+    class: Siege Machines
+    condition:
+    - attacking
+    value:
+      number: 10
+      unit: percentage
+  level: gold
+name: Rhine Flame Axe

@@ -1,68 +1,68 @@
 ---
-name: Battle of Mobei
 levels:
-  - level: 'Green'
-    buff:
-      - attribute: March Time
-        value:
-          number: 1
-          unit: percentage
-      - attribute: Attack
-        condition:
-          - Marching
-        class: Mounted Troops
-        value:
-          number: 3
-          unit: percentage
-  - level: 'Blue'
-    buff:
-      - attribute: March Time
-        value:
-          number: 1
-          unit: percentage
-      - attribute: Attack
-        condition:
-          - Marching
-        class: Mounted Troops
-        value:
-          number: 3
-          unit: percentage
-  - level: 'Purple'
-    buff:
-      - attribute: March Time
-        value:
-          number: 2
-          unit: percentage
-      - attribute: Attack
-        condition:
-          - Marching
-        class: Mounted Troops
-        value:
-          number: 6
-          unit: percentage
-  - level: 'Orange'
-    buff:
-      - attribute: March Time
-        value:
-          number: 2
-          unit: percentage
-      - attribute: Attack
-        condition:
-          - Marching
-        class: Mounted Troops
-        value:
-          number: 6
-          unit: percentage
-  - level: 'Gold'
-    buff:
-      - attribute: March Time
-        value:
-          number: 4
-          unit: percentage
-      - attribute: Attack
-        condition:
-          - Marching
-        class: Mounted Troops
-        value:
-          number: 12
-          unit: percentage
+- buff:
+  - attribute: March Time
+    value:
+      number: 1
+      unit: percentage
+  - attribute: Attack
+    class: Mounted Troops
+    condition:
+    - marching
+    value:
+      number: 3
+      unit: percentage
+  level: green
+- buff:
+  - attribute: March Time
+    value:
+      number: 1
+      unit: percentage
+  - attribute: Attack
+    class: Mounted Troops
+    condition:
+    - marching
+    value:
+      number: 3
+      unit: percentage
+  level: blue
+- buff:
+  - attribute: March Time
+    value:
+      number: 2
+      unit: percentage
+  - attribute: Attack
+    class: Mounted Troops
+    condition:
+    - marching
+    value:
+      number: 6
+      unit: percentage
+  level: purple
+- buff:
+  - attribute: March Time
+    value:
+      number: 2
+      unit: percentage
+  - attribute: Attack
+    class: Mounted Troops
+    condition:
+    - marching
+    value:
+      number: 6
+      unit: percentage
+  level: orange
+- buff:
+  - attribute: March Time
+    value:
+      number: 4
+      unit: percentage
+  - attribute: Attack
+    class: Mounted Troops
+    condition:
+    - marching
+    value:
+      number: 12
+      unit: percentage
+  level: gold
+name: Battle of Mobei

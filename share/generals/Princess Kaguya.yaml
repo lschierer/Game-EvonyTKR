@@ -1,23 +1,27 @@
 ---
 general:
-  name: Princess Kaguya
-  display: summary
-  leadership: 115
-  leadership_increment: 8.92
-  attack: 114
-  attack_increment: 8.83
-  defense: 116
-  defense_increment: 8.96
-  politics: 115
-  politics_increment: 8.64
-  stars: '5Red'
-  level: '1'
-  type:
-   - ranged_specialist
-  book: Blood Restrain
   ascending: true
+  basic_attributes:
+    attack:
+      base: 114
+      increment: 8.83
+    defense:
+      base: 116
+      increment: 8.96
+    leadership:
+      base: 115
+      increment: 8.92
+    politics:
+      base: 115
+      increment: 8.64
+  book: Blood Restrain
+  display: summary
+  name: Princess Kaguya
   specialities:
-    - Ranged Troop Formation
-    - Siege
-    - War God
-    - The Tale of the Bamboo Cutter
+  - Ranged Troop Formation
+  - Siege
+  - War God
+  - The Tale of the Bamboo Cutter
+  stars: red5
+  type:
+  - ranged_specialist

@@ -1,83 +1,83 @@
 ---
-name: Holy Knight
 levels:
-  - level: 'Green'
-    buff:
-      - attribute: Attack
-        condition:
-          - Marching
-        class: Ranged Troops
-        value:
-          number: 3
-          unit: percentage
-      - attribute: Attack
-        condition:
-          - Marching
-        class: Mounted Troops
-        value:
-          number: 3
-          unit: percentage
-  - level: 'Blue'
-    buff:
-      - attribute: Attack
-        condition:
-          - Marching
-        class: Ranged Troops
-        value:
-          number: 3
-          unit: percentage
-      - attribute: Attack
-        condition:
-          - Marching
-        class: Mounted Troops
-        value:
-          number: 3
-          unit: percentage
-  - level: 'Purple'
-    buff:
-      - attribute: Attack
-        condition:
-          - Marching
-        class: Ranged Troops
-        value:
-          number: 5
-          unit: percentage
-      - attribute: Attack
-        condition:
-          - Marching
-        class: Mounted Troops
-        value:
-          number: 5
-          unit: percentage
-  - level: 'Orange'
-    buff:
-      - attribute: Attack
-        condition:
-          - Marching
-        class: Ranged Troops
-        value:
-          number: 5
-          unit: percentage
-      - attribute: Attack
-        condition:
-          - Marching
-        class: Mounted Troops
-        value:
-          number: 5
-          unit: percentage
-  - level: 'Gold'
-    buff:
-      - attribute: Attack
-        condition:
-          - Marching
-        class: Ranged Troops
-        value:
-          number: 10
-          unit: percentage
-      - attribute: Attack
-        condition:
-          - Marching
-        class: Mounted Troops
-        value:
-          number: 10
-          unit: percentage
+- buff:
+  - attribute: Attack
+    class: Ranged Troops
+    condition:
+    - marching
+    value:
+      number: 3
+      unit: percentage
+  - attribute: Attack
+    class: Mounted Troops
+    condition:
+    - marching
+    value:
+      number: 3
+      unit: percentage
+  level: green
+- buff:
+  - attribute: Attack
+    class: Ranged Troops
+    condition:
+    - marching
+    value:
+      number: 3
+      unit: percentage
+  - attribute: Attack
+    class: Mounted Troops
+    condition:
+    - marching
+    value:
+      number: 3
+      unit: percentage
+  level: blue
+- buff:
+  - attribute: Attack
+    class: Ranged Troops
+    condition:
+    - marching
+    value:
+      number: 5
+      unit: percentage
+  - attribute: Attack
+    class: Mounted Troops
+    condition:
+    - marching
+    value:
+      number: 5
+      unit: percentage
+  level: purple
+- buff:
+  - attribute: Attack
+    class: Ranged Troops
+    condition:
+    - marching
+    value:
+      number: 5
+      unit: percentage
+  - attribute: Attack
+    class: Mounted Troops
+    condition:
+    - marching
+    value:
+      number: 5
+      unit: percentage
+  level: orange
+- buff:
+  - attribute: Attack
+    class: Ranged Troops
+    condition:
+    - marching
+    value:
+      number: 10
+      unit: percentage
+  - attribute: Attack
+    class: Mounted Troops
+    condition:
+    - marching
+    value:
+      number: 10
+      unit: percentage
+  level: gold
+name: Holy Knight

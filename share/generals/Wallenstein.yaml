@@ -1,23 +1,27 @@
 ---
 general:
-  name: Wallenstein
-  display: summary
-  leadership: 122
-  leadership_increment: 9.02
-  attack: 118
-  attack_increment: 8.97
-  defense: 116
-  defense_increment: 8.88
-  politics: 104
-  politics_increment: 8.50
-  stars: '5Red'
-  level: '1'
-  type:
-   - ranged_specialist
-  book: Bohemian Pioneer
   ascending: true
+  basic_attributes:
+    attack:
+      base: 118
+      increment: 8.97
+    defense:
+      base: 116
+      increment: 8.88
+    leadership:
+      base: 122
+      increment: 9.02
+    politics:
+      base: 104
+      increment: 8.5
+  book: Bohemian Pioneer
+  display: summary
+  name: Wallenstein
   specialities:
-    - Ranged Troop Assault
-    - Bash
-    - War God
-    - Battle of Alte Veste
+  - Ranged Troop Assault
+  - Bash
+  - War God
+  - Battle of Alte Veste
+  stars: red5
+  type:
+  - ranged_specialist

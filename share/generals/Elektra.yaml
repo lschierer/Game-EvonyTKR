@@ -1,25 +1,29 @@
 ---
 general:
-  name: Elektra
-  display: summary
-  leadership: 115
-  leadership_increment: 9.03
-  attack: 110
-  attack_increment: 8.87
-  defense: 115
-  defense_increment: 9.11
-  politics: 112
-  politics_increment: 8.26
-  stars: '5Red'
-  level: '1'
-  type:
-   - ranged_specialist
-  extra:
-    - Dragon God - Elektra
-  book: Blood Restrain
   ascending: true
+  basic_attributes:
+    attack:
+      base: 110
+      increment: 8.87
+    defense:
+      base: 115
+      increment: 9.11
+    leadership:
+      base: 115
+      increment: 9.03
+    politics:
+      base: 112
+      increment: 8.26
+  book: Blood Restrain
+  display: summary
+  extra:
+  - Dragon God - Elektra
+  name: Elektra
   specialities:
-    - Ranged Troop Assault
-    - Siege
-    - Ranged Troop Ares
-    - Holy Knight
+  - Ranged Troop Assault
+  - Siege
+  - Ranged Troop Ares
+  - Holy Knight
+  stars: red5
+  type:
+  - ranged_specialist

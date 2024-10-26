@@ -1,63 +1,63 @@
 ---
-name: Ranged Troop Defense
 levels:
-  - level: Green
-    buff:
-      - attribute: HP
-        class: Ranged Troops
-        value:
-          number: 1
-          unit: percentage
-      - attribute: Defense
-        class: Ranged Troops
-        value:
-          number: 1
-          unit: percentage
-  - level: Blue
-    buff:
-      - attribute: HP
-        class: Ranged Troops
-        value:
-          number: 1
-          unit: percentage
-      - attribute: Defense
-        class: Ranged Troops
-        value:
-          number: 1
-          unit: percentage
-  - level: Purple
-    buff:
-      - attribute: HP
-        class: Ranged Troops
-        value:
-          number: 2
-          unit: percentage
-      - attribute: Defense
-        class: Ranged Troops
-        value:
-          number: 2
-          unit: percentage
-  - level: Orange
-    buff:
-      - attribute: HP
-        class: Ranged Troops
-        value:
-          number: 2
-          unit: percentage
-      - attribute: Defense
-        class: Ranged Troops
-        value:
-          number: 2
-          unit: percentage
-  - level: Gold
-    buff:
-      - attribute: HP
-        class: Ranged Troops
-        value:
-          number: 4
-          unit: percentage
-      - attribute: Defense
-        class: Ranged Troops
-        value:
-          number: 4
-          unit: percentage
+- buff:
+  - attribute: HP
+    class: Ranged Troops
+    value:
+      number: 1
+      unit: percentage
+  - attribute: Defense
+    class: Ranged Troops
+    value:
+      number: 1
+      unit: percentage
+  level: green
+- buff:
+  - attribute: HP
+    class: Ranged Troops
+    value:
+      number: 1
+      unit: percentage
+  - attribute: Defense
+    class: Ranged Troops
+    value:
+      number: 1
+      unit: percentage
+  level: blue
+- buff:
+  - attribute: HP
+    class: Ranged Troops
+    value:
+      number: 2
+      unit: percentage
+  - attribute: Defense
+    class: Ranged Troops
+    value:
+      number: 2
+      unit: percentage
+  level: purple
+- buff:
+  - attribute: HP
+    class: Ranged Troops
+    value:
+      number: 2
+      unit: percentage
+  - attribute: Defense
+    class: Ranged Troops
+    value:
+      number: 2
+      unit: percentage
+  level: orange
+- buff:
+  - attribute: HP
+    class: Ranged Troops
+    value:
+      number: 4
+      unit: percentage
+  - attribute: Defense
+    class: Ranged Troops
+    value:
+      number: 4
+      unit: percentage
+  level: gold
+name: Ranged Troop Defense

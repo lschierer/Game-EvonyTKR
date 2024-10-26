@@ -1,22 +1,26 @@
 ---
 general:
-  name: Charles the Great
-  display: summary
-  leadership: 110
-  leadership_increment: 8.66
-  attack: 103
-  attack_increment: 7.84
-  defense: 100
-  defense_increment: 7.83
-  politics: 114
-  politics_increment: 8.98
-  stars: '5Red'
-  level: '1'
-  type: mayor
-  book: Domination
-  specialities:
-    - Mounted Troop Formation
-    - Trapping
-    - Ruler
-    - Empire Founder
   ascending: true
+  basic_attributes:
+    attack:
+      base: 103
+      increment: 7.84
+    defense:
+      base: 100
+      increment: 7.83
+    leadership:
+      base: 110
+      increment: 8.66
+    politics:
+      base: 114
+      increment: 8.98
+  book: Domination
+  display: summary
+  name: Charles the Great
+  specialities:
+  - Mounted Troop Formation
+  - Trapping
+  - Ruler
+  - Empire Founder
+  stars: red5
+  type: mayor

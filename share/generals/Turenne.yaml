@@ -1,23 +1,27 @@
 ---
 general:
-  name: Turenne
-  display: summary
-  level: '1'
-  stars: '5Red'
-  type:
-   - ground_specialist
-  leadership: 125
-  leadership_increment: 9.13
-  attack: 116
-  attack_increment: 8.82
-  defense: 113
-  defense_increment: 8.76
-  politics: 107
-  politics_increment: 8.64
-  book: Crossing the River Rhine
   ascending: true
+  basic_attributes:
+    attack:
+      base: 116
+      increment: 8.82
+    defense:
+      base: 113
+      increment: 8.76
+    leadership:
+      base: 125
+      increment: 9.13
+    politics:
+      base: 107
+      increment: 8.64
+  book: Crossing the River Rhine
+  display: summary
+  name: Turenne
   specialities:
-    - Ground Troop Assault
-    - Formation
-    - Ground Troop Ares
-    - Battle of the Dunes
+  - Ground Troop Assault
+  - Formation
+  - Ground Troop Ares
+  - Battle of the Dunes
+  stars: red5
+  type:
+  - ground_specialist

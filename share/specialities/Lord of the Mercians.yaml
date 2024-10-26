@@ -1,153 +1,153 @@
 ---
-name: Lord of the Mercians
 levels:
-  - level: Green
-    buff:
-      - attribute: Attack
-        class: Mounted Troops
-        condition:
-          - Against Monsters
-        value:
-          number: 3
-          unit: percentage
-      - attribute: Attack
-        class: Ground Troops
-        condition:
-          - Against Monsters
-        value:
-          number: 3
-          unit: percentage
-      - attribute: Defense
-        class: Mounted Troops
-        condition:
-          - Against Monsters
-        value:
-          number: 3
-          unit: percentage
-      - attribute: Defense
-        class: Ground Troops
-        condition:
-          - Against Monsters
-        value:
-          number: 3
-          unit: percentage
-  - level: Blue
-    buff:
-      - attribute: Attack
-        class: Mounted Troops
-        condition:
-          - Against Monsters
-        value:
-          number: 3
-          unit: percentage
-      - attribute: Attack
-        class: Ground Troops
-        condition:
-          - Against Monsters
-        value:
-          number: 3
-          unit: percentage
-      - attribute: Defense
-        class: Mounted Troops
-        condition:
-          - Against Monsters
-        value:
-          number: 3
-          unit: percentage
-      - attribute: Defense
-        class: Ground Troops
-        condition:
-          - Against Monsters
-        value:
-          number: 3
-          unit: percentage
-  - level: Purple
-    buff:
-      - attribute: Attack
-        class: Mounted Troops
-        condition:
-          - Against Monsters
-        value:
-          number: 6
-          unit: percentage
-      - attribute: Attack
-        class: Ground Troops
-        condition:
-          - Against Monsters
-        value:
-          number: 6
-          unit: percentage
-      - attribute: Defense
-        class: Mounted Troops
-        condition:
-          - Against Monsters
-        value:
-          number: 6
-          unit: percentage
-      - attribute: Defense
-        class: Ground Troops
-        condition:
-          - Against Monsters
-        value:
-          number: 6
-          unit: percentage
-  - level: Orange
-    buff:
-      - attribute: Attack
-        class: Mounted Troops
-        condition:
-          - Against Monsters
-        value:
-          number: 6
-          unit: percentage
-      - attribute: Attack
-        class: Ground Troops
-        condition:
-          - Against Monsters
-        value:
-          number: 6
-          unit: percentage
-      - attribute: Defense
-        class: Mounted Troops
-        condition:
-          - Against Monsters
-        value:
-          number: 6
-          unit: percentage
-      - attribute: Defense
-        class: Ground Troops
-        condition:
-          - Against Monsters
-        value:
-          number: 6
-          unit: percentage
-  - level: Gold
-    buff:
-      - attribute: Attack
-        class: Mounted Troops
-        condition:
-          - Against Monsters
-        value:
-          number: 12
-          unit: percentage
-      - attribute: Attack
-        class: Ground Troops
-        condition:
-          - Against Monsters
-        value:
-          number: 12
-          unit: percentage
-      - attribute: Defense
-        class: Mounted Troops
-        condition:
-          - Against Monsters
-        value:
-          number: 12
-          unit: percentage
-      - attribute: Defense
-        class: Ground Troops
-        condition:
-          - Against Monsters
-        value:
-          number: 12
-          unit: percentage
+- buff:
+  - attribute: Attack
+    class: Mounted Troops
+    condition:
+    - against_monsters
+    value:
+      number: 3
+      unit: percentage
+  - attribute: Attack
+    class: Ground Troops
+    condition:
+    - against_monsters
+    value:
+      number: 3
+      unit: percentage
+  - attribute: Defense
+    class: Mounted Troops
+    condition:
+    - against_monsters
+    value:
+      number: 3
+      unit: percentage
+  - attribute: Defense
+    class: Ground Troops
+    condition:
+    - against_monsters
+    value:
+      number: 3
+      unit: percentage
+  level: green
+- buff:
+  - attribute: Attack
+    class: Mounted Troops
+    condition:
+    - against_monsters
+    value:
+      number: 3
+      unit: percentage
+  - attribute: Attack
+    class: Ground Troops
+    condition:
+    - against_monsters
+    value:
+      number: 3
+      unit: percentage
+  - attribute: Defense
+    class: Mounted Troops
+    condition:
+    - against_monsters
+    value:
+      number: 3
+      unit: percentage
+  - attribute: Defense
+    class: Ground Troops
+    condition:
+    - against_monsters
+    value:
+      number: 3
+      unit: percentage
+  level: blue
+- buff:
+  - attribute: Attack
+    class: Mounted Troops
+    condition:
+    - against_monsters
+    value:
+      number: 6
+      unit: percentage
+  - attribute: Attack
+    class: Ground Troops
+    condition:
+    - against_monsters
+    value:
+      number: 6
+      unit: percentage
+  - attribute: Defense
+    class: Mounted Troops
+    condition:
+    - against_monsters
+    value:
+      number: 6
+      unit: percentage
+  - attribute: Defense
+    class: Ground Troops
+    condition:
+    - against_monsters
+    value:
+      number: 6
+      unit: percentage
+  level: purple
+- buff:
+  - attribute: Attack
+    class: Mounted Troops
+    condition:
+    - against_monsters
+    value:
+      number: 6
+      unit: percentage
+  - attribute: Attack
+    class: Ground Troops
+    condition:
+    - against_monsters
+    value:
+      number: 6
+      unit: percentage
+  - attribute: Defense
+    class: Mounted Troops
+    condition:
+    - against_monsters
+    value:
+      number: 6
+      unit: percentage
+  - attribute: Defense
+    class: Ground Troops
+    condition:
+    - against_monsters
+    value:
+      number: 6
+      unit: percentage
+  level: orange
+- buff:
+  - attribute: Attack
+    class: Mounted Troops
+    condition:
+    - against_monsters
+    value:
+      number: 12
+      unit: percentage
+  - attribute: Attack
+    class: Ground Troops
+    condition:
+    - against_monsters
+    value:
+      number: 12
+      unit: percentage
+  - attribute: Defense
+    class: Mounted Troops
+    condition:
+    - against_monsters
+    value:
+      number: 12
+      unit: percentage
+  - attribute: Defense
+    class: Ground Troops
+    condition:
+    - against_monsters
+    value:
+      number: 12
+      unit: percentage
+  level: gold
+name: Lord of the Mercians

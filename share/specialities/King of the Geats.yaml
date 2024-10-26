@@ -1,103 +1,103 @@
 ---
-name: King of the Geats
 levels:
-  - level: Green
-    buff:
-      - attribute: Attack
-        condition:
-          - Against Monsters
-        class: Mounted Troops
-        value:
-          number: 4
-          unit: percentage
-      - attribute: Attack
-        class: Mounted Troops
-        value:
-          number: 1
-          unit: percentage
-      - attribute: Marching Speed to Monsters
-        condition:
-          - Against Monsters
-        value:
-          number: 3
-          unit: percentage
-  - level: Blue
-    buff:
-      - attribute: Attack
-        condition:
-          - Against Monsters
-        class: Mounted Troops
-        value:
-          number: 4
-          unit: percentage
-      - attribute: Attack
-        class: Mounted Troops
-        value:
-          number: 2
-          unit: percentage
-      - attribute: Marching Speed to Monsters
-        condition:
-          - Against Monsters
-        value:
-          number: 4
-          unit: percentage
-  - level: Purple
-    buff:
-      - attribute: Attack
-        condition:
-          - Against Monsters
-        class: Mounted Troops
-        value:
-          number: 8
-          unit: percentage
-      - attribute: Attack
-        class: Mounted Troops
-        value:
-          number: 3
-          unit: percentage
-      - attribute: Marching Speed to Monsters
-        condition:
-          - Against Monsters
-        value:
-          number: 7
-          unit: percentage
-  - level: Orange
-    buff:
-      - attribute: Attack
-        condition:
-          - Against Monsters
-        class: Mounted Troops
-        value:
-          number: 8
-          unit: percentage
-      - attribute: Attack
-        class: Mounted Troops
-        value:
-          number: 3
-          unit: percentage
-      - attribute: Marching Speed to Monsters
-        condition:
-          - Against Monsters
-        value:
-          number: 7
-          unit: percentage
-  - level: Gold
-    buff:
-      - attribute: Attack
-        condition:
-          - Against Monsters
-        class: Mounted Troops
-        value:
-          number: 16
-          unit: percentage
-      - attribute: Attack
-        class: Mounted Troops
-        value:
-          number: 6
-          unit: percentage
-      - attribute: Marching Speed to Monsters
-        condition:
-          - Against Monsters
-        value:
-          number: 14
-          unit: percentage
+- buff:
+  - attribute: Attack
+    class: Mounted Troops
+    condition:
+    - against_monsters
+    value:
+      number: 4
+      unit: percentage
+  - attribute: Attack
+    class: Mounted Troops
+    value:
+      number: 1
+      unit: percentage
+  - attribute: Marching Speed to Monsters
+    condition:
+    - against_monsters
+    value:
+      number: 3
+      unit: percentage
+  level: green
+- buff:
+  - attribute: Attack
+    class: Mounted Troops
+    condition:
+    - against_monsters
+    value:
+      number: 4
+      unit: percentage
+  - attribute: Attack
+    class: Mounted Troops
+    value:
+      number: 2
+      unit: percentage
+  - attribute: Marching Speed to Monsters
+    condition:
+    - against_monsters
+    value:
+      number: 4
+      unit: percentage
+  level: blue
+- buff:
+  - attribute: Attack
+    class: Mounted Troops
+    condition:
+    - against_monsters
+    value:
+      number: 8
+      unit: percentage
+  - attribute: Attack
+    class: Mounted Troops
+    value:
+      number: 3
+      unit: percentage
+  - attribute: Marching Speed to Monsters
+    condition:
+    - against_monsters
+    value:
+      number: 7
+      unit: percentage
+  level: purple
+- buff:
+  - attribute: Attack
+    class: Mounted Troops
+    condition:
+    - against_monsters
+    value:
+      number: 8
+      unit: percentage
+  - attribute: Attack
+    class: Mounted Troops
+    value:
+      number: 3
+      unit: percentage
+  - attribute: Marching Speed to Monsters
+    condition:
+    - against_monsters
+    value:
+      number: 7
+      unit: percentage
+  level: orange
+- buff:
+  - attribute: Attack
+    class: Mounted Troops
+    condition:
+    - against_monsters
+    value:
+      number: 16
+      unit: percentage
+  - attribute: Attack
+    class: Mounted Troops
+    value:
+      number: 6
+      unit: percentage
+  - attribute: Marching Speed to Monsters
+    condition:
+    - against_monsters
+    value:
+      number: 14
+      unit: percentage
+  level: gold
+name: King of the Geats

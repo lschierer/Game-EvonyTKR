@@ -1,23 +1,27 @@
 ---
 general:
-  name: Dmitry
-  display: summary
-  leadership: 116
-  leadership_increment: 8.67
-  attack: 109
-  attack_increment: 8.25
-  defense: 116
-  defense_increment: 8.76
-  politics: 111
-  politics_increment: 8.73
-  stars: '5Red'
-  level: '1'
-  type:
-   - ground_specialist
-  book: Hero of Don River
-  specialities:
-    - Ranged Troop Formation
-    - Snipe
-    - Ranged Troop Ares
-    - Battle of Kulikovo
   ascending: true
+  basic_attributes:
+    attack:
+      base: 109
+      increment: 8.25
+    defense:
+      base: 116
+      increment: 8.76
+    leadership:
+      base: 116
+      increment: 8.67
+    politics:
+      base: 111
+      increment: 8.73
+  book: Hero of Don River
+  display: summary
+  name: Dmitry
+  specialities:
+  - Ranged Troop Formation
+  - Snipe
+  - Ranged Troop Ares
+  - Battle of Kulikovo
+  stars: red5
+  type:
+  - ground_specialist

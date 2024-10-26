@@ -1,43 +1,43 @@
 ---
-name: Suppress
 levels:
-  - level: Green
-    buff:
-      - attribute: HP
-        condition:
-          - Enemy
-        value:
-          number: 1
-          unit: percentage
-  - level: Blue
-    buff:
-      - attribute: HP
-        condition:
-          - Enemy
-        value:
-          number: 1
-          unit: percentage
-  - level: Purple
-    buff:
-      - attribute: HP
-        condition:
-          - Enemy
-        value:
-          number: 2
-          unit: percentage
-  - level: Orange
-    buff:
-      - attribute: HP
-        condition:
-          - Enemy
-        value:
-          number: 2
-          unit: percentage
-  - level: Gold
-    buff:
-      - attribute: HP
-        condition:
-          - Enemy
-        value:
-          number: 4
-          unit: percentage
+- buff:
+  - attribute: HP
+    condition:
+    - enemy
+    value:
+      number: 1
+      unit: percentage
+  level: green
+- buff:
+  - attribute: HP
+    condition:
+    - enemy
+    value:
+      number: 1
+      unit: percentage
+  level: blue
+- buff:
+  - attribute: HP
+    condition:
+    - enemy
+    value:
+      number: 2
+      unit: percentage
+  level: purple
+- buff:
+  - attribute: HP
+    condition:
+    - enemy
+    value:
+      number: 2
+      unit: percentage
+  level: orange
+- buff:
+  - attribute: HP
+    condition:
+    - enemy
+    value:
+      number: 4
+      unit: percentage
+  level: gold
+name: Suppress

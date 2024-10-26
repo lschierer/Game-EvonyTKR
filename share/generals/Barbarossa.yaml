@@ -1,23 +1,27 @@
 ---
 general:
-  name: Barbarossa
-  display: summary
-  leadership: 115
-  leadership_increment: 9.15
-  attack: 107
-  attack_increment: 8.43
-  defense: 109
-  defense_increment: 8.47
-  politics: 112
-  politics_increment: 8.63
-  stars: '5Red'
-  level: '1'
-  type:
-   - mounted_specialist
-  book: Bloody Leader
-  specialities:
-    - Mounted Troop Assault
-    - Annihilation
-    - Iron Warrior
-    - Crusaders
   ascending: true
+  basic_attributes:
+    attack:
+      base: 107
+      increment: 8.43
+    defense:
+      base: 109
+      increment: 8.47
+    leadership:
+      base: 115
+      increment: 9.15
+    politics:
+      base: 112
+      increment: 8.63
+  book: Bloody Leader
+  display: summary
+  name: Barbarossa
+  specialities:
+  - Mounted Troop Assault
+  - Annihilation
+  - Iron Warrior
+  - Crusaders
+  stars: red5
+  type:
+  - mounted_specialist

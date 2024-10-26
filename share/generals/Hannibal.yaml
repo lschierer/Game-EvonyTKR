@@ -1,23 +1,27 @@
 ---
 general:
-  name: Hannibal
-  display: summary
-  type:
-   - mounted_specialist
-  stars: '5Red'
-  leadership: 120
-  leadership_increment: 9.15
-  attack: 115
-  attack_increment: 8.75
-  defense: 108
-  defense_increment: 8.59
-  politics: 95
-  politics_increment: 8.29
-  level: '1'
-  book: Master of Strategy
   ascending: true
+  basic_attributes:
+    attack:
+      base: 115
+      increment: 8.75
+    defense:
+      base: 108
+      increment: 8.59
+    leadership:
+      base: 120
+      increment: 9.15
+    politics:
+      base: 95
+      increment: 8.29
+  book: Master of Strategy
+  display: summary
+  name: Hannibal
   specialities:
-    - Mounted Troop Assault
-    - Formation
-    - Mounted Troop Ares
-    - Battle of Cannae
+  - Mounted Troop Assault
+  - Formation
+  - Mounted Troop Ares
+  - Battle of Cannae
+  stars: red5
+  type:
+  - mounted_specialist

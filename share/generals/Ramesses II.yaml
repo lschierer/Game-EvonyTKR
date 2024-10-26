@@ -1,23 +1,27 @@
 ---
 general:
-  name: Ramesses II
-  display: summary
-  leadership: 113
-  leadership_increment: 8.75
-  attack: 111
-  attack_increment: 8.79
-  defense: 106
-  defense_increment: 8.56
-  politics: 112
-  politics_increment: 8.75
-  stars: '5Red'
-  level: '1'
-  type:
-   - siege_specialist
-  book: Great Pharaoh
-  specialities:
-    - Siege Machine Formation
-    - Bash
-    - Siege Machine Ares
-    - Battle of Kadesh
   ascending: true
+  basic_attributes:
+    attack:
+      base: 111
+      increment: 8.79
+    defense:
+      base: 106
+      increment: 8.56
+    leadership:
+      base: 113
+      increment: 8.75
+    politics:
+      base: 112
+      increment: 8.75
+  book: Great Pharaoh
+  display: summary
+  name: Ramesses II
+  specialities:
+  - Siege Machine Formation
+  - Bash
+  - Siege Machine Ares
+  - Battle of Kadesh
+  stars: red5
+  type:
+  - siege_specialist

@@ -1,88 +1,88 @@
 ---
-name: Mounted Troop Ares
 levels:
-  - level: Green
-    buff:
-      - attribute: Attack
-        class: Mounted Troops
-        value:
-          number: 1
-          unit: percentage
-      - attribute: HP
-        class: Mounted Troops
-        value:
-          number: 1
-          unit: percentage
-      - attribute: Defense
-        class: Mounted Troops
-        value:
-          number: 1
-          unit: percentage
-  - level: Blue
-    buff:
-      - attribute: Attack
-        class: Mounted Troops
-        value:
-          number: 1
-          unit: percentage
-      - attribute: HP
-        class: Mounted Troops
-        value:
-          number: 1
-          unit: percentage
-      - attribute: Defense
-        class: Mounted Troops
-        value:
-          number: 1
-          unit: percentage
-  - level: Purple
-    buff:
-      - attribute: Attack
-        class: Mounted Troops
-        value:
-          number: 2
-          unit: percentage
-      - attribute: HP
-        class: Mounted Troops
-        value:
-          number: 2
-          unit: percentage
-      - attribute: Defense
-        class: Mounted Troops
-        value:
-          number: 2
-          unit: percentage
-  - level: Orange
-    buff:
-      - attribute: Attack
-        class: Mounted Troops
-        value:
-          number: 2
-          unit: percentage
-      - attribute: HP
-        class: Mounted Troops
-        value:
-          number: 2
-          unit: percentage
-      - attribute: Defense
-        class: Mounted Troops
-        value:
-          number: 2
-          unit: percentage
-  - level: Gold
-    buff:
-      - attribute: Attack
-        class: Mounted Troops
-        value:
-          number: 4
-          unit: percentage
-      - attribute: HP
-        class: Mounted Troops
-        value:
-          number: 4
-          unit: percentage
-      - attribute: Defense
-        class: Mounted Troops
-        value:
-          number: 4
-          unit: percentage
+- buff:
+  - attribute: Attack
+    class: Mounted Troops
+    value:
+      number: 1
+      unit: percentage
+  - attribute: HP
+    class: Mounted Troops
+    value:
+      number: 1
+      unit: percentage
+  - attribute: Defense
+    class: Mounted Troops
+    value:
+      number: 1
+      unit: percentage
+  level: green
+- buff:
+  - attribute: Attack
+    class: Mounted Troops
+    value:
+      number: 1
+      unit: percentage
+  - attribute: HP
+    class: Mounted Troops
+    value:
+      number: 1
+      unit: percentage
+  - attribute: Defense
+    class: Mounted Troops
+    value:
+      number: 1
+      unit: percentage
+  level: blue
+- buff:
+  - attribute: Attack
+    class: Mounted Troops
+    value:
+      number: 2
+      unit: percentage
+  - attribute: HP
+    class: Mounted Troops
+    value:
+      number: 2
+      unit: percentage
+  - attribute: Defense
+    class: Mounted Troops
+    value:
+      number: 2
+      unit: percentage
+  level: purple
+- buff:
+  - attribute: Attack
+    class: Mounted Troops
+    value:
+      number: 2
+      unit: percentage
+  - attribute: HP
+    class: Mounted Troops
+    value:
+      number: 2
+      unit: percentage
+  - attribute: Defense
+    class: Mounted Troops
+    value:
+      number: 2
+      unit: percentage
+  level: orange
+- buff:
+  - attribute: Attack
+    class: Mounted Troops
+    value:
+      number: 4
+      unit: percentage
+  - attribute: HP
+    class: Mounted Troops
+    value:
+      number: 4
+      unit: percentage
+  - attribute: Defense
+    class: Mounted Troops
+    value:
+      number: 4
+      unit: percentage
+  level: gold
+name: Mounted Troop Ares

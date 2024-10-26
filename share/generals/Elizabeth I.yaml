@@ -1,23 +1,27 @@
 ---
 general:
-  name: Elizabeth I
-  display: summary
-  leadership: 115
-  leadership_increment: 8.73
-  attack: 113
-  attack_increment: 8.72
-  defense: 112
-  defense_increment: 8.65
-  politics: 120
-  politics_increment: 9.25
-  stars: '5Red'
-  level: '45'
-  type:
-   - ranged_specialist
-  book: Hammer of the Gauls - Elizabeth I
-  specialities:
-    - Ranged Troop Formation
-    - Annihilation
-    - Ranged Troop Ares
-    - Golden Age
   ascending: true
+  basic_attributes:
+    attack:
+      base: 113
+      increment: 8.72
+    defense:
+      base: 112
+      increment: 8.65
+    leadership:
+      base: 115
+      increment: 8.73
+    politics:
+      base: 120
+      increment: 9.25
+  book: Hammer of the Gauls - Elizabeth I
+  display: summary
+  name: Elizabeth I
+  specialities:
+  - Ranged Troop Formation
+  - Annihilation
+  - Ranged Troop Ares
+  - Golden Age
+  stars: red5
+  type:
+  - ranged_specialist

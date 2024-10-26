@@ -1,153 +1,153 @@
 ---
-name: Light of Wisdom
 levels:
-  - level: 'Green'
-    buff:
-      - attribute: Attack
-        condition:
-          - Marching
-        class: Ranged Troops
-        value:
-          number: 4
-          unit: percentage
-      - attribute: Defense
-        condition:
-          - Marching
-        class: Ranged Troops
-        value:
-          number: 3
-          unit: percentage
-      - attribute: HP
-        condition:
-          - Attacking
-        class: Ranged Troops
-        value:
-          number: 1
-          unit: percentage
-      - attribute: HP
-        condition:
-          - Attacking
-        class: Siege Machines
-        value:
-          number: 1
-          unit: percentage
-  - level: 'Blue'
-    buff:
-      - attribute: Attack
-        condition:
-          - Marching
-        class: Ranged Troops
-        value:
-          number: 4
-          unit: percentage
-      - attribute: Defense
-        condition:
-          - Marching
-        class: Ranged Troops
-        value:
-          number: 3
-          unit: percentage
-      - attribute: HP
-        condition:
-          - Attacking
-        class: Ranged Troops
-        value:
-          number: 2
-          unit: percentage
-      - attribute: HP
-        condition:
-          - Attacking
-        class: Siege Machines
-        value:
-          number: 2
-          unit: percentage
-  - level: 'Purple'
-    buff:
-      - attribute: Attack
-        condition:
-          - Marching
-        class: Ranged Troops
-        value:
-          number: 8
-          unit: percentage
-      - attribute: Defense
-        condition:
-          - Marching
-        class: Ranged Troops
-        value:
-          number: 6
-          unit: percentage
-      - attribute: HP
-        condition:
-          - Attacking
-        class: Ranged Troops
-        value:
-          number: 3
-          unit: percentage
-      - attribute: HP
-        condition:
-          - Attacking
-        class: Siege Machines
-        value:
-          number: 3
-          unit: percentage
-  - level: 'Orange'
-    buff:
-      - attribute: Attack
-        condition:
-          - Marching
-        class: Ranged Troops
-        value:
-          number: 8
-          unit: percentage
-      - attribute: Defense
-        condition:
-          - Marching
-        class: Ranged Troops
-        value:
-          number: 6
-          unit: percentage
-      - attribute: HP
-        condition:
-          - Attacking
-        class: Ranged Troops
-        value:
-          number: 3
-          unit: percentage
-      - attribute: HP
-        condition:
-          - Attacking
-        class: Siege Machines
-        value:
-          number: 3
-          unit: percentage
-  - level: 'Gold'
-    buff:
-      - attribute: Attack
-        condition:
-          - Marching
-        class: Ranged Troops
-        value:
-          number: 16
-          unit: percentage
-      - attribute: Defense
-        condition:
-          - Marching
-        class: Ranged Troops
-        value:
-          number: 12
-          unit: percentage
-      - attribute: HP
-        condition:
-          - Attacking
-        class: Ranged Troops
-        value:
-          number: 6
-          unit: percentage
-      - attribute: HP
-        condition:
-          - Attacking
-        class: Siege Machines
-        value:
-          number: 6
-          unit: percentage
+- buff:
+  - attribute: Attack
+    class: Ranged Troops
+    condition:
+    - marching
+    value:
+      number: 4
+      unit: percentage
+  - attribute: Defense
+    class: Ranged Troops
+    condition:
+    - marching
+    value:
+      number: 3
+      unit: percentage
+  - attribute: HP
+    class: Ranged Troops
+    condition:
+    - attacking
+    value:
+      number: 1
+      unit: percentage
+  - attribute: HP
+    class: Siege Machines
+    condition:
+    - attacking
+    value:
+      number: 1
+      unit: percentage
+  level: green
+- buff:
+  - attribute: Attack
+    class: Ranged Troops
+    condition:
+    - marching
+    value:
+      number: 4
+      unit: percentage
+  - attribute: Defense
+    class: Ranged Troops
+    condition:
+    - marching
+    value:
+      number: 3
+      unit: percentage
+  - attribute: HP
+    class: Ranged Troops
+    condition:
+    - attacking
+    value:
+      number: 2
+      unit: percentage
+  - attribute: HP
+    class: Siege Machines
+    condition:
+    - attacking
+    value:
+      number: 2
+      unit: percentage
+  level: blue
+- buff:
+  - attribute: Attack
+    class: Ranged Troops
+    condition:
+    - marching
+    value:
+      number: 8
+      unit: percentage
+  - attribute: Defense
+    class: Ranged Troops
+    condition:
+    - marching
+    value:
+      number: 6
+      unit: percentage
+  - attribute: HP
+    class: Ranged Troops
+    condition:
+    - attacking
+    value:
+      number: 3
+      unit: percentage
+  - attribute: HP
+    class: Siege Machines
+    condition:
+    - attacking
+    value:
+      number: 3
+      unit: percentage
+  level: purple
+- buff:
+  - attribute: Attack
+    class: Ranged Troops
+    condition:
+    - marching
+    value:
+      number: 8
+      unit: percentage
+  - attribute: Defense
+    class: Ranged Troops
+    condition:
+    - marching
+    value:
+      number: 6
+      unit: percentage
+  - attribute: HP
+    class: Ranged Troops
+    condition:
+    - attacking
+    value:
+      number: 3
+      unit: percentage
+  - attribute: HP
+    class: Siege Machines
+    condition:
+    - attacking
+    value:
+      number: 3
+      unit: percentage
+  level: orange
+- buff:
+  - attribute: Attack
+    class: Ranged Troops
+    condition:
+    - marching
+    value:
+      number: 16
+      unit: percentage
+  - attribute: Defense
+    class: Ranged Troops
+    condition:
+    - marching
+    value:
+      number: 12
+      unit: percentage
+  - attribute: HP
+    class: Ranged Troops
+    condition:
+    - attacking
+    value:
+      number: 6
+      unit: percentage
+  - attribute: HP
+    class: Siege Machines
+    condition:
+    - attacking
+    value:
+      number: 6
+      unit: percentage
+  level: gold
+name: Light of Wisdom

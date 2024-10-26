@@ -1,153 +1,153 @@
 ---
-name: Bonaparte Dynasty
 levels:
-  - level: 'Green'
-    buff:
-      - attribute: Attack
-        condition:
-          - dragon to the attack
-        class: Mounted Troops
-        value:
-          number: 4
-          unit: percentage
-      - attribute: Defense
-        condition:
-          - dragon to the attack
-        class: Mounted Troops
-        value:
-          number: 3
-          unit: percentage
-      - attribute: Attack
-        condition:
-          - Reduces Enemy with a Dragon
-        class: Ranged Troops
-        value:
-          number: 1
-          unit: percentage
-      - attribute: Attack
-        condition:
-          - Reduces Enemy with a Dragon
-        class: Siege Machines
-        value:
-          number: 1
-          unit: percentage
-  - level: 'Blue'
-    buff:
-      - attribute: Attack
-        condition:
-          - dragon to the attack
-        class: Mounted Troops
-        value:
-          number: 4
-          unit: percentage
-      - attribute: Defense
-        condition:
-          - dragon to the attack
-        class: Mounted Troops
-        value:
-          number: 3
-          unit: percentage
-      - attribute: Attack
-        condition:
-          - Reduces Enemy with a Dragon
-        class: Ranged Troops
-        value:
-          number: 2
-          unit: percentage
-      - attribute: Attack
-        condition:
-          - Reduces Enemy with a Dragon
-        class: Siege Machines
-        value:
-          number: 2
-          unit: percentage
-  - level: 'Purple'
-    buff:
-      - attribute: Attack
-        condition:
-          - dragon to the attack
-        class: Mounted Troops
-        value:
-          number: 8
-          unit: percentage
-      - attribute: Defense
-        condition:
-          - dragon to the attack
-        class: Mounted Troops
-        value:
-          number: 6
-          unit: percentage
-      - attribute: Attack
-        condition:
-          - Reduces Enemy with a Dragon
-        class: Ranged Troops
-        value:
-          number: 3
-          unit: percentage
-      - attribute: Attack
-        condition:
-          - Reduces Enemy with a Dragon
-        class: Siege Machines
-        value:
-          number: 3
-          unit: percentage
-  - level: 'Orange'
-    buff:
-      - attribute: Attack
-        condition:
-          - dragon to the attack
-        class: Mounted Troops
-        value:
-          number: 8
-          unit: percentage
-      - attribute: Defense
-        condition:
-          - dragon to the attack
-        class: Mounted Troops
-        value:
-          number: 6
-          unit: percentage
-      - attribute: Attack
-        condition:
-          - Reduces Enemy with a Dragon
-        class: Ranged Troops
-        value:
-          number: 3
-          unit: percentage
-      - attribute: Attack
-        condition:
-          - Reduces Enemy with a Dragon
-        class: Siege Machines
-        value:
-          number: 3
-          unit: percentage
-  - level: 'Gold'
-    buff:
-      - attribute: Attack
-        condition:
-          - dragon to the attack
-        class: Mounted Troops
-        value:
-          number: 16
-          unit: percentage
-      - attribute: Defense
-        condition:
-          - dragon to the attack
-        class: Mounted Troops
-        value:
-          number: 12
-          unit: percentage
-      - attribute: Attack
-        condition:
-          - Reduces Enemy with a Dragon
-        class: Ranged Troops
-        value:
-          number: 6
-          unit: percentage
-      - attribute: Attack
-        condition:
-          - Reduces Enemy with a Dragon
-        class: Siege Machines
-        value:
-          number: 6
-          unit: percentage
+- buff:
+  - attribute: Attack
+    class: Mounted Troops
+    condition:
+    - dragon_to_the_attack
+    value:
+      number: 4
+      unit: percentage
+  - attribute: Defense
+    class: Mounted Troops
+    condition:
+    - dragon_to_the_attack
+    value:
+      number: 3
+      unit: percentage
+  - attribute: Attack
+    class: Ranged Troops
+    condition:
+    - reduces_enemy_with_a_dragon
+    value:
+      number: 1
+      unit: percentage
+  - attribute: Attack
+    class: Siege Machines
+    condition:
+    - reduces_enemy_with_a_dragon
+    value:
+      number: 1
+      unit: percentage
+  level: green
+- buff:
+  - attribute: Attack
+    class: Mounted Troops
+    condition:
+    - dragon_to_the_attack
+    value:
+      number: 4
+      unit: percentage
+  - attribute: Defense
+    class: Mounted Troops
+    condition:
+    - dragon_to_the_attack
+    value:
+      number: 3
+      unit: percentage
+  - attribute: Attack
+    class: Ranged Troops
+    condition:
+    - reduces_enemy_with_a_dragon
+    value:
+      number: 2
+      unit: percentage
+  - attribute: Attack
+    class: Siege Machines
+    condition:
+    - reduces_enemy_with_a_dragon
+    value:
+      number: 2
+      unit: percentage
+  level: blue
+- buff:
+  - attribute: Attack
+    class: Mounted Troops
+    condition:
+    - dragon_to_the_attack
+    value:
+      number: 8
+      unit: percentage
+  - attribute: Defense
+    class: Mounted Troops
+    condition:
+    - dragon_to_the_attack
+    value:
+      number: 6
+      unit: percentage
+  - attribute: Attack
+    class: Ranged Troops
+    condition:
+    - reduces_enemy_with_a_dragon
+    value:
+      number: 3
+      unit: percentage
+  - attribute: Attack
+    class: Siege Machines
+    condition:
+    - reduces_enemy_with_a_dragon
+    value:
+      number: 3
+      unit: percentage
+  level: purple
+- buff:
+  - attribute: Attack
+    class: Mounted Troops
+    condition:
+    - dragon_to_the_attack
+    value:
+      number: 8
+      unit: percentage
+  - attribute: Defense
+    class: Mounted Troops
+    condition:
+    - dragon_to_the_attack
+    value:
+      number: 6
+      unit: percentage
+  - attribute: Attack
+    class: Ranged Troops
+    condition:
+    - reduces_enemy_with_a_dragon
+    value:
+      number: 3
+      unit: percentage
+  - attribute: Attack
+    class: Siege Machines
+    condition:
+    - reduces_enemy_with_a_dragon
+    value:
+      number: 3
+      unit: percentage
+  level: orange
+- buff:
+  - attribute: Attack
+    class: Mounted Troops
+    condition:
+    - dragon_to_the_attack
+    value:
+      number: 16
+      unit: percentage
+  - attribute: Defense
+    class: Mounted Troops
+    condition:
+    - dragon_to_the_attack
+    value:
+      number: 12
+      unit: percentage
+  - attribute: Attack
+    class: Ranged Troops
+    condition:
+    - reduces_enemy_with_a_dragon
+    value:
+      number: 6
+      unit: percentage
+  - attribute: Attack
+    class: Siege Machines
+    condition:
+    - reduces_enemy_with_a_dragon
+    value:
+      number: 6
+      unit: percentage
+  level: gold
+name: Bonaparte Dynasty

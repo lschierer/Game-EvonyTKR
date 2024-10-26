@@ -1,23 +1,27 @@
 ---
 general:
-  name: Henry V
-  display: summary
-  leadership: 115
-  leadership_increment: 8.83
-  attack: 118
-  attack_increment: 9.05
-  defense: 114
-  defense_increment: 8.85
-  politics: 111
-  politics_increment: 8.62
-  stars: '5Red'
-  level: '1'
-  type:
-   - ranged_specialist
-  book: Hammer of the Gauls - Henry V
-  specialities:
-    - Ranged Troop Formation
-    - Bash
-    - War God
-    - Battle of Agincourt
   ascending: true
+  basic_attributes:
+    attack:
+      base: 118
+      increment: 9.05
+    defense:
+      base: 114
+      increment: 8.85
+    leadership:
+      base: 115
+      increment: 8.83
+    politics:
+      base: 111
+      increment: 8.62
+  book: Hammer of the Gauls - Henry V
+  display: summary
+  name: Henry V
+  specialities:
+  - Ranged Troop Formation
+  - Bash
+  - War God
+  - Battle of Agincourt
+  stars: red5
+  type:
+  - ranged_specialist

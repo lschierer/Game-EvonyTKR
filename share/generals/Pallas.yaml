@@ -1,25 +1,29 @@
 ---
 general:
-  name: Pallas
-  display: summary
-  leadership: 113
-  leadership_increment: 8.8
-  attack: 120
-  attack_increment: 9.08
-  defense: 119
-  defense_increment: 8.93
-  politics: 106
-  politics_increment: 8.67
-  stars: '5Red'
-  level: '1'
-  type:
-   - siege_specialist
-  extra:
-    - Legend of Sanctuary
-  book: Guard of Owl and Serpent
-  specialities:
-    - Siege Machine Formation
-    - Siege
-    - War God
-    - Sanctuary Goddess
   ascending: true
+  basic_attributes:
+    attack:
+      base: 120
+      increment: 9.08
+    defense:
+      base: 119
+      increment: 8.93
+    leadership:
+      base: 113
+      increment: 8.8
+    politics:
+      base: 106
+      increment: 8.67
+  book: Guard of Owl and Serpent
+  display: summary
+  extra:
+  - Legend of Sanctuary
+  name: Pallas
+  specialities:
+  - Siege Machine Formation
+  - Siege
+  - War God
+  - Sanctuary Goddess
+  stars: red5
+  type:
+  - siege_specialist

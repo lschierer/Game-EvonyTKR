@@ -1,23 +1,27 @@
 ---
 general:
-  name: Guan Yu
-  display: summary
-  leadership: 116
-  leadership_increment: 9.11
-  attack: 116
-  attack_increment: 9.02
-  defense: 116
-  defense_increment: 8.99
-  politics: 108
-  politics_increment: 8.25
-  stars: '5Red'
-  level: '1'
-  type:
-   - ground_specialist
-  book: Saint of War
-  specialities:
-    - Ground Troop Assault
-    - Annihilation
-    - Ground Troop Ares
-    - Battle of Fancheng
   ascending: true
+  basic_attributes:
+    attack:
+      base: 116
+      increment: 9.02
+    defense:
+      base: 116
+      increment: 8.99
+    leadership:
+      base: 116
+      increment: 9.11
+    politics:
+      base: 108
+      increment: 8.25
+  book: Saint of War
+  display: summary
+  name: Guan Yu
+  specialities:
+  - Ground Troop Assault
+  - Annihilation
+  - Ground Troop Ares
+  - Battle of Fancheng
+  stars: red5
+  type:
+  - ground_specialist

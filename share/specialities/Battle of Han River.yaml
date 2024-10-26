@@ -1,38 +1,38 @@
 ---
-name: Battle of Han River
 levels:
-  - level: Green
-    buff:
-      - attribute: Attack
-        class: Mounted Troops
-        value:
-          number: 4
-          unit: percentage
-  - level: Blue
-    buff:
-      - attribute: Attack
-        class: Mounted Troops
-        value:
-          number: 5
-          unit: percentage
-  - level: Purple
-    buff:
-      - attribute: Attack
-        class: Mounted Troops
-        value:
-          number: 9
-          unit: percentage
-  - level: Orange
-    buff:
-      - attribute: Attack
-        class: Mounted Troops
-        value:
-          number: 9
-          unit: percentage
-  - level: Gold
-    buff:
-      - attribute: Attack
-        class: Mounted Troops
-        value:
-          number: 18
-          unit: percentage
+- buff:
+  - attribute: Attack
+    class: Mounted Troops
+    value:
+      number: 4
+      unit: percentage
+  level: green
+- buff:
+  - attribute: Attack
+    class: Mounted Troops
+    value:
+      number: 5
+      unit: percentage
+  level: blue
+- buff:
+  - attribute: Attack
+    class: Mounted Troops
+    value:
+      number: 9
+      unit: percentage
+  level: purple
+- buff:
+  - attribute: Attack
+    class: Mounted Troops
+    value:
+      number: 9
+      unit: percentage
+  level: orange
+- buff:
+  - attribute: Attack
+    class: Mounted Troops
+    value:
+      number: 18
+      unit: percentage
+  level: gold
+name: Battle of Han River

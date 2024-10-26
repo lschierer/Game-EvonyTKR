@@ -1,63 +1,63 @@
 ---
-name: Bash
 levels:
-  - level: Green
-    buff:
-      - attribute: Attack
-        class: Ranged Troops
-        value:
-          number: 1
-          unit: percentage
-      - attribute: Attack
-        class: Siege Machines
-        value:
-          number: 1
-          unit: percentage
-  - level: Blue
-    buff:
-      - attribute: Attack
-        class: Ranged Troops
-        value:
-          number: 1
-          unit: percentage
-      - attribute: Attack
-        class: Siege Machines
-        value:
-          number: 1
-          unit: percentage
-  - level: Purple
-    buff:
-      - attribute: Attack
-        class: Ranged Troops
-        value:
-          number: 2
-          unit: percentage
-      - attribute: Attack
-        class: Siege Machines
-        value:
-          number: 2
-          unit: percentage
-  - level: Orange
-    buff:
-      - attribute: Attack
-        class: Ranged Troops
-        value:
-          number: 2
-          unit: percentage
-      - attribute: Attack
-        class: Siege Machines
-        value:
-          number: 2
-          unit: percentage
-  - level: Gold
-    buff:
-      - attribute: Attack
-        class: Ranged Troops
-        value:
-          number: 4
-          unit: percentage
-      - attribute: Attack
-        class: Siege Machines
-        value:
-          number: 4
-          unit: percentage
+- buff:
+  - attribute: Attack
+    class: Ranged Troops
+    value:
+      number: 1
+      unit: percentage
+  - attribute: Attack
+    class: Siege Machines
+    value:
+      number: 1
+      unit: percentage
+  level: green
+- buff:
+  - attribute: Attack
+    class: Ranged Troops
+    value:
+      number: 1
+      unit: percentage
+  - attribute: Attack
+    class: Siege Machines
+    value:
+      number: 1
+      unit: percentage
+  level: blue
+- buff:
+  - attribute: Attack
+    class: Ranged Troops
+    value:
+      number: 2
+      unit: percentage
+  - attribute: Attack
+    class: Siege Machines
+    value:
+      number: 2
+      unit: percentage
+  level: purple
+- buff:
+  - attribute: Attack
+    class: Ranged Troops
+    value:
+      number: 2
+      unit: percentage
+  - attribute: Attack
+    class: Siege Machines
+    value:
+      number: 2
+      unit: percentage
+  level: orange
+- buff:
+  - attribute: Attack
+    class: Ranged Troops
+    value:
+      number: 4
+      unit: percentage
+  - attribute: Attack
+    class: Siege Machines
+    value:
+      number: 4
+      unit: percentage
+  level: gold
+name: Bash

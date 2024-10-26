@@ -1,23 +1,27 @@
 ---
 general:
-  name: Philip II
-  display: summary
-  leadership: 118
-  leadership_increment: 8.93
-  attack: 116
-  attack_increment: 8.95
-  defense: 114
-  defense_increment: 8.88
-  politics: 110
-  politics_increment: 8.59
-  stars: '5Red'
-  level: '1'
-  type:
-   - siege_specialist
-  book: Absolute Monarch
-  specialities:
-    - Siege Machine Assault
-    - Siege
-    - Siege Machine Ares
-    - Battle of Bouvines
   ascending: true
+  basic_attributes:
+    attack:
+      base: 116
+      increment: 8.95
+    defense:
+      base: 114
+      increment: 8.88
+    leadership:
+      base: 118
+      increment: 8.93
+    politics:
+      base: 110
+      increment: 8.59
+  book: Absolute Monarch
+  display: summary
+  name: Philip II
+  specialities:
+  - Siege Machine Assault
+  - Siege
+  - Siege Machine Ares
+  - Battle of Bouvines
+  stars: red5
+  type:
+  - siege_specialist
