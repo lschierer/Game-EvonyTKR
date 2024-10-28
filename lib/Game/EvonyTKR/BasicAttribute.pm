@@ -51,18 +51,56 @@ use overload
     __CLASS__->validation();
   }
 
+  method setBase($newBase = 0) {
+    my @errors = ();
+    my $type = t('PositiveOrZeroNum');
+    is_Num($newBase)
+      or push @errors => "base must be a number, not $newBase";
+    $type->check($newBase)
+      or push @errors => "base must be positive, not $newBase";
+    if(scalar @errors >= 1) {
+      $self->logger()->logerror(join(', ', @errors));
+      return;
+    }
+    else {
+      $base = $newBase;
+    }
+  }
+
+  method setBase($newIncrement = 0) {
+    my @errors = ();
+    my $type = t('PositiveOrZeroNum');
+    is_Num($newIncrement)
+      or push @errors => "increment must be a number, not $newIncrement";
+    $type->check($newBase)
+      or push @errors => "increment must be positive, not $newIncrement";
+    if(scalar @errors >= 1) {
+      $self->logger()->logerror(join(', ', @errors));
+      return;
+    }
+    else {
+      $increment = $newBase;
+    }
+  }
+
   #https://evonyguidewiki.com/en/general-cultivate-en/
-  method total($level = 1, $stars = 'none', $name = "GeneralName", $attrib = "Attribute") {
+  method total(
+    $level = 1,
+    $stars = 'none',
+    $name = "GeneralName",
+    $attrib = "Attribute") {
     my $AES_adjustment = 0;
-    if(exists $BasicAESAdjustment{$stars}) {}
+    if(exists $BasicAESAdjustment{$stars}) {
      $AES_adjustment = $BasicAESAdjustment{$stars};
     }
     my $step = $level * $increment;
-    $self->logger()->trace(sprintf('Basic Arribute %s for %s is %n after step 1', $attrib, $name, $step);
+    $self->logger()->trace(sprintf(
+      'Basic Arribute %s for %s is %n after step 1',
+      $attrib, $name, $step));
     $step = $step + 500 + $AES_adjustment;
     $self->logger()->trace(sprintf(
       'Basic Arribute %s for %s is %n after adding 500 and AES %n',
-      $attrib, $name, $step, $AES_adjustment);
+      $attrib, $name, $step, $AES_adjustment));
 
     if($step < 900 ) {
       $step = $step *.1;
@@ -70,11 +108,18 @@ use overload
     else {
       $step = 90 + ($step - 900) * 0.2;
     }
-    $self->logger()->trace(sprintf('Basic Arribute %s for %s is %n after if block', $attrib, $name, $step);
+    $self->logger()->trace(sprintf(
+      'Basic Arribute %s for %s is %n after if block',
+      $attrib, $name, $step));
     return $step;
   }
 
-  method score($level = 1, $stars = 'none', $name = "GeneralName", $attrib = "Attribute", $multiplier = 0) {
+  method score(
+    $level = 1,
+    $stars = 'none',
+    $name = "GeneralName",
+    $multiplier = 0,
+    $attrib = "Attribute",) {
     return $self->total($level, $stars, $name, $attrib) * $multiplier;
   }
 
@@ -153,13 +198,15 @@ use overload
     }
   }
 
-  method _toHashRef {
+  method _toHashRef($verbose = 0) {
     my $returnRef = {};
     $returnRef->{$self->attribute_name()} = {
-      base      => $self->base(),
-      increment => $self->incrment(),
       total     => $self->total(),
     };
+    if($verbose){
+      $returnRef->{$self->attribute_name()}->{base} = $self->base();
+      $returnRef->{$self->attribute_name()}->{increment} = $self->increment();
+    }
     return $returnRef;
   }
 

@@ -62,7 +62,7 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Data) {
 
   field $_generalType : reader = 'All Troops';
 
-  field $basic_attributes :reader =
+  field $basic_attributes :reader = Game::EvonyTKR::BasicAttributes->new();
 
   field $level : reader : param //= 45;
 
@@ -78,28 +78,39 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Data) {
 
   field $hasCovenant : reader = false;
 
-
-
-
-
   method _getEvAns4BasicAttributes($resultRef, $BuffMultipliers) {
 
     $resultRef->{'BAS'}->{'Attack'} =
-      $self->effective_attack() *
-      $BuffMultipliers->getMultiplierForBuff('Attack', $self->generalType());
+      $self->basic_attributes()->attack()->score(
+        $self->level(),
+        $self->ascendingAttributes()->activeLevel(),
+        $self->name(),
+        $BuffMultipliers->getMultiplierForBuff('Attack', $self->generalType(),
+        'attack');
 
     $resultRef->{'BAS'}->{'Defense'} =
-      $self->effective_defense() *
-      $BuffMultipliers->getMultiplierForBuff('Defense', $self->generalType());
+      $self->basic_attributes()->defense()->score(
+        $self->level(),
+        $self->ascendingAttributes()->activeLevel(),
+        $self->name(),
+        $BuffMultipliers->getMultiplierForBuff('Defense', $self->generalType(),
+        'defense');
 
     $resultRef->{'BAS'}->{'Leadershp'} =
-      $self->effective_leadership() *
-      $BuffMultipliers->getMultiplierForBuff('HP', $self->generalType());
+      $self->basic_attributes()->leadershp()->score(
+        $self->level(),
+        $self->ascendingAttributes()->activeLevel(),
+        $self->name(),
+        $BuffMultipliers->getMultiplierForBuff('HP', $self->generalType(),
+        'leadershp');
 
     $resultRef->{'BAS'}->{'Politics'} =
-      $self->effective_politics() *
-      $BuffMultipliers->getMultiplierForBuff('Death to Wounded',
-      $self->generalType());
+      $self->basic_attributes()->politics()->score(
+        $self->level(),
+        $self->ascendingAttributes()->activeLevel(),
+        $self->name(),
+        $BuffMultipliers->getMultiplierForBuff('Death to Wounded', $self->generalType(),
+        'politics');
 
     for my $key (keys %{ $resultRef->{'BAS'} }) {
       $resultRef->{'BAS'}->{'Overall'} += $resultRef->{'BAS'}->{$key};
@@ -561,28 +572,10 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Data) {
       };
     }
 
-    if ($verbose) {
-      $self->logger()->trace("add basic attributes to returnRef for $name");
-      $returnRef->{basic_attributes} => $self->basic_attributes();
-    }
-    else {
-      $returnRef->{basicAttributes} = {
-        leadership  => {
-          total     => $self->effective_leadership(),
-        },
-        attack      => {
-          total     => $self->effective_attack(),
-        },
-        defense     => {
-          total     => $self->effective_defense(),
-        },
-        politics    => {
-          total     => $self->effective_politics(),
-        },
-      };
+    $self->logger()->trace("add basic attributes to returnRef for $name");
+    $returnRef->{basic_attributes} => $self->basic_attributes($verbose);
 
-      return $returnRef;
-    }
+    return $returnRef;
   }
 
   method TO_JSON {

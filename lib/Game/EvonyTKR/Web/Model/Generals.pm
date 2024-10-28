@@ -222,6 +222,15 @@ class Game::EvonyTKR::Web::Model::Generals : isa(Game::EvonyTKR::Web::Logger) {
         my $general =
           $constructors{$_}->new(name => $yamlData->{'general'}->{'name'},);
 
+        $general->basic_attributes()->attack()->setBase($attack);
+        $general->basic_attributes()->attack()->setIncrement($attack_increment);
+        $general->basic_attributes()->leadership()->setBase($leadership);
+        $general->basic_attributes()->leadership()->setIncrement($leadershp_increment);
+        $general->basic_attributes()->defense()->setBase($defense);
+        $general->basic_attributes()->defense()->setIncrement($defense_increment);
+        $general->basic_attributes()->politics()->setBase($politics);
+        $general->basic_attributes()->politics()->setIncrement($politics_increment);
+
         my $bookName = $yamlData->{'general'}->{'book'};
         if (defined $bookName) {
           $self->logger()->trace("primary skill book for $name is $bookName");
