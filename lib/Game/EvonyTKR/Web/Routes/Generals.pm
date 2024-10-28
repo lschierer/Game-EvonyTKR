@@ -15,29 +15,29 @@ package Game::EvonyTKR::Web::Routes::Generals {
       controller => 'Generals',
     );
 
-    $generalRoutes->get('/' => [format => ['html','txt', 'json']])->to(
+    $generalRoutes->get('/' => [format => ['html', 'txt', 'json']])->to(
       format => 'html',
       action => 'index'
-      );
+    );
 
-    $generalRoutes->get('/list' => [format => ['html','txt', 'json']])->to(
+    $generalRoutes->get('/list' => [format => ['html', 'txt', 'json']])->to(
       format => 'txt',
       action => 'list'
-      );
+    );
 
-    my $namedID = $generalRoutes->under('/named/'  => sub ($c) {
-      $logger->trace('in generalRoutes namedID under clause');
-      my $result = $c->openapi->validate_request($c->req);
-      if(!$result) {
-        $logger->warn('invalid request recieved',);
-        $c->respond_to(
-          any => { data  => 'Invalid Request', status => 404 }
-        );
+    my $namedID = $generalRoutes->under(
+      '/named/' => sub ($c) {
+        $logger->trace('in generalRoutes namedID under clause');
+        my $result = $c->openapi->validate_request($c->req);
+        if (!$result) {
+          $logger->warn('invalid request recieved',);
+          $c->respond_to(any => { data => 'Invalid Request', status => 404 });
+        }
+        return 1;
       }
-      return 1;
-    });
+    );
 
-    $namedID->get('/:name' => [format => ['html','txt', 'json']])->to(
+    $namedID->get('/:name' => [format => ['html', 'txt', 'json']])->to(
       format => undef,
       action => 'GetGeneral',
     );

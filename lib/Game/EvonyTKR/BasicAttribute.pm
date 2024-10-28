@@ -4,28 +4,27 @@ use File::FindLib 'lib';
 
 class Game::EvonyTKR::BasicAttributes : isa(Game::EvonyTKR::Data) {
 # PODNAME: Game::EvonyTKR::BasicAttribute
-use Croak;
-use Types::Common qw( t is_Num is_Str is_Int);
-use List::AllUtils qw( any none );
-use Data::Printer;
-use namespace::autoclean;
+  use Croak;
+  use Types::Common  qw( t is_Num is_Str is_Int);
+  use List::AllUtils qw( any none );
+  use Data::Printer;
+  use namespace::autoclean;
 # VERSION
 
+  use File::FindLib 'lib';
+  use overload
+    '<=>' => \&_comparison,
+    '=='  => \&_equality,
+    '!='  => \&_inequality,
+    '""'  => \&_toString;
 
-use File::FindLib 'lib';
-use overload
-  '<=>' => \&_comparison,
-  '=='  => \&_equality,
-  '!='  => \&_inequality,
-  '""'  => \&_toString;
+  field $base : reader : param //= 0;
 
-  field $base :reader :param //= 0;
+  field $increment : reader : param //= 0;
 
-  field $increment :reader :param //= 0;
+  field $attribute_name : reader : param;
 
-  field $attribute_name :reader :param;
-
-  field @AttributeNames :reader = qw(
+  field @AttributeNames : reader = qw(
     attack
     defense
     leadership
@@ -53,12 +52,12 @@ use overload
 
   method setBase($newBase = 0) {
     my @errors = ();
-    my $type = t('PositiveOrZeroNum');
+    my $type   = t('PositiveOrZeroNum');
     is_Num($newBase)
       or push @errors => "base must be a number, not $newBase";
     $type->check($newBase)
       or push @errors => "base must be positive, not $newBase";
-    if(scalar @errors >= 1) {
+    if (scalar @errors >= 1) {
       $self->logger()->logerror(join(', ', @errors));
       return;
     }
@@ -69,12 +68,12 @@ use overload
 
   method setBase($newIncrement = 0) {
     my @errors = ();
-    my $type = t('PositiveOrZeroNum');
+    my $type   = t('PositiveOrZeroNum');
     is_Num($newIncrement)
       or push @errors => "increment must be a number, not $newIncrement";
     $type->check($newBase)
       or push @errors => "increment must be positive, not $newIncrement";
-    if(scalar @errors >= 1) {
+    if (scalar @errors >= 1) {
       $self->logger()->logerror(join(', ', @errors));
       return;
     }
@@ -85,41 +84,46 @@ use overload
 
   #https://evonyguidewiki.com/en/general-cultivate-en/
   method total(
-    $level = 1,
-    $stars = 'none',
-    $name = "GeneralName",
-    $attrib = "Attribute") {
+    $level  = 1,
+    $stars  = 'none',
+    $name   = "GeneralName",
+    $attrib = "Attribute"
+  ) {
     my $AES_adjustment = 0;
-    if(exists $BasicAESAdjustment{$stars}) {
-     $AES_adjustment = $BasicAESAdjustment{$stars};
+    if (exists $BasicAESAdjustment{$stars}) {
+      $AES_adjustment = $BasicAESAdjustment{$stars};
     }
     my $step = $level * $increment;
     $self->logger()->trace(sprintf(
       'Basic Arribute %s for %s is %n after step 1',
-      $attrib, $name, $step));
+      $attrib, $name, $step
+    ));
     $step = $step + 500 + $AES_adjustment;
     $self->logger()->trace(sprintf(
       'Basic Arribute %s for %s is %n after adding 500 and AES %n',
-      $attrib, $name, $step, $AES_adjustment));
+      $attrib, $name, $step, $AES_adjustment
+    ));
 
-    if($step < 900 ) {
-      $step = $step *.1;
+    if ($step < 900) {
+      $step = $step * .1;
     }
     else {
       $step = 90 + ($step - 900) * 0.2;
     }
     $self->logger()->trace(sprintf(
       'Basic Arribute %s for %s is %n after if block',
-      $attrib, $name, $step));
+      $attrib, $name, $step
+    ));
     return $step;
   }
 
   method score(
-    $level = 1,
-    $stars = 'none',
-    $name = "GeneralName",
+    $level      = 1,
+    $stars      = 'none',
+    $name       = "GeneralName",
     $multiplier = 0,
-    $attrib = "Attribute",) {
+    $attrib     = "Attribute",
+  ) {
     return $self->total($level, $stars, $name, $attrib) * $multiplier;
   }
 
@@ -140,9 +144,9 @@ use overload
 
     is_Str($attribute_name)
       or push @errors => "attribute name must be a string, not $attribute_name";
-    if(none { $_ eq $attribute_name } @AttributeNames) {
-      push @errors, "attribute name must be one of " .
-        Data::Printer::np @AttributeNames;
+    if (none { $_ eq $attribute_name } @AttributeNames) {
+      push @errors,
+        "attribute name must be one of " . Data::Printer::np @AttributeNames;
     }
     if (scalar @errors >= 1) {
       $self->logger()->logcroak(join(', ' => @errors));
@@ -153,17 +157,20 @@ use overload
   method _comparison ($other, $swap = 0) {
     my $otherClass = blessed $other;
     my @classList  = split(/::/, $otherClass);
-    if($classList[2] ne 'BasicAttribute') {
+    if ($classList[2] ne 'BasicAttribute') {
       my $od = Data::Printer::p $other;
-      $self->logger()->logcroak("Game::EvonyTKR::BasicAttribute comparison operator cannot take a $od");
+      $self->logger()
+        ->logcroak(
+        "Game::EvonyTKR::BasicAttribute comparison operator cannot take a $od");
     }
     else {
       my $mt = $self->total();
       my $ot = $other->total();
-      if($self->attribute_name() cmp $other->attribute_name()) {
+      if ($self->attribute_name() cmp $other->attribute_name()) {
         $self->logger()->warn(
-        'you probably did not intend to compare to different attributes: %s %s',
-        $self->attribute_name(), $other->attribute_name());
+          'you probably did not intend to compare to different attributes: %s %s',
+          $self->attribute_name(), $other->attribute_name()
+        );
         return $self->attribute_name() cmp $other->attribute_name();
       }
       return $mt <=> $ot;
@@ -173,39 +180,43 @@ use overload
   method _equality ($other, $swap = 0) {
     my $otherClass = blessed $other;
     my @classList  = split(/::/, $otherClass);
-    if($classList[2] ne 'BasicAttribute') {
+    if ($classList[2] ne 'BasicAttribute') {
       my $od = Data::Printer::p $other;
-      $self->logger()->logcroak("Game::EvonyTKR::BasicAttribute equality operator cannot take a $od");
+      $self->logger()
+        ->logcroak(
+        "Game::EvonyTKR::BasicAttribute equality operator cannot take a $od");
     }
     else {
       my $mt = $self->total();
       my $ot = $other->total();
-      return ($my == $ot ) and ($self->attribute_name() eq $other->attribute_name());
+      return ($my == $ot)
+        and ($self->attribute_name() eq $other->attribute_name());
     }
   }
 
   method _inequality ($other, $swap = 0) {
     my $otherClass = blessed $other;
     my @classList  = split(/::/, $otherClass);
-    if($classList[2] ne 'BasicAttribute') {
+    if ($classList[2] ne 'BasicAttribute') {
       my $od = Data::Printer::p $other;
-      $self->logger()->logcroak("Game::EvonyTKR::BasicAttribute inequality operator cannot take a $od");
+      $self->logger()
+        ->logcroak(
+        "Game::EvonyTKR::BasicAttribute inequality operator cannot take a $od");
     }
     else {
       my $mt = $self->total();
       my $ot = $other->total();
-      return ($my != $ot ) or ($self->attribute_name() ne $other->attribute_name());
+      return ($my != $ot)
+        or ($self->attribute_name() ne $other->attribute_name());
     }
   }
 
   method _toHashRef($verbose = 0) {
     my $returnRef = {};
-    $returnRef->{$self->attribute_name()} = {
-      total     => $self->total(),
-    };
-    if($verbose){
-      $returnRef->{$self->attribute_name()}->{base} = $self->base();
-      $returnRef->{$self->attribute_name()}->{increment} = $self->increment();
+    $returnRef->{ $self->attribute_name() } = { total => $self->total(), };
+    if ($verbose) {
+      $returnRef->{ $self->attribute_name() }->{base}      = $self->base();
+      $returnRef->{ $self->attribute_name() }->{increment} = $self->increment();
     }
     return $returnRef;
   }

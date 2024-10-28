@@ -145,31 +145,34 @@ class Game::EvonyTKR::Web::Model::Generals : isa(Game::EvonyTKR::Web::Logger) {
   }
 
   method readFromFile($name) {
-    my $ypp = YAML::PP->new(boolean => 'JSON::PP');
+    my $ypp      = YAML::PP->new(boolean => 'JSON::PP');
     my $fileName = $name . '.yaml';
     my $generalShare =
       File::Spec->catfile(dist_dir('Game-EvonyTKR'), 'generals');
     my $FileWithPath = File::Spec->catfile($generalShare, $fileName);
     if (-T -s -r $FileWithPath) {
       $self->logger()->debug("$fileName exists as expected");
-      my $yamlData   = $ypp->load_file($FileWithPath);
+      my $yamlData = $ypp->load_file($FileWithPath);
 
       my $leadership =
         $yamlData->{'general'}->{'basic_attributes'}->{'leadership'}->{'base'};
       my $leadership_increment =
-        $yamlData->{'general'}->{'basic_attributes'}->{'leadership'}->{'increment'};
+        $yamlData->{'general'}->{'basic_attributes'}->{'leadership'}
+        ->{'increment'};
       my $attack =
         $yamlData->{'general'}->{'basic_attributes'}->{'attack'}->{'base'};
       my $attack_increment =
         $yamlData->{'general'}->{'basic_attributes'}->{'attack'}->{'increment'};
-        my $defense =
-          $yamlData->{'general'}->{'basic_attributes'}->{'defense'}->{'base'};
-        my $defense_increment =
-          $yamlData->{'general'}->{'basic_attributes'}->{'defense'}->{'increment'};
-        my $politics =
-          $yamlData->{'general'}->{'basic_attributes'}->{'politics'}->{'base'};
-        my $politics_increment =
-          $yamlData->{'general'}->{'basic_attributes'}->{'politics'}->{'increment'};
+      my $defense =
+        $yamlData->{'general'}->{'basic_attributes'}->{'defense'}->{'base'};
+      my $defense_increment =
+        $yamlData->{'general'}->{'basic_attributes'}->{'defense'}
+        ->{'increment'};
+      my $politics =
+        $yamlData->{'general'}->{'basic_attributes'}->{'politics'}->{'base'};
+      my $politics_increment =
+        $yamlData->{'general'}->{'basic_attributes'}->{'politics'}
+        ->{'increment'};
 
       $self->logger()->trace(sprintf(
         'for %s: leadership: %d, li: %d, attack: %d, ai: %d, defense: %d, di: %d, politics: %d, pi: %d',
@@ -192,7 +195,9 @@ class Game::EvonyTKR::Web::Model::Generals : isa(Game::EvonyTKR::Web::Logger) {
 
       my @generalClassKey;
       my @scoreType = @{ $yamlData->{'general'}->{'type'} };
-      for my $gt (qw(ground_specialist mounted_specialist ranged_specialist siege_specialist mayor officer )) {
+      for my $gt (
+        qw(ground_specialist mounted_specialist ranged_specialist siege_specialist mayor officer )
+      ) {
         my $first = first { index($_, $gt) != -1 } @scoreType;
         if (defined $first) {
           push @generalClassKey, $first;
@@ -225,11 +230,14 @@ class Game::EvonyTKR::Web::Model::Generals : isa(Game::EvonyTKR::Web::Logger) {
         $general->basic_attributes()->attack()->setBase($attack);
         $general->basic_attributes()->attack()->setIncrement($attack_increment);
         $general->basic_attributes()->leadership()->setBase($leadership);
-        $general->basic_attributes()->leadership()->setIncrement($leadershp_increment);
+        $general->basic_attributes()->leadership()
+          ->setIncrement($leadershp_increment);
         $general->basic_attributes()->defense()->setBase($defense);
-        $general->basic_attributes()->defense()->setIncrement($defense_increment);
+        $general->basic_attributes()->defense()
+          ->setIncrement($defense_increment);
         $general->basic_attributes()->politics()->setBase($politics);
-        $general->basic_attributes()->politics()->setIncrement($politics_increment);
+        $general->basic_attributes()->politics()
+          ->setIncrement($politics_increment);
 
         my $bookName = $yamlData->{'general'}->{'book'};
         if (defined $bookName) {

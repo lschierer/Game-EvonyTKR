@@ -27,11 +27,11 @@ package Game::EvonyTKR::Web::Controller::Generals {
     my ($self) = @_;
     my $text = "Generals Pages";
     $self->respond_to(
-      txt   => { text   => $text},
-      html  => sub {
+      txt  => { text => $text },
+      html => sub {
         $self->render(text => $text);
       },
-      any   => { data   => '', status => 204 },
+      any => { data => '', status => 204 },
     );
     return;
   }
@@ -39,20 +39,24 @@ package Game::EvonyTKR::Web::Controller::Generals {
   sub list {
     my ($self) = @_;
     my $jsonResponse = {};
-    if(defined $generalModel){
+    if (defined $generalModel) {
       for my $type ($EvonyData->GeneralKeys()) {
-        if(defined $generalModel->generals()->{$type}) {
+        if (defined $generalModel->generals()->{$type}) {
           $jsonResponse->{$type} = $generalModel->generals()->{$type};
         }
       }
     }
     $self->respond_to(
-      txt   => {text  => Data::Printer::np($jsonResponse, indent => 2)  },
-      json  => {json  => $jsonResponse },
-      html  => sub {
-        $self->render(text  => ansi2html(Data::Printer::np($jsonResponse, indent => 4, colored => 0) ));
+      txt  => { text => Data::Printer::np($jsonResponse, indent => 2) },
+      json => { json => $jsonResponse },
+      html => sub {
+        $self->render(
+          text => ansi2html(
+            Data::Printer::np($jsonResponse, indent => 4, colored => 0)
+          )
+        );
       },
-      any  => { data  => '', status => 204 },
+      any => { data => '', status => 204 },
     );
     return;
   }
@@ -162,12 +166,15 @@ package Game::EvonyTKR::Web::Controller::Generals {
         my $generalHashRef = {};
         $$generalHashRef{'data'} = $general->toHashRef($verbose);
         $self->respond_to(
-          json  => { json => $generalHashRef },
-          html  => {
-            text       => ansi2html(Data::Printer::np(
-              $generalHashRef, indent => 4, colored => 0)),
+          json => { json => $generalHashRef },
+          html => {
+            text => ansi2html(Data::Printer::np(
+              $generalHashRef,
+              indent  => 4,
+              colored => 0
+            )),
           },
-          any   => { data => '', status => 204 },
+          any => { data => '', status => 204 },
         );
         return;
       }

@@ -15,17 +15,17 @@ package Game::EvonyTKR::Web::Routes::Generals::Conflicts {
       controller => 'Generals::Conflicts',
     );
 
-    $routes->get('/' => [format => ['html','txt', 'json']])->to(
+    $routes->get('/' => [format => ['html', 'txt', 'json']])->to(
       format => 'html',
       action => 'index'
-      );
+    );
 
-    $routes->get('/list' => [format => ['html','txt', 'json']])->to(
+    $routes->get('/list' => [format => ['html', 'txt', 'json']])->to(
       format => 'txt',
       action => 'list'
-      );
+    );
 
-    $routes->get('/named/:id' => [format => ['html','txt', 'json']])->to(
+    $routes->get('/named/:id' => [format => ['html', 'txt', 'json']])->to(
       format => undef,
       action => 'generalById',
     );

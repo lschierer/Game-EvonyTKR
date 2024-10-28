@@ -169,11 +169,9 @@ package Game::EvonyTKR::Web::SkillBook {
               my $level = $tbe->{'level'};
               if (exists $tbe->{'buff'}) {
                 my @tbeBuffs = @{ $tbe->{'buff'} };
-                if (
-                  not(  defined($name)
-                    and defined($level)
-                    and (scalar @tbeBuffs > 0))
-                ) {
+                if (not(defined($name)
+                  and defined($level)
+                  and (scalar @tbeBuffs > 0))) {
                   $logger->logcroak(
                     "something went wrong setting values for book in $tsbf");
                 }

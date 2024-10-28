@@ -62,7 +62,7 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Data) {
 
   field $_generalType : reader = 'All Troops';
 
-  field $basic_attributes :reader = Game::EvonyTKR::BasicAttributes->new();
+  field $basic_attributes : reader = Game::EvonyTKR::BasicAttributes->new();
 
   field $level : reader : param //= 45;
 
@@ -82,35 +82,44 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Data) {
 
     $resultRef->{'BAS'}->{'Attack'} =
       $self->basic_attributes()->attack()->score(
-        $self->level(),
-        $self->ascendingAttributes()->activeLevel(),
-        $self->name(),
-        $BuffMultipliers->getMultiplierForBuff('Attack', $self->generalType(),
-        'attack');
+      $self->level(),
+      $self->ascendingAttributes()->activeLevel(),
+      $self->name(),
+      $BuffMultipliers->getMultiplierForBuff(
+        'Attack', $self->generalType(), 'attack'
+      )
+      );
 
     $resultRef->{'BAS'}->{'Defense'} =
       $self->basic_attributes()->defense()->score(
-        $self->level(),
-        $self->ascendingAttributes()->activeLevel(),
-        $self->name(),
-        $BuffMultipliers->getMultiplierForBuff('Defense', $self->generalType(),
-        'defense');
+      $self->level(),
+      $self->ascendingAttributes()->activeLevel(),
+      $self->name(),
+      $BuffMultipliers->getMultiplierForBuff(
+        'Defense', $self->generalType(), 'defense'
+      )
+      );
 
     $resultRef->{'BAS'}->{'Leadershp'} =
       $self->basic_attributes()->leadershp()->score(
-        $self->level(),
-        $self->ascendingAttributes()->activeLevel(),
-        $self->name(),
-        $BuffMultipliers->getMultiplierForBuff('HP', $self->generalType(),
-        'leadershp');
+      $self->level(),
+      $self->ascendingAttributes()->activeLevel(),
+      $self->name(),
+      $BuffMultipliers->getMultiplierForBuff(
+        'HP', $self->generalType(), 'leadershp'
+      )
+      );
 
     $resultRef->{'BAS'}->{'Politics'} =
       $self->basic_attributes()->politics()->score(
-        $self->level(),
-        $self->ascendingAttributes()->activeLevel(),
-        $self->name(),
-        $BuffMultipliers->getMultiplierForBuff('Death to Wounded', $self->generalType(),
-        'politics');
+      $self->level(),
+      $self->ascendingAttributes()->activeLevel(),
+      $self->name(),
+      $BuffMultipliers->getMultiplierForBuff(
+        'Death to Wounded',
+        $self->generalType(), 'politics'
+      )
+      );
 
     for my $key (keys %{ $resultRef->{'BAS'} }) {
       $resultRef->{'BAS'}->{'Overall'} += $resultRef->{'BAS'}->{$key};
@@ -286,7 +295,8 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Data) {
     if ($type ne 'Game::EvonyTKR::SkillBook::Special') {
       $self->logger()
         ->logcroak(
-        "built_in_book must be a Game::EvonyTKR::SkillBook::Special, not $type");
+        "built_in_book must be a Game::EvonyTKR::SkillBook::Special, not $type"
+        );
     }
     $self->logger()
       ->trace(
@@ -558,7 +568,7 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Data) {
     $returnRef->{ascendingAttributes} =
       $self->ascendingAttributes()->toHashRef($verbose);
 
-    if($verbose) {
+    if ($verbose) {
       $self->logger()->trace("add scores info to returnRef for $name");
       $returnRef->{EvAnsScores} = {
         AttackingAsPrimary   => $self->getEvAnsScoreAsPrimary('Attacking'),

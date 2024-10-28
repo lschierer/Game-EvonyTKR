@@ -25,7 +25,7 @@ class Game::EvonyTKR::General::Conflicts : isa(Game::EvonyTKR::Data) {
   use namespace::autoclean;
 # VERSION
 
-  field $name :reader :param;
+  field $name : reader : param;
 
   field $uuid : reader;
 
@@ -33,16 +33,16 @@ class Game::EvonyTKR::General::Conflicts : isa(Game::EvonyTKR::Data) {
     $uuid = uuid5(uuid5($self->UUID5_base(), 'Conflicts'), $name);
   }
 
-  field $primaryMembers :reader = ();
+  field $primaryMembers : reader = ();
 
-  field $relatedConflicts :reader = ();
+  field $relatedConflicts : reader = ();
 
-  field $books :reader = ();
+  field $books : reader = ();
 
-  method add_primary_general($general){
+  method add_primary_general($general) {
     my $classList = blessed $general;
-    if(index($classList, 'Game::EvonyTKR::General') != -1) {
-      if(none {$_->name() eq $general->name()} @$primaryMembers) {
+    if (index($classList, 'Game::EvonyTKR::General') != -1) {
+      if (none { $_->name() eq $general->name() } @$primaryMembers) {
         push @$primaryMembers, $general;
       }
     }
@@ -50,8 +50,8 @@ class Game::EvonyTKR::General::Conflicts : isa(Game::EvonyTKR::Data) {
 
   method add_related_conflict($conflict) {
     my $classList = blessed $conflict;
-    if(index($classList, 'Game::EvonyTKR::General::Conflict') != -1){
-      if(none { $_->name() eq $conflict->name() } @$relatedConflicts ) {
+    if (index($classList, 'Game::EvonyTKR::General::Conflict') != -1) {
+      if (none { $_->name() eq $conflict->name() } @$relatedConflicts) {
         push @$relatedConflicts, $conflict;
       }
     }
@@ -59,8 +59,8 @@ class Game::EvonyTKR::General::Conflicts : isa(Game::EvonyTKR::Data) {
 
   method add_conflicting_book($book) {
     my $classList = blessed $book;
-    if(index($classList, 'Game::EvonyTKR::SkillBook') != -1) {
-      if ( none { $_->name() eq $book->name() } @$books ) {
+    if (index($classList, 'Game::EvonyTKR::SkillBook') != -1) {
+      if (none { $_->name() eq $book->name() } @$books) {
         push @$books, $book;
       }
     }
@@ -68,19 +68,23 @@ class Game::EvonyTKR::General::Conflicts : isa(Game::EvonyTKR::Data) {
 
   method check_conflicting_general($general) {
     my $classList = blessed $general;
-    if(index($classList, 'Game::EvonyTKR::General') != -1) {
+    if (index($classList, 'Game::EvonyTKR::General') != -1) {
       my $found = first { $_->name() eq $general->name() } @$primaryMembers;
-      if(defined $found) {
+      if (defined $found) {
         $self->logger()->debug(sprintf(
           'determined that %s is in fact part of conflict group %s.  full list is %s.',
-          $general->name(), $name, Data::Printer::np $primaryMembers, ));
+          $general->name(), $name, Data::Printer::np $primaryMembers,
+        ));
         return $name;
       }
-      $self->logger()->debug(sprintf('%s is not a member of %s, list is %s.',
-        $general->name(), $name, Data::Printer::np $primaryMembers, ));
+      $self->logger()->debug(sprintf(
+        '%s is not a member of %s, list is %s.',
+        $general->name(), $name, Data::Printer::np $primaryMembers,
+      ));
       return 0;
     }
-    $self->logger()->debug(sprintf(
+    $self->logger()
+      ->debug(sprintf(
       'could not validate an object of %s as a member of a conflict group',
       $classList));
     return 0;
@@ -88,19 +92,23 @@ class Game::EvonyTKR::General::Conflicts : isa(Game::EvonyTKR::Data) {
 
   method check_conflicting_book($book) {
     my $classList = blessed $book;
-    if(index($classList, 'Game::EvonyTKR::SkillBook') != -1) {
+    if (index($classList, 'Game::EvonyTKR::SkillBook') != -1) {
       my $found = first { $_->name() eq $book->name() } @$books;
-      if(defined $found) {
+      if (defined $found) {
         $self->logger()->debug(sprintf(
           'determined that %s is in fact part of conflict group %s.  full list is %s.',
-          $book->name(), $name, Data::Printer::np $books, ));
+          $book->name(), $name, Data::Printer::np $books,
+        ));
         return $name;
       }
-      $self->logger()->debug(sprintf('%s is not a member of %s, list is %s.',
-        $book->name(), $name, Data::Printer::np $books, ));
+      $self->logger()->debug(sprintf(
+        '%s is not a member of %s, list is %s.',
+        $book->name(), $name, Data::Printer::np $books,
+      ));
       return 0;
     }
-    $self->logger()->debug(sprintf(
+    $self->logger()
+      ->debug(sprintf(
       'could not validate an object of %s as a member of a conflict group',
       $classList));
     return 0;
@@ -108,16 +116,16 @@ class Game::EvonyTKR::General::Conflicts : isa(Game::EvonyTKR::Data) {
 
   method check_conflcting($object) {
     my $classList = blessed $object;
-    if(index($classList, 'Game::EvonyTKR::General') != -1) {
+    if (index($classList, 'Game::EvonyTKR::General') != -1) {
       return check_conflicting_general($object);
     }
-    if(index($classList, 'Game::EvonyTKR::SkillBook') != -1) {
+    if (index($classList, 'Game::EvonyTKR::SkillBook') != -1) {
       return check_conflicting_book($object);
     }
-    $self->logger()->error(sprintf('%s is of type %s, which is not %s nor %s',
-    Data::Printer::np $object, $classList, 
-    'Game::EvonyTKR::General',
-    'Game::EvonyTKR::SkillBook',
+    $self->logger()->error(sprintf(
+      '%s is of type %s, which is not %s nor %s',
+      Data::Printer::np $object, $classList,
+      'Game::EvonyTKR::General', 'Game::EvonyTKR::SkillBook',
     ));
     return 0;
   }

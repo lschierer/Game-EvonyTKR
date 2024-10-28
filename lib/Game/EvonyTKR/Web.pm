@@ -18,7 +18,7 @@ package Game::EvonyTKR::Web {
   use Mojo::Base 'Mojolicious', -signatures;
   use Mojolicious::Routes::Route;
   use Mojo::File::Share qw(dist_dir dist_file);
-  use Mojo::JSON qw(decode_json encode_json);
+  use Mojo::JSON        qw(decode_json encode_json);
   use Log::Log4perl::Level;
 
   use Game::EvonyTKR::Web::Logger;
@@ -71,12 +71,13 @@ package Game::EvonyTKR::Web {
     #let me use the DefaultHelpers
     $self->plugin('DefaultHelpers');
 
-    my $OpenAPISchemaFilename = File::Spec->catfile($dist_dir, "openapi.schema.yaml");
+    my $OpenAPISchemaFilename =
+      File::Spec->catfile($dist_dir, "openapi.schema.yaml");
     my $OpenAPISchema = get_openapi($OpenAPISchemaFilename);
     $self->config({
       openapi => {
-        document_filename   => $OpenAPISchemaFilename,
-        after_response      => \&log_responses,
+        document_filename => $OpenAPISchemaFilename,
+        after_response    => \&log_responses,
       }
     });
 
@@ -91,30 +92,33 @@ package Game::EvonyTKR::Web {
 
   sub log_responses($controller) {
     my $result = $controller->validate_response();
-    if($result) {
+    if ($result) {
       $controller->app->log()->debug("response is valid");
     }
     else {
-      $controller->app->log()->error("response is invalid", $result)
+      $controller->app->log()->error("response is invalid", $result);
     }
   }
 
   sub get_openapi ($openapi_filename) {
-    my $ypp = YAML::PP->new(boolean => 'JSON::PP');
+    my $ypp     = YAML::PP->new(boolean => 'JSON::PP');
     my $newTemp = 0;
-    if(not defined($OpenAPISchemaCache)) {
+    if (not defined($OpenAPISchemaCache)) {
       $OpenAPISchemaCache = File::Temp->new();
-      $newTemp = true;
+      $newTemp            = true;
     }
     my $serialized_file = Path::Tiny::path($OpenAPISchemaCache);
-    my $openapi_file = Path::Tiny::path($openapi_filename);
+    my $openapi_file    = Path::Tiny::path($openapi_filename);
     my $openapi;
-    if ($newTemp or $serialized_file->stat->mtime < $openapi_file->stat->mtime) {
+    if ($newTemp or $serialized_file->stat->mtime < $openapi_file->stat->mtime)
+    {
       $openapi = OpenAPI::Modern->new(
-        openapi_uri => '/',
-        openapi_schema => $ypp->load_file($openapi_file), # your openapi document
+        openapi_uri    => '/',
+        openapi_schema => $ypp->load_file($openapi_file)
+        ,    # your openapi document
       );
-      my $frozen = Sereal::Encoder->new({ freeze_callbacks => 1 })->encode($openapi);
+      my $frozen =
+        Sereal::Encoder->new({ freeze_callbacks => 1 })->encode($openapi);
       $serialized_file->spew_raw($frozen);
     }
     else {

@@ -18,7 +18,7 @@ class Game::EvonyTKR::Data
 # VERSION
   use File::FindLib 'lib';
 
-  field @buffAttributes :reader = (
+  field @buffAttributes : reader = (
     "attack",
     "attack speed",
     "death to survival",
@@ -117,10 +117,10 @@ class Game::EvonyTKR::Data
 
   #keys should come from @GeneralKeys above.
   field %generalClass : reader = (
-    'ground_specialist'   => 'Game::EvonyTKR::General::Ground',
-    'mounted_specialist'  => 'Game::EvonyTKR::General::Mounted',
-    'ranged_specialist'   => 'Game::EvonyTKR::General::Ranged',
-    'siege_specialist'    => 'Game::EvonyTKR::General::Siege',
+    'ground_specialist'  => 'Game::EvonyTKR::General::Ground',
+    'mounted_specialist' => 'Game::EvonyTKR::General::Mounted',
+    'ranged_specialist'  => 'Game::EvonyTKR::General::Ranged',
+    'siege_specialist'   => 'Game::EvonyTKR::General::Siege',
   );
 
   field $specialityLevels : reader =
