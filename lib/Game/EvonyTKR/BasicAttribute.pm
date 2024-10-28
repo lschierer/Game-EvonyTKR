@@ -153,6 +153,26 @@ use overload
     }
   }
 
+  method _toHashRef {
+    my $returnRef = {};
+    $returnRef->{$self->attribute_name()} = {
+      base      => $self->base(),
+      increment => $self->incrment(),
+      total     => $self->total(),
+    };
+    return $returnRef;
+  }
+
+  method TO_JSON {
+    my $json = JSON::MaybeXS->new(utf8 => 1);
+    return $self->toHashRef();
+  }
+
+  method _toString {
+    my $json = JSON::MaybeXS->new(utf8 => 1);
+    return $json->encode($self->toHashRef());
+  }
+
 }
 1;
 __END__
