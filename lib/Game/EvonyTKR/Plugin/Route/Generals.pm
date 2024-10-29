@@ -3,15 +3,23 @@ use experimental qw(class);
 use utf8::all;
 use MojoX::Log::Log4perl;
 use Mojo::File qw(curfile);
+use Mojo::File::Share qw(dist_dir dist_file);
 use File::FindLib 'lib';
 
 package Game::EvonyTKR::Plugin::Route::Generals {
   use Mojo::Base 'Mojolicious::Plugin', -role, -signatures;
-  use Mojo::File::Share qw(dist_dir dist_file);
   use Carp;
 
   sub register ($self, $app, $r) {
-    $app->routes->get('/generals')->to('Example#welcome');
+    my $generalRoutes = $r->any('/generals')->to(
+      namespace  => 'Game::EvonyTKR::Controller',
+      controller => 'Generals',
+    );
+
+    $generalRoutes->get('/' => [format => ['html', 'txt', 'json']])->to(
+      format => 'html',
+      action => 'list'
+    );
 
   }
 
