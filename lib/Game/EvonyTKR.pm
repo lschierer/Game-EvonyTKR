@@ -1,4 +1,5 @@
 use v5.40.0;
+use feature 'try';
 use experimental qw(class);
 use utf8::all;
 use MojoX::Log::Log4perl;
@@ -35,13 +36,12 @@ package Game::EvonyTKR {
 
     $self->renderer->paths([$home->rel_file('share/templates')]);
 
-    preSeedGenerals($self, $distDir);
-
     # Router
     my $r = $self->routes;
 
     push @{$self->plugins->namespaces}, 'Game::EvonyTKR::Plugin';
 
+    $self->plugin('DefaultHelpers');
     $self->plugin('Route::Base');
 
   }
