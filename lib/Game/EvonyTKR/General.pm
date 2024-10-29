@@ -320,53 +320,6 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Data) {
     $type->check($ascending)
       or push @errors => "ascending must be a bool, not $ascending";
 
-    $type = t('PositiveOrZeroNum');
-    is_Num($leadership)
-      or push @errors => "leadership must be a number, not $leadership";
-    $type->check($leadership)
-      or push @errors => "leadership must be positive, not $leadership";
-
-    is_Num($leadership_increment)
-      or push @errors =>
-      "leadership_increment must be a number, not $leadership_increment";
-    $type->check($leadership_increment)
-      or push @errors =>
-      "leadership_increment must be positive, not $leadership_increment";
-
-    is_Num($attack)
-      or push @errors => "attack must be a number, not $attack";
-    $type->check($attack)
-      or push @errors => "attack must be positive, not $attack";
-
-    is_Num($attack_increment)
-      or push @errors =>
-      "attack_increment must be a number, not $attack_increment";
-    $type->check($attack_increment)
-      or push @errors =>
-      "attack_increment must be positive, not $attack_increment";
-
-    is_Num($defense)
-      or push @errors => "defense must be a number, not $defense";
-    $type->check($defense)
-      or push @errors => "defense must be positive, not $defense";
-
-    is_Num($defense_increment)
-      or push @errors =>
-      "defense_increment must be a number, not $defense_increment";
-    $type->check($defense_increment)
-      or push @errors =>
-      "defense_increment must be positive, not $defense_increment";
-
-    is_Num($politics)
-      or push @errors => "politics must be a number, not $politics";
-
-    is_Num($politics_increment)
-      or push @errors =>
-      "politics_increment must be a number, not $politics_increment";
-    $type->check($politics_increment)
-      or push @errors =>
-      "politics_increment must be positive, not $politics_increment";
-
     my $pInt = t('PositiveOrZeroInt');
     is_Int($level)
       or push @errors => "level must be an integer, not $level";
@@ -379,31 +332,6 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Data) {
     if (@errors) {
       die join ', ' => @errors;
     }
-  }
-
-  method effective_leadership() {
-    $self->logger()
-      ->trace('computing effective_leadership for ' . $self->name());
-    return $self->_adjustBasicAttribute($self->leadership(),
-      $self->leadership_increment());
-  }
-
-  method effective_attack() {
-    $self->logger()->trace('computing effective_attack for ' . $self->name());
-    return $self->_adjustBasicAttribute($self->attack(),
-      $self->attack_increment());
-  }
-
-  method effective_defense() {
-    $self->logger()->trace('computing effective_defense for ' . $self->name());
-    return $self->_adjustBasicAttribute($self->defense(),
-      $self->defense_increment());
-  }
-
-  method effective_politics() {
-    $self->logger()->trace('computing effective_politics for ' . $self->name());
-    return $self->_adjustBasicAttribute($self->politics(),
-      $self->politics_increment());
   }
 
   method changeActiveSpecialityLevel($specialityNumber, $newLevel) {
@@ -545,7 +473,7 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Data) {
     $returnRef->{hasCovenant} = $self->hasCovenant();
 
     $self->logger()->trace("add book stuff to returnRef for $name");
-    $returnRef->{built_in_book} =
+    $returnRef->{builtInBook} =
       defined $self->built_in_book
       ? $self->built_in_book->toHashRef($verbose)
       : {};
@@ -565,8 +493,11 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Data) {
     $returnRef->{specialities} = \@specialityRefs;
 
     $self->logger()->trace("add ascending attributes to returnRef for $name");
-    $returnRef->{ascendingAttributes} =
-      $self->ascendingAttributes()->toHashRef($verbose);
+    $returnRef->{ascending} = $self->ascending();
+    if($self->ascending()) {
+      $returnRef->{ascendingAttributes} =
+        $self->ascendingAttributes()->toHashRef($verbose);
+    }
 
     if ($verbose) {
       $self->logger()->trace("add scores info to returnRef for $name");
@@ -583,7 +514,8 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Data) {
     }
 
     $self->logger()->trace("add basic attributes to returnRef for $name");
-    $returnRef->{basic_attributes} => $self->basic_attributes($verbose);
+    $returnRef->{basicAttributes} = $self->basic_attributes()->_toHashRef($verbose,
+      $self->level(), $self->ascendingAttributes()->activeLevel(), $self->name());
 
     return $returnRef;
   }
@@ -648,66 +580,6 @@ This base class implements the attributes and methods common to all Generals, bu
 =method name
 
 Returns the general's name, which will also be the key by which we find the general.
-=cut
-
-=method leadership
-
-Returns the base value for leadership, one of the four basic attributes of a general.
-=cut
-
-=method leadership_increment
-
-Returns the amount by which the effective value of leadership (as opposed to its base value) increases with each level gained
-=cut
-
-=method effective_leadership()
-
-returns the value that a user of this general at this investment level will experience for leadership.
-=cut
-
-=method attack
-
-Returns the base value for attack, one of the four basic attributes of a general.
-=cut
-
-=method attack_increment
-
-Returns the amount by which the effective value of attack (as opposed to its base value) increases with each level gained
-=cut
-
-=method effective_attack()
-
-returns the value that a user of this general at this investment level will experience for attack.
-=cut
-
-=method defense
-
-Returns the base value for defense, one of the four basic attributes of a general.
-=cut
-
-=attr defense_increment
-
-Returns the amount by which the effective value of defense (as opposed to its base value) increases with each level gained
-=cut
-
-=method effective_defense()
-
-returns the value that a user of this general at this investment level will experience for defense.
-=cut
-
-=method politics
-
-Returns the base value for politics, one of the four basic attributes of a general.
-=cut
-
-=attr politics_increment
-
-Returns the amount by which the effective value of politics (as opposed to its base value) increases with each level gained
-=cut
-
-=method effective_politics()
-
-returns the value that a user of this general at this investment level will experience for politics.
 =cut
 
 =method level

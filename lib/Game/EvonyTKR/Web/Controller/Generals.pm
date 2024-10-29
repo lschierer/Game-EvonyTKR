@@ -108,20 +108,46 @@ package Game::EvonyTKR::Web::Controller::Generals {
     }
   }
 
+  sub GetUUID {
+    my ($self) = @_;
+    $self->log()->trace("in Controller::General::GetUUID");
+    my $nameParam = $self->param('name');
+
+    my $typeParam = $self->param('type');
+
+    $self->log()->trace("generating UUID for $nameParam with type $typeParam");
+
+    if (not defined $generalModel) {
+      $self->log()->warn('generalModel was not defined!!');
+      $generalModel = Game::EvonyTKR::Web::Model::Generals->new();
+    }
+    else{
+      $self->log()->trace('generalModel was defined.');
+      $self->log()->trace('generalModel is '. Data::Printer::np $generalModel);
+    }
+    my $uuid = $generalModel->UUID_for_name($nameParam, $typeParam);
+    $self->respond_to(
+      json  => {json => $uuid},
+      html  => {text => $uuid},
+      txt   => {text => $uuid},
+      any => { data => '', status => 204 },
+    );
+  }
+
   sub GetGeneral {
     my ($self) = @_;
     $self->log()->trace("get in Controller::General");
 
-    my $nameParam = $self->param('name');
-    $self->log()->trace("looking for $nameParam in GetGeneral");
+    my $idParam = $self->param('id');
+    $self->log()->trace("looking for $idParam in GetGeneral");
 
-    if (not defined $generalModel) {
+    if (not defined($generalModel)) {
       #this should be unnecessary and never actually be reached.
       $generalModel = Game::EvonyTKR::Web::Model::Generals->new();
     }
-    my $general = $generalModel->get_by_name($nameParam);
+    my $general = $generalModel->get_by_id($idParam);
 
-    if (not defined $general or not $general) {
+    if (not defined($general) or not $general) {
       $self->log()->error('no id from Model');
       $self->reply->not_found();
     }
@@ -153,18 +179,19 @@ package Game::EvonyTKR::Web::Controller::Generals {
           $self->log()->debug("Query level is not defined.");
         }
 
-        my @specialityLevels = $self->_specialityParamHelper($nameParam,);
+        my @specialityLevels = $self->_specialityParamHelper($gc->name());
         foreach my $i (0 .. $#specialityLevels) {
           my $sp = $specialityLevels[$i];
           my $sl = $i + 1;
           $general->changeActiveSpecialityLevel($sl, $sp);
         }
 
-        my $ascendingLevel = $self->_ascendingParamHelper($nameParam);
+        my $ascendingLevel = $self->_ascendingParamHelper($gc->name());
         $general->ascendingAttributes()->setActiveLevel($ascendingLevel);
 
         my $generalHashRef = {};
-        $$generalHashRef{'data'} = $general->toHashRef($verbose);
+        $generalHashRef->{'data'} = $general->toHashRef($verbose);
+        $generalHashRef->{'id'} = $idParam;
         $self->respond_to(
           json => { json => $generalHashRef },
           html => {

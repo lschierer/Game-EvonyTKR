@@ -1,22 +1,23 @@
 use v5.40.0;
 use experimental qw(class);
 use File::FindLib 'lib';
+require Game::EvonyTKR::Data;
 use YAML::PP;
 
-class Game::EvonyTKR::Web::Model::Generals : isa(Game::EvonyTKR::Web::Logger) {
+class Game::EvonyTKR::Web::Model::Generals : isa(Game::EvonyTKR::Data) {
   use Carp;
   use Data::Printer;
   use Devel::Peek;
   use File::ShareDir ':ALL';
   use File::Spec;
   use Util::Any ':all';
-  use Game::EvonyTKR::Data;
   use Game::EvonyTKR::General;
   use Game::EvonyTKR::General::Ground;
   use Game::EvonyTKR::General::Mounted;
   use Game::EvonyTKR::General::Ranged;
   use Game::EvonyTKR::General::Siege;
   use X500::RDN;
+  use UUID qw(uuid5);
   use namespace::autoclean;
 # PODNAME: Game::EvonyTKR::Web::Model::General
 # VERSION
@@ -24,10 +25,8 @@ class Game::EvonyTKR::Web::Model::Generals : isa(Game::EvonyTKR::Web::Logger) {
 
   field $generals : reader;
 
-  field $EvonyData = Game::EvonyTKR::Data->new();
-
   ADJUST {
-    for my $generalType ($EvonyData->GeneralKeys()) {
+    for my $generalType ($self->GeneralKeys()) {
       $generals->{$generalType} = {};
     }
   }
@@ -43,19 +42,22 @@ class Game::EvonyTKR::Web::Model::Generals : isa(Game::EvonyTKR::Web::Logger) {
     }
     my $name        = $ng->name();
     my $generalType = $ng->generalType();
+    my $base = $self->UUID5_Generals()->{$generalType};
+    $self->logger()->trace(sprintf('uuidbase for %s is %s', $generalType, $base));
+    my $uuid = uuid5($base, $name);
 
     if (not exists($generals->{$generalType})) {
       $self->logger()->logcroak("$generalType is not already in the hash");
     }
     else {
-      if (not exists($generals->{$generalType}->{$name})) {
-        $generals->{$generalType}->{$name} = $ng;
+      if (not exists($generals->{$generalType}->{$uuid})) {
+        $generals->{$generalType}->{$uuid} = $ng;
 
-        if (not exists $generals->{$name}) {
-          $generals->{$name} = [$generalType];
+        if (not exists $generals->{$uuid}) {
+          $generals->{$uuid} = [$generalType];
         }
         else {
-          push @{ $generals->{$name} }, $generalType;
+          push @{ $generals->{$uuid} }, $generalType;
         }
         return 1;
       }
@@ -64,59 +66,47 @@ class Game::EvonyTKR::Web::Model::Generals : isa(Game::EvonyTKR::Web::Logger) {
     return 0;
   }
 
-  method remove_general($rg) {
-    my $gc  = blessed($rg);
-    my @gcl = split(/::/, $gc);
-    if ($gcl[2] !~ /general/i) {
-      $self->logger()
-        ->logwarn(
-        "provided object is of type '$gc' not 'Game::EvonyTKR::General '");
-      return 0;
+  method remove_general($id) {
+    my $uv = UUID::version($id);
+    if($uv eq 'v5'){
+      for my $t (@{$generals->{$id}}) {
+        delete $generals->{$t}->{$id};
+      }
+      delete $generals->{$id};
     }
-    delete $generals->{ $rg->name() };
-    delete $generals->${ $rg->generalType() }->{ $rg->name() };
+    else {
+      $self->logger()->logerror(sprintf('$id %s is %s, not a UUID5', $id, $uv));
+    }
   }
 
-  method get_by_name($name, $type = undef) {
-    if (exists $generals->{$name}) {
-      $self->logger()->trace(sprintf(
-        'looking for cached general %s with type %s',
-        $name, defined $type ? $type : 'undefined'
-      ));
-      if (defined $type) {
-        $self->logger()->trace('and type is defined');
-        if (any { $_ =~ $type } @{ $generals->{$name} }) {
-          return $generals->{$type}->{$name};
+  method get_by_id($id, $type = undef) {
+    if(exists $generals->{$id}) {
+      if(defined($type)) {
+        $self->logger()->trace(sprintf('looking for cached general %s with type %s',
+        $id, defined $type ? $type : 'undefined'));
+        if (any { $_ =~ /$type/ } @{ $generals->{$id} }) {
+          return $generals->{$type}->{$id};
         }
       }
       else {
-        $self->logger()
-          ->trace(
-          'type undefined looking for cached general, returning first available.'
-          );
-        for my $key ($EvonyData->GeneralKeys()) {
-          if (exists $generals->{$key} and exists $generals->{$key}->{$name}) {
-            $self->logger()
-              ->trace(sprintf('found general %s within type %s', $name, $key));
-            return $generals->{$key}->{$name};
-          }
+        if(defined $generals->{$id}) {
+          $type = $$generals->{$id};
+          return $generals->{$type}->{$id};
         }
       }
     }
-    else {
-      $self->logger()
-        ->trace(sprintf('searching for general %s of unknown type', $name));
-      my $generalShare =
-        File::Spec->catfile(File::ShareDir::dist_dir('Game-EvonyTKR'),
-        'generals');
-      my $FileWithPath = File::Spec->catfile($generalShare, "$name.yaml");
+    return undef;
+  }
 
-      if (-T -s -r $FileWithPath) {
-        $self->logger()->trace("found $name.yaml in get_by_id");
-        if ($self->readFromFile($name)) {
-          return $self->get_by_name($name);
-        }
-      }
+  method UUID_for_name($name, $type = undef) {
+    if(defined($type)) {
+      $self->logger()->trace(sprintf('obtaining base for type %s', $type));
+      my %ug = $self->UUID5_Generals();
+      $self->logger()->trace(sprintf('UUID5_Generals is %s',
+      Data::Printer::np %ug));
+      my $base = $ug{$type};
+      $self->logger()->trace(sprintf('base for %s is %s', $type, $base));
+      return uuid5($base, $name);
     }
   }
 
@@ -136,13 +126,6 @@ class Game::EvonyTKR::Web::Model::Generals : isa(Game::EvonyTKR::Web::Logger) {
     }
   }
 
-  method generate_RDN($n, $t, $u) {
-    return new X500::DN(
-      new X500::RDN('SERIALNUMBER' => $u),
-      new X500::RDN('CN'           => $n),
-      $EvonyData->globalDN()->getRDNs(),
-    );
-  }
 
   method readFromFile($name) {
     my $ypp      = YAML::PP->new(boolean => 'JSON::PP');
@@ -211,7 +194,7 @@ class Game::EvonyTKR::Web::Model::Generals : isa(Game::EvonyTKR::Web::Logger) {
           Data::Printer::np @scoreType
         ));
       }
-      my %constructors = $EvonyData->generalClass();
+      my %constructors = $self->generalClass();
       for (@generalClassKey) {
         if (not defined $constructors{$_}) {
           $self->logger()->error(sprintf(
@@ -231,7 +214,7 @@ class Game::EvonyTKR::Web::Model::Generals : isa(Game::EvonyTKR::Web::Logger) {
         $general->basic_attributes()->attack()->setIncrement($attack_increment);
         $general->basic_attributes()->leadership()->setBase($leadership);
         $general->basic_attributes()->leadership()
-          ->setIncrement($leadershp_increment);
+          ->setIncrement($leadership_increment);
         $general->basic_attributes()->defense()->setBase($defense);
         $general->basic_attributes()->defense()
           ->setIncrement($defense_increment);
@@ -244,7 +227,7 @@ class Game::EvonyTKR::Web::Model::Generals : isa(Game::EvonyTKR::Web::Logger) {
           $self->logger()->trace("primary skill book for $name is $bookName");
           my $sb = Game::EvonyTKR::SkillBook::Special->new(name => $bookName);
           $sb->readFromFile();
-          $general->addBuiltInBook($sb);
+          $general->addbuilt_in_book($sb);
         }
         else {
           $self->logger()

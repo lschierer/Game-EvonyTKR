@@ -36,8 +36,8 @@ class Game::EvonyTKR::Ascending : isa(Game::EvonyTKR::Logger) {
 
   field %Buffs : reader;
   field $levels = enum [
-    'None', '1Purple', '2Purple', '3Purple', '4Purple', '5Purple',
-    '1Red', '2Red',    '3Red',    '4Red',    '5Red',
+    'None', 'purple1', 'purple2', 'purple3', 'purple4', 'purple5',
+    'red1', 'red2',    'red3',    'red4',    'red5',
   ];
 
   field $activeLevel : reader : param //= 'None';
@@ -126,37 +126,34 @@ class Game::EvonyTKR::Ascending : isa(Game::EvonyTKR::Logger) {
             $tl, $printableBuff, $buffCount,
           ));
         }
-        if ($tl eq '1Purple') {
-          $self->logger()->trace('finished 1Purple, call for 2Purple');
-          $self->add_buff('2Purple', $nb, 1);
+        if($tl =~ /^purple(\d)/) {
+          $self->logger()->trace(sprintf(
+            'finished purple%d',
+            $1));
+            if($1 + 1 <= 5) {
+              my $al = $1 + 1;
+              $self->logger()->trace(sprintf(
+                'calling for purple%d',
+                $al));
+              $self->add_buff("purple$al", $nb, 1);
+            }
         }
-        elsif ($tl eq '2Purple') {
-          $self->logger()->trace('finished 2Purple, call for 3Purple');
-          $self->add_buff('3Purple', $nb, 1);
+        elsif ($tl =~ /^red(\d)/) {
+          $self->logger()->trace(sprintf(
+            'finished red%d',
+            $1));
+            if($1 + 1 <= 5) {
+              my $al = $1 + 1;
+              $self->logger()->trace(sprintf(
+                'calling for red%d',
+                $al));
+              $self->add_buff("red$al", $nb, 1);
+            }
         }
-        elsif ($tl eq '3Purple') {
-          $self->logger()->trace('finished 3Purple, call for 4Purple');
-          $self->add_buff('4Purple', $nb, 1);
-        }
-        elsif ($tl eq '4Purple') {
-          $self->logger()->trace('finished 4Purple, call for 5Purple');
-          $self->add_buff('5Purple', $nb, 1);
-        }
-        elsif ($tl eq '1Red') {
-          $self->logger()->trace('finished 1Red, call for 2red');
-          $self->add_buff('2Red', $nb, 1);
-        }
-        elsif ($tl eq '2Red') {
-          $self->logger()->trace('finished 2Red, call for 3red');
-          $self->add_buff('3Red', $nb, 1);
-        }
-        elsif ($tl eq '3Red') {
-          $self->logger()->trace('finished 3Red, call for 4red');
-          $self->add_buff('4Red', $nb, 1);
-        }
-        elsif ($tl eq '4Red') {
-          $self->logger()->trace('finished 4Red, call for 5red');
-          $self->add_buff('5Red', $nb, 1);
+        else {
+          $self->logger()->error(sprintf(
+            'tl is %s, neither red nor purple',
+            $tl));
         }
         $self->logger()->trace("$level totally complete");
         last;
@@ -333,46 +330,46 @@ __END__
 
 Ascending is one of several ways that a General can provide Buffs for Troops.
 
-Ascending works similarly to Specialities in that there are multiple levels, however there is only one set of Ascending Buffs per general, instead of the four possible Specialities (plus possible Flex Speciality).   
+Ascending works similarly to Specialities in that there are multiple levels, however there is only one set of Ascending Buffs per general, instead of the four possible Specialities (plus possible Flex Speciality).
 
 =for :List
 
 * Ascending Buffs can be either values 1Purple through 5Purple (for Purple quality generals), or 1Red through 5Red (for Gold/Red quality generals).
 
-* Ascending Buffs 1Red through 5Red provide ehancements to Basic skills and affect the General's effective scores for the basic attributes. 
+* Ascending Buffs 1Red through 5Red provide ehancements to Basic skills and affect the General's effective scores for the basic attributes.
 
-* Ascending a Historic (Gold/Red) General costs both general fragments and Blood of Ares.  Ascending a General that is merely Historic but not Legendary (Purple) requires general fragments, but not Blood of Ares. 
+* Ascending a Historic (Gold/Red) General costs both general fragments and Blood of Ares.  Ascending a General that is merely Historic but not Legendary (Purple) requires general fragments, but not Blood of Ares.
 
-* For low spenders, Blood of Ares is a severe limiting factor on ascending generals.  As you grow in spending, it limits the I<rate> at which you ascend, but not I<if> you ascend a general.  Fragments are the true limiting concern for players of all levels.  It is not possible to get sufficient fragments of all generals to fully ascend them without spending in any reasonable amount of time.  It is not possible to ascend certain "retired" generals I<at all> if you have not already done so.  These "retired" Generals are included in the distribution data to allow players who I<do> have them to compare effectiveness in using them. 
+* For low spenders, Blood of Ares is a severe limiting factor on ascending generals.  As you grow in spending, it limits the I<rate> at which you ascend, but not I<if> you ascend a general.  Fragments are the true limiting concern for players of all levels.  It is not possible to get sufficient fragments of all generals to fully ascend them without spending in any reasonable amount of time.  It is not possible to ascend certain "retired" generals I<at all> if you have not already done so.  These "retired" Generals are included in the distribution data to allow players who I<do> have them to compare effectiveness in using them.
 =cut
 
 =method name()
 
-returns the name field from the Speciality. 
+returns the name field from the Speciality.
 =cut
 
 =method activeLevel
 
-returns the level, values 1Purple through 5Purple (for Purple quality generals), or 1Red through 5Red (for Gold/Red quality generals), that is active at this time. 
+returns the level, values 1Purple through 5Purple (for Purple quality generals), or 1Red through 5Red (for Gold/Red quality generals), that is active at this time.
 =cut
 
 =method setActiveLevel($newLevel)
 
 sets the activeLevel to newLevel presuming it is a valid value 1Purple through 5Purple (for Purple quality generals), or 1Red through 5Red (for Gold/Red quality generals).
 
-Todo: Make sure the value is valid I<for the General's quality>. 
+Todo: Make sure the value is valid I<for the General's quality>.
 =cut
 
 =method add_buff($level, $nb)
 
-This method takes a Game::EvonyTKR::Buff as its sole parameter and adds it as one of the buffs this Speciality at the specified $level.  $level must be one of 1Purple through 5Purple (for Purple quality generals), or 1Red through 5Red (for Gold/Red quality generals) or the function will fail to add the buff.  
+This method takes a Game::EvonyTKR::Buff as its sole parameter and adds it as one of the buffs this Speciality at the specified $level.  $level must be one of 1Purple through 5Purple (for Purple quality generals), or 1Red through 5Red (for Gold/Red quality generals) or the function will fail to add the buff.
 
-Todo: Make sure that this is not called twice with the same Buff/Level combination.  Make sure the Level provided is valid I<for that General's quality>. 
+Todo: Make sure that this is not called twice with the same Buff/Level combination.  Make sure the Level provided is valid I<for that General's quality>.
 =cut
 
 =method Buffs()
 
-Returns a hash with the levels 1Purple through 5Purple, and 1Red through 5Red as the keys and an array with the buffs at that level as the values.  Note all 10 levels are always present, but only 5 will have Buffs assigned.  The other 5 will return empty lists. 
+Returns a hash with the levels 1Purple through 5Purple, and 1Red through 5Red as the keys and an array with the buffs at that level as the values.  Note all 10 levels are always present, but only 5 will have Buffs assigned.  The other 5 will return empty lists.
 
-Each level is cumulative, you never need to read more than the array for the currently active level. 
+Each level is cumulative, you never need to read more than the array for the currently active level.
 =cut

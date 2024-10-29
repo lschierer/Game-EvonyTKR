@@ -4,7 +4,7 @@ use File::FindLib 'lib';
 
 class Game::EvonyTKR::BasicAttributes : isa(Game::EvonyTKR::Data) {
 # PODNAME: Game::EvonyTKR::BasicAttributes
-  use Croak;
+  use Carp;
   use Types::Common  qw( t is_Num is_Str is_Int);
   use List::AllUtils qw( any none );
   use Data::Printer;
@@ -23,7 +23,7 @@ class Game::EvonyTKR::BasicAttributes : isa(Game::EvonyTKR::Data) {
     Game::EvonyTKR::BasicAttribute->new(attribute_name => 'attack',);
 
   field $leadership : reader =
-    Game::EvonyTKR::BasicAttribute->new(attribute_name => 'leadershp',);
+    Game::EvonyTKR::BasicAttribute->new(attribute_name => 'leadership',);
 
   field $defense : reader =
     Game::EvonyTKR::BasicAttribute->new(attribute_name => 'defense',);
@@ -33,21 +33,21 @@ class Game::EvonyTKR::BasicAttributes : isa(Game::EvonyTKR::Data) {
 
   method total($level = 1, $stars = 'none', $name = "GeneralName") {
     my $total = $self->attack()
-      ->total($level = 1, $stars = 'none', $name = "GeneralName", 'attack');
+      ->total($level, $stars, $name, 'attack');
     $total += $self->leadership->total(
-      $level = 1,
-      $stars = 'none',
-      $name  = "GeneralName", 'leadership'
+      $level,
+      $stars,
+      $name, 'leadership'
     );
     $total += $self->defense->total(
-      $level = 1,
-      $stars = 'none',
-      $name  = "GeneralName", 'defense'
+      $level,
+      $stars,
+      $name, 'defense'
     );
     $total += $self->politics->total(
-      $level = 1,
-      $stars = 'none',
-      $name  = "GeneralName", 'politics'
+      $level,
+      $stars,
+      $name, 'politics'
     );
     return $total;
   }
@@ -119,13 +119,40 @@ class Game::EvonyTKR::BasicAttributes : isa(Game::EvonyTKR::Data) {
     }
   }
 
-  method _toHashRef($verbose = 0) {
+  method getReaderForAttribute($attrib) {
+    if ($attrib =~ /attack/i) {
+      return $self->attack();
+    }
+    elsif ($attrib =~ /leadership/i ) {
+      return $self->leadership();
+    }
+    elsif ($attrib =~ /defense/i) {
+      return $self->defense();
+    }
+    elsif($attrib =~ /politics/i ) {
+      return $self->politics();
+    }
+    else {
+      $self->logger()->logcroak("invalid attribute requested");
+    }
+  }
+
+  method _toHashRef($verbose = 0, $level=1, $stars = 'none', $name = "GeneralName") {
     my $returnRef = {
-      leadership => $self->leadership()->_toHashRef($verbose),
-      attack     => $self->attack()->_toHashRef($verbose),
-      defense    => $self->defense()->_toHashRef($verbose),
-      politic    => $self->politics()->_toHashRef($verbose),
-    } return $returnRef;
+      leadership => {},
+      attack     => {},
+      defense    => {},
+      politics    => {},
+    };
+    for my $k (qw (leadership attack defense politics)) {
+      if($verbose) {
+        $returnRef->{$k}->{base}      = $self->getReaderForAttribute($k)->base();
+        $returnRef->{$k}->{increment} = $self->getReaderForAttribute($k)->increment();
+      }
+      $returnRef->{$k}->{total}      = $self->getReaderForAttribute($k)->total($level,
+      $stars, $name, $k);
+    }
+    return $returnRef;
   }
 
   method TO_JSON {

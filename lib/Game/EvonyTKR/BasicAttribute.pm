@@ -2,12 +2,13 @@ use v5.40.0;
 use experimental qw(class);
 use File::FindLib 'lib';
 
-class Game::EvonyTKR::BasicAttributes : isa(Game::EvonyTKR::Data) {
+class Game::EvonyTKR::BasicAttribute : isa(Game::EvonyTKR::Data) {
 # PODNAME: Game::EvonyTKR::BasicAttribute
-  use Croak;
+  use Carp;
   use Types::Common  qw( t is_Num is_Str is_Int);
   use List::AllUtils qw( any none );
   use Data::Printer;
+  use Hash::Util;
   use namespace::autoclean;
 # VERSION
 
@@ -46,8 +47,30 @@ class Game::EvonyTKR::BasicAttributes : isa(Game::EvonyTKR::Data) {
   );
 
   ADJUST {
-    lock_keys(%BasicAESAdjustment);
-    __CLASS__->validation();
+    Hash::Util::lock_keys(%BasicAESAdjustment);
+    my @errors = ();
+
+    my $type = t('PositiveOrZeroNum');
+    is_Num($base)
+      or push @errors => "base must be a number, not $base";
+    $type->check($base)
+      or push @errors => "base must be positive, not $base";
+
+    $type = t('PositiveOrZeroNum');
+    is_Num($increment)
+      or push @errors => "increment must be a number, not $increment";
+    $type->check($increment)
+      or push @errors => "increment must be positive, not $increment";
+
+    is_Str($attribute_name)
+      or push @errors => "attribute name must be a string, not $attribute_name";
+    if (none { $_ eq $attribute_name } @AttributeNames) {
+      push @errors,
+        "attribute name must be one of " . Data::Printer::np @AttributeNames;
+    }
+    if (scalar @errors >= 1) {
+      croak(join(', ' => @errors));
+    }
   }
 
   method setBase($newBase = 0) {
@@ -66,19 +89,19 @@ class Game::EvonyTKR::BasicAttributes : isa(Game::EvonyTKR::Data) {
     }
   }
 
-  method setBase($newIncrement = 0) {
+  method setIncrement($newIncrement = 0) {
     my @errors = ();
     my $type   = t('PositiveOrZeroNum');
     is_Num($newIncrement)
       or push @errors => "increment must be a number, not $newIncrement";
-    $type->check($newBase)
+    $type->check($newIncrement)
       or push @errors => "increment must be positive, not $newIncrement";
     if (scalar @errors >= 1) {
       $self->logger()->logerror(join(', ', @errors));
       return;
     }
     else {
-      $increment = $newBase;
+      $increment = $newIncrement;
     }
   }
 
@@ -95,12 +118,12 @@ class Game::EvonyTKR::BasicAttributes : isa(Game::EvonyTKR::Data) {
     }
     my $step = $level * $increment;
     $self->logger()->trace(sprintf(
-      'Basic Arribute %s for %s is %n after step 1',
+      'Basic Arribute %s for %s is %d after step 1',
       $attrib, $name, $step
     ));
     $step = $step + 500 + $AES_adjustment;
     $self->logger()->trace(sprintf(
-      'Basic Arribute %s for %s is %n after adding 500 and AES %n',
+      'Basic Arribute %s for %s is %d after adding 500 and AES %n',
       $attrib, $name, $step, $AES_adjustment
     ));
 
@@ -111,7 +134,7 @@ class Game::EvonyTKR::BasicAttributes : isa(Game::EvonyTKR::Data) {
       $step = 90 + ($step - 900) * 0.2;
     }
     $self->logger()->trace(sprintf(
-      'Basic Arribute %s for %s is %n after if block',
+      'Basic Arribute %s for %s is %d after if block',
       $attrib, $name, $step
     ));
     return $step;
@@ -124,11 +147,13 @@ class Game::EvonyTKR::BasicAttributes : isa(Game::EvonyTKR::Data) {
     $multiplier = 0,
     $attrib     = "Attribute",
   ) {
-    return $self->total($level, $stars, $name, $attrib) * $multiplier;
+    my $total = $self->total($level, $stars, $name, $attrib);
+    $total = $total * $multiplier;
+    return $total;
   }
 
   method validation {
-    my @ererors = ();
+    my @errors = ();
 
     my $type = t('PositiveOrZeroNum');
     is_Num($base)
@@ -136,7 +161,7 @@ class Game::EvonyTKR::BasicAttributes : isa(Game::EvonyTKR::Data) {
     $type->check($base)
       or push @errors => "base must be positive, not $base";
 
-    my $type = t('PositiveOrZeroNum');
+    $type = t('PositiveOrZeroNum');
     is_Num($increment)
       or push @errors => "increment must be a number, not $increment";
     $type->check($increment)
@@ -189,8 +214,8 @@ class Game::EvonyTKR::BasicAttributes : isa(Game::EvonyTKR::Data) {
     else {
       my $mt = $self->total();
       my $ot = $other->total();
-      return ($my == $ot)
-        and ($self->attribute_name() eq $other->attribute_name());
+      return (($mt == $ot)
+        and ($self->attribute_name() eq $other->attribute_name()));
     }
   }
 
@@ -206,17 +231,17 @@ class Game::EvonyTKR::BasicAttributes : isa(Game::EvonyTKR::Data) {
     else {
       my $mt = $self->total();
       my $ot = $other->total();
-      return ($my != $ot)
-        or ($self->attribute_name() ne $other->attribute_name());
+      return (($mt != $ot)
+        or ($self->attribute_name() ne $other->attribute_name()));
     }
   }
 
   method _toHashRef($verbose = 0) {
     my $returnRef = {};
-    $returnRef->{ $self->attribute_name() } = { total => $self->total(), };
+    $returnRef->{ total } = $self->total();
     if ($verbose) {
-      $returnRef->{ $self->attribute_name() }->{base}      = $self->base();
-      $returnRef->{ $self->attribute_name() }->{increment} = $self->increment();
+      $returnRef->{base}      = $self->base();
+      $returnRef->{increment} = $self->increment();
     }
     return $returnRef;
   }

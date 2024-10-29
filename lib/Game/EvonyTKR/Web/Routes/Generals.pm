@@ -25,6 +25,12 @@ package Game::EvonyTKR::Web::Routes::Generals {
       action => 'list'
     );
 
+    $generalRoutes->get('/uuid/:type/:name' => [format =>
+      ['html', 'txt', 'json']])->to(
+        format  => 'txt',
+        action  => 'GetUUID',
+    );
+
     my $namedID = $generalRoutes->under(
       '/named/' => sub ($c) {
         $logger->trace('in generalRoutes namedID under clause');
@@ -37,7 +43,7 @@ package Game::EvonyTKR::Web::Routes::Generals {
       }
     );
 
-    $namedID->get('/:name' => [format => ['html', 'txt', 'json']])->to(
+    $namedID->get('/:id' => [format => ['html', 'txt', 'json']])->to(
       format => undef,
       action => 'GetGeneral',
     );
