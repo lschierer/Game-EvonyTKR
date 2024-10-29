@@ -1,25 +1,29 @@
 ---
 general:
-  name: Elise
-  display: summary
-  score_as:
-   - Ground
-  leadership: 119
-  leadership_increment: 9.13
-  defense: 112
-  defense_increment: 8.88
-  attack: 114
-  attack_increment: 9.11
-  politics: 113
-  politics_increment: 8.26
-  stars: '5Red'
-  level: '1'
-  book: Dragon's Song
-  extra:
-    - Odyssey - Elise
   ascending: true
+  basic_attributes:
+    attack:
+      base: 114
+      increment: 9.11
+    defense:
+      base: 112
+      increment: 8.88
+    leadership:
+      base: 119
+      increment: 9.13
+    politics:
+      base: 113
+      increment: 8.26
+  book: Dragon's Song
+  display: summary
+  extra:
+  - Odyssey - Elise
+  name: Elise
   specialities:
-    - Ground Troop Assault
-    - Formation
-    - Ground Troop Ares
-    - Dragontamer
+  - Ground Troop Assault
+  - Formation
+  - Ground Troop Ares
+  - Dragontamer
+  stars: red5
+  type:
+  - ground_specialist

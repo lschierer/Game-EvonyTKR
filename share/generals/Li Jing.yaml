@@ -1,23 +1,27 @@
 ---
 general:
-  name: Li Jing
-  display: summary
-  leadership: 109
-  leadership_increment: 8.98
-  attack: 117
-  attack_increment: 8.65
-  defense: 107
-  defense_increment: 8.58
-  politics: 102
-  politics_increment: 8.44
-  stars: '5Red'
-  level: '1'
-  score_as:
-   - Mounted
-  book: Win by Surprise Attacks
-  specialities:
-    - Mounted Troop Formation
-    - Strike
-    - Mounted Troop Ares
-    - Conquest of the Eastern Turks
   ascending: true
+  basic_attributes:
+    attack:
+      base: 117
+      increment: 8.65
+    defense:
+      base: 107
+      increment: 8.58
+    leadership:
+      base: 109
+      increment: 8.98
+    politics:
+      base: 102
+      increment: 8.44
+  book: Win by Surprise Attacks
+  display: summary
+  name: Li Jing
+  specialities:
+  - Mounted Troop Formation
+  - Strike
+  - Mounted Troop Ares
+  - Conquest of the Eastern Turks
+  stars: red5
+  type:
+  - mounted_specialist

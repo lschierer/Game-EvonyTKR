@@ -1,23 +1,27 @@
 ---
 general:
-  name: Epaminondas
-  display: summary
-  leadership: 111
-  leadership_increment: 9.13
-  attack: 116
-  attack_increment: 8.89
-  defense: 114
-  defense_increment: 9.11
-  politics: 103
-  politics_increment: 8.25
-  stars: '5Red'
-  level: '1'
-  score_as:
-   - Ground
-  book: Military Legend
-  specialities:
-    - Ground Troop Assault
-    - Formation
-    - Ground Troop Ares
-    - Battle of Mantinea
   ascending: true
+  basic_attributes:
+    attack:
+      base: 116
+      increment: 8.89
+    defense:
+      base: 114
+      increment: 9.11
+    leadership:
+      base: 111
+      increment: 9.13
+    politics:
+      base: 103
+      increment: 8.25
+  book: Military Legend
+  display: summary
+  name: Epaminondas
+  specialities:
+  - Ground Troop Assault
+  - Formation
+  - Ground Troop Ares
+  - Battle of Mantinea
+  stars: red5
+  type:
+  - ground_specialist

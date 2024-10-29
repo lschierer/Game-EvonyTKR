@@ -1,23 +1,26 @@
 ---
 general:
-  name: Constantine the Great
-  display: summary
-  leadership: 112
-  leadership_increment: 9.05
-  attack: 109
-  attack_increment: 8.57
-  defense: 106
-  defense_increment: 8.53
-  politics: 119
-  politics_increment: 9.15
-  stars: '5Red'
-  level: '1'
-  score_as:
-   - Mayor
-  book: Roman Emperor
-  specialities:
-    - Mounted Troop Formation
-    - Formation
-    - War God
-    - Battle of the Milvian Bridge
   ascending: true
+  basic_attributes:
+    attack:
+      base: 109
+      increment: 8.57
+    defense:
+      base: 106
+      increment: 8.53
+    leadership:
+      base: 112
+      increment: 9.05
+    politics:
+      base: 119
+      increment: 9.15
+  book: Roman Emperor
+  display: summary
+  name: Constantine the Great
+  specialities:
+  - Mounted Troop Formation
+  - Formation
+  - War God
+  - Battle of the Milvian Bridge
+  stars: red5
+  type: mayor

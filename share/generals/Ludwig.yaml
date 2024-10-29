@@ -1,23 +1,27 @@
 ---
 general:
-  name: Ludwig
-  display: summary
-  leadership: 117
-  leadership_increment: 8.82
-  attack: 123
-  attack_increment: 8.99
-  defense: 121
-  defense_increment: 9.06
-  politics: 101
-  politics_increment: 8.51
-  stars: '5Red'
-  level: '1'
-  score_as:
-   - Ground
-  book: North Frostwolf
-  specialities:
-    - Ground Troop Formation
-    - Annihilation
-    - Ground Troop Ares
-    - Principality Commander
   ascending: true
+  basic_attributes:
+    attack:
+      base: 123
+      increment: 8.99
+    defense:
+      base: 121
+      increment: 9.06
+    leadership:
+      base: 117
+      increment: 8.82
+    politics:
+      base: 101
+      increment: 8.51
+  book: North Frostwolf
+  display: summary
+  name: Ludwig
+  specialities:
+  - Ground Troop Formation
+  - Annihilation
+  - Ground Troop Ares
+  - Principality Commander
+  stars: red5
+  type:
+  - ground_specialist

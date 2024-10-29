@@ -1,23 +1,27 @@
 ---
 general:
-  name: Carus
-  display: summary
-  leadership: 116
-  leadership_increment: 9.09
-  attack: 119
-  attack_increment: 8.66
-  defense: 115
-  defense_increment: 8.78
-  politics: 112
-  politics_increment: 8.65
-  stars: '5Red'
-  level: '1'
-  score_as:
-   - Ground
-  book: Expedition to Persia
-  specialities:
-    - Ground Troop Assault
-    - Annihilation
-    - War God
-    - Persicus Maximus
   ascending: true
+  basic_attributes:
+    attack:
+      base: 119
+      increment: 8.66
+    defense:
+      base: 115
+      increment: 8.78
+    leadership:
+      base: 116
+      increment: 9.09
+    politics:
+      base: 112
+      increment: 8.65
+  book: Expedition to Persia
+  display: summary
+  name: Carus
+  specialities:
+  - Ground Troop Assault
+  - Annihilation
+  - War God
+  - Persicus Maximus
+  stars: red5
+  type:
+  - ground_specialist

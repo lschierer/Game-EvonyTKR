@@ -1,23 +1,27 @@
 ---
 general:
-  name: Mordred
-  display: summary
-  score_as:
-   - Mounted
-  stars: '5Red'
-  leadership: 119
-  leadership_increment: 8.91
-  attack: 118
-  attack_increment: 8.86
-  defense: 114
-  defense_increment: 9.08
-  politics: 108
-  politics_increment: 8.53
-  level: '1'
-  book: Knight of Treachery
   ascending: true
+  basic_attributes:
+    attack:
+      base: 118
+      increment: 8.86
+    defense:
+      base: 114
+      increment: 9.08
+    leadership:
+      base: 119
+      increment: 8.91
+    politics:
+      base: 108
+      increment: 8.53
+  book: Knight of Treachery
+  display: summary
+  name: Mordred
   specialities:
-    - Mounted Troop Formation
-    - Formation
-    - Mounted Troop Ares
-    - Battle of Camlann
+  - Mounted Troop Formation
+  - Formation
+  - Mounted Troop Ares
+  - Battle of Camlann
+  stars: red5
+  type:
+  - mounted_specialist

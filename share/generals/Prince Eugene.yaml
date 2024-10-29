@@ -1,23 +1,27 @@
 ---
 general:
-  name: Prince Eugene
-  display: summary
-  leadership: 120
-  leadership_increment: 9.15
-  attack: 118
-  attack_increment: 8.86
-  defense: 117
-  defense_increment: 8.77
-  politics: 105
-  politics_increment: 8.55
-  stars: '5Red'
-  level: '1'
-  score_as:
-   - Mounted
-  book: Battle of Zenta
-  specialities:
-    - Mounted Troop Formation
-    - Annihilation
-    - Mounted Troop Ares
-    - Ode to Knight
   ascending: true
+  basic_attributes:
+    attack:
+      base: 118
+      increment: 8.86
+    defense:
+      base: 117
+      increment: 8.77
+    leadership:
+      base: 120
+      increment: 9.15
+    politics:
+      base: 105
+      increment: 8.55
+  book: Battle of Zenta
+  display: summary
+  name: Prince Eugene
+  specialities:
+  - Mounted Troop Formation
+  - Annihilation
+  - Mounted Troop Ares
+  - Ode to Knight
+  stars: red5
+  type:
+  - mounted_specialist

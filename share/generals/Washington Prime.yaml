@@ -1,23 +1,27 @@
 ---
 general:
-  name: Washington Prime
-  display: summary
-  score_as:
-   - Mounted
-  attack: 128
-  attack_increment: 9.02
-  leadership: 126
-  leadership_increment: 8.99
-  defense: 123
-  defense_increment: 8.86
-  politics: 102
-  politics_increment: 8.22
-  level: '45'
-  stars: '5Red'
-  book: General of the Armies
-  specialities:
-    - Mounted Troop Formation
-    - Annihilation
-    - Mounted Troop Ares
-    - Founding Father
   ascending: true
+  basic_attributes:
+    attack:
+      base: 128
+      increment: 9.02
+    defense:
+      base: 123
+      increment: 8.86
+    leadership:
+      base: 126
+      increment: 8.99
+    politics:
+      base: 102
+      increment: 8.22
+  book: General of the Armies
+  display: summary
+  name: Washington Prime
+  specialities:
+  - Mounted Troop Formation
+  - Annihilation
+  - Mounted Troop Ares
+  - Founding Father
+  stars: red5
+  type:
+  - mounted_specialist

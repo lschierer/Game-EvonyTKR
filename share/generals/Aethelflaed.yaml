@@ -1,27 +1,31 @@
 ---
 general:
-  name: Aethelflaed
-  level: '1'
-  display: summary
-  note:
-    - severity: info
-      text: >
-        The Mounted Troops' Attack Skill Book may, however, be used.
-  score_as:
-   - Mounted
-  stars: '5Red'
-  leadership: 112
-  leadership_increment: 8.94
-  attack: 107
-  attack_increment: 8.78
-  defense: 115
-  defense_increment: 9.12
-  politics: 113
-  politics_increment: 8.44
-  book: Lady of the Mercians
   ascending: true
+  basic_attributes:
+    attack:
+      base: 107
+      increment: 8.78
+    defense:
+      base: 115
+      increment: 9.12
+    leadership:
+      base: 112
+      increment: 8.94
+    politics:
+      base: 113
+      increment: 8.44
+  book: Lady of the Mercians
+  display: summary
+  name: Aethelflaed
+  note:
+  - severity: info
+    text: |
+      The Mounted Troops' Attack Skill Book may, however, be used.
   specialities:
-    - Hunter
-    - Fortune
-    - Mounted Troop Ares
-    - Lord of the Mercians
+  - Hunter
+  - Fortune
+  - Mounted Troop Ares
+  - Lord of the Mercians
+  stars: red5
+  type:
+  - mounted_specialist

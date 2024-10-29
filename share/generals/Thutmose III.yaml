@@ -1,23 +1,27 @@
 ---
 general:
-  name: Thutmose III
-  display: summary
-  leadership: 114
-  leadership_increment: 8.85
-  attack: 116
-  attack_increment: 8.99
-  defense: 112
-  defense_increment: 8.86
-  politics: 108
-  politics_increment: 8.65
-  stars: '5Red'
-  level: '1'
-  score_as:
-   - Archers
-  book: Invincible Pharaoh
-  specialities:
-    - Ranged Troop Formation
-    - Bash
-    - War God
-    - Battle of Megiddo
   ascending: true
+  basic_attributes:
+    attack:
+      base: 116
+      increment: 8.99
+    defense:
+      base: 112
+      increment: 8.86
+    leadership:
+      base: 114
+      increment: 8.85
+    politics:
+      base: 108
+      increment: 8.65
+  book: Invincible Pharaoh
+  display: summary
+  name: Thutmose III
+  specialities:
+  - Ranged Troop Formation
+  - Bash
+  - War God
+  - Battle of Megiddo
+  stars: red5
+  type:
+  - ranged_specialist

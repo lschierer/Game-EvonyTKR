@@ -1,23 +1,26 @@
 ---
 general:
-  name: Empress Dowager Cixi
-  display: summary
-  leadership: 87
-  leadership_increment: 8.11
-  attack: 106
-  attack_increment: 7.69
-  defense: 109
-  defense_increment: 8.32
-  politics: 92
-  politics_increment: 7.89
-  stars: '5Red'
-  level: '1'
-  score_as:
-   - Mayor
-  book: Curses
-  specialities:
-    - Mounted Troop Defense
-    - Suppress
-    - Ruler
-    - Manipulation
   ascending: true
+  basic_attributes:
+    attack:
+      base: 106
+      increment: 7.69
+    defense:
+      base: 109
+      increment: 8.32
+    leadership:
+      base: 87
+      increment: 8.11
+    politics:
+      base: 92
+      increment: 7.89
+  book: Curses
+  display: summary
+  name: Empress Dowager Cixi
+  specialities:
+  - Mounted Troop Defense
+  - Suppress
+  - Ruler
+  - Manipulation
+  stars: red5
+  type: mayor

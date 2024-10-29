@@ -1,23 +1,27 @@
 ---
 general:
-  name: Mu Guiying
-  display: summary
-  leadership: 114
-  leadership_increment: 9.01
-  attack: 123
-  attack_increment: 8.86
-  defense: 111
-  defense_increment: 8.95
-  politics: 110
-  politics_increment: 8.75
-  stars: '5Red'
-  level: '1'
-  score_as:
-   - Siege
-  book: Heroine of the Yang Family
-  specialities:
-    - Siege Machine Assault
-    - Bash
-    - Siege Machine Ares
-    - Defeat the Liao army
   ascending: true
+  basic_attributes:
+    attack:
+      base: 123
+      increment: 8.86
+    defense:
+      base: 111
+      increment: 8.95
+    leadership:
+      base: 114
+      increment: 9.01
+    politics:
+      base: 110
+      increment: 8.75
+  book: Heroine of the Yang Family
+  display: summary
+  name: Mu Guiying
+  specialities:
+  - Siege Machine Assault
+  - Bash
+  - Siege Machine Ares
+  - Defeat the Liao army
+  stars: red5
+  type:
+  - siege_specialist

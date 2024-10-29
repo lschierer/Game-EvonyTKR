@@ -1,23 +1,27 @@
 ---
 general:
-  name: Gaius Octavius
-  display: summary
-  score_as:
-   - Mounted
-  stars: '5Red'
-  leadership: 116
-  leadership_increment: 9.18
-  attack: 115
-  attack_increment: 8.83
-  defense: 113
-  defense_increment: 9.02
-  politics: 115
-  politics_increment: 8.45
-  level: '1'
-  book: Augustus
   ascending: true
+  basic_attributes:
+    attack:
+      base: 115
+      increment: 8.83
+    defense:
+      base: 113
+      increment: 9.02
+    leadership:
+      base: 116
+      increment: 9.18
+    politics:
+      base: 115
+      increment: 8.45
+  book: Augustus
+  display: summary
+  name: Gaius Octavius
   specialities:
-    - Mounted Troop Assault
-    - Annihilation
-    - War God
-    - Battle of Actium
+  - Mounted Troop Assault
+  - Annihilation
+  - War God
+  - Battle of Actium
+  stars: red5
+  type:
+  - mounted_specialist

@@ -1,23 +1,27 @@
 ---
 general:
-  name: Subutai
-  display: summary
-  leadership: 115
-  leadership_increment: 8.82
-  attack: 120
-  attack_increment: 9.01
-  defense: 112
-  defense_increment: 8.82
-  politics: 111
-  politics_increment: 8.76
-  stars: '5Red'
-  level: '1'
-  score_as:
-   - Archers
-  book: Mongol Conquest
-  specialities:
-    - Ranged Troop Formation
-    - Siege
-    - Ranged Troop Ares
-    - Battle of Mohi
   ascending: true
+  basic_attributes:
+    attack:
+      base: 120
+      increment: 9.01
+    defense:
+      base: 112
+      increment: 8.82
+    leadership:
+      base: 115
+      increment: 8.82
+    politics:
+      base: 111
+      increment: 8.76
+  book: Mongol Conquest
+  display: summary
+  name: Subutai
+  specialities:
+  - Ranged Troop Formation
+  - Siege
+  - Ranged Troop Ares
+  - Battle of Mohi
+  stars: red5
+  type:
+  - ranged_specialist

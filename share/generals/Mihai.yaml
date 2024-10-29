@@ -1,23 +1,27 @@
 ---
 general:
-  name: Mihai
-  display: summary
-  leadership: 118
-  leadership_increment: 8.82
-  attack: 120
-  attack_increment: 9.05
-  defense: 117
-  defense_increment: 8.87
-  politics: 106
-  politics_increment: 8.69
-  stars: '5Red'
-  level: '1'
-  score_as:
-   - Archers
-  book: Battle of Selimbar
   ascending: true
+  basic_attributes:
+    attack:
+      base: 120
+      increment: 9.05
+    defense:
+      base: 117
+      increment: 8.87
+    leadership:
+      base: 118
+      increment: 8.82
+    politics:
+      base: 106
+      increment: 8.69
+  book: Battle of Selimbar
+  display: summary
+  name: Mihai
   specialities:
-    - Ranged Troop Assault
-    - Bash
-    - Ranged Troop Ares
-    - Romanian Ruler
+  - Ranged Troop Assault
+  - Bash
+  - Ranged Troop Ares
+  - Romanian Ruler
+  stars: red5
+  type:
+  - ranged_specialist

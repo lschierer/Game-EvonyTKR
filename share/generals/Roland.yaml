@@ -1,23 +1,27 @@
 ---
 general:
-  name: Roland
-  display: summary
-  score_as:
-   - Mounted
-  stars: '5Red'
-  leadership: 105
-  leadership_increment: 8.55
-  attack: 118
-  attack_increment: 8.91
-  defense: 117
-  defense_increment: 9.05
-  politics: 100
-  politics_increment: 8.35
-  level: '1'
-  book: Glory Knight
   ascending: true
+  basic_attributes:
+    attack:
+      base: 118
+      increment: 8.91
+    defense:
+      base: 117
+      increment: 9.05
+    leadership:
+      base: 105
+      increment: 8.55
+    politics:
+      base: 100
+      increment: 8.35
+  book: Glory Knight
+  display: summary
+  name: Roland
   specialities:
-    - Mounted Troop Formation
-    - Annihilation
-    - Mounted Troop Ares
-    - Paladin
+  - Mounted Troop Formation
+  - Annihilation
+  - Mounted Troop Ares
+  - Paladin
+  stars: red5
+  type:
+  - mounted_specialist

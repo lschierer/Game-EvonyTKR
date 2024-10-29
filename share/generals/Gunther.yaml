@@ -1,25 +1,29 @@
 ---
 general:
-  name: Gunther
-  display: summary
-  leadership: 125
-  leadership_increment: 9.19
-  attack: 121
-  attack_increment: 9.08
-  defense: 118
-  defense_increment: 8.95
-  politics: 105
-  politics_increment: 8.35
-  stars: '5Red'
-  level: '1'
-  score_as:
-   - Siege
-  extra:
-    - King of Rhine
-  book: The King of Atlis
-  specialities:
-    - Siege Machine Formation
-    - Bash
-    - Siege Machine Ares
-    - Rhine Flame Axe
   ascending: true
+  basic_attributes:
+    attack:
+      base: 121
+      increment: 9.08
+    defense:
+      base: 118
+      increment: 8.95
+    leadership:
+      base: 125
+      increment: 9.19
+    politics:
+      base: 105
+      increment: 8.35
+  book: The King of Atlis
+  display: summary
+  extra:
+  - King of Rhine
+  name: Gunther
+  specialities:
+  - Siege Machine Formation
+  - Bash
+  - Siege Machine Ares
+  - Rhine Flame Axe
+  stars: red5
+  type:
+  - siege_specialist

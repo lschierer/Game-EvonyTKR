@@ -1,23 +1,27 @@
 ---
 general:
-  name: Sun Ce
-  display: summary
-  leadership: 114
-  leadership_increment: 8.76
-  attack: 120
-  attack_increment: 9.03
-  defense: 116
-  defense_increment: 9.03
-  politics: 108
-  politics_increment: 8.58
-  stars: '5Red'
-  level: '1'
-  score_as:
-   - Mounted
-  book: Young Conqueror
   ascending: true
+  basic_attributes:
+    attack:
+      base: 120
+      increment: 9.03
+    defense:
+      base: 116
+      increment: 9.03
+    leadership:
+      base: 114
+      increment: 8.76
+    politics:
+      base: 108
+      increment: 8.58
+  book: Young Conqueror
+  display: summary
+  name: Sun Ce
   specialities:
-    - Mounted Troop Formation
-    - Mounted Troop Ares
-    - Annihilation
-    - Conquests in Jiangdong
+  - Mounted Troop Formation
+  - Mounted Troop Ares
+  - Annihilation
+  - Conquests in Jiangdong
+  stars: red5
+  type:
+  - mounted_specialist

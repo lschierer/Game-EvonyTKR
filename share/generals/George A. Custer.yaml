@@ -1,23 +1,27 @@
 ---
 general:
-  name: George A. Custer
-  display: summary
-  score_as:
-   - Mounted
-  stars: '5Red'
-  level: '1'
-  leadership: 118
-  leadership_increment: 9.01
-  attack: 120
-  attack_increment: 9.03
-  defense: 115
-  defense_increment: 8.74
-  politics: 107
-  politics_increment: 8.58
-  book: Son of the Morning Star
   ascending: true
+  basic_attributes:
+    attack:
+      base: 120
+      increment: 9.03
+    defense:
+      base: 115
+      increment: 8.74
+    leadership:
+      base: 118
+      increment: 9.01
+    politics:
+      base: 107
+      increment: 8.58
+  book: Son of the Morning Star
+  display: summary
+  name: George A. Custer
   specialities:
-    - Mounted Troop Defense
-    - Strike
-    - Mounted Troop Ares
-    - Battle of Gettysburg
+  - Mounted Troop Defense
+  - Strike
+  - Mounted Troop Ares
+  - Battle of Gettysburg
+  stars: red5
+  type:
+  - mounted_specialist

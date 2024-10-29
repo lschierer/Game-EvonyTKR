@@ -1,23 +1,27 @@
 ---
 general:
-  name: John Churchill
-  display: summary
-  leadership: 120
-  leadership_increment: 9.02
-  attack: 121
-  attack_increment: 9.03
-  defense: 116
-  defense_increment: 8.77
-  politics: 104
-  politics_increment: 8.55
-  stars: '5Red'
-  level: '1'
-  score_as:
-   - Siege
-  book: Duke of Marlborough
-  specialities:
-    - Siege Machine Assault
-    - Siege
-    - Siege Machine Ares
-    - Battle of Blenheim
   ascending: true
+  basic_attributes:
+    attack:
+      base: 121
+      increment: 9.03
+    defense:
+      base: 116
+      increment: 8.77
+    leadership:
+      base: 120
+      increment: 9.02
+    politics:
+      base: 104
+      increment: 8.55
+  book: Duke of Marlborough
+  display: summary
+  name: John Churchill
+  specialities:
+  - Siege Machine Assault
+  - Siege
+  - Siege Machine Ares
+  - Battle of Blenheim
+  stars: red5
+  type:
+  - siege_specialist

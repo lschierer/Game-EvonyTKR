@@ -1,23 +1,27 @@
 ---
 general:
-  name: John Hunyadi
-  display: summary
-  leadership: 115
-  leadership_increment: 9.02
-  attack: 124
-  attack_increment: 8.77
-  defense: 108
-  defense_increment: 9.03
-  politics: 107
-  politics_increment: 8.69
-  stars: '5Red'
-  level: '1'
-  score_as:
-   - Siege
-  book: Regent Governor
-  specialities:
-    - Siege Machine Assault
-    - Bash
-    - Siege Machine Ares
-    - Siege of Belgrade
   ascending: true
+  basic_attributes:
+    attack:
+      base: 124
+      increment: 8.77
+    defense:
+      base: 108
+      increment: 9.03
+    leadership:
+      base: 115
+      increment: 9.02
+    politics:
+      base: 107
+      increment: 8.69
+  book: Regent Governor
+  display: summary
+  name: John Hunyadi
+  specialities:
+  - Siege Machine Assault
+  - Bash
+  - Siege Machine Ares
+  - Siege of Belgrade
+  stars: red5
+  type:
+  - siege_specialist

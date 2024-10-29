@@ -1,23 +1,27 @@
 ---
 general:
-  name: Hestia
-  display: summary
-  leadership: 128
-  leadership_increment: 9.08
-  attack: 121
-  attack_increment: 9.03
-  defense: 112
-  defense_increment: 8.82
-  politics: 105
-  politics_increment: 8.77
-  stars: '5Red'
-  level: '1'
-  score_as:
-   - Mounted
-  book: Dance of the Sacred Fire
-  specialities:
-    - Mounted Troop Formation
-    - Formation
-    - Mounted Troop Ares
-    - Warm Shelter
   ascending: true
+  basic_attributes:
+    attack:
+      base: 121
+      increment: 9.03
+    defense:
+      base: 112
+      increment: 8.82
+    leadership:
+      base: 128
+      increment: 9.08
+    politics:
+      base: 105
+      increment: 8.77
+  book: Dance of the Sacred Fire
+  display: summary
+  name: Hestia
+  specialities:
+  - Mounted Troop Formation
+  - Formation
+  - Mounted Troop Ares
+  - Warm Shelter
+  stars: red5
+  type:
+  - mounted_specialist

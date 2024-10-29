@@ -1,23 +1,27 @@
 ---
 general:
-  name: Napoleon Prime
-  display: summary
-  leadership: 119
-  leadership_increment: 8.83
-  attack: 124
-  attack_increment: 9.04
-  defense: 121
-  defense_increment: 9.01
-  politics: 113
-  politics_increment: 8.62
-  stars: '5Red'
-  level: '1'
-  score_as:
-   - Mounted
-  book: Napoleonic Wars
-  specialities:
-    - Mounted Troop Formation
-    - Strike
-    - Mounted Troop Ares
-    - Bonaparte Dynasty
   ascending: true
+  basic_attributes:
+    attack:
+      base: 124
+      increment: 9.04
+    defense:
+      base: 121
+      increment: 9.01
+    leadership:
+      base: 119
+      increment: 8.83
+    politics:
+      base: 113
+      increment: 8.62
+  book: Napoleonic Wars
+  display: summary
+  name: Napoleon Prime
+  specialities:
+  - Mounted Troop Formation
+  - Strike
+  - Mounted Troop Ares
+  - Bonaparte Dynasty
+  stars: red5
+  type:
+  - mounted_specialist

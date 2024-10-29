@@ -1,23 +1,27 @@
 ---
 general:
-  name: Godfrey of Bouillon
-  display: summary
-  leadership: 119
-  leadership_increment: 9.01
-  attack: 121
-  attack_increment: 9.06
-  defense: 111
-  defense_increment: 8.68
-  politics: 108
-  politics_increment: 8.51
-  stars: '5Red'
-  level: '1'
-  score_as:
-   - Archers
-  book: King of Jerusalem
-  specialities:
-    - Ranged Troop Defense
-    - Siege
-    - Ranged Troop Ares
-    - Advocate of the Holy Sepulchre
   ascending: true
+  basic_attributes:
+    attack:
+      base: 121
+      increment: 9.06
+    defense:
+      base: 111
+      increment: 8.68
+    leadership:
+      base: 119
+      increment: 9.01
+    politics:
+      base: 108
+      increment: 8.51
+  book: King of Jerusalem
+  display: summary
+  name: Godfrey of Bouillon
+  specialities:
+  - Ranged Troop Defense
+  - Siege
+  - Ranged Troop Ares
+  - Advocate of the Holy Sepulchre
+  stars: red5
+  type:
+  - ranged_specialist

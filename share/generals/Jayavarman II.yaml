@@ -1,23 +1,27 @@
 ---
 general:
-  name: Jayavarman II
-  display: summary
-  leadership: 118
-  leadership_increment: 9.07
-  attack: 113
-  attack_increment: 8.95
-  defense: 115
-  defense_increment: 8.81
-  politics: 109
-  politics_increment: 8.65
-  stars: '5Red'
-  level: '1'
-  score_as:
-   - Mounted
-  book: Khmer King
-  specialities:
-    - Mounted Troop Defense
-    - Strike
-    - Mounted Troop Ares
-    - King of Lower Chenla
   ascending: true
+  basic_attributes:
+    attack:
+      base: 113
+      increment: 8.95
+    defense:
+      base: 115
+      increment: 8.81
+    leadership:
+      base: 118
+      increment: 9.07
+    politics:
+      base: 109
+      increment: 8.65
+  book: Khmer King
+  display: summary
+  name: Jayavarman II
+  specialities:
+  - Mounted Troop Defense
+  - Strike
+  - Mounted Troop Ares
+  - King of Lower Chenla
+  stars: red5
+  type:
+  - mounted_specialist

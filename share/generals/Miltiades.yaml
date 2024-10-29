@@ -1,22 +1,27 @@
 ---
 general:
-  name: Miltiades
-  display: summary
-  leadership: 130
-  leadership_increment: 9.11
-  attack: 121
-  attack_increment: 8.78
-  defense: 118
-  defense_increment: 8.54
-  politics: 113
-  politics_increment: 8.25
-  stars: '5Red'
-  score_as:
-   - Ground
-  book: Athenian Phalanx
-  specialities:
-    - Ground Troop Defense
-    - Annihilation
-    - Ground Troop Ares
-    - Battle of Marathon
   ascending: true
+  basic_attributes:
+    attack:
+      base: 121
+      increment: 8.78
+    defense:
+      base: 118
+      increment: 8.54
+    leadership:
+      base: 130
+      increment: 9.11
+    politics:
+      base: 113
+      increment: 8.25
+  book: Athenian Phalanx
+  display: summary
+  name: Miltiades
+  specialities:
+  - Ground Troop Defense
+  - Annihilation
+  - Ground Troop Ares
+  - Battle of Marathon
+  stars: red5
+  type:
+  - ground_specialist

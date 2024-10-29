@@ -1,24 +1,27 @@
 ---
 general:
-  name: King Arthur
-  level: '1'
-  display: summary
-  score_as: 
-    - Mounted
-  stars: '5Red'
-  leadership: 115
-  attack: 109
-  defense: 105
-  politics: 94
-  leadership_increment: 9.08
-  attack_increment: 8.14
-  defense_increment: 8.25
-  politics_increment: 7.33
-  book: Caliburn
-  specialities:
-    - Mounted Troop Formation
-    - Bash
-    - King's Ambition
-    - Legendary Knight
   ascending: true
-    
+  basic_attributes:
+    attack:
+      base: 109
+      increment: 8.14
+    defense:
+      base: 105
+      increment: 8.25
+    leadership:
+      base: 115
+      increment: 9.08
+    politics:
+      base: 94
+      increment: 7.33
+  book: Caliburn
+  display: summary
+  name: King Arthur
+  specialities:
+  - Mounted Troop Formation
+  - Bash
+  - King's Ambition
+  - Legendary Knight
+  stars: red5
+  type:
+  - mounted_specialist

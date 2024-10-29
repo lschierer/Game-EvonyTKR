@@ -1,0 +1,48 @@
+use v5.40.0;
+use utf8::all;
+use Carp;
+use Module::Build;
+
+my $builder = Module::Build->new(
+    module_name         => 'Game::EvonyTKR',
+    license             => 'ISC',
+    dist_author         => 'Luke Schierer <luke.schierer@gmail.com>',
+    dist_abstract       => 'Display and Evaluate information about Generals, Buffs, and DeBuffs for the Evony TKR Game',
+    create_makefile_pl  => 0,     #'traditional',
+    script_files        => 'script/game-evonytkr',
+    create_readme       => 0,
+    requires            => {
+      'Carp'                        => '0',
+      'File::FindLib'               => '0',
+      'File::HomeDir'               => '0',
+      'File::ShareDir'              => '0',
+      'File::Spec'                  => '0',
+      'Mojo::Base'                  => '0',
+      'Mojo::File'                  => '0',
+      'Mojo::File::Share'           => '0',
+      'Mojo::JSON'                  => '0',
+      'Mojolicious::Commands'       => '0',
+      'MojoX::Model'                => '0',
+      'MojoX::MIME::Types'          => '0',
+      'Role::Tiny'                  => '0',
+      'Util::Any'                   => '0',
+    },
+    recommends          => {
+      'MojoX::Log::Log4perl'  => '0',
+    },
+    build_requires      => {
+
+    },
+    test_requires       => {
+      'Test::Mojo'  => '0',
+      'Test::More'  => '0',
+    },
+    meta_merge => {
+        resources => {
+            repository => 'https://github.com/szabgab/App',
+            bugtracker => 'https://github.com/szabgab/App/issues'
+        }
+    },
+);
+
+$builder->create_build_script();
