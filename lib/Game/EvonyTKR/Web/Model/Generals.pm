@@ -22,6 +22,7 @@ class Game::EvonyTKR::Web::Model::Generals : isa(Game::EvonyTKR::Data) {
 # PODNAME: Game::EvonyTKR::Web::Model::General
 # VERSION
   use File::FindLib 'lib';
+  use Mojo::Base 'MojoX::Model';
 
   field $generals : reader;
 
