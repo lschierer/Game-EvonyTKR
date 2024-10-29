@@ -40,7 +40,9 @@ my $builder = Module::Build->new(
       'MojoX::Log::Log4perl'  => '0',
     },
     build_requires      => {
-
+      'App::podweaver'  => '0',
+      'Pod::Weaver::Section::Leftovers' => '0',
+      'Perl::Version'                   => '0',
     },
     test_requires       => {
       'Test::Mojo'  => '0',

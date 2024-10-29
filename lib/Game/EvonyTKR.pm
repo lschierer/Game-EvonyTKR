@@ -12,6 +12,7 @@ package Game::EvonyTKR {
   use Mojo::File::Share qw(dist_dir dist_file);
   use Carp;
   use Game::EvonyTKR::Logger::Config;
+  our $VERSION = '0.0';
 
   # This method will run once at server start
   sub startup ($self) {

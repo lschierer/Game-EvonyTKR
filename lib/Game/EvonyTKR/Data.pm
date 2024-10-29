@@ -15,8 +15,8 @@ class Game::EvonyTKR::Data
   use X500::DN;
   use UUID qw(uuid5);
   use namespace::autoclean;
-# VERSION
   use File::FindLib 'lib';
+  our $VERSION = '0.0';
   my $debug = 0;
 
   field @buffAttributes : reader = (

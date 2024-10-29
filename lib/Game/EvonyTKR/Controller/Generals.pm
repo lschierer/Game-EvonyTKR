@@ -7,6 +7,9 @@ require Data::Printer;
 package Game::EvonyTKR::Controller::Generals {
   use Mojo::Base 'Mojolicious::Controller', -role, -strict, -signatures;
   use HTML::FromANSI qw(ansi2html);
+  our $VERSION = '0.0';
+
+  my $generals = {};
 
   sub list ($self) {
     my $jsonResponse = {};
@@ -26,3 +29,6 @@ package Game::EvonyTKR::Controller::Generals {
   }
 }
 1;
+
+__END__
+#ABSTRACT: Controller in a Model-View-Controller take on handling Generals for the Evony TKR Game.

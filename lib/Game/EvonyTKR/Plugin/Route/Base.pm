@@ -14,6 +14,7 @@ use YAML::PP;
 package Game::EvonyTKR::Plugin::Route::Base {
   use Mojo::Base 'Mojolicious::Plugin', -role, -signatures;
   use Carp;
+  our $VERSION = '0.0';
 
   my $OpenAPISchemaCache;
 

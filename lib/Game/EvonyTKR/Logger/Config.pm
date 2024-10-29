@@ -13,6 +13,7 @@ package Game::EvonyTKR::Logger::Config {
   use Util::Any -all;
   use namespace::autoclean;
   use File::FindLib 'lib';
+  our $VERSION = '0.0';
 
   my @logLevels = qw(
     FATAL

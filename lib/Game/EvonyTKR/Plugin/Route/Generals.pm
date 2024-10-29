@@ -9,6 +9,7 @@ use File::FindLib 'lib';
 package Game::EvonyTKR::Plugin::Route::Generals {
   use Mojo::Base 'Mojolicious::Plugin', -role, -signatures;
   use Carp;
+  our $VERSION = '0.0';
 
   sub register ($self, $app, $r) {
     my $generalRoutes = $r->any('/generals')->to(

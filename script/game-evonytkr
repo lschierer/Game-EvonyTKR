@@ -4,9 +4,19 @@ use experimental qw(class);
 use utf8::all;
 use Carp;
 use Mojo::File qw(curfile);
+# PODNAME: App::game-evonytkr
+
+our $VERSION = 'v0.30.0';
 
 use lib Mojo::File::curfile->dirname->sibling('lib')->to_string;
 use Mojolicious::Commands;
 
 # Start command line interface for application
 Mojolicious::Commands->start_app('Game::EvonyTKR');
+
+__END__
+# ABSTRACT: command wrapper for the Game::EvonyTKR Mojolicious application
+
+=head1 DESCRIPTION
+
+This wrapper allows you to run the various Mojolicous::Command commands for the Game::EvonyTRK Mojolicious applicaiton
