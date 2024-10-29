@@ -10,7 +10,7 @@ package Game::EvonyTKR::Plugin::Route::Generals {
   use Mojo::File::Share qw(dist_dir dist_file);
   use Carp;
 
-  sub register ($self, $app, $conf) {
+  sub register ($self, $app, $r) {
     $app->routes->get('/generals')->to('Example#welcome');
 
   }

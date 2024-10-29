@@ -19,7 +19,8 @@ package Game::EvonyTKR::Plugin::Route::Base {
 
   sub register ($self, $app, $conf) {
     $app->routes->get('/')->to('Example#welcome');
-    $app->plugin('Route::Generals');
+
+    $app->plugin('Route::Generals', $app->routes);
 
     my $home = Mojo::Home->new();
 
@@ -33,6 +34,9 @@ package Game::EvonyTKR::Plugin::Route::Base {
         after_response    => \&log_responses,
       }
     });
+
+    $app->plugin('OpenAPI::Modern', $app->config->{openapi});
+
   }
 
   sub log_responses($controller) {
