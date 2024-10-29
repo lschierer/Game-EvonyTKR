@@ -5,6 +5,7 @@ use utf8::all;
 use MojoX::Log::Log4perl;
 use Mojo::File qw(curfile);
 use lib curfile->dirname->sibling('lib')->to_string;
+use YAML::PP;
 
 package Game::EvonyTKR {
   use Mojo::Base 'Mojolicious', -role, -signatures;
@@ -29,7 +30,9 @@ package Game::EvonyTKR {
     $self->log( MojoX::Log::Log4perl->new($logConfig->to_string(), 10) );
 
     # Load configuration from config file
-    my $config = $self->plugin('NotYAMLConfig');
+    my $config = $self->plugin('NotYAMLConfig' => {
+      module  => 'YAML::PP',
+    });
 
     # Configure the application
     $self->secrets($config->{secrets});
