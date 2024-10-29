@@ -117,7 +117,7 @@ package Game::EvonyTKR::Web::Controller::Generals {
 
     $self->log()->trace("generating UUID for $nameParam with type $typeParam");
 
-    if (not defined $generalModel) {
+    if (not defined $generalModel ) {
       $self->log()->warn('generalModel was not defined!!');
       $generalModel = Game::EvonyTKR::Web::Model::Generals->new();
     }

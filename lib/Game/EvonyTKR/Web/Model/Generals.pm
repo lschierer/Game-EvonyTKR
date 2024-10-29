@@ -101,9 +101,7 @@ class Game::EvonyTKR::Web::Model::Generals : isa(Game::EvonyTKR::Data) {
   method UUID_for_name($name, $type = undef) {
     if(defined($type)) {
       $self->logger()->trace(sprintf('obtaining base for type %s', $type));
-      my %ug = $self->UUID5_Generals();
-      $self->logger()->trace(sprintf('UUID5_Generals is %s',
-      Data::Printer::np %ug));
+      my %ug = %{$self->UUID5_Generals()};
       my $base = $ug{$type};
       $self->logger()->trace(sprintf('base for %s is %s', $type, $base));
       return uuid5($base, $name);

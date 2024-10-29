@@ -17,6 +17,7 @@ class Game::EvonyTKR::Data
   use namespace::autoclean;
 # VERSION
   use File::FindLib 'lib';
+  my $debug = 0;
 
   field @buffAttributes : reader = (
     "attack",
@@ -136,16 +137,19 @@ class Game::EvonyTKR::Data
 
   field $UUID5_base : reader;
 
-  field %UUID5_Generals : reader = ();
+  field $UUID5_Generals : reader = {};
 
   ADJUST {
     $self->logger()->info('final adjust block for Game::EvonyTKR::Data');
     my $ns_base = uuid5(dns => 'perl.org');
     $UUID5_base = uuid5($ns_base, $globalDN->getX500String());
     my $UUID5_Generals_base = uuid5($UUID5_base, 'Generals');
-    for my $k (@{$self->GeneralKeys()}) {
-      $UUID5_Generals{$k} = uuid5($UUID5_Generals_base, $k);
-      $self->logger()->trace("base for $k is " . $UUID5_Generals{$k});
+    for my $k ($self->GeneralKeys()) {
+      $UUID5_Generals->{$k} = uuid5($UUID5_Generals_base, $k);
+      if($debug) {
+        $self->logger()->trace("base for $k is " . $UUID5_Generals->{$k});
+      }
+
     }
   }
 

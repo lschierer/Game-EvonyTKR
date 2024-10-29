@@ -32,7 +32,7 @@ package Game::EvonyTKR::Web::Routes::Generals {
     );
 
     my $namedID = $generalRoutes->under(
-      '/named/' => sub ($c) {
+      '/byId/' => sub ($c) {
         $logger->trace('in generalRoutes namedID under clause');
         my $result = $c->openapi->validate_request($c->req);
         if (!$result) {
