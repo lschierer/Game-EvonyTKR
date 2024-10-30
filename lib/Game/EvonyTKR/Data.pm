@@ -13,7 +13,7 @@ use X500::DN;
 use UUID qw(uuid5);
 use namespace::autoclean;
 
-class Game::EvonyTKR::Data :isa(Game::EvonyTKR::Logger) {
+class Game::EvonyTKR::Data : isa(Game::EvonyTKR::Logger) {
 # PODNAME: Game::EvonyTKR::Data
   use Carp;
   use File::FindLib 'lib';
@@ -75,13 +75,11 @@ class Game::EvonyTKR::Data :isa(Game::EvonyTKR::Logger) {
   );
 
   field @debuffConditions : reader = (
-    'monster',
-    'enemy',
+    'monster', 'enemy',
     'enemy in city',
     'reduces enemy',
     'reduces enemy in attack',
-    'reduces enemy with a dragon',
-    'reduces',
+    'reduces enemy with a dragon', 'reduces',
   );
 
   field @BuffAttributes : reader = (qw(
@@ -168,7 +166,7 @@ class Game::EvonyTKR::Data :isa(Game::EvonyTKR::Logger) {
     my $UUID5_Generals_base = uuid5($UUID5_base, 'Generals');
     for my $k ($self->GeneralKeys()) {
       $UUID5_Generals->{$k} = uuid5($UUID5_Generals_base, $k);
-      if($debug) {
+      if ($debug) {
         $self->logger()->trace("base for $k is " . $UUID5_Generals->{$k});
       }
 

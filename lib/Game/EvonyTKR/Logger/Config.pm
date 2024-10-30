@@ -34,12 +34,12 @@ package Game::EvonyTKR::Logger::Config {
     }
     my $dd = File::ShareDir::dist_dir('Game-EvonyTKR');
     if ($self->{mode} eq 'production') {
-      $confFile = File::Spec->catfile($dd,'log4perl.conf');
+      $confFile = File::Spec->catfile($dd, 'log4perl.conf');
 
     }
     else {
       my $mode = $self->{mode};
-      $confFile = File::Spec->catfile($dd,"log4perl.$mode.conf");
+      $confFile = File::Spec->catfile($dd, "log4perl.$mode.conf");
     }
     if (!-T -s -r $confFile) {
       croak("$confFile does not exist");

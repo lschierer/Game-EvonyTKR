@@ -17,23 +17,25 @@ package Game::EvonyTKR {
   # This method will run once at server start
   sub startup ($self) {
     my $distDir = Mojo::File::Share::dist_dir('Game-EvonyTKR');
-    my $home = Mojo::Home->new;
+    my $home    = Mojo::Home->new;
     $home->detect;
 
     my $logConfig;
-    if($self->mode() eq 'production') {
+    if ($self->mode() eq 'production') {
       $logConfig = $home->rel_file('share/log4perl.conf');
     }
     else {
       $logConfig = $home->rel_file('share/log4perl.development.conf');
     }
 
-    $self->log( MojoX::Log::Log4perl->new($logConfig->to_string(), 10) );
+    $self->log(MojoX::Log::Log4perl->new($logConfig->to_string(), 10));
 
     # Load configuration from config file
-    my $config = $self->plugin('NotYAMLConfig' => {
-      module  => 'YAML::PP',
-    });
+    my $config = $self->plugin(
+      'NotYAMLConfig' => {
+        module => 'YAML::PP',
+      }
+    );
 
     # Configure the application
     $self->secrets($config->{secrets});
@@ -43,7 +45,7 @@ package Game::EvonyTKR {
     # Router
     my $r = $self->routes;
 
-    push @{$self->plugins->namespaces}, 'Game::EvonyTKR::Plugin';
+    push @{ $self->plugins->namespaces }, 'Game::EvonyTKR::Plugin';
 
     $self->plugin('DefaultHelpers');
     $self->plugin('Route::Base');
@@ -51,13 +53,14 @@ package Game::EvonyTKR {
   }
 
   sub preSeedGenerals($app, $dd) {
-    my $generalDir = $dd->child('generals');
+    my $generalDir  = $dd->child('generals');
     my $generalGlob = $generalDir->to_string() . "/*.yaml";
     $app->log()->trace(sprintf('generalGlob pattern is %s', $generalGlob));
     my @generalFiles = glob($generalGlob);
-    $app->log()->trace(sprintf('glob returned %d generals', scalar @generalFiles));
+    $app->log()
+      ->trace(sprintf('glob returned %d generals', scalar @generalFiles));
     foreach my $filename (@generalFiles) {
-      if( -f $filename) {
+      if (-f $filename) {
         $app->log()->trace(sprintf('ready to read %s', $filename));
       }
     }

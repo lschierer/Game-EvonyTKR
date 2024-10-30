@@ -2,7 +2,7 @@ use v5.40.0;
 use experimental qw(class);
 use utf8::all;
 use MojoX::Log::Log4perl;
-use Mojo::File qw(curfile);
+use Mojo::File        qw(curfile);
 use Mojo::File::Share qw(dist_dir dist_file);
 use File::FindLib 'lib';
 

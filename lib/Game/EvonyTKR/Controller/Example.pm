@@ -1,4 +1,4 @@
-package Game::EvonyTKR::Controller::Example{
+package Game::EvonyTKR::Controller::Example {
   use Mojo::Base 'Mojolicious::Controller', -signatures;
   our $VERSION = 'v0.30.0';
 
