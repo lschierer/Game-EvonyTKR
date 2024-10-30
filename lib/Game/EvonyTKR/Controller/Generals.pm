@@ -2,6 +2,7 @@ use v5.40.0;
 use experimental qw(class);
 use utf8::all;
 use File::FindLib 'lib';
+use Mojo::Home;
 require Data::Printer;
 
 package Game::EvonyTKR::Controller::Generals {
@@ -13,6 +14,7 @@ package Game::EvonyTKR::Controller::Generals {
 
   sub list ($self) {
     my $jsonResponse = {};
+    preSeedGenerals($self);
     $self->respond_to(
       txt  => { text => Data::Printer::np($jsonResponse, indent => 2) },
       json => { json => $jsonResponse },
@@ -27,6 +29,23 @@ package Game::EvonyTKR::Controller::Generals {
     );
     return;
   }
+
+  sub preSeedGenerals($c) {
+    my $home = Mojo::Home->new();
+    $home->detect();
+    my $generalDir  = $home->child('share')->child('generals');
+    my $generalGlob = $generalDir->to_string() . "/*.yaml";
+    $c->app()->log()->trace(sprintf('generalGlob pattern is %s', $generalGlob));
+    my @generalFiles = glob($generalGlob);
+    $c->app()->log()
+      ->trace(sprintf('glob returned %d generals', scalar @generalFiles));
+    foreach my $filename (@generalFiles) {
+      if (-f $filename) {
+        $c->app()->log()->trace(sprintf('ready to read %s', $filename));
+      }
+    }
+  }
+
 }
 1;
 
