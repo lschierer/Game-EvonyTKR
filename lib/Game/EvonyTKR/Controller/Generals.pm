@@ -7,7 +7,7 @@ require Data::Printer;
 package Game::EvonyTKR::Controller::Generals {
   use Mojo::Base 'Mojolicious::Controller', -role, -strict, -signatures;
   use HTML::FromANSI qw(ansi2html);
-  our $VERSION = '0.0';
+  our $VERSION = 'v0.30.0';
 
   my $generals = {};
 

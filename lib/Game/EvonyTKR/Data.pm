@@ -16,7 +16,7 @@ class Game::EvonyTKR::Data
   use UUID qw(uuid5);
   use namespace::autoclean;
   use File::FindLib 'lib';
-  our $VERSION = '0.0';
+  our $VERSION = 'v0.30.0';
   my $debug = 0;
 
   field @buffAttributes : reader = (

@@ -18,7 +18,7 @@ class Game::EvonyTKR::Logger {
   use File::Touch;
   use Log::Log4perl;
   use namespace::autoclean;
-  our $VERSION = '0.0';
+  our $VERSION = 'v0.30.0';
 
   field $category : reader : param = __CLASS__;
 
