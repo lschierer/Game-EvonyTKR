@@ -1,3 +1,11 @@
 #!/usr/bin/env bash
 
- find . -type f -exec egrep '(use|require)' {} \; | sed 's/^[ \t]*//' | cut -d ' ' -f 2 | sort -u | egrep -v '^(v5.40|namespace|lib|experimental|Game::EvonyTKR|utf8)'
+ step1=$(find lib/ script/ -type f -exec egrep -h '^\s*(use|require)' {} \;) || exit 1
+
+ step2=$(echo "$step1" | sed 's/^[ \t]*//' | cut -d ' ' -f 2 | cut -d ';' -f 1) || exit 2
+
+ step3=$(echo "$step2" | sort -u ) || exit 3
+
+ step4=$(echo "$step3" | egrep -v '^(v5.40|feature|namespace|lib|experimental|Game::EvonyTKR|utf8)') || exit 4
+
+ echo "$step4"
