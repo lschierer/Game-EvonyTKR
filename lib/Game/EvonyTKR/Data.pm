@@ -10,7 +10,7 @@ class Game::EvonyTKR::Data
   use Types::Common::Numeric qw(PositiveOrZeroInt);
   use Type::Utils            qw(is enum);
   use File::ShareDir ':ALL';
-  use YAML::XS;
+  use YAML::PP;
   use X500::RDN;
   use X500::DN;
   use UUID qw(uuid5);
@@ -74,6 +74,7 @@ class Game::EvonyTKR::Data
   );
 
   field @debuffConditions : reader = (
+    'monster',
     'enemy',
     'enemy in city',
     'reduces enemy',
@@ -82,16 +83,36 @@ class Game::EvonyTKR::Data
     'reduces',
   );
 
-  field @BuffAttributes : reader;
-
-  method set_BuffAttributes {
-    my $data_location = dist_file('Game-EvonyTKR', 'buff/attributes.yaml');
-    open(my $DATA, '<', $data_location) or die $!;
-    my $yaml = do { local $/; <$DATA> };
-    my $data = Load $yaml;
-    close $DATA;
-    @BuffAttributes = @{ $data->{'attributes'} };
-  }
+  field @BuffAttributes : reader = (qw(
+    'Attack',
+    'Attack Speed',
+    'Death to Survival',
+    'Death to Soul',
+    'Death to Wounded',
+    'Defense',
+    'Deserter Capacity',
+    'Double Items Drop Rate',
+    'HP',
+    'Healing Speed',
+    'Hospital Capacity',
+    'Leadership',
+    'Load',
+    'March Size Capacity',
+    'March Time',
+    'Marching Speed',
+    'Politics',
+    'Rally Capacity',
+    'Range',
+    'Resources Production',
+    'Stamina cost',
+    'SubCity Construction Speed',
+    'SubCity Gold Production',
+    'SubCity Training Speed',
+    'SubCity Troop Capacity',
+    'Training Capacity',
+    'Training Speed',
+    'Wounded to Death',
+  ));
 
   method AllConditions() {
     return (@buffConditions, @debuffConditions);
@@ -198,9 +219,4 @@ This includes both Buff and Debuff conditions. see buffConditions() and debuffCo
 A *buff* will affect either exactly one or All classes of troops. This is attempting to replace having an enum.
 
 A *General* can have more than one Class from this list.  That is because General Classes and Buff classes are the same values, but used totally differently.
-=cut
-
-=method set_BuffAttributes()
-
-get the possible attributes from the yaml data file in the shared directory and load them into memory.
 =cut
