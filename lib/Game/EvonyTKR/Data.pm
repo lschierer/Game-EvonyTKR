@@ -1,20 +1,21 @@
-use experimental 'class';
+use v5.40.0;
+use feature 'try';
+use experimental qw(class);
 use utf8::all;
 use File::FindLib 'lib';
+use Types::Standard        qw(is_Int Int Str is_Str);
+use Types::Common::Numeric qw(PositiveOrZeroInt);
+use Type::Utils            qw(is enum);
+use File::ShareDir ':ALL';
+use YAML::PP;
+use X500::RDN;
+use X500::DN;
+use UUID qw(uuid5);
+use namespace::autoclean;
 
-class Game::EvonyTKR::Data
-  : isa(Game::EvonyTKR::Logger) {
+class Game::EvonyTKR::Data :isa(Game::EvonyTKR::Logger) {
 # PODNAME: Game::EvonyTKR::Data
   use Carp;
-  use Types::Standard        qw(is_Int Int Str is_Str);
-  use Types::Common::Numeric qw(PositiveOrZeroInt);
-  use Type::Utils            qw(is enum);
-  use File::ShareDir ':ALL';
-  use YAML::PP;
-  use X500::RDN;
-  use X500::DN;
-  use UUID qw(uuid5);
-  use namespace::autoclean;
   use File::FindLib 'lib';
   our $VERSION = 'v0.30.0';
   my $debug = 0;
@@ -181,16 +182,19 @@ __END__
 
 # ABSTRACT: Runtime Data values for Game::EvonyTKR
 
-=method new()
-
-instantiate the shared data helper functions.
-=cut
+=pod
 
 =head1 DESCRIPTION
 
 Due to the encapsulation and initialization order requirements, even if the perlclass feature had already implemented the :common attribute, things marked as common would not be initialized in time for other parameters to validate against them.  Thus I need a ::Data class that users can initialize first.
 
 =cut
+
+=head1 METHODS
+
+=method new()
+
+instantiate the shared data helper functions.
 
 =method buffConditions
 
@@ -219,4 +223,5 @@ This includes both Buff and Debuff conditions. see buffConditions() and debuffCo
 A *buff* will affect either exactly one or All classes of troops. This is attempting to replace having an enum.
 
 A *General* can have more than one Class from this list.  That is because General Classes and Buff classes are the same values, but used totally differently.
+
 =cut

@@ -66,3 +66,15 @@ package Game::EvonyTKR {
 }
 
 1;
+
+__END__
+
+#ABSTRACT: The main Mojolicious configuration, command, and control module
+
+=pod
+
+=head1 DESCRIPTION
+
+this module contains the primary Mojolicious command, control and configuration.
+
+=cut

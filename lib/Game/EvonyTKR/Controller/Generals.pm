@@ -32,3 +32,13 @@ package Game::EvonyTKR::Controller::Generals {
 
 __END__
 #ABSTRACT: Controller in a Model-View-Controller take on handling Generals for the Evony TKR Game.
+
+=head1 DESCRIPTION
+
+Mojolicious uses a Model-View-Controller framework, this is a Controller in that framework.
+This particular Controller is for handling Generals, which are central to success in the Game Evony TKR,
+and the primary reason for this distribution.  This contains methods for listing the
+Generals we have information about, finding and displaying the correct Model for a
+particular General, and converting a General's name to UUIDv5 id string.
+
+=cut

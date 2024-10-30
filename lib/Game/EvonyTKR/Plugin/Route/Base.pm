@@ -80,3 +80,17 @@ package Game::EvonyTKR::Plugin::Route::Base {
     }
 }
 1;
+
+__END__
+
+#ABSTRACT: the base router for the root of the distribution
+
+=pod
+
+=head1 DESCRIPTION
+
+I have pulled the route handling out into plugins to keep the main file
+as clean as possible.  This particular one handles the base routes, and as
+such also initializes the OpenAPI plugin.
+
+=cut

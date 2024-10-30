@@ -2,16 +2,14 @@ use v5.40.0;
 use experimental qw(class);
 use utf8::all;
 use File::FindLib 'lib';
+use File::HomeDir;
+use File::ShareDir ':ALL';
+use File::Spec;
+use Util::Any -all;
 use namespace::autoclean;
 
 package Game::EvonyTKR::Logger::Config {
-# ABSTRACT: manage the log4perl configuration
   use Carp;
-  use File::HomeDir;
-  use File::ShareDir ':ALL';
-  use File::Spec;
-  use Util::Any -all;
-  use namespace::autoclean;
   use File::FindLib 'lib';
   our $VERSION = 'v0.30.0';
 
@@ -57,3 +55,16 @@ package Game::EvonyTKR::Logger::Config {
 
 }
 1;
+
+__END__
+
+# ABSTRACT: manage the log4perl configuration
+
+=pod
+
+=head1 DESCRIPTION
+
+Configuration information for Log4Perl including methods for finding what directory
+to write logs to, and for finding the log4perl configuration file.
+
+=cut

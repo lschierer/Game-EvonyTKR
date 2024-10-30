@@ -26,3 +26,15 @@ package Game::EvonyTKR::Plugin::Route::Generals {
 
 }
 1;
+
+__END__
+#ABSTRACT: The Router for the /generals based routes
+
+=pod
+
+=head1 DESCRIPTION
+
+I have pulled the route handling for this distribution out into plugins to keep
+the main file as simple as possible.  This particular one handles /generals based routes.
+
+=cut

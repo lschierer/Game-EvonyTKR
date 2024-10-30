@@ -1,23 +1,22 @@
 use v5.40.0;
 use experimental qw(class);
 use utf8::all;
+use Class::ISA;
+use Types::Common qw( t is_Num is_Str is_Int);
+use Type::Utils "is";
+use Util::Any -all;
+use List::MoreUtils;
+use File::ShareDir ':ALL';
+use File::Spec;
+use File::HomeDir;
+use File::Path qw(make_path);
+use File::Touch;
+use Log::Log4perl;
+use namespace::autoclean;
 
 class Game::EvonyTKR::Logger {
 # PODNAME: Game::EvonyTKR::Logger
-# ABSTRACT: Set up and manage logging for the distribution
   use Carp;
-  use Class::ISA;
-  use Types::Common qw( t is_Num is_Str is_Int);
-  use Type::Utils "is";
-  use Util::Any -all;
-  use List::MoreUtils;
-  use File::ShareDir ':ALL';
-  use File::Spec;
-  use File::HomeDir;
-  use File::Path qw(make_path);
-  use File::Touch;
-  use Log::Log4perl;
-  use namespace::autoclean;
   our $VERSION = 'v0.30.0';
 
   field $category : reader : param = __CLASS__;
@@ -54,14 +53,31 @@ class Game::EvonyTKR::Logger {
 
 }
 1;
+
 __END__
+
+# ABSTRACT: Set up and manage logging for the distribution
+
+=pod
+
+=head1 DESCRIPTION
+
+This is intended as an abstract class of sorts from which to inherit uniform methods
+for using logging.
+
+=cut
+
+=head1 METHODS
 
 =method new()
 
 instantiate the class. This will also configure the logging.
+
 =cut
 
 =method logger()
 
 returns the logger for use in logging messages.
+
+=cut
 =cut

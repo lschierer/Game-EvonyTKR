@@ -17,6 +17,10 @@ Mojolicious::Commands->start_app('Game::EvonyTKR');
 __END__
 # ABSTRACT: command wrapper for the Game::EvonyTKR Mojolicious application
 
+=pod
+
 =head1 DESCRIPTION
 
 This wrapper allows you to run the various Mojolicous::Command commands for the Game::EvonyTRK Mojolicious applicaiton
+
+=cut
