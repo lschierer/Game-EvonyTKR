@@ -16,6 +16,7 @@ MANIFEST.bak
 ^MYMETA\.yml$
 _build
 commitlint.config.js
+devServer.sh
 perlcritic.rc
 script/finddeps.sh
 weaver.ini

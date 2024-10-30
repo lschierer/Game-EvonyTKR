@@ -2,16 +2,18 @@ use v5.40.0;
 use feature 'try';
 use experimental qw(class);
 use utf8::all;
-use MojoX::Log::Log4perl;
-use Mojo::File qw(curfile);
-use lib curfile->dirname->sibling('lib')->to_string;
+use File::FindLib 'lib';
+
+require MojoX::Log::Log4perl;
 use YAML::PP;
+use namespace::clean;
 
 package Game::EvonyTKR {
   use Mojo::Base 'Mojolicious', -role, -signatures;
   use Mojo::File::Share qw(dist_dir dist_file);
   use Carp;
   use Game::EvonyTKR::Logger::Config;
+  use File::FindLib 'lib';
   our $VERSION = 'v0.30.0';
 
   # This method will run once at server start
@@ -50,20 +52,6 @@ package Game::EvonyTKR {
     $self->plugin('DefaultHelpers');
     $self->plugin('Route::Base');
 
-  }
-
-  sub preSeedGenerals($app, $dd) {
-    my $generalDir  = $dd->child('generals');
-    my $generalGlob = $generalDir->to_string() . "/*.yaml";
-    $app->log()->trace(sprintf('generalGlob pattern is %s', $generalGlob));
-    my @generalFiles = glob($generalGlob);
-    $app->log()
-      ->trace(sprintf('glob returned %d generals', scalar @generalFiles));
-    foreach my $filename (@generalFiles) {
-      if (-f $filename) {
-        $app->log()->trace(sprintf('ready to read %s', $filename));
-      }
-    }
   }
 
 }
