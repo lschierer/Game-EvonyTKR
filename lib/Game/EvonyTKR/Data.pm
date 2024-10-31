@@ -3,7 +3,6 @@ use feature 'try';
 use experimental qw(class);
 use utf8::all;
 use File::FindLib 'lib';
-use namespace::clean;
 
 class Game::EvonyTKR::Data : isa(Game::EvonyTKR::Logger) {
 # PODNAME: Game::EvonyTKR::Data
