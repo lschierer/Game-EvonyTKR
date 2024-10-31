@@ -3,20 +3,17 @@ use feature 'try';
 use experimental qw(class);
 use utf8::all;
 use File::FindLib 'lib';
-use Types::Standard        qw(is_Int Int Str is_Str);
-use Types::Common::Numeric qw(PositiveOrZeroInt);
-use Type::Utils            qw(is enum);
-use File::ShareDir ':ALL';
-use YAML::PP;
-use X500::RDN;
-use X500::DN;
-use UUID qw(uuid5);
-use namespace::autoclean;
+use namespace::clean;
 
 class Game::EvonyTKR::Data : isa(Game::EvonyTKR::Logger) {
 # PODNAME: Game::EvonyTKR::Data
+  use Type::Utils            qw(is enum);
+  use UUID qw(uuid5);
+  use namespace::autoclean;
   use Carp;
   use File::FindLib 'lib';
+  use X500::DN;
+  use X500::RDN;
   our $VERSION = 'v0.30.0';
   my $debug = 0;
 
@@ -82,7 +79,7 @@ class Game::EvonyTKR::Data : isa(Game::EvonyTKR::Logger) {
     'reduces enemy with a dragon', 'reduces',
   );
 
-  field @BuffAttributes : reader = (qw(
+  field @BuffAttributes : reader = (
     'Attack',
     'Attack Speed',
     'Death to Survival',
@@ -111,7 +108,7 @@ class Game::EvonyTKR::Data : isa(Game::EvonyTKR::Logger) {
     'Training Capacity',
     'Training Speed',
     'Wounded to Death',
-  ));
+  );
 
   method AllConditions() {
     return (@buffConditions, @debuffConditions);
@@ -147,12 +144,12 @@ class Game::EvonyTKR::Data : isa(Game::EvonyTKR::Logger) {
   field $specialityLevels : reader =
     enum [qw( none green blue purple orange gold)];
 
-  field $globalDN : reader = new X500::DN(
-    new X500::RDN('OU' => 'EvonyTKR'),
-    new X500::RDN('OU' => 'Game'),
-    new X500::RDN('OU' => 'module'),
-    new X500::RDN('dc' => 'Perl'),
-    new X500::RDN('dc' => 'org'),
+  field $globalDN :reader = X500::DN->new(
+    X500::RDN->new('OU' => 'EvonyTKR'),
+    X500::RDN->new('OU' => 'Game'),
+    X500::RDN->new('OU' => 'module'),
+    X500::RDN->new('dc' => 'Perl'),
+    X500::RDN->new('dc' => 'org'),
   );
 
   field $UUID5_base : reader;

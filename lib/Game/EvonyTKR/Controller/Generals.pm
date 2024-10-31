@@ -4,6 +4,9 @@ use utf8::all;
 use File::FindLib 'lib';
 use Mojo::Home;
 require Data::Printer;
+require Game::EvonyTKR::Model::General;
+require YAML::PP;
+use namespace::autoclean;
 
 package Game::EvonyTKR::Controller::Generals {
   use Mojo::Base 'Mojolicious::Controller', -role, -strict, -signatures;
@@ -31,19 +34,23 @@ package Game::EvonyTKR::Controller::Generals {
   }
 
   sub preSeedGenerals($c) {
+    my $ypp = YAML::PP->new(boolean => 'JSON::PP' );
     my $home = Mojo::Home->new();
     $home->detect();
     my $generalDir  = $home->child('share')->child('generals');
-    my $generalGlob = $generalDir->to_string() . "/*.yaml";
-    $c->app()->log()->trace(sprintf('generalGlob pattern is %s', $generalGlob));
-    my @generalFiles = glob($generalGlob);
+    my $generalFiles = $generalDir->list();
     $c->app()->log()
-      ->trace(sprintf('glob returned %d generals', scalar @generalFiles));
-    foreach my $filename (@generalFiles) {
-      if (-f $filename) {
-        $c->app()->log()->trace(sprintf('ready to read %s', $filename));
+      ->trace(sprintf('collection returned %d generals', $generalFiles->size()));
+    for my $element ($generalFiles->each()) {
+      my $yamlData = $ypp->load_file($element->to_string());
+      for my $gt (@{$yamlData->{'general'}->{'type'}}) {
+        my $rg = Game::EvonyTKR::Model::General->new(
+          name  => $yamlData->{'general'}->{'name'},
+          type  => $gt,
+        );
       }
     }
+
   }
 
 }
