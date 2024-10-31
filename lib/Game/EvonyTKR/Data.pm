@@ -156,7 +156,6 @@ class Game::EvonyTKR::Data : isa(Game::EvonyTKR::Logger) {
   field $UUID5_Generals : reader = {};
 
   ADJUST {
-    $self->logger()->info('final adjust block for Game::EvonyTKR::Data');
     my $ns_base = uuid5(dns => 'perl.org');
     $UUID5_base = uuid5($ns_base, $globalDN->getX500String());
     my $UUID5_Generals_base = uuid5($UUID5_base, 'Generals');
