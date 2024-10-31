@@ -23,4 +23,5 @@ general:
   - Ruler
   - Manipulation
   stars: red5
-  type: mayor
+  type: 
+    - mayor

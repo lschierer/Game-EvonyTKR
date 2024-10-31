@@ -23,4 +23,5 @@ general:
   - Kings Ambition
   - Harald Bluetooth
   stars: red5
-  type: mayor
+  type: 
+    - mayor

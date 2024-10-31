@@ -23,4 +23,5 @@ general:
   - Ruler
   - Empire Founder
   stars: red5
-  type: mayor
+  type: 
+    - mayor

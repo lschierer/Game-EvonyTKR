@@ -23,4 +23,5 @@ general:
   - War God
   - Battle of the Milvian Bridge
   stars: red5
-  type: mayor
+  type: 
+    - mayor
