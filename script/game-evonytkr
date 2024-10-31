@@ -1,8 +1,10 @@
 #!/usr/bin/env perl
 use v5.40.0;
+use experimental qw(class);
 use utf8::all;
 use Carp;
-use File::FindLib 'lib';
+use Mojo::File qw(curfile);
+use lib curfile->dirname->sibling('lib')->to_string;
 
 # PODNAME: App::game-evonytkr
 our $VERSION = 'v0.30.0';
