@@ -4,13 +4,13 @@ use utf8::all;
 use File::FindLib 'lib';
 use Mojo::Home;
 require Data::Printer;
-require Game::EvonyTKR::Model::General;
 require YAML::PP;
 use namespace::autoclean;
 
 package Game::EvonyTKR::Controller::Generals {
   use Mojo::Base 'Mojolicious::Controller', -role, -strict, -signatures;
   use HTML::FromANSI qw(ansi2html);
+  require Game::EvonyTKR::Model::General;
   our $VERSION = 'v0.30.0';
 
   my $generals = {};
