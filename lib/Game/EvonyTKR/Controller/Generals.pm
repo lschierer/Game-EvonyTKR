@@ -5,28 +5,43 @@ use File::FindLib 'lib';
 use Mojo::Home;
 require Data::Printer;
 require YAML::PP;
-use namespace::autoclean;
 
 package Game::EvonyTKR::Controller::Generals {
   use Mojo::Base 'Mojolicious::Controller', -role, -strict, -signatures;
-  use HTML::FromANSI qw(ansi2html);
   require Game::EvonyTKR::Model::General;
   our $VERSION = 'v0.30.0';
 
   my $generals = {};
 
   sub list ($self) {
-    my $jsonResponse = {};
+    my $jsonResponse = [];
     preSeedGenerals($self);
+    for my $k (keys %{$generals}) {
+      $self->app()->log()
+        ->trace(sprintf(
+        'generals of type %s getting added to jsonResponse', $k));
+      my @gk = keys %{ $generals->{$k} };
+      my $kr = {
+        type    => $k,
+        members => [],
+      };
+      for my $i (0 .. scalar @gk - 1) {
+        my $n = $gk[$i];
+        $self->app()->log()->trace(sprintf(
+          'general %d of %d with name %s added to jsonResponse',
+          $i + 1, scalar @gk, $n
+        ));
+        push @{ $kr->{members} }, $n;
+      }
+      push @{$jsonResponse}, $kr;
+    }
     $self->respond_to(
       txt  => { text => Data::Printer::np($jsonResponse, indent => 2) },
       json => { json => $jsonResponse },
       html => sub {
-        $self->render(
-          text => ansi2html(
-            Data::Printer::np($jsonResponse, indent => 4, colored => 0)
-          )
-        );
+        $self->render(text => '<pre>'
+            . Data::Printer::np($jsonResponse, indent => 4, colored => 0)
+            . '</pre>');
       },
       any => { data => '', status => 204 },
     );
@@ -34,19 +49,30 @@ package Game::EvonyTKR::Controller::Generals {
   }
 
   sub preSeedGenerals($c) {
-    my $ypp = YAML::PP->new(boolean => 'JSON::PP' );
+    my $ypp  = YAML::PP->new(boolean => 'JSON::PP');
     my $home = Mojo::Home->new();
     $home->detect();
-    my $generalDir  = $home->child('share')->child('generals');
+    my $generalDir   = $home->child('share')->child('generals');
     my $generalFiles = $generalDir->list();
     $c->app()->log()
-      ->trace(sprintf('collection returned %d generals', $generalFiles->size()));
+      ->trace(
+      sprintf('collection returned %d generals', $generalFiles->size()));
     for my $element ($generalFiles->each()) {
       my $yamlData = $ypp->load_file($element->to_string());
-      for my $gt (@{$yamlData->{'general'}->{'type'}}) {
+      for my $gt (@{ $yamlData->{'general'}->{'type'} }) {
         my $rg = Game::EvonyTKR::Model::General->new(
-          name  => $yamlData->{'general'}->{'name'},
-          type  => $gt,
+          name => $yamlData->{'general'}->{'name'},
+          type => $gt,
+        );
+        if (not exists $generals->{$gt}) {
+          $generals->{$gt} = {};
+        }
+        $generals->{$gt}->{ $rg->name() } = $rg;
+        $c->app()->log()->trace(
+          sprintf(
+            'added %s with type %s from %s',
+            $rg->name(), $rg->type(), $element->to_string()
+          )
         );
       }
     }
