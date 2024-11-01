@@ -22,6 +22,11 @@ package Game::EvonyTKR::Plugin::Route::Generals {
       action => 'list'
     );
 
+    $generalRoutes->get('/byId/:id'=> [format => ['html', 'txt', 'json']])->to(
+      format  => 'html',
+      action  => 'getGeneralById',
+    );
+
     $generalRoutes->get('/uuid/:type/:name' => [format => ['html', 'txt', 'json']])->to(
       format  => 'html',
       action  => 'getUUID',

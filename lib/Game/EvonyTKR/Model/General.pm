@@ -1,17 +1,22 @@
 use v5.40.0;
 use experimental qw(class);
 use utf8::all;
-require Data::Printer;
 use File::FindLib 'lib';
+require Data::Printer;
 require Game::EvonyTKR::BasicAttributes;
+
 
 class Game::EvonyTKR::Model::General :isa(Game::EvonyTKR::Data) {
 # PODNAME: Game::EvonyTKR::Model::General
   use List::AllUtils qw( any none );
   use UUID qw(uuid5);
+  use Mojo::JSON qw (encode_json);
   use namespace::autoclean;
   use Carp;
   use File::FindLib 'lib';
+  use overload
+    '""'  => \&to_String;
+
   our $VERSION = 'v0.30.0';
   my $debug = 1;
 
@@ -21,8 +26,9 @@ class Game::EvonyTKR::Model::General :isa(Game::EvonyTKR::Data) {
 
   field $type :reader :param;
 
-  field $basicAttributes :reader = Game::EvonyTKR::BasicAttributes->new();
+  field $ascending :reader :param //= false;
 
+  field $basicAttributes :reader = Game::EvonyTKR::BasicAttributes->new();
 
   ADJUST {
     my @errors;
@@ -40,7 +46,59 @@ class Game::EvonyTKR::Model::General :isa(Game::EvonyTKR::Data) {
     $id = uuid5($uuid5base, $name);
   }
 
+  method TO_JSON() {
+    $self->logger()->trace(sprintf('Model::General->TO_JSON'));
+    return {
+      id              => $self->id(),
+      name            => $self->name(),
+      type            => $self->type(),
+      ascending       => $self->ascending(),
+      basicAttributes => $self->basicAttributes(),
+    };
+  }
 
+  method to_String($meth = "toString", $a = undef, $b = undef)  {
+    $self->logger()->trace(sprintf('Model::General->to_String started'));
+    my $returnable;
+    if (defined $b) {
+        $returnable = "[$meth $a $b]";
+    } else {
+      if(defined $a) {
+        if(blessed $a) {
+          my $aClass = blessed $a;
+          my @aClassList = split(/::/, $aClass);
+          if($aClassList[2] eq 'Model' and $aClassList[3] eq 'General') {
+            $returnable = a->TO_JSON();
+          }
+          else {
+            if(defined $meth) {
+              $returnable = "blessed [$meth $a ]";
+            }
+            else {
+              $returnable = "blessed $a";
+            }
+          }
+        }
+        else {
+          if(defined $meth) {
+            $returnable = "unblessed [$meth $a ]";
+          }
+          else {
+            $returnable = $self->TO_JSON();
+          }
+        }
+      }
+      else {
+        $returnable = $self->TO_JSON();
+      }
+    }
+    $self->logger()->trace(sprintf('Model::General->to_String returning %s', $returnable));
+    return $returnable;
+  }
+
+  method _data_printer ($ddp) {
+    return $self->TO_JSON();
+  }
 }
 1;
 

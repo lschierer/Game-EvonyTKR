@@ -7,6 +7,7 @@ require Data::Printer;
 require Game::EvonyTKR::BasicAttribute;
 require Game::EvonyTKR::Data;
 require Game::EvonyTKR::Model::General;
+require JSON::MaybeXS;
 require YAML::PP;
 
 package Game::EvonyTKR::Controller::Generals {
@@ -30,14 +31,14 @@ package Game::EvonyTKR::Controller::Generals {
         members => [],
       };
       for my $i (0 .. scalar @gk - 1) {
-        my $n = $gk[$i];
+        my $entry = $gk[$i];
         $self->app()->log()->trace(sprintf(
           'general %d of %d with name %s added to jsonResponse',
-          $i + 1, scalar @gk, $n
+          $i + 1, scalar @gk, $entry
         ));
         my $e = {
-          name  => $n,
-          id    => $generals->{$k}->{$n}->id()
+          name  => $generals->{$k}->{$entry}->name(),
+          id    => $generals->{$k}->{$entry}->id()
         };
         push @{ $kr->{members} }, $e;
       }
@@ -54,6 +55,57 @@ package Game::EvonyTKR::Controller::Generals {
       any => { data => '', status => 204 },
     );
     return;
+  }
+
+  sub getGeneralById($self) {
+    $self->app()->log()->trace(sprintf('Entering Controller::Generals->getGeneralById'));
+    my $idParam = $self->param('id');
+    my $verbose = $self->param('verbose');
+    my $level = $self->param('level');
+    my $AscendingLevel = $self->param('AscendingLevel');
+    my @SpecialityLevels = @{$self->every_param('SpecialityLevel')};
+
+    my $general;
+    if($self->app()->mode() ne 'production') {
+      preSeedGenerals($self);
+    }
+    for my $k ($data->GeneralKeys()) {
+      if(exists $generals->{$k}) {
+        if(not exists $generals->{$k}->{$idParam}) {
+          $self->app()->log()->trace(sprintf('%s is not of type %s', $idParam, $k));
+        }
+        else {
+          $general = $generals->{$k}->{$idParam};
+        }
+      }
+      else {
+        $self->app()->log()->error(sprintf('$generals->{%s} does not exist!', $k));
+      }
+    }
+    if(not defined $general ) {
+      $self->app()->log()->warn(sprintf('general with id %s was not found', $idParam));
+      $self->respond_to(
+        txt   => sub { $self->reply->txt_not_found() } ,
+        html  => sub { $self->reply->html_not_found() },
+        json  => sub { $self->reply->json_not_found() },
+        any   => sub { $self->reply->not_found() },
+      );
+      return;
+    }else {
+      $self->app()->log()->trace(sprintf('general is defined as a %s',
+        blessed $general));
+      my $json = JSON::MaybeXS->new(
+        utf8 => 1,
+        pretty => 1,
+        allow_blessed => 1,
+        convert_blessed => 1,
+        );
+      my $encoded = $json->encode($general);
+      $self->app()->log()->debug(sprintf('encoded general %s is %s',
+      $idParam, $encoded));
+      $self->render(data => $encoded);
+      return;
+    }
   }
 
   sub getUUID($self) {
@@ -112,7 +164,7 @@ package Game::EvonyTKR::Controller::Generals {
           $rg->basicAttributes()->setAttribute($ak,$aObject);
         }
 
-        $generals->{$gt}->{ $rg->name() } = $rg;
+        $generals->{$gt}->{ $rg->id() } = $rg;
         $c->app()->log()->trace(
           sprintf(
             'added %s with type %s from %s',

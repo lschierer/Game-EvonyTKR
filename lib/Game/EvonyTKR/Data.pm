@@ -139,14 +139,6 @@ class Game::EvonyTKR::Data : isa(Game::EvonyTKR::Logger) {
     wall
   ));
 
-  #keys should come from @GeneralKeys above.
-  field %generalClass : reader = (
-    'ground_specialist'  => 'Game::EvonyTKR::General::Ground',
-    'mounted_specialist' => 'Game::EvonyTKR::General::Mounted',
-    'ranged_specialist'  => 'Game::EvonyTKR::General::Ranged',
-    'siege_specialist'   => 'Game::EvonyTKR::General::Siege',
-  );
-
   field $specialityLevels : reader =
     enum [qw( none green blue purple orange gold)];
 

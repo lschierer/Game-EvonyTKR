@@ -174,7 +174,7 @@ class Game::EvonyTKR::BasicAttributes : isa(Game::EvonyTKR::Data) {
     }
   }
 
-  method _toHashRef($verbose = 0, $level=1, $stars = 'none', $name = "GeneralName") {
+  method toHashRef($verbose = 0, $level=1, $stars = 'none', $name = "GeneralName") {
     my $returnRef = {
       leadership => {},
       attack     => {},
@@ -192,7 +192,7 @@ class Game::EvonyTKR::BasicAttributes : isa(Game::EvonyTKR::Data) {
     return $returnRef;
   }
 
-  method TO_JSON {
+  method TO_JSON() {
     my $json = JSON::MaybeXS->new(utf8 => 1);
     return $self->toHashRef();
   }
