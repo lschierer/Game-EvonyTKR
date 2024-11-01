@@ -103,7 +103,12 @@ package Game::EvonyTKR::Controller::Generals {
       my $encoded = $json->encode($general);
       $self->app()->log()->debug(sprintf('encoded general %s is %s',
       $idParam, $encoded));
-      $self->render(data => $encoded);
+      $self->respond_to(
+        txt   => sub { $self->render(data => $encoded); },
+        html  => sub { $self->render(data => $encoded); },
+        json  => sub { $self->render(data => $encoded); },
+        any   => { data => '', status => 204 },
+      );
       return;
     }
   }

@@ -12,23 +12,21 @@ package Game::EvonyTKR::Plugin::Route::Generals {
   our $VERSION = 'v0.30.0';
 
   sub register ($self, $app, $r) {
-    my $generalRoutes = $r->any('/generals')->to(
-      namespace  => 'Game::EvonyTKR::Controller',
-      controller => 'Generals',
+    my $generalRoutes = $r->any('/generals'=> [format => ['html', 'txt', 'json']])->to(
+      namespace   => 'Game::EvonyTKR::Controller',
+      controller  => 'Generals',
+      format      => undef,
     );
 
-    $generalRoutes->get('/' => [format => ['html', 'txt', 'json']])->to(
-      format => 'html',
+    $generalRoutes->get('/' )->to(
       action => 'list'
     );
 
-    $generalRoutes->get('/byId/:id'=> [format => ['html', 'txt', 'json']])->to(
-      format  => 'html',
+    $generalRoutes->get('/byId/:id')->to(
       action  => 'getGeneralById',
     );
 
-    $generalRoutes->get('/uuid/:type/:name' => [format => ['html', 'txt', 'json']])->to(
-      format  => 'html',
+    $generalRoutes->get('/uuid/:type/:name' )->to(
       action  => 'getUUID',
     );
 
