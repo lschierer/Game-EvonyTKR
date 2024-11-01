@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-morbo -v -w ./ ./script/game-evonytkr
+perl -MMojo::JSON::MaybeXS -S morbo -v -w ./ ./script/game-evonytkr
