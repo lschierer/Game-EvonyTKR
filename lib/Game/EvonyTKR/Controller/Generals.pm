@@ -2,16 +2,20 @@ use v5.40.0;
 use experimental qw(class);
 use utf8::all;
 use File::FindLib 'lib';
-use Mojo::Home;
+require Mojo::Home;
 require Data::Printer;
+require Game::EvonyTKR::BasicAttribute;
+require Game::EvonyTKR::Data;
+require Game::EvonyTKR::Model::General;
 require YAML::PP;
 
 package Game::EvonyTKR::Controller::Generals {
   use Mojo::Base 'Mojolicious::Controller', -role, -strict, -signatures;
-  require Game::EvonyTKR::Model::General;
+
   our $VERSION = 'v0.30.0';
 
   my $generals = {};
+  my $data = Game::EvonyTKR::Data->new();
 
   sub list ($self) {
     my $jsonResponse = [];
@@ -31,7 +35,11 @@ package Game::EvonyTKR::Controller::Generals {
           'general %d of %d with name %s added to jsonResponse',
           $i + 1, scalar @gk, $n
         ));
-        push @{ $kr->{members} }, $n;
+        my $e = {
+          name  => $n,
+          id    => $generals->{$k}->{$n}->id()
+        };
+        push @{ $kr->{members} }, $e;
       }
       push @{$jsonResponse}, $kr;
     }
@@ -59,6 +67,7 @@ package Game::EvonyTKR::Controller::Generals {
       sprintf('collection returned %d generals', $generalFiles->size()));
     for my $element ($generalFiles->each()) {
       my $yamlData = $ypp->load_file($element->to_string());
+
       for my $gt (@{ $yamlData->{'general'}->{'type'} }) {
         my $rg = Game::EvonyTKR::Model::General->new(
           name => $yamlData->{'general'}->{'name'},
@@ -67,6 +76,20 @@ package Game::EvonyTKR::Controller::Generals {
         if (not exists $generals->{$gt}) {
           $generals->{$gt} = {};
         }
+
+        for my $ak ($data->AttributeNames()) {
+          $c->app()->log()->trace(sprintf('getting attributes from yaml for attribute %s',
+            $ak));
+          my $base = $yamlData->{'general'}->{'basic_attributes'}->{$ak}->{'base'};
+          my $increment = $yamlData->{'general'}->{'basic_attributes'}->{$ak}->{'increment'};
+          my $aObject = Game::EvonyTKR::BasicAttribute->new(
+            base            => $base,
+            increment       => $increment,
+            attribute_name  => $ak,
+          );
+          $rg->basicAttributes()->setAttribute($ak,$aObject);
+        }
+
         $generals->{$gt}->{ $rg->name() } = $rg;
         $c->app()->log()->trace(
           sprintf(

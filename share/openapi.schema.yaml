@@ -12,22 +12,22 @@ paths:
         - generals
       summary: Get all Generals
       responses:
-        "200":
+        '200':
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/GeneralList"
+                  $ref: '#/components/schemas/GeneralList'
                 minItems: 4
                 maxItems: 10
           description: OK - Successful request with response body
-        "204":
-          $ref: "#/components/responses/NoContent"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "500":
-          $ref: "#/components/responses/InternalServerErrror"
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerErrror'
       description: |
         a summary listing of all available generals
   /generals:
@@ -37,19 +37,19 @@ paths:
         - generals
       summary: Get all Generals
       responses:
-        "200":
+        '200':
           content:
             text/html:
               schema:
                 type: string
                 maxLength: 10000
           description: OK - Successful request with response body
-        "204":
-          $ref: "#/components/responses/NoContent"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "500":
-          $ref: "#/components/responses/InternalServerErrror"
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerErrror'
       description: |
         a summary listing of all available generals
   /generals.txt:
@@ -59,19 +59,19 @@ paths:
         - generals
       summary: Get all Generals
       responses:
-        "200":
+        '200':
           content:
             text/plain:
               schema:
                 type: string
                 maxLength: 10000
           description: OK - Successful request with response body
-        "204":
-          $ref: "#/components/responses/NoContent"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "500":
-          $ref: "#/components/responses/InternalServerErrror"
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerErrror'
       description: |
         a summary listing of all available generals
   /generals/byId/{id}.json:
@@ -81,7 +81,7 @@ paths:
         - generals
       summary: Get a General by Id
       responses:
-        "200":
+        '200':
           content:
             application/json:
               schema:
@@ -91,14 +91,14 @@ paths:
                   - data
                 properties:
                   data:
-                    $ref: "#/components/schemas/General"
+                    $ref: '#/components/schemas/General'
           description: OK - Successful request with response body
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "500":
-          $ref: "#/components/responses/InternalServerErrror"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerErrror'
       parameters:
         - in: query
           name: verbose
@@ -121,16 +121,16 @@ paths:
           required: false
           description: set the level of the general you want information about
           allowReserved: false
-        - $ref: "#/components/parameters/id"
+        - $ref: '#/components/parameters/id'
       description: Returns the general with the matching id.
   /generals/uuid/{type}/{name}:
     get:
       operationId: uuidForTypeAndName
       tags:
         - generals
-      summary: "Get a UUID for a type/name pair "
+      summary: 'Get a UUID for a type/name pair '
       responses:
-        "200":
+        '200':
           content:
             application/json:
               schema:
@@ -138,15 +138,15 @@ paths:
                 format: uuid
                 maxLength: 100
           description: OK - Successful request with response body containing the UUID for the general
-        "204":
-          $ref: "#/components/responses/NoContent"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "500":
-          $ref: "#/components/responses/InternalServerErrror"
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerErrror'
       parameters:
-        - $ref: "#/components/parameters/type"
-        - $ref: "#/components/parameters/name"
+        - $ref: '#/components/parameters/type'
+        - $ref: '#/components/parameters/name'
 components:
   schemas:
     Buff:
@@ -176,17 +176,17 @@ components:
           default: false
         attribute:
           oneOf:
-            - $ref: "#/components/schemas/BuffAttributes"
+            - $ref: '#/components/schemas/BuffAttributes'
             - type: array
               items:
-                $ref: "#/components/schemas/BuffAttributes"
+                $ref: '#/components/schemas/BuffAttributes'
               maxItems: 10
         conditions:
           oneOf:
-            - $ref: "#/components/schemas/Condition"
+            - $ref: '#/components/schemas/Condition'
             - type: array
               items:
-                $ref: "#/components/schemas/Condition"
+                $ref: '#/components/schemas/Condition'
               maxItems: 10
     Skin:
       type: object
@@ -199,12 +199,12 @@ components:
         activeBuffs:
           type: array
           items:
-            $ref: "#/components/schemas/Buff"
+            $ref: '#/components/schemas/Buff'
           maxItems: 10
         passiveBuffs:
           type: array
           items:
-            $ref: "#/components/schemas/Buff"
+            $ref: '#/components/schemas/Buff'
           maxItems: 10
       description: Some generals have Skins or alternate outfits that add buffs
     General:
@@ -224,13 +224,13 @@ components:
           oneOf:
             - type: string
               maxLength: 1000
-            - $ref: "#/components/schemas/Skin"
+            - $ref: '#/components/schemas/Skin'
         type:
           oneOf:
-            - $ref: "#/components/schemas/GeneralEvaluationTypes"
+            - $ref: '#/components/schemas/GeneralEvaluationTypes'
             - type: array
               items:
-                $ref: "#/components/schemas/GeneralEvaluationTypes"
+                $ref: '#/components/schemas/GeneralEvaluationTypes'
               maxItems: 5
         level:
           type: integer
@@ -240,8 +240,8 @@ components:
         ascending:
           oneOf:
             - type: boolean
-            - $ref: "#/components/schemas/Ascending"
-            - $ref: "#/components/schemas/AscendingSummary"
+            - $ref: '#/components/schemas/Ascending'
+            - $ref: '#/components/schemas/AscendingSummary'
         otherBooks:
           oneOf:
             - type: array
@@ -251,13 +251,13 @@ components:
               maxItems: 4
             - type: array
               items:
-                $ref: "#/components/schemas/StandardBook"
+                $ref: '#/components/schemas/StandardBook'
               maxItems: 4
         builtInBook:
           oneOf:
             - type: string
               maxLength: 1000
-            - $ref: "#/components/schemas/BuiltinBook"
+            - $ref: '#/components/schemas/BuiltinBook'
         specialities:
           oneOf:
             - type: array
@@ -267,16 +267,16 @@ components:
               maxItems: 5
             - type: array
               items:
-                $ref: "#/components/schemas/Speciality"
+                $ref: '#/components/schemas/Speciality'
               maxItems: 5
             - type: array
               items:
-                $ref: "#/components/schemas/SpecialityEffect"
+                $ref: '#/components/schemas/SpecialityEffect'
               maxItems: 5
         basicAttributes:
           oneOf:
-            - $ref: "#/components/schemas/BasicAttributes"
-            - $ref: "#/components/schemas/BasicAttributesSummary"
+            - $ref: '#/components/schemas/BasicAttributes'
+            - $ref: '#/components/schemas/BasicAttributesSummary'
     Ascending:
       type: object
       required:
@@ -285,23 +285,23 @@ components:
         levels:
           type: array
           items:
-            $ref: "#/components/schemas/AscendingLevel"
+            $ref: '#/components/schemas/AscendingLevel'
           maxItems: 15
         activeLevel:
-          $ref: "#/components/schemas/AscendingLevelNames"
+          $ref: '#/components/schemas/AscendingLevelNames'
       description: The overall effeects of Ascending a General
     Condition:
       oneOf:
         - anyOf:
-            - $ref: "#/components/schemas/BuffCondition"
-            - $ref: "#/components/schemas/DebuffConditions"
+            - $ref: '#/components/schemas/BuffCondition'
+            - $ref: '#/components/schemas/DebuffConditions'
         - type: array
           items:
             anyOf:
-              - $ref: "#/components/schemas/BuffCondition"
-              - $ref: "#/components/schemas/DebuffConditions"
+              - $ref: '#/components/schemas/BuffCondition'
+              - $ref: '#/components/schemas/DebuffConditions'
           maxItems: 10
-      description: "A condition is essentially an adverb for a Buff object. "
+      description: 'A condition is essentially an adverb for a Buff object. '
     Speciality:
       type: object
       required:
@@ -314,10 +314,10 @@ components:
         levels:
           type: array
           items:
-            $ref: "#/components/schemas/SpecialityLevel"
+            $ref: '#/components/schemas/SpecialityLevel'
           maxItems: 6
         activeLevel:
-          $ref: "#/components/schemas/SpecialityLevelNames"
+          $ref: '#/components/schemas/SpecialityLevelNames'
     BuiltinBook:
       type: object
       required:
@@ -333,7 +333,7 @@ components:
         buffs:
           type: array
           items:
-            $ref: "#/components/schemas/Buff"
+            $ref: '#/components/schemas/Buff'
           maxItems: 10
       description: A General's Builtin Book
     StandardBook:
@@ -349,7 +349,7 @@ components:
         buffs:
           type: array
           items:
-            $ref: "#/components/schemas/Buff"
+            $ref: '#/components/schemas/Buff'
           maxItems: 10
         level:
           type: integer
@@ -389,10 +389,10 @@ components:
         buffs:
           type: array
           items:
-            $ref: "#/components/schemas/Buff"
+            $ref: '#/components/schemas/Buff'
           maxItems: 10
         level:
-          $ref: "#/components/schemas/AscendingLevelNames"
+          $ref: '#/components/schemas/AscendingLevelNames'
       description: The effect of one star of ascending
     BuffAttributes:
       oneOf:
@@ -428,17 +428,31 @@ components:
             - Wounded_to_Death
           type: string
           description: The many possible attributes that can be buffed
+    GeneralListItem:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          maxLength: 1000
     GeneralList:
       type: object
+      required:
+        - type
+        - members
       properties:
         type:
-          $ref: "#/components/schemas/GeneralEvaluationTypes"
+          $ref: '#/components/schemas/GeneralEvaluationTypes'
         members:
           type: array
           items:
-            type: string
-            maxLength: 1000
+            $ref: '#/components/schemas/GeneralListItem'
           maxItems: 1000
+        id:
+          type: string
+          format: uuid
+          maxLength: 100
     GeneralSummary:
       type: object
       properties:
@@ -447,10 +461,10 @@ components:
           maxLength: 1000
         type:
           oneOf:
-            - $ref: "#/components/schemas/GeneralEvaluationTypes"
+            - $ref: '#/components/schemas/GeneralEvaluationTypes'
             - type: array
               items:
-                $ref: "#/components/schemas/GeneralEvaluationTypes"
+                $ref: '#/components/schemas/GeneralEvaluationTypes'
               maxItems: 5
       description: The minimal information necessary to find a General
       x-fiddle-dto-info:
@@ -464,13 +478,13 @@ components:
         - politics
       properties:
         attack:
-          $ref: "#/components/schemas/BasicAttributesObject"
+          $ref: '#/components/schemas/BasicAttributesObject'
         defense:
-          $ref: "#/components/schemas/BasicAttributesObject"
+          $ref: '#/components/schemas/BasicAttributesObject'
         politics:
-          $ref: "#/components/schemas/BasicAttributesObject"
+          $ref: '#/components/schemas/BasicAttributesObject'
         leadership:
-          $ref: "#/components/schemas/BasicAttributesObject"
+          $ref: '#/components/schemas/BasicAttributesObject'
     SpecialityLevel:
       type: object
       required:
@@ -480,10 +494,10 @@ components:
         Buffs:
           type: array
           items:
-            $ref: "#/components/schemas/Buff"
+            $ref: '#/components/schemas/Buff'
           maxItems: 10
         level:
-          $ref: "#/components/schemas/SpecialityLevelNames"
+          $ref: '#/components/schemas/SpecialityLevelNames'
     AscendingSummary:
       type: object
       required:
@@ -493,10 +507,10 @@ components:
         buffs:
           type: array
           items:
-            $ref: "#/components/schemas/Buff"
+            $ref: '#/components/schemas/Buff'
           maxItems: 10
         activeLevel:
-          $ref: "#/components/schemas/AscendingLevelNames"
+          $ref: '#/components/schemas/AscendingLevelNames'
       description: |
         The buffs provided foor a general ascended at a particualr number of stars.
       x-fiddle-dto-info:
@@ -521,14 +535,14 @@ components:
         buff:
           type: array
           items:
-            $ref: "#/components/schemas/Buff"
+            $ref: '#/components/schemas/Buff'
           maxItems: 10
         name:
           type: string
           maxLength: 1000
         activeLevel:
           oneOf:
-            - $ref: "#/components/schemas/SpecialityLevelNames"
+            - $ref: '#/components/schemas/SpecialityLevelNames'
       description: The Effective Buff Provided by a Speciality at a particular level
       x-fiddle-dto-info:
         baseSchemaName: Speciality
@@ -536,8 +550,8 @@ components:
       oneOf:
         - type: string
           const: none
-        - $ref: "#/components/schemas/RedGeneralAscendingLevels"
-        - $ref: "#/components/schemas/PurpleGeneralAscendingLevels"
+        - $ref: '#/components/schemas/RedGeneralAscendingLevels'
+        - $ref: '#/components/schemas/PurpleGeneralAscendingLevels'
       default: none
       description: |
         A general Ascends as either a Red or a Purple General but not both.
@@ -579,14 +593,14 @@ components:
         - politics
       properties:
         attack:
-          $ref: "#/components/schemas/BasicAttributesObjectSummary"
+          $ref: '#/components/schemas/BasicAttributesObjectSummary'
         defense:
-          $ref: "#/components/schemas/BasicAttributesObjectSummary"
+          $ref: '#/components/schemas/BasicAttributesObjectSummary'
         politics:
-          $ref: "#/components/schemas/BasicAttributesObjectSummary"
+          $ref: '#/components/schemas/BasicAttributesObjectSummary'
         leadership:
-          $ref: "#/components/schemas/BasicAttributesObjectSummary"
-      description: "A summary of the values that the basic attributes have at a particular level, after they have been computed for that level. "
+          $ref: '#/components/schemas/BasicAttributesObjectSummary'
+      description: 'A summary of the values that the basic attributes have at a particular level, after they have been computed for that level. '
       x-fiddle-dto-info:
         baseSchemaName: BasicAttributes
     GeneralEvaluationTypes:
@@ -647,7 +661,7 @@ components:
       content:
         application/json:
           schema:
-            type: "null"
+            type: 'null'
       description: The request was successful, but there is no content to return in the response.
     BadRequest:
       content:
@@ -706,7 +720,7 @@ components:
       in: path
       name: type
       schema:
-        $ref: "#/components/schemas/GeneralEvaluationTypes"
+        $ref: '#/components/schemas/GeneralEvaluationTypes'
       required: true
 tags:
   - name: generals

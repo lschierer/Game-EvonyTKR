@@ -3,6 +3,7 @@ use experimental qw(class);
 use utf8::all;
 require Data::Printer;
 use File::FindLib 'lib';
+require Game::EvonyTKR::BasicAttributes;
 
 class Game::EvonyTKR::Model::General :isa(Game::EvonyTKR::Data) {
 # PODNAME: Game::EvonyTKR::Model::General
@@ -14,12 +15,18 @@ class Game::EvonyTKR::Model::General :isa(Game::EvonyTKR::Data) {
   our $VERSION = 'v0.30.0';
   my $debug = 1;
 
+  field $id :reader;
+
   field $name : reader : param;
 
   field $type :reader :param;
 
+  field $basicAttributes :reader = Game::EvonyTKR::BasicAttributes->new();
+
+
   ADJUST {
     my @errors;
+
     if(none { $_ =~ /$type/i } $self->GeneralKeys() ) {
       my @gk = $self->GeneralKeys();
       my $possible = Data::Printer::np( @gk);
@@ -28,6 +35,9 @@ class Game::EvonyTKR::Model::General :isa(Game::EvonyTKR::Data) {
     if(@errors) {
       $self->logger()->logcroak(join ', ' => @errors);
     }
+
+    my $uuid5base = $self->UUID5_Generals()->{$type};
+    $id = uuid5($uuid5base, $name);
   }
 
 

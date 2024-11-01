@@ -16,6 +16,13 @@ class Game::EvonyTKR::Data : isa(Game::EvonyTKR::Logger) {
   our $VERSION = 'v0.30.0';
   my $debug = 0;
 
+  field @AttributeNames : reader = qw(
+    attack
+    defense
+    leadership
+    politics
+  );
+
   field @buffAttributes : reader = (
     "attack",
     "attack speed",
