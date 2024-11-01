@@ -2,8 +2,8 @@ use v5.40.0;
 use experimental qw(class);
 use File::FindLib 'lib';
 
-class Game::EvonyTKR::BasicAttribute : isa(Game::EvonyTKR::Data) {
-# PODNAME: Game::EvonyTKR::BasicAttribute
+class Game::EvonyTKR::Model::BasicAttribute : isa(Game::EvonyTKR::Data) {
+# PODNAME: Game::EvonyTKR::Model::BasicAttribute
   use Carp;
   use Types::Common  qw( t is_Num is_Str is_Int);
   use List::AllUtils qw( any none );

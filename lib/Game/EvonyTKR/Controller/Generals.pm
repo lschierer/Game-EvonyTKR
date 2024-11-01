@@ -4,7 +4,7 @@ use utf8::all;
 use File::FindLib 'lib';
 require Mojo::Home;
 require Data::Printer;
-require Game::EvonyTKR::BasicAttribute;
+require Game::EvonyTKR::Model::BasicAttribute;
 require Game::EvonyTKR::Data;
 require Game::EvonyTKR::Model::General;
 require JSON::MaybeXS;
@@ -139,13 +139,21 @@ package Game::EvonyTKR::Controller::Generals {
     $c->app()->log()
       ->trace(
       sprintf('collection returned %d generals', $generalFiles->size()));
+
     for my $element ($generalFiles->each()) {
       my $yamlData = $ypp->load_file($element->to_string());
 
+      my $specialityNames = [];
+      for my $s (@{$yamlData->{'general'}->{'specialities'}}) {
+        push @{$specialityNames}, $s;
+      }
+
       for my $gt (@{ $yamlData->{'general'}->{'type'} }) {
         my $rg = Game::EvonyTKR::Model::General->new(
-          name => $yamlData->{'general'}->{'name'},
-          type => $gt,
+          name            => $yamlData->{'general'}->{'name'},
+          type            => $gt,
+          builtInBookName => $yamlData->{'general'}->{'book'},
+          specialityNames => $specialityNames,
         );
         if (not exists $generals->{$gt}) {
           $generals->{$gt} = {};
@@ -156,7 +164,7 @@ package Game::EvonyTKR::Controller::Generals {
             $ak));
           my $base = $yamlData->{'general'}->{'basic_attributes'}->{$ak}->{'base'};
           my $increment = $yamlData->{'general'}->{'basic_attributes'}->{$ak}->{'increment'};
-          my $aObject = Game::EvonyTKR::BasicAttribute->new(
+          my $aObject = Game::EvonyTKR::Model::BasicAttribute->new(
             base            => $base,
             increment       => $increment,
             attribute_name  => $ak,

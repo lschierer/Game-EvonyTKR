@@ -2,13 +2,13 @@ use v5.40.0;
 use experimental qw(class);
 use File::FindLib 'lib';
 
-class Game::EvonyTKR::BasicAttributes : isa(Game::EvonyTKR::Data) {
-# PODNAME: Game::EvonyTKR::BasicAttributes
+class Game::EvonyTKR::Model::BasicAttributes : isa(Game::EvonyTKR::Data) {
+# PODNAME: Game::EvonyTKR::Model::BasicAttributes
   use Carp;
   use Types::Common  qw( t is_Num is_Str is_Int);
   use List::AllUtils qw( any none );
   use Data::Printer;
-  require Game::EvonyTKR::BasicAttribute;
+  require Game::EvonyTKR::Model::BasicAttribute;
   use namespace::autoclean;
 # VERSION
 
@@ -20,10 +20,10 @@ class Game::EvonyTKR::BasicAttributes : isa(Game::EvonyTKR::Data) {
     '""'  => \&_toString;
 
   field $attributes :reader = {
-    attack      => Game::EvonyTKR::BasicAttribute->new(attribute_name => 'attack',),
-    leadership  => Game::EvonyTKR::BasicAttribute->new(attribute_name => 'leadership',),
-    defense     => Game::EvonyTKR::BasicAttribute->new(attribute_name => 'defense',),
-    politics    => Game::EvonyTKR::BasicAttribute->new(attribute_name => 'politics',),
+    attack      => Game::EvonyTKR::Model::BasicAttribute->new(attribute_name => 'attack',),
+    leadership  => Game::EvonyTKR::Model::BasicAttribute->new(attribute_name => 'leadership',),
+    defense     => Game::EvonyTKR::Model::BasicAttribute->new(attribute_name => 'defense',),
+    politics    => Game::EvonyTKR::Model::BasicAttribute->new(attribute_name => 'politics',),
   };
 
   method attack {
@@ -54,7 +54,7 @@ class Game::EvonyTKR::BasicAttributes : isa(Game::EvonyTKR::Data) {
     my @nac = split(/::/, blessed $newAttribute);
     if($nac[2] ne 'BasicAttribute') {
       $self->logger()->error(sprintf('newAttribute must be a %s not a %s',
-        'Game::EvonyTKR::BasicAttribute', blessed $newAttribute));
+        'Game::EvonyTKR::Model::BasicAttribute', blessed $newAttribute));
       return;
     }
 
@@ -113,7 +113,7 @@ class Game::EvonyTKR::BasicAttributes : isa(Game::EvonyTKR::Data) {
       my $od = Data::Printer::p $other;
       $self->logger()
         ->logcroak(
-        "Game::EvonyTKR::BasicAttributes comparison operator cannot take a $od"
+        "Game::EvonyTKR::Model::BasicAttributes comparison operator cannot take a $od"
         );
     }
     else {
@@ -130,7 +130,7 @@ class Game::EvonyTKR::BasicAttributes : isa(Game::EvonyTKR::Data) {
       my $od = Data::Printer::p $other;
       $self->logger()
         ->logcroak(
-        "Game::EvonyTKR::BasicAttributes equality operator cannot take a $od");
+        "Game::EvonyTKR::Model::BasicAttributes equality operator cannot take a $od");
     }
     else {
       my $mt = $self->total();
@@ -146,7 +146,7 @@ class Game::EvonyTKR::BasicAttributes : isa(Game::EvonyTKR::Data) {
       my $od = Data::Printer::p $other;
       $self->logger()
         ->logcroak(
-        "Game::EvonyTKR::BasicAttributes inequality operator cannot take a $od"
+        "Game::EvonyTKR::Model::BasicAttributes inequality operator cannot take a $od"
         );
     }
     else {

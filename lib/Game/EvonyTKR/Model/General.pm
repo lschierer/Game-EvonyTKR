@@ -3,7 +3,7 @@ use experimental qw(class);
 use utf8::all;
 use File::FindLib 'lib';
 require Data::Printer;
-require Game::EvonyTKR::BasicAttributes;
+require Game::EvonyTKR::Model::BasicAttributes;
 
 
 class Game::EvonyTKR::Model::General :isa(Game::EvonyTKR::Data) {
@@ -28,7 +28,15 @@ class Game::EvonyTKR::Model::General :isa(Game::EvonyTKR::Data) {
 
   field $ascending :reader :param //= false;
 
-  field $basicAttributes :reader = Game::EvonyTKR::BasicAttributes->new();
+  field $basicAttributes :reader = Game::EvonyTKR::Model::BasicAttributes->new();
+
+  field $builtInBookName :reader :param;
+
+  field $builtInBook :reader;
+
+  field $specialityNames :reader :param;
+
+  field $specialities :reader //= [];
 
   ADJUST {
     my @errors;
@@ -48,12 +56,16 @@ class Game::EvonyTKR::Model::General :isa(Game::EvonyTKR::Data) {
 
   method TO_JSON() {
     $self->logger()->trace(sprintf('Model::General->TO_JSON'));
+    my $bb = defined $builtInBook ? $builtInBook : $builtInBookName;
+    my $s = scalar @$specialities ? $specialities : $specialityNames;
     return {
       id              => $self->id(),
       name            => $self->name(),
       type            => $self->type(),
       ascending       => $self->ascending(),
       basicAttributes => $self->basicAttributes(),
+      builtInBook     => $bb,
+      specialities    => $s,
     };
   }
 

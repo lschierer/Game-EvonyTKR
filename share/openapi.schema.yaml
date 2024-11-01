@@ -180,6 +180,13 @@ components:
         passive:
           type: boolean
           default: false
+        targetedTypes:
+          oneOf:
+            - $ref: '#/components/schemas/TargetedTypes'
+            - type: array
+              items:
+                $ref: '#/components/schemas/TargetedTypes'
+              maxItems: 5
         attribute:
           oneOf:
             - $ref: '#/components/schemas/BuffAttributes'
@@ -571,6 +578,14 @@ components:
         - Gold
       type: string
       default: None
+    TargetedTypes:
+      enum:
+        - Ground Troops
+        - Mounted Troops
+        - Ranged Troops
+        - Siege Machines
+        - All Troops
+        - Monsters
     BasicAttributesObject:
       type: object
       required:

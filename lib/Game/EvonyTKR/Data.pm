@@ -23,7 +23,7 @@ class Game::EvonyTKR::Data : isa(Game::EvonyTKR::Logger) {
     politics
   );
 
-  field @buffAttributes : reader = (
+  field @buffAttributeValues : reader = (
     "attack",
     "attack speed",
     "death to survival",
@@ -56,7 +56,7 @@ class Game::EvonyTKR::Data : isa(Game::EvonyTKR::Logger) {
     "wounded to death",
   );
 
-  field @buffConditions : reader = (
+  field @buffConditionValues : reader = (
     'against monsters',
     'attacking',
     'defending',
@@ -77,7 +77,7 @@ class Game::EvonyTKR::Data : isa(Game::EvonyTKR::Logger) {
     'leading the army to attack',
   );
 
-  field @debuffConditions : reader = (
+  field @debuffConditionValues : reader = (
     'monster', 'enemy',
     'enemy in city',
     'reduces enemy',
@@ -117,10 +117,10 @@ class Game::EvonyTKR::Data : isa(Game::EvonyTKR::Logger) {
   );
 
   method AllConditions() {
-    return (@buffConditions, @debuffConditions);
+    return (@buffConditionValues, @debuffConditionValues);
   }
 
-  field @BuffClasses : reader = (
+  field @targetedTypeValues : reader = (
     'Ground Troops',
     'Mounted Troops',
     'Ranged Troops',
