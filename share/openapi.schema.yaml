@@ -125,7 +125,31 @@ paths:
       description: Returns the general with the matching id.
   /generals/uuid/{type}/{name}:
     get:
-      operationId: uuidForTypeAndName
+      operationId: uuidForTypeAndNameHtml
+      tags:
+        - generals
+      summary: "Get a UUID for a type/name pair "
+      responses:
+        "200":
+          content:
+            text/html:
+              schema:
+                type: string
+                format: uuid
+                maxLength: 100
+          description: OK - Successful request with response body containing the UUID for the general
+        "204":
+          $ref: "#/components/responses/NoContent"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalServerErrror"
+      parameters:
+        - $ref: "#/components/parameters/type"
+        - $ref: "#/components/parameters/name"
+  /generals/uuid/{type}/{name}.json:
+    get:
+      operationId: uuidForTypeAndNameJson
       tags:
         - generals
       summary: "Get a UUID for a type/name pair "

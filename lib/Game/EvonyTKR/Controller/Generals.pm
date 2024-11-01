@@ -11,7 +11,7 @@ require YAML::PP;
 
 package Game::EvonyTKR::Controller::Generals {
   use Mojo::Base 'Mojolicious::Controller', -role, -strict, -signatures;
-
+  use UUID qw(uuid5);
   our $VERSION = 'v0.30.0';
 
   my $generals = {};
@@ -49,6 +49,28 @@ package Game::EvonyTKR::Controller::Generals {
       html => sub {
         $self->render(text => '<pre>'
             . Data::Printer::np($jsonResponse, indent => 4, colored => 0)
+            . '</pre>');
+      },
+      any => { data => '', status => 204 },
+    );
+    return;
+  }
+
+  sub getUUID($self) {
+    $self->app()->log()->trace(sprintf('Entering Controller::Generals->getUUID'));
+
+    my $nameParam = $self->param('name');
+    my $typeParam = $self->param('type');
+    $self->app()->log()->trace(sprintf('generating UUID for %s with type %s',
+      $nameParam, $typeParam));
+
+    my $returnUUID = uuid5($data->UUID5_Generals()->{$typeParam}, $nameParam);
+    $self->respond_to(
+      txt  => { text => $returnUUID },
+      json => { json => { UUID => $returnUUID } },
+      html => sub {
+        $self->render(text => '<pre>'
+            . $returnUUID
             . '</pre>');
       },
       any => { data => '', status => 204 },
