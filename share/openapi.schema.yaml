@@ -5,6 +5,63 @@ info:
   description: |
     Allow users to obtain information on Generals, General Pairs, General Conflicts, General SkillBooks, General Specialities, and related  information for Evony TKR
 paths:
+  /books.{extension}:
+    get:
+      tags:
+        - books
+      summary: Get all books
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    type: array
+                    maxItems: 1000
+                    items:
+                      anyOf:
+                        - $ref: "#/components/schemas/BuiltinBookListObject"
+                        - $ref: "#/components/schemas/StandardBookListItem"
+          description: OK - Successful request with response body
+        "204":
+          $ref: "#/components/responses/NoContent"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalServerErrror"
+      parameters:
+        - $ref: "#/components/parameters/extension"
+      operationId: getAllBooks
+  /books/byId/{id}.{extension}:
+    get:
+      tags:
+        - books
+      summary: Get a Book by UUID
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/BuiltinBook"
+                  - $ref: "#/components/schemas/StandardBook"
+          description: OK - Successful request with response body
+        "204":
+          $ref: "#/components/responses/NoContent"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerErrror"
+      parameters:
+        - $ref: "#/components/parameters/extension"
+        - $ref: "#/components/parameters/id"
+      operationId: getABookByUuid
   /generals.{extension}:
     get:
       tags:
@@ -18,11 +75,6 @@ paths:
                 type: string
                 title: GeneralsHtmlListOk
                 maxLength: 10000
-            text/plain;charset=UTF-8:
-              schema:
-                type: string
-                title: GeneralsTxtListOk
-                maxLength: 10000
             application/json:
               schema:
                 type: array
@@ -31,6 +83,11 @@ paths:
                 title: GeneralsJsonListOk
                 maxItems: 10
                 minItems: 4
+            text/plain;charset=UTF-8:
+              schema:
+                type: string
+                title: GeneralsTxtListOk
+                maxLength: 10000
           description: OK - Successful request with response body
         "204":
           $ref: "#/components/responses/NoContent"
@@ -38,11 +95,11 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "500":
           $ref: "#/components/responses/InternalServerErrror"
+      parameters:
+        - $ref: "#/components/parameters/extension"
       description: |
         a summary listing of all available generals
       operationId: generalsHTMLList
-      parameters:
-        - $ref: "#/components/parameters/extension"
   /generals/byId/{id}.{extension}:
     get:
       tags:
@@ -51,17 +108,19 @@ paths:
       responses:
         "200":
           content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/General"
-            text/plain:
-              schema:
-                type: string
-                maxLength: 1000
             text/html:
               schema:
                 type: string
+                title: GetGeneralByIdOk
                 maxLength: 1000
+            text/plain:
+              schema:
+                type: string
+                title: GetGeneralByIdOk
+                maxLength: 1000
+            application/json:
+              schema:
+                $ref: "#/components/schemas/General"
           description: OK - Successful request with response body
         "400":
           $ref: "#/components/responses/BadRequest"
@@ -89,15 +148,18 @@ paths:
             text/html:
               schema:
                 type: string
+                title: UuidForTypeAndNameOk
                 format: uuid
                 maxLength: 100
             text/plain:
               schema:
                 type: string
+                title: UuidForTypeAndNameOk
                 format: uuid
                 maxLength: 100
             application/json:
               schema:
+                title: UuidForTypeAndNameOk
                 uuidResponse:
                   type: object
                   required:
@@ -146,13 +208,6 @@ components:
         passive:
           type: boolean
           default: false
-        targetedTypes:
-          oneOf:
-            - $ref: "#/components/schemas/TargetedTypes"
-            - type: array
-              items:
-                $ref: "#/components/schemas/TargetedTypes"
-              maxItems: 5
         attribute:
           oneOf:
             - $ref: "#/components/schemas/BuffAttributes"
@@ -167,6 +222,13 @@ components:
               items:
                 $ref: "#/components/schemas/Condition"
               maxItems: 10
+        targetedTypes:
+          oneOf:
+            - $ref: "#/components/schemas/TargetedTypes"
+            - type: array
+              items:
+                $ref: "#/components/schemas/TargetedTypes"
+              maxItems: 5
     Skin:
       type: object
       required:
@@ -302,7 +364,12 @@ components:
       required:
         - name
         - text
+        - id
       properties:
+        id:
+          type: string
+          format: uuid
+          maxLength: 100
         name:
           type: string
           maxLength: 1000
@@ -334,7 +401,12 @@ components:
         - buffs
         - level
         - name
+        - id
       properties:
+        id:
+          type: string
+          format: uuid
+          maxLength: 100
         name:
           type: string
           maxLength: 1000
@@ -372,6 +444,14 @@ components:
         - Leading_the_Army_to_Attack
       type: string
       description: Some Buffs apply only conditionally
+    TargetedTypes:
+      enum:
+        - Ground Troops
+        - Mounted Troops
+        - Ranged Troops
+        - Siege Machines
+        - All Troops
+        - Monsters
     AscendingLevel:
       type: object
       required:
@@ -544,14 +624,27 @@ components:
         - Gold
       type: string
       default: None
-    TargetedTypes:
-      enum:
-        - Ground Troops
-        - Mounted Troops
-        - Ranged Troops
-        - Siege Machines
-        - All Troops
-        - Monsters
+    StandardBookListItem:
+      type: object
+      required:
+        - level
+        - name
+      properties:
+        id:
+          type: string
+          format: uuid
+          maxLength: 100
+        name:
+          type: string
+          maxLength: 100
+        level:
+          type: integer
+          minimum: 1
+          maximum: 4
+          format: int32
+      description: list item version of the StandardBook
+      x-fiddle-dto-info:
+        baseSchemaName: StandardBook
     BasicAttributesObject:
       type: object
       required:
@@ -571,6 +664,21 @@ components:
           type: number
           format: float
           minimum: 0
+    BuiltinBookListObject:
+      type: object
+      required:
+        - name
+      properties:
+        id:
+          type: string
+          format: uuid
+          maxLength: 100
+        name:
+          type: string
+          maxLength: 100
+      description: List Item version of the BuiltInBook
+      x-fiddle-dto-info:
+        baseSchemaName: BuiltinBook
     BasicAttributesSummary:
       type: object
       required:
@@ -686,16 +794,6 @@ components:
                 maxLength: 1000
       description: The server encountered an unexpected condition that prevented it from fulfilling the request. Report the issue to the support team if it persists.
   parameters:
-    extension:
-      in: path
-      name: extension
-      schema:
-        type: string
-        pattern: "^(csv|json|html)$"
-        maxLength: 5
-      required: true
-      description: |
-        the file extension that determines the response type
     id:
       in: path
       name: id
@@ -742,20 +840,29 @@ components:
       required: false
       description: return verbose results
       allowReserved: false
+    extension:
+      in: path
+      name: extension
+      schema:
+        type: string
+        pattern: ^(csv|json|html)$
+        maxLength: 5
+      required: true
+      description: |
+        the file extension that determines the response type
     AscendingLevel:
       in: query
-      required: false
       name: AscendingLevel
       style: form
       schema:
         $ref: "#/components/schemas/AscendingLevelNames"
       explode: true
+      required: false
       description: You may whant your general returned reflecting a specific Ascending Level
       allowReserved: false
       allowEmptyValue: false
     SpecialityLevel:
       in: query
-      required: false
       name: SpecialityLevel
       style: form
       schema:
@@ -764,6 +871,7 @@ components:
           $ref: "#/components/schemas/SpecialityLevelNames"
         maxItems: 5
       explode: true
+      required: false
       description: Generals have speciality levels, when you ask for one, you may want that general with specialities at specific levels.
       allowReserved: false
       allowEmptyValue: false
@@ -771,3 +879,4 @@ tags:
   - name: generals
     description: |
       items dealing with generals
+  - name: books

@@ -23,7 +23,7 @@ class Game::EvonyTKR::Model::Book :isa(Game::EvonyTKR::Data) {
 
   # from Type::Registry, this will save me from some of the struggles I have had with some types having blessed references and others not.
   ADJUST {
-    if (!(t->simple_lookup("Num"))) {
+    if (!(t->simple_lookup("Str"))) {
       t->add_types(-Common);
     }
   }
@@ -35,7 +35,45 @@ class Game::EvonyTKR::Model::Book :isa(Game::EvonyTKR::Data) {
   field $buff :reader :param //= [];
 
   method validate() {
+    my @errors;
+    if(scalar @{$buff}) {
+      for my $b (@{$buff}) {
+        my $bc = blessed $b;
+        my @bcl = split(/::/, $bc);
+        if(not ($bcl[2] eq 'Model' and $bcl[3] eq 'Buff')) {
+          push @errors, sprintf('$buff must contain type Game::EvonyTKR::Model::Buff not %s', $bc);
+        }
+      }
+    }
+    my $type = t('Str');
+    $type->check($name) or push @errors => sprintf('$name must contain a string, not %s', $name);
+    $type->check($text) or push @errors => sprintf('$text must contain a string, not %s', $text);
+    if(@errors) {
+      $self->logger()->logcroak(join(', ' => @errors));
+    }
+  }
 
+  ADJUST {
+    $self->validate();
+  }
+
+  TO_JSON($verbose = false) {
+    my $returnable = {
+      name  => $name,
+      text  => $text,
+    }
+    if($verbose) {
+      if(scalar @{$buff}) {
+        for my $b (@{$buff}) {
+          push @{$returnable->{'buff'}}, $b->TO_JSON();
+        }
+      }
+    }
+    return $returnable;
+  }
+
+  method to_String($verbose = false) {
+    $self->TO_JSON($verbose);
   }
 
 }
