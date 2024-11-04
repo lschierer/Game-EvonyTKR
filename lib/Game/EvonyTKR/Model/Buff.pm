@@ -5,7 +5,6 @@ use File::FindLib 'lib';
 require Data::Printer;
 require Game::EvonyTKR::Model::Buff::Value;
 
-
 class Game::EvonyTKR::Model::Buff :isa(Game::EvonyTKR::Data) {
 # PODNAME: Game::EvonyTKR::Model::Buff
   use List::AllUtils qw( any none );

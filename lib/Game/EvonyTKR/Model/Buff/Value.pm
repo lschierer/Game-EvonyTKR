@@ -7,6 +7,7 @@ require Data::Printer;
 
 class Game::EvonyTKR::Model::Buff::Value :isa(Game::EvonyTKR::Data) {
 # PODNAME: Game::EvonyTKR::Model::Buff::Value
+  use Types::Common qw( -lexical -all);
   use Mojo::JSON qw (encode_json);
   use namespace::autoclean;
   use Carp;

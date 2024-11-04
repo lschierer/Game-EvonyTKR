@@ -5,7 +5,6 @@ use File::FindLib 'lib';
 require Data::Printer;
 require Game::EvonyTKR::Model::BasicAttributes;
 
-
 class Game::EvonyTKR::Model::General :isa(Game::EvonyTKR::Data) {
 # PODNAME: Game::EvonyTKR::Model::General
   use List::AllUtils qw( any none );

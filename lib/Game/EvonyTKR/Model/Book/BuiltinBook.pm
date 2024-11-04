@@ -10,7 +10,6 @@ class Game::EvonyTKR::Model::Book::Builtin :isa(Game::EvonyTKR::Model::Book) {
 # PODNAME: Game::EvonyTKR::Model::Book
   use List::AllUtils qw( any none );
   use UUID qw(uuid5);
-  use Mojo::JSON qw (encode_json);
   use namespace::autoclean;
   use Carp;
   use File::FindLib 'lib';

@@ -19,6 +19,12 @@ class Game::EvonyTKR::Model::BasicAttribute : isa(Game::EvonyTKR::Data) {
     '!='  => \&_inequality,
     '""'  => \&_toString;
 
+  ADJUST {
+    if(!(t->simple_lookup('PositiveOrZeroNum'))) {
+      t->add_types(-Common);
+    }
+  }
+
   field $base : reader : param //= 0;
 
   field $increment : reader : param //= 0;

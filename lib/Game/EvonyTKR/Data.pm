@@ -6,7 +6,8 @@ use File::FindLib 'lib';
 
 class Game::EvonyTKR::Data : isa(Game::EvonyTKR::Logger) {
 # PODNAME: Game::EvonyTKR::Data
-  use Type::Tiny::Enum;
+  use Type::Utils            qw(is enum);
+  use Types::Common qw( -lexical -all);
   use UUID qw(uuid5);
   use namespace::autoclean;
   use Carp;
@@ -15,6 +16,14 @@ class Game::EvonyTKR::Data : isa(Game::EvonyTKR::Logger) {
   use X500::RDN;
   our $VERSION = 'v0.30.0';
   my $debug = 0;
+
+  # from Type::Registry, this will save me from some of the struggles I have had with some types having blessed references and others not.
+    ADJUST {
+      if (!(t->simple_lookup("Num"))) {
+        t->add_types(-Common);
+      }
+
+    }
 
   field @AttributeNames : reader = qw(
     attack

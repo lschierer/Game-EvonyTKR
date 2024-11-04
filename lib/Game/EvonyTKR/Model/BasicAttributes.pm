@@ -7,6 +7,7 @@ class Game::EvonyTKR::Model::BasicAttributes : isa(Game::EvonyTKR::Data) {
   use Carp;
   use List::AllUtils qw( any none );
   use Data::Printer;
+  use Types::Common qw( -lexical -all);
   require Game::EvonyTKR::Model::BasicAttribute;
   use namespace::autoclean;
 # VERSION
