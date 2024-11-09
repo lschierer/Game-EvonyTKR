@@ -5,7 +5,6 @@ use File::FindLib 'lib';
 class Game::EvonyTKR::Model::BasicAttributes : isa(Game::EvonyTKR::Data) {
 # PODNAME: Game::EvonyTKR::Model::BasicAttributes
   use Carp;
-  use Types::Common  qw( t is_Num is_Str is_Int);
   use List::AllUtils qw( any none );
   use Data::Printer;
   require Game::EvonyTKR::Model::BasicAttribute;

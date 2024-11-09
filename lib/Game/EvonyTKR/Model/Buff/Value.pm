@@ -7,21 +7,12 @@ require Data::Printer;
 
 class Game::EvonyTKR::Model::Buff::Value :isa(Game::EvonyTKR::Data) {
 # PODNAME: Game::EvonyTKR::Model::Buff::Value
-  use Types::Standard qw(Num is_Num);
-  use Types::Common qw( -lexical -all t );
   use Mojo::JSON qw (encode_json);
   use namespace::autoclean;
   use Carp;
   use File::FindLib 'lib';
   use overload
     '""'  => \&to_String;
-
-# from Type::Registry, this will save me from some of the struggles I have had with some types having blessed references and others not.
-  ADJUST {
-    if (!(t->simple_lookup("Num"))) {
-      t->add_types(-Common);
-    }
-  }
 
   field $number :reader :param //= 0;
 

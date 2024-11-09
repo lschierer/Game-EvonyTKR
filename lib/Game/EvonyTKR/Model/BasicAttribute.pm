@@ -5,10 +5,10 @@ use File::FindLib 'lib';
 class Game::EvonyTKR::Model::BasicAttribute : isa(Game::EvonyTKR::Data) {
 # PODNAME: Game::EvonyTKR::Model::BasicAttribute
   use Carp;
-  use Types::Common  qw( t is_Num is_Str is_Int);
   use List::AllUtils qw( any none );
   use Data::Printer;
   use Hash::Util;
+  use Types::Common qw( -lexical -all t);
   use namespace::autoclean;
 # VERSION
 

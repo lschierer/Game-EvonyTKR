@@ -6,7 +6,7 @@ use File::FindLib 'lib';
 
 class Game::EvonyTKR::Data : isa(Game::EvonyTKR::Logger) {
 # PODNAME: Game::EvonyTKR::Data
-  use Type::Utils            qw(is enum);
+  use Type::Tiny::Enum;
   use UUID qw(uuid5);
   use namespace::autoclean;
   use Carp;
@@ -140,7 +140,9 @@ class Game::EvonyTKR::Data : isa(Game::EvonyTKR::Logger) {
   ));
 
   field $specialityLevels : reader =
-    enum [qw( none green blue purple orange gold)];
+    Type::Tiny::Enum->new(
+      values  => [qw( none green blue purple orange gold)]
+    );
 
   field $globalDN :reader = X500::DN->new(
     X500::RDN->new('OU' => 'EvonyTKR'),

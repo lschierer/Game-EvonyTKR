@@ -5,7 +5,7 @@ use File::FindLib 'lib';
 require Mojo::Home;
 require Data::Printer;
 require Game::EvonyTKR::Data;
-require Game::EvonyTKR::Model::Books;
+require Game::EvonyTKR::Model::Book;
 require JSON::MaybeXS;
 require YAML::PP;
 

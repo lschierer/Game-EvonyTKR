@@ -2,8 +2,7 @@ use v5.40.0;
 use experimental qw(class);
 use utf8::all;
 use Class::ISA;
-use Types::Common qw( t is_Num is_Str is_Int);
-use Type::Utils "is";
+use Types::Common qw( -lexical -all t);
 use Util::Any -all;
 use List::MoreUtils;
 use File::ShareDir ':ALL';
@@ -24,6 +23,13 @@ class Game::EvonyTKR::Logger {
   field $logger : reader;
 
   field $location : reader;
+
+  # from Type::Registry, this will save me from some of the struggles I have had with some types having blessed references and others not.
+  ADJUST {
+    if (!(t->simple_lookup("Str"))) {
+      t->add_types(-Common);
+    }
+  }
 
   ADJUST {
     $self->get_logger();
