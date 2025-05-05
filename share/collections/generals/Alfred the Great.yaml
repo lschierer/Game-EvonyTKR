@@ -1,0 +1,26 @@
+ascending: true
+basic_attributes:
+  attack:
+    base: 112
+    increment: 8.64
+  defense:
+    base: 116
+    increment: 8.87
+  leadership:
+    base: 117
+    increment: 9.03
+  politics:
+    base: 112
+    increment: 8.56
+book: Great King
+display: summary
+specialities:
+  - Ranged Troop Formation
+  - Siege
+  - Ranged Troop Ares
+  - Battle of Edington
+stars: red5
+type:
+  - ranged_specialist
+general: Alfred the Great
+name: Alfred the Great

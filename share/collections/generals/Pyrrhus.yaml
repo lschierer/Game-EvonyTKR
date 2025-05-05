@@ -1,0 +1,26 @@
+ascending: true
+basic_attributes:
+  attack:
+    base: 117
+    increment: 8.92
+  defense:
+    base: 121
+    increment: 8.78
+  leadership:
+    base: 119
+    increment: 9.02
+  politics:
+    base: 107
+    increment: 8.69
+book: Pyrrhic War
+display: summary
+specialities:
+  - Ground Troop Defense
+  - Annihilation
+  - Ground Troop Ares
+  - Pyrrhic Victory
+stars: red5
+type:
+  - ground_specialist
+general: Pyrrhus
+name: Pyrrhus

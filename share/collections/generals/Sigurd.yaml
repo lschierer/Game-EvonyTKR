@@ -1,0 +1,26 @@
+ascending: true
+basic_attributes:
+  attack:
+    base: 125
+    increment: 8.98
+  defense:
+    base: 129
+    increment: 9.11
+  leadership:
+    base: 119
+    increment: 8.62
+  politics:
+    base: 105
+    increment: 8.12
+book: Snake in the Eye
+display: summary
+specialities:
+  - Ranged Troop Defense
+  - Bash
+  - Ranged Troop Ares
+  - King of Denmark
+stars: red5
+type:
+  - ranged_specialist
+general: Sigurd
+name: Sigurd
