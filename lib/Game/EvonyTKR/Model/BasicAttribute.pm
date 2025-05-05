@@ -1,6 +1,7 @@
 use v5.40.0;
 use experimental qw(class);
 use File::FindLib 'lib';
+require Math::Round;
 
 class Game::EvonyTKR::Model::BasicAttribute : isa(Game::EvonyTKR::Data) {
 # PODNAME: Game::EvonyTKR::Model::BasicAttribute
@@ -20,7 +21,7 @@ class Game::EvonyTKR::Model::BasicAttribute : isa(Game::EvonyTKR::Data) {
     '""'  => \&_toString;
 
   ADJUST {
-    if(!(t->simple_lookup('PositiveOrZeroNum'))) {
+    if (!(t->simple_lookup('PositiveOrZeroNum'))) {
       t->add_types(-Common);
     }
   }
@@ -30,6 +31,8 @@ class Game::EvonyTKR::Model::BasicAttribute : isa(Game::EvonyTKR::Data) {
   field $increment : reader : param //= 0;
 
   field $attribute_name : reader : param;
+
+  field $EvansAdjustment = 2.4867;
 
   field %BasicAESAdjustment = (
     'none'    => 0,
@@ -47,7 +50,7 @@ class Game::EvonyTKR::Model::BasicAttribute : isa(Game::EvonyTKR::Data) {
 
   ADJUST {
     Hash::Util::lock_keys(%BasicAESAdjustment);
-    my @errors = ();
+    my @errors         = ();
     my @AttributeNames = $self->AttributeNames();
 
     my $type = t('PositiveOrZeroNum');
@@ -105,6 +108,7 @@ class Game::EvonyTKR::Model::BasicAttribute : isa(Game::EvonyTKR::Data) {
     }
   }
 
+  # =ROUND(((900*0.1)+(((L131+(M131*2.4867*44))*1.1+50+520)-900)*0.2)/100,3)
   #https://evonyguidewiki.com/en/general-cultivate-en/
   method total(
     $level  = 1,
@@ -113,47 +117,30 @@ class Game::EvonyTKR::Model::BasicAttribute : isa(Game::EvonyTKR::Data) {
     $attrib = "Attribute"
   ) {
     my $AES_adjustment = 0;
+    my $cultivation    = 520;
     if (exists $BasicAESAdjustment{$stars}) {
       $AES_adjustment = $BasicAESAdjustment{$stars};
     }
-    my $step = $level * $increment;
-    $self->logger()->trace(sprintf(
-      'Basic Arribute %s for %s is %d after step 1',
-      $attrib, $name, $step
-    ));
-    $step = $step + 500 + $AES_adjustment;
-    $self->logger()->trace(sprintf(
-      'Basic Arribute %s for %s is %d after adding 500 and AES %n',
-      $attrib, $name, $step, $AES_adjustment
-    ));
-
-    if ($step < 900) {
-      $step = $step * .1;
-    }
-    else {
-      $step = 90 + ($step - 900) * 0.2;
-    }
-    $self->logger()->trace(sprintf(
-      'Basic Arribute %s for %s is %d after if block',
-      $attrib, $name, $step
-    ));
-    return $step;
-  }
-
-  method score(
-    $level      = 1,
-    $stars      = 'none',
-    $name       = "GeneralName",
-    $multiplier = 0,
-    $attrib     = "Attribute",
-  ) {
-    my $total = $self->total($level, $stars, $name, $attrib);
-    $total = $total * $multiplier;
-    return $total;
+    # The EvansAdjustment may be intended to partially account for the variable
+    # amount of attribute increase per star a general gets for the first five
+    # stars.  This varies per general and does not seem to be tracked by anyone.
+    my $sa     = $BasicAESAdjustment{$stars};
+    my $result = Math::Round::round((
+        (900 * 0.1) + ((
+            ($base + ($increment * $EvansAdjustment * $level)) * 1.1 +
+              $sa + $cultivation
+          ) - 900
+        ) * 0.2
+      ) / 100,
+      3
+    );
+    $self->logger->debug(
+      "found total basic attribute value of $result for $name");
+    return $result;
   }
 
   method validation {
-    my @errors = ();
+    my @errors         = ();
     my @AttributeNames = $self->AttributeNames();
 
     my $type = t('PositiveOrZeroNum');
@@ -194,7 +181,7 @@ class Game::EvonyTKR::Model::BasicAttribute : isa(Game::EvonyTKR::Data) {
       my $ot = $other->total();
       if ($self->attribute_name() cmp $other->attribute_name()) {
         $self->logger()->warn(
-          'you probably did not intend to compare to different attributes: %s %s',
+'you probably did not intend to compare to different attributes: %s %s',
           $self->attribute_name(), $other->attribute_name()
         );
         return $self->attribute_name() cmp $other->attribute_name();
@@ -216,7 +203,7 @@ class Game::EvonyTKR::Model::BasicAttribute : isa(Game::EvonyTKR::Data) {
       my $mt = $self->total();
       my $ot = $other->total();
       return (($mt == $ot)
-        and ($self->attribute_name() eq $other->attribute_name()));
+          and ($self->attribute_name() eq $other->attribute_name()));
     }
   }
 
@@ -232,17 +219,20 @@ class Game::EvonyTKR::Model::BasicAttribute : isa(Game::EvonyTKR::Data) {
     else {
       my $mt = $self->total();
       my $ot = $other->total();
-      return (($mt != $ot)
-        or ($self->attribute_name() ne $other->attribute_name()));
+      return (
+             ($mt != $ot)
+          or ($self->attribute_name() ne $other->attribute_name())
+      );
     }
   }
 
   method _toHashRef($verbose = 0) {
     my $returnRef = {};
-    $returnRef->{ total } = $self->total();
+
+    $returnRef->{base}      = $self->base();
+    $returnRef->{increment} = $self->increment();
     if ($verbose) {
-      $returnRef->{base}      = $self->base();
-      $returnRef->{increment} = $self->increment();
+      $returnRef->{total} = $self->total();
     }
     return $returnRef;
   }

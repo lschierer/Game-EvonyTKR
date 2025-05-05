@@ -5,47 +5,48 @@ use File::FindLib 'lib';
 require Data::Printer;
 require Game::EvonyTKR::Model::BasicAttributes;
 
-class Game::EvonyTKR::Model::General :isa(Game::EvonyTKR::Data) {
+class Game::EvonyTKR::Model::General : isa(Game::EvonyTKR::Data) {
 # PODNAME: Game::EvonyTKR::Model::General
   use List::AllUtils qw( any none );
-  use UUID qw(uuid5);
-  use Mojo::JSON qw (encode_json);
+  use UUID           qw(uuid5);
+  use Mojo::JSON     qw (encode_json);
   use namespace::autoclean;
   use Carp;
   use File::FindLib 'lib';
   use overload
-    '""'  => \&to_String;
+    '""' => \&to_String;
 
   our $VERSION = 'v0.30.0';
   my $debug = 1;
 
-  field $id :reader;
+  field $id : reader;
 
   field $name : reader : param;
 
-  field $type :reader :param;
+  field $type : reader : param;
 
-  field $ascending :reader :param //= false;
+  field $ascending : reader : param //= false;
 
-  field $basicAttributes :reader = Game::EvonyTKR::Model::BasicAttributes->new();
+  field $basicAttributes : reader =
+    Game::EvonyTKR::Model::BasicAttributes->new();
 
-  field $builtInBookName :reader :param;
+  field $builtInBookName : reader : param;
 
-  field $builtInBook :reader;
+  field $builtInBook : reader;
 
-  field $specialityNames :reader :param;
+  field $specialityNames : reader : param;
 
-  field $specialities :reader //= [];
+  field $specialities : reader //= [];
 
   ADJUST {
     my @errors;
 
-    if(none { $_ =~ /$type/i } $self->GeneralKeys() ) {
-      my @gk = $self->GeneralKeys();
-      my $possible = Data::Printer::np( @gk);
+    if (none { $_ =~ /$type/i } $self->GeneralKeys()) {
+      my @gk       = $self->GeneralKeys();
+      my $possible = Data::Printer::np(@gk);
       push @errors, sprintf('type must be one of %s, not %s', $possible, $type);
     }
-    if(@errors) {
+    if (@errors) {
       $self->logger()->logcroak(join ', ' => @errors);
     }
 
@@ -55,8 +56,8 @@ class Game::EvonyTKR::Model::General :isa(Game::EvonyTKR::Data) {
 
   method TO_JSON() {
     $self->logger()->trace(sprintf('Model::General->TO_JSON'));
-    my $bb = defined $builtInBook ? $builtInBook : $builtInBookName;
-    my $s = scalar @$specialities ? $specialities : $specialityNames;
+    my $bb = defined $builtInBook  ? $builtInBook  : $builtInBookName;
+    my $s  = scalar @$specialities ? $specialities : $specialityNames;
     return {
       id              => $self->id(),
       name            => $self->name(),
@@ -68,21 +69,22 @@ class Game::EvonyTKR::Model::General :isa(Game::EvonyTKR::Data) {
     };
   }
 
-  method to_String($meth = "toString", $a = undef, $b = undef)  {
+  method to_String($meth = "toString", $a = undef, $b = undef) {
     $self->logger()->trace(sprintf('Model::General->to_String started'));
     my $returnable;
     if (defined $b) {
-        $returnable = "[$meth $a $b]";
-    } else {
-      if(defined $a) {
-        if(blessed $a) {
-          my $aClass = blessed $a;
+      $returnable = "[$meth $a $b]";
+    }
+    else {
+      if (defined $a) {
+        if (blessed $a) {
+          my $aClass     = blessed $a;
           my @aClassList = split(/::/, $aClass);
-          if($aClassList[2] eq 'Model' and $aClassList[3] eq 'General') {
+          if ($aClassList[2] eq 'Model' and $aClassList[3] eq 'General') {
             $returnable = a->TO_JSON();
           }
           else {
-            if(defined $meth) {
+            if (defined $meth) {
               $returnable = "blessed [$meth $a ]";
             }
             else {
@@ -91,7 +93,7 @@ class Game::EvonyTKR::Model::General :isa(Game::EvonyTKR::Data) {
           }
         }
         else {
-          if(defined $meth) {
+          if (defined $meth) {
             $returnable = "unblessed [$meth $a ]";
           }
           else {
@@ -103,7 +105,8 @@ class Game::EvonyTKR::Model::General :isa(Game::EvonyTKR::Data) {
         $returnable = $self->TO_JSON();
       }
     }
-    $self->logger()->trace(sprintf('Model::General->to_String returning %s', $returnable));
+    $self->logger()
+      ->trace(sprintf('Model::General->to_String returning %s', $returnable));
     return $returnable;
   }
 

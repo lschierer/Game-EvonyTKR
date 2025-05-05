@@ -6,9 +6,9 @@ use File::FindLib 'lib';
 
 class Game::EvonyTKR::Data : isa(Game::EvonyTKR::Logger) {
 # PODNAME: Game::EvonyTKR::Data
-  use Type::Utils            qw(is enum);
+  use Type::Utils   qw(is enum);
   use Types::Common qw( -lexical -all);
-  use UUID qw(uuid5);
+  use UUID          qw(uuid5);
   use namespace::autoclean;
   use Carp;
   use File::FindLib 'lib';
@@ -17,143 +17,133 @@ class Game::EvonyTKR::Data : isa(Game::EvonyTKR::Logger) {
   our $VERSION = 'v0.30.0';
   my $debug = 0;
 
-  # from Type::Registry, this will save me from some of the struggles I have had with some types having blessed references and others not.
-    ADJUST {
-      if (!(t->simple_lookup("Num"))) {
-        t->add_types(-Common);
-      }
-
+# from Type::Registry, this will save me from some of the struggles I have had with some types having blessed references and others not.
+  ADJUST {
+    if (!(t->simple_lookup("Num"))) {
+      t->add_types(-Common);
     }
 
-  field @AttributeNames : reader = qw(
-    attack
-    defense
-    leadership
-    politics
-  );
-
-  field @buffAttributeValues : reader = (
-    "attack",
-    "attack speed",
-    "death to survival",
-    "death to soul",
-    "death to wounded",
-    "defense",
-    "deserter capacity",
-    "double items drop rate",
-    "hp",
-    "healing speed",
-    "hospital capacity",
-    "leadership",
-    "load",
-    "march size capacity",
-    "march time",
-    "marching speed",
-    "marching speed to monsters",
-    "monstersattack",
-    "politics",
-    "rally capacity",
-    "range",
-    "resources production",
-    "stamina cost",
-    "subcity construction speed",
-    "subcity gold production",
-    "subcity training speed",
-    "subcity troop capacity",
-    "training capacity",
-    "training speed",
-    "wounded to death",
-  );
-
-  field @buffConditionValues : reader = (
-    'against monsters',
-    'attacking',
-    'defending',
-    'during svs',
-    'in city',
-    'in main city',
-    'marching',
-    'reinforcing',
-    'when city mayor',
-    'when city mayor for this subcity',
-    'when defending outside the main city',
-    'when rallying',
-    'when the main defense general',
-    'when an officer',
-    'brings a dragon',
-    'brings dragon or beast to attack',
-    'dragon to the attack',
-    'leading the army to attack',
-  );
-
-  field @debuffConditionValues : reader = (
-    'monster', 'enemy',
-    'enemy in city',
-    'reduces enemy',
-    'reduces enemy in attack',
-    'reduces enemy with a dragon', 'reduces',
-  );
-
-  field @BuffAttributes : reader = (
-    'Attack',
-    'Attack Speed',
-    'Death to Survival',
-    'Death to Soul',
-    'Death to Wounded',
-    'Defense',
-    'Deserter Capacity',
-    'Double Items Drop Rate',
-    'HP',
-    'Healing Speed',
-    'Hospital Capacity',
-    'Leadership',
-    'Load',
-    'March Size Capacity',
-    'March Time',
-    'Marching Speed',
-    'Politics',
-    'Rally Capacity',
-    'Range',
-    'Resources Production',
-    'Stamina cost',
-    'SubCity Construction Speed',
-    'SubCity Gold Production',
-    'SubCity Training Speed',
-    'SubCity Troop Capacity',
-    'Training Capacity',
-    'Training Speed',
-    'Wounded to Death',
-  );
-
-  method AllConditions() {
-    return (@buffConditionValues, @debuffConditionValues);
   }
 
-  field @targetedTypeValues : reader = (
-    'Ground Troops',
-    'Mounted Troops',
-    'Ranged Troops',
-    'Siege Machines',
-    'All Troops',
-    'Monsters',
+  field $AttributeNames : reader = Type::Tiny::Enum->new(
+    values => [qw(
+      attack
+      defense
+      leadership
+      politics
+    )]
   );
 
-  field @GeneralKeys : reader = (qw(
-    ground_specialist
-    mounted_specialist
-    ranged_specialist
-    siege_specialist
-    mayor
-    officer
-    wall
-  ));
+  field $allowedBuffActivation : reader = Type::Tiny::Enum->new(
+    values => [
+      "Overall", "PvM",     "Attacking", "Reinforcing",
+      "Defense", "In City", "Out City",  "Wall",
+      "Mayor",   "Officer",
+    ]
+  );
+
+  field $buffAttributeValues : reader = Type::Tiny::Enum->new(
+    values => [
+      "Attack",
+      "Death to Soul",
+      "Death to Survival",
+      "Death to Wounded",
+      "Defense",
+      "Deserter Capacity",
+      "Double Items Drop Rate",
+      "HP",
+      "Hospital Capacity",
+      "March Size Capacity",
+      "Marching Speed to Monsters",
+      "Marching Speed",
+      "Rally Capacity",
+      "Resources Production",
+      "Stamina cost",
+      "SubCity Construction Speed",
+      "SubCity Gold Production",
+      "SubCity Training Speed",
+      "SubCity Troop Capacity",
+      "Training Capacity",
+      "Training Speed",
+      "Wounded to Death",
+    ]
+  );
+
+  field $buffConditionValues : reader = Type::Tiny::Enum->new(
+    values => [
+      "Against Monsters",
+      "Attacking",
+      "brings a dragon",
+      "brings dragon or beast to attack",
+      "Defending",
+      "dragon to the attack",
+      "leading the army to attack",
+      "Marching",
+      "Reinforcing",
+      "When City Mayor for this SubCity",
+      "When Defending Outside The Main City",
+      "When Rallying",
+      "In Main City",
+      "When the Main Defense General",
+    ]
+
+  );
+
+  field $debuffConditionValues : reader = Type::Tiny::Enum->new(
+    values => [
+      "Enemy",
+      "Enemy In City",
+      "Reduces",
+      "Reduces Enemy",
+      "Reduces Enemy in Attack",
+      "Reduces Enemy with a Dragon",
+      "Reduces Monster",
+    ]
+
+  );
+
+  field $bookConditionValues : reader =
+    Type::Tiny::Enum->new(values => ["all the time", "when not mine"]);
+
+  method AllConditions() {
+    my %seen;
+    my $allowedConditions = grep { not $seen{$_}++ } (
+      @{ $buffConditionValues->values },
+      @{ $debuffConditionValues->values },
+      @{ $bookConditionValues->values }
+    ) return $allowedConditions;
+  }
+
+  field $targetedTypeValues : reader = Type::Tiny::Enum->new(
+    values => [
+      'Ground Troops',
+      'Mounted Troops',
+      'Ranged Troops',
+      'Siege Machines',
+      'All Troops',
+      'Monsters',
+    ]
+  );
+
+  field $GeneralKeys : reader = Type::Tiny::Enum->new(
+    values => [qw(
+      ground_specialist
+      mounted_specialist
+      ranged_specialist
+      siege_specialist
+      mayor
+      officer
+      wall
+    )]
+  );
+
+  field $allowedValueUnits : reader =
+    Type::Tiny::Enum->new(values => [qw( flat percentage )]);
 
   field $specialityLevels : reader =
-    Type::Tiny::Enum->new(
-      values  => [qw( none green blue purple orange gold)]
-    );
+    Type::Tiny::Enum->new(values => [qw( none green blue purple orange gold)]);
 
-  field $globalDN :reader = X500::DN->new(
+  field $globalDN : reader = X500::DN->new(
     X500::RDN->new('OU' => 'EvonyTKR'),
     X500::RDN->new('OU' => 'Game'),
     X500::RDN->new('OU' => 'module'),

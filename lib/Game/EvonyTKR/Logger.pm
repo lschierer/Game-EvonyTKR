@@ -24,7 +24,7 @@ class Game::EvonyTKR::Logger {
 
   field $location : reader;
 
-  # from Type::Registry, this will save me from some of the struggles I have had with some types having blessed references and others not.
+# from Type::Registry, this will save me from some of the struggles I have had with some types having blessed references and others not.
   ADJUST {
     if (!(t->simple_lookup("Str"))) {
       t->add_types(-Common);

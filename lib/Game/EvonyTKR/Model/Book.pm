@@ -5,42 +5,47 @@ use File::FindLib 'lib';
 require Data::Printer;
 require Game::EvonyTKR::Model::Buff::Value;
 
-class Game::EvonyTKR::Model::Book :isa(Game::EvonyTKR::Data) {
+class Game::EvonyTKR::Model::Book : isa(Game::EvonyTKR::Data) {
 # PODNAME: Game::EvonyTKR::Model::Book
   use List::AllUtils qw( any none );
-  use Types::Common qw( -lexical -all);
-  use UUID qw(uuid5);
-  use Mojo::JSON qw (encode_json);
+  use Types::Common  qw( -lexical -all);
+  use UUID           qw(uuid5);
+  use Mojo::JSON     qw (encode_json);
   use namespace::autoclean;
   use Carp;
   use File::FindLib 'lib';
   use overload
-    '""'  => \&to_String;
+    '""' => \&to_String;
 
   our $VERSION = 'v0.30.0';
   my $debug = 1;
 
-  field $name :reader :param;
+  field $name : reader : param;
 
-  field $text :reader :param //= "Original text not available.";
+  field $text : reader : param //= "Original text not available.";
 
-  field $buff :reader :param //= [];
+  field $buff : reader : param //= [];
 
   method validate() {
     my @errors;
-    if(scalar @{$buff}) {
+    if (scalar @{$buff}) {
       for my $b (@{$buff}) {
-        my $bc = blessed $b;
+        my $bc  = blessed $b;
         my @bcl = split(/::/, $bc);
-        if(not ($bcl[2] eq 'Model' and $bcl[3] eq 'Buff')) {
-          push @errors, sprintf('$buff must contain type Game::EvonyTKR::Model::Buff not %s', $bc);
+        if (not($bcl[2] eq 'Model' and $bcl[3] eq 'Buff')) {
+          push @errors,
+            sprintf(
+            '$buff must contain type Game::EvonyTKR::Model::Buff not %s',
+            $bc);
         }
       }
     }
     my $type = t('Str');
-    $type->check($name) or push @errors => sprintf('$name must contain a string, not %s', $name);
-    $type->check($text) or push @errors => sprintf('$text must contain a string, not %s', $text);
-    if(@errors) {
+    $type->check($name)
+      or push @errors => sprintf('$name must contain a string, not %s', $name);
+    $type->check($text)
+      or push @errors => sprintf('$text must contain a string, not %s', $text);
+    if (@errors) {
       $self->logger()->logcroak(join(', ' => @errors));
     }
   }
@@ -51,13 +56,13 @@ class Game::EvonyTKR::Model::Book :isa(Game::EvonyTKR::Data) {
 
   method TO_JSON($verbose = false) {
     my $returnable = {
-      name  => $name,
-      text  => $text,
+      name => $name,
+      text => $text,
     };
-    if($verbose) {
-      if(scalar @{$buff}) {
+    if ($verbose) {
+      if (scalar @{$buff}) {
         for my $b (@{$buff}) {
-          push @{$returnable->{'buff'}}, $b->TO_JSON();
+          push @{ $returnable->{'buff'} }, $b->TO_JSON();
         }
       }
     }

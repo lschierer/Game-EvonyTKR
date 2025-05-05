@@ -19,11 +19,16 @@ class Game::EvonyTKR::Model::BasicAttributes : isa(Game::EvonyTKR::Data) {
     '!='  => \&_inequality,
     '""'  => \&_toString;
 
-  field $attributes :reader = {
-    attack      => Game::EvonyTKR::Model::BasicAttribute->new(attribute_name => 'attack',),
-    leadership  => Game::EvonyTKR::Model::BasicAttribute->new(attribute_name => 'leadership',),
-    defense     => Game::EvonyTKR::Model::BasicAttribute->new(attribute_name => 'defense',),
-    politics    => Game::EvonyTKR::Model::BasicAttribute->new(attribute_name => 'politics',),
+  field $attributes : reader = {
+    attack =>
+      Game::EvonyTKR::Model::BasicAttribute->new(attribute_name => 'attack',),
+    leadership => Game::EvonyTKR::Model::BasicAttribute->new(
+      attribute_name => 'leadership',
+    ),
+    defense =>
+      Game::EvonyTKR::Model::BasicAttribute->new(attribute_name => 'defense',),
+    politics =>
+      Game::EvonyTKR::Model::BasicAttribute->new(attribute_name => 'politics',),
   };
 
   method attack {
@@ -45,23 +50,31 @@ class Game::EvonyTKR::Model::BasicAttributes : isa(Game::EvonyTKR::Data) {
   field @attributeNames = qw(attack leadership defense politics);
 
   method setAttribute($attributeName, $newAttribute) {
-    if ( none { $_ =~ $attributeName } @attributeNames ) {
-      $self->logger()->error(sprintf('attributeName must be one of %s, not %s',
-        Data::Printer::np(@attributeNames), $attributeName,));
-        return;
-    }
-
-    my @nac = split(/::/, blessed $newAttribute);
-    if($nac[2] ne 'BasicAttribute') {
-      $self->logger()->error(sprintf('newAttribute must be a %s not a %s',
-        'Game::EvonyTKR::Model::BasicAttribute', blessed $newAttribute));
+    if (none { $_ =~ $attributeName } @attributeNames) {
+      $self->logger()->error(sprintf(
+        'attributeName must be one of %s, not %s',
+        Data::Printer::np(@attributeNames),
+        $attributeName,
+      ));
       return;
     }
 
-    if(not exists $self->attributes()->{$attributeName} ) {
-      $self->logger()->error(sprintf('$self->attributes()->{$attributeName} does not exist for $attributeName %s',
+    my @nac = split(/::/, blessed $newAttribute);
+    if ($nac[2] ne 'BasicAttribute') {
+      $self->logger()->error(sprintf(
+        'newAttribute must be a %s not a %s',
+        'Game::EvonyTKR::Model::BasicAttribute',
+        blessed $newAttribute
+      ));
+      return;
+    }
+
+    if (not exists $self->attributes()->{$attributeName}) {
+      $self->logger()
+        ->error(sprintf(
+'$self->attributes()->{$attributeName} does not exist for $attributeName %s',
         $attributeName));
-        return;
+      return;
     }
 
     $self->attributes()->{$attributeName} = $newAttribute;
@@ -69,23 +82,10 @@ class Game::EvonyTKR::Model::BasicAttributes : isa(Game::EvonyTKR::Data) {
   }
 
   method total($level = 1, $stars = 'none', $name = "GeneralName") {
-    my $total = $self->attack()
-      ->total($level, $stars, $name, 'attack');
-    $total += $self->leadership->total(
-      $level,
-      $stars,
-      $name, 'leadership'
-    );
-    $total += $self->defense->total(
-      $level,
-      $stars,
-      $name, 'defense'
-    );
-    $total += $self->politics->total(
-      $level,
-      $stars,
-      $name, 'politics'
-    );
+    my $total = $self->attack()->total($level, $stars, $name, 'attack');
+    $total += $self->leadership->total($level, $stars, $name, 'leadership');
+    $total += $self->defense->total($level, $stars, $name, 'defense');
+    $total += $self->politics->total($level, $stars, $name, 'politics');
     return $total;
   }
 
@@ -113,7 +113,7 @@ class Game::EvonyTKR::Model::BasicAttributes : isa(Game::EvonyTKR::Data) {
       my $od = Data::Printer::p $other;
       $self->logger()
         ->logcroak(
-        "Game::EvonyTKR::Model::BasicAttributes comparison operator cannot take a $od"
+"Game::EvonyTKR::Model::BasicAttributes comparison operator cannot take a $od"
         );
     }
     else {
@@ -130,7 +130,8 @@ class Game::EvonyTKR::Model::BasicAttributes : isa(Game::EvonyTKR::Data) {
       my $od = Data::Printer::p $other;
       $self->logger()
         ->logcroak(
-        "Game::EvonyTKR::Model::BasicAttributes equality operator cannot take a $od");
+"Game::EvonyTKR::Model::BasicAttributes equality operator cannot take a $od"
+        );
     }
     else {
       my $mt = $self->total();
@@ -146,7 +147,7 @@ class Game::EvonyTKR::Model::BasicAttributes : isa(Game::EvonyTKR::Data) {
       my $od = Data::Printer::p $other;
       $self->logger()
         ->logcroak(
-        "Game::EvonyTKR::Model::BasicAttributes inequality operator cannot take a $od"
+"Game::EvonyTKR::Model::BasicAttributes inequality operator cannot take a $od"
         );
     }
     else {
@@ -160,13 +161,13 @@ class Game::EvonyTKR::Model::BasicAttributes : isa(Game::EvonyTKR::Data) {
     if ($attrib =~ /attack/i) {
       return $self->attack();
     }
-    elsif ($attrib =~ /leadership/i ) {
+    elsif ($attrib =~ /leadership/i) {
       return $self->leadership();
     }
     elsif ($attrib =~ /defense/i) {
       return $self->defense();
     }
-    elsif($attrib =~ /politics/i ) {
+    elsif ($attrib =~ /politics/i) {
       return $self->politics();
     }
     else {
@@ -174,20 +175,27 @@ class Game::EvonyTKR::Model::BasicAttributes : isa(Game::EvonyTKR::Data) {
     }
   }
 
-  method toHashRef($verbose = 0, $level=1, $stars = 'none', $name = "GeneralName") {
+  method toHashRef(
+    $verbose = 0,
+    $level   = 1,
+    $stars   = 'none',
+    $name    = "GeneralName"
+  ) {
     my $returnRef = {
       leadership => {},
       attack     => {},
       defense    => {},
-      politics    => {},
+      politics   => {},
     };
     for my $k (qw (leadership attack defense politics)) {
-      if($verbose) {
-        $returnRef->{$k}->{base}      = $self->getReaderForAttribute($k)->base();
-        $returnRef->{$k}->{increment} = $self->getReaderForAttribute($k)->increment();
+      $returnRef->{$k}->{base} = $self->getReaderForAttribute($k)->base();
+      $returnRef->{$k}->{increment} =
+        $self->getReaderForAttribute($k)->increment();
+      if ($verbose) {
+        $returnRef->{$k}->{total} =
+          $self->getReaderForAttribute($k)->total($level, $stars, $name, $k);
       }
-      $returnRef->{$k}->{total}      = $self->getReaderForAttribute($k)->total($level,
-      $stars, $name, $k);
+
     }
     return $returnRef;
   }

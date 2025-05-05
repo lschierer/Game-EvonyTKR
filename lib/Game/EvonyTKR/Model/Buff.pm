@@ -5,60 +5,59 @@ use File::FindLib 'lib';
 require Data::Printer;
 require Game::EvonyTKR::Model::Buff::Value;
 
-class Game::EvonyTKR::Model::Buff :isa(Game::EvonyTKR::Data) {
+class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Data) {
 # PODNAME: Game::EvonyTKR::Model::Buff
   use List::AllUtils qw( any none );
-  use UUID qw(uuid5);
-  use Mojo::JSON qw (encode_json);
+  use UUID           qw(uuid5);
+  use Mojo::JSON     qw (encode_json);
   use namespace::autoclean;
   use Carp;
   use File::FindLib 'lib';
   use overload
-    '""'  => \&to_String;
+    '""' => \&to_String;
 
   our $VERSION = 'v0.30.0';
   my $debug = 1;
 
-  field $attribute :reader :param;
+  field $attribute : reader : param;
 
-  field $value :reader :param;
+  field $value : reader : param;
 
-  field $debuffConditions :reader :param //= [];
+  field $debuffConditions : reader : param //= [];
 
-  field $buffConditions :reader :param //= [];
+  field $buffConditions : reader : param //= [];
 
-  field $targetedTypes :reader :param // = [];
+  field $targetedTypes : reader : param // = [];
 
   method conditions() {
-    return (@{$self->debuffConditions()}, @{$self->buffConditions()});
+    return (@{ $self->debuffConditions() }, @{ $self->buffConditions() });
   }
 
-  field $passive :reader :param //= 0;
+  field $passive : reader : param //= 0;
 
   method validate() {
     my @errors;
-    for my $c (@{$self->buffConditions()} ) {
-      if ( none { $_ =~ /$c/i } $self->$self->buffConditionValues()) {
-        push @errors, sprintf('Detected illegal value "%s" in buffConditions.  All values must be one of "%s"',
-          $c, Data::Printer::np($self->buffConditionValues()));
+    my $re      = $self->buffConditionValues()->as_regexp();
+    my @invalid = grep !/$re/i, $self->buffConditions();
+    if ($invalid) {
+      foreach $iv (@invalid) {
+        push @errors,
+          sprintf(
+'Detected illegal value "%s" in buffConditions.  All values must be one of "%s"',
+          $iv, Data::Printer::np($self->buffConditionValues()->values()));
+
       }
-    }
-    for my $c (@{$self->debuffConditions()} ) {
-      if ( none { $_ =~ /$c/i } $self->$self->debuffConditionValues()) {
-        push @errors, sprintf('Detected illegal value "%s" in debuffConditions.  All values must be one of "%s"',
-          $c, Data::Printer::np($self->debuffConditionValues()));
-      }
-    }
-    if ( none { $_ =~ /$attribute/i } $self->BuffAttributes() ) {
-      push @errors, sprintf('Detected illegal value %s as attribute. You must use one of %s.',
-        $attribute, Data::Printer::np($self->BuffAttributes()));
     }
 
-    for my $t ( @{ $self->targetedTypes() }) {
-      if ( none { $_ =~ /$t/i } $self->targetedTypeValues() ) {
-        push @errors, sprintf(
-        'Detected illegal value %s in targetedTypes.  All values must be one of %s.',
-          $t, Data::Printer::np($self->targetedTypeValues()));
+    $re = $self->debuffConditionValues()->as_regexp();
+    @invalid = grep !/$re/i, $self->debuffConditions();
+    if ($invalid) {
+      foreach $iv (@invalid) {
+        push @errors,
+          sprintf(
+'Detected illegal value "%s" in debuffConditions.  All values must be one of "%s"',
+          $iv, Data::Printer::np($self->debuffConditionValues()->values()));
+
       }
     }
 
@@ -66,7 +65,7 @@ class Game::EvonyTKR::Model::Buff :isa(Game::EvonyTKR::Data) {
     $type->check($passive)
       or push @errors => "passive must be 0 or 1, not $passive";
 
-    if(@errors) {
+    if (@errors) {
       $self->logger()->logcroak(join(', ' => @errors));
     }
 
@@ -80,10 +79,10 @@ class Game::EvonyTKR::Model::Buff :isa(Game::EvonyTKR::Data) {
 
   TO_JSON() {
     return {
-      attribute     => $self->attribute(),
-      value         => {
-        number      => $self->value()->number(),
-        unit        => $self->value()->unit(),
+      attribute => $self->attribute(),
+      value     => {
+        number => $self->value()->number(),
+        unit   => $self->value()->unit(),
       },
       passive       => $self->passive(),
       targetedTypes => $self->targetedTypes(),

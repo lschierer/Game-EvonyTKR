@@ -4,39 +4,46 @@ use utf8::all;
 use File::FindLib 'lib';
 require Data::Printer;
 
-
-class Game::EvonyTKR::Model::Buff::Value :isa(Game::EvonyTKR::Data) {
+class Game::EvonyTKR::Model::Buff::Value : isa(Game::EvonyTKR::Data) {
 # PODNAME: Game::EvonyTKR::Model::Buff::Value
   use Types::Common qw( -lexical -all);
-  use Mojo::JSON qw (encode_json);
+  use Mojo::JSON    qw (encode_json);
   use namespace::autoclean;
   use Carp;
   use File::FindLib 'lib';
   use overload
-    '""'  => \&to_String;
+    '""' => \&to_String;
 
-  field $number :reader :param //= 0;
+  field $number : reader : param //= 0;
 
-  field $unit :reader :param //= 'flat';
+  field $unit : reader : param //= 'flat';
 
-  method validate(){
+  method validate() {
     my @errors;
 
-    if($unit ne 'flat' and $unit ne 'percentage') {
+    if ($unit ne 'flat' and $unit ne 'percentage') {
       push @errors, "unit must be 'flat' or 'percentage' not '$unit'";
     }
 
     my $type = t('PositiveOrZeroNum');
     $type->check($number)
-      or push @errors => "number must be a positive floating point number, not '$number'";
+      or push @errors =>
+      "number must be a positive floating point number, not '$number'";
 
-    if(scalar @errors >= 1) {
+    if (scalar @errors >= 1) {
       $self->logger()->logcroak(join(', ' => @errors));
     }
   }
 
   ADJUST {
     $self->validate();
+  }
+
+  method to_String {
+    return {
+      number => $number,
+      unit   => $unit,
+    };
   }
 
 }
