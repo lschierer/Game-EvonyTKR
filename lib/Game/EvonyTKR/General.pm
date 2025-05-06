@@ -87,7 +87,7 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Data) {
   }
 
   method TO_JSON {
-      return $self->toHashRef();
+    return $self->toHashRef();
   }
 
 }

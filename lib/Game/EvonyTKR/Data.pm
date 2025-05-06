@@ -8,7 +8,7 @@ use namespace::autoclean;
 class Game::EvonyTKR::Data : isa(Game::EvonyTKR::Logger) {
 # PODNAME: Game::EvonyTKR::Data
   require Type::Tiny::Enum;
-  use UUID          qw(uuid5);
+  use UUID qw(uuid5);
   use namespace::autoclean;
   use File::FindLib 'lib';
   use X500::DN;
@@ -163,7 +163,7 @@ class Game::EvonyTKR::Data : isa(Game::EvonyTKR::Logger) {
   }
 
   method TO_JSON {
-      return $self->toHashRef();
+    return $self->toHashRef();
   }
 
 }

@@ -88,13 +88,14 @@ package Game::EvonyTKR {
 
     my $gi = Game::EvonyTKR::General::Importer->new(inputDir => $generalsDir,);
     $generals = $gi->importAll();
-    my $json = JSON::PP->new()->utf8()
-            ->pretty()
-            ->indent()
-            ->canonical()
-            ->convert_blessed();
-    $logger->info(
-      "imported generals: " . $json->encode($generals));
+    my $json =
+      JSON::PP->new()
+      ->utf8()
+      ->pretty()
+      ->indent()
+      ->canonical()
+      ->convert_blessed();
+    $logger->info("imported generals: " . $json->encode($generals));
   }
 
 };

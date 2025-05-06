@@ -61,7 +61,7 @@ class Game::EvonyTKR::Logger {
   }
 
   method TO_JSON {
-      return $self->toHashRef();
+    return $self->toHashRef();
   }
 
 }

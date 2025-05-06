@@ -14,8 +14,8 @@ class Game::EvonyTKR::BasicAttribute : isa(Game::EvonyTKR::Data) {
   require JSON::PP;
   use namespace::autoclean;
   use overload
-    '""'  => \&TO_JSON,
-    "fallback"  => 0;
+    '""'       => \&TO_JSON,
+    "fallback" => 0;
 # VERSION
 
   use File::FindLib 'lib';
@@ -245,7 +245,6 @@ class Game::EvonyTKR::BasicAttribute : isa(Game::EvonyTKR::Data) {
   method TO_JSON {
     return $self->toHashRef();
   }
-
 
 }
 1;

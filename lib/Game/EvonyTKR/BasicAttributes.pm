@@ -179,8 +179,10 @@ class Game::EvonyTKR::BasicAttributes : isa(Game::EvonyTKR::Data) {
 
   method toHashRef {
     return {
-      attack  => $attributes->{attack},
-      defense => $attributes->{defense},
+      attack      => $attributes->{attack},
+      defense     => $attributes->{defense},
+      leadership  => $attributes->{leadership},
+      politics    => $attributes->{politics},
     };
   }
 

@@ -66,6 +66,31 @@ class Game::EvonyTKR::General::Importer : isa(Game::EvonyTKR::Data) {
       $general->basicAttributes()
         ->attack()
         ->setBase($go->{basic_attributes}->{attack}->{base});
+      $general->basicAttributes()
+        ->attack()
+        ->setIncrement($go->{basic_attributes}->{attack}->{increment});
+
+      $general->basicAttributes()
+        ->defense()
+        ->setBase($go->{basic_attributes}->{defense}->{base});
+      $general->basicAttributes()
+        ->defense()
+        ->setIncrement($go->{basic_attributes}->{defense}->{increment});
+
+      $general->basicAttributes()
+        ->leadership()
+        ->setBase($go->{basic_attributes}->{leadership}->{base});
+      $general->basicAttributes()
+        ->leadership()
+        ->setIncrement($go->{basic_attributes}->{leadership}->{increment});
+
+      $general->basicAttributes()
+        ->politics()
+        ->setBase($go->{basic_attributes}->{politics}->{base});
+      $general->basicAttributes()
+        ->politics()
+        ->setIncrement($go->{basic_attributes}->{politics}->{increment});
+
       $generals->{ $go->{name} } = $general;
     }
 
