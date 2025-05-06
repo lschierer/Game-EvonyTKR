@@ -51,7 +51,6 @@ package Game::EvonyTKR::Logger::Config {
   sub getLogDir {
     my $home   = File::HomeDir->my_home;
     my $logDir = File::Spec->catdir($home, 'var/log/Perl/dist/Game-Evony/');
-    say "getLogDir returning $logDir";
     return $logDir;
   }
 

@@ -69,12 +69,11 @@ package Game::EvonyTKR {
     else {
       $logConfig = $distDir->child('log4perl.development.conf');
     }
-    say "logConfig is $logConfig";
 
     Log::Log4perl::init_and_watch($logConfig->stringify());
     $logger = Log::Log4perl->get_logger('Game-EvonyTKR');
-
     $logger->info("startup");
+    $logger->info('Logging based on $logConfig');
 
     $self->importer($opt->{input}, $opt->{conflicts});
   }
