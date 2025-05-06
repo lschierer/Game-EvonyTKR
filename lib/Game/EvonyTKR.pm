@@ -2,10 +2,10 @@ use v5.40.0;
 use feature 'try';
 use experimental qw(class);
 use utf8::all;
-use File::FindLib 'lib';
 require Path::Tiny;
 
 use YAML::PP;
+require JSON::PP;
 require File::Share;
 require Log::Log4perl;
 use namespace::clean;
@@ -14,9 +14,9 @@ package Game::EvonyTKR {
   use parent qw(App::Cmd::Simple);
   use namespace::autoclean;
   use Carp;
-  use Path::Tiny;
-  use Game::EvonyTKR::Logger::Config;
   use File::FindLib 'lib';
+  use Game::EvonyTKR::Logger::Config;
+  require Game::EvonyTKR::General::Importer;
   our $VERSION = 'v0.40.0';
 
   my $cg;
@@ -24,6 +24,7 @@ package Game::EvonyTKR {
   my $generals;
   my $skillBooks;
   my $specialities;
+  my $logger;
 
   sub opt_spec {
     return (
@@ -40,6 +41,20 @@ package Game::EvonyTKR {
     my ($self, $opt, $args) = @_;
     # no args allowed but options!
     $self->usage_error("No args allowed") if @$args;
+    if (Path::Tiny::path($opt->{input})->exists()) {
+      if (Path::Tiny::path($opt->{input})->is_dir()) {
+        if (defined($logger)) {
+          $logger->debug(
+            "input directory $opt->{input} is in fact a directory.");
+        }
+      }
+      else {
+        croak("input $opt->{input} is not a directory");
+      }
+    }
+    else {
+      croak("input $opt->{input} does not exist");
+    }
   }
 
   sub execute {
@@ -54,15 +69,36 @@ package Game::EvonyTKR {
     else {
       $logConfig = $distDir->child('log4perl.development.conf');
     }
+    say "logConfig is $logConfig";
 
     Log::Log4perl::init_and_watch($logConfig->stringify());
-    my $logger = Log::Log4perl->get_logger('Game-EvonyTKR');
+    $logger = Log::Log4perl->get_logger('Game-EvonyTKR');
 
     $logger->info("startup");
 
+    $self->importer($opt->{input}, $opt->{conflicts});
   }
 
-}
+  sub importer ($self, $input, $conflicts) {
+    $input = Path::Tiny::path($input);
+    my $generalsDir = $input->child("generals");
+
+    if (!$generalsDir->is_dir()) {
+      croak("no generals collection available at $generalsDir");
+    }
+
+    my $gi = Game::EvonyTKR::General::Importer->new(inputDir => $generalsDir,);
+    $generals = $gi->importAll();
+    my $json = JSON::PP->new()->utf8()
+            ->pretty()
+            ->indent()
+            ->canonical()
+            ->convert_blessed();
+    $logger->info(
+      "imported generals: " . $json->encode($generals));
+  }
+
+};
 
 1;
 

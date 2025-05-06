@@ -1,8 +1,6 @@
 use v5.40.0;
 use experimental qw(class);
 use utf8::all;
-use Class::ISA;
-use Types::Common qw( -lexical -all t);
 use Util::Any -all;
 use List::MoreUtils;
 use File::ShareDir ':ALL';
@@ -15,6 +13,7 @@ use namespace::autoclean;
 
 class Game::EvonyTKR::Logger {
 # PODNAME: Game::EvonyTKR::Logger
+  use Types::Common qw(  t);
   use Carp;
   our $VERSION = 'v0.30.0';
 
@@ -55,6 +54,14 @@ class Game::EvonyTKR::Logger {
       chmod(0600, $logFile);
     }
     return $logFile;
+  }
+
+  method toHashRef {
+    return {};
+  }
+
+  method TO_JSON {
+      return $self->toHashRef();
   }
 
 }

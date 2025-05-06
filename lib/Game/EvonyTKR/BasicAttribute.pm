@@ -3,28 +3,29 @@ use experimental qw(class);
 use File::FindLib 'lib';
 require Math::Round;
 
-class Game::EvonyTKR::Model::BasicAttribute : isa(Game::EvonyTKR::Data) {
-# PODNAME: Game::EvonyTKR::Model::BasicAttribute
+class Game::EvonyTKR::BasicAttribute : isa(Game::EvonyTKR::Data) {
+# PODNAME: Game::EvonyTKR::BasicAttribute
   use Carp;
   use List::AllUtils qw( any none );
+  use Types::Common  qw( t is_Num is_Str);
+  use Scalar::Util   qw(blessed);
   use Data::Printer;
   use Hash::Util;
-  use Types::Common qw( -lexical -all t);
+  require JSON::PP;
   use namespace::autoclean;
+  use overload
+    '""'  => \&TO_JSON,
+    "fallback"  => 0;
 # VERSION
 
   use File::FindLib 'lib';
   use overload
-    '<=>' => \&_comparison,
-    '=='  => \&_equality,
-    '!='  => \&_inequality,
-    '""'  => \&_toString;
-
-  ADJUST {
-    if (!(t->simple_lookup('PositiveOrZeroNum'))) {
-      t->add_types(-Common);
-    }
-  }
+    '<=>'      => \&_comparison,
+    '=='       => \&_equality,
+    'eq'       => \&_equality,
+    '!='       => \&_inequality,
+    '""'       => \&_toString,
+    "fallback" => 0;
 
   field $base : reader : param //= 0;
 
@@ -50,26 +51,28 @@ class Game::EvonyTKR::Model::BasicAttribute : isa(Game::EvonyTKR::Data) {
 
   ADJUST {
     Hash::Util::lock_keys(%BasicAESAdjustment);
-    my @errors         = ();
-    my @AttributeNames = $self->AttributeNames();
+    my @errors = ();
 
-    my $type = t('PositiveOrZeroNum');
+    my $tp = t('PositiveOrZeroNum');
     is_Num($base)
       or push @errors => "base must be a number, not $base";
-    $type->check($base)
+    $tp->check($base)
       or push @errors => "base must be positive, not $base";
 
-    $type = t('PositiveOrZeroNum');
+    $tp = t('PositiveOrZeroNum');
     is_Num($increment)
       or push @errors => "increment must be a number, not $increment";
-    $type->check($increment)
+    $tp->check($increment)
       or push @errors => "increment must be positive, not $increment";
 
     is_Str($attribute_name)
       or push @errors => "attribute name must be a string, not $attribute_name";
-    if (none { $_ eq $attribute_name } @AttributeNames) {
+    my $re = $self->AttributeNames()->as_regexp;
+
+    if ($attribute_name !~ /$re/i) {
       push @errors,
-        "attribute name must be one of " . Data::Printer::np @AttributeNames;
+        "attribute name is $attribute_name, not one of "
+        . Data::Printer::np $self->AttributeNames()->values();
     }
     if (scalar @errors >= 1) {
       croak(join(', ' => @errors));
@@ -78,10 +81,10 @@ class Game::EvonyTKR::Model::BasicAttribute : isa(Game::EvonyTKR::Data) {
 
   method setBase($newBase = 0) {
     my @errors = ();
-    my $type   = t('PositiveOrZeroNum');
+    my $tp     = t('PositiveOrZeroNum');
     is_Num($newBase)
       or push @errors => "base must be a number, not $newBase";
-    $type->check($newBase)
+    $tp->check($newBase)
       or push @errors => "base must be positive, not $newBase";
     if (scalar @errors >= 1) {
       $self->logger()->logerror(join(', ', @errors));
@@ -94,10 +97,10 @@ class Game::EvonyTKR::Model::BasicAttribute : isa(Game::EvonyTKR::Data) {
 
   method setIncrement($newIncrement = 0) {
     my @errors = ();
-    my $type   = t('PositiveOrZeroNum');
+    my $tp     = t('PositiveOrZeroNum');
     is_Num($newIncrement)
       or push @errors => "increment must be a number, not $newIncrement";
-    $type->check($newIncrement)
+    $tp->check($newIncrement)
       or push @errors => "increment must be positive, not $newIncrement";
     if (scalar @errors >= 1) {
       $self->logger()->logerror(join(', ', @errors));
@@ -143,16 +146,16 @@ class Game::EvonyTKR::Model::BasicAttribute : isa(Game::EvonyTKR::Data) {
     my @errors         = ();
     my @AttributeNames = $self->AttributeNames();
 
-    my $type = t('PositiveOrZeroNum');
+    my $tp = t('PositiveOrZeroNum');
     is_Num($base)
       or push @errors => "base must be a number, not $base";
-    $type->check($base)
+    $tp->check($base)
       or push @errors => "base must be positive, not $base";
 
-    $type = t('PositiveOrZeroNum');
+    $tp = t('PositiveOrZeroNum');
     is_Num($increment)
       or push @errors => "increment must be a number, not $increment";
-    $type->check($increment)
+    $tp->check($increment)
       or push @errors => "increment must be positive, not $increment";
 
     is_Str($attribute_name)
@@ -192,19 +195,25 @@ class Game::EvonyTKR::Model::BasicAttribute : isa(Game::EvonyTKR::Data) {
 
   method _equality ($other, $swap = 0) {
     my $otherClass = blessed $other;
-    my @classList  = split(/::/, $otherClass);
-    if ($classList[2] ne 'BasicAttribute') {
-      my $od = Data::Printer::p $other;
-      $self->logger()
-        ->logcroak(
-        "Game::EvonyTKR::BasicAttribute equality operator cannot take a $od");
+    if (defined($otherClass) && length($otherClass) > 0) {
+      my @classList = split(/::/, $otherClass);
+      if ($classList[2] ne 'BasicAttribute') {
+        my $od = Data::Printer::p $other;
+        $self->logger()
+          ->logcroak(
+          "Game::EvonyTKR::BasicAttribute equality operator cannot take a $od");
+      }
+      else {
+        my $mt = $self->total();
+        my $ot = $other->total();
+        return (($mt == $ot)
+            and ($self->attribute_name() eq $other->attribute_name()));
+      }
     }
     else {
-      my $mt = $self->total();
-      my $ot = $other->total();
-      return (($mt == $ot)
-          and ($self->attribute_name() eq $other->attribute_name()));
+      return 0;
     }
+
   }
 
   method _inequality ($other, $swap = 0) {
@@ -226,26 +235,17 @@ class Game::EvonyTKR::Model::BasicAttribute : isa(Game::EvonyTKR::Data) {
     }
   }
 
-  method _toHashRef($verbose = 0) {
-    my $returnRef = {};
-
-    $returnRef->{base}      = $self->base();
-    $returnRef->{increment} = $self->increment();
-    if ($verbose) {
-      $returnRef->{total} = $self->total();
-    }
-    return $returnRef;
+  method toHashRef {
+    return {
+      base      => $base,
+      increment => $increment,
+    };
   }
 
   method TO_JSON {
-    my $json = JSON::MaybeXS->new(utf8 => 1);
     return $self->toHashRef();
   }
 
-  method _toString {
-    my $json = JSON::MaybeXS->new(utf8 => 1);
-    return $json->encode($self->toHashRef());
-  }
 
 }
 1;

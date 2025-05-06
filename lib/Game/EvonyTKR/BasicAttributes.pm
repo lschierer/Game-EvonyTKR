@@ -2,13 +2,13 @@ use v5.40.0;
 use experimental qw(class);
 use File::FindLib 'lib';
 
-class Game::EvonyTKR::Model::BasicAttributes : isa(Game::EvonyTKR::Data) {
-# PODNAME: Game::EvonyTKR::Model::BasicAttributes
+class Game::EvonyTKR::BasicAttributes : isa(Game::EvonyTKR::Data) {
+# PODNAME: Game::EvonyTKR::BasicAttributes
   use Carp;
   use List::AllUtils qw( any none );
+  use Types::Common  qw( t is_Num is_Str);
   use Data::Printer;
-  use Types::Common qw( -lexical -all);
-  require Game::EvonyTKR::Model::BasicAttribute;
+  require Game::EvonyTKR::BasicAttribute;
   use namespace::autoclean;
 # VERSION
 
@@ -17,19 +17,22 @@ class Game::EvonyTKR::Model::BasicAttributes : isa(Game::EvonyTKR::Data) {
     '<=>' => \&_comparison,
     '=='  => \&_equality,
     '!='  => \&_inequality,
-    '""'  => \&_toString;
+    '""'  => \&TO_JSON;
 
-  field $attributes : reader = {
-    attack =>
-      Game::EvonyTKR::Model::BasicAttribute->new(attribute_name => 'attack',),
-    leadership => Game::EvonyTKR::Model::BasicAttribute->new(
-      attribute_name => 'leadership',
-    ),
-    defense =>
-      Game::EvonyTKR::Model::BasicAttribute->new(attribute_name => 'defense',),
-    politics =>
-      Game::EvonyTKR::Model::BasicAttribute->new(attribute_name => 'politics',),
-  };
+  field $attributes : reader;
+
+  ADJUST {
+    my $an = $self->AttributeNames();
+    $attributes->{attack} = Game::EvonyTKR::BasicAttribute->new(
+      attribute_name => $an->closest_match('attack'),);
+    $attributes->{defense} = Game::EvonyTKR::BasicAttribute->new(
+      attribute_name => $an->closest_match('defense'),);
+    $attributes->{leadership} = Game::EvonyTKR::BasicAttribute->new(
+      attribute_name => $an->closest_match('leadership'),);
+    $attributes->{politics} = Game::EvonyTKR::BasicAttribute->new(
+      attribute_name => $an->closest_match('politics'),);
+
+  }
 
   method attack {
     return $self->attributes()->{attack};
@@ -53,7 +56,7 @@ class Game::EvonyTKR::Model::BasicAttributes : isa(Game::EvonyTKR::Data) {
     if (none { $_ =~ $attributeName } @attributeNames) {
       $self->logger()->error(sprintf(
         'attributeName must be one of %s, not %s',
-        Data::Printer::np(@attributeNames),
+        Data::Printer::np($self->AttributeNames->values()),
         $attributeName,
       ));
       return;
@@ -63,7 +66,7 @@ class Game::EvonyTKR::Model::BasicAttributes : isa(Game::EvonyTKR::Data) {
     if ($nac[2] ne 'BasicAttribute') {
       $self->logger()->error(sprintf(
         'newAttribute must be a %s not a %s',
-        'Game::EvonyTKR::Model::BasicAttribute',
+        'Game::EvonyTKR::BasicAttribute',
         blessed $newAttribute
       ));
       return;
@@ -113,7 +116,7 @@ class Game::EvonyTKR::Model::BasicAttributes : isa(Game::EvonyTKR::Data) {
       my $od = Data::Printer::p $other;
       $self->logger()
         ->logcroak(
-"Game::EvonyTKR::Model::BasicAttributes comparison operator cannot take a $od"
+        "Game::EvonyTKR::BasicAttributes comparison operator cannot take a $od"
         );
     }
     else {
@@ -130,8 +133,7 @@ class Game::EvonyTKR::Model::BasicAttributes : isa(Game::EvonyTKR::Data) {
       my $od = Data::Printer::p $other;
       $self->logger()
         ->logcroak(
-"Game::EvonyTKR::Model::BasicAttributes equality operator cannot take a $od"
-        );
+        "Game::EvonyTKR::BasicAttributes equality operator cannot take a $od");
     }
     else {
       my $mt = $self->total();
@@ -147,7 +149,7 @@ class Game::EvonyTKR::Model::BasicAttributes : isa(Game::EvonyTKR::Data) {
       my $od = Data::Printer::p $other;
       $self->logger()
         ->logcroak(
-"Game::EvonyTKR::Model::BasicAttributes inequality operator cannot take a $od"
+        "Game::EvonyTKR::BasicAttributes inequality operator cannot take a $od"
         );
     }
     else {
@@ -175,39 +177,15 @@ class Game::EvonyTKR::Model::BasicAttributes : isa(Game::EvonyTKR::Data) {
     }
   }
 
-  method toHashRef(
-    $verbose = 0,
-    $level   = 1,
-    $stars   = 'none',
-    $name    = "GeneralName"
-  ) {
-    my $returnRef = {
-      leadership => {},
-      attack     => {},
-      defense    => {},
-      politics   => {},
+  method toHashRef {
+    return {
+      attack  => $attributes->{attack},
+      defense => $attributes->{defense},
     };
-    for my $k (qw (leadership attack defense politics)) {
-      $returnRef->{$k}->{base} = $self->getReaderForAttribute($k)->base();
-      $returnRef->{$k}->{increment} =
-        $self->getReaderForAttribute($k)->increment();
-      if ($verbose) {
-        $returnRef->{$k}->{total} =
-          $self->getReaderForAttribute($k)->total($level, $stars, $name, $k);
-      }
-
-    }
-    return $returnRef;
   }
 
-  method TO_JSON() {
-    my $json = JSON::MaybeXS->new(utf8 => 1);
+  method TO_JSON {
     return $self->toHashRef();
-  }
-
-  method _toString {
-    my $json = JSON::MaybeXS->new(utf8 => 1);
-    return $json->encode($self->toHashRef());
   }
 
 }

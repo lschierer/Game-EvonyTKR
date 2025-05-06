@@ -8,8 +8,6 @@ require Game::EvonyTKR::Model::Buff::Value;
 class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Data) {
 # PODNAME: Game::EvonyTKR::Model::Buff
   use List::AllUtils qw( any none );
-  use UUID           qw(uuid5);
-  use Mojo::JSON     qw (encode_json);
   use namespace::autoclean;
   use Carp;
   use File::FindLib 'lib';

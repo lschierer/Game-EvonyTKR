@@ -23,6 +23,7 @@ package Game::EvonyTKR::Logger::Config {
   );
 
   sub new ($class, $m = 'production') {
+    say "Game::EvonyTKR::Logger::Config new sub";
     my $self = { mode => $m, };
     bless $self, $class;
   }
@@ -50,6 +51,7 @@ package Game::EvonyTKR::Logger::Config {
   sub getLogDir {
     my $home   = File::HomeDir->my_home;
     my $logDir = File::Spec->catdir($home, 'var/log/Perl/dist/Game-Evony/');
+    say "getLogDir returning $logDir";
     return $logDir;
   }
 

@@ -3,14 +3,14 @@ use feature 'try';
 use experimental qw(class);
 use utf8::all;
 use File::FindLib 'lib';
+use namespace::autoclean;
 
 class Game::EvonyTKR::Data : isa(Game::EvonyTKR::Logger) {
 # PODNAME: Game::EvonyTKR::Data
-  use Type::Utils   qw(is enum);
-  use Types::Common qw( -lexical -all);
+  require Type::Tiny::Enum;
+  use Types::Common qw( -lexical -all t);
   use UUID          qw(uuid5);
   use namespace::autoclean;
-  use Carp;
   use File::FindLib 'lib';
   use X500::DN;
   use X500::RDN;
@@ -111,7 +111,8 @@ class Game::EvonyTKR::Data : isa(Game::EvonyTKR::Logger) {
       @{ $buffConditionValues->values },
       @{ $debuffConditionValues->values },
       @{ $bookConditionValues->values }
-    ) return $allowedConditions;
+    );
+    return $allowedConditions;
   }
 
   field $targetedTypeValues : reader = Type::Tiny::Enum->new(
@@ -159,13 +160,19 @@ class Game::EvonyTKR::Data : isa(Game::EvonyTKR::Logger) {
     my $ns_base = uuid5(dns => 'perl.org');
     $UUID5_base = uuid5($ns_base, $globalDN->getX500String());
     my $UUID5_Generals_base = uuid5($UUID5_base, 'Generals');
-    for my $k ($self->GeneralKeys()) {
+    for my $k (@{ $self->GeneralKeys()->values() }) {
       $UUID5_Generals->{$k} = uuid5($UUID5_Generals_base, $k);
-      if ($debug) {
-        $self->logger()->trace("base for $k is " . $UUID5_Generals->{$k});
-      }
+      $self->logger()->trace("base for $k is " . $UUID5_Generals->{$k});
 
     }
+  }
+
+  method toHashRef {
+    return {};
+  }
+
+  method TO_JSON {
+      return $self->toHashRef();
   }
 
 }
