@@ -3,16 +3,17 @@ use experimental qw(class);
 use utf8::all;
 use File::FindLib 'lib';
 require Data::Printer;
-require Game::EvonyTKR::Model::Buff::Value;
+require Game::EvonyTKR::Buff::Value;
 
-class Game::EvonyTKR::Model::Book : isa(Game::EvonyTKR::Data) {
-# PODNAME: Game::EvonyTKR::Model::Book
+class Game::EvonyTKR::Book : isa(Game::EvonyTKR::Data) {
+# PODNAME: Game::EvonyTKR::Book
   use List::AllUtils qw( any none );
   use namespace::autoclean;
   use Carp;
   use File::FindLib 'lib';
   use overload
-    '""' => \&to_String;
+    '""'        => \&TO_JSON,
+    'fallback'  => 0;
 
   our $VERSION = 'v0.30.0';
   my $debug = 1;
@@ -29,10 +30,10 @@ class Game::EvonyTKR::Model::Book : isa(Game::EvonyTKR::Data) {
       for my $b (@{$buff}) {
         my $bc  = blessed $b;
         my @bcl = split(/::/, $bc);
-        if (not($bcl[2] eq 'Model' and $bcl[3] eq 'Buff')) {
+        if (not($bcl[1] eq 'EvonyTKR' and $bcl[2] eq 'Buff')) {
           push @errors,
             sprintf(
-            '$buff must contain type Game::EvonyTKR::Model::Buff not %s',
+            '$buff must contain type Game::EvonyTKR::Buff not %s',
             $bc);
         }
       }
@@ -51,23 +52,29 @@ class Game::EvonyTKR::Model::Book : isa(Game::EvonyTKR::Data) {
     $self->validate();
   }
 
-  method TO_JSON($verbose = false) {
-    my $returnable = {
-      name => $name,
-      text => $text,
-    };
-    if ($verbose) {
-      if (scalar @{$buff}) {
-        for my $b (@{$buff}) {
-          push @{ $returnable->{'buff'} }, $b->TO_JSON();
+  method addBuff ($newBuff) {
+    if(Scalar::Util::reftype($newBuff) eq 'OBJECT') {
+      my $classList = blessed $newBuff;
+      my @classStack = split(/::/, $newBuff);
+      if($classStack >= 3) {
+        if($classStack[2] eq 'Buff') {
+          $self->logger->info("adding $newBuff to $name");
+          push @{ $buff }, $newBuff;
         }
       }
     }
-    return $returnable;
   }
 
-  method to_String($verbose = false) {
-    $self->TO_JSON($verbose);
+  method toHashRef {
+    return {
+      name            => $name,
+      text            => $text,
+      buff            => $buff,
+    };
+  }
+
+  method TO_JSON {
+    return $self->toHashRef();
   }
 
 }

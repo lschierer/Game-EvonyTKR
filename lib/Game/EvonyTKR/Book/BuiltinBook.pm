@@ -3,21 +3,33 @@ use experimental qw(class);
 use utf8::all;
 use File::FindLib 'lib';
 require Data::Printer;
-require Game::EvonyTKR::Model::Buff::Value;
+require Game::EvonyTKR::Buff;
 
-class Game::EvonyTKR::Model::Book::Builtin : isa(Game::EvonyTKR::Model::Book) {
-# PODNAME: Game::EvonyTKR::Model::Book
+class Game::EvonyTKR::Book::Builtin : isa(Game::EvonyTKR::Book) {
+# PODNAME: Game::EvonyTKR::Book
   use List::AllUtils qw( any none );
   use namespace::autoclean;
   use Carp;
   use File::FindLib 'lib';
   use overload
-    '""' => \&to_String;
+    '""'        => \&TO_JSON,
+    'fallback'  => 0;
 
   our $VERSION = 'v0.30.0';
   my $debug = 1;
 
-  field $GeneralRef : reader;
+
+  method toHashRef {
+    return {
+      name            => $name,
+      text            => $text,
+      buff            => $buff,
+    };
+  }
+
+  method TO_JSON {
+    return $self->toHashRef();
+  }
 
 }
 1;
