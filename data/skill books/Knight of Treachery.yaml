@@ -1,0 +1,25 @@
+---
+name: Knight of Treachery
+text: Increases mounted troops’ attack by 40% and increases ground troops and mounted troops’ defense by 30% when General is leading the army to attack.
+buff:
+  - attribute: Attack
+    class: Mounted Troops
+    condition:
+      - leading the army to attack
+    value:
+      number: 40
+      unit: percentage
+  - attribute: Defense
+    class: Mounted Troops
+    condition:
+      - leading the army to attack
+    value:
+      number: 30
+      unit: percentage
+  - attribute: Defense
+    class: Ground Troops
+    condition:
+      - leading the army to attack
+    value:
+      number: 30
+      unit: percentage

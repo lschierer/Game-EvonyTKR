@@ -1,0 +1,15 @@
+---
+name: Expedition to Persia
+text: Increases Troop Attack by 10% and increases ground troops’ attack by another 25% when General is leading the army to attack.
+buff:
+  - attribute: Attack
+    value:
+      number: 10
+      unit: percentage
+  - attribute: Attack
+    condition:
+      - leading the army to attack
+    class: Ground Troops
+    value:
+      number: 25
+      unit: percentage

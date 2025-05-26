@@ -1,0 +1,68 @@
+---
+name: Battle of Bouvines
+levels:
+  - level: "Green"
+    buff:
+      - attribute: Attack
+        class: Siege Machines
+        value:
+          number: 3
+          unit: percentage
+      - attribute: Rally Capacity
+        condition:
+          - When Rallying
+        value:
+          number: 1
+          unit: percentage
+  - level: "Blue"
+    buff:
+      - attribute: Attack
+        class: Siege Machines
+        value:
+          number: 3
+          unit: percentage
+      - attribute: Rally Capacity
+        condition:
+          - When Rallying
+        value:
+          number: 1
+          unit: percentage
+  - level: "Purple"
+    buff:
+      - attribute: Attack
+        class: Siege Machines
+        value:
+          number: 6
+          unit: percentage
+      - attribute: Rally Capacity
+        condition:
+          - When Rallying
+        value:
+          number: 1
+          unit: percentage
+  - level: "Orange"
+    buff:
+      - attribute: Attack
+        class: Siege Machines
+        value:
+          number: 6
+          unit: percentage
+      - attribute: Rally Capacity
+        condition:
+          - When Rallying
+        value:
+          number: 1
+          unit: percentage
+  - level: "Gold"
+    buff:
+      - attribute: Attack
+        class: Siege Machines
+        value:
+          number: 12
+          unit: percentage
+      - attribute: Rally Capacity
+        condition:
+          - When Rallying
+        value:
+          number: 1
+          unit: percentage

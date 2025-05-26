@@ -1,0 +1,23 @@
+---
+name: Great Captainess
+buff:
+  - attribute: Attack
+    condition:
+      - leading the army to attack
+    class: Ranged Troops
+    value:
+      number: 35
+      unit: percentage
+  - attribute: Defense
+    condition:
+      - leading the army to attack
+    class: Ranged Troops
+    value:
+      number: 35
+      unit: percentage
+  - attribute: March Size Capacity
+    condition:
+      - leading the army to attack
+    value:
+      number: 10
+      unit: percentage

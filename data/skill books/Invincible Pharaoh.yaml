@@ -1,0 +1,17 @@
+---
+name: Invincible Pharaoh
+buff:
+  - attribute: Attack
+    condition:
+      - leading the army to attack
+    class: Ranged Troops
+    value:
+      number: 30
+      unit: percentage
+  - attribute: HP
+    condition:
+      - leading the army to attack
+    class: Ground Troops
+    value:
+      number: 25
+      unit: percentage

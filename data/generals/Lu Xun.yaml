@@ -1,0 +1,26 @@
+ascending: true
+basic_attributes:
+  attack:
+    base: 121
+    increment: 9.07
+  defense:
+    base: 118
+    increment: 8.79
+  leadership:
+    base: 116
+    increment: 8.94
+  politics:
+    base: 107
+    increment: 8.62
+book: Battle of Xiaoting
+display: summary
+specialities:
+  - Ground Troop Defense
+  - Formation
+  - Ground Troop Ares
+  - Chief Controller of Eastern Wu
+stars: red5
+type:
+  - ground_specialist
+general: Lu Xun
+name: Lu Xun

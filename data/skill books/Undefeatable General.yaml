@@ -1,0 +1,25 @@
+---
+name: Undefeatable General
+text: Increases ground troops and mounted troops’ attack by 30% and increases mounted troops’ HP by 30% when General is leading the army to attack.
+buff:
+  - attribute: Attack
+    class: Ground Troops
+    condition:
+      - leading the army to attack
+    value:
+      number: 30
+      unit: percentage
+  - attribute: Attack
+    class: Mounted Troops
+    condition:
+      - leading the army to attack
+    value:
+      number: 30
+      unit: percentage
+  - attribute: HP
+    class: Mounted Troops
+    condition:
+      - leading the army to attack
+    value:
+      number: 30
+      unit: percentage

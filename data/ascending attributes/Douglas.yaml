@@ -1,0 +1,103 @@
+---
+ascending:
+  - level: "red1"
+    buff:
+      - attribute: Attack
+        condition:
+          - Marching
+        class: Ranged Troops
+        value:
+          number: 5
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - Marching
+        class: Ranged Troops
+        value:
+          number: 10
+          unit: percentage
+      - attribute: HP
+        condition:
+          - Marching
+        class: Ranged Troops
+        value:
+          number: 10
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - Marching
+        class: Siege Machines
+        value:
+          number: 10
+          unit: percentage
+      - attribute: HP
+        condition:
+          - Marching
+        class: Siege Machines
+        value:
+          number: 10
+          unit: percentage
+  - level: "red2"
+    buff:
+      - attribute: Wounded to Death
+        condition:
+          - Enemy In City
+        value:
+          number: 10
+          unit: percentage
+  - level: "red3"
+    buff:
+      - attribute: Attack
+        condition:
+          - Attacking
+        class: Ranged Troops
+        value:
+          number: 10
+          unit: percentage
+      - attribute: March Size Capacity
+        condition:
+          - Attacking
+        value:
+          number: 10
+          unit: percentage
+  - level: "red4"
+    buff:
+      - attribute: Defense
+        condition:
+          - Marching
+        class: Ranged Troops
+        value:
+          number: 30
+          unit: percentage
+      - attribute: HP
+        condition:
+          - Marching
+        class: Ranged Troops
+        value:
+          number: 40
+          unit: percentage
+  - level: "red5"
+    buff:
+      - attribute: Attack
+        condition:
+          - Marching
+        class: Ranged Troops
+        value:
+          number: 30
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - Marching
+        class: Ranged Troops
+        value:
+          number: 15
+          unit: percentage
+      - attribute: HP
+        condition:
+          - Marching
+        class: Ranged Troops
+        value:
+          number: 15
+          unit: percentage
+general: Douglas
+id: Douglas

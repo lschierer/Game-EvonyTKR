@@ -1,0 +1,36 @@
+---
+name: Golden Apple
+buff:
+  - attribute: Defense
+    condition:
+      - When Defending Outside The Main City
+    class: Ranged Troops
+    value:
+      number: 35
+      unit: percentage
+  - attribute: Defense
+    condition:
+      - When Defending Outside The Main City
+    class: Siege Machines
+    value:
+      number: 35
+      unit: percentage
+  - attribute: Defense
+    condition:
+      - When Defending Outside The Main City
+    class: Siege Machines
+    value:
+      number: 35
+      unit: percentage
+  - attribute: HP
+    condition:
+      - When Defending Outside The Main City
+    class: Siege Machines
+    value:
+      number: 35
+      unit: percentage
+  - attribute: Attack
+    class: Ranged Troops
+    value:
+      number: 45
+      unit: percentage

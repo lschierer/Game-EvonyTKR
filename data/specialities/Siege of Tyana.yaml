@@ -1,0 +1,118 @@
+---
+name: Siege of Tyana
+levels:
+  - level: Green
+    buff:
+      - condition:
+          - Marching
+        attribute: Attack
+        class: Ground Troops
+        value:
+          number: 3
+          unit: percentage
+      - condition:
+          - Marching
+        attribute: HP
+        class: Ground Troops
+        value:
+          number: 4
+          unit: percentage
+      - condition:
+          - Marching
+        attribute: HP
+        class: Mounted Troops
+        value:
+          number: 4
+          unit: percentage
+  - level: Blue
+    buff:
+      - condition:
+          - Marching
+        attribute: Attack
+        class: Ground Troops
+        value:
+          number: 4
+          unit: percentage
+      - condition:
+          - Marching
+        attribute: HP
+        class: Ground Troops
+        value:
+          number: 4
+          unit: percentage
+      - condition:
+          - Marching
+        attribute: HP
+        class: Mounted Troops
+        value:
+          number: 4
+          unit: percentage
+  - level: Purple
+    buff:
+      - condition:
+          - Marching
+        attribute: Attack
+        class: Ground Troops
+        value:
+          number: 6
+          unit: percentage
+      - condition:
+          - Marching
+        attribute: HP
+        class: Ground Troops
+        value:
+          number: 8
+          unit: percentage
+      - condition:
+          - Marching
+        attribute: HP
+        class: Mounted Troops
+        value:
+          number: 8
+          unit: percentage
+  - level: Orange
+    buff:
+      - condition:
+          - Marching
+        attribute: Attack
+        class: Ground Troops
+        value:
+          number: 8
+          unit: percentage
+      - condition:
+          - Marching
+        attribute: HP
+        class: Ground Troops
+        value:
+          number: 8
+          unit: percentage
+      - condition:
+          - Marching
+        attribute: HP
+        class: Mounted Troops
+        value:
+          number: 8
+          unit: percentage
+  - level: Gold
+    buff:
+      - condition:
+          - Marching
+        attribute: Attack
+        class: Ground Troops
+        value:
+          number: 14
+          unit: percentage
+      - condition:
+          - Marching
+        attribute: HP
+        class: Ground Troops
+        value:
+          number: 16
+          unit: percentage
+      - condition:
+          - Marching
+        attribute: HP
+        class: Mounted Troops
+        value:
+          number: 16
+          unit: percentage

@@ -1,0 +1,53 @@
+---
+ascending:
+  - level: "red1"
+    buff:
+      - attribute: HP
+        class: Mounted Troops
+        value:
+          number: 20
+          unit: percentage
+  - level: "red2"
+    buff:
+      - attribute: Wounded to Death
+        condition:
+          - Enemy In City
+        value:
+          number: 10
+          unit: percentage
+  - level: "red3"
+    buff:
+      - attribute: March Size Capacity
+        value:
+          number: 6
+          unit: percentage
+      - attribute: Attack
+        class: Mounted Troops
+        value:
+          number: 10
+          unit: percentage
+  - level: "red4"
+    buff:
+      - attribute: Attack
+        class: Mounted Troops
+        value:
+          number: 5
+          unit: percentage
+      - attribute: HP
+        class: Mounted Troops
+        value:
+          number: 30
+          unit: percentage
+  - level: "red5"
+    buff:
+      - attribute: March Size Capacity
+        value:
+          number: 8
+          unit: percentage
+      - attribute: Attack
+        class: Mounted Troops
+        value:
+          number: 20
+          unit: percentage
+general: Ii Naomasa
+id: Ii Naomasa
