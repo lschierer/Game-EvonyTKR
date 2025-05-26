@@ -5,7 +5,8 @@
   "description": "",
   "scripts": {
     "test": "echo \"Warning: no test specified\" && exit 0",
-    "prepare": "husky"
+    "prepare": "husky",
+    "build": "./bin/generate_json.sh && ./bin/generate_schemas.sh"
   },
   "author": "Luke Schierer",
   "license": "ISC",
