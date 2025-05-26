@@ -6,7 +6,7 @@ require Data::Printer;
 require Game::EvonyTKR::Buff;
 
 class Game::EvonyTKR::Book::Builtin : isa(Game::EvonyTKR::Book) {
-# PODNAME: Game::EvonyTKR::Book
+# PODNAME: Game::EvonyTKR::Book::Builtin
   use List::AllUtils qw( any none );
   use namespace::autoclean;
   use Carp;

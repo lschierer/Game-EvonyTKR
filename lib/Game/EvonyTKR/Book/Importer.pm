@@ -7,7 +7,8 @@ require Path::Tiny;
 require Game::EvonyTKR::Buff;
 require Game::EvonyTKR::Buff::Value;
 require Game::EvonyTKR::Book;
-require Game::EvonyTKR::Book::BuiltinBook;
+require Game::EvonyTKR::Book::Builtin;
+require YAML::PP;
 
 class Game::EvonyTKR::Book::Importer : isa(Game::EvonyTKR::Data) {
 # PODNAME: Game::EvonyTKR::Book::Importer
@@ -45,6 +46,8 @@ class Game::EvonyTKR::Book::Importer : isa(Game::EvonyTKR::Data) {
       yaml_version => ['1.2', '1.1'],
     );
 
+    my $importedBooks = {};
+
     foreach my $bookFile (@bookFiles) {
       $bookFile = Path::Tiny::path(Encode::decode('utf8', $bookFile->stringify()));
       my $bookData = $bookFile->slurp_utf8;
@@ -52,24 +55,39 @@ class Game::EvonyTKR::Book::Importer : isa(Game::EvonyTKR::Data) {
 
       next unless ref $bookObject eq 'HASH' && $bookObject->{name};
 
-      if(!exists($bookObject->{level})){
-        my $book = Game::EvonyTKR::Book::BuiltinBook->new(
-          name  => $bookObject->{name};
+      if(!exists($bookObject->{level})) {
+        # This is a builtin book
+        my $book = Game::EvonyTKR::Book::Builtin->new(
+          name => $bookObject->{name},
           (exists $bookObject->{text} ? (text => $bookObject->{text}) : ()),
         );
-        foreach $buffObject (@{ $bookObject->{buff} }) {
-          my $value = Game::EvonyTKR::Buff::Value->new(
-            number  => $buff->{value}->{number},
-            unit    => $buff->{value}->{unit},
-          );
+        
+        # Process buffs if they exist
+        if (exists $bookObject->{buff} && ref $bookObject->{buff} eq 'ARRAY') {
+          my @buffs;
+          
+          foreach my $buffObject (@{ $bookObject->{buff} }) {
+            my $value = Game::EvonyTKR::Buff::Value->new(
+              number => $buffObject->{value}->{number},
+              unit   => $buffObject->{value}->{unit},
+            );
 
-          my $buff = Game::EvonyTKR::Buff->new(
-            attribute => $buffObject->{attribute},
-            value     => $value,
-          );
+            my $buff = Game::EvonyTKR::Buff->new(
+              attribute => $buffObject->{attribute},
+              value     => $value,
+              (exists $buffObject->{class} ? (class => $buffObject->{class}) : ()),
+              (exists $buffObject->{condition} ? (condition => $buffObject->{condition}) : ()),
+            );
+            
+            $book->addBuff($buff);
+          }
         }
+        
+        $importedBooks->{$bookObject->{name}} = $book;
       }
     }
+    
+    return $importedBooks;
   }
 };
 1;
