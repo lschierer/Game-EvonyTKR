@@ -1,0 +1,13 @@
+---
+name: Gwanggaeto-taewang
+buff:
+  - attribute: Attack
+    class: Ranged Troops
+    value:
+      number: 20
+      unit: percentage
+  - attribute: Attack
+    class: Siege Machines
+    value:
+      number: 20
+      unit: percentage

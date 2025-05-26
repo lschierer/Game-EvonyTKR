@@ -1,0 +1,38 @@
+---
+name: Blessing of Siren
+buff:
+  - attribute: Attack
+    condition:
+      - leading the army to attack
+    class: Ranged Troops
+    value:
+      number: 25
+      unit: percentage
+  - attribute: Attack
+    condition:
+      - brings dragon or beast to attack
+    class: Ranged Troops
+    value:
+      number: 15
+      unit: percentage
+  - attribute: Attack
+    condition:
+      - brings dragon or beast to attack
+    class: Siege Machines
+    value:
+      number: 15
+      unit: percentage
+  - attribute: Defense
+    condition:
+      - brings dragon or beast to attack
+    class: Ranged Troops
+    value:
+      number: 15
+      unit: percentage
+  - attribute: Defense
+    condition:
+      - brings dragon or beast to attack
+    class: Siege Machines
+    value:
+      number: 15
+      unit: percentage

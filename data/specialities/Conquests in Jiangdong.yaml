@@ -1,0 +1,63 @@
+---
+name: Conquests in Jiangdong
+levels:
+  - level: Green
+    buff:
+      - attribute: Attack
+        class: Mounted Troops
+        value:
+          number: 3
+          unit: percentage
+      - attribute: Defense
+        class: Mounted Troops
+        value:
+          number: 2
+          unit: percentage
+  - level: Blue
+    buff:
+      - attribute: Attack
+        class: Mounted Troops
+        value:
+          number: 3
+          unit: percentage
+      - attribute: Defense
+        class: Mounted Troops
+        value:
+          number: 2
+          unit: percentage
+  - level: Purple
+    buff:
+      - attribute: Attack
+        class: Mounted Troops
+        value:
+          number: 6
+          unit: percentage
+      - attribute: Defense
+        class: Mounted Troops
+        value:
+          number: 4
+          unit: percentage
+  - level: Orange
+    buff:
+      - attribute: Attack
+        class: Mounted Troops
+        value:
+          number: 6
+          unit: percentage
+      - attribute: Defense
+        class: Mounted Troops
+        value:
+          number: 4
+          unit: percentage
+  - level: Gold
+    buff:
+      - attribute: Attack
+        class: Mounted Troops
+        value:
+          number: 12
+          unit: percentage
+      - attribute: Defense
+        class: Mounted Troops
+        value:
+          number: 8
+          unit: percentage

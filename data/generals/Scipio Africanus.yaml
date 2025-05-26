@@ -1,0 +1,26 @@
+ascending: true
+basic_attributes:
+  attack:
+    base: 111
+    increment: 8.61
+  defense:
+    base: 115
+    increment: 9.06
+  leadership:
+    base: 114
+    increment: 8.49
+  politics:
+    base: 116
+    increment: 8.75
+book: Conqueror
+display: summary
+specialities:
+  - Ground Troop Assault
+  - Annihilation
+  - Ground Troop Ares
+  - Battle of Zama
+stars: red5
+type:
+  - ground_specialist
+general: Scipio Africanus
+name: Scipio Africanus

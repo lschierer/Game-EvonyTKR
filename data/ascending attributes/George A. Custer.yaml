@@ -1,0 +1,96 @@
+---
+ascending:
+  - level: "red1"
+    buff:
+      - attribute: Defense
+        condition:
+          - Marching
+        class: Ground Troops
+        value:
+          number: 10
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - Marching
+        class: Mounted Troops
+        value:
+          number: 10
+          unit: percentage
+      - attribute: HP
+        condition:
+          - Marching
+        class: Ground Troops
+        value:
+          number: 10
+          unit: percentage
+      - attribute: HP
+        condition:
+          - Marching
+        class: Mounted Troops
+        value:
+          number: 10
+          unit: percentage
+  - level: "red2"
+    buff:
+      - attribute: Wounded to Death
+        condition:
+          - Enemy In City
+        value:
+          number: 10
+          unit: percentage
+  - level: "red3"
+    buff:
+      - attribute: Rally Capacity
+        condition:
+          - When Rallying
+        value:
+          number: 8
+          unit: percentage
+  - level: "red4"
+    buff:
+      - attribute: Attack
+        class: Mounted Troops
+        condition:
+          - Marching
+        value:
+          number: 10
+          unit: percentage
+      - attribute: HP
+        class: Ground Troops
+        condition:
+          - Marching
+        value:
+          number: 15
+          unit: percentage
+      - attribute: HP
+        class: Mounted Troops
+        condition:
+          - Marching
+        value:
+          number: 15
+          unit: percentage
+  - level: "red5"
+    buff:
+      - attribute: Attack
+        condition:
+          - Marching
+        class: Mounted Troops
+        value:
+          number: 15
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - Marching
+        class: Mounted Troops
+        value:
+          number: 20
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - Marching
+        class: Ground Troops
+        value:
+          number: 20
+          unit: percentage
+general: George A. Custer
+id: George A. Custer

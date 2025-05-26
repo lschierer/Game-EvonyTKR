@@ -1,0 +1,69 @@
+---
+ascending:
+  - level: "red1"
+    buff:
+      - attribute: Attack
+        class: Siege Machines
+        value:
+          number: 5
+          unit: percentage
+      - attribute: Defense
+        class: Siege Machines
+        value:
+          number: 15
+          unit: percentage
+  - level: "red2"
+    buff:
+      - attribute: Death to Wounded
+        condition:
+          - Marching
+        value:
+          number: 10
+          unit: percentage
+  - level: "red3"
+    buff:
+      - attribute: Attack
+        class: Siege Machines
+        value:
+          number: 5
+          unit: percentage
+      - attribute: March Size Capacity
+        value:
+          number: 8
+          unit: percentage
+  - level: "red4"
+    buff:
+      - attribute: Defense
+        class: Ranged Troops
+        value:
+          number: 20
+          unit: percentage
+      - attribute: Defense
+        class: Siege Machines
+        value:
+          number: 20
+          unit: percentage
+      - attribute: Attack
+        class: Siege Machines
+        value:
+          number: 30
+          unit: percentage
+  - level: "red5"
+    buff:
+      - attribute: Attack
+        class: Siege Machines
+        value:
+          number: 25
+          unit: percentage
+      - attribute: Defense
+        class: Siege Machines
+        value:
+          number: 15
+          unit: percentage
+      - attribute: HP
+        class: Siege Machines
+        value:
+          number: 15
+          unit: percentage
+general: Mu Guiying
+id: Mu Guiying

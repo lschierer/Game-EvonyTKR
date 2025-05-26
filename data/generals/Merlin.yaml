@@ -1,0 +1,26 @@
+ascending: true
+basic_attributes:
+  attack:
+    base: 129
+    increment: 9.09
+  defense:
+    base: 121
+    increment: 8.98
+  leadership:
+    base: 123
+    increment: 9.01
+  politics:
+    base: 106
+    increment: 8.25
+book: Weaving the Fate
+display: summary
+specialities:
+  - Ranged Troop Formation
+  - Bash
+  - Ranged Troop Ares
+  - Light of Wisdom
+stars: red5
+type:
+  - ranged_specialist
+general: Merlin
+name: Merlin

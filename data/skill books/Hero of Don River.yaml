@@ -1,0 +1,17 @@
+---
+name: Hero of Don River
+buff:
+  - attribute: HP
+    condition:
+      - Reinforcing
+    class: Ground Troops
+    value:
+      number: 20
+      unit: percentage
+  - attribute: Attack
+    condition:
+      - Reinforcing
+    class: Ranged Troops
+    value:
+      number: 30
+      unit: percentage

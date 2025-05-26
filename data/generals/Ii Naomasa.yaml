@@ -1,0 +1,26 @@
+ascending: true
+basic_attributes:
+  attack:
+    base: 121
+    increment: 8.94
+  defense:
+    base: 117
+    increment: 8.91
+  leadership:
+    base: 120
+    increment: 9.0
+  politics:
+    base: 102
+    increment: 8.52
+book: Red Demon
+display: summary
+specialities:
+  - Mounted Troop Defense
+  - Suppress
+  - Mounted Troop Ares
+  - Siege of Odawara
+stars: red5
+type:
+  - mounted_specialist
+general: Ii Naomasa
+name: Ii Naomasa

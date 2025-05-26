@@ -1,0 +1,83 @@
+---
+name: Battle of Cannae
+levels:
+  - level: Green
+    buff:
+      - attribute: Attack
+        condition:
+          - Marching
+        class: Mounted Troops
+        value:
+          number: 4
+          unit: percentage
+      - attribute: HP
+        condition:
+          - Marching
+        class: Mounted Troops
+        value:
+          number: 4
+          unit: percentage
+  - level: Blue
+    buff:
+      - attribute: Attack
+        condition:
+          - Marching
+        class: Mounted Troops
+        value:
+          number: 4
+          unit: percentage
+      - attribute: HP
+        condition:
+          - Marching
+        class: Mounted Troops
+        value:
+          number: 4
+          unit: percentage
+  - level: Purple
+    buff:
+      - attribute: Attack
+        condition:
+          - Marching
+        class: Mounted Troops
+        value:
+          number: 7
+          unit: percentage
+      - attribute: HP
+        condition:
+          - Marching
+        class: Mounted Troops
+        value:
+          number: 7
+          unit: percentage
+  - level: Orange
+    buff:
+      - attribute: Attack
+        condition:
+          - Marching
+        class: Mounted Troops
+        value:
+          number: 7
+          unit: percentage
+      - attribute: HP
+        condition:
+          - Marching
+        class: Mounted Troops
+        value:
+          number: 7
+          unit: percentage
+  - level: Gold
+    buff:
+      - attribute: Attack
+        condition:
+          - Marching
+        class: Mounted Troops
+        value:
+          number: 14
+          unit: percentage
+      - attribute: HP
+        condition:
+          - Marching
+        class: Mounted Troops
+        value:
+          number: 14
+          unit: percentage

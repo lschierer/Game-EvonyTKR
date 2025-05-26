@@ -1,0 +1,24 @@
+---
+name: Blood Restrain
+buff:
+  - attribute: Attack
+    class: Ranged Troops
+    condition:
+      - leading the army to attack
+    value:
+      number: 35
+      unit: percentage
+  - attribute: HP
+    class: Ranged Troops
+    condition:
+      - leading the army to attack
+    value:
+      number: 30
+      unit: percentage
+  - attribute: HP
+    class: Siege Machines
+    condition:
+      - leading the army to attack
+    value:
+      number: 30
+      unit: percentage
