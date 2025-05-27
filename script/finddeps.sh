@@ -6,6 +6,6 @@
 
  step3=$(echo "$step2" | sort -u ) || exit 3
 
- step4=$(echo "$step3" | egrep -v '^(v5.40|feature|namespace|parent|overload|experimental|Game::EvonyTKR|utf8)') || exit 4
+ step4=$(echo "$step3" | egrep -v '^(v5.40|feature|parent|overload|experimental|Game::EvonyTKR|utf8)') || exit 4
 
  echo "$step4"

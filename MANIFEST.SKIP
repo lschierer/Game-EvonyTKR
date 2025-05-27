@@ -20,3 +20,6 @@ devServer.sh
 perlcritic.rc
 script/finddeps.sh
 weaver.ini
+blib
+.zed
+./*.tar.gz
