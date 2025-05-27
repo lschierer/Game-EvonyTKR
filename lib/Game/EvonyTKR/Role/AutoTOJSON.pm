@@ -1,7 +1,5 @@
 package Game::EvonyTKR::Role::AutoTOJSON;
-use v5.38;
-use strict;
-use warnings;
+use v5.40;
 
 sub import {
   my ($class) = @_;
