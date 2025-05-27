@@ -1,111 +1,169 @@
-use experimental 'class';
+use v5.40.0;
+use feature 'try';
+use experimental qw(class);
 use utf8::all;
 use File::FindLib 'lib';
+use namespace::autoclean;
 
-class Game::EvonyTKR::Data
-  : isa(Game::EvonyTKR::Logger) {
+class Game::EvonyTKR::Data : isa(Game::EvonyTKR::Logger) {
 # PODNAME: Game::EvonyTKR::Data
-  use Carp;
-  use Types::Standard        qw(is_Int Int Str is_Str);
-  use Types::Common::Numeric qw(PositiveOrZeroInt);
-  use Type::Utils            qw(is enum);
-  use File::ShareDir ':ALL';
-  use YAML::XS;
-  use X500::RDN;
-  use X500::DN;
+  require Type::Tiny::Enum;
   use UUID qw(uuid5);
   use namespace::autoclean;
-# VERSION
   use File::FindLib 'lib';
+  use X500::DN;
+  use X500::RDN;
+  our $VERSION = 'v0.30.0';
+  my $debug = 0;
 
-  field @buffConditions : reader = (
-    'Against Monsters',
-    'Attacking',
-    'Defending',
-    'During SvS',
-    'In City',
-    'In Main City',
-    'Marching',
-    'Reinforcing',
-    'When City Mayor',
-    'When City Mayor for this SubCity',
-    'When Defending Outside The Main City',
-    'When Rallying',
-    'When The Main Defense General',
-    'When an officer',
-    'brings a dragon',
-    'brings dragon or beast to attack',
-    'dragon to the attack',
-    'leading the army to attack',
+  field $AttributeNames : reader = Type::Tiny::Enum->new(
+    values => [qw(
+      attack
+      defense
+      leadership
+      politics
+    )]
   );
 
-  field @debuffConditions : reader = (
-    'Enemy',
-    'Enemy In City',
-    'Reduces Enemy',
-    'Reduces Enemy in Attack',
-    'Reduces Enemy with a Dragon',
-    'Reduces',
+  field $allowedBuffActivation : reader = Type::Tiny::Enum->new(
+    values => [
+      "Overall", "PvM",     "Attacking", "Reinforcing",
+      "Defense", "In City", "Out City",  "Wall",
+      "Mayor",   "Officer",
+    ]
   );
 
-  field @BuffAttributes : reader;
+  field $buffAttributeValues : reader = Type::Tiny::Enum->new(
+    values => [
+      "Attack",
+      "Death to Soul",
+      "Death to Survival",
+      "Death to Wounded",
+      "Defense",
+      "Deserter Capacity",
+      "Double Items Drop Rate",
+      "HP",
+      "Hospital Capacity",
+      "March Size Capacity",
+      "Marching Speed to Monsters",
+      "Marching Speed",
+      "Rally Capacity",
+      "Resources Production",
+      "Stamina cost",
+      "SubCity Construction Speed",
+      "SubCity Gold Production",
+      "SubCity Training Speed",
+      "SubCity Troop Capacity",
+      "Training Capacity",
+      "Training Speed",
+      "Wounded to Death",
+    ]
+  );
 
-  method set_BuffAttributes {
-    my $data_location = dist_file('Game-EvonyTKR', 'buff/attributes.yaml');
-    open(my $DATA, '<', $data_location) or die $!;
-    my $yaml = do { local $/; <$DATA> };
-    my $data = Load $yaml;
-    close $DATA;
-    @BuffAttributes = @{ $data->{'attributes'} };
-  }
+  field $buffConditionValues : reader = Type::Tiny::Enum->new(
+    values => [
+      "Against Monsters",
+      "Attacking",
+      "brings a dragon",
+      "brings dragon or beast to attack",
+      "Defending",
+      "dragon to the attack",
+      "leading the army to attack",
+      "Marching",
+      "Reinforcing",
+      "When City Mayor for this SubCity",
+      "When Defending Outside The Main City",
+      "When Rallying",
+      "In Main City",
+      "When the Main Defense General",
+    ]
+
+  );
+
+  field $debuffConditionValues : reader = Type::Tiny::Enum->new(
+    values => [
+      "Enemy",
+      "Enemy In City",
+      "Reduces",
+      "Reduces Enemy",
+      "Reduces Enemy in Attack",
+      "Reduces Enemy with a Dragon",
+      "Reduces Monster",
+    ]
+
+  );
+
+  field $bookConditionValues : reader =
+    Type::Tiny::Enum->new(values => ["all the time", "when not mine"]);
 
   method AllConditions() {
-    return (@buffConditions, @debuffConditions);
+    my %seen;
+    my $allowedConditions = grep { not $seen{$_}++ } (
+      @{ $buffConditionValues->values },
+      @{ $debuffConditionValues->values },
+      @{ $bookConditionValues->values }
+    );
+    return $allowedConditions;
   }
 
-  field @BuffClasses : reader = (
-    'Ground Troops',
-    'Mounted Troops',
-    'Ranged Troops',
-    'Siege Machines',
-    'All Troops',
-    'Monsters',
+  field $targetedTypeValues : reader = Type::Tiny::Enum->new(
+    values => [
+      'Ground Troops',
+      'Mounted Troops',
+      'Ranged Troops',
+      'Siege Machines',
+      'All Troops',
+      'Monsters',
+    ]
   );
 
-  field @GeneralKeys : reader = (
-    'Ground Troops',
-    'Mayor',
-    'Mounted Troops',
-    'Officer',
-    'Ranged Troops',
-    'Siege Machines',
-    'Wall',
+  field $GeneralKeys : reader = Type::Tiny::Enum->new(
+    values => [qw(
+      ground_specialist
+      mounted_specialist
+      ranged_specialist
+      siege_specialist
+      mayor
+      officer
+      wall
+    )]
   );
 
-  #keys should come from @GeneralKeys above.
-  field %generalClass : reader = (
-    'Ground Troops'  => 'Game::EvonyTKR::General::Ground',
-    'Mounted Troops' => 'Game::EvonyTKR::General::Mounted',
-    'Ranged Troops'  => 'Game::EvonyTKR::General::Ranged',
-    'Siege Machines' => 'Game::EvonyTKR::General::Siege',
-  );
+  field $allowedValueUnits : reader =
+    Type::Tiny::Enum->new(values => [qw( flat percentage )]);
 
   field $specialityLevels : reader =
-    enum [qw( None Green Blue Purple Orange Gold)];
+    Type::Tiny::Enum->new(values => [qw( none green blue purple orange gold)]);
 
-  field $globalDN : reader = new X500::DN(
-    new X500::RDN('OU' => 'EvonyTKR'),
-    new X500::RDN('OU' => 'Game'),
-    new X500::RDN('OU' => 'module'),
-    new X500::RDN('dc' => 'Perl'),
-    new X500::RDN('dc' => 'org'),
+  field $globalDN : reader = X500::DN->new(
+    X500::RDN->new('OU' => 'EvonyTKR'),
+    X500::RDN->new('OU' => 'Game'),
+    X500::RDN->new('OU' => 'module'),
+    X500::RDN->new('dc' => 'Perl'),
+    X500::RDN->new('dc' => 'org'),
   );
 
   field $UUID5_base : reader;
 
+  field $UUID5_Generals : reader = {};
+
   ADJUST {
     my $ns_base = uuid5(dns => 'perl.org');
     $UUID5_base = uuid5($ns_base, $globalDN->getX500String());
+    my $UUID5_Generals_base = uuid5($UUID5_base, 'Generals');
+    for my $k (@{ $self->GeneralKeys()->values() }) {
+      $UUID5_Generals->{$k} = uuid5($UUID5_Generals_base, $k);
+      $self->logger()->trace("base for $k is " . $UUID5_Generals->{$k});
+
+    }
+  }
+
+  method toHashRef {
+    return {};
+  }
+
+  method TO_JSON {
+    return $self->toHashRef();
   }
 
 }
@@ -115,16 +173,19 @@ __END__
 
 # ABSTRACT: Runtime Data values for Game::EvonyTKR
 
-=method new()
-
-instantiate the shared data helper functions.
-=cut
+=pod
 
 =head1 DESCRIPTION
 
 Due to the encapsulation and initialization order requirements, even if the perlclass feature had already implemented the :common attribute, things marked as common would not be initialized in time for other parameters to validate against them.  Thus I need a ::Data class that users can initialize first.
 
 =cut
+
+=head1 METHODS
+
+=method new()
+
+instantiate the shared data helper functions.
 
 =method buffConditions
 
@@ -153,10 +214,5 @@ This includes both Buff and Debuff conditions. see buffConditions() and debuffCo
 A *buff* will affect either exactly one or All classes of troops. This is attempting to replace having an enum.
 
 A *General* can have more than one Class from this list.  That is because General Classes and Buff classes are the same values, but used totally differently.
+
 =cut
-
-=method set_BuffAttributes()
-
-get the possible attributes from the yaml data file in the shared directory and load them into memory.
-=cut
-

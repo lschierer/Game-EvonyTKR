@@ -1,0 +1,59 @@
+---
+ascending:
+  - level: "red1"
+    buff:
+      - attribute: Attack
+        class: Ground Troops
+        value:
+          number: 5
+          unit: percentage
+      - attribute: HP
+        class: Ground Troops
+        value:
+          number: 10
+          unit: percentage
+      - attribute: HP
+        class: Mounted Troops
+        value:
+          number: 10
+          unit: percentage
+  - level: "red2"
+    buff:
+      - attribute: Death to Wounded
+        condition:
+          - Marching
+        value:
+          number: 10
+          unit: percentage
+  - level: "red3"
+    buff:
+      - attribute: March Size Capacity
+        value:
+          number: 12
+          unit: percentage
+  - level: "red4"
+    buff:
+      - attribute: Attack
+        class: Ground Troops
+        value:
+          number: 10
+          unit: percentage
+      - attribute: HP
+        class: Ground Troops
+        value:
+          number: 20
+          unit: percentage
+  - level: "red5"
+    buff:
+      - attribute: Attack
+        class: Ground Troops
+        value:
+          number: 20
+          unit: percentage
+      - attribute: Defense
+        class: Ground Troops
+        value:
+          number: 35
+          unit: percentage
+general: Turenne
+id: Turenne

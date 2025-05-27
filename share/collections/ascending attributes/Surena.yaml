@@ -1,0 +1,78 @@
+---
+ascending:
+  - level: "red1"
+    buff:
+      - attribute: Attack
+        class: Siege Machines
+        value:
+          number: 5
+          unit: percentage
+      - attribute: Defense
+        class: Siege Machines
+        value:
+          number: 10
+          unit: percentage
+      - attribute: HP
+        class: Siege Machines
+        value:
+          number: 10
+          unit: percentage
+  - level: "red2"
+    buff:
+      - attribute: Wounded to Death
+        condition:
+          - Enemy In City
+        value:
+          number: 10
+          unit: percentage
+  - level: "red3"
+    buff:
+      - attribute: Rally Capacity
+        condition:
+          - When Rallying
+        value:
+          number: 8
+          unit: percentage
+  - level: "red4"
+    buff:
+      - attribute: Attack
+        class: Siege Machines
+        value:
+          number: 5
+          unit: percentage
+      - attribute: Defense
+        class: Siege Machines
+        value:
+          number: 10
+          unit: percentage
+      - attribute: HP
+        class: Siege Machines
+        value:
+          number: 10
+          unit: percentage
+  - level: "red5"
+    buff:
+      - attribute: Attack
+        class: Siege Machines
+        value:
+          number: 5
+          unit: percentage
+      - attribute: Defense
+        class: Siege Machines
+        value:
+          number: 10
+          unit: percentage
+      - attribute: HP
+        class: Siege Machines
+        value:
+          number: 10
+          unit: percentage
+      - attribute: Attack
+        condition:
+          - dragon to the attack
+        class: Siege Machines
+        value:
+          number: 10
+          unit: percentage
+general: Surena
+id: Surena

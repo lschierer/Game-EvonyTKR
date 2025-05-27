@@ -1,0 +1,88 @@
+---
+ascending:
+  - level: "red1"
+    buff:
+      - attribute: Attack
+        condition:
+          - Marching
+        value:
+          number: 10
+          unit: percentage
+  - level: "red2"
+    buff:
+      - attribute: Death to Wounded
+        condition:
+          - Marching
+        value:
+          number: 8
+          unit: percentage
+  - level: "red3"
+    buff:
+      - attribute: Attack
+        class: Ground Troops
+        condition:
+          - Marching
+        value:
+          number: 20
+          unit: percentage
+      - attribute: Defense
+        class: Ground Troops
+        condition:
+          - Marching
+        value:
+          number: 20
+          unit: percentage
+  - level: "red4"
+    buff:
+      - attribute: Defense
+        class: Ground Troops
+        condition:
+          - Marching
+        value:
+          number: 15
+          unit: percentage
+      - attribute: Defense
+        class: Mounted Troops
+        condition:
+          - Marching
+        value:
+          number: 15
+          unit: percentage
+      - attribute: HP
+        class: Ground Troops
+        condition:
+          - Marching
+        value:
+          number: 15
+          unit: percentage
+      - attribute: HP
+        class: Mounted Troops
+        condition:
+          - Marching
+        value:
+          number: 15
+          unit: percentage
+  - level: "red5"
+    buff:
+      - attribute: Attack
+        class: Ground Troops
+        condition:
+          - Attacking
+        value:
+          number: 20
+          unit: percentage
+      - attribute: HP
+        class: Ground Troops
+        condition:
+          - Attacking
+        value:
+          number: 20
+          unit: percentage
+      - attribute: March Size Capacity
+        condition:
+          - Attacking
+        value:
+          number: 8
+          unit: percentage
+general: Totila
+id: Totila

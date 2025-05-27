@@ -1,30 +1,34 @@
 use v5.40.0;
 use experimental qw(class);
 use utf8::all;
+use Util::Any -all;
+use List::MoreUtils;
+use File::ShareDir ':ALL';
+use File::Spec;
+use File::HomeDir;
+use File::Path qw(make_path);
+use File::Touch;
+use Log::Log4perl;
+use namespace::autoclean;
 
 class Game::EvonyTKR::Logger {
 # PODNAME: Game::EvonyTKR::Logger
-# ABSTRACT: Set up and manage logging for the distribution
+  use Types::Common qw(  t);
   use Carp;
-  use Class::ISA;
-  use Types::Common qw( t is_Num is_Str is_Int);
-  use Type::Utils "is";
-  use Util::Any -all;
-  use List::MoreUtils;
-  use File::ShareDir ':ALL';
-  use File::Spec;
-  use File::HomeDir;
-  use File::Path qw(make_path);
-  use File::Touch;
-  use Log::Log4perl;
-  use namespace::autoclean;
-# VERSION
+  our $VERSION = 'v0.30.0';
 
   field $category : reader : param = __CLASS__;
 
   field $logger : reader;
 
   field $location : reader;
+
+# from Type::Registry, this will save me from some of the struggles I have had with some types having blessed references and others not.
+  ADJUST {
+    if (!(t->simple_lookup("Str"))) {
+      t->add_types(-Common);
+    }
+  }
 
   ADJUST {
     $self->get_logger();
@@ -52,16 +56,41 @@ class Game::EvonyTKR::Logger {
     return $logFile;
   }
 
+  method toHashRef {
+    return {};
+  }
+
+  method TO_JSON {
+    return $self->toHashRef();
+  }
+
 }
 1;
+
 __END__
+
+# ABSTRACT: Set up and manage logging for the distribution
+
+=pod
+
+=head1 DESCRIPTION
+
+This is intended as an abstract class of sorts from which to inherit uniform methods
+for using logging.
+
+=cut
+
+=head1 METHODS
 
 =method new()
 
-instantiate the class. This will also configure the logging. 
+instantiate the class. This will also configure the logging.
+
 =cut
 
 =method logger()
 
-returns the logger for use in logging messages. 
+returns the logger for use in logging messages.
+
+=cut
 =cut

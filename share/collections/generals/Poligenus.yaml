@@ -1,0 +1,26 @@
+ascending: true
+basic_attributes:
+  attack:
+    base: 121
+    increment: 9.04
+  defense:
+    base: 119
+    increment: 8.73
+  leadership:
+    base: 111
+    increment: 8.97
+  politics:
+    base: 108
+    increment: 8.66
+book: Foresight
+display: summary
+specialities:
+  - Mounted Troop Assault
+  - Strike
+  - War God
+  - Firesworn
+stars: red5
+type:
+  - mounted_specialist
+general: Poligenus
+name: Poligenus

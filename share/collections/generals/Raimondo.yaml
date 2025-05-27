@@ -1,0 +1,28 @@
+ascending: true
+basic_attributes:
+  attack:
+    base: 121
+    increment: 8.95
+  defense:
+    base: 112
+    increment: 9.06
+  leadership:
+    base: 115
+    increment: 8.79
+  politics:
+    base: 106
+    increment: 8.72
+book: The Military Art
+display: summary
+extra:
+  - Odyssey - Raimondo
+specialities:
+  - Siege Machine Formation
+  - Siege
+  - Siege Machine Ares
+  - Battle of Saint Gotthard
+stars: red5
+type:
+  - siege_specialist
+general: Raimondo
+name: Raimondo
