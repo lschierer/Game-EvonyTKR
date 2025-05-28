@@ -1,0 +1,40 @@
+<div class="speciality-details">
+  <% use Scalar::Util qw(reftype); %>
+  <% if( $speciality && reftype($speciality) eq 'OBJECT') { %>
+  <table>
+    <thead>
+      <% foreach my $ln (  qw/Green Blue Purple Orange Gold/ ) { %>
+        <th> <%= $ln %> </th>
+      <% } %>
+
+    </thead>
+    <tbody>
+      <tr>
+        <% foreach my $ln (  qw/Green Blue Purple Orange Gold/ ) { %>
+          <td>
+            <% my $level = $speciality->levels->{lc($ln)}; %>
+            <% foreach my $buff ( @{ $level } ) { %>
+              <dl>
+                <dt>Attribute: </dt><dd><%= $buff->attribute() %></dd>
+                <dt>Targed Types: </dt><dd><%= join(', ', @{ $buff->targetedTypes() } ) %></dd>
+                <% my @conditions = $buff->conditions(); %>
+                <% if (@conditions) { %>
+                    <dt>Conditions:</dt>
+                        <% foreach my $condition (@conditions) { %>
+                            <dd><%= $condition %></dd>
+                        <% } %>
+                <% } %>
+                <dt>Value: </dt><dd><%= $buff->value->number() %><%= $buff->value->unit() eq 'percentage' ? '%' : '' %></dd>
+              </dl>
+            <% } %>
+          </td>
+        <% } %>
+      </tr>
+
+    </tbody>
+  </table>
+  <% } else { %>
+    <span>Speciality Not Available</span>
+    <span><%= ref($speciality) %></span>
+  <% } %>
+</div>

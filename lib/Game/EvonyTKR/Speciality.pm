@@ -1,6 +1,7 @@
 use v5.40.0;
 use experimental qw(class);
 use File::FindLib 'lib';
+require JSON::PP;
 
 class Game::EvonyTKR::Speciality : isa(Game::EvonyTKR::Logger) {
   use builtin         qw(indexed);
@@ -8,22 +9,19 @@ class Game::EvonyTKR::Speciality : isa(Game::EvonyTKR::Logger) {
   use Types::Common   qw( t);
   use Type::Utils     qw(is enum);
   use Carp;
-  use Data::Dumper;
-  use Data::Printer;
-  use File::ShareDir ':ALL';
-  use File::Spec;
-  use Game::EvonyTKR::Buff;
-  use Game::EvonyTKR::Buff::Value;
-  use Game::EvonyTKR::Data;
+  require Data::Printer;
+  require Game::EvonyTKR::Buff;
+  require Game::EvonyTKR::Data;
   use List::MoreUtils;
+  require Path::Tiny;
   use Util::Any -all;
-  use YAML::XS qw{LoadFile Load};
+  require YAML::PP;
   use namespace::autoclean;
 # PODNAME: Game::EvonyTKR::Speciality
 # VERSION
   use Game::EvonyTKR::Logger;
   use overload
-    '""'       => \&_toString,
+    '""'       => \&TO_JSON,
     "fallback" => 1;
 
 # from Type::Registry, this will save me from some of the struggles I have had with some types having blessed references and others not.
@@ -45,33 +43,33 @@ class Game::EvonyTKR::Speciality : isa(Game::EvonyTKR::Logger) {
     }
   }
 
-  field %Buffs : reader;
-  field $levels : reader = $EvonyData->specialityLevels();
+  field $levels : reader;
+  field $level_names : reader = $EvonyData->specialityLevels();
 
   field $activeLevel : reader : param //= 'None';
 
   ADJUST {
-    my @lv = @{ $levels->values() };
+    my @lv = @{ $level_names->values() };
     for my $tl (@lv) {
-      $Buffs{$tl} = ();
+      $levels->{$tl} = ();
     }
     my @errors;
-    my $t            = $levels->compiled_check();
-    my $prettyLevels = np @{ $levels->values() };
+    my $t            = $level_names->compiled_check();
+    my $prettyLevels = Data::Printer::np @{ $level_names->values() };
     $t->($activeLevel)
       or push @errors =>
       "activeLevel must be one of $prettyLevels, not $activeLevel";
   }
 
   method setActiveLevel ($newLevel) {
-    my $t = $levels->compiled_check();
+    my $t = $level_names->compiled_check();
     if ($t->($newLevel)) {
       $activeLevel = $newLevel;
     }
     else {
       $self->logger()->warn(sprintf(
         '%s is not a valid level, options are %s',
-        $newLevel, Data::Printer::np $levels->values()
+        $newLevel, Data::Printer::np $level_names->values()
       ));
     }
   }
@@ -80,15 +78,15 @@ class Game::EvonyTKR::Speciality : isa(Game::EvonyTKR::Logger) {
     if (blessed $nb ne 'Game::EvonyTKR::Buff') {
       return 0;
     }
-    my $tcheck = $levels->compiled_check();
+    my $tcheck = $level_names->compiled_check();
     if (none { $tcheck->($_) } ($level)) {
       return 0;
     }
 
-    my @levelValues = @{ $levels->values() };
+    my @levelValues = @{ $level_names->values() };
     for my $tl (@levelValues) {
       if ($level eq 'None') {
-        # Level None never has any buffs, this was a mistake.
+        # Level None never has any levels, this was a mistake.
         last;
       }
       if ($tl eq 'None') {
@@ -97,12 +95,12 @@ class Game::EvonyTKR::Speciality : isa(Game::EvonyTKR::Logger) {
       if ($tl eq $level) {
         if ($inherited) {
           my $copy;
-          if ($nb->has_buffClass()) {
+          if ($nb->has_targetedType()) {
             $copy = Game::EvonyTKR::Buff->new(
-              attribute => $nb->attribute(),
-              value     => $nb->value(),
-              buffClass => $nb->buffClass(),
-              inherited => 1,
+              attribute     => $nb->attribute,
+              value         => $nb->value,
+              targetedTypes => $nb->targetedTypes,
+              inherited     => 1,
             );
           }
           else {
@@ -118,13 +116,15 @@ class Game::EvonyTKR::Speciality : isa(Game::EvonyTKR::Logger) {
             }
           }
           $self->logger()
-            ->trace("Adding inherited buff at level $tl" . np $copy);
-          push @{ $Buffs{$tl} }, $copy;
+            ->trace(
+            "Adding inherited buff at level $tl" . Data::Printer::np $copy);
+          push @{ $levels->{$tl} }, $copy;
         }
         else {
           $self->logger()
-            ->trace("Adding uninherited buff at level $tl" . np $nb);
-          push @{ $Buffs{$tl} }, $nb;
+            ->trace(
+            "Adding uninherited buff at level $tl" . Data::Printer::np $nb);
+          push @{ $levels->{$tl} }, $nb;
         }
         if ($tl eq 'Green') {
           $self->add_buff('Blue', $nb, 1);
@@ -145,29 +145,29 @@ class Game::EvonyTKR::Speciality : isa(Game::EvonyTKR::Logger) {
   }
 
   method getEvAnsScore($name, $resultRef, $BuffMultipliers, $GeneralBias) {
-    my @ab = @{ $Buffs{$activeLevel} };
+    my @ab = @{ $levels->{$activeLevel} };
     my $bc = scalar @ab;
     $self->logger()
-      ->debug("getEvAnsScore for $name found $bc buffs at $activeLevel");
+      ->debug("getEvAnsScore for $name found $bc levels at $activeLevel");
     if ($bc > 0) {
       for my ($i, $thisBuff) (indexed(@ab)) {
         my $result =
           $thisBuff->getEvAnsScore($name, $BuffMultipliers, $GeneralBias,);
         $self->logger()
           ->debug(
-          "getEvAnsScore for $name recieved $result from getEvAnsScore for buff $i"
+"getEvAnsScore for $name recieved $result from getEvAnsScore for buff $i"
           );
         my $category = $BuffMultipliers->EvAnsCategory($thisBuff);
         if (not defined $category) {
           $self->logger()
             ->warn("getEvAnsScore for $name found no category returned for "
-              . np $thisBuff);
+              . Data::Printer::np $thisBuff);
           $category = 'Unused';
         }
         else {
           $self->logger()
             ->debug("getEvAnsScore for $name found category $category for "
-              . np $thisBuff);
+              . Data::Printer::np $thisBuff);
         }
         $resultRef->{'SPS'}->{$category} += $result;
         $self->logger()
@@ -183,68 +183,36 @@ class Game::EvonyTKR::Speciality : isa(Game::EvonyTKR::Logger) {
     }
   }
 
-  method toHashRef($verbose = 0) {
-    $self->logger()
-      ->trace("Starting toHashRef for Speciality, verbose is $verbose");
-    my $returnRef = {
-      name        => $self->name(),
-      activeLevel => $self->activeLevel(),
+  method toHashRef {
+    return {
+      id     => $name,
+      name   => $name,
+      levels => $levels,
     };
-    my @values = @{ $levels->values() };
-    if ($verbose) {
-      # I initially thought to test for duplicate buffs.  This fails because
-      # Generals (see Dmitry) can *have* duplicate buffs.  Instead I created
-      # the inherited field for Buffs.
-      for my $key (sort keys %Buffs) {
-        $self->logger()->trace("processing $key");
-        for my $thisBuff (@{ $Buffs{$key} }) {
-          if (not $thisBuff->inherited()) {
-            $self->logger()
-              ->trace("found unique buff for $key " . np $thisBuff);
-            push @{ $returnRef->{$key} }, $thisBuff->toHashRef();
-          }
-          else {
-            if ($thisBuff->inherited()) {
-              $self->logger()
-                ->trace("found inherited buff at $key " . np $thisBuff);
-            }
-          }
-        }
-      }
-    }
-    else {
-      $self->logger()->debug("activeLevel is $activeLevel");
-      $self->logger()->debug(
-        exists $Buffs{$activeLevel}
-        ? "'$activeLevel' is a valid key"
-        : "'$activeLevel' is not a valid key"
-      );
-      for my $thisBuff (@{ $Buffs{$activeLevel} }) {
-        push @{ $returnRef->{$activeLevel} }, $thisBuff->toHashRef();
-      }
-    }
-    return $returnRef;
   }
 
-  method _toString {
-    my $json = JSON::MaybeXS->new(utf8 => 1);
-    return $json->encode($self->toHashRef());
+  method TO_JSON {
+    return $self->toHashRef();
   }
 
-  method readFromFile() {
+  field $ypp = YAML::PP->new(
+    schema       => [qw/ + Perl /],
+    yaml_version => ['1.2', '1.1'],
+  );
+
+  method readFromFile($dist_dir = '') {
     my $SpecialityFileName = $name . '.yaml';
     $self->logger()->debug("about to get $SpecialityFileName");
     my $SpecialityShare =
-      File::Spec->catfile(dist_dir('Game-EvonyTKR'), 'specialities');
-    my $FileWithPath =
-      File::Spec->catfile($SpecialityShare, $SpecialityFileName);
-    if (-T -s -r $FileWithPath) {
+      Path::Tiny::path($dist_dir)->child("collections/specialities");
+    my $FileWithPath = $SpecialityShare->child($SpecialityFileName);
+    if ($FileWithPath->is_file()) {
       $self->logger()->debug("$SpecialityFileName exists as expected");
-      my $data       = LoadFile($FileWithPath);
+      my $data       = $ypp->load_file($FileWithPath);
       my @fileLevels = @{ $data->{'levels'} };
       foreach my $fl (@fileLevels) {
-        my @flBuffs = @{ $fl->{'buff'} };
-        foreach my $flb (@flBuffs) {
+        my @fllevels = @{ $fl->{'buff'} };
+        foreach my $flb (@fllevels) {
           my $v;
           my $b;
           my @flKeys = keys %{$flb};
@@ -263,10 +231,17 @@ class Game::EvonyTKR::Speciality : isa(Game::EvonyTKR::Logger) {
             );
             if (any { $_ eq 'class' } @flKeys) {
 
+              my @targetedTypes = ();
+              if (ref $flb->{'class'} eq 'ARRAY') {
+                @targetedTypes = $flb->{'class'};
+              }
+              else {
+                push @targetedTypes, $flb->{'class'};
+              }
               $b = Game::EvonyTKR::Buff->new(
-                attribute => $flb->{'attribute'},
-                value     => $v,
-                buffClass => $flb->{'class'},
+                attribute     => $flb->{'attribute'},
+                value         => $v,
+                targetedTypes => \@targetedTypes,
               );
             }
             else {
@@ -284,6 +259,7 @@ class Game::EvonyTKR::Speciality : isa(Game::EvonyTKR::Logger) {
             if (any { $_ eq 'condition' } @flKeys) {
               my @conditions = @{ $flb->{'condition'} };
               foreach my $flc (@conditions) {
+                $self->logger()->trace("adding condition $flc");
                 $b->set_condition($flc);
               }
             }
@@ -291,7 +267,8 @@ class Game::EvonyTKR::Speciality : isa(Game::EvonyTKR::Logger) {
             $self->logger()
               ->info(
               "Adding buff from $SpecialityFileName to " . $fl->{'level'});
-            $self->add_buff($fl->{'level'}, $b);
+            $self->add_buff(lc($fl->{'level'}), $b);
+            $self->logger()->info("levels now " . Data::Printer::np($levels));
           }
           else {
             $self->logger()->warn('No buff defined');
@@ -299,6 +276,10 @@ class Game::EvonyTKR::Speciality : isa(Game::EvonyTKR::Logger) {
         }
 
       }
+    }
+    else {
+      $self->logger()
+        ->warn("failed to find $SpecialityFileName at $FileWithPath");
     }
 
   }
@@ -312,26 +293,26 @@ __END__
 
 =head1 DESCRIPTION
 
-Specialities are one of several ways that a General can provide Buffs for Troops.
+Specialities are one of several ways that a General can provide levels for Troops.
 
 Unlike SkillBooks, all Specialities are essentially with one slight exception to do two slight exceptions:
 
 =for :List
 
-* The 4th standard Speciality can only be activated if the first 3 standard Specialities are at Gold level.  When they do reach Gold level, this 4th Speciality automatically gets Green level. 
+* The 4th standard Speciality can only be activated if the first 3 standard Specialities are at Gold level.  When they do reach Gold level, this 4th Speciality automatically gets Green level.
 
-* Flex Specialities can only be added once a General has 4 active Specialities.  Flex specialities grow in distictingly different ways, and unlike other Specialities can be added and removed from a General in an almost SkillBook like way, but when present, are otherwise exactly like any other Speciality in how the Buffs are applied and when the Buffs are used.   Flex Specialities I<do> in fact need a sub class. 
+* Flex Specialities can only be added once a General has 4 active Specialities.  Flex specialities grow in distictingly different ways, and unlike other Specialities can be added and removed from a General in an almost SkillBook like way, but when present, are otherwise exactly like any other Speciality in how the levels are applied and when the levels are used.   Flex Specialities I<do> in fact need a sub class.
 
 =cut
 
 =method name()
 
-returns the name field from the Speciality. 
+returns the name field from the Speciality.
 =cut
 
 =method activeLevel
 
-returns the level, 'Green', 'Blue', 'Purple', 'Orange', or 'Gold', that is active at this time. 
+returns the level, 'Green', 'Blue', 'Purple', 'Orange', or 'Gold', that is active at this time.
 =cut
 
 =method setActiveLevel($newLevel)
@@ -341,17 +322,16 @@ sets the activeLevel to newLevel presuming it is a valid value (one of 'Green', 
 
 =method add_buff($level, $nb)
 
-This method takes a Game::EvonyTKR::Buff as its sole parameter and adds it as one of the buffs this Speciality at the specified $level.  $level must be one of 'Green', 'Blue', 'Purple', 'Orange', or 'Gold' or the function will fail to add the buff.  
+This method takes a Game::EvonyTKR::Buff as its sole parameter and adds it as one of the levels this Speciality at the specified $level.  $level must be one of 'Green', 'Blue', 'Purple', 'Orange', or 'Gold' or the function will fail to add the buff.
 
-It is because Flex specialities require greater granularity that they require a subclass. 
+It is because Flex specialities require greater granularity that they require a subclass.
 
-NOTE:  Because Specialities frequently have the same Buff at multiple levels, this method cannot protect against being called twice for the same Buff at this time.  It is up to the caller to use with care. 
+NOTE:  Because Specialities frequently have the same Buff at multiple levels, this method cannot protect against being called twice for the same Buff at this time.  It is up to the caller to use with care.
 =cut
 
-=method Buffs()
+=method levels()
 
-Returns a hash with the levels 'Green', 'Blue', 'Purple', 'Orange', or 'Gold' as the keys and an array with the buffs at that level as the values. 
+Returns a hash with the levels 'Green', 'Blue', 'Purple', 'Orange', or 'Gold' as the keys and an array with the levels at that level as the values.
 
-Each level is cumulative, you never need to read more than the array for the currently active level. 
+Each level is cumulative, you never need to read more than the array for the currently active level.
 =cut
-

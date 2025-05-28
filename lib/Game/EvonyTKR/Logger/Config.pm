@@ -28,12 +28,15 @@ package Game::EvonyTKR::Logger::Config {
     bless $self, $class;
   }
 
-  sub path($self, $m = 'production') {
+  sub path(
+    $self,
+    $m = 'production',
+    $dd = File::ShareDir::dist_dir('Game-EvonyTKR')
+  ) {
     my $confFile;
     if ($m ne $self->{mode}) {
       $self->{mode} = $m;
     }
-    my $dd = File::ShareDir::dist_dir('Game-EvonyTKR');
     if ($self->{mode} eq 'production') {
       $confFile = File::Spec->catfile($dd, 'log4perl.conf');
 

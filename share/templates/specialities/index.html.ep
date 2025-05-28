@@ -1,0 +1,10 @@
+<div class="specialities">
+  <% if ($specialities && ref($specialities) eq 'HASH' && %$specialities) { %>
+    <dl>
+      <% foreach my $key (sort(keys %$specialities)) { %>
+        <dt><%= $key %></dt>
+        <dd><a href="/Specialities/details/<%= $key %>">details for this specialitiy</a></dd>
+      <% } %>
+    </dl>
+  <% } %>
+</div>

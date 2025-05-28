@@ -4,13 +4,15 @@ use utf8::all;
 use File::FindLib 'lib';
 require Data::Printer;
 
-class Game::EvonyTKR::Model::Buff::Value : isa(Game::EvonyTKR::Data) {
+class Game::EvonyTKR::Buff::Value : isa(Game::EvonyTKR::Data) {
 # PODNAME: Game::EvonyTKR::Model::Buff::Value
   use namespace::autoclean;
+  use Types::Common qw( t );
   use Carp;
   use File::FindLib 'lib';
   use overload
-    '""' => \&to_String;
+    '""'       => \&TO_JSON,
+    'fallback' => 0;
 
   field $number : reader : param //= 0;
 
@@ -37,11 +39,15 @@ class Game::EvonyTKR::Model::Buff::Value : isa(Game::EvonyTKR::Data) {
     $self->validate();
   }
 
-  method to_String {
+  method toHashRef {
     return {
       number => $number,
       unit   => $unit,
     };
+  }
+
+  method TO_JSON {
+    return $self->toHashRef();
   }
 
 }

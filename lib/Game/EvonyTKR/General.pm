@@ -15,7 +15,8 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Data) {
   use Carp;
   use File::FindLib 'lib';
   use overload
-    '""' => \&TO_JSON;
+    '""'       => \&TO_JSON,
+    "fallback" => 1;
 
   our $VERSION = 'v0.30.0';
   my $debug = 1;

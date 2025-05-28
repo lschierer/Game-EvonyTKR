@@ -12,18 +12,17 @@ class Game::EvonyTKR::Book::Builtin : isa(Game::EvonyTKR::Book) {
   use Carp;
   use File::FindLib 'lib';
   use overload
-    '""'        => \&TO_JSON,
-    'fallback'  => 0;
+    '""'       => \&TO_JSON,
+    'fallback' => 0;
 
   our $VERSION = 'v0.30.0';
   my $debug = 1;
 
-
   method toHashRef {
     return {
-      name            => $name,
-      text            => $text,
-      buff            => $buff,
+      name => $name,
+      text => $text,
+      buff => $buff,
     };
   }
 

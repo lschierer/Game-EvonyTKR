@@ -1,3 +1,4 @@
 [tools]
 just = "latest"
 perl = "latest"
+pnpm = "10"

@@ -1,0 +1,90 @@
+<div class="general">
+  <h2 >Details for <%= title %></h2>
+  <div class="basicInfo">
+    <div class="baseStats">
+      <h3 >
+        Base Stats
+      </h3>
+      <ul class="baseStats">
+        <li>
+          <span >Leadership:</span>
+          <ul>
+            <li>
+              <span >Base: </span>
+              <span class=" leadership-base"><%= $leadershipBase %></span>
+            </li>
+            <li>
+              <span >Increment: </span>
+              <span class=" leadership-increment"><%= $leadershipIncrement %></span>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <span >Attack:</span>
+          <ul>
+            <li>
+              <span >Base: </span>
+              <span class="attack-base"><%= $attackBase %></span>
+            </li>
+            <li>
+              <span >Increment: </span>
+              <span class="attack-increment"><%= $attackIncrement  %></span>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <span class="">Defense:</span>
+          <ul>
+            <li>
+              <span >Base: </span>
+              <span class="defense-base"><%= $defenseBase %></span>
+            </li>
+            <li>
+              <span >Increment: </span>
+              <span class="defense-increment"><%= $defenseIncrement  %></span>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <span class="">Politics:</span>
+          <ul>
+            <li>
+              <span >Base: </span>
+              <span class="politics-base"><%= $politicsBase %></span>
+            </li>
+            <li>
+              <span >Increment: </span>
+              <span class="politics-increment"><%= $politicsIncrement  %></span>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+    <div class="ExtraBaseInfo">
+      <h3 class="">
+        Basic Information
+      </h3>
+      <ul class="baseInfo">
+        <li>
+          <span class="">Type: </span>
+          <% if ($typeValue && ref($typeValue) eq 'ARRAY' && @$typeValue) { %>
+            <ul>
+              <% foreach my $item (@$typeValue) { %>
+                <li><%= $item %></li>
+              <% } %>
+            </ul>
+          <% } else { %>
+            <span class="type-value">No type available</span>
+          <% } %>
+          <span class="type-value"></span>
+        </li>
+        <li>
+          <span class="">Ascendable: </span>
+          <span class="ascending-value"><%= $ascendingValue ? "True" : "False" %></span>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="specialSkill"></div>
+  <div class="specialities"></div>
+</div>

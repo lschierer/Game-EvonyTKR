@@ -12,8 +12,8 @@ class Game::EvonyTKR::Book : isa(Game::EvonyTKR::Data) {
   use Carp;
   use File::FindLib 'lib';
   use overload
-    '""'        => \&TO_JSON,
-    'fallback'  => 0;
+    '""'       => \&TO_JSON,
+    'fallback' => 0;
 
   our $VERSION = 'v0.30.0';
   my $debug = 1;
@@ -32,9 +32,7 @@ class Game::EvonyTKR::Book : isa(Game::EvonyTKR::Data) {
         my @bcl = split(/::/, $bc);
         if (not($bcl[1] eq 'EvonyTKR' and $bcl[2] eq 'Buff')) {
           push @errors,
-            sprintf(
-            '$buff must contain type Game::EvonyTKR::Buff not %s',
-            $bc);
+            sprintf('$buff must contain type Game::EvonyTKR::Buff not %s', $bc);
         }
       }
     }
@@ -53,13 +51,13 @@ class Game::EvonyTKR::Book : isa(Game::EvonyTKR::Data) {
   }
 
   method addBuff ($newBuff) {
-    if(Scalar::Util::reftype($newBuff) eq 'OBJECT') {
-      my $classList = blessed $newBuff;
+    if (Scalar::Util::reftype($newBuff) eq 'OBJECT') {
+      my $classList  = blessed $newBuff;
       my @classStack = split(/::/, $newBuff);
-      if($classStack >= 3) {
-        if($classStack[2] eq 'Buff') {
+      if ($classStack >= 3) {
+        if ($classStack[2] eq 'Buff') {
           $self->logger->info("adding $newBuff to $name");
-          push @{ $buff }, $newBuff;
+          push @{$buff}, $newBuff;
         }
       }
     }
@@ -67,9 +65,9 @@ class Game::EvonyTKR::Book : isa(Game::EvonyTKR::Data) {
 
   method toHashRef {
     return {
-      name            => $name,
-      text            => $text,
-      buff            => $buff,
+      name => $name,
+      text => $text,
+      buff => $buff,
     };
   }
 

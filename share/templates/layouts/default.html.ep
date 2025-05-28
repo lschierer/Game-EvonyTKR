@@ -1,5 +1,34 @@
 <!DOCTYPE html>
-<html>
-  <head><title><%= title %></title></head>
-  <body><%= content %></body>
+<html lang="en" class="light-theme light">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+
+    <link rel="stylesheet" href="/css/global.css" />
+    % if (stash('yaml_data') && exists stash('yaml_data')->{css}) {
+      % foreach my $css_file (@{stash('yaml_data')->{css}}) {
+        <link rel="stylesheet" href="<%= $css_file %>">
+      % }
+    % }
+  </head>
+  <body class="light-theme light">
+    <header>
+
+    </header>
+
+    <main >
+      <%== content %>
+    </main>
+
+    <footer>
+      <p>&copy; <%= (localtime)[5] + 1900 %> Luke Schierer</p>
+    </footer>
+
+    % if (stash('yaml_data') && exists stash('yaml_data')->{js}) {
+      % foreach my $js_file (@{stash('yaml_data')->{js}}) {
+        <script src="<%= $js_file %>"></script>
+      % }
+    % }
+  </body>
 </html>

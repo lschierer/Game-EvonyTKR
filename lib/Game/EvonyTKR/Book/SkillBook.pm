@@ -12,8 +12,8 @@ class Game::EvonyTKR::Book::SkillBook : isa(Game::EvonyTKR::Book) {
   use Carp;
   use File::FindLib 'lib';
   use overload
-    '""'        => \&TO_JSON,
-    'fallback'  => 0;
+    '""'       => \&TO_JSON,
+    'fallback' => 0;
 
   our $VERSION = 'v0.30.0';
   my $debug = 1;
@@ -23,7 +23,8 @@ class Game::EvonyTKR::Book::SkillBook : isa(Game::EvonyTKR::Book) {
   ADJUST {
     # Validate level is between 1 and 5
     if ($level < 1 || $level > 5) {
-      $self->logger()->logcroak("SkillBook level must be between 1 and 5, got $level");
+      $self->logger()
+        ->logcroak("SkillBook level must be between 1 and 5, got $level");
     }
   }
 

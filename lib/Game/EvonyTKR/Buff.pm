@@ -9,10 +9,13 @@ class Game::EvonyTKR::Buff : isa(Game::EvonyTKR::Data) {
 # PODNAME: Game::EvonyTKR::Buff
   use List::AllUtils qw( any none );
   use namespace::autoclean;
+  use Types::Common qw( t );
   use Carp;
   use File::FindLib 'lib';
   use overload
-    '""' => \&to_String;
+    '""'       => \&TO_JSON,
+    '.'        => \&concat,
+    'fallback' => 0;
 
   our $VERSION = 'v0.30.0';
   my $debug = 1;
@@ -25,37 +28,119 @@ class Game::EvonyTKR::Buff : isa(Game::EvonyTKR::Data) {
 
   field $buffConditions : reader : param //= [];
 
-  field $targetedTypes : reader : param // = [];
+  field $targetedTypes : reader : param //= [];
 
   method conditions() {
-    return (@{ $self->debuffConditions() }, @{ $self->buffConditions() });
+    my @result;
+
+    # Check if debuffConditions exists and is an array reference
+    if (defined $self->debuffConditions()
+      && ref($self->debuffConditions()) eq 'ARRAY') {
+      push @result, @{ $self->debuffConditions() };
+    }
+
+    # Check if buffConditions exists and is an array reference
+    if (defined $self->buffConditions()
+      && ref($self->buffConditions()) eq 'ARRAY') {
+      push @result, @{ $self->buffConditions() };
+    }
+
+    return @result;
   }
 
   field $passive : reader : param //= 0;
 
+  method set_condition ($condition) {
+    my $logger = $self->logger();
+    my $re     = $self->buffConditionValues->as_regexp();
+
+    # Check if the condition is a valid buff condition
+    if ($condition =~ /$re/) {
+      # Initialize the array if it doesn't exist
+      $buffConditions //= [];
+
+      # Add the condition if it's not already there
+      unless (grep { $_ eq $condition } @$buffConditions) {
+        push @$buffConditions, $condition;
+      }
+
+      $logger->debug("Added buff condition: $condition");
+      return 1;
+    }
+
+    $re = $self->debuffConditionValues->as_regexp();
+
+    # Check if the condition is a valid debuff condition
+    if ($condition =~ /$re/) {
+      # Initialize the array if it doesn't exist
+      $debuffConditions //= [];
+
+      # Add the condition if it's not already there
+      unless (grep { $_ eq $condition } @$debuffConditions) {
+        push @$debuffConditions, $condition;
+      }
+
+      $logger->debug("Added debuff condition: $condition");
+      return 1;
+    }
+
+    # If we get here, the condition wasn't valid
+    $logger->error(
+      "Invalid condition: '$condition'. Must be one of: "
+        . join(", ",
+        $self->buffConditionValues()->values(),
+        $self->debuffConditionValues()->values())
+    );
+    return 0;
+
+  }
+
   method validate() {
     my @errors;
-    my $re      = $self->buffConditionValues()->as_regexp();
-    my @invalid = grep !/$re/i, $self->buffConditions();
-    if ($invalid) {
-      foreach $iv (@invalid) {
+    my $re = $self->buffConditionValues()->as_regexp;
+    $self->logger->trace("re for buffConditionValues is $re");
+    my @tbc = @{$buffConditions};
+    my @invalid;
+
+    # Check if we got an array reference instead of a flat array
+    if (@tbc == 1 && ref($tbc[0]) eq 'ARRAY') {
+      $self->logger->error("needed to flatten buffConditions"
+          . Data::Printer::np($buffConditions));
+      @tbc = @{ $tbc[0] };    # Flatten it
+    }
+
+    @invalid = grep !/$re/, @tbc;
+
+    # Report errors for invalid conditions
+    if (@invalid) {
+      foreach my $iv (@invalid) {
         push @errors,
           sprintf(
-'Detected illegal value "%s" in buffConditions.  All values must be one of "%s"',
-          $iv, Data::Printer::np($self->buffConditionValues()->values()));
-
+'Detected illegal value "%s" in buffConditions. All values must be one of: %s',
+          $iv, join(', ', $self->buffConditionValues->values()));
       }
     }
 
-    $re = $self->debuffConditionValues()->as_regexp();
-    @invalid = grep !/$re/i, $self->debuffConditions();
-    if ($invalid) {
-      foreach $iv (@invalid) {
+    $re = $self->debuffConditionValues()->as_regexp;
+    $self->logger->trace("re for debuffConditionValues is $re");
+
+    my @tdc = @{$debuffConditions};
+
+    # Check if we got an array reference instead of a flat array
+    if (@tdc == 1 && ref($tdc[0]) eq 'ARRAY') {
+      @tdc = @{ $tdc[0] };    # Flatten it
+      $self->logger->error("needed to flatten debuffConditions");
+    }
+
+    @invalid = grep !/$re/, @tdc;
+
+    # Report errors for invalid conditions
+    if (@invalid) {
+      foreach my $iv (@invalid) {
         push @errors,
           sprintf(
-'Detected illegal value "%s" in debuffConditions.  All values must be one of "%s"',
-          $iv, Data::Printer::np($self->debuffConditionValues()->values()));
-
+'Detected illegal value "%s" in debuffConditions. All values must be one of: %s',
+          $iv, join(', ', $self->debuffConditionValues()->values()));
       }
     }
 
@@ -75,22 +160,49 @@ class Game::EvonyTKR::Buff : isa(Game::EvonyTKR::Data) {
     $self->validate();
   }
 
-  TO_JSON() {
+  method has_targetedType() {
+    if (ref $targetedTypes eq 'ARRAY') {
+      return scalar @{$targetedTypes};
+    }
+    else {
+      return length($targetedTypes);
+    }
+  }
+
+  method toHashRef() {
+    my $c;
+    my $conditionCount = scalar $self->conditions();
+    $self->logger()->info("in toHashRef, I have $conditionCount conditions");
+    if($conditionCount ){
+      $c = $self->conditions();
+    } else {
+      $c = [];
+    }
     return {
-      attribute => $self->attribute(),
+      attribute => $attribute,
       value     => {
-        number => $self->value()->number(),
-        unit   => $self->value()->unit(),
+        number => $value->number(),
+        unit   => $value->unit(),
       },
-      passive       => $self->passive(),
-      targetedTypes => $self->targetedTypes(),
-      conditions    => $self->conditions(),
+      passive       => $passive,
+      targetedTypes => scalar @{$targetedTypes} > 0 ? $targetedTypes : [],
+      conditions    => $c,
     };
   }
 
-  method to_String() {
-    $self->TO_JSON();
+  method TO_JSON() {
+    return $self->toHashRef();
   }
+
+  method concat($other, $swap) {
+    if ($swap) {
+      return $other . $self->TO_JSON();
+    }
+    else {
+      return $self->TO_JSON() . $other;
+    }
+  }
+
 }
 1;
 

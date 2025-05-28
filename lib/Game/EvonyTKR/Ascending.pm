@@ -176,7 +176,7 @@ class Game::EvonyTKR::Ascending : isa(Game::EvonyTKR::Logger) {
           $thisBuff->getEvAnsScore($name, $BuffMultipliers, $GeneralBias,);
         $self->logger()
           ->debug(
-          "getEvAnsScore for $name recieved $result from getEvAnsScore for buff $i"
+"getEvAnsScore for $name recieved $result from getEvAnsScore for buff $i"
           );
         my $category = $BuffMultipliers->EvAnsCategory($thisBuff);
         if (not defined $category) {

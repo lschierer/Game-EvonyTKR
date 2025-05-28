@@ -4,10 +4,8 @@ use utf8::all;
 use Util::Any -all;
 use List::MoreUtils;
 use File::ShareDir ':ALL';
-use File::Spec;
 use File::HomeDir;
-use File::Path qw(make_path);
-use File::Touch;
+require Path::Tiny;
 use Log::Log4perl;
 use namespace::autoclean;
 
@@ -43,15 +41,17 @@ class Game::EvonyTKR::Logger {
   }
 
   method getLogfileName($name = 'system.log') {
-    my $home   = File::HomeDir->my_home;
-    my $logDir = File::Spec->catdir($home, 'var/log/Perl/dist/Game-Evony/');
+    my $home = File::HomeDir->my_home;
+    my $logDir =
+      Path::Tiny::path($home)->child('var/log/Perl/dist/Game-Evony/');
     if (!-r -w -x -o -d $logDir) {
-      make_path($logDir, "0770");
+      $logDir = Path::Tiny::path($logDir);
+      $logDir->mkdir({ mode => 0770 });
     }
-    my $logFile = File::Spec->catfile($logDir, $name);
-    if (!-e $logFile) {
-      touch($logFile);
-      chmod(0600, $logFile);
+    my $logFile = $logDir->child($name);
+    if (!$logFile->is_file()) {
+      $logFile->touch();
+      $logFile->chmod(0600);
     }
     return $logFile;
   }

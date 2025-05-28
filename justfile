@@ -7,4 +7,4 @@ build:
   ./Build
 
 dev:
-  morbo ./scripts/game-evonytkr
+  morbo --watch ./share --watch ./lib ./scripts/game-evonytkr
