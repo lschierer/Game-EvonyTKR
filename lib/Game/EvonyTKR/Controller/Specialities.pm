@@ -24,8 +24,27 @@ package Game::EvonyTKR::Controller::Specialities {
 
   my $specialities = {};
 
+  sub show($self, $c) {
+    my $logger = Log::Log4perl->get_logger(__PACKAGE__);
+
+    my $name = $c->param('name');
+
+    return $c->reply->not_found unless $self->preShow($c, $name);
+
+    if ($c->stash('no_layout')) {
+      return $c->render(template => 'specialities/details', layout => undef);
+    }
+    else {
+      return $c->render(
+        template => 'specialities/details',
+        layout   => 'default'
+      );
+    }
+
+  }
+
   # Show details for a specific general
-  sub show($self) {
+  sub preShow($self, $c, $name) {
     my $logger = Log::Log4perl->get_logger(__PACKAGE__);
 
     if (not defined $specialities or not scalar keys %$specialities) {
@@ -39,35 +58,27 @@ package Game::EvonyTKR::Controller::Specialities {
         "show_speciality has $specialityCount specialities available");
     }
 
-    my $name = $self->param('name');
-    # Here you would fetch data for the specific item
-    # and pass it to the template
+    my $speciality;
     if (exists $specialities->{$name}) {
-      $self->stash(speciality_name => $name);
-    }
-    else {
-      return $self->reply->not_found;
-    }
-    my $speciality = $specialities->{$name};
-    $logger->trace("speciality " . $speciality->name . "found in specialities");
+      $speciality = $specialities->{$name};
 
-    $logger->trace($speciality->name
-        . "has levels "
-        . Data::Printer::np($speciality->levels));
-    $self->stash(
-      title      => $speciality->name(),
-      speciality => $speciality,
-    );
-    if ($self->stash('no_layout')) {
-      return $self->render(template => 'specialities/details', layout => undef);
-    }
-    else {
-      return $self->render(
-        template => 'specialities/details',
-        layout   => 'default'
+      $logger->trace(
+        "speciality " . $speciality->name . "found in specialities");
+
+      $c->stash(
+        name            => $name,
+        speciality      => $speciality,
+        title           => $name,
+        speciality_name => $name,
       );
-    }
 
+    }
+    else {
+      $logger->error(
+        "Cannot find speciality $name in specialities even after laoding");
+      return 0;    # the speciality does not exist.
+    }
+    return 1;
   }
 
   sub index($self) {

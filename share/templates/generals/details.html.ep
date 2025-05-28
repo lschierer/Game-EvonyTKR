@@ -1,3 +1,4 @@
+<% use Scalar::Util qw(reftype); %>
 <div class="general">
   <h2 >Details for <%= title %></h2>
   <div class="basicInfo">
@@ -85,6 +86,13 @@
       </ul>
     </div>
   </div>
-  <div class="specialSkill"></div>
-  <div class="specialities"></div>
+  <div class="specialskill"></div>
+  <div class="specialities">
+    <% if( $general && reftype $general eq 'OBJECT' && $general->can('specialityNames')) { %>
+      <% foreach my $specialityName ( @{ $general->specialityNames } ) { %>
+        <%= get_speciality_details($specialityName) %>
+      <% } %>
+
+    <% } %>
+  </div>
 </div>

@@ -173,9 +173,10 @@ class Game::EvonyTKR::Buff : isa(Game::EvonyTKR::Data) {
     my $c;
     my $conditionCount = scalar $self->conditions();
     $self->logger()->info("in toHashRef, I have $conditionCount conditions");
-    if($conditionCount ){
+    if ($conditionCount) {
       $c = $self->conditions();
-    } else {
+    }
+    else {
       $c = [];
     }
     return {

@@ -52,6 +52,7 @@ package Game::EvonyTKR::Controller::Generals {
       politicsIncrement   => $general->basicAttributes->leadership->increment(),
       typeValue           => $general->type(),
       ascendingValue      => $general->ascending(),
+      general             => $general,
     );
 
     $self->render(template => 'generals/details', layout => 'default');
