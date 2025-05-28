@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
- step1=$(find lib/ script/ -type f -exec egrep -h '^\s*(use|require)' {} \;) || exit 1
+ step1=$(find lib/ scripts/ -type f -exec egrep -h '^\s*(use|require)' {} \;) || exit 1
 
  step2=$(echo "$step1" | sed 's/^[ \t]*//' | cut -d ' ' -f 2 | cut -d ';' -f 1) || exit 2
 
