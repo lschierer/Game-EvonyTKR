@@ -1,3 +1,4 @@
 [tools]
+jq = "latest"
 pnpm = "10"
 yq = "latest"
