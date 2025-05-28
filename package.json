@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Warning: no test specified\" && exit 0",
     "prepare": "husky",
-    "build": "./bin/generate_json.sh && ./bin/generate_schemas.sh"
+    "build": "./bin/generate_json.sh && ./bin/generate_schemas.sh && ./bin/generate_zod_schemas.sh"
   },
   "author": "Luke Schierer",
   "license": "ISC",
