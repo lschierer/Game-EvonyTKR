@@ -164,7 +164,6 @@ package Game::EvonyTKR::Plugins::CollectionBase {
     $name = $self->param('name');
 
     $logger->debug("show detects name $name");
-    my $logger = Log::Log4perl->get_logger(ref($self));
 
     $logger->debug("Showing details for $name");
 
