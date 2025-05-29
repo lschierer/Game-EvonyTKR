@@ -1,5 +1,5 @@
 {
-  "name": "evonytkrtips-data",
+  "name": "@evonytkrtips/data",
   "type": "module",
   "version": "1.0.0",
   "description": "",
@@ -14,12 +14,12 @@
     "./schemas/*.json": "./dist/schemas/*.json"
   },
   "files": [
-    "dist/**/*.json",
-    "dist/**/*.ts",
-    "dist/**/*.js",
-    "dist/**/*.js.map",
-    "dist/**/*.d.ts",
-    "dist/**/*.d.ts.map"
+    "./**/*.json",
+    "./**/*.mjs",
+    "./**/*.sh",
+    "./**/*.toml",
+    "./**/*.ts",
+    "./**/*.yaml"
   ],
   "devDependencies": {
     "@commitlint/cli": "^19.8.1",
