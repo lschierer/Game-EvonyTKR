@@ -1,5 +1,7 @@
 <link rel="stylesheet" href="/css/collectionIndex.css" />
-
+<article>
+  <%== $content %>
+</article>
 <div class="collection-list">
   <ul class="collection-grid">
     <% if ($items && ref $items eq 'HASH') { %>

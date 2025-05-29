@@ -1,20 +1,17 @@
-package Game::EvonyTKR::Plugins::Generals;
-use Mojo::Base 'Mojolicious::Plugin', -signatures;
-use Log::Log4perl;
+use v5.40.0;
+use experimental qw(class);
+use utf8::all;
+use File::FindLib 'lib';
+use namespace::clean;
 
-sub register($self, $app, $config = {}) {
-  my $r      = $config->{route} || $app->routes;
-  my $logger = Log::Log4perl->get_logger(__PACKAGE__);
+package Game::EvonyTKR::Plugins::Generals {
+  use Mojo::Base 'Game::EvonyTKR::Plugins::CollectionBase';
 
-  # Define routes that point to the controller
-  my $routes = $r->any('/Generals')->to(
-    namespace  => 'Game::EvonyTKR::Controller',
-    controller => 'Generals',
-  );
-  $routes->get('/')->to(action => 'index');
-  $routes->get('/details/:name')->to(action => 'show_general');
+  # Specify which collection this controller handles
+  sub collection_name {'generals'}
 
-  $logger->debug("Registered Generals routes");
+  # Override loadItem to add any generals-specific processing
+
 }
 
 1;

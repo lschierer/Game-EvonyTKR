@@ -2,34 +2,37 @@ use v5.40.0;
 use experimental qw(class);
 use utf8::all;
 use File::FindLib 'lib';
-require Game::EvonyTKR::Controller::Specialities;
 use namespace::clean;
 
-package Game::EvonyTKR::Plugins::Specialities;
-use Mojo::Base 'Mojolicious::Plugin', -signatures;
-use Log::Log4perl;
+package Game::EvonyTKR::Plugins::Specialities {
+  use Mojo::Base 'Game::EvonyTKR::Plugins::CollectionBase';
 
-sub register($self, $app, $config = {}) {
-  my $r      = $config->{route} || $app->routes;
-  my $logger = Log::Log4perl->get_logger(__PACKAGE__);
+  # Specify which collection this controller handles
+  sub collection_name {'specialities'}
 
-  # Define routes that point to the controller
-  my $routes = $r->any('/Specialities')->to(
-    namespace  => 'Game::EvonyTKR::Controller',
-    controller => 'Specialities',
-  );
-  $routes->get('/')->to(action => 'index');
-  $routes->get('/details/:name')->to(action => 'show');
+  # Override loadItem to add any Speciality-specific processing
 
-  $app->helper(
-    get_speciality_details => sub ($c, $name) {
-      my $ctrl = Game::EvonyTKR::Controller::Specialities->new;
-      return '' unless $ctrl->preShow($c, $name);
-      return $c->render_to_string(template => 'specialities/details');
-    }
-  );
+  sub sort_levels($self, $levels) {
+    # Define the order of levels (if they don't sort alphabetically)
+    my %level_order = (
+      'Green'  => 1,
+      'Blue'   => 2,
+      'Purple' => 3,
+      'Orange' => 4,
+      'Gold'   => 5,
+    );
 
-  $logger->debug("Registered Specialities routes");
+    # Return sorted array
+    return [
+      sort {
+  # Use the defined order if available, otherwise fall back to string comparison
+        ($level_order{ $a->{level} } // 999)
+          <=> ($level_order{ $b->{level} } // 999)
+          || $a->{level} cmp $b->{level}
+      } @$levels
+    ];
+  }
+
 }
 
 1;

@@ -1,98 +1,108 @@
 <% use Scalar::Util qw(reftype); %>
 <div class="general">
-  <h2 >Details for <%= title %></h2>
-  <div class="basicInfo">
-    <div class="baseStats">
-      <h3 >
-        Base Stats
-      </h3>
-      <ul class="baseStats">
-        <li>
-          <span >Leadership:</span>
-          <ul>
-            <li>
-              <span >Base: </span>
-              <span class=" leadership-base"><%= $leadershipBase %></span>
-            </li>
-            <li>
-              <span >Increment: </span>
-              <span class=" leadership-increment"><%= $leadershipIncrement %></span>
-            </li>
-          </ul>
-        </li>
-        <li>
-          <span >Attack:</span>
-          <ul>
-            <li>
-              <span >Base: </span>
-              <span class="attack-base"><%= $attackBase %></span>
-            </li>
-            <li>
-              <span >Increment: </span>
-              <span class="attack-increment"><%= $attackIncrement  %></span>
-            </li>
-          </ul>
-        </li>
-        <li>
-          <span class="">Defense:</span>
-          <ul>
-            <li>
-              <span >Base: </span>
-              <span class="defense-base"><%= $defenseBase %></span>
-            </li>
-            <li>
-              <span >Increment: </span>
-              <span class="defense-increment"><%= $defenseIncrement  %></span>
-            </li>
-          </ul>
-        </li>
-        <li>
-          <span class="">Politics:</span>
-          <ul>
-            <li>
-              <span >Base: </span>
-              <span class="politics-base"><%= $politicsBase %></span>
-            </li>
-            <li>
-              <span >Increment: </span>
-              <span class="politics-increment"><%= $politicsIncrement  %></span>
-            </li>
-          </ul>
-        </li>
-      </ul>
-    </div>
-    <div class="ExtraBaseInfo">
-      <h3 class="">
-        Basic Information
-      </h3>
-      <ul class="baseInfo">
-        <li>
-          <span class="">Type: </span>
-          <% if ($typeValue && ref($typeValue) eq 'ARRAY' && @$typeValue) { %>
+  <% if( $item && ref $item eq 'HASH' ) { %>
+    <h2 >Details for <%= $item->{name} %></h2>
+    <div class="basicInfo">
+      <div class="baseStats">
+        <h4 >
+          Base Stats
+        </h4>
+        <ul class="baseStats">
+          <li>
+            <span >Leadership:</span>
             <ul>
-              <% foreach my $item (@$typeValue) { %>
-                <li><%= $item %></li>
-              <% } %>
+              <li>
+                <span >Base: </span>
+                <span class=" leadership-base"><%= $item->{basic_attributes}->{leadership}->{base} %></span>
+              </li>
+              <li>
+                <span >Increment: </span>
+                <span class=" leadership-increment"><%= $item->{basic_attributes}->{leadership}->{increment} %></span>
+              </li>
             </ul>
-          <% } else { %>
-            <span class="type-value">No type available</span>
-          <% } %>
-          <span class="type-value"></span>
-        </li>
-        <li>
-          <span class="">Ascendable: </span>
-          <span class="ascending-value"><%= $ascendingValue ? "True" : "False" %></span>
-        </li>
-      </ul>
-    </div>
-  </div>
-  <div class="specialskill"></div>
-  <div class="specialities">
-    <% if( $general && reftype $general eq 'OBJECT' && $general->can('specialityNames')) { %>
-      <% foreach my $specialityName ( @{ $general->specialityNames } ) { %>
-        <%= get_speciality_details($specialityName) %>
-      <% } %>
+          </li>
+          <li>
+            <span >Attack:</span>
+            <ul>
+              <li>
+                <span >Base: </span>
+                <span class="attack-base"><%= $item->{basic_attributes}->{attack}->{base} %></span>
+              </li>
+              <li>
+                <span >Increment: </span>
+                <span class="attack-increment"><%= $item->{basic_attributes}->{attack}->{increment}  %></span>
+              </li>
+            </ul>
+          </li>
+          <li>
+            <span class="">Defense:</span>
+            <ul>
+              <li>
+                <span >Base: </span>
+                <span class="defense-base"><%= $item->{basic_attributes}->{defense}->{base} %></span>
+              </li>
+              <li>
+                <span >Increment: </span>
+                <span class="defense-increment"><%= $item->{basic_attributes}->{defense}->{increment}  %></span>
+              </li>
+            </ul>
+          </li>
+          <li>
+            <span class="">Politics:</span>
+            <ul>
+              <li>
+                <span >Base: </span>
+                <span class="politics-base"><%= $item->{basic_attributes}->{politics}->{base} %></span>
+              </li>
+              <li>
+                <span >Increment: </span>
+                <span class="politics-increment"><%= $item->{basic_attributes}->{politics}->{increment}  %></span>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+      <div class="ExtraBaseInfo">
+        <h4 class="">
+          Basic Information
+        </h4>
+        <ul class="baseInfo">
+          <li>
+            <span class="">Type: </span>
 
-    <% } %>
-  </div>
+              <ul>
+                <% foreach my $type_item (@{ $item->{type} }) { %>
+                  <li><%= $type_item %></li>
+                <% } %>
+              </ul>
+          </li>
+          <li>
+            <span class="">Ascendable: </span>
+            <span class="ascending-value"><%= $item->{ascending} ? "True" : "False" %></span>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="specialskill">
+      <h4><%= $item->{name} %>'s Special Skill</h4>
+      <h5><%= $item->{book} %></h5>
+      <%= get_builtin_book_text($item->{book}) %>
+      <% if($item->{ascending}) { %>
+        <h5><%= $item->{name} %>'s Ascension Buffs</h5>
+        <%= get_ascending_section($item->{name}) %>
+      <% } %>
+    </div>
+    <div class="specialities">
+      <h4><%= $item->{name} %>'s Specialities</h4>
+      <ol>
+        <% foreach my $specialityName ( @{ $item->{specialities} } ) { %>
+          <li>
+            <a href="/Specialities/details/<%= $specialityName %>">
+              <%= $specialityName %>
+            </a>
+          </li>
+        <% } %>
+      </ol>
+    </div>
+  <% } %>
 </div>

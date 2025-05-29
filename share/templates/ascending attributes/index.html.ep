@@ -5,7 +5,9 @@
     <% if ($items && ref $items eq 'HASH') { %>
       <% foreach my $key (sort(keys(%$items))) { %>
         <li class="collection-item">
-          <a href="/<%= ucfirst($collection_name) %>/details/<%= $key %>/">
+          <% my $collectionLink = $collection_name =~ s/(\w)(\w+)/\U$1\L$2/gr; %>
+          <% $collectionLink =~ s/\s+//g; %>
+          <a href="/<%= $collectionLink %>/details/<%= $key %>/">
             <%= $items->{$key}->{name} %>
           </a>
         </li>

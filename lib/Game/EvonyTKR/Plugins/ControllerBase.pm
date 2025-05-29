@@ -2,21 +2,56 @@ use v5.40.0;
 use experimental qw(class);
 use utf8::all;
 use File::FindLib 'lib';
+require Data::Printer;
 use namespace::clean;
 
-package Game::EvonyTKR::Role::MarkdownRenderer {
-  use Mojo::Base -role, -signatures;
-  use Mojo::File;
-  use YAML::PP;
-  use Text::MultiMarkdown;
-  require Data::Printer;
+package Game::EvonyTKR::Plugins::ControllerBase {
+  use Mojo::Base 'Mojolicious::Controller';
+  use Mojo::Base 'Mojolicious::Plugin', -signatures, -role;
   use Log::Log4perl;
-  use Carp;
+  require Mojo::File;
+  require Text::MultiMarkdown;
+  require YAML::PP;
+  require Data::Printer;
 
-  our $VERSION = 'v0.01.0';
-  # Create a logger for the entire package
+  my $base = '';
+  my $routes;
 
-  # Render markdown file with YAML front matter
+  sub getBase($self) {
+    return $base;
+  }
+
+  sub register($self, $app, $config = {}) {
+    my $logger = Log::Log4perl->get_logger(__PACKAGE__);
+    $logger->info("Registering routes for " . ref($self));
+
+    my @parts = split(/::/, ref($self));
+    $base = pop(@parts);
+    my $r = $app->routes;
+
+    # Set up routes
+    $routes = $r->any("/$base");
+    $routes->get('/')
+      ->to(controller => $base, action => 'index')
+      ->name("${base}_index");
+
+    $logger->info("Routes for $base registered successfully");
+  }
+
+  sub getRoutes($self) {
+    return $routes;
+  }
+
+  sub index($self) {
+    $self->stash(
+      layout   => 'default',
+      template => 'markdown',
+      content  => "Hello from the $base Controller",
+    );
+
+    $self->render();
+  }
+
   sub render_markdown_file($self, $c, $path) {
     my $logger = Log::Log4perl->get_logger(ref($self));
 
@@ -59,12 +94,15 @@ package Game::EvonyTKR::Role::MarkdownRenderer {
 
     $logger->trace("layout is $layout");
 
+    my $template = $self->stash('template') // 'markdown';
+    $logger->debug("Using template: $template");
+
     $logger->trace("front matter keys: " . join(", ", keys %$front_matter));
 
     # Set content for rendering
     # Render with the specified layout
     return $c->render(
-      template => "markdown",
+      template => $template,
       layout   => $layout,
       content  => $html,
     );
@@ -103,34 +141,6 @@ package Game::EvonyTKR::Role::MarkdownRenderer {
     my $parser = Text::MultiMarkdown->new(tab_width => 2,);
     return $parser->markdown($markdown);
   }
-};
 
+}
 1;
-
-__END__
-
-#ABSTRACT: Base controller for rendering Markdown files with YAML front matter
-
-=pod
-
-=head1 DESCRIPTION
-
-A base controller that provides functionality to render Markdown files with YAML front matter.
-This can be used as a base class for controllers that need to render content from Markdown files.
-
-=head1 METHODS
-
-=head2 render_markdown_file($path)
-
-Renders a Markdown file with YAML front matter. The front matter is parsed and added to the stash,
-and the Markdown content is converted to HTML and rendered with the specified layout.
-
-=head2 parse_front_matter($content)
-
-Parses YAML front matter from content. Returns a hashref of front matter data and the remaining content.
-
-=head2 markdown_to_html($markdown)
-
-Converts Markdown to HTML using MultiMarkdown.
-
-=cut

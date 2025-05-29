@@ -3,6 +3,7 @@ find-perl-deps:
 
 build:
   perl Build.PL
+  ./Build installdeps --cpan_client 'cpanm -n'
   ./Build manifest
   ./Build
 

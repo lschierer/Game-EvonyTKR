@@ -1,0 +1,32 @@
+<div class="builtinbook-details">
+  <% if( $item && ref($item) eq 'HASH') { %>
+    <h3><%= $item->{name} %></h3>
+    <p class="description">
+      <%= $item->{text} %>
+    </p>
+    <ul>
+      <% foreach my $buff  (@{ $item->{buff} }) { %>
+        <li>
+          <dl>
+            <dt>Attribute: </dt>
+            <dd><%= $buff->{attribute} %>
+            <% if ( exists $buff->{class} ) { %>
+              <dt>Troop Type: </dt>
+              <dd><%= $buff->{class} %></dd>
+            <% } %>
+            <% if ( exists $buff->{condition} ) { %>
+              <dt>Condition(s): </dt>
+              <% foreach my $condition (@{ $buff->{condition} }) { %>
+                <dd><%= $condition %></dd>
+              <% } %>
+            <% } %>
+            <dt>Value: </dt>
+            <dd><%= $buff->{value}->{number} %><%= $buff->{value}->{unit} eq 'percentage' ? '%' : '' %></dd>
+          </dl>
+        </li>
+      <% } %>
+    </ul>
+  <% } %>
+</div>
+<% require Data::Printer; %>
+<!-- <%= Data::Printer::np($item) %> -->

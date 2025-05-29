@@ -1,0 +1,23 @@
+div.collection-list {
+  padding: var(--size-4) var(--size-3);
+}
+
+.collection-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+  list-style: none;
+  padding: 0;
+}
+
+.collection-item {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 1rem;
+  transition: transform 0.2s ease-in-out;
+}
+
+.collection-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 8px rgb(0 0 0 / 10%);
+}

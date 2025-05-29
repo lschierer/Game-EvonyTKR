@@ -1,15 +1,17 @@
 <link rel="stylesheet" href="/css/collectionIndex.css" />
-
+<% require Data::Printer; %>
 <div class="collection-list">
   <ul class="collection-grid">
     <% if ($items && ref $items eq 'HASH') { %>
       <% foreach my $key (sort(keys(%$items))) { %>
         <li class="collection-item">
-          <a href="/<%= ucfirst($collection_name) %>/details/<%= $key %>/">
+          <a href="/<%= $controller_name %>/details/<%= $key %>/">
             <%= $items->{$key}->{name} %>
           </a>
+
         </li>
       <% } %>
     <% } %>
   </ul>
+  <!-- <%= Data::Printer::np($items) %> -->
 </div>

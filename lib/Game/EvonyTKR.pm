@@ -5,17 +5,14 @@ use File::FindLib 'lib';
 require YAML::PP;
 require Game::EvonyTKR::Logger;
 require Game::EvonyTKR::Logger::Config;
-require Game::EvonyTKR::General::Importer;
-require Game::EvonyTKR::Role::MarkdownRenderer;
-require Game::EvonyTKR::Plugins::Generals;
-require Game::EvonyTKR::Plugins::Specialities;
+require Game::EvonyTKR::Plugins::ControllerBase;
+require Game::EvonyTKR::Plugins::CollectionBase;
 use namespace::clean;
 
 package Game::EvonyTKR {
-  use Mojo::Base 'Mojolicious', -strict, -role, -signatures;
+  use Mojo::Base 'Mojolicious', -strict, -signatures;
   use Mojo::File::Share qw(dist_dir dist_file);
   use Log::Log4perl;
-  use Mojolicious::Plugin::DefaultHelpers;
 
   use Carp;
   our $VERSION = 'v0.50.0';
@@ -56,6 +53,7 @@ package Game::EvonyTKR {
 
     my $r = $self->routes;
     push @{ $self->routes->namespaces }, 'Game::EvonyTKR::Controller';
+    push @{ $self->routes->namespaces }, 'Game::EvonyTKR::Plugins';
     $r->any("/")->to('Root#index');
 
     my $SystemLogger = Game::EvonyTKR::Logger->new();
@@ -112,9 +110,14 @@ package Game::EvonyTKR {
       $logger->info("startup");
       $logger->info("Logging configured with $logConfig");
     }
+    push @{ $self->plugins->namespaces }, 'Game::EvonyTKR::Plugins';
+    push @{ $self->preload_namespaces },  'Game::EvonyTKR::Plugins';
+    $self->plugin(
+      'Module::Loader' => {
+        plugin_namespaces => ['Game::EvonyTKR::Plugins']
+      }
+    );
 
-    $self->plugin('Game::EvonyTKR::Plugins::Generals',     $r);
-    $self->plugin('Game::EvonyTKR::Plugins::Specialities', $r);
     $self->start(@ARGV);
 
   }

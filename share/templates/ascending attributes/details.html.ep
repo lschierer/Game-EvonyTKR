@@ -1,0 +1,43 @@
+<div class="ascendingattribute-details">
+  <% use Scalar::Util qw(reftype); %>
+  <% if( $item && ref($item) eq 'HASH') { %>
+    <% my $column_info = get_column_info($item); %>
+    <% my $sorted_levels = sort_ascending_levels($item); %>
+    <h3><%= $item->{name} %></h3>
+    <table>
+      <thead>
+        <% foreach my $level (@$sorted_levels) { %>
+          <th> <%= ascending_level_names($level->{level}) %> </th>
+        <% } %>
+      </thead>
+    <tbody>
+      <tr>
+        <% foreach my $level (@$sorted_levels) { %>
+          <td>
+            <% foreach my $buff (@{ $level->{buff} }) { %>
+              <dl>
+                <dt>Attribute: </dt><dd><%= $buff->{attribute} %></dd>
+                <% if (exists $buff->{class} ) { %>
+                  <dt>Targed Type: </dt><dd><%= $buff->{class} %></dd>
+                <% } %>
+                <% my @conditions = @{$buff->{condition}} ; %>
+                <% if (@conditions ) { %>
+                    <dt>Conditions:</dt>
+                        <% foreach my $condition (@conditions) { %>
+                            <dd><%= $condition %></dd>
+                        <% } %>
+                <% } %>
+                <dt>Value: </dt><dd><%= $buff->{value}->{number} %><%= $buff->{value}->{unit} eq 'percentage' ? '%' : '' %></dd>
+              </dl>
+            <% } %>
+          </td>
+        <% } %>
+      </tr>
+
+    </tbody>
+  </table>
+  <% } else { %>
+    <span>Speciality Not Available</span>
+    <span><%= ref($item) %></span>
+  <% } %>
+</div>

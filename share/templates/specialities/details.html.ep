@@ -1,6 +1,7 @@
 <div class="speciality-details">
   <% use Scalar::Util qw(reftype); %>
-  <% if( $speciality && reftype($speciality) eq 'OBJECT') { %>
+  <% if( $item && ref($item) eq 'HASH') { %>
+  <h3><%= $item->{name} %></h3>
   <table>
     <thead>
       <% foreach my $ln (  qw/Green Blue Purple Orange Gold/ ) { %>
@@ -10,21 +11,21 @@
     </thead>
     <tbody>
       <tr>
-        <% foreach my $ln (  qw/Green Blue Purple Orange Gold/ ) { %>
+        <% my $sorted_levels = $self->sort_levels($item->{levels}); %>
+        <% foreach my $level (@$sorted_levels) { %>
           <td>
-            <% my $level = $speciality->levels->{lc($ln)}; %>
-            <% foreach my $buff ( @{ $level } ) { %>
+            <% foreach my $buff (@{ $level->{buff} }) { %>
               <dl>
-                <dt>Attribute: </dt><dd><%= $buff->attribute() %></dd>
-                <dt>Targed Types: </dt><dd><%= join(', ', @{ $buff->targetedTypes() } ) %></dd>
-                <% my @conditions = $buff->conditions(); %>
-                <% if (@conditions) { %>
+                <dt>Attribute: </dt><dd><%= $buff->{attribute} %></dd>
+                <dt>Targed Type: </dt><dd><%= $buff->{class} %></dd>
+                <% if (exists $buff->{condition} && ref $buff->{condition} eq 'ARRAY') { %>
+                  <% my @conditions = @{$buff->{condition}}; %>
                     <dt>Conditions:</dt>
-                        <% foreach my $condition (@conditions) { %>
-                            <dd><%= $condition %></dd>
-                        <% } %>
+                    <% foreach my $condition (@conditions) { %>
+                      <dd><%= $condition %></dd>
+                    <% } %>
                 <% } %>
-                <dt>Value: </dt><dd><%= $buff->value->number() %><%= $buff->value->unit() eq 'percentage' ? '%' : '' %></dd>
+                <dt>Value: </dt><dd><%= $buff->{value}->{number} %><%= $buff->{value}->{unit} eq 'percentage' ? '%' : '' %></dd>
               </dl>
             <% } %>
           </td>
@@ -35,6 +36,6 @@
   </table>
   <% } else { %>
     <span>Speciality Not Available</span>
-    <span><%= ref($speciality) %></span>
+    <span><%= ref($item) %></span>
   <% } %>
 </div>
