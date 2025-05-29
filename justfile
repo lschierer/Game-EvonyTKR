@@ -3,14 +3,23 @@ find-perl-deps:
 
 
 prepare:
+  mise install
   perl Build.PL
 
-deps: prepare
+[working-directory: 'share']
+npmdeps:
+  pnpm install
+
+deps: prepare npmdeps
   ./Build installdeps --cpan_client 'cpanm -n'
 
-build: deps
+[working-directory: 'share']
+css: npmdeps
+  pnpm build:css
+
+build: deps css
   ./Build manifest
   ./Build
 
-dev: deps
+dev: deps css
   morbo --watch ./share --watch ./lib ./scripts/game-evonytkr
