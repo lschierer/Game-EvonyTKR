@@ -29,10 +29,14 @@ package Game::EvonyTKR::Plugins::ControllerBase {
     $base = pop(@parts);
     my $r = $app->routes;
 
+    my $controller_name = $self->can('controller_name') ?
+                             $self->controller_name() :
+                             $base;
+
     # Set up routes
     $routes = $r->any("/$base");
     $routes->get('/')
-      ->to(controller => $base, action => 'index')
+      ->to(controller => $controller_name, action => 'index')
       ->name("${base}_index");
 
     $logger->info("Routes for $base registered successfully");

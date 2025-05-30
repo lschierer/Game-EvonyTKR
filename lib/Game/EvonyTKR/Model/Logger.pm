@@ -9,24 +9,16 @@ require Path::Tiny;
 use Log::Log4perl;
 use namespace::autoclean;
 
-class Game::EvonyTKR::Logger {
-# PODNAME: Game::EvonyTKR::Logger
-  use Types::Common qw(  t);
+class Game::EvonyTKR::Model::Logger {
+# PODNAME: Game::EvonyTKR::Model::Logger
   use Carp;
   our $VERSION = 'v0.30.0';
 
-  field $category : reader : param = __CLASS__;
+  field $location : reader;
 
   field $logger : reader;
 
-  field $location : reader;
-
-# from Type::Registry, this will save me from some of the struggles I have had with some types having blessed references and others not.
-  ADJUST {
-    if (!(t->simple_lookup("Str"))) {
-      t->add_types(-Common);
-    }
-  }
+  field $category : reader : param = __CLASS__;
 
   ADJUST {
     $self->get_logger();

@@ -3,23 +3,23 @@ use experimental qw(class);
 use File::FindLib 'lib';
 require JSON::PP;
 
-class Game::EvonyTKR::Speciality : isa(Game::EvonyTKR::Logger) {
+class Game::EvonyTKR::Model::Speciality : isa(Game::EvonyTKR::Model::Logger) {
   use builtin         qw(indexed);
   use Types::Standard qw(is_Int Int Num is_Num Str is_Str);
   use Types::Common   qw( t);
   use Type::Utils     qw(is enum);
   use Carp;
   require Data::Printer;
-  require Game::EvonyTKR::Buff;
-  require Game::EvonyTKR::Data;
+  require Game::EvonyTKR::Model::Buff;
+  require Game::EvonyTKR::Model::Data;
   use List::MoreUtils;
   require Path::Tiny;
   use Util::Any -all;
   require YAML::PP;
   use namespace::autoclean;
-# PODNAME: Game::EvonyTKR::Speciality
+# PODNAME: Game::EvonyTKR::Model::Speciality
 # VERSION
-  use Game::EvonyTKR::Logger;
+  use Game::EvonyTKR::Model::Logger;
   use overload
     '""'       => \&TO_JSON,
     "fallback" => 1;
@@ -33,7 +33,7 @@ class Game::EvonyTKR::Speciality : isa(Game::EvonyTKR::Logger) {
 
   field $name : reader : param;
 
-  field $EvonyData : reader = Game::EvonyTKR::Data->new();
+  field $EvonyData : reader = Game::EvonyTKR::Model::Data->new();
 
   ADJUST {
     my @errors;
@@ -75,7 +75,7 @@ class Game::EvonyTKR::Speciality : isa(Game::EvonyTKR::Logger) {
   }
 
   method add_buff($level, $nb, $inherited = 0) {
-    if (blessed $nb ne 'Game::EvonyTKR::Buff') {
+    if (blessed $nb ne 'Game::EvonyTKR::Model::Buff') {
       return 0;
     }
     my $tcheck = $level_names->compiled_check();
@@ -96,7 +96,7 @@ class Game::EvonyTKR::Speciality : isa(Game::EvonyTKR::Logger) {
         if ($inherited) {
           my $copy;
           if ($nb->has_targetedType()) {
-            $copy = Game::EvonyTKR::Buff->new(
+            $copy = Game::EvonyTKR::Model::Buff->new(
               attribute     => $nb->attribute,
               value         => $nb->value,
               targetedTypes => $nb->targetedTypes,
@@ -104,7 +104,7 @@ class Game::EvonyTKR::Speciality : isa(Game::EvonyTKR::Logger) {
             );
           }
           else {
-            $copy = Game::EvonyTKR::Buff->new(
+            $copy = Game::EvonyTKR::Model::Buff->new(
               attribute => $nb->attribute(),
               value     => $nb->value(),
               inherited => 1,
@@ -225,7 +225,7 @@ class Game::EvonyTKR::Speciality : isa(Game::EvonyTKR::Logger) {
                 ->logcroak(
                 "attribute is not defined in a buff for $SpecialityFileName");
             }
-            $v = Game::EvonyTKR::Buff::Value->new(
+            $v = Game::EvonyTKR::Model::Buff::Value->new(
               number => $flb->{'value'}->{'number'},
               unit   => $flb->{'value'}->{'unit'},
             );
@@ -238,14 +238,14 @@ class Game::EvonyTKR::Speciality : isa(Game::EvonyTKR::Logger) {
               else {
                 push @targetedTypes, $flb->{'class'};
               }
-              $b = Game::EvonyTKR::Buff->new(
+              $b = Game::EvonyTKR::Model::Buff->new(
                 attribute     => $flb->{'attribute'},
                 value         => $v,
                 targetedTypes => \@targetedTypes,
               );
             }
             else {
-              $b = Game::EvonyTKR::Buff->new(
+              $b = Game::EvonyTKR::Model::Buff->new(
                 attribute => $flb->{'attribute'},
                 value     => $v,
               );
@@ -322,7 +322,7 @@ sets the activeLevel to newLevel presuming it is a valid value (one of 'Green', 
 
 =method add_buff($level, $nb)
 
-This method takes a Game::EvonyTKR::Buff as its sole parameter and adds it as one of the levels this Speciality at the specified $level.  $level must be one of 'Green', 'Blue', 'Purple', 'Orange', or 'Gold' or the function will fail to add the buff.
+This method takes a Game::EvonyTKR::Model::Buff as its sole parameter and adds it as one of the levels this Speciality at the specified $level.  $level must be one of 'Green', 'Blue', 'Purple', 'Orange', or 'Gold' or the function will fail to add the buff.
 
 It is because Flex specialities require greater granularity that they require a subclass.
 

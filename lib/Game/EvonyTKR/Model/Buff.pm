@@ -3,10 +3,10 @@ use experimental qw(class);
 use utf8::all;
 use File::FindLib 'lib';
 require Data::Printer;
-require Game::EvonyTKR::Buff::Value;
+require Game::EvonyTKR::Model::Buff::Value;
 
-class Game::EvonyTKR::Buff : isa(Game::EvonyTKR::Data) {
-# PODNAME: Game::EvonyTKR::Buff
+class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Model::Data) {
+# PODNAME: Game::EvonyTKR::Model::Buff
   use List::AllUtils qw( any none );
   use namespace::autoclean;
   use Types::Common qw( t );
@@ -240,7 +240,7 @@ returns the attribute that which this Buff/Debuff affects.
 
 =method value()
 
-returns the Game::EvonyTKR::Buff::Value that is the amount by which this
+returns the Game::EvonyTKR::Model::Buff::Value that is the amount by which this
 buff/debuff affects its attribute.
 
 =cut

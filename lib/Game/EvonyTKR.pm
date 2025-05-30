@@ -3,8 +3,8 @@ use experimental qw(class);
 use utf8::all;
 use File::FindLib 'lib';
 require YAML::PP;
-require Game::EvonyTKR::Logger;
-require Game::EvonyTKR::Logger::Config;
+require Game::EvonyTKR::Model::Logger;
+require Game::EvonyTKR::Model::Logger::Config;
 require Game::EvonyTKR::Plugins::ControllerBase;
 require Game::EvonyTKR::Plugins::CollectionBase;
 use namespace::clean;
@@ -56,7 +56,7 @@ package Game::EvonyTKR {
     push @{ $self->routes->namespaces }, 'Game::EvonyTKR::Plugins';
     $r->any("/")->to('Root#index');
 
-    my $SystemLogger = Game::EvonyTKR::Logger->new();
+    my $SystemLogger = Game::EvonyTKR::Model::Logger->new();
     my $logFile2     = $SystemLogger->getLogfileName();
 
     my %logLevel = (
@@ -68,7 +68,7 @@ package Game::EvonyTKR {
     say "starting with mode $mode";
 
     # Use the Logger::Config module to get the log configuration path
-    my $loggerConfig = Game::EvonyTKR::Logger::Config->new($mode);
+    my $loggerConfig = Game::EvonyTKR::Model::Logger::Config->new($mode);
     my $logConfig;
 
     # Use traditional Perl error handling with eval
@@ -131,7 +131,7 @@ package Game::EvonyTKR {
       croak("no generals collection available at $generalsDir");
     }
 
-    my $gi = Game::EvonyTKR::General::Importer->new(inputDir => $generalsDir,);
+    my $gi = Game::EvonyTKR::Model::General::Importer->new(inputDir => $generalsDir,);
     $generals = $gi->importAll();
     my $json =
       JSON::PP->new()

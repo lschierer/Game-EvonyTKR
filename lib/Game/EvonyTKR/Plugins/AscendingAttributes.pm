@@ -2,13 +2,20 @@ use v5.40.0;
 use experimental qw(class);
 use utf8::all;
 use File::FindLib 'lib';
+require Game::EvonyTKR::Model::AscendingAttributes::Manager;
 use namespace::clean;
 
 package Game::EvonyTKR::Plugins::AscendingAttributes {
   use Mojo::Base 'Game::EvonyTKR::Plugins::CollectionBase';
 
+  my $manager;
+
   # Specify which collection this controller handles
   sub collection_name {'ascending attributes'}
+
+  sub controller_name($self) {
+       return 'AscendingAttributes';  # Explicitly return the controller name
+     }
 
   # Override loadItem to add any Ascending Attributes-specific processing
 
@@ -16,6 +23,29 @@ package Game::EvonyTKR::Plugins::AscendingAttributes {
     my $logger = Log::Log4perl->get_logger(__PACKAGE__);
     $logger->info("Registering routes for " . ref($self));
     $self->SUPER::register($app, $config);
+
+    eval {
+      $manager = Game::EvonyTKR::Model::AscendingAttributes::Manager->new();
+
+      my $distDir    = Mojo::File::Share::dist_dir('Game::EvonyTKR');
+      my $collection = $self->collection_name;
+      my $SourceDir  = $distDir->child("collections/$collection");
+      $manager->importAll($SourceDir);
+
+      $logger->info(
+"Successfully loaded Ascending Attributes manager with collection from $SourceDir"
+      );
+    };
+    if ($@) {
+      $logger->error("Failed to initialize Ascending Attributes Manager: $@");
+      $manager = undef;
+    }
+
+    $app->helper(
+      get_builtinbook_manager => sub {
+        return $manager;
+      }
+    );
 
     $app->helper(
       get_column_info => sub($c, $item) {
@@ -50,6 +80,10 @@ package Game::EvonyTKR::Plugins::AscendingAttributes {
         return "";
       }
     );
+  }
+
+  sub show ($self ) {
+    return $self->SUPER::show();
   }
 
   sub fetch_for_helper ($self, $c, $name) {

@@ -3,8 +3,8 @@ use experimental qw(class);
 use FindBin;
 use lib "$FindBin::Bin/../../../lib";
 
-class Game::EvonyTKR::Covenant : isa(Game::EvonyTKR::Logger) {
-# PODNAME: Game::EvonyTKR::Covenant
+class Game::EvonyTKR::Model::Covenant : isa(Game::EvonyTKR::Model::Logger) {
+# PODNAME: Game::EvonyTKR::Model::Covenant
   use builtin         qw(indexed);
   use Types::Standard qw(is_Int Int Num is_Num Str is_Str);
   use Types::Common   qw( t);
@@ -14,13 +14,13 @@ class Game::EvonyTKR::Covenant : isa(Game::EvonyTKR::Logger) {
   use Data::Printer;
   use File::ShareDir ':ALL';
   use File::Spec;
-  use Game::EvonyTKR::Buff;
-  use Game::EvonyTKR::Buff::Value;
+  use Game::EvonyTKR::Model::Buff;
+  use Game::EvonyTKR::Model::Buff::Value;
   use List::MoreUtils;
   use Util::Any -all;
   use YAML::XS qw{LoadFile Load};
   use namespace::autoclean;
-  use Game::EvonyTKR::Logger;
+  use Game::EvonyTKR::Model::Logger;
   use overload
     '""'       => \&_toString,
     "fallback" => 1;
@@ -72,7 +72,7 @@ class Game::EvonyTKR::Covenant : isa(Game::EvonyTKR::Logger) {
       else {
         $self->logger()
           ->logcroak(
-          "$generalClass is not a subclass of Game::EvonyTKR::General");
+          "$generalClass is not a subclass of Game::EvonyTKR::Model::General");
       }
     }
     else {
@@ -83,7 +83,7 @@ class Game::EvonyTKR::Covenant : isa(Game::EvonyTKR::Logger) {
   }
 
   method addBuff($level, $nb, $inherited = 0) {
-    if (blessed $nb ne 'Game::EvonyTKR::Buff') {
+    if (blessed $nb ne 'Game::EvonyTKR::Model::Buff') {
       return 0;
     }
     my $tcheck = $CovenantLevels->compiled_check();
@@ -97,7 +97,7 @@ class Game::EvonyTKR::Covenant : isa(Game::EvonyTKR::Logger) {
         if ($inherited) {
           my $copy;
           if ($nb->has_buffClass()) {
-            $copy = Game::EvonyTKR::Buff->new(
+            $copy = Game::EvonyTKR::Model::Buff->new(
               attribute => $nb->attribute(),
               value     => $nb->value(),
               buffClass => $nb->buffClass(),
@@ -105,7 +105,7 @@ class Game::EvonyTKR::Covenant : isa(Game::EvonyTKR::Logger) {
             );
           }
           else {
-            $copy = Game::EvonyTKR::Buff->new(
+            $copy = Game::EvonyTKR::Model::Buff->new(
               attribute => $nb->attribute(),
               value     => $nb->value(),
               inherited => 1,
@@ -285,19 +285,19 @@ class Game::EvonyTKR::Covenant : isa(Game::EvonyTKR::Logger) {
             if (any { $_ eq 'value' } @ebKeys) {
               $self->logger()
                 ->debug("$CovenantFile at $value has a buff with a value");
-              $v = Game::EvonyTKR::Buff::Value->new(
+              $v = Game::EvonyTKR::Model::Buff::Value->new(
                 number => $eb->{'value'}->{'number'},
                 unit   => $eb->{'value'}->{'unit'},
               );
               if (any { $_ =~ /class/i } @ebKeys) {
-                $b = Game::EvonyTKR::Buff->new(
+                $b = Game::EvonyTKR::Model::Buff->new(
                   attribute => $eb->{'attribute'},
                   value     => $v,
                   buffClass => $eb->{'class'},
                 );
               }
               else {
-                $b = Game::EvonyTKR::Buff->new(
+                $b = Game::EvonyTKR::Model::Buff->new(
                   attribute => $eb->{'attribute'},
                   value     => $v,
                 );
@@ -359,13 +359,13 @@ Todo:  actually get the activation conditions for Covenants right.  For now I am
 
 =method primary()
 
-Returns the Primary Game::EvonyTKR::General with whom this Covenant is associated. 
+Returns the Primary Game::EvonyTKR::Model::General with whom this Covenant is associated. 
 
 =cut 
 
 =method secondary()
 
-returns a hash containing the secondary or supporting Game::EvonyTKR::General objects for this covenant.
+returns a hash containing the secondary or supporting Game::EvonyTKR::Model::General objects for this covenant.
 =cut
 
 =method secondaryKeys()
@@ -376,7 +376,7 @@ or in the setSecondary() method.
 
 =method setSecondary($position, $general)
 
-sets the Game::EvonyTKR::General $general as a supporting general in $position in the %secondary hash. 
+sets the Game::EvonyTKR::Model::General $general as a supporting general in $position in the %secondary hash. 
 the $position field must use one of the values returned by secondaryKeys().
 =cut
 
@@ -394,7 +394,7 @@ a HashRef.
 
 =method addBuff($level, $nb, $inherited = 0)
 
-adds the Game::EvonyTKR::Buff to the specified $level so long as $level is a valid selection from CovenantLevels().
+adds the Game::EvonyTKR::Model::Buff to the specified $level so long as $level is a valid selection from CovenantLevels().
 
 $inherited should not be used by external callers, it is used internally to set up the Buff structure such that each Level contains all Buffs from the previous levels, but marked as such. 
 

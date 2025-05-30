@@ -3,10 +3,10 @@ use experimental qw(class);
 use utf8::all;
 use File::FindLib 'lib';
 require Data::Printer;
-require Game::EvonyTKR::BasicAttributes;
+require Game::EvonyTKR::Model::BasicAttributes;
 require JSON::PP;
 
-class Game::EvonyTKR::General : isa(Game::EvonyTKR::Data) {
+class Game::EvonyTKR::Model::General : isa(Game::EvonyTKR::Model::Data) {
 # PODNAME: Game::EvonyTKR::Model::General
   use List::AllUtils qw( any none );
   use Types::Common  qw( t is_Num is_Str);
@@ -29,7 +29,7 @@ class Game::EvonyTKR::General : isa(Game::EvonyTKR::Data) {
 
   field $ascending : reader : param //= false;
 
-  field $basicAttributes : reader = Game::EvonyTKR::BasicAttributes->new();
+  field $basicAttributes : reader = Game::EvonyTKR::Model::BasicAttributes->new();
 
   field $builtInBookName : reader : param;
 
@@ -118,6 +118,6 @@ returns the general's name.
 
 =method type()
 
-returns the general's type, which must be one of the values from Game::EvonyTKR::Data->GeneralKeys()
+returns the general's type, which must be one of the values from Game::EvonyTKR::Model::Data->GeneralKeys()
 
 =cut

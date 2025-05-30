@@ -20,12 +20,11 @@
                 <% if (exists $buff->{class} ) { %>
                   <dt>Targed Type: </dt><dd><%= $buff->{class} %></dd>
                 <% } %>
-                <% my @conditions = @{$buff->{condition}} ; %>
-                <% if (@conditions ) { %>
-                    <dt>Conditions:</dt>
-                        <% foreach my $condition (@conditions) { %>
-                            <dd><%= $condition %></dd>
-                        <% } %>
+                <% if ( exists $buff->{condition} ) { %>
+                  <dt>Condition(s): </dt>
+                  <% foreach my $condition (@{ $buff->{condition} }) { %>
+                    <dd><%= $condition %></dd>
+                  <% } %>
                 <% } %>
                 <dt>Value: </dt><dd><%= $buff->{value}->{number} %><%= $buff->{value}->{unit} eq 'percentage' ? '%' : '' %></dd>
               </dl>

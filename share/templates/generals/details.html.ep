@@ -1,7 +1,7 @@
 <% use Scalar::Util qw(reftype); %>
 <div class="general">
-  <% if( $item && ref $item eq 'HASH' ) { %>
-    <h2 >Details for <%= $item->{name} %></h2>
+  <% if( $item && reftype $item eq 'OBJECT' && $item->isa('Game::EvonyTKR::Model::General')) { %>
+    <h2 >Details for <%= $item->name %></h2>
     <div class="basicInfo">
       <div class="baseStats">
         <h4 >
@@ -13,11 +13,11 @@
             <ul>
               <li>
                 <span >Base: </span>
-                <span class=" leadership-base"><%= $item->{basic_attributes}->{leadership}->{base} %></span>
+                <span class=" leadership-base"><%= $item->basicAttributes->leadership->base %></span>
               </li>
               <li>
                 <span >Increment: </span>
-                <span class=" leadership-increment"><%= $item->{basic_attributes}->{leadership}->{increment} %></span>
+                <span class=" leadership-increment"><%= $item->basicAttributes->leadership->increment %></span>
               </li>
             </ul>
           </li>
@@ -26,11 +26,11 @@
             <ul>
               <li>
                 <span >Base: </span>
-                <span class="attack-base"><%= $item->{basic_attributes}->{attack}->{base} %></span>
+                <span class="attack-base"><%= $item->basicAttributes->attack->base %></span>
               </li>
               <li>
                 <span >Increment: </span>
-                <span class="attack-increment"><%= $item->{basic_attributes}->{attack}->{increment}  %></span>
+                <span class="attack-increment"><%= $item->basicAttributes->attack->increment  %></span>
               </li>
             </ul>
           </li>
@@ -39,11 +39,11 @@
             <ul>
               <li>
                 <span >Base: </span>
-                <span class="defense-base"><%= $item->{basic_attributes}->{defense}->{base} %></span>
+                <span class="defense-base"><%= $item->basicAttributes->defense->base %></span>
               </li>
               <li>
                 <span >Increment: </span>
-                <span class="defense-increment"><%= $item->{basic_attributes}->{defense}->{increment}  %></span>
+                <span class="defense-increment"><%= $item->basicAttributes->defense->increment  %></span>
               </li>
             </ul>
           </li>
@@ -52,11 +52,11 @@
             <ul>
               <li>
                 <span >Base: </span>
-                <span class="politics-base"><%= $item->{basic_attributes}->{politics}->{base} %></span>
+                <span class="politics-base"><%= $item->basicAttributes->politics->base %></span>
               </li>
               <li>
                 <span >Increment: </span>
-                <span class="politics-increment"><%= $item->{basic_attributes}->{politics}->{increment}  %></span>
+                <span class="politics-increment"><%= $item->basicAttributes->politics->increment  %></span>
               </li>
             </ul>
           </li>
@@ -71,31 +71,31 @@
             <span class="">Type: </span>
 
               <ul>
-                <% foreach my $type_item (@{ $item->{type} }) { %>
+                <% foreach my $type_item (@{ $item->type }) { %>
                   <li><%= $type_item %></li>
                 <% } %>
               </ul>
           </li>
           <li>
             <span class="">Ascendable: </span>
-            <span class="ascending-value"><%= $item->{ascending} ? "True" : "False" %></span>
+            <span class="ascending-value"><%= $item->ascending ? "True" : "False" %></span>
           </li>
         </ul>
       </div>
     </div>
     <div class="specialskill">
-      <h4><%= $item->{name} %>'s Special Skill</h4>
-      <h5><%= $item->{book} %></h5>
-      <%= get_builtin_book_text($item->{book}) %>
-      <% if($item->{ascending}) { %>
-        <h5><%= $item->{name} %>'s Ascension Buffs</h5>
-        <%= get_ascending_section($item->{name}) %>
+      <h4><%= $item->name %>'s Special Skill</h4>
+      <h5><%= $item->builtInBookName %></h5>
+      <%= get_builtin_book_text($item->builtInBookName) %>
+      <% if($item->ascending) { %>
+        <h5><%= $item->name %>'s Ascension Buffs</h5>
+        <%= get_ascending_section($item->name) %>
       <% } %>
     </div>
     <div class="specialities">
-      <h4><%= $item->{name} %>'s Specialities</h4>
+      <h4><%= $item->name %>'s Specialities</h4>
       <ol>
-        <% foreach my $specialityName ( @{ $item->{specialities} } ) { %>
+        <% foreach my $specialityName ( @{ $item->specialityNames } ) { %>
           <li>
             <a href="/Specialities/details/<%= $specialityName %>">
               <%= $specialityName %>
@@ -104,5 +104,9 @@
         <% } %>
       </ol>
     </div>
+  <% } else { %>
+    <!-- <%= Scalar::Util::reftype $item; %> -->
+    <!-- <%= $item->isa('Game::EvonyTKR::General'); %> -->
   <% } %>
+
 </div>

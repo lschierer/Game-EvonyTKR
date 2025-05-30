@@ -3,10 +3,10 @@ use experimental qw(class);
 use utf8::all;
 use File::FindLib 'lib';
 require Data::Printer;
-require Game::EvonyTKR::Buff;
+require Game::EvonyTKR::Model::Buff;
 
-class Game::EvonyTKR::Book::SkillBook : isa(Game::EvonyTKR::Book) {
-# PODNAME: Game::EvonyTKR::Book::SkillBook
+class Game::EvonyTKR::Model::Book::SkillBook : isa(Game::EvonyTKR::Model::Book) {
+# PODNAME: Game::EvonyTKR::Model::Book::SkillBook
   use List::AllUtils qw( any none );
   use namespace::autoclean;
   use Carp;

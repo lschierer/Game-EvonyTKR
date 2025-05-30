@@ -2,6 +2,8 @@ use v5.40.0;
 use experimental qw(class);
 use utf8::all;
 use File::FindLib 'lib';
+require Game::EvonyTKR::Model::General;
+require Game::EvonyTKR::Model::General::Manager;
 use namespace::clean;
 
 package Game::EvonyTKR::Plugins::Generals {
@@ -10,8 +12,57 @@ package Game::EvonyTKR::Plugins::Generals {
   # Specify which collection this controller handles
   sub collection_name {'generals'}
 
+  my $manager;
+
   # Override loadItem to add any generals-specific processing
 
+  sub register($self, $app, $config = {}) {
+    my $logger = Log::Log4perl->get_logger(__PACKAGE__);
+    $logger->info("Registering routes for " . ref($self));
+    $self->SUPER::register($app, $config);
+
+    eval {
+      $manager = Game::EvonyTKR::Model::General::Manager->new();
+
+      my $distDir    = Mojo::File::Share::dist_dir('Game::EvonyTKR');
+      my $collection = $self->collection_name;
+      my $SourceDir  = $distDir->child("collections/$collection");
+      $manager->importAll($SourceDir);
+
+      $logger->info(
+        "Successfully loaded book manager with collection from $SourceDir");
+    };
+    if ($@) {
+      $logger->error("Failed to initialize General Manager: $@");
+      $manager = undef;
+    }
+
+    $app->helper(
+      get_general_manager => sub {
+        return $manager;
+      }
+    );
+  }
+
+  sub show ($self) {
+    my $logger = Log::Log4perl->get_logger(ref($self));
+    $logger->debug("start of show method");
+    my $name;
+    $name = $self->param('name');
+
+    $logger->debug("show detects name $name");
+
+    $logger->debug("Showing details for $name");
+
+    my $general = $manager->getGeneral($name);
+    $logger->debug("got general of type " . blessed $general);
+
+    if ($general) {
+      $self->stash(item => $general);
+      return $self->render(template => $self->details_template);
+    }
+    $self->SUPER::show();
+  }
 }
 
 1;

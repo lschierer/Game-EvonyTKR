@@ -3,10 +3,11 @@ use experimental qw(class);
 use utf8::all;
 use File::FindLib 'lib';
 require Data::Printer;
-require Game::EvonyTKR::Buff;
+require Game::EvonyTKR::Model::Buff;
+require Game::EvonyTKR::Model::Book;
 
-class Game::EvonyTKR::Book::Builtin : isa(Game::EvonyTKR::Book) {
-# PODNAME: Game::EvonyTKR::Book::Builtin
+class Game::EvonyTKR::Model::Book::Builtin : isa(Game::EvonyTKR::Model::Book) {
+# PODNAME: Game::EvonyTKR::Model::Book::Builtin
   use List::AllUtils qw( any none );
   use namespace::autoclean;
   use Carp;
@@ -20,9 +21,9 @@ class Game::EvonyTKR::Book::Builtin : isa(Game::EvonyTKR::Book) {
 
   method toHashRef {
     return {
-      name => $name,
-      text => $text,
-      buff => $buff,
+      name => $self->name,
+      text => $self->text,
+      buff => $self->buff,
     };
   }
 

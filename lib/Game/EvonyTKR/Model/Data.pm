@@ -3,10 +3,11 @@ use feature 'try';
 use experimental qw(class);
 use utf8::all;
 use File::FindLib 'lib';
+use Readonly;
 use namespace::autoclean;
 
-class Game::EvonyTKR::Data : isa(Game::EvonyTKR::Logger) {
-# PODNAME: Game::EvonyTKR::Data
+class Game::EvonyTKR::Model::Data : isa(Game::EvonyTKR::Model::Logger) {
+# PODNAME: Game::EvonyTKR::Model::Data
   require Type::Tiny::Enum;
   use UUID qw(uuid5);
   use namespace::autoclean;
@@ -134,6 +135,46 @@ class Game::EvonyTKR::Data : isa(Game::EvonyTKR::Logger) {
 
   field $specialityLevels : reader =
     Type::Tiny::Enum->new(values => [qw( none green blue purple orange gold)]);
+
+  Readonly::Scalar my $redAscendingLevelNames => {
+    red1 => '1 Red Star',
+    red2 => '2 Red Stars',
+    red3 => '3 Red Stars',
+    red4 => '4 Red Stars',
+    red5 => '5 Red Stars',
+  };
+
+  Readonly::Scalar my $purpleAscendingLevelNames => {
+    purple1 => '1 Purple Star',
+    purple2 => '2 Purple Stars',
+    purple3 => '3 Purple Stars',
+    purple4 => '4 Purple Stars',
+    purple5 => '5 Purple Stars',
+  };
+
+  method AscendingLevelNames ($red = 1, $printable = 0) {
+    my $towalk;
+    if ($red) {
+      $towalk = $redAscendingLevelNames;
+    }
+    else {
+      $towalk = $purpleAscendingLevelNames;
+    }
+    my @results = ('None');
+    if ($printable) {
+      foreach my $key (sort keys %{$towalk}) {
+        push @results, $towalk->{$key};
+      }
+    }
+    else {
+      # push the keys to preserve the initial value
+      # and the flat array.
+      foreach my $key (sort keys %{$towalk}) {
+        push @results, $key;
+      }
+    }
+    return \@results;
+  }
 
   field $globalDN : reader = X500::DN->new(
     X500::RDN->new('OU' => 'EvonyTKR'),

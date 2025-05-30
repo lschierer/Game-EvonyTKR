@@ -2,39 +2,19 @@ use v5.40.0;
 use experimental qw(class);
 use utf8::all;
 use File::FindLib 'lib';
+require Game::EvonyTKR::Model::Book::BuiltinBook;
+require Game::EvonyTKR::Model::Book::Manager;
 use namespace::clean;
 
 package Game::EvonyTKR::Plugins::BuiltinBooks {
   use Mojo::Base 'Game::EvonyTKR::Plugins::CollectionBase';
 
+  my $manager;
+
   # Specify which collection this controller handles
-  sub collection_name {'skillbooks'}
+  sub collection_name {'skill books'}
 
   # Override loadItem to add any BuiltinBooks-specific processing
-
-  # Helper method to get text or link to details
-  sub get_book_text($self, $book_name) {
-    my $logger = Log::Log4perl->get_logger(ref($self));
-    # Check if the book exists
-    unless ($self->itemExists($book_name)) {
-      $logger->error("failed to find book '$book_name' in index");
-      return "Unknown book: $book_name";
-    }
-
-    # Lazy load the book data
-    my $book = $self->loadItem($book_name);
-
-    # If text is available, return it
-    if ($book && $book->{text} && length($book->{text}) > 0) {
-      return $book->{text};
-    }
-
-    # Otherwise, return a link to the details page
-    my $url = $self->url_for('/BuiltinBooks/details/' . $book_name);
-
-    return
-qq{<a href="$url">$book_name does not have a text description available, see here for details.</a>};
-  }
 
   # Register this when the application starts
   sub register($self, $app, $config = {}) {
@@ -42,10 +22,39 @@ qq{<a href="$url">$book_name does not have a text description available, see her
     $logger->info("Registering routes for " . ref($self));
     $self->SUPER::register($app, $config);
 
+    eval {
+      $manager = Game::EvonyTKR::Model::Book::Manager->new();
+
+      my $distDir    = Mojo::File::Share::dist_dir('Game::EvonyTKR');
+      my $collection = $self->collection_name;
+      my $SourceDir  = $distDir->child("collections/$collection");
+      $manager->importAll($SourceDir);
+
+      $logger->info(
+        "Successfully loaded book manager with collection from $SourceDir");
+    };
+    if ($@) {
+      $logger->error("Failed to initialize Book Manager: $@");
+      $manager = undef;
+    }
+
+    $app->helper(
+      get_builtinbook_manager => sub {
+        return $manager;
+      }
+    );
+
     $app->helper(
       get_builtin_book_text => sub ($c, $book_name) {
         $app->log->debug("get_builtin_book_text for book '$book_name'");
-        return $self->get_book_text($book_name);
+        my $book = $manager->getBook($book_name);
+        if ($book) {
+          return $book->text();
+        }
+        else {
+          $logger->warn("No book found for '$book_name'");
+        }
+        return "";
       }
     );
   }

@@ -3,8 +3,8 @@ use experimental qw(class);
 use File::FindLib 'lib';
 require Math::Round;
 
-class Game::EvonyTKR::BasicAttribute : isa(Game::EvonyTKR::Data) {
-# PODNAME: Game::EvonyTKR::BasicAttribute
+class Game::EvonyTKR::Model::BasicAttribute : isa(Game::EvonyTKR::Model::Data) {
+# PODNAME: Game::EvonyTKR::Model::BasicAttribute
   use Carp;
   use List::AllUtils qw( any none );
   use Types::Common  qw( t is_Num is_Str);
@@ -177,7 +177,7 @@ class Game::EvonyTKR::BasicAttribute : isa(Game::EvonyTKR::Data) {
       my $od = Data::Printer::p $other;
       $self->logger()
         ->logcroak(
-        "Game::EvonyTKR::BasicAttribute comparison operator cannot take a $od");
+        "Game::EvonyTKR::Model::BasicAttribute comparison operator cannot take a $od");
     }
     else {
       my $mt = $self->total();
@@ -201,7 +201,7 @@ class Game::EvonyTKR::BasicAttribute : isa(Game::EvonyTKR::Data) {
         my $od = Data::Printer::p $other;
         $self->logger()
           ->logcroak(
-          "Game::EvonyTKR::BasicAttribute equality operator cannot take a $od");
+          "Game::EvonyTKR::Model::BasicAttribute equality operator cannot take a $od");
       }
       else {
         my $mt = $self->total();
@@ -223,7 +223,7 @@ class Game::EvonyTKR::BasicAttribute : isa(Game::EvonyTKR::Data) {
       my $od = Data::Printer::p $other;
       $self->logger()
         ->logcroak(
-        "Game::EvonyTKR::BasicAttribute inequality operator cannot take a $od");
+        "Game::EvonyTKR::Model::BasicAttribute inequality operator cannot take a $od");
     }
     else {
       my $mt = $self->total();
@@ -249,4 +249,4 @@ class Game::EvonyTKR::BasicAttribute : isa(Game::EvonyTKR::Data) {
 }
 1;
 __END__
-# ABSTRACT: Stores a single Basic Attribute of a Game::EvonyTKR::General
+# ABSTRACT: Stores a single Basic Attribute of a Game::EvonyTKR::Model::General

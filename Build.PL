@@ -41,7 +41,9 @@ my $builder = Module::Build->new(
       'Mojolicious::Plugin::Module::Loader' => '0',
       'Mojolicious::Routes'         => '0',
       'Mojolicious::Routes::Route'  => '0',
+      'Path::Iterator::Rule'        => '0',
       'Path::Tiny'                  => '0',
+      'Readonly'                    => '0',
       'Role::Tiny'            => '0',
       'Role::Tiny::With'            => '0',
       'Scalar::Util'                => '0',
@@ -79,7 +81,8 @@ my $builder = Module::Build->new(
       'Log::Any::Adapter'               => '0',
     },
     test_requires       => {
-      'Test::More'  => '0',
+      'Test::More'    => '0',
+      'Perl::Critic'  => '0',
     },
     meta_merge => {
         resources => {

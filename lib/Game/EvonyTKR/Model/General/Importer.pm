@@ -5,7 +5,7 @@ require Data::Printer;
 require Path::Tiny;
 require YAML::PP;
 
-class Game::EvonyTKR::General::Importer : isa(Game::EvonyTKR::Data) {
+class Game::EvonyTKR::Model::General::Importer : isa(Game::EvonyTKR::Model::Data) {
   use Carp;
   use Cwd;
   use List::AllUtils qw( any none );
@@ -13,7 +13,7 @@ class Game::EvonyTKR::General::Importer : isa(Game::EvonyTKR::Data) {
   use Hash::Util;
   use Storable qw(dclone);
   use namespace::autoclean;
-  require Game::EvonyTKR::General;
+  require Game::EvonyTKR::Model::General;
 # VERSION
   my $debug = 1;
 
@@ -56,7 +56,7 @@ class Game::EvonyTKR::General::Importer : isa(Game::EvonyTKR::Data) {
 
       next unless ref $go eq 'HASH' && $go->{name};
 
-      my $general = Game::EvonyTKR::General->new(
+      my $general = Game::EvonyTKR::Model::General->new(
         name            => $go->{name},
         type            => $go->{type},
         ascending       => $go->{ascending},
