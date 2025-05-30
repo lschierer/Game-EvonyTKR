@@ -1,9 +1,0 @@
----
-name: Strategy Expert
-buff:
-  - attribute: Stamina cost
-    condition:
-      - Against Monsters
-    value:
-      number: 25
-      unit: percentage

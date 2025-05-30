@@ -9,6 +9,9 @@ prepare:
 [working-directory: 'share']
 npmdeps:
   pnpm install
+  rsync -a node_modules/evonytkrtips-data/data/ collections/ --delete
+  touch collections/.gitkeep
+
 
 deps: prepare npmdeps
   ./Build installdeps --cpan_client 'cpanm -n'

@@ -1,8 +1,0 @@
----
-name: Heroism
-buff:
-  - attribute: Attack
-    class: Ranged Troops
-    value:
-      number: 35
-      unit: percentage
