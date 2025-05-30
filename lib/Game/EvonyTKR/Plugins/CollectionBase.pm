@@ -26,9 +26,10 @@ package Game::EvonyTKR::Plugins::CollectionBase {
     my @parts = split(/::/, ref($self));
     $base = pop(@parts);
 
-    my $controller_name = $self->can('controller_name') ?
-                             $self->controller_name() :
-                             $base;
+    my $controller_name =
+        $self->can('controller_name')
+      ? $self->controller_name()
+      : $base;
 
     my $routes = $self->getRoutes();
     $routes->get('/details/:name')

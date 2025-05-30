@@ -2,7 +2,8 @@ use v5.40.0;
 use experimental qw(class);
 use File::FindLib 'lib';
 
-class Game::EvonyTKR::Model::BasicAttributes : isa(Game::EvonyTKR::Model::Data) {
+class Game::EvonyTKR::Model::BasicAttributes : isa(Game::EvonyTKR::Model::Data)
+{
 # PODNAME: Game::EvonyTKR::Model::BasicAttributes
   use Carp;
   use List::AllUtils qw( any none );
@@ -116,7 +117,7 @@ class Game::EvonyTKR::Model::BasicAttributes : isa(Game::EvonyTKR::Model::Data) 
       my $od = Data::Printer::p $other;
       $self->logger()
         ->logcroak(
-        "Game::EvonyTKR::Model::BasicAttributes comparison operator cannot take a $od"
+"Game::EvonyTKR::Model::BasicAttributes comparison operator cannot take a $od"
         );
     }
     else {
@@ -133,7 +134,8 @@ class Game::EvonyTKR::Model::BasicAttributes : isa(Game::EvonyTKR::Model::Data) 
       my $od = Data::Printer::p $other;
       $self->logger()
         ->logcroak(
-        "Game::EvonyTKR::Model::BasicAttributes equality operator cannot take a $od");
+"Game::EvonyTKR::Model::BasicAttributes equality operator cannot take a $od"
+        );
     }
     else {
       my $mt = $self->total();
@@ -149,7 +151,7 @@ class Game::EvonyTKR::Model::BasicAttributes : isa(Game::EvonyTKR::Model::Data) 
       my $od = Data::Printer::p $other;
       $self->logger()
         ->logcroak(
-        "Game::EvonyTKR::Model::BasicAttributes inequality operator cannot take a $od"
+"Game::EvonyTKR::Model::BasicAttributes inequality operator cannot take a $od"
         );
     }
     else {

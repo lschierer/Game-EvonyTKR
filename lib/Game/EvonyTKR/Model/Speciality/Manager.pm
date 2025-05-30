@@ -9,21 +9,21 @@ require Path::Iterator::Rule;
 require YAML::PP;
 require Game::EvonyTKR::Model::Buff;
 require Game::EvonyTKR::Model::Buff::Value;
-require Game::EvonyTKR::Model::AscendingAttributes;
+require Game::EvonyTKR::Model::Speciality;
 use namespace::clean;
 
-class Game::EvonyTKR::Model::AscendingAttributes::Manager :
+class Game::EvonyTKR::Model::Speciality::Manager :
   isa(Game::EvonyTKR::Model::Data) {
-  # PODNAME: Game::EvonyTKR::Model::AscendingAttributes::Manager
+  # PODNAME: Game::EvonyTKR::Model::Speciality::Manager
   use Carp;
   use overload
     'fallback' => 0;
 
-  my $ascendingAttributess = {};
+  my $specialities = {};
 
-  method getAscendingAttributes ($name) {
-    if (exists $ascendingAttributess->{$name}) {
-      return $ascendingAttributess->{$name};
+  method getSpeciality ($name) {
+    if (exists $specialities->{$name}) {
+      return $specialities->{$name};
     }
     return 0;
   }
@@ -32,8 +32,7 @@ class Game::EvonyTKR::Model::AscendingAttributes::Manager :
     $SourceDir = Path::Tiny::path($SourceDir);
     if (!$SourceDir->is_dir()) {
       $self->logger->logcroak(
-"Game::EvonyTKR::Model::AscendingAttributes::Manager requires a directory, not $SourceDir"
-      );
+        "Model::Speciality::Manager requires a directory, not $SourceDir");
     }
     my $rule = Path::Iterator::Rule->new();
     $rule->name(qr/\.ya?ml$/);
@@ -48,7 +47,7 @@ class Game::EvonyTKR::Model::AscendingAttributes::Manager :
     while (defined(my $file = $iter->())) {
       # work around for UTF8 filenames not importing correctly by default.
       $file = Path::Tiny::path(Encode::decode('utf8', $file));
-      $self->logger->debug("AscendingAttributes::Manager importing $file");
+      $self->logger->debug("Speciality::Manager importing $file");
       my $basename = $file->basename('.yaml');
       my $name     = $basename;
 
@@ -66,11 +65,11 @@ class Game::EvonyTKR::Model::AscendingAttributes::Manager :
         $name = $object->{name};
       }
 
-      $ascendingAttributess->{$name} =
-        Game::EvonyTKR::Model::AscendingAttributes->new(general => $name,);
-      foreach my $oa (@{ $object->{ascending} }) {
-        my $level = $oa->{level};
-        foreach my $ob (@{ $oa->{buff} }) {
+      $specialities->{$name} =
+        Game::EvonyTKR::Model::Speciality->new(name => $name,);
+      foreach my $ol (@{ $object->{levels} }) {
+        my $level = $ol->{level};
+        foreach my $ob (@{ $ol->{buff} }) {
           my $v = Game::EvonyTKR::Model::Buff::Value->new(
             number => $ob->{number},
             unit   => $ob->{unit},
@@ -94,14 +93,13 @@ class Game::EvonyTKR::Model::AscendingAttributes::Manager :
               $b->set_condition($c);
             }
           }
-          $ascendingAttributess->{$name}->addBuff($level, $b);
+          $specialities->{$name}->addBuff($level, $b);
         }
       }
     }
-    my $countImported = scalar keys %$ascendingAttributess;
+    my $countImported = scalar keys %$specialities;
     $self->logger->info(
-"Game::EvonyTKR::Model::AscendingAttributes::Manager imported $countImported ascendingAttributess"
-    );
+      "Model::Speciality::Manager imported $countImported specialities");
     return $countImported;
   }
 }

@@ -7,12 +7,10 @@ require Game::EvonyTKR::Model::Buff;
 require Game::EvonyTKR::Model::Buff::Value;
 use namespace::clean;
 
-class Game::EvonyTKR::Model::AscendingAttributes : isa(Game::EvonyTKR::Model::Data) {
+class Game::EvonyTKR::Model::AscendingAttributes :
+  isa(Game::EvonyTKR::Model::Data) {
 # PODNAME: Game::EvonyTKR::Model::AscendingAttributes
 
-  use Types::Standard qw(is_Int Int Num is_Num Str is_Str);
-  use Types::Common   qw( t);
-  use Type::Utils     qw(is enum);
   use Carp;
   use Data::Printer;
 

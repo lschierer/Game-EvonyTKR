@@ -31,7 +31,8 @@ class Game::EvonyTKR::Model::Book::Manager : isa(Game::EvonyTKR::Model::Data) {
     $SourceDir = Path::Tiny::path($SourceDir);
     if (!$SourceDir->is_dir()) {
       $self->logger->logcroak(
-        "Game::EvonyTKR::Model::Book::Manager requires a directory, not $SourceDir");
+"Game::EvonyTKR::Model::Book::Manager requires a directory, not $SourceDir"
+      );
     }
     my $rule = Path::Iterator::Rule->new();
     $rule->name(qr/\.ya?ml$/);

@@ -14,7 +14,8 @@ require Game::EvonyTKR::Model::BasicAttribute;
 require Game::EvonyTKR::Model::BasicAttributes;
 use namespace::clean;
 
-class Game::EvonyTKR::Model::General::Manager : isa(Game::EvonyTKR::Model::Data) {
+class Game::EvonyTKR::Model::General::Manager :
+  isa(Game::EvonyTKR::Model::Data) {
   # PODNAME: Game::EvonyTKR::Model::General::Manager
   use Carp;
   use overload
@@ -33,7 +34,7 @@ class Game::EvonyTKR::Model::General::Manager : isa(Game::EvonyTKR::Model::Data)
     $SourceDir = Path::Tiny::path($SourceDir);
     if (!$SourceDir->is_dir()) {
       $self->logger->logcroak(
-        "Game::EvonyTKR::Model::General::Manager requires a directory, not $SourceDir"
+"Game::EvonyTKR::Model::General::Manager requires a directory, not $SourceDir"
       );
     }
     my $rule = Path::Iterator::Rule->new();
@@ -87,7 +88,8 @@ class Game::EvonyTKR::Model::General::Manager : isa(Game::EvonyTKR::Model::Data)
     }
     my $countImported = scalar keys %$generals;
     $self->logger->info(
-      "Game::EvonyTKR::Model::General::Manager imported $countImported Generals");
+      "Game::EvonyTKR::Model::General::Manager imported $countImported Generals"
+    );
     return $countImported;
   }
 }

@@ -131,7 +131,8 @@ package Game::EvonyTKR {
       croak("no generals collection available at $generalsDir");
     }
 
-    my $gi = Game::EvonyTKR::Model::General::Importer->new(inputDir => $generalsDir,);
+    my $gi =
+      Game::EvonyTKR::Model::General::Importer->new(inputDir => $generalsDir,);
     $generals = $gi->importAll();
     my $json =
       JSON::PP->new()

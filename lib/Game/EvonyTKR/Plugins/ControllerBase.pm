@@ -29,9 +29,10 @@ package Game::EvonyTKR::Plugins::ControllerBase {
     $base = pop(@parts);
     my $r = $app->routes;
 
-    my $controller_name = $self->can('controller_name') ?
-                             $self->controller_name() :
-                             $base;
+    my $controller_name =
+        $self->can('controller_name')
+      ? $self->controller_name()
+      : $base;
 
     # Set up routes
     $routes = $r->any("/$base");

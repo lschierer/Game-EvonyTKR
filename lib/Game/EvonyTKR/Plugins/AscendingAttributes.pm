@@ -14,8 +14,8 @@ package Game::EvonyTKR::Plugins::AscendingAttributes {
   sub collection_name {'ascending attributes'}
 
   sub controller_name($self) {
-       return 'AscendingAttributes';  # Explicitly return the controller name
-     }
+    return 'AscendingAttributes';    # Explicitly return the controller name
+  }
 
   # Override loadItem to add any Ascending Attributes-specific processing
 
@@ -82,7 +82,7 @@ package Game::EvonyTKR::Plugins::AscendingAttributes {
     );
   }
 
-  sub show ($self ) {
+  sub show ($self) {
     return $self->SUPER::show();
   }
 

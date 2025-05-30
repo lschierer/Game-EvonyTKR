@@ -60,7 +60,9 @@ class Game::EvonyTKR::Model::Book : isa(Game::EvonyTKR::Model::Data) {
         my @bcl = split(/::/, $bc);
         if (not($bcl[1] eq 'EvonyTKR' and $bcl[2] eq 'Buff')) {
           push @errors,
-            sprintf('$buff must contain type Game::EvonyTKR::Model::Buff not %s', $bc);
+            sprintf(
+            '$buff must contain type Game::EvonyTKR::Model::Buff not %s',
+            $bc);
         }
       }
     }

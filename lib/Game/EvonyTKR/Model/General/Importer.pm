@@ -5,7 +5,8 @@ require Data::Printer;
 require Path::Tiny;
 require YAML::PP;
 
-class Game::EvonyTKR::Model::General::Importer : isa(Game::EvonyTKR::Model::Data) {
+class Game::EvonyTKR::Model::General::Importer :
+  isa(Game::EvonyTKR::Model::Data) {
   use Carp;
   use Cwd;
   use List::AllUtils qw( any none );
@@ -98,5 +99,5 @@ class Game::EvonyTKR::Model::General::Importer : isa(Game::EvonyTKR::Model::Data
     return $generals;
   }
 
-};
+  };
 1;

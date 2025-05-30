@@ -5,7 +5,8 @@ use File::FindLib 'lib';
 require Data::Printer;
 require Game::EvonyTKR::Model::Buff;
 
-class Game::EvonyTKR::Model::Book::SkillBook : isa(Game::EvonyTKR::Model::Book) {
+class Game::EvonyTKR::Model::Book::SkillBook : isa(Game::EvonyTKR::Model::Book)
+{
 # PODNAME: Game::EvonyTKR::Model::Book::SkillBook
   use List::AllUtils qw( any none );
   use namespace::autoclean;

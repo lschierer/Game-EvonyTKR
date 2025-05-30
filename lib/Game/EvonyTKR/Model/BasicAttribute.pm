@@ -177,7 +177,8 @@ class Game::EvonyTKR::Model::BasicAttribute : isa(Game::EvonyTKR::Model::Data) {
       my $od = Data::Printer::p $other;
       $self->logger()
         ->logcroak(
-        "Game::EvonyTKR::Model::BasicAttribute comparison operator cannot take a $od");
+"Game::EvonyTKR::Model::BasicAttribute comparison operator cannot take a $od"
+        );
     }
     else {
       my $mt = $self->total();
@@ -201,7 +202,8 @@ class Game::EvonyTKR::Model::BasicAttribute : isa(Game::EvonyTKR::Model::Data) {
         my $od = Data::Printer::p $other;
         $self->logger()
           ->logcroak(
-          "Game::EvonyTKR::Model::BasicAttribute equality operator cannot take a $od");
+"Game::EvonyTKR::Model::BasicAttribute equality operator cannot take a $od"
+          );
       }
       else {
         my $mt = $self->total();
@@ -223,7 +225,8 @@ class Game::EvonyTKR::Model::BasicAttribute : isa(Game::EvonyTKR::Model::Data) {
       my $od = Data::Printer::p $other;
       $self->logger()
         ->logcroak(
-        "Game::EvonyTKR::Model::BasicAttribute inequality operator cannot take a $od");
+"Game::EvonyTKR::Model::BasicAttribute inequality operator cannot take a $od"
+        );
     }
     else {
       my $mt = $self->total();
