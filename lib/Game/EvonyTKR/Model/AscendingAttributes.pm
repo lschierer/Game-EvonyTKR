@@ -1,5 +1,7 @@
 use v5.40.0;
 use experimental qw(class);
+use utf8::all;
+
 use FindBin;
 require JSON::PP;
 use lib "$FindBin::Bin/../../../lib";
@@ -23,13 +25,6 @@ class Game::EvonyTKR::Model::AscendingAttributes :
   use overload
     '""'       => \&_toString,
     "fallback" => 1;
-
-# from Type::Registry, this will save me from some of the struggles I have had with some types having blessed references and others not.
-  ADJUST {
-    if (!(t->simple_lookup("Num"))) {
-      t->add_types(-Common);
-    }
-  }
 
   field $id : reader;
   field $general : reader : param;

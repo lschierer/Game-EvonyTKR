@@ -24,28 +24,12 @@ class Game::EvonyTKR::Model::Logger {
     $self->get_logger();
   }
 
-  method get_logger() {
-    if (not defined $category) {
-      $category = __CLASS__;
-    }
-    $logger = Log::Log4perl->get_logger($category);
+  method get_logger {
+    return $logger if defined $logger;
+    Log::Log4perl::Config->utf8(1);
+    $logger = Log::Log4perl->get_logger($category)
+      ;    # $category is a field set to __CLASS__
     return $logger;
-  }
-
-  method getLogfileName($name = 'system.log') {
-    my $home = File::HomeDir->my_home;
-    my $logDir =
-      Path::Tiny::path($home)->child('var/log/Perl/dist/Game-Evony/');
-    if (!-r -w -x -o -d $logDir) {
-      $logDir = Path::Tiny::path($logDir);
-      $logDir->mkdir({ mode => 0770 });
-    }
-    my $logFile = $logDir->child($name);
-    if (!$logFile->is_file()) {
-      $logFile->touch();
-      $logFile->chmod(0600);
-    }
-    return $logFile;
   }
 
   method toHashRef {

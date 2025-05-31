@@ -1,5 +1,7 @@
 use v5.40.0;
 use experimental qw(class);
+use utf8::all;
+
 use FindBin;
 require JSON::PP;
 use lib "$FindBin::Bin/../../../lib";

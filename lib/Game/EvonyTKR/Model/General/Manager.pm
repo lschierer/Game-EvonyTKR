@@ -21,7 +21,7 @@ class Game::EvonyTKR::Model::General::Manager :
   use overload
     'fallback' => 0;
 
-  my $generals = {};
+  field $generals = {};
 
   method getGeneral ($name) {
     if (exists $generals->{$name}) {

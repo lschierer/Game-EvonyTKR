@@ -8,7 +8,7 @@ use File::Spec;
 use Util::Any -all;
 use namespace::autoclean;
 
-package Game::EvonyTKR::Model::Logger::Config {
+package Game::EvonyTKR::Logger::Config {
   use Carp;
   use File::FindLib 'lib';
   our $VERSION = 'v0.30.0';
@@ -23,7 +23,7 @@ package Game::EvonyTKR::Model::Logger::Config {
   );
 
   sub new ($class, $m = 'production') {
-    say "Game::EvonyTKR::Model::Logger::Config new sub";
+    say "Game::EvonyTKR::Logger::Config new sub";
     my $self = { mode => $m, };
     bless $self, $class;
   }

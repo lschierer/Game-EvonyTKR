@@ -11,13 +11,7 @@ div.collection-list {
 }
 
 .collection-item {
-  border: 1px solid #ddd;
+  border: 1px solid var(--surface-4);
   border-radius: 4px;
   padding: 1rem;
-  transition: transform 0.2s ease-in-out;
-}
-
-.collection-item:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 4px 8px rgb(0 0 0 / 10%);
 }

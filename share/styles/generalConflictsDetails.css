@@ -1,0 +1,43 @@
+.collection-list {
+  padding: var(--size-4) var(--size-3);
+  width: 100%;
+}
+
+general-conflict-group-details {
+  width: 95vw;
+}
+
+.collection-item {
+  border: 1px solid var(--surface-4);
+  border-radius: 4px;
+  padding: 1rem;
+}
+
+.members-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(200px, 1fr));
+  gap: 0.5rem 1rem;
+  padding: 0;
+  list-style: none;
+  margin: var(--size-2);
+  max-width: 100%;
+}
+
+.other-conflicts {
+  width: 100%;
+  max-inline-size: none;
+}
+
+.other-conflicts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0.5rem 1rem;
+  padding: 1rem;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: calc(95vw - 3rem);
+  border-left: 3px solid var(--surface-3);
+  background-color: var(--surface-1);
+  list-style: none;
+  width: 100%;
+}

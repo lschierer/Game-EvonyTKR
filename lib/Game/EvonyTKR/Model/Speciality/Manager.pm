@@ -19,7 +19,7 @@ class Game::EvonyTKR::Model::Speciality::Manager :
   use overload
     'fallback' => 0;
 
-  my $specialities = {};
+  field $specialities = {};
 
   method getSpeciality ($name) {
     if (exists $specialities->{$name}) {

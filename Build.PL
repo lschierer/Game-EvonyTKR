@@ -50,6 +50,7 @@ my $builder = Module::Build->new(
       'Sereal::Decoder'             => '0',
       'Sereal::Encoder'             => '0',
       'Storable'                    => '0',
+      'Text::CSV'		    => '0',
       'Text::MultiMarkdown'         => '0',
       'Type::Tiny::Enum'            => '0',
       'Type::Utils'                 => '0',

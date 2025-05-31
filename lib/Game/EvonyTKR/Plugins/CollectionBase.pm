@@ -170,8 +170,6 @@ package Game::EvonyTKR::Plugins::CollectionBase {
 
     $logger->debug("show detects name $name");
 
-    $logger->debug("Showing details for $name");
-
     unless ($self->itemExists($name)) {
       $logger->error("Item not found: $name");
       return $self->reply->not_found;

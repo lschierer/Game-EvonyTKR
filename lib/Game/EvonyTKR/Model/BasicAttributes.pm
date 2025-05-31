@@ -1,5 +1,7 @@
 use v5.40.0;
 use experimental qw(class);
+use utf8::all;
+
 use File::FindLib 'lib';
 
 class Game::EvonyTKR::Model::BasicAttributes : isa(Game::EvonyTKR::Model::Data)
@@ -64,7 +66,7 @@ class Game::EvonyTKR::Model::BasicAttributes : isa(Game::EvonyTKR::Model::Data)
     }
 
     my @nac = split(/::/, blessed $newAttribute);
-    if ($nac[2] ne 'BasicAttribute') {
+    if ($nac[3] ne 'BasicAttribute') {
       $self->logger()->error(sprintf(
         'newAttribute must be a %s not a %s',
         'Game::EvonyTKR::Model::BasicAttribute',

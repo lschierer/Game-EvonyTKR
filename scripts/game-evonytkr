@@ -2,6 +2,8 @@
 use v5.40.0;
 use experimental qw(class);
 use utf8::all;
+binmode(STDOUT, ":utf8");
+binmode(STDERR, ":utf8");
 use Carp;
 
 use Mojo::Base -strict;

@@ -1,18 +1,22 @@
 use v5.40.0;
 use experimental qw(class);
 use utf8::all;
+binmode(STDOUT, ":utf8");
+binmode(STDERR, ":utf8");
 use File::FindLib 'lib';
 require YAML::PP;
 require Game::EvonyTKR::Model::Logger;
-require Game::EvonyTKR::Model::Logger::Config;
+require Game::EvonyTKR::Logger::Config;
 require Game::EvonyTKR::Plugins::ControllerBase;
 require Game::EvonyTKR::Plugins::CollectionBase;
+
 use namespace::clean;
 
 package Game::EvonyTKR {
   use Mojo::Base 'Mojolicious', -strict, -signatures;
   use Mojo::File::Share qw(dist_dir dist_file);
   use Log::Log4perl;
+  use Log::Log4perl::Config;
 
   use Carp;
   our $VERSION = 'v0.50.0';
@@ -56,9 +60,6 @@ package Game::EvonyTKR {
     push @{ $self->routes->namespaces }, 'Game::EvonyTKR::Plugins';
     $r->any("/")->to('Root#index');
 
-    my $SystemLogger = Game::EvonyTKR::Model::Logger->new();
-    my $logFile2     = $SystemLogger->getLogfileName();
-
     my %logLevel = (
       development => 'ALL',
       production  => 'INFO',
@@ -68,7 +69,7 @@ package Game::EvonyTKR {
     say "starting with mode $mode";
 
     # Use the Logger::Config module to get the log configuration path
-    my $loggerConfig = Game::EvonyTKR::Model::Logger::Config->new($mode);
+    my $loggerConfig = Game::EvonyTKR::Logger::Config->new($mode);
     my $logConfig;
 
     # Use traditional Perl error handling with eval
@@ -84,6 +85,7 @@ package Game::EvonyTKR {
       $self->log->info("Using Log4perl config from $logConfig");
 
       # Initialize Log4perl with the config file
+      Log::Log4perl::Config->utf8(1);
       Log::Log4perl::init($logConfig);
 
       # Get the logger instance

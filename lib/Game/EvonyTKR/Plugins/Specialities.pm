@@ -29,7 +29,8 @@ package Game::EvonyTKR::Plugins::Specialities {
       $manager->importAll($SourceDir);
 
       $logger->info(
-        "Successfully loaded Speciality manager with collection from $SourceDir");
+        "Successfully loaded Speciality manager with collection from $SourceDir"
+      );
     };
     if ($@) {
       $logger->error("Failed to initialize Speciality Manager: $@");

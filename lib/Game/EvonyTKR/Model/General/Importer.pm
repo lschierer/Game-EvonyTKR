@@ -1,5 +1,7 @@
 use v5.40.0;
 use experimental qw(class);
+use utf8::all;
+
 use File::FindLib 'lib';
 require Data::Printer;
 require Path::Tiny;
