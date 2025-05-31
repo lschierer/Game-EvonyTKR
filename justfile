@@ -29,4 +29,5 @@ build: deps css
   ./Build
 
 dev: deps css
+  rm -f "${HOME}/var/log/Perl/dist/Game-Evony/*.log"
   morbo --watch ./share --watch ./lib ./scripts/game-evonytkr

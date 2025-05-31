@@ -1,8 +1,6 @@
 use v5.40.0;
 use experimental qw(class);
 use utf8::all;
-binmode(STDOUT, ":utf8");
-binmode(STDERR, ":utf8");
 use File::FindLib 'lib';
 require YAML::PP;
 require Game::EvonyTKR::Model::Logger;
@@ -17,6 +15,7 @@ package Game::EvonyTKR {
   use Mojo::File::Share qw(dist_dir dist_file);
   use Log::Log4perl;
   use Log::Log4perl::Config;
+  Log::Log4perl::Config->utf8(1);
 
   use Carp;
   our $VERSION = 'v0.50.0';
@@ -32,6 +31,7 @@ package Game::EvonyTKR {
     my $distDir = Mojo::File::Share::dist_dir('Game::EvonyTKR');
     my $home    = Mojo::Home->new;
     $home->detect;
+    Log::Log4perl::Config->utf8(1);
     $self->log->debug("Mojo Home is $home");
     $self->log->debug("Distribution directory is $distDir");
 
@@ -69,6 +69,7 @@ package Game::EvonyTKR {
     say "starting with mode $mode";
 
     # Use the Logger::Config module to get the log configuration path
+
     my $loggerConfig = Game::EvonyTKR::Logger::Config->new($mode);
     my $logConfig;
 
@@ -85,7 +86,7 @@ package Game::EvonyTKR {
       $self->log->info("Using Log4perl config from $logConfig");
 
       # Initialize Log4perl with the config file
-      Log::Log4perl::Config->utf8(1);
+
       Log::Log4perl::init($logConfig);
 
       # Get the logger instance

@@ -2,18 +2,19 @@
 use v5.40.0;
 use experimental qw(class);
 use utf8::all;
-binmode(STDOUT, ":utf8");
-binmode(STDERR, ":utf8");
+
 use Carp;
 
 use Mojo::Base -strict;
 use Mojo::File qw(curfile);
 use lib curfile->dirname->sibling('lib')->to_string;
 use Mojolicious::Commands;
+use Log::Log4perl;
+use Log::Log4perl::Config;
 
 # PODNAME: App::game-evonytkr
 our $VERSION = 'v0.50.0';
-
+Log::Log4perl::Config->utf8(1);
 
 # Start command line interface for application
 require Game::EvonyTKR;
