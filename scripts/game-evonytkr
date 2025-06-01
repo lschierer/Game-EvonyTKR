@@ -1,27 +1,16 @@
 #!/usr/bin/env perl
-use v5.40.0;
+use v5.40;
 use experimental qw(class);
 use utf8::all;
-
-use Carp;
 
 use Mojo::Base -strict;
 use Mojo::File qw(curfile);
 use lib curfile->dirname->sibling('lib')->to_string;
+
 use Mojolicious::Commands;
-use Log::Log4perl;
-use Log::Log4perl::Config;
 
-# PODNAME: App::game-evonytkr
-our $VERSION = 'v0.50.0';
-Log::Log4perl::Config->utf8(1);
-
-# Start command line interface for application
-require Game::EvonyTKR;
-
+# Start the app
 Mojolicious::Commands->start_app('Game::EvonyTKR');
-
-__END__
 # ABSTRACT: command wrapper for the Game::EvonyTKR Mojolicious application
 
 =pod

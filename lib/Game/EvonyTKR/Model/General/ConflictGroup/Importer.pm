@@ -83,7 +83,8 @@ class Game::EvonyTKR::Model::General::ConflictGroup::Importer :
     # -----------------------------
     # Load group link definitions
     # -----------------------------
-    my %group_links;
+
+    my %code_parts;
     my $grp_csv = Text::CSV->new({ binary => 1, auto_diag => 1 });
 
     open my $grp_fh, '<:encoding(UTF-8)', $groups_file
@@ -92,26 +93,17 @@ class Game::EvonyTKR::Model::General::ConflictGroup::Importer :
     $grp_csv->column_names(@$grp_header);
 
     while (my $row = $grp_csv->getline_hr($grp_fh)) {
+      my $key   = $row->{Skill}                    // next;
       my $combo = $row->{'Troop Combination Code'} // next;
-      next if $combo =~ /^\s*$/;
-      my @groups = split /[-&]/, $combo;
-      for my $g1 (@groups) {
-        for my $g2 (@groups) {
-          next if $g1 eq $g2;
-          push @{ $group_links{$g1} }, $g2;
-        }
-      }
+      $code_parts{$key} = [
+        $row->{'Troop Combination Code'} // '',
+        $row->{'Skill Combination Code'} // '',
+        $row->{'Action Code'}            // '',
+      ];
     }
     close $grp_fh;
 
-    # Normalize linked group lists
-    $_ = [uniq @{$_}] for values %group_links;
-
-    return \%group_links;
-  }
-
-  method buildLinks($group_members) {
-
+    return \%code_parts;
   }
 
   method importAndMap() {

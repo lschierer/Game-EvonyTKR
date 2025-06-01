@@ -12,8 +12,6 @@ package Game::EvonyTKR::Plugins::Generals {
   # Specify which collection this controller handles
   sub collection_name {'generals'}
 
-  my $manager;
-
   # Override loadItem to add any generals-specific processing
 
   sub register($self, $app, $config = {}) {
@@ -21,25 +19,9 @@ package Game::EvonyTKR::Plugins::Generals {
     $logger->info("Registering routes for " . ref($self));
     $self->SUPER::register($app, $config);
 
-    eval {
-      $manager = Game::EvonyTKR::Model::General::Manager->new();
-
-      my $distDir    = Mojo::File::Share::dist_dir('Game::EvonyTKR');
-      my $collection = $self->collection_name;
-      my $SourceDir  = $distDir->child("collections/$collection");
-      $manager->importAll($SourceDir);
-
-      $logger->info(
-        "Successfully loaded book manager with collection from $SourceDir");
-    };
-    if ($@) {
-      $logger->error("Failed to initialize General Manager: $@");
-      $manager = undef;
-    }
-
     $app->helper(
       get_general_manager => sub {
-        return $manager;
+        return $self->app->get_root_manager->generalManager;
       }
     );
   }
@@ -54,7 +36,8 @@ package Game::EvonyTKR::Plugins::Generals {
 
     $logger->debug("Showing details for $name");
 
-    my $general = $manager->getGeneral($name);
+    my $general =
+      $self->app->get_root_manager->generalManager->getGeneral($name);
     $logger->debug("got general of type " . blessed $general);
 
     if ($general) {

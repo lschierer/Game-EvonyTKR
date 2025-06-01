@@ -1,0 +1,16 @@
+<link rel="stylesheet" href="/css/collectionIndex.css" />
+
+<div class="collection-list">
+
+  <ul class="collection-grid">
+    <% if ($items && ref $items eq 'ARRAY') { %>
+      <% foreach my $item (sort @{ $items} ) { %>
+        <li class="collection-item">
+          <a href="/Generals/Pairs/<%= $item %>/">
+            <%= $item %>
+          </a>
+        </li>
+      <% } %>
+    <% } %>
+  </ul>
+</div>

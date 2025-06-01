@@ -12,34 +12,15 @@ package Game::EvonyTKR::Plugins::GeneralConflictGroups {
   # Specify which collection this controller handles
   sub collection_name {'general conflict groups'}
 
-  my $manager;
-
   # Override loadItem to add any generals-specific processing
   sub register($self, $app, $config = {}) {
     my $logger = Log::Log4perl->get_logger(__PACKAGE__);
     $logger->info("Registering routes for " . ref($self));
     $self->SUPER::register($app, $config);
 
-    eval {
-      $manager = Game::EvonyTKR::Model::General::ConflictGroup::Manager->new();
-
-      my $distDir    = Mojo::File::Share::dist_dir('Game::EvonyTKR');
-      my $collection = $self->collection_name;
-      my $SourceDir  = $distDir->child("collections/$collection");
-      $manager->importAll($SourceDir);
-
-      $logger->info(
-"Successfully loaded General::ConflictGroup manager with collection from $SourceDir"
-      );
-    };
-    if ($@) {
-      $logger->error("Failed to initialize General::ConflictGroup Manager: $@");
-      $manager = undef;
-    }
-
     $app->helper(
-      get_general_conflictgroup_manager => sub {
-        return $manager;
+      get_general_conflictgroup_manager => sub ($c) {
+        return $c->app->get_root_manager->generalConflictGroupManager;
       }
     );
   }
@@ -54,7 +35,9 @@ package Game::EvonyTKR::Plugins::GeneralConflictGroups {
     my @parts     = split(/::/, ref($self));
     my $baseClass = pop(@parts);
     $self->stash(
-      items           => $manager->get_conflict_groups(),
+      items => $self->app->get_root_manager->generalConflictGroupManager
+        ->get_conflict_groups(
+        ),
       collection_name => $collection,
       controller_name => $baseClass,
     );
@@ -95,7 +78,8 @@ package Game::EvonyTKR::Plugins::GeneralConflictGroups {
       $logger->error("No id provided for show controller");
       return $self->reply->not_found;
     }
-    my $item = $manager->get_conflict_group($id);
+    my $item = $self->app->get_root_manager->generalConflictGroupManager
+      ->get_conflict_group($id);
     $self->stash(item => $item);
 
     if ( !defined $item

@@ -10,7 +10,7 @@ importers:
     dependencies:
       evonytkrtips-data:
         specifier: github:lschierer/EvonyTKRTips-Data
-        version: '@evonytkrtips/data@https://codeload.github.com/lschierer/EvonyTKRTips-Data/tar.gz/bb93b932a12bee571b58b540066e852adcf22ecc'
+        version: '@evonytkrtips/data@https://codeload.github.com/lschierer/EvonyTKRTips-Data/tar.gz/13001d2389795979de14c0ea526cb7d0828c6a61'
       open-props:
         specifier: ^1.7.15
         version: 1.7.15
@@ -506,8 +506,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@evonytkrtips/data@https://codeload.github.com/lschierer/EvonyTKRTips-Data/tar.gz/bb93b932a12bee571b58b540066e852adcf22ecc':
-    resolution: {tarball: https://codeload.github.com/lschierer/EvonyTKRTips-Data/tar.gz/bb93b932a12bee571b58b540066e852adcf22ecc}
+  '@evonytkrtips/data@https://codeload.github.com/lschierer/EvonyTKRTips-Data/tar.gz/13001d2389795979de14c0ea526cb7d0828c6a61':
+    resolution: {tarball: https://codeload.github.com/lschierer/EvonyTKRTips-Data/tar.gz/13001d2389795979de14c0ea526cb7d0828c6a61}
     version: 1.0.0
 
   '@isaacs/cliui@8.0.2':
@@ -2124,7 +2124,7 @@ snapshots:
   '@esbuild/win32-x64@0.25.5':
     optional: true
 
-  '@evonytkrtips/data@https://codeload.github.com/lschierer/EvonyTKRTips-Data/tar.gz/bb93b932a12bee571b58b540066e852adcf22ecc': {}
+  '@evonytkrtips/data@https://codeload.github.com/lschierer/EvonyTKRTips-Data/tar.gz/13001d2389795979de14c0ea526cb7d0828c6a61': {}
 
   '@isaacs/cliui@8.0.2':
     dependencies:

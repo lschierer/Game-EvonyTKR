@@ -23,7 +23,17 @@ class Game::EvonyTKR::Model::General::ConflictGroup::Manager :
   }
 
   method are_generals_compatible($general1, $general2) {
-    # Efficient compatibility check using indexes
+    # Trivially compatible if the names are identical
+    # Return false - A general cannot pair with him/herself.
+    return 0 if $general1 eq $general2;
+
+    my $groups = $self->get_conflict_groups_for_general($general1);
+    foreach my $group_id (@$groups) {
+      my $group = $self->get_conflict_group($group_id) // next;
+      return $group->is_compatible($general1, $general2);
+    }
+
+    return 1;
   }
 
   method get_conflict_group($id) {

@@ -23,6 +23,10 @@ class Game::EvonyTKR::Model::General::Manager :
 
   field $generals = {};
 
+  method get_all_generals () {
+    return \%{ $generals };
+  }
+
   method getGeneral ($name) {
     if (exists $generals->{$name}) {
       return $generals->{$name};

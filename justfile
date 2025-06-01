@@ -13,7 +13,7 @@ npmdeps:
   touch collections/.gitkeep
   mkdir 'collections/general conflict groups'
   touch 'collections/general conflict groups/.gitkeep'
-  find node_modules/evonytkrtips-data/share/ -name '*.csv' -exec iconv -f macroman -t utf-8 {} > `basename {} ` \;
+  find node_modules/evonytkrtips-data/share/ -name '*.csv' -exec sh -c 'iconv -f macroman -t utf-8 "$1" > "$(basename "$1")"' _ {} \;
 
 
 deps: prepare npmdeps

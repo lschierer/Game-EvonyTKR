@@ -69,12 +69,10 @@ class Game::EvonyTKR::Model::General::ConflictGroup :
       next unless $linked;
 
       for my $general (@{ $linked->primary_generals }) {
-        $self->logger->debug(
-          sprintf(
-            'linked group %s adding %s to %s',
-            $linked->name, $general, $self->name
-          )
-        );
+        $self->logger->debug(sprintf(
+          'linked group %s adding %s to %s',
+          $linked->name, $general, $self->name
+        ));
         my $norm = $self->normalize_name($general);
         $expanded_conflicts->{$norm} = 1;
         $other_conflicts->{$norm}    = 1 unless $is_primary{$norm};
