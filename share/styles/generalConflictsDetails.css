@@ -10,13 +10,13 @@ general-conflict-group-details {
 .collection-item {
   border: 1px solid var(--surface-4);
   border-radius: 4px;
-  padding: 1rem;
+  padding: var(--size-3);
 }
 
 .members-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(200px, 1fr));
-  gap: 0.5rem 1rem;
+  gap: var(--size-2) var(--size-3);
   padding: 0;
   list-style: none;
   margin: var(--size-2);
@@ -31,11 +31,11 @@ general-conflict-group-details {
 .other-conflicts-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 0.5rem 1rem;
-  padding: 1rem;
+  gap: var(--size-2) var(--size-3);
+  padding: var(--size-3);
   margin-left: auto;
   margin-right: auto;
-  max-width: calc(95vw - 3rem);
+  max-width: calc(95vw - var(--size-8));
   border-left: 3px solid var(--surface-3);
   background-color: var(--surface-1);
   list-style: none;

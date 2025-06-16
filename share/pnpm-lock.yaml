@@ -8,12 +8,21 @@ importers:
 
   .:
     dependencies:
+      '@spectrum-css/icon':
+        specifier: ^9.1.0
+        version: 9.1.0(@spectrum-css/tokens@16.0.2)
+      '@spectrum-css/link':
+        specifier: ^7.1.0
+        version: 7.1.0(@spectrum-css/tokens@16.0.2)
+      '@spectrum-css/tokens':
+        specifier: ^16.0.2
+        version: 16.0.2
+      '@spectrum-css/typography':
+        specifier: ^8.1.0
+        version: 8.1.0(@spectrum-css/tokens@16.0.2)
       evonytkrtips-data:
         specifier: github:lschierer/EvonyTKRTips-Data
         version: '@evonytkrtips/data@https://codeload.github.com/lschierer/EvonyTKRTips-Data/tar.gz/13001d2389795979de14c0ea526cb7d0828c6a61'
-      open-props:
-        specifier: ^1.7.15
-        version: 1.7.15
     devDependencies:
       '@tsconfig/node22':
         specifier: ^22.0.2
@@ -536,6 +545,33 @@ packages:
   '@nodelib/fs.walk@1.2.8':
     resolution: {integrity: sha512-oGB+UxlgWcgQkgwo8GcEGwemoTFt3FIO9ababBmaGwXIoBKZ+GTy0pP185beGg7Llih/NSHSV2XAs1lnznocSg==}
     engines: {node: '>= 8'}
+
+  '@spectrum-css/icon@9.1.0':
+    resolution: {integrity: sha512-w7/Xcb6zr9wLS0et8Rb5MMdbfP2FC1/hTaiARVfos2u8MC5J3gFpyM7QIOJzgTJVQGWgRQZAAWYfqGNBmWPNmw==}
+    peerDependencies:
+      '@spectrum-css/tokens': '>=16.0.0 <17.0.0'
+    peerDependenciesMeta:
+      '@spectrum-css/tokens':
+        optional: true
+
+  '@spectrum-css/link@7.1.0':
+    resolution: {integrity: sha512-uhf0FnBdk+seD9kr3iBhKN9pBTYuENcAqy4JFeUZTqtWByem/gJ4Y4jEb/zE4ENo4u8RzvM4RHr9FGgSGkb29g==}
+    peerDependencies:
+      '@spectrum-css/tokens': '>=16.0.1'
+    peerDependenciesMeta:
+      '@spectrum-css/tokens':
+        optional: true
+
+  '@spectrum-css/tokens@16.0.2':
+    resolution: {integrity: sha512-VF/O5I903qpwO6TUZY4hTvYTy7t5HHe1nY6xBD2ZbaT4tX5Dm7RsSw8umVw5qbjCinHJL/pEsb0xsWtlsyUicQ==}
+
+  '@spectrum-css/typography@8.1.0':
+    resolution: {integrity: sha512-zw3shoF9M6rnnwBWEXZaMhG5HaNag7auCUJ3YdqG9AvvQo038gjSrbOXMIOPPxocZjxYU+g5gNLAaCr88fjSwA==}
+    peerDependencies:
+      '@spectrum-css/tokens': '>=16.0.1'
+    peerDependenciesMeta:
+      '@spectrum-css/tokens':
+        optional: true
 
   '@trysound/sax@0.2.0':
     resolution: {integrity: sha512-L7z9BgrNEcYyUYtF+HaEfiS5ebkh9jXqbszz7pC0hRBPaatV0XjSD3+eHrpqFemQfgwiFF0QPIarnIihIDn7OA==}
@@ -1102,9 +1138,6 @@ packages:
 
   nth-check@2.1.1:
     resolution: {integrity: sha512-lqjrjmaOoAnWfMmBPL+XNnynZh2+swxiX3WUE0s4yEHI6m+AwrK2UZOimIRl3X/4QctVqS8AiZjFqyOGrMXb/w==}
-
-  open-props@1.7.15:
-    resolution: {integrity: sha512-TvyN35N02w1wmIsz6SUInEo0RaVvSvIj794qlHjkmeTFuBYu2vzV6LbZyE5D8/c5UsGtRudl4ScK1jkabPBpGw==}
 
   package-json-from-dist@1.0.1:
     resolution: {integrity: sha512-UEZIS3/by4OC8vL3P2dTXRETpebLI2NiI5vIrjaD/5UtrkFX/tNbwjTSRAGC/+7CAo2pIcBaRgWmcBBHcsaCIw==}
@@ -2159,6 +2192,20 @@ snapshots:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.19.1
 
+  '@spectrum-css/icon@9.1.0(@spectrum-css/tokens@16.0.2)':
+    optionalDependencies:
+      '@spectrum-css/tokens': 16.0.2
+
+  '@spectrum-css/link@7.1.0(@spectrum-css/tokens@16.0.2)':
+    optionalDependencies:
+      '@spectrum-css/tokens': 16.0.2
+
+  '@spectrum-css/tokens@16.0.2': {}
+
+  '@spectrum-css/typography@8.1.0(@spectrum-css/tokens@16.0.2)':
+    optionalDependencies:
+      '@spectrum-css/tokens': 16.0.2
+
   '@trysound/sax@0.2.0': {}
 
   '@tsconfig/node22@22.0.2': {}
@@ -2716,8 +2763,6 @@ snapshots:
   nth-check@2.1.1:
     dependencies:
       boolbase: 1.0.0
-
-  open-props@1.7.15: {}
 
   package-json-from-dist@1.0.1: {}
 

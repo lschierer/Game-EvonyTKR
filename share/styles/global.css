@@ -1,32 +1,34 @@
 /* the props */
-@import url('open-props/open-props.min.css');
-@import url('open-props/theme.light.switch.min.css');
-@import url('open-props/theme.dark.switch.min.css');
-
-/* optional imports that use the props */
-@import url('open-props/normalize.min.css');
-@import url('open-props/buttons.min.css');
+@import url('@spectrum-css/tokens/dist/css/index.css');
+@import url('@spectrum-css/typography/dist/index.css');
+@import url('@spectrum-css/icon/dist/index.css');
+@import url('@spectrum-css/link/dist/index.css');
 
 :root {
-  --brand: var(--brand-light);
-  --text-1: var(--text-1-light);
-  --text-2: var(--text-2-light);
-  --surface-1: var(--surface-1-light);
-  --surface-2: var(--surface-2-light);
-  --surface-3: var(--surface-3-light);
-  --surface-4: var(--surface-4-light);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --brand: var(--brand-dark);
-    --text-1: var(--text-1-dark);
-    --text-2: var(--text-2-dark);
-    --surface-1: var(--surface-1-dark);
-    --surface-2: var(--surface-2-dark);
-    --surface-3: var(--surface-3-dark);
-    --surface-4: var(--surface-4-dark);
-  }
+  --brand: var(--spectrum-cyan-800);
+  --text-1: var(--spectrum-cyan-1300);
+  --text-2: var(--spectrum-cyan-400);
+  --surface-1: var(--spectrum-gray-300);
+  --surface-2: var(--spectrum-gray-500);
+  --surface-3: var(--spectrum-gray-700);
+  --surface-4: var(--spectrum-gray-900);
+  --size-000: -0.5rem;
+  --size-00: -0.25rem;
+  --size-1: 0.25rem;
+  --size-2: 0.5rem;
+  --size-3: 1rem;
+  --size-4: 1.25rem;
+  --size-5: 1.5rem;
+  --size-6: 1.75rem;
+  --size-7: 2rem;
+  --size-8: 3rem;
+  --size-9: 4rem;
+  --size-10: 5rem;
+  --size-11: 7.5rem;
+  --size-12: 10rem;
+  --size-13: 15rem;
+  --size-14: 20rem;
+  --size-15: 30rem;
 }
 
 html,

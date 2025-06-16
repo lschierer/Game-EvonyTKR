@@ -35,7 +35,10 @@
     "typescript": "^5.8.3"
   },
   "dependencies": {
-    "evonytkrtips-data": "github:lschierer/EvonyTKRTips-Data",
-    "open-props": "^1.7.15"
+    "@spectrum-css/icon": "^9.1.0",
+    "@spectrum-css/link": "^7.1.0",
+    "@spectrum-css/tokens": "^16.0.2",
+    "@spectrum-css/typography": "^8.1.0",
+    "evonytkrtips-data": "github:lschierer/EvonyTKRTips-Data"
   }
 }
