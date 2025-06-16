@@ -5,6 +5,7 @@ use File::FindLib 'lib';
 require Game::EvonyTKR::Model::General::Pair;
 require Game::EvonyTKR::Model::General::Pair::Manager;
 require Data::Printer;
+require Log::Log4perl;
 use namespace::clean;
 
 package Game::EvonyTKR::Plugins::GeneralPairs {
@@ -40,9 +41,6 @@ package Game::EvonyTKR::Plugins::GeneralPairs {
       ->name("${base}_index");
 
     $app->plugins->on('evonytkrtips_initialized' => sub($self, $manager){
-      my $r = $app->routes;
-      my $routes = $r->any("$base");
-
       $logger->debug("evonytkrtips_initialized sub has controller_name $controller_name.");
 
       if( not defined $manager ) {
