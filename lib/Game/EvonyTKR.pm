@@ -79,11 +79,12 @@ package Game::EvonyTKR {
     # Instantiate and attach shared model manager
     # Run rootImport once on first dispatch
     $self->hook(
-      before_dispatch => sub {
+      before_server_start => sub {
         state $initialized = do {
           $self->log->info("⚙️  Running rootImport...");
           $RootManager->rootImport();
           $self->log->info("✅ rootImport completed.");
+          $self->plugins->emit(evonytkrtips_initialized => $RootManager);
           1;
         };
       }
