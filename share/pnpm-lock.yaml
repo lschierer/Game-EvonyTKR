@@ -8,12 +8,18 @@ importers:
 
   .:
     dependencies:
+      '@spectrum-css/button':
+        specifier: ^14.1.6
+        version: 14.1.6(@spectrum-css/icon@9.1.0(@spectrum-css/tokens@16.0.2))(@spectrum-css/tokens@16.0.2)
       '@spectrum-css/icon':
         specifier: ^9.1.0
         version: 9.1.0(@spectrum-css/tokens@16.0.2)
       '@spectrum-css/link':
         specifier: ^7.1.0
         version: 7.1.0(@spectrum-css/tokens@16.0.2)
+      '@spectrum-css/table':
+        specifier: ^8.1.0
+        version: 8.1.0(@spectrum-css/button@14.1.6(@spectrum-css/icon@9.1.0(@spectrum-css/tokens@16.0.2))(@spectrum-css/tokens@16.0.2))(@spectrum-css/icon@9.1.0(@spectrum-css/tokens@16.0.2))(@spectrum-css/tokens@16.0.2)
       '@spectrum-css/tokens':
         specifier: ^16.0.2
         version: 16.0.2
@@ -23,6 +29,9 @@ importers:
       evonytkrtips-data:
         specifier: github:lschierer/EvonyTKRTips-Data
         version: '@evonytkrtips/data@https://codeload.github.com/lschierer/EvonyTKRTips-Data/tar.gz/13001d2389795979de14c0ea526cb7d0828c6a61'
+      iconify-icon:
+        specifier: ^3.0.0
+        version: 3.0.0
     devDependencies:
       '@tsconfig/node22':
         specifier: ^22.0.2
@@ -519,6 +528,9 @@ packages:
     resolution: {tarball: https://codeload.github.com/lschierer/EvonyTKRTips-Data/tar.gz/13001d2389795979de14c0ea526cb7d0828c6a61}
     version: 1.0.0
 
+  '@iconify/types@2.0.0':
+    resolution: {integrity: sha512-+wluvCrRhXrhyOmRDJ3q8mux9JkKy5SJ/v8ol2tu4FVjyYvtEzkc/3pK15ET6RKg4b4w4BmTk1+gsCUhf21Ykg==}
+
   '@isaacs/balanced-match@4.0.1':
     resolution: {integrity: sha512-yzMTt9lEb8Gv7zRioUilSglI0c0smZ9k5D65677DLWLtWJaXIS3CqcGyUFByYKlnUj6TkjLVs54fBl6+TiGQDQ==}
     engines: {node: 20 || >=22}
@@ -546,6 +558,20 @@ packages:
     resolution: {integrity: sha512-oGB+UxlgWcgQkgwo8GcEGwemoTFt3FIO9ababBmaGwXIoBKZ+GTy0pP185beGg7Llih/NSHSV2XAs1lnznocSg==}
     engines: {node: '>= 8'}
 
+  '@spectrum-css/button@14.1.6':
+    resolution: {integrity: sha512-h4LTMT7sRYC9P0OKJn8vr7JJY8NU4xkcKvmwoph5sOgaFaDhNZ15JzO93FoKgAWMpFzh1CXGXyrIJhq2mBpc5A==}
+    peerDependencies:
+      '@spectrum-css/icon': '>=9.0.0 <10.0.0'
+      '@spectrum-css/progresscircle': '>=5.0.0 <6.0.0'
+      '@spectrum-css/tokens': '>=16.0.0 <17.0.0'
+    peerDependenciesMeta:
+      '@spectrum-css/icon':
+        optional: true
+      '@spectrum-css/progresscircle':
+        optional: true
+      '@spectrum-css/tokens':
+        optional: true
+
   '@spectrum-css/icon@9.1.0':
     resolution: {integrity: sha512-w7/Xcb6zr9wLS0et8Rb5MMdbfP2FC1/hTaiARVfos2u8MC5J3gFpyM7QIOJzgTJVQGWgRQZAAWYfqGNBmWPNmw==}
     peerDependencies:
@@ -559,6 +585,26 @@ packages:
     peerDependencies:
       '@spectrum-css/tokens': '>=16.0.1'
     peerDependenciesMeta:
+      '@spectrum-css/tokens':
+        optional: true
+
+  '@spectrum-css/table@8.1.0':
+    resolution: {integrity: sha512-cEe0gW/2f28usWsG02iG5dzfKgTBucoVzOYPCN7t3Pmi/o0ohl4+ElLjfRl+hwWM2yNoIyDyQ7c4JcdTr9Nbew==}
+    peerDependencies:
+      '@spectrum-css/button': '>=14.0.0 <15.0.0'
+      '@spectrum-css/checkbox': '>=10.0.0 <11.0.0'
+      '@spectrum-css/icon': '>=9.0.0 <10.0.0'
+      '@spectrum-css/thumbnail': '>=8.0.0 <9.0.0'
+      '@spectrum-css/tokens': '>=16.0.0 <17.0.0'
+    peerDependenciesMeta:
+      '@spectrum-css/button':
+        optional: true
+      '@spectrum-css/checkbox':
+        optional: true
+      '@spectrum-css/icon':
+        optional: true
+      '@spectrum-css/thumbnail':
+        optional: true
       '@spectrum-css/tokens':
         optional: true
 
@@ -971,6 +1017,9 @@ packages:
   html-tags@3.3.1:
     resolution: {integrity: sha512-ztqyC3kLto0e9WbNp0aeP+M3kTt+nbaIveGmUxAtZa+8iFgKLUOD4YKM5j+f3QD89bra7UeumolZHKuOXnTmeQ==}
     engines: {node: '>=8'}
+
+  iconify-icon@3.0.0:
+    resolution: {integrity: sha512-yPcnpkn8HUEUckrxxJBOer3jbGv3bqozHsLMLBRxhk3As1X76BgV2mS2a1HTNOIagR8nUs30H3qAd9GLe8Mnlg==}
 
   ieee754@1.2.1:
     resolution: {integrity: sha512-dcyqhDvX1C46lXZcVqCpK+FtMRQVdIMN6/Df5js2zouUsqG7I6sFxitIC+7KYK29KdXOLHdu9zL4sFnoVQnqaA==}
@@ -2161,6 +2210,8 @@ snapshots:
 
   '@evonytkrtips/data@https://codeload.github.com/lschierer/EvonyTKRTips-Data/tar.gz/13001d2389795979de14c0ea526cb7d0828c6a61': {}
 
+  '@iconify/types@2.0.0': {}
+
   '@isaacs/balanced-match@4.0.1': {}
 
   '@isaacs/brace-expansion@5.0.0':
@@ -2192,12 +2243,23 @@ snapshots:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.19.1
 
+  '@spectrum-css/button@14.1.6(@spectrum-css/icon@9.1.0(@spectrum-css/tokens@16.0.2))(@spectrum-css/tokens@16.0.2)':
+    optionalDependencies:
+      '@spectrum-css/icon': 9.1.0(@spectrum-css/tokens@16.0.2)
+      '@spectrum-css/tokens': 16.0.2
+
   '@spectrum-css/icon@9.1.0(@spectrum-css/tokens@16.0.2)':
     optionalDependencies:
       '@spectrum-css/tokens': 16.0.2
 
   '@spectrum-css/link@7.1.0(@spectrum-css/tokens@16.0.2)':
     optionalDependencies:
+      '@spectrum-css/tokens': 16.0.2
+
+  '@spectrum-css/table@8.1.0(@spectrum-css/button@14.1.6(@spectrum-css/icon@9.1.0(@spectrum-css/tokens@16.0.2))(@spectrum-css/tokens@16.0.2))(@spectrum-css/icon@9.1.0(@spectrum-css/tokens@16.0.2))(@spectrum-css/tokens@16.0.2)':
+    optionalDependencies:
+      '@spectrum-css/button': 14.1.6(@spectrum-css/icon@9.1.0(@spectrum-css/tokens@16.0.2))(@spectrum-css/tokens@16.0.2)
+      '@spectrum-css/icon': 9.1.0(@spectrum-css/tokens@16.0.2)
       '@spectrum-css/tokens': 16.0.2
 
   '@spectrum-css/tokens@16.0.2': {}
@@ -2643,6 +2705,10 @@ snapshots:
   hookified@1.9.1: {}
 
   html-tags@3.3.1: {}
+
+  iconify-icon@3.0.0:
+    dependencies:
+      '@iconify/types': 2.0.0
 
   ieee754@1.2.1: {}
 

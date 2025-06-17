@@ -4,6 +4,7 @@ use utf8::all;
 use File::FindLib 'lib';
 require Data::Printer;
 require Game::EvonyTKR::Model::Buff::Value;
+require JSON::PP;
 
 class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Model::Data) {
 # PODNAME: Game::EvonyTKR::Model::Buff
@@ -13,7 +14,7 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Model::Data) {
   use Carp;
   use File::FindLib 'lib';
   use overload
-    '""'       => \&TO_JSON,
+    '""'       => \&as_string,
     '.'        => \&concat,
     'fallback' => 0;
 
@@ -169,10 +170,10 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Model::Data) {
     }
   }
 
-  method toHashRef() {
+  method to_hash() {
     my $c;
     my $conditionCount = scalar $self->conditions();
-    $self->logger()->info("in toHashRef, I have $conditionCount conditions");
+    $self->logger()->info("in to_hash, I have $conditionCount conditions");
     if ($conditionCount) {
       $c = $self->conditions();
     }
@@ -192,19 +193,102 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Model::Data) {
   }
 
   method TO_JSON() {
-    return $self->toHashRef();
+    return $self->to_hash();
+  }
+  
+  method as_string() {
+    my $json = JSON::PP->new->utf8->pretty->allow_blessed(1)->convert_blessed(1)->encode($self->to_hash());
+    return $json;
   }
 
   method concat($other, $swap) {
     if ($swap) {
-      return $other . $self->TO_JSON();
+      return $other . $self->as_string();
     }
     else {
-      return $self->TO_JSON() . $other;
+      return $self->as_string() . $other;
     }
   }
 
 }
+1;
+
+__END__
+
+#ABSTRACT: The basic unit of incrementing or decrementing strength of Generals and Troops
+
+=pod
+
+=head1 DESCRIPTION
+
+A buff is the basic unit of incrementing some aspect of the strength of either a general or the troops that general leads.
+
+A debuff is a negative buff, and so the same class implements both.
+
+Buffs/Debuffs apply to attributes, and may do so conditionally (for example when
+attacking, or when defending), or unconditionally.  The buff may apply actively
+(when a general leads a march, or when a civilization treasure is activated), or
+passively (the buff/debuff applies simply because you own the General or Treasure).
+
+Both active and passive buffs may be conditional on the General's (Treasure's, Dragon's,
+so on) level, the level to which the General has been ascended, and/or the level
+to which the General's specialities have been activated.  Similar level related
+conditions apply to Buffs/Debuffs associated with Senate Seats, Armor, and Spiritual
+Beast Seals.
+
+=cut
+
+=method attribute()
+
+returns the attribute that which this Buff/Debuff affects.
+
+=cut
+
+=method value()
+
+returns the Game::EvonyTKR::Model::Buff::Value that is the amount by which this
+buff/debuff affects its attribute.
+
+=cut
+
+=method debuffConditions()
+
+if not empty, this is a debuff, and this defines when the debuff is active.
+
+=cut
+
+=method buffConditions()
+
+if not empty, restricts when this buff/debuff acts on its attribute
+
+=cut
+
+=method targetedTypes()
+
+if not empty, restricts what targets are affected by this buff/debuff.
+
+note that one of the targets is "monsters."  If that is the target, then
+and this is a *buff*, then this is effectively a *debuff* for you. if the target is
+Monsters and it is a *debuff*, it is effectively a *buff* for you.
+
+=cut
+
+=method conditions
+
+if not empty, there are restictions on when this buff/debuff affects its attribute.
+You should use the more specific methods to determine what those conditions are, but you
+could use this if you are just printing them.
+
+=cut
+
+=method validate()
+
+this will cause a croak if anything about this buff violates its defined structure.
+
+=cut
+
+
+=cut
 1;
 
 __END__

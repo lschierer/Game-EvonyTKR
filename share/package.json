@@ -4,7 +4,8 @@
   "description": "Assets for the Evony TKR Tips website",
   "type": "module",
   "scripts": {
-    "build:css": "rimraf ./public/css/ ; mkdir -p ./public/css/ ; tsx ./scripts/build-css.ts ./public/css/"
+    "build:css": "rimraf ./public/css/ ; mkdir -p ./public/css/ ; tsx ./scripts/build-css.ts ./public/css/",
+    "build:ts": "tsc -p ./tsconfig.build.json && tsx ./scripts/build-ts.ts"
   },
   "keywords": [],
   "author": "Luke Schierer",
@@ -35,10 +36,13 @@
     "typescript": "^5.8.3"
   },
   "dependencies": {
+    "@spectrum-css/button": "^14.1.6",
     "@spectrum-css/icon": "^9.1.0",
     "@spectrum-css/link": "^7.1.0",
+    "@spectrum-css/table": "^8.1.0",
     "@spectrum-css/tokens": "^16.0.2",
     "@spectrum-css/typography": "^8.1.0",
-    "evonytkrtips-data": "github:lschierer/EvonyTKRTips-Data"
+    "evonytkrtips-data": "github:lschierer/EvonyTKRTips-Data",
+    "iconify-icon": "^3.0.0"
   }
 }

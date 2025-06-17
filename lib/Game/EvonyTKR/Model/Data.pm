@@ -176,6 +176,55 @@ class Game::EvonyTKR::Model::Data : isa(Game::EvonyTKR::Model::Logger) {
     return \@results;
   }
 
+  Readonly::Scalar my $rallySpotCapacity => {
+    1   => 800,
+    2   => 1200,
+    3   => 2000,
+    4   => 3200,
+    5   => 4600,
+    6   => 6400,
+    7   => 8400,
+    8   => 10800,
+    9   => 13600,
+    10  => 16600,
+    11  => 20000,
+    12  => 23600,
+    13  => 27600,
+    14  => 32000,
+    15  => 36600,
+    16  => 41600,
+    17  => 46800,
+    18  => 52400,
+    19  => 58400,
+    20  => 64600,
+    21  => 71200,
+    22  => 78000,
+    23  => 85200,
+    24  => 92800,
+    25  => 100000,
+    26  => 110000,
+    27  => 125000,
+    28  => 145000,
+    29  => 170000,
+    30  => 200000,
+    31  => 225000,
+    32  => 250000,
+    33  => 285000,
+    34  => 315000,
+    35  => 350000,
+    36  => 385000,
+    37  => 420000,
+    38  => 460000,
+    39  => 500000,
+    40  => 550000,
+    41  => 600000,
+    42  => 660000,
+    43  => 720000,
+    44  => 790000,
+    45  => 860000,
+  };
+
+
   field $globalDN : reader = X500::DN->new(
     X500::RDN->new('OU' => 'EvonyTKR'),
     X500::RDN->new('OU' => 'Game'),
@@ -203,10 +252,16 @@ class Game::EvonyTKR::Model::Data : isa(Game::EvonyTKR::Model::Logger) {
     return {};
   }
 
+  # Method for JSON serialization
   method TO_JSON {
-    return $self->toHashRef();
+      return $self->to_hash();
   }
 
+  # Stringification method using JSON
+  method as_string {
+      my $json = JSON::PP->new->utf8->pretty->allow_blessed(1)->convert_blessed(1)->encode($self->to_hash());
+      return $json;
+  }
 }
 1;
 

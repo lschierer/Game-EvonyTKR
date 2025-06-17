@@ -12,12 +12,14 @@
     "strict": true,
     "target": "ES2023",
     "verbatimModuleSyntax": true,
-    "types": ["node", "dom", "dom.iterable"],
+    "types": ["node"],
     "noEmit": true,
     "composite": true,
     "rootDir": ".",
-    "baseUrl": "./"
+    "baseUrl": "./",
+    "outDir": "./public/types",
+    "declarationDir": "./public/types"
   },
   "exclude": ["**/node_modules/**"],
-  "include": ["./**/*.ts", "./types/*.d.ts"]
+  "include": ["./ts/**/*.ts", "./types/*.d.ts"]
 }

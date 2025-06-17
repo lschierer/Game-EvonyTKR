@@ -22,7 +22,7 @@ class Game::EvonyTKR::Model::Speciality : isa(Game::EvonyTKR::Model::Data) {
 # VERSION
   use Game::EvonyTKR::Model::Logger;
   use overload
-    '""'       => \&_toString,
+    '""'       => \&as_string,
     "fallback" => 1;
 
   field $id : reader;
@@ -82,9 +82,15 @@ class Game::EvonyTKR::Model::Speciality : isa(Game::EvonyTKR::Model::Data) {
     };
   }
 
-  method _toString {
-    my $json = JSON::PP->new->utf8->canonical->encode($self->toHashRef());
-    return $json;
+  # Method for JSON serialization
+  method TO_JSON {
+      return $self->to_hash();
+  }
+
+  # Stringification method using JSON
+  method as_string {
+      my $json = JSON::PP->new->utf8->pretty->allow_blessed(1)->convert_blessed(1)->encode($self->to_hash());
+      return $json;
   }
 
 }

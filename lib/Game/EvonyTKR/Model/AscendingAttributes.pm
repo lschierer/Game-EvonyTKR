@@ -23,7 +23,7 @@ class Game::EvonyTKR::Model::AscendingAttributes :
 # VERSION
   use Game::EvonyTKR::Model::Logger;
   use overload
-    '""'       => \&_toString,
+    '""'       => \&as_string,
     "fallback" => 1;
 
   field $id : reader;
@@ -86,7 +86,7 @@ class Game::EvonyTKR::Model::AscendingAttributes :
     return scalar @{ $ascending->{$level}->{buffs} };
   }
 
-  method toHashRef {
+  method to_hash {
     return {
       id        => $id,
       general   => $general,
@@ -94,12 +94,70 @@ class Game::EvonyTKR::Model::AscendingAttributes :
     };
   }
 
-  method _toString {
-    my $json = JSON::PP->new->utf8->canonical->encode($self->toHashRef());
+  method TO_JSON {
+    return $self->to_hash();
+  }
+  
+  method as_string {
+    my $json = JSON::PP->new->utf8->pretty->allow_blessed(1)->convert_blessed(1)->encode($self->to_hash());
     return $json;
   }
 
 }
+
+1;
+
+__END__
+
+# ABSTRACT: Module for processing information about Evony TKR Specialities.
+
+=head1 DESCRIPTION
+
+Ascending is one of several ways that a General can provide Buffs for Troops.
+
+Ascending works similarly to Specialities in that there are multiple levels, however there is only one set of Ascending Buffs per general, instead of the four possible Specialities (plus possible Flex Speciality).
+
+=for :List
+
+* Ascending Buffs can be either values 1Purple through 5Purple (for Purple quality generals), or 1Red through 5Red (for Gold/Red quality generals).
+
+* Ascending Buffs 1Red through 5Red provide ehancements to Basic skills and affect the General's effective scores for the basic attributes.
+
+* Ascending a Historic (Gold/Red) General costs both general fragments and Blood of Ares.  Ascending a General that is merely Historic but not Legendary (Purple) requires general fragments, but not Blood of Ares.
+
+* For low spenders, Blood of Ares is a severe limiting factor on ascending generals.  As you grow in spending, it limits the I<rate> at which you ascend, but not I<if> you ascend a general.  Fragments are the true limiting concern for players of all levels.  It is not possible to get sufficient fragments of all generals to fully ascend them without spending in any reasonable amount of time.  It is not possible to ascend certain "retired" generals I<at all> if you have not already done so.  These "retired" Generals are included in the distribution data to allow players who I<do> have them to compare effectiveness in using them.
+=cut
+
+=method name()
+
+returns the name field from the Speciality.
+=cut
+
+=method activeLevel
+
+returns the level, values 1Purple through 5Purple (for Purple quality generals), or 1Red through 5Red (for Gold/Red quality generals), that is active at this time.
+=cut
+
+=method setActiveLevel($newLevel)
+
+sets the activeLevel to newLevel presuming it is a valid value 1Purple through 5Purple (for Purple quality generals), or 1Red through 5Red (for Gold/Red quality generals).
+
+Todo: Make sure the value is valid I<for the General's quality>.
+=cut
+
+=method add_buff($level, $nb)
+
+This method takes a Game::EvonyTKR::Model::Buff as its sole parameter and adds it as one of the buffs this Speciality at the specified $level.  $level must be one of 1Purple through 5Purple (for Purple quality generals), or 1Red through 5Red (for Gold/Red quality generals) or the function will fail to add the buff.
+
+Todo: Make sure that this is not called twice with the same Buff/Level combination.  Make sure the Level provided is valid I<for that General's quality>.
+=cut
+
+=method Buffs()
+
+Returns a hash with the levels 1Purple through 5Purple, and 1Red through 5Red as the keys and an array with the buffs at that level as the values.  Note all 10 levels are always present, but only 5 will have Buffs assigned.  The other 5 will return empty lists.
+
+Each level is cumulative, you never need to read more than the array for the currently active level.
+=cut
 
 1;
 

@@ -5,10 +5,15 @@
   <ul class="collection-grid">
     <% if ($items && ref $items eq 'ARRAY') { %>
       <% foreach my $item (sort @{ $items} ) { %>
-        <li class="collection-item">
-          <a href="/Generals/Pairs/<%= $item %>/">
+        <% $item =~ s/_/ /g; %>
+        <% $item =~ s/(\w)(\w+)( specialist)?/\U$1\L$2 \UP\Lairs/; %>
+        <li class="collection-item" >
+          <button
+            class=" spectrum-Button spectrum-Button--fill spectrum-Button--primary spectrum-Button--sizeM "
+            onclick="document.location='/Generals/Pairs/<%= $item %>/'"
+          >
             <%= $item %>
-          </a>
+          </button>
         </li>
       <% } %>
     <% } %>

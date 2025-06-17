@@ -9,6 +9,13 @@ prepare:
 [working-directory: 'share']
 npmdeps:
   pnpm install
+  rm -rf public
+  mkdir -p public/assets
+  mkdir -p public/css
+  mkdir -p public/images
+  mkdir -p public/js
+  mkdir -p public/types
+  pnpm build:ts
   rsync -a node_modules/evonytkrtips-data/data/ collections/ --delete
   touch collections/.gitkeep
   mkdir 'collections/general conflict groups'

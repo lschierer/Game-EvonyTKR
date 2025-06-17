@@ -6,12 +6,16 @@
 
 :root {
   --brand: var(--spectrum-cyan-800);
-  --text-1: var(--spectrum-cyan-1300);
+  --text-1: var(--spectrum-cyan-1200);
   --text-2: var(--spectrum-cyan-400);
   --surface-1: var(--spectrum-gray-300);
   --surface-2: var(--spectrum-gray-500);
   --surface-3: var(--spectrum-gray-700);
   --surface-4: var(--spectrum-gray-900);
+
+  /* Spectrum normally uses fixed pixel based sizing.  This lets me use relative sizing */
+
+  /* idea taken from open-props */
   --size-000: -0.5rem;
   --size-00: -0.25rem;
   --size-1: 0.25rem;
@@ -29,6 +33,8 @@
   --size-13: 15rem;
   --size-14: 20rem;
   --size-15: 30rem;
+  --mod-button-background-color-default: var(--text-1);
+  --mod-button-content-color-default: var(--text-2);
 }
 
 html,

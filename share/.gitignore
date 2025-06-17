@@ -1,5 +1,7 @@
 node_modules
 public/css
+public/js
+public/types
 collections
 *.csv
 

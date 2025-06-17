@@ -5,18 +5,19 @@ use File::FindLib 'lib';
 require Data::Printer;
 require Game::EvonyTKR::Model::Buff;
 require Game::EvonyTKR::Model::Buff::Value;
+require JSON::PP;
 use namespace::clean;
 
 class Game::EvonyTKR::Model::Book : isa(Game::EvonyTKR::Model::Data) {
   # PODNAME: Game::EvonyTKR::Model::Book
   use Carp;
   use overload
-    '""'       => \&TO_JSON,
+    '""'       => \&as_string,
     'bool'     => \&_isTrue,
     'fallback' => 0;
 
   field $name : reader : param;
-  field $buff : reader;
+  field $buff : reader = [];
   field $text : reader : param //= '';
 
   method addBuff ($newBuff) {
@@ -32,7 +33,7 @@ class Game::EvonyTKR::Model::Book : isa(Game::EvonyTKR::Model::Data) {
     }
   }
 
-  method toHashRef {
+  method to_hash {
     return {
       name => $name,
       text => $text,
@@ -41,7 +42,12 @@ class Game::EvonyTKR::Model::Book : isa(Game::EvonyTKR::Model::Data) {
   }
 
   method TO_JSON {
-    return $self->toHashRef();
+    return $self->to_hash();
+  }
+
+  method as_string {
+    my $json = JSON::PP->new->utf8->pretty->allow_blessed(1)->convert_blessed(1)->encode($self->to_hash());
+    return $json;
   }
 
   method _isTrue {
@@ -77,6 +83,21 @@ class Game::EvonyTKR::Model::Book : isa(Game::EvonyTKR::Model::Data) {
   }
 
 }
+1;
+
+__END__
+
+#ABSTRACT: base class for builtin BuiltIn and Standard Skill Books.
+
+=pod
+
+=head1 DESCRIPTION
+
+Books are one of the fundamental ways in which the game adds Buffs and Debuffs to Generals.
+
+=cut
+
+=cut
 1;
 
 __END__

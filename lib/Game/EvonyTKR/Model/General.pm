@@ -15,7 +15,7 @@ class Game::EvonyTKR::Model::General : isa(Game::EvonyTKR::Model::Data) {
   use Carp;
   use File::FindLib 'lib';
   use overload
-    '""'       => \&TO_JSON,
+    '""'       => \&as_string,
     "fallback" => 1;
 
   our $VERSION = 'v0.30.0';
@@ -34,7 +34,7 @@ class Game::EvonyTKR::Model::General : isa(Game::EvonyTKR::Model::Data) {
 
   field $builtInBookName : reader : param;
 
-  field $builtInBook : reader;
+  field $builtInBook : reader = undef;
 
   field $specialityNames : reader : param;
 
@@ -76,7 +76,14 @@ class Game::EvonyTKR::Model::General : isa(Game::EvonyTKR::Model::Data) {
 
   }
 
-  method toHashRef {
+  method populateBuiltInBook( $bookManager ) {
+    my $bb = $bookManager->getBook($builtInBookName);
+    if($bb) {
+      $builtInBook = $bb;
+    }
+  }
+
+  method to_hash {
     return {
       id              => $id,
       name            => $name,
@@ -89,10 +96,44 @@ class Game::EvonyTKR::Model::General : isa(Game::EvonyTKR::Model::Data) {
   }
 
   method TO_JSON {
-    return $self->toHashRef();
+    return $self->to_hash();
+  }
+
+  method as_string {
+    my $json = JSON::PP->new->utf8->pretty->canonical(1)->allow_blessed(1)->convert_blessed(1)->encode($self->to_hash());
+    return $json;
   }
 
 }
+1;
+
+__END__
+#ABSTRACT: how to store a General in memory
+
+=pod
+
+=head1 DESCRIPTION
+
+I am not doing true MVC because I am using yaml files as the persistence layer instead of a database.  This class stores a General in memory so that the Controller need not read
+in and parse the YAML every time.
+
+=cut
+
+=method new($name)
+
+Create an instance of a Model::General with name $name.
+
+=method name()
+
+returns the general's name.
+
+=cut
+
+=method type()
+
+returns the general's type, which must be one of the values from Game::EvonyTKR::Model::Data->GeneralKeys()
+
+=cut
 1;
 
 __END__
