@@ -38,13 +38,16 @@ class Game::EvonyTKR::Model::Logger {
 
   # Method for JSON serialization
   method TO_JSON {
-      return $self->to_hash();
+    return $self->to_hash();
   }
 
   # Stringification method using JSON
   method as_string {
-      my $json = JSON::PP->new->utf8->pretty->allow_blessed(1)->convert_blessed(1)->encode($self->to_hash());
-      return $json;
+    my $json =
+      JSON::PP->new->utf8->pretty->allow_blessed(1)
+      ->convert_blessed(1)
+      ->encode($self->to_hash());
+    return $json;
   }
 
 }

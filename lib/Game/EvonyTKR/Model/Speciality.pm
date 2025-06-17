@@ -23,7 +23,8 @@ class Game::EvonyTKR::Model::Speciality : isa(Game::EvonyTKR::Model::Data) {
   use Game::EvonyTKR::Model::Logger;
   use overload
     '""'       => \&as_string,
-    "fallback" => 1;
+    'bool'     => sub { $_[0]->_isTrue() },
+    "fallback" => 0;
 
   field $id : reader;
   field $name : reader : param;
@@ -74,7 +75,7 @@ class Game::EvonyTKR::Model::Speciality : isa(Game::EvonyTKR::Model::Data) {
     return scalar @{ $levels->{$level}->{buffs} };
   }
 
-  method toHashRef {
+  method to_hash {
     return {
       id     => $id,
       name   => $name,
@@ -84,13 +85,16 @@ class Game::EvonyTKR::Model::Speciality : isa(Game::EvonyTKR::Model::Data) {
 
   # Method for JSON serialization
   method TO_JSON {
-      return $self->to_hash();
+    return $self->to_hash();
   }
 
   # Stringification method using JSON
   method as_string {
-      my $json = JSON::PP->new->utf8->pretty->allow_blessed(1)->convert_blessed(1)->encode($self->to_hash());
-      return $json;
+    my $json =
+      JSON::PP->new->utf8->pretty->allow_blessed(1)
+      ->convert_blessed(1)
+      ->encode($self->to_hash());
+    return $json;
   }
 
 }

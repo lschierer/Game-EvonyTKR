@@ -17,6 +17,7 @@ class Game::EvonyTKR::Model::Speciality::Manager :
   # PODNAME: Game::EvonyTKR::Model::Speciality::Manager
   use Carp;
   use overload
+    'bool'     => sub { $_[0]->_isTrue() },
     'fallback' => 0;
 
   field $specialities = {};

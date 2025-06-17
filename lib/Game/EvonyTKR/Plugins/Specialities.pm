@@ -13,7 +13,9 @@ package Game::EvonyTKR::Plugins::Specialities {
 
   my $manager;
 
-  # Override loadItem to add any Speciality-specific processing
+  sub get_manager($self) {
+    return $self->app->get_root_manager->specialityManager;
+  }
 
   sub register($self, $app, $config = {}) {
     my $logger = Log::Log4perl->get_logger(__PACKAGE__);

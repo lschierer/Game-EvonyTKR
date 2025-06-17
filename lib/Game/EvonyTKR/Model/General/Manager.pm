@@ -19,12 +19,13 @@ class Game::EvonyTKR::Model::General::Manager :
   # PODNAME: Game::EvonyTKR::Model::General::Manager
   use Carp;
   use overload
+    'bool'     => sub { $_[0]->_isTrue() },
     'fallback' => 0;
 
   field $generals = {};
 
   method get_all_generals () {
-    return \%{ $generals };
+    return \%{$generals};
   }
 
   method getGeneral ($name) {

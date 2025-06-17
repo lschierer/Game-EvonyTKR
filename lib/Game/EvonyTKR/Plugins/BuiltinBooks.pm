@@ -12,7 +12,9 @@ package Game::EvonyTKR::Plugins::BuiltinBooks {
   # Specify which collection this controller handles
   sub collection_name {'skill books'}
 
-  # Override loadItem to add any BuiltinBooks-specific processing
+  sub get_manager($self) {
+    return $self->app->get_root_manager->bookManager;
+  }
 
   # Register this when the application starts
   sub register($self, $app, $config = {}) {

@@ -1,31 +1,64 @@
 <div class="builtinbook-details">
-  <% if( $item && ref($item) eq 'HASH') { %>
-    <h3><%= $item->{name} %></h3>
-    <p class="description">
-      <%= $item->{text} %>
-    </p>
-    <ul>
-      <% foreach my $buff  (@{ $item->{buff} }) { %>
-        <li>
-          <dl>
-            <dt>Attribute: </dt>
-            <dd><%= $buff->{attribute} %>
-            <% if ( exists $buff->{class} ) { %>
-              <dt>Troop Type: </dt>
-              <dd><%= $buff->{class} %></dd>
-            <% } %>
-            <% if ( exists $buff->{condition} ) { %>
-              <dt>Condition(s): </dt>
-              <% foreach my $condition (@{ $buff->{condition} }) { %>
-                <dd><%= $condition %></dd>
+  <% if( $item ) { %>
+    <% require Scalar::Util; %>
+    <% if( ref($item) eq 'HASH' ) { %>
+      <h3><%= $item->{name} %></h3>
+      <p class="description">
+        <%= $item->{text} %>
+      </p>
+      <ul>
+        <% foreach my $buff  (@{ $item->{buff} }) { %>
+          <li>
+            <dl>
+              <dt>Attribute: </dt>
+              <dd><%= $buff->{attribute} %>
+              <% if ( exists $buff->{class} ) { %>
+                <dt>Troop Type: </dt>
+                <dd><%= $buff->{class} %></dd>
               <% } %>
-            <% } %>
-            <dt>Value: </dt>
-            <dd><%= $buff->{value}->{number} %><%= $buff->{value}->{unit} eq 'percentage' ? '%' : '' %></dd>
-          </dl>
-        </li>
-      <% } %>
-    </ul>
+              <% if ( exists $buff->{condition} ) { %>
+                <dt>Condition(s): </dt>
+                <% foreach my $condition (@{ $buff->{condition} }) { %>
+                  <dd><%= $condition %></dd>
+                <% } %>
+              <% } %>
+              <dt>Value: </dt>
+              <dd><%= $buff->{value}->{number} %><%= $buff->{value}->{unit} eq 'percentage' ? '%' : '' %></dd>
+            </dl>
+          </li>
+        <% } %>
+      </ul>
+    <% } elsif ( Scalar::Util::reftype($item) eq 'OBJECT' && Scalar::Util::blessed($item) eq 'Game::EvonyTKR::Model::Book' ) { %>
+      <h3><%= $item->name %></h3>
+      <p class="description">
+        <%= $item->text %>
+      </p>
+      <ul>
+        <% foreach my $buff  (@{ $item->buff }) { %>
+          <li>
+            <dl>
+              <dt>Attribute: </dt>
+              <dd><%= $buff->attribute %>
+              <% if ( scalar @{ $buff->targetedTypes } > 0 ) { %>
+                <dt>Troop Type: </dt>
+                <dd><%= $buff->targetedTypes %></dd>
+              <% } %>
+              <% if ( scalar $buff->conditions()  ) { %>
+                <dt>Condition(s): </dt>
+                <% foreach my $condition (@{ $buff->conditions() }) { %>
+                  <dd><%= $condition %></dd>
+                <% } %>
+              <% } %>
+              <dt>Value: </dt>
+              <dd><%= $buff->value->number %><%= $buff->value->unit eq 'percentage' ? '%' : '' %></dd>
+            </dl>
+          </li>
+        <% } %>
+      </ul>
+    <% } else { %>
+      <%= Scalar::Util::reftype($item) %>
+      <%= Scalar::Util::blessed($item) %>
+    <% } %>
   <% } %>
 </div>
 <% require Data::Printer; %>

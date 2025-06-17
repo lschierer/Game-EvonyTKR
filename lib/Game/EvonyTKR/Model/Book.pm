@@ -21,16 +21,67 @@ class Game::EvonyTKR::Model::Book : isa(Game::EvonyTKR::Model::Data) {
   field $text : reader : param //= '';
 
   method addBuff ($newBuff) {
-    if (Scalar::Util::reftype($newBuff) eq 'OBJECT') {
-      my $classList  = blessed $newBuff;
-      my @classStack = split(/::/, Scalar::Util::reftype($newBuff));
-      if (scalar @classStack >= 3) {
-        if ($classStack[2] eq 'Buff') {
+    $self->logger->debug("addBuff called for book '$name'");
+
+    if (!defined $newBuff) {
+      $self->logger->warn("addBuff: newBuff is undefined");
+      return;
+    }
+
+    my $reftype = Scalar::Util::reftype($newBuff);
+    my $blessed = Scalar::Util::blessed($newBuff);
+
+    $self->logger->debug(
+      "addBuff: newBuff reftype=$reftype, blessed=" . ($blessed // 'undef'));
+
+    if ($reftype eq 'OBJECT') {
+      my $classList = $blessed;
+      $self->logger->debug("Adding buff of class $classList to book $name");
+
+      my @classStack = split(/::/, $classList);
+      $self->logger->debug("Class stack: " . join(", ", @classStack));
+
+      if (scalar @classStack > 3) {
+        if ($classStack[3] eq 'Buff') {
           $self->logger->info("adding $newBuff to $name");
+
+          # Check if $buff is defined and is an array reference
+          if (!defined $buff) {
+            $self->logger->warn("$buff is undefined in book $name");
+            $buff = [];
+          }
+          elsif (ref($buff) ne 'ARRAY') {
+            $self->logger->warn(
+              "$buff is not an array reference in book $name");
+            $buff = [];
+          }
+
           push @{$buff}, $newBuff;
+          $self->logger->debug(
+            "Book $name now has " . scalar @{$buff} . " buffs");
+        }
+        else {
+          $self->logger->warn("Not adding buff: class stack position 2 is "
+              . $classStack[2]
+              . " not 'Buff'.");
         }
       }
+      else {
+        $self->logger->warn(
+          "Not adding buff: class stack has fewer than 3 elements");
+      }
     }
+    else {
+      $self->logger->warn("Not adding buff: not an object (reftype=$reftype)");
+    }
+  }
+
+  method getBuffs {
+    if (!defined $buff) {
+      $self->logger->warn("getBuffs: buff is undefined in book $name");
+      return [];
+    }
+    return $buff;
   }
 
   method to_hash {
@@ -46,7 +97,10 @@ class Game::EvonyTKR::Model::Book : isa(Game::EvonyTKR::Model::Data) {
   }
 
   method as_string {
-    my $json = JSON::PP->new->utf8->pretty->allow_blessed(1)->convert_blessed(1)->encode($self->to_hash());
+    my $json =
+      JSON::PP->new->utf8->pretty->allow_blessed(1)
+      ->convert_blessed(1)
+      ->encode($self->to_hash());
     return $json;
   }
 

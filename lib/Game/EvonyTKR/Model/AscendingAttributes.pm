@@ -97,9 +97,12 @@ class Game::EvonyTKR::Model::AscendingAttributes :
   method TO_JSON {
     return $self->to_hash();
   }
-  
+
   method as_string {
-    my $json = JSON::PP->new->utf8->pretty->allow_blessed(1)->convert_blessed(1)->encode($self->to_hash());
+    my $json =
+      JSON::PP->new->utf8->pretty->allow_blessed(1)
+      ->convert_blessed(1)
+      ->encode($self->to_hash());
     return $json;
   }
 

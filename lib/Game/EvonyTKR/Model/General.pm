@@ -16,6 +16,7 @@ class Game::EvonyTKR::Model::General : isa(Game::EvonyTKR::Model::Data) {
   use File::FindLib 'lib';
   use overload
     '""'       => \&as_string,
+    'bool'     => sub { $_[0]->_isTrue() },
     "fallback" => 1;
 
   our $VERSION = 'v0.30.0';
@@ -76,10 +77,21 @@ class Game::EvonyTKR::Model::General : isa(Game::EvonyTKR::Model::Data) {
 
   }
 
-  method populateBuiltInBook( $bookManager ) {
+  method populateBuiltInBook($bookManager) {
     my $bb = $bookManager->getBook($builtInBookName);
-    if($bb) {
+    if ($bb) {
       $builtInBook = $bb;
+    }
+  }
+
+  method populateSpecialities ($specialityManager) {
+    foreach my $sn_index (0 .. scalar(@{$specialityNames})) {
+      my $sn = $specialityNames->[$sn_index];
+      $self->logger->debug("populating $sn");
+      my $speciality = $specialityManager->getSpeciality($sn);
+      if ($speciality) {
+        $specialities->[$sn_index] = $speciality;
+      }
     }
   }
 
@@ -100,7 +112,11 @@ class Game::EvonyTKR::Model::General : isa(Game::EvonyTKR::Model::Data) {
   }
 
   method as_string {
-    my $json = JSON::PP->new->utf8->pretty->canonical(1)->allow_blessed(1)->convert_blessed(1)->encode($self->to_hash());
+    my $json =
+      JSON::PP->new->utf8->pretty->canonical(1)
+      ->allow_blessed(1)
+      ->convert_blessed(1)
+      ->encode($self->to_hash());
     return $json;
   }
 

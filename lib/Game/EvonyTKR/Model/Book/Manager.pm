@@ -16,14 +16,22 @@ class Game::EvonyTKR::Model::Book::Manager : isa(Game::EvonyTKR::Model::Data) {
   # PODNAME: Game::EvonyTKR::Model::Book::Manager
   use Carp;
   use overload
+    'bool'     => sub { my ($self) = @_; $self->_isTrue() },
     'fallback' => 0;
 
-  my $books = {};
+  field $books = {};
 
   method getBook ($name) {
     if (exists $books->{$name}) {
-      return $books->{$name};
+      my $book = $books->{$name};
+      $self->logger->debug(sprintf(
+        'getBook for "%s" found book "%s" with %s buffs and type %s',
+        $name, $book->name, scalar @{ $book->buff },
+        blessed($book)
+      ));
+      return $book;
     }
+    $self->logger->debug("getBook for '$name' found no book");
     return 0;
   }
 
@@ -65,14 +73,30 @@ class Game::EvonyTKR::Model::Book::Manager : isa(Game::EvonyTKR::Model::Data) {
         $name = $object->{name};
       }
 
+      $self->logger->debug("Creating book '$name' from file $file");
       $books->{$name} = Game::EvonyTKR::Model::Book->new(
         name => $name,
         text => $object->{text} // '',
       );
+
+      my $buffCount = 0;
+      if (exists $object->{buff} && ref($object->{buff}) eq 'ARRAY') {
+        $buffCount = scalar @{ $object->{buff} };
+      }
+      $self->logger->debug("Book '$name' has $buffCount buffs in YAML");
+
       foreach my $ob (@{ $object->{buff} }) {
+        $self->logger->debug("Processing buff for book '$name': "
+            . "attribute="
+            . ($ob->{attribute} // 'undef')
+            . ", number="
+            . ($ob->{value}->{number} // 'undef')
+            . ", unit="
+            . ($ob->{value}->{unit} // 'undef'));
+
         my $v = Game::EvonyTKR::Model::Buff::Value->new(
-          number => $ob->{number},
-          unit   => $ob->{unit},
+          number => $ob->{value}->{number},
+          unit   => $ob->{value}->{unit},
         );
         my $b;
         if (exists $ob->{class}) {
@@ -94,8 +118,16 @@ class Game::EvonyTKR::Model::Book::Manager : isa(Game::EvonyTKR::Model::Data) {
           }
         }
         $books->{$name}->addBuff($b);
+        $self->logger->debug("Added buff for attribute '"
+            . $ob->{attribute}
+            . "' to book '$name', now has "
+            . scalar @{ $books->{$name}->buff }
+            . " buffs");
       }
 
+      $self->logger->debug("Finished importing book '$name' with "
+          . scalar @{ $books->{$name}->buff }
+          . " buffs");
     }
     my $countImported = scalar keys %$books;
     $self->logger->info(

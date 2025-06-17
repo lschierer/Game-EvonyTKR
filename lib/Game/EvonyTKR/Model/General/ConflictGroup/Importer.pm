@@ -110,12 +110,13 @@ class Game::EvonyTKR::Model::General::ConflictGroup::Importer :
     my $group_members = $self->loadGenerals();
     my $group_links   = $self->loadGroupLinkDefinitions();
 
-    my %position_index;    # key = "$position:$value", value = [ group keys... ]
+    my %part_index;    # key = part value, value = [ group keys... ]
 
+    # First, index all parts of all groups
     foreach my $group_name (keys %$group_members) {
       my @parts = split /-/, $group_name;
-      for my $i (0 .. $#parts) {
-        push @{ $position_index{"$i:$parts[$i]"} }, $group_name;
+      for my $part (@parts) {
+        push @{ $part_index{$part} }, $group_name;
       }
     }
 
@@ -127,11 +128,10 @@ class Game::EvonyTKR::Model::General::ConflictGroup::Importer :
 
       $self->logger->debug("Checking $group_name parts: @parts");
 
-      for my $i (0 .. $#parts) {
-        my $key           = "$i:$parts[$i]";
-        my $linked_groups = $position_index{$key} // [];
-        $self->logger->debug(
-          "  Part[$i] = $parts[$i], linked via $key → @$linked_groups");
+      # Check for conflicts based on any matching part, regardless of position
+      for my $part (@parts) {
+        my $linked_groups = $part_index{$part} // [];
+        $self->logger->debug("  Part = $part, linked → @$linked_groups");
 
         foreach my $conflict (@$linked_groups) {
           next if $conflict eq $group_name;
@@ -150,7 +150,6 @@ class Game::EvonyTKR::Model::General::ConflictGroup::Importer :
       };
 
       $conflictGroups->{$group_name} = $conflict;
-
     }
 
     $self->logger->info(

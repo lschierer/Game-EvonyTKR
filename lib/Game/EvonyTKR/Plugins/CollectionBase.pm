@@ -161,22 +161,51 @@ package Game::EvonyTKR::Plugins::CollectionBase {
     }
   }
 
+  sub get_manager($self) {
+    my $collection = $self->collection_name;
+    my $logger     = Log::Log4perl->get_logger(ref($self));
+
+    $logger->error(
+"FIXME: No manager defined for collection '$collection'. Implement get_manager in "
+        . ref($self));
+    return undef;    # Return undef to trigger fallback to legacy method
+  }
+
   # Default show action
   sub show($self) {
     my $logger = Log::Log4perl->get_logger(ref($self));
-    $logger->debug("start of show method");
+    $logger->debug("start of legacy show method");
     my $name;
     $name = $self->param('name');
 
     $logger->debug("show detects name $name");
 
-    unless ($self->itemExists($name)) {
-      $logger->error("Item not found: $name");
-      return $self->reply->not_found;
-    }
+    my $manager = $self->get_manager();
+    if ($manager) {
+      my $method =
+          $manager->can('getBook')       ? 'getBook'
+        : $manager->can('getGeneral')    ? 'getGeneral'
+        : $manager->can('get_item')      ? 'get_item'
+        : $manager->can('getSpeciality') ? 'getSpeciality'
+        :                                  undef;
 
-    my $item = $self->loadItem($name);
-    $self->stash(item => $item);
+      if ($method && (my $item = $manager->$method($name))) {
+        $logger->debug("Item '$name' found via manager");
+        $self->stash(item => $item);
+      }
+      else {
+        $logger->error("Item not found: $name");
+        return $self->reply->not_found;
+      }
+    }
+    else {
+      unless ($self->itemExists($name)) {
+        $logger->error("Item not found: $name");
+        return $self->reply->not_found;
+      }
+      my $item = $self->loadItem($name);
+      $self->stash(item => $item);
+    }
 
     if ($self->stash('no_layout')) {
       return $self->render_to_string(

@@ -5,6 +5,11 @@ require Data::Printer;
 
 class Game::EvonyTKR::Model::General::ConflictGroup :
   isa(Game::EvonyTKR::Model::Data) {
+  use Unicode::Normalize qw(NFKD);
+  use overload
+    'bool'     => sub { $_[0]->_isTrue() },
+    'fallback' => 0;
+
   field $id : param : reader;
   field $name : param : reader;
   field $primary_generals : param = [];
@@ -29,6 +34,9 @@ class Game::EvonyTKR::Model::General::ConflictGroup :
   }
 
   method normalize_name ($raw_name, $original = '') {
+    # First, normalize Unicode characters
+    $raw_name = NFKD($raw_name);          # Decompose characters with diacritics
+    $raw_name =~ s/\p{NonspacingMark}//g; # Remove diacritical marks
 
     # Remove square bracket metadata completely
     $raw_name =~ s/\s*\[[^\]]+\]\s*//g;
@@ -42,7 +50,6 @@ class Game::EvonyTKR::Model::General::ConflictGroup :
 
     my $name = $raw_name;
     if (length $original) {
-
       $self->logger->debug("Normalized '$original' → '$name'")
         if $name ne $original;
     }
@@ -50,7 +57,6 @@ class Game::EvonyTKR::Model::General::ConflictGroup :
   }
 
   method build_expanded_conflicts($all_groups) {
-
     # Index your own primary generals
     my %is_primary = map { $self->normalize_name($_) => 1 } @$primary_generals;
     $self->logger->debug("build_expanded_conflicts for $name detects primarys "
@@ -84,16 +90,21 @@ class Game::EvonyTKR::Model::General::ConflictGroup :
   }
 
   method is_compatible($general1, $general2) {
+    # Normalize both general names
+    my $norm1 = $self->normalize_name($general1);
+    my $norm2 = $self->normalize_name($general2);
+
     # Check if either general conflicts with the other
     return 0
-      if exists $expanded_conflicts->{$general1}
-      && exists $expanded_conflicts->{$general2};
+      if exists $expanded_conflicts->{$norm1}
+      && exists $expanded_conflicts->{$norm2};
 
     return 1;
   }
 
   method contains_general($general) {
-    return exists $expanded_conflicts->{$general};
+    my $norm = $self->normalize_name($general);
+    return exists $expanded_conflicts->{$norm};
   }
 }
 1;

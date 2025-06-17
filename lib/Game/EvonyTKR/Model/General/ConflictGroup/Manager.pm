@@ -14,9 +14,42 @@ use namespace::clean;
 class Game::EvonyTKR::Model::General::ConflictGroup::Manager :
   isa(Game::EvonyTKR::Model::Data) {
   use Carp;
+  use List::AllUtils qw( any none );
+  use overload
+    'bool'     => sub { my ($self) = @_; $self->_isTrue() },
+    'fallback' => 0;
 
   field $conflict_groups         = {};
   field $general_to_groups_index = {};
+
+  field $totalConflicts = {
+    'March Size Increase'     => ['27c65eef-7ae7-5192-9320-23721fc16d1b',],
+    "Mounted Attack Increase" => [
+      '1e4a92f6-39e4-5fae-a150-158442b1b93e',
+      '51ab85e0-906f-5c75-b31d-b89613933fb8',
+    ],
+    'Monster Mounted Attack Increase' => [
+      '9c236ce6-4506-5a99-bcb5-5ae2da859cae',
+      'bf61cd9f-20ee-5fbc-8556-cad7e9219ae2',
+      'c4216fa6-2ff1-5876-89c1-0de34fab0125',
+      'd563fe9f-ed0c-56cb-8322-dc1645fe7c42',
+      'e69ef6f5-0a56-5510-b2a7-53fa238e2142',
+      'fd591957-81e8-5881-97f4-e9e8778662f9',
+    ],
+    'March Speed Increase Skill' => [],
+  };
+
+  field $partialConflcits = {
+    'Increase Double Drop from Monsters' => [],
+    'March Size Increase'                => [
+      '49334784-699a-5074-885e-837068986e97',
+      '54e76995-987c-5006-b7b1-93b4733b67fe',
+      'ba1d667a-3be2-5f7c-8e1d-215200e76209',
+      '905cd852-5ded-5d02-8f10-57e0054a48bd'
+    ],
+    "Mounted Attack Increase" => [],
+    'Mounted HP Increase'     => ['e69ef6f5-0a56-5510-b2a7-53fa238e2142',],
+  };
 
   method get_conflict_groups_for_general($general) {
     return $general_to_groups_index->{$general} // [];
@@ -27,10 +60,20 @@ class Game::EvonyTKR::Model::General::ConflictGroup::Manager :
     # Return false - A general cannot pair with him/herself.
     return 0 if $general1 eq $general2;
 
-    my $groups = $self->get_conflict_groups_for_general($general1);
-    foreach my $group_id (@$groups) {
+    # Try with normalized names
+    my $norm1 = $conflict_groups->{ (keys %$conflict_groups)[0] }
+      ->normalize_name($general1);
+    my $norm2 = $conflict_groups->{ (keys %$conflict_groups)[0] }
+      ->normalize_name($general2);
+
+    # Check both original and normalized names
+    my @groups1 = @{ $self->get_conflict_groups_for_general($general1) // [] };
+    push @groups1, @{ $self->get_conflict_groups_for_general($norm1) // [] }
+      if $norm1 ne $general1;
+
+    foreach my $group_id (@groups1) {
       my $group = $self->get_conflict_group($group_id) // next;
-      return $group->is_compatible($general1, $general2);
+      return 0 unless $group->is_compatible($general1, $general2);
     }
 
     return 1;
@@ -55,6 +98,60 @@ class Game::EvonyTKR::Model::General::ConflictGroup::Manager :
     $self->logger->debug(
       "conflict_groups_index is " . Data::Printer::np($list));
     return sort $list;
+  }
+
+  method is_book_compatible ($bookName, $generalName, $primary = 1) {
+
+    if (exists $totalConflicts->{$bookName}) {
+      $self->logger->debug("bookname $bookName has total conflicts.");
+      foreach my $conflictId (@{ $totalConflicts->{$bookName} }) {
+        $self->logger->debug(
+"inspecting for total confict in group $conflictId for conflicts with $bookName and $generalName"
+        );
+        my $cg = $self->get_conflict_group($conflictId);
+        if ($cg) {
+          $self->logger->debug(
+"inspecting for total conflict in group $conflictId to see if it contains $generalName in "
+              . Data::Printer::np($cg->primary_generals));
+          if (any { $cg->normalize_name($generalName) =~ /$_/ }
+            @{ $cg->primary_generals }) {
+            $self->logger->debug(
+              "found conflict in group $conflictId between $bookName and "
+                . Data::Printer::np($cg->primary_generals));
+            return 0;
+          }
+        }
+        else {
+          $self->error("cannot retrieve conflict group $conflictId.");
+        }
+      }
+    }
+
+# if primary is set to true, I am only checking for total conflicts, assuming that
+# this general contains the book in question and thus a partial match works.
+    if (not $primary) {
+      if (exists $partialConflcits->{$bookName}) {
+        foreach my $conflictId (@{ $partialConflcits->{$bookName} }) {
+          my $cg = $self->get_conflict_group($conflictId);
+          if ($cg) {
+            $self->logger->debug(
+"inspecting for partial conflict conflict in group $conflictId to see if it contains $generalName in "
+                . Data::Printer::np($cg->primary_generals));
+            if (any { $cg->normalize_name($generalName) =~ /$_/ }
+              @{ $cg->primary_generals }) {
+              $self->logger->debug(sprintf(
+                'found match for book %s between %s and one of %s.',
+                $bookName, $generalName,
+                Data::Printer::np($cg->primary_generals)
+              ));
+              return 0;
+            }
+          }
+        }
+      }
+    }
+
+    return 1;
   }
 
   method importAll($SourceDir) {
@@ -126,7 +223,11 @@ class Game::EvonyTKR::Model::General::ConflictGroup::Manager :
         );
       push @{$allgroups}, $conflict_groups->{$id};
       foreach my $general (@{ $object->{members} }) {
-        push @{ $general_to_groups_index->{$general} }, $id;
+        my $norm_general = $conflict_groups->{$id}->normalize_name($general);
+        push @{ $general_to_groups_index->{$norm_general} }, $id;
+        # Also keep the original mapping for backward compatibility
+        push @{ $general_to_groups_index->{$general} }, $id
+          if $norm_general ne $general;
       }
     }
 
