@@ -36,6 +36,7 @@ class Game::EvonyTKR::Model::EvonyTKR::Manager :
     $SourceDir = Path::Tiny::path($SourceDir);
 
     $generalPairManager = Game::EvonyTKR::Model::General::Pair::Manager->new(
+      rootManager          => $self,
       generalManager       => $generalManager,
       conflictGroupManager => $generalConflictGroupManager
     );

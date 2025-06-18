@@ -23,9 +23,9 @@ class Game::EvonyTKR::Model::Book : isa(Game::EvonyTKR::Model::Data) {
 
   method get_buffs (
     $attribute,
-    $targetedType = '',
-    $conditions   = [],
-    $debuff       = 0
+    $targetedType     = '',
+    $conditions       = [],
+    $debuffConditions = [],
   ) {
     my $logger = $self->logger;
     $logger->debug("Calculating buffs for $name, attribute: $attribute");
@@ -33,7 +33,9 @@ class Game::EvonyTKR::Model::Book : isa(Game::EvonyTKR::Model::Data) {
     my $total = 0;
 
     foreach my $b (@$buff) {
-      if ($b->match_buff($attribute, $targetedType, $conditions, $debuff)) {
+      if ($b->match_buff(
+        $attribute, $targetedType, $conditions, $debuffConditions
+      )) {
         my $val = $b->value->number;
         $logger->debug("  ➤ Match found. Adding $val to total.");
         $total += $val;

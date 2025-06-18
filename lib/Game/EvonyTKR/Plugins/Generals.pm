@@ -4,6 +4,7 @@ use utf8::all;
 use File::FindLib 'lib';
 require Game::EvonyTKR::Model::General;
 require Game::EvonyTKR::Model::General::Manager;
+require Game::EvonyTKR::Model::Buff::Summarizer;
 use namespace::clean;
 
 package Game::EvonyTKR::Plugins::Generals {
@@ -31,10 +32,9 @@ package Game::EvonyTKR::Plugins::Generals {
     $logger->debug("start of show method");
     my $name;
     $name = $self->param('name');
+    my $calculate_buffs = $self->param('calculate_buffs') // 0;
 
-    $logger->debug("show detects name $name");
-
-    $logger->debug("Showing details for $name");
+    $logger->debug("show detects name $name, showing details.");
 
     my $general =
       $self->app->get_root_manager->generalManager->getGeneral($name);
@@ -42,6 +42,37 @@ package Game::EvonyTKR::Plugins::Generals {
 
     if ($general) {
       $self->stash(item => $general);
+
+      if ($calculate_buffs) {
+        $logger->debug(
+          "show method sees a request for display of calculated buff summaries."
+        );
+        my $targetType;
+        if (ref $general->type eq 'ARRAY') {
+            $targetType = $general->type->[0] if @{$general->type};
+        } else {
+            $targetType = $general->type;
+        }
+        $targetType //= '';  # Default to empty string if undefined
+        $logger->debug("Using $targetType as targetType for $name");
+        my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
+          rootManager => $self->app->get_root_manager(),
+          general     => $general,
+          isPrimary   => 1,
+          targetType  => $targetType,
+
+        );
+        $summarizer->updateBuffs();
+        my $marchIncrease  = $summarizer->marchIncrease;
+        my $attackIncrease = $summarizer->attackIncrease;
+        $self->stash(
+          'buff-summaries' => {
+            marchIncrease  => $marchIncrease,
+            attackIncrease => $attackIncrease,
+          },
+        );
+      }
+
       return $self->render(template => $self->details_template);
     }
     $self->SUPER::show();

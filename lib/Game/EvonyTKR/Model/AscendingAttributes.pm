@@ -15,7 +15,7 @@ class Game::EvonyTKR::Model::AscendingAttributes :
 
   use Carp;
   use Data::Printer;
-
+  require Readonly;
   use List::MoreUtils;
   use Util::Any -all;
   use UUID qw(uuid5);
@@ -54,9 +54,9 @@ class Game::EvonyTKR::Model::AscendingAttributes :
 
   method get_buffs_at_level (
     $level, $attribute,
-    $targetedType = '',
-    $conditions   = [],
-    $debuff       = 0
+    $targetedType     = '',
+    $conditions       = [],
+    $debuffConditions = []
   ) {
     my $logger = $self->logger;
     $logger->debug(
@@ -94,8 +94,9 @@ class Game::EvonyTKR::Model::AscendingAttributes :
         "Checking level $lvl with " . scalar(@{$buffs}) . " buffs");
 
       foreach my $buff (@$buffs) {
-        if ($buff->match_buff($attribute, $targetedType, $conditions, $debuff))
-        {
+        if ($buff->match_buff(
+          $attribute, $targetedType, $conditions, $debuffConditions
+        )) {
           my $val = $buff->value->number;
           $logger->debug("  ➤ Match found. Adding $val to total.");
           $total += $val;

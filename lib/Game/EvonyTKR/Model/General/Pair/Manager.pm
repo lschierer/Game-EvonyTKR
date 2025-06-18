@@ -10,6 +10,7 @@ class Game::EvonyTKR::Model::General::Pair::Manager :
     'bool'     => sub { $_[0]->_isTrue() },
     'fallback' => 0;
 
+  field $rootManager : param;
   field $generalManager : param;
   field $conflictGroupManager : param;
   field $pairs_by_type = {};    # e.g., { Mounted => [ [genA, genB], ... ] }
@@ -64,6 +65,7 @@ class Game::EvonyTKR::Model::General::Pair::Manager :
           primary   => $primary,
           secondary => $secondary,
         );
+        $pair->setRootManager($rootManager);
 
         for my $t (@common) {
           push @{ $pairs_by_type->{$t} }, $pair;

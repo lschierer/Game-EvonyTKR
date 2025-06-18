@@ -23,6 +23,8 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Model::Data) {
 
   field $attribute : reader : param;
 
+  field $activationType :reader :param = 'personal';
+
   field $value : reader : param;
 
   field $debuffConditions : reader : param //= [];
@@ -103,6 +105,14 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Model::Data) {
     my @tbc = @{$buffConditions};
     my @invalid;
 
+    if($activationType ne 'personal' && $activationType ne 'passive') {
+      push @errors,
+        sprintf(
+          'Detected illegalt value %s in activationType. All values must be one of %s.',
+          $activationType, 'personal, passive'
+        );
+    }
+
     # Check if we got an array reference instead of a flat array
     if (@tbc == 1 && ref($tbc[0]) eq 'ARRAY') {
       $self->logger->error("needed to flatten buffConditions"
@@ -172,24 +182,38 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Model::Data) {
 
   method match_buff (
     $test_attribute,
-    $test_targetedType = '',
-    $test_conditions   = [],
-    $test_debuff       = 0
+    $test_targetedType     = '',
+    $test_buffConditions   = [],
+    $test_debuffConditions = [],
   ) {
     my $logger = $self->logger;
 
+    # Override empty array with defaults
+    if (scalar @$test_buffConditions == 0) {
+      $test_buffConditions = [
+        "Attacking",
+        "brings a dragon",
+        "brings dragon or beast to attack",
+        "dragon to the attack",
+        "leading the army to attack",
+        "Marching",
+        "When Rallying",
+      ];
+      $logger->trace("Empty buff conditions provided, using defaults instead");
+    }
+
     $logger->trace(sprintf(
-'Checking match for buff: attr=%s, targetType=%s, conditions=%s, debuff conditions=%s, debuff=%s',
+'Checking match for buff: attr=%s, targetType=%s, buff conditions=%s, debuff conditions=%s',
       $attribute,
-      join(', ', @$targetedTypes    // []),
-      join(', ', @$buffConditions   // []),
-      join(', ', @$debuffConditions // []),
-      $test_debuff
+      join(', ', ref $targetedTypes eq 'ARRAY'    ? @$targetedTypes    : ()),
+      join(', ', ref $buffConditions eq 'ARRAY'   ? @$buffConditions   : ()),
+      join(', ', ref $debuffConditions eq 'ARRAY' ? @$debuffConditions : ()),
     ));
 
+    # Check attribute match
     return 0 unless $attribute eq $test_attribute;
 
-    # Match targetedType if provided
+    # Check targetedType match if provided
     if (length($test_targetedType) && @$targetedTypes) {
       # targetType often comes from generals, convert it for use here.
       if ($test_targetedType =~ /^(\w+)_specialist$/) {
@@ -223,42 +247,59 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Model::Data) {
       }
     }
 
-    # Match conditions if provided
-    if (@$test_conditions) {
-      if ($test_debuff) {
+    # Check debuff conditions
+    my $has_debuff_conditions = scalar @$debuffConditions > 0;
 
-        if (!@$debuffConditions) {
-          $logger->trace("  ✗ Rejected: empty debuffConditions in debuff mode");
-          return 0;
-        }
-        if (
-          any {
-            my $c = $_;
-            none { $_ eq $c } @$test_conditions
-          } @$debuffConditions
-        ) {
-          $logger->trace("  ✗ Rejected: debuffConditions not all matched");
-          return 0;
-        }
-      }
-      else {
-        if (scalar @$debuffConditions) {
-          $logger->trace(
-            "  ✗ Rejected: non-empty debuffConditions when not in debuff mode");
-          return 0;
-        }
-      }
-
-      my $buff_conditions = $self->buffConditions // [];
-      if (
-        any {
-          my $c = $_;
-          none { $_ eq $c } @$test_conditions
-        } @$buff_conditions
-      ) {
-        $logger->trace("  ✗ Rejected: buffConditions not all matched");
+    # If test_debuffConditions is empty, reject any buff with debuff conditions
+    if (scalar @$test_debuffConditions == 0) {
+      if ($has_debuff_conditions) {
+        $logger->trace(
+          "  ✗ Rejected: buff has debuff conditions but none were requested");
         return 0;
       }
+    }
+# If test_debuffConditions is provided, check that all debuff conditions are in the allowed list
+    elsif ($has_debuff_conditions) {
+      foreach my $condition (@$debuffConditions) {
+        if (none { $_ eq $condition } @$test_debuffConditions) {
+          $logger->trace(
+            "  ✗ Rejected: debuff condition '$condition' not in allowed list");
+          return 0;
+        }
+      }
+    }
+
+    # Check buff conditions
+    my $has_buff_conditions = scalar @$buffConditions > 0;
+
+# If test_buffConditions is provided, check that all buff conditions are in the allowed list
+    if (scalar @$test_buffConditions > 0) {
+      # A buff with no conditions should match when conditions are specified
+      if (!$has_buff_conditions) {
+        $logger->trace(
+          "  ✓ Buff has no conditions, accepting unconditional buff");
+        # Continue to the end of the function
+      }
+      else {
+        $logger->trace("Checking buff conditions: "
+            . join(', ', @$buffConditions)
+            . " against allowed: "
+            . join(', ', @$test_buffConditions));
+
+        # Check if ANY of the buff's conditions are NOT in the allowed list
+        my %allowed_conditions = map { $_ => 1 } @$test_buffConditions;
+        foreach my $condition (@$buffConditions) {
+          if (!exists $allowed_conditions{$condition}) {
+            $logger->trace(
+              "  ✗ Rejected: buff condition '$condition' not in allowed list");
+            return 0;
+          }
+        }
+
+      }
+    }
+    else {
+      $logger->error("NO TEST BUFF CONDITIONS!!");
     }
 
     $logger->trace("  ✓ Buff matched");
