@@ -52,7 +52,12 @@ class Game::EvonyTKR::Model::AscendingAttributes :
     $id = uuid5($ascendingbase, $general);
   }
 
-  method get_buffs_at_level ($level, $attribute) {
+  method get_buffs_at_level (
+    $level, $attribute,
+    $targetedType = '',
+    $conditions   = [],
+    $debuff       = 0
+  ) {
     my $logger = $self->logger;
     $logger->debug(
       "Calculating ascending buffs for level: $level, attribute: $attribute");
@@ -89,14 +94,11 @@ class Game::EvonyTKR::Model::AscendingAttributes :
         "Checking level $lvl with " . scalar(@{$buffs}) . " buffs");
 
       foreach my $buff (@$buffs) {
-        my $attr = $buff->attribute;
-        my $val  = $buff->value;
-        $logger->debug("  Buff: attribute=$attr, value=" . $val->number);
-
-        if ($attr eq $attribute) {
-          $logger->debug(
-            "  ➤ Match found. Adding " . $val->number . " to total.");
-          $total += $val->number;
+        if ($buff->match_buff($attribute, $targetedType, $conditions, $debuff))
+        {
+          my $val = $buff->value->number;
+          $logger->debug("  ➤ Match found. Adding $val to total.");
+          $total += $val;
         }
       }
     }

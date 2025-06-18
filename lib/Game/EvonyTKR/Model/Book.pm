@@ -11,6 +11,7 @@ use namespace::clean;
 class Game::EvonyTKR::Model::Book : isa(Game::EvonyTKR::Model::Data) {
   # PODNAME: Game::EvonyTKR::Model::Book
   use Carp;
+  use List::AllUtils qw( any none );
   use overload
     '""'       => \&as_string,
     'bool'     => \&_isTrue,
@@ -19,6 +20,29 @@ class Game::EvonyTKR::Model::Book : isa(Game::EvonyTKR::Model::Data) {
   field $name : reader : param;
   field $buff : reader = [];
   field $text : reader : param //= '';
+
+  method get_buffs (
+    $attribute,
+    $targetedType = '',
+    $conditions   = [],
+    $debuff       = 0
+  ) {
+    my $logger = $self->logger;
+    $logger->debug("Calculating buffs for $name, attribute: $attribute");
+
+    my $total = 0;
+
+    foreach my $b (@$buff) {
+      if ($b->match_buff($attribute, $targetedType, $conditions, $debuff)) {
+        my $val = $b->value->number;
+        $logger->debug("  ➤ Match found. Adding $val to total.");
+        $total += $val;
+      }
+    }
+
+    $logger->debug("$name: total for attribute '$attribute': $total");
+    return $total;
+  }
 
   method addBuff ($newBuff) {
     $self->logger->debug("addBuff called for book '$name'");

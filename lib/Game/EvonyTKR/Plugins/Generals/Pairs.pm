@@ -101,14 +101,14 @@ package Game::EvonyTKR::Plugins::Generals::Pairs {
         $logger->warn("pair $pair_index has no manager set");
         $pairs[$pair_index]->setRootManager($self->app->get_root_manager());
       }
-      $pairs[$pair_index]->updateBuffs();
+      $pairs[$pair_index]->updateBuffs($generalType);
     }
 
     # Get sort parameters from query
     my $sort_param = $self->param('sort')
-      // 'primary,secondary,marchbuff';    # Default sort columns
+      // 'primary,secondary,marchbuff,attackbuff';    # Default sort columns
     my $dir_param = $self->param('dir')
-      // 'desc,desc,desc';                 # Default directions
+      // 'asc,asc,desc,desc';                         # Default directions
 
     # Parse sort parameters
     my @sort_columns = split(',', $sort_param);

@@ -51,7 +51,12 @@ class Game::EvonyTKR::Model::Speciality : isa(Game::EvonyTKR::Model::Data) {
     $id = uuid5($specialitybase, $name);
   }
 
-  method get_buffs_at_level ($level, $attribute) {
+  method get_buffs_at_level (
+    $level, $attribute,
+    $targetedType = '',
+    $conditions   = [],
+    $debuff       = 0
+  ) {
     $level = lc($level)
       ;    # sanitize the data from the user - level names must be lower case
     my $logger = $self->logger;
@@ -82,14 +87,11 @@ class Game::EvonyTKR::Model::Speciality : isa(Game::EvonyTKR::Model::Data) {
         "Checking level '$level_name' with " . scalar(@$buffs) . " buffs");
 
       foreach my $buff (@$buffs) {
-        my $buff_attr  = $buff->attribute;
-        my $buff_value = $buff->value->number();
-
-        $logger->debug("  Buff: attribute=$buff_attr, value=$buff_value");
-
-        if ($buff_attr eq $attribute) {
-          $logger->debug("  ➤ Match found. Adding $buff_value to total.");
-          $total += $buff_value;
+        if ($buff->match_buff($attribute, $targetedType, $conditions, $debuff))
+        {
+          my $val = $buff->value->number;
+          $logger->debug("  ➤ Match found. Adding $val to total.");
+          $total += $val;
         }
       }
     }

@@ -23,8 +23,8 @@ class Game::EvonyTKR::Model::General::ConflictGroup::Manager :
   field $general_to_groups_index = {};
 
   field $totalConflicts = {
-    'March Size Increase'     => ['27c65eef-7ae7-5192-9320-23721fc16d1b',],
-    "Mounted Attack Increase" => [
+    'March Size Increase'  => ['27c65eef-7ae7-5192-9320-23721fc16d1b',],
+    "Mounted Troop Attack" => [
       '1e4a92f6-39e4-5fae-a150-158442b1b93e',
       '51ab85e0-906f-5c75-b31d-b89613933fb8',
     ],
@@ -47,8 +47,8 @@ class Game::EvonyTKR::Model::General::ConflictGroup::Manager :
       'ba1d667a-3be2-5f7c-8e1d-215200e76209',
       '905cd852-5ded-5d02-8f10-57e0054a48bd'
     ],
-    "Mounted Attack Increase" => [],
-    'Mounted HP Increase'     => ['e69ef6f5-0a56-5510-b2a7-53fa238e2142',],
+    "Mounted Troop Attack" => [],
+    'Mounted Troop HP'     => ['e69ef6f5-0a56-5510-b2a7-53fa238e2142',],
   };
 
   method get_conflict_groups_for_general($general) {

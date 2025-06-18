@@ -170,6 +170,101 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Model::Data) {
     }
   }
 
+  method match_buff (
+    $test_attribute,
+    $test_targetedType = '',
+    $test_conditions   = [],
+    $test_debuff       = 0
+  ) {
+    my $logger = $self->logger;
+
+    $logger->trace(sprintf(
+'Checking match for buff: attr=%s, targetType=%s, conditions=%s, debuff conditions=%s, debuff=%s',
+      $attribute,
+      join(', ', @$targetedTypes    // []),
+      join(', ', @$buffConditions   // []),
+      join(', ', @$debuffConditions // []),
+      $test_debuff
+    ));
+
+    return 0 unless $attribute eq $test_attribute;
+
+    # Match targetedType if provided
+    if (length($test_targetedType) && @$targetedTypes) {
+      # targetType often comes from generals, convert it for use here.
+      if ($test_targetedType =~ /^(\w+)_specialist$/) {
+        my $short = $1;
+
+        my %general_to_targeted = (
+          mounted => 'Mounted Troops',
+          ground  => 'Ground Troops',
+          ranged  => 'Ranged Troops',
+          siege   => 'Siege Machines',
+        );
+
+        if (exists $general_to_targeted{$short}) {
+          $test_targetedType = $general_to_targeted{$short};
+          $logger->trace(
+            "Normalized test_targetedType to '$test_targetedType'");
+        }
+        else {
+          $logger->warn(
+            "Unrecognized general specialist key: $test_targetedType");
+          return 0;
+        }
+      }
+
+      # Match against the buff's targetedTypes
+      if (none { $_ =~ /\Q$test_targetedType\E/i } @$targetedTypes) {
+        $logger->trace(
+          "  ✗ Rejected: targetedType '$test_targetedType' not matched by "
+            . Data::Printer::np($targetedTypes));
+        return 0;
+      }
+    }
+
+    # Match conditions if provided
+    if (@$test_conditions) {
+      if ($test_debuff) {
+
+        if (!@$debuffConditions) {
+          $logger->trace("  ✗ Rejected: empty debuffConditions in debuff mode");
+          return 0;
+        }
+        if (
+          any {
+            my $c = $_;
+            none { $_ eq $c } @$test_conditions
+          } @$debuffConditions
+        ) {
+          $logger->trace("  ✗ Rejected: debuffConditions not all matched");
+          return 0;
+        }
+      }
+      else {
+        if (scalar @$debuffConditions) {
+          $logger->trace(
+            "  ✗ Rejected: non-empty debuffConditions when not in debuff mode");
+          return 0;
+        }
+      }
+
+      my $buff_conditions = $self->buffConditions // [];
+      if (
+        any {
+          my $c = $_;
+          none { $_ eq $c } @$test_conditions
+        } @$buff_conditions
+      ) {
+        $logger->trace("  ✗ Rejected: buffConditions not all matched");
+        return 0;
+      }
+    }
+
+    $logger->trace("  ✓ Buff matched");
+    return 1;
+  }
+
   method to_hash() {
     my $c;
     my $conditionCount = scalar $self->conditions();

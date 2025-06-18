@@ -10,19 +10,23 @@
             <% my $primary_index = -1; %>
             <% my $secondary_index = -1; %>
             <% my $marchbuff_index = -1; %>
+            <% my $attackbuff_index = -1; %>
             <% for my $i (0..$#$sort_columns) { %>
               <% $primary_index = $i if $sort_columns->[$i] eq 'primary'; %>
               <% $secondary_index = $i if $sort_columns->[$i] eq 'secondary'; %>
               <% $marchbuff_index = $i if $sort_columns->[$i] eq 'marchbuff'; %>
+              <% $attackbuff_index = $i if $sort_columns->[$i] eq 'attackbuff'; %>
             <% } %>
 
             <% my $primary_dir = $primary_index >= 0 ? $sort_dirs->[$primary_index] : 'desc'; %>
             <% my $secondary_dir = $secondary_index >= 0 ? $sort_dirs->[$secondary_index] : 'desc'; %>
             <% my $marchbuff_dir = $marchbuff_index >= 0 ? $sort_dirs->[$marchbuff_index] : 'desc'; %>
+            <% my $attackbuff_dir = $attackbuff_index >= 0 ? $sort_dirs->[$attackbuff_index] : 'desc'; %>
 
             <% my $primary_sort_order = $primary_index >= 0 ? $primary_index + 1 : 0; %>
             <% my $secondary_sort_order = $secondary_index >= 0 ? $secondary_index + 1 : 0; %>
             <% my $marchbuff_sort_order = $marchbuff_index >= 0 ? $marchbuff_index + 1 : 0; %>
+            <% my $attackbuff_sort_order = $attackbuff_index >= 0 ? $attackbuff_index + 1 : 0; %>
 
             <th
               tabindex="0"
@@ -96,6 +100,28 @@
               <span class="spectrum-Table-columnTitle">March Buff</span>
             </th>
 
+            <th
+              tabindex="0"
+              data-column="attackbuff"
+              class="spectrum-Table-headCell is-sortable <%= $attackbuff_index >= 0 ? $attackbuff_dir eq 'asc' ? 'is-sorted-asc' : 'is-sorted-desc' : '' %>"
+              <% if ( $attackbuff_index >= 0 ) { %>
+                aria-sort="<%= $attackbuff_dir eq 'asc' ? 'ascending' : 'descending' %>"
+                data-direction="<%= $attackbuff_dir %>"
+                data-sort-order="<%= $attackbuff_sort_order %>"
+              <% } %>
+            >
+              <iconify-icon
+                icon="<%= $attackbuff_dir eq 'desc' ? 'tabler:arrow-down' : 'tabler:arrow-up' %>"
+                aria-hidden="true"
+                role="img"
+                class="spectrum-Icon spectrum-Icon--medium spectrum-Table-sortedIcon"
+              ></iconify-icon>
+              <% if ($attackbuff_sort_order > 0) { %>
+                <span class="sort-order"><%= $attackbuff_sort_order %></span>
+              <% } %>
+              <span class="spectrum-Table-columnTitle">Attack Buff</span>
+            </th>
+
           </tr>
         </thead>
 
@@ -110,6 +136,9 @@
               </td>
               <td class="spectrum-Table-cell">
                 <%= $item->marchbuff() %>
+              </td>
+              <td class="spectrum-Table-cell">
+                <%= $item->attackbuff() %>
               </td>
             </tr>
           <% } %>
