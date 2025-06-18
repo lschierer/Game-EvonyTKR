@@ -52,7 +52,10 @@
                 <% foreach my $buff (@{ $level->{buffs} }) { %>
                   <dl>
                     <dt>Attribute: </dt><dd><%= $buff->attribute %></dd>
-                    <dt>Targed Type: </dt><dd><%= join @{ $buff->targetedTypes}, ', '; %></dd>
+                    <dt>Targed Type: </dt>
+                    <% foreach my $tt ( @{ $buff->targetedTypes} ) { %>
+                      <dd><%= $tt %></dd>
+                    <% } %>
                     <% if (scalar $buff->conditions() > 0 ) { %>
                       <% my @conditions = $buff->conditions(); %>
                         <dt>Conditions:</dt>

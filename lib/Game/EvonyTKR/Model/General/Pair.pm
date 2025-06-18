@@ -26,25 +26,30 @@ class Game::EvonyTKR::Model::General::Pair : isa(Game::EvonyTKR::Model::Data) {
     return 0;
   }
 
-  #parameters unused currently, but adding them for future growth
+  # some parameters unused currently, but adding them for future growth
   method updateBuffs (
-    $primaryAscending     = 'None',
-    $primarySpeciality1   = 'none',
-    $primarySpeciality2   = 'none',
-    $primarySpeciality3   = 'none',
-    $primarySpeciality4   = 'none',
-    $secondarySpeciality1 = 'none',
-    $secondarySpeciality2 = 'none',
-    $secondarySpeciality3 = 'none',
-    $secondarySpeciality4 = 'none',
+    $primaryAscending     = 'red5',
+    $primarySpeciality1   = 'gold',
+    $primarySpeciality2   = 'gold',
+    $primarySpeciality3   = 'gold',
+    $primarySpeciality4   = 'gold',
+    $secondarySpeciality1 = 'gold',
+    $secondarySpeciality2 = 'gold',
+    $secondarySpeciality3 = 'gold',
+    $secondarySpeciality4 = 'gold',
     $keepLevel            = 40,
     $primaryLevel         = 45,
     $secondaryLevel       = 45,
   ) {
-    $self->updateMarchSize();
+    $self->updateMarchSize(
+      $primaryAscending,     $primarySpeciality1,   $primarySpeciality2,
+      $primarySpeciality3,   $primarySpeciality4,   $secondarySpeciality1,
+      $secondarySpeciality2, $secondarySpeciality3, $secondarySpeciality4,
+      $keepLevel,
+    );
   }
 
-  #parameters unused currently, but adding them for future growth
+  # some parameters unused currently, but adding them for future growth
   method updateMarchSize (
     $primaryAscending     = 'None',
     $primarySpeciality1   = 'none',
@@ -127,11 +132,86 @@ class Game::EvonyTKR::Model::General::Pair : isa(Game::EvonyTKR::Model::Data) {
       }
     }
 
-    foreach my $sn ($primary->specialityNames, $secondary->specialityNames) {
+    my @specialityNames  = @{ $primary->specialityNames };
+    my @specialityLevels = (
+      $primarySpeciality1, $primarySpeciality2,
+      $primarySpeciality3, $primarySpeciality4
+    );
+    foreach my $sn_index (0 .. $#specialityNames) {
+      my $sn = $specialityNames[$sn_index];
+      my $sl = lc($specialityLevels[$sn_index]);
+      $self->logger->debug(
+        "processing primary " . $primary->name . " $sn at level $sl");
+      my $speciality = $rootManager->specialityManager->getSpeciality($sn);
+      if ($speciality) {
+        $self->logger->debug(
+          sprintf('checking %s for marchbuff', $speciality->name));
 
+        my $sv = $speciality->get_buffs_at_level($sl, 'March Size Capacity');
+        $self->logger->debug("retrieved $sv as total for level $sl "
+            . $speciality->name
+            . " as part of "
+            . $primary->name);
+        $marchbuff += $sv;
+
+      }
+      else {
+        $self->logger->error(sprintf(
+          'cannot retrieve speciality %s for %s', $sn, $primary->name,
+        ));
+      }
+    }
+
+    @specialityNames  = @{ $secondary->specialityNames };
+    @specialityLevels = (
+      $secondarySpeciality1, $secondarySpeciality2,
+      $secondarySpeciality3, $secondarySpeciality4
+    );
+    foreach my $sn_index (0 .. $#specialityNames) {
+      my $sn = $specialityNames[$sn_index];
+      my $sl = lc($specialityLevels[$sn_index]);
+      $self->logger->debug(
+        "processing secondary " . $secondary->name . " $sn at level $sl");
+      my $speciality = $rootManager->specialityManager->getSpeciality($sn);
+      if ($speciality) {
+        $self->logger->debug(
+          sprintf('checking %s for marchbuff', $speciality->name));
+
+        my $sv = $speciality->get_buffs_at_level($sl, 'March Size Capacity');
+        $self->logger->debug("retrieved $sv as total for level $sl "
+            . $speciality->name
+            . " as part of "
+            . $secondary->name);
+        $marchbuff += $sv;
+
+      }
+      else {
+        $self->logger->error(sprintf(
+          'cannot retrieve speciality %s for %s',
+          $sn, $secondary->name,
+        ));
+      }
+    }
+
+    my $aa = $rootManager->ascendingAttributesManager->getAscendingAttributes(
+      $primary->name);
+    if ($aa) {
+      $self->logger->debug("retrieved ascending buffs for " . $primary->name);
+      my $av =
+        $aa->get_buffs_at_level($primaryAscending, 'March Size Capacity');
+      $self->logger->debug(sprintf(
+'%s Ascending Attributes has March Size Capacity buffs with total %s at level %s',
+        $primary->name, $av, $primaryAscending,
+      ));
+      $marchbuff += $av;
+    }
+    else {
+      $self->logger->error(
+        "cannot find Ascending Attributes for " . $primary->name);
     }
 
   }
+
   # Method to convert to hash
   method to_hash {
     return {

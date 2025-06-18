@@ -17,14 +17,16 @@ class Game::EvonyTKR::Model::AscendingAttributes::Manager :
   # PODNAME: Game::EvonyTKR::Model::AscendingAttributes::Manager
   use Carp;
   use overload
+    'bool'     => sub { $_[0]->_isTrue() },
     'fallback' => 0;
 
-  my $ascendingAttributess = {};
+  field $ascendingAttributess = {};
 
   method getAscendingAttributes ($name) {
     if (exists $ascendingAttributess->{$name}) {
       return $ascendingAttributess->{$name};
     }
+    $self->logger->warn("failed to find Ascending Attribute $name");
     return 0;
   }
 
@@ -72,8 +74,8 @@ class Game::EvonyTKR::Model::AscendingAttributes::Manager :
         my $level = $oa->{level};
         foreach my $ob (@{ $oa->{buff} }) {
           my $v = Game::EvonyTKR::Model::Buff::Value->new(
-            number => $ob->{number},
-            unit   => $ob->{unit},
+            number => $ob->{value}->{number},
+            unit   => $ob->{value}->{unit},
           );
           my $b;
           if (exists $ob->{class}) {

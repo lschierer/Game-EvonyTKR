@@ -7,6 +7,7 @@ require Game::EvonyTKR::Model::General::Manager;
 require Game::EvonyTKR::Model::General::ConflictGroup::Manager;
 require Game::EvonyTKR::Model::General::Pair::Manager;
 require Game::EvonyTKR::Model::Speciality::Manager;
+require Game::EvonyTKR::Model::AscendingAttributes::Manager;
 use namespace::clean;
 
 class Game::EvonyTKR::Model::EvonyTKR::Manager :
@@ -17,6 +18,7 @@ class Game::EvonyTKR::Model::EvonyTKR::Manager :
   field $generalConflictGroupManager : reader;
   field $bookManager : reader;
   field $specialityManager : reader;
+  field $ascendingAttributesManager : reader;
 
   # computed types
   field $generalPairManager : reader;
@@ -28,6 +30,8 @@ class Game::EvonyTKR::Model::EvonyTKR::Manager :
       Game::EvonyTKR::Model::General::ConflictGroup::Manager->new();
     $bookManager       = Game::EvonyTKR::Model::Book::Manager->new();
     $specialityManager = Game::EvonyTKR::Model::Speciality::Manager->new();
+    $ascendingAttributesManager =
+      Game::EvonyTKR::Model::AscendingAttributes::Manager->new();
 
     $SourceDir = Path::Tiny::path($SourceDir);
 
@@ -60,6 +64,11 @@ class Game::EvonyTKR::Model::EvonyTKR::Manager :
     $self->logger->info(" starting import of specialities.");
     $specialityManager->importAll($collectionDir->child('specialities'));
     $self->logger->info("import of specialities complete");
+
+    $self->logger->info(" starting import of ascending attributes.");
+    $ascendingAttributesManager->importAll(
+      $collectionDir->child('ascending attributes'));
+    $self->logger->info("import of ascending attributes complete");
 
     $self->logger->info("root import complete");
 

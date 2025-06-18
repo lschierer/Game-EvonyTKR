@@ -24,7 +24,8 @@ class Game::EvonyTKR::Model::AscendingAttributes :
   use Game::EvonyTKR::Model::Logger;
   use overload
     '""'       => \&as_string,
-    "fallback" => 1;
+    'bool'     => sub { $_[0]->_isTrue() },
+    "fallback" => 0;
 
   field $id : reader;
   field $general : reader : param;
@@ -46,34 +47,80 @@ class Game::EvonyTKR::Model::AscendingAttributes :
     $ascending = \%step2;
   }
 
-  field $activeLevel : reader : param //= 'None';
-
   ADJUST {
     my $ascendingbase = uuid5($self->UUID5_base, 'Ascending Attributes');
     $id = uuid5($ascendingbase, $general);
   }
 
-  method setActiveLevel ($newLevel) {
-    my $red = 1;
-    if ($newLevel !~ /(purple|red)[0-9]{1}/i) {
+  method get_buffs_at_level ($level, $attribute) {
+    my $logger = $self->logger;
+    $logger->debug(
+      "Calculating ascending buffs for level: $level, attribute: $attribute");
+
+    return 0 if not defined $level or $level eq 'none';
+
+    my ($is_red, $valid_levels);
+    if ($level =~ /^red\d$/) {
+      $is_red       = 1;
+      $valid_levels = $self->AscendingLevelNames(1);    # red
+    }
+    elsif ($level =~ /^purple\d$/) {
+      $is_red       = 0;
+      $valid_levels = $self->AscendingLevelNames(0);    # purple
+    }
+    else {
+      $logger->warn("Invalid ascending level: $level");
       return 0;
     }
-    if ($newLevel =~ /purple/i) {
-      $red = 0;
+
+    my %level_index = map { $valid_levels->[$_] => $_ } 0 .. $#$valid_levels;
+    return 0 unless exists $level_index{$level};
+
+    my $target_index = $level_index{$level};
+    my $levels_by_name =
+      $self->ascending;    # { red1 => [...], purple1 => [...], ... }
+
+    my $total = 0;
+    for my $i (1 .. $target_index) {    # skip index 0 ('None')
+      my $lvl   = $valid_levels->[$i];
+      my $buffs = $levels_by_name->{$lvl}->{buffs} // [];
+
+      $logger->debug(
+        "Checking level $lvl with " . scalar(@{$buffs}) . " buffs");
+
+      foreach my $buff (@$buffs) {
+        my $attr = $buff->attribute;
+        my $val  = $buff->value;
+        $logger->debug("  Buff: attribute=$attr, value=" . $val->number);
+
+        if ($attr eq $attribute) {
+          $logger->debug(
+            "  ➤ Match found. Adding " . $val->number . " to total.");
+          $total += $val->number;
+        }
+      }
     }
-    if (none { $_ eq $newLevel } @{ $self->AscendingLevelNames($red) }) {
-      return 0;
-    }
-    $activeLevel = $newLevel;
-    return 1;
+
+    $logger->debug("Total for $level/$attribute: $total");
+    return $total;
   }
 
   method addBuff ($level, $nb) {
     my $red = 1;
     if (!blessed($nb) || blessed($nb) ne "Game::EvonyTKR::Model::Buff") {
+      $self->logger->error(sprintf(
+        'attempting to add buff of type %s not "Game::EvonyTKR::Model::Buff"',
+        !blessed($nb) ? Scalar::Util::reftype($nb) : blessed($nb)));
       exit 0;
     }
+
     if ($level !~ /(purple|red)[0-9]{1}/i) {
+      $self->logger->error(sprintf(
+        'level should be one of %s, not %s',
+        Data::Printer::np((
+          $self->AscendingLevelNames(0), $self->AscendingLevelNames(1))),
+        $level
+      ));
       return 0;
     }
     if ($level =~ /purple/i) {
@@ -82,6 +129,7 @@ class Game::EvonyTKR::Model::AscendingAttributes :
     if (none { $_ eq $level } @{ $self->AscendingLevelNames($red) }) {
       return 0;
     }
+
     push @{ $ascending->{$level}->{buffs} }, $nb;
     return scalar @{ $ascending->{$level}->{buffs} };
   }
@@ -94,10 +142,12 @@ class Game::EvonyTKR::Model::AscendingAttributes :
     };
   }
 
+  # Method for JSON serialization
   method TO_JSON {
     return $self->to_hash();
   }
 
+  # Stringification method using JSON
   method as_string {
     my $json =
       JSON::PP->new->utf8->pretty->allow_blessed(1)
@@ -134,18 +184,6 @@ Ascending works similarly to Specialities in that there are multiple levels, how
 =method name()
 
 returns the name field from the Speciality.
-=cut
-
-=method activeLevel
-
-returns the level, values 1Purple through 5Purple (for Purple quality generals), or 1Red through 5Red (for Gold/Red quality generals), that is active at this time.
-=cut
-
-=method setActiveLevel($newLevel)
-
-sets the activeLevel to newLevel presuming it is a valid value 1Purple through 5Purple (for Purple quality generals), or 1Red through 5Red (for Gold/Red quality generals).
-
-Todo: Make sure the value is valid I<for the General's quality>.
 =cut
 
 =method add_buff($level, $nb)

@@ -46,32 +46,83 @@ class Game::EvonyTKR::Model::Speciality : isa(Game::EvonyTKR::Model::Data) {
     $levels = \%step2;
   }
 
-  field $activeLevel : reader : param //= 'None';
-
   ADJUST {
     my $specialitybase = uuid5($self->UUID5_base, 'Speciality');
     $id = uuid5($specialitybase, $name);
   }
 
-  method setActiveLevel ($newLevel) {
-    my $specialityLevelsNames = $self->specialityLevels->unique_values;
-    if (none { $_ eq $newLevel } @{$specialityLevelsNames}) {
+  method get_buffs_at_level ($level, $attribute) {
+    $level = lc($level)
+      ;    # sanitize the data from the user - level names must be lower case
+    my $logger = $self->logger;
+    $logger->debug(
+      "Calculating buffs for level: $level, attribute: $attribute");
+
+    # an enum's values function will always return in the same order.
+    my $valid_levels = $self->specialityLevels->values;
+    my %level_index  = map { $valid_levels->[$_] => $_ } 0 .. $#$valid_levels;
+
+    unless (exists $level_index{$level}) {
+      $logger->debug("Invalid level: $level");
       return 0;
     }
-    $activeLevel = $newLevel;
-    return 1;
+
+    return 0 if $level eq 'none';
+
+    my $buffs_by_level = $self->levels;
+    my $target_index   = $level_index{$level};
+
+    my $total = 0;
+
+    for my $i (1 .. $target_index) {    # skip index 0 ('none')
+      my $level_name = $valid_levels->[$i];
+      my $buffs      = $buffs_by_level->{$level_name}->{buffs} // [];
+
+      $logger->debug(
+        "Checking level '$level_name' with " . scalar(@$buffs) . " buffs");
+
+      foreach my $buff (@$buffs) {
+        my $buff_attr  = $buff->attribute;
+        my $buff_value = $buff->value->number();
+
+        $logger->debug("  Buff: attribute=$buff_attr, value=$buff_value");
+
+        if ($buff_attr eq $attribute) {
+          $logger->debug("  ➤ Match found. Adding $buff_value to total.");
+          $total += $buff_value;
+        }
+      }
+    }
+
+    $logger->debug(
+      "$name has Total for level '$level' and attribute '$attribute': $total");
+    return $total;
   }
 
   method addBuff ($level, $nb) {
-    my $red = 1;
+
     if (!blessed($nb) || blessed($nb) ne "Game::EvonyTKR::Model::Buff") {
+      $self->logger->error(sprintf(
+        'attempting to add buff of type %s not "Game::EvonyTKR::Model::Buff"',
+        !blessed($nb) ? Scalar::Util::reftype($nb) : blessed($nb)));
       exit 0;
     }
     my $specialityLevelsNames = $self->specialityLevels->unique_values;
-    if (none { $_ eq $level } @{$specialityLevelsNames}) {
+
+    # the data files apparently have bad cases in them for level names.
+    if (none { $_ =~ /$level/i } @{$specialityLevelsNames}) {
+      $self->logger->error(sprintf(
+        'level should be one of %s, not %s',
+        Data::Printer::np(@{$specialityLevelsNames}), $level
+      ));
       return 0;
     }
+    $level = lc($level);
     push @{ $levels->{$level}->{buffs} }, $nb;
+    $self->logger->debug(sprintf(
+      'speciality %s at %s now has buffs %s.',
+      $name, $level, Data::Printer::np($levels->{$level}->{buffs})
+    ));
     return scalar @{ $levels->{$level}->{buffs} };
   }
 
@@ -114,17 +165,6 @@ A Speciality is one of several ways that a General can provide Buffs for Troops.
 =method name()
 
 returns the name field from the Speciality.
-=cut
-
-=method activeLevel
-
-returns the level, values None, Green, Blue, Purple, Orange, or Gold, that is active at this time.
-=cut
-
-=method setActiveLevel($newLevel)
-
-sets the activeLevel to newLevel presuming it is a valid value None, Green, Blue, Purple, Orange, or Gold.
-
 =cut
 
 =method add_buff($level, $nb)
