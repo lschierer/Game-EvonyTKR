@@ -8,6 +8,7 @@ require Game::EvonyTKR::Model::General::ConflictGroup::Manager;
 require Game::EvonyTKR::Model::General::Pair::Manager;
 require Game::EvonyTKR::Model::Speciality::Manager;
 require Game::EvonyTKR::Model::AscendingAttributes::Manager;
+require Game::EvonyTKR::Model::Covenant::Manager;
 use namespace::clean;
 
 class Game::EvonyTKR::Model::EvonyTKR::Manager :
@@ -19,6 +20,7 @@ class Game::EvonyTKR::Model::EvonyTKR::Manager :
   field $bookManager : reader;
   field $specialityManager : reader;
   field $ascendingAttributesManager : reader;
+  field $covenantManager : reader;
 
   # computed types
   field $generalPairManager : reader;
@@ -32,6 +34,8 @@ class Game::EvonyTKR::Model::EvonyTKR::Manager :
     $specialityManager = Game::EvonyTKR::Model::Speciality::Manager->new();
     $ascendingAttributesManager =
       Game::EvonyTKR::Model::AscendingAttributes::Manager->new();
+    $covenantManager =
+      Game::EvonyTKR::Model::Covenant::Manager->new(rootManager => $self,);
 
     $SourceDir = Path::Tiny::path($SourceDir);
 
@@ -70,6 +74,10 @@ class Game::EvonyTKR::Model::EvonyTKR::Manager :
     $ascendingAttributesManager->importAll(
       $collectionDir->child('ascending attributes'));
     $self->logger->info("import of ascending attributes complete");
+
+    $self->logger->info(" starting import of covenants.");
+    $covenantManager->importAll($collectionDir->child('covenants'));
+    $self->logger->info("import of covenants complete");
 
     $self->logger->info("root import complete");
 

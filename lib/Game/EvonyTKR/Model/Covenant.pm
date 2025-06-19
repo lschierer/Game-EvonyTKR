@@ -13,6 +13,7 @@ class Game::EvonyTKR::Model::Covenant : isa(Game::EvonyTKR::Model::Data) {
 # PODNAME: Game::EvonyTKR::Model::Covenant
   use builtin         qw(indexed);
   require Data::Printer;
+  require Type::Tiny::Enum;
   require Readonly;
   use namespace::autoclean;
   use File::FindLib 'lib';
@@ -26,6 +27,9 @@ class Game::EvonyTKR::Model::Covenant : isa(Game::EvonyTKR::Model::Data) {
   my $debug = 1;
 
   field $primary : reader : param;
+  field $one :param;
+  field $two :param;
+  field $three :param;
 
   field $secondary : reader;
 
@@ -33,18 +37,21 @@ class Game::EvonyTKR::Model::Covenant : isa(Game::EvonyTKR::Model::Data) {
 
   ADJUST {
     my $step1 = {};
-    foreach my $key ( @secondaryKeys ) {
-      $step1->{$key} = $primary;
-    }
+    $step1->{one} = $one;
+    $step1->{two} = $two;
+    $step1->{three} = $three;
+
     # Use Readonly::Hash1 for shallow readonly - hash structure is fixed but array contents can change
     Readonly::Hash1 my %step2 => %{$step1};
     $secondary = \%step2;
   }
 
-  field $categories : reader;
+  field $categories :reader;
 
   field $CovenantLevels =
-    enum ['None', 'War', 'Cooperation', 'Peace', 'Faith', 'Honor', 'Civilization',];
+    Type::Tiny::Enum->new(
+      values => ['None', 'War', 'Cooperation', 'Peace', 'Faith', 'Honor', 'Civilization',],
+    );
 
   ADJUST {
     #Covenants only have these levels.
@@ -64,27 +71,12 @@ class Game::EvonyTKR::Model::Covenant : isa(Game::EvonyTKR::Model::Data) {
     $categories = \%step2;
 
     for my ($index, $lv) (indexed(@levels)) {
+      if ($lv eq 'None') {
+        next;
+      }
       my $al = 10000 + $index * 2 * 1000;
       $self->logger()->trace("setting activationLevel for $lv to $al");
-      $categories->{$lv} = {
-        activationLevel => $al,
-      };
-    }
-  }
-
-  method setSecondary ($position, $general) {
-    if (any { $_ =~ /$position/i } @secondaryKeys) {
-      my $generalClass = blessed $general;
-      if($generalClass ne 'Game::EvonyTKR::Model::General') {
-        $self->logger->logcroak("$generalClass is not a Game::EvonyTKR::Model::General.");
-      }
-      $position = lc($position);
-      $secondary->{$position} = $general;
-    }
-    else {
-      $self->logger()
-        ->logwarn("$position is not a valid position, must be one of "
-          . np @secondaryKeys);
+      $categories->{$lv}->{activationLevel} = $al;
     }
   }
 
@@ -97,10 +89,10 @@ class Game::EvonyTKR::Model::Covenant : isa(Game::EvonyTKR::Model::Data) {
       exit 0;
     }
 
-    if (none { $level =~ /$_/i) @{ $CovenantLevels->values() } ) {
+    if (none { $level =~ /$_/i } @{ $CovenantLevels->values() } ) {
       $self->logger->error(sprintf(
         'level should be one of %s, not %s',
-        join(', ' @{ $CovenantLevels->values() }),
+        join(', ', @{ $CovenantLevels->values() }),
         $level
       ));
       return 0;
@@ -110,7 +102,7 @@ class Game::EvonyTKR::Model::Covenant : isa(Game::EvonyTKR::Model::Data) {
     }
 
     push @{ $categories->{$level}->{buffs} }, $nb;
-    return scalar @{ $ascending->{$level}->{buffs} };
+    return scalar @{ $categories->{$level}->{buffs} };
   }
 
   method to_hash($verbose = 0) {
@@ -119,9 +111,9 @@ class Game::EvonyTKR::Model::Covenant : isa(Game::EvonyTKR::Model::Data) {
     my $returnRef = {
       primary   => $primary->name(),
       secondary => {
-        one   => $secondary{'one'},
-        two   => $secondary{'two'},
-        three => $secondary{'three'},
+        one   => $secondary->{'one'},
+        two   => $secondary->{'two'},
+        three => $secondary->{'three'},
       },
     };
   }

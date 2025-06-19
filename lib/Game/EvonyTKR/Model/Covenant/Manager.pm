@@ -11,10 +11,11 @@ require Path::Iterator::Rule;
 require YAML::PP;
 require Game::EvonyTKR::Model::Buff;
 require Game::EvonyTKR::Model::Buff::Value;
+require Game::EvonyTKR::Model::Covenant;
 use namespace::clean;
 
-class Game::EvonyTKR::Model::Covenant : isa(Game::EvonyTKR::Model::Data) {
-# PODNAME: Game::EvonyTKR::Model::Covenant
+class Game::EvonyTKR::Model::Covenant::Manager : isa(Game::EvonyTKR::Model::Data) {
+# PODNAME: Game::EvonyTKR::Model::Covenant::Manager
   use builtin qw(indexed);
   require Data::Printer;
   require Readonly;
@@ -80,17 +81,14 @@ class Game::EvonyTKR::Model::Covenant : isa(Game::EvonyTKR::Model::Data) {
       my $primary = $rootManager->generalManager->getGeneral($name);
       if ($primary) {
         $covenants->{$name} =
-          Game::EvonyTKR::Model::Covenant->new(primary => $primary,);
-        my @secondaryKeys = $covenants->{$name}->secondaryKeys();
-        foreach my $ki (0 .. scalar(@secondaryKeys)) {
-          my $key = @secondaryKeys[$ki];
-          my $sgn = $object->{generals}->[$ki];
-          my $sg  = $rootManager->generalManager->getGeneral($sgn);
-          if ($sg) {
-            $covenants->$name->setSecondary($key, $sg);
-          }
-        }
-        foreach my $oc (@{ $object->category }) {
+          Game::EvonyTKR::Model::Covenant->new(
+            primary => $primary,
+            one     => $object->{generals}->[0],
+            two     => $object->{generals}->[1],
+            three   => $object->{generals}->[2],
+        );
+
+        foreach my $oc (@{ $object->{category} }) {
           foreach my $ob (@{ $object->{buff} }) {
             my $v = Game::EvonyTKR::Model::Buff::Value->new(
               number => $ob->{value}->{number},
