@@ -108,5 +108,24 @@
     <!-- <%= Scalar::Util::reftype $item; %> -->
     <!-- <%= $item->isa('Game::EvonyTKR::General'); %> -->
   <% } %>
+  <% if (stash 'buff-summaries') { %>
+    <div class="buff-summaries">
+      <h3>Calculated Buff Summaries</h3>
+      <table class="buff-table">
+        <tr>
+          <th>Buff Type</th>
+          <th>Value</th>
+        </tr>
+        <tr>
+          <td>March Size Increase</td>
+          <td><%= stash('buff-summaries')->{marchIncrease} %></td>
+        </tr>
+        <tr>
+          <td>Attack</td>
+          <td><%= stash('buff-summaries')->{attackIncrease} %></td>
+        </tr>
+      </table>
+    </div>
+  <% } %>
 
 </div>
