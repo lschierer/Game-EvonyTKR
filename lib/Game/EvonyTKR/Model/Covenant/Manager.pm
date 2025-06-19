@@ -13,10 +13,9 @@ require Game::EvonyTKR::Model::Buff;
 require Game::EvonyTKR::Model::Buff::Value;
 use namespace::clean;
 
-
 class Game::EvonyTKR::Model::Covenant : isa(Game::EvonyTKR::Model::Data) {
 # PODNAME: Game::EvonyTKR::Model::Covenant
-  use builtin         qw(indexed);
+  use builtin qw(indexed);
   require Data::Printer;
   require Readonly;
   use namespace::autoclean;
@@ -29,7 +28,7 @@ class Game::EvonyTKR::Model::Covenant : isa(Game::EvonyTKR::Model::Data) {
 
   my $debug = 1;
 
-  field $rootManager :param;
+  field $rootManager : param;
 
   field $covenants = {};
 
@@ -79,32 +78,44 @@ class Game::EvonyTKR::Model::Covenant : isa(Game::EvonyTKR::Model::Data) {
         $name = $object->{name};
       }
       my $primary = $rootManager->generalManager->getGeneral($name);
-      if($primary) {
-        $covenants->{$name} = Game::EvonyTKR::Model::Covenant->new(
-          primary => $primary,
-        );
+      if ($primary) {
+        $covenants->{$name} =
+          Game::EvonyTKR::Model::Covenant->new(primary => $primary,);
         my @secondaryKeys = $covenants->{$name}->secondaryKeys();
-        foreach my $ki ( 0..scalar(@secondaryKeys) ) {
+        foreach my $ki (0 .. scalar(@secondaryKeys)) {
           my $key = @secondaryKeys[$ki];
           my $sgn = $object->{generals}->[$ki];
-          my $sg = $rootManager->generalManager->getGeneral($sgn);
-          if($sg) {
+          my $sg  = $rootManager->generalManager->getGeneral($sgn);
+          if ($sg) {
             $covenants->$name->setSecondary($key, $sg);
           }
         }
-        foreach my $oc ( @{ $object->category }) {
-          foreach my $ob ( @{ })
-          my $v = Game::EvonyTKR::Model::Buff::Value->new(
-            number => $ob->{value}->{number},
-            unit   => $ob->{value}->{unit},
-          );
-          my $buff = Game::EvonyTKR::Model::Buff->new(
-            number => $object->{buff}
-          );
+        foreach my $oc (@{ $object->category }) {
+          foreach my $ob (@{ $object->{buff} }) {
+            my $v = Game::EvonyTKR::Model::Buff::Value->new(
+              number => $ob->{value}->{number},
+              unit   => $ob->{value}->{unit},
+            );
+            my $b = Game::EvonyTKR::Model::Buff->new(
+              value          => $v,
+              attribute      => $ob->{attribute},
+              targgetedTypes => $ob->{class},
+              activationType => $oc->{type},
+            );
+            if (exists $ob->{condition}) {
+              foreach my $c (@{ $ob->{condition} }) {
+                $b->set_condition($c);
+              }
+            }
+            $covenants->{$name}->addBuff($oc->{category}, $b);
+          }
         }
       }
-
     }
+    my $countImported = scalar keys %$covenants;
+    $self->logger->info(
+      "Model::Covenant::Manager imported $countImported covenants");
+    return $countImported;
   }
 };
 1;
