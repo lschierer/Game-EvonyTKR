@@ -17,6 +17,7 @@ class Game::EvonyTKR::Model::General::Pair::Manager :
 
   method get_pairs_by_type($type) {
     my $pairs = [];
+
     if (exists $pairs_by_type->{$type}) {
       $pairs = $pairs_by_type->{$type} // [];
     }
@@ -74,5 +75,12 @@ class Game::EvonyTKR::Model::General::Pair::Manager :
     }
     my $pairTypeCount = scalar keys %{$pairs_by_type};
     $self->logger->info("returning $pairTypeCount sets of pairs.");
+    $self->logger->debug(
+      "returning " . join(', ', keys %{$pairs_by_type}) . " types of pairs.");
+    foreach my $type (keys %{$pairs_by_type}) {
+      my $tc = scalar @{ $pairs_by_type->{$type} };
+      $self->logger->debug("returning $tc pairs for $type");
+    }
+
   }
 }

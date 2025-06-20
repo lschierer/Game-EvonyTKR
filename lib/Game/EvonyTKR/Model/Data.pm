@@ -76,6 +76,7 @@ class Game::EvonyTKR::Model::Data : isa(Game::EvonyTKR::Model::Logger) {
       "When Defending Outside The Main City",
       "When Rallying",
       "In Main City",
+      'In City',
       "When the Main Defense General",
     ]
 

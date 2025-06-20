@@ -17,6 +17,15 @@ package Game::EvonyTKR::Plugins::Generals::Pairs {
 
   my $base = '/Generals/Pairs/';
 
+  my @defaultColumns = qw(
+    primary secondary marchbuff
+    attackbuff defensebuff hpbuff
+    groundattackdebuff grounddefensedebuff groundhpdebuff
+    mountedattackdebuff mounteddefensedebuff mountedhpdebuff
+    rangedattackdebuff rangeddefensedebuff rangedhpdebuff
+    siegeattackdebuff siegedefensedebuff siegehpdebuff
+  );
+
   sub getBase($self) {
     return $base;
   }
@@ -67,12 +76,15 @@ package Game::EvonyTKR::Plugins::Generals::Pairs {
         foreach my $type (@generalTypes) {
           my $linkTarget = $type =~ s/_/ /gr;
           $linkTarget =~ s/(\w)(\w+)( specialist)?/\U$1\L$2 \UP\Lairs/;
-          $routes->get("/$linkTarget/")->to(
-            controller  => $controller_name,
-            action      => 'typeIndex',
-            generalType => $type,
-            linkTarget  => $linkTarget
-          )->name("${base}_${type}_index");
+          $routes->get("/$linkTarget/" =>
+              { generalType => $type, linkTarget => $linkTarget })
+            ->to(controller => $controller_name, action => 'typeIndex')
+            ->name("${base}_${type}_index");
+
+          $routes->get("/$linkTarget/data.json" =>
+              { generalType => $type, linkTarget => $linkTarget })
+            ->to(controller => $controller_name, action => 'typeIndex_json')
+            ->name("${base}_${type}_json");
         }
       }
     );
@@ -90,106 +102,49 @@ package Game::EvonyTKR::Plugins::Generals::Pairs {
     my $generalType = $self->stash('generalType');
     my $linkTarget  = $self->stash('linkTarget');
 
-    my $pm    = $self->app->get_general_pair_manager();
-    my @pairs = @{ $pm->get_pairs_by_type($generalType) };
-    $logger->debug(sprintf('there are %s pairs to update.', scalar(@pairs)));
-
-    # Process all pairs synchronously for now
-    foreach my $pair_index (0 .. $#pairs) {
-      $logger->debug("updating pair $pair_index.");
-      if (not $pairs[$pair_index]->rootManager) {
-        $logger->warn("pair $pair_index has no manager set");
-        $pairs[$pair_index]->setRootManager($self->app->get_root_manager());
-      }
-      $pairs[$pair_index]->updateBuffs($generalType);
-    }
-
-    # Get sort parameters from query
-    my $sort_param = $self->param('sort')
-      // 'primary,secondary,marchbuff,attackbuff,defensebuff'
-      ;    # Default sort columns
-    my $dir_param = $self->param('dir')
-      // 'asc,asc,desc,desc,desc';    # Default directions
-
-    # Parse sort parameters
-    my @sort_columns = split(',', $sort_param);
-    my @sort_dirs    = split(',', $dir_param);
-
-    # Ensure we have directions for all columns (default to desc)
-    while (scalar @sort_dirs < scalar @sort_columns) {
-      push @sort_dirs, 'desc';
-    }
-
-    # Create a sort specification for the template
-    my %sort_spec =
-      map { $sort_columns[$_] => $sort_dirs[$_] } 0 .. $#sort_columns;
-
-    $logger->debug("Sorting by: " . Data::Printer::np(%sort_spec));
-
-    # Sort the pairs based on parameters
-    @pairs = sort {
-      my $result = 0;
-
-      # Apply each sort column in order
-      for my $i (0 .. $#sort_columns) {
-        my $col = $sort_columns[$i];
-        my $dir = $sort_dirs[$i];
-
-        my $cmp = 0;
-        if ($col eq 'primary') {
-          $cmp = $a->primary->name cmp $b->primary->name;
-        }
-        elsif ($col eq 'secondary') {
-          $cmp = $a->secondary->name cmp $b->secondary->name;
-        }
-        elsif ($col eq 'marchbuff') {
-          $cmp = $a->marchbuff <=> $b->marchbuff;    # Numeric comparison
-        }
-        elsif ($col eq 'attackbuff') {
-          $cmp = $a->attackbuff <=> $b->attackbuff;    # Numeric comparison
-        }
-        elsif ($col eq 'defensebuff') {
-          $cmp = $a->defensebuff <=> $b->defensebuff;    # Numeric comparison
-        }
-        # Add more columns here as you implement them
-
-        # Apply sort direction
-        $cmp = -$cmp if $dir eq 'desc';
-
-        # If this column gives a definitive result, use it
-        if ($cmp != 0) {
-          $result = $cmp;
-          last;
-        }
-      }
-
-      return $result;
-    } @pairs;
-
-    # Stash the sorted pairs and sort parameters for the template
-    $self->stash(
-      items        => \@pairs,
-      sort_columns => \@sort_columns,
-      sort_dirs    => \@sort_dirs,
-      sort_spec    => \%sort_spec
-    );
+    # Stash data for the template
+    $self->stash(template => 'generals/pairs/typeIndex',);
 
     my $markdown_path =
       $distDir->child("pages/generals/pairs/$linkTarget/index.md");
 
-    my $template = 'generals/pairs/typeIndex';
-    $self->stash(template => $template);
-
     if (-f $markdown_path) {
-      $logger->debug("GeneralPairs plugin found a markdown index file");
-      # Render with markdown
+      $logger->debug("Rendering from markdown index file");
       return $self->SUPER::render_markdown_file($self, $markdown_path);
     }
     else {
-      $logger->debug("GeneralPairs plugin rendering without markdown file");
-      # Render just the items
-      return $self->render(template => $template);
+      $logger->debug("Rendering without markdown file");
+      return $self->render;
     }
+  }
+
+  sub typeIndex_json ($self) {
+    my $logger      = Log::Log4perl->get_logger(__PACKAGE__);
+    my $distDir     = Mojo::File::Share::dist_dir('Game::EvonyTKR');
+    my $generalType = $self->stash('generalType');
+    my $linkTarget  = $self->stash('linkTarget');
+
+    my $pm    = $self->app->get_general_pair_manager();
+    my @pairs = @{ $pm->get_pairs_by_type($generalType) };
+
+    $logger->debug(sprintf('There are %s pairs to update.', scalar(@pairs)));
+
+    # Ensure all pairs have rootManager and updated buffs
+    foreach my $pair_index (0 .. $#pairs) {
+      my $pair = $pairs[$pair_index];
+
+      $logger->debug("Updating pair $pair_index.");
+
+      if (!$pair->rootManager) {
+        $logger->warn("Pair $pair_index has no manager set");
+        $pair->setRootManager($self->app->get_root_manager());
+      }
+
+      $pair->updateBuffs($generalType);
+    }
+
+    my @json_data = map { $_->TO_JSON } @pairs;
+    $self->render(json => { data => \@json_data });
   }
 
   sub index ($self) {

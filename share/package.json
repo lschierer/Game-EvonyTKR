@@ -42,7 +42,11 @@
     "@spectrum-css/table": "^8.1.0",
     "@spectrum-css/tokens": "^16.0.2",
     "@spectrum-css/typography": "^8.1.0",
+    "@tanstack/table-core": "^8.21.3",
     "evonytkrtips-data": "github:lschierer/EvonyTKRTips-Data",
-    "iconify-icon": "^3.0.0"
+    "iconify-icon": "^3.0.0",
+    "signal-polyfill": "^0.2.2",
+    "signal-utils": "^0.21.1",
+    "zod": "^3.25.67"
   }
 }

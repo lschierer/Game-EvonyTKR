@@ -26,12 +26,24 @@ importers:
       '@spectrum-css/typography':
         specifier: ^8.1.0
         version: 8.1.0(@spectrum-css/tokens@16.0.2)
+      '@tanstack/table-core':
+        specifier: ^8.21.3
+        version: 8.21.3
       evonytkrtips-data:
         specifier: github:lschierer/EvonyTKRTips-Data
         version: '@evonytkrtips/data@https://codeload.github.com/lschierer/EvonyTKRTips-Data/tar.gz/6c2728f431fb50b1b828b3d4fe34c7a95a5c4c2c'
       iconify-icon:
         specifier: ^3.0.0
         version: 3.0.0
+      signal-polyfill:
+        specifier: ^0.2.2
+        version: 0.2.2
+      signal-utils:
+        specifier: ^0.21.1
+        version: 0.21.1(signal-polyfill@0.2.2)
+      zod:
+        specifier: ^3.25.67
+        version: 3.25.67
     devDependencies:
       '@tsconfig/node22':
         specifier: ^22.0.2
@@ -618,6 +630,10 @@ packages:
     peerDependenciesMeta:
       '@spectrum-css/tokens':
         optional: true
+
+  '@tanstack/table-core@8.21.3':
+    resolution: {integrity: sha512-ldZXEhOBb8Is7xLs01fR3YEc3DERiz5silj8tnGkFZytt1abEvl/GhUmCE0PMLaMPTa3Jk4HbKmRlHmu+gCftg==}
+    engines: {node: '>=12'}
 
   '@trysound/sax@0.2.0':
     resolution: {integrity: sha512-L7z9BgrNEcYyUYtF+HaEfiS5ebkh9jXqbszz7pC0hRBPaatV0XjSD3+eHrpqFemQfgwiFF0QPIarnIihIDn7OA==}
@@ -1690,6 +1706,14 @@ packages:
     resolution: {integrity: sha512-bzyZ1e88w9O1iNJbKnOlvYTrWPDl46O1bG0D3XInv+9tkPrxrN8jUUTiFlDkkmKWgn1M6CfIA13SuGqOa9Korw==}
     engines: {node: '>=14'}
 
+  signal-polyfill@0.2.2:
+    resolution: {integrity: sha512-p63Y4Er5/eMQ9RHg0M0Y64NlsQKpiu6MDdhBXpyywRuWiPywhJTpKJ1iB5K2hJEbFZ0BnDS7ZkJ+0AfTuL37Rg==}
+
+  signal-utils@0.21.1:
+    resolution: {integrity: sha512-i9cdLSvVH4j8ql8mz2lyrA93xL499P8wEbIev3ldSriXeUwqh+wM4Q5VPhIZ19gPtIS4BOopJuKB8l1+wH9LCg==}
+    peerDependencies:
+      signal-polyfill: ^0.2.0
+
   slash@3.0.0:
     resolution: {integrity: sha512-g9Q1haeby36OSStwb4ntCGGGaKsaVSjQ68fBxoQcutl5fS1vuY18H3wSt3jFyFtrkx+Kz0V1G85A4MyAdDMi2Q==}
     engines: {node: '>=8'}
@@ -1859,6 +1883,9 @@ packages:
   yargs@17.7.2:
     resolution: {integrity: sha512-7dSzzRQ++CKnNI/krKnYRV7JKKPUXMEh61soaHKg9mrWEhzFWhFnxPxGl+69cD1Ou63C13NUPCnmIcrvqCuM6w==}
     engines: {node: '>=12'}
+
+  zod@3.25.67:
+    resolution: {integrity: sha512-idA2YXwpCdqUSKRCACDE6ItZD9TZzy3OZMtpfLoh6oPR47lipysRrJfjzMqFxQ3uJuUPyUeWe1r9vLH33xO/Qw==}
 
 snapshots:
 
@@ -2267,6 +2294,8 @@ snapshots:
   '@spectrum-css/typography@8.1.0(@spectrum-css/tokens@16.0.2)':
     optionalDependencies:
       '@spectrum-css/tokens': 16.0.2
+
+  '@tanstack/table-core@8.21.3': {}
 
   '@trysound/sax@0.2.0': {}
 
@@ -3354,6 +3383,12 @@ snapshots:
 
   signal-exit@4.1.0: {}
 
+  signal-polyfill@0.2.2: {}
+
+  signal-utils@0.21.1(signal-polyfill@0.2.2):
+    dependencies:
+      signal-polyfill: 0.2.2
+
   slash@3.0.0: {}
 
   slash@5.1.0: {}
@@ -3560,3 +3595,5 @@ snapshots:
       string-width: 4.2.3
       y18n: 5.0.8
       yargs-parser: 21.1.1
+
+  zod@3.25.67: {}

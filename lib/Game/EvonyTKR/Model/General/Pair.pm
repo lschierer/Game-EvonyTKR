@@ -19,9 +19,25 @@ class Game::EvonyTKR::Model::General::Pair : isa(Game::EvonyTKR::Model::Data) {
 
   field $marchbuff : reader = 0;
 
-  field $attackbuff : reader = 0;
-
+  field $attackbuff : reader  = 0;
   field $defensebuff : reader = 0;
+  field $hpbuff : reader      = 0;
+
+  field $groundattackdebuff : reader  = 0;
+  field $grounddefensedebuff : reader = 0;
+  field $groundhpdebuff : reader      = 0;
+
+  field $mountedattackdebuff : reader  = 0;
+  field $mounteddefensedebuff : reader = 0;
+  field $mountedhpdebuff : reader      = 0;
+
+  field $rangedattackdebuff : reader  = 0;
+  field $rangeddefensedebuff : reader = 0;
+  field $rangedhpdebuff : reader      = 0;
+
+  field $siegeattackdebuff : reader  = 0;
+  field $siegedefensedebuff : reader = 0;
+  field $siegehpdebuff : reader      = 0;
 
   method setRootManager ($nm) {
     if (Scalar::Util::blessed $nm eq 'Game::EvonyTKR::Model::EvonyTKR::Manager')
@@ -88,8 +104,24 @@ class Game::EvonyTKR::Model::General::Pair : isa(Game::EvonyTKR::Model::Data) {
   # Method to convert to hash
   method to_hash {
     return {
-      primary   => $primary,
-      secondary => $secondary,
+      primary              => $primary,
+      secondary            => $secondary,
+      marchbuff            => $marchbuff,
+      attackbuff           => $attackbuff,
+      defensebuff          => $defensebuff,
+      hpbuff               => $hpbuff,
+      groundattackdebuff   => $groundattackdebuff,
+      grounddefensedebuff  => $grounddefensedebuff,
+      groundhpdebuff       => $groundhpdebuff,
+      mountedattackdebuff  => $mountedattackdebuff,
+      mounteddefensedebuff => $mounteddefensedebuff,
+      mountedhpdebuff      => $mountedhpdebuff,
+      rangedattackdebuff   => $rangedattackdebuff,
+      rangeddefensedebuff  => $rangeddefensedebuff,
+      rangedhpdebuff       => $rangedhpdebuff,
+      siegeattackdebuff    => $siegeattackdebuff,
+      siegedefensedebuff   => $siegedefensedebuff,
+      siegehpdebuff        => $siegehpdebuff,
       # Add any other useful properties you might need
     };
   }
