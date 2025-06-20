@@ -1,5 +1,6 @@
 node_modules
 public/css
+ts/css
 public/js
 public/types
 collections

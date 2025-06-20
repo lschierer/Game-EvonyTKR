@@ -3,3 +3,9 @@
 .w-500 {
   width: var(--spectrum-spacing-500);
 }
+
+div.general-pairs-table {
+  max-width: 90vw;
+  max-height: 60vh;
+  overflow: scroll;
+}

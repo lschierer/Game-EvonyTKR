@@ -15,6 +15,7 @@ npmdeps:
   mkdir -p public/images
   mkdir -p public/js
   mkdir -p public/types
+  pnpm build:css
   pnpm build:ts
   rsync -a node_modules/evonytkrtips-data/data/ collections/ --delete
   touch collections/.gitkeep
@@ -30,6 +31,7 @@ deps: prepare npmdeps
 [working-directory: 'share']
 css: npmdeps
   pnpm build:css
+  rsync -a --delete ts/css public/
 
 build: deps css
   ./Build manifest

@@ -35,6 +35,5 @@
   import "/js/Generals/Pairs/typeIndex.js";
 </script>
 
-<div id="wrapper" class="general-pairs-table">
 
-</div>
+  <pairs-table></pairs-table>

@@ -6,6 +6,7 @@ import fs from 'fs';
 import { execSync } from 'child_process';
 import path from 'path';
 import process from 'node:process';
+import { litCssPlugin } from 'esbuild-plugin-lit-css';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -42,6 +43,7 @@ async function main() {
     target: 'es2020',
     sourcemap: true,
     outExtension: { '.js': '.js' },
+    plugins: [litCssPlugin()],
   });
 
   // Fix imports in the generated JS files to include .js extensions

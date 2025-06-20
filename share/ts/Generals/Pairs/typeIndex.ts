@@ -1,20 +1,27 @@
 import 'iconify-icon';
 
-import { signalObject } from 'signal-utils/object';
-import { reaction } from 'signal-utils/subtle/reaction';
+import { customElement } from 'lit/decorators.js';
+import {
+  html,
+  LitElement,
+  type CSSResultGroup,
+  type PropertyValues,
+} from 'lit';
+import { repeat } from 'lit/directives/repeat.js';
+import { until } from 'lit/directives/until.js';
+
+import SpectrumTokensCSS from '@spectrum-css/tokens/dist/index.css' with { type: 'css' };
+import GeneralPairsIndexCSS from '../../css/GeneralPairsIndex.css' with { type: 'css' };
 
 import {
-  type Table,
-  type ColumnDef,
-  type TableOptions,
-  type TableOptionsResolved,
   getCoreRowModel,
+  TableController,
+  type SortingState,
+  type ColumnDef,
   getSortedRowModel,
-  createTable,
-  type TableState,
   type CellContext,
   type HeaderContext,
-} from '@tanstack/table-core';
+} from '@tanstack/lit-table';
 
 /**
  * TypeScript for enhanced General Pairs table sorting functionality
@@ -78,55 +85,6 @@ export const flexRender = <TProps extends object>(comp: any, props: TProps) => {
   return comp;
 };
 
-/**
- * Signal-aware table wrapper around TanStack Table.
- */
-export const useTable = <GeneralPair>(options: TableOptions<GeneralPair>) => {
-  // Create an internal reactive state object based on initial table state
-  let state = signalObject({
-    columnPinning: {
-      left: new Array<string>(),
-      right: new Array<string>(),
-    },
-    ...options.state,
-  }) as Partial<TableState>;
-
-  // Compose user options into TanStack's resolved options
-  const resolvedOptions: TableOptionsResolved<GeneralPair> = {
-    state: state,
-    onStateChange: () => {}, // placeholder
-    renderFallbackValue: null,
-    ...options,
-  };
-
-  const table = createTable<GeneralPair>(resolvedOptions);
-
-  // Watch the internal state and re-bind it to the table options on change
-  reaction(
-    () => state as unknown as TableState, // tslint:disable-line
-    (value: TableState) => {
-      table.setOptions((prev) => ({
-        ...prev,
-        ...options,
-        state: {
-          ...value,
-          ...options.state, // user-supplied state wins
-        },
-        onStateChange: (updater) => {
-          const newState =
-            typeof updater === 'function'
-              ? updater(state as unknown as TableState)
-              : updater; // tslint:disable-line
-          Object.assign(state, newState); // update SignalObject in-place
-          options.onStateChange?.(updater);
-        },
-      }));
-    },
-  );
-
-  return table;
-};
-
 const tableHeaders = new Map<string, string>([
   ['primary', 'Primary'],
   ['secondary', 'Secondary'],
@@ -157,6 +115,7 @@ const columns: ColumnDef<GeneralPair>[] = Array.from(tableHeaders.keys()).map(
     return {
       id: key,
       accessorKey,
+      enableSorting: true,
       cell: (info: CellContext<GeneralPair, unknown>) => {
         const value = info.getValue();
         return typeof value === 'number'
@@ -164,132 +123,144 @@ const columns: ColumnDef<GeneralPair>[] = Array.from(tableHeaders.keys()).map(
           : (value ?? '');
       },
       header: (info: HeaderContext<GeneralPair, unknown>) =>
-        `<span>${tableHeaders.get(info.column.id)}</span>`,
+        html`<span>${tableHeaders.get(info.column.id)}</span>`,
       sortDescFirst,
     };
   },
 );
 
-const renderTable = (table: Table<GeneralPair>) => {
-  // Create table elements
-  const tableElement = document.createElement('table');
-  const theadElement = document.createElement('thead');
-  const tbodyElement = document.createElement('tbody');
+@customElement('pairs-table')
+export default class PairsTable extends LitElement {
+  private tableController = new TableController<GeneralPair>(this);
 
-  tableElement.classList.add('spectrum-Table');
-  tableElement.classList.add('spectrum-Table--sizeM');
-  theadElement.classList.add('spectrum-Table-head');
-  tbodyElement.classList.add('spectrum-Table-body');
+  static properties = {
+    mode: { type: String },
+    data: { attribute: false },
+  };
 
-  tableElement.appendChild(theadElement);
-  tableElement.appendChild(tbodyElement);
+  private _sorting: SortingState = [];
+  private data: GeneralPair[] = [];
 
-  if (!table) {
-    console.error('Table is undefined!!');
-    return;
+  protected async firstUpdated(
+    _changedProperties: PropertyValues,
+  ): Promise<void> {
+    this.data = await this.fetchData();
+    this.requestUpdate();
   }
 
-  // Render table headers
-  table.getHeaderGroups().forEach((headerGroup) => {
-    const trElement = document.createElement('tr');
+  protected willUpdate(_changedProperties: PropertyValues): void {}
 
-    headerGroup.headers.forEach((header) => {
-      const thElement = document.createElement('th');
-      thElement.classList.add('spectrum-Table-headCell', 'is-sortable');
-      thElement.colSpan = header.colSpan;
+  async fetchData(): Promise<GeneralPair[]> {
+    const url = window.location.pathname.replace(/\/$/, '') + '/data.json';
+    const response = await fetch(url);
+    if (!response.ok) throw new Error('Failed to fetch data');
 
-      const divElement = document.createElement('div');
-      divElement.classList.add('w-500', 'cursor-pointer', 'select-none');
-
-      if (!header.isPlaceholder) {
-        // Set inner HTML and click handler
-        divElement.innerHTML = flexRender(
-          header.column.columnDef.header,
-          header.getContext(),
-        );
-
-        // Append sort indicator
-        const sortIcon =
-          {
-            asc: ' 🔼',
-            desc: ' 🔽',
-          }[header.column.getIsSorted() as string] ?? '';
-        divElement.innerHTML += sortIcon;
-
-        // Wire up sorting toggle
-        divElement.addEventListener('click', (event) => {
-          const isMultiSort = event.shiftKey;
-          header.column.toggleSorting(isMultiSort);
-        });
-      }
-
-      thElement.appendChild(divElement);
-      trElement.appendChild(thElement);
-    });
-
-    theadElement.appendChild(trElement);
-  });
-
-  // Render table rows
-  table
-    .getRowModel()
-    .rows.slice(0, 10)
-    .forEach((row) => {
-      const trElement = document.createElement('tr');
-      trElement.classList.add('spectrum-Table-row');
-      row.getVisibleCells().forEach((cell) => {
-        const tdElement = document.createElement('td');
-        tdElement.classList.add('spectrum-Table-cell');
-        tdElement.innerHTML = flexRender(
-          cell.column.columnDef.cell,
-          cell.getContext(),
-        );
-        trElement.appendChild(tdElement);
-      });
-      tbodyElement.appendChild(trElement);
-    });
-
-  // Render table state info
-  const stateInfoElement = document.createElement('pre');
-  stateInfoElement.textContent = JSON.stringify(
-    {
-      sorting: table.getState().sorting,
-    },
-    null,
-    2,
-  );
-
-  // Clear previous content and append new content
-  const wrapperElement = document.getElementById('wrapper') as HTMLDivElement;
-  wrapperElement.innerHTML = '';
-  wrapperElement.appendChild(tableElement);
-  wrapperElement.appendChild(stateInfoElement);
-};
-
-async function fetchData(): Promise<GeneralPair[]> {
-  const url = window.location.pathname.replace(/\/$/, '') + '/data.json';
-  const response = await fetch(url);
-  if (!response.ok) throw new Error('Failed to fetch data');
-
-  const json = await response.json();
-  const valid = GeneralPair.array().safeParse(json.data as object);
-  if (valid.success) {
-    return valid.data;
+    const json = await response.json();
+    const valid = GeneralPair.array().safeParse(json.data as object);
+    if (valid.success) {
+      return valid.data;
+    }
+    console.error('error getting data: ', valid.error.message);
+    return [];
   }
-  console.error('error getting data: ', valid.error.message);
-  return [];
+
+  static styles?: CSSResultGroup | undefined = [
+    SpectrumTokensCSS,
+    GeneralPairsIndexCSS,
+  ];
+
+  private async renderTable() {
+    const table = this.tableController.table({
+      columns,
+      data: this.data,
+      state: {
+        sorting: this._sorting,
+      },
+      onSortingChange: (updaterOrValue) => {
+        this._sorting =
+          typeof updaterOrValue === 'function'
+            ? updaterOrValue(this._sorting)
+            : updaterOrValue;
+
+        this.requestUpdate(); // Important!
+      },
+      getSortedRowModel: getSortedRowModel(),
+      getCoreRowModel: getCoreRowModel(),
+    });
+
+    return html`
+      <table class="spectrum-Table spectrum-Table--sizeM">
+        <thead class="spectrum-Table-head">
+          ${repeat(
+            table.getHeaderGroups(),
+            (headerGroup) => headerGroup.id,
+            (headerGroup) => html`
+              ${repeat(
+                headerGroup.headers,
+                (header) => header.id,
+                (header) => html`
+                  <th
+                    colspan="${header.colSpan}"
+                    class="spectrum-Table-headCell is-sortable"
+                  >
+                    ${header.isPlaceholder
+                      ? null
+                      : html`<div
+                          title=${header.column.getCanSort()
+                            ? header.column.getNextSortingOrder() === 'asc'
+                              ? 'Sort ascending'
+                              : header.column.getNextSortingOrder() === 'desc'
+                                ? 'Sort descending'
+                                : 'Clear sort'
+                            : undefined}
+                          @click="${header.column.getToggleSortingHandler()}"
+                          style="cursor: ${header.column.getCanSort()
+                            ? 'pointer'
+                            : 'not-allowed'}"
+                        >
+                          ${flexRender(
+                            header.column.columnDef.header,
+                            header.getContext(),
+                          )}
+                          ${{ asc: ' 🔼', desc: ' 🔽' }[
+                            header.column.getIsSorted() as string
+                          ] ?? null}
+                        </div>`}
+                  </th>
+                `,
+              )}
+            `,
+          )}
+        </thead>
+        <tbody class="spectrum-Table-body">
+          ${repeat(
+            table.getRowModel().rows,
+            (row) => row.id,
+            (row) => html`
+              <tr class="spectrum-Table-row">
+                ${repeat(
+                  row.getVisibleCells(),
+                  (cell) => cell.id,
+                  (cell) =>
+                    html` <td class="spectrum-Table-cell">
+                      ${flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext(),
+                      )}
+                    </td>`,
+                )}
+              </tr>
+            `,
+          )}
+        </tbody>
+      </table>
+    `;
+  }
+  protected render() {
+    return html`
+      <div id="wrapper" class="general-pairs-table">
+        ${until(this.renderTable(), html`<span>Loading...</span>`)}
+      </div>
+    `;
+  }
 }
-
-fetchData().then((data) => {
-  const table: Table<GeneralPair> = useTable<GeneralPair>({
-    data,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    enableSorting: true,
-    enableMultiSort: true,
-    onStateChange: () => renderTable(table),
-  });
-
-  renderTable(table);
-});
