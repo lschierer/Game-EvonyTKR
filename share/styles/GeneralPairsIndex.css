@@ -1,11 +1,57 @@
-@import url('@spectrum-css/table/dist/index.css');
+/* Styles for the General Pairs table */
 
-.w-500 {
-  width: var(--spectrum-spacing-500);
+.general-pairs-table {
+  max-width: 90vw;
+  overflow: auto;
+  height: 60vh;
+  margin: 20px 0;
+  position: relative;
 }
 
-div.general-pairs-table {
-  max-width: 90vw;
-  max-height: 60vh;
-  overflow: scroll;
+/* Add cursor pointer to sortable headers */
+.spectrum-Table-headCell.is-sortable {
+  cursor: pointer;
+}
+
+table,
+thead,
+th {
+  --mod-table-header-background-color-scrollable: var(--surface-1);
+}
+
+thead > tr {
+  width: 100%;
+}
+
+tbody {
+  position: relative;
+  width: 100%;
+}
+
+tbody > tr {
+  position: absolute;
+}
+
+/* Loading indicator styles */
+.loading-indicator {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  padding: 8px 16px;
+  background-color: rgb(0 0 0 / 70%);
+  color: white;
+  border-radius: 4px;
+  z-index: 1000;
+}
+
+.loading-placeholder {
+  color: #888;
+  font-style: italic;
+}
+
+/* Responsive adjustments */
+@media (width <= 768px) {
+  .general-pairs-table {
+    overflow-x: auto;
+  }
 }

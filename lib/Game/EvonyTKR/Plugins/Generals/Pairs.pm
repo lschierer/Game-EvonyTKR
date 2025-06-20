@@ -34,6 +34,10 @@ package Game::EvonyTKR::Plugins::Generals::Pairs {
     return "Generals::Pairs";
   }
 
+  sub get_manager ($self) {
+    return $self->app->get_root_manager->generalPairManager;
+  }
+
   # Override loadItem to add any generals-specific processing
   sub register($self, $app, $config = {}) {
     my $logger = Log::Log4perl->get_logger(__PACKAGE__);
@@ -120,32 +124,25 @@ package Game::EvonyTKR::Plugins::Generals::Pairs {
 
   sub typeIndex_json ($self) {
     my $logger      = Log::Log4perl->get_logger(__PACKAGE__);
-    my $distDir     = Mojo::File::Share::dist_dir('Game::EvonyTKR');
     my $generalType = $self->stash('generalType');
     my $linkTarget  = $self->stash('linkTarget');
 
     my $pm    = $self->app->get_general_pair_manager();
     my @pairs = @{ $pm->get_pairs_by_type($generalType) };
 
-    $logger->debug(sprintf('There are %s pairs to update.', scalar(@pairs)));
+    $logger->debug(sprintf('There are %s pairs to return.', scalar(@pairs)));
 
-    # Ensure all pairs have rootManager and updated buffs
-    foreach my $pair_index (0 .. $#pairs) {
-      my $pair = $pairs[$pair_index];
-
-      $logger->debug("Updating pair $pair_index.");
-
-      if (!$pair->rootManager) {
-        $logger->warn("Pair $pair_index has no manager set");
-        $pair->setRootManager($self->app->get_root_manager());
+    # Return just the basic pair information without computing buffs
+    my @json_data = map {
+      {
+        primary => { name => $_->primary->name },
+        secondary => { name => $_->secondary->name }
       }
+    } @pairs;
 
-      $pair->updateBuffs($generalType);
-    }
-
-    my @json_data = map { $_->TO_JSON } @pairs;
     $self->render(json => { data => \@json_data });
   }
+
 
   sub index ($self) {
     my $logger = Log::Log4perl->get_logger(__PACKAGE__);

@@ -32,12 +32,15 @@ importers:
       '@tanstack/lit-table':
         specifier: ^8.21.3
         version: 8.21.3(lit@3.3.0)
+      '@tanstack/lit-virtual':
+        specifier: ^3.13.10
+        version: 3.13.10(lit@3.3.0)
       '@tanstack/table-core':
         specifier: ^8.21.3
         version: 8.21.3
       evonytkrtips-data:
         specifier: github:lschierer/EvonyTKRTips-Data
-        version: '@evonytkrtips/data@https://codeload.github.com/lschierer/EvonyTKRTips-Data/tar.gz/6c2728f431fb50b1b828b3d4fe34c7a95a5c4c2c'
+        version: '@evonytkrtips/data@https://codeload.github.com/lschierer/EvonyTKRTips-Data/tar.gz/40ae3ba719e3987572c69f6310f6ae03cd26de1d'
       iconify-icon:
         specifier: ^3.0.0
         version: 3.0.0
@@ -548,8 +551,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@evonytkrtips/data@https://codeload.github.com/lschierer/EvonyTKRTips-Data/tar.gz/6c2728f431fb50b1b828b3d4fe34c7a95a5c4c2c':
-    resolution: {tarball: https://codeload.github.com/lschierer/EvonyTKRTips-Data/tar.gz/6c2728f431fb50b1b828b3d4fe34c7a95a5c4c2c}
+  '@evonytkrtips/data@https://codeload.github.com/lschierer/EvonyTKRTips-Data/tar.gz/40ae3ba719e3987572c69f6310f6ae03cd26de1d':
+    resolution: {tarball: https://codeload.github.com/lschierer/EvonyTKRTips-Data/tar.gz/40ae3ba719e3987572c69f6310f6ae03cd26de1d}
     version: 1.0.0
 
   '@iconify/types@2.0.0':
@@ -661,9 +664,17 @@ packages:
     peerDependencies:
       lit: ^3.1.3
 
+  '@tanstack/lit-virtual@3.13.10':
+    resolution: {integrity: sha512-/akF23oKKCd0bz1cqCbVLy8LDF9PENUUFgTLKQmS1tbjFw6MmihZNrRBw/15zY/+xGfBIrvuMuelg+bKZjbsWQ==}
+    peerDependencies:
+      lit: ^3.1.0
+
   '@tanstack/table-core@8.21.3':
     resolution: {integrity: sha512-ldZXEhOBb8Is7xLs01fR3YEc3DERiz5silj8tnGkFZytt1abEvl/GhUmCE0PMLaMPTa3Jk4HbKmRlHmu+gCftg==}
     engines: {node: '>=12'}
+
+  '@tanstack/virtual-core@3.13.10':
+    resolution: {integrity: sha512-sPEDhXREou5HyZYqSWIqdU580rsF6FGeN7vpzijmP3KTiOGjOMZASz4Y6+QKjiFQwhWrR58OP8izYaNGVxvViA==}
 
   '@trysound/sax@0.2.0':
     resolution: {integrity: sha512-L7z9BgrNEcYyUYtF+HaEfiS5ebkh9jXqbszz7pC0hRBPaatV0XjSD3+eHrpqFemQfgwiFF0QPIarnIihIDn7OA==}
@@ -768,8 +779,8 @@ packages:
   caniuse-api@3.0.0:
     resolution: {integrity: sha512-bsTwuIg/BZZK/vreVTYYbSWoe2F+71P7K5QGEX+pT250DZbfU1MQ5prOKpPR+LL6uWKK3KMwMCAS74QB3Um1uw==}
 
-  caniuse-lite@1.0.30001723:
-    resolution: {integrity: sha512-1R/elMjtehrFejxwmexeXAtae5UO9iSyFn6G/I806CYC/BLyyBk1EPhrKBkWhy6wM6Xnm47dSJQec+tLJ39WHw==}
+  caniuse-lite@1.0.30001724:
+    resolution: {integrity: sha512-WqJo7p0TbHDOythNTqYujmaJTvtYRZrjpP8TCvH6Vb9CYJerJNKamKzIWOM4BkQatWj9H2lYulpdAQNBe7QhNA==}
 
   chalk@1.1.3:
     resolution: {integrity: sha512-U3lRVLMSlsCfjqYPbLyVv11M9CPW4I728d6TCKMAOJueEeB9/8o+eSsMnxPJD+Q+K909sdESg7C+tIkoH6on1A==}
@@ -920,8 +931,8 @@ packages:
   eastasianwidth@0.2.0:
     resolution: {integrity: sha512-I88TYZWc9XiYHRQ4/3c5rjjfgkjhLyW2luGIheGERbNQ6OY7yTybanSpDXZa8y7VUP9YmDcYa+eyq4ca7iLqWA==}
 
-  electron-to-chromium@1.5.170:
-    resolution: {integrity: sha512-GP+M7aeluQo9uAyiTCxgIj/j+PrWhMlY7LFVj8prlsPljd0Fdg9AprlfUi+OCSFWy9Y5/2D/Jrj9HS8Z4rpKWA==}
+  electron-to-chromium@1.5.171:
+    resolution: {integrity: sha512-scWpzXEJEMrGJa4Y6m/tVotb0WuvNmasv3wWVzUAeCgKU0ToFOhUW6Z+xWnRQANMYGxN4ngJXIThgBJOqzVPCQ==}
 
   emoji-regex@8.0.0:
     resolution: {integrity: sha512-MSjYzcWNOA0ewAHpz0MxpYFvwg6yjy1NG3xteoqz644VCo/RPgnr1/GGt+ic3iJTzQ8Eu3TdM14SawnVUmGE6A==}
@@ -2283,7 +2294,7 @@ snapshots:
   '@esbuild/win32-x64@0.25.5':
     optional: true
 
-  '@evonytkrtips/data@https://codeload.github.com/lschierer/EvonyTKRTips-Data/tar.gz/6c2728f431fb50b1b828b3d4fe34c7a95a5c4c2c': {}
+  '@evonytkrtips/data@https://codeload.github.com/lschierer/EvonyTKRTips-Data/tar.gz/40ae3ba719e3987572c69f6310f6ae03cd26de1d': {}
 
   '@iconify/types@2.0.0': {}
 
@@ -2365,7 +2376,14 @@ snapshots:
       '@tanstack/table-core': 8.21.3
       lit: 3.3.0
 
+  '@tanstack/lit-virtual@3.13.10(lit@3.3.0)':
+    dependencies:
+      '@tanstack/virtual-core': 3.13.10
+      lit: 3.3.0
+
   '@tanstack/table-core@8.21.3': {}
+
+  '@tanstack/virtual-core@3.13.10': {}
 
   '@trysound/sax@0.2.0': {}
 
@@ -2420,7 +2438,7 @@ snapshots:
   autoprefixer@10.4.21(postcss@8.5.6):
     dependencies:
       browserslist: 4.25.0
-      caniuse-lite: 1.0.30001723
+      caniuse-lite: 1.0.30001724
       fraction.js: 4.3.7
       normalize-range: 0.1.2
       picocolors: 1.1.1
@@ -2441,8 +2459,8 @@ snapshots:
 
   browserslist@4.25.0:
     dependencies:
-      caniuse-lite: 1.0.30001723
-      electron-to-chromium: 1.5.170
+      caniuse-lite: 1.0.30001724
+      electron-to-chromium: 1.5.171
       node-releases: 2.0.19
       update-browserslist-db: 1.1.3(browserslist@4.25.0)
 
@@ -2461,11 +2479,11 @@ snapshots:
   caniuse-api@3.0.0:
     dependencies:
       browserslist: 4.25.0
-      caniuse-lite: 1.0.30001723
+      caniuse-lite: 1.0.30001724
       lodash.memoize: 4.1.2
       lodash.uniq: 4.5.0
 
-  caniuse-lite@1.0.30001723: {}
+  caniuse-lite@1.0.30001724: {}
 
   chalk@1.1.3:
     dependencies:
@@ -2647,7 +2665,7 @@ snapshots:
 
   eastasianwidth@0.2.0: {}
 
-  electron-to-chromium@1.5.170: {}
+  electron-to-chromium@1.5.171: {}
 
   emoji-regex@8.0.0: {}
 

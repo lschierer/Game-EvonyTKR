@@ -51,6 +51,7 @@ package Game::EvonyTKR {
     };
 
     if ($logConfig && -f $logConfig) {
+      say "init for log4perl at $logConfig";
       Log::Log4perl::init($logConfig);
       my $log4perl_logger = Log::Log4perl->get_logger('Game.EvonyTKR');
 

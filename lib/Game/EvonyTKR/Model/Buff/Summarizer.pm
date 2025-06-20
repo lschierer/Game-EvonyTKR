@@ -41,11 +41,18 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
   field $attackIncrease : reader      = 0;
   field $defenseIncrease : reader     = 0;
   field $hpIncrease : reader          = 0;
-  field $reducegroundattack : reader  = 0;
-  field $reducerangedattack : reader  = 0;
-  field $reducemountedattack : reader = 0;
-  field $reducesiegeattack : reader   = 0;
-  field $reducegroundhp : reader      = 0;
+  field $reducegroundattack   : reader  = 0;
+  field $reducegroundhp       : reader  = 0;
+  field $reducegrounddefense  : reader = 0;
+  field $reducesiegeattack   : reader  = 0;
+  field $reducesiegedefense  : reader  = 0;
+  field $reducesiegehp       : reader = 0;
+  field $reducemountedattack   : reader  = 0;
+  field $reducemounteddefense  : reader  = 0;
+  field $reducemountedhp       : reader = 0;
+  field $reducerangedattack   : reader  = 0;
+  field $reducerangeddefense  : reader  = 0;
+  field $reducerangedhp       : reader = 0;
 
   # some parameters unused currently, but adding them for future growth
   method updateBuffs () {
@@ -56,8 +63,25 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
   }
 
   method updateDebuffs () {
-    $reducegroundattack = $self->updateAttackDebuff('Ground Troops');
-    $reducegroundhp     = $self->updateHPDebuff('Ground Troops');
+    # Ground troop debuffs
+    $reducegroundattack  = $self->updateAttackDebuff('Ground Troops');
+    $reducegroundhp      = $self->updateHPDebuff('Ground Troops');
+    $reducegrounddefense = $self->updateDefenseDebuff('Ground Troops');
+
+    # Mounted troop debuffs
+    $reducemountedattack  = $self->updateAttackDebuff('Mounted Troops');
+    $reducemounteddefense = $self->updateDefenseDebuff('Mounted Troops');
+    $reducemountedhp      = $self->updateHPDebuff('Mounted Troops');
+
+    # Ranged troop debuffs
+    $reducerangedattack  = $self->updateAttackDebuff('Ranged Troops');
+    $reducerangeddefense = $self->updateDefenseDebuff('Ranged Troops');
+    $reducerangedhp      = $self->updateHPDebuff('Ranged Troops');
+
+    # Siege machine debuffs
+    $reducesiegeattack  = $self->updateAttackDebuff('Siege Machines');
+    $reducesiegedefense = $self->updateDefenseDebuff('Siege Machines');
+    $reducesiegehp      = $self->updateHPDebuff('Siege Machines');
   }
 
   # some parameters unused currently, but adding them for future growth
