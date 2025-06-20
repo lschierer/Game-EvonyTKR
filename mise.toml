@@ -1,4 +1,5 @@
 [tools]
 jq = "latest"
+perl = "latest"
 pnpm = "10"
 yq = "latest"
