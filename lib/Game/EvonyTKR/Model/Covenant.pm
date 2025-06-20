@@ -8,10 +8,9 @@ require Game::EvonyTKR::Model::Buff;
 require Game::EvonyTKR::Model::Buff::Value;
 use namespace::clean;
 
-
 class Game::EvonyTKR::Model::Covenant : isa(Game::EvonyTKR::Model::Data) {
 # PODNAME: Game::EvonyTKR::Model::Covenant
-  use builtin         qw(indexed);
+  use builtin qw(indexed);
   require Data::Printer;
   require Type::Tiny::Enum;
   require Readonly;
@@ -27,9 +26,9 @@ class Game::EvonyTKR::Model::Covenant : isa(Game::EvonyTKR::Model::Data) {
   my $debug = 1;
 
   field $primary : reader : param;
-  field $one :param;
-  field $two :param;
-  field $three :param;
+  field $one : param;
+  field $two : param;
+  field $three : param;
 
   field $secondary : reader;
 
@@ -37,34 +36,45 @@ class Game::EvonyTKR::Model::Covenant : isa(Game::EvonyTKR::Model::Data) {
 
   ADJUST {
     my $step1 = {};
+    my $name  = $primary->name;
+#if(blessed $one ne 'Game::EvonyTKR::Model::General') {
+#  $self->logger->logcroak("one of $name must be of type 'Game::EvonyTKR::Model::General' not " . blessed($one));
+#}
     $step1->{one} = $one;
+#if(blessed $two ne 'Game::EvonyTKR::Model::General') {
+#  $self->logger->logcroak("two of $name  must be of type 'Game::EvonyTKR::Model::General' not " . blessed($two));
+#}
     $step1->{two} = $two;
+#if(blessed $three ne 'Game::EvonyTKR::Model::General') {
+#  $self->logger->logcroak("three of $name  must be of type 'Game::EvonyTKR::Model::General' not " . blessed($three));
+#}
     $step1->{three} = $three;
 
-    # Use Readonly::Hash1 for shallow readonly - hash structure is fixed but array contents can change
+# Use Readonly::Hash1 for shallow readonly - hash structure is fixed but array contents can change
     Readonly::Hash1 my %step2 => %{$step1};
     $secondary = \%step2;
   }
 
-  field $categories :reader;
+  field $categories : reader;
 
-  field $CovenantLevels =
-    Type::Tiny::Enum->new(
-      values => ['None', 'War', 'Cooperation', 'Peace', 'Faith', 'Honor', 'Civilization',],
-    );
+  field $CovenantLevels = Type::Tiny::Enum->new(
+    values => [
+      'None', 'War', 'Cooperation', 'Peace', 'Faith', 'Honor', 'Civilization',
+    ],
+  );
 
   ADJUST {
     #Covenants only have these levels.
     my @levels = @{ $CovenantLevels->values() };
-    my $step1 = {};
+    my $step1  = {};
     foreach my $key (@levels) {
-      if ($key eq 'None'){
+      if ($key eq 'None') {
         next;
       }
       $step1->{$key} = {
-        type => "personal",
+        type            => "personal",
         activationLevel => 0,
-        buffs => []
+        buffs           => []
       };
     }
     Readonly::Hash1 my %step2 => %{$step1};
@@ -80,6 +90,56 @@ class Game::EvonyTKR::Model::Covenant : isa(Game::EvonyTKR::Model::Data) {
     }
   }
 
+  method get_buffs_at_level (
+    $level, $attribute,
+    $targetedType     = '',
+    $conditions       = [],
+    $debuffConditions = [],
+    $includePassive   = 0,
+  ) {
+    my $logger = $self->logger;
+    $logger->debug(
+      "Calculating ascending buffs for level: $level, attribute: $attribute");
+
+    return 0 if not defined $level or $level eq 'None';
+
+    my $valid_levels = $CovenantLevels->values;
+    my %level_index  = map { $valid_levels->[$_] => $_ } 0 .. $#$valid_levels;
+
+    unless (exists $level_index{$level}) {
+      $logger->debug("Invalid level: $level");
+      return 0;
+    }
+
+    my $total = 0;
+
+    my $target_index = $level_index{$level};
+
+    for my $i (1 .. $target_index) {    # skip index 0 for 'None'
+      my $level_name = $valid_levels->[$i];
+      my $buffs      = $categories->{$level_name}->{buffs};
+
+      $logger->debug(
+        "Checking level '$level_name' with " . scalar(@$buffs) . " buffs");
+
+      foreach my $buff (@$buffs) {
+        if ($buff->passive & !$includePassive) {
+          next;
+        }
+        if ($buff->match_buff(
+          $attribute, $targetedType, $conditions, $debuffConditions
+        )) {
+          my $val = $buff->value->number;
+          $logger->debug("  ➤ Match found. Adding $val to total.");
+          $total += $val;
+        }
+      }
+    }
+    $logger->debug($primary->name
+        . " has Total $total for level '$level' and attribute '$attribute'");
+    return $total;
+  }
+
   method addBuff ($level, $nb) {
     my $red = 1;
     if (!blessed($nb) || blessed($nb) ne "Game::EvonyTKR::Model::Buff") {
@@ -89,11 +149,10 @@ class Game::EvonyTKR::Model::Covenant : isa(Game::EvonyTKR::Model::Data) {
       exit 0;
     }
 
-    if (none { $level =~ /$_/i } @{ $CovenantLevels->values() } ) {
+    if (none { $level =~ /$_/i } @{ $CovenantLevels->values() }) {
       $self->logger->error(sprintf(
         'level should be one of %s, not %s',
-        join(', ', @{ $CovenantLevels->values() }),
-        $level
+        join(', ', @{ $CovenantLevels->values() }), $level
       ));
       return 0;
     }
@@ -102,19 +161,26 @@ class Game::EvonyTKR::Model::Covenant : isa(Game::EvonyTKR::Model::Data) {
     }
 
     push @{ $categories->{$level}->{buffs} }, $nb;
-    return scalar @{ $categories->{$level}->{buffs} };
+    my $count = scalar @{ $categories->{$level}->{buffs} };
+    $self->logger->debug("Added buff for attribute '"
+        . $nb->attribute
+        . "' to covenant level '$level', now has $count buffs");
+    return $count;
+
   }
 
-  method to_hash($verbose = 0) {
-    $self->logger()
-      ->trace("Starting toHashRef for Covenant, verbose is $verbose");
+  method to_hash() {
     my $returnRef = {
-      primary   => $primary->name(),
+      primary   => $primary->name,
       secondary => {
+        #one   => $secondary->{'one'}->name,
+        #two   => $secondary->{'two'}->name,
+        #three => $secondary->{'three'}->name,
         one   => $secondary->{'one'},
         two   => $secondary->{'two'},
         three => $secondary->{'three'},
       },
+      categories => $categories,
     };
   }
 

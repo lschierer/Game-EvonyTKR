@@ -32,123 +32,251 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
   field $speciality3 : reader : param    //= 'gold';
   field $speciality4 : reader : param    //= 'gold';
   field $generalLevel : reader : param   //= 45;
+  field $covenantLevel : reader : param  //= 'Civilization';
+  field $includePassive : reader : param //= 1;
   field $keepLevel : reader : param      //= 40;
 
   # output values
-  field $marchIncrease : reader  = 0;
-  field $attackIncrease : reader = 0;
+  field $marchIncrease : reader       = 0;
+  field $attackIncrease : reader      = 0;
+  field $defenseIncrease : reader     = 0;
+  field $hpIncrease : reader          = 0;
+  field $reducegroundattack : reader  = 0;
+  field $reducerangedattack : reader  = 0;
+  field $reducemountedattack : reader = 0;
+  field $reducesiegeattack : reader   = 0;
+  field $reducegroundhp : reader      = 0;
 
   # some parameters unused currently, but adding them for future growth
-  method updateBuffs (
+  method updateBuffs () {
+    $marchIncrease   = $self->updateMarchSize();
+    $attackIncrease  = $self->updateAttackIncrease();
+    $defenseIncrease = $self->updateDefenseIncrease();
+    $hpIncrease      = $self->updateHPIncrease();
+  }
 
-  ) {
-    $marchIncrease  = $self->updateMarchSize();
-    $attackIncrease = $self->updateAttackIncrease();
+  method updateDebuffs () {
+    $reducegroundattack = $self->updateAttackDebuff('Ground Troops');
+    $reducegroundhp     = $self->updateHPDebuff('Ground Troops');
   }
 
   # some parameters unused currently, but adding them for future growth
   method updateMarchSize () {
+    return $self->updateBuff('March Size Capacity');
+  }
+
+  method updateAttackIncrease () {
+    return $self->updateBuff('Attack',);
+  }
+
+  method updateDefenseIncrease () {
+    return $self->updateBuff('Defense',);
+  }
+
+  method updateHPIncrease () {
+    return $self->updateBuff('HP');
+  }
+
+  method updateAttackDebuff ($debuffType, $activationType = 'Overall') {
+    return $self->updateDebuff('Attack', $debuffType, $activationType);
+  }
+
+  method updateDefenseDebuff ($debuffType, $activationType = 'Overall') {
+    return $self->updateDebuff('Defense', $debuffType, $activationType);
+  }
+
+  method updateHPDebuff ($debuffType, $activationType = 'Overall') {
+    return $self->updateDebuff('HP', $debuffType, $activationType);
+  }
+
+  method updateBuff ($attribute, $activationType = 'Overall') {
+    # set $total to 0 to ensure this function is idempotent
     my $total = 0;
 
+    my @buffConditions = $self->buffConditionValues->values->@*;
+# filter them based on $activationType;
+# do *not* use word boundary conditionals to match both words like 'City' and 'SubCity'
+    if ($activationType eq 'PvM') {
+      @buffConditions =
+        grep { !/(Defend|Defense|Reinforc|City)/ } @buffConditions;
+    }
+    elsif ($activationType eq 'Overall' || $activationType eq 'Attacking') {
+      @buffConditions =
+        grep { !/(Monsters|Defend|Defense|Reinforc|City|Mayor)/ }
+        @buffConditions;
+    }
+    elsif ($activationType eq 'Reinforcing') {
+      @buffConditions =
+        grep { !/(Monsters|Mayor|Rally|attack|Marching|When the Main)/i }
+        @buffConditions;
+    }
+    elsif ($activationType eq 'Wall') {
+      @buffConditions =
+        grep { !/(Monsters|Mayor|Rally|attack|Marching|Reinfor|Outside)/i }
+        @buffConditions;
+    }
+    elsif ($activationType eq 'Mayor') {
+      @buffConditions = grep {/(Mayor|In Main City)/} @buffConditions;
+    }
+    else {
+      $self->logger->warn(
+        sprintf('activationType %s is not handled. Using Overall',
+          $activationType)
+      );
+      return $self->updateBuff($attribute, 'Overall');
+    }
+
+    my $standardSkill = 0;
     if (
-      $isPrimary
+      $attribute eq 'March Size Capacity'
       && $rootManager->generalConflictGroupManager->is_book_compatible(
         'March Size Increase',
         $general->name
       )
     ) {
-      $total += 12;
+      $standardSkill = 12;
+    }
+    elsif ($attribute =~ /(Attack|Defense|HP)/) {
+      for my $tt (qw(Mounted Ground Ranged Siege)) {
+        if (
+          $targetType =~ /$tt/i
+          && $rootManager->generalConflictGroupManager->is_book_compatible(
+            "$tt $attribute Increase",
+            $general->name
+          )
+        ) {
+          $standardSkill = 25;
+        }
+      }
+    }
+    if ($isPrimary) {
+      $self->logger->debug(
+"adding standard skillbook value $standardSkill for attribute $attribute."
+      );
+      $total += $standardSkill;
     }
 
-    my $bv = $self->summarize_book_for_attribute('March Size Capacity');
+    my $bv = $self->summarize_book_for_attribute($attribute, $targetType,
+      \@buffConditions);
     $total += $bv;
 
-    my $sv = $self->summarize_specialities_for_attribute('March Size Capacity');
+    my $cv = $self->summarize_covenant_for_attribute($attribute, $targetType,
+      \@buffConditions);
+    $total += $cv;
+
+    my $sv =
+      $self->summarize_specialities_for_attribute($attribute, $targetType,
+      \@buffConditions);
     $total += $sv;
 
     if ($isPrimary) {
-      my $av = $self->summarize_ascendingAttributes_for_attribute(
-        'March Size Capacity');
+      my $av = $self->summarize_ascendingAttributes_for_attribute($attribute,
+        $targetType, \@buffConditions);
       $total += $av;
     }
-
+    $self->logger->info("returning $attribute total: $total");
     return $total;
   }
 
-  method updateAttackIncrease (
-
-  ) {
-
-    # set $total to 0 to ensure this function is idempotent
+  method updateDebuff ($attribute, $debuffType, $activationType = 'Overall') {
     my $total = 0;
 
-    if (
-         $isPrimary
-      && $targetType =~ /Mounted/i
-      && $rootManager->generalConflictGroupManager->is_book_compatible(
-        'Mounted Attack Increase',
-        $general->name
-      )
-    ) {
-
-      $total += 25;
-
+    if (!$self->allowedBuffActivation->check($activationType)) {
+      $self->logger->error(sprintf(
+        'activation type must be one of %s not %s.',
+        join(", ", $self->allowedBuffActivation->values->@*),
+        $activationType,
+      ));
+      return $total;
     }
 
-    if (
-         $isPrimary
-      && $targetType =~ /Ground/i
-      && $rootManager->generalConflictGroupManager->is_book_compatible(
-        'Ground Troop Attack',
-        $general->name
-      )
-    ) {
-
-      $total += 25;
-
+    for my $tt (qw(Mounted Ground Ranged Siege)) {
+      if (
+           $isPrimary
+        && $debuffType =~ /$tt/i
+        && $rootManager->generalConflictGroupManager->is_book_compatible(
+          "Enemy $tt $attribute",
+          $general->name
+        )
+      ) {
+        $total += 0;    # see note in README.
+      }
     }
 
-    if (
-         $isPrimary
-      && $targetType =~ /Ranged/i
-      && $rootManager->generalConflictGroupManager->is_book_compatible(
-        'Ranged Troop Attack',
-        $general->name
-      )
-    ) {
-
-      $total += 25;
-
+    my @buffConditions   = $self->buffConditionValues->values->@*;
+    my @debuffConditions = $self->debuffConditionValues->values->@*;
+# filter them based on $activationType;
+# do *not* use word boundary conditionals to match both words like 'City' and 'SubCity'
+    if ($activationType eq 'PvM') {
+      @buffConditions =
+        grep { !/(Defend|Defense|Reinforc|City)/ } @buffConditions;
+      @debuffConditions = grep { !/Enemy/ } @debuffConditions;
+    }
+    elsif ($activationType eq 'Overall' || $activationType eq 'Attacking') {
+      @buffConditions =
+        grep { !/(Monsters|Defend|Defense|Reinforc|City|Mayor)/ }
+        @buffConditions;
+      @debuffConditions = grep { $_ ne "Reduces Monster" } @debuffConditions;
+    }
+    elsif ($activationType eq 'Reinforcing') {
+      @buffConditions =
+        grep { !/(Monsters|Mayor|Rally|attack|Marching|When the Main)/i }
+        @buffConditions;
+      @debuffConditions = grep { $_ ne "Reduces Monster" } @debuffConditions;
+    }
+    elsif ($activationType eq 'Wall') {
+      @buffConditions =
+        grep { !/(Monsters|Mayor|Rally|attack|Marching|Reinfor|Outside)/i }
+        @buffConditions;
+      @debuffConditions = grep { $_ ne "Reduces Monster" } @debuffConditions;
+    }
+    elsif ($activationType eq 'Mayor') {
+      @buffConditions   = grep {/(Mayor|In Main City)/} @buffConditions;
+      @debuffConditions = grep { $_ ne "Reduces Monster" } @debuffConditions;
+    }
+    else {
+      $self->logger->warn(
+        sprintf('activationType %s is not handled. Using Overall',
+          $activationType)
+      );
+      return $self->updateAttackDebuff($debuffType, 'Overall');
     }
 
-    if (
-         $isPrimary
-      && $targetType =~ /Siege/i
-      && $rootManager->generalConflictGroupManager->is_book_compatible(
-        'Siege Machine Attack',
-        $general->name
-      )
-    ) {
-
-      $total += 25;
-
+    if (!scalar(@debuffConditions)) {
+      $self->logger->error("Debuff MUST have debuffConditions.");
+      return 0;
     }
 
-    my $bv = $self->summarize_book_for_attribute('Attack');
+    my $bv = $self->summarize_book_for_attribute($attribute, $debuffType,
+      \@buffConditions, \@debuffConditions);
     $total += $bv;
 
-    my $sv = $self->summarize_specialities_for_attribute('Attack');
+    my $cv = $self->summarize_covenant_for_attribute($attribute, $debuffType,
+      \@buffConditions, \@debuffConditions);
+    $total += $cv;
+
+    my $sv =
+      $self->summarize_specialities_for_attribute($attribute, $debuffType,
+      \@buffConditions, \@debuffConditions);
     $total += $sv;
 
     if ($isPrimary) {
-      my $av = $self->summarize_ascendingAttributes_for_attribute('Attack');
+      my $av = $self->summarize_ascendingAttributes_for_attribute($attribute,
+        $debuffType, \@buffConditions, \@debuffConditions);
       $total += $av;
     }
+
+    $self->logger->info("returning $attribute total: $total");
 
     return $total;
   }
 
-  method summarize_book_for_attribute ($attribute) {
+  method summarize_book_for_attribute (
+    $attribute,
+    $summaryType      = $targetType,
+    $buffConditions   = [],
+    $debuffConditions = []
+  ) {
     my $total = 0;
     $self->logger->debug($general->name
         . " book name: "
@@ -171,8 +299,9 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
     my $book = $general->builtInBook();
     if ($book) {
 
-      $self->logger->debug("adding buffs to pair for book " . $book->name);
-      my $bv = $book->get_buffs($attribute, $targetType);
+      $self->logger->debug("adding buffs for book " . $book->name);
+      my $bv = $book->get_buffs($attribute, $summaryType, $buffConditions,
+        $debuffConditions);
       $self->logger->trace(sprintf(
         'found %s in %s %s buffs for %s.',
         $bv, $book->name, $attribute, $general->name
@@ -183,10 +312,53 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
       $self->logger->error(
         "cannot update total with book " . Data::Printer::np($book));
     }
+    $self->logger->debug(sprintf(
+      'returning %s as book total for attribute "%s" with "%s" and "%s"',
+      $total,                         $attribute,
+      join(",", $buffConditions->@*), join(", ", $debuffConditions->@*),
+    ));
     return $total;
   }
 
-  method summarize_specialities_for_attribute ($attribute) {
+  method summarize_covenant_for_attribute (
+    $attribute,
+    $summaryType      = $targetType,
+    $buffConditions   = [],
+    $debuffConditions = []
+  ) {
+    my $total = 0;
+
+    my $covenant = $rootManager->covenantManager->getCovenant($general->name);
+    if ($covenant) {
+      $self->logger->debug("Found covenant for "
+          . $general->name
+          . " now processing at level $covenantLevel for attribute $attribute."
+      );
+
+      my $cv = $covenant->get_buffs_at_level(
+        $covenantLevel,  $attribute, $summaryType,
+        $buffConditions, $debuffConditions
+      );
+      $self->logger->debug(
+"retrieved $cv as total $attribute for level $covenantLevel of covenant for "
+          . $general->name);
+
+      $total += $cv;
+    }
+    $self->logger->debug(sprintf(
+      'returning %s as convenant total for attribute "%s" with "%s" and "%s"',
+      $total,                         $attribute,
+      join(",", $buffConditions->@*), join(", ", $debuffConditions->@*),
+    ));
+    return $total;
+  }
+
+  method summarize_specialities_for_attribute (
+    $attribute,
+    $summaryType      = $targetType,
+    $buffConditions   = [],
+    $debuffConditions = []
+  ) {
     my $total           = 0;
     my @specialityNames = @{ $general->specialityNames };
     my @specialityLevels =
@@ -201,7 +373,8 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
         $self->logger->debug(
           sprintf('checking %s for %s', $speciality->name, $attribute));
 
-        my $sv = $speciality->get_buffs_at_level($sl, $attribute, $targetType);
+        my $sv = $speciality->get_buffs_at_level($sl, $attribute, $summaryType,
+          $buffConditions, $debuffConditions);
         $self->logger->debug("retrieved $sv as total $attribute for level $sl "
             . $speciality->name
             . " as part of "
@@ -215,10 +388,20 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
         ));
       }
     }
+    $self->logger->debug(sprintf(
+      'returning %s as speciality total for attribute %s with "%s" and "%s"',
+      $total,                         $attribute,
+      join(",", $buffConditions->@*), join(", ", $debuffConditions->@*),
+    ));
     return $total;
   }
 
-  method summarize_ascendingAttributes_for_attribute ($attribute) {
+  method summarize_ascendingAttributes_for_attribute (
+    $attribute,
+    $summaryType      = $targetType,
+    $buffConditions   = [],
+    $debuffConditions = []
+  ) {
     my $total = 0;
 
     my $aa = $rootManager->ascendingAttributesManager->getAscendingAttributes(
@@ -226,7 +409,10 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
     if ($aa) {
       $self->logger->debug(
         "retrieved ascendingAttribute buffs for " . $general->name);
-      my $av = $aa->get_buffs_at_level($ascendingLevel, $attribute, $targetType);
+      my $av = $aa->get_buffs_at_level(
+        $ascendingLevel, $attribute, $summaryType,
+        $buffConditions, $debuffConditions
+      );
       $self->logger->debug(sprintf(
         '%s Ascending Attributes has %s buffs with total %s at level %s',
         $general->name, $attribute, $av, $ascendingLevel,
@@ -237,7 +423,11 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
       $self->logger->error(
         "cannot find Ascending Attributes for " . $general->name);
     }
-
+    $self->logger->debug(sprintf(
+'returning %s as Ascending Attributes total for attribute "%s" with "%s" and "%s"',
+      $total,                         $attribute,
+      join(",", $buffConditions->@*), join(", ", $debuffConditions->@*),
+    ));
     return $total;
   }
 

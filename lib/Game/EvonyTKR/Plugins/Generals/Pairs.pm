@@ -106,9 +106,10 @@ package Game::EvonyTKR::Plugins::Generals::Pairs {
 
     # Get sort parameters from query
     my $sort_param = $self->param('sort')
-      // 'primary,secondary,marchbuff,attackbuff';    # Default sort columns
+      // 'primary,secondary,marchbuff,attackbuff,defensebuff'
+      ;    # Default sort columns
     my $dir_param = $self->param('dir')
-      // 'asc,asc,desc,desc';                         # Default directions
+      // 'asc,asc,desc,desc,desc';    # Default directions
 
     # Parse sort parameters
     my @sort_columns = split(',', $sort_param);
@@ -142,8 +143,13 @@ package Game::EvonyTKR::Plugins::Generals::Pairs {
           $cmp = $a->secondary->name cmp $b->secondary->name;
         }
         elsif ($col eq 'marchbuff') {
-          $cmp =
-            $a->marchbuff <=> $b->marchbuff;  # Numeric comparison for marchbuff
+          $cmp = $a->marchbuff <=> $b->marchbuff;    # Numeric comparison
+        }
+        elsif ($col eq 'attackbuff') {
+          $cmp = $a->attackbuff <=> $b->attackbuff;    # Numeric comparison
+        }
+        elsif ($col eq 'defensebuff') {
+          $cmp = $a->defensebuff <=> $b->defensebuff;    # Numeric comparison
         }
         # Add more columns here as you implement them
 

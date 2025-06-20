@@ -124,6 +124,22 @@
           <td>Attack</td>
           <td><%= stash('buff-summaries')->{attackIncrease} %></td>
         </tr>
+        <tr>
+          <td>Defense</td>
+          <td><%= stash('buff-summaries')->{defenseIncrease} %></td>
+        </tr>
+        <tr>
+          <td>HP</td>
+          <td><%= stash('buff-summaries')->{hpIncrease} %></td>
+        </tr>
+        <tr>
+          <td>Reduce Enemy Ground Attack</td>
+          <td><%= stash('buff-summaries')->{reducegroundattack} %></td>
+        </tr>
+        <tr>
+          <td>Reduce Enemy Ground HP</td>
+          <td><%= stash('buff-summaries')->{reducegroundhp} %></td>
+        </tr>
       </table>
     </div>
   <% } %>

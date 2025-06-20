@@ -21,6 +21,8 @@ class Game::EvonyTKR::Model::General::Pair : isa(Game::EvonyTKR::Model::Data) {
 
   field $attackbuff : reader = 0;
 
+  field $defensebuff : reader = 0;
+
   method setRootManager ($nm) {
     if (Scalar::Util::blessed $nm eq 'Game::EvonyTKR::Model::EvonyTKR::Manager')
     {
@@ -78,6 +80,9 @@ class Game::EvonyTKR::Model::General::Pair : isa(Game::EvonyTKR::Model::Data) {
       $primarySummarizer->marchIncrease + $secondarySummarizer->marchIncrease;
     $attackbuff =
       $primarySummarizer->attackIncrease + $secondarySummarizer->attackIncrease;
+    $defensebuff =
+      $primarySummarizer->defenseIncrease +
+      $secondarySummarizer->defenseIncrease;
   }
 
   # Method to convert to hash

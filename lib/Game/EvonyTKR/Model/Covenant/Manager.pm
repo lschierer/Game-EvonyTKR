@@ -14,7 +14,8 @@ require Game::EvonyTKR::Model::Buff::Value;
 require Game::EvonyTKR::Model::Covenant;
 use namespace::clean;
 
-class Game::EvonyTKR::Model::Covenant::Manager : isa(Game::EvonyTKR::Model::Data) {
+class Game::EvonyTKR::Model::Covenant::Manager :
+  isa(Game::EvonyTKR::Model::Data) {
 # PODNAME: Game::EvonyTKR::Model::Covenant::Manager
   use builtin qw(indexed);
   require Data::Printer;
@@ -69,7 +70,8 @@ class Game::EvonyTKR::Model::Covenant::Manager : isa(Game::EvonyTKR::Model::Data
         schema       => [qw/ + Perl /],
         yaml_version => ['1.2', '1.1'],
       )->load_string($data);
-
+      $self->logger->trace(
+        "$object imported, looks like " . Data::Printer::np($object));
       if (exists $object->{name}) {
         if ($name ne $object->{name}) {
           $self->logger->error(
@@ -78,42 +80,68 @@ class Game::EvonyTKR::Model::Covenant::Manager : isa(Game::EvonyTKR::Model::Data
         }
         $name = $object->{name};
       }
+
       my $primary = $rootManager->generalManager->getGeneral($name);
       if ($primary) {
-        $covenants->{$name} =
-          Game::EvonyTKR::Model::Covenant->new(
-            primary => $primary,
-            one     => $object->{generals}->[0],
-            two     => $object->{generals}->[1],
-            three   => $object->{generals}->[2],
+        $self->logger->debug(
+          "found primary general for $name, starting import.");
+        $self->logger->debug(
+          "generals for $name are " . join(", ", @{ $object->{generals} }));
+#my $one = $rootManager->generalManager->getGeneral($object->{generals}->[0]);
+#my $two = $rootManager->generalManager->getGeneral($object->{generals}->[1]);
+#my $three = $rootManager->generalManager->getGeneral($object->{generals}->[2]);
+        $covenants->{$name} = Game::EvonyTKR::Model::Covenant->new(
+          primary => $primary,
+          one     => $object->{generals}->[0],
+          two     => $object->{generals}->[1],
+          three   => $object->{generals}->[2],
         );
 
-        foreach my $oc (@{ $object->{category} }) {
-          foreach my $ob (@{ $object->{buff} }) {
+        foreach my $oc (@{ $object->{levels} }) {
+          my $category = $oc->{category};
+
+          # Find buffs for this category
+          foreach my $ob (@{ $oc->{buff} }) {
+
             my $v = Game::EvonyTKR::Model::Buff::Value->new(
               number => $ob->{value}->{number},
               unit   => $ob->{value}->{unit},
             );
+ # very few collection types have passive buffs. Covenants are an exception.
+ # however, the data source for covenants records this one level above the buffs
+ # themselves, recording a different instance of $object->{levels} for an
+ # object with passive buffs and one without.  We need to merge any objects
+ # that have the same category, adding the buffs from both to the same array.
             my $b = Game::EvonyTKR::Model::Buff->new(
-              value          => $v,
-              attribute      => $ob->{attribute},
-              targgetedTypes => $ob->{class},
-              activationType => $oc->{type},
+              value         => $v,
+              attribute     => $ob->{attribute},
+              targetedTypes => (exists $ob->{class} && defined $ob->{class})
+              ? [$ob->{class}]
+              : [],
+              passive => $oc->{type} eq 'passive',
             );
             if (exists $ob->{condition}) {
               foreach my $c (@{ $ob->{condition} }) {
                 $b->set_condition($c);
               }
             }
-            $covenants->{$name}->addBuff($oc->{category}, $b);
+            $covenants->{$name}->addBuff($category, $b);
+
           }
         }
+
       }
+      else {
+        $self->logger->error("Cannot find primary general for covenant $name");
+      }
+      $self->logger->debug(
+        "import of $file for $name complete.  covenant created: "
+          . Data::Printer::np($covenants->{$name}));
     }
     my $countImported = scalar keys %$covenants;
     $self->logger->info(
       "Model::Covenant::Manager imported $countImported covenants");
     return $countImported;
   }
-};
+  };
 1;

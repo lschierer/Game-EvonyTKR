@@ -49,11 +49,12 @@ package Game::EvonyTKR::Plugins::Generals {
         );
         my $targetType;
         if (ref $general->type eq 'ARRAY') {
-            $targetType = $general->type->[0] if @{$general->type};
-        } else {
-            $targetType = $general->type;
+          $targetType = $general->type->[0] if @{ $general->type };
         }
-        $targetType //= '';  # Default to empty string if undefined
+        else {
+          $targetType = $general->type;
+        }
+        $targetType //= '';    # Default to empty string if undefined
         $logger->debug("Using $targetType as targetType for $name");
         my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
           rootManager => $self->app->get_root_manager(),
@@ -63,12 +64,16 @@ package Game::EvonyTKR::Plugins::Generals {
 
         );
         $summarizer->updateBuffs();
-        my $marchIncrease  = $summarizer->marchIncrease;
-        my $attackIncrease = $summarizer->attackIncrease;
+        $summarizer->updateDebuffs();
+
         $self->stash(
           'buff-summaries' => {
-            marchIncrease  => $marchIncrease,
-            attackIncrease => $attackIncrease,
+            marchIncrease      => $summarizer->marchIncrease,
+            attackIncrease     => $summarizer->attackIncrease,
+            defenseIncrease    => $summarizer->defenseIncrease,
+            hpIncrease         => $summarizer->hpIncrease,
+            reducegroundattack => $summarizer->reducegroundattack,
+            reducegroundhp     => $summarizer->reducegroundhp,
           },
         );
       }

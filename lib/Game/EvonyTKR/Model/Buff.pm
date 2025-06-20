@@ -23,8 +23,6 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Model::Data) {
 
   field $attribute : reader : param;
 
-  field $activationType :reader :param = 'personal';
-
   field $value : reader : param;
 
   field $debuffConditions : reader : param //= [];
@@ -104,14 +102,6 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Model::Data) {
     $self->logger->trace("re for buffConditionValues is $re");
     my @tbc = @{$buffConditions};
     my @invalid;
-
-    if($activationType ne 'personal' && $activationType ne 'passive') {
-      push @errors,
-        sprintf(
-          'Detected illegalt value %s in activationType. All values must be one of %s.',
-          $activationType, 'personal, passive'
-        );
-    }
 
     # Check if we got an array reference instead of a flat array
     if (@tbc == 1 && ref($tbc[0]) eq 'ARRAY') {
@@ -268,6 +258,12 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Model::Data) {
         }
       }
     }
+    else {
+      $logger->trace(
+"  ✗ Rejected: debuff conditions are not present in buff and are required."
+      );
+      return 0;
+    }
 
     # Check buff conditions
     my $has_buff_conditions = scalar @$buffConditions > 0;
@@ -309,7 +305,7 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Model::Data) {
   method to_hash() {
     my $c;
     my $conditionCount = scalar $self->conditions();
-    $self->logger()->info("in to_hash, I have $conditionCount conditions");
+    $self->logger()->debug("in to_hash, I have $conditionCount conditions");
     if ($conditionCount) {
       $c = $self->conditions();
     }

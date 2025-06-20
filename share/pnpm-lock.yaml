@@ -28,7 +28,7 @@ importers:
         version: 8.1.0(@spectrum-css/tokens@16.0.2)
       evonytkrtips-data:
         specifier: github:lschierer/EvonyTKRTips-Data
-        version: '@evonytkrtips/data@https://codeload.github.com/lschierer/EvonyTKRTips-Data/tar.gz/93e230a769afe00146dcadf491b1224b610f1ae1'
+        version: '@evonytkrtips/data@https://codeload.github.com/lschierer/EvonyTKRTips-Data/tar.gz/6c2728f431fb50b1b828b3d4fe34c7a95a5c4c2c'
       iconify-icon:
         specifier: ^3.0.0
         version: 3.0.0
@@ -524,8 +524,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@evonytkrtips/data@https://codeload.github.com/lschierer/EvonyTKRTips-Data/tar.gz/93e230a769afe00146dcadf491b1224b610f1ae1':
-    resolution: {tarball: https://codeload.github.com/lschierer/EvonyTKRTips-Data/tar.gz/93e230a769afe00146dcadf491b1224b610f1ae1}
+  '@evonytkrtips/data@https://codeload.github.com/lschierer/EvonyTKRTips-Data/tar.gz/6c2728f431fb50b1b828b3d4fe34c7a95a5c4c2c':
+    resolution: {tarball: https://codeload.github.com/lschierer/EvonyTKRTips-Data/tar.gz/6c2728f431fb50b1b828b3d4fe34c7a95a5c4c2c}
     version: 1.0.0
 
   '@iconify/types@2.0.0':
@@ -2208,7 +2208,7 @@ snapshots:
   '@esbuild/win32-x64@0.25.5':
     optional: true
 
-  '@evonytkrtips/data@https://codeload.github.com/lschierer/EvonyTKRTips-Data/tar.gz/93e230a769afe00146dcadf491b1224b610f1ae1': {}
+  '@evonytkrtips/data@https://codeload.github.com/lschierer/EvonyTKRTips-Data/tar.gz/6c2728f431fb50b1b828b3d4fe34c7a95a5c4c2c': {}
 
   '@iconify/types@2.0.0': {}
 

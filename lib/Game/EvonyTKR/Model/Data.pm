@@ -91,7 +91,6 @@ class Game::EvonyTKR::Model::Data : isa(Game::EvonyTKR::Model::Logger) {
       "Reduces Enemy with a Dragon",
       "Reduces Monster",
     ]
-
   );
 
   field $bookConditionValues : reader =
