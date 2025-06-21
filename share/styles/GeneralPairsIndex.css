@@ -1,12 +1,6 @@
 /* Styles for the General Pairs table */
 
-.general-pairs-table {
-  max-width: 90vw;
-  overflow: auto;
-  height: 60vh;
-  margin: 20px 0;
-  position: relative;
-}
+@import url('@spectrum-css/table/dist/index.css');
 
 /* Add cursor pointer to sortable headers */
 .spectrum-Table-headCell.is-sortable {
@@ -19,22 +13,56 @@ th {
   --mod-table-header-background-color-scrollable: var(--surface-1);
 }
 
-thead > tr {
+thead,
+tr {
   width: 100%;
 }
 
-tbody {
-  position: relative;
-  width: 100%;
+.general-pairs-table {
+  max-width: 90vw;
+  max-height: 65vh;
+  margin: 20px 0;
 }
 
-tbody > tr {
-  position: absolute;
+span.table-header-sort {
+  background: var(--surface-3);
+  color: var(--brand);
+  font-size: calc(calc(var(--size-2) + var(--size-3)) / 2);
+  padding: calc(calc(var(--size-2) + var(--size-1)) / 2);
+  border-radius: 50%;
+  line-height: var(--size-1);
+  display: inline-block;
+}
+
+table.spectrum-Table-main {
+  width: fit-content;
+  max-width: 100%;
+}
+
+tbody::before {
+  content: '';
+  display: table-row;
+  height: 0;
+}
+
+tbody::before > td {
+  padding: 0;
+  border: none;
+}
+
+tbody.spectrum-Table-body {
+  overflow: auto;
+  height: 60vh; /* or whatever height */
+  width: 100%;
+  min-width: 100%;
+}
+
+tbody.spectrum-Table-body > tr {
+  width: 100%;
 }
 
 /* Loading indicator styles */
 .loading-indicator {
-  position: fixed;
   top: 10px;
   right: 10px;
   padding: 8px 16px;

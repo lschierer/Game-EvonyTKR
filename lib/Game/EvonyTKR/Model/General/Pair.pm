@@ -89,40 +89,55 @@ class Game::EvonyTKR::Model::General::Pair : isa(Game::EvonyTKR::Model::Data) {
       generalLevel => $secondaryLevel,
       keepLevel    => $keepLevel,
     );
-    
+
     # Update buffs for both summarizers
     $primarySummarizer->updateBuffs();
     $secondarySummarizer->updateBuffs();
-    
+
     # Update debuffs for both summarizers
     $primarySummarizer->updateDebuffs();
     $secondarySummarizer->updateDebuffs();
-    
+
     # Set buff values by summing primary and secondary
-    $marchbuff = $primarySummarizer->marchIncrease + $secondarySummarizer->marchIncrease;
-    $attackbuff = $primarySummarizer->attackIncrease + $secondarySummarizer->attackIncrease;
-    $defensebuff = $primarySummarizer->defenseIncrease + $secondarySummarizer->defenseIncrease;
+    $marchbuff =
+      $primarySummarizer->marchIncrease + $secondarySummarizer->marchIncrease;
+    $attackbuff =
+      $primarySummarizer->attackIncrease + $secondarySummarizer->attackIncrease;
+    $defensebuff = $primarySummarizer->defenseIncrease +
+      $secondarySummarizer->defenseIncrease;
     $hpbuff = $primarySummarizer->hpIncrease + $secondarySummarizer->hpIncrease;
-    
+
     # Set ground troop debuff values
-    $groundattackdebuff = $primarySummarizer->reducegroundattack + $secondarySummarizer->reducegroundattack;
-    $grounddefensedebuff = $primarySummarizer->reducegrounddefense + $secondarySummarizer->reducegrounddefense;
-    $groundhpdebuff = $primarySummarizer->reducegroundhp + $secondarySummarizer->reducegroundhp;
-    
+    $groundattackdebuff = $primarySummarizer->reducegroundattack +
+      $secondarySummarizer->reducegroundattack;
+    $grounddefensedebuff = $primarySummarizer->reducegrounddefense +
+      $secondarySummarizer->reducegrounddefense;
+    $groundhpdebuff =
+      $primarySummarizer->reducegroundhp + $secondarySummarizer->reducegroundhp;
+
     # Set mounted troop debuff values
-    $mountedattackdebuff = $primarySummarizer->reducemountedattack + $secondarySummarizer->reducemountedattack;
-    $mounteddefensedebuff = $primarySummarizer->reducemounteddefense + $secondarySummarizer->reducemounteddefense;
-    $mountedhpdebuff = $primarySummarizer->reducemountedhp + $secondarySummarizer->reducemountedhp;
-    
+    $mountedattackdebuff = $primarySummarizer->reducemountedattack +
+      $secondarySummarizer->reducemountedattack;
+    $mounteddefensedebuff = $primarySummarizer->reducemounteddefense +
+      $secondarySummarizer->reducemounteddefense;
+    $mountedhpdebuff = $primarySummarizer->reducemountedhp +
+      $secondarySummarizer->reducemountedhp;
+
     # Set ranged troop debuff values
-    $rangedattackdebuff = $primarySummarizer->reducerangedattack + $secondarySummarizer->reducerangedattack;
-    $rangeddefensedebuff = $primarySummarizer->reducerangeddefense + $secondarySummarizer->reducerangeddefense;
-    $rangedhpdebuff = $primarySummarizer->reducerangedhp + $secondarySummarizer->reducerangedhp;
-    
+    $rangedattackdebuff = $primarySummarizer->reducerangedattack +
+      $secondarySummarizer->reducerangedattack;
+    $rangeddefensedebuff = $primarySummarizer->reducerangeddefense +
+      $secondarySummarizer->reducerangeddefense;
+    $rangedhpdebuff =
+      $primarySummarizer->reducerangedhp + $secondarySummarizer->reducerangedhp;
+
     # Set siege machine debuff values
-    $siegeattackdebuff = $primarySummarizer->reducesiegeattack + $secondarySummarizer->reducesiegeattack;
-    $siegedefensedebuff = $primarySummarizer->reducesiegedefense + $secondarySummarizer->reducesiegedefense;
-    $siegehpdebuff = $primarySummarizer->reducesiegehp + $secondarySummarizer->reducesiegehp;
+    $siegeattackdebuff = $primarySummarizer->reducesiegeattack +
+      $secondarySummarizer->reducesiegeattack;
+    $siegedefensedebuff = $primarySummarizer->reducesiegedefense +
+      $secondarySummarizer->reducesiegedefense;
+    $siegehpdebuff =
+      $primarySummarizer->reducesiegehp + $secondarySummarizer->reducesiegehp;
   }
 
   # Method to convert to hash

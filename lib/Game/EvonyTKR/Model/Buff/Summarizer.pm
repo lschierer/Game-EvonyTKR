@@ -37,22 +37,22 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
   field $keepLevel : reader : param      //= 40;
 
   # output values
-  field $marchIncrease : reader       = 0;
-  field $attackIncrease : reader      = 0;
-  field $defenseIncrease : reader     = 0;
-  field $hpIncrease : reader          = 0;
-  field $reducegroundattack   : reader  = 0;
-  field $reducegroundhp       : reader  = 0;
-  field $reducegrounddefense  : reader = 0;
-  field $reducesiegeattack   : reader  = 0;
-  field $reducesiegedefense  : reader  = 0;
-  field $reducesiegehp       : reader = 0;
-  field $reducemountedattack   : reader  = 0;
-  field $reducemounteddefense  : reader  = 0;
-  field $reducemountedhp       : reader = 0;
-  field $reducerangedattack   : reader  = 0;
-  field $reducerangeddefense  : reader  = 0;
-  field $reducerangedhp       : reader = 0;
+  field $marchIncrease : reader        = 0;
+  field $attackIncrease : reader       = 0;
+  field $defenseIncrease : reader      = 0;
+  field $hpIncrease : reader           = 0;
+  field $reducegroundattack : reader   = 0;
+  field $reducegroundhp : reader       = 0;
+  field $reducegrounddefense : reader  = 0;
+  field $reducesiegeattack : reader    = 0;
+  field $reducesiegedefense : reader   = 0;
+  field $reducesiegehp : reader        = 0;
+  field $reducemountedattack : reader  = 0;
+  field $reducemounteddefense : reader = 0;
+  field $reducemountedhp : reader      = 0;
+  field $reducerangedattack : reader   = 0;
+  field $reducerangeddefense : reader  = 0;
+  field $reducerangedhp : reader       = 0;
 
   # some parameters unused currently, but adding them for future growth
   method updateBuffs () {

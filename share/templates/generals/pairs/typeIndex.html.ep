@@ -1,34 +1,3 @@
-% use List::AllUtils 'firstidx';
-% my @columns = qw(
-%        primary secondary marchbuff
-%        attackbuff defensebuff hpbuff
-%        groundattackdebuff grounddefensedebuff groundhpdebuff
-%        mountedattackdebuff mounteddefensedebuff mountedhpdebuff
-%        rangedattackdebuff rangeddefensedebuff rangedhpdebuff
-%        siegeattackdebuff siegedefensedebuff siegehpdebuff
-%      );
-% my %column_labels = (
-%        primary                => 'Primary',
-%        secondary              => 'Secondary',
-%        marchbuff              => 'March Size',
-%        attackbuff             => 'Attack',
-%        defensebuff            => 'Defense',
-%        hpbuff                 => 'HP',
-%        groundattackdebuff     => 'Ground Attack Debuff',
-%        grounddefensedebuff    => 'Ground Defense Debuff',
-%        groundhpdebuff         => 'Ground HP Debuff',
-%        mountedattackdebuff    => 'Mounted Attack Debuff',
-%        mounteddefensedebuff   => 'Mounted Defense Debuff',
-%        mountedhpdebuff        => 'Mounted HP Debuff',
-%        rangedattackdebuff     => 'Ranged Attack Debuff',
-%        rangeddefensedebuff    => 'Ranged Defense Debuff',
-%        rangedhpdebuff         => 'Ranged HP Debuff',
-%        siegeattackdebuff      => 'Siege Attack Debuff',
-%        siegedefensedebuff     => 'Siege Defense Debuff',
-%        siegehpdebuff          => 'Siege HP Debuff',
-%      );
-% my $sort_columns = stash('sort_columns');
-% my $sort_dirs    = stash('sort_dirs');
 
 <link rel="stylesheet" href="/css/GeneralPairsIndex.css" />
 <script  type="module" >

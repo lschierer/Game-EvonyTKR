@@ -14,6 +14,7 @@ package Game::EvonyTKR::Plugins::Generals::Pairs {
   use Carp;
   use List::AllUtils qw( all any none );
   use Mojo::Promise;
+  use Mojo::Util qw(url_unescape);
 
   my $base = '/Generals/Pairs/';
 
@@ -61,6 +62,11 @@ package Game::EvonyTKR::Plugins::Generals::Pairs {
       ->to(controller => $controller_name, action => 'index')
       ->name("${base}_index");
 
+    # this is the new route
+    $routes->get('/:linkTarget/pair')
+      ->to(controller => $controller_name, action => 'pair_buffs')
+      ->name("${base}_single_pair_buffs");
+
     $app->plugins->on(
       'evonytkrtips_initialized' => sub($self, $manager) {
         $logger->debug(
@@ -89,6 +95,7 @@ package Game::EvonyTKR::Plugins::Generals::Pairs {
               { generalType => $type, linkTarget => $linkTarget })
             ->to(controller => $controller_name, action => 'typeIndex_json')
             ->name("${base}_${type}_json");
+
         }
       }
     );
@@ -133,16 +140,13 @@ package Game::EvonyTKR::Plugins::Generals::Pairs {
     $logger->debug(sprintf('There are %s pairs to return.', scalar(@pairs)));
 
     # Return just the basic pair information without computing buffs
-    my @json_data = map {
-      {
-        primary => { name => $_->primary->name },
-        secondary => { name => $_->secondary->name }
-      }
-    } @pairs;
+    my @json_data = map { {
+      primary   => { name => $_->primary->name },
+      secondary => { name => $_->secondary->name }
+    } } @pairs;
 
     $self->render(json => { data => \@json_data });
   }
-
 
   sub index ($self) {
     my $logger = Log::Log4perl->get_logger(__PACKAGE__);
@@ -172,6 +176,54 @@ package Game::EvonyTKR::Plugins::Generals::Pairs {
       return $self->render(template => $template);
     }
 
+  }
+
+  sub pair_buffs ($self) {
+    my $logger        = Log::Log4perl->get_logger(__PACKAGE__);
+    my $primaryName   = url_unescape($self->param('primary'));
+    my $secondaryName = url_unescape($self->param('secondary'));
+    my $linkTarget    = $self->param('linkTarget');
+
+    $logger->debug(
+"Computing pair buffs for primary '$primaryName' secondary '$secondaryName', linkTarget '$linkTarget'"
+    );
+
+    if (any { !defined($_) || $_ eq '' }
+      ($primaryName, $secondaryName, $linkTarget)) {
+      $logger->error("Missing parameter");
+      return $self->render(json => { error => "Missing parameter" },
+        status => 400);
+    }
+
+    my $typeMap = {
+      'Ground Pairs'  => 'ground_specialist',
+      'Ranged Pairs'  => 'ranged_specialist',
+      'Siege Pairs'   => 'siege_specialist',
+      'Mounted Pairs' => 'mounted_specialist',
+    };
+
+    my $targetType = $typeMap->{$linkTarget};
+    unless ($targetType) {
+      $logger->error("Invalid linkTarget: $linkTarget");
+      return $self->render(
+        json   => { error => "Unknown pair category" },
+        status => 404
+      );
+    }
+
+    my $pm = $self->app->get_general_pair_manager();
+
+    my ($pair) = grep {
+      $_->primary->name eq $primaryName && $_->secondary->name eq $secondaryName
+    } $pm->get_pairs_by_type($targetType)->@*;
+    unless ($pair) {
+      $logger->warn("Pair not found: $primaryName / $secondaryName");
+      return $self->render(json => { error => "Pair not found" },
+        status => 404);
+    }
+
+    $pair->updateBuffs();
+    return $self->render(json => $pair);
   }
 }
 1;

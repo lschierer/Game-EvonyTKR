@@ -38,6 +38,9 @@ importers:
       '@tanstack/table-core':
         specifier: ^8.21.3
         version: 8.21.3
+      '@tanstack/virtual-core':
+        specifier: ^3.13.10
+        version: 3.13.10
       evonytkrtips-data:
         specifier: github:lschierer/EvonyTKRTips-Data
         version: '@evonytkrtips/data@https://codeload.github.com/lschierer/EvonyTKRTips-Data/tar.gz/40ae3ba719e3987572c69f6310f6ae03cd26de1d'
