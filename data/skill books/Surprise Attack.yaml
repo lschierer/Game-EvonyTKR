@@ -1,0 +1,16 @@
+name: Surprise Attack
+buff:
+  - attribute: Attack
+    condition:
+      - Reduces Enemy
+    class: Ranged Troops
+    value:
+      number: 30
+      unit: percentage
+  - attribute: Attack
+    condition:
+      - Reduces Enemy
+    class: Siege Machines
+    value:
+      number: 20
+      unit: percentage
