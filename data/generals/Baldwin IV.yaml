@@ -1,0 +1,26 @@
+ascending: true
+basic_attributes:
+  attack:
+    base: 108
+    increment: 8.67
+  defense:
+    base: 115
+    increment: 9.14
+  leadership:
+    base: 112
+    increment: 8.73
+  politics:
+    base: 108
+    increment: 8.63
+book: Surprise Attack
+display: summary
+specialities:
+  - Mounted Troop Assault
+  - Snipe
+  - Mounted Troop Ares
+  - Battle of Montgisard
+stars: red5
+type:
+  - mayor
+general: Baldwin IV
+name: Baldwin IV
