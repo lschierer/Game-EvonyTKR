@@ -1,8 +1,8 @@
 
 <link rel="stylesheet" href="/css/GeneralPairsIndex.css" />
 <script  type="module" >
-  import "/js/Generals/Pairs/typeIndex.js";
+  import "/js/Generals/GeneralTable.js";
 </script>
 
 
-  <pairs-table></pairs-table>
+  <general-table mode='pair' generaltype="<%= $generalType %>" typeheader="<%= $linkTarget %>"></general-table>

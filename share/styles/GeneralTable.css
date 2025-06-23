@@ -1,6 +1,31 @@
 /* Styles for the General Pairs table */
 
-@import url('@spectrum-css/table/dist/index.css');
+@import url('@spectrum-css/table/index.css');
+@import url('@spectrum-css/overlay/index.css');
+
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--spectrum-overlay-background-color); /* token */
+  pointer-events: none;
+}
+
+.spectrum-Overlay-content {
+  background-color: var(--spectrum-global-color-gray-50); /* surface overlay */
+  padding: var(--spectrum-global-dimension-size-200)
+    var(--spectrum-global-dimension-size-400);
+  border-radius: var(--spectrum-alias-border-radius-medium);
+  color: var(--spectrum-global-color-gray-900);
+  font-weight: var(--spectrum-global-font-weight-bold);
+  pointer-events: auto;
+}
 
 /* Add cursor pointer to sortable headers */
 .spectrum-Table-headCell.is-sortable {

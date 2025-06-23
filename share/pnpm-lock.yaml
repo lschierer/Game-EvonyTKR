@@ -20,6 +20,9 @@ importers:
       '@spectrum-css/link':
         specifier: ^7.1.0
         version: 7.1.0(@spectrum-css/tokens@16.0.2)
+      '@spectrum-css/overlay':
+        specifier: ^4.0.2
+        version: 4.0.2
       '@spectrum-css/table':
         specifier: ^8.1.0
         version: 8.1.0(@spectrum-css/button@14.1.6(@spectrum-css/icon@9.1.0(@spectrum-css/tokens@16.0.2))(@spectrum-css/tokens@16.0.2))(@spectrum-css/icon@9.1.0(@spectrum-css/tokens@16.0.2))(@spectrum-css/tokens@16.0.2)
@@ -629,6 +632,9 @@ packages:
     peerDependenciesMeta:
       '@spectrum-css/tokens':
         optional: true
+
+  '@spectrum-css/overlay@4.0.2':
+    resolution: {integrity: sha512-1GyU1E36L2h/WpCOYpoLw6OA15apk9HLlFNNsVJHROpWT5SLzbXlOSnWSLkqEW5pf2q0nJo1eca6GLUEoaw8gQ==}
 
   '@spectrum-css/table@8.1.0':
     resolution: {integrity: sha512-cEe0gW/2f28usWsG02iG5dzfKgTBucoVzOYPCN7t3Pmi/o0ohl4+ElLjfRl+hwWM2yNoIyDyQ7c4JcdTr9Nbew==}
@@ -2361,6 +2367,8 @@ snapshots:
   '@spectrum-css/link@7.1.0(@spectrum-css/tokens@16.0.2)':
     optionalDependencies:
       '@spectrum-css/tokens': 16.0.2
+
+  '@spectrum-css/overlay@4.0.2': {}
 
   '@spectrum-css/table@8.1.0(@spectrum-css/button@14.1.6(@spectrum-css/icon@9.1.0(@spectrum-css/tokens@16.0.2))(@spectrum-css/tokens@16.0.2))(@spectrum-css/icon@9.1.0(@spectrum-css/tokens@16.0.2))(@spectrum-css/tokens@16.0.2)':
     optionalDependencies:

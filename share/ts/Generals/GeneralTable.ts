@@ -1,14 +1,15 @@
+// This component supports both single-general and general-pair modes.
+// It progressively loads full data row-by-row from the appropriate endpoint.
+
 import 'iconify-icon';
-import { customElement, state, property } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 import {
   html,
-  LitElement,
   type CSSResultGroup,
+  LitElement,
   type PropertyValues,
 } from 'lit';
 import { repeat } from 'lit/directives/repeat.js';
-//import { styleMap } from 'lit/directives/style-map.js';
-import { type Ref, createRef, ref } from 'lit/directives/ref.js';
 
 import {
   getCoreRowModel,
@@ -22,27 +23,20 @@ import {
 } from '@tanstack/lit-table';
 
 import * as z from 'zod';
-
-// Import CSS
 import SpectrumTokensCSS from '@spectrum-css/tokens/dist/index.css' with { type: 'css' };
-import GeneralDatasIndexCSS from '../css/GeneralTable.css' with { type: 'css' };
+import GeneralTableCSS from '../css/GeneralTable.css' with { type: 'css' };
 
 // Zod Schemas
-export const Attack = z.object({
-  base: z.number(),
-  increment: z.number(),
+const BasicAttribute = z.object({ base: z.number(), increment: z.number() });
+type BasicAttribute = z.infer<typeof BasicAttribute>;
+const BasicAttributes = z.object({
+  attack: BasicAttribute,
+  defense: BasicAttribute,
+  leadership: BasicAttribute,
+  politics: BasicAttribute,
 });
-export type Attack = z.infer<typeof Attack>;
 
-export const BasicAttributes = z.object({
-  attack: Attack,
-  defense: Attack,
-  leadership: Attack,
-  politics: Attack,
-});
-export type BasicAttributes = z.infer<typeof BasicAttributes>;
-
-export const General = z.object({
+const General = z.object({
   ascending: z.boolean(),
   basicAttributes: BasicAttributes,
   builtInBookName: z.string(),
@@ -51,17 +45,27 @@ export const General = z.object({
   specialityNames: z.array(z.string()),
   type: z.array(z.string()),
 });
-export type General = z.infer<typeof General>;
+type General = z.infer<typeof General>;
 
-export const GeneralData = z.object({
+const PairBuffs = z.object({
   primary: General,
+  secondary: General,
+});
+type PairBuffs = z.infer<typeof PairBuffs>;
+
+const SingleBuffs = z.object({
+  primary: General,
+});
+type SingleBuffs = z.infer<typeof SingleBuffs>;
+
+const BuffFields = z.object({
+  marchbuff: z.number(),
   attackbuff: z.number(),
   defensebuff: z.number(),
+  hpbuff: z.number(),
   groundattackdebuff: z.number(),
   grounddefensedebuff: z.number(),
   groundhpdebuff: z.number(),
-  hpbuff: z.number(),
-  marchbuff: z.number(),
   mountedattackdebuff: z.number(),
   mounteddefensedebuff: z.number(),
   mountedhpdebuff: z.number(),
@@ -72,10 +76,12 @@ export const GeneralData = z.object({
   siegedefensedebuff: z.number(),
   siegehpdebuff: z.number(),
 });
-export type GeneralData = z.infer<typeof GeneralData>;
+type BuffFields = z.infer<typeof BuffFields>;
 
-const RowData = z.union([GeneralData, z.null()]);
-type RowData = z.infer<typeof RowData>;
+const GeneralData = SingleBuffs.merge(BuffFields);
+const GeneralPair = PairBuffs.merge(BuffFields);
+type GeneralData = z.infer<typeof GeneralData>;
+type GeneralPair = z.infer<typeof GeneralPair>;
 
 const GeneralDataStub = z.object({
   primary: z.object({ name: z.string() }),
@@ -83,9 +89,21 @@ const GeneralDataStub = z.object({
 });
 type GeneralDataStub = z.infer<typeof GeneralDataStub>;
 
-// Columns
+const GeneralPairStub = z.object({
+  primary: z.object({ name: z.string() }),
+  secondary: z.object({ name: z.string() }),
+  current: z.enum(['stale', 'pending', 'current']).optional(),
+});
+type GeneralPairStub = z.infer<typeof GeneralPairStub>;
+
+const RowData = z.union([GeneralData, GeneralPair]);
+type RowData = z.infer<typeof RowData>;
+const RowStub = z.union([GeneralDataStub, GeneralPairStub]);
+type RowStub = z.infer<typeof RowStub>;
+
 const tableHeaders = new Map<string, string>([
   ['primary', 'Primary'],
+  ['secondary', 'Secondary'],
   ['marchbuff', 'March Size'],
   ['attackbuff', 'Attack'],
   ['defensebuff', 'Defense'],
@@ -104,91 +122,46 @@ const tableHeaders = new Map<string, string>([
   ['siegehpdebuff', 'Siege HP Debuff'],
 ]);
 
-// Main Component
 @customElement('general-table')
-export default class GeneralTable extends LitElement {
-  @property({ type: String })
-  public generalType: string = '';
+export class GeneralTable extends LitElement {
+  @property({ type: String }) generalType = '';
+  @property({ type: String }) typeHeader = '';
+  @property({ type: String }) mode: 'pair' | 'single' = 'single';
 
-  @property({ type: String })
-  public typeHeader: string = '';
+  @state() private _sorting: SortingState = [];
+  @state() private columns: ColumnDef<RowData>[] = [];
+  @state() private nameList: RowStub[] = [];
 
-  @state()
-  private _sorting: SortingState = [];
-
-  private tableData = new Array<RowData>();
-  private GeneralDatas = new Map<number, GeneralData>();
-
-  @state() private nameList: GeneralDataStub[] = new Array<GeneralDataStub>();
-
-  private scrollElementRef: Ref<HTMLDivElement> = createRef();
-  private _bgFetchTimer?: number; //purposefully not reactive.
-
+  private dataMap = new Map<number, RowData>();
+  private tableData: RowData[] = [];
+  private _bgFetchTimer?: number;
   private tableController = new TableController<RowData>(this);
 
-  static styles?: CSSResultGroup = [SpectrumTokensCSS, GeneralDatasIndexCSS];
+  static styles: CSSResultGroup = [SpectrumTokensCSS, GeneralTableCSS];
 
-  @state()
-  private columns: ColumnDef<RowData>[] = new Array<ColumnDef<RowData>>();
-
-  protected async firstUpdated(_changedProperties: PropertyValues) {
-    super.firstUpdated(_changedProperties);
-    console.log(
-      `firstUpdated start with keys ${Array.from(_changedProperties.keys()).join(', ')}`,
-    );
-
+  override async firstUpdated(_changed: PropertyValues) {
     this.columns = this.generateColumns();
     const stubData = await this.fetchStubPairs();
-    this.nameList = [...stubData]; // ensure lit notices
-
-    this.requestUpdate();
+    this.nameList = [...stubData];
     this.startBackgroundFetch();
   }
 
-  protected columnVisibilityRules: Record<
-    string,
-    { allow: (key: string) => boolean }
-  > = {
-    mayor: {
-      allow: (key) => key === 'primary' || key.endsWith('debuff'),
-    },
-    // Future rule: wall generals
-    wall_general: {
-      allow: (key) =>
-        ['primary', 'attackbuff', 'defensebuff', 'hpbuff'].includes(key),
-    },
-  };
-
-  private generateColumns() {
-    const typeKey = this.generalType?.toLowerCase?.() ?? '';
-    console.log(
-      `Resolved typeKey: '${typeKey}' from generalType: '${this.generalType}'`,
-    );
-
-    const rules = this.columnVisibilityRules[typeKey];
-    if (!rules) {
-      console.warn(
-        `No column visibility rules defined for type '${typeKey}', using defaults.`,
-      );
-    }
-
+  private generateColumns(): ColumnDef<RowData>[] {
     return Array.from(tableHeaders.keys())
-      .filter((key) => (rules ? rules.allow(key) : true))
+      .filter((key) => this.mode === 'pair' || key !== 'secondary')
       .map((key) => {
+        const accessorFn = (row: RowData) => {
+          if (!row) return null;
+          if (key === 'primary') return (row as any).primary?.name;
+          if (key === 'secondary') return (row as any).secondary?.name;
+          return (row as any)[key];
+        };
+
         return {
           id: key,
-          accessorFn:
-            key === 'primary'
-              ? (row: RowData) =>
-                  row && typeof row === 'object' && 'primary' in row
-                    ? row.primary.name
-                    : ''
-              : (row: RowData) =>
-                  row && typeof row === 'object'
-                    ? (row as GeneralData)[key as keyof GeneralData]
-                    : null,
+          accessorFn,
           enableSorting: true,
-          sortDescFirst: key !== 'primary',
+          sortDescFirst: key !== 'primary' && key !== 'secondary',
           cell: (info: CellContext<RowData, unknown>) => {
             const value = info.getValue();
             return typeof value === 'number'
@@ -199,29 +172,25 @@ export default class GeneralTable extends LitElement {
             const sortIndex = info.table
               .getState()
               .sorting.findIndex((s) => s.id === info.column.id);
-
             const direction = info.column.getIsSorted();
             const showArrow =
               direction === 'asc' ? '🔼' : direction === 'desc' ? '🔽' : '';
-
             return html`<div
               class="table-header-sort"
               @click=${info.column.getToggleSortingHandler()}
             >
-              ${info.column.id === 'primary'
+              ${key === 'primary' && this.mode === 'single'
                 ? this.typeHeader
-                : (tableHeaders.get(info.column.id) ?? info.column.id)}
+                : (tableHeaders.get(key) ?? key)}
               ${direction
-                ? html`
-                    <span class="table-header-sort">
-                      <span>${showArrow}</span>
-                      ${sortIndex > -1
-                        ? html`<span class="table-header-sort-index">
-                            ${sortIndex + 1}
-                          </span>`
-                        : null}
-                    </span>
-                  `
+                ? html`<span class="table-header-sort">
+                    <span>${showArrow}</span>
+                    ${sortIndex > -1
+                      ? html`<span class="table-header-sort-index"
+                          >${sortIndex + 1}</span
+                        >`
+                      : null}
+                  </span>`
                 : null}
             </div>`;
           },
@@ -229,205 +198,171 @@ export default class GeneralTable extends LitElement {
       });
   }
 
-  protected override willUpdate(_changedProperties: PropertyValues) {
-    super.willUpdate(_changedProperties);
-    console.log(
-      `willUpdate has keys ${Array.from(_changedProperties.keys()).join(', ')}`,
-    );
-    if (
-      _changedProperties.has('generalType') ||
-      _changedProperties.has('typeHeader')
-    ) {
-      this.columns = this.generateColumns();
-    }
-  }
-
-  updated(_changedProperties: PropertyValues) {
-    super.updated(_changedProperties);
-    console.log(
-      `updated changed has keys ${Array.from(_changedProperties.keys()).join(', ')}`,
-    );
-  }
-
-  private async fetchStubPairs(): Promise<GeneralDataStub[]> {
+  private async fetchStubPairs(): Promise<RowStub[]> {
     const url = window.location.pathname.replace(/\/$/, '') + '/data.json';
     const res = await fetch(url);
     const json = await res.json();
-    console.log('json =', json);
-    const valid = GeneralDataStub.array().safeParse(json);
-    if (valid.success) {
-      console.log('parsed GeneralDataStub:', valid.data);
-      return valid.data;
-    }
-    console.error('Zod validation failed', valid.error);
+    const result =
+      this.mode === 'pair'
+        ? GeneralPairStub.array().safeParse(json.data)
+        : GeneralDataStub.array().safeParse(json);
+    if (result.success) return result.data;
+    console.error('Stub validation failed', result.error);
     return [];
   }
 
-  private async fetchPair(stub: GeneralDataStub): Promise<GeneralData> {
+  private async fetchRow(index: number): Promise<RowData> {
+    this.nameList[index].current = 'pending';
+    const stub = this.nameList[index];
+
     const basePath = window.location.pathname.replace(/\/comparison\/?$/, '');
-    const parts = basePath.split('/');
-    const lastPart = parts.pop() ?? '';
+    if (this.mode === 'pair') {
+      const pairStub = stub as GeneralPairStub;
+      const url = `${basePath}pair?primary=${encodeURIComponent(pairStub.primary.name)}&secondary=${encodeURIComponent(pairStub.secondary.name)}`;
+      const res = await fetch(url);
+      const json = await res.json();
+      const parsed = GeneralPair.safeParse(json);
+      if (parsed.success) return parsed.data;
+      throw new Error(parsed.error.message);
+    } else {
+      const parts = basePath.split('/');
+      const lastPart = parts.pop() ?? '';
+      const normalizedType =
+        lastPart === 'Mayors'
+          ? 'Mayor Specialist'
+          : lastPart.replace(/s$/, '') + ' Specialist';
+      const newBasePath = [...parts, normalizedType].join('/');
 
-    // Convert plural to singular and add " Specialist"
-    const normalizedType =
-      lastPart === 'Mayors'
-        ? 'Mayor Specialist'
-        : lastPart.replace(/s$/, '') + ' Specialist';
-
-    const newBasePath = [...parts, normalizedType].join('/');
-    const pairBuffUrl = `${newBasePath}/primary/${encodeURIComponent(stub.primary.name)}`;
-    console.log(`fetchPair requesting url ${pairBuffUrl}`);
-    const result = await fetch(pairBuffUrl)
-      .then((res) => {
-        if (!res.ok)
-          throw new Error(
-            `Failed to fetch buffs for pair ${stub.primary.name}`,
-          );
-        return res.json();
-      })
-      .then((data) => {
-        const valid = GeneralData.safeParse(data);
-        if (valid.success) {
-          return valid.data;
-        } else {
-          console.error(valid.error.message);
-          throw new Error(valid.error.message);
-        }
-      });
-    return result;
+      const url = `${newBasePath}/primary/${encodeURIComponent(stub.primary.name)}`;
+      const res = await fetch(url);
+      const json = await res.json();
+      const parsed = GeneralData.safeParse(json);
+      if (parsed.success) return parsed.data;
+      throw new Error(parsed.error.message);
+    }
   }
 
   private startBackgroundFetch() {
     if (this._bgFetchTimer) return;
 
     const loadNext = () => {
-      const nextIndex = this.nameList.findIndex((stub) => {
-        if (stub.current === undefined || stub.current === 'stale') {
-          return true;
-        }
-        return false;
-      });
+      const nextIndex = this.nameList.findIndex(
+        (stub) => stub.current !== 'current',
+      );
       if (nextIndex === -1) {
         this._bgFetchTimer = undefined;
+        console.log(
+          `nextIndex is -1, namelist has ${this.nameList.length} and tableData has ${this.tableData.length}`,
+        );
+        this.requestUpdate();
         return;
       }
-      this.nameList[nextIndex].current = 'pending';
-      this.updatePair_at_index(nextIndex);
-      this._bgFetchTimer = window.setTimeout(loadNext, 100); // 10 rows per second
+      if (
+        !this.nameList[nextIndex].current ||
+        (this.nameList[nextIndex].current !== 'current' &&
+          this.nameList[nextIndex].current !== 'pending')
+      ) {
+        this.nameList[nextIndex].current = 'pending';
+        this.fetchRow(nextIndex)
+          .then((full) => {
+            this.nameList[nextIndex].current = 'current';
+            this.dataMap.set(nextIndex, full);
+            this.tableData = this.nameList
+              .map((_, i) => this.dataMap.get(i))
+              .filter(Boolean) as RowData[];
+            this.requestUpdate();
+          })
+          .catch((e) => {
+            console.error('Fetch failed at index', nextIndex, e);
+            this.nameList[nextIndex].current = 'stale';
+          });
+      }
+
+      this._bgFetchTimer = window.setTimeout(loadNext, 50);
     };
 
     loadNext();
   }
 
-  protected updatePair_at_index(nextIndex: number) {
-    this.fetchPair(this.nameList[nextIndex])
-      .then((pair) => {
-        this.nameList[nextIndex].current = 'current';
-        this.GeneralDatas.set(nextIndex, pair);
-        this.tableData = Array.from(this.GeneralDatas.values());
-
+  override render() {
+    const table = this.tableController.table({
+      columns: this.columns,
+      data: this.tableData,
+      state: { sorting: this._sorting },
+      onSortingChange: (updaterOrValue) => {
+        this._sorting =
+          typeof updaterOrValue === 'function'
+            ? updaterOrValue(this._sorting)
+            : updaterOrValue;
         this.requestUpdate();
-      })
-      .catch((err) => {
-        console.error(`Failed to fetch pair at index ${nextIndex}:`, err);
-      });
-  }
+      },
+      getSortedRowModel: getSortedRowModel(),
+      getCoreRowModel: getCoreRowModel(),
+    });
 
-  // Called when form inputs change
-  protected async handleFormUpdate(newParams: unknown) {
-    console.log(`handleFormUpdate called with ${JSON.stringify(newParams)}`);
-    this.nameList.map((stub) => (stub.current = 'stale'));
-    this.nameList = [...this.nameList]; // trigger a reactive update;
-
-    this.requestUpdate();
-    this.startBackgroundFetch(); // start the background pair update;
-  }
-
-  protected render() {
-    console.log(`render start with ${this.tableData.length}`);
-
-    let returnable = html``;
-
-    if (!this.tableData.length)
-      returnable = html`${returnable}<span>Loading...</span>`;
-    else {
-      console.log(`render has ${this.tableData.length} items`);
-
-      // Step 3: create the table
-      const table = this.tableController.table({
-        columns: this.columns,
-        data: this.tableData,
-        state: { sorting: this._sorting },
-        onSortingChange: (updaterOrValue) => {
-          this._sorting =
-            typeof updaterOrValue === 'function'
-              ? updaterOrValue(this._sorting)
-              : updaterOrValue;
-          this.requestUpdate();
-        },
-        getSortedRowModel: getSortedRowModel(),
-        getCoreRowModel: getCoreRowModel(),
-      });
-
-      returnable = html`${returnable}
-        <div
-          class="general-pairs-table spectrum-Table spectrum-Table-scroller spectrum-Table--sizeM"
-        >
-          <table class="spectrum-Table-main">
-            <thead class="spectrum-Table-head">
-              ${repeat(
-                table.getHeaderGroups(),
-                (hg) => hg.id,
-                (hg) =>
-                  html`<tr>
-                    ${repeat(
-                      hg.headers,
-                      (h) => h.id,
-                      (h) =>
-                        html`<th
-                          colspan=${h.colSpan}
-                          class="spectrum-Table-headCell is-sortable"
-                        >
-                          ${h.isPlaceholder
-                            ? null
-                            : html`<div
-                                @click=${h.column.getToggleSortingHandler()}
-                              >
-                                ${flexRender(
-                                  h.column.columnDef.header,
-                                  h.getContext(),
-                                )}
-                              </div>`}
-                        </th>`,
-                    )}
-                  </tr>`,
-              )}
-            </thead>
-            <tbody class="spectrum-Table-body" ${ref(this.scrollElementRef)}>
-              ${repeat(
-                table.getRowModel().rows,
-                (row) => row.id,
-                (row) => html`
-                  <tr class="spectrum-Table-row">
-                    ${repeat(
-                      row.getVisibleCells(),
-                      (cell) => cell.id,
-                      (cell) =>
-                        html`<td class="spectrum-Table-cell">
-                          ${flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext(),
-                          )}
-                        </td>`,
-                    )}
-                  </tr>
-                `,
-              )}
-            </tbody>
-          </table>
-        </div> `;
-    }
-
-    return returnable;
+    return html`
+      ${this.tableData.length !== this.nameList.length
+        ? html` <div class="spectrum-Overlay is-open loading-overlay">
+            <div class="spectrum-Overlay-wrapper">
+              <div class="spectrum-Overlay-content">Loading data...</div>
+            </div>
+          </div>`
+        : ''}
+      <div
+        class="general-pairs-table spectrum-Table spectrum-Table-scroller spectrum-Table--sizeM"
+      >
+        <table class="spectrum-Table-main">
+          <thead class="spectrum-Table-head">
+            ${repeat(
+              table.getHeaderGroups(),
+              (hg) => hg.id,
+              (hg) =>
+                html`<tr>
+                  ${repeat(
+                    hg.headers,
+                    (h) => h.id,
+                    (h) =>
+                      html`<th
+                        colspan=${h.colSpan}
+                        class="spectrum-Table-headCell is-sortable"
+                      >
+                        ${h.isPlaceholder
+                          ? null
+                          : html`<div
+                              @click=${h.column.getToggleSortingHandler()}
+                            >
+                              ${flexRender(
+                                h.column.columnDef.header,
+                                h.getContext(),
+                              )}
+                            </div>`}
+                      </th>`,
+                  )}
+                </tr>`,
+            )}
+          </thead>
+          <tbody class="spectrum-Table-body">
+            ${repeat(
+              table.getRowModel().rows,
+              (row) => row.id,
+              (row) =>
+                html`<tr class="spectrum-Table-row">
+                  ${repeat(
+                    row.getVisibleCells(),
+                    (cell) => cell.id,
+                    (cell) =>
+                      html`<td class="spectrum-Table-cell">
+                        ${flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext(),
+                        )}
+                      </td>`,
+                  )}
+                </tr>`,
+            )}
+          </tbody>
+        </table>
+      </div>
+    `;
   }
 }

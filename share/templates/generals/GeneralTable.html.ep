@@ -5,4 +5,4 @@
 </script>
 
 
-  <general-table generaltype="<%= $generalType %>" typeheader="<%= $linkTarget %>"></general-table>
+  <general-table mode='single' generaltype="<%= $generalType %>" typeheader="<%= $linkTarget %>"></general-table>

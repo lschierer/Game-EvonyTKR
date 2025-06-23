@@ -41,6 +41,7 @@
     "@spectrum-css/button": "^14.1.6",
     "@spectrum-css/icon": "^9.1.0",
     "@spectrum-css/link": "^7.1.0",
+    "@spectrum-css/overlay": "^4.0.2",
     "@spectrum-css/table": "^8.1.0",
     "@spectrum-css/tokens": "^16.0.2",
     "@spectrum-css/typography": "^8.1.0",
