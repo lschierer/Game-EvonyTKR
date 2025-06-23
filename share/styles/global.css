@@ -1,8 +1,10 @@
 /* the props */
 @import url('@spectrum-css/tokens/dist/css/index.css');
-@import url('@spectrum-css/typography/dist/index.css');
-@import url('@spectrum-css/icon/dist/index.css');
-@import url('@spectrum-css/link/dist/index.css');
+@import url('@spectrum-css/typography/index.css');
+@import url('@spectrum-css/icon/index.css');
+@import url('@spectrum-css/link/index.css');
+@import url('@spectrum-css/sidenav/index.css');
+@import url('@spectrum-css/splitview/index.css');
 
 :root {
   --brand: var(--spectrum-cyan-800);
@@ -33,8 +35,23 @@
   --size-13: 15rem;
   --size-14: 20rem;
   --size-15: 30rem;
+
+  /* customize the spectrum-css tokens */
   --mod-button-background-color-default: var(--text-1);
   --mod-button-content-color-default: var(--text-2);
+  --mod-body-font-color: var(--text-1);
+  --mod-heading-font-color: var(--text-1);
+  --mod-splitview-background-color: var(--surface-1);
+  --mod-table-header-background-color-scrollable: var(--text-1);
+  --mod-table-header-background-color: var(--text-1);
+  /* stylelint-disable-next-line custom-property-pattern */
+  --mod-table-header-background-color--quiet: var(--text-1);
+  --mod-table-header-text-color: var(--text-2);
+  /* stylelint-disable-next-line custom-property-pattern */
+  --mod-table-row-background-color--quiet: var(--surface-1);
+  --mod-table-row-background-color-hover: var(--surface-3);
+  --mod-table-row-background-color: var(--surface-1);
+  --mod-table-row-text-color: var(--text-1);
 }
 
 html,
@@ -44,19 +61,24 @@ body {
   accent-color: var(--link);
 }
 
-h1,
-h2,
-h3,
-h4,
-p,
-dt,
-span {
-  color: var(--text-1);
-}
-
 h5,
 h6,
 small,
 dd {
   color: var(--text-2);
+}
+
+div.spectrum-SplitView {
+  max-height: 90vh;
+  overflow: hidden auto; /* Changed from overflow: scroll */ /* Hide horizontal scrollbar completely */
+}
+
+div#nav {
+  max-width: 20vw;
+  flex: 1;
+}
+
+div#main {
+  width: 80vw;
+  min-height: 100%;
 }

@@ -1,0 +1,29 @@
+/* Speciality level colors */
+
+.level-green {
+  color: var(--spectrum-semantic-positive-color-default);
+}
+
+.level-blue {
+  color: var(--spectrum-semantic-informative-color-default);
+}
+
+.level-purple {
+  color: var(--spectrum-semantic-notice-color-default);
+}
+
+.level-orange {
+  color: var(--spectrum-semantic-notice-color-dark);
+}
+
+.level-gold {
+  color: var(--spectrum-semantic-notice-color-light);
+}
+
+.speciality-level {
+  margin-bottom: 2rem;
+}
+
+.speciality-info {
+  margin-bottom: 2rem;
+}

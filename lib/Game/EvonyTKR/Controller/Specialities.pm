@@ -5,8 +5,8 @@ use File::FindLib 'lib';
 require Game::EvonyTKR::Model::Speciality::Manager;
 use namespace::clean;
 
-package Game::EvonyTKR::Plugins::Specialities {
-  use Mojo::Base 'Game::EvonyTKR::Plugins::CollectionBase';
+package Game::EvonyTKR::Controller::Specialities {
+  use Mojo::Base 'Game::EvonyTKR::Controller::CollectionBase';
 
   # Specify which collection this controller handles
   sub collection_name {'specialities'}

@@ -5,8 +5,9 @@ use File::FindLib 'lib';
 require YAML::PP;
 require Game::EvonyTKR::Model::Logger;
 require Game::EvonyTKR::Logger::Config;
-require Game::EvonyTKR::Plugins::ControllerBase;
-require Game::EvonyTKR::Plugins::CollectionBase;
+require Game::EvonyTKR::Controller::Root;
+require Game::EvonyTKR::Controller::ControllerBase;
+require Game::EvonyTKR::Controller::CollectionBase;
 require Game::EvonyTKR::Model::EvonyTKR::Manager;
 
 use namespace::clean;
@@ -92,18 +93,19 @@ package Game::EvonyTKR {
     );
     # Set namespaces
     push @{ $self->routes->namespaces },  'Game::EvonyTKR::Controller';
-    push @{ $self->routes->namespaces },  'Game::EvonyTKR::Plugins';
     push @{ $self->plugins->namespaces }, 'Game::EvonyTKR::Plugins';
-    push @{ $self->preload_namespaces },  'Game::EvonyTKR::Plugins';
-
-    # Root route
-    $self->routes->any("/")->to('Root#index');
+    push @{ $self->plugins->namespaces }, 'Game::EvonyTKR::Controller';
+    push @{ $self->preload_namespaces },  'Game::EvonyTKR::Controller';
 
     $self->plugin(
       'Module::Loader' => {
-        plugin_namespaces => ['Game::EvonyTKR::Plugins']
+        plugin_namespaces => ['Game::EvonyTKR::Controller']
       }
     );
+
+    # Register infrastructure plugins in specific order
+    $self->plugin('Game::EvonyTKR::Plugins::Navigation');
+    $self->plugin('Game::EvonyTKR::Plugins::StaticPages');  # Register last for lowest priority
 
   }
 };

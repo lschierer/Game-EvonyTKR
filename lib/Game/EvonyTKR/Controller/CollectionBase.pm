@@ -6,8 +6,8 @@ require Data::Printer;
 require Role::Tiny;
 use namespace::clean;
 
-package Game::EvonyTKR::Plugins::CollectionBase {
-  use Mojo::Base 'Game::EvonyTKR::Plugins::ControllerBase';
+package Game::EvonyTKR::Controller::CollectionBase {
+  use Mojo::Base 'Game::EvonyTKR::Controller::ControllerBase';
 
   use Mojo::File::Share qw(dist_dir);
   require Path::Tiny;

@@ -309,7 +309,7 @@ export class GeneralTable extends LitElement {
           </div>`
         : ''}
       <div
-        class="general-pairs-table spectrum-Table spectrum-Table-scroller spectrum-Table--sizeM"
+        class="general-pairs-table spectrum-Table spectrum-Table-scroller spectrum-Table--quiet spectrum-Table--sizeM"
       >
         <table class="spectrum-Table-main">
           <thead class="spectrum-Table-head">

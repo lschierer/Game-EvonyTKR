@@ -1,103 +1,97 @@
+% layout 'default';
+% title 'General Details: ' . $item->name;
+
+<link rel="stylesheet" href="/css/collectionDetails.css" />
 <% use Scalar::Util qw(reftype); %>
-<div class="general">
+<div class="general-details">
   <% if( $item && reftype $item eq 'OBJECT' && $item->isa('Game::EvonyTKR::Model::General')) { %>
-    <h2 >Details for <%= $item->name %></h2>
+    <h2 class="spectrum-Heading spectrum-Heading--sizeXL">Details for <%= $item->name %></h2>
     <div class="basicInfo">
       <div class="baseStats">
-        <h4 >
-          Base Stats
-        </h4>
-        <ul class="baseStats">
-          <li>
-            <span >Leadership:</span>
-            <ul>
-              <li>
-                <span >Base: </span>
-                <span class=" leadership-base"><%= $item->basicAttributes->leadership->base %></span>
-              </li>
-              <li>
-                <span >Increment: </span>
-                <span class=" leadership-increment"><%= $item->basicAttributes->leadership->increment %></span>
-              </li>
-            </ul>
-          </li>
-          <li>
-            <span >Attack:</span>
-            <ul>
-              <li>
-                <span >Base: </span>
-                <span class="attack-base"><%= $item->basicAttributes->attack->base %></span>
-              </li>
-              <li>
-                <span >Increment: </span>
-                <span class="attack-increment"><%= $item->basicAttributes->attack->increment  %></span>
-              </li>
-            </ul>
-          </li>
-          <li>
-            <span class="">Defense:</span>
-            <ul>
-              <li>
-                <span >Base: </span>
-                <span class="defense-base"><%= $item->basicAttributes->defense->base %></span>
-              </li>
-              <li>
-                <span >Increment: </span>
-                <span class="defense-increment"><%= $item->basicAttributes->defense->increment  %></span>
-              </li>
-            </ul>
-          </li>
-          <li>
-            <span class="">Politics:</span>
-            <ul>
-              <li>
-                <span >Base: </span>
-                <span class="politics-base"><%= $item->basicAttributes->politics->base %></span>
-              </li>
-              <li>
-                <span >Increment: </span>
-                <span class="politics-increment"><%= $item->basicAttributes->politics->increment  %></span>
-              </li>
-            </ul>
-          </li>
-        </ul>
+        <h3 class="spectrum-Heading spectrum-Heading--sizeL">Basic Attributes</h3>
+        <table class="spectrum-Table spectrum-Table--sizeM spectrum-Table--quiet">
+          <thead class="spectrum-Table-head">
+            <tr>
+              <th class="spectrum-Table-headCell">Attribute</th>
+              <th class="spectrum-Table-headCell">Base</th>
+              <th class="spectrum-Table-headCell">Increment</th>
+            </tr>
+          </thead>
+          <tbody class="spectrum-Table-body">
+            <tr class="spectrum-Table-row">
+              <td class="spectrum-Table-cell"><strong class="spectrum-Body-strong">Attack</strong></td>
+              <td class="spectrum-Table-cell"><%= $item->basicAttributes->attack->base %></td>
+              <td class="spectrum-Table-cell"><%= $item->basicAttributes->attack->increment %></td>
+            </tr>
+            <tr class="spectrum-Table-row">
+              <td class="spectrum-Table-cell"><strong class="spectrum-Body-strong">Defense</strong></td>
+              <td class="spectrum-Table-cell"><%= $item->basicAttributes->defense->base %></td>
+              <td class="spectrum-Table-cell"><%= $item->basicAttributes->defense->increment %></td>
+            </tr>
+            <tr class="spectrum-Table-row">
+              <td class="spectrum-Table-cell"><strong class="spectrum-Body-strong">Leadership</strong></td>
+              <td class="spectrum-Table-cell"><%= $item->basicAttributes->leadership->base %></td>
+              <td class="spectrum-Table-cell"><%= $item->basicAttributes->leadership->increment %></td>
+            </tr>
+            <tr class="spectrum-Table-row">
+              <td class="spectrum-Table-cell"><strong class="spectrum-Body-strong">Politics</strong></td>
+              <td class="spectrum-Table-cell"><%= $item->basicAttributes->politics->base %></td>
+              <td class="spectrum-Table-cell"><%= $item->basicAttributes->politics->increment %></td>
+            </tr>
+          </tbody>
+        </table>
       </div>
       <div class="ExtraBaseInfo">
-        <h4 class="">
-          Basic Information
-        </h4>
+        <h3 class="spectrum-Heading spectrum-Heading--sizeL">
+           Basic Information
+        </h3>
         <ul class="baseInfo">
-          <li>
-            <span class="">Type: </span>
-
-              <ul>
-                <% foreach my $type_item (@{ $item->type }) { %>
-                  <li><%= $type_item %></li>
-                <% } %>
-              </ul>
+          <li class="spectrum-Body spectrum-Body--sizeS">
+            <strong class="spectrum-Body-strong">Type: </strong>
+            <% if (ref $item->type eq 'ARRAY') { %>
+              <% my $lastIndex = $#{$item->type}; %>
+              <% for my $i (0..$lastIndex) { %>
+                <% my $type = $item->type->[$i]; %>
+                <% my $formattedType = $type =~ s/_/ /gr; %>
+                <% $formattedType =~ s/(\w)(\w+)( specialist)?/\U$1\L$2 \US\Lpecialist/; %>
+                <%= $formattedType %><%= $i == $lastIndex ? '' : ', ' %>
+              <% } %>
+            <% } else { %>
+              <% my $formattedType = $item->type =~ s/_/ /gr; %>
+              <% $formattedType =~ s/(\w)(\w+)( specialist)?/\U$1\L$2 \US\Lpecialist/; %>
+              <%= $formattedType %>
+            <% } %>
           </li>
-          <li>
-            <span class="">Ascendable: </span>
+          <li class="spectrum-Body spectrum-Body--sizeS">
+            <strong class="spectrum-Body-strong">Ascendable: </strong>
             <span class="ascending-value"><%= $item->ascending ? "True" : "False" %></span>
           </li>
         </ul>
       </div>
     </div>
     <div class="specialskill">
-      <h4><%= $item->name %>'s Special Skill</h4>
-      <h5><%= $item->builtInBookName %></h5>
+      <h3 class="spectrum-Heading spectrum-Heading--sizeL">
+        <%= $item->name %>'s Special Skill
+      </h3>
+      <h4 class="spectrum-Heading spectrum-Heading--sizeM">
+        <%= $item->builtInBookName %>
+      </h4>
       <%= get_builtin_book_text($item->builtInBookName) %>
       <% if($item->ascending) { %>
-        <h5><%= $item->name %>'s Ascension Buffs</h5>
+        <h4 class="spectrum-Heading spectrum-Heading--sizeM">
+          <%= $item->name %>'s Ascension Buffs
+        </h4>
         <%= get_ascending_section($item->name) %>
       <% } %>
     </div>
     <div class="specialities">
-      <h4><%= $item->name %>'s Specialities</h4>
+      <h3 class="spectrum-Heading spectrum-Heading--sizeL">
+        <%= $item->name %>'s Specialities
+      </h3>
       <ol>
         <% foreach my $specialityName ( @{ $item->specialityNames } ) { %>
-          <li>
-            <a href="/Specialities/details/<%= $specialityName %>">
+          <li class="spectrum-Body spectrum-Body--sizeS">
+            <a href="/Specialities/details/<%= $specialityName %>" class="spectrum-Link spectrum-Link--quiet spectrum-Link--primary">
               <%= $specialityName %>
             </a>
           </li>
@@ -108,40 +102,85 @@
     <!-- <%= Scalar::Util::reftype $item; %> -->
     <!-- <%= $item->isa('Game::EvonyTKR::General'); %> -->
   <% } %>
-  <% if (stash 'buff-summaries') { %>
-    <div class="buff-summaries">
-      <h3>Calculated Buff Summaries</h3>
-      <table class="buff-table">
-        <tr>
-          <th>Buff Type</th>
-          <th>Value</th>
-        </tr>
-        <tr>
-          <td>March Size Increase</td>
-          <td><%= stash('buff-summaries')->{marchIncrease} %></td>
-        </tr>
-        <tr>
-          <td>Attack</td>
-          <td><%= stash('buff-summaries')->{attackIncrease} %></td>
-        </tr>
-        <tr>
-          <td>Defense</td>
-          <td><%= stash('buff-summaries')->{defenseIncrease} %></td>
-        </tr>
-        <tr>
-          <td>HP</td>
-          <td><%= stash('buff-summaries')->{hpIncrease} %></td>
-        </tr>
-        <tr>
-          <td>Reduce Enemy Ground Attack</td>
-          <td><%= stash('buff-summaries')->{reducegroundattack} %></td>
-        </tr>
-        <tr>
-          <td>Reduce Enemy Ground HP</td>
-          <td><%= stash('buff-summaries')->{reducegroundhp} %></td>
-        </tr>
-      </table>
-    </div>
-  <% } %>
 
+  % if (stash 'buff-summaries') {
+    <div class="buff-summaries">
+      <h2 class="spectrum-Heading spectrum-Heading--sizeL">Buff Summaries</h2>
+
+      <h3 class="spectrum-Heading spectrum-Heading--sizeM">Summary Values (Based on General's Primary Type)</h3>
+      <table class="spectrum-Table spectrum-Table--sizeM spectrum-Table--quiet">
+        <thead class="spectrum-Table-head">
+          <tr>
+            <th class="spectrum-Table-headCell">Buff Type</th>
+            <th class="spectrum-Table-headCell">Value</th>
+          </tr>
+        </thead>
+        <tbody class="spectrum-Table-body">
+          <tr class="spectrum-Table-row">
+            <td class="spectrum-Table-cell"><strong class="spectrum-Body-strong">March Size</strong></td>
+            <td class="spectrum-Table-cell"><%= stash('buff-summaries')->{marchIncrease} %></td>
+          </tr>
+          <tr class="spectrum-Table-row">
+            <td class="spectrum-Table-cell"><strong class="spectrum-Body-strong">Attack</strong></td>
+            <td class="spectrum-Table-cell"><%= stash('buff-summaries')->{attackIncrease} %></td>
+          </tr>
+          <tr class="spectrum-Table-row">
+            <td class="spectrum-Table-cell"><strong class="spectrum-Body-strong">Defense</strong></td>
+            <td class="spectrum-Table-cell"><%= stash('buff-summaries')->{defenseIncrease} %></td>
+          </tr>
+          <tr class="spectrum-Table-row">
+            <td class="spectrum-Table-cell"><strong class="spectrum-Body-strong">HP</strong></td>
+            <td class="spectrum-Table-cell"><%= stash('buff-summaries')->{hpIncrease} %></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 class="spectrum-Heading spectrum-Heading--sizeM">Buff Values by Troop Type</h3>
+      <table class="spectrum-Table spectrum-Table--sizeM spectrum-Table--quiet">
+        <thead class="spectrum-Table-head">
+          <tr>
+            <th class="spectrum-Table-headCell">Troop Type</th>
+            <th class="spectrum-Table-headCell">March Size</th>
+            <th class="spectrum-Table-headCell">Attack</th>
+            <th class="spectrum-Table-headCell">Defense</th>
+            <th class="spectrum-Table-headCell">HP</th>
+          </tr>
+        </thead>
+        <tbody class="spectrum-Table-body">
+          % foreach my $troopType (sort keys %{stash('buff-summaries')->{buffValues}}) {
+            <tr class="spectrum-Table-row">
+              <td class="spectrum-Table-cell"><strong><%= $troopType %></strong></td>
+              <td class="spectrum-Table-cell"><%= stash('buff-summaries')->{buffValues}->{$troopType}->{'March Size Capacity'} %></td>
+              <td class="spectrum-Table-cell"><%= stash('buff-summaries')->{buffValues}->{$troopType}->{'Attack'} %></td>
+              <td class="spectrum-Table-cell"><%= stash('buff-summaries')->{buffValues}->{$troopType}->{'Defense'} %></td>
+              <td class="spectrum-Table-cell"><%= stash('buff-summaries')->{buffValues}->{$troopType}->{'HP'} %></td>
+            </tr>
+          % }
+        </tbody>
+      </table>
+
+      <h3 class="spectrum-Heading spectrum-Heading--sizeM">Debuff Values by Troop Type</h3>
+      <table class="spectrum-Table spectrum-Table--sizeM spectrum-Table--quiet">
+        <thead class="spectrum-Table-head">
+          <tr>
+            <th class="spectrum-Table-headCell">Troop Type</th>
+            <th class="spectrum-Table-headCell">Attack</th>
+            <th class="spectrum-Table-headCell">Defense</th>
+            <th class="spectrum-Table-headCell">HP</th>
+          </tr>
+        </thead>
+        <tbody class="spectrum-Table-body">
+          % foreach my $troopType (sort keys %{stash('buff-summaries')->{debuffValues}}) {
+            <tr class="spectrum-Table-row">
+              <td class="spectrum-Table-cell"><strong><%= $troopType %></strong></td>
+              <td class="spectrum-Table-cell"><%= stash('buff-summaries')->{debuffValues}->{$troopType}->{'Attack'} %></td>
+              <td class="spectrum-Table-cell"><%= stash('buff-summaries')->{debuffValues}->{$troopType}->{'Defense'} %></td>
+              <td class="spectrum-Table-cell"><%= stash('buff-summaries')->{debuffValues}->{$troopType}->{'HP'} %></td>
+            </tr>
+          % }
+        </tbody>
+      </table>
+
+    </div>
+  % }
 </div>

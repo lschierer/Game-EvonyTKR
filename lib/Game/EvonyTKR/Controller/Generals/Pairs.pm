@@ -9,8 +9,8 @@ require Log::Log4perl;
 require Sereal;
 use namespace::clean;
 
-package Game::EvonyTKR::Plugins::Generals::Pairs {
-  use Mojo::Base 'Game::EvonyTKR::Plugins::ControllerBase';
+package Game::EvonyTKR::Controller::Generals::Pairs {
+  use Mojo::Base 'Game::EvonyTKR::Controller::ControllerBase';
   use Carp;
   use List::AllUtils qw( all any none );
   use Mojo::Promise;
@@ -191,8 +191,10 @@ package Game::EvonyTKR::Plugins::Generals::Pairs {
     if (any { !defined($_) || $_ eq '' }
       ($primaryName, $secondaryName, $linkTarget)) {
       $logger->error("Missing parameter");
-      return $self->render(json => { error => "Missing parameter" },
-        status => 400);
+      return $self->render(
+        json   => { error => "Missing parameter" },
+        status => 400
+      );
     }
 
     my $typeMap = {
@@ -218,8 +220,10 @@ package Game::EvonyTKR::Plugins::Generals::Pairs {
     } $pm->get_pairs_by_type($targetType)->@*;
     unless ($pair) {
       $logger->warn("Pair not found: $primaryName / $secondaryName");
-      return $self->render(json => { error => "Pair not found" },
-        status => 404);
+      return $self->render(
+        json   => { error => "Pair not found" },
+        status => 404
+      );
     }
 
     $pair->updateBuffs();

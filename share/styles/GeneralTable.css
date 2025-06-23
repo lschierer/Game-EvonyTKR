@@ -32,12 +32,6 @@
   cursor: pointer;
 }
 
-table,
-thead,
-th {
-  --mod-table-header-background-color-scrollable: var(--surface-1);
-}
-
 thead,
 tr {
   width: 100%;

@@ -8,8 +8,8 @@ require Game::EvonyTKR::Model::Buff::Summarizer;
 require Data::Printer;
 use namespace::clean;
 
-package Game::EvonyTKR::Plugins::Generals {
-  use Mojo::Base 'Game::EvonyTKR::Plugins::CollectionBase';
+package Game::EvonyTKR::Controller::Generals {
+  use Mojo::Base 'Game::EvonyTKR::Controller::CollectionBase';
   use List::AllUtils qw( all any none );
   use Carp;
 
@@ -160,38 +160,25 @@ package Game::EvonyTKR::Plugins::Generals {
           general     => $general,
           isPrimary   => 1,
           targetType  => $targetType,
-
         );
+
         $summarizer->updateBuffs();
         $summarizer->updateDebuffs();
 
+        # Stash the full buff and debuff hashes for granular access in the template
         $self->stash(
           'buff-summaries' => {
-            # Buff values
-            marchIncrease   => $summarizer->marchIncrease,
-            attackIncrease  => $summarizer->attackIncrease,
-            defenseIncrease => $summarizer->defenseIncrease,
-            hpIncrease      => $summarizer->hpIncrease,
+            # For backward compatibility
+            marchIncrease      => $summarizer->marchIncrease,
+            attackIncrease     => $summarizer->attackIncrease,
+            defenseIncrease    => $summarizer->defenseIncrease,
+            hpIncrease         => $summarizer->hpIncrease,
+            reducegroundattack => $summarizer->reducegroundattack,
+            reducegroundhp     => $summarizer->reducegroundhp,
 
-            # Ground troop debuffs
-            reducegroundattack  => $summarizer->reducegroundattack,
-            reducegrounddefense => $summarizer->reducegrounddefense,
-            reducegroundhp      => $summarizer->reducegroundhp,
-
-            # Mounted troop debuffs
-            reducemountedattack  => $summarizer->reducemountedattack,
-            reducemounteddefense => $summarizer->reducemounteddefense,
-            reducemountedhp      => $summarizer->reducemountedhp,
-
-            # Ranged troop debuffs
-            reducerangedattack  => $summarizer->reducerangedattack,
-            reducerangeddefense => $summarizer->reducerangeddefense,
-            reducerangedhp      => $summarizer->reducerangedhp,
-
-            # Siege machine debuffs
-            reducesiegeattack  => $summarizer->reducesiegeattack,
-            reducesiegedefense => $summarizer->reducesiegedefense,
-            reducesiegehp      => $summarizer->reducesiegehp,
+            # Full granular data
+            buffValues         => $summarizer->buffValues,
+            debuffValues       => $summarizer->debuffValues,
           },
         );
       }

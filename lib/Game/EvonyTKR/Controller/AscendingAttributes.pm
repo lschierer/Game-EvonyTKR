@@ -5,8 +5,8 @@ use File::FindLib 'lib';
 require Game::EvonyTKR::Model::AscendingAttributes::Manager;
 use namespace::clean;
 
-package Game::EvonyTKR::Plugins::AscendingAttributes {
-  use Mojo::Base 'Game::EvonyTKR::Plugins::CollectionBase';
+package Game::EvonyTKR::Controller::AscendingAttributes {
+  use Mojo::Base 'Game::EvonyTKR::Controller::CollectionBase';
 
   my $manager;
 

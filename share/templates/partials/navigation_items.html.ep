@@ -1,0 +1,14 @@
+<!-- share/templates/partials/navigation_items.html.ep -->
+% foreach my $item (@$items) {
+  <li class="spectrum-SideNav-item">
+    <a href="<%= $item->{path} %>" class="spectrum-SideNav-itemLink">
+      <span class="spectrum-SideNav-itemLabel"><%= $item->{title} %></span>
+    </a>
+
+    % if (@{$item->{children}}) {
+      <ul class="spectrum-SideNav-itemGroup">
+        <%= include 'partials/navigation_items', items => $item->{children} %>
+      </ul>
+    % }
+  </li>
+% }

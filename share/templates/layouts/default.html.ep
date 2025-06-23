@@ -16,10 +16,35 @@
     <header>
 
     </header>
+    <% if (current_route ne '/' ) { %>
+      <div class=" spectrum-SplitView spectrum-SplitView--horizontal ">
+        <div id="nav" class="spectrum-SplitView-pane">
+          <div class="spectrum-Site-sideBar">
+            <nav class="spectrum-SideNav">
+              <ul class="spectrum-SideNav-itemGroup">
+                <li class="spectrum-SideNav-item">
+                  <a href="/" class="spectrum-SideNav-itemLink">
+                    <span class="spectrum-SideNav-itemLabel">Home</span>
+                  </a>
+                </li>
+
+                <%= include 'partials/navigation_items', items => $navigation %>
+              </ul>
+            </nav>
+          </div>
+        </div>
+        <div tabindex="0" class=" spectrum-SplitView-splitter "></div>
+        <div id="main" class="spectrum-SplitView-pane"
+    <% } %>
 
     <main >
       <%== content %>
     </main>
+
+    <% if (current_route ne '/' ) { %>
+        </div> <!-- close the Right spectrum-SplitView-pane -->
+      </div> <!-- close the spectrum-SplitView spectrum-SplitView--horizontal -->
+    <% } %>
 
     <footer>
       <p>&copy; <%= (localtime)[5] + 1900 %> Luke Schierer</p>

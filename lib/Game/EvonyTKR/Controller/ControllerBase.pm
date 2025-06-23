@@ -5,7 +5,7 @@ use File::FindLib 'lib';
 require Data::Printer;
 use namespace::clean;
 
-package Game::EvonyTKR::Plugins::ControllerBase {
+package Game::EvonyTKR::Controller::ControllerBase {
   use Mojo::Base 'Mojolicious::Controller';
   use Mojo::Base 'Mojolicious::Plugin', -signatures, -role;
   use Log::Log4perl;
