@@ -1,0 +1,8 @@
+
+<link rel="stylesheet" href="/css/GeneralTable.css" />
+<script  type="module" >
+  import "/js/Generals/GeneralTable.js";
+</script>
+
+
+  <general-table generaltype="<%= $generalType %>" typeheader="<%= $linkTarget %>"></general-table>

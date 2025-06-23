@@ -10,6 +10,8 @@ use namespace::clean;
 
 package Game::EvonyTKR::Plugins::Generals {
   use Mojo::Base 'Game::EvonyTKR::Plugins::CollectionBase';
+  use List::AllUtils qw( all any none );
+  use Carp;
 
   # Specify which collection this controller handles
   sub collection_name {'generals'}
@@ -35,7 +37,7 @@ package Game::EvonyTKR::Plugins::Generals {
 
     $app->helper(
       get_general_manager => sub {
-        return $self->app->get_root_manager->generalManager;
+        return $app->get_root_manager->generalManager;
       }
     );
 
@@ -69,6 +71,27 @@ package Game::EvonyTKR::Plugins::Generals {
         if (not defined $pm) {
           $logger->logcroak('No pair manager in manager');
         }
+
+        $routes->get(
+          '/Mayors/comparison' => {
+            generalType => 'mayor',
+            linkTarget  => 'Mayor',
+            isPrimary   => 1
+          }
+          )
+          ->to(controller => $controller_name, action => 'mayor_comparison')
+          ->name("${base}_mayor_comparison");
+
+        $routes->get(
+          '/Mayors/comparison/data.json' => {
+            generalType => 'Mayor',
+            linkTarget  => 'Mayor',
+            isPrimary   => 1
+          }
+        )->to(
+          controller => $controller_name,
+          action     => 'mayor_comparison_json'
+        )->name("${base}_mayor_comparison_json");
 
         my @generalTypes = $pm->get_pair_types();
         $logger->debug("got generalTypes " . Data::Printer::np(@generalTypes));
@@ -178,6 +201,86 @@ package Game::EvonyTKR::Plugins::Generals {
     $self->SUPER::show();
   }
 
+  sub mayor_comparison ($self) {
+    my $logger      = Log::Log4perl->get_logger(__PACKAGE__);
+    my $distDir     = Mojo::File::Share::dist_dir('Game::EvonyTKR');
+    my $generalType = $self->stash('generalType');
+    my $linkTarget  = $self->stash('linkTarget');
+
+    # Stash data for the template
+    $self->stash(template => 'generals/GeneralTable',);
+
+    my $markdown_path = $distDir->child("pages/generals/Mayor/comparison.md");
+
+    if (-f $markdown_path) {
+      $logger->debug("Rendering from markdown index file");
+      return $self->SUPER::render_markdown_file($self, $markdown_path);
+    }
+    else {
+      $logger->debug("Rendering without markdown file");
+      return $self->render;
+    }
+  }
+
+  sub mayor_comparison_json ($self) {
+    my $logger      = Log::Log4perl->get_logger(__PACKAGE__);
+    my $distDir     = Mojo::File::Share::dist_dir('Game::EvonyTKR');
+    my $generalType = $self->stash('generalType');
+    my $linkTarget  = $self->stash('linkTarget');
+
+    my $gm = $self->app->get_general_manager();
+
+    my @generalBuffSummaries = ();
+    while (my ($key, $general) = each(%{ $gm->get_all_generals() })) {
+      $logger->debug("inspecting '$key', first need to see if it is a mayor."
+          . Data::Printer::np($general));
+      if (none { lc($_) eq 'mayor' } @{ $general->type }) {
+        $logger->debug("none of "
+            . $general->name
+            . "'s types: "
+            . Data::Printer::np($general->type)
+            . "match as a mayor.");
+        next;
+      }
+      my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
+        rootManager => $self->app->get_root_manager(),
+        general     => $general,
+        isPrimary   => 1,
+        targetType  => $generalType,
+      );
+
+      $summarizer->updateBuffs();
+      $summarizer->updateDebuffs();
+
+      my $result = {
+        marchbuff            => $summarizer->marchIncrease,
+        attackbuff           => $summarizer->attackIncrease,
+        defensebuff          => $summarizer->defenseIncrease,
+        hpbuff               => $summarizer->hpIncrease,
+        groundattackdebuff   => $summarizer->reducegroundattack,
+        grounddefensedebuff  => $summarizer->reducegrounddefense,
+        groundhpdebuff       => $summarizer->reducegroundhp,
+        mountedattackdebuff  => $summarizer->reducemountedattack,
+        mounteddefensedebuff => $summarizer->reducemounteddefense,
+        mountedhpdebuff      => $summarizer->reducemountedhp,
+        rangedattackdebuff   => $summarizer->reducerangedattack,
+        rangeddefensedebuff  => $summarizer->reducerangeddefense,
+        rangedhpdebuff       => $summarizer->reducerangedhp,
+        siegeattackdebuff    => $summarizer->reducesiegeattack,
+        siegedefensedebuff   => $summarizer->reducesiegedefense,
+        siegehpdebuff        => $summarizer->reducesiegehp,
+        primary              => $general,
+      };
+      push @generalBuffSummaries, $result;
+    }
+    if (scalar @generalBuffSummaries) {
+      return $self->render(json => \@generalBuffSummaries);
+    }
+    else {
+      return $self->render(json => {});
+    }
+  }
+
   sub general_buffs ($self) {
     my $logger     = Log::Log4perl->get_logger(__PACKAGE__);
     my $name       = $self->param('name');
@@ -192,8 +295,10 @@ package Game::EvonyTKR::Plugins::Generals {
       $self->app->get_root_manager->generalManager->getGeneral($name);
 
     if (!$general) {
-      return $self->render(json => { error => "General not found" },
-        status => 404);
+      return $self->render(
+        json   => { error => "General not found" },
+        status => 404
+      );
     }
 
     # If targetType not provided but general has a type, use that
