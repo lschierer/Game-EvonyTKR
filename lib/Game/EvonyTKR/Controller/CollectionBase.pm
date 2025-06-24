@@ -8,10 +8,10 @@ use namespace::clean;
 
 package Game::EvonyTKR::Controller::CollectionBase {
   use Mojo::Base 'Game::EvonyTKR::Controller::ControllerBase';
-
   use Mojo::File::Share qw(dist_dir);
   require Path::Tiny;
   use YAML::PP;
+  use Carp;
 
   sub collection_name ($self) {
     return '';
@@ -19,57 +19,25 @@ package Game::EvonyTKR::Controller::CollectionBase {
 
   my $base;
 
-  sub register {
-    my ($self, $app, $config) = @_;
+  sub register($self, $app, $config = {}) {
     my $logger = Log::Log4perl->get_logger(__PACKAGE__);
-    $logger->info("Registering navigation plugin");
+    $logger->info("Registering routes for " . ref($self));
+    $self->SUPER::register($app, $config);
+    my @parts = split(/::/, ref($self));
+    $base = pop(@parts);
 
-    # Store navigation items
-    my $navigation_items = [];
+    my $controller_name =
+        $self->can('controller_name')
+      ? $self->controller_name()
+      : $base;
 
-    # Helper to add navigation items
-    $app->helper(
-      add_navigation_item => sub {
-        my ($c, $item) = @_;
+    my $routes = $self->getRoutes();
+    $routes->get('/details/:name')
+      ->to(controller => $controller_name, action => 'show')
+      ->name("${base}_show");
 
-        # Validate item structure
-        unless (ref $item eq 'HASH'
-          && exists $item->{title}
-          && exists $item->{path}) {
-          $logger->error(
-            "Invalid navigation item: " . Data::Printer::np($item));
-          return;
-        }
+    $logger->info("Routes for $base registered successfully");
 
-        # Add the item
-        push @$navigation_items, $item;
-        $logger->debug(
-          "Added navigation item: " . $item->{title} . " => " . $item->{path});
-        return 1;
-      }
-    );
-
-    # Helper to get all navigation items
-    $app->helper(
-      get_navigation_items => sub {
-        my $c = shift;
-        return $navigation_items;
-      }
-    );
-
-    # Add the navigation to every request
-    $app->hook(
-      before_render => sub {
-        my ($c, $args) = @_;
-
-        # Skip for API routes and non-HTML responses
-        return
-          if $args->{json} || $args->{text} || $c->req->url->path =~ /\.json$/;
-
-        # Generate navigation and add to stash
-        $c->stash(navigation => $c->generate_navigation);
-      }
-    );
   }
 
   # Optional method for custom template
