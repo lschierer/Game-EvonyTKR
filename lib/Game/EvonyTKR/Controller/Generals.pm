@@ -58,15 +58,16 @@ package Game::EvonyTKR::Controller::Generals {
       ->to(controller => $controller_name, action => 'index')
       ->name("${base}_index");
 
-    $routes->get('/details')
-      ->to(controller => $controller_name, action => 'index')
-      ->name("General details");
+    $routes->any('/details')
+      ->to(cb => sub ($c) {
+        $c->redirect_to('/Generals')
+      });
 
     # Add a parent navigation item for Generals
     $app->add_navigation_item({
       title => 'Generals',
       path  => '/Generals',
-      order => '10',
+      order => 10,
     });
 
     # Add a parent navigation item for Generals
@@ -95,10 +96,10 @@ package Game::EvonyTKR::Controller::Generals {
           $app->get_root_manager->generalManager->get_all_generals();
         foreach my $general (values %$generals) {
           $app->add_navigation_item({
-            title  => "Details for $general->name",
+            title  => "Details for " . $general->name,
             path   => "/Generals/details/" . $general->name,
             parent => 'Generals/details/',
-            order  => '10',
+            order  => 10,
           });
         }
 

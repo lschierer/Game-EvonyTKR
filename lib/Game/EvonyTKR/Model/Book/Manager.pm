@@ -21,6 +21,12 @@ class Game::EvonyTKR::Model::Book::Manager : isa(Game::EvonyTKR::Model::Data) {
 
   field $books = {};
 
+  method get_all_books {
+    my $values;
+    @{ $values } = values %{ $books };
+    return $values;
+  }
+
   method getBook ($name) {
     if (exists $books->{$name}) {
       my $book = $books->{$name};

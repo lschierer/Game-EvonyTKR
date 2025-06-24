@@ -16,7 +16,8 @@
     <header>
 
     </header>
-    <% if (current_route ne '/' ) { %>
+    <% my $cr = url_for(current_route)->to_abs->path; %>
+    <% if ($cr ne '/' ) { %>
       <div class=" spectrum-SplitView spectrum-SplitView--horizontal ">
         <div id="nav" class="spectrum-SplitView-pane">
           <div class="spectrum-Site-sideBar">
@@ -29,6 +30,7 @@
                 </li>
 
                 <%= include 'partials/navigation_items', items => $navigation %>
+
               </ul>
             </nav>
           </div>

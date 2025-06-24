@@ -1,8 +1,7 @@
 ---
 author: Luke Schierer
 layout: splash
-imports:
-  - /components/SplashCards.ts type="module"
+title: Evony TKR Tips
 ---
 
 

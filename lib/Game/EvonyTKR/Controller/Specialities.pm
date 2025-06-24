@@ -11,10 +11,18 @@ package Game::EvonyTKR::Controller::Specialities {
   # Specify which collection this controller handles
   sub collection_name {'specialities'}
 
-  my $manager;
-
   sub get_manager($self) {
     return $self->app->get_root_manager->specialityManager;
+  }
+
+  my $base = '/Specialities/';
+
+  sub getBase($self) {
+    return $base;
+  }
+
+  sub controller_name ($self) {
+    return "Specialities";
   }
 
   sub register($self, $app, $config = {}) {
@@ -22,26 +30,64 @@ package Game::EvonyTKR::Controller::Specialities {
     $logger->info("Registering routes for " . ref($self));
     $self->SUPER::register($app, $config);
 
-    eval {
-      $manager = Game::EvonyTKR::Model::Speciality::Manager->new();
+    $app->add_navigation_item({
+      title  => 'Details of General Specialities',
+      path   => '/Specialities/',
+      order  => 20,
+    });
+
+    my @parts     = split(/::/, ref($self));
+    my $baseClass = pop(@parts);
+
+    my $controller_name =
+        $self->can('controller_name')
+      ? $self->controller_name()
+      : $baseClass;
+
+    $logger->debug("got controller_name $controller_name.");
+
+    my $r      = $app->routes;
+    my $routes = $r->any("$base");
+
+    $routes->any('/details')
+      ->to(cb => sub ($c) {
+        $c->redirect_to('/Specialities')
+      });
+
+      $app->plugins->on(
+        'evonytkrtips_initialized' => sub($self, $manager) {
+          $logger->debug(
+            "evonytkrtips_initialized sub has controller_name $controller_name.");
+
+            if (not defined $manager) {
+              $logger->logcroak('No Manager Defined');
+            }
+
+          foreach my $speciality (@{ $manager->specialityManager->get_all_specialities() }) {
+            my $name = $speciality->name;
+            $app->add_navigation_item({
+              title   => "Details for $name",
+              path    => "/Specialities/details/$name",
+              parent  => "/Specialities/details/",
+              order => 20,
+            });
+          }
+        }
+      );
 
       my $distDir    = Mojo::File::Share::dist_dir('Game::EvonyTKR');
       my $collection = $self->collection_name;
       my $SourceDir  = $distDir->child("collections/$collection");
-      $manager->importAll($SourceDir);
 
       $logger->info(
         "Successfully loaded Speciality manager with collection from $SourceDir"
       );
-    };
-    if ($@) {
-      $logger->error("Failed to initialize Speciality Manager: $@");
-      $manager = undef;
-    }
+
 
     $app->helper(
       get_builtinbook_manager => sub {
-        return $manager;
+        my $self = shift;
+        return $self->app->get_root_manager->specialityManager;
       }
     );
   }

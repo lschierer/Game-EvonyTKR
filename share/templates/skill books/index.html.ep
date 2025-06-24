@@ -5,7 +5,8 @@
     <% if ($items && ref $items eq 'HASH') { %>
       <% foreach my $key (sort(keys(%$items))) { %>
         <li class="collection-item">
-          <a href="/<%= $controller_name %>/details/<%= $key %>/">
+          <!-- linkBase is '<%= $linkBase %>' -->
+          <a href="/<%= $linkBase %>/details/<%= $key %>">
             <%= $items->{$key}->{name} %>
           </a>
 

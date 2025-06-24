@@ -5,247 +5,145 @@ use File::FindLib 'lib';
 require Data::Printer;
 use namespace::clean;
 
-# lib/Game/EvonyTKR/Plugins/Navigation.pm
 package Game::EvonyTKR::Plugins::Navigation {
   use Mojo::Base 'Mojolicious::Plugin';
   use Carp;
   require Log::Log4perl;
 
-  # Store navigation items by path
-  my %nav_items_by_path = ();
+  my %nav_items_by_path;
+  my %raw_paths;
+
+  my $rejected_items_by_path = {
+    '/policy'         => 1,
+    '/policy/privacy' => 1,
+    '/index'          => 1,
+  };
 
   sub register {
     my ($self, $app, $config) = @_;
     my $logger = Log::Log4perl->get_logger(__PACKAGE__);
     $logger->info("Registering navigation plugin");
 
-    # Helper to add navigation items
     $app->helper(add_navigation_item => sub {
       my ($c, $item) = @_;
+      my $log = Log::Log4perl->get_logger(__PACKAGE__);
 
-      my $logger = Log::Log4perl->get_logger(__PACKAGE__);
-      $logger->debug(
-        "add_navigation_item called for " . Data::Printer::np($item));
-
-      # Validate item structure
-      unless (ref $item eq 'HASH'
-        && exists $item->{title}
-        && exists $item->{path}) {
-        $logger->error("Invalid navigation item: " . Data::Printer::np($item));
+      unless (ref $item eq 'HASH' && $item->{path}) {
+        $log->error("Invalid item (missing path): " . Data::Printer::np($item));
         return;
       }
 
       my $path = $item->{path};
 
-      # Handle conflicts
+      if ($rejected_items_by_path->{$path}) {
+        $log->debug("Skipping rejected path $path");
+        return;
+      }
+
+      unless (exists $item->{title}) {
+        $log->error("Item rejected: missing title for $path");
+        return;
+      }
+
+      $raw_paths{$path} = 1;
+
       if (exists $nav_items_by_path{$path}) {
         my $existing = $nav_items_by_path{$path};
-
-        # If both have order, use the one with lower value
         if (exists $item->{order} && exists $existing->{order}) {
           if ($item->{order} < $existing->{order}) {
             $nav_items_by_path{$path} = $item;
-            $logger->debug(
-              "Replaced navigation item for path '$path' with lower order item");
           }
-          else {
-            $logger->debug(
-              "Kept existing navigation item for path '$path' with lower order");
-          }
-        }
-        # If only new item has order, use it
-        elsif (exists $item->{order}) {
+        } elsif (exists $item->{order}) {
           $nav_items_by_path{$path} = $item;
-          $logger->debug(
-            "Replaced navigation item for path '$path' with ordered item");
+        } elsif (!exists $existing->{order}) {
+          $log->error("Duplicate navigation item at $path without order");
         }
-        # If only existing item has order, keep it
-        elsif (exists $existing->{order}) {
-          $logger->debug(
-            "Kept existing navigation item for path '$path' with order");
-        }
-        # If neither has order, log error and keep first
-        else {
-          $logger->error(
-            "Multiple navigation items for path '$path' without order attribute");
-        }
-      }
-      else {
-        # No conflict, just add the item
+      } else {
         $nav_items_by_path{$path} = $item;
-        $logger->debug(
-          "Added navigation item: " . $item->{title} . " => " . $path);
       }
 
       return 1;
     });
 
-    # Helper to generate organized navigation
-    $app->helper(
-      generate_navigation => sub {
-        my $c = shift;
+    $app->helper(generate_navigation => sub {
+      my $c = shift;
+      my $structure = {};
 
-        # Build navigation structure
-        my $nav_structure = {};
-
-        # Process all navigation items
-        foreach my $path (keys %nav_items_by_path) {
-          my $item = $nav_items_by_path{$path};
-          $self->add_item_to_structure($item, $nav_structure);
-        }
-
-        # Organize and return
-        return $self->organize_navigation($nav_structure);
+      foreach my $path (keys %nav_items_by_path) {
+        $self->_add_path_to_structure($structure, $path, $nav_items_by_path{$path});
       }
-    );
 
-    # Add the navigation to every request
-    $app->hook(
-      before_render => sub {
-        my ($c, $args) = @_;
+      return $self->_prune_and_sort($structure, '');
+    });
 
-        # Skip for API routes and non-HTML responses
-        return
-          if $args->{json} || $args->{text} || $c->req->url->path =~ /\.json$/;
-
-        # Generate navigation and add to stash
-        $c->stash(navigation => $c->generate_navigation);
-      }
-    );
+    $app->hook(before_render => sub {
+      my ($c, $args) = @_;
+      return if $args->{json} || $args->{text} || $c->req->url->path =~ /\.json$/;
+      $c->stash(navigation => $c->generate_navigation);
+    });
   }
 
+  sub _add_path_to_structure {
+    my ($self, $tree, $path, $item) = @_;
+    my @segments = grep { length } split '/', $path;
+    my $current = $tree;
+    my $full_path = '';
 
-  # Add an item to the navigation structure
-  sub add_item_to_structure {
-    my ($self, $item, $nav_structure) = @_;
+    # sanity checks
+    return unless defined $path && length $path;
+    return unless ref($item) eq 'HASH';
+    return unless defined $item->{title};
 
-    my $path     = $item->{path};
-    my @segments = split('/', $path);
-    shift @segments if $segments[0] eq '';    # Remove empty first segment
+    for my $i (0..$#segments) {
+      my $seg = $segments[$i];
+      if (!$seg) {
+        return; # <--- # another sanity check
+      }
+      $full_path .= "/$seg";
+      my $is_leaf = $i == $#segments;
 
-    # Skip if no segments
-    return unless @segments;
-
-    # Handle parent-child relationships
-    if ($item->{parent}) {
-      # This is a child item with a specified parent
-      my $parent = $item->{parent};
-
-      # Ensure parent exists
-      $nav_structure->{$parent} ||= {
-        title    => $self->format_title($parent),
-        path     => "/$parent",
+      $current->{$seg} //= {
+        title => $self->_titleize($seg),
+        path  => $full_path,
+        order => 9999,
         children => {},
-        order    => $item->{parent_order} || 0,
       };
 
-      # Add as child
-      my $last_segment = $segments[-1];
-      $nav_structure->{$parent}->{children}->{$last_segment} = {
-        title    => $item->{title},
-        path     => $path,
-        children => $item->{children} || {},
-        order    => $item->{order}    || 0,
-      };
-    }
-    else {
-      # This is a top-level item or a path with multiple segments
-      my $current   = $nav_structure;
-      my $full_path = '';
-
-      for my $i (0 .. $#segments) {
-        my $segment = $segments[$i];
-        $full_path .= "/$segment";
-
-        if ($i == $#segments) {
-          # This is the last segment - use the item's title
-          $current->{$segment} = {
-            title    => $item->{title},
-            path     => $full_path,
-            children => $item->{children} || {},
-            order    => $item->{order}    || 0,
-          };
-        }
-        else {
-          # Create intermediate segments if they don't exist
-          $current->{$segment} ||= {
-            title    => $self->format_title($segment),
-            path     => $full_path,
-            children => {},
-            order    => 0,
-          };
-
-          # Move to next level
-          $current = $current->{$segment}->{children};
-        }
-      }
-    }
-  }
-
-  # Format a path segment into a title
-  sub format_title {
-    my ($self, $segment) = @_;
-
-    # Replace hyphens and underscores with spaces
-    $segment =~ s/[-_]/ /g;
-
-    # Capitalize words
-    $segment =~ s/(\w+)/\u\L$1/g;
-
-    return $segment;
-  }
-
-  # Organize navigation into a hierarchical structure
-  sub organize_navigation {
-    my ($self, $nav_structure) = @_;
-
-    my @nav = ();
-
-    # Process top-level items
-    foreach my $key (sort keys %$nav_structure) {
-      my $item = $nav_structure->{$key};
-
-      # Process children recursively
-      my @children = ();
-      foreach my $child_key (sort keys %{ $item->{children} }) {
-        push @children,
-          $self->organize_navigation_item($child_key,
-          $item->{children}->{$child_key});
+      if ($is_leaf) {
+        $current->{$seg}->{title}  = $item->{title};
+        $current->{$seg}->{order}  = $item->{order} // 9999;
       }
 
-      # Add item with its children
-      push @nav,
-        {
-        title    => $item->{title},
-        path     => $item->{path},
-        children => \@children,
-        order    => $item->{order},
-        };
+      $current = $current->{$seg}->{children};
     }
-
-    # Sort by order
-    @nav = sort { $a->{order} <=> $b->{order} } @nav;
-
-    return \@nav;
   }
 
-  # Recursively organize a navigation item
-  sub organize_navigation_item {
-    my ($self, $key, $item) = @_;
+  sub _prune_and_sort {
+    my ($self, $tree, $prefix) = @_;
+    my @result;
 
-    my @children = ();
-    foreach my $child_key (sort keys %{ $item->{children} }) {
-      push @children,
-        $self->organize_navigation_item($child_key,
-        $item->{children}->{$child_key});
+    foreach my $key (sort keys %$tree) {
+      my $node = $tree->{$key};
+      my $has_valid_children = scalar keys %{ $node->{children} }; # Will check recursively
+
+      my $children = $self->_prune_and_sort($node->{children}, $node->{path});
+
+      push @result, {
+        title    => $node->{title},
+        path     => $node->{path},
+        order    => $node->{order} // 9999,
+        children => $children,
+      } if @$children || exists $raw_paths{$node->{path}} || exists $raw_paths{"$node->{path}/index"};
     }
 
-    return {
-      title    => $item->{title},
-      path     => $item->{path},
-      children => \@children,
-      order    => $item->{order},
-    };
+    @result = sort { $a->{order} <=> $b->{order} || lc($a->{title}) cmp lc($b->{title}) } @result;
+    return \@result;
+  }
+
+  sub _titleize {
+    my ($self, $seg) = @_;
+    $seg =~ s/_/ /g;
+    return join ' ', map { ucfirst lc } split ' ', $seg;
   }
 }
 

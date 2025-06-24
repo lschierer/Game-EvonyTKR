@@ -14,6 +14,7 @@ class Game::EvonyTKR::Model::Book : isa(Game::EvonyTKR::Model::Data) {
   use List::AllUtils qw( any none );
   use overload
     '""'       => \&as_string,
+    '.'        => \&concat,
     'bool'     => \&_isTrue,
     'fallback' => 0;
 
@@ -128,6 +129,15 @@ class Game::EvonyTKR::Model::Book : isa(Game::EvonyTKR::Model::Data) {
       ->convert_blessed(1)
       ->encode($self->to_hash());
     return $json;
+  }
+
+  method concat($other, $swap) {
+    if ($swap) {
+      return $other . $self->as_string();
+    }
+    else {
+      return $self->as_string() . $other;
+    }
   }
 
   method _isTrue {

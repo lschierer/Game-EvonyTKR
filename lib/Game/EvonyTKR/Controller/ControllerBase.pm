@@ -27,7 +27,10 @@ package Game::EvonyTKR::Controller::ControllerBase {
     $logger->info("Registering routes for " . ref($self));
 
     my @parts = split(/::/, ref($self));
-    $base = pop(@parts);
+    $base = $self->can('getBase')
+      ? $self->getBase()
+      : pop(@parts);
+
     my $r = $app->routes;
 
     my $controller_name =
@@ -66,6 +69,7 @@ package Game::EvonyTKR::Controller::ControllerBase {
 
   sub index($self) {
     $self->stash(
+      base     => $self->getBase(),
       layout   => 'default',
       template => 'markdown',
       content  => "Hello from the $base Controller",

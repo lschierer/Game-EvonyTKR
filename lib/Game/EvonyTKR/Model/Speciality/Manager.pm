@@ -30,6 +30,12 @@ class Game::EvonyTKR::Model::Speciality::Manager :
     return 0;
   }
 
+  method get_all_specialities {
+    my $values;
+    @{ $values } = values %{ $specialities };
+    return $values;
+  }
+
   method importAll ($SourceDir) {
     $SourceDir = Path::Tiny::path($SourceDir);
     if (!$SourceDir->is_dir()) {

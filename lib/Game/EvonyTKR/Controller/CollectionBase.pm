@@ -134,7 +134,7 @@ package Game::EvonyTKR::Controller::CollectionBase {
   sub index($self) {
     my $collection = $self->collection_name;
     my $items      = $self->getItems();
-    my $logger     = Log::Log4perl->get_logger(ref($self));
+    my $logger     = Log::Log4perl->get_logger(__PACKAGE__);
 
     $logger->debug("Rendering index for $collection");
 
@@ -144,7 +144,10 @@ package Game::EvonyTKR::Controller::CollectionBase {
 
     my @parts     = split(/::/, ref($self));
     my $baseClass = pop(@parts);
+    my $base = $self->getBase();
+    $logger->debug("CollectionBase index method has base $base");
     $self->stash(
+      linkBase        => $base,
       items           => $items,
       collection_name => $collection,
       controller_name => $baseClass,

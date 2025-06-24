@@ -41,11 +41,13 @@
               <dd><%= $buff->attribute %>
               <% if ( scalar @{ $buff->targetedTypes } > 0 ) { %>
                 <dt>Troop Type: </dt>
-                <dd><%= $buff->targetedTypes %></dd>
+                <% foreach my $tt ( @{ $buff->targetedTypes() } ) { %>
+                  <dd><%= $tt %></dd>
+                <% } %>
               <% } %>
               <% if ( scalar $buff->conditions()  ) { %>
                 <dt>Condition(s): </dt>
-                <% foreach my $condition (@{ $buff->conditions() }) { %>
+                <% foreach my $condition ($buff->conditions() ) { %>
                   <dd><%= $condition %></dd>
                 <% } %>
               <% } %>

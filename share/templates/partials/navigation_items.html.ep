@@ -1,23 +1,33 @@
-<!-- share/templates/partials/navigation_items.html.ep -->
-% foreach my $item (@$items) {
-  <% my $cr = url_for current_route; %>
-  <!-- cr is <%= $cr %> -->
-  <!-- item path is <%= $item->{path} %> -->
-  <li
-    <% if ( $cr eq $item->{path}) { %>
-      class="custom-depth spectrum-SideNav-item is-selected"
-    <% } else { %>
-      class="custom-depth spectrum-SideNav-item"
-    <% } %>
-  >
-    <a href="<%= $item->{path} %>" class="spectrum-SideNav-itemLink">
-      <span class="spectrum-SideNav-link-text"><%= $item->{title} %></span>
-    </a>
+% use Mojo::Util 'url_escape';
+% use Scalar::Util 'reftype';
+% my $current_path = $c->req->url->path->to_abs_string;
+<!-- current_path is <%= $current_path %> -->
+% if (ref $items eq 'ARRAY') {
+  % foreach my $item (@$items) {
+    % next unless ref $item eq 'HASH';
+    % next if ($item->{path} =~ /\/details$/ and ( not $current_path =~ /details/ ));
+    <% my $item_path = url_for($item->{path})->to_abs->path; %>
+    <!-- item_path is <%= $item_path %> -->
+    <% my $item_href = url_for($item->{path}); %>
+    <% my $is_selected = ($item_path eq $current_path || "$item_path/" eq $current_path); %>
+    <% my $is_parent   = ($current_path =~ m{^\Q$item_path\E(?:/|$)}); %>
+    <% my $is_sibling  = ($item_path =~ m{^(.*/)[^/]+$} && $current_path =~ m{^\Q$1\E[^/]+$}); %>
+    <% my $has_children = $item->{children} && ref $item->{children} eq 'ARRAY' && @{$item->{children}}; %>
+    <% my $should_recurse = ($is_selected || $is_parent || $is_sibling); %>
+    <!-- should_recurse is <%= $should_recurse ? 'true' : 'false' %> -->
 
-    % if (@{$item->{children}}) {
-      <ul class="spectrum-SideNav spectrum-SideNav--multilevel">
-        <%= include 'partials/navigation_items', items => $item->{children} %>
-      </ul>
-    % }
-  </li>
+    <li
+      class="custom-depth spectrum-SideNav-item<%= $is_selected ? ' is-selected' : '' %>"
+    >
+      <a href="<%= $item_href %>" class="spectrum-SideNav-itemLink">
+        <span class="spectrum-SideNav-link-text"><%= $item->{title} %></span>
+      </a>
+
+      % if ($has_children && $should_recurse) {
+        <ul class="spectrum-SideNav spectrum-SideNav--multilevel">
+          <%= include 'partials/navigation_items', items => $item->{children} %>
+        </ul>
+      % }
+    </li>
+  % }
 % }
