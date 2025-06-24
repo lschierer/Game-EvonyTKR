@@ -16,7 +16,8 @@ package Game::EvonyTKR::Plugins::StaticPages {
     $logger->info("Registering static page routes");
 
     # Get the pages directory
-    my $pages_dir = Mojo::File::Share::dist_dir('Game::EvonyTKR')->child('pages');
+    my $pages_dir =
+      Mojo::File::Share::dist_dir('Game::EvonyTKR')->child('pages');
 
     # Find all markdown files
     my $rule = Path::Iterator::Rule->new;
@@ -25,12 +26,13 @@ package Game::EvonyTKR::Plugins::StaticPages {
 
     # Register routes for each markdown file
     while (my $file = $iter->()) {
-      my $file_path = Mojo::File->new($file);
+      my $file_path     = Mojo::File->new($file);
       my $relative_path = $file_path->to_rel($pages_dir);
 
       # Convert path to route
       my $route_path = $self->file_path_to_route($relative_path);
-      $logger->debug("Registering static route: $route_path for file: $relative_path");
+      $logger->debug(
+        "Registering static route: $route_path for file: $relative_path");
 
       # Register the route with low priority
       $app->routes->get($route_path)->to(
@@ -39,6 +41,16 @@ package Game::EvonyTKR::Plugins::StaticPages {
           return $c->render_markdown_file($file_path);
         }
       )->name("static_$route_path");
+
+      my ($front_matter, $markdown) = $app->parse_front_matter($file_path);
+      my $title =
+        exists $front_matter->{title} ? $front_matter->{title} : $file_path;
+      $app->add_navigation_item({
+        title => $title,
+        path  => $route_path,
+        order => 100,           # Static pages come after dynamic content
+      });
+
     }
   }
 

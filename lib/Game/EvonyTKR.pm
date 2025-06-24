@@ -97,15 +97,20 @@ package Game::EvonyTKR {
     push @{ $self->plugins->namespaces }, 'Game::EvonyTKR::Controller';
     push @{ $self->preload_namespaces },  'Game::EvonyTKR::Controller';
 
+    # Register infrastructure plugins in specific order
+    # First Navigation
+    $self->plugin('Game::EvonyTKR::Plugins::Navigation');
+
+    # Then Controller Plugins
     $self->plugin(
       'Module::Loader' => {
         plugin_namespaces => ['Game::EvonyTKR::Controller']
       }
     );
 
-    # Register infrastructure plugins in specific order
-    $self->plugin('Game::EvonyTKR::Plugins::Navigation');
-    $self->plugin('Game::EvonyTKR::Plugins::StaticPages');  # Register last for lowest priority
+    # Last the Static Pages
+    $self->plugin('Game::EvonyTKR::Plugins::StaticPages')
+      ;    # Register last for lowest priority
 
   }
 };

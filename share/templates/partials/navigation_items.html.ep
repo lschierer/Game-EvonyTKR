@@ -1,12 +1,21 @@
 <!-- share/templates/partials/navigation_items.html.ep -->
 % foreach my $item (@$items) {
-  <li class="spectrum-SideNav-item">
+  <% my $cr = url_for current_route; %>
+  <!-- cr is <%= $cr %> -->
+  <!-- item path is <%= $item->{path} %> -->
+  <li
+    <% if ( $cr eq $item->{path}) { %>
+      class="custom-depth spectrum-SideNav-item is-selected"
+    <% } else { %>
+      class="custom-depth spectrum-SideNav-item"
+    <% } %>
+  >
     <a href="<%= $item->{path} %>" class="spectrum-SideNav-itemLink">
-      <span class="spectrum-SideNav-itemLabel"><%= $item->{title} %></span>
+      <span class="spectrum-SideNav-link-text"><%= $item->{title} %></span>
     </a>
 
     % if (@{$item->{children}}) {
-      <ul class="spectrum-SideNav-itemGroup">
+      <ul class="spectrum-SideNav spectrum-SideNav--multilevel">
         <%= include 'partials/navigation_items', items => $item->{children} %>
       </ul>
     % }

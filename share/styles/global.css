@@ -69,8 +69,8 @@ dd {
 }
 
 div.spectrum-SplitView {
-  max-height: 90vh;
-  overflow: hidden auto; /* Changed from overflow: scroll */ /* Hide horizontal scrollbar completely */
+  max-height: 90vh; /* change this to allow for the space for the header and footer */
+  overflow: hidden auto;
 }
 
 div#nav {
@@ -81,4 +81,10 @@ div#nav {
 div#main {
   width: 80vw;
   min-height: 100%;
+}
+
+li
+  > ul.spectrum-SideNav.spectrum-SideNav--multilevel
+  > li.custom-depth.spectrum-SideNav-item {
+  padding-inline-start: 1em;
 }

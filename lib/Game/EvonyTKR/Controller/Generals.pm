@@ -58,6 +58,25 @@ package Game::EvonyTKR::Controller::Generals {
       ->to(controller => $controller_name, action => 'index')
       ->name("${base}_index");
 
+    $routes->get('/details')
+      ->to(controller => $controller_name, action => 'index')
+      ->name("General details");
+
+    # Add a parent navigation item for Generals
+    $app->add_navigation_item({
+      title => 'Generals',
+      path  => '/Generals',
+      order => '10',
+    });
+
+    # Add a parent navigation item for Generals
+    $app->add_navigation_item({
+      title  => 'General Details',
+      path   => '/Generals/details',
+      parent => '/Generals',
+      order  => '10',
+    });
+
     $app->plugins->on(
       'evonytkrtips_initialized' => sub($self, $manager) {
         $logger->debug(
@@ -70,6 +89,17 @@ package Game::EvonyTKR::Controller::Generals {
         my $pm = $manager->generalPairManager;
         if (not defined $pm) {
           $logger->logcroak('No pair manager in manager');
+        }
+
+        my $generals =
+          $app->get_root_manager->generalManager->get_all_generals();
+        foreach my $general (values %$generals) {
+          $app->add_navigation_item({
+            title  => "Details for $general->name",
+            path   => "/Generals/details/" . $general->name,
+            parent => 'Generals/details/',
+            order  => '10',
+          });
         }
 
         $routes->get(
@@ -165,7 +195,7 @@ package Game::EvonyTKR::Controller::Generals {
         $summarizer->updateBuffs();
         $summarizer->updateDebuffs();
 
-        # Stash the full buff and debuff hashes for granular access in the template
+     # Stash the full buff and debuff hashes for granular access in the template
         $self->stash(
           'buff-summaries' => {
             # For backward compatibility
@@ -177,8 +207,8 @@ package Game::EvonyTKR::Controller::Generals {
             reducegroundhp     => $summarizer->reducegroundhp,
 
             # Full granular data
-            buffValues         => $summarizer->buffValues,
-            debuffValues       => $summarizer->debuffValues,
+            buffValues   => $summarizer->buffValues,
+            debuffValues => $summarizer->debuffValues,
           },
         );
       }

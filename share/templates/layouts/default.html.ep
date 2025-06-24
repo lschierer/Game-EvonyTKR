@@ -20,11 +20,11 @@
       <div class=" spectrum-SplitView spectrum-SplitView--horizontal ">
         <div id="nav" class="spectrum-SplitView-pane">
           <div class="spectrum-Site-sideBar">
-            <nav class="spectrum-SideNav">
-              <ul class="spectrum-SideNav-itemGroup">
+            <nav class="">
+              <ul class="spectrum-SideNav spectrum-SideNav--multilevel">
                 <li class="spectrum-SideNav-item">
                   <a href="/" class="spectrum-SideNav-itemLink">
-                    <span class="spectrum-SideNav-itemLabel">Home</span>
+                    <span class="spectrum-SideNav-link-text">Home</span>
                   </a>
                 </li>
 

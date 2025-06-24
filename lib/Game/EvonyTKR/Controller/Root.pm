@@ -10,7 +10,7 @@ package Game::EvonyTKR::Controller::Root {
   use Mojo::Base 'Mojolicious::Controller';
   use Mojo::Base 'Mojolicious::Plugin', -signatures, -role;
   use Log::Log4perl;
-  use List::Util qw( any );
+  use List::Util        qw( any );
   use Mojo::File::Share qw(dist_dir dist_file);
   use Carp;
   our $VERSION = 'v0.02.0';

@@ -13,6 +13,7 @@ package Game::EvonyTKR::Controller::ControllerBase {
   require Text::MultiMarkdown;
   require YAML::PP;
   require Data::Printer;
+  use Carp;
 
   my $base = '';
   my $routes;
@@ -41,6 +42,22 @@ package Game::EvonyTKR::Controller::ControllerBase {
       ->name("${base}_index");
 
     $logger->info("Routes for $base registered successfully");
+
+    # Register the render_markdown_file helper
+    $app->helper(
+      render_markdown_file => sub {
+        my ($c, $file_path) = @_;
+        return $self->render_markdown_file($c, $file_path);
+      }
+    );
+
+    $app->helper(
+      parse_front_matter => sub ($c, $file_path) {
+        my $content = $file_path->slurp('UTF-8');
+        return $self->parse_front_matter($content, $file_path);
+      }
+    );
+
   }
 
   sub getRoutes($self) {
@@ -70,7 +87,7 @@ package Game::EvonyTKR::Controller::ControllerBase {
     }
 
     # Read file content
-    my $content = $file->slurp;
+    my $content = $file->slurp('UTF-8');
     $logger->debug("found " . length($content) . " content from slurp");
 
     # Parse YAML front matter and markdown content

@@ -135,6 +135,7 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
   method overallMarchIncrease() {
     return $buffValues->{'Overall'}->{'March Size Capacity'};
   }
+
   method overallAttackIncrease() {
     return $buffValues->{'Overall'}->{'Attack'};
   }
@@ -418,12 +419,10 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
       $self->logger->debug("adding buffs for book " . $book->name);
       my $bv = $book->get_buffs($attribute, $summaryType, $buffConditions,
         $debuffConditions);
-      $self->logger->trace(
-        sprintf(
-          'found %s in %s %s buffs for %s.',
-          $bv, $book->name, $attribute, $general->name
-        )
-      );
+      $self->logger->trace(sprintf(
+        'found %s in %s %s buffs for %s.',
+        $bv, $book->name, $attribute, $general->name
+      ));
       $total += $bv;
     }
     else {
