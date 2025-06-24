@@ -32,7 +32,7 @@ class Game::EvonyTKR::Model::Speciality::Manager :
 
   method get_all_specialities {
     my $values;
-    @{ $values } = values %{ $specialities };
+    @{$values} = values %{$specialities};
     return $values;
   }
 

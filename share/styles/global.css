@@ -88,3 +88,16 @@ li
   > li.custom-depth.spectrum-SideNav-item {
   padding-inline-start: 1em;
 }
+
+.is-selected > ul a {
+  color: var(
+    --highcontrast-sidenav-font-color,
+    var(--mod-sidenav-font-color)
+  ) !important;
+  background-color: var(--mod-sidenav-background-default) !important;
+}
+
+a.spectrum-SideNav-itemLink > iconify-icon {
+  display: inline-block;
+  margin: 0.5em 1em;
+}

@@ -144,7 +144,7 @@ package Game::EvonyTKR::Controller::CollectionBase {
 
     my @parts     = split(/::/, ref($self));
     my $baseClass = pop(@parts);
-    my $base = $self->getBase();
+    my $base      = $self->getBase();
     $logger->debug("CollectionBase index method has base $base");
     $self->stash(
       linkBase        => $base,

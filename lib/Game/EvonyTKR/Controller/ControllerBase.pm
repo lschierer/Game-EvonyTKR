@@ -27,7 +27,8 @@ package Game::EvonyTKR::Controller::ControllerBase {
     $logger->info("Registering routes for " . ref($self));
 
     my @parts = split(/::/, ref($self));
-    $base = $self->can('getBase')
+    $base =
+        $self->can('getBase')
       ? $self->getBase()
       : pop(@parts);
 

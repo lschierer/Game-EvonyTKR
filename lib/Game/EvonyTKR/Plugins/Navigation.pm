@@ -24,69 +24,81 @@ package Game::EvonyTKR::Plugins::Navigation {
     my $logger = Log::Log4perl->get_logger(__PACKAGE__);
     $logger->info("Registering navigation plugin");
 
-    $app->helper(add_navigation_item => sub {
-      my ($c, $item) = @_;
-      my $log = Log::Log4perl->get_logger(__PACKAGE__);
+    $app->helper(
+      add_navigation_item => sub {
+        my ($c, $item) = @_;
+        my $log = Log::Log4perl->get_logger(__PACKAGE__);
 
-      unless (ref $item eq 'HASH' && $item->{path}) {
-        $log->error("Invalid item (missing path): " . Data::Printer::np($item));
-        return;
-      }
+        unless (ref $item eq 'HASH' && $item->{path}) {
+          $log->error(
+            "Invalid item (missing path): " . Data::Printer::np($item));
+          return;
+        }
 
-      my $path = $item->{path};
+        my $path = $item->{path};
 
-      if ($rejected_items_by_path->{$path}) {
-        $log->debug("Skipping rejected path $path");
-        return;
-      }
+        if ($rejected_items_by_path->{$path}) {
+          $log->debug("Skipping rejected path $path");
+          return;
+        }
 
-      unless (exists $item->{title}) {
-        $log->error("Item rejected: missing title for $path");
-        return;
-      }
+        unless (exists $item->{title}) {
+          $log->error("Item rejected: missing title for $path");
+          return;
+        }
 
-      $raw_paths{$path} = 1;
+        $raw_paths{$path} = 1;
 
-      if (exists $nav_items_by_path{$path}) {
-        my $existing = $nav_items_by_path{$path};
-        if (exists $item->{order} && exists $existing->{order}) {
-          if ($item->{order} < $existing->{order}) {
+        if (exists $nav_items_by_path{$path}) {
+          my $existing = $nav_items_by_path{$path};
+          if (exists $item->{order} && exists $existing->{order}) {
+            if ($item->{order} < $existing->{order}) {
+              $nav_items_by_path{$path} = $item;
+            }
+          }
+          elsif (exists $item->{order}) {
             $nav_items_by_path{$path} = $item;
           }
-        } elsif (exists $item->{order}) {
-          $nav_items_by_path{$path} = $item;
-        } elsif (!exists $existing->{order}) {
-          $log->error("Duplicate navigation item at $path without order");
+          elsif (!exists $existing->{order}) {
+            $log->error("Duplicate navigation item at $path without order");
+          }
         }
-      } else {
-        $nav_items_by_path{$path} = $item;
+        else {
+          $nav_items_by_path{$path} = $item;
+        }
+
+        return 1;
       }
+    );
 
-      return 1;
-    });
+    $app->helper(
+      generate_navigation => sub {
+        my $c         = shift;
+        my $structure = {};
 
-    $app->helper(generate_navigation => sub {
-      my $c = shift;
-      my $structure = {};
+        foreach my $path (keys %nav_items_by_path) {
+          $self->_add_path_to_structure($structure, $path,
+            $nav_items_by_path{$path});
+        }
 
-      foreach my $path (keys %nav_items_by_path) {
-        $self->_add_path_to_structure($structure, $path, $nav_items_by_path{$path});
+        return $self->_prune_and_sort($structure, '');
       }
+    );
 
-      return $self->_prune_and_sort($structure, '');
-    });
-
-    $app->hook(before_render => sub {
-      my ($c, $args) = @_;
-      return if $args->{json} || $args->{text} || $c->req->url->path =~ /\.json$/;
-      $c->stash(navigation => $c->generate_navigation);
-    });
+    $app->hook(
+      before_render => sub {
+        my ($c, $args) = @_;
+        return
+          if $args->{json} || $args->{text} || $c->req->url->path =~ /\.json$/;
+        $c->stash(navigation => $c->generate_navigation);
+      }
+    );
   }
 
   sub _add_path_to_structure {
     my ($self, $tree, $path, $item) = @_;
-    my @segments = grep { length } split '/', $path;
-    my $current = $tree;
+    my @segments  = grep {length} split '/', $path;
+    my $current   = $tree;
     my $full_path = '';
 
     # sanity checks
@@ -94,24 +106,24 @@ package Game::EvonyTKR::Plugins::Navigation {
     return unless ref($item) eq 'HASH';
     return unless defined $item->{title};
 
-    for my $i (0..$#segments) {
+    for my $i (0 .. $#segments) {
       my $seg = $segments[$i];
       if (!$seg) {
-        return; # <--- # another sanity check
+        return;    # <--- # another sanity check
       }
       $full_path .= "/$seg";
       my $is_leaf = $i == $#segments;
 
       $current->{$seg} //= {
-        title => $self->_titleize($seg),
-        path  => $full_path,
-        order => 9999,
+        title    => $self->_titleize($seg),
+        path     => $full_path,
+        order    => 9999,
         children => {},
       };
 
       if ($is_leaf) {
-        $current->{$seg}->{title}  = $item->{title};
-        $current->{$seg}->{order}  = $item->{order} // 9999;
+        $current->{$seg}->{title} = $item->{title};
+        $current->{$seg}->{order} = $item->{order} // 9999;
       }
 
       $current = $current->{$seg}->{children};
@@ -124,19 +136,27 @@ package Game::EvonyTKR::Plugins::Navigation {
 
     foreach my $key (sort keys %$tree) {
       my $node = $tree->{$key};
-      my $has_valid_children = scalar keys %{ $node->{children} }; # Will check recursively
+      my $has_valid_children =
+        scalar keys %{ $node->{children} };    # Will check recursively
 
       my $children = $self->_prune_and_sort($node->{children}, $node->{path});
 
-      push @result, {
+      push @result,
+        {
         title    => $node->{title},
         path     => $node->{path},
         order    => $node->{order} // 9999,
         children => $children,
-      } if @$children || exists $raw_paths{$node->{path}} || exists $raw_paths{"$node->{path}/index"};
+        }
+        if @$children
+        || exists $raw_paths{ $node->{path} }
+        || exists $raw_paths{"$node->{path}/index"};
     }
 
-    @result = sort { $a->{order} <=> $b->{order} || lc($a->{title}) cmp lc($b->{title}) } @result;
+    @result = sort {
+      $a->{order} <=> $b->{order}
+        || lc($a->{title}) cmp lc($b->{title})
+    } @result;
     return \@result;
   }
 

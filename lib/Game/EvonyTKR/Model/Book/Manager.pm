@@ -23,7 +23,7 @@ class Game::EvonyTKR::Model::Book::Manager : isa(Game::EvonyTKR::Model::Data) {
 
   method get_all_books {
     my $values;
-    @{ $values } = values %{ $books };
+    @{$values} = values %{$books};
     return $values;
   }
 

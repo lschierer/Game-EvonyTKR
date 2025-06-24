@@ -1,0 +1,26 @@
+% layout 'default';
+<link rel="stylesheet" href="/css/GeneralTable.css" />
+<script  type="module" >
+  import "/js/Generals/GeneralTable.js";
+</script>
+
+<div class="general-comparison">
+  <%= include 'partials/level_settings_form',
+      mode => $mode,
+      ascendingLevel        => $ascendingLevel,
+      primarySpeciality1    => $primarySpeciality1,
+      primarySpeciality2    => $primarySpeciality2,
+      primarySpeciality3    => $primarySpeciality3,
+      primarySpeciality4    => $primarySpeciality4,
+      secondarySpeciality1  => $secondarySpeciality1,
+      secondarySpeciality2  => $secondarySpeciality2,
+      secondarySpeciality3  => $secondarySpeciality3,
+      secondarySpeciality4  => $secondarySpeciality4,
+      ascendingLevelValues  => $ascendingLevelValues,
+      specialityLevelValues => $specialityLevelValues
+  %>
+
+  <div class="general-table-container">
+    <general-table mode='single' generaltype="<%= $generalType %>" typeheader="<%= $linkTarget %>"></general-table>
+  </div>
+</div>

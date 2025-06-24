@@ -132,6 +132,16 @@ export class GeneralTable extends LitElement {
   @state() private columns: ColumnDef<RowData>[] = [];
   @state() private nameList: RowStub[] = [];
 
+  @state() private ascendingLevel: string = 'red5';
+  @state() private primarySpeciality1: string = 'gold';
+  @state() private primarySpeciality2: string = 'gold';
+  @state() private primarySpeciality3: string = 'gold';
+  @state() private primarySpeciality4: string = 'gold';
+  @state() private secondarySpeciality1: string = 'gold';
+  @state() private secondarySpeciality2: string = 'gold';
+  @state() private secondarySpeciality3: string = 'gold';
+  @state() private secondarySpeciality4: string = 'gold';
+
   private dataMap = new Map<number, RowData>();
   private tableData: RowData[] = [];
   private _bgFetchTimer?: number;
@@ -140,15 +150,50 @@ export class GeneralTable extends LitElement {
   static styles: CSSResultGroup = [SpectrumTokensCSS, GeneralTableCSS];
 
   override async firstUpdated(_changed: PropertyValues) {
+    this.fetchParams();
     this.columns = this.generateColumns();
     const stubData = await this.fetchStubPairs();
     this.nameList = [...stubData];
     this.startBackgroundFetch();
   }
 
+  protected override async willUpdate(_changedProperties: PropertyValues) {
+    if (
+      _changedProperties.has('ascendingLevel') ||
+      _changedProperties.has('primarySpeciality1') ||
+      _changedProperties.has('primarySpeciality2') ||
+      _changedProperties.has('primarySpeciality3') ||
+      _changedProperties.has('primarySpeciality4') ||
+      _changedProperties.has('secondarySpeciality1') ||
+      _changedProperties.has('secondarySpeciality2') ||
+      _changedProperties.has('secondarySpeciality3') ||
+      _changedProperties.has('secondarySpeciality4')
+    ) {
+      this.nameList.forEach((nameStub, index) => {
+        nameStub.current = 'stale';
+        this.dataMap.delete(index);
+        this.startBackgroundFetch();
+      });
+    }
+  }
   private generateColumns(): ColumnDef<RowData>[] {
     return Array.from(tableHeaders.keys())
-      .filter((key) => this.mode === 'pair' || key !== 'secondary')
+      .filter((key) => {
+        if (this.mode === 'single' && key === 'secondary') {
+          return false;
+        }
+        if (this.generalType === 'mayor') {
+          if (
+            key === 'marchbuff' ||
+            key === 'attackbuff' ||
+            key === 'defensebuff' ||
+            key === 'hpbuff'
+          ) {
+            return false;
+          }
+        }
+        return true;
+      })
       .map((key) => {
         const accessorFn = (row: RowData) => {
           if (!row) return null;
@@ -199,7 +244,23 @@ export class GeneralTable extends LitElement {
   }
 
   private async fetchStubPairs(): Promise<RowStub[]> {
-    const url = window.location.pathname.replace(/\/$/, '') + '/data.json';
+    let url = window.location.pathname.replace(/\/$/, '') + '/data.json';
+    url = url + `?ascendingLevel=${this.ascendingLevel}`;
+    if (this.mode === 'single') {
+      url = url + `&speciality1=${this.primarySpeciality1}`;
+      url = url + `&speciality2=${this.primarySpeciality2}`;
+      url = url + `&speciality3=${this.primarySpeciality3}`;
+      url = url + `&speciality4=${this.primarySpeciality4}`;
+    } else {
+      url = url + `&primarySpeciality1=${this.primarySpeciality1}`;
+      url = url + `&primarySpeciality2=${this.primarySpeciality2}`;
+      url = url + `&primarySpeciality3=${this.primarySpeciality3}`;
+      url = url + `&primarySpeciality4=${this.primarySpeciality4}`;
+      url = url + `&secondarySpeciality1=${this.secondarySpeciality1}`;
+      url = url + `&secondarySpeciality2=${this.secondarySpeciality2}`;
+      url = url + `&secondarySpeciality3=${this.secondarySpeciality3}`;
+      url = url + `&secondarySpeciality4=${this.secondarySpeciality4}`;
+    }
     const res = await fetch(url);
     const json = await res.json();
     const result =
@@ -239,6 +300,36 @@ export class GeneralTable extends LitElement {
       const parsed = GeneralData.safeParse(json);
       if (parsed.success) return parsed.data;
       throw new Error(parsed.error.message);
+    }
+  }
+
+  private fetchParams() {
+    const urlParams = new URLSearchParams(window.location.search);
+
+    // Get ascending level
+    if (urlParams.has('ascendingLevel')) {
+      this.ascendingLevel = urlParams.get('ascendingLevel') || 'red5';
+    }
+
+    // Get speciality levels based on mode
+    if (this.mode === 'single') {
+      this.primarySpeciality1 = urlParams.get('speciality1') || 'gold';
+      this.primarySpeciality2 = urlParams.get('speciality2') || 'gold';
+      this.primarySpeciality3 = urlParams.get('speciality3') || 'gold';
+      this.primarySpeciality4 = urlParams.get('speciality4') || 'gold';
+    } else {
+      this.primarySpeciality1 = urlParams.get('primarySpeciality1') || 'gold';
+      this.primarySpeciality2 = urlParams.get('primarySpeciality2') || 'gold';
+      this.primarySpeciality3 = urlParams.get('primarySpeciality3') || 'gold';
+      this.primarySpeciality4 = urlParams.get('primarySpeciality4') || 'gold';
+      this.secondarySpeciality1 =
+        urlParams.get('secondarySpeciality1') || 'gold';
+      this.secondarySpeciality2 =
+        urlParams.get('secondarySpeciality2') || 'gold';
+      this.secondarySpeciality3 =
+        urlParams.get('secondarySpeciality3') || 'gold';
+      this.secondarySpeciality4 =
+        urlParams.get('secondarySpeciality4') || 'gold';
     }
   }
 

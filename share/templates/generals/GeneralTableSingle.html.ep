@@ -1,0 +1,24 @@
+% layout 'default';
+<link rel="stylesheet" href="/css/GeneralTable.css" />
+<script  type="module" >
+  import "/js/Generals/GeneralTable.js";
+</script>
+
+<div class="general-comparison">
+  <%= include 'partials/level_settings_form',
+      mode                  => $mode,
+      linkTarget            => $linkTarget,
+      covenantLevel         => $covenantLevel,
+      ascendingLevel        => $ascendingLevel,
+      speciality1           => $speciality1,
+      speciality2           => $speciality2,
+      speciality3           => $speciality3,
+      speciality4           => $speciality4,
+      ascendingLevelValues  => $ascendingLevelValues,
+      specialityLevelValues => $specialityLevelValues
+  %>
+
+  <div class="general-table-container">
+    <general-table mode='single' generaltype="<%= $generalType %>" typeheader="<%= $linkTarget %>"></general-table>
+  </div>
+</div>

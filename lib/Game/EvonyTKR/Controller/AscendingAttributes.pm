@@ -3,18 +3,29 @@ use experimental qw(class);
 use utf8::all;
 use File::FindLib 'lib';
 require Game::EvonyTKR::Model::AscendingAttributes::Manager;
+require Data::Printer;
 use namespace::clean;
 
 package Game::EvonyTKR::Controller::AscendingAttributes {
-  use Mojo::Base 'Game::EvonyTKR::Controller::CollectionBase';
-
-  my $manager;
+  use Mojo::Base 'Game::EvonyTKR::Controller::CollectionBase', -strict, -signatures;
+  use List::AllUtils qw(uniq);
+  use Carp;
 
   # Specify which collection this controller handles
   sub collection_name {'ascending attributes'}
 
+  my $base = '/Ascending Attributes';
+
+  sub getBase($self) {
+    return $base;
+  }
+
   sub controller_name($self) {
     return 'AscendingAttributes';    # Explicitly return the controller name
+  }
+
+  sub get_manager ($self) {
+    return $self->app->get_root_manager->ascendingAttributesManager;
   }
 
   # Override loadItem to add any Ascending Attributes-specific processing
@@ -24,26 +35,18 @@ package Game::EvonyTKR::Controller::AscendingAttributes {
     $logger->info("Registering routes for " . ref($self));
     $self->SUPER::register($app, $config);
 
-    eval {
-      $manager = Game::EvonyTKR::Model::AscendingAttributes::Manager->new();
+    my $distDir    = Mojo::File::Share::dist_dir('Game::EvonyTKR');
+    my $collection = $self->collection_name;
+    my $SourceDir  = $distDir->child("collections/$collection");
 
-      my $distDir    = Mojo::File::Share::dist_dir('Game::EvonyTKR');
-      my $collection = $self->collection_name;
-      my $SourceDir  = $distDir->child("collections/$collection");
-      $manager->importAll($SourceDir);
-
-      $logger->info(
+    $logger->info(
 "Successfully loaded Ascending Attributes manager with collection from $SourceDir"
-      );
-    };
-    if ($@) {
-      $logger->error("Failed to initialize Ascending Attributes Manager: $@");
-      $manager = undef;
-    }
+    );
 
     $app->helper(
-      get_builtinbook_manager => sub {
-        return $manager;
+      get_ascendingattributes_manager => sub ($c) {
+
+        return $c->app->get_root_manager->ascendingAttributesManager;
       }
     );
 
@@ -60,8 +63,20 @@ package Game::EvonyTKR::Controller::AscendingAttributes {
     );
 
     $app->helper(
-      ascending_level_names => sub($c, $level) {
-        return $self->level_names($level);
+      ascending_level_names => sub($c, $level = '') {
+        my $logger = Log::Log4perl->get_logger(__PACKAGE__);
+        if (length($level) == 0) {
+        my $purpleNames = $c->app->get_root_manager->AscendingLevelNames(0, 1);
+              my $redNames = $c->app->get_root_manager->AscendingLevelNames(1, 1);
+
+              # Combine and get unique values
+              my @combined = (@$purpleNames, @$redNames);
+              my @unique = uniq(@combined);
+
+              $logger->debug("ascending_level_names returning unique list: " . Data::Printer::np(@unique));
+              return \@unique;
+        }
+        return $c->app->get_root_manager->AscendingLevelLabel($level);
       }
     );
 
@@ -136,25 +151,6 @@ package Game::EvonyTKR::Controller::AscendingAttributes {
     }
 
     return $level_sets{$set_type};
-  }
-
-  sub level_names ($self, $level) {
-    my $level_names = {
-      "purple1" => "1 Purple Star",
-      "purple2" => "2 Purple Stars",
-      "purple3" => "3 Purple Stars",
-      "purple4" => "4 Purple Stars",
-      "purple5" => "5 Purple Stars",
-      "red1"    => "1 Red Star",
-      "red2"    => "2 Red Stars",
-      "red3"    => "3 Red Stars",
-      "red4"    => "4 Red Stars",
-      "red5"    => "5 Red Stars",
-    };
-    if (exists $level_names->{$level}) {
-      return $level_names->{$level};
-    }
-    return 'None';
   }
 
   sub sort_ascending_levels($self, $item) {

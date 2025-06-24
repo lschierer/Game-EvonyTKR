@@ -16,6 +16,7 @@ class Game::EvonyTKR::Model::Data : isa(Game::EvonyTKR::Model::Logger) {
   use X500::RDN;
   our $VERSION = 'v0.30.0';
   my $debug = 0;
+  use Carp;
 
   field $AttributeNames : reader = Type::Tiny::Enum->new(
     values => [qw(
@@ -136,6 +137,17 @@ class Game::EvonyTKR::Model::Data : isa(Game::EvonyTKR::Model::Logger) {
   field $specialityLevels : reader =
     Type::Tiny::Enum->new(values => [qw( none green blue purple orange gold)]);
 
+  field $covenantLevelNames :reader =
+    ['None', 'War', 'Cooperation', 'Peace', 'Faith', 'Honor', 'Civilization',];
+
+  method checkCovenantLevel ($proposedLevel) {
+    my $check = {};
+    foreach my $key ($covenantLevelNames->@*) {
+      $check->{$key} = 1;
+    }
+    return exists $check->{$proposedLevel};
+  }
+
   Readonly::Scalar my $redAscendingLevelNames => {
     red1 => '1 Red Star',
     red2 => '2 Red Stars',
@@ -151,6 +163,24 @@ class Game::EvonyTKR::Model::Data : isa(Game::EvonyTKR::Model::Logger) {
     purple4 => '4 Purple Stars',
     purple5 => '5 Purple Stars',
   };
+
+  method checkAscendingLevel ($proposedLevel) {
+    if ($proposedLevel =~ /red/) {
+      return exists $redAscendingLevelNames->{$proposedLevel};
+    }
+    else {
+      return exists $purpleAscendingLevelNames->{$proposedLevel};
+    }
+  }
+
+  method AscendingLevelLabel ($levelName) {
+    if ($levelName =~ /red/) {
+      return $redAscendingLevelNames->{$levelName};
+    }
+    else {
+      return $purpleAscendingLevelNames->{$levelName};
+    }
+  }
 
   method AscendingLevelNames ($red = 1, $printable = 0) {
     my $towalk;

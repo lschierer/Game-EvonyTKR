@@ -20,6 +20,11 @@
       class="custom-depth spectrum-SideNav-item<%= $is_selected ? ' is-selected' : '' %>"
     >
       <a href="<%= $item_href %>" class="spectrum-SideNav-itemLink">
+        <% if (exists $item->{children} and scalar @{ $item->{children} } > 0 ) { %>
+          <iconify-icon icon="tdesign:folder-1" ></iconify-icon>
+        <% } else { %>
+          <iconify-icon icon="tdesign:article" ></iconify-icon>
+        <% } %>
         <span class="spectrum-SideNav-link-text"><%= $item->{title} %></span>
       </a>
 

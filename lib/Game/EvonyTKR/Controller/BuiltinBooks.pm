@@ -11,7 +11,7 @@ package Game::EvonyTKR::Controller::BuiltinBooks {
 
   # Specify which collection this controller handles
   sub collection_name {
-    return 'skill books'
+    return 'skill books';
   }
 
   sub get_manager($self) {
@@ -41,9 +41,9 @@ package Game::EvonyTKR::Controller::BuiltinBooks {
     );
 
     $app->add_navigation_item({
-      title  => 'Details of General Skill Books',
-      path   => '/Skill Books/',
-      order  => 20,
+      title => 'Details of General Skill Books',
+      path  => '/Skill Books/',
+      order => 20,
     });
 
     my @parts     = split(/::/, ref($self));
@@ -59,31 +59,32 @@ package Game::EvonyTKR::Controller::BuiltinBooks {
     my $r      = $app->routes;
     my $routes = $r->any("$base");
 
-    $routes->any('/details')
-      ->to(cb => sub ($c) {
-        $c->redirect_to('/Skill Books')
-      });
+    $routes->any('/details')->to(
+      cb => sub ($c) {
+        $c->redirect_to('/Skill Books');
+      }
+    );
 
-      $app->plugins->on(
-        'evonytkrtips_initialized' => sub($self, $manager) {
-          $logger->debug(
-            "evonytkrtips_initialized sub has controller_name $controller_name.");
+    $app->plugins->on(
+      'evonytkrtips_initialized' => sub($self, $manager) {
+        $logger->debug(
+          "evonytkrtips_initialized sub has controller_name $controller_name.");
 
-            if (not defined $manager) {
-              $logger->logcroak('No Manager Defined');
-            }
-
-          foreach my $book (@{ $manager->bookManager->get_all_books() }) {
-            my $name = $book->name;
-            $app->add_navigation_item({
-              title   => "Details for $name",
-              path    => "/Skill Books/details/$name",
-              parent  => "/Skill Books/details/",
-              order => 20,
-            });
-          }
+        if (not defined $manager) {
+          $logger->logcroak('No Manager Defined');
         }
-      );
+
+        foreach my $book (@{ $manager->bookManager->get_all_books() }) {
+          my $name = $book->name;
+          $app->add_navigation_item({
+            title  => "Details for $name",
+            path   => "/Skill Books/details/$name",
+            parent => "/Skill Books/details/",
+            order  => 20,
+          });
+        }
+      }
+    );
 
     $app->helper(
       get_builtin_book_text => sub ($c, $book_name) {

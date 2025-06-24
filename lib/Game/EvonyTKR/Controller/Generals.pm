@@ -16,7 +16,7 @@ package Game::EvonyTKR::Controller::Generals {
   # Specify which collection this controller handles
   sub collection_name {'generals'}
 
-  my $base = '/Generals/';
+  my $base = '/Generals';
 
   sub getBase($self) {
     return $base;
@@ -58,10 +58,11 @@ package Game::EvonyTKR::Controller::Generals {
       ->to(controller => $controller_name, action => 'index')
       ->name("${base}_index");
 
-    $routes->any('/details')
-      ->to(cb => sub ($c) {
-        $c->redirect_to('/Generals')
-      });
+    $routes->any('/details')->to(
+      cb => sub ($c) {
+        $c->redirect_to('/Generals');
+      }
+    );
 
     # Add a parent navigation item for Generals
     $app->add_navigation_item({
@@ -112,6 +113,13 @@ package Game::EvonyTKR::Controller::Generals {
           )
           ->to(controller => $controller_name, action => 'mayor_comparison')
           ->name("${base}_mayor_comparison");
+
+        $app->add_navigation_item({
+          title  => "Comparison of Mayor's Buffs",
+          path   => "/Generals/Mayors/comparison",
+          parent => '/Generals/Mayors',
+          order  => 10,
+        });
 
         $routes->get(
           '/Mayors/comparison/data.json' => {
@@ -225,8 +233,67 @@ package Game::EvonyTKR::Controller::Generals {
     my $generalType = $self->stash('generalType');
     my $linkTarget  = $self->stash('linkTarget');
 
+    # Get query parameters with defaults
+    my $covenantLevel  = $self->param('covenantLevel')  // 'Civilization';
+    my $ascendingLevel = $self->param('ascendingLevel') // 'red5';
+    my $speciality1    = $self->param('speciality1')    // 'gold';
+    my $speciality2    = $self->param('speciality2')    // 'gold';
+    my $speciality3    = $self->param('speciality3')    // 'gold';
+    my $speciality4    = $self->param('speciality4')    // 'gold';
+
+    # Validate parameters using enums from Game::EvonyTKR::Model::Data
+    my $data_model = Game::EvonyTKR::Model::Data->new();
+
+    if(!$data_model->checkCovenantLevel($covenantLevel)) {
+      $logger->warn(
+        "Invalid covenantLevel: $covenantLevel, using default 'Civilization'");
+        $covenantLevel = 'Civilization';
+    }
+
+    # Validate ascending level
+    if (!$data_model->checkAscendingLevel($ascendingLevel)) {
+      $logger->warn(
+        "Invalid ascendingLevel: $ascendingLevel, using default 'red5'");
+      $ascendingLevel = 'red5';
+    }
+
+    # Validate speciality levels
+    if (!$data_model->specialityLevels->check($speciality1)) {
+      $logger->warn("Invalid speciality1: $speciality1, using default 'gold'");
+      $speciality1 = 'gold';
+    }
+
+    if (!$data_model->specialityLevels->check($speciality2)) {
+      $logger->warn("Invalid speciality2: $speciality2, using default 'gold'");
+      $speciality2 = 'gold';
+    }
+
+    if (!$data_model->specialityLevels->check($speciality3)) {
+      $logger->warn("Invalid speciality3: $speciality3, using default 'gold'");
+      $speciality3 = 'gold';
+    }
+
+    if (!$data_model->specialityLevels->check($speciality4)) {
+      $logger->warn("Invalid speciality4: $speciality4, using default 'gold'");
+      $speciality4 = 'gold';
+    }
+
     # Stash data for the template
-    $self->stash(template => 'generals/GeneralTable',);
+    $self->stash(
+      template       => 'generals/GeneralTableSingle',
+      mode           => 'single',
+      covenantLevel  => $covenantLevel,
+      ascendingLevel => $ascendingLevel,
+      speciality1    => $speciality1,
+      speciality2    => $speciality2,
+      speciality3    => $speciality3,
+      speciality4    => $speciality4,
+
+      # Add enum values for the template to use
+      ascendingLevelValues  => $data_model->AscendingLevelNames(),
+      covenantLevelValues   => $data_model->covenantLevelNames,
+      specialityLevelValues => $data_model->specialityLevels->values,
+    );
 
     my $markdown_path = $distDir->child("pages/generals/Mayor/comparison.md");
 
@@ -246,9 +313,48 @@ package Game::EvonyTKR::Controller::Generals {
     my $generalType = $self->stash('generalType');
     my $linkTarget  = $self->stash('linkTarget');
 
-    my $gm = $self->app->get_general_manager();
+    # Get query parameters with defaults
+    my $ascendingLevel = $self->param('ascendingLevel') // 'red5';
+    my $covenantLevel  = $self->param('covenantLevel') // 'Civilization';
+    my $speciality1    = $self->param('speciality1')    // 'gold';
+    my $speciality2    = $self->param('speciality2')    // 'gold';
+    my $speciality3    = $self->param('speciality3')    // 'gold';
+    my $speciality4    = $self->param('speciality4')    // 'gold';
 
+    # Validate parameters using enums from Game::EvonyTKR::Model::Data
+    my $data_model = Game::EvonyTKR::Model::Data->new();
+
+    # Validate ascending level
+    if (!$data_model->checkAscendingLevel($ascendingLevel)) {
+      $logger->warn(
+        "Invalid ascendingLevel: $ascendingLevel, using default 'red5'");
+      $ascendingLevel = 'red5';
+    }
+
+    # Validate speciality levels
+    if (!$data_model->specialityLevels->check($speciality1)) {
+      $logger->warn("Invalid speciality1: $speciality1, using default 'gold'");
+      $speciality1 = 'gold';
+    }
+
+    if (!$data_model->specialityLevels->check($speciality2)) {
+      $logger->warn("Invalid speciality2: $speciality2, using default 'gold'");
+      $speciality2 = 'gold';
+    }
+
+    if (!$data_model->specialityLevels->check($speciality3)) {
+      $logger->warn("Invalid speciality3: $speciality3, using default 'gold'");
+      $speciality3 = 'gold';
+    }
+
+    if (!$data_model->specialityLevels->check($speciality4)) {
+      $logger->warn("Invalid speciality4: $speciality4, using default 'gold'");
+      $speciality4 = 'gold';
+    }
+
+    my $gm                   = $self->app->get_general_manager();
     my @generalBuffSummaries = ();
+
     while (my ($key, $general) = each(%{ $gm->get_all_generals() })) {
       $logger->debug("inspecting '$key', first need to see if it is a mayor."
           . Data::Printer::np($general));
@@ -261,15 +367,21 @@ package Game::EvonyTKR::Controller::Generals {
         next;
       }
       my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
-        rootManager => $self->app->get_root_manager(),
-        general     => $general,
-        isPrimary   => 1,
-        targetType  => $generalType,
+        rootManager    => $self->app->get_root_manager(),
+        general        => $general,
+        isPrimary      => 1,
+        targetType     => $generalType,
+        ascendingLevel => $ascendingLevel,
+        covenantLevel  => $covenantLevel,
+        speciality1    => $speciality1,
+        speciality2    => $speciality2,
+        speciality3    => $speciality3,
+        speciality4    => $speciality4,
+
       );
 
       $summarizer->updateBuffs();
       $summarizer->updateDebuffs();
-
       my $result = {
         marchbuff            => $summarizer->marchIncrease,
         attackbuff           => $summarizer->attackIncrease,
