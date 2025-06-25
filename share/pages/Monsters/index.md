@@ -31,6 +31,7 @@ Once upon a time, when you attacked a monster, or another keep, the primary effe
 With any version of Evony in the last year, and really for the last two years, that is not true.  That is because the number and significance of "passive buffs", those that come from things like Civilization Treasures, Art Work, Spiritual Beast Seals (and many other sources) have proliferated in both variety and in the amount of buff they provide.
 
 Currently to get a reasonable picture of what it would take to reproduce someone's results in a monster attack, you would need to know (this is no particular order):
+
 1. What troop type(s) they used.
 1. What troop tier(s) they used, and how many in each tier.
 1. What primary and secondary general they picked
