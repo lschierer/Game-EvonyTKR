@@ -32,9 +32,9 @@ class Game::EvonyTKR::Model::Speciality : isa(Game::EvonyTKR::Model::Data) {
   field $levels : reader;
 
   ADJUST {
-    my $step1                 = {};
-    my $specialityLevelsNames = $self->specialityLevels->unique_values;
-    foreach my $key (@{$specialityLevelsNames}) {
+    my $step1 = {};
+
+    foreach my $key ($self->specialityLevels->@*) {
       $step1->{$key} = {
         level => $key,
         buffs => [],     # Empty arrayref that can be modified later
@@ -63,43 +63,50 @@ class Game::EvonyTKR::Model::Speciality : isa(Game::EvonyTKR::Model::Data) {
     $logger->debug(
       "Calculating buffs for level: $level, attribute: $attribute");
 
-    # an enum's values function will always return in the same order.
-    my $valid_levels = $self->specialityLevels->values;
-    my %level_index  = map { $valid_levels->[$_] => $_ } 0 .. $#$valid_levels;
+    return 0 if not defined $level or $level =~ /none/i;
 
-    unless (exists $level_index{$level}) {
-      $logger->debug("Invalid level: $level");
-      return 0;
+    # an list's values function will always return in the same order.
+    my $valid_levels = $self->specialityLevels;
+    # Define the hierarchy of levels
+    my @level_hierarchy = $self->specialityLevels->@*;
+
+    # Find the index of the requested level
+    my $level_index = -1;
+    for my $i (0 .. $#level_hierarchy) {
+      if ($level_hierarchy[$i] eq $level) {
+        $level_index = $i;
+        last;
+      }
     }
 
-    return 0 if $level eq 'none';
+    return 0 if $level_index <= 0;    # 'none' or invalid level
 
-    my $buffs_by_level = $self->levels;
-    my $target_index   = $level_index{$level};
+    my $total          = 0;
+    my $levels_by_name = $self->levels;
 
-    my $total = 0;
-
-    for my $i (1 .. $target_index) {    # skip index 0 ('none')
-      my $level_name = $valid_levels->[$i];
-      my $buffs      = $buffs_by_level->{$level_name}->{buffs} // [];
+    # Accumulate buffs from all levels up to and including the specified level
+    for my $i (1 .. $level_index) {    # Start from 1 to skip 'none'
+      my $current_level = $level_hierarchy[$i];
+      my $buffs         = $levels_by_name->{$current_level}->{buffs} // [];
 
       $logger->debug(
-        "Checking level '$level_name' with " . scalar(@$buffs) . " buffs");
+        "Checking level $current_level with " . scalar(@{$buffs}) . " buffs");
 
       foreach my $buff (@$buffs) {
         if ($buff->match_buff(
           $attribute, $targetedType, $conditions, $debuffConditions
         )) {
           my $val = $buff->value->number;
-          $logger->debug("  ➤ Match found. Adding $val to total.");
+          $logger->debug(
+            "  ➤ Match found at level $current_level. Adding $val to total.");
           $total += $val;
         }
       }
     }
 
-    $logger->debug(
-      "$name has Total for level '$level' and attribute '$attribute': $total");
+    $logger->debug("Total for $level/$attribute: $total");
     return $total;
+
   }
 
   method addBuff ($level, $nb) {
@@ -110,13 +117,12 @@ class Game::EvonyTKR::Model::Speciality : isa(Game::EvonyTKR::Model::Data) {
         !blessed($nb) ? Scalar::Util::reftype($nb) : blessed($nb)));
       exit 0;
     }
-    my $specialityLevelsNames = $self->specialityLevels->unique_values;
 
     # the data files apparently have bad cases in them for level names.
-    if (none { $_ =~ /$level/i } @{$specialityLevelsNames}) {
+    if (none { $_ =~ /$level/i } $self->specialityLevels->@*) {
       $self->logger->error(sprintf(
         'level should be one of %s, not %s',
-        Data::Printer::np(@{$specialityLevelsNames}), $level
+        Data::Printer::np($self->specialityLevels->@*), $level
       ));
       return 0;
     }

@@ -7,6 +7,7 @@ use namespace::clean;
 
 package Game::EvonyTKR::Controller::Specialities {
   use Mojo::Base 'Game::EvonyTKR::Controller::CollectionBase';
+  use List::AllUtils qw( all any none first);
 
   # Specify which collection this controller handles
   sub collection_name {'specialities'}
@@ -93,23 +94,35 @@ package Game::EvonyTKR::Controller::Specialities {
 
     $app->helper(
       speciality_level_names => sub ($c, $level = '', $printable = 0) {
-        $level //= '';  # Ensure defined
+        $level //= '';    # Ensure defined
         my $logger = Log::Log4perl->get_logger(__PACKAGE__);
         if (length($level) == 0) {
           my $nameList = [];
-          foreach my $orig_name ($c->app->get_root_manager->specialityLevels->values->@*) {
-            $logger->debug("speciality_level_names evaluating speciality level name $orig_name");
+          foreach
+            my $orig_name ($c->app->get_root_manager->specialityLevels->@*) {
+            $logger->debug(
+"speciality_level_names evaluating speciality level name $orig_name"
+            );
             my $name;
-            if($printable) {
+            if ($printable) {
               $name = $orig_name =~ s/(\w)(\w*)/\U$1\L$2/r;
-            } else {
+            }
+            else {
               $name = $orig_name;
             }
             push @$nameList, $name;
           }
           return $nameList;
-        } else {
-          my $match = $c->app->get_root_manager->specialityLevels->closest_match($level);
+        }
+        else {
+          $logger->debug(
+            "speciality_level_names sees levels"
+              . Data::Printer::np(
+              $c->app->get_root_manager->specialityLevels->@*
+              )
+          );
+          my $match = first { $level =~ /$_/i }
+            $c->app->get_root_manager->specialityLevels->@*;
           $match =~ s/(\w)(\w*)/\U$1\L$2/;
           return $match;
         }

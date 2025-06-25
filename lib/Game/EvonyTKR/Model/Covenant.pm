@@ -57,17 +57,11 @@ class Game::EvonyTKR::Model::Covenant : isa(Game::EvonyTKR::Model::Data) {
 
   field $categories : reader;
 
-  field $CovenantLevels = Type::Tiny::Enum->new(
-    values => [
-      'None', 'War', 'Cooperation', 'Peace', 'Faith', 'Honor', 'Civilization',
-    ],
-  );
-
   ADJUST {
     #Covenants only have these levels.
-    my @levels = @{ $CovenantLevels->values() };
-    my $step1  = {};
-    foreach my $key (@levels) {
+    my $step1 = {};
+    foreach my $key ($self->covenantLevels->@*) {
+      $self->logger->debug("initializing covenantLevel $key");
       if ($key eq 'None') {
         next;
       }
@@ -80,7 +74,7 @@ class Game::EvonyTKR::Model::Covenant : isa(Game::EvonyTKR::Model::Data) {
     Readonly::Hash1 my %step2 => %{$step1};
     $categories = \%step2;
 
-    for my ($index, $lv) (indexed(@levels)) {
+    for my ($index, $lv) (indexed($self->covenantLevels->@*)) {
       if ($lv eq 'None') {
         next;
       }
@@ -101,9 +95,9 @@ class Game::EvonyTKR::Model::Covenant : isa(Game::EvonyTKR::Model::Data) {
     $logger->debug(
       "Calculating ascending buffs for level: $level, attribute: $attribute");
 
-    return 0 if not defined $level or $level eq 'None';
+    return 0 if not defined $level or $level =~ /None/i;
 
-    my $valid_levels = $CovenantLevels->values;
+    my $valid_levels = $self->covenantLevels;
     my %level_index  = map { $valid_levels->[$_] => $_ } 0 .. $#$valid_levels;
 
     unless (exists $level_index{$level}) {
@@ -149,22 +143,30 @@ class Game::EvonyTKR::Model::Covenant : isa(Game::EvonyTKR::Model::Data) {
       exit 0;
     }
 
-    if (none { $level =~ /$_/i } @{ $CovenantLevels->values() }) {
+    if (none { $level =~ /$_/i } @{ $self->covenantLevels }) {
       $self->logger->error(sprintf(
         'level should be one of %s, not %s',
-        join(', ', @{ $CovenantLevels->values() }), $level
+        join(', ', @{ $self->covenantLevels }), $level
       ));
       return 0;
     }
     if ($level eq 'None') {
       return 0;
     }
+    my $count = -1;
+    $level = lc($level);
+    if (!exists $categories->{$level}) {
+      $self->logger->error(
+        "category $level is not a valid key for covenantlevels!!");
+    }
+    else {
+      push @{ $categories->{$level}->{buffs} }, $nb;
+      $count = scalar @{ $categories->{$level}->{buffs} };
+      $self->logger->debug("Added buff for attribute '"
+          . $nb->attribute
+          . "' to covenant level '$level', now has $count buffs");
+    }
 
-    push @{ $categories->{$level}->{buffs} }, $nb;
-    my $count = scalar @{ $categories->{$level}->{buffs} };
-    $self->logger->debug("Added buff for attribute '"
-        . $nb->attribute
-        . "' to covenant level '$level', now has $count buffs");
     return $count;
 
   }
@@ -251,21 +253,16 @@ sets the Game::EvonyTKR::Model::General $general as a supporting general in $pos
 the $position field must use one of the values returned by secondaryKeys().
 =cut
 
-=method CovenantLevels()
-
-returns a reference to Type::Tiny::Enum of possible levels for the Covenant.
-=cut
-
 =method Buffs()
 
 returns a hash of the Buffs for this Covenant
-The primary keys are the values from CovenantLevels(), each of which returns
+The primary keys are the values from $self->covenantLevels from the ::Data class, each of which returns
 a HashRef.
 =cut
 
 =method addBuff($level, $nb, $inherited = 0)
 
-adds the Game::EvonyTKR::Model::Buff to the specified $level so long as $level is a valid selection from CovenantLevels().
+adds the Game::EvonyTKR::Model::Buff to the specified $level so long as $level is a valid selection from $self->covenantLevels.
 
 $inherited should not be used by external callers, it is used internally to set up the Buff structure such that each Level contains all Buffs from the previous levels, but marked as such.
 

@@ -1,0 +1,656 @@
+#!/usr/bin/env perl
+use v5.40.0;
+use experimental qw(class);
+use utf8::all;
+use Test::More;
+use Test::Deep;
+use File::FindLib 'lib';
+use Data::Printer;
+require Path::Tiny;
+require File::ShareDir;
+
+# Load required modules
+require Game::EvonyTKR::Model::General::Manager;
+require Game::EvonyTKR::Model::AscendingAttributes::Manager;
+require Game::EvonyTKR::Model::Book::Manager;
+require Game::EvonyTKR::Model::Speciality::Manager;
+require Game::EvonyTKR::Model::Covenant::Manager;
+require Game::EvonyTKR::Model::Buff::Summarizer;
+require Game::EvonyTKR::Model::General::ConflictGroup::Manager;
+require Game::EvonyTKR::Model::EvonyTKR::Manager;
+
+use Log::Log4perl qw(:easy);
+Log::Log4perl->easy_init($ERROR);  # Only show errors and above
+
+# Create a test class that mimics the EvonyTKR::Manager structure
+class BuffSummarizerTest {
+
+  field $generalManager;
+  field $ascendingAttributesManager;
+  field $bookManager;
+  field $specialityManager;
+  field $covenantManager;
+  field $generalConflictGroupManager;
+  field $dataDir = Path::Tiny::path('./share');
+  field $rootManager = Game::EvonyTKR::Model::EvonyTKR::Manager->new(SourceDir => $dataDir);
+
+    ADJUST {
+      # Import all data similar to EvonyTKR::Manager's rootImport method
+      $generalManager = Game::EvonyTKR::Model::General::Manager->new();
+      $generalConflictGroupManager =
+        Game::EvonyTKR::Model::General::ConflictGroup::Manager->new();
+      $bookManager       = Game::EvonyTKR::Model::Book::Manager->new();
+      $specialityManager = Game::EvonyTKR::Model::Speciality::Manager->new();
+      $ascendingAttributesManager =
+        Game::EvonyTKR::Model::AscendingAttributes::Manager->new();
+      $covenantManager =
+        Game::EvonyTKR::Model::Covenant::Manager->new(rootManager => $rootManager,);
+    }
+
+    method generalManager() { return $generalManager; }
+    method ascendingAttributesManager() { return $ascendingAttributesManager; }
+    method bookManager() { return $bookManager; }
+    method specialityManager() { return $specialityManager; }
+    method covenantManager() { return $covenantManager; }
+    method generalConflictGroupManager() { return $generalConflictGroupManager; }
+
+    method rootImport() {
+      my $collectionDir = $dataDir->child("collections");
+      say ("starting root import");
+
+      say ("starting import of generals.");
+      $generalManager->importAll($collectionDir->child("generals"));
+      say ("import of generals complete.");
+
+      say (" starting import of conflict groups.");
+      $generalConflictGroupManager->importAll(
+        $collectionDir->child('general conflict groups'));
+      say ("import of conflict groups complete");
+
+      say (" starting import of books.");
+      $bookManager->importAll($collectionDir->child('skill books'));
+      say ("import of books complete");
+
+      say (" starting import of specialities.");
+      $specialityManager->importAll($collectionDir->child('specialities'));
+      say ("import of specialities complete");
+
+      say (" starting import of ascending attributes.");
+      $ascendingAttributesManager->importAll(
+        $collectionDir->child('ascending attributes'));
+      say ("import of ascending attributes complete");
+
+      say (" starting import of covenants.");
+      $covenantManager->importAll($collectionDir->child('covenants'));
+      say ("import of covenants complete");
+
+      say ("root import complete");
+
+    }
+
+    method AscendingLevelNames($red = 1, $printable = 0) {
+        return $generalManager->AscendingLevelNames($red, $printable);
+    }
+
+    method AscendingLevelLabel($level) {
+        return $generalManager->AscendingLevelLabel($level);
+    }
+}
+
+# Create test instance and import data
+my $testManager = BuffSummarizerTest->new();
+$testManager->rootImport();
+
+# Get Marco Polo general
+my $marco_polo = $testManager->generalManager->getGeneral("Marco Polo");
+ok(defined $marco_polo, "Marco Polo general loaded");
+
+# Test case: All values set to 'none'
+subtest "Marco Polo with all values set to 'none'" => sub {
+
+    my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
+        rootManager    => $testManager,
+        general        => $marco_polo,
+        isPrimary      => 1,
+        targetType     => 'mounted_specialist',
+        ascendingLevel => 'none',
+        covenantLevel  => 'none',
+        speciality1    => 'none',
+        speciality2    => 'none',
+        speciality3    => 'none',
+        speciality4    => 'none',
+    );
+
+    $summarizer->updateBuffs();
+    $summarizer->updateDebuffs();
+
+    # Test Buff values for different troop types
+    is_deeply($summarizer->buffValues->{'Ground Troops'},
+        { 'March Size Capacity' => 12, 'Attack' => 25, 'Defense' => 25, 'HP' => 25 },
+        "Ground troop buffs should match expected values");
+
+    is_deeply($summarizer->buffValues->{'Mounted Troops'},
+        { 'March Size Capacity' => 12, 'Attack' => 70, 'Defense' => 65, 'HP' => 65 },
+        "Mounted troop buffs should match expected values");
+
+    is_deeply($summarizer->buffValues->{'Ranged Troops'},
+        { 'March Size Capacity' => 12, 'Attack' => 25, 'Defense' => 25, 'HP' => 25 },
+        "Ranged troop buffs should match expected values");
+
+    is_deeply($summarizer->buffValues->{'Siege Machines'},
+        { 'March Size Capacity' => 12, 'Attack' => 25, 'Defense' => 25, 'HP' => 25 },
+        "Siege Machines buffs should match expected values");
+
+    # Test Debuff values for different troop types
+    is_deeply($summarizer->debuffValues, {
+        'Ground Troops'  => { 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
+        'Mounted Troops' => { 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
+        'Ranged Troops'  => { 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
+        'Siege Machines' => { 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
+    }, "No debuffs should be present");
+};
+
+# Additional test cases can be added here for other combinations
+# For example:
+
+# Test case: Red1 ascending, all else none
+subtest "Marco Polo with Red1 ascending, all else none" => sub {
+
+    my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
+        rootManager    => $testManager,
+        general        => $marco_polo,
+        isPrimary      => 1,
+        targetType     => 'mounted_specialist',
+        ascendingLevel => 'red1',
+        covenantLevel  => 'none',
+        speciality1    => 'none',
+        speciality2    => 'none',
+        speciality3    => 'none',
+        speciality4    => 'none',
+    );
+
+    $summarizer->updateBuffs();
+    $summarizer->updateDebuffs();
+
+    # Test Buff values for different troop types
+    is_deeply($summarizer->buffValues->{'Ground Troops'},
+        { 'March Size Capacity' => 12, 'Attack' => 25, 'Defense' => 25, 'HP' => 25 },
+        "Ground troop buffs should match expected values");
+
+    is_deeply($summarizer->buffValues->{'Mounted Troops'},
+        { 'March Size Capacity' => 12, 'Attack' => 95, 'Defense' => 65, 'HP' => 80 },
+        "Mounted troop buffs should match expected values");
+
+    is_deeply($summarizer->buffValues->{'Ranged Troops'},
+        { 'March Size Capacity' => 12, 'Attack' => 25, 'Defense' => 25, 'HP' => 25 },
+        "Ranged troop buffs should match expected values");
+
+    is_deeply($summarizer->buffValues->{'Siege Machines'},
+        { 'March Size Capacity' => 12, 'Attack' => 25, 'Defense' => 25, 'HP' => 25 },
+        "Siege Machines buffs should match expected values");
+
+    # Test Debuff values for different troop types
+    is_deeply($summarizer->debuffValues, {
+        'Ground Troops'  => { 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
+        'Mounted Troops' => { 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
+        'Ranged Troops'  => { 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
+        'Siege Machines' => { 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
+    }, "No debuffs should be present");
+};
+
+# Test case: Red2 ascending, all else none
+subtest "Marco Polo with Red2 ascending, all else none" => sub {
+
+    my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
+        rootManager    => $testManager,
+        general        => $marco_polo,
+        isPrimary      => 1,
+        targetType     => 'mounted_specialist',
+        ascendingLevel => 'red2',
+        covenantLevel  => 'none',
+        speciality1    => 'none',
+        speciality2    => 'none',
+        speciality3    => 'none',
+        speciality4    => 'none',
+    );
+
+    $summarizer->updateBuffs();
+    $summarizer->updateDebuffs();
+
+    # Test Buff values for different troop types
+    is_deeply($summarizer->buffValues->{'Ground Troops'},
+        { 'March Size Capacity' => 12, 'Attack' => 25, 'Defense' => 25, 'HP' => 25 },
+        "Ground troop buffs should match expected values");
+
+    is_deeply($summarizer->buffValues->{'Mounted Troops'},
+        { 'March Size Capacity' => 12, 'Attack' => 95, 'Defense' => 65, 'HP' => 80 },
+        "Mounted troop buffs should match expected values");
+
+    is_deeply($summarizer->buffValues->{'Ranged Troops'},
+        { 'March Size Capacity' => 12, 'Attack' => 25, 'Defense' => 25, 'HP' => 25 },
+        "Ranged troop buffs should match expected values");
+
+    is_deeply($summarizer->buffValues->{'Siege Machines'},
+        { 'March Size Capacity' => 12, 'Attack' => 25, 'Defense' => 25, 'HP' => 25 },
+        "Siege Machines buffs should match expected values");
+
+    # Test Debuff values for different troop types
+    is_deeply($summarizer->debuffValues, {
+        'Ground Troops'  => { 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
+        'Mounted Troops' => { 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
+        'Ranged Troops'  => { 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
+        'Siege Machines' => { 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
+    }, "No debuffs should be present");
+};
+
+# Test case: Red3 ascending, all else none
+subtest "Marco Polo with Red3 ascending, all else none" => sub {
+
+    my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
+        rootManager    => $testManager,
+        general        => $marco_polo,
+        isPrimary      => 1,
+        targetType     => 'mounted_specialist',
+        ascendingLevel => 'red3',
+        covenantLevel  => 'none',
+        speciality1    => 'none',
+        speciality2    => 'none',
+        speciality3    => 'none',
+        speciality4    => 'none',
+    );
+
+    $summarizer->updateBuffs();
+    $summarizer->updateDebuffs();
+
+    # Test Buff values for different troop types
+    is_deeply($summarizer->buffValues->{'Ground Troops'},
+        { 'March Size Capacity' => 20, 'Attack' => 25, 'Defense' => 25, 'HP' => 25 },
+        "Ground troop buffs should match expected values");
+
+    is_deeply($summarizer->buffValues->{'Mounted Troops'},
+        { 'March Size Capacity' => 20, 'Attack' => 125, 'Defense' => 65, 'HP' => 80 },
+        "Mounted troop buffs should match expected values");
+
+    is_deeply($summarizer->buffValues->{'Ranged Troops'},
+        { 'March Size Capacity' => 20, 'Attack' => 25, 'Defense' => 25, 'HP' => 25 },
+        "Ranged troop buffs should match expected values");
+
+    is_deeply($summarizer->buffValues->{'Siege Machines'},
+        { 'March Size Capacity' => 20, 'Attack' => 25, 'Defense' => 25, 'HP' => 25 },
+        "Siege Machines buffs should match expected values");
+
+    # Test Debuff values for different troop types
+    is_deeply($summarizer->debuffValues, {
+        'Ground Troops'  => { 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
+        'Mounted Troops' => { 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
+        'Ranged Troops'  => { 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
+        'Siege Machines' => { 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
+    }, "No debuffs should be present");
+};
+
+# Test case: Red4 ascending, all else none
+subtest "Marco Polo with Red4 ascending, all else none" => sub {
+
+    my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
+        rootManager    => $testManager,
+        general        => $marco_polo,
+        isPrimary      => 1,
+        targetType     => 'mounted_specialist',
+        ascendingLevel => 'red4',
+        covenantLevel  => 'none',
+        speciality1    => 'none',
+        speciality2    => 'none',
+        speciality3    => 'none',
+        speciality4    => 'none',
+    );
+
+    $summarizer->updateBuffs();
+    $summarizer->updateDebuffs();
+
+    # Test Buff values for different troop types
+    is_deeply($summarizer->buffValues->{'Ground Troops'},
+        { 'March Size Capacity' => 20, 'Attack' => 25, 'Defense' => 25, 'HP' => 25 },
+        "Ground troop buffs should match expected values");
+
+    is_deeply($summarizer->buffValues->{'Mounted Troops'},
+        { 'March Size Capacity' => 20, 'Attack' => 125, 'Defense' => 65, 'HP' => 80 },
+        "Mounted troop buffs should match expected values");
+
+    is_deeply($summarizer->buffValues->{'Ranged Troops'},
+        { 'March Size Capacity' => 20, 'Attack' => 25, 'Defense' => 25, 'HP' => 25 },
+        "Ranged troop buffs should match expected values");
+
+    is_deeply($summarizer->buffValues->{'Siege Machines'},
+        { 'March Size Capacity' => 20, 'Attack' => 25, 'Defense' => 25, 'HP' => 25 },
+        "Siege Machines buffs should match expected values");
+
+    # Test Debuff values for different troop types
+    is_deeply($summarizer->debuffValues, {
+        'Ground Troops'  => { 'Attack' => 0, 'Defense' => 10, 'HP' => 10 },
+        'Mounted Troops' => { 'Attack' => 0, 'Defense' => 10, 'HP' => 10 },
+        'Ranged Troops'  => { 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
+        'Siege Machines' => { 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
+    }, "Debuffs match expected values.");
+};
+
+# Test case: Red5 ascending, all else none
+subtest "Marco Polo with Red5 ascending, all else none" => sub {
+
+    my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
+        rootManager    => $testManager,
+        general        => $marco_polo,
+        isPrimary      => 1,
+        targetType     => 'mounted_specialist',
+        ascendingLevel => 'red5',
+        covenantLevel  => 'none',
+        speciality1    => 'none',
+        speciality2    => 'none',
+        speciality3    => 'none',
+        speciality4    => 'none',
+    );
+
+    $summarizer->updateBuffs();
+    $summarizer->updateDebuffs();
+
+    # Test Buff values for different troop types
+    is_deeply($summarizer->buffValues->{'Ground Troops'},
+        { 'March Size Capacity' => 20, 'Attack' => 25, 'Defense' => 25, 'HP' => 25 },
+        "Ground troop buffs should match expected values");
+
+    is_deeply($summarizer->buffValues->{'Mounted Troops'},
+        { 'March Size Capacity' => 20, 'Attack' => 165, 'Defense' => 90, 'HP' => 105 },
+        "Mounted troop buffs should match expected values");
+
+    is_deeply($summarizer->buffValues->{'Ranged Troops'},
+        { 'March Size Capacity' => 20, 'Attack' => 25, 'Defense' => 25, 'HP' => 25 },
+        "Ranged troop buffs should match expected values");
+
+    is_deeply($summarizer->buffValues->{'Siege Machines'},
+        { 'March Size Capacity' => 20, 'Attack' => 25, 'Defense' => 25, 'HP' => 25 },
+        "Siege Machines buffs should match expected values");
+
+    # Test Debuff values for different troop types
+    is_deeply($summarizer->debuffValues, {
+        'Ground Troops'  => { 'Attack' => 0, 'Defense' => 10, 'HP' => 10 },
+        'Mounted Troops' => { 'Attack' => 0, 'Defense' => 10, 'HP' => 10 },
+        'Ranged Troops'  => { 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
+        'Siege Machines' => { 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
+    }, "Debuffs match expected values.");
+};
+
+# Test case: Green 1st speciality, all else none
+subtest "Marco Polo with Green 1st speciality, all else none" => sub {
+
+    my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
+        rootManager    => $testManager,
+        general        => $marco_polo,
+        isPrimary      => 1,
+        targetType     => 'mounted_specialist',
+        ascendingLevel => 'none',
+        covenantLevel  => 'none',
+        speciality1    => 'green',
+        speciality2    => 'none',
+        speciality3    => 'none',
+        speciality4    => 'none',
+    );
+
+    $summarizer->updateBuffs();
+    $summarizer->updateDebuffs();
+
+    # Test Buff values for different troop types
+    is_deeply($summarizer->buffValues->{'Ground Troops'},
+        { 'March Size Capacity' => 12, 'Attack' => 25, 'Defense' => 25, 'HP' => 25 },
+        "Ground troop buffs should match expected values");
+
+    is_deeply($summarizer->buffValues->{'Mounted Troops'},
+        { 'March Size Capacity' => 12, 'Attack' => 71, 'Defense' => 66, 'HP' => 65 },
+        "Mounted troop buffs should match expected values");
+
+    is_deeply($summarizer->buffValues->{'Ranged Troops'},
+        { 'March Size Capacity' => 12, 'Attack' => 25, 'Defense' => 25, 'HP' => 25 },
+        "Ranged troop buffs should match expected values");
+
+    is_deeply($summarizer->buffValues->{'Siege Machines'},
+        { 'March Size Capacity' => 12, 'Attack' => 25, 'Defense' => 25, 'HP' => 25 },
+        "Siege Machines buffs should match expected values");
+
+    # Test Debuff values for different troop types
+    is_deeply($summarizer->debuffValues, {
+        'Ground Troops'  => { 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
+        'Mounted Troops' => { 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
+        'Ranged Troops'  => { 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
+        'Siege Machines' => { 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
+    }, "Debuffs match expected values.");
+};
+
+# Test case: Blue 1st speciality, all else none
+subtest "Marco Polo with Blue 1st speciality, all else none" => sub {
+
+    my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
+        rootManager    => $testManager,
+        general        => $marco_polo,
+        isPrimary      => 1,
+        targetType     => 'mounted_specialist',
+        ascendingLevel => 'none',
+        covenantLevel  => 'none',
+        speciality1    => 'blue',
+        speciality2    => 'none',
+        speciality3    => 'none',
+        speciality4    => 'none',
+    );
+
+    $summarizer->updateBuffs();
+    $summarizer->updateDebuffs();
+
+    # Test Buff values for different troop types
+    is_deeply($summarizer->buffValues->{'Ground Troops'},
+        { 'March Size Capacity' => 12, 'Attack' => 25, 'Defense' => 25, 'HP' => 25 },
+        "Ground troop buffs should match expected values");
+
+    is_deeply($summarizer->buffValues->{'Mounted Troops'},
+        { 'March Size Capacity' => 12, 'Attack' => 72, 'Defense' => 67, 'HP' => 65 },
+        "Mounted troop buffs should match expected values");
+
+    is_deeply($summarizer->buffValues->{'Ranged Troops'},
+        { 'March Size Capacity' => 12, 'Attack' => 25, 'Defense' => 25, 'HP' => 25 },
+        "Ranged troop buffs should match expected values");
+
+    is_deeply($summarizer->buffValues->{'Siege Machines'},
+        { 'March Size Capacity' => 12, 'Attack' => 25, 'Defense' => 25, 'HP' => 25 },
+        "Siege Machines buffs should match expected values");
+
+    # Test Debuff values for different troop types
+    is_deeply($summarizer->debuffValues, {
+        'Ground Troops'  => { 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
+        'Mounted Troops' => { 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
+        'Ranged Troops'  => { 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
+        'Siege Machines' => { 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
+    }, "Debuffs match expected values.");
+};
+
+# Test case: Purple 1st speciality, all else none
+subtest "Marco Polo with Purple 1st speciality, all else none" => sub {
+
+    my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
+        rootManager    => $testManager,
+        general        => $marco_polo,
+        isPrimary      => 1,
+        targetType     => 'mounted_specialist',
+        ascendingLevel => 'none',
+        covenantLevel  => 'none',
+        speciality1    => 'purple',
+        speciality2    => 'none',
+        speciality3    => 'none',
+        speciality4    => 'none',
+    );
+
+    $summarizer->updateBuffs();
+    $summarizer->updateDebuffs();
+
+    # Test Buff values for different troop types
+    is_deeply($summarizer->buffValues->{'Ground Troops'},
+        { 'March Size Capacity' => 12, 'Attack' => 25, 'Defense' => 25, 'HP' => 25 },
+        "Ground troop buffs should match expected values");
+
+    is_deeply($summarizer->buffValues->{'Mounted Troops'},
+        { 'March Size Capacity' => 12, 'Attack' => 74, 'Defense' => 69, 'HP' => 65 },
+        "Mounted troop buffs should match expected values");
+
+    is_deeply($summarizer->buffValues->{'Ranged Troops'},
+        { 'March Size Capacity' => 12, 'Attack' => 25, 'Defense' => 25, 'HP' => 25 },
+        "Ranged troop buffs should match expected values");
+
+    is_deeply($summarizer->buffValues->{'Siege Machines'},
+        { 'March Size Capacity' => 12, 'Attack' => 25, 'Defense' => 25, 'HP' => 25 },
+        "Siege Machines buffs should match expected values");
+
+    # Test Debuff values for different troop types
+    is_deeply($summarizer->debuffValues, {
+        'Ground Troops'  => { 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
+        'Mounted Troops' => { 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
+        'Ranged Troops'  => { 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
+        'Siege Machines' => { 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
+    }, "Debuffs match expected values.");
+};
+
+# Test case: Orange 1st speciality, all else none
+subtest "Marco Polo with Orange 1st speciality, all else none" => sub {
+
+    my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
+        rootManager    => $testManager,
+        general        => $marco_polo,
+        isPrimary      => 1,
+        targetType     => 'mounted_specialist',
+        ascendingLevel => 'none',
+        covenantLevel  => 'none',
+        speciality1    => 'orange',
+        speciality2    => 'none',
+        speciality3    => 'none',
+        speciality4    => 'none',
+    );
+
+    $summarizer->updateBuffs();
+    $summarizer->updateDebuffs();
+
+    # Test Buff values for different troop types
+    is_deeply($summarizer->buffValues->{'Ground Troops'},
+        { 'March Size Capacity' => 12, 'Attack' => 25, 'Defense' => 25, 'HP' => 25 },
+        "Ground troop buffs should match expected values");
+
+    is_deeply($summarizer->buffValues->{'Mounted Troops'},
+        { 'March Size Capacity' => 12, 'Attack' => 76, 'Defense' => 71, 'HP' => 65 },
+        "Mounted troop buffs should match expected values");
+
+    is_deeply($summarizer->buffValues->{'Ranged Troops'},
+        { 'March Size Capacity' => 12, 'Attack' => 25, 'Defense' => 25, 'HP' => 25 },
+        "Ranged troop buffs should match expected values");
+
+    is_deeply($summarizer->buffValues->{'Siege Machines'},
+        { 'March Size Capacity' => 12, 'Attack' => 25, 'Defense' => 25, 'HP' => 25 },
+        "Siege Machines buffs should match expected values");
+
+    # Test Debuff values for different troop types
+    is_deeply($summarizer->debuffValues, {
+        'Ground Troops'  => { 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
+        'Mounted Troops' => { 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
+        'Ranged Troops'  => { 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
+        'Siege Machines' => { 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
+    }, "Debuffs match expected values.");
+};
+
+# Test case: Gold 1st speciality, all else none
+subtest "Marco Polo with Gold 1st speciality, all else none" => sub {
+
+    my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
+        rootManager    => $testManager,
+        general        => $marco_polo,
+        isPrimary      => 1,
+        targetType     => 'mounted_specialist',
+        ascendingLevel => 'none',
+        covenantLevel  => 'none',
+        speciality1    => 'gold',
+        speciality2    => 'none',
+        speciality3    => 'none',
+        speciality4    => 'none',
+    );
+
+    $summarizer->updateBuffs();
+    $summarizer->updateDebuffs();
+
+    # Test Buff values for different troop types
+    is_deeply($summarizer->buffValues->{'Ground Troops'},
+        { 'March Size Capacity' => 12, 'Attack' => 25, 'Defense' => 25, 'HP' => 25 },
+        "Ground troop buffs should match expected values");
+
+    is_deeply($summarizer->buffValues->{'Mounted Troops'},
+        { 'March Size Capacity' => 12, 'Attack' => 80, 'Defense' => 75, 'HP' => 65 },
+        "Mounted troop buffs should match expected values");
+
+    is_deeply($summarizer->buffValues->{'Ranged Troops'},
+        { 'March Size Capacity' => 12, 'Attack' => 25, 'Defense' => 25, 'HP' => 25 },
+        "Ranged troop buffs should match expected values");
+
+    is_deeply($summarizer->buffValues->{'Siege Machines'},
+        { 'March Size Capacity' => 12, 'Attack' => 25, 'Defense' => 25, 'HP' => 25 },
+        "Siege Machines buffs should match expected values");
+
+    # Test Debuff values for different troop types
+    is_deeply($summarizer->debuffValues, {
+        'Ground Troops'  => { 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
+        'Mounted Troops' => { 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
+        'Ranged Troops'  => { 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
+        'Siege Machines' => { 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
+    }, "Debuffs match expected values.");
+};
+
+# Test case: Civilization covenant, all else none
+subtest "Marco Polo with Civilization covenant, all else none" => sub {
+    plan tests => 1;
+
+    my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
+        rootManager    => $testManager,
+        general        => $marco_polo,
+        isPrimary      => 1,
+        targetType     => 'mounted_specialist',
+        ascendingLevel => 'none',
+        covenantLevel  => 'Civilization',
+        speciality1    => 'none',
+        speciality2    => 'none',
+        speciality3    => 'none',
+        speciality4    => 'none',
+    );
+
+    $summarizer->updateBuffs();
+    $summarizer->updateDebuffs();
+
+    # Add your expected values here
+    # This is a placeholder - you'll need to compute these values by hand
+    pass("Civilization covenant test placeholder - add actual assertions");
+};
+
+# Test case: All maxed out (Red5, Gold specialities, Civilization covenant)
+subtest "Marco Polo with all maxed out" => sub {
+    plan tests => 1;
+
+    my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
+        rootManager    => $testManager,
+        general        => $marco_polo,
+        isPrimary      => 1,
+        targetType     => 'mounted_specialist',
+        ascendingLevel => 'red5',
+        covenantLevel  => 'Civilization',
+        speciality1    => 'gold',
+        speciality2    => 'gold',
+        speciality3    => 'gold',
+        speciality4    => 'gold',
+    );
+
+    $summarizer->updateBuffs();
+    $summarizer->updateDebuffs();
+
+    # Add your expected values here
+    # This is a placeholder - you'll need to compute these values by hand
+    pass("All maxed out test placeholder - add actual assertions");
+};
+
+done_testing();

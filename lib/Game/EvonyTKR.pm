@@ -14,7 +14,7 @@ use namespace::clean;
 
 package Game::EvonyTKR {
   use Mojo::Base 'Mojolicious', -strict, -signatures;
-  use Mojo::File::Share qw(dist_dir dist_file);
+  use Mojo::File::Share qw(dist_dir );
   use Log::Log4perl;
   use Log::Log4perl::Config;
   Log::Log4perl::Config->utf8(1);

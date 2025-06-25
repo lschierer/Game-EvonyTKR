@@ -12,6 +12,7 @@ class Game::EvonyTKR::Model::Data : isa(Game::EvonyTKR::Model::Logger) {
   use UUID qw(uuid5);
   use namespace::autoclean;
   use File::FindLib 'lib';
+  use List::AllUtils qw( all any none );
   use X500::DN;
   use X500::RDN;
   our $VERSION = 'v0.30.0';
@@ -134,15 +135,106 @@ class Game::EvonyTKR::Model::Data : isa(Game::EvonyTKR::Model::Logger) {
   field $allowedValueUnits : reader =
     Type::Tiny::Enum->new(values => [qw( flat percentage )]);
 
-  field $specialityLevels : reader =
-    Type::Tiny::Enum->new(values => [qw( none green blue purple orange gold)]);
+  field $specialityLevels : reader;
 
-  field $covenantLevelNames :reader =
-    ['None', 'War', 'Cooperation', 'Peace', 'Faith', 'Honor', 'Civilization',];
+  ADJUST {
+    my @step1 = qw( none green blue purple orange gold );
+    Readonly::Array my @slv => @step1;
+    $specialityLevels = \@slv;
+  }
+
+  method validateSpecialityLevels (@specialities) {
+    my $logger = $self->logger;
+
+    # Ensure we have exactly 4 specialities
+    if (scalar @specialities != 4) {
+      $logger->warn("Expected 4 specialities, got " . scalar @specialities);
+      return 0;
+    }
+
+    # Validate that each speciality level is valid
+    foreach my $index (0 .. 3) {
+      my $level = $specialities[$index];
+      if (!$self->specialityLevels->check($level)) {
+        $logger->warn("Invalid speciality level at index $index: $level");
+        return 0;
+      }
+    }
+
+    # Check the speciality 4 rule
+    my $all_gold = all { $_ eq 'gold' } @specialities[0 .. 2];
+
+    if ($all_gold && $specialities[3] eq 'none') {
+      $logger->warn(
+        "When specialities 1-3 are all gold, speciality 4 cannot be 'none'");
+      return 0;
+    }
+
+    if (!$all_gold && $specialities[3] ne 'none') {
+      $logger->warn(
+        "When specialities 1-3 are not all gold, speciality 4 must be 'none'");
+      return 0;
+    }
+
+    return 1;
+  }
+
+  method normalizeSpecialityLevels (@specialities) {
+    my $logger     = $self->logger;
+    my @normalized = @specialities;
+
+    # Ensure we have exactly 4 specialities
+    if (scalar @normalized != 4) {
+      $logger->warn("Expected 4 specialities, got "
+          . scalar @normalized
+          . ". Padding with defaults.");
+      while (scalar @normalized < 4) {
+        push @normalized, 'gold';
+      }
+      @normalized = @normalized[0 .. 3] if scalar @normalized > 4;
+    }
+
+    # Validate and normalize each speciality level
+    foreach my $index (0 .. 3) {
+      if (none { $_ eq $normalized[$index] } $specialityLevels->@*) {
+        $logger->warn(
+"Invalid speciality level at index $index: $normalized[$index], using default"
+        );
+        $normalized[$index] = 'gold';
+      }
+    }
+
+    # Apply the speciality 4 rule
+    my $all_gold = all { $_ eq 'gold' } @normalized[0 .. 2];
+
+    if ($all_gold && $normalized[3] eq 'none') {
+      $logger->warn(
+"When specialities 1-3 are all gold, speciality 4 cannot be 'none'. Setting to gold."
+      );
+      $normalized[3] = 'gold';
+    }
+
+    if (!$all_gold && $normalized[3] ne 'none') {
+      $logger->warn(
+"When specialities 1-3 are not all gold, speciality 4 must be 'none'. Setting to none."
+      );
+      $normalized[3] = 'none';
+    }
+
+    return @normalized;
+  }
+
+  field $covenantLevels : reader;
+
+  ADJUST {
+    my @step1 = qw( none war cooperation peace faith honor civilization );
+    Readonly::Array my @clv => @step1;
+    $covenantLevels = \@clv;
+  }
 
   method checkCovenantLevel ($proposedLevel) {
     my $check = {};
-    foreach my $key ($covenantLevelNames->@*) {
+    foreach my $key ($covenantLevels->@*) {
       $check->{$key} = 1;
     }
     return exists $check->{$proposedLevel};
@@ -165,6 +257,9 @@ class Game::EvonyTKR::Model::Data : isa(Game::EvonyTKR::Model::Logger) {
   };
 
   method checkAscendingLevel ($proposedLevel) {
+    if ($proposedLevel =~ /none/i) {
+      return 1;
+    }
     if ($proposedLevel =~ /red/) {
       return exists $redAscendingLevelNames->{$proposedLevel};
     }

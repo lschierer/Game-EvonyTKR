@@ -133,10 +133,12 @@ export class GeneralTable extends LitElement {
   @state() private nameList: RowStub[] = [];
 
   @state() private ascendingLevel: string = 'red5';
+  @state() private primaryCovenantLevel: string = 'civilization';
   @state() private primarySpeciality1: string = 'gold';
   @state() private primarySpeciality2: string = 'gold';
   @state() private primarySpeciality3: string = 'gold';
   @state() private primarySpeciality4: string = 'gold';
+  @state() private secondaryCovenantLevel: string = 'civilization';
   @state() private secondarySpeciality1: string = 'gold';
   @state() private secondarySpeciality2: string = 'gold';
   @state() private secondarySpeciality3: string = 'gold';
@@ -247,15 +249,18 @@ export class GeneralTable extends LitElement {
     let url = window.location.pathname.replace(/\/$/, '') + '/data.json';
     url = url + `?ascendingLevel=${this.ascendingLevel}`;
     if (this.mode === 'single') {
+      url = url + `&covenantLevel=${this.primaryCovenantLevel}`;
       url = url + `&speciality1=${this.primarySpeciality1}`;
       url = url + `&speciality2=${this.primarySpeciality2}`;
       url = url + `&speciality3=${this.primarySpeciality3}`;
       url = url + `&speciality4=${this.primarySpeciality4}`;
     } else {
+      url = url + `&primaryCovenantLevel=${this.primaryCovenantLevel}`;
       url = url + `&primarySpeciality1=${this.primarySpeciality1}`;
       url = url + `&primarySpeciality2=${this.primarySpeciality2}`;
       url = url + `&primarySpeciality3=${this.primarySpeciality3}`;
       url = url + `&primarySpeciality4=${this.primarySpeciality4}`;
+      url = url + `&secondaryCovenantLevel=${this.primaryCovenantLevel}`;
       url = url + `&secondarySpeciality1=${this.secondarySpeciality1}`;
       url = url + `&secondarySpeciality2=${this.secondarySpeciality2}`;
       url = url + `&secondarySpeciality3=${this.secondarySpeciality3}`;
@@ -279,7 +284,22 @@ export class GeneralTable extends LitElement {
     const basePath = window.location.pathname.replace(/\/comparison\/?$/, '');
     if (this.mode === 'pair') {
       const pairStub = stub as GeneralPairStub;
-      const url = `${basePath}pair?primary=${encodeURIComponent(pairStub.primary.name)}&secondary=${encodeURIComponent(pairStub.secondary.name)}`;
+      const params = new URLSearchParams({
+        primary: encodeURIComponent(pairStub.primary.name),
+        secondary: encodeURIComponent(pairStub.secondary.name),
+        ascendingLevel: this.ascendingLevel,
+        primaryCovenantLevel: this.primaryCovenantLevel,
+        primarySpeciality1: this.primarySpeciality1,
+        primarySpeciality2: this.primarySpeciality2,
+        primarySpeciality3: this.primarySpeciality3,
+        primarySpeciality4: this.primarySpeciality4,
+        secondaryCovenantLevel: this.secondaryCovenantLevel,
+        secondarySpeciality1: this.secondarySpeciality1,
+        secondarySpeciality2: this.secondarySpeciality2,
+        secondarySpeciality3: this.secondarySpeciality3,
+        secondarySpeciality4: this.secondarySpeciality4,
+      });
+      const url = `${basePath}pair?${params.toString()}`;
       const res = await fetch(url);
       const json = await res.json();
       const parsed = GeneralPair.safeParse(json);
@@ -294,7 +314,16 @@ export class GeneralTable extends LitElement {
           : lastPart.replace(/s$/, '') + ' Specialist';
       const newBasePath = [...parts, normalizedType].join('/');
 
-      const url = `${newBasePath}/primary/${encodeURIComponent(stub.primary.name)}`;
+      const params = new URLSearchParams({
+        ascendingLevel: this.ascendingLevel,
+        covenantLevel: this.primaryCovenantLevel,
+        speciality1: this.primarySpeciality1,
+        speciality2: this.primarySpeciality2,
+        speciality3: this.primarySpeciality3,
+        speciality4: this.primarySpeciality4,
+      });
+
+      const url = `${newBasePath}/primary/${encodeURIComponent(stub.primary.name)}?${params.toString()}`;
       const res = await fetch(url);
       const json = await res.json();
       const parsed = GeneralData.safeParse(json);

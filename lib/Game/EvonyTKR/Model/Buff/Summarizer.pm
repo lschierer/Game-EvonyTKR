@@ -24,15 +24,19 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
   # Input parameters
   field $rootManager : param;
   field $general : param;
-  field $isPrimary : reader : param      //= 1;
-  field $targetType : reader : param     //= '';
+  field $isPrimary : reader : param  //= 1;
+  field $targetType : reader : param //= '';
+
+  # these are needed now
   field $ascendingLevel : reader : param //= 'red5';
   field $speciality1 : reader : param    //= 'gold';
   field $speciality2 : reader : param    //= 'gold';
   field $speciality3 : reader : param    //= 'gold';
   field $speciality4 : reader : param    //= 'gold';
-  field $generalLevel : reader : param   //= 45;
   field $covenantLevel : reader : param  //= 'Civilization';
+
+  # these are anticipated that I will need them in the future.
+  field $generalLevel : reader : param   //= 45;
   field $includePassive : reader : param //= 1;
   field $keepLevel : reader : param      //= 40;
 
