@@ -76,7 +76,7 @@ package Game::EvonyTKR::Controller::Generals {
       title  => 'General Details',
       path   => '/Generals/details',
       parent => '/Generals',
-      order  => '10',
+      order  => 10,
     });
 
     $app->plugins->on(

@@ -15,11 +15,12 @@
 
   # Get enum values
   my $covenantLevelValues = stash('covenantLevelValues') // [];
-  my $ascendingLevelValues = ascending_level_names() // [];
-
-  my $specialityLevelValues = stash('specialityLevelValues') // [];
+  my $ascendingLevelValues = ascending_level_names('', 0) // [];
+  my $specialityLevelValues = speciality_level_names() // [];
 %>
+<!-- $ascendingLevel is <%= $ascendingLevel %> -->
 <!-- ascendingLevelValues is <%= Data::Printer::np($ascendingLevelValues) %> -->
+<!-- specialityLevelValues is <%= Data::Printer::np($specialityLevelValues) %> -->
 <link rel="stylesheet" href="/css/level_settings_form.css" />
 <div class="settings-form">
   <h3 class="spectrum-Heading spectrum-Heading--sizeS"><%= $mode eq 'pair' ? 'Primary General' : $linkTarget %> </h3>
@@ -42,7 +43,8 @@
           <div class="spectrum-Form-itemField">
             <select id="ascendingLevel" name="ascendingLevel" class="spectrum-Picker spectrum-Picker--sizeM">
               <% foreach my $level (@{$ascendingLevelValues}) { %>
-                <option value="<%= $level %>" <%= $ascendingLevel eq $level ? 'selected' : '' %>><%= ucfirst($level) %></option>
+                <% my $label = ascending_level_names($level, 1); %>
+                <option value="<%= $level %>" <%= $ascendingLevel eq $level ? 'selected' : '' %>><%= $label %></option>
               <% } %>
             </select>
           </div>

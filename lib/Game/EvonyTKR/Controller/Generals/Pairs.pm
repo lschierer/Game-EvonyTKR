@@ -114,7 +114,7 @@ package Game::EvonyTKR::Controller::Generals::Pairs {
     my $linkTarget  = $self->stash('linkTarget');
 
     # Stash data for the template
-    $self->stash(template => 'generals/pairs/typeIndex',);
+    $self->stash(template => 'generals/pairs/GeneralTablePair');
 
     my $markdown_path =
       $distDir->child("pages/generals/pairs/$linkTarget/index.md");

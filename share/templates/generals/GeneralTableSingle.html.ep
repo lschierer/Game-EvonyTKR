@@ -14,8 +14,6 @@
       speciality2           => $speciality2,
       speciality3           => $speciality3,
       speciality4           => $speciality4,
-      ascendingLevelValues  => $ascendingLevelValues,
-      specialityLevelValues => $specialityLevelValues
   %>
 
   <div class="general-table-container">

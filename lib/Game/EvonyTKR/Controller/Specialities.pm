@@ -85,11 +85,37 @@ package Game::EvonyTKR::Controller::Specialities {
       "Successfully loaded Speciality manager with collection from $SourceDir");
 
     $app->helper(
-      get_builtinbook_manager => sub {
+      get_speciality_manager => sub {
         my $self = shift;
         return $self->app->get_root_manager->specialityManager;
       }
     );
+
+    $app->helper(
+      speciality_level_names => sub ($c, $level = '', $printable = 0) {
+        $level //= '';  # Ensure defined
+        my $logger = Log::Log4perl->get_logger(__PACKAGE__);
+        if (length($level) == 0) {
+          my $nameList = [];
+          foreach my $orig_name ($c->app->get_root_manager->specialityLevels->values->@*) {
+            $logger->debug("speciality_level_names evaluating speciality level name $orig_name");
+            my $name;
+            if($printable) {
+              $name = $orig_name =~ s/(\w)(\w*)/\U$1\L$2/r;
+            } else {
+              $name = $orig_name;
+            }
+            push @$nameList, $name;
+          }
+          return $nameList;
+        } else {
+          my $match = $c->app->get_root_manager->specialityLevels->closest_match($level);
+          $match =~ s/(\w)(\w*)/\U$1\L$2/;
+          return $match;
+        }
+      }
+    );
+
   }
 
   sub sort_levels($self, $levels) {
