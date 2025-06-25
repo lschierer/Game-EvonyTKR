@@ -1,0 +1,26 @@
+ascending: true
+basic_attributes:
+  attack:
+    base: 109
+    increment: 8.39
+  defense:
+    base: 116
+    increment: 8.83
+  leadership:
+    base: 111
+    increment: 8.96
+  politics:
+    base: 93
+    increment: 7.94
+book: Rain of Arrows
+specialities:
+  - Ranged Troop Assault
+  - Suppress
+  - Ranged Troop Ares
+  - Battle of Poitiers
+stars: red5
+type:
+  - mayor
+  - ranged_specialist
+general: Edward the Black Prince
+name: Edward the Black Prince
