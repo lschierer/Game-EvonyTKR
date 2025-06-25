@@ -13,7 +13,6 @@ basic_attributes:
     base: 119
     increment: 9.15
 book: Roman Emperor
-display: summary
 specialities:
   - Mounted Troop Formation
   - Formation

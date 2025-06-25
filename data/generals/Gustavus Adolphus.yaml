@@ -1,0 +1,25 @@
+ascending: true
+basic_attributes:
+  attack:
+    base: 115
+    increment: 8.69
+  defense:
+    base: 95
+    increment: 8.28
+  leadership:
+    base: 106
+    increment: 8.98
+  politics:
+    base: 110
+    increment: 8.51
+book: Fire Suppression
+specialities:
+  - Siege Machine Assault
+  - Bash
+  - Siege Machine Ares
+  - Battle of Bradfield
+stars: red5
+type:
+  - mayor
+general: Gustavus Adolphus
+name: Gustavus Adolphus
