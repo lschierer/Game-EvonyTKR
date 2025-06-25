@@ -45,10 +45,11 @@ package Game::EvonyTKR::Plugins::StaticPages {
       my ($front_matter, $markdown) = $app->parse_front_matter($file_path);
       my $title =
         exists $front_matter->{title} ? $front_matter->{title} : $file_path;
+      my $order = 100 + exists $front_matter->{order} ? $front_matter->{order} : 0;
       $app->add_navigation_item({
         title => $title,
         path  => $route_path,
-        order => 100,           # Static pages come after dynamic content
+        order => $order,           # Static pages come after dynamic content
       });
 
     }
