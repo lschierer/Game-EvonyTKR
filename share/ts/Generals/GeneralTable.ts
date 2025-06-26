@@ -285,8 +285,8 @@ export class GeneralTable extends LitElement {
     if (this.mode === 'pair') {
       const pairStub = stub as GeneralPairStub;
       const params = new URLSearchParams({
-        primary: encodeURIComponent(pairStub.primary.name),
-        secondary: encodeURIComponent(pairStub.secondary.name),
+        primary: pairStub.primary.name,
+        secondary: pairStub.secondary.name,
         ascendingLevel: this.ascendingLevel,
         primaryCovenantLevel: this.primaryCovenantLevel,
         primarySpeciality1: this.primarySpeciality1,
@@ -304,6 +304,7 @@ export class GeneralTable extends LitElement {
       const json = await res.json();
       const parsed = GeneralPair.safeParse(json);
       if (parsed.success) return parsed.data;
+      console.error(parsed.error.message);
       throw new Error(parsed.error.message);
     } else {
       const parts = basePath.split('/');
@@ -429,7 +430,7 @@ export class GeneralTable extends LitElement {
           </div>`
         : ''}
       <div
-        class="general-pairs-table spectrum-Table spectrum-Table-scroller spectrum-Table--quiet spectrum-Table--sizeM"
+        class="general-pairs-table spectrum-Table spectrum-Table-scroller spectrum-Table--quiet spectrum-Table--sizeM spectrum-Table--compact"
       >
         <table class="spectrum-Table-main">
           <thead class="spectrum-Table-head">

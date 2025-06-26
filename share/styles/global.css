@@ -81,6 +81,7 @@ div#nav {
 div#main {
   width: 80vw;
   min-height: 100%;
+  padding: 0 1rem;
 }
 
 li

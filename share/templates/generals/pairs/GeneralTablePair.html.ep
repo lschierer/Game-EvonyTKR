@@ -8,19 +8,28 @@
   <%= include 'partials/level_settings_form',
       mode => $mode,
       ascendingLevel        => $ascendingLevel,
-      primarySpeciality1    => $primarySpeciality1,
-      primarySpeciality2    => $primarySpeciality2,
-      primarySpeciality3    => $primarySpeciality3,
-      primarySpeciality4    => $primarySpeciality4,
-      secondarySpeciality1  => $secondarySpeciality1,
-      secondarySpeciality2  => $secondarySpeciality2,
-      secondarySpeciality3  => $secondarySpeciality3,
-      secondarySpeciality4  => $secondarySpeciality4,
-      ascendingLevelValues  => $ascendingLevelValues,
-      specialityLevelValues => $specialityLevelValues
+      primaryCovenantLevel  => $primaryCovenantLevel,
+      primarySpecialities   => $primarySpecialities,
+      secondaryCovenantLevel  => $secondaryCovenantLevel,
+      secondarySpecialities   => $secondarySpecialities,
   %>
 
   <div class="general-table-container">
-    <general-table mode='single' generaltype="<%= $generalType %>" typeheader="<%= $linkTarget %>"></general-table>
+    <general-table
+      mode='pair'
+      generaltype="<%= $generalType %>"
+      typeheader="<%= $linkTarget %>"
+      ascendingLevel="<%= $ascendingLevel %>"
+      primaryCovenantLevel="<%= $primaryCovenantLevel %>"
+      primarySpeciality1="<%= $primarySpecialities->[0] %>"
+      primarySpeciality2="<%= $primarySpecialities->[1] %>"
+      primarySpeciality3="<%= $primarySpecialities->[2] %>"
+      primarySpeciality4="<%= $primarySpecialities->[3] %>"
+      secondaryCovenantLevel="<%= $secondaryCovenantLevel %>"
+      secondarySpeciality1="<%= $secondarySpecialities->[0] %>"
+      secondarySpeciality2="<%= $secondarySpecialities->[1] %>"
+      secondarySpeciality3="<%= $secondarySpecialities->[2] %>"
+      secondarySpeciality4="<%= $secondarySpecialities->[3] %>"
+      ></general-table>
   </div>
 </div>

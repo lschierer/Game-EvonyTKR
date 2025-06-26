@@ -41,7 +41,6 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
   field $keepLevel : reader : param      //= 40;
 
 # Output values - stored in hashes for easier access
-# Output values - stored in hashes for easier access with troop type granularity
   field $buffValues : reader = {
     'Ground Troops' =>
       { 'March Size Capacity' => 0, 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },

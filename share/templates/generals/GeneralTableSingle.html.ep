@@ -18,8 +18,8 @@
       mode='single'
       generaltype="<%= $generalType %>"
       typeheader="<%= $linkTarget %>"
-      covenantLevel="<%= $covenantLevel %>"
       ascendingLevel="<%= $ascendingLevel %>"
+      primaryCovenantLevel="<%= $covenantLevel %>"
       primarySpeciality1="<%= $specialities->[0] %>"
       primarySpeciality2="<%= $specialities->[1] %>"
       primarySpeciality3="<%= $specialities->[2] %>"

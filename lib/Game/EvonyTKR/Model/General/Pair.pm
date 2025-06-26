@@ -7,6 +7,7 @@ require Scalar::Util;
 class Game::EvonyTKR::Model::General::Pair : isa(Game::EvonyTKR::Model::Data) {
   require Game::EvonyTKR::Model::General;
   require Game::EvonyTKR::Model::Buff::Summarizer;
+  use List::AllUtils qw( all any none );
   use overload
     '""'       => \&as_string,
     'fallback' => 1;
@@ -14,30 +15,32 @@ class Game::EvonyTKR::Model::General::Pair : isa(Game::EvonyTKR::Model::Data) {
   field $primary : reader : param;
   field $secondary : reader : param;
   field $rootManager : reader = undef;
+  field $targetType :reader;
+
+  ADJUST {
+    $targetType = ref($primary->type) eq 'ARRAY' ? $primary->type->[0] : $primary->type;
+  }
 
   #computed fields;
+  field $buffValues : reader = {
+    'Ground Troops' =>
+      { 'March Size Capacity' => 0, 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
+    'Mounted Troops' =>
+      { 'March Size Capacity' => 0, 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
+    'Ranged Troops' =>
+      { 'March Size Capacity' => 0, 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
+    'Siege Machines' =>
+      { 'March Size Capacity' => 0, 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
+    'Overall' =>
+      { 'March Size Capacity' => 0, 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
+  };
 
-  field $marchbuff : reader = 0;
-
-  field $attackbuff : reader  = 0;
-  field $defensebuff : reader = 0;
-  field $hpbuff : reader      = 0;
-
-  field $groundattackdebuff : reader  = 0;
-  field $grounddefensedebuff : reader = 0;
-  field $groundhpdebuff : reader      = 0;
-
-  field $mountedattackdebuff : reader  = 0;
-  field $mounteddefensedebuff : reader = 0;
-  field $mountedhpdebuff : reader      = 0;
-
-  field $rangedattackdebuff : reader  = 0;
-  field $rangeddefensedebuff : reader = 0;
-  field $rangedhpdebuff : reader      = 0;
-
-  field $siegeattackdebuff : reader  = 0;
-  field $siegedefensedebuff : reader = 0;
-  field $siegehpdebuff : reader      = 0;
+  field $debuffValues : reader = {
+    'Ground Troops'  => { 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
+    'Mounted Troops' => { 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
+    'Ranged Troops'  => { 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
+    'Siege Machines' => { 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
+  };
 
   method setRootManager ($nm) {
     if (Scalar::Util::blessed $nm eq 'Game::EvonyTKR::Model::EvonyTKR::Manager')
@@ -48,46 +51,86 @@ class Game::EvonyTKR::Model::General::Pair : isa(Game::EvonyTKR::Model::Data) {
     return 0;
   }
 
+  method setTargetType ($tt) {
+    if (any {$tt =~ /$_/} $self->GeneralKeys->values ){
+      $targetType = $tt;
+    }
+  }
+
+  method _compute_total_buffs ($primarySummarizer, $secondarySummarizer)  {
+    my $primary  = $primarySummarizer->buffValues;
+    my $secondary = $secondarySummarizer->buffValues;
+    $self->logger->debug("primary is " . Data::Printer::np($primary));
+    $self->logger->debug("secondary is " . Data::Printer::np($secondary));
+
+    foreach my $category (keys %$primary) {
+      $self->logger->debug("computing buff total for category $category");
+      foreach my $type (keys %{ $primary->{$category} }) {
+        $self->logger->debug("computing buff total for category $category type $type");
+        $buffValues->{$category}->{$type} =
+          ($primary->{$category}->{$type} // 0) +
+          ($secondary->{$category}->{$type} // 0);
+      }
+    }
+  }
+
+  method _compute_total_debuffs ($primarySummarizer, $secondarySummarizer) {
+    my $primary  = $primarySummarizer->debuffValues;
+    my $secondary = $secondarySummarizer->debuffValues;
+
+    foreach my $category (keys %$primary) {
+      foreach my $type (keys %{ $primary->{$category} }) {
+        $debuffValues->{$category}{$type} =
+          ($primary->{$category}{$type} // 0) +
+          ($secondary->{$category}{$type} // 0);
+      }
+    }
+  }
+
   method updateBuffs (
-    $generalType          = '',
-    $primaryAscending     = 'red5',
-    $primarySpeciality1   = 'gold',
-    $primarySpeciality2   = 'gold',
-    $primarySpeciality3   = 'gold',
-    $primarySpeciality4   = 'gold',
-    $secondarySpeciality1 = 'gold',
-    $secondarySpeciality2 = 'gold',
-    $secondarySpeciality3 = 'gold',
-    $secondarySpeciality4 = 'gold',
-    $keepLevel            = 40,
-    $primaryLevel         = 45,
-    $secondaryLevel       = 45,
+    $generalType            = '',
+    $primaryAscending       = 'red5',
+    $primaryCovenantLevel   = 'civilization',
+    $primarySpecialities    = [ 'gold', 'gold', 'gold', 'gold',],
+    $secondaryCovenantLevel   = 'civilization',
+    $secondarySpecialities  = [ 'gold', 'gold', 'gold', 'gold',],
+
+    $keepLevel              = 40,
+    $primaryLevel           = 45,
+    $secondaryLevel         = 45,
   ) {
 
     my $primarySummarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
-      rootManager    => $rootManager,
-      general        => $primary,
-      isPrimary      => 1,
-      targetType     => $generalType,
-      ascendingLevel => $primaryAscending,
-      speciality1    => $primarySpeciality1,
-      speciality2    => $primarySpeciality2,
-      speciality3    => $primarySpeciality3,
-      speciality4    => $primarySpeciality4,
-      generalLevel   => $primaryLevel,
-      keepLevel      => $keepLevel,
+      rootManager     => $rootManager,
+      general         => $primary,
+      isPrimary       => 1,
+      targetType      => $generalType,
+
+      ascendingLevel  => $primaryAscending,
+      covenantLevel   => $primaryCovenantLevel,
+      speciality1     => $primarySpecialities->[0],
+      speciality2     => $primarySpecialities->[1],
+      speciality3     => $primarySpecialities->[2],
+      speciality4     => $primarySpecialities->[3],
+
+      generalLevel    => $primaryLevel,
+      keepLevel       => $keepLevel,
     );
     my $secondarySummarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
-      rootManager  => $rootManager,
-      general      => $secondary,
-      isPrimary    => 0,
-      targetType   => $generalType,
-      speciality1  => $secondarySpeciality1,
-      speciality2  => $secondarySpeciality2,
-      speciality3  => $secondarySpeciality3,
-      speciality4  => $secondarySpeciality4,
-      generalLevel => $secondaryLevel,
-      keepLevel    => $keepLevel,
+      rootManager     => $rootManager,
+      general         => $secondary,
+      isPrimary       => 1,
+      targetType      => $generalType,
+
+      ascendingLevel  => 'none',
+      covenantLevel   => $secondaryCovenantLevel,
+      speciality1     => $secondarySpecialities->[0],
+      speciality2     => $secondarySpecialities->[1],
+      speciality3     => $secondarySpecialities->[2],
+      speciality4     => $secondarySpecialities->[3],
+
+      generalLevel    => $secondaryLevel,
+      keepLevel       => $keepLevel,
     );
 
     # Update buffs for both summarizers
@@ -98,70 +141,45 @@ class Game::EvonyTKR::Model::General::Pair : isa(Game::EvonyTKR::Model::Data) {
     $primarySummarizer->updateDebuffs();
     $secondarySummarizer->updateDebuffs();
 
-    # Set buff values by summing primary and secondary
-    $marchbuff =
-      $primarySummarizer->marchIncrease + $secondarySummarizer->marchIncrease;
-    $attackbuff =
-      $primarySummarizer->attackIncrease + $secondarySummarizer->attackIncrease;
-    $defensebuff = $primarySummarizer->defenseIncrease +
-      $secondarySummarizer->defenseIncrease;
-    $hpbuff = $primarySummarizer->hpIncrease + $secondarySummarizer->hpIncrease;
+    $self->_compute_total_buffs ($primarySummarizer, $secondarySummarizer);
+    $self->_compute_total_debuffs ($primarySummarizer, $secondarySummarizer);
 
-    # Set ground troop debuff values
-    $groundattackdebuff = $primarySummarizer->reducegroundattack +
-      $secondarySummarizer->reducegroundattack;
-    $grounddefensedebuff = $primarySummarizer->reducegrounddefense +
-      $secondarySummarizer->reducegrounddefense;
-    $groundhpdebuff =
-      $primarySummarizer->reducegroundhp + $secondarySummarizer->reducegroundhp;
-
-    # Set mounted troop debuff values
-    $mountedattackdebuff = $primarySummarizer->reducemountedattack +
-      $secondarySummarizer->reducemountedattack;
-    $mounteddefensedebuff = $primarySummarizer->reducemounteddefense +
-      $secondarySummarizer->reducemounteddefense;
-    $mountedhpdebuff = $primarySummarizer->reducemountedhp +
-      $secondarySummarizer->reducemountedhp;
-
-    # Set ranged troop debuff values
-    $rangedattackdebuff = $primarySummarizer->reducerangedattack +
-      $secondarySummarizer->reducerangedattack;
-    $rangeddefensedebuff = $primarySummarizer->reducerangeddefense +
-      $secondarySummarizer->reducerangeddefense;
-    $rangedhpdebuff =
-      $primarySummarizer->reducerangedhp + $secondarySummarizer->reducerangedhp;
-
-    # Set siege machine debuff values
-    $siegeattackdebuff = $primarySummarizer->reducesiegeattack +
-      $secondarySummarizer->reducesiegeattack;
-    $siegedefensedebuff = $primarySummarizer->reducesiegedefense +
-      $secondarySummarizer->reducesiegedefense;
-    $siegehpdebuff =
-      $primarySummarizer->reducesiegehp + $secondarySummarizer->reducesiegehp;
   }
 
   # Method to convert to hash
   method to_hash {
+    $self->logger->debug("buffvalues is " . Data::Printer::np($buffValues));
+    my $tt = $targetType;
+    if( $targetType =~ /(\w+)_(specialist)/ ) {
+      $tt = $targetType =~ s/(\w+)_(specialist)/$1 Troops/r;
+      $tt =~ s/^(\w)/\U$1/;
+      if ($tt eq 'Siege Troops') {
+        $tt = 'Siege Machines';
+      }
+      if ( $tt eq 'Wall Troops') {
+        $tt = 'Overall';
+      }
+      $self->logger->debug("looking for type $tt");
+    }
     return {
-      primary              => $primary,
-      secondary            => $secondary,
-      marchbuff            => $marchbuff,
-      attackbuff           => $attackbuff,
-      defensebuff          => $defensebuff,
-      hpbuff               => $hpbuff,
-      groundattackdebuff   => $groundattackdebuff,
-      grounddefensedebuff  => $grounddefensedebuff,
-      groundhpdebuff       => $groundhpdebuff,
-      mountedattackdebuff  => $mountedattackdebuff,
-      mounteddefensedebuff => $mounteddefensedebuff,
-      mountedhpdebuff      => $mountedhpdebuff,
-      rangedattackdebuff   => $rangedattackdebuff,
-      rangeddefensedebuff  => $rangeddefensedebuff,
-      rangedhpdebuff       => $rangedhpdebuff,
-      siegeattackdebuff    => $siegeattackdebuff,
-      siegedefensedebuff   => $siegedefensedebuff,
-      siegehpdebuff        => $siegehpdebuff,
-      # Add any other useful properties you might need
+      primary               => $primary,
+      secondary             => $secondary,
+      marchbuff             => $buffValues->{$tt}->{'March Size Capacity'},
+      attackbuff            => $buffValues->{$tt}->{'Attack'},
+      defensebuff           => $buffValues->{$tt}->{'Defense'},
+      hpbuff                => $buffValues->{$tt}->{'Defense'},
+      groundattackdebuff    => $debuffValues->{'Ground Troops'}->{'Attack'},
+      grounddefensedebuff   => $debuffValues->{'Ground Troops'}->{'Defense'},
+      groundhpdebuff        => $debuffValues->{'Ground Troops'}->{'HP'},
+      mountedattackdebuff   => $debuffValues->{'Mounted Troops'}->{'Attack'},
+      mounteddefensedebuff  => $debuffValues->{'Mounted Troops'}->{'Defense'},
+      mountedhpdebuff       => $debuffValues->{'Mounted Troops'}->{'HP'},
+      rangedattackdebuff    => $debuffValues->{'Ranged Troops'}->{'Attack'},
+      rangeddefensedebuff   => $debuffValues->{'Ranged Troops'}->{'Defense'},
+      rangedhpdebuff        => $debuffValues->{'Ranged Troops'}->{'HP'},
+      siegeattackdebuff     => $debuffValues->{'Siege Machines'}->{'Attack'},
+      siegedefensedebuff    => $debuffValues->{'Siege Machines'}->{'Defense'},
+      siegehpdebuff         => $debuffValues->{'Siege Machines'}->{'HP'},
     };
   }
 
