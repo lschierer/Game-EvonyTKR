@@ -330,35 +330,8 @@ package Game::EvonyTKR::Controller::Generals {
     my $generalType = $self->stash('generalType');
     my $linkTarget  = $self->stash('linkTarget');
 
-    # Get query parameters with defaults
-    my $ascendingLevel = $self->param('ascendingLevel') // 'red5';
-    my $covenantLevel  = $self->param('covenantLevel')  // 'civilization';
-    my @specialities;
-    push @specialities, $self->param('speciality1') // 'gold';
-    push @specialities, $self->param('speciality2') // 'gold';
-    push @specialities, $self->param('speciality3') // 'gold';
-    push @specialities, $self->param('speciality4') // 'gold';
-
-    # Validate parameters using enums from Game::EvonyTKR::Model::Data
-    my $data_model = Game::EvonyTKR::Model::Data->new();
-
-    # Validate ascending level
-    if (!$data_model->checkAscendingLevel($ascendingLevel)) {
-      $logger->warn(
-        "Invalid ascendingLevel: $ascendingLevel, using default 'red5'");
-      $ascendingLevel = 'red5';
-    }
-    else {
-      $logger->debug(
-        "mayor_comparison_json using ascendingLevel $ascendingLevel");
-    }
-
-    # Validate speciality levels
-    @specialities = $data_model->normalizeSpecialityLevels(@specialities);
-
     my $gm                   = $self->app->get_general_manager();
-    my @generalBuffSummaries = ();
-
+    my @generalBuffSummaries;
     while (my ($key, $general) = each(%{ $gm->get_all_generals() })) {
       $logger->debug("inspecting '$key', first need to see if it is a mayor."
           . Data::Printer::np($general));
@@ -371,39 +344,7 @@ package Game::EvonyTKR::Controller::Generals {
         next;
       }
 
-      my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
-        rootManager    => $self->app->get_root_manager(),
-        general        => $general,
-        isPrimary      => 1,
-        targetType     => $generalType,
-        ascendingLevel => $ascendingLevel,
-        covenantLevel  => $covenantLevel,
-        speciality1    => $specialities[0],
-        speciality2    => $specialities[1],
-        speciality3    => $specialities[2],
-        speciality4    => $specialities[3],
-
-      );
-
-      $summarizer->updateBuffs();
-      $summarizer->updateDebuffs();
       my $result = {
-        marchbuff            => $summarizer->marchIncrease,
-        attackbuff           => $summarizer->attackIncrease,
-        defensebuff          => $summarizer->defenseIncrease,
-        hpbuff               => $summarizer->hpIncrease,
-        groundattackdebuff   => $summarizer->reducegroundattack,
-        grounddefensedebuff  => $summarizer->reducegrounddefense,
-        groundhpdebuff       => $summarizer->reducegroundhp,
-        mountedattackdebuff  => $summarizer->reducemountedattack,
-        mounteddefensedebuff => $summarizer->reducemounteddefense,
-        mountedhpdebuff      => $summarizer->reducemountedhp,
-        rangedattackdebuff   => $summarizer->reducerangedattack,
-        rangeddefensedebuff  => $summarizer->reducerangeddefense,
-        rangedhpdebuff       => $summarizer->reducerangedhp,
-        siegeattackdebuff    => $summarizer->reducesiegeattack,
-        siegedefensedebuff   => $summarizer->reducesiegedefense,
-        siegehpdebuff        => $summarizer->reducesiegehp,
         primary              => $general,
       };
       push @generalBuffSummaries, $result;
