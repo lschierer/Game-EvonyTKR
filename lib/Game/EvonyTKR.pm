@@ -9,6 +9,7 @@ require Game::EvonyTKR::Controller::Root;
 require Game::EvonyTKR::Controller::ControllerBase;
 require Game::EvonyTKR::Controller::CollectionBase;
 require Game::EvonyTKR::Model::EvonyTKR::Manager;
+require GitRepo::Reader;
 
 use namespace::clean;
 
@@ -76,7 +77,10 @@ package Game::EvonyTKR {
     my $RootManager =
       Game::EvonyTKR::Model::EvonyTKR::Manager->new(SourceDir => $distDir,);
 
+    my $RepoData = GitRepo::Reader->new(source_dir => $distDir,);
+
     $self->helper(get_root_manager => sub { return $RootManager });
+    $self->helper(get_repo_data => sub { return $RepoData });
 
     # Instantiate and attach shared model manager
     # Run rootImport once on first dispatch

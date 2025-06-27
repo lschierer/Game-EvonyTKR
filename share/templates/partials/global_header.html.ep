@@ -1,0 +1,139 @@
+%# share/templates/partials/global_header.html.ep
+% my $url = url_for()->path;
+% my $siteLogo = Mojo::File->new('share/images/TKRTipsLogo.svg')->slurp('UTF-8');
+% $siteLogo =~ s/<svg/<svg class="site-logo"/;
+<div class="header">
+  <div class="site-title-section">
+    <div class="logo-container">
+      <a href="/" class="site-title spectrum-Link spectrum-Link--quiet spectrum-Link--secondary">
+        <%== $siteLogo %>
+      </a>
+    </div>
+    <div class="title-container">
+      <a href="/" class="site-title spectrum-Link spectrum-Link--quiet spectrum-Link--secondary">
+        <span class="site-title spectrum-Heading spectrum-Heading--sizeXXL">Evony TKR Tips</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <% foreach my $navItem ("Generals", "Monsters", "PvP", "Reference") { %>
+      <div class="nav-item">
+        <a href="/<%= $navItem %>" class="spectrum-Link spectrum-Link--primary spectrum-Link--quiet">
+          <span class="spectrum-Heading spectrum-Heading--serif spectrum-Heading--sizeXS">
+            <%= $navItem %>
+          </span>
+        </a>
+      </div>
+    <% } %>
+  </div>
+
+  <div class="social-icons-section">
+    <div class="nav-item">
+      <a class="social-icons nav-item spectrum-Link spectrum-Link--primary spectrum-Link--quiet " href="https://github.com/lschierer/Game-EvonyTKR">
+        <iconify-icon id="github" class="social-icons nav-item" icon="codicon:github" height="none"></iconify-icon>
+      </a>
+    </div>
+  </div>
+</div>
+
+<style>
+  div.header {
+    height: var(--header-height);
+    width: 100%;
+    background-color: var(--mod-heading-font-color);
+    color: var(--text-2);
+
+    padding: var(--size-1);
+    box-sizing: border-box;
+    display: grid;
+    grid-template-columns: 2fr 4fr 1fr; /* Left, middle, right sections */
+    align-items: center;
+  }
+
+  div.site-title-section {
+    grid-column: 1;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    height: calc(100% - calc(2 * var(--size-1)));
+    padding-left: 1rem;
+  }
+
+  div.logo-container {
+    display: block;
+    height: 100%;
+    width: fit-content;
+    margin: 0;
+    padding: 0;
+    flex: 0 0 auto;
+  }
+
+  a.site-title {
+    width: max-content;
+    height: fit-content;
+    --mod-link-text-color: var(--text-2);
+    --mod-link-text-color-secondary-hover: var(--text-2);
+    --mod-link-text-color-secondary-focus: var(--text-2);
+  }
+
+  svg.site-logo {
+    /* total header height minus the padding on the top minus the padding on the bottom minus a margin on the top and bottom */
+    height: calc(var(--header-height) - calc(calc(2 * var(--size-1)) + calc(2 * var(--logo-vertical-margin))));
+    width: auto;
+    margin: auto 0; /* center vertically */
+    display: block;
+  }
+
+  div.title-container {
+    height: inherit;
+    width: max-content;
+    flex: 0 1 auto;
+  }
+
+  span.site-title.spectrum-Heading {
+    background-color: var(--mod-heading-font-color);
+    color: var(--text-2);
+    box-sizing: border-box;
+    margin: auto 0 auto 0.5em; /* center vertically */
+  }
+
+  div.nav-section {
+    grid-column: 2;
+    width: 100%;
+    height: inherit;
+    display: flex;
+    justify-self: center;
+    justify-content: space-around;
+    align-items: center;
+
+    --mod-heading-font-color: var(--text-2);
+  }
+
+  div.social-icons-section {
+    width: 100%;
+    height: inherit;
+    display: flex;
+    justify-self: center;
+    justify-content: space-around;
+    align-items: center;
+
+    --social-icon-size: var(--size-7);
+    --mod-heading-font-color: var(--text-2);
+  }
+
+  iconify-icon.social-icons.nav-item {
+    height: var(--social-icon-size);
+    width: var(--social-icon-size);
+  }
+
+  iconify-icon#github {
+    color: var(--github-green);
+  }
+
+  div.nav-item > a.social-icons.nav-item {
+    height: fit-content;
+    width: fit-content;
+  }
+
+</style>

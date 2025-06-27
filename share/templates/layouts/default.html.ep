@@ -15,7 +15,7 @@
   </head>
   <body class="spectrum spectrum--medium spectrum--light spectrum-Typography light-theme light">
     <header>
-
+      <%= include 'partials/global_header' %>
     </header>
     <% my $cr = url_for(current_route)->to_abs->path; %>
     <% if ($cr ne '/' ) { %>
@@ -50,7 +50,7 @@
     <% } %>
 
     <footer>
-      <p>&copy; <%= (localtime)[5] + 1900 %> Luke Schierer</p>
+      <%= include 'partials/global_footer' %>
     </footer>
 
     % if (stash('yaml_data') && exists stash('yaml_data')->{js}) {

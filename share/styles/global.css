@@ -14,6 +14,7 @@
   --surface-2: var(--spectrum-gray-500);
   --surface-3: var(--spectrum-gray-700);
   --surface-4: var(--spectrum-gray-900);
+  --github-green: #08872b;
 
   /* Spectrum normally uses fixed pixel based sizing.  This lets me use relative sizing */
 
@@ -35,8 +36,11 @@
   --size-13: 15rem;
   --size-14: 20rem;
   --size-15: 30rem;
+  --header-height: 7vh;
+  --logo-vertical-margin: 2px;
 
   /* customize the spectrum-css tokens */
+  --spectrum-background-base-color: var(--surface-1);
   --mod-button-background-color-default: var(--text-1);
   --mod-button-content-color-default: var(--text-2);
   --mod-body-font-color: var(--text-1);
@@ -56,9 +60,11 @@
 
 html,
 body {
-  background-color: var(--surface-1);
   color: var(--text-1);
-  accent-color: var(--link);
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  box-sizing: border-box;
 }
 
 h5,
@@ -68,9 +74,30 @@ dd {
   color: var(--text-2);
 }
 
-div.spectrum-SplitView {
-  max-height: 90vh; /* change this to allow for the space for the header and footer */
+header {
+  width: 100vw;
+  margin: 0;
+  padding: 0;
+  height: var(--header-height);
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+div.spectrum-SplitView,
+main {
+  height: 88vh;
   overflow: hidden auto;
+  flex-grow: 1;
+}
+
+main,
+article {
+  margin: 8px;
+}
+
+footer {
+  height: 5vh;
+  flex-shrink: 0;
 }
 
 div#nav {
