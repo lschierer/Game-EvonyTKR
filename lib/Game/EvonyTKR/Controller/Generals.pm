@@ -16,14 +16,20 @@ package Game::EvonyTKR::Controller::Generals {
   # Specify which collection this controller handles
   sub collection_name {'generals'}
 
+  sub controller_name ($self) {
+    return "Generals";
+  }
+
   my $base = '/Generals';
+
+  my $reference_base = '/Reference/Generals';
+
+  sub getReferenceBase($self) {
+    return $reference_base;
+  }
 
   sub getBase($self) {
     return $base;
-  }
-
-  sub controller_name ($self) {
-    return "Generals";
   }
 
   sub get_manager ($self) {
@@ -60,17 +66,15 @@ package Game::EvonyTKR::Controller::Generals {
     $logger->debug("got controller_name $controller_name.");
 
     my $r      = $app->routes;
-    my $routes = $r->any("$base");
+    my $mainRoutes = $r->any($base);
+    my $referenceRoutes = $app->routes->any($reference_base);
 
-    $routes->get('/')
+    $mainRoutes->get('/')
       ->to(controller => $controller_name, action => 'index')
       ->name("${base}_index");
 
-    $routes->any('/details')->to(
-      cb => sub ($c) {
-        $c->redirect_to('/Generals');
-      }
-    );
+    $referenceRoutes->get('/')->to(controller => $controller_name, action => 'index')
+    ->name("${reference_base}_index");
 
     # Add a parent navigation item for Generals
     $app->add_navigation_item({
@@ -82,8 +86,8 @@ package Game::EvonyTKR::Controller::Generals {
     # Add a parent navigation item for Generals
     $app->add_navigation_item({
       title  => 'General Details',
-      path   => '/Generals/details',
-      parent => '/Generals',
+      path   => $reference_base,
+      parent => '/Reference',
       order  => 10,
     });
 
@@ -104,15 +108,22 @@ package Game::EvonyTKR::Controller::Generals {
         my $generals =
           $app->get_root_manager->generalManager->get_all_generals();
         foreach my $general (values %$generals) {
+
+          my $clean_name = $general->name;
+          $clean_name =~ s{^/}{};
+          $referenceRoutes->get($clean_name => {name => $clean_name })
+            ->to(controller => $controller_name, action => 'show')
+            ->name("${reference_base}_show");
+
           $app->add_navigation_item({
             title  => "Details for " . $general->name,
-            path   => "/Generals/details/" . $general->name,
-            parent => 'Generals/details/',
+            path   => "${reference_base}/${clean_name}",
+            parent => $reference_base,
             order  => 10,
           });
         }
 
-        $routes->get(
+        $mainRoutes->get(
           '/Mayors/comparison' => {
             generalType => 'mayor',
             linkTarget  => 'Mayor',
@@ -129,7 +140,7 @@ package Game::EvonyTKR::Controller::Generals {
           order  => 10,
         });
 
-        $routes->get(
+        $mainRoutes->get(
           '/Mayors/comparison/data.json' => {
             generalType => 'Mayor',
             linkTarget  => 'Mayor',
@@ -147,7 +158,7 @@ package Game::EvonyTKR::Controller::Generals {
           $linkTarget =~ s/(\w)(\w+)( specialist)?/\U$1\L$2 \US\Lpecialist/;
 
           # For primary generals
-          $routes->get(
+          $mainRoutes->get(
             "/$linkTarget/primary/:name" => {
               generalType => $type,
               linkTarget  => $linkTarget,
@@ -158,7 +169,7 @@ package Game::EvonyTKR::Controller::Generals {
             ->name("${base}_${type}_primary");
 
           # For secondary generals
-          $routes->get(
+          $mainRoutes->get(
             "/$linkTarget/secondary/:name" => {
               generalType => $type,
               linkTarget  => $linkTarget,

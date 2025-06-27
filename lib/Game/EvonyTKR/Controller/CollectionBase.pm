@@ -31,12 +31,6 @@ package Game::EvonyTKR::Controller::CollectionBase {
       ? $self->controller_name()
       : $base;
 
-    my $routes = $self->getRoutes();
-    $routes->get('/details/:name')
-      ->to(controller => $controller_name, action => 'show')
-      ->name("${base}_show");
-
-    $logger->info("Routes for $base registered successfully");
 
   }
 

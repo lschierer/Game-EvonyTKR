@@ -51,12 +51,6 @@ package Game::EvonyTKR::Controller::Specialties {
     my $r      = $app->routes;
     my $routes = $r->any("$base");
 
-    $routes->any('/details')->to(
-      cb => sub ($c) {
-        $c->redirect_to($base);
-      }
-    );
-
     $app->plugins->on(
       'evonytkrtips_initialized' => sub($self, $manager) {
         $logger->debug(
@@ -65,15 +59,21 @@ package Game::EvonyTKR::Controller::Specialties {
         if (not defined $manager) {
           $logger->logcroak('No Manager Defined');
         }
-        my $base = getBase($self);
+
         foreach my $specialty (
           @{ $manager->specialtyManager->get_all_specialties() }) {
           my $name = $specialty->name;
 
+          my $clean_name = $name;
+          $clean_name =~ s{^/}{};
+          $routes->get($clean_name => {name => $clean_name })
+            ->to(controller => $controller_name, action => 'show')
+            ->name("${base}_show");
+
           $app->add_navigation_item({
             title  => "Details for $name",
-            path   => "$base/details/$name",
-            parent => "$base/details/",
+            path   => "$base/$name",
+            parent => "$base/",
             order  => 20,
           });
         }

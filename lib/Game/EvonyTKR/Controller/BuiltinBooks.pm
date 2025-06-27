@@ -18,14 +18,16 @@ package Game::EvonyTKR::Controller::BuiltinBooks {
     return $self->app->get_root_manager->bookManager;
   }
 
-  my $base = 'Skill Books';
-
-  sub getBase($self) {
-    return $base;
-  }
-
   sub controller_name ($self) {
     return "BuiltinBooks";
+  }
+
+  my $base = '/Reference/Skill Books';
+
+  # in part because parent classes use this to override different values of $base
+  sub getBase($self ) {
+    $base =~ s{/$}{};
+    return $base;
   }
 
   # Register this when the application starts
@@ -42,7 +44,7 @@ package Game::EvonyTKR::Controller::BuiltinBooks {
 
     $app->add_navigation_item({
       title => 'Details of General Skill Books',
-      path  => '/Skill Books/',
+      path  => $self->getBase(),
       order => 20,
     });
 
@@ -59,12 +61,15 @@ package Game::EvonyTKR::Controller::BuiltinBooks {
     my $r      = $app->routes;
     my $routes = $r->any("$base");
 
+    # for backwards compatibility
     $routes->any('/details')->to(
       cb => sub ($c) {
-        $c->redirect_to('/Skill Books');
+        $c->redirect_to($self->getBase());
       }
     );
 
+    # register routes that cannot exist until after the manager class has
+    # done its thing only after initialization
     $app->plugins->on(
       'evonytkrtips_initialized' => sub($self, $manager) {
         $logger->debug(
@@ -73,13 +78,20 @@ package Game::EvonyTKR::Controller::BuiltinBooks {
         if (not defined $manager) {
           $logger->logcroak('No Manager Defined');
         }
-
+        my $base = getBase($self);
         foreach my $book (@{ $manager->bookManager->get_all_books() }) {
           my $name = $book->name;
+
+          my $clean_name = $name;
+          $clean_name =~ s{^/}{};
+          $routes->get($clean_name => {name => $clean_name })
+            ->to(controller => $controller_name, action => 'show')
+            ->name("${base}_show");
+
           $app->add_navigation_item({
             title  => "Details for $name",
-            path   => "/Skill Books/details/$name",
-            parent => "/Skill Books/details/",
+            path   => "$base/$name",
+            parent => $base,
             order  => 20,
           });
         }
