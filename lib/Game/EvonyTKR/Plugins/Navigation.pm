@@ -158,7 +158,8 @@ package Game::EvonyTKR::Plugins::Navigation {
       $a->{order} <=> $b->{order}
         || lc($a->{title}) cmp lc($b->{title})
     } @result;
-    $logger->debug("_prune_and_sort returning result " . Data::Printer::np(@result));
+    $logger->debug(
+      "_prune_and_sort returning result " . Data::Printer::np(@result));
     return \@result;
   }
 

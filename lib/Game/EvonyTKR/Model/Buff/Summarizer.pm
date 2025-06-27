@@ -29,10 +29,10 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
 
   # these are needed now
   field $ascendingLevel : reader : param //= 'red5';
-  field $specialty1 : reader : param    //= 'gold';
-  field $specialty2 : reader : param    //= 'gold';
-  field $specialty3 : reader : param    //= 'gold';
-  field $specialty4 : reader : param    //= 'gold';
+  field $specialty1 : reader : param     //= 'gold';
+  field $specialty2 : reader : param     //= 'gold';
+  field $specialty3 : reader : param     //= 'gold';
+  field $specialty4 : reader : param     //= 'gold';
   field $covenantLevel : reader : param  //= 'Civilization';
 
   # these are anticipated that I will need them in the future.
@@ -481,9 +481,8 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
     $debuffConditions = []
   ) {
     my $total           = 0;
-    my @specialtyNames = @{ $general->specialtyNames };
-    my @specialtyLevels =
-      ($specialty1, $specialty2, $specialty3, $specialty4);
+    my @specialtyNames  = @{ $general->specialtyNames };
+    my @specialtyLevels = ($specialty1, $specialty2, $specialty3, $specialty4);
 
     foreach my $sn_index (0 .. $#specialtyNames) {
       my $sn = $specialtyNames[$sn_index];

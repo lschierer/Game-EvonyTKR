@@ -44,11 +44,12 @@ package Game::EvonyTKR::Plugins::StaticPages {
       )->name("static_$route_path");
 
       my $parsedFile = $app->parse_markdown_frontmatter($file_path);
-      if($parsedFile) {
+      if ($parsedFile) {
         $app->add_navigation_item({
           title => $parsedFile->{title},
           path  => $route_path,
-          order => $parsedFile->{order},           # Static pages come after dynamic content
+          order => $parsedFile->{order}
+          ,    # Static pages come after dynamic content
         });
       }
     }

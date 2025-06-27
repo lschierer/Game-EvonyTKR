@@ -57,15 +57,16 @@ package Game::EvonyTKR::Controller::Generals {
 
     $logger->debug("got controller_name $controller_name.");
 
-    my $mainRoutes = $app->routes->any($base);
+    my $mainRoutes      = $app->routes->any($base);
     my $referenceRoutes = $app->routes->any($reference_base);
 
     $mainRoutes->get('/')
       ->to(controller => $controller_name, action => 'index')
       ->name("${base}_index");
 
-    $referenceRoutes->get('/')->to(controller => $controller_name, action => 'index')
-    ->name("${reference_base}_index");
+    $referenceRoutes->get('/')
+      ->to(controller => $controller_name, action => 'index')
+      ->name("${reference_base}_index");
 
     # Add a parent navigation item for Generals
     $app->add_navigation_item({
@@ -102,7 +103,7 @@ package Game::EvonyTKR::Controller::Generals {
 
           my $clean_name = $general->name;
           $clean_name =~ s{^/}{};
-          $referenceRoutes->get($clean_name => {name => $clean_name })
+          $referenceRoutes->get($clean_name => { name => $clean_name })
             ->to(controller => $controller_name, action => 'show')
             ->name("${reference_base}_show");
 
@@ -190,7 +191,8 @@ package Game::EvonyTKR::Controller::Generals {
     $logger->debug("Generals index method has base $base");
 
     my $items = $self->get_general_manager()->get_all_generals();
-    $logger->debug(sprintf('Items: %s with %s keys.', ref($items), scalar(keys %$items)));
+    $logger->debug(
+      sprintf('Items: %s with %s keys.', ref($items), scalar(keys %$items)));
     $self->stash(
       linkBase        => $base,
       items           => $items,
@@ -202,7 +204,8 @@ package Game::EvonyTKR::Controller::Generals {
       # Render with markdown
       $self->stash(template => '/generals/index');
 
-      return $self->render_markdown_file($markdown_path, { template => 'generals/index' });
+      return $self->render_markdown_file($markdown_path,
+        { template => 'generals/index' });
     }
     else {
       # Render just the items
@@ -272,10 +275,10 @@ package Game::EvonyTKR::Controller::Generals {
           targetType     => $targetType,
           ascendingLevel => $ascendingLevel,
           covenantLevel  => $covenantLevel,
-          specialty1    => $specialties[0],
-          specialty2    => $specialties[1],
-          specialty3    => $specialties[2],
-          specialty4    => $specialties[3],
+          specialty1     => $specialties[0],
+          specialty2     => $specialties[1],
+          specialty3     => $specialties[2],
+          specialty4     => $specialties[3],
         );
 
         $summarizer->updateBuffs();
@@ -343,7 +346,7 @@ package Game::EvonyTKR::Controller::Generals {
       mode           => 'single',
       covenantLevel  => $covenantLevel,
       ascendingLevel => $ascendingLevel,
-      specialties   => \@specialties,
+      specialties    => \@specialties,
 
      # Add enum values for which I do not yet have managers that provide helpers
       covenantLevelValues => $data_model->covenantLevels,
@@ -367,7 +370,7 @@ package Game::EvonyTKR::Controller::Generals {
     my $generalType = $self->stash('generalType');
     my $linkTarget  = $self->stash('linkTarget');
 
-    my $gm                   = $self->app->get_general_manager();
+    my $gm = $self->app->get_general_manager();
     my @generalBuffSummaries;
     while (my ($key, $general) = each(%{ $gm->get_all_generals() })) {
       $logger->debug("inspecting '$key', first need to see if it is a mayor."
@@ -381,9 +384,7 @@ package Game::EvonyTKR::Controller::Generals {
         next;
       }
 
-      my $result = {
-        primary              => $general,
-      };
+      my $result = { primary => $general, };
       push @generalBuffSummaries, $result;
     }
     if (scalar @generalBuffSummaries) {
@@ -451,16 +452,16 @@ package Game::EvonyTKR::Controller::Generals {
     }
 
     my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
-      rootManager => $self->app->get_root_manager(),
-      general     => $general,
-      isPrimary   => $isPrimary,
-      targetType  => $targetType,
+      rootManager    => $self->app->get_root_manager(),
+      general        => $general,
+      isPrimary      => $isPrimary,
+      targetType     => $targetType,
       ascendingLevel => $ascendingLevel,
       covenantLevel  => $covenantLevel,
-      specialty1    => $specialties[0],
-      specialty2    => $specialties[1],
-      specialty3    => $specialties[2],
-      specialty4    => $specialties[3],
+      specialty1     => $specialties[0],
+      specialty2     => $specialties[1],
+      specialty3     => $specialties[2],
+      specialty4     => $specialties[3],
     );
 
     $summarizer->updateBuffs();

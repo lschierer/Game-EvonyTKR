@@ -30,7 +30,7 @@ class Game::EvonyTKR::Model::EvonyTKR::Manager :
     $generalManager = Game::EvonyTKR::Model::General::Manager->new();
     $generalConflictGroupManager =
       Game::EvonyTKR::Model::General::ConflictGroup::Manager->new();
-    $bookManager       = Game::EvonyTKR::Model::Book::Manager->new();
+    $bookManager      = Game::EvonyTKR::Model::Book::Manager->new();
     $specialtyManager = Game::EvonyTKR::Model::Specialty::Manager->new();
     $ascendingAttributesManager =
       Game::EvonyTKR::Model::AscendingAttributes::Manager->new();

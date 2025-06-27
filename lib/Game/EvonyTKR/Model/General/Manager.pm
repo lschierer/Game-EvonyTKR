@@ -78,7 +78,7 @@ class Game::EvonyTKR::Model::General::Manager :
         type            => $object->{type},
         ascending       => $object->{ascending},
         builtInBookName => $object->{book},
-        specialtyNames => $object->{specialties},
+        specialtyNames  => $object->{specialties},
       );
 
       foreach my $baKey (keys %{ $object->{basic_attributes} }) {

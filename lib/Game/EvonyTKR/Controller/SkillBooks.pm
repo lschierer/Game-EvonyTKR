@@ -24,8 +24,8 @@ package Game::EvonyTKR::Controller::SkillBooks {
 
   my $base = '/Reference/Skill Books';
 
-  # in part because parent classes use this to override different values of $base
-  sub getBase($self ) {
+ # in part because parent classes use this to override different values of $base
+  sub getBase($self) {
     $base =~ s{/$}{};
     return $base;
   }
@@ -63,7 +63,6 @@ package Game::EvonyTKR::Controller::SkillBooks {
       ->to(controller => $controller_name, action => 'index')
       ->name("${base}_index");
 
-
     # for backwards compatibility
     $mainRoutes->any('/details')->to(
       cb => sub ($c) {
@@ -88,7 +87,7 @@ package Game::EvonyTKR::Controller::SkillBooks {
           my $clean_name = $name;
           $clean_name =~ s{^/}{};
 
-          $mainRoutes->get($clean_name => {name => $clean_name })
+          $mainRoutes->get($clean_name => { name => $clean_name })
             ->to(controller => $controller_name, action => 'show')
             ->name("${base}_show");
 
@@ -132,7 +131,8 @@ package Game::EvonyTKR::Controller::SkillBooks {
     $logger->debug("SkillBooks index method has base $base");
 
     my $items = $self->get_root_manager()->bookManager->get_all_books();
-    $logger->debug(sprintf('Items: %s with %s items.', ref($items), scalar(@$items)));
+    $logger->debug(
+      sprintf('Items: %s with %s items.', ref($items), scalar(@$items)));
     $self->stash(
       linkBase        => $base,
       items           => $items,
@@ -144,7 +144,8 @@ package Game::EvonyTKR::Controller::SkillBooks {
       # Render with markdown
       $self->stash(template => 'skill books/index');
 
-      return $self->render_markdown_file($markdown_path, { template => 'skill books/index' });
+      return $self->render_markdown_file($markdown_path,
+        { template => 'skill books/index' });
     }
     else {
       # Render just the items
@@ -168,9 +169,9 @@ package Game::EvonyTKR::Controller::SkillBooks {
     $logger->debug("retrieved skill book $book");
 
     $self->stash(
-      item      => $book,
-      template  => 'skill books/details',
-      layout    => 'default',
+      item     => $book,
+      template => 'skill books/details',
+      layout   => 'default',
     );
     return $self->render();
   }

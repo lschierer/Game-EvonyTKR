@@ -91,8 +91,10 @@ package Game::EvonyTKR::Controller::AscendingAttributes {
     $app->helper(
       get_ascending_section => sub ($c, $name = '') {
         if (length($name)) {
-          my $item = $app->get_root_manager->ascendingAttributesManager->getAscendingAttributes($name);
-          if (ref($item) eq 'OBJECT' && blessed($item) eq 'Game::EvonyTKR::Model::AscendingAttributes') {
+          my $item = $app->get_root_manager->ascendingAttributesManager
+            ->getAscendingAttributes($name);
+          if (ref($item) eq 'OBJECT'
+            && blessed($item) eq 'Game::EvonyTKR::Model::AscendingAttributes') {
             return $c->render_to_string(
               item     => $item,
               template => '/ascending attributes/details',

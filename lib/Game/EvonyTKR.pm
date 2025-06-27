@@ -78,7 +78,7 @@ package Game::EvonyTKR {
     my $RepoData = GitRepo::Reader->new(source_dir => $distDir,);
 
     $self->helper(get_root_manager => sub { return $RootManager });
-    $self->helper(get_repo_data => sub { return $RepoData });
+    $self->helper(get_repo_data    => sub { return $RepoData });
 
     # Instantiate and attach shared model manager
     # Run rootImport once on first dispatch

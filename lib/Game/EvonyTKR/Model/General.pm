@@ -103,7 +103,7 @@ class Game::EvonyTKR::Model::General : isa(Game::EvonyTKR::Model::Data) {
       basicAttributes => $basicAttributes,
       ascending       => $ascending,
       builtInBookName => $builtInBookName,
-      specialtyNames => $specialtyNames,
+      specialtyNames  => $specialtyNames,
     };
   }
 

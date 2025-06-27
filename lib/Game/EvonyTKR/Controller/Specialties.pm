@@ -32,10 +32,10 @@ package Game::EvonyTKR::Controller::Specialties {
     $self->SUPER::register($app, $config);
 
     $app->add_navigation_item({
-      title   => 'Details of General Specialties',
-      path    => $base,
-      parent  => '/Reference',
-      order   => 20,
+      title  => 'Details of General Specialties',
+      path   => $base,
+      parent => '/Reference',
+      order  => 20,
     });
 
     my @parts     = split(/::/, ref($self));
@@ -50,8 +50,9 @@ package Game::EvonyTKR::Controller::Specialties {
 
     my $mainRoutes = $app->routes->any($base);
 
-    $mainRoutes->get('/')->to(controller => $controller_name, action => 'index')
-    ->name("${base}_index");
+    $mainRoutes->get('/')
+      ->to(controller => $controller_name, action => 'index')
+      ->name("${base}_index");
 
     $app->plugins->on(
       'evonytkrtips_initialized' => sub($self, $manager) {
@@ -62,14 +63,15 @@ package Game::EvonyTKR::Controller::Specialties {
           $logger->logcroak('No Manager Defined');
         }
 
-        foreach my $specialty (
-          @{ $manager->specialtyManager->get_all_specialties() }) {
+        foreach
+          my $specialty (@{ $manager->specialtyManager->get_all_specialties() })
+        {
           my $name = $specialty->name;
 
           my $clean_name = $name;
           $clean_name =~ s{^/}{};
 
-          $mainRoutes->get($clean_name => {name => $clean_name })
+          $mainRoutes->get($clean_name => { name => $clean_name })
             ->to(controller => $controller_name, action => 'show')
             ->name("${base}_show");
 
@@ -80,7 +82,9 @@ package Game::EvonyTKR::Controller::Specialties {
             order  => 20,
           });
 
-          $logger->debug("added route and nav item for name '$name' cleaned to '$clean_name' with path '$base/$name'");
+          $logger->debug(
+"added route and nav item for name '$name' cleaned to '$clean_name' with path '$base/$name'"
+          );
         }
       }
     );
@@ -108,7 +112,7 @@ package Game::EvonyTKR::Controller::Specialties {
           foreach
             my $orig_name ($c->app->get_root_manager->specialtyLevels->@*) {
             $logger->debug(
-"specialty_level_names evaluating specialty level name $orig_name"
+              "specialty_level_names evaluating specialty level name $orig_name"
             );
             my $name;
             if ($printable) {
@@ -122,12 +126,9 @@ package Game::EvonyTKR::Controller::Specialties {
           return $nameList;
         }
         else {
-          $logger->debug(
-            "specialty_level_names sees levels"
+          $logger->debug("specialty_level_names sees levels"
               . Data::Printer::np(
-              $c->app->get_root_manager->specialtyLevels->@*
-              )
-          );
+              $c->app->get_root_manager->specialtyLevels->@*));
           my $match = first { $level =~ /$_/i }
             $c->app->get_root_manager->specialtyLevels->@*;
           $match =~ s/(\w)(\w*)/\U$1\L$2/;
@@ -174,7 +175,8 @@ package Game::EvonyTKR::Controller::Specialties {
     $logger->debug("Specialties index method has base $base");
 
     my $items = $self->get_specialty_manager()->get_all_specialties();
-    $logger->debug(sprintf('Items: %s with %s items.', ref($items), scalar(@$items)));
+    $logger->debug(
+      sprintf('Items: %s with %s items.', ref($items), scalar(@$items)));
     $self->stash(
       linkBase        => $base,
       items           => $items,
@@ -186,7 +188,8 @@ package Game::EvonyTKR::Controller::Specialties {
       # Render with markdown
       $self->stash(template => 'specialties/index');
 
-      return $self->render_markdown_file($markdown_path, { template => 'specialties/index' });
+      return $self->render_markdown_file($markdown_path,
+        { template => 'specialties/index' });
     }
     else {
       # Render just the items
@@ -201,7 +204,8 @@ package Game::EvonyTKR::Controller::Specialties {
     $name = $self->param('name');
     $logger->debug("show detects name $name, showing details.");
 
-    my $specialty = $self->get_root_manager->specialtyManager->getSpecialty($name);
+    my $specialty =
+      $self->get_root_manager->specialtyManager->getSpecialty($name);
 
     unless ($specialty) {
       $logger->error("speciality '$name' was not found.");
@@ -210,9 +214,9 @@ package Game::EvonyTKR::Controller::Specialties {
     $logger->debug("retrieved specialty $specialty");
 
     $self->stash(
-      item      => $specialty,
-      template  => 'specialties/details',
-      layout    => 'default',
+      item     => $specialty,
+      template => 'specialties/details',
+      layout   => 'default',
     );
     return $self->render();
   }

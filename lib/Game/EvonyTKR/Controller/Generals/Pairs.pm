@@ -62,13 +62,13 @@ package Game::EvonyTKR::Controller::Generals::Pairs {
       ->to(controller => $controller_name, action => 'index')
       ->name("${base}_index");
 
-      # Add a parent navigation item for General Pairs
-      $app->add_navigation_item({
-        title  => 'General Pairs',
-        path   => '/Generals/Pairs',
-        parent => '/Generals',
-        order  => 10,
-      });
+    # Add a parent navigation item for General Pairs
+    $app->add_navigation_item({
+      title  => 'General Pairs',
+      path   => '/Generals/Pairs',
+      parent => '/Generals',
+      order  => 10,
+    });
 
     $routes->get('/:linkTarget/pair')
       ->to(controller => $controller_name, action => 'pair_buffs')
@@ -127,14 +127,15 @@ package Game::EvonyTKR::Controller::Generals::Pairs {
     my $linkTarget  = $self->stash('linkTarget');
 
     # Get query parameters with defaults
-    my $ascendingLevel = $self->param('ascendingLevel') // 'red5';
-    my $primaryCovenantLevel  = $self->param('covenantLevel')  // 'civilization';
+    my $ascendingLevel       = $self->param('ascendingLevel') // 'red5';
+    my $primaryCovenantLevel = $self->param('covenantLevel')  // 'civilization';
     my @primarySpecialties;
     push @primarySpecialties, $self->param('primarySpecialty1') // 'gold';
     push @primarySpecialties, $self->param('primarySpecialty2') // 'gold';
     push @primarySpecialties, $self->param('primarySpecialty3') // 'gold';
     push @primarySpecialties, $self->param('primarySpecialty4') // 'gold';
-    my $secondaryCovenantLevel  = $self->param('covenantLevel')  // 'civilization';
+    my $secondaryCovenantLevel = $self->param('covenantLevel')
+      // 'civilization';
     my @secondarySpecialties;
     push @secondarySpecialties, $self->param('secondarySpecialty1') // 'gold';
     push @secondarySpecialties, $self->param('secondarySpecialty2') // 'gold';
@@ -153,26 +154,30 @@ package Game::EvonyTKR::Controller::Generals::Pairs {
 
     if (!$data_model->checkCovenantLevel($primaryCovenantLevel)) {
       $logger->warn(
-        "Invalid covenantLevel: $primaryCovenantLevel, using default 'civilization'");
+"Invalid covenantLevel: $primaryCovenantLevel, using default 'civilization'"
+      );
       $primaryCovenantLevel = 'civilization';
     }
 
-    @primarySpecialties = $data_model->normalizeSpecialtyLevels(@primarySpecialties);
+    @primarySpecialties =
+      $data_model->normalizeSpecialtyLevels(@primarySpecialties);
 
     if (!$data_model->checkCovenantLevel($secondaryCovenantLevel)) {
       $logger->warn(
-        "Invalid covenantLevel: $secondaryCovenantLevel, using default 'civilization'");
+"Invalid covenantLevel: $secondaryCovenantLevel, using default 'civilization'"
+      );
       $secondaryCovenantLevel = 'civilization';
     }
 
-    @secondarySpecialties = $data_model->normalizeSpecialtyLevels(@secondarySpecialties);
+    @secondarySpecialties =
+      $data_model->normalizeSpecialtyLevels(@secondarySpecialties);
 
     $self->stash(
-      mode                    => 'pair',
-      ascendingLevel          => $ascendingLevel,
-      primaryCovenantLevel    => $primaryCovenantLevel,
+      mode                   => 'pair',
+      ascendingLevel         => $ascendingLevel,
+      primaryCovenantLevel   => $primaryCovenantLevel,
       primarySpecialties     => \@primarySpecialties,
-      secondaryCovenantLevel  => $secondaryCovenantLevel,
+      secondaryCovenantLevel => $secondaryCovenantLevel,
       secondarySpecialties   => \@secondarySpecialties,
     );
 
