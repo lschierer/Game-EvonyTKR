@@ -41,7 +41,6 @@
   --logo-vertical-margin: 2px;
 
   /* customize the spectrum-css tokens */
-  --spectrum-background-base-color: var(--surface-1);
   --mod-button-background-color-default: var(--text-1);
   --mod-button-content-color-default: var(--text-2);
   --mod-body-font-color: var(--text-1);
@@ -66,6 +65,7 @@ body {
   flex-direction: column;
   margin: 0;
   box-sizing: border-box;
+  background-color: var(--spectrum-background-base-color);
 }
 
 h5,
@@ -97,7 +97,6 @@ div.spectrum-SplitView-pane {
 
 main,
 article {
-  background-color: var(--spectrum-background-base-color);
   height: fit-content;
   margin: 8px;
 }

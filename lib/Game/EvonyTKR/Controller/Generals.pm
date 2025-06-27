@@ -9,7 +9,7 @@ require Data::Printer;
 use namespace::clean;
 
 package Game::EvonyTKR::Controller::Generals {
-  use Mojo::Base 'Game::EvonyTKR::Controller::CollectionBase';
+  use Mojo::Base 'Game::EvonyTKR::Controller::ControllerBase';
   use List::AllUtils qw( all any none );
   use Carp;
 
@@ -41,14 +41,6 @@ package Game::EvonyTKR::Controller::Generals {
     $logger->info("Registering routes for " . ref($self));
     $self->SUPER::register($app, $config);
 
-    $app->hook(before_dispatch => sub {
-         my $c = shift;
-         $logger->debug("Request path: " . $c->req->url->path);
-         $logger->debug("Matched route name: " . ($c->match->endpoint ? $c->match->endpoint->name : 'none'));
-         $logger->debug("Stash values: " . Data::Printer::np($c->stash));
-       });
-
-
     $app->helper(
       get_general_manager => sub {
         return $app->get_root_manager->generalManager;
@@ -65,8 +57,7 @@ package Game::EvonyTKR::Controller::Generals {
 
     $logger->debug("got controller_name $controller_name.");
 
-    my $r      = $app->routes;
-    my $mainRoutes = $r->any($base);
+    my $mainRoutes = $app->routes->any($base);
     my $referenceRoutes = $app->routes->any($reference_base);
 
     $mainRoutes->get('/')
@@ -184,6 +175,41 @@ package Game::EvonyTKR::Controller::Generals {
     );
   }
 
+  sub index($self) {
+    my $logger     = Log::Log4perl->get_logger(__PACKAGE__);
+    my $collection = collection_name();
+    $logger->debug("Rendering index for $collection");
+
+    # Check if markdown exists for this collection
+    my $distDir       = Mojo::File::Share::dist_dir('Game::EvonyTKR');
+    my $markdown_path = $distDir->child("pages/$collection/index.md");
+
+    my @parts     = split(/::/, ref($self));
+    my $baseClass = pop(@parts);
+    my $base      = $self->getBase();
+    $logger->debug("Generals index method has base $base");
+
+    my $items = $self->get_general_manager()->get_all_generals();
+    $logger->debug(sprintf('Items: %s with %s keys.', ref($items), scalar(keys %$items)));
+    $self->stash(
+      linkBase        => $base,
+      items           => $items,
+      collection_name => $collection,
+      controller_name => $baseClass,
+    );
+
+    if (-f $markdown_path) {
+      # Render with markdown
+      $self->stash(template => '/generals/index');
+
+      return $self->render_markdown_file($markdown_path, { template => 'generals/index' });
+    }
+    else {
+      # Render just the items
+      return $self->render(template => '/generals/index');
+    }
+  }
+
   sub show ($self) {
     my $logger = Log::Log4perl->get_logger(ref($self));
     $logger->debug("start of show method");
@@ -273,7 +299,7 @@ package Game::EvonyTKR::Controller::Generals {
         );
       }
 
-      return $self->render(template => $self->details_template);
+      return $self->render(template => 'generals/details');
     }
     $self->SUPER::show();
   }

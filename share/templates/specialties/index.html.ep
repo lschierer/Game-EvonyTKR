@@ -2,11 +2,11 @@
 
 <div class="collection-list">
   <ul class="collection-grid">
-    <% if ($items && ref $items eq 'HASH') { %>
-      <% foreach my $key (sort(keys(%$items))) { %>
+    <% if ($items && ref $items eq 'ARRAY') { %>
+      <% foreach my $item (sort {$a->name cmp $b->name } $items->@* ) { %>
         <li class="collection-item">
-          <a href="/Reference/<%= ucfirst($collection_name) %>/<%= $key %>/">
-            <%= $items->{$key}->{name} %>
+          <a href="/Reference/<%= ucfirst($collection_name) %>/<%= $item->name %>/">
+            <%= $item->name %>
           </a>
         </li>
       <% } %>

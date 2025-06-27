@@ -6,7 +6,7 @@ require Game::EvonyTKR::Model::Specialty::Manager;
 use namespace::clean;
 
 package Game::EvonyTKR::Controller::Specialties {
-  use Mojo::Base 'Game::EvonyTKR::Controller::CollectionBase';
+  use Mojo::Base 'Game::EvonyTKR::Controller::ControllerBase';
   use List::AllUtils qw( all any none first);
 
   # Specify which collection this controller handles
@@ -16,7 +16,7 @@ package Game::EvonyTKR::Controller::Specialties {
     return $self->app->get_root_manager->specialtyManager;
   }
 
-  my $base = '/Reference/Specialties/';
+  my $base = '/Reference/Specialties';
 
   sub getBase($self) {
     return $base;
@@ -48,8 +48,10 @@ package Game::EvonyTKR::Controller::Specialties {
 
     $logger->debug("got controller_name $controller_name.");
 
-    my $r      = $app->routes;
-    my $routes = $r->any("$base");
+    my $mainRoutes = $app->routes->any($base);
+
+    $mainRoutes->get('/')->to(controller => $controller_name, action => 'index')
+    ->name("${base}_index");
 
     $app->plugins->on(
       'evonytkrtips_initialized' => sub($self, $manager) {
@@ -66,16 +68,19 @@ package Game::EvonyTKR::Controller::Specialties {
 
           my $clean_name = $name;
           $clean_name =~ s{^/}{};
-          $routes->get($clean_name => {name => $clean_name })
+
+          $mainRoutes->get($clean_name => {name => $clean_name })
             ->to(controller => $controller_name, action => 'show')
             ->name("${base}_show");
 
           $app->add_navigation_item({
             title  => "Details for $name",
             path   => "$base/$name",
-            parent => "$base/",
+            parent => "$base",
             order  => 20,
           });
+
+          $logger->debug("added route and nav item for name '$name' cleaned to '$clean_name' with path '$base/$name'");
         }
       }
     );
@@ -152,6 +157,64 @@ package Game::EvonyTKR::Controller::Specialties {
           || $a->{level} cmp $b->{level}
       } @$levels
     ];
+  }
+
+  sub index($self) {
+    my $logger     = Log::Log4perl->get_logger(__PACKAGE__);
+    my $collection = collection_name();
+    $logger->debug("Rendering index for $collection");
+
+    # Check if markdown exists for this collection
+    my $distDir       = Mojo::File::Share::dist_dir('Game::EvonyTKR');
+    my $markdown_path = $distDir->child("pages/$collection/index.md");
+
+    my @parts     = split(/::/, ref($self));
+    my $baseClass = pop(@parts);
+    my $base      = $self->getBase();
+    $logger->debug("Specialties index method has base $base");
+
+    my $items = $self->get_specialty_manager()->get_all_specialties();
+    $logger->debug(sprintf('Items: %s with %s items.', ref($items), scalar(@$items)));
+    $self->stash(
+      linkBase        => $base,
+      items           => $items,
+      collection_name => $collection,
+      controller_name => $baseClass,
+    );
+
+    if (-f $markdown_path) {
+      # Render with markdown
+      $self->stash(template => 'specialties/index');
+
+      return $self->render_markdown_file($markdown_path, { template => 'specialties/index' });
+    }
+    else {
+      # Render just the items
+      return $self->render(template => 'specialties/index');
+    }
+  }
+
+  sub show ($self) {
+    my $logger = Log::Log4perl->get_logger(ref($self));
+    $logger->debug("start of show method");
+    my $name;
+    $name = $self->param('name');
+    $logger->debug("show detects name $name, showing details.");
+
+    my $specialty = $self->get_root_manager->specialtyManager->getSpecialty($name);
+
+    unless ($specialty) {
+      $logger->error("speciality '$name' was not found.");
+      $self->reply->not_found;
+    }
+    $logger->debug("retrieved specialty $specialty");
+
+    $self->stash(
+      item      => $specialty,
+      template  => 'specialties/details',
+      layout    => 'default',
+    );
+    return $self->render();
   }
 
 }

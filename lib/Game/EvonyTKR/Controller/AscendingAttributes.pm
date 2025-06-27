@@ -7,7 +7,7 @@ require Data::Printer;
 use namespace::clean;
 
 package Game::EvonyTKR::Controller::AscendingAttributes {
-  use Mojo::Base 'Game::EvonyTKR::Controller::CollectionBase', -strict,
+  use Mojo::Base 'Game::EvonyTKR::Controller::ControllerBase', -strict,
     -signatures;
   use List::AllUtils qw(uniq);
   use Carp;
@@ -91,11 +91,11 @@ package Game::EvonyTKR::Controller::AscendingAttributes {
     $app->helper(
       get_ascending_section => sub ($c, $name = '') {
         if (length($name)) {
-          my $item = $self->fetch_for_helper($self, $name);
-          if (ref($item) eq 'HASH') {
+          my $item = $app->get_root_manager->ascendingAttributesManager->getAscendingAttributes($name);
+          if (ref($item) eq 'OBJECT' && blessed($item) eq 'Game::EvonyTKR::Model::AscendingAttributes') {
             return $c->render_to_string(
               item     => $item,
-              template => $self->details_template,
+              template => '/ascending attributes/details',
               layout   => undef
             );
           }
@@ -107,21 +107,6 @@ package Game::EvonyTKR::Controller::AscendingAttributes {
 
   sub show ($self) {
     return $self->SUPER::show();
-  }
-
-  sub fetch_for_helper ($self, $c, $name) {
-    my $logger = Log::Log4perl->get_logger(ref($self));
-    $logger->debug("start of show_as_string method for $name");
-
-    unless ($self->itemExists($name)) {
-      $logger->error("Item not found: $name");
-      return '';
-    }
-
-    my $item = $self->loadItem($name);
-    $c->stash(item => $item);
-    return $item;
-
   }
 
   sub get_column_info($self, $item) {

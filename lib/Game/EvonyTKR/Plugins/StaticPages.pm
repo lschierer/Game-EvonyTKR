@@ -1,10 +1,11 @@
-# lib/Game/EvonyTKR/Plugins/StaticPages.pm
 use v5.40.0;
 use experimental qw(class);
 use utf8::all;
 use File::FindLib 'lib';
 use Mojo::File;
 use Path::Iterator::Rule;
+require Text::MultiMarkdown;
+require YAML::PP;
 
 package Game::EvonyTKR::Plugins::StaticPages {
   use Mojo::Base 'Mojolicious::Plugin';
@@ -42,27 +43,31 @@ package Game::EvonyTKR::Plugins::StaticPages {
         }
       )->name("static_$route_path");
 
-      my ($front_matter, $markdown) = $app->parse_front_matter($file_path);
-      my $title =
-        exists $front_matter->{title} ? $front_matter->{title} : $file_path;
-      my $order = 100 + exists $front_matter->{order} ? $front_matter->{order} : 0;
-      $app->add_navigation_item({
-        title => $title,
-        path  => $route_path,
-        order => $order,           # Static pages come after dynamic content
-      });
-
+      my $parsedFile = $app->parse_markdown_frontmatter($file_path);
+      if($parsedFile) {
+        $app->add_navigation_item({
+          title => $parsedFile->{title},
+          path  => $route_path,
+          order => $parsedFile->{order},           # Static pages come after dynamic content
+        });
+      }
     }
   }
 
   # Convert file path to route path
   sub file_path_to_route {
     my ($self, $path) = @_;
+    my $logger = Log::Log4perl->get_logger(__PACKAGE__);
 
     # Remove file extension
     $path =~ s/\.md$//;
 
-    # Handle index files
+    # Special case for root index.md
+    if ($path eq 'index') {
+      return '/';
+    }
+
+    # Handle other index files in subdirectories
     $path =~ s/\/index$//;
 
     # Ensure path starts with /
@@ -70,6 +75,7 @@ package Game::EvonyTKR::Plugins::StaticPages {
 
     return $path;
   }
+
 };
 
 1;

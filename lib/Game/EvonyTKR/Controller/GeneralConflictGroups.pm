@@ -7,7 +7,7 @@ require Game::EvonyTKR::Model::General::ConflictGroup::Manager;
 use namespace::clean;
 
 package Game::EvonyTKR::Controller::GeneralConflictGroups {
-  use Mojo::Base 'Game::EvonyTKR::Controller::CollectionBase';
+  use Mojo::Base 'Game::EvonyTKR::Controller::ControllerBase';
 
   # Specify which collection this controller handles
   sub collection_name {'general conflict groups'}
@@ -65,7 +65,7 @@ package Game::EvonyTKR::Controller::GeneralConflictGroups {
     $logger->debug("start of show method");
     my $id;
 
-# this parameter is created by the parent class Game::EvonyTKR::Controller::CollectionBase
+# this parameter is created by the parent class Game::EvonyTKR::Controller::ControllerBase
 # 'name' is a reasonable unique identifier for everything *except* conflict conflict groups
 # where the upstream source for the information *regularly* changes the names, and the
 # process that takes the upstream source and generates files from it cannot figure out

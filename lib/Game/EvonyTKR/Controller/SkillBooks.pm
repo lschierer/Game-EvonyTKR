@@ -6,8 +6,8 @@ require Game::EvonyTKR::Model::Book::BuiltinBook;
 require Game::EvonyTKR::Model::Book::Manager;
 use namespace::clean;
 
-package Game::EvonyTKR::Controller::BuiltinBooks {
-  use Mojo::Base 'Game::EvonyTKR::Controller::CollectionBase';
+package Game::EvonyTKR::Controller::SkillBooks {
+  use Mojo::Base 'Game::EvonyTKR::Controller::ControllerBase';
 
   # Specify which collection this controller handles
   sub collection_name {
@@ -19,7 +19,7 @@ package Game::EvonyTKR::Controller::BuiltinBooks {
   }
 
   sub controller_name ($self) {
-    return "BuiltinBooks";
+    return "SkillBooks";
   }
 
   my $base = '/Reference/Skill Books';
@@ -58,11 +58,14 @@ package Game::EvonyTKR::Controller::BuiltinBooks {
 
     $logger->debug("got controller_name $controller_name.");
 
-    my $r      = $app->routes;
-    my $routes = $r->any("$base");
+    my $mainRoutes = $app->routes->any($base);
+    $mainRoutes->get('/')
+      ->to(controller => $controller_name, action => 'index')
+      ->name("${base}_index");
+
 
     # for backwards compatibility
-    $routes->any('/details')->to(
+    $mainRoutes->any('/details')->to(
       cb => sub ($c) {
         $c->redirect_to($self->getBase());
       }
@@ -84,7 +87,8 @@ package Game::EvonyTKR::Controller::BuiltinBooks {
 
           my $clean_name = $name;
           $clean_name =~ s{^/}{};
-          $routes->get($clean_name => {name => $clean_name })
+
+          $mainRoutes->get($clean_name => {name => $clean_name })
             ->to(controller => $controller_name, action => 'show')
             ->name("${base}_show");
 
@@ -111,6 +115,64 @@ package Game::EvonyTKR::Controller::BuiltinBooks {
         return "";
       }
     );
+  }
+
+  sub index($self) {
+    my $logger     = Log::Log4perl->get_logger(__PACKAGE__);
+    my $collection = collection_name();
+    $logger->debug("Rendering index for $collection");
+
+    # Check if markdown exists for this collection
+    my $distDir       = Mojo::File::Share::dist_dir('Game::EvonyTKR');
+    my $markdown_path = $distDir->child("pages/$collection/index.md");
+
+    my @parts     = split(/::/, ref($self));
+    my $baseClass = pop(@parts);
+    my $base      = $self->getBase();
+    $logger->debug("SkillBooks index method has base $base");
+
+    my $items = $self->get_root_manager()->bookManager->get_all_books();
+    $logger->debug(sprintf('Items: %s with %s items.', ref($items), scalar(@$items)));
+    $self->stash(
+      linkBase        => $base,
+      items           => $items,
+      collection_name => $collection,
+      controller_name => $baseClass,
+    );
+
+    if (-f $markdown_path) {
+      # Render with markdown
+      $self->stash(template => 'skill books/index');
+
+      return $self->render_markdown_file($markdown_path, { template => 'skill books/index' });
+    }
+    else {
+      # Render just the items
+      return $self->render(template => 'skill books/index');
+    }
+  }
+
+  sub show ($self) {
+    my $logger = Log::Log4perl->get_logger(ref($self));
+    $logger->debug("start of show method");
+    my $name;
+    $name = $self->param('name');
+    $logger->debug("show detects name $name, showing details.");
+
+    my $book = $self->get_root_manager()->bookManager->getBook($name);
+
+    unless ($book) {
+      $logger->error("skill book '$name' was not found.");
+      $self->reply->not_found;
+    }
+    $logger->debug("retrieved skill book $book");
+
+    $self->stash(
+      item      => $book,
+      template  => 'skill books/details',
+      layout    => 'default',
+    );
+    return $self->render();
   }
 
 }

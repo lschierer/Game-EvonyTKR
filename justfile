@@ -41,3 +41,8 @@ build: deps css
 dev: deps css
   rm -f "${HOME}/var/log/Perl/dist/Game-Evony/*.log"
   morbo --watch ./share --watch ./lib ./scripts/game-evonytkr
+
+quickdev:
+  echo "${HOME}/var/log/Perl/dist/Game-Evony/*.log"
+  rm -f "${HOME}/var/log/Perl/dist/Game-Evony/*.log"
+  morbo --watch ./share --watch ./lib ./scripts/game-evonytkr

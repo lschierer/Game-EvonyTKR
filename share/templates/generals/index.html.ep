@@ -8,7 +8,7 @@
       <% foreach my $key (sort(keys(%$items))) { %>
         <li class="collection-item">
           <a href="/Reference/Generals/<%= $key %>/">
-            <%= $items->{$key}->{name} %>
+            <%= $items->{$key}->name %>
           </a>
         </li>
       <% } %>

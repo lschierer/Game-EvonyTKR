@@ -2,12 +2,12 @@
 <% require Data::Printer; %>
 <div class="collection-list">
   <ul class="collection-grid">
-    <% if ($items && ref $items eq 'HASH') { %>
-      <% foreach my $key (sort(keys(%$items))) { %>
+    <% if ($items && ref $items eq 'ARRAY') { %>
+      <% foreach my $item (sort {$a->name cmp $b->name} $items->@* ) { %>
         <li class="collection-item">
           <!-- linkBase is '<%= $linkBase %>' -->
-          <a href="/Reference/Skill Books/<%= $key %>">
-            <%= $items->{$key}->{name} %>
+          <a href="/Reference/Skill Books/<%= $item->name %>">
+            <%= $item->name %>
           </a>
 
         </li>

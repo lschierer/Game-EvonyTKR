@@ -23,8 +23,9 @@ class Game::EvonyTKR::Model::Specialty : isa(Game::EvonyTKR::Model::Data) {
   use Game::EvonyTKR::Model::Logger;
   use overload
     '""'       => \&as_string,
-    'bool'     => sub { $_[0]->_isTrue() },
-    "fallback" => 0;
+    '.'        => \&concat,
+    'bool'     => \&_isTrue,
+    'fallback' => 0;
 
   field $id : reader;
   field $name : reader : param;
@@ -143,7 +144,6 @@ class Game::EvonyTKR::Model::Specialty : isa(Game::EvonyTKR::Model::Data) {
     };
   }
 
-  # Method for JSON serialization
   method TO_JSON {
     return $self->to_hash();
   }
@@ -155,6 +155,23 @@ class Game::EvonyTKR::Model::Specialty : isa(Game::EvonyTKR::Model::Data) {
       ->convert_blessed(1)
       ->encode($self->to_hash());
     return $json;
+  }
+
+  method concat($other, $swap) {
+    if ($swap) {
+      return $other . $self->as_string();
+    }
+    else {
+      return $self->as_string() . $other;
+    }
+  }
+
+  method _isTrue {
+    return
+         defined($self)
+      && ref($self)
+      && blessed($self)
+      && $self->isa('Game::EvonyTKR::Model::Specialty');
   }
 
 }

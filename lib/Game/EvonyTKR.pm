@@ -5,9 +5,8 @@ use File::FindLib 'lib';
 require YAML::PP;
 require Game::EvonyTKR::Model::Logger;
 require Game::EvonyTKR::Logger::Config;
-require Game::EvonyTKR::Controller::Root;
+#require Game::EvonyTKR::Controller::Root;
 require Game::EvonyTKR::Controller::ControllerBase;
-require Game::EvonyTKR::Controller::CollectionBase;
 require Game::EvonyTKR::Model::EvonyTKR::Manager;
 require GitRepo::Reader;
 
@@ -19,7 +18,6 @@ package Game::EvonyTKR {
   use Log::Log4perl;
   use Log::Log4perl::Config;
   Log::Log4perl::Config->utf8(1);
-
   use Carp;
   our $VERSION = 'v0.50.0';
 
@@ -102,7 +100,11 @@ package Game::EvonyTKR {
     push @{ $self->preload_namespaces },  'Game::EvonyTKR::Controller';
 
     # Register infrastructure plugins in specific order
-    # First Navigation
+
+    # First Plugins that provide helpers but do not define routes
+    # Markdown
+    $self->plugin('Game::EvonyTKR::Plugins::Markdown');
+    # Navigation
     $self->plugin('Game::EvonyTKR::Plugins::Navigation');
 
     # Then Controller Plugins
