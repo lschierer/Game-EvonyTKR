@@ -14,7 +14,7 @@ basic_attributes:
     increment: 8.53
 book: Knight of Treachery
 display: summary
-specialities:
+specialties:
   - Mounted Troop Formation
   - Formation
   - Mounted Troop Ares

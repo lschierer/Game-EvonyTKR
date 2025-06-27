@@ -14,7 +14,7 @@ basic_attributes:
     increment: 8.68
 book: Golden Apple
 display: summary
-specialities:
+specialties:
   - Ranged Troop Defense
   - Siege
   - Ranged Troop Ares

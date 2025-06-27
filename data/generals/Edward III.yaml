@@ -14,7 +14,7 @@ basic_attributes:
     increment: 8.57
 book: Knights of the Garter
 display: summary
-specialities:
+specialties:
   - Ranged Troop Assault
   - Bash
   - Ranged Troop Ares

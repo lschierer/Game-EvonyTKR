@@ -14,7 +14,7 @@ basic_attributes:
     increment: 8.49
 book: Ironhanded Leader
 display: summary
-specialities:
+specialties:
   - Ground Troop Defense
   - Snipe
   - War God

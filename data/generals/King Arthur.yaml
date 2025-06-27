@@ -14,7 +14,7 @@ basic_attributes:
     increment: 7.33
 book: Caliburn
 display: summary
-specialities:
+specialties:
   - Mounted Troop Formation
   - Bash
   - King's Ambition

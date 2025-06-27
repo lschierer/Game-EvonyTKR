@@ -14,7 +14,7 @@ basic_attributes:
     increment: 8.61
 book: Glorious Blade
 display: summary
-specialities:
+specialties:
   - Ground Troop Defense
   - Annihilation
   - Ground Troop Ares

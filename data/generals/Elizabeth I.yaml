@@ -14,7 +14,7 @@ basic_attributes:
     increment: 9.25
 book: Hammer of the Gauls - Elizabeth I
 display: summary
-specialities:
+specialties:
   - Ranged Troop Formation
   - Annihilation
   - Ranged Troop Ares

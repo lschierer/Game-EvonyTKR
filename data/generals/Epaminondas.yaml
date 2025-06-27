@@ -14,7 +14,7 @@ basic_attributes:
     increment: 8.25
 book: Military Legend
 display: summary
-specialities:
+specialties:
   - Ground Troop Assault
   - Formation
   - Ground Troop Ares

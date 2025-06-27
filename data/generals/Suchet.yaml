@@ -14,7 +14,7 @@ basic_attributes:
     increment: 8.61
 book: Duke of Albufera
 display: summary
-specialities:
+specialties:
   - Ground Troop Assault
   - Annihilation
   - War God

@@ -14,7 +14,7 @@ basic_attributes:
     increment: 8.57
 book: Great Northern War
 display: summary
-specialities:
+specialties:
   - Ranged Troop Formation
   - Bash
   - Ranged Troop Ares

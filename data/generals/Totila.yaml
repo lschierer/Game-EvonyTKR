@@ -14,7 +14,7 @@ basic_attributes:
     increment: 8.33
 book: Gothic Sword
 display: summary
-specialities:
+specialties:
   - Ground Troop Defense
   - Annihilation
   - Ground Troop Ares

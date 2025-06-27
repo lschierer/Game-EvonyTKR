@@ -14,7 +14,7 @@ basic_attributes:
     increment: 8.62
 book: Hammer of the Gauls - Henry V
 display: summary
-specialities:
+specialties:
   - Ranged Troop Formation
   - Bash
   - War God

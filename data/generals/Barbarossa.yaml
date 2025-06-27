@@ -14,7 +14,7 @@ basic_attributes:
     increment: 8.63
 book: Bloody Leader
 display: summary
-specialities:
+specialties:
   - Mounted Troop Assault
   - Annihilation
   - Iron Warrior

@@ -14,7 +14,7 @@ basic_attributes:
     increment: 8.65
 book: The Eagle of Brittany
 display: summary
-specialities:
+specialties:
   - Mounted Troop Defense
   - Strike
   - Unparalleled Leader

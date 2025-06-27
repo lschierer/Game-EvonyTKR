@@ -14,7 +14,7 @@ basic_attributes:
     increment: 8.74
 book: Silesian Wars
 display: summary
-specialities:
+specialties:
   - Mounted Troop Defense
   - Strike
   - Mounted Troop Ares

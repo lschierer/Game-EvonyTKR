@@ -14,7 +14,7 @@ basic_attributes:
     increment: 8.65
 book: Expedition to Persia
 display: summary
-specialities:
+specialties:
   - Ground Troop Assault
   - Annihilation
   - War God

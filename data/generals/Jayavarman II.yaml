@@ -14,7 +14,7 @@ basic_attributes:
     increment: 8.65
 book: Khmer King
 display: summary
-specialities:
+specialties:
   - Mounted Troop Defense
   - Strike
   - Mounted Troop Ares

@@ -14,7 +14,7 @@ basic_attributes:
     increment: 8.76
 book: Mongol Conquest
 display: summary
-specialities:
+specialties:
   - Ranged Troop Formation
   - Siege
   - Ranged Troop Ares

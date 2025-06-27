@@ -14,7 +14,7 @@ basic_attributes:
     increment: 8.49
 book: Queen of Hungary
 display: summary
-specialities:
+specialties:
   - Hunter
   - Strike
   - Mounted Troop Ares

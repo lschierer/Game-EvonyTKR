@@ -14,7 +14,7 @@ basic_attributes:
     increment: 8.61
 book: Conqueror at Sea
 display: summary
-specialities:
+specialties:
   - Mounted Troop Assault
   - Formation
   - Mounted Troop Ares

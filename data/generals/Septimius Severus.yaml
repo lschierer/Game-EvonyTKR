@@ -14,7 +14,7 @@ basic_attributes:
     increment: 8.51
 book: Severan Dynasty
 display: summary
-specialities:
+specialties:
   - Siege Machine Formation
   - Siege
   - Siege Machine Ares

@@ -14,7 +14,7 @@ basic_attributes:
     increment: 8.59
 book: Byzantine Commander
 display: summary
-specialities:
+specialties:
   - Siege Machine Assault
   - Bash
   - Siege Machine Ares

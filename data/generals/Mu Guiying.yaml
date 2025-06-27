@@ -14,7 +14,7 @@ basic_attributes:
     increment: 8.75
 book: Heroine of the Yang Family
 display: summary
-specialities:
+specialties:
   - Siege Machine Assault
   - Bash
   - Siege Machine Ares

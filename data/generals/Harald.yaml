@@ -14,7 +14,7 @@ basic_attributes:
     increment: 8.64
 book: King of the Vikings
 display: summary
-specialities:
+specialties:
   - Siege Machine Assault
   - Sabotage
   - Kings Ambition

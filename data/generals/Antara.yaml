@@ -14,7 +14,7 @@ basic_attributes:
     increment: 6.25
 book: Heroism
 display: summary
-specialities:
+specialties:
   - Ranged Troop Defense
   - Bash
   - Unparalleled Leader
