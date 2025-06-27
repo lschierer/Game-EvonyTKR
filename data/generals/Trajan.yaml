@@ -14,7 +14,7 @@ basic_attributes:
     increment: 8.34
 book: Praetorian Guard
 display: summary
-specialities:
+specialties:
   - Ground Troop Assault
   - Formation
   - Ground Troop Ares

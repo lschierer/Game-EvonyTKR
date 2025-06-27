@@ -14,7 +14,7 @@ basic_attributes:
     increment: 8.25
 book: Weaving the Fate
 display: summary
-specialities:
+specialties:
   - Ranged Troop Formation
   - Bash
   - Ranged Troop Ares

@@ -14,7 +14,7 @@ basic_attributes:
     increment: 8.35
 book: Glory Knight
 display: summary
-specialities:
+specialties:
   - Mounted Troop Formation
   - Annihilation
   - Mounted Troop Ares

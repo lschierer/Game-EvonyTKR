@@ -14,7 +14,7 @@ basic_attributes:
     increment: 8.69
 book: Regent Governor
 display: summary
-specialities:
+specialties:
   - Siege Machine Assault
   - Bash
   - Siege Machine Ares

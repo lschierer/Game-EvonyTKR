@@ -14,7 +14,7 @@ basic_attributes:
     increment: 8.73
 book: Hero of Don River
 display: summary
-specialities:
+specialties:
   - Ranged Troop Formation
   - Snipe
   - Ranged Troop Ares

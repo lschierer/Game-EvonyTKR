@@ -14,7 +14,7 @@ basic_attributes:
     increment: 8.25
 book: Athenian Phalanx
 display: summary
-specialities:
+specialties:
   - Ground Troop Defense
   - Annihilation
   - Ground Troop Ares

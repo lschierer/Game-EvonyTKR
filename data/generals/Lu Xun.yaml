@@ -14,7 +14,7 @@ basic_attributes:
     increment: 8.62
 book: Battle of Xiaoting
 display: summary
-specialities:
+specialties:
   - Ground Troop Defense
   - Formation
   - Ground Troop Ares

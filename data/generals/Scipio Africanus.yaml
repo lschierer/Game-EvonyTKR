@@ -14,7 +14,7 @@ basic_attributes:
     increment: 8.75
 book: Conqueror
 display: summary
-specialities:
+specialties:
   - Ground Troop Assault
   - Annihilation
   - Ground Troop Ares

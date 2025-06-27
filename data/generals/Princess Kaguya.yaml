@@ -14,7 +14,7 @@ basic_attributes:
     increment: 8.64
 book: Blood Restrain
 display: summary
-specialities:
+specialties:
   - Ranged Troop Formation
   - Siege
   - War God

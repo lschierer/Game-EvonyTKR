@@ -14,7 +14,7 @@ basic_attributes:
     increment: 8.22
 book: General of the Armies
 display: summary
-specialities:
+specialties:
   - Mounted Troop Formation
   - Annihilation
   - Mounted Troop Ares

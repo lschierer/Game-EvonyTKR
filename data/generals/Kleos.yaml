@@ -14,7 +14,7 @@ basic_attributes:
     increment: 8.72
 book: Holy War of Yadirah
 display: summary
-specialities:
+specialties:
   - Siege Troop Defense
   - Bash
   - Siege Machine Ares

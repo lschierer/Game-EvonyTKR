@@ -14,7 +14,7 @@ basic_attributes:
     increment: 8.34
 book: Queen of Revenge
 display: summary
-specialities:
+specialties:
   - Ranged Troop Assault
   - Bash
   - Ranged Troop Ares

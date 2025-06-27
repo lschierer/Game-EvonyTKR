@@ -14,7 +14,7 @@ basic_attributes:
     increment: 8.56
 book: Great King
 display: summary
-specialities:
+specialties:
   - Ranged Troop Formation
   - Siege
   - Ranged Troop Ares

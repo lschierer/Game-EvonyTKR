@@ -13,7 +13,7 @@ basic_attributes:
     base: 101
     increment: 7.78
 book: Ride the Waves
-specialities:
+specialties:
   - Mounted Troop Formation
   - Annihilation
   - Mounted Troop Ares

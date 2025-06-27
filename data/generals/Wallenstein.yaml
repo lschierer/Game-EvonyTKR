@@ -14,7 +14,7 @@ basic_attributes:
     increment: 8.5
 book: Bohemian Pioneer
 display: summary
-specialities:
+specialties:
   - Ranged Troop Assault
   - Bash
   - War God

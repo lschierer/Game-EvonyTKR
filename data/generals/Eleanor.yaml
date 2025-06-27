@@ -14,7 +14,7 @@ basic_attributes:
     increment: 8.67
 book: Great Captainess
 display: summary
-specialities:
+specialties:
   - Ranged Troop Formation
   - Bash
   - Ranged Troop Ares

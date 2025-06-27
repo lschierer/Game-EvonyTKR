@@ -13,7 +13,7 @@ basic_attributes:
     base: 119
     increment: 9.15
 book: Roman Emperor
-specialities:
+specialties:
   - Mounted Troop Formation
   - Formation
   - War God

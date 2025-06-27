@@ -14,7 +14,7 @@ basic_attributes:
     increment: 8.98
 book: Domination
 display: summary
-specialities:
+specialties:
   - Mounted Troop Formation
   - Trapping
   - Ruler

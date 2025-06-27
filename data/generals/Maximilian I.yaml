@@ -14,7 +14,7 @@ basic_attributes:
     increment: 8.52
 book: The White Emperor
 display: summary
-specialities:
+specialties:
   - Mounted Troop Assault
   - Snipe
   - War God

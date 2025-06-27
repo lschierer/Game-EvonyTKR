@@ -14,7 +14,7 @@ basic_attributes:
     increment: 7.89
 book: Curses
 display: summary
-specialities:
+specialties:
   - Mounted Troop Defense
   - Suppress
   - Ruler

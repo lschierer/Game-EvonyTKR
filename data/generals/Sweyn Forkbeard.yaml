@@ -14,7 +14,7 @@ basic_attributes:
     increment: 8.69
 book: Viking King
 display: summary
-specialities:
+specialties:
   - Ground Troop Defense
   - Formation
   - Ground Troop Ares

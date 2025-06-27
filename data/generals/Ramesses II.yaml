@@ -14,7 +14,7 @@ basic_attributes:
     increment: 8.75
 book: Great Pharaoh
 display: summary
-specialities:
+specialties:
   - Siege Machine Formation
   - Bash
   - Siege Machine Ares

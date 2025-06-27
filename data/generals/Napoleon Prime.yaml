@@ -14,7 +14,7 @@ basic_attributes:
     increment: 8.62
 book: Napoleonic Wars
 display: summary
-specialities:
+specialties:
   - Mounted Troop Formation
   - Strike
   - Mounted Troop Ares

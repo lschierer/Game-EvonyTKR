@@ -14,7 +14,7 @@ basic_attributes:
     increment: 9.11
 book: Dragon Slayer
 display: summary
-specialities:
+specialties:
   - Mounted Troop Formation
   - Annihilation
   - Mounted Troop Ares

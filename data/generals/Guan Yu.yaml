@@ -14,7 +14,7 @@ basic_attributes:
     increment: 8.25
 book: Saint of War
 display: summary
-specialities:
+specialties:
   - Ground Troop Assault
   - Annihilation
   - Ground Troop Ares

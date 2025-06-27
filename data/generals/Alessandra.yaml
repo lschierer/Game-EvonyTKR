@@ -14,7 +14,7 @@ basic_attributes:
     increment: 8.56
 book: Eagle of Snowfield
 display: summary
-specialities:
+specialties:
   - Ground Troop Defense
   - Formation
   - Ground Troop Ares

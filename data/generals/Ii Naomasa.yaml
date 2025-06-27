@@ -14,7 +14,7 @@ basic_attributes:
     increment: 8.52
 book: Red Demon
 display: summary
-specialities:
+specialties:
   - Mounted Troop Defense
   - Suppress
   - Mounted Troop Ares
