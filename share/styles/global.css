@@ -10,6 +10,7 @@
   --brand: var(--spectrum-cyan-800);
   --text-1: var(--spectrum-cyan-1200);
   --text-2: var(--spectrum-cyan-400);
+  --text-3: var(--spectrum-cyan-800);
   --surface-1: var(--spectrum-gray-300);
   --surface-2: var(--spectrum-gray-500);
   --surface-3: var(--spectrum-gray-700);
@@ -71,7 +72,7 @@ h5,
 h6,
 small,
 dd {
-  color: var(--text-2);
+  color: var(--text-3);
 }
 
 header {
@@ -83,15 +84,21 @@ header {
   flex-shrink: 0;
 }
 
-div.spectrum-SplitView,
+div.spectrum-SplitView.spectrum-SplitView--horizontal,
 main {
   height: 88vh;
-  overflow: hidden auto;
   flex-grow: 1;
+}
+
+div.spectrum-SplitView-pane {
+  height: 88vh;
+  overflow: auto;
 }
 
 main,
 article {
+  background-color: var(--spectrum-background-base-color);
+  height: fit-content;
   margin: 8px;
 }
 

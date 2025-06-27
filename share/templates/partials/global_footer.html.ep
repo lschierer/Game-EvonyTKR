@@ -3,9 +3,9 @@
 <div class="footer">
   % my $computedDate = get_repo_data->find_copyright_range();
   % if ( $computedDate ) {
-    <p> &copy; <%= $computedDate->year %> &ndash; <%= (localtime)[5] + 1900 %> <%= get_repo_data->find_authors(); %>
+    <span class="spectrum-Body spectrum-Body--sizeS"> &copy; <%= $computedDate->year %> &ndash; <%= (localtime)[5] + 1900 %> <%= get_repo_data->find_authors(); %></span>
   % } else {
-    <p>&copy; <%= (localtime)[5] + 1900 %> Luke Schierer</p>
+    <p class="spectrum-Body spectrum-Body--sizeS" >&copy; <%= (localtime)[5] + 1900 %> Luke Schierer</p>
   % }
 </div>
 <style>
@@ -14,8 +14,9 @@
     width: 100%;
     padding: var(--size-1);
     box-sizing: border-box;
+    background: var(--text-1);
 
-    --spectrum-background-base-color: var(--brand-1);
+    --spectrum-background-base-color: var(--text-1);
     --mod-body-font-color: var(--text-2);
     --mod-heading-font-color: var(--text-2);
   }
