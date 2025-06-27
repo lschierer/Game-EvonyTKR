@@ -13,7 +13,7 @@ require File::ShareDir;
 require Game::EvonyTKR::Model::General::Manager;
 require Game::EvonyTKR::Model::AscendingAttributes::Manager;
 require Game::EvonyTKR::Model::Book::Manager;
-require Game::EvonyTKR::Model::Speciality::Manager;
+require Game::EvonyTKR::Model::Specialty::Manager;
 require Game::EvonyTKR::Model::Covenant::Manager;
 require Game::EvonyTKR::Model::Buff::Summarizer;
 require Game::EvonyTKR::Model::General::ConflictGroup::Manager;
@@ -28,7 +28,7 @@ class BuffSummarizerTest {
   field $generalManager;
   field $ascendingAttributesManager;
   field $bookManager;
-  field $specialityManager;
+  field $specialtyManager;
   field $covenantManager;
   field $generalConflictGroupManager;
   field $dataDir = Path::Tiny::path('./share');
@@ -40,7 +40,7 @@ class BuffSummarizerTest {
       $generalConflictGroupManager =
         Game::EvonyTKR::Model::General::ConflictGroup::Manager->new();
       $bookManager       = Game::EvonyTKR::Model::Book::Manager->new();
-      $specialityManager = Game::EvonyTKR::Model::Speciality::Manager->new();
+      $specialtyManager = Game::EvonyTKR::Model::Specialty::Manager->new();
       $ascendingAttributesManager =
         Game::EvonyTKR::Model::AscendingAttributes::Manager->new();
       $covenantManager =
@@ -50,7 +50,7 @@ class BuffSummarizerTest {
     method generalManager() { return $generalManager; }
     method ascendingAttributesManager() { return $ascendingAttributesManager; }
     method bookManager() { return $bookManager; }
-    method specialityManager() { return $specialityManager; }
+    method specialtyManager() { return $specialtyManager; }
     method covenantManager() { return $covenantManager; }
     method generalConflictGroupManager() { return $generalConflictGroupManager; }
 
@@ -71,9 +71,9 @@ class BuffSummarizerTest {
       $bookManager->importAll($collectionDir->child('skill books'));
       say ("import of books complete");
 
-      say (" starting import of specialities.");
-      $specialityManager->importAll($collectionDir->child('specialities'));
-      say ("import of specialities complete");
+      say (" starting import of specialties.");
+      $specialtyManager->importAll($collectionDir->child('specialties'));
+      say ("import of specialties complete");
 
       say (" starting import of ascending attributes.");
       $ascendingAttributesManager->importAll(
@@ -115,10 +115,10 @@ subtest "Marco Polo with all values set to 'none'" => sub {
         targetType     => 'mounted_specialist',
         ascendingLevel => 'none',
         covenantLevel  => 'none',
-        speciality1    => 'none',
-        speciality2    => 'none',
-        speciality3    => 'none',
-        speciality4    => 'none',
+        specialty1    => 'none',
+        specialty2    => 'none',
+        specialty3    => 'none',
+        specialty4    => 'none',
     );
 
     $summarizer->updateBuffs();
@@ -163,10 +163,10 @@ subtest "Marco Polo with Red1 ascending, all else none" => sub {
         targetType     => 'mounted_specialist',
         ascendingLevel => 'red1',
         covenantLevel  => 'none',
-        speciality1    => 'none',
-        speciality2    => 'none',
-        speciality3    => 'none',
-        speciality4    => 'none',
+        specialty1    => 'none',
+        specialty2    => 'none',
+        specialty3    => 'none',
+        specialty4    => 'none',
     );
 
     $summarizer->updateBuffs();
@@ -208,10 +208,10 @@ subtest "Marco Polo with Red2 ascending, all else none" => sub {
         targetType     => 'mounted_specialist',
         ascendingLevel => 'red2',
         covenantLevel  => 'none',
-        speciality1    => 'none',
-        speciality2    => 'none',
-        speciality3    => 'none',
-        speciality4    => 'none',
+        specialty1    => 'none',
+        specialty2    => 'none',
+        specialty3    => 'none',
+        specialty4    => 'none',
     );
 
     $summarizer->updateBuffs();
@@ -253,10 +253,10 @@ subtest "Marco Polo with Red3 ascending, all else none" => sub {
         targetType     => 'mounted_specialist',
         ascendingLevel => 'red3',
         covenantLevel  => 'none',
-        speciality1    => 'none',
-        speciality2    => 'none',
-        speciality3    => 'none',
-        speciality4    => 'none',
+        specialty1    => 'none',
+        specialty2    => 'none',
+        specialty3    => 'none',
+        specialty4    => 'none',
     );
 
     $summarizer->updateBuffs();
@@ -298,10 +298,10 @@ subtest "Marco Polo with Red4 ascending, all else none" => sub {
         targetType     => 'mounted_specialist',
         ascendingLevel => 'red4',
         covenantLevel  => 'none',
-        speciality1    => 'none',
-        speciality2    => 'none',
-        speciality3    => 'none',
-        speciality4    => 'none',
+        specialty1    => 'none',
+        specialty2    => 'none',
+        specialty3    => 'none',
+        specialty4    => 'none',
     );
 
     $summarizer->updateBuffs();
@@ -343,10 +343,10 @@ subtest "Marco Polo with Red5 ascending, all else none" => sub {
         targetType     => 'mounted_specialist',
         ascendingLevel => 'red5',
         covenantLevel  => 'none',
-        speciality1    => 'none',
-        speciality2    => 'none',
-        speciality3    => 'none',
-        speciality4    => 'none',
+        specialty1    => 'none',
+        specialty2    => 'none',
+        specialty3    => 'none',
+        specialty4    => 'none',
     );
 
     $summarizer->updateBuffs();
@@ -378,8 +378,8 @@ subtest "Marco Polo with Red5 ascending, all else none" => sub {
     }, "Debuffs match expected values.");
 };
 
-# Test case: Green 1st speciality, all else none
-subtest "Marco Polo with Green 1st speciality, all else none" => sub {
+# Test case: Green 1st specialty, all else none
+subtest "Marco Polo with Green 1st specialty, all else none" => sub {
 
     my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
         rootManager    => $testManager,
@@ -388,10 +388,10 @@ subtest "Marco Polo with Green 1st speciality, all else none" => sub {
         targetType     => 'mounted_specialist',
         ascendingLevel => 'none',
         covenantLevel  => 'none',
-        speciality1    => 'green',
-        speciality2    => 'none',
-        speciality3    => 'none',
-        speciality4    => 'none',
+        specialty1    => 'green',
+        specialty2    => 'none',
+        specialty3    => 'none',
+        specialty4    => 'none',
     );
 
     $summarizer->updateBuffs();
@@ -423,8 +423,8 @@ subtest "Marco Polo with Green 1st speciality, all else none" => sub {
     }, "Debuffs match expected values.");
 };
 
-# Test case: Blue 1st speciality, all else none
-subtest "Marco Polo with Blue 1st speciality, all else none" => sub {
+# Test case: Blue 1st specialty, all else none
+subtest "Marco Polo with Blue 1st specialty, all else none" => sub {
 
     my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
         rootManager    => $testManager,
@@ -433,10 +433,10 @@ subtest "Marco Polo with Blue 1st speciality, all else none" => sub {
         targetType     => 'mounted_specialist',
         ascendingLevel => 'none',
         covenantLevel  => 'none',
-        speciality1    => 'blue',
-        speciality2    => 'none',
-        speciality3    => 'none',
-        speciality4    => 'none',
+        specialty1    => 'blue',
+        specialty2    => 'none',
+        specialty3    => 'none',
+        specialty4    => 'none',
     );
 
     $summarizer->updateBuffs();
@@ -468,8 +468,8 @@ subtest "Marco Polo with Blue 1st speciality, all else none" => sub {
     }, "Debuffs match expected values.");
 };
 
-# Test case: Purple 1st speciality, all else none
-subtest "Marco Polo with Purple 1st speciality, all else none" => sub {
+# Test case: Purple 1st specialty, all else none
+subtest "Marco Polo with Purple 1st specialty, all else none" => sub {
 
     my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
         rootManager    => $testManager,
@@ -478,10 +478,10 @@ subtest "Marco Polo with Purple 1st speciality, all else none" => sub {
         targetType     => 'mounted_specialist',
         ascendingLevel => 'none',
         covenantLevel  => 'none',
-        speciality1    => 'purple',
-        speciality2    => 'none',
-        speciality3    => 'none',
-        speciality4    => 'none',
+        specialty1    => 'purple',
+        specialty2    => 'none',
+        specialty3    => 'none',
+        specialty4    => 'none',
     );
 
     $summarizer->updateBuffs();
@@ -513,8 +513,8 @@ subtest "Marco Polo with Purple 1st speciality, all else none" => sub {
     }, "Debuffs match expected values.");
 };
 
-# Test case: Orange 1st speciality, all else none
-subtest "Marco Polo with Orange 1st speciality, all else none" => sub {
+# Test case: Orange 1st specialty, all else none
+subtest "Marco Polo with Orange 1st specialty, all else none" => sub {
 
     my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
         rootManager    => $testManager,
@@ -523,10 +523,10 @@ subtest "Marco Polo with Orange 1st speciality, all else none" => sub {
         targetType     => 'mounted_specialist',
         ascendingLevel => 'none',
         covenantLevel  => 'none',
-        speciality1    => 'orange',
-        speciality2    => 'none',
-        speciality3    => 'none',
-        speciality4    => 'none',
+        specialty1    => 'orange',
+        specialty2    => 'none',
+        specialty3    => 'none',
+        specialty4    => 'none',
     );
 
     $summarizer->updateBuffs();
@@ -558,8 +558,8 @@ subtest "Marco Polo with Orange 1st speciality, all else none" => sub {
     }, "Debuffs match expected values.");
 };
 
-# Test case: Gold 1st speciality, all else none
-subtest "Marco Polo with Gold 1st speciality, all else none" => sub {
+# Test case: Gold 1st specialty, all else none
+subtest "Marco Polo with Gold 1st specialty, all else none" => sub {
 
     my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
         rootManager    => $testManager,
@@ -568,10 +568,10 @@ subtest "Marco Polo with Gold 1st speciality, all else none" => sub {
         targetType     => 'mounted_specialist',
         ascendingLevel => 'none',
         covenantLevel  => 'none',
-        speciality1    => 'gold',
-        speciality2    => 'none',
-        speciality3    => 'none',
-        speciality4    => 'none',
+        specialty1    => 'gold',
+        specialty2    => 'none',
+        specialty3    => 'none',
+        specialty4    => 'none',
     );
 
     $summarizer->updateBuffs();
@@ -614,10 +614,10 @@ subtest "Marco Polo with Civilization covenant, all else none" => sub {
         targetType     => 'mounted_specialist',
         ascendingLevel => 'none',
         covenantLevel  => 'Civilization',
-        speciality1    => 'none',
-        speciality2    => 'none',
-        speciality3    => 'none',
-        speciality4    => 'none',
+        specialty1    => 'none',
+        specialty2    => 'none',
+        specialty3    => 'none',
+        specialty4    => 'none',
     );
 
     $summarizer->updateBuffs();
@@ -628,7 +628,7 @@ subtest "Marco Polo with Civilization covenant, all else none" => sub {
     pass("Civilization covenant test placeholder - add actual assertions");
 };
 
-# Test case: All maxed out (Red5, Gold specialities, Civilization covenant)
+# Test case: All maxed out (Red5, Gold specialties, Civilization covenant)
 subtest "Marco Polo with all maxed out" => sub {
     plan tests => 1;
 
@@ -639,10 +639,10 @@ subtest "Marco Polo with all maxed out" => sub {
         targetType     => 'mounted_specialist',
         ascendingLevel => 'red5',
         covenantLevel  => 'Civilization',
-        speciality1    => 'gold',
-        speciality2    => 'gold',
-        speciality3    => 'gold',
-        speciality4    => 'gold',
+        specialty1    => 'gold',
+        specialty2    => 'gold',
+        specialty3    => 'gold',
+        specialty4    => 'gold',
     );
 
     $summarizer->updateBuffs();

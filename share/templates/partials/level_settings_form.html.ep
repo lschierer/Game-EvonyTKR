@@ -5,20 +5,20 @@
   my $linkTarget = stash('linkTarget') // 'Primary';
   my $ascendingLevel = stash('ascendingLevel') // 'red5';
   my $primaryCovenantLevel = stash('primaryCovenantLevel') // stash('covenantLevel') // 'civilization';
-  my $primarySpecialities = stash('primarySpecialities') // stash('specialities') // [ qw( gold gold gold gold ) ];
+  my $primarySpecialties = stash('primarySpecialties') // stash('specialties') // [ qw( gold gold gold gold ) ];
   my $secondaryCovenantLevel = stash('secondaryCovenantLevel') // 'civilization';
-  my $secondarySpecialities = stash('secondarySpecialities') // [ qw( gold gold gold gold ) ];
+  my $secondarySpecialties = stash('secondarySpecialties') // [ qw( gold gold gold gold ) ];
 
   # Get enum values
   my $covenantLevelValues = get_root_manager->covenantLevels // [];
   my $ascendingLevelValues = ascending_level_names('', 0) // [];
-  my $specialityLevelValues = speciality_level_names() // [];
+  my $specialtyLevelValues = specialty_level_names() // [];
 %>
 <!-- $ascendingLevel is <%= $ascendingLevel %> -->
-<!-- $primarySpecialities is <%= Data::Printer::np($primarySpecialities) %> -->
+<!-- $primarySpecialties is <%= Data::Printer::np($primarySpecialties) %> -->
 <!-- covenantLevelValues is <%= Data::Printer::np($covenantLevelValues) %> -->
 <!-- ascendingLevelValues is <%= Data::Printer::np($ascendingLevelValues) %> -->
-<!-- specialityLevelValues is <%= Data::Printer::np($specialityLevelValues) %> -->
+<!-- specialtyLevelValues is <%= Data::Printer::np($specialtyLevelValues) %> -->
 <link rel="stylesheet" href="/css/level_settings_form.css" />
 <div class="settings-form">
   <h3 class="spectrum-Heading spectrum-Heading--sizeS"><%= $mode eq 'pair' ? 'Primary General' : $linkTarget %> </h3>
@@ -48,13 +48,13 @@
           </div>
         </div>
         <% foreach my $index (1..4) { %>
-          <% my $speciality = $primarySpecialities->[$index - 1] // 'none'; %>
+          <% my $specialty = $primarySpecialties->[$index - 1] // 'none'; %>
           <div class="spectrum-Form-item">
-            <label for="primarySpeciality<%= $index %>" class="spectrum-FieldLabel spectrum-FieldLabel--sizeM">Speciality <%= $index %>:</label>
+            <label for="primarySpecialty<%= $index %>" class="spectrum-FieldLabel spectrum-FieldLabel--sizeM">Specialty <%= $index %>:</label>
             <div class="spectrum-Form-itemField">
-              <select id="primarySpeciality<%= $index %>" name="<%= $mode eq 'pair' ? "primarySpeciality$index" : "speciality$index" %>" class="spectrum-Picker spectrum-Picker--sizeM">
-                <% foreach my $level (@{$specialityLevelValues}) { %>
-                  <option value="<%= $level %>" <%= $speciality eq $level ? 'selected' : '' %>><%= ucfirst($level) %></option>
+              <select id="primarySpecialty<%= $index %>" name="<%= $mode eq 'pair' ? "primarySpecialty$index" : "specialty$index" %>" class="spectrum-Picker spectrum-Picker--sizeM">
+                <% foreach my $level (@{$specialtyLevelValues}) { %>
+                  <option value="<%= $level %>" <%= $specialty eq $level ? 'selected' : '' %>><%= ucfirst($level) %></option>
                 <% } %>
               </select>
             </div>
@@ -86,13 +86,13 @@
         </div>
 
         <% foreach my $index (1..4) { %>
-          <% my $speciality = $secondarySpecialities->[$index - 1] // 'none'; %>
+          <% my $specialty = $secondarySpecialties->[$index - 1] // 'none'; %>
           <div class="spectrum-Form-item">
-            <label for="secondarySpeciality<%= $index %>" class="spectrum-FieldLabel spectrum-FieldLabel--sizeM">Speciality <%= $index %>:</label>
+            <label for="secondarySpecialty<%= $index %>" class="spectrum-FieldLabel spectrum-FieldLabel--sizeM">Specialty <%= $index %>:</label>
             <div class="spectrum-Form-itemField">
-              <select id="secondarySpeciality<%= $index %>" name="<%= $mode eq 'pair' ? "secondarySpeciality$index" : "speciality$index" %>" class="spectrum-Picker spectrum-Picker--sizeM">
-                <% foreach my $level (@{$specialityLevelValues}) { %>
-                  <option value="<%= $level %>" <%= $speciality eq $level ? 'selected' : '' %>><%= ucfirst($level) %></option>
+              <select id="secondarySpecialty<%= $index %>" name="<%= $mode eq 'pair' ? "secondarySpecialty$index" : "specialty$index" %>" class="spectrum-Picker spectrum-Picker--sizeM">
+                <% foreach my $level (@{$specialtyLevelValues}) { %>
+                  <option value="<%= $level %>" <%= $specialty eq $level ? 'selected' : '' %>><%= ucfirst($level) %></option>
                 <% } %>
               </select>
             </div>

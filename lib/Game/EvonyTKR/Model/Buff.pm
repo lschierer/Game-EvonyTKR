@@ -367,7 +367,7 @@ passively (the buff/debuff applies simply because you own the General or Treasur
 
 Both active and passive buffs may be conditional on the General's (Treasure's, Dragon's,
 so on) level, the level to which the General has been ascended, and/or the level
-to which the General's specialities have been activated.  Similar level related
+to which the General's specialties have been activated.  Similar level related
 conditions apply to Buffs/Debuffs associated with Senate Seats, Armor, and Spiritual
 Beast Seals.
 
@@ -445,7 +445,7 @@ passively (the buff/debuff applies simply because you own the General or Treasur
 
 Both active and passive buffs may be conditional on the General's (Treasure's, Dragon's,
 so on) level, the level to which the General has been ascended, and/or the level
-to which the General's specialities have been activated.  Similar level related
+to which the General's specialties have been activated.  Similar level related
 conditions apply to Buffs/Debuffs associated with Senate Seats, Armor, and Spiritual
 Beast Seals.
 

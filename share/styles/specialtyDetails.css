@@ -1,4 +1,4 @@
-/* Speciality level colors */
+/* Specialty level colors */
 
 .level-green {
   color: var(--spectrum-semantic-positive-color-default);
@@ -20,10 +20,10 @@
   color: var(--spectrum-semantic-notice-color-light);
 }
 
-.speciality-level {
+.specialty-level {
   margin-bottom: 2rem;
 }
 
-.speciality-info {
+.specialty-info {
   margin-bottom: 2rem;
 }

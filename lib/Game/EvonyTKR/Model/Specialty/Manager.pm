@@ -9,30 +9,30 @@ require Path::Iterator::Rule;
 require YAML::PP;
 require Game::EvonyTKR::Model::Buff;
 require Game::EvonyTKR::Model::Buff::Value;
-require Game::EvonyTKR::Model::Speciality;
+require Game::EvonyTKR::Model::Specialty;
 use namespace::clean;
 
-class Game::EvonyTKR::Model::Speciality::Manager :
+class Game::EvonyTKR::Model::Specialty::Manager :
   isa(Game::EvonyTKR::Model::Data) {
-  # PODNAME: Game::EvonyTKR::Model::Speciality::Manager
+  # PODNAME: Game::EvonyTKR::Model::Specialty::Manager
   use Carp;
   use overload
     'bool'     => sub { $_[0]->_isTrue() },
     'fallback' => 0;
 
-  field $specialities = {};
+  field $specialties = {};
 
-  method getSpeciality ($name) {
-    if (exists $specialities->{$name}) {
-      return $specialities->{$name};
+  method getSpecialty ($name) {
+    if (exists $specialties->{$name}) {
+      return $specialties->{$name};
     }
-    $self->logger->warn("failed to find speciality $name");
+    $self->logger->warn("failed to find specialty $name");
     return 0;
   }
 
-  method get_all_specialities {
+  method get_all_specialties {
     my $values;
-    @{$values} = values %{$specialities};
+    @{$values} = values %{$specialties};
     return $values;
   }
 
@@ -40,7 +40,7 @@ class Game::EvonyTKR::Model::Speciality::Manager :
     $SourceDir = Path::Tiny::path($SourceDir);
     if (!$SourceDir->is_dir()) {
       $self->logger->logcroak(
-        "Model::Speciality::Manager requires a directory, not $SourceDir");
+        "Model::Specialty::Manager requires a directory, not $SourceDir");
     }
     my $rule = Path::Iterator::Rule->new();
     $rule->name(qr/\.ya?ml$/);
@@ -55,7 +55,7 @@ class Game::EvonyTKR::Model::Speciality::Manager :
     while (defined(my $file = $iter->())) {
       # work around for UTF8 filenames not importing correctly by default.
       $file = Path::Tiny::path(Encode::decode('utf8', $file));
-      $self->logger->debug("Speciality::Manager importing $file");
+      $self->logger->debug("Specialty::Manager importing $file");
       my $basename = $file->basename('.yaml');
       my $name     = $basename;
 
@@ -73,8 +73,8 @@ class Game::EvonyTKR::Model::Speciality::Manager :
         $name = $object->{name};
       }
 
-      $specialities->{$name} =
-        Game::EvonyTKR::Model::Speciality->new(name => $name,);
+      $specialties->{$name} =
+        Game::EvonyTKR::Model::Specialty->new(name => $name,);
       foreach my $ol (@{ $object->{levels} }) {
         my $level = $ol->{level};
         foreach my $ob (@{ $ol->{buff} }) {
@@ -101,13 +101,13 @@ class Game::EvonyTKR::Model::Speciality::Manager :
               $b->set_condition($c);
             }
           }
-          $specialities->{$name}->addBuff($level, $b);
+          $specialties->{$name}->addBuff($level, $b);
         }
       }
     }
-    my $countImported = scalar keys %$specialities;
+    my $countImported = scalar keys %$specialties;
     $self->logger->info(
-      "Model::Speciality::Manager imported $countImported specialities");
+      "Model::Specialty::Manager imported $countImported specialties");
     return $countImported;
   }
 }

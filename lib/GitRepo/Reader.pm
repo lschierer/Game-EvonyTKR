@@ -80,7 +80,7 @@ class GitRepo::Reader {
 
       if($mailmap_file->is_file()) {
         $mailmap = 1;
-        $logger->debug('mailmap found');
+        $logger->info("mailmap '$mailmap_file' found");
       } else {
         $mailmap = 0;
         $logger->warn("No mailmap file at $mailmap_file");

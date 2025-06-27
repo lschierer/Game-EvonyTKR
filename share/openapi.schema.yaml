@@ -3,7 +3,7 @@ info:
   title: Evony TKR API
   version: 0.0.2
   description: |
-    Allow users to obtain information on Generals, General Pairs, General Conflicts, General SkillBooks, General Specialities, and related  information for Evony TKR
+    Allow users to obtain information on Generals, General Pairs, General Conflicts, General SkillBooks, General Specialties, and related  information for Evony TKR
 paths:
   /books.{extension}:
     get:
@@ -134,7 +134,7 @@ paths:
         - $ref: "#/components/parameters/level"
         - $ref: "#/components/parameters/id"
         - $ref: "#/components/parameters/AscendingLevel"
-        - $ref: "#/components/parameters/SpecialityLevel"
+        - $ref: "#/components/parameters/SpecialtyLevel"
       description: Returns the general with the matching id.
       operationId: getGeneralById
   /generals/uuid/{type}/{name}.{extension}:
@@ -255,7 +255,7 @@ components:
         - basicAttributes
         - builtInBook
         - name
-        - specialities
+        - specialties
         - type
       properties:
         name:
@@ -299,7 +299,7 @@ components:
             - type: string
               maxLength: 1000
             - $ref: "#/components/schemas/BuiltinBook"
-        specialities:
+        specialties:
           oneOf:
             - type: array
               items:
@@ -308,11 +308,11 @@ components:
               maxItems: 5
             - type: array
               items:
-                $ref: "#/components/schemas/Speciality"
+                $ref: "#/components/schemas/Specialty"
               maxItems: 5
             - type: array
               items:
-                $ref: "#/components/schemas/SpecialityEffect"
+                $ref: "#/components/schemas/SpecialtyEffect"
               maxItems: 5
         basicAttributes:
           oneOf:
@@ -343,7 +343,7 @@ components:
               - $ref: "#/components/schemas/DebuffConditions"
           maxItems: 10
       description: "A condition is essentially an adverb for a Buff object. "
-    Speciality:
+    Specialty:
       type: object
       required:
         - levels
@@ -355,10 +355,10 @@ components:
         levels:
           type: array
           items:
-            $ref: "#/components/schemas/SpecialityLevel"
+            $ref: "#/components/schemas/SpecialtyLevel"
           maxItems: 6
         activeLevel:
-          $ref: "#/components/schemas/SpecialityLevelNames"
+          $ref: "#/components/schemas/SpecialtyLevelNames"
     BuiltinBook:
       type: object
       required:
@@ -544,7 +544,7 @@ components:
         name:
           type: string
           maxLength: 1000
-    SpecialityLevel:
+    SpecialtyLevel:
       type: object
       required:
         - Buffs
@@ -556,7 +556,7 @@ components:
             $ref: "#/components/schemas/Buff"
           maxItems: 10
         level:
-          $ref: "#/components/schemas/SpecialityLevelNames"
+          $ref: "#/components/schemas/SpecialtyLevelNames"
     AscendingSummary:
       type: object
       required:
@@ -585,7 +585,7 @@ components:
         - Reduces
       type: string
       description: Some Buffs are in fact Debuffs
-    SpecialityEffect:
+    SpecialtyEffect:
       type: object
       required:
         - name
@@ -601,10 +601,10 @@ components:
           maxLength: 1000
         activeLevel:
           oneOf:
-            - $ref: "#/components/schemas/SpecialityLevelNames"
-      description: The Effective Buff Provided by a Speciality at a particular level
+            - $ref: "#/components/schemas/SpecialtyLevelNames"
+      description: The Effective Buff Provided by a Specialty at a particular level
       x-fiddle-dto-info:
-        baseSchemaName: Speciality
+        baseSchemaName: Specialty
     AscendingLevelNames:
       oneOf:
         - type: string
@@ -614,7 +614,7 @@ components:
       default: none
       description: |
         A general Ascends as either a Red or a Purple General but not both.
-    SpecialityLevelNames:
+    SpecialtyLevelNames:
       enum:
         - None
         - Green
@@ -861,18 +861,18 @@ components:
       description: You may whant your general returned reflecting a specific Ascending Level
       allowReserved: false
       allowEmptyValue: false
-    SpecialityLevel:
+    SpecialtyLevel:
       in: query
-      name: SpecialityLevel
+      name: SpecialtyLevel
       style: form
       schema:
         type: array
         items:
-          $ref: "#/components/schemas/SpecialityLevelNames"
+          $ref: "#/components/schemas/SpecialtyLevelNames"
         maxItems: 5
       explode: true
       required: false
-      description: Generals have speciality levels, when you ask for one, you may want that general with specialities at specific levels.
+      description: Generals have specialty levels, when you ask for one, you may want that general with specialties at specific levels.
       allowReserved: false
       allowEmptyValue: false
 tags:

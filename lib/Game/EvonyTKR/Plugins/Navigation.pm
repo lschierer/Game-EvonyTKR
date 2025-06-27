@@ -132,6 +132,7 @@ package Game::EvonyTKR::Plugins::Navigation {
 
   sub _prune_and_sort {
     my ($self, $tree, $prefix) = @_;
+    my $logger = Log::Log4perl->get_logger(__PACKAGE__);
     my @result;
 
     foreach my $key (sort keys %$tree) {
@@ -157,6 +158,7 @@ package Game::EvonyTKR::Plugins::Navigation {
       $a->{order} <=> $b->{order}
         || lc($a->{title}) cmp lc($b->{title})
     } @result;
+    $logger->debug("_prune_and_sort returning result " . Data::Printer::np(@result));
     return \@result;
   }
 

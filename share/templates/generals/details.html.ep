@@ -84,15 +84,15 @@
         <%= get_ascending_section($item->name) %>
       <% } %>
     </div>
-    <div class="specialities">
+    <div class="specialties">
       <h3 class="spectrum-Heading spectrum-Heading--sizeL">
-        <%= $item->name %>'s Specialities
+        <%= $item->name %>'s Specialties
       </h3>
       <ol>
-        <% foreach my $specialityName ( @{ $item->specialityNames } ) { %>
+        <% foreach my $specialtyName ( @{ $item->specialtyNames } ) { %>
           <li class="spectrum-Body spectrum-Body--sizeS">
-            <a href="/Specialities/details/<%= $specialityName %>" class="spectrum-Link spectrum-Link--quiet spectrum-Link--primary">
-              <%= $specialityName %>
+            <a href="/Reference/Specialties/details/<%= $specialtyName %>" class="spectrum-Link spectrum-Link--quiet spectrum-Link--primary">
+              <%= $specialtyName %>
             </a>
           </li>
         <% } %>

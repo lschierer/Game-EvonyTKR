@@ -165,13 +165,13 @@ class Game::EvonyTKR::Model::AscendingAttributes :
 
 __END__
 
-# ABSTRACT: Module for processing information about Evony TKR Specialities.
+# ABSTRACT: Module for processing information about Evony TKR Specialties.
 
 =head1 DESCRIPTION
 
 Ascending is one of several ways that a General can provide Buffs for Troops.
 
-Ascending works similarly to Specialities in that there are multiple levels, however there is only one set of Ascending Buffs per general, instead of the four possible Specialities (plus possible Flex Speciality).
+Ascending works similarly to Specialties in that there are multiple levels, however there is only one set of Ascending Buffs per general, instead of the four possible Specialties (plus possible Flex Specialty).
 
 =for :List
 
@@ -186,12 +186,12 @@ Ascending works similarly to Specialities in that there are multiple levels, how
 
 =method name()
 
-returns the name field from the Speciality.
+returns the name field from the Specialty.
 =cut
 
 =method add_buff($level, $nb)
 
-This method takes a Game::EvonyTKR::Model::Buff as its sole parameter and adds it as one of the buffs this Speciality at the specified $level.  $level must be one of 1Purple through 5Purple (for Purple quality generals), or 1Red through 5Red (for Gold/Red quality generals) or the function will fail to add the buff.
+This method takes a Game::EvonyTKR::Model::Buff as its sole parameter and adds it as one of the buffs this Specialty at the specified $level.  $level must be one of 1Purple through 5Purple (for Purple quality generals), or 1Red through 5Red (for Gold/Red quality generals) or the function will fail to add the buff.
 
 Todo: Make sure that this is not called twice with the same Buff/Level combination.  Make sure the Level provided is valid I<for that General's quality>.
 =cut
@@ -207,13 +207,13 @@ Each level is cumulative, you never need to read more than the array for the cur
 
 __END__
 
-# ABSTRACT: Module for processing information about Evony TKR Specialities.
+# ABSTRACT: Module for processing information about Evony TKR Specialties.
 
 =head1 DESCRIPTION
 
 Ascending is one of several ways that a General can provide Buffs for Troops.
 
-Ascending works similarly to Specialities in that there are multiple levels, however there is only one set of Ascending Buffs per general, instead of the four possible Specialities (plus possible Flex Speciality).
+Ascending works similarly to Specialties in that there are multiple levels, however there is only one set of Ascending Buffs per general, instead of the four possible Specialties (plus possible Flex Specialty).
 
 =for :List
 
@@ -228,7 +228,7 @@ Ascending works similarly to Specialities in that there are multiple levels, how
 
 =method name()
 
-returns the name field from the Speciality.
+returns the name field from the Specialty.
 =cut
 
 =method activeLevel
@@ -245,7 +245,7 @@ Todo: Make sure the value is valid I<for the General's quality>.
 
 =method add_buff($level, $nb)
 
-This method takes a Game::EvonyTKR::Model::Buff as its sole parameter and adds it as one of the buffs this Speciality at the specified $level.  $level must be one of 1Purple through 5Purple (for Purple quality generals), or 1Red through 5Red (for Gold/Red quality generals) or the function will fail to add the buff.
+This method takes a Game::EvonyTKR::Model::Buff as its sole parameter and adds it as one of the buffs this Specialty at the specified $level.  $level must be one of 1Purple through 5Purple (for Purple quality generals), or 1Red through 5Red (for Gold/Red quality generals) or the function will fail to add the buff.
 
 Todo: Make sure that this is not called twice with the same Buff/Level combination.  Make sure the Level provided is valid I<for that General's quality>.
 =cut

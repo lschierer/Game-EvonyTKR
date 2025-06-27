@@ -36,7 +36,7 @@
     </tbody>
   </table>
   <% } else { %>
-    <span>Speciality Not Available</span>
+    <span>Specialty Not Available</span>
     <span><%= ref($item) %></span>
   <% } %>
 </div>

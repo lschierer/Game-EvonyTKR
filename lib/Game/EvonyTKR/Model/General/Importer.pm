@@ -64,7 +64,7 @@ class Game::EvonyTKR::Model::General::Importer :
         type            => $go->{type},
         ascending       => $go->{ascending},
         builtInBookName => $go->{book},
-        specialityNames => $go->{specialities},
+        specialtyNames => $go->{specialties},
       );
       $general->basicAttributes()
         ->attack()

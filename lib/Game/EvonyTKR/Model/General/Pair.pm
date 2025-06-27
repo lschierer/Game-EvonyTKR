@@ -91,9 +91,9 @@ class Game::EvonyTKR::Model::General::Pair : isa(Game::EvonyTKR::Model::Data) {
     $generalType            = '',
     $primaryAscending       = 'red5',
     $primaryCovenantLevel   = 'civilization',
-    $primarySpecialities    = [ 'gold', 'gold', 'gold', 'gold',],
+    $primarySpecialties    = [ 'gold', 'gold', 'gold', 'gold',],
     $secondaryCovenantLevel   = 'civilization',
-    $secondarySpecialities  = [ 'gold', 'gold', 'gold', 'gold',],
+    $secondarySpecialties  = [ 'gold', 'gold', 'gold', 'gold',],
 
     $keepLevel              = 40,
     $primaryLevel           = 45,
@@ -108,10 +108,10 @@ class Game::EvonyTKR::Model::General::Pair : isa(Game::EvonyTKR::Model::Data) {
 
       ascendingLevel  => $primaryAscending,
       covenantLevel   => $primaryCovenantLevel,
-      speciality1     => $primarySpecialities->[0],
-      speciality2     => $primarySpecialities->[1],
-      speciality3     => $primarySpecialities->[2],
-      speciality4     => $primarySpecialities->[3],
+      specialty1     => $primarySpecialties->[0],
+      specialty2     => $primarySpecialties->[1],
+      specialty3     => $primarySpecialties->[2],
+      specialty4     => $primarySpecialties->[3],
 
       generalLevel    => $primaryLevel,
       keepLevel       => $keepLevel,
@@ -124,10 +124,10 @@ class Game::EvonyTKR::Model::General::Pair : isa(Game::EvonyTKR::Model::Data) {
 
       ascendingLevel  => 'none',
       covenantLevel   => $secondaryCovenantLevel,
-      speciality1     => $secondarySpecialities->[0],
-      speciality2     => $secondarySpecialities->[1],
-      speciality3     => $secondarySpecialities->[2],
-      speciality4     => $secondarySpecialities->[3],
+      specialty1     => $secondarySpecialties->[0],
+      specialty2     => $secondarySpecialties->[1],
+      specialty3     => $secondarySpecialties->[2],
+      specialty4     => $secondarySpecialties->[3],
 
       generalLevel    => $secondaryLevel,
       keepLevel       => $keepLevel,

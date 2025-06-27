@@ -9,8 +9,8 @@ require Game::EvonyTKR::Model::Buff;
 require Game::EvonyTKR::Model::Buff::Value;
 use namespace::clean;
 
-class Game::EvonyTKR::Model::Speciality : isa(Game::EvonyTKR::Model::Data) {
-# PODNAME: Game::EvonyTKR::Model::Speciality
+class Game::EvonyTKR::Model::Specialty : isa(Game::EvonyTKR::Model::Data) {
+# PODNAME: Game::EvonyTKR::Model::Specialty
 
   use Carp;
   use Data::Printer;
@@ -34,7 +34,7 @@ class Game::EvonyTKR::Model::Speciality : isa(Game::EvonyTKR::Model::Data) {
   ADJUST {
     my $step1 = {};
 
-    foreach my $key ($self->specialityLevels->@*) {
+    foreach my $key ($self->specialtyLevels->@*) {
       $step1->{$key} = {
         level => $key,
         buffs => [],     # Empty arrayref that can be modified later
@@ -47,8 +47,8 @@ class Game::EvonyTKR::Model::Speciality : isa(Game::EvonyTKR::Model::Data) {
   }
 
   ADJUST {
-    my $specialitybase = uuid5($self->UUID5_base, 'Speciality');
-    $id = uuid5($specialitybase, $name);
+    my $specialtybase = uuid5($self->UUID5_base, 'Specialty');
+    $id = uuid5($specialtybase, $name);
   }
 
   method get_buffs_at_level (
@@ -66,9 +66,9 @@ class Game::EvonyTKR::Model::Speciality : isa(Game::EvonyTKR::Model::Data) {
     return 0 if not defined $level or $level =~ /none/i;
 
     # an list's values function will always return in the same order.
-    my $valid_levels = $self->specialityLevels;
+    my $valid_levels = $self->specialtyLevels;
     # Define the hierarchy of levels
-    my @level_hierarchy = $self->specialityLevels->@*;
+    my @level_hierarchy = $self->specialtyLevels->@*;
 
     # Find the index of the requested level
     my $level_index = -1;
@@ -119,17 +119,17 @@ class Game::EvonyTKR::Model::Speciality : isa(Game::EvonyTKR::Model::Data) {
     }
 
     # the data files apparently have bad cases in them for level names.
-    if (none { $_ =~ /$level/i } $self->specialityLevels->@*) {
+    if (none { $_ =~ /$level/i } $self->specialtyLevels->@*) {
       $self->logger->error(sprintf(
         'level should be one of %s, not %s',
-        Data::Printer::np($self->specialityLevels->@*), $level
+        Data::Printer::np($self->specialtyLevels->@*), $level
       ));
       return 0;
     }
     $level = lc($level);
     push @{ $levels->{$level}->{buffs} }, $nb;
     $self->logger->debug(sprintf(
-      'speciality %s at %s now has buffs %s.',
+      'specialty %s at %s now has buffs %s.',
       $name, $level, Data::Printer::np($levels->{$level}->{buffs})
     ));
     return scalar @{ $levels->{$level}->{buffs} };
@@ -163,22 +163,22 @@ class Game::EvonyTKR::Model::Speciality : isa(Game::EvonyTKR::Model::Data) {
 
 __END__
 
-# ABSTRACT: Module for processing information about Evony TKR Specialities.
+# ABSTRACT: Module for processing information about Evony TKR Specialties.
 
 =head1 DESCRIPTION
 
-A Speciality is one of several ways that a General can provide Buffs for Troops.
+A Specialty is one of several ways that a General can provide Buffs for Troops.
 
 =cut
 
 =method name()
 
-returns the name field from the Speciality.
+returns the name field from the Specialty.
 =cut
 
 =method add_buff($level, $nb)
 
-This method takes a Game::EvonyTKR::Model::Buff as its sole parameter and adds it as one of the buffs this Speciality at the specified $level.  $level must be one of 1Purple through 5Purple (for Purple quality generals), or 1Red through 5Red (for Gold/Red quality generals) or the function will fail to add the buff.
+This method takes a Game::EvonyTKR::Model::Buff as its sole parameter and adds it as one of the buffs this Specialty at the specified $level.  $level must be one of 1Purple through 5Purple (for Purple quality generals), or 1Red through 5Red (for Gold/Red quality generals) or the function will fail to add the buff.
 
 Todo: Make sure that this is not called twice with the same Buff/Level combination.  Make sure the Level provided is valid I<for that General's quality>.
 =cut

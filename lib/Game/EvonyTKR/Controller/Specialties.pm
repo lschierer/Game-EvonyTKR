@@ -2,28 +2,28 @@ use v5.40.0;
 use experimental qw(class);
 use utf8::all;
 use File::FindLib 'lib';
-require Game::EvonyTKR::Model::Speciality::Manager;
+require Game::EvonyTKR::Model::Specialty::Manager;
 use namespace::clean;
 
-package Game::EvonyTKR::Controller::Specialities {
+package Game::EvonyTKR::Controller::Specialties {
   use Mojo::Base 'Game::EvonyTKR::Controller::CollectionBase';
   use List::AllUtils qw( all any none first);
 
   # Specify which collection this controller handles
-  sub collection_name {'specialities'}
+  sub collection_name {'Specialties'}
 
   sub get_manager($self) {
-    return $self->app->get_root_manager->specialityManager;
+    return $self->app->get_root_manager->specialtyManager;
   }
 
-  my $base = '/Specialities/';
+  my $base = '/Reference/Specialties/';
 
   sub getBase($self) {
     return $base;
   }
 
   sub controller_name ($self) {
-    return "Specialities";
+    return "Specialties";
   }
 
   sub register($self, $app, $config = {}) {
@@ -32,9 +32,10 @@ package Game::EvonyTKR::Controller::Specialities {
     $self->SUPER::register($app, $config);
 
     $app->add_navigation_item({
-      title => 'Details of General Specialities',
-      path  => '/Specialities/',
-      order => 20,
+      title   => 'Details of General Specialties',
+      path    => $base,
+      parent  => '/Reference',
+      order   => 20,
     });
 
     my @parts     = split(/::/, ref($self));
@@ -52,7 +53,7 @@ package Game::EvonyTKR::Controller::Specialities {
 
     $routes->any('/details')->to(
       cb => sub ($c) {
-        $c->redirect_to('/Specialities');
+        $c->redirect_to($base);
       }
     );
 
@@ -64,14 +65,15 @@ package Game::EvonyTKR::Controller::Specialities {
         if (not defined $manager) {
           $logger->logcroak('No Manager Defined');
         }
+        my $base = getBase($self);
+        foreach my $specialty (
+          @{ $manager->specialtyManager->get_all_specialties() }) {
+          my $name = $specialty->name;
 
-        foreach my $speciality (
-          @{ $manager->specialityManager->get_all_specialities() }) {
-          my $name = $speciality->name;
           $app->add_navigation_item({
             title  => "Details for $name",
-            path   => "/Specialities/details/$name",
-            parent => "/Specialities/details/",
+            path   => "$base/details/$name",
+            parent => "$base/details/",
             order  => 20,
           });
         }
@@ -83,25 +85,25 @@ package Game::EvonyTKR::Controller::Specialities {
     my $SourceDir  = $distDir->child("collections/$collection");
 
     $logger->info(
-      "Successfully loaded Speciality manager with collection from $SourceDir");
+      "Successfully loaded Specialty manager with collection from $SourceDir");
 
     $app->helper(
-      get_speciality_manager => sub {
+      get_specialty_manager => sub {
         my $self = shift;
-        return $self->app->get_root_manager->specialityManager;
+        return $self->app->get_root_manager->specialtyManager;
       }
     );
 
     $app->helper(
-      speciality_level_names => sub ($c, $level = '', $printable = 0) {
+      specialty_level_names => sub ($c, $level = '', $printable = 0) {
         $level //= '';    # Ensure defined
         my $logger = Log::Log4perl->get_logger(__PACKAGE__);
         if (length($level) == 0) {
           my $nameList = [];
           foreach
-            my $orig_name ($c->app->get_root_manager->specialityLevels->@*) {
+            my $orig_name ($c->app->get_root_manager->specialtyLevels->@*) {
             $logger->debug(
-"speciality_level_names evaluating speciality level name $orig_name"
+"specialty_level_names evaluating specialty level name $orig_name"
             );
             my $name;
             if ($printable) {
@@ -116,13 +118,13 @@ package Game::EvonyTKR::Controller::Specialities {
         }
         else {
           $logger->debug(
-            "speciality_level_names sees levels"
+            "specialty_level_names sees levels"
               . Data::Printer::np(
-              $c->app->get_root_manager->specialityLevels->@*
+              $c->app->get_root_manager->specialtyLevels->@*
               )
           );
           my $match = first { $level =~ /$_/i }
-            $c->app->get_root_manager->specialityLevels->@*;
+            $c->app->get_root_manager->specialtyLevels->@*;
           $match =~ s/(\w)(\w*)/\U$1\L$2/;
           return $match;
         }

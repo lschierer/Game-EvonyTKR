@@ -24,7 +24,7 @@ const getFrontmatter: GetFrontmatter = async () => {
   /* end workaround */
 
   return {
-    title: "Available Specialities",
+    title: "Available Specialties",
     author: "Luke Schierer",
     layout: "standard",
     imports: ['/components/DirectoryIndex.ts type="module"'],

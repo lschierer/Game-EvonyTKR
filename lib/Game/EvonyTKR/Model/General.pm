@@ -37,9 +37,9 @@ class Game::EvonyTKR::Model::General : isa(Game::EvonyTKR::Model::Data) {
 
   field $builtInBook : reader = undef;
 
-  field $specialityNames : reader : param;
+  field $specialtyNames : reader : param;
 
-  field $specialities : reader //= [];
+  field $specialties : reader //= [];
 
   ADJUST {
     my @errors;
@@ -84,13 +84,13 @@ class Game::EvonyTKR::Model::General : isa(Game::EvonyTKR::Model::Data) {
     }
   }
 
-  method populateSpecialities ($specialityManager) {
-    foreach my $sn_index (0 .. scalar(@{$specialityNames})) {
-      my $sn = $specialityNames->[$sn_index];
+  method populateSpecialties ($specialtyManager) {
+    foreach my $sn_index (0 .. scalar(@{$specialtyNames})) {
+      my $sn = $specialtyNames->[$sn_index];
       $self->logger->debug("populating $sn");
-      my $speciality = $specialityManager->getSpeciality($sn);
-      if ($speciality) {
-        $specialities->[$sn_index] = $speciality;
+      my $specialty = $specialtyManager->getSpecialty($sn);
+      if ($specialty) {
+        $specialties->[$sn_index] = $specialty;
       }
     }
   }
@@ -103,7 +103,7 @@ class Game::EvonyTKR::Model::General : isa(Game::EvonyTKR::Model::Data) {
       basicAttributes => $basicAttributes,
       ascending       => $ascending,
       builtInBookName => $builtInBookName,
-      specialityNames => $specialityNames,
+      specialtyNames => $specialtyNames,
     };
   }
 

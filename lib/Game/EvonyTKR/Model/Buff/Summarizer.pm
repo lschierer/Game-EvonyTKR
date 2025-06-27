@@ -29,10 +29,10 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
 
   # these are needed now
   field $ascendingLevel : reader : param //= 'red5';
-  field $speciality1 : reader : param    //= 'gold';
-  field $speciality2 : reader : param    //= 'gold';
-  field $speciality3 : reader : param    //= 'gold';
-  field $speciality4 : reader : param    //= 'gold';
+  field $specialty1 : reader : param    //= 'gold';
+  field $specialty2 : reader : param    //= 'gold';
+  field $specialty3 : reader : param    //= 'gold';
+  field $specialty4 : reader : param    //= 'gold';
   field $covenantLevel : reader : param  //= 'Civilization';
 
   # these are anticipated that I will need them in the future.
@@ -378,9 +378,9 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
     $total += $self->summarize_covenant_for_attribute($attribute, $summaryType,
       $buffConditions, $debuffConditions);
 
-    # Speciality buffs
+    # Specialty buffs
     $total +=
-      $self->summarize_specialities_for_attribute($attribute, $summaryType,
+      $self->summarize_specialties_for_attribute($attribute, $summaryType,
       $buffConditions, $debuffConditions);
 
     # Ascending attribute buffs (primary only)
@@ -474,43 +474,43 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
     return $total;
   }
 
-  method summarize_specialities_for_attribute(
+  method summarize_specialties_for_attribute(
     $attribute,
     $summaryType      = $targetType,
     $buffConditions   = [],
     $debuffConditions = []
   ) {
     my $total           = 0;
-    my @specialityNames = @{ $general->specialityNames };
-    my @specialityLevels =
-      ($speciality1, $speciality2, $speciality3, $speciality4);
+    my @specialtyNames = @{ $general->specialtyNames };
+    my @specialtyLevels =
+      ($specialty1, $specialty2, $specialty3, $specialty4);
 
-    foreach my $sn_index (0 .. $#specialityNames) {
-      my $sn = $specialityNames[$sn_index];
-      my $sl = lc($specialityLevels[$sn_index]);
+    foreach my $sn_index (0 .. $#specialtyNames) {
+      my $sn = $specialtyNames[$sn_index];
+      my $sl = lc($specialtyLevels[$sn_index]);
       $self->logger->debug(
         "processing " . $general->name . " $sn at level $sl");
 
-      my $speciality = $rootManager->specialityManager->getSpeciality($sn);
-      if ($speciality) {
+      my $specialty = $rootManager->specialtyManager->getSpecialty($sn);
+      if ($specialty) {
         $self->logger->debug(
-          sprintf('checking %s for %s', $speciality->name, $attribute));
-        my $sv = $speciality->get_buffs_at_level($sl, $attribute, $summaryType,
+          sprintf('checking %s for %s', $specialty->name, $attribute));
+        my $sv = $specialty->get_buffs_at_level($sl, $attribute, $summaryType,
           $buffConditions, $debuffConditions);
         $self->logger->debug("retrieved $sv as total $attribute for level $sl "
-            . $speciality->name
+            . $specialty->name
             . " as part of "
             . $general->name);
         $total += $sv;
       }
       else {
         $self->logger->error(
-          sprintf('cannot retrieve speciality %s for %s', $sn, $general->name));
+          sprintf('cannot retrieve specialty %s for %s', $sn, $general->name));
       }
     }
 
     $self->logger->debug(sprintf(
-      'returning %s as speciality total for attribute %s with "%s" and "%s"',
+      'returning %s as specialty total for attribute %s with "%s" and "%s"',
       $total,                      $attribute,
       join(",", @$buffConditions), join(", ", @$debuffConditions),
     ));

@@ -1,13 +1,13 @@
 <link rel="stylesheet" href="/css/collectionDetails.css" />
-<div class="speciality-details">
+<div class="specialty-details">
   <% use Scalar::Util; %>
   <% if( $item ) { %>
-    <% if ( Scalar::Util::reftype($item) eq 'OBJECT' && Scalar::Util::blessed($item) eq 'Game::EvonyTKR::Model::Speciality' ) { %>
+    <% if ( Scalar::Util::reftype($item) eq 'OBJECT' && Scalar::Util::blessed($item) eq 'Game::EvonyTKR::Model::Specialty' ) { %>
       <h3 class="spectrum-Heading spectrum-Heading--sizeL">Buffs Provided at Each Level for <%= $item->name %></h3>
       <table class="spectrum-Table spectrum-Table--sizeM spectrum-Table--quiet" >
         <thead class="spectrum-Table-head">
           <tr>
-            <% foreach my $ln ( speciality_level_names('', 1)->@* ) { %>
+            <% foreach my $ln ( specialty_level_names('', 1)->@* ) { %>
               <% next if $ln eq 'None'; %>
               <th class="spectrum-Table-headCell"> <%= $ln %> </th>
             <% } %>
@@ -15,9 +15,9 @@
         </thead>
         <tbody class="spectrum-Table-body">
           <tr class="spectrum-Table-row">
-            <% foreach my $key (speciality_level_names('', 0)->@* ) { %>
+            <% foreach my $key (specialty_level_names('', 0)->@* ) { %>
               <% next if $key eq 'none'; %>
-              <% my $label = speciality_level_names($key, 1); %>
+              <% my $label = specialty_level_names($key, 1); %>
               <% my $level = $item->levels->{$key}; %>
               <td class="spectrum-Table-cell <%= $level->{level} %>">
                 <% foreach my $buff (@{ $level->{buffs} }) { %>
@@ -45,7 +45,7 @@
       </table>
     <% } %>
   <% } else { %>
-    <span>Speciality Not Available</span>
+    <span>Specialty Not Available</span>
     <span><%= ref($item) %></span>
   <% } %>
 

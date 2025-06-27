@@ -222,7 +222,7 @@ To get the Buff for a given Covenant Level, you must
 
 * The Primary and Secondary Generals' Basic attributes added together must equal or exceed the minimum value for that level.
 
-Thus Cultivating and Ascending Generals from the list for each Covenant will help obtain the Buffs provided by that Covenant, but Specialities, Armor, and Beasts/Dragons will not. because while these increase the General's power, they do only Cultivating and Ascending increase the General's Basic Attributes.
+Thus Cultivating and Ascending Generals from the list for each Covenant will help obtain the Buffs provided by that Covenant, but Specialties, Armor, and Beasts/Dragons will not. because while these increase the General's power, they do only Cultivating and Ascending increase the General's Basic Attributes.
 
 This makes figuring out when to include these buffs I<much> more complicated than any other Buff so far considered.  Typically I look solely at Pairs of Generals.  For a Covenant, I need to consider your I<entire inventory> of Generals,
 as there are passive buffs always active, and the supporting Generals may not be part of the Pair, but their basic attributes are still critical to determine the activation conditions.

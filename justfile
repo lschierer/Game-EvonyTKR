@@ -26,6 +26,7 @@ npmdeps:
 
 deps: prepare npmdeps
   ./Build installdeps --cpan_client 'cpanm -n'
+  perl ./scripts/update_git_meta.pl
 
 
 [working-directory: 'share']

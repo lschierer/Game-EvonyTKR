@@ -189,7 +189,7 @@ package Game::EvonyTKR::Controller::CollectionBase {
           $manager->can('getBook')       ? 'getBook'
         : $manager->can('getGeneral')    ? 'getGeneral'
         : $manager->can('get_item')      ? 'get_item'
-        : $manager->can('getSpeciality') ? 'getSpeciality'
+        : $manager->can('getSpecialty') ? 'getSpecialty'
         :                                  undef;
 
       if ($method && (my $item = $manager->$method($name))) {

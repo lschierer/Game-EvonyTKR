@@ -6,7 +6,7 @@ import collection from "@evonytkrtips/assets/collections/generals";
 
 import {
   getAscendingSummary,
-  getSpecialitySummary,
+  getSpecialtySummary,
   getSkillbookSummary,
   mergeBuffSummaries,
 } from "../../../lib/BuffSummaryService.ts";
@@ -98,10 +98,10 @@ export default class MayorGeneralComparisonPage extends HTMLElement {
 
             const summaries = new Array<Buff.BuffSummaryResponse>();
 
-            // Process specialities
-            if (valid.data.specialities.length) {
-              for (const speciality of valid.data.specialities) {
-                const summary = await getSpecialitySummary(speciality);
+            // Process specialties
+            if (valid.data.specialties.length) {
+              for (const specialty of valid.data.specialties) {
+                const summary = await getSpecialtySummary(specialty);
                 if (!summary.error) {
                   summaries.push(summary);
                 }

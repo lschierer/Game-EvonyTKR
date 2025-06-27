@@ -6,7 +6,7 @@ require Game::EvonyTKR::Model::Book::Manager;
 require Game::EvonyTKR::Model::General::Manager;
 require Game::EvonyTKR::Model::General::ConflictGroup::Manager;
 require Game::EvonyTKR::Model::General::Pair::Manager;
-require Game::EvonyTKR::Model::Speciality::Manager;
+require Game::EvonyTKR::Model::Specialty::Manager;
 require Game::EvonyTKR::Model::AscendingAttributes::Manager;
 require Game::EvonyTKR::Model::Covenant::Manager;
 use namespace::clean;
@@ -18,7 +18,7 @@ class Game::EvonyTKR::Model::EvonyTKR::Manager :
   field $generalManager : reader;
   field $generalConflictGroupManager : reader;
   field $bookManager : reader;
-  field $specialityManager : reader;
+  field $specialtyManager : reader;
   field $ascendingAttributesManager : reader;
   field $covenantManager : reader;
 
@@ -31,7 +31,7 @@ class Game::EvonyTKR::Model::EvonyTKR::Manager :
     $generalConflictGroupManager =
       Game::EvonyTKR::Model::General::ConflictGroup::Manager->new();
     $bookManager       = Game::EvonyTKR::Model::Book::Manager->new();
-    $specialityManager = Game::EvonyTKR::Model::Speciality::Manager->new();
+    $specialtyManager = Game::EvonyTKR::Model::Specialty::Manager->new();
     $ascendingAttributesManager =
       Game::EvonyTKR::Model::AscendingAttributes::Manager->new();
     $covenantManager =
@@ -66,9 +66,9 @@ class Game::EvonyTKR::Model::EvonyTKR::Manager :
     $bookManager->importAll($collectionDir->child('skill books'));
     $self->logger->info("import of books complete");
 
-    $self->logger->info(" starting import of specialities.");
-    $specialityManager->importAll($collectionDir->child('specialities'));
-    $self->logger->info("import of specialities complete");
+    $self->logger->info(" starting import of specialties.");
+    $specialtyManager->importAll($collectionDir->child('specialties'));
+    $self->logger->info("import of specialties complete");
 
     $self->logger->info(" starting import of ascending attributes.");
     $ascendingAttributesManager->importAll(

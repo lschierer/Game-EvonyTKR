@@ -97,7 +97,7 @@ fragments from the following generals. It is not clear to me how frequently they
 Note the difference in their scores here from their scores as assistants. That
 is because here they are being scored with having been fully ascended, and when
 taking into account their personal attributes and not just their skills and
-specialities.
+specialties.
 
 All of them accept the same assistants:
 

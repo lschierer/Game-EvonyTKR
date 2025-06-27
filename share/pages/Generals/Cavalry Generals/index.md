@@ -108,7 +108,7 @@ If you do replace Theodora, use her to join rallies other alliance members run b
 - March Speed against Monsters
 - Luck
 
-Send her with a single troop, ideally paired with Nathanael Greene. This maximizes your double drop chances even better than Baibars, especially if you can get her fortune speciality to purple or even orange level.
+Send her with a single troop, ideally paired with Nathanael Greene. This maximizes your double drop chances even better than Baibars, especially if you can get her fortune specialty to purple or even orange level.
 
 [Monster Hunting]: ../pair_picking/monster_hunters/
 [explanation]: ../pair_picking/monster_hunters/#explanation

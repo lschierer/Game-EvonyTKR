@@ -1,4 +1,4 @@
-import { getSpecialitySummary } from "../../../lib/BuffSummaryService.ts";
+import { getSpecialtySummary } from "../../../lib/BuffSummaryService.ts";
 
 import debugFunction from "../../../lib/debug.ts";
 const DEBUG = debugFunction(new URL(import.meta.url).pathname);
@@ -7,7 +7,7 @@ if (DEBUG) {
 }
 
 /**
- * Summarizes speciality buffs by attribute, troop class, and condition
+ * Summarizes specialty buffs by attribute, troop class, and condition
  */
 export const handler = async (request: Request): Promise<Response> => {
   try {
@@ -17,11 +17,11 @@ export const handler = async (request: Request): Promise<Response> => {
     const maxLevel = url.searchParams.get("level");
     
     if (DEBUG) {
-      console.log(`specialities handler looking for name: ${name}, level: ${maxLevel}`);
+      console.log(`specialties handler looking for name: ${name}, level: ${maxLevel}`);
     }
     
     // Get the summary using the service
-    const summary = await getSpecialitySummary(name || "", maxLevel || undefined);
+    const summary = await getSpecialtySummary(name || "", maxLevel || undefined);
     
     // Check for errors
     if (summary.error) {
@@ -49,13 +49,13 @@ export const handler = async (request: Request): Promise<Response> => {
       }
     );
   } catch (error) {
-    console.error("Error processing specialities:", error);
+    console.error("Error processing specialties:", error);
     return new Response(
       JSON.stringify({
         error: {
           status: 500,
           code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to process specialities",
+          message: "Failed to process specialties",
           details: {
             error: error instanceof Error ? error.message : String(error)
           }

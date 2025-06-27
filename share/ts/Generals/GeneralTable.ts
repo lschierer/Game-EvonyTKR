@@ -42,7 +42,7 @@ const General = z.object({
   builtInBookName: z.string(),
   id: z.string(),
   name: z.string(),
-  specialityNames: z.array(z.string()),
+  specialtyNames: z.array(z.string()),
   type: z.array(z.string()),
 });
 type General = z.infer<typeof General>;
@@ -134,15 +134,15 @@ export class GeneralTable extends LitElement {
 
   @state() private ascendingLevel: string = 'red5';
   @state() private primaryCovenantLevel: string = 'civilization';
-  @state() private primarySpeciality1: string = 'gold';
-  @state() private primarySpeciality2: string = 'gold';
-  @state() private primarySpeciality3: string = 'gold';
-  @state() private primarySpeciality4: string = 'gold';
+  @state() private primarySpecialty1: string = 'gold';
+  @state() private primarySpecialty2: string = 'gold';
+  @state() private primarySpecialty3: string = 'gold';
+  @state() private primarySpecialty4: string = 'gold';
   @state() private secondaryCovenantLevel: string = 'civilization';
-  @state() private secondarySpeciality1: string = 'gold';
-  @state() private secondarySpeciality2: string = 'gold';
-  @state() private secondarySpeciality3: string = 'gold';
-  @state() private secondarySpeciality4: string = 'gold';
+  @state() private secondarySpecialty1: string = 'gold';
+  @state() private secondarySpecialty2: string = 'gold';
+  @state() private secondarySpecialty3: string = 'gold';
+  @state() private secondarySpecialty4: string = 'gold';
 
   private dataMap = new Map<number, RowData>();
   private tableData: RowData[] = [];
@@ -162,14 +162,14 @@ export class GeneralTable extends LitElement {
   protected override async willUpdate(_changedProperties: PropertyValues) {
     if (
       _changedProperties.has('ascendingLevel') ||
-      _changedProperties.has('primarySpeciality1') ||
-      _changedProperties.has('primarySpeciality2') ||
-      _changedProperties.has('primarySpeciality3') ||
-      _changedProperties.has('primarySpeciality4') ||
-      _changedProperties.has('secondarySpeciality1') ||
-      _changedProperties.has('secondarySpeciality2') ||
-      _changedProperties.has('secondarySpeciality3') ||
-      _changedProperties.has('secondarySpeciality4')
+      _changedProperties.has('primarySpecialty1') ||
+      _changedProperties.has('primarySpecialty2') ||
+      _changedProperties.has('primarySpecialty3') ||
+      _changedProperties.has('primarySpecialty4') ||
+      _changedProperties.has('secondarySpecialty1') ||
+      _changedProperties.has('secondarySpecialty2') ||
+      _changedProperties.has('secondarySpecialty3') ||
+      _changedProperties.has('secondarySpecialty4')
     ) {
       this.nameList.forEach((nameStub, index) => {
         nameStub.current = 'stale';
@@ -250,21 +250,21 @@ export class GeneralTable extends LitElement {
     url = url + `?ascendingLevel=${this.ascendingLevel}`;
     if (this.mode === 'single') {
       url = url + `&covenantLevel=${this.primaryCovenantLevel}`;
-      url = url + `&speciality1=${this.primarySpeciality1}`;
-      url = url + `&speciality2=${this.primarySpeciality2}`;
-      url = url + `&speciality3=${this.primarySpeciality3}`;
-      url = url + `&speciality4=${this.primarySpeciality4}`;
+      url = url + `&specialty1=${this.primarySpecialty1}`;
+      url = url + `&specialty2=${this.primarySpecialty2}`;
+      url = url + `&specialty3=${this.primarySpecialty3}`;
+      url = url + `&specialty4=${this.primarySpecialty4}`;
     } else {
       url = url + `&primaryCovenantLevel=${this.primaryCovenantLevel}`;
-      url = url + `&primarySpeciality1=${this.primarySpeciality1}`;
-      url = url + `&primarySpeciality2=${this.primarySpeciality2}`;
-      url = url + `&primarySpeciality3=${this.primarySpeciality3}`;
-      url = url + `&primarySpeciality4=${this.primarySpeciality4}`;
+      url = url + `&primarySpecialty1=${this.primarySpecialty1}`;
+      url = url + `&primarySpecialty2=${this.primarySpecialty2}`;
+      url = url + `&primarySpecialty3=${this.primarySpecialty3}`;
+      url = url + `&primarySpecialty4=${this.primarySpecialty4}`;
       url = url + `&secondaryCovenantLevel=${this.primaryCovenantLevel}`;
-      url = url + `&secondarySpeciality1=${this.secondarySpeciality1}`;
-      url = url + `&secondarySpeciality2=${this.secondarySpeciality2}`;
-      url = url + `&secondarySpeciality3=${this.secondarySpeciality3}`;
-      url = url + `&secondarySpeciality4=${this.secondarySpeciality4}`;
+      url = url + `&secondarySpecialty1=${this.secondarySpecialty1}`;
+      url = url + `&secondarySpecialty2=${this.secondarySpecialty2}`;
+      url = url + `&secondarySpecialty3=${this.secondarySpecialty3}`;
+      url = url + `&secondarySpecialty4=${this.secondarySpecialty4}`;
     }
     const res = await fetch(url);
     const json = await res.json();
@@ -289,15 +289,15 @@ export class GeneralTable extends LitElement {
         secondary: pairStub.secondary.name,
         ascendingLevel: this.ascendingLevel,
         primaryCovenantLevel: this.primaryCovenantLevel,
-        primarySpeciality1: this.primarySpeciality1,
-        primarySpeciality2: this.primarySpeciality2,
-        primarySpeciality3: this.primarySpeciality3,
-        primarySpeciality4: this.primarySpeciality4,
+        primarySpecialty1: this.primarySpecialty1,
+        primarySpecialty2: this.primarySpecialty2,
+        primarySpecialty3: this.primarySpecialty3,
+        primarySpecialty4: this.primarySpecialty4,
         secondaryCovenantLevel: this.secondaryCovenantLevel,
-        secondarySpeciality1: this.secondarySpeciality1,
-        secondarySpeciality2: this.secondarySpeciality2,
-        secondarySpeciality3: this.secondarySpeciality3,
-        secondarySpeciality4: this.secondarySpeciality4,
+        secondarySpecialty1: this.secondarySpecialty1,
+        secondarySpecialty2: this.secondarySpecialty2,
+        secondarySpecialty3: this.secondarySpecialty3,
+        secondarySpecialty4: this.secondarySpecialty4,
       });
       const url = `${basePath}pair?${params.toString()}`;
       const res = await fetch(url);
@@ -318,10 +318,10 @@ export class GeneralTable extends LitElement {
       const params = new URLSearchParams({
         ascendingLevel: this.ascendingLevel,
         covenantLevel: this.primaryCovenantLevel,
-        speciality1: this.primarySpeciality1,
-        speciality2: this.primarySpeciality2,
-        speciality3: this.primarySpeciality3,
-        speciality4: this.primarySpeciality4,
+        specialty1: this.primarySpecialty1,
+        specialty2: this.primarySpecialty2,
+        specialty3: this.primarySpecialty3,
+        specialty4: this.primarySpecialty4,
       });
 
       const url = `${newBasePath}/primary/${encodeURIComponent(stub.primary.name)}?${params.toString()}`;
@@ -341,25 +341,25 @@ export class GeneralTable extends LitElement {
       this.ascendingLevel = urlParams.get('ascendingLevel') || 'red5';
     }
 
-    // Get speciality levels based on mode
+    // Get specialty levels based on mode
     if (this.mode === 'single') {
-      this.primarySpeciality1 = urlParams.get('speciality1') || 'gold';
-      this.primarySpeciality2 = urlParams.get('speciality2') || 'gold';
-      this.primarySpeciality3 = urlParams.get('speciality3') || 'gold';
-      this.primarySpeciality4 = urlParams.get('speciality4') || 'gold';
+      this.primarySpecialty1 = urlParams.get('specialty1') || 'gold';
+      this.primarySpecialty2 = urlParams.get('specialty2') || 'gold';
+      this.primarySpecialty3 = urlParams.get('specialty3') || 'gold';
+      this.primarySpecialty4 = urlParams.get('specialty4') || 'gold';
     } else {
-      this.primarySpeciality1 = urlParams.get('primarySpeciality1') || 'gold';
-      this.primarySpeciality2 = urlParams.get('primarySpeciality2') || 'gold';
-      this.primarySpeciality3 = urlParams.get('primarySpeciality3') || 'gold';
-      this.primarySpeciality4 = urlParams.get('primarySpeciality4') || 'gold';
-      this.secondarySpeciality1 =
-        urlParams.get('secondarySpeciality1') || 'gold';
-      this.secondarySpeciality2 =
-        urlParams.get('secondarySpeciality2') || 'gold';
-      this.secondarySpeciality3 =
-        urlParams.get('secondarySpeciality3') || 'gold';
-      this.secondarySpeciality4 =
-        urlParams.get('secondarySpeciality4') || 'gold';
+      this.primarySpecialty1 = urlParams.get('primarySpecialty1') || 'gold';
+      this.primarySpecialty2 = urlParams.get('primarySpecialty2') || 'gold';
+      this.primarySpecialty3 = urlParams.get('primarySpecialty3') || 'gold';
+      this.primarySpecialty4 = urlParams.get('primarySpecialty4') || 'gold';
+      this.secondarySpecialty1 =
+        urlParams.get('secondarySpecialty1') || 'gold';
+      this.secondarySpecialty2 =
+        urlParams.get('secondarySpecialty2') || 'gold';
+      this.secondarySpecialty3 =
+        urlParams.get('secondarySpecialty3') || 'gold';
+      this.secondarySpecialty4 =
+        urlParams.get('secondarySpecialty4') || 'gold';
     }
   }
 

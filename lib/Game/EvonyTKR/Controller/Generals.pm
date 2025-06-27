@@ -184,11 +184,11 @@ package Game::EvonyTKR::Controller::Generals {
 
     my $covenantLevel  = $self->param('covenantLevel')  // 'civilization';
     my $ascendingLevel = $self->param('ascendingLevel') // 'red5';
-    my @specialities;
-    push @specialities, $self->param('speciality1') // 'gold';
-    push @specialities, $self->param('speciality2') // 'gold';
-    push @specialities, $self->param('speciality3') // 'gold';
-    push @specialities, $self->param('speciality4') // 'gold';
+    my @specialties;
+    push @specialties, $self->param('specialty1') // 'gold';
+    push @specialties, $self->param('specialty2') // 'gold';
+    push @specialties, $self->param('specialty3') // 'gold';
+    push @specialties, $self->param('specialty4') // 'gold';
 
     # Validate parameters using enums from Game::EvonyTKR::Model::Data
     my $data_model = Game::EvonyTKR::Model::Data->new();
@@ -206,7 +206,7 @@ package Game::EvonyTKR::Controller::Generals {
       $ascendingLevel = 'red5';
     }
 
-    @specialities = $data_model->normalizeSpecialityLevels(@specialities);
+    @specialties = $data_model->normalizeSpecialtyLevels(@specialties);
 
     my $general =
       $self->app->get_root_manager->generalManager->getGeneral($name);
@@ -235,10 +235,10 @@ package Game::EvonyTKR::Controller::Generals {
           targetType     => $targetType,
           ascendingLevel => $ascendingLevel,
           covenantLevel  => $covenantLevel,
-          speciality1    => $specialities[0],
-          speciality2    => $specialities[1],
-          speciality3    => $specialities[2],
-          speciality4    => $specialities[3],
+          specialty1    => $specialties[0],
+          specialty2    => $specialties[1],
+          specialty3    => $specialties[2],
+          specialty4    => $specialties[3],
         );
 
         $summarizer->updateBuffs();
@@ -276,11 +276,11 @@ package Game::EvonyTKR::Controller::Generals {
     # Get query parameters with defaults
     my $covenantLevel  = $self->param('covenantLevel')  // 'civilization';
     my $ascendingLevel = $self->param('ascendingLevel') // 'red5';
-    my @specialities;
-    push @specialities, $self->param('speciality1') // 'gold';
-    push @specialities, $self->param('speciality2') // 'gold';
-    push @specialities, $self->param('speciality3') // 'gold';
-    push @specialities, $self->param('speciality4') // 'gold';
+    my @specialties;
+    push @specialties, $self->param('specialty1') // 'gold';
+    push @specialties, $self->param('specialty2') // 'gold';
+    push @specialties, $self->param('specialty3') // 'gold';
+    push @specialties, $self->param('specialty4') // 'gold';
 
     # Validate parameters using enums from Game::EvonyTKR::Model::Data
     my $data_model = Game::EvonyTKR::Model::Data->new();
@@ -298,7 +298,7 @@ package Game::EvonyTKR::Controller::Generals {
       $ascendingLevel = 'red5';
     }
 
-    @specialities = $data_model->normalizeSpecialityLevels(@specialities);
+    @specialties = $data_model->normalizeSpecialtyLevels(@specialties);
 
     # Stash data for the template
     $self->stash(
@@ -306,7 +306,7 @@ package Game::EvonyTKR::Controller::Generals {
       mode           => 'single',
       covenantLevel  => $covenantLevel,
       ascendingLevel => $ascendingLevel,
-      specialities   => \@specialities,
+      specialties   => \@specialties,
 
      # Add enum values for which I do not yet have managers that provide helpers
       covenantLevelValues => $data_model->covenantLevels,
@@ -370,11 +370,11 @@ package Game::EvonyTKR::Controller::Generals {
     # Get query parameters with defaults
     my $ascendingLevel = $self->param('ascendingLevel') // 'red5';
     my $covenantLevel  = $self->param('covenantLevel')  // 'civilization';
-    my @specialities;
-    push @specialities, $self->param('speciality1') // 'gold';
-    push @specialities, $self->param('speciality2') // 'gold';
-    push @specialities, $self->param('speciality3') // 'gold';
-    push @specialities, $self->param('speciality4') // 'gold';
+    my @specialties;
+    push @specialties, $self->param('specialty1') // 'gold';
+    push @specialties, $self->param('specialty2') // 'gold';
+    push @specialties, $self->param('specialty3') // 'gold';
+    push @specialties, $self->param('specialty4') // 'gold';
 
     # Validate parameters using enums from Game::EvonyTKR::Model::Data
     my $data_model = Game::EvonyTKR::Model::Data->new();
@@ -390,8 +390,8 @@ package Game::EvonyTKR::Controller::Generals {
         "mayor_comparison_json using ascendingLevel $ascendingLevel");
     }
 
-    # Validate speciality levels
-    @specialities = $data_model->normalizeSpecialityLevels(@specialities);
+    # Validate specialty levels
+    @specialties = $data_model->normalizeSpecialtyLevels(@specialties);
 
     my $general =
       $self->app->get_root_manager->generalManager->getGeneral($name);
@@ -420,10 +420,10 @@ package Game::EvonyTKR::Controller::Generals {
       targetType  => $targetType,
       ascendingLevel => $ascendingLevel,
       covenantLevel  => $covenantLevel,
-      speciality1    => $specialities[0],
-      speciality2    => $specialities[1],
-      speciality3    => $specialities[2],
-      speciality4    => $specialities[3],
+      specialty1    => $specialties[0],
+      specialty2    => $specialties[1],
+      specialty3    => $specialties[2],
+      specialty4    => $specialties[3],
     );
 
     $summarizer->updateBuffs();

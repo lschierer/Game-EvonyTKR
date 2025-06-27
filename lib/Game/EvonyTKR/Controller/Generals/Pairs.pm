@@ -129,17 +129,17 @@ package Game::EvonyTKR::Controller::Generals::Pairs {
     # Get query parameters with defaults
     my $ascendingLevel = $self->param('ascendingLevel') // 'red5';
     my $primaryCovenantLevel  = $self->param('covenantLevel')  // 'civilization';
-    my @primarySpecialities;
-    push @primarySpecialities, $self->param('primarySpeciality1') // 'gold';
-    push @primarySpecialities, $self->param('primarySpeciality2') // 'gold';
-    push @primarySpecialities, $self->param('primarySpeciality3') // 'gold';
-    push @primarySpecialities, $self->param('primarySpeciality4') // 'gold';
+    my @primarySpecialties;
+    push @primarySpecialties, $self->param('primarySpecialty1') // 'gold';
+    push @primarySpecialties, $self->param('primarySpecialty2') // 'gold';
+    push @primarySpecialties, $self->param('primarySpecialty3') // 'gold';
+    push @primarySpecialties, $self->param('primarySpecialty4') // 'gold';
     my $secondaryCovenantLevel  = $self->param('covenantLevel')  // 'civilization';
-    my @secondarySpecialities;
-    push @secondarySpecialities, $self->param('secondarySpeciality1') // 'gold';
-    push @secondarySpecialities, $self->param('secondarySpeciality2') // 'gold';
-    push @secondarySpecialities, $self->param('secondarySpeciality3') // 'gold';
-    push @secondarySpecialities, $self->param('secondarySpeciality4') // 'gold';
+    my @secondarySpecialties;
+    push @secondarySpecialties, $self->param('secondarySpecialty1') // 'gold';
+    push @secondarySpecialties, $self->param('secondarySpecialty2') // 'gold';
+    push @secondarySpecialties, $self->param('secondarySpecialty3') // 'gold';
+    push @secondarySpecialties, $self->param('secondarySpecialty4') // 'gold';
 
     # Validate parameters using enums from Game::EvonyTKR::Model::Data
     my $data_model = Game::EvonyTKR::Model::Data->new();
@@ -157,7 +157,7 @@ package Game::EvonyTKR::Controller::Generals::Pairs {
       $primaryCovenantLevel = 'civilization';
     }
 
-    @primarySpecialities = $data_model->normalizeSpecialityLevels(@primarySpecialities);
+    @primarySpecialties = $data_model->normalizeSpecialtyLevels(@primarySpecialties);
 
     if (!$data_model->checkCovenantLevel($secondaryCovenantLevel)) {
       $logger->warn(
@@ -165,15 +165,15 @@ package Game::EvonyTKR::Controller::Generals::Pairs {
       $secondaryCovenantLevel = 'civilization';
     }
 
-    @secondarySpecialities = $data_model->normalizeSpecialityLevels(@secondarySpecialities);
+    @secondarySpecialties = $data_model->normalizeSpecialtyLevels(@secondarySpecialties);
 
     $self->stash(
       mode                    => 'pair',
       ascendingLevel          => $ascendingLevel,
       primaryCovenantLevel    => $primaryCovenantLevel,
-      primarySpecialities     => \@primarySpecialities,
+      primarySpecialties     => \@primarySpecialties,
       secondaryCovenantLevel  => $secondaryCovenantLevel,
-      secondarySpecialities   => \@secondarySpecialities,
+      secondarySpecialties   => \@secondarySpecialties,
     );
 
     # Stash data for the template

@@ -1,9 +1,11 @@
 %# share/templates/partials/global_footer.html.ep
 
 <div class="footer">
-  % my $computedDate = get_repo_data->find_copyright_range();
-  % if ( $computedDate ) {
-    <span class="spectrum-Body spectrum-Body--sizeS"> &copy; <%= $computedDate->year %> &ndash; <%= (localtime)[5] + 1900 %> <%= get_repo_data->find_authors(); %></span>
+  % my $copyDate = app->config->{git_meta}->{copyright};
+  % my $authors = app->config->{git_meta}->{authors};
+
+  % if ( $copyDate && $authors) {
+    <span class="spectrum-Body spectrum-Body--sizeS"> &copy; <%= $copyDate %> <%= $authors %></span>
   % } else {
     <p class="spectrum-Body spectrum-Body--sizeS" >&copy; <%= (localtime)[5] + 1900 %> Luke Schierer</p>
   % }

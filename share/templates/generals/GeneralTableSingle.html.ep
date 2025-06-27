@@ -10,7 +10,7 @@
       linkTarget            => $linkTarget,
       covenantLevel         => $covenantLevel,
       ascendingLevel        => $ascendingLevel,
-      specialities          => $specialities,
+      specialties          => $specialties,
   %>
 
   <div class="general-table-container">
@@ -20,10 +20,10 @@
       typeheader="<%= $linkTarget %>"
       ascendingLevel="<%= $ascendingLevel %>"
       primaryCovenantLevel="<%= $covenantLevel %>"
-      primarySpeciality1="<%= $specialities->[0] %>"
-      primarySpeciality2="<%= $specialities->[1] %>"
-      primarySpeciality3="<%= $specialities->[2] %>"
-      primarySpeciality4="<%= $specialities->[3] %>"
+      primarySpecialty1="<%= $specialties->[0] %>"
+      primarySpecialty2="<%= $specialties->[1] %>"
+      primarySpecialty3="<%= $specialties->[2] %>"
+      primarySpecialty4="<%= $specialties->[3] %>"
       ></general-table>
   </div>
 </div>

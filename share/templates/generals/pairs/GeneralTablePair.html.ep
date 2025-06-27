@@ -9,9 +9,9 @@
       mode => $mode,
       ascendingLevel        => $ascendingLevel,
       primaryCovenantLevel  => $primaryCovenantLevel,
-      primarySpecialities   => $primarySpecialities,
+      primarySpecialties   => $primarySpecialties,
       secondaryCovenantLevel  => $secondaryCovenantLevel,
-      secondarySpecialities   => $secondarySpecialities,
+      secondarySpecialties   => $secondarySpecialties,
   %>
 
   <div class="general-table-container">
@@ -21,15 +21,15 @@
       typeheader="<%= $linkTarget %>"
       ascendingLevel="<%= $ascendingLevel %>"
       primaryCovenantLevel="<%= $primaryCovenantLevel %>"
-      primarySpeciality1="<%= $primarySpecialities->[0] %>"
-      primarySpeciality2="<%= $primarySpecialities->[1] %>"
-      primarySpeciality3="<%= $primarySpecialities->[2] %>"
-      primarySpeciality4="<%= $primarySpecialities->[3] %>"
+      primarySpecialty1="<%= $primarySpecialties->[0] %>"
+      primarySpecialty2="<%= $primarySpecialties->[1] %>"
+      primarySpecialty3="<%= $primarySpecialties->[2] %>"
+      primarySpecialty4="<%= $primarySpecialties->[3] %>"
       secondaryCovenantLevel="<%= $secondaryCovenantLevel %>"
-      secondarySpeciality1="<%= $secondarySpecialities->[0] %>"
-      secondarySpeciality2="<%= $secondarySpecialities->[1] %>"
-      secondarySpeciality3="<%= $secondarySpecialities->[2] %>"
-      secondarySpeciality4="<%= $secondarySpecialities->[3] %>"
+      secondarySpecialty1="<%= $secondarySpecialties->[0] %>"
+      secondarySpecialty2="<%= $secondarySpecialties->[1] %>"
+      secondarySpecialty3="<%= $secondarySpecialties->[2] %>"
+      secondarySpecialty4="<%= $secondarySpecialties->[3] %>"
       ></general-table>
   </div>
 </div>
