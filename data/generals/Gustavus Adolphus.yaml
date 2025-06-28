@@ -13,7 +13,7 @@ basic_attributes:
     base: 110
     increment: 8.51
 book: Fire Suppression
-specialities:
+specialties:
   - Siege Machine Assault
   - Bash
   - Siege Machine Ares

@@ -13,7 +13,7 @@ basic_attributes:
     base: 107
     increment: 8.64
 book: Chivalry
-specialities:
+specialties:
   - Ground Troop Defense
   - Trapping
   - Ruler
