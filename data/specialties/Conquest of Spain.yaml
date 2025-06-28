@@ -1,0 +1,82 @@
+name: Conquest of Spain
+levels:
+  - level: Green
+    buff:
+      - attribute: Training Speed
+        class: Ground Troops
+        condition:
+          - Applied to Barracks Officer
+        value:
+          number: 3
+          unit: percentage
+      - attribute: Training Capacity
+        class: Ground Troops
+        condition:
+          - Applied to Barracks Officer
+        value:
+          number: 2
+          unit: percentage
+  - level: Blue
+    buff:
+      - attribute: Training Speed
+        class: Ground Troops
+        condition:
+          - Applied to Barracks Officer
+        value:
+          number: 3
+          unit: percentage
+      - attribute: Training Capacity
+        class: Ground Troops
+        condition:
+          - Applied to Barracks Officer
+        value:
+          number: 2
+          unit: percentage
+  - level: Purple
+    buff:
+      - attribute: Training Speed
+        class: Ground Troops
+        condition:
+          - Applied to Barracks Officer
+        value:
+          number: 5
+          unit: percentage
+      - attribute: Training Capacity
+        class: Ground Troops
+        condition:
+          - Applied to Barracks Officer
+        value:
+          number: 4
+          unit: percentage
+  - level: Orange
+    buff:
+      - attribute: Training Speed
+        class: Ground Troops
+        condition:
+          - Applied to Barracks Officer
+        value:
+          number: 5
+          unit: percentage
+      - attribute: Training Capacity
+        class: Ground Troops
+        condition:
+          - Applied to Barracks Officer
+        value:
+          number: 4
+          unit: percentage
+  - level: Gold
+    buff:
+      - attribute: Training Speed
+        class: Ground Troops
+        condition:
+          - Applied to Barracks Officer
+        value:
+          number: 10
+          unit: percentage
+      - attribute: Training Capacity
+        class: Ground Troops
+        condition:
+          - Applied to Barracks Officer
+        value:
+          number: 8
+          unit: percentage

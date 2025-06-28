@@ -7,7 +7,7 @@ levels:
         condition:
           - When City Mayor for this SubCity
         value:
-          number: 0
+          number: 8
           unit: percentage
   - level: Blue
     buff:
@@ -15,7 +15,7 @@ levels:
         condition:
           - When City Mayor for this SubCity
         value:
-          number: 0
+          number: 8
           unit: percentage
   - level: Purple
     buff:
@@ -23,7 +23,7 @@ levels:
         condition:
           - When City Mayor for this SubCity
         value:
-          number: 0
+          number: 16
           unit: percentage
   - level: Orange
     buff:
@@ -31,7 +31,7 @@ levels:
         condition:
           - When City Mayor for this SubCity
         value:
-          number: 0
+          number: 16
           unit: percentage
   - level: Gold
     buff:
@@ -39,5 +39,5 @@ levels:
         condition:
           - When City Mayor for this SubCity
         value:
-          number: 80
+          number: 32
           unit: percentage
