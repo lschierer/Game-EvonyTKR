@@ -13,7 +13,7 @@ basic_attributes:
     base: 93
     increment: 7.94
 book: Rain of Arrows
-specialities:
+specialties:
   - Ranged Troop Assault
   - Suppress
   - Ranged Troop Ares
