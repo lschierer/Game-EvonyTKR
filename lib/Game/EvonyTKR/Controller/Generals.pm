@@ -371,7 +371,7 @@ package Game::EvonyTKR::Controller::Generals {
     my $linkTarget  = $self->stash('linkTarget');
 
     my $gm = $self->app->get_general_manager();
-    my @generalBuffSummaries;
+    my @selected;
     while (my ($key, $general) = each(%{ $gm->get_all_generals() })) {
       $logger->debug("inspecting '$key', first need to see if it is a mayor."
           . Data::Printer::np($general));
@@ -385,10 +385,10 @@ package Game::EvonyTKR::Controller::Generals {
       }
 
       my $result = { primary => $general, };
-      push @generalBuffSummaries, $result;
+      push @selected, $result;
     }
-    if (scalar @generalBuffSummaries) {
-      return $self->render(json => \@generalBuffSummaries);
+    if (scalar @selected) {
+      return $self->render(json => \@selected);
     }
     else {
       return $self->render(json => {});
@@ -407,12 +407,12 @@ package Game::EvonyTKR::Controller::Generals {
 
     # Get query parameters with defaults
     my $ascendingLevel = $self->param('ascendingLevel') // 'red5';
-    my $covenantLevel  = $self->param('covenantLevel')  // 'civilization';
+    my $covenantLevel  = $self->param('covenantLevel')  // $self->param('primaryCovenantLevel')  // 'civilization';
     my @specialties;
-    push @specialties, $self->param('specialty1') // 'gold';
-    push @specialties, $self->param('specialty2') // 'gold';
-    push @specialties, $self->param('specialty3') // 'gold';
-    push @specialties, $self->param('specialty4') // 'gold';
+    push @specialties, $self->param('primarySpecialty1') // $self->param('specialty1') // 'gold';
+    push @specialties, $self->param('primarySpecialty2') // $self->param('specialty2') // 'gold';
+    push @specialties, $self->param('primarySpecialty3') // $self->param('specialty3') // 'gold';
+    push @specialties, $self->param('primarySpecialty4') // $self->param('specialty4') // 'gold';
 
     # Validate parameters using enums from Game::EvonyTKR::Model::Data
     my $data_model = Game::EvonyTKR::Model::Data->new();

@@ -26,9 +26,9 @@
       <form id="primary-settings-form" class="spectrum-Form spectrum-Form--labelsAbove spectrum-Form--sizeM">
 
         <div class="spectrum-Form-item">
-          <label for="covenantLevel" class="spectrum-FieldLabel spectrum-FieldLabel--sizeM">Covenant Level:</label>
+          <label for="primaryCovenantLevel" class="spectrum-FieldLabel spectrum-FieldLabel--sizeM">Covenant Level:</label>
           <div class="spectrum-Form-itemField">
-            <select id="covenantLevel" name="covenantLevel" class="spectrum-Picker spectrum-Picker--sizeM">
+            <select id="primaryCovenantLevel" name="primaryCovenantLevel" class="spectrum-Picker spectrum-Picker--sizeM">
               <% foreach my $level (@{$covenantLevelValues}) { %>
                 <option value="<%= $level %>" <%= $primaryCovenantLevel eq $level ? 'selected' : '' %>><%= ucfirst($level) %></option>
               <% } %>
@@ -61,7 +61,7 @@
           </div>
         <% } %>
 
-        <div class="spectrum-Form-item">
+        <div id="primarySubmit" class="spectrum-Form-item">
           <div class="spectrum-Form-itemField">
             <button type="submit" class="spectrum-Button spectrum-Button--primary spectrum-Button--sizeM">
               <span class="spectrum-Button-label">Apply Settings</span>
@@ -75,11 +75,11 @@
       <h3 class="spectrum-Heading spectrum-Heading--sizeS">Secondary General</h3>
       <form id="secondary-settings-form" class="spectrum-Form spectrum-Form--labelsAbove spectrum-Form--sizeM">
         <div class="spectrum-Form-item">
-          <label for="covenantLevel" class="spectrum-FieldLabel spectrum-FieldLabel--sizeM">Covenant Level:</label>
+          <label for="secondaryCovenantLevel" class="spectrum-FieldLabel spectrum-FieldLabel--sizeM">Covenant Level:</label>
           <div class="spectrum-Form-itemField">
-            <select id="covenantLevel" name="covenantLevel" class="spectrum-Picker spectrum-Picker--sizeM">
+            <select id="secondaryCovenantLevel" name="secondaryCovenantLevel" class="spectrum-Picker spectrum-Picker--sizeM">
               <% foreach my $level (@{$covenantLevelValues}) { %>
-                <option value="<%= $level %>" <%= $primaryCovenantLevel eq $level ? 'selected' : '' %>><%= ucfirst($level) %></option>
+                <option value="<%= $level %>" <%= $secondaryCovenantLevel eq $level ? 'selected' : '' %>><%= ucfirst($level) %></option>
               <% } %>
             </select>
           </div>
@@ -99,7 +99,7 @@
           </div>
         <% } %>
 
-        <div class="spectrum-Form-item">
+        <div id="secondarySubmit" class="spectrum-Form-item">
           <div class="spectrum-Form-itemField">
             <button type="submit" class="spectrum-Button spectrum-Button--secondary spectrum-Button--sizeM">
               <span class="spectrum-Button-label">Apply Settings</span>
@@ -113,8 +113,13 @@
 <style>
 .settings-form {
   background-color: var(--surface-1);
-  --mod-form-grid-template-columns-labels-above: repeat(5, 2fr);
+  --mod-form-grid-template-columns-labels-above: repeat(10, 1fr);
   --mod-form-inline-size: 100%;
+
+  div#primarySubmit,
+  div#secondarySubmit {
+    grid-column: 1/-1;
+  }
 }
 
 </style>
@@ -129,4 +134,13 @@ document.addEventListener('DOMContentLoaded', function() {
     window.location.href = window.location.pathname + '?' + params.toString();
   });
 });
+% if ($mode eq 'pair') {
+  document.getElementById('secondary-settings-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const params = new URLSearchParams(formData);
+      window.location.href = window.location.pathname + '?' + params.toString();
+    });
+  });
+% }
 </script>

@@ -255,6 +255,10 @@ export class GeneralTable extends LitElement {
       url = url + `&specialty3=${this.primarySpecialty3}`;
       url = url + `&specialty4=${this.primarySpecialty4}`;
     } else {
+      url = url.replace('comparison', '');
+      url = url.replace('Cavalry', 'Mounted');
+      url = url.replace('Archer', 'Ranged');
+      url = url.replace('Infantry', 'Ground');
       url = url + `&primaryCovenantLevel=${this.primaryCovenantLevel}`;
       url = url + `&primarySpecialty1=${this.primarySpecialty1}`;
       url = url + `&primarySpecialty2=${this.primarySpecialty2}`;
@@ -281,8 +285,11 @@ export class GeneralTable extends LitElement {
     this.nameList[index].current = 'pending';
     const stub = this.nameList[index];
 
-    const basePath = window.location.pathname.replace(/\/comparison\/?$/, '');
+    let basePath = window.location.pathname.replace(/\/comparison\/?$/, '');
     if (this.mode === 'pair') {
+      basePath = basePath.replace('Cavalry', 'Mounted');
+      basePath = basePath.replace('Archer', 'Ranged');
+      basePath = basePath.replace('Infantry', 'Ground');
       const pairStub = stub as GeneralPairStub;
       const params = new URLSearchParams({
         primary: pairStub.primary.name,
@@ -299,7 +306,7 @@ export class GeneralTable extends LitElement {
         secondarySpecialty3: this.secondarySpecialty3,
         secondarySpecialty4: this.secondarySpecialty4,
       });
-      const url = `${basePath}pair?${params.toString()}`;
+      const url = `${basePath}/pair?${params.toString()}`;
       const res = await fetch(url);
       const json = await res.json();
       const parsed = GeneralPair.safeParse(json);
@@ -352,14 +359,10 @@ export class GeneralTable extends LitElement {
       this.primarySpecialty2 = urlParams.get('primarySpecialty2') || 'gold';
       this.primarySpecialty3 = urlParams.get('primarySpecialty3') || 'gold';
       this.primarySpecialty4 = urlParams.get('primarySpecialty4') || 'gold';
-      this.secondarySpecialty1 =
-        urlParams.get('secondarySpecialty1') || 'gold';
-      this.secondarySpecialty2 =
-        urlParams.get('secondarySpecialty2') || 'gold';
-      this.secondarySpecialty3 =
-        urlParams.get('secondarySpecialty3') || 'gold';
-      this.secondarySpecialty4 =
-        urlParams.get('secondarySpecialty4') || 'gold';
+      this.secondarySpecialty1 = urlParams.get('secondarySpecialty1') || 'gold';
+      this.secondarySpecialty2 = urlParams.get('secondarySpecialty2') || 'gold';
+      this.secondarySpecialty3 = urlParams.get('secondarySpecialty3') || 'gold';
+      this.secondarySpecialty4 = urlParams.get('secondarySpecialty4') || 'gold';
     }
   }
 

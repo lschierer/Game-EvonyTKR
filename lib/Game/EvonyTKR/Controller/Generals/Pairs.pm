@@ -91,19 +91,33 @@ package Game::EvonyTKR::Controller::Generals::Pairs {
         my @generalTypes = $pm->get_pair_types();
         $logger->debug("got generalTypes " . Data::Printer::np(@generalTypes));
         foreach my $type (@generalTypes) {
+          if ($type eq 'mayor' or $type eq 'officer') {
+            # these types do not pair at this time.
+            next;
+          }
+
           my $linkTarget = $type =~ s/_/ /gr;
           $linkTarget =~ s/(\w)(\w+)( specialist)?/\U$1\L$2 \UP\Lairs/;
-          $routes->get("/$linkTarget/" =>
+
+          my $uiTarget = $linkTarget; # set a default since not all types need mutation
+          $uiTarget =~ s/Mounted/Cavalry/g;
+          $uiTarget =~ s/Ground/Infantry/g;
+          $uiTarget =~ s/Ranged/Archer/g;
+
+          $logger->debug("using uiTarget '$uiTarget' linkTarget '$linkTarget' for generalType '$type'");
+
+          $app->add_navigation_item({
+            title  => "$linkTarget Pairs",
+            path   => "/Generals/Pairs/$uiTarget/comparison",
+            parent => '/Generals/Pairs',
+            order  => 10,
+          });
+
+          $routes->get("/$uiTarget/" =>
               { generalType => $type, linkTarget => $linkTarget })
             ->to(controller => $controller_name, action => 'typeIndex')
             ->name("${base}_${type}_index");
 
-          $app->add_navigation_item({
-            title  => "$linkTarget Pairs",
-            path   => "/Generals/Pairs/$linkTarget",
-            parent => '/Generals/Pairs',
-            order  => 10,
-          });
           $routes->get("/$linkTarget/data.json" =>
               { generalType => $type, linkTarget => $linkTarget })
             ->to(controller => $controller_name, action => 'typeIndex_json')
@@ -128,13 +142,13 @@ package Game::EvonyTKR::Controller::Generals::Pairs {
 
     # Get query parameters with defaults
     my $ascendingLevel       = $self->param('ascendingLevel') // 'red5';
-    my $primaryCovenantLevel = $self->param('covenantLevel')  // 'civilization';
+    my $primaryCovenantLevel = $self->param('primaryCovenantLevel')  // 'civilization';
     my @primarySpecialties;
     push @primarySpecialties, $self->param('primarySpecialty1') // 'gold';
     push @primarySpecialties, $self->param('primarySpecialty2') // 'gold';
     push @primarySpecialties, $self->param('primarySpecialty3') // 'gold';
     push @primarySpecialties, $self->param('primarySpecialty4') // 'gold';
-    my $secondaryCovenantLevel = $self->param('covenantLevel')
+    my $secondaryCovenantLevel = $self->param('secondaryCovenantLevel')
       // 'civilization';
     my @secondarySpecialties;
     push @secondarySpecialties, $self->param('secondarySpecialty1') // 'gold';
