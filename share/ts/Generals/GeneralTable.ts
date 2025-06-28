@@ -124,25 +124,26 @@ const tableHeaders = new Map<string, string>([
 
 @customElement('general-table')
 export class GeneralTable extends LitElement {
+  @property({ type: String }) mode: 'pair' | 'single' = 'single';
   @property({ type: String }) generalType = '';
   @property({ type: String }) typeHeader = '';
-  @property({ type: String }) mode: 'pair' | 'single' = 'single';
+  @property({ type: String }) public ascendingLevel: string = 'red5';
+  @property({ type: String }) public primaryCovenantLevel: string =
+    'civilization';
+  @property({ type: String }) public primarySpecialty1: string = 'gold';
+  @property({ type: String }) public primarySpecialty2: string = 'gold';
+  @property({ type: String }) public primarySpecialty3: string = 'gold';
+  @property({ type: String }) public primarySpecialty4: string = 'gold';
+  @property({ type: String }) public secondaryCovenantLevel: string =
+    'civilization';
+  @property({ type: String }) public secondarySpecialty1: string = 'gold';
+  @property({ type: String }) public secondarySpecialty2: string = 'gold';
+  @property({ type: String }) public secondarySpecialty3: string = 'gold';
+  @property({ type: String }) public secondarySpecialty4: string = 'gold';
 
   @state() private _sorting: SortingState = [];
   @state() private columns: ColumnDef<RowData>[] = [];
   @state() private nameList: RowStub[] = [];
-
-  @state() private ascendingLevel: string = 'red5';
-  @state() private primaryCovenantLevel: string = 'civilization';
-  @state() private primarySpecialty1: string = 'gold';
-  @state() private primarySpecialty2: string = 'gold';
-  @state() private primarySpecialty3: string = 'gold';
-  @state() private primarySpecialty4: string = 'gold';
-  @state() private secondaryCovenantLevel: string = 'civilization';
-  @state() private secondarySpecialty1: string = 'gold';
-  @state() private secondarySpecialty2: string = 'gold';
-  @state() private secondarySpecialty3: string = 'gold';
-  @state() private secondarySpecialty4: string = 'gold';
 
   private dataMap = new Map<number, RowData>();
   private tableData: RowData[] = [];
@@ -152,7 +153,6 @@ export class GeneralTable extends LitElement {
   static styles: CSSResultGroup = [SpectrumTokensCSS, GeneralTableCSS];
 
   override async firstUpdated(_changed: PropertyValues) {
-    this.fetchParams();
     this.columns = this.generateColumns();
     const stubData = await this.fetchStubPairs();
     this.nameList = [...stubData];
@@ -255,7 +255,7 @@ export class GeneralTable extends LitElement {
       url = url + `&specialty3=${this.primarySpecialty3}`;
       url = url + `&specialty4=${this.primarySpecialty4}`;
     } else {
-      url = url.replace('comparison', '');
+      url = url.replace('/comparison', '');
       url = url.replace('Cavalry', 'Mounted');
       url = url.replace('Archer', 'Ranged');
       url = url.replace('Infantry', 'Ground');
@@ -264,7 +264,7 @@ export class GeneralTable extends LitElement {
       url = url + `&primarySpecialty2=${this.primarySpecialty2}`;
       url = url + `&primarySpecialty3=${this.primarySpecialty3}`;
       url = url + `&primarySpecialty4=${this.primarySpecialty4}`;
-      url = url + `&secondaryCovenantLevel=${this.primaryCovenantLevel}`;
+      url = url + `&secondaryCovenantLevel=${this.secondaryCovenantLevel}`;
       url = url + `&secondarySpecialty1=${this.secondarySpecialty1}`;
       url = url + `&secondarySpecialty2=${this.secondarySpecialty2}`;
       url = url + `&secondarySpecialty3=${this.secondarySpecialty3}`;
@@ -337,32 +337,6 @@ export class GeneralTable extends LitElement {
       const parsed = GeneralData.safeParse(json);
       if (parsed.success) return parsed.data;
       throw new Error(parsed.error.message);
-    }
-  }
-
-  private fetchParams() {
-    const urlParams = new URLSearchParams(window.location.search);
-
-    // Get ascending level
-    if (urlParams.has('ascendingLevel')) {
-      this.ascendingLevel = urlParams.get('ascendingLevel') || 'red5';
-    }
-
-    // Get specialty levels based on mode
-    if (this.mode === 'single') {
-      this.primarySpecialty1 = urlParams.get('specialty1') || 'gold';
-      this.primarySpecialty2 = urlParams.get('specialty2') || 'gold';
-      this.primarySpecialty3 = urlParams.get('specialty3') || 'gold';
-      this.primarySpecialty4 = urlParams.get('specialty4') || 'gold';
-    } else {
-      this.primarySpecialty1 = urlParams.get('primarySpecialty1') || 'gold';
-      this.primarySpecialty2 = urlParams.get('primarySpecialty2') || 'gold';
-      this.primarySpecialty3 = urlParams.get('primarySpecialty3') || 'gold';
-      this.primarySpecialty4 = urlParams.get('primarySpecialty4') || 'gold';
-      this.secondarySpecialty1 = urlParams.get('secondarySpecialty1') || 'gold';
-      this.secondarySpecialty2 = urlParams.get('secondarySpecialty2') || 'gold';
-      this.secondarySpecialty3 = urlParams.get('secondarySpecialty3') || 'gold';
-      this.secondarySpecialty4 = urlParams.get('secondarySpecialty4') || 'gold';
     }
   }
 

@@ -113,7 +113,7 @@ package Game::EvonyTKR::Controller::Generals::Pairs {
             order  => 10,
           });
 
-          $routes->get("/$uiTarget/" =>
+          $routes->get("/$uiTarget/comparison" =>
               { generalType => $type, linkTarget => $linkTarget })
             ->to(controller => $controller_name, action => 'typeIndex')
             ->name("${base}_${type}_index");
@@ -206,7 +206,8 @@ package Game::EvonyTKR::Controller::Generals::Pairs {
       return $self->SUPER::render_markdown_file($self, $markdown_path);
     }
     else {
-      $logger->debug("Rendering without markdown file");
+      my %renderStash = %{ $self->stash() };
+      $logger->debug("Rendering without markdown file, stash is " . Data::Printer::np(%renderStash));
       return $self->render;
     }
   }
@@ -279,6 +280,52 @@ package Game::EvonyTKR::Controller::Generals::Pairs {
       );
     }
 
+    my $ascendingLevel       = $self->param('ascendingLevel') // 'red5';
+    my $primaryCovenantLevel = $self->param('primaryCovenantLevel')  // 'civilization';
+    my @primarySpecialties;
+    push @primarySpecialties, $self->param('primarySpecialty1') // 'gold';
+    push @primarySpecialties, $self->param('primarySpecialty2') // 'gold';
+    push @primarySpecialties, $self->param('primarySpecialty3') // 'gold';
+    push @primarySpecialties, $self->param('primarySpecialty4') // 'gold';
+    my $secondaryCovenantLevel = $self->param('secondaryCovenantLevel')
+      // 'civilization';
+    my @secondarySpecialties;
+    push @secondarySpecialties, $self->param('secondarySpecialty1') // 'gold';
+    push @secondarySpecialties, $self->param('secondarySpecialty2') // 'gold';
+    push @secondarySpecialties, $self->param('secondarySpecialty3') // 'gold';
+    push @secondarySpecialties, $self->param('secondarySpecialty4') // 'gold';
+
+    # Validate parameters using enums from Game::EvonyTKR::Model::Data
+    my $data_model = Game::EvonyTKR::Model::Data->new();
+
+    # Validate ascending level
+    if (!$data_model->checkAscendingLevel($ascendingLevel)) {
+      $logger->warn(
+        "Invalid ascendingLevel: $ascendingLevel, using default 'red5'");
+      $ascendingLevel = 'red5';
+    }
+
+    if (!$data_model->checkCovenantLevel($primaryCovenantLevel)) {
+      $logger->warn(
+"Invalid covenantLevel: $primaryCovenantLevel, using default 'civilization'"
+      );
+      $primaryCovenantLevel = 'civilization';
+    }
+
+    @primarySpecialties =
+      $data_model->normalizeSpecialtyLevels(@primarySpecialties);
+
+    if (!$data_model->checkCovenantLevel($secondaryCovenantLevel)) {
+      $logger->warn(
+"Invalid covenantLevel: $secondaryCovenantLevel, using default 'civilization'"
+      );
+      $secondaryCovenantLevel = 'civilization';
+    }
+
+    @secondarySpecialties =
+      $data_model->normalizeSpecialtyLevels(@secondarySpecialties);
+
+
     my $typeMap = {
       'Ground Pairs'  => 'ground_specialist',
       'Ranged Pairs'  => 'ranged_specialist',
@@ -300,15 +347,35 @@ package Game::EvonyTKR::Controller::Generals::Pairs {
     my ($pair) = grep {
       $_->primary->name eq $primaryName && $_->secondary->name eq $secondaryName
     } $pm->get_pairs_by_type($targetType)->@*;
+
     unless ($pair) {
       $logger->warn("Pair not found: $primaryName / $secondaryName");
+
       return $self->render(
         json   => { error => "Pair not found" },
         status => 404
       );
     }
+    $logger->info(sprintf(
+'Computing Pair Buffs for %s/%s targetType %s ascendingLevel %s primary CovenantLevel %s primary Specialties %s secondary CovenantLevel %s secondary Specialties %s',
+      $pair->primary->name,
+      $pair->secondary->name,
+      $targetType,
+      $ascendingLevel,
+      $primaryCovenantLevel,
+      join(', ', @primarySpecialties),
+      $secondaryCovenantLevel,
+      join(', ', @secondarySpecialties),
+    ));
+    $pair->updateBuffsAndDebuffs(
+      $targetType,
+      $ascendingLevel,
+      $primaryCovenantLevel,
+      \@primarySpecialties,
+      $secondaryCovenantLevel,
+      \@secondarySpecialties,
+    );
 
-    $pair->updateBuffs();
     return $self->render(json => $pair);
   }
 }

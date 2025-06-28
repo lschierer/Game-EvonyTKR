@@ -89,7 +89,7 @@ class Game::EvonyTKR::Model::General::Pair : isa(Game::EvonyTKR::Model::Data) {
     }
   }
 
-  method updateBuffs (
+  method updateBuffsAndDebuffs (
     $generalType            = '',
     $primaryAscending       = 'red5',
     $primaryCovenantLevel   = 'civilization',

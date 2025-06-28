@@ -127,7 +127,9 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   // Handle form submission
-  document.getElementById('primary-settings-form').addEventListener('submit', function(e) {
+  document
+  .getElementById('primary-settings-form')
+  .addEventListener('submit', function (e) {
     e.preventDefault();
     const formData = new FormData(e.target);
     const params = new URLSearchParams(formData);
@@ -135,12 +137,13 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 % if ($mode eq 'pair') {
-  document.getElementById('secondary-settings-form').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const formData = new FormData(e.target);
-      const params = new URLSearchParams(formData);
-      window.location.href = window.location.pathname + '?' + params.toString();
-    });
+  document
+  .getElementById('secondary-settings-form')
+  .addEventListener('submit', function (e) {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const params = new URLSearchParams(formData);
+    window.location.href = window.location.pathname + '?' + params.toString();
   });
 % }
 </script>
