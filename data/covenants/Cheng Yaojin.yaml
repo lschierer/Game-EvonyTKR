@@ -1,0 +1,70 @@
+name: Cheng Yaojin
+generals:
+  - Li Shimin
+  - Li Jing
+  - Sun Ci
+levels:
+  - category: War
+    type: personal
+    buff:
+      - attribute: Defense
+        value:
+          number: 10
+          unit: percentage
+        class: Mounted Troops
+  - category: Cooperation
+    type: personal
+    buff:
+      - attribute: Wounded to Death
+        condition:
+          - Attacking
+          - Enemy
+        value:
+          number: 10
+          unit: percentage
+  - category: Peace
+    type: passive
+    buff:
+      - attribute: Training Speed
+        value:
+          number: 10
+          unit: percentage
+        class: Mounted Troops
+  - category: Faith
+    type: personal
+    buff:
+      - attribute: March Size Capacity
+        value:
+          number: 8
+          unit: percentage
+  - category: Faith
+    type: passive
+    buff:
+      - attribute: Marching Speed
+        value:
+          number: 10
+          unit: percentage
+  - category: Honor
+    type: personal
+    buff:
+      - attribute: Attack
+        value:
+          number: 5
+          unit: percentage
+        class: Mounted Troops
+  - category: Civilization
+    type: personal
+    buff:
+      - attribute: Attack
+        value:
+          number: 5
+          unit: percentage
+        class: Mounted Troops
+  - category: Civilization
+    type: personal
+    buff:
+      - attribute: HP
+        value:
+          number: 10
+          unit: percentage
+        class: Mounted Troops
