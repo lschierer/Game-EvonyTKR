@@ -1,0 +1,25 @@
+ascending: true
+basic_attributes:
+  attack:
+    base: 144
+    increment: 9.63
+  defense:
+    base: 131
+    increment: 8.97
+  leadership:
+    base: 116
+    increment: 8.24
+  politics:
+    base: 101
+    increment: 7.55
+book: Whirlwind Iron Axe
+specialties:
+  - Mounted Troop Formation
+  - Annihilation
+  - Mounted Troop Ares
+  - King of Chaos
+stars: red5
+type:
+  - mounted_specialist
+general: Cheng Yaojin
+name: Cheng Yaojin
