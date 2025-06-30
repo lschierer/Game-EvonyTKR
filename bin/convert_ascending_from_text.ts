@@ -1,12 +1,75 @@
 import * as z from "zod";
+import * as yaml from "js-yaml";
+import { createInterface } from "readline";
 
-const input = `
-1 StarAttacking Mounted Troop Defense +20% and HP +20%
-2 StarAttacking Troop Death into Wounded Rate +8%
-3 StarMounted Troop Attack +30%, Mounted Troop and Ground Troop Defense +15%
-4 StarAttacking Mounted Troop Attack +20%, Attacking Ground Troop and Mounted Troop HP +20%
-5 StarWhen attacking, Ground Troop and Mounted Troop Attack +40%, Mounted Troop Defense and HP +25%
-`;
+// Define the schema inline to avoid import issues with spaces in filename
+const Attribute = z.enum([
+  "Attack",
+  "Death to Survival", 
+  "Death to Wounded",
+  "Defense",
+  "Double Items Drop Rate",
+  "HP",
+  "March Size Capacity",
+  "Marching Speed",
+  "Marching Speed to Monsters",
+  "Rally Capacity",
+  "Stamina cost",
+  "SubCity Training Speed",
+  "Wounded to Death",
+]);
+
+const ClassEnum = z.enum([
+  "Ground Troops",
+  "Mounted Troops", 
+  "Ranged Troops",
+  "Siege Machines",
+  "Sieged Machines",
+]);
+
+const Condition = z.enum([
+  "Against Monsters",
+  "Attacking",
+  "dragon to the attack",
+  "Enemy",
+  "Enemy In City", 
+  "In City",
+  "leading the army to attack",
+  "Marching",
+  "Reduces Enemy",
+  "Reduces Monster",
+  "Reinforcing",
+  "When City Mayor for this SubCity",
+  "When Defending Outside The Main City",
+  "When Rallying",
+]);
+
+const Unit = z.enum(["percentage"]);
+
+const Level = z.enum(["red1", "red2", "red3", "red4", "red5"]);
+
+const Value = z.object({
+  number: z.number(),
+  unit: Unit,
+});
+
+const Buff = z.object({
+  attribute: Attribute,
+  condition: z.array(Condition).optional(),
+  class: ClassEnum.optional(),
+  value: Value,
+});
+
+const Ascending = z.object({
+  level: Level,
+  buff: z.array(Buff),
+});
+
+const Ascendingattribute = z.object({
+  ascending: z.array(Ascending),
+  general: z.string().optional(),
+  id: z.string().optional(),
+});
 
 const attributeMap: Record<string, string> = {
   Attack: "Attack",
@@ -40,42 +103,64 @@ function parseLine(line: string) {
   const match = line.match(/^(\d) Star(.*)$/);
   if (!match) return null;
   const level = levelMap[match[1] as keyof typeof levelMap];
-  const rest = match[2].trim();
+  let rest = match[2].trim();
 
   const buffs: any[] = [];
 
-  // Split on , or " and "
-  const parts = rest.split(/,| and /).map((p) => p.trim());
+  // Handle global conditions at the start
+  let globalConditions: string[] = [];
+  for (const cond in conditionMap) {
+    if (rest.startsWith(cond)) {
+      globalConditions.push(conditionMap[cond]);
+      rest = rest.replace(cond, "").trim();
+      if (rest.startsWith(',')) {
+        rest = rest.substring(1).trim();
+      }
+      break;
+    }
+  }
+
+  // Split on commas, but be careful with "and" within buff descriptions
+  const parts = rest.split(',').map(p => p.trim());
 
   for (let part of parts) {
-    let condition: string[] = [];
-    for (const cond in conditionMap) {
-      if (part.includes(cond)) {
-        condition.push(conditionMap[cond]);
-        part = part.replace(cond, "").trim();
+    // Handle "and" within a single buff description
+    const andParts = part.split(' and ').map(p => p.trim());
+    
+    for (let andPart of andParts) {
+      let localConditions = [...globalConditions];
+      
+      // Check for local conditions
+      for (const cond in conditionMap) {
+        if (andPart.includes(cond) && !globalConditions.some(gc => gc === conditionMap[cond])) {
+          localConditions.push(conditionMap[cond]);
+          andPart = andPart.replace(cond, "").trim();
+        }
       }
+
+      // Match the attribute pattern
+      const attrMatch = andPart.match(
+        /(.*?)(Attack|Defense|HP|Troop Death into Wounded Rate|March Size Increase)\s*\+(\d+)%/,
+      );
+      if (!attrMatch) continue;
+
+      const troopPart = attrMatch[1].trim();
+      const fullAttr = attrMatch[2].trim();
+      const number = parseInt(attrMatch[3]);
+
+      const attr = attributeMap[fullAttr] || fullAttr;
+      
+      // Extract troop class from the troop part
+      const troopMatch = troopPart.match(/(Mounted|Ground|Ranged|Siege) Troop/);
+      const classStr = troopMatch ? classMap[troopMatch[0]] : undefined;
+
+      buffs.push({
+        attribute: attr,
+        value: { number, unit: "percentage" },
+        ...(classStr ? { class: classStr } : {}),
+        ...(localConditions.length ? { condition: localConditions } : {}),
+      });
     }
-
-    let match = part.match(
-      /(.*?)(Attack|Defense|HP|Troop Death into Wounded Rate)\s*\+(\d+)%/,
-    );
-    if (!match) continue;
-
-    const fullAttr = match[2].trim();
-    const number = parseInt(match[3]);
-
-    const attr = attributeMap[fullAttr] || fullAttr;
-    const troopMatch = match[1]
-      .trim()
-      .match(/(Mounted|Ground|Ranged|Siege) Troop/);
-    const classStr = troopMatch ? classMap[troopMatch[0]] : undefined;
-
-    buffs.push({
-      attribute: attr,
-      value: { number, unit: "percentage" },
-      ...(classStr ? { class: classStr } : {}),
-      ...(condition.length ? { condition } : {}),
-    });
   }
 
   return {
@@ -90,4 +175,103 @@ function parseInput(input: string) {
   return { ascending };
 }
 
-console.log(JSON.stringify(parseInput(input), null, 2));
+async function promptForInput(): Promise<string> {
+  const rl = createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
+
+  return new Promise((resolve) => {
+    console.log("=== Ascending Attributes Text to YAML Converter ===");
+    console.log("Please paste the ascending attributes text below.");
+    console.log("Expected format: '1 Star Attacking Mounted Troop Defense +20% and HP +20%'");
+    console.log("Press Ctrl+D (Unix/Mac) or Ctrl+Z (Windows) when finished, or type 'END' on a new line:");
+    console.log("");
+    
+    let input = "";
+    
+    rl.on("line", (line) => {
+      if (line.trim() === "END") {
+        rl.close();
+        resolve(input);
+      } else {
+        input += line + "\n";
+      }
+    });
+    
+    rl.on("close", () => {
+      resolve(input);
+    });
+  });
+}
+
+async function promptForOptionalFields(): Promise<{general?: string, id?: string}> {
+  const rl = createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
+
+  return new Promise((resolve) => {
+    console.log("\n=== Optional Fields ===");
+    
+    rl.question("Enter general name (optional, press Enter to skip): ", (general) => {
+      rl.question("Enter ID (optional, press Enter to skip): ", (id) => {
+        rl.close();
+        resolve({
+          ...(general.trim() ? { general: general.trim() } : {}),
+          ...(id.trim() ? { id: id.trim() } : {}),
+        });
+      });
+    });
+  });
+}
+
+async function main() {
+  try {
+    const input = await promptForInput();
+    
+    if (!input.trim()) {
+      console.error("No input provided. Exiting.");
+      process.exit(1);
+    }
+    
+    const optionalFields = await promptForOptionalFields();
+    
+    const result = parseInput(input);
+    
+    // Add optional fields if provided
+    const finalResult = {
+      ...result,
+      ...optionalFields,
+    };
+    
+    // Validate against the Zod schema
+    const validated = Ascendingattribute.parse(finalResult);
+    
+    // Output as YAML 1.2
+    const yamlOutput = yaml.dump(validated, {
+      indent: 2,
+      lineWidth: -1,
+      noRefs: true,
+      sortKeys: false,
+    });
+    
+    console.log("\n=== Generated YAML ===");
+    console.log(yamlOutput);
+    
+    console.log("✅ Conversion completed successfully!");
+    
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      console.error("❌ Validation error:");
+      error.errors.forEach(err => {
+        console.error(`  - ${err.path.join('.')}: ${err.message}`);
+      });
+    } else {
+      console.error("❌ Error:", error);
+    }
+    process.exit(1);
+  }
+}
+
+main();
