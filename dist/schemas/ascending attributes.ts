@@ -19,14 +19,14 @@ export const Attribute = z.enum([
 export type Attribute = z.infer<typeof Attribute>;
 
 
-export const ClassEnum = z.enum([
+export const Class = z.enum([
     "Ground Troops",
     "Mounted Troops",
     "Ranged Troops",
     "Siege Machines",
     "Sieged Machines",
 ]);
-export type ClassEnum = z.infer<typeof ClassEnum>;
+export type Class = z.infer<typeof Class>;
 
 
 export const Condition = z.enum([
@@ -72,7 +72,7 @@ export type Value = z.infer<typeof Value>;
 export const Buff = z.object({
     "attribute": Attribute,
     "condition": z.array(Condition).optional(),
-    "class": ClassEnum.optional(),
+    "class": Class.optional(),
     "value": Value,
 });
 export type Buff = z.infer<typeof Buff>;

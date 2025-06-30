@@ -13,23 +13,29 @@ export const Attribute = z.enum([
     "Marching Speed to Monsters",
     "Rally Capacity",
     "SubCity Construction Speed",
+    "SubCity Death to Survival",
+    "SubCity Gold Production",
+    "SubCity Training Speed",
     "SubCity Troop Capacity",
+    "Training Capacity",
+    "Training Speed",
     "Wounded to Death",
 ]);
 export type Attribute = z.infer<typeof Attribute>;
 
 
-export const ClassEnum = z.enum([
+export const Class = z.enum([
     "Ground Troops",
     "Mounted Troops",
     "Ranged Troops",
     "Siege Machines",
 ]);
-export type ClassEnum = z.infer<typeof ClassEnum>;
+export type Class = z.infer<typeof Class>;
 
 
 export const Condition = z.enum([
     "Against Monsters",
+    "Applied to Barracks Officer",
     "Attacking",
     "brings a dragon",
     "dragon to the attack",
@@ -54,31 +60,31 @@ export const Unit = z.enum([
 export type Unit = z.infer<typeof Unit>;
 
 
-export const LevelEnum = z.enum([
+export const Level = z.enum([
     "Blue",
     "Gold",
     "Green",
     "Orange",
     "Purple",
 ]);
-export type LevelEnum = z.infer<typeof LevelEnum>;
+export type Level = z.infer<typeof Level>;
 
 export const Value = z.object({
     "number": z.number(),
-    "unit": Unit,
+    "unit": Unit.optional(),
 });
 export type Value = z.infer<typeof Value>;
 
 export const Buff = z.object({
     "attribute": Attribute,
-    "class": ClassEnum.optional(),
+    "class": Class.optional(),
     "value": Value,
     "condition": z.array(Condition).optional(),
 });
 export type Buff = z.infer<typeof Buff>;
 
 export const LevelElement = z.object({
-    "level": LevelEnum,
+    "level": Level,
     "buff": z.array(Buff),
 });
 export type LevelElement = z.infer<typeof LevelElement>;
