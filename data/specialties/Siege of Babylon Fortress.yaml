@@ -10,7 +10,7 @@ levels:
           number: 2
           unit: percentage
       - attribute: HP
-        class: Groupd Troops
+        class: Ground Troops
         condition:
           - Enemy
         value:
@@ -32,7 +32,7 @@ levels:
           number: 2
           unit: percentage
       - attribute: HP
-        class: Groupd Troops
+        class: Ground Troops
         condition:
           - Enemy
         value:
@@ -54,7 +54,7 @@ levels:
           number: 4
           unit: percentage
       - attribute: HP
-        class: Groupd Troops
+        class: Ground Troops
         condition:
           - Enemy
         value:
@@ -76,7 +76,7 @@ levels:
           number: 4
           unit: percentage
       - attribute: HP
-        class: Groupd Troops
+        class: Ground Troops
         condition:
           - Enemy
         value:
@@ -98,7 +98,7 @@ levels:
           number: 8
           unit: percentage
       - attribute: HP
-        class: Groupd Troops
+        class: Ground Troops
         condition:
           - Enemy
         value:

@@ -1,0 +1,62 @@
+name: Haakon Haraldsson
+generals:
+  - Margaret I
+  - Harald III
+  - Ragnar
+levels:
+  - category: War
+    type: personal
+    buff:
+      - attribute: March Size Capacity
+        value:
+          number: 8
+          unit: percentage
+  - category: Cooperation
+    type: passive
+    buff:
+      - attribute: HP
+        condition:
+          - When Rallying
+        value:
+          number: 10
+          unit: percentage
+        class: Mounted Troops
+  - category: Peace
+    type: personal
+    buff:
+      - attribute: Defense
+        value:
+          number: 10
+          unit: percentage
+        class: Mounted Troops
+  - category: Faith
+    type: personal
+    buff:
+      - attribute: Attack
+        value:
+          number: 5
+          unit: percentage
+        class: Mounted Troops
+  - category: Faith
+    type: passive
+    buff:
+      - attribute: Training Speed
+        value:
+          number: 10
+          unit: percentage
+        class: Mounted Troops
+  - category: Civilization
+    type: personal
+    buff:
+      - attribute: HP
+        value:
+          number: 10
+          unit: percentage
+        class: Mounted Troops
+      - attribute: Attack
+        condition:
+          - Attacking
+        value:
+          number: 5
+          unit: percentage
+        class: Ground Troops
