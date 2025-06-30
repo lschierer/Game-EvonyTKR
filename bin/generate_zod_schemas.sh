@@ -27,5 +27,6 @@ find $INPUTDIR -type d -mindepth 1 -maxdepth 1 | while read -r fd; do
   echo "$combined_json" > $TEMP;
   pnpm quicktype -l typescript-zod --src-lang json --src $TEMP --top-level $TYPE > "$OUTPUTDIR/$DIR.ts"
   gsed -i -E 's/Schema//g' "$OUTPUTDIR/$DIR.ts"
+  gsed -i -E 's/Enum//g' "$OUTPUTDIR/$DIR.ts"
   rm $TEMP;
 done
