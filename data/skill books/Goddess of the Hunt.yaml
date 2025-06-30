@@ -1,0 +1,25 @@
+name: Goddess of the Hunt
+text: >-
+  Increases mounted troops’ attack and defense by 50% and increases ground troops and mounted troops’ HP by 40% when General is leading the army to attack.
+buff:
+  - attribute: Attack
+    class: Mounted Troops
+    condition:
+      - leading the army to attack
+    value:
+      number: 50
+      unit: percentage
+  - attribute: HP
+    class: Ground Troops
+    condition:
+      - leading the army to attack
+    value:
+      number: 40
+      unit: percentage
+  - attribute: HP
+    class: Mounted Troops
+    condition:
+      - leading the army to attack
+    value:
+      number: 40
+      unit: percentage
