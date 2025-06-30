@@ -96,6 +96,7 @@ class Game::EvonyTKR::Model::General::Pair : isa(Game::EvonyTKR::Model::Data) {
     $primarySpecialties     = ['gold', 'gold', 'gold', 'gold',],
     $secondaryCovenantLevel = 'civilization',
     $secondarySpecialties   = ['gold', 'gold', 'gold', 'gold',],
+    $allowedBuffActivation  = 'Overall',
 
     $keepLevel      = 40,
     $primaryLevel   = 45,
@@ -103,10 +104,11 @@ class Game::EvonyTKR::Model::General::Pair : isa(Game::EvonyTKR::Model::Data) {
   ) {
 
     my $primarySummarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
-      rootManager => $rootManager,
-      general     => $primary,
-      isPrimary   => 1,
-      targetType  => $generalType,
+      rootManager    => $rootManager,
+      general        => $primary,
+      isPrimary      => 1,
+      targetType     => $generalType,
+      activationType => $allowedBuffActivation,
 
       ascendingLevel => $primaryAscending,
       covenantLevel  => $primaryCovenantLevel,
@@ -119,10 +121,11 @@ class Game::EvonyTKR::Model::General::Pair : isa(Game::EvonyTKR::Model::Data) {
       keepLevel    => $keepLevel,
     );
     my $secondarySummarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
-      rootManager => $rootManager,
-      general     => $secondary,
-      isPrimary   => 1,
-      targetType  => $generalType,
+      rootManager    => $rootManager,
+      general        => $secondary,
+      isPrimary      => 1,
+      targetType     => $generalType,
+      activationType => $allowedBuffActivation,
 
       ascendingLevel => 'none',
       covenantLevel  => $secondaryCovenantLevel,

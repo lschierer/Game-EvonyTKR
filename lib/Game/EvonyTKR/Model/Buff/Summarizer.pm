@@ -24,8 +24,9 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
   # Input parameters
   field $rootManager : param;
   field $general : param;
-  field $isPrimary : reader : param  //= 1;
-  field $targetType : reader : param //= '';
+  field $isPrimary : reader : param      //= 1;
+  field $targetType : reader : param     //= '';
+  field $activationType : reader : param //= 'Overall';
 
   # these are needed now
   field $ascendingLevel : reader : param //= 'red5';
@@ -61,128 +62,30 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
     'Siege Machines' => { 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
   };
 
-  # Accessor methods for backward compatibility
-  method marchIncrease() {
-    my $type = $self->_getTroopTypeForTarget();
-    return $buffValues->{$type}->{'March Size Capacity'};
+  method getBuffForTypeAndKey ($troopType, $key) {
+    if (exists $buffValues->{$troopType}) {
+      if (exists $buffValues->{$troopType}->{$key}) {
+        return $buffValues->{$troopType}->{$key};
+      }
+      $self->logger->error(
+        "$key is not a valid key for buffValues at $troopType");
+    }
+    $self->logger->error("$troopType is not a valid troop type for buffValues");
+    return 0;
   }
 
-  method attackIncrease() {
-    my $type = $self->_getTroopTypeForTarget();
-    return $buffValues->{$type}->{'Attack'};
+  method getDebuffForTypeAndKey ($troopType, $key) {
+    if (exists $debuffValues->{$troopType}) {
+      if (exists $debuffValues->{$troopType}->{$key}) {
+        return $debuffValues->{$troopType}->{$key};
+      }
+      $self->logger->error(
+        "$key is not a valid key for debuffValues at $troopType");
+    }
+    $self->logger->error(
+      "$troopType is not a valid troop type for debuffValues");
+    return 0;
   }
-
-  method defenseIncrease() {
-    my $type = $self->_getTroopTypeForTarget();
-    return $buffValues->{$type}->{'Defense'};
-  }
-
-  method hpIncrease() {
-    my $type = $self->_getTroopTypeForTarget();
-    return $buffValues->{$type}->{'HP'};
-  }
-
-  # Granular accessor methods for wall generals and other specialized needs
-  method groundMarchIncrease() {
-    return $buffValues->{'Ground Troops'}->{'March Size Capacity'};
-  }
-
-  method groundAttackIncrease() {
-    return $buffValues->{'Ground Troops'}->{'Attack'};
-  }
-
-  method groundDefenseIncrease() {
-    return $buffValues->{'Ground Troops'}->{'Defense'};
-  }
-  method groundHpIncrease() { return $buffValues->{'Ground Troops'}->{'HP'}; }
-
-  method mountedMarchIncrease() {
-    return $buffValues->{'Mounted Troops'}->{'March Size Capacity'};
-  }
-
-  method mountedAttackIncrease() {
-    return $buffValues->{'Mounted Troops'}->{'Attack'};
-  }
-
-  method mountedDefenseIncrease() {
-    return $buffValues->{'Mounted Troops'}->{'Defense'};
-  }
-  method mountedHpIncrease() { return $buffValues->{'Mounted Troops'}->{'HP'}; }
-
-  method rangedMarchIncrease() {
-    return $buffValues->{'Ranged Troops'}->{'March Size Capacity'};
-  }
-
-  method rangedAttackIncrease() {
-    return $buffValues->{'Ranged Troops'}->{'Attack'};
-  }
-
-  method rangedDefenseIncrease() {
-    return $buffValues->{'Ranged Troops'}->{'Defense'};
-  }
-  method rangedHpIncrease() { return $buffValues->{'Ranged Troops'}->{'HP'}; }
-
-  method siegeMarchIncrease() {
-    return $buffValues->{'Siege Machines'}->{'March Size Capacity'};
-  }
-
-  method siegeAttackIncrease() {
-    return $buffValues->{'Siege Machines'}->{'Attack'};
-  }
-
-  method siegeDefenseIncrease() {
-    return $buffValues->{'Siege Machines'}->{'Defense'};
-  }
-  method siegeHpIncrease() { return $buffValues->{'Siege Machines'}->{'HP'}; }
-
-  method overallMarchIncrease() {
-    return $buffValues->{'Overall'}->{'March Size Capacity'};
-  }
-
-  method overallAttackIncrease() {
-    return $buffValues->{'Overall'}->{'Attack'};
-  }
-
-  method overallDefenseIncrease() {
-    return $buffValues->{'Overall'}->{'Defense'};
-  }
-  method overallHpIncrease() { return $buffValues->{'Overall'}->{'HP'}; }
-
-  method reducegroundattack() {
-    return $debuffValues->{'Ground Troops'}->{'Attack'};
-  }
-
-  method reducegrounddefense() {
-    return $debuffValues->{'Ground Troops'}->{'Defense'};
-  }
-  method reducegroundhp() { return $debuffValues->{'Ground Troops'}->{'HP'}; }
-
-  method reducemountedattack() {
-    return $debuffValues->{'Mounted Troops'}->{'Attack'};
-  }
-
-  method reducemounteddefense() {
-    return $debuffValues->{'Mounted Troops'}->{'Defense'};
-  }
-  method reducemountedhp() { return $debuffValues->{'Mounted Troops'}->{'HP'}; }
-
-  method reducerangedattack() {
-    return $debuffValues->{'Ranged Troops'}->{'Attack'};
-  }
-
-  method reducerangeddefense() {
-    return $debuffValues->{'Ranged Troops'}->{'Defense'};
-  }
-  method reducerangedhp() { return $debuffValues->{'Ranged Troops'}->{'HP'}; }
-
-  method reducesiegeattack() {
-    return $debuffValues->{'Siege Machines'}->{'Attack'};
-  }
-
-  method reducesiegedefense() {
-    return $debuffValues->{'Siege Machines'}->{'Defense'};
-  }
-  method reducesiegehp() { return $debuffValues->{'Siege Machines'}->{'HP'}; }
 
   # Helper method to determine troop type from targetType
   method _getTroopTypeForTarget() {
@@ -205,23 +108,30 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
 
   # Main update methods
   method updateBuffs() {
-    my @troopTypes = (
-      'Ground Troops',
-      'Mounted Troops',
-      'Ranged Troops',
-      'Siege Machines',
-      'Overall'
-    );
 
-    foreach my $troopType (@troopTypes) {
+    $self->logger->info(sprintf(
+'updateBuffs called for %s with isPrimary "%s" targetType "%s" activationType "%s", general set to %s %s %s %s %s %s',
+      $general->name,  $isPrimary,  $targetType, $activationType,
+      $ascendingLevel, $specialty1, $specialty2, $specialty3,
+      $specialty4,     $covenantLevel,
+    ));
+
+    foreach my $troopType (keys %$buffValues) {
       foreach my $attribute (keys %{ $buffValues->{$troopType} }) {
         $buffValues->{$troopType}->{$attribute} =
-          $self->updateBuff($attribute, 'Overall', $troopType);
+          $self->updateBuff($attribute, $troopType);
       }
     }
   }
 
   method updateDebuffs() {
+    $self->logger->info(sprintf(
+'updateDebuffs called for %s with isPrimary "%s" targetType "%s" activationType "%s", general set to %s %s %s %s %s %s',
+      $general->name,  $isPrimary,  $targetType, $activationType,
+      $ascendingLevel, $specialty1, $specialty2, $specialty3,
+      $specialty4,     $covenantLevel,
+    ));
+
     foreach my $troopType (keys %$debuffValues) {
       foreach my $attribute (keys %{ $debuffValues->{$troopType} }) {
         $debuffValues->{$troopType}->{$attribute} =
@@ -231,45 +141,74 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
   }
 
   # Filter buff conditions based on activation type
-  method filterBuffConditions($activationType) {
+  method filterBuffConditions() {
     my @buffConditions = $self->buffConditionValues->values->@*;
 
     # Create a mapping of activation types to filter patterns
     my %activationFilters = (
-      'PvM'         => qr/(Defend|Defense|Reinforc|City)/,
-      'Overall'     => qr/(Monsters|Defend|Defense|Reinforc|City|Mayor)/,
-      'Attacking'   => qr/(Monsters|Defend|Defense|Reinforc|City|Mayor)/,
-      'Reinforcing' =>
-        qr/(Monsters|Mayor|Rally|attack|Marching|When the Main)/i,
-      'Wall'  => qr/(Monsters|Mayor|Rally|attack|Marching|Reinfor|Outside)/i,
-      'Mayor' => qr/(Mayor|In Main City)/,
+      'PvM' => [
+        'Against Monsters',
+        'Attacking',
+        "brings a dragon",
+        "brings dragon or beast to attack",
+        "dragon to the attack",
+        "leading the army to attack",
+        "Marching",
+        "When Rallying",
+      ],
+      'Overall'   => ["brings a dragon", "Marching", "When Rallying",],
+      'Attacking' => [
+        "Attacking",
+        "brings a dragon",
+        "brings dragon or beast to attack",
+        "dragon to the attack",
+        "leading the army to attack",
+        "Marching",
+        "When Rallying",
+      ],
+      'Reinforcing' => [
+        "brings a dragon",
+        "Defending", "Marching", "Reinforcing",
+        "When Defending Outside The Main City",
+        "In Main City", 'In City',
+      ],
+      'Wall' => [
+        "brings a dragon",
+        "Defending",    "When City Mayor for this SubCity",
+        "In Main City", 'In City', "When the Main Defense General",
+      ],
+      'Mayor' =>
+        ['When City Mayor for this SubCity', "In Main City", 'In City',],
     );
 
     if (exists $activationFilters{$activationType}) {
-      if ($activationType eq 'Mayor') {
-        # For Mayor, we keep only matching conditions
-        @buffConditions =
-          grep {/$activationFilters{$activationType}/} @buffConditions;
-      }
-      else {
-        # For others, we filter out matching conditions
-        @buffConditions =
-          grep { !/$activationFilters{$activationType}/ } @buffConditions;
-      }
+      my $allowed = $activationFilters{$activationType};
+
+      my %allowed = map { $_ => 1 } @$allowed;
+
+      my @filtered = grep { $allowed{$_} } @buffConditions;
+
+      $self->logger->debug(
+            "Filtering buff conditions for $activationType: allowed = ["
+          . join(', ', @$allowed)
+          . "] → result = ["
+          . join(', ', @filtered)
+          . "]");
+
+      return \@filtered;
     }
     else {
       $self->logger->warn(
         sprintf('activationType %s is not handled. Using Overall',
           $activationType)
       );
-      return $self->filterBuffConditions('Overall');
+      $activationType = 'Overall';
+      return $self->filterBuffConditions();
     }
-
-    return \@buffConditions;
   }
 
   # Filter debuff conditions based on activation type
-  method filterDebuffConditions($activationType) {
+  method filterDebuffConditions() {
     my @debuffConditions = $self->debuffConditionValues->values->@*;
 
     if ($activationType ne 'PvM') {
@@ -284,33 +223,32 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
   }
 
   # Core buff calculation method
-  method updateBuff(
-    $attribute,
-    $activationType = 'Overall',
-    $troopType = 'Overall'
-  ) {
+  method updateBuff($attribute, $buffType) {
+
     my $total          = 0;
-    my $buffConditions = $self->filterBuffConditions($activationType);
+    my $buffConditions = $self->filterBuffConditions();
 
     # Add standard skill book value if applicable
     if ($isPrimary) {
-      my $standardSkill = $self->getStandardSkillValue($attribute, $troopType);
+      my $standardSkill = $self->getStandardSkillValue($attribute, $buffType);
       $total += $standardSkill;
       $self->logger->debug(
-"adding standard skillbook value $standardSkill for attribute $attribute and troop type $troopType."
+"adding standard skillbook value $standardSkill for attribute $attribute and buff type $buffType."
       );
     }
 
     # Add buff values from various sources
     $total +=
-      $self->summarize_from_sources($attribute, $troopType, $buffConditions);
+      $self->summarize_from_sources($attribute, $buffType, $buffConditions);
 
-    $self->logger->info("returning $attribute total for $troopType: $total");
+    $self->logger->debug("returning $attribute total for $buffType: $total");
     return $total;
   }
 
   # Get standard skill book value
   method getStandardSkillValue($attribute, $troopType) {
+    my $total = 0;
+    my $tt    = $troopType =~ s/ Troops$//r;    # Remove " Troops" suffix
     if (
       $attribute eq 'March Size Capacity'
       && $rootManager->generalConflictGroupManager->is_book_compatible(
@@ -318,10 +256,10 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
         $general->name
       )
     ) {
-      return 12;
+      $total += 12;
     }
     elsif ($attribute =~ /(Attack|Defense|HP)/) {
-      my $tt = $troopType =~ s/ Troops$//r;    # Remove " Troops" suffix
+
       if (
         $troopType ne 'Overall'
         && $rootManager->generalConflictGroupManager->is_book_compatible(
@@ -329,27 +267,30 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
           $general->name
         )
       ) {
-        return 25;
+        $total += 25;
       }
     }
-    return 0;
+    if ($activationType eq 'PvM') {
+      if ($attribute =~ /(Attack|Defense|HP)/) {
+        if ($troopType ne 'Overall') {
+          if ($rootManager->generalConflictGroupManager->is_book_compatible(
+            "Monster $tt $attribute Increase",
+            $general->name
+          )) {
+            $total += 45;
+          }
+        }
+      }
+    }
+    return $total;
   }
 
   # Core debuff calculation method
-  method updateDebuff($attribute, $debuffType, $activationType = 'Overall') {
+  method updateDebuff($attribute, $debuffType) {
     my $total = 0;
 
-    if (!$self->allowedBuffActivation->check($activationType)) {
-      $self->logger->error(sprintf(
-        'activation type must be one of %s not %s.',
-        join(", ", $self->allowedBuffActivation->values->@*),
-        $activationType,
-      ));
-      return $total;
-    }
-
-    my $buffConditions   = $self->filterBuffConditions($activationType);
-    my $debuffConditions = $self->filterDebuffConditions($activationType);
+    my $buffConditions   = $self->filterBuffConditions();
+    my $debuffConditions = $self->filterDebuffConditions();
 
     if (!scalar(@$debuffConditions)) {
       $self->logger->error("Debuff MUST have debuffConditions.");
@@ -361,7 +302,7 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
       $self->summarize_from_sources($attribute, $debuffType, $buffConditions,
       $debuffConditions);
 
-    $self->logger->info("returning $attribute total: $total");
+    $self->logger->debug("returning $attribute total for $debuffType: $total");
     return $total;
   }
 

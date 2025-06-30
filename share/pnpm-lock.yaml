@@ -70,7 +70,7 @@ importers:
         version: 3.13.12
       evonytkrtips-data:
         specifier: github:lschierer/EvonyTKRTips-Data
-        version: '@evonytkrtips/data@https://codeload.github.com/lschierer/EvonyTKRTips-Data/tar.gz/73d7ff2109dd59d9af7da3434bc1786f56f29f47'
+        version: '@evonytkrtips/data@https://codeload.github.com/lschierer/EvonyTKRTips-Data/tar.gz/92b07acf95dde89d1d5e53cd973b489971eaf908'
       iconify-icon:
         specifier: ^3.0.0
         version: 3.0.0
@@ -91,8 +91,8 @@ importers:
         specifier: ^22.0.2
         version: 22.0.2
       '@types/node':
-        specifier: ^24.0.6
-        version: 24.0.6
+        specifier: ^24.0.7
+        version: 24.0.7
       '@types/postcss-import':
         specifier: ^14.0.3
         version: 14.0.3
@@ -581,8 +581,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@evonytkrtips/data@https://codeload.github.com/lschierer/EvonyTKRTips-Data/tar.gz/73d7ff2109dd59d9af7da3434bc1786f56f29f47':
-    resolution: {tarball: https://codeload.github.com/lschierer/EvonyTKRTips-Data/tar.gz/73d7ff2109dd59d9af7da3434bc1786f56f29f47}
+  '@evonytkrtips/data@https://codeload.github.com/lschierer/EvonyTKRTips-Data/tar.gz/92b07acf95dde89d1d5e53cd973b489971eaf908':
+    resolution: {tarball: https://codeload.github.com/lschierer/EvonyTKRTips-Data/tar.gz/92b07acf95dde89d1d5e53cd973b489971eaf908}
     version: 1.0.0
 
   '@iconify/types@2.0.0':
@@ -807,8 +807,8 @@ packages:
   '@tsconfig/node22@22.0.2':
     resolution: {integrity: sha512-Kmwj4u8sDRDrMYRoN9FDEcXD8UpBSaPQQ24Gz+Gamqfm7xxn+GBR7ge/Z7pK8OXNGyUzbSwJj+TH6B+DS/epyA==}
 
-  '@types/node@24.0.6':
-    resolution: {integrity: sha512-ZOyn+gOs749xU7ovp+Ibj0g1o3dFRqsfPnT22C2t5JzcRvgsEDpGawPbCISGKLudJk9Y0wiu9sYd6kUh0pc9TA==}
+  '@types/node@24.0.7':
+    resolution: {integrity: sha512-YIEUUr4yf8q8oQoXPpSlnvKNVKDQlPMWrmOcgzoduo7kvA2UF0/BwJ/eMKFTiTtkNL17I0M6Xe2tvwFU7be6iw==}
 
   '@types/postcss-import@14.0.3':
     resolution: {integrity: sha512-raZhRVTf6Vw5+QbmQ7LOHSDML71A5rj4+EqDzAbrZPfxfoGzFxMHRCq16VlddGIZpHELw0BG4G0YE2ANkdZiIQ==}
@@ -973,8 +973,8 @@ packages:
     peerDependencies:
       postcss: ^8.4
 
-  css-select@5.1.0:
-    resolution: {integrity: sha512-nwoRF1rvRRnnCqqY7updORDsuqKzqYJ28+oSMaJMMgOauh3fvwHqMS7EZpIPqK8GL+g9mKxF1vP/ZjSeNjEVHg==}
+  css-select@5.2.2:
+    resolution: {integrity: sha512-TizTzUddG/xYLA3NXodFM0fSbNizXjOKhqiQQwvhlspadZokn1KDy0NZFS0wuEubIYAV5/c1/lAr0TaaFXEXzw==}
 
   css-tree@2.2.1:
     resolution: {integrity: sha512-OA0mILzGc1kCOCSJerOeqDxDQ4HOh+G8NbOJFOTgOCzpw7fCBubk0fEyxp8AgOL/jvLgYA/uV0cMbe43ElF1JA==}
@@ -988,8 +988,8 @@ packages:
     resolution: {integrity: sha512-0eW44TGN5SQXU1mWSkKwFstI/22X2bG1nYzZTYMAWjylYURhse752YgbE4Cx46AC+bAvI+/dYTPRk1LqSUnu6w==}
     engines: {node: ^10 || ^12.20.0 || ^14.13.0 || >=15.0.0}
 
-  css-what@6.1.0:
-    resolution: {integrity: sha512-HTUrgRJ7r4dsZKU6GjmpfRK1O76h97Z8MfS1G0FozR+oF2kG6Vfe8JE6zwrkbxigziPHinCJ+gCPjA9EaBDtRw==}
+  css-what@6.2.2:
+    resolution: {integrity: sha512-u/O3vwbptzhMs3L1fQE82ZSLHQQfto5gyZzwteVIEyeaY5Fc7R4dapF/BvRoSYFeqfBk4m0V1Vafq5Pjv25wvA==}
     engines: {node: '>= 6'}
 
   cssdb@8.3.1:
@@ -1201,8 +1201,8 @@ packages:
     resolution: {integrity: sha512-0hJU9SCPvmMzIBdZFqNPXWa6dqh7WdH0cII9y+CyS8rG3nL48Bclra9HmKhVVUHyPWNH5Y7xDwAB7bfgSjkUMQ==}
     engines: {node: '>= 0.4'}
 
-  hookified@1.9.1:
-    resolution: {integrity: sha512-u3pxtGhKjcSXnGm1CX6aXS9xew535j3lkOCegbA6jdyh0BaAjTbXI4aslKstCr6zUNtoCxFGFKwjbSHdGrMB8g==}
+  hookified@1.10.0:
+    resolution: {integrity: sha512-dJw0492Iddsj56U1JsSTm9E/0B/29a1AuoSLRAte8vQg/kaTGF3IgjEWT8c8yG4cC10+HisE1x5QAwR0Xwc+DA==}
 
   html-tags@3.3.1:
     resolution: {integrity: sha512-ztqyC3kLto0e9WbNp0aeP+M3kTt+nbaIveGmUxAtZa+8iFgKLUOD4YKM5j+f3QD89bra7UeumolZHKuOXnTmeQ==}
@@ -2418,7 +2418,7 @@ snapshots:
   '@esbuild/win32-x64@0.25.5':
     optional: true
 
-  '@evonytkrtips/data@https://codeload.github.com/lschierer/EvonyTKRTips-Data/tar.gz/73d7ff2109dd59d9af7da3434bc1786f56f29f47': {}
+  '@evonytkrtips/data@https://codeload.github.com/lschierer/EvonyTKRTips-Data/tar.gz/92b07acf95dde89d1d5e53cd973b489971eaf908': {}
 
   '@iconify/types@2.0.0': {}
 
@@ -2550,7 +2550,7 @@ snapshots:
 
   '@tsconfig/node22@22.0.2': {}
 
-  '@types/node@24.0.6':
+  '@types/node@24.0.7':
     dependencies:
       undici-types: 7.8.0
 
@@ -2632,7 +2632,7 @@ snapshots:
 
   cacheable@1.10.0:
     dependencies:
-      hookified: 1.9.1
+      hookified: 1.10.0
       keyv: 5.3.4
 
   callsites@3.1.0: {}
@@ -2719,10 +2719,10 @@ snapshots:
     dependencies:
       postcss: 8.5.6
 
-  css-select@5.1.0:
+  css-select@5.2.2:
     dependencies:
       boolbase: 1.0.0
-      css-what: 6.1.0
+      css-what: 6.2.2
       domhandler: 5.0.3
       domutils: 3.2.2
       nth-check: 2.1.1
@@ -2742,7 +2742,7 @@ snapshots:
       mdn-data: 2.12.2
       source-map-js: 1.2.1
 
-  css-what@6.1.0: {}
+  css-what@6.2.2: {}
 
   cssdb@8.3.1: {}
 
@@ -2914,7 +2914,7 @@ snapshots:
     dependencies:
       cacheable: 1.10.0
       flatted: 3.3.3
-      hookified: 1.9.1
+      hookified: 1.10.0
 
   flatted@3.3.3: {}
 
@@ -2990,7 +2990,7 @@ snapshots:
     dependencies:
       function-bind: 1.1.2
 
-  hookified@1.9.1: {}
+  hookified@1.10.0: {}
 
   html-tags@3.3.1: {}
 
@@ -3784,9 +3784,9 @@ snapshots:
     dependencies:
       '@trysound/sax': 0.2.0
       commander: 7.2.0
-      css-select: 5.1.0
+      css-select: 5.2.2
       css-tree: 2.3.1
-      css-what: 6.1.0
+      css-what: 6.2.2
       csso: 5.0.5
       picocolors: 1.1.1
 

@@ -18,8 +18,9 @@
     <general-table
       mode='pair'
       generaltype="<%= $generalType %>"
-      typeheader="<%= $linkTarget %>"
+      uiTarget="<%= $uiTarget %>"
       ascendingLevel="<%= $ascendingLevel %>"
+      allowedBuffActivation="<%= $buffActivation %>"
       primaryCovenantLevel="<%= $primaryCovenantLevel %>"
       primarySpecialty1="<%= $primarySpecialties->[0] %>"
       primarySpecialty2="<%= $primarySpecialties->[1] %>"

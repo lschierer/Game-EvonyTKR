@@ -28,13 +28,40 @@ class Game::EvonyTKR::Model::Data : isa(Game::EvonyTKR::Model::Logger) {
     )]
   );
 
-  field $allowedBuffActivation : reader = Type::Tiny::Enum->new(
-    values => [
-      "Overall", "PvM",     "Attacking", "Reinforcing",
-      "Defense", "In City", "Out City",  "Wall",
-      "Mayor",   "Officer",
-    ]
+  field $GeneralKeys : reader = Type::Tiny::Enum->new(
+    values => [qw(
+      ground_specialist
+      mounted_specialist
+      ranged_specialist
+      siege_specialist
+      mayor
+      officer
+      wall
+    )]
   );
+
+  field $allowedBuffActivation : reader = [
+    "Overall", "PvM",     "Attacking", "Reinforcing",
+    "Defense", "In City", "Out City",  "Wall",
+    "Mayor",   "Officer",
+  ];
+
+  method validateBuffActivation ($proposed) {
+
+    my %valid;
+    foreach my $key ($allowedBuffActivation->@*) {
+      $valid{$key} = 1;
+    }
+
+    if (none { $_ eq $proposed } $allowedBuffActivation->@*) {
+      $self->logger->warn(
+"validateBuffActivation detected illegal Buff Activation Condition $proposed"
+      );
+      return 0;
+    }
+
+    return 1;
+  }
 
   field $buffAttributeValues : reader = Type::Tiny::Enum->new(
     values => [
@@ -57,6 +84,7 @@ class Game::EvonyTKR::Model::Data : isa(Game::EvonyTKR::Model::Logger) {
       "SubCity Gold Production",
       "SubCity Training Speed",
       "SubCity Troop Capacity",
+      "SubCity Death to Survival",
       "Training Capacity",
       "Training Speed",
       "Wounded to Death",
@@ -80,6 +108,7 @@ class Game::EvonyTKR::Model::Data : isa(Game::EvonyTKR::Model::Logger) {
       "In Main City",
       'In City',
       "When the Main Defense General",
+      "Applied to Barracks Officer",
     ]
 
   );
@@ -109,28 +138,14 @@ class Game::EvonyTKR::Model::Data : isa(Game::EvonyTKR::Model::Logger) {
     return $allowedConditions;
   }
 
-  field $targetedTypeValues : reader = Type::Tiny::Enum->new(
-    values => [
-      'Ground Troops',
-      'Mounted Troops',
-      'Ranged Troops',
-      'Siege Machines',
-      'All Troops',
-      'Monsters',
-    ]
-  );
-
-  field $GeneralKeys : reader = Type::Tiny::Enum->new(
-    values => [qw(
-      ground_specialist
-      mounted_specialist
-      ranged_specialist
-      siege_specialist
-      mayor
-      officer
-      wall
-    )]
-  );
+  field $targetedTypes : reader = [
+    'Ground Troops',
+    'Mounted Troops',
+    'Ranged Troops',
+    'Siege Machines',
+    'All Troops',
+    'Monsters',
+  ];
 
   field $allowedValueUnits : reader =
     Type::Tiny::Enum->new(values => [qw( flat percentage )]);

@@ -19,8 +19,17 @@ require Game::EvonyTKR::Model::Buff::Summarizer;
 require Game::EvonyTKR::Model::General::ConflictGroup::Manager;
 require Game::EvonyTKR::Model::EvonyTKR::Manager;
 
-use Log::Log4perl qw(:easy);
-Log::Log4perl->easy_init($ERROR);  # Only show errors and above
+use Log::Log4perl;
+
+Log::Log4perl::init(\<<'EOT');
+log4perl.rootLogger              = ERROR, Screen
+log4perl.logger.Game.EvonyTKR.Model.Buff = INFO, Screen
+
+log4perl.appender.Screen         = Log::Log4perl::Appender::Screen
+log4perl.appender.Screen.stderr = 1
+log4perl.appender.Screen.layout  = PatternLayout
+log4perl.appender.Screen.layout.ConversionPattern = %d [%p] %m%n
+EOT
 
 # Create a test class that mimics the EvonyTKR::Manager structure
 class BuffSummarizerTest {
@@ -105,6 +114,10 @@ $testManager->rootImport();
 my $marco_polo = $testManager->generalManager->getGeneral("Marco Polo");
 ok(defined $marco_polo, "Marco Polo general loaded");
 
+my $aethelflaed = $testManager->generalManager->getGeneral("Aethelflaed");
+ok(defined $aethelflaed, "Aethelflaed general loaded");
+
+
 # Test case: All values set to 'none'
 subtest "Marco Polo with all values set to 'none'" => sub {
 
@@ -113,6 +126,7 @@ subtest "Marco Polo with all values set to 'none'" => sub {
         general        => $marco_polo,
         isPrimary      => 1,
         targetType     => 'mounted_specialist',
+        activationType => 'Attacking',
         ascendingLevel => 'none',
         covenantLevel  => 'none',
         specialty1    => 'none',
@@ -150,6 +164,52 @@ subtest "Marco Polo with all values set to 'none'" => sub {
     }, "No debuffs should be present");
 };
 
+# Test case: All values set to 'none'
+subtest "Aethelflaed with all values set to 'none'" => sub {
+
+    my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
+        rootManager    => $testManager,
+        general        => $aethelflaed,
+        isPrimary      => 1,
+        targetType     => 'mounted_specialist',
+        activationType => 'PvM',
+        ascendingLevel => 'none',
+        covenantLevel  => 'none',
+        specialty1    => 'none',
+        specialty2    => 'none',
+        specialty3    => 'none',
+        specialty4    => 'none',
+    );
+
+    $summarizer->updateBuffs();
+    $summarizer->updateDebuffs();
+
+    # Test Buff values for different troop types
+    is_deeply($summarizer->buffValues->{'Ground Troops'},
+        { 'March Size Capacity' => 12, 'Attack' => 70, 'Defense' => 70, 'HP' => 70 },
+        "Ground troop buffs should match expected values");
+
+    is_deeply($summarizer->buffValues->{'Mounted Troops'},
+        { 'March Size Capacity' => 12, 'Attack' => 80, 'Defense' => 125, 'HP' => 70 },
+        "Mounted troop buffs should match expected values");
+
+    is_deeply($summarizer->buffValues->{'Ranged Troops'},
+        { 'March Size Capacity' => 12, 'Attack' => 70, 'Defense' => 70, 'HP' => 70 },
+        "Ranged troop buffs should match expected values");
+
+    is_deeply($summarizer->buffValues->{'Siege Machines'},
+        { 'March Size Capacity' => 12, 'Attack' => 70, 'Defense' => 70, 'HP' => 70 },
+        "Siege Machines buffs should match expected values");
+
+    # Test Debuff values for different troop types
+    is_deeply($summarizer->debuffValues, {
+        'Ground Troops'  => { 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
+        'Mounted Troops' => { 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
+        'Ranged Troops'  => { 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
+        'Siege Machines' => { 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
+    }, "No debuffs should be present");
+};
+
 # Additional test cases can be added here for other combinations
 # For example:
 
@@ -161,6 +221,7 @@ subtest "Marco Polo with Red1 ascending, all else none" => sub {
         general        => $marco_polo,
         isPrimary      => 1,
         targetType     => 'mounted_specialist',
+        activationType => 'Attacking',
         ascendingLevel => 'red1',
         covenantLevel  => 'none',
         specialty1    => 'none',
@@ -206,6 +267,7 @@ subtest "Marco Polo with Red2 ascending, all else none" => sub {
         general        => $marco_polo,
         isPrimary      => 1,
         targetType     => 'mounted_specialist',
+        activationType => 'Attacking',
         ascendingLevel => 'red2',
         covenantLevel  => 'none',
         specialty1    => 'none',
@@ -251,6 +313,7 @@ subtest "Marco Polo with Red3 ascending, all else none" => sub {
         general        => $marco_polo,
         isPrimary      => 1,
         targetType     => 'mounted_specialist',
+        activationType => 'Attacking',
         ascendingLevel => 'red3',
         covenantLevel  => 'none',
         specialty1    => 'none',
@@ -296,6 +359,7 @@ subtest "Marco Polo with Red4 ascending, all else none" => sub {
         general        => $marco_polo,
         isPrimary      => 1,
         targetType     => 'mounted_specialist',
+        activationType => 'Attacking',
         ascendingLevel => 'red4',
         covenantLevel  => 'none',
         specialty1    => 'none',
@@ -341,6 +405,7 @@ subtest "Marco Polo with Red5 ascending, all else none" => sub {
         general        => $marco_polo,
         isPrimary      => 1,
         targetType     => 'mounted_specialist',
+        activationType => 'Attacking',
         ascendingLevel => 'red5',
         covenantLevel  => 'none',
         specialty1    => 'none',
@@ -386,6 +451,7 @@ subtest "Marco Polo with Green 1st specialty, all else none" => sub {
         general        => $marco_polo,
         isPrimary      => 1,
         targetType     => 'mounted_specialist',
+        activationType => 'Attacking',
         ascendingLevel => 'none',
         covenantLevel  => 'none',
         specialty1    => 'green',
@@ -431,6 +497,7 @@ subtest "Marco Polo with Blue 1st specialty, all else none" => sub {
         general        => $marco_polo,
         isPrimary      => 1,
         targetType     => 'mounted_specialist',
+        activationType => 'Attacking',
         ascendingLevel => 'none',
         covenantLevel  => 'none',
         specialty1    => 'blue',
@@ -476,6 +543,7 @@ subtest "Marco Polo with Purple 1st specialty, all else none" => sub {
         general        => $marco_polo,
         isPrimary      => 1,
         targetType     => 'mounted_specialist',
+        activationType => 'Attacking',
         ascendingLevel => 'none',
         covenantLevel  => 'none',
         specialty1    => 'purple',
@@ -521,6 +589,7 @@ subtest "Marco Polo with Orange 1st specialty, all else none" => sub {
         general        => $marco_polo,
         isPrimary      => 1,
         targetType     => 'mounted_specialist',
+        activationType => 'Attacking',
         ascendingLevel => 'none',
         covenantLevel  => 'none',
         specialty1    => 'orange',
@@ -566,6 +635,7 @@ subtest "Marco Polo with Gold 1st specialty, all else none" => sub {
         general        => $marco_polo,
         isPrimary      => 1,
         targetType     => 'mounted_specialist',
+        activationType => 'Attacking',
         ascendingLevel => 'none',
         covenantLevel  => 'none',
         specialty1    => 'gold',
@@ -612,6 +682,7 @@ subtest "Marco Polo with Civilization covenant, all else none" => sub {
         general        => $marco_polo,
         isPrimary      => 1,
         targetType     => 'mounted_specialist',
+        activationType => 'Attacking',
         ascendingLevel => 'none',
         covenantLevel  => 'Civilization',
         specialty1    => 'none',
@@ -637,6 +708,7 @@ subtest "Marco Polo with all maxed out" => sub {
         general        => $marco_polo,
         isPrimary      => 1,
         targetType     => 'mounted_specialist',
+        activationType => 'Attacking',
         ascendingLevel => 'red5',
         covenantLevel  => 'Civilization',
         specialty1    => 'gold',
@@ -652,5 +724,50 @@ subtest "Marco Polo with all maxed out" => sub {
     # This is a placeholder - you'll need to compute these values by hand
     pass("All maxed out test placeholder - add actual assertions");
 };
+subtest "Aethelflaed with all maxed out" => sub {
 
+    my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
+        rootManager    => $testManager,
+        general        => $aethelflaed,
+        isPrimary      => 1,
+        targetType     => 'mounted_specialist',
+        activationType => 'PvM',
+        ascendingLevel => 'red5',
+        covenantLevel  => 'Civilization',
+        specialty1    => 'gold',
+        specialty2    => 'gold',
+        specialty3    => 'gold',
+        specialty4    => 'gold',
+    );
+
+    $summarizer->updateBuffs();
+    $summarizer->updateDebuffs();
+
+    # Add your expected values here
+    is_deeply($summarizer->buffValues->{'Ground Troops'},
+        { 'March Size Capacity' => 12, 'Attack' => 100, 'Defense' => 140, 'HP' => 115 },
+        "Ground troop buffs should match expected values");
+
+    is_deeply($summarizer->buffValues->{'Mounted Troops'},
+        { 'March Size Capacity' => 12, 'Attack' => 155, 'Defense' => 205, 'HP' => 155 },
+        "Mounted troop buffs should match expected values");
+
+    is_deeply($summarizer->buffValues->{'Ranged Troops'},
+        { 'March Size Capacity' => 12, 'Attack' => 70, 'Defense' => 110, 'HP' => 115 },
+        "Ranged troop buffs should match expected values");
+
+    is_deeply($summarizer->buffValues->{'Siege Machines'},
+        { 'March Size Capacity' => 12, 'Attack' => 70, 'Defense' => 110, 'HP' => 115 },
+        "Siege Machines buffs should match expected values");
+
+    # Test Debuff values for different troop types
+    is_deeply($summarizer->debuffValues, {
+        'Ground Troops'  => { 'Attack' => 25, 'Defense' => 10, 'HP' => 0 },
+        'Mounted Troops' => { 'Attack' => 25, 'Defense' => 10, 'HP' => 0 },
+        'Ranged Troops'  => { 'Attack' => 25, 'Defense' => 10, 'HP' => 0 },
+        'Siege Machines' => { 'Attack' => 25, 'Defense' => 10, 'HP' => 0 },
+    }, "No debuffs should be present");
+};
+
+#
 done_testing();

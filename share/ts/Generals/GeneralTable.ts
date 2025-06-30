@@ -1,5 +1,6 @@
 // This component supports both single-general and general-pair modes.
 // It progressively loads full data row-by-row from the appropriate endpoint.
+const DEBUG = true;
 
 import 'iconify-icon';
 import { customElement, property, state } from 'lit/decorators.js';
@@ -126,7 +127,7 @@ const tableHeaders = new Map<string, string>([
 export class GeneralTable extends LitElement {
   @property({ type: String }) mode: 'pair' | 'single' = 'single';
   @property({ type: String }) generalType = '';
-  @property({ type: String }) typeHeader = '';
+  @property({ type: String }) uiTarget = '';
   @property({ type: String }) public ascendingLevel: string = 'red5';
   @property({ type: String }) public primaryCovenantLevel: string =
     'civilization';
@@ -140,6 +141,7 @@ export class GeneralTable extends LitElement {
   @property({ type: String }) public secondarySpecialty2: string = 'gold';
   @property({ type: String }) public secondarySpecialty3: string = 'gold';
   @property({ type: String }) public secondarySpecialty4: string = 'gold';
+  @property({ type: String }) public allowedBuffActivation: string = 'Overall';
 
   @state() private _sorting: SortingState = [];
   @state() private columns: ColumnDef<RowData>[] = [];
@@ -162,14 +164,17 @@ export class GeneralTable extends LitElement {
   protected override async willUpdate(_changedProperties: PropertyValues) {
     if (
       _changedProperties.has('ascendingLevel') ||
+      _changedProperties.has('primaryCovenantLevel') ||
       _changedProperties.has('primarySpecialty1') ||
       _changedProperties.has('primarySpecialty2') ||
       _changedProperties.has('primarySpecialty3') ||
       _changedProperties.has('primarySpecialty4') ||
+      _changedProperties.has('secondaryCovenantLevel') ||
       _changedProperties.has('secondarySpecialty1') ||
       _changedProperties.has('secondarySpecialty2') ||
       _changedProperties.has('secondarySpecialty3') ||
-      _changedProperties.has('secondarySpecialty4')
+      _changedProperties.has('secondarySpecialty4') ||
+      _changedProperties.has('allowedBuffActivation')
     ) {
       this.nameList.forEach((nameStub, index) => {
         nameStub.current = 'stale';
@@ -227,7 +232,7 @@ export class GeneralTable extends LitElement {
               @click=${info.column.getToggleSortingHandler()}
             >
               ${key === 'primary' && this.mode === 'single'
-                ? this.typeHeader
+                ? this.uiTarget
                 : (tableHeaders.get(key) ?? key)}
               ${direction
                 ? html`<span class="table-header-sort">
@@ -245,39 +250,48 @@ export class GeneralTable extends LitElement {
       });
   }
 
-  private async fetchStubPairs(): Promise<RowStub[]> {
-    let url = window.location.pathname.replace(/\/$/, '') + '/data.json';
-    url = url + `?ascendingLevel=${this.ascendingLevel}`;
-    if (this.mode === 'single') {
-      url = url + `&covenantLevel=${this.primaryCovenantLevel}`;
-      url = url + `&specialty1=${this.primarySpecialty1}`;
-      url = url + `&specialty2=${this.primarySpecialty2}`;
-      url = url + `&specialty3=${this.primarySpecialty3}`;
-      url = url + `&specialty4=${this.primarySpecialty4}`;
+  private urlConversion(scope: 'data' | 'row'): string {
+    let basePath = window.location.pathname.replace(/\/$/, '');
+    console.log(
+      `urlconversion for ${scope} and mode ${this.mode} for original url ${basePath}`,
+    );
+    basePath = decodeURIComponent(basePath);
+
+    if (scope === 'data') {
+      if (this.mode === 'pair') {
+        basePath = basePath.replace('pair-comparison', 'pair/data.json');
+      } else {
+        basePath = basePath.replace('comparison', 'data.json');
+      }
     } else {
-      url = url.replace('/comparison', '');
-      url = url.replace('Cavalry', 'Mounted');
-      url = url.replace('Archer', 'Ranged');
-      url = url.replace('Infantry', 'Ground');
-      url = url + `&primaryCovenantLevel=${this.primaryCovenantLevel}`;
-      url = url + `&primarySpecialty1=${this.primarySpecialty1}`;
-      url = url + `&primarySpecialty2=${this.primarySpecialty2}`;
-      url = url + `&primarySpecialty3=${this.primarySpecialty3}`;
-      url = url + `&primarySpecialty4=${this.primarySpecialty4}`;
-      url = url + `&secondaryCovenantLevel=${this.secondaryCovenantLevel}`;
-      url = url + `&secondarySpecialty1=${this.secondarySpecialty1}`;
-      url = url + `&secondarySpecialty2=${this.secondarySpecialty2}`;
-      url = url + `&secondarySpecialty3=${this.secondarySpecialty3}`;
-      url = url + `&secondarySpecialty4=${this.secondarySpecialty4}`;
+      if (this.mode === 'pair') {
+        basePath = basePath.replace('pair-comparison', 'pair-row.json');
+      } else {
+        basePath = basePath.replace('comparison', 'primary/row.json');
+      }
     }
+    console.log(`urlConversion returning ${basePath}`);
+    return basePath;
+  }
+
+  private async fetchStubPairs(): Promise<RowStub[]> {
+    const url = this.urlConversion('data');
+
+    if (DEBUG) {
+      console.log(`[fetchStubPairs] Mode: ${this.mode}, URL: ${url}`);
+    }
+
     const res = await fetch(url);
     const json = await res.json();
+
     const result =
       this.mode === 'pair'
         ? GeneralPairStub.array().safeParse(json.data)
         : GeneralDataStub.array().safeParse(json);
+
     if (result.success) return result.data;
-    console.error('Stub validation failed', result.error);
+
+    console.error('[fetchStubPairs] Stub validation failed', result.error);
     return [];
   }
 
@@ -285,11 +299,8 @@ export class GeneralTable extends LitElement {
     this.nameList[index].current = 'pending';
     const stub = this.nameList[index];
 
-    let basePath = window.location.pathname.replace(/\/comparison\/?$/, '');
+    let basePath = this.urlConversion('row');
     if (this.mode === 'pair') {
-      basePath = basePath.replace('Cavalry', 'Mounted');
-      basePath = basePath.replace('Archer', 'Ranged');
-      basePath = basePath.replace('Infantry', 'Ground');
       const pairStub = stub as GeneralPairStub;
       const params = new URLSearchParams({
         primary: pairStub.primary.name,
@@ -306,7 +317,7 @@ export class GeneralTable extends LitElement {
         secondarySpecialty3: this.secondarySpecialty3,
         secondarySpecialty4: this.secondarySpecialty4,
       });
-      const url = `${basePath}/pair?${params.toString()}`;
+      const url = `${basePath}?${params.toString()}`;
       const res = await fetch(url);
       const json = await res.json();
       const parsed = GeneralPair.safeParse(json);
@@ -314,15 +325,8 @@ export class GeneralTable extends LitElement {
       console.error(parsed.error.message);
       throw new Error(parsed.error.message);
     } else {
-      const parts = basePath.split('/');
-      const lastPart = parts.pop() ?? '';
-      const normalizedType =
-        lastPart === 'Mayors'
-          ? 'Mayor Specialist'
-          : lastPart.replace(/s$/, '') + ' Specialist';
-      const newBasePath = [...parts, normalizedType].join('/');
-
       const params = new URLSearchParams({
+        generalType: this.generalType,
         ascendingLevel: this.ascendingLevel,
         covenantLevel: this.primaryCovenantLevel,
         specialty1: this.primarySpecialty1,
@@ -331,7 +335,7 @@ export class GeneralTable extends LitElement {
         specialty4: this.primarySpecialty4,
       });
 
-      const url = `${newBasePath}/primary/${encodeURIComponent(stub.primary.name)}?${params.toString()}`;
+      const url = `${basePath}?name=${encodeURIComponent(stub.primary.name)}&${params.toString()}`;
       const res = await fetch(url);
       const json = await res.json();
       const parsed = GeneralData.safeParse(json);

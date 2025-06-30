@@ -7,7 +7,6 @@
 <div class="general-comparison">
   <%= include 'partials/level_settings_form',
       mode                  => $mode,
-      linkTarget            => $linkTarget,
       covenantLevel         => $covenantLevel,
       ascendingLevel        => $ascendingLevel,
       specialties          => $specialties,
@@ -17,7 +16,8 @@
     <general-table
       mode='single'
       generaltype="<%= $generalType %>"
-      typeheader="<%= $linkTarget %>"
+      uiTarget="<%= $uiTarget %>"
+      allowedBuffActivation="<%= $buffActivation %>"
       ascendingLevel="<%= $ascendingLevel %>"
       primaryCovenantLevel="<%= $covenantLevel %>"
       primarySpecialty1="<%= $specialties->[0] %>"

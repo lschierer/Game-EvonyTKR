@@ -2,6 +2,7 @@
 layout: standard
 title: Notes on General's Buffs
 author: Luke Schierer
+order: 10
 ---
 
 
