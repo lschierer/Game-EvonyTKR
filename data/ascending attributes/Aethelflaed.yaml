@@ -1,6 +1,6 @@
 ---
 ascending:
-  - level: "red1"
+  - level: red1
     buff:
       - attribute: HP
         condition:
@@ -12,11 +12,10 @@ ascending:
       - attribute: Defense
         condition:
           - Against Monsters
-        class: Mounted Troops
         value:
           number: 10
           unit: percentage
-  - level: "red2"
+  - level: red2
     buff:
       - attribute: Defense
         condition:
@@ -30,7 +29,7 @@ ascending:
         value:
           number: 15
           unit: percentage
-  - level: "red3"
+  - level: red3
     buff:
       - attribute: Attack
         condition:
@@ -44,7 +43,7 @@ ascending:
         value:
           number: 20
           unit: percentage
-  - level: "red4"
+  - level: red4
     buff:
       - attribute: Attack
         condition:
@@ -59,7 +58,7 @@ ascending:
         value:
           number: 20
           unit: percentage
-  - level: "red5"
+  - level: red5
     buff:
       - attribute: Attack
         condition:
