@@ -1,0 +1,24 @@
+name: Haakon the Good
+text: >-
+  Increases mounted troops’ attack and HP by 50% and increases ground troops and mounted troops’ defense by 40% when General is leading the army.
+buff:
+  - attribute: Attack
+    class: Mounted Troops
+    value:
+      number: 50
+      unit: percentage
+  - attribute: HP
+    class: Mounted Troops
+    value:
+      number: 50
+      unit: percentage
+  - attribute: Defense
+    class: Ground Troops
+    value:
+      number: 40
+      unit: percentage
+  - attribute: HP
+    class: Mounted Troops
+    value:
+      number: 40
+      unit: percentage

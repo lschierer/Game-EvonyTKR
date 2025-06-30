@@ -1,0 +1,25 @@
+ascending: true
+basic_attributes:
+  attack:
+    base: 132
+    increment: 9.02
+  defense:
+    base: 128
+    increment: 8.61
+  leadership:
+    base: 131
+    increment: 8.89
+  politics:
+    base: 100
+    increment: 8.22
+book: Haakon the Good
+specialties:
+  - Mounted Troop Formation
+  - Annihilation
+  - Mounted Troop Ares
+  - Battle of Rastarkalv
+stars: red5
+type:
+  - mounted_specialist
+general: Haakon Haraldsson
+name: Haakon Haraldsson
