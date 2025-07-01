@@ -2,22 +2,22 @@ ascending:
   - level: red1
     buff:
       - attribute: Attack
-        class: Mounted Troops
+        class: Ground Troops
         value:
           number: 5
           unit: percentage
       - attribute: Attack
-        class: Ground Troops
+        class: Mounted Troops
         value:
           number: 5
           unit: percentage
       - attribute: Defense
-        class: Mounted Troops
+        class: Ground Troops
         value:
           number: 10
           unit: percentage
       - attribute: Defense
-        class: Ground Troops
+        class: Mounted Troops
         value:
           number: 10
           unit: percentage
@@ -25,7 +25,7 @@ ascending:
     buff:
       - attribute: Death to Wounded
         condition:
-          - Attacking
+          - Marching
         value:
           number: 8
           unit: percentage
@@ -55,26 +55,21 @@ ascending:
   - level: red5
     buff:
       - attribute: Attack
-        class: Mounted Troops
+        class: Ground Troops
         value:
           number: 20
           unit: percentage
       - attribute: Attack
-        class: Ground Troops
+        class: Mounted Troops
         value:
           number: 20
           unit: percentage
       - attribute: Defense
-        class: Mounted Troops
+        class: Ground Troops
         value:
           number: 15
           unit: percentage
       - attribute: Defense
-        class: Ground Troops
-        value:
-          number: 15
-          unit: percentage
-      - attribute: HP
         class: Mounted Troops
         value:
           number: 15
@@ -84,3 +79,10 @@ ascending:
         value:
           number: 15
           unit: percentage
+      - attribute: HP
+        class: Mounted Troops
+        value:
+          number: 15
+          unit: percentage
+general: Cheng Yaojin
+id: Cheng Yaojin
