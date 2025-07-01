@@ -1,0 +1,25 @@
+ascending: true
+basic_attributes:
+  attack:
+    base: 83
+    increment: 6.65
+  defense:
+    base: 101
+    increment: 7.49
+  leadership:
+    base: 108
+    increment: 8.49
+  politics:
+    base: 119
+    increment: 8.49
+book: Domination
+specialties:
+  - Ranged Troop Defense
+  - Pacify
+  - Ruler
+  - Territory Expansion
+stars: red5
+type:
+  - mayor
+general: Catherine II
+name: Catherine II

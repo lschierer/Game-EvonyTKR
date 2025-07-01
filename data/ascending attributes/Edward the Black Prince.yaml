@@ -7,15 +7,15 @@ ascending:
           number: 5
           unit: percentage
       - attribute: Defense
-        class: Mounted Troops
         condition:
           - Enemy
+        class: Mounted Troops
         value:
-          number: 15
+          number: -15
           unit: percentage
   - level: red2
     buff:
-      - attribute: Death to Wounded
+      - attribute: Wounded to Death
         condition:
           - Enemy
           - In City
@@ -36,11 +36,11 @@ ascending:
           number: 10
           unit: percentage
       - attribute: HP
-        class: Mounted Troops
         condition:
           - Enemy
+        class: Mounted Troops
         value:
-          number: 20
+          number: -20
           unit: percentage
   - level: red5
     buff:
@@ -50,9 +50,11 @@ ascending:
           number: 15
           unit: percentage
       - attribute: Attack
-        class: Mounted Troops
         condition:
           - Enemy
+        class: Mounted Troops
         value:
-          number: 5
+          number: -5
           unit: percentage
+general: Edward the Black Prince
+id: Edward the Black Prince
