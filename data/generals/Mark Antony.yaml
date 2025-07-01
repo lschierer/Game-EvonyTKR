@@ -1,0 +1,25 @@
+ascending: true
+basic_attributes:
+  leadership:
+    base: 121
+    increment: 9.09
+  attack:
+    base: 112
+    increment: 8.73
+  defense:
+    base: 108
+    increment: 8.59
+  politics:
+    base: 119
+    increment: 8.95
+book: Plebeian Tribune
+specialties:
+  - Ground Troop Defense
+  - Snipe
+  - Iron Warrior
+  - Parthian War
+stars: red5
+type:
+  - mayor
+general: Mark Antony
+name: Mark Antony

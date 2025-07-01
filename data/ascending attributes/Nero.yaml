@@ -1,7 +1,7 @@
 ascending:
   - level: red1
     buff:
-      - attribute: Defense
+      - attribute: HP
         condition:
           - Enemy
         value:
@@ -9,17 +9,9 @@ ascending:
           unit: percentage
   - level: red2
     buff:
-      - attribute: Defense
+      - attribute: HP
         condition:
           - Enemy
-        class: Ranged Troops
-        value:
-          number: -10
-          unit: percentage
-      - attribute: Defense
-        condition:
-          - Enemy
-        class: Siege Machines
         value:
           number: -10
           unit: percentage
@@ -27,21 +19,13 @@ ascending:
         condition:
           - When City Mayor for this SubCity
         value:
-          number: 20
+          number: 10
           unit: percentage
   - level: red3
     buff:
       - attribute: Defense
         condition:
           - Enemy
-        class: Ground Troops
-        value:
-          number: -10
-          unit: percentage
-      - attribute: Defense
-        condition:
-          - Enemy
-        class: Mounted Troops
         value:
           number: -10
           unit: percentage
@@ -49,11 +33,17 @@ ascending:
         condition:
           - When City Mayor for this SubCity
         value:
-          number: 15
+          number: 10
           unit: percentage
   - level: red4
     buff:
-      - attribute: HP
+      - attribute: Attack
+        condition:
+          - Enemy
+        value:
+          number: -5
+          unit: percentage
+      - attribute: Defense
         condition:
           - Enemy
         value:
@@ -67,5 +57,5 @@ ascending:
         value:
           number: -10
           unit: percentage
-general: Harald
-id: Harald
+general: Nero
+id: Nero

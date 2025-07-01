@@ -1,0 +1,25 @@
+ascending: true
+basic_attributes:
+  leadership:
+    base: 115
+    increment: 8.80
+  attack:
+    base: 111
+    increment: 8.79
+  defense:
+    base: 107
+    increment: 8.75
+  politics:
+    base: 128
+    increment: 9.02
+book: Battle of Kircholm
+specialties:
+  - Siege Machine Defense
+  - Snipe
+  - War God
+  - Grand Hetman
+stars: red5
+type:
+  - mayor
+general: Jan Karol Chodkiewicz
+name: Jan Karol Chodkiewicz
