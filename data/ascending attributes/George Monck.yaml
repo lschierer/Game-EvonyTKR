@@ -1,0 +1,51 @@
+ascending:
+  - level: red1
+    buff:
+      - attribute: Defense
+        class: Mounted Troops
+        value:
+          number: 15
+          unit: percentage
+      - attribute: HP
+        value:
+          number: 15
+          unit: percentage
+  - level: red2
+    buff:
+      - attribute: Death to Wounded
+        value:
+          number: 8
+          unit: percentage
+  - level: red3
+    buff:
+      - attribute: Attack
+        condition:
+          - Attacking
+        class: Mounted Troops
+        value:
+          number: 35
+          unit: percentage
+  - level: red4
+    buff:
+      - attribute: Attack
+        class: Mounted Troops
+        value:
+          number: 15
+          unit: percentage
+      - attribute: HP
+        value:
+          number: 15
+          unit: percentage
+  - level: red5
+    buff:
+      - attribute: Attack
+        class: Mounted Troops
+        value:
+          number: 40
+          unit: percentage
+      - attribute: HP
+        value:
+          number: 25
+          unit: percentage
+general: George Monck
+id: George Monck

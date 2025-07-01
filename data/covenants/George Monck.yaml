@@ -1,0 +1,69 @@
+name: George Monck
+generals:
+  - Queen Victoria
+  - Edward III
+  - John Hunyadi
+levels:
+  - category: Cooperation
+    type: passive
+    buff:
+      - attribute: Training Speed
+        value:
+          number: 10
+          unit: percentage
+        class: Mounted Troops
+  - category: Peace
+    type: personal
+    buff:
+      - attribute: Attack
+        condition:
+          - Marching
+        value:
+          number: 5
+          unit: percentage
+        class: Mounted Troops
+  - category: Faith
+    type: personal
+    buff:
+      - attribute: Defense
+        condition:
+          - Marching
+        value:
+          number: 10
+          unit: percentage
+        class: Mounted Troops
+  - category: Faith
+    type: passive
+    buff:
+      - attribute: Attack
+        condition:
+          - When Rallying
+        value:
+          number: 10
+          unit: percentage
+        class: Mounted Troops
+  - category: Honor
+    type: personal
+    buff:
+      - attribute: HP
+        condition:
+          - Marching
+        value:
+          number: 10
+          unit: percentage
+        class: Mounted Troops
+  - category: Civilization
+    type: personal
+    buff:
+      - attribute: Attack
+        value:
+          number: 5
+          unit: percentage
+        class: Mounted Troops
+      - attribute: Defense
+        condition:
+          - When Rallying
+        value:
+          number: 10
+          unit: percentage
+        class: Mounted Troops
