@@ -13,11 +13,10 @@ basic_attributes:
     base: 103
     increment: 8.64
 book: King of the Vikings
-display: summary
 specialties:
   - Siege Machine Assault
   - Sabotage
-  - Kings Ambition
+  - King's Ambition
   - Harald Bluetooth
 stars: red5
 type:
