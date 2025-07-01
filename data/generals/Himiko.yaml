@@ -1,0 +1,25 @@
+ascending: true
+basic_attributes:
+  leadership:
+    base: 112
+    increment: 9.16
+  attack:
+    base: 113
+    increment: 8.71
+  defense:
+    base: 106
+    increment: 8.36
+  politics:
+    base: 111
+    increment: 8.64
+book: Kiido Magic
+specialties:
+  - Ranged Troop Assault
+  - Snipe
+  - Iron Warrior
+  - Queen of Yamataikoku
+stars: red5
+type:
+  - mayor
+general: Himiko
+name: Himiko

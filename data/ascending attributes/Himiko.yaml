@@ -1,33 +1,31 @@
 ascending:
   - level: red1
     buff:
-      - attribute: HP
-        condition:
-          - Enemy
+      - attribute: Attack
         class: Ranged Troops
         value:
-          number: -15
+          number: 5
           unit: percentage
-      - attribute: HP
-        condition:
-          - Enemy
-        class: Siege Machines
+      - attribute: Defense
+        class: Ranged Troops
         value:
-          number: -15
+          number: 15
           unit: percentage
   - level: red2
     buff:
       - attribute: Death to Wounded
         condition:
-          - Marching
+          - leading the army to attack
         value:
           number: 8
           unit: percentage
   - level: red3
     buff:
-      - attribute: March Size Capacity
+      - attribute: Rally Capacity
+        condition:
+          - When Rallying
         value:
-          number: 10
+          number: 6
           unit: percentage
   - level: red4
     buff:
@@ -36,22 +34,27 @@ ascending:
         value:
           number: 10
           unit: percentage
-      - attribute: Attack
-        class: Siege Machines
+      - attribute: HP
+        class: Ranged Troops
         value:
-          number: 10
+          number: 15
           unit: percentage
   - level: red5
     buff:
       - attribute: Attack
         class: Ranged Troops
         value:
-          number: 15
+          number: 10
           unit: percentage
-      - attribute: Attack
-        class: Siege Machines
+      - attribute: Defense
+        class: Ranged Troops
         value:
-          number: 15
+          number: 10
           unit: percentage
-general: Gustavus Adolphus
-id: Gustavus Adolphus
+      - attribute: HP
+        class: Ranged Troops
+        value:
+          number: 10
+          unit: percentage
+general: Himiko
+id: Himiko

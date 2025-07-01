@@ -4,48 +4,19 @@ ascending:
       - attribute: Defense
         condition:
           - Enemy
-        class: Ground Troops
-        value:
-          number: -10
-          unit: percentage
-      - attribute: Defense
-        condition:
-          - Enemy
-        class: Mounted Troops
-        value:
-          number: -10
-          unit: percentage
-      - attribute: HP
-        condition:
-          - Enemy
-        class: Ground Troops
-        value:
-          number: -10
-          unit: percentage
-      - attribute: HP
-        condition:
-          - Enemy
-        class: Mounted Troops
         value:
           number: -10
           unit: percentage
   - level: red2
     buff:
-      - attribute: Defense
-        condition:
-          - Enemy
-        class: Ground Troops
-        value:
-          number: -15
-          unit: percentage
-      - attribute: Defense
+      - attribute: Attack
         condition:
           - Enemy
         class: Mounted Troops
         value:
-          number: -15
+          number: -10
           unit: percentage
-      - attribute: SubCity Training Speed
+      - attribute: Death to Survival
         condition:
           - When City Mayor for this SubCity
         value:
@@ -53,53 +24,38 @@ ascending:
           unit: percentage
   - level: red3
     buff:
-      - attribute: Defense
+      - attribute: HP
         condition:
           - Enemy
-        class: Ground Troops
         value:
-          number: -15
+          number: -10
           unit: percentage
-      - attribute: Defense
-        condition:
-          - Enemy
-        class: Mounted Troops
-        value:
-          number: -15
-          unit: percentage
-      - attribute: Death to Survival
+      - attribute: SubCity Training Speed
         condition:
           - When City Mayor for this SubCity
         value:
-          number: 10
+          number: 20
           unit: percentage
   - level: red4
     buff:
       - attribute: Attack
         condition:
           - Enemy
-        class: Ground Troops
-        value:
-          number: -10
-          unit: percentage
-      - attribute: Attack
-        condition:
-          - Enemy
         class: Mounted Troops
         value:
-          number: -10
+          number: -15
           unit: percentage
-      - attribute: HP
+      - attribute: Defense
         condition:
           - Enemy
-        class: Ground Troops
+        class: Siege Machines
         value:
           number: -15
           unit: percentage
       - attribute: HP
         condition:
           - Enemy
-        class: Mounted Troops
+        class: Siege Machines
         value:
           number: -15
           unit: percentage
@@ -119,19 +75,33 @@ ascending:
         value:
           number: -15
           unit: percentage
-      - attribute: HP
+      - attribute: Defense
         condition:
           - Enemy
-        class: Ground Troops
+        class: Ranged Troops
+        value:
+          number: -15
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - Enemy
+        class: Siege Machines
         value:
           number: -15
           unit: percentage
       - attribute: HP
         condition:
           - Enemy
-        class: Mounted Troops
+        class: Ranged Troops
         value:
           number: -15
           unit: percentage
-general: Empress Dowager Cixi
-id: Empress Dowager Cixi
+      - attribute: HP
+        condition:
+          - Enemy
+        class: Siege Machines
+        value:
+          number: -15
+          unit: percentage
+general: Jan Karol Chodkiewicz
+id: Jan Karol Chodkiewicz

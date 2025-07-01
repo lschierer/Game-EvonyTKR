@@ -1,0 +1,25 @@
+ascending: true
+basic_attributes:
+  leadership:
+    base: 117
+    increment: 9.03
+  attack:
+    base: 105
+    increment: 8.14
+  defense:
+    base: 108
+    increment: 8.66
+  politics:
+    base: 115
+    increment: 9.16
+book: Queen of Northern Europe
+specialties:
+  - Ranged Troop Assault
+  - Pacify
+  - King’s Ambition
+  - Uncrowned Queen
+stars: red5
+type:
+  - mayor
+general: Margaret I
+name: Margaret I

@@ -1,0 +1,25 @@
+ascending: true
+basic_attributes:
+  leadership:
+    base: 109
+    increment: 8.74
+  attack:
+    base: 93
+    increment: 7.33
+  defense:
+    base: 96
+    increment: 7.49
+  politics:
+    base: 114
+    increment: 7.99
+book: Civilization
+specialties:
+  - Ground Troop Defense
+  - Pacify
+  - Ruler
+  - Hangul
+stars: red5
+type:
+  - mayor
+general: King Sejong
+name: King Sejong

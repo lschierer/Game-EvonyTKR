@@ -4,46 +4,46 @@ ascending:
       - attribute: Defense
         condition:
           - Enemy
-        class: Ground Troops
+        class: Ranged Troops
         value:
           number: -10
           unit: percentage
       - attribute: Defense
         condition:
           - Enemy
-        class: Mounted Troops
+        class: Siege Machines
         value:
           number: -10
           unit: percentage
       - attribute: HP
         condition:
           - Enemy
-        class: Ground Troops
+        class: Ranged Troops
         value:
           number: -10
           unit: percentage
       - attribute: HP
         condition:
           - Enemy
-        class: Mounted Troops
+        class: Siege Machines
         value:
           number: -10
           unit: percentage
   - level: red2
     buff:
-      - attribute: Defense
+      - attribute: Attack
         condition:
           - Enemy
         class: Ground Troops
         value:
-          number: -15
+          number: -10
           unit: percentage
-      - attribute: Defense
+      - attribute: Attack
         condition:
           - Enemy
         class: Mounted Troops
         value:
-          number: -15
+          number: -10
           unit: percentage
       - attribute: SubCity Training Speed
         condition:
@@ -71,7 +71,7 @@ ascending:
         condition:
           - When City Mayor for this SubCity
         value:
-          number: 10
+          number: 20
           unit: percentage
   - level: red4
     buff:
@@ -80,14 +80,14 @@ ascending:
           - Enemy
         class: Ground Troops
         value:
-          number: -10
+          number: -15
           unit: percentage
       - attribute: Attack
         condition:
           - Enemy
         class: Mounted Troops
         value:
-          number: -10
+          number: -15
           unit: percentage
       - attribute: HP
         condition:
@@ -105,33 +105,33 @@ ascending:
           unit: percentage
   - level: red5
     buff:
-      - attribute: Attack
+      - attribute: Defense
         condition:
           - Enemy
-        class: Ground Troops
+        class: Ranged Troops
         value:
-          number: -15
+          number: -10
           unit: percentage
-      - attribute: Attack
+      - attribute: Defense
         condition:
           - Enemy
-        class: Mounted Troops
+        class: Siege Machines
         value:
-          number: -15
-          unit: percentage
-      - attribute: HP
-        condition:
-          - Enemy
-        class: Ground Troops
-        value:
-          number: -15
+          number: -10
           unit: percentage
       - attribute: HP
         condition:
           - Enemy
-        class: Mounted Troops
+        class: Ranged Troops
         value:
-          number: -15
+          number: -50
           unit: percentage
-general: Empress Dowager Cixi
-id: Empress Dowager Cixi
+      - attribute: HP
+        condition:
+          - Enemy
+        class: Siege Machines
+        value:
+          number: -50
+          unit: percentage
+general: Gilgamesh
+id: Gilgamesh

@@ -1,0 +1,25 @@
+ascending: true
+basic_attributes:
+  leadership:
+    base: 109
+    increment: 8.73
+  attack:
+    base: 115
+    increment: 8.67
+  defense:
+    base: 112
+    increment: 9.14
+  politics:
+    base: 124
+    increment: 8.63
+book: Lion of Sagami
+specialties:
+  - Ground Troop Defense
+  - Snipe
+  - War God
+  - Siege of Kawagoe
+stars: red5
+type:
+  - mayor
+general: Hojo Ujiyasu
+name: Hojo Ujiyasu
