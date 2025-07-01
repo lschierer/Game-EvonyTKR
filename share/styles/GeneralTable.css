@@ -1,6 +1,6 @@
 /* Styles for the General Pairs table */
 
-@import url('@spectrum-css/table/index.css');
+@import url('@spectrum-css/table/dist/index.css');
 @import url('@spectrum-css/overlay/index.css');
 
 .loading-overlay {

@@ -2,9 +2,9 @@ use v5.40.0;
 use experimental qw(class);
 use utf8::all;
 
-use FindBin;
+use File::FindLib 'lib';
 require JSON::PP;
-use lib "$FindBin::Bin/../../../lib";
+
 require Game::EvonyTKR::Model::Buff;
 require Game::EvonyTKR::Model::Buff::Value;
 use namespace::clean;

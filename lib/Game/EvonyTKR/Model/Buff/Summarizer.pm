@@ -62,43 +62,44 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
     'Siege Machines' => { 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
   };
 
-  method getBuffForTypeAndKey ($troopType, $key) {
-    if (exists $buffValues->{$troopType}) {
-      if (exists $buffValues->{$troopType}->{$key}) {
-        return $buffValues->{$troopType}->{$key};
+  method getBuffForTypeAndKey ($tt, $key) {
+    # normalize $tt
+    $tt = $self->_getTroopTypeForTarget($tt);
+    if (exists $buffValues->{$tt}) {
+      if (exists $buffValues->{$tt}->{$key}) {
+        return $buffValues->{$tt}->{$key};
       }
-      $self->logger->error(
-        "$key is not a valid key for buffValues at $troopType");
+      $self->logger->error("$key is not a valid key for buffValues at $tt");
     }
-    $self->logger->error("$troopType is not a valid troop type for buffValues");
+    $self->logger->error("$tt is not a valid troop type for buffValues");
     return 0;
   }
 
-  method getDebuffForTypeAndKey ($troopType, $key) {
-    if (exists $debuffValues->{$troopType}) {
-      if (exists $debuffValues->{$troopType}->{$key}) {
-        return $debuffValues->{$troopType}->{$key};
+  method getDebuffForTypeAndKey ($tt, $key) {
+    # normalize $tt
+    $tt = $self->_getTroopTypeForTarget($key);
+    if (exists $debuffValues->{$tt}) {
+      if (exists $debuffValues->{$tt}->{$key}) {
+        return $debuffValues->{$tt}->{$key};
       }
-      $self->logger->error(
-        "$key is not a valid key for debuffValues at $troopType");
+      $self->logger->error("$key is not a valid key for debuffValues at $tt");
     }
-    $self->logger->error(
-      "$troopType is not a valid troop type for debuffValues");
+    $self->logger->error("$tt is not a valid troop type for debuffValues");
     return 0;
   }
 
   # Helper method to determine troop type from targetType
-  method _getTroopTypeForTarget() {
-    if ($targetType =~ /Ground/i) {
+  method _getTroopTypeForTarget($tt = $targetType) {
+    if ($tt =~ /Ground/i) {
       return 'Ground Troops';
     }
-    elsif ($targetType =~ /Mounted/i) {
+    elsif ($tt =~ /Mounted/i) {
       return 'Mounted Troops';
     }
-    elsif ($targetType =~ /Ranged/i) {
+    elsif ($tt =~ /Ranged/i) {
       return 'Ranged Troops';
     }
-    elsif ($targetType =~ /Siege/i) {
+    elsif ($tt =~ /Siege/i) {
       return 'Siege Machines';
     }
     else {
@@ -122,9 +123,14 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
           $self->updateBuff($attribute, $troopType);
       }
     }
+    $self->logger->info(
+      "returning buffs for " . $general->name . Data::Printer::np($buffValues));
   }
 
   method updateDebuffs() {
+    if (!$general) {
+      $self->logger->logcroak("NO GENERAL ASSIGNED FOR " . blessed($self));
+    }
     $self->logger->info(sprintf(
 'updateDebuffs called for %s with isPrimary "%s" targetType "%s" activationType "%s", general set to %s %s %s %s %s %s',
       $general->name,  $isPrimary,  $targetType, $activationType,
@@ -138,6 +144,9 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
           $self->updateDebuff($attribute, $troopType);
       }
     }
+    $self->logger->info("returning debuffs for"
+        . $general->name
+        . Data::Printer::np($debuffValues));
   }
 
   # Filter buff conditions based on activation type

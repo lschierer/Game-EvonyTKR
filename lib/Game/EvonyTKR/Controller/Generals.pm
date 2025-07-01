@@ -137,6 +137,15 @@ package Game::EvonyTKR::Controller::Generals {
 
       }
     );
+    # two routes for directory indices
+    $mainRoutes->get('/:uiTarget')->to(
+      controller => 'Generals',
+      action     => 'uiTarget_index',
+    )->name('General_dynamic_uiTarget_index');
+    $mainRoutes->get('/:uiTarget/:buffActivation')->to(
+      controller => 'Generals',
+      action     => 'buffActivation_index',
+    )->name('General_dynamic_buffActivation_index');
     # two routes for the user interface
     $mainRoutes->get('/:uiTarget/:buffActivation/comparison')->to(
       controller => 'Generals',
@@ -166,6 +175,58 @@ package Game::EvonyTKR::Controller::Generals {
       controller => 'Generals',
       action     => 'pairRow',
     )->name('Generals_dynamic_pairRow');
+
+    foreach my $route ($app->general_routing->all_valid_routes()) {
+      $logger->debug("building nav items for "
+          . $route->{uiTarget} . "|"
+          . $route->{buffActivation});
+      my $printableUI = $route->{uiTarget} =~ s/-/ /rg;
+
+      $app->add_navigation_item({
+        title  => sprintf('Picking %s',   $printableUI),
+        path   => sprintf('/Generals/%s', $route->{uiTarget}),
+        parent => '/Generals',
+        order  => 20 + ($route->{order} || 0),
+      });
+
+      $app->add_navigation_item({
+        title => sprintf(
+          'Picking %s Generals for %s',
+          $printableUI, $route->{buffActivation}
+        ),
+        path => sprintf('/Generals/%s/%s',
+          $route->{uiTarget}, $route->{buffActivation}),
+        parent => sprintf('/Generals/%s', $route->{uiTarget}),
+        order  => 20 + ($route->{order} || 0),
+      });
+
+      my $path = sprintf('/Generals/%s/%s/comparison',
+        $route->{uiTarget}, $route->{buffActivation});
+      $app->add_navigation_item({
+        title =>
+          sprintf('%s %s Comparison', $printableUI, $route->{buffActivation}),
+        path   => $path,
+        parent => sprintf('/Generals/%s/%s',
+          $route->{uiTarget}, $route->{buffActivation}),
+        order => 20 + ($route->{order} || 0),
+      });
+
+      # Add pair comparison navigation item if applicable
+      if ($route->{has_pairs}) {
+        my $pair_path = sprintf('/Generals/%s/%s/pair-comparison',
+          $route->{uiTarget}, $route->{buffActivation});
+        $app->add_navigation_item({
+          title => sprintf(
+            '%s %s Pair Comparison',
+            $printableUI, $route->{buffActivation}
+          ),
+          path   => $pair_path,
+          parent => sprintf('/Generals/%s/%s',
+            $route->{uiTarget}, $route->{buffActivation}),
+          order => 50 + ($route->{order} || 0),
+        });
+      }
+    }
 
   }
 
@@ -203,6 +264,84 @@ package Game::EvonyTKR::Controller::Generals {
     else {
       # Render just the items
       return $self->render(template => '/generals/index');
+    }
+  }
+
+  sub uiTarget_index($self) {
+    my $logger   = Log::Log4perl->get_logger(__PACKAGE__);
+    my $uiTarget = $self->param('uiTarget');
+
+    my @valid_routes =
+      $self->general_routing->get_routes_for_uiTarget($uiTarget);
+    $logger->debug("found valid_routes "
+        . Data::Printer::np(@valid_routes)
+        . "for $uiTarget");
+    # Validate the uiTarget parameter
+    unless (@valid_routes) {
+      return $self->reply->not_found;
+    }
+
+    # Stash data for the template
+    $self->stash(
+      uiTarget => $uiTarget,
+      routes   => \@valid_routes,
+      title    => "Picking $uiTarget"
+    );
+
+    # Check for static content
+    my $distDir       = Mojo::File::Share::dist_dir('Game::EvonyTKR');
+    my $markdown_path = $distDir->child("pages/Generals/$uiTarget/index.md");
+    $logger->info("looking for index at $markdown_path");
+
+    if (-f $markdown_path) {
+      # Render with markdown
+      $self->stash(template => "generals/uiTarget/index");
+      return $self->render_markdown_file($markdown_path,
+        { template => "generals/uiTarget/index_with_file" });
+    }
+    else {
+      # Render just the dynamic content
+      return $self->render(template => 'generals/uiTarget/index');
+    }
+  }
+
+  sub buffActivation_index($self) {
+    my $logger         = Log::Log4perl->get_logger(__PACKAGE__);
+    my $uiTarget       = $self->param('uiTarget');
+    my $buffActivation = $self->param('buffActivation');
+
+    my $route =
+      $self->general_routing->lookup_route($uiTarget, $buffActivation);
+
+    # Validate the parameters
+    unless ($route) {
+      return $self->reply->not_found;
+    }
+
+    # Stash data for the template
+    $self->stash(
+      uiTarget       => $uiTarget,
+      buffActivation => $buffActivation,
+      route          => $route,
+      title          => "Picking $uiTarget Generals for $buffActivation"
+    );
+
+    # Check for static content
+    my $distDir = Mojo::File::Share::dist_dir('Game::EvonyTKR');
+    my $markdown_path =
+      $distDir->child("pages/Generals/$uiTarget/$buffActivation/index.md");
+
+    if (-f $markdown_path) {
+      # Render with markdown
+      $self->stash(
+        template => "generals/uiTarget/buffActivation/index_with_file");
+      return $self->render_markdown_file($markdown_path,
+        { template => "generals/uiTarget/buffActivation/index_with_file" });
+    }
+    else {
+      # Render just the dynamic content
+      return $self->render(
+        template => 'generals/uiTarget/buffActivation/index');
     }
   }
 
@@ -281,12 +420,14 @@ package Game::EvonyTKR::Controller::Generals {
         $self->stash(
           'buff-summaries' => {
             # For backward compatibility
-            marchIncrease      => $summarizer->marchIncrease,
-            attackIncrease     => $summarizer->attackIncrease,
-            defenseIncrease    => $summarizer->defenseIncrease,
-            hpIncrease         => $summarizer->hpIncrease,
-            reducegroundattack => $summarizer->reducegroundattack,
-            reducegroundhp     => $summarizer->reducegroundhp,
+            marchIncrease => $summarizer->getBuffForTypeAndKey(
+              $targetType, 'March Size Capacity'
+            ),
+            attackIncrease =>
+              $summarizer->getBuffForTypeAndKey($targetType, 'Attack'),
+            defenseIncrease =>
+              $summarizer->getBuffForTypeAndKey($targetType, 'Defense'),
+            hpIncrease => $summarizer->getBuffForTypeAndKey($targetType, 'HP'),
 
             # Full granular data
             buffValues   => $summarizer->buffValues,
@@ -820,7 +961,40 @@ package Game::EvonyTKR::Controller::Generals {
       $buffActivation
     );
 
-    return $self->render(json => $pair);
+    my $buffKey = $route_meta->{generalType} =~ s/_/ /r;
+    $buffKey =~ s/(\w)(\w+) specialist/\U$1\L$2 \UT\Lroops/;
+    $logger->debug("buffKey is $buffKey");
+
+    return $self->render(
+      json => {
+        "primary"     => $pair->primary,
+        "secondary"   => $pair->secondary,
+        "attackbuff"  => $pair->buffValues->{$buffKey}->{'Attack'},
+        "defensebuff" => $pair->buffValues->{$buffKey}->{'Defense'},
+        "hpbuff"      => $pair->buffValues->{$buffKey}->{'HP'},
+        "marchbuff"   => $pair->buffValues->{$buffKey}->{'March Size Capacity'},
+        "groundattackdebuff" =>
+          $pair->debuffValues->{'Ground Troops'}->{'Attack'},
+        "grounddefensedebuff" =>
+          $pair->debuffValues->{'Ground Troops'}->{'Defense'},
+        "groundhpdebuff"      => $pair->debuffValues->{'Ground Troops'}->{'HP'},
+        "mountedattackdebuff" =>
+          $pair->debuffValues->{'Mounted Troops'}->{'Attack'},
+        "mounteddefensedebuff" =>
+          $pair->debuffValues->{'Mounted Troops'}->{'Defense'},
+        "mountedhpdebuff"    => $pair->debuffValues->{'Mounted Troops'}->{'HP'},
+        "rangedattackdebuff" =>
+          $pair->debuffValues->{'Ranged Troops'}->{'Attack'},
+        "rangeddefensedebuff" =>
+          $pair->debuffValues->{'Ranged Troops'}->{'Defense'},
+        "rangedhpdebuff"    => $pair->debuffValues->{'Ranged Troops'}->{'HP'},
+        "siegeattackdebuff" =>
+          $pair->debuffValues->{'Siege Machines'}->{'Attack'},
+        "siegedefensedebuff" =>
+          $pair->debuffValues->{'Siege Machines'}->{'Defense'},
+        "siegehpdebuff" => $pair->debuffValues->{'Siege Machines'}->{'HP'},
+      }
+    );
   }
 
 }

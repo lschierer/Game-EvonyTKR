@@ -42,7 +42,7 @@
 
   /* customize the spectrum-css tokens */
   --mod-button-background-color-default: var(--text-1);
-  --mod-button-content-color-default: var(--text-2);
+  --mod-button-content-color-default: var(--text-3);
   --mod-body-font-color: var(--text-1);
   --mod-heading-font-color: var(--text-1);
   --mod-splitview-background-color: var(--surface-1);
@@ -56,6 +56,7 @@
   --mod-table-row-background-color-hover: var(--surface-3);
   --mod-table-row-background-color: var(--surface-1);
   --mod-table-row-text-color: var(--text-1);
+  --mod-button-border-color-default: var(--surface-2);
 }
 
 html,
@@ -134,4 +135,14 @@ li
 a.spectrum-SideNav-itemLink > iconify-icon {
   display: inline-block;
   margin: 0.5em 1em;
+}
+
+aside.note {
+  padding: 0 3rem;
+  color: var(--spectrum-green-800);
+  font-family: var(
+    --mod-body-serif-font-family,
+    var(--spectrum-body-serif-font-family)
+  );
+  line-height: var(--mod-body-line-height, var(--spectrum-body-line-height));
 }

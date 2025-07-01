@@ -26,7 +26,22 @@ class Game::EvonyTKR::Control::General::Routing :
     return values %$validRoutes;
   }
 
+  method get_routes_for_uiTarget ($uiTarget) {
+    $self->logger->debug("looking for routes for $uiTarget");
+    my @results;
+    my $slug = $self->_slugify($uiTarget);
+    $self->logger->debug("slug for $uiTarget is $slug");
+    foreach my $key (keys %$validRoutes) {
+      if ($key =~ /^$slug/) {
+        push @results, $validRoutes->{$key};
+      }
+    }
+    return @results;
+  }
+
   method lookup_route ($slug_ui, $slug_buff,) {
+    $slug_ui   = $self->_slugify($slug_ui);
+    $slug_buff = $self->_slugify($slug_buff);
     my $key = lc("$slug_ui|$slug_buff");
     if (exists $validRoutes->{$key}) {
       return $validRoutes->{$key};

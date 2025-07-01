@@ -5,6 +5,8 @@ use File::FindLib 'lib';
 use Mojo::File;
 use Path::Iterator::Rule;
 require Text::MultiMarkdown;
+require Markdent::Parser;
+require Game::EvonyTKR::Markdown::SpectrumHandler;
 require Data::Printer;
 require YAML::PP;
 
@@ -139,14 +141,20 @@ package Game::EvonyTKR::Plugins::Markdown {
       "Template paths: " . join(", ", @{ $c->app->renderer->paths }));
     $logger->debug("Looking for template: $template.html.ep");
 
-    my $mm = Text::MultiMarkdown->new(
-      tab_width   => 2,
-      unicode_ids => 1,
+    open my $fh, '>', \my $html_content;
+    binmode $fh, ':encoding(UTF-8)';    # Make sure to set encoding
+
+    my $handler =
+      Game::EvonyTKR::Markdown::SpectrumHandler->new(output => $fh,);
+
+    my $parser = Markdent::Parser->new(
+      dialects => ['GitHub'],
+      handler  => $handler,
     );
 
-    # Convert markdown to HTML
-    my $html_content = $mm->markdown($parsedFile->{content});
-
+    $parser->parse(markdown => $parsedFile->{content});
+    close $fh;
+    $logger->debug("html is now $html_content");
     # Add markdown content to stash but don't override existing content
     if (!exists $c->stash->{markdown_content}) {
       $c->stash(markdown_content => $html_content);

@@ -179,12 +179,32 @@ export class GeneralTable extends LitElement {
       this.nameList.forEach((nameStub, index) => {
         nameStub.current = 'stale';
         this.dataMap.delete(index);
+        if (this.batchSize >= 10) {
+          console.log('resetting batch size');
+          this.batchSize = 1;
+        }
         this.startBackgroundFetch();
       });
     }
   }
+
   private generateColumns(): ColumnDef<RowData>[] {
-    return Array.from(tableHeaders.keys())
+    // Create a columns array starting with the static index column
+    const columns: ColumnDef<RowData>[] = [
+      {
+        id: 'rowIndex',
+        header: '#',
+        enableSorting: false,
+        size: 50,
+        cell: ({ table, row }) => {
+          const index = table.getRowModel().rows.indexOf(row) + 1;
+          return html`${index}`;
+        },
+      },
+    ];
+
+    // Add the dynamically generated columns
+    const dynamicColumns = Array.from(tableHeaders.keys())
       .filter((key) => {
         if (this.mode === 'single' && key === 'secondary') {
           return false;
@@ -248,6 +268,11 @@ export class GeneralTable extends LitElement {
           },
         };
       });
+
+    // Add the dynamic columns to our columns array
+    columns.push(...dynamicColumns);
+
+    return columns;
   }
 
   private urlConversion(scope: 'data' | 'row'): string {
@@ -344,43 +369,71 @@ export class GeneralTable extends LitElement {
     }
   }
 
+  private batchSize = 1;
   private startBackgroundFetch() {
     if (this._bgFetchTimer) return;
 
-    const loadNext = () => {
-      const nextIndex = this.nameList.findIndex(
-        (stub) => stub.current !== 'current',
-      );
-      if (nextIndex === -1) {
+    const loadNext = async () => {
+      console.log(`batch size is ${this.batchSize}`);
+      if (this.batchSize <= 20) {
+        this.batchSize++;
+      } else {
+        this.batchSize = 1;
+      }
+      const timeoutSize = this.batchSize * 2;
+
+      // Find next batch of indices to fetch
+      const indicesToFetch = [];
+      for (
+        let i = 0;
+        i < this.nameList.length && indicesToFetch.length < this.batchSize;
+        i++
+      ) {
+        if (
+          this.nameList[i].current !== 'current' &&
+          this.nameList[i].current !== 'pending'
+        ) {
+          indicesToFetch.push(i);
+        }
+      }
+
+      if (indicesToFetch.length === 0) {
         this._bgFetchTimer = undefined;
         console.log(
-          `nextIndex is -1, namelist has ${this.nameList.length} and tableData has ${this.tableData.length}`,
+          `No more indices to fetch, namelist has ${this.nameList.length} and tableData has ${this.tableData.length}`,
         );
         this.requestUpdate();
         return;
       }
-      if (
-        !this.nameList[nextIndex].current ||
-        (this.nameList[nextIndex].current !== 'current' &&
-          this.nameList[nextIndex].current !== 'pending')
-      ) {
-        this.nameList[nextIndex].current = 'pending';
-        this.fetchRow(nextIndex)
-          .then((full) => {
-            this.nameList[nextIndex].current = 'current';
-            this.dataMap.set(nextIndex, full);
-            this.tableData = this.nameList
-              .map((_, i) => this.dataMap.get(i))
-              .filter(Boolean) as RowData[];
-            this.requestUpdate();
-          })
-          .catch((e) => {
-            console.error('Fetch failed at index', nextIndex, e);
-            this.nameList[nextIndex].current = 'stale';
-          });
-      }
 
-      this._bgFetchTimer = window.setTimeout(loadNext, 50);
+      // Mark all as pending
+      indicesToFetch.forEach((index) => {
+        this.nameList[index].current = 'pending';
+      });
+
+      // Fetch all rows in parallel
+      await Promise.all(
+        indicesToFetch.map((index) =>
+          this.fetchRow(index)
+            .then((full) => {
+              this.nameList[index].current = 'current';
+              this.dataMap.set(index, full);
+            })
+            .catch((e) => {
+              console.error('Fetch failed at index', index, e);
+              this.nameList[index].current = 'stale';
+            }),
+        ),
+      );
+
+      // Update table data after all fetches complete
+      this.tableData = this.nameList
+        .map((_, i) => this.dataMap.get(i))
+        .filter(Boolean) as RowData[];
+      this.requestUpdate();
+
+      // Schedule next batch
+      this._bgFetchTimer = window.setTimeout(loadNext, timeoutSize);
     };
 
     loadNext();
@@ -401,7 +454,6 @@ export class GeneralTable extends LitElement {
       getSortedRowModel: getSortedRowModel(),
       getCoreRowModel: getCoreRowModel(),
     });
-
     return html`
       ${this.tableData.length !== this.nameList.length
         ? html` <div class="spectrum-Overlay is-open loading-overlay">
@@ -447,18 +499,25 @@ export class GeneralTable extends LitElement {
             ${repeat(
               table.getRowModel().rows,
               (row) => row.id,
-              (row) =>
+              (row, index) =>
                 html`<tr class="spectrum-Table-row">
                   ${repeat(
                     row.getVisibleCells(),
                     (cell) => cell.id,
-                    (cell) =>
-                      html`<td class="spectrum-Table-cell">
-                        ${flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext(),
-                        )}
-                      </td>`,
+                    (cell) => {
+                      if (cell.column.id === 'rowIndex') {
+                        return html`<td class="spectrum-Table-cell">
+                          ${index + 1}
+                        </td>`;
+                      } else {
+                        return html`<td class="spectrum-Table-cell">
+                          ${flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext(),
+                          )}
+                        </td>`;
+                      }
+                    },
                   )}
                 </tr>`,
             )}

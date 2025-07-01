@@ -93,14 +93,30 @@ package Game::EvonyTKR::Controller::AscendingAttributes {
         if (length($name)) {
           my $item = $app->get_root_manager->ascendingAttributesManager
             ->getAscendingAttributes($name);
-          if (ref($item) eq 'OBJECT'
+          if ( Scalar::Util::reftype($item) eq 'OBJECT'
             && blessed($item) eq 'Game::EvonyTKR::Model::AscendingAttributes') {
+            $logger->debug("rendering get_ascending_section for $name");
             return $c->render_to_string(
               item     => $item,
               template => '/ascending attributes/details',
               layout   => undef
             );
           }
+          else {
+            $logger->warn(
+              "get_ascending_section cannot find Ascending Attributes for $name"
+            );
+            $logger->debug(
+              sprintf(
+                "searching for $name, instead got %s %s",
+                Scalar::Util::reftype($item),
+                blessed($item)
+              )
+            );
+          }
+        }
+        else {
+          $logger->warn("cannot get_ascending_section without a name");
         }
         return "";
       }
@@ -133,7 +149,7 @@ package Game::EvonyTKR::Controller::AscendingAttributes {
 
     # Check if item has ascending levels
     if ( $item
-      && $item->{ascending}
+      && $item->ascending
       && ref $item->{ascending} eq 'ARRAY'
       && @{ $item->{ascending} }) {
       # Get the first level name

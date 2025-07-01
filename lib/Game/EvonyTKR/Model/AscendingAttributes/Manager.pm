@@ -20,11 +20,11 @@ class Game::EvonyTKR::Model::AscendingAttributes::Manager :
     'bool'     => sub { $_[0]->_isTrue() },
     'fallback' => 0;
 
-  field $ascendingAttributess = {};
+  field $ascendingAttributes = {};
 
   method getAscendingAttributes ($name) {
-    if (exists $ascendingAttributess->{$name}) {
-      return $ascendingAttributess->{$name};
+    if (exists $ascendingAttributes->{$name}) {
+      return $ascendingAttributes->{$name};
     }
     $self->logger->warn("failed to find Ascending Attribute $name");
     return 0;
@@ -68,7 +68,7 @@ class Game::EvonyTKR::Model::AscendingAttributes::Manager :
         $name = $object->{name};
       }
 
-      $ascendingAttributess->{$name} =
+      $ascendingAttributes->{$name} =
         Game::EvonyTKR::Model::AscendingAttributes->new(general => $name,);
       foreach my $oa (@{ $object->{ascending} }) {
         my $level = $oa->{level};
@@ -96,13 +96,20 @@ class Game::EvonyTKR::Model::AscendingAttributes::Manager :
               $b->set_condition($c);
             }
           }
-          $ascendingAttributess->{$name}->addBuff($level, $b);
+          $ascendingAttributes->{$name}->addBuff($level, $b);
         }
       }
+      $self->logger->debug(
+        sprintf('imported %s %s',
+          $name,
+          exists $ascendingAttributes->{$name}
+          ? 'successfully'
+          : 'unsuccessfully')
+      );
     }
-    my $countImported = scalar keys %$ascendingAttributess;
+    my $countImported = scalar keys %$ascendingAttributes;
     $self->logger->info(
-"Game::EvonyTKR::Model::AscendingAttributes::Manager imported $countImported ascendingAttributess"
+"Game::EvonyTKR::Model::AscendingAttributes::Manager imported $countImported ascendingAttributes"
     );
     return $countImported;
   }

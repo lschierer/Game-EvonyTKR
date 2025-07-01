@@ -59,6 +59,8 @@ class Game::EvonyTKR::Model::General::Pair : isa(Game::EvonyTKR::Model::Data) {
   }
 
   method _compute_total_buffs ($primarySummarizer, $secondarySummarizer) {
+    $primarySummarizer->updateBuffs();
+    $secondarySummarizer->updateBuffs();
     my $primary   = $primarySummarizer->buffValues;
     my $secondary = $secondarySummarizer->buffValues;
     $self->logger->debug("primary is " . Data::Printer::np($primary));
@@ -77,14 +79,17 @@ class Game::EvonyTKR::Model::General::Pair : isa(Game::EvonyTKR::Model::Data) {
   }
 
   method _compute_total_debuffs ($primarySummarizer, $secondarySummarizer) {
+    $primarySummarizer->updateDebuffs();
+    $secondarySummarizer->updateDebuffs();
     my $primary   = $primarySummarizer->debuffValues;
     my $secondary = $secondarySummarizer->debuffValues;
 
     foreach my $category (keys %$primary) {
+      $self->logger->debug("calc debuffs for $category");
       foreach my $type (keys %{ $primary->{$category} }) {
-        $debuffValues->{$category}{$type} =
-          ($primary->{$category}{$type}   // 0) +
-          ($secondary->{$category}{$type} // 0);
+        $self->logger->debug("calc debuffs for $type");
+        $debuffValues->{$category}->{$type} =
+          $primary->{$category}->{$type} + $secondary->{$category}->{$type};
       }
     }
   }
@@ -96,19 +101,27 @@ class Game::EvonyTKR::Model::General::Pair : isa(Game::EvonyTKR::Model::Data) {
     $primarySpecialties     = ['gold', 'gold', 'gold', 'gold',],
     $secondaryCovenantLevel = 'civilization',
     $secondarySpecialties   = ['gold', 'gold', 'gold', 'gold',],
-    $allowedBuffActivation  = 'Overall',
+    $buffActivation         = 'Overall',
 
     $keepLevel      = 40,
     $primaryLevel   = 45,
     $secondaryLevel = 45,
   ) {
+    if (!$primary) {
+      $self->logger->logcroak("NO PRIMARY DEFINED FOR PAIR");
+      return;
+    }
+    if (!$secondary) {
+      $self->logger->logcroak("NO SECONDARY DEFINED FOR PAIR");
+      return;
+    }
 
     my $primarySummarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
       rootManager    => $rootManager,
       general        => $primary,
       isPrimary      => 1,
       targetType     => $generalType,
-      activationType => $allowedBuffActivation,
+      activationType => $buffActivation,
 
       ascendingLevel => $primaryAscending,
       covenantLevel  => $primaryCovenantLevel,
@@ -125,7 +138,7 @@ class Game::EvonyTKR::Model::General::Pair : isa(Game::EvonyTKR::Model::Data) {
       general        => $secondary,
       isPrimary      => 1,
       targetType     => $generalType,
-      activationType => $allowedBuffActivation,
+      activationType => $buffActivation,
 
       ascendingLevel => 'none',
       covenantLevel  => $secondaryCovenantLevel,
@@ -138,22 +151,19 @@ class Game::EvonyTKR::Model::General::Pair : isa(Game::EvonyTKR::Model::Data) {
       keepLevel    => $keepLevel,
     );
 
-    # Update buffs for both summarizers
-    $primarySummarizer->updateBuffs();
-    $secondarySummarizer->updateBuffs();
-
-    # Update debuffs for both summarizers
-    $primarySummarizer->updateDebuffs();
-    $secondarySummarizer->updateDebuffs();
-
     $self->_compute_total_buffs($primarySummarizer, $secondarySummarizer);
     $self->_compute_total_debuffs($primarySummarizer, $secondarySummarizer);
+    $self->logger->debug(sprintf(
+      'updated pair %s/%s buffs %s debuffs %s.',
+      $primary->name,                 $secondary->name,
+      Data::Printer::np($buffValues), Data::Printer::np($debuffValues),
+    ));
 
   }
 
   # Method to convert to hash
   method to_hash {
-    $self->logger->debug("buffvalues is " . Data::Printer::np($buffValues));
+
     my $tt = $targetType;
     if ($targetType =~ /(\w+)_(specialist)/) {
       $tt = $targetType =~ s/(\w+)_(specialist)/$1 Troops/r;

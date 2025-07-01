@@ -1,42 +1,57 @@
-<div class="ascendingattribute-details">
-  <% use Scalar::Util qw(reftype); %>
-  <% if( $item && ref($item) eq 'HASH') { %>
-    <% my $column_info = get_column_info($item); %>
-    <% my $sorted_levels = sort_ascending_levels($item); %>
-    <h3><%= $item->{name} %></h3>
-    <table>
-      <thead>
-        <% foreach my $level (@$sorted_levels) { %>
-          <th> <%= ascending_level_names($level->{level}) %> </th>
-        <% } %>
-      </thead>
-    <tbody>
-      <tr>
-        <% foreach my $level (@$sorted_levels) { %>
-          <td>
-            <% foreach my $buff (@{ $level->{buff} }) { %>
-              <dl>
-                <dt>Attribute: </dt><dd><%= $buff->{attribute} %></dd>
-                <% if (exists $buff->{class} ) { %>
-                  <dt>Targed Type: </dt><dd><%= $buff->{class} %></dd>
-                <% } %>
-                <% if ( exists $buff->{condition} ) { %>
-                  <dt>Condition(s): </dt>
-                  <% foreach my $condition (@{ $buff->{condition} }) { %>
-                    <dd><%= $condition %></dd>
-                  <% } %>
-                <% } %>
-                <dt>Value: </dt><dd><%= $buff->{value}->{number} %><%= $buff->{value}->{unit} eq 'percentage' ? '%' : '' %></dd>
-              </dl>
-            <% } %>
-          </td>
-        <% } %>
-      </tr>
+% require Scalar::Util;
+% if( $item && Scalar::Util::reftype($item) eq 'OBJECT' && Scalar::Util::blessed($item) eq 'Game::EvonyTKR::Model::AscendingAttributes') {
+%   my $sorted_levels = ($item->AscendingLevelNames(0), $item->AscendingLevelNames(1));
+%   my $firstWithBuff;
+%   foreach my $l ( $sorted_levels->@* ) {
+%     if (exists $item->ascending->{$l} && exists $item->ascending->{$l}->{buffs} && scalar @{ $item->ascending->{$l}->{buffs} } > 0) {
+%        $firstWithBuff = $l;
+%        last;
+%     }
+%   }
+%   my $red = $firstWithBuff =~ /red/i;
+%   $sorted_levels = $item->AscendingLevelNames($red);
 
-    </tbody>
-  </table>
-  <% } else { %>
-    <span>Specialty Not Available</span>
-    <span><%= ref($item) %></span>
-  <% } %>
-</div>
+  <div class="ascendingattribute-details">
+    <table  class="spectrum-Table spectrum-Table--sizeM spectrum-Table--quiet" >
+      <thead class="spectrum-Table-head">
+        <tr>
+          <% foreach my $level ($sorted_levels->@*) { %>
+            <% if ( $level =~ /none/i ) { next; } %>
+            <th class="spectrum-Table-headCell"> <%= ascending_level_names($level) %> </th>
+          <% } %>
+        </tr>
+      </thead>
+      <tbody class="spectrum-Table-body">
+        <tr class="spectrum-Table-row">
+          <% foreach my $level (@$sorted_levels) { %>
+            <% if ( $level =~ /none/i ) { next; } %>
+            <td class="spectrum-Table-cell <%= $level %>">
+              <% foreach my $buff (@{ $item->ascending->{$level}->{buffs} }) { %>
+                <dl>
+                  <dt>Attribute: </dt><dd><%= $buff->attribute %></dd>
+                  <% if (scalar $buff->targetedTypes->@* ) { %>
+                    <dt>Targed Type: </dt>
+                      <% foreach my $class ( $buff->targetedTypes->@* ) { %>
+                        <dd><%= $class %></dd>
+                      <% } %>
+                  <% } %>
+                  <% if ( scalar $buff->conditions() ) { %>
+                    <dt>Condition(s): </dt>
+                    <% foreach my $condition ($buff->conditions()) { %>
+                      <dd><%= $condition %></dd>
+                    <% } %>
+                  <% } %>
+                  <dt>Value: </dt><dd><%= $buff->value->number %><%= $buff->value->unit eq 'percentage' ? '%' : '' %></dd>
+                </dl>
+              <% } %>
+            </td>
+          <% } %>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+% } else {
+  <span>Specialty Not Available</span>
+  <span><%= ref($item) %></span>
+% }

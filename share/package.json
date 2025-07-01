@@ -12,7 +12,7 @@
   "license": "ISC",
   "devDependencies": {
     "@tsconfig/node22": "^22.0.2",
-    "@types/node": "^24.0.7",
+    "@types/node": "^24.0.8",
     "@types/postcss-import": "^14.0.3",
     "@types/postcss-sorting": "^8.0.2",
     "autoprefixer": "^10.4.21",
@@ -39,7 +39,9 @@
   "dependencies": {
     "@lit-labs/signals": "^0.1.2",
     "@spectrum-css/button": "^14.1.6",
+    "@spectrum-css/buttongroup": "^9.1.0",
     "@spectrum-css/commons": "^11.0.0",
+    "@spectrum-css/divider": "^5.1.0",
     "@spectrum-css/fieldgroup": "^7.1.0",
     "@spectrum-css/fieldlabel": "^10.1.0",
     "@spectrum-css/form": "^1.1.0",
@@ -51,6 +53,8 @@
     "@spectrum-css/sidenav": "^7.1.0",
     "@spectrum-css/splitview": "^7.1.0",
     "@spectrum-css/table": "^8.1.0",
+    "@spectrum-css/tag": "^10.1.0",
+    "@spectrum-css/taggroup": "^7.1.0",
     "@spectrum-css/tokens": "^16.0.2",
     "@spectrum-css/typography": "^8.1.0",
     "@tanstack/lit-table": "^8.21.3",

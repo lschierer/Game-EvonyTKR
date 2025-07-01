@@ -1,0 +1,20 @@
+% layout 'default';
+% require Data::Printer;
+% $title =~ s/-/ /g;
+<link rel="stylesheet" href="/css/gridIndex.css" />
+<section class="main-section">
+  <h2  class="spectrum-Heading spectrum-Heading--sizeXL"><%= $title %></h2>
+  <article>
+    When picking generals, you can evaluate them based on a variety of criteria, primarily based on the varius buff activation conditions.
+    <div class="link-grid spectrum-ButtonGroup spectrum-ButtonGroup--sizeM ">
+      <% foreach my $route ($routes->@*) { %>
+        <button
+          class="link-item spectrum-Button spectrum-Button--outline spectrum-Button--primary spectrum-Button--sizeM spectrum-ButtonGroup-item "
+          onclick="document.location='/Generals/<%= $uiTarget %>/<%= $route->{buffActivation} %>'"
+          >
+            <span <span class="spectrum-Button-label"><%= $route->{uiTarget} %> for <%= $route->{buffActivation} %> Use</span>
+        </button>
+      <% } %>
+    </div>
+  </article>
+</section>
