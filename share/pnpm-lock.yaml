@@ -82,7 +82,7 @@ importers:
         version: 3.13.12
       evonytkrtips-data:
         specifier: github:lschierer/EvonyTKRTips-Data
-        version: '@evonytkrtips/data@https://codeload.github.com/lschierer/EvonyTKRTips-Data/tar.gz/2c9bcaebaf8d19545e53d233ca8613ae44669dd7'
+        version: '@evonytkrtips/data@https://codeload.github.com/lschierer/EvonyTKRTips-Data/tar.gz/ec30083604b688e433f8955a9a0fc184701a75d7'
       iconify-icon:
         specifier: ^3.0.0
         version: 3.0.0
@@ -103,8 +103,8 @@ importers:
         specifier: ^22.0.2
         version: 22.0.2
       '@types/node':
-        specifier: ^24.0.8
-        version: 24.0.8
+        specifier: ^24.0.10
+        version: 24.0.10
       '@types/postcss-import':
         specifier: ^14.0.3
         version: 14.0.3
@@ -593,8 +593,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@evonytkrtips/data@https://codeload.github.com/lschierer/EvonyTKRTips-Data/tar.gz/2c9bcaebaf8d19545e53d233ca8613ae44669dd7':
-    resolution: {tarball: https://codeload.github.com/lschierer/EvonyTKRTips-Data/tar.gz/2c9bcaebaf8d19545e53d233ca8613ae44669dd7}
+  '@evonytkrtips/data@https://codeload.github.com/lschierer/EvonyTKRTips-Data/tar.gz/ec30083604b688e433f8955a9a0fc184701a75d7':
+    resolution: {tarball: https://codeload.github.com/lschierer/EvonyTKRTips-Data/tar.gz/ec30083604b688e433f8955a9a0fc184701a75d7}
     version: 1.0.0
 
   '@iconify/types@2.0.0':
@@ -869,8 +869,8 @@ packages:
   '@types/js-yaml@4.0.9':
     resolution: {integrity: sha512-k4MGaQl5TGo/iipqb2UDG2UwjXziSWkh0uysQelTlJpX1qGlpUZYm8PnO4DxG1qBomtJUdYJ6qR6xdIah10JLg==}
 
-  '@types/node@24.0.8':
-    resolution: {integrity: sha512-WytNrFSgWO/esSH9NbpWUfTMGQwCGIKfCmNlmFDNiI5gGhgMmEA+V1AEvKLeBNvvtBnailJtkrEa2OIISwrVAA==}
+  '@types/node@24.0.10':
+    resolution: {integrity: sha512-ENHwaH+JIRTDIEEbDK6QSQntAYGtbvdDXnMXnZaZ6k13Du1dPMmprkEHIL7ok2Wl2aZevetwTAb5S+7yIF+enA==}
 
   '@types/postcss-import@14.0.3':
     resolution: {integrity: sha512-raZhRVTf6Vw5+QbmQ7LOHSDML71A5rj4+EqDzAbrZPfxfoGzFxMHRCq16VlddGIZpHELw0BG4G0YE2ANkdZiIQ==}
@@ -2480,7 +2480,7 @@ snapshots:
   '@esbuild/win32-x64@0.25.5':
     optional: true
 
-  '@evonytkrtips/data@https://codeload.github.com/lschierer/EvonyTKRTips-Data/tar.gz/2c9bcaebaf8d19545e53d233ca8613ae44669dd7':
+  '@evonytkrtips/data@https://codeload.github.com/lschierer/EvonyTKRTips-Data/tar.gz/ec30083604b688e433f8955a9a0fc184701a75d7':
     dependencies:
       '@types/js-yaml': 4.0.9
       js-yaml: 4.1.0
@@ -2636,7 +2636,7 @@ snapshots:
 
   '@types/js-yaml@4.0.9': {}
 
-  '@types/node@24.0.8':
+  '@types/node@24.0.10':
     dependencies:
       undici-types: 7.8.0
 

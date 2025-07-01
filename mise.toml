@@ -1,5 +1,5 @@
 [tools]
 just = "latest"
-node = "lts"
+node = "24"
 perl = "latest"
 pnpm = "10"
