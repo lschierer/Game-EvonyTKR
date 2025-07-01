@@ -180,7 +180,9 @@ export class GeneralTable extends LitElement {
         nameStub.current = 'stale';
         this.dataMap.delete(index);
         if (this.batchSize >= 10) {
-          console.log('resetting batch size');
+          if (DEBUG) {
+            console.log('resetting batch size');
+          }
           this.batchSize = 1;
         }
         this.startBackgroundFetch();
@@ -277,9 +279,7 @@ export class GeneralTable extends LitElement {
 
   private urlConversion(scope: 'data' | 'row'): string {
     let basePath = window.location.pathname.replace(/\/$/, '');
-    console.log(
-      `urlconversion for ${scope} and mode ${this.mode} for original url ${basePath}`,
-    );
+
     basePath = decodeURIComponent(basePath);
 
     if (scope === 'data') {
@@ -295,7 +295,9 @@ export class GeneralTable extends LitElement {
         basePath = basePath.replace('comparison', 'primary/row.json');
       }
     }
-    console.log(`urlConversion returning ${basePath}`);
+    if (DEBUG) {
+      console.log(`urlConversion returning ${basePath}`);
+    }
     return basePath;
   }
 
@@ -374,8 +376,11 @@ export class GeneralTable extends LitElement {
     if (this._bgFetchTimer) return;
 
     const loadNext = async () => {
-      console.log(`batch size is ${this.batchSize}`);
-      if (this.batchSize <= 20) {
+      if (DEBUG) {
+        console.log(`batch size is ${this.batchSize}`);
+      }
+
+      if (this.batchSize <= 25) {
         this.batchSize++;
       } else {
         this.batchSize = 1;
