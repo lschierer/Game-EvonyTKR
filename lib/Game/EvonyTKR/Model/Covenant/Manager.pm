@@ -38,7 +38,7 @@ class Game::EvonyTKR::Model::Covenant::Manager :
     if (exists $covenants->{$name}) {
       return $covenants->{$name};
     }
-    $self->logger->warn("failed to find covenant $name");
+    $self->logger->info("failed to find covenant $name");
     return 0;
   }
 
