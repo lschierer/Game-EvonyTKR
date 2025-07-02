@@ -101,7 +101,7 @@ class Game::EvonyTKR::Model::Book::Manager : isa(Game::EvonyTKR::Model::Data) {
             . ($ob->{value}->{unit} // 'undef'));
 
         my $v = Game::EvonyTKR::Model::Buff::Value->new(
-          number => $ob->{value}->{number},
+          number => abs($ob->{value}->{number}),
           unit   => $ob->{value}->{unit},
         );
         my $b;

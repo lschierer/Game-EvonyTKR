@@ -7,6 +7,7 @@ require JSON::PP;
 
 require Game::EvonyTKR::Model::Buff;
 require Game::EvonyTKR::Model::Buff::Value;
+require Game::EvonyTKR::Model::Buff::Matcher;
 use namespace::clean;
 
 class Game::EvonyTKR::Model::Specialty : isa(Game::EvonyTKR::Model::Data) {
@@ -53,7 +54,7 @@ class Game::EvonyTKR::Model::Specialty : isa(Game::EvonyTKR::Model::Data) {
   }
 
   method get_buffs_at_level (
-    $level, $attribute,
+    $level, $attribute, $matching_type,
     $targetedType     = '',
     $conditions       = [],
     $debuffConditions = [],
@@ -62,9 +63,20 @@ class Game::EvonyTKR::Model::Specialty : isa(Game::EvonyTKR::Model::Data) {
       ;    # sanitize the data from the user - level names must be lower case
     my $logger = $self->logger;
     $logger->debug(
-      "Calculating buffs for level: $level, attribute: $attribute");
+      "Calculating buffs for $name level: $level, attribute: $attribute");
 
     return 0 if not defined $level or $level =~ /none/i;
+
+    # For buff matching, don't pass debuff conditions
+    # For debuff matching, don't pass buff conditions
+    my ($match_buff_conditions, $match_debuff_conditions);
+    if ($matching_type eq 'buff') {
+      $match_buff_conditions = $conditions;
+      $match_debuff_conditions = [];
+    } else {
+      $match_buff_conditions = [];
+      $match_debuff_conditions = $debuffConditions;
+    }
 
     # an list's values function will always return in the same order.
     my $valid_levels = $self->specialtyLevels;
@@ -91,21 +103,22 @@ class Game::EvonyTKR::Model::Specialty : isa(Game::EvonyTKR::Model::Data) {
       my $buffs         = $levels_by_name->{$current_level}->{buffs} // [];
 
       $logger->debug(
-        "Checking level $current_level with " . scalar(@{$buffs}) . " buffs");
+        "Checking $name level $current_level with " . scalar(@{$buffs}) . " buffs");
 
       foreach my $buff (@$buffs) {
-        if ($buff->match_buff(
-          $attribute, $targetedType, $conditions, $debuffConditions
-        )) {
+        my $matcher = Game::EvonyTKR::Model::Buff::Matcher->new(toTest => $buff);
+        my $logID = int(rand(9e12)) + 1e12;
+        if ($matcher->match($attribute, $targetedType, $match_buff_conditions, $match_debuff_conditions, $logID)) {
           my $val = $buff->value->number;
-          $logger->debug(
-            "  ➤ Match found at level $current_level. Adding $val to total.");
+          $logger->debug("$logID  ➤ Match found at $name level $current_level. Adding $val to total.");
           $total += $val;
+        } else {
+          $logger->debug("$logID  ✗ No match found.");
         }
       }
     }
 
-    $logger->debug("Total for $level/$attribute: $total");
+    $logger->debug("Total for $name $level/$attribute/$targetedType/$matching_type: $total");
     return $total;
 
   }

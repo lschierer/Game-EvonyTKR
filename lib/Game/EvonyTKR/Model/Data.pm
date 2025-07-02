@@ -63,8 +63,10 @@ class Game::EvonyTKR::Model::Data : isa(Game::EvonyTKR::Model::Logger) {
     return 1;
   }
 
-  field $buffAttributeValues : reader = Type::Tiny::Enum->new(
-    values => [
+  field $buffAttributeValues : reader;
+
+  ADJUST {
+    my @step1 = (
       "Attack",
       "Death to Soul",
       "Death to Survival",
@@ -88,11 +90,15 @@ class Game::EvonyTKR::Model::Data : isa(Game::EvonyTKR::Model::Logger) {
       "Training Capacity",
       "Training Speed",
       "Wounded to Death",
-    ]
-  );
+    );
+    Readonly::Array my @bav => @step1;
+    $buffAttributeValues = \@bav;
+  }
 
-  field $buffConditionValues : reader = Type::Tiny::Enum->new(
-    values => [
+  field $buffConditionValues : reader;
+
+  ADJUST {
+    my @step1 = (
       "Against Monsters",
       "Attacking",
       "brings a dragon",
@@ -109,12 +115,15 @@ class Game::EvonyTKR::Model::Data : isa(Game::EvonyTKR::Model::Logger) {
       'In City',
       "When the Main Defense General",
       "Applied to Barracks Officer",
-    ]
+    );
+    Readonly::Array my @bcv => @step1;
+    $buffConditionValues = \@bcv;
+  }
 
-  );
+  field $debuffConditionValues : reader;
 
-  field $debuffConditionValues : reader = Type::Tiny::Enum->new(
-    values => [
+  ADJUST {
+    my @step1 = (
       "Enemy",
       "Enemy In City",
       "Reduces",
@@ -122,20 +131,27 @@ class Game::EvonyTKR::Model::Data : isa(Game::EvonyTKR::Model::Logger) {
       "Reduces Enemy in Attack",
       "Reduces Enemy with a Dragon",
       "Reduces Monster",
-    ]
-  );
+    );
+    Readonly::Array my @dcv => @step1;
+    $debuffConditionValues = \@dcv;
+  }
 
-  field $bookConditionValues : reader =
-    Type::Tiny::Enum->new(values => ["all the time", "when not mine"]);
+  field $bookConditionValues : reader;
+
+  ADJUST {
+    my @step1 = ("all the time", "when not mine");
+    Readonly::Array my @bkcv => @step1;
+    $bookConditionValues = \@bkcv;
+  }
 
   method AllConditions() {
     my %seen;
-    my $allowedConditions = grep { not $seen{$_}++ } (
-      @{ $buffConditionValues->values },
-      @{ $debuffConditionValues->values },
-      @{ $bookConditionValues->values }
+    my @allowedConditions = grep { not $seen{$_}++ } (
+      @{$buffConditionValues},
+      @{$debuffConditionValues},
+      @{$bookConditionValues}
     );
-    return $allowedConditions;
+    return @allowedConditions;
   }
 
   field $targetedTypes : reader = [

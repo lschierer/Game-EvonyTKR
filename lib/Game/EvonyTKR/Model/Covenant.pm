@@ -6,6 +6,7 @@ use File::FindLib 'lib';
 require JSON::PP;
 require Game::EvonyTKR::Model::Buff;
 require Game::EvonyTKR::Model::Buff::Value;
+require Game::EvonyTKR::Model::Buff::Matcher;
 use namespace::clean;
 
 class Game::EvonyTKR::Model::Covenant : isa(Game::EvonyTKR::Model::Data) {
@@ -85,7 +86,7 @@ class Game::EvonyTKR::Model::Covenant : isa(Game::EvonyTKR::Model::Data) {
   }
 
   method get_buffs_at_level (
-    $level, $attribute,
+    $level, $attribute, $matching_type,
     $targetedType     = '',
     $conditions       = [],
     $debuffConditions = [],
@@ -94,6 +95,17 @@ class Game::EvonyTKR::Model::Covenant : isa(Game::EvonyTKR::Model::Data) {
     my $logger = $self->logger;
     $logger->debug(
       "Calculating ascending buffs for level: $level, attribute: $attribute");
+
+      # For buff matching, don't pass debuff conditions
+      # For debuff matching, don't pass buff conditions
+      my ($match_buff_conditions, $match_debuff_conditions);
+      if ($matching_type eq 'buff') {
+        $match_buff_conditions = $conditions;
+        $match_debuff_conditions = [];
+      } else {
+        $match_buff_conditions = [];
+        $match_debuff_conditions = $debuffConditions;
+      }
 
     return 0 if not defined $level or $level =~ /None/i;
 
@@ -120,12 +132,14 @@ class Game::EvonyTKR::Model::Covenant : isa(Game::EvonyTKR::Model::Data) {
         if ($buff->passive & !$includePassive) {
           next;
         }
-        if ($buff->match_buff(
-          $attribute, $targetedType, $conditions, $debuffConditions
-        )) {
+        my $matcher = Game::EvonyTKR::Model::Buff::Matcher->new(toTest => $buff);
+        my $logID = int(rand(9e12)) + 1e12;
+        if ($matcher->match($attribute, $targetedType, $match_buff_conditions, $match_debuff_conditions, $logID)) {
           my $val = $buff->value->number;
           $logger->debug("  ➤ Match found. Adding $val to total.");
           $total += $val;
+        } else {
+          $logger->debug("  ✗ No match found.");
         }
       }
     }

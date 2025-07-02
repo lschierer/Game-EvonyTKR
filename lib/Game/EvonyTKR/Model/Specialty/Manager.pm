@@ -79,7 +79,7 @@ class Game::EvonyTKR::Model::Specialty::Manager :
         my $level = $ol->{level};
         foreach my $ob (@{ $ol->{buff} }) {
           my $v = Game::EvonyTKR::Model::Buff::Value->new(
-            number => $ob->{value}->{number},
+            number => abs($ob->{value}->{number}),
             unit   => $ob->{value}->{unit},
           );
           my $b;

@@ -405,6 +405,7 @@ package Game::EvonyTKR::Controller::Generals {
           general        => $general,
           isPrimary      => 1,
           targetType     => $targetType,
+          activationType => 'Attacking',
           ascendingLevel => $ascendingLevel,
           covenantLevel  => $covenantLevel,
           specialty1     => $specialties[0],

@@ -5,6 +5,7 @@ use File::FindLib 'lib';
 require Data::Printer;
 require Game::EvonyTKR::Model::Buff;
 require Game::EvonyTKR::Model::Buff::Value;
+require Game::EvonyTKR::Model::Buff::Matcher;
 require JSON::PP;
 use namespace::clean;
 
@@ -24,6 +25,7 @@ class Game::EvonyTKR::Model::Book : isa(Game::EvonyTKR::Model::Data) {
 
   method get_buffs (
     $attribute,
+    $matching_type,
     $targetedType     = '',
     $conditions       = [],
     $debuffConditions = [],
@@ -33,13 +35,26 @@ class Game::EvonyTKR::Model::Book : isa(Game::EvonyTKR::Model::Data) {
 
     my $total = 0;
 
+    # For buff matching, don't pass debuff conditions
+    # For debuff matching, don't pass buff conditions
+    my ($match_buff_conditions, $match_debuff_conditions);
+    if ($matching_type eq 'buff') {
+      $match_buff_conditions = $conditions;
+      $match_debuff_conditions = [];
+    } else {
+      $match_buff_conditions = [];
+      $match_debuff_conditions = $debuffConditions;
+    }
+
     foreach my $b (@$buff) {
-      if ($b->match_buff(
-        $attribute, $targetedType, $conditions, $debuffConditions
-      )) {
+      my $matcher = Game::EvonyTKR::Model::Buff::Matcher->new(toTest => $b);
+      my $logID = int(rand(9e12)) + 1e12;
+      if ($matcher->match($attribute, $targetedType, $match_buff_conditions, $match_debuff_conditions, $logID)) {
         my $val = $b->value->number;
         $logger->debug("  ➤ Match found. Adding $val to total.");
         $total += $val;
+      } else {
+        $logger->debug("  ✗ No match found.");
       }
     }
 

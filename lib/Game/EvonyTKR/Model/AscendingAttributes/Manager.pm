@@ -74,7 +74,7 @@ class Game::EvonyTKR::Model::AscendingAttributes::Manager :
         my $level = $oa->{level};
         foreach my $ob (@{ $oa->{buff} }) {
           my $v = Game::EvonyTKR::Model::Buff::Value->new(
-            number => $ob->{value}->{number},
+            number => abs($ob->{value}->{number} // 0),
             unit   => $ob->{value}->{unit},
           );
           my $b;

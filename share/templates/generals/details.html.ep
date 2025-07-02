@@ -91,7 +91,7 @@
       <ol>
         <% foreach my $specialtyName ( @{ $item->specialtyNames } ) { %>
           <li class="spectrum-Body spectrum-Body--sizeS">
-            <a href="/Reference/Specialties/details/<%= $specialtyName %>" class="spectrum-Link spectrum-Link--quiet spectrum-Link--primary">
+            <a href="/Reference/Specialties/<%= $specialtyName %>" class="spectrum-Link spectrum-Link--quiet spectrum-Link--primary">
               <%= $specialtyName %>
             </a>
           </li>
@@ -136,48 +136,60 @@
       </table>
 
       <h3 class="spectrum-Heading spectrum-Heading--sizeM">Buff Values by Troop Type</h3>
+      % my $buffValues = stash('buff-summaries')->{buffValues};
+      % my @buffAttributes = ();
+      % if (keys %$buffValues) {
+      %   my $firstTroopType = (sort keys %$buffValues)[0];
+      %   @buffAttributes = sort keys %{$buffValues->{$firstTroopType}};
+      % }
       <table class="spectrum-Table spectrum-Table--sizeM spectrum-Table--quiet">
         <thead class="spectrum-Table-head">
           <tr>
             <th class="spectrum-Table-headCell">Troop Type</th>
-            <th class="spectrum-Table-headCell">March Size</th>
-            <th class="spectrum-Table-headCell">Attack</th>
-            <th class="spectrum-Table-headCell">Defense</th>
-            <th class="spectrum-Table-headCell">HP</th>
+            % foreach my $attr (@buffAttributes) {
+              <th class="spectrum-Table-headCell"><%= $attr eq 'March Size Capacity' ? 'March Size' : $attr %></th>
+            % }
           </tr>
         </thead>
         <tbody class="spectrum-Table-body">
-          % foreach my $troopType (sort keys %{stash('buff-summaries')->{buffValues}}) {
+          % foreach my $troopType (sort keys %$buffValues) {
             <tr class="spectrum-Table-row">
               <td class="spectrum-Table-cell"><strong><%= $troopType %></strong></td>
-              <td class="spectrum-Table-cell"><%= stash('buff-summaries')->{buffValues}->{$troopType}->{'March Size Capacity'} %></td>
-              <td class="spectrum-Table-cell"><%= stash('buff-summaries')->{buffValues}->{$troopType}->{'Attack'} %></td>
-              <td class="spectrum-Table-cell"><%= stash('buff-summaries')->{buffValues}->{$troopType}->{'Defense'} %></td>
-              <td class="spectrum-Table-cell"><%= stash('buff-summaries')->{buffValues}->{$troopType}->{'HP'} %></td>
+              % foreach my $attr (@buffAttributes) {
+                <td class="spectrum-Table-cell"><%= $buffValues->{$troopType}->{$attr} // 0 %></td>
+              % }
             </tr>
           % }
         </tbody>
       </table>
 
       <h3 class="spectrum-Heading spectrum-Heading--sizeM">Debuff Values by Troop Type</h3>
+      % my $debuffValues = stash('buff-summaries')->{debuffValues};
+      % my @debuffAttributes = ();
+      % if (keys %$debuffValues) {
+      %   my $firstTroopType = (sort keys %$debuffValues)[0];
+      %   @debuffAttributes = sort keys %{$debuffValues->{$firstTroopType}};
+      % }
       <table class="spectrum-Table spectrum-Table--sizeM spectrum-Table--quiet">
         <thead class="spectrum-Table-head">
           <tr>
             <th class="spectrum-Table-headCell">Troop Type</th>
-            <th class="spectrum-Table-headCell">Attack</th>
-            <th class="spectrum-Table-headCell">Defense</th>
-            <th class="spectrum-Table-headCell">HP</th>
+            % foreach my $attr (@debuffAttributes) {
+              <th class="spectrum-Table-headCell"><%= $attr %></th>
+            % }
           </tr>
         </thead>
         <tbody class="spectrum-Table-body">
-          % foreach my $troopType (sort keys %{stash('buff-summaries')->{debuffValues}}) {
+          % foreach my $troopType (sort keys %$debuffValues) {
             <tr class="spectrum-Table-row">
               <td class="spectrum-Table-cell"><strong><%= $troopType %></strong></td>
-              <td class="spectrum-Table-cell"><%= stash('buff-summaries')->{debuffValues}->{$troopType}->{'Attack'} %></td>
-              <td class="spectrum-Table-cell"><%= stash('buff-summaries')->{debuffValues}->{$troopType}->{'Defense'} %></td>
-              <td class="spectrum-Table-cell"><%= stash('buff-summaries')->{debuffValues}->{$troopType}->{'HP'} %></td>
+              % foreach my $attr (@debuffAttributes) {
+                <td class="spectrum-Table-cell"><%= $debuffValues->{$troopType}->{$attr} // 0 %></td>
+              % }
             </tr>
           % }
+        </tbody>
+      </table>
         </tbody>
       </table>
 

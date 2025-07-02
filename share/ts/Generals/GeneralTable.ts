@@ -183,7 +183,7 @@ export class GeneralTable extends LitElement {
           if (DEBUG) {
             console.log('resetting batch size');
           }
-          this.batchSize = 1;
+          this.batchSize = 60;
         }
         this.startBackgroundFetch();
       });
@@ -371,7 +371,7 @@ export class GeneralTable extends LitElement {
     }
   }
 
-  private batchSize = 1;
+  private batchSize = 60;
   private startBackgroundFetch() {
     if (this._bgFetchTimer) return;
 
@@ -380,10 +380,10 @@ export class GeneralTable extends LitElement {
         console.log(`batch size is ${this.batchSize}`);
       }
 
-      if (this.batchSize <= 25) {
-        this.batchSize++;
+      if (this.batchSize) {
+        this.batchSize--;
       } else {
-        this.batchSize = 1;
+        this.batchSize = 60;
       }
       const timeoutSize = this.batchSize * 2;
 

@@ -54,6 +54,7 @@ package Game::EvonyTKR::Controller::Specialties {
       ->to(controller => $controller_name, action => 'index')
       ->name("${base}_index");
 
+
     $app->plugins->on(
       'evonytkrtips_initialized' => sub($self, $manager) {
         $logger->debug(

@@ -6,6 +6,7 @@ use File::FindLib 'lib';
 require JSON::PP;
 require Game::EvonyTKR::Model::Buff;
 require Game::EvonyTKR::Model::Buff::Value;
+require Game::EvonyTKR::Model::Buff::Matcher;
 use namespace::clean;
 
 class Game::EvonyTKR::Model::AscendingAttributes :
@@ -55,11 +56,12 @@ class Game::EvonyTKR::Model::AscendingAttributes :
     $level, $attribute,
     $targetedType     = '',
     $conditions       = [],
-    $debuffConditions = []
+    $debuffConditions = [],
+    $matching_type    = 'buff'
   ) {
     my $logger = $self->logger;
     $logger->debug(
-      "Calculating ascending buffs for level: $level, attribute: $attribute");
+      "Calculating ascending buffs for level: $level, attribute: $attribute, matching_type: $matching_type");
 
     return 0 if not defined $level or $level eq 'none';
 
@@ -81,24 +83,52 @@ class Game::EvonyTKR::Model::AscendingAttributes :
     return 0 unless exists $level_index{$level};
 
     my $target_index = $level_index{$level};
-    my $levels_by_name =
-      $self->ascending;    # { red1 => [...], purple1 => [...], ... }
-
+    $self->logger->debug("my ascending hash looks like " . Data::Printer::np($ascending));
     my $total = 0;
     for my $i (1 .. $target_index) {    # skip index 0 ('None')
       my $lvl   = $valid_levels->[$i];
-      my $buffs = $levels_by_name->{$lvl}->{buffs} // [];
+      my $buffs = $ascending->{$lvl}->{buffs} // [];
 
       $logger->debug(
         "Checking level $lvl with " . scalar(@{$buffs}) . " buffs");
 
       foreach my $buff (@$buffs) {
-        if ($buff->match_buff(
-          $attribute, $targetedType, $conditions, $debuffConditions
-        )) {
+        my $logID = int(rand(9e12)) + 1e12;
+        my $matcher = Game::EvonyTKR::Model::Buff::Matcher->new(toTest => $buff);
+
+        # Debug: Log what we're about to test
+        $logger->debug($logID . sprintf(
+          "Testing buff: attr=%s, targetTypes=%s, buffConds=%s, debuffConds=%s, matching_type=%s",
+          $buff->attribute,
+          join(',', @{$buff->targetedTypes // []}),
+          join(',', @{$buff->buffConditions // []}),
+          join(',', @{$buff->debuffConditions // []}),
+          $matching_type
+        ));
+
+        # For buff matching, don't pass debuff conditions
+        # For debuff matching, don't pass buff conditions
+        my ($match_buff_conditions, $match_debuff_conditions);
+        if ($matching_type eq 'buff') {
+          $match_buff_conditions = $conditions;
+          $match_debuff_conditions = [];
+        } else {
+          $match_buff_conditions = [];
+          $match_debuff_conditions = $debuffConditions;
+        }
+
+        $logger->debug($logID . sprintf(
+          "Calling matcher with: buffConds=%s, debuffConds=%s",
+          join(',', @$match_buff_conditions),
+          join(',', @$match_debuff_conditions)
+        ));
+
+        if ($matcher->match($attribute, $targetedType, $match_buff_conditions, $match_debuff_conditions, $logID)) {
           my $val = $buff->value->number;
-          $logger->debug("  ➤ Match found. Adding $val to total.");
+          $logger->debug("$logID  ➤ Match found. Adding $val to total.");
           $total += $val;
+        } else {
+          $logger->debug("$logID  ✗ No match found.");
         }
       }
     }

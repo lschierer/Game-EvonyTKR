@@ -60,6 +60,7 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
     'Mounted Troops' => { 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
     'Ranged Troops'  => { 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
     'Siege Machines' => { 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
+    'Overall'        => { 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
   };
 
   method getBuffForTypeAndKey ($tt, $key) {
@@ -151,7 +152,7 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
 
   # Filter buff conditions based on activation type
   method filterBuffConditions() {
-    my @buffConditions = $self->buffConditionValues->values->@*;
+    my @buffConditions = @{$self->buffConditionValues};
 
     # Create a mapping of activation types to filter patterns
     my %activationFilters = (
@@ -218,7 +219,7 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
 
   # Filter debuff conditions based on activation type
   method filterDebuffConditions() {
-    my @debuffConditions = $self->debuffConditionValues->values->@*;
+    my @debuffConditions = @{$self->debuffConditionValues};
 
     if ($activationType ne 'PvM') {
       @debuffConditions = grep { $_ ne "Reduces Monster" } @debuffConditions;
@@ -320,23 +321,34 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
     $debuffConditions = []) {
     my $total = 0;
 
+    # Determine if we're doing buff or debuff matching based on whether debuffConditions were passed
+    my $matching_type = (scalar @$debuffConditions > 0) ? 'debuff' : 'buff';
+
     # Book buffs
     $total += $self->summarize_book_for_attribute($attribute, $summaryType,
-      $buffConditions, $debuffConditions);
+      $buffConditions, $debuffConditions, $matching_type);
+
+    $self->logger->info("summarize_from_sources has $total after summarize_book for $attribute/$summaryType");
 
     # Covenant buffs
     $total += $self->summarize_covenant_for_attribute($attribute, $summaryType,
-      $buffConditions, $debuffConditions);
+      $buffConditions, $debuffConditions, $matching_type);
+
+    $self->logger->info("summarize_from_sources has $total after summarize_covenant for $attribute/$summaryType");
 
     # Specialty buffs
     $total +=
       $self->summarize_specialties_for_attribute($attribute, $summaryType,
-      $buffConditions, $debuffConditions);
+      $buffConditions, $debuffConditions, $matching_type);
+
+    $self->logger->info("summarize_from_sources has $total after summarize_specialties for $attribute/$summaryType");
 
     # Ascending attribute buffs (primary only)
     if ($isPrimary) {
       $total += $self->summarize_ascendingAttributes_for_attribute($attribute,
-        $summaryType, $buffConditions, $debuffConditions);
+        $summaryType, $buffConditions, $debuffConditions, $matching_type);
+
+      $self->logger->info("summarize_from_sources has $total after summarize_ascendingAttributes for $attribute/$summaryType");
     }
 
     return $total;
@@ -347,7 +359,8 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
     $attribute,
     $summaryType      = $targetType,
     $buffConditions   = [],
-    $debuffConditions = []
+    $debuffConditions = [],
+    $matching_type    = 'buff'
   ) {
     my $total = 0;
     $self->logger->debug($general->name
@@ -370,7 +383,7 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
     my $book = $general->builtInBook();
     if ($book) {
       $self->logger->debug("adding buffs for book " . $book->name);
-      my $bv = $book->get_buffs($attribute, $summaryType, $buffConditions,
+      my $bv = $book->get_buffs($attribute, $matching_type, $summaryType, $buffConditions,
         $debuffConditions);
       $self->logger->trace(sprintf(
         'found %s in %s %s buffs for %s.',
@@ -395,7 +408,8 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
     $attribute,
     $summaryType      = $targetType,
     $buffConditions   = [],
-    $debuffConditions = []
+    $debuffConditions = [],
+    $matching_type    = 'buff'
   ) {
     my $total = 0;
 
@@ -407,7 +421,7 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
       );
 
       my $cv = $covenant->get_buffs_at_level(
-        $covenantLevel,  $attribute, $summaryType,
+        $covenantLevel,  $attribute, $matching_type, $summaryType,
         $buffConditions, $debuffConditions
       );
       $self->logger->debug(
@@ -428,7 +442,8 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
     $attribute,
     $summaryType      = $targetType,
     $buffConditions   = [],
-    $debuffConditions = []
+    $debuffConditions = [],
+    $matching_type    = 'buff'
   ) {
     my $total           = 0;
     my @specialtyNames  = @{ $general->specialtyNames };
@@ -444,7 +459,7 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
       if ($specialty) {
         $self->logger->debug(
           sprintf('checking %s for %s', $specialty->name, $attribute));
-        my $sv = $specialty->get_buffs_at_level($sl, $attribute, $summaryType,
+        my $sv = $specialty->get_buffs_at_level($sl, $attribute, $matching_type, $summaryType,
           $buffConditions, $debuffConditions);
         $self->logger->debug("retrieved $sv as total $attribute for level $sl "
             . $specialty->name
@@ -470,7 +485,8 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
     $attribute,
     $summaryType      = $targetType,
     $buffConditions   = [],
-    $debuffConditions = []
+    $debuffConditions = [],
+    $matching_type    = 'buff'
   ) {
     my $total = 0;
 
@@ -481,7 +497,7 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
         "retrieved ascendingAttribute buffs for " . $general->name);
       my $av = $aa->get_buffs_at_level(
         $ascendingLevel, $attribute, $summaryType,
-        $buffConditions, $debuffConditions
+        $buffConditions, $debuffConditions, $matching_type
       );
       $self->logger->debug(sprintf(
         '%s Ascending Attributes has %s buffs with total %s at level %s',

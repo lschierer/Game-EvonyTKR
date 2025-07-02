@@ -104,7 +104,7 @@ class Game::EvonyTKR::Model::Covenant::Manager :
           foreach my $ob (@{ $oc->{buff} }) {
 
             my $v = Game::EvonyTKR::Model::Buff::Value->new(
-              number => $ob->{value}->{number},
+              number => abs($ob->{value}->{number}),
               unit   => $ob->{value}->{unit},
             );
  # very few collection types have passive buffs. Covenants are an exception.

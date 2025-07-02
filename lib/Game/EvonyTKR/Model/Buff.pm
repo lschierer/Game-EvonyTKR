@@ -53,10 +53,9 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Model::Data) {
 
   method set_condition ($condition) {
     my $logger = $self->logger();
-    my $re     = $self->buffConditionValues->as_regexp();
 
     # Check if the condition is a valid buff condition
-    if ($condition =~ /$re/) {
+    if (any { $condition eq $_ } @{$self->buffConditionValues}) {
       # Initialize the array if it doesn't exist
       $buffConditions //= [];
 
@@ -69,10 +68,8 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Model::Data) {
       return 1;
     }
 
-    $re = $self->debuffConditionValues->as_regexp();
-
     # Check if the condition is a valid debuff condition
-    if ($condition =~ /$re/) {
+    if (any { $condition eq $_ } @{$self->debuffConditionValues}) {
       # Initialize the array if it doesn't exist
       $debuffConditions //= [];
 
@@ -89,8 +86,8 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Model::Data) {
     $logger->error(
       "Invalid condition: '$condition'. Must be one of: "
         . join(", ",
-        $self->buffConditionValues()->values(),
-        $self->debuffConditionValues()->values())
+        @{$self->buffConditionValues()},
+        @{$self->debuffConditionValues()})
     );
     return 0;
 
@@ -98,8 +95,6 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Model::Data) {
 
   method validate() {
     my @errors;
-    my $re = $self->buffConditionValues()->as_regexp;
-    $self->logger->trace("re for buffConditionValues is $re");
     my @tbc = @{$buffConditions};
     my @invalid;
 
@@ -110,7 +105,9 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Model::Data) {
       @tbc = @{ $tbc[0] };    # Flatten it
     }
 
-    @invalid = grep !/$re/, @tbc;
+    # Find elements in @tbc that are not in the valid conditions
+    my %valid_conditions = map { $_ => 1 } @{ $self->buffConditionValues };
+    @invalid = grep { !exists $valid_conditions{$_} } @tbc;
 
     # Report errors for invalid conditions
     if (@invalid) {
@@ -118,12 +115,9 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Model::Data) {
         push @errors,
           sprintf(
 'Detected illegal value "%s" in buffConditions. All values must be one of: %s',
-          $iv, join(', ', $self->buffConditionValues->values()));
+          $iv, join(', ', @{$self->buffConditionValues}));
       }
     }
-
-    $re = $self->debuffConditionValues()->as_regexp;
-    $self->logger->trace("re for debuffConditionValues is $re");
 
     my @tdc = @{$debuffConditions};
 
@@ -133,7 +127,9 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Model::Data) {
       $self->logger->error("needed to flatten debuffConditions");
     }
 
-    @invalid = grep !/$re/, @tdc;
+    # Find elements in @tdc that are not in the valid debuff conditions
+    my %valid_debuff_conditions = map { $_ => 1 } @{ $self->debuffConditionValues };
+    @invalid = grep { !exists $valid_debuff_conditions{$_} } @tdc;
 
     # Report errors for invalid conditions
     if (@invalid) {
@@ -141,7 +137,7 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Model::Data) {
         push @errors,
           sprintf(
 'Detected illegal value "%s" in debuffConditions. All values must be one of: %s',
-          $iv, join(', ', $self->debuffConditionValues()->values()));
+          $iv, join(', ', @{$self->debuffConditionValues()}));
       }
     }
 
