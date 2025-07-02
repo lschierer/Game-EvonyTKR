@@ -1,32 +1,31 @@
-name: Goddess of the Hunt
+name: Patriot’s Radiance
 buff:
   - attribute: Defense
-    class: Mounted Troops
+    class: Ranged Troops
     condition:
       - leading the army to attack
     value:
-      number: 50
+      number: 45
       unit: percentage
   - attribute: Attack
-    class: Mounted Troops
+    class: Ranged Troops
     condition:
       - leading the army to attack
     value:
-      number: 50
+      number: 45
       unit: percentage
   - attribute: HP
-    class: Ground Troops
+    class: Ranged Troops
     condition:
       - leading the army to attack
     value:
-      number: 40
+      number: 30
       unit: percentage
   - attribute: HP
-    class: Mounted Troops
+    class: Siege Machines
     condition:
       - leading the army to attack
     value:
-      number: 40
+      number: 30
       unit: percentage
-text: >-
-  Increases mounted troops’ attack and defense by 50% and increases ground troops and mounted troops’ HP by 40% when General is leading the army to attack.
+text: Increases ranged troops’ attack and defense by 45% and ranged troops and siege machines’ HP by 30% when General is leading the army to attack.

@@ -1,0 +1,8 @@
+name: Holy Light
+buff:
+  - attribute: HP
+    class: Mounted Troops
+    value:
+      number: 35
+      unit: percentage
+text: Increases Mounted Troop HP by 35% when General is leading the army.

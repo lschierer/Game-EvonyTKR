@@ -1,19 +1,19 @@
 ascending:
   - level: red1
     buff:
+      - attribute: Attack
+        condition:
+          - Attacking
+        class: Ranged Troops
+        value:
+          number: 10
+          unit: percentage
       - attribute: Defense
         condition:
           - Attacking
-        class: Mounted Troops
+        class: Ranged Troops
         value:
-          number: 20
-          unit: percentage
-      - attribute: HP
-        condition:
-          - Attacking
-        class: Mounted Troops
-        value:
-          number: 20
+          number: 15
           unit: percentage
   - level: red2
     buff:
@@ -26,86 +26,80 @@ ascending:
   - level: red3
     buff:
       - attribute: Attack
-        class: Mounted Troops
+        condition:
+          - Attacking
+        class: Siege Machines
         value:
-          number: 30
+          number: 25
           unit: percentage
-      - attribute: Defense
-        class: Mounted Troops
-        value:
-          number: 15
-          unit: percentage
-      - attribute: Defense
-        class: Ground Troops
-        value:
-          number: 15
-          unit: percentage
-  - level: red4
-    buff:
       - attribute: Attack
         condition:
           - Attacking
-        class: Mounted Troops
+        class: Ranged Troops
         value:
-          number: 20
+          number: 25
+          unit: percentage
+      - attribute: March Size Capacity
+        class: Siege Machines
+        value:
+          number: 10
+          unit: percentage
+      - attribute: March Size Capacity
+        class: Ranged Troops
+        value:
+          number: 10
+          unit: percentage
+  - level: red4
+    buff:
+      - attribute: HP
+        condition:
+          - Attacking
+        class: Siege Machines
+        value:
+          number: 25
           unit: percentage
       - attribute: HP
         condition:
           - Attacking
-        class: Mounted Troops
+        class: Ranged Troops
         value:
-          number: 20
+          number: 25
           unit: percentage
-      - attribute: HP
+      - attribute: Defense
         condition:
           - Attacking
-        class: Ground Troops
+        class: Siege Machines
         value:
-          number: 20
+          number: 25
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - Attacking
+        class: Ranged Troops
+        value:
+          number: 25
           unit: percentage
   - level: red5
     buff:
       - attribute: Attack
         condition:
           - Attacking
-        class: Mounted Troops
+        class: Ranged Troops
         value:
           number: 40
-          unit: percentage
-      - attribute: Attack
-        condition:
-          - Attacking
-        class: Ground Troops
-        value:
-          number: 40
-          unit: percentage
-      - attribute: Defense
-        condition:
-          - Attacking
-        class: Mounted Troops
-        value:
-          number: 25
-          unit: percentage
-      - attribute: Defense
-        condition:
-          - Attacking
-        class: Ground Troops
-        value:
-          number: 25
           unit: percentage
       - attribute: HP
         condition:
           - Attacking
-        class: Mounted Troops
+        class: Ranged Troops
         value:
-          number: 25
+          number: 40
           unit: percentage
-      - attribute: HP
+      - attribute: Rally Capacity
         condition:
-          - Attacking
-        class: Ground Troops
+          - When Rallying
         value:
-          number: 25
+          number: 8
           unit: percentage
-general: Artemis
-id: Artemis
+general: Artemisia I
+id: Artemisia I

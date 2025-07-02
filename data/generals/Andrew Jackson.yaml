@@ -1,0 +1,25 @@
+ascending: true
+basic_attributes:
+  leadership:
+    base: 116
+    increment: 0
+  attack:
+    base: 102
+    increment: 0
+  defense:
+    base: 102
+    increment: 0
+  politics:
+    base: 116
+    increment: 0
+book: Old Hickory
+specialties:
+  - Ranged Troop Assault
+  - Snipe
+  - Iron Warrior
+  - Battle of New Orleans
+stars: red5
+type:
+  - mayor
+general: Andrew Jackson
+name: Andrew Jackson
