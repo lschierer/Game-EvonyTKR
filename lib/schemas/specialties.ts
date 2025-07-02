@@ -13,6 +13,7 @@ export type LevelElement = z.infer<typeof LevelElement>;
 
 export const Specialty = z.object({
   name: z.string(),
+  general: z.string().optional(), // for use by Specialties usable only by specific Officers.
   levels: z.array(LevelElement),
 });
 export type Specialty = z.infer<typeof Specialty>;

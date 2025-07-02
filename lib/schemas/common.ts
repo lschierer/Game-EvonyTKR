@@ -8,6 +8,7 @@ export const Attribute = z.enum([
   "Defense",
   "Deserter Capacity",
   "Double Items Drop Rate",
+  "Healing Speed",
   "Hospital Capacity",
   "HP",
   "March Size Capacity",
@@ -57,6 +58,12 @@ export const Condition = z.enum([
   "When City Mayor for this SubCity",
   "When Defending Outside The Main City",
   "When Rallying",
+  // Officer positions
+  "When Appointed as Hospital Officer",
+  "When Appointed as Prison Officer", 
+  "When Appointed as Workshop Officer",
+  "When Appointed as Academy Officer",
+  "When Appointed as Embassy Officer",
 ]);
 export type Condition = z.infer<typeof Condition>;
 

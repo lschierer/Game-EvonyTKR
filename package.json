@@ -8,7 +8,9 @@
     "prepare": "husky",
     "build": "./bin/generate_json.sh && ./bin/generate_schemas.sh && ./bin/generate_zod_schemas.sh",
     "convert-ascending": "tsx bin/convert_ascending_from_text.ts",
-    "convert-covenant": "tsx bin/convert_covenant_from_text.ts"
+    "convert-covenant": "tsx bin/convert_covenant_from_text.ts",
+    "convert-specialty": "tsx bin/convert_specialty_from_text.ts",
+    "convert-skillbook": "tsx bin/convert_skillbook_from_text.ts"
   },
   "author": "Luke Schierer",
   "license": "ISC",
