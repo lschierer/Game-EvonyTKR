@@ -319,12 +319,15 @@ async function main() {
     // Validate against the Zod schema
     const validated = Covenant.parse(finalResult);
 
-    // Output as YAML 1.2
+    // Output as YAML 1.2 with safer string handling
     const yamlOutput = yaml.dump(validated, {
       indent: 2,
       lineWidth: -1,
       noRefs: true,
       sortKeys: false,
+      quotingType: '"', // Use double quotes for strings with special chars
+      forceQuotes: false, // Only quote when necessary
+      flowLevel: -1, // Use block style
     });
 
     console.log("\n=== Generated YAML ===");
