@@ -13,12 +13,11 @@ basic_attributes:
     base: 67
     increment: 6.25
 book: Heroism
-display: summary
 specialties:
   - Ranged Troop Defense
   - Bash
   - Unparalleled Leader
-stars: None
+stars: purple1
 type:
   - ranged_specialist
 general: Antara

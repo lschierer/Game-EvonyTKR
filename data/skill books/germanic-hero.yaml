@@ -1,0 +1,32 @@
+name: Germanic Hero
+buff:
+  - attribute: HP
+    class: Ground Troops
+    condition:
+      - Enemy
+    value:
+      number: 10
+      unit: percentage
+  - attribute: HP
+    class: Mounted Troops
+    condition:
+      - Enemy
+    value:
+      number: 10
+      unit: percentage
+  - attribute: Attack
+    class: Ranged Troops
+    condition:
+      - Enemy
+    value:
+      number: 15
+      unit: percentage
+  - attribute: Attack
+    class: Siege Machines
+    condition:
+      - Enemy
+    value:
+      number: 15
+      unit: percentage
+text: >-
+  Reduces enemy ground troops and mounted troops’ HP by 10% and enemy ranged troops and siege machines’ attack by 15% when General is leading the army.

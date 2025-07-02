@@ -1,31 +1,17 @@
 ascending:
   - level: red1
     buff:
-      - attribute: Attack
-        condition:
-          - Enemy
-        class: Siege Machines
-        value:
-          number: -5
-          unit: percentage
-      - attribute: Attack
-        condition:
-          - Enemy
-        class: Ranged Troops
-        value:
-          number: -5
-          unit: percentage
       - attribute: HP
         condition:
           - Enemy
-        class: Siege Machines
+        class: Ground Troops
         value:
           number: -10
           unit: percentage
       - attribute: HP
         condition:
           - Enemy
-        class: Ranged Troops
+        class: Mounted Troops
         value:
           number: -10
           unit: percentage
@@ -34,38 +20,16 @@ ascending:
       - attribute: Defense
         condition:
           - Enemy
-        class: Siege Machines
+        class: Ground Troops
         value:
-          number: -10
+          number: -5
           unit: percentage
       - attribute: Defense
         condition:
           - Enemy
-        class: Ranged Troops
+        class: Mounted Troops
         value:
-          number: -10
-          unit: percentage
-      - attribute: SubCity Training Speed
-        condition:
-          - When City Mayor for this SubCity
-        value:
-          number: 20
-          unit: percentage
-  - level: red3
-    buff:
-      - attribute: HP
-        condition:
-          - Enemy
-        class: Siege Machines
-        value:
-          number: -15
-          unit: percentage
-      - attribute: HP
-        condition:
-          - Enemy
-        class: Ranged Troops
-        value:
-          number: -15
+          number: -5
           unit: percentage
       - attribute: Death to Survival
         condition:
@@ -73,71 +37,87 @@ ascending:
         value:
           number: 10
           unit: percentage
+  - level: red3
+    buff:
+      - attribute: Defense
+        condition:
+          - Enemy
+        class: Ground Troops
+        value:
+          number: -5
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - Enemy
+        class: Mounted Troops
+        value:
+          number: -5
+          unit: percentage
+      - attribute: SubCity Training Speed
+        condition:
+          - When City Mayor for this SubCity
+        value:
+          number: 20
+          unit: percentage
   - level: red4
     buff:
-      - attribute: Attack
-        condition:
-          - Enemy
-        class: Siege Machines
-        value:
-          number: -10
-          unit: percentage
-      - attribute: Attack
+      - attribute: Defense
         condition:
           - Enemy
         class: Ranged Troops
         value:
-          number: -10
+          number: -15
           unit: percentage
       - attribute: Defense
         condition:
           - Enemy
         class: Siege Machines
         value:
-          number: -10
+          number: -15
           unit: percentage
-      - attribute: Defense
+      - attribute: HP
         condition:
           - Enemy
         class: Ranged Troops
         value:
-          number: -10
+          number: -15
+          unit: percentage
+      - attribute: HP
+        condition:
+          - Enemy
+        class: Siege Machines
+        value:
+          number: -15
           unit: percentage
   - level: red5
     buff:
       - attribute: Attack
         condition:
           - Enemy
-        class: Siege Machines
+        class: Ranged Troops
         value:
           number: -10
           unit: percentage
       - attribute: Attack
         condition:
           - Enemy
-        class: Ranged Troops
-        value:
-          number: -10
-          unit: percentage
-      - attribute: Defense
-        class: Siege Machines
-        value:
-          number: -10
-          unit: percentage
-      - attribute: Defense
-        class: Ranged Troops
-        value:
-          number: -10
-          unit: percentage
-      - attribute: HP
         class: Siege Machines
         value:
           number: -10
           unit: percentage
       - attribute: HP
+        condition:
+          - Enemy
         class: Ranged Troops
         value:
           number: -10
           unit: percentage
-general: Baldwin IV
-id: Baldwin IV
+      - attribute: HP
+        condition:
+          - Enemy
+        class: Siege Machines
+        value:
+          number: -10
+          unit: percentage
+general: Arminius
+id: Arminius

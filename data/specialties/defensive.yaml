@@ -1,0 +1,102 @@
+name: Defensive
+levels:
+  - level: Green
+    buff:
+      - attribute: Hospital Capacity
+        value:
+          number: 0
+          unit: percentage
+      - attribute: Attack
+        class: Ground Troops
+        condition:
+          - In City
+        value:
+          number: 0
+          unit: percentage
+      - attribute: Attack
+        class: Mounted Troops
+        condition:
+          - In City
+        value:
+          number: 0
+          unit: percentage
+  - level: Blue
+    buff:
+      - attribute: Hospital Capacity
+        value:
+          number: 0
+          unit: percentage
+      - attribute: Attack
+        class: Ground Troops
+        condition:
+          - In City
+        value:
+          number: 0
+          unit: percentage
+      - attribute: Attack
+        class: Mounted Troops
+        condition:
+          - In City
+        value:
+          number: 0
+          unit: percentage
+  - level: Purple
+    buff:
+      - attribute: Hospital Capacity
+        value:
+          number: 0
+          unit: percentage
+      - attribute: Attack
+        class: Ground Troops
+        condition:
+          - In City
+        value:
+          number: 0
+          unit: percentage
+      - attribute: Attack
+        class: Mounted Troops
+        condition:
+          - In City
+        value:
+          number: 0
+          unit: percentage
+  - level: Orange
+    buff:
+      - attribute: Hospital Capacity
+        value:
+          number: 0
+          unit: percentage
+      - attribute: Attack
+        class: Ground Troops
+        condition:
+          - In City
+        value:
+          number: 0
+          unit: percentage
+      - attribute: Attack
+        class: Mounted Troops
+        condition:
+          - In City
+        value:
+          number: 0
+          unit: percentage
+  - level: Gold
+    buff:
+      - attribute: Hospital Capacity
+        value:
+          number: 10
+          unit: percentage
+      - attribute: Attack
+        class: Ground Troops
+        condition:
+          - In City
+        value:
+          number: 10
+          unit: percentage
+      - attribute: Attack
+        class: Mounted Troops
+        condition:
+          - In City
+        value:
+          number: 10
+          unit: percentage

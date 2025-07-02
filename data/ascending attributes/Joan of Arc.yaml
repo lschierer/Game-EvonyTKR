@@ -1,0 +1,57 @@
+ascending:
+  - level: purple1
+    buff:
+      - attribute: Defense
+        class: Mounted Troops
+        value:
+          number: 10
+          unit: percentage
+      - attribute: HP
+        class: Mounted Troops
+        value:
+          number: 10
+          unit: percentage
+  - level: purple2
+    buff:
+      - attribute: Attack
+        class: Mounted Troops
+        value:
+          number: 10
+          unit: percentage
+  - level: purple3
+    buff:
+      - attribute: HP
+        value:
+          number: 10
+          unit: percentage
+  - level: purple4
+    buff:
+      - attribute: Defense
+        class: Ground Troops
+        value:
+          number: 10
+          unit: percentage
+      - attribute: Defense
+        class: Mounted Troops
+        value:
+          number: 10
+          unit: percentage
+      - attribute: HP
+        class: Ground Troops
+        value:
+          number: 10
+          unit: percentage
+      - attribute: HP
+        class: Mounted Troops
+        value:
+          number: 10
+          unit: percentage
+  - level: purple5
+    buff:
+      - attribute: Attack
+        class: Mounted Troops
+        value:
+          number: 20
+          unit: percentage
+general: Joan of Arc
+id: Joan of Arc
