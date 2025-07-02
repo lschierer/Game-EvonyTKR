@@ -57,8 +57,6 @@ levels:
     buff:
       - attribute: Attack
         class: Mounted Troops
-        condition:
-          - Attacking
         value:
           number: 10
           unit: percentage
@@ -66,7 +64,7 @@ levels:
     type: personal
     buff:
       - attribute: HP
-        type: Mounted Troops
+        class: Mounted Troops
         condition:
           - When Rallying
         value:
