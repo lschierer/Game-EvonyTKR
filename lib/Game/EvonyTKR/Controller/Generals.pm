@@ -801,29 +801,29 @@ package Game::EvonyTKR::Controller::Generals {
       hpbuff =>
         $summarizer->getBuffForTypeAndKey($route_meta->{generalType}, 'HP'),
       groundattackdebuff =>
-        $summarizer->getBuffForTypeAndKey('Ground Troops', 'Attack'),
+        $summarizer->getDebuffForTypeAndKey('Ground Troops', 'Attack'),
       grounddefensedebuff =>
-        $summarizer->getBuffForTypeAndKey('Ground Troops', 'Defense'),
+        $summarizer->getDebuffForTypeAndKey('Ground Troops', 'Defense'),
       groundhpdebuff =>
-        $summarizer->getBuffForTypeAndKey('Ground Troops', 'HP'),
+        $summarizer->getDebuffForTypeAndKey('Ground Troops', 'HP'),
       mountedattackdebuff =>
-        $summarizer->getBuffForTypeAndKey('Mounted Troops', 'Attack'),
+        $summarizer->getDebuffForTypeAndKey('Mounted Troops', 'Attack'),
       mounteddefensedebuff =>
-        $summarizer->getBuffForTypeAndKey('Mounted Troops', 'Defense'),
+        $summarizer->getDebuffForTypeAndKey('Mounted Troops', 'Defense'),
       mountedhpdebuff =>
-        $summarizer->getBuffForTypeAndKey('Mounted Troops', 'HP'),
+        $summarizer->getDebuffForTypeAndKey('Mounted Troops', 'HP'),
       rangedattackdebuff =>
-        $summarizer->getBuffForTypeAndKey('Ranged Troops', 'Attack'),
+        $summarizer->getDebuffForTypeAndKey('Ranged Troops', 'Attack'),
       rangeddefensedebuff =>
-        $summarizer->getBuffForTypeAndKey('Ranged Troops', 'Defense'),
+        $summarizer->getDebuffForTypeAndKey('Ranged Troops', 'Defense'),
       rangedhpdebuff =>
-        $summarizer->getBuffForTypeAndKey('Ranged Troops', 'HP'),
+        $summarizer->getDebuffForTypeAndKey('Ranged Troops', 'HP'),
       siegeattackdebuff =>
-        $summarizer->getBuffForTypeAndKey('Siege Machines', 'Attack'),
+        $summarizer->getDebuffForTypeAndKey('Siege Machines', 'Attack'),
       siegedefensedebuff =>
-        $summarizer->getBuffForTypeAndKey('Siege Machines', 'Defense'),
+        $summarizer->getDebuffForTypeAndKey('Siege Machines', 'Defense'),
       siegehpdebuff =>
-        $summarizer->getBuffForTypeAndKey('Siege Machines', 'HP'),
+        $summarizer->getDebuffForTypeAndKey('Siege Machines', 'HP'),
     };
     if ($isPrimary) {
       $result->{primary} = $general;
@@ -963,6 +963,7 @@ package Game::EvonyTKR::Controller::Generals {
 
     my $buffKey = $route_meta->{generalType} =~ s/_/ /r;
     $buffKey =~ s/(\w)(\w+) specialist/\U$1\L$2 \UT\Lroops/;
+    $buffKey =~ s/Siege Troops/Siege Machines/;
     $logger->debug("buffKey is $buffKey");
 
     return $self->render(
