@@ -25,6 +25,7 @@ import {
 
 import * as z from 'zod';
 import SpectrumTokensCSS from '@spectrum-css/tokens/dist/index.css' with { type: 'css' };
+import SpectrumProgressBarCSS from '@spectrum-css/progressbar/dist/index.css' with { type: 'css' };
 import GeneralTableCSS from '../css/GeneralTable.css' with { type: 'css' };
 
 // Zod Schemas
@@ -152,7 +153,11 @@ export class GeneralTable extends LitElement {
   private _bgFetchTimer?: number;
   private tableController = new TableController<RowData>(this);
 
-  static styles: CSSResultGroup = [SpectrumTokensCSS, GeneralTableCSS];
+  static styles: CSSResultGroup = [
+    SpectrumTokensCSS,
+    SpectrumProgressBarCSS,
+    GeneralTableCSS,
+  ];
 
   override async firstUpdated(_changed: PropertyValues) {
     this.columns = this.generateColumns();
@@ -178,12 +183,11 @@ export class GeneralTable extends LitElement {
     ) {
       this.nameList.forEach((nameStub, index) => {
         nameStub.current = 'stale';
-        this.dataMap.delete(index);
         if (this.batchSize >= 10) {
           if (DEBUG) {
             console.log('resetting batch size');
           }
-          this.batchSize = 60;
+          this.batchSize = this.maxBatch;
         }
         this.startBackgroundFetch();
       });
@@ -371,80 +375,63 @@ export class GeneralTable extends LitElement {
     }
   }
 
-  private batchSize = 60;
-  private startBackgroundFetch() {
+  private maxBatch = 6;
+  private batchSize = this.maxBatch;
+  private async startBackgroundFetch() {
     if (this._bgFetchTimer) return;
+    this._bgFetchTimer = 1; // prevent re-entry
 
-    const loadNext = async () => {
-      if (DEBUG) {
-        console.log(`batch size is ${this.batchSize}`);
-      }
+    const maxConcurrency = this.batchSize;
+    let active = 0;
+    let index = 0;
 
-      if (this.batchSize) {
-        this.batchSize--;
-      } else {
-        this.batchSize = 60;
-      }
-      const timeoutSize = this.batchSize * 2;
+    const next = () => {
+      while (active < maxConcurrency && index < this.nameList.length) {
+        const row = this.nameList[index];
+        const i = index++;
+        if (!row.current || row.current === 'stale') {
+          this.nameList[i].current = 'pending';
+          active++;
 
-      // Find next batch of indices to fetch
-      const indicesToFetch = [];
-      for (
-        let i = 0;
-        i < this.nameList.length && indicesToFetch.length < this.batchSize;
-        i++
-      ) {
-        if (
-          this.nameList[i].current !== 'current' &&
-          this.nameList[i].current !== 'pending'
-        ) {
-          indicesToFetch.push(i);
+          this.fetchRow(i)
+            .then((full) => {
+              this.nameList[i].current = 'current';
+              this.dataMap.set(i, full);
+            })
+            .catch((err) => {
+              console.error(`Fetch failed for row ${i}`, err);
+              this.nameList[i].current = 'stale';
+            })
+            .finally(() => {
+              active--;
+              next(); // Launch next as soon as one finishes
+              this.updateTableData(); // Partial update as rows load
+            });
         }
       }
 
-      if (indicesToFetch.length === 0) {
+      // If we’re done
+      if (index >= this.nameList.length && active === 0) {
         this._bgFetchTimer = undefined;
-        console.log(
-          `No more indices to fetch, namelist has ${this.nameList.length} and tableData has ${this.tableData.length}`,
-        );
-        this.requestUpdate();
-        return;
+        console.log('✅ All rows fetched');
+        this.updateTableData(); // Final update
       }
-
-      // Mark all as pending
-      indicesToFetch.forEach((index) => {
-        this.nameList[index].current = 'pending';
-      });
-
-      // Fetch all rows in parallel
-      await Promise.all(
-        indicesToFetch.map((index) =>
-          this.fetchRow(index)
-            .then((full) => {
-              this.nameList[index].current = 'current';
-              this.dataMap.set(index, full);
-            })
-            .catch((e) => {
-              console.error('Fetch failed at index', index, e);
-              this.nameList[index].current = 'stale';
-            }),
-        ),
-      );
-
-      // Update table data after all fetches complete
-      this.tableData = this.nameList
-        .map((_, i) => this.dataMap.get(i))
-        .filter(Boolean) as RowData[];
-      this.requestUpdate();
-
-      // Schedule next batch
-      this._bgFetchTimer = window.setTimeout(loadNext, timeoutSize);
     };
 
-    loadNext();
+    next();
+  }
+
+  private updateTableData() {
+    this.tableData = this.nameList
+      .map((_, i) => this.dataMap.get(i))
+      .filter((x): x is RowData => !!x);
+    this.requestUpdate();
   }
 
   override render() {
+    const loadingCount = this.nameList.filter(
+      (r) => r.current !== 'current',
+    ).length;
     const table = this.tableController.table({
       columns: this.columns,
       data: this.tableData,
@@ -460,10 +447,20 @@ export class GeneralTable extends LitElement {
       getCoreRowModel: getCoreRowModel(),
     });
     return html`
-      ${this.tableData.length !== this.nameList.length
-        ? html` <div class="spectrum-Overlay is-open loading-overlay">
-            <div class="spectrum-Overlay-wrapper">
-              <div class="spectrum-Overlay-content">Loading data...</div>
+      ${loadingCount > 0
+        ? html` <div id="table-loading">
+            <div class=" spectrum-ProgressBar " role="progressbar">
+              <div class="spectrum-ProgressBar-track">
+                <div
+                  class="spectrum-ProgressBar-fill"
+                  style="inline-size: ${((this.nameList.length - loadingCount) /
+                    this.nameList.length) *
+                  100}%;"
+                ></div>
+              </div>
+              <div class="spectrum-ProgressBar-label">
+                Refreshing ${loadingCount}/${this.nameList.length} rows...
+              </div>
             </div>
           </div>`
         : ''}
@@ -504,27 +501,32 @@ export class GeneralTable extends LitElement {
             ${repeat(
               table.getRowModel().rows,
               (row) => row.id,
-              (row, index) =>
-                html`<tr class="spectrum-Table-row">
+              (row, index) => {
+                const isStale = this.nameList[index]?.current === 'stale';
+                return html`<tr
+                  class="spectrum-Table-row ${isStale ? 'stale-row' : ''}"
+                >
                   ${repeat(
                     row.getVisibleCells(),
                     (cell) => cell.id,
                     (cell) => {
                       if (cell.column.id === 'rowIndex') {
-                        return html`<td class="spectrum-Table-cell">
-                          ${index + 1}
-                        </td>`;
-                      } else {
-                        return html`<td class="spectrum-Table-cell">
-                          ${flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext(),
-                          )}
-                        </td>`;
+                        return html`
+                          <span class="spectrum-Body spectrum-Body--sizeM"
+                            >${index}</span
+                          >
+                        `;
                       }
+                      return html`<td class="spectrum-Table-cell">
+                        ${flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext(),
+                        )}
+                      </td>`;
                     },
                   )}
-                </tr>`,
+                </tr>`;
+              },
             )}
           </tbody>
         </table>

@@ -3,6 +3,18 @@
 @import url('@spectrum-css/table/dist/index.css');
 @import url('@spectrum-css/overlay/index.css');
 
+div#table-loading {
+  width: 100%;
+  padding: 1rem;
+  margin: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  /* @spectrum-css progress bar cannot be more than 768px */
+  --mod-progressbar-size-default: min(768px, 100%);
+}
+
 .loading-overlay {
   position: absolute;
   top: 0;
@@ -30,6 +42,10 @@
 /* Add cursor pointer to sortable headers */
 .spectrum-Table-headCell.is-sortable {
   cursor: pointer;
+}
+
+tr.stale-row {
+  background-color: var(--surface-2);
 }
 
 thead,

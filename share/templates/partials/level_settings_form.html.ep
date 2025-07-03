@@ -147,3 +147,32 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 % }
 </script>
+%# something about replacing the current script with the following to
+%# to prevent the need to fully refresh the page on form change.
+%# this example doesn't capture the complexity of
+%# both single and pair mode, and I need to think it through.
+%#
+%# const table = document.querySelector('general-table');
+%# const formData = new FormData(e.target);
+%# const params = new URLSearchParams(formData);
+%#
+%# // Update URL without reload
+%# const newUrl = `${window.location.pathname}?${params.toString()}`;
+%# window.history.pushState({}, '', newUrl);
+%#
+%# // Update Lit element props
+%# table.ascendingLevel = params.get('ascendingLevel');
+%# table.primaryCovenantLevel = params.get('primaryCovenantLevel');
+%# table.primarySpecialty1 = params.get('primarySpecialty1');
+%# table.primarySpecialty2 = params.get('primarySpecialty2');
+%# table.primarySpecialty3 = params.get('primarySpecialty3');
+%# table.primarySpecialty4 = params.get('primarySpecialty4');
+%#
+%# // For pair mode:
+%# if (table.mode === 'pair') {
+%#   table.secondaryCovenantLevel = params.get('secondaryCovenantLevel');
+%#   table.secondarySpecialty1 = params.get('secondarySpecialty1');
+%#   table.secondarySpecialty2 = params.get('secondarySpecialty2');
+%#   table.secondarySpecialty3 = params.get('secondarySpecialty3');
+%#   table.secondarySpecialty4 = params.get('secondarySpecialty4');
+%# }
