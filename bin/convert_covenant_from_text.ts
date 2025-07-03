@@ -17,6 +17,7 @@ const attributeMap: AttributeMapping = {
   Defense: "Defense",
   HP: "HP",
   "March Size Capacity": "March Size Capacity",
+  "March Speed": "March Speed",
   "Marching Speed": "Marching Speed",
   "Training Speed": "Training Speed",
   "Training Capacity": "Training Capacity",

@@ -30,13 +30,16 @@ export function extractTroopClasses(
   classMap: ClassMapping,
 ): common.Class[] {
   const troopClasses: common.Class[] = [];
-  
+
   // Sort by length (longest first) to avoid partial matches
   const classKeys = Object.keys(classMap).sort((a, b) => b.length - a.length);
-  
+
   for (const cls of classKeys) {
     // Use word boundaries for precise matching, but handle possessive forms
-    const regex = new RegExp(`\\b${cls.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');
+    const regex = new RegExp(
+      `\\b${cls.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`,
+      "i",
+    );
     if (regex.test(text)) {
       const mappedClass = classMap[cls];
       if (mappedClass && !troopClasses.includes(mappedClass)) {
@@ -48,25 +51,156 @@ export function extractTroopClasses(
 }
 
 /**
- * Extract conditions from text using word boundaries and enhanced pattern matching
+ * Apply contextual modifiers to buffs based on sentence context
+ * Handles patterns like "Training Speed in Subordinate City" -> "SubCity Training Speed"
+ */
+function applyContextualModifiers(
+  buffs: any[],
+  fullText: string,
+  conditionMap: ConditionMapping,
+): any[] {
+  const modifiedBuffs = buffs.map(buff => ({ ...buff }));
+  
+  // Handle "in Subordinate City" modifier
+  if (/\bin\s+(?:this\s+)?Subordinate\s+City\b/i.test(fullText)) {
+    modifiedBuffs.forEach(buff => {
+      // Convert Training Speed -> SubCity Training Speed
+      if (buff.attribute === "Training Speed") {
+        buff.attribute = "SubCity Training Speed";
+      }
+      // Convert other attributes that have SubCity variants
+      else if (buff.attribute === "Death to Survival") {
+        buff.attribute = "SubCity Death to Survival";
+      }
+      else if (buff.attribute === "Gold Production") {
+        buff.attribute = "SubCity Gold Production";
+      }
+      else if (buff.attribute === "Training Capacity") {
+        buff.attribute = "SubCity Training Capacity";
+      }
+      else if (buff.attribute === "Construction Speed") {
+        buff.attribute = "SubCity Construction Speed";
+      }
+    });
+  }
+  
+  // Handle "when General is the Mayor" condition
+  if (/when\s+General\s+is\s+the\s+Mayor/i.test(fullText)) {
+    const mayorCondition = conditionMap["When City Mayor for this SubCity"];
+    if (mayorCondition) {
+      modifiedBuffs.forEach(buff => {
+        if (!buff.condition) {
+          buff.condition = [];
+        }
+        if (!buff.condition.includes(mayorCondition)) {
+          buff.condition.push(mayorCondition);
+        }
+      });
+    }
+  }
+  
+  return modifiedBuffs;
+}
+/**
+ * Enhanced condition extraction that handles complex multi-condition patterns
+ * Supports patterns like "when General brings any Dragon or Spiritual Beast to attack"
  */
 export function extractConditions(
   text: string,
   conditionMap: ConditionMapping,
 ): common.Condition[] {
   const conditions: common.Condition[] = [];
-  
+
   // Sort by length (longest first) to avoid partial matches
-  const conditionKeys = Object.keys(conditionMap).sort((a, b) => b.length - a.length);
+  const conditionKeys = Object.keys(conditionMap).sort(
+    (a, b) => b.length - a.length,
+  );
+
+  // Handle complex multi-condition patterns first
   
+  // Pattern for "brings any Dragon or Spiritual Beast"
+  const dragonBeastPattern =
+    /when\s+General\s+brings\s+any\s+Dragon\s+or\s+Spiritual\s+Beast(?:\s+to\s+attack)?/i;
+  const dragonBeastMatch = text.match(dragonBeastPattern);
+  if (dragonBeastMatch) {
+    const fullMatch = dragonBeastMatch[0];
+
+    // Add the dragon/beast conditions
+    if (conditionMap["brings a dragon"]) {
+      conditions.push(conditionMap["brings a dragon"]);
+    }
+    if (conditionMap["brings a spiritual beast"]) {
+      conditions.push(conditionMap["brings a spiritual beast"]);
+    }
+
+    // Check if "to attack" is included
+    if (fullMatch.includes("to attack") && conditionMap["to attack"]) {
+      conditions.push(conditionMap["to attack"]);
+    }
+  }
+  
+  // Pattern for just "brings any dragon" (without spiritual beast)
+  const dragonOnlyPattern = /when\s+General\s+brings\s+any\s+dragon(?:\s+to\s+attack)?/i;
+  const dragonOnlyMatch = text.match(dragonOnlyPattern);
+  if (dragonOnlyMatch && !dragonBeastMatch) { // Only if we didn't already match the full pattern
+    const fullMatch = dragonOnlyMatch[0];
+
+    // Add the dragon condition
+    if (conditionMap["brings a dragon"]) {
+      conditions.push(conditionMap["brings a dragon"]);
+    }
+
+    // Check if "to attack" is included
+    if (fullMatch.includes("to attack") && conditionMap["to attack"]) {
+      conditions.push(conditionMap["to attack"]);
+    }
+  }
+
+  // Handle "leading the army" patterns
+  const leadingArmyPattern =
+    /when\s+General\s+is\s+leading\s+the\s+army(?:\s+to\s+attack)?/i;
+  const leadingArmyMatch = text.match(leadingArmyPattern);
+  if (leadingArmyMatch) {
+    const fullMatch = leadingArmyMatch[0];
+
+    if (
+      fullMatch.includes("to attack") &&
+      conditionMap["leading the army to attack"]
+    ) {
+      conditions.push(conditionMap["to attack"]);
+    } else if (conditionMap["leading the army"]) {
+      conditions.push(conditionMap["leading the army"]);
+    }
+  }
+
+  // Handle other standard conditions
   for (const cond of conditionKeys) {
+    // Skip the complex patterns we already handled
+    if (
+      cond.includes("dragon") ||
+      cond.includes("spiritual beast") ||
+      cond.includes("leading the army")
+    ) {
+      continue;
+    }
+
     // Handle special case: "Marching Troop" should extract "Marching" condition
     if (cond === "Marching" && text.includes("Marching Troop")) {
-      conditions.push(conditionMap[cond]);
+      if (!conditions.includes(conditionMap[cond])) {
+        conditions.push(conditionMap[cond]);
+      }
     }
     // Handle special case: "In-city Troop" should extract "In City" condition
     else if (cond === "In City" && text.includes("In-city Troop")) {
-      conditions.push(conditionMap[cond]);
+      if (!conditions.includes(conditionMap[cond])) {
+        conditions.push(conditionMap[cond]);
+      }
+    }
+    // Handle special case: "Monsters" should extract "Against Monsters" condition
+    else if (cond === "Against Monsters" && /\bMonsters?\b/i.test(text)) {
+      if (!conditions.includes(conditionMap[cond])) {
+        conditions.push(conditionMap[cond]);
+      }
     }
     // Handle "When attacking" at start of clause
     else if (cond === "Attacking" && /when\s+attacking/i.test(text)) {
@@ -76,7 +210,10 @@ export function extractConditions(
     }
     // Use word boundaries for precise matching
     else {
-      const regex = new RegExp(`\\b${cond.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');
+      const regex = new RegExp(
+        `\\b${cond.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`,
+        "i",
+      );
       if (regex.test(text)) {
         if (!conditions.includes(conditionMap[cond])) {
           conditions.push(conditionMap[cond]);
@@ -84,6 +221,7 @@ export function extractConditions(
       }
     }
   }
+
   return conditions;
 }
 
@@ -112,7 +250,8 @@ export function parseAttributePattern(
   const skillBookMatches = Array.from(text.matchAll(skillBookRegex));
 
   if (skillBookMatches.length > 0) {
-    const results: { attributes: common.Attribute[]; percentage: number }[] = [];
+    const results: { attributes: common.Attribute[]; percentage: number }[] =
+      [];
 
     for (const match of skillBookMatches) {
       const segment = match[1];
@@ -121,7 +260,10 @@ export function parseAttributePattern(
       // Find attributes in the segment using word boundaries
       const attributes: common.Attribute[] = [];
       for (const attr of attributeKeys) {
-        const regex = new RegExp(`\\b${attr.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');
+        const regex = new RegExp(
+          `\\b${attr.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`,
+          "i",
+        );
         if (regex.test(segment)) {
           const mappedAttr = attributeMap[attr];
           if (mappedAttr && !attributes.includes(mappedAttr)) {
@@ -159,7 +301,10 @@ export function parseAttributePattern(
       // Find all attributes mentioned in the group using word boundaries
       const attributes: common.Attribute[] = [];
       for (const attr of attributeKeys) {
-        const regex = new RegExp(`\\b${attr.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');
+        const regex = new RegExp(
+          `\\b${attr.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`,
+          "i",
+        );
         if (regex.test(attributePart)) {
           const mappedAttr = attributeMap[attr];
           if (mappedAttr && !attributes.includes(mappedAttr)) {
@@ -264,6 +409,7 @@ export function parseTextSegment(
   attributeMap: AttributeMapping,
   classMap: ClassMapping,
   conditionMap: ConditionMapping,
+  fullContext?: string, // Optional full sentence context for contextual modifiers
 ): ParsedBuff[] {
   const buffs: ParsedBuff[] = [];
 
@@ -285,7 +431,11 @@ export function parseTextSegment(
     );
   }
 
-  return buffs;
+  // Apply contextual modifiers based on full text context
+  const contextText = fullContext || text;
+  const modifiedBuffs = applyContextualModifiers(buffs, contextText, conditionMap);
+
+  return modifiedBuffs;
 }
 
 /**
@@ -318,19 +468,19 @@ export function splitComplexText(text: string): string[] {
         // Look for patterns where we have "attribute +X%, other attributes +Y%"
         const commaParts = majorPart.split(",").map((p) => p.trim());
 
-        // Check if we have a pattern like "Attack, Defense and HP -10%" 
+        // Check if we have a pattern like "Attack, Defense and HP -10%"
         // where the percentage only appears at the end
         const lastPart = commaParts[commaParts.length - 1];
         const percentageMatch = lastPart.match(/([-+]\d+%)/);
-        
+
         if (percentageMatch && commaParts.length > 1) {
           const percentage = percentageMatch[1];
-          
+
           // Check if earlier parts are missing percentages
-          const needsPercentage = commaParts.slice(0, -1).some(part => 
-            !part.match(/[-+]\d+%/)
-          );
-          
+          const needsPercentage = commaParts
+            .slice(0, -1)
+            .some((part) => !part.match(/[-+]\d+%/));
+
           if (needsPercentage) {
             // Distribute the percentage to all parts that need it
             const enhancedParts = commaParts.map((part, index) => {
@@ -342,7 +492,7 @@ export function splitComplexText(text: string): string[] {
                 return part; // Part already has its own percentage
               }
             });
-            
+
             allParts.push(...enhancedParts);
           } else {
             // Normal comma splitting

@@ -10,74 +10,7 @@ import {
   type ConditionMapping,
 } from "../lib/parsing-utils.js";
 
-// Define the schema inline to avoid import issues with spaces in filename
-const Attribute = z.enum([
-  "Attack",
-  "Death to Survival",
-  "Death to Wounded",
-  "Defense",
-  "Double Items Drop Rate",
-  "HP",
-  "March Size Capacity",
-  "Marching Speed",
-  "Marching Speed to Monsters",
-  "Rally Capacity",
-  "Stamina cost",
-  "SubCity Training Speed",
-  "Wounded to Death",
-]);
-
-const ClassEnum = z.enum([
-  "Ground Troops",
-  "Mounted Troops",
-  "Ranged Troops",
-  "Siege Machines",
-  "Sieged Machines",
-]);
-
-const Condition = z.enum([
-  "Against Monsters",
-  "Attacking",
-  "dragon to the attack",
-  "Enemy",
-  "Enemy In City",
-  "In City",
-  "leading the army to attack",
-  "Marching",
-  "Reduces Enemy",
-  "Reduces Monster",
-  "Reinforcing",
-  "When City Mayor for this SubCity",
-  "When Defending Outside The Main City",
-  "When Rallying",
-]);
-
-const Unit = z.enum(["percentage"]);
-
-const Level = z.enum(["red1", "red2", "red3", "red4", "red5"]);
-
-const Value = z.object({
-  number: z.number(),
-  unit: Unit,
-});
-
-const Buff = z.object({
-  attribute: Attribute,
-  condition: z.array(Condition).optional(),
-  class: ClassEnum.optional(),
-  value: Value,
-});
-
-const Ascending = z.object({
-  level: Level,
-  buff: z.array(Buff),
-});
-
-const Ascendingattribute = z.object({
-  ascending: z.array(Ascending),
-  general: z.string().optional(),
-  id: z.string().optional(),
-});
+import { Ascendingattribute } from "../lib/schemas/ascending attributes";
 
 const attributeMap: AttributeMapping = {
   Attack: "Attack",
@@ -102,6 +35,7 @@ const classMap: ClassMapping = {
 
 const conditionMap: ConditionMapping = {
   Attacking: "Attacking",
+  Monsters: "Against Monsters",
   "When attacking": "Attacking",
   Enemy: "Enemy",
   "when General is the Mayor": "When City Mayor for this SubCity",
