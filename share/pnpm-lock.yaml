@@ -47,6 +47,9 @@ importers:
       '@spectrum-css/picker':
         specifier: ^9.1.4
         version: 9.1.4(@spectrum-css/icon@9.1.0(@spectrum-css/tokens@16.0.2))(@spectrum-css/tokens@16.0.2)
+      '@spectrum-css/progressbar':
+        specifier: ^6.1.0
+        version: 6.1.0(@spectrum-css/fieldlabel@10.1.0(@spectrum-css/icon@9.1.0(@spectrum-css/tokens@16.0.2))(@spectrum-css/tokens@16.0.2))(@spectrum-css/tokens@16.0.2)
       '@spectrum-css/sidenav':
         specifier: ^7.1.0
         version: 7.1.0(@spectrum-css/icon@9.1.0(@spectrum-css/tokens@16.0.2))(@spectrum-css/tokens@16.0.2)
@@ -96,8 +99,8 @@ importers:
         specifier: ^0.21.1
         version: 0.21.1(signal-polyfill@0.2.2)
       zod:
-        specifier: ^3.25.69
-        version: 3.25.69
+        specifier: ^3.25.70
+        version: 3.25.70
     devDependencies:
       '@tsconfig/node22':
         specifier: ^22.0.2
@@ -759,6 +762,17 @@ packages:
       '@spectrum-css/popover':
         optional: true
       '@spectrum-css/progresscircle':
+        optional: true
+      '@spectrum-css/tokens':
+        optional: true
+
+  '@spectrum-css/progressbar@6.1.0':
+    resolution: {integrity: sha512-wwdLytyExhjGgDg0i6CXnuL3zeKqhJrqa8LD50rgkRNbwHwfoWWW8kUFYXW5xpoyw2GUQCKeD1PP1HbsmRuqgQ==}
+    peerDependencies:
+      '@spectrum-css/fieldlabel': '>=10.0.0 <11.0.0'
+      '@spectrum-css/tokens': '>=16.0.0 <17.0.0'
+    peerDependenciesMeta:
+      '@spectrum-css/fieldlabel':
         optional: true
       '@spectrum-css/tokens':
         optional: true
@@ -2129,8 +2143,8 @@ packages:
     resolution: {integrity: sha512-7dSzzRQ++CKnNI/krKnYRV7JKKPUXMEh61soaHKg9mrWEhzFWhFnxPxGl+69cD1Ou63C13NUPCnmIcrvqCuM6w==}
     engines: {node: '>=12'}
 
-  zod@3.25.69:
-    resolution: {integrity: sha512-cjUx+boz8dfYGssYKLGNTF5VUF6NETpcZCDTN3knhUUXQTAAvErzRhV3pgeCZm2YsL4HOwtEHPonlsshPu2I0A==}
+  zod@3.25.70:
+    resolution: {integrity: sha512-2WWzL2X2GpPU6as2xK1HFb6U5BZdJMdpB5Qtlan4a1KLYcZ6Gvox+mqZpxOd66sfe5AP3pEWpd2BC3f0yLH/nQ==}
 
 snapshots:
 
@@ -2583,6 +2597,11 @@ snapshots:
   '@spectrum-css/picker@9.1.4(@spectrum-css/icon@9.1.0(@spectrum-css/tokens@16.0.2))(@spectrum-css/tokens@16.0.2)':
     optionalDependencies:
       '@spectrum-css/icon': 9.1.0(@spectrum-css/tokens@16.0.2)
+      '@spectrum-css/tokens': 16.0.2
+
+  '@spectrum-css/progressbar@6.1.0(@spectrum-css/fieldlabel@10.1.0(@spectrum-css/icon@9.1.0(@spectrum-css/tokens@16.0.2))(@spectrum-css/tokens@16.0.2))(@spectrum-css/tokens@16.0.2)':
+    optionalDependencies:
+      '@spectrum-css/fieldlabel': 10.1.0(@spectrum-css/icon@9.1.0(@spectrum-css/tokens@16.0.2))(@spectrum-css/tokens@16.0.2)
       '@spectrum-css/tokens': 16.0.2
 
   '@spectrum-css/sidenav@7.1.0(@spectrum-css/icon@9.1.0(@spectrum-css/tokens@16.0.2))(@spectrum-css/tokens@16.0.2)':
@@ -3957,4 +3976,4 @@ snapshots:
       y18n: 5.0.8
       yargs-parser: 21.1.1
 
-  zod@3.25.69: {}
+  zod@3.25.70: {}
