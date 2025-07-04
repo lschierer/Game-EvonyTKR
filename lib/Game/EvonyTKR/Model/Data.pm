@@ -102,6 +102,7 @@ class Game::EvonyTKR::Model::Data : isa(Game::EvonyTKR::Model::Logger) {
       "Against Monsters",
       "Attacking",
       "brings a dragon",
+      "brings a spiritual beast",
       "brings dragon or beast to attack",
       "Defending",
       "dragon to the attack",
