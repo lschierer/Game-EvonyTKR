@@ -13,7 +13,6 @@ basic_attributes:
     base: 112
     increment: 8.63
 book: Bloody Leader
-display: summary
 specialties:
   - Mounted Troop Assault
   - Annihilation
