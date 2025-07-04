@@ -118,6 +118,9 @@ package Game::EvonyTKR {
     $self->plugin('Game::EvonyTKR::Plugins::StaticPages')
       ;    # Register last for lowest priority
 
+
+    # configure to tell it that I will be behind an ELB/ALB.
+    #$self->reverse_proxy(1);
   }
 };
 
