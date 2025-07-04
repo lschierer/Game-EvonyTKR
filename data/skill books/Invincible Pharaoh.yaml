@@ -1,17 +1,18 @@
----
 name: Invincible Pharaoh
 buff:
   - attribute: Attack
-    condition:
-      - leading the army to attack
     class: Ranged Troops
+    condition:
+      - Attacking
     value:
       number: 30
       unit: percentage
   - attribute: HP
-    condition:
-      - leading the army to attack
     class: Ground Troops
+    condition:
+      - Attacking
     value:
       number: 25
       unit: percentage
+text: >-
+  Increases ranged troops attack by 30% and ground troops HP by 25% when General is leading the army to attack.
