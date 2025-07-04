@@ -4,7 +4,7 @@
 @import url('@spectrum-css/overlay/index.css');
 
 div#table-loading {
-  width: 100%;
+  width: calc(100% - 4rem);
   padding: 1rem;
   margin: auto;
   display: flex;
