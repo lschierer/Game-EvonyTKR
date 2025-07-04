@@ -1,0 +1,87 @@
+name: Battle of Marathon
+levels:
+  - level: Green
+    buff:
+      - attribute: Attack
+        class: Ranged Troops
+        value:
+          number: 0
+          unit: percentage
+      - attribute: Defense
+        class: Ranged Troops
+        value:
+          number: 0
+          unit: percentage
+      - attribute: Defense
+        class: Ground Troops
+        value:
+          number: 0
+          unit: percentage
+  - level: Blue
+    buff:
+      - attribute: Attack
+        class: Ranged Troops
+        value:
+          number: 0
+          unit: percentage
+      - attribute: Defense
+        class: Ranged Troops
+        value:
+          number: 0
+          unit: percentage
+      - attribute: Defense
+        class: Ground Troops
+        value:
+          number: 0
+          unit: percentage
+  - level: Purple
+    buff:
+      - attribute: Attack
+        class: Ranged Troops
+        value:
+          number: 0
+          unit: percentage
+      - attribute: Defense
+        class: Ranged Troops
+        value:
+          number: 0
+          unit: percentage
+      - attribute: Defense
+        class: Ground Troops
+        value:
+          number: 0
+          unit: percentage
+  - level: Orange
+    buff:
+      - attribute: Attack
+        class: Ranged Troops
+        value:
+          number: 0
+          unit: percentage
+      - attribute: Defense
+        class: Ranged Troops
+        value:
+          number: 0
+          unit: percentage
+      - attribute: Defense
+        class: Ground Troops
+        value:
+          number: 0
+          unit: percentage
+  - level: Gold
+    buff:
+      - attribute: Attack
+        class: Ranged Troops
+        value:
+          number: 20
+          unit: percentage
+      - attribute: Defense
+        class: Ranged Troops
+        value:
+          number: 20
+          unit: percentage
+      - attribute: Defense
+        class: Ground Troops
+        value:
+          number: 20
+          unit: percentage
