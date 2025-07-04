@@ -1,0 +1,52 @@
+name: Battle of Brandywine
+levels:
+  - level: Green
+    buff:
+      - attribute: March Size Capacity
+        value:
+          number: 1
+          unit: percentage
+      - attribute: Death to Wounded
+        value:
+          number: 1
+          unit: percentage
+  - level: Blue
+    buff:
+      - attribute: March Size Capacity
+        value:
+          number: 1
+          unit: percentage
+      - attribute: Death to Wounded
+        value:
+          number: 1
+          unit: percentage
+  - level: Purple
+    buff:
+      - attribute: March Size Capacity
+        value:
+          number: 2
+          unit: percentage
+      - attribute: Death to Wounded
+        value:
+          number: 2
+          unit: percentage
+  - level: Orange
+    buff:
+      - attribute: March Size Capacity
+        value:
+          number: 2
+          unit: percentage
+      - attribute: Death to Wounded
+        value:
+          number: 2
+          unit: percentage
+  - level: Gold
+    buff:
+      - attribute: March Size Capacity
+        value:
+          number: 4
+          unit: percentage
+      - attribute: Death to Wounded
+        value:
+          number: 4
+          unit: percentage

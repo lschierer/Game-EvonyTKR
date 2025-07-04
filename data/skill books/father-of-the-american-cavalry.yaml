@@ -1,0 +1,10 @@
+name: Father of the American Cavalry
+buff:
+  - attribute: Death to Wounded
+    condition:
+      - Attacking
+    value:
+      number: 10
+      unit: percentage
+text: >-
+  Increases the attacking troops’ death-turning-wounded rate by 10% when General is leading the army.

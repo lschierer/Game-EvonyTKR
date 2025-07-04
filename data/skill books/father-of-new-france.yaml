@@ -1,0 +1,14 @@
+name: Father of New France
+buff:
+  - attribute: Attack
+    class: Siege Machines
+    value:
+      number: 50
+      unit: percentage
+  - attribute: HP
+    class: Siege Machines
+    value:
+      number: 50
+      unit: percentage
+text: >-
+  Increases siege machines’ attack and HP by 50% and ranged troops and siege machines’ defense by 40% when General is leading the army.

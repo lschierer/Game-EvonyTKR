@@ -1,9 +1,10 @@
----
 name: Domination
 buff:
-  - attribute: SubCity Gold Production
+  - attribute: SubCity Training Speed
     condition:
       - When City Mayor for this SubCity
     value:
-      number: 75
+      number: 35
       unit: percentage
+text: >-
+  Increases Troop Training Speed by 35% in Subordinate City when General is the Mayor.
