@@ -71,11 +71,6 @@ class Game::EvonyTKR::Model::Book::Manager : isa(Game::EvonyTKR::Model::Data) {
         yaml_version => ['1.2', '1.1'],
       )->load_string($data);
       if (exists $object->{name}) {
-        if ($name ne $object->{name}) {
-          $self->logger->error(
-"filename and internal name do not match for file '$file' with name '$object->{name}'"
-          );
-        }
         $name = $object->{name};
       }
 
