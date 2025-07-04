@@ -96,13 +96,8 @@ my $builder = Module::Build->new(
     test_requires       => {
       'Test::More'    => '0',
       'Perl::Critic'  => '0',
-    },
-    meta_merge => {
-        resources => {
-            repository => 'https://github.com/szabgab/App',
-            bugtracker => 'https://github.com/szabgab/App/issues'
-        }
-    },
+    }
+
 );
 
 $builder->create_build_script();
