@@ -348,7 +348,7 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
     $self->logger->info("summarize_from_sources has $total after summarize_specialties for $attribute/$summaryType");
 
     # Ascending attribute buffs (primary only)
-    if ($isPrimary) {
+    if ($isPrimary && $general->ascending ) {
       $total += $self->summarize_ascendingAttributes_for_attribute($attribute,
         $summaryType, $buffConditions, $debuffConditions, $matching_type);
 

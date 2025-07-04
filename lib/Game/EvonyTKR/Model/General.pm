@@ -28,7 +28,7 @@ class Game::EvonyTKR::Model::General : isa(Game::EvonyTKR::Model::Data) {
 
   field $type : reader : param;
 
-  field $ascending : reader : param //= false;
+  field $ascending : reader : param //= 0;
 
   field $basicAttributes : reader =
     Game::EvonyTKR::Model::BasicAttributes->new();
