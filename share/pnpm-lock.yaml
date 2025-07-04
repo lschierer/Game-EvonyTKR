@@ -85,7 +85,7 @@ importers:
         version: 3.13.12
       evonytkrtips-data:
         specifier: github:lschierer/EvonyTKRTips-Data
-        version: '@evonytkrtips/data@https://codeload.github.com/lschierer/EvonyTKRTips-Data/tar.gz/301a9989f2f2803b9f368e770c19fd9307dbd306'
+        version: '@evonytkrtips/data@https://codeload.github.com/lschierer/EvonyTKRTips-Data/tar.gz/df9f90c1914a37294eec5d2926ae12afbfdaf15c'
       iconify-icon:
         specifier: ^3.0.0
         version: 3.0.0
@@ -596,8 +596,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@evonytkrtips/data@https://codeload.github.com/lschierer/EvonyTKRTips-Data/tar.gz/301a9989f2f2803b9f368e770c19fd9307dbd306':
-    resolution: {tarball: https://codeload.github.com/lschierer/EvonyTKRTips-Data/tar.gz/301a9989f2f2803b9f368e770c19fd9307dbd306}
+  '@evonytkrtips/data@https://codeload.github.com/lschierer/EvonyTKRTips-Data/tar.gz/df9f90c1914a37294eec5d2926ae12afbfdaf15c':
+    resolution: {tarball: https://codeload.github.com/lschierer/EvonyTKRTips-Data/tar.gz/df9f90c1914a37294eec5d2926ae12afbfdaf15c}
     version: 1.0.0
 
   '@iconify/types@2.0.0':
@@ -2494,7 +2494,7 @@ snapshots:
   '@esbuild/win32-x64@0.25.5':
     optional: true
 
-  '@evonytkrtips/data@https://codeload.github.com/lschierer/EvonyTKRTips-Data/tar.gz/301a9989f2f2803b9f368e770c19fd9307dbd306':
+  '@evonytkrtips/data@https://codeload.github.com/lschierer/EvonyTKRTips-Data/tar.gz/df9f90c1914a37294eec5d2926ae12afbfdaf15c':
     dependencies:
       '@types/js-yaml': 4.0.9
       js-yaml: 4.1.0
