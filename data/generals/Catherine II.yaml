@@ -1,14 +1,14 @@
 ascending: true
 basic_attributes:
+  leadership:
+    base: 108
+    increment: 8.49
   attack:
     base: 83
     increment: 6.65
   defense:
     base: 101
     increment: 7.49
-  leadership:
-    base: 108
-    increment: 8.49
   politics:
     base: 119
     increment: 8.49

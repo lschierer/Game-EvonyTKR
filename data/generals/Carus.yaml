@@ -1,19 +1,18 @@
 ascending: true
 basic_attributes:
+  leadership:
+    base: 116
+    increment: 9.09
   attack:
     base: 119
     increment: 8.66
   defense:
     base: 115
     increment: 8.78
-  leadership:
-    base: 116
-    increment: 9.09
   politics:
     base: 112
     increment: 8.65
 book: Expedition to Persia
-display: summary
 specialties:
   - Ground Troop Assault
   - Annihilation

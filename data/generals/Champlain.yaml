@@ -1,0 +1,25 @@
+ascending: true
+basic_attributes:
+  leadership:
+    base: 119
+    increment: 8.63
+  attack:
+    base: 132
+    increment: 8.88
+  defense:
+    base: 125
+    increment: 8.64
+  politics:
+    base: 119
+    increment: 8.62
+book: Father of New France
+specialties:
+  - Siege Machine Formation
+  - Siege
+  - Siege Machine Ares
+  - Golden Route
+stars: red5
+type:
+  - siege_specialist
+general: Champlain
+name: Champlain

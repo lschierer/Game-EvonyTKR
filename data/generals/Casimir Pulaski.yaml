@@ -1,0 +1,28 @@
+ascending: true
+basic_attributes:
+  leadership:
+    base: 105
+    increment: 0
+  attack:
+    base: 104
+    increment: 0
+  defense:
+    base: 100
+    increment: 0
+  politics:
+    base: 112
+    increment: 0
+book: Father of the American Cavalry
+specialties:
+  - Siege Machine Formation
+  - Snipe
+  - War God
+  - Battle of Brandywine
+stars: red5
+type:
+  - ground_specialist
+  - mounted_specialist
+  - ranged_specialist
+  - siege_specialist
+general: Casimir Pulaski
+name: Casimir Pulaski

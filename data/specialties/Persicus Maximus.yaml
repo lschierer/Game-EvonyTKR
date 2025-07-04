@@ -1,153 +1,152 @@
----
 name: Persicus Maximus
 levels:
-  - level: "Green"
+  - level: Green
     buff:
       - attribute: Attack
+        class: Mounted Troops
         condition:
           - Attacking
-        class: Mounted Troops
         value:
           number: 2
           unit: percentage
       - attribute: Attack
+        class: Ground Troops
         condition:
           - Attacking
-        class: Ground Troops
         value:
           number: 2
           unit: percentage
       - attribute: Defense
-        condition:
-          - Attacking
         class: Mounted Troops
+        condition:
+          - Attacking
         value:
           number: 2
           unit: percentage
       - attribute: Defense
+        class: Ground Troops
         condition:
           - Attacking
-        class: Ground Troops
         value:
           number: 2
           unit: percentage
-  - level: "Blue"
+  - level: Blue
     buff:
       - attribute: Attack
+        class: Mounted Troops
         condition:
           - Attacking
-        class: Mounted Troops
         value:
           number: 2
           unit: percentage
       - attribute: Attack
+        class: Ground Troops
         condition:
           - Attacking
-        class: Ground Troops
         value:
           number: 2
           unit: percentage
       - attribute: Defense
-        condition:
-          - Attacking
         class: Mounted Troops
+        condition:
+          - Attacking
         value:
           number: 2
           unit: percentage
       - attribute: Defense
+        class: Ground Troops
         condition:
           - Attacking
-        class: Ground Troops
         value:
           number: 2
           unit: percentage
-  - level: "Purple"
+  - level: Purple
     buff:
       - attribute: Attack
+        class: Mounted Troops
         condition:
           - Attacking
-        class: Mounted Troops
         value:
           number: 4
           unit: percentage
       - attribute: Attack
+        class: Ground Troops
         condition:
           - Attacking
-        class: Ground Troops
         value:
           number: 4
           unit: percentage
       - attribute: Defense
-        condition:
-          - Attacking
         class: Mounted Troops
+        condition:
+          - Attacking
         value:
           number: 4
           unit: percentage
       - attribute: Defense
+        class: Ground Troops
         condition:
           - Attacking
-        class: Ground Troops
         value:
           number: 4
           unit: percentage
-  - level: "Orange"
+  - level: Orange
     buff:
       - attribute: Attack
+        class: Mounted Troops
         condition:
           - Attacking
-        class: Mounted Troops
         value:
           number: 4
           unit: percentage
       - attribute: Attack
+        class: Ground Troops
         condition:
           - Attacking
-        class: Ground Troops
         value:
           number: 4
           unit: percentage
       - attribute: Defense
-        condition:
-          - Attacking
         class: Mounted Troops
+        condition:
+          - Attacking
         value:
           number: 4
           unit: percentage
       - attribute: Defense
+        class: Ground Troops
         condition:
           - Attacking
-        class: Ground Troops
         value:
           number: 4
           unit: percentage
-  - level: "Gold"
+  - level: Gold
     buff:
       - attribute: Attack
+        class: Mounted Troops
         condition:
           - Attacking
-        class: Mounted Troops
         value:
           number: 8
           unit: percentage
       - attribute: Attack
+        class: Ground Troops
         condition:
           - Attacking
-        class: Ground Troops
         value:
           number: 8
           unit: percentage
       - attribute: Defense
-        condition:
-          - Attacking
         class: Mounted Troops
+        condition:
+          - Attacking
         value:
           number: 8
           unit: percentage
       - attribute: Defense
+        class: Ground Troops
         condition:
           - Attacking
-        class: Ground Troops
         value:
           number: 8
           unit: percentage
