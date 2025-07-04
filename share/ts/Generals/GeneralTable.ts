@@ -446,6 +446,7 @@ export class GeneralTable extends LitElement {
       getSortedRowModel: getSortedRowModel(),
       getCoreRowModel: getCoreRowModel(),
     });
+    let rowIndex = 1;
     return html`
       ${loadingCount > 0
         ? html` <div id="table-loading">
@@ -459,7 +460,7 @@ export class GeneralTable extends LitElement {
                 ></div>
               </div>
               <div class="spectrum-ProgressBar-label">
-                Refreshing ${loadingCount}/${this.nameList.length} rows...
+                Refreshing ${loadingCount} of ${this.nameList.length} rows...
               </div>
             </div>
           </div>`
@@ -502,6 +503,7 @@ export class GeneralTable extends LitElement {
               table.getRowModel().rows,
               (row) => row.id,
               (row, index) => {
+                const currentIndex = rowIndex++;
                 const isStale = this.nameList[index]?.current === 'stale';
                 return html`<tr
                   class="spectrum-Table-row ${isStale ? 'stale-row' : ''}"
@@ -511,18 +513,20 @@ export class GeneralTable extends LitElement {
                     (cell) => cell.id,
                     (cell) => {
                       if (cell.column.id === 'rowIndex') {
+                        rowIndex++;
                         return html`
                           <span class="spectrum-Body spectrum-Body--sizeM"
-                            >${index}</span
+                            >${currentIndex}</span
                           >
                         `;
+                      } else {
+                        return html`<td class="spectrum-Table-cell">
+                          ${flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext(),
+                          )}
+                        </td>`;
                       }
-                      return html`<td class="spectrum-Table-cell">
-                        ${flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext(),
-                        )}
-                      </td>`;
                     },
                   )}
                 </tr>`;
