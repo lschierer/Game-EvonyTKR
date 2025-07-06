@@ -55,7 +55,7 @@ ascending:
           unit: percentage
   - level: "red5"
     buff:
-      - attribute: March Size Capacity
+      - attribute: March Size
         value:
           number: 10
           unit: percentage

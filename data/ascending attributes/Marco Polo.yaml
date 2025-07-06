@@ -31,7 +31,7 @@ ascending:
         value:
           number: 30
           unit: percentage
-      - attribute: March Size Capacity
+      - attribute: March Size
         value:
           number: 8
           unit: percentage

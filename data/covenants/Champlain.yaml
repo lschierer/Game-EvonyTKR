@@ -22,7 +22,7 @@ levels:
   - category: Peace
     type: personal
     buff:
-      - attribute: March Size Capacity
+      - attribute: March Size
         value:
           number: 6
           unit: percentage

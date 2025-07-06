@@ -56,7 +56,7 @@ ascending:
           unit: percentage
       - condition:
           - Attacking
-        attribute: March Size Capacity
+        attribute: March Size
         value:
           number: 8
           unit: percentage
