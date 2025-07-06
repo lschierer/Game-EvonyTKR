@@ -100,7 +100,7 @@ ascending:
         value:
           number: 20
           unit: percentage
-      - attribute: March Size Capacity
+      - attribute: March Size
         condition:
           - Marching
         value:

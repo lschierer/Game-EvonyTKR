@@ -51,7 +51,7 @@ levels:
   - category: Honor
     type: personal
     buff:
-      - attribute: March Size Capacity
+      - attribute: March Size
         value:
           number: 5
           unit: percentage

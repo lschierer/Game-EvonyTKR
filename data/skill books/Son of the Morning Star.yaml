@@ -2,7 +2,7 @@
 name: Son of the Morning Star
 text: Increases the March Size by 10% and mounted troops’ attack by 40% when General is leading the army to attack.
 buff:
-  - attribute: March Size Capacity
+  - attribute: March Size
     condition:
       - leading the army to attack
     value:

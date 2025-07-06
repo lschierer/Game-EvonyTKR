@@ -15,7 +15,7 @@ buff:
     value:
       number: 35
       unit: percentage
-  - attribute: March Size Capacity
+  - attribute: March Size
     condition:
       - leading the army to attack
     value:

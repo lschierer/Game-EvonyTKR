@@ -3,7 +3,7 @@ name: Siege
 levels:
   - level: Green
     buff:
-      - attribute: March Size Capacity
+      - attribute: March Size
         value:
           number: 1
           unit: percentage
@@ -23,7 +23,7 @@ levels:
           unit: percentage
   - level: Blue
     buff:
-      - attribute: March Size Capacity
+      - attribute: March Size
         value:
           number: 1
           unit: percentage
@@ -43,7 +43,7 @@ levels:
           unit: percentage
   - level: Purple
     buff:
-      - attribute: March Size Capacity
+      - attribute: March Size
         value:
           number: 1
           unit: percentage
@@ -63,7 +63,7 @@ levels:
           unit: percentage
   - level: Orange
     buff:
-      - attribute: March Size Capacity
+      - attribute: March Size
         value:
           number: 1
           unit: percentage
@@ -83,7 +83,7 @@ levels:
           unit: percentage
   - level: Gold
     buff:
-      - attribute: March Size Capacity
+      - attribute: March Size
         value:
           number: 2
           unit: percentage

@@ -7,7 +7,7 @@ levels:
   - category: War
     type: personal
     buff:
-      - attribute: March Size Capacity
+      - attribute: March Size
         value:
           number: 8
           unit: percentage
