@@ -2,21 +2,21 @@ name: Eternal King of Norway
 text: Increases mounted troops' attack by 55% and increases mounted troops defense and HP by 40% when General is leading the army to attack.
 buff:
   - attribute: Attack
-    class: Mounted Troops
+    targetedType: Mounted Troops
     condition:
       - leading the army to attack
     value:
       number: 55
       unit: percentage
   - attribute: Defense
-    class: Mounted Troops
+    targetedType: Mounted Troops
     condition:
       - leading the army to attack
     value:
       number: 40
       unit: percentage
   - attribute: HP
-    class: Mounted Troops
+    targetedType: Mounted Troops
     condition:
       - leading the army to attack
     value:

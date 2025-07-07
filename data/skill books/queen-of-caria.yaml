@@ -1,14 +1,14 @@
 name: Queen of Caria
 buff:
   - attribute: Defense
-    class: Ranged Troops
+    targetedType: Ranged Troops
     condition:
       - leading the army to attack
     value:
       number: 55
       unit: percentage
   - attribute: Attack
-    class: Ranged Troops
+    targetedType: Ranged Troops
     condition:
       - leading the army to attack
     value:

@@ -4,21 +4,21 @@ buff:
   - attribute: Attack
     condition:
       - leading the army to attack
-    class: Siege Machines
+    targetedType: Siege Machines
     value:
       number: 40
       unit: percentage
   - attribute: Defense
     condition:
       - leading the army to attack
-    class: Ranged Troops
+    targetedType: Ranged Troops
     value:
       number: 20
       unit: percentage
   - attribute: Defense
     condition:
       - leading the army to attack
-    class: Siege Machines
+    targetedType: Siege Machines
     value:
       number: 20
       unit: percentage

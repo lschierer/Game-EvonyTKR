@@ -1,7 +1,7 @@
 name: Dictator
 buff:
   - attribute: Attack
-    class: Mounted Troops
+    targetedType: Mounted Troops
     condition:
       - Against Monsters
       - Attacking
@@ -9,14 +9,14 @@ buff:
       number: 45
       unit: percentage
   - attribute: Attack
-    class: Mounted Troops
+    targetedType: Mounted Troops
     condition:
       - brings a dragon
     value:
       number: 15
       unit: percentage
   - attribute: Attack
-    class: Ground Troops
+    targetedType: Ground Troops
     condition:
       - brings a dragon
     value:

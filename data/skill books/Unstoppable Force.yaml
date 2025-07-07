@@ -2,28 +2,28 @@
 name: Unstoppable Force
 buff:
   - attribute: Attack
-    class: Ranged Troops
+    targetedType: Ranged Troops
     condition:
       - leading the army to attack
     value:
       number: 45
       unit: percentage
   - attribute: Defense
-    class: Ranged Troops
+    targetedType: Ranged Troops
     condition:
       - leading the army to attack
     value:
       number: 45
       unit: percentage
   - attribute: HP
-    class: Ranged Troops
+    targetedType: Ranged Troops
     condition:
       - brings dragon or beast to attack
     value:
       number: 35
       unit: percentage
   - attribute: HP
-    class: Siege Machines
+    targetedType: Siege Machines
     condition:
       - brings dragon or beast to attack
     value:

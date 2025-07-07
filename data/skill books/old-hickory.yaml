@@ -1,14 +1,14 @@
 name: Old Hickory
 buff:
   - attribute: Attack
-    class: Ranged Troops
+    targetedType: Ranged Troops
     condition:
       - Enemy
     value:
       number: 20
       unit: percentage
   - attribute: HP
-    class: Mounted Troops
+    targetedType: Mounted Troops
     value:
       number: 20
       unit: percentage

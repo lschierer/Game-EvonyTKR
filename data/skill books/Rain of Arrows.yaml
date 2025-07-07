@@ -2,12 +2,12 @@ name: Rain of Arrows
 text: Increases your ranged troops' attack by 25% and reduces enemy mounted troops' attack by 15% when General is leading the army.
 buff:
   - attribute: Attack
-    class: Ranged Troops
+    targetedType: Ranged Troops
     value:
       number: 25
       unit: percentage
   - attribute: Attack
-    class: Mounted Troops
+    targetedType: Mounted Troops
     condition:
       - Enemy
     value:

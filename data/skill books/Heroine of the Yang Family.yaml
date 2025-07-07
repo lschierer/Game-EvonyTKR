@@ -2,17 +2,17 @@
 name: Heroine of the Yang Family
 buff:
   - attribute: Attack
-    class: Siege Machines
+    targetedType: Siege Machines
     value:
       number: 45
       unit: percentage
   - attribute: Defense
-    class: Siege Machines
+    targetedType: Siege Machines
     value:
       number: 20
       unit: percentage
   - attribute: HP
-    class: Siege Machines
+    targetedType: Siege Machines
     value:
       number: 20
       unit: percentage

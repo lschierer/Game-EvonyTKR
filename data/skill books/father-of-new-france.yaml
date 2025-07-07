@@ -1,12 +1,12 @@
 name: Father of New France
 buff:
   - attribute: Attack
-    class: Siege Machines
+    targetedType: Siege Machines
     value:
       number: 50
       unit: percentage
   - attribute: HP
-    class: Siege Machines
+    targetedType: Siege Machines
     value:
       number: 50
       unit: percentage

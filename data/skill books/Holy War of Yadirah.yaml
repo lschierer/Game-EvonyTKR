@@ -4,14 +4,14 @@ buff:
   - attribute: Attack
     condition:
       - leading the army to attack
-    class: Siege Machines
+    targetedType: Siege Machines
     value:
       number: 40
       unit: percentage
   - attribute: HP
     condition:
       - leading the army to attack
-    class: Siege Machines
+    targetedType: Siege Machines
     value:
       number: 40
       unit: percentage
