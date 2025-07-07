@@ -1,7 +1,6 @@
 find-perl-deps:
   ./scripts/finddeps.sh
 
-
 prepare:
   mise install
   perl Build.PL
@@ -17,11 +16,8 @@ npmdeps:
   mkdir -p public/types
   pnpm build:css
   pnpm build:ts
-  rsync -a node_modules/evonytkrtips-data/data/ collections/ --delete
-  touch collections/.gitkeep
-  mkdir 'collections/general conflict groups'
-  touch 'collections/general conflict groups/.gitkeep'
-  find node_modules/evonytkrtips-data/share/ -name '*.csv' -exec sh -c 'iconv -f macroman -t utf-8 "$1" > "$(basename "$1")"' _ {} \;
+
+#find node_modules/evonytkrtips-data/share/ -name '*.csv' -exec sh -c 'iconv -f macroman -t utf-8 "$1" > "$(basename "$1")"' _ {} \;
 
 
 deps: prepare npmdeps

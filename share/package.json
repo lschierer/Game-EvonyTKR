@@ -17,7 +17,7 @@
     "@types/postcss-sorting": "^8.0.2",
     "autoprefixer": "^10.4.21",
     "cssnano": "^7.0.7",
-    "esbuild": "^0.25.5",
+    "esbuild": "^0.25.6",
     "esbuild-plugin-lit-css": "^3.0.2",
     "glob": "^11.0.3",
     "jiti": "^2.4.2",
@@ -62,11 +62,10 @@
     "@tanstack/lit-virtual": "^3.13.12",
     "@tanstack/table-core": "^8.21.3",
     "@tanstack/virtual-core": "^3.13.12",
-    "evonytkrtips-data": "github:lschierer/EvonyTKRTips-Data",
     "iconify-icon": "^3.0.0",
     "lit": "^3.3.0",
     "signal-polyfill": "^0.2.2",
     "signal-utils": "^0.21.1",
-    "zod": "^3.25.74"
+    "zod": "^3.25.75"
   }
 }
