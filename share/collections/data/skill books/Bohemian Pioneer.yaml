@@ -2,7 +2,7 @@
 name: Bohemian Pioneer
 buff:
   - attribute: Attack
-    class: Ranged Troops
+    targetedType: Ranged Troops
     condition:
       - leading the army to attack
     value:

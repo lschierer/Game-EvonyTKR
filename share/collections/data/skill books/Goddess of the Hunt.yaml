@@ -1,28 +1,28 @@
 name: Goddess of the Hunt
 buff:
   - attribute: Defense
-    class: Mounted Troops
+    targetedType: Mounted Troops
     condition:
       - leading the army to attack
     value:
       number: 50
       unit: percentage
   - attribute: Attack
-    class: Mounted Troops
+    targetedType: Mounted Troops
     condition:
       - leading the army to attack
     value:
       number: 50
       unit: percentage
   - attribute: HP
-    class: Ground Troops
+    targetedType: Ground Troops
     condition:
       - leading the army to attack
     value:
       number: 40
       unit: percentage
   - attribute: HP
-    class: Mounted Troops
+    targetedType: Mounted Troops
     condition:
       - leading the army to attack
     value:

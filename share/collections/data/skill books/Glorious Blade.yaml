@@ -4,21 +4,21 @@ buff:
   - attribute: HP
     condition:
       - When Defending Outside The Main City
-    class: Ground Troops
+    targetedType: Ground Troops
     value:
       number: 50
       unit: percentage
   - attribute: Attack
     condition:
       - When Defending Outside The Main City
-    class: Ground Troops
+    targetedType: Ground Troops
     value:
       number: 40
       unit: percentage
   - attribute: Defense
     condition:
       - When Defending Outside The Main City
-    class: Ground Troops
+    targetedType: Ground Troops
     value:
       number: 40
       unit: percentage

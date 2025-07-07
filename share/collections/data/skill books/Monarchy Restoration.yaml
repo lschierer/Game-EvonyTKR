@@ -1,27 +1,27 @@
 name: Monarchy Restoration
 buff:
   - attribute: Attack
-    class: Mounted Troops
+    targetedType: Mounted Troops
     value:
       number: 50
       unit: percentage
   - attribute: Defense
-    class: Mounted Troops
+    targetedType: Mounted Troops
     value:
       number: 40
       unit: percentage
   - attribute: Defense
-    class: Ground Troops
+    targetedType: Ground Troops
     value:
       number: 40
       unit: percentage
   - attribute: HP
-    class: Mounted Troops
+    targetedType: Mounted Troops
     value:
       number: 40
       unit: percentage
   - attribute: HP
-    class: Ground Troops
+    targetedType: Ground Troops
     value:
       number: 40
       unit: percentage

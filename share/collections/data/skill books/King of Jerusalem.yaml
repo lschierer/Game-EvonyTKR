@@ -2,22 +2,22 @@
 name: King of Jerusalem
 buff:
   - attribute: Attack
-    class: Ranged Troops
+    targetedType: Ranged Troops
     value:
       number: 40
       unit: percentage
   - attribute: HP
-    class: Ranged Troops
+    targetedType: Ranged Troops
     value:
       number: 40
       unit: percentage
   - attribute: Defense
-    class: Ranged Troops
+    targetedType: Ranged Troops
     value:
       number: 10
       unit: percentage
   - attribute: Defense
-    class: Siege Machines
+    targetedType: Siege Machines
     value:
       number: 10
       unit: percentage

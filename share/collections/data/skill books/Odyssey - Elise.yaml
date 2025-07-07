@@ -3,14 +3,14 @@ buff:
   - attribute: Defense
     condition:
       - brings a dragon
-    class: Ground Troops
+    targetedType: Ground Troops
     value:
       number: 15
       unit: percentage
   - attribute: HP
     condition:
       - brings a dragon
-    class: Ground Troops
+    targetedType: Ground Troops
     value:
       number: 15
       unit: percentage

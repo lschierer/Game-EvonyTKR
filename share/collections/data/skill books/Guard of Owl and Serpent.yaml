@@ -4,42 +4,42 @@ buff:
   - attribute: Attack
     condition:
       - leading the army to attack
-    class: Siege Machines
+    targetedType: Siege Machines
     value:
       number: 35
       unit: percentage
   - attribute: Defense
     condition:
       - leading the army to attack
-    class: Siege Machines
+    targetedType: Siege Machines
     value:
       number: 35
       unit: percentage
   - attribute: Attack
     condition:
       - brings dragon or beast to attack
-    class: Ranged Troops
+    targetedType: Ranged Troops
     value:
       number: 10
       unit: percentage
   - attribute: HP
     condition:
       - brings dragon or beast to attack
-    class: Ranged Troops
+    targetedType: Ranged Troops
     value:
       number: 10
       unit: percentage
   - attribute: Attack
     condition:
       - brings dragon or beast to attack
-    class: Siege Machines
+    targetedType: Siege Machines
     value:
       number: 10
       unit: percentage
   - attribute: HP
     condition:
       - brings dragon or beast to attack
-    class: Siege Machines
+    targetedType: Siege Machines
     value:
       number: 10
       unit: percentage

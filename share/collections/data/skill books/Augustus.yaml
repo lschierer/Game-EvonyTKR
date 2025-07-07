@@ -1,18 +1,22 @@
 ---
+buffs:
+- attribute: Attack
+  conditions:
+  - leading the army
+  - Attacking
+  passive: 0
+  targetedType: Mounted Troops
+  value:
+    number: 40
+    unit: percentage
+- attribute: Attack
+  conditions:
+  - leading the army
+  - Attacking
+  passive: 0
+  targetedType: Ranged Troops
+  value:
+    number: 15
+    unit: percentage
 name: Augustus
 text: Increases mounted troops’ attack by 40% and ranged troops’ attack by 15% when General is leading the army to attack.
-buff:
-  - attribute: Attack
-    class: Mounted Troops
-    condition:
-      - leading the army to attack
-    value:
-      number: 40
-      unit: percentage
-  - attribute: Attack
-    class: Ranged Troops
-    condition:
-      - leading the army to attack
-    value:
-      number: 15
-      unit: percentage

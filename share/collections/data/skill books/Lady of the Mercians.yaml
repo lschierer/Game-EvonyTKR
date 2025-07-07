@@ -4,14 +4,14 @@ buff:
   - attribute: Attack
     condition:
       - Against Monsters
-    class: Mounted Troops
+    targetedType: Mounted Troops
     value:
       number: 55
       unit: percentage
   - attribute: Defense
     condition:
       - Against Monsters
-    class: Mounted Troops
+    targetedType: Mounted Troops
     value:
       number: 55
       unit: percentage
