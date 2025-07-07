@@ -71,10 +71,11 @@ class Game::EvonyTKR::Model::Specialty : isa(Game::EvonyTKR::Model::Data) {
     # For debuff matching, don't pass buff conditions
     my ($match_buff_conditions, $match_debuff_conditions);
     if ($matching_type eq 'buff') {
-      $match_buff_conditions = $conditions;
+      $match_buff_conditions   = $conditions;
       $match_debuff_conditions = [];
-    } else {
-      $match_buff_conditions = [];
+    }
+    else {
+      $match_buff_conditions   = [];
       $match_debuff_conditions = $debuffConditions;
     }
 
@@ -102,23 +103,33 @@ class Game::EvonyTKR::Model::Specialty : isa(Game::EvonyTKR::Model::Data) {
       my $current_level = $level_hierarchy[$i];
       my $buffs         = $levels_by_name->{$current_level}->{buffs} // [];
 
-      $logger->debug(
-        "Checking $name level $current_level with " . scalar(@{$buffs}) . " buffs");
+      $logger->debug("Checking $name level $current_level with "
+          . scalar(@{$buffs})
+          . " buffs");
 
       foreach my $buff (@$buffs) {
-        my $matcher = Game::EvonyTKR::Model::Buff::Matcher->new(toTest => $buff);
+        my $matcher =
+          Game::EvonyTKR::Model::Buff::Matcher->new(toTest => $buff);
         my $logID = int(rand(9e12)) + 1e12;
-        if ($matcher->match($attribute, $targetedType, $match_buff_conditions, $match_debuff_conditions, $logID)) {
+        if ($matcher->match(
+          $attribute,             $targetedType,
+          $match_buff_conditions, $match_debuff_conditions,
+          $logID
+        )) {
           my $val = $buff->value->number;
-          $logger->debug("$logID  ➤ Match found at $name level $current_level. Adding $val to total.");
+          $logger->debug(
+"$logID  ➤ Match found at $name level $current_level. Adding $val to total."
+          );
           $total += $val;
-        } else {
+        }
+        else {
           $logger->debug("$logID  ✗ No match found.");
         }
       }
     }
 
-    $logger->debug("Total for $name $level/$attribute/$targetedType/$matching_type: $total");
+    $logger->debug(
+      "Total for $name $level/$attribute/$targetedType/$matching_type: $total");
     return $total;
 
   }

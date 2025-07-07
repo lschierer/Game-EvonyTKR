@@ -4,7 +4,8 @@ use utf8::all;
 use File::FindLib 'lib';
 require Data::Printer;
 
-class Game::EvonyTKR::Model::Buff::Value : isa(Game::EvonyTKR::Model::Data) {
+class Game::EvonyTKR::Model::Buff::Value :
+  isa(Game::EvonyTKR::Shared::Constants) {
 # PODNAME: Game::EvonyTKR::Model::Buff::Value
   use namespace::autoclean;
   use Types::Common qw( t );

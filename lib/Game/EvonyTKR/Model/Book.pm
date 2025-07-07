@@ -24,8 +24,7 @@ class Game::EvonyTKR::Model::Book : isa(Game::EvonyTKR::Model::Data) {
   field $text : reader : param //= '';
 
   method get_buffs (
-    $attribute,
-    $matching_type,
+    $attribute, $matching_type,
     $targetedType     = '',
     $conditions       = [],
     $debuffConditions = [],
@@ -39,21 +38,27 @@ class Game::EvonyTKR::Model::Book : isa(Game::EvonyTKR::Model::Data) {
     # For debuff matching, don't pass buff conditions
     my ($match_buff_conditions, $match_debuff_conditions);
     if ($matching_type eq 'buff') {
-      $match_buff_conditions = $conditions;
+      $match_buff_conditions   = $conditions;
       $match_debuff_conditions = [];
-    } else {
-      $match_buff_conditions = [];
+    }
+    else {
+      $match_buff_conditions   = [];
       $match_debuff_conditions = $debuffConditions;
     }
 
     foreach my $b (@$buff) {
       my $matcher = Game::EvonyTKR::Model::Buff::Matcher->new(toTest => $b);
-      my $logID = int(rand(9e12)) + 1e12;
-      if ($matcher->match($attribute, $targetedType, $match_buff_conditions, $match_debuff_conditions, $logID)) {
+      my $logID   = int(rand(9e12)) + 1e12;
+      if ($matcher->match(
+        $attribute,             $targetedType,
+        $match_buff_conditions, $match_debuff_conditions,
+        $logID
+      )) {
         my $val = $b->value->number;
         $logger->debug("  ➤ Match found. Adding $val to total.");
         $total += $val;
-      } else {
+      }
+      else {
         $logger->debug("  ✗ No match found.");
       }
     }

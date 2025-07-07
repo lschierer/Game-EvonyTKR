@@ -3,9 +3,8 @@ use experimental qw(class);
 use utf8::all;
 use File::FindLib 'lib';
 use File::HomeDir;
-use File::ShareDir ':ALL';
-use File::Spec;
-use Util::Any -all;
+require File::Share;
+require Path::Tiny;
 use namespace::autoclean;
 
 package Game::EvonyTKR::Logger::Config {
@@ -31,19 +30,18 @@ package Game::EvonyTKR::Logger::Config {
   sub path(
     $self,
     $m = 'production',
-    $dd = File::ShareDir::dist_dir('Game-EvonyTKR')
+    $dd = File::Share::dist_dir('Game-EvonyTKR')
   ) {
     my $confFile;
     if ($m ne $self->{mode}) {
       $self->{mode} = $m;
     }
     if ($self->{mode} eq 'production') {
-      $confFile = File::Spec->catfile($dd, 'log4perl.conf');
-
+      $confFile = Path::Tiny::path($dd)->child('log4perl.conf');
     }
     else {
       my $mode = $self->{mode};
-      $confFile = File::Spec->catfile($dd, "log4perl.$mode.conf");
+      $confFile = Path::Tiny::path($dd)->child("log4perl.$mode.conf");
     }
     if (!-T -s -r $confFile) {
       croak("$confFile does not exist");
@@ -52,8 +50,9 @@ package Game::EvonyTKR::Logger::Config {
   }
 
   sub getLogDir {
-    my $home   = File::HomeDir->my_home;
-    my $logDir = File::Spec->catdir($home, 'var/log/Perl/dist/Game-Evony/');
+    my $home = File::HomeDir->my_home;
+    my $logDir =
+      Path::Tiny::path($home)->child('var/log/Perl/dist/Game-Evony/');
     return $logDir;
   }
 

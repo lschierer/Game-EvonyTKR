@@ -10,8 +10,6 @@ require Game::EvonyTKR::Controller::ControllerBase;
 require Game::EvonyTKR::Model::EvonyTKR::Manager;
 require GitRepo::Reader;
 
-use namespace::clean;
-
 package Game::EvonyTKR {
   use Mojo::Base 'Mojolicious', -strict, -signatures;
   use Mojo::File::Share qw(dist_dir );
@@ -51,8 +49,8 @@ package Game::EvonyTKR {
     };
 
     if ($logConfig && -f $logConfig) {
-      say "init for log4perl at $logConfig";
-      Log::Log4perl::init($logConfig);
+      say "init for log4perl at $logConfig " . ref($logConfig);
+      Log::Log4perl::init($logConfig->canonpath());
       my $log4perl_logger = Log::Log4perl->get_logger('Game.EvonyTKR');
 
       my %logLevel = (
@@ -117,7 +115,6 @@ package Game::EvonyTKR {
     # Last the Static Pages
     $self->plugin('Game::EvonyTKR::Plugins::StaticPages')
       ;    # Register last for lowest priority
-
 
     # configure to tell it that I will be behind an ELB/ALB.
     #$self->reverse_proxy(1);

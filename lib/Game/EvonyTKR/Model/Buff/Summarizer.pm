@@ -44,15 +44,15 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
 # Output values - stored in hashes for easier access
   field $buffValues : reader = {
     'Ground Troops' =>
-      { 'March Size Capacity' => 0, 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
+      { 'March Size' => 0, 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
     'Mounted Troops' =>
-      { 'March Size Capacity' => 0, 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
+      { 'March Size' => 0, 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
     'Ranged Troops' =>
-      { 'March Size Capacity' => 0, 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
+      { 'March Size' => 0, 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
     'Siege Machines' =>
-      { 'March Size Capacity' => 0, 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
+      { 'March Size' => 0, 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
     'Overall' =>
-      { 'March Size Capacity' => 0, 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
+      { 'March Size' => 0, 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
   };
 
   field $debuffValues : reader = {
@@ -152,7 +152,7 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
 
   # Filter buff conditions based on activation type
   method filterBuffConditions() {
-    my @buffConditions = @{$self->buffConditionValues};
+    my @buffConditions = @{ $self->buffConditionValues };
 
     # Create a mapping of activation types to filter patterns
     my %activationFilters = (
@@ -167,7 +167,12 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
         "Marching",
         "When Rallying",
       ],
-      'Overall'   => ["brings a dragon", "brings a spiritual beast", "Marching", "When Rallying",],
+      'Overall' => [
+        "brings a dragon",
+        "brings a spiritual beast",
+        "Marching",
+        "When Rallying",
+      ],
       'Attacking' => [
         "Attacking",
         "brings a dragon",
@@ -181,15 +186,21 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
       'Reinforcing' => [
         "brings a dragon",
         "brings a spiritual beast",
-        "Defending", "Marching", "Reinforcing",
+        "Defending",
+        "Marching",
+        "Reinforcing",
         "When Defending Outside The Main City",
-        "In Main City", 'In City',
+        "In Main City",
+        'In City',
       ],
       'Wall' => [
         "brings a dragon",
         "brings a spiritual beast",
-        "Defending",    "When City Mayor for this SubCity",
-        "In Main City", 'In City', "When the Main Defense General",
+        "Defending",
+        "When City Mayor for this SubCity",
+        "In Main City",
+        'In City',
+        "When the Main Defense General",
       ],
       'Mayor' =>
         ['When City Mayor for this SubCity', "In Main City", 'In City',],
@@ -223,7 +234,7 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
 
   # Filter debuff conditions based on activation type
   method filterDebuffConditions() {
-    my @debuffConditions = @{$self->debuffConditionValues};
+    my @debuffConditions = @{ $self->debuffConditionValues };
 
     if ($activationType ne 'PvM') {
       @debuffConditions = grep { $_ ne "Reduces Monster" } @debuffConditions;
@@ -264,7 +275,7 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
     my $total = 0;
     my $tt    = $troopType =~ s/ Troops$//r;    # Remove " Troops" suffix
     if (
-      $attribute eq 'March Size Capacity'
+      $attribute eq 'March Size'
       && $rootManager->generalConflictGroupManager->is_book_compatible(
         'March Size Increase',
         $general->name
@@ -325,34 +336,49 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
     $debuffConditions = []) {
     my $total = 0;
 
-    # Determine if we're doing buff or debuff matching based on whether debuffConditions were passed
+# Determine if we're doing buff or debuff matching based on whether debuffConditions were passed
     my $matching_type = (scalar @$debuffConditions > 0) ? 'debuff' : 'buff';
 
     # Book buffs
-    $total += $self->summarize_book_for_attribute($attribute, $summaryType,
-      $buffConditions, $debuffConditions, $matching_type);
+    $total += $self->summarize_book_for_attribute(
+      $attribute,        $summaryType, $buffConditions,
+      $debuffConditions, $matching_type
+    );
 
-    $self->logger->info("summarize_from_sources has $total after summarize_book for $attribute/$summaryType");
+    $self->logger->info(
+"summarize_from_sources has $total after summarize_book for $attribute/$summaryType"
+    );
 
     # Covenant buffs
-    $total += $self->summarize_covenant_for_attribute($attribute, $summaryType,
-      $buffConditions, $debuffConditions, $matching_type);
+    $total += $self->summarize_covenant_for_attribute(
+      $attribute,        $summaryType, $buffConditions,
+      $debuffConditions, $matching_type
+    );
 
-    $self->logger->info("summarize_from_sources has $total after summarize_covenant for $attribute/$summaryType");
+    $self->logger->info(
+"summarize_from_sources has $total after summarize_covenant for $attribute/$summaryType"
+    );
 
     # Specialty buffs
-    $total +=
-      $self->summarize_specialties_for_attribute($attribute, $summaryType,
-      $buffConditions, $debuffConditions, $matching_type);
+    $total += $self->summarize_specialties_for_attribute(
+      $attribute,        $summaryType, $buffConditions,
+      $debuffConditions, $matching_type
+    );
 
-    $self->logger->info("summarize_from_sources has $total after summarize_specialties for $attribute/$summaryType");
+    $self->logger->info(
+"summarize_from_sources has $total after summarize_specialties for $attribute/$summaryType"
+    );
 
     # Ascending attribute buffs (primary only)
-    if ($isPrimary && $general->ascending ) {
-      $total += $self->summarize_ascendingAttributes_for_attribute($attribute,
-        $summaryType, $buffConditions, $debuffConditions, $matching_type);
+    if ($isPrimary && $general->ascending) {
+      $total += $self->summarize_ascendingAttributes_for_attribute(
+        $attribute,        $summaryType, $buffConditions,
+        $debuffConditions, $matching_type
+      );
 
-      $self->logger->info("summarize_from_sources has $total after summarize_ascendingAttributes for $attribute/$summaryType");
+      $self->logger->info(
+"summarize_from_sources has $total after summarize_ascendingAttributes for $attribute/$summaryType"
+      );
     }
 
     return $total;
@@ -387,8 +413,10 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
     my $book = $general->builtInBook();
     if ($book) {
       $self->logger->debug("adding buffs for book " . $book->name);
-      my $bv = $book->get_buffs($attribute, $matching_type, $summaryType, $buffConditions,
-        $debuffConditions);
+      my $bv = $book->get_buffs(
+        $attribute,      $matching_type, $summaryType,
+        $buffConditions, $debuffConditions
+      );
       $self->logger->trace(sprintf(
         'found %s in %s %s buffs for %s.',
         $bv, $book->name, $attribute, $general->name
@@ -425,8 +453,8 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
       );
 
       my $cv = $covenant->get_buffs_at_level(
-        $covenantLevel,  $attribute, $matching_type, $summaryType,
-        $buffConditions, $debuffConditions
+        $covenantLevel, $attribute,      $matching_type,
+        $summaryType,   $buffConditions, $debuffConditions
       );
       $self->logger->debug(
 "retrieved $cv as total $attribute for level $covenantLevel of covenant for "
@@ -463,8 +491,8 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
       if ($specialty) {
         $self->logger->debug(
           sprintf('checking %s for %s', $specialty->name, $attribute));
-        my $sv = $specialty->get_buffs_at_level($sl, $attribute, $matching_type, $summaryType,
-          $buffConditions, $debuffConditions);
+        my $sv = $specialty->get_buffs_at_level($sl, $attribute, $matching_type,
+          $summaryType, $buffConditions, $debuffConditions);
         $self->logger->debug("retrieved $sv as total $attribute for level $sl "
             . $specialty->name
             . " as part of "
@@ -500,7 +528,7 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
       $self->logger->debug(
         "retrieved ascendingAttribute buffs for " . $general->name);
       my $av = $aa->get_buffs_at_level(
-        $ascendingLevel, $attribute, $summaryType,
+        $ascendingLevel, $attribute,        $summaryType,
         $buffConditions, $debuffConditions, $matching_type
       );
       $self->logger->debug(sprintf(

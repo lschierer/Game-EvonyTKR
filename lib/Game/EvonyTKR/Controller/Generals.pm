@@ -421,9 +421,8 @@ package Game::EvonyTKR::Controller::Generals {
         $self->stash(
           'buff-summaries' => {
             # For backward compatibility
-            marchIncrease => $summarizer->getBuffForTypeAndKey(
-              $targetType, 'March Size Capacity'
-            ),
+            marchIncrease =>
+              $summarizer->getBuffForTypeAndKey($targetType, 'March Size'),
             attackIncrease =>
               $summarizer->getBuffForTypeAndKey($targetType, 'Attack'),
             defenseIncrease =>
@@ -792,7 +791,7 @@ package Game::EvonyTKR::Controller::Generals {
     my $result = {
       marchbuff => $summarizer->getBuffForTypeAndKey(
         $route_meta->{generalType},
-        'March Size Capacity'
+        'March Size'
       ),
       attackbuff =>
         $summarizer->getBuffForTypeAndKey($route_meta->{generalType}, 'Attack'),
@@ -969,12 +968,12 @@ package Game::EvonyTKR::Controller::Generals {
 
     return $self->render(
       json => {
-        "primary"     => $pair->primary,
-        "secondary"   => $pair->secondary,
-        "attackbuff"  => $pair->buffValues->{$buffKey}->{'Attack'},
-        "defensebuff" => $pair->buffValues->{$buffKey}->{'Defense'},
-        "hpbuff"      => $pair->buffValues->{$buffKey}->{'HP'},
-        "marchbuff"   => $pair->buffValues->{$buffKey}->{'March Size Capacity'},
+        "primary"            => $pair->primary,
+        "secondary"          => $pair->secondary,
+        "attackbuff"         => $pair->buffValues->{$buffKey}->{'Attack'},
+        "defensebuff"        => $pair->buffValues->{$buffKey}->{'Defense'},
+        "hpbuff"             => $pair->buffValues->{$buffKey}->{'HP'},
+        "marchbuff"          => $pair->buffValues->{$buffKey}->{'March Size'},
         "groundattackdebuff" =>
           $pair->debuffValues->{'Ground Troops'}->{'Attack'},
         "grounddefensedebuff" =>

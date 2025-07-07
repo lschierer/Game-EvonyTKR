@@ -147,7 +147,7 @@
           <tr>
             <th class="spectrum-Table-headCell">Troop Type</th>
             % foreach my $attr (@buffAttributes) {
-              <th class="spectrum-Table-headCell"><%= $attr eq 'March Size Capacity' ? 'March Size' : $attr %></th>
+              <th class="spectrum-Table-headCell"><%= $attr eq 'March Size' ? 'March Size' : $attr %></th>
             % }
           </tr>
         </thead>

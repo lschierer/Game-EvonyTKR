@@ -1,0 +1,8 @@
+#!/usr/bin/env perl
+use v5.40;
+use utf8::all;
+use File::FindLib 'lib';
+use Devel::Local;
+require Game::EvonyTKR;
+use Game::EvonyTKR::Importer;
+Game::EvonyTKR::Importer->run;

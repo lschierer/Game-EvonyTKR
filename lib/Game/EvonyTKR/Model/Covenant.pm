@@ -96,16 +96,17 @@ class Game::EvonyTKR::Model::Covenant : isa(Game::EvonyTKR::Model::Data) {
     $logger->debug(
       "Calculating ascending buffs for level: $level, attribute: $attribute");
 
-      # For buff matching, don't pass debuff conditions
-      # For debuff matching, don't pass buff conditions
-      my ($match_buff_conditions, $match_debuff_conditions);
-      if ($matching_type eq 'buff') {
-        $match_buff_conditions = $conditions;
-        $match_debuff_conditions = [];
-      } else {
-        $match_buff_conditions = [];
-        $match_debuff_conditions = $debuffConditions;
-      }
+    # For buff matching, don't pass debuff conditions
+    # For debuff matching, don't pass buff conditions
+    my ($match_buff_conditions, $match_debuff_conditions);
+    if ($matching_type eq 'buff') {
+      $match_buff_conditions   = $conditions;
+      $match_debuff_conditions = [];
+    }
+    else {
+      $match_buff_conditions   = [];
+      $match_debuff_conditions = $debuffConditions;
+    }
 
     return 0 if not defined $level or $level =~ /None/i;
 
@@ -132,13 +133,19 @@ class Game::EvonyTKR::Model::Covenant : isa(Game::EvonyTKR::Model::Data) {
         if ($buff->passive & !$includePassive) {
           next;
         }
-        my $matcher = Game::EvonyTKR::Model::Buff::Matcher->new(toTest => $buff);
+        my $matcher =
+          Game::EvonyTKR::Model::Buff::Matcher->new(toTest => $buff);
         my $logID = int(rand(9e12)) + 1e12;
-        if ($matcher->match($attribute, $targetedType, $match_buff_conditions, $match_debuff_conditions, $logID)) {
+        if ($matcher->match(
+          $attribute,             $targetedType,
+          $match_buff_conditions, $match_debuff_conditions,
+          $logID
+        )) {
           my $val = $buff->value->number;
           $logger->debug("  ➤ Match found. Adding $val to total.");
           $total += $val;
-        } else {
+        }
+        else {
           $logger->debug("  ✗ No match found.");
         }
       }

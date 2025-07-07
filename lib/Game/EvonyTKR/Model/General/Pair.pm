@@ -25,15 +25,15 @@ class Game::EvonyTKR::Model::General::Pair : isa(Game::EvonyTKR::Model::Data) {
   #computed fields;
   field $buffValues : reader = {
     'Ground Troops' =>
-      { 'March Size Capacity' => 0, 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
+      { 'March Size' => 0, 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
     'Mounted Troops' =>
-      { 'March Size Capacity' => 0, 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
+      { 'March Size' => 0, 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
     'Ranged Troops' =>
-      { 'March Size Capacity' => 0, 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
+      { 'March Size' => 0, 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
     'Siege Machines' =>
-      { 'March Size Capacity' => 0, 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
+      { 'March Size' => 0, 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
     'Overall' =>
-      { 'March Size Capacity' => 0, 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
+      { 'March Size' => 0, 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
   };
 
   field $debuffValues : reader = {
@@ -179,7 +179,7 @@ class Game::EvonyTKR::Model::General::Pair : isa(Game::EvonyTKR::Model::Data) {
     return {
       primary              => $primary,
       secondary            => $secondary,
-      marchbuff            => $buffValues->{$tt}->{'March Size Capacity'},
+      marchbuff            => $buffValues->{$tt}->{'March Size'},
       attackbuff           => $buffValues->{$tt}->{'Attack'},
       defensebuff          => $buffValues->{$tt}->{'Defense'},
       hpbuff               => $buffValues->{$tt}->{'Defense'},

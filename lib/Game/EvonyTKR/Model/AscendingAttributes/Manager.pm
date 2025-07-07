@@ -99,13 +99,11 @@ class Game::EvonyTKR::Model::AscendingAttributes::Manager :
           $ascendingAttributes->{$name}->addBuff($level, $b);
         }
       }
-      $self->logger->debug(
-        sprintf('imported %s %s',
-          $name,
-          exists $ascendingAttributes->{$name}
-          ? 'successfully'
-          : 'unsuccessfully')
-      );
+      $self->logger->debug(sprintf('imported %s %s',
+        $name,
+        exists $ascendingAttributes->{$name}
+        ? 'successfully'
+        : 'unsuccessfully'));
     }
     my $countImported = scalar keys %$ascendingAttributes;
     $self->logger->info(

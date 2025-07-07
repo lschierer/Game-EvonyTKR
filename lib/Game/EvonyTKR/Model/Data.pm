@@ -76,7 +76,7 @@ class Game::EvonyTKR::Model::Data : isa(Game::EvonyTKR::Model::Logger) {
       "Double Items Drop Rate",
       "HP",
       "Hospital Capacity",
-      "March Size Capacity",
+      "March Size",
       "Marching Speed to Monsters",
       "Marching Speed",
       "Rally Capacity",
@@ -148,8 +148,7 @@ class Game::EvonyTKR::Model::Data : isa(Game::EvonyTKR::Model::Logger) {
   method AllConditions() {
     my %seen;
     my @allowedConditions = grep { not $seen{$_}++ } (
-      @{$buffConditionValues},
-      @{$debuffConditionValues},
+      @{$buffConditionValues}, @{$debuffConditionValues},
       @{$bookConditionValues}
     );
     return @allowedConditions;

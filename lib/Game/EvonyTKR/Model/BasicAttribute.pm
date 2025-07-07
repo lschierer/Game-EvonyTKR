@@ -17,6 +17,7 @@ class Game::EvonyTKR::Model::BasicAttribute : isa(Game::EvonyTKR::Model::Data) {
   use namespace::autoclean;
   use overload
     '""'       => \&TO_JSON,
+    '.'        => \&concat,
     "fallback" => 0;
 # VERSION
 
@@ -260,6 +261,15 @@ class Game::EvonyTKR::Model::BasicAttribute : isa(Game::EvonyTKR::Model::Data) {
       ->convert_blessed(1)
       ->encode($self->to_hash());
     return $json;
+  }
+
+  method concat($other, $swap) {
+    if ($swap) {
+      return $other . $self->as_string();
+    }
+    else {
+      return $self->as_string() . $other;
+    }
   }
 
 }

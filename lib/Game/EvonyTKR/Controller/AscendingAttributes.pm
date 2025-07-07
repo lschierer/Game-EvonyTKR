@@ -106,13 +106,11 @@ package Game::EvonyTKR::Controller::AscendingAttributes {
             $logger->warn(
               "get_ascending_section cannot find Ascending Attributes for $name"
             );
-            $logger->debug(
-              sprintf(
-                "searching for $name, instead got %s %s",
-                Scalar::Util::reftype($item),
-                blessed($item)
-              )
-            );
+            $logger->debug(sprintf(
+              "searching for $name, instead got %s %s",
+              Scalar::Util::reftype($item),
+              blessed($item)
+            ));
           }
         }
         else {

@@ -6,7 +6,7 @@ require Data::Printer;
 require Game::EvonyTKR::Model::Buff::Value;
 require JSON::PP;
 
-class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Model::Data) {
+class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Shared::Constants) {
 # PODNAME: Game::EvonyTKR::Model::Buff
   use List::AllUtils qw( any none );
   use namespace::autoclean;
@@ -29,7 +29,9 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Model::Data) {
 
   field $buffConditions : reader : param //= [];
 
-  field $targetedTypes : reader : param //= [];
+  field $targetedType : reader : param //= '';
+
+  field $passive : reader : param //= 0;
 
   method conditions() {
     my @result;
@@ -49,13 +51,17 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Model::Data) {
     return @result;
   }
 
-  field $passive : reader : param //= 0;
+  method set_target ($tt) {
+    if (any { $_ eq $tt } @{ $self->TroopTypeValues }) {
+      $targetedType = $tt;
+    }
+  }
 
   method set_condition ($condition) {
     my $logger = $self->logger();
 
     # Check if the condition is a valid buff condition
-    if (any { $condition eq $_ } @{$self->buffConditionValues}) {
+    if (any { $condition eq $_ } @{ $self->BuffConditionValues }) {
       # Initialize the array if it doesn't exist
       $buffConditions //= [];
 
@@ -69,7 +75,7 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Model::Data) {
     }
 
     # Check if the condition is a valid debuff condition
-    if (any { $condition eq $_ } @{$self->debuffConditionValues}) {
+    if (any { $condition eq $_ } @{ $self->DebuffConditionValues }) {
       # Initialize the array if it doesn't exist
       $debuffConditions //= [];
 
@@ -86,8 +92,8 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Model::Data) {
     $logger->error(
       "Invalid condition: '$condition'. Must be one of: "
         . join(", ",
-        @{$self->buffConditionValues()},
-        @{$self->debuffConditionValues()})
+        @{ $self->BuffConditionValues },
+        @{ $self->DebuffConditionValues })
     );
     return 0;
 
@@ -106,7 +112,7 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Model::Data) {
     }
 
     # Find elements in @tbc that are not in the valid conditions
-    my %valid_conditions = map { $_ => 1 } @{ $self->buffConditionValues };
+    my %valid_conditions = map { $_ => 1 } @{ $self->BuffConditionValues };
     @invalid = grep { !exists $valid_conditions{$_} } @tbc;
 
     # Report errors for invalid conditions
@@ -115,7 +121,7 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Model::Data) {
         push @errors,
           sprintf(
 'Detected illegal value "%s" in buffConditions. All values must be one of: %s',
-          $iv, join(', ', @{$self->buffConditionValues}));
+          $iv, join(', ', @{ $self->BuffConditionValues }));
       }
     }
 
@@ -128,7 +134,8 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Model::Data) {
     }
 
     # Find elements in @tdc that are not in the valid debuff conditions
-    my %valid_debuff_conditions = map { $_ => 1 } @{ $self->debuffConditionValues };
+    my %valid_debuff_conditions =
+      map { $_ => 1 } @{ $self->DebuffConditionValues };
     @invalid = grep { !exists $valid_debuff_conditions{$_} } @tdc;
 
     # Report errors for invalid conditions
@@ -137,7 +144,7 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Model::Data) {
         push @errors,
           sprintf(
 'Detected illegal value "%s" in debuffConditions. All values must be one of: %s',
-          $iv, join(', ', @{$self->debuffConditionValues()}));
+          $iv, join(', ', @{ $self->DebuffConditionValues() }));
       }
     }
 
@@ -158,12 +165,7 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Model::Data) {
   }
 
   method has_targetedType() {
-    if (ref $targetedTypes eq 'ARRAY') {
-      return scalar @{$targetedTypes};
-    }
-    else {
-      return length($targetedTypes);
-    }
+    return length($targetedType);
   }
 
   method match_buff (
@@ -191,7 +193,7 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Model::Data) {
     $logger->trace(sprintf(
 'Checking match for buff: attr=%s, targetType=%s, buff conditions=%s, debuff conditions=%s',
       $attribute,
-      join(', ', ref $targetedTypes eq 'ARRAY'    ? @$targetedTypes    : ()),
+      $targetedType,
       join(', ', ref $buffConditions eq 'ARRAY'   ? @$buffConditions   : ()),
       join(', ', ref $debuffConditions eq 'ARRAY' ? @$debuffConditions : ()),
     ));
@@ -200,7 +202,7 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Model::Data) {
     return 0 unless $attribute eq $test_attribute;
 
     # Check targetedType match if provided
-    if (length($test_targetedType) && @$targetedTypes) {
+    if (length($test_targetedType) && length($targetedType)) {
       # targetType often comes from generals, convert it for use here.
       if ($test_targetedType =~ /^(\w+)_specialist$/) {
         my $short = $1;
@@ -225,10 +227,11 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Model::Data) {
       }
 
       # Match against the buff's targetedTypes
-      if (none { $_ =~ /\Q$test_targetedType\E/i } @$targetedTypes) {
-        $logger->trace(
-          "  ✗ Rejected: targetedType '$test_targetedType' not matched by "
-            . Data::Printer::np($targetedTypes));
+      if ($targetedType ne $test_targetedType) {
+        $logger->trace(sprintf(
+          '  ✗ Rejected: test_targetedType "%s" not matched by "%s"',
+          $test_targetedType, $targetedType
+        ));
         return 0;
       }
     }
@@ -303,7 +306,8 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Model::Data) {
     my $conditionCount = scalar $self->conditions();
     $self->logger()->debug("in to_hash, I have $conditionCount conditions");
     if ($conditionCount) {
-      $c = $self->conditions();
+      my @rc = $self->conditions();
+      $c = \@rc;
     }
     else {
       $c = [];
@@ -314,9 +318,9 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Model::Data) {
         number => $value->number(),
         unit   => $value->unit(),
       },
-      passive       => $passive,
-      targetedTypes => scalar @{$targetedTypes} > 0 ? $targetedTypes : [],
-      conditions    => $c,
+      passive      => $passive,
+      targetedType => length($targetedType) > 0 ? $targetedType : '',
+      conditions   => $c,
     };
   }
 
