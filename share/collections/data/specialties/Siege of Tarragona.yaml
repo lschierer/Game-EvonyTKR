@@ -1,0 +1,188 @@
+---
+name: Siege of Tarragona
+levels:
+  - level: "Green"
+    buff:
+      - attribute: Attack
+        condition:
+          - Marching
+        class: Ground Troops
+        value:
+          number: 4
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - Attacking
+        class: Ground Troops
+        value:
+          number: 3
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - Attacking
+        class: Mounted Troops
+        value:
+          number: 3
+          unit: percentage
+      - attribute: HP
+        condition:
+          - Attacking
+        class: Mounted Troops
+        value:
+          number: 2
+          unit: percentage
+      - attribute: HP
+        condition:
+          - Attacking
+        class: Ground Troops
+        value:
+          number: 2
+          unit: percentage
+  - level: "Blue"
+    buff:
+      - attribute: Attack
+        condition:
+          - Marching
+        class: Ground Troops
+        value:
+          number: 4
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - Attacking
+        class: Ground Troops
+        value:
+          number: 3
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - Attacking
+        class: Mounted Troops
+        value:
+          number: 3
+          unit: percentage
+      - attribute: HP
+        condition:
+          - Attacking
+        class: Mounted Troops
+        value:
+          number: 2
+          unit: percentage
+      - attribute: HP
+        condition:
+          - Attacking
+        class: Ground Troops
+        value:
+          number: 2
+          unit: percentage
+  - level: "Purple"
+    buff:
+      - attribute: Attack
+        condition:
+          - Marching
+        class: Ground Troops
+        value:
+          number: 8
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - Attacking
+        class: Ground Troops
+        value:
+          number: 6
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - Attacking
+        class: Mounted Troops
+        value:
+          number: 6
+          unit: percentage
+      - attribute: HP
+        condition:
+          - Attacking
+        class: Mounted Troops
+        value:
+          number: 4
+          unit: percentage
+      - attribute: HP
+        condition:
+          - Attacking
+        class: Ground Troops
+        value:
+          number: 4
+          unit: percentage
+  - level: "Orange"
+    buff:
+      - attribute: Attack
+        condition:
+          - Marching
+        class: Ground Troops
+        value:
+          number: 8
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - Attacking
+        class: Ground Troops
+        value:
+          number: 6
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - Attacking
+        class: Mounted Troops
+        value:
+          number: 6
+          unit: percentage
+      - attribute: HP
+        condition:
+          - Attacking
+        class: Mounted Troops
+        value:
+          number: 4
+          unit: percentage
+      - attribute: HP
+        condition:
+          - Attacking
+        class: Ground Troops
+        value:
+          number: 4
+          unit: percentage
+  - level: "Gold"
+    buff:
+      - attribute: Attack
+        condition:
+          - Marching
+        class: Ground Troops
+        value:
+          number: 16
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - Attacking
+        class: Ground Troops
+        value:
+          number: 12
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - Attacking
+        class: Mounted Troops
+        value:
+          number: 12
+          unit: percentage
+      - attribute: HP
+        condition:
+          - Attacking
+        class: Mounted Troops
+        value:
+          number: 8
+          unit: percentage
+      - attribute: HP
+        condition:
+          - Attacking
+        class: Ground Troops
+        value:
+          number: 8
+          unit: percentage

@@ -1,0 +1,106 @@
+---
+ascending:
+  - level: "red1"
+    buff:
+      - condition:
+          - Marching
+        attribute: Defense
+        class: Ground Troops
+        value:
+          number: 10
+          unit: percentage
+      - condition:
+          - Marching
+        attribute: Defense
+        class: Mounted Troops
+        value:
+          number: 10
+          unit: percentage
+      - condition:
+          - Marching
+        attribute: HP
+        class: Ground Troops
+        value:
+          number: 10
+          unit: percentage
+      - condition:
+          - Marching
+        attribute: HP
+        class: Mounted Troops
+        value:
+          number: 10
+          unit: percentage
+  - level: "red2"
+    buff:
+      - condition:
+          - Enemy In City
+        attribute: Wounded to Death
+        value:
+          number: 10
+          unit: percentage
+  - level: "red3"
+    buff:
+      - condition:
+          - Attacking
+        attribute: Defense
+        class: Ground Troops
+        value:
+          number: 10
+          unit: percentage
+      - condition:
+          - Attacking
+        attribute: HP
+        class: Ground Troops
+        value:
+          number: 10
+          unit: percentage
+      - condition:
+          - Attacking
+        attribute: March Size
+        value:
+          number: 8
+          unit: percentage
+  - level: "red4"
+    buff:
+      - condition:
+          - Marching
+        class: Ground Troops
+        attribute: Attack
+        value:
+          number: 15
+          unit: percentage
+      - condition:
+          - Marching
+        class: Ground Troops
+        attribute: Defense
+        value:
+          number: 25
+          unit: percentage
+      - condition:
+          - Marching
+        class: Mounted Troops
+        attribute: Defense
+        value:
+          number: 25
+          unit: percentage
+  - level: "red5"
+    buff:
+      - condition:
+          - Marching
+        class: Ground Troops
+        attribute: Attack
+        value:
+          number: 20
+          unit: percentage
+      - class: Ground Troops
+        attribute: Defense
+        value:
+          number: 20
+          unit: percentage
+      - class: Ground Troops
+        attribute: HP
+        value:
+          number: 20
+          unit: percentage
+general: Aurelian
+id: Aurelian

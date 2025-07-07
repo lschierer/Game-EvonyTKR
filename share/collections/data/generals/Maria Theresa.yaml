@@ -1,0 +1,26 @@
+ascending: true
+basic_attributes:
+  attack:
+    base: 123
+    increment: 8.85
+  defense:
+    base: 107
+    increment: 8.91
+  leadership:
+    base: 110
+    increment: 8.64
+  politics:
+    base: 112
+    increment: 8.49
+book: Queen of Hungary
+display: summary
+specialties:
+  - Hunter
+  - Strike
+  - Mounted Troop Ares
+  - War of Succession
+stars: red5
+type:
+  - mounted_specialist
+general: Maria Theresa
+name: Maria Theresa

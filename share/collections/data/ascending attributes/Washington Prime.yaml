@@ -1,0 +1,63 @@
+---
+ascending:
+  - level: "red1"
+    buff:
+      - attribute: Defense
+        class: Mounted Troops
+        value:
+          number: 10
+          unit: percentage
+      - attribute: HP
+        class: Mounted Troops
+        value:
+          number: 10
+          unit: percentage
+  - level: "red2"
+    buff:
+      - attribute: Death to Wounded
+        condition:
+          - Marching
+        value:
+          number: 8
+          unit: percentage
+  - level: "red3"
+    buff:
+      - attribute: Marching Speed
+        value:
+          number: 20
+          unit: percentage
+      - attribute: March Size
+        value:
+          number: 5
+          unit: percentage
+  - level: "red4"
+    buff:
+      - attribute: Attack
+        class: Mounted Troops
+        value:
+          number: 15
+          unit: percentage
+      - attribute: HP
+        class: Mounted Troops
+        value:
+          number: 15
+          unit: percentage
+  - level: "red5"
+    buff:
+      - attribute: Attack
+        class: Mounted Troops
+        value:
+          number: 20
+          unit: percentage
+      - attribute: Defense
+        class: Mounted Troops
+        value:
+          number: 20
+          unit: percentage
+      - attribute: HP
+        class: Mounted Troops
+        value:
+          number: 20
+          unit: percentage
+general: Washington Prime
+id: Washington Prime

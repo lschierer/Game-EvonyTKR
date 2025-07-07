@@ -1,0 +1,80 @@
+name: Napoleon Prime
+generals:
+  - Napoleon
+  - André Masséna
+  - Soult
+levels:
+  - category: War
+    type: personal
+    buff:
+      - attribute: Attack
+        class: Mounted Troops
+        condition:
+          - Against Monsters
+        value:
+          number: 12
+          unit: percentage
+  - category: Cooperation
+    type: personal
+    buff:
+      - attribute: March Size
+        value:
+          number: 5
+          unit: percentage
+  - category: Peace
+    type: personal
+    buff:
+      - attribute: HP
+        class: Mounted Troops
+        condition:
+          - When Rallying
+        value:
+          number: 8
+          unit: percentage
+  - category: Faith
+    type: passive
+    buff:
+      - attribute: Training Speed
+        class: Mounted Troops
+        value:
+          number: 10
+          unit: percentage
+      - attribute: Training Capacity
+        class: Mounted Troops
+        value:
+          number: 15
+          unit: percentage
+  - category: Honor
+    type: personal
+    buff:
+      - attribute: Attack
+        class: Mounted Troops
+        condition:
+          - Attacking
+        value:
+          number: 8
+          unit: percentage
+      - attribute: Attack
+        class: Ground Troops
+        condition:
+          - Attacking
+        value:
+          number: 8
+          unit: percentage
+  - category: Civilization
+    type: personal
+    buff:
+      - attribute: Attack
+        class: Mounted Troops
+        condition:
+          - Marching
+        value:
+          number: 12
+          unit: percentage
+      - attribute: Attack
+        class: Mounted Troops
+        condition:
+          - When Rallying
+        value:
+          number: 15
+          unit: percentage

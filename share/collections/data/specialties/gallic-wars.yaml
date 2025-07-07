@@ -1,0 +1,72 @@
+name: Gallic Wars
+levels:
+  - level: Green
+    buff:
+      - attribute: Attack
+        condition:
+          - Against Monsters
+        value:
+          number: 0
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - Against Monsters
+        value:
+          number: 0
+          unit: percentage
+  - level: Blue
+    buff:
+      - attribute: Attack
+        condition:
+          - Against Monsters
+        value:
+          number: 0
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - Against Monsters
+        value:
+          number: 0
+          unit: percentage
+  - level: Purple
+    buff:
+      - attribute: Attack
+        condition:
+          - Against Monsters
+        value:
+          number: 0
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - Against Monsters
+        value:
+          number: 0
+          unit: percentage
+  - level: Orange
+    buff:
+      - attribute: Attack
+        condition:
+          - Against Monsters
+        value:
+          number: 0
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - Against Monsters
+        value:
+          number: 0
+          unit: percentage
+  - level: Gold
+    buff:
+      - attribute: Attack
+        condition:
+          - Against Monsters
+        value:
+          number: -20
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - Against Monsters
+        value:
+          number: -20
+          unit: percentage

@@ -1,0 +1,26 @@
+ascending: true
+basic_attributes:
+  attack:
+    base: 119
+    increment: 8.91
+  defense:
+    base: 114
+    increment: 9.02
+  leadership:
+    base: 121
+    increment: 8.88
+  politics:
+    base: 105
+    increment: 8.57
+book: Knights of the Garter
+display: summary
+specialties:
+  - Ranged Troop Assault
+  - Bash
+  - Ranged Troop Ares
+  - Battle of Crecy
+stars: red5
+type:
+  - ranged_specialist
+general: Edward III
+name: Edward III

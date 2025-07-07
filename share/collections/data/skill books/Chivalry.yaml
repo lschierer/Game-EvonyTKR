@@ -1,0 +1,15 @@
+name: Chivalry
+text: Increases the Construction Speed by 50% and troops' training speed by 30% in Subordinate City when General is the Mayor.
+buff:
+  - attribute: SubCity Construction Speed
+    condition:
+      - When City Mayor for this SubCity
+    value:
+      number: 50
+      unit: percentage
+  - attribute: SubCity Training Speed
+    condition:
+      - When City Mayor for this SubCity
+    value:
+      number: 30
+      unit: percentage

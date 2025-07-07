@@ -1,0 +1,73 @@
+---
+name: Harald Bluetooth
+levels:
+  - level: Green
+    buff:
+      - attribute: Wounded to Death
+        condition:
+          - Enemy
+        value:
+          number: 1
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - Enemy
+        value:
+          number: 1
+          unit: percentage
+  - level: Blue
+    buff:
+      - attribute: Wounded to Death
+        condition:
+          - Enemy
+        value:
+          number: 1
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - Enemy
+        value:
+          number: 1
+          unit: percentage
+  - level: Purple
+    buff:
+      - attribute: Wounded to Death
+        condition:
+          - Enemy
+        value:
+          number: 2
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - Enemy
+        value:
+          number: 2
+          unit: percentage
+  - level: Orange
+    buff:
+      - attribute: Wounded to Death
+        condition:
+          - Enemy
+        value:
+          number: 2
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - Enemy
+        value:
+          number: 2
+          unit: percentage
+  - level: Gold
+    buff:
+      - attribute: Wounded to Death
+        condition:
+          - Enemy
+        value:
+          number: 4
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - Enemy
+        value:
+          number: 4
+          unit: percentage

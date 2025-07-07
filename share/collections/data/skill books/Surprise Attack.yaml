@@ -1,0 +1,18 @@
+name: Surprise Attack
+buff:
+  - attribute: Attack
+    class: Ranged Troops
+    condition:
+      - Enemy
+    value:
+      number: 30
+      unit: percentage
+  - attribute: Attack
+    class: Siege Machines
+    condition:
+      - Enemy
+    value:
+      number: 20
+      unit: percentage
+text: >-
+  Reduces enemy ranged troops’ attack by 30% and enemy siege machines’ attack by 20% when General is leading the army.

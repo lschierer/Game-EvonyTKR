@@ -1,0 +1,31 @@
+name: Patriot’s Radiance
+buff:
+  - attribute: Defense
+    class: Ranged Troops
+    condition:
+      - leading the army to attack
+    value:
+      number: 45
+      unit: percentage
+  - attribute: Attack
+    class: Ranged Troops
+    condition:
+      - leading the army to attack
+    value:
+      number: 45
+      unit: percentage
+  - attribute: HP
+    class: Ranged Troops
+    condition:
+      - leading the army to attack
+    value:
+      number: 30
+      unit: percentage
+  - attribute: HP
+    class: Siege Machines
+    condition:
+      - leading the army to attack
+    value:
+      number: 30
+      unit: percentage
+text: Increases ranged troops’ attack and defense by 45% and ranged troops and siege machines’ HP by 30% when General is leading the army to attack.

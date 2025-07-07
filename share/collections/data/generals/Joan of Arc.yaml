@@ -1,0 +1,24 @@
+ascending: true
+basic_attributes:
+  attack:
+    base: 101
+    increment: 7.69
+  defense:
+    base: 102
+    increment: 7.78
+  leadership:
+    base: 95
+    increment: 6.35
+  politics:
+    base: 65
+    increment: 5.35
+book: Holy Light
+specialties:
+  - Mounted Troop Defense
+  - Suppress
+  - Unparalleled Leader
+stars: purple5
+type:
+  - mounted_specialist
+general: Joan of Arc
+name: Joan of Arc

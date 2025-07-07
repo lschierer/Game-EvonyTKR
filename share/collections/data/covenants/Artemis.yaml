@@ -1,0 +1,66 @@
+name: Artemis
+generals:
+  - Hermes
+  - Queen Boudica
+  - Hestia
+levels:
+  - category: War
+    type: personal
+    buff:
+      - attribute: Attack
+        value:
+          number: 10
+          unit: percentage
+        class: Mounted Troops
+  - category: Peace
+    type: passive
+    buff:
+      - attribute: Training Speed
+        value:
+          number: 10
+          unit: percentage
+        class: Mounted Troops
+  - category: Faith
+    type: personal
+    buff:
+      - attribute: March Size
+        value:
+          number: 5
+          unit: percentage
+  - category: Faith
+    type: passive
+    buff:
+      - attribute: Attack
+        condition:
+          - When Rallying
+        value:
+          number: 10
+          unit: percentage
+        class: Mounted Troops
+  - category: Honor
+    type: personal
+    buff:
+      - attribute: HP
+        condition:
+          - Attacking
+        value:
+          number: 15
+          unit: percentage
+        class: Mounted Troops
+  - category: Civilization
+    type: personal
+    buff:
+      - attribute: Attack
+        condition:
+          - Attacking
+        value:
+          number: 15
+          unit: percentage
+        class: Mounted Troops
+      - attribute: Defense
+        condition:
+          - Attacking
+        value:
+          number: 10
+          unit: percentage
+        class: Mounted Troops

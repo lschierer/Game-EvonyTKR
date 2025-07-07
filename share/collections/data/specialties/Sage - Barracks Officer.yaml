@@ -1,0 +1,82 @@
+name: Sage - Barracks Officer
+levels:
+  - level: Green
+    buff:
+      - attribute: Training Speed
+        class: Ground Troops
+        condition:
+          - Applied to Barracks Officer
+        value:
+          number: 2
+          unit: percentage
+      - attribute: Training Capacity
+        class: Ground Troops
+        condition:
+          - Applied to Barracks Officer
+        value:
+          number: 2
+          unit: percentage
+  - level: Blue
+    buff:
+      - attribute: Training Speed
+        class: Ground Troops
+        condition:
+          - Applied to Barracks Officer
+        value:
+          number: 2
+          unit: percentage
+      - attribute: Training Capacity
+        class: Ground Troops
+        condition:
+          - Applied to Barracks Officer
+        value:
+          number: 2
+          unit: percentage
+  - level: Purple
+    buff:
+      - attribute: Training Speed
+        class: Ground Troops
+        condition:
+          - Applied to Barracks Officer
+        value:
+          number: 4
+          unit: percentage
+      - attribute: Training Capacity
+        class: Ground Troops
+        condition:
+          - Applied to Barracks Officer
+        value:
+          number: 4
+          unit: percentage
+  - level: Orange
+    buff:
+      - attribute: Training Speed
+        class: Ground Troops
+        condition:
+          - Applied to Barracks Officer
+        value:
+          number: 4
+          unit: percentage
+      - attribute: Training Capacity
+        class: Ground Troops
+        condition:
+          - Applied to Barracks Officer
+        value:
+          number: 4
+          unit: percentage
+  - level: Gold
+    buff:
+      - attribute: Training Speed
+        class: Ground Troops
+        condition:
+          - Applied to Barracks Officer
+        value:
+          number: 8
+          unit: percentage
+      - attribute: Training Capacity
+        class: Ground Troops
+        condition:
+          - Applied to Barracks Officer
+        value:
+          number: 8
+          unit: percentage

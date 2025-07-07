@@ -1,0 +1,16 @@
+---
+name: Duke of Marlborough
+buff:
+  - attribute: Attack
+    condition:
+      - leading the army to attack
+    class: Siege Machines
+    value:
+      number: 30
+      unit: percentage
+  - attribute: Rally Capacity
+    condition:
+      - When Rallying
+    value:
+      number: 12
+      unit: percentage

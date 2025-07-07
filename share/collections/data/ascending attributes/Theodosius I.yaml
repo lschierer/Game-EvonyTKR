@@ -1,0 +1,80 @@
+---
+ascending:
+  - level: "red1"
+    buff:
+      - attribute: Attack
+        class: Siege Machines
+        condition:
+          - Marching
+        value:
+          number: 10
+          unit: percentage
+      - attribute: Defense
+        class: Siege Machines
+        condition:
+          - Marching
+        value:
+          number: 15
+          unit: percentage
+  - level: "red2"
+    buff:
+      - attribute: Death to Wounded
+        condition:
+          - Marching
+        value:
+          number: 10
+          unit: percentage
+  - level: "red3"
+    buff:
+      - attribute: HP
+        class: Siege Machines
+        condition:
+          - Marching
+        value:
+          number: 10
+          unit: percentage
+      - attribute: March Size
+        value:
+          number: 5
+          unit: percentage
+  - level: "red4"
+    buff:
+      - attribute: Attack
+        class: Siege Machines
+        condition:
+          - Marching
+        value:
+          number: 15
+          unit: percentage
+      - attribute: Defense
+        class: Siege Machines
+        condition:
+          - Marching
+        value:
+          number: 15
+          unit: percentage
+  - level: "red5"
+    buff:
+      - attribute: Attack
+        class: Siege Machines
+        condition:
+          - Marching
+        value:
+          number: 20
+          unit: percentage
+      - attribute: Defense
+        class: Siege Machines
+        condition:
+          - Marching
+        value:
+          number: 20
+          unit: percentage
+      - attribute: HP
+        class: Siege Machines
+        condition:
+          - Marching
+        value:
+          number: 20
+          unit: percentage
+general: Theodosius I
+id: Theodosius I

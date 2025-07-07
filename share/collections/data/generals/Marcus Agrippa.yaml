@@ -1,0 +1,26 @@
+ascending: true
+basic_attributes:
+  attack:
+    base: 120
+    increment: 8.99
+  defense:
+    base: 113
+    increment: 8.85
+  leadership:
+    base: 117
+    increment: 8.91
+  politics:
+    base: 111
+    increment: 8.7
+book: Governor of Transalpine Gaul
+display: summary
+specialties:
+  - Ranged Troop Formation
+  - Bash
+  - Ranged Troop Ares
+  - Battle of Actium
+stars: red5
+type:
+  - ranged_specialist
+general: Marcus Agrippa
+name: Marcus Agrippa

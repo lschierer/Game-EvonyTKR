@@ -1,0 +1,30 @@
+ascending: true
+basic_attributes:
+  leadership:
+    base: 127
+    increment: 8.63
+  attack:
+    base: 129
+    increment: 9.86
+  defense:
+    base: 126
+    increment: 8.68
+  politics:
+    base: 115
+    increment: 8.50
+book: Queen of Caria
+display: summary
+note:
+  - severity: info
+    text: |
+      The Mounted Troops' Attack Skill Book may, however, be used.
+specialties:
+  - Ranged Troop Assault
+  - Bash
+  - Ranged Troop Ares
+  - Conquest of Kos
+stars: red5
+type:
+  - ranged_specialist
+general: Artemisia I
+name: Artemisia I

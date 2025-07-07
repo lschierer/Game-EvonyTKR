@@ -1,0 +1,28 @@
+ascending: true
+basic_attributes:
+  attack:
+    base: 114
+    increment: 9.11
+  defense:
+    base: 112
+    increment: 8.88
+  leadership:
+    base: 119
+    increment: 9.13
+  politics:
+    base: 113
+    increment: 8.26
+book: Dragon's Song
+display: summary
+extra:
+  - Odyssey - Elise
+specialties:
+  - Ground Troop Assault
+  - Formation
+  - Ground Troop Ares
+  - Dragontamer
+stars: red5
+type:
+  - ground_specialist
+general: Elise
+name: Elise

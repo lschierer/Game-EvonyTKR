@@ -1,0 +1,96 @@
+---
+ascending:
+  - level: "red1"
+    buff:
+      - attribute: Defense
+        condition:
+          - Marching
+        class: Ranged Troops
+        value:
+          number: 10
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - Marching
+        class: Siege Machines
+        value:
+          number: 10
+          unit: percentage
+      - attribute: HP
+        condition:
+          - Marching
+        class: Ranged Troops
+        value:
+          number: 20
+          unit: percentage
+      - attribute: HP
+        condition:
+          - Marching
+        class: Siege Machines
+        value:
+          number: 20
+          unit: percentage
+  - level: "red2"
+    buff:
+      - attribute: Death to Wounded
+        condition:
+          - Marching
+        value:
+          number: 10
+          unit: percentage
+  - level: "red3"
+    buff:
+      - attribute: Attack
+        condition:
+          - Marching
+        class: Siege Machines
+        value:
+          number: 10
+          unit: percentage
+      - attribute: March Size
+        condition:
+          - Marching
+        value:
+          number: 10
+          unit: percentage
+  - level: "red4"
+    buff:
+      - attribute: Attack
+        condition:
+          - Marching
+        class: Ranged Troops
+        value:
+          number: 15
+          unit: percentage
+      - attribute: Attack
+        condition:
+          - Marching
+        class: Siege Machines
+        value:
+          number: 15
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - Marching
+        class: Siege Machines
+        value:
+          number: 25
+          unit: percentage
+  - level: "red5"
+    buff:
+      - attribute: Attack
+        condition:
+          - Marching
+        class: Siege Machines
+        value:
+          number: 25
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - Marching
+        class: Siege Machines
+        value:
+          number: 35
+          unit: percentage
+general: John Hunyadi
+id: John Hunyadi

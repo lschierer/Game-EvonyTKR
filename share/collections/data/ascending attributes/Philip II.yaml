@@ -1,0 +1,89 @@
+---
+ascending:
+  - level: "red1"
+    buff:
+      - attribute: Attack
+        condition:
+          - leading the army to attack
+        class: Siege Machines
+        value:
+          number: 10
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - leading the army to attack
+        class: Siege Machines
+        value:
+          number: 20
+          unit: percentage
+  - level: "red2"
+    buff:
+      - attribute: Wounded to Death
+        condition:
+          - Enemy In City
+        value:
+          number: 10
+          unit: percentage
+  - level: "red3"
+    buff:
+      - attribute: March Size
+        condition:
+          - Attacking
+        value:
+          number: 14
+          unit: percentage
+  - level: "red4"
+    buff:
+      - attribute: Attack
+        condition:
+          - leading the army to attack
+        class: Siege Machines
+        value:
+          number: 10
+          unit: percentage
+      - attribute: HP
+        condition:
+          - leading the army to attack
+        class: Ranged Troops
+        value:
+          number: 25
+          unit: percentage
+      - attribute: HP
+        condition:
+          - leading the army to attack
+        class: Siege Machines
+        value:
+          number: 25
+          unit: percentage
+  - level: "red5"
+    buff:
+      - attribute: Attack
+        condition:
+          - leading the army to attack
+        class: Siege Machines
+        value:
+          number: 15
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - leading the army to attack
+        class: Siege Machines
+        value:
+          number: 15
+          unit: percentage
+      - attribute: HP
+        condition:
+          - leading the army to attack
+        class: Ranged Troops
+        value:
+          number: 15
+          unit: percentage
+      - attribute: HP
+        condition:
+          - leading the army to attack
+        class: Siege Machines
+        value:
+          number: 15
+          unit: percentage
+general: Philip II
+id: Philip II

@@ -1,0 +1,25 @@
+ascending: true
+basic_attributes:
+  leadership:
+    base: 119
+    increment: 0
+  attack:
+    base: 112
+    increment: 0
+  defense:
+    base: 113
+    increment: 0
+  politics:
+    base: 111
+    increment: 0
+book: Dictator
+specialties:
+  - Mounted Troop Assault
+  - Fortune
+  - War God
+  - Gallic Wars
+stars: red5
+type:
+  - mounted_specialist
+general: Caesar
+name: Caesar

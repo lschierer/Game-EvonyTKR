@@ -1,0 +1,25 @@
+ascending: true
+basic_attributes:
+  attack:
+    base: 124
+    increment: 8.75
+  defense:
+    base: 125
+    increment: 8.69
+  leadership:
+    base: 129
+    increment: 8.87
+  politics:
+    base: 119
+    increment: 8.45
+book: Eternal King of Norway
+specialties:
+  - Mounted Troop Formation
+  - Annihilation
+  - Mounted Troop Ares
+  - Battle of Nesjar
+stars: red5
+type:
+  - mounted_specialist
+general: Olav II
+name: Olav II

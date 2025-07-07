@@ -1,0 +1,72 @@
+name: Territory Expansion
+levels:
+  - level: Green
+    buff:
+      - attribute: SubCity Gold Production
+        condition:
+          - When City Mayor for this SubCity
+        value:
+          number: 4
+          unit: percentage
+      - attribute: SubCity Training Speed
+        condition:
+          - When City Mayor for this SubCity
+        value:
+          number: 2
+          unit: percentage
+  - level: Blue
+    buff:
+      - attribute: SubCity Gold Production
+        condition:
+          - When City Mayor for this SubCity
+        value:
+          number: 4
+          unit: percentage
+      - attribute: SubCity Training Speed
+        condition:
+          - When City Mayor for this SubCity
+        value:
+          number: 2
+          unit: percentage
+  - level: Purple
+    buff:
+      - attribute: SubCity Gold Production
+        condition:
+          - When City Mayor for this SubCity
+        value:
+          number: 8
+          unit: percentage
+      - attribute: SubCity Training Speed
+        condition:
+          - When City Mayor for this SubCity
+        value:
+          number: 4
+          unit: percentage
+  - level: Orange
+    buff:
+      - attribute: SubCity Gold Production
+        condition:
+          - When City Mayor for this SubCity
+        value:
+          number: 8
+          unit: percentage
+      - attribute: SubCity Training Speed
+        condition:
+          - When City Mayor for this SubCity
+        value:
+          number: 4
+          unit: percentage
+  - level: Gold
+    buff:
+      - attribute: SubCity Gold Production
+        condition:
+          - When City Mayor for this SubCity
+        value:
+          number: 16
+          unit: percentage
+      - attribute: SubCity Training Speed
+        condition:
+          - When City Mayor for this SubCity
+        value:
+          number: 8
+          unit: percentage

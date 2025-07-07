@@ -1,0 +1,87 @@
+ascending:
+  - level: red1
+    buff:
+      - attribute: Defense
+        condition:
+          - Enemy
+        value:
+          number: -10
+          unit: percentage
+  - level: red2
+    buff:
+      - attribute: Defense
+        condition:
+          - Enemy
+        class: Ground Troops
+        value:
+          number: -5
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - Enemy
+        class: Mounted Troops
+        value:
+          number: -5
+          unit: percentage
+      - attribute: SubCity Training Speed
+        condition:
+          - When City Mayor for this SubCity
+        value:
+          number: 20
+          unit: percentage
+  - level: red3
+    buff:
+      - attribute: Defense
+        condition:
+          - Enemy
+        class: Ground Troops
+        value:
+          number: -10
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - Enemy
+        class: Mounted Troops
+        value:
+          number: -10
+          unit: percentage
+  - level: red4
+    buff:
+      - attribute: HP
+        condition:
+          - Enemy
+        value:
+          number: -10
+          unit: percentage
+  - level: red5
+    buff:
+      - attribute: Attack
+        condition:
+          - Enemy
+        class: Ground Troops
+        value:
+          number: -10
+          unit: percentage
+      - attribute: Attack
+        condition:
+          - Enemy
+        class: Mounted Troops
+        value:
+          number: -10
+          unit: percentage
+      - attribute: HP
+        condition:
+          - Enemy
+        class: Ground Troops
+        value:
+          number: -10
+          unit: percentage
+      - attribute: HP
+        condition:
+          - Enemy
+        class: Mounted Troops
+        value:
+          number: -10
+          unit: percentage
+general: Mansa Musa
+id: Mansa Musa

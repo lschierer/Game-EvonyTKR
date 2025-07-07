@@ -1,0 +1,71 @@
+name: Champlain
+generals:
+  - Turenne
+  - André Masséna
+  - Suchet
+levels:
+  - category: War
+    type: personal
+    buff:
+      - attribute: Defense
+        class: Siege Machines
+        value:
+          number: 10
+          unit: percentage
+  - category: Cooperation
+    type: passive
+    buff:
+      - attribute: March Speed
+        value:
+          number: 5
+          unit: percentage
+  - category: Peace
+    type: personal
+    buff:
+      - attribute: March Size
+        value:
+          number: 6
+          unit: percentage
+  - category: Faith
+    type: personal
+    buff:
+      - attribute: Attack
+        class: Siege Machines
+        value:
+          number: 10
+          unit: percentage
+  - category: Faith
+    type: passive
+    buff:
+      - attribute: HP
+        class: Siege Machines
+        condition:
+          - When Rallying
+        value:
+          number: 10
+          unit: percentage
+  - category: Honor
+    type: personal
+    buff:
+      - attribute: Defense
+        class: Siege Machines
+        condition:
+          - Reinforcing
+        value:
+          number: 10
+          unit: percentage
+  - category: Civilization
+    type: personal
+    buff:
+      - attribute: HP
+        class: Siege Machines
+        value:
+          number: 10
+          unit: percentage
+      - attribute: Attack
+        class: Siege Machines
+        condition:
+          - When Rallying
+        value:
+          number: 10
+          unit: percentage

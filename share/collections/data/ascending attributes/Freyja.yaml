@@ -1,0 +1,104 @@
+---
+ascending:
+  - level: "red1"
+    buff:
+      - attribute: HP
+        condition:
+          - When Defending Outside The Main City
+        class: Ground Troops
+        value:
+          number: 20
+          unit: percentage
+      - attribute: Attack
+        condition:
+          - When Defending Outside The Main City
+        class: Ground Troops
+        value:
+          number: 10
+          unit: percentage
+  - level: "red2"
+    buff:
+      - attribute: Death to Wounded
+        condition:
+          - When Defending Outside The Main City
+        value:
+          number: 8
+          unit: percentage
+      - attribute: Attack
+        condition:
+          - When Defending Outside The Main City
+        class: Ground Troops
+        value:
+          number: 10
+          unit: percentage
+      - attribute: Attack
+        condition:
+          - When Defending Outside The Main City
+        class: Mounted Troops
+        value:
+          number: 10
+          unit: percentage
+  - level: "red3"
+    buff:
+      - attribute: March Size
+        value:
+          number: 12
+          unit: percentage
+      - attribute: Attack
+        condition:
+          - When Defending Outside The Main City
+        class: Ground Troops
+        value:
+          number: 10
+          unit: percentage
+      - attribute: Attack
+        condition:
+          - When Defending Outside The Main City
+        class: Mounted Troops
+        value:
+          number: 10
+          unit: percentage
+  - level: "red4"
+    buff:
+      - attribute: HP
+        class: Ground Troops
+        value:
+          number: 30
+          unit: percentage
+      - attribute: Attack
+        condition:
+          - When Defending Outside The Main City
+        class: Ground Troops
+        value:
+          number: 15
+          unit: percentage
+      - attribute: Attack
+        condition:
+          - When Defending Outside The Main City
+        class: Mounted Troops
+        value:
+          number: 15
+          unit: percentage
+  - level: "red5"
+    buff:
+      - attribute: Attack
+        class: Ground Troops
+        value:
+          number: 50
+          unit: percentage
+      - attribute: Attack
+        condition:
+          - When Defending Outside The Main City
+        class: Ground Troops
+        value:
+          number: 35
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - When Defending Outside The Main City
+        class: Ground Troops
+        value:
+          number: 35
+          unit: percentage
+general: Freyja
+id: Freyja

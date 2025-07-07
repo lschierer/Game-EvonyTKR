@@ -1,0 +1,26 @@
+ascending: true
+basic_attributes:
+  attack:
+    base: 121
+    increment: 9.03
+  defense:
+    base: 118
+    increment: 8.82
+  leadership:
+    base: 114
+    increment: 8.89
+  politics:
+    base: 106
+    increment: 8.71
+book: Saint Louis
+display: summary
+specialties:
+  - Ranged Troop Formation
+  - Siege
+  - Ranged Troop Ares
+  - Battle of Pelagonia
+stars: red5
+type:
+  - ranged_specialist
+general: Louis IX
+name: Louis IX

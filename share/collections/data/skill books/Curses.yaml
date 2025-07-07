@@ -1,0 +1,16 @@
+---
+name: Curses
+buff:
+  - attribute: Defense
+    condition:
+      - Reduces Enemy
+    value:
+      number: 15
+      unit: percentage
+  - attribute: Defense
+    condition:
+      - Reduces Enemy
+    class: Ground Troops
+    value:
+      number: 15
+      unit: percentage

@@ -1,0 +1,7 @@
+node_modules
+dist
+Build
+MYMETA.json
+MYMETA.yml
+_build
+share/GeneralDictionaryGrid.html

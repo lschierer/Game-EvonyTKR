@@ -1,0 +1,63 @@
+name: Algernon Sidney
+generals:
+  - William Wallace
+  - John Churchill
+  - Merlin
+levels:
+  - category: War
+    type: personal
+    buff:
+      - attribute: Attack
+        class: Ranged Troops
+        condition:
+          - Marching
+        value:
+          number: 5
+          unit: percentage
+  - category: Cooperation
+    type: passive
+    buff:
+      - attribute: Attack
+        class: Ranged Troops
+        condition:
+          - Reinforcing
+        value:
+          number: 5
+          unit: percentage
+  - category: Peace
+    type: personal
+    buff:
+      - attribute: Attack
+        class: Ranged Troops
+        condition:
+          - Marching
+        value:
+          number: 5
+          unit: percentage
+  - category: Honor
+    type: personal
+    buff:
+      - attribute: Defense
+        class: Ranged Troops
+        condition:
+          - Marching
+        value:
+          number: 5
+          unit: percentage
+  - category: Civilization
+    type: personal
+    buff:
+      - attribute: Attack
+        class: Ranged Troops
+        condition:
+          - Marching
+        value:
+          number: 5
+          unit: percentage
+      - attribute: HP
+        class: Ranged Troops
+        condition:
+          - Marching
+        value:
+          number: 10
+          unit: percentage

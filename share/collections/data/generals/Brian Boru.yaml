@@ -1,0 +1,25 @@
+ascending: true
+basic_attributes:
+  leadership:
+    base: 125
+    increment: 8.66
+  attack:
+    base: 130
+    increment: 8.85
+  defense:
+    base: 122
+    increment: 8.66
+  politics:
+    base: 119
+    increment: 8.58
+book: High King of Ireland
+specialties:
+  - Ranged Troop Assault
+  - Bash
+  - Ranged Troop Ares
+  - Battle of Clontarf
+stars: red5
+type:
+  - ranged_specialist
+general: Brian Boru
+name: Brian Boru

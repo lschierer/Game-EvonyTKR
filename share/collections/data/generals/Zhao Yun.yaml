@@ -1,0 +1,26 @@
+ascending: true
+basic_attributes:
+  attack:
+    base: 119
+    increment: 9.01
+  defense:
+    base: 118
+    increment: 9.05
+  leadership:
+    base: 113
+    increment: 8.95
+  politics:
+    base: 110
+    increment: 8.35
+book: Undefeatable General
+display: summary
+specialties:
+  - Mounted Troop Formation
+  - Annihilation
+  - Mounted Troop Ares
+  - Battle of Han River
+stars: red5
+type:
+  - mounted_specialist
+general: Zhao Yun
+name: Zhao Yun

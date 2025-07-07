@@ -1,0 +1,26 @@
+ascending: true
+basic_attributes:
+  attack:
+    base: 119
+    increment: 9.01
+  defense:
+    base: 117
+    increment: 9.0
+  leadership:
+    base: 117
+    increment: 8.71
+  politics:
+    base: 108
+    increment: 8.65
+book: Queen Annes Revenge
+display: summary
+specialties:
+  - Siege Machine Formation
+  - Bash
+  - Siege Machine Ares
+  - Blackbeard
+stars: red5
+type:
+  - siege_specialist
+general: Edward Teach
+name: Edward Teach

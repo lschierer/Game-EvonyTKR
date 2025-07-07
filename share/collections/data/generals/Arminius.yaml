@@ -1,0 +1,25 @@
+ascending: true
+basic_attributes:
+  leadership:
+    base: 115
+    increment: 0
+  attack:
+    base: 113
+    increment: 0
+  defense:
+    base: 107
+    increment: 0
+  politics:
+    base: 109
+    increment: 0
+book: Germanic Hero
+specialties:
+  - Ranged Troop Assault
+  - Snipe
+  - Iron Warrior
+  - Battle of the Teutoburg Forest
+stars: red5
+type:
+  - mayor
+general: Arminius
+name: Arminius

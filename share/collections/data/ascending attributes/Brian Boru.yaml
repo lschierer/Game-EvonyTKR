@@ -1,0 +1,107 @@
+ascending:
+  - level: red1
+    buff:
+      - attribute: Defense
+        class: Siege Machines
+        value:
+          number: 15
+          unit: percentage
+      - attribute: Defense
+        class: Ranged Troops
+        value:
+          number: 15
+          unit: percentage
+      - attribute: HP
+        class: Siege Machines
+        value:
+          number: 15
+          unit: percentage
+      - attribute: HP
+        class: Ranged Troops
+        value:
+          number: 15
+          unit: percentage
+  - level: red2
+    buff:
+      - attribute: Death to Wounded
+        condition:
+          - Attacking
+        value:
+          number: 8
+          unit: percentage
+  - level: red3
+    buff:
+      - attribute: March Size
+        value:
+          number: 10
+          unit: percentage
+      - attribute: Attack
+        class: Ranged Troops
+        value:
+          number: 25
+          unit: percentage
+  - level: red4
+    buff:
+      - attribute: Attack
+        condition:
+          - Attacking
+        class: Siege Machines
+        value:
+          number: 15
+          unit: percentage
+      - attribute: Attack
+        condition:
+          - Attacking
+        class: Ranged Troops
+        value:
+          number: 15
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - Attacking
+        class: Siege Machines
+        value:
+          number: 20
+          unit: percentage
+      - attribute: Defense
+        condition:
+          - Attacking
+        class: Ranged Troops
+        value:
+          number: 20
+          unit: percentage
+      - attribute: HP
+        condition:
+          - Attacking
+        class: Siege Machines
+        value:
+          number: 20
+          unit: percentage
+      - attribute: HP
+        condition:
+          - Attacking
+        class: Ranged Troops
+        value:
+          number: 20
+          unit: percentage
+  - level: red5
+    buff:
+      - attribute: Attack
+        condition:
+          - Attacking
+        class: Ranged Troops
+        value:
+          number: 35
+          unit: percentage
+      - attribute: Defense
+        class: Ranged Troops
+        value:
+          number: 25
+          unit: percentage
+      - attribute: HP
+        class: Ranged Troops
+        value:
+          number: 25
+          unit: percentage
+general: Brian Boru
+id: Brian Boru

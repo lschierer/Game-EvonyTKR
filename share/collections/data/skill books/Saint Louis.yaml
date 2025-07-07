@@ -1,0 +1,13 @@
+---
+name: Saint Louis
+buff:
+  - attribute: Attack
+    class: Ranged Troops
+    value:
+      number: 40
+      unit: percentage
+  - attribute: Defense
+    class: Ranged Troops
+    value:
+      number: 45
+      unit: percentage

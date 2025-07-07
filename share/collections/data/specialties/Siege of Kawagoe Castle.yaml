@@ -1,0 +1,82 @@
+name: Siege of Kawagoe Castle
+levels:
+  - level: Green
+    buff:
+      - attribute: Attack
+        class: Ranged Troops
+        condition:
+          - Enemy
+        value:
+          number: 3
+          unit: percentage
+      - attribute: HP
+        class: Mounted Troops
+        condition:
+          - Enemy
+        value:
+          number: 3
+          unit: percentage
+  - level: Blue
+    buff:
+      - attribute: Attack
+        class: Ranged Troops
+        condition:
+          - Enemy
+        value:
+          number: 3
+          unit: percentage
+      - attribute: HP
+        class: Mounted Troops
+        condition:
+          - Enemy
+        value:
+          number: 4
+          unit: percentage
+  - level: Purple
+    buff:
+      - attribute: Attack
+        class: Ranged Troops
+        condition:
+          - Enemy
+        value:
+          number: 6
+          unit: percentage
+      - attribute: HP
+        class: Mounted Troops
+        condition:
+          - Enemy
+        value:
+          number: 6
+          unit: percentage
+  - level: Orange
+    buff:
+      - attribute: Attack
+        class: Ranged Troops
+        condition:
+          - Enemy
+        value:
+          number: 6
+          unit: percentage
+      - attribute: HP
+        class: Mounted Troops
+        condition:
+          - Enemy
+        value:
+          number: 8
+          unit: percentage
+  - level: Gold
+    buff:
+      - attribute: Attack
+        class: Ranged Troops
+        condition:
+          - Enemy
+        value:
+          number: 12
+          unit: percentage
+      - attribute: HP
+        class: Mounted Troops
+        condition:
+          - Enemy
+        value:
+          number: 14
+          unit: percentage

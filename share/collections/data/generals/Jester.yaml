@@ -1,0 +1,25 @@
+ascending: true
+basic_attributes:
+  leadership:
+    base: 98
+    increment: 8.33
+  attack:
+    base: 108
+    increment: 7.91
+  defense:
+    base: 103
+    increment: 8.04
+  politics:
+    base: 80
+    increment: 7.21
+book: Atrophy
+specialties:
+  - Siege Machine Defense
+  - Suppress
+  - Iron Warrior
+  - Massacre
+stars: red5
+type:
+  - mayor
+general: Jester
+name: Jester

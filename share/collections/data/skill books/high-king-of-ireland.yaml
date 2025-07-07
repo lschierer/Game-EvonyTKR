@@ -1,0 +1,38 @@
+name: High King of Ireland
+buff:
+  - attribute: Attack
+    class: Ranged Troops
+    condition:
+      - leading the army to attack
+      - Attacking
+    value:
+      number: 50
+      unit: percentage
+  - attribute: HP
+    class: Ranged Troops
+    condition:
+      - leading the army to attack
+      - Attacking
+    value:
+      number: 50
+      unit: percentage
+  - attribute: Defense
+    class: Siege Machines
+    condition:
+      - brings a dragon
+      - brings a spiritual beast
+      - Attacking
+    value:
+      number: 35
+      unit: percentage
+  - attribute: Defense
+    class: Ranged Troops
+    condition:
+      - brings a dragon
+      - brings a spiritual beast
+      - Attacking
+    value:
+      number: 35
+      unit: percentage
+text: >-
+  Increases ranged troops’ attack and HP by 50% when General is leading the army to attack. Increases ranged troops and siege machines’ defense by 35% when General brings any Dragon or Spiritual Beast to attack.

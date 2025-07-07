@@ -1,0 +1,82 @@
+name: Battle of the Teutoburg Forest
+levels:
+  - level: Green
+    buff:
+      - attribute: HP
+        class: Ground Troops
+        condition:
+          - Enemy
+        value:
+          number: 3
+          unit: percentage
+      - attribute: HP
+        class: Mounted Troops
+        condition:
+          - Enemy
+        value:
+          number: 3
+          unit: percentage
+  - level: Blue
+    buff:
+      - attribute: HP
+        class: Ground Troops
+        condition:
+          - Enemy
+        value:
+          number: 3
+          unit: percentage
+      - attribute: HP
+        class: Mounted Troops
+        condition:
+          - Enemy
+        value:
+          number: 3
+          unit: percentage
+  - level: Purple
+    buff:
+      - attribute: HP
+        class: Ground Troops
+        condition:
+          - Enemy
+        value:
+          number: 6
+          unit: percentage
+      - attribute: HP
+        class: Mounted Troops
+        condition:
+          - Enemy
+        value:
+          number: 6
+          unit: percentage
+  - level: Orange
+    buff:
+      - attribute: HP
+        class: Ground Troops
+        condition:
+          - Enemy
+        value:
+          number: 6
+          unit: percentage
+      - attribute: HP
+        class: Mounted Troops
+        condition:
+          - Enemy
+        value:
+          number: 6
+          unit: percentage
+  - level: Gold
+    buff:
+      - attribute: HP
+        class: Ground Troops
+        condition:
+          - Enemy
+        value:
+          number: 12
+          unit: percentage
+      - attribute: HP
+        class: Mounted Troops
+        condition:
+          - Enemy
+        value:
+          number: 12
+          unit: percentage

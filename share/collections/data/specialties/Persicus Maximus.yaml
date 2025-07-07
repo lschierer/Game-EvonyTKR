@@ -1,0 +1,152 @@
+name: Persicus Maximus
+levels:
+  - level: Green
+    buff:
+      - attribute: Attack
+        class: Mounted Troops
+        condition:
+          - Attacking
+        value:
+          number: 2
+          unit: percentage
+      - attribute: Attack
+        class: Ground Troops
+        condition:
+          - Attacking
+        value:
+          number: 2
+          unit: percentage
+      - attribute: Defense
+        class: Mounted Troops
+        condition:
+          - Attacking
+        value:
+          number: 2
+          unit: percentage
+      - attribute: Defense
+        class: Ground Troops
+        condition:
+          - Attacking
+        value:
+          number: 2
+          unit: percentage
+  - level: Blue
+    buff:
+      - attribute: Attack
+        class: Mounted Troops
+        condition:
+          - Attacking
+        value:
+          number: 2
+          unit: percentage
+      - attribute: Attack
+        class: Ground Troops
+        condition:
+          - Attacking
+        value:
+          number: 2
+          unit: percentage
+      - attribute: Defense
+        class: Mounted Troops
+        condition:
+          - Attacking
+        value:
+          number: 2
+          unit: percentage
+      - attribute: Defense
+        class: Ground Troops
+        condition:
+          - Attacking
+        value:
+          number: 2
+          unit: percentage
+  - level: Purple
+    buff:
+      - attribute: Attack
+        class: Mounted Troops
+        condition:
+          - Attacking
+        value:
+          number: 4
+          unit: percentage
+      - attribute: Attack
+        class: Ground Troops
+        condition:
+          - Attacking
+        value:
+          number: 4
+          unit: percentage
+      - attribute: Defense
+        class: Mounted Troops
+        condition:
+          - Attacking
+        value:
+          number: 4
+          unit: percentage
+      - attribute: Defense
+        class: Ground Troops
+        condition:
+          - Attacking
+        value:
+          number: 4
+          unit: percentage
+  - level: Orange
+    buff:
+      - attribute: Attack
+        class: Mounted Troops
+        condition:
+          - Attacking
+        value:
+          number: 4
+          unit: percentage
+      - attribute: Attack
+        class: Ground Troops
+        condition:
+          - Attacking
+        value:
+          number: 4
+          unit: percentage
+      - attribute: Defense
+        class: Mounted Troops
+        condition:
+          - Attacking
+        value:
+          number: 4
+          unit: percentage
+      - attribute: Defense
+        class: Ground Troops
+        condition:
+          - Attacking
+        value:
+          number: 4
+          unit: percentage
+  - level: Gold
+    buff:
+      - attribute: Attack
+        class: Mounted Troops
+        condition:
+          - Attacking
+        value:
+          number: 8
+          unit: percentage
+      - attribute: Attack
+        class: Ground Troops
+        condition:
+          - Attacking
+        value:
+          number: 8
+          unit: percentage
+      - attribute: Defense
+        class: Mounted Troops
+        condition:
+          - Attacking
+        value:
+          number: 8
+          unit: percentage
+      - attribute: Defense
+        class: Ground Troops
+        condition:
+          - Attacking
+        value:
+          number: 8
+          unit: percentage

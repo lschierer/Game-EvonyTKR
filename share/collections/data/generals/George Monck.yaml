@@ -1,0 +1,25 @@
+ascending: true
+basic_attributes:
+  attack:
+    base: 147
+    increment: 9.46
+  defense:
+    base: 126
+    increment: 8.71
+  leadership:
+    base: 115
+    increment: 8.23
+  politics:
+    base: 106
+    increment: 8.08
+book: Monarchy Restoration
+specialties:
+  - Mounted Troop Assault
+  - Formation
+  - Mounted Troop Ares
+  - Duke of Albemarle
+stars: red5
+type:
+  - mounted_specialist
+general: George Monck
+name: George Monck
