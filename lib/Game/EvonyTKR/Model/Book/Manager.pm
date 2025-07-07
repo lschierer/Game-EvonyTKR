@@ -1,4 +1,4 @@
-use v5.40.0;
+use v5.42.0;
 use experimental qw(class);
 use utf8::all;
 use File::FindLib 'lib';
@@ -12,7 +12,7 @@ require Game::EvonyTKR::Model::Buff;
 require Game::EvonyTKR::Model::Buff::Value;
 use namespace::clean;
 
-class Game::EvonyTKR::Model::Book::Manager : isa(Game::EvonyTKR::Model::Data) {
+class Game::EvonyTKR::Model::Book::Manager : isa(Game::EvonyTKR::Shared::Data) {
   # PODNAME: Game::EvonyTKR::Model::Book::Manager
   use Carp;
   use overload
@@ -100,19 +100,15 @@ class Game::EvonyTKR::Model::Book::Manager : isa(Game::EvonyTKR::Model::Data) {
           unit   => $ob->{value}->{unit},
         );
         my $b;
-        if (exists $ob->{class}) {
-          $b = Game::EvonyTKR::Model::Buff->new(
-            value         => $v,
-            attribute     => $ob->{attribute},
-            targetedTypes => [$ob->{class}],
-          );
+        $b = Game::EvonyTKR::Model::Buff->new(
+          value     => $v,
+          attribute => $ob->{attribute},
+        );
+
+        if (exists $ob->{targetedType}) {
+          $b->set_target($ob->{targetedType});
         }
-        else {
-          $b = Game::EvonyTKR::Model::Buff->new(
-            value     => $v,
-            attribute => $ob->{attribute},
-          );
-        }
+
         if (exists $ob->{condition}) {
           foreach my $c (@{ $ob->{condition} }) {
             $b->set_condition($c);

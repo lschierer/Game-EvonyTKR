@@ -1,4 +1,4 @@
-use v5.40.0;
+use v5.42.0;
 use experimental qw(class);
 use File::FindLib 'lib';
 require Data::Printer;
@@ -10,11 +10,13 @@ require Game::EvonyTKR::Shared::Parser;
 require Game::EvonyTKR::Model::Buff;
 require Game::EvonyTKR::Model::Buff::Value;
 
-class Game::EvonyTKR::Importer::SkillBook :
+class Game::EvonyTKR::Converter::SkillBook :
   isa(Game::EvonyTKR::Shared::Constants) {
   use List::AllUtils qw( first all any none );
   use namespace::autoclean;
 
+  field $outputDir :param;
+  field $debug :param //= 0;
   field $name = '';
   field $text = '';
   field $buffs;
@@ -61,16 +63,29 @@ class Game::EvonyTKR::Importer::SkillBook :
 
   }
 
-  method printYAML {
+  method printYAML () {
     my $data = {
       name  => $name,
       text  => $text,
       buffs => [map { $_->to_hash() } @$buffs],
     };
-    say YAML::PP->new(
+    my $yc = YAML::PP->new(
       schema       => [qw/ + Perl /],
       yaml_version => ['1.2', '1.1'],
     )->dump($data);
+    my $filename = lc($name);
+    $filename = "${filename}.yaml";
+    if(!$outputDir->is_dir()){
+      $self->logger->error("$outputDir is not a directory!!!" . $outputDir->stat());
+    }
+    $outputDir->child($filename)->touch();
+    if($debug) {
+      say $yc;
+      $outputDir->child($filename)->spew_utf8($yc);
+    } else {
+      $outputDir->child($filename)->spew_utf8($yc);
+    }
+
   }
 
   method execute {

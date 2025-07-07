@@ -1,4 +1,4 @@
-use v5.40.0;
+use v5.42.0;
 use experimental qw(class);
 use utf8::all;
 use File::FindLib 'lib';
@@ -10,7 +10,7 @@ require YAML::PP;
 require Game::EvonyTKR::Model::BasicAttributes;
 require Game::EvonyTKR::Model::BasicAttribute;
 
-class Game::EvonyTKR::Importer::General :
+class Game::EvonyTKR::Converter::General :
   isa(Game::EvonyTKR::Shared::Constants) {
   use List::AllUtils qw( first all any none );
   use namespace::autoclean;

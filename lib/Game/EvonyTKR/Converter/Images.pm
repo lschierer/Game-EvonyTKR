@@ -1,4 +1,4 @@
-use v5.40.0;
+use v5.42.0;
 use experimental qw(class);
 use utf8::all;
 use File::FindLib 'lib';
@@ -8,9 +8,10 @@ require HTTP::Tiny;
 require Path::Tiny;
 require IO::Socket::IP;    # for HTTP::Tiny;
 require IO::Socket::SSL;
+require Game::EvonyTKR; # for dist_dir to work
 require GD;
 
-class Game::EvonyTKR::Data::Images {
+class Game::EvonyTKR::Converter::Images {
   use File::Share ':all';
   use Carp;
   our $VERSION = 'v0.01.0';
@@ -18,13 +19,13 @@ class Game::EvonyTKR::Data::Images {
   field $generalDictionaryFile;
   field $tree;
   field $images  = {};
-  field $distDir = Path::Tiny::path(dist_dir('Game::EvonyTKR::Data'));
+  field $distDir = Path::Tiny::path(dist_dir('Game::EvonyTKR'));
 
   method getgeneralDictionaryFile {
     # this should ask the user where the general dictionary is.
     # I don't know how best to implement that. I'm hard coding it for now.
 
-    my $dictionary = $distDir->child('GeneralDictionaryGrid.html');
+    my $dictionary = $distDir->child('collections/share/GeneralDictionaryGrid.html');
     if ($dictionary->is_file()) {
       $generalDictionaryFile = $dictionary;
     }
@@ -57,7 +58,7 @@ class Game::EvonyTKR::Data::Images {
   }
 
   method getImages {
-    my $targetDir = $distDir->parent->child('data/images/generals/');
+    my $targetDir = $distDir->child('collections/data/images/generals/');
     $targetDir->mkdir({
       mode => 0710,
     });
