@@ -1,7 +1,7 @@
 name: Holy Light
 buff:
   - attribute: HP
-    class: Mounted Troops
+    targetedType: Mounted Troops
     value:
       number: 35
       unit: percentage

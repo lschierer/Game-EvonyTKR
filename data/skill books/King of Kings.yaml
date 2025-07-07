@@ -3,21 +3,21 @@ name: King of Kings
 text: Increases ranged troops and siege machines’ attack by 15% and mounted troops’ attack by 25% when General is leading the army to attack.
 buff:
   - attribute: Attack
-    class: Ranged Troops
+    targetedType: Ranged Troops
     condition:
       - leading the army to attack
     value:
       number: 15
       unit: percentage
   - attribute: Attack
-    class: Siege Machines
+    targetedType: Siege Machines
     condition:
       - leading the army to attack
     value:
       number: 15
       unit: percentage
   - attribute: Attack
-    class: Mounted Troops
+    targetedType: Mounted Troops
     condition:
       - leading the army to attack
     value:

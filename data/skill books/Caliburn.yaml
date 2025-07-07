@@ -7,14 +7,14 @@ buff:
       number: 15
       unit: percentage
   - attribute: Attack
-    class: Mounted Troops
+    targetedType: Mounted Troops
     condition:
       - leading the army to attack
     value:
       number: 35
       unit: percentage
   - attribute: Defense
-    class: Mounted Troops
+    targetedType: Mounted Troops
     condition:
       - leading the army to attack
     value:

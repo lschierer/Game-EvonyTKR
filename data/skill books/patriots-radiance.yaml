@@ -1,28 +1,28 @@
 name: Patriot’s Radiance
 buff:
   - attribute: Defense
-    class: Ranged Troops
+    targetedType: Ranged Troops
     condition:
       - leading the army to attack
     value:
       number: 45
       unit: percentage
   - attribute: Attack
-    class: Ranged Troops
+    targetedType: Ranged Troops
     condition:
       - leading the army to attack
     value:
       number: 45
       unit: percentage
   - attribute: HP
-    class: Ranged Troops
+    targetedType: Ranged Troops
     condition:
       - leading the army to attack
     value:
       number: 30
       unit: percentage
   - attribute: HP
-    class: Siege Machines
+    targetedType: Siege Machines
     condition:
       - leading the army to attack
     value:

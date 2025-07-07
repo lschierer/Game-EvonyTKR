@@ -1,21 +1,21 @@
 name: Military-political Genius
 buff:
   - attribute: Attack
-    class: Ranged Troops
+    targetedType: Ranged Troops
     condition:
       - Enemy
     value:
       number: -15
       unit: percentage
   - attribute: Attack
-    class: Siege Machines
+    targetedType: Siege Machines
     condition:
       - Enemy
     value:
       number: -15
       unit: percentage
   - attribute: Attack
-    class: Ground Troops
+    targetedType: Ground Troops
     condition:
       - Enemy
     value:

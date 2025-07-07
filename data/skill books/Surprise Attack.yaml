@@ -1,14 +1,14 @@
 name: Surprise Attack
 buff:
   - attribute: Attack
-    class: Ranged Troops
+    targetedType: Ranged Troops
     condition:
       - Enemy
     value:
       number: 30
       unit: percentage
   - attribute: Attack
-    class: Siege Machines
+    targetedType: Siege Machines
     condition:
       - Enemy
     value:

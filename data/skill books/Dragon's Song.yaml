@@ -4,14 +4,14 @@ text: |
   Increases ground troops and mounted troops’ HP by 30% when General is leading the army to attack. Increases ground troops’ attack by 30% when General brings any dragon to attack.
 buff:
   - attribute: HP
-    class: Ground Troops
+    targetedType: Ground Troops
     condition:
       - leading the army to attack
     value:
       number: 30
       unit: percentage
   - attribute: HP
-    class: Mounted Troops
+    targetedType: Mounted Troops
     condition:
       - leading the army to attack
     value:
@@ -20,7 +20,7 @@ buff:
   - attribute: Attack
     condition:
       - dragon to the attack
-    class: Ground Troops
+    targetedType: Ground Troops
     value:
       number: 30
       unit: percentage

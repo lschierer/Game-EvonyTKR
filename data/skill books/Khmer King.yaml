@@ -5,35 +5,35 @@ buff:
   - attribute: Attack
     condition:
       - leading the army to attack
-    class: Mounted Troops
+    targetedType: Mounted Troops
     value:
       number: 45
       unit: percentage
   - attribute: Defense
     condition:
       - leading the army to attack
-    class: Ground Troops
+    targetedType: Ground Troops
     value:
       number: 25
       unit: percentage
   - attribute: Defense
     condition:
       - leading the army to attack
-    class: Mounted Troops
+    targetedType: Mounted Troops
     value:
       number: 25
       unit: percentage
   - attribute: HP
     condition:
       - leading the army to attack
-    class: Ground Troops
+    targetedType: Ground Troops
     value:
       number: 25
       unit: percentage
   - attribute: HP
     condition:
       - leading the army to attack
-    class: Mounted Troops
+    targetedType: Mounted Troops
     value:
       number: 25
       unit: percentage

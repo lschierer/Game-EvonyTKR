@@ -10,7 +10,7 @@ buff:
   - attribute: Defense
     condition:
       - Reduces Enemy
-    class: Ground Troops
+    targetedType: Ground Troops
     value:
       number: 15
       unit: percentage

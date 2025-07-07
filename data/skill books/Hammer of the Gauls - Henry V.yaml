@@ -2,17 +2,17 @@
 name: Hammer of the Gauls - Henry V
 buff:
   - attribute: Attack
-    class: Ranged Troops
+    targetedType: Ranged Troops
     value:
       number: 30
       unit: percentage
   - attribute: Defense
-    class: Ranged Troops
+    targetedType: Ranged Troops
     value:
       number: 10
       unit: percentage
   - attribute: HP
-    class: Ranged Troops
+    targetedType: Ranged Troops
     value:
       number: 10
       unit: percentage
