@@ -4,7 +4,6 @@ use utf8::all;
 use File::FindLib 'lib';
 require Data::Printer;
 require Game::EvonyTKR::Model::Buff::Value;
-require Array::Utils;
 require JSON::PP;
 
 class Game::EvonyTKR::Model::Buff::Matcher : isa(Game::EvonyTKR::Model::Data) {

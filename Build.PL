@@ -1,4 +1,4 @@
-use v5.40.0;
+use v5.42.0;
 use utf8::all;
 use Carp;
 use Module::Build;
@@ -9,7 +9,10 @@ my $builder = Module::Build->new(
     dist_author         => 'Luke Schierer <luke.schierer@gmail.com>',
     dist_abstract       => 'Display and Evaluate information about Generals, Buffs, and DeBuffs for the Evony TKR Game',
     create_makefile_pl  => 0,     #'traditional',
-    script_files        => 'scripts/game-evonytkr',
+    script_files        => [
+      'scripts/game-evonytkr',
+      'scripts/create-general',
+    ],
     create_readme       => 0,
     requires            => {
       'App::Cmd::Simple'            => '0',
@@ -18,6 +21,7 @@ my $builder = Module::Build->new(
       'Data::Printer'               => '0',
       'Date::Manip'                 => '0',
       'DateTime'                    => '0',
+      'Devel::Local'                => '0',
       'Encode'                      => '0',
       'File::FindLib'               => '0',
       'File::HomeDir'               => '0',
@@ -94,6 +98,7 @@ my $builder = Module::Build->new(
       'Log::Any::Adapter'               => '0',
     },
     test_requires       => {
+      'Test::Deep'    => '0',
       'Test::More'    => '0',
       'Perl::Critic'  => '0',
     }

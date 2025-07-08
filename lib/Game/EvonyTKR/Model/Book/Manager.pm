@@ -12,7 +12,7 @@ require Game::EvonyTKR::Model::Buff;
 require Game::EvonyTKR::Model::Buff::Value;
 use namespace::clean;
 
-class Game::EvonyTKR::Model::Book::Manager : isa(Game::EvonyTKR::Shared::Data) {
+class Game::EvonyTKR::Model::Book::Manager : isa(Game::EvonyTKR::Shared::Constants) {
   # PODNAME: Game::EvonyTKR::Model::Book::Manager
   use Carp;
   use overload

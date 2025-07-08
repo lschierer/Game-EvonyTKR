@@ -1,4 +1,5 @@
 use v5.42.0;
+use utf8::all;
 use experimental qw(class);
 use File::FindLib 'lib';
 require Data::Printer;
@@ -13,6 +14,7 @@ require Game::EvonyTKR::Model::Buff::Value;
 class Game::EvonyTKR::Converter::SkillBook :
   isa(Game::EvonyTKR::Shared::Constants) {
   use List::AllUtils qw( first all any none );
+  use Carp;
   use namespace::autoclean;
 
   field $outputDir :param;

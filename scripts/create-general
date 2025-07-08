@@ -4,5 +4,5 @@ use utf8::all;
 use File::FindLib 'lib';
 use Devel::Local;
 require Game::EvonyTKR;
-use Game::EvonyTKR::Importer;
-Game::EvonyTKR::Importer->run;
+use Game::EvonyTKR::Converter;
+Game::EvonyTKR::Converter->run;

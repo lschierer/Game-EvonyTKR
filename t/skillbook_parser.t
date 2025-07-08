@@ -79,9 +79,7 @@ subtest 'fake singlebuff book' => sub {
   foreach my $frag (@fragments) {
     diag "frag is " . Data::Printer::np($frag);
     my @nb = $parser->normalize_buff($frag);
-    diag Data::Printer::np(@nb);
     push(@hashedBuffs, @nb);
-    diag Data::Printer::np(@hashedBuffs);
   }
 
   is scalar(@hashedBuffs), 1, 'Parsed 1 buffs';
@@ -262,6 +260,397 @@ subtest 'Chivalry Skill Book' => sub {
     ),
     '30% SubCity Training Speed buff (Mayor)'
   );
+
+  done_testing;
+};
+
+subtest 'Alessandra Red1 - Multiple troops with and' => sub {
+  my $text = "Marching Ground Troop and Mounted Troop Defense +10% and HP +10%";
+
+  my @fragments = $parser->tokenize_buffs($text);
+  my @hashedBuffs;
+  foreach my $frag (@fragments) {
+    diag "frag is $frag";
+    my @nb = $parser->normalize_buff($frag);
+    push(@hashedBuffs, @nb);
+  }
+
+  is scalar(@hashedBuffs), 4, 'Parsed 4 buffs (2 troops × 2 attributes)';
+
+  ok(
+    match_buff(
+      \@hashedBuffs,
+      attribute  => 'Defense',
+      value      => 10,
+      class      => 'Ground Troops',
+      conditions => ['Marching']
+    ),
+    'Ground Troops 10% Defense buff (Marching)'
+  );
+
+  ok(
+    match_buff(
+      \@hashedBuffs,
+      attribute  => 'HP',
+      value      => 10,
+      class      => 'Ground Troops',
+      conditions => ['Marching']
+    ),
+    'Ground Troops 10% HP buff (Marching)'
+  );
+
+  ok(
+    match_buff(
+      \@hashedBuffs,
+      attribute  => 'Defense',
+      value      => 10,
+      class      => 'Mounted Troops',
+      conditions => ['Marching']
+    ),
+    'Mounted Troops 10% Defense buff (Marching)'
+  );
+
+  ok(
+    match_buff(
+      \@hashedBuffs,
+      attribute  => 'HP',
+      value      => 10,
+      class      => 'Mounted Troops',
+      conditions => ['Marching']
+    ),
+    'Mounted Troops 10% HP buff (Marching)'
+  );
+
+  done_testing;
+};
+
+subtest 'Alessandra Red2 - Single debuff' => sub {
+  my $text = "Enemy In-city Troop Wounded into Death rate +10%";
+
+  my @fragments = $parser->tokenize_buffs($text);
+  my @hashedBuffs;
+  foreach my $frag (@fragments) {
+    diag "frag is $frag";
+    my @nb = $parser->normalize_buff($frag);
+    push(@hashedBuffs, @nb);
+  }
+
+  is scalar(@hashedBuffs), 1, 'Parsed 1 buff';
+
+  ok(
+    match_buff(
+      \@hashedBuffs,
+      attribute  => 'Wounded to Death',
+      value      => 10,
+      conditions => ['In City', 'Enemy']
+    ),
+    'Enemy Troops 10% Wounded to Death debuff (In City)'
+  );
+
+  done_testing;
+};
+
+subtest 'Alessandra Red3 - Single buff with condition' => sub {
+  my $text = "When General is launching Alliance War, Rally Capacity +8%";
+
+  my @fragments = $parser->tokenize_buffs($text);
+  my @hashedBuffs;
+  foreach my $frag (@fragments) {
+    diag "frag is $frag";
+    my @nb = $parser->normalize_buff($frag);
+    push(@hashedBuffs, @nb);
+  }
+
+  is scalar(@hashedBuffs), 1, 'Parsed 1 buff';
+
+  ok(
+    match_buff(
+      \@hashedBuffs,
+      attribute  => 'Rally Capacity',
+      value      => 8,
+      conditions => ['When Rallying']
+    ),
+    'Rally Capacity 8% buff (launching Alliance War)'
+  );
+
+  done_testing;
+};
+
+subtest 'Alessandra Red4 - Single buff' => sub {
+  my $text = "Marching Ground Troop Defense +50%";
+
+  my @fragments = $parser->tokenize_buffs($text);
+  my @hashedBuffs;
+  foreach my $frag (@fragments) {
+    diag "frag is $frag";
+    my @nb = $parser->normalize_buff($frag);
+    push(@hashedBuffs, @nb);
+  }
+
+  is scalar(@hashedBuffs), 1, 'Parsed 1 buff';
+
+  ok(
+    match_buff(
+      \@hashedBuffs,
+      attribute  => 'Defense',
+      value      => 50,
+      class      => 'Ground Troops',
+      conditions => ['Marching']
+    ),
+    'Ground Troops 50% Defense buff (Marching)'
+  );
+
+  done_testing;
+};
+
+subtest 'Alessandra Red5 - Mixed comma and and' => sub {
+  my $text = "Marching Ground Troop Attack +20%, Defense and HP +20%";
+
+  my @fragments = $parser->tokenize_buffs($text);
+  my @hashedBuffs;
+  foreach my $frag (@fragments) {
+    diag "frag is $frag";
+    my @nb = $parser->normalize_buff($frag);
+    push(@hashedBuffs, @nb);
+  }
+
+  is scalar(@hashedBuffs), 3, 'Parsed 3 buffs';
+
+  ok(
+    match_buff(
+      \@hashedBuffs,
+      attribute  => 'Attack',
+      value      => 20,
+      class      => 'Ground Troops',
+      conditions => ['Marching']
+    ),
+    'Ground Troops 20% Attack buff (Marching)'
+  );
+
+  ok(
+    match_buff(
+      \@hashedBuffs,
+      attribute  => 'Defense',
+      value      => 20,
+      class      => 'Ground Troops',
+      conditions => ['Marching']
+    ),
+    'Ground Troops 20% Defense buff (Marching)'
+  );
+
+  ok(
+    match_buff(
+      \@hashedBuffs,
+      attribute  => 'HP',
+      value      => 20,
+      class      => 'Ground Troops',
+      conditions => ['Marching']
+    ),
+    'Ground Troops 20% HP buff (Marching)'
+  );
+
+  done_testing;
+};
+
+
+diag "start of Aethelflaed Ascending Attributes";
+
+#1 Star When attacking Monsters, Mounted Troop HP +30%, Troops Defense +10%.
+subtest 'Aethelflaed’s Red1' => sub {
+  my $text = "When attacking Monsters, Mounted Troop HP +30%, Troops Defense +10%.";
+
+  my @fragments = $parser->tokenize_buffs($text);
+  my @hashedBuffs;
+  foreach my $frag (@fragments) {
+    diag "frag is $frag";
+    my @nb = $parser->normalize_buff($frag);
+    push(@hashedBuffs, @nb);
+  }
+
+  is scalar(@hashedBuffs), 2, 'Parsed 2 buffs';
+
+  ok(
+    match_buff(
+      \@hashedBuffs,
+      attribute  => 'HP',
+      value      => 30,
+      class      => 'Mounted Troops',
+      conditions => ['Against Monsters']
+    ),
+    'Mounted Troops 20% HP buff (Against Monsters)'
+  );
+
+  ok(
+    match_buff(
+      \@hashedBuffs,
+      attribute  => 'Defense',
+      value      => 10,
+      conditions => ['Against Monsters']
+    ),
+    'Mounted Troops 10% Defense buff (Against Monsters)'
+  );
+
+  done_testing;
+};
+
+
+#2 Star When attacking Monsters, Monsters Defense -10%, Troops HP +15%.
+subtest 'Aethelflaed’s Red2' => sub {
+  my $text = "When attacking Monsters, Monsters Defense -10%, Troops HP +15%.";
+
+  my @fragments = $parser->tokenize_buffs($text);
+  my @hashedBuffs;
+  foreach my $frag (@fragments) {
+    diag "frag is $frag";
+    my @nb = $parser->normalize_buff($frag);
+    push(@hashedBuffs, @nb);
+  }
+
+  is scalar(@hashedBuffs), 2, 'Parsed 2 buffs';
+
+  ok(
+    match_buff(
+      \@hashedBuffs,
+      attribute  => 'Defense',
+      value      => 10,
+      conditions => ['Monsters']
+    ),
+    '10% Defense debuff (Monsters)'
+  );
+
+  ok(
+    match_buff(
+      \@hashedBuffs,
+      attribute  => 'HP',
+      value      => 15,
+      conditions => ['Against Monsters']
+    ),
+    'Generic 15% HP buff (Against Monsters)'
+  );
+
+  done_testing;
+};
+
+#3 Star When attacking Monsters, Monsters Attack -10%, Troops Defense +20%.
+subtest 'Aethelflaed’s Red3' => sub {
+  my $text = "When attacking Monsters, Monsters Attack -10%, Troops Defense +20%.";
+
+  my @fragments = $parser->tokenize_buffs($text);
+  my @hashedBuffs;
+  foreach my $frag (@fragments) {
+    diag "frag is $frag";
+    my @nb = $parser->normalize_buff($frag);
+    push(@hashedBuffs, @nb);
+  }
+
+  is scalar(@hashedBuffs), 2, 'Parsed 2 buffs';
+
+  ok(
+    match_buff(
+      \@hashedBuffs,
+      attribute  => 'Attack',
+      value      => 10,
+      conditions => ['Monsters']
+    ),
+    '10% Attack debuff (Monsters)'
+  );
+
+  ok(
+    match_buff(
+      \@hashedBuffs,
+      attribute  => 'Defense',
+      value      => 20,
+      conditions => ['Against Monsters']
+    ),
+    'Generic 20% Defense buff (Against Monsters)'
+  );
+
+  done_testing;
+};
+
+#4 Star When attacking Monsters, Mounted Troop Attack +15%, Troops HP +20%.
+subtest 'Aethelflaed’s Red4' => sub {
+  my $text = "When attacking Monsters, Mounted Troop Attack +15%, Troops HP +20%.";
+
+  my @fragments = $parser->tokenize_buffs($text);
+  my @hashedBuffs;
+  foreach my $frag (@fragments) {
+    diag "frag is $frag";
+    my @nb = $parser->normalize_buff($frag);
+    push(@hashedBuffs, @nb);
+  }
+
+  is scalar(@hashedBuffs), 2, 'Parsed 2 buffs';
+
+  ok(
+    match_buff(
+      \@hashedBuffs,
+      attribute  => 'Attack',
+      value      => 15,
+      class      => "Mounted Troops",
+      conditions => ['Against Monsters']
+    ),
+    '15% Mounted Troops Attack buff (Against Monsters)'
+  );
+
+  ok(
+    match_buff(
+      \@hashedBuffs,
+      attribute  => 'HP',
+      value      => 20,
+      conditions => ['Against Monsters']
+    ),
+    'Generic 20% HP buff (Against Monsters)'
+  );
+
+  done_testing;
+};
+
+#5 Star When attacking Monsters, Mounted Troop Attack +20%, Troops Defense and HP +10%.
+subtest 'Aethelflaed’s Red5' => sub {
+  my $text = "When attacking Monsters, Mounted Troop Attack +20%, Troops Defense and HP +10%.";
+
+  my @fragments = $parser->tokenize_buffs($text);
+  my @hashedBuffs;
+  foreach my $frag (@fragments) {
+    diag "frag is $frag";
+    my @nb = $parser->normalize_buff($frag);
+    push(@hashedBuffs, @nb);
+  }
+
+  is scalar(@hashedBuffs), 3, 'Parsed 3 buffs';
+
+  ok(
+    match_buff(
+      \@hashedBuffs,
+      attribute  => 'Attack',
+      value      => 20,
+      class      => "Mounted Troops",
+      conditions => ['Against Monsters']
+    ),
+    '15% Mounted Troops Attack buff (Against Monsters)'
+  );
+
+  ok(
+    match_buff(
+      \@hashedBuffs,
+      attribute  => 'Defense',
+      value      => 10,
+      conditions => ['Against Monsters']
+    ),
+    'Generic 10% Defense buff (Against Monsters)'
+  );
+
+  ok(
+    match_buff(
+      \@hashedBuffs,
+      attribute  => 'HP',
+      value      => 10,
+      conditions => ['Against Monsters']
+    ),
+    'Generic 10% HP buff (Against Monsters)'
+  );
+
 
   done_testing;
 };
