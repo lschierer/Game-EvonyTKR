@@ -4,21 +4,26 @@ text: Increases mounted troops’ attack by 50% when General is leading the army
 buff:
   - attribute: Attack
     condition:
-      - leading the army to attack
+      - leading the army
+      - Attacking
     targetedType: Mounted Troops
     value:
       number: 50
       unit: percentage
   - attribute: Defense
     condition:
-      - brings dragon or beast to attack
+      - brings a dragon
+      - brings a spiritual beast
+      - Attacking
     targetedType: Mounted Troops
     value:
       number: 30
       unit: percentage
   - attribute: HP
     condition:
-      - brings dragon or beast to attack
+      - brings a dragon
+      - brings a spiritual beast
+      - Attacking
     targetedType: Mounted Troops
     value:
       number: 30
