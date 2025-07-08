@@ -3,7 +3,6 @@ buff:
   - attribute: Attack
     targetedType: Ranged Troops
     condition:
-      - leading the army to attack
       - Attacking
     value:
       number: 50
@@ -11,7 +10,6 @@ buff:
   - attribute: HP
     targetedType: Ranged Troops
     condition:
-      - leading the army to attack
       - Attacking
     value:
       number: 50

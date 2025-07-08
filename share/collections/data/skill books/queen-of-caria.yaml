@@ -3,20 +3,20 @@ buff:
   - attribute: Defense
     targetedType: Ranged Troops
     condition:
-      - leading the army to attack
+      - Attacking
     value:
       number: 55
       unit: percentage
   - attribute: Attack
     targetedType: Ranged Troops
     condition:
-      - leading the army to attack
+      - Attacking
     value:
       number: 55
       unit: percentage
   - attribute: HP
     condition:
-      - leading the army to attack
+      - Attacking
     value:
       number: 35
       unit: percentage

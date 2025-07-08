@@ -4,20 +4,20 @@ buff:
   - attribute: Attack
     targetedType: Siege Machines
     condition:
-      - leading the army to attack
+      - Attacking
     value:
       number: 45
       unit: percentage
   - attribute: Defense
     targetedType: Siege Machines
     condition:
-      - leading the army to attack
+      - Attacking
     value:
       number: 45
       unit: percentage
   - attribute: March Size
     condition:
-      - leading the army to attack
+      - Attacking
     value:
       number: 8
       unit: percentage

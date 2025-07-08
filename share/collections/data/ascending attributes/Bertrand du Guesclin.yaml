@@ -3,28 +3,28 @@ ascending:
     buff:
       - attribute: Attack
         condition:
-          - leading the army to attack
+          - Attacking
         class: Mounted Troops
         value:
           number: 10
           unit: percentage
       - attribute: Attack
         condition:
-          - leading the army to attack
+          - Attacking
         class: Ground Troops
         value:
           number: 10
           unit: percentage
       - attribute: Defense
         condition:
-          - leading the army to attack
+          - Attacking
         class: Mounted Troops
         value:
           number: 10
           unit: percentage
       - attribute: Defense
         condition:
-          - leading the army to attack
+          - Attacking
         class: Ground Troops
         value:
           number: 10
@@ -48,14 +48,14 @@ ascending:
     buff:
       - attribute: HP
         condition:
-          - leading the army to attack
+          - Attacking
         class: Mounted Troops
         value:
           number: 20
           unit: percentage
       - attribute: HP
         condition:
-          - leading the army to attack
+          - Attacking
         class: Ground Troops
         value:
           number: 20
@@ -69,28 +69,28 @@ ascending:
           unit: percentage
       - attribute: Defense
         condition:
-          - leading the army to attack
+          - Attacking
         class: Mounted Troops
         value:
           number: 10
           unit: percentage
       - attribute: Defense
         condition:
-          - leading the army to attack
+          - Attacking
         class: Ground Troops
         value:
           number: 10
           unit: percentage
       - attribute: HP
         condition:
-          - leading the army to attack
+          - Attacking
         class: Mounted Troops
         value:
           number: 10
           unit: percentage
       - attribute: HP
         condition:
-          - leading the army to attack
+          - Attacking
         class: Ground Troops
         value:
           number: 10

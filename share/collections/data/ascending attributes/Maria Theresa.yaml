@@ -18,7 +18,7 @@ ascending:
     buff:
       - attribute: Attack
         condition:
-          - Reduces Monster
+          - Monsters
         value:
           number: 10
           unit: percentage

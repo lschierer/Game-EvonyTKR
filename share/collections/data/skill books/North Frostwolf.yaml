@@ -3,28 +3,31 @@ name: North Frostwolf
 buff:
   - attribute: Attack
     condition:
-      - leading the army to attack
+      - Attacking
     targetedType: Ground Troops
     value:
       number: 15
       unit: percentage
   - attribute: Attack
     condition:
-      - dragon to the attack
+      - brings a dragon
+      - Attacking
     targetedType: Ground Troops
     value:
       number: 25
       unit: percentage
   - attribute: Defense
     condition:
-      - dragon to the attack
+      - brings a dragon
+      - Attacking
     targetedType: Ground Troops
     value:
       number: 25
       unit: percentage
   - attribute: HP
     condition:
-      - dragon to the attack
+      - brings a dragon
+      - Attacking
     targetedType: Ground Troops
     value:
       number: 25

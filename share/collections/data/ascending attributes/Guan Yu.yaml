@@ -4,21 +4,21 @@ ascending:
     buff:
       - attribute: Attack
         condition:
-          - leading the army to attack
+          - Attacking
         class: Ground Troops
         value:
           number: 10
           unit: percentage
       - attribute: HP
         condition:
-          - leading the army to attack
+          - Attacking
         class: Ground Troops
         value:
           number: 10
           unit: percentage
       - attribute: HP
         condition:
-          - leading the army to attack
+          - Attacking
         class: Mounted Troops
         value:
           number: 10
@@ -27,7 +27,8 @@ ascending:
     buff:
       - attribute: Wounded to Death
         condition:
-          - Enemy In City
+          - Enemy
+          - In City
         value:
           number: 10
           unit: percentage
@@ -43,14 +44,14 @@ ascending:
     buff:
       - attribute: Defense
         condition:
-          - leading the army to attack
+          - Attacking
         class: Ground Troops
         value:
           number: 35
           unit: percentage
       - attribute: Defense
         condition:
-          - leading the army to attack
+          - Attacking
         class: Mounted Troops
         value:
           number: 35
@@ -59,35 +60,35 @@ ascending:
     buff:
       - attribute: Attack
         condition:
-          - leading the army to attack
+          - Attacking
         class: Ground Troops
         value:
           number: 20
           unit: percentage
       - attribute: HP
         condition:
-          - leading the army to attack
+          - Attacking
         class: Mounted Troops
         value:
           number: 10
           unit: percentage
       - attribute: HP
         condition:
-          - leading the army to attack
+          - Attacking
         class: Ground Troops
         value:
           number: 10
           unit: percentage
       - attribute: Defense
         condition:
-          - leading the army to attack
+          - Attacking
         class: Mounted Troops
         value:
           number: 15
           unit: percentage
       - attribute: Defense
         condition:
-          - leading the army to attack
+          - Attacking
         class: Ground Troops
         value:
           number: 15

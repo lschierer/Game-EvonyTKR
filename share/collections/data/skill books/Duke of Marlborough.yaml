@@ -3,7 +3,7 @@ name: Duke of Marlborough
 buff:
   - attribute: Attack
     condition:
-      - leading the army to attack
+      - Attacking
     targetedType: Siege Machines
     value:
       number: 30

@@ -9,8 +9,16 @@ buff:
       unit: percentage
   - attribute: Attack
     condition:
-      - dragon to the attack
+      - brings a dragon
+      - Attacking
     targetedType: Mounted Troops
     value:
       number: 15
+      unit: percentage
+  - attribute: Marching Speed
+    condition:
+      - you own the General
+    passive: 1
+    value:
+      number: 10
       unit: percentage

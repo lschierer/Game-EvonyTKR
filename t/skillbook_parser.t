@@ -655,4 +655,131 @@ subtest 'Aethelflaed’s Red5' => sub {
   done_testing;
 };
 
+# Monarchy Restoration
+# Increases mounted troops’ attack by 50% when General is leading the army to attack. Increases ground troops and mounted troops’ defense and HP by 40% when General brings any Dragon or Spiritual Beast to attack.
+diag 'start of Monarchy Restoration Skill Book';
+subtest 'Monarchy Restoration Skill Book' => sub {
+  my $text = "Increases mounted troops’ attack by 50% when General is leading the army to attack. Increases ground troops and mounted troops’ defense and HP by 40% when General brings any Dragon or Spiritual Beast to attack.";
+
+  my @fragments = $parser->tokenize_buffs($text);
+  my @hashedBuffs;
+  foreach my $frag (@fragments) {
+    diag "frag is $frag";
+    my @nb = $parser->normalize_buff($frag);
+    push(@hashedBuffs, @nb);
+  }
+
+  is scalar(@hashedBuffs), 5, 'Parsed 5 buffs';
+
+  ok(
+    match_buff(
+      \@hashedBuffs,
+      attribute   => 'Attack',
+      value       => 50,
+      class       => 'Mounted Troops',
+      conditions  => ['leading the army', 'Attacking']
+    ),
+    '50% Mounted Troop Attack buff (Attacking)'
+  );
+
+  ok(
+    match_buff(
+      \@hashedBuffs,
+      attribute   => 'Defense',
+      value       => 40,
+      class       => 'Ground Troops',
+      conditions  => ['brings a dragon', 'brings a spiritual beast', 'Attacking']
+    ),
+    '40% Ground Troop Defense buff (conditional Attacking)'
+  );
+
+  ok(
+    match_buff(
+      \@hashedBuffs,
+      attribute   => 'HP',
+      value       => 40,
+      class       => 'Ground Troops',
+      conditions  => ['brings a dragon', 'brings a spiritual beast', 'Attacking']
+    ),
+    '40% Ground Troop HP buff (conditional Attacking)'
+  );
+
+  ok(
+    match_buff(
+      \@hashedBuffs,
+      attribute   => 'Defense',
+      value       => 40,
+      class       => 'Mounted Troops',
+      conditions  => ['brings a dragon', 'brings a spiritual beast', 'Attacking']
+    ),
+    '40% Mounted Troop Defense buff (conditional Attacking)'
+  );
+
+  ok(
+    match_buff(
+      \@hashedBuffs,
+      attribute   => 'HP',
+      value       => 40,
+      class       => 'Mounted Troops',
+      conditions  => ['brings a dragon', 'brings a spiritual beast', 'Attacking']
+    ),
+    '40% Mounted Troop HP buff (conditional Attacking)'
+  );
+
+  done_testing;
+};
+
+# Napoleonic Wars
+# Increases mounted troops’ attack by 50% when General is leading the army to attack. Increases mounted troops’ defense and HP by 30% when General brings any Dragon or Spiritual Beast to attack.
+diag 'start of Napoleonic Wars Skill Book';
+subtest 'Napoleonic Wars Skill Book' => sub {
+  my $text = "Increases mounted troops’ attack by 50% when General is leading the army to attack. Increases mounted troops’ defense and HP by 30% when General brings any Dragon or Spiritual Beast to attack.";
+
+  my @fragments = $parser->tokenize_buffs($text);
+  my @hashedBuffs;
+  foreach my $frag (@fragments) {
+    diag "frag is $frag";
+    my @nb = $parser->normalize_buff($frag);
+    push(@hashedBuffs, @nb);
+  }
+
+  is scalar(@hashedBuffs), 3, 'Parsed 3 buffs';
+
+  ok(
+    match_buff(
+      \@hashedBuffs,
+      attribute   => 'Attack',
+      value       => 50,
+      class       => 'Mounted Troops',
+      conditions  => ['leading the army', 'Attacking']
+    ),
+    '50% Mounted Troop Attack buff (Attacking)'
+  );
+
+  ok(
+    match_buff(
+      \@hashedBuffs,
+      attribute   => 'Defense',
+      value       => 30,
+      class       => 'Mounted Troops',
+      conditions  => ['brings a dragon', 'brings a spiritual beast', 'Attacking']
+    ),
+    '40% Mounted Troop Defense buff (conditional Attacking)'
+  );
+
+  ok(
+    match_buff(
+      \@hashedBuffs,
+      attribute   => 'HP',
+      value       => 30,
+      class       => 'Mounted Troops',
+      conditions  => ['brings a dragon', 'brings a spiritual beast', 'Attacking']
+    ),
+    '40% Mounted Troop HP buff (conditional Attacking)'
+  );
+
+  done_testing;
+};
+
+
 done_testing;

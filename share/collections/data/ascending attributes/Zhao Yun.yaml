@@ -3,7 +3,7 @@ ascending:
   - level: "red1"
     buff:
       - condition:
-          - leading the army to attack
+          - Attacking
         attribute: Attack
         class: Mounted Troops
         value:
@@ -12,7 +12,7 @@ ascending:
       - attribute: Defense
         class: Mounted Troops
         condition:
-          - leading the army to attack
+          - Attacking
         value:
           number: 10
           unit: percentage
@@ -20,7 +20,8 @@ ascending:
     buff:
       - attribute: Wounded to Death
         condition:
-          - Enemy In City
+          - Enemy
+          - In City
         value:
           number: 10
           unit: percentage
@@ -52,14 +53,14 @@ ascending:
     buff:
       - attribute: Attack
         condition:
-          - leading the army to attack
+          - Attacking
         class: Mounted Troops
         value:
           number: 25
           unit: percentage
       - attribute: Defense
         condition:
-          - leading the army to attack
+          - Attacking
         class: Mounted Troops
         value:
           number: 20

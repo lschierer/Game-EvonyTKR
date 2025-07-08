@@ -3,7 +3,7 @@ name: Queen of Revenge
 buff:
   - attribute: Attack
     condition:
-      - leading the army to attack
+      - Attacking
     targetedType: Ranged Troops
     value:
       number: 35
