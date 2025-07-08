@@ -4,7 +4,7 @@ buff:
   - attribute: Attack
     targetedType: Ranged Troops
     condition:
-      - leading the army to attack
+      - Attacking
     value:
       number: 10
       unit: percentage

@@ -1,6 +1,7 @@
 ---
 name: Queen of Hungary
-text: Increases mounted troops’ attack, defense and HP by 45% and reduces your Stamina cost by 20% when General is leading the army to attack Monsters.
+text: >-
+  Increases mounted troops’ attack, defense and HP by 45% and reduces your Stamina cost by 20% when General is leading the army to attack Monsters.
 buff:
   - attribute: Attack
     condition:

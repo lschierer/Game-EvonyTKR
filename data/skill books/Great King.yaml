@@ -3,14 +3,14 @@ name: Great King
 buff:
   - attribute: Attack
     condition:
-      - leading the army to attack
+      - Attacking
     targetedType: Ranged Troops
     value:
       number: 30
       unit: percentage
   - attribute: Attack
     condition:
-      - leading the army to attack
+      - Attacking
     targetedType: Siege Machines
     value:
       number: 20

@@ -9,7 +9,7 @@ levels:
     buff:
       - attribute: Defense
         condition:
-          - Reduces Monster
+          - Monsters
         value:
           number: 8
           unit: percentage

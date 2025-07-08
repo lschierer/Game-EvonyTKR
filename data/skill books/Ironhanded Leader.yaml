@@ -3,28 +3,28 @@ name: Ironhanded Leader
 buff:
   - attribute: Attack
     condition:
-      - leading the army to attack
+      - Attacking
     targetedType: Ground Troops
     value:
       number: 30
       unit: percentage
   - attribute: Attack
     condition:
-      - leading the army to attack
+      - Attacking
     targetedType: Mounted Troops
     value:
       number: 30
       unit: percentage
   - attribute: Defense
     condition:
-      - leading the army to attack
+      - Attacking
     targetedType: Ground Troops
     value:
       number: 15
       unit: percentage
   - attribute: Defense
     condition:
-      - leading the army to attack
+      - Attacking
     targetedType: Mounted Troops
     value:
       number: 15

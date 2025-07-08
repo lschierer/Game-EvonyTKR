@@ -1,10 +1,11 @@
 ---
 name: National Warrior
-text: Increases Troop Attack by 10% when General is leading the army to attack. Increases ground troops and mounted troops’ attack by 15% when General brings any dragon.
+text: >-
+  Increases Troop Attack by 10% when General is leading the army to attack. Increases ground troops and mounted troops’ attack by 15% when General brings any dragon.
 buff:
   - attribute: Attack
     condition:
-      - leading the army to attack
+      - Attacking
     value:
       number: 10
       unit: percentage

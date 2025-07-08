@@ -3,14 +3,15 @@ name: Shield of Parthians
 buff:
   - attribute: Attack
     condition:
-      - leading the army to attack
+      - Attacking
     targetedType: Siege Machines
     value:
       number: 25
       unit: percentage
   - attribute: Attack
     condition:
-      - dragon to the attack
+      - brings a dragon
+      - Attacking
     targetedType: Siege Machines
     value:
       number: 15

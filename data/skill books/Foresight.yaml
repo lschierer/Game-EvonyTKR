@@ -4,7 +4,7 @@ text: Increases ground troops and mounted troops’ attack by 40% and increases 
 buff:
   - attribute: Attack
     condition:
-      - leading the army to attack
+      - Attacking
     targetedType: Mounted Troops
     value:
       number: 40
@@ -15,14 +15,14 @@ buff:
       number: 40
       unit: percentage
   - condition:
-      - leading the army to attack
+      - Attacking
     attribute: Defense
     targetedType: Mounted Troops
     value:
       number: 25
       unit: percentage
   - condition:
-      - leading the army to attack
+      - Attacking
     attribute: HP
     targetedType: Mounted Troops
     value:

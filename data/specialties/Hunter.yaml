@@ -5,7 +5,7 @@ levels:
     buff:
       - attribute: Attack
         condition:
-          - Reduces Monster
+          - Monsters
         value:
           number: 1
           unit: percentage
@@ -13,7 +13,7 @@ levels:
     buff:
       - attribute: Attack
         condition:
-          - Reduces Monster
+          - Monsters
         value:
           number: 2
           unit: percentage
@@ -21,7 +21,7 @@ levels:
     buff:
       - attribute: Attack
         condition:
-          - Reduces Monster
+          - Monsters
         value:
           number: 3
           unit: percentage
@@ -29,7 +29,7 @@ levels:
     buff:
       - attribute: Attack
         condition:
-          - Reduces Monster
+          - Monsters
         value:
           number: 3
           unit: percentage
@@ -37,7 +37,7 @@ levels:
     buff:
       - attribute: Attack
         condition:
-          - Reduces Monster
+          - Monsters
         value:
           number: 6
           unit: percentage

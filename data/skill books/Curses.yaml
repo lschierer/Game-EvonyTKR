@@ -3,13 +3,13 @@ name: Curses
 buff:
   - attribute: Defense
     condition:
-      - Reduces Enemy
+      - Enemy
     value:
       number: 15
       unit: percentage
   - attribute: Defense
     condition:
-      - Reduces Enemy
+      - Enemy
     targetedType: Ground Troops
     value:
       number: 15

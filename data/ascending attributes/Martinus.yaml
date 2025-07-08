@@ -11,7 +11,8 @@ ascending:
     buff:
       - attribute: Wounded to Death
         condition:
-          - Enemy In City
+          - Enemy
+          - In City
         value:
           number: 8
           unit: percentage
@@ -40,7 +41,8 @@ ascending:
       - attribute: Attack
         class: Mounted Troops
         condition:
-          - dragon to the attack
+          - brings a dragon
+          - Attacking
         value:
           number: 20
           unit: percentage
