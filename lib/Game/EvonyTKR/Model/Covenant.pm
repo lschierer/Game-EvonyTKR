@@ -104,7 +104,7 @@ class Game::EvonyTKR::Model::Covenant : isa(Game::EvonyTKR::Shared::Constants) {
       $match_debuff_conditions = [];
     }
     else {
-      $match_buff_conditions   = [];
+      $match_buff_conditions   = $conditions;
       $match_debuff_conditions = $debuffConditions;
     }
 

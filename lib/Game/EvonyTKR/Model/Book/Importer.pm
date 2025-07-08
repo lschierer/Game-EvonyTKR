@@ -10,7 +10,7 @@ require Game::EvonyTKR::Model::Book;
 require Game::EvonyTKR::Model::Book::Builtin;
 require YAML::PP;
 
-class Game::EvonyTKR::Model::Book::Importer : isa(Game::EvonyTKR::Model::Data) {
+class Game::EvonyTKR::Model::Book::Importer : isa(Game::EvonyTKR::Shared::Constants) {
 # PODNAME: Game::EvonyTKR::Model::Book::Importer
   use List::AllUtils qw( any none );
   use namespace::autoclean;

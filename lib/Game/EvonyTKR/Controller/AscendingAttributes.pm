@@ -65,26 +65,27 @@ package Game::EvonyTKR::Controller::AscendingAttributes {
 
     $app->helper(
       ascending_level_names => sub($c, $level = '', $printable = 0) {
-        my $logger = Log::Log4perl->get_logger(__PACKAGE__);
+        $logger->debug("ascending_level_names helper started, level is '$level', for " . __PACKAGE__);
+        #my $logger = Log::Log4perl->get_logger(__PACKAGE__);
         if (length($level) == 0) {
 
           my $purpleNames =
-            $c->app->get_root_manager->AscendingLevelNames(0, $printable);
+            $c->app->get_root_manager->AscendingAttributeLevelNames(0, $printable);
           my $redNames =
-            $c->app->get_root_manager->AscendingLevelNames(1, $printable);
+            $c->app->get_root_manager->AscendingAttributeLevelNames(1, $printable);
 
           # Combine and get unique values
           my @combined = (@$purpleNames, @$redNames);
           my @unique   = uniq(@combined);
 
           $logger->debug("ascending_level_names returning unique list: "
-              . Data::Printer::np(@unique));
+              . join(', ', @unique));
           return \@unique;
         }
         if ($level eq 'None') {
           return 'None';
         }
-        return $c->app->get_root_manager->AscendingLevelLabel($level);
+        return $c->app->get_root_manager->AscendingAttributeLevelNames($level);
       }
     );
 

@@ -12,7 +12,7 @@ require Game::EvonyTKR::Model::General::ConflictGroup::Importer;
 use namespace::clean;
 
 class Game::EvonyTKR::Model::General::ConflictGroup::Manager :
-  isa(Game::EvonyTKR::Model::Data) {
+  isa(Game::EvonyTKR::Shared::Constants) {
   use Carp;
   use List::AllUtils qw( any none );
   use overload
@@ -173,9 +173,9 @@ class Game::EvonyTKR::Model::General::ConflictGroup::Manager :
     }
 
     my $generals_file =
-      $SourceDir->child('collections/share/EvansFullGeneralInfo.csv');
+      $SourceDir->parent->parent->child('share/EvansFullGeneralInfo.csv');
     my $groups_file =
-      $SourceDir->child('collections/share/EvAnsConflictGroupDefinitions.csv');
+      $SourceDir->parent->parent->child('share/EvAnsConflictGroupDefinitions.csv');
     if ($generals_file->is_file() && $groups_file->is_file()) {
       my $importer =
         Game::EvonyTKR::Model::General::ConflictGroup::Importer->new(

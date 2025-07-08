@@ -9,7 +9,7 @@ require Game::EvonyTKR::Model::Buff::Matcher;
 require JSON::PP;
 use namespace::clean;
 
-class Game::EvonyTKR::Model::Book : isa(Game::EvonyTKR::Model::Data) {
+class Game::EvonyTKR::Model::Book : isa(Game::EvonyTKR::Shared::Constants) {
   # PODNAME: Game::EvonyTKR::Model::Book
   use Carp;
   use List::AllUtils qw( any none );
@@ -42,7 +42,7 @@ class Game::EvonyTKR::Model::Book : isa(Game::EvonyTKR::Model::Data) {
       $match_debuff_conditions = [];
     }
     else {
-      $match_buff_conditions   = [];
+      $match_buff_conditions   = $conditions;
       $match_debuff_conditions = $debuffConditions;
     }
 

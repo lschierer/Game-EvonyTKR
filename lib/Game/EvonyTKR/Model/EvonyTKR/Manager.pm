@@ -12,7 +12,7 @@ require Game::EvonyTKR::Model::Covenant::Manager;
 use namespace::clean;
 
 class Game::EvonyTKR::Model::EvonyTKR::Manager :
-  isa(Game::EvonyTKR::Model::Data) {
+  isa(Game::EvonyTKR::Shared::Constants) {
 
   field $SourceDir : reader : param;
   field $generalManager : reader;

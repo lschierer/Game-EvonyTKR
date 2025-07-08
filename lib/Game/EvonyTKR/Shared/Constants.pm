@@ -31,6 +31,21 @@ class Game::EvonyTKR::Shared::Constants : isa(Game::EvonyTKR::Model::Logger) {
     say "execute called for " . __PACKAGE__;
   }
 
+  field $GeneralKeys : reader;
+
+  ADJUST {
+    Readonly::Array my @temp => qw(
+      ground_specialist
+      mounted_specialist
+      ranged_specialist
+      siege_specialist
+      mayor
+      officer
+      wall
+    );
+    $GeneralKeys = \@temp;
+  }
+
   field $TroopTypeValues : reader;
 
   ADJUST {
@@ -44,8 +59,8 @@ class Game::EvonyTKR::Shared::Constants : isa(Game::EvonyTKR::Model::Logger) {
   }
 
   method string_to_trooptype ($string) {
-    $string = s/(\w+)(?: .*)/\L$1/;
-    my $key = first { $_ =~ /^$string/ } keys %{$TroopTypeValues};
+    $string =~ s/(\w+)(?: .*)/\L$1/x;
+    my $key = first { $_ =~ /^$string/x } keys %{$TroopTypeValues};
     if (exists $TroopTypeValues->{$key}) {
       return $TroopTypeValues->{$key};
     }
@@ -54,6 +69,17 @@ class Game::EvonyTKR::Shared::Constants : isa(Game::EvonyTKR::Model::Logger) {
       # reflective of a troop type
       return '';
     }
+  }
+
+  field $AllowedBuffActivationValues : reader;
+
+  ADJUST {
+    Readonly::Array my @temp => (
+      "Overall", "PvM",     "Attacking", "Reinforcing",
+      "Defense", "In City", "Out City",  "Wall",
+      "Mayor",   "Officer",
+    );
+    $AllowedBuffActivationValues = \@temp;
   }
 
   field $AttributeValues : reader;
@@ -71,8 +97,10 @@ class Game::EvonyTKR::Shared::Constants : isa(Game::EvonyTKR::Model::Logger) {
       "Healing Speed",
       "Hospital Capacity",
       "HP",
+      'Leadership',
       "March Size",
       "Marching Speed",
+      'Politics',
       "Rally Capacity",
       "Resources Production",
       "Stamina cost",
@@ -85,7 +113,6 @@ class Game::EvonyTKR::Shared::Constants : isa(Game::EvonyTKR::Model::Logger) {
       "Training Capacity",
       "Training Speed",
       "Wounded to Death",
-      'you own the General',
     );
     $AttributeValues = \@temp;
   }
@@ -98,7 +125,7 @@ class Game::EvonyTKR::Shared::Constants : isa(Game::EvonyTKR::Model::Logger) {
       'march size increase'           => 'March Size',
       'march size'                    => 'March Size',
       'wounded into death rate'       => 'Wounded to Death',
-      'wounded into death'       => 'Wounded to Death',
+      'wounded into death'            => 'Wounded to Death',
     };
     if ($exact) {
       return $exact;
@@ -122,33 +149,40 @@ class Game::EvonyTKR::Shared::Constants : isa(Game::EvonyTKR::Model::Logger) {
 
   ADJUST {
     Readonly::Array my @temp => (
-      "Against Monsters",
-      "Attacking",
-      "brings a dragon",
-      "brings a spiritual beast",
-      "Defending",
+      'Against Monsters',
+      'Attacking',
+      'brings a dragon',
+      'brings a spiritual beast',
+      'Defending',
       'During SvS',
-      "Enemy",
-      "In City",
-      "In Main City",
-      "leading the army",
-      "Marching",
-      "Reinforcing",
-      "When City Mayor for this SubCity",
-      "When Defending Outside The Main City",
-      "When Rallying",
+      'In City',
+      'In Main City',
+      'leading the army',
+      'Marching',
+      'Reinforcing',
+      'When City Mayor for this SubCity',
+      'When Defending Outside The Main City',
+      'When Rallying',
       'When The Main Defense General',
-      # Officer positions "When Appointed as Hospital Officer",
-      "When Appointed as Prison Officer",
-      "When Appointed as Workshop Officer",
-      "When Appointed as Academy Officer",
-      "When Appointed as Embassy Officer",
-      "When Appointed as Barracks Officer",
+      'you own the General',
+      # Officer positions 'When Appointed as Hospital Officer',
+      'When Appointed as Prison Officer',
+      'When Appointed as Workshop Officer',
+      'When Appointed as Academy Officer',
+      'When Appointed as Embassy Officer',
+      'When Appointed as Barracks Officer',
     );
     $BuffConditionValues = \@temp;
   }
 
   field $DebuffConditionValues : reader;
+
+  field $BookConditionValues : reader;
+
+  ADJUST {
+    Readonly::Array my @bkcv => ("all the time", "when not mine");
+    $BookConditionValues = \@bkcv;
+  }
 
   ADJUST {
     Readonly::Array my @temp => ("Enemy", "Monsters",);
@@ -170,10 +204,10 @@ class Game::EvonyTKR::Shared::Constants : isa(Game::EvonyTKR::Model::Logger) {
       'to attack'            => 'Attacking',
       'General is the Mayor' => "When City Mayor for this SubCity",
       'When General is launching Alliance War' => 'When Rallying',
-      'launching Alliance War' => 'When Rallying',
-      'When attacking Monsters' => 'Against Monsters',
-      'attacking Monsters'   => 'Against Monsters',
-      'In-city'              => 'In City',
+      'launching Alliance War'                 => 'When Rallying',
+      'When attacking Monsters'                => 'Against Monsters',
+      'attacking Monsters'                     => 'Against Monsters',
+      'In-city'                                => 'In City',
     };
 
     if ($exactBuff) {
@@ -202,7 +236,7 @@ class Game::EvonyTKR::Shared::Constants : isa(Game::EvonyTKR::Model::Logger) {
     my %seen;
     my @allowedConditions = grep { not $seen{$_}++ } (
       @{$BuffConditionValues}, @{$DebuffConditionValues},
-      #@{$bookConditionValues}
+      @{$BookConditionValues}
     );
     return @allowedConditions;
   }
@@ -245,21 +279,30 @@ class Game::EvonyTKR::Shared::Constants : isa(Game::EvonyTKR::Model::Logger) {
     my @result;
     push @result, 'none';
     if ($isRed) {
-      push @result, keys %{$redAscendingLevelNames};
+      push @result, sort(keys %{$redAscendingLevelNames});
     }
     else {
-      push @result, keys %{$purpleAscendingLevelNames};
+      push @result, sort(keys %{$purpleAscendingLevelNames});
     }
     return @result;
   }
 
   method AscendingAttributeLevelNames ($isRed = 1) {
+    my @result = ('None');
+    my @valid  = $self->AscendingAttributeLevelValues($isRed);
     if ($isRed) {
-      return values %{$redAscendingLevelNames};
+      foreach my $index (1 .. 5) {
+        my $key = $valid[$index];
+        push @result, $redAscendingLevelNames->{$key};
+      }
     }
     else {
-      return values %{$purpleAscendingLevelNames};
+      foreach my $index (1 .. 5) {
+        my $key = $valid[$index];
+        push @result, $redAscendingLevelNames->{$key};
+      }
     }
+    return @result;
   }
 
   field $globalDN : reader = X500::DN->new(
@@ -278,7 +321,10 @@ class Game::EvonyTKR::Shared::Constants : isa(Game::EvonyTKR::Model::Logger) {
     my $ns_base = uuid5(dns => 'perl.org');
     $UUID5_base = uuid5($ns_base, $globalDN->getX500String());
     my $UUID5_Generals_base = uuid5($UUID5_base, 'Generals');
-
+    foreach my $gk (@{$GeneralKeys}) {
+      my $specific_base = uuid5($UUID5_Generals_base, $gk);
+      $UUID5_Generals->{$gk} = $specific_base;
+    }
   }
 
   method _isTrue {

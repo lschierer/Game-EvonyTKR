@@ -1,39 +1,39 @@
 % require Scalar::Util;
 % if( $item && Scalar::Util::reftype($item) eq 'OBJECT' && Scalar::Util::blessed($item) eq 'Game::EvonyTKR::Model::AscendingAttributes') {
-%   my $sorted_levels = ($item->AscendingLevelNames(0), $item->AscendingLevelNames(1));
+%   my @sorted_levels = ($item->AscendingAttributeLevelValues(0), $item->AscendingAttributeLevelValues(1));
 %   my $firstWithBuff;
-%   foreach my $l ( $sorted_levels->@* ) {
+%   foreach my $l ( @sorted_levels) {
 %     if (exists $item->ascending->{$l} && exists $item->ascending->{$l}->{buffs} && scalar @{ $item->ascending->{$l}->{buffs} } > 0) {
 %        $firstWithBuff = $l;
 %        last;
 %     }
 %   }
 %   my $red = $firstWithBuff =~ /red/i;
-%   $sorted_levels = $item->AscendingLevelNames($red);
+%   @sorted_levels = $item->AscendingAttributeLevelValues($red);
+%   my @sorted_labels = $item->AscendingAttributeLevelNames($red);
 
   <div class="ascendingattribute-details">
+    <!-- <%= Data::Printer::np($item); %> -->
     <table  class="spectrum-Table spectrum-Table--sizeM spectrum-Table--quiet" >
       <thead class="spectrum-Table-head">
         <tr>
-          <% foreach my $level ($sorted_levels->@*) { %>
-            <% if ( $level =~ /none/i ) { next; } %>
-            <th class="spectrum-Table-headCell"> <%= ascending_level_names($level) %> </th>
+          <% foreach my $index (1..5) {  # skip 0 for none %>
+            <% my $label = $sorted_labels[$index]; %>
+            <th class="spectrum-Table-headCell"> <%= $label %> </th>
           <% } %>
         </tr>
       </thead>
       <tbody class="spectrum-Table-body">
         <tr class="spectrum-Table-row">
-          <% foreach my $level (@$sorted_levels) { %>
+          <% foreach my $level (@sorted_levels) { %>
             <% if ( $level =~ /none/i ) { next; } %>
             <td class="spectrum-Table-cell <%= $level %>">
               <% foreach my $buff (@{ $item->ascending->{$level}->{buffs} }) { %>
                 <dl>
                   <dt>Attribute: </dt><dd><%= $buff->attribute %></dd>
-                  <% if (scalar $buff->targetedTypes->@* ) { %>
-                    <dt>Targed Type: </dt>
-                      <% foreach my $class ( $buff->targetedTypes->@* ) { %>
-                        <dd><%= $class %></dd>
-                      <% } %>
+                  <% if ( length $buff->targetedType  > 0 ) { %>
+                      <dt>Troop Type: </dt>
+                      <dd><%= $buff->targetedType %></dd>
                   <% } %>
                   <% if ( scalar $buff->conditions() ) { %>
                     <dt>Condition(s): </dt>

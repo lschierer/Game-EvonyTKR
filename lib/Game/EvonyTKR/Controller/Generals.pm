@@ -8,6 +8,7 @@ require Game::EvonyTKR::Model::General::Pair;
 require Game::EvonyTKR::Model::General::Pair::Manager;
 require Game::EvonyTKR::Model::Buff::Summarizer;
 require Game::EvonyTKR::Control::Generals::Routing;
+require Game::EvonyTKR::Model::Data;
 require Data::Printer;
 use namespace::clean;
 
@@ -362,17 +363,17 @@ package Game::EvonyTKR::Controller::Generals {
     push @specialties, $self->param('specialty3') // 'gold';
     push @specialties, $self->param('specialty4') // 'gold';
 
-    # Validate parameters using enums from Game::EvonyTKR::Model::Data
+    my $rootManager = $self->get_root_manager();
     my $data_model = Game::EvonyTKR::Model::Data->new();
 
-    if (!$data_model->checkCovenantLevel($covenantLevel)) {
+    if (none {$_ eq $covenantLevel} @{ $rootManager->CovenantLevelValues } ) {
       $logger->warn(
         "Invalid covenantLevel: $covenantLevel, using default 'civilization'");
       $covenantLevel = 'civilization';
     }
 
     # Validate ascending level
-    if (!$data_model->checkAscendingLevel($ascendingLevel)) {
+    if (none {$_ eq $ascendingLevel} $rootManager->AscendingAttributeLevelValues() ) {
       $logger->warn(
         "Invalid ascendingLevel: $ascendingLevel, using default 'red5'");
       $ascendingLevel = 'red5';

@@ -110,7 +110,7 @@ package Game::EvonyTKR::Controller::Specialties {
         if (length($level) == 0) {
           my $nameList = [];
           foreach
-            my $orig_name ($c->app->get_root_manager->specialtyLevels->@*) {
+            my $orig_name ($c->app->get_root_manager->SpecialtyLevelValues->@*) {
             $logger->debug(
               "specialty_level_names evaluating specialty level name $orig_name"
             );
@@ -128,9 +128,9 @@ package Game::EvonyTKR::Controller::Specialties {
         else {
           $logger->debug("specialty_level_names sees levels"
               . Data::Printer::np(
-              $c->app->get_root_manager->specialtyLevels->@*));
+              $c->app->get_root_manager->SpecialtyLevelValues->@*));
           my $match = first { $level =~ /$_/i }
-            $c->app->get_root_manager->specialtyLevels->@*;
+            $c->app->get_root_manager->SpecialtyLevelValues->@*;
           $match =~ s/(\w)(\w*)/\U$1\L$2/;
           return $match;
         }

@@ -12,11 +12,9 @@
             <dl>
               <dt>Attribute: </dt>
               <dd><%= $buff->attribute %>
-              <% if ( scalar @{ $buff->targetedTypes } > 0 ) { %>
+              <% if ( length $buff->targetedType  > 0 ) { %>
                 <dt>Troop Type: </dt>
-                <% foreach my $tt ( @{ $buff->targetedTypes() } ) { %>
-                  <dd><%= $tt %></dd>
-                <% } %>
+                  <dd><%= $buff->targetedType %></dd>
               <% } %>
               <% if ( scalar $buff->conditions()  ) { %>
                 <dt>Condition(s): </dt>

@@ -6,7 +6,7 @@ require Data::Printer;
 require Game::EvonyTKR::Model::Buff::Value;
 require JSON::PP;
 
-class Game::EvonyTKR::Model::Buff::Matcher : isa(Game::EvonyTKR::Model::Data) {
+class Game::EvonyTKR::Model::Buff::Matcher : isa(Game::EvonyTKR::Shared::Constants) {
   use List::AllUtils qw( any all none );
   use namespace::autoclean;
   use Carp;
@@ -23,7 +23,7 @@ class Game::EvonyTKR::Model::Buff::Matcher : isa(Game::EvonyTKR::Model::Data) {
   );
 
   method matchTargetedType($test_tt, $logID) {
-    if (scalar @{ $toTest->targetedTypes }) {
+    if (length $toTest->targetedType ) {
       # test_tt often comes from generals, convert it for use here.
       if ($test_tt =~ /^(\w+)_specialist$/) {
         my $short = $1;
@@ -40,12 +40,12 @@ class Game::EvonyTKR::Model::Buff::Matcher : isa(Game::EvonyTKR::Model::Data) {
         }
       }
 
-      if (none { $_ =~ /\Q$test_tt\E/i } @{ $toTest->targetedTypes }) {
+      if ($toTest->targetedType !~ /$test_tt/i ) {
         $self->logger->debug(
           $logID
             . sprintf(
             '  ✗ Rejected: targetedType "%s" not matched by %s',
-            $test_tt, Data::Printer::np($toTest->targetedTypes)
+            $test_tt, $toTest->targetedType
             )
         );
         return 0;
@@ -129,7 +129,7 @@ class Game::EvonyTKR::Model::Buff::Matcher : isa(Game::EvonyTKR::Model::Data) {
       return 0;
     }
 
-    if (scalar @$testBuffs == 0) {
+    if (scalar @$testBuffs == 0 && scalar @$testDebuffs == 0) {
       $testBuffs = [
         "Attacking",
         "brings a dragon",

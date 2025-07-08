@@ -8,7 +8,7 @@ require Path::Tiny;
 require YAML::PP;
 
 class Game::EvonyTKR::Model::General::Importer :
-  isa(Game::EvonyTKR::Model::Data) {
+  isa(Game::EvonyTKR::Shared::Constants) {
   use Carp;
   use Cwd;
   use List::AllUtils qw( any none );

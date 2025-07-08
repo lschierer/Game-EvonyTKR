@@ -6,7 +6,7 @@ require Data::Printer;
 require Game::EvonyTKR::Model::BasicAttributes;
 require JSON::PP;
 
-class Game::EvonyTKR::Model::General : isa(Game::EvonyTKR::Model::Data) {
+class Game::EvonyTKR::Model::General : isa(Game::EvonyTKR::Shared::Constants) {
 # PODNAME: Game::EvonyTKR::Model::General
   use List::AllUtils qw( any none );
   use Types::Common  qw( t is_Num is_Str);
@@ -44,17 +44,16 @@ class Game::EvonyTKR::Model::General : isa(Game::EvonyTKR::Model::Data) {
   ADJUST {
     my @errors;
 
-    my $re = $self->GeneralKeys->as_regexp();
     if (ref $type) {
       foreach my $t1 (@{$type}) {
-        if ($t1 !~ /$re/i) {
+        if (none {$t1 =~ /$_/i} @{ $self->GeneralKeys }) {
           push @errors,
             sprintf('type must be one of %s, not %s',
             Data::Printer::np($self->GeneralKeys()->values()), $t1);
         }
       }
     }
-    elsif ($type !~ /$re/i) {
+    elsif (none {$type =~ /$_/i} @{ $self->GeneralKeys }) {
       push @errors,
         sprintf('type must be one of %s, not %s',
         Data::Printer::np($self->GeneralKeys()->values()), $type);

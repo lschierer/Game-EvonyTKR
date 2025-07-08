@@ -8,6 +8,7 @@ use File::FindLib 'lib';
 use Data::Printer;
 require Path::Tiny;
 require File::ShareDir;
+require Game::EvonyTKR;
 
 # Load required modules
 require Game::EvonyTKR::Model::General::Manager;
@@ -18,13 +19,20 @@ require Game::EvonyTKR::Model::Covenant::Manager;
 require Game::EvonyTKR::Model::Buff::Summarizer;
 require Game::EvonyTKR::Model::General::ConflictGroup::Manager;
 require Game::EvonyTKR::Model::EvonyTKR::Manager;
-require Game::EvonyTKR::Model::Data;
+require Game::EvonyTKR::Shared::Constants;
+require Game::EvonyTKR;
 
 use Log::Log4perl;
 
 Log::Log4perl::init(\<<'EOT');
 log4perl.rootLogger              = ERROR, Screen
-log4perl.logger.Game.EvonyTKR.Model.Buff = WARN, Screen
+log4perl.logger.Game.EvonyTKR.Model.Buff = WARN
+log4perl.logger.Game.EvonyTKR.Model.Buff.Summarizer = WARN
+
+log4perl.additivity.Game.EvonyTKR = 0
+log4perl.additivity.Mojolicious = 0
+log4perl.additivity.MojoX = 0
+log4perl.additivity.Web = 0
 
 log4perl.appender.Screen         = Log::Log4perl::Appender::Screen
 log4perl.appender.Screen.stderr = 1
@@ -33,7 +41,7 @@ log4perl.appender.Screen.layout.ConversionPattern = %d [%p] %m%n
 EOT
 
 # Create a test class that mimics the EvonyTKR::Manager structure
-class BuffSummarizerTest : isa(Game::EvonyTKR::Model::Data) {
+class BuffSummarizerTest : isa(Game::EvonyTKR::Shared::Constants) {
 
   field $generalManager;
   field $ascendingAttributesManager;
@@ -65,7 +73,7 @@ class BuffSummarizerTest : isa(Game::EvonyTKR::Model::Data) {
   method generalConflictGroupManager() { return $generalConflictGroupManager; }
 
   method rootImport() {
-    my $collectionDir = $dataDir->child("collections");
+    my $collectionDir = $dataDir->child("collections/data");
     say("starting root import");
 
     say("starting import of generals.");
@@ -145,7 +153,7 @@ subtest "Marco Polo with all values set to 'none'" => sub {
   is_deeply(
     $summarizer->buffValues->{'Ground Troops'},
     {
-      'March Size Capacity' => 12,
+      'March Size' => 12,
       'Attack'              => 25,
       'Defense'             => 25,
       'HP'                  => 25
@@ -156,7 +164,7 @@ subtest "Marco Polo with all values set to 'none'" => sub {
   is_deeply(
     $summarizer->buffValues->{'Mounted Troops'},
     {
-      'March Size Capacity' => 12,
+      'March Size' => 12,
       'Attack'              => 70,
       'Defense'             => 65,
       'HP'                  => 65
@@ -167,7 +175,7 @@ subtest "Marco Polo with all values set to 'none'" => sub {
   is_deeply(
     $summarizer->buffValues->{'Ranged Troops'},
     {
-      'March Size Capacity' => 12,
+      'March Size' => 12,
       'Attack'              => 25,
       'Defense'             => 25,
       'HP'                  => 25
@@ -178,7 +186,7 @@ subtest "Marco Polo with all values set to 'none'" => sub {
   is_deeply(
     $summarizer->buffValues->{'Siege Machines'},
     {
-      'March Size Capacity' => 12,
+      'March Size' => 12,
       'Attack'              => 25,
       'Defense'             => 25,
       'HP'                  => 25
@@ -224,7 +232,7 @@ subtest "Aethelflaed with all values set to 'none'" => sub {
   is_deeply(
     $summarizer->buffValues->{'Ground Troops'},
     {
-      'March Size Capacity' => 12,
+      'March Size' => 12,
       'Attack'              => 70,
       'Defense'             => 70,
       'HP'                  => 70
@@ -235,7 +243,7 @@ subtest "Aethelflaed with all values set to 'none'" => sub {
   is_deeply(
     $summarizer->buffValues->{'Mounted Troops'},
     {
-      'March Size Capacity' => 12,
+      'March Size' => 12,
       'Attack'              => 80,
       'Defense'             => 125,
       'HP'                  => 70
@@ -246,7 +254,7 @@ subtest "Aethelflaed with all values set to 'none'" => sub {
   is_deeply(
     $summarizer->buffValues->{'Ranged Troops'},
     {
-      'March Size Capacity' => 12,
+      'March Size' => 12,
       'Attack'              => 70,
       'Defense'             => 70,
       'HP'                  => 70
@@ -257,7 +265,7 @@ subtest "Aethelflaed with all values set to 'none'" => sub {
   is_deeply(
     $summarizer->buffValues->{'Siege Machines'},
     {
-      'March Size Capacity' => 12,
+      'March Size' => 12,
       'Attack'              => 70,
       'Defense'             => 70,
       'HP'                  => 70
@@ -306,7 +314,7 @@ subtest "Marco Polo with Red1 ascending, all else none" => sub {
   is_deeply(
     $summarizer->buffValues->{'Ground Troops'},
     {
-      'March Size Capacity' => 12,
+      'March Size' => 12,
       'Attack'              => 25,
       'Defense'             => 25,
       'HP'                  => 25
@@ -317,7 +325,7 @@ subtest "Marco Polo with Red1 ascending, all else none" => sub {
   is_deeply(
     $summarizer->buffValues->{'Mounted Troops'},
     {
-      'March Size Capacity' => 12,
+      'March Size' => 12,
       'Attack'              => 95,
       'Defense'             => 65,
       'HP'                  => 80
@@ -328,7 +336,7 @@ subtest "Marco Polo with Red1 ascending, all else none" => sub {
   is_deeply(
     $summarizer->buffValues->{'Ranged Troops'},
     {
-      'March Size Capacity' => 12,
+      'March Size' => 12,
       'Attack'              => 25,
       'Defense'             => 25,
       'HP'                  => 25
@@ -339,7 +347,7 @@ subtest "Marco Polo with Red1 ascending, all else none" => sub {
   is_deeply(
     $summarizer->buffValues->{'Siege Machines'},
     {
-      'March Size Capacity' => 12,
+      'March Size' => 12,
       'Attack'              => 25,
       'Defense'             => 25,
       'HP'                  => 25
@@ -385,7 +393,7 @@ subtest "Marco Polo with Red2 ascending, all else none" => sub {
   is_deeply(
     $summarizer->buffValues->{'Ground Troops'},
     {
-      'March Size Capacity' => 12,
+      'March Size' => 12,
       'Attack'              => 25,
       'Defense'             => 25,
       'HP'                  => 25
@@ -396,7 +404,7 @@ subtest "Marco Polo with Red2 ascending, all else none" => sub {
   is_deeply(
     $summarizer->buffValues->{'Mounted Troops'},
     {
-      'March Size Capacity' => 12,
+      'March Size' => 12,
       'Attack'              => 95,
       'Defense'             => 65,
       'HP'                  => 80
@@ -407,7 +415,7 @@ subtest "Marco Polo with Red2 ascending, all else none" => sub {
   is_deeply(
     $summarizer->buffValues->{'Ranged Troops'},
     {
-      'March Size Capacity' => 12,
+      'March Size' => 12,
       'Attack'              => 25,
       'Defense'             => 25,
       'HP'                  => 25
@@ -418,7 +426,7 @@ subtest "Marco Polo with Red2 ascending, all else none" => sub {
   is_deeply(
     $summarizer->buffValues->{'Siege Machines'},
     {
-      'March Size Capacity' => 12,
+      'March Size' => 12,
       'Attack'              => 25,
       'Defense'             => 25,
       'HP'                  => 25
@@ -464,7 +472,7 @@ subtest "Marco Polo with Red3 ascending, all else none" => sub {
   is_deeply(
     $summarizer->buffValues->{'Ground Troops'},
     {
-      'March Size Capacity' => 20,
+      'March Size' => 20,
       'Attack'              => 25,
       'Defense'             => 25,
       'HP'                  => 25
@@ -475,7 +483,7 @@ subtest "Marco Polo with Red3 ascending, all else none" => sub {
   is_deeply(
     $summarizer->buffValues->{'Mounted Troops'},
     {
-      'March Size Capacity' => 20,
+      'March Size' => 20,
       'Attack'              => 125,
       'Defense'             => 65,
       'HP'                  => 80
@@ -486,7 +494,7 @@ subtest "Marco Polo with Red3 ascending, all else none" => sub {
   is_deeply(
     $summarizer->buffValues->{'Ranged Troops'},
     {
-      'March Size Capacity' => 20,
+      'March Size' => 20,
       'Attack'              => 25,
       'Defense'             => 25,
       'HP'                  => 25
@@ -497,7 +505,7 @@ subtest "Marco Polo with Red3 ascending, all else none" => sub {
   is_deeply(
     $summarizer->buffValues->{'Siege Machines'},
     {
-      'March Size Capacity' => 20,
+      'March Size' => 20,
       'Attack'              => 25,
       'Defense'             => 25,
       'HP'                  => 25
@@ -543,7 +551,7 @@ subtest "Marco Polo with Red4 ascending, all else none" => sub {
   is_deeply(
     $summarizer->buffValues->{'Ground Troops'},
     {
-      'March Size Capacity' => 20,
+      'March Size' => 20,
       'Attack'              => 25,
       'Defense'             => 25,
       'HP'                  => 25
@@ -554,7 +562,7 @@ subtest "Marco Polo with Red4 ascending, all else none" => sub {
   is_deeply(
     $summarizer->buffValues->{'Mounted Troops'},
     {
-      'March Size Capacity' => 20,
+      'March Size' => 20,
       'Attack'              => 125,
       'Defense'             => 65,
       'HP'                  => 80
@@ -565,7 +573,7 @@ subtest "Marco Polo with Red4 ascending, all else none" => sub {
   is_deeply(
     $summarizer->buffValues->{'Ranged Troops'},
     {
-      'March Size Capacity' => 20,
+      'March Size' => 20,
       'Attack'              => 25,
       'Defense'             => 25,
       'HP'                  => 25
@@ -576,7 +584,7 @@ subtest "Marco Polo with Red4 ascending, all else none" => sub {
   is_deeply(
     $summarizer->buffValues->{'Siege Machines'},
     {
-      'March Size Capacity' => 20,
+      'March Size' => 20,
       'Attack'              => 25,
       'Defense'             => 25,
       'HP'                  => 25
@@ -622,7 +630,7 @@ subtest "Marco Polo with Red5 ascending, all else none" => sub {
   is_deeply(
     $summarizer->buffValues->{'Ground Troops'},
     {
-      'March Size Capacity' => 20,
+      'March Size' => 20,
       'Attack'              => 25,
       'Defense'             => 25,
       'HP'                  => 25
@@ -633,7 +641,7 @@ subtest "Marco Polo with Red5 ascending, all else none" => sub {
   is_deeply(
     $summarizer->buffValues->{'Mounted Troops'},
     {
-      'March Size Capacity' => 20,
+      'March Size' => 20,
       'Attack'              => 165,
       'Defense'             => 90,
       'HP'                  => 105
@@ -644,7 +652,7 @@ subtest "Marco Polo with Red5 ascending, all else none" => sub {
   is_deeply(
     $summarizer->buffValues->{'Ranged Troops'},
     {
-      'March Size Capacity' => 20,
+      'March Size' => 20,
       'Attack'              => 25,
       'Defense'             => 25,
       'HP'                  => 25
@@ -655,7 +663,7 @@ subtest "Marco Polo with Red5 ascending, all else none" => sub {
   is_deeply(
     $summarizer->buffValues->{'Siege Machines'},
     {
-      'March Size Capacity' => 20,
+      'March Size' => 20,
       'Attack'              => 25,
       'Defense'             => 25,
       'HP'                  => 25
@@ -701,7 +709,7 @@ subtest "Marco Polo with Green 1st specialty, all else none" => sub {
   is_deeply(
     $summarizer->buffValues->{'Ground Troops'},
     {
-      'March Size Capacity' => 12,
+      'March Size' => 12,
       'Attack'              => 25,
       'Defense'             => 25,
       'HP'                  => 25
@@ -712,7 +720,7 @@ subtest "Marco Polo with Green 1st specialty, all else none" => sub {
   is_deeply(
     $summarizer->buffValues->{'Mounted Troops'},
     {
-      'March Size Capacity' => 12,
+      'March Size' => 12,
       'Attack'              => 71,
       'Defense'             => 66,
       'HP'                  => 65
@@ -723,7 +731,7 @@ subtest "Marco Polo with Green 1st specialty, all else none" => sub {
   is_deeply(
     $summarizer->buffValues->{'Ranged Troops'},
     {
-      'March Size Capacity' => 12,
+      'March Size' => 12,
       'Attack'              => 25,
       'Defense'             => 25,
       'HP'                  => 25
@@ -734,7 +742,7 @@ subtest "Marco Polo with Green 1st specialty, all else none" => sub {
   is_deeply(
     $summarizer->buffValues->{'Siege Machines'},
     {
-      'March Size Capacity' => 12,
+      'March Size' => 12,
       'Attack'              => 25,
       'Defense'             => 25,
       'HP'                  => 25
@@ -780,7 +788,7 @@ subtest "Marco Polo with Blue 1st specialty, all else none" => sub {
   is_deeply(
     $summarizer->buffValues->{'Ground Troops'},
     {
-      'March Size Capacity' => 12,
+      'March Size' => 12,
       'Attack'              => 25,
       'Defense'             => 25,
       'HP'                  => 25
@@ -791,7 +799,7 @@ subtest "Marco Polo with Blue 1st specialty, all else none" => sub {
   is_deeply(
     $summarizer->buffValues->{'Mounted Troops'},
     {
-      'March Size Capacity' => 12,
+      'March Size' => 12,
       'Attack'              => 72,
       'Defense'             => 67,
       'HP'                  => 65
@@ -802,7 +810,7 @@ subtest "Marco Polo with Blue 1st specialty, all else none" => sub {
   is_deeply(
     $summarizer->buffValues->{'Ranged Troops'},
     {
-      'March Size Capacity' => 12,
+      'March Size' => 12,
       'Attack'              => 25,
       'Defense'             => 25,
       'HP'                  => 25
@@ -813,7 +821,7 @@ subtest "Marco Polo with Blue 1st specialty, all else none" => sub {
   is_deeply(
     $summarizer->buffValues->{'Siege Machines'},
     {
-      'March Size Capacity' => 12,
+      'March Size' => 12,
       'Attack'              => 25,
       'Defense'             => 25,
       'HP'                  => 25
@@ -859,7 +867,7 @@ subtest "Marco Polo with Purple 1st specialty, all else none" => sub {
   is_deeply(
     $summarizer->buffValues->{'Ground Troops'},
     {
-      'March Size Capacity' => 12,
+      'March Size' => 12,
       'Attack'              => 25,
       'Defense'             => 25,
       'HP'                  => 25
@@ -870,7 +878,7 @@ subtest "Marco Polo with Purple 1st specialty, all else none" => sub {
   is_deeply(
     $summarizer->buffValues->{'Mounted Troops'},
     {
-      'March Size Capacity' => 12,
+      'March Size' => 12,
       'Attack'              => 74,
       'Defense'             => 69,
       'HP'                  => 65
@@ -881,7 +889,7 @@ subtest "Marco Polo with Purple 1st specialty, all else none" => sub {
   is_deeply(
     $summarizer->buffValues->{'Ranged Troops'},
     {
-      'March Size Capacity' => 12,
+      'March Size' => 12,
       'Attack'              => 25,
       'Defense'             => 25,
       'HP'                  => 25
@@ -892,7 +900,7 @@ subtest "Marco Polo with Purple 1st specialty, all else none" => sub {
   is_deeply(
     $summarizer->buffValues->{'Siege Machines'},
     {
-      'March Size Capacity' => 12,
+      'March Size' => 12,
       'Attack'              => 25,
       'Defense'             => 25,
       'HP'                  => 25
@@ -938,7 +946,7 @@ subtest "Marco Polo with Orange 1st specialty, all else none" => sub {
   is_deeply(
     $summarizer->buffValues->{'Ground Troops'},
     {
-      'March Size Capacity' => 12,
+      'March Size' => 12,
       'Attack'              => 25,
       'Defense'             => 25,
       'HP'                  => 25
@@ -949,7 +957,7 @@ subtest "Marco Polo with Orange 1st specialty, all else none" => sub {
   is_deeply(
     $summarizer->buffValues->{'Mounted Troops'},
     {
-      'March Size Capacity' => 12,
+      'March Size' => 12,
       'Attack'              => 76,
       'Defense'             => 71,
       'HP'                  => 65
@@ -960,7 +968,7 @@ subtest "Marco Polo with Orange 1st specialty, all else none" => sub {
   is_deeply(
     $summarizer->buffValues->{'Ranged Troops'},
     {
-      'March Size Capacity' => 12,
+      'March Size' => 12,
       'Attack'              => 25,
       'Defense'             => 25,
       'HP'                  => 25
@@ -971,7 +979,7 @@ subtest "Marco Polo with Orange 1st specialty, all else none" => sub {
   is_deeply(
     $summarizer->buffValues->{'Siege Machines'},
     {
-      'March Size Capacity' => 12,
+      'March Size' => 12,
       'Attack'              => 25,
       'Defense'             => 25,
       'HP'                  => 25
@@ -1017,7 +1025,7 @@ subtest "Marco Polo with Gold 1st specialty, all else none" => sub {
   is_deeply(
     $summarizer->buffValues->{'Ground Troops'},
     {
-      'March Size Capacity' => 12,
+      'March Size' => 12,
       'Attack'              => 25,
       'Defense'             => 25,
       'HP'                  => 25
@@ -1028,7 +1036,7 @@ subtest "Marco Polo with Gold 1st specialty, all else none" => sub {
   is_deeply(
     $summarizer->buffValues->{'Mounted Troops'},
     {
-      'March Size Capacity' => 12,
+      'March Size' => 12,
       'Attack'              => 80,
       'Defense'             => 75,
       'HP'                  => 65
@@ -1039,7 +1047,7 @@ subtest "Marco Polo with Gold 1st specialty, all else none" => sub {
   is_deeply(
     $summarizer->buffValues->{'Ranged Troops'},
     {
-      'March Size Capacity' => 12,
+      'March Size' => 12,
       'Attack'              => 25,
       'Defense'             => 25,
       'HP'                  => 25
@@ -1050,7 +1058,7 @@ subtest "Marco Polo with Gold 1st specialty, all else none" => sub {
   is_deeply(
     $summarizer->buffValues->{'Siege Machines'},
     {
-      'March Size Capacity' => 12,
+      'March Size' => 12,
       'Attack'              => 25,
       'Defense'             => 25,
       'HP'                  => 25
@@ -1122,7 +1130,7 @@ subtest "Marco Polo with all maxed out" => sub {
   is_deeply(
     $summarizer->buffValues->{'Ground Troops'},
     {
-      'March Size Capacity' => 41,
+      'March Size' => 41,
       'Attack'              => 35,
       'Defense'             => 25,
       'HP'                  => 25,
@@ -1130,7 +1138,7 @@ subtest "Marco Polo with all maxed out" => sub {
     "Ground troop buffs should match expected values"
   );
 
-  is($summarizer->buffValues->{'Mounted Troops'}->{'March Size Capacity'}, 41, "Marco Polo Attacking March Size");
+  is($summarizer->buffValues->{'Mounted Troops'}->{'March Size'}, 41, "Marco Polo Attacking March Size");
   is($summarizer->buffValues->{'Mounted Troops'}->{'Attack'}, 265, "Marco Polo Attacking Attack");
   is($summarizer->buffValues->{'Mounted Troops'}->{'Defense'}, 120, "Marco Polo Attacking Defense");
   is($summarizer->buffValues->{'Mounted Troops'}->{'HP'}, 155, "Marco Polo Attacking HP");
@@ -1138,7 +1146,7 @@ subtest "Marco Polo with all maxed out" => sub {
   is_deeply(
     $summarizer->buffValues->{'Ranged Troops'},
     {
-      'March Size Capacity' => 41,
+      'March Size' => 41,
       'Attack'              => 25,
       'Defense'             => 25,
       'HP'                  => 25
@@ -1149,7 +1157,7 @@ subtest "Marco Polo with all maxed out" => sub {
   is_deeply(
     $summarizer->buffValues->{'Siege Machines'},
     {
-      'March Size Capacity' => 41,
+      'March Size' => 41,
       'Attack'              => 25,
       'Defense'             => 25,
       'HP'                  => 25
@@ -1222,7 +1230,7 @@ subtest "Aethelflaed with all maxed out" => sub {
   is_deeply(
     $summarizer->buffValues->{'Ground Troops'},
     {
-      'March Size Capacity' => 12,
+      'March Size' => 12,
       'Attack'              => 100,
       'Defense'             => 140,
       'HP'                  => 115
@@ -1233,7 +1241,7 @@ subtest "Aethelflaed with all maxed out" => sub {
   is_deeply(
     $summarizer->buffValues->{'Mounted Troops'},
     {
-      'March Size Capacity' => 12,
+      'March Size' => 12,
       'Attack'              => 155,
       'Defense'             => 205,
       'HP'                  => 155
@@ -1244,7 +1252,7 @@ subtest "Aethelflaed with all maxed out" => sub {
   is_deeply(
     $summarizer->buffValues->{'Ranged Troops'},
     {
-      'March Size Capacity' => 12,
+      'March Size' => 12,
       'Attack'              => 70,
       'Defense'             => 110,
       'HP'                  => 115
@@ -1255,7 +1263,7 @@ subtest "Aethelflaed with all maxed out" => sub {
   is_deeply(
     $summarizer->buffValues->{'Siege Machines'},
     {
-      'March Size Capacity' => 12,
+      'March Size' => 12,
       'Attack'              => 70,
       'Defense'             => 110,
       'HP'                  => 115

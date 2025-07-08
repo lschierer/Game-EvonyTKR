@@ -11,7 +11,7 @@ require Game::EvonyTKR::Model::General::Pair::Manager;
 use namespace::clean;
 
 class Game::EvonyTKR::Control::General::Routing :
-  isa(Game::EvonyTKR::Model::Data) {
+  isa(Game::EvonyTKR::Shared::Constants) {
   use Carp;
 
   field $validRoutes : reader;
@@ -90,12 +90,12 @@ class Game::EvonyTKR::Control::General::Routing :
     return $str;    # returns e.g. "mounted_specialist"
   }
 
-# the main routes will be dependant on GeneralKeys and allowedBuffActivation
+# the main routes will be dependant on GeneralKeys and AllowedBuffActivationValues
 # specialties, skill books, and so on, while important, are essentially ancillary
 # information to support generals.
   method get_valid_routes() {
-    foreach my $buffActivation ($self->allowedBuffActivation->@*) {
-      foreach my $tt ($self->GeneralKeys->values->@*) {
+    foreach my $buffActivation ($self->AllowedBuffActivationValues->@*) {
+      foreach my $tt ($self->GeneralKeys->@*) {
         next if $buffActivation eq 'Officer' && $tt ne 'officer';
         next if $buffActivation eq 'Mayor'   && $tt ne 'mayor';
         next

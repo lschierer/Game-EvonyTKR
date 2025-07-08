@@ -24,8 +24,9 @@
                   <dl>
                     <dt>Attribute: </dt><dd><%= $buff->attribute %></dd>
                     <dt>Targed Type: </dt>
-                    <% foreach my $tt ( @{ $buff->targetedTypes} ) { %>
-                      <dd><%= $tt %></dd>
+                    <% if ( length $buff->targetedType  > 0 ) { %>
+                        <dt>Troop Type: </dt>
+                        <dd><%= $buff->targetedType %></dd>
                     <% } %>
                     <% if (scalar $buff->conditions() > 0 ) { %>
                       <% my @conditions = $buff->conditions(); %>

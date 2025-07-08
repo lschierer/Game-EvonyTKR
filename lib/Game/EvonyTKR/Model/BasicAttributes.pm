@@ -4,11 +4,11 @@ use utf8::all;
 
 use File::FindLib 'lib';
 
-class Game::EvonyTKR::Model::BasicAttributes : isa(Game::EvonyTKR::Model::Data)
+class Game::EvonyTKR::Model::BasicAttributes : isa(Game::EvonyTKR::Shared::Constants)
 {
 # PODNAME: Game::EvonyTKR::Model::BasicAttributes
   use Carp;
-  use List::AllUtils qw( any none );
+  use List::AllUtils qw( any none first );
   use Types::Common  qw( t is_Num is_Str);
   use Data::Printer;
   require Game::EvonyTKR::Model::BasicAttribute;
@@ -26,16 +26,14 @@ class Game::EvonyTKR::Model::BasicAttributes : isa(Game::EvonyTKR::Model::Data)
   field $attributes : reader;
 
   ADJUST {
-    my $an = $self->AttributeNames();
     $attributes->{attack} = Game::EvonyTKR::Model::BasicAttribute->new(
-      attribute_name => $an->closest_match('attack'),);
+      attribute_name => first { $_ =~ /attack/i } @{ $self->AttributeValues });
     $attributes->{defense} = Game::EvonyTKR::Model::BasicAttribute->new(
-      attribute_name => $an->closest_match('defense'),);
+      attribute_name =>  first { $_ =~ /defense/i } @{ $self->AttributeValues });
     $attributes->{leadership} = Game::EvonyTKR::Model::BasicAttribute->new(
-      attribute_name => $an->closest_match('leadership'),);
+      attribute_name => first { $_ =~ /leadership/i } @{ $self->AttributeValues });
     $attributes->{politics} = Game::EvonyTKR::Model::BasicAttribute->new(
-      attribute_name => $an->closest_match('politics'),);
-
+      attribute_name => first { $_ =~ /politics/i } @{ $self->AttributeValues });
   }
 
   method attack {
@@ -60,7 +58,7 @@ class Game::EvonyTKR::Model::BasicAttributes : isa(Game::EvonyTKR::Model::Data)
     if (none { $_ =~ $attributeName } @attributeNames) {
       $self->logger()->error(sprintf(
         'attributeName must be one of %s, not %s',
-        Data::Printer::np($self->AttributeNames->values()),
+        Data::Printer::np($self->AttributeValues ),
         $attributeName,
       ));
       return;

@@ -15,7 +15,7 @@ require Game::EvonyTKR::Model::BasicAttributes;
 use namespace::clean;
 
 class Game::EvonyTKR::Model::General::Manager :
-  isa(Game::EvonyTKR::Model::Data) {
+  isa(Game::EvonyTKR::Shared::Constants) {
   # PODNAME: Game::EvonyTKR::Model::General::Manager
   use Carp;
   use overload

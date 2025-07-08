@@ -1,11 +1,9 @@
 severity = 3
 theme = core + best-practices
+exclude   = Modules::RequireExplicitPackage Objects::RequireIsa
 
 # Disable legacy OO assumptions
 [-Objects::ProhibitIndirectSyntax]
-[-Objects::RequireBlessedReferences]
-[-Objects::RequireIsa]
-[-Objects::RequireNoRef]
 
 # Disable strict/warnings policies — Corinna classes don't need them
 [-TestingAndDebugging::RequireUseStrict]
@@ -16,22 +14,14 @@ theme = core + best-practices
 [-Subroutines::RequireFinalReturn]
 [-Subroutines::ProtectPrivateSubs]
 
-# Disable ProhibitCallsToUndeclaredSubs to allow method calls
-[-Subroutines::ProhibitCallsToUndeclaredSubs]
-
-# Clean namespace enforcement is handled via namespace::autoclean inside the class
-[-Modules::RequireExplicitNamespace]
 
 # Optional: if you use Readonly in ADJUST blocks, disable this to avoid warnings
 [-ValuesAndExpressions::ProhibitConstantPragma]
 
 # Style improvements
-[CodeLayout::RequireConsistentIndentation]
-indentation_style = spaces
-indentation_amount = 2
+[CodeLayout::RequireTidyCode]
+perltidyrc = ./.perltidyrc
 
-[Variables::ProhibitUnusedVariables]
-skip_unused_subroutine_arguments = 1
 
 # Allow class-level method and field declarations to omit parens
 [-BuiltinFunctions::ProhibitVoidMap]

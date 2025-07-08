@@ -12,7 +12,7 @@ require Encode;
 use namespace::clean;
 
 class Game::EvonyTKR::Model::General::ConflictGroup::Importer :
-  isa(Game::EvonyTKR::Model::Data) {
+  isa(Game::EvonyTKR::Shared::Constants) {
   use Carp;
   use List::AllUtils qw( any none uniq );
   our $VERSION = 'v0.0.1';

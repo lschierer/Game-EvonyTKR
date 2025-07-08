@@ -98,9 +98,11 @@ my $builder = Module::Build->new(
       'Log::Any::Adapter'               => '0',
     },
     test_requires       => {
-      'Test::Deep'    => '0',
-      'Test::More'    => '0',
-      'Perl::Critic'  => '0',
+      'Test::Deep'            => '0',
+      'Test::More'            => '0',
+      'Perl::Critic'          => '0',
+      'Perl::Critic::Policy'  => '0',
+      'Perl::Critic::Policy::Modules::RequireExplicitPackage' => '0',
     }
 
 );

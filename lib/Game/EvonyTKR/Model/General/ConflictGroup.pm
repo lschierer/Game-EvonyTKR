@@ -4,7 +4,7 @@ use utf8::all;
 require Data::Printer;
 
 class Game::EvonyTKR::Model::General::ConflictGroup :
-  isa(Game::EvonyTKR::Model::Data) {
+  isa(Game::EvonyTKR::Shared::Constants) {
   use Unicode::Normalize qw(NFKD);
   use overload
     'bool'     => sub { $_[0]->_isTrue() },

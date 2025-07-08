@@ -7,7 +7,7 @@ require Game::EvonyTKR::Model::Buff::Value;
 require JSON::PP;
 
 class Game::EvonyTKR::Model::Buff::Summarizer :
-  isa(Game::EvonyTKR::Model::Data) {
+  isa(Game::EvonyTKR::Shared::Constants) {
   # PODNAME: Game::EvonyTKR::Model::Buff
   use List::AllUtils qw( any none );
   use namespace::autoclean;
@@ -152,58 +152,71 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
 
   # Filter buff conditions based on activation type
   method filterBuffConditions() {
-    my @buffConditions = @{ $self->buffConditionValues };
+    my @buffConditions = @{ $self->BuffConditionValues };
 
     # Create a mapping of activation types to filter patterns
     my %activationFilters = (
       'PvM' => [
         'Against Monsters',
         'Attacking',
-        "brings a dragon",
-        "brings a spiritual beast",
-        "brings dragon or beast to attack",
-        "dragon to the attack",
-        "leading the army to attack",
-        "Marching",
-        "When Rallying",
+        'brings a dragon',
+        'brings a spiritual beast',
+        'leading the army',
+        'Marching',
+        'When Rallying',
+        'you own the General',
       ],
       'Overall' => [
-        "brings a dragon",
-        "brings a spiritual beast",
-        "Marching",
-        "When Rallying",
+        'brings a dragon',
+        'brings a spiritual beast',
+        'Marching',
+        'When Rallying',
+        'you own the General',
+        'leading the army',
       ],
       'Attacking' => [
-        "Attacking",
-        "brings a dragon",
-        "brings a spiritual beast",
-        "brings dragon or beast to attack",
-        "dragon to the attack",
-        "leading the army to attack",
-        "Marching",
-        "When Rallying",
+        'Attacking',
+        'brings a dragon',
+        'brings a spiritual beast',
+        'brings dragon or beast to attack',
+        'dragon to the attack',
+        'leading the army to attack',
+        'Marching',
+        'When Rallying',
+        'you own the General',
+        'leading the army',
       ],
       'Reinforcing' => [
-        "brings a dragon",
-        "brings a spiritual beast",
-        "Defending",
-        "Marching",
-        "Reinforcing",
-        "When Defending Outside The Main City",
-        "In Main City",
+        'brings a dragon',
+        'brings a spiritual beast',
+        'Defending',
+        'Marching',
+        'Reinforcing',
+        'When Defending Outside The Main City',
+        'In Main City',
         'In City',
+        'you own the General',
+        'leading the army',
       ],
       'Wall' => [
-        "brings a dragon",
-        "brings a spiritual beast",
-        "Defending",
-        "When City Mayor for this SubCity",
-        "In Main City",
+        'brings a dragon',
+        'brings a spiritual beast',
+        'Defending',
+        'When City Mayor for this SubCity',
+        'In Main City',
         'In City',
-        "When the Main Defense General",
+        'When the Main Defense General',
+        'you own the General',
+        'leading the army',
       ],
       'Mayor' =>
-        ['When City Mayor for this SubCity', "In Main City", 'In City',],
+        [
+          'When City Mayor for this SubCity',
+          'In Main City',
+          'In City',
+          'you own the General',
+          'leading the army',
+        ],
     );
 
     if (exists $activationFilters{$activationType}) {
@@ -234,14 +247,14 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
 
   # Filter debuff conditions based on activation type
   method filterDebuffConditions() {
-    my @debuffConditions = @{ $self->debuffConditionValues };
+    my @debuffConditions = @{ $self->DebuffConditionValues };
 
     if ($activationType ne 'PvM') {
-      @debuffConditions = grep { $_ ne "Reduces Monster" } @debuffConditions;
+      @debuffConditions = ("Enemy");
     }
 
     if ($activationType eq 'PvM') {
-      @debuffConditions = grep { !/Enemy/ } @debuffConditions;
+      @debuffConditions = ("Monsters");
     }
 
     return \@debuffConditions;

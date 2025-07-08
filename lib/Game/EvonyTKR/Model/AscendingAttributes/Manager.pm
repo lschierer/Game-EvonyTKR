@@ -95,6 +95,12 @@ class Game::EvonyTKR::Model::AscendingAttributes::Manager :
             }
           }
           $ascendingAttributes->{$name}->addBuff($level, $b);
+          $self->logger->debug(sprintf(
+            '%s now has %s buffs at level %s',
+            $name,
+            scalar( $ascendingAttributes->{$name}->ascending->{$level}->{buffs}->@* ),
+            $level,
+          ));
         }
       }
       $self->logger->debug(sprintf('imported %s %s',

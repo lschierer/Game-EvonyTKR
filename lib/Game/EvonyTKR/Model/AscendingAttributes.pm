@@ -10,7 +10,7 @@ require Game::EvonyTKR::Model::Buff::Matcher;
 use namespace::clean;
 
 class Game::EvonyTKR::Model::AscendingAttributes :
-  isa(Game::EvonyTKR::Model::Data) {
+  isa(Game::EvonyTKR::Shared::Constants) {
 # PODNAME: Game::EvonyTKR::Model::AscendingAttributes
 
   use Carp;
@@ -24,6 +24,7 @@ class Game::EvonyTKR::Model::AscendingAttributes :
   use Game::EvonyTKR::Model::Logger;
   use overload
     '""'       => \&as_string,
+    '.'        => \&concat,
     'bool'     => sub { $_[0]->_isTrue() },
     "fallback" => 0;
 
@@ -34,8 +35,8 @@ class Game::EvonyTKR::Model::AscendingAttributes :
 
   ADJUST {
     my $step1 = {};
-    foreach my $key (@{ $self->AscendingLevelNames(0) },
-      @{ $self->AscendingLevelNames(1) }) {
+    foreach my $key ($self->AscendingAttributeLevelValues(0) ,
+      $self->AscendingAttributeLevelValues(1) ) {
       $step1->{$key} = {
         level => $key,
         buffs => [],     # Empty arrayref that can be modified later
@@ -66,21 +67,22 @@ class Game::EvonyTKR::Model::AscendingAttributes :
 
     return 0 if not defined $level or $level eq 'none';
 
-    my ($is_red, $valid_levels);
+    my $is_red ;
+    my @valid_levels;
     if ($level =~ /^red\d$/) {
       $is_red       = 1;
-      $valid_levels = $self->AscendingLevelNames(1);    # red
+      @valid_levels = $self->AscendingAttributeLevelValues(1);    # red
     }
     elsif ($level =~ /^purple\d$/) {
       $is_red       = 0;
-      $valid_levels = $self->AscendingLevelNames(0);    # purple
+      @valid_levels = $self->AscendingAttributeLevelValues(0);    # purple
     }
     else {
       $logger->warn("Invalid ascending level: $level");
       return 0;
     }
 
-    my %level_index = map { $valid_levels->[$_] => $_ } 0 .. $#$valid_levels;
+    my %level_index = map { $valid_levels[$_] => $_ } 0 .. $#valid_levels;
     return 0 unless exists $level_index{$level};
 
     my $target_index = $level_index{$level};
@@ -88,7 +90,12 @@ class Game::EvonyTKR::Model::AscendingAttributes :
       "my ascending hash looks like " . Data::Printer::np($ascending));
     my $total = 0;
     for my $i (1 .. $target_index) {    # skip index 0 ('None')
-      my $lvl   = $valid_levels->[$i];
+      my $lvl   = $valid_levels[$i];
+      if(not exists $ascending->{$level}) {
+        $logger->error(sprintf('%s is not a valid level, must be one of %s',
+          $lvl, join(', ', keys %$ascending),
+        ));
+      }
       my $buffs = $ascending->{$lvl}->{buffs} // [];
 
       $logger->debug(
@@ -103,9 +110,9 @@ class Game::EvonyTKR::Model::AscendingAttributes :
         $logger->debug(
           $logID
             . sprintf(
-"Testing buff: attr=%s, targetTypes=%s, buffConds=%s, debuffConds=%s, matching_type=%s",
+"Testing buff: attr=%s, targetType=%s, buffConds=%s, debuffConds=%s, matching_type=%s",
             $buff->attribute,
-            join(',', @{ $buff->targetedTypes    // [] }),
+            $buff->targetedType,
             join(',', @{ $buff->buffConditions   // [] }),
             join(',', @{ $buff->debuffConditions // [] }),
             $matching_type
@@ -120,7 +127,7 @@ class Game::EvonyTKR::Model::AscendingAttributes :
           $match_debuff_conditions = [];
         }
         else {
-          $match_buff_conditions   = [];
+          $match_buff_conditions   = $conditions;
           $match_debuff_conditions = $debuffConditions;
         }
 
@@ -164,8 +171,8 @@ class Game::EvonyTKR::Model::AscendingAttributes :
     if ($level !~ /(purple|red)[0-9]{1}/i) {
       $self->logger->error(sprintf(
         'level should be one of %s, not %s',
-        Data::Printer::np((
-          $self->AscendingLevelNames(0), $self->AscendingLevelNames(1))),
+        join(', ', (
+          $self->AscendingAttributeLevelValues(0), $self->AscendingAttributeLevelValues(1))),
         $level
       ));
       return 0;
@@ -173,11 +180,15 @@ class Game::EvonyTKR::Model::AscendingAttributes :
     if ($level =~ /purple/i) {
       $red = 0;
     }
-    if (none { $_ eq $level } @{ $self->AscendingLevelNames($red) }) {
+    if (none { $_ eq $level } $self->AscendingAttributeLevelValues($red) ) {
+      $self->logger->debug("$level must be one of " .
+        join(', ', ($self->AscendingAttributeLevelValues(0), $self->AscendingAttributeLevelValues(1))));
       return 0;
     }
 
     push @{ $ascending->{$level}->{buffs} }, $nb;
+    $self->logger->debug("$level now has " .
+    scalar @{ $ascending->{$level}->{buffs} } . " buffs");
     return scalar @{ $ascending->{$level}->{buffs} };
   }
 
@@ -201,6 +212,15 @@ class Game::EvonyTKR::Model::AscendingAttributes :
       ->convert_blessed(1)
       ->encode($self->to_hash());
     return $json;
+  }
+
+  method concat($other, $swap) {
+    if ($swap) {
+      return $other . $self->as_string();
+    }
+    else {
+      return $self->as_string() . $other;
+    }
   }
 
 }

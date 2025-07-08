@@ -10,7 +10,7 @@ require Game::EvonyTKR::Model::Buff::Value;
 require Game::EvonyTKR::Model::Buff::Matcher;
 use namespace::clean;
 
-class Game::EvonyTKR::Model::Specialty : isa(Game::EvonyTKR::Model::Data) {
+class Game::EvonyTKR::Model::Specialty : isa(Game::EvonyTKR::Shared::Constants) {
 # PODNAME: Game::EvonyTKR::Model::Specialty
 
   use Carp;
@@ -25,7 +25,7 @@ class Game::EvonyTKR::Model::Specialty : isa(Game::EvonyTKR::Model::Data) {
   use overload
     '""'       => \&as_string,
     '.'        => \&concat,
-    'bool'     => \&_isTrue,
+    'bool'     => sub { $_[0]->_isTrue() },
     'fallback' => 0;
 
   field $id : reader;
@@ -36,7 +36,7 @@ class Game::EvonyTKR::Model::Specialty : isa(Game::EvonyTKR::Model::Data) {
   ADJUST {
     my $step1 = {};
 
-    foreach my $key ($self->specialtyLevels->@*) {
+    foreach my $key ($self->SpecialtyLevelValues->@*) {
       $step1->{$key} = {
         level => $key,
         buffs => [],     # Empty arrayref that can be modified later
@@ -75,14 +75,14 @@ class Game::EvonyTKR::Model::Specialty : isa(Game::EvonyTKR::Model::Data) {
       $match_debuff_conditions = [];
     }
     else {
-      $match_buff_conditions   = [];
+      $match_buff_conditions   = $conditions;
       $match_debuff_conditions = $debuffConditions;
     }
 
     # an list's values function will always return in the same order.
-    my $valid_levels = $self->specialtyLevels;
+    my $valid_levels = @{ $self->SpecialtyLevelValues };
     # Define the hierarchy of levels
-    my @level_hierarchy = $self->specialtyLevels->@*;
+    my @level_hierarchy = $self->SpecialtyLevelValues->@*;
 
     # Find the index of the requested level
     my $level_index = -1;
@@ -144,10 +144,10 @@ class Game::EvonyTKR::Model::Specialty : isa(Game::EvonyTKR::Model::Data) {
     }
 
     # the data files apparently have bad cases in them for level names.
-    if (none { $_ =~ /$level/i } $self->specialtyLevels->@*) {
+    if (none { $_ =~ /$level/i } $self->SpecialtyLevelValues->@*) {
       $self->logger->error(sprintf(
         'level should be one of %s, not %s',
-        Data::Printer::np($self->specialtyLevels->@*), $level
+        join(', ', $self->SpecialtyLevelValues->@*), $level
       ));
       return 0;
     }
@@ -188,14 +188,6 @@ class Game::EvonyTKR::Model::Specialty : isa(Game::EvonyTKR::Model::Data) {
     else {
       return $self->as_string() . $other;
     }
-  }
-
-  method _isTrue {
-    return
-         defined($self)
-      && ref($self)
-      && blessed($self)
-      && $self->isa('Game::EvonyTKR::Model::Specialty');
   }
 
 }

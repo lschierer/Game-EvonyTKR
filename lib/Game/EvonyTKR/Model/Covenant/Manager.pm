@@ -15,7 +15,7 @@ require Game::EvonyTKR::Model::Covenant;
 use namespace::clean;
 
 class Game::EvonyTKR::Model::Covenant::Manager :
-  isa(Game::EvonyTKR::Model::Data) {
+  isa(Game::EvonyTKR::Shared::Constants) {
 # PODNAME: Game::EvonyTKR::Model::Covenant::Manager
   use builtin qw(indexed);
   require Data::Printer;

@@ -5,7 +5,7 @@ use utf8::all;
 use File::FindLib 'lib';
 require Math::Round;
 
-class Game::EvonyTKR::Model::BasicAttribute : isa(Game::EvonyTKR::Model::Data) {
+class Game::EvonyTKR::Model::BasicAttribute : isa(Game::EvonyTKR::Shared::Constants) {
 # PODNAME: Game::EvonyTKR::Model::BasicAttribute
   use Carp;
   use List::AllUtils qw( any none );
@@ -70,12 +70,11 @@ class Game::EvonyTKR::Model::BasicAttribute : isa(Game::EvonyTKR::Model::Data) {
 
     is_Str($attribute_name)
       or push @errors => "attribute name must be a string, not $attribute_name";
-    my $re = $self->AttributeNames()->as_regexp;
 
-    if ($attribute_name !~ /$re/i) {
+    if (none { $attribute_name =~ /$_/i } @{ $self->AttributeValues }) {
       push @errors,
         "attribute name is $attribute_name, not one of "
-        . Data::Printer::np $self->AttributeNames()->values();
+        . Data::Printer::np $self->AttributeValues;
     }
     if (scalar @errors >= 1) {
       croak(join(', ' => @errors));
