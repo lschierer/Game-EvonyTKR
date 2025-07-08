@@ -5,14 +5,14 @@ ascending:
       - attribute: Attack
         class: Ground Troops
         condition:
-          - leading the army to attack
+          - Attacking
         value:
           number: 5
           unit: percentage
       - attribute: Defense
         class: Ground Troops
         condition:
-          - leading the army to attack
+          - Attacking
         value:
           number: 155
           unit: percentage

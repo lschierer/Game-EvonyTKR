@@ -5,14 +5,14 @@ levels:
       - attribute: Training Speed
         class: Ground Troops
         condition:
-          - Applied to Barracks Officer
+          - When Appointed as Barracks Officer
         value:
           number: 2
           unit: percentage
       - attribute: Training Capacity
         class: Ground Troops
         condition:
-          - Applied to Barracks Officer
+          - When Appointed as Barracks Officer
         value:
           number: 2
           unit: percentage
@@ -21,14 +21,14 @@ levels:
       - attribute: Training Speed
         class: Ground Troops
         condition:
-          - Applied to Barracks Officer
+          - When Appointed as Barracks Officer
         value:
           number: 2
           unit: percentage
       - attribute: Training Capacity
         class: Ground Troops
         condition:
-          - Applied to Barracks Officer
+          - When Appointed as Barracks Officer
         value:
           number: 2
           unit: percentage
@@ -37,14 +37,14 @@ levels:
       - attribute: Training Speed
         class: Ground Troops
         condition:
-          - Applied to Barracks Officer
+          - When Appointed as Barracks Officer
         value:
           number: 4
           unit: percentage
       - attribute: Training Capacity
         class: Ground Troops
         condition:
-          - Applied to Barracks Officer
+          - When Appointed as Barracks Officer
         value:
           number: 4
           unit: percentage
@@ -53,14 +53,14 @@ levels:
       - attribute: Training Speed
         class: Ground Troops
         condition:
-          - Applied to Barracks Officer
+          - When Appointed as Barracks Officer
         value:
           number: 4
           unit: percentage
       - attribute: Training Capacity
         class: Ground Troops
         condition:
-          - Applied to Barracks Officer
+          - When Appointed as Barracks Officer
         value:
           number: 4
           unit: percentage
@@ -69,14 +69,14 @@ levels:
       - attribute: Training Speed
         class: Ground Troops
         condition:
-          - Applied to Barracks Officer
+          - When Appointed as Barracks Officer
         value:
           number: 8
           unit: percentage
       - attribute: Training Capacity
         class: Ground Troops
         condition:
-          - Applied to Barracks Officer
+          - When Appointed as Barracks Officer
         value:
           number: 8
           unit: percentage

@@ -11,7 +11,7 @@ levels:
       - attribute: Attack
         class: Ranged Troops
         condition:
-          - Reduces Enemy
+          - Enemy
         value:
           number: 2
           unit: percentage
@@ -25,7 +25,7 @@ levels:
       - attribute: Attack
         class: Ranged Troops
         condition:
-          - Reduces Enemy
+          - Enemy
         value:
           number: 2
           unit: percentage
@@ -39,7 +39,7 @@ levels:
       - attribute: Attack
         class: Ranged Troops
         condition:
-          - Reduces Enemy
+          - Enemy
         value:
           number: 4
           unit: percentage
@@ -53,7 +53,7 @@ levels:
       - attribute: Attack
         class: Ranged Troops
         condition:
-          - Reduces Enemy
+          - Enemy
         value:
           number: 4
           unit: percentage
@@ -67,7 +67,7 @@ levels:
       - attribute: Attack
         class: Ranged Troops
         condition:
-          - Reduces Enemy
+          - Enemy
         value:
           number: 8
           unit: percentage

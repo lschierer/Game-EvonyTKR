@@ -3,7 +3,7 @@ name: Conquest
 buff:
   - attribute: Attack
     condition:
-      - leading the army to attack
+      - Attacking
     targetedType: Ground Troops
     value:
       number: 20

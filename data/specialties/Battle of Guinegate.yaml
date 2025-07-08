@@ -10,7 +10,8 @@ levels:
           unit: percentage
       - attribute: Defense
         condition:
-          - Reduces Enemy in Attack
+          - Enemy
+          - Attacking
         class: Ranged Troops
         value:
           number: 3
@@ -24,7 +25,8 @@ levels:
           unit: percentage
       - attribute: Defense
         condition:
-          - Reduces Enemy in Attack
+          - Enemy
+          - Attacking
         class: Ranged Troops
         value:
           number: 3
@@ -38,7 +40,8 @@ levels:
           unit: percentage
       - attribute: Defense
         condition:
-          - Reduces Enemy in Attack
+          - Enemy
+          - Attacking
         class: Ranged Troops
         value:
           number: 6
@@ -52,7 +55,8 @@ levels:
           unit: percentage
       - attribute: Defense
         condition:
-          - Reduces Enemy in Attack
+          - Enemy
+          - Attacking
         class: Ranged Troops
         value:
           number: 6
@@ -66,7 +70,8 @@ levels:
           unit: percentage
       - attribute: Defense
         condition:
-          - Reduces Enemy in Attack
+          - Enemy
+          - Attacking
         class: Ranged Troops
         value:
           number: 12

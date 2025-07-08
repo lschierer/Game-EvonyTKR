@@ -1,6 +1,7 @@
 ---
 name: Caliburn
-text: Increases March Size by 15% when General is leading the army and increases mounted troops’ attack and defense by 35% when General is leading the army to attack.
+text: >-
+  Increases March Size by 15% when General is leading the army and increases mounted troops’ attack and defense by 35% when General is leading the army to attack.
 buff:
   - attribute: March Size
     value:
@@ -9,14 +10,14 @@ buff:
   - attribute: Attack
     targetedType: Mounted Troops
     condition:
-      - leading the army to attack
+      - Attacking
     value:
       number: 35
       unit: percentage
   - attribute: Defense
     targetedType: Mounted Troops
     condition:
-      - leading the army to attack
+      - Attacking
     value:
       number: 35
       unit: percentage

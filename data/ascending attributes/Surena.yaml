@@ -21,7 +21,8 @@ ascending:
     buff:
       - attribute: Wounded to Death
         condition:
-          - Enemy In City
+          - Enemy
+          - In City
         value:
           number: 10
           unit: percentage
@@ -69,7 +70,8 @@ ascending:
           unit: percentage
       - attribute: Attack
         condition:
-          - dragon to the attack
+          - brings a dragon
+          - Attacking
         class: Siege Machines
         value:
           number: 10

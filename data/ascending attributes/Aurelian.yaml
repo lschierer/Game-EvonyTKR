@@ -33,7 +33,8 @@ ascending:
   - level: "red2"
     buff:
       - condition:
-          - Enemy In City
+          - Enemy
+          - In City
         attribute: Wounded to Death
         value:
           number: 10

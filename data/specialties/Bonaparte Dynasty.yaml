@@ -5,28 +5,32 @@ levels:
     buff:
       - attribute: Attack
         condition:
-          - dragon to the attack
+          - brings a dragon
+          - Attacking
         class: Mounted Troops
         value:
           number: 4
           unit: percentage
       - attribute: Defense
         condition:
-          - dragon to the attack
+          - brings a dragon
+          - Attacking
         class: Mounted Troops
         value:
           number: 3
           unit: percentage
       - attribute: Attack
         condition:
-          - Reduces Enemy with a Dragon
+          - Enemy
+          - brings a dragon
         class: Ranged Troops
         value:
           number: 1
           unit: percentage
       - attribute: Attack
         condition:
-          - Reduces Enemy with a Dragon
+          - Enemy
+          - brings a dragon
         class: Siege Machines
         value:
           number: 1
@@ -35,28 +39,32 @@ levels:
     buff:
       - attribute: Attack
         condition:
-          - dragon to the attack
+          - brings a dragon
+          - Attacking
         class: Mounted Troops
         value:
           number: 4
           unit: percentage
       - attribute: Defense
         condition:
-          - dragon to the attack
+          - brings a dragon
+          - Attacking
         class: Mounted Troops
         value:
           number: 3
           unit: percentage
       - attribute: Attack
         condition:
-          - Reduces Enemy with a Dragon
+          - Enemy
+          - brings a dragon
         class: Ranged Troops
         value:
           number: 2
           unit: percentage
       - attribute: Attack
         condition:
-          - Reduces Enemy with a Dragon
+          - Enemy
+          - brings a dragon
         class: Siege Machines
         value:
           number: 2
@@ -65,28 +73,32 @@ levels:
     buff:
       - attribute: Attack
         condition:
-          - dragon to the attack
+          - brings a dragon
+          - Attacking
         class: Mounted Troops
         value:
           number: 8
           unit: percentage
       - attribute: Defense
         condition:
-          - dragon to the attack
+          - brings a dragon
+          - Attacking
         class: Mounted Troops
         value:
           number: 6
           unit: percentage
       - attribute: Attack
         condition:
-          - Reduces Enemy with a Dragon
+          - Enemy
+          - brings a dragon
         class: Ranged Troops
         value:
           number: 3
           unit: percentage
       - attribute: Attack
         condition:
-          - Reduces Enemy with a Dragon
+          - Enemy
+          - brings a dragon
         class: Siege Machines
         value:
           number: 3
@@ -95,28 +107,32 @@ levels:
     buff:
       - attribute: Attack
         condition:
-          - dragon to the attack
+          - brings a dragon
+          - Attacking
         class: Mounted Troops
         value:
           number: 8
           unit: percentage
       - attribute: Defense
         condition:
-          - dragon to the attack
+          - brings a dragon
+          - Attacking
         class: Mounted Troops
         value:
           number: 6
           unit: percentage
       - attribute: Attack
         condition:
-          - Reduces Enemy with a Dragon
+          - Enemy
+          - brings a dragon
         class: Ranged Troops
         value:
           number: 3
           unit: percentage
       - attribute: Attack
         condition:
-          - Reduces Enemy with a Dragon
+          - Enemy
+          - brings a dragon
         class: Siege Machines
         value:
           number: 3
@@ -125,28 +141,32 @@ levels:
     buff:
       - attribute: Attack
         condition:
-          - dragon to the attack
+          - brings a dragon
+          - Attacking
         class: Mounted Troops
         value:
           number: 16
           unit: percentage
       - attribute: Defense
         condition:
-          - dragon to the attack
+          - brings a dragon
+          - Attacking
         class: Mounted Troops
         value:
           number: 12
           unit: percentage
       - attribute: Attack
         condition:
-          - Reduces Enemy with a Dragon
+          - Enemy
+          - brings a dragon
         class: Ranged Troops
         value:
           number: 6
           unit: percentage
       - attribute: Attack
         condition:
-          - Reduces Enemy with a Dragon
+          - Enemy
+          - brings a dragon
         class: Siege Machines
         value:
           number: 6

@@ -1,25 +1,26 @@
 ---
 name: Glory Knight
-text: Increases mounted troops’ attack by 30% and increases mounted troops’ defense and HP by 15% when General is leading the army to attack.
+text: >-
+  Increases mounted troops’ attack by 30% and increases mounted troops’ defense and HP by 15% when General is leading the army to attack.
 buff:
   - attribute: Attack
     targetedType: Mounted Troops
     condition:
-      - leading the army to attack
+      - Attacking
     value:
       number: 30
       unit: percentage
   - attribute: Defense
     targetedType: Mounted Troops
     condition:
-      - leading the army to attack
+      - Attacking
     value:
       number: 15
       unit: percentage
   - attribute: HP
     targetedType: Mounted Troops
     condition:
-      - leading the army to attack
+      - Attacking
     value:
       number: 15
       unit: percentage

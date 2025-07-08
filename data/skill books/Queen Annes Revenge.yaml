@@ -13,14 +13,18 @@ buff:
       unit: percentage
   - attribute: Attack
     condition:
-      - brings dragon or beast to attack
+      - brings a spiritual beast
+      - brings a dragon
+      - Attacking
     targetedType: Siege Machines
     value:
       number: 10
       unit: percentage
   - attribute: Attack
     condition:
-      - brings dragon or beast to attack
+      - brings a spiritual beast
+      - brings a dragon
+      - Attacking
     targetedType: Ranged Troops
     value:
       number: 10
