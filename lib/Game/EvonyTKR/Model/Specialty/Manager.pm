@@ -13,7 +13,7 @@ require Game::EvonyTKR::Model::Specialty;
 use namespace::clean;
 
 class Game::EvonyTKR::Model::Specialty::Manager :
-  isa(Game::EvonyTKR::Model::Data) {
+  isa(Game::EvonyTKR::Shared::Constants) {
   # PODNAME: Game::EvonyTKR::Model::Specialty::Manager
   use Carp;
   use overload
@@ -78,19 +78,17 @@ class Game::EvonyTKR::Model::Specialty::Manager :
             unit   => $ob->{value}->{unit},
           );
           my $b;
+          $b = Game::EvonyTKR::Model::Buff->new(
+            value         => $v,
+            attribute     => $ob->{attribute},
+          );
+
           if (exists $ob->{class}) {
-            $b = Game::EvonyTKR::Model::Buff->new(
-              value         => $v,
-              attribute     => $ob->{attribute},
-              targetedTypes => [$ob->{class}],
-            );
+            $b->set_target($ob->{class})
+          }elsif(exists $ob->{targetedType}){
+            $b->set_target($ob->{targetedType})
           }
-          else {
-            $b = Game::EvonyTKR::Model::Buff->new(
-              value     => $v,
-              attribute => $ob->{attribute},
-            );
-          }
+
           if (exists $ob->{condition}) {
             foreach my $c (@{ $ob->{condition} }) {
               $b->set_condition($c);

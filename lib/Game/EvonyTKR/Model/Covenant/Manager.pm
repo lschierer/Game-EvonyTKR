@@ -115,11 +115,15 @@ class Game::EvonyTKR::Model::Covenant::Manager :
             my $b = Game::EvonyTKR::Model::Buff->new(
               value         => $v,
               attribute     => $ob->{attribute},
-              targetedTypes => (exists $ob->{class} && defined $ob->{class})
-              ? [$ob->{class}]
-              : [],
               passive => $oc->{type} eq 'passive',
             );
+
+            if(exists $ob->{class} && defined $ob->{class}) {
+              $b->set_target($ob->{class});
+            }elsif(exists $ob->{targetedType} && defined $ob->{targetedType}){
+              $b->set_target($ob->{targetedType});
+            }
+
             if (exists $ob->{condition}) {
               foreach my $c (@{ $ob->{condition} }) {
                 $b->set_condition($c);

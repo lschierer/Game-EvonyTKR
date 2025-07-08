@@ -52,7 +52,7 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Shared::Constants) {
   }
 
   method set_target ($tt) {
-    if (any { $_ eq $tt } @{ $self->TroopTypeValues }) {
+    if (any { $_ eq $tt } values %{ $self->TroopTypeValues } ) {
       $targetedType = $tt;
     }
   }

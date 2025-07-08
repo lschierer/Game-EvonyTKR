@@ -9,7 +9,7 @@ require Game::EvonyTKR::Model::Buff::Value;
 require Game::EvonyTKR::Model::Buff::Matcher;
 use namespace::clean;
 
-class Game::EvonyTKR::Model::Covenant : isa(Game::EvonyTKR::Model::Data) {
+class Game::EvonyTKR::Model::Covenant : isa(Game::EvonyTKR::Shared::Constants) {
 # PODNAME: Game::EvonyTKR::Model::Covenant
   use builtin qw(indexed);
   require Data::Printer;
@@ -61,7 +61,7 @@ class Game::EvonyTKR::Model::Covenant : isa(Game::EvonyTKR::Model::Data) {
   ADJUST {
     #Covenants only have these levels.
     my $step1 = {};
-    foreach my $key ($self->covenantLevels->@*) {
+    foreach my $key ($self->CovenantLevelValues->@*) {
       $self->logger->debug("initializing covenantLevel $key");
       if ($key eq 'None') {
         next;
@@ -75,7 +75,7 @@ class Game::EvonyTKR::Model::Covenant : isa(Game::EvonyTKR::Model::Data) {
     Readonly::Hash1 my %step2 => %{$step1};
     $categories = \%step2;
 
-    for my ($index, $lv) (indexed($self->covenantLevels->@*)) {
+    for my ($index, $lv) (indexed($self->CovenantLevelValues->@*)) {
       if ($lv eq 'None') {
         next;
       }
@@ -110,7 +110,7 @@ class Game::EvonyTKR::Model::Covenant : isa(Game::EvonyTKR::Model::Data) {
 
     return 0 if not defined $level or $level =~ /None/i;
 
-    my $valid_levels = $self->covenantLevels;
+    my $valid_levels = $self->CovenantLevelValues;
     my %level_index  = map { $valid_levels->[$_] => $_ } 0 .. $#$valid_levels;
 
     unless (exists $level_index{$level}) {
@@ -164,7 +164,7 @@ class Game::EvonyTKR::Model::Covenant : isa(Game::EvonyTKR::Model::Data) {
       exit 0;
     }
 
-    if (none { $level =~ /$_/i } @{ $self->covenantLevels }) {
+    if (none { $level =~ /$_/i } @{ $self->CovenantLevelValues }) {
       $self->logger->error(sprintf(
         'level should be one of %s, not %s',
         join(', ', @{ $self->covenantLevels }), $level

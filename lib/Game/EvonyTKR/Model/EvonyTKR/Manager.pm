@@ -50,7 +50,7 @@ class Game::EvonyTKR::Model::EvonyTKR::Manager :
   method rootImport () {
     # first the imported types
 
-    my $collectionDir = $SourceDir->child("collections");
+    my $collectionDir = $SourceDir->child("collections/data");
     $self->logger->info("starting root import");
 
     $self->logger->info("starting import of generals.");

@@ -60,6 +60,14 @@ class Game::EvonyTKR::Model::General::ConflictGroup::Manager :
     # Return false - A general cannot pair with him/herself.
     return 0 if $general1 eq $general2;
 
+    if(not defined $general1){
+      $self->error("general1 must be defined!!!");
+      return 0;
+    }
+    if (not defined $general2 ) {
+      $self->error("general2 must be defined!!!");
+      return 0;
+    }
     # Try with normalized names
     my $norm1 = $conflict_groups->{ (keys %$conflict_groups)[0] }
       ->normalize_name($general1);
@@ -165,9 +173,9 @@ class Game::EvonyTKR::Model::General::ConflictGroup::Manager :
     }
 
     my $generals_file =
-      $SourceDir->parent->parent->child('EvansFullGeneralInfo.csv');
+      $SourceDir->child('collections/share/EvansFullGeneralInfo.csv');
     my $groups_file =
-      $SourceDir->parent->parent->child('EvAnsConflictGroupDefinitions.csv');
+      $SourceDir->child('collections/share/EvAnsConflictGroupDefinitions.csv');
     if ($generals_file->is_file() && $groups_file->is_file()) {
       my $importer =
         Game::EvonyTKR::Model::General::ConflictGroup::Importer->new(

@@ -85,6 +85,7 @@ class Game::EvonyTKR::Shared::Constants : isa(Game::EvonyTKR::Model::Logger) {
       "Training Capacity",
       "Training Speed",
       "Wounded to Death",
+      'you own the General',
     );
     $AttributeValues = \@temp;
   }
@@ -126,6 +127,7 @@ class Game::EvonyTKR::Shared::Constants : isa(Game::EvonyTKR::Model::Logger) {
       "brings a dragon",
       "brings a spiritual beast",
       "Defending",
+      'During SvS',
       "Enemy",
       "In City",
       "In Main City",
@@ -135,11 +137,13 @@ class Game::EvonyTKR::Shared::Constants : isa(Game::EvonyTKR::Model::Logger) {
       "When City Mayor for this SubCity",
       "When Defending Outside The Main City",
       "When Rallying",
+      'When The Main Defense General',
       # Officer positions "When Appointed as Hospital Officer",
       "When Appointed as Prison Officer",
       "When Appointed as Workshop Officer",
       "When Appointed as Academy Officer",
       "When Appointed as Embassy Officer",
+      "When Appointed as Barracks Officer",
     );
     $BuffConditionValues = \@temp;
   }
