@@ -1,13 +1,14 @@
 % File: buff_parser.prolog
 
-:- include('EvonyBuffDictionary').
 :- include('EvonyBuffGrammar').
+:- use_module(library(readutil)).
 :- initialization(main).
 
 main :-
-    read(Tokens),  % expect a list like: [increases, mounted, troops, attack, by, 50]
-    ( phrase(buffs(Buffs), Tokens) ->
-        write_term(Buffs, [quoted(true)]), nl
-    ; write('[]')
-    ),
-    halt.
+  read_line(Line),
+  atom_codes(Atom, Line),
+  tokenize_atom(Atom, Tokens),
+  ( phrase(buffs(Buffs), Tokens) ->
+      write_term(Buffs, [quoted(true)]), nl
+  ; writeln('[]') ),
+  halt.

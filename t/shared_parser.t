@@ -9,7 +9,7 @@ require Game::EvonyTKR;
 require Data::Printer;
 require Game::EvonyTKR::Shared::Parser;
 
-use Log::Log4perl;
+use Log::Log4perl qw(:levels);
 
 Log::Log4perl->init(\<<'EOT');
 log4perl.rootLogger              = ERROR, Screen
@@ -29,7 +29,7 @@ log4perl.appender.Screen.layout.ConversionPattern = %d [%p] %m%n
 EOT
 
 my $parser = Game::EvonyTKR::Shared::Parser->new();
-$parser->logger->level('DEBUG');
+$parser->logger->level($DEBUG);
 
 use List::MoreUtils qw(uniq);
 

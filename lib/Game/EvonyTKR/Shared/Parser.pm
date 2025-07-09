@@ -507,7 +507,7 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
     my $token_list = '[' . join(', ', map { "'$_'" } @words) . ']';
 
     my ($in_fh, $out_fh, $err_fh)= (undef, gensym, gensym);
-    my $cmd = ['gprolog',  '--query-goal "main, halt"', '--consult-file', $self->distDir->child('prolog/Game/EvonyTKR/Shared/buff_parser.pl')];
+    my $cmd = ['swipl',  '-s', $self->distDir->child('prolog/Game/EvonyTKR/Shared/buff_parser.pl')];
     my $pid = open3($in_fh, $out_fh, $err_fh, @$cmd);
 
     print $in_fh "$token_list.\n";
