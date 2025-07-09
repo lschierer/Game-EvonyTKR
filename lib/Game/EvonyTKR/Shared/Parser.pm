@@ -7,11 +7,14 @@ require Path::Tiny;
 require Readonly;
 require JSON::PP;
 require YAML::PP;
+require AI::Prolog;
 require Game::EvonyTKR::Model::Buff;
 require Game::EvonyTKR::Model::Buff::Value;
 
 class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
   use List::AllUtils qw( first all any none );
+  use IPC::Open3;
+  use Symbol 'gensym';
   use namespace::autoclean;
 
   method noramlize_attributes ($fragment) {
@@ -30,14 +33,14 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
       # Try to extract the attribute part from the end of the phrase before "by"
       # Look for common attribute patterns
       my @potential_attrs;
-      
+
       # Try different attribute extraction patterns
       if ($before_by =~ /\b(wounded\s+into\s+death\s+rate)\s*$/i) {
         push @potential_attrs, $1;
       } elsif ($before_by =~ /\b([\w\s]*(?:attack|defense|hp|speed|capacity|size|rate))\s*$/i) {
         push @potential_attrs, $1;
       }
-      
+
       foreach my $potential_attr (@potential_attrs) {
         $potential_attr =~ s/^\s+|\s+$//g; # trim whitespace
         my $mapped = $self->string_to_attribute($potential_attr);
@@ -142,7 +145,6 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
         $working_fragment =~ s/\b\Q$phrase\E\b//i;
       }
     }
-
     # Normalize attributes and strip them from the fragment
     my @attributes = $self->noramlize_attributes($working_fragment);
     if (scalar(@attributes) == 0) {
@@ -218,25 +220,25 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
 
     } elsif ($fragment =~ /([-+])(\d+)/) {
       # Handle patterns with +/- values that don't match the "by X%" format
-      
+
       # Special case: Complex patterns like "Marching Ground Troop and Mounted Troop Defense +10 and HP +10"
-      # This pattern has multiple troops connected by "and" 
+      # This pattern has multiple troops connected by "and"
       if ($fragment =~ /^(\w+)\s+((?:\w+\s+Troops?\s+and\s+)+\w+\s+Troops?)\s+(.+)$/) {
         my ($condition, $troop_list, $attr_part) = ($1, $2, $3);
-        
+
         # Extract individual troop types
         my @troop_types = split(/\s+and\s+/, $troop_list);
-        
+
         # Extract attributes with values
         my @attr_parts = split(/\s+and\s+/, $attr_part);
         my @attributes_with_values;
-        
+
         foreach my $attr_part (@attr_parts) {
           if ($attr_part =~ /(.+?)\s+([-+])(\d+)/) {
             push @attributes_with_values, [$1, $2, $3];
           }
         }
-        
+
         # Create buffs for each combination of troop type and attribute
         foreach my $troop_type (@troop_types) {
           # Convert to plural form
@@ -244,12 +246,12 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
           $troop_type =~ s/\bMounted Troop\b/Mounted Troops/g;
           $troop_type =~ s/\bRanged Troop\b/Ranged Troops/g;
           $troop_type =~ s/\bSiege Machine\b/Siege Machines/g;
-          
+
           foreach my $attr_data (@attributes_with_values) {
             my ($attr, $sign, $value) = @$attr_data;
             my $full_desc = "$troop_type $attr";
             my $restructured_fragment = "$full_desc by $value% when $condition";
-            
+
             if ($restructured_fragment =~ /(?<desc>.+?) by (?<value>-?\d+)%?(?:\s+(?<cond>.+?))?\.?$/i) {
               my $new_value = abs($+{value}) + 0;
               my $new_is_debuff = $+{value} =~ /^-/ ? 1 : 0;
@@ -258,7 +260,7 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
             }
           }
         }
-        
+
       } else {
         # Original logic for simpler patterns
         # First, check if there's a leading condition before the first comma
@@ -270,10 +272,10 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
             $leading_condition = $potential_condition;
           }
         }
-        
+
         # Split on comma or " and " while preserving the original structure
         my @parts = split(/\s*(?:,|(?:\s+and\s+))\s*/, $fragment);
-        
+
         # Extract troop context from the first part that has a value
         my $troop_context = '';
         my $condition_context = '';
@@ -287,19 +289,19 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
             }
           }
         }
-        
+
         foreach my $part (@parts) {
           if ($part =~ /(.+?)\s+([-+])(\d+)/) {
             my ($desc, $sign, $value) = ($1, $2, $3);
             my $is_debuff = ($sign eq '-') ? 1 : 0;
-            
+
             # Process this part normally
             $self->process_part($desc, $sign, $value, $leading_condition, \@buffs);
-            
+
           } elsif ($part =~ /^([A-Za-z\s]+)$/) {
             # This part has no value - check if the next part has a value we can share
             my $attribute_only = $1;
-            
+
             # Look for a value in the remaining parts
             # Find the current attribute's position first
             my $current_index = -1;
@@ -309,14 +311,14 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
                 last;
               }
             }
-            
+
             my $processed = 0;
-            
+
             # Look for the next value-bearing part after the current attribute
             for my $j ($current_index + 1 .. $#parts) {
               if ($parts[$j] =~ /(.+?)\s+([-+])(\d+)/) {
                 my ($other_desc, $other_sign, $other_value) = ($1, $2, $3);
-                
+
                 # For shared values, reconstruct the full context using extracted troop context
                 my $full_desc = $attribute_only;
                 if ($troop_context) {
@@ -331,21 +333,21 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
                     $full_desc = "$attribute_only";
                   }
                 }
-                
+
                 # Share the value with this attribute
                 $self->process_part($full_desc, $other_sign, $other_value, $leading_condition, \@buffs);
                 $processed = 1;
                 last; # Use the first value found after the current attribute
               }
             }
-            
+
             # If no value found after current attribute, fall back to any available value
             if (!$processed && $current_index >= 0) {
               for my $j (0..$#parts) {
                 next if $j == $current_index; # Skip the current attribute itself
                 if ($parts[$j] =~ /(.+?)\s+([-+])(\d+)/) {
                   my ($other_desc, $other_sign, $other_value) = ($1, $2, $3);
-                  
+
                   # Only use this as fallback if it's a simple attribute
                   if ($other_desc =~ /^[A-Za-z\s]+$/) {
                     my $full_desc = $attribute_only;
@@ -354,7 +356,7 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
                     } elsif ($leading_condition && $attribute_only =~ /^(Attack|Defense|HP)$/i) {
                       $full_desc = "$attribute_only";
                     }
-                    
+
                     $self->process_part($full_desc, $other_sign, $other_value, $leading_condition, \@buffs);
                     last;
                   }
@@ -368,13 +370,13 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
 
     return @buffs;
   }
-  
+
   method process_part ($desc, $sign, $value, $leading_condition, $buffs_ref) {
     my $is_debuff = ($sign eq '-') ? 1 : 0;
-    
+
     # Restructure to match the "by X%" pattern that the first if clause expects
     my $restructured_fragment;
-    
+
     # If we have a leading condition and this part doesn't contain a comma, combine them
     if ($leading_condition && $desc !~ /,/) {
       # For shared values, we need to reconstruct the troop type context
@@ -391,7 +393,7 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
           $desc = "$troop_context $desc";
         }
       }
-      
+
       # Determine the appropriate condition based on the target
       my $condition_to_use = $leading_condition;
       if ($desc =~ /\bMonsters?\b/i) {
@@ -401,63 +403,63 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
         # This is a buff affecting troops - map the leading condition appropriately
         $condition_to_use = $self->string_to_condition($leading_condition) || $leading_condition;
       }
-      
+
       # Convert singular troop types to plural, but preserve "Troops" as-is for targetedType handling
       my $processed_desc = $desc;
       $processed_desc =~ s/\bGround Troop\b/Ground Troops/g;
       $processed_desc =~ s/\bMounted Troop\b/Mounted Troops/g;
       $processed_desc =~ s/\bRanged Troop\b/Ranged Troops/g;
       $processed_desc =~ s/\bSiege Machine\b/Siege Machines/g;
-      
+
       $restructured_fragment = "$processed_desc by $value% $condition_to_use";
     } elsif ($desc =~ /^(.+?),\s*(.+)$/) {
       # Pattern: "condition, troop attribute" -> "troop attribute by value% condition"
       my ($condition, $troop_attr) = ($1, $2);
-      
+
       # Convert singular troop types to plural in troop_attr
       $troop_attr =~ s/\bGround Troop\b/Ground Troops/g;
       $troop_attr =~ s/\bMounted Troop\b/Mounted Troops/g;
       $troop_attr =~ s/\bRanged Troop\b/Ranged Troops/g;
       $troop_attr =~ s/\bSiege Machine\b/Siege Machines/g;
-      
+
       $restructured_fragment = "$troop_attr by $value% $condition";
     } elsif ($desc =~ /^(Enemy|Monsters?)\s+(.+)$/) {
       # Pattern: "Enemy/Monster troop attribute" -> special handling for debuffs
       my ($enemy_type, $troop_attr) = ($1, $2);
-      
+
       # Extract conditions like "In-city" from the troop_attr
       my @conditions = ($enemy_type);
       if ($troop_attr =~ s/^(In-city|Out-city|Marching)\s+//i) {
         push @conditions, $1;
       }
-      
+
       # Remove "Troop" from enemy patterns since it's not part of the attribute
       $troop_attr =~ s/\bTroops?\s+//g;
-      
+
       # Convert singular troop types to plural (for any remaining troop references)
       $troop_attr =~ s/\bGround Troop\b/Ground Troops/g;
       $troop_attr =~ s/\bMounted Troop\b/Mounted Troops/g;
       $troop_attr =~ s/\bRanged Troop\b/Ranged Troops/g;
       $troop_attr =~ s/\bSiege Machine\b/Siege Machines/g;
-      
+
       # For enemy patterns, put conditions first so attribute can be extracted cleanly
       my $condition_str = join(' ', @conditions);
       $restructured_fragment = "$condition_str $troop_attr by $value%";
     } elsif ($desc =~ /^(\w+)\s+(.+)$/) {
       # Pattern: "condition troop attribute" -> "troop attribute by value% condition"
       my ($condition, $troop_attr) = ($1, $2);
-      
+
       # Convert singular troop types to plural to match Constants
       $troop_attr =~ s/\bGround Troop\b/Ground Troops/g;
       $troop_attr =~ s/\bMounted Troop\b/Mounted Troops/g;
       $troop_attr =~ s/\bRanged Troop\b/Ranged Troops/g;
       $troop_attr =~ s/\bSiege Machine\b/Siege Machines/g;
-      
+
       $restructured_fragment = "$troop_attr by $value% when $condition";
     } else {
       # Fallback - but try to inherit context from the calling environment
       # This handles cases like "HP" where we need to get troop context from elsewhere
-      
+
       # Check if this is a simple attribute that needs context inheritance
       if ($desc =~ /^(Attack|Defense|HP|March Size|Rally Capacity|Training Speed|Construction Speed)$/i) {
         # Try to find context from the buffs already processed in this fragment
@@ -479,7 +481,7 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
         $restructured_fragment = "$desc by $value%";
       }
     }
-    
+
     # Now use the first if clause logic directly
     if ($restructured_fragment =~ /(?<desc>.+?) by (?<value>-?\d+)%?(?:\s+(?<cond>.+?))?\.?$/i) {
       my $new_value = abs($+{value}) + 0;
@@ -489,65 +491,99 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
     }
   }
 
-  method tokenize_buffs {
-    my ($text) = @_;
-    $text =~ s/[%]//g;
-    $text =~ s/[’‘]/'/g;    # Replace fancy single quotes with ASCII '
+  method tokenize_buffs ($text) {
 
-    # First split full input into sentences
-    my @sentences = split /\.\s*/, $text;
-    my @result;
+    my $grammar = Path::Tiny::path('share/prolog/Game/EvonyTKR/Shared/EvonyBuffDictionary.pl');
+    $grammar->spew_utf8(join("\n",
+        (map {my $t = lc($_); my @l = split(/ /, $t); sprintf('attribute([%s]).', join(", ", map{ "\"$_\"" } @l));  } $self->AttributeValues->@*),
+        (map {my $t = lc($_); my @l = split(/ /, $t); sprintf('troop([%s]).', join(", ", map{ "\"$_\"" } @l));  } values $self->TroopTypeValues->%*),
+        (map {my $t = lc($_); my @l = split(/ /, $t); sprintf('condition([%s]).', join(", ", map{ "\"$_\"" } @l));  } $self->BuffConditionValues->@*),
+        (map {my $t = lc($_); my @l = split(/ /, $t); sprintf('condition([%s]).', join(", ", map{ "\"$_\"" } @l));  } $self->DebuffConditionValues->@*),
+    ));
 
-    for my $sentence (@sentences) {
-      next unless $sentence =~ /\S/;
+    $text =~ s/[’‘]//g; # remove apostrophies entirely for prolog to parse.
+    $text = lc($text); # prolog requires all lower case.
+    my @words = split(/\s+/, $text);
+    my $token_list = '[' . join(', ', map { "'$_'" } @words) . ']';
 
-      # Extract trailing "when ..." clause
-      my $condition_str = '';
-      my $extra_context = '';
+    my ($in_fh, $out_fh, $err_fh)= (undef, gensym, gensym);
+    my $cmd = ['gprolog',  '--query-goal "main, halt"', '--consult-file', $self->distDir->child('prolog/Game/EvonyTKR/Shared/buff_parser.pl')];
+    my $pid = open3($in_fh, $out_fh, $err_fh, @$cmd);
 
-      if ($sentence =~ s/\s+when\s+(.*)$//i) {
-        $condition_str = $1;
-      }
+    print $in_fh "$token_list.\n";
+    close $in_fh;
 
-      if ($sentence =~ s/\s+(in Subordinate City)\b//i) {
-        $extra_context = $1;
-      }
+    my @err = <$err_fh>;   # STDERR: compiler messages, banner
+    my @out = <$out_fh>;   # STDOUT: actual result
+    waitpid $pid, 0;
 
-      # construct an attribute regex
-      my $attr_regex = join '|',
-        map { quotemeta($_) } $self->AttributeValues->@*;
+    my $parsed = join('', @out);
+    $parsed =~ s/^\s+|\s+$//g;
 
-      # a verbs regex
-      my $verbs_regex = join '|',
-        qw(Reduces Increases Improves Decreases Boosts Lowers);
-
-      my @subs;
-
-# Match any "... by <number>" pattern (covers attack and HP by 40, March Size by 15)
-# Match any phrase that ends in 'by <value>', even if it has multiple troop types before it
-      my @by_clauses = $sentence =~ /
-        (
-          (?:$verbs_regex|\band\b)?       # leading keyword like "Increases" or "and"
-          [^\.]*?                          # fragment up to the value
-          \b(?:troops[’']\s+)?             # optional troops' prefix — preserve it!
-          [a-z ]*?                         # attribute area
-          \bby\s+\d+                       # match the value
-        )
-      /gix;
-      @subs = @by_clauses if @by_clauses;
-
-      # Fallback: if nothing matched, keep the full sentence
-      @subs = ($sentence) unless @subs;
-
-      foreach my $s (@subs) {
-        $s .= " $extra_context"      if $extra_context;
-        $s .= " when $condition_str" if $condition_str;
-        push @result, $s;
-      }
-    }
-    $self->logger->debug(sprintf('tokenize_buffs returning %s',
-    join(', ', grep {/\S/} @result ) ));
-    return grep {/\S/} @result;
+    $self->logger->info(sprintf('parsed text is %s', $parsed));
+    return $parsed;
+    # Parse the Prolog output like: "[buff(attack,mounted,50,leading), buff(defense,mounted,30,dragon), ...]"
   }
+
+#  method tokenize_buffs {
+#    my ($text) = @_;
+#    $text =~ s/[%]//g;
+#    $text =~ s/[’‘]/'/g;    # Replace fancy single quotes with ASCII '
+#
+#    # First split full input into sentences
+#    my @sentences = split /\.\s*/, $text;
+#    my @result;
+#
+#    for my $sentence (@sentences) {
+#      next unless $sentence =~ /\S/;
+#
+#      # Extract trailing "when ..." clause
+#      my $condition_str = '';
+#      my $extra_context = '';
+#
+#      if ($sentence =~ s/\s+when\s+(.*)$//i) {
+#        $condition_str = $1;
+#      }
+#
+#      if ($sentence =~ s/\s+(in Subordinate City)\b//i) {
+#        $extra_context = $1;
+#      }
+#
+#      # construct an attribute regex
+#      my $attr_regex = join '|',
+#        map { quotemeta($_) } $self->AttributeValues->@*;
+#
+#      # a verbs regex
+#      my $verbs_regex = join '|',
+#        qw(Reduces Increases Improves Decreases Boosts Lowers);
+#
+#      my @subs;
+#
+## Match any "... by <number>" pattern (covers attack and HP by 40, March Size by 15)
+## Match any phrase that ends in 'by <value>', even if it has multiple troop types before it
+#      my @by_clauses = $sentence =~ /
+#        (
+#          (?:$verbs_regex|\band\b)?       # leading keyword like "Increases" or "and"
+#          [^\.]*?                          # fragment up to the value
+#          \b(?:troops[’']\s+)?             # optional troops' prefix — preserve it!
+#          [a-z ]*?                         # attribute area
+#          \bby\s+\d+                       # match the value
+#        )
+#      /gix;
+#      @subs = @by_clauses if @by_clauses;
+#
+#      # Fallback: if nothing matched, keep the full sentence
+#      @subs = ($sentence) unless @subs;
+#
+#      foreach my $s (@subs) {
+#        $s .= " $extra_context"      if $extra_context;
+#        $s .= " when $condition_str" if $condition_str;
+#        push @result, $s;
+#      }
+#    }
+#    $self->logger->debug(sprintf('tokenize_buffs returning %s',
+#    join(', ', grep {/\S/} @result ) ));
+#    return grep {/\S/} @result;
+#  }
 }
 1;
