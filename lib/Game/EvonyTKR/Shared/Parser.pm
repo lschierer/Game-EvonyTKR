@@ -127,16 +127,27 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
 
     my $grammar = Path::Tiny::path(
       'share/prolog/Game/EvonyTKR/Shared/EvonyBuffDictionary.pl');
-    $grammar->spew_utf8(join(
-      "\n",
+    $grammar->spew_utf8(join("\n",sort(
+
       # Generate DCG rules for troops
       (
         map {
+
           my $t      = lc($_);
           my @l      = split(/ /, $t);
+          my $base = $l[1] =~ s/s$//r;
+          my @s;
+          foreach my $index ( 0..$#l ) {
+            $s[$index] = $index ?  $base : $l[$index] ;
+          }
           my $atom   = join('_',    @l);
           my $tokens = join('], [', @l);
-          sprintf('troop(%s) --> [%s].', $atom, $tokens);
+
+          my $stokens = join ('], [', @s);
+          my @rules;
+          push @rules, sprintf('troop(%s) --> [%s].', $atom, $tokens);
+          push @rules, sprintf('troop(%s) --> [%s].', $atom, $stokens);
+          @rules;
         } values $self->TroopTypeValues->%*
       ),
 
@@ -144,10 +155,19 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
       (
         map {
           my $t      = lc($_);
-          my @l      = split(/ /, $t);
-          my $atom   = join('_',    @l);
-          my $tokens = join('], [', @l);
-          sprintf('attribute(%s) --> [%s].', $atom, $tokens);
+          if($_ =~ /^SubCity (.+)$/i) {
+            my $base_attr = lc($1);
+            my @l = split(/ /, $base_attr);
+            my $base_atom = join('_', @l);
+            my $subcity_atom = "subcity_" . $base_atom;
+
+            sprintf('subcity_attribute(%s) --> [%s].', $base_atom, join('], [', @l));
+          }else {
+            my @l      = split(/ /, $t);
+            my $atom   = join('_',    @l);
+            my $tokens = join('], [', @l);
+            sprintf('attribute(%s) --> [%s].', $atom, $tokens);
+          }
         } $self->AttributeValues->@*
       ),
 
@@ -195,7 +215,7 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
 		    } keys %{ $self->mapped_conditions }
      ),
 
-    ));
+    )));
     # remove the following for prolog:
     #\x{0022}    # ASCII double quote "
     #\x{0027}    # ASCII single quote '
