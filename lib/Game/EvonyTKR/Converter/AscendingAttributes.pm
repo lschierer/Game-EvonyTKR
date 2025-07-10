@@ -20,16 +20,15 @@ class Game::EvonyTKR::Converter::AscendingAttributes :
   # PODNAME: Game::EvonyTKR::Converter::AscendingAttributes
 
   # input fields
-  field $outputDir :param;
-  field $debug :param //= 0;
+  field $outputDir : param;
+  field $debug : param //= 0;
 
   # internal control fields
   field $red = 1;
 
   # output fields
-  field $name :reader = '';
-  field $data :reader;
-
+  field $name : reader = '';
+  field $data : reader;
 
   ADJUST {
     Readonly::Hash1 my %temp => (
@@ -58,27 +57,27 @@ class Game::EvonyTKR::Converter::AscendingAttributes :
         text  => '',
         buffs => [],
       },
-      red1    => {
+      red1 => {
         label => '1st Red Star',
         text  => '',
         buffs => [],
       },
-      red2    => {
+      red2 => {
         label => '2nd Red Star',
         text  => '',
         buffs => [],
       },
-      red3    => {
+      red3 => {
         label => '3rd Red Star',
         text  => '',
         buffs => [],
       },
-      red4    => {
+      red4 => {
         label => '4th Red Star',
         text  => '',
         buffs => [],
       },
-      red5    => {
+      red5 => {
         label => '5th Red Star',
         text  => '',
         buffs => [],
@@ -100,47 +99,49 @@ class Game::EvonyTKR::Converter::AscendingAttributes :
     my $data = {
       id        => $name,
       general   => $name,
-      ascending => $red ? {
-        red1    => {
+      ascending => $red
+      ? {
+        red1 => {
           text  => $data->{red1}->{text},
-          buffs => [ map {$_->to_hash() } @{ $data->{red1}->{buffs}} ],
+          buffs => [map { $_->to_hash() } @{ $data->{red1}->{buffs} }],
         },
-        red2    => {
+        red2 => {
           text  => $data->{red2}->{text},
-          buffs => [ map {$_->to_hash() } @{ $data->{red2}->{buffs}} ],
+          buffs => [map { $_->to_hash() } @{ $data->{red2}->{buffs} }],
         },
-        red3    => {
+        red3 => {
           text  => $data->{red3}->{text},
-          buffs => [ map {$_->to_hash() } @{ $data->{red3}->{buffs}} ],
+          buffs => [map { $_->to_hash() } @{ $data->{red3}->{buffs} }],
         },
-        red4    => {
+        red4 => {
           text  => $data->{red4}->{text},
-          buffs => [ map {$_->to_hash() } @{ $data->{red4}->{buffs}} ],
+          buffs => [map { $_->to_hash() } @{ $data->{red4}->{buffs} }],
         },
-        red5    => {
+        red5 => {
           text  => $data->{red5}->{text},
-          buffs => [ map {$_->to_hash() } @{ $data->{red5}->{buffs}} ],
+          buffs => [map { $_->to_hash() } @{ $data->{red5}->{buffs} }],
         },
-      } : {
-        purple1    => {
+        }
+      : {
+        purple1 => {
           text  => $data->{purple1}->{text},
-          buffs => [ map {$_->to_hash() } @{ $data->{purple1}->{buffs}} ],
+          buffs => [map { $_->to_hash() } @{ $data->{purple1}->{buffs} }],
         },
-        purple2    => {
+        purple2 => {
           text  => $data->{purple2}->{text},
-          buffs => [ map {$_->to_hash() } @{ $data->{purple2}->{buffs}} ],
+          buffs => [map { $_->to_hash() } @{ $data->{purple2}->{buffs} }],
         },
-        purple3    => {
+        purple3 => {
           text  => $data->{purple3}->{text},
-          buffs => [ map {$_->to_hash() } @{ $data->{purple3}->{buffs}} ],
+          buffs => [map { $_->to_hash() } @{ $data->{purple3}->{buffs} }],
         },
-        purple4    => {
+        purple4 => {
           text  => $data->{purple4}->{text},
-          buffs => [ map {$_->to_hash() } @{ $data->{purple4}->{buffs}} ],
+          buffs => [map { $_->to_hash() } @{ $data->{purple4}->{buffs} }],
         },
-        purple5    => {
+        purple5 => {
           text  => $data->{purple5}->{text},
-          buffs => [ map {$_->to_hash() } @{ $data->{purple5}->{buffs}} ],
+          buffs => [map { $_->to_hash() } @{ $data->{purple5}->{buffs} }],
         },
       },
     };
@@ -150,21 +151,23 @@ class Game::EvonyTKR::Converter::AscendingAttributes :
     )->dump($data);
     my $filename = lc($name);
     $filename = "${filename}.yaml";
-    if(!$outputDir->is_dir()){
-      $self->logger->error("$outputDir is not a directory!!!" . $outputDir->stat());
+    if (!$outputDir->is_dir()) {
+      $self->logger->error(
+        "$outputDir is not a directory!!!" . $outputDir->stat());
     }
     $outputDir->child($filename)->touch();
-    if($debug) {
+    if ($debug) {
       say $yc;
       $outputDir->child($filename)->spew_utf8($yc);
-    } else {
+    }
+    else {
       $outputDir->child($filename)->spew_utf8($yc);
     }
 
   }
 
   method parseText {
-    foreach my $index (1..5){
+    foreach my $index (1 .. 5) {
       my $key = $red ? 'red' : 'purple';
       $key = "$key$index";
       my $parser    = Game::EvonyTKR::Shared::Parser->new();
@@ -191,20 +194,23 @@ class Game::EvonyTKR::Converter::AscendingAttributes :
       }
     }
 
-    foreach my $index (0..4) {
-      unless ($index < scalar(@lines) ) {
-        $self->logger->logcroak("Invalid Ascending Attribute Text: insufficient lines entered.");
+    foreach my $index (0 .. 4) {
+      unless ($index < scalar(@lines)) {
+        $self->logger->logcroak(
+          "Invalid Ascending Attribute Text: insufficient lines entered.");
       }
       my $line = $lines[$index];
-      my $key = $red ? 'red' : 'purple';
-      if($line =~ /^(\d) Star (.+)$/){
+      my $key  = $red ? 'red' : 'purple';
+      if ($line =~ /^(\d) Star (.+)$/) {
         $key = "$key$1";
-        if(exists $data->{$key}) {
+        if (exists $data->{$key}) {
           $data->{$key}->{text} = $2;
-        } else {
+        }
+        else {
           $self->logger->logcroak("Invalid Ascending Attribute Line: '$line'");
         }
-      } else {
+      }
+      else {
         $self->logger->logcroak("Invalid Ascending Attribute Line: '$line'");
       }
     }
@@ -212,7 +218,8 @@ class Game::EvonyTKR::Converter::AscendingAttributes :
 
   method getName {
     say "Please enter the name of the general to whom this applies: ";
-    open(my $tty, '<:encoding(UTF-8)', '/dev/tty') or $self->logger->logcroak("Cannot open /dev/tty: $!");
+    open(my $tty, '<:encoding(UTF-8)', '/dev/tty')
+      or $self->logger->logcroak("Cannot open /dev/tty: $!");
     my $potentialName = <$tty>;
     close $tty;
     chomp $potentialName;
@@ -223,26 +230,28 @@ class Game::EvonyTKR::Converter::AscendingAttributes :
 
   method purpleOrRed {
     my $answer = '';
-    while (lc($answer) ne 'red' and lc($answer) ne 'purple'){
-      if($answer) {
+    while (lc($answer) ne 'red' and lc($answer) ne 'purple') {
+      if ($answer) {
         say "You must type 'red' or 'purple', not $answer";
-      } else {
+      }
+      else {
         say "Does this General ascend to Purple or Red Stars? (purple|red)";
       }
 
-      open(my $tty, '<:encoding(UTF-8)', '/dev/tty') or $self->logger->logcroak("Cannot open /dev/tty: $!");
+      open(my $tty, '<:encoding(UTF-8)', '/dev/tty')
+        or $self->logger->logcroak("Cannot open /dev/tty: $!");
       $answer = <$tty>;
       close $tty;
       chomp $answer;
       $answer = lc($answer);
     }
-    if($answer eq 'red'){
+    if ($answer eq 'red') {
       $red = 1;
-    } else {
+    }
+    else {
       $red = 0;
     }
   }
-
 
 }
 1;

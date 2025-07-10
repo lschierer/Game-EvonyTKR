@@ -5,7 +5,8 @@ use utf8::all;
 use File::FindLib 'lib';
 require Math::Round;
 
-class Game::EvonyTKR::Model::BasicAttribute : isa(Game::EvonyTKR::Shared::Constants) {
+class Game::EvonyTKR::Model::BasicAttribute :
+  isa(Game::EvonyTKR::Shared::Constants) {
 # PODNAME: Game::EvonyTKR::Model::BasicAttribute
   use Carp;
   use List::AllUtils qw( any none );

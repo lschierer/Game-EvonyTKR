@@ -113,14 +113,15 @@ class Game::EvonyTKR::Model::Covenant::Manager :
  # object with passive buffs and one without.  We need to merge any objects
  # that have the same category, adding the buffs from both to the same array.
             my $b = Game::EvonyTKR::Model::Buff->new(
-              value         => $v,
-              attribute     => $ob->{attribute},
-              passive => $oc->{type} eq 'passive',
+              value     => $v,
+              attribute => $ob->{attribute},
+              passive   => $oc->{type} eq 'passive',
             );
 
-            if(exists $ob->{class} && defined $ob->{class}) {
+            if (exists $ob->{class} && defined $ob->{class}) {
               $b->set_target($ob->{class});
-            }elsif(exists $ob->{targetedType} && defined $ob->{targetedType}){
+            }
+            elsif (exists $ob->{targetedType} && defined $ob->{targetedType}) {
               $b->set_target($ob->{targetedType});
             }
 

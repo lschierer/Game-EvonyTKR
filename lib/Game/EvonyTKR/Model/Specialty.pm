@@ -10,7 +10,8 @@ require Game::EvonyTKR::Model::Buff::Value;
 require Game::EvonyTKR::Model::Buff::Matcher;
 use namespace::clean;
 
-class Game::EvonyTKR::Model::Specialty : isa(Game::EvonyTKR::Shared::Constants) {
+class Game::EvonyTKR::Model::Specialty : isa(Game::EvonyTKR::Shared::Constants)
+{
 # PODNAME: Game::EvonyTKR::Model::Specialty
 
   use Carp;

@@ -4,8 +4,8 @@ use utf8::all;
 
 use File::FindLib 'lib';
 
-class Game::EvonyTKR::Model::BasicAttributes : isa(Game::EvonyTKR::Shared::Constants)
-{
+class Game::EvonyTKR::Model::BasicAttributes :
+  isa(Game::EvonyTKR::Shared::Constants) {
 # PODNAME: Game::EvonyTKR::Model::BasicAttributes
   use Carp;
   use List::AllUtils qw( any none first );
@@ -29,11 +29,13 @@ class Game::EvonyTKR::Model::BasicAttributes : isa(Game::EvonyTKR::Shared::Const
     $attributes->{attack} = Game::EvonyTKR::Model::BasicAttribute->new(
       attribute_name => first { $_ =~ /attack/i } @{ $self->AttributeValues });
     $attributes->{defense} = Game::EvonyTKR::Model::BasicAttribute->new(
-      attribute_name =>  first { $_ =~ /defense/i } @{ $self->AttributeValues });
+      attribute_name => first { $_ =~ /defense/i } @{ $self->AttributeValues });
     $attributes->{leadership} = Game::EvonyTKR::Model::BasicAttribute->new(
-      attribute_name => first { $_ =~ /leadership/i } @{ $self->AttributeValues });
+      attribute_name => first { $_ =~ /leadership/i }
+        @{ $self->AttributeValues });
     $attributes->{politics} = Game::EvonyTKR::Model::BasicAttribute->new(
-      attribute_name => first { $_ =~ /politics/i } @{ $self->AttributeValues });
+      attribute_name => first { $_ =~ /politics/i }
+        @{ $self->AttributeValues });
   }
 
   method attack {
@@ -58,7 +60,7 @@ class Game::EvonyTKR::Model::BasicAttributes : isa(Game::EvonyTKR::Shared::Const
     if (none { $_ =~ $attributeName } @attributeNames) {
       $self->logger()->error(sprintf(
         'attributeName must be one of %s, not %s',
-        Data::Printer::np($self->AttributeValues ),
+        Data::Printer::np($self->AttributeValues),
         $attributeName,
       ));
       return;

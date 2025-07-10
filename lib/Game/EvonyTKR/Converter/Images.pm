@@ -8,7 +8,7 @@ require HTTP::Tiny;
 require Path::Tiny;
 require IO::Socket::IP;    # for HTTP::Tiny;
 require IO::Socket::SSL;
-require Game::EvonyTKR; # for dist_dir to work
+require Game::EvonyTKR;    # for dist_dir to work
 require GD;
 
 class Game::EvonyTKR::Converter::Images {
@@ -25,7 +25,8 @@ class Game::EvonyTKR::Converter::Images {
     # this should ask the user where the general dictionary is.
     # I don't know how best to implement that. I'm hard coding it for now.
 
-    my $dictionary = $distDir->child('collections/share/GeneralDictionaryGrid.html');
+    my $dictionary =
+      $distDir->child('collections/share/GeneralDictionaryGrid.html');
     if ($dictionary->is_file()) {
       $generalDictionaryFile = $dictionary;
     }

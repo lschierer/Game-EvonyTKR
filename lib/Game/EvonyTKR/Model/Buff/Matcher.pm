@@ -6,7 +6,8 @@ require Data::Printer;
 require Game::EvonyTKR::Model::Buff::Value;
 require JSON::PP;
 
-class Game::EvonyTKR::Model::Buff::Matcher : isa(Game::EvonyTKR::Shared::Constants) {
+class Game::EvonyTKR::Model::Buff::Matcher :
+  isa(Game::EvonyTKR::Shared::Constants) {
   use List::AllUtils qw( any all none );
   use namespace::autoclean;
   use Carp;
@@ -23,7 +24,7 @@ class Game::EvonyTKR::Model::Buff::Matcher : isa(Game::EvonyTKR::Shared::Constan
   );
 
   method matchTargetedType($test_tt, $logID) {
-    if (length $toTest->targetedType ) {
+    if (length $toTest->targetedType) {
       # test_tt often comes from generals, convert it for use here.
       if ($test_tt =~ /^(\w+)_specialist$/) {
         my $short = $1;
@@ -40,7 +41,7 @@ class Game::EvonyTKR::Model::Buff::Matcher : isa(Game::EvonyTKR::Shared::Constan
         }
       }
 
-      if ($toTest->targetedType !~ /$test_tt/i ) {
+      if ($toTest->targetedType !~ /$test_tt/i) {
         $self->logger->debug(
           $logID
             . sprintf(

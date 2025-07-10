@@ -17,8 +17,8 @@ class Game::EvonyTKR::Converter::SkillBook :
   use Carp;
   use namespace::autoclean;
 
-  field $outputDir :param;
-  field $debug :param //= 0;
+  field $outputDir : param;
+  field $debug : param //= 0;
   field $name = '';
   field $text = '';
   field $buffs;
@@ -77,14 +77,16 @@ class Game::EvonyTKR::Converter::SkillBook :
     )->dump($data);
     my $filename = lc($name);
     $filename = "${filename}.yaml";
-    if(!$outputDir->is_dir()){
-      $self->logger->error("$outputDir is not a directory!!!" . $outputDir->stat());
+    if (!$outputDir->is_dir()) {
+      $self->logger->error(
+        "$outputDir is not a directory!!!" . $outputDir->stat());
     }
     $outputDir->child($filename)->touch();
-    if($debug) {
+    if ($debug) {
       say $yc;
       $outputDir->child($filename)->spew_utf8($yc);
-    } else {
+    }
+    else {
       $outputDir->child($filename)->spew_utf8($yc);
     }
 

@@ -51,7 +51,7 @@ class Game::EvonyTKR::Model::Data : isa(Game::EvonyTKR::Shared::Constants) {
     # Validate that each specialty level is valid
     foreach my $index (0 .. 3) {
       my $level = $specialties[$index];
-      if (none {$_ =~ /$level/i } @{ $self->SpecialtyLevelValues }) {
+      if (none { $_ =~ /$level/i } @{ $self->SpecialtyLevelValues }) {
         $logger->warn("Invalid specialty level at index $index: $level");
         return 0;
       }
@@ -133,10 +133,14 @@ class Game::EvonyTKR::Model::Data : isa(Game::EvonyTKR::Shared::Constants) {
       return 1;
     }
     if ($proposedLevel =~ /red/) {
-      return any {$proposedLevel eq $_ } @{ $self->AscendingAttributeLevelValues(1) };
+      return
+        any { $proposedLevel eq $_ }
+        @{ $self->AscendingAttributeLevelValues(1) };
     }
     else {
-      return any {$proposedLevel eq $_ } @{ $self->AscendingAttributeLevelValues(0) };
+      return
+        any { $proposedLevel eq $_ }
+        @{ $self->AscendingAttributeLevelValues(0) };
     }
   }
 

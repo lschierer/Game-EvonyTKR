@@ -364,16 +364,17 @@ package Game::EvonyTKR::Controller::Generals {
     push @specialties, $self->param('specialty4') // 'gold';
 
     my $rootManager = $self->get_root_manager();
-    my $data_model = Game::EvonyTKR::Model::Data->new();
+    my $data_model  = Game::EvonyTKR::Model::Data->new();
 
-    if (none {$_ eq $covenantLevel} @{ $rootManager->CovenantLevelValues } ) {
+    if (none { $_ eq $covenantLevel } @{ $rootManager->CovenantLevelValues }) {
       $logger->warn(
         "Invalid covenantLevel: $covenantLevel, using default 'civilization'");
       $covenantLevel = 'civilization';
     }
 
     # Validate ascending level
-    if (none {$_ eq $ascendingLevel} $rootManager->AscendingAttributeLevelValues() ) {
+    if (none { $_ eq $ascendingLevel }
+      $rootManager->AscendingAttributeLevelValues()) {
       $logger->warn(
         "Invalid ascendingLevel: $ascendingLevel, using default 'red5'");
       $ascendingLevel = 'red5';

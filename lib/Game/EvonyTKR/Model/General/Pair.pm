@@ -4,7 +4,8 @@ use utf8::all;
 require JSON::PP;
 require Scalar::Util;
 
-class Game::EvonyTKR::Model::General::Pair : isa(Game::EvonyTKR::Shared::Constants) {
+class Game::EvonyTKR::Model::General::Pair :
+  isa(Game::EvonyTKR::Shared::Constants) {
   require Game::EvonyTKR::Model::General;
   require Game::EvonyTKR::Model::Buff::Summarizer;
   use List::AllUtils qw( all any none );

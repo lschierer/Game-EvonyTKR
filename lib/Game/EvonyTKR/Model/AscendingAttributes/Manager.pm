@@ -79,14 +79,15 @@ class Game::EvonyTKR::Model::AscendingAttributes::Manager :
           );
           my $b;
           $b = Game::EvonyTKR::Model::Buff->new(
-            value         => $v,
-            attribute     => $ob->{attribute},
+            value     => $v,
+            attribute => $ob->{attribute},
           );
 
           if (exists $ob->{class}) {
-            $b->set_target($ob->{class})
-          }elsif(exists $ob->{targetedType}){
-            $b->set_target($ob->{targetedType})
+            $b->set_target($ob->{class});
+          }
+          elsif (exists $ob->{targetedType}) {
+            $b->set_target($ob->{targetedType});
           }
 
           if (exists $ob->{condition}) {
@@ -98,7 +99,9 @@ class Game::EvonyTKR::Model::AscendingAttributes::Manager :
           $self->logger->debug(sprintf(
             '%s now has %s buffs at level %s',
             $name,
-            scalar( $ascendingAttributes->{$name}->ascending->{$level}->{buffs}->@* ),
+            scalar(
+              $ascendingAttributes->{$name}->ascending->{$level}->{buffs}->@*
+            ),
             $level,
           ));
         }

@@ -9,10 +9,17 @@ require Game::EvonyTKR;
 require Data::Printer;
 use Game::EvonyTKR::Shared::Parser;
 
-use Log::Log4perl qw(:easy);
-Log::Log4perl->easy_init($WARN);
+use Log::Log4perl qw(:levels);
+#use Log::Log4perl qw(:easy);       #  <<- Tried these two lines first.
+#Log::Log4perl->easy_init($DEBUG);  #
+
+my $loggerConfig = Game::EvonyTKR::Logger::Config->new('test');
+my $logConfig = Path::Tiny->cwd()->child('share/log4perl.test.conf ');
+say $logConfig->absolute();
+Log::Log4perl::init($logConfig->canonpath());
 
 my $parser = Game::EvonyTKR::Shared::Parser->new();
+$parser->logger->level($DEBUG);   # <-- tried each solution with and without this line
 
 use List::MoreUtils qw(uniq);
 
@@ -111,7 +118,7 @@ subtest 'Dictator Skill Book' => sub {
     my @nb = $parser->normalize_buff($frag);
     push(@hashedBuffs, @nb);
   }
-
+  diag  "final buffs are " . Data::Printer::np(@hashedBuffs);
   is scalar(@hashedBuffs), 3, 'Parsed 3 buffs';
 
   ok(
@@ -142,7 +149,7 @@ subtest 'Dictator Skill Book' => sub {
       attribute  => 'Attack',
       value      => 45,
       class      => 'Mounted Troops',
-      conditions => ['Against Monsters', 'leading the army']
+      conditions => ['Against Monsters']
     ),
     'Mounted Troops 45% attack buff (Against Monsters)'
   );

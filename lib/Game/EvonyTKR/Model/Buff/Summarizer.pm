@@ -209,14 +209,12 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
         'you own the General',
         'leading the army',
       ],
-      'Mayor' =>
-        [
-          'When City Mayor for this SubCity',
-          'In Main City',
-          'In City',
-          'you own the General',
-          'leading the army',
-        ],
+      'Mayor' => [
+        'When City Mayor for this SubCity',
+        'In Main City', 'In City',
+        'you own the General',
+        'leading the army',
+      ],
     );
 
     if (exists $activationFilters{$activationType}) {

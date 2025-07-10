@@ -79,14 +79,15 @@ class Game::EvonyTKR::Model::Specialty::Manager :
           );
           my $b;
           $b = Game::EvonyTKR::Model::Buff->new(
-            value         => $v,
-            attribute     => $ob->{attribute},
+            value     => $v,
+            attribute => $ob->{attribute},
           );
 
           if (exists $ob->{class}) {
-            $b->set_target($ob->{class})
-          }elsif(exists $ob->{targetedType}){
-            $b->set_target($ob->{targetedType})
+            $b->set_target($ob->{class});
+          }
+          elsif (exists $ob->{targetedType}) {
+            $b->set_target($ob->{targetedType});
           }
 
           if (exists $ob->{condition}) {

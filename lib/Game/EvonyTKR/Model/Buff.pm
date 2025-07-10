@@ -52,7 +52,7 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Shared::Constants) {
   }
 
   method set_target ($tt) {
-    if (any { $_ eq $tt } values %{ $self->TroopTypeValues } ) {
+    if (any { $_ eq $tt } values %{ $self->TroopTypeValues }) {
       $targetedType = $tt;
     }
   }
@@ -301,7 +301,7 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Shared::Constants) {
     return 1;
   }
 
-  method to_hash() {
+  method to_hash {
     my $c;
     my $conditionCount = scalar $self->conditions();
     $self->logger()->debug("in to_hash, I have $conditionCount conditions");
@@ -324,11 +324,11 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Shared::Constants) {
     };
   }
 
-  method TO_JSON() {
+  method TO_JSON {
     return $self->to_hash();
   }
 
-  method as_string() {
+  method as_string {
     my $json =
       JSON::PP->new->utf8->pretty->allow_blessed(1)
       ->convert_blessed(1)

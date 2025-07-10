@@ -23,8 +23,11 @@ package Game::EvonyTKR::Converter {
       [
         "mode" => hidden => {
           one_of => [
-            ['general',   'Convert a General to normalized YAML'],
-            ['ascending', 'Convert the Ascending Attributes of a General to normalized YAML'],
+            ['general', 'Convert a General to normalized YAML'],
+            [
+              'ascending',
+              'Convert the Ascending Attributes of a General to normalized YAML'
+            ],
             ['skillbook', 'Convert SkillBook Text to normalized YAML'],
           ],
           required => 1,
@@ -46,7 +49,7 @@ package Game::EvonyTKR::Converter {
     Log::Log4perl::Config->utf8(1);
     Log::Log4perl->easy_init($DEBUG);
 
-    my $dd = Path::Tiny::path(File::Share::dist_dir('Game-EvonyTKR'));
+    my $dd    = Path::Tiny::path(File::Share::dist_dir('Game-EvonyTKR'));
     my $debug = $opt->{debug} ? 1 : 0;
 
     #my $result = $opt->{blortex} ? blortex() : blort();
@@ -58,9 +61,10 @@ package Game::EvonyTKR::Converter {
       my $bookHandler = Game::EvonyTKR::Converter::SkillBook->new(
         outputDir => $dd->child('/collections/data/skill books/'),
         debug     => $debug,
-        );
+      );
       $bookHandler->execute();
-    }elsif ($opt->mode eq 'ascending'){
+    }
+    elsif ($opt->mode eq 'ascending') {
       my $handler = Game::EvonyTKR::Converter::AscendingAttributes->new(
         outputDir => $dd->child('/collections/data/ascending attributes/'),
         debug     => $debug,
