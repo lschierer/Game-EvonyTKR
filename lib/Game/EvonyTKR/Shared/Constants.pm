@@ -193,13 +193,14 @@ class Game::EvonyTKR::Shared::Constants : isa(Game::EvonyTKR::Model::Logger) {
   # a direct phrase in a condition *or* a mapping to a condition
   field $words_condition_phrase : reader = 6;
 
-  method string_to_condition ($string) {
-    my $exactBuff   = first { $_ eq $string } $BuffConditionValues->@*;
-    my $exactDebuff = first { $_ eq $string } $DebuffConditionValues->@*;
-    my $map         = {
+  field $mapped_conditions :reader;
+
+  ADJUST {
+    Readonly::Scalar my $temp => {
       'In-Rally'             => "When Rallying",
       'Reduces Monster'      => "Monsters",            # debuff version
       'brings any dragon'    => 'brings a dragon',
+      'brings any spiritual beast'    => 'brings a spiritual beast',
       'to attack Monsters'   => 'Against Monsters',    # buff version
       'to attack'            => 'Attacking',
       'General is the Mayor' => "When City Mayor for this SubCity",
@@ -209,6 +210,13 @@ class Game::EvonyTKR::Shared::Constants : isa(Game::EvonyTKR::Model::Logger) {
       'attacking Monsters'                     => 'Against Monsters',
       'In-city'                                => 'In City',
     };
+    $mapped_conditions = $temp;
+  }
+
+  method string_to_condition ($string) {
+    my $exactBuff   = first { $_ eq $string } $BuffConditionValues->@*;
+    my $exactDebuff = first { $_ eq $string } $DebuffConditionValues->@*;
+    my $map         = $mapped_conditions;
 
     if ($exactBuff) {
       return $exactBuff;

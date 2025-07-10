@@ -21,7 +21,7 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
     $self->logger->debug("Processing Prolog fragment: $prolog_fragment");
 
     # Parse Prolog buff format: buff(attribute,troop,value,conditions)
-    if ($prolog_fragment =~ /^buff\(([^,]+),([^,]+),(\d+),\[([^\]]*)\]\)$/) {
+    if ($prolog_fragment =~ /^buff\(([^,]+),([^,]+),(\d+),\[(.+)\]\)$/) {
       my ($attr_atom, $troop_atom, $value, $conditions_str) = ($1, $2, $3, $4);
 
       # Convert atoms back to display format
@@ -40,8 +40,7 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
         foreach my $part (@condition_parts) {
           $part =~ s/^\s+|\s+$//g;    # trim whitespace
 
-          if ($part =~ /^'([^']+)'$/) {
-            # Quoted condition: 'brings a dragon'
+          if ($part =~ /^['"]([^'"]+)['"]$/) {            # Quoted condition: 'brings a dragon'
             push @conditions, $1;
             $self->logger->debug("Found quoted condition: '$1'");
           }
@@ -190,16 +189,45 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
         map {
           my $t = lc($_);
           my @l = split(/ /, $t);
-          sprintf('condition([%s]).', join(", ", map {"\"$_\""} @l));
+          sprintf('condition([%s]).', join(", ", map {"'$_'"} @l));
         } $self->BuffConditionValues->@*
       ),
       (
         map {
           my $t = lc($_);
           my @l = split(/ /, $t);
-          sprintf('condition([%s]).', join(", ", map {"\"$_\""} @l));
+          sprintf('condition([%s]).', join(", ", map {"'$_'"} @l));
         } $self->DebuffConditionValues->@*
       ),
+
+     (
+       map {
+         my $key = $_;
+         my $val = $self->mapped_conditions->{$key};
+         my @lhs_tokens = map { lc($_) } split(/ /, $key);
+         my $rhs_atom   = lc($val);
+         sprintf('condition_syn([%s], \'%s\').', join(', ', map { "'$_'" } @lhs_tokens), $rhs_atom);
+       } sort {
+      		my @aparts = split(/ /, $a);
+      		my @bparts = split(/ /, $b);
+      		return scalar(@aparts) <=> scalar(@bparts);
+		    } keys %{ $self->mapped_conditions }
+     ),
+
+     (
+       map {
+         my $key = $_;
+         my $val = $self->mapped_conditions->{$key};
+         my @lhs_tokens = map { lc($_) } split(/ /, $key);
+         my $rhs_atom   = lc($val);
+         sprintf("condition_syn_key([%s]).", join(', ', map { "'$_'" } @lhs_tokens));
+       } sort {
+      		my @aparts = split(/ /, $a);
+      		my @bparts = split(/ /, $b);
+      		return scalar(@aparts) <=> scalar(@bparts);
+		    } keys %{ $self->mapped_conditions }
+     ),
+
     ));
     # remove the following for prolog:
     #\x{0022}    # ASCII double quote "
@@ -217,11 +245,11 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
     $self->logger->debug("cleaned text is '$text'");
 
     # Send the raw string instead of tokenizing
-    my $quoted_text = "\"$text\"";    # Quote the string for Prolog
+    my $quoted_text = "'" . $text . "'";  # single-quote to create an atom
 
     my ($in_fh, $out_fh, $err_fh) = (undef, gensym, gensym);
     my $cmd = [
-      'swipl', '-s',
+      'swipl', '-q', '-s',
       $self->distDir->child('prolog/Game/EvonyTKR/Shared/buff_parser.pl')
     ];
     my $pid = open3($in_fh, $out_fh, $err_fh, @$cmd);
@@ -234,30 +262,20 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
     waitpid $pid, 0;
 
     # Debug logging
-    $self->logger->info("STDERR: " . join('', @err));
-    $self->logger->info("STDOUT: " . join('', @out));
+    foreach my $error_line (@err){
+      $self->logger->error("STDERR: $error_line");
+    }
+    foreach my $stdout_line (@out ) {
+      $self->logger->debug("STDOUT: $stdout_line");
+    }
+
 
     my $parsed = join('', @out);
     $parsed =~ s/^\s+|\s+$//g;
     $self->logger->info(sprintf('parsed text is %s', $parsed));
 
     # Extract just the buff list (last non-debug line)
-    my @output_lines = grep { $_ !~ /^DEBUG:/ } @out;
-    my $single       = join('', @output_lines);
-    my @buff_fragments;
-    if ($single =~ /\[buff/) {
-      if($single !~ /^\[(buff\(.+?\))(,)?/) {
-        $self->logger->error("buff_fragments does not match regex!!" . $single);
-      }
-      while ($single =~ s/^\[?(buff\(.+?\))(,)?//) {
-        my $f = $2;
-        $self->logger->debug("found frag $f");
-        push @buff_fragments, $1;
-      }
-    }
-    else {
-      push @buff_fragments, $single;
-    }
+    my @buff_fragments = grep { /^\s*buff\(/ } map { s/^\s+|\s+$//gr } @out;
 
     $self->logger->debug(
       "Split into " . scalar(@buff_fragments) . " buff fragments: " . join('----',@buff_fragments ));

@@ -4,94 +4,75 @@
 :- use_module(library(readutil)).
 :- use_module(library(lists)).
 :- use_module(library(dcg/basics)).
+:- style_check(-singleton).
 
-% Rule to filter out definite articles  (except 'the' because I need it)
-filter_articles --> [a], !, filter_articles. % Similarly, handle "a" and "an" if needed.
-filter_articles --> [an], !, filter_articles.
-filter_articles --> [Word], { \+ is_article(Word) }, filter_articles. % If not an article, include the word and continue filtering.
-filter_articles --> []. % Base case: an empty list is processed as is.
-
-% Predicate to check if a word is a definite article
-is_article(the).
-is_article(a).
-is_article(an).
-
-% Parse the input string into sentences, then into buffs
-parse_text(Buffs) -->
-    sentences(SentenceStrings),
-    { format('DEBUG: Found sentences: ~w~n', [SentenceStrings]),
-      maplist(parse_sentence_to_buffs, SentenceStrings, BuffLists),
-      append(BuffLists, Buffs)
-    }.
-
-% Parse sentences separated by periods
-sentences([S|Ss]) -->
-    string_without(".", Codes),
-    { Codes \= [], atom_codes(S, Codes) },
-    ( "." -> sentences(Ss) ; {Ss = []} ).
-sentences([]) --> [].
-
-
-% Convert a sentence string to buffs
-parse_sentence_to_buffs(SentenceAtom, Buffs) :-
-    format('DEBUG: Parsing sentence: ~w~n', [SentenceAtom]),
-    atom_string(SentenceAtom, SentenceStr),
-    split_string(SentenceStr, ' ', ' ', TokenStrings),
-    maplist(atom_string, Tokens, TokenStrings),
-    format('DEBUG: Sentence tokens: ~w~n', [Tokens]),
-    ( phrase(sentence_buffs(Buffs), Tokens) ->
-        format('DEBUG: Sentence parsed successfully: ~w~n', [Buffs])
-    ; format('DEBUG: Sentence parsing failed~n', []),
-      Buffs = []
-    ).
-
-
-% Parse buffs within a single sentence (tokenized)
-sentence_buffs([B|Bs]) --> buff(B), sentence_buffs(Bs).
-sentence_buffs(Buffs) --> buff(Buffs).
+% Top-level DCG to extract a flat list of buffs from a tokenized sentence
+sentence_buffs(All) -->
+    buff(Buffs),
+    sentence_buffs(Rest),
+    { append(Buffs, Rest, All) }.
 sentence_buffs([]) --> [].
 
-% Pattern 1: Original simple pattern
-buff(buff(AttributeAtom, TroopAtom, Value, ConditionList)) -->
-    optional_verb,
-    troop(TroopAtom),      % Automatically tries all troop patterns
-    attribute(AttributeAtom), % Automatically tries all attribute patterns
-    [by], [ValueAtom],
-    [when], optional_subject, optional_verb, condition_phrase(ConditionList),
-    { extract_value(ValueAtom, Value) }.
+% Entry point for a single buff pattern
+buff(B) --> buff_pattern(B).
 
-% Pattern 2: Matrix expansion for "increases ground troops and mounted troops defense and hp by 40%..."
-buff(Buffs) -->
-    optional_verb,
-    troop_list(Troops),
-    attribute_list(Attributes),
-    [by], [ValueAtom],
-    [when], condition_phrase(Condition),
-    { extract_value(ValueAtom, Value),
-      expand_matrix(Troops, Attributes, Value, Condition, Buffs)
-    }.
+% Pattern 1: Simple one-buff
+buff_pattern(Buffs) -->
+  optional_verb,
+  troop(TroopAtom),
+  attribute(AttributeAtom),
+  [by], [ValueAtom],
+  [when], optional_subject, optional_verb,
+  condition_phrase(ConditionSets),
+  { format("DEBUG: Flattened condition sets: ~w~n", [ConditionSets]) },
+  {
+    extract_value(ValueAtom, Value),
+    maplist({TroopAtom, AttributeAtom, Value}/[Conds, B]>>(
+      B = buff(AttributeAtom, TroopAtom, Value, Conds)
+    ), ConditionSets, Buffs)
+  },
+  { format("DEBUG: Matched simple buff: troop=~w attr=~w value=~w cond=~w~n",
+            [TroopAtom, AttributeAtom, Value, ConditionSets]) }.
 
-% Pattern 3: not quite so Matrixed for Sentence tokens: [increases,ground,troops,and,mounted,troops,attack,by,15%,when,general,brings,any,dragon]
-buff(Buffs) -->
-    optional_verb,
-    troop_list(Troops),
-    attribute_list(Attributes),
-    [by], [ValueAtom],
-    [when], condition_phrase(ConditionList),
-    { extract_value(ValueAtom, Value) }.
+% Pattern 2: Matrix expansion
+buff_pattern(Buffs) -->
+  optional_verb,
+  troop_list(Troops),
+  attribute_list(Attributes),
+  [by], [ValueAtom],
+  [when], condition_phrase(Condition),
+  { extract_value(ValueAtom, Value),
+    expand_matrix(Troops, Attributes, Value, Condition, Buffs) }.
+
+% Pattern 3: Another matrix variant
+buff_pattern(Buffs) -->
+  optional_verb,
+  troop_list(Troops),
+  attribute_list(Attributes),
+  [by], [ValueAtom],
+  [when], condition_phrase(ConditionList),
+  { extract_value(ValueAtom, Value),
+    expand_matrix(Troops, Attributes, Value, ConditionList, Buffs) }.
 
 
 % Helper for + value extraction
 extract_value_plus(ValueAtom, Value) :-
     atom_number(ValueAtom, Value).
 
-% Helper for condition words
-condition_word(marching) --> [marching].
-condition_word(attacking) --> [attacking].
+% DCG wrapper for parsing conditions inside buff
+condition_phrase(ConditionSets) -->
+    remainder(Rest),
+    {
+        parse_complex_condition(Rest, ConditionSets)
+    }.
 
-% Helper for location words
-location_word('in-city') --> ['in-city'].
-location_word('out-city') --> ['out-city'].
+% flatten each condition list into separate buffs
+flatten_condition_sets([], []).
+
+flatten_condition_sets([CondList | RestSets], Buffs) :-
+    expand_matrix(Troops, Attributes, Value, CondList, ThisBuffs),
+    flatten_condition_sets(RestSets, OtherBuffs),
+    append(ThisBuffs, OtherBuffs, Buffs).
 
 % Parse troop list: "ground troops and mounted troops"
 troop_list([T1, T2]) -->
@@ -106,72 +87,63 @@ attribute_list([A1, A2]) -->
 attribute_list([A]) -->
     attribute(A).
 
-% Parse individual troop names
-troop_name(ground_troops) --> [ground], [troops].
-troop_name(mounted_troops) --> [mounted], [troops].
+% Base case
+normalize_condition_tokens([], [[]]).
 
-% Parse condition phrase
-condition_phrase(Conditions) -->
-    condition_tokens(TokenList),
-    { parse_complex_condition(TokenList, Conditions) }.
+% Match a condition and recurse
+normalize_condition_tokens(Input, Result) :-
+    match_any_condition(Input, Match, Remaining, Canonical),
+    normalize_condition_tokens(Remaining, RestVariants),
+    findall([Canonical | Rest], member(Rest, RestVariants), Result).
 
-% Extract all tokens from "when" to end of sentence
-condition_tokens([T|Ts]) --> [T], condition_tokens(Ts).
-condition_tokens([]) --> [].
+% Handle disjunction: split on "or"
+normalize_condition_tokens(Input, Result) :-
+    append(Left, [or | Right], Input),
+    normalize_condition_tokens(Left, LeftVariants),
+    normalize_condition_tokens(Right, RightVariants),
+    append(LeftVariants, RightVariants, Result).
 
-parse_complex_condition(TokenList, Conditions) :-
-    % Normalize tokens: handle both single token and multi-token substitutions
-    condition_map(TokenList, NormalizedTokens),
-    %format('DEBUG: Original tokens: ~w~n', [TokenList]),
-    %format('DEBUG: Normalized tokens: ~w~n', [NormalizedTokens]),
+% Skip unmatchable token
+normalize_condition_tokens([_ | T], Result) :-
+    normalize_condition_tokens(T, Result).
 
-    % Convert to set for subset matching
-    list_to_set(NormalizedTokens, TokenSet),
-    %format('DEBUG: Token set: ~w~n', [TokenSet]),
+% Match either a canonical or synonym condition prefix
+% Match mapped synonyms
+match_any_condition(Input, Match, Remaining, Canonical) :-
+    condition_syn(Match, Canonical),
+    append(Match, Remaining, Input),
+    format("DEBUG: matched synonym: ~w -> ~w~n", [Match, Canonical]).
 
-    findall(Condition, (
-        condition(ConditionStrings),
-        %format('DEBUG: Trying condition: ~w~n', [ConditionStrings]),
-        % Convert condition strings to atoms
-        maplist(atom_string, ConditionAtoms, ConditionStrings),
-        %format('DEBUG: Condition as atoms: ~w~n', [ConditionAtoms]),
-        ( subset(ConditionAtoms, TokenSet) ->
-            ( atomic_list_concat(ConditionStrings, ' ', Condition)%,
-              %format('DEBUG: MATCHED condition: ~w -> ~w~n', [ConditionAtoms, Condition])
-            )
-        ; ( %format('DEBUG: FAILED to match condition: ~w~n', [ConditionAtoms]),
-            fail
-          )
-        )
-    ), Conditions).
+% Match canonical phrases directly
+match_any_condition(Input, Match, Remaining, Canonical) :-
+    condition(Match),
+    append(Match, Remaining, Input),
+    atomics_to_string(Match, ' ', Canonical),
+    format("DEBUG: matched canonical: ~w -> ~w~n", [Match, Canonical]).
 
-
-% Normalize the entire token list to handle multi-token patterns
-condition_map([], []).
-condition_map([leading, the, army, to, attack, monsters|Rest], ['against monsters'|NormalizedRest]) :-
-    !,
-condition_map([to, attack|Rest], [attacking|NormalizedRest]) :-
-    !,
-    condition_map(Rest, NormalizedRest).
-condition_map([any|Rest], [a|NormalizedRest]) :-
-    !,
-    condition_map(Rest, NormalizedRest).
-condition_map([Token|Rest], [Token|NormalizedRest]) :-
-    condition_map(Rest, NormalizedRest).
-
+parse_complex_condition(Tokens, ConditionSets) :-
+    format('DEBUG: Raw condition tokens: ~w~n', [Tokens]),
+    normalize_condition_tokens(Tokens, ConditionSets),
+    forall(
+        member(Cond, ConditionSets),
+        format('DEBUG: Normalized Canonicals: ~w~n', [Cond])
+    ).
 
 % Expand the matrix: create all troop×attribute combinations
-expand_matrix(Troops, Attributes, Value, Condition, Buffs) :-
-    findall(buff(Attr, Troop, Value, Condition),
-            (member(Troop, Troops), member(Attr, Attributes)),
-            Buffs).
+expand_matrix(Troops, Attrs, Value, ConditionSets, Buffs) :-
+    findall(buff(Attr, Troop, Value, Conds),
+      (
+        member(Troop, Troops),
+        member(Attr, Attrs),
+        member(Conds, ConditionSets)
+      ),
+      Buffs).
 
 
 % Helper to extract numeric value from percentage
 extract_value(ValueAtom, Value) :-
     atom_string(ValueAtom, ValueStr),
-    string_concat(NumStr, "%", ValueStr),
-    number_string(Value, NumStr).
+    number_string(Value, ValueStr).
 
 optional_verb --> [increases].
 optional_verb --> [reduces].
@@ -180,15 +152,58 @@ optional_verb --> [].
 optional_subject --> [general].
 optional_subject --> [].
 
+is_junk_token('.') :- !.
+is_junk_token(',') :- !.
+is_junk_token('%') :- !.
+is_junk_token('"') :- !.
+is_junk_token('“') :- !.
+is_junk_token('”') :- !.
+is_junk_token('’') :- !.
+is_junk_token(_) :- fail.
+
+% entry point from main
+parse_all_buffs(InputStr, FlatBuffs) :-
+    normalize_space(string(Cleaned), InputStr),
+    split_string(Cleaned, ".", "", Sentences),
+    maplist(string_lower, Sentences, Lowered),
+    maplist(tokenize_and_parse, Lowered, BuffLists),
+    append(BuffLists, FlatBuffs).
+
+tokenize_and_parse(SentenceStr, Buffs) :-
+    tokenize_atom(SentenceStr, RawTokens),
+    exclude(is_junk_token, RawTokens, Tokens),
+    format('DEBUG: Tokens about to be matched: ~w~n', [Tokens]),
+    ( phrase(sentence_buffs(Buffs), Tokens) ->
+        true
+    ;   Buffs = []  % fallback on failure
+    ),
+    format('DEBUG: Buffs are: ~w~n', [Buffs]).
+
+% perl and prolog do not agree on what does
+% and does not need to be quoted
+
+print_buffs([]).
+print_buffs([buff(Attr, Troop, Val, Conds)|Rest]) :-
+    format("buff(~w,~w,~w,[", [Attr, Troop, Val]),
+    print_conditions(Conds),
+    format("])~n", []),
+    print_buffs(Rest).
+
+print_conditions([]).
+print_conditions([C]) :-
+    format("~q", [C]).
+print_conditions([C|Cs]) :-
+    format("~q,", [C]),
+    print_conditions(Cs).
+
 main :-
-  read_term(InputString, []),
-  format('DEBUG: Input string: ~w~n', [InputString]),
-  atom_codes(InputString, Codes),
-  ( phrase(parse_text(Buffs), Codes) ->
-      format('DEBUG: Parse succeeded with: ~w~n', [Buffs]),
-      write_term(Buffs, [quoted(true)]), nl
-  ; format('DEBUG: Parse failed~n', []),
-    writeln('[]') ),
-  halt.
+    read(InputAtom),
+    atom_string(InputAtom, InputStr),
+    parse_all_buffs(InputStr, Buffs),
+    print_buffs(Buffs),
+    halt.
+
+wrap_normalize(In, Out) :-
+    ( catch(normalize_space(string(Out), In), E, (print_message(error, E), Out = "")) ).
 
 :- initialization(main).

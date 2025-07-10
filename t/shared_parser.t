@@ -38,6 +38,12 @@ subtest 'fake singlebuff book' => sub {
       push(@hashedBuffs, @nb);
     }
 
+    if(scalar @hashedBuffs > 0 ) {
+      diag "buffs are now " . Data::Printer::np(@hashedBuffs);
+    } else {
+      diag "No buffs returned."
+    }
+
     is scalar(@hashedBuffs), 1, 'Parsed 1 buffs';
 
     ok(
@@ -53,7 +59,7 @@ subtest 'fake singlebuff book' => sub {
   done_testing;
 
 };
-
+require Scalar::Util;
 ## Monarchy Restoration
 ## Increases mounted troops’ attack by 50% when General is leading the army to attack. Increases ground troops and mounted troops’ defense and HP by 40% when General brings any Dragon or Spiritual Beast to attack.
 diag 'start of Monarchy Restoration Skill Book';
@@ -65,9 +71,18 @@ subtest 'Monarchy Restoration Skill Book' => sub {
   foreach my $frag (@fragments) {
     diag "frag is " . $frag;
     my @nb = $parser->normalize_buff($frag);
+    diag "size: " . scalar(@nb);
+    diag "nb is " . Data::Printer::np(\@nb);
     push(@hashedBuffs, @nb);
   }
-  diag "buffs are now " . Data::Printer::np(@hashedBuffs);
+  if(scalar @hashedBuffs > 0 ) {
+    diag "hashedBuffs size " . scalar(@hashedBuffs);
+    for my $i (0 .. $#hashedBuffs) {
+        diag "hashedBuffs[$i] = " . Data::Printer::np($hashedBuffs[$i]);
+    }
+  } else {
+    diag "No buffs returned."
+  }
   is scalar(@hashedBuffs), 5, 'Parsed 1 Monarchy Restoration buffs';
 
   ok(
