@@ -149,7 +149,7 @@ subtest 'Dictator Skill Book' => sub {
       attribute  => 'Attack',
       value      => 45,
       class      => 'Mounted Troops',
-      conditions => ['Against Monsters']
+      conditions => ["leading the army",'Against Monsters']
     ),
     'Mounted Troops 45% attack buff (Against Monsters)'
   );

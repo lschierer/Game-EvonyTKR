@@ -69,7 +69,7 @@ subtest 'Monarchy Restoration Skill Book' => sub {
   my @fragments = $parser->tokenize_buffs($text);
   my @hashedBuffs;
   foreach my $frag (@fragments) {
-    diag "frag is " . $frag;
+    diag "frag is " . Data::Printer::np($frag);
     my @nb = $parser->normalize_buff($frag);
     diag "size: " . scalar(@nb);
     diag "nb is " . Data::Printer::np(\@nb);
