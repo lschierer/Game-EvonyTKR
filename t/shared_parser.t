@@ -33,7 +33,7 @@ subtest 'fake singlebuff book' => sub {
     my @fragments = $parser->tokenize_buffs($text);
     my @hashedBuffs;
     foreach my $frag (@fragments) {
-      diag "frag is " . $frag;
+      diag "frag is " . Data::Printer::np($frag);
       my @nb = $parser->normalize_buff($frag);
       push(@hashedBuffs, @nb);
     }

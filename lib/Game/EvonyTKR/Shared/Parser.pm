@@ -17,87 +17,54 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
   use namespace::autoclean;
 
   # Simplified normalize_buff - parses Prolog output format
-  method normalize_buff ($prolog_fragment) {
-    $self->logger->debug("Processing Prolog fragment: $prolog_fragment");
+  method normalize_buff ($buff_hash) {
+    $self->logger->debug("Processing Prolog fragment: " . Data::Printer::np($buff_hash));
 
-    # Parse Prolog buff format: buff(attribute,troop,value,conditions)
-    if ($prolog_fragment =~ /^buff\(([^,]+),([^,]+),(\d+),\[(.+)\]\)$/) {
-      my ($attr_atom, $troop_atom, $value, $conditions_str) = ($1, $2, $3, $4);
+    my @result;
 
-      # Convert atoms back to display format
-      my $attribute  = $self->atom_to_attribute($attr_atom);
-      my $troop_type = $self->atom_to_troop($troop_atom);
+    unless (ref $buff_hash eq 'HASH') {
+      $self->logger->warn("Expected buff as hash, got: $buff_hash");
+      return;
+    }
 
-      # Parse conditions list
-      my @conditions;
-      if ($conditions_str) {
-        $self->logger->debug("Raw conditions string: '$conditions_str'");
+    my $attribute_atom  = $buff_hash->{attribute};
+    my $troop_atom      = $buff_hash->{troop};
+    my $value           = $buff_hash->{value};
+    my $conditions_list = $buff_hash->{conditions} // [];
 
-# Handle mixed quoted and unquoted conditions: attacking,'brings a dragon','brings a spiritual beast'
-# Split on commas first, then handle quoted vs unquoted
-        my @condition_parts = split(/,/, $conditions_str);
+    # Decode atom into full names
+    my $attribute  = $self->atom_to_attribute($attribute_atom);
+    my $troop_type = $self->atom_to_troop($troop_atom);
 
-        foreach my $part (@condition_parts) {
-          $part =~ s/^\s+|\s+$//g;    # trim whitespace
+    # Create the buff object
+    my $buff_value = Game::EvonyTKR::Model::Buff::Value->new(
+      number => $value,
+      unit   => 'percentage'
+    );
 
-          if ($part =~ /^['"]([^'"]+)['"]$/) {            # Quoted condition: 'brings a dragon'
-            push @conditions, $1;
-            $self->logger->debug("Found quoted condition: '$1'");
-          }
-          elsif ($part =~ /^[a-z_]+$/) {
-            # Unquoted single word condition: attacking
-            push @conditions, $part;
-            $self->logger->debug("Found unquoted condition: '$part'");
-          }
-          else {
-            $self->logger->warn("Unrecognized condition format: '$part'");
-          }
-        }
+    my $buff = Game::EvonyTKR::Model::Buff->new(
+      attribute    => $attribute,
+      value        => $buff_value,
+      targetedType => $troop_type || '',
+      passive      => 0,
+    );
 
-        $self->logger->debug("Final parsed conditions: ["
-            . join(', ', map {"'$_'"} @conditions)
-            . "]");
-      }
-      else {
-        $self->logger->debug("No conditions string provided");
-      }
-
-      # Create the buff object
-      my $buff_value = Game::EvonyTKR::Model::Buff::Value->new(
-        number => $value,
-        unit   => 'percentage'
-      );
-
-      my $buff = Game::EvonyTKR::Model::Buff->new(
-        attribute    => $attribute,
-        value        => $buff_value,
-        targetedType => $troop_type || '',
-        passive      => 0,
-      );
-
-      # Add conditions
-      foreach my $condition (@conditions) {
-        $self->logger->debug("Processing condition: '$condition'");
-        # Map lowercase Prolog output to proper Constants format
-        my $normalized_condition = $self->normalize_condition_case($condition);
+    # Handle condition normalization
+    foreach my $cond (@$conditions_list) {
+      $self->logger->debug("Processing condition: '$cond'");
+      my $normalized = $self->normalize_condition_case($cond);
+      if (defined $normalized) {
+        my $r = $buff->set_condition($normalized);
         $self->logger->debug(
-          "Normalized condition: '$condition' -> '$normalized_condition'");
-        my $result = $buff->set_condition($normalized_condition);
-        $self->logger->debug("set_condition result: $result");
+          "Added buff condition: $normalized ; set_condition result: $r");
+      } else {
+        $self->logger->warn("Could not normalize condition: '$cond'");
       }
-
-      # Log final buff conditions
-      my @final_conditions = $buff->conditions();
-      $self->logger->debug("Final buff conditions: ["
-          . join(', ', map {"'$_'"} @final_conditions)
-          . "]");
-
-      return ($buff);
     }
-    else {
-      $self->logger->error("Could not parse Prolog fragment: $prolog_fragment");
-      return ();
-    }
+
+    push @result, $buff;
+
+    return @result;
   }
 
   method normalize_condition_case($prolog_condition) {
@@ -249,7 +216,7 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
 
     my ($in_fh, $out_fh, $err_fh) = (undef, gensym, gensym);
     my $cmd = [
-      'swipl', '-q', '-s',
+      'swipl', '-q', '-g', 'main', '-s',
       $self->distDir->child('prolog/Game/EvonyTKR/Shared/buff_parser.pl')
     ];
     my $pid = open3($in_fh, $out_fh, $err_fh, @$cmd);
@@ -272,14 +239,61 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
 
     my $parsed = join('', @out);
     $parsed =~ s/^\s+|\s+$//g;
-    $self->logger->info(sprintf('parsed text is %s', $parsed));
+    $self->logger->info(sprintf('parsed text is -- %s --', $parsed));
 
     # Extract just the buff list (last non-debug line)
-    my @buff_fragments = grep { /^\s*buff\(/ } map { s/^\s+|\s+$//gr } @out;
+    my @buff_fragments;
+    my @json_lines;
+    my @json_buffer;
 
-    $self->logger->debug(
-      "Split into " . scalar(@buff_fragments) . " buff fragments: " . join('----',@buff_fragments ));
-    return @buff_fragments;
+    my $last_buff_index = -1;
+    for (my $i = 0; $i < @out; $i++) {
+        if ($out[$i] =~ /^buff\(/) {
+            $last_buff_index = $i;
+        }
+    }
+
+    foreach my $line (@out) {
+      chomp $line;
+      if ($line =~ /^DEBUG:/) {
+        $self->logger->debug("STDOUT: $line");
+      } elsif ($line =~ /^buff\(/) {
+        push @buff_fragments, $line;  # optional: keep legacy Prolog format
+      }
+    }
+
+    if ($last_buff_index >= 0) {
+      for my $line (@out[($last_buff_index + 1) .. $#out]) {
+          push @json_buffer, $line;
+      }
+
+      # Step 3: Parse buffered JSON lines
+      my $json_text = join("\n", @json_buffer);
+      $json_text =~ s/\}\s+{/},{/g;
+      eval {
+          $json_text = "[$json_text]";
+          $self->logger->debug("json text is -- $json_text -- ");
+          my $decoded = JSON::PP->new(utf8 => 1)->decode($json_text);
+          push @json_lines, @$decoded;
+      };
+      if ($@) {
+          $self->logger->warn("Failed to parse JSON block: $@");
+      }
+    } else {
+        $self->logger->warn("No buff(...) line found; skipping JSON extraction");
+    }
+
+    $self->logger->debug(sprintf(
+      'found %d buffs: %s',
+      scalar @buff_fragments,
+      join(', ', @buff_fragments)
+    ));
+    if(scalar@json_lines != scalar @buff_fragments) {
+      $self->logger->warn(sprintf('uneven output detected: %s versus %s, are there missing output lines?',
+        scalar @json_lines, scalar @buff_fragments
+      ));
+    }
+    return @json_lines;
   }
 }
 1;
