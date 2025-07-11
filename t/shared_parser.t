@@ -22,6 +22,7 @@ Log::Log4perl::init($logConfig->canonpath());
 
 my $parser = Game::EvonyTKR::Shared::Parser->new();
 $parser->logger->level($DEBUG);   # <-- tried each solution with and without this line
+$parser->generate_grammar();
 
 use List::MoreUtils qw(uniq);
 

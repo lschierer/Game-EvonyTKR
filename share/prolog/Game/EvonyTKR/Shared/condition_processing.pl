@@ -1,132 +1,115 @@
 % File: condition_processing.pl
-% All condition parsing and processing logic
+% All condition parsing and processing logic using modern DCG rules
 
-% Assumes condition([Phrase]) where [Phrase] is a list
-% with precisely 1, or 2 Words is a valid condition.
+% === Simple condition matchers ===
 
+% Matches a single condition phrase (including synonyms) and returns its canonical string
 short_condition(CondStr) -->
-    [W1, W2],
-    { condition([W1, W2]), atomics_to_string([W1, W2], ' ', CondStr) }.
+    condition(Match),
+    {
+        atomics_to_string(Match, ' ', CondStr),
+        format("DEBUG: short_condition matched: ~w -> ~w~n", [Match, CondStr])
+    }.
 
-short_condition(CondStr) -->
-    [W1],
-    { condition([W1]), atomics_to_string([W1], ' ', CondStr) }.
-
-% DCG wrapper for parsing and flattening condition sets
+% Matches a single condition phrase from start of input and returns canonical string
 consume_condition(Canonical) -->
-  match_prefix(Consumed),
-  {
-    match_any_condition(Consumed, _, _, Canonical)
-  }.
+    remainder(Tokens),
+    {
+        greedy_condition_match(Tokens, [Canonical])
+    }.
 
-match_prefix([Token|Rest]) -->
-  [Token],
-  match_prefix(Rest).
-match_prefix([]) --> [].
-
-tokens_to_match([], _) --> [].
+% === Merged condition sets (multiple conditions, possibly with "or") ===
 
 merged_conditions(UniqueConditions) -->
-  remainder(Rest),
-  {
-    extract_condition_atoms(Rest, UniqueConditions)
-  }.
+    remainder(Rest),
+    {
+        extract_condition_atoms(Rest, UniqueConditions)
+    }.
+
+% === Helper for Disjunction ===
+
+% for use inside disjunct_variant loops
+normalize_condition_tokens([], []).
+normalize_condition_tokens(Input, [Canonical|Rest]) :-
+  match_any_condition(Input, _Match, Remaining, Canonical),
+  normalize_condition_tokens(Remaining, Rest).
+normalize_condition_tokens([_|T], Rest) :-
+  normalize_condition_tokens(T, Rest).
+
+% === Disjunction and greedy parsing ===
 
 % Main condition extraction logic - handles both simple and complex cases
 extract_condition_atoms(Tokens, UniqueConditions) :-
   format('DEBUG: Raw condition tokens: ~w~n', [Tokens]),
-
-  % Check if we need disjunctive processing (contains "or" or complex overlaps)
   ( needs_disjunctive_processing(Tokens) ->
-    % Complex case: use the full disjunctive logic
-    findall(Flat,
-      (
-      disjunct_variant(Tokens, Variant),
-      normalize_condition_tokens(Variant, Flat),
-      format('DEBUG: Normalized Canonicals: ~w~n', [Flat])
-      ),
-      AllConds),
-    flatten(AllConds, FlatAll),
-    list_to_set(FlatAll, ConditionsSet)
+      % Use tolerant match for overlapping disjunctions
+      findall(Flat,
+          (
+              disjunct_variant(Tokens, Variant),
+              normalize_condition_tokens(Variant, Flat),
+              format('DEBUG: Normalized Canonicals: ~w~n', [Flat])
+          ),
+          AllConds),
+      flatten(AllConds, FlatAll),
+      list_to_set(FlatAll, ConditionsSet)
   ;
-    % Simple case: use greedy longest-match processing
-    greedy_condition_match(Tokens, ConditionsSet),
-    format('DEBUG: Greedy match result: ~w~n', [ConditionsSet])
+      % Default: greedy one-pass match
+      greedy_condition_match(Tokens, ConditionsSet),
+      format('DEBUG: Greedy match result: ~w~n', [ConditionsSet])
   ),
-
-  % Assign the result to UniqueConditions
   UniqueConditions = ConditionsSet,
   format("DEBUG: Final condition sets: ~w~n", [UniqueConditions]).
 
 % Detect if disjunctive processing is needed
 needs_disjunctive_processing(Tokens) :-
-  member(or, Tokens), !.
-needs_disjunctive_processing(_Tokens) :-
-  % Add other complex cases here if needed
-  fail.
+    member(or, Tokens), !.
+needs_disjunctive_processing(_) :- fail.
 
-% === GREEDY MATCHING (for simple cases) ===
+% === Greedy matcher ===
 
-% Greedy longest-match for simple cases
 greedy_condition_match([], []).
-greedy_condition_match(Tokens, [Condition|Rest]) :-
-    % Find the longest possible match starting from current position
-    find_longest_match(Tokens, Match, Remaining, Condition),
-    !,  % Cut to prevent backtracking
+greedy_condition_match(Tokens, [Canonical | Rest]) :-
+    find_longest_match(Tokens, Match, Remaining, Canonical),
+    !,
     greedy_condition_match(Remaining, Rest).
-greedy_condition_match([_|Tokens], Conditions) :-
-    % Skip unmatched token and continue
-    greedy_condition_match(Tokens, Conditions).
+greedy_condition_match([_ | Tokens], Rest) :-
+    greedy_condition_match(Tokens, Rest).
 
-% Find the single longest match at the current position
-find_longest_match(Tokens, BestMatch, BestRemaining, BestCondition) :-
-    findall([Len, Match, Remaining, Condition],
-            (match_any_condition(Tokens, Match, Remaining, Condition),
-              length(Match, Len)),
-            Matches),
-    Matches \= [],  % Ensure we found at least one match
-    sort(1, @>=, Matches, [[_MaxLen, BestMatch, BestRemaining, BestCondition]|_]).
+find_longest_match(Tokens, BestMatch, BestRemaining, BestCanonical) :-
+    findall([Len, Match, Remaining, Canonical],
+        ( match_any_condition(Tokens, Match, Remaining, Canonical),
+          length(Match, Len)
+        ),
+        Matches),
+    Matches \= [],
+    sort(1, @>=, Matches, [[_Len, BestMatch, BestRemaining, BestCanonical] | _]).
 
-% === DISJUNCTIVE PROCESSING (for complex cases with "or") ===
+% === Condition matching ===
 
-% Generate disjunctive split variants from input tokens
+match_any_condition(Input, Match, Remaining, Canonical) :-
+    phrase(condition(Match), Input),
+    append(Match, Remaining, Input),
+    atomics_to_string(Match, ' ', Canonical),
+    format("DEBUG: matched condition: ~w -> ~w~n", [Match, Canonical]).
+
+% === Disjunctive splits ===
+
 disjunct_variant(Tokens, Left) :-
-  append(Prefix, [or | Suffix], Tokens),
-  append(PrefixStart, LeftDisj, Prefix),
-  append(_RightDisj, _SuffixEnd, Suffix),
-  append(PrefixStart, LeftDisj, Left).
+    append(Prefix, [or | Suffix], Tokens),
+    append(PrefixStart, LeftDisj, Prefix),
+    append(_, _, Suffix),
+    append(PrefixStart, LeftDisj, Left).
 
 disjunct_variant(Tokens, Right) :-
-  append(Prefix, [or | Suffix], Tokens),
-  append(PrefixStart, _LeftDisj, Prefix),
-  append(RightDisj, SuffixEnd, Suffix),
-  append(PrefixStart, RightDisj, Right).
+    append(Prefix, [or | Suffix], Tokens),
+    append(_, _, Prefix),
+    append(RightDisj, _, Suffix),
+    append(_, RightDisj, Right).
 
-disjunct_variant(Tokens, Tokens). % default: no "or"
+%fallback
+disjunct_variant(Tokens, Tokens) :-
+    \+ member(or, Tokens).
 
-% Normalize a single token list variant into canonical conditions
-normalize_condition_tokens([], []).
-normalize_condition_tokens(Input, [Canonical|Rest]) :-
-  match_any_condition(Input, _Match, Remaining, Canonical),
-  normalize_condition_tokens(Remaining, Rest).
-normalize_condition_tokens([_|T], Norm) :-
-  normalize_condition_tokens(T, Norm). % skip unmatched
+% === Token cleanup ===
 
-% === CONDITION MATCHING ===
-
-
-
-
-% Match either a canonical or synonym condition prefix
-% Match mapped synonyms first (more specific)
-match_any_condition(Input, Match, Remaining, Canonical) :-
-  condition_syn(Match, Canonical),
-  append(Match, Remaining, Input),
-  format("DEBUG: matched synonym: ~w -> ~w~n", [Match, Canonical]).
-
-% Match canonical phrases directly
-match_any_condition(Input, Match, Remaining, Canonical) :-
-  condition(Match),
-  append(Match, Remaining, Input),
-  atomics_to_string(Match, ' ', Canonical),
-  format("DEBUG: matched canonical: ~w -> ~w~n", [Match, Canonical]).
+tokens_to_match([], _) --> [].

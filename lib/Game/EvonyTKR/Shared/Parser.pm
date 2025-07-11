@@ -11,14 +11,15 @@ require Game::EvonyTKR::Model::Buff;
 require Game::EvonyTKR::Model::Buff::Value;
 
 class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
-  use List::AllUtils qw( first all any none );
+  use List::AllUtils qw( first all any none uniq );
   use IPC::Open3;
   use Symbol 'gensym';
   use namespace::autoclean;
 
   # Simplified normalize_buff - parses Prolog output format
   method normalize_buff ($buff_hash) {
-    $self->logger->debug("Processing Prolog fragment: " . Data::Printer::np($buff_hash));
+    $self->logger->debug(
+      "Processing Prolog fragment: " . Data::Printer::np($buff_hash));
 
     my @result;
 
@@ -33,8 +34,7 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
     my $conditions_list = $buff_hash->{conditions} // [];
 
     # Decode atom into full names
-    my $attribute  = $self->atom_to_attribute($attribute_atom);
-
+    my $attribute = $self->atom_to_attribute($attribute_atom);
 
     # Create the buff object
     my $buff_value = Game::EvonyTKR::Model::Buff::Value->new(
@@ -43,15 +43,15 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
     );
 
     my $buff = Game::EvonyTKR::Model::Buff->new(
-      attribute    => $attribute,
-      value        => $buff_value,
-      passive      => 0,
+      attribute => $attribute,
+      value     => $buff_value,
+      passive   => 0,
     );
 
-    if(ref($troop_atom) eq 'ARRAY') {
+    if (ref($troop_atom) eq 'ARRAY') {
       $troop_atom = $troop_atom->[0];
     }
-    if(length($troop_atom)) {
+    if (length($troop_atom)) {
       $self->logger->debug("troop_atom is '$troop_atom'");
       my $troop_type = $self->atom_to_troop($troop_atom);
       $buff->set_target($troop_type);
@@ -60,11 +60,12 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
     # Handle condition normalization
     foreach my $cond (@$conditions_list) {
       my $r;
-      if($cond eq 'enemy') {
-       $r = $buff->set_condition('Enemy');
-       $self->logger->debug(
-         "Added debuff condition: 'Enemy' ; set_condition result: $r");
-      } elsif($cond eq 'monsters') {
+      if ($cond eq 'enemy') {
+        $r = $buff->set_condition('Enemy');
+        $self->logger->debug(
+          "Added debuff condition: 'Enemy' ; set_condition result: $r");
+      }
+      elsif ($cond eq 'monsters') {
         $r = $buff->set_condition('Monsters');
         $self->logger->debug(
           "Added debuff condition: 'Monsters' ; set_condition result: $r");
@@ -76,7 +77,8 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
           $r = $buff->set_condition($normalized);
           $self->logger->debug(
             "Added buff condition: $normalized ; set_condition result: $r");
-        } else {
+        }
+        else {
           $self->logger->warn("Could not normalize condition: '$cond'");
         }
       }
@@ -143,117 +145,132 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
     return $self->string_to_trooptype($troop) || ucfirst($troop);
   }
 
-  method tokenize_buffs ($text) {
-
+  method generate_grammar {
     my $grammar = Path::Tiny::path(
       'share/prolog/Game/EvonyTKR/Shared/EvonyBuffDictionary.pl');
-    $grammar->spew_utf8(join("\n",sort(
+    my @rules;
 
-      # Generate DCG rules for troops
-      (
-        map {
+    # Generate DCG rules for troops
+    push @rules, map {
+      my $t    = lc($_);
+      my @l    = split(/ /, $t);
+      my $base = $l[1] =~ s/s$//r;
+      my @s;
+      foreach my $index (0 .. $#l) {
+        $s[$index] = $index ? $base : $l[$index];
+      }
+      my $atom   = join('_',    @l);
+      my $tokens = join('], [', @l);
 
-          my $t      = lc($_);
-          my @l      = split(/ /, $t);
-          my $base = $l[1] =~ s/s$//r;
-          my @s;
-          foreach my $index ( 0..$#l ) {
-            $s[$index] = $index ?  $base : $l[$index] ;
-          }
-          my $atom   = join('_',    @l);
-          my $tokens = join('], [', @l);
+      my $stokens = join('], [', @s);
+      my @r2;
+      push @r2, sprintf('troop(%s) --> [%s].', $atom, $tokens);
+      push @r2, sprintf('troop(%s) --> [%s].', $atom, $stokens);
+      @r2;
+    } values $self->TroopTypeValues->%*;
 
-          my $stokens = join ('], [', @s);
-          my @rules;
-          push @rules, sprintf('troop(%s) --> [%s].', $atom, $tokens);
-          push @rules, sprintf('troop(%s) --> [%s].', $atom, $stokens);
-          @rules;
-        } values $self->TroopTypeValues->%*
-      ),
+    # Generate DCG rules for attributes
+    push @rules, map {
+      my $t = lc($_);
+      if ($_ =~ /^SubCity (.+)$/i) {
+        my $base_attr    = lc($1);
+        my @l            = split(/ /, $base_attr);
+        my $base_atom    = join('_', @l);
+        my $subcity_atom = "subcity_" . $base_atom;
 
-      # Generate DCG rules for attributes
-      (
-        map {
-          my $t      = lc($_);
-          if($_ =~ /^SubCity (.+)$/i) {
-            my $base_attr = lc($1);
-            my @l = split(/ /, $base_attr);
-            my $base_atom = join('_', @l);
-            my $subcity_atom = "subcity_" . $base_atom;
+        sprintf('subcity_attribute(%s) --> [%s].', $base_atom,
+          join('], [', @l));
+      }
+      else {
+        my @l      = split(/ /, $t);
+        my $atom   = join('_',    @l);
+        my $tokens = join('], [', @l);
+        my @r2;
+        push @r2, sprintf('attribute(%s) --> [%s].', $atom, $tokens);
 
-            sprintf('subcity_attribute(%s) --> [%s].', $base_atom, join('], [', @l));
-          }else {
-            my @l      = split(/ /, $t);
-            my $atom   = join('_',    @l);
-            my $tokens = join('], [', @l);
-            my @rules;
-            push @rules, sprintf('attribute(%s) --> [%s].', $atom, $tokens);
+        if (scalar @l > 1 && $l[1] eq 'to') {
+          $l[1] = 'into';
 
-            if(scalar @l > 1 && $l[1] eq 'to') {
-              $l[1] = 'into';
-
+          $tokens = join('], [', @l);
+          push @r2, sprintf('attribute(%s) --> [%s].', $atom, $tokens);
+          if (scalar @l >= 2) {
+            if ($l[2] =~ /(?:wounded|death)/i) {
+              push @l, 'rate';
               $tokens = join('], [', @l);
-              push @rules, sprintf('attribute(%s) --> [%s].', $atom, $tokens);
-              if( scalar @l >= 2) {
-                if($l[2] =~/(?:wounded|death)/i ) {
-                  push @l, 'rate';
-                  $tokens = join('], [', @l);
-                  push @rules, sprintf('attribute(%s) --> [%s].', $atom, $tokens);
-                }
-              }
+              push @r2, sprintf('attribute(%s) --> [%s].', $atom, $tokens);
             }
-            @rules;
           }
-        } $self->AttributeValues->@*
-      ),
+        }
+        @r2;
+      }
+    } $self->AttributeValues->@*;
 
-      # Keep validation predicates for conditions
-      (
-        map {
-          my $t = lc($_);
-          my @l = split(/ /, $t);
-          sprintf('condition([%s]).', join(", ", map {"'$_'"} @l));
-        } $self->BuffConditionValues->@*
-      ),
-      (
-        map {
-          my $t = lc($_);
-          my @l = split(/ /, $t);
-          sprintf('condition([%s]).', join(", ", map {"'$_'"} @l));
-        } $self->DebuffConditionValues->@*
-      ),
+    # Keep validation predicates for conditions
+    push @rules, map {
+      my $t  = lc($_);
+      my @l  = split(/ /, $t);
+      my $cs = join(", ", map {"'$_'"} @l);
+      sprintf('condition([%s]) --> [%s].', $cs, $cs);
+    } $self->BuffConditionValues->@*;
 
-     (
-       map {
-         my $key = $_;
-         my $val = $self->mapped_conditions->{$key};
-         my @lhs_tokens = map { lc($_) } split(/ /, $key);
-         my $rhs_atom   = lc($val);
-         sprintf('condition_syn([%s], \'%s\').', join(', ', map { "'$_'" } @lhs_tokens), $rhs_atom);
-       } sort {
-      		my @aparts = split(/ /, $a);
-      		my @bparts = split(/ /, $b);
-      		return scalar(@aparts) <=> scalar(@bparts);
-		    } keys %{ $self->mapped_conditions }
-     ),
+    push @rules, map {
+      my $t  = lc($_);
+      my @l  = split(/ /, $t);
+      my $cs = join(", ", map {"'$_'"} @l);
+      sprintf('condition([%s]) --> [%s].', $cs, $cs);
+    } $self->DebuffConditionValues->@*;
 
-     (
-       map {
-         my $key = $_;
-         my $val = $self->mapped_conditions->{$key};
-         my @lhs_tokens = map { lc($_) } split(/ /, $key);
-         my $rhs_atom   = lc($val);
-         sprintf("condition_syn_key([%s]).", join(', ', map { "'$_'" } @lhs_tokens));
-       } sort {
-      		my @aparts = split(/ /, $a);
-      		my @bparts = split(/ /, $b);
-      		return scalar(@aparts) <=> scalar(@bparts);
-		    } keys %{ $self->mapped_conditions }
-     ),
+    push @rules, map {
+      my $key = $_;
+      $self->logger->debug("condition key is $key");
+      my $val = $self->mapped_conditions->{$key};
+      $self->logger->debug("condition val is $val");
 
-    )));
+      my @synonym = split(/ /, $val);
+      $self->logger->debug("condition synonym is " . join(', ', @synonym));
+      foreach my $s (@synonym) {
+        $s =~ s/(.*)/\'$1\'/;
+      }
+      $self->logger->debug(
+        "condition synonym step2 is " . join(', ', @synonym));
 
+      my @term = split(/ /, $key);
+      foreach my $t (@term) {
+        $t =~ s/(.*)/\'$1\'/;
+      }
 
+      sprintf(
+        'condition([%s]) --> [%s].',
+        join(', ', @synonym),
+        join(', ', @term)
+      );
+    } sort {
+      my @aparts = split(/ /, $a);
+      my @bparts = split(/ /, $b);
+      return scalar(@aparts) <=> scalar(@bparts);
+    } keys %{ $self->mapped_conditions };
+
+    foreach my $r (@rules) {
+      $r = lc($r);
+    }
+    @rules = uniq(sort(@rules));
+    # Group by predicate name
+    my %grouped;
+    foreach my $rule (@rules) {
+      my ($head) = $rule =~ /^(\w+)\(/;  # Extract predicate name (e.g., 'condition', 'attribute')
+      push @{ $grouped{$head} }, $rule;
+    }
+
+    # Sort each group by reverse line length, then flatten all groups
+    @rules = map {
+      my $group = $_;
+      sort { length($b) <=> length($a) } @$group
+    } @grouped{ sort keys %grouped };  # Maintain alphabetical order of predicate groups
+    $grammar->spew_utf8(join("\n", @rules));
+
+  }
+
+  method tokenize_buffs ($text) {
 
     # remove the following for prolog:
     #\x{0022}    # ASCII double quote "
@@ -276,7 +293,7 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
     $self->logger->debug("cleaned text is '$text'");
 
     # Send the raw string instead of tokenizing
-    my $quoted_text = "'" . $text . "'";  # single-quote to create an atom
+    my $quoted_text = "'" . $text . "'";    # single-quote to create an atom
 
     my ($in_fh, $out_fh, $err_fh) = (undef, gensym, gensym);
     my $cmd = [
@@ -285,7 +302,7 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
     ];
     my $pid = open3($in_fh, $out_fh, $err_fh, @$cmd);
 
-    print $in_fh "$quoted_text.\n";    # Send quoted string
+    print $in_fh "$quoted_text.\n";         # Send quoted string
     close $in_fh;
 
     my @err = <$err_fh>;
@@ -293,13 +310,12 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
     waitpid $pid, 0;
 
     # Debug logging
-    foreach my $error_line (@err){
+    foreach my $error_line (@err) {
       $self->logger->error("STDERR: $error_line");
     }
-    foreach my $stdout_line (@out ) {
+    foreach my $stdout_line (@out) {
       $self->logger->debug("STDOUT: $stdout_line");
     }
-
 
     my $parsed = join('', @out);
     $parsed =~ s/^\s+|\s+$//g;
@@ -312,39 +328,41 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
 
     my $last_buff_index = -1;
     for (my $i = 0; $i < @out; $i++) {
-        if ($out[$i] =~ /^buff\(/) {
-            $last_buff_index = $i;
-        }
+      if ($out[$i] =~ /^buff\(/) {
+        $last_buff_index = $i;
+      }
     }
 
     foreach my $line (@out) {
       chomp $line;
       if ($line =~ /^DEBUG:/) {
         $self->logger->debug("STDOUT: $line");
-      } elsif ($line =~ /^buff\(/) {
-        push @buff_fragments, $line;  # optional: keep legacy Prolog format
+      }
+      elsif ($line =~ /^buff\(/) {
+        push @buff_fragments, $line;    # optional: keep legacy Prolog format
       }
     }
 
     if ($last_buff_index >= 0) {
       for my $line (@out[($last_buff_index + 1) .. $#out]) {
-          push @json_buffer, $line;
+        push @json_buffer, $line;
       }
 
       # Step 3: Parse buffered JSON lines
       my $json_text = join("\n", @json_buffer);
       $json_text =~ s/\}\s+{/},{/g;
       eval {
-          $json_text = "[$json_text]";
-          $self->logger->debug("json text is -- $json_text -- ");
-          my $decoded = JSON::PP->new(utf8 => 1)->decode($json_text);
-          push @json_lines, @$decoded;
+        $json_text = "[$json_text]";
+        $self->logger->debug("json text is -- $json_text -- ");
+        my $decoded = JSON::PP->new(utf8 => 1)->decode($json_text);
+        push @json_lines, @$decoded;
       };
       if ($@) {
-          $self->logger->warn("Failed to parse JSON block: $@");
+        $self->logger->warn("Failed to parse JSON block: $@");
       }
-    } else {
-        $self->logger->warn("No buff(...) line found; skipping JSON extraction");
+    }
+    else {
+      $self->logger->warn("No buff(...) line found; skipping JSON extraction");
     }
 
     $self->logger->debug(sprintf(
@@ -352,9 +370,11 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
       scalar @buff_fragments,
       join(', ', @buff_fragments)
     ));
-    if(scalar@json_lines != scalar @buff_fragments) {
-      $self->logger->warn(sprintf('uneven output detected: %s versus %s, are there missing output lines?',
-        scalar @json_lines, scalar @buff_fragments
+    if (scalar @json_lines != scalar @buff_fragments) {
+      $self->logger->warn(sprintf(
+        'uneven output detected: %s versus %s, are there missing output lines?',
+        scalar @json_lines,
+        scalar @buff_fragments
       ));
     }
     return @json_lines;

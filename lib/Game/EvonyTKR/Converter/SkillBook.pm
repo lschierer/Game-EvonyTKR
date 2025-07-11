@@ -55,7 +55,8 @@ class Game::EvonyTKR::Converter::SkillBook :
 
   method parseSkillbookText {
 
-    my $parser    = Game::EvonyTKR::Shared::Parser->new();
+    my $c    = Game::EvonyTKR::Shared::Parser->new();
+    $parser->generate_grammar();
     my @fragments = $parser->tokenize_buffs($text);
     foreach my $frag (@fragments) {
       push(@$buffs, $parser->normalize_buff($frag));
