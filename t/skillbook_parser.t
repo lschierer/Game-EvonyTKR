@@ -241,7 +241,7 @@ subtest 'Chivalry Skill Book' => sub {
   my @fragments = $parser->tokenize_buffs($text);
   my @hashedBuffs;
   foreach my $frag (@fragments) {
-    diag "frag is $frag";
+    diag "frag is " . Data::Printer::np($frag);
     my @nb = $parser->normalize_buff($frag);
     push(@hashedBuffs, @nb);
   }
@@ -277,7 +277,7 @@ subtest 'Alessandra Red1 - Multiple troops with and' => sub {
   my @fragments = $parser->tokenize_buffs($text);
   my @hashedBuffs;
   foreach my $frag (@fragments) {
-    diag "frag is $frag";
+    diag "frag is " . Data::Printer::np($frag);
     my @nb = $parser->normalize_buff($frag);
     push(@hashedBuffs, @nb);
   }
@@ -337,7 +337,7 @@ subtest 'Alessandra Red2 - Single debuff' => sub {
   my @fragments = $parser->tokenize_buffs($text);
   my @hashedBuffs;
   foreach my $frag (@fragments) {
-    diag "frag is $frag";
+    diag "frag is " . Data::Printer::np($frag);
     my @nb = $parser->normalize_buff($frag);
     push(@hashedBuffs, @nb);
   }
@@ -363,7 +363,7 @@ subtest 'Alessandra Red3 - Single buff with condition' => sub {
   my @fragments = $parser->tokenize_buffs($text);
   my @hashedBuffs;
   foreach my $frag (@fragments) {
-    diag "frag is $frag";
+    diag "frag is " . Data::Printer::np($frag);
     my @nb = $parser->normalize_buff($frag);
     push(@hashedBuffs, @nb);
   }
@@ -389,7 +389,7 @@ subtest 'Alessandra Red4 - Single buff' => sub {
   my @fragments = $parser->tokenize_buffs($text);
   my @hashedBuffs;
   foreach my $frag (@fragments) {
-    diag "frag is $frag";
+    diag "frag is " . Data::Printer::np($frag);
     my @nb = $parser->normalize_buff($frag);
     push(@hashedBuffs, @nb);
   }
@@ -416,7 +416,7 @@ subtest 'Alessandra Red5 - Mixed comma and and' => sub {
   my @fragments = $parser->tokenize_buffs($text);
   my @hashedBuffs;
   foreach my $frag (@fragments) {
-    diag "frag is $frag";
+    diag "frag is " . Data::Printer::np($frag);
     my @nb = $parser->normalize_buff($frag);
     push(@hashedBuffs, @nb);
   }
@@ -469,7 +469,7 @@ subtest 'Aethelflaed’s Red1' => sub {
   my @fragments = $parser->tokenize_buffs($text);
   my @hashedBuffs;
   foreach my $frag (@fragments) {
-    diag "frag is $frag";
+    diag "frag is " . Data::Printer::np($frag);
     my @nb = $parser->normalize_buff($frag);
     push(@hashedBuffs, @nb);
   }
@@ -508,7 +508,7 @@ subtest 'Aethelflaed’s Red2' => sub {
   my @fragments = $parser->tokenize_buffs($text);
   my @hashedBuffs;
   foreach my $frag (@fragments) {
-    diag "frag is $frag";
+    diag "frag is " . Data::Printer::np($frag);
     my @nb = $parser->normalize_buff($frag);
     push(@hashedBuffs, @nb);
   }
@@ -545,7 +545,7 @@ subtest 'Aethelflaed’s Red3' => sub {
   my @fragments = $parser->tokenize_buffs($text);
   my @hashedBuffs;
   foreach my $frag (@fragments) {
-    diag "frag is $frag";
+    diag "frag is " . Data::Printer::np($frag);
     my @nb = $parser->normalize_buff($frag);
     push(@hashedBuffs, @nb);
   }
@@ -582,7 +582,7 @@ subtest 'Aethelflaed’s Red4' => sub {
   my @fragments = $parser->tokenize_buffs($text);
   my @hashedBuffs;
   foreach my $frag (@fragments) {
-    diag "frag is $frag";
+    diag "frag is " . Data::Printer::np($frag);
     my @nb = $parser->normalize_buff($frag);
     push(@hashedBuffs, @nb);
   }
@@ -620,7 +620,7 @@ subtest 'Aethelflaed’s Red5' => sub {
   my @fragments = $parser->tokenize_buffs($text);
   my @hashedBuffs;
   foreach my $frag (@fragments) {
-    diag "frag is $frag";
+    diag "frag is " . Data::Printer::np($frag);
     my @nb = $parser->normalize_buff($frag);
     push(@hashedBuffs, @nb);
   }
@@ -671,7 +671,7 @@ subtest 'Monarchy Restoration Skill Book' => sub {
   my @fragments = $parser->tokenize_buffs($text);
   my @hashedBuffs;
   foreach my $frag (@fragments) {
-    diag "frag is $frag";
+    diag "frag is " . Data::Printer::np($frag);
     my @nb = $parser->normalize_buff($frag);
     push(@hashedBuffs, @nb);
   }
@@ -745,7 +745,7 @@ subtest 'Napoleonic Wars Skill Book' => sub {
   my @fragments = $parser->tokenize_buffs($text);
   my @hashedBuffs;
   foreach my $frag (@fragments) {
-    diag "frag is $frag";
+    diag "frag is " . Data::Printer::np($frag);
     my @nb = $parser->normalize_buff($frag);
     push(@hashedBuffs, @nb);
   }

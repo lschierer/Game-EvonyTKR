@@ -1,6 +1,7 @@
 % File: buff_parser.pl
 % Main entry point for buff parsing - delegates to specialized modules
 
+:- style_check(-singleton).
 :- include('EvonyBuffDictionary').
 :- include('buff_patterns').
 :- include('condition_processing').
@@ -11,7 +12,7 @@
 :- use_module(library(lists)).
 :- use_module(library(dcg/basics)).
 :- use_module(library(http/json)).
-:- style_check(-singleton).
+
 
 % Main entry point from command line
 main :-

@@ -34,7 +34,7 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
 
     # Decode atom into full names
     my $attribute  = $self->atom_to_attribute($attribute_atom);
-    my $troop_type = $self->atom_to_troop($troop_atom);
+
 
     # Create the buff object
     my $buff_value = Game::EvonyTKR::Model::Buff::Value->new(
@@ -45,20 +45,40 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
     my $buff = Game::EvonyTKR::Model::Buff->new(
       attribute    => $attribute,
       value        => $buff_value,
-      targetedType => $troop_type || '',
       passive      => 0,
     );
 
+    if(ref($troop_atom) eq 'ARRAY') {
+      $troop_atom = $troop_atom->[0];
+    }
+    if(length($troop_atom)) {
+      $self->logger->debug("troop_atom is '$troop_atom'");
+      my $troop_type = $self->atom_to_troop($troop_atom);
+      $buff->set_target($troop_type);
+    }
+
     # Handle condition normalization
     foreach my $cond (@$conditions_list) {
-      $self->logger->debug("Processing condition: '$cond'");
-      my $normalized = $self->normalize_condition_case($cond);
-      if (defined $normalized) {
-        my $r = $buff->set_condition($normalized);
+      my $r;
+      if($cond eq 'enemy') {
+       $r = $buff->set_condition('Enemy');
+       $self->logger->debug(
+         "Added debuff condition: 'Enemy' ; set_condition result: $r");
+      } elsif($cond eq 'monsters') {
+        $r = $buff->set_condition('Monsters');
         $self->logger->debug(
-          "Added buff condition: $normalized ; set_condition result: $r");
-      } else {
-        $self->logger->warn("Could not normalize condition: '$cond'");
+          "Added debuff condition: 'Monsters' ; set_condition result: $r");
+      }
+      else {
+        $self->logger->debug("Processing condition: '$cond'");
+        my $normalized = $self->normalize_condition_case($cond);
+        if (defined $normalized) {
+          $r = $buff->set_condition($normalized);
+          $self->logger->debug(
+            "Added buff condition: $normalized ; set_condition result: $r");
+        } else {
+          $self->logger->warn("Could not normalize condition: '$cond'");
+        }
       }
     }
 
@@ -166,7 +186,23 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
             my @l      = split(/ /, $t);
             my $atom   = join('_',    @l);
             my $tokens = join('], [', @l);
-            sprintf('attribute(%s) --> [%s].', $atom, $tokens);
+            my @rules;
+            push @rules, sprintf('attribute(%s) --> [%s].', $atom, $tokens);
+
+            if(scalar @l > 1 && $l[1] eq 'to') {
+              $l[1] = 'into';
+
+              $tokens = join('], [', @l);
+              push @rules, sprintf('attribute(%s) --> [%s].', $atom, $tokens);
+              if( scalar @l >= 2) {
+                if($l[2] =~/(?:wounded|death)/i ) {
+                  push @l, 'rate';
+                  $tokens = join('], [', @l);
+                  push @rules, sprintf('attribute(%s) --> [%s].', $atom, $tokens);
+                }
+              }
+            }
+            @rules;
           }
         } $self->AttributeValues->@*
       ),
@@ -216,6 +252,9 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
      ),
 
     )));
+
+
+
     # remove the following for prolog:
     #\x{0022}    # ASCII double quote "
     #\x{0027}    # ASCII single quote '
@@ -229,6 +268,11 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
       s/[\x{0022}\x{0027}\x{2018}\x{2019}\x{201C}\x{201D}\x{0060}\x{00B4}]//gx
       ;    # remove apostrophies entirely for prolog to parse.
     $text = lc($text);    # prolog requires all lower case.
+
+    # prolog will tokenize hyphens even in words.
+    # none of my constants are built around in-word hyphens.
+    $text =~ s/\bin-([a-zA-Z]+)\b/in $1/g;
+
     $self->logger->debug("cleaned text is '$text'");
 
     # Send the raw string instead of tokenizing

@@ -10,6 +10,8 @@ troop_list([T]) -->
   troop(T).
 troop_list(['']) -->
   [troops].
+troop_list(['']) -->
+  [troop].
 
 % === ATTRIBUTE PARSING ===
 

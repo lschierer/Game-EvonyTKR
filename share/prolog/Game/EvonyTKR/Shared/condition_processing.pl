@@ -1,7 +1,31 @@
 % File: condition_processing.pl
 % All condition parsing and processing logic
 
+% Assumes condition([Phrase]) where [Phrase] is a list
+% with precisely 1, or 2 Words is a valid condition.
+
+short_condition(CondStr) -->
+    [W1, W2],
+    { condition([W1, W2]), atomics_to_string([W1, W2], ' ', CondStr) }.
+
+short_condition(CondStr) -->
+    [W1],
+    { condition([W1]), atomics_to_string([W1], ' ', CondStr) }.
+
 % DCG wrapper for parsing and flattening condition sets
+consume_condition(Canonical) -->
+  match_prefix(Consumed),
+  {
+    match_any_condition(Consumed, _, _, Canonical)
+  }.
+
+match_prefix([Token|Rest]) -->
+  [Token],
+  match_prefix(Rest).
+match_prefix([]) --> [].
+
+tokens_to_match([], _) --> [].
+
 merged_conditions(UniqueConditions) -->
   remainder(Rest),
   {
@@ -89,6 +113,9 @@ normalize_condition_tokens([_|T], Norm) :-
   normalize_condition_tokens(T, Norm). % skip unmatched
 
 % === CONDITION MATCHING ===
+
+
+
 
 % Match either a canonical or synonym condition prefix
 % Match mapped synonyms first (more specific)
