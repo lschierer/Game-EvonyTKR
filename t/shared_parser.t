@@ -57,7 +57,7 @@ subtest 'fake singlebuff book' => sub {
       ),
       'Mounted Troops 45% attack buff (leading the army)'
     );
-  done_testing;
+  done_testing();
 
 };
 require Scalar::Util;
@@ -141,7 +141,7 @@ subtest 'Monarchy Restoration Skill Book' => sub {
     '40% Mounted Troop HP buff (conditional Attacking)'
   );
 
-  done_testing;
+  done_testing();
 };
 
 
@@ -248,7 +248,7 @@ subtest 'Dictator Skill Book' => sub {
     ),
     'Mounted Troops 45% attack buff (Against Monsters)'
   );
-  done_testing;
+  done_testing();
 };
 
 subtest 'Augustus Skill Book' => sub {
@@ -286,7 +286,7 @@ subtest 'Augustus Skill Book' => sub {
     ),
     'Ranged Troops 15% attack buff (Attacking)'
   );
-  done_testing;
+  done_testing();
 };
 
 subtest 'Bloody Leader Skill Book' => sub {
@@ -324,7 +324,7 @@ subtest 'Bloody Leader Skill Book' => sub {
     'March Size 10% buff (Attacking)'
   );
 
-  done_testing;
+  done_testing();
 };
 
 diag 'start of Chivalry Skill Book';
@@ -363,7 +363,7 @@ subtest 'Chivalry Skill Book' => sub {
     '30% SubCity Training Speed buff (Mayor)'
   );
 
-  done_testing;
+  done_testing();
 };
 
 subtest 'Alessandra Red1 - Multiple troops with and' => sub {
@@ -423,7 +423,7 @@ subtest 'Alessandra Red1 - Multiple troops with and' => sub {
     'Mounted Troops 10% HP buff (Marching)'
   );
 
-  done_testing;
+  done_testing();
 };
 
 subtest 'Alessandra Red2 - Single debuff' => sub {
@@ -450,7 +450,7 @@ subtest 'Alessandra Red2 - Single debuff' => sub {
     'Enemy Troops 10% Wounded to Death debuff (In City)'
   );
 
-  done_testing;
+  done_testing();
 };
 
 subtest 'Alessandra Red3 - Single buff with condition' => sub {
@@ -476,7 +476,7 @@ subtest 'Alessandra Red3 - Single buff with condition' => sub {
     'Rally Capacity 8% buff (launching Alliance War)'
   );
 
-  done_testing;
+  done_testing();
 };
 
 subtest 'Alessandra Red4 - Single buff' => sub {
@@ -503,7 +503,7 @@ subtest 'Alessandra Red4 - Single buff' => sub {
     'Ground Troops 50% Defense buff (Marching)'
   );
 
-  done_testing;
+  done_testing();
 };
 
 subtest 'Alessandra Red5 - Mixed comma and and' => sub {
@@ -552,7 +552,7 @@ subtest 'Alessandra Red5 - Mixed comma and and' => sub {
     'Ground Troops 20% HP buff (Marching)'
   );
 
-  done_testing;
+  done_testing();
 };
 
 
@@ -593,7 +593,7 @@ subtest 'Aethelflaed’s Red1' => sub {
     'Mounted Troops 10% Defense buff (Against Monsters)'
   );
 
-  done_testing;
+  done_testing();
 };
 
 
@@ -631,7 +631,7 @@ subtest 'Aethelflaed’s Red2' => sub {
     'Generic 15% HP buff (Against Monsters)'
   );
 
-  done_testing;
+  done_testing();
 };
 
 #3 Star When attacking Monsters, Monsters Attack -10%, Troops Defense +20%.
@@ -668,7 +668,7 @@ subtest 'Aethelflaed’s Red3' => sub {
     'Generic 20% Defense buff (Against Monsters)'
   );
 
-  done_testing;
+  done_testing();
 };
 
 #4 Star When attacking Monsters, Mounted Troop Attack +15%, Troops HP +20%.
@@ -706,7 +706,7 @@ subtest 'Aethelflaed’s Red4' => sub {
     'Generic 20% HP buff (Against Monsters)'
   );
 
-  done_testing;
+  done_testing();
 };
 
 #5 Star When attacking Monsters, Mounted Troop Attack +20%, Troops Defense and HP +10%.
@@ -755,7 +755,7 @@ subtest 'Aethelflaed’s Red5' => sub {
   );
 
 
-  done_testing;
+  done_testing();
 };
 
 
@@ -808,7 +808,7 @@ subtest 'Aethelflaed’s Red5' => sub {
 #    '40% Mounted Troop HP buff (conditional Attacking)'
 #  );
 #
-#  done_testing;
+#  done_testing();
 #};
 #
 

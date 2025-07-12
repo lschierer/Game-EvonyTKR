@@ -435,9 +435,7 @@ class Game::EvonyTKR::Shared::Constants : isa(Game::EvonyTKR::Model::Logger) {
       'to attack Monsters'         => 'Against Monsters',         # buff version
       'to attack'                  => 'Attacking',
       'General is the Mayor'       => "When City Mayor for this SubCity",
-      'When General is launching Alliance War' => 'When Rallying',
       'launching Alliance War'                 => 'When Rallying',
-      'When attacking Monsters'                => 'Against Monsters',
       'attacking Monsters'                     => 'Against Monsters',
       'In-city'                                => 'In City',
     };

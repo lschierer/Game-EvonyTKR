@@ -8,15 +8,9 @@ troop_list([T1, T2]) -->
   troop(T1), [and], troop(T2).
 troop_list([T]) -->
   troop(T).
-troop_list(['']) -->
-  [troops].
-troop_list(['']) -->
-  [troop].
 
-troop('') -->
-  [troop].
-troop('') -->
-  [troops].
+
+
 
 % === ATTRIBUTE PARSING ===
 
@@ -68,15 +62,27 @@ normalize_condition_format(Conds, Conds) :-
 
 % === OPTIONAL ELEMENTS ===
 
-% Optional verb patterns
+% --- Reusable Optional Phrase Fragments ---
+optional_when_general_is --> [when], [general], [is] ; [].
+optional_when_general --> [when], [general] ; [].
+optional_general_is --> ([general], [is]) ; [].
+optional_when --> [when] ; [].
+optional_verb --> [increases] ; [reduces] ; [].
 optional_verb --> [increases].
 optional_verb --> [reduces].
 optional_verb --> [is].
 optional_verb --> [].
+optional_subject --> [general] ; [].
 
-% Optional subject patterns
-optional_subject --> [general].
-optional_subject --> [].
+% Optional troop placeholder that binds to '' if not matched
+troop('') -->
+  [troop].
+troop('') -->
+  [troops].
+optional_troop('') --> [troops] ; [troop].
+optional_troop(T) --> troop(T).
+optional_troop('') --> [].
+
 
 % === TOKEN FILTERING ===
 

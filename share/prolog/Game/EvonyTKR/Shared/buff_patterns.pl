@@ -1,6 +1,7 @@
 % File: buff_patterns.pl
 % All DCG patterns for parsing different buff structures
 
+
 % Subcity Pattern 1: Matrix expansion
 % initial attribute with no troop type + bifurcated with troop type attribute + shared conditions
 buff_pattern(Buffs) -->
@@ -23,31 +24,33 @@ buff_pattern(Buffs) -->
     expand_matrix([''], SubCityAttrs1, Value1, [UniqueConditions], Buffs1),
     expand_matrix(Troops2, SubCityAttrs2, Value2, [UniqueConditions], Buffs2),
     append(Buffs1, Buffs2, Buffs),
-    format("DEBUG: Subcity Pattern 1 Final buffs: ~w~n", [Buffs])
+    format("DEBUG: Subcity Pattern 1 matched Final buffs: ~w~n", [Buffs])
   }.
 
-% Pattern: 2C1TAV
+% Pattern: 2C1AV
 % 2C: 2 Conditions
-% 1TAV: 1 Troop Attribute Value clause
+% 1AV: 1 [No|Generic] Troop Attribute Value clause
 buff_pattern(Buffs) -->
-  condition(Cond1), condition(Cond2),troop(_),
+  {format("Trying '2C1AV'~n")},
+  condition(Cond1), condition(Cond2),optional_troop(''),
   attribute(Attr1),[+],[ValueAtom1],
   {
-    format("DEBUG: matched terms for '2C1TAV' Cond1='~w', cond2='~w' attr1='~w' ValueAtom1='~w'~n", [Cond1, Cond2, Attr1, ValueAtom1]),
+    format("DEBUG: matched terms for '2C1AV' Cond1='~w', cond2='~w' attr1='~w' ValueAtom1='~w'~n", [Cond1, Cond2, Attr1, ValueAtom1]),
     extract_value(ValueAtom1, Value1),
     extract_condition_atoms(Cond1, PCond1),
     extract_condition_atoms(Cond2, PCond2),
     list_to_set([PCond1, PCond2], PCond),
     Buffs = [buff(Attr1, '', Value1, PCond)],
-    format("DEBUG: Matched '2C1TAV': buff='~w'~n", [Buffs])
+    format("DEBUG: matched '2C1AV': buff='~w'~n", [Buffs])
   }.
 
-% Pattern: 1C1AV1AandAV
+% Pattern: 1C1TLAV1AandAV
 % 1C: shared condition
-% 1AV: there is an attribute with its own value
+% 1TLAV: there is one or more troop types then an attribute with its own value
 % 1AandAV: there is an 'Attribute and Attribute Value" clause
 % total: 3 buffs.
 buff_pattern(Buffs) -->
+  {format("Trying '1C1TLAV1AandAV'~n")},
   condition(ConditionWord),
   troop_list(Troops),
   attribute(Attribute1),
@@ -60,12 +63,15 @@ buff_pattern(Buffs) -->
     expand_matrix(Troops, [Attribute1], Value1, [ConditionWord], B1),
     expand_matrix(Troops, [Attribute2, Attribute3], Value2, [ConditionWord], B2),
     append(B1, B2, Buffs),
-    format("DEBUG: 1C1AV1AandAV alt: attr1 + val1; attr2 and attr3 + val2~n" )
+    format("DEBUG: 1C1TLAV1AandAV matched~n" )
   }.
 
-% Pattern 1: Alternate matrix variant with + values
-% initial shared condition + bifurcated troop type + bifurcated attribute with individual values
+% 1C1TL1ALVandALV
+% 1 shared condition
+% 1 shared troop list
+% 1 Attribute list Value and Attribute list Value clause
 buff_pattern(Buffs) -->
+  {format("Trying '1C1TL1ALVandALV'~n)")},
   condition(ConditionWord),
   troop_list(Troops),
   attribute_list(Attributes1),
@@ -78,10 +84,12 @@ buff_pattern(Buffs) -->
     expand_matrix(Troops, Attributes1, Value1, [ConditionWord], Buffs1),
     expand_matrix(Troops, Attributes2, Value2, [ConditionWord], Buffs2),
     append(Buffs1, Buffs2, Buffs),
-    format("DEBUG: Pattern 1")
+    format("DEBUG: '1C1TL1ALVandALV' matched")
   }.
 
 % Pattern 2: Standard matrix expansion
+% this appears to need the specificity of [when], [general],
+% to prevent merged_conditions() from going haywire
 buff_pattern(Buffs) -->
   { format("DEBUG: Trying Pattern 2~n") },
   optional_verb,
@@ -98,12 +106,13 @@ buff_pattern(Buffs) -->
   { format("DEBUG: Pattern 2 UniqueConditions: '~w'~n", [UniqueConditions]) },
   {
     expand_matrix(Troops, Attributes, Value, [UniqueConditions], Buffs),
-    format("DEBUG: Pattern 2: Buffs '~w'~n", [Buffs])
+    format("DEBUG: Pattern 2 matched Buffs: '~w'~n", [Buffs])
   }.
 
 % Pattern 3: Matrix expansion with generic + specific attributes
 % initial attribute with no troop type + standard troop type attribute clause + shared conditions
 buff_pattern(Buffs) -->
+  {format("Trying 'Pattern 3'~n")},
   optional_verb, [the],
   attribute_list(Attributes1),
   [by], [ValueAtom1],
@@ -111,7 +120,7 @@ buff_pattern(Buffs) -->
   troop_list(Troops2),
   attribute_list(Attributes2),
   [by], [ValueAtom2],
-  [when], [general], [is], merged_conditions(UniqueConditions),
+  optional_when_general_is, merged_conditions(UniqueConditions),
   {
     extract_value(ValueAtom1, Value1),
     extract_value(ValueAtom2, Value2),
@@ -119,7 +128,7 @@ buff_pattern(Buffs) -->
     expand_matrix( [''], Attributes1, Value1, [UniqueConditions], Buffs1),
     expand_matrix(Troops2, Attributes2, Value2, [UniqueConditions], Buffs2),
     append(Buffs1, Buffs2, Buffs),
-    format("DEBUG: Pattern 3")
+    format("DEBUG: Pattern 3 matched~n")
   }.
 
 % Pattern 4: Matrix expansion (bifurcated object of the verb, but shared conditions)
@@ -131,7 +140,7 @@ buff_pattern(Buffs) -->
   troop_list(Troops2),
   attribute_list(Attributes2),
   [by], [ValueAtom2],
-  [when], [general], [is], merged_conditions(UniqueConditions),
+  optional_when_general_is, merged_conditions(UniqueConditions),
   {
     extract_value(ValueAtom1, Value1),
     extract_value(ValueAtom2, Value2),
@@ -139,7 +148,7 @@ buff_pattern(Buffs) -->
     expand_matrix(Troops1, Attributes1, Value1, [UniqueConditions], Buffs1),
     expand_matrix(Troops2, Attributes2, Value2, [UniqueConditions], Buffs2),
     append(Buffs1, Buffs2, Buffs),
-    format("DEBUG: Pattern 4")
+    format("DEBUG: Pattern 4 matched~n")
   }.
 
 % 1C1A1V
@@ -149,7 +158,7 @@ buff_pattern(Buffs) -->
 % no troops
 buff_pattern(Buffs) -->
   { format("DEBUG: Trying '1C1A1V'~n", []) },
-  [when], [general], [is],
+  optional_when_general_is,
   condition(CanonCond),
   {
     format("DEBUG: Passed condition(~w)~n", [CanonCond])
@@ -162,7 +171,7 @@ buff_pattern(Buffs) -->
     format("DEBUG: Passed Value: '~w'~n", [Value]),
     extract_condition_atoms(CanonCond, PrintableConditions),
     Buffs = [buff(AttributeAtom, '', Value, PrintableConditions)],
-    format("DEBUG: Matched '1C1A1V': attr='~w' value='~w' cond='~w' buff='~w'~n",
+    format("DEBUG: matched '1C1A1V': attr='~w' value='~w' cond='~w' buff='~w'~n",
            [AttributeAtom, Value, SingleCond, Buffs])
   }.
 
@@ -185,7 +194,7 @@ buff_pattern(Buffs) -->
     extract_value(ValueAtom1, Value1),
     format("DEBUG: Passed ValueAtom1(~w)~n", [Value1])
   },
-  troop(_),  { format("DEBUG: found generic troop type~n") },
+  optional_troop(''),  { format("DEBUG: found generic troop type~n") },
   attribute(Attr2), [+],[ValueAtom2],
   { format("DEBUG: Passed attribute(~w)~n", [Attr2]) },
   {
@@ -197,7 +206,7 @@ buff_pattern(Buffs) -->
     Buff1 = buff(Attr1, Troop1, Value1, PCond1),
     Buff2 = buff(Attr2, '', Value2, PCond1),
     Buffs = [Buff1, Buff2],
-    format("DEBUG: '1C1ATV1AV' buffs: '~w'~n", [Buffs])
+    format("DEBUG: '1C1ATV1AV' matched buffs: '~w'~n", [Buffs])
   }.
 
 % 1C1AV1ATV
@@ -212,7 +221,7 @@ buff_pattern(Buffs) -->
     extract_condition_atoms(Cond1, PCond1),
     format("DEBUG: Passed condition(~w)~n", [PCond1])
   },
-  troop(_),  { format("DEBUG: found generic troop type~n") },
+  optional_troop(''),  { format("DEBUG: found generic troop type~n") },
   attribute(Attr1), [+],[ValueAtom1],
   { format("DEBUG: Passed attribute(~w)~n", [Attr1]) },
   {
@@ -231,7 +240,7 @@ buff_pattern(Buffs) -->
     Buff1 = buff(Attr1, '', Value1, PCond1),
     Buff2 = buff(Attr2, Troop2, Value2, PCond1),
     Buffs = [Buff1, Buff2],
-    format("DEBUG: '1C1AV1ATV' buffs: '~w'~n", [Buffs])
+    format("DEBUG: '1C1AV1ATV' matched buffs: '~w'~n", [Buffs])
   }.
 
 % 1C1CAV1TAV
@@ -256,7 +265,7 @@ buff_pattern(Buffs) -->
     Buff1 = buff(Attr1, '', Value1, [Cond1, Cond2]),
     Buff2 = buff(Attr2, Troop2, Value2, [Cond1]),
     Buffs = [Buff1, Buff2],
-    format("DEBUG: 1C1CAV1TAV buffs: '~w'~n", [Buffs])
+    format("DEBUG: 1C1CAV1TAV matched buffs: '~w'~n", [Buffs])
   }.
 
 % 1C1TAV1AV
@@ -289,7 +298,7 @@ buff_pattern(Buffs) -->
     Buff1 = buff(Attributes1, Troop1, Value1, [CanonCond]),
     Buff2 = buff(Attributes2, '',     Value2, [CanonCond]),
     Buffs = [Buff1, Buff2],
-    format("DEBUG: 1C1TAV1AV buffs: '~w'~n", [Buffs])
+    format("DEBUG: 1C1TAV1AV matched buffs: '~w'~n", [Buffs])
   }.
 
 % 1C1TAV2A1V
@@ -310,7 +319,7 @@ buff_pattern(Buffs) -->
     extract_value(ValueAtom1, Value1),
     format("DEBUG: Passed ValueAtom1(~w)~n", [Value1])
   },
-  troop(_), attribute(Attr2a), [and], attribute(Attr2b),
+  optional_troop(''), attribute(Attr2a), [and], attribute(Attr2b),
   { format("DEBUG: Passed attribute(~w)~n", [Attr2a]) },
   { format("DEBUG: Passed attribute(~w)~n", [Attr2b]) },
   [+], [ValueAtom2],
@@ -325,7 +334,7 @@ buff_pattern(Buffs) -->
     Buff2a = buff(Attr2a, '',   Value2, [Cond1]),
     Buff2b = buff(Attr2b, '',   Value2, [Cond1]),
     Buffs = [Buff1, Buff2a, Buff2b],
-    format("DEBUG: 1C1TAV2A1V buffs: '~w'~n", [Buffs])
+    format("DEBUG: 1C1TAV2A1V matched buffs: '~w'~n", [Buffs])
   }.
 
 % 1C1T1A1V
@@ -349,7 +358,7 @@ buff_pattern(Buffs) -->
     extract_value(ValueAtom, Value),
     format("DEBUG: Passed Value: '~w'~n", [Value]),
     Buffs = [buff(AttributeAtom, TroopAtom, Value, PrintableConditions)],
-    format("DEBUG: Matched '1C1T1A1V': attr='~w' value='~w' cond='~w' buff='~w'~n",
+    format("DEBUG: matched '1C1T1A1V': attr='~w' value='~w' cond='~w' buff='~w'~n",
             [AttributeAtom, Value, SingleCond, Buffs])
   }.
 
@@ -365,6 +374,6 @@ buff_pattern([buff(AttributeAtom, TroopAtom, Value, UniqueConditions)]) -->
   {
     extract_value(ValueAtom, Value)
   },
-  { format("DEBUG: Matched simple buff: troop=~w attr=~w value=~w cond=~w~n",
+  { format("DEBUG: matched simple buff: troop=~w attr=~w value=~w cond=~w~n",
     [TroopAtom, AttributeAtom, Value, UniqueConditions])
   }.
