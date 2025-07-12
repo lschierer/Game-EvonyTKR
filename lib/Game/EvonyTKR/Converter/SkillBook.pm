@@ -55,14 +55,14 @@ class Game::EvonyTKR::Converter::SkillBook :
 
   method parseSkillbookText {
 
-    my $c = Game::EvonyTKR::Shared::Parser->new();
-    $parser->generate_grammar();
+    my $parser = Game::EvonyTKR::Shared::Parser->new();
+
     my @fragments = $parser->tokenize_buffs($text);
     foreach my $frag (@fragments) {
-      push(@$buffs, $parser->normalize_buff($frag));
+      push@$buffs, $parser->normalize_buff($frag);
     }
 
-    say Data::Printer::np($buffs);
+    $self->logger->debug(Data::Printer::np($buffs));
 
   }
 

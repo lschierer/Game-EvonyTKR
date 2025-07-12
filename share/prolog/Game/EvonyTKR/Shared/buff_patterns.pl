@@ -44,6 +44,39 @@ buff_pattern(Buffs) -->
     format("DEBUG: matched '2C1AV': buff='~w'~n", [Buffs])
   }.
 
+% Pattern: 1TAVand2TA1V1C
+% 1TAV: 1 Troop Attribute Value clause
+% and junction
+% 2TA1V: 2 Troop 2 Attribe 1 Value clause
+% 1 shared condition (no commas or periods)
+buff_pattern(Buffs) -->
+  {format("Trying '1TAVand2TA1V1C'~n")},
+  optional_verb, troop(Troop1), attribute(Attr1),
+  [by], [ValueAtom1],
+  {
+    extract_value(ValueAtom1, Value1),
+    format("DEBUG: troop1: '~w' attribute1: '~w' ValueAtom1: '~w'~n", [Troop1, Attr1, Value1])
+  },
+  [and], optional_verb, troop_list(Troops2),
+  attribute_list(Attrs2), [by], [ValueAtom2],
+  {
+    extract_value(ValueAtom2, Value2),
+    format("DEBUG: troop2: '~w' attribute2: '~w' ValueAtom2: '~w'~n", [Troops2, Attrs2, Value2])
+  },
+  optional_when_general_is, condition(Cond1),
+  {format("DEBUG: condition: '~w'~n", [Cond1])},
+  {
+    extract_condition_atoms(Cond1, PCond1),
+    Buff1 = buff(Attr1, Troop1, Value1, PCond1),
+    format("buff1: '~w'~n", [Buff1])
+  },
+  {
+    expand_matrix(Troops2, Attrs2, Value2, [PCond1], Buffs2),
+    format("DEBUG: buff2: '~w'~n", [Buffs2]),
+    Buffs = [Buff1 | Buffs2],
+    format("DEBUG: '1TAVand2TA1V1C' matched: '~w'~n", [Buffs])
+  }.
+
 % Pattern: 1C1TLAV1AandAV
 % 1C: shared condition
 % 1TLAV: there is one or more troop types then an attribute with its own value
@@ -60,8 +93,9 @@ buff_pattern(Buffs) -->
   {
     extract_value(ValueAtom1, Value1),
     extract_value(ValueAtom2, Value2),
-    expand_matrix(Troops, [Attribute1], Value1, [ConditionWord], B1),
-    expand_matrix(Troops, [Attribute2, Attribute3], Value2, [ConditionWord], B2),
+    extract_condition_atoms(ConditionWord, PCondition),
+    expand_matrix(Troops, [Attribute1], Value1, [PCondition], B1),
+    expand_matrix(Troops, [Attribute2, Attribute3], Value2, [PCondition], B2),
     append(B1, B2, Buffs),
     format("DEBUG: 1C1TLAV1AandAV matched~n" )
   }.
@@ -81,8 +115,9 @@ buff_pattern(Buffs) -->
   {
     extract_value(ValueAtom1, Value1),
     extract_value(ValueAtom2, Value2),
-    expand_matrix(Troops, Attributes1, Value1, [ConditionWord], Buffs1),
-    expand_matrix(Troops, Attributes2, Value2, [ConditionWord], Buffs2),
+    extract_condition_atoms(ConditionWord, PCondition),
+    expand_matrix(Troops, Attributes1, Value1, [PCondition], Buffs1),
+    expand_matrix(Troops, Attributes2, Value2, [PCondition], Buffs2),
     append(Buffs1, Buffs2, Buffs),
     format("DEBUG: '1C1TL1ALVandALV' matched")
   }.

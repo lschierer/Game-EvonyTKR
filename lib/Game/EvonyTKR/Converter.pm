@@ -13,6 +13,7 @@ package Game::EvonyTKR::Converter {
   require Game::EvonyTKR::Converter::General;
   require Game::EvonyTKR::Converter::SkillBook;
   require Game::EvonyTKR::Converter::AscendingAttributes;
+  require Game::EvonyTKR::Shared::Parser;
   use Carp;
   use Log::Log4perl qw(:easy);
   our $VERSION = 'v0.01.0';
@@ -51,6 +52,7 @@ package Game::EvonyTKR::Converter {
 
     my $dd    = Path::Tiny::path(File::Share::dist_dir('Game-EvonyTKR'));
     my $debug = $opt->{debug} ? 1 : 0;
+    Game::EvonyTKR::Shared::Parser->new()->generate_grammar();
 
     #my $result = $opt->{blortex} ? blortex() : blort();
     if ($opt->mode eq 'general') {
