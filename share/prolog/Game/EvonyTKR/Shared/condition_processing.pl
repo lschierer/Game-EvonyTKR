@@ -29,12 +29,15 @@ merged_conditions(UniqueConditions) -->
 % === Helper for Disjunction ===
 
 % for use inside disjunct_variant loops
-normalize_condition_tokens([], []).
+normalize_condition_tokens([], []) :- !.
+
 normalize_condition_tokens(Input, [Canonical|Rest]) :-
-  match_any_condition(Input, _Match, Remaining, Canonical),
-  normalize_condition_tokens(Remaining, Rest).
+    match_any_condition(Input, _Match, Remaining, Canonical),
+    !,
+    normalize_condition_tokens(Remaining, Rest).
+
 normalize_condition_tokens([_|T], Rest) :-
-  normalize_condition_tokens(T, Rest).
+    normalize_condition_tokens(T, Rest).
 
 % === Disjunction and greedy parsing ===
 
@@ -87,28 +90,37 @@ find_longest_match(Tokens, BestMatch, BestRemaining, BestCanonical) :-
 % === Condition matching ===
 
 match_any_condition(Input, Match, Remaining, Canonical) :-
-    phrase(condition(Match), Input),
-    append(Match, Remaining, Input),
-    atomics_to_string(Match, ' ', Canonical),
-    format("DEBUG: matched condition: ~w -> ~w~n", [Match, Canonical]).
+  phrase(condition(Match), Input, Remaining),
+  atomics_to_string(Match, ' ', Canonical),
+  format("DEBUG: matched condition: ~w -> ~w~n", [Match, Canonical]).
+
+match_any_condition(_, _, _, _) :-
+  format("DEBUG: match_any_condition failed on input~n"),
+  fail.
 
 % === Disjunctive splits ===
 
+% Only generate exactly two variants: one for each disjunct branch
 disjunct_variant(Tokens, Left) :-
-    append(Prefix, [or | Suffix], Tokens),
-    append(PrefixStart, LeftDisj, Prefix),
-    append(_, _, Suffix),
-    append(PrefixStart, LeftDisj, Left).
+    append(Left, [or | _], Tokens),
+    Left \= [],
+    format("DEBUG: disjunct_variant LEFT: ~w~n", [Left]).
 
-disjunct_variant(Tokens, Right) :-
-    append(Prefix, [or | Suffix], Tokens),
-    append(_, _, Prefix),
-    append(RightDisj, _, Suffix),
-    append(_, RightDisj, Right).
+disjunct_variant(Tokens, RightWithContext) :-
+    append(Left, [or | Right], Tokens),
+    Left \= [],
+    Right \= [],
+    % Optional: extract context prefix
+    prefix_context(Left, Context),
+    append(Context, Right, RightWithContext),
+    format("DEBUG: disjunct_variant RIGHT: ~w~n", [RightWithContext]).
 
-%fallback
-disjunct_variant(Tokens, Tokens) :-
-    \+ member(or, Tokens).
+% Helper to extract a context (e.g., ['brings', 'any'])
+% For now, just return first 2 tokens of Left if present
+prefix_context(Left, Context) :-
+    length(Left, L),
+    ( L >= 2 -> append(Context, _, Left), length(Context, 2)
+    ; Context = Left ).
 
 % === Token cleanup ===
 

@@ -13,6 +13,11 @@ troop_list(['']) -->
 troop_list(['']) -->
   [troop].
 
+troop('') -->
+  [troop].
+troop('') -->
+  [troops].
+
 % === ATTRIBUTE PARSING ===
 
 % Parse attribute list: "defense and hp"

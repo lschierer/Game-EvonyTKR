@@ -26,30 +26,20 @@ buff_pattern(Buffs) -->
     format("DEBUG: Subcity Pattern 1 Final buffs: ~w~n", [Buffs])
   }.
 
-
-
-% Debuff Pattern 1: Alternate matrix variant with + values
-% initial debuff indicator, initial condition,  single attribute without troop type
+% Pattern: 2C1TAV
+% 2C: 2 Conditions
+% 1TAV: 1 Troop Attribute Value clause
 buff_pattern(Buffs) -->
-  { format("DEBUG: Trying Debuff Pattern 1~n", []) },
-  short_condition(Enemy),
-  { format("DEBUG: Passed short_condition(~w)~n", [Enemy]) },
-  short_condition(CondPhrase),
-  { format("DEBUG: Passed short_condition(~w)~n", [CondPhrase]) },
-  troop_list(Troops),
-  { format("DEBUG: Passed troop_list(~w)~n", [Troops]) },
-  attribute_list(Attrs),
-  { format("DEBUG: Passed attribute_list(~w)~n", [Attrs]) },
-  [+], [ValueAtom],
+  condition(Cond1), condition(Cond2),troop(_),
+  attribute(Attr1),[+],[ValueAtom1],
   {
-    extract_value(ValueAtom, Value),
-    format("DEBUG: Passed Value: '~w'~n", [Value])
-  },
-  {
-    list_to_set([Enemy,CondPhrase], CanonicalConds),
-    format("DEBUG: CanonicalConds are '~w'~n", [CanonicalConds]),
-    expand_matrix(Troops, Attrs, Value, [CanonicalConds], Buffs),
-    format("DEBUG: Debuff Pattern 1 matched: Cond='~w' Troops='~w' Attrs='~w'~n", [CanonicalConds, Troops, Attrs])
+    format("DEBUG: matched terms for '2C1TAV' Cond1='~w', cond2='~w' attr1='~w' ValueAtom1='~w'~n", [Cond1, Cond2, Attr1, ValueAtom1]),
+    extract_value(ValueAtom1, Value1),
+    extract_condition_atoms(Cond1, PCond1),
+    extract_condition_atoms(Cond2, PCond2),
+    list_to_set([PCond1, PCond2], PCond),
+    Buffs = [buff(Attr1, '', Value1, PCond)],
+    format("DEBUG: Matched '2C1TAV': buff='~w'~n", [Buffs])
   }.
 
 % Pattern: 1C1AV1AandAV
@@ -70,7 +60,7 @@ buff_pattern(Buffs) -->
     expand_matrix(Troops, [Attribute1], Value1, [ConditionWord], B1),
     expand_matrix(Troops, [Attribute2, Attribute3], Value2, [ConditionWord], B2),
     append(B1, B2, Buffs),
-    format("DEBUG: 1C1AV1AandAV alt: attr1 + val1; attr2 and attr3 + val2~n", [])
+    format("DEBUG: 1C1AV1AandAV alt: attr1 + val1; attr2 and attr3 + val2~n" )
   }.
 
 % Pattern 1: Alternate matrix variant with + values
@@ -93,16 +83,22 @@ buff_pattern(Buffs) -->
 
 % Pattern 2: Standard matrix expansion
 buff_pattern(Buffs) -->
-  { format("DEBUG: trying Pattern 2~n") },
+  { format("DEBUG: Trying Pattern 2~n") },
   optional_verb,
   troop_list(Troops),
+  { format("DEBUG: Pattern 2 troop_list: '~w'~n", [Troops]) },
   attribute_list(Attributes),
+  { format("DEBUG: Pattern 2 Attributes: '~w'~n", [Attributes]) },
   [by], [ValueAtom],
-  [when], merged_conditions(UniqueConditions),
   {
     extract_value(ValueAtom, Value),
+    format("DEBUG: Pattern 2 Value: '~w'~n", [Value])
+  },
+  [when], [general], merged_conditions(UniqueConditions),
+  { format("DEBUG: Pattern 2 UniqueConditions: '~w'~n", [UniqueConditions]) },
+  {
     expand_matrix(Troops, Attributes, Value, [UniqueConditions], Buffs),
-    format("DEBUG: Pattern 2")
+    format("DEBUG: Pattern 2: Buffs '~w'~n", [Buffs])
   }.
 
 % Pattern 3: Matrix expansion with generic + specific attributes
@@ -146,15 +142,17 @@ buff_pattern(Buffs) -->
     format("DEBUG: Pattern 4")
   }.
 
-
-
-% 1 Buff Pattern 1: initial condition, no troops
+% 1C1A1V
+% 1C: one condition
+% 1A: one attribute
+% 1V: one value
+% no troops
 buff_pattern(Buffs) -->
-  { format("DEBUG: Trying '1 Buff Pattern 1'~n", []) },
+  { format("DEBUG: Trying '1C1A1V'~n", []) },
   [when], [general], [is],
-  consume_condition(CanonCond),
+  condition(CanonCond),
   {
-    format("DEBUG: Passed short_condition(~w)~n", [CanonCond])
+    format("DEBUG: Passed condition(~w)~n", [CanonCond])
   },
   attribute(AttributeAtom),
   { format("DEBUG: Passed attribute(~w)~n", [AttributeAtom]) },
@@ -162,21 +160,89 @@ buff_pattern(Buffs) -->
   {
     extract_value(ValueAtom, Value),
     format("DEBUG: Passed Value: '~w'~n", [Value]),
-    Buffs = [buff(AttributeAtom, '', Value, [CanonCond])],
-    format("DEBUG: Matched 1 Buff Pattern 1: attr='~w' value='~w' cond='~w' buff='~w'~n",
+    extract_condition_atoms(CanonCond, PrintableConditions),
+    Buffs = [buff(AttributeAtom, '', Value, PrintableConditions)],
+    format("DEBUG: Matched '1C1A1V': attr='~w' value='~w' cond='~w' buff='~w'~n",
            [AttributeAtom, Value, SingleCond, Buffs])
   }.
 
-% 2CCAVTAV
-% 2 Shared Conditions
-% 1 Condition Attribute Value clause
+% 1C1ATV1AV
+% 1 Shared Condition
+% 1 Troop Attribute Value clause
+% 1 Attribuve Value (no troop) clause
+buff_pattern(Buffs) -->
+  { format("DEBUG: Trying '1C1ATV1AV'~n")  },
+  [when],
+  condition(Cond1),
+  {
+    format("DEBUG: Passed condition(~w)~n", [Cond1])
+  },
+  troop(Troop1),
+  { format("DEBUG: Passed troop(~w)~n", [Troop1]) },
+  attribute(Attr1), [+],[ValueAtom1],
+  { format("DEBUG: Passed attribute(~w)~n", [Attr1]) },
+  {
+    extract_value(ValueAtom1, Value1),
+    format("DEBUG: Passed ValueAtom1(~w)~n", [Value1])
+  },
+  troop(_),  { format("DEBUG: found generic troop type~n") },
+  attribute(Attr2), [+],[ValueAtom2],
+  { format("DEBUG: Passed attribute(~w)~n", [Attr2]) },
+  {
+    extract_value(ValueAtom2, Value2),
+    format("DEBUG: Passed ValueAtom2(~w)~n", [Value2])
+  },
+  {
+    extract_condition_atoms(Cond1, PCond1),
+    Buff1 = buff(Attr1, Troop1, Value1, PCond1),
+    Buff2 = buff(Attr2, '', Value2, PCond1),
+    Buffs = [Buff1, Buff2],
+    format("DEBUG: '1C1ATV1AV' buffs: '~w'~n", [Buffs])
+  }.
+
+% 1C1AV1ATV
+% 1 Shared Condition
+% 1 Attribuve Value (no troop) clause
+% 1 Troop Attribute Value clause
+buff_pattern(Buffs) -->
+  { format("DEBUG: Trying '1C1AV1ATV'~n")  },
+  [when],
+  condition(Cond1),
+  {
+    extract_condition_atoms(Cond1, PCond1),
+    format("DEBUG: Passed condition(~w)~n", [PCond1])
+  },
+  troop(_),  { format("DEBUG: found generic troop type~n") },
+  attribute(Attr1), [+],[ValueAtom1],
+  { format("DEBUG: Passed attribute(~w)~n", [Attr1]) },
+  {
+    extract_value(ValueAtom1, Value1),
+    format("DEBUG: Passed ValueAtom1(~w)~n", [Value1])
+  },
+  troop(Troop2),
+  { format("DEBUG: Passed troop(~w)~n", [Troop2]) },
+  attribute(Attr2), [+],[ValueAtom2],
+  { format("DEBUG: Passed attribute(~w)~n", [Attr2]) },
+  {
+    extract_value(ValueAtom2, Value2),
+    format("DEBUG: Passed ValueAtom2(~w)~n", [Value2])
+  },
+  {
+    Buff1 = buff(Attr1, '', Value1, PCond1),
+    Buff2 = buff(Attr2, Troop2, Value2, PCond1),
+    Buffs = [Buff1, Buff2],
+    format("DEBUG: '1C1AV1ATV' buffs: '~w'~n", [Buffs])
+  }.
+
+% 1C1CAV1TAV
+% 1 Shared Condition
+% 1 Condition Attribute Value (no troop) clause
 % 1 Troop Attribuve Value clause
 buff_pattern(Buffs) -->
-  { format("DEBUG: Trying 2CCAVTAV~n")  },
+  { format("DEBUG: Trying 1C1CAV1TAV~n")  },
   [when],
   condition(Cond1),
   condition(Cond2),
-  condition(Cond3),
   attribute(Attr1), [ValueAtom1],
   {
     extract_value(ValueAtom1, Value1)
@@ -187,10 +253,10 @@ buff_pattern(Buffs) -->
     extract_value(ValueAtom2, Value2)
   },
   {
-    Buff1 = buff(Attr1, '', Value1, [Cond1, Cond2, Cond3]),
-    Buff2 = buff(Attr2, Troop2, Value2, [Cond1, Cond2]),
+    Buff1 = buff(Attr1, '', Value1, [Cond1, Cond2]),
+    Buff2 = buff(Attr2, Troop2, Value2, [Cond1]),
     Buffs = [Buff1, Buff2],
-    format("DEBUG: 2CCAVTAV buffs: '~w'~n", [Buffs])
+    format("DEBUG: 1C1CAV1TAV buffs: '~w'~n", [Buffs])
   }.
 
 % 1C1TAV1AV
@@ -226,12 +292,53 @@ buff_pattern(Buffs) -->
     format("DEBUG: 1C1TAV1AV buffs: '~w'~n", [Buffs])
   }.
 
-% 1 Buff Pattern 2: initial condition, with troops
+% 1C1TAV2A1V
+% 1C = 1 shared condition
+% 1TAV = 1 troop attribute value clause
+% 2A1V = no troop 2 attribute 1 value matrix clause
 buff_pattern(Buffs) -->
-  { format("DEBUG: Trying '1 Buff Pattern 2'~n", []) },
-  consume_condition(CanonCond),
+  { format("DEBUG: Trying 1C1TAV2A1V~n", []) },
+  [when],
+  condition(Cond1),
+  { format("DEBUG: Passed condition(~w)~n", [Cond1]) },
+  troop(Troop1),
+  { format("DEBUG: Passed troop(~w)~n", [Troop1]) },
+  attribute(Attr1),
+  { format("DEBUG: Passed attribute(~w)~n", [Attr1]) },
+  [+], [ValueAtom1],
   {
-    format("DEBUG: Passed short_condition(~w)~n", [CanonCond])
+    extract_value(ValueAtom1, Value1),
+    format("DEBUG: Passed ValueAtom1(~w)~n", [Value1])
+  },
+  troop(_), attribute(Attr2a), [and], attribute(Attr2b),
+  { format("DEBUG: Passed attribute(~w)~n", [Attr2a]) },
+  { format("DEBUG: Passed attribute(~w)~n", [Attr2b]) },
+  [+], [ValueAtom2],
+  {
+    extract_value(ValueAtom2, Value2),
+    format("DEBUG: Passed ValueAtom2(~w)~n", [Value2])
+  },
+  {
+    format("DEBUG: matched all for '1C1TAV2A1V'~n"),
+    extract_value(ValueAtom2, Value2),
+    Buff1 = buff(Attr1, Troop1, Value1, [Cond1]),
+    Buff2a = buff(Attr2a, '',   Value2, [Cond1]),
+    Buff2b = buff(Attr2b, '',   Value2, [Cond1]),
+    Buffs = [Buff1, Buff2a, Buff2b],
+    format("DEBUG: 1C1TAV2A1V buffs: '~w'~n", [Buffs])
+  }.
+
+% 1C1T1A1V
+% 1C: 1 condition
+% 1T: 1 Troop
+% 1A: 1 attribute
+% 1V: 1 value
+buff_pattern(Buffs) -->
+  { format("DEBUG: Trying '1C1T1A1V'~n", []) },
+  condition(CanonCond),
+  {
+    extract_condition_atoms(CanonCond, PrintableConditions),
+    format("DEBUG: Passed condition(~w)~n", [PrintableConditions])
   },
   troop(TroopAtom),
   { format("DEBUG: Passed troop(~w)~n", [TroopAtom]) },
@@ -241,8 +348,8 @@ buff_pattern(Buffs) -->
   {
     extract_value(ValueAtom, Value),
     format("DEBUG: Passed Value: '~w'~n", [Value]),
-    Buffs = [buff(AttributeAtom, TroopAtom, Value, [CanonCond])],
-    format("DEBUG: Matched 1 Buff Pattern 2: attr='~w' value='~w' cond='~w' buff='~w'~n",
+    Buffs = [buff(AttributeAtom, TroopAtom, Value, PrintableConditions)],
+    format("DEBUG: Matched '1C1T1A1V': attr='~w' value='~w' cond='~w' buff='~w'~n",
             [AttributeAtom, Value, SingleCond, Buffs])
   }.
 

@@ -61,7 +61,7 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Shared::Constants) {
     my $logger = $self->logger();
 
     # Check if the condition is a valid buff condition
-    if (any { $condition eq $_ } @{ $self->BuffConditionValues }) {
+    if (any { $condition eq $_ } keys %{ $self->BuffConditionValues } ) {
       # Initialize the array if it doesn't exist
       $buffConditions //= [];
 
@@ -92,7 +92,7 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Shared::Constants) {
     $logger->error(
       "Invalid condition: '$condition'. Must be one of: "
         . join(", ",
-        @{ $self->BuffConditionValues },
+        keys %{ $self->BuffConditionValues },
         @{ $self->DebuffConditionValues })
     );
     return 0;
@@ -112,7 +112,7 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Shared::Constants) {
     }
 
     # Find elements in @tbc that are not in the valid conditions
-    my %valid_conditions = map { $_ => 1 } @{ $self->BuffConditionValues };
+    my %valid_conditions = map { $_ => 1 } keys %{ $self->BuffConditionValues };
     @invalid = grep { !exists $valid_conditions{$_} } @tbc;
 
     # Report errors for invalid conditions
@@ -121,7 +121,7 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Shared::Constants) {
         push @errors,
           sprintf(
 'Detected illegal value "%s" in buffConditions. All values must be one of: %s',
-          $iv, join(', ', @{ $self->BuffConditionValues }));
+          $iv, join(', ', keys %{ $self->BuffConditionValues }));
       }
     }
 

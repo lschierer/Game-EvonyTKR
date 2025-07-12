@@ -2,6 +2,7 @@
 % Main entry point for buff parsing - delegates to specialized modules
 
 :- style_check(-singleton).
+:- discontiguous troop/3.
 :- include('EvonyBuffDictionary').
 :- include('buff_patterns').
 :- include('condition_processing').

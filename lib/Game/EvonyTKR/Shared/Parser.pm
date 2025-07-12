@@ -22,6 +22,7 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
       "Processing Prolog fragment: " . Data::Printer::np($buff_hash));
 
     my @result;
+    my $is_debuff = 0;
 
     unless (ref $buff_hash eq 'HASH') {
       $self->logger->warn("Expected buff as hash, got: $buff_hash");
@@ -32,6 +33,50 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
     my $troop_atom      = $buff_hash->{troop};
     my $value           = $buff_hash->{value};
     my $conditions_list = $buff_hash->{conditions} // [];
+
+# Prolog cannot parse the negative out of the numbers, we must do so here.
+# that also means that it sometimes does not set the debuff conditions correctly.
+    if ($value < 0) {
+      $self->logger->info("detected a debuff to convert");
+      $is_debuff = 1;
+      $value = abs($value);
+      if (scalar @{$conditions_list}) {
+        my $is_PvM = 0;
+        foreach my $c (@{$conditions_list}) {
+
+          if(exists $self->BuffConditionValues->{$c} ) {
+            if ( $self->BuffConditionValues->{$c}->{PvM}
+              && ( not $self->BuffConditionValues->{$c}->{Attacking} )
+              && ( not $self->BuffConditionValues->{$c}->{Defense} )
+              && ( not $self->BuffConditionValues->{$c}->{Mayor} )
+              && ( not $self->BuffConditionValues->{$c}->{Wall} )
+            ) {
+              # this particular disunion, while not exhaustive,
+              # is sufficient to ensure that we have eliminated
+              # the possibility this is a PvP buff. While
+              # there are conditions that overlap, only a
+              # definitively PvM buff can pass here.
+              $c =~ s/against monsters/monsters/i;
+              # a duplicate won't hurt, missing the value will.
+              # there is a possibility that at some future
+              # point a second value other than 'against monsters'
+              # might pass this test.
+              push @{ $conditions_list }, 'Monsters';
+              $is_PvM = 1;
+              last;
+            }
+          }
+        }
+        if (not $is_PvM) {
+
+        }
+      }
+      else {
+        # if there are NO conditions already,
+        # then it *cannot* be a PvM buff.
+        push @{$conditions_list}, 'Enemy';
+      }
+    }
 
     # Decode atom into full names
     my $attribute = $self->atom_to_attribute($attribute_atom);
@@ -59,16 +104,27 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
 
     # Handle condition normalization
     foreach my $cond (@$conditions_list) {
+      if(ref $cond eq 'ARRAY') {
+        $cond = join(' ', @{ $cond });
+      }
       my $r;
       if ($cond eq 'enemy') {
+        $is_debuff = 1;
         $r = $buff->set_condition('Enemy');
         $self->logger->debug(
           "Added debuff condition: 'Enemy' ; set_condition result: $r");
       }
       elsif ($cond eq 'monsters') {
+        $is_debuff = 1;
         $r = $buff->set_condition('Monsters');
         $self->logger->debug(
           "Added debuff condition: 'Monsters' ; set_condition result: $r");
+      }
+      elsif ( $cond eq 'against monsters' && $is_debuff) {
+        $cond = 'Monsters';
+        $r = $buff->set_condition($cond);
+        $self->logger->debug(
+          "Added buff condition: $cond ; set_condition result: $r");
       }
       else {
         $self->logger->debug("Processing condition: '$cond'");
@@ -90,14 +146,17 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
   }
 
   method normalize_condition_case($prolog_condition) {
-    $self->logger->debug(
-      "normalize_condition_case called with: '$prolog_condition'");
+    if(ref $prolog_condition eq 'ARRAY') {
+      $prolog_condition = join(' ', @{ $prolog_condition });
+    }
+    $self->logger->debug(sprintf(
+      'normalize_condition_case called with: "%s"', $prolog_condition));
 
     # Create a mapping from lowercase to proper case
     my %condition_map;
 
     # Build map from existing constants (both buff and debuff)
-    foreach my $const (@{ $self->BuffConditionValues },
+    foreach my $const (keys %{ $self->BuffConditionValues } ,
       @{ $self->DebuffConditionValues }) {
       $condition_map{ lc($const) } = $const;
     }
@@ -211,7 +270,7 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
       my @l  = split(/ /, $t);
       my $cs = join(", ", map {"'$_'"} @l);
       sprintf('condition([%s]) --> [%s].', $cs, $cs);
-    } $self->BuffConditionValues->@*;
+    } keys %{ $self->BuffConditionValues };
 
     push @rules, map {
       my $t  = lc($_);
@@ -257,7 +316,8 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
     # Group by predicate name
     my %grouped;
     foreach my $rule (@rules) {
-      my ($head) = $rule =~ /^(\w+)\(/;  # Extract predicate name (e.g., 'condition', 'attribute')
+      my ($head) = $rule =~
+        /^(\w+)\(/;    # Extract predicate name (e.g., 'condition', 'attribute')
       push @{ $grouped{$head} }, $rule;
     }
 
@@ -265,7 +325,8 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
     @rules = map {
       my $group = $_;
       sort { length($b) <=> length($a) } @$group
-    } @grouped{ sort keys %grouped };  # Maintain alphabetical order of predicate groups
+    } @grouped{ sort keys %grouped }
+      ;    # Maintain alphabetical order of predicate groups
     $grammar->spew_utf8(join("\n", @rules));
 
   }

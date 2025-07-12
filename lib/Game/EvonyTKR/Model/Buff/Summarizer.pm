@@ -152,7 +152,7 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
 
   # Filter buff conditions based on activation type
   method filterBuffConditions() {
-    my @buffConditions = @{ $self->BuffConditionValues };
+    my @buffConditions = keys %{ $self->BuffConditionValues };
 
     # Create a mapping of activation types to filter patterns
     my %activationFilters = (
