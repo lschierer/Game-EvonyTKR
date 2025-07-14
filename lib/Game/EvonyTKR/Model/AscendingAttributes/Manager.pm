@@ -70,6 +70,10 @@ class Game::EvonyTKR::Model::AscendingAttributes::Manager :
 
       $ascendingAttributes->{$name} =
         Game::EvonyTKR::Model::AscendingAttributes->new(general => $name,);
+      unless (exists $object->{ascending} && ref($object->{ascending}) eq 'ARRAY') {
+          $self->logger->error("object has unexpected format for '$name': " . Data::Printer::np($object));
+          next;
+      }
       foreach my $oa (@{ $object->{ascending} }) {
         my $level = $oa->{level};
         foreach my $ob (@{ $oa->{buff} }) {

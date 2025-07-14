@@ -117,16 +117,24 @@ class Game::EvonyTKR::Shared::Constants : isa(Game::EvonyTKR::Model::Logger) {
     $AttributeValues = \@temp;
   }
 
-  method string_to_attribute ($string) {
-    my $exact = first { lc($_) eq lc($string) } $AttributeValues->@*;
-    my $map   = {
-      'troop death into wounded rate' => 'Death to Wounded',
+  field $MappedAttributeNames :reader;
+
+  ADJUST {
+    Readonly::Scalar my $temp => {
+      'death into wounded rate' => 'Death to Wounded',
       'death into survival rate'      => 'Death to Survival',
       'march size increase'           => 'March Size',
       'march size'                    => 'March Size',
+      'the march size'                => 'March Size',
       'wounded into death rate'       => 'Wounded to Death',
       'wounded into death'            => 'Wounded to Death',
     };
+    $MappedAttributeNames = $temp;
+  }
+
+  method string_to_attribute ($string) {
+    my $exact = first { lc($_) eq lc($string) } $AttributeValues->@*;
+    my $map   = $MappedAttributeNames;
     if ($exact) {
       return $exact;
     }
@@ -431,13 +439,18 @@ class Game::EvonyTKR::Shared::Constants : isa(Game::EvonyTKR::Model::Logger) {
       'In-Rally'                   => "When Rallying",
       'Reduces Monster'            => "Monsters",          # debuff version
       'brings any dragon'          => 'brings a dragon',
+      'brings dragon'              => 'brings a dragon',
       'brings any spiritual beast' => 'brings a spiritual beast',
+      'brings spiritual beast'     => 'brings a spiritual beast',
       'to attack Monsters'         => 'Against Monsters',         # buff version
       'to attack'                  => 'Attacking',
-      'General is the Mayor'       => "When City Mayor for this SubCity",
-      'launching Alliance War'                 => 'When Rallying',
-      'attacking Monsters'                     => 'Against Monsters',
-      'In-city'                                => 'In City',
+      'the Mayor'                  => "When City Mayor for this SubCity",
+      'in this subordinate city'   => "When City Mayor for this SubCity",
+      'in subordinate city'        => "When City Mayor for this SubCity",
+      'launching Alliance War'     => 'When Rallying',
+      'attacking Monsters'         => 'Against Monsters',
+      'In-city'                    => 'In City',
+      'from Monsters'              => 'Against Monsters',
     };
     $mapped_conditions = $temp;
   }

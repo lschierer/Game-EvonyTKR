@@ -67,12 +67,14 @@ optional_when_general_is --> [when], [general], [is] ; [].
 optional_when_general --> [when], [general] ; [].
 optional_general_is --> ([general], [is]) ; [].
 optional_when --> [when] ; [].
-optional_verb --> [increases] ; [reduces] ; [].
+optional_verb --> [increases] ; [reduces] ; [grants]; [].
 optional_verb --> [increases].
 optional_verb --> [reduces].
 optional_verb --> [is].
 optional_verb --> [].
-optional_subject --> [general] ; [].
+optional_subject --> [general] ; [you]; [].
+optional_plus --> [+] ; [].
+optional_by   --> [by] ; [].
 
 % Optional troop placeholder that binds to '' if not matched
 troop('') -->
@@ -86,7 +88,13 @@ optional_troop('') --> [].
 
 % === TOKEN FILTERING ===
 
+% to identify when the sentence splitter resulted in an
+% empty string.
+string_empty(S) :- string_length(S, Len), Len =:= 0.
+
 % Identify junk tokens to filter out
+is_junk_token('a') :- !.
+is_junk_token('an') :- !.
 is_junk_token('.') :- !.
 is_junk_token(',') :- !.
 is_junk_token('%') :- !.
@@ -96,6 +104,7 @@ is_junk_token('”') :- !.        % Unicode right double quote
 is_junk_token('’') :- !.        % Unicode right single quote/apostrophe
 is_junk_token('\'') :- !.       % ASCII single quote/apostrophe (escaped)
 is_junk_token(_) :- fail.
+
 
 % === UTILITY PREDICATES ===
 

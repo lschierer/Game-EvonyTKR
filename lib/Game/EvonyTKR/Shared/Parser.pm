@@ -13,6 +13,7 @@ require Game::EvonyTKR::Model::Buff::Value;
 class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
   use List::AllUtils qw( first all any none uniq );
   use IPC::Open3;
+  use open qw(:std :utf8);
   use Symbol 'gensym';
   use namespace::autoclean;
 
@@ -34,8 +35,8 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
     my $value           = $buff_hash->{value};
     my $conditions_list = $buff_hash->{conditions} // [];
 
-# Prolog cannot parse the negative out of the numbers, we must do so here.
-# that also means that it sometimes does not set the debuff conditions correctly.
+    # Prolog cannot parse the negative out of the numbers, we must do so here.
+    # that also means that it sometimes does not set the debuff conditions correctly.
     if ($value < 0) {
       $self->logger->info("detected a debuff to convert");
       $is_debuff = 1;
@@ -237,7 +238,7 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
         my $base_atom    = join('_', @l);
         my $subcity_atom = "subcity_" . $base_atom;
 
-        sprintf('subcity_attribute(%s) --> [%s].', $base_atom,
+        sprintf('subcity_attribute(%s) --> [%s].', $subcity_atom,
           join('], [', @l));
       }
       else {
@@ -252,17 +253,34 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
 
           $tokens = join('], [', @l);
           push @r2, sprintf('attribute(%s) --> [%s].', $atom, $tokens);
-          if (scalar @l >= 2) {
-            if ($l[2] =~ /(?:wounded|death)/i) {
-              push @l, 'rate';
-              $tokens = join('], [', @l);
-              push @r2, sprintf('attribute(%s) --> [%s].', $atom, $tokens);
-            }
-          }
         }
         @r2;
       }
     } $self->AttributeValues->@*;
+
+    push @rules, map {
+      my $key = $_;
+      $self->logger->debug("attribute alias key is '$key'");
+      my $attr = $self->MappedAttributeNames->{$key};
+      $self->logger->debug("attribute for alias '$key' is '$attr'");
+
+      $attr = lc($attr);
+      my @term            = split(/ /, $attr);
+      my $base_atom    = join('_', @term);
+      my $val = lc($key);
+      my @synonym = split(/ /, $val);
+      foreach my $s (@synonym) {
+        $s =~ s/(.*)/\'$1\'/;
+      }
+
+
+      sprintf(
+        'attribute(%s) --> [%s].',
+        join('_', @term),
+        join(', ', @synonym)
+      );
+
+    } keys %{ $self->MappedAttributeNames };
 
     # Keep validation predicates for conditions
     push @rules, map {
@@ -281,9 +299,9 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
 
     push @rules, map {
       my $key = $_;
-      $self->logger->debug("condition key is $key");
+      $self->logger->debug("condition key is '$key'");
       my $val = $self->mapped_conditions->{$key};
-      $self->logger->debug("condition val is $val");
+      $self->logger->debug("condition val is '$val'");
 
       my @synonym = split(/ /, $val);
       $self->logger->debug("condition synonym is " . join(', ', @synonym));
@@ -362,6 +380,9 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
       $self->distDir->child('prolog/Game/EvonyTKR/Shared/buff_parser.pl')
     ];
     my $pid = open3($in_fh, $out_fh, $err_fh, @$cmd);
+    binmode($in_fh,  ":utf8");   # Write to Prolog's stdin
+    binmode($out_fh, ":utf8");   # Read from Prolog's stdout
+    binmode($err_fh, ":utf8");   # Read from Prolog's stderr
 
     print $in_fh "$quoted_text.\n";         # Send quoted string
     close $in_fh;

@@ -46,7 +46,8 @@ package Game::EvonyTKR::Converter {
 
   sub execute {
     my ($self, $opt, $args) = @_;
-
+    binmode(STDOUT, ":utf8");
+    binmode(STDERR, ":utf8");
     Log::Log4perl::Config->utf8(1);
     Log::Log4perl->easy_init($DEBUG);
 

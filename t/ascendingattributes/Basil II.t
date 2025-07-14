@@ -1,0 +1,206 @@
+use v5.40.0;
+use utf8::all;
+use experimental qw(class);
+use Test::More;
+use List::AllUtils qw( all any none );
+use Devel::Local;
+use File::FindLib 'lib';
+require Game::EvonyTKR;
+require Data::Printer;
+require Game::EvonyTKR::Shared::Parser;
+require Game::EvonyTKR::Logger::Config;
+require Path::Tiny;
+require Scalar::Util;
+
+use Log::Log4perl qw(:levels);
+#use Log::Log4perl qw(:easy);       #  <<- Tried these two lines first.
+#Log::Log4perl->easy_init($DEBUG);  #
+
+my $loggerConfig = Game::EvonyTKR::Logger::Config->new('test');
+my $logConfig    = Path::Tiny->cwd()->child('share/log4perl.test.conf ');
+say $logConfig->absolute();
+Log::Log4perl::init($logConfig->canonpath());
+
+my $parser = Game::EvonyTKR::Shared::Parser->new();
+$parser->logger->level($DEBUG)
+  ;    # <-- tried each solution with and without this line
+$parser->generate_grammar();
+
+use List::MoreUtils qw(uniq);
+
+## Andrew Jackson
+## Reduces enemy ranged troops’ attack by 20% and mounted troops’ HP by 20% when General is leading the army.
+
+diag 'start of Basil II Ascending Attributes';
+
+subtest 'Basil II Ascending Attributes' => sub {
+
+  subtest '1 Star' => sub {
+    my $text = 'Increases Mounted Troop and Ground Troop Attack by 10% and Defense by 10% when General is leading the army to attack.';
+    my $hb   = testText($text);
+
+    is scalar(@{$hb}), 4, "Final Buff Count";
+
+    ok(
+      match_buff(
+        $hb,
+        attribute  => 'Attack',
+        class     => 'Mounted Troops',
+        value      => 10,
+        conditions => ['leading the army', 'Attacking']
+      ),
+      '10% Mounted Troops Attack buff (leading the army, Attacking)'
+    );
+
+    ok(
+      match_buff(
+        $hb,
+        attribute  => 'Attack',
+        class     => 'Ground Troops',
+        value      => 10,
+        conditions => ['leading the army', 'Attacking']
+      ),
+      '10% Ground Troops Attack buff (leading the army, Attacking)'
+    );
+
+    ok(
+      match_buff(
+        $hb,
+        attribute  => 'Defense',
+        class     => 'Mounted Troops',
+        value      => 10,
+        conditions => ['leading the army', 'Attacking']
+      ),
+      '10% Mounted Troops Defense buff (leading the army, Attacking)'
+    );
+
+    ok(
+      match_buff(
+        $hb,
+        attribute  => 'Defense',
+        class     => 'Ground Troops',
+        value      => 10,
+        conditions => ['leading the army', 'Attacking']
+      ),
+      '10% Ground Troops Defense buff (leading the army, Attacking)'
+    );
+
+    done_testing();
+  };
+
+  subtest '3 Star' => sub {
+    my $text = 'When General is launching Alliance War, Rally Capacity +8%.';
+    my $hb   = testText($text);
+
+    is scalar(@{$hb}), 1, "Final Buff Count";
+
+    ok(
+      match_buff(
+        $hb,
+        attribute  => 'Rally Capacity',
+        value      => 8,
+        conditions => ['When Rallying' ]
+      ),
+      '8% Rally Capacity buff (When Rallying)'
+    );
+
+    done_testing()
+  };
+
+  subtest '4 Star' => sub {
+    my $text = 'Increases Mounted Troop and Ground Troop Attack by 10% and HP by 10% when General is leading the army to attack.';
+    my $hb   = testText($text);
+
+    is scalar(@{$hb}), 4, "Final Buff Count";
+
+
+    done_testing()
+  };
+
+  subtest '5 Star' => sub {
+    my $text = 'Increases Mounted Troop and Ground Troop Attack by 10%, Defense by 10% and HP by 10% when General is leading the army to attack.';
+    my $hb   = testText($text);
+
+    is scalar(@{$hb}), 6, "Final Buff Count";
+
+
+    done_testing()
+  };
+
+
+  done_testing();
+};
+done_testing();
+
+sub testText ($tt) {
+  my @fragments = $parser->tokenize_buffs($tt);
+  my @hashedBuffs;
+  foreach my $frag (@fragments) {
+    diag "frag is " . Data::Printer::np($frag);
+    my @nb = $parser->normalize_buff($frag);
+    diag "size: " . scalar(@nb);
+    diag "nb is " . Data::Printer::np(\@nb);
+    push(@hashedBuffs, @nb);
+  }
+  diag "final results are: " . Data::Printer::np(\@hashedBuffs);
+  diag "size: " . scalar(@hashedBuffs);
+
+  return \@hashedBuffs;
+}
+
+sub match_buff {
+  my ($buffs, %args) = @_;
+
+  return any {
+    my $buff = $_;
+
+    my $ok = 1;
+
+    if ($buff->attribute ne $args{attribute}) {
+      diag sprintf('attribute test failed: %s ne %s.',
+        $buff->attribute, $args{attribute});
+      $ok = 0;
+    }
+
+    if ($buff->value->number != $args{value}) {
+      diag sprintf('value test failed: %s ne %s.',
+        $buff->value->number, $args{value});
+      $ok = 0;
+    }
+
+    if (defined $args{class}) {
+      if (($buff->targetedType // '') ne $args{class}) {
+        diag sprintf(
+          'class test failed: %s ne %s.',
+          $buff->targetedType // 'undef',
+          $args{class}
+        );
+        $ok = 0;
+      }
+    }
+
+    if (defined $args{conditions} && @{ $args{conditions} }) {
+      if (scalar $buff->conditions() > 0) {
+        my @actual   = $buff->conditions();
+        my @expected = @{ $args{conditions} };
+        my @union    = List::MoreUtils::uniq(@actual, @expected);
+        if ( scalar(@union) != scalar(@actual)
+          || scalar(@actual) != scalar(@expected)) {
+          diag sprintf('conditions mismatch: actual=%s expected=%s union=%s',
+            scalar(@actual), scalar(@expected), scalar(@union));
+          diag('actual: ' . join(', ', @actual));
+          diag('expected: ' . join(', ', @expected));
+          $ok = 0;
+        }
+      }
+      else {
+        diag('expected conditions but none found in buff');
+        $ok = 0;
+      }
+    }
+
+    return $ok;
+  } @$buffs;
+}
+1;
+__END__

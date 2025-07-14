@@ -201,7 +201,7 @@ class Game::EvonyTKR::Converter::AscendingAttributes :
       }
       my $line = $lines[$index];
       my $key  = $red ? 'red' : 'purple';
-      if ($line =~ /^(\d) Star (.+)$/) {
+      if ($line =~ /^(\d) Star(?: –)? (.+)$/) {
         $key = "$key$1";
         if (exists $data->{$key}) {
           $data->{$key}->{text} = $2;
