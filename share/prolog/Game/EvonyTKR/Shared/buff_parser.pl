@@ -63,7 +63,8 @@ sentence_buffs(All) -->
 sentence_buffs([]) --> [].
 
 % Entry point for a single buff pattern
-buff(B) --> buff_pattern(B).
+buff(B) -->
+  buff_pattern(B).
 
 :- initialization(run_if_script).
 

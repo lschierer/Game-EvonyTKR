@@ -9,9 +9,6 @@ troop_list([T1, T2]) -->
 troop_list([T]) -->
   troop(T).
 
-
-
-
 % === ATTRIBUTE PARSING ===
 
 % Parse attribute list: "defense and hp"

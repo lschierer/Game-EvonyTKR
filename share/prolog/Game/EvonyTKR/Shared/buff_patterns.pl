@@ -190,26 +190,6 @@ buff_pattern(Buffs) -->
     format("DEBUG: '1C2TAV1CT2A1V' matched: '~w'~n", [Buffs])
   }.
 
-% Pattern: 1CTAV2A1V
-% 1 Troop Attribute Value clause
-% 1 Attribute Value clause
-buff_pattern(Buffs) -->
-  {format("Trying '1CTAV2A1V'~n")},
-  condition(Cond1),
-  {extract_condition_atoms(Cond1,PCond1)},
-  troop(Troop1), attribute(Attr1),
-  optional_plus, [ValueAtom1],
-  {extract_value(ValueAtom1,Value1)},
-  attribute(Attr2), [and], attribute(Attr3),
-  optional_plus, [ValueAtom2],
-  {extract_value(ValueAtom2,Value2)},
-  {
-    Buff1 = buff(Attr1, Troop1, Value1, [PCond1]),
-    Buff2 = buff(Attr2, Troop1, Value2, ['leading the army']),
-    Buff3 = buff(Attr3, Troop1, Value2, ['leading the army']),
-    Buffs = [Buff1, Buff2, Buff3],
-    format("DEBUG: '1CTAV2A1V' matched: '~w'~n", [Buffs])
-  }.
 
 % Pattern: 1TAV1AV
 % 1 Troop Attribute Value clause
@@ -277,6 +257,22 @@ buff_pattern(Buffs) -->
     format("DEBUG: '1C1TAVandAV' matched: Buffs: '~w'~n", [Buffs])
   }.
 
+% Pattern: 1TAVandAV
+% 1 shared condition
+% 1 Troop Attribute Value and Attribute Value
+buff_pattern(Buffs) -->
+  {format("Trying '1TAVandAV'~n")},
+  optional_when,troop(Troop1),attribute(Attr1),
+  optional_plus,[ValueAtom1],
+  {extract_value(ValueAtom1, Value1)},
+  [and],attribute(Attr2),optional_plus,[ValueAtom2],
+  { extract_value(ValueAtom2, Value2) },
+  {
+    Buff1 = buff(Attr1,Troop1,Value1,[]),
+    Buff2 = buff(Attr2,Troop1,Value2,[]),
+    Buffs = [Buff1, Buff2],
+    format("DEBUG: '1TAVandAV' matched: Buffs: '~w'~n", [Buffs])
+  }.
 
 % Pattern: 1C1TAVandTAV1C
 % 1 shared condition (no commas or periods)
@@ -378,6 +374,28 @@ buff_pattern(Buffs) -->
     format("DEBUG: 1C1TLAV1AandAV matched~n" )
   }.
 
+% Pattern: 1CTAV2A1V
+% 1 Troop Attribute Value clause
+% 1 Attribute Value clause
+buff_pattern(Buffs) -->
+  {format("Trying '1CTAV2A1V'~n")},
+  condition(Cond1),
+  {extract_condition_atoms(Cond1,PCond1)},
+  troop(Troop1), attribute(Attr1),
+  optional_plus, [ValueAtom1],
+  {extract_value(ValueAtom1,Value1)},
+  attribute(Attr2), [and], attribute(Attr3),
+  optional_plus, [ValueAtom2],
+  {extract_value(ValueAtom2,Value2)},
+  {
+    Buff1 = buff(Attr1, Troop1, Value1, [PCond1]),
+    Buff2 = buff(Attr2, Troop1, Value2, []),
+    Buff3 = buff(Attr3, Troop1, Value2, []),
+    Buffs = [Buff1, Buff2, Buff3],
+    format("DEBUG: '1CTAV2A1V' matched: '~w'~n", [Buffs])
+  }.
+
+
 % 2T1AVand2T1AV1C
 % 2 Troops
 % 1 Attribute Value clause
@@ -438,6 +456,25 @@ buff_pattern(Buffs) -->
     Buff4 = buff(Attr2, Troop2, Value2, PCond),
     Buffs = [Buff1, Buff2, Buff3, Buff4 ],
     format("DEBUG: '2T1AVand1AV2C' matched: '~w'~n", [Buffs])
+  }.
+
+% 2T2xAV
+% 2 Troops
+% 2x  Attribute Value clauses
+buff_pattern(Buffs) -->
+  {format("DEBUG: Trying '2T2xAV'~n")},
+  troop(Troop1), [and], troop(Troop2),
+  attribute(Attr1), optional_plus, [ValueAtom1], {
+    extract_value(ValueAtom1, Value1) },
+  [and], attribute(Attr2), optional_plus,
+  [ValueAtom2], { extract_value(ValueAtom2, Value2) },
+ {
+    Buff1 = buff(Attr1, Troop1, Value1, []),
+    Buff2 = buff(Attr1, Troop2, Value1, []),
+    Buff3 = buff(Attr2, Troop1, Value2, []),
+    Buff4 = buff(Attr2, Troop2, Value2, []),
+    Buffs = [Buff1, Buff2, Buff3, Buff4 ],
+    format("DEBUG: '2T2xAV' matched: '~w'~n", [Buffs])
   }.
 
 % 2T2xAV1andAV2C
@@ -736,6 +773,26 @@ buff_pattern(Buffs) -->
     Buff2 = buff(Attr2, Troop2, Value2, [Cond1]),
     Buffs = [Buff1, Buff2],
     format("DEBUG: 1C1CAV1TAV matched buffs: '~w'~n", [Buffs])
+  }.
+
+% Pattern: 1TAV2T2A1V
+buff_pattern(Buffs) -->
+  { format("DEBUG: Trying '1TAV2T2A1V'~n")  },
+  troop(Troop1),attribute(Attr1),
+  optional_plus, [ValueAtom1],
+  { extract_value(ValueAtom1, Value1) },
+  troop(Troop2), [and], troop(Troop3),
+  attribute(Attr2), [and], attribute(Attr3),
+  optional_plus, [ValueAtom2],
+  { extract_value(ValueAtom2, Value2) },
+  {
+    Buff1 = buff(Attr1, Troop1, Value1, []),
+    Buff2 = buff(Attr2, Troop2, Value2, []),
+    Buff3 = buff(Attr3, Troop2, Value2, []),
+    Buff4 = buff(Attr2, Troop3, Value2, []),
+    Buff5 = buff(Attr3, Troop3, Value2, []),
+    Buffs = [Buff1, Buff2, Buff3, Buff4, Buff5],
+    format("DEBUG: '1TAV2T2A1V' matched: buffs: '~w'~n", [Buffs])
   }.
 
 % 1C1TAV1AV

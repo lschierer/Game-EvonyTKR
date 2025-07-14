@@ -1,6 +1,18 @@
 % File: condition_processing.pl
 % All condition parsing and processing logic using modern DCG rules
 
+% Normalize empty conditions in buff lists
+normalize_empty_conditions([], []).
+normalize_empty_conditions([buff(Attr, Troop, Val, Conds)|Rest], [buff(Attr, Troop, Val, NormConds)|NormRest]) :-
+  normalize_single_condition(Conds, NormConds),
+  normalize_empty_conditions(Rest, NormRest).
+
+% Handle different empty condition formats
+normalize_single_condition([], []) :- !.           % Empty list stays empty
+normalize_single_condition('', []) :- !.           % Empty string becomes empty list
+normalize_single_condition([Cond], [Cond]) :- !.   % Single condition stays as-is
+normalize_single_condition(Conds, Conds).          % Multiple conditions stay as-is
+
 % === Simple condition matchers ===
 
 % Matches a single condition phrase (including synonyms) and returns its canonical string
