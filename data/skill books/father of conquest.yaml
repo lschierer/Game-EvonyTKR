@@ -1,0 +1,13 @@
+---
+buffs:
+- attribute: Double Items Drop Rate
+  conditions:
+  - Against Monsters
+  - leading the army
+  passive: 0
+  targetedType: ''
+  value:
+    number: 25
+    unit: percentage
+name: Father of Conquest
+text: Grants you a 25% Double Items Drop Rate from Monsters when General is leading the army.
