@@ -60,7 +60,7 @@ package Game::EvonyTKR::Converter {
       my $generalHander = Game::EvonyTKR::Converter::General->new();
       $generalHander->execute();
     }
-    if ($opt->mode eq 'skillbook') {
+    elsif ($opt->mode eq 'skillbook') {
       my $bookHandler = Game::EvonyTKR::Converter::SkillBook->new(
         outputDir => $dd->child('/collections/data/skill books/'),
         debug     => $debug,

@@ -25,6 +25,8 @@ class Game::EvonyTKR::Converter::General :
   field $ascending = 0;
   field $stars     = 'none';
 
+  field @types;
+
   method getPrimaryFields {
     say "Enter the General's Name:";
     my $n = <STDIN>;
@@ -70,6 +72,22 @@ class Game::EvonyTKR::Converter::General :
       $stars     = $v;
       $ascending = 1;
     }
+    say "Enter General's type as one or more of " . join (', ', $self->GeneralKeys->@*) . " (one per line).";
+    say "Press Ctrl+D when finished, or type 'END' on a new line:";
+    while (my $t = <STDIN>) {
+      chomp $t;
+      if($t ne 'END') {
+        if( any {$t eq $_ } $self->GeneralKeys->@* ){
+          say "adding type $t to $name";
+          push @types, $t;
+        } else {
+          say "type $t is invalid, must be one of " . join (', ', $self->GeneralKeys->@*);
+        }
+      }
+      else {
+        last;
+      }
+    }
   }
 
   method printYAML {
@@ -97,6 +115,7 @@ class Game::EvonyTKR::Converter::General :
       specialties => $specialties,
       ascending   => $ascending,
       stars       => $stars,
+      type        => \@types,
     };
     $self->logger->debug(sprintf('general is %s', Data::Printer::np($data)));
     say YAML::PP->new(
