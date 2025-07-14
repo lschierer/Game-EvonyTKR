@@ -124,6 +124,7 @@ class Game::EvonyTKR::Shared::Constants : isa(Game::EvonyTKR::Model::Logger) {
       'death into wounded rate' => 'Death to Wounded',
       'death into survival rate'      => 'Death to Survival',
       'march size increase'           => 'March Size',
+      'march size Capacity'           => 'March Size',
       'march size'                    => 'March Size',
       'the march size'                => 'March Size',
       'wounded into death rate'       => 'Wounded to Death',

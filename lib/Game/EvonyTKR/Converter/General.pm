@@ -63,10 +63,10 @@ class Game::EvonyTKR::Converter::General :
       push(@$specialties, $v);
     }
     say "Enter ascending level from one of "
-      . join(', ', $self->AscendingAttributeLevelValues()->@*);
+      . join(', ', $self->AscendingAttributeLevelValues());
     $v = <STDIN>;
     chomp $v;
-    if (any { $_ eq $v } $self->AscendingAttributeLevelValues()->@*) {
+    if (any { $_ eq $v } $self->AscendingAttributeLevelValues()) {
       $stars     = $v;
       $ascending = 1;
     }
