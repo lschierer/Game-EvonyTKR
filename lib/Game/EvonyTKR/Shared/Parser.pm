@@ -57,7 +57,7 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
               # the possibility this is a PvP buff. While
               # there are conditions that overlap, only a
               # definitively PvM buff can pass here.
-              $c =~ s/against monsters/monsters/i;
+              $c =~ s/against[_ ]monsters/monsters/i;
               # a duplicate won't hurt, missing the value will.
               # there is a possibility that at some future
               # point a second value other than 'against monsters'
@@ -121,7 +121,7 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
         $self->logger->debug(
           "Added debuff condition: 'Monsters' ; set_condition result: $r");
       }
-      elsif ( $cond eq 'against monsters' && $is_debuff) {
+      elsif ( $cond =~ /against[_ ]monsters/i && $is_debuff) {
         $cond = 'Monsters';
         $r = $buff->set_condition($cond);
         $self->logger->debug(
@@ -153,6 +153,29 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
     $self->logger->debug(sprintf(
       'normalize_condition_case called with: "%s"', $prolog_condition));
 
+    # Handle the new underscore-based condition format
+    # Convert underscore atoms back to display format
+    if ($prolog_condition =~ /^[a-z_]+$/ && $prolog_condition =~ /_/) {
+      # This looks like an underscore-based atom from Prolog
+      my $display_condition = $prolog_condition;
+      $display_condition =~ s/_/ /g;  # Convert underscores to spaces
+
+      $self->logger->debug("Converted underscore atom: '$prolog_condition' -> '$display_condition'");
+
+      # Try to map to proper case using existing constants
+      my $mapped = $self->string_to_condition($display_condition);
+      if ($mapped) {
+        $self->logger->debug("string_to_condition mapped: '$display_condition' -> '$mapped'");
+        return $mapped;
+      }
+
+      # Fallback: capitalize each word
+      my $capitalized = join(' ', map { ucfirst($_) } split(/ /, $display_condition));
+      $self->logger->debug("Using capitalized fallback: '$display_condition' -> '$capitalized'");
+      return $capitalized;
+    }
+
+    # Legacy handling for old format (space-separated strings)
     # Create a mapping from lowercase to proper case
     my %condition_map;
 
@@ -270,61 +293,81 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
       my $val = lc($key);
       my @synonym = split(/ /, $val);
       foreach my $s (@synonym) {
-        $s =~ s/(.*)/\'$1\'/;
+        $s =~ s/(.*)/[$1]/;
+        $s =~ s/\’//g;
       }
-
-
-      sprintf(
-        'attribute(%s) --> [%s].',
-        join('_', @term),
-        join(', ', @synonym)
-      );
-
+      if($key =~ /^sub/i ) {
+        sprintf(
+          'subcity_attribute(%s) --> %s.',
+          join('_', @term),
+          join(', ', @synonym)
+        );
+      }
+      else {
+        sprintf(
+          'attribute(%s) --> %s.',
+          join('_', @term),
+          join(', ',  @synonym)
+        );
+      }
     } keys %{ $self->MappedAttributeNames };
 
     # Keep validation predicates for conditions
     push @rules, map {
-      my $t  = lc($_);
-      my @l  = split(/ /, $t);
-      my $cs = join(", ", map {"'$_'"} @l);
-      sprintf('condition([%s]) --> [%s].', $cs, $cs);
+      my $t = lc($_);
+      my @l      = split(/ /, $t);
+      my $atom   = join('_',    @l);
+      my $tokens = join('], [', @l);
+      my @r2;
+      push @r2, sprintf('condition(%s) --> [%s].', $atom, $tokens);
+
+      if (scalar @l > 1 && $l[1] eq 'to') {
+        $l[1] = 'into';
+
+        $tokens = join('], [', @l);
+        push @r2, sprintf('condition(%s) --> [%s].', $atom, $tokens);
+      }
+      @r2;
     } keys %{ $self->BuffConditionValues };
 
     push @rules, map {
-      my $t  = lc($_);
-      my @l  = split(/ /, $t);
-      my $cs = join(", ", map {"'$_'"} @l);
-      sprintf('condition([%s]) --> [%s].', $cs, $cs);
+      my $t = lc($_);
+      my @l      = split(/ /, $t);
+      my $atom   = join('_',    @l);
+      my $tokens = join('], [', @l);
+      my @r2;
+      push @r2, sprintf('condition(%s) --> [%s].', $atom, $tokens);
+
+      if (scalar @l > 1 && $l[1] eq 'to') {
+        $l[1] = 'into';
+
+        $tokens = join('], [', @l);
+        push @r2, sprintf('condition(%s) --> [%s].', $atom, $tokens);
+      }
+      @r2;
     } $self->DebuffConditionValues->@*;
 
     push @rules, map {
       my $key = $_;
-      $self->logger->debug("condition key is '$key'");
-      my $val = $self->mapped_conditions->{$key};
-      $self->logger->debug("condition val is '$val'");
+      $self->logger->debug("condition alias key is '$key'");
+      my $attr = $self->mapped_conditions->{$key};
+      $self->logger->debug("condition for alias '$key' is '$attr'");
 
+      $attr = lc($attr);
+      my @term            = split(/ /, $attr);
+      my $base_atom    = join('_', @term);
+      my $val = lc($key);
       my @synonym = split(/ /, $val);
-      $self->logger->debug("condition synonym is " . join(', ', @synonym));
       foreach my $s (@synonym) {
-        $s =~ s/(.*)/\'$1\'/;
-      }
-      $self->logger->debug(
-        "condition synonym step2 is " . join(', ', @synonym));
-
-      my @term = split(/ /, $key);
-      foreach my $t (@term) {
-        $t =~ s/(.*)/\'$1\'/;
+        $s =~ s/(.*)/[$1]/;
+        $s =~ s/[\x{2018}\x{2019}]/'/g;
       }
 
       sprintf(
-        'condition([%s]) --> [%s].',
-        join(', ', @synonym),
-        join(', ', @term)
+        'condition(%s) --> %s.',
+        join('_', @term),
+        join(', ', @synonym)
       );
-    } sort {
-      my @aparts = split(/ /, $a);
-      my @bparts = split(/ /, $b);
-      return scalar(@aparts) <=> scalar(@bparts);
     } keys %{ $self->mapped_conditions };
 
     foreach my $r (@rules) {

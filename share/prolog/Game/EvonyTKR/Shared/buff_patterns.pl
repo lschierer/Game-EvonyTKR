@@ -1,6 +1,25 @@
 % File: buff_patterns.pl
 % All DCG patterns for parsing different buff structures
 
+% Subcity Pattern: Sub1SaV
+% this has all sorts of constants
+% because I do not care to add
+% this many special cases to the
+% global Constants file.
+% Generic Troops,
+buff_pattern(Buffs) -->
+  {format("DEBUG: Trying 'Sub1SaV'~n")},
+  optional_verb, subcity_attribute(Attr1),
+  [by], [ValueAtom1],
+  {extract_value(ValueAtom1, Value1)},
+  optional_when_general_is, [the],[mayor],
+  {
+    Buffs = [
+      buff(Attr1,'',Value1,['when', 'city', 'mayor', 'for', 'this', 'subcity'])
+    ],
+    format("DEBUG: 'Sub1SaV' matched: '~w'~n", [Buffs])
+  }.
+
 % Subcity Pattern: Sub1CSACV
 % 1 Condition Attribute Condition Value
 % Generic Troops,
@@ -22,6 +41,7 @@ buff_pattern(Buffs) -->
     Buffs = [buff(Attr1,'',Value1,PCond)],
     format("DEBUG: 'Sub1CSACV' matched: '~w'~n", [Buffs])
   }.
+
 
 % Subcity Pattern 1: Matrix expansion
 % initial attribute with no troop type + bifurcated with troop type attribute + shared conditions
@@ -433,6 +453,25 @@ buff_pattern(Buffs) -->
     format("DEBUG: '1CTAVand1C2T1AV1C' matched: '~w'~n", [Buffs])
   }.
 
+% Pattern: 1C2T1AV1C
+buff_pattern(Buffs) -->
+  {format("DEBUG: Trying '1C2T1AV1C'~n")},
+  optional_verb, condition(Cond1),
+  {extract_condition_atoms(Cond1,PCond1)},
+  troop(Troop1), [and], troop(Troop2),
+  attribute(Attr1), [by], [ValueAtom1],
+  {extract_value(ValueAtom1,Value1)},
+  optional_when_general_is,condition(Cond2),
+  {extract_condition_atoms(Cond2,PCond2)},
+  {
+    list_to_set([PCond1,PCond2], PCondA),
+    Buffs = [
+      buff(Attr1, Troop1, Value1, PCondA),
+      buff(Attr1, Troop2, Value1, PCondA)
+    ],
+    format("DEBUG: '1C2T1AV1C' matched: '~w'~n", [Buffs])
+  }.
+
 % Pattern: 1C1TLAV1AandAV
 % 1C: shared condition
 % 1TLAV: there is one or more troop types then an attribute with its own value
@@ -598,7 +637,7 @@ buff_pattern(Buffs) -->
 % 1 Troop Attribute Value clause
 % 2 Troop 1Attribute Value clause
 % 2 shared conditions
-buff_pattern(Buffs)-->
+buff_pattern(Buffs) -->
   {format("DEBUG: Trying '1TAVand2T1AV2C'~n")},
   optional_verb, troop(Troop1), attribute(Attr1),
   optional_by, [ValueAtom1],{
@@ -884,7 +923,7 @@ buff_pattern(Buffs) -->
 buff_pattern(Buffs) -->
   { format("DEBUG: Trying 1C1TAV1AV~n", []) },
   [when],
-  consume_condition(CanonCond),
+  condition(CanonCond),
   { format("DEBUG: Passed short_condition(~w)~n", [CanonCond]) },
   troop(Troop1),
   { format("DEBUG: Passed troop(~w)~n", [Troop1]) },
@@ -1022,7 +1061,7 @@ buff_pattern(Buffs) -->
 % Pattern 1C1TAV
 % 1 shared condition
 % 1 troop attribute value clause
-buff_pattern([buff(Attr1, Troop1, Value1, [PCond1])]) -->
+buff_pattern(Buffs) -->
   {format("DEBUG: Trying '1C1TAV'~n")},
   optional_when, condition(Cond1),
   {
@@ -1038,8 +1077,12 @@ buff_pattern([buff(Attr1, Troop1, Value1, [PCond1])]) -->
     extract_value(ValueAtom1, Value1),
     format("DEBUG: ValueAtom1: '~w'~n", [Value1])
   },
-  { format("DEBUG: '1C1TAV' matched: buff: troop=~w attr=~w value=~w cond=~w~n",
-    [Troop1, Attr1, Value, PCond1])
+  {
+    Buffs = [
+      buff(Attr1, Troop1, Value1, [PCond1])
+    ],
+    format("DEBUG: '1C1TAV' matched: '~w'~n",
+    [Buffs])
   }.
 
 

@@ -121,7 +121,7 @@ class Game::EvonyTKR::Shared::Constants : isa(Game::EvonyTKR::Model::Logger) {
 
   ADJUST {
     Readonly::Scalar my $temp => {
-      'death into wounded rate' => 'Death to Wounded',
+      'death into wounded rate'       => 'Death to Wounded',
       'death into survival rate'      => 'Death to Survival',
       'march size increase'           => 'March Size',
       'march size Capacity'           => 'March Size',
@@ -129,6 +129,10 @@ class Game::EvonyTKR::Shared::Constants : isa(Game::EvonyTKR::Model::Logger) {
       'the march size'                => 'March Size',
       'wounded into death rate'       => 'Wounded to Death',
       'wounded into death'            => 'Wounded to Death',
+      'subordinate city troops’ death to survival rate'   => 'SubCity Death to Survival',
+      'subordinate city troops’ death to survival'        => 'SubCity Death to Survival',
+      'subordinate city troops’ death into survival rate' => 'SubCity Death to Survival',
+      'subordinate city troops’ death into survival'      => 'SubCity Death to Survival',
     };
     $MappedAttributeNames = $temp;
   }
@@ -457,7 +461,7 @@ class Game::EvonyTKR::Shared::Constants : isa(Game::EvonyTKR::Model::Logger) {
   }
 
   method string_to_condition ($string) {
-    my $exactBuff   = first { $_ eq $string } $BuffConditionValues->@*;
+    my $exactBuff   = first { $_ eq $string } keys %{ $BuffConditionValues };
     my $exactDebuff = first { $_ eq $string } $DebuffConditionValues->@*;
     my $map         = $mapped_conditions;
 
@@ -470,7 +474,7 @@ class Game::EvonyTKR::Shared::Constants : isa(Game::EvonyTKR::Model::Logger) {
     elsif (exists $map->{$string}) {
       my $v = $map->{$string};
       unless (any { $_ eq $v }
-        ($BuffConditionValues->@*, $DebuffConditionValues->@*)) {
+        (keys %{ $BuffConditionValues }, $DebuffConditionValues->@*)) {
         $self->logger->logcroak(
           "$v is not a valid condition mapping for $string");
       }
@@ -486,7 +490,7 @@ class Game::EvonyTKR::Shared::Constants : isa(Game::EvonyTKR::Model::Logger) {
   method AllConditions() {
     my %seen;
     my @allowedConditions = grep { not $seen{$_}++ } (
-      @{$BuffConditionValues}, @{$DebuffConditionValues},
+      keys %{ $BuffConditionValues }, @{$DebuffConditionValues},
       @{$BookConditionValues}
     );
     return @allowedConditions;

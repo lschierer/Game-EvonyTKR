@@ -27,12 +27,12 @@ $parser->generate_grammar();
 
 use List::MoreUtils qw(uniq);
 
-## Dictator
+## Roman Emperor
 ## Reduces enemy ground troops and mounted troops’ attack by 20% when General is leading the army. Increases Subordinate City troops’ death to survival rate by 10% when General is the Mayor.
 
-diag 'start of Dictator Skill Book';
-subtest 'Dictator Skill Book' => sub {
-  my $text = "Increases mounted troops’ attack by 45% when General is leading the army to attack Monsters. Increases ground troops and mounted troops’ attack by 15% when General brings any dragon.";
+diag 'start of Roman Emperor Skill Book';
+subtest 'Roman Emperor Skill Book' => sub {
+  my $text = "Reduces enemy ground troops and mounted troops’ attack by 20% when General is leading the army. Increases Subordinate City troops’ death to survival rate by 10% when General is the Mayor.";
 
   my $hb   = testText($text);
 
@@ -42,22 +42,11 @@ subtest 'Dictator Skill Book' => sub {
     match_buff(
       $hb,
       attribute  => 'Attack',
-      class      => 'Mounted Troops',
-      value      => 45,
-      conditions => ['leading the army', 'Against Monsters']
-    ),
-    '45% Mounted Troops Attack buff (leading the army, Attacking)'
-  );
-
-  ok(
-    match_buff(
-      $hb,
-      attribute  => 'Attack',
       class      => 'Ground Troops',
-      value      => 15,
-      conditions => ['brings a dragon']
+      value      => 20,
+      conditions => ['Enemy', 'leading the army']
     ),
-    '15% Ground Troops Attack buff (brings a dragon)'
+    '20% Ground Troops Attack debuff (Enemny leading the army)'
   );
 
   ok(
@@ -65,10 +54,20 @@ subtest 'Dictator Skill Book' => sub {
       $hb,
       attribute  => 'Attack',
       class      => 'Mounted Troops',
-      value      => 15,
-      conditions => ['brings a dragon']
+      value      => 20,
+      conditions => ['Enemy', 'leading the army']
     ),
-    '15% Mounted Troops Attack buff (brings a dragon)'
+    '20% Mounted Troops Attack debuff (Enemny leading the army)'
+  );
+
+  ok(
+    match_buff(
+      $hb,
+      attribute  => 'Death to Survival',
+      value      => 10,
+      conditions => ['When City Mayor for this SubCity']
+    ),
+    '10% Mounted Troops Death to Survival buff (When City Mayor for this SubCity)'
   );
 
   done_testing();
