@@ -461,14 +461,16 @@ class Game::EvonyTKR::Shared::Constants : isa(Game::EvonyTKR::Model::Logger) {
   }
 
   method string_to_condition ($string) {
-    my $exactBuff   = first { $_ eq $string } keys %{ $BuffConditionValues };
-    my $exactDebuff = first { $_ eq $string } $DebuffConditionValues->@*;
+    my $exactBuff   = first { $string =~ /$_/i } keys %{ $BuffConditionValues };
+    my $exactDebuff = first { $string =~ /$_/i } $DebuffConditionValues->@*;
     my $map         = $mapped_conditions;
 
     if ($exactBuff) {
+      $self->logger->debug("Mapped Exact Buff $exactBuff");
       return $exactBuff;
     }
     elsif ($exactDebuff) {
+      $self->logger->debug("Mapped Exact DeBuff $exactDebuff");
       return $exactDebuff;
     }
     elsif (exists $map->{$string}) {

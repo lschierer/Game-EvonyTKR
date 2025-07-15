@@ -147,9 +147,7 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
   }
 
   method normalize_condition_case($prolog_condition) {
-    if(ref $prolog_condition eq 'ARRAY') {
-      $prolog_condition = join(' ', @{ $prolog_condition });
-    }
+
     $self->logger->debug(sprintf(
       'normalize_condition_case called with: "%s"', $prolog_condition));
 

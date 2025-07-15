@@ -63,11 +63,11 @@ subtest 'Roman Emperor Skill Book' => sub {
   ok(
     match_buff(
       $hb,
-      attribute  => 'Death to Survival',
+      attribute  => 'SubCity Death to Survival',
       value      => 10,
       conditions => ['When City Mayor for this SubCity']
     ),
-    '10% Mounted Troops Death to Survival buff (When City Mayor for this SubCity)'
+    '10%  Death to Survival buff (When City Mayor for this SubCity)'
   );
 
   done_testing();
