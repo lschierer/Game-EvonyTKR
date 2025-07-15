@@ -696,6 +696,26 @@ buff_pattern(Buffs) -->
     format("DEBUG: Pattern 4 matched~n")
   }.
 
+% 1C2T2xAV
+% no troops
+buff_pattern(Buffs) -->
+  { format("DEBUG: Trying '1C2T2xAV'~n", []) },
+  condition(Cond1),
+  troop(Troop1), [and], troop(Troop2),
+  attribute(Attr1), optional_plus, [ValueAtom1],
+  {extract_value(ValueAtom1, Value1)}, [and],
+  attribute(Attr2), optional_plus, [ValueAtom2],
+  {extract_value(ValueAtom2, Value2)},
+  {
+    Buffs = [
+      buff(Attr1, Troop1, Value1, [Cond1]),
+      buff(Attr1, Troop2, Value1, [Cond1]),
+      buff(Attr2, Troop1, Value2, [Cond1]),
+      buff(Attr2, Troop2, Value2, [Cond1])
+    ],
+    format("DEBUG: matched '1C2T2xAV': '~w'~n", [Buffs])
+  }.
+
 % 1C2T1A1V
 % 1C: one condition
 % 2 Troop Types
