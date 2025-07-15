@@ -457,8 +457,9 @@ class Game::EvonyTKR::Shared::Constants : isa(Game::EvonyTKR::Model::Logger) {
       'in subordinate city'        => "When City Mayor for this SubCity",
       'launching Alliance War'     => 'When Rallying',
       'attacking Monsters'         => 'Against Monsters',
-      'In-city'                    => 'In City',
+      'in-city'                    => 'In City',
       'from Monsters'              => 'Against Monsters',
+      'the main city defense general'  => 'When The Main Defense General',
     };
     $mapped_conditions = $temp;
   }

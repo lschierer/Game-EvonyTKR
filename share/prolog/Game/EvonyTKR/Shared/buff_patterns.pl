@@ -105,11 +105,30 @@ buff_pattern(Buffs) -->
     format("DEBUG: '1CACV' matched: '~w'~n", [Buffs])
   }.
 
+% Pattern: 2C1T2xAV
+buff_pattern(Buffs) -->
+  {format("DEBUG: Trying '2C1T2xAV'~n")},
+  optional_when_general_is, condition(Cond1),
+  condition(Cond2), troop(Troop1), attribute(Attr1),
+  optional_value_adj, [ValueAtom1],
+  {extract_value(ValueAtom1,Value1)},
+  [and], attribute(Attr2), optional_value_adj,
+  [ValueAtom2],
+  {extract_value(ValueAtom2,Value2)},
+  {
+    Buffs = [
+      buff(Attr1, Troop1, Value1, [Cond1, Cond2]),
+      buff(Attr2, Troop1, Value2, [Cond1, Cond2])
+    ],
+    format("DEBUG: '2C1T2xAV' matched: '~w'~n", [Buffs])
+  }.
+
+
 % Pattern: 2C1AV
 % 2C: 2 Conditions
 % 1AV: 1 [No|Generic] Troop Attribute Value clause
 buff_pattern(Buffs) -->
-  {format("Trying '2C1AV'~n")},
+  {format("DEBUG: Trying '2C1AV'~n")},
   condition(Cond1), condition(Cond2),troop(Tx),
   attribute(Attr1),optional_value_adj,[ValueAtom1],
   {
@@ -201,7 +220,7 @@ buff_pattern(Buffs) -->
 % to the Generic Attribute as well,
 % 2 Shared Conditions
 buff_pattern(Buffs) -->
-  {format("Trying '1TAVand1Aand2T1AV2C'~n")},
+  {format("DEBUG: Trying '1TAVand1Aand2T1AV2C'~n")},
   optional_verb, troop(Troop1), attribute(Attr1),
   optional_value_adj, [ValueAtom1],
   { extract_value(ValueAtom1, Value1) },
@@ -318,7 +337,7 @@ buff_pattern(Buffs) -->
 % 1 Troop Attribute Value clause
 % 1 Attribute Value clause
 buff_pattern(Buffs) -->
-  {format("Trying '1TAV1AV'~n")},
+  {format("DEBUG: Trying '1TAV1AV'~n")},
   troop(Troop1), attribute(Attr1),
   optional_value_adj, [ValueAtom1],
   {extract_value(ValueAtom1,Value1)},
@@ -337,7 +356,7 @@ buff_pattern(Buffs) -->
 % 2Troop Attribute Value
 % 1 No Troup Attribute Value
 buff_pattern(Buffs) -->
-  {format("Trying '1C2TAV1AV'~n")},
+  {format("DEBUG: Trying '1C2TAV1AV'~n")},
   optional_when,condition(Cond1),
   troop(Troop1), [and], troop(Troop2),
   attribute(Attr1), optional_value_adj,[ValueAtom1],
@@ -356,7 +375,7 @@ buff_pattern(Buffs) -->
 % 1 shared condition
 % 1 Troop Attribute Value and Attribute Value
 buff_pattern(Buffs) -->
-  {format("Trying '1C1TAVandAV'~n")},
+  {format("DEBUG: Trying '1C1TAVandAV'~n")},
   optional_when,condition(Cond1),
   troop(Troop1),attribute(Attr1),
   optional_value_adj,[ValueAtom1],
@@ -381,7 +400,7 @@ buff_pattern(Buffs) -->
 % 1 shared condition
 % 1 Troop Attribute Value and Attribute Value
 buff_pattern(Buffs) -->
-  {format("Trying '1TAVandAV'~n")},
+  {format("DEBUG: Trying '1TAVandAV'~n")},
   optional_when,troop(Troop1),attribute(Attr1),
   optional_value_adj,[ValueAtom1],
   {extract_value(ValueAtom1, Value1)},
@@ -401,7 +420,7 @@ buff_pattern(Buffs) -->
 % TA1V: 1 Troop Attribute Value clause
 % 1 shared condition (no commas or periods)
 buff_pattern(Buffs) -->
-  {format("Trying '1C1TAVandTAV1C'~n")},
+  {format("DEBUG: Trying '1C1TAVandTAV1C'~n")},
   optional_verb, condition(Cond1),
   troop(Troop1), attribute(Attr1),
   optional_value_adj, [ValueAtom1],
@@ -437,7 +456,7 @@ buff_pattern(Buffs) -->
 % 2TA1V: 2 Troop 2 Attribute 1 Value clause
 % 1 shared condition (no commas or periods)
 buff_pattern(Buffs) -->
-  {format("Trying '1TAVand2TA1V1C'~n")},
+  {format("DEBUG: Trying '1TAVand2TA1V1C'~n")},
   optional_verb, troop(Troop1), attribute(Attr1),
   optional_value_adj, [ValueAtom1],[and], optional_verb,
   troop(Troop2), [and], troop(Troop3),
@@ -537,7 +556,7 @@ buff_pattern(Buffs) -->
 % 1AandAV: there is an 'Attribute and Attribute Value" clause
 % total: 3 buffs.
 buff_pattern(Buffs) -->
-  {format("Trying '1C1TLAV1AandAV'~n")},
+  {format("DEBUG: Trying '1C1TLAV1AandAV'~n")},
   condition(Cond1),troop_list(Troops),
   attribute(Attribute1), optional_value_adj, [ValueAtom1],
   attribute(Attribute2), [and], attribute(Attribute3),
@@ -555,7 +574,7 @@ buff_pattern(Buffs) -->
 % 1 Troop Attribute Value clause
 % 1 Attribute Value clause
 buff_pattern(Buffs) -->
-  {format("Trying '1CTAV2A1V'~n")},
+  {format("DEBUG: Trying '1CTAV2A1V'~n")},
   condition(Cond1),
   troop(Troop1), attribute(Attr1),
   optional_value_adj, [ValueAtom1],
@@ -765,7 +784,7 @@ buff_pattern(Buffs) -->
 % 1 shared troop list
 % 1 Attribute list Value and Attribute list Value clause
 buff_pattern(Buffs) -->
-  {format("Trying '1C1TL1ALVandALV'~n")},
+  {format("DEBUG: Trying '1C1TL1ALVandALV'~n")},
   condition(Cond1),
   troop_list(Troops),
   attribute_list(Attributes1),
@@ -806,7 +825,7 @@ buff_pattern(Buffs) -->
 % Pattern 3: Matrix expansion with generic + specific attributes
 % initial attribute with no troop type + standard troop type attribute clause + shared conditions
 buff_pattern(Buffs) -->
-  {format("Trying 'Pattern 3'~n")},
+  {format("DEBUG: Trying 'Pattern 3'~n")},
   optional_verb, [the],
   attribute_list(Attributes1),
   optional_value_adj, [ValueAtom1],
