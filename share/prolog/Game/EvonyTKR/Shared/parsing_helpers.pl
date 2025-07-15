@@ -70,8 +70,10 @@ optional_verb --> [reduces].
 optional_verb --> [is].
 optional_verb --> [].
 optional_subject --> [general] ; [you]; [].
+optional_value_adj --> [+] ; [by] ; [by] ,[another] ; [].
 optional_plus --> [+] ; [].
 optional_by   --> [by] ; [].
+
 
 % Optional troop placeholder that binds to '' if not matched
 troop('') -->

@@ -449,6 +449,7 @@ class Game::EvonyTKR::Shared::Constants : isa(Game::EvonyTKR::Model::Logger) {
       'brings spiritual beast'     => 'brings a spiritual beast',
       'to attack Monsters'         => 'Against Monsters',         # buff version
       'to attack'                  => 'Attacking',
+      'to reinforce'               => 'Reinforcing',
       'the Mayor'                  => "When City Mayor for this SubCity",
       'in this subordinate city'   => "When City Mayor for this SubCity",
       'in subordinate city'        => "When City Mayor for this SubCity",

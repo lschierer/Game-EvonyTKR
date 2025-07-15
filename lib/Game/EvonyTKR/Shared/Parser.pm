@@ -436,9 +436,7 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
     foreach my $error_line (@err) {
       $self->logger->error("STDERR: $error_line");
     }
-    foreach my $stdout_line (@out) {
-      $self->logger->debug("STDOUT: $stdout_line");
-    }
+    # Note, we will output STDOUT after parsing it below.
 
     my $parsed = join('', @out);
     $parsed =~ s/^\s+|\s+$//g;

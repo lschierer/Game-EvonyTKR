@@ -10,7 +10,7 @@
 buff_pattern(Buffs) -->
   {format("DEBUG: Trying 'Sub1SaV'~n")},
   optional_verb, subcity_attribute(Attr1),
-  [by], [ValueAtom1],
+  optional_value_adj, [ValueAtom1],
   {extract_value(ValueAtom1, Value1)},
   optional_when_general_is, [the],[mayor],
   {
@@ -27,7 +27,7 @@ buff_pattern(Buffs) -->
   {format("DEBUG: Trying 'Sub1CSACV'~n")},
   optional_when_general_is,condition(Cond1),
   subcity_attribute(Attr1), condition(Cond2),
-  optional_plus,[ValueAtom1],
+  optional_value_adj,[ValueAtom1],
   {
     extract_value(ValueAtom1, Value1),
     format("DEBUG: ValueAtom1: '~w'~n", [Value1]),
@@ -44,7 +44,7 @@ buff_pattern(Buffs) -->
   optional_verb, [the],
   subcity_attribute(Attribute1),
   {format("DEBUG:subcity_attribute: '~w'~n", [Attribute1])},
-  [by], [ValueAtom1],
+  optional_value_adj, [ValueAtom1],
   {
     extract_value(ValueAtom1, Value1),
     format("DEBUG: ValueAtom1: '~w'~n", [Value1])
@@ -54,7 +54,7 @@ buff_pattern(Buffs) -->
   {format("DEBUG: troop: '~w'~n", [Troop2])},
   subcity_attribute(Attribute2),
   {format("DEBUG:subcity_attribute: '~w'~n", [Attribute2])},
-  [by], [ValueAtom2],
+  optional_value_adj, [ValueAtom2],
   {
     extract_value(ValueAtom2, Value2),
     format("DEBUG: ValueAtom2: '~w'~n", [Value2])
@@ -79,7 +79,7 @@ buff_pattern(Buffs) -->
   attribute(Attr1),
   {format("DEBUG: attribute: '~w'~n", [Attr1])},
   condition(Cond2),
-  optional_plus,[ValueAtom1],
+  optional_value_adj,[ValueAtom1],
   {
     extract_value(ValueAtom1, Value1),
     format("DEBUG: ValueAtom1: '~w'~n", [Value1]),
@@ -96,7 +96,7 @@ buff_pattern(Buffs) -->
 buff_pattern(Buffs) -->
   {format("Trying '2C1AV'~n")},
   condition(Cond1), condition(Cond2),optional_troop(''),
-  attribute(Attr1),[+],[ValueAtom1],
+  attribute(Attr1),optional_value_adj,[ValueAtom1],
   {
     format("DEBUG: matched terms for '2C1AV' Cond1='~w', cond2='~w' attr1='~w' ValueAtom1='~w'~n", [Cond1, Cond2, Attr1, ValueAtom1]),
     extract_value(ValueAtom1, Value1),
@@ -110,10 +110,10 @@ buff_pattern(Buffs) -->
   {format("DEBUG: Trying '1C2T1AV2A1V'~n")},
   optional_verb, condition(Cond1),
   troop(Troop1), [and], troop(Troop2),
-  attribute(Attr1), optional_plus, [ValueAtom1],
+  attribute(Attr1), optional_value_adj, [ValueAtom1],
   {extract_value(ValueAtom1,Value1)},
   attribute(Attr2), [and], attribute(Attr3),
-  optional_plus, [ValueAtom2],
+  optional_value_adj, [ValueAtom2],
   {extract_value(ValueAtom2,Value2)},
   {
     Buffs = [
@@ -138,11 +138,11 @@ buff_pattern(Buffs) -->
   { format("DEBUG: Trying '1C2T1AVand1C1T2A1VC'~n", []) },
   optional_verb, condition(Cond1),
   troop(Troop1), [and], troop(Troop2),
-  attribute(Attr1), [by], [ValueAtom1],
+  attribute(Attr1), optional_value_adj, [ValueAtom1],
   {extract_value(ValueAtom1, Value1)},
   [and], condition(Cond2),
   troop(Troop3), attribute(Attr2), [and],
-  attribute(Attr3), [by], [ValueAtom2],
+  attribute(Attr3), optional_value_adj, [ValueAtom2],
   {extract_value(ValueAtom2, Value2)},
   optional_when_general_is, condition(Cond3),
   {
@@ -157,6 +157,28 @@ buff_pattern(Buffs) -->
     format("DEBUG: matched '1C2T1AVand1C1T2A1VC': '~w'~n", [Buffs])
   }.
 
+% Pattern: 1C2T1AVand1C2T1AV1C
+buff_pattern(Buffs) -->
+  {format("DEBUG: Trying: '1C2T1AVand1C2T1AV1C'~n")},
+  optional_verb, condition(Cond1),
+  troop(Troop1), [and], troop(Troop2),
+  attribute(Attr1), optional_value_adj, [ValueAtom1],
+  {extract_value(ValueAtom1, Value1)},
+  [and], condition(Cond2),
+  troop(Troop3), [and], troop(Troop4),
+  attribute(Attr2), optional_value_adj, [ValueAtom2],
+  {extract_value(ValueAtom2, Value2)},
+  optional_when_general_is, condition(Cond3),
+  {
+    Buffs = [
+      buff(Attr1, Troop1, Value1, [Cond1, Cond3]),
+      buff(Attr1, Troop2, Value1, [Cond1, Cond3]),
+      buff(Attr2, Troop3, Value2, [Cond2, Cond3]),
+      buff(Attr2, Troop4, Value2, [Cond2, Cond3])
+    ],
+    format("DEBUG: '1C2T1AVand1C2T1AV1C' matched: '~w'~n'", [Buffs])
+  }.
+
 % Pattern: 1TAVand1Aand2T1AV2C
 % 1 Troop Attribute Value clause
 % 1 Generic Attribute and 2 Troop Types
@@ -166,11 +188,11 @@ buff_pattern(Buffs) -->
 buff_pattern(Buffs) -->
   {format("Trying '1TAVand1Aand2T1AV2C'~n")},
   optional_verb, troop(Troop1), attribute(Attr1),
-  [by], [ValueAtom1],
+  optional_value_adj, [ValueAtom1],
   { extract_value(ValueAtom1, Value1) },
   [and], optional_verb, attribute(Attr2), [and],
   troop(Troop2), [and], troop(Troop3),
-  attribute(Attr3), [by], [ValueAtom2],
+  attribute(Attr3), optional_value_adj, [ValueAtom2],
   { extract_value(ValueAtom2, Value2) },
   optional_when_general_is, condition(Cond1),
   condition(Cond2),
@@ -194,10 +216,10 @@ buff_pattern(Buffs) -->
   {format("DEBUG: Trying '1T2A1Vand2T1AV2C'~n")},
   optional_verb, troop(Troop1),
   attribute(Attr1), [and], attribute(Attr2),
-  [by], [ValueAtom1],
+  optional_value_adj, [ValueAtom1],
   {extract_value(ValueAtom1,Value1)}, [and],
   optional_verb, troop(Troop2), [and],
-  troop(Troop3), attribute(Attr3), [by],
+  troop(Troop3), attribute(Attr3), optional_value_adj,
   [ValueAtom2],
   {extract_value(ValueAtom2,Value2)},
   optional_when_general_is,
@@ -212,13 +234,34 @@ buff_pattern(Buffs) -->
     format("DEBUG: '1T2A1Vand2T1AV2C' matched: '~w'~n", [Buffs])
   }.
 
+% Pattern: 1T2A1Vand1TAV2C
+buff_pattern(Buffs) -->
+  {format("DEBUG: Trying '1T2A1Vand1TAV2C'~n")},
+  optional_verb, [the], troop(Troop1),
+  attribute(Attr1), [and], attribute(Attr2),
+  optional_value_adj, [ValueAtom1],
+  {extract_value(ValueAtom1, Value1)},
+  [and], troop(Troop2), attribute(Attr3),
+  optional_value_adj, [ValueAtom2],
+  {extract_value(ValueAtom2, Value2)},
+  optional_when_general_is,
+  condition(Cond1),condition(Cond2),
+  {
+    Buffs = [
+      buff(Attr1, Troop1, Value1, [Cond1,Cond2]),
+      buff(Attr2, Troop1, Value1, [Cond1,Cond2]),
+      buff(Attr3, Troop2, Value2, [Cond1,Cond2])
+    ],
+    format("DEBUG: '1T2A1Vand1TAV2C' matched: Buffs: '~w'~n", [Buffs])
+  }.
+
 % Pattern: 1T2A1Vand1AV1C
 buff_pattern(Buffs) -->
   {format("DEBUG: Trying '1T2A1Vand1AV1C'~n")},
   optional_verb, troop(Troop1), attribute(Attr1),
-  [and], attribute(Attr2), [by], [ValueAtom1],
+  [and], attribute(Attr2), optional_value_adj, [ValueAtom1],
   {extract_value(ValueAtom1,Value1)}, [and],
-  attribute(Attr3), [by], [ValueAtom2],
+  attribute(Attr3), optional_value_adj, [ValueAtom2],
   {extract_value(ValueAtom2,Value2)},
   optional_when_general_is, condition(Cond1),
   {
@@ -241,11 +284,11 @@ buff_pattern(Buffs) -->
 buff_pattern(Buffs) -->
   condition(Cond1),
   troop(Troop1), [and], troop(Troop2),
-  attribute(Attr1), optional_plus,
+  attribute(Attr1), optional_value_adj,
   [ValueAtom1], {extract_value(ValueAtom1,Value1)},
   condition(Cond2),troop(Troop3),
   attribute(Attr2), [and], attribute(Attr3),
-  optional_plus,[ValueAtom2],
+  optional_value_adj,[ValueAtom2],
   {extract_value(ValueAtom2,Value2)},
   {
     Buff1 = buff(Attr1, Troop1, Value1, [Cond1]),
@@ -263,9 +306,9 @@ buff_pattern(Buffs) -->
 buff_pattern(Buffs) -->
   {format("Trying '1TAV1AV'~n")},
   troop(Troop1), attribute(Attr1),
-  optional_plus, [ValueAtom1],
+  optional_value_adj, [ValueAtom1],
   {extract_value(ValueAtom1,Value1)},
-  attribute(Attr2), optional_plus,
+  attribute(Attr2), optional_value_adj,
   [ValueAtom2],
   {extract_value(ValueAtom2,Value2)},
   {
@@ -283,9 +326,9 @@ buff_pattern(Buffs) -->
   {format("Trying '1C2TAV1AV'~n")},
   optional_when,condition(Cond1),
   troop(Troop1), [and], troop(Troop2),
-  attribute(Attr1), optional_plus,[ValueAtom1],
+  attribute(Attr1), optional_value_adj,[ValueAtom1],
   { extract_value(ValueAtom1, Value1)},
-  attribute(Attr2),optional_plus,[ValueAtom2],
+  attribute(Attr2),optional_value_adj,[ValueAtom2],
   { extract_value(ValueAtom2, Value2) },
   {
     Buff1 = buff(Attr1,Troop1,Value1,[Cond1]),
@@ -302,12 +345,12 @@ buff_pattern(Buffs) -->
   {format("Trying '1C1TAVandAV'~n")},
   optional_when,condition(Cond1),
   troop(Troop1),attribute(Attr1),
-  optional_plus,[ValueAtom1],
+  optional_value_adj,[ValueAtom1],
   {
     extract_value(ValueAtom1, Value1),
     format("DEBUG: ValueAtom1: '~w'~n", [Value1])
   },
-  [and],attribute(Attr2),optional_plus,[ValueAtom2],
+  [and],attribute(Attr2),optional_value_adj,[ValueAtom2],
   {
     extract_value(ValueAtom2, Value2),
     format("DEBUG: ValueAtom2: '~w'~n", [Value2])
@@ -326,9 +369,9 @@ buff_pattern(Buffs) -->
 buff_pattern(Buffs) -->
   {format("Trying '1TAVandAV'~n")},
   optional_when,troop(Troop1),attribute(Attr1),
-  optional_plus,[ValueAtom1],
+  optional_value_adj,[ValueAtom1],
   {extract_value(ValueAtom1, Value1)},
-  [and],attribute(Attr2),optional_plus,[ValueAtom2],
+  [and],attribute(Attr2),optional_value_adj,[ValueAtom2],
   { extract_value(ValueAtom2, Value2) },
   {
     Buff1 = buff(Attr1,Troop1,Value1,[]),
@@ -347,13 +390,13 @@ buff_pattern(Buffs) -->
   {format("Trying '1C1TAVandTAV1C'~n")},
   optional_verb, condition(Cond1),
   troop(Troop1), attribute(Attr1),
-  [by], [ValueAtom1],
+  optional_value_adj, [ValueAtom1],
   {
     extract_value(ValueAtom1, Value1),
     format("DEBUG: troop1: '~w' attribute1: '~w' ValueAtom1: '~w'~n", [Troop1, Attr1, Value1])
   },
   [and], troop(Troop2), attribute(Attr2),
-  [by], [ValueAtom2],
+  optional_value_adj, [ValueAtom2],
   {
     extract_value(ValueAtom2, Value2),
     format("DEBUG: troop2: '~w' attribute2: '~w' ValueAtom2: '~w'~n", [Troop2, Attr2, Value2])
@@ -382,10 +425,10 @@ buff_pattern(Buffs) -->
 buff_pattern(Buffs) -->
   {format("Trying '1TAVand2TA1V1C'~n")},
   optional_verb, troop(Troop1), attribute(Attr1),
-  [by], [ValueAtom1],[and], optional_verb,
+  optional_value_adj, [ValueAtom1],[and], optional_verb,
   troop(Troop2), [and], troop(Troop3),
   attribute(Attr2), [and], attribute(Attr3),
-  [by], [ValueAtom2], optional_when_general_is,
+  optional_value_adj, [ValueAtom2], optional_when_general_is,
   condition(Cond1),
   { extract_value(ValueAtom1, Value1) },
   { extract_value(ValueAtom2, Value2) },
@@ -404,11 +447,11 @@ buff_pattern(Buffs) -->
   {format("DEBUG: Trying '1CTAVand1C2T1AV1C'~n")},
   optional_verb, condition(Cond1),
   troop(Troop1), attribute(Attr1),
-  [by], [ValueAtom1],
+  optional_value_adj, [ValueAtom1],
   {extract_value(ValueAtom1,Value1)},
   [and], condition(Cond2),
   troop(Troop2), [and], troop(Troop3),
-  attribute(Attr2), [by], [ValueAtom2],
+  attribute(Attr2), optional_value_adj, [ValueAtom2],
   {extract_value(ValueAtom2,Value2)},
   optional_when_general_is,condition(Cond3),
   {
@@ -422,12 +465,30 @@ buff_pattern(Buffs) -->
     format("DEBUG: '1CTAVand1C2T1AV1C' matched: '~w'~n", [Buffs])
   }.
 
+% Pattern: 1CTAVand1CTAV1C
+buff_pattern(Buffs) -->
+  {format("DEBUG: Trying '1CTAVand1CTAV1C'~n")},
+  optional_verb, condition(Cond1), troop(Troop1),
+  attribute(Attr1), optional_value_adj,
+  [ValueAtom1], {extract_value(ValueAtom1, Value1)},
+  [and], condition(Cond2), troop(Troop2),
+  attribute(Attr2), optional_value_adj,
+  [ValueAtom2], {extract_value(ValueAtom2, Value2)},
+  optional_when_general_is, condition(Cond3),
+  {
+    Buffs = [
+      buff(Attr1, Troop1, Value1, [Cond1,Cond3]),
+      buff(Attr2, Troop2, Value2, [Cond2,Cond3])
+    ],
+    format("DEBUG: '1CTAVand1CTAV1C' matched: Buffs: '~w'~n", [Buffs])
+  }.
+
 % Pattern: 1C2T1AV1C
 buff_pattern(Buffs) -->
   {format("DEBUG: Trying '1C2T1AV1C'~n")},
   optional_verb, condition(Cond1),
   troop(Troop1), [and], troop(Troop2),
-  attribute(Attr1), [by], [ValueAtom1],
+  attribute(Attr1), optional_value_adj, [ValueAtom1],
   {extract_value(ValueAtom1,Value1)},
   optional_when_general_is,condition(Cond2),
   {
@@ -447,9 +508,9 @@ buff_pattern(Buffs) -->
 buff_pattern(Buffs) -->
   {format("Trying '1C1TLAV1AandAV'~n")},
   condition(Cond1),troop_list(Troops),
-  attribute(Attribute1), [+], [ValueAtom1],
+  attribute(Attribute1), optional_value_adj, [ValueAtom1],
   attribute(Attribute2), [and], attribute(Attribute3),
-  [+], [ValueAtom2],
+  optional_value_adj, [ValueAtom2],
   {
     extract_value(ValueAtom1, Value1),
     extract_value(ValueAtom2, Value2),
@@ -466,10 +527,10 @@ buff_pattern(Buffs) -->
   {format("Trying '1CTAV2A1V'~n")},
   condition(Cond1),
   troop(Troop1), attribute(Attr1),
-  optional_plus, [ValueAtom1],
+  optional_value_adj, [ValueAtom1],
   {extract_value(ValueAtom1,Value1)},
   attribute(Attr2), [and], attribute(Attr3),
-  optional_plus, [ValueAtom2],
+  optional_value_adj, [ValueAtom2],
   {extract_value(ValueAtom2,Value2)},
   {
     Buff1 = buff(Attr1, Troop1, Value1, [Cond1]),
@@ -489,11 +550,11 @@ buff_pattern(Buffs) -->
 buff_pattern(Buffs) -->
   {format("DEBUG: Trying '2T1AVand2T1AV1C'~n")},
   optional_verb, troop(Troop1), [and], troop(Troop2),
-  attribute(Attr1), [by], [ValueAtom1], {
+  attribute(Attr1), optional_value_adj, [ValueAtom1], {
     extract_value(ValueAtom1, Value1),
     format("DEBUG: ValueAtom1: '~w'~n", [Value1])
   }, [and], optional_verb, troop(Troop3), [and], troop(Troop4),
-  attribute(Attr2), [by], [ValueAtom2], {
+  attribute(Attr2), optional_value_adj, [ValueAtom2], {
     extract_value(ValueAtom2, Value2),
     format("DEBUG: ValueAtom2: '~w'~n", [Value2])
   }, optional_when_general_is, condition(Cond1),
@@ -516,10 +577,10 @@ buff_pattern(Buffs) -->
 buff_pattern(Buffs) -->
   {format("DEBUG: Trying '2T1AVand1AV2C'~n")},
   optional_verb, troop(Troop1), [and], troop(Troop2),
-  attribute(Attr1), [by], [ValueAtom1], {
+  attribute(Attr1), optional_value_adj, [ValueAtom1], {
     extract_value(ValueAtom1, Value1),
     format("DEBUG: ValueAtom1: '~w'~n", [Value1])
-  }, [and], attribute(Attr2), [by], [ValueAtom2], {
+  }, [and], attribute(Attr2), optional_value_adj, [ValueAtom2], {
     extract_value(ValueAtom2, Value2),
     format("DEBUG: ValueAtom2: '~w'~n", [Value2])
   }, optional_when_general_is, condition(Cond1),
@@ -534,15 +595,72 @@ buff_pattern(Buffs) -->
     format("DEBUG: '2T1AVand1AV2C' matched: '~w'~n", [Buffs])
   }.
 
-% 2T2xAV
+% Pattern: 1CTAV1CT2A1V
+buff_pattern(Buffs) -->
+  {format("DEBUG: Trying '1CTAV1CT2A1V'~n")},
+  condition(Cond1), troop(Troop1),
+  attribute(Attr1), optional_value_adj, [ValueAtom1],
+  {extract_value(ValueAtom1, Value1)},
+  condition(Cond2), troop(Troop2),
+  attribute(Attr2), [and], attribute(Attr3),
+  optional_value_adj, [ValueAtom2],
+  {extract_value(ValueAtom2, Value2)},
+  {
+    Buffs = [
+      buff(Attr1, Troop1, Value1, [Cond1]),
+      buff(Attr2, Troop2, Value2, [Cond2]),
+      buff(Attr3, Troop2, Value2, [Cond2])
+    ],
+    format("DEBUG: '1CTAV1CT2A1V' matched: Buffs: '~w'~n", [Buffs])
+  }.
+
+% Pattern: 1C2T3A1V
+buff_pattern(Buffs) -->
+  {format("DEBUG: Trying '1C2T2A1V'~n")},
+  condition(Cond1),troop(Troop1),[and],
+  troop(Troop2), attribute(Attr1),
+  attribute(Attr2), [and], attribute(Attr3),
+  optional_value_adj, [ValueAtom1],
+  {extract_value(ValueAtom1, Value1)},
+  {
+    Buffs = [
+      buff(Attr1, Troop1, Value1, [Cond1]),
+      buff(Attr1, Troop2, Value1, [Cond1]),
+      buff(Attr2, Troop1, Value1, [Cond1]),
+      buff(Attr2, Troop2, Value1, [Cond1]),
+      buff(Attr3, Troop1, Value1, [Cond1]),
+      buff(Attr3, Troop2, Value1, [Cond1])
+    ],
+    format("DEBUG: '1C2T2A1V' matched: Buffs: '~w'~n", [Buffs])
+  }.
+
+% Pattern: 1C2T2A1V
+buff_pattern(Buffs) -->
+  {format("DEBUG: Trying '1C2T2A1V'~n")},
+  condition(Cond1),troop(Troop1),[and],
+  troop(Troop2), attribute(Attr1), [and],
+  attribute(Attr2), optional_value_adj,
+  [ValueAtom1],
+  {extract_value(ValueAtom1, Value1)},
+  {
+    Buffs = [
+      buff(Attr1, Troop1, Value1, [Cond1]),
+      buff(Attr1, Troop2, Value1, [Cond1]),
+      buff(Attr2, Troop1, Value1, [Cond1]),
+      buff(Attr2, Troop2, Value1, [Cond1])
+    ],
+    format("DEBUG: '1C2T2A1V' matched: Buffs: '~w'~n", [Buffs])
+  }.
+
+% Pattern: 2T2xAV
 % 2 Troops
 % 2x  Attribute Value clauses
 buff_pattern(Buffs) -->
   {format("DEBUG: Trying '2T2xAV'~n")},
   troop(Troop1), [and], troop(Troop2),
-  attribute(Attr1), optional_plus, [ValueAtom1], {
+  attribute(Attr1), optional_value_adj, [ValueAtom1], {
     extract_value(ValueAtom1, Value1) },
-  [and], attribute(Attr2), optional_plus,
+  [and], attribute(Attr2), optional_value_adj,
   [ValueAtom2], { extract_value(ValueAtom2, Value2) },
  {
     Buff1 = buff(Attr1, Troop1, Value1, []),
@@ -561,13 +679,13 @@ buff_pattern(Buffs) -->
 buff_pattern(Buffs) -->
   {format("DEBUG: Trying '2T2xAV1andAV2C'~n")},
   optional_verb, troop(Troop1), [and], troop(Troop2),
-  attribute(Attr1), [by], [ValueAtom1], {
+  attribute(Attr1), optional_value_adj, [ValueAtom1], {
     extract_value(ValueAtom1, Value1),
     format("DEBUG: ValueAtom1: '~w'~n", [Value1])
-  }, attribute(Attr2), [by], [ValueAtom2], {
+  }, attribute(Attr2), optional_value_adj, [ValueAtom2], {
     extract_value(ValueAtom2, Value2),
     format("DEBUG: ValueAtom2: '~w'~n", [Value2])
-  }, [and], attribute(Attr3), [by], [ValueAtom3], {
+  }, [and], attribute(Attr3), optional_value_adj, [ValueAtom3], {
     extract_value(ValueAtom3, Value3),
     format("DEBUG: ValueAtom3: '~w'~n", [Value3])
   }, optional_when_general_is, condition(Cond1),
@@ -620,9 +738,9 @@ buff_pattern(Buffs) -->
   condition(Cond1),
   troop_list(Troops),
   attribute_list(Attributes1),
-  [+], [ValueAtom1],
+  optional_value_adj, [ValueAtom1],
   [and], attribute_list(Attributes2),
-  [+], [ValueAtom2],
+  optional_value_adj, [ValueAtom2],
   {
     extract_value(ValueAtom1, Value1),
     extract_value(ValueAtom2, Value2),
@@ -642,7 +760,7 @@ buff_pattern(Buffs) -->
   { format("DEBUG: Pattern 2 troop_list: '~w'~n", [Troops]) },
   attribute_list(Attributes),
   { format("DEBUG: Pattern 2 Attributes: '~w'~n", [Attributes]) },
-  [by], [ValueAtom],
+  optional_value_adj, [ValueAtom],
   {
     extract_value(ValueAtom, Value),
     format("DEBUG: Pattern 2 Value: '~w'~n", [Value])
@@ -660,11 +778,11 @@ buff_pattern(Buffs) -->
   {format("Trying 'Pattern 3'~n")},
   optional_verb, [the],
   attribute_list(Attributes1),
-  [by], [ValueAtom1],
+  optional_value_adj, [ValueAtom1],
   [and],
   troop_list(Troops2),
   attribute_list(Attributes2),
-  [by], [ValueAtom2],
+  optional_value_adj, [ValueAtom2],
   optional_when_general_is, merged_conditions(UniqueConditions),
   {
     extract_value(ValueAtom1, Value1),
@@ -681,10 +799,10 @@ buff_pattern(Buffs) -->
   optional_verb,
   troop_list(Troops1),
   attribute_list(Attributes1),
-  [by], [ValueAtom1], [and],
+  optional_value_adj, [ValueAtom1], [and],
   troop_list(Troops2),
   attribute_list(Attributes2),
-  [by], [ValueAtom2],
+  optional_value_adj, [ValueAtom2],
   optional_when_general_is, merged_conditions(UniqueConditions),
   {
     extract_value(ValueAtom1, Value1),
@@ -702,9 +820,9 @@ buff_pattern(Buffs) -->
   { format("DEBUG: Trying '1C2T2xAV'~n", []) },
   condition(Cond1),
   troop(Troop1), [and], troop(Troop2),
-  attribute(Attr1), optional_plus, [ValueAtom1],
+  attribute(Attr1), optional_value_adj, [ValueAtom1],
   {extract_value(ValueAtom1, Value1)}, [and],
-  attribute(Attr2), optional_plus, [ValueAtom2],
+  attribute(Attr2), optional_value_adj, [ValueAtom2],
   {extract_value(ValueAtom2, Value2)},
   {
     Buffs = [
@@ -732,7 +850,7 @@ buff_pattern(Buffs) -->
   },
   attribute(Attr1),
   { format("DEBUG: Attr1: '~w'~n", [Attr1]) },
-  optional_plus, [ValueAtom],
+  optional_value_adj, [ValueAtom],
   {
     extract_value(ValueAtom, Value),
     format("DEBUG: Passed Value: '~w'~n", [Value]),
@@ -758,7 +876,7 @@ buff_pattern(Buffs) -->
   },
   attribute(AttributeAtom),
   { format("DEBUG: Passed attribute(~w)~n", [AttributeAtom]) },
-  [+], [ValueAtom],
+  optional_value_adj, [ValueAtom],
   {
     extract_value(ValueAtom, Value),
     format("DEBUG: Passed Value: '~w'~n", [Value]),
@@ -780,14 +898,14 @@ buff_pattern(Buffs) -->
   },
   troop(Troop1),
   { format("DEBUG: Passed troop(~w)~n", [Troop1]) },
-  attribute(Attr1), [+],[ValueAtom1],
+  attribute(Attr1), optional_value_adj,[ValueAtom1],
   { format("DEBUG: Passed attribute(~w)~n", [Attr1]) },
   {
     extract_value(ValueAtom1, Value1),
     format("DEBUG: Passed ValueAtom1(~w)~n", [Value1])
   },
   optional_troop(''),  { format("DEBUG: found generic troop type~n") },
-  attribute(Attr2), [+],[ValueAtom2],
+  attribute(Attr2), optional_value_adj,[ValueAtom2],
   { format("DEBUG: Passed attribute(~w)~n", [Attr2]) },
   {
     extract_value(ValueAtom2, Value2),
@@ -808,7 +926,7 @@ buff_pattern(Buffs) -->
   { format("DEBUG: Trying '1C1AV1ATV'~n")  },
   [when], condition(Cond1), optional_troop(''),
   { format("DEBUG: found generic troop type~n") },
-  attribute(Attr1), [+],[ValueAtom1],
+  attribute(Attr1), optional_value_adj,[ValueAtom1],
   { format("DEBUG: Passed attribute(~w)~n", [Attr1]) },
   {
     extract_value(ValueAtom1, Value1),
@@ -816,7 +934,7 @@ buff_pattern(Buffs) -->
   },
   troop(Troop2),
   { format("DEBUG: Passed troop(~w)~n", [Troop2]) },
-  attribute(Attr2), [+],[ValueAtom2],
+  attribute(Attr2), optional_value_adj,[ValueAtom2],
   { format("DEBUG: Passed attribute(~w)~n", [Attr2]) },
   {
     extract_value(ValueAtom2, Value2),
@@ -843,7 +961,7 @@ buff_pattern(Buffs) -->
     extract_value(ValueAtom1, Value1)
   },
   troop(Troop2),
-  attribute(Attr2), [+],[ValueAtom2],
+  attribute(Attr2), optional_value_adj,[ValueAtom2],
   {
     extract_value(ValueAtom2, Value2)
   },
@@ -858,11 +976,11 @@ buff_pattern(Buffs) -->
 buff_pattern(Buffs) -->
   { format("DEBUG: Trying '1TAV2T2A1V'~n")  },
   troop(Troop1),attribute(Attr1),
-  optional_plus, [ValueAtom1],
+  optional_value_adj, [ValueAtom1],
   { extract_value(ValueAtom1, Value1) },
   troop(Troop2), [and], troop(Troop3),
   attribute(Attr2), [and], attribute(Attr3),
-  optional_plus, [ValueAtom2],
+  optional_value_adj, [ValueAtom2],
   { extract_value(ValueAtom2, Value2) },
   {
     Buff1 = buff(Attr1, Troop1, Value1, []),
@@ -885,14 +1003,14 @@ buff_pattern(Buffs) -->
   { format("DEBUG: Passed troop(~w)~n", [Troop1]) },
   attribute(Attributes1),
   { format("DEBUG: Passed attribute(~w)~n", [Attributes1]) },
-  [+], [ValueAtom1],
+  optional_value_adj, [ValueAtom1],
   {
     extract_value(ValueAtom1, Value1),
     format("DEBUG: Passed ValueAtom1(~w)~n", [Value1])
   },
   [troops], attribute(Attributes2),
   { format("DEBUG: Passed attribute(~w)~n", [Attributes2]) },
-  [+], [ValueAtom2],
+  optional_value_adj, [ValueAtom2],
   {
     extract_value(ValueAtom2, Value2),
     format("DEBUG: Passed ValueAtom2(~w)~n", [Value2])
@@ -918,7 +1036,7 @@ buff_pattern(Buffs) -->
   { format("DEBUG: Passed troop(~w)~n", [Troop1]) },
   attribute(Attr1),
   { format("DEBUG: Passed attribute(~w)~n", [Attr1]) },
-  [+], [ValueAtom1],
+  optional_value_adj, [ValueAtom1],
   {
     extract_value(ValueAtom1, Value1),
     format("DEBUG: Passed ValueAtom1(~w)~n", [Value1])
@@ -926,7 +1044,7 @@ buff_pattern(Buffs) -->
   optional_troop(''), attribute(Attr2a), [and], attribute(Attr2b),
   { format("DEBUG: Passed attribute(~w)~n", [Attr2a]) },
   { format("DEBUG: Passed attribute(~w)~n", [Attr2b]) },
-  [+], [ValueAtom2],
+  optional_value_adj, [ValueAtom2],
   {
     extract_value(ValueAtom2, Value2),
     format("DEBUG: Passed ValueAtom2(~w)~n", [Value2])
@@ -952,7 +1070,7 @@ buff_pattern(Buffs) -->
   { format("DEBUG: Passed troop(~w)~n", [TroopAtom]) },
   attribute(AttributeAtom),
   { format("DEBUG: Passed attribute(~w)~n", [AttributeAtom]) },
-  [+], [ValueAtom],
+  optional_value_adj, [ValueAtom],
   {
     extract_value(ValueAtom, Value),
     format("DEBUG: Passed Value: '~w'~n", [Value]),
@@ -1003,7 +1121,7 @@ buff_pattern(Buffs) -->
   {format("DEBUG: troop: '~w'~n", [Troop1])},
   attribute(Attr1),
   {format("DEBUG: attribute: '~w'~n", [Attr1])},
-  optional_plus,[ValueAtom1],
+  optional_value_adj,[ValueAtom1],
   {
     extract_value(ValueAtom1, Value1),
     format("DEBUG: ValueAtom1: '~w'~n", [Value1])
@@ -1022,7 +1140,7 @@ buff_pattern([buff(AttributeAtom, TroopAtom, Value, UniqueConditions)]) -->
   optional_when, optional_verb,
   troop(TroopAtom),
   attribute(AttributeAtom),
-  [by], [ValueAtom],
+  optional_value_adj, [ValueAtom],
   [when], optional_subject, optional_verb,
   merged_conditions(UniqueConditions),
   {
@@ -1030,4 +1148,18 @@ buff_pattern([buff(AttributeAtom, TroopAtom, Value, UniqueConditions)]) -->
   },
   { format("DEBUG: matched simple buff: troop=~w attr=~w value=~w cond=~w~n",
     [TroopAtom, AttributeAtom, Value, UniqueConditions])
+  }.
+
+%Pattern 1AV
+% Only attribute and value present
+buff_pattern(Buffs) -->
+  {format("DEBUG: Trying '1AV'~n")},
+  attribute(Attr1), optional_value_adj,
+  [ValueAtom1],
+  {extract_value(ValueAtom1,Value1)},
+  {
+    Buffs = [
+      buff(Attr1, '', Value1,[])
+    ],
+    format("DEBUG: '1AV' matched: '~w'~n", [Buffs])
   }.
