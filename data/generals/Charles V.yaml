@@ -1,0 +1,24 @@
+ascending: 1
+basic_attributes:
+  attack:
+    base: 129
+    increment: 8.86
+  defense:
+    base: 124
+    increment: 8.67
+  leadership:
+    base: 128
+    increment: 8.81
+  politics:
+    base: 114
+    increment: 8.42
+book: Duke of Burgundy
+name: Charles V
+specialties:
+  - Ground Troop Formation
+  - Formation
+  - Ground Troop Ares
+  - Conquest of Sumer
+stars: red5
+type:
+  - ground_specialist
