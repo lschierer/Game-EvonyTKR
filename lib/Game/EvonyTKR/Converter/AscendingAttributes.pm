@@ -96,59 +96,24 @@ class Game::EvonyTKR::Converter::AscendingAttributes :
   }
 
   method printYAML () {
-    my $data = {
+    my $result = {
       id        => $name,
       general   => $name,
-      ascending => $red
-      ? {
-        red1 => {
-          text  => $data->{red1}->{text},
-          buffs => [map { $_->to_hash() } @{ $data->{red1}->{buffs} }],
-        },
-        red2 => {
-          text  => $data->{red2}->{text},
-          buffs => [map { $_->to_hash() } @{ $data->{red2}->{buffs} }],
-        },
-        red3 => {
-          text  => $data->{red3}->{text},
-          buffs => [map { $_->to_hash() } @{ $data->{red3}->{buffs} }],
-        },
-        red4 => {
-          text  => $data->{red4}->{text},
-          buffs => [map { $_->to_hash() } @{ $data->{red4}->{buffs} }],
-        },
-        red5 => {
-          text  => $data->{red5}->{text},
-          buffs => [map { $_->to_hash() } @{ $data->{red5}->{buffs} }],
-        },
-        }
-      : {
-        purple1 => {
-          text  => $data->{purple1}->{text},
-          buffs => [map { $_->to_hash() } @{ $data->{purple1}->{buffs} }],
-        },
-        purple2 => {
-          text  => $data->{purple2}->{text},
-          buffs => [map { $_->to_hash() } @{ $data->{purple2}->{buffs} }],
-        },
-        purple3 => {
-          text  => $data->{purple3}->{text},
-          buffs => [map { $_->to_hash() } @{ $data->{purple3}->{buffs} }],
-        },
-        purple4 => {
-          text  => $data->{purple4}->{text},
-          buffs => [map { $_->to_hash() } @{ $data->{purple4}->{buffs} }],
-        },
-        purple5 => {
-          text  => $data->{purple5}->{text},
-          buffs => [map { $_->to_hash() } @{ $data->{purple5}->{buffs} }],
-        },
-      },
     };
+    my @keys = $self->AscendingAttributeLevelValues($red);
+    foreach my $k (@keys){
+      if($k eq 'none') {
+        next;
+      }
+      push @{$result->{ascending} }, {
+        level => $k,
+        buff  => [map { $_->to_hash() } @{ $data->{lc($k)}->{buffs} }]
+      };
+    }
     my $yc = YAML::PP->new(
       schema       => [qw/ + Perl /],
       yaml_version => ['1.2', '1.1'],
-    )->dump($data);
+    )->dump($result);
     my $filename = lc($name);
     $filename = "${filename}.yaml";
     if (!$outputDir->is_dir()) {
