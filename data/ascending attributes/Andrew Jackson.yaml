@@ -1,95 +1,118 @@
+---
 ascending:
   - level: red1
     buff:
       - attribute: HP
         condition:
           - Enemy
+        passive: 0
         class: Ground Troops
         value:
-          number: -10
+          number: 10
           unit: percentage
       - attribute: HP
         condition:
           - Enemy
+        passive: 0
         class: Mounted Troops
         value:
-          number: -10
+          number: 10
           unit: percentage
+    text: Enemy Ground Troop and Mounted Troop HP -10%.
   - level: red2
     buff:
       - attribute: HP
         condition:
           - Enemy
+        passive: 0
         class: Ground Troops
         value:
-          number: -10
+          number: 10
           unit: percentage
       - attribute: HP
         condition:
           - Enemy
+        passive: 0
         class: Mounted Troops
         value:
-          number: -10
+          number: 10
           unit: percentage
       - attribute: SubCity Training Speed
         condition:
           - When City Mayor for this SubCity
+        passive: 0
+        class: ''
         value:
           number: 10
           unit: percentage
+    text: >-
+      Enemy Ground Troop and Mounted Troop HP -10%; when General is the Mayor, Training Speed in this Subordinate City +10%.
   - level: red3
     buff:
       - attribute: Defense
         condition:
           - Enemy
+        passive: 0
         class: Ground Troops
         value:
-          number: -10
+          number: 10
           unit: percentage
       - attribute: Defense
         condition:
           - Enemy
+        passive: 0
         class: Mounted Troops
         value:
-          number: -10
+          number: 10
           unit: percentage
       - attribute: Death to Survival
         condition:
           - When City Mayor for this SubCity
+        passive: 0
+        class: ''
         value:
           number: 10
           unit: percentage
+    text: >-
+      Enemy Ground Troop and Mounted Troop Defense -10%; when General is the Mayor, Death into Survival Rate in this Subordinate City +10%.
   - level: red4
     buff:
       - attribute: Attack
         condition:
           - Enemy
+        passive: 0
         class: Ranged Troops
         value:
-          number: -20
+          number: 20
           unit: percentage
+    text: Enemy Ranged Troop Attack -20%.
   - level: red5
     buff:
       - attribute: Attack
         condition:
           - Enemy
+        passive: 0
         class: Ranged Troops
         value:
-          number: -20
+          number: 20
           unit: percentage
       - attribute: Defense
         condition:
           - Enemy
+        passive: 0
         class: Ground Troops
         value:
-          number: -10
+          number: 10
           unit: percentage
       - attribute: Defense
         condition:
           - Enemy
+        passive: 0
         class: Mounted Troops
         value:
-          number: -10
+          number: 10
           unit: percentage
+    text: >-
+      Enemy Ranged Troop Attack -20%, Enemy Ground Troop and Mounted Troop Defense -10%.
 general: Andrew Jackson
 id: Andrew Jackson
