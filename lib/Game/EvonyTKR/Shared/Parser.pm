@@ -299,7 +299,7 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
         $s =~ s/(.*)/[$1]/;
         $s =~ s/\’//g;
       }
-      if($key =~ /^sub/i ) {
+      if($key =~ /^(?:sub|mayor)/i ) {
         sprintf(
           'subcity_attribute(%s) --> %s.',
           join('_', @term),

@@ -9,6 +9,7 @@
 % Generic Troops,
 buff_pattern(Buffs) -->
   {format("DEBUG: Trying 'Sub1SaV'~n")},
+  optional_when, optional_when_general_is,
   optional_verb, subcity_attribute(Attr1),
   optional_value_adj, [ValueAtom1],
   {extract_value(ValueAtom1, Value1)},
@@ -34,6 +35,22 @@ buff_pattern(Buffs) -->
     list_to_set([Cond1, Cond2], PCond),
     Buffs = [buff(Attr1,'',Value1,PCond)],
     format("DEBUG: 'Sub1CSACV' matched: '~w'~n", [Buffs])
+  }.
+
+% Subcity Pattern: Sub1SACV
+% 1  SubAttribute Condition Value
+% Generic Troops,
+buff_pattern(Buffs) -->
+  {format("DEBUG: Trying 'Sub1SACV'~n")},
+  optional_when, optional_when_general_is,
+  subcity_attribute(Attr1), condition(Cond1),
+  optional_value_adj,[ValueAtom1],
+  {extract_value(ValueAtom1, Value1)},
+  {
+    Buffs = [
+      buff(Attr1,'',Value1,[Cond1])
+    ],
+    format("DEBUG: 'Sub1SACV' matched: '~w'~n", [Buffs])
   }.
 
 
@@ -478,6 +495,23 @@ buff_pattern(Buffs) -->
       buff(Attr2, Troop2, Value2, [Cond2,Cond3])
     ],
     format("DEBUG: '1CTAVand1CTAV1C' matched: Buffs: '~w'~n", [Buffs])
+  }.
+
+% Pattern: 1CTAVand1TAV1C
+buff_pattern(Buffs) -->
+  {format("DEBUG: Trying '1CTAVand1TAV1C'~n")},
+  optional_verb, optional_the, condition(Cond1),
+  troop(Troop1), attribute(Attr1), optional_value_adj,
+  [ValueAtom1], {extract_value(ValueAtom1, Value1)},
+  [and], troop(Troop2), attribute(Attr2), optional_value_adj,
+  [ValueAtom2], {extract_value(ValueAtom2, Value2)},
+  optional_when_general_is, condition(Cond2),
+  {
+    Buffs = [
+      buff(Attr1, Troop1, Value1, [Cond1,Cond2]),
+      buff(Attr2, Troop2, Value2, [Cond1,Cond2])
+    ],
+    format("DEBUG: '1CTAVand1TAV1C' matched: Buffs: '~w'~n", [Buffs])
   }.
 
 % Pattern: 1C2T1AV1C
@@ -973,7 +1007,7 @@ buff_pattern(Buffs) -->
 % 1TAV = 1 troop attribute value clause
 % 1AV = 1 attribute value clause
 buff_pattern(Buffs) -->
-  { format("DEBUG: Trying 1C1TAV1AV~n", []) },
+  { format("DEBUG: Trying 1C1TAV1AV~n") },
   [when],
   condition(Cond1), troop(Troop1),
   { format("DEBUG: Passed troop(~w)~n", [Troop1]) },
@@ -1004,7 +1038,7 @@ buff_pattern(Buffs) -->
 % 1TAV = 1 troop attribute value clause
 % 2A1V = no troop 2 attribute 1 value matrix clause
 buff_pattern(Buffs) -->
-  { format("DEBUG: Trying 1C1TAV2A1V~n", []) },
+  { format("DEBUG: Trying 1C1TAV2A1V~n") },
   [when],
   condition(Cond1),
   { format("DEBUG: Passed condition(~w)~n", [Cond1]) },
@@ -1026,7 +1060,6 @@ buff_pattern(Buffs) -->
     format("DEBUG: Passed ValueAtom2(~w)~n", [Value2])
   },
   {
-    format("DEBUG: matched all for '1C1TAV2A1V'~n"),
     extract_value(ValueAtom2, Value2),
     Buff1 = buff(Attr1, Troop1, Value1, [Cond1]),
     Buff2a = buff(Attr2a, '',   Value2, [Cond1]),
@@ -1035,7 +1068,42 @@ buff_pattern(Buffs) -->
     format("DEBUG: 1C1TAV2A1V matched buffs: '~w'~n", [Buffs])
   }.
 
-% 1C1A1V
+% 1TAV2A1V
+% 1TAV = 1 troop attribute value clause
+% 2A1V = Implied first troop 2 attribute 1 value matrix clause
+buff_pattern(Buffs) -->
+  { format("DEBUG: Trying 1TAV2A1V~n", []) },
+  troop(Troop1), attribute(Attr1),
+  optional_value_adj, [ValueAtom1],
+  { extract_value(ValueAtom1, Value1) },
+  attribute(Attr2a), [and], attribute(Attr2b),
+  optional_value_adj, [ValueAtom2],
+  { extract_value(ValueAtom2, Value2) },
+  {
+    Buff1 = buff(Attr1, Troop1, Value1, []),
+    Buff2a = buff(Attr2a, Troop1,   Value2, []),
+    Buff2b = buff(Attr2b, Troop1,   Value2, []),
+    Buffs = [Buff1, Buff2a, Buff2b],
+    format("DEBUG: 1TAV2A1V matched buffs: '~w'~n", [Buffs])
+  }.
+
+% Pattern: 1AV1TAV
+buff_pattern(Buffs) -->
+  {format("DEBUG: Trying '1AV1TAV'~n")},
+  attribute(Attr1), optional_value_adj,
+  [ValueAtom1],{extract_value(ValueAtom1,Value1)},
+  troop(Troop2), attribute(Attr2),
+  optional_value_adj, [ValueAtom2],
+  {extract_value(ValueAtom2,Value2)},
+  {
+    Buffs = [
+      buff(Attr1, '', Value1,[]),
+      buff(Attr2, Troop2, Value2, [])
+    ],
+    format("DEBUG: '1AV1TAV' matched: Buffs: '~w'~n", [Buffs])
+  }.
+
+% Pattern: 1C1A1V
 % 1C: one condition
 % 1A: one attribute
 % 1V: one value

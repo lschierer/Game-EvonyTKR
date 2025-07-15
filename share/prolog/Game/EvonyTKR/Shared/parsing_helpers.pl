@@ -73,6 +73,7 @@ optional_subject --> [general] ; [you]; [].
 optional_value_adj --> [+] ; [by] ; [by] ,[another] ; [].
 optional_plus --> [+] ; [].
 optional_by   --> [by] ; [].
+optional_the  --> [the] ; [].
 
 
 % Optional troop placeholder that binds to '' if not matched

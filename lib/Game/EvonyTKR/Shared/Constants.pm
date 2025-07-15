@@ -129,6 +129,8 @@ class Game::EvonyTKR::Shared::Constants : isa(Game::EvonyTKR::Model::Logger) {
       'the march size'                => 'March Size',
       'wounded into death rate'       => 'Wounded to Death',
       'wounded into death'            => 'Wounded to Death',
+      'mayor training speed'                              => 'SubCity Training Speed',
+      'mayor death into survival rate'                    => 'SubCity Death to Survival',
       'subordinate city troops’ death to survival rate'   => 'SubCity Death to Survival',
       'subordinate city troops’ death to survival'        => 'SubCity Death to Survival',
       'subordinate city troops’ death into survival rate' => 'SubCity Death to Survival',
