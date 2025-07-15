@@ -47,9 +47,9 @@ subtest 'Charles V Ascending Attributes' => sub {
         attribute  => 'Attack',
         class     => 'Ground Troops',
         value      => 15,
-        conditions => ['leading the army' ]
+        conditions => [ ]
       ),
-      '15% Ground Troops Attack buff (leading the army)'
+      '15% Ground Troops Attack buff ()'
     );
 
     ok(
@@ -57,9 +57,9 @@ subtest 'Charles V Ascending Attributes' => sub {
         $hb,
         attribute  => 'March Size',
         value      => 10,
-        conditions => ['leading the army']
+        conditions => []
       ),
-      '10% March Size buff (leading the army)'
+      '10% March Size buff ()'
     );
 
     done_testing();

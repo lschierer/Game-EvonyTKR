@@ -41,8 +41,10 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
       $self->logger->info("detected a debuff to convert");
       $is_debuff = 1;
       $value = abs($value);
+      @{$conditions_list} = grep { length($_) > 0 } @{$conditions_list};
       if (scalar @{$conditions_list}) {
         my $is_PvM = 0;
+
         foreach my $c (@{$conditions_list}) {
 
           if(exists $self->BuffConditionValues->{$c} ) {
@@ -129,6 +131,9 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
       }
       else {
         $self->logger->debug("Processing condition: '$cond'");
+        if(length($cond) == 0){
+          next;
+        }
         my $normalized = $self->normalize_condition_case($cond);
         if (defined $normalized) {
           $r = $buff->set_condition($normalized);

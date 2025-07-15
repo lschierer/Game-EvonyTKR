@@ -80,9 +80,7 @@ troop('') -->
   [troop].
 troop('') -->
   [troops].
-optional_troop('') --> [troops] ; [troop].
-optional_troop(T) --> troop(T).
-optional_troop('') --> [].
+
 
 
 % === TOKEN FILTERING ===

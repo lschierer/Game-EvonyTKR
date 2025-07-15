@@ -5,6 +5,7 @@
 :- set_prolog_flag(encoding, utf8).
 :- style_check(-singleton).
 :- discontiguous troop/3.
+:- discontiguous condition/3.
 :- include('EvonyBuffDictionary').
 :- include('buff_patterns').
 :- include('condition_processing').
