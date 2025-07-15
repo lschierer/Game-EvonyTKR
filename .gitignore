@@ -13,3 +13,4 @@ MANIFEST
 META.json
 META.yml
 blib
+.DS_Store
