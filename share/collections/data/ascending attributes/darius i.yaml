@@ -1,7 +1,7 @@
 ---
 ascending:
 - buff:
-  - attribute: Attack
+  - attribute: Defense
     conditions:
     - Enemy
     passive: 0
@@ -9,7 +9,7 @@ ascending:
     value:
       number: 10
       unit: percentage
-  - attribute: Attack
+  - attribute: Defense
     conditions:
     - Enemy
     passive: 0
@@ -17,7 +17,7 @@ ascending:
     value:
       number: 10
       unit: percentage
-  - attribute: Defense
+  - attribute: HP
     conditions:
     - Enemy
     passive: 0
@@ -25,7 +25,7 @@ ascending:
     value:
       number: 10
       unit: percentage
-  - attribute: Defense
+  - attribute: HP
     conditions:
     - Enemy
     passive: 0
@@ -35,21 +35,21 @@ ascending:
       unit: percentage
   level: red1
 - buff:
-  - attribute: Defense
+  - attribute: Attack
     conditions:
     - Enemy
     passive: 0
     targetedType: Ground Troops
     value:
-      number: 15
+      number: 10
       unit: percentage
-  - attribute: Defense
+  - attribute: Attack
     conditions:
     - Enemy
     passive: 0
     targetedType: Mounted Troops
     value:
-      number: 15
+      number: 10
       unit: percentage
   - attribute: SubCity Training Speed
     conditions:
@@ -57,11 +57,11 @@ ascending:
     passive: 0
     targetedType: ''
     value:
-      number: 20
+      number: 15
       unit: percentage
   level: red2
 - buff:
-  - attribute: HP
+  - attribute: Attack
     conditions:
     - Enemy
     passive: 0
@@ -69,7 +69,7 @@ ascending:
     value:
       number: 15
       unit: percentage
-  - attribute: HP
+  - attribute: Attack
     conditions:
     - Enemy
     passive: 0
@@ -83,25 +83,25 @@ ascending:
     passive: 0
     targetedType: ''
     value:
-      number: 10
+      number: 15
       unit: percentage
   level: red3
 - buff:
-  - attribute: Attack
+  - attribute: Defense
     conditions:
     - Enemy
     passive: 0
     targetedType: Ground Troops
     value:
-      number: 15
+      number: 20
       unit: percentage
-  - attribute: Attack
+  - attribute: Defense
     conditions:
     - Enemy
     passive: 0
     targetedType: Mounted Troops
     value:
-      number: 15
+      number: 20
       unit: percentage
   - attribute: HP
     conditions:
@@ -109,7 +109,7 @@ ascending:
     passive: 0
     targetedType: Ground Troops
     value:
-      number: 15
+      number: 20
       unit: percentage
   - attribute: HP
     conditions:
@@ -117,7 +117,7 @@ ascending:
     passive: 0
     targetedType: Mounted Troops
     value:
-      number: 15
+      number: 20
       unit: percentage
   level: red4
 - buff:
@@ -170,5 +170,5 @@ ascending:
       number: 15
       unit: percentage
   level: red5
-general: Constantine the Great
-id: Constantine the Great
+general: Darius I
+id: Darius I

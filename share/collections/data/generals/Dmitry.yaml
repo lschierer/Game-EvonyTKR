@@ -13,7 +13,6 @@ basic_attributes:
     base: 111
     increment: 8.73
 book: Hero of Don River
-display: summary
 specialties:
   - Ranged Troop Formation
   - Snipe
@@ -21,6 +20,7 @@ specialties:
   - Battle of Kulikovo
 stars: red5
 type:
+  - ranged_specialist
   - ground_specialist
 general: Dmitry
 name: Dmitry
