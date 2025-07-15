@@ -212,6 +212,24 @@ buff_pattern(Buffs) -->
     format("DEBUG: '1T2A1Vand2T1AV2C' matched: '~w'~n", [Buffs])
   }.
 
+% Pattern: 1T2A1Vand1AV1C
+buff_pattern(Buffs) -->
+  {format("DEBUG: Trying '1T2A1Vand1AV1C'~n")},
+  optional_verb, troop(Troop1), attribute(Attr1),
+  [and], attribute(Attr2), [by], [ValueAtom1],
+  {extract_value(ValueAtom1,Value1)}, [and],
+  attribute(Attr3), [by], [ValueAtom2],
+  {extract_value(ValueAtom2,Value2)},
+  optional_when_general_is, condition(Cond1),
+  {
+    Buffs = [
+      buff(Attr1, Troop1, Value1, [Cond1]),
+      buff(Attr2, Troop1, Value1, [Cond1]),
+      buff(Attr3, '', Value2, [Cond1])
+    ],
+    format("DEBUG: '1T2A1Vand1AV1C' matched: Buffs: '~w'~n", [Buffs])
+  }.
+
 % Pattern: 1C2TAV1CT2A1V
 % 1 NOT SHARED Condition
 % 2 Troops with
