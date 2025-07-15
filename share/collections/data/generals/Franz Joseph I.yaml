@@ -1,0 +1,24 @@
+ascending: 1
+basic_attributes:
+  attack:
+    base: 133
+    increment: 9.15
+  defense:
+    base: 128
+    increment: 9.06
+  leadership:
+    base: 125
+    increment: 9.02
+  politics:
+    base: 106
+    increment: 7.52
+book: Imperial Authority
+name: Franz Joseph I
+specialties:
+  - Ranged Troop Formation
+  - Siege
+  - Ranged Troop Ares
+  - Austro-Hungarian Compromise
+stars: red5
+type:
+  - ranged_specialist

@@ -1,0 +1,24 @@
+ascending: 1
+basic_attributes:
+  attack:
+    base: 105
+    increment: 0
+  defense:
+    base: 118
+    increment: 0
+  leadership:
+    base: 111
+    increment: 0
+  politics:
+    base: 101
+    increment: 0
+book: Ocean Squadrons
+name: George Dewey
+specialties:
+  - Ranged Troop Formation
+  - Ambush
+  - War God
+  - Battle of Manila Bay
+stars: red5
+type:
+  - wall
