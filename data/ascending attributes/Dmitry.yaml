@@ -1,81 +1,93 @@
 ---
 ascending:
-  - level: "red1"
-    buff:
-      - attribute: Attack
-        condition:
-          - Reinforcing
-        class: Ranged Troops
-        value:
-          number: 15
-          unit: percentage
-      - attribute: Defense
-        condition:
-          - Reinforcing
-        class: Ground Troops
-        value:
-          number: 10
-          unit: percentage
-  - level: "red2"
-    buff:
-      - attribute: Defense
-        condition:
-          - Reinforcing
-        class: Ground Troops
-        value:
-          number: 15
-          unit: percentage
-      - attribute: HP
-        condition:
-          - Reinforcing
-        class: Ground Troops
-        value:
-          number: 15
-          unit: percentage
-  - level: "red3"
-    buff:
-      - attribute: March Size
-        value:
-          number: 10
-          unit: percentage
-  - level: "red4"
-    buff:
-      - attribute: Attack
-        condition:
-          - Reinforcing
-        class: Ranged Troops
-        value:
-          number: 10
-          unit: percentage
-      - attribute: HP
-        condition:
-          - Reinforcing
-        class: Ground Troops
-        value:
-          number: 20
-          unit: percentage
-  - level: "red5"
-    buff:
-      - attribute: Attack
-        condition:
-          - Reinforcing
-        class: Ranged Troops
-        value:
-          number: 15
-          unit: percentage
-      - attribute: Defense
-        condition:
-          - Reinforcing
-        class: Ground Troops
-        value:
-          number: 15
-          unit: percentage
-      - attribute: HP
-        condition:
-          - Reinforcing
-        class: Ground Troops
-        value:
-          number: 15
-          unit: percentage
+- buff:
+  - attribute: Attack
+    conditions:
+    - Reinforcing
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 15
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - Reinforcing
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 10
+      unit: percentage
+  level: red1
+- buff:
+  - attribute: Defense
+    conditions:
+    - Reinforcing
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 15
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - Reinforcing
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 15
+      unit: percentage
+  level: red2
+- buff:
+  - attribute: March Size
+    conditions: []
+    passive: 0
+    targetedType: ''
+    value:
+      number: 10
+      unit: percentage
+  level: red3
+- buff:
+  - attribute: Attack
+    conditions:
+    - Reinforcing
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - Reinforcing
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 20
+      unit: percentage
+  level: red4
+- buff:
+  - attribute: Attack
+    conditions:
+    - Reinforcing
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 15
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - Reinforcing
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 15
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - Reinforcing
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 15
+      unit: percentage
+  level: red5
 general: Dmitry
 id: Dmitry

@@ -1,9 +1,18 @@
 ---
 buffs:
-- attribute: Defense
+- attribute: Attack
   conditions:
+  - Enemy
   - leading the army
-  - Reinforcing
+  passive: 0
+  targetedType: Ground Troops
+  value:
+    number: 35
+    unit: percentage
+- attribute: HP
+  conditions:
+  - Enemy
+  - leading the army
   passive: 0
   targetedType: Ground Troops
   value:
@@ -11,21 +20,12 @@ buffs:
     unit: percentage
 - attribute: HP
   conditions:
+  - Enemy
   - leading the army
-  - Reinforcing
   passive: 0
-  targetedType: Ground Troops
+  targetedType: Mounted Troops
   value:
     number: 20
     unit: percentage
-- attribute: Attack
-  conditions:
-  - leading the army
-  - Reinforcing
-  passive: 0
-  targetedType: Ranged Troops
-  value:
-    number: 30
-    unit: percentage
-name: Hero of Don River
-text: 'Increases the ground troops’ defense and HP by 20% and ranged troops’ attack by 30% when General is leading the army to reinforce. '
+name: Great King of Persia
+text: 'Reduces enemy ground troops’ attack by 35%, and enemy ground troops and mounted troops’ HP by 20% when General is leading the army. '
