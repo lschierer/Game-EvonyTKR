@@ -1,0 +1,28 @@
+---
+buffs:
+- attribute: Attack
+  conditions:
+  - leading the army
+  passive: 0
+  targetedType: Siege Machines
+  value:
+    number: 55
+    unit: percentage
+- attribute: Defense
+  conditions:
+  - leading the army
+  passive: 0
+  targetedType: Siege Machines
+  value:
+    number: 55
+    unit: percentage
+- attribute: HP
+  conditions:
+  - leading the army
+  passive: 0
+  targetedType: Siege Machines
+  value:
+    number: 40
+    unit: percentage
+name: Hora Quirini
+text: 'Increases siege machines’ attack and defense by 55% and siege machines’ HP by 40% when General is leading the army. '
