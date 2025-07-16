@@ -59,7 +59,7 @@ class Game::EvonyTKR::Converter::SkillBook :
 
     my @fragments = $parser->tokenize_buffs($text);
     foreach my $frag (@fragments) {
-      push@$buffs, $parser->normalize_buff($frag);
+      push @$buffs, $parser->normalize_buff($frag);
     }
 
     $self->logger->debug(Data::Printer::np($buffs));

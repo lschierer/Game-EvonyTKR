@@ -13,7 +13,9 @@ package Game::EvonyTKR::Converter {
   require Game::EvonyTKR::Converter::General;
   require Game::EvonyTKR::Converter::SkillBook;
   require Game::EvonyTKR::Converter::AscendingAttributes;
+  require Game::EvonyTKR::Converter::Specialty;
   require Game::EvonyTKR::Shared::Parser;
+  require Game::EvonyTKR::Logger::Config;
   use Carp;
   use Log::Log4perl qw(:easy);
   our $VERSION = 'v0.01.0';
@@ -30,6 +32,7 @@ package Game::EvonyTKR::Converter {
               'Convert the Ascending Attributes of a General to normalized YAML'
             ],
             ['skillbook', 'Convert SkillBook Text to normalized YAML'],
+            ['specialty', 'Convert Specialty Text to normalized YAML'],
           ],
           required => 1,
         },
@@ -48,11 +51,22 @@ package Game::EvonyTKR::Converter {
     my ($self, $opt, $args) = @_;
     binmode(STDOUT, ":utf8");
     binmode(STDERR, ":utf8");
-    Log::Log4perl::Config->utf8(1);
-    Log::Log4perl->easy_init($DEBUG);
 
-    my $dd    = Path::Tiny::path(File::Share::dist_dir('Game-EvonyTKR'));
     my $debug = $opt->{debug} ? 1 : 0;
+
+    Log::Log4perl::Config->utf8(1);
+    my $loggerConfig = Game::EvonyTKR::Logger::Config->new('test');
+    my $logConfig;
+    if ($debug) {
+      $logConfig = Path::Tiny->cwd()->child('share/log4perl.development.conf ');
+    }
+    else {
+      $logConfig = Path::Tiny->cwd()->child('share/log4perl.conf ');
+    }
+    Log::Log4perl::init($logConfig->canonpath());
+
+    my $dd = Path::Tiny::path(File::Share::dist_dir('Game-EvonyTKR'));
+
     Game::EvonyTKR::Shared::Parser->new()->generate_grammar();
 
     #my $result = $opt->{blortex} ? blortex() : blort();
@@ -70,6 +84,13 @@ package Game::EvonyTKR::Converter {
     elsif ($opt->mode eq 'ascending') {
       my $handler = Game::EvonyTKR::Converter::AscendingAttributes->new(
         outputDir => $dd->child('/collections/data/ascending attributes/'),
+        debug     => $debug,
+      );
+      $handler->execute();
+    }
+    elsif ($opt->mode eq 'specialty') {
+      my $handler = Game::EvonyTKR::Converter::Specialty->new(
+        outputDir => $dd->child('/collections/data/specialties/'),
         debug     => $debug,
       );
       $handler->execute();

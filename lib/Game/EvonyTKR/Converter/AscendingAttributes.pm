@@ -97,18 +97,19 @@ class Game::EvonyTKR::Converter::AscendingAttributes :
 
   method printYAML () {
     my $result = {
-      id        => $name,
-      general   => $name,
+      id      => $name,
+      general => $name,
     };
     my @keys = $self->AscendingAttributeLevelValues($red);
-    foreach my $k (@keys){
-      if($k eq 'none') {
+    foreach my $k (@keys) {
+      if ($k eq 'none') {
         next;
       }
-      push @{$result->{ascending} }, {
+      push @{ $result->{ascending} },
+        {
         level => $k,
-        buff  => [map { $_->to_hash() } @{ $data->{lc($k)}->{buffs} }]
-      };
+        buff  => [map { $_->to_hash() } @{ $data->{ lc($k) }->{buffs} }]
+        };
     }
     my $yc = YAML::PP->new(
       schema       => [qw/ + Perl /],

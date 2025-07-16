@@ -61,7 +61,7 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Shared::Constants) {
     my $logger = $self->logger();
 
     # Check if the condition is a valid buff condition
-    if (any { $condition eq $_ } keys %{ $self->BuffConditionValues } ) {
+    if (any { $condition eq $_ } keys %{ $self->BuffConditionValues }) {
       # Initialize the array if it doesn't exist
       $buffConditions //= [];
 

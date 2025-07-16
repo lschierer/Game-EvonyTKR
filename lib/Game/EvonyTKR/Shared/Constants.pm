@@ -117,24 +117,28 @@ class Game::EvonyTKR::Shared::Constants : isa(Game::EvonyTKR::Model::Logger) {
     $AttributeValues = \@temp;
   }
 
-  field $MappedAttributeNames :reader;
+  field $MappedAttributeNames : reader;
 
   ADJUST {
     Readonly::Scalar my $temp => {
-      'death into wounded rate'       => 'Death to Wounded',
-      'death into survival rate'      => 'Death to Survival',
-      'march size increase'           => 'March Size',
-      'march size Capacity'           => 'March Size',
-      'march size'                    => 'March Size',
-      'the march size'                => 'March Size',
-      'wounded into death rate'       => 'Wounded to Death',
-      'wounded into death'            => 'Wounded to Death',
-      'mayor training speed'                              => 'SubCity Training Speed',
-      'mayor death into survival rate'                    => 'SubCity Death to Survival',
-      'subordinate city troops’ death to survival rate'   => 'SubCity Death to Survival',
-      'subordinate city troops’ death to survival'        => 'SubCity Death to Survival',
-      'subordinate city troops’ death into survival rate' => 'SubCity Death to Survival',
-      'subordinate city troops’ death into survival'      => 'SubCity Death to Survival',
+      'death into wounded rate'        => 'Death to Wounded',
+      'death into survival rate'       => 'Death to Survival',
+      'march size increase'            => 'March Size',
+      'march size Capacity'            => 'March Size',
+      'march size'                     => 'March Size',
+      'the march size'                 => 'March Size',
+      'wounded into death rate'        => 'Wounded to Death',
+      'wounded into death'             => 'Wounded to Death',
+      'mayor training speed'           => 'SubCity Training Speed',
+      'mayor death into survival rate' => 'SubCity Death to Survival',
+      'subordinate city troops’ death to survival rate' =>
+        'SubCity Death to Survival',
+      'subordinate city troops’ death to survival' =>
+        'SubCity Death to Survival',
+      'subordinate city troops’ death into survival rate' =>
+        'SubCity Death to Survival',
+      'subordinate city troops’ death into survival' =>
+        'SubCity Death to Survival',
     };
     $MappedAttributeNames = $temp;
   }
@@ -452,20 +456,20 @@ class Game::EvonyTKR::Shared::Constants : isa(Game::EvonyTKR::Model::Logger) {
       'to attack Monsters'         => 'Against Monsters',         # buff version
       'to attack'                  => 'Attacking',
       'to reinforce'               => 'Reinforcing',
-      'the Mayor'                  => "When City Mayor for this SubCity",
-      'in this subordinate city'   => "When City Mayor for this SubCity",
-      'in subordinate city'        => "When City Mayor for this SubCity",
-      'launching Alliance War'     => 'When Rallying',
-      'attacking Monsters'         => 'Against Monsters',
-      'in-city'                    => 'In City',
-      'from Monsters'              => 'Against Monsters',
-      'the main city defense general'  => 'When The Main Defense General',
+      'the Mayor'                     => "When City Mayor for this SubCity",
+      'in this subordinate city'      => "When City Mayor for this SubCity",
+      'in subordinate city'           => "When City Mayor for this SubCity",
+      'launching Alliance War'        => 'When Rallying',
+      'attacking Monsters'            => 'Against Monsters',
+      'in-city'                       => 'In City',
+      'from Monsters'                 => 'Against Monsters',
+      'the main city defense general' => 'When The Main Defense General',
     };
     $mapped_conditions = $temp;
   }
 
   method string_to_condition ($string) {
-    my $exactBuff   = first { $string =~ /$_/i } keys %{ $BuffConditionValues };
+    my $exactBuff   = first { $string =~ /$_/i } keys %{$BuffConditionValues};
     my $exactDebuff = first { $string =~ /$_/i } $DebuffConditionValues->@*;
     my $map         = $mapped_conditions;
 
@@ -480,7 +484,7 @@ class Game::EvonyTKR::Shared::Constants : isa(Game::EvonyTKR::Model::Logger) {
     elsif (exists $map->{$string}) {
       my $v = $map->{$string};
       unless (any { $_ eq $v }
-        (keys %{ $BuffConditionValues }, $DebuffConditionValues->@*)) {
+        (keys %{$BuffConditionValues}, $DebuffConditionValues->@*)) {
         $self->logger->logcroak(
           "$v is not a valid condition mapping for $string");
       }
@@ -496,7 +500,8 @@ class Game::EvonyTKR::Shared::Constants : isa(Game::EvonyTKR::Model::Logger) {
   method AllConditions() {
     my %seen;
     my @allowedConditions = grep { not $seen{$_}++ } (
-      keys %{ $BuffConditionValues }, @{$DebuffConditionValues},
+      keys %{$BuffConditionValues},
+      @{$DebuffConditionValues},
       @{$BookConditionValues}
     );
     return @allowedConditions;

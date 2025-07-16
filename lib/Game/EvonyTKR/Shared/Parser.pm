@@ -35,25 +35,24 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
     my $value           = $buff_hash->{value};
     my $conditions_list = $buff_hash->{conditions} // [];
 
-    # Prolog cannot parse the negative out of the numbers, we must do so here.
-    # that also means that it sometimes does not set the debuff conditions correctly.
+# Prolog cannot parse the negative out of the numbers, we must do so here.
+# that also means that it sometimes does not set the debuff conditions correctly.
     if ($value < 0) {
       $self->logger->info("detected a debuff to convert");
       $is_debuff = 1;
-      $value = abs($value);
+      $value     = abs($value);
       @{$conditions_list} = grep { length($_) > 0 } @{$conditions_list};
       if (scalar @{$conditions_list}) {
         my $is_PvM = 0;
 
         foreach my $c (@{$conditions_list}) {
 
-          if(exists $self->BuffConditionValues->{$c} ) {
+          if (exists $self->BuffConditionValues->{$c}) {
             if ( $self->BuffConditionValues->{$c}->{PvM}
-              && ( not $self->BuffConditionValues->{$c}->{Attacking} )
-              && ( not $self->BuffConditionValues->{$c}->{Defense} )
-              && ( not $self->BuffConditionValues->{$c}->{Mayor} )
-              && ( not $self->BuffConditionValues->{$c}->{Wall} )
-            ) {
+              && (not $self->BuffConditionValues->{$c}->{Attacking})
+              && (not $self->BuffConditionValues->{$c}->{Defense})
+              && (not $self->BuffConditionValues->{$c}->{Mayor})
+              && (not $self->BuffConditionValues->{$c}->{Wall})) {
               # this particular disunion, while not exhaustive,
               # is sufficient to ensure that we have eliminated
               # the possibility this is a PvP buff. While
@@ -64,7 +63,7 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
               # there is a possibility that at some future
               # point a second value other than 'against monsters'
               # might pass this test.
-              push @{ $conditions_list }, 'Monsters';
+              push @{$conditions_list}, 'Monsters';
               $is_PvM = 1;
               last;
             }
@@ -107,31 +106,31 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
 
     # Handle condition normalization
     foreach my $cond (@$conditions_list) {
-      if(ref $cond eq 'ARRAY') {
-        $cond = join(' ', @{ $cond });
+      if (ref $cond eq 'ARRAY') {
+        $cond = join(' ', @{$cond});
       }
       my $r;
       if ($cond eq 'enemy') {
         $is_debuff = 1;
-        $r = $buff->set_condition('Enemy');
+        $r         = $buff->set_condition('Enemy');
         $self->logger->debug(
           "Added debuff condition: 'Enemy' ; set_condition result: $r");
       }
       elsif ($cond eq 'monsters') {
         $is_debuff = 1;
-        $r = $buff->set_condition('Monsters');
+        $r         = $buff->set_condition('Monsters');
         $self->logger->debug(
           "Added debuff condition: 'Monsters' ; set_condition result: $r");
       }
-      elsif ( $cond =~ /against[_ ]monsters/i && $is_debuff) {
+      elsif ($cond =~ /against[_ ]monsters/i && $is_debuff) {
         $cond = 'Monsters';
-        $r = $buff->set_condition($cond);
+        $r    = $buff->set_condition($cond);
         $self->logger->debug(
           "Added buff condition: $cond ; set_condition result: $r");
       }
       else {
         $self->logger->debug("Processing condition: '$cond'");
-        if(length($cond) == 0){
+        if (length($cond) == 0) {
           next;
         }
         my $normalized = $self->normalize_condition_case($cond);
@@ -161,20 +160,25 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
     if ($prolog_condition =~ /^[a-z_]+$/ && $prolog_condition =~ /_/) {
       # This looks like an underscore-based atom from Prolog
       my $display_condition = $prolog_condition;
-      $display_condition =~ s/_/ /g;  # Convert underscores to spaces
+      $display_condition =~ s/_/ /g;    # Convert underscores to spaces
 
-      $self->logger->debug("Converted underscore atom: '$prolog_condition' -> '$display_condition'");
+      $self->logger->debug(
+        "Converted underscore atom: '$prolog_condition' -> '$display_condition'"
+      );
 
       # Try to map to proper case using existing constants
       my $mapped = $self->string_to_condition($display_condition);
       if ($mapped) {
-        $self->logger->debug("string_to_condition mapped: '$display_condition' -> '$mapped'");
+        $self->logger->debug(
+          "string_to_condition mapped: '$display_condition' -> '$mapped'");
         return $mapped;
       }
 
       # Fallback: capitalize each word
-      my $capitalized = join(' ', map { ucfirst($_) } split(/ /, $display_condition));
-      $self->logger->debug("Using capitalized fallback: '$display_condition' -> '$capitalized'");
+      my $capitalized =
+        join(' ', map { ucfirst($_) } split(/ /, $display_condition));
+      $self->logger->debug(
+        "Using capitalized fallback: '$display_condition' -> '$capitalized'");
       return $capitalized;
     }
 
@@ -183,8 +187,10 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
     my %condition_map;
 
     # Build map from existing constants (both buff and debuff)
-    foreach my $const (keys %{ $self->BuffConditionValues } ,
-      @{ $self->DebuffConditionValues }) {
+    foreach my $const (
+      keys %{ $self->BuffConditionValues },
+      @{ $self->DebuffConditionValues }
+    ) {
       $condition_map{ lc($const) } = $const;
     }
 
@@ -264,8 +270,8 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
         my $base_atom    = join('_', @l);
         my $subcity_atom = "subcity_" . $base_atom;
 
-        sprintf('subcity_attribute(%s) --> [%s].', $subcity_atom,
-          join('], [', @l));
+        sprintf('subcity_attribute(%s) --> [%s].',
+          $subcity_atom, join('], [', @l));
       }
       else {
         my @l      = split(/ /, $t);
@@ -291,33 +297,30 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
       $self->logger->debug("attribute for alias '$key' is '$attr'");
 
       $attr = lc($attr);
-      my @term            = split(/ /, $attr);
-      my $base_atom    = join('_', @term);
-      my $val = lc($key);
-      my @synonym = split(/ /, $val);
+      my @term      = split(/ /, $attr);
+      my $base_atom = join('_', @term);
+      my $val       = lc($key);
+      my @synonym   = split(/ /, $val);
       foreach my $s (@synonym) {
         $s =~ s/(.*)/[$1]/;
         $s =~ s/\’//g;
       }
-      if($key =~ /^(?:sub|mayor)/i ) {
+      if ($key =~ /^(?:sub|mayor)/i) {
         sprintf(
           'subcity_attribute(%s) --> %s.',
-          join('_', @term),
+          join('_',  @term),
           join(', ', @synonym)
         );
       }
       else {
-        sprintf(
-          'attribute(%s) --> %s.',
-          join('_', @term),
-          join(', ',  @synonym)
-        );
+        sprintf('attribute(%s) --> %s.', join('_', @term),
+          join(', ', @synonym));
       }
     } keys %{ $self->MappedAttributeNames };
 
     # Keep validation predicates for conditions
     push @rules, map {
-      my $t = lc($_);
+      my $t      = lc($_);
       my @l      = split(/ /, $t);
       my $atom   = join('_',    @l);
       my $tokens = join('], [', @l);
@@ -334,7 +337,7 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
     } keys %{ $self->BuffConditionValues };
 
     push @rules, map {
-      my $t = lc($_);
+      my $t      = lc($_);
       my @l      = split(/ /, $t);
       my $atom   = join('_',    @l);
       my $tokens = join('], [', @l);
@@ -357,20 +360,16 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
       $self->logger->debug("condition for alias '$key' is '$attr'");
 
       $attr = lc($attr);
-      my @term            = split(/ /, $attr);
-      my $base_atom    = join('_', @term);
-      my $val = lc($key);
-      my @synonym = split(/ /, $val);
+      my @term      = split(/ /, $attr);
+      my $base_atom = join('_', @term);
+      my $val       = lc($key);
+      my @synonym   = split(/ /, $val);
       foreach my $s (@synonym) {
         $s =~ s/(.*)/[$1]/;
         $s =~ s/[\x{2018}\x{2019}]/'/g;
       }
 
-      sprintf(
-        'condition(%s) --> %s.',
-        join('_', @term),
-        join(', ', @synonym)
-      );
+      sprintf('condition(%s) --> %s.', join('_', @term), join(', ', @synonym));
     } keys %{ $self->mapped_conditions };
 
     foreach my $r (@rules) {
@@ -426,9 +425,9 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
       $self->distDir->child('prolog/Game/EvonyTKR/Shared/buff_parser.pl')
     ];
     my $pid = open3($in_fh, $out_fh, $err_fh, @$cmd);
-    binmode($in_fh,  ":utf8");   # Write to Prolog's stdin
-    binmode($out_fh, ":utf8");   # Read from Prolog's stdout
-    binmode($err_fh, ":utf8");   # Read from Prolog's stderr
+    binmode($in_fh,  ":utf8");              # Write to Prolog's stdin
+    binmode($out_fh, ":utf8");              # Read from Prolog's stdout
+    binmode($err_fh, ":utf8");              # Read from Prolog's stderr
 
     print $in_fh "$quoted_text.\n";         # Send quoted string
     close $in_fh;
