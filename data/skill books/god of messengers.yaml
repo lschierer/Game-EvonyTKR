@@ -1,0 +1,28 @@
+---
+buffs:
+- attribute: Attack
+  conditions:
+  - leading the army
+  passive: 0
+  targetedType: Mounted Troops
+  value:
+    number: 50
+    unit: percentage
+- attribute: HP
+  conditions:
+  - leading the army
+  passive: 0
+  targetedType: Mounted Troops
+  value:
+    number: 50
+    unit: percentage
+- attribute: March Size
+  conditions:
+  - leading the army
+  passive: 0
+  targetedType: ''
+  value:
+    number: 12
+    unit: percentage
+name: God of Messengers
+text: 'Increases mounted troops’ attack and HP by 50% and March Size by 12% when General is leading the army. '
