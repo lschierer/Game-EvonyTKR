@@ -17,13 +17,13 @@ require Game::EvonyTKR::Model::Buff;
 require Game::EvonyTKR::Model::Buff::Value;
 require Game::EvonyTKR::Converter::Helpers;
 
-class Game::EvonyTKR::Converter::Specialty :
+class Game::EvonyTKR::Converter::Covenant :
   isa(Game::EvonyTKR::Shared::Constants) {
   use List::AllUtils qw( first all any none );
   use Carp;
   use namespace::autoclean;
 
-  # PODNAME: Game::EvonyTKR::Converter::Specialty
+  # PODNAME: Game::EvonyTKR::Converter::Covenant
 
   # input fields
   # This will eventually be something online that I have to fetch.
@@ -36,7 +36,7 @@ class Game::EvonyTKR::Converter::Specialty :
   field $helpers = Game::EvonyTKR::Converter::Helpers->new(debug => $debug);
 
   # output fields
-  field $specialties : reader;
+  field $covenantHash : reader;
 
   ADJUST {
     $self->logger->debug(sprintf(
@@ -56,13 +56,13 @@ class Game::EvonyTKR::Converter::Specialty :
   }
 
   method execute {
-    say "=== Specialty Text to YAML Converter ===";
+    say "=== Covenant Text to YAML Converter ===";
     $self->getMainText();
     $self->parseText();
   }
 
   method parseText {
-    foreach my $specialty (@$specialties) {
+    foreach my $covenant (@$covenantHash) {
       my $fileName   = sprintf('%s.yaml', $specialty->{name});
       my $lcFileName = lc($fileName);
       if ($outputDir->child($fileName)->is_file()) {
@@ -110,59 +110,24 @@ class Game::EvonyTKR::Converter::Specialty :
 
   method setupLevelsHash {
     Readonly::Hash1 my %temp => (
-      Green  => [],
-      Blue   => [],
-      Purple => [],
-      Orange => [],
-      Gold   => [],
+      war           => [],
+      cooperation   => [],
+      peace         => [],
+      faith         => [],
+      honor         => [],
+      civilization  => [],
     );
     my $levels = \%temp;
     return $levels;
   }
 
-  method create_skeleton_buff ($original_buff) {
-    # Create a new buff object with the same properties but value = 0
-    my $skeleton_value = Game::EvonyTKR::Model::Buff::Value->new(
-      number => 0,
-      unit   => $original_buff->value->unit  # Keep same unit (percentage, etc.)
-    );
 
-    my $skeleton_buff = Game::EvonyTKR::Model::Buff->new(
-      attribute => $original_buff->attribute,
-      value     => $skeleton_value,
-      passive   => $original_buff->passive,
-    );
-
-    # Copy target if it exists
-    if ($original_buff->targetedType) {
-      $skeleton_buff->set_target($original_buff->targetedType);
-    }
-
-    # Copy conditions
-    for my $condition ($original_buff->conditions) {
-      $skeleton_buff->set_condition($condition);
-    }
-
-    return $skeleton_buff;
-  }
 
   method printYAML ($name, $buffs) {
 
     my $levels = $self->setupLevelsHash();
 
-    # Put actual buffs in Gold level
-    for my $b (@{$buffs}) {
-      push @{ $levels->{Gold} }, $b;
-    }
 
-    # Create skeleton buffs for other levels
-    for my $level_name (qw/Green Blue Purple Orange/) {
-      for my $gold_buff (@{$buffs}) {
-        # Clone the buff but set value to 0
-        my $skeleton_buff = $self->create_skeleton_buff($gold_buff);
-        push @{ $levels->{$level_name} }, $skeleton_buff;
-      }
-    }
 
     my $result = {
       name   => $name,
@@ -199,21 +164,15 @@ class Game::EvonyTKR::Converter::Specialty :
   }
 
   method getMainText {
-    $self->logger->trace("Start of ::Converter::Specialty->getMainText");
+    $self->logger->trace("Start of ::Converter::Covenant->getMainText");
     unless ($generalFile->is_file()) {
       $self->logger->logcroak("$generalFile must be a file.");
       exit -1;
     }
     my $html_content = $generalFile->slurp_utf8();
-    $specialties = $self->extract_specialties($html_content);
-
-    for my $specialty (@$specialties) {
-      $self->logger->debug(
-        sprintf('Specialty: "%s" Details: ', $specialty->{name}));
-      for my $detail (@{ $specialty->{details} }) {
-        $self->logger->debug("  - $detail");
-      }
-    }
+    my $tree = HTML::TreeBuilder->new();
+    $tree->parse($html_content);
+    $tree->eof();
 
   }
 

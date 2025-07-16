@@ -3,13 +3,17 @@ use utf8::all;
 use experimental qw(class);
 use File::FindLib 'lib';
 require Data::Printer;
+require HTML::TreeBuilder;
+require HTTP::Tiny;
+require IO::Socket::IP;    # for HTTP::Tiny;
+require IO::Socket::SSL;
 require Path::Tiny;
 require Readonly;
-require JSON::PP;
 require YAML::PP;
 require Game::EvonyTKR::Shared::Parser;
 require Game::EvonyTKR::Model::Buff;
 require Game::EvonyTKR::Model::Buff::Value;
+require Game::EvonyTKR::Converter::Helpers;
 
 class Game::EvonyTKR::Converter::SkillBook :
   isa(Game::EvonyTKR::Shared::Constants) {
@@ -19,39 +23,105 @@ class Game::EvonyTKR::Converter::SkillBook :
 
   field $outputDir : param;
   field $debug : param //= 0;
+  field $generalFile : param //= '';
+
+  ADJUST {
+    $self->logger->debug(sprintf(
+  '%s assumes that the class or module calling it has generated the required grammar for %s',
+      __CLASS__, 'Game::EvonyTKR::Shared::Parser'
+    ));
+    # do not assume we were properly passed
+    # a Path::Tiny::path
+    $outputDir = Path::Tiny::path($outputDir);
+
+    if (length($generalFile) == 0) {
+      $self->logger->debug("setting generalFile to default test file in "
+          . $self->distDir->canonpath());
+      $generalFile =
+        $self->distDir->child('collections/share/TestGeneralFile.html');
+    }
+  }
+
+
   field $name = '';
   field $text = '';
   field $buffs;
 
-  method getName {
-    say "Please enter a name: ";
-    open(my $tty, '<', '/dev/tty') or die "Cannot open /dev/tty: $!";
-    my $potentialName = <$tty>;
-    close $tty;
-    chomp $potentialName;
-    if (length($potentialName)) {
-      $name = $potentialName;
-    }
-  }
+  field $skillbookHash;
+  field $helpers = Game::EvonyTKR::Converter::Helpers->new(debug => $debug);
 
   method getMainText {
     say "=== Skill Book Text to YAML Converter ===";
-    say "Please paste the skill book text below.";
-    say
-"Expected format: 'Increases ranged troops' attack and defense by 45% and...'",
-      say "Press Ctrl+D when finished, or type 'END' on a new line:",
-      my @lines;
-    while (my $line = <STDIN>) {
-      chomp $line;    # Remove the newline character
-      if ($line ne 'END') {
-        push @lines, $line;
-      }
-      else {
-        last;
+    $self->logger->trace("Start of ::Converter::Specialty->getMainText");
+    unless ($generalFile->is_file()) {
+      $self->logger->logcroak("$generalFile must be a file.");
+      exit -1;
+    }
+    my $html_content = $generalFile->slurp_utf8();
+    my $tree = HTML::TreeBuilder->new();
+    $tree->parse($html_content);
+    # Find the container div
+    my $container = $tree->look_down(
+      '_tag'  => 'div',
+      'class' =>
+        qr/elementor-element-(?:\w){1,8}.*elementor-widget-theme-post-content/
+    );
+
+    unless ($container) {
+      warn "Could not find specialty container div";
+      return [];
+    }
+    if ($debug) {
+      $self->logger->debug("Found container: " . $container->starttag());
+    }
+
+    # Get all h2 and h3 elements in reading order
+    my @headers = $container->look_down('_tag' => qr/^h[23]$/);
+
+    # Find the second h2 (start of skillbook)
+    my $h2_count = 0;
+    my $start_index;
+
+    for my $i (0 .. $#headers) {
+      if ($headers[$i]->tag eq 'h2') {
+        $h2_count++;
+        if ($h2_count == 2) {
+          $start_index = $i;
+          last;
+        }
       }
     }
-    $text = join(' ', @lines);
+
+    unless (defined $start_index) {
+      warn "Could not find second h2 tag";
+      return [];
+    }
+
+    #extract 1 H3 tag after the second H2 tag
+    my $h3_index = $start_index + 1;
+    if($h3_index <= $#headers){
+      if ($headers[$h3_index]->tag eq 'h3') {
+        my $skillbookH3 = $headers[$h3_index];
+
+        my $skillBookName = $skillbookH3->as_trimmed_text;
+        my $para = $helpers->find_next_p_after_element($skillbookH3);
+
+        if($para) {
+          $name = $skillBookName;
+          $text = $para->as_trimmed_text;
+        }
+        else {
+          $self->logger->error("Could not find the required paragraph");
+        }
+      }
+    }
+    else {
+      $self->logger->error("Cannot find the required H3 tag!!");
+    }
+
+
   }
+
 
   method parseSkillbookText {
 
@@ -96,7 +166,6 @@ class Game::EvonyTKR::Converter::SkillBook :
   method execute {
     $self->getMainText();
     $self->parseSkillbookText();
-    $self->getName();
     $self->printYAML();
   }
 
