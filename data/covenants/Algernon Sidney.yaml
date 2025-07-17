@@ -1,63 +1,87 @@
-name: Algernon Sidney
+---
 generals:
   - William Wallace
   - John Churchill
   - Merlin
 levels:
-  - category: War
-    type: personal
-    buff:
+  - buffs:
       - attribute: Attack
-        class: Ranged Troops
-        condition:
+        conditions:
           - Marching
+        passive: 0
+        targetedType: Ranged Troops
         value:
           number: 5
           unit: percentage
-  - category: Cooperation
-    type: passive
-    buff:
+    category: war
+    text: Marching Ranged Troop Attack +5% (Local)
+  - buffs:
+      - attribute: March Size
+        conditions: []
+        passive: 0
+        targetedType: ''
+        value:
+          number: 8
+          unit: percentage
+      - attribute: Marching Speed
+        conditions: []
+        passive: 1
+        targetedType: ''
+        value:
+          number: 10
+          unit: percentage
+    category: faith
+    text: Marching Size Capacity +8% (Local);;March Speed +10% (Global)
+  - buffs:
       - attribute: Attack
-        class: Ranged Troops
-        condition:
+        conditions:
           - Reinforcing
+        passive: 1
+        targetedType: Ranged Troops
         value:
           number: 5
           unit: percentage
-  - category: Peace
-    type: personal
-    buff:
+    category: cooperation
+    text: Reinforcing Ranged Troop Attack +5% (Global)
+  - buffs:
       - attribute: Attack
-        class: Ranged Troops
-        condition:
+        conditions:
           - Marching
-        value:
-          number: 5
-          unit: percentage
-  - category: Honor
-    type: personal
-    buff:
-      - attribute: Defense
-        class: Ranged Troops
-        condition:
-          - Marching
-        value:
-          number: 5
-          unit: percentage
-  - category: Civilization
-    type: personal
-    buff:
-      - attribute: Attack
-        class: Ranged Troops
-        condition:
-          - Marching
+        passive: 0
+        targetedType: Ranged Troops
         value:
           number: 5
           unit: percentage
       - attribute: HP
-        class: Ranged Troops
-        condition:
+        conditions:
           - Marching
+        passive: 0
+        targetedType: Ranged Troops
         value:
           number: 10
           unit: percentage
+    category: civilization
+    text: Marching Ranged Troop Attack +5% (Local);;Marching Ranged Troop HP +10% (Local)
+  - buffs:
+      - attribute: Defense
+        conditions:
+          - Marching
+        passive: 0
+        targetedType: Ranged Troops
+        value:
+          number: 5
+          unit: percentage
+    category: honor
+    text: Marching Ranged Troop Defense +5% (Local)
+  - buffs:
+      - attribute: Attack
+        conditions:
+          - Marching
+        passive: 0
+        targetedType: Ranged Troops
+        value:
+          number: 5
+          unit: percentage
+    category: peace
+    text: Marching Ranged Troop Attack +5% (Local)
+name: Algernon Sidney
