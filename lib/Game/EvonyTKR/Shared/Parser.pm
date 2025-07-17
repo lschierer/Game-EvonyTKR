@@ -145,9 +145,7 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
       }
     }
 
-    push @result, $buff;
-
-    return @result;
+    return $buff;
   }
 
   method normalize_condition_case($prolog_condition) {

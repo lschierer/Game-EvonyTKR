@@ -10,6 +10,7 @@ require Readonly;
 require Game::EvonyTKR::Shared::Parser;
 require Game::EvonyTKR::Model::Buff;
 require Game::EvonyTKR::Model::Buff::Value;
+require Game::EvonyTKR::Converter::Helpers;
 
 class Game::EvonyTKR::Converter::AscendingAttributes :
   isa(Game::EvonyTKR::Shared::Constants) {
@@ -20,11 +21,26 @@ class Game::EvonyTKR::Converter::AscendingAttributes :
   # PODNAME: Game::EvonyTKR::Converter::AscendingAttributes
 
   # input fields
+  field $tree      : param :reader;
   field $outputDir : param;
-  field $debug : param //= 0;
+  field $debug     : param //= 0;
+  field $red       : param //= 1;
+
+  ADJUST {
+    $self->logger->debug(sprintf(
+'%s assumes that the class or module calling it has generated the required grammar for %s',
+      __CLASS__, 'Game::EvonyTKR::Shared::Parser'
+    ));
+    $self->logger->debug(sprintf(
+'%s assumes that the class or module calling it has also correctly set up the $tree field.',
+      __CLASS__));
+    # do not assume we were properly passed
+    # a Path::Tiny::path
+    $outputDir = Path::Tiny::path($outputDir);
+  }
 
   # internal control fields
-  field $red = 1;
+  field $helpers = Game::EvonyTKR::Converter::Helpers->new(debug => $debug);
 
   # output fields
   field $name : reader = '';
@@ -88,8 +104,7 @@ class Game::EvonyTKR::Converter::AscendingAttributes :
 
   method execute {
     say "=== Ascending AscendingAttributes Text to YAML Converter ===";
-    $self->getName();
-    $self->purpleOrRed();
+    $self->logger->debug(sprintf('ascending getMainText sees tree -- %s --', $tree->as_XML()));
     $self->getMainText();
     $self->parseText();
     $self->printYAML();
@@ -144,79 +159,91 @@ class Game::EvonyTKR::Converter::AscendingAttributes :
     }
   }
 
+  method getName () {
+
+  }
+
   method getMainText {
-    say "Please paste the ascending attribute text below.";
-    say
-"Expected format: '1 Star Increases ranged troops' attack and defense by 45% and...'",
-      say "Press Ctrl+D when finished, or type 'END' on a new line:",
-      my @lines;
-    while (my $line = <STDIN>) {
-      chomp $line;    # Remove the newline character
-      if ($line ne 'END') {
-        push @lines, $line;
-      }
-      else {
-        last;
-      }
+    $self->logger->trace(
+      "Start of ::Converter::AscendingAttributes->getMainText");
+
+
+    my $header = $self->tree->look_down(sub {
+      my $el = shift;
+      return 0 unless $el->tag eq 'header';
+
+      my $class = $el->attr('class') // '';
+      my %classes = map { $_ => 1 } split /\s+/, $class;
+
+      return $classes{'entry-header'} && $classes{'hentry-wrapper'};
+    });
+
+    unless ($header) {
+      $self->logger->logcroak("header cannot be found in the provided file.");
     }
 
-    foreach my $index (0 .. 4) {
-      unless ($index < scalar(@lines)) {
-        $self->logger->logcroak(
-          "Invalid Ascending Attribute Text: insufficient lines entered.");
-      }
-      my $line = $lines[$index];
-      my $key  = $red ? 'red' : 'purple';
-      if ($line =~ /^(\d) Star(?:\s*[-–—]\s*)? (.+)$/) {
-        $key = "$key$1";
-        if (exists $data->{$key}) {
-          $data->{$key}->{text} = $2;
+    my $nh = $header->look_down('_tag' => 'h1');
+    unless ($nh) {
+      $self->logger->logcroak("name H1 cannot be found in the provided file.");
+    }
+
+    $name = $nh->as_trimmed_text;
+
+    # Find the container div
+    my $container = $tree->look_down(
+      '_tag'  => 'div',
+      'class' => qr/entry-content.*th-content/
+    );
+
+    unless ($container) {
+      warn "Could not find entry-content div container";
+      return [];
+    }
+    if ($debug) {
+      $self->logger->debug("Found container: " . $container->starttag());
+    }
+
+    # Get all h2 and h3 elements in reading order
+    my @headers = $container->look_down('_tag' => qr/^h[23]$/);
+
+    # Find the third h2 (start of skillbook)
+    my $target   = 3;
+    my $h2_count = 0;
+    my $start_index;
+
+    for my $i (0 .. $#headers) {
+      if ($headers[$i]->tag eq 'h2') {
+        $h2_count++;
+        if ($h2_count == $target) {
+          $start_index = $i;
+          last;
         }
-        else {
-          $self->logger->logcroak("Invalid Ascending Attribute Line: '$line'");
-        }
-      }
-      else {
-        $self->logger->logcroak("Invalid Ascending Attribute Line: '$line'");
       }
     }
-  }
 
-  method getName {
-    say "Please enter the name of the general to whom this applies: ";
-    open(my $tty, '<:encoding(UTF-8)', '/dev/tty')
-      or $self->logger->logcroak("Cannot open /dev/tty: $!");
-    my $potentialName = <$tty>;
-    close $tty;
-    chomp $potentialName;
-    if (length($potentialName)) {
-      $name = $potentialName;
+    unless (defined $start_index) {
+      warn "Could not find required h2 tag";
+      return [];
     }
-  }
 
-  method purpleOrRed {
-    my $answer = '';
-    while (lc($answer) ne 'red' and lc($answer) ne 'purple') {
-      if ($answer) {
-        say "You must type 'red' or 'purple', not $answer";
-      }
-      else {
-        say "Does this General ascend to Purple or Red Stars? (purple|red)";
-      }
+    my $ascendingUL =
+      $helpers->find_next_ul_after_element($headers[$start_index]);
+    unless ($ascendingUL) {
+      $self->logger->error("Cound not find required UL for ascending");
+      return [];
+    }
+    my $items = $helpers->extract_ul_details($ascendingUL);
+    foreach my $index (0 .. (scalar(@{$items}) - 1)) {
+      my $key = sprintf('%s%s', $red ? 'red' : 'purple', $index + 1,);
+      $self->logger->debug("computed key '$key'");
+      my $line = $items->[$index];
+      $self->logger->debug("found line '$line'");
+      $line =~ s/^\s+|\s+$//g;
+      $line =~ s/^\d\s+Star\s*[-–—]\s*(.+)$/$1/;
+      $data->{$key}->{text} = $line;
+      $self->logger->debug(sprintf('added "%s" to "%s"', $line, $key));
+    }
 
-      open(my $tty, '<:encoding(UTF-8)', '/dev/tty')
-        or $self->logger->logcroak("Cannot open /dev/tty: $!");
-      $answer = <$tty>;
-      close $tty;
-      chomp $answer;
-      $answer = lc($answer);
-    }
-    if ($answer eq 'red') {
-      $red = 1;
-    }
-    else {
-      $red = 0;
-    }
   }
 
 }

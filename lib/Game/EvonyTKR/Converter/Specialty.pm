@@ -27,7 +27,7 @@ class Game::EvonyTKR::Converter::Specialty :
 
   # input fields
   # This will eventually be something online that I have to fetch.
-  field $generalFile : param //= '';
+  field $tree :param;
   field $outputDir : param;
   field $debug : param //= 0;
 
@@ -43,20 +43,19 @@ class Game::EvonyTKR::Converter::Specialty :
 '%s assumes that the class or module calling it has generated the required grammar for %s',
       __CLASS__, 'Game::EvonyTKR::Shared::Parser'
     ));
+    $self->logger->debug(sprintf(
+      '%s assumes that the class or module calling it has also correctly set up the $tree field.',
+      __CLASS__
+    ));
     # do not assume we were properly passed
     # a Path::Tiny::path
     $outputDir = Path::Tiny::path($outputDir);
 
-    if (length($generalFile) == 0) {
-      $self->logger->debug("setting generalFile to default test file in "
-          . $self->distDir->canonpath());
-      $generalFile =
-        $self->distDir->child('collections/share/TestGeneralFile.html');
-    }
   }
 
   method execute {
     say "=== Specialty Text to YAML Converter ===";
+    $self->logger->debug(sprintf('specialty sees tree -- %s --', $tree->as_XML()));
     $self->getMainText();
     $self->parseText();
   }
@@ -200,12 +199,8 @@ class Game::EvonyTKR::Converter::Specialty :
 
   method getMainText {
     $self->logger->trace("Start of ::Converter::Specialty->getMainText");
-    unless ($generalFile->is_file()) {
-      $self->logger->logcroak("$generalFile must be a file.");
-      exit -1;
-    }
-    my $html_content = $generalFile->slurp_utf8();
-    $specialties = $self->extract_specialties($html_content);
+
+    $specialties = $self->extract_specialties();
 
     for my $specialty (@$specialties) {
       $self->logger->debug(
@@ -217,52 +212,48 @@ class Game::EvonyTKR::Converter::Specialty :
 
   }
 
-  method extract_specialties ($html_content) {
-
-    my $tree = HTML::TreeBuilder->new();
-    $tree->parse($html_content);
-    $tree->eof();
-
+  method extract_specialties {
     # Find the container div
     my $container = $tree->look_down(
       '_tag'  => 'div',
-      'class' =>
-        qr/elementor-element-(?:\w){1,8}.*elementor-widget-theme-post-content/
+      'class' =>  qr/entry-content.*th-content/
     );
 
     unless ($container) {
-      warn "Could not find specialty container div";
+      warn "Could not find entry-content div container";
       return [];
     }
     if ($debug) {
       $self->logger->debug("Found container: " . $container->starttag());
     }
 
+
     # Get all h2 and h3 elements in reading order
     my @headers = $container->look_down('_tag' => qr/^h[23]$/);
 
-    # Find the third h2 (start of specialties)
+    # Find the third h2 (start of skillbook)
+    my $target = 4;
     my $h2_count = 0;
-    my $specialty_start_index;
+    my $start_index;
 
     for my $i (0 .. $#headers) {
       if ($headers[$i]->tag eq 'h2') {
         $h2_count++;
-        if ($h2_count == 3) {
-          $specialty_start_index = $i;
+        if ($h2_count == $target) {
+          $start_index = $i;
           last;
         }
       }
     }
 
-    unless (defined $specialty_start_index) {
-      warn "Could not find second h2 tag";
+    unless (defined $start_index) {
+      warn "Could not find required h2 tag";
       return [];
     }
 
     # Extract the 4 h3 tags after the second h2
     my @specialty_h3s;
-    for my $i (($specialty_start_index + 1) .. ($specialty_start_index + 4)) {
+    for my $i (($start_index + 1) .. ($start_index + 4)) {
       last if $i > $#headers;
       if ($headers[$i]->tag eq 'h3') {
         push @specialty_h3s, $headers[$i];

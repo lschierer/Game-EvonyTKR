@@ -23,23 +23,20 @@ class Game::EvonyTKR::Converter::SkillBook :
 
   field $outputDir : param;
   field $debug : param //= 0;
-  field $generalFile : param //= '';
+  field $tree : param;
 
   ADJUST {
     $self->logger->debug(sprintf(
   '%s assumes that the class or module calling it has generated the required grammar for %s',
       __CLASS__, 'Game::EvonyTKR::Shared::Parser'
     ));
+    $self->logger->debug(sprintf(
+      '%s assumes that the class or module calling it has also correctly set up the $tree field.',
+      __CLASS__
+    ));
     # do not assume we were properly passed
     # a Path::Tiny::path
     $outputDir = Path::Tiny::path($outputDir);
-
-    if (length($generalFile) == 0) {
-      $self->logger->debug("setting generalFile to default test file in "
-          . $self->distDir->canonpath());
-      $generalFile =
-        $self->distDir->child('collections/share/TestGeneralFile.html');
-    }
   }
 
 
@@ -51,41 +48,34 @@ class Game::EvonyTKR::Converter::SkillBook :
   field $helpers = Game::EvonyTKR::Converter::Helpers->new(debug => $debug);
 
   method getMainText {
-    say "=== Skill Book Text to YAML Converter ===";
-    $self->logger->trace("Start of ::Converter::Specialty->getMainText");
-    unless ($generalFile->is_file()) {
-      $self->logger->logcroak("$generalFile must be a file.");
-      exit -1;
-    }
-    my $html_content = $generalFile->slurp_utf8();
-    my $tree = HTML::TreeBuilder->new();
-    $tree->parse($html_content);
+
     # Find the container div
     my $container = $tree->look_down(
       '_tag'  => 'div',
-      'class' =>
-        qr/elementor-element-(?:\w){1,8}.*elementor-widget-theme-post-content/
+      'class' =>  qr/elementor-element-(?:\w){1,9}.elementor-widget.elementor-widget-theme-post-content/
     );
 
     unless ($container) {
-      warn "Could not find specialty container div";
+      warn "Could not find theme-post-content div container";
       return [];
     }
     if ($debug) {
       $self->logger->debug("Found container: " . $container->starttag());
     }
 
+
     # Get all h2 and h3 elements in reading order
     my @headers = $container->look_down('_tag' => qr/^h[23]$/);
 
     # Find the second h2 (start of skillbook)
+    my $target = 2;
     my $h2_count = 0;
     my $start_index;
 
     for my $i (0 .. $#headers) {
       if ($headers[$i]->tag eq 'h2') {
         $h2_count++;
-        if ($h2_count == 2) {
+        if ($h2_count == $target) {
           $start_index = $i;
           last;
         }
@@ -93,7 +83,7 @@ class Game::EvonyTKR::Converter::SkillBook :
     }
 
     unless (defined $start_index) {
-      warn "Could not find second h2 tag";
+      warn "Could not find required h2 tag";
       return [];
     }
 
@@ -128,8 +118,15 @@ class Game::EvonyTKR::Converter::SkillBook :
     my $parser = Game::EvonyTKR::Shared::Parser->new();
 
     my @fragments = $parser->tokenize_buffs($text);
+    $self->logger->debug(sprintf('thee are %s fragments',
+    scalar(@fragments)));
     foreach my $frag (@fragments) {
-      push @$buffs, $parser->normalize_buff($frag);
+      my $b = $parser->normalize_buff($frag);
+      $self->logger->debug(sprintf(
+        'recieved %s from normalize_buff for "%s"',
+        ref($b), Data::Printer::np($frag)
+      ));
+      push @{$buffs}, $b;
     }
 
     $self->logger->debug(Data::Printer::np($buffs));
@@ -164,6 +161,8 @@ class Game::EvonyTKR::Converter::SkillBook :
   }
 
   method execute {
+    say "=== Skill Book Text to YAML Converter ===";
+    $self->logger->info('=== Skill Book Text to YAML Converter ===');
     $self->getMainText();
     $self->parseSkillbookText();
     $self->printYAML();
