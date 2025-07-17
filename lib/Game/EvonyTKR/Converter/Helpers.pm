@@ -52,7 +52,7 @@ class Game::EvonyTKR::Converter::Helpers :
   }
 
   method find_next_p_after_element ($element) {
-    # Get the container (go up until we find one with ul elements)
+    # Get the container (go up until we find one with p elements)
     my $container = $element;
     while ($container && !$container->look_down('_tag' => 'p')) {
       $container = $container->parent;
@@ -61,10 +61,36 @@ class Game::EvonyTKR::Converter::Helpers :
 
     return undef unless $container;
 
-    # Find all ul elements in the container
+    # Find all p elements in the container
     my @all_ps = $container->look_down('_tag' => 'p');
 
-    # Find the first ul that comes after our h3 in document order
+    # Find the first p that comes after our h3 in document order
+    my $h3_pos = $self->get_element_position($element);
+
+    for my $p (@all_ps) {
+      my $p_pos = $self->get_element_position($p);
+      if ($p_pos gt $h3_pos) {    # String comparison instead of numeric
+        return $p;
+      }
+    }
+
+    return undef;
+  }
+
+  method find_next_table_after_element ($element) {
+    # Get the container (go up until we find one with table elements)
+    my $container = $element;
+    while ($container && !$container->look_down('_tag' => 'table')) {
+      $container = $container->parent;
+      last if !$container || $container->tag eq 'body';
+    }
+
+    return undef unless $container;
+
+    # Find all table elements in the container
+    my @all_ps = $container->look_down('_tag' => 'table');
+
+    # Find the first table that comes after our h3 in document order
     my $h3_pos = $self->get_element_position($element);
 
     for my $p (@all_ps) {

@@ -26,8 +26,8 @@ class Game::EvonyTKR::Converter::Covenant :
   # PODNAME: Game::EvonyTKR::Converter::Covenant
 
   # input fields
-  # This will eventually be something online that I have to fetch.
-  field $generalFile : param //= '';
+
+  field $tree : param;
   field $outputDir : param;
   field $debug : param //= 0;
 
@@ -36,6 +36,8 @@ class Game::EvonyTKR::Converter::Covenant :
   field $helpers = Game::EvonyTKR::Converter::Helpers->new(debug => $debug);
 
   # output fields
+  field $primary :reader;
+  field $supporting :reader = [];
   field $covenantHash : reader;
 
   ADJUST {
@@ -43,106 +45,113 @@ class Game::EvonyTKR::Converter::Covenant :
 '%s assumes that the class or module calling it has generated the required grammar for %s',
       __CLASS__, 'Game::EvonyTKR::Shared::Parser'
     ));
+    $self->logger->debug(sprintf(
+'%s assumes that the class or module calling it has also correctly set up the $tree field.',
+      __CLASS__));
     # do not assume we were properly passed
     # a Path::Tiny::path
     $outputDir = Path::Tiny::path($outputDir);
 
-    if (length($generalFile) == 0) {
-      $self->logger->debug("setting generalFile to default test file in "
-          . $self->distDir->canonpath());
-      $generalFile =
-        $self->distDir->child('collections/share/TestGeneralFile.html');
-    }
   }
 
   method execute {
     say "=== Covenant Text to YAML Converter ===";
+    $self->logger->info("=== Covenant Text to YAML Converter ===");
     $self->getMainText();
     $self->parseText();
+    $self->printYAML();
   }
 
   method parseText {
-    foreach my $covenant (@$covenantHash) {
-      my $fileName   = sprintf('%s.yaml', $specialty->{name});
-      my $lcFileName = lc($fileName);
-      if ($outputDir->child($fileName)->is_file()) {
-        $self->logger->debug(sprintf(
-          'Specialty "%s" has already been converted - "%s" already exists',
-          $specialty->{name}, $outputDir->child($fileName)->canonpath()
-        ));
-        next;
-      }
-      elsif ($outputDir->child($lcFileName)->is_file()) {
-        $self->logger->debug(sprintf(
-          'Specialty "%s" has already been converted - "%s" already exists',
-          $specialty->{name}, $outputDir->child($lcFileName)->canonpath()
-        ));
-        next;
-      }
-      else {
-        # this is based off what we do in the test harness
-        $self->logger->debug(
-          sprintf('"%s" needs to be converted.', $specialty->{name}));
-        my @hashedBuffs;
-        for my $detail (@{ $specialty->{details} }) {
-          my @fragments = $parser->tokenize_buffs($detail);
+    $self->logger->debug("at start of parseText, covenantHash currently has " . Data::Printer::np($covenantHash));
+    foreach my $key (keys %$covenantHash) {
+      $self->logger->debug("parseText for key $key");
+      my $covenant = $covenantHash->{$key};
+      my @sentences = split(/;;/, $covenant->{text});
+      foreach my $sentence (@sentences) {
+        if( $sentence =~ /(.+)(\((?:Local|Global)\))/) {
+          my $text = $1;
+          my $passive = $2 eq '(Global)' ? 1 : 0;
+          $self->logger->debug(sprintf('using text "%s" as a %s buff',
+            $text, $passive? 'passive': 'personal'));
+
+          my @fragments = $parser->tokenize_buffs($text);
+          $self->logger->debug(sprintf('thee are %s fragments', scalar(@fragments)));
+
           foreach my $frag (@fragments) {
+            my $b = $parser->normalize_buff($frag);
             $self->logger->debug(sprintf(
-              'frag for "%s" is %s',
-              $specialty->{name}, Data::Printer::np($frag)
+              'recieved %s from normalize_buff for "%s"',
+              ref($b), Data::Printer::np($frag)
             ));
-            my $nb;
-            @{$nb} = $parser->normalize_buff($frag);
-            $self->logger->debug('after normalize_buff, size of frag is %s',
-              scalar(@{$nb}));
-            $self->logger->debug(sprintf(
-              'this fragment was normalized to -- %s -- ',
-              Data::Printer::np($nb)));
-            push(@hashedBuffs, @{$nb});
+            if($passive){
+              $b->set_passive(1);
+            }
+            push @{ $covenantHash->{$key}->{buffs} }, $b;
           }
         }
-        if (scalar(@hashedBuffs)) {
-          $self->printYAML($specialty->{name}, \@hashedBuffs);
-        }
       }
+
+      $self->logger->debug(sprintf('found %s buffs for key %s: %s',
+        scalar(@{ $covenantHash->{$key}->{buffs} }),
+        $key,
+        Data::Printer::np($covenantHash->{$key}->{buffs})
+      ));
+
     }
   }
 
   method setupLevelsHash {
     Readonly::Hash1 my %temp => (
-      war          => [],
-      cooperation  => [],
-      peace        => [],
-      faith        => [],
-      honor        => [],
-      civilization => [],
+      war          => {
+        text        => '',
+        buffs       => [],
+      },
+      cooperation  => {
+        text        => '',
+        buffs       => [],
+      },
+      peace        => {
+        text        => '',
+        buffs       => [],
+      },
+      faith        => {
+        text        => '',
+        buffs       => [],
+      },
+      honor        => {
+        text        => '',
+        buffs       => [],
+      },
+      civilization => {
+        text        => '',
+        buffs       => [],
+      },
     );
     my $levels = \%temp;
     return $levels;
   }
 
-  method printYAML ($name, $buffs) {
-
-    my $levels = $self->setupLevelsHash();
+  method printYAML () {
 
     my $result = {
-      name   => $name,
-      levels => [
-        map {
-          my $level_name = $_;
-          {
-            level => $level_name,
-            buffs => [map { $_->to_hash } @{ $levels->{$level_name} }],
-          }
-        } qw/Green Blue Purple Orange Gold/ # Fixed order instead of keys %{$levels}
-      ],
+      name      => $primary,
+      generals  => $supporting,
+      levels    => [],
     };
+    foreach my $key (keys %$covenantHash) {
+      push @{$result->{levels} }, {
+        category  => $key,
+        buffs     => [map { $_->to_hash } @{ $covenantHash->{$key}->{buffs} }],
+        text      => $covenantHash->{$key}->{text},
+      };
+    }
 
     my $yc = YAML::PP->new(
       schema       => [qw/ + Perl /],
       yaml_version => ['1.2', '1.1'],
     )->dump($result);
-    my $filename = lc($name);
+    my $filename = lc($primary);
     $filename = "${filename}.yaml";
     if (!$outputDir->is_dir()) {
       $self->logger->error(
@@ -161,91 +170,213 @@ class Game::EvonyTKR::Converter::Covenant :
 
   method getMainText {
     $self->logger->trace("Start of ::Converter::Covenant->getMainText");
-    unless ($generalFile->is_file()) {
-      $self->logger->logcroak("$generalFile must be a file.");
-      exit -1;
-    }
-    my $html_content = $generalFile->slurp_utf8();
-    my $tree         = HTML::TreeBuilder->new();
-    $tree->parse($html_content);
-    $tree->eof();
 
-    # Find the container div
+    my $statsTable = $tree->look_down(
+      '_tag'  => 'table',
+      'class' => qr/stats-table/,
+    );
+    if ($statsTable) {
+      $self->GetMainText_Template2();
+    }
+    else {
+      $self->GetMainText_Template1();
+    }
+
+  }
+
+  method GetMainText_Template2 () {
     my $container = $tree->look_down(
       '_tag'  => 'div',
-      'class' =>
-        qr/elementor-element-(?:\w){1,8}.*elementor-widget-theme-post-content/
+      'class' => qr/\w+-covenant-container/
     );
 
     unless ($container) {
-      warn "Could not find specialty container div";
+      warn "Could not find covenant-container div";
       return [];
     }
     if ($debug) {
       $self->logger->debug("Found container: " . $container->starttag());
     }
 
-  }
-
-  method extract_specialties ($html_content) {
-
-    my $tree = HTML::TreeBuilder->new();
-    $tree->parse($html_content);
-    $tree->eof();
-
     # Get all h2 and h3 elements in reading order
     my @headers = $container->look_down('_tag' => qr/^h[23]$/);
+    unless (scalar(@headers) > 0){
+      $self->logger->error("No headers found");
+    }
 
-    # Find the third h2 (start of specialties)
-    my $h2_count = 0;
-    my $specialty_start_index;
+    # Find the first h3 (start of the pertinent info)
+    my $target   = 1;
+    my $h3_count = 0;
+    my $start_index;
 
+    my $targetH3;
     for my $i (0 .. $#headers) {
-      if ($headers[$i]->tag eq 'h2') {
-        $h2_count++;
-        if ($h2_count == 3) {
-          $specialty_start_index = $i;
+      if ($headers[$i]->tag eq 'h3') {
+        $h3_count++;
+        if ($h3_count == $target) {
+          $targetH3 = $headers[$i];
+          $start_index = $i;
           last;
         }
       }
     }
 
-    unless (defined $specialty_start_index) {
-      warn "Could not find second h2 tag";
+    unless (defined $start_index) {
+      warn "Could not find required h2 tag";
       return [];
     }
+    $self->logger->debug("found start_index $start_index");
 
-    # Extract the 4 h3 tags after the second h2
-    my @specialty_h3s;
-    for my $i (($specialty_start_index + 1) .. ($specialty_start_index + 4)) {
-      last if $i > $#headers;
-      if ($headers[$i]->tag eq 'h3') {
-        push @specialty_h3s, $headers[$i];
-      }
-    }
-
-    # For each h3, find its associated ul
-    my @specialties;
-    for my $h3 (@specialty_h3s) {
-      my $specialty_name = $h3->as_trimmed_text;
-
-      # Find the next ul element after this h3 in document order
-      my $ul = $helpers->find_next_ul_after_element($h3);
-
-      if ($ul) {
-        push @specialties,
-          {
-          name       => $specialty_name,
-          details    => $helpers->extract_ul_details($ul),
-          h3_element => $h3,
-          ul_element => $ul
-          };
+    $primary = $targetH3->as_trimmed_text =~ s/Evony\s+(.+?)(?:[’']s)?\s+Covenant/$1/r;
+    $self->logger->debug("found primary '$primary'");
+    my $supporting_para = $helpers->find_next_p_after_element($targetH3);
+    if($supporting_para){
+      my @links = $supporting_para->look_down('_tag' => 'a');
+      if(scalar @links) {
+        foreach my $link (@links) {
+          $self->logger->debug(sprintf('supporting general "%s"', $link->as_trimmed_text));
+          push @{$supporting}, $link->as_trimmed_text;
+        }
       }
       else {
-        warn "Could not find ul for specialty: $specialty_name";
+        $self->logger->error("Could not find links in supporting_para");
+      }
+    } else {
+      $self->logger->error("Cound not find supporting_para");
+    }
+
+    $covenantHash = $self->setupLevelsHash();
+    my $detailsTable = $helpers->find_next_table_after_element($targetH3);
+    unless ($detailsTable) {
+      $self->logger->error("cound not find detailsTable");
+    }
+
+    my @rows = $detailsTable->look_down('_tag' => 'tr');
+    unless(scalar(@rows)) {
+      $self->logger->error("no rows in table");
+    }
+
+    foreach my $ri (0..$#rows) {
+      next unless $ri > 0; # skip the header row.
+      my $row = $rows[$ri];
+      my @cells = $row->look_down('_tag' => 'td');
+      my $key = lc($cells[0]->as_trimmed_text);
+      # the source site occasionally accidentically has extra text
+      # in the cell being used as the key.
+      $key = first {$key =~ /$_/i } @{$self->CovenantLevelValues };
+      $self->logger->debug("getting text for key $key");
+
+      my $fragment = $cells[1]->as_HTML;
+      $fragment =~ s/<td>(.+)<\/td>/$1/;
+      # some fragments have divs inside the td tag
+      # those divs may have one or more attributes.
+      $fragment =~ s/<div.*?>(.+)<\/div>/$1/;
+      $fragment =~ s/<br\s*\/?>/;;/g;
+      $self->logger->debug("fragment for $key is $fragment");
+      if(exists $covenantHash->{$key}){
+        $covenantHash->{$key}->{text} = $fragment;
+      }
+      else {
+        $self->logger->error("key $key is invalid, valid keys are " .
+          join(', ', keys %$covenantHash));
       }
     }
-    return \@specialties;
+  }
+
+  method GetMainText_Template1 () {
+    my $container = $tree->look_down(
+      '_tag'  => 'div',
+      'class' =>
+        qr/elementor-element-(?:\w){1,9}.elementor-widget.elementor-widget-theme-post-content/
+        );
+
+    unless ($container) {
+      warn "Could not find theme-post-content div container";
+      return [];
+    }
+    if ($debug) {
+      $self->logger->debug("Found container: " . $container->starttag());
+    }
+
+    # Get all h2 and h3 elements in reading order
+    my @headers = $container->look_down('_tag' => qr/^h[23]$/);
+    unless (scalar(@headers) > 0){
+      $self->logger->error("No headers found");
+    }
+
+    # Find the Third h2 (start of the pertinent info)
+    my $target   = 4;
+    my $h2_count = 0;
+    my $start_index;
+
+    my $targetH2;
+    for my $i (0 .. $#headers) {
+      if ($headers[$i]->tag eq 'h2') {
+        $h2_count++;
+        if ($h2_count == $target) {
+          $targetH2 = $headers[$i];
+          $start_index = $i;
+          last;
+        }
+      }
+    }
+
+    unless (defined $start_index) {
+      warn "Could not find required h2 tag";
+      return [];
+    }
+    $self->logger->debug("found start_index $start_index");
+
+    $primary = $targetH2->as_trimmed_text =~ s/Evony\s+(.+?)(?:[’']s)?\s+Covenant/$1/r;
+    my $supporting_para = $helpers->find_next_p_after_element($targetH2);
+    if($supporting_para){
+      my @links = $supporting_para->look_down('_tag' => 'a');
+      if(scalar @links) {
+        foreach my $link (@links) {
+          $self->logger->debug(sprintf('supporting general "%s"', $link->as_trimmed_text));
+          push @{$supporting}, $link->as_trimmed_text;
+        }
+      }
+      else {
+        $self->logger->error("Could not find links in supporting_para");
+      }
+    } else {
+      $self->logger->error("Cound not find supporting_para");
+    }
+
+    $covenantHash = $self->setupLevelsHash();
+    my $detailsTable = $helpers->find_next_table_after_element($targetH2);
+    unless ($detailsTable) {
+      $self->logger->error("cound not find detailsTable");
+    }
+
+    my @rows = $detailsTable->look_down('_tag' => 'tr');
+    unless(scalar(@rows)) {
+      $self->logger->error("no rows in table");
+    }
+
+    foreach my $ri (0..$#rows) {
+      next unless $ri > 0; # skip the header row.
+      my $row = $rows[$ri];
+      my @cells = $row->look_down('_tag' => 'td');
+      my $key = lc($cells[0]->as_trimmed_text);
+      # the source site occasionally accidentically has extra text
+      # in the cell being used as the key.
+      $key = first {$key =~ /$_/i } @{$self->CovenantLevelValues };
+      $self->logger->debug("getting text for key $key");
+
+      my $fragment = $cells[1]->as_HTML;
+      $fragment =~ s/<td>(.+)<\/td>/$1/;
+      $fragment =~ s/<br\s*\/?>/;;/g;
+      $self->logger->debug("fragment for $key is $fragment");
+      if(exists $covenantHash->{$key}){
+        $covenantHash->{$key}->{text} = $fragment;
+      }
+      else {
+        $self->logger->error("key $key is invalid, valid keys are " .
+          join(', ', keys %$covenantHash));
+      }
+    }
   }
 
 }

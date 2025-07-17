@@ -17,6 +17,7 @@ package Game::EvonyTKR::Converter {
   require Game::EvonyTKR::Converter::SkillBook;
   require Game::EvonyTKR::Converter::AscendingAttributes;
   require Game::EvonyTKR::Converter::Specialty;
+  require Game::EvonyTKR::Converter::Covenant;
   require Game::EvonyTKR::Shared::Parser;
   require Game::EvonyTKR::Logger::Config;
   use Carp;
@@ -132,6 +133,12 @@ package Game::EvonyTKR::Converter {
     $handler = Game::EvonyTKR::Converter::Specialty->new(
       tree      => $decoder->decode($serialized),
       outputDir => $dd->child('/collections/data/specialties/'),
+      debug     => $debug,
+    );
+    $handler->execute();
+    $handler = Game::EvonyTKR::Converter::Covenant->new(
+      tree      => $decoder->decode($serialized),
+      outputDir => $dd->child('/collections/data/covenants/'),
       debug     => $debug,
     );
     $handler->execute();
