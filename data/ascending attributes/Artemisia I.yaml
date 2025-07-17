@@ -1,105 +1,122 @@
+---
 ascending:
-  - level: red1
-    buff:
+  - buff:
       - attribute: Attack
-        condition:
+        conditions:
           - Attacking
-        class: Ranged Troops
+        passive: 0
+        targetedType: Ranged Troops
         value:
           number: 10
           unit: percentage
       - attribute: Defense
-        condition:
+        conditions:
           - Attacking
-        class: Ranged Troops
+        passive: 0
+        targetedType: Ranged Troops
         value:
           number: 15
           unit: percentage
-  - level: red2
-    buff:
+    level: red1
+    text: Attacking Ranged Troop Attack +10% and Defense +15%
+  - buff:
       - attribute: Death to Wounded
-        condition:
+        conditions:
           - Attacking
+        passive: 0
+        targetedType: ''
         value:
           number: 8
           unit: percentage
-  - level: red3
-    buff:
+    level: red2
+    text: Attacking Troop Death into Wounded Rate +8%
+  - buff:
       - attribute: Attack
-        condition:
+        conditions:
           - Attacking
-        class: Siege Machines
+        passive: 0
+        targetedType: Ranged Troops
         value:
           number: 25
           unit: percentage
       - attribute: Attack
-        condition:
+        conditions:
           - Attacking
-        class: Ranged Troops
+        passive: 0
+        targetedType: Siege Machines
         value:
           number: 25
           unit: percentage
       - attribute: March Size
-        class: Siege Machines
+        conditions: []
+        passive: 0
+        targetedType: ''
         value:
           number: 10
           unit: percentage
-      - attribute: March Size
-        class: Ranged Troops
-        value:
-          number: 10
-          unit: percentage
-  - level: red4
-    buff:
+    level: red3
+    text: Attacking Ranged Troop and Siege Machine Attack +25%, March Size Capacity +10%
+  - buff:
       - attribute: HP
-        condition:
+        conditions:
           - Attacking
-        class: Siege Machines
+        passive: 0
+        targetedType: Ranged Troops
         value:
           number: 25
           unit: percentage
       - attribute: HP
-        condition:
+        conditions:
           - Attacking
-        class: Ranged Troops
+        passive: 0
+        targetedType: Siege Machines
         value:
           number: 25
           unit: percentage
       - attribute: Defense
-        condition:
+        conditions:
           - Attacking
-        class: Siege Machines
+        passive: 0
+        targetedType: Ranged Troops
         value:
           number: 25
           unit: percentage
       - attribute: Defense
-        condition:
+        conditions:
           - Attacking
-        class: Ranged Troops
+        passive: 0
+        targetedType: Siege Machines
         value:
           number: 25
           unit: percentage
-  - level: red5
-    buff:
+    level: red4
+    text: Attacking Ranged Troop and Siege Machine HP +25% and Defense +25%
+  - buff:
       - attribute: Attack
-        condition:
+        conditions:
           - Attacking
-        class: Ranged Troops
+        passive: 0
+        targetedType: Ranged Troops
         value:
           number: 40
           unit: percentage
       - attribute: HP
-        condition:
+        conditions:
           - Attacking
-        class: Ranged Troops
+        passive: 0
+        targetedType: Ranged Troops
         value:
           number: 40
           unit: percentage
       - attribute: Rally Capacity
-        condition:
+        conditions:
           - When Rallying
+        passive: 0
+        targetedType: ''
         value:
           number: 8
           unit: percentage
+    level: red5
+    text: Attacking Ranged Troop Attack and HP +40%; When General is launching Alliance War, Rally Capacity +8%
 general: Artemisia I
 id: Artemisia I
