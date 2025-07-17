@@ -5,7 +5,6 @@ require Path::Tiny;
 require YAML::PP;
 require Hash::Util;
 require Text::CSV;
-require Storable;
 require UUID;
 require Game::EvonyTKR::Model::General::ConflictGroup;
 require Encode;

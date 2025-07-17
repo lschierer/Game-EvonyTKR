@@ -174,14 +174,6 @@ class Game::EvonyTKR::Converter::Covenant :
     $tree->parse($html_content);
     $tree->eof();
 
-  }
-
-  method extract_specialties ($html_content) {
-
-    my $tree = HTML::TreeBuilder->new();
-    $tree->parse($html_content);
-    $tree->eof();
-
     # Find the container div
     my $container = $tree->look_down(
       '_tag'  => 'div',
@@ -196,6 +188,18 @@ class Game::EvonyTKR::Converter::Covenant :
     if ($debug) {
       $self->logger->debug("Found container: " . $container->starttag());
     }
+
+  }
+
+  method extract_specialties ($html_content) {
+
+    my $tree = HTML::TreeBuilder->new();
+    $tree->parse($html_content);
+    $tree->eof();
+
+
+
+
 
     # Get all h2 and h3 elements in reading order
     my @headers = $container->look_down('_tag' => qr/^h[23]$/);
@@ -249,8 +253,6 @@ class Game::EvonyTKR::Converter::Covenant :
         warn "Could not find ul for specialty: $specialty_name";
       }
     }
-
-    $tree->delete();
     return \@specialties;
   }
 

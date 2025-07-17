@@ -48,7 +48,83 @@ class Game::EvonyTKR::Converter::SkillBook :
   field $helpers = Game::EvonyTKR::Converter::Helpers->new(debug => $debug);
 
   method getMainText {
+    my $statsTable = $tree->look_down(
+      '_tag'  => 'table',
+      'class' => qr/stats-table/,
+    );
+    if($statsTable) {
+      $self->GetMainText_Template2();
+    } else {
+      $self->GetMainText_Template1();
+    }
+  }
 
+  method GetMainText_Template2 {
+    my $container = $tree->look_down(
+      '_tag'  => 'div',
+      'class' =>  qr/elementor-element-(?:\w){1,9}.elementor-widget.elementor-widget-theme-post-content/
+    );
+
+    unless ($container) {
+      warn "Could not find theme-post-content div container";
+      return [];
+    }
+    if ($debug) {
+      $self->logger->debug("Found container: " . $container->starttag());
+    }
+
+    # Get all h2 and h3 elements in reading order
+    my @headers = $container->look_down('_tag' => qr/^h[234]$/);
+
+    # Find the first h3 (start of skillbook)
+    my $target = 1;
+    my $h3_count = 0;
+    my $start_index;
+
+    for my $i (0 .. $#headers) {
+      if ($headers[$i]->tag eq 'h3') {
+        $h3_count++;
+        if ($h3_count == $target) {
+          $start_index = $i;
+          last;
+        }
+      }
+    }
+
+    unless (defined $start_index) {
+      warn "Could not find required h3 tag";
+      return [];
+    }
+
+    #extract 1 H4 tag after the first H3 tag
+    my $h4_index = $start_index;
+    while($h4_index <= $#headers){
+      if ($headers[$h4_index]->tag eq 'h4') {
+        my $skillbookH4 = $headers[$h4_index];
+
+        my $skillBookName = $skillbookH4->as_trimmed_text;
+        my $para = $helpers->find_next_p_after_element($skillbookH4);
+
+        if($para) {
+          $name = $skillBookName;
+          $text = $para->as_trimmed_text;
+        }
+        else {
+          $self->logger->error("Could not find the required paragraph");
+        }
+        last;
+      }
+      else {
+        $h4_index++;
+      }
+    }
+    unless(length($name) && length($text)) {
+      $self->logger->error("Cannot find and parse the required H3 tag!!");
+    }
+
+  }
+
+  method GetMainText_Template1 {
     # Find the container div
     my $container = $tree->look_down(
       '_tag'  => 'div',
@@ -108,8 +184,6 @@ class Game::EvonyTKR::Converter::SkillBook :
     else {
       $self->logger->error("Cannot find the required H3 tag!!");
     }
-
-
   }
 
 

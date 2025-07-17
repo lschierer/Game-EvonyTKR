@@ -281,8 +281,6 @@ class Game::EvonyTKR::Converter::Specialty :
         warn "Could not find ul for specialty: $specialty_name";
       }
     }
-
-    $tree->delete();
     return \@specialties;
   }
 

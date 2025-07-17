@@ -14,7 +14,6 @@ class Game::EvonyTKR::Model::General::Importer :
   use List::AllUtils qw( any none );
   use Data::Printer;
   use Hash::Util;
-  use Storable qw(dclone);
   use namespace::autoclean;
   require Game::EvonyTKR::Model::General;
 # VERSION

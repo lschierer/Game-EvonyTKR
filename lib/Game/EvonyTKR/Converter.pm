@@ -119,12 +119,12 @@ package Game::EvonyTKR::Converter {
       debug     => $debug,
     );
     $handler->execute();
-    #$handler = Game::EvonyTKR::Converter::AscendingAttributes->new(
-    #  tree      => $decoder->decode($serialized),
-    #  outputDir => $dd->child('/collections/data/ascending attributes/'),
-    #  debug     => $debug,
-    #);
-    #$handler->execute();
+    $handler = Game::EvonyTKR::Converter::AscendingAttributes->new(
+      tree      => $decoder->decode($serialized),
+      outputDir => $dd->child('/collections/data/ascending attributes/'),
+      debug     => $debug,
+    );
+    $handler->execute();
     #$handler = Game::EvonyTKR::Converter::Specialty->new(
     #  tree      => $decoder->decode($serialized),
     #  outputDir => $dd->child('/collections/data/specialties/'),

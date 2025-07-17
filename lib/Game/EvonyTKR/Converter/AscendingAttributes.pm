@@ -104,7 +104,8 @@ class Game::EvonyTKR::Converter::AscendingAttributes :
 
   method execute {
     say "=== Ascending AscendingAttributes Text to YAML Converter ===";
-    $self->logger->debug(sprintf('ascending getMainText sees tree -- %s --', $tree->as_XML()));
+    $self->logger->info("=== Ascending AscendingAttributes Text to YAML Converter ===");
+    $self->logger->debug(sprintf('ascending getMainText sees tree with length %s', length($tree->as_XML())));
     $self->getMainText();
     $self->parseText();
     $self->printYAML();
@@ -123,7 +124,8 @@ class Game::EvonyTKR::Converter::AscendingAttributes :
       push @{ $result->{ascending} },
         {
         level => $k,
-        buff  => [map { $_->to_hash() } @{ $data->{ lc($k) }->{buffs} }]
+        buff  => [map { $_->to_hash() } @{ $data->{ lc($k) }->{buffs} }],
+        text  => $data->{ lc($k) }->{text},
         };
     }
     my $yc = YAML::PP->new(
@@ -152,62 +154,96 @@ class Game::EvonyTKR::Converter::AscendingAttributes :
       my $key = $red ? 'red' : 'purple';
       $key = "$key$index";
       my $parser    = Game::EvonyTKR::Shared::Parser->new();
-      my @fragments = $parser->tokenize_buffs($data->{$key}->{text});
-      foreach my $frag (@fragments) {
-        push(@{ $data->{$key}->{buffs} }, $parser->normalize_buff($frag));
+      if(length($data->{$key}->{text})){
+        my @fragments = $parser->tokenize_buffs($data->{$key}->{text});
+        foreach my $frag (@fragments) {
+          push(@{ $data->{$key}->{buffs} }, $parser->normalize_buff($frag));
+        }
       }
     }
-  }
-
-  method getName () {
-
   }
 
   method getMainText {
     $self->logger->trace(
       "Start of ::Converter::AscendingAttributes->getMainText");
+      my $statsTable = $tree->look_down(
+        '_tag'  => 'table',
+        'class' => qr/stats-table/,
+      );
+      if($statsTable) {
+        $self->logger->debug("Calling Template2");
+        $self->GetMainText_Template2();
+      } else {
+        $self->logger->trace("Calling Template1");
+        $self->GetMainText_Template1();
+      }
 
+  }
 
-    my $header = $self->tree->look_down(sub {
-      my $el = shift;
-      return 0 unless $el->tag eq 'header';
-
-      my $class = $el->attr('class') // '';
-      my %classes = map { $_ => 1 } split /\s+/, $class;
-
-      return $classes{'entry-header'} && $classes{'hentry-wrapper'};
-    });
-
-    unless ($header) {
-      $self->logger->logcroak("header cannot be found in the provided file.");
+  method Extract_Lines_from_UL ($ascendingUL) {
+    if($ascendingUL) {
+      my $items = $helpers->extract_ul_details($ascendingUL);
+      foreach my $index (0 .. (scalar(@{$items}) - 1)) {
+        my $key = sprintf('%s%s', $red ? 'red' : 'purple', $index + 1,);
+        $self->logger->debug("computed key '$key'");
+        my $line = $items->[$index];
+        $self->logger->debug("found line '$line'");
+        $line =~ s/^\s+|\s+$//g;
+        $line =~ s/^\d\s+Star\s*[-–—]\s*(.+)$/$1/;
+        $data->{$key}->{text} = $line;
+        $self->logger->debug(sprintf('added "%s" to "%s"', $line, $key));
+      }
     }
-
-    my $nh = $header->look_down('_tag' => 'h1');
-    unless ($nh) {
-      $self->logger->logcroak("name H1 cannot be found in the provided file.");
+    else {
+      $self->logger->error("Could not find the required ul");
     }
+  }
 
-    $name = $nh->as_trimmed_text;
-
-    # Find the container div
+  method GetMainText_Template2 {
     my $container = $tree->look_down(
       '_tag'  => 'div',
-      'class' => qr/entry-content.*th-content/
+      'class' => qr/\w+-ascension-buffs/,
+    );
+    unless($container){
+      $self->logger->error("Cound not find ascension-buffs container");
+      return;
+    }
+    $self->logger->debug("found container " . $container->starttag);
+    my $h4 = $container->look_down('_tag' => qr/^h4$/);
+    $self->logger->debug(sprintf('h4 is "%s"', $h4->as_trimmed_text));
+    $name = $h4->as_trimmed_text =~ s/Evony\s+(.+?)(?:[’']s)?\s+Ascension\s+Buffs/$1/r;
+    $self->logger->debug("name is $name");
+    my $ascendingUL = $helpers->find_next_ul_after_element($h4);
+
+    unless(length($name)){
+      $self->logger->error("Cound not find name in document.");
+    }
+    unless($ascendingUL){
+      $self->logger->error("Cound not find UL in ascension-buffs container.");
+    }
+    $self->Extract_Lines_from_UL($ascendingUL);
+  }
+
+  method GetMainText_Template1 {
+    my $container = $tree->look_down(
+      '_tag'  => 'div',
+      'class' =>  qr/elementor-element-(?:\w){1,9}.elementor-widget.elementor-widget-theme-post-content/
     );
 
     unless ($container) {
-      warn "Could not find entry-content div container";
+      warn "Could not find theme-post-content div container";
       return [];
     }
     if ($debug) {
       $self->logger->debug("Found container: " . $container->starttag());
     }
 
+
     # Get all h2 and h3 elements in reading order
     my @headers = $container->look_down('_tag' => qr/^h[23]$/);
 
-    # Find the third h2 (start of skillbook)
-    my $target   = 3;
+    # Find the second h2 (start of skillbook)
+    my $target = 2;
     my $h2_count = 0;
     my $start_index;
 
@@ -226,26 +262,39 @@ class Game::EvonyTKR::Converter::AscendingAttributes :
       return [];
     }
 
-    my $ascendingUL =
-      $helpers->find_next_ul_after_element($headers[$start_index]);
-    unless ($ascendingUL) {
-      $self->logger->error("Cound not find required UL for ascending");
-      return [];
-    }
-    my $items = $helpers->extract_ul_details($ascendingUL);
-    foreach my $index (0 .. (scalar(@{$items}) - 1)) {
-      my $key = sprintf('%s%s', $red ? 'red' : 'purple', $index + 1,);
-      $self->logger->debug("computed key '$key'");
-      my $line = $items->[$index];
-      $self->logger->debug("found line '$line'");
-      $line =~ s/^\s+|\s+$//g;
-      $line =~ s/^\d\s+Star\s*[-–—]\s*(.+)$/$1/;
-      $data->{$key}->{text} = $line;
-      $self->logger->debug(sprintf('added "%s" to "%s"', $line, $key));
-    }
+    my $ascendingUL ;
 
+    #extract 1 H3 tag and its UL after the second H2 tag
+    my $h3_index = $start_index + 1;
+    my $h3_count = 0;
+    while($h3_index <= $#headers){
+      if ($headers[$h3_index]->tag eq 'h3') {
+        $h3_count++;
+        unless($h3_count == '2'){
+          $h3_index++;
+          next;
+        }
+
+        my $targetH3 = $headers[$h3_index];
+
+        $name = $targetH3->as_trimmed_text =~ s/Evony\s+(.+?)(?:[’']s)?\s+Ascension\s+Buffs/$1/r;
+        $self->logger->debug(sprintf('targetH3 is "%s"', $targetH3->as_trimmed_text));
+        $self->logger->debug("name is $name");
+        $ascendingUL = $helpers->find_next_ul_after_element($targetH3);
+        $self->Extract_Lines_from_UL($ascendingUL);
+        last;
+      }
+      else {
+        $h3_index++;
+      }
+    }
+    unless(length($name)) {
+      $self->logger->error("Could not find name in document.");
+    }
+    unless(defined $ascendingUL){
+      $self->logger->error("Cound not find ul for parsing.");
+    }
   }
-
 }
 1;
 __END__
