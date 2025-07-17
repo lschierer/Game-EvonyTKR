@@ -1,81 +1,111 @@
+---
 ascending:
-  - level: red1
-    buff:
+  - buff:
       - attribute: Attack
-        class: Ranged Troops
+        conditions: []
+        passive: 0
+        targetedType: Ranged Troops
         value:
           number: 15
           unit: percentage
       - attribute: HP
-        class: Ranged Troops
+        conditions: []
+        passive: 0
+        targetedType: Ranged Troops
         value:
           number: 10
           unit: percentage
-  - level: red2
-    buff:
+    level: red1
+    text: Ranged Troop Attack +15% and HP +10%
+  - buff:
       - attribute: Death to Wounded
-        condition:
+        conditions:
           - Marching
+        passive: 0
+        targetedType: ''
         value:
           number: 8
           unit: percentage
-  - level: red3
-    buff:
+    level: red2
+    text: Marching Troop Death into Wounded Rate +8%
+  - buff:
       - attribute: Attack
-        class: Ranged Troops
+        conditions:
+          - Attacking
+        passive: 0
+        targetedType: Ranged Troops
         value:
           number: 25
           unit: percentage
       - attribute: March Size
-        class: Ranged Troops
+        conditions: []
+        passive: 0
+        targetedType: ''
         value:
           number: 8
           unit: percentage
-  - level: red4
-    buff:
+    level: red3
+    text: When attacking, Ranged Troop Attack +25%, March Size Capacity +8%
+  - buff:
       - attribute: Defense
-        condition:
+        conditions:
           - Marching
-        class: Ranged Troops
+        passive: 0
+        targetedType: Ranged Troops
         value:
           number: 15
           unit: percentage
       - attribute: HP
-        condition:
+        conditions:
           - Marching
-        class: Ranged Troops
+        passive: 0
+        targetedType: Ranged Troops
         value:
           number: 15
           unit: percentage
-  - level: red5
-    buff:
+    level: red4
+    text: Marching Ranged Troop Defense +15% and HP +15%
+  - buff:
       - attribute: Attack
-        condition:
+        conditions:
           - Marching
-        class: Ranged Troops
+        passive: 0
+        targetedType: Ranged Troops
         value:
           number: 40
           unit: percentage
       - attribute: Attack
-        condition:
+        conditions:
           - Marching
-        class: Siege Machines
+        passive: 0
+        targetedType: Siege Machines
         value:
           number: 40
           unit: percentage
-      - attribute: HP
-        condition:
-          - Marching
-        class: Ranged Troops
+      - attribute: March Size
+        conditions: []
+        passive: 0
+        targetedType: ''
         value:
           number: 10
           unit: percentage
       - attribute: HP
-        condition:
+        conditions:
           - Marching
-        class: Siege Machines
+        passive: 0
+        targetedType: Ranged Troops
         value:
           number: 10
           unit: percentage
+      - attribute: HP
+        conditions:
+          - Marching
+        passive: 0
+        targetedType: Siege Machines
+        value:
+          number: 10
+          unit: percentage
+    level: red5
+    text: Marching Ranged Troop and Siege Machine Attack +40%, March Size Capacity and Marching Ranged Troop and Siege Machine HP +10%
 general: Algernon Sidney
 id: Algernon Sidney
