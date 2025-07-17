@@ -32,7 +32,10 @@ package Game::EvonyTKR::Converter {
         "mode" => hidden => {
           one_of => [
             ['general', 'Convert a General to normalized YAML'],
-            ['all',     'Convert everything to normalized YAML from a provided URL'],
+            [
+              'all',
+              'Convert everything to normalized YAML from a provided URL'
+            ],
           ],
           required => 1,
         },
@@ -76,10 +79,10 @@ package Game::EvonyTKR::Converter {
       my $generalHander = Game::EvonyTKR::Converter::General->new();
       $generalHander->execute();
     }
-    elsif ($opt->mode eq 'all' ){
-      if(length($opt->url) == 0) {
-         $logger->logcroak("A URL is required with --all");
-         exit -1;
+    elsif ($opt->mode eq 'all') {
+      if (length($opt->url) == 0) {
+        $logger->logcroak("A URL is required with --all");
+        exit -1;
       }
       $self->doAll($logger, $opt->url, $opt->debug);
     }
@@ -97,10 +100,10 @@ package Game::EvonyTKR::Converter {
 
   sub doAll ($self, $logger, $url, $debug) {
     $logger->debug("::Converter->doAll started.");
-    my $dd = Path::Tiny::path(File::Share::dist_dir('Game-EvonyTKR'));
-    my $ua = LWP::UserAgent->new;
+    my $dd       = Path::Tiny::path(File::Share::dist_dir('Game-EvonyTKR'));
+    my $ua       = LWP::UserAgent->new;
     my $response = $ua->get($url);
-    unless($response->is_success) {
+    unless ($response->is_success) {
       $logger->logcroak("Failed to fetch $url: ", $response->status_line);
     }
     my $tree = HTML::TreeBuilder->new;
@@ -110,7 +113,8 @@ package Game::EvonyTKR::Converter {
     my $decoder = Sereal::Decoder->new;
 
     $logger->debug("tree is " . Data::Printer::np($tree));
-    $tree->look_down(_tag => 'script')->delete() for $tree->look_down(_tag => 'script');
+    $tree->look_down(_tag => 'script')->delete()
+      for $tree->look_down(_tag => 'script');
     my $serialized = $encoder->encode($tree);
     my $handler;
     $handler = Game::EvonyTKR::Converter::SkillBook->new(
@@ -125,12 +129,12 @@ package Game::EvonyTKR::Converter {
       debug     => $debug,
     );
     $handler->execute();
-    #$handler = Game::EvonyTKR::Converter::Specialty->new(
-    #  tree      => $decoder->decode($serialized),
-    #  outputDir => $dd->child('/collections/data/specialties/'),
-    #  debug     => $debug,
-    #);
-    #$handler->execute();
+    $handler = Game::EvonyTKR::Converter::Specialty->new(
+      tree      => $decoder->decode($serialized),
+      outputDir => $dd->child('/collections/data/specialties/'),
+      debug     => $debug,
+    );
+    $handler->execute();
   }
 }
 1;

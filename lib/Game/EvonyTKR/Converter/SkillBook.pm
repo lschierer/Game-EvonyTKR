@@ -27,18 +27,16 @@ class Game::EvonyTKR::Converter::SkillBook :
 
   ADJUST {
     $self->logger->debug(sprintf(
-  '%s assumes that the class or module calling it has generated the required grammar for %s',
+'%s assumes that the class or module calling it has generated the required grammar for %s',
       __CLASS__, 'Game::EvonyTKR::Shared::Parser'
     ));
     $self->logger->debug(sprintf(
-      '%s assumes that the class or module calling it has also correctly set up the $tree field.',
-      __CLASS__
-    ));
+'%s assumes that the class or module calling it has also correctly set up the $tree field.',
+      __CLASS__));
     # do not assume we were properly passed
     # a Path::Tiny::path
     $outputDir = Path::Tiny::path($outputDir);
   }
-
 
   field $name = '';
   field $text = '';
@@ -52,9 +50,10 @@ class Game::EvonyTKR::Converter::SkillBook :
       '_tag'  => 'table',
       'class' => qr/stats-table/,
     );
-    if($statsTable) {
+    if ($statsTable) {
       $self->GetMainText_Template2();
-    } else {
+    }
+    else {
       $self->GetMainText_Template1();
     }
   }
@@ -62,7 +61,8 @@ class Game::EvonyTKR::Converter::SkillBook :
   method GetMainText_Template2 {
     my $container = $tree->look_down(
       '_tag'  => 'div',
-      'class' =>  qr/elementor-element-(?:\w){1,9}.elementor-widget.elementor-widget-theme-post-content/
+      'class' =>
+qr/elementor-element-(?:\w){1,9}.elementor-widget.elementor-widget-theme-post-content/
     );
 
     unless ($container) {
@@ -77,7 +77,7 @@ class Game::EvonyTKR::Converter::SkillBook :
     my @headers = $container->look_down('_tag' => qr/^h[234]$/);
 
     # Find the first h3 (start of skillbook)
-    my $target = 1;
+    my $target   = 1;
     my $h3_count = 0;
     my $start_index;
 
@@ -98,14 +98,14 @@ class Game::EvonyTKR::Converter::SkillBook :
 
     #extract 1 H4 tag after the first H3 tag
     my $h4_index = $start_index;
-    while($h4_index <= $#headers){
+    while ($h4_index <= $#headers) {
       if ($headers[$h4_index]->tag eq 'h4') {
         my $skillbookH4 = $headers[$h4_index];
 
         my $skillBookName = $skillbookH4->as_trimmed_text;
-        my $para = $helpers->find_next_p_after_element($skillbookH4);
+        my $para          = $helpers->find_next_p_after_element($skillbookH4);
 
-        if($para) {
+        if ($para) {
           $name = $skillBookName;
           $text = $para->as_trimmed_text;
         }
@@ -118,7 +118,7 @@ class Game::EvonyTKR::Converter::SkillBook :
         $h4_index++;
       }
     }
-    unless(length($name) && length($text)) {
+    unless (length($name) && length($text)) {
       $self->logger->error("Cannot find and parse the required H3 tag!!");
     }
 
@@ -128,7 +128,8 @@ class Game::EvonyTKR::Converter::SkillBook :
     # Find the container div
     my $container = $tree->look_down(
       '_tag'  => 'div',
-      'class' =>  qr/elementor-element-(?:\w){1,9}.elementor-widget.elementor-widget-theme-post-content/
+      'class' =>
+qr/elementor-element-(?:\w){1,9}.elementor-widget.elementor-widget-theme-post-content/
     );
 
     unless ($container) {
@@ -139,12 +140,11 @@ class Game::EvonyTKR::Converter::SkillBook :
       $self->logger->debug("Found container: " . $container->starttag());
     }
 
-
     # Get all h2 and h3 elements in reading order
     my @headers = $container->look_down('_tag' => qr/^h[23]$/);
 
     # Find the second h2 (start of skillbook)
-    my $target = 2;
+    my $target   = 2;
     my $h2_count = 0;
     my $start_index;
 
@@ -165,14 +165,14 @@ class Game::EvonyTKR::Converter::SkillBook :
 
     #extract 1 H3 tag after the second H2 tag
     my $h3_index = $start_index + 1;
-    if($h3_index <= $#headers){
+    if ($h3_index <= $#headers) {
       if ($headers[$h3_index]->tag eq 'h3') {
         my $skillbookH3 = $headers[$h3_index];
 
         my $skillBookName = $skillbookH3->as_trimmed_text;
-        my $para = $helpers->find_next_p_after_element($skillbookH3);
+        my $para          = $helpers->find_next_p_after_element($skillbookH3);
 
-        if($para) {
+        if ($para) {
           $name = $skillBookName;
           $text = $para->as_trimmed_text;
         }
@@ -186,14 +186,12 @@ class Game::EvonyTKR::Converter::SkillBook :
     }
   }
 
-
   method parseSkillbookText {
 
     my $parser = Game::EvonyTKR::Shared::Parser->new();
 
     my @fragments = $parser->tokenize_buffs($text);
-    $self->logger->debug(sprintf('thee are %s fragments',
-    scalar(@fragments)));
+    $self->logger->debug(sprintf('thee are %s fragments', scalar(@fragments)));
     foreach my $frag (@fragments) {
       my $b = $parser->normalize_buff($frag);
       $self->logger->debug(sprintf(

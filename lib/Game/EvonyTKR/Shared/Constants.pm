@@ -515,6 +515,52 @@ class Game::EvonyTKR::Shared::Constants : isa(Game::EvonyTKR::Model::Logger) {
     $SpecialtyLevelValues = \@temp;
   }
 
+  field $CommonSpecialtyNames : reader;
+  # these are names of specialties that are common to
+  # many generals, and if found, should only be
+  # imported if not already present on the filesystem.
+
+  ADJUST {
+    Readonly::Array my @temp => (
+      'Ambush',
+      'Annihilation',
+      'Bash',
+      'Formation',
+      'Fortune',
+      'Ground Troop Ares',
+      'Ground Troop Assault',
+      'Ground Troop Defense',
+      'Ground Troop Formation',
+      'Hunter',
+      'Iron Warrior',
+      "King's Ambition",
+      "King’s Ambition",
+      'Mounted Troop Ares',
+      'Mounted Troop Assault',
+      'Mounted Troop Defense',
+      'Mounted Troop Formation',
+      'Pacify',
+      'Ranged Troop Ares',
+      'Ranged Troop Assault',
+      'Ranged Troop Defense',
+      'Ranged Troop Formation',
+      'Ruler',
+      'Sabotage',
+      'Siege',
+      'Siege Machine Ares',
+      'Siege Machine Assault',
+      'Siege Machine Defense',
+      'Siege Machine Formation',
+      'Snipe',
+      'Strike',
+      'Suppress',
+      'Trapping',
+      'Unparalleled Leader',
+      'War God',
+    );
+    $CommonSpecialtyNames = \@temp;
+  }
+
   field $CovenantLevelValues : reader;
 
   ADJUST {

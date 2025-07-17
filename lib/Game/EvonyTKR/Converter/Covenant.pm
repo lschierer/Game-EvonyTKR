@@ -110,24 +110,20 @@ class Game::EvonyTKR::Converter::Covenant :
 
   method setupLevelsHash {
     Readonly::Hash1 my %temp => (
-      war           => [],
-      cooperation   => [],
-      peace         => [],
-      faith         => [],
-      honor         => [],
-      civilization  => [],
+      war          => [],
+      cooperation  => [],
+      peace        => [],
+      faith        => [],
+      honor        => [],
+      civilization => [],
     );
     my $levels = \%temp;
     return $levels;
   }
 
-
-
   method printYAML ($name, $buffs) {
 
     my $levels = $self->setupLevelsHash();
-
-
 
     my $result = {
       name   => $name,
@@ -170,7 +166,7 @@ class Game::EvonyTKR::Converter::Covenant :
       exit -1;
     }
     my $html_content = $generalFile->slurp_utf8();
-    my $tree = HTML::TreeBuilder->new();
+    my $tree         = HTML::TreeBuilder->new();
     $tree->parse($html_content);
     $tree->eof();
 
@@ -196,10 +192,6 @@ class Game::EvonyTKR::Converter::Covenant :
     my $tree = HTML::TreeBuilder->new();
     $tree->parse($html_content);
     $tree->eof();
-
-
-
-
 
     # Get all h2 and h3 elements in reading order
     my @headers = $container->look_down('_tag' => qr/^h[23]$/);

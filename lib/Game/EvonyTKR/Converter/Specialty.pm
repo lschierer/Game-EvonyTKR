@@ -27,7 +27,7 @@ class Game::EvonyTKR::Converter::Specialty :
 
   # input fields
   # This will eventually be something online that I have to fetch.
-  field $tree :param;
+  field $tree : param;
   field $outputDir : param;
   field $debug : param //= 0;
 
@@ -44,9 +44,8 @@ class Game::EvonyTKR::Converter::Specialty :
       __CLASS__, 'Game::EvonyTKR::Shared::Parser'
     ));
     $self->logger->debug(sprintf(
-      '%s assumes that the class or module calling it has also correctly set up the $tree field.',
-      __CLASS__
-    ));
+'%s assumes that the class or module calling it has also correctly set up the $tree field.',
+      __CLASS__));
     # do not assume we were properly passed
     # a Path::Tiny::path
     $outputDir = Path::Tiny::path($outputDir);
@@ -55,65 +54,82 @@ class Game::EvonyTKR::Converter::Specialty :
 
   method execute {
     say "=== Specialty Text to YAML Converter ===";
-    $self->logger->debug(sprintf('specialty sees tree -- %s --', $tree->as_XML()));
+    $self->logger->debug(
+      sprintf('specialty sees tree -- %s --', $tree->as_XML()));
     $self->getMainText();
     $self->parseText();
   }
 
   method parseText {
-    foreach my $specialty (@$specialties) {
-      my $fileName   = sprintf('%s.yaml', $specialty->{name});
+    foreach my $specialty (@{$specialties}) {
+      my $sn         = $specialty->{name} // 'unknown';
+      my $fileName   = sprintf('%s.yaml', $sn);
       my $lcFileName = lc($fileName);
-      if ($outputDir->child($fileName)->is_file()) {
-        $self->logger->debug(sprintf(
-          'Specialty "%s" has already been converted - "%s" already exists',
-          $specialty->{name}, $outputDir->child($fileName)->canonpath()
-        ));
-        next;
-      }
-      elsif ($outputDir->child($lcFileName)->is_file()) {
-        $self->logger->debug(sprintf(
-          'Specialty "%s" has already been converted - "%s" already exists',
-          $specialty->{name}, $outputDir->child($lcFileName)->canonpath()
-        ));
-        next;
+      if (any { $_ =~ /$sn/ } @{ $self->CommonSpecialtyNames }) {
+        if ( $outputDir->child($fileName)->is_file()
+          || $outputDir->child($lcFileName)->is_file()) {
+          $self->logger->debug(
+            "Common Specialty $fileName has already been converted.");
+          next;
+        }
       }
       else {
-        # this is based off what we do in the test harness
-        $self->logger->debug(
-          sprintf('"%s" needs to be converted.', $specialty->{name}));
-        my @hashedBuffs;
-        for my $detail (@{ $specialty->{details} }) {
-          my @fragments = $parser->tokenize_buffs($detail);
-          foreach my $frag (@fragments) {
-            $self->logger->debug(sprintf(
-              'frag for "%s" is %s',
-              $specialty->{name}, Data::Printer::np($frag)
-            ));
-            my $nb;
-            @{$nb} = $parser->normalize_buff($frag);
-            $self->logger->debug('after normalize_buff, size of frag is %s',
-              scalar(@{$nb}));
-            $self->logger->debug(sprintf(
-              'this fragment was normalized to -- %s -- ',
-              Data::Printer::np($nb)));
-            push(@hashedBuffs, @{$nb});
-          }
-        }
-        if (scalar(@hashedBuffs)) {
-          $self->printYAML($specialty->{name}, \@hashedBuffs);
+        $self->logger->debug("");
+      }
+      # this is based off what we do in the test harness
+      $self->logger->debug(
+        sprintf('"%s" needs to be converted.', $specialty->{name}));
+      my @hashedBuffs;
+      my @textString;
+      for my $detail (@{ $specialty->{details} }) {
+        push @textString, $detail;
+        my @fragments = $parser->tokenize_buffs($detail);
+        foreach my $frag (@fragments) {
+          $self->logger->debug(sprintf(
+            'frag for "%s" is %s',
+            $specialty->{name}, Data::Printer::np($frag)
+          ));
+          my $nb;
+          @{$nb} = $parser->normalize_buff($frag);
+          $self->logger->debug('after normalize_buff, size of frag is %s',
+            scalar(@{$nb}));
+          $self->logger->debug(sprintf(
+            'this fragment was normalized to -- %s -- ',
+            Data::Printer::np($nb)));
+          push(@hashedBuffs, @{$nb});
         }
       }
+
+      if (scalar(@hashedBuffs)) {
+        $self->printYAML($specialty->{name}, \@hashedBuffs,
+          join(', ', @textString));
+      }
+
     }
   }
 
   method setupLevelsHash {
     Readonly::Hash1 my %temp => (
-      Green  => [],
-      Blue   => [],
-      Purple => [],
-      Orange => [],
-      Gold   => [],
+      Green => {
+        text  => '',
+        buffs => [],
+      },
+      Blue => {
+        text  => '',
+        buffs => [],
+      },
+      Purple => {
+        text  => '',
+        buffs => [],
+      },
+      Orange => {
+        text  => '',
+        buffs => [],
+      },
+      Gold => {
+        text  => '',
+        buffs => [],
+      },
     );
     my $levels = \%temp;
     return $levels;
@@ -145,21 +161,22 @@ class Game::EvonyTKR::Converter::Specialty :
     return $skeleton_buff;
   }
 
-  method printYAML ($name, $buffs) {
+  method printYAML ($name, $buffs, $textString) {
 
     my $levels = $self->setupLevelsHash();
 
     # Put actual buffs in Gold level
     for my $b (@{$buffs}) {
-      push @{ $levels->{Gold} }, $b;
+      push @{ $levels->{Gold}->{buffs} }, $b;
     }
+    $levels->{Gold}->{text} = $textString;
 
     # Create skeleton buffs for other levels
     for my $level_name (qw/Green Blue Purple Orange/) {
       for my $gold_buff (@{$buffs}) {
         # Clone the buff but set value to 0
         my $skeleton_buff = $self->create_skeleton_buff($gold_buff);
-        push @{ $levels->{$level_name} }, $skeleton_buff;
+        push @{ $levels->{$level_name}->{buffs} }, $skeleton_buff;
       }
     }
 
@@ -170,7 +187,8 @@ class Game::EvonyTKR::Converter::Specialty :
           my $level_name = $_;
           {
             level => $level_name,
-            buffs => [map { $_->to_hash } @{ $levels->{$level_name} }],
+            text  => $levels->{$level_name}->{text},
+            buffs => [map { $_->to_hash } @{ $levels->{$level_name}->{buffs} }],
           }
         } qw/Green Blue Purple Orange Gold/ # Fixed order instead of keys %{$levels}
       ],
@@ -200,7 +218,16 @@ class Game::EvonyTKR::Converter::Specialty :
   method getMainText {
     $self->logger->trace("Start of ::Converter::Specialty->getMainText");
 
-    $specialties = $self->extract_specialties();
+    my $statsTable = $tree->look_down(
+      '_tag'  => 'table',
+      'class' => qr/stats-table/,
+    );
+    if ($statsTable) {
+      $self->GetMainText_Template2();
+    }
+    else {
+      $self->GetMainText_Template1();
+    }
 
     for my $specialty (@$specialties) {
       $self->logger->debug(
@@ -212,27 +239,60 @@ class Game::EvonyTKR::Converter::Specialty :
 
   }
 
-  method extract_specialties {
-    # Find the container div
+  method GetMainText_Template2 {
     my $container = $tree->look_down(
       '_tag'  => 'div',
-      'class' =>  qr/entry-content.*th-content/
+      'class' => qr/\w+-specialties-container/
     );
 
     unless ($container) {
-      warn "Could not find entry-content div container";
+      warn "Could not find specialties-container div";
       return [];
     }
     if ($debug) {
       $self->logger->debug("Found container: " . $container->starttag());
     }
 
+    my @specialtyDivs = $container->look_down(
+      '_tag'  => 'div',
+      'class' => 'specialty'
+    );
+
+    foreach my $div (@specialtyDivs) {
+      my $h4 = $div->look_down('_tag' => qr/^h4$/);
+      my $sn = $h4->as_trimmed_text;
+      my $ul = $helpers->find_next_ul_after_element($h4);
+      push @{$specialties},
+        {
+        name       => $sn,
+        details    => $helpers->extract_ul_details($ul),
+        h_element  => $h4,
+        ul_element => $ul,
+        };
+    }
+
+  }
+
+  method GetMainText_Template1 {
+    my $container = $tree->look_down(
+      '_tag'  => 'div',
+      'class' =>
+qr/elementor-element-(?:\w){1,9}.elementor-widget.elementor-widget-theme-post-content/
+    );
+
+    unless ($container) {
+      warn "Could not find theme-post-content div container";
+      return [];
+    }
+    if ($debug) {
+      $self->logger->debug("Found container: " . $container->starttag());
+    }
 
     # Get all h2 and h3 elements in reading order
     my @headers = $container->look_down('_tag' => qr/^h[23]$/);
 
-    # Find the third h2 (start of skillbook)
-    my $target = 4;
+    # Find the Third h2 (start of the pertinent info)
+    my $target   = 3;
     my $h2_count = 0;
     my $start_index;
 
@@ -269,11 +329,11 @@ class Game::EvonyTKR::Converter::Specialty :
       my $ul = $helpers->find_next_ul_after_element($h3);
 
       if ($ul) {
-        push @specialties,
+        push @{$specialties},
           {
           name       => $specialty_name,
           details    => $helpers->extract_ul_details($ul),
-          h3_element => $h3,
+          h_element  => $h3,
           ul_element => $ul
           };
       }
@@ -281,7 +341,6 @@ class Game::EvonyTKR::Converter::Specialty :
         warn "Could not find ul for specialty: $specialty_name";
       }
     }
-    return \@specialties;
   }
 
 }
