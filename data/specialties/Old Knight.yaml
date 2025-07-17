@@ -1,118 +1,133 @@
 ---
-name: Old Knight
 levels:
-  - level: Green
-    buff:
+  - buffs:
       - attribute: Attack
-        condition:
+        conditions:
           - Marching
-        class: Ranged Troops
+        passive: 0
+        targetedType: Ranged Troops
         value:
-          number: 3
+          number: 0
           unit: percentage
       - attribute: Defense
-        condition:
+        conditions:
           - Attacking
-        class: Siege Machines
+        passive: 0
+        targetedType: Siege Machines
         value:
-          number: 4
+          number: 0
           unit: percentage
       - attribute: Defense
-        condition:
+        conditions:
           - Attacking
-        class: Ranged Troops
+        passive: 0
+        targetedType: Ranged Troops
         value:
-          number: 4
+          number: 0
           unit: percentage
-  - level: Blue
-    buff:
+    level: Green
+  - buffs:
       - attribute: Attack
-        condition:
+        conditions:
           - Marching
-        class: Ranged Troops
+        passive: 0
+        targetedType: Ranged Troops
         value:
-          number: 4
+          number: 0
           unit: percentage
       - attribute: Defense
-        condition:
+        conditions:
           - Attacking
-        class: Siege Machines
+        passive: 0
+        targetedType: Siege Machines
         value:
-          number: 4
+          number: 0
           unit: percentage
       - attribute: Defense
-        condition:
+        conditions:
           - Attacking
-        class: Ranged Troops
+        passive: 0
+        targetedType: Ranged Troops
         value:
-          number: 4
+          number: 0
           unit: percentage
-  - level: Purple
-    buff:
+    level: Blue
+  - buffs:
       - attribute: Attack
-        condition:
+        conditions:
           - Marching
-        class: Ranged Troops
+        passive: 0
+        targetedType: Ranged Troops
         value:
-          number: 6
+          number: 0
           unit: percentage
       - attribute: Defense
-        condition:
+        conditions:
           - Attacking
-        class: Siege Machines
+        passive: 0
+        targetedType: Siege Machines
         value:
-          number: 8
+          number: 0
           unit: percentage
       - attribute: Defense
-        condition:
+        conditions:
           - Attacking
-        class: Ranged Troops
+        passive: 0
+        targetedType: Ranged Troops
         value:
-          number: 8
+          number: 0
           unit: percentage
-  - level: Orange
-    buff:
+    level: Purple
+  - buffs:
       - attribute: Attack
-        condition:
+        conditions:
           - Marching
-        class: Ranged Troops
+        passive: 0
+        targetedType: Ranged Troops
         value:
-          number: 7
+          number: 0
           unit: percentage
       - attribute: Defense
-        condition:
+        conditions:
           - Attacking
-        class: Siege Machines
+        passive: 0
+        targetedType: Siege Machines
         value:
-          number: 8
+          number: 0
           unit: percentage
       - attribute: Defense
-        condition:
+        conditions:
           - Attacking
-        class: Ranged Troops
+        passive: 0
+        targetedType: Ranged Troops
         value:
-          number: 8
+          number: 0
           unit: percentage
-  - level: Gold
-    buff:
+    level: Orange
+  - buffs:
       - attribute: Attack
-        condition:
+        conditions:
           - Marching
-        class: Ranged Troops
+        passive: 0
+        targetedType: Ranged Troops
         value:
-          number: 15
+          number: 35
           unit: percentage
       - attribute: Defense
-        condition:
+        conditions:
           - Attacking
-        class: Siege Machines
+        passive: 0
+        targetedType: Siege Machines
         value:
-          number: 16
+          number: 40
           unit: percentage
       - attribute: Defense
-        condition:
+        conditions:
           - Attacking
-        class: Ranged Troops
+        passive: 0
+        targetedType: Ranged Troops
         value:
-          number: 16
+          number: 40
           unit: percentage
+    level: Gold
+name: Old Knight
