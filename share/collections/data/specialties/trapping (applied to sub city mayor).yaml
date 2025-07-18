@@ -1,0 +1,98 @@
+---
+levels:
+- buffs:
+  - attribute: SubCity Training Speed
+    conditions:
+    - When City Mayor for this SubCity
+    passive: 0
+    targetedType: ''
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Death to Survival
+    conditions:
+    - When City Mayor for this SubCity
+    passive: 0
+    targetedType: ''
+    value:
+      number: 0
+      unit: percentage
+  level: Green
+  text: ''
+- buffs:
+  - attribute: SubCity Training Speed
+    conditions:
+    - When City Mayor for this SubCity
+    passive: 0
+    targetedType: ''
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Death to Survival
+    conditions:
+    - When City Mayor for this SubCity
+    passive: 0
+    targetedType: ''
+    value:
+      number: 0
+      unit: percentage
+  level: Blue
+  text: ''
+- buffs:
+  - attribute: SubCity Training Speed
+    conditions:
+    - When City Mayor for this SubCity
+    passive: 0
+    targetedType: ''
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Death to Survival
+    conditions:
+    - When City Mayor for this SubCity
+    passive: 0
+    targetedType: ''
+    value:
+      number: 0
+      unit: percentage
+  level: Purple
+  text: ''
+- buffs:
+  - attribute: SubCity Training Speed
+    conditions:
+    - When City Mayor for this SubCity
+    passive: 0
+    targetedType: ''
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Death to Survival
+    conditions:
+    - When City Mayor for this SubCity
+    passive: 0
+    targetedType: ''
+    value:
+      number: 0
+      unit: percentage
+  level: Orange
+  text: ''
+- buffs:
+  - attribute: SubCity Training Speed
+    conditions:
+    - When City Mayor for this SubCity
+    passive: 0
+    targetedType: ''
+    value:
+      number: 20
+      unit: percentage
+  - attribute: Death to Survival
+    conditions:
+    - When City Mayor for this SubCity
+    passive: 0
+    targetedType: ''
+    value:
+      number: 6
+      unit: percentage
+  level: Gold
+  text: Training Speed in this Subordinate City +20%, Death into Survival Rate in this Subordinate City +6%
+name: Trapping (Applied to Sub City Mayor)
