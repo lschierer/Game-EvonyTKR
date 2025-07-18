@@ -1,123 +1,138 @@
 ---
-ascending:
-- buff:
+levels:
+- buffs:
   - attribute: Attack
-    conditions:
-    - Marching
-    passive: 0
-    targetedType: Ranged Troops
-    value:
-      number: 5
-      unit: percentage
-  - attribute: Defense
-    conditions:
-    - Marching
-    passive: 0
-    targetedType: Ranged Troops
-    value:
-      number: 10
-      unit: percentage
-  - attribute: Defense
-    conditions:
-    - Marching
-    passive: 0
-    targetedType: Siege Machines
-    value:
-      number: 10
-      unit: percentage
-  - attribute: HP
-    conditions:
-    - Marching
-    passive: 0
-    targetedType: Ranged Troops
-    value:
-      number: 10
-      unit: percentage
-  - attribute: HP
-    conditions:
-    - Marching
-    passive: 0
-    targetedType: Siege Machines
-    value:
-      number: 10
-      unit: percentage
-  level: red1
-  text: Marching Ranged Troop Attack +5%, Marching Ranged Troop and Siege Machine Defense and HP +10%.
-- buff:
-  - attribute: Wounded to Death
     conditions:
     - Enemy
-    - In City
-    passive: 0
-    targetedType: ''
-    value:
-      number: 10
-      unit: percentage
-  level: red2
-  text: Enemy In-city Troop Wounded into Death rate +10%.
-- buff:
-  - attribute: Attack
-    conditions:
-    - Attacking
     passive: 0
     targetedType: Ranged Troops
     value:
-      number: 10
-      unit: percentage
-  - attribute: March Size
-    conditions: []
-    passive: 0
-    targetedType: ''
-    value:
-      number: 10
-      unit: percentage
-  level: red3
-  text: When attacking, Ranged Troop Attack +10%, March Size Capacity +10%.
-- buff:
-  - attribute: Defense
-    conditions:
-    - Marching
-    passive: 0
-    targetedType: Ranged Troops
-    value:
-      number: 30
-      unit: percentage
-  - attribute: HP
-    conditions:
-    - Marching
-    passive: 0
-    targetedType: Ranged Troops
-    value:
-      number: 40
-      unit: percentage
-  level: red4
-  text: Marching Ranged Troop Defense +30% and HP +40%.
-- buff:
-  - attribute: Attack
-    conditions:
-    - Marching
-    passive: 0
-    targetedType: Ranged Troops
-    value:
-      number: 30
+      number: 0
       unit: percentage
   - attribute: Defense
     conditions:
-    - Marching
+    - Enemy
     passive: 0
     targetedType: Ranged Troops
     value:
-      number: 15
+      number: 0
       unit: percentage
   - attribute: HP
     conditions:
-    - Marching
+    - Enemy
     passive: 0
     targetedType: Ranged Troops
     value:
-      number: 15
+      number: 0
       unit: percentage
-  level: red5
-  text: Marching Ranged Troop Attack +30%, Defense and HP +15%.
-general: Douglas
-id: Douglas
+  level: Green
+  text: ''
+- buffs:
+  - attribute: Attack
+    conditions:
+    - Enemy
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - Enemy
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - Enemy
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 0
+      unit: percentage
+  level: Blue
+  text: ''
+- buffs:
+  - attribute: Attack
+    conditions:
+    - Enemy
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - Enemy
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - Enemy
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 0
+      unit: percentage
+  level: Purple
+  text: ''
+- buffs:
+  - attribute: Attack
+    conditions:
+    - Enemy
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - Enemy
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - Enemy
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 0
+      unit: percentage
+  level: Orange
+  text: ''
+- buffs:
+  - attribute: Attack
+    conditions:
+    - Enemy
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 26
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - Enemy
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 26
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - Enemy
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 26
+      unit: percentage
+  level: Gold
+  text: Enemy Ranged Troop Attack -26%, Enemy Ranged Troop Defense -26%, Enemy Ranged Troop HP -26%
+name: The North Sea Empire

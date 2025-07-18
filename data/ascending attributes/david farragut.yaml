@@ -1,7 +1,40 @@
 ---
 ascending:
-- buff: []
+- buff:
+  - attribute: Defense
+    conditions:
+    - Enemy
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - Enemy
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 10
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - Enemy
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - Enemy
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 10
+      unit: percentage
   level: red1
+  text: Enemy Ranged Troop and Siege Machine Defense and HP -10%.
 - buff:
   - attribute: Defense
     conditions:
@@ -28,6 +61,7 @@ ascending:
       number: 20
       unit: percentage
   level: red2
+  text: Enemy Ground Troop and Mounted Troop Defense -10%; when General is the Mayor, Training Speed in this Subordinate City +20%.
 - buff:
   - attribute: Defense
     conditions:
@@ -54,6 +88,7 @@ ascending:
       number: 10
       unit: percentage
   level: red3
+  text: Enemy Ground Troop and Mounted Troop Defense -15%; when General is the Mayor, Death into Survival Rate in this Subordinate City +10%.
 - buff:
   - attribute: HP
     conditions:
@@ -72,7 +107,57 @@ ascending:
       number: 20
       unit: percentage
   level: red4
-- buff: []
+  text: Enemy Ground Troop and Mounted Troop HP -20%.
+- buff:
+  - attribute: Attack
+    conditions:
+    - Enemy
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: Attack
+    conditions:
+    - Enemy
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 10
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - Enemy
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - Enemy
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 10
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - Enemy
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - Enemy
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 10
+      unit: percentage
   level: red5
+  text: Enemy Ranged Troop and Siege Machine Attack, Defense and HP -10%.
 general: David Farragut
 id: David Farragut
