@@ -5,7 +5,7 @@ ascending:
     conditions:
     - Marching
     passive: 0
-    targetedType: Ranged Troops
+    targetedType: Ground Troops
     value:
       number: 10
       unit: percentage
@@ -13,7 +13,7 @@ ascending:
     conditions:
     - Marching
     passive: 0
-    targetedType: Siege Machines
+    targetedType: Mounted Troops
     value:
       number: 10
       unit: percentage
@@ -21,20 +21,20 @@ ascending:
     conditions:
     - Marching
     passive: 0
-    targetedType: Ranged Troops
+    targetedType: Ground Troops
     value:
-      number: 15
+      number: 10
       unit: percentage
   - attribute: HP
     conditions:
     - Marching
     passive: 0
-    targetedType: Siege Machines
+    targetedType: Mounted Troops
     value:
-      number: 15
+      number: 10
       unit: percentage
   level: red1
-  text: Marching Ranged Troop and Siege Machine Defense +10% and HP +15%.
+  text: Marching Ground Troop and Mounted Troop Defense +10% and HP +10%.
 - buff:
   - attribute: Wounded to Death
     conditions:
@@ -59,74 +59,42 @@ ascending:
   level: red3
   text: When General is launching Alliance War, Rally Capacity +8%.
 - buff:
-  - attribute: Attack
+  - attribute: Defense
     conditions:
     - Marching
     passive: 0
-    targetedType: Ranged Troops
+    targetedType: Ground Troops
     value:
-      number: 10
-      unit: percentage
-  - attribute: Attack
-    conditions:
-    - Marching
-    passive: 0
-    targetedType: Siege Machines
-    value:
-      number: 10
-      unit: percentage
-  - attribute: HP
-    conditions:
-    - Marching
-    passive: 0
-    targetedType: Ranged Troops
-    value:
-      number: 15
-      unit: percentage
-  - attribute: HP
-    conditions:
-    - Marching
-    passive: 0
-    targetedType: Siege Machines
-    value:
-      number: 15
+      number: 50
       unit: percentage
   level: red4
-  text: Marching Ranged Troop and Siege Machine Attack +10% and HP +15%.
+  text: Marching Ground Troop Defense +50%.
 - buff:
   - attribute: Attack
     conditions:
     - Marching
     passive: 0
-    targetedType: Ranged Troops
+    targetedType: Ground Troops
     value:
-      number: 15
-      unit: percentage
-  - attribute: Attack
-    conditions:
-    - Marching
-    passive: 0
-    targetedType: Siege Machines
-    value:
-      number: 15
+      number: 20
       unit: percentage
   - attribute: Defense
     conditions:
     - Marching
     passive: 0
-    targetedType: Ranged Troops
+    targetedType: Ground Troops
     value:
-      number: 10
+      number: 20
       unit: percentage
-  - attribute: Defense
+  - attribute: HP
     conditions:
     - Marching
     passive: 0
-    targetedType: Siege Machines
+    targetedType: Ground Troops
     value:
-      number: 10
+      number: 20
       unit: percentage
   level: red5
-  text: Marching Ranged Troop and Siege Machine Attack +15% and Defense +10%.
-general: Alfred the Great
-id: Alfred the Great
+  text: Marching Ground Troop Attack +20%, Defense and HP +20%.
+general: Eagle of Snowfield – Ascended
+id: Eagle of Snowfield – Ascended
