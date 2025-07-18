@@ -1,0 +1,24 @@
+ascending: 'true'
+basic_attributes:
+  attack:
+    base: 105
+    increment: 0
+  defense:
+    base: 110
+    increment: 0
+  leadership:
+    base: 118
+    increment: 0
+  politics:
+    base: 113
+    increment: 0
+book: The Great Khan
+name: Genghis Khan
+specialties:
+  - Mounted Troop Assault
+  - Annihilation
+  - 'King’s Ambition'
+  - Battle of Bukhara
+stars: red5
+type:
+  - mounted_specialist

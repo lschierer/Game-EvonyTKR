@@ -1,69 +1,86 @@
-name: George Monck
+---
 generals:
-  - Queen Victoria
-  - Edward III
-  - John Hunyadi
+- Queen Victoria
+- Edward III
+- John Hunyadi
 levels:
-  - category: Cooperation
-    type: passive
-    buff:
-      - attribute: Training Speed
-        value:
-          number: 10
-          unit: percentage
-        class: Mounted Troops
-  - category: Peace
-    type: personal
-    buff:
-      - attribute: Attack
-        condition:
-          - Marching
-        value:
-          number: 5
-          unit: percentage
-        class: Mounted Troops
-  - category: Faith
-    type: personal
-    buff:
-      - attribute: Defense
-        condition:
-          - Marching
-        value:
-          number: 10
-          unit: percentage
-        class: Mounted Troops
-  - category: Faith
-    type: passive
-    buff:
-      - attribute: Attack
-        condition:
-          - When Rallying
-        value:
-          number: 10
-          unit: percentage
-        class: Mounted Troops
-  - category: Honor
-    type: personal
-    buff:
-      - attribute: HP
-        condition:
-          - Marching
-        value:
-          number: 10
-          unit: percentage
-        class: Mounted Troops
-  - category: Civilization
-    type: personal
-    buff:
-      - attribute: Attack
-        value:
-          number: 5
-          unit: percentage
-        class: Mounted Troops
-      - attribute: Defense
-        condition:
-          - When Rallying
-        value:
-          number: 10
-          unit: percentage
-        class: Mounted Troops
+- buffs:
+  - attribute: HP
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 10
+      unit: percentage
+  category: honor
+  text: Marching Mounted Troop HP +10% (Local)
+- buffs:
+  - attribute: Attack
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 5
+      unit: percentage
+  category: peace
+  text: Marching Mounted Troop Attack +5% (Local)
+- buffs:
+  - attribute: Defense
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: Attack
+    conditions:
+    - When Rallying
+    passive: 1
+    targetedType: Mounted Troops
+    value:
+      number: 10
+      unit: percentage
+  category: faith
+  text: Marching Mounted Troop Defense +10% (Local);;In-Rally Mounted Troop Attack +10% (Global)
+- buffs:
+  - attribute: Attack
+    conditions: []
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 5
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - When Rallying
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 10
+      unit: percentage
+  category: civilization
+  text: Mounted Troop Attack +5% (Local);;In-Rally Mounted Troop Defense +10% (Local)
+- buffs:
+  - attribute: Marching Speed
+    conditions: []
+    passive: 0
+    targetedType: ''
+    value:
+      number: 10
+      unit: percentage
+  category: war
+  text: March Speed +10% (Local)
+- buffs:
+  - attribute: Training Capacity
+    conditions: []
+    passive: 1
+    targetedType: Mounted Troops
+    value:
+      number: 10
+      unit: percentage
+  category: cooperation
+  text: Mounted Troop Training Capacity +10% (Global)
+name: George Monck

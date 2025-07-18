@@ -1,0 +1,98 @@
+---
+levels:
+- buffs:
+  - attribute: Attack
+    conditions:
+    - In City
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Attack
+    conditions:
+    - In City
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 0
+      unit: percentage
+  level: Green
+  text: ''
+- buffs:
+  - attribute: Attack
+    conditions:
+    - In City
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Attack
+    conditions:
+    - In City
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 0
+      unit: percentage
+  level: Blue
+  text: ''
+- buffs:
+  - attribute: Attack
+    conditions:
+    - In City
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Attack
+    conditions:
+    - In City
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 0
+      unit: percentage
+  level: Purple
+  text: ''
+- buffs:
+  - attribute: Attack
+    conditions:
+    - In City
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Attack
+    conditions:
+    - In City
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 0
+      unit: percentage
+  level: Orange
+  text: ''
+- buffs:
+  - attribute: Attack
+    conditions:
+    - In City
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 26
+      unit: percentage
+  - attribute: Attack
+    conditions:
+    - In City
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 26
+      unit: percentage
+  level: Gold
+  text: In-city Ranged Troop and Siege Machine Attack +26%
+name: Battle of Manila Bay
