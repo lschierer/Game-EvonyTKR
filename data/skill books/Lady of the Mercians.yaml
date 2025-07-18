@@ -1,20 +1,22 @@
-buff:
-  - attribute: Attack
-    conditions:
-      - leading the army
-      - Against Monsters
-    targetedType: Mounted Troops
-    value:
-      number: 55
-      unit: percentage
-  - attribute: Defense
-    conditions:
-      - leading the army
-      - Against Monsters
-    targetedType: Mounted Troops
-    value:
-      number: 55
-      unit: percentage
+---
+buffs:
+- attribute: Attack
+  conditions:
+  - leading the army
+  - Against Monsters
+  passive: 0
+  targetedType: Mounted Troops
+  value:
+    number: 55
+    unit: percentage
+- attribute: Defense
+  conditions:
+  - leading the army
+  - Against Monsters
+  passive: 0
+  targetedType: Mounted Troops
+  value:
+    number: 55
+    unit: percentage
 name: Lady of the Mercians
-text: >-
-  Increases mounted troops’ attack and defense by 55% when General is leading the army to attack Monsters.
+text: Increases mounted troops’ attack and defense by 55% when General is leading the army to attack Monsters.

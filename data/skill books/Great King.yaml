@@ -1,17 +1,22 @@
 ---
+buffs:
+- attribute: Attack
+  conditions:
+  - leading the army
+  - Attacking
+  passive: 0
+  targetedType: Ranged Troops
+  value:
+    number: 30
+    unit: percentage
+- attribute: Attack
+  conditions:
+  - leading the army
+  - Attacking
+  passive: 0
+  targetedType: Siege Machines
+  value:
+    number: 20
+    unit: percentage
 name: Great King
-buff:
-  - attribute: Attack
-    condition:
-      - Attacking
-    targetedType: Ranged Troops
-    value:
-      number: 30
-      unit: percentage
-  - attribute: Attack
-    condition:
-      - Attacking
-    targetedType: Siege Machines
-    value:
-      number: 20
-      unit: percentage
+text: Increases ranged troops’ attack by 30% and siege machines’ attack by 20% when General is leading the army to attack.
