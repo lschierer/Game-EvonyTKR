@@ -572,6 +572,24 @@ buff_pattern(Buffs) -->
     format("DEBUG: '1C1TAVandTAV1C' matched: '~w'~n", [Buffs])
   }.
 
+% Pattern: 1TAVand1CTAV
+buff_pattern(Buffs) -->
+  {format("DEBUG: Trying '1TAVand1CTAV'~n")},
+  optional_verb, optional_your, troop(Troop1),
+  attribute(Attr1), optional_value_adj, [ValueAtom1],
+  [and], optional_verb, condition(Cond2a), troop(Troop2),
+  attribute(Attr2), optional_value_adj, [ValueAtom2],
+  optional_when_general_is, condition(Cond2b),
+  {extract_value(ValueAtom1,Value1)},
+  {extract_value(ValueAtom2,Value2)},
+  {
+    Buffs = [
+      buff(Attr1, Troop1, Value1, []),
+      buff(Attr2, Troop2, Value2, [Cond2a, Cond2b])
+    ]
+  },
+  {format("DEBUG: '1TAVand1CTAV' matched: '~w'~n", [Buffs])}.
+
 % Pattern: 1C2TAV1CT2A1V
 % 1 NOT SHARED Condition
 % 2 Troops with

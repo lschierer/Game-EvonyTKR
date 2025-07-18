@@ -264,6 +264,9 @@ class Game::EvonyTKR::Converter::Specialty :
       my $h4 = $div->look_down('_tag' => qr/^h4$/);
       my $sn = $h4->as_trimmed_text;
       $sn = s/\s+\(Applied to Subordinate City Mayor\)//;
+      $sn = s/\s+\(When General brings any dragon\)//;
+      $sn =~ s/\s+\(Applied to Main City Defense General\)//;
+
       my $ul = $helpers->find_next_ul_after_element($h4);
       push @{$specialties},
         {
@@ -326,7 +329,10 @@ qr/elementor-element-(?:\w){1,9}.elementor-widget.elementor-widget-theme-post-co
     # For each h3, find its associated ul
     my @specialties;
     for my $h3 (@specialty_h3s) {
-      my $specialty_name = $h3->as_trimmed_text;
+      my $sn = $h3->as_trimmed_text;
+      $sn =~ s/\s+\(Applied to Subordinate City Mayor\)//;
+      $sn =~ s/\s+\(When General brings any dragon\)//;
+      $sn =~ s/\s+\(Applied to Main City Defense General\)//;
 
       # Find the next ul element after this h3 in document order
       my $ul = $helpers->find_next_ul_after_element($h3);
@@ -334,14 +340,14 @@ qr/elementor-element-(?:\w){1,9}.elementor-widget.elementor-widget-theme-post-co
       if ($ul) {
         push @{$specialties},
           {
-          name       => $specialty_name,
+          name       => $sn,
           details    => $helpers->extract_ul_details($ul),
           h_element  => $h3,
           ul_element => $ul
           };
       }
       else {
-        warn "Could not find ul for specialty: $specialty_name";
+        warn "Could not find ul for specialty: $sn";
       }
     }
   }

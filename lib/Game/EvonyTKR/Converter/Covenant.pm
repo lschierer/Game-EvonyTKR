@@ -73,30 +73,38 @@ class Game::EvonyTKR::Converter::Covenant :
       $self->logger->debug("parseText for key $key");
       my $covenant  = $covenantHash->{$key};
       my @sentences = split(/;;/, $covenant->{text});
+      my $passive = 0;
+      my @fragments;
       foreach my $sentence (@sentences) {
-        if ($sentence =~ /(.+)(\((?:Local|Global)\))/) {
+        if ($sentence =~ /(.+)(\((?:Local|Global|General Only)\))/i) {
           my $text    = $1;
-          my $passive = $2 eq '(Global)' ? 1 : 0;
+          $passive = $2 eq '(Global)' ? 1 : 0;
           $self->logger->debug(sprintf(
             'using text "%s" as a %s buff',
             $text, $passive ? 'passive' : 'personal'
           ));
 
-          my @fragments = $parser->tokenize_buffs($text);
-          $self->logger->debug(
-            sprintf('thee are %s fragments', scalar(@fragments)));
+          @fragments = $parser->tokenize_buffs($text);
+        } else {
+          $self->logger->debug(sprintf(
+            'using text "%s" as a %s buff',
+            $sentence, $passive ? 'passive' : 'personal'
+          ));
 
-          foreach my $frag (@fragments) {
-            my $b = $parser->normalize_buff($frag);
-            $self->logger->debug(sprintf(
-              'recieved %s from normalize_buff for "%s"',
-              ref($b), Data::Printer::np($frag)
-            ));
-            if ($passive) {
-              $b->set_passive(1);
-            }
-            push @{ $covenantHash->{$key}->{buffs} }, $b;
+          @fragments = $parser->tokenize_buffs($sentence);
+        }
+        $self->logger->debug(
+          sprintf('there are %s fragments', scalar(@fragments)));
+        foreach my $frag (@fragments) {
+          my $b = $parser->normalize_buff($frag);
+          $self->logger->debug(sprintf(
+            'recieved %s from normalize_buff for "%s"',
+            ref($b), Data::Printer::np($frag)
+          ));
+          if ($passive) {
+            $b->set_passive(1);
           }
+          push @{ $covenantHash->{$key}->{buffs} }, $b;
         }
       }
 
@@ -240,6 +248,7 @@ class Game::EvonyTKR::Converter::Covenant :
       $targetH3->as_trimmed_text =~ s/Evony\s+(.+?)\s+Covenant:?/$1/r;
       $primary =~ s/[\x{0022}\x{0027}\x{2018}\x{2019}\x{201C}\x{201D}\x{0060}\x{00B4}]s//g;
       $primary =~ s/Evony\s+(.+?)\s+Covenant:/$1/;
+      $primary =~ s/[-–—]*//;
     $self->logger->debug("found primary '$primary'");
     my $supporting_para = $helpers->find_next_p_after_element($targetH3);
     if ($supporting_para) {
@@ -350,6 +359,7 @@ qr/elementor-element-(?:\w){1,9}.elementor-widget.elementor-widget-theme-post-co
     $primary =~ s/[\x{0022}\x{0027}\x{2018}\x{2019}\x{201C}\x{201D}\x{0060}\x{00B4}]s//g;
     $primary =~ s/Guide//;
     $primary =~ s/^\s+|\s+$//g;
+    $primary =~ s/[-–—]*//;
     my $supporting_para = $helpers->find_next_p_after_element($targetH2);
     if ($supporting_para) {
       my @links = $supporting_para->look_down('_tag' => 'a');
