@@ -287,7 +287,7 @@ qr/elementor-element-(?:\w){1,9}.elementor-widget.elementor-widget-theme-post-co
         my $targetH3 = $headers[$h3_index];
 
         my $th3 = $targetH3->as_trimmed_text;
-        if ($th3 != /Ascended Special Skill Buffs/) {
+        if ($th3 !~ /Ascended Special Skill Buffs/) {
           $name = $targetH3->as_trimmed_text =~
             s/Evony\s+(.+?)(?:[’']s)?\s+Ascension\s+Buffs/$1/r;
           $self->logger->debug(

@@ -66,7 +66,7 @@ class Game::EvonyTKR::Converter::Specialty :
       my $sn         = $specialty->{name} // 'unknown';
       my $fileName   = sprintf('%s.yaml', $sn);
       my $lcFileName = lc($fileName);
-      if (any { $_ =~ /$sn/ } @{ $self->CommonSpecialtyNames }) {
+      if (any { $_ =~ /$sn/i } @{ $self->CommonSpecialtyNames }) {
         if ( $outputDir->child($fileName)->is_file()
           || $outputDir->child($lcFileName)->is_file()) {
           $self->logger->debug(
