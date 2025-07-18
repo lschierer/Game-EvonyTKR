@@ -1,0 +1,123 @@
+---
+levels:
+- buffs:
+  - attribute: Attack
+    conditions: []
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Defense
+    conditions: []
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: HP
+    conditions: []
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 0
+      unit: percentage
+  level: Green
+  text: ''
+- buffs:
+  - attribute: Attack
+    conditions: []
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Defense
+    conditions: []
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: HP
+    conditions: []
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 0
+      unit: percentage
+  level: Blue
+  text: ''
+- buffs:
+  - attribute: Attack
+    conditions: []
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Defense
+    conditions: []
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: HP
+    conditions: []
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 0
+      unit: percentage
+  level: Purple
+  text: ''
+- buffs:
+  - attribute: Attack
+    conditions: []
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Defense
+    conditions: []
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: HP
+    conditions: []
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 0
+      unit: percentage
+  level: Orange
+  text: ''
+- buffs:
+  - attribute: Attack
+    conditions: []
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 40
+      unit: percentage
+  - attribute: Defense
+    conditions: []
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 30
+      unit: percentage
+  - attribute: HP
+    conditions: []
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 30
+      unit: percentage
+  level: Gold
+  text: Ranged Troop Attack +40%, Ranged Troop Defense +30%, Ranged Troop HP +30%
+name: Austro-Hungarian Compromise
