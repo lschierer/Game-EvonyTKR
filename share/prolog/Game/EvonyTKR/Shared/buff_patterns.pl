@@ -1459,6 +1459,22 @@ buff_pattern(Buffs) -->
     format("DEBUG: '1TAV' matched: '~w'~n", [Buffs])
   }.
 
+% Pattern 1ACV
+% Only attribute and value present
+buff_pattern(Buffs) -->
+  {format("DEBUG: Trying '1ACV'~n")},
+  attribute(Attr1), condition(Cond1),
+  optional_verb,
+  optional_value_adj, [ValueAtom1],
+  {extract_value(ValueAtom1,Value1)},
+  {
+    Buffs = [
+      buff(Attr1, '', Value1,[Cond1])
+    ],
+    format("DEBUG: '1ACV' matched: '~w'~n", [Buffs])
+  }.
+
+
 % Pattern 1AV
 % Only attribute and value present
 buff_pattern(Buffs) -->
