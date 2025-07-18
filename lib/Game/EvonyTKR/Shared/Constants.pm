@@ -129,6 +129,7 @@ class Game::EvonyTKR::Shared::Constants : isa(Game::EvonyTKR::Model::Logger) {
       'march size'                     => 'March Size',
       'the march size'                 => 'March Size',
       'march speed'                    => 'Marching Speed',
+      'march time reduction'           => 'Marching Speed',
       'wounded into death rate'        => 'Wounded to Death',
       'wounded into death'             => 'Wounded to Death',
       'mayor training speed'           => 'SubCity Training Speed',
@@ -449,16 +450,16 @@ class Game::EvonyTKR::Shared::Constants : isa(Game::EvonyTKR::Model::Logger) {
 
   ADJUST {
     Readonly::Scalar my $temp => {
-      'In-Rally'                    => "When Rallying",
-      'in rally'                    => 'When Rallying',
-      'Reduces Monster'             => "Monsters",          # debuff version
-      'brings any dragon'           => 'brings a dragon',
-      'brings dragon'               => 'brings a dragon',
-      'brings any spiritual beast'  => 'brings a spiritual beast',
-      'brings spiritual beast'      => 'brings a spiritual beast',
-      'to attack Monsters'          => 'Against Monsters',         # buff version
-      'to attack'                   => 'Attacking',
-      'to reinforce'                => 'Reinforcing',
+      'In-Rally'                   => "When Rallying",
+      'in rally'                   => 'When Rallying',
+      'Reduces Monster'            => "Monsters",          # debuff version
+      'brings any dragon'          => 'brings a dragon',
+      'brings dragon'              => 'brings a dragon',
+      'brings any spiritual beast' => 'brings a spiritual beast',
+      'brings spiritual beast'     => 'brings a spiritual beast',
+      'to attack Monsters'         => 'Against Monsters',         # buff version
+      'to attack'                  => 'Attacking',
+      'to reinforce'               => 'Reinforcing',
       'the Mayor'                     => "When City Mayor for this SubCity",
       'in this subordinate city'      => "When City Mayor for this SubCity",
       'in subordinate city'           => "When City Mayor for this SubCity",

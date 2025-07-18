@@ -15,6 +15,10 @@ class Game::EvonyTKR::Converter::General :
   use List::AllUtils qw( first all any none );
   use namespace::autoclean;
 
+  field $tree      : param;
+  field $outputDir : param;
+  field $debug     : param //= 0;
+
   field $name = '';
 
   field $basic = Game::EvonyTKR::Model::BasicAttributes->new();
@@ -27,74 +31,25 @@ class Game::EvonyTKR::Converter::General :
 
   field @types;
 
+  # internal control fields
+  field $helpers = Game::EvonyTKR::Converter::Helpers->new(debug => $debug);
+
   method getPrimaryFields {
-    say "Enter the General's Name:";
-    my $n = <STDIN>;
-    chomp $n;
-    # todo: make sure this is a UTF8 string;
-    $name = $n;
-    my $v;
-    foreach my $attribute ('Leadership', 'Attack', 'Defense', 'Politics') {
-      say "$attribute:";
-      $v = <STDIN>;
-      chomp $v;
-      my $b = $v;
-      say "$attribute increment:";
-      $v = <STDIN>;
-      chomp $v;
-      my $i  = $v;
-      my $ba = Game::EvonyTKR::Model::BasicAttribute->new(
-        base           => $b,
-        increment      => $i,
-        attribute_name => lc($attribute),
-      );
-      $basic->setAttribute(lc($attribute), $ba);
+    my $statsTable = $tree->look_down(
+      '_tag'  => 'table',
+      'class' => qr/stats-table/,
+    );
+    if ($statsTable) {
+      $self->getPrimaryFields_Template2();
     }
-    say "Enter Book Name:";
-    $v = <STDIN>;
-    chomp $v;
-    # todo: make sure this is a UTF8 string;
-    $book = $v;
-    my $i = 0;
-    while ($i < 4) {
-      $i++;
-      say "Enter Specialty Name:";
-      $v = <STDIN>;
-      chomp $v;
-      # todo: make sure this is a UTF8 string;
-      push(@$specialties, $v);
-    }
-    say "Enter ascending level from one of "
-      . join(', ', $self->AscendingAttributeLevelValues());
-    $v = <STDIN>;
-    chomp $v;
-    if (any { $_ eq $v } $self->AscendingAttributeLevelValues()) {
-      $stars     = $v;
-      $ascending = 1;
-    }
-    say "Enter General's type as one or more of "
-      . join(', ', $self->GeneralKeys->@*)
-      . " (one per line).";
-    say "Press Ctrl+D when finished, or type 'END' on a new line:";
-    while (my $t = <STDIN>) {
-      chomp $t;
-      if ($t ne 'END') {
-        if (any { $t eq $_ } $self->GeneralKeys->@*) {
-          say "adding type $t to $name";
-          push @types, $t;
-        }
-        else {
-          say "type $t is invalid, must be one of "
-            . join(', ', $self->GeneralKeys->@*);
-        }
-      }
-      else {
-        last;
-      }
+    else {
+      $self->getPrimaryFields_Template1();
     }
   }
 
   method printYAML {
+    say
+"This makes a ton of assumptions because I cannot reliably find all the info needed on the source page.";
     my $data = {
       name             => $name,
       basic_attributes => {
@@ -115,11 +70,11 @@ class Game::EvonyTKR::Converter::General :
           increment => $basic->politics->increment,
         },
       },
-      book        => $book,
-      specialties => $specialties,
-      ascending   => $ascending,
-      stars       => $stars,
-      type        => \@types,
+      book        => '',
+      specialties => '',
+      ascending   => 'true',
+      stars       => 'red5',
+      type        => '',
     };
     $self->logger->debug(sprintf('general is %s', Data::Printer::np($data)));
     say YAML::PP->new(
@@ -130,11 +85,87 @@ class Game::EvonyTKR::Converter::General :
   }
 
   method execute {
-
+    say "=== Basic Stats ===";
+    $self->logger->info("=== Basic Stats ===");
     $self->getPrimaryFields();
     $self->printYAML();
   }
 
+  method getPrimaryFields_Template1 {
+    my $container = $tree->look_down(
+      '_tag'  => 'div',
+      'class' =>
+qr/elementor-element-(?:\w){1,9}.elementor-widget.elementor-widget-theme-post-content/
+    );
+
+    unless ($container) {
+      warn "Could not find theme-post-content div container";
+      return [];
+    }
+    if ($debug) {
+      $self->logger->debug("Found container: " . $container->starttag());
+    }
+
+    # Get all h2 and h3 elements in reading order
+    my @headers = $container->look_down('_tag' => qr/^h[23]$/);
+
+    # Find the First h2 (start of the pertinent info)
+    my $target   = 1;
+    my $h2_count = 0;
+    my $start_index;
+
+    for my $i (0 .. $#headers) {
+      if ($headers[$i]->tag eq 'h2') {
+        $h2_count++;
+        if ($h2_count == $target) {
+          $start_index = $i;
+          last;
+        }
+      }
+    }
+
+    unless (defined $start_index) {
+      warn "Could not find required h2 tag";
+      return [];
+    }
+
+    my $targetH2 = $headers[$start_index];
+    unless ($targetH2) {
+      $self->logger->error("Cannot find targetH2");
+    }
+
+    $name = $targetH2->as_trimmed_text =~ s/(.+?)\s*[-–—]\s*Stats:/$1/r;
+    $self->logger->debug("name is $name");
+
+    my $statsH3 = $headers[$start_index + 1];
+    # the attributes are in the next 4 paragraph elements.
+    my @keys = qw(leadership attack defense politics);
+    my @paras = $helpers->find_all_p_after_element($statsH3);
+
+    if (@paras < @keys) {
+        $self->logger->error("Expected 4 stats <p> tags after H3, found " . scalar @paras);
+    } else {
+        for my $i (0..$#keys) {
+            my $key = $keys[$i];
+            my $text = $paras[$i]->as_trimmed_text;
+            my ($value) = $text =~ /\Q$key\E\s*:\s*([0-9.]+)/i;
+            if (defined $value) {
+                $self->logger->debug("setting $key to $value");
+                my $ba = Game::EvonyTKR::Model::BasicAttribute->new(
+                  base            => $value,
+                  increment       => 0,
+                  attribute_name  => $key,
+                );
+                $basic->setAttribute($key, $ba);
+            } else {
+                $self->logger->warn("Could not extract $key value from '$text'");
+            }
+        }
+    }
+
+  }
+
 }
+
 1;
 __END__

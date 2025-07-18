@@ -142,6 +142,12 @@ package Game::EvonyTKR::Converter {
       debug     => $debug,
     );
     $handler->execute();
+    $handler = Game::EvonyTKR::Converter::General->new(
+      tree      => $decoder->decode($serialized),
+      outputDir => $dd->child('/collections/data/generals/'),
+      debug     => $debug,
+    );
+    $handler->execute();
   }
 }
 1;

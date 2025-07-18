@@ -21,10 +21,10 @@ class Game::EvonyTKR::Converter::AscendingAttributes :
   # PODNAME: Game::EvonyTKR::Converter::AscendingAttributes
 
   # input fields
-  field $tree : param : reader;
+  field $tree      : param : reader;
   field $outputDir : param;
-  field $debug : param //= 0;
-  field $red : param   //= 1;
+  field $debug     : param //= 0;
+  field $red       : param //= 1;
 
   ADJUST {
     $self->logger->debug(sprintf(
@@ -111,8 +111,11 @@ class Game::EvonyTKR::Converter::AscendingAttributes :
         length($tree->as_XML()))
     );
     $self->getMainText();
-    $self->parseText();
-    $self->printYAML();
+    if (length($name)) {
+      $self->parseText();
+      $self->printYAML();
+    }
+
   }
 
   method printYAML () {
@@ -175,11 +178,11 @@ class Game::EvonyTKR::Converter::AscendingAttributes :
       'class' => qr/stats-table/,
     );
     if ($statsTable) {
-      $self->logger->debug("Calling Template2");
+      $self->logger->debug("Calling Template2 for ascending attributes");
       $self->GetMainText_Template2();
     }
     else {
-      $self->logger->trace("Calling Template1");
+      $self->logger->trace("Calling Template1 for ascending attributes");
       $self->GetMainText_Template1();
     }
 
@@ -283,11 +286,28 @@ qr/elementor-element-(?:\w){1,9}.elementor-widget.elementor-widget-theme-post-co
 
         my $targetH3 = $headers[$h3_index];
 
-        $name = $targetH3->as_trimmed_text =~
-          s/Evony\s+(.+?)(?:[’']s)?\s+Ascension\s+Buffs/$1/r;
-        $self->logger->debug(
-          sprintf('targetH3 is "%s"', $targetH3->as_trimmed_text));
-        $self->logger->debug("name is $name");
+        my $th3 = $targetH3->as_trimmed_text;
+        if ($th3 != /Ascended Special Skill Buffs/) {
+          $name = $targetH3->as_trimmed_text =~
+            s/Evony\s+(.+?)(?:[’']s)?\s+Ascension\s+Buffs/$1/r;
+          $self->logger->debug(
+            sprintf('targetH3 is "%s"', $targetH3->as_trimmed_text));
+          $self->logger->debug("name is $name");
+        }
+        else {
+          my $h1 = $tree->look_down(
+            '_tag'  => qr/^h1$/,
+            'class' => qr/elementor-heading-title.elementor-size-default/,
+          );
+          if ($h1) {
+            $name = $h1->as_trimmed_text =~ s/Evony\s+General:\s+(.+)/$1/r;
+          }
+          else {
+            $self->logger->error("Cannot determine name for this general.");
+            return;
+          }
+        }
+
         $ascendingUL = $helpers->find_next_ul_after_element($targetH3);
         $self->Extract_Lines_from_UL($ascendingUL);
         last;

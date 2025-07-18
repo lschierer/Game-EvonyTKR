@@ -31,7 +31,7 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Shared::Constants) {
 
   field $targetedType : reader : param //= '';
 
-  field $passive :reader  :writer :param //= 0;
+  field $passive : reader : writer : param //= 0;
 
   method conditions() {
     my @result;

@@ -10,12 +10,12 @@ class Game::EvonyTKR::Model::General::ConflictGroup :
     'bool'     => sub { $_[0]->_isTrue() },
     'fallback' => 0;
 
-  field $id : param : reader;
-  field $name : param : reader;
+  field $id               : param : reader;
+  field $name             : param : reader;
   field $primary_generals : param = [];
-  field $linked_groups : param    = [];
-  field $expanded_conflicts       = {};
-  field $other_conflicts          = {};
+  field $linked_groups    : param = [];
+  field $expanded_conflicts = {};
+  field $other_conflicts    = {};
 
   method primary_generals() {
     return [@$primary_generals];    # Return a copy to prevent modification

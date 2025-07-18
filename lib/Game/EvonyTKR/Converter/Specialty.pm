@@ -27,9 +27,9 @@ class Game::EvonyTKR::Converter::Specialty :
 
   # input fields
   # This will eventually be something online that I have to fetch.
-  field $tree : param;
+  field $tree      : param;
   field $outputDir : param;
-  field $debug : param //= 0;
+  field $debug     : param //= 0;
 
   # internal control fields
   field $parser  = Game::EvonyTKR::Shared::Parser->new();
@@ -54,8 +54,9 @@ class Game::EvonyTKR::Converter::Specialty :
 
   method execute {
     say "=== Specialty Text to YAML Converter ===";
+    $self->logger->info("=== Specialty Text to YAML Converter ===");
     $self->logger->debug(
-      sprintf('specialty sees tree -- %s --', $tree->as_XML()));
+      sprintf('specialty sees tree sized -- %s --', length($tree->as_XML())));
     $self->getMainText();
     $self->parseText();
   }
@@ -74,7 +75,7 @@ class Game::EvonyTKR::Converter::Specialty :
         }
       }
       else {
-        $self->logger->debug("");
+        $self->logger->debug("$sn is not a common specialty");
       }
       # this is based off what we do in the test harness
       $self->logger->debug(
@@ -91,8 +92,9 @@ class Game::EvonyTKR::Converter::Specialty :
           ));
           my $nb;
           @{$nb} = $parser->normalize_buff($frag);
-          $self->logger->debug('after normalize_buff, size of frag is %s',
-            scalar(@{$nb}));
+          $self->logger->debug(sprintf(
+            'after normalize_buff, size of frag is %s', scalar(@{$nb})
+          ));
           $self->logger->debug(sprintf(
             'this fragment was normalized to -- %s -- ',
             Data::Printer::np($nb)));

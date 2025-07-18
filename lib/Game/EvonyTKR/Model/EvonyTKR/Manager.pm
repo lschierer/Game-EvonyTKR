@@ -14,13 +14,13 @@ use namespace::clean;
 class Game::EvonyTKR::Model::EvonyTKR::Manager :
   isa(Game::EvonyTKR::Shared::Constants) {
 
-  field $SourceDir : reader : param;
-  field $generalManager : reader;
+  field $SourceDir                   : reader : param;
+  field $generalManager              : reader;
   field $generalConflictGroupManager : reader;
-  field $bookManager : reader;
-  field $specialtyManager : reader;
-  field $ascendingAttributesManager : reader;
-  field $covenantManager : reader;
+  field $bookManager                 : reader;
+  field $specialtyManager            : reader;
+  field $ascendingAttributesManager  : reader;
+  field $covenantManager             : reader;
 
   # computed types
   field $generalPairManager : reader;

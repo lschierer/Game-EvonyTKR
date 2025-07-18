@@ -50,6 +50,26 @@ class Game::EvonyTKR::Converter::Helpers :
 
     return undef;
   }
+  method find_all_p_after_element ($element) {
+      # Find the container (as you already do)
+      my $container = $element;
+      while ($container && !$container->look_down('_tag' => 'p')) {
+          $container = $container->parent;
+          last if !$container || $container->tag eq 'body';
+      }
+
+      return () unless $container;
+
+      my $start_pos = $self->get_element_position($element);
+      my @all_ps = $container->look_down('_tag' => 'p');
+
+      my @after = grep {
+          my $p_pos = $self->get_element_position($_);
+          $p_pos gt $start_pos;
+      } @all_ps;
+
+      return @after;
+  }
 
   method find_next_p_after_element ($element) {
     # Get the container (go up until we find one with p elements)
