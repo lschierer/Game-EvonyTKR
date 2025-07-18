@@ -1,23 +1,31 @@
 ---
+buffs:
+- attribute: Attack
+  conditions:
+  - leading the army
+  - Attacking
+  passive: 0
+  targetedType: Ranged Troops
+  value:
+    number: 35
+    unit: percentage
+- attribute: Defense
+  conditions:
+  - leading the army
+  - Attacking
+  passive: 0
+  targetedType: Ranged Troops
+  value:
+    number: 35
+    unit: percentage
+- attribute: March Size
+  conditions:
+  - leading the army
+  - Attacking
+  passive: 0
+  targetedType: Ranged Troops
+  value:
+    number: 10
+    unit: percentage
 name: Great Captainess
-buff:
-  - attribute: Attack
-    condition:
-      - Attacking
-    targetedType: Ranged Troops
-    value:
-      number: 35
-      unit: percentage
-  - attribute: Defense
-    condition:
-      - Attacking
-    targetedType: Ranged Troops
-    value:
-      number: 35
-      unit: percentage
-  - attribute: March Size
-    condition:
-      - Attacking
-    value:
-      number: 10
-      unit: percentage
+text: Increases ranged troops’ attack and defense by 35% and March Size by 10% when General is leading the army to attack.
