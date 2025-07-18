@@ -20,6 +20,7 @@ ascending:
       number: 20
       unit: percentage
   level: red1
+  text: When General is the Main City Defense General, In-city Mounted Troop Defense +30% and HP +20%.
 - buff:
   - attribute: Hospital Capacity
     conditions:
@@ -30,6 +31,7 @@ ascending:
       number: 20
       unit: percentage
   level: red2
+  text: When General is the Main City Defense General, Hospital Capacity +20%.
 - buff:
   - attribute: Attack
     conditions:
@@ -68,6 +70,7 @@ ascending:
       number: 20
       unit: percentage
   level: red3
+  text: When General is the Main City Defense General, In-city Siege Machine and Ranged Troop Attack +10% and HP +20%.
 - buff:
   - attribute: Attack
     conditions:
@@ -106,6 +109,7 @@ ascending:
       number: 30
       unit: percentage
   level: red4
+  text: When General is the Main City Defense General, In-city Siege Machine and Ranged Troop Attack +10% and HP +30%.
 - buff:
   - attribute: HP
     conditions:
@@ -144,5 +148,6 @@ ascending:
       number: 20
       unit: percentage
   level: red5
+  text: Increases In-city Mounted Troop HP by 15%, Defense by 25% and In-city Ranged Troop and Siege Machine Attack by 20% when General is the Main City Defense General.
 general: George Dewey
 id: George Dewey

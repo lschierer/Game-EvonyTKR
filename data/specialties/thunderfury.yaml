@@ -1,6 +1,102 @@
 ---
-ascending:
-- buff:
+levels:
+- buffs:
+  - attribute: Attack
+    conditions: []
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: HP
+    conditions: []
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Attack
+    conditions: []
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 0
+      unit: percentage
+  level: Green
+  text: ''
+- buffs:
+  - attribute: Attack
+    conditions: []
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: HP
+    conditions: []
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Attack
+    conditions: []
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 0
+      unit: percentage
+  level: Blue
+  text: ''
+- buffs:
+  - attribute: Attack
+    conditions: []
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: HP
+    conditions: []
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Attack
+    conditions: []
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 0
+      unit: percentage
+  level: Purple
+  text: ''
+- buffs:
+  - attribute: Attack
+    conditions: []
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: HP
+    conditions: []
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Attack
+    conditions: []
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 0
+      unit: percentage
+  level: Orange
+  text: ''
+- buffs:
   - attribute: Attack
     conditions: []
     passive: 0
@@ -15,90 +111,13 @@ ascending:
     value:
       number: 10
       unit: percentage
-  level: red1
-  text: Ground Troop Attack +10% and HP +10%
-- buff:
-  - attribute: Death to Wounded
-    conditions:
-    - Marching
-    passive: 0
-    targetedType: ''
-    value:
-      number: 8
-      unit: percentage
-  level: red2
-  text: Marching Troop Death into Wounded Rate +8%
-- buff:
-  - attribute: Defense
-    conditions: []
-    passive: 0
-    targetedType: Ground Troops
-    value:
-      number: 10
-      unit: percentage
-  - attribute: Defense
-    conditions: []
-    passive: 0
-    targetedType: Mounted Troops
-    value:
-      number: 10
-      unit: percentage
-  - attribute: HP
-    conditions: []
-    passive: 0
-    targetedType: Ground Troops
-    value:
-      number: 10
-      unit: percentage
-  - attribute: HP
-    conditions: []
-    passive: 0
-    targetedType: Mounted Troops
-    value:
-      number: 10
-      unit: percentage
-  level: red3
-  text: Ground Troop and Mounted Troop Defense +10% and HP +10%
-- buff:
   - attribute: Attack
     conditions: []
     passive: 0
-    targetedType: Ground Troops
+    targetedType: Ranged Troops
     value:
-      number: 20
+      number: 25
       unit: percentage
-  - attribute: Defense
-    conditions: []
-    passive: 0
-    targetedType: Ground Troops
-    value:
-      number: 20
-      unit: percentage
-  level: red4
-  text: Ground Troop Attack +20% and Defense +20%
-- buff:
-  - attribute: Attack
-    conditions: []
-    passive: 0
-    targetedType: Ground Troops
-    value:
-      number: 20
-      unit: percentage
-  - attribute: HP
-    conditions: []
-    passive: 0
-    targetedType: Ground Troops
-    value:
-      number: 20
-      unit: percentage
-  - attribute: March Size
-    conditions: []
-    passive: 0
-    targetedType: ''
-    value:
-      number: 5
-      unit: percentage
-  level: red5
-  text: Ground Troop Attack and HP +20%, March Size Capacity +5%
-general: Frigg
-id: Frigg
+  level: Gold
+  text: Ground Troop Attack +10%, Ground Troop HP +10%, Ranged Troop Attack +25%
+name: Thunderfury
