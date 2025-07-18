@@ -125,8 +125,16 @@ class Game::EvonyTKR::Converter::General :
       my $row = $rows[$index];
       my $key = $keys[$index];
       my @cells = $row->look_down('_tag' => 'td');
-      my $value = scalar(@cells) >= 1 ? $cells[1]->as_trimmed_text : 0;
-      my $increment = scalar(@cells) >= 3 ? $cells[3]->as_trimmed_text : 0;
+      my $value;
+      my $increment;
+      if($cells[0]->as_trimmed_text =~ /$key/i) {
+        $value = scalar(@cells) >= 1 ? $cells[1]->as_trimmed_text : 0;
+        $increment = scalar(@cells) >= 3 ? $cells[3]->as_trimmed_text : 0;
+      } else {
+        $value = scalar(@cells) >= 2 ? $cells[2]->as_trimmed_text : 0;
+        $increment = scalar(@cells) >= 4 ? $cells[4]->as_trimmed_text : 0;
+      }
+
       my $ba = Game::EvonyTKR::Model::BasicAttribute->new(
         base            => $value,
         increment       => $increment,

@@ -237,7 +237,9 @@ class Game::EvonyTKR::Converter::Covenant :
     $self->logger->debug("found start_index $start_index");
 
     $primary =
-      $targetH3->as_trimmed_text =~ s/Evony\s+(.+?)(?:[’']s)?\s+Covenant/$1/r;
+      $targetH3->as_trimmed_text =~ s/Evony\s+(.+?)\s+Covenant:?/$1/r;
+      $primary =~ s/[\x{0022}\x{0027}\x{2018}\x{2019}\x{201C}\x{201D}\x{0060}\x{00B4}]s//g;
+      $primary =~ s/Evony\s+(.+?)\s+Covenant:/$1/;
     $self->logger->debug("found primary '$primary'");
     my $supporting_para = $helpers->find_next_p_after_element($targetH3);
     if ($supporting_para) {
@@ -340,7 +342,9 @@ qr/elementor-element-(?:\w){1,9}.elementor-widget.elementor-widget-theme-post-co
     $self->logger->debug("found start_index $start_index");
 
     $primary =
-      $targetH2->as_trimmed_text =~ s/Evony\s+(.+?)(?:[’']s)?\s+Covenant/$1/r;
+      $targetH2->as_trimmed_text =~ s/Evony\s+(.+?)\s+Covenant:?/$1/r;
+      $primary =~ s/[\x{0022}\x{0027}\x{2018}\x{2019}\x{201C}\x{201D}\x{0060}\x{00B4}]s//g;
+      $primary =~ s/Evony\s+(.+?)\s+Covenant:/$1/;
     my $supporting_para = $helpers->find_next_p_after_element($targetH2);
     if ($supporting_para) {
       my @links = $supporting_para->look_down('_tag' => 'a');

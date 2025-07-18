@@ -64,7 +64,7 @@ optional_when_general_is --> [when], [general], [is] ; [].
 optional_when_general --> [when], [general] ; [].
 optional_general_is --> ([general], [is]) ; [].
 optional_when --> [when] ; [].
-optional_verb --> [increases] ; [reduces] ; [grants]; [].
+optional_verb --> [boosts] ; [increases] ; [reduces] ; [grants]; [].
 optional_verb --> [increases].
 optional_verb --> [reduces].
 optional_verb --> [is].

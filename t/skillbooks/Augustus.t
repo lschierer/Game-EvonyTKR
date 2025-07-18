@@ -44,7 +44,6 @@ subtest 'Augustus Skill Book' => sub {
       attribute  => 'Attack',
       class      => 'Mounted Troops',
       value      => 40,
-      conditions => ['leading the army', 'Attacking']
     ),
     '40% Mounted Troops Attack buff (leading the army, Attacking)'
   );

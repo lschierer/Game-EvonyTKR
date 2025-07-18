@@ -303,7 +303,7 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
         $s =~ s/(.*)/[$1]/;
         $s =~ s/\’//g;
       }
-      if ($key =~ /^(?:sub|mayor)/i) {
+      if ($key =~ /^(?:sub|mayor|the gold)/i) {
         sprintf(
           'subcity_attribute(%s) --> %s.',
           join('_',  @term),

@@ -221,6 +221,7 @@ class Game::EvonyTKR::Converter::AscendingAttributes :
     $self->logger->debug(sprintf('h4 is "%s"', $h4->as_trimmed_text));
     $name = $h4->as_trimmed_text =~
       s/Evony\s+(.+?)(?:[’']s)?\s+Ascension\s+Buffs/$1/r;
+    $name =~ s/[\x{0022}\x{0027}\x{2018}\x{2019}\x{201C}\x{201D}\x{0060}\x{00B4}]//g;
     $self->logger->debug("name is $name");
     my $ascendingUL = $helpers->find_next_ul_after_element($h4);
 
@@ -234,10 +235,25 @@ class Game::EvonyTKR::Converter::AscendingAttributes :
   }
 
   method GetMainText_Template1 {
+
+    my $h1 = $tree->look_down(
+      '_tag'  => qr/^h1$/,
+      'class' => qr/elementor-heading-title.elementor-size-default/,
+    );
+    if ($h1) {
+      $name = $h1->as_trimmed_text =~ s/Evony\s+General:\s+(.+)/$1/r;
+      $name =~ s/[\x{0022}\x{0027}\x{2018}\x{2019}\x{201C}\x{201D}\x{0060}\x{00B4}]//g;
+      $name =~ s/Evony\s+(.+?)\s+General\s+Guide/$1/;
+    }
+    else {
+      $self->logger->error("Cannot determine name for this general.");
+      return;
+    }
+
     my $container = $tree->look_down(
       '_tag'  => 'div',
       'class' =>
-qr/elementor-element-(?:\w){1,9}.elementor-widget.elementor-widget-theme-post-content/
+      qr/elementor-element-(?:\w){1,9}.elementor-widget.elementor-widget-theme-post-content/
     );
 
     unless ($container) {
@@ -285,28 +301,6 @@ qr/elementor-element-(?:\w){1,9}.elementor-widget.elementor-widget-theme-post-co
         }
 
         my $targetH3 = $headers[$h3_index];
-
-        my $th3 = $targetH3->as_trimmed_text;
-        if ($th3 !~ /Ascended Special Skill Buffs/) {
-          $name = $targetH3->as_trimmed_text =~
-            s/Evony\s+(.+?)(?:[’']s)?\s+Ascension\s+Buffs/$1/r;
-          $self->logger->debug(
-            sprintf('targetH3 is "%s"', $targetH3->as_trimmed_text));
-          $self->logger->debug("name is $name");
-        }
-        else {
-          my $h1 = $tree->look_down(
-            '_tag'  => qr/^h1$/,
-            'class' => qr/elementor-heading-title.elementor-size-default/,
-          );
-          if ($h1) {
-            $name = $h1->as_trimmed_text =~ s/Evony\s+General:\s+(.+)/$1/r;
-          }
-          else {
-            $self->logger->error("Cannot determine name for this general.");
-            return;
-          }
-        }
 
         $ascendingUL = $helpers->find_next_ul_after_element($targetH3);
         $self->Extract_Lines_from_UL($ascendingUL);

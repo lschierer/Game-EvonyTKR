@@ -62,7 +62,7 @@ class Game::EvonyTKR::Converter::SkillBook :
     my $container = $tree->look_down(
       '_tag'  => 'div',
       'class' =>
-qr/elementor-element-(?:\w){1,9}.elementor-widget.elementor-widget-theme-post-content/
+        qr/elementor-element-(?:\w){1,9}.elementor-widget.elementor-widget-theme-post-content/
     );
 
     unless ($container) {
@@ -103,6 +103,7 @@ qr/elementor-element-(?:\w){1,9}.elementor-widget.elementor-widget-theme-post-co
         my $skillbookH4 = $headers[$h4_index];
 
         my $skillBookName = $skillbookH4->as_trimmed_text;
+        $skillBookName =~ s/(.+?)\s*[-–—]\s*Ascended/$1/;
         my $para          = $helpers->find_next_p_after_element($skillbookH4);
 
         if ($para) {
@@ -129,7 +130,7 @@ qr/elementor-element-(?:\w){1,9}.elementor-widget.elementor-widget-theme-post-co
     my $container = $tree->look_down(
       '_tag'  => 'div',
       'class' =>
-qr/elementor-element-(?:\w){1,9}.elementor-widget.elementor-widget-theme-post-content/
+        qr/elementor-element-(?:\w){1,9}.elementor-widget.elementor-widget-theme-post-content/
     );
 
     unless ($container) {
@@ -164,8 +165,8 @@ qr/elementor-element-(?:\w){1,9}.elementor-widget.elementor-widget-theme-post-co
     }
 
     #extract 1 H3 tag after the second H2 tag
-    my $h3_index = $start_index + 1;
-    if ($h3_index <= $#headers) {
+    my $h3_index = $start_index;
+    while ($h3_index <= $#headers) {
       if ($headers[$h3_index]->tag eq 'h3') {
         my $skillbookH3 = $headers[$h3_index];
 
@@ -179,9 +180,12 @@ qr/elementor-element-(?:\w){1,9}.elementor-widget.elementor-widget-theme-post-co
         else {
           $self->logger->error("Could not find the required paragraph");
         }
+        last;
+      } else{
+        $h3_index++;
       }
     }
-    else {
+    unless(length($name)) {
       $self->logger->error("Cannot find the required H3 tag!!");
     }
   }
