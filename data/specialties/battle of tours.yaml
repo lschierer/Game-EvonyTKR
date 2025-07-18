@@ -1,0 +1,58 @@
+---
+levels:
+- buffs:
+  - attribute: Death to Survival
+    conditions:
+    - When City Mayor for this SubCity
+    passive: 0
+    targetedType: ''
+    value:
+      number: 0
+      unit: percentage
+  level: Green
+  text: ''
+- buffs:
+  - attribute: Death to Survival
+    conditions:
+    - When City Mayor for this SubCity
+    passive: 0
+    targetedType: ''
+    value:
+      number: 0
+      unit: percentage
+  level: Blue
+  text: ''
+- buffs:
+  - attribute: Death to Survival
+    conditions:
+    - When City Mayor for this SubCity
+    passive: 0
+    targetedType: ''
+    value:
+      number: 0
+      unit: percentage
+  level: Purple
+  text: ''
+- buffs:
+  - attribute: Death to Survival
+    conditions:
+    - When City Mayor for this SubCity
+    passive: 0
+    targetedType: ''
+    value:
+      number: 0
+      unit: percentage
+  level: Orange
+  text: ''
+- buffs:
+  - attribute: Death to Survival
+    conditions:
+    - When City Mayor for this SubCity
+    passive: 0
+    targetedType: ''
+    value:
+      number: 10
+      unit: percentage
+  level: Gold
+  text: Increases Construction Speed in Subordinate City +40%, Death into Survival Rate in this Subordinate City +10%
+name: Battle of Tours 

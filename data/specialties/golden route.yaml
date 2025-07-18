@@ -1,118 +1,123 @@
 ---
-ascending:
-- buff:
+levels:
+- buffs:
   - attribute: Attack
     conditions: []
     passive: 0
     targetedType: Siege Machines
     value:
-      number: 10
-      unit: percentage
-  - attribute: HP
-    conditions: []
-    passive: 0
-    targetedType: Siege Machines
-    value:
-      number: 10
-      unit: percentage
-  level: red1
-  text: Siege Machine Attack +10% and HP +10%
-- buff:
-  - attribute: Death to Wounded
-    conditions:
-    - Attacking
-    passive: 0
-    targetedType: ''
-    value:
-      number: 8
-      unit: percentage
-  level: red2
-  text: Attacking Troop Death into Wounded Rate +8%
-- buff:
-  - attribute: Attack
-    conditions: []
-    passive: 0
-    targetedType: Ranged Troops
-    value:
-      number: 15
-      unit: percentage
-  - attribute: Attack
-    conditions: []
-    passive: 0
-    targetedType: Siege Machines
-    value:
-      number: 15
-      unit: percentage
-  - attribute: Defense
-    conditions: []
-    passive: 0
-    targetedType: Ranged Troops
-    value:
-      number: 15
+      number: 0
       unit: percentage
   - attribute: Defense
     conditions: []
     passive: 0
     targetedType: Siege Machines
     value:
-      number: 15
-      unit: percentage
-  level: red3
-  text: Ranged Troop and Siege Machine Attack +15% and Defense +15%
-- buff:
-  - attribute: Attack
-    conditions: []
-    passive: 0
-    targetedType: Siege Machines
-    value:
-      number: 20
+      number: 0
       unit: percentage
   - attribute: HP
     conditions: []
     passive: 0
     targetedType: Siege Machines
     value:
-      number: 20
+      number: 0
       unit: percentage
-  level: red4
-  text: Siege Machine Attack +20% and HP +20%
-- buff:
+  level: Green
+  text: ''
+- buffs:
   - attribute: Attack
     conditions: []
     passive: 0
     targetedType: Siege Machines
     value:
-      number: 25
-      unit: percentage
-  - attribute: Defense
-    conditions: []
-    passive: 0
-    targetedType: Ranged Troops
-    value:
-      number: 25
-      unit: percentage
-  - attribute: HP
-    conditions: []
-    passive: 0
-    targetedType: Ranged Troops
-    value:
-      number: 25
+      number: 0
       unit: percentage
   - attribute: Defense
     conditions: []
     passive: 0
     targetedType: Siege Machines
     value:
-      number: 25
+      number: 0
       unit: percentage
   - attribute: HP
     conditions: []
     passive: 0
     targetedType: Siege Machines
     value:
-      number: 25
+      number: 0
       unit: percentage
-  level: red5
-  text: Siege Machine Attack +25%, Ranged Troop and Siege Machine Defense and HP +25%
-general: Champlain
-id: Champlain
+  level: Blue
+  text: ''
+- buffs:
+  - attribute: Attack
+    conditions: []
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Defense
+    conditions: []
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 0
+      unit: percentage
+  - attribute: HP
+    conditions: []
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 0
+      unit: percentage
+  level: Purple
+  text: ''
+- buffs:
+  - attribute: Attack
+    conditions: []
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Defense
+    conditions: []
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 0
+      unit: percentage
+  - attribute: HP
+    conditions: []
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 0
+      unit: percentage
+  level: Orange
+  text: ''
+- buffs:
+  - attribute: Attack
+    conditions: []
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 45
+      unit: percentage
+  - attribute: Defense
+    conditions: []
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 35
+      unit: percentage
+  - attribute: HP
+    conditions: []
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 35
+      unit: percentage
+  level: Gold
+  text: Siege Machine Attack +45%, Siege Machine Defense +35%, Siege Machine HP +35%
+name: Golden Route

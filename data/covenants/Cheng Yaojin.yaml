@@ -1,70 +1,83 @@
-name: Cheng Yaojin
+---
 generals:
-  - Li Shimin
   - Li Jing
-  - Sun Ci
+  - Li Shimin
+  - Sun Ce
 levels:
-  - category: War
-    type: personal
-    buff:
-      - attribute: Defense
+  - buffs:
+      - attribute: Attack
+        conditions: []
+        passive: 0
+        targetedType: Mounted Troops
+        value:
+          number: 5
+          unit: percentage
+      - attribute: HP
+        conditions: []
+        passive: 0
+        targetedType: Mounted Troops
         value:
           number: 10
           unit: percentage
-        class: Mounted Troops
-  - category: Cooperation
-    type: personal
-    buff:
+    category: civilization
+    text: Mounted Troop Attack +5% (Local);;Mounted Troop HP +10% (Local)
+  - buffs:
       - attribute: Wounded to Death
-        condition:
-          - Attacking
+        conditions:
           - Enemy
+          - Attacking
+        passive: 0
+        targetedType: ''
         value:
           number: 10
           unit: percentage
-  - category: Peace
-    type: passive
-    buff:
+    category: cooperation
+    text: Enemy Wounded into Death when attacking +10% (Local)
+  - buffs:
+      - attribute: Defense
+        conditions: []
+        passive: 0
+        targetedType: Mounted Troops
+        value:
+          number: 10
+          unit: percentage
+    category: war
+    text: Mounted Troop Defense +10% (Local)
+  - buffs:
       - attribute: Training Speed
+        conditions: []
+        passive: 1
+        targetedType: Mounted Troops
         value:
           number: 10
           unit: percentage
-        class: Mounted Troops
-  - category: Faith
-    type: personal
-    buff:
+    category: peace
+    text: Mounted Troop Training Speed +10% (Global)
+  - buffs:
       - attribute: March Size
+        conditions: []
+        passive: 0
+        targetedType: ''
         value:
           number: 8
           unit: percentage
-  - category: Faith
-    type: passive
-    buff:
       - attribute: Marching Speed
+        conditions: []
+        passive: 1
+        targetedType: ''
         value:
           number: 10
           unit: percentage
-  - category: Honor
-    type: personal
-    buff:
+    category: faith
+    text: March Size Capacity +8% (Local);;March Speed +10% (Global)
+  - buffs:
       - attribute: Attack
+        conditions: []
+        passive: 0
+        targetedType: Mounted Troops
         value:
           number: 5
           unit: percentage
-        class: Mounted Troops
-  - category: Civilization
-    type: personal
-    buff:
-      - attribute: Attack
-        value:
-          number: 5
-          unit: percentage
-        class: Mounted Troops
-  - category: Civilization
-    type: personal
-    buff:
-      - attribute: HP
-        value:
-          number: 10
-          unit: percentage
-        class: Mounted Troops
+    category: honor
+    text: Mounted Troop Attack +5% (Local)
+name: Cheng Yaojin
