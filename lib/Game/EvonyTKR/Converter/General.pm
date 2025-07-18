@@ -91,6 +91,51 @@ class Game::EvonyTKR::Converter::General :
     $self->printYAML();
   }
 
+  method getPrimaryFields_Template2 {
+
+    my $h1 = $tree->look_down(
+      '_tag'    => qr/^h1$/,
+      'class'   => qr/elementor-heading-title.elementor-size-default/,
+    );
+    if($h1){
+      $name = $h1->as_trimmed_text =~ s/Evony\s+(.*)$/$1/r;
+    }
+
+    my $container = $tree->look_down(
+      '_tag'  => 'div',
+      'class' => qr/\w+-stats-left/
+    );
+
+    unless ($container) {
+      $self->logger->error("Cannot find $container for stats");
+      return;
+    }
+    my $statsTable = $container->look_down('_tag' => 'table');
+    unless ($statsTable) {
+      $self->logger->error("Cannot find $statsTable for stats");
+      return;
+    }
+    my @rows = $statsTable->look_down('_tag', 'tr');
+    my @keys = qw(leadership attack defense politics);
+    if(scalar(@rows) != scalar(@keys)){
+      $self->error("something wrong with this page, too many rows found");
+      return;
+    }
+    foreach my $index (0..$#keys){
+      my $row = $rows[$index];
+      my $key = $keys[$index];
+      my @cells = $row->look_down('_tag' => 'td');
+      my $value = scalar(@cells) >= 1 ? $cells[1]->as_trimmed_text : 0;
+      my $increment = scalar(@cells) >= 3 ? $cells[3]->as_trimmed_text : 0;
+      my $ba = Game::EvonyTKR::Model::BasicAttribute->new(
+        base            => $value,
+        increment       => $increment,
+        attribute_name  => $key,
+      );
+      $basic->setAttribute($key, $ba);
+    }
+  }
+
   method getPrimaryFields_Template1 {
     my $container = $tree->look_down(
       '_tag'  => 'div',
