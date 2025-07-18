@@ -1,22 +1,22 @@
 ---
 buffs:
-  - attribute: Defense
-    conditions:
-      - Enemy
-      - leading the army
-    passive: 0
-    targetedType: ''
-    value:
-      number: 15
-      unit: percentage
-  - attribute: Defense
-    conditions:
-      - Enemy
-      - leading the army
-    passive: 0
-    targetedType: Ground Troops
-    value:
-      number: 15
-      unit: percentage
+- attribute: Defense
+  conditions:
+  - Enemy
+  - leading the army
+  passive: 0
+  targetedType: ''
+  value:
+    number: 15
+    unit: percentage
+- attribute: Defense
+  conditions:
+  - Enemy
+  - leading the army
+  passive: 0
+  targetedType: Ground Troops
+  value:
+    number: 15
+    unit: percentage
 name: Curses
-text: 'Reduces enemy troops’ defense by 15% and enemy ground troops’ defense by another 15% when General is leading the army. '
+text: Reduces enemy troops’ defense by 15% and enemy ground troops’ defense by another 15% when General is leading the army.
