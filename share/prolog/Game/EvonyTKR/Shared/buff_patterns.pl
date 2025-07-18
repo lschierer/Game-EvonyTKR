@@ -160,6 +160,26 @@ buff_pattern(Buffs) -->
     format("DEBUG: '1C2T1AVand1C2T1AV1C' matched: '~w'~n'", [Buffs])
   }.
 
+% Pattern: 1C2T1AVand1CTAV1C
+buff_pattern(Buffs) -->
+  {format("DEBUG: Trying: '1C2T1AVand1CTAV1C'~n")},
+  optional_verb, condition(Cond1),
+  troop(Troop1a), [and], troop(Troop1b),
+  attribute(Attr1), optional_value_adj, [ValueAtom1],
+  [and], condition(Cond2), troop(Troop2),
+  attribute(Attr2), optional_value_adj, [ValueAtom2],
+  optional_when_general_is, condition(CondS1),
+  {extract_value(ValueAtom1, Value1)},
+  {extract_value(ValueAtom2, Value2)},
+  {
+    Buffs = [
+      buff(Attr1, Troop1a,  Value1, [Cond1, CondS1]),
+      buff(Attr1, Troop1b,  Value1, [Cond1, CondS1]),
+      buff(Attr2, Troop2,   Value2, [Cond2, CondS1])
+    ],
+    format("DEBUG: '1C2T1AVand1CTAV1C' matched: '~w'~n'", [Buffs])
+  }.
+
 % Pattern: 1CTAVAVand1C2T1AV1C
 buff_pattern(Buffs) -->
   {format("DEBUG: Trying: '1CTAVAVand1C2T1AV1C'~n")},
