@@ -3,38 +3,34 @@ buffs:
 - attribute: Attack
   conditions:
   - leading the army
-  - Attacking
+  passive: 0
+  targetedType: Siege Machines
+  value:
+    number: 50
+    unit: percentage
+- attribute: HP
+  conditions:
+  - leading the army
+  passive: 0
+  targetedType: Siege Machines
+  value:
+    number: 50
+    unit: percentage
+- attribute: Defense
+  conditions:
+  - leading the army
   passive: 0
   targetedType: Ranged Troops
   value:
     number: 40
     unit: percentage
-- attribute: March Size
-  conditions:
-  - leading the army
-  - Attacking
-  passive: 0
-  targetedType: ''
-  value:
-    number: 10
-    unit: percentage
 - attribute: Defense
   conditions:
   - leading the army
-  - Attacking
-  passive: 0
-  targetedType: Ranged Troops
-  value:
-    number: 10
-    unit: percentage
-- attribute: Defense
-  conditions:
-  - leading the army
-  - Attacking
   passive: 0
   targetedType: Siege Machines
   value:
-    number: 10
+    number: 40
     unit: percentage
-name: Great Northern War
-text: Increases ranged troops’ attack by 40% and increases the March Size and ranged troops and siege machines’ defense by 10% when General is leading the army to attack.
+name: Father of New France
+text: Increases siege machines’ attack and HP by 50% and ranged troops and siege machines’ defense by 40% when General is leading the army.
