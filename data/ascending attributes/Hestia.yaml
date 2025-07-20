@@ -1,110 +1,130 @@
 ---
 ascending:
-  - level: "red1"
-    buff:
-      - attribute: Defense
-        condition:
-          - Marching
-        class: Ground Troops
-        value:
-          number: 10
-          unit: percentage
-      - attribute: Defense
-        condition:
-          - Marching
-        class: Mounted Troops
-        value:
-          number: 10
-          unit: percentage
-      - attribute: HP
-        condition:
-          - Marching
-        class: Ground Troops
-        value:
-          number: 10
-          unit: percentage
-      - attribute: HP
-        condition:
-          - Marching
-        class: Mounted Troops
-        value:
-          number: 10
-          unit: percentage
-  - level: "red2"
-    buff:
-      - attribute: Death to Wounded
-        condition:
-          - Marching
-        value:
-          number: 8
-          unit: percentage
-  - level: "red3"
-    buff:
-      - attribute: Attack
-        condition:
-          - Marching
-        class: Mounted Troops
-        value:
-          number: 20
-          unit: percentage
-      - attribute: Defense
-        condition:
-          - Marching
-        class: Mounted Troops
-        value:
-          number: 20
-          unit: percentage
-  - level: "red4"
-    buff:
-      - attribute: Attack
-        condition:
-          - Marching
-        class: Mounted Troops
-        value:
-          number: 10
-          unit: percentage
-      - attribute: Attack
-        condition:
-          - Marching
-        class: Ground Troops
-        value:
-          number: 10
-          unit: percentage
-      - attribute: Defense
-        condition:
-          - Marching
-        class: Mounted Troops
-        value:
-          number: 10
-          unit: percentage
-      - attribute: Defense
-        condition:
-          - Marching
-        class: Ground Troops
-        value:
-          number: 10
-          unit: percentage
-  - level: "red5"
-    buff:
-      - attribute: Attack
-        condition:
-          - Marching
-        class: Mounted Troops
-        value:
-          number: 20
-          unit: percentage
-      - attribute: Defense
-        condition:
-          - Marching
-        class: Mounted Troops
-        value:
-          number: 20
-          unit: percentage
-      - attribute: March Size
-        condition:
-          - Marching
-        value:
-          number: 10
-          unit: percentage
+- buff:
+  - attribute: Defense
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 10
+      unit: percentage
+  level: red1
+  text: Marching Ground Troop and Mounted Troop Defense +10% and HP +10%
+- buff:
+  - attribute: Death to Wounded
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: ''
+    value:
+      number: 8
+      unit: percentage
+  level: red2
+  text: Marching Troop Death into Wounded Rate +8%
+- buff:
+  - attribute: Attack
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 20
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 20
+      unit: percentage
+  level: red3
+  text: Marching Mounted Troop Attack +20%, and Defense +20%
+- buff:
+  - attribute: Attack
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: Attack
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 10
+      unit: percentage
+  level: red4
+  text: Marching Mounted Troop and Ground Troop Attack +10% and Defense +10%
+- buff:
+  - attribute: Attack
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 20
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 20
+      unit: percentage
+  - attribute: March Size
+    conditions: []
+    passive: 0
+    targetedType: ''
+    value:
+      number: 10
+      unit: percentage
+  level: red5
+  text: Marching Mounted Troop Attack and Defense +20%, March Size Capacity +10%
 general: Hestia
 id: Hestia

@@ -2,31 +2,21 @@
 ascending:
 - buff:
   - attribute: Attack
-    conditions:
-    - leading the army
-    passive: 0
-    targetedType: Ranged Troops
-    value:
-      number: 5
-      unit: percentage
-  - attribute: Defense
-    conditions:
-    - leading the army
+    conditions: []
     passive: 0
     targetedType: Ranged Troops
     value:
       number: 10
       unit: percentage
-  - attribute: HP
-    conditions:
-    - leading the army
+  - attribute: Defense
+    conditions: []
     passive: 0
-    targetedType: Ranged Troops
+    targetedType: Ground Troops
     value:
       number: 10
       unit: percentage
   level: red1
-  text: Increases Ranged Troop Attack by 5%, Defense and HP by 10% when General is leading the army.
+  text: Ranged Troop Attack +10%, Ground Troop Defense +10%.
 - buff:
   - attribute: Death to Wounded
     conditions:
@@ -52,57 +42,44 @@ ascending:
   text: When General is launching Alliance War, Rally Capacity +8%.
 - buff:
   - attribute: Attack
-    conditions:
-    - leading the army
-    passive: 0
-    targetedType: Ranged Troops
-    value:
-      number: 10
-      unit: percentage
-  - attribute: Defense
-    conditions:
-    - leading the army
+    conditions: []
     passive: 0
     targetedType: Ranged Troops
     value:
       number: 10
       unit: percentage
   - attribute: HP
-    conditions:
-    - leading the army
+    conditions: []
     passive: 0
-    targetedType: Ranged Troops
+    targetedType: Ground Troops
     value:
       number: 10
       unit: percentage
   level: red4
-  text: Increases Ranged Troop Attack by 10%, Defense and HP by 10% when General is leading the army.
+  text: Ranged Troop Attack +10%, Ground Troop HP +10%.
 - buff:
   - attribute: Attack
-    conditions:
-    - leading the army
+    conditions: []
     passive: 0
     targetedType: Ranged Troops
     value:
-      number: 15
+      number: 10
       unit: percentage
   - attribute: Defense
-    conditions:
-    - leading the army
+    conditions: []
     passive: 0
-    targetedType: Ranged Troops
+    targetedType: Ground Troops
     value:
       number: 10
       unit: percentage
   - attribute: HP
-    conditions:
-    - leading the army
+    conditions: []
     passive: 0
-    targetedType: Ranged Troops
+    targetedType: Ground Troops
     value:
       number: 10
       unit: percentage
   level: red5
-  text: Increases Ranged Troop Attack by 15%, Defense and HP by 10% when General is leading the army.
-general: Henry V
-id: Henry V
+  text: Ranged Troop Attack +10%, Ground Troop Defense and HP +10%.
+general: Harald III
+id: Harald III

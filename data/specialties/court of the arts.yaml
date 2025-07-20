@@ -1,0 +1,53 @@
+---
+levels:
+- buffs:
+  - attribute: Attack
+    conditions: []
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 0
+      unit: percentage
+  level: Green
+  text: ''
+- buffs:
+  - attribute: Attack
+    conditions: []
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 0
+      unit: percentage
+  level: Blue
+  text: ''
+- buffs:
+  - attribute: Attack
+    conditions: []
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 0
+      unit: percentage
+  level: Purple
+  text: ''
+- buffs:
+  - attribute: Attack
+    conditions: []
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 0
+      unit: percentage
+  level: Orange
+  text: ''
+- buffs:
+  - attribute: Attack
+    conditions: []
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 50
+      unit: percentage
+  level: Gold
+  text: Siege Machine Attack +50%, Ranged Troop and Siege Machine Defense +30%, Ranged Troop and Siege Machine HP +30%
+name: Court of the Arts

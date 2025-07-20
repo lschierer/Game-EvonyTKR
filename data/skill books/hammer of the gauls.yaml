@@ -1,12 +1,19 @@
 ---
 buffs:
 - attribute: Attack
+  conditions: []
+  passive: 0
+  targetedType: Ranged Troops
+  value:
+    number: 30
+    unit: percentage
+- attribute: Defense
   conditions:
   - leading the army
   passive: 0
   targetedType: Ranged Troops
   value:
-    number: 55
+    number: 10
     unit: percentage
 - attribute: HP
   conditions:
@@ -14,15 +21,7 @@ buffs:
   passive: 0
   targetedType: Ranged Troops
   value:
-    number: 55
+    number: 10
     unit: percentage
-- attribute: March Size
-  conditions:
-  - leading the army
-  passive: 0
-  targetedType: ''
-  value:
-    number: 8
-    unit: percentage
-name: Muskets Array
-text: Increases ranged troops’ attack and HP by 55% and march size capacity by 8% when General is leading the army.
+name: Hammer of the Gauls
+text: Increases ranged troops’ attack by 30% and increases ranged troops’ defense and HP by 10% when General is leading the army.
