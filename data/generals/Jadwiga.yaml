@@ -1,0 +1,24 @@
+ascending: 'true'
+basic_attributes:
+  attack:
+    base: 106
+    increment: 0
+  defense:
+    base: 105
+    increment: 0
+  leadership:
+    base: 114
+    increment: 0
+  politics:
+    base: 120
+    increment: 0
+book: Faith of Queen
+name: Jadwiga
+specialties:
+  - Mounted Troop Formation
+  - Defensive
+  - Mounted Troop Ares
+  - Queen of Poland
+stars: red5
+type:
+  - wall

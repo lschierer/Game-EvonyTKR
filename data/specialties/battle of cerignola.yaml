@@ -1,104 +1,123 @@
 ---
-ascending:
-- buff:
+levels:
+- buffs:
   - attribute: Attack
     conditions: []
     passive: 0
     targetedType: Ranged Troops
     value:
-      number: 10
+      number: 0
       unit: percentage
   - attribute: Defense
     conditions: []
     passive: 0
     targetedType: Ranged Troops
     value:
-      number: 10
-      unit: percentage
-  level: red1
-  text: Ranged Troop Attack and Defense +10%
-- buff:
-  - attribute: Death to Wounded
-    conditions:
-    - Attacking
-    passive: 0
-    targetedType: ''
-    value:
-      number: 8
-      unit: percentage
-  level: red2
-  text: Attacking Troop Death into Wounded Rate +8%
-- buff:
-  - attribute: Attack
-    conditions: []
-    passive: 0
-    targetedType: Ranged Troops
-    value:
-      number: 15
-      unit: percentage
-  - attribute: Attack
-    conditions: []
-    passive: 0
-    targetedType: Siege Machines
-    value:
-      number: 15
+      number: 0
       unit: percentage
   - attribute: HP
     conditions: []
     passive: 0
     targetedType: Ranged Troops
     value:
-      number: 15
+      number: 0
       unit: percentage
-  level: red3
-  text: Ranged Troop and Siege Machine Attack +15%, Ranged Troop HP +15%
-- buff:
+  level: Green
+  text: ''
+- buffs:
+  - attribute: Attack
+    conditions: []
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 0
+      unit: percentage
   - attribute: Defense
     conditions: []
     passive: 0
     targetedType: Ranged Troops
     value:
-      number: 15
-      unit: percentage
-  - attribute: Defense
-    conditions: []
-    passive: 0
-    targetedType: Siege Machines
-    value:
-      number: 15
+      number: 0
       unit: percentage
   - attribute: HP
     conditions: []
     passive: 0
     targetedType: Ranged Troops
     value:
-      number: 15
+      number: 0
+      unit: percentage
+  level: Blue
+  text: ''
+- buffs:
+  - attribute: Attack
+    conditions: []
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Defense
+    conditions: []
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 0
       unit: percentage
   - attribute: HP
     conditions: []
     passive: 0
-    targetedType: Siege Machines
+    targetedType: Ranged Troops
     value:
-      number: 15
+      number: 0
       unit: percentage
-  level: red4
-  text: Ranged Troop and Siege Machine Defense and HP +15%
-- buff:
+  level: Purple
+  text: ''
+- buffs:
   - attribute: Attack
+    conditions: []
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Defense
+    conditions: []
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: HP
+    conditions: []
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 0
+      unit: percentage
+  level: Orange
+  text: ''
+- buffs:
+  - attribute: Attack
+    conditions: []
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 50
+      unit: percentage
+  - attribute: Defense
     conditions: []
     passive: 0
     targetedType: Ranged Troops
     value:
       number: 40
       unit: percentage
-  - attribute: Defense
+  - attribute: HP
     conditions: []
     passive: 0
     targetedType: Ranged Troops
     value:
       number: 40
       unit: percentage
-  level: red5
-  text: Ranged Troop Attack and Defense +40%
-general: Gonzalo
-id: Gonzalo
+  level: Gold
+  text: Ranged Troop Attack +50%, Ranged Troop Defense +40%, Ranged Troop HP +40%
+name: Battle of Cerignola
