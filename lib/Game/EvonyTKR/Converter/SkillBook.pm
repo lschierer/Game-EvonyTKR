@@ -103,7 +103,9 @@ class Game::EvonyTKR::Converter::SkillBook :
         my $skillbookH4 = $headers[$h4_index];
 
         my $skillBookName = $skillbookH4->as_trimmed_text;
-        $skillBookName =~ s/(.+?)\s*[-–—]\s*Ascended/$1/;
+        $skillBookName =~ s/[-–—]//;
+        $skillBookName =~ s/Ascended//;
+        $skillBookName =~ s/^\s+|\s+$//g;
         my $para          = $helpers->find_next_p_after_element($skillbookH4);
 
         if ($para) {
@@ -171,6 +173,9 @@ class Game::EvonyTKR::Converter::SkillBook :
         my $skillbookH3 = $headers[$h3_index];
 
         my $skillBookName = $skillbookH3->as_trimmed_text;
+        $skillBookName =~ s/[-–—]//;
+        $skillBookName =~ s/Ascended//;
+        $skillBookName =~ s/^\s+|\s+$//g;
         my $para          = $helpers->find_next_p_after_element($skillbookH3);
 
         if ($para) {
@@ -240,8 +245,11 @@ class Game::EvonyTKR::Converter::SkillBook :
     say "=== Skill Book Text to YAML Converter ===";
     $self->logger->info('=== Skill Book Text to YAML Converter ===');
     $self->getMainText();
-    $self->parseSkillbookText();
-    $self->printYAML();
+    if(length($name)){
+      $self->parseSkillbookText();
+      $self->printYAML();
+    }
+
   }
 
 }

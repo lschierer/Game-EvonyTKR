@@ -262,9 +262,9 @@ class Game::EvonyTKR::Converter::Specialty :
 
     foreach my $div (@specialtyDivs) {
       my $h4 = $div->look_down('_tag' => qr/^h4$/);
-      my $sn = $h4->as_trimmed_text;
-      $sn = s/\s+\(Applied to Subordinate City Mayor\)//;
-      $sn = s/\s+\(When General brings any dragon\)//;
+      my $sn = $h4->as_trimmed_text // '';
+      $sn =~ s/\s+\(Applied to Subordinate City Mayor\)//;
+      $sn =~ s/\s+\(When General brings any dragon\)//;
       $sn =~ s/\s+\(Applied to Main City Defense General\)//;
 
       my $ul = $helpers->find_next_ul_after_element($h4);
