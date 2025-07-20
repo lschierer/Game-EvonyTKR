@@ -1,71 +1,91 @@
+---
 ascending:
-  - level: red1
-    buff:
-      - attribute: Defense
-        condition:
-          - Enemy
-        value:
-          number: -10
-          unit: percentage
-  - level: red2
-    buff:
-      - attribute: Defense
-        condition:
-          - Enemy
-        class: Ranged Troops
-        value:
-          number: -10
-          unit: percentage
-      - attribute: Defense
-        condition:
-          - Enemy
-        class: Siege Machines
-        value:
-          number: -10
-          unit: percentage
-      - attribute: SubCity Training Speed
-        condition:
-          - When City Mayor for this SubCity
-        value:
-          number: 20
-          unit: percentage
-  - level: red3
-    buff:
-      - attribute: Defense
-        condition:
-          - Enemy
-        class: Ground Troops
-        value:
-          number: -10
-          unit: percentage
-      - attribute: Defense
-        condition:
-          - Enemy
-        class: Mounted Troops
-        value:
-          number: -10
-          unit: percentage
-      - attribute: Death to Survival
-        condition:
-          - When City Mayor for this SubCity
-        value:
-          number: 15
-          unit: percentage
-  - level: red4
-    buff:
-      - attribute: HP
-        condition:
-          - Enemy
-        value:
-          number: -10
-          unit: percentage
-  - level: red5
-    buff:
-      - attribute: Attack
-        condition:
-          - Enemy
-        value:
-          number: -10
-          unit: percentage
+- buff:
+  - attribute: Defense
+    conditions:
+    - Enemy
+    passive: 0
+    targetedType: ''
+    value:
+      number: 10
+      unit: percentage
+  level: red1
+  text: Enemy Troop Defense -10%.
+- buff:
+  - attribute: Defense
+    conditions:
+    - Enemy
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - Enemy
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 10
+      unit: percentage
+  - attribute: SubCity Training Speed
+    conditions:
+    - When City Mayor for this SubCity
+    passive: 0
+    targetedType: ''
+    value:
+      number: 20
+      unit: percentage
+  level: red2
+  text: Enemy Ranged Troop and Siege Machine Defense -10%; when General is the Mayor, Training Speed in this Subordinate City +20%.
+- buff:
+  - attribute: Defense
+    conditions:
+    - Enemy
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - Enemy
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: Death to Survival
+    conditions:
+    - When City Mayor for this SubCity
+    passive: 0
+    targetedType: ''
+    value:
+      number: 15
+      unit: percentage
+  level: red3
+  text: Enemy Ground Troop and Mounted Troop Defense -10%; when General is the Mayor, Death into Survival Rate in this Subordinate City +15%.
+- buff:
+  - attribute: HP
+    conditions:
+    - Enemy
+    passive: 0
+    targetedType: ''
+    value:
+      number: 10
+      unit: percentage
+  level: red4
+  text: Enemy Troop HP -10%.
+- buff:
+  - attribute: Attack
+    conditions:
+    - Enemy
+    passive: 0
+    targetedType: ''
+    value:
+      number: 10
+      unit: percentage
+  level: red5
+  text: Enemy Troop Attack -10%.
 general: Harald
 id: Harald

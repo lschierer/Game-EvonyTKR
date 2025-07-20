@@ -16,6 +16,7 @@ ascending:
       number: 10
       unit: percentage
   level: red1
+  text: Siege Machine Defense and HP +10%
 - buff:
   - attribute: Death to Wounded
     conditions:
@@ -26,6 +27,7 @@ ascending:
       number: 8
       unit: percentage
   level: red2
+  text: Attacking Troop Death into Wounded Rate +8%
 - buff:
   - attribute: Attack
     conditions: []
@@ -63,6 +65,7 @@ ascending:
       number: 10
       unit: percentage
   level: red3
+  text: Siege Machine Attack +20%, Ranged Troop and Siege Machine Defense and HP +10%
 - buff:
   - attribute: Attack
     conditions: []
@@ -86,6 +89,7 @@ ascending:
       number: 10
       unit: percentage
   level: red4
+  text: Ranged Troop and Siege Machine Attack +20%, Siege Machine Defense +10%
 - buff:
   - attribute: Attack
     conditions: []
@@ -109,5 +113,6 @@ ascending:
       number: 35
       unit: percentage
   level: red5
+  text: Siege Machine Attack, Defense and HP +35%
 general: Hersilia
 id: Hersilia

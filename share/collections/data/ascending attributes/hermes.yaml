@@ -23,6 +23,7 @@ ascending:
       number: 10
       unit: percentage
   level: red1
+  text: Mounted Troop Attack +10%, Mounted Troop Defense and HP +10%
 - buff:
   - attribute: Death to Wounded
     conditions:
@@ -33,6 +34,7 @@ ascending:
       number: 8
       unit: percentage
   level: red2
+  text: Attacking Troop Death into Wounded Rate +8%
 - buff:
   - attribute: Attack
     conditions: []
@@ -77,6 +79,7 @@ ascending:
       number: 15
       unit: percentage
   level: red3
+  text: Mounted Troop and Ground Troop Attack +20%, Defense and HP +15%
 - buff:
   - attribute: Defense
     conditions: []
@@ -93,6 +96,7 @@ ascending:
       number: 20
       unit: percentage
   level: red4
+  text: Mounted Troop Defense +20% and HP +20%
 - buff:
   - attribute: Attack
     conditions: []
@@ -130,5 +134,6 @@ ascending:
       number: 25
       unit: percentage
   level: red5
+  text: Mounted Troop Attack +25%, Ground Troop and Mounted Troop Defense and HP +25%
 general: Hermes
 id: Hermes
