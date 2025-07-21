@@ -72,7 +72,13 @@ class Game::EvonyTKR::Model::Specialty::Manager :
         Game::EvonyTKR::Model::Specialty->new(name => $name,);
       foreach my $ol (@{ $object->{levels} }) {
         my $level = $ol->{level};
-        foreach my $ob (@{ $ol->{buffs} }) {
+        my @buffs;
+        if(exists $ol->{buff}){
+          @buffs = @{$ol->{buff}};
+        }elsif(exists $ol->{buffs}){
+          @buffs = @{$ol->{buffs}};
+        }
+        foreach my $ob (@{ $ol->{buff} }) {
           my $v = Game::EvonyTKR::Model::Buff::Value->new(
             number => abs($ob->{value}->{number}),
             unit   => $ob->{value}->{unit},
@@ -89,6 +95,10 @@ class Game::EvonyTKR::Model::Specialty::Manager :
           }
 
           if (exists $ob->{conditions}) {
+            foreach my $c (@{ $ob->{conditions} }) {
+              $b->set_condition($c);
+            }
+          }elsif(exists $ob->{conditions}){
             foreach my $c (@{ $ob->{conditions} }) {
               $b->set_condition($c);
             }
