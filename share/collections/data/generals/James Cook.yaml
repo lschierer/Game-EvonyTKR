@@ -13,7 +13,7 @@ basic_attributes:
     base: 115
     increment: 8.54
 book: Judgment Knight
-name: James Cook General
+name: James Cook
 specialties:
   - Ranged Troop Formation
   - Bash
