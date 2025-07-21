@@ -1,0 +1,19 @@
+<link rel="stylesheet" href="/css/collectionIndex.css" />
+
+<div class="collection-list">
+  <ul class="collection-grid">
+    <% if ($items && ref $items eq 'ARRAY') { %>
+      <% foreach my $item ( $items->@* ) { %>
+        <% if (not defined $item or not defined $item->primary) { %>
+          <!-- <%= Data::Printer::np($item) %> -->
+          next;
+        <% } %>
+        <li class="collection-item">
+          <a href="/Reference/<%= ucfirst($collection_name) %>/<%= $item->primary->name %>/">
+            <%= $item->primary->name %>
+          </a>
+        </li>
+      <% } %>
+    <% } %>
+  </ul>
+</div>

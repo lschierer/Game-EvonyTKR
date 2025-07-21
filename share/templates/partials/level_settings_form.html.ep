@@ -10,13 +10,14 @@
   my $secondarySpecialties = stash('secondarySpecialties') // [ qw( gold gold gold gold ) ];
 
   # Get enum values
-  my $covenantLevelValues = get_root_manager->covenantLevels // [];
-  my $ascendingLevelValues = ascending_level_names('', 0) // [];
+  my $covenantCategoryValues = get_root_manager->CovenantCategoryValues // [];
+  my $ascendingLevelValues = ascending_level_names() // []; # Get values
   my $specialtyLevelValues = specialty_level_names() // [];
 %>
+
 <!-- $ascendingLevel is <%= $ascendingLevel %> -->
 <!-- $primarySpecialties is <%= Data::Printer::np($primarySpecialties) %> -->
-<!-- covenantLevelValues is <%= Data::Printer::np($covenantLevelValues) %> -->
+<!-- covenantCategoryValues is <%= Data::Printer::np($covenantCategoryValues) %> -->
 <!-- ascendingLevelValues is <%= Data::Printer::np($ascendingLevelValues) %> -->
 <!-- specialtyLevelValues is <%= Data::Printer::np($specialtyLevelValues) %> -->
 <link rel="stylesheet" href="/css/level_settings_form.css" />
@@ -29,7 +30,7 @@
           <label for="primaryCovenantLevel" class="spectrum-FieldLabel spectrum-FieldLabel--sizeM">Covenant Level:</label>
           <div class="spectrum-Form-itemField">
             <select id="primaryCovenantLevel" name="primaryCovenantLevel" class="spectrum-Picker spectrum-Picker--sizeM">
-              <% foreach my $level (@{$covenantLevelValues}) { %>
+              <% foreach my $level (@{$covenantCategoryValues}) { %>
                 <option value="<%= $level %>" <%= $primaryCovenantLevel eq $level ? 'selected' : '' %>><%= ucfirst($level) %></option>
               <% } %>
             </select>
@@ -78,7 +79,7 @@
           <label for="secondaryCovenantLevel" class="spectrum-FieldLabel spectrum-FieldLabel--sizeM">Covenant Level:</label>
           <div class="spectrum-Form-itemField">
             <select id="secondaryCovenantLevel" name="secondaryCovenantLevel" class="spectrum-Picker spectrum-Picker--sizeM">
-              <% foreach my $level (@{$covenantLevelValues}) { %>
+              <% foreach my $level (@{$covenantCategoryValues}) { %>
                 <option value="<%= $level %>" <%= $secondaryCovenantLevel eq $level ? 'selected' : '' %>><%= ucfirst($level) %></option>
               <% } %>
             </select>

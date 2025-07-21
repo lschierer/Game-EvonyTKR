@@ -1,0 +1,52 @@
+<link rel="stylesheet" href="/css/collectionDetails.css" />
+<div class="covenant-details">
+  <% use Scalar::Util; %>
+  <% if( $item ) { %>
+    <% if ( Scalar::Util::reftype($item) eq 'OBJECT' && Scalar::Util::blessed($item) eq 'Game::EvonyTKR::Model::Covenant' ) { %>
+      <h3 class="spectrum-Heading spectrum-Heading--sizeL">Buffs Provided by each Category for <%= $item->primary->name %></h3>
+      <table class="spectrum-Table spectrum-Table--sizeM spectrum-Table--quiet" >
+        <thead class="spectrum-Table-head">
+          <tr>
+            <% foreach my $ln ( covenant_category_names(1)->@* ) { %>
+              <% next if $ln eq 'None'; %>
+              <th class="spectrum-Table-headCell"> <%= $ln %> </th>
+            <% } %>
+          </tr>
+        </thead>
+        <tbody class="spectrum-Table-body">
+          <tr class="spectrum-Table-row">
+            <% foreach my $key (covenant_category_names(0)->@* ) { %>
+              <% next if $key eq 'none'; %>
+              <% my $category = $item->categories->{$key}; %>
+              <td class="spectrum-Table-cell <%= $category->{level} %>">
+                <% foreach my $buff (@{ $category->{buffs} }) { %>
+                  <dl>
+                    <dt>Attribute: </dt><dd><%= $buff->attribute %></dd>
+                    <dt>Targed Type: </dt>
+                    <% if ( length $buff->targetedType  > 0 ) { %>
+                        <dt>Troop Type: </dt>
+                        <dd><%= $buff->targetedType %></dd>
+                    <% } %>
+                    <% if (scalar $buff->conditions() > 0 ) { %>
+                      <% my @conditions = $buff->conditions(); %>
+                        <dt>Conditions:</dt>
+                        <% foreach my $condition (@conditions) { %>
+                          <dd><%= $condition %></dd>
+                        <% } %>
+                    <% } %>
+                    <dt>Value: </dt><dd><%= $buff->value->number %><%= $buff->value->unit eq 'percentage' ? '%' : '' %></dd>
+                  </dl>
+                <% } %>
+              </td>
+            <% } %>
+          </tr>
+
+        </tbody>
+      </table>
+    <% } %>
+  <% } else { %>
+    <span>Covenant Not Available</span>
+    <span><%= ref($item) %></span>
+  <% } %>
+
+</div>
