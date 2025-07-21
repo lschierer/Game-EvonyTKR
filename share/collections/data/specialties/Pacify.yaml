@@ -1,71 +1,71 @@
 name: Pacify
 levels:
   - level: Green
-    buff:
+    buffs:
       - attribute: SubCity Gold Production
-        condition:
+        conditions:
           - When City Mayor for this SubCity
         value:
           number: 4
           unit: percentage
       - attribute: SubCity Construction Speed
-        condition:
+        conditions:
           - When City Mayor for this SubCity
         value:
           number: 4
           unit: percentage
   - level: Blue
-    buff:
+    buffs:
       - attribute: SubCity Gold Production
-        condition:
+        conditions:
           - When City Mayor for this SubCity
         value:
           number: 4
           unit: percentage
       - attribute: SubCity Construction Speed
-        condition:
+        conditions:
           - When City Mayor for this SubCity
         value:
           number: 4
           unit: percentage
   - level: Purple
-    buff:
+    buffs:
       - attribute: SubCity Gold Production
-        condition:
+        conditions:
           - When City Mayor for this SubCity
         value:
           number: 7
           unit: percentage
       - attribute: SubCity Construction Speed
-        condition:
+        conditions:
           - When City Mayor for this SubCity
         value:
           number: 7
           unit: percentage
   - level: Orange
-    buff:
+    buffs:
       - attribute: SubCity Gold Production
-        condition:
+        conditions:
           - When City Mayor for this SubCity
         value:
           number: 7
           unit: percentage
       - attribute: SubCity Construction Speed
-        condition:
+        conditions:
           - When City Mayor for this SubCity
         value:
           number: 7
           unit: percentage
   - level: Gold
-    buff:
+    buffs:
       - attribute: SubCity Gold Production
-        condition:
+        conditions:
           - When City Mayor for this SubCity
         value:
           number: 14
           unit: percentage
       - attribute: SubCity Construction Speed
-        condition:
+        conditions:
           - When City Mayor for this SubCity
         value:
           number: 14

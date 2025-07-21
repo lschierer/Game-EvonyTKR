@@ -1,151 +1,151 @@
 name: Battle of Montgisard
 levels:
   - level: Green
-    buff:
+    buffs:
       - attribute: Attack
-        class: Ranged Troops
-        condition:
+        targetedType: Ranged Troops
+        conditions:
           - Enemy
         value:
           number: 2
           unit: percentage
       - attribute: Attack
-        class: Siege Machines
-        condition:
+        targetedType: Siege Machines
+        conditions:
           - Enemy
         value:
           number: 2
           unit: percentage
       - attribute: HP
-        class: Ranged Troops
-        condition:
+        targetedType: Ranged Troops
+        conditions:
           - Enemy
         value:
           number: 1
           unit: percentage
       - attribute: HP
-        class: Siege Machines
-        condition:
+        targetedType: Siege Machines
+        conditions:
           - Enemy
         value:
           number: 1
           unit: percentage
   - level: Blue
-    buff:
+    buffs:
       - attribute: Attack
-        class: Ranged Troops
-        condition:
+        targetedType: Ranged Troops
+        conditions:
           - Enemy
         value:
           number: 2
           unit: percentage
       - attribute: Attack
-        class: Siege Machines
-        condition:
+        targetedType: Siege Machines
+        conditions:
           - Enemy
         value:
           number: 2
           unit: percentage
       - attribute: HP
-        class: Ranged Troops
-        condition:
+        targetedType: Ranged Troops
+        conditions:
           - Enemy
         value:
           number: 1
           unit: percentage
       - attribute: HP
-        class: Siege Machines
-        condition:
+        targetedType: Siege Machines
+        conditions:
           - Enemy
         value:
           number: 1
           unit: percentage
   - level: Purple
-    buff:
+    buffs:
       - attribute: Attack
-        class: Ranged Troops
-        condition:
+        targetedType: Ranged Troops
+        conditions:
           - Enemy
         value:
           number: 4
           unit: percentage
       - attribute: Attack
-        class: Siege Machines
-        condition:
+        targetedType: Siege Machines
+        conditions:
           - Enemy
         value:
           number: 4
           unit: percentage
       - attribute: HP
-        class: Ranged Troops
-        condition:
+        targetedType: Ranged Troops
+        conditions:
           - Enemy
         value:
           number: 2
           unit: percentage
       - attribute: HP
-        class: Siege Machines
-        condition:
+        targetedType: Siege Machines
+        conditions:
           - Enemy
         value:
           number: 2
           unit: percentage
   - level: Orange
-    buff:
+    buffs:
       - attribute: Attack
-        class: Ranged Troops
-        condition:
+        targetedType: Ranged Troops
+        conditions:
           - Enemy
         value:
           number: 4
           unit: percentage
       - attribute: Attack
-        class: Siege Machines
-        condition:
+        targetedType: Siege Machines
+        conditions:
           - Enemy
         value:
           number: 4
           unit: percentage
       - attribute: HP
-        class: Ranged Troops
-        condition:
+        targetedType: Ranged Troops
+        conditions:
           - Enemy
         value:
           number: 2
           unit: percentage
       - attribute: HP
-        class: Siege Machines
-        condition:
+        targetedType: Siege Machines
+        conditions:
           - Enemy
         value:
           number: 2
           unit: percentage
   - level: Gold
-    buff:
+    buffs:
       - attribute: Attack
-        class: Ranged Troops
-        condition:
+        targetedType: Ranged Troops
+        conditions:
           - Enemy
         value:
           number: 8
           unit: percentage
       - attribute: Attack
-        class: Siege Machines
-        condition:
+        targetedType: Siege Machines
+        conditions:
           - Enemy
         value:
           number: 8
           unit: percentage
       - attribute: HP
-        class: Ranged Troops
-        condition:
+        targetedType: Ranged Troops
+        conditions:
           - Enemy
         value:
           number: 4
           unit: percentage
       - attribute: HP
-        class: Siege Machines
-        condition:
+        targetedType: Siege Machines
+        conditions:
           - Enemy
         value:
           number: 4

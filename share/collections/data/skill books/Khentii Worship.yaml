@@ -1,6 +1,6 @@
 ---
 name: Khentii Worship
-buff:
+buffs:
   - attribute: Marching Speed
     value:
       number: 20

@@ -1,71 +1,71 @@
 name: Eldorado
 levels:
   - level: Green
-    buff:
+    buffs:
       - attribute: HP
-        condition:
+        conditions:
           - Enemy
         value:
           number: 1
           unit: percentage
       - attribute: Defense
-        condition:
+        conditions:
           - Enemy
         value:
           number: 1
           unit: percentage
   - level: Blue
-    buff:
+    buffs:
       - attribute: HP
-        condition:
+        conditions:
           - Enemy
         value:
           number: 1
           unit: percentage
       - attribute: Defense
-        condition:
+        conditions:
           - Enemy
         value:
           number: 1
           unit: percentage
   - level: Purple
-    buff:
+    buffs:
       - attribute: HP
-        condition:
+        conditions:
           - Enemy
         value:
           number: 2
           unit: percentage
       - attribute: Defense
-        condition:
+        conditions:
           - Enemy
         value:
           number: 2
           unit: percentage
   - level: Orange
-    buff:
+    buffs:
       - attribute: HP
-        condition:
+        conditions:
           - Enemy
         value:
           number: 2
           unit: percentage
       - attribute: Defense
-        condition:
+        conditions:
           - Enemy
         value:
           number: 2
           unit: percentage
   - level: Gold
-    buff:
+    buffs:
       - attribute: HP
-        condition:
+        conditions:
           - Enemy
         value:
           number: 4
           unit: percentage
       - attribute: Defense
-        condition:
+        conditions:
           - Enemy
         value:
           number: 4

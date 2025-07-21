@@ -1,6 +1,6 @@
 ---
 name: Crossing the River Rhine
-buff:
+buffs:
   - attribute: Attack
     targetedType: Ground Troops
     value:

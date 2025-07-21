@@ -1,6 +1,6 @@
 ---
 name: Severan Dynasty
-buff:
+buffs:
   - attribute: Attack
     targetedType: Siege Machines
     value:

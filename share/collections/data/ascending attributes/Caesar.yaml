@@ -1,6 +1,6 @@
 ---
 ascending:
-- buff:
+- buffs:
   - attribute: Attack
     conditions:
     - Against Monsters
@@ -19,7 +19,7 @@ ascending:
       unit: percentage
   level: red1
   text: When attacking Monsters, Troops Attack +5% and Defense +10%.
-- buff:
+- buffs:
   - attribute: Defense
     conditions:
     - Monsters
@@ -38,7 +38,7 @@ ascending:
       unit: percentage
   level: red2
   text: When attacking Monsters, Monsters Defense -10%, Troops HP +15%.
-- buff:
+- buffs:
   - attribute: Attack
     conditions:
     - Monsters
@@ -57,7 +57,7 @@ ascending:
       unit: percentage
   level: red3
   text: When attacking Monsters, Monsters Attack -10%, Troops Defense +20%.
-- buff:
+- buffs:
   - attribute: Attack
     conditions:
     - Against Monsters
@@ -76,7 +76,7 @@ ascending:
       unit: percentage
   level: red4
   text: When attacking Monsters, Troops Attack +10% and HP +20%.
-- buff: []
+- buffs: []
   level: red5
   text: When attacking Monsters, Troops Attack +15%, Defense and HP +10%.
 general: Caesar

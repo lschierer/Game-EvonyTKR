@@ -1,6 +1,6 @@
 ---
 ascending:
-- buff:
+- buffs:
   - attribute: Attack
     conditions:
     - leading the army
@@ -30,7 +30,7 @@ ascending:
       unit: percentage
   level: red1
   text: Increases Mounted Troop Attack by 10% and Mounted Troop and Ground Troop Defense by 10% when General is leading the army to attack.
-- buff:
+- buffs:
   - attribute: Wounded to Death
     conditions:
     - Enemy
@@ -42,7 +42,7 @@ ascending:
       unit: percentage
   level: red2
   text: Enemy In-city Troop Wounded into Death rate +10%.
-- buff:
+- buffs:
   - attribute: March Size
     conditions: []
     passive: 0
@@ -52,7 +52,7 @@ ascending:
       unit: percentage
   level: red3
   text: March Size Capacity +14%.
-- buff:
+- buffs:
   - attribute: HP
     conditions:
     - leading the army
@@ -73,7 +73,7 @@ ascending:
       unit: percentage
   level: red4
   text: Increases Mounted Troop and Ground Troop HP by 20% when General is leading the army to attack.
-- buff:
+- buffs:
   - attribute: Attack
     conditions: []
     passive: 0

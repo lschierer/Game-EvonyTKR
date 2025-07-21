@@ -1,6 +1,6 @@
 ---
 ascending:
-- buff:
+- buffs:
   - attribute: Attack
     conditions: []
     passive: 0
@@ -17,7 +17,7 @@ ascending:
       unit: percentage
   level: red1
   text: Ranged Troop Attack +15% and HP +10%
-- buff:
+- buffs:
   - attribute: Death to Wounded
     conditions:
     - Marching
@@ -28,7 +28,7 @@ ascending:
       unit: percentage
   level: red2
   text: Marching Troop Death into Wounded Rate +8%
-- buff:
+- buffs:
   - attribute: Attack
     conditions:
     - Attacking
@@ -46,7 +46,7 @@ ascending:
       unit: percentage
   level: red3
   text: When attacking, Ranged Troop Attack +25%, March Size Capacity +8%
-- buff:
+- buffs:
   - attribute: Defense
     conditions:
     - Marching
@@ -65,7 +65,7 @@ ascending:
       unit: percentage
   level: red4
   text: Marching Ranged Troop Defense +15% and HP +15%
-- buff:
+- buffs:
   - attribute: Attack
     conditions:
     - Marching

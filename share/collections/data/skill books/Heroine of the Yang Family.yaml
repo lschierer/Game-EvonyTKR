@@ -1,6 +1,6 @@
 ---
 name: Heroine of the Yang Family
-buff:
+buffs:
   - attribute: Attack
     targetedType: Siege Machines
     value:

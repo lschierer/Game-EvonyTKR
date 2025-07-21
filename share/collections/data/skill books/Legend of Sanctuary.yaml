@@ -1,22 +1,22 @@
 ---
 name: Legend of Sanctuary
-buff:
+buffs:
   - attribute: Attack
-    condition:
+    conditions:
       - Marching
     targetedType: Siege Machines
     value:
       number: 10
       unit: percentage
   - attribute: HP
-    condition:
+    conditions:
       - Enemy
     targetedType: Ranged Troops
     value:
       number: 20
       unit: percentage
   - attribute: HP
-    condition:
+    conditions:
       - Enemy
     targetedType: Siege Machines
     value:

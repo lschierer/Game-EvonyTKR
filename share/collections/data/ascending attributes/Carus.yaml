@@ -1,6 +1,6 @@
 ---
 ascending:
-- buff:
+- buffs:
   - attribute: Attack
     conditions:
     - Marching
@@ -19,7 +19,7 @@ ascending:
       unit: percentage
   level: red1
   text: Marching Troops Attack +5%, Marching Ground Troop Defense +10%.
-- buff:
+- buffs:
   - attribute: Wounded to Death
     conditions:
     - Enemy
@@ -31,7 +31,7 @@ ascending:
       unit: percentage
   level: red2
   text: Enemy In-city Troop Wounded into Death rate +10%.
-- buff:
+- buffs:
   - attribute: Rally Capacity
     conditions:
     - When Rallying
@@ -42,7 +42,7 @@ ascending:
       unit: percentage
   level: red3
   text: When General is launching Alliance War, Rally Capacity +8%.
-- buff:
+- buffs:
   - attribute: Attack
     conditions:
     - Marching
@@ -61,7 +61,7 @@ ascending:
       unit: percentage
   level: red4
   text: Marching Ground troop Attack +20% and HP +20%.
-- buff:
+- buffs:
   - attribute: Attack
     conditions:
     - Marching

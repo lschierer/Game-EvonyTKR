@@ -1,7 +1,7 @@
 name: Father of the American Cavalry
-buff:
+buffs:
   - attribute: Death to Wounded
-    condition:
+    conditions:
       - Attacking
     value:
       number: 10

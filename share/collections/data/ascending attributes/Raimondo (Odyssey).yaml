@@ -1,64 +1,64 @@
 ---
 ascending:
   - level: "red1"
-    buff:
+    buffs:
       - attribute: Defense
-        class: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 15
           unit: percentage
       - attribute: HP
-        class: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 15
           unit: percentage
   - level: "red2"
-    buff:
+    buffs:
       - attribute: Death to Wounded
-        condition:
+        conditions:
           - Marching
         value:
           number: 8
           unit: percentage
   - level: "red3"
-    buff:
+    buffs:
       - attribute: Defense
-        class: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 15
           unit: percentage
       - attribute: Rally Capacity
-        condition:
+        conditions:
           - When Rallying
         value:
           number: 6
           unit: percentage
   - level: "red4"
-    buff:
+    buffs:
       - attribute: Attack
-        class: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 15
           unit: percentage
       - attribute: Attack
-        class: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 15
           unit: percentage
       - attribute: Defense
-        class: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 15
           unit: percentage
   - level: "red5"
-    buff:
+    buffs:
       - attribute: Attack
-        class: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 20
           unit: percentage
       - attribute: Defense
-        class: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 35
           unit: percentage

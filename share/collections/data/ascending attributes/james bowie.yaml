@@ -1,6 +1,6 @@
 ---
 ascending:
-- buff:
+- buffs:
   - attribute: Defense
     conditions:
     - When The Main Defense General
@@ -39,7 +39,7 @@ ascending:
       unit: percentage
   level: red1
   text: When General is the Main City Defense General, In-city Mounted Troop and Ground Troop Defense +10% and HP +10%.
-- buff:
+- buffs:
   - attribute: Hospital Capacity
     conditions:
     - When The Main Defense General
@@ -50,7 +50,7 @@ ascending:
       unit: percentage
   level: red2
   text: When General is the Main City Defense General, Hospital Capacity +15%.
-- buff:
+- buffs:
   - attribute: Defense
     conditions:
     - When The Main Defense General
@@ -89,7 +89,7 @@ ascending:
       unit: percentage
   level: red3
   text: When General is the Main City Defense General, In-city Mounted Troop and Ground Troop Defense +15% and HP +15%.
-- buff:
+- buffs:
   - attribute: Attack
     conditions:
     - When The Main Defense General
@@ -128,7 +128,7 @@ ascending:
       unit: percentage
   level: red4
   text: When General is the Main City Defense General, In-city Mounted Troop and Ground Troop Attack +15% and defense +15%.
-- buff:
+- buffs:
   - attribute: Attack
     conditions:
     - When The Main Defense General

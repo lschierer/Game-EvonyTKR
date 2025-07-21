@@ -2,111 +2,111 @@
 name: Queen of Nomadic
 levels:
   - level: "Green"
-    buff:
+    buffs:
       - attribute: Attack
-        condition:
+        conditions:
           - Marching
-        class: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 2
           unit: percentage
       - attribute: HP
-        condition:
+        conditions:
           - Marching
-        class: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 2
           unit: percentage
       - attribute: Rally Capacity
-        condition:
+        conditions:
           - When Rallying
         value:
           number: 1
           unit: percentage
   - level: "Blue"
-    buff:
+    buffs:
       - attribute: Attack
-        condition:
+        conditions:
           - Marching
-        class: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 3
           unit: percentage
       - attribute: HP
-        condition:
+        conditions:
           - Marching
-        class: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 3
           unit: percentage
       - attribute: Rally Capacity
-        condition:
+        conditions:
           - When Rallying
         value:
           number: 1
           unit: percentage
   - level: "Purple"
-    buff:
+    buffs:
       - attribute: Attack
-        condition:
+        conditions:
           - Marching
-        class: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 5
           unit: percentage
       - attribute: HP
-        condition:
+        conditions:
           - Marching
-        class: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 5
           unit: percentage
       - attribute: Rally Capacity
-        condition:
+        conditions:
           - When Rallying
         value:
           number: 1
           unit: percentage
   - level: "Orange"
-    buff:
+    buffs:
       - attribute: Attack
-        condition:
+        conditions:
           - Marching
-        class: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 5
           unit: percentage
       - attribute: HP
-        condition:
+        conditions:
           - Marching
-        class: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 5
           unit: percentage
       - attribute: Rally Capacity
-        condition:
+        conditions:
           - When Rallying
         value:
           number: 1
           unit: percentage
   - level: "Gold"
-    buff:
+    buffs:
       - attribute: Attack
-        condition:
+        conditions:
           - Marching
-        class: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 10
           unit: percentage
       - attribute: HP
-        condition:
+        conditions:
           - Marching
-        class: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 10
           unit: percentage
       - attribute: Rally Capacity
-        condition:
+        conditions:
           - When Rallying
         value:
           number: 1

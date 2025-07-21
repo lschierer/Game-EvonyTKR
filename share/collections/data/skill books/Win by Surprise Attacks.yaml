@@ -1,7 +1,7 @@
 ---
 name: Win by Surprise Attacks
 text: Increases Mounted Troop Attack by 35% when General is leading the army.
-buff:
+buffs:
   - attribute: Attack
     targetedType: Mounted Troops
     value:

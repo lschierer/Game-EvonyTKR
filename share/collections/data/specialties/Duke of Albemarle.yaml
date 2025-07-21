@@ -1,102 +1,102 @@
 name: Duke of Albemarle
 levels:
   - level: Green
-    buff:
+    buffs:
       - attribute: Attack
-        class: Mounted Troops
-        condition:
+        targetedType: Mounted Troops
+        conditions:
           - Attacking
         value:
           number: 5
       - attribute: HP
-        class: Mounted Troops
-        condition:
+        targetedType: Mounted Troops
+        conditions:
           - Attacking
         value:
           number: 3
       - attribute: Defense
-        class: Mounted Troops
-        condition:
+        targetedType: Mounted Troops
+        conditions:
           - Attacking
         value:
           number: 3
   - level: Blue
-    buff:
+    buffs:
       - attribute: Attack
-        class: Mounted Troops
-        condition:
+        targetedType: Mounted Troops
+        conditions:
           - Attacking
         value:
           number: 5
       - attribute: HP
-        class: Mounted Troops
-        condition:
+        targetedType: Mounted Troops
+        conditions:
           - Attacking
         value:
           number: 3
       - attribute: Defense
-        class: Mounted Troops
-        condition:
+        targetedType: Mounted Troops
+        conditions:
           - Attacking
         value:
           number: 3
   - level: Purple
-    buff:
+    buffs:
       - attribute: Attack
-        class: Mounted Troops
-        condition:
+        targetedType: Mounted Troops
+        conditions:
           - Attacking
         value:
           number: 10
       - attribute: HP
-        class: Mounted Troops
-        condition:
+        targetedType: Mounted Troops
+        conditions:
           - Attacking
         value:
           number: 6
       - attribute: Defense
-        class: Mounted Troops
-        condition:
+        targetedType: Mounted Troops
+        conditions:
           - Attacking
         value:
           number: 6
   - level: Orange
-    buff:
+    buffs:
       - attribute: Attack
-        class: Mounted Troops
-        condition:
+        targetedType: Mounted Troops
+        conditions:
           - Attacking
         value:
           number: 10
       - attribute: HP
-        class: Mounted Troops
-        condition:
+        targetedType: Mounted Troops
+        conditions:
           - Attacking
         value:
           number: 6
       - attribute: Defense
-        class: Mounted Troops
-        condition:
+        targetedType: Mounted Troops
+        conditions:
           - Attacking
         value:
           number: 6
   - level: Gold
-    buff:
+    buffs:
       - attribute: Attack
-        class: Mounted Troops
-        condition:
+        targetedType: Mounted Troops
+        conditions:
           - Attacking
         value:
           number: 20
       - attribute: HP
-        class: Mounted Troops
-        condition:
+        targetedType: Mounted Troops
+        conditions:
           - Attacking
         value:
           number: 12
       - attribute: Defense
-        class: Mounted Troops
-        condition:
+        targetedType: Mounted Troops
+        conditions:
           - Attacking
         value:
           number: 12
