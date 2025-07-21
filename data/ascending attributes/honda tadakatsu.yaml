@@ -1,6 +1,6 @@
 ---
 ascending:
-- buff:
+- buffs:
   - attribute: Defense
     conditions:
     - Enemy
@@ -19,7 +19,7 @@ ascending:
       unit: percentage
   level: red1
   text: Enemy Mounted Troop Defense -15% and HP -15%.
-- buff:
+- buffs:
   - attribute: Death to Wounded
     conditions:
     - leading the army
@@ -31,7 +31,7 @@ ascending:
       unit: percentage
   level: red2
   text: Increases Troop Death into Wounded Rate by 8% when General is leading the army to attack.
-- buff:
+- buffs:
   - attribute: Rally Capacity
     conditions:
     - When Rallying
@@ -42,7 +42,7 @@ ascending:
       unit: percentage
   level: red3
   text: When General is launching Alliance War, Rally Capacity +6%.
-- buff:
+- buffs:
   - attribute: Defense
     conditions: []
     passive: 0
@@ -59,7 +59,7 @@ ascending:
       unit: percentage
   level: red4
   text: Mounted Troop Defense +20% and HP +20%.
-- buff:
+- buffs:
   - attribute: Attack
     conditions: []
     passive: 0

@@ -1,6 +1,6 @@
 ---
 name: Hammer of the Gauls - Elizabeth I
-buff:
+buffs:
   - attribute: Attack
     targetedType: Ranged Troops
     value:
@@ -13,7 +13,7 @@ buff:
       unit: percentage
   - attribute: Attack
     targetedType: Ranged Troops
-    condition:
+    conditions:
       - Enemy
     value:
       number: 15

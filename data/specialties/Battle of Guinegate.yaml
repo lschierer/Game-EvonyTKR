@@ -2,77 +2,77 @@
 name: Battle of Guinegate
 levels:
   - level: "Green"
-    buff:
+    buffs:
       - attribute: Attack
-        class: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 3
           unit: percentage
       - attribute: Defense
-        condition:
+        conditions:
           - Enemy
           - Attacking
-        class: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 3
           unit: percentage
   - level: "Blue"
-    buff:
+    buffs:
       - attribute: Attack
-        class: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 3
           unit: percentage
       - attribute: Defense
-        condition:
+        conditions:
           - Enemy
           - Attacking
-        class: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 3
           unit: percentage
   - level: "Purple"
-    buff:
+    buffs:
       - attribute: Attack
-        class: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 6
           unit: percentage
       - attribute: Defense
-        condition:
+        conditions:
           - Enemy
           - Attacking
-        class: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 6
           unit: percentage
   - level: "Orange"
-    buff:
+    buffs:
       - attribute: Attack
-        class: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 6
           unit: percentage
       - attribute: Defense
-        condition:
+        conditions:
           - Enemy
           - Attacking
-        class: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 6
           unit: percentage
   - level: "Gold"
-    buff:
+    buffs:
       - attribute: Attack
-        class: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 12
           unit: percentage
       - attribute: Defense
-        condition:
+        conditions:
           - Enemy
           - Attacking
-        class: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 12
           unit: percentage

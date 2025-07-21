@@ -1,6 +1,6 @@
 ---
 ascending:
-- buff:
+- buffs:
   - attribute: Defense
     conditions:
     - Marching
@@ -19,7 +19,7 @@ ascending:
       unit: percentage
   level: red1
   text: Marching Mounted Troop Defense +15% and HP +15%
-- buff:
+- buffs:
   - attribute: Death to Wounded
     conditions:
     - Marching
@@ -30,7 +30,7 @@ ascending:
       unit: percentage
   level: red2
   text: Marching Troop Death into Wounded Rate +8%
-- buff:
+- buffs:
   - attribute: Attack
     conditions:
     - Attacking
@@ -48,7 +48,7 @@ ascending:
       unit: percentage
   level: red3
   text: When attacking, Mounted Troop Attack +35%, March Size Capacity +8%
-- buff:
+- buffs:
   - attribute: Attack
     conditions:
     - Marching
@@ -83,7 +83,7 @@ ascending:
       unit: percentage
   level: red4
   text: Marching Ground Troop and Mounted Troop Attack +15% and HP +15%
-- buff:
+- buffs:
   - attribute: Attack
     conditions:
     - Marching

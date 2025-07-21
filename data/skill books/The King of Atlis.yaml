@@ -1,22 +1,22 @@
 ---
 name: The King of Atlis
-buff:
+buffs:
   - attribute: Attack
-    condition:
+    conditions:
       - Attacking
     targetedType: Siege Machines
     value:
       number: 45
       unit: percentage
   - attribute: Defense
-    condition:
+    conditions:
       - Attacking
     targetedType: Siege Machines
     value:
       number: 45
       unit: percentage
   - attribute: HP
-    condition:
+    conditions:
       - brings a spiritual beast
       - brings a dragon
       - Attacking
@@ -25,7 +25,7 @@ buff:
       number: 30
       unit: percentage
   - attribute: HP
-    condition:
+    conditions:
       - brings a spiritual beast
       - brings a dragon
       - Attacking

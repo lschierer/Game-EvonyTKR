@@ -6,61 +6,61 @@ generals:
 levels:
   - category: War
     type: personal
-    buff:
+    buffs:
       - attribute: Attack
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 5
           unit: percentage
   - category: War
     type: passive
-    buff:
+    buffs:
       - attribute: Training Capacity
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 5
           unit: percentage
   - category: Cooperation
     type: passive
-    buff:
+    buffs:
       - attribute: Deserter Capacity
         value:
           number: 10
           unit: percentage
   - category: Peace
     type: personal
-    buff:
+    buffs:
       - attribute: Defense
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 10
           unit: percentage
   - category: Faith
     type: personal
-    buff:
+    buffs:
       - attribute: Defense
-        class: Ground Troops
-        condition:
+        targetedType: Ground Troops
+        conditions:
           - When Rallying
         value:
           number: 10
           unit: percentage
   - category: Honor
     type: personal
-    buff:
+    buffs:
       - attribute: Attack
-        class: Ground Troops
-        condition:
+        targetedType: Ground Troops
+        conditions:
           - When Rallying
         value:
           number: 15
           unit: percentage
   - category: Civilization
     type: personal
-    buff:
+    buffs:
       - attribute: Attack
-        class: Ground Troops
-        condition:
+        targetedType: Ground Troops
+        conditions:
           - Marching
         value:
           number: 10

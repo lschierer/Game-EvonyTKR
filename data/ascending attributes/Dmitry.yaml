@@ -1,6 +1,6 @@
 ---
 ascending:
-  - buff:
+  - buffs:
       - attribute: Attack
         conditions:
           - Reinforcing
@@ -19,7 +19,7 @@ ascending:
           unit: percentage
     level: red1
     text: Reinforcing Ranged Troop Attack +15%, Reinforcing Ground Troop Defense +10%
-  - buff:
+  - buffs:
       - attribute: Defense
         conditions:
           - Reinforcing
@@ -38,7 +38,7 @@ ascending:
           unit: percentage
     level: red2
     text: Reinforcing Ground Troop Defense +15% and HP +15%
-  - buff:
+  - buffs:
       - attribute: March Size
         conditions: []
         passive: 0
@@ -48,7 +48,7 @@ ascending:
           unit: percentage
     level: red3
     text: March Size Capacity +10%
-  - buff:
+  - buffs:
       - attribute: Attack
         conditions:
           - Reinforcing
@@ -67,7 +67,7 @@ ascending:
           unit: percentage
     level: red4
     text: Reinforcing Ranged Troop Attack +10%, Reinforcing Ground Troop HP +20%
-  - buff:
+  - buffs:
       - attribute: Attack
         conditions:
           - Reinforcing

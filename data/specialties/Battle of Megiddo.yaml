@@ -1,87 +1,87 @@
 name: Battle of Marathon
 levels:
   - level: Green
-    buff:
+    buffs:
       - attribute: Attack
-        class: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 0
           unit: percentage
       - attribute: Defense
-        class: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 0
           unit: percentage
       - attribute: Defense
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 0
           unit: percentage
   - level: Blue
-    buff:
+    buffs:
       - attribute: Attack
-        class: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 0
           unit: percentage
       - attribute: Defense
-        class: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 0
           unit: percentage
       - attribute: Defense
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 0
           unit: percentage
   - level: Purple
-    buff:
+    buffs:
       - attribute: Attack
-        class: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 0
           unit: percentage
       - attribute: Defense
-        class: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 0
           unit: percentage
       - attribute: Defense
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 0
           unit: percentage
   - level: Orange
-    buff:
+    buffs:
       - attribute: Attack
-        class: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 0
           unit: percentage
       - attribute: Defense
-        class: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 0
           unit: percentage
       - attribute: Defense
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 0
           unit: percentage
   - level: Gold
-    buff:
+    buffs:
       - attribute: Attack
-        class: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 20
           unit: percentage
       - attribute: Defense
-        class: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 20
           unit: percentage
       - attribute: Defense
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 20
           unit: percentage

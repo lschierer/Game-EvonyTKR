@@ -1,15 +1,15 @@
 name: Invincible Pharaoh
-buff:
+buffs:
   - attribute: Attack
     targetedType: Ranged Troops
-    condition:
+    conditions:
       - Attacking
     value:
       number: 30
       unit: percentage
   - attribute: HP
     targetedType: Ground Troops
-    condition:
+    conditions:
       - Attacking
     value:
       number: 25

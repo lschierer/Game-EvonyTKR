@@ -1,85 +1,85 @@
 ascending:
   - level: red1
-    buff:
+    buffs:
       - attribute: Defense
-        condition:
+        conditions:
           - Enemy
         value:
           number: -10
           unit: percentage
   - level: red2
-    buff:
+    buffs:
       - attribute: Defense
-        condition:
+        conditions:
           - Enemy
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: -5
           unit: percentage
       - attribute: Defense
-        condition:
+        conditions:
           - Enemy
-        class: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: -5
           unit: percentage
       - attribute: SubCity Training Speed
-        condition:
+        conditions:
           - When City Mayor for this SubCity
         value:
           number: 20
           unit: percentage
   - level: red3
-    buff:
+    buffs:
       - attribute: Defense
-        condition:
+        conditions:
           - Enemy
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: -10
           unit: percentage
       - attribute: Defense
-        condition:
+        conditions:
           - Enemy
-        class: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: -10
           unit: percentage
   - level: red4
-    buff:
+    buffs:
       - attribute: HP
-        condition:
+        conditions:
           - Enemy
         value:
           number: -10
           unit: percentage
   - level: red5
-    buff:
+    buffs:
       - attribute: Attack
-        condition:
+        conditions:
           - Enemy
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: -10
           unit: percentage
       - attribute: Attack
-        condition:
+        conditions:
           - Enemy
-        class: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: -10
           unit: percentage
       - attribute: HP
-        condition:
+        conditions:
           - Enemy
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: -10
           unit: percentage
       - attribute: HP
-        condition:
+        conditions:
           - Enemy
-        class: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: -10
           unit: percentage

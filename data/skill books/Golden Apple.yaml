@@ -2,30 +2,30 @@
 name: Golden Apple
 text: >-
   Increases ranged troops and siege machines' defense and HP by 35% when General is leading the army to defend outside the Main City. Increases ranged troops' attack by 45% when General is leading the army.
-buff:
+buffs:
   - attribute: Defense
-    condition:
+    conditions:
       - When Defending Outside The Main City
     targetedType: Ranged Troops
     value:
       number: 35
       unit: percentage
   - attribute: Defense
-    condition:
+    conditions:
       - When Defending Outside The Main City
     targetedType: Siege Machines
     value:
       number: 35
       unit: percentage
   - attribute: Defense
-    condition:
+    conditions:
       - When Defending Outside The Main City
     targetedType: Siege Machines
     value:
       number: 35
       unit: percentage
   - attribute: HP
-    condition:
+    conditions:
       - When Defending Outside The Main City
     targetedType: Siege Machines
     value:

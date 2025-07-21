@@ -1,8 +1,8 @@
 ---
 name: Strategy Expert
-buff:
+buffs:
   - attribute: Stamina cost
-    condition:
+    conditions:
       - Against Monsters
     value:
       number: 25

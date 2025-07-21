@@ -1,6 +1,6 @@
 ---
 ascending:
-- buff:
+- buffs:
   - attribute: Defense
     conditions:
     - Enemy
@@ -19,7 +19,7 @@ ascending:
       unit: percentage
   level: red1
   text: Enemy Ranged Troop and Siege Machine Defense -10%.
-- buff:
+- buffs:
   - attribute: Defense
     conditions:
     - Enemy
@@ -54,7 +54,7 @@ ascending:
       unit: percentage
   level: red2
   text: Enemy Ranged Troop and Siege Machine Defense and HP -15%.
-- buff:
+- buffs:
   - attribute: Attack
     conditions:
     - Enemy
@@ -81,7 +81,7 @@ ascending:
       unit: percentage
   level: red3
   text: Enemy Ranged Troop and Siege Machine Attack -10%; when General is the Mayor, Death into Survival Rate in this Subordinate City +10%.
-- buff:
+- buffs:
   - attribute: Defense
     conditions:
     - Enemy
@@ -116,7 +116,7 @@ ascending:
       unit: percentage
   level: red4
   text: Enemy Ranged Troop and Siege Machine Defense and HP -20%.
-- buff:
+- buffs:
   - attribute: Attack
     conditions:
     - Enemy

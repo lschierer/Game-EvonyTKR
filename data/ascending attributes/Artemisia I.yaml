@@ -1,6 +1,6 @@
 ---
 ascending:
-- buff:
+- buffs:
   - attribute: Attack
     conditions:
     - Attacking
@@ -19,7 +19,7 @@ ascending:
       unit: percentage
   level: red1
   text: Attacking Ranged Troop Attack +10% and Defense +15%
-- buff:
+- buffs:
   - attribute: Death to Wounded
     conditions:
     - Attacking
@@ -30,7 +30,7 @@ ascending:
       unit: percentage
   level: red2
   text: Attacking Troop Death into Wounded Rate +8%
-- buff:
+- buffs:
   - attribute: Attack
     conditions:
     - Attacking
@@ -56,7 +56,7 @@ ascending:
       unit: percentage
   level: red3
   text: Attacking Ranged Troop and Siege Machine Attack +25%, March Size Capacity +10%
-- buff:
+- buffs:
   - attribute: HP
     conditions:
     - Attacking
@@ -91,7 +91,7 @@ ascending:
       unit: percentage
   level: red4
   text: Attacking Ranged Troop and Siege Machine HP +25% and Defense +25%
-- buff:
+- buffs:
   - attribute: Attack
     conditions:
     - Attacking

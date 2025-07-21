@@ -1,7 +1,7 @@
 ---
 name: Battle of Zenta
 text: Increases mounted troops’ attack by 35% and mounted troops’ defense and HP by 10% when General is leading the army.
-buff:
+buffs:
   - attribute: Attack
     targetedType: Mounted Troops
     value:

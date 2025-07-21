@@ -6,94 +6,94 @@ generals:
 levels:
   - category: War
     type: personal
-    buff:
+    buffs:
       - attribute: Attack
-        condition:
+        conditions:
           - In City
         value:
           number: 5
           unit: percentage
   - category: Cooperation
     type: passive
-    buff:
+    buffs:
       - attribute: Death to Soul
-        condition:
+        conditions:
           - In Main City
         value:
           number: 10
           unit: percentage
   - category: Peace
     type: personal
-    buff:
+    buffs:
       - attribute: HP
-        condition:
+        conditions:
           - In City
         value:
           number: 5
           unit: percentage
   - category: Peace
     type: passive
-    buff:
+    buffs:
       - attribute: Defense
-        condition:
+        conditions:
           - In City
         value:
           number: 5
           unit: percentage
   - category: Faith
     type: personal
-    buff:
+    buffs:
       - attribute: HP
-        class: Ground Troops
-        condition:
+        targetedType: Ground Troops
+        conditions:
           - In City
         value:
           number: 10
           unit: percentage
       - attribute: Defense
-        class: Ground Troops
-        condition:
+        targetedType: Ground Troops
+        conditions:
           - In City
         value:
           number: 10
           unit: percentage
   - category: Honor
     type: personal
-    buff:
+    buffs:
       - attribute: Defense
-        class: Ground Troops
-        condition:
+        targetedType: Ground Troops
+        conditions:
           - In City
         value:
           number: 5
           unit: percentage
       - attribute: Defense
-        class: Mounted Troops
-        condition:
+        targetedType: Mounted Troops
+        conditions:
           - In City
         value:
           number: 5
           unit: percentage
       - attribute: HP
-        class: Ground Troops
-        condition:
+        targetedType: Ground Troops
+        conditions:
           - In City
         value:
           number: 5
           unit: percentage
       - attribute: HP
-        class: Mounted Troops
-        condition:
+        targetedType: Mounted Troops
+        conditions:
           - In City
         value:
           number: 5
           unit: percentage
   - category: Civilization
     type: personal
-    buff:
+    buffs:
       - attribute: Attack
-        class: Ground Troops
-        condition:
+        targetedType: Ground Troops
+        conditions:
           - In City
         value:
           number: 30

@@ -1,7 +1,7 @@
 name: Battle of Brandywine
 levels:
   - level: Green
-    buff:
+    buffs:
       - attribute: March Size
         value:
           number: 1
@@ -11,7 +11,7 @@ levels:
           number: 1
           unit: percentage
   - level: Blue
-    buff:
+    buffs:
       - attribute: March Size
         value:
           number: 1
@@ -21,7 +21,7 @@ levels:
           number: 1
           unit: percentage
   - level: Purple
-    buff:
+    buffs:
       - attribute: March Size
         value:
           number: 2
@@ -31,7 +31,7 @@ levels:
           number: 2
           unit: percentage
   - level: Orange
-    buff:
+    buffs:
       - attribute: March Size
         value:
           number: 2
@@ -41,7 +41,7 @@ levels:
           number: 2
           unit: percentage
   - level: Gold
-    buff:
+    buffs:
       - attribute: March Size
         value:
           number: 4

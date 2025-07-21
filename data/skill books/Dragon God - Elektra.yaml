@@ -1,15 +1,15 @@
 ---
 name: Dragon God - Elektra
-buff:
+buffs:
   - attribute: Attack
     targetedType: Ranged Troops
-    condition:
+    conditions:
       - brings a dragon
     value:
       number: 10
       unit: percentage
   - attribute: HP
-    condition:
+    conditions:
       - brings a dragon
     targetedType: Ranged Troops
     value:
