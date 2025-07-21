@@ -22,8 +22,8 @@ class Game::EvonyTKR::Converter::SkillBook :
   use namespace::autoclean;
 
   field $outputDir : param;
-  field $debug     : param //= 0;
-  field $tree      : param;
+  field $debug : param //= 0;
+  field $tree : param;
 
   ADJUST {
     $self->logger->debug(sprintf(
@@ -62,7 +62,7 @@ class Game::EvonyTKR::Converter::SkillBook :
     my $container = $tree->look_down(
       '_tag'  => 'div',
       'class' =>
-        qr/elementor-element-(?:\w){1,9}.elementor-widget.elementor-widget-theme-post-content/
+qr/elementor-element-(?:\w){1,9}.elementor-widget.elementor-widget-theme-post-content/
     );
 
     unless ($container) {
@@ -106,7 +106,7 @@ class Game::EvonyTKR::Converter::SkillBook :
         $skillBookName =~ s/[-–—]//;
         $skillBookName =~ s/Ascended//;
         $skillBookName =~ s/^\s+|\s+$//g;
-        my $para          = $helpers->find_next_p_after_element($skillbookH4);
+        my $para = $helpers->find_next_p_after_element($skillbookH4);
 
         if ($para) {
           $name = $skillBookName;
@@ -132,7 +132,7 @@ class Game::EvonyTKR::Converter::SkillBook :
     my $container = $tree->look_down(
       '_tag'  => 'div',
       'class' =>
-        qr/elementor-element-(?:\w){1,9}.elementor-widget.elementor-widget-theme-post-content/
+qr/elementor-element-(?:\w){1,9}.elementor-widget.elementor-widget-theme-post-content/
     );
 
     unless ($container) {
@@ -176,7 +176,7 @@ class Game::EvonyTKR::Converter::SkillBook :
         $skillBookName =~ s/[-–—]//;
         $skillBookName =~ s/Ascended//;
         $skillBookName =~ s/^\s+|\s+$//g;
-        my $para          = $helpers->find_next_p_after_element($skillbookH3);
+        my $para = $helpers->find_next_p_after_element($skillbookH3);
 
         if ($para) {
           $name = $skillBookName;
@@ -186,11 +186,12 @@ class Game::EvonyTKR::Converter::SkillBook :
           $self->logger->error("Could not find the required paragraph");
         }
         last;
-      } else{
+      }
+      else {
         $h3_index++;
       }
     }
-    unless(length($name)) {
+    unless (length($name)) {
       $self->logger->error("Cannot find the required H3 tag!!");
     }
   }
@@ -245,7 +246,7 @@ class Game::EvonyTKR::Converter::SkillBook :
     say "=== Skill Book Text to YAML Converter ===";
     $self->logger->info('=== Skill Book Text to YAML Converter ===');
     $self->getMainText();
-    if(length($name)){
+    if (length($name)) {
       $self->parseSkillbookText();
       $self->printYAML();
     }

@@ -13,10 +13,10 @@ class Game::EvonyTKR::Model::General::Pair :
     '""'       => \&as_string,
     'fallback' => 1;
 
-  field $primary     : reader : param;
-  field $secondary   : reader : param;
+  field $primary : reader : param;
+  field $secondary : reader : param;
   field $rootManager : reader = undef;
-  field $targetType  : reader;
+  field $targetType : reader;
 
   ADJUST {
     $targetType =

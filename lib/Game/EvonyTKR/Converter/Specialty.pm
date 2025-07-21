@@ -27,9 +27,9 @@ class Game::EvonyTKR::Converter::Specialty :
 
   # input fields
   # This will eventually be something online that I have to fetch.
-  field $tree      : param;
+  field $tree : param;
   field $outputDir : param;
-  field $debug     : param //= 0;
+  field $debug : param //= 0;
 
   # internal control fields
   field $parser  = Game::EvonyTKR::Shared::Parser->new();

@@ -27,17 +27,17 @@ class Game::EvonyTKR::Converter::Covenant :
 
   # input fields
 
-  field $tree      : param;
+  field $tree : param;
   field $outputDir : param;
-  field $debug     : param //= 0;
+  field $debug : param //= 0;
 
   # internal control fields
   field $parser  = Game::EvonyTKR::Shared::Parser->new();
   field $helpers = Game::EvonyTKR::Converter::Helpers->new(debug => $debug);
 
   # output fields
-  field $primary      : reader;
-  field $supporting   : reader = [];
+  field $primary : reader;
+  field $supporting : reader = [];
   field $covenantHash : reader;
 
   ADJUST {
@@ -73,11 +73,11 @@ class Game::EvonyTKR::Converter::Covenant :
       $self->logger->debug("parseText for key $key");
       my $covenant  = $covenantHash->{$key};
       my @sentences = split(/;;/, $covenant->{text});
-      my $passive = 0;
+      my $passive   = 0;
       my @fragments;
       foreach my $sentence (@sentences) {
         if ($sentence =~ /(.+)(\((?:Local|Global|General Only)\))/i) {
-          my $text    = $1;
+          my $text = $1;
           $passive = $2 eq '(Global)' ? 1 : 0;
           $self->logger->debug(sprintf(
             'using text "%s" as a %s buff',
@@ -85,7 +85,8 @@ class Game::EvonyTKR::Converter::Covenant :
           ));
 
           @fragments = $parser->tokenize_buffs($text);
-        } else {
+        }
+        else {
           $self->logger->debug(sprintf(
             'using text "%s" as a %s buff',
             $sentence, $passive ? 'passive' : 'personal'
@@ -244,11 +245,11 @@ class Game::EvonyTKR::Converter::Covenant :
     }
     $self->logger->debug("found start_index $start_index");
 
-    $primary =
-      $targetH3->as_trimmed_text =~ s/Evony\s+(.+?)\s+Covenant:?/$1/r;
-      $primary =~ s/[\x{0022}\x{0027}\x{2018}\x{2019}\x{201C}\x{201D}\x{0060}\x{00B4}]s//g;
-      $primary =~ s/Evony\s+(.+?)\s+Covenant:/$1/;
-      $primary =~ s/[-–—]*//;
+    $primary = $targetH3->as_trimmed_text =~ s/Evony\s+(.+?)\s+Covenant:?/$1/r;
+    $primary =~
+      s/[\x{0022}\x{0027}\x{2018}\x{2019}\x{201C}\x{201D}\x{0060}\x{00B4}]s//g;
+    $primary =~ s/Evony\s+(.+?)\s+Covenant:/$1/;
+    $primary =~ s/[-–—]*//;
     $self->logger->debug("found primary '$primary'");
     my $supporting_para = $helpers->find_next_p_after_element($targetH3);
     if ($supporting_para) {
@@ -286,7 +287,7 @@ class Game::EvonyTKR::Converter::Covenant :
       my $key   = lc($cells[0]->as_trimmed_text);
       # the source site occasionally accidentically has extra text
       # in the cell being used as the key.
-      $key = first { $key =~ /$_/i } @{ $self->CovenantLevelValues };
+      $key = first { $key =~ /$_/i } @{ $self->CovenantCategoryValues };
       $self->logger->debug("getting text for key $key");
 
       my $fragment = $cells[1]->as_HTML;
@@ -351,16 +352,19 @@ qr/elementor-element-(?:\w){1,9}.elementor-widget.elementor-widget-theme-post-co
     $self->logger->debug("found start_index $start_index");
 
     $primary = $targetH2->as_trimmed_text;
-    $primary =~ s/[\x{0022}\x{0027}\x{2018}\x{2019}\x{201C}\x{201D}\x{0060}\x{00B4}]s//g;
+    $primary =~
+      s/[\x{0022}\x{0027}\x{2018}\x{2019}\x{201C}\x{201D}\x{0060}\x{00B4}]s//g;
     $primary =~ s/Evony//;
     $primary =~ s/Generals?//i;
     $primary =~ s/Covenant//i;
     $primary =~ s/://g;
-    $primary =~ s/[\x{0022}\x{0027}\x{2018}\x{2019}\x{201C}\x{201D}\x{0060}\x{00B4}]s//g;
+    $primary =~
+      s/[\x{0022}\x{0027}\x{2018}\x{2019}\x{201C}\x{201D}\x{0060}\x{00B4}]s//g;
     $primary =~ s/Guide//;
     $primary =~ s/^\s+|\s+$//g;
     $primary =~ s/[-–—]*//;
     my $supporting_para = $helpers->find_next_p_after_element($targetH2);
+
     if ($supporting_para) {
       my @links = $supporting_para->look_down('_tag' => 'a');
       if (scalar @links) {
@@ -402,7 +406,7 @@ qr/elementor-element-(?:\w){1,9}.elementor-widget.elementor-widget-theme-post-co
       my $key   = lc($cells[0]->as_trimmed_text);
       # the source site occasionally accidentically has extra text
       # in the cell being used as the key.
-      $key = first { $key =~ /$_/i } @{ $self->CovenantLevelValues };
+      $key = first { $key =~ /$_/i } @{ $self->CovenantCategoryValues };
       $self->logger->debug("getting text for key $key");
 
       my $fragment = $cells[1]->as_HTML;

@@ -59,13 +59,15 @@ class Game::EvonyTKR::Model::AscendingAttributes::Manager :
         schema       => [qw/ + Perl /],
         yaml_version => ['1.2', '1.1'],
       )->load_string($data);
-      if (exists $object->{name}) {
-        if ($name ne $object->{name}) {
+      if (exists $object->{general}) {
+        if ($object->{general} !~ /$name/i) {
           $self->logger->error(
-"filename and internal name do not match for file '$file' with name '$object->{name}'"
+"filename and internal name do not match for file '$file' with name '$object->{general}'"
           );
+        } else {
+          $self->logger->info("using object name " . $object->{general})
         }
-        $name = $object->{name};
+        $name = $object->{general};
       }
 
       $ascendingAttributes->{$name} =
@@ -76,9 +78,10 @@ class Game::EvonyTKR::Model::AscendingAttributes::Manager :
             . Data::Printer::np($object));
         next;
       }
+      $self->logger->debug("starting import for $name");
       foreach my $oa (@{ $object->{ascending} }) {
         my $level = $oa->{level};
-        foreach my $ob (@{ $oa->{buff} }) {
+        foreach my $ob (@{ $oa->{buffs} }) {
           my $v = Game::EvonyTKR::Model::Buff::Value->new(
             number => abs($ob->{value}->{number} // 0),
             unit   => $ob->{value}->{unit},
@@ -89,15 +92,12 @@ class Game::EvonyTKR::Model::AscendingAttributes::Manager :
             attribute => $ob->{attribute},
           );
 
-          if (exists $ob->{class}) {
-            $b->set_target($ob->{class});
-          }
-          elsif (exists $ob->{targetedType}) {
+          if (exists $ob->{targetedType}) {
             $b->set_target($ob->{targetedType});
           }
 
-          if (exists $ob->{condition}) {
-            foreach my $c (@{ $ob->{condition} }) {
+          if (exists $ob->{conditions}) {
+            foreach my $c (@{ $ob->{conditions} }) {
               $b->set_condition($c);
             }
           }

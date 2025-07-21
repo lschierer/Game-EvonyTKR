@@ -21,10 +21,10 @@ class Game::EvonyTKR::Converter::AscendingAttributes :
   # PODNAME: Game::EvonyTKR::Converter::AscendingAttributes
 
   # input fields
-  field $tree      : param : reader;
+  field $tree : param : reader;
   field $outputDir : param;
-  field $debug     : param //= 0;
-  field $red       : param //= 1;
+  field $debug : param //= 0;
+  field $red : param   //= 1;
 
   ADJUST {
     $self->logger->debug(sprintf(
@@ -221,7 +221,8 @@ class Game::EvonyTKR::Converter::AscendingAttributes :
     $self->logger->debug(sprintf('h4 is "%s"', $h4->as_trimmed_text));
     $name = $h4->as_trimmed_text =~
       s/Evony\s+(.+?)(?:[’']s)?\s+Ascension\s+Buffs/$1/r;
-    $name =~ s/[\x{0022}\x{0027}\x{2018}\x{2019}\x{201C}\x{201D}\x{0060}\x{00B4}]//g;
+    $name =~
+      s/[\x{0022}\x{0027}\x{2018}\x{2019}\x{201C}\x{201D}\x{0060}\x{00B4}]//g;
     $self->logger->debug("name is $name");
     my $ascendingUL = $helpers->find_next_ul_after_element($h4);
 
@@ -245,7 +246,8 @@ class Game::EvonyTKR::Converter::AscendingAttributes :
       $name =~ s/Evony//;
       $name =~ s/Generals?//i;
       $name =~ s/://g;
-      $name =~ s/[\x{0022}\x{0027}\x{2018}\x{2019}\x{201C}\x{201D}\x{0060}\x{00B4}]s//g;
+      $name =~
+s/[\x{0022}\x{0027}\x{2018}\x{2019}\x{201C}\x{201D}\x{0060}\x{00B4}]s//g;
       $name =~ s/Guide//;
       $name =~ s/^\s+|\s+$//g;
     }
@@ -257,7 +259,7 @@ class Game::EvonyTKR::Converter::AscendingAttributes :
     my $container = $tree->look_down(
       '_tag'  => 'div',
       'class' =>
-      qr/elementor-element-(?:\w){1,9}.elementor-widget.elementor-widget-theme-post-content/
+qr/elementor-element-(?:\w){1,9}.elementor-widget.elementor-widget-theme-post-content/
     );
 
     unless ($container) {

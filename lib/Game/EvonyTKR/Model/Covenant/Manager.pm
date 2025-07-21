@@ -42,6 +42,10 @@ class Game::EvonyTKR::Model::Covenant::Manager :
     return 0;
   }
 
+  method get_all_covenants {
+    return values %{$covenants};
+  }
+
   method importAll ($SourceDir) {
     $SourceDir = Path::Tiny::path($SourceDir);
     if (!$SourceDir->is_dir()) {
@@ -73,7 +77,7 @@ class Game::EvonyTKR::Model::Covenant::Manager :
       $self->logger->trace(
         "$object imported, looks like " . Data::Printer::np($object));
       if (exists $object->{name}) {
-        if ($name ne $object->{name}) {
+        if ($object->{name} !~ /$name/i) {
           $self->logger->error(
 "filename and internal name do not match for file '$file' with name '$object->{name}'"
           );
@@ -82,66 +86,59 @@ class Game::EvonyTKR::Model::Covenant::Manager :
       }
 
       my $primary = $rootManager->generalManager->getGeneral($name);
-      if ($primary) {
-        $self->logger->debug(
-          "found primary general for $name, starting import.");
-        $self->logger->debug(
-          "generals for $name are " . join(", ", @{ $object->{generals} }));
-#my $one = $rootManager->generalManager->getGeneral($object->{generals}->[0]);
-#my $two = $rootManager->generalManager->getGeneral($object->{generals}->[1]);
-#my $three = $rootManager->generalManager->getGeneral($object->{generals}->[2]);
-        $covenants->{$name} = Game::EvonyTKR::Model::Covenant->new(
-          primary => $primary,
-          one     => $object->{generals}->[0],
-          two     => $object->{generals}->[1],
-          three   => $object->{generals}->[2],
-        );
-
-        foreach my $oc (@{ $object->{levels} }) {
-          my $category = $oc->{category};
-
-          # Find buffs for this category
-          foreach my $ob (@{ $oc->{buff} }) {
-
-            my $v = Game::EvonyTKR::Model::Buff::Value->new(
-              number => abs($ob->{value}->{number}),
-              unit   => $ob->{value}->{unit},
-            );
- # very few collection types have passive buffs. Covenants are an exception.
- # however, the data source for covenants records this one level above the buffs
- # themselves, recording a different instance of $object->{levels} for an
- # object with passive buffs and one without.  We need to merge any objects
- # that have the same category, adding the buffs from both to the same array.
-            my $b = Game::EvonyTKR::Model::Buff->new(
-              value     => $v,
-              attribute => $ob->{attribute},
-              passive   => $oc->{type} eq 'passive',
-            );
-
-            if (exists $ob->{class} && defined $ob->{class}) {
-              $b->set_target($ob->{class});
-            }
-            elsif (exists $ob->{targetedType} && defined $ob->{targetedType}) {
-              $b->set_target($ob->{targetedType});
-            }
-
-            if (exists $ob->{condition}) {
-              foreach my $c (@{ $ob->{condition} }) {
-                $b->set_condition($c);
-              }
-            }
-            $covenants->{$name}->addBuff($category, $b);
-
-          }
-        }
-
-      }
-      else {
+      unless ($primary) {
         $self->logger->error("Cannot find primary general for covenant $name");
+        next;
+      }
+      $self->logger->debug("found primary general for $name, starting import.");
+      $self->logger->debug(
+        "generals for $name are " . join(", ", @{ $object->{generals} }));
+
+      $covenants->{$name} = Game::EvonyTKR::Model::Covenant->new(
+        primary => $primary,
+        one     => $object->{generals}->[0],
+        two     => $object->{generals}->[1],
+        three   => $object->{generals}->[2],
+      );
+
+      foreach my $oc (@{ $object->{levels} }) {
+        my $category = $oc->{category};
+
+        # Find buffs for this category
+        foreach my $ob (@{ $oc->{buffs} }) {
+
+          my $v = Game::EvonyTKR::Model::Buff::Value->new(
+            number => abs($ob->{value}->{number}),
+            unit   => $ob->{value}->{unit},
+          );
+# very few collection types have passive buffs. Covenants are an exception.
+# however, the data source for covenants records this one level above the buffs
+# themselves, recording a different instance of $object->{levels} for an
+# object with passive buffs and one without.  We need to merge any objects
+# that have the same category, adding the buffs from both to the same array.
+          my $b = Game::EvonyTKR::Model::Buff->new(
+            value     => $v,
+            attribute => $ob->{attribute},
+            passive   => $ob->{passive} // 0,
+          );
+
+          if (exists $ob->{targetedType} && defined $ob->{targetedType}) {
+            $b->set_target($ob->{targetedType});
+          }
+
+          if (exists $ob->{conditions}) {
+            foreach my $c (@{ $ob->{conditions} }) {
+              $b->set_condition($c);
+            }
+          }
+          $covenants->{$name}->addBuff($category, $b);
+
+        }
       }
       $self->logger->debug(
         "import of $file for $name complete.  covenant created: "
           . Data::Printer::np($covenants->{$name}));
+
     }
     my $countImported = scalar keys %$covenants;
     $self->logger->info(

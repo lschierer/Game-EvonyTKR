@@ -82,12 +82,12 @@ class Game::EvonyTKR::Model::Book::Manager :
       );
 
       my $buffCount = 0;
-      if (exists $object->{buff} && ref($object->{buff}) eq 'ARRAY') {
-        $buffCount = scalar @{ $object->{buff} };
+      if (exists $object->{buffs} && ref($object->{buffs}) eq 'ARRAY') {
+        $buffCount = scalar @{ $object->{buffs} };
       }
       $self->logger->debug("Book '$name' has $buffCount buffs in YAML");
 
-      foreach my $ob (@{ $object->{buff} }) {
+      foreach my $ob (@{ $object->{buffs} }) {
         $self->logger->debug("Processing buff for book '$name': "
             . "attribute="
             . ($ob->{attribute} // 'undef')
@@ -104,14 +104,15 @@ class Game::EvonyTKR::Model::Book::Manager :
         $b = Game::EvonyTKR::Model::Buff->new(
           value     => $v,
           attribute => $ob->{attribute},
+          passive   => $ob->{passive} // 0,
         );
 
         if (exists $ob->{targetedType}) {
           $b->set_target($ob->{targetedType});
         }
 
-        if (exists $ob->{condition}) {
-          foreach my $c (@{ $ob->{condition} }) {
+        if (exists $ob->{conditions}) {
+          foreach my $c (@{ $ob->{conditions} }) {
             $b->set_condition($c);
           }
         }

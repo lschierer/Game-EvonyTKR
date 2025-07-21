@@ -122,7 +122,7 @@ class Game::EvonyTKR::Model::Data : isa(Game::EvonyTKR::Shared::Constants) {
 
   method checkCovenantLevel ($proposedLevel) {
     my $check = {};
-    foreach my $key ($self->CovenantLevelValues->@*) {
+    foreach my $key ($self->CovenantCategoryValues->@*) {
       $check->{$key} = 1;
     }
     return exists $check->{$proposedLevel};
@@ -134,13 +134,11 @@ class Game::EvonyTKR::Model::Data : isa(Game::EvonyTKR::Shared::Constants) {
     }
     if ($proposedLevel =~ /red/) {
       return
-        any { $proposedLevel eq $_ }
-        @{ $self->AscendingAttributeLevelValues(1) };
+        any { $proposedLevel eq $_ } $self->AscendingAttributeLevelValues(1);
     }
     else {
       return
-        any { $proposedLevel eq $_ }
-        @{ $self->AscendingAttributeLevelValues(0) };
+        any { $proposedLevel eq $_ } $self->AscendingAttributeLevelValues(0);
     }
   }
 

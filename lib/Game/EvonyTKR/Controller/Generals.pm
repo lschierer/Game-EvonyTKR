@@ -66,13 +66,7 @@ package Game::EvonyTKR::Controller::Generals {
       }
     );
 
-    my @parts     = split(/::/, ref($self));
-    my $baseClass = pop(@parts);
-
-    my $controller_name =
-        $self->can('controller_name')
-      ? $self->controller_name()
-      : $baseClass;
+    my $controller_name = $self->controller_name();
 
     $logger->debug("got controller_name $controller_name.");
 
@@ -366,7 +360,8 @@ package Game::EvonyTKR::Controller::Generals {
     my $rootManager = $self->get_root_manager();
     my $data_model  = Game::EvonyTKR::Model::Data->new();
 
-    if (none { $_ eq $covenantLevel } @{ $rootManager->CovenantLevelValues }) {
+    if (none { $_ eq $covenantLevel } @{ $rootManager->CovenantCategoryValues })
+    {
       $logger->warn(
         "Invalid covenantLevel: $covenantLevel, using default 'civilization'");
       $covenantLevel = 'civilization';
@@ -699,6 +694,19 @@ package Game::EvonyTKR::Controller::Generals {
       primary   => { name => $_->primary->name },
       secondary => { name => $_->secondary->name }
     } } @pairs;
+
+    @json_data = sort {
+        # First compare primary->name
+        my $primary_cmp = $a->{primary}->{name} cmp $b->{primary}->{name};
+
+        # If primary names are the same, compare secondary->name
+        if ($primary_cmp == 0) {
+            return $a->{secondary}->{name} cmp $b->{secondary}->{name};
+        }
+
+        # Otherwise, return the primary name comparison result
+        return $primary_cmp;
+    } @json_data;
 
     $self->render(json => { data => \@json_data });
   }

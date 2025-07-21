@@ -15,9 +15,9 @@ class Game::EvonyTKR::Converter::General :
   use List::AllUtils qw( first all any none );
   use namespace::autoclean;
 
-  field $tree      : param;
+  field $tree : param;
   field $outputDir : param;
-  field $debug     : param //= 0;
+  field $debug : param //= 0;
 
   field $name = '';
 
@@ -94,10 +94,10 @@ class Game::EvonyTKR::Converter::General :
   method getPrimaryFields_Template2 {
 
     my $h1 = $tree->look_down(
-      '_tag'    => qr/^h1$/,
-      'class'   => qr/elementor-heading-title.elementor-size-default/,
+      '_tag'  => qr/^h1$/,
+      'class' => qr/elementor-heading-title.elementor-size-default/,
     );
-    if($h1){
+    if ($h1) {
       $name = $h1->as_trimmed_text =~ s/Evony\s+(.*)$/$1/r;
     }
 
@@ -117,28 +117,29 @@ class Game::EvonyTKR::Converter::General :
     }
     my @rows = $statsTable->look_down('_tag', 'tr');
     my @keys = qw(leadership attack defense politics);
-    if(scalar(@rows) != scalar(@keys)){
+    if (scalar(@rows) != scalar(@keys)) {
       $self->error("something wrong with this page, too many rows found");
       return;
     }
-    foreach my $index (0..$#keys){
-      my $row = $rows[$index];
-      my $key = $keys[$index];
+    foreach my $index (0 .. $#keys) {
+      my $row   = $rows[$index];
+      my $key   = $keys[$index];
       my @cells = $row->look_down('_tag' => 'td');
       my $value;
       my $increment;
-      if($cells[0]->as_trimmed_text =~ /$key/i) {
-        $value = scalar(@cells) >= 1 ? $cells[1]->as_trimmed_text : 0;
+      if ($cells[0]->as_trimmed_text =~ /$key/i) {
+        $value     = scalar(@cells) >= 1 ? $cells[1]->as_trimmed_text : 0;
         $increment = scalar(@cells) >= 3 ? $cells[3]->as_trimmed_text : 0;
-      } else {
-        $value = scalar(@cells) >= 2 ? $cells[2]->as_trimmed_text : 0;
+      }
+      else {
+        $value     = scalar(@cells) >= 2 ? $cells[2]->as_trimmed_text : 0;
         $increment = scalar(@cells) >= 4 ? $cells[4]->as_trimmed_text : 0;
       }
 
       my $ba = Game::EvonyTKR::Model::BasicAttribute->new(
-        base            => $value,
-        increment       => $increment,
-        attribute_name  => $key,
+        base           => $value,
+        increment      => $increment,
+        attribute_name => $key,
       );
       $basic->setAttribute($key, $ba);
     }
@@ -192,28 +193,31 @@ qr/elementor-element-(?:\w){1,9}.elementor-widget.elementor-widget-theme-post-co
 
     my $statsH3 = $headers[$start_index + 1];
     # the attributes are in the next 4 paragraph elements.
-    my @keys = qw(leadership attack defense politics);
+    my @keys  = qw(leadership attack defense politics);
     my @paras = $helpers->find_all_p_after_element($statsH3);
 
     if (@paras < @keys) {
-        $self->logger->error("Expected 4 stats <p> tags after H3, found " . scalar @paras);
-    } else {
-        for my $i (0..$#keys) {
-            my $key = $keys[$i];
-            my $text = $paras[$i]->as_trimmed_text;
-            my ($value) = $text =~ /\Q$key\E\s*:\s*([0-9.]+)/i;
-            if (defined $value) {
-                $self->logger->debug("setting $key to $value");
-                my $ba = Game::EvonyTKR::Model::BasicAttribute->new(
-                  base            => $value,
-                  increment       => 0,
-                  attribute_name  => $key,
-                );
-                $basic->setAttribute($key, $ba);
-            } else {
-                $self->logger->warn("Could not extract $key value from '$text'");
-            }
+      $self->logger->error(
+        "Expected 4 stats <p> tags after H3, found " . scalar @paras);
+    }
+    else {
+      for my $i (0 .. $#keys) {
+        my $key     = $keys[$i];
+        my $text    = $paras[$i]->as_trimmed_text;
+        my ($value) = $text =~ /\Q$key\E\s*:\s*([0-9.]+)/i;
+        if (defined $value) {
+          $self->logger->debug("setting $key to $value");
+          my $ba = Game::EvonyTKR::Model::BasicAttribute->new(
+            base           => $value,
+            increment      => 0,
+            attribute_name => $key,
+          );
+          $basic->setAttribute($key, $ba);
         }
+        else {
+          $self->logger->warn("Could not extract $key value from '$text'");
+        }
+      }
     }
 
   }

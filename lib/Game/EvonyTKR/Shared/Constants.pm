@@ -452,18 +452,18 @@ class Game::EvonyTKR::Shared::Constants : isa(Game::EvonyTKR::Model::Logger) {
 
   ADJUST {
     Readonly::Scalar my $temp => {
-      'In-Rally'                      => "When Rallying",
-      'in rally'                      => 'When Rallying',
-      'Reduces Monster'               => "Monsters",          # debuff version
-      'brings any dragon'             => 'brings a dragon',
-      'brings dragon'                 => 'brings a dragon',
-      'with dragon'                   => 'brings a dragon',
-      'with any dragon'               => 'brings a dragon',
-      'brings any spiritual beast'    => 'brings a spiritual beast',
-      'brings spiritual beast'        => 'brings a spiritual beast',
-      'to attack Monsters'            => 'Against Monsters',         # buff version
-      'to attack'                     => 'Attacking',
-      'to reinforce'                  => 'Reinforcing',
+      'In-Rally'                   => "When Rallying",
+      'in rally'                   => 'When Rallying',
+      'Reduces Monster'            => "Monsters",          # debuff version
+      'brings any dragon'          => 'brings a dragon',
+      'brings dragon'              => 'brings a dragon',
+      'with dragon'                => 'brings a dragon',
+      'with any dragon'            => 'brings a dragon',
+      'brings any spiritual beast' => 'brings a spiritual beast',
+      'brings spiritual beast'     => 'brings a spiritual beast',
+      'to attack Monsters'         => 'Against Monsters',         # buff version
+      'to attack'                  => 'Attacking',
+      'to reinforce'               => 'Reinforcing',
       'the Mayor'                     => "When City Mayor for this SubCity",
       'in this subordinate city'      => "When City Mayor for this SubCity",
       'in subordinate city'           => "When City Mayor for this SubCity",
@@ -569,14 +569,14 @@ class Game::EvonyTKR::Shared::Constants : isa(Game::EvonyTKR::Model::Logger) {
     $CommonSpecialtyNames = \@temp;
   }
 
-  field $CovenantLevelValues : reader;
+  field $CovenantCategoryValues : reader;
 
   ADJUST {
     Readonly::Array my @temp => (
       'none',  'war',   'cooperation', 'peace',
       'faith', 'honor', 'civilization',
     );
-    $CovenantLevelValues = \@temp;
+    $CovenantCategoryValues = \@temp;
   }
 
   Readonly::Scalar my $redAscendingLevelNames => {
@@ -594,6 +594,19 @@ class Game::EvonyTKR::Shared::Constants : isa(Game::EvonyTKR::Model::Logger) {
     purple4 => '4 Purple Stars',
     purple5 => '5 Purple Stars',
   };
+
+  method AscendingAttributeLevelName ($level) {
+    if($level =~ /red/) {
+      if(exists $redAscendingLevelNames->{$level}){
+        return $redAscendingLevelNames->{$level};
+      }
+    } else {
+      if(exists $purpleAscendingLevelNames->{$level}){
+        return $purpleAscendingLevelNames->{$level};
+      }
+    }
+    return 'None';
+  }
 
   method AscendingAttributeLevelValues ($isRed = 1) {
     my @result;
@@ -619,7 +632,8 @@ class Game::EvonyTKR::Shared::Constants : isa(Game::EvonyTKR::Model::Logger) {
     else {
       foreach my $index (1 .. 5) {
         my $key = $valid[$index];
-        push @result, $redAscendingLevelNames->{$key};
+        push @result,
+          $purpleAscendingLevelNames->{$key};    # Use purple names here!
       }
     }
     return @result;

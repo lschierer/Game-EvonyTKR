@@ -22,24 +22,24 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
   our $VERSION = 'v0.30.0';
 
   # Input parameters
-  field $rootManager    : param;
-  field $general        : param;
-  field $isPrimary      : reader : param //= 1;
-  field $targetType     : reader : param //= '';
+  field $rootManager : param;
+  field $general : param;
+  field $isPrimary : reader : param      //= 1;
+  field $targetType : reader : param     //= '';
   field $activationType : reader : param //= 'Overall';
 
   # these are needed now
   field $ascendingLevel : reader : param //= 'red5';
-  field $specialty1     : reader : param //= 'gold';
-  field $specialty2     : reader : param //= 'gold';
-  field $specialty3     : reader : param //= 'gold';
-  field $specialty4     : reader : param //= 'gold';
-  field $covenantLevel  : reader : param //= 'Civilization';
+  field $specialty1 : reader : param     //= 'gold';
+  field $specialty2 : reader : param     //= 'gold';
+  field $specialty3 : reader : param     //= 'gold';
+  field $specialty4 : reader : param     //= 'gold';
+  field $covenantLevel : reader : param  //= 'Civilization';
 
   # these are anticipated that I will need them in the future.
-  field $generalLevel   : reader : param //= 45;
+  field $generalLevel : reader : param   //= 45;
   field $includePassive : reader : param //= 1;
-  field $keepLevel      : reader : param //= 40;
+  field $keepLevel : reader : param      //= 40;
 
 # Output values - stored in hashes for easier access
   field $buffValues : reader = {

@@ -18,8 +18,8 @@ class GitRepo::Reader {
   require Log::Log4perl;
 
   field $source_dir : param : reader //= './';
-  field $git_repo   : reader;
-  field $logger     : reader = Log::Log4perl->get_logger(__PACKAGE__);
+  field $git_repo : reader;
+  field $logger : reader = Log::Log4perl->get_logger(__PACKAGE__);
 
   field $oldest  = 0;
   field $authors = {};

@@ -9,7 +9,7 @@ use namespace::clean;
 package Game::EvonyTKR::Controller::AscendingAttributes {
   use Mojo::Base 'Game::EvonyTKR::Controller::ControllerBase', -strict,
     -signatures;
-  use List::AllUtils qw(uniq);
+  use List::AllUtils qw(uniq first);
   use Carp;
 
   # Specify which collection this controller handles
@@ -65,31 +65,58 @@ package Game::EvonyTKR::Controller::AscendingAttributes {
 
     $app->helper(
       ascending_level_names => sub($c, $level = '', $printable = 0) {
-        $logger->debug(
-          "ascending_level_names helper started, level is '$level', for "
-            . __PACKAGE__);
-        #my $logger = Log::Log4perl->get_logger(__PACKAGE__);
+        $logger->debug(sprintf(
+          'ascending_level_names helper started, level is %s, printable is %s',
+          defined $level ? $level : '', defined $printable ? $printable : 0,
+        ));
+
+        # Case 1: Return all level values (for dropdown values)
         if (length($level) == 0) {
+          if ($printable) {
+            # Return all printable names
+            my @purpleNames =
+              $c->app->get_root_manager->AscendingAttributeLevelNames(0);
+            my @redNames =
+              $c->app->get_root_manager->AscendingAttributeLevelNames(1);
 
-          my $purpleNames =
-            $c->app->get_root_manager->AscendingAttributeLevelNames(0,
-            $printable);
-          my $redNames =
-            $c->app->get_root_manager->AscendingAttributeLevelNames(1,
-            $printable);
+            # Combine and get unique values
+            my %combined;
+            foreach my $ln (@purpleNames, @redNames) {
+              $combined{$ln}++;
+            }
+            my @unique = sort keys(%combined);
+            $logger->debug("derived unique keys " . join(', ', @unique));
+            return \@unique;
+          }
+          else {
+            # Return all internal values
+            my @purpleValues =
+              $c->app->get_root_manager->AscendingAttributeLevelValues(0);
+            my @redValues =
+              $c->app->get_root_manager->AscendingAttributeLevelValues(1);
 
-          # Combine and get unique values
-          my @combined = (@$purpleNames, @$redNames);
-          my @unique   = uniq(@combined);
-
-          $logger->debug("ascending_level_names returning unique list: "
-              . join(', ', @unique));
-          return \@unique;
+            # Combine and get unique values
+            my %combined;
+            foreach my $ln (@purpleValues, @redValues) {
+              $combined{$ln}++;
+            }
+            my @unique = sort keys(%combined);
+            $logger->debug("derived unique keys " . join(', ', @unique));
+            return \@unique;
+          }
         }
-        if ($level eq 'None') {
-          return 'None';
+
+        # Case 2: Return a specific level's name
+        if($printable){
+          return $c->app->get_root_manager->AscendingAttributeLevelName($level);
+        } else {
+          if($level =~ /red/) {
+            return first {$_ =~ /level/} $c->app->get_root_manager->AscendingAttributeLevelValues(1);
+          } else {
+            return first {$_ =~ /level/} $c->app->get_root_manager->AscendingAttributeLevelValues(0);
+          }
         }
-        return $c->app->get_root_manager->AscendingAttributeLevelNames($level);
+        return 'none';
       }
     );
 
