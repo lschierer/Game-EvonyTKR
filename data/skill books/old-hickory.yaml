@@ -1,8 +1,8 @@
 name: Old Hickory
-buff:
+buffs:
   - attribute: Attack
     targetedType: Ranged Troops
-    condition:
+    conditions:
       - Enemy
     value:
       number: 20

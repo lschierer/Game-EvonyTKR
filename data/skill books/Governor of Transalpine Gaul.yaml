@@ -1,36 +1,36 @@
 ---
 name: Governor of Transalpine Gaul
-buff:
+buffs:
   - attribute: Attack
-    condition:
+    conditions:
       - Attacking
     targetedType: Ranged Troops
     value:
       number: 40
       unit: percentage
   - attribute: Defense
-    condition:
+    conditions:
       - Attacking
     targetedType: Ranged Troops
     value:
       number: 30
       unit: percentage
   - attribute: Defense
-    condition:
+    conditions:
       - Attacking
     targetedType: Siege Machines
     value:
       number: 30
       unit: percentage
   - attribute: HP
-    condition:
+    conditions:
       - Attacking
     targetedType: Ranged Troops
     value:
       number: 30
       unit: percentage
   - attribute: HP
-    condition:
+    conditions:
       - Attacking
     targetedType: Siege Machines
     value:

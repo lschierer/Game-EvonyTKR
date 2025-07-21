@@ -1,6 +1,6 @@
 ---
 ascending:
-  - buff:
+  - buffs:
       - attribute: Attack
         conditions:
           - Enemy
@@ -26,7 +26,7 @@ ascending:
           number: 10
           unit: percentage
     level: red1
-  - buff:
+  - buffs:
       - attribute: HP
         conditions:
           - Enemy
@@ -36,7 +36,7 @@ ascending:
           number: 10
           unit: percentage
     level: red2
-  - buff:
+  - buffs:
       - attribute: Defense
         conditions:
           - Enemy
@@ -46,7 +46,7 @@ ascending:
           number: 20
           unit: percentage
     level: red3
-  - buff:
+  - buffs:
       - attribute: Attack
         conditions:
           - Enemy
@@ -72,7 +72,7 @@ ascending:
           number: 10
           unit: percentage
     level: red4
-  - buff:
+  - buffs:
       - attribute: Attack
         conditions:
           - Enemy

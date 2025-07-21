@@ -1,34 +1,34 @@
 ---
 ascending:
   - level: "red1"
-    buff:
+    buffs:
       - attribute: Attack
-        class: Siege Machines
-        condition:
+        targetedType: Siege Machines
+        conditions:
           - Marching
         value:
           number: 10
           unit: percentage
       - attribute: Defense
-        class: Siege Machines
-        condition:
+        targetedType: Siege Machines
+        conditions:
           - Marching
         value:
           number: 15
           unit: percentage
   - level: "red2"
-    buff:
+    buffs:
       - attribute: Death to Wounded
-        condition:
+        conditions:
           - Marching
         value:
           number: 10
           unit: percentage
   - level: "red3"
-    buff:
+    buffs:
       - attribute: HP
-        class: Siege Machines
-        condition:
+        targetedType: Siege Machines
+        conditions:
           - Marching
         value:
           number: 10
@@ -38,40 +38,40 @@ ascending:
           number: 5
           unit: percentage
   - level: "red4"
-    buff:
+    buffs:
       - attribute: Attack
-        class: Siege Machines
-        condition:
+        targetedType: Siege Machines
+        conditions:
           - Marching
         value:
           number: 15
           unit: percentage
       - attribute: Defense
-        class: Siege Machines
-        condition:
+        targetedType: Siege Machines
+        conditions:
           - Marching
         value:
           number: 15
           unit: percentage
   - level: "red5"
-    buff:
+    buffs:
       - attribute: Attack
-        class: Siege Machines
-        condition:
+        targetedType: Siege Machines
+        conditions:
           - Marching
         value:
           number: 20
           unit: percentage
       - attribute: Defense
-        class: Siege Machines
-        condition:
+        targetedType: Siege Machines
+        conditions:
           - Marching
         value:
           number: 20
           unit: percentage
       - attribute: HP
-        class: Siege Machines
-        condition:
+        targetedType: Siege Machines
+        conditions:
           - Marching
         value:
           number: 20

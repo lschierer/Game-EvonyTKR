@@ -1,16 +1,16 @@
 ---
 name: Dragon God - Martinus
-buff:
+buffs:
   - attribute: Attack
     targetedType: Mounted Troops
-    condition:
+    conditions:
       - brings a dragon
     value:
       number: 10
       unit: percentage
   - attribute: Defense
     targetedType: Mounted Troops
-    condition:
+    conditions:
       - brings a dragon
     value:
       number: 10

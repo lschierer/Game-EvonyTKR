@@ -1,7 +1,7 @@
 name: Golden Route
 levels:
   - level: Green
-    buff:
+    buffs:
       - attribute: Attack
         targetedType: Siege Machines
         value:
@@ -18,7 +18,7 @@ levels:
           number: 0
           unit: percentage
   - level: Blue
-    buff:
+    buffs:
       - attribute: Attack
         targetedType: Siege Machines
         value:
@@ -35,7 +35,7 @@ levels:
           number: 0
           unit: percentage
   - level: Purple
-    buff:
+    buffs:
       - attribute: Attack
         targetedType: Siege Machines
         value:
@@ -52,7 +52,7 @@ levels:
           number: 0
           unit: percentage
   - level: Orange
-    buff:
+    buffs:
       - attribute: Attack
         targetedType: Siege Machines
         value:
@@ -69,7 +69,7 @@ levels:
           number: 0
           unit: percentage
   - level: Gold
-    buff:
+    buffs:
       - attribute: Attack
         targetedType: Siege Machines
         value:

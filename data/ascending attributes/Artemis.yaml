@@ -1,6 +1,6 @@
 ---
 ascending:
-- buff:
+- buffs:
   - attribute: Defense
     conditions:
     - Attacking
@@ -19,7 +19,7 @@ ascending:
       unit: percentage
   level: red1
   text: Attacking Mounted Troop Defense +20% and HP +20%
-- buff:
+- buffs:
   - attribute: Death to Wounded
     conditions:
     - Attacking
@@ -30,7 +30,7 @@ ascending:
       unit: percentage
   level: red2
   text: Attacking Troop Death into Wounded Rate +8%
-- buff:
+- buffs:
   - attribute: Attack
     conditions: []
     passive: 0
@@ -54,7 +54,7 @@ ascending:
       unit: percentage
   level: red3
   text: Mounted Troop Attack +30%, Mounted Troop and Ground Troop Defense +15%
-- buff:
+- buffs:
   - attribute: Attack
     conditions:
     - Attacking
@@ -81,7 +81,7 @@ ascending:
       unit: percentage
   level: red4
   text: Attacking Mounted Troop Attack +20%, Attacking Ground Troop and Mounted Troop HP +20%
-- buff:
+- buffs:
   - attribute: Attack
     conditions:
     - Attacking

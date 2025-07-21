@@ -1,22 +1,22 @@
 ---
 name: Odyssey - Douglas
-buff:
+buffs:
   - attribute: Attack
-    condition:
+    conditions:
       - Marching
     targetedType: Ranged Troops
     value:
       number: 10
       unit: percentage
   - attribute: Defense
-    condition:
+    conditions:
       - Enemy
     targetedType: Ground Troops
     value:
       number: 20
       unit: percentage
   - attribute: Defense
-    condition:
+    conditions:
       - Enemy
     targetedType: Mounted Troops
     value:

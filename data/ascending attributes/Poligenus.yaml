@@ -1,115 +1,115 @@
 ---
 ascending:
   - level: "red1"
-    buff:
+    buffs:
       - attribute: Attack
-        condition:
+        conditions:
           - Marching
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 5
           unit: percentage
       - attribute: Attack
-        condition:
+        conditions:
           - Marching
-        class: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 5
           unit: percentage
       - attribute: Defense
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 5
           unit: percentage
       - attribute: Defense
-        class: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 5
           unit: percentage
       - attribute: HP
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 5
           unit: percentage
       - attribute: HP
-        class: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 5
           unit: percentage
   - level: "red2"
-    buff:
+    buffs:
       - attribute: Wounded to Death
-        condition:
+        conditions:
           - Enemy
           - In City
         value:
           number: 10
           unit: percentage
   - level: "red3"
-    buff:
+    buffs:
       - attribute: Attack
-        condition:
+        conditions:
           - Attacking
-        class: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 10
           unit: percentage
       - attribute: March Size
-        condition:
+        conditions:
           - Attacking
         value:
           number: 10
           unit: percentage
   - level: "red4"
-    buff:
+    buffs:
       - attribute: Defense
-        condition:
+        conditions:
           - Marching
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 20
           unit: percentage
       - attribute: Defense
-        condition:
+        conditions:
           - Marching
-        class: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 20
           unit: percentage
       - attribute: HP
-        condition:
+        conditions:
           - Marching
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 20
           unit: percentage
       - attribute: HP
-        condition:
+        conditions:
           - Marching
-        class: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 20
           unit: percentage
   - level: "red5"
-    buff:
+    buffs:
       - attribute: Attack
-        condition:
+        conditions:
           - Marching
-        class: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 30
           unit: percentage
       - attribute: Defense
-        condition:
+        conditions:
           - Marching
-        class: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 25
           unit: percentage
       - attribute: HP
-        condition:
+        conditions:
           - Marching
-        class: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 25
           unit: percentage

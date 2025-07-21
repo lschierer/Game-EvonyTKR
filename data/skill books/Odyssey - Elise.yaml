@@ -1,14 +1,14 @@
 name: Odyssey - Elise
-buff:
+buffs:
   - attribute: Defense
-    condition:
+    conditions:
       - brings a dragon
     targetedType: Ground Troops
     value:
       number: 15
       unit: percentage
   - attribute: HP
-    condition:
+    conditions:
       - brings a dragon
     targetedType: Ground Troops
     value:

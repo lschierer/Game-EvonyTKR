@@ -1,6 +1,6 @@
 ---
 name: Hammer of the Gauls - Henry V
-buff:
+buffs:
   - attribute: Attack
     targetedType: Ranged Troops
     value:

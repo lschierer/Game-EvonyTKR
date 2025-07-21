@@ -1,9 +1,9 @@
 ---
 name: Napoleonic Wars
 text: Increases mounted troops’ attack by 50% when General is leading the army to attack. Increases mounted troops’ defense and HP by 30% when General brings any Dragon or Spiritual Beast to attack.
-buff:
+buffs:
   - attribute: Attack
-    condition:
+    conditions:
       - leading the army
       - Attacking
     targetedType: Mounted Troops
@@ -11,7 +11,7 @@ buff:
       number: 50
       unit: percentage
   - attribute: Defense
-    condition:
+    conditions:
       - brings a dragon
       - brings a spiritual beast
       - Attacking
@@ -20,7 +20,7 @@ buff:
       number: 30
       unit: percentage
   - attribute: HP
-    condition:
+    conditions:
       - brings a dragon
       - brings a spiritual beast
       - Attacking

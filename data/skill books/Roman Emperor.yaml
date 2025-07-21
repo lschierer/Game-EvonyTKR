@@ -1,22 +1,22 @@
 ---
 name: Roman Emperor
-buff:
+buffs:
   - attribute: Attack
     targetedType: Ground Troops
-    condition:
+    conditions:
       - Enemy
     value:
       number: 20
       unit: percentage
   - attribute: Attack
     targetedType: Mounted Troops
-    condition:
+    conditions:
       - Enemy
     value:
       number: 20
       unit: percentage
   - attribute: Death to Survival
-    condition:
+    conditions:
       - When City Mayor for this SubCity
     value:
       number: 10

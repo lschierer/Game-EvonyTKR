@@ -1,6 +1,6 @@
 ---
 name: Mongol Conquest
-buff:
+buffs:
   - attribute: Attack
     targetedType: Ranged Troops
     value:

@@ -1,46 +1,46 @@
 name: Battle of New Orleans
 levels:
   - level: Green
-    buff:
+    buffs:
       - attribute: Attack
-        class: Ranged Troops
-        condition:
+        targetedType: Ranged Troops
+        conditions:
           - Enemy
         value:
           number: 0
           unit: percentage
   - level: Blue
-    buff:
+    buffs:
       - attribute: Attack
-        class: Ranged Troops
-        condition:
+        targetedType: Ranged Troops
+        conditions:
           - Enemy
         value:
           number: 0
           unit: percentage
   - level: Purple
-    buff:
+    buffs:
       - attribute: Attack
-        class: Ranged Troops
-        condition:
+        targetedType: Ranged Troops
+        conditions:
           - Enemy
         value:
           number: 0
           unit: percentage
   - level: Orange
-    buff:
+    buffs:
       - attribute: Attack
-        class: Ranged Troops
-        condition:
+        targetedType: Ranged Troops
+        conditions:
           - Enemy
         value:
           number: 0
           unit: percentage
   - level: Gold
-    buff:
+    buffs:
       - attribute: Attack
-        class: Ranged Troops
-        condition:
+        targetedType: Ranged Troops
+        conditions:
           - Enemy
         value:
           number: -30

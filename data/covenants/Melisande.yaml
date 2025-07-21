@@ -6,75 +6,75 @@ generals:
 levels:
   - category: War
     type: personal
-    buff:
+    buffs:
       - attribute: Attack
-        class: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 5
           unit: percentage
       - attribute: Attack
-        class: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 5
           unit: percentage
   - category: Cooperation
     type: passive
-    buff:
+    buffs:
       - attribute: Marching Speed
         value:
           number: 15
           unit: percentage
   - category: Peace
     type: personal
-    buff:
+    buffs:
       - attribute: Defense
-        class: Siege Machines
-        condition:
+        targetedType: Siege Machines
+        conditions:
           - When Rallying
         value:
           number: 10
           unit: percentage
       - attribute: Attack
-        class: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 5
           unit: percentage
   - category: Faith
     type: passive
-    buff:
+    buffs:
       - attribute: Defense
-        condition:
+        conditions:
           - Reinforcing
         value:
           number: 5
           unit: percentage
   - category: Honor
     type: personal
-    buff:
+    buffs:
       - attribute: March Size
         value:
           number: 5
           unit: percentage
   - category: Civilization
     type: personal
-    buff:
+    buffs:
       - attribute: HP
-        class: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 5
           unit: percentage
       - attribute: HP
-        class: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 5
           unit: percentage
       - attribute: Defense
-        class: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 5
           unit: percentage
       - attribute: Defense
-        class: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 5
           unit: percentage

@@ -1,6 +1,6 @@
 ---
 name: Queen Annes Revenge
-buff:
+buffs:
   - attribute: Attack
     targetedType: Siege Machines
     value:
@@ -12,7 +12,7 @@ buff:
       number: 30
       unit: percentage
   - attribute: Attack
-    condition:
+    conditions:
       - brings a spiritual beast
       - brings a dragon
       - Attacking
@@ -21,7 +21,7 @@ buff:
       number: 10
       unit: percentage
   - attribute: Attack
-    condition:
+    conditions:
       - brings a spiritual beast
       - brings a dragon
       - Attacking

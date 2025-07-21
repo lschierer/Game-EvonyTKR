@@ -1,6 +1,6 @@
 ---
 ascending:
-- buff:
+- buffs:
   - attribute: HP
     conditions:
     - Marching
@@ -29,7 +29,7 @@ ascending:
       unit: percentage
   level: red1
   text: Marching Mounted Troop and Ground Troop HP +10%, with Dragon, Marching Ground Troop Attack +15%.
-- buff:
+- buffs:
   - attribute: Wounded to Death
     conditions:
     - Enemy
@@ -41,7 +41,7 @@ ascending:
       unit: percentage
   level: red2
   text: Enemy In-city Troop Wounded into Death rate +10%.
-- buff:
+- buffs:
   - attribute: March Size
     conditions: []
     passive: 0
@@ -51,7 +51,7 @@ ascending:
       unit: percentage
   level: red3
   text: March Size Capacity +14%.
-- buff:
+- buffs:
   - attribute: Defense
     conditions:
     - Marching
@@ -62,7 +62,7 @@ ascending:
       unit: percentage
   level: red4
   text: Marching Ground Troop Defense +60%.
-- buff:
+- buffs:
   - attribute: HP
     conditions:
     - leading the army

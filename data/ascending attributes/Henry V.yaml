@@ -1,6 +1,6 @@
 ---
 ascending:
-- buff:
+- buffs:
   - attribute: Attack
     conditions:
     - leading the army
@@ -27,7 +27,7 @@ ascending:
       unit: percentage
   level: red1
   text: Increases Ranged Troop Attack by 5%, Defense and HP by 10% when General is leading the army.
-- buff:
+- buffs:
   - attribute: Death to Wounded
     conditions:
     - leading the army
@@ -39,7 +39,7 @@ ascending:
       unit: percentage
   level: red2
   text: Increases Troop Death into Wounded Rate by 10% when General is leading the army to attack.
-- buff:
+- buffs:
   - attribute: Rally Capacity
     conditions:
     - When Rallying
@@ -50,7 +50,7 @@ ascending:
       unit: percentage
   level: red3
   text: When General is launching Alliance War, Rally Capacity +8%.
-- buff:
+- buffs:
   - attribute: Attack
     conditions:
     - leading the army
@@ -77,7 +77,7 @@ ascending:
       unit: percentage
   level: red4
   text: Increases Ranged Troop Attack by 10%, Defense and HP by 10% when General is leading the army.
-- buff:
+- buffs:
   - attribute: Attack
     conditions:
     - leading the army

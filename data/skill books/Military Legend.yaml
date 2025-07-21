@@ -1,6 +1,6 @@
 ---
 name: Military Legend
-buff:
+buffs:
   - attribute: Attack
     targetedType: Ground Troops
     value:

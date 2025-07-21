@@ -1,6 +1,6 @@
 ---
 ascending:
-- buff:
+- buffs:
   - attribute: Attack
     conditions: []
     passive: 0
@@ -17,7 +17,7 @@ ascending:
       unit: percentage
   level: red1
   text: Siege Machine Attack +5% and Defense +15%.
-- buff:
+- buffs:
   - attribute: Death to Wounded
     conditions:
     - Marching
@@ -28,7 +28,7 @@ ascending:
       unit: percentage
   level: red2
   text: Marching Troop Death into Wounded Rate +8%.
-- buff:
+- buffs:
   - attribute: Attack
     conditions: []
     passive: 0
@@ -46,7 +46,7 @@ ascending:
       unit: percentage
   level: red3
   text: Siege Machine Attack +5%; when General is launching Alliance War, Rally Capacity +8%.
-- buff:
+- buffs:
   - attribute: HP
     conditions: []
     passive: 0
@@ -56,7 +56,7 @@ ascending:
       unit: percentage
   level: red4
   text: Siege Machine HP +55%.
-- buff:
+- buffs:
   - attribute: Attack
     conditions: []
     passive: 0
