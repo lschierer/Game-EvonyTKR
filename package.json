@@ -1,0 +1,29 @@
+{
+  "name": "game-evonytkr",
+  "version": "0.1.0",
+  "description": "This is primarily a Perl project, but deploys using SST (and thus typescript)",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Luke Schierer <luke@schierer.org>",
+  "license": "ISC",
+  "devDependencies": {
+    "@commitlint/cli": "^19.8.1",
+    "@commitlint/config-conventional": "^19.8.1",
+    "@commitlint/types": "^19.8.1",
+    "@tsconfig/node24": "^24.0.1",
+    "@types/aws-lambda": "8.10.152",
+    "@types/node": "^24.0.15",
+    "globals": "^16.3.0",
+    "husky": "^9.1.7",
+    "jiti": "^2.4.2",
+    "lint-staged": "^16.1.2",
+    "stylelint-config-standard": "^38.0.0",
+    "tsx": "^4.20.3",
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "sst": "3.17.10"
+  }
+}
