@@ -39,7 +39,13 @@ const BasicAttributes = z.object({
 });
 
 const General = z.object({
-  ascending: z.boolean(),
+  ascending: z.union([
+    z.boolean(),
+    z.literal('true'),
+    z.literal('false'),
+    z.literal(1),
+    z.literal(0),
+  ]),
   basicAttributes: BasicAttributes,
   builtInBookName: z.string(),
   id: z.string(),
@@ -80,8 +86,8 @@ const BuffFields = z.object({
 });
 type BuffFields = z.infer<typeof BuffFields>;
 
-const GeneralData = SingleBuffs.merge(BuffFields);
-const GeneralPair = PairBuffs.merge(BuffFields);
+const GeneralData = SingleBuffs.extend(BuffFields.shape);
+const GeneralPair = PairBuffs.extend(BuffFields.shape);
 type GeneralData = z.infer<typeof GeneralData>;
 type GeneralPair = z.infer<typeof GeneralPair>;
 
