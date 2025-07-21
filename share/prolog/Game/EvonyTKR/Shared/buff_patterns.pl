@@ -216,6 +216,27 @@ buff_pattern(Buffs) -->
     format("DEBUG: '1CTAVand1C2T1AV1C' matched: '~w'~n", [Buffs])
   }.
 
+% Pattern: 1CTAVand1CT2A1VC
+buff_pattern(Buffs) -->
+  {format("DEBUG: Trying '1CTAVand1CT2A1VC'~n")},
+  optional_verb, condition(Cond1), troop(Troop1),
+  attribute(Attr1), optional_value_adj,
+  [ValueAtom1], [and],
+  condition(Cond2), troop(Troop2),
+  attribute(Attr2a), [and], attribute(Attr2b),
+  optional_value_adj, [ValueAtom2],
+  optional_when_general_is, condition(CondS),
+  {extract_value(ValueAtom1, Value1)},
+  {extract_value(ValueAtom2, Value2)},
+  {
+    Buffs = [
+      buff(Attr1,   Troop1, Value1, [Cond1,CondS]),
+      buff(Attr2a,  Troop2, Value2, [Cond2,CondS]),
+      buff(Attr2b,  Troop2, Value2, [Cond2,CondS])
+    ],
+    format("DEBUG: '1CTAVand1CT2A1VC' matched: Buffs: '~w'~n", [Buffs])
+  }.
+
 % Pattern: 1CTAVand1CTAV1C
 buff_pattern(Buffs) -->
   {format("DEBUG: Trying '1CTAVand1CTAV1C'~n")},
@@ -1739,6 +1760,19 @@ buff_pattern(Buffs) -->
     format("DEBUG: matched '1C1A1V': Buffs: '~w'~n", [Buffs])
   }.
 
+% 1C1TAV1C
+buff_pattern(Buffs) -->
+  { format("DEBUG: Trying '1C1TAV1C'~n", []) },
+  optional_when, optional_verb,
+  condition(Cond1a), troop(Troop1), attribute(Attr1),
+  optional_value_adj, [ValueAtom1],
+  optional_when_general_is, condition(Cond1b),
+  {
+    extract_value(ValueAtom1, Value1),
+    Buffs = [buff(Attr1, Troop1, Value1, [Cond1a,Cond1b])],
+    format("DEBUG: matched '1C1TAV1C': '~w'~n", [Buffs])
+  }.
+
 % 1C1TAV
 % 1C: 1 condition
 % 1T: 1 Troop
@@ -1746,15 +1780,15 @@ buff_pattern(Buffs) -->
 % 1V: 1 value
 buff_pattern(Buffs) -->
   { format("DEBUG: Trying '1C1TAV'~n", []) },
-  optional_when_general_is, condition(Cond1),
+  optional_when_general_is, optional_when,
+  condition(Cond1),
   troop(Troop1), attribute(Attr1),
-  optional_value_adj, [ValueAtom],
+  optional_value_adj, [ValueAtom1],
   {
-    extract_value(ValueAtom, Value),
-    Buffs = [buff(Attr1, Troop1, Value, [Cond1])],
+    extract_value(ValueAtom1, Value1),
+    Buffs = [buff(Attr1, Troop1, Value1, [Cond1])],
     format("DEBUG: matched '1C1TAV': '~w'~n", [Buffs])
   }.
-
 
 % Pattern: 1CAV
 buff_pattern(Buffs) -->
@@ -1788,28 +1822,6 @@ buff_pattern(Buffs) -->
     format("DEBUG: '1VA2C' matched: '~w'~n", [Buffs])
   }.
 
-% Pattern 1C1TAV
-% 1 shared condition
-% 1 troop attribute value clause
-buff_pattern(Buffs) -->
-  {format("DEBUG: Trying '1C1TAV'~n")},
-  optional_when, condition(Cond1),
-  troop(Troop1),
-  {format("DEBUG: troop: '~w'~n", [Troop1])},
-  attribute(Attr1),
-  {format("DEBUG: attribute: '~w'~n", [Attr1])},
-  optional_value_adj,[ValueAtom1],
-  {
-    extract_value(ValueAtom1, Value1),
-    format("DEBUG: ValueAtom1: '~w'~n", [Value1])
-  },
-  {
-    Buffs = [
-      buff(Attr1, Troop1, Value1, [Cond1])
-    ],
-    format("DEBUG: '1C1TAV' matched: '~w'~n",
-    [Buffs])
-  }.
 
 
 % Pattern 1: Simple one-buff (most general - should be last)
