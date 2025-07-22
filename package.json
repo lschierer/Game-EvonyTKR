@@ -4,7 +4,9 @@
   "description": "This is primarily a Perl project, but deploys using SST (and thus typescript)",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc",
+    "watch": "tsc -w",
+    "cdk": "cdk"
   },
   "author": "Luke Schierer <luke@schierer.org>",
   "license": "ISC",

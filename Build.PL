@@ -15,6 +15,7 @@ my $builder = Module::Build->new(
     ],
     create_readme       => 0,
     requires            => {
+      'utf8::all'                   => '0',
       'App::Cmd::Simple'            => '0',
       'Carp'                        => '0',
       'Cwd'                         => '0',
@@ -65,6 +66,8 @@ my $builder = Module::Build->new(
       'Mojolicious::Plugin::Module::Loader' => '0',
       'Mojolicious::Routes'         => '0',
       'Mojolicious::Routes::Route'  => '0',
+      'Moose'                       => '0',
+      'Moose::Autobox'              => '0',
       'Params::ValidationCompiler'  => '0',
       'Path::Iterator::Rule'        => '0',
       'Path::Tiny'                  => '0',
@@ -87,7 +90,6 @@ my $builder = Module::Build->new(
       'namespace::autoclean'        => '0',
       'namespace::clean'            => '0',
       'overload'                    => '0',
-      'utf8::all'                   => '0',
     },
     recommends          => {
 
@@ -96,12 +98,26 @@ my $builder = Module::Build->new(
       'Module::Build'   => '0.42'
     },
     build_requires      => {
+      'utf8::all'                       => '0',
       'App::podweaver'                  => '0',
       'File::Spec'                      => '0',
       'FindBin'                         => '0',
-      'Pod::Weaver'                     => '0',
-      'Pod::Weaver::Section::Leftovers' => '0',
+      'File::Find::Rule'                => '0',
+      'File::Find::Rule::Perl'          => '0',
+      'File::Find::Rule::VCS'           => '0',
+      'File::Slurp'                     => '0',
+      'Log::Any::Adapter::Dispatch'     => '0',
+      'Software::License::Perl_5'       => '0',
+      'Test::Command'                   => '0',
+      'Test::MockObject'                => '0',
+      'Moose'                           => '0',
+      'Moose::Autobox'                  => '0',
       'Perl::Version'                   => '0',
+      'Pod::Elemental'                  => '0',
+      'Pod::Weaver'                     => '0',
+      'Pod::Weaver::Role::SectionReplacer'            => '0',
+      'Pod::Weaver::PluginBundle::ReplaceBoilerplate' => '0',
+      'Pod::Weaver::Section::Leftovers' => '0',
       'Log::Any::Adapter'               => '0',
       'Mojolicious::Command::Author::generate::dockerfile'    => '0',
     },
@@ -113,7 +129,10 @@ my $builder = Module::Build->new(
       'Perl::Critic'          => '0',
       'Perl::Critic::Policy'  => '0',
       'Perl::Critic::Policy::Modules::RequireExplicitPackage' => '0',
-    }
+    },
+    exclude_file_types => [
+      'share/infrastructure'
+    ]
 
 );
 

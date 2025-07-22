@@ -19,3 +19,4 @@ blib
 .sst
 
 node_modules
+share/infrastructure/cdk.out

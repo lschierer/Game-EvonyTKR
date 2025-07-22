@@ -65,9 +65,9 @@ async function fixImportExtensions() {
       /from\s+['"]([^'"]*?)['"];/g,
       (match, importPath) => {
         // Skip external modules
-        if (importPath.startsWith('.')) {
+        if ((importPath as string).startsWith('.')) {
           // Add .js extension if it doesn't have one
-          if (!importPath.endsWith('.js')) {
+          if (!(importPath as string).endsWith('.js')) {
             return `from '${importPath}.js';`;
           }
         }
@@ -79,7 +79,7 @@ async function fixImportExtensions() {
   }
 }
 
-main().catch((err) => {
+main().catch((err: unknown) => {
   console.error('Build failed:', err);
   process.exit(1);
 });
