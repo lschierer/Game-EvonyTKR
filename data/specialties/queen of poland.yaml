@@ -1,93 +1,77 @@
 ---
 levels:
-- buffs:
-  - attribute: Attack
-    conditions: []
-    passive: 0
-    targetedType: Mounted Troops
-    value:
-      number: 0
-      unit: percentage
-  - attribute: Attack
-    conditions:
-    - Enemy
-    passive: 0
-    targetedType: Siege Machines
-    value:
-      number: 0
-      unit: percentage
-  level: Green
-  text: ''
-- buffs:
-  - attribute: Attack
-    conditions: []
-    passive: 0
-    targetedType: Mounted Troops
-    value:
-      number: 0
-      unit: percentage
-  - attribute: Attack
-    conditions:
-    - Enemy
-    passive: 0
-    targetedType: Siege Machines
-    value:
-      number: 0
-      unit: percentage
-  level: Blue
-  text: ''
-- buffs:
-  - attribute: Attack
-    conditions: []
-    passive: 0
-    targetedType: Mounted Troops
-    value:
-      number: 0
-      unit: percentage
-  - attribute: Attack
-    conditions:
-    - Enemy
-    passive: 0
-    targetedType: Siege Machines
-    value:
-      number: 0
-      unit: percentage
-  level: Purple
-  text: ''
-- buffs:
-  - attribute: Attack
-    conditions: []
-    passive: 0
-    targetedType: Mounted Troops
-    value:
-      number: 0
-      unit: percentage
-  - attribute: Attack
-    conditions:
-    - Enemy
-    passive: 0
-    targetedType: Siege Machines
-    value:
-      number: 0
-      unit: percentage
-  level: Orange
-  text: ''
-- buffs:
-  - attribute: Attack
-    conditions: []
-    passive: 0
-    targetedType: Mounted Troops
-    value:
-      number: 26
-      unit: percentage
-  - attribute: Attack
-    conditions:
-    - Enemy
-    passive: 0
-    targetedType: Siege Machines
-    value:
-      number: 20
-      unit: percentage
-  level: Gold
-  text: Mounted Troop Attack +26%, Enemy Siege Machine Attack -20%
+  - buffs:
+      - attribute: Attack
+        targetedType: Mounted Troops
+        value:
+          number: 3
+          unit: percentage
+      - attribute: Attack
+        conditions:
+          - Enemy
+        targetedType: Siege Machines
+        value:
+          number: 2
+          unit: percentage
+    level: Green
+    text: ''
+  - buffs:
+      - attribute: Attack
+        targetedType: Mounted Troops
+        value:
+          number: 3
+          unit: percentage
+      - attribute: Attack
+        conditions:
+          - Enemy
+        targetedType: Siege Machines
+        value:
+          number: 2
+          unit: percentage
+    level: Blue
+    text: ''
+  - buffs:
+      - attribute: Attack
+        targetedType: Mounted Troops
+        value:
+          number: 5
+          unit: percentage
+      - attribute: Attack
+        conditions:
+          - Enemy
+        targetedType: Siege Machines
+        value:
+          number: 4
+          unit: percentage
+    level: Purple
+    text: ''
+  - buffs:
+      - attribute: Attack
+        targetedType: Mounted Troops
+        value:
+          number: 5
+          unit: percentage
+      - attribute: Attack
+        conditions:
+          - Enemy
+        targetedType: Siege Machines
+        value:
+          number: 4
+          unit: percentage
+    level: Orange
+    text: ''
+  - buffs:
+      - attribute: Attack
+        targetedType: Mounted Troops
+        value:
+          number: 10
+          unit: percentage
+      - attribute: Attack
+        conditions:
+          - Enemy
+        targetedType: Siege Machines
+        value:
+          number: 8
+          unit: percentage
+    level: Gold
 name: Queen of Poland

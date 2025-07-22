@@ -1,118 +1,92 @@
----
 name: Battle of the Frigidus
 levels:
   - level: Green
+    text: Attacking Siege Machine Attack +4%. Attacking Siege Machine Defense +2%. Attacking Siege Machine HP +2%.
     buffs:
-      - attribute: Attack
+      - attribute: attack
+        troop: siege_machines
+        value: 4
         conditions:
-          - Marching
-        targetedType: Siege Machines
-        value:
-          number: 4
-          unit: percentage
-      - attribute: Defense
+          - attacking
+      - attribute: defense
+        troop: siege_machines
+        value: 2
         conditions:
-          - Marching
-        targetedType: Siege Machines
-        value:
-          number: 2
-          unit: percentage
-      - attribute: HP
+          - attacking
+      - attribute: hp
+        troop: siege_machines
+        value: 2
         conditions:
-          - Marching
-        targetedType: Siege Machines
-        value:
-          number: 2
-          unit: percentage
+          - attacking
   - level: Blue
+    text: Attacking Siege Machine Attack +4%. Attacking Siege Machine Defense +3%. Attacking Siege Machine HP +3%.
     buffs:
-      - attribute: Attack
+      - attribute: attack
+        troop: siege_machines
+        value: 4
         conditions:
-          - Marching
-        targetedType: Siege Machines
-        value:
-          number: 4
-          unit: percentage
-      - attribute: Defense
+          - attacking
+      - attribute: defense
+        troop: siege_machines
+        value: 3
         conditions:
-          - Marching
-        targetedType: Siege Machines
-        value:
-          number: 3
-          unit: percentage
-      - attribute: HP
+          - attacking
+      - attribute: hp
+        troop: siege_machines
+        value: 3
         conditions:
-          - Marching
-        targetedType: Siege Machines
-        value:
-          number: 3
-          unit: percentage
+          - attacking
   - level: Purple
+    text: Attacking Siege Machine Attack +8%. Attacking Siege Machine Defense +5%. Attacking Siege Machine HP +5%.
     buffs:
-      - attribute: Attack
+      - attribute: attack
+        troop: siege_machines
+        value: 8
         conditions:
-          - Marching
-        targetedType: Siege Machines
-        value:
-          number: 8
-          unit: percentage
-      - attribute: Defense
+          - attacking
+      - attribute: defense
+        troop: siege_machines
+        value: 5
         conditions:
-          - Marching
-        targetedType: Siege Machines
-        value:
-          number: 5
-          unit: percentage
-      - attribute: HP
+          - attacking
+      - attribute: hp
+        troop: siege_machines
+        value: 5
         conditions:
-          - Marching
-        targetedType: Siege Machines
-        value:
-          number: 5
-          unit: percentage
+          - attacking
   - level: Orange
+    text: Attacking Siege Machine Attack +8%. Attacking Siege Machine Defense +5%. Attacking Siege Machine HP +5%.
     buffs:
-      - attribute: Attack
+      - attribute: attack
+        troop: siege_machines
+        value: 8
         conditions:
-          - Marching
-        targetedType: Siege Machines
-        value:
-          number: 8
-          unit: percentage
-      - attribute: Defense
+          - attacking
+      - attribute: defense
+        troop: siege_machines
+        value: 5
         conditions:
-          - Marching
-        targetedType: Siege Machines
-        value:
-          number: 5
-          unit: percentage
-      - attribute: HP
+          - attacking
+      - attribute: hp
+        troop: siege_machines
+        value: 5
         conditions:
-          - Marching
-        targetedType: Siege Machines
-        value:
-          number: 5
-          unit: percentage
+          - attacking
   - level: Gold
+    text: Attacking Siege Machine Attack +16%. Attacking Siege Machine Defense +10%. Attacking Siege Machine HP +10%.
     buffs:
-      - attribute: Attack
+      - attribute: attack
+        troop: siege_machines
+        value: 16
         conditions:
-          - Marching
-        targetedType: Siege Machines
-        value:
-          number: 16
-          unit: percentage
-      - attribute: Defense
+          - attacking
+      - attribute: defense
+        troop: siege_machines
+        value: 10
         conditions:
-          - Marching
-        targetedType: Siege Machines
-        value:
-          number: 10
-          unit: percentage
-      - attribute: HP
+          - attacking
+      - attribute: hp
+        troop: siege_machines
+        value: 10
         conditions:
-          - Marching
-        targetedType: Siege Machines
-        value:
-          number: 10
-          unit: percentage
+          - attacking
