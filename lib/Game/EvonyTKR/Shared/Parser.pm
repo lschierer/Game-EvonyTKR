@@ -402,7 +402,7 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
     #\x{201C}    # Unicode left double quote "
     #\x{201D}    # Unicode right double quote "
     #\x{0060}    # ASCII backtick
-    # \x{00B4}    # ASCII acute accent ´
+    #\x{00B4}    # ASCII acute accent ´
     $text =~
       s/[\x{0022}\x{0027}\x{2018}\x{2019}\x{201C}\x{201D}\x{0060}\x{00B4}]//gx
       ;    # remove apostrophies entirely for prolog to parse.

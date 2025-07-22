@@ -209,6 +209,18 @@ class Game::EvonyTKR::Shared::Constants : isa(Game::EvonyTKR::Model::Logger) {
         "Mayor"       => 1,
         "Officer"     => 0,
       },
+      'brings a sacred dragon' => {
+        "Overall"     => 1,
+        "PvM"         => 1,
+        "Attacking"   => 1,
+        "Reinforcing" => 1,
+        "Defense"     => 1,
+        "In City"     => 1,
+        "Out City"    => 1,
+        "Wall"        => 1,
+        "Mayor"       => 1,
+        "Officer"     => 0,
+      },
       'brings a spiritual beast' => {
         "Overall"     => 1,
         "PvM"         => 1,
@@ -456,9 +468,11 @@ class Game::EvonyTKR::Shared::Constants : isa(Game::EvonyTKR::Model::Logger) {
       'in rally'                   => 'When Rallying',
       'Reduces Monster'            => "Monsters",          # debuff version
       'brings any dragon'          => 'brings a dragon',
+      'brings any sacred dragon'   => 'brings a sacred dragon',
       'brings dragon'              => 'brings a dragon',
       'with dragon'                => 'brings a dragon',
       'with any dragon'            => 'brings a dragon',
+      'with any sacred dragon'     => 'brings a sacred dragon',
       'brings any spiritual beast' => 'brings a spiritual beast',
       'brings spiritual beast'     => 'brings a spiritual beast',
       'to attack Monsters'         => 'Against Monsters',         # buff version

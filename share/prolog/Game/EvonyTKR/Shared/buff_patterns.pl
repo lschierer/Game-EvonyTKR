@@ -1855,6 +1855,22 @@ buff_pattern(Buffs) -->
   },
   {format("DEBUG: '1T3A1V' matched: '~w'~n", [Buffs])}.
 
+
+% Pattern 2T1AV
+% Only attribute and value present
+buff_pattern(Buffs) -->
+  {format("DEBUG: Trying '2T1AV'~n")},
+  troop(Troop1a), [and], troop(Troop1b),
+  attribute(Attr1),
+  optional_value_adj, [ValueAtom1],
+  {extract_value(ValueAtom1,Value1)},
+  { Buffs = [
+      buff(Attr1, Troop1a, Value1,[]),
+      buff(Attr1, Troop1b, Value1,[])
+    ],
+    format("DEBUG: '2T1AV' matched: '~w'~n", [Buffs])
+  }.
+
 % Pattern 1TAV
 % Only attribute and value present
 buff_pattern(Buffs) -->
