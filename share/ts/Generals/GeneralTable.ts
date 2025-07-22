@@ -1,6 +1,7 @@
 // This component supports both single-general and general-pair modes.
 // It progressively loads full data row-by-row from the appropriate endpoint.
-const DEBUG = true;
+import debugFunction from '../localDebug';
+const DEBUG = debugFunction(new URL(import.meta.url).pathname);
 
 import 'iconify-icon';
 import { customElement, property, state } from 'lit/decorators.js';
@@ -165,14 +166,15 @@ export class GeneralTable extends LitElement {
     GeneralTableCSS,
   ];
 
-  override async firstUpdated(_changed: PropertyValues) {
+  /* eslint-disable-next-line  @typescript-eslint/no-misused-promises */
+  override async firstUpdated() {
     this.columns = this.generateColumns();
     const stubData = await this.fetchStubPairs();
     this.nameList = [...stubData];
     this.startBackgroundFetch();
   }
 
-  protected override async willUpdate(_changedProperties: PropertyValues) {
+  protected override willUpdate(_changedProperties: PropertyValues) {
     if (
       _changedProperties.has('ascendingLevel') ||
       _changedProperties.has('primaryCovenantLevel') ||
@@ -187,7 +189,7 @@ export class GeneralTable extends LitElement {
       _changedProperties.has('secondarySpecialty4') ||
       _changedProperties.has('allowedBuffActivation')
     ) {
-      this.nameList.forEach((nameStub, index) => {
+      this.nameList.forEach((nameStub) => {
         nameStub.current = 'stale';
         if (this.batchSize >= 10) {
           if (DEBUG) {
@@ -235,10 +237,11 @@ export class GeneralTable extends LitElement {
       })
       .map((key) => {
         const accessorFn = (row: RowData) => {
+          /* eslint-disable-next-line  @typescript-eslint/no-unnecessary-condition */
           if (!row) return null;
-          if (key === 'primary') return (row as any).primary?.name;
-          if (key === 'secondary') return (row as any).secondary?.name;
-          return (row as any)[key];
+          if (key === 'primary') return (row as GeneralPair).primary.name;
+          if (key === 'secondary') return (row as GeneralPair).secondary.name;
+          return row[key as keyof typeof row];
         };
 
         return {
@@ -319,11 +322,11 @@ export class GeneralTable extends LitElement {
     }
 
     const res = await fetch(url);
-    const json = await res.json();
+    const json = (await res.json()) as object;
 
     const result =
       this.mode === 'pair'
-        ? GeneralPairStub.array().safeParse(json.data)
+        ? GeneralPairStub.array().safeParse(json['data' as keyof typeof json])
         : GeneralDataStub.array().safeParse(json);
 
     if (result.success) return result.data;
@@ -336,7 +339,7 @@ export class GeneralTable extends LitElement {
     this.nameList[index].current = 'pending';
     const stub = this.nameList[index];
 
-    let basePath = this.urlConversion('row');
+    const basePath = this.urlConversion('row');
     if (this.mode === 'pair') {
       const pairStub = stub as GeneralPairStub;
       const params = new URLSearchParams({
@@ -356,7 +359,7 @@ export class GeneralTable extends LitElement {
       });
       const url = `${basePath}?${params.toString()}`;
       const res = await fetch(url);
-      const json = await res.json();
+      const json = (await res.json()) as object;
       const parsed = GeneralPair.safeParse(json);
       if (parsed.success) return parsed.data;
       console.error(parsed.error.message);
@@ -374,7 +377,7 @@ export class GeneralTable extends LitElement {
 
       const url = `${basePath}?name=${encodeURIComponent(stub.primary.name)}&${params.toString()}`;
       const res = await fetch(url);
-      const json = await res.json();
+      const json = (await res.json()) as object;
       const parsed = GeneralData.safeParse(json);
       if (parsed.success) return parsed.data;
       throw new Error(parsed.error.message);
@@ -383,7 +386,7 @@ export class GeneralTable extends LitElement {
 
   private maxBatch = 6;
   private batchSize = this.maxBatch;
-  private async startBackgroundFetch() {
+  private startBackgroundFetch() {
     if (this._bgFetchTimer) return;
     this._bgFetchTimer = 1; // prevent re-entry
 
@@ -404,7 +407,7 @@ export class GeneralTable extends LitElement {
               this.nameList[i].current = 'current';
               this.dataMap.set(i, full);
             })
-            .catch((err) => {
+            .catch((err: unknown) => {
               console.error(`Fetch failed for row ${i}`, err);
               this.nameList[i].current = 'stale';
             })
