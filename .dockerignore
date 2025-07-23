@@ -1,6 +1,6 @@
 
-# sst
-.sst
-
 .build
-share/infrastructure/cdk.out
+share/infrastructure
+cdk.out
+node_modules
+share/node_modules

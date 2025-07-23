@@ -11,8 +11,6 @@ import * as logs from 'aws-cdk-lib/aws-logs';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as cdk from 'aws-cdk-lib';
 import * as iam from 'aws-cdk-lib/aws-iam';
-import * as events from 'aws-cdk-lib/aws-events';
-import * as eventsTargets from 'aws-cdk-lib/aws-events-targets';
 
 interface MojoliciousStackProps extends StackProps {
   domainName: string;
@@ -106,9 +104,16 @@ export class MojoliciousStack extends Stack {
       },
     );
 
+    // Add a volume to share logs
+    taskDefinition.addVolume({
+      name: 'perl-logs',
+      host: {}, // Empty host means it's an ephemeral volume
+    });
+
     // Add container to task definition
-    const container = taskDefinition.addContainer('EvonyTKRTipsContainer', {
+    const appContainer = taskDefinition.addContainer('EvonyTKRTipsContainer', {
       image: ecs.ContainerImage.fromEcrRepository(repository, props.imageTag),
+      user: 'mojo',
       logging: ecs.LogDrivers.awsLogs({
         streamPrefix: 'evonytkrtips',
         logRetention: logs.RetentionDays.ONE_WEEK,
@@ -117,6 +122,7 @@ export class MojoliciousStack extends Stack {
         // Add any environment variables your Mojolicious app needs
         MOJO_MODE: 'production',
         MOJO_LISTEN: `http://0.0.0.0:${props.containerPort}`,
+        HOME: '/home/mojo',
       },
       healthCheck: {
         command: [
@@ -131,9 +137,16 @@ export class MojoliciousStack extends Stack {
     });
 
     // Add port mapping
-    container.addPortMappings({
+    appContainer.addPortMappings({
       containerPort: props.containerPort,
       protocol: ecs.Protocol.TCP,
+    });
+
+    // Mount the logs volume in your app container
+    appContainer.addMountPoints({
+      containerPath: '/home/mojo/var/',
+      sourceVolume: 'perl-logs',
+      readOnly: false,
     });
 
     const albSG = new ec2.SecurityGroup(this, 'EvonyTKRTipsAlbSG', {
@@ -156,43 +169,9 @@ export class MojoliciousStack extends Stack {
       cluster,
       taskDefinition,
       desiredCount: props.desiredCount,
+      enableExecuteCommand: true,
       assignPublicIp: false,
       securityGroups: [albSG, serviceSG],
-    });
-
-    const syncTaskDefinition = new ecs.FargateTaskDefinition(
-      this,
-      'LogSyncTaskDef',
-      {
-        memoryLimitMiB: 512,
-        cpu: 256,
-        taskRole: syncTaskRole,
-      },
-    );
-
-    syncTaskDefinition.addContainer('LogSyncContainer', {
-      image: ecs.ContainerImage.fromRegistry('amazonlinux'), // could use a custom image with awscli
-      command: [
-        'sh',
-        '-c',
-        [
-          `aws s3 cp /root/var/log/Perl/dist/Game-Evony/system.log s3://${logbucket.bucketName}/$(date +%Y/%m/%d/%H%M)_system.log`,
-          `aws s3 cp /root/var/log/Perl/dist/Game-Evony/root.log s3://${logbucket.bucketName}/$(date +%Y/%m/%d/%H%M)_root.log`,
-        ].join(' && '),
-      ],
-      logging: ecs.LogDrivers.awsLogs({ streamPrefix: 'log-sync' }),
-    });
-
-    new events.Rule(this, 'LogSyncSchedule', {
-      schedule: events.Schedule.rate(Duration.minutes(10)),
-      targets: [
-        new eventsTargets.EcsTask({
-          cluster,
-          taskDefinition: syncTaskDefinition,
-          subnetSelection: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
-          securityGroups: [service.connections.securityGroups[0]],
-        }),
-      ],
     });
 
     // Create ALB
@@ -247,6 +226,29 @@ export class MojoliciousStack extends Stack {
         new targets.LoadBalancerTarget(lb),
       ),
       ttl: Duration.minutes(5),
+    });
+
+    //for logging to s3
+    // Add sidecar container for log syncing
+    const syncContainer = taskDefinition.addContainer('LogSyncContainer', {
+      image: ecs.ContainerImage.fromRegistry('amazon/aws-cli'),
+      user: '1000:1000', // Use the same UID:GID as the mojo user
+      essential: false, // Not essential so main container can start first
+      command: [
+        '/bin/sh',
+        '-c',
+        'while true; do aws s3 cp /logs/ s3://' +
+          logbucket.bucketName +
+          '/$(date +%Y/%m/%d)/ --recursive --exclude "*" --include "*.log"; sleep 600; done',
+      ],
+      logging: ecs.LogDrivers.awsLogs({ streamPrefix: 'log-sync' }),
+    });
+
+    // Mount the logs volume in the sync container
+    syncContainer.addMountPoints({
+      containerPath: '/logs',
+      sourceVolume: 'perl-logs',
+      readOnly: true,
     });
 
     // Outputs

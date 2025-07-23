@@ -1,12 +1,14 @@
 {
   "name": "game-evonytkr",
   "version": "0.1.0",
-  "description": "This is primarily a Perl project, but deploys using SST (and thus typescript)",
+  "description": "This is primarily a Perl project, but deploys using CDK (and thus typescript)",
   "type": "module",
   "scripts": {
-    "build": "tsc",
-    "watch": "tsc -w",
-    "cdk": "cdk"
+    "cdk": "cdk",
+    "deploy": "cdk deploy",
+    "synth": "cdk synth",
+    "diff": "cdk diff",
+    "bootstrap": "cdk bootstrap"
   },
   "author": "Luke Schierer <luke@schierer.org>",
   "license": "ISC",
@@ -14,18 +16,20 @@
     "@commitlint/cli": "^19.8.1",
     "@commitlint/config-conventional": "^19.8.1",
     "@commitlint/types": "^19.8.1",
+    "@tsconfig/node22": "^22.0.2",
     "@tsconfig/node24": "^24.0.1",
     "@types/aws-lambda": "8.10.152",
-    "@types/node": "^24.0.15",
+    "@types/node": "^24.1.0",
+    "aws-cdk": "^2.1021.0",
+    "aws-cdk-lib": "^2.206.0",
+    "constructs": "^10.4.2",
     "globals": "^16.3.0",
     "husky": "^9.1.7",
-    "jiti": "^2.4.2",
+    "jiti": "^2.5.0",
     "lint-staged": "^16.1.2",
     "stylelint-config-standard": "^38.0.0",
+    "ts-node": "^10.9.2",
     "tsx": "^4.20.3",
-    "typescript": "^5"
-  },
-  "dependencies": {
-    "sst": "3.17.10"
+    "typescript": "^5.8.3"
   }
 }

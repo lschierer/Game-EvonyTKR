@@ -1,6 +1,5 @@
 packages:
   - share
-  - share/collections
   - share/infrastructure
 onlyBuiltDependencies:
   - esbuild

@@ -13,6 +13,9 @@ my $builder = Module::Build->new(
       'scripts/game-evonytkr',
       'scripts/create-general',
     ],
+     share_dir => {
+        dist => ['share'],  # This tells Module::Build to install the share directory
+    },
     create_readme       => 0,
     requires            => {
       'utf8::all'                   => '0',
@@ -132,7 +135,8 @@ my $builder = Module::Build->new(
       'Perl::Critic::Policy::Modules::RequireExplicitPackage' => '0',
     },
     exclude_file_types => [
-      'share/infrastructure'
+      'share/infrastructure',
+      'node_modules'
     ]
 
 );

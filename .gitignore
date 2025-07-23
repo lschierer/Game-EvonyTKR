@@ -1,4 +1,6 @@
 Game-EvonyTKR.geany
+cdk.out
+cdk.context.json 
 /Game-EvonyTKR-*
 /.build
 /_build*
