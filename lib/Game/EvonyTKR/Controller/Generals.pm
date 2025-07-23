@@ -250,6 +250,7 @@ package Game::EvonyTKR::Controller::Generals {
     );
 
     if (-f $markdown_path) {
+      $logger->debug("rendering /Generals/ with markdown index content from $markdown_path");
       # Render with markdown
       $self->stash(template => '/generals/index');
 
@@ -257,6 +258,7 @@ package Game::EvonyTKR::Controller::Generals {
         { template => 'generals/index' });
     }
     else {
+      $logger->debug("no markdown index content found at $markdown_path");
       # Render just the items
       return $self->render(template => '/generals/index');
     }
