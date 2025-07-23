@@ -118,6 +118,16 @@ export class MojoliciousStack extends Stack {
         MOJO_MODE: 'production',
         MOJO_LISTEN: `http://0.0.0.0:${props.containerPort}`,
       },
+      healthCheck: {
+        command: [
+          'CMD-SHELL',
+          `curl -f http://localhost:${props.containerPort}/health || exit 1`,
+        ],
+        interval: Duration.seconds(30),
+        timeout: Duration.seconds(5),
+        retries: 3,
+        startPeriod: Duration.seconds(10), // wait this long before running the first check
+      },
     });
 
     // Add port mapping
