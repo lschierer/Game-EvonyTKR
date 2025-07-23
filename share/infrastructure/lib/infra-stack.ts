@@ -8,6 +8,11 @@ import * as route53 from 'aws-cdk-lib/aws-route53';
 import * as targets from 'aws-cdk-lib/aws-route53-targets';
 import * as acm from 'aws-cdk-lib/aws-certificatemanager';
 import * as logs from 'aws-cdk-lib/aws-logs';
+import * as s3 from 'aws-cdk-lib/aws-s3';
+import * as cdk from 'aws-cdk-lib';
+import * as iam from 'aws-cdk-lib/aws-iam';
+import * as events from 'aws-cdk-lib/aws-events';
+import * as eventsTargets from 'aws-cdk-lib/aws-events-targets';
 
 interface MojoliciousStackProps extends StackProps {
   domainName: string;
@@ -24,6 +29,30 @@ interface MojoliciousStackProps extends StackProps {
 export class MojoliciousStack extends Stack {
   constructor(scope: Construct, id: string, props: MojoliciousStackProps) {
     super(scope, id, props);
+
+    const logbucket = new s3.Bucket(this, 'EvonyTKRTipsLogBucket', {
+      encryption: s3.BucketEncryption.KMS_MANAGED,
+      blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
+      objectOwnership: s3.ObjectOwnership.BUCKET_OWNER_ENFORCED,
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+      autoDeleteObjects: true,
+      enforceSSL: true,
+      minimumTLSVersion: 1.2,
+      intelligentTieringConfigurations: [
+        {
+          name: 'EvonyTKRTipsLogs',
+          prefix: '*',
+          archiveAccessTierTime: Duration.days(90),
+          deepArchiveAccessTierTime: Duration.days(180),
+        },
+      ],
+    });
+
+    const syncTaskRole = new iam.Role(this, 'LogSyncTaskRole', {
+      assumedBy: new iam.ServicePrincipal('ecs-tasks.amazonaws.com'),
+    });
+
+    logbucket.grantWrite(syncTaskRole);
 
     // Full domain name for the application
     const fullDomainName = `${props.appSubdomain}.${props.domainName}`;
@@ -97,17 +126,61 @@ export class MojoliciousStack extends Stack {
       protocol: ecs.Protocol.TCP,
     });
 
+    const albSG = new ec2.SecurityGroup(this, 'EvonyTKRTipsAlbSG', {
+      vpc,
+      description: 'ALB SG',
+      allowAllOutbound: true,
+    });
+    albSG.addIngressRule(ec2.Peer.anyIpv4(), ec2.Port.tcp(443));
+    albSG.addIngressRule(ec2.Peer.anyIpv4(), ec2.Port.tcp(80));
+
+    const serviceSG = new ec2.SecurityGroup(this, 'EvonyTKRTipsServiceSG', {
+      vpc,
+      description: 'Fargate service SG',
+      allowAllOutbound: true,
+    });
+    serviceSG.addIngressRule(albSG, ec2.Port.tcp(props.containerPort));
+
     // Create Fargate service
     const service = new ecs.FargateService(this, 'EvonyTKRTipsService', {
       cluster,
       taskDefinition,
       desiredCount: props.desiredCount,
       assignPublicIp: false,
-      securityGroups: [
-        new ec2.SecurityGroup(this, 'EvonyTKRTipsServiceSG', {
-          vpc,
-          description: 'Security group for evonytkrtips Fargate service',
-          allowAllOutbound: true,
+      securityGroups: [albSG, serviceSG],
+    });
+
+    const syncTaskDefinition = new ecs.FargateTaskDefinition(
+      this,
+      'LogSyncTaskDef',
+      {
+        memoryLimitMiB: 512,
+        cpu: 256,
+        taskRole: syncTaskRole,
+      },
+    );
+
+    syncTaskDefinition.addContainer('LogSyncContainer', {
+      image: ecs.ContainerImage.fromRegistry('amazonlinux'), // could use a custom image with awscli
+      command: [
+        'sh',
+        '-c',
+        [
+          `aws s3 cp /root/var/log/Perl/dist/Game-Evony/system.log s3://${logbucket.bucketName}/$(date +%Y/%m/%d/%H%M)_system.log`,
+          `aws s3 cp /root/var/log/Perl/dist/Game-Evony/root.log s3://${logbucket.bucketName}/$(date +%Y/%m/%d/%H%M)_root.log`,
+        ].join(' && '),
+      ],
+      logging: ecs.LogDrivers.awsLogs({ streamPrefix: 'log-sync' }),
+    });
+
+    new events.Rule(this, 'LogSyncSchedule', {
+      schedule: events.Schedule.rate(Duration.minutes(10)),
+      targets: [
+        new eventsTargets.EcsTask({
+          cluster,
+          taskDefinition: syncTaskDefinition,
+          subnetSelection: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
+          securityGroups: [service.connections.securityGroups[0]],
         }),
       ],
     });
@@ -117,6 +190,8 @@ export class MojoliciousStack extends Stack {
       vpc,
       internetFacing: true,
     });
+
+    lb.addSecurityGroup(albSG);
 
     // Create HTTPS listener
     const httpsListener = lb.addListener('EvonyTKRTipsHttpsListener', {

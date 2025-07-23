@@ -15,15 +15,15 @@ const envConfigs: Record<string, EnvConfig> = {
   dev: {
     subdomain: 'dev',
     desiredCount: 1,
-    cpu: 256,
-    memory: 512,
+    cpu: 1024,
+    memory: 4096,
     imageTag: 'latest',
   },
   prod: {
     subdomain: 'www',
     desiredCount: 2,
-    cpu: 512,
-    memory: 1024,
+    cpu: 2048,
+    memory: 5120,
     imageTag: 'stable',
   },
 };

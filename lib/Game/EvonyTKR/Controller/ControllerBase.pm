@@ -28,6 +28,16 @@ package Game::EvonyTKR::Controller::ControllerBase {
     my $logger = Log::Log4perl->get_logger(__PACKAGE__);
     $logger->info("ControllerBase register function");
 
+    my $routes = $app->routes;
+
+    $routes->get('/health')->to(cb => sub($c) {
+      $c->render(json => {
+        status    => 'ok',
+        mode      => $app->mode // 'unknown',
+        version   => $app->VERSION,
+        time      => scalar localtime,
+        }, status => 200);
+    });
   }
 
   sub getRoutes($self) {

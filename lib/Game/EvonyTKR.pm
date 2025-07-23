@@ -49,6 +49,10 @@ package Game::EvonyTKR {
     };
 
     if ($logConfig && -f $logConfig) {
+      my $logDir = $loggerConfig->getLogDir();
+      if(! -d $logDir ) {
+        $logDir->mkdir({mode => 0751 });
+      }
       say "init for log4perl at $logConfig " . ref($logConfig);
       Log::Log4perl::init($logConfig->canonpath());
       my $log4perl_logger = Log::Log4perl->get_logger('Game.EvonyTKR');

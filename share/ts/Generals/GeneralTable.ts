@@ -361,9 +361,13 @@ export class GeneralTable extends LitElement {
       const res = await fetch(url);
       const json = (await res.json()) as object;
       const parsed = GeneralPair.safeParse(json);
-      if (parsed.success) return parsed.data;
-      console.error(parsed.error.message);
-      throw new Error(parsed.error.message);
+      if (parsed.success) {
+        return parsed.data;
+      } else {
+        console.error(parsed.error.message);
+        console.error(`recieved: `, res.text());
+        throw new Error(parsed.error.message);
+      }
     } else {
       const params = new URLSearchParams({
         generalType: this.generalType,

@@ -14,7 +14,7 @@ else
 fi
 
 # Get ECR login credentials and login
-aws --profile ${AWS_PROFILE} --region ${AWS_REGION} ecr get-login-password | podman login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
+aws --profile ${AWS_PROFILE} --region ${AWS_REGION} ecr get-login-password | podman login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com || exit 1;
 
 # Tag and push the image
 podman tag evonytkrtips:latest ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/evonytkrtips:latest

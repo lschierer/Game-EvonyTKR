@@ -46,6 +46,7 @@ my $builder = Module::Build->new(
       'Log::Log4perl'               => '0',
       'Log::Log4perl::Config'       => '0',
       'Log::Log4perl::Level'        => '0',
+      'Log::Dispatch::FileRotate'   => '0',
       'LWP::Protocol::https'        => '0',
       'LWP::UserAgent'              => '0',
       'Markdent::CheckedOutput'     => '0',
