@@ -359,6 +359,9 @@ export class GeneralTable extends LitElement {
       });
       const url = `${basePath}?${params.toString()}`;
       const res = await fetch(url);
+      if (!res.ok) {
+        throw new Error(`HTTP error ${res.status}`);
+      }
       const json = (await res.json()) as object;
       const parsed = GeneralPair.safeParse(json);
       if (parsed.success) {
@@ -381,6 +384,9 @@ export class GeneralTable extends LitElement {
 
       const url = `${basePath}?name=${encodeURIComponent(stub.primary.name)}&${params.toString()}`;
       const res = await fetch(url);
+      if (!res.ok) {
+        throw new Error(`HTTP error ${res.status}`);
+      }
       const json = (await res.json()) as object;
       const parsed = GeneralData.safeParse(json);
       if (parsed.success) return parsed.data;
@@ -392,46 +398,52 @@ export class GeneralTable extends LitElement {
   private batchSize = this.maxBatch;
   private startBackgroundFetch() {
     if (this._bgFetchTimer) return;
-    this._bgFetchTimer = 1; // prevent re-entry
+    this._bgFetchTimer = 1;
 
     const maxConcurrency = this.batchSize;
+    const pending = new Set<number>();
+
+    // Initialize with all rows needing fetch
+    this.nameList.forEach((row, i) => {
+      if (!row.current || row.current === 'stale') {
+        pending.add(i);
+        this.nameList[i].current = 'pending';
+      }
+    });
+
     let active = 0;
-    let index = 0;
 
-    const next = () => {
-      while (active < maxConcurrency && index < this.nameList.length) {
-        const row = this.nameList[index];
-        const i = index++;
-        if (!row.current || row.current === 'stale') {
-          this.nameList[i].current = 'pending';
-          active++;
+    const maybeLaunchMore = () => {
+      while (active < maxConcurrency && pending.size > 0) {
+        const [i] = pending; // grab one from the set
+        pending.delete(i);
+        active++;
 
-          this.fetchRow(i)
-            .then((full) => {
-              this.nameList[i].current = 'current';
-              this.dataMap.set(i, full);
-            })
-            .catch((err: unknown) => {
-              console.error(`Fetch failed for row ${i}`, err);
-              this.nameList[i].current = 'stale';
-            })
-            .finally(() => {
-              active--;
-              next(); // Launch next as soon as one finishes
-              this.updateTableData(); // Partial update as rows load
-            });
-        }
+        this.fetchRow(i)
+          .then((full) => {
+            this.nameList[i].current = 'current';
+            this.dataMap.set(i, full);
+          })
+          .catch((err: unknown) => {
+            console.error(`Fetch failed for row ${i}`, err);
+            this.nameList[i].current = 'stale';
+            pending.add(i); // Retry later
+          })
+          .finally(() => {
+            active--;
+            maybeLaunchMore(); // continue the pipeline
+            this.updateTableData();
+          });
       }
 
-      // If we’re done
-      if (index >= this.nameList.length && active === 0) {
-        this._bgFetchTimer = undefined;
+      if (active === 0 && pending.size === 0) {
         console.log('✅ All rows fetched');
-        this.updateTableData(); // Final update
+        this._bgFetchTimer = undefined;
+        this.updateTableData();
       }
     };
 
-    next();
+    maybeLaunchMore();
   }
 
   private updateTableData() {
