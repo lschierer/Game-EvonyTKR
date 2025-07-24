@@ -24,7 +24,7 @@
     "outDir": "./public/types",
     "declarationDir": "./public/types"
   },
-  "exclude": ["**/node_modules/**"],
-  "include": ["./ts/**/*.ts", "./scripts/*.ts", "./types/*.d.ts"],
-  "references": [{ "path": "./infrastructure" }]
+  "exclude": ["**/node_modules/**", "**/cdk.out/**"],
+  "include": ["commitlint.config.js"],
+  "references": [{ "path": "./share" }]
 }

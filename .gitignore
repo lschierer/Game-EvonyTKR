@@ -22,3 +22,6 @@ blib
 
 node_modules
 share/infrastructure/cdk.out
+
+*.d.ts.map
+tsconfig.build.tsbuildinfo

@@ -5,7 +5,7 @@ import globals from 'globals';
 
 export default tseslint.config(
   {
-    ignores: ['**/dist/**', '**/public/**'],
+    ignores: ['**/dist/**', '**/public/**', '**/cdk.out/**'],
   },
   {
     extends: [
