@@ -2,6 +2,7 @@ use v5.42.0;
 use experimental qw(class);
 use utf8::all;
 use File::FindLib 'lib';
+require Log::Log4perl;
 require YAML::PP;
 require Game::EvonyTKR::Model::Logger;
 require Game::EvonyTKR::Logger::Config;
@@ -10,10 +11,11 @@ require Game::EvonyTKR::Controller::ControllerBase;
 require Game::EvonyTKR::Model::EvonyTKR::Manager;
 require GitRepo::Reader;
 
+
 package Game::EvonyTKR {
   use Mojo::Base 'Mojolicious', -strict, -signatures;
   use Mojo::File::Share qw(dist_dir );
-  use Log::Log4perl;
+  use MojoX::Log::Log4perl;
   use Log::Log4perl::Config;
   Log::Log4perl::Config->utf8(1);
   use Carp;
@@ -51,25 +53,10 @@ package Game::EvonyTKR {
     if ($logConfig && -f $logConfig) {
       my $logDir = $loggerConfig->getLogDir();
       if(! -d $logDir ) {
-        $logDir->mkdir({mode => 0751 });
+        $logDir->mkdir({mode => 0755 });
       }
-      say "init for log4perl at $logConfig " . ref($logConfig);
-      Log::Log4perl::init($logConfig->canonpath());
-      my $log4perl_logger = Log::Log4perl->get_logger('Game.EvonyTKR');
 
-      my %logLevel = (
-        development => 'ALL',
-        production  => 'INFO',
-      );
-
-      $self->log->handle(undef);    # Disable default Mojo logger
-      $self->log->level('debug');
-      $self->log->on(
-        message => sub ($log, $level, @lines) {
-          my $msg = join "\n", @lines;
-          $log4perl_logger->$level($msg) if $log4perl_logger->can($level);
-        }
-      );
+      $self->log( MojoX::Log::Log4perl->new($logConfig->canonpath()) );
 
       $self->log->info("✅ Log4perl initialized from $logConfig");
     }
