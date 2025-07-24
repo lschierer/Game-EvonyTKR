@@ -567,14 +567,14 @@ package Game::EvonyTKR::Controller::Generals {
 
     unless ($data_model->checkCovenantLevel($primaryCovenantLevel)) {
       $logger->warn(
-"Invalid primaryCovenantLevel: $primaryCovenantLevel, using 'civilization'"
+        "Invalid primaryCovenantLevel: $primaryCovenantLevel, using 'civilization'"
       );
       $primaryCovenantLevel = 'civilization';
     }
 
     unless ($data_model->checkCovenantLevel($secondaryCovenantLevel)) {
       $logger->warn(
-"Invalid secondaryCovenantLevel: $secondaryCovenantLevel, using 'civilization'"
+        "Invalid secondaryCovenantLevel: $secondaryCovenantLevel, using 'civilization'"
       );
       $secondaryCovenantLevel = 'civilization';
     }

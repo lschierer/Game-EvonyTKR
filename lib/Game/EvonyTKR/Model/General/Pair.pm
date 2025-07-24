@@ -9,6 +9,7 @@ class Game::EvonyTKR::Model::General::Pair :
   require Game::EvonyTKR::Model::General;
   require Game::EvonyTKR::Model::Buff::Summarizer;
   use List::AllUtils qw( all any none );
+  use Readonly;
   use overload
     '""'       => \&as_string,
     'fallback' => 1;
@@ -18,31 +19,14 @@ class Game::EvonyTKR::Model::General::Pair :
   field $rootManager : reader = undef;
   field $targetType : reader;
 
+  field $total_computed_buffs_cache = {};
+  field $current_cache_key :reader :writer;
+
   ADJUST {
     $targetType =
       ref($primary->type) eq 'ARRAY' ? $primary->type->[0] : $primary->type;
   }
 
-  #computed fields;
-  field $buffValues : reader = {
-    'Ground Troops' =>
-      { 'March Size' => 0, 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
-    'Mounted Troops' =>
-      { 'March Size' => 0, 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
-    'Ranged Troops' =>
-      { 'March Size' => 0, 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
-    'Siege Machines' =>
-      { 'March Size' => 0, 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
-    'Overall' =>
-      { 'March Size' => 0, 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
-  };
-
-  field $debuffValues : reader = {
-    'Ground Troops'  => { 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
-    'Mounted Troops' => { 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
-    'Ranged Troops'  => { 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
-    'Siege Machines' => { 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
-  };
 
   method setRootManager ($nm) {
     if (Scalar::Util::blessed $nm eq 'Game::EvonyTKR::Model::EvonyTKR::Manager')
@@ -59,6 +43,14 @@ class Game::EvonyTKR::Model::General::Pair :
     }
   }
 
+  method buffValues {
+      return $self->total_computed_buffs_cache->{$self->current_cache_key}->{buffValues} // {};
+  }
+  method debuffValues {
+      return $self->total_computed_buffs_cache->{$self->current_cache_key}->{debuffValues} // {};
+  }
+
+
   method _compute_total_buffs ($primarySummarizer, $secondarySummarizer) {
     $primarySummarizer->updateBuffs();
     $secondarySummarizer->updateBuffs();
@@ -72,7 +64,7 @@ class Game::EvonyTKR::Model::General::Pair :
       foreach my $type (keys %{ $primary->{$category} }) {
         $self->logger->debug(
           "computing buff total for category $category type $type");
-        $buffValues->{$category}->{$type} =
+        $self->total_computed_buffs_cache->{$current_cache_key}->{buffValues}->{$category}->{$type} =
           ($primary->{$category}->{$type}   // 0) +
           ($secondary->{$category}->{$type} // 0);
       }
@@ -89,24 +81,24 @@ class Game::EvonyTKR::Model::General::Pair :
       $self->logger->debug("calc debuffs for $category");
       foreach my $type (keys %{ $primary->{$category} }) {
         $self->logger->debug("calc debuffs for $type");
-        $debuffValues->{$category}->{$type} =
+        $self->total_computed_buffs_cache->{$current_cache_key}->{debuffValues}->{$category}->{$type} =
           $primary->{$category}->{$type} + $secondary->{$category}->{$type};
       }
     }
   }
 
   method updateBuffsAndDebuffs (
-    $generalType            = '',
+    $generalType            = '',  # this was determined by which table was requested
     $primaryAscending       = 'red5',
     $primaryCovenantLevel   = 'civilization',
     $primarySpecialties     = ['gold', 'gold', 'gold', 'gold',],
     $secondaryCovenantLevel = 'civilization',
     $secondarySpecialties   = ['gold', 'gold', 'gold', 'gold',],
-    $buffActivation         = 'Overall',
+    $buffActivation         = 'Overall', # this was determined by which table was requested
 
-    $keepLevel      = 40,
-    $primaryLevel   = 45,
-    $secondaryLevel = 45,
+    $keepLevel      = 40,    # I have plans for this value but do not use it yet
+    $primaryLevel   = 45,    # I have plans for this value but do not use it yet
+    $secondaryLevel = 45,    # I have plans for this value but do not use it yet
   ) {
     if (!$primary) {
       $self->logger->logcroak("NO PRIMARY DEFINED FOR PAIR");
@@ -114,6 +106,16 @@ class Game::EvonyTKR::Model::General::Pair :
     }
     if (!$secondary) {
       $self->logger->logcroak("NO SECONDARY DEFINED FOR PAIR");
+      return;
+    }
+    $current_cache_key = sprintf('%s-%s-%s-%s-%s-%s',
+        $generalType, $buffActivation,
+        $primaryAscending, $primaryCovenantLevel, join('-', @$primarySpecialties),
+        $secondaryCovenantLevel, join('-', @$secondarySpecialties)
+    );
+
+    if (exists $self->total_computed_buffs_cache->{$current_cache_key}) {
+      $self->logger->debug("Cache hit for '$current_cache_key'");
       return;
     }
 
@@ -153,7 +155,9 @@ class Game::EvonyTKR::Model::General::Pair :
     );
 
     $self->_compute_total_buffs($primarySummarizer, $secondarySummarizer);
+
     $self->_compute_total_debuffs($primarySummarizer, $secondarySummarizer);
+
     $self->logger->debug(sprintf(
       'updated pair %s/%s buffs %s debuffs %s.',
       $primary->name,                 $secondary->name,
@@ -183,7 +187,7 @@ class Game::EvonyTKR::Model::General::Pair :
       marchbuff            => $buffValues->{$tt}->{'March Size'},
       attackbuff           => $buffValues->{$tt}->{'Attack'},
       defensebuff          => $buffValues->{$tt}->{'Defense'},
-      hpbuff               => $buffValues->{$tt}->{'Defense'},
+      hpbuff               => $buffValues->{$tt}->{'HP'},
       groundattackdebuff   => $debuffValues->{'Ground Troops'}->{'Attack'},
       grounddefensedebuff  => $debuffValues->{'Ground Troops'}->{'Defense'},
       groundhpdebuff       => $debuffValues->{'Ground Troops'}->{'HP'},
