@@ -75,22 +75,15 @@ RUN chown -R mojo:mojo /home/mojo
 
 # create an init script to set /home/mojo/var permissions
 
-RUN cat > /usr/local/bin/fix_mojo_var.sh << 'EOF'
-#!/bin/bash
-set -e
+RUN apt-get update && \
+  apt-get install -y sudo
 
-mkdir -p /home/mojo/var/log || exit 1
-chown -R mojo:mojo /home/mojo/var || exit 2
-EOF
-
-# Set the user
-USER mojo
-
-# Set HOME environment variable explicitly
-ENV HOME=/home/mojo
+COPY share/scripts/dockerEntrypoint.sh /usr/local/bin/dockerEntrypoint.sh
+RUN chmod +x /usr/local/bin/dockerEntrypoint.sh
 
 # Command to run your application
 EXPOSE 3000
-CMD ["nc", "-v", "-l", "0.0.0.0", "3000"]
-#CMD ["perl", "scripts/game-evonytkr", "prefork", "-m", "development"]
+ENTRYPOINT ["/usr/local/bin/dockerEntrypoint.sh"]
+#CMD ["nc", "-v", "-l", "0.0.0.0", "3000"]
+CMD ["perl", "scripts/game-evonytkr", "prefork", "-m", "development"]
 #CMD ["perl", "scripts/game-evonytkr", "prefork", "-m", "production"]

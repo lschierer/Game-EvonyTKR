@@ -113,7 +113,6 @@ export class MojoliciousStack extends Stack {
     // Add container to task definition
     const appContainer = taskDefinition.addContainer('EvonyTKRTipsContainer', {
       image: ecs.ContainerImage.fromEcrRepository(repository, props.imageTag),
-      user: 'mojo',
       logging: ecs.LogDrivers.awsLogs({
         streamPrefix: 'evonytkrtips',
         logRetention: logs.RetentionDays.ONE_WEEK,
@@ -230,26 +229,23 @@ export class MojoliciousStack extends Stack {
 
     //for logging to s3
     // Add sidecar container for log syncing
-    const syncContainer = taskDefinition.addContainer('LogSyncContainer', {
-      image: ecs.ContainerImage.fromRegistry('amazon/aws-cli'),
-      user: '1000:1000', // Use the same UID:GID as the mojo user
-      essential: false, // Not essential so main container can start first
-      command: [
-        '/bin/sh',
-        '-c',
-        'while true; do aws s3 cp /logs/ s3://' +
-          logbucket.bucketName +
-          '/$(date +%Y/%m/%d)/ --recursive --exclude "*" --include "*.log"; sleep 600; done',
-      ],
-      logging: ecs.LogDrivers.awsLogs({ streamPrefix: 'log-sync' }),
-    });
+    //const syncContainer = taskDefinition.addContainer('LogSyncContainer', {
+    //  image: ecs.ContainerImage.fromRegistry('amazon/aws-cli'),
+    //  essential: false, // Not essential so main container can start first
+    //  command: [
+    //    '/bin/sh',
+    //    '-c',
+    //    `while true; do DATE=$(date +%Y/%m/%d); aws s3 cp /logs/ "s3://${logbucket.bucketName}/$DATE/" --recursive --exclude "*" --include "*.log"; sleep 600; done`,
+    //  ],
+    //  logging: ecs.LogDrivers.awsLogs({ streamPrefix: 'log-sync' }),
+    //});
 
-    // Mount the logs volume in the sync container
-    syncContainer.addMountPoints({
-      containerPath: '/logs',
-      sourceVolume: 'perl-logs',
-      readOnly: true,
-    });
+    //// Mount the logs volume in the sync container
+    //syncContainer.addMountPoints({
+    //  containerPath: '/logs',
+    //  sourceVolume: 'perl-logs',
+    //  readOnly: true,
+    //});
 
     // Outputs
     new CfnOutput(this, 'EvonyTKRTipsLoadBalancerDNS', {

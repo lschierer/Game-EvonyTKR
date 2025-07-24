@@ -6,6 +6,7 @@ use utf8::all;
 use Mojo::Base -strict;
 use Mojo::File qw(curfile);
 use lib curfile->dirname->sibling('lib')->to_string;
+require Game::EvonyTKR;
 
 use Mojolicious::Commands;
 
