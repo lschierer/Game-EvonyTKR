@@ -101,6 +101,7 @@ export class MojoliciousStack extends Stack {
           cpuArchitecture: ecs.CpuArchitecture.ARM64,
           operatingSystemFamily: ecs.OperatingSystemFamily.LINUX,
         },
+        taskRole: syncTaskRole,
       },
     );
 
@@ -143,7 +144,7 @@ export class MojoliciousStack extends Stack {
 
     // Mount the logs volume in your app container
     appContainer.addMountPoints({
-      containerPath: '/home/mojo/var/',
+      containerPath: '/home/mojo/var/log/Perl/dist/Game-Evony',
       sourceVolume: 'perl-logs',
       readOnly: false,
     });
@@ -227,25 +228,68 @@ export class MojoliciousStack extends Stack {
       ttl: Duration.minutes(5),
     });
 
-    //for logging to s3
-    // Add sidecar container for log syncing
-    //const syncContainer = taskDefinition.addContainer('LogSyncContainer', {
-    //  image: ecs.ContainerImage.fromRegistry('amazon/aws-cli'),
-    //  essential: false, // Not essential so main container can start first
-    //  command: [
-    //    '/bin/sh',
-    //    '-c',
-    //    `while true; do DATE=$(date +%Y/%m/%d); aws s3 cp /logs/ "s3://${logbucket.bucketName}/$DATE/" --recursive --exclude "*" --include "*.log"; sleep 600; done`,
-    //  ],
-    //  logging: ecs.LogDrivers.awsLogs({ streamPrefix: 'log-sync' }),
-    //});
+    // Add sidecar container for log shipping to S3
+    const logShipperContainer = taskDefinition.addContainer(
+      'LogShipperContainer',
+      {
+        image: ecs.ContainerImage.fromRegistry(
+          'amazon/aws-for-fluent-bit:stable',
+        ),
+        essential: false,
+        cpu: 128,
+        memoryReservationMiB: 128,
+        logging: ecs.LogDrivers.awsLogs({
+          streamPrefix: 'log-shipper',
+          logRetention: logs.RetentionDays.ONE_WEEK,
+        }),
+        environment: {
+          AWS_REGION: this.region,
+          S3_BUCKET: logbucket.bucketName,
+          // Enable ECS metadata endpoint v4
+          ECS_ENABLE_CONTAINER_METADATA: 'true',
+        },
+        // Use only command line configuration, no config file
+        command: [
+          '/fluent-bit/bin/fluent-bit',
+          '-i',
+          'tail',
+          '-p',
+          'path=/var/log/app/*.log',
+          '-p',
+          'tag=app',
+          '-p',
+          'refresh_interval=5',
+          '-p',
+          'path_key=filepath',
+          '-o',
+          's3',
+          '-p',
+          'match=*',
+          '-p',
+          'bucket=${S3_BUCKET}',
+          '-p',
+          'region=${AWS_REGION}',
+          '-p',
+          's3_key_format=/logs/%Y/%m/%d/${filepath[2]}/%H%M%S-${HOSTNAME}.log',
+          '-p',
+          'total_file_size=10M',
+          '-p',
+          'upload_timeout=10m',
+          '-p',
+          'use_put_object=On',
+          '-p',
+          'compression=gzip',
+          '-v',
+        ],
+      },
+    );
 
-    //// Mount the logs volume in the sync container
-    //syncContainer.addMountPoints({
-    //  containerPath: '/logs',
-    //  sourceVolume: 'perl-logs',
-    //  readOnly: true,
-    //});
+    // Mount the logs volume in the log shipper container
+    logShipperContainer.addMountPoints({
+      containerPath: '/var/log/app',
+      sourceVolume: 'perl-logs',
+      readOnly: true,
+    });
 
     // Outputs
     new CfnOutput(this, 'EvonyTKRTipsLoadBalancerDNS', {

@@ -85,5 +85,5 @@ RUN chmod +x /usr/local/bin/dockerEntrypoint.sh
 EXPOSE 3000
 ENTRYPOINT ["/usr/local/bin/dockerEntrypoint.sh"]
 #CMD ["nc", "-v", "-l", "0.0.0.0", "3000"]
-CMD ["perl", "scripts/game-evonytkr", "prefork", "-m", "development"]
+CMD ["perl", "scripts/game-evonytkr", "prefork", "-m", "preprod"]
 #CMD ["perl", "scripts/game-evonytkr", "prefork", "-m", "production"]
