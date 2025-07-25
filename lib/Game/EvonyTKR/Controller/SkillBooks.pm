@@ -45,7 +45,7 @@ package Game::EvonyTKR::Controller::SkillBooks {
     $app->add_navigation_item({
       title => 'Details of General Skill Books',
       path  => $self->getBase(),
-      order => 20,
+      order => 30,
     });
 
     my @parts     = split(/::/, ref($self));
@@ -95,7 +95,7 @@ package Game::EvonyTKR::Controller::SkillBooks {
             title  => "Details for $name",
             path   => "$base/$name",
             parent => $base,
-            order  => 20,
+            order  => 30,
           });
         }
       }

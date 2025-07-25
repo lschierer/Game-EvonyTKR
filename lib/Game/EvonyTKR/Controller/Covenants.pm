@@ -61,7 +61,7 @@ package Game::EvonyTKR::Controller::Covenants {
     $app->add_navigation_item({
       title => 'Details of General Covenants',
       path  => $self->getBase(),
-      order => 20,
+      order => 50,
     });
 
     my @parts     = split(/::/, ref($self));
@@ -134,7 +134,7 @@ package Game::EvonyTKR::Controller::Covenants {
             title  => sprintf('Details for %s\'s Covenant', $name),
             path   => "$base/$name",
             parent => $base,
-            order  => 20,
+            order  => 50,
           });
         }
       }

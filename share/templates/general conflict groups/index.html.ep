@@ -5,7 +5,7 @@
     <% if ($items && ref $items eq 'HASH'  ) { %>
       <% foreach my $key (sort {$items->{$a}->name cmp $items->{$b}->name} keys %{ $items} ) { %>
         <li class="collection-item">
-          <a href="/Reference/Generals/ConflictGroups/<%= $key %>/">
+          <a href="/Reference/Conflict Groups/<%= $key %>/">
             <%= $items->{$key}->name %>
           </a>
         </li>

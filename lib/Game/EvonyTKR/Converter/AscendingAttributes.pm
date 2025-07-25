@@ -131,7 +131,7 @@ class Game::EvonyTKR::Converter::AscendingAttributes :
       push @{ $result->{ascending} },
         {
         level => $k,
-        buff  => [map { $_->to_hash() } @{ $data->{ lc($k) }->{buffs} }],
+        buffs => [map { $_->to_hash() } @{ $data->{ lc($k) }->{buffs} }],
         text  => $data->{ lc($k) }->{text},
         };
     }

@@ -23,7 +23,7 @@ package Game::EvonyTKR::Controller::ConflictGroups {
     return "ConflictGroups";
   }
 
-  my $base = '/Reference/Generals/ConflictGroups';
+  my $base = '/Reference/Conflict Groups';
 
 
   sub getBase($self) {
@@ -56,8 +56,8 @@ package Game::EvonyTKR::Controller::ConflictGroups {
     $app->add_navigation_item({
       title  => 'General Conflict Group Details',
       path   => $base,
-      parent => '/Reference/Generals/',
-      order  => 10,
+      parent => '/Reference/',
+      order  => 60,
     });
 
     my $gcm = $app->get_root_manager->generalConflictGroupManager;
@@ -92,7 +92,7 @@ package Game::EvonyTKR::Controller::ConflictGroups {
           $app->add_navigation_item({
             parent  => $base,
             path    => $gr,
-            order   => 20,
+            order   => 60,
             title   => "Details for " . $allConflictGroups{$key}->name,
           });
         }

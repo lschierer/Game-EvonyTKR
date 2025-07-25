@@ -35,7 +35,7 @@ package Game::EvonyTKR::Controller::Specialties {
       title  => 'Details of General Specialties',
       path   => $base,
       parent => '/Reference',
-      order  => 20,
+      order  => 40,
     });
 
     my @parts     = split(/::/, ref($self));
@@ -79,7 +79,7 @@ package Game::EvonyTKR::Controller::Specialties {
             title  => "Details for $name",
             path   => "$base/$name",
             parent => "$base",
-            order  => 20,
+            order  => 40,
           });
 
           $logger->debug(

@@ -10,7 +10,7 @@
     <dd class="collection-list">
       <ul class="members-grid">
         <% foreach my $member (sort @{ $item->primary_generals }) { %>
-          <li class="collection-item"><a href="/Generals/details/<%= $member %>/"><%= $member %></a></li>
+          <li class="collection-item"><a href="/Reference/Generals/<%= $member %>/"><%= $member %></a></li>
         <% } %>
       </ul>
     </dd>
@@ -19,7 +19,7 @@
     <dd class="other-conflicts">
       <ul class="other-conflicts-grid">
         <% foreach my $other (sort  keys %{ $item->get_other_conflicts() } ) { %>
-          <li class="collection-item"><a href="/Generals/details/<%= $other %>/"><%= $other %></a></li>
+          <li class="collection-item"><a href="/Reference/Generals/<%= $other %>/"><%= $other %></a></li>
         <% } %>
       </ul>
     </dd>

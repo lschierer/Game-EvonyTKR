@@ -81,14 +81,7 @@ package Game::EvonyTKR::Controller::Generals {
       ->to(controller => $controller_name, action => 'index')
       ->name("${reference_base}_index");
 
-    # Add a parent navigation item for Generals
-    $app->add_navigation_item({
-      title => 'Generals',
-      path  => '/Generals',
-      order => 10,
-    });
-
-    # Add a parent navigation item for Generals
+    # Add a parent navigation item for General Details under Reference
     $app->add_navigation_item({
       title  => 'General Details',
       path   => $reference_base,
@@ -232,7 +225,7 @@ package Game::EvonyTKR::Controller::Generals {
 
     # Check if markdown exists for this collection
     my $distDir       = Mojo::File::Share::dist_dir('Game::EvonyTKR');
-    my $markdown_path = $distDir->child("pages/$collection/index.md");
+    my $markdown_path = $distDir->child("pages/Generals/index.md");
 
     my @parts     = split(/::/, ref($self));
     my $baseClass = pop(@parts);

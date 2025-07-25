@@ -45,12 +45,32 @@ package Game::EvonyTKR::Plugins::StaticPages {
 
       my $parsedFile = $app->parse_markdown_frontmatter($file_path);
       if ($parsedFile) {
-        $app->add_navigation_item({
-          title => $parsedFile->{title},
-          path  => $route_path,
-          order => $parsedFile->{order}
-          ,    # Static pages come after dynamic content
-        });
+        # Check for case-insensitive navigation conflicts before adding
+        my $normalized_route = lc($route_path);
+        my $has_conflict = 0;
+
+        # Check if any existing navigation item conflicts (case-insensitive)
+        my $existing_nav = $app->get_existing_navigation_items() || {};
+        $logger->debug(sprintf('comparing against %s existing nav entries.',
+          scalar keys %$existing_nav));
+        foreach my $existing_path (keys %$existing_nav) {
+          if (lc($existing_path) eq $normalized_route) {
+            $has_conflict = 1;
+            $logger->debug("Skipping static page navigation for '$route_path' - conflicts with existing '$existing_path'");
+            last;
+          }
+        }
+
+        # Only add navigation item if no case-insensitive conflict exists
+        unless ($has_conflict) {
+          $logger->debug("$route_path has no conflicts, adding nav entry.");
+          $app->add_navigation_item({
+            title => $parsedFile->{title},
+            path  => $route_path,
+            order => $parsedFile->{order}
+            ,    # Static pages come after dynamic content
+          });
+        }
       }
     }
   }
