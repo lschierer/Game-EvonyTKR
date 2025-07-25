@@ -1,0 +1,29 @@
+---
+buffs:
+  - attribute: Attack
+    troop: Siege Machines
+    value:
+      number: 40
+    conditions: []
+  - attribute: Defense
+    troop: Ranged Troops
+    value:
+      number: 25
+    conditions: []
+  - attribute: Defense
+    troop: Siege Machines
+    value:
+      number: 25
+    conditions: []
+  - attribute: HP
+    troop: Ranged Troops
+    value:
+      number: 25
+    conditions: []
+  - attribute: HP
+    troop: Siege Machines
+    value:
+      number: 25
+    conditions: []
+name: Rhine Staff
+text: Siege Machine Attack +40%. Ranged Troop and Siege Machine Defense +25%. Ranged Troop and Siege Machine HP +25%.

@@ -12,8 +12,7 @@ basic_attributes:
   politics:
     base: 120
     increment: 9.25
-book: Hammer of the Gauls - Elizabeth I
-display: summary
+book: Glory of the Queen
 specialties:
   - Ranged Troop Formation
   - Annihilation
