@@ -19,7 +19,7 @@ class Game::EvonyTKR::Model::General::Pair :
   field $rootManager : reader = undef;
   field $targetType : reader;
 
-  field $total_computed_buffs_cache = {};
+  field %total_computed_buffs_cache;
   field $current_cache_key :reader :writer;
 
   ADJUST {
@@ -44,10 +44,16 @@ class Game::EvonyTKR::Model::General::Pair :
   }
 
   method buffValues {
-      return $self->total_computed_buffs_cache->{$self->current_cache_key}->{buffValues} // {};
+    unless (defined $current_cache_key) {
+      return {}
+    }
+      return $total_computed_buffs_cache{$current_cache_key}->{buffValues} // {};
   }
   method debuffValues {
-      return $self->total_computed_buffs_cache->{$self->current_cache_key}->{debuffValues} // {};
+      unless (defined $current_cache_key) {
+        return {}
+      }
+      return $total_computed_buffs_cache{$current_cache_key}->{debuffValues} // {};
   }
 
 
@@ -64,7 +70,7 @@ class Game::EvonyTKR::Model::General::Pair :
       foreach my $type (keys %{ $primary->{$category} }) {
         $self->logger->debug(
           "computing buff total for category $category type $type");
-        $self->total_computed_buffs_cache->{$current_cache_key}->{buffValues}->{$category}->{$type} =
+        $total_computed_buffs_cache{$current_cache_key}->{buffValues}->{$category}->{$type} =
           ($primary->{$category}->{$type}   // 0) +
           ($secondary->{$category}->{$type} // 0);
       }
@@ -81,7 +87,7 @@ class Game::EvonyTKR::Model::General::Pair :
       $self->logger->debug("calc debuffs for $category");
       foreach my $type (keys %{ $primary->{$category} }) {
         $self->logger->debug("calc debuffs for $type");
-        $self->total_computed_buffs_cache->{$current_cache_key}->{debuffValues}->{$category}->{$type} =
+        $total_computed_buffs_cache{$current_cache_key}->{debuffValues}->{$category}->{$type} =
           $primary->{$category}->{$type} + $secondary->{$category}->{$type};
       }
     }
@@ -108,15 +114,19 @@ class Game::EvonyTKR::Model::General::Pair :
       $self->logger->logcroak("NO SECONDARY DEFINED FOR PAIR");
       return;
     }
-    $current_cache_key = sprintf('%s-%s-%s-%s-%s-%s',
+    $current_cache_key = sprintf('%s-%s-%s-%s-%s-%s-%s',
         $generalType, $buffActivation,
         $primaryAscending, $primaryCovenantLevel, join('-', @$primarySpecialties),
         $secondaryCovenantLevel, join('-', @$secondarySpecialties)
     );
 
-    if (exists $self->total_computed_buffs_cache->{$current_cache_key}) {
-      $self->logger->debug("Cache hit for '$current_cache_key'");
+    if (exists $total_computed_buffs_cache{$current_cache_key}) {
+      $self->logger->info(sprintf('Cache hit for "%s". There are "%s" cache entries.',
+      $current_cache_key, scalar keys %total_computed_buffs_cache));
       return;
+    } else{
+      $self->logger->info(sprintf('Cache miss for "%s". There are "%s" cache entries.',
+      $current_cache_key, scalar keys %total_computed_buffs_cache));
     }
 
     my $primarySummarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
@@ -161,7 +171,7 @@ class Game::EvonyTKR::Model::General::Pair :
     $self->logger->debug(sprintf(
       'updated pair %s/%s buffs %s debuffs %s.',
       $primary->name,                 $secondary->name,
-      Data::Printer::np($buffValues), Data::Printer::np($debuffValues),
+      Data::Printer::np($self->buffValues), Data::Printer::np($self->debuffValues),
     ));
 
   }
@@ -184,22 +194,22 @@ class Game::EvonyTKR::Model::General::Pair :
     return {
       primary              => $primary,
       secondary            => $secondary,
-      marchbuff            => $buffValues->{$tt}->{'March Size'},
-      attackbuff           => $buffValues->{$tt}->{'Attack'},
-      defensebuff          => $buffValues->{$tt}->{'Defense'},
-      hpbuff               => $buffValues->{$tt}->{'HP'},
-      groundattackdebuff   => $debuffValues->{'Ground Troops'}->{'Attack'},
-      grounddefensedebuff  => $debuffValues->{'Ground Troops'}->{'Defense'},
-      groundhpdebuff       => $debuffValues->{'Ground Troops'}->{'HP'},
-      mountedattackdebuff  => $debuffValues->{'Mounted Troops'}->{'Attack'},
-      mounteddefensedebuff => $debuffValues->{'Mounted Troops'}->{'Defense'},
-      mountedhpdebuff      => $debuffValues->{'Mounted Troops'}->{'HP'},
-      rangedattackdebuff   => $debuffValues->{'Ranged Troops'}->{'Attack'},
-      rangeddefensedebuff  => $debuffValues->{'Ranged Troops'}->{'Defense'},
-      rangedhpdebuff       => $debuffValues->{'Ranged Troops'}->{'HP'},
-      siegeattackdebuff    => $debuffValues->{'Siege Machines'}->{'Attack'},
-      siegedefensedebuff   => $debuffValues->{'Siege Machines'}->{'Defense'},
-      siegehpdebuff        => $debuffValues->{'Siege Machines'}->{'HP'},
+      marchbuff            => $self->buffValues->{$tt}->{'March Size'},
+      attackbuff           => $self->buffValues->{$tt}->{'Attack'},
+      defensebuff          => $self->buffValues->{$tt}->{'Defense'},
+      hpbuff               => $self->buffValues->{$tt}->{'HP'},
+      groundattackdebuff   => $self->debuffValues->{'Ground Troops'}->{'Attack'},
+      grounddefensedebuff  => $self->debuffValues->{'Ground Troops'}->{'Defense'},
+      groundhpdebuff       => $self->debuffValues->{'Ground Troops'}->{'HP'},
+      mountedattackdebuff  => $self->debuffValues->{'Mounted Troops'}->{'Attack'},
+      mounteddefensedebuff => $self->debuffValues->{'Mounted Troops'}->{'Defense'},
+      mountedhpdebuff      => $self->debuffValues->{'Mounted Troops'}->{'HP'},
+      rangedattackdebuff   => $self->debuffValues->{'Ranged Troops'}->{'Attack'},
+      rangeddefensedebuff  => $self->debuffValues->{'Ranged Troops'}->{'Defense'},
+      rangedhpdebuff       => $self->debuffValues->{'Ranged Troops'}->{'HP'},
+      siegeattackdebuff    => $self->debuffValues->{'Siege Machines'}->{'Attack'},
+      siegedefensedebuff   => $self->debuffValues->{'Siege Machines'}->{'Defense'},
+      siegehpdebuff        => $self->debuffValues->{'Siege Machines'}->{'HP'},
     };
   }
 
