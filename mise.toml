@@ -1,5 +1,7 @@
 [tools]
+jq = "latest"
 just = "latest"
 node = "24"
 perl = "latest"
 pnpm = "10"
+yq = "latest"
