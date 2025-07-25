@@ -5,10 +5,10 @@ Alessandra,3,Epic,1,Other,"November, 2022",32,Ground,Not Required,,,GR5A-MS,GR-A
 Alexander Nevski,4,Epic,1,Russia,"December, 2017",92,Subordinate City,Not Required,-,-,-,-,-,-,-,-,Tavern,-,-,-,2 - Subordinate City (PvP),-,-,-,-
 Alexander the Great,5,Epic,1,Other,"August, 2021",47,Ground,Not Required,,,GR1A-RC,GR-AT-wAT,RC,-,-,-,General Token (Premium),General Token (GH2),-,-,6 - Ground,-,-,-,-
 Alfred the Great,6,Epic,1,Europe,"December, 2017",92,Ranged,Not Required,,,RA1A-SG1A,RA-AT-wAT,SG-AT-wAT,-,-,-,Relic Rewards,General Token (Premium),-,-,3 - Ranged,10 - Siege,-,-,-
-Algernon Sydney,7,Epic,1,Europe,"October, 2024",8,Ranged,Not Required,,,RA4A-RA13A,RA-AT&DF-wAT,RA&SG-HP-wAT,William Wallace,John Churchill,Merlin,General Token (Premium),General Token (Glory),-,-,3 - Ranged,-,-,-,-
+Algernon Sidney,7,Epic,1,Europe,"October, 2024",8,Ranged,Not Required,,,RA4A-RA13A,RA-AT&DF-wAT,RA&SG-HP-wAT,William Wallace,John Churchill,Merlin,General Token (Premium),General Token (Glory),-,-,3 - Ranged,-,-,-,-
 Amir Timur,8,Epic,1,Other,"December, 2017",92,Development,Not Required,-,-,-,-,-,-,-,-,Tavern,-,-,-,8 - Gathering,-,-,-,-
 Amr ibn al-As,9,Epic,1,Arabia,"May, 2021",51,Subordinate City,Not Required,-,-,-,-,-,-,-,-,Premium Special Event,-,-,-,2 - Subordinate City (PvP),-,-,-,-
-Andre Massena,10,Epic,1,Europe,"December, 2023",19,Mounted,Not Required,,,MT1L-MS,MT-AT-wLD,MS,Turenne,Roland,Bertrand du Guesclin,Special Event,-,-,-,4 - Mounted,5 - Monsters (Pushing),-,-,-
+André Masséna,10,Epic,1,Europe,"December, 2023",19,Mounted,Not Required,,,MT1L-MS,MT-AT-wLD,MS,Turenne,Roland,Bertrand du Guesclin,Special Event,-,-,-,4 - Mounted,5 - Monsters (Pushing),-,-,-
 Andrew Jackson,11,Epic,1,America,"January, 2019",79,Subordinate City,Not Required,-,-,-,-,-,-,-,-,Tavern,-,-,-,2 - Subordinate City (PvP),-,-,-,-
 Antara,12,Legendary,0,Arabia,"December, 2017",92,Ranged,Not Required,,,RA1L-EM,RA-AT-wLD,EM,-,-,-,Tavern,-,-,-,3 - Ranged,-,-,-,-
 Arminius,13,Epic,1,Europe,"August, 2019",72,Subordinate City,Not Required,-,-,-,-,-,-,-,-,Tavern,Great General's Chest,-,-,2 - Subordinate City (PvP),-,-,-,-
@@ -177,8 +177,8 @@ Miyamoto Musashi,175,Legendary,0,Japan,"December, 2017",92,Ground,Not Required,,
 Mordred,176,Epic,1,Europe,"November, 2022",32,Mounted,Not Required,,,MT1A-GR12A,MT-AT-wAT,GR&MT-DF-wAT,-,-,-,General Token (Glory),General Token (Premium),-,-,4 - Mounted,5 - Monsters (Pushing),-,-,-
 Mu Guiying,177,Epic,1,China,"February, 2024",17,Siege,Not Required,,,SG1L-SG7L,SG-AT-wLD,SG-DF&HP-wLD,Elektra [D],Yue Fei,Guan Yu,General Token (Premium),-,-,-,10 - Siege,-,-,-,-
 Napoleon,178,Epic,1,Europe,"October, 2019",70,Mixed,Not Required,,,TR1A-SG1A,TR-AT-wAT,SG-AT-wAT,-,-,-,General Token (Premium),-,-,-,10 - Siege,-,-,-,-
-Napoleon (Prime) [D/S],179,Epic,1,Europe,"December, 2023",19,Mounted,Dragon/Spiritual Beast,,,MT1A-MT7A,MT-AT-wAT,MT-DF&HP-wAT,Napoleon,Andre Massena,Soult,Not Available,-,-,-,4 - Mounted,5 - Monsters (Pushing),-,-,-
-Napoleon (Prime) [ND/S],180,Epic,0,Europe,"December, 2023",19,Mounted,No Dragon/Spiritual Beast,,,MT1A-MT7A,MT-AT-wAT,MT-DF&HP-wAT,Napoleon,Andre Massena,Soult,Not Available,-,-,-,4 - Mounted,5 - Monsters (Pushing),-,-,-
+Napoleon (Prime) [D/S],179,Epic,1,Europe,"December, 2023",19,Mounted,Dragon/Spiritual Beast,,,MT1A-MT7A,MT-AT-wAT,MT-DF&HP-wAT,Napoleon,André Masséna,Soult,Not Available,-,-,-,4 - Mounted,5 - Monsters (Pushing),-,-,-
+Napoleon (Prime) [ND/S],180,Epic,0,Europe,"December, 2023",19,Mounted,No Dragon/Spiritual Beast,,,MT1A-MT7A,MT-AT-wAT,MT-DF&HP-wAT,Napoleon,André Masséna,Soult,Not Available,-,-,-,4 - Mounted,5 - Monsters (Pushing),-,-,-
 Narcissus,181,Epic,1,Europe,"November, 2024",8,Ground,Not Required,,,GR5A-GR12A,GR-AT&HP-wAT,GR&MT-DF-wAT,Lucilla,Ludwig,Martinus,General Token (Premium),General Token (Glory),-,-,6 - Ground,-,-,-,-
 Narses,182,Epic,1,Europe,"July, 2023",24,Subordinate City,Not Required,-,-,-,-,-,-,-,-,Premium Special Event,King's Party Cake,-,-,2 - Subordinate City (PvP),-,-,-,-
 Nathanael Greene,183,Epic,1,America,"December, 2017",92,Development,Not Required,-,-,-,-,-,-,-,-,Tavern,-,-,-,7 - Monsters (Treasure),-,-,-,-
