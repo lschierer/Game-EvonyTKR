@@ -2,10 +2,10 @@
 
 <div class="collection-list">
   <ul class="collection-grid">
-    <% if ($items && ref $items eq 'HASH') { %>
-      <% foreach my $key (sort keys %{ $items} ) { %>
+    <% if ($items && ref $items eq 'HASH'  ) { %>
+      <% foreach my $key (sort {$items->{$a}->name cmp $items->{$b}->name} keys %{ $items} ) { %>
         <li class="collection-item">
-          <a href="/GeneralConflictGroups/details/<%= $key %>/">
+          <a href="/Reference/Generals/ConflictGroups/<%= $key %>/">
             <%= $items->{$key}->name %>
           </a>
         </li>
