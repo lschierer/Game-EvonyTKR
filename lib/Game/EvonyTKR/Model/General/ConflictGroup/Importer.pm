@@ -93,10 +93,10 @@ class Game::EvonyTKR::Model::General::ConflictGroup::Importer :
 
     while (my $row = $grp_csv->getline_hr($grp_fh)) {
       my $key   = $row->{Skill}                    // next;
-      my $combo = $row->{'Troop Combination Code'} // next;
+      my $combo = $row->{'Primary Troop/Skill Classification Code'} // next;
       $code_parts{$key} = [
-        $row->{'Troop Combination Code'} // '',
-        $row->{'Skill Combination Code'} // '',
+        $row->{'Primary Troop/Skill Classification Code'} // '',
+        $row->{'Troop & Skill Combination Code'} // '',
         $row->{'Action Code'}            // '',
       ];
     }
