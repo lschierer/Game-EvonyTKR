@@ -1,178 +1,182 @@
----
-levels:
-- buffs:
-  - attribute: HP
-    conditions:
-    - Attacking
-    passive: 0
-    targetedType: Ranged Troops
-    value:
-      number: 0
-      unit: percentage
-  - attribute: HP
-    conditions:
-    - Attacking
-    passive: 0
-    targetedType: Siege Machines
-    value:
-      number: 0
-      unit: percentage
-  - attribute: Defense
-    conditions:
-    - Attacking
-    passive: 0
-    targetedType: Siege Machines
-    value:
-      number: 0
-      unit: percentage
-  - attribute: Defense
-    conditions:
-    - Attacking
-    passive: 0
-    targetedType: Ranged Troops
-    value:
-      number: 0
-      unit: percentage
-  level: Green
-  text: ''
-- buffs:
-  - attribute: HP
-    conditions:
-    - Attacking
-    passive: 0
-    targetedType: Ranged Troops
-    value:
-      number: 0
-      unit: percentage
-  - attribute: HP
-    conditions:
-    - Attacking
-    passive: 0
-    targetedType: Siege Machines
-    value:
-      number: 0
-      unit: percentage
-  - attribute: Defense
-    conditions:
-    - Attacking
-    passive: 0
-    targetedType: Siege Machines
-    value:
-      number: 0
-      unit: percentage
-  - attribute: Defense
-    conditions:
-    - Attacking
-    passive: 0
-    targetedType: Ranged Troops
-    value:
-      number: 0
-      unit: percentage
-  level: Blue
-  text: ''
-- buffs:
-  - attribute: HP
-    conditions:
-    - Attacking
-    passive: 0
-    targetedType: Ranged Troops
-    value:
-      number: 0
-      unit: percentage
-  - attribute: HP
-    conditions:
-    - Attacking
-    passive: 0
-    targetedType: Siege Machines
-    value:
-      number: 0
-      unit: percentage
-  - attribute: Defense
-    conditions:
-    - Attacking
-    passive: 0
-    targetedType: Siege Machines
-    value:
-      number: 0
-      unit: percentage
-  - attribute: Defense
-    conditions:
-    - Attacking
-    passive: 0
-    targetedType: Ranged Troops
-    value:
-      number: 0
-      unit: percentage
-  level: Purple
-  text: ''
-- buffs:
-  - attribute: HP
-    conditions:
-    - Attacking
-    passive: 0
-    targetedType: Ranged Troops
-    value:
-      number: 0
-      unit: percentage
-  - attribute: HP
-    conditions:
-    - Attacking
-    passive: 0
-    targetedType: Siege Machines
-    value:
-      number: 0
-      unit: percentage
-  - attribute: Defense
-    conditions:
-    - Attacking
-    passive: 0
-    targetedType: Siege Machines
-    value:
-      number: 0
-      unit: percentage
-  - attribute: Defense
-    conditions:
-    - Attacking
-    passive: 0
-    targetedType: Ranged Troops
-    value:
-      number: 0
-      unit: percentage
-  level: Orange
-  text: ''
-- buffs:
-  - attribute: HP
-    conditions:
-    - Attacking
-    passive: 0
-    targetedType: Ranged Troops
-    value:
-      number: 25
-      unit: percentage
-  - attribute: HP
-    conditions:
-    - Attacking
-    passive: 0
-    targetedType: Siege Machines
-    value:
-      number: 25
-      unit: percentage
-  - attribute: Defense
-    conditions:
-    - Attacking
-    passive: 0
-    targetedType: Siege Machines
-    value:
-      number: 25
-      unit: percentage
-  - attribute: Defense
-    conditions:
-    - Attacking
-    passive: 0
-    targetedType: Ranged Troops
-    value:
-      number: 25
-      unit: percentage
-  level: Gold
-  text: Ranged Troop Attack +40%, Attacking Ranged Troop and Siege Machine HP +25%, Attacking Siege Machine and Ranged Troop Defense +25%
 name: Whig Patriot
+levels:
+  - level: Green
+    buffs:
+      - attribute: Attack
+        targetedType: Ranged Troops
+        value:
+          number: 4
+          unit: percentage
+      - attribute: HP
+        targetedType: Ranged Troops
+        conditions:
+          - Attacking
+        value:
+          number: 2
+          unit: percentage
+      - attribute: HP
+        targetedType: Siege Machines
+        conditions:
+          - Attacking
+        value:
+          number: 2
+          unit: percentage
+      - attribute: Defense
+        targetedType: Ranged Troops
+        conditions:
+          - Attacking
+        value:
+          number: 2
+          unit: percentage
+      - attribute: Defense
+        targetedType: Siege Machines
+        conditions:
+          - Attacking
+        value:
+          number: 2
+          unit: percentage
+    text: Ranged Troop Attack +4%. Attacking Ranged Troop and Siege Machine HP +2%. Attacking Siege Machine and Ranged Troop Defense +2%.
+  - level: Blue
+    text: Ranged Troop Attack +4%. Attacking Ranged Troop and Siege Machine HP +3%. Attacking Siege Machine and Ranged Troop Defense +3%.
+    buffs:
+      - attribute: Attack
+        targetedType: Ranged Troops
+        value:
+          number: 4
+          unit: percentage
+      - attribute: HP
+        targetedType: Ranged Troops
+        conditions:
+          - Attacking
+        value:
+          number: 3
+          unit: percentage
+      - attribute: HP
+        targetedType: Siege Machines
+        conditions:
+          - Attacking
+        value:
+          number: 3
+          unit: percentage
+      - attribute: Defense
+        targetedType: Ranged Troops
+        conditions:
+          - Attacking
+        value:
+          number: 3
+          unit: percentage
+      - attribute: Defense
+        targetedType: Siege Machines
+        conditions:
+          - Attacking
+        value:
+          number: 3
+          unit: percentage
+  - level: Purple
+    text: Ranged Troop Attack +8%. Attacking Ranged Troop and Siege Machine HP +5%. Attacking Siege Machine and Ranged Troop Defense +5%.
+    buffs:
+      - attribute: Attack
+        targetedType: Ranged Troops
+        value:
+          number: 8
+          unit: percentage
+      - attribute: HP
+        targetedType: Ranged Troops
+        conditions:
+          - Attacking
+        value:
+          number: 5
+          unit: percentage
+      - attribute: HP
+        targetedType: Siege Machines
+        conditions:
+          - Attacking
+        value:
+          number: 5
+          unit: percentage
+      - attribute: Defense
+        targetedType: Ranged Troops
+        conditions:
+          - Attacking
+        value:
+          number: 5
+          unit: percentage
+      - attribute: Defense
+        targetedType: Siege Machines
+        conditions:
+          - Attacking
+        value:
+          number: 5
+          unit: percentage
+  - level: Orange
+    text: Ranged Troop Attack +8%. Attacking Ranged Troop and Siege Machine HP +5%. Attacking Siege Machine and Ranged Troop Defense +5%.
+    buffs:
+      - attribute: Attack
+        targetedType: Ranged Troops
+        value:
+          number: 8
+          unit: percentage
+      - attribute: HP
+        targetedType: Ranged Troops
+        conditions:
+          - Attacking
+        value:
+          number: 5
+          unit: percentage
+      - attribute: HP
+        targetedType: Siege Machines
+        conditions:
+          - Attacking
+        value:
+          number: 5
+          unit: percentage
+      - attribute: Defense
+        targetedType: Ranged Troops
+        conditions:
+          - Attacking
+        value:
+          number: 5
+          unit: percentage
+      - attribute: Defense
+        targetedType: Siege Machines
+        conditions:
+          - Attacking
+        value:
+          number: 5
+          unit: percentage
+  - level: Gold
+    text: Ranged Troop Attack +16%. Attacking Ranged Troop and Siege Machine HP +10%. Attacking Siege Machine and Ranged Troop Defense +10%.
+    buffs:
+      - attribute: Attack
+        targetedType: Ranged Troops
+        value:
+          number: 16
+          unit: percentage
+      - attribute: HP
+        targetedType: Ranged Troops
+        conditions:
+          - Attacking
+        value:
+          number: 10
+          unit: percentage
+      - attribute: HP
+        targetedType: Siege Machines
+        conditions:
+          - Attacking
+        value:
+          number: 10
+          unit: percentage
+      - attribute: Defense
+        targetedType: Ranged Troops
+        conditions:
+          - Attacking
+        value:
+          number: 10
+          unit: percentage
+      - attribute: Defense
+        targetedType: Siege Machines
+        conditions:
+          - Attacking
+        value:
+          number: 10
+          unit: percentage
