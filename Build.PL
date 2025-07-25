@@ -70,7 +70,6 @@ my $builder = Module::Build->new(
       'Mojolicious::Plugin::Module::Loader' => '0',
       'Mojolicious::Routes'         => '0',
       'Mojolicious::Routes::Route'  => '0',
-      'MojoX::Log::Log4perl'        => '0',
       'Moose'                       => '0',
       'Moose::Autobox'              => '0',
       'Params::ValidationCompiler'  => '0',
