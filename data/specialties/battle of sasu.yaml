@@ -1,0 +1,112 @@
+name: Battle of Sasu
+levels:
+  - level: Green
+    buffs:
+      - attribute: attack
+        troop: Ground Troops
+        value: 1
+        conditions:
+          - Enemy
+      - attribute: Attack
+        troop: Mounted Troops
+        value: 1
+        conditions:
+          - Enemy
+      - attribute: Attack
+        conditions:
+          - Enemy
+        troop: Ranged Troops
+        value: 2
+      - attribute: Attack
+        conditions:
+          - Enemy
+        troop: Siege Machines
+        value: 2
+  - level: Blue
+    buffs:
+      - attribute: attack
+        troop: Ground Troops
+        value: 1
+        conditions:
+          - Enemy
+      - attribute: Attack
+        troop: Mounted Troops
+        value: 1
+        conditions:
+          - Enemy
+      - attribute: Attack
+        conditions:
+          - Enemy
+        troop: Ranged Troops
+        value: 2
+      - attribute: Attack
+        conditions:
+          - Enemy
+        troop: Siege Machines
+        value: 2
+  - level: Purple
+    buffs:
+      - attribute: attack
+        troop: Ground Troops
+        value: 2
+        conditions:
+          - Enemy
+      - attribute: Attack
+        troop: Mounted Troops
+        value: 2
+        conditions:
+          - Enemy
+      - attribute: Attack
+        conditions:
+          - Enemy
+        troop: Ranged Troops
+        value: 4
+      - attribute: Attack
+        conditions:
+          - Enemy
+        troop: Siege Machines
+        value: 4
+  - level: Orange
+    buffs:
+      - attribute: attack
+        troop: Ground Troops
+        value: 2
+        conditions:
+          - Enemy
+      - attribute: Attack
+        troop: Mounted Troops
+        value: 2
+        conditions:
+          - Enemy
+      - attribute: Attack
+        conditions:
+          - Enemy
+        troop: Ranged Troops
+        value: 4
+      - attribute: Attack
+        conditions:
+          - Enemy
+        troop: Siege Machines
+        value: 4
+  - level: Gold
+    buffs:
+      - attribute: attack
+        troop: Ground Troops
+        value: 4
+        conditions:
+          - Enemy
+      - attribute: Attack
+        troop: Mounted Troops
+        value: 4
+        conditions:
+          - Enemy
+      - attribute: Attack
+        conditions:
+          - Enemy
+        troop: Ranged Troops
+        value: 8
+      - attribute: Attack
+        conditions:
+          - Enemy
+        troop: Siege Machines
+        value: 8
