@@ -1,0 +1,24 @@
+ascending: 'true'
+basic_attributes:
+  attack:
+    base: 135
+    increment: 8.85
+  defense:
+    base: 120
+    increment: 8.57
+  leadership:
+    base: 129
+    increment: 8.83
+  politics:
+    base: 113
+    increment: 8.52
+book: God of Strategy
+name: Mouri Motonari
+specialties:
+  - Mounted Troop Assault
+  - Formation
+  - Mounted Troop Ares
+  - Battle of Miyajima
+stars: red5
+type:
+  - mounted_specialist
