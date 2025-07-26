@@ -1,6 +1,6 @@
 ---
 ascending:
-  - level: "red1"
+  - level: red1
     buffs:
       - attribute: Defense
         targetedType: Mounted Troops
@@ -12,7 +12,7 @@ ascending:
         value:
           number: 10
           unit: percentage
-  - level: "red2"
+  - level: red2
     buffs:
       - attribute: Death to Wounded
         conditions:
@@ -20,7 +20,7 @@ ascending:
         value:
           number: 8
           unit: percentage
-  - level: "red3"
+  - level: red3
     buffs:
       - attribute: Marching Speed
         value:
@@ -30,7 +30,7 @@ ascending:
         value:
           number: 5
           unit: percentage
-  - level: "red4"
+  - level: red4
     buffs:
       - attribute: Attack
         targetedType: Mounted Troops
@@ -42,7 +42,7 @@ ascending:
         value:
           number: 15
           unit: percentage
-  - level: "red5"
+  - level: red5
     buffs:
       - attribute: Attack
         targetedType: Mounted Troops

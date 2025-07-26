@@ -1,0 +1,25 @@
+ascending: true
+basic_attributes:
+  attack:
+    base: 123
+    increment: 8.75
+  defense:
+    base: 121
+    increment: 8.51
+  leadership:
+    base: 132
+    increment: 9.08
+  politics:
+    base: 115
+    increment: 8.20
+book: Unstoppable by Thousands
+specialties:
+  - Ground Troop Formation
+  - Formation
+  - War God
+  - Battle of Changban
+stars: red5
+type:
+  - ground_specialist
+general: Zhang Fei
+name: Zhang Fei
