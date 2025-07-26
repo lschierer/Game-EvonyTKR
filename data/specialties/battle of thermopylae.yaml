@@ -1,0 +1,93 @@
+---
+levels:
+  - buffs:
+      - attribute: Attack
+        conditions: []
+        passive: 0
+        targetedType: Ground Troops
+        value:
+          number: 3
+          unit: percentage
+      - attribute: Attack
+        conditions:
+          - Enemy
+        passive: 0
+        targetedType: Mounted Troops
+        value:
+          number: 3
+          unit: percentage
+    level: Green
+    text: 'Ground Troop Attack +3%. Enemy Mounted Troop Attack -3%.'
+  - buffs:
+      - attribute: Attack
+        conditions: []
+        passive: 0
+        targetedType: Ground Troops
+        value:
+          number: 3
+          unit: percentage
+      - attribute: Attack
+        conditions:
+          - Enemy
+        passive: 0
+        targetedType: Mounted Troops
+        value:
+          number: 3
+          unit: percentage
+    level: Blue
+    text: 'Ground Troop Attack +3%. Enemy Mounted Troop Attack -3%.'
+  - buffs:
+      - attribute: Attack
+        conditions: []
+        passive: 0
+        targetedType: Ground Troops
+        value:
+          number: 6
+          unit: percentage
+      - attribute: Attack
+        conditions:
+          - Enemy
+        passive: 0
+        targetedType: Mounted Troops
+        value:
+          number: 6
+          unit: percentage
+    level: Purple
+    text: 'Ground Troop Attack +6%. Enemy Mounted Troop Attack -6%.'
+  - buffs:
+      - attribute: Attack
+        conditions: []
+        passive: 0
+        targetedType: Ground Troops
+        value:
+          number: 6
+          unit: percentage
+      - attribute: Attack
+        conditions:
+          - Enemy
+        passive: 0
+        targetedType: Mounted Troops
+        value:
+          number: 6
+          unit: percentage
+    level: Orange
+    text: 'Ground Troop Attack +6%. Enemy Mounted Troop Attack -6%.'
+  - buffs:
+      - attribute: Attack
+        conditions: []
+        passive: 0
+        targetedType: Ground Troops
+        value:
+          number: 12
+          unit: percentage
+      - attribute: Attack
+        conditions:
+          - Enemy
+        passive: 0
+        targetedType: Mounted Troops
+        value:
+          number: 12
+          unit: percentage
+    level: Gold
+    text: Ground Troop Attack +12%, Enemy Mounted Troop Attack -12%
+name: Battle of Thermopylae

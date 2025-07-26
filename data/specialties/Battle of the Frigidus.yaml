@@ -5,17 +5,23 @@ levels:
     buffs:
       - attribute: attack
         troop: siege_machines
-        value: 4
+        value:
+          number: 4
+          unit: percentage
         conditions:
           - attacking
       - attribute: defense
         troop: siege_machines
-        value: 2
+        value:
+          number: 2
+          unit: percentage
         conditions:
           - attacking
       - attribute: hp
         troop: siege_machines
-        value: 2
+        value:
+          number: 2
+          unit: percentage
         conditions:
           - attacking
   - level: Blue
@@ -23,17 +29,23 @@ levels:
     buffs:
       - attribute: attack
         troop: siege_machines
-        value: 4
+        value:
+          number: 4
+          unit: percentage
         conditions:
           - attacking
       - attribute: defense
         troop: siege_machines
-        value: 3
+        value:
+          number: 3
+          unit: percentage
         conditions:
           - attacking
       - attribute: hp
         troop: siege_machines
-        value: 3
+        value:
+          number: 3
+          unit: percentage
         conditions:
           - attacking
   - level: Purple
@@ -41,17 +53,23 @@ levels:
     buffs:
       - attribute: attack
         troop: siege_machines
-        value: 8
+        value:
+          number: 8
+          unit: percentage
         conditions:
           - attacking
       - attribute: defense
         troop: siege_machines
-        value: 5
+        value:
+          number: 5
+          unit: percentage
         conditions:
           - attacking
       - attribute: hp
         troop: siege_machines
-        value: 5
+        value:
+          number: 5
+          unit: percentage
         conditions:
           - attacking
   - level: Orange
@@ -59,17 +77,23 @@ levels:
     buffs:
       - attribute: attack
         troop: siege_machines
-        value: 8
+        value:
+          number: 8
+          unit: percentage
         conditions:
           - attacking
       - attribute: defense
         troop: siege_machines
-        value: 5
+        value:
+          number: 5
+          unit: percentage
         conditions:
           - attacking
       - attribute: hp
         troop: siege_machines
-        value: 5
+        value:
+          number: 5
+          unit: percentage
         conditions:
           - attacking
   - level: Gold
@@ -77,16 +101,22 @@ levels:
     buffs:
       - attribute: attack
         troop: siege_machines
-        value: 16
+        value:
+          number: 16
+          unit: percentage
         conditions:
           - attacking
       - attribute: defense
         troop: siege_machines
-        value: 10
+        value:
+          number: 10
+          unit: percentage
         conditions:
           - attacking
       - attribute: hp
         troop: siege_machines
-        value: 10
+        value:
+          number: 10
+          unit: percentage
         conditions:
           - attacking
