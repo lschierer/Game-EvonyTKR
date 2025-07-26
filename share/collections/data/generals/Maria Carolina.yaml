@@ -1,0 +1,24 @@
+ascending: 'true'
+basic_attributes:
+  attack:
+    base: 123
+    increment: 8.62
+  defense:
+    base: 125
+    increment: 8.67
+  leadership:
+    base: 131
+    increment: 8.95
+  politics:
+    base: 117
+    increment: 8.49
+book: Iron-Willed Queen
+name: Maria Carolina
+specialties:
+  - Ground Troop Defense
+  - Formation
+  - Ground Troop Ares
+  - Court of the Arts
+stars: red5
+type:
+  - ground_specialist
