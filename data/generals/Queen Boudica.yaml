@@ -1,0 +1,23 @@
+ascending: 'true'
+basic_attributes:
+  attack:
+    base: 109
+    increment: 0
+  defense:
+    base: 109
+    increment: 0
+  leadership:
+    base: 108
+    increment: 0
+  politics:
+    base: 115
+    increment: 0
+book: Rebel Leader
+name: Queen Boudica
+specialties:
+  - Mounted Troop Defense
+  - Defensive
+  - War God
+  - Battle of Watling Street
+stars: red5
+type: ''

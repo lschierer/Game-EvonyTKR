@@ -1,0 +1,17 @@
+name: Sengoku Beauty
+text: >-
+  Increases in-city troops' attack by 15% and in-city ground troops' HP by 30% when General is the Main City Defense General.
+buffs:
+  - attribute: Attack
+    value:
+      number: 15
+    conditions:
+      - In City
+      - When The Main Defense General
+  - attribute: HP
+    troop: Ground Troops
+    value:
+      number: 30
+    conditions:
+      - In City
+      - When The Main Defense General

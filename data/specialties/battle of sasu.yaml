@@ -4,109 +4,149 @@ levels:
     buffs:
       - attribute: attack
         troop: Ground Troops
-        value: 1
+        value:
+          number: 1
+          unit: percentage
         conditions:
           - Enemy
       - attribute: Attack
         troop: Mounted Troops
-        value: 1
+        value:
+          number: 1
+          unit: percentage
         conditions:
           - Enemy
       - attribute: Attack
         conditions:
           - Enemy
         troop: Ranged Troops
-        value: 2
+        value:
+          number: 2
+          unit: percentage
       - attribute: Attack
         conditions:
           - Enemy
         troop: Siege Machines
-        value: 2
+        value:
+          number: 2
+          unit: percentage
   - level: Blue
     buffs:
       - attribute: attack
         troop: Ground Troops
-        value: 1
+        value:
+          number: 1
+          unit: percentage
         conditions:
           - Enemy
       - attribute: Attack
         troop: Mounted Troops
-        value: 1
+        value:
+          number: 1
+          unit: percentage
         conditions:
           - Enemy
       - attribute: Attack
         conditions:
           - Enemy
         troop: Ranged Troops
-        value: 2
+        value:
+          number: 2
+          unit: percentage
       - attribute: Attack
         conditions:
           - Enemy
         troop: Siege Machines
-        value: 2
+        value:
+          number: 2
+          unit: percentage
   - level: Purple
     buffs:
       - attribute: attack
         troop: Ground Troops
-        value: 2
+        value:
+          number: 2
+          unit: percentage
         conditions:
           - Enemy
       - attribute: Attack
         troop: Mounted Troops
-        value: 2
+        value:
+          number: 2
+          unit: percentage
         conditions:
           - Enemy
       - attribute: Attack
         conditions:
           - Enemy
         troop: Ranged Troops
-        value: 4
+        value:
+          number: 4
+          unit: percentage
       - attribute: Attack
         conditions:
           - Enemy
         troop: Siege Machines
-        value: 4
+        value:
+          number: 4
+          unit: percentage
   - level: Orange
     buffs:
       - attribute: attack
         troop: Ground Troops
-        value: 2
+        value:
+          number: 2
+          unit: percentage
         conditions:
           - Enemy
       - attribute: Attack
         troop: Mounted Troops
-        value: 2
+        value:
+          number: 2
+          unit: percentage
         conditions:
           - Enemy
       - attribute: Attack
         conditions:
           - Enemy
         troop: Ranged Troops
-        value: 4
+        value:
+          number: 4
+          unit: percentage
       - attribute: Attack
         conditions:
           - Enemy
         troop: Siege Machines
-        value: 4
+        value:
+          number: 4
+          unit: percentage
   - level: Gold
     buffs:
       - attribute: attack
         troop: Ground Troops
-        value: 4
+        value:
+          number: 4
+          unit: percentage
         conditions:
           - Enemy
       - attribute: Attack
         troop: Mounted Troops
-        value: 4
+        value:
+          number: 4
+          unit: percentage
         conditions:
           - Enemy
       - attribute: Attack
         conditions:
           - Enemy
         troop: Ranged Troops
-        value: 8
+        value:
+          number: 8
+          unit: percentage
       - attribute: Attack
         conditions:
           - Enemy
         troop: Siege Machines
-        value: 8
+        value:
+          number: 8
+          unit: percentage

@@ -1,0 +1,24 @@
+ascending: 'true'
+basic_attributes:
+  attack:
+    base: 126
+    increment: 8.88
+  defense:
+    base: 121
+    increment: 8.71
+  leadership:
+    base: 130
+    increment: 8.93
+  politics:
+    base: 107
+    increment: 8.01
+book: Spirit of Zuidama
+name: Tachibana Ginchiyo
+specialties:
+  - Ranged Troop Defense
+  - Bash
+  - Ranged Troop Ares
+  - Siege of Yanagawa
+stars: red5
+type:
+  - ranged_specialist
