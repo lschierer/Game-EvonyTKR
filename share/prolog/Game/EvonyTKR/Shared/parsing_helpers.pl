@@ -70,7 +70,8 @@ optional_verb --> [reduces].
 optional_verb --> [is].
 optional_verb --> [].
 optional_subject --> [general] ; [you]; [].
-optional_value_adj --> [+] ; [by] ; [by] ,[another] ; [].
+optional_value_adj --> [+] ; [by] ; [by] ,[another] ; [extra], [+] ; [].
+optional_value_prep --> [for] ; [].
 optional_plus --> [+] ; [].
 optional_by   --> [by] ; [].
 optional_the  --> [the] ; [].
@@ -82,6 +83,8 @@ troop('') -->
   [troop].
 troop('') -->
   [troops].
+troop('') -->
+  [all], [troops].
 
 
 

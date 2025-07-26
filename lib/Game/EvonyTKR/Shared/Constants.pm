@@ -111,6 +111,7 @@ class Game::EvonyTKR::Shared::Constants : isa(Game::EvonyTKR::Model::Logger) {
       "SubCity Training Speed",
       "SubCity Troop Capacity",
       "Training Capacity",
+      'Trap Triggering Rate',
       "Training Speed",
       "Wounded to Death",
     );
@@ -136,6 +137,7 @@ class Game::EvonyTKR::Shared::Constants : isa(Game::EvonyTKR::Model::Logger) {
       'mayor training speed'           => 'SubCity Training Speed',
       'mayor death into survival rate' => 'SubCity Death to Survival',
       'the gold production speed'      => 'SubCity Gold Production',
+      "traps’ triggering rate"         => 'Trap Triggering Rate',
       'subordinate city troops’ death to survival rate' =>
         'SubCity Death to Survival',
       'subordinate city troops’ death to survival' =>
@@ -144,6 +146,7 @@ class Game::EvonyTKR::Shared::Constants : isa(Game::EvonyTKR::Model::Logger) {
         'SubCity Death to Survival',
       'subordinate city troops’ death into survival' =>
         'SubCity Death to Survival',
+
     };
     $MappedAttributeNames = $temp;
   }

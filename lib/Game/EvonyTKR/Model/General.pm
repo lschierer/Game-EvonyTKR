@@ -5,6 +5,7 @@ use File::FindLib 'lib';
 require Data::Printer;
 require Game::EvonyTKR::Model::BasicAttributes;
 require JSON::PP;
+require Log::Log4perl;
 
 class Game::EvonyTKR::Model::General : isa(Game::EvonyTKR::Shared::Constants) {
 # PODNAME: Game::EvonyTKR::Model::General
@@ -43,6 +44,9 @@ class Game::EvonyTKR::Model::General : isa(Game::EvonyTKR::Shared::Constants) {
 
   ADJUST {
     my @errors;
+    unless($self->can('_isTrue') && $self->_isTrue() ){
+      Log::Log4perl->logcroak("unexpected value: " . blessed($self) );
+    }
 
     if (ref $type) {
       foreach my $t1 (@{$type}) {
