@@ -5,88 +5,138 @@ levels:
     buffs:
       - attribute: attack
         troop: ranged_troops
-        value: 3
+        value:
+          number: 3
+          unit: percentage
       - attribute: defense
         troop: ranged_troops
-        value: 3
+        value:
+          number: 3
+          unit: percentage
       - attribute: defense
         troop: siege_machines
-        value: 3
+        value:
+          number: 3
+          unit: percentage
       - attribute: hp
         troop: ranged_troops
-        value: 3
+        value:
+          number: 3
+          unit: percentage
       - attribute: hp
         troop: siege_machines
-        value: 3
+        value:
+          number: 3
+          unit: percentage
   - level: Blue
     text: Ranged Troop Attack +4%. Ranged Troop and Siege Machine Defense +3%. Ranged Troop and Siege Machine HP +3%.
     buffs:
       - attribute: attack
         troop: ranged_troops
-        value: 4
+        value:
+          number: 4
+          unit: percentage
       - attribute: defense
         troop: ranged_troops
-        value: 3
+        value:
+          number: 3
+          unit: percentage
       - attribute: defense
         troop: siege_machines
-        value: 3
+        value:
+          number: 3
+          unit: percentage
       - attribute: hp
         troop: ranged_troops
-        value: 3
+        value:
+          number: 3
+          unit: percentage
       - attribute: hp
         troop: siege_machines
-        value: 3
+        value:
+          number: 3
+          unit: percentage
   - level: Purple
     text: Ranged Troop Attack +7%. Ranged Troop and Siege Machine Defense +6%. Ranged Troop and Siege Machine HP +6%.
     buffs:
       - attribute: attack
         troop: ranged_troops
-        value: 7
+        value:
+          number: 7
+          unit: percentage
       - attribute: defense
         troop: ranged_troops
-        value: 6
+        value:
+          number: 6
+          unit: percentage
       - attribute: defense
         troop: siege_machines
-        value: 6
+        value:
+          number: 6
+          unit: percentage
       - attribute: hp
         troop: ranged_troops
-        value: 6
+        value:
+          number: 6
+          unit: percentage
       - attribute: hp
         troop: siege_machines
-        value: 6
+        value:
+          number: 6
+          unit: percentage
   - level: Orange
     text: Ranged Troop Attack +7%. Ranged Troop and Siege Machine Defense +6%. Ranged Troop and Siege Machine HP +6%.
     buffs:
       - attribute: attack
         troop: ranged_troops
-        value: 7
+        value:
+          number: 7
+          unit: percentage
       - attribute: defense
         troop: ranged_troops
-        value: 6
+        value:
+          number: 6
+          unit: percentage
       - attribute: defense
         troop: siege_machines
-        value: 6
+        value:
+          number: 6
+          unit: percentage
       - attribute: hp
         troop: ranged_troops
-        value: 6
+        value:
+          number: 6
+          unit: percentage
       - attribute: hp
         troop: siege_machines
-        value: 6
+        value:
+          number: 6
+          unit: percentage
   - level: Gold
     text: Ranged Troop Attack +14%. Ranged Troop and Siege Machine Defense +12%. Ranged Troop and Siege Machine HP +12%.
     buffs:
       - attribute: attack
         troop: ranged_troops
-        value: 14
+        value:
+          number: 14
+          unit: percentage
       - attribute: defense
         troop: ranged_troops
-        value: 12
+        value:
+          number: 12
+          unit: percentage
       - attribute: defense
         troop: siege_machines
-        value: 12
+        value:
+          number: 12
+          unit: percentage
       - attribute: hp
         troop: ranged_troops
-        value: 12
+        value:
+          number: 12
+          unit: percentage
       - attribute: hp
         troop: siege_machines
-        value: 12
+        value:
+          number: 12
+          unit: percentage

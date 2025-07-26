@@ -1,0 +1,86 @@
+---
+generals:
+- Himiko
+- Frigg
+- Hestia
+levels:
+- buffs:
+  - attribute: HP
+    conditions: []
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 10
+      unit: percentage
+  category: war
+  text: Ranged Troop HP +10% (Local)
+- buffs:
+  - attribute: Attack
+    conditions:
+    - Reinforcing
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 5
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - Reinforcing
+    passive: 1
+    targetedType: Ranged Troops
+    value:
+      number: 5
+      unit: percentage
+  category: faith
+  text: Reinforcing Ranged Troop Attack +5% (Local);;Reinforcing Ranged Troop Defense +5% (Global)
+- buffs:
+  - attribute: HP
+    conditions:
+    - When Rallying
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 10
+      unit: percentage
+  category: honor
+  text: In-Rally Ranged Troop HP +10% (Local)
+- buffs:
+  - attribute: Attack
+    conditions: []
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 5
+      unit: percentage
+  - attribute: Defense
+    conditions: []
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 10
+      unit: percentage
+  category: civilization
+  text: Ranged Troop Attack +5% (Local);;Ranged Troop Defense +10% (Local)
+- buffs:
+  - attribute: Wounded to Death
+    conditions:
+    - Enemy
+    - Attacking
+    passive: 0
+    targetedType: ''
+    value:
+      number: 10
+      unit: percentage
+  category: cooperation
+  text: Enemy Wounded into Death when attacking +10% (Local)
+- buffs:
+  - attribute: Training Speed
+    conditions: []
+    passive: 1
+    targetedType: Ranged Troops
+    value:
+      number: 10
+      unit: percentage
+  category: peace
+  text: Ranged Troop Training Speed +10% (Global)
+name: Tachibana Ginchiyo

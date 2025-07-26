@@ -8,7 +8,9 @@ levels:
         conditions: []
       - attribute: Attack
         troop: Mounted Troops
-        value: 4
+        value:
+          number: 4
+          unit: percentage
         conditions: []
       - attribute: HP
         troop: Ground Troops
@@ -27,7 +29,9 @@ levels:
         conditions: []
       - attribute: Attack
         troop: Mounted Troops
-        value: 4
+        value:
+          number: 4
+          unit: percentage
         conditions: []
       - attribute: HP
         troop: Ground Troops
@@ -46,7 +50,9 @@ levels:
         conditions: []
       - attribute: Attack
         troop: Mounted Troops
-        value: 4
+        value:
+          number: 4
+          unit: percentage
         conditions: []
       - attribute: HP
         troop: Ground Troops
@@ -65,7 +71,9 @@ levels:
         conditions: []
       - attribute: Attack
         troop: Mounted Troops
-        value: 8
+        value:
+          number: 8
+          unit: percentage
         conditions: []
       - attribute: HP
         troop: Ground Troops
@@ -84,7 +92,9 @@ levels:
         conditions: []
       - attribute: Attack
         troop: Mounted Troops
-        value: 16
+        value:
+          number: 16
+          unit: percentage
         conditions: []
       - attribute: HP
         troop: Ground Troops

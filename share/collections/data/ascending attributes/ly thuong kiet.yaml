@@ -1,0 +1,136 @@
+---
+ascending:
+- buffs:
+  - attribute: Defense
+    conditions:
+    - When The Main Defense General
+    - In City
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - When The Main Defense General
+    - In City
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - When The Main Defense General
+    - In City
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - When The Main Defense General
+    - In City
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 10
+      unit: percentage
+  level: red1
+  text: When General is the Main City Defense General, In-city Mounted Troop and Ground Troop Defense +10% and HP +10%.
+- buffs:
+  - attribute: Hospital Capacity
+    conditions:
+    - When The Main Defense General
+    passive: 0
+    targetedType: ''
+    value:
+      number: 15
+      unit: percentage
+  level: red2
+  text: When General is the Main City Defense General, Hospital Capacity +15%.
+- buffs:
+  - attribute: Defense
+    conditions:
+    - When The Main Defense General
+    - In City
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 20
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - When The Main Defense General
+    - In City
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 20
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - When The Main Defense General
+    - In City
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 20
+      unit: percentage
+  level: red3
+  text: When General is the Main City Defense General, In-city Ranged Troop Defense +20%, In-city Ground Troop and Mounted Troop Defense +20%.
+- buffs:
+  - attribute: HP
+    conditions:
+    - In City
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 20
+      unit: percentage
+  - attribute: HP
+    conditions: []
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 20
+      unit: percentage
+  - attribute: HP
+    conditions: []
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 20
+      unit: percentage
+  level: red4
+  text: When General is the Main City Defense General. In-city Ranged Troop HP +20%, In-city Ground Troop and Mounted Troop HP +20%.
+- buffs:
+  - attribute: Attack
+    conditions:
+    - In City
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 20
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - In City
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 20
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - In City
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 20
+      unit: percentage
+  level: red5
+  text: When General is the Main City Defense General. In-city Ranged Troop Attack +20%, Defense and HP +20%.
+general: Ly Thuong Kiet
+id: Ly Thuong Kiet

@@ -4,54 +4,84 @@ levels:
     buffs:
       - attribute: Attack
         troop: Ground Troops
-        value: 3
+        value:
+          number: 3
+          unit: percentage
       - attribute: defense
         troop: Ground Troops
-        value: 1
+        value:
+          number: 1
+          unit: percentage
       - attribute: HP
         troop: Ground Troops
-        value: 1
+        value:
+          number: 1
+          unit: percentage
   - level: Blue
     buffs:
       - attribute: Attack
         troop: Ground Troops
-        value: 3
+        value:
+          number: 3
+          unit: percentage
       - attribute: defense
         troop: Ground Troops
-        value: 2
+        value:
+          number: 2
+          unit: percentage
       - attribute: HP
         troop: Ground Troops
-        value: 2
+        value:
+          number: 2
+          unit: percentage
   - level: Purple
     buffs:
       - attribute: Attack
         troop: Ground Troops
-        value: 6
+        value:
+          number: 6
+          unit: percentage
       - attribute: defense
         troop: Ground Troops
-        value: 3
+        value:
+          number: 3
+          unit: percentage
       - attribute: HP
         troop: Ground Troops
-        value: 3
+        value:
+          number: 3
+          unit: percentage
   - level: Orange
     buffs:
       - attribute: Attack
         troop: Ground Troops
-        value: 6
+        value:
+          number: 6
+          unit: percentage
       - attribute: defense
         troop: Ground Troops
-        value: 3
+        value:
+          number: 3
+          unit: percentage
       - attribute: HP
         troop: Ground Troops
-        value: 3
+        value:
+          number: 3
+          unit: percentage
   - level: Orange
     buffs:
       - attribute: Attack
         troop: Ground Troops
-        value: 12
+        value:
+          number: 12
+          unit: percentage
       - attribute: defense
         troop: Ground Troops
-        value: 6
+        value:
+          number: 6
+          unit: percentage
       - attribute: HP
         troop: Ground Troops
-        value: 6
+        value:
+          number: 6
+          unit: percentage
