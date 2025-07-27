@@ -100,7 +100,7 @@ package Game::EvonyTKR::Controller::Generals {
           "evonytkrtips_initialized sub has controller_name $controller_name.");
 
         if (not defined $gm) {
-          $self->logger->logcroak("general manager must be defined");
+          $logger->logcroak("general manager must be defined");
         }
 
         while (my ($k, $v) = each %{ $gm->get_all_generals() }) {
@@ -126,10 +126,22 @@ package Game::EvonyTKR::Controller::Generals {
       }
     );
     # two routes for directory indices
-    $mainRoutes->get('/:uiTarget')->to(
+    $mainRoutes->get('/:uiTarget')
+    ->requires(is_valid_uiTarget => 1)->to(
       controller => 'Generals',
       action     => 'uiTarget_index',
     )->name('General_dynamic_uiTarget_index');
+
+    # check that :uiTarget is a valid route, otherwise this becomes
+    # too broad a match and prevents anything else from matching.
+    $app->routes->add_condition(
+      is_valid_uiTarget => sub ($route, $c, $captures, $arg) {
+        my $uiTarget = $captures->{uiTarget};
+        my @valid_routes = $c->general_routing->get_routes_for_uiTarget($uiTarget);
+        return !!@valid_routes;
+      }
+    );
+
     $mainRoutes->get('/:uiTarget/:buffActivation')->to(
       controller => 'Generals',
       action     => 'buffActivation_index',

@@ -60,11 +60,11 @@ class Game::EvonyTKR::Model::General::ConflictGroup::Manager :
     # Return false - A general cannot pair with him/herself.
     return 0 if $general1 eq $general2;
 
-    if (not defined $general1) {
+    if (not defined $general1 or length($general1) == 0) {
       $self->error("general1 must be defined!!!");
       return 0;
     }
-    if (not defined $general2) {
+    if (not defined $general2 or length($general2) == 0) {
       $self->error("general2 must be defined!!!");
       return 0;
     }

@@ -2,6 +2,7 @@
 jq = "latest"
 just = "latest"
 node = "24"
+pandoc = "latest"
 perl = "latest"
 pnpm = "10"
 yq = "latest"

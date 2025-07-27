@@ -73,6 +73,11 @@ class Game::EvonyTKR::Model::General::Manager :
         $name = $object->{name};
       }
 
+      unless (exists $object->{type} and length($object->{type}) > 0) {
+        $self->logger->error("$name is missing type!!");
+        next;
+      }
+
       $generals->{$name} = Game::EvonyTKR::Model::General->new(
         name            => $name,
         type            => $object->{type},

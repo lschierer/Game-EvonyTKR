@@ -47,8 +47,11 @@ class Game::EvonyTKR::Model::General : isa(Game::EvonyTKR::Shared::Constants) {
     unless($self->can('_isTrue') && $self->_isTrue() ){
       Log::Log4perl->logcroak("unexpected value: " . blessed($self) );
     }
-
-    if (ref $type) {
+    if(not defined $type) {
+    push @errors,
+      sprintf('type must be one of %s', join(', ', @{ $self->GeneralKeys }));
+    }
+    elsif (ref $type) {
       foreach my $t1 (@{$type}) {
         if (none { $t1 =~ /$_/i } @{ $self->GeneralKeys }) {
           push @errors,
@@ -59,8 +62,8 @@ class Game::EvonyTKR::Model::General : isa(Game::EvonyTKR::Shared::Constants) {
     }
     elsif (none { $type =~ /$_/i } @{ $self->GeneralKeys }) {
       push @errors,
-        sprintf('type must be one of %s, not %s',
-        Data::Printer::np($self->GeneralKeys()->values()), $type);
+        sprintf('type must be one of %s, not "%s"',
+        Data::Printer::np($self->GeneralKeys()), $type);
     }
     if (@errors) {
       $self->logger()->logcroak(join ', ' => @errors);

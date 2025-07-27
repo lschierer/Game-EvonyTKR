@@ -5,6 +5,7 @@
 @import url('@spectrum-css/link/index.css');
 @import url('@spectrum-css/sidenav/index.css');
 @import url('@spectrum-css/splitview/index.css');
+@import url('@spectrum-css/divider/dist/index.css');
 
 :root {
   --brand: var(--spectrum-cyan-800);
@@ -43,6 +44,7 @@
   /* customize the spectrum-css tokens */
   --mod-button-background-color-default: var(--text-1);
   --mod-button-content-color-default: var(--text-3);
+  --mod-divider-background-color: var(--text-1);
   --mod-body-font-color: var(--text-1);
   --mod-heading-font-color: var(--text-1);
   --mod-splitview-background-color: var(--surface-1);

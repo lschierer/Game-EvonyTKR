@@ -4,11 +4,11 @@ use utf8::all;
 use File::FindLib 'lib';
 use Mojo::File;
 use Path::Iterator::Rule;
-require Text::MultiMarkdown;
-require Markdent::Parser;
+require Pandoc;
 require Game::EvonyTKR::Markdown::SpectrumHandler;
 require Data::Printer;
 require YAML::PP;
+require Mojo::DOM58;
 
 package Game::EvonyTKR::Plugins::Markdown {
   use Mojo::Base 'Mojolicious::Plugin', -strict, -signatures;
@@ -141,19 +141,11 @@ package Game::EvonyTKR::Plugins::Markdown {
       "Template paths: " . join(", ", @{ $c->app->renderer->paths }));
     $logger->debug("Looking for template: $template.html.ep");
 
-    open my $fh, '>', \my $html_content;
-    binmode $fh, ':encoding(UTF-8)';    # Make sure to set encoding
+    my $parser = Pandoc->new();
+    my $html_content = $parser->convert('gfm' => 'html', $parsedFile->{content});
+    $html_content = $self->SpectrumFormatting($html_content);
 
-    my $handler =
-      Game::EvonyTKR::Markdown::SpectrumHandler->new(output => $fh,);
 
-    my $parser = Markdent::Parser->new(
-      dialects => ['GitHub'],
-      handler  => $handler,
-    );
-
-    $parser->parse(markdown => $parsedFile->{content});
-    close $fh;
     $logger->debug("html is now $html_content");
     # Add markdown content to stash but don't override existing content
     if (!exists $c->stash->{markdown_content}) {
@@ -175,6 +167,57 @@ package Game::EvonyTKR::Plugins::Markdown {
       layout   => $c->stash('layout'),
       content  => $content
     );
+  }
+
+  sub SpectrumFormatting ($self, $html_content) {
+    my $dom = Mojo::DOM58->new($html_content);
+
+    my %spectrum_h = (
+      h1 => "spectrum-Heading spectrum-Heading--sizeXXL",
+      h2 => "spectrum-Heading spectrum-Heading--sizeXL",
+      h3 => "spectrum-Heading spectrum-Heading--sizeL",
+      h4 => "spectrum-Heading spectrum-Heading--sizeM",
+      h5 => "spectrum-Heading spectrum-Heading--sizeS",
+      h6 => "spectrum-Heading spectrum-Heading--sizeXS",
+    );
+
+    # Add header classes
+    for my $tag (keys %spectrum_h) {
+      $dom->find($tag)->each(sub { $_->attr(class => $spectrum_h{$tag}) });
+    }
+
+    # Add paragraph classes
+    $dom->find('p')->each(sub {
+      $_->attr(class => "spectrum-Body spectrum-Body--serif spectrum-Body--sizeM");
+    });
+
+    # Add list item classes
+    $dom->find('li')->each(sub {
+      $_->attr(class => "spectrum-Body spectrum-Body--serif spectrum-Body--sizeM");
+    });
+
+    # Add link classes
+    $dom->find('a')->each(sub {
+      $_->attr(class => "spectrum-Link spectrum-Link--primary spectrum-Link--quiet");
+    });
+
+    # Add emphasis class
+    $dom->find('em')->each(sub {
+      $_->attr(class => "spectrum-Body-emphasized");
+    });
+
+    # Add strong class
+    $dom->find('strong')->each(sub {
+      $_->attr(class => "spectrum-Body-strong");
+    });
+
+    $dom->find('hr')->each(sub {
+      $_->attr(class => 'spectrum-Divider spectrum-Divider--sizeM')
+    });
+
+    # Convert back to HTML string
+    my $styled_html = $dom->to_string;
+    return $styled_html;
   }
 
 };

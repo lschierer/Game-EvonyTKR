@@ -11,10 +11,19 @@ package Game::EvonyTKR::Plugins::StaticPages {
   use Mojo::Base 'Mojolicious::Plugin';
   use Carp;
 
+  my %static_routes;
+
   sub register {
     my ($self, $app, $config) = @_;
     my $logger = Log::Log4perl->get_logger(__PACKAGE__);
     $logger->info("Registering static page routes");
+
+    # Add helper to check if a static route exists
+    $app->helper(
+      static_route_name_for => sub ($c, $path) {
+        return $static_routes{$path};  # undef if not present
+      }
+    );
 
     # Get the pages directory
     my $pages_dir =
@@ -42,6 +51,9 @@ package Game::EvonyTKR::Plugins::StaticPages {
           return $c->render_markdown_file($file_path);
         }
       )->name("static_$route_path");
+      my $requested_path = $route_path =~ s{^/}{}r;
+      $logger->debug("storing $requested_path in static_routes hash for $route_path");
+      $static_routes{$requested_path} = "static_$route_path";
 
       my $parsedFile = $app->parse_markdown_frontmatter($file_path);
       if ($parsedFile) {
