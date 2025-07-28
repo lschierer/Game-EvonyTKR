@@ -15,7 +15,8 @@
     % }
     <script src="https://cdn.jsdelivr.net/npm/iconify-icon@3.0.0/dist/iconify-icon.min.js"></script>
   </head>
-  <body class="spectrum spectrum--medium spectrum--light spectrum-Typography light-theme light">
+  <% my $classes = sprintf('spectrum spectrum--medium spectrum--light spectrum-Typography light-theme light %s', $sidebar ? 'with-sidebar' : ''); %>
+  <body class=" <%= $classes %>">
     <header>
       <%= include 'partials/global_header' %>
     </header>

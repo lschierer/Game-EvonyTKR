@@ -39,6 +39,8 @@
   --size-14: 20rem;
   --size-15: 30rem;
   --header-height: 7vh;
+  --main-height: 88vh;
+  --footer-height: 5vh;
   --logo-vertical-margin: 2px;
 
   /* customize the spectrum-css tokens */
@@ -61,14 +63,85 @@
   --mod-button-border-color-default: var(--surface-2);
 }
 
-html,
-body {
-  color: var(--text-1);
-  display: flex;
-  flex-direction: column;
-  margin: 0;
+html {
+  min-width: 100vw;
+  height: 100vh;
   box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  color: var(--text-1);
   background-color: var(--spectrum-background-base-color);
+  display: grid;
+  grid-template-areas:
+    'header'
+    'content'
+    'footer';
+  grid-template-rows: var(--header-height) 1fr var(--footer-height);
+  height: 100vh;
+}
+
+/* 2. Optional sidebar layout */
+body.with-sidebar {
+  display: grid;
+  grid-template:
+    'header header' var(--header-height)
+    'content content' 1fr
+    'footer footer' var(--footer-height);
+}
+
+/* 3. Layout regions */
+header {
+  grid-area: header;
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: var(--header-height);
+}
+
+footer {
+  grid-area: footer;
+  height: var(--footer-height);
+  width: 100%;
+}
+
+div.spectrum-SplitView.spectrum-SplitView--horizontal {
+  grid-area: content;
+  height: var(--main-height);
+  width: 100vw;
+}
+
+main,
+div#main {
+  grid-area: content;
+  overflow-y: auto;
+  padding: 0 1rem;
+  min-height: var(--main-height);
+  box-sizing: border-box;
+}
+
+/* 4. Sidebar */
+div#nav {
+  grid-area: content;
+  max-width: max(250px, 20vw);
+  overflow-y: auto;
+  padding: 0.5rem;
+}
+
+/* 5. SplitView pane (used in legacy layout maybe?) */
+div.spectrum-SplitView-pane {
+  height: var(--main-height);
+  width: 100vw;
+  overflow: auto;
+  box-sizing: border-box;
+}
+
+/* 6. Article content */
+article {
+  box-sizing: border-box;
+  height: fit-content;
+  margin: 8px;
 }
 
 h5,
@@ -76,48 +149,6 @@ h6,
 small,
 dd {
   color: var(--text-3);
-}
-
-header {
-  width: 100vw;
-  margin: 0;
-  padding: 0;
-  height: var(--header-height);
-  box-sizing: border-box;
-  flex-shrink: 0;
-}
-
-div.spectrum-SplitView.spectrum-SplitView--horizontal,
-main {
-  height: 88vh;
-  flex-grow: 1;
-}
-
-div.spectrum-SplitView-pane {
-  height: 88vh;
-  overflow: auto;
-}
-
-main,
-article {
-  height: fit-content;
-  margin: 8px;
-}
-
-footer {
-  height: 5vh;
-  flex-shrink: 0;
-}
-
-div#nav {
-  max-width: 20vw;
-  flex: 1;
-}
-
-div#main {
-  width: 80vw;
-  min-height: 100%;
-  padding: 0 1rem;
 }
 
 li

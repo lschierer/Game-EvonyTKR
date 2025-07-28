@@ -11,7 +11,7 @@
     </div>
     <div class="title-container">
       <a href="/" class="site-title spectrum-Link spectrum-Link--quiet spectrum-Link--secondary">
-        <span class="site-title spectrum-Heading spectrum-Heading--sizeXXL">Evony TKR Tips</span>
+        <span class="site-title spectrum-Heading ">Evony TKR Tips</span>
       </a>
     </div>
   </div>
@@ -19,11 +19,11 @@
   <div class="nav-section">
     <% foreach my $navItem ("Generals", "Monsters", "PvP", "Reference") { %>
       <div class="nav-item">
-        <a href="/<%= $navItem %>" class="spectrum-Link spectrum-Link--primary spectrum-Link--quiet">
-          <span class="spectrum-Heading spectrum-Heading--serif spectrum-Heading--sizeXS">
+        <span class="spectrum-Heading spectrum-Heading--serif spectrum-Heading--sizeXS">
+          <a href="/<%= $navItem %>" class="spectrum-Link spectrum-Link--primary spectrum-Link--quiet">
             <%= $navItem %>
-          </span>
-        </a>
+          </a>
+        </span>
       </div>
     <% } %>
   </div>
@@ -40,86 +40,126 @@
 <style>
   div.header {
     height: var(--header-height);
-    width: 100%;
+    width: 100vw;
     background-color: var(--mod-heading-font-color);
     color: var(--text-2);
 
     padding: var(--size-1);
     box-sizing: border-box;
     display: grid;
-    grid-template-columns: 2fr 4fr 1fr; /* Left, middle, right sections */
+    grid-template-columns: 2fr 4fr 1fr;
+    grid-gap: 0 1rem;
     align-items: center;
   }
 
+
+
   div.site-title-section {
     grid-column: 1;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    height: calc(100% - calc(2 * var(--size-1)));
-    padding-left: 1rem;
+    grid-row-start: 1;
+    grid-row-end: -1;
+    display: grid;
+    box-sizing: border-box;
+    grid-template-rows: subgrid;
+    grid-template-columns: 1fr 5fr;
   }
 
   div.logo-container {
     display: block;
-    height: 100%;
-    width: fit-content;
-    margin: 0;
-    padding: 0;
-    flex: 0 0 auto;
-  }
-
-  a.site-title {
-    width: max-content;
-    height: fit-content;
-    --mod-link-text-color: var(--text-2);
-    --mod-link-text-color-secondary-hover: var(--text-2);
-    --mod-link-text-color-secondary-focus: var(--text-2);
+    box-sizing: border-box;
+    grid-row: 1/-1;
+    grid-column: 1 / 1;
+    max-height: var(--header-height);
+    margin: 2px 0;
   }
 
   svg.site-logo {
-    /* total header height minus the padding on the top minus the padding on the bottom minus a margin on the top and bottom */
-    height: calc(var(--header-height) - calc(calc(2 * var(--size-1)) + calc(2 * var(--logo-vertical-margin))));
-    width: auto;
-    margin: auto 0; /* center vertically */
     display: block;
+    width: auto;
+    height: 90%;
+    max-height: var(--header-height);
   }
 
+
   div.title-container {
-    height: inherit;
-    width: max-content;
-    flex: 0 1 auto;
+    display: block;
+    box-sizing: border-box;
+    grid-row: 1/-1;
+    grid-column: 2/-1;
+    overflow: hidden;
+    text-wrap: nowrap;
+    white-space: nowrap;
+    max-height: var(--header-height);
   }
 
   span.site-title.spectrum-Heading {
     background-color: var(--mod-heading-font-color);
     color: var(--text-2);
     box-sizing: border-box;
-    margin: auto 0 auto 0.5em; /* center vertically */
+    margin: auto 0; /* center vertically */
+    font-size: var(--spectrum-heading-size-m);
+    line-height: var(--spectrum-heading-line-height-m);
+  }
+
+  @media (min-width: 1016px) {
+    span.site-title.spectrum-Heading {
+      font-size: var(--spectrum-heading-size-l);
+      line-height: var(--spectrum-heading-line-height-l);
+    }
+  }
+
+  @media (min-width: 1286px) {
+    span.site-title.spectrum-Heading {
+      font-size: var(--spectrum-heading-size-xl);
+      line-height: var(--spectrum-heading-line-height-xl);
+    }
+  }
+
+  @media (min-width: 1401px) {
+    span.site-title.spectrum-Heading {
+      font-size: var(--spectrum-heading-size-xxl);
+      line-height: var(--spectrum-heading-line-height-xxl);
+    }
+  }
+
+  a.site-title {
+    --mod-link-text-color: var(--text-2);
+    --mod-link-text-color-secondary-hover: var(--text-2);
+    --mod-link-text-color-secondary-focus: var(--text-2);
   }
 
   div.nav-section {
-    grid-column: 2;
-    width: 100%;
-    height: inherit;
-    display: flex;
-    justify-self: center;
-    justify-content: space-around;
-    align-items: center;
-
+    grid-column: 2/3;
+    grid-row: 1/-1;
+    display: grid;
+    grid-template-rows: subgrid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-gap: 0 1em;
+    justify-content: space-between;
     --mod-heading-font-color: var(--text-2);
   }
 
-  div.social-icons-section {
-    width: 100%;
-    height: inherit;
-    display: flex;
-    justify-self: center;
-    justify-content: space-around;
-    align-items: center;
+  div.nav-section > div.nav-item {
+    grid-row: 1/-1;
+    grid-column-end: span 1;
+    margin: auto 0;
+  }
 
+  div.social-icons-section {
+    grid-row: 1/-1;
+    grid-column-end: span 1;
+    display: grid;
+    grid-template-rows: subgrid;
+    justify-content: end;
+    align-items: center;
+    grid-auto-columns: 1fr;
+    margin: 2em;
     --social-icon-size: var(--size-7);
     --mod-heading-font-color: var(--text-2);
+  }
+
+  div.social-icons-section > div.nav-item {
+    justify-self: end;
   }
 
   iconify-icon.social-icons.nav-item {
