@@ -1,0 +1,138 @@
+---
+levels:
+- buffs:
+  - attribute: Attack
+    conditions:
+    - Enemy
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - Enemy
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - Enemy
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 0
+      unit: percentage
+  level: Green
+  text: ''
+- buffs:
+  - attribute: Attack
+    conditions:
+    - Enemy
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - Enemy
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - Enemy
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 0
+      unit: percentage
+  level: Blue
+  text: ''
+- buffs:
+  - attribute: Attack
+    conditions:
+    - Enemy
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - Enemy
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - Enemy
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 0
+      unit: percentage
+  level: Purple
+  text: ''
+- buffs:
+  - attribute: Attack
+    conditions:
+    - Enemy
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - Enemy
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - Enemy
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 0
+      unit: percentage
+  level: Orange
+  text: ''
+- buffs:
+  - attribute: Attack
+    conditions:
+    - Enemy
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 26
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - Enemy
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 26
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - Enemy
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 26
+      unit: percentage
+  level: Gold
+  text: Enemy Ranged Troop Attack -26%, Enemy Ranged Troop Defense -26%, Enemy Ranged Troop HP -26%
+name: The North Sea Empire

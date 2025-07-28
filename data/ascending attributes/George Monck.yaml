@@ -1,51 +1,114 @@
+---
 ascending:
-  - level: red1
-    buff:
-      - attribute: Defense
-        class: Mounted Troops
-        value:
-          number: 15
-          unit: percentage
-      - attribute: HP
-        value:
-          number: 15
-          unit: percentage
-  - level: red2
-    buff:
-      - attribute: Death to Wounded
-        value:
-          number: 8
-          unit: percentage
-  - level: red3
-    buff:
-      - attribute: Attack
-        condition:
-          - Attacking
-        class: Mounted Troops
-        value:
-          number: 35
-          unit: percentage
-  - level: red4
-    buff:
-      - attribute: Attack
-        class: Mounted Troops
-        value:
-          number: 15
-          unit: percentage
-      - attribute: HP
-        value:
-          number: 15
-          unit: percentage
-  - level: red5
-    buff:
-      - attribute: Attack
-        class: Mounted Troops
-        value:
-          number: 40
-          unit: percentage
-      - attribute: HP
-        value:
-          number: 25
-          unit: percentage
+- buffs:
+  - attribute: Defense
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 15
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 15
+      unit: percentage
+  level: red1
+  text: Marching Mounted Troop Defense +15% and HP +15%
+- buffs:
+  - attribute: Death to Wounded
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: ''
+    value:
+      number: 8
+      unit: percentage
+  level: red2
+  text: Marching Troop Death into Wounded Rate +8%
+- buffs:
+  - attribute: Attack
+    conditions:
+    - Attacking
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 35
+      unit: percentage
+  - attribute: March Size
+    conditions: []
+    passive: 0
+    targetedType: ''
+    value:
+      number: 8
+      unit: percentage
+  level: red3
+  text: When attacking, Mounted Troop Attack +35%, March Size Capacity +8%
+- buffs:
+  - attribute: Attack
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 15
+      unit: percentage
+  - attribute: Attack
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 15
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 15
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 15
+      unit: percentage
+  level: red4
+  text: Marching Ground Troop and Mounted Troop Attack +15% and HP +15%
+- buffs:
+  - attribute: Attack
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 40
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 25
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 25
+      unit: percentage
+  level: red5
+  text: Marching Mounted Troop Attack +40%, Defense and HP +25%
 general: George Monck
 id: George Monck

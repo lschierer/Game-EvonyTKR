@@ -1,0 +1,82 @@
+name: Battle of Miyajima
+levels:
+  - level: Green
+    buffs:
+      - attribute: Attack
+        troop: Mounted Troops
+        value:
+          number: 4
+          unit: percentage
+      - attribute: Defense
+        troop: Mounted Troops
+        value:
+          number: 4
+          unit: percentage
+      - attribute: March Size
+        value:
+          number: 1
+          unit: percentage
+  - level: Blue
+    buffs:
+      - attribute: Attack
+        troop: Mounted Troops
+        value:
+          number: 5
+          unit: percentage
+      - attribute: Defense
+        troop: Mounted Troops
+        value:
+          number: 5
+          unit: percentage
+      - attribute: March Size
+        value:
+          number: 1
+          unit: percentage
+  - level: Purple
+    buffs:
+      - attribute: Attack
+        troop: Mounted Troops
+        value:
+          number: 9
+          unit: percentage
+      - attribute: Defense
+        troop: Mounted Troops
+        value:
+          number: 9
+          unit: percentage
+      - attribute: March Size
+        value:
+          number: 2
+          unit: percentage
+  - level: Orange
+    buffs:
+      - attribute: Attack
+        troop: Mounted Troops
+        value:
+          number: 9
+          unit: percentage
+      - attribute: Defense
+        troop: Mounted Troops
+        value:
+          number: 9
+          unit: percentage
+      - attribute: March Size
+        value:
+          number: 2
+          unit: percentage
+  - level: Gold
+    buffs:
+      - attribute: Attack
+        troop: Mounted Troops
+        value:
+          number: 18
+          unit: percentage
+      - attribute: Defense
+        troop: Mounted Troops
+        value:
+          number: 18
+          unit: percentage
+      - attribute: March Size
+        value:
+          number: 4
+          unit: percentage

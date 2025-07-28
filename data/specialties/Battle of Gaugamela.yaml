@@ -2,102 +2,102 @@
 name: Battle of Gaugamela
 levels:
   - level: "Green"
-    buff:
+    buffs:
       - attribute: March Size
         value:
           number: 1
           unit: percentage
       - attribute: Attack
-        condition:
+        conditions:
           - Attacking
-        class: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 2
           unit: percentage
       - attribute: Attack
-        condition:
+        conditions:
           - Attacking
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 2
           unit: percentage
   - level: "Blue"
-    buff:
+    buffs:
       - attribute: March Size
         value:
           number: 1
           unit: percentage
       - attribute: Attack
-        condition:
+        conditions:
           - Attacking
-        class: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 2
           unit: percentage
       - attribute: Attack
-        condition:
+        conditions:
           - Attacking
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 2
           unit: percentage
   - level: "Purple"
-    buff:
+    buffs:
       - attribute: March Size
         value:
           number: 2
           unit: percentage
       - attribute: Attack
-        condition:
+        conditions:
           - Attacking
-        class: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 4
           unit: percentage
       - attribute: Attack
-        condition:
+        conditions:
           - Attacking
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 4
           unit: percentage
   - level: "Orange"
-    buff:
+    buffs:
       - attribute: March Size
         value:
           number: 2
           unit: percentage
       - attribute: Attack
-        condition:
+        conditions:
           - Attacking
-        class: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 4
           unit: percentage
       - attribute: Attack
-        condition:
+        conditions:
           - Attacking
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 4
           unit: percentage
   - level: "Gold"
-    buff:
+    buffs:
       - attribute: March Size
         value:
           number: 4
           unit: percentage
       - attribute: Attack
-        condition:
+        conditions:
           - Attacking
-        class: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 8
           unit: percentage
       - attribute: Attack
-        condition:
+        conditions:
           - Attacking
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 8
           unit: percentage

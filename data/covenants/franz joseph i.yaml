@@ -1,0 +1,84 @@
+---
+generals:
+- Arminius
+- Prince Eugene
+- Raimondo
+levels:
+- buffs:
+  - attribute: March Size
+    conditions: []
+    passive: 0
+    targetedType: ''
+    value:
+      number: 8
+      unit: percentage
+  - attribute: HP
+    conditions: []
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 10
+      unit: percentage
+  category: civilization
+  text: March Size Capacity +8% (Local);;Ranged Troop HP +10% (Local)
+- buffs:
+  - attribute: Attack
+    conditions: []
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 5
+      unit: percentage
+  category: war
+  text: Ranged Troop Attack +5% (Local)
+- buffs:
+  - attribute: Defense
+    conditions:
+    - When Rallying
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 10
+      unit: percentage
+  category: peace
+  text: In-Rally Ranged Troop Defense +10% (Local)
+- buffs:
+  - attribute: Marching Speed
+    conditions: []
+    passive: 1
+    targetedType: ''
+    value:
+      number: 10
+      unit: percentage
+  category: cooperation
+  text: March Speed +10% (Global)
+- buffs:
+  - attribute: Defense
+    conditions: []
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 10
+      unit: percentage
+  category: honor
+  text: Ranged Troop Defense +10% (Local)
+- buffs:
+  - attribute: HP
+    conditions:
+    - Reinforcing
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: Attack
+    conditions:
+    - Reinforcing
+    passive: 1
+    targetedType: Ranged Troops
+    value:
+      number: 5
+      unit: percentage
+  category: faith
+  text: Reinforcing Ranged Troop HP +10% (Local);;Reinforcing Ranged Troop Attack +5% (Global)
+name: Franz Joseph I

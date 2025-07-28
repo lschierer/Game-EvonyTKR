@@ -1,86 +1,86 @@
 ---
 ascending:
   - level: red1
-    buff:
+    buffs:
       - attribute: Attack
-        class: Ranged Troops
-        condition:
+        targetedType: Ranged Troops
+        conditions:
           - Marching
         value:
           number: 15
           unit: percentage
       - attribute: Defense
-        class: Ranged Troops
-        condition:
+        targetedType: Ranged Troops
+        conditions:
           - Marching
         value:
           number: 10
           unit: percentage
   - level: red2
-    buff:
+    buffs:
       - attribute: Death to Wounded
-        condition:
+        conditions:
           - Marching
         value:
           number: 8
           unit: percentage
   - level: red3
-    buff:
+    buffs:
       - attribute: March Size
-        condition:
+        conditions:
           - Attacking
         value:
           number: 8
           unit: percentage
       - attribute: HP
-        class: Ranged Troops
-        condition:
+        targetedType: Ranged Troops
+        conditions:
           - Attacking
         value:
           number: 10
           unit: percentage
   - level: red4
-    buff:
+    buffs:
       - attribute: Attack
-        class: Ranged Troops
-        condition:
+        targetedType: Ranged Troops
+        conditions:
           - Marching
         value:
           number: 10
           unit: percentage
       - attribute: Defense
-        class: Ranged Troops
-        condition:
+        targetedType: Ranged Troops
+        conditions:
           - Marching
         value:
           number: 10
           unit: percentage
       - attribute: HP
-        class: Ranged Troops
-        condition:
+        targetedType: Ranged Troops
+        conditions:
           - Marching
         value:
           number: 10
           unit: percentage
   - level: red5
-    buff:
+    buffs:
       - attribute: Attack
-        class: Ranged Troops
-        condition:
+        targetedType: Ranged Troops
+        conditions:
           - Marching
         value:
           number: 35
           unit: percentage
       - attribute: Defense
-        class: Ranged Troops
-        condition:
+        targetedType: Ranged Troops
+        conditions:
           - Marching
         value:
           number: 20
           unit: percentage
       - attribute: HP
-        class: Ranged Troops
-        condition:
+        targetedType: Ranged Troops
+        conditions:
           - Marching
         value:
           number: 20

@@ -1,24 +1,24 @@
 ---
 name: Supreme Power
-buff:
+buffs:
   - attribute: Attack
     targetedType: Siege Machines
-    condition:
-      - leading the army to attack
+    conditions:
+      - Attacking
     value:
       number: 40
       unit: percentage
   - attribute: HP
     targetedType: Ranged Troops
-    condition:
-      - leading the army to attack
+    conditions:
+      - Attacking
     value:
       number: 35
       unit: percentage
   - attribute: HP
     targetedType: Siege Machines
-    condition:
-      - leading the army to attack
+    conditions:
+      - Attacking
     value:
       number: 35
       unit: percentage

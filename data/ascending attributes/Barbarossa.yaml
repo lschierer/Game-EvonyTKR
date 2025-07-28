@@ -1,67 +1,84 @@
+---
 ascending:
-  - level: red1
-    buff:
-      - attribute: Defense
-        condition:
-          - Marching
-        class: Mounted Troops
-        value:
-          number: 15
-          unit: percentage
-      - attribute: HP
-        condition:
-          - Marching
-        class: Mounted Troops
-        value:
-          number: 15
-          unit: percentage
-  - level: red2
-    buff:
-      - attribute: Death to Wounded
-        condition:
-          - leading the army to attack
-        value:
-          number: 8
-          unit: percentage
-  - level: red3
-    buff:
-      - attribute: Rally Capacity
-        condition:
-          - When Rallying
-        value:
-          number: 6
-          unit: percentage
-  - level: red4
-    buff:
-      - attribute: Attack
-        condition:
-          - Marching
-        class: Mounted Troops
-        value:
-          number: 15
-          unit: percentage
-      - attribute: Defense
-        condition:
-          - Marching
-        class: Mounted Troops
-        value:
-          number: 20
-          unit: percentage
-  - level: red5
-    buff:
-      - attribute: Attack
-        condition:
-          - Marching
-        class: Mounted Troops
-        value:
-          number: 20
-          unit: percentage
-      - attribute: HP
-        condition:
-          - Marching
-        class: Mounted Troops
-        value:
-          number: 20
-          unit: percentage
+- buffs:
+  - attribute: Defense
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 15
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 15
+      unit: percentage
+  level: red1
+  text: Marching Mounted Troop Defense +15% and HP +15%.
+- buffs:
+  - attribute: Death to Wounded
+    conditions:
+    - leading the army
+    - Attacking
+    passive: 0
+    targetedType: ''
+    value:
+      number: 8
+      unit: percentage
+  level: red2
+  text: Increases Troop Death into Wounded Rate by 8% when General is leading the army to attack.
+- buffs:
+  - attribute: Rally Capacity
+    conditions:
+    - When Rallying
+    passive: 0
+    targetedType: ''
+    value:
+      number: 6
+      unit: percentage
+  level: red3
+  text: When General is launching Alliance War, Rally Capacity +6%.
+- buffs:
+  - attribute: Attack
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 15
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 20
+      unit: percentage
+  level: red4
+  text: Marching Mounted Troop Attack +15% and Defense +20%.
+- buffs:
+  - attribute: Attack
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 20
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 20
+      unit: percentage
+  level: red5
+  text: Marching Mounted Troop Attack +20% and HP +20%.
 general: Barbarossa
 id: Barbarossa

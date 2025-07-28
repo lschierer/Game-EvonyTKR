@@ -1,87 +1,87 @@
 ---
 ascending:
   - level: "red1"
-    buff:
+    buffs:
       - attribute: Attack
-        condition:
-          - leading the army to attack
-        class: Ground Troops
+        conditions:
+          - Attacking
+        targetedType: Ground Troops
         value:
           number: 15
           unit: percentage
       - attribute: Defense
-        condition:
-          - leading the army to attack
-        class: Mounted Troops
+        conditions:
+          - Attacking
+        targetedType: Mounted Troops
         value:
           number: 15
           unit: percentage
       - attribute: Defense
-        condition:
-          - leading the army to attack
-        class: Ground Troops
+        conditions:
+          - Attacking
+        targetedType: Ground Troops
         value:
           number: 15
           unit: percentage
   - level: "red2"
-    buff:
+    buffs:
       - attribute: Death to Wounded
-        condition:
-          - leading the army to attack
+        conditions:
+          - Attacking
         value:
           number: 10
           unit: percentage
   - level: "red3"
-    buff:
+    buffs:
       - attribute: Rally Capacity
-        condition:
+        conditions:
           - When Rallying
         value:
           number: 8
           unit: percentage
   - level: "red4"
-    buff:
+    buffs:
       - attribute: Defense
-        condition:
-          - leading the army to attack
-        class: Mounted Troops
+        conditions:
+          - Attacking
+        targetedType: Mounted Troops
         value:
           number: 35
           unit: percentage
       - attribute: Defense
-        condition:
-          - leading the army to attack
-        class: Ground Troops
+        conditions:
+          - Attacking
+        targetedType: Ground Troops
         value:
           number: 35
           unit: percentage
   - level: "red5"
-    buff:
+    buffs:
       - attribute: Attack
-        condition:
-          - leading the army to attack
-        class: Ground Troops
+        conditions:
+          - Attacking
+        targetedType: Ground Troops
         value:
           number: 20
           unit: percentage
       - attribute: HP
-        condition:
-          - leading the army to attack
-        class: Ground Troops
+        conditions:
+          - Attacking
+        targetedType: Ground Troops
         value:
           number: 15
           unit: percentage
       - attribute: Defense
-        condition:
-          - leading the army to attack
-        class: Mounted Troops
+        conditions:
+          - Attacking
+        targetedType: Mounted Troops
         value:
           number: 10
           unit: percentage
       - attribute: HP
-        condition:
-          - leading the army to attack
-        class: Ground Troops
+        conditions:
+          - Attacking
+        targetedType: Ground Troops
         value:
           number: 10
           unit: percentage

@@ -1,15 +1,15 @@
 ---
 name: Absolute Monarch
-buff:
+buffs:
   - attribute: Attack
-    condition:
-      - leading the army to attack
+    conditions:
+      - Attacking
     targetedType: Siege Machines
     value:
       number: 25
       unit: percentage
   - attribute: Rally Capacity
-    condition:
+    conditions:
       - When Rallying
     value:
       number: 10

@@ -6,74 +6,74 @@ generals:
 levels:
   - category: War
     type: personal
-    buff:
+    buffs:
       - attribute: Attack
-        class: Mounted Troops
-        condition:
+        targetedType: Mounted Troops
+        conditions:
           - Against Monsters
         value:
           number: 12
           unit: percentage
   - category: Cooperation
     type: personal
-    buff:
+    buffs:
       - attribute: March Size
         value:
           number: 5
           unit: percentage
   - category: Peace
     type: personal
-    buff:
+    buffs:
       - attribute: HP
-        class: Mounted Troops
-        condition:
+        targetedType: Mounted Troops
+        conditions:
           - When Rallying
         value:
           number: 8
           unit: percentage
   - category: Faith
     type: passive
-    buff:
+    buffs:
       - attribute: Training Speed
-        class: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 10
           unit: percentage
       - attribute: Training Capacity
-        class: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 15
           unit: percentage
   - category: Honor
     type: personal
-    buff:
+    buffs:
       - attribute: Attack
-        class: Mounted Troops
-        condition:
+        targetedType: Mounted Troops
+        conditions:
           - Attacking
         value:
           number: 8
           unit: percentage
       - attribute: Attack
-        class: Ground Troops
-        condition:
+        targetedType: Ground Troops
+        conditions:
           - Attacking
         value:
           number: 8
           unit: percentage
   - category: Civilization
     type: personal
-    buff:
+    buffs:
       - attribute: Attack
-        class: Mounted Troops
-        condition:
+        targetedType: Mounted Troops
+        conditions:
           - Marching
         value:
           number: 12
           unit: percentage
       - attribute: Attack
-        class: Mounted Troops
-        condition:
+        targetedType: Mounted Troops
+        conditions:
           - When Rallying
         value:
           number: 15

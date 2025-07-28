@@ -1,23 +1,23 @@
 ---
 name: Byzantine Commander
-buff:
+buffs:
   - attribute: Attack
-    condition:
-      - leading the army to attack
+    conditions:
+      - Attacking
     targetedType: Siege Machines
     value:
       number: 40
       unit: percentage
   - attribute: Defense
-    condition:
-      - leading the army to attack
+    conditions:
+      - Attacking
     targetedType: Ranged Troops
     value:
       number: 20
       unit: percentage
   - attribute: Defense
-    condition:
-      - leading the army to attack
+    conditions:
+      - Attacking
     targetedType: Siege Machines
     value:
       number: 20

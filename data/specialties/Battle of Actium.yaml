@@ -2,117 +2,117 @@
 name: Battle of Actium
 levels:
   - level: "Green"
-    buff:
+    buffs:
       - attribute: Attack
-        condition:
+        conditions:
           - Marching
-        class: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 4
           unit: percentage
       - attribute: Defense
-        condition:
+        conditions:
           - Attacking
-        class: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 4
           unit: percentage
       - attribute: Defense
-        condition:
+        conditions:
           - Attacking
-        class: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 4
           unit: percentage
   - level: "Blue"
-    buff:
+    buffs:
       - attribute: Attack
-        condition:
+        conditions:
           - Marching
-        class: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 4
           unit: percentage
       - attribute: Defense
-        condition:
+        conditions:
           - Attacking
-        class: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 4
           unit: percentage
       - attribute: Defense
-        condition:
+        conditions:
           - Attacking
-        class: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 4
           unit: percentage
   - level: "Purple"
-    buff:
+    buffs:
       - attribute: Attack
-        condition:
+        conditions:
           - Marching
-        class: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 8
           unit: percentage
       - attribute: Defense
-        condition:
+        conditions:
           - Attacking
-        class: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 8
           unit: percentage
       - attribute: Defense
-        condition:
+        conditions:
           - Attacking
-        class: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 8
           unit: percentage
   - level: "Orange"
-    buff:
+    buffs:
       - attribute: Attack
-        condition:
+        conditions:
           - Marching
-        class: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 8
           unit: percentage
       - attribute: Defense
-        condition:
+        conditions:
           - Attacking
-        class: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 8
           unit: percentage
       - attribute: Defense
-        condition:
+        conditions:
           - Attacking
-        class: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 8
           unit: percentage
   - level: "Gold"
-    buff:
+    buffs:
       - attribute: Attack
-        condition:
+        conditions:
           - Marching
-        class: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 16
           unit: percentage
       - attribute: Defense
-        condition:
+        conditions:
           - Attacking
-        class: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 16
           unit: percentage
       - attribute: Defense
-        condition:
+        conditions:
           - Attacking
-        class: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 16
           unit: percentage

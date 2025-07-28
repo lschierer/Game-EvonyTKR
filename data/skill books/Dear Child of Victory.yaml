@@ -1,7 +1,7 @@
 ---
 name: Dear Child of Victory
 text: Increases the March Size by 12% and mounted troops’ attack by 45% when General is leading the army.
-buff:
+buffs:
   - attribute: Attack
     targetedType: Mounted Troops
     value:

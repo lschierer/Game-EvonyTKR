@@ -1,0 +1,84 @@
+---
+generals:
+- Wallenstein
+- Margaret I
+- Frigg
+levels:
+- buffs:
+  - attribute: Attack
+    conditions: []
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 5
+      unit: percentage
+  category: peace
+  text: Siege Machine Attack +5% (Local)
+- buffs:
+  - attribute: Training Speed
+    conditions: []
+    passive: 1
+    targetedType: Siege Machines
+    value:
+      number: 10
+      unit: percentage
+  category: cooperation
+  text: Siege Machine Training Speed +10% (Global)
+- buffs:
+  - attribute: HP
+    conditions: []
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 10
+      unit: percentage
+  category: war
+  text: Siege Machine HP +10% (Local)
+- buffs:
+  - attribute: Defense
+    conditions: []
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 10
+      unit: percentage
+  - attribute: Attack
+    conditions:
+    - When Rallying
+    passive: 1
+    targetedType: Siege Machines
+    value:
+      number: 5
+      unit: percentage
+  category: faith
+  text: Siege Machine Defense +10% (Local);;In-Rally Siege Machine Attack +5% (Global)
+- buffs:
+  - attribute: HP
+    conditions:
+    - Reinforcing
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 10
+      unit: percentage
+  category: honor
+  text: Reinforcing Siege Machine HP +10% (Local)
+- buffs:
+  - attribute: Attack
+    conditions:
+    - Attacking
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 10
+      unit: percentage
+  - attribute: March Size
+    conditions: []
+    passive: 0
+    targetedType: ''
+    value:
+      number: 5
+      unit: percentage
+  category: civilization
+  text: Attacking Siege Machine Attack +10% (Local);;March Size Capacity +5% (Local)
+name: Christina

@@ -1,24 +1,30 @@
 ---
+buffs:
+- attribute: Attack
+  conditions:
+  - leading the army
+  - Attacking
+  passive: 0
+  targetedType: Mounted Troops
+  value:
+    number: 15
+    unit: percentage
+- attribute: Attack
+  conditions:
+  - leading the army
+  - Attacking
+  passive: 0
+  targetedType: Ranged Troops
+  value:
+    number: 15
+    unit: percentage
+- attribute: Attack
+  conditions:
+  - brings a dragon
+  passive: 0
+  targetedType: Ranged Troops
+  value:
+    number: 20
+    unit: percentage
 name: Blood Restrain
-buff:
-  - attribute: Attack
-    targetedType: Ranged Troops
-    condition:
-      - leading the army to attack
-    value:
-      number: 35
-      unit: percentage
-  - attribute: HP
-    targetedType: Ranged Troops
-    condition:
-      - leading the army to attack
-    value:
-      number: 30
-      unit: percentage
-  - attribute: HP
-    targetedType: Siege Machines
-    condition:
-      - leading the army to attack
-    value:
-      number: 30
-      unit: percentage
+text: Increases mounted troops and ranged troops’ attack by 15% when General is leading the army to attack. Increases ranged troops’ attack by another 20% when the General brings any dragon.

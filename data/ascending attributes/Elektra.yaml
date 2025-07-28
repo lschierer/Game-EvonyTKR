@@ -1,80 +1,107 @@
 ---
 ascending:
-  - level: "red1"
-    buff:
-      - attribute: Attack
-        condition:
-          - Marching
-        class: Ranged Troops
-        value:
-          number: 5
-          unit: percentage
-      - attribute: Defense
-        condition:
-          - Marching
-        class: Ranged Troops
-        value:
-          number: 10
-          unit: percentage
-  - level: "red2"
-    buff:
-      - attribute: Wounded to Death
-        condition:
-          - Enemy In City
-        value:
-          number: 8
-          unit: percentage
-  - level: "red3"
-    buff:
-      - attribute: March Size
-        value:
-          number: 10
-          unit: percentage
-  - level: "red4"
-    buff:
-      - attribute: Attack
-        condition:
-          - Marching
-        class: Mounted Troops
-        value:
-          number: 5
-          unit: percentage
-      - attribute: Attack
-        condition:
-          - Marching
-        class: Mounted Troops
-        value:
-          number: 5
-          unit: percentage
-      - attribute: Defense
-        condition:
-          - Marching
-        class: Ranged Troops
-        value:
-          number: 30
-          unit: percentage
-  - level: "red5"
-    buff:
-      - attribute: Attack
-        condition:
-          - Marching
-        class: Mounted Troops
-        value:
-          number: 8
-          unit: percentage
-      - attribute: Attack
-        condition:
-          - Marching
-        class: Ranged Troops
-        value:
-          number: 5
-          unit: percentage
-      - attribute: Attack
-        condition:
-          - dragon to the attack
-        class: Ranged Troops
-        value:
-          number: 20
-          unit: percentage
+- buffs:
+  - attribute: Attack
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 5
+      unit: percentage
+  - attribute: Attack
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 5
+      unit: percentage
+  - attribute: Defense
+    conditions: []
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 10
+      unit: percentage
+  level: red1
+  text: Marching Mounted Troop and Ranged Troop Attack +5%, Marching Ranged Troop Defense +10%.
+- buffs:
+  - attribute: Wounded to Death
+    conditions:
+    - Enemy
+    - In City
+    passive: 0
+    targetedType: ''
+    value:
+      number: 8
+      unit: percentage
+  level: red2
+  text: Enemy In-city Troop Wounded into Death rate +8%.
+- buffs:
+  - attribute: March Size
+    conditions: []
+    passive: 0
+    targetedType: ''
+    value:
+      number: 10
+      unit: percentage
+  level: red3
+  text: March Size Capacity +10%.
+- buffs:
+  - attribute: Attack
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 5
+      unit: percentage
+  - attribute: Attack
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 5
+      unit: percentage
+  - attribute: Defense
+    conditions: []
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 30
+      unit: percentage
+  level: red4
+  text: Marching Mounted Troop and Ranged Troop Attack +5%, Marching Ranged Troop Defense +30%.
+- buffs:
+  - attribute: Attack
+    conditions:
+    - Marching
+    - brings a dragon
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 5
+      unit: percentage
+  - attribute: Attack
+    conditions:
+    - Marching
+    - brings a dragon
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 5
+      unit: percentage
+  - attribute: Attack
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 20
+      unit: percentage
+  level: red5
+  text: Marching Mounted Troop and Ranged Troop Attack +5%, with Dragon, Marching Ranged Troop Attack +20%.
 general: Elektra
 id: Elektra

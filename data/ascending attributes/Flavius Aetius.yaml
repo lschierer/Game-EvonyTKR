@@ -1,107 +1,110 @@
+---
 ascending:
-  - level: red1
-    buff:
+  - buffs:
       - attribute: Attack
-        condition:
+        conditions:
           - Enemy
-        class: Ranged Troops
+        passive: 0
+        targetedType: Ranged Troops
         value:
-          number: -5
+          number: 5
           unit: percentage
       - attribute: Attack
-        condition:
+        conditions:
           - Enemy
-        class: Siege Machines
+        passive: 0
+        targetedType: Siege Machines
         value:
-          number: -5
+          number: 5
           unit: percentage
       - attribute: Defense
-        condition:
+        conditions:
           - Enemy
-        class: Ground Troops
+        passive: 0
+        targetedType: Ground Troops
         value:
-          number: -10
+          number: 10
           unit: percentage
-  - level: red2
-    buff:
+    level: red1
+  - buffs:
       - attribute: HP
-        condition:
+        conditions:
           - Enemy
-        class: Ground Troops
+        passive: 0
+        targetedType: Ground Troops
         value:
-          number: -10
+          number: 10
           unit: percentage
-      - attribute: SubCity Training Speed
-        class: Ground Troops
+    level: red2
+  - buffs:
+      - attribute: Defense
+        conditions:
+          - Enemy
+        passive: 0
+        targetedType: Ground Troops
+        value:
+          number: 20
+          unit: percentage
+    level: red3
+  - buffs:
+      - attribute: Attack
+        conditions:
+          - Enemy
+        passive: 0
+        targetedType: Ranged Troops
+        value:
+          number: 10
+          unit: percentage
+      - attribute: Attack
+        conditions:
+          - Enemy
+        passive: 0
+        targetedType: Siege Machines
+        value:
+          number: 10
+          unit: percentage
+      - attribute: HP
+        conditions:
+          - Enemy
+        passive: 0
+        targetedType: Ground Troops
+        value:
+          number: 10
+          unit: percentage
+    level: red4
+  - buffs:
+      - attribute: Attack
+        conditions:
+          - Enemy
+        passive: 0
+        targetedType: Ranged Troops
         value:
           number: 15
           unit: percentage
-  - level: red3
-    buff:
-      - attribute: Defense
-        condition:
+      - attribute: Attack
+        conditions:
           - Enemy
-        class: Ground Troops
-        value:
-          number: -20
-          unit: percentage
-      - attribute: Death to Survival
-        class: Ground Troops
+        passive: 0
+        targetedType: Siege Machines
         value:
           number: 15
           unit: percentage
-  - level: red4
-    buff:
-      - attribute: Attack
-        condition:
-          - Enemy
-        class: Ranged Troops
-        value:
-          number: -10
-          unit: percentage
-      - attribute: Attack
-        condition:
-          - Enemy
-        class: Siege Machines
-        value:
-          number: -10
-          unit: percentage
-      - attribute: HP
-        condition:
-          - Enemy
-        class: Ground Troops
-        value:
-          number: -10
-          unit: percentage
-  - level: red5
-    buff:
-      - attribute: Attack
-        condition:
-          - Enemy
-        class: Ranged Troops
-        value:
-          number: -15
-          unit: percentage
-      - attribute: Attack
-        condition:
-          - Enemy
-        class: Siege Machines
-        value:
-          number: -15
-          unit: percentage
       - attribute: Defense
-        condition:
+        conditions:
           - Enemy
-        class: Ground Troops
+        passive: 0
+        targetedType: Ground Troops
         value:
-          number: -15
+          number: 15
           unit: percentage
       - attribute: HP
-        condition:
+        conditions:
           - Enemy
-        class: Ground Troops
+        passive: 0
+        targetedType: Ground Troops
         value:
-          number: -15
+          number: 15
           unit: percentage
+    level: red5
 general: Flavius Aetius
 id: Flavius Aetius

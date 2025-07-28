@@ -1,6 +1,6 @@
 ---
 name: Praetorian Guard
-buff:
+buffs:
   - attribute: Attack
     targetedType: Ground Troops
     value:

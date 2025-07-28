@@ -1,34 +1,34 @@
 ---
 ascending:
   - level: "red1"
-    buff:
+    buffs:
       - attribute: Attack
-        class: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 5
           unit: percentage
       - attribute: Defense
-        class: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 10
           unit: percentage
       - attribute: HP
-        class: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 10
           unit: percentage
   - level: "red2"
-    buff:
+    buffs:
       - attribute: Death to Wounded
-        condition:
+        conditions:
           - Marching
         value:
           number: 8
           unit: percentage
   - level: "red3"
-    buff:
+    buffs:
       - attribute: Attack
-        class: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 10
           unit: percentage
@@ -37,21 +37,21 @@ ascending:
           number: 4
           unit: percentage
   - level: "red4"
-    buff:
+    buffs:
       - attribute: Defense
-        class: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 25
           unit: percentage
       - attribute: HP
-        class: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 25
           unit: percentage
   - level: "red5"
-    buff:
+    buffs:
       - attribute: Attack
-        class: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 20
           unit: percentage

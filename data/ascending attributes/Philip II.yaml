@@ -1,87 +1,88 @@
 ---
 ascending:
   - level: "red1"
-    buff:
+    buffs:
       - attribute: Attack
-        condition:
-          - leading the army to attack
-        class: Siege Machines
+        conditions:
+          - Attacking
+        targetedType: Siege Machines
         value:
           number: 10
           unit: percentage
       - attribute: Defense
-        condition:
-          - leading the army to attack
-        class: Siege Machines
+        conditions:
+          - Attacking
+        targetedType: Siege Machines
         value:
           number: 20
           unit: percentage
   - level: "red2"
-    buff:
+    buffs:
       - attribute: Wounded to Death
-        condition:
-          - Enemy In City
+        conditions:
+          - Enemy
+          - In City
         value:
           number: 10
           unit: percentage
   - level: "red3"
-    buff:
+    buffs:
       - attribute: March Size
-        condition:
+        conditions:
           - Attacking
         value:
           number: 14
           unit: percentage
   - level: "red4"
-    buff:
+    buffs:
       - attribute: Attack
-        condition:
-          - leading the army to attack
-        class: Siege Machines
+        conditions:
+          - Attacking
+        targetedType: Siege Machines
         value:
           number: 10
           unit: percentage
       - attribute: HP
-        condition:
-          - leading the army to attack
-        class: Ranged Troops
+        conditions:
+          - Attacking
+        targetedType: Ranged Troops
         value:
           number: 25
           unit: percentage
       - attribute: HP
-        condition:
-          - leading the army to attack
-        class: Siege Machines
+        conditions:
+          - Attacking
+        targetedType: Siege Machines
         value:
           number: 25
           unit: percentage
   - level: "red5"
-    buff:
+    buffs:
       - attribute: Attack
-        condition:
-          - leading the army to attack
-        class: Siege Machines
+        conditions:
+          - Attacking
+        targetedType: Siege Machines
         value:
           number: 15
           unit: percentage
       - attribute: Defense
-        condition:
-          - leading the army to attack
-        class: Siege Machines
+        conditions:
+          - Attacking
+        targetedType: Siege Machines
         value:
           number: 15
           unit: percentage
       - attribute: HP
-        condition:
-          - leading the army to attack
-        class: Ranged Troops
+        conditions:
+          - Attacking
+        targetedType: Ranged Troops
         value:
           number: 15
           unit: percentage
       - attribute: HP
-        condition:
-          - leading the army to attack
-        class: Siege Machines
+        conditions:
+          - Attacking
+        targetedType: Siege Machines
         value:
           number: 15
           unit: percentage

@@ -2,18 +2,18 @@
 name: Battle of Blenheim
 levels:
   - level: "Green"
-    buff:
+    buffs:
       - attribute: Attack
-        condition:
+        conditions:
           - Marching
-        class: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 3
           unit: percentage
       - attribute: Defense
-        condition:
+        conditions:
           - Marching
-        class: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 1
           unit: percentage
@@ -22,18 +22,18 @@ levels:
           number: 1
           unit: percentage
   - level: "Blue"
-    buff:
+    buffs:
       - attribute: Attack
-        condition:
+        conditions:
           - Marching
-        class: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 3
           unit: percentage
       - attribute: Defense
-        condition:
+        conditions:
           - Marching
-        class: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 2
           unit: percentage
@@ -42,18 +42,18 @@ levels:
           number: 1
           unit: percentage
   - level: "Purple"
-    buff:
+    buffs:
       - attribute: Attack
-        condition:
+        conditions:
           - Marching
-        class: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 6
           unit: percentage
       - attribute: Defense
-        condition:
+        conditions:
           - Marching
-        class: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 3
           unit: percentage
@@ -62,18 +62,18 @@ levels:
           number: 1
           unit: percentage
   - level: "Orange"
-    buff:
+    buffs:
       - attribute: Attack
-        condition:
+        conditions:
           - Marching
-        class: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 6
           unit: percentage
       - attribute: Defense
-        condition:
+        conditions:
           - Marching
-        class: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 3
           unit: percentage
@@ -82,18 +82,18 @@ levels:
           number: 2
           unit: percentage
   - level: "Gold"
-    buff:
+    buffs:
       - attribute: Attack
-        condition:
+        conditions:
           - Marching
-        class: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 12
           unit: percentage
       - attribute: Defense
-        condition:
+        conditions:
           - Marching
-        class: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 6
           unit: percentage

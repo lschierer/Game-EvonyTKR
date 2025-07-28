@@ -1,76 +1,78 @@
 ---
 ascending:
   - level: "red1"
-    buff:
+    buffs:
       - attribute: Attack
-        class: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 5
           unit: percentage
       - attribute: Defense
-        class: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 10
           unit: percentage
       - attribute: HP
-        class: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 10
           unit: percentage
   - level: "red2"
-    buff:
+    buffs:
       - attribute: Wounded to Death
-        condition:
-          - Enemy In City
+        conditions:
+          - Enemy
+          - In City
         value:
           number: 10
           unit: percentage
   - level: "red3"
-    buff:
+    buffs:
       - attribute: Rally Capacity
-        condition:
+        conditions:
           - When Rallying
         value:
           number: 8
           unit: percentage
   - level: "red4"
-    buff:
+    buffs:
       - attribute: Attack
-        class: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 5
           unit: percentage
       - attribute: Defense
-        class: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 10
           unit: percentage
       - attribute: HP
-        class: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 10
           unit: percentage
   - level: "red5"
-    buff:
+    buffs:
       - attribute: Attack
-        class: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 5
           unit: percentage
       - attribute: Defense
-        class: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 10
           unit: percentage
       - attribute: HP
-        class: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 10
           unit: percentage
       - attribute: Attack
-        condition:
-          - dragon to the attack
-        class: Siege Machines
+        conditions:
+          - brings a dragon
+          - Attacking
+        targetedType: Siege Machines
         value:
           number: 10
           unit: percentage

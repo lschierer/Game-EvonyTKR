@@ -2,14 +2,14 @@
 name: Dacian Wars
 levels:
   - level: Green
-    buff:
+    buffs:
       - attribute: Attack
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 2
           unit: percentage
       - attribute: HP
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 2
           unit: percentage
@@ -18,14 +18,14 @@ levels:
           number: 1
           unit: percentage
   - level: Blue
-    buff:
+    buffs:
       - attribute: Attack
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 2
           unit: percentage
       - attribute: HP
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 2
           unit: percentage
@@ -34,14 +34,14 @@ levels:
           number: 1
           unit: percentage
   - level: Purple
-    buff:
+    buffs:
       - attribute: Attack
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 3
           unit: percentage
       - attribute: HP
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 3
           unit: percentage
@@ -50,14 +50,14 @@ levels:
           number: 2
           unit: percentage
   - level: Orange
-    buff:
+    buffs:
       - attribute: Attack
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 3
           unit: percentage
       - attribute: HP
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 3
           unit: percentage
@@ -66,14 +66,14 @@ levels:
           number: 2
           unit: percentage
   - level: Gold
-    buff:
+    buffs:
       - attribute: Attack
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 6
           unit: percentage
       - attribute: HP
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 6
           unit: percentage
