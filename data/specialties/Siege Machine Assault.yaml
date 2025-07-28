@@ -2,6 +2,7 @@
 name: Siege Machine Assault
 levels:
   - level: Green
+    text: Siege Machine Attack +1%. Siege Machine HP +1.
     buffs:
       - attribute: Attack
         targetedType: Siege Machines
@@ -14,6 +15,7 @@ levels:
           number: 1
           unit: percentage
   - level: Blue
+    text: Siege Machine Attack +1%. Siege Machine HP +1.
     buffs:
       - attribute: Attack
         targetedType: Siege Machines
@@ -26,6 +28,7 @@ levels:
           number: 1
           unit: percentage
   - level: Purple
+    text: Siege Machine Attack +2%. Siege Machine HP +2.
     buffs:
       - attribute: Attack
         targetedType: Siege Machines
@@ -38,6 +41,7 @@ levels:
           number: 2
           unit: percentage
   - level: Orange
+    text: Siege Machine Attack +2%. Siege Machine HP +2.
     buffs:
       - attribute: Attack
         targetedType: Siege Machines
@@ -50,6 +54,7 @@ levels:
           number: 2
           unit: percentage
   - level: Gold
+    text: Siege Machine Attack +4%. Siege Machine HP +4.
     buffs:
       - attribute: Attack
         targetedType: Siege Machines
