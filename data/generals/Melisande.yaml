@@ -1,0 +1,25 @@
+ascending: true
+basic_attributes:
+  leadership:
+    base: 113
+    increment: 0
+  attack:
+    base: 126
+    increment: 0
+  defense:
+    base: 119
+    increment: 0
+  politics:
+    base: 113
+    increment: 0
+book: Queen of Gimle
+specialties:
+  - Siege Machine Formation
+  - Suppress
+  - War God
+  - Rhine Staff
+stars: red5
+type:
+  - siege_specialist
+general: Melisande
+name: Melisande

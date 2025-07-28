@@ -1,7 +1,7 @@
 ---
 name: The Military Art
 text: Increases siege machines' attack by 45% and ranged troops and siege machines' defense by 25% when General is leading the army.
-buff:
+buffs:
   - attribute: Attack
     targetedType: Siege Machines
     value:

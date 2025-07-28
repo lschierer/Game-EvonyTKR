@@ -12,7 +12,8 @@ basic_attributes:
   politics:
     base: 108
     increment: 8.65
-book: Queen Annes Revenge
+book: >-
+  Queen Anne's Revenge
 display: summary
 specialties:
   - Siege Machine Formation

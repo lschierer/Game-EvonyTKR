@@ -1,62 +1,91 @@
-name: Haakon Haraldsson
+---
 generals:
-  - Margaret I
-  - Harald III
-  - Ragnar
+- Margaret I
+- Harald III
+- Ragnar
 levels:
-  - category: War
-    type: personal
-    buff:
-      - attribute: March Size
-        value:
-          number: 8
-          unit: percentage
-  - category: Cooperation
-    type: passive
-    buff:
-      - attribute: HP
-        condition:
-          - When Rallying
-        value:
-          number: 10
-          unit: percentage
-        class: Mounted Troops
-  - category: Peace
-    type: personal
-    buff:
-      - attribute: Defense
-        value:
-          number: 10
-          unit: percentage
-        class: Mounted Troops
-  - category: Faith
-    type: personal
-    buff:
-      - attribute: Attack
-        value:
-          number: 5
-          unit: percentage
-        class: Mounted Troops
-  - category: Faith
-    type: passive
-    buff:
-      - attribute: Training Speed
-        value:
-          number: 10
-          unit: percentage
-        class: Mounted Troops
-  - category: Civilization
-    type: personal
-    buff:
-      - attribute: HP
-        value:
-          number: 10
-          unit: percentage
-        class: Mounted Troops
-      - attribute: Attack
-        condition:
-          - Attacking
-        value:
-          number: 5
-          unit: percentage
-        class: Ground Troops
+- buffs:
+  - attribute: HP
+    conditions:
+    - When Rallying
+    passive: 1
+    targetedType: Mounted Troops
+    value:
+      number: 10
+      unit: percentage
+  category: cooperation
+  text: In-Rally Mounted Troop HP +10% (Global)
+- buffs:
+  - attribute: March Size
+    conditions: []
+    passive: 0
+    targetedType: ''
+    value:
+      number: 8
+      unit: percentage
+  category: war
+  text: March Size Capacity +8% (Local)
+- buffs:
+  - attribute: HP
+    conditions: []
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: Attack
+    conditions:
+    - Attacking
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 5
+      unit: percentage
+  - attribute: Attack
+    conditions:
+    - Attacking
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 5
+      unit: percentage
+  category: civilization
+  text: Mounted Troop HP +10% (Local);;Attacking Mounted Troop and Ground Troop Attack +5% (Local)
+- buffs:
+  - attribute: Defense
+    conditions: []
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 10
+      unit: percentage
+  category: peace
+  text: Mounted Troop Defense +10% (Local)
+- buffs:
+  - attribute: Attack
+    conditions: []
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 5
+      unit: percentage
+  - attribute: Training Capacity
+    conditions: []
+    passive: 1
+    targetedType: Mounted Troops
+    value:
+      number: 10
+      unit: percentage
+  category: faith
+  text: Mounted Troop Attack +5% (Local);;Mounted Troop Training Capacity +10% (Global)
+- buffs:
+  - attribute: Marching Speed
+    conditions: []
+    passive: 0
+    targetedType: ''
+    value:
+      number: 10
+      unit: percentage
+  category: honor
+  text: March Speed +10% (Local)
+name: Haakon Haraldsson

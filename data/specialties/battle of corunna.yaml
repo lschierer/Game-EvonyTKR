@@ -1,0 +1,87 @@
+name: Battle of Corunna
+levels:
+  - level: Green
+    buffs:
+      - attribute: Attack
+        troop: Ground Troops
+        value:
+          number: 3
+          unit: percentage
+      - attribute: defense
+        troop: Ground Troops
+        value:
+          number: 1
+          unit: percentage
+      - attribute: HP
+        troop: Ground Troops
+        value:
+          number: 1
+          unit: percentage
+  - level: Blue
+    buffs:
+      - attribute: Attack
+        troop: Ground Troops
+        value:
+          number: 3
+          unit: percentage
+      - attribute: defense
+        troop: Ground Troops
+        value:
+          number: 2
+          unit: percentage
+      - attribute: HP
+        troop: Ground Troops
+        value:
+          number: 2
+          unit: percentage
+  - level: Purple
+    buffs:
+      - attribute: Attack
+        troop: Ground Troops
+        value:
+          number: 6
+          unit: percentage
+      - attribute: defense
+        troop: Ground Troops
+        value:
+          number: 3
+          unit: percentage
+      - attribute: HP
+        troop: Ground Troops
+        value:
+          number: 3
+          unit: percentage
+  - level: Orange
+    buffs:
+      - attribute: Attack
+        troop: Ground Troops
+        value:
+          number: 6
+          unit: percentage
+      - attribute: defense
+        troop: Ground Troops
+        value:
+          number: 3
+          unit: percentage
+      - attribute: HP
+        troop: Ground Troops
+        value:
+          number: 3
+          unit: percentage
+  - level: Orange
+    buffs:
+      - attribute: Attack
+        troop: Ground Troops
+        value:
+          number: 12
+          unit: percentage
+      - attribute: defense
+        troop: Ground Troops
+        value:
+          number: 6
+          unit: percentage
+      - attribute: HP
+        troop: Ground Troops
+        value:
+          number: 6
+          unit: percentage

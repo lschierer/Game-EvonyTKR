@@ -1,0 +1,42 @@
+name: Fortune
+levels:
+  - level: Green
+    buffs:
+      - conditions:
+          - Against Monsters
+        attribute: 'Double Items Drop Rate'
+        value:
+          number: 1
+          unit: percentage
+  - level: Blue
+    buffs:
+      - conditions:
+          - Against Monsters
+        attribute: 'Double Items Drop Rate'
+        value:
+          number: 2
+          unit: percentage
+  - level: Purple
+    buffs:
+      - conditions:
+          - Against Monsters
+        attribute: 'Double Items Drop Rate'
+        value:
+          number: 3
+          unit: percentage
+  - level: Orange
+    buffs:
+      - conditions:
+          - Against Monsters
+        attribute: 'Double Items Drop Rate'
+        value:
+          number: 3
+          unit: percentage
+  - level: Gold
+    buffs:
+      - conditions:
+          - Against Monsters
+        attribute: 'Double Items Drop Rate'
+        value:
+          number: 6
+          unit: percentage

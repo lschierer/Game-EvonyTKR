@@ -1,6 +1,6 @@
 ---
 name: Pyrrhic War
-buff:
+buffs:
   - attribute: Attack
     targetedType: Ground Troops
     value:

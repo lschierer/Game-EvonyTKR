@@ -1,0 +1,27 @@
+---
+ascending: 'true'
+basic_attributes:
+  attack:
+    base: 113
+    increment: 0
+  defense:
+    base: 112
+    increment: 0
+  leadership:
+    base: 112
+    increment: 0
+  politics:
+    base: 108
+    increment: 0
+book: Nordic Hammer
+name: Gnarr
+specialties:
+  - Ranged Troop Assault
+  - Bash
+  - War God
+  - Thunderfury
+stars: red5
+type:
+  - ground_specialist
+  - mounted_specialist
+  - ranged_specialist

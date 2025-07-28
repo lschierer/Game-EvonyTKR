@@ -1,10 +1,12 @@
+---
+buffs:
+- attribute: SubCity Gold Production
+  conditions:
+  - When City Mayor for this SubCity
+  passive: 0
+  targetedType: ''
+  value:
+    number: 75
+    unit: percentage
 name: Domination
-buff:
-  - attribute: SubCity Training Speed
-    condition:
-      - When City Mayor for this SubCity
-    value:
-      number: 35
-      unit: percentage
-text: >-
-  Increases Troop Training Speed by 35% in Subordinate City when General is the Mayor.
+text: Boosts the Gold Production Speed by 75% in Subordinate City when General is the Mayor.

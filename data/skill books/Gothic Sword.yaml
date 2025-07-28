@@ -1,31 +1,31 @@
 ---
 name: Gothic Sword
-buff:
+buffs:
   - attribute: Attack
     targetedType: Ground Troops
-    condition:
-      - leading the army to attack
+    conditions:
+      - Attacking
     value:
       number: 45
       unit: percentage
   - attribute: Defense
     targetedType: Ground Troops
-    condition:
-      - leading the army to attack
+    conditions:
+      - Attacking
     value:
       number: 45
       unit: percentage
   - attribute: HP
     targetedType: Ground Troops
-    condition:
-      - leading the army to attack
+    conditions:
+      - Attacking
     value:
       number: 30
       unit: percentage
   - attribute: HP
     targetedType: Mounted Troops
-    condition:
-      - leading the army to attack
+    conditions:
+      - Attacking
     value:
       number: 30
       unit: percentage

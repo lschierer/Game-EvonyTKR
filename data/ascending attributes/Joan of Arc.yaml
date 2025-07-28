@@ -1,55 +1,55 @@
 ascending:
   - level: purple1
-    buff:
+    buffs:
       - attribute: Defense
-        class: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 10
           unit: percentage
       - attribute: HP
-        class: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 10
           unit: percentage
   - level: purple2
-    buff:
+    buffs:
       - attribute: Attack
-        class: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 10
           unit: percentage
   - level: purple3
-    buff:
+    buffs:
       - attribute: HP
         value:
           number: 10
           unit: percentage
   - level: purple4
-    buff:
+    buffs:
       - attribute: Defense
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 10
           unit: percentage
       - attribute: Defense
-        class: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 10
           unit: percentage
       - attribute: HP
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 10
           unit: percentage
       - attribute: HP
-        class: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 10
           unit: percentage
   - level: purple5
-    buff:
+    buffs:
       - attribute: Attack
-        class: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 20
           unit: percentage

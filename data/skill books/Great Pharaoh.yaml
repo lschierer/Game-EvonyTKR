@@ -1,6 +1,6 @@
 ---
 name: Great Pharaoh
-buff:
+buffs:
   - attribute: Attack
     targetedType: Siege Machines
     value:

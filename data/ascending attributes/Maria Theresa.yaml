@@ -1,64 +1,64 @@
 ---
 ascending:
   - level: "red1"
-    buff:
+    buffs:
       - attribute: "Double Items Drop Rate"
-        condition:
+        conditions:
           - Against Monsters
         value:
           number: 10
           unit: percentage
       - attribute: Marching Speed to Monsters
-        condition:
+        conditions:
           - Against Monsters
         value:
           number: 5
           unit: percentage
   - level: "red2"
-    buff:
+    buffs:
       - attribute: Attack
-        condition:
-          - Reduces Monster
+        conditions:
+          - Monsters
         value:
           number: 10
           unit: percentage
       - attribute: Marching Speed to Monsters
-        condition:
+        conditions:
           - Against Monsters
         value:
           number: 10
           unit: percentage
   - level: "red3"
-    buff:
+    buffs:
       - attribute: March Size
         value:
           number: 10
           unit: percentage
       - attribute: Stamina cost
-        condition:
+        conditions:
           - Against Monsters
         value:
           number: 5
           unit: percentage
   - level: "red4"
-    buff:
+    buffs:
       - attribute: Attack
-        condition:
+        conditions:
           - Against Monsters
-        class: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 30
           unit: percentage
   - level: "red5"
-    buff:
+    buffs:
       - attribute: "Double Items Drop Rate"
-        condition:
+        conditions:
           - Against Monsters
         value:
           number: 10
           unit: percentage
       - attribute: Stamina cost
-        condition:
+        conditions:
           - Against Monsters
         value:
           number: 5

@@ -2,62 +2,67 @@
 name: Siege Machine Assault
 levels:
   - level: Green
-    buff:
+    text: Siege Machine Attack +1%. Siege Machine HP +1.
+    buffs:
       - attribute: Attack
-        class: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 1
           unit: percentage
       - attribute: HP
-        class: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 1
           unit: percentage
   - level: Blue
-    buff:
+    text: Siege Machine Attack +1%. Siege Machine HP +1.
+    buffs:
       - attribute: Attack
-        class: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 1
           unit: percentage
       - attribute: HP
-        class: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 1
           unit: percentage
   - level: Purple
-    buff:
+    text: Siege Machine Attack +2%. Siege Machine HP +2.
+    buffs:
       - attribute: Attack
-        class: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 2
           unit: percentage
       - attribute: HP
-        class: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 2
           unit: percentage
   - level: Orange
-    buff:
+    text: Siege Machine Attack +2%. Siege Machine HP +2.
+    buffs:
       - attribute: Attack
-        class: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 2
           unit: percentage
       - attribute: HP
-        class: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 2
           unit: percentage
   - level: Gold
-    buff:
+    text: Siege Machine Attack +4%. Siege Machine HP +4.
+    buffs:
       - attribute: Attack
-        class: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 4
           unit: percentage
       - attribute: HP
-        class: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 4
           unit: percentage

@@ -1,16 +1,16 @@
 ---
 name: Conqueror
-buff:
+buffs:
   - attribute: Attack
-    condition:
-      - leading the army to attack
+    conditions:
+      - Attacking
     targetedType: Ground Troops
     value:
       number: 30
       unit: percentage
   - attribute: HP
-    condition:
-      - leading the army to attack
+    conditions:
+      - Attacking
     targetedType: Ground Troops
     value:
       number: 40

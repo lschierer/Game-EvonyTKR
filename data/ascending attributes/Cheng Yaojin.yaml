@@ -1,88 +1,125 @@
+---
 ascending:
-  - level: red1
-    buff:
+  - buffs:
       - attribute: Attack
-        class: Ground Troops
+        conditions: []
+        passive: 0
+        targetedType: Mounted Troops
         value:
           number: 5
           unit: percentage
       - attribute: Attack
-        class: Mounted Troops
+        conditions: []
+        passive: 0
+        targetedType: Ground Troops
         value:
           number: 5
           unit: percentage
       - attribute: Defense
-        class: Ground Troops
+        conditions: []
+        passive: 0
+        targetedType: Mounted Troops
         value:
           number: 10
           unit: percentage
       - attribute: Defense
-        class: Mounted Troops
+        conditions: []
+        passive: 0
+        targetedType: Ground Troops
         value:
           number: 10
           unit: percentage
-  - level: red2
-    buff:
+    level: red1
+    text: Mounted Troop and Ground Troop Attack +5% and Defense +10%
+  - buffs:
       - attribute: Death to Wounded
-        condition:
+        conditions:
           - Marching
+        passive: 0
+        targetedType: ''
         value:
           number: 8
           unit: percentage
-  - level: red3
-    buff:
+    level: red2
+    text: Marching Troop Death into Wounded Rate +8%
+  - buffs:
       - attribute: March Size
+        conditions: []
+        passive: 0
+        targetedType: ''
         value:
           number: 10
           unit: percentage
       - attribute: Attack
-        class: Mounted Troops
+        conditions: []
+        passive: 0
+        targetedType: Mounted Troops
         value:
           number: 20
           unit: percentage
-  - level: red4
-    buff:
+    level: red3
+    text: March Size Capacity +10%, Mounted Troop Attack +20%
+  - buffs:
       - attribute: Defense
-        class: Mounted Troops
+        conditions: []
+        passive: 0
+        targetedType: Mounted Troops
         value:
           number: 10
           unit: percentage
       - attribute: HP
-        class: Mounted Troops
+        conditions: []
+        passive: 0
+        targetedType: Mounted Troops
         value:
           number: 10
           unit: percentage
-  - level: red5
-    buff:
+    level: red4
+    text: Mounted Troop Defense +10% and HP +10%
+  - buffs:
       - attribute: Attack
-        class: Ground Troops
+        conditions: []
+        passive: 0
+        targetedType: Mounted Troops
         value:
           number: 20
           unit: percentage
       - attribute: Attack
-        class: Mounted Troops
+        conditions: []
+        passive: 0
+        targetedType: Ground Troops
         value:
           number: 20
           unit: percentage
       - attribute: Defense
-        class: Ground Troops
+        conditions: []
+        passive: 0
+        targetedType: Mounted Troops
         value:
           number: 15
           unit: percentage
       - attribute: Defense
-        class: Mounted Troops
+        conditions: []
+        passive: 0
+        targetedType: Ground Troops
         value:
           number: 15
           unit: percentage
       - attribute: HP
-        class: Ground Troops
+        conditions: []
+        passive: 0
+        targetedType: Mounted Troops
         value:
           number: 15
           unit: percentage
       - attribute: HP
-        class: Mounted Troops
+        conditions: []
+        passive: 0
+        targetedType: Ground Troops
         value:
           number: 15
           unit: percentage
+    level: red5
+    text: Mounted Troop and Ground Troop Attack +20%, Defense and HP +15%
 general: Cheng Yaojin
 id: Cheng Yaojin

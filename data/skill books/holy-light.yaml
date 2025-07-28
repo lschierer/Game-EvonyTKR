@@ -1,5 +1,5 @@
 name: Holy Light
-buff:
+buffs:
   - attribute: HP
     targetedType: Mounted Troops
     value:

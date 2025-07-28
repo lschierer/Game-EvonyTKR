@@ -1,27 +1,36 @@
+---
+buffs:
+- attribute: Defense
+  conditions:
+  - Enemy
+  passive: 0
+  targetedType: Ranged Troops
+  value:
+    number: 15
+    unit: percentage
+- attribute: Defense
+  conditions:
+  - Enemy
+  passive: 0
+  targetedType: Siege Machines
+  value:
+    number: 15
+    unit: percentage
+- attribute: Attack
+  conditions:
+  - leading the army
+  passive: 0
+  targetedType: Ranged Troops
+  value:
+    number: 15
+    unit: percentage
+- attribute: Attack
+  conditions:
+  - leading the army
+  passive: 0
+  targetedType: Siege Machines
+  value:
+    number: 15
+    unit: percentage
 name: Fire Suppression
-text: Reduces enemy ranged troops and siege machines' defense by 15% and increases your ranged troops and siege machines' attack by 15% when General is leading the army.
-buff:
-  - attribute: Defense
-    targetedType: Ranged Troops
-    condition:
-      - Enemy
-    value:
-      number: 15
-      unit: percentage
-  - attribute: Defense
-    targetedType: Siege Machines
-    condition:
-      - Enemy
-    value:
-      number: 15
-      unit: percentage
-  - attribute: Attack
-    targetedType: Ranged Troops
-    value:
-      number: 15
-      unit: percentage
-  - attribute: Attack
-    targetedType: Siege Machines
-    value:
-      number: 15
-      unit: percentage
+text: Reduces enemy ranged troops and siege machines’ defense by 15% and increases your ranged troops and siege machines’ attack by 15% when General is leading the army.

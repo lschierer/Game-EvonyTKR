@@ -1,6 +1,6 @@
 ---
 name: Red Demon
-buff:
+buffs:
   - attribute: Attack
     targetedType: Mounted Troops
     value:

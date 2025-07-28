@@ -1,0 +1,24 @@
+ascending: 'true'
+basic_attributes:
+  attack:
+    base: 117
+    increment: 0
+  defense:
+    base: 114
+    increment: 0
+  leadership:
+    base: 117
+    increment: 0
+  politics:
+    base: 109
+    increment: 0
+book: Mapuche Leader
+name: Lautaro
+specialties:
+  - Mounted Troop Formation
+  - Sabotage
+  - Ground Troop Ares
+  - Battle of Marihuenu
+stars: red5
+type:
+  - wall

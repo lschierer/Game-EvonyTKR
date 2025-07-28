@@ -1,0 +1,178 @@
+---
+levels:
+- buffs:
+  - attribute: Attack
+    conditions:
+    - In City
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Attack
+    conditions:
+    - In City
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - In City
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - In City
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 0
+      unit: percentage
+  level: Green
+  text: ''
+- buffs:
+  - attribute: Attack
+    conditions:
+    - In City
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Attack
+    conditions:
+    - In City
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - In City
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - In City
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 0
+      unit: percentage
+  level: Blue
+  text: ''
+- buffs:
+  - attribute: Attack
+    conditions:
+    - In City
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Attack
+    conditions:
+    - In City
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - In City
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - In City
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 0
+      unit: percentage
+  level: Purple
+  text: ''
+- buffs:
+  - attribute: Attack
+    conditions:
+    - In City
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Attack
+    conditions:
+    - In City
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - In City
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - In City
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 0
+      unit: percentage
+  level: Orange
+  text: ''
+- buffs:
+  - attribute: Attack
+    conditions:
+    - In City
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 30
+      unit: percentage
+  - attribute: Attack
+    conditions:
+    - In City
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 30
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - In City
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 20
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - In City
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 20
+      unit: percentage
+  level: Gold
+  text: In-city Ranged Troop and Siege Machine Attack +30%, In-city Ranged Troop and Siege Machine Defense +20%
+name: Siege of Constantinople

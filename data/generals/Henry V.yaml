@@ -12,8 +12,7 @@ basic_attributes:
   politics:
     base: 111
     increment: 8.62
-book: Hammer of the Gauls - Henry V
-display: summary
+book: Hammer of the Gauls
 specialties:
   - Ranged Troop Formation
   - Bash

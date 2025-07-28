@@ -1,71 +1,108 @@
 ---
 ascending:
-  - level: "red1"
-    buff:
-      - attribute: Attack
-        class: Ranged Troops
-        value:
-          number: 5
-          unit: percentage
-      - attribute: Defense
-        class: Ranged Troops
-        value:
-          number: 10
-          unit: percentage
-      - attribute: HP
-        class: Ranged Troops
-        value:
-          number: 10
-          unit: percentage
-  - level: "red2"
-    buff:
-      - attribute: Death to Wounded
-        condition:
-          - leading the army to attack
-        value:
-          number: 10
-          unit: percentage
-  - level: "red3"
-    buff:
-      - attribute: Rally Capacity
-        condition:
-          - When Rallying
-        value:
-          number: 8
-          unit: percentage
-  - level: "red4"
-    buff:
-      - attribute: Attack
-        class: Ranged Troops
-        value:
-          number: 10
-          unit: percentage
-      - attribute: Defense
-        class: Ranged Troops
-        value:
-          number: 10
-          unit: percentage
-      - attribute: HP
-        class: Ranged Troops
-        value:
-          number: 10
-          unit: percentage
-  - level: "red5"
-    buff:
-      - attribute: Attack
-        class: Ranged Troops
-        value:
-          number: 15
-          unit: percentage
-      - attribute: Defense
-        class: Ranged Troops
-        value:
-          number: 10
-          unit: percentage
-      - attribute: HP
-        class: Ranged Troops
-        value:
-          number: 10
-          unit: percentage
+- buffs:
+  - attribute: Attack
+    conditions:
+    - leading the army
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 5
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - leading the army
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - leading the army
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 10
+      unit: percentage
+  level: red1
+  text: Increases Ranged Troop Attack by 5%, Defense and HP by 10% when General is leading the army.
+- buffs:
+  - attribute: Death to Wounded
+    conditions:
+    - leading the army
+    - Attacking
+    passive: 0
+    targetedType: ''
+    value:
+      number: 10
+      unit: percentage
+  level: red2
+  text: Increases Troop Death into Wounded Rate by 10% when General is leading the army to attack.
+- buffs:
+  - attribute: Rally Capacity
+    conditions:
+    - When Rallying
+    passive: 0
+    targetedType: ''
+    value:
+      number: 8
+      unit: percentage
+  level: red3
+  text: When General is launching Alliance War, Rally Capacity +8%.
+- buffs:
+  - attribute: Attack
+    conditions:
+    - leading the army
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - leading the army
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - leading the army
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 10
+      unit: percentage
+  level: red4
+  text: Increases Ranged Troop Attack by 10%, Defense and HP by 10% when General is leading the army.
+- buffs:
+  - attribute: Attack
+    conditions:
+    - leading the army
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 15
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - leading the army
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - leading the army
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 10
+      unit: percentage
+  level: red5
+  text: Increases Ranged Troop Attack by 15%, Defense and HP by 10% when General is leading the army.
 general: Henry V
 id: Henry V

@@ -1,9 +1,7 @@
 ---
 buffs:
 - attribute: Attack
-  conditions:
-  - leading the army
-  - Attacking
+  conditions: []
   passive: 0
   targetedType: Mounted Troops
   value:

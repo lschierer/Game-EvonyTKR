@@ -1,57 +1,58 @@
 ---
 ascending:
   - level: "red1"
-    buff:
+    buffs:
       - attribute: Attack
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 10
           unit: percentage
       - attribute: Defense
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 15
           unit: percentage
   - level: "red2"
-    buff:
+    buffs:
       - attribute: Wounded to Death
-        condition:
-          - Enemy In City
+        conditions:
+          - Enemy
+          - In City
         value:
           number: 8
           unit: percentage
   - level: "red3"
-    buff:
+    buffs:
       - attribute: March Size
         value:
           number: 10
           unit: percentage
   - level: "red4"
-    buff:
+    buffs:
       - attribute: Attack
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 10
           unit: percentage
       - attribute: HP
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 15
           unit: percentage
   - level: "red5"
-    buff:
+    buffs:
       - attribute: Attack
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 10
           unit: percentage
       - attribute: Defense
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 10
           unit: percentage
       - attribute: HP
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 10
           unit: percentage

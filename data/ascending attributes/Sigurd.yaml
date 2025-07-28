@@ -1,34 +1,34 @@
 ---
 ascending:
   - level: "red1"
-    buff:
+    buffs:
       - attribute: Attack
-        class: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 10
           unit: percentage
       - attribute: Defense
-        class: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 10
           unit: percentage
       - attribute: HP
-        class: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 10
           unit: percentage
   - level: "red2"
-    buff:
+    buffs:
       - attribute: Death to Wounded
-        condition:
+        conditions:
           - Marching
         value:
           number: 8
           unit: percentage
   - level: "red3"
-    buff:
+    buffs:
       - attribute: Attack
-        class: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 10
           unit: percentage
@@ -37,30 +37,30 @@ ascending:
           number: 30
           unit: percentage
   - level: "red4"
-    buff:
+    buffs:
       - attribute: Attack
-        class: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 8
           unit: percentage
       - attribute: Defense
-        class: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 8
           unit: percentage
       - attribute: HP
-        class: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 8
           unit: percentage
   - level: "red5"
-    buff:
+    buffs:
       - attribute: March Size
         value:
           number: 10
           unit: percentage
       - attribute: Attack
-        class: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 30
           unit: percentage

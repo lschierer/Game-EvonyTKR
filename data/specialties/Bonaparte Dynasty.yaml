@@ -2,152 +2,172 @@
 name: Bonaparte Dynasty
 levels:
   - level: "Green"
-    buff:
+    buffs:
       - attribute: Attack
-        condition:
-          - dragon to the attack
-        class: Mounted Troops
+        conditions:
+          - brings a dragon
+          - Attacking
+        targetedType: Mounted Troops
         value:
           number: 4
           unit: percentage
       - attribute: Defense
-        condition:
-          - dragon to the attack
-        class: Mounted Troops
+        conditions:
+          - brings a dragon
+          - Attacking
+        targetedType: Mounted Troops
         value:
           number: 3
           unit: percentage
       - attribute: Attack
-        condition:
-          - Reduces Enemy with a Dragon
-        class: Ranged Troops
+        conditions:
+          - Enemy
+          - brings a dragon
+        targetedType: Ranged Troops
         value:
           number: 1
           unit: percentage
       - attribute: Attack
-        condition:
-          - Reduces Enemy with a Dragon
-        class: Siege Machines
+        conditions:
+          - Enemy
+          - brings a dragon
+        targetedType: Siege Machines
         value:
           number: 1
           unit: percentage
   - level: "Blue"
-    buff:
+    buffs:
       - attribute: Attack
-        condition:
-          - dragon to the attack
-        class: Mounted Troops
+        conditions:
+          - brings a dragon
+          - Attacking
+        targetedType: Mounted Troops
         value:
           number: 4
           unit: percentage
       - attribute: Defense
-        condition:
-          - dragon to the attack
-        class: Mounted Troops
+        conditions:
+          - brings a dragon
+          - Attacking
+        targetedType: Mounted Troops
         value:
           number: 3
           unit: percentage
       - attribute: Attack
-        condition:
-          - Reduces Enemy with a Dragon
-        class: Ranged Troops
+        conditions:
+          - Enemy
+          - brings a dragon
+        targetedType: Ranged Troops
         value:
           number: 2
           unit: percentage
       - attribute: Attack
-        condition:
-          - Reduces Enemy with a Dragon
-        class: Siege Machines
+        conditions:
+          - Enemy
+          - brings a dragon
+        targetedType: Siege Machines
         value:
           number: 2
           unit: percentage
   - level: "Purple"
-    buff:
+    buffs:
       - attribute: Attack
-        condition:
-          - dragon to the attack
-        class: Mounted Troops
+        conditions:
+          - brings a dragon
+          - Attacking
+        targetedType: Mounted Troops
         value:
           number: 8
           unit: percentage
       - attribute: Defense
-        condition:
-          - dragon to the attack
-        class: Mounted Troops
+        conditions:
+          - brings a dragon
+          - Attacking
+        targetedType: Mounted Troops
         value:
           number: 6
           unit: percentage
       - attribute: Attack
-        condition:
-          - Reduces Enemy with a Dragon
-        class: Ranged Troops
+        conditions:
+          - Enemy
+          - brings a dragon
+        targetedType: Ranged Troops
         value:
           number: 3
           unit: percentage
       - attribute: Attack
-        condition:
-          - Reduces Enemy with a Dragon
-        class: Siege Machines
+        conditions:
+          - Enemy
+          - brings a dragon
+        targetedType: Siege Machines
         value:
           number: 3
           unit: percentage
   - level: "Orange"
-    buff:
+    buffs:
       - attribute: Attack
-        condition:
-          - dragon to the attack
-        class: Mounted Troops
+        conditions:
+          - brings a dragon
+          - Attacking
+        targetedType: Mounted Troops
         value:
           number: 8
           unit: percentage
       - attribute: Defense
-        condition:
-          - dragon to the attack
-        class: Mounted Troops
+        conditions:
+          - brings a dragon
+          - Attacking
+        targetedType: Mounted Troops
         value:
           number: 6
           unit: percentage
       - attribute: Attack
-        condition:
-          - Reduces Enemy with a Dragon
-        class: Ranged Troops
+        conditions:
+          - Enemy
+          - brings a dragon
+        targetedType: Ranged Troops
         value:
           number: 3
           unit: percentage
       - attribute: Attack
-        condition:
-          - Reduces Enemy with a Dragon
-        class: Siege Machines
+        conditions:
+          - Enemy
+          - brings a dragon
+        targetedType: Siege Machines
         value:
           number: 3
           unit: percentage
   - level: "Gold"
-    buff:
+    buffs:
       - attribute: Attack
-        condition:
-          - dragon to the attack
-        class: Mounted Troops
+        conditions:
+          - brings a dragon
+          - Attacking
+        targetedType: Mounted Troops
         value:
           number: 16
           unit: percentage
       - attribute: Defense
-        condition:
-          - dragon to the attack
-        class: Mounted Troops
+        conditions:
+          - brings a dragon
+          - Attacking
+        targetedType: Mounted Troops
         value:
           number: 12
           unit: percentage
       - attribute: Attack
-        condition:
-          - Reduces Enemy with a Dragon
-        class: Ranged Troops
+        conditions:
+          - Enemy
+          - brings a dragon
+        targetedType: Ranged Troops
         value:
           number: 6
           unit: percentage
       - attribute: Attack
-        condition:
-          - Reduces Enemy with a Dragon
-        class: Siege Machines
+        conditions:
+          - Enemy
+          - brings a dragon
+        targetedType: Siege Machines
         value:
           number: 6
           unit: percentage

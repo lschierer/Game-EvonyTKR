@@ -1,83 +1,87 @@
-name: Artemisia I
+---
 generals:
-  - Seleucus I
-  - Leonidas I
-  - Alexander the Great
+- Seleucus I
+- Leonidas I
+- Alexander the Great
 levels:
-  - category: War
-    type: personal
-    buff:
-      - attribute: Defense
-        class: Ranged Troops
-        condition:
-          - Attacking
-        value:
-          number: 10
-          unit: percentage
-  - category: Cooperation
-    type: passive
-    buff:
-      - attribute: Training Capacity
-        class: Ranged Troops
-        value:
-          number: 10
-          unit: percentage
-      - attribute: Training Speed
-        class: Ranged Troops
-        value:
-          number: 10
-          unit: percentage
-  - category: Peace
-    type: personal
-    buff:
-      - attribute: Attack
-        class: Ranged Troops
-        condition:
-          - When Rallying
-        value:
-          number: 10
-          unit: percentage
-  - category: Faith
-    type: personal
-    buff:
-      - attribute: HP
-        class: Ranged Troops
-        condition:
-          - Attacking
-        value:
-          number: 10
-          unit: percentage
-  - category: Faith
-    type: passive
-    buff:
-      - attribute: Attack
-        class: Ranged Troops
-        condition:
-          - Attacking
-        value:
-          number: 5
-          unit: percentage
-  - category: Honor
-    type: personal
-    buff:
-      - attribute: March Size
-        value:
-          number: 8
-          unit: percentage
-  - category: Civilization
-    type: personal
-    buff:
-      - attribute: Attack
-        class: Ranged Troops
-        condition:
-          - Attacking
-        value:
-          number: 10
-          unit: percentage
-      - attribute: HP
-        class: Ranged Troops
-        condition:
-          - When Rallying
-        value:
-          number: 10
-          unit: percentage
+- buffs:
+  - attribute: HP
+    conditions:
+    - Attacking
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: Attack
+    conditions:
+    - Attacking
+    passive: 1
+    targetedType: Ranged Troops
+    value:
+      number: 5
+      unit: percentage
+  category: faith
+  text: ' Attacking Ranged Troop HP +10% (Local);; Attacking Ranged Troop Attack +5% (Global) '
+- buffs:
+  - attribute: Training Capacity
+    conditions: []
+    passive: 1
+    targetedType: Ranged Troops
+    value:
+      number: 10
+      unit: percentage
+  category: cooperation
+  text: Ranged Troop Training Capacity +10% (Global)
+- buffs:
+  - attribute: Defense
+    conditions:
+    - Attacking
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 10
+      unit: percentage
+  category: war
+  text: Attacking Ranged Troop Defense +10% (Local)
+- buffs:
+  - attribute: March Size
+    conditions: []
+    passive: 0
+    targetedType: ''
+    value:
+      number: 8
+      unit: percentage
+  category: honor
+  text: March Size Capacity +8% (Local)
+- buffs:
+  - attribute: Attack
+    conditions:
+    - When Rallying
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 10
+      unit: percentage
+  category: peace
+  text: In-Rally Ranged Troop Attack +10% (Local)
+- buffs:
+  - attribute: Attack
+    conditions:
+    - Attacking
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - When Rallying
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 10
+      unit: percentage
+  category: civilization
+  text: ' Attacking Ranged Troop Attack +10% (Local);; In-Rally Ranged Troop HP +10% (Local) '
+name: Artemisia I

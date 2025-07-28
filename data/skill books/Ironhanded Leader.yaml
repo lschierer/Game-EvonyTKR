@@ -1,31 +1,40 @@
 ---
+buffs:
+- attribute: Attack
+  conditions:
+  - leading the army
+  - Attacking
+  passive: 0
+  targetedType: Ground Troops
+  value:
+    number: 30
+    unit: percentage
+- attribute: Attack
+  conditions:
+  - leading the army
+  - Attacking
+  passive: 0
+  targetedType: Mounted Troops
+  value:
+    number: 30
+    unit: percentage
+- attribute: Defense
+  conditions:
+  - leading the army
+  - Attacking
+  passive: 0
+  targetedType: Ground Troops
+  value:
+    number: 15
+    unit: percentage
+- attribute: Defense
+  conditions:
+  - leading the army
+  - Attacking
+  passive: 0
+  targetedType: Mounted Troops
+  value:
+    number: 15
+    unit: percentage
 name: Ironhanded Leader
-buff:
-  - attribute: Attack
-    condition:
-      - leading the army to attack
-    targetedType: Ground Troops
-    value:
-      number: 30
-      unit: percentage
-  - attribute: Attack
-    condition:
-      - leading the army to attack
-    targetedType: Mounted Troops
-    value:
-      number: 30
-      unit: percentage
-  - attribute: Defense
-    condition:
-      - leading the army to attack
-    targetedType: Ground Troops
-    value:
-      number: 15
-      unit: percentage
-  - attribute: Defense
-    condition:
-      - leading the army to attack
-    targetedType: Mounted Troops
-    value:
-      number: 15
-      unit: percentage
+text: Increases ground troops and mounted troops’ attack by 30% and increases ground troops and mounted troops’ defense by 15% when General is leading the army to attack.

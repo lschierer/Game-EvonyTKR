@@ -6,79 +6,79 @@ generals:
 levels:
   - category: War
     type: personal
-    buff:
+    buffs:
       - attribute: HP
-        class: Ranged Troops
+        targetedType: Ranged Troops
         value:
           number: 5
           unit: percentage
       - attribute: HP
-        class: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 5
           unit: percentage
   - category: Cooperation
     type: passive
-    buff:
+    buffs:
       - attribute: Deserter Capacity
         value:
           number: 10
           unit: percentage
   - category: Peace
     type: personal
-    buff:
+    buffs:
       - attribute: Attack
-        class: Siege Machines
+        targetedType: Siege Machines
         value:
           number: 5
           unit: percentage
   - category: Faith
     type: passive
-    buff:
+    buffs:
       - attribute: HP
-        class: Ranged Troops
-        condition:
+        targetedType: Ranged Troops
+        conditions:
           - Enemy
         value:
           number: 8
           unit: percentage
       - attribute: HP
-        class: Siege Machines
-        condition:
+        targetedType: Siege Machines
+        conditions:
           - Enemy
         value:
           number: 8
           unit: percentage
   - category: Honor
     type: personal
-    buff:
+    buffs:
       - attribute: Attack
-        class: Ranged Troops
-        condition:
+        targetedType: Ranged Troops
+        conditions:
           - When Rallying
         value:
           number: 5
           unit: percentage
       - attribute: Attack
-        class: Siege Machines
-        condition:
+        targetedType: Siege Machines
+        conditions:
           - When Rallying
         value:
           number: 5
           unit: percentage
       - attribute: Attack
-        class: Siege Machines
-        condition:
+        targetedType: Siege Machines
+        conditions:
           - When Rallying
         value:
           number: 10
           unit: percentage
   - category: Civilization
     type: personal
-    buff:
+    buffs:
       - attribute: Attack
-        class: Siege Machines
-        condition:
+        targetedType: Siege Machines
+        conditions:
           - Marching
         value:
           number: 15

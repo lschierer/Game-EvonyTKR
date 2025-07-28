@@ -1,0 +1,98 @@
+---
+levels:
+- buffs:
+  - attribute: Attack
+    conditions:
+    - Monsters
+    passive: 0
+    targetedType: ''
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - Monsters
+    passive: 0
+    targetedType: ''
+    value:
+      number: 0
+      unit: percentage
+  level: Green
+  text: ''
+- buffs:
+  - attribute: Attack
+    conditions:
+    - Monsters
+    passive: 0
+    targetedType: ''
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - Monsters
+    passive: 0
+    targetedType: ''
+    value:
+      number: 0
+      unit: percentage
+  level: Blue
+  text: ''
+- buffs:
+  - attribute: Attack
+    conditions:
+    - Monsters
+    passive: 0
+    targetedType: ''
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - Monsters
+    passive: 0
+    targetedType: ''
+    value:
+      number: 0
+      unit: percentage
+  level: Purple
+  text: ''
+- buffs:
+  - attribute: Attack
+    conditions:
+    - Monsters
+    passive: 0
+    targetedType: ''
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - Monsters
+    passive: 0
+    targetedType: ''
+    value:
+      number: 0
+      unit: percentage
+  level: Orange
+  text: ''
+- buffs:
+  - attribute: Attack
+    conditions:
+    - Monsters
+    passive: 0
+    targetedType: ''
+    value:
+      number: 20
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - Monsters
+    passive: 0
+    targetedType: ''
+    value:
+      number: 20
+      unit: percentage
+  level: Gold
+  text: Mounted Troop Attack on Monsters +30%, Monsters Attack -20%, Monsters Defense -20%
+name: Gallic Wars
