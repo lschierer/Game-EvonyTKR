@@ -1,0 +1,12 @@
+name: Augusta
+levels:
+  - level: Green
+    text: Ground Troop Attack +3% Ground Troop Defense +3% Ground Troop HP +3%.
+  - level: Blue
+    text: Ground Troop Attack +4% Ground Troop Defense +4% Ground Troop HP +4%.
+  - level: Purple
+    text: Ground Troop Attack +7% Ground Troop Defense +7% Ground Troop HP +7%.
+  - level: Orange
+    text: Ground Troop Attack +7% Ground Troop Defense +7% Ground Troop HP +7%.
+  - level: Gold
+    text: Ground Troop Attack +14% Ground Troop Defense +14% Ground Troop HP +14%.
