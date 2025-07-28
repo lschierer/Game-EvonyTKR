@@ -65,7 +65,10 @@ class Game::EvonyTKR::Model::Specialty::Manager :
         yaml_version => ['1.2', '1.1'],
       )->load_string($data);
       if (exists $object->{name}) {
-        $name = $object->{name};
+        if($object->{name} !~ /$name/i ) {
+          $self->logger->warn("$name does not match " . $object->{name});
+          $name = $object->{name};
+        }
       }
 
       $specialties->{$name} =
