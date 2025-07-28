@@ -20,4 +20,5 @@ specialties:
   - War God
   - Battle of Watling Street
 stars: red5
-type: ''
+type:
+  - wall
