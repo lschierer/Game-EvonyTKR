@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=schema.json
+
+glossary:
+  - term: Troop Death to Wounded
+    synonyms:
+      - Death to Wounded
+      - Death into Wounded
+      - Death Turning Revival
+      - Death Turning Wounded
+    definition: >-
+      In any fight, there is a probability that some troops will be killed, and a second probability that some will desert.
+      The Death to Wounded rate 'rescues' a percentage of these 'killed' and 'deserting' troops, causing them to instead
+      become wounded and go to your hospital. This is only effective if your hospital is not full. Further, it is unclear
+      that it plays any role at all in battlefield, where no troops can be killed or desert.

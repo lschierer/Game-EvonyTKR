@@ -1,0 +1,70 @@
+# yaml-language-server: $schema=schema.json
+
+glossary:
+  - term: SkillBook
+    definition: >-
+      There are two types of SkillBooks: Built-in books and other SkillBooks.
+      Both are the same in that they are attached to a 'General' and provide
+      'Buffs' and/or 'Debuffs' to your game play.  These may be 'unconditional'
+      in that they affect your game play all the time for as long as you
+      own the 'General' or they may be 'conditional' in that they only configs:
+      take effect when you use the 'General' in the specified way. configs:
+      'Other' skill books are further subdivided into 'Military,' 'Development,'
+      'Subordinate City,' 'Debuff', and 'Officer' Books.  These differ only
+      in how you can obtain them, and in which situations you might use them.
+    related_terms:
+      - General
+      - Subordinate City
+  - term: Subordinate City
+    definition: >-
+      In addition to your primary keep, which is also called your 'city,' the game allows you to attach
+      one or more additional keeps to your account.  One is automatic, and does not show on the map.
+      Additional ones come with increases in rank and/or VIP level, and are on the map.  These additional ones can be attacked, and taken from you.
+      All subordinate cities behave the same way while you own them (except that only some can be directly attacked). Each provides
+      certain 'Buffs' based on the 'Culture' of that city (NOT your culture), and allows you to attach a 'General' to the city as 'Mayor'.
+      This 'Mayor' will provide additional benefits, primarily in the form of 'Debuffs.'
+    related_terms:
+      - General
+      - Culture
+      - Debuff
+      - Buff
+      - Mayor
+  - term: Secondary General
+    synonyms:
+      - Assistant General
+    related_terms:
+      - SkillBooks
+      - Specialties
+      - Covenant
+      - Basic Attributes
+      - Gear
+      - Dragon
+      - Spiritual Beast
+      - Ascending Attributes
+      - General
+    definition: >-
+      In certain use cases, you can attach two Generals for use instead of just one.  The secondary is the second one attached, and can only *be*
+      attached if the first one is at least level 23, with at least 3 stars.  This second general is only partly utilized.  You get the benefit
+      from its 'SkillBooks', 'Specialties', and 'Covenant', but not from its 'Basic Attributes', 'Gear', 'Dragon'/'Spiritual Beast', or 'Ascending Attributes.'
+  - term: Spiritual Beast
+    definition: >-
+      Each 'General' has a slots that can be filled to provide additional 'Buffs' and 'Debuffs.' One of these is for the 'Dragon' or Spiritual Beast.
+      A 'Dragon' and Spiritual Beast are mutually exclusive, and fill the same role in the game, but differ in quality.  A Spiritual Beast is a more
+      limited way in which to provide extra 'Buffs' and/or 'Debuffs' to your 'General'.  Spiritual Beasts are usually more easily obtained than
+      'Dragons', and more frequently provide 'Debuffs' to the 'General' to whom they are attached.  However, the Spiritual Beast provides a smaller
+      total number of Buffs/Debuffs, and there is less potential room for growth in the value of these Buffs/Debuffs.
+    related_terms:
+      - Buff
+      - Debuff
+      - Dragon
+      - General
+  - term: Specialty
+    definition: >-
+      Each 'General' has either three or four slots for 'Specialties.'  In Gold and Red Historical Generals with slots for four specialties, the
+      fourth specialty is different in certain ways. 1) It is always unique to that 'General.' 2) It can only be activated once the first three
+      are fully developed to 'Gold' level.  3) When the first three *are* developed to 'Gold' level, the 'Green' level of this fourth specialty
+      is automatically activated.  Specialties have levels 'Green', 'Blue', 'Purple', 'Orange', and 'Gold' levels, in that order, with each
+      requiring a greater number of the corresponding 'Rune Stone' resource to activate.  Obtaining these Rune Stones is one of the major limitations
+      in developing a 'General.'  On Generals with four specialties, a fifth "flex specialty" may be attached once the fourth is at least partly developed.
+    related_terms:
+      - General

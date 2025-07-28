@@ -1,98 +1,98 @@
 ---
 levels:
-- buffs:
-  - attribute: Attack
-    conditions:
-    - In City
-    passive: 0
-    targetedType: Ranged Troops
-    value:
-      number: 0
-      unit: percentage
-  - attribute: Attack
-    conditions:
-    - In City
-    passive: 0
-    targetedType: Siege Machines
-    value:
-      number: 0
-      unit: percentage
-  level: Green
-  text: ''
-- buffs:
-  - attribute: Attack
-    conditions:
-    - In City
-    passive: 0
-    targetedType: Ranged Troops
-    value:
-      number: 0
-      unit: percentage
-  - attribute: Attack
-    conditions:
-    - In City
-    passive: 0
-    targetedType: Siege Machines
-    value:
-      number: 0
-      unit: percentage
-  level: Blue
-  text: ''
-- buffs:
-  - attribute: Attack
-    conditions:
-    - In City
-    passive: 0
-    targetedType: Ranged Troops
-    value:
-      number: 0
-      unit: percentage
-  - attribute: Attack
-    conditions:
-    - In City
-    passive: 0
-    targetedType: Siege Machines
-    value:
-      number: 0
-      unit: percentage
-  level: Purple
-  text: ''
-- buffs:
-  - attribute: Attack
-    conditions:
-    - In City
-    passive: 0
-    targetedType: Ranged Troops
-    value:
-      number: 0
-      unit: percentage
-  - attribute: Attack
-    conditions:
-    - In City
-    passive: 0
-    targetedType: Siege Machines
-    value:
-      number: 0
-      unit: percentage
-  level: Orange
-  text: ''
-- buffs:
-  - attribute: Attack
-    conditions:
-    - In City
-    passive: 0
-    targetedType: Ranged Troops
-    value:
-      number: 26
-      unit: percentage
-  - attribute: Attack
-    conditions:
-    - In City
-    passive: 0
-    targetedType: Siege Machines
-    value:
-      number: 26
-      unit: percentage
-  level: Gold
-  text: In-city Ranged Troop and Siege Machine Attack +26%
+  - buffs:
+      - attribute: Attack
+        conditions:
+          - In City
+        passive: 0
+        targetedType: Ranged Troops
+        value:
+          number: 4
+          unit: percentage
+      - attribute: Attack
+        conditions:
+          - In City
+        passive: 0
+        targetedType: Siege Machines
+        value:
+          number: 4
+          unit: percentage
+    level: Green
+    text: In-city Ranged Troop and Siege Machine Attack +4%.
+  - buffs:
+      - attribute: Attack
+        conditions:
+          - In City
+        passive: 0
+        targetedType: Ranged Troops
+        value:
+          number: 4
+          unit: percentage
+      - attribute: Attack
+        conditions:
+          - In City
+        passive: 0
+        targetedType: Siege Machines
+        value:
+          number: 4
+          unit: percentage
+    level: Blue
+    text: In-city Ranged Troop and Siege Machine Attack +4%.
+  - buffs:
+      - attribute: Attack
+        conditions:
+          - In City
+        passive: 0
+        targetedType: Ranged Troops
+        value:
+          number: 7
+          unit: percentage
+      - attribute: Attack
+        conditions:
+          - In City
+        passive: 0
+        targetedType: Siege Machines
+        value:
+          number: 7
+          unit: percentage
+    level: Purple
+    text: In-city Ranged Troop and Siege Machine Attack +7%.
+  - buffs:
+      - attribute: Attack
+        conditions:
+          - In City
+        passive: 0
+        targetedType: Ranged Troops
+        value:
+          number: 7
+          unit: percentage
+      - attribute: Attack
+        conditions:
+          - In City
+        passive: 0
+        targetedType: Siege Machines
+        value:
+          number: 7
+          unit: percentage
+    level: Orange
+    text: In-city Ranged Troop and Siege Machine Attack +7%.
+  - buffs:
+      - attribute: Attack
+        conditions:
+          - In City
+        passive: 0
+        targetedType: Ranged Troops
+        value:
+          number: 14
+          unit: percentage
+      - attribute: Attack
+        conditions:
+          - In City
+        passive: 0
+        targetedType: Siege Machines
+        value:
+          number: 26
+          unit: percentage
+    level: Gold
+    text: In-city Ranged Troop and Siege Machine Attack +14%
 name: Battle of Manila Bay
