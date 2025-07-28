@@ -19,8 +19,8 @@ can skip it and dive right in here.
 Your Siege generals will be the _last_ PvP generals you invest [rune stones]
 and [BoA] on. This is because siege troops require gems to heal.
 
-[rune stones]: ../../reference/glossary/#rune_stones
-[BoA]: ../../reference/glossary/#BoA
+[rune stones]: ../../Reference/Glossary/#rune_stones
+[BoA]: ../../Reference/Glossary/#BoA
 
 ### For Free to Play Players:
 
@@ -40,8 +40,8 @@ However, my analysis indicates that **[Suleiman the Magnificent]** is consistent
 
 He is thus my recommendation. You should then pick one of the many premium generals that [Suleiman] pairs with as your assistant.
 
-[debuffs]: ../../reference/glossary/#debuff
-[ascended]: ../../reference/glossary/#ascend
+[debuffs]: ../../Reference/Glossary/#debuff
+[ascended]: ../../Reference/Glossary/#ascend
 
 ### For Light Spenders
 
@@ -72,9 +72,9 @@ If you are a light spender, I strongly recommend accepting the smaller attack [b
 [wall]: ../wall/
 [ground]: ../ground/
 [ranged]: ../ranged/
-[ascend]: ../../reference/glossary/#ascend
-[BoC]: ../../reference/glossary/#BoC
-[BoG]: ../../reference/glossary/#BoG
-[buff]: ../../reference/glossary/#buff
-[PvP]: ../../reference/glossary/#pvp
+[ascend]: ../../Reference/Glossary/#ascend
+[BoC]: ../../Reference/Glossary/#BoC
+[BoG]: ../../Reference/Glossary/#BoG
+[buff]: ../../Reference/Glossary/#buff
+[PvP]: ../../Reference/Glossary/#pvp
 [Monster]: ../monster_hunters/

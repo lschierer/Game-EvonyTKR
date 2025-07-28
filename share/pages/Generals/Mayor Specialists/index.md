@@ -43,7 +43,7 @@ At this time, I do not recommend the use of peace time mayors for either free
 or light spenders. I explain why [here][peace].
 
 [peace]: ../peace_time_subcity_mayors/
-[debuff]: ../../reference/glossary/#debuff
+[debuff]: ../../Reference/Glossary/#debuff
 
 In the [Mayor Comparison Table], see how radically the lists change as you look at different levels of investment in your mayors. I recommend Free Players set the investment level selectors to a low Covenant level, 2 or 3 Red Ascending Stars, and 3 Purple Specialties for the first 3 Specialties. Unless you know yourself to be able to invest highly, you should otherwise set the Specialty levels no higher than 3 Orange and 3 or 4 Red Stars.
 

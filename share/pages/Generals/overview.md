@@ -136,10 +136,10 @@ Remember, that ascending an assistant *can* help activate a covenant *some* but
 
 [^Note]: **_DO NOT_** start building a ton of this troop type *yet*.  You need to be able to [ghost].  Your total number of troops should be less than or equal to the size of your march (with march increase [buffs]) times the number of marches you have available to you.
 
-[ghost]: /Reference/glossary/#ghost
-[buff]: /Reference/glossary/#buff
-[buffs]: /Reference/glossary/#buff
-[ascend]: ../../reference/glossary/#ascend
+[ghost]: /Reference/Glossary/#ghost
+[buff]: /Reference/Glossary/#buff
+[buffs]: /Reference/Glossary/#buff
+[ascend]: ../../Reference/Glossary/#ascend
 
 [^many]: "Many" tokens is defined as:
     * _**NO MATTER WHAT, NO LESS THAN 50**_ tokens.

@@ -26,4 +26,4 @@ Measure this by attacking an empty keep and looking at the report.
 Do not [splat][]. This will just annoy the other players on your server. While
 it might generate lots of points, it will not help your server win.
 
-[splat]: ../../reference/glossary#spat
+[splat]: ../../Reference/Glossary#spat

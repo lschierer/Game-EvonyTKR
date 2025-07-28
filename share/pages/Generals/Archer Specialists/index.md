@@ -60,6 +60,6 @@ primary general who is compatible with one of your main PvP generals.  Use the P
 
 [Attacking Archer Pairs table]: </Generals/Archer%20Specialists/Attacking/pair-comparison>
 
-[buff]: ../../reference/glossary/#buff
-[buffs]: ../../reference/glossary/#buff
+[buff]: ../../Reference/Glossary/#buff
+[buffs]: ../../Reference/Glossary/#buff
 [Overview]: ../overview/

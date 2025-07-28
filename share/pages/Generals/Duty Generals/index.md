@@ -264,5 +264,5 @@ Speed. There are strong arguments both ways.
     - All Troop HP Increase (when Rally Spot Officer): +5%
     - March Size Increase (when Rally Spot Officer): +9%
 
-[debuffs]: ../../reference/glossary#debuff
-[buffs]: ../../reference/glossary#buff
+[debuffs]: ../../Reference/Glossary#debuff
+[buffs]: ../../Reference/Glossary#buff
