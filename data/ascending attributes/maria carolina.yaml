@@ -1,0 +1,91 @@
+---
+ascending:
+- buffs:
+  - attribute: Attack
+    targetedType: Ground Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: Defense
+    targetedType: Ground Troops
+    value:
+      number: 5
+      unit: percentage
+  - attribute: HP
+    targetedType: Ground Troops
+    value:
+      number: 5
+      unit: percentage
+  level: red1
+  text: Ground Troop Attack +10%, Defense and HP +5%
+- buffs:
+  - attribute: Death to Wounded
+    conditions:
+    - Attacking
+    targetedType: ''
+    value:
+      number: 8
+      unit: percentage
+  level: red2
+  text: Attacking Troop Death into Wounded Rate +8%
+- buffs:
+  - attribute: Attack
+    targetedType: Ground Troops
+    value:
+      number: 20
+      unit: percentage
+  - attribute: Attack
+    targetedType: Mounted Troops
+    value:
+      number: 20
+      unit: percentage
+  - attribute: Defense
+    targetedType: Ground Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: HP
+    targetedType: Ground Troops
+    value:
+      number: 10
+      unit: percentage
+  level: red3
+  text: Ground Troop and Mounted Troop Attack +20%, Ground Troop Defense and HP +10%
+- buffs:
+  - attribute: Attack
+    targetedType: Ground Troops
+    value:
+      number: 20
+      unit: percentage
+  - attribute: HP
+    targetedType: Ground Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: HP
+    targetedType: Mounted Troops
+    value:
+      number: 10
+      unit: percentage
+  level: red4
+  text: Ground Troop Attack +20%, Ground Troop and Mounted Troop HP +10%
+- buffs:
+  - attribute: Attack
+    targetedType: Ground Troops
+    value:
+      number: 30
+      unit: percentage
+  - attribute: Defense
+    targetedType: Ground Troops
+    value:
+      number: 25
+      unit: percentage
+  - attribute: HP
+    targetedType: Ground Troops
+    value:
+      number: 25
+      unit: percentage
+  level: red5
+  text: Ground Troop Attack +30%, Defense and HP +25%
+general: Maria Carolina
+id: Maria Carolina

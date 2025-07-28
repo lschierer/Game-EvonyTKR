@@ -1,83 +1,107 @@
 ---
 ascending:
-  - level: red1
-    buff:
-      - attribute: HP
-        condition:
-          - Against Monsters
-        class: Mounted Troops
-        value:
-          number: 30
-          unit: percentage
-      - attribute: Defense
-        condition:
-          - Against Monsters
-        value:
-          number: 10
-          unit: percentage
-  - level: red2
-    buff:
-      - attribute: Defense
-        condition:
-          - Monsters
-        value:
-          number: 10
-          unit: percentage
-      - attribute: HP
-        condition:
-          - Against Monsters
-        value:
-          number: 15
-          unit: percentage
-  - level: red3
-    buff:
-      - attribute: Attack
-        condition:
-          - Monsters
-        value:
-          number: 10
-          unit: percentage
-      - attribute: Defense
-        condition:
-          - Against Monsters
-        value:
-          number: 20
-          unit: percentage
-  - level: red4
-    buff:
-      - attribute: Attack
-        condition:
-          - Against Monsters
-        class: Mounted Troops
-        value:
-          number: 15
-          unit: percentage
-      - attribute: HP
-        condition:
-          - Against Monsters
-        value:
-          number: 20
-          unit: percentage
-  - level: red5
-    buff:
-      - attribute: Attack
-        condition:
-          - Against Monsters
-        class: Mounted Troops
-        value:
-          number: 20
-          unit: percentage
-      - attribute: Defense
-        condition:
-          - Against Monsters
-        value:
-          number: 10
-          unit: percentage
-      - attribute: HP
-        condition:
-          - Against Monsters
-        value:
-          number: 10
-          unit: percentage
+- buffs:
+  - attribute: HP
+    conditions:
+    - Against Monsters
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 30
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - Against Monsters
+    passive: 0
+    targetedType: ''
+    value:
+      number: 10
+      unit: percentage
+  level: red1
+  text: When attacking Monsters, Mounted Troop HP +30%, Troops Defense +10%.
+- buffs:
+  - attribute: Defense
+    conditions:
+    - Monsters
+    passive: 0
+    targetedType: ''
+    value:
+      number: 10
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - Against Monsters
+    passive: 0
+    targetedType: ''
+    value:
+      number: 15
+      unit: percentage
+  level: red2
+  text: When attacking Monsters, Monsters Defense -10%, Troops HP +15%.
+- buffs:
+  - attribute: Attack
+    conditions:
+    - Monsters
+    passive: 0
+    targetedType: ''
+    value:
+      number: 10
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - Against Monsters
+    passive: 0
+    targetedType: ''
+    value:
+      number: 20
+      unit: percentage
+  level: red3
+  text: When attacking Monsters, Monsters Attack -10%, Troops Defense +20%.
+- buffs:
+  - attribute: Attack
+    conditions:
+    - Against Monsters
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 15
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - Against Monsters
+    passive: 0
+    targetedType: ''
+    value:
+      number: 20
+      unit: percentage
+  level: red4
+  text: When attacking Monsters, Mounted Troop Attack +15%, Troops HP +20%.
+- buffs:
+  - attribute: Attack
+    conditions:
+    - Against Monsters
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 20
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - Against Monsters
+    passive: 0
+    targetedType: ''
+    value:
+      number: 10
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - Against Monsters
+    passive: 0
+    targetedType: ''
+    value:
+      number: 10
+      unit: percentage
+  level: red5
+  text: When attacking Monsters, Mounted Troop Attack +20%, Troops Defense and HP +10%.
 general: Aethelflaed
 id: Aethelflaed

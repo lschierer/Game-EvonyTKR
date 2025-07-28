@@ -1,0 +1,24 @@
+ascending: 1
+basic_attributes:
+  attack:
+    base: 133
+    increment: 8.83
+  defense:
+    base: 126
+    increment: 8.7
+  leadership:
+    base: 121
+    increment: 8.57
+  politics:
+    base: 119
+    increment: 8.57
+book: Hora Quirini
+name: Hersilia
+specialties:
+  - Siege Machine Formation
+  - Siege
+  - Siege Machine Ares
+  - Court of the Arts
+stars: red5
+type:
+  - siege_specialist

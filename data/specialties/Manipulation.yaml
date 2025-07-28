@@ -2,41 +2,41 @@
 name: Manipulation
 levels:
   - level: Green
-    buff:
+    buffs:
       - attribute: Defense
-        condition:
+        conditions:
           - Enemy
         value:
           number: 2
           unit: percentage
   - level: Blue
-    buff:
+    buffs:
       - attribute: Defense
-        condition:
+        conditions:
           - Enemy
         value:
           number: 2
           unit: percentage
   - level: Purple
-    buff:
+    buffs:
       - attribute: Defense
-        condition:
+        conditions:
           - Enemy
         value:
           number: 3
           unit: percentage
   - level: Orange
-    buff:
+    buffs:
       - attribute: Defense
-        condition:
+        conditions:
           - Enemy
         value:
           number: 3
           unit: percentage
   - level: Gold
-    buff:
+    buffs:
       - attribute: Defense
-        condition:
+        conditions:
           - Enemy
         value:
           number: 6

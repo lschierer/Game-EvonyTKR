@@ -1,22 +1,22 @@
 ---
 name: Glorious Blade
-buff:
+buffs:
   - attribute: HP
-    condition:
+    conditions:
       - When Defending Outside The Main City
     targetedType: Ground Troops
     value:
       number: 50
       unit: percentage
   - attribute: Attack
-    condition:
+    conditions:
       - When Defending Outside The Main City
     targetedType: Ground Troops
     value:
       number: 40
       unit: percentage
   - attribute: Defense
-    condition:
+    conditions:
       - When Defending Outside The Main City
     targetedType: Ground Troops
     value:

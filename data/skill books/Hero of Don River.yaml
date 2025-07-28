@@ -1,17 +1,31 @@
 ---
+buffs:
+- attribute: Defense
+  conditions:
+  - leading the army
+  - Reinforcing
+  passive: 0
+  targetedType: Ground Troops
+  value:
+    number: 20
+    unit: percentage
+- attribute: HP
+  conditions:
+  - leading the army
+  - Reinforcing
+  passive: 0
+  targetedType: Ground Troops
+  value:
+    number: 20
+    unit: percentage
+- attribute: Attack
+  conditions:
+  - leading the army
+  - Reinforcing
+  passive: 0
+  targetedType: Ranged Troops
+  value:
+    number: 30
+    unit: percentage
 name: Hero of Don River
-buff:
-  - attribute: HP
-    condition:
-      - Reinforcing
-    targetedType: Ground Troops
-    value:
-      number: 20
-      unit: percentage
-  - attribute: Attack
-    condition:
-      - Reinforcing
-    targetedType: Ranged Troops
-    value:
-      number: 30
-      unit: percentage
+text: Increases the ground troops’ defense and HP by 20% and ranged troops’ attack by 30% when General is leading the army to reinforce.

@@ -1,0 +1,167 @@
+name: Champion Gladiator
+levels:
+  - level: Green
+    text: Attacking Ground Troop Attack +5%. Attacking Mounted Troop and Ground Troop Defense +3%. Attacking Mounted Troop and Ground Troop HP +3%.
+    buffs:
+      - attribute: Attack
+        troop: Ground Troops
+        value:
+          number: 5
+        conditions:
+          - Attacking
+      - attribute: Defense
+        troop: Mounted Troops
+        value:
+          number: 3
+        conditions:
+          - Attacking
+      - attribute: Defense
+        troop: Ground Troops
+        value:
+          number: 3
+        conditions:
+          - Attacking
+      - attribute: HP
+        troop: Mounted Troops
+        value:
+          number: 3
+        conditions:
+          - Attacking
+      - attribute: HP
+        troop: Ground Troops
+        value:
+          number: 3
+        conditions:
+          - Attacking
+  - level: Blue
+    text: Attacking Ground Troop Attack +5%. Attacking Mounted Troop and Ground Troop Defense +3%. Attacking Mounted Troop and Ground Troop HP +3%.
+    buffs:
+      - attribute: Attack
+        troop: Ground Troops
+        value:
+          number: 5
+        conditions:
+          - Attacking
+      - attribute: Defense
+        troop: Mounted Troops
+        value:
+          number: 3
+        conditions:
+          - Attacking
+      - attribute: Defense
+        troop: Ground Troops
+        value:
+          number: 3
+        conditions:
+          - Attacking
+      - attribute: HP
+        troop: Mounted Troops
+        value:
+          number: 3
+        conditions:
+          - Attacking
+      - attribute: HP
+        troop: Ground Troops
+        value:
+          number: 3
+        conditions:
+          - Attacking
+  - level: Purple
+    text: Attacking Ground Troop Attack +10%. Attacking Mounted Troop and Ground Troop Defense +6%. Attacking Mounted Troop and Ground Troop HP +6%.
+    buffs:
+      - attribute: Attack
+        troop: Ground Troops
+        value:
+          number: 10
+        conditions:
+          - Attacking
+      - attribute: Defense
+        troop: Mounted Troops
+        value:
+          number: 6
+        conditions:
+          - Attacking
+      - attribute: Defense
+        troop: Ground Troops
+        value:
+          number: 6
+        conditions:
+          - Attacking
+      - attribute: HP
+        troop: Mounted Troops
+        value:
+          number: 6
+        conditions:
+          - Attacking
+      - attribute: HP
+        troop: Ground Troops
+        value:
+          number: 6
+        conditions:
+          - Attacking
+  - level: Orange
+    text: Attacking Ground Troop Attack +10%. Attacking Mounted Troop and Ground Troop Defense +6%. Attacking Mounted Troop and Ground Troop HP +6%.
+    buffs:
+      - attribute: Attack
+        troop: Ground Troops
+        value:
+          number: 10
+        conditions:
+          - Attacking
+      - attribute: Defense
+        troop: Mounted Troops
+        value:
+          number: 6
+        conditions:
+          - Attacking
+      - attribute: Defense
+        troop: Ground Troops
+        value:
+          number: 6
+        conditions:
+          - Attacking
+      - attribute: HP
+        troop: Mounted Troops
+        value:
+          number: 6
+        conditions:
+          - Attacking
+      - attribute: HP
+        troop: Ground Troops
+        value:
+          number: 6
+        conditions:
+          - Attacking
+  - level: Gold
+    text: Attacking Ground Troop Attack +20%. Attacking Mounted Troop and Ground Troop Defense +12%. Attacking Mounted Troop and Ground Troop HP +12%.
+    buffs:
+      - attribute: Attack
+        troop: Ground Troops
+        value:
+          number: 20
+        conditions:
+          - Attacking
+      - attribute: Defense
+        troop: Mounted Troops
+        value:
+          number: 12
+        conditions:
+          - Attacking
+      - attribute: Defense
+        troop: Ground Troops
+        value:
+          number: 12
+        conditions:
+          - Attacking
+      - attribute: HP
+        troop: Mounted Troops
+        value:
+          number: 12
+        conditions:
+          - Attacking
+      - attribute: HP
+        troop: Ground Troops
+        value:
+          number: 12
+        conditions:
+          - Attacking

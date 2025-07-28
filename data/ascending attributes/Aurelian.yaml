@@ -1,108 +1,131 @@
 ---
 ascending:
-  - level: red1
-    buff:
-      - attribute: Defense
-        condition:
-          - Marching
-        passive: 0
-        class: Ground Troops
-        value:
-          number: 10
-          unit: percentage
-      - attribute: Defense
-        condition:
-          - Marching
-        passive: 0
-        class: Mounted Troops
-        value:
-          number: 10
-          unit: percentage
-      - attribute: HP
-        condition:
-          - Marching
-        passive: 0
-        class: Ground Troops
-        value:
-          number: 10
-          unit: percentage
-      - attribute: HP
-        condition:
-          - Marching
-        passive: 0
-        class: Mounted Troops
-        value:
-          number: 10
-          unit: percentage
-    text: Marching Ground Troop and Mounted Troop Defense +10% and HP +10%.
-  - level: red2
-    buff:
-      - attribute: Wounded to Death
-        condition:
-          - Enemy
-          - In City
-        passive: 0
-        class: ''
-        value:
-          number: 10
-          unit: percentage
-    text: Enemy In-city Troop Wounded into Death rate +10%.
-  - level: red3
-    buff: []
-    text: When attacking, Ground Troop Defense and HP +10%, March Size Capacity +8%.
-  - level: red4
-    buff:
-      - attribute: Attack
-        condition:
-          - Marching
-        passive: 0
-        class: Ground Troops
-        value:
-          number: 15
-          unit: percentage
-      - attribute: Defense
-        condition:
-          - Marching
-        passive: 0
-        class: Ground Troops
-        value:
-          number: 25
-          unit: percentage
-      - attribute: Defense
-        condition:
-          - Marching
-        passive: 0
-        class: Mounted Troops
-        value:
-          number: 25
-          unit: percentage
-    text: Marching Ground Troop Attack +15%, Marching Ground Troop and Mounted Troop Defense +25%.
-  - level: red5
-    buff:
-      - attribute: Attack
-        condition:
-          - Marching
-        passive: 0
-        class: Ground Troops
-        value:
-          number: 20
-          unit: percentage
-      - attribute: Defense
-        condition:
-          - Marching
-        passive: 0
-        class: Ground Troops
-        value:
-          number: 20
-          unit: percentage
-      - attribute: HP
-        condition:
-          - Marching
-        passive: 0
-        class: Ground Troops
-        value:
-          number: 20
-          unit: percentage
-    text: Marching Ground Troop Attack +20%, Defense and HP +20%.
+- buffs:
+  - attribute: Defense
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 10
+      unit: percentage
+  level: red1
+  text: Marching Ground Troop and Mounted Troop Defense +10% and HP +10%.
+- buffs:
+  - attribute: Wounded to Death
+    conditions:
+    - Enemy
+    - In City
+    passive: 0
+    targetedType: ''
+    value:
+      number: 10
+      unit: percentage
+  level: red2
+  text: Enemy In-city Troop Wounded into Death rate +10%.
+- buffs:
+  - attribute: Defense
+    conditions:
+    - Attacking
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - Attacking
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: March Size
+    conditions: []
+    passive: 0
+    targetedType: ''
+    value:
+      number: 8
+      unit: percentage
+  level: red3
+  text: When attacking, Ground Troop Defense and HP +10%, March Size Capacity +8%.
+- buffs:
+  - attribute: Attack
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 15
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 25
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 25
+      unit: percentage
+  level: red4
+  text: Marching Ground Troop Attack +15%, Marching Ground Troop and Mounted Troop Defense +25%.
+- buffs:
+  - attribute: Attack
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 20
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 20
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 20
+      unit: percentage
+  level: red5
+  text: Marching Ground Troop Attack +20%, Defense and HP +20%.
 general: Aurelian
 id: Aurelian

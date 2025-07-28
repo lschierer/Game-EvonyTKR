@@ -1,0 +1,40 @@
+---
+buffs:
+- attribute: Attack
+  conditions:
+  - Enemy
+  - leading the army
+  passive: 0
+  targetedType: Ranged Troops
+  value:
+    number: 10
+    unit: percentage
+- attribute: Attack
+  conditions:
+  - Enemy
+  - leading the army
+  passive: 0
+  targetedType: Siege Machines
+  value:
+    number: 10
+    unit: percentage
+- attribute: Defense
+  conditions:
+  - Enemy
+  - leading the army
+  passive: 0
+  targetedType: Ground Troops
+  value:
+    number: 20
+    unit: percentage
+- attribute: Defense
+  conditions:
+  - Enemy
+  - leading the army
+  passive: 0
+  targetedType: Mounted Troops
+  value:
+    number: 20
+    unit: percentage
+name: Hero of the Union Navy
+text: Reduces enemy ranged troops and siege machines’ attack by 10% and enemy ground troops and mounted troops’ defense by 20% when General is leading the army.

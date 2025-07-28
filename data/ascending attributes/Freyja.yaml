@@ -1,102 +1,102 @@
 ---
 ascending:
   - level: "red1"
-    buff:
+    buffs:
       - attribute: HP
-        condition:
+        conditions:
           - When Defending Outside The Main City
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 20
           unit: percentage
       - attribute: Attack
-        condition:
+        conditions:
           - When Defending Outside The Main City
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 10
           unit: percentage
   - level: "red2"
-    buff:
+    buffs:
       - attribute: Death to Wounded
-        condition:
+        conditions:
           - When Defending Outside The Main City
         value:
           number: 8
           unit: percentage
       - attribute: Attack
-        condition:
+        conditions:
           - When Defending Outside The Main City
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 10
           unit: percentage
       - attribute: Attack
-        condition:
+        conditions:
           - When Defending Outside The Main City
-        class: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 10
           unit: percentage
   - level: "red3"
-    buff:
+    buffs:
       - attribute: March Size
         value:
           number: 12
           unit: percentage
       - attribute: Attack
-        condition:
+        conditions:
           - When Defending Outside The Main City
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 10
           unit: percentage
       - attribute: Attack
-        condition:
+        conditions:
           - When Defending Outside The Main City
-        class: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 10
           unit: percentage
   - level: "red4"
-    buff:
+    buffs:
       - attribute: HP
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 30
           unit: percentage
       - attribute: Attack
-        condition:
+        conditions:
           - When Defending Outside The Main City
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 15
           unit: percentage
       - attribute: Attack
-        condition:
+        conditions:
           - When Defending Outside The Main City
-        class: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 15
           unit: percentage
   - level: "red5"
-    buff:
+    buffs:
       - attribute: Attack
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 50
           unit: percentage
       - attribute: Attack
-        condition:
+        conditions:
           - When Defending Outside The Main City
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 35
           unit: percentage
       - attribute: Defense
-        condition:
+        conditions:
           - When Defending Outside The Main City
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 35
           unit: percentage

@@ -2,30 +2,30 @@
 name: Dragon Slayer
 text: >-
   Increases mounted troops’ attack and defense by 35% and increases ground troops and mounted troops’ HP by 30% when General is leading the army to attack.
-buff:
+buffs:
   - attribute: Attack
-    condition:
+    conditions:
       - Attacking
     targetedType: Mounted Troops
     value:
       number: 35
       unit: percentage
   - attribute: Defense
-    condition:
+    conditions:
       - Attacking
     targetedType: Mounted Troops
     value:
       number: 35
       unit: percentage
   - attribute: HP
-    condition:
+    conditions:
       - Attacking
     targetedType: Ground Troops
     value:
       number: 30
       unit: percentage
   - attribute: HP
-    condition:
+    conditions:
       - Attacking
     targetedType: Mounted Troops
     value:

@@ -1,32 +1,31 @@
 ---
-buff:
-  - attribute: Attack
-    condition:
-      - leading the army
-      - Attacking
-    passive: 0
-    targetedType: Ground Troops
-    value:
-      number: 40
-      unit: percentage
-  - attribute: HP
-    condition:
-      - leading the army
-      - Attacking
-    passive: 0
-    targetedType: Ground Troops
-    value:
-      number: 35
-      unit: percentage
-  - attribute: HP
-    condition:
-      - leading the army
-      - Attacking
-    passive: 0
-    targetedType: Mounted Troops
-    value:
-      number: 35
-      unit: percentage
+buffs:
+- attribute: Attack
+  conditions:
+  - leading the army
+  - Attacking
+  passive: 0
+  targetedType: Ground Troops
+  value:
+    number: 40
+    unit: percentage
+- attribute: HP
+  conditions:
+  - leading the army
+  - Attacking
+  passive: 0
+  targetedType: Ground Troops
+  value:
+    number: 35
+    unit: percentage
+- attribute: HP
+  conditions:
+  - leading the army
+  - Attacking
+  passive: 0
+  targetedType: Mounted Troops
+  value:
+    number: 35
+    unit: percentage
 name: Restorer of the World
-text: >-
-  Increases ground troops’ attack by 40% and increases ground troops and mounted troops’ HP by 35% when General is leading the army to attack.
+text: Increases ground troops’ attack by 40% and increases ground troops and mounted troops’ HP by 35% when General is leading the army to attack.

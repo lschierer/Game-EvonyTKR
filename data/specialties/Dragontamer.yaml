@@ -2,80 +2,80 @@
 name: Dragontamer
 levels:
   - level: Green
-    buff:
+    buffs:
       - attribute: Attack
-        condition:
+        conditions:
           - brings a dragon
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 3
           unit: percentage
       - attribute: HP
-        condition:
+        conditions:
           - brings a dragon
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 3
           unit: percentage
   - level: Blue
-    buff:
+    buffs:
       - attribute: Attack
-        condition:
+        conditions:
           - brings a dragon
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 3
           unit: percentage
       - attribute: HP
-        condition:
+        conditions:
           - brings a dragon
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 3
           unit: percentage
   - level: Purple
-    buff:
+    buffs:
       - attribute: Attack
-        condition:
+        conditions:
           - brings a dragon
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 6
           unit: percentage
       - attribute: HP
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 6
           unit: percentage
   - level: Orange
-    buff:
+    buffs:
       - attribute: Attack
-        condition:
+        conditions:
           - brings a dragon
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 6
           unit: percentage
       - attribute: HP
-        condition:
+        conditions:
           - brings a dragon
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 6
           unit: percentage
   - level: Gold
-    buff:
+    buffs:
       - attribute: Attack
-        condition:
+        conditions:
           - brings a dragon
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 12
           unit: percentage
       - attribute: HP
-        condition:
+        conditions:
           - brings a dragon
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 12
           unit: percentage

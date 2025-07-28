@@ -1,97 +1,116 @@
 ---
 ascending:
-  - level: "red1"
-    buff:
-      - attribute: Defense
-        condition:
-          - Marching
-        class: Ground Troops
-        value:
-          number: 10
-          unit: percentage
-      - attribute: Defense
-        condition:
-          - Marching
-        class: Mounted Troops
-        value:
-          number: 10
-          unit: percentage
-      - attribute: HP
-        condition:
-          - Marching
-        class: Ground Troops
-        value:
-          number: 10
-          unit: percentage
-      - attribute: HP
-        condition:
-          - Marching
-        class: Mounted Troops
-        value:
-          number: 10
-          unit: percentage
-  - level: "red2"
-    buff:
-      - attribute: Wounded to Death
-        condition:
-          - Enemy
-          - In City
-        value:
-          number: 10
-          unit: percentage
-  - level: "red3"
-    buff:
-      - attribute: Rally Capacity
-        condition:
-          - When Rallying
-        value:
-          number: 8
-          unit: percentage
-  - level: "red4"
-    buff:
-      - attribute: Attack
-        class: Mounted Troops
-        condition:
-          - Marching
-        value:
-          number: 10
-          unit: percentage
-      - attribute: HP
-        class: Ground Troops
-        condition:
-          - Marching
-        value:
-          number: 15
-          unit: percentage
-      - attribute: HP
-        class: Mounted Troops
-        condition:
-          - Marching
-        value:
-          number: 15
-          unit: percentage
-  - level: "red5"
-    buff:
-      - attribute: Attack
-        condition:
-          - Marching
-        class: Mounted Troops
-        value:
-          number: 15
-          unit: percentage
-      - attribute: Defense
-        condition:
-          - Marching
-        class: Mounted Troops
-        value:
-          number: 20
-          unit: percentage
-      - attribute: Defense
-        condition:
-          - Marching
-        class: Ground Troops
-        value:
-          number: 20
-          unit: percentage
+- buffs:
+  - attribute: Defense
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 10
+      unit: percentage
+  level: red1
+  text: Marching Ground Troop and Mounted Troop Defense +10% and HP +10%.
+- buffs:
+  - attribute: Wounded to Death
+    conditions:
+    - Enemy
+    - In City
+    passive: 0
+    targetedType: ''
+    value:
+      number: 10
+      unit: percentage
+  level: red2
+  text: Enemy in-city Troop Wounded into Death rate +10%.
+- buffs:
+  - attribute: Rally Capacity
+    conditions:
+    - When Rallying
+    passive: 0
+    targetedType: ''
+    value:
+      number: 8
+      unit: percentage
+  level: red3
+  text: When General is launching Alliance War, Rally Capacity +8%.
+- buffs:
+  - attribute: Attack
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 15
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 15
+      unit: percentage
+  level: red4
+  text: Marching Mounted Troop Attack +10%, Marching Ground Troop and Mounted Troop HP +15%.
+- buffs:
+  - attribute: Attack
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 15
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 20
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 20
+      unit: percentage
+  level: red5
+  text: Marching Mounted Troop Attack +15%, Marching Ground Troop and Mounted Troop Defense +20%.
 general: George A Custer
 id: George A Custer

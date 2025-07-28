@@ -1,74 +1,91 @@
 ---
 ascending:
-  - level: "red1"
-    buff:
-      - attribute: Attack
-        class: Ranged Troops
-        condition:
-          - Marching
-        value:
-          number: 10
-          unit: percentage
-      - attribute: Defense
-        class: Mounted Troops
-        condition:
-          - Marching
-        value:
-          number: 20
-          unit: percentage
-  - level: "red2"
-    buff:
-      - attribute: Wounded to Death
-        condition:
-          - Enemy
-          - In City
-        value:
-          number: 10
-          unit: percentage
-  - level: "red3"
-    buff:
-      - attribute: March Size
-        value:
-          number: 14
-          unit: percentage
-  - level: "red4"
-    buff:
-      - attribute: Attack
-        class: Ranged Troops
-        condition:
-          - Marching
-        value:
-          number: 20
-          unit: percentage
-      - attribute: HP
-        class: Mounted Troops
-        condition:
-          - Marching
-        value:
-          number: 20
-          unit: percentage
-  - level: "red5"
-    buff:
-      - attribute: Attack
-        class: Mounted Troops
-        condition:
-          - Marching
-        value:
-          number: 20
-          unit: percentage
-      - attribute: Defense
-        condition:
-          - Marching
-        class: Mounted Troops
-        value:
-          number: 15
-          unit: percentage
-      - attribute: HP
-        condition:
-          - Marching
-        class: Mounted Troops
-        value:
-          number: 15
-          unit: percentage
+- buffs:
+  - attribute: Attack
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 20
+      unit: percentage
+  level: red1
+  text: Marching Ranged Troop Attack +10%, Marching Mounted Troop Defense +20%.
+- buffs:
+  - attribute: Wounded to Death
+    conditions:
+    - Enemy
+    - In City
+    passive: 0
+    targetedType: ''
+    value:
+      number: 10
+      unit: percentage
+  level: red2
+  text: Enemy In-city Troop Wounded into Death rate +10%.
+- buffs:
+  - attribute: March Size
+    conditions: []
+    passive: 0
+    targetedType: ''
+    value:
+      number: 14
+      unit: percentage
+  level: red3
+  text: March Size Capacity +14%.
+- buffs:
+  - attribute: Attack
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 20
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 20
+      unit: percentage
+  level: red4
+  text: Marching Ranged Troop Attack +20%, Marching Mounted Troop HP +20%.
+- buffs:
+  - attribute: Attack
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 20
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 15
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 15
+      unit: percentage
+  level: red5
+  text: Marching Mounted Troop Attack +20%, Defense and HP +15%.
 general: Gaius Octavius
 id: Gaius Octavius

@@ -1,0 +1,12 @@
+name: Queen of Britain
+levels:
+  - level: Green
+    text: All Troops HP +1%
+  - level: Blue
+    text: All Troops HP +1%
+  - level: Purple
+    text: All Troops HP +2%
+  - level: Orange
+    text: All Troops HP +2%
+  - level: Gold
+    text: All Troops HP +4%

@@ -1,0 +1,122 @@
+name: Battle of Pavia
+levels:
+  - level: Green
+    text: Attacking Ground Troop Attack +4%. Attacking Ground Troop Defense +3%. Attacking Ground Troop HP +3%.
+    buffs:
+      - attribute: Attack
+        class: Ground Troops
+        conditions:
+          - Attacking
+        value:
+          number: 4
+          unit: percentage
+      - attribute: Defense
+        class: Ground Troops
+        conditions:
+          - Attacking
+        value:
+          number: 3
+          unit: percentage
+      - attribute: HP
+        class: Ground Troops
+        conditions:
+          - Attacking
+        value:
+          number: 3
+          unit: percentage
+  - level: Blue
+    text: Attacking Ground Troop Attack +4%. Attacking Ground Troop Defense +4%. Attacking Ground Troop HP +4%.
+    buffs:
+      - attribute: Attack
+        class: Ground Troops
+        conditions:
+          - Attacking
+        value:
+          number: 4
+          unit: percentage
+      - attribute: Defense
+        class: Ground Troops
+        conditions:
+          - Attacking
+        value:
+          number: 4
+          unit: percentage
+      - attribute: HP
+        class: Ground Troops
+        conditions:
+          - Attacking
+        value:
+          number: 4
+          unit: percentage
+  - level: Purple
+    text: Attacking Ground Troop Attack +8%. Attacking Ground Troop Defense +7%. Attacking Ground Troop HP +7%.
+    buffs:
+      - attribute: Attack
+        class: Ground Troops
+        conditions:
+          - Attacking
+        value:
+          number: 8
+          unit: percentage
+      - attribute: Defense
+        class: Ground Troops
+        conditions:
+          - Attacking
+        value:
+          number: 7
+          unit: percentage
+      - attribute: HP
+        class: Ground Troops
+        conditions:
+          - Attacking
+        value:
+          number: 7
+          unit: percentage
+  - level: Orange
+    text: Attacking Ground Troop Attack +8%. Attacking Ground Troop Defense +7%. Attacking Ground Troop HP +7%.
+    buffs:
+      - attribute: Attack
+        class: Ground Troops
+        conditions:
+          - Attacking
+        value:
+          number: 8
+          unit: percentage
+      - attribute: Defense
+        class: Ground Troops
+        conditions:
+          - Attacking
+        value:
+          number: 7
+          unit: percentage
+      - attribute: HP
+        class: Ground Troops
+        conditions:
+          - Attacking
+        value:
+          number: 7
+          unit: percentage
+  - level: Gold
+    text: Attacking Ground Troop Attack +16%. Attacking Ground Troop Defense +14%. Attacking Ground Troop HP +14%.
+    buffs:
+      - attribute: Attack
+        class: Ground Troops
+        conditions:
+          - Attacking
+        value:
+          number: 16
+          unit: percentage
+      - attribute: Defense
+        class: Ground Troops
+        conditions:
+          - Attacking
+        value:
+          number: 14
+          unit: percentage
+      - attribute: HP
+        class: Ground Troops
+        conditions:
+          - Attacking
+        value:
+          number: 14
+          unit: percentage

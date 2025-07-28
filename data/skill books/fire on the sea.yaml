@@ -1,0 +1,22 @@
+---
+buffs:
+- attribute: Attack
+  conditions:
+  - In City
+  - When The Main Defense General
+  passive: 0
+  targetedType: ''
+  value:
+    number: 10
+    unit: percentage
+- attribute: Attack
+  conditions:
+  - In City
+  - When The Main Defense General
+  passive: 0
+  targetedType: Siege Machines
+  value:
+    number: 35
+    unit: percentage
+name: Fire on the Sea
+text: Increases in-city troops’ attack by 10%, and in-city siege machines’ attack by another 35% when General is the Main City Defense General.

@@ -1,81 +1,81 @@
 name: Conquest of Spain
 levels:
   - level: Green
-    buff:
+    buffs:
       - attribute: Training Speed
-        class: Ground Troops
-        condition:
+        targetedType: Ground Troops
+        conditions:
           - When Appointed as Barracks Officer
         value:
           number: 3
           unit: percentage
       - attribute: Training Capacity
-        class: Ground Troops
-        condition:
+        targetedType: Ground Troops
+        conditions:
           - When Appointed as Barracks Officer
         value:
           number: 2
           unit: percentage
   - level: Blue
-    buff:
+    buffs:
       - attribute: Training Speed
-        class: Ground Troops
-        condition:
+        targetedType: Ground Troops
+        conditions:
           - When Appointed as Barracks Officer
         value:
           number: 3
           unit: percentage
       - attribute: Training Capacity
-        class: Ground Troops
-        condition:
+        targetedType: Ground Troops
+        conditions:
           - When Appointed as Barracks Officer
         value:
           number: 2
           unit: percentage
   - level: Purple
-    buff:
+    buffs:
       - attribute: Training Speed
-        class: Ground Troops
-        condition:
+        targetedType: Ground Troops
+        conditions:
           - When Appointed as Barracks Officer
         value:
           number: 5
           unit: percentage
       - attribute: Training Capacity
-        class: Ground Troops
-        condition:
+        targetedType: Ground Troops
+        conditions:
           - When Appointed as Barracks Officer
         value:
           number: 4
           unit: percentage
   - level: Orange
-    buff:
+    buffs:
       - attribute: Training Speed
-        class: Ground Troops
-        condition:
+        targetedType: Ground Troops
+        conditions:
           - When Appointed as Barracks Officer
         value:
           number: 5
           unit: percentage
       - attribute: Training Capacity
-        class: Ground Troops
-        condition:
+        targetedType: Ground Troops
+        conditions:
           - When Appointed as Barracks Officer
         value:
           number: 4
           unit: percentage
   - level: Gold
-    buff:
+    buffs:
       - attribute: Training Speed
-        class: Ground Troops
-        condition:
+        targetedType: Ground Troops
+        conditions:
           - When Appointed as Barracks Officer
         value:
           number: 10
           unit: percentage
       - attribute: Training Capacity
-        class: Ground Troops
-        condition:
+        targetedType: Ground Troops
+        conditions:
           - When Appointed as Barracks Officer
         value:
           number: 8

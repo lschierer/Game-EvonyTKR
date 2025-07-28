@@ -25,4 +25,4 @@ buffs:
     number: 8
     unit: percentage
 name: Muskets Array
-text: 'Increases ranged troops’ attack and HP by 55% and march size capacity by 8% when General is leading the army. '
+text: Increases ranged troops’ attack and HP by 55% and march size capacity by 8% when General is leading the army.

@@ -1,0 +1,22 @@
+---
+buffs:
+- attribute: Attack
+  conditions:
+  - Enemy
+  - leading the army
+  passive: 0
+  targetedType: Siege Machines
+  value:
+    number: 20
+    unit: percentage
+- attribute: HP
+  conditions:
+  - Enemy
+  - leading the army
+  passive: 0
+  targetedType: Ground Troops
+  value:
+    number: 20
+    unit: percentage
+name: Roman Glory
+text: Reduces the enemy siege machines’ attack by 20% and ground troops’ HP by 20% when General is leading the army.

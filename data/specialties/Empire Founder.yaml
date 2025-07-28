@@ -2,41 +2,41 @@
 name: Empire Founder
 levels:
   - level: Green
-    buff:
+    buffs:
       - attribute: SubCity Construction Speed
-        condition:
+        conditions:
           - When City Mayor for this SubCity
         value:
           number: 8
           unit: percentage
   - level: Blue
-    buff:
+    buffs:
       - attribute: SubCity Construction Speed
-        condition:
+        conditions:
           - When City Mayor for this SubCity
         value:
           number: 8
           unit: percentage
   - level: Purple
-    buff:
+    buffs:
       - attribute: SubCity Construction Speed
-        condition:
+        conditions:
           - When City Mayor for this SubCity
         value:
           number: 16
           unit: percentage
   - level: Orange
-    buff:
+    buffs:
       - attribute: SubCity Construction Speed
-        condition:
+        conditions:
           - When City Mayor for this SubCity
         value:
           number: 16
           unit: percentage
   - level: Gold
-    buff:
+    buffs:
       - attribute: SubCity Construction Speed
-        condition:
+        conditions:
           - When City Mayor for this SubCity
         value:
           number: 32

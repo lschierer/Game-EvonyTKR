@@ -2,50 +2,50 @@
 name: Champion Knight
 levels:
   - level: Green
-    buff:
+    buffs:
       - attribute: Attack
-        class: Mounted Troops
-        condition:
+        targetedType: Mounted Troops
+        conditions:
           - brings a dragon
           - Attacking
         value:
           number: 5
           unit: percentage
   - level: Blue
-    buff:
+    buffs:
       - attribute: Attack
-        class: Mounted Troops
-        condition:
+        targetedType: Mounted Troops
+        conditions:
           - brings a dragon
           - Attacking
         value:
           number: 5
           unit: percentage
   - level: Purple
-    buff:
+    buffs:
       - attribute: Attack
-        class: Mounted Troops
-        condition:
+        targetedType: Mounted Troops
+        conditions:
           - brings a dragon
           - Attacking
         value:
           number: 9
           unit: percentage
   - level: Orange
-    buff:
+    buffs:
       - attribute: Attack
-        class: Mounted Troops
-        condition:
+        targetedType: Mounted Troops
+        conditions:
           - brings a dragon
           - Attacking
         value:
           number: 9
           unit: percentage
   - level: Gold
-    buff:
+    buffs:
       - attribute: Attack
-        class: Mounted Troops
-        condition:
+        targetedType: Mounted Troops
+        conditions:
           - brings a dragon
           - Attacking
         value:

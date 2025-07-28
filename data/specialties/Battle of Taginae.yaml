@@ -1,186 +1,186 @@
 name: Battle of Taginae
 levels:
   - level: Green
-    buff:
+    buffs:
       - attribute: Attack
-        class: Ground Troops
-        condition:
+        targetedType: Ground Troops
+        conditions:
           - Enemy
         value:
           number: 3
           unit: percentage
       - attribute: Defense
-        class: Ground Troops
-        condition:
+        targetedType: Ground Troops
+        conditions:
           - Enemy
         value:
           number: 2
           unit: percentage
       - attribute: Defense
-        class: Mounted Troops
-        condition:
+        targetedType: Mounted Troops
+        conditions:
           - Enemy
         value:
           number: 2
           unit: percentage
       - attribute: HP
-        class: Ground Troops
-        condition:
+        targetedType: Ground Troops
+        conditions:
           - Enemy
         value:
           number: 2
           unit: percentage
       - attribute: HP
-        class: Mounted Troops
-        condition:
+        targetedType: Mounted Troops
+        conditions:
           - Enemy
         value:
           number: 2
           unit: percentage
   - level: Blue
-    buff:
+    buffs:
       - attribute: Attack
-        class: Ground Troops
-        condition:
+        targetedType: Ground Troops
+        conditions:
           - Enemy
         value:
           number: 4
           unit: percentage
       - attribute: Defense
-        class: Ground Troops
-        condition:
+        targetedType: Ground Troops
+        conditions:
           - Enemy
         value:
           number: 3
           unit: percentage
       - attribute: Defense
-        class: Mounted Troops
-        condition:
+        targetedType: Mounted Troops
+        conditions:
           - Enemy
         value:
           number: 3
           unit: percentage
       - attribute: HP
-        class: Ground Troops
-        condition:
+        targetedType: Ground Troops
+        conditions:
           - Enemy
         value:
           number: 3
           unit: percentage
       - attribute: HP
-        class: Mounted Troops
-        condition:
+        targetedType: Mounted Troops
+        conditions:
           - Enemy
         value:
           number: 3
           unit: percentage
   - level: Purple
-    buff:
+    buffs:
       - attribute: Attack
-        class: Ground Troops
-        condition:
+        targetedType: Ground Troops
+        conditions:
           - Enemy
         value:
           number: 7
           unit: percentage
       - attribute: Defense
-        class: Ground Troops
-        condition:
+        targetedType: Ground Troops
+        conditions:
           - Enemy
         value:
           number: 5
           unit: percentage
       - attribute: Defense
-        class: Mounted Troops
-        condition:
+        targetedType: Mounted Troops
+        conditions:
           - Enemy
         value:
           number: 5
           unit: percentage
       - attribute: HP
-        class: Ground Troops
-        condition:
+        targetedType: Ground Troops
+        conditions:
           - Enemy
         value:
           number: 5
           unit: percentage
       - attribute: HP
-        class: Mounted Troops
-        condition:
+        targetedType: Mounted Troops
+        conditions:
           - Enemy
         value:
           number: 5
           unit: percentage
   - level: Orange
-    buff:
+    buffs:
       - attribute: Attack
-        class: Ground Troops
-        condition:
+        targetedType: Ground Troops
+        conditions:
           - Enemy
         value:
           number: 7
           unit: percentage
       - attribute: Defense
-        class: Ground Troops
-        condition:
+        targetedType: Ground Troops
+        conditions:
           - Enemy
         value:
           number: 5
           unit: percentage
       - attribute: Defense
-        class: Mounted Troops
-        condition:
+        targetedType: Mounted Troops
+        conditions:
           - Enemy
         value:
           number: 5
           unit: percentage
       - attribute: HP
-        class: Ground Troops
-        condition:
+        targetedType: Ground Troops
+        conditions:
           - Enemy
         value:
           number: 5
           unit: percentage
       - attribute: HP
-        class: Mounted Troops
-        condition:
+        targetedType: Mounted Troops
+        conditions:
           - Enemy
         value:
           number: 5
           unit: percentage
   - level: Gold
-    buff:
+    buffs:
       - attribute: Attack
-        class: Ground Troops
-        condition:
+        targetedType: Ground Troops
+        conditions:
           - Enemy
         value:
           number: 14
           unit: percentage
       - attribute: Defense
-        class: Ground Troops
-        condition:
+        targetedType: Ground Troops
+        conditions:
           - Enemy
         value:
           number: 10
           unit: percentage
       - attribute: Defense
-        class: Mounted Troops
-        condition:
+        targetedType: Mounted Troops
+        conditions:
           - Enemy
         value:
           number: 10
           unit: percentage
       - attribute: HP
-        class: Ground Troops
-        condition:
+        targetedType: Ground Troops
+        conditions:
           - Enemy
         value:
           number: 10
           unit: percentage
       - attribute: HP
-        class: Mounted Troops
-        condition:
+        targetedType: Mounted Troops
+        conditions:
           - Enemy
         value:
           number: 10

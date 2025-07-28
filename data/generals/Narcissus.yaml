@@ -1,0 +1,24 @@
+ascending: 'true'
+basic_attributes:
+  attack:
+    base: 141
+    increment: 9.44
+  defense:
+    base: 135
+    increment: 9.24
+  leadership:
+    base: 138
+    increment: 9.31
+  politics:
+    base: 81
+    increment: 6.76
+book: Golden Glory
+name: Narcissus
+specialties:
+  - Ground Troop Defense
+  - Suppress
+  - Ground Troop Ares
+  - Champion Gladiator
+stars: red5
+type:
+  - ground_specialist

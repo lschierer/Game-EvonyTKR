@@ -1,0 +1,11 @@
+name: Conquering Hero
+text: >-
+  Increases in-city ranged troops’ attack by 50% when General is the Main City Defense General.
+buffs:
+  - attribute: Attack
+    troop: Ranged Troops
+    value:
+      number: 50
+    conditions:
+      - In City
+      - When The Main Defense General

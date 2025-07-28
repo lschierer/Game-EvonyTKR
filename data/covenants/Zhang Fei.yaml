@@ -1,0 +1,62 @@
+name: Zhang Fei
+generals:
+  - Wei Qing
+  - Guan Yu
+  - Zhao Yun
+levels:
+  - category: War
+    buffs:
+      - attribute: Defense
+        targetedType: Ground Troops
+        value:
+          number: 10
+          unit: percentage
+  - category: Cooperation
+    buffs:
+      - attribute: HP
+        passive: 1
+        targetedType: Ground Troops
+        conditions:
+          - When Rallying
+        value:
+          number: 10
+          unit: percentage
+  - category: Peace
+    buffs:
+      - attribute: Attack
+        targetedType: Ground Troops
+        value:
+          number: 10
+          unit: percentage
+  - category: Faith
+    buffs:
+      - attribute: Marching Speed
+        value:
+          number: 10
+          unit: percentage
+      - attribute: Training Speed
+        targetedType: Ground Troops
+        passive: 1
+        value:
+          number: 10
+          unit: percentage
+  - category: Honor
+    buffs:
+      - attribute: Attack
+        targetedType: Ground Troops
+        conditions:
+          - When Rallying
+        value:
+          number: 10
+          unit: percentage
+  - category: Civilization
+    buffs:
+      - attribute: March Size
+        value:
+          number: 10
+          unit: percentage
+      - attribute: HP
+        targetedType: Ground Troops
+        value:
+          number: 10
+          unit: percentage

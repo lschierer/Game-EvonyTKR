@@ -1,0 +1,31 @@
+---
+buffs:
+- attribute: Attack
+  conditions:
+  - Enemy
+  - leading the army
+  passive: 0
+  targetedType: Ground Troops
+  value:
+    number: 25
+    unit: percentage
+- attribute: Defense
+  conditions:
+  - Enemy
+  - leading the army
+  passive: 0
+  targetedType: Ranged Troops
+  value:
+    number: 40
+    unit: percentage
+- attribute: Defense
+  conditions:
+  - Enemy
+  - leading the army
+  passive: 0
+  targetedType: Siege Machines
+  value:
+    number: 40
+    unit: percentage
+name: King of Uruk
+text: Reduces enemy ground troops’ attack by 25% and enemy ranged troops and siege machines’ defense by 40% when General is leading the army.

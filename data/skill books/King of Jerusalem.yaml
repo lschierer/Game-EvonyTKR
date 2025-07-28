@@ -1,6 +1,6 @@
 ---
 name: King of Jerusalem
-buff:
+buffs:
   - attribute: Attack
     targetedType: Ranged Troops
     value:
