@@ -1,0 +1,32 @@
+# yaml-language-server: $schema=schema.json
+
+glossary:
+  - term: Blood of Ares
+    synonyms:
+      - BoA
+    definition: >-
+      Blood of Ares is one of several items that can be either won or purchased in the game.  This item is used primarily for activating a General's Ascending Attributes, but can also be used to unlock certain attributes of Senate seats.
+      related_terms:
+        - Ascending Attributes
+        - General
+        - Senate
+  - term: Basic Attribute
+    definition: >-
+      One of 'Politics', 'Leadership', 'Attack', or 'Defense'.  These attributes are built in to each 'General' and indirectly provide
+      a variety of different 'Buffs.'
+    related_terms:
+      - Politics
+      - Leadership
+      - Attack
+      - Defense
+      - General
+      - Buff
+  - term: Buff
+    definition: >-
+      This is a slang term that indicates that an attribute is being increased.  The implication is that it is strong, or "Buff" after this configs:
+      multiplier has been applied.  Despite the use of the word 'multiplier' here in the definition, Buffs are only *sometimes* in fact actually configs:
+      a multiplication operation on the base statistic.  A 'Flat Buff' is an addition opeation, the resulting statistic is <Original Value> + <Buff Value>.
+      A Percentage or Standard Buff is a multiplicative operation: <Original Value> + <Original Value> * <Buff Value expressed as a decimal>.
+      So for example a "25% increase" Buff would be <Original Value> + <Original Value> * 0.25.
+    related_terms:
+      - Debuff

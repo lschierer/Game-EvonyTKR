@@ -1,0 +1,25 @@
+# yaml-language-server: $schema=schema.json
+
+glossary:
+  - term: General
+    definition: >-
+      The game provides characters called 'Generals' that perform a number of roles.  The common theme to these roles is that the Generals provide
+      you with 'Buffs' and 'Debuffs' which you can activate either by owning the General or by using the General. Generals provide these 'Buffs'
+      and 'Debuffs' by way of 'Basic Attributes', 'SkillBooks', 'Ascending Attributes', 'Specialties', 'Covenants', any 'Gear' assigned to that
+      General, and any 'Dragon' or 'Spiritual Beast' assigned.
+    related_terms:
+      - Ascending Attributes
+      - Basic Attribute
+      - Buff
+      - Covenant
+      - Debuff
+      - Dragon
+      - Gear
+      - Mayor
+      - Officer
+      - Primary General
+      - Secondary General
+      - SkillBook
+      - Specialties
+      - Spiritual Beast
+      - Wall General
