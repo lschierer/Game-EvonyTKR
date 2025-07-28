@@ -9,6 +9,7 @@ require Game::EvonyTKR::Model::General::Pair::Manager;
 require Game::EvonyTKR::Model::Specialty::Manager;
 require Game::EvonyTKR::Model::AscendingAttributes::Manager;
 require Game::EvonyTKR::Model::Covenant::Manager;
+require Game::EvonyTKR::Model::Glossary::Manager;
 use namespace::clean;
 
 class Game::EvonyTKR::Model::EvonyTKR::Manager :
@@ -21,6 +22,7 @@ class Game::EvonyTKR::Model::EvonyTKR::Manager :
   field $specialtyManager : reader;
   field $ascendingAttributesManager : reader;
   field $covenantManager : reader;
+  field $glossaryManager :reader;
 
   # computed types
   field $generalPairManager : reader;
@@ -38,6 +40,10 @@ class Game::EvonyTKR::Model::EvonyTKR::Manager :
       Game::EvonyTKR::Model::Covenant::Manager->new(rootManager => $self,);
 
     $SourceDir = Path::Tiny::path($SourceDir);
+
+    $glossaryManager = Game::EvonyTKR::Model::Glossary::Manager->new(
+      SourceDir   => $SourceDir,
+    );
 
     $generalPairManager = Game::EvonyTKR::Model::General::Pair::Manager->new(
       rootManager          => $self,
@@ -78,6 +84,8 @@ class Game::EvonyTKR::Model::EvonyTKR::Manager :
     $self->logger->info(" starting import of covenants.");
     $covenantManager->importAll($collectionDir->child('covenants'));
     $self->logger->info("import of covenants complete");
+
+    $glossaryManager->importAll($SourceDir->child("collections/Glossary"));
 
     $self->logger->info("root import complete");
 

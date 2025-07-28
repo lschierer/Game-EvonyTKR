@@ -1,0 +1,57 @@
+% require Scalar::Util;
+% title 'Glossary of Terms';
+%
+% if (defined $available_letters and Scalar::Util::reftype($available_letters) eq 'ARRAY') {
+<article>
+  <ul class="alphabetlist">
+    <% foreach my $letter (@$available_letters) { %>
+      <li>
+        <span class="spectrum-Heading spectrum-Heading--sizeM">
+          <a id="<%= $letter %>" href="#<%= $letter %>" class="spectrum-Link spectrum-Link--quiet spectrum-Link--secondary">
+            <%= $letter %>
+          </a>
+        </span>
+        <dl>
+          <% foreach my $term_obj (@{ getTermsByLetter($letter) }) { %>
+            <% my $term = $term_obj->term; %>
+            <dt class="spectrum-Heading spectrum-Heading--sizeS">
+              <a id="<%= $term %>" href="#<%= $term %>" class="spectrum-Link spectrum-Link--quiet spectrum-Link--secondary">
+                <%= $term %>
+              </a>
+            </dt>
+            <dd>
+              <%= $term_obj->definition %>
+            </dd>
+            <% my @syn = $term_obj->synonyms->@*; %>
+            <% if(scalar @syn) { %>
+              <dd>
+                Synonyms: <ul>
+                  <% foreach my $s (sort @syn) { %>
+                    <li><a href="#<%= $s %>" class="spectrum-Link spectrum-Link--secondary"><%= $s %></a></li>
+                  <% } %>
+                </ul>
+              </dd>
+            <% } %>
+            <% my @related = $term_obj->related_terms->@*; %>
+            <% if(scalar @related) { %>
+              <dd>
+                See also: <ul>
+                  <% foreach my $r (sort @related) { %>
+                    <li><a href="#<%= $r %>" class="spectrum-Link spectrum-Link--secondary"><%= $r %></a></li>
+                  <% } %>
+                </ul>
+              </dd>
+            <% } %>
+          <% } %>
+        </dl>
+      </li>
+    <% } %>
+  </ul>
+</article>
+<style>
+</style>
+
+% } else {
+<!-- <%= Scalar::Util::reftype($available_letters) %> -->
+<!-- <% Data::Printer::np($available_letters); %> -->
+% }

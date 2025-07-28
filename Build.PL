@@ -56,6 +56,7 @@ my $builder = Module::Build->new(
       'Module::Find'                => '0',
       'Module::Load'                => '0',
       'Mojo::Base'                  => '0',
+      'Mojo::DOM58'                 => '0',
       'Mojo::File'                  => '0',
       'Mojo::File::Share'           => '0',
       'Mojo::Util'                  => '0',
