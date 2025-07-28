@@ -1,0 +1,24 @@
+ascending: 1
+basic_attributes:
+  attack:
+    base: 114
+    increment: 0
+  defense:
+    base: 117
+    increment: 0
+  leadership:
+    base: 119
+    increment: 0
+  politics:
+    base: 110
+    increment: 0
+book: Hero of the Union Navy
+name: David Farragut
+specialties:
+  - Ranged Troop Assault
+  - Sabotage
+  - War God
+  - Capture of New Orleans
+stars: red5
+type:
+  - mayor

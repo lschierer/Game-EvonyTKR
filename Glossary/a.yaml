@@ -1,0 +1,32 @@
+# yaml-language-server: $schema=schema.json
+
+glossary:
+  - term: Ascending Attributes
+    definition: A General's built-in SkillBook may have additional attributes that can be activated.  Activating these attributes is called 'Ascending' the General, who is then 'Ascended.'  This activation will require fragments of the General whose additional attributes are being activated.  For most, but not all, Gold or Red level Historical Generals, this will require 'Blood of Ares.'
+    related_terms:
+      - General
+      - SkilllBook
+      - Ascending
+      - Ascended
+      - Blood of Ares
+  - term: ascend
+    synonyms:
+      - ascending
+    definition: to activate a the 'Ascending Attributes' for a General's built-in SkillBook
+    related_terms:
+      - Ascending Attributes
+      - SkillBook
+      - General
+  - term: ascended
+    definition: See 'Ascend,' for which this is the past tense, indicating that this General has already had his/her 'Ascending Attributes' activated.
+    related_terms:
+      - Ascend
+      - General
+      - Ascending Attributes
+  - term: Attack
+    definition: >-
+      A of the 'Basic Attribute' which affects the related troops' attack statistic across all activation conditions, but only when the 'General'
+      is being used as a 'Primary General.'
+    related_terms:
+      - Primary General
+      - Basic Attribute

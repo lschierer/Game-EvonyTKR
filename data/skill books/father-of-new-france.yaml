@@ -1,5 +1,5 @@
 name: Father of New France
-buff:
+buffs:
   - attribute: Attack
     targetedType: Siege Machines
     value:

@@ -1,0 +1,62 @@
+name: Great Beauty
+levels:
+  - level: Green
+    text: All Troops Attack +1%. Ground Troop Defense +1%.
+    buffs:
+      - attribute: Attack
+        value:
+          number: 1
+          unit: percentage
+      - attribute: Defense
+        troop: Ground Troops
+        value:
+          number: 1
+          unit: percentage
+  - level: Blue
+    text: All Troops Attack +1%. Ground Troop Defense +1%.
+    buffs:
+      - attribute: Attack
+        value:
+          number: 1
+          unit: percentage
+      - attribute: Defense
+        troop: Ground Troops
+        value:
+          number: 1
+          unit: percentage
+  - level: Purple
+    text: All Troops Attack +2%. Ground Troop Defense +2%.
+    buffs:
+      - attribute: Attack
+        value:
+          number: 2
+          unit: percentage
+      - attribute: Defense
+        troop: Ground Troops
+        value:
+          number: 2
+          unit: percentage
+  - level: Orange
+    text: All Troops Attack +2%. Ground Troop Defense +2%.
+    buffs:
+      - attribute: Attack
+        value:
+          number: 2
+          unit: percentage
+      - attribute: Defense
+        troop: Ground Troops
+        value:
+          number: 2
+          unit: percentage
+  - level: Gold
+    text: All Troops Attack +4%. Ground Troop Defense +4%.
+    buffs:
+      - attribute: Attack
+        value:
+          number: 4
+          unit: percentage
+      - attribute: Defense
+        troop: Ground Troops
+        value:
+          number: 4
+          unit: percentage

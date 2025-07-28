@@ -1,63 +1,88 @@
 ---
-name: Prince of Essling
 levels:
-  - level: Green
-    buff:
-      - attribute: Attack
-        class: Mounted Troops
-        value:
-          number: 1
-          unit: percentage
-      - attribute: Defense
-        class: Mounted Troops
-        value:
-          number: 1
-          unit: percentage
-  - level: Blue
-    buff:
-      - attribute: Attack
-        class: Mounted Troops
-        value:
-          number: 1
-          unit: percentage
-      - attribute: Defense
-        class: Mounted Troops
-        value:
-          number: 1
-          unit: percentage
-  - level: Purple
-    buff:
-      - attribute: Attack
-        class: Mounted Troops
-        value:
-          number: 1
-          unit: percentage
-      - attribute: Defense
-        class: Mounted Troops
-        value:
-          number: 1
-          unit: percentage
-  - level: Orange
-    buff:
-      - attribute: Attack
-        class: Mounted Troops
-        value:
-          number: 1
-          unit: percentage
-      - attribute: Defense
-        class: Mounted Troops
-        value:
-          number: 1
-          unit: percentage
-  - level: Gold
-    buff:
-      - attribute: Attack
-        class: Mounted Troops
-        value:
-          number: 41
-          unit: percentage
-      - attribute: Defense
-        class: Mounted Troops
-        value:
-          number: 41
-          unit: percentage
+- buffs:
+  - attribute: Attack
+    conditions: []
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Defense
+    conditions: []
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 0
+      unit: percentage
+  level: Green
+  text: ''
+- buffs:
+  - attribute: Attack
+    conditions: []
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Defense
+    conditions: []
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 0
+      unit: percentage
+  level: Blue
+  text: ''
+- buffs:
+  - attribute: Attack
+    conditions: []
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Defense
+    conditions: []
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 0
+      unit: percentage
+  level: Purple
+  text: ''
+- buffs:
+  - attribute: Attack
+    conditions: []
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Defense
+    conditions: []
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 0
+      unit: percentage
+  level: Orange
+  text: ''
+- buffs:
+  - attribute: Attack
+    conditions: []
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 45
+      unit: percentage
+  - attribute: Defense
+    conditions: []
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 45
+      unit: percentage
+  level: Gold
+  text: Mounted Troop Attack +45%, Mounted Troop Defense +45%
+name: Prince of Essling

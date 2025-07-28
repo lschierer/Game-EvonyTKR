@@ -2,112 +2,112 @@
 name: Queen of the Gods
 levels:
   - level: "Green"
-    buff:
+    buffs:
       - attribute: Attack
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 2
           unit: percentage
       - attribute: Attack
-        class: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 2
           unit: percentage
       - attribute: Defense
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 4
           unit: percentage
       - attribute: HP
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 4
           unit: percentage
   - level: "Blue"
-    buff:
+    buffs:
       - attribute: Attack
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 2
           unit: percentage
       - attribute: Attack
-        class: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 2
           unit: percentage
       - attribute: Defense
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 4
           unit: percentage
       - attribute: HP
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 4
           unit: percentage
   - level: "Purple"
-    buff:
+    buffs:
       - attribute: Attack
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 4
           unit: percentage
       - attribute: Attack
-        class: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 4
           unit: percentage
       - attribute: Defense
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 8
           unit: percentage
       - attribute: HP
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 8
           unit: percentage
   - level: "Orange"
-    buff:
+    buffs:
       - attribute: Attack
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 4
           unit: percentage
       - attribute: Attack
-        class: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 4
           unit: percentage
       - attribute: Defense
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 8
           unit: percentage
       - attribute: HP
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 8
           unit: percentage
   - level: "Gold"
-    buff:
+    buffs:
       - attribute: Attack
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 8
           unit: percentage
       - attribute: Attack
-        class: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 8
           unit: percentage
       - attribute: Defense
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 16
           unit: percentage
       - attribute: HP
-        class: Ground Troops
+        targetedType: Ground Troops
         value:
           number: 16
           unit: percentage

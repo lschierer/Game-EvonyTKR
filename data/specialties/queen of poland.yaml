@@ -1,0 +1,77 @@
+---
+levels:
+  - buffs:
+      - attribute: Attack
+        targetedType: Mounted Troops
+        value:
+          number: 3
+          unit: percentage
+      - attribute: Attack
+        conditions:
+          - Enemy
+        targetedType: Siege Machines
+        value:
+          number: 2
+          unit: percentage
+    level: Green
+    text: ''
+  - buffs:
+      - attribute: Attack
+        targetedType: Mounted Troops
+        value:
+          number: 3
+          unit: percentage
+      - attribute: Attack
+        conditions:
+          - Enemy
+        targetedType: Siege Machines
+        value:
+          number: 2
+          unit: percentage
+    level: Blue
+    text: ''
+  - buffs:
+      - attribute: Attack
+        targetedType: Mounted Troops
+        value:
+          number: 5
+          unit: percentage
+      - attribute: Attack
+        conditions:
+          - Enemy
+        targetedType: Siege Machines
+        value:
+          number: 4
+          unit: percentage
+    level: Purple
+    text: ''
+  - buffs:
+      - attribute: Attack
+        targetedType: Mounted Troops
+        value:
+          number: 5
+          unit: percentage
+      - attribute: Attack
+        conditions:
+          - Enemy
+        targetedType: Siege Machines
+        value:
+          number: 4
+          unit: percentage
+    level: Orange
+    text: ''
+  - buffs:
+      - attribute: Attack
+        targetedType: Mounted Troops
+        value:
+          number: 10
+          unit: percentage
+      - attribute: Attack
+        conditions:
+          - Enemy
+        targetedType: Siege Machines
+        value:
+          number: 8
+          unit: percentage
+    level: Gold
+name: Queen of Poland

@@ -1,0 +1,117 @@
+name: Battle of Changban
+levels:
+  - level: Green
+    text: Ground Troop Attack +4%. Ground Troop and Mounted Troop Defense +3%. Ground Troop and Mounted Troop HP +3%.
+    buffs:
+      - attribute: Attack
+        troop: Ground Troops
+        value:
+          number: 4
+      - attribute: Defense
+        troop: Ground Troops
+        value:
+          number: 3
+      - attribute: Defense
+        troop: Mounted Troops
+        value:
+          number: 3
+      - attribute: HP
+        troop: Ground Troops
+        value:
+          number: 3
+      - attribute: HP
+        troop: Mounted Troops
+        value:
+          number: 3
+  - level: Blue
+    text: Ground Troop Attack +4%. Ground Troop and Mounted Troop Defense +4%. Ground Troop and Mounted Troop HP +4%.
+    buffs:
+      - attribute: Attack
+        troop: Ground Troops
+        value:
+          number: 4
+      - attribute: Defense
+        troop: Ground Troops
+        value:
+          number: 4
+      - attribute: Defense
+        troop: Mounted Troops
+        value:
+          number: 4
+      - attribute: HP
+        troop: Ground Troops
+        value:
+          number: 4
+      - attribute: HP
+        troop: Mounted Troops
+        value:
+          number: 4
+  - level: Purple
+    text: Ground Troop Attack +8%. Ground Troop and Mounted Troop Defense +7%. Ground Troop and Mounted Troop HP +7%.
+    buffs:
+      - attribute: Attack
+        troop: Ground Troops
+        value:
+          number: 8
+      - attribute: Defense
+        troop: Ground Troops
+        value:
+          number: 7
+      - attribute: Defense
+        troop: Mounted Troops
+        value:
+          number: 7
+      - attribute: HP
+        troop: Ground Troops
+        value:
+          number: 7
+      - attribute: HP
+        troop: Mounted Troops
+        value:
+          number: 7
+  - level: Orange
+    text: Ground Troop Attack +8%. Ground Troop and Mounted Troop Defense +7%. Ground Troop and Mounted Troop HP +7%.
+    buffs:
+      - attribute: Attack
+        troop: Ground Troops
+        value:
+          number: 8
+      - attribute: Defense
+        troop: Ground Troops
+        value:
+          number: 7
+      - attribute: Defense
+        troop: Mounted Troops
+        value:
+          number: 7
+      - attribute: HP
+        troop: Ground Troops
+        value:
+          number: 7
+      - attribute: HP
+        troop: Mounted Troops
+        value:
+          number: 7
+  - level: Gold
+    text: Ground Troop Attack +16%. Ground Troop and Mounted Troop Defense +14%. Ground Troop and Mounted Troop HP +14%.
+    buffs:
+      - attribute: Attack
+        troop: Ground Troops
+        value:
+          number: 16
+      - attribute: Defense
+        troop: Ground Troops
+        value:
+          number: 14
+      - attribute: Defense
+        troop: Mounted Troops
+        value:
+          number: 14
+      - attribute: HP
+        troop: Ground Troops
+        value:
+          number: 14
+      - attribute: HP
+        troop: Mounted Troops
+        value:
+          number: 14

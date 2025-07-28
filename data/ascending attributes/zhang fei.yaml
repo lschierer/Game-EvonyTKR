@@ -1,0 +1,96 @@
+general: Zhang Fei
+id: Zhang Fei
+ascending:
+  - level: red1
+    text: Ground Troop Attack +15% and HP +10%.
+    buffs:
+      - attribute: Attack
+        troop: Ground Troops
+        value:
+          number: 15
+      - attribute: HP
+        troop: Ground Troops
+        value:
+          number: 10
+  - level: red2
+    text: Attacking Troop Death into Wounded Rate +8%.
+    buffs:
+      - attribute: Death to Wounded
+        conditions:
+          - Attacking
+        value:
+          number: 8
+          unit: percentage
+  - level: red3
+    text: Increases ground troops’ attack by 10% and ground troops and mounted troops’ defense and HP by 10% when General is leading the army.
+    buffs:
+      - attribute: Attack
+        troop: Ground Troops
+        value:
+          number: 10
+          unit: percentage
+      - attribute: Defense
+        troop: Ground Troops
+        value:
+          number: 10
+          unit: percentage
+      - attribute: Defense
+        troop: Mounted Troops
+        value:
+          number: 10
+          unit: percentage
+      - attribute: HP
+        troop: Ground Troops
+        value:
+          number: 10
+          unit: percentage
+      - attribute: HP
+        troop: Mounted Troops
+        value:
+          number: 10
+          unit: percentage
+  - level: red4
+    text: Ground Troop and Mounted Troop Attack +10%, March Size Capacity +10%.
+    buffs:
+      - attribute: Attack
+        troop: Ground Troops
+        value:
+          number: 10
+          unit: percentage
+      - attribute: Attack
+        troop: Mounted Troops
+        value:
+          number: 10
+          unit: percentage
+      - attribute: March Size
+        value:
+          number: 10
+          unit: percentage
+  - level: red5
+    text: Increases ground troops’ attack by 30% and ground troops and mounted troops’ defense and HP by 10% when General is leading the army.
+    buffs:
+      - attribute: Attack
+        troop: Ground Troops
+        value:
+          number: 30
+          unit: percentage
+      - attribute: Defense
+        troop: Ground Troops
+        value:
+          number: 10
+          unit: percentage
+      - attribute: Defense
+        troop: Mounted Troops
+        value:
+          number: 10
+          unit: percentage
+      - attribute: HP
+        troop: Ground Troops
+        value:
+          number: 10
+          unit: percentage
+      - attribute: HP
+        troop: Mounted Troops
+        value:
+          number: 10
+          unit: percentage

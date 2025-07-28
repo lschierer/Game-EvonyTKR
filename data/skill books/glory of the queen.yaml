@@ -1,0 +1,20 @@
+---
+name: Glory of the Queen
+buffs:
+  - attribute: Attack
+    targetedType: Ranged Troops
+    value:
+      number: 15
+      unit: percentage
+  - attribute: Attack
+    targetedType: Siege Machines
+    value:
+      number: 15
+      unit: percentage
+  - attribute: Attack
+    targetedType: Ranged Troops
+    conditions:
+      - Enemy
+    value:
+      number: 15
+      unit: percentage

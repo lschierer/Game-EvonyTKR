@@ -1,0 +1,25 @@
+---
+buffs:
+- attribute: Trap Triggering Rate
+  conditions: []
+  passive: 0
+  targetedType: ''
+  value:
+    number: 60
+    unit: percentage
+- attribute: Attack
+  conditions: []
+  passive: 0
+  targetedType: Ranged Troops
+  value:
+    number: 30
+    unit: percentage
+- attribute: Defense
+  conditions: []
+  passive: 0
+  targetedType: Ranged Troops
+  value:
+    number: 30
+    unit: percentage
+name: Vietnamese Warrior
+text: Increases the traps’ triggering rate by 60% and ranged troops’ attack and defense by 30% when General is the Main City’s Defense General.

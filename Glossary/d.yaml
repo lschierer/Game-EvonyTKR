@@ -1,0 +1,30 @@
+# yaml-language-server: $schema=schema.json
+
+glossary:
+  - term: Debuff
+    definition: >-
+      A Debuff is really the same as a 'Buff' except that it decreases, rather than increases, the affected statistic/attribute.
+      Debuffs are also distinct in that you cannot reduce an enemy's attributes by more than half of the value they started at before
+      any Debuffs were applied.
+    related_terms:
+      - Buff
+  - term: Defense
+    definition: >-
+      A of the 'Basic Attribute' which affects the related troops' defense statistic across all activation conditions, but only when the 'General'
+      is being used as a 'Primary General.'  A common misconception is that this applies only when someone else attacks you. The reality is that
+      there is an aspect of defense used all the time.
+    related_terms:
+      - Primary General
+      - Basic Attribute
+  - term: Dragon
+    definition: >-
+      Each 'General' has a slots that can be filled to provide additional 'Buffs' and 'Debuffs.' One of these is for the Dragon or 'Spiritual Beast.'
+      A Dragon and 'Spiritual Beast' are mutually exclusive, and fill the same role in the game, but differ in quality.  A Dragon offers a wider
+      variety of 'Buffs' and 'Debuffs', in that the Dragon can be refined, with four slots for Buffs that the user selects from the refining attributes.
+      Additionally, the Dragon offers greater room for growth in the value of its built-in 'Buffs' (or 'Debuffs'), in that the Dragon itself can be configs:
+      leveled more extensively, and some of these Buffs/Debuffs are leveled independantly as 'Talents.'
+    related_terms:
+      - Buff
+      - Debuff
+      - Spiritual Beast
+      - General

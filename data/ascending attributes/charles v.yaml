@@ -1,131 +1,129 @@
 ---
 ascending:
-  red1:
-    buffs:
-    - attribute: Defense
-      conditions:
-      - Attacking
-      passive: 0
-      targetedType: Ground Troops
-      value:
-        number: 10
-        unit: percentage
-    - attribute: Defense
-      conditions:
-      - Attacking
-      passive: 0
-      targetedType: Mounted Troops
-      value:
-        number: 10
-        unit: percentage
-    - attribute: HP
-      conditions:
-      - Attacking
-      passive: 0
-      targetedType: Ground Troops
-      value:
-        number: 10
-        unit: percentage
-    - attribute: HP
-      conditions:
-      - Attacking
-      passive: 0
-      targetedType: Mounted Troops
-      value:
-        number: 10
-        unit: percentage
-    text: Attacking Ground Troop and Mounted Troop Defense +10% and HP +10%
-  red2:
-    buffs:
-    - attribute: Death to Wounded
-      conditions:
-      - Attacking
-      passive: 0
-      targetedType: ''
-      value:
-        number: 8
-        unit: percentage
-    text: Attacking Troop Death into Wounded Rate +8%
-  red3:
-    buffs:
-    - attribute: Attack
-      conditions:
-      - Attacking
-      passive: 0
-      targetedType: Mounted Troops
-      value:
-        number: 25
-        unit: percentage
-    - attribute: Attack
-      conditions:
-      - Attacking
-      passive: 0
-      targetedType: Ground Troops
-      value:
-        number: 25
-        unit: percentage
-    - attribute: Defense
-      conditions:
-      - Attacking
-      passive: 0
-      targetedType: Ground Troops
-      value:
-        number: 10
-        unit: percentage
-    - attribute: HP
-      conditions:
-      - Attacking
-      passive: 0
-      targetedType: Ground Troops
-      value:
-        number: 10
-        unit: percentage
-    text: Attacking Mounted Troop and Ground Troop Attack +25%, Attacking Ground Troop Defense and HP +10%
-  red4:
-    buffs:
-    - attribute: Attack
-      conditions:
-      - leading the army
-      passive: 0
-      targetedType: Ground Troops
-      value:
-        number: 15
-        unit: percentage
-    - attribute: March Size
-      conditions:
-      - leading the army
-      passive: 0
-      targetedType: ''
-      value:
-        number: 10
-        unit: percentage
-    text: Ground Troop Attack +15%, March Size Capacity +10%
-  red5:
-    buffs:
-    - attribute: Attack
-      conditions:
-      - Attacking
-      passive: 0
-      targetedType: Ground Troops
-      value:
-        number: 30
-        unit: percentage
-    - attribute: Defense
-      conditions:
-      - leading the army
-      passive: 0
-      targetedType: Ground Troops
-      value:
-        number: 30
-        unit: percentage
-    - attribute: HP
-      conditions:
-      - leading the army
-      passive: 0
-      targetedType: Ground Troops
-      value:
-        number: 30
-        unit: percentage
-    text: Attacking Ground Troop Attack +30%, Defense and HP +30%
+- buffs:
+  - attribute: Defense
+    conditions:
+    - Attacking
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - Attacking
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - Attacking
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - Attacking
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 10
+      unit: percentage
+  level: red1
+  text: Attacking Ground Troop and Mounted Troop Defense +10% and HP +10%
+- buffs:
+  - attribute: Death to Wounded
+    conditions:
+    - Attacking
+    passive: 0
+    targetedType: ''
+    value:
+      number: 8
+      unit: percentage
+  level: red2
+  text: Attacking Troop Death into Wounded Rate +8%
+- buffs:
+  - attribute: Attack
+    conditions:
+    - Attacking
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 25
+      unit: percentage
+  - attribute: Attack
+    conditions:
+    - Attacking
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 25
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - Attacking
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - Attacking
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 10
+      unit: percentage
+  level: red3
+  text: Attacking Mounted Troop and Ground Troop Attack +25%, Attacking Ground Troop Defense and HP +10%
+- buffs:
+  - attribute: Attack
+    conditions: []
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 15
+      unit: percentage
+  - attribute: March Size
+    conditions: []
+    passive: 0
+    targetedType: ''
+    value:
+      number: 10
+      unit: percentage
+  level: red4
+  text: Ground Troop Attack +15%, March Size Capacity +10%
+- buffs:
+  - attribute: Attack
+    conditions:
+    - Attacking
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 30
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - Attacking
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 30
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - Attacking
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 30
+      unit: percentage
+  level: red5
+  text: Attacking Ground Troop Attack +30%, Defense and HP +30%
 general: Charles V
 id: Charles V

@@ -1,22 +1,22 @@
 ---
 name: Battle of Selimbar
-buff:
+buffs:
   - attribute: Attack
-    condition:
+    conditions:
       - Attacking
     targetedType: Ranged Troops
     value:
       number: 45
       unit: percentage
   - attribute: Defense
-    condition:
+    conditions:
       - Attacking
     targetedType: Ranged Troops
     value:
       number: 45
       unit: percentage
   - attribute: Defense
-    condition:
+    conditions:
       - Attacking
     targetedType: Siege Machines
     value:

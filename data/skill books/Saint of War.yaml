@@ -1,22 +1,22 @@
 ---
 name: Saint of War
-buff:
+buffs:
   - attribute: Attack
-    condition:
+    conditions:
       - Attacking
     targetedType: Ground Troops
     value:
       number: 30
       unit: percentage
   - attribute: HP
-    condition:
+    conditions:
       - Attacking
     targetedType: Ground Troops
     value:
       number: 20
       unit: percentage
   - attribute: HP
-    condition:
+    conditions:
       - Attacking
     targetedType: Mounted Troops
     value:

@@ -1,0 +1,20 @@
+name: Emperor
+generals:
+  - general: Napoleon (Prime)
+    buffs:
+      - attribute: Attack
+        targetedType: Mounted Troops
+        conditions:
+          - Attacking
+        value:
+          number: 10
+          unit: percentage
+        passive: 0
+      - attribute: HP
+        targetedType: Ground Troops
+        conditions:
+          - Enemy
+        value:
+          number: 20
+          unit: percentage
+        passive: 0

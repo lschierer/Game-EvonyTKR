@@ -2,62 +2,62 @@
 name: Mounted Troop Assault
 levels:
   - level: Green
-    buff:
+    buffs:
       - attribute: Attack
-        class: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 1
           unit: percentage
       - attribute: HP
-        class: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 1
           unit: percentage
   - level: Blue
-    buff:
+    buffs:
       - attribute: Attack
-        class: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 1
           unit: percentage
       - attribute: HP
-        class: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 1
           unit: percentage
   - level: Purple
-    buff:
+    buffs:
       - attribute: Attack
-        class: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 2
           unit: percentage
       - attribute: HP
-        class: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 2
           unit: percentage
   - level: Orange
-    buff:
+    buffs:
       - attribute: Attack
-        class: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 2
           unit: percentage
       - attribute: HP
-        class: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 2
           unit: percentage
   - level: Gold
-    buff:
+    buffs:
       - attribute: Attack
-        class: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 4
           unit: percentage
       - attribute: HP
-        class: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 4
           unit: percentage

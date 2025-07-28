@@ -1,0 +1,37 @@
+---
+name: Dragon God
+generals:
+  - general: Elektra
+    buffs:
+      - attribute: Attack
+        passive: 0
+        targetedType: Ranged Troops
+        conditions:
+          - brings a dragon
+        value:
+          number: 10
+          unit: percentage
+      - attribute: HP
+        passive: 0
+        conditions:
+          - brings a dragon
+        targetedType: Ranged Troops
+        value:
+          number: 15
+          unit: percentage
+  - general: Martinus
+    buffs:
+      - attribute: Attack
+        targetedType: Mounted Troops
+        conditions:
+          - brings a dragon
+        value:
+          number: 10
+          unit: percentage
+      - attribute: Defense
+        targetedType: Mounted Troops
+        conditions:
+          - brings a dragon
+        value:
+          number: 10
+          unit: percentage

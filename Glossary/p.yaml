@@ -1,0 +1,21 @@
+# yaml-language-server: $schema=schema.json
+
+glossary:
+  - term: Primary General
+    synonyms:
+      - Lead General
+    related_terms:
+      - General
+    definition: >-
+      In certain use cases, you can attach two Generals for use instead of just one.  The primary is the first one attached, and must be at least configs:
+      level 23 and have at least 3 stars or you will not be able to attach a second.  This first general is fully utilized.
+  - term: politics
+    definition: >-
+      A of the 'Basic Attribute' which affects the related troops' across all activation conditions, but only when the 'General'
+      is being used as a 'Primary General.'  This attribute affects the Subordinate City Construction and Gold Production Speeds if the
+      'General' is used as a 'Mayor.'  It affects the 'Troop Death to Wounded' rate for any troops this 'General' is in charge of.  Lastly,
+      if the 'General' is a 'Primary General' for a march used for gathering, it affects the Resource Gathering Speed.
+    related_terms:
+      - Primary General
+      - Basic Attribute
+      - Troop Death to Wounded

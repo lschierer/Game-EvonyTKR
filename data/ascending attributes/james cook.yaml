@@ -1,0 +1,111 @@
+---
+ascending:
+- buffs:
+  - attribute: Defense
+    conditions: []
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: HP
+    conditions: []
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 10
+      unit: percentage
+  level: red1
+  text: Ranged Troop Defense +10% and HP +10%
+- buffs:
+  - attribute: Death to Wounded
+    conditions:
+    - Attacking
+    passive: 0
+    targetedType: ''
+    value:
+      number: 8
+      unit: percentage
+  level: red2
+  text: Attacking Troop Death into Wounded Rate +8%
+- buffs:
+  - attribute: Attack
+    conditions: []
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 25
+      unit: percentage
+  - attribute: Defense
+    conditions: []
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 15
+      unit: percentage
+  - attribute: Defense
+    conditions: []
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 15
+      unit: percentage
+  level: red3
+  text: Ranged Troop Attack +25%, Ranged Troop and Siege Machine Defense +15%
+- buffs:
+  - attribute: Attack
+    conditions: []
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: Attack
+    conditions: []
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 10
+      unit: percentage
+  - attribute: HP
+    conditions: []
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: HP
+    conditions: []
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 10
+      unit: percentage
+  level: red4
+  text: Ranged Troop and Siege Machine Attack +10% and HP +10%
+- buffs:
+  - attribute: Attack
+    conditions: []
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 35
+      unit: percentage
+  - attribute: Defense
+    conditions: []
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 20
+      unit: percentage
+  - attribute: HP
+    conditions: []
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 20
+      unit: percentage
+  level: red5
+  text: Ranged Troop Attack +35%, Defense and HP +20%
+general: James Cook
+id: James Cook

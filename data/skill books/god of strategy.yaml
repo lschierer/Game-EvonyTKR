@@ -1,0 +1,36 @@
+---
+buffs:
+- attribute: Attack
+  conditions:
+  - leading the army
+  passive: 0
+  targetedType: Mounted Troops
+  value:
+    number: 55
+    unit: percentage
+- attribute: Defense
+  conditions:
+  - leading the army
+  passive: 0
+  targetedType: Mounted Troops
+  value:
+    number: 55
+    unit: percentage
+- attribute: HP
+  conditions:
+  - leading the army
+  passive: 0
+  targetedType: Ground Troops
+  value:
+    number: 35
+    unit: percentage
+- attribute: HP
+  conditions:
+  - leading the army
+  passive: 0
+  targetedType: Mounted Troops
+  value:
+    number: 35
+    unit: percentage
+name: God of Strategy
+text: Increases mounted troops’ attack and defense by 55% and ground troops and mounted troops’ HP by 35% when General is leading the army.

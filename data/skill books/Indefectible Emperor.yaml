@@ -1,6 +1,6 @@
 ---
 name: Indefectible Emperor
-buff:
+buffs:
   - attribute: Attack
     targetedType: Ranged Troops
     value:
@@ -12,7 +12,7 @@ buff:
       number: 15
       unit: percentage
   - attribute: Defense
-    condition:
+    conditions:
       - Enemy
     value:
       number: 10

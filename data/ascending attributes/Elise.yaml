@@ -1,79 +1,106 @@
 ---
 ascending:
-  - level: "red1"
-    buff:
-      - attribute: HP
-        condition:
-          - Marching
-        class: Mounted Troops
-        value:
-          number: 10
-          unit: percentage
-      - attribute: HP
-        condition:
-          - Marching
-        class: Ground Troops
-        value:
-          number: 10
-          unit: percentage
-      - attribute: Attack
-        condition:
-          - brings a dragon
-          - Attacking
-        class: Ground Troops
-        value:
-          number: 15
-          unit: percentage
-  - level: "red2"
-    buff:
-      - attribute: Wounded to Death
-        condition:
-          - Enemy
-          - In City
-        value:
-          number: 10
-          unit: percentage
-  - level: "red3"
-    buff:
-      - attribute: March Size
-        value:
-          number: 14
-          unit: percentage
-  - level: "red4"
-    buff:
-      - attribute: Defense
-        class: Ground Troops
-        condition:
-          - Marching
-        value:
-          number: 60
-          unit: percentage
-  - level: "red5"
-    buff:
-      - attribute: HP
-        class: Mounted Troops
-        value:
-          number: 10
-          unit: percentage
-      - attribute: HP
-        class: Ground Troops
-        value:
-          number: 10
-          unit: percentage
-      - attribute: Defense
-        class: Mounted Troops
-        condition:
-          - Attacking
-        value:
-          number: 10
-          unit: percentage
-      - attribute: Attack
-        class: Ground Troops
-        condition:
-          - brings a dragon
-          - Attacking
-        value:
-          number: 20
-          unit: percentage
+- buffs:
+  - attribute: HP
+    conditions:
+    - Marching
+    - brings a dragon
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - Marching
+    - brings a dragon
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: Attack
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 15
+      unit: percentage
+  level: red1
+  text: Marching Mounted Troop and Ground Troop HP +10%, with Dragon, Marching Ground Troop Attack +15%.
+- buffs:
+  - attribute: Wounded to Death
+    conditions:
+    - Enemy
+    - In City
+    passive: 0
+    targetedType: ''
+    value:
+      number: 10
+      unit: percentage
+  level: red2
+  text: Enemy In-city Troop Wounded into Death rate +10%.
+- buffs:
+  - attribute: March Size
+    conditions: []
+    passive: 0
+    targetedType: ''
+    value:
+      number: 14
+      unit: percentage
+  level: red3
+  text: March Size Capacity +14%.
+- buffs:
+  - attribute: Defense
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 60
+      unit: percentage
+  level: red4
+  text: Marching Ground Troop Defense +60%.
+- buffs:
+  - attribute: HP
+    conditions:
+    - leading the army
+    - Attacking
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - leading the army
+    - Attacking
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - leading the army
+    - Attacking
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: Attack
+    conditions:
+    - leading the army
+    - Attacking
+    - brings a dragon
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 20
+      unit: percentage
+  level: red5
+  text: Increases Mounted Troop and Ground Troop HP by 10% and Ground Troop Defense by 10% when General is leading the army to attack. Increases Ground Troop Attack by 20% when General is leading the army to attack with any dragon.
 general: Elise
 id: Elise

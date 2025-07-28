@@ -2,62 +2,62 @@
 name: Battle of Pontvallain
 levels:
   - level: "Green"
-    buff:
+    buffs:
       - attribute: Attack
-        class: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 2
           unit: percentage
       - attribute: HP
-        class: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 3
           unit: percentage
   - level: "Blue"
-    buff:
+    buffs:
       - attribute: Attack
-        class: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 3
           unit: percentage
       - attribute: HP
-        class: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 3
           unit: percentage
   - level: "Purple"
-    buff:
+    buffs:
       - attribute: Attack
-        class: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 5
           unit: percentage
       - attribute: HP
-        class: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 6
           unit: percentage
   - level: "Orange"
-    buff:
+    buffs:
       - attribute: Attack
-        class: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 5
           unit: percentage
       - attribute: HP
-        class: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 6
           unit: percentage
   - level: "Gold"
-    buff:
+    buffs:
       - attribute: Attack
-        class: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 10
           unit: percentage
       - attribute: HP
-        class: Mounted Troops
+        targetedType: Mounted Troops
         value:
           number: 12
           unit: percentage

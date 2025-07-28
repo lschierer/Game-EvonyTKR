@@ -1,81 +1,81 @@
 name: Uncrowned Queen
 levels:
   - level: Green
-    buff:
+    buffs:
       - attribute: Attack
-        class: Mounted Troops
-        condition:
+        targetedType: Mounted Troops
+        conditions:
           - Enemy
         value:
           number: 3
           unit: percentage
       - attribute: HP
-        class: Mounted Troops
-        condition:
+        targetedType: Mounted Troops
+        conditions:
           - Enemy
         value:
           number: 3
           unit: percentage
   - level: Blue
-    buff:
+    buffs:
       - attribute: Attack
-        class: Mounted Troops
-        condition:
+        targetedType: Mounted Troops
+        conditions:
           - Enemy
         value:
           number: 3
           unit: percentage
       - attribute: HP
-        class: Mounted Troops
-        condition:
+        targetedType: Mounted Troops
+        conditions:
           - Enemy
         value:
           number: 3
           unit: percentage
   - level: Purple
-    buff:
+    buffs:
       - attribute: Attack
-        class: Mounted Troops
-        condition:
+        targetedType: Mounted Troops
+        conditions:
           - Enemy
         value:
           number: 6
           unit: percentage
       - attribute: HP
-        class: Mounted Troops
-        condition:
+        targetedType: Mounted Troops
+        conditions:
           - Enemy
         value:
           number: 6
           unit: percentage
   - level: Orange
-    buff:
+    buffs:
       - attribute: Attack
-        class: Mounted Troops
-        condition:
+        targetedType: Mounted Troops
+        conditions:
           - Enemy
         value:
           number: 6
           unit: percentage
       - attribute: HP
-        class: Mounted Troops
-        condition:
+        targetedType: Mounted Troops
+        conditions:
           - Enemy
         value:
           number: 6
           unit: percentage
   - level: Gold
-    buff:
+    buffs:
       - attribute: Attack
-        class: Mounted Troops
-        condition:
+        targetedType: Mounted Troops
+        conditions:
           - Enemy
         value:
           number: 12
           unit: percentage
       - attribute: HP
-        class: Mounted Troops
-        condition:
+        targetedType: Mounted Troops
+        conditions:
           - Enemy
         value:
           number: 12

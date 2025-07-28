@@ -1,29 +1,29 @@
 name: Patriot’s Radiance
-buff:
+buffs:
   - attribute: Defense
     targetedType: Ranged Troops
-    condition:
+    conditions:
       - Attacking
     value:
       number: 45
       unit: percentage
   - attribute: Attack
     targetedType: Ranged Troops
-    condition:
+    conditions:
       - Attacking
     value:
       number: 45
       unit: percentage
   - attribute: HP
     targetedType: Ranged Troops
-    condition:
+    conditions:
       - Attacking
     value:
       number: 30
       unit: percentage
   - attribute: HP
     targetedType: Siege Machines
-    condition:
+    conditions:
       - Attacking
     value:
       number: 30

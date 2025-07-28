@@ -1,33 +1,43 @@
 ---
 name: Unparalleled Leader
 levels:
-  - level: "Green"
-    buff:
+  - level: 'Green'
+    buffs:
       - attribute: Death to Wounded
+        conditions:
+          - attacking
         value:
           number: 1
           unit: percentage
-  - level: "Blue"
-    buff:
+  - level: 'Blue'
+    buffs:
       - attribute: Death to Wounded
+        conditions:
+          - attacking
         value:
           number: 1
           unit: percentage
-  - level: "Purple"
-    buff:
+  - level: 'Purple'
+    buffs:
       - attribute: Death to Wounded
+        conditions:
+          - attacking
         value:
           number: 2
           unit: percentage
-  - level: "Orange"
-    buff:
+  - level: 'Orange'
+    buffs:
       - attribute: Death to Wounded
+        conditions:
+          - attacking
         value:
           number: 2
           unit: percentage
-  - level: "Gold"
-    buff:
+  - level: 'Gold'
+    buffs:
       - attribute: Death to Wounded
+        conditions:
+          - attacking
         value:
           number: 4
           unit: percentage

@@ -1,26 +1,29 @@
+---
+buffs:
+- attribute: Attack
+  conditions:
+  - leading the army
+  - Against Monsters
+  passive: 0
+  targetedType: Mounted Troops
+  value:
+    number: 45
+    unit: percentage
+- attribute: Attack
+  conditions:
+  - brings a dragon
+  passive: 0
+  targetedType: Ground Troops
+  value:
+    number: 15
+    unit: percentage
+- attribute: Attack
+  conditions:
+  - brings a dragon
+  passive: 0
+  targetedType: Mounted Troops
+  value:
+    number: 15
+    unit: percentage
 name: Dictator
-buff:
-  - attribute: Attack
-    targetedType: Mounted Troops
-    condition:
-      - Against Monsters
-      - Attacking
-    value:
-      number: 45
-      unit: percentage
-  - attribute: Attack
-    targetedType: Mounted Troops
-    condition:
-      - brings a dragon
-    value:
-      number: 15
-      unit: percentage
-  - attribute: Attack
-    targetedType: Ground Troops
-    condition:
-      - brings a dragon
-    value:
-      number: 15
-      unit: percentage
-text: >-
-  Increases mounted troops’ attack by 45% when General is leading the army to attack Monsters. Increases ground troops and mounted troops’ attack by 15% when General brings any dragon.
+text: Increases mounted troops’ attack by 45% when General is leading the army to attack Monsters. Increases ground troops and mounted troops’ attack by 15% when General brings any dragon.

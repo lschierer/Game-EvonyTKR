@@ -1,0 +1,29 @@
+---
+buffs:
+- attribute: Attack
+  conditions:
+  - Enemy
+  - leading the army
+  passive: 0
+  targetedType: Mounted Troops
+  value:
+    number: 25
+    unit: percentage
+- attribute: Attack
+  conditions:
+  - leading the army
+  passive: 0
+  targetedType: Ranged Troops
+  value:
+    number: 15
+    unit: percentage
+- attribute: Defense
+  conditions:
+  - leading the army
+  passive: 0
+  targetedType: Ranged Troops
+  value:
+    number: 15
+    unit: percentage
+name: Kiido Magic
+text: Reduces enemy mounted troops’ attack by 25% and increases your ranged troops’ attack and defense by 15% when General is leading the army.

@@ -1,0 +1,152 @@
+name: Battle of Sasu
+levels:
+  - level: Green
+    buffs:
+      - attribute: attack
+        troop: Ground Troops
+        value:
+          number: 1
+          unit: percentage
+        conditions:
+          - Enemy
+      - attribute: Attack
+        troop: Mounted Troops
+        value:
+          number: 1
+          unit: percentage
+        conditions:
+          - Enemy
+      - attribute: Attack
+        conditions:
+          - Enemy
+        troop: Ranged Troops
+        value:
+          number: 2
+          unit: percentage
+      - attribute: Attack
+        conditions:
+          - Enemy
+        troop: Siege Machines
+        value:
+          number: 2
+          unit: percentage
+  - level: Blue
+    buffs:
+      - attribute: attack
+        troop: Ground Troops
+        value:
+          number: 1
+          unit: percentage
+        conditions:
+          - Enemy
+      - attribute: Attack
+        troop: Mounted Troops
+        value:
+          number: 1
+          unit: percentage
+        conditions:
+          - Enemy
+      - attribute: Attack
+        conditions:
+          - Enemy
+        troop: Ranged Troops
+        value:
+          number: 2
+          unit: percentage
+      - attribute: Attack
+        conditions:
+          - Enemy
+        troop: Siege Machines
+        value:
+          number: 2
+          unit: percentage
+  - level: Purple
+    buffs:
+      - attribute: attack
+        troop: Ground Troops
+        value:
+          number: 2
+          unit: percentage
+        conditions:
+          - Enemy
+      - attribute: Attack
+        troop: Mounted Troops
+        value:
+          number: 2
+          unit: percentage
+        conditions:
+          - Enemy
+      - attribute: Attack
+        conditions:
+          - Enemy
+        troop: Ranged Troops
+        value:
+          number: 4
+          unit: percentage
+      - attribute: Attack
+        conditions:
+          - Enemy
+        troop: Siege Machines
+        value:
+          number: 4
+          unit: percentage
+  - level: Orange
+    buffs:
+      - attribute: attack
+        troop: Ground Troops
+        value:
+          number: 2
+          unit: percentage
+        conditions:
+          - Enemy
+      - attribute: Attack
+        troop: Mounted Troops
+        value:
+          number: 2
+          unit: percentage
+        conditions:
+          - Enemy
+      - attribute: Attack
+        conditions:
+          - Enemy
+        troop: Ranged Troops
+        value:
+          number: 4
+          unit: percentage
+      - attribute: Attack
+        conditions:
+          - Enemy
+        troop: Siege Machines
+        value:
+          number: 4
+          unit: percentage
+  - level: Gold
+    buffs:
+      - attribute: attack
+        troop: Ground Troops
+        value:
+          number: 4
+          unit: percentage
+        conditions:
+          - Enemy
+      - attribute: Attack
+        troop: Mounted Troops
+        value:
+          number: 4
+          unit: percentage
+        conditions:
+          - Enemy
+      - attribute: Attack
+        conditions:
+          - Enemy
+        troop: Ranged Troops
+        value:
+          number: 8
+          unit: percentage
+      - attribute: Attack
+        conditions:
+          - Enemy
+        troop: Siege Machines
+        value:
+          number: 8
+          unit: percentage

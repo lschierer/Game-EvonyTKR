@@ -1,151 +1,151 @@
 name: Battle of Bradfield
 levels:
   - level: Green
-    buff:
+    buffs:
       - attribute: Attack
-        class: Siege Machines
-        condition:
+        targetedType: Siege Machines
+        conditions:
           - Attacking
         value:
           number: 2
           unit: percentage
       - attribute: Attack
-        class: Ranged Troops
-        condition:
+        targetedType: Ranged Troops
+        conditions:
           - Attacking
         value:
           number: 2
           unit: percentage
       - attribute: HP
-        class: Siege Machines
-        condition:
+        targetedType: Siege Machines
+        conditions:
           - Attacking
         value:
           number: 2
           unit: percentage
       - attribute: HP
-        class: Ranged Troops
-        condition:
+        targetedType: Ranged Troops
+        conditions:
           - Attacking
         value:
           number: 2
           unit: percentage
   - level: Blue
-    buff:
+    buffs:
       - attribute: Attack
-        class: Siege Machines
-        condition:
+        targetedType: Siege Machines
+        conditions:
           - Attacking
         value:
           number: 2
           unit: percentage
       - attribute: Attack
-        class: Ranged Troops
-        condition:
+        targetedType: Ranged Troops
+        conditions:
           - Attacking
         value:
           number: 2
           unit: percentage
       - attribute: HP
-        class: Siege Machines
-        condition:
+        targetedType: Siege Machines
+        conditions:
           - Attacking
         value:
           number: 2
           unit: percentage
       - attribute: HP
-        class: Ranged Troops
-        condition:
+        targetedType: Ranged Troops
+        conditions:
           - Attacking
         value:
           number: 2
           unit: percentage
   - level: Purple
-    buff:
+    buffs:
       - attribute: Attack
-        class: Siege Machines
-        condition:
+        targetedType: Siege Machines
+        conditions:
           - Attacking
         value:
           number: 3
           unit: percentage
       - attribute: Attack
-        class: Ranged Troops
-        condition:
+        targetedType: Ranged Troops
+        conditions:
           - Attacking
         value:
           number: 3
           unit: percentage
       - attribute: HP
-        class: Siege Machines
-        condition:
+        targetedType: Siege Machines
+        conditions:
           - Attacking
         value:
           number: 3
           unit: percentage
       - attribute: HP
-        class: Ranged Troops
-        condition:
+        targetedType: Ranged Troops
+        conditions:
           - Attacking
         value:
           number: 3
           unit: percentage
   - level: Orange
-    buff:
+    buffs:
       - attribute: Attack
-        class: Siege Machines
-        condition:
+        targetedType: Siege Machines
+        conditions:
           - Attacking
         value:
           number: 3
           unit: percentage
       - attribute: Attack
-        class: Ranged Troops
-        condition:
+        targetedType: Ranged Troops
+        conditions:
           - Attacking
         value:
           number: 3
           unit: percentage
       - attribute: HP
-        class: Siege Machines
-        condition:
+        targetedType: Siege Machines
+        conditions:
           - Attacking
         value:
           number: 3
           unit: percentage
       - attribute: HP
-        class: Ranged Troops
-        condition:
+        targetedType: Ranged Troops
+        conditions:
           - Attacking
         value:
           number: 3
           unit: percentage
   - level: Gold
-    buff:
+    buffs:
       - attribute: Attack
-        class: Siege Machines
-        condition:
+        targetedType: Siege Machines
+        conditions:
           - Attacking
         value:
           number: 6
           unit: percentage
       - attribute: Attack
-        class: Ranged Troops
-        condition:
+        targetedType: Ranged Troops
+        conditions:
           - Attacking
         value:
           number: 6
           unit: percentage
       - attribute: HP
-        class: Siege Machines
-        condition:
+        targetedType: Siege Machines
+        conditions:
           - Attacking
         value:
           number: 6
           unit: percentage
       - attribute: HP
-        class: Ranged Troops
-        condition:
+        targetedType: Ranged Troops
+        conditions:
           - Attacking
         value:
           number: 6

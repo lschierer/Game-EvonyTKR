@@ -1,0 +1,24 @@
+name: Empire Glory
+generals:
+  - general: Elektra
+    buffs:
+      - attribute: Attack
+        passive: 1
+        targetedType: Ranged Troops
+        value:
+          number: 10
+          unit: percentage
+      - attribute: Attack
+        passive: 1
+        targetedType: Siege Machines
+        value:
+          number: 10
+          unit: percentage
+      - attribute: Attack
+        passive: 0
+        targetedType: Ranged Troops
+        conditions:
+          - Attacking
+        value:
+          number: 15
+          unit: percentage

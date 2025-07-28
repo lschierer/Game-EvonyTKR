@@ -1,8 +1,8 @@
 ---
 name: Dignity of Grand Prince
-buff:
+buffs:
   - attribute: Attack
-    condition:
+    conditions:
       - Enemy
     value:
       number: 10
