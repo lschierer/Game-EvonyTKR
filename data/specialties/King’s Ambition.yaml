@@ -1,5 +1,6 @@
 ---
-name: King's Ambition
+name: >-
+  King’s Ambition
 levels:
   - level: Green
     buffs:
