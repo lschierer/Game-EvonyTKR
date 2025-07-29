@@ -65,9 +65,10 @@ class Game::EvonyTKR::Model::Specialty::Manager :
         yaml_version => ['1.2', '1.1'],
       )->load_string($data);
       if (exists $object->{name}) {
+        # some files are lower case, get the proper case sensitive name
+        $name = $object->{name};
         if($object->{name} !~ /$name/i ) {
           $self->logger->warn("$name does not match " . $object->{name});
-          $name = $object->{name};
         }
       }
 
@@ -75,39 +76,22 @@ class Game::EvonyTKR::Model::Specialty::Manager :
         Game::EvonyTKR::Model::Specialty->new(name => $name,);
       foreach my $ol (@{ $object->{levels} }) {
         my $level = $ol->{level};
+        $self->logger->debug("attempting import of $level for $name");
         my @buffs;
         if(exists $ol->{buff}){
           @buffs = @{$ol->{buff}};
         }elsif(exists $ol->{buffs}){
           @buffs = @{$ol->{buffs}};
         }
-        foreach my $ob (@{ $ol->{buff} }) {
-          my $v = Game::EvonyTKR::Model::Buff::Value->new(
-            number => abs($ob->{value}->{number}),
-            unit   => $ob->{value}->{unit},
-          );
-          my $b;
-          $b = Game::EvonyTKR::Model::Buff->new(
-            value     => $v,
-            attribute => $ob->{attribute},
-            passive   => $ob->{passive} // 0,
-          );
-
-          if (exists $ob->{targetedType}) {
-            $b->set_target($ob->{targetedType});
-          }
-
-          if (exists $ob->{conditions}) {
-            foreach my $c (@{ $ob->{conditions} }) {
-              $b->set_condition($c);
-            }
-          }elsif(exists $ob->{conditions}){
-            foreach my $c (@{ $ob->{conditions} }) {
-              $b->set_condition($c);
-            }
-          }
+        foreach my $ob (@buffs) {
+          my $b = Game::EvonyTKR::Model::Buff->from_hash($ob);
           $specialties->{$name}->addBuff($level, $b);
         }
+      }
+      if(exists $specialties->{$name}){
+        $self->logger->debug("imported $name as: " . $specialties->{$name});
+      } else {
+        $self->logger->error("failed to import $name");
       }
     }
     my $countImported = scalar keys %$specialties;

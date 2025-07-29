@@ -105,34 +105,15 @@ class Game::EvonyTKR::Model::Covenant::Manager :
         my $category = $oc->{category};
 
         # Find buffs for this category
-        foreach my $ob (@{ $oc->{buffs} }) {
-
-          my $v = Game::EvonyTKR::Model::Buff::Value->new(
-            number => abs($ob->{value}->{number}),
-            unit   => $ob->{value}->{unit},
-          );
-# very few collection types have passive buffs. Covenants are an exception.
-# however, the data source for covenants records this one level above the buffs
-# themselves, recording a different instance of $object->{levels} for an
-# object with passive buffs and one without.  We need to merge any objects
-# that have the same category, adding the buffs from both to the same array.
-          my $b = Game::EvonyTKR::Model::Buff->new(
-            value     => $v,
-            attribute => $ob->{attribute},
-            passive   => $ob->{passive} // 0,
-          );
-
-          if (exists $ob->{targetedType} && defined $ob->{targetedType}) {
-            $b->set_target($ob->{targetedType});
-          }
-
-          if (exists $ob->{conditions}) {
-            foreach my $c (@{ $ob->{conditions} }) {
-              $b->set_condition($c);
-            }
-          }
+        my @buffs;
+        if(exists $oc->{buff}){
+          @buffs = @{$oc->{buff}};
+        }elsif(exists $oc->{buffs}){
+          @buffs = @{$oc->{buffs}};
+        }
+        foreach my $ob (@buffs) {
+          my $b = Game::EvonyTKR::Model::Buff->from_hash($ob);
           $covenants->{$name}->addBuff($category, $b);
-
         }
       }
       $self->logger->debug(

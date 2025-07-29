@@ -191,7 +191,7 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Shared::Constants) {
     }
 
     $logger->trace(sprintf(
-'Checking match for buff: attr=%s, targetType=%s, buff conditions=%s, debuff conditions=%s',
+    'Checking match for buff: attr=%s, targetType=%s, buff conditions=%s, debuff conditions=%s',
       $attribute,
       $targetedType,
       join(', ', ref $buffConditions eq 'ARRAY'   ? @$buffConditions   : ()),
@@ -247,7 +247,7 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Shared::Constants) {
         return 0;
       }
     }
-# If test_debuffConditions is provided, check that all debuff conditions are in the allowed list
+    # If test_debuffConditions is provided, check that all debuff conditions are in the allowed list
     elsif ($has_debuff_conditions) {
       foreach my $condition (@$debuffConditions) {
         if (none { $_ eq $condition } @$test_debuffConditions) {
@@ -259,7 +259,7 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Shared::Constants) {
     }
     else {
       $logger->trace(
-"  ✗ Rejected: debuff conditions are not present in buff and are required."
+      "  ✗ Rejected: debuff conditions are not present in buff and are required."
       );
       return 0;
     }
@@ -267,7 +267,7 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Shared::Constants) {
     # Check buff conditions
     my $has_buff_conditions = scalar @$buffConditions > 0;
 
-# If test_buffConditions is provided, check that all buff conditions are in the allowed list
+    # If test_buffConditions is provided, check that all buff conditions are in the allowed list
     if (scalar @$test_buffConditions > 0) {
       # A buff with no conditions should match when conditions are specified
       if (!$has_buff_conditions) {
@@ -299,6 +299,31 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Shared::Constants) {
 
     $logger->trace("  ✓ Buff matched");
     return 1;
+  }
+
+  sub from_hash ($self, $hashref) {
+    my $v = Game::EvonyTKR::Model::Buff::Value->new(
+      number => abs($hashref->{value}->{number}),
+      unit   => $hashref->{value}->{unit} // 'percentage',
+    );
+    my $r =  Game::EvonyTKR::Model::Buff->new(
+      attribute   => $hashref->{attribute},
+      passive     => $hashref->{passive} // 0,
+      value       => $v,
+    );
+    if(exists $hashref->{targetedType}){
+      $r->set_target($hashref->{targetedType});
+    }
+    if (exists $hashref->{condition}) {
+      foreach my $c (@{ $hashref->{conditions} }) {
+        $r->set_condition($c);
+      }
+    }elsif(exists $hashref->{conditions}){
+      foreach my $c (@{ $hashref->{conditions} }) {
+        $r->set_condition($c);
+      }
+    }
+    return $r;
   }
 
   method to_hash {

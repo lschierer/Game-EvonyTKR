@@ -82,46 +82,19 @@ class Game::EvonyTKR::Model::Book::Manager :
       );
 
       my $buffCount = 0;
-      if (exists $object->{buffs} && ref($object->{buffs}) eq 'ARRAY') {
-        $buffCount = scalar @{ $object->{buffs} };
+
+
+      my @buffs;
+      if(exists $object->{buff}){
+        @buffs = @{$object->{buff}};
+      }elsif(exists $object->{buffs}){
+        @buffs = @{$object->{buffs}};
       }
-      $self->logger->debug("Book '$name' has $buffCount buffs in YAML");
+      $self->logger->debug(sprintf('Book %s has %s buffs in YAML', $name, scalar @buffs));
 
-      foreach my $ob (@{ $object->{buffs} }) {
-        $self->logger->debug("Processing buff for book '$name': "
-            . "attribute="
-            . ($ob->{attribute} // 'undef')
-            . ", number="
-            . ($ob->{value}->{number} // 'undef')
-            . ", unit="
-            . ($ob->{value}->{unit} // 'undef'));
-
-        my $v = Game::EvonyTKR::Model::Buff::Value->new(
-          number => abs($ob->{value}->{number}),
-          unit   => $ob->{value}->{unit},
-        );
-        my $b;
-        $b = Game::EvonyTKR::Model::Buff->new(
-          value     => $v,
-          attribute => $ob->{attribute},
-          passive   => $ob->{passive} // 0,
-        );
-
-        if (exists $ob->{targetedType}) {
-          $b->set_target($ob->{targetedType});
-        }
-
-        if (exists $ob->{conditions}) {
-          foreach my $c (@{ $ob->{conditions} }) {
-            $b->set_condition($c);
-          }
-        }
+      foreach my $ob (@buffs) {
+        my $b = Game::EvonyTKR::Model::Buff->from_hash($ob);
         $books->{$name}->addBuff($b);
-        $self->logger->debug("Added buff for attribute '"
-            . $ob->{attribute}
-            . "' to book '$name', now has "
-            . scalar @{ $books->{$name}->buff }
-            . " buffs");
       }
 
       $self->logger->debug("Finished importing book '$name' with "

@@ -138,6 +138,7 @@ class Game::EvonyTKR::Shared::Constants : isa(Game::EvonyTKR::Model::Logger) {
       'mayor death into survival rate' => 'SubCity Death to Survival',
       'the gold production speed'      => 'SubCity Gold Production',
       "traps’ triggering rate"         => 'Trap Triggering Rate',
+      'Trap Triggering Chance'         => 'Trap Triggering Rate',
       'subordinate city troops’ death to survival rate' =>
         'SubCity Death to Survival',
       'subordinate city troops’ death to survival' =>
