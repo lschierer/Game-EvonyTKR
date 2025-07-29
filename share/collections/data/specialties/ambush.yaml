@@ -1,98 +1,92 @@
----
-levels:
-- buffs:
-  - attribute: Attack
-    conditions:
-    - In City
-    passive: 0
-    targetedType: Ranged Troops
-    value:
-      number: 0
-      unit: percentage
-  - attribute: Attack
-    conditions:
-    - In City
-    passive: 0
-    targetedType: Siege Machines
-    value:
-      number: 0
-      unit: percentage
-  level: Green
-  text: ''
-- buffs:
-  - attribute: Attack
-    conditions:
-    - In City
-    passive: 0
-    targetedType: Ranged Troops
-    value:
-      number: 0
-      unit: percentage
-  - attribute: Attack
-    conditions:
-    - In City
-    passive: 0
-    targetedType: Siege Machines
-    value:
-      number: 0
-      unit: percentage
-  level: Blue
-  text: ''
-- buffs:
-  - attribute: Attack
-    conditions:
-    - In City
-    passive: 0
-    targetedType: Ranged Troops
-    value:
-      number: 0
-      unit: percentage
-  - attribute: Attack
-    conditions:
-    - In City
-    passive: 0
-    targetedType: Siege Machines
-    value:
-      number: 0
-      unit: percentage
-  level: Purple
-  text: ''
-- buffs:
-  - attribute: Attack
-    conditions:
-    - In City
-    passive: 0
-    targetedType: Ranged Troops
-    value:
-      number: 0
-      unit: percentage
-  - attribute: Attack
-    conditions:
-    - In City
-    passive: 0
-    targetedType: Siege Machines
-    value:
-      number: 0
-      unit: percentage
-  level: Orange
-  text: ''
-- buffs:
-  - attribute: Attack
-    conditions:
-    - In City
-    passive: 0
-    targetedType: Ranged Troops
-    value:
-      number: 10
-      unit: percentage
-  - attribute: Attack
-    conditions:
-    - In City
-    passive: 0
-    targetedType: Siege Machines
-    value:
-      number: 10
-      unit: percentage
-  level: Gold
-  text: Trap Triggering Chance +20%, In-city Ranged Troop and Siege Machine Attack +10%
 name: Ambush
+levels:
+  - buffs:
+      - attribute: Trap Triggering Rate
+        value:
+          number: 2
+      - attribute: Attack
+        troop: Ranged Troops
+        value:
+          number: 1
+        conditions:
+          - In City
+      - attribute: Attack
+        troop: Siege Machines
+        value:
+          number: 1
+        conditions:
+          - In City
+    level: Green
+    text: Trap Triggering Chance +2%. In-city Ranged Troop and Siege Machine Attack +1%.
+  - buffs:
+      - attribute: Trap Triggering Rate
+        value:
+          number: 2
+      - attribute: Attack
+        troop: Ranged Troops
+        value:
+          number: 1
+        conditions:
+          - In City
+      - attribute: Attack
+        troop: Siege Machines
+        value:
+          number: 1
+        conditions:
+          - In City
+    level: Blue
+    text: Trap Triggering Chance +2%. In-city Ranged Troop and Siege Machine Attack +1%.
+  - buffs:
+      - attribute: Trap Triggering Rate
+        value:
+          number: 4
+      - attribute: Attack
+        troop: Ranged Troops
+        value:
+          number: 2
+        conditions:
+          - In City
+      - attribute: Attack
+        troop: Siege Machines
+        value:
+          number: 2
+        conditions:
+          - In City
+    level: Purple
+    text: Trap Triggering Chance +4%. In-city Ranged Troop and Siege Machine Attack +2%.
+  - buffs:
+      - attribute: Trap Triggering Rate
+        value:
+          number: 4
+      - attribute: Attack
+        troop: Ranged Troops
+        value:
+          number: 2
+        conditions:
+          - In City
+      - attribute: Attack
+        troop: Siege Machines
+        value:
+          number: 2
+        conditions:
+          - In City
+    level: Orange
+    text: Trap Triggering Chance +4%. In-city Ranged Troop and Siege Machine Attack +2%.
+  - buffs:
+      - attribute: Trap Triggering Rate
+        value:
+          number: 8
+      - attribute: Attack
+        troop: Ranged Troops
+        value:
+          number: 4
+        conditions:
+          - In City
+      - attribute: Attack
+        troop: Siege Machines
+        value:
+          number: 4
+        conditions:
+          - In City
+    level: Gold
+    text: Trap Triggering Chance +8%. In-city Ranged Troop and Siege Machine Attack +4%.
