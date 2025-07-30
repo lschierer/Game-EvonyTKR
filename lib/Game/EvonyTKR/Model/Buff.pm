@@ -314,6 +314,9 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Shared::Constants) {
     if(exists $hashref->{targetedType}){
       $r->set_target($hashref->{targetedType});
     }
+    if(exists $hashref->{troop}){
+      $r->set_target($hashref->{troop});
+    }
     if (exists $hashref->{condition}) {
       foreach my $c (@{ $hashref->{conditions} }) {
         $r->set_condition($c);
