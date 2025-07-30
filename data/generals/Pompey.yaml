@@ -1,0 +1,24 @@
+ascending: 'true'
+basic_attributes:
+  attack:
+    base: 102
+    increment: 0
+  defense:
+    base: 101
+    increment: 0
+  leadership:
+    base: 119
+    increment: 0
+  politics:
+    base: 111
+    increment: 0
+book: Roman Consul
+name: Pompey
+specialties:
+  - Ground Troop Formation
+  - Pacify
+  - King’s Ambition
+  - Battle of the Lycus
+stars: red5
+type:
+  - mayor
