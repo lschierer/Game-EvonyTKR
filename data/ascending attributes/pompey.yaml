@@ -1,0 +1,127 @@
+ascending:
+  - buffs:
+      - attribute: Defense
+        troop: Mounted Troops
+        value:
+          number: 15
+        conditions:
+          - When the Main Defense Deneral
+          - In City
+      - attribute: HP
+        troop: Mounted Troops
+        value:
+          number: 10
+          unit: percentage
+        conditions:
+          - When the Main Defense Deneral
+          - In City
+      - attribute: Defense
+        troop: Ground Troops
+        value:
+          number: 15
+          unit: percentage
+        conditions:
+          - When the Main Defense Deneral
+          - In City
+      - attribute: HP
+        troop: Ground Troops
+        value:
+          number: 10
+          unit: percentage
+        conditions:
+          - When the Main Defense Deneral
+          - In City
+    level: red1
+    text: When General is the Main City Defense General, In-city Mounted Troop and Ground Troop Defense +15% and HP +10%.
+  - buffs:
+      - attribute: Hospital Capacity
+        value:
+          number: 20
+          unit: percentage
+        conditions:
+          - When the Main Defense Deneral
+    level: red2
+    text: When General is the Main City Defense General, Hospital Capacity +20%.
+  - buffs:
+      - attribute: Defense
+        troop: Ranged Troops
+        value:
+          number: 30
+          unit: percentage
+        conditions:
+          - When the Main Defense Deneral
+          - In City
+      - attribute: HP
+        troop: Ground Troops
+        value:
+          number: 20
+          unit: percentage
+        conditions:
+          - When the Main Defense Deneral
+          - In City
+      - attribute: HP
+        troop: Mounted Troops
+        value:
+          number: 20
+          unit: percentage
+        conditions:
+          - When the Main Defense Deneral
+          - In City
+    level: red3
+    text: When General is the Main City Defense General, In-city Ranged Troop Defense +30%, In-city Ground Troop and Mounted Troop HP +20%.
+  - buffs:
+      - attribute: HP
+        troop: Ranged Troops
+        value:
+          number: 30
+          unit: percentage
+        conditions:
+          - When the Main Defense Deneral
+          - In City
+      - attribute: Defense
+        troop: Ground Troops
+        value:
+          number: 30
+          unit: percentage
+        conditions:
+          - When the Main Defense Deneral
+          - In City
+      - attribute: Defense
+        troop: Mounted Troops
+        value:
+          number: 30
+          unit: percentage
+        conditions:
+          - When the Main Defense Deneral
+          - In City
+    level: red4
+    text: When General is the Main City Defense General, In-city Ranged Troop HP +30%, In-city Ground Troop and Mounted Troop Defense +30%.
+  - buffs:
+      - attribute: attack
+        troop: Ranged Troops
+        value:
+          number: 20
+          unit: percentage
+        conditions:
+          - When the Main Defense Deneral
+          - In City
+      - attribute: Defense
+        troop: Ranged Troops
+        value:
+          number: 30
+          unit: percentage
+        conditions:
+          - When the Main Defense Deneral
+          - In City
+      - attribute: HP
+        troop: Ranged Troops
+        value:
+          number: 30
+          unit: percentage
+        conditions:
+          - When the Main Defense Deneral
+          - In City
+    level: red5
+    text: When General is the Main City Defense General, In-city Ranged Troop Attack +20%, Defense and HP +30%.
+general: Pompey
+id: Pompey
