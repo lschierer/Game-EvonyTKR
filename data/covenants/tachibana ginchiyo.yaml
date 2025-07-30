@@ -6,7 +6,6 @@ generals:
 levels:
 - buffs:
   - attribute: HP
-    conditions: []
     passive: 0
     targetedType: Ranged Troops
     value:
@@ -46,14 +45,12 @@ levels:
   text: In-Rally Ranged Troop HP +10% (Local)
 - buffs:
   - attribute: Attack
-    conditions: []
     passive: 0
     targetedType: Ranged Troops
     value:
       number: 5
       unit: percentage
   - attribute: Defense
-    conditions: []
     passive: 0
     targetedType: Ranged Troops
     value:
@@ -67,7 +64,6 @@ levels:
     - Enemy
     - Attacking
     passive: 0
-    targetedType: ''
     value:
       number: 10
       unit: percentage
@@ -75,7 +71,6 @@ levels:
   text: Enemy Wounded into Death when attacking +10% (Local)
 - buffs:
   - attribute: Training Speed
-    conditions: []
     passive: 1
     targetedType: Ranged Troops
     value:

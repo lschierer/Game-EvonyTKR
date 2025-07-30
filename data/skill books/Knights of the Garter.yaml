@@ -1,7 +1,6 @@
 ---
 buffs:
 - attribute: Attack
-  conditions: []
   passive: 0
   targetedType: Ranged Troops
   value:

@@ -2,21 +2,18 @@
 levels:
 - buffs:
   - attribute: Attack
-    conditions: []
     passive: 0
     targetedType: Ground Troops
     value:
       number: 0
       unit: percentage
   - attribute: HP
-    conditions: []
     passive: 0
     targetedType: Ground Troops
     value:
       number: 0
       unit: percentage
   - attribute: Attack
-    conditions: []
     passive: 0
     targetedType: Ranged Troops
     value:
@@ -26,21 +23,18 @@ levels:
   text: ''
 - buffs:
   - attribute: Attack
-    conditions: []
     passive: 0
     targetedType: Ground Troops
     value:
       number: 0
       unit: percentage
   - attribute: HP
-    conditions: []
     passive: 0
     targetedType: Ground Troops
     value:
       number: 0
       unit: percentage
   - attribute: Attack
-    conditions: []
     passive: 0
     targetedType: Ranged Troops
     value:
@@ -50,21 +44,18 @@ levels:
   text: ''
 - buffs:
   - attribute: Attack
-    conditions: []
     passive: 0
     targetedType: Ground Troops
     value:
       number: 0
       unit: percentage
   - attribute: HP
-    conditions: []
     passive: 0
     targetedType: Ground Troops
     value:
       number: 0
       unit: percentage
   - attribute: Attack
-    conditions: []
     passive: 0
     targetedType: Ranged Troops
     value:
@@ -74,21 +65,18 @@ levels:
   text: ''
 - buffs:
   - attribute: Attack
-    conditions: []
     passive: 0
     targetedType: Ground Troops
     value:
       number: 0
       unit: percentage
   - attribute: HP
-    conditions: []
     passive: 0
     targetedType: Ground Troops
     value:
       number: 0
       unit: percentage
   - attribute: Attack
-    conditions: []
     passive: 0
     targetedType: Ranged Troops
     value:
@@ -98,21 +86,18 @@ levels:
   text: ''
 - buffs:
   - attribute: Attack
-    conditions: []
     passive: 0
     targetedType: Ground Troops
     value:
       number: 10
       unit: percentage
   - attribute: HP
-    conditions: []
     passive: 0
     targetedType: Ground Troops
     value:
       number: 10
       unit: percentage
   - attribute: Attack
-    conditions: []
     passive: 0
     targetedType: Ranged Troops
     value:

@@ -32,7 +32,6 @@ ascending:
     conditions:
     - Marching
     passive: 0
-    targetedType: ''
     value:
       number: 8
       unit: percentage
@@ -56,9 +55,7 @@ ascending:
       number: 20
       unit: percentage
   - attribute: March Size
-    conditions: []
     passive: 0
-    targetedType: ''
     value:
       number: 10
       unit: percentage
@@ -93,9 +90,7 @@ ascending:
       number: 40
       unit: percentage
   - attribute: March Size
-    conditions: []
     passive: 0
-    targetedType: ''
     value:
       number: 8
       unit: percentage

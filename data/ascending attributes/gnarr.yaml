@@ -18,7 +18,6 @@ ascending:
       number: 10
       unit: percentage
   - attribute: HP
-    conditions: []
     passive: 0
     targetedType: Ranged Troops
     value:
@@ -32,7 +31,6 @@ ascending:
     - leading the army
     - Attacking
     passive: 0
-    targetedType: ''
     value:
       number: 10
       unit: percentage
@@ -40,9 +38,7 @@ ascending:
   text: Increases Troop Death into Wounded Rate by 10% when General is leading the army to attack.
 - buffs:
   - attribute: March Size
-    conditions: []
     passive: 0
-    targetedType: ''
     value:
       number: 14
       unit: percentage
@@ -66,7 +62,6 @@ ascending:
       number: 15
       unit: percentage
   - attribute: Defense
-    conditions: []
     passive: 0
     targetedType: Ranged Troops
     value:
@@ -92,7 +87,6 @@ ascending:
       number: 15
       unit: percentage
   - attribute: Attack
-    conditions: []
     passive: 0
     targetedType: Ranged Troops
     value:

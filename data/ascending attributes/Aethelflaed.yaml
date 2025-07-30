@@ -13,7 +13,6 @@ ascending:
     conditions:
     - Against Monsters
     passive: 0
-    targetedType: ''
     value:
       number: 10
       unit: percentage
@@ -24,7 +23,6 @@ ascending:
     conditions:
     - Monsters
     passive: 0
-    targetedType: ''
     value:
       number: 10
       unit: percentage
@@ -32,7 +30,6 @@ ascending:
     conditions:
     - Against Monsters
     passive: 0
-    targetedType: ''
     value:
       number: 15
       unit: percentage
@@ -43,7 +40,6 @@ ascending:
     conditions:
     - Monsters
     passive: 0
-    targetedType: ''
     value:
       number: 10
       unit: percentage
@@ -51,7 +47,6 @@ ascending:
     conditions:
     - Against Monsters
     passive: 0
-    targetedType: ''
     value:
       number: 20
       unit: percentage
@@ -70,7 +65,6 @@ ascending:
     conditions:
     - Against Monsters
     passive: 0
-    targetedType: ''
     value:
       number: 20
       unit: percentage
@@ -89,7 +83,6 @@ ascending:
     conditions:
     - Against Monsters
     passive: 0
-    targetedType: ''
     value:
       number: 10
       unit: percentage
@@ -97,7 +90,6 @@ ascending:
     conditions:
     - Against Monsters
     passive: 0
-    targetedType: ''
     value:
       number: 10
       unit: percentage

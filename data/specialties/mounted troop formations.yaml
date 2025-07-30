@@ -2,14 +2,12 @@
 levels:
 - buffs:
   - attribute: Attack
-    conditions: []
     passive: 0
     targetedType: Mounted Troops
     value:
       number: 0
       unit: percentage
   - attribute: Defense
-    conditions: []
     passive: 0
     targetedType: Mounted Troops
     value:
@@ -19,14 +17,12 @@ levels:
   text: ''
 - buffs:
   - attribute: Attack
-    conditions: []
     passive: 0
     targetedType: Mounted Troops
     value:
       number: 0
       unit: percentage
   - attribute: Defense
-    conditions: []
     passive: 0
     targetedType: Mounted Troops
     value:
@@ -36,14 +32,12 @@ levels:
   text: ''
 - buffs:
   - attribute: Attack
-    conditions: []
     passive: 0
     targetedType: Mounted Troops
     value:
       number: 0
       unit: percentage
   - attribute: Defense
-    conditions: []
     passive: 0
     targetedType: Mounted Troops
     value:
@@ -53,14 +47,12 @@ levels:
   text: ''
 - buffs:
   - attribute: Attack
-    conditions: []
     passive: 0
     targetedType: Mounted Troops
     value:
       number: 0
       unit: percentage
   - attribute: Defense
-    conditions: []
     passive: 0
     targetedType: Mounted Troops
     value:
@@ -70,14 +62,12 @@ levels:
   text: ''
 - buffs:
   - attribute: Attack
-    conditions: []
     passive: 0
     targetedType: Mounted Troops
     value:
       number: 10
       unit: percentage
   - attribute: Defense
-    conditions: []
     passive: 0
     targetedType: Mounted Troops
     value:

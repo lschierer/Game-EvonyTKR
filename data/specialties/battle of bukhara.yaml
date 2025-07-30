@@ -2,9 +2,7 @@
 levels:
 - buffs:
   - attribute: March Size
-    conditions: []
     passive: 0
-    targetedType: ''
     value:
       number: 0
       unit: percentage
@@ -13,7 +11,6 @@ levels:
     - Enemy
     - Attacking
     passive: 0
-    targetedType: ''
     value:
       number: 0
       unit: percentage
@@ -21,9 +18,7 @@ levels:
   text: ''
 - buffs:
   - attribute: March Size
-    conditions: []
     passive: 0
-    targetedType: ''
     value:
       number: 0
       unit: percentage
@@ -32,7 +27,6 @@ levels:
     - Enemy
     - Attacking
     passive: 0
-    targetedType: ''
     value:
       number: 0
       unit: percentage
@@ -40,9 +34,7 @@ levels:
   text: ''
 - buffs:
   - attribute: March Size
-    conditions: []
     passive: 0
-    targetedType: ''
     value:
       number: 0
       unit: percentage
@@ -51,7 +43,6 @@ levels:
     - Enemy
     - Attacking
     passive: 0
-    targetedType: ''
     value:
       number: 0
       unit: percentage
@@ -59,9 +50,7 @@ levels:
   text: ''
 - buffs:
   - attribute: March Size
-    conditions: []
     passive: 0
-    targetedType: ''
     value:
       number: 0
       unit: percentage
@@ -70,7 +59,6 @@ levels:
     - Enemy
     - Attacking
     passive: 0
-    targetedType: ''
     value:
       number: 0
       unit: percentage
@@ -78,9 +66,7 @@ levels:
   text: ''
 - buffs:
   - attribute: March Size
-    conditions: []
     passive: 0
-    targetedType: ''
     value:
       number: 10
       unit: percentage
@@ -89,7 +75,6 @@ levels:
     - Enemy
     - Attacking
     passive: 0
-    targetedType: ''
     value:
       number: 10
       unit: percentage

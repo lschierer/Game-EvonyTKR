@@ -25,7 +25,6 @@ levels:
   text: ' Attacking Ranged Troop HP +10% (Local);; Attacking Ranged Troop Attack +5% (Global) '
 - buffs:
   - attribute: Training Capacity
-    conditions: []
     passive: 1
     targetedType: Ranged Troops
     value:
@@ -46,9 +45,7 @@ levels:
   text: Attacking Ranged Troop Defense +10% (Local)
 - buffs:
   - attribute: March Size
-    conditions: []
     passive: 0
-    targetedType: ''
     value:
       number: 8
       unit: percentage

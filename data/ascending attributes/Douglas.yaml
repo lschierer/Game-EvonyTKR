@@ -49,7 +49,6 @@ ascending:
     - Enemy
     - In City
     passive: 0
-    targetedType: ''
     value:
       number: 10
       unit: percentage
@@ -65,9 +64,7 @@ ascending:
       number: 10
       unit: percentage
   - attribute: March Size
-    conditions: []
     passive: 0
-    targetedType: ''
     value:
       number: 10
       unit: percentage

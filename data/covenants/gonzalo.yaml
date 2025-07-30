@@ -28,7 +28,6 @@ levels:
   text: Ranged Troop and Siege Machine Attack +10%(Local)
 - buffs:
   - attribute: Attack
-    conditions: []
     passive: 0
     targetedType: Ranged Troops
     value:
@@ -38,7 +37,6 @@ levels:
   text: Ranged Troop Attack +10% (Local)
 - buffs:
   - attribute: Training Capacity
-    conditions: []
     passive: 1
     targetedType: Ranged Troops
     value:
@@ -48,7 +46,6 @@ levels:
   text: Ranged Troop Training Capacity +10% (Global)
 - buffs:
   - attribute: Defense
-    conditions: []
     passive: 0
     targetedType: Ranged Troops
     value:
@@ -58,16 +55,13 @@ levels:
   text: Ranged Troop Defense +10% (Local)
 - buffs:
   - attribute: HP
-    conditions: []
     passive: 0
     targetedType: Ranged Troops
     value:
       number: 10
       unit: percentage
   - attribute: March Size
-    conditions: []
     passive: 0
-    targetedType: ''
     value:
       number: 6
       unit: percentage

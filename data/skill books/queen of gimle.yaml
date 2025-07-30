@@ -7,19 +7,15 @@ buffs:
     value:
       number: 40
       unit: percentage
-    conditions: []
   - attribute: Defense
     troop: Siege Machines
     value:
       number: 40
-    conditions: []
   - attribute: HP
     troop: Siege Machines
     value:
       number: 40
-    conditions: []
   - attribute: March Size
     troop: ''
     value:
       number: 8
-    conditions: []

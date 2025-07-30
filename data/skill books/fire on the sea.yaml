@@ -5,7 +5,6 @@ buffs:
   - In City
   - When The Main Defense General
   passive: 0
-  targetedType: ''
   value:
     number: 10
     unit: percentage

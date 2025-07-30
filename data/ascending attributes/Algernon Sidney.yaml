@@ -2,14 +2,12 @@
 ascending:
 - buffs:
   - attribute: Attack
-    conditions: []
     passive: 0
     targetedType: Ranged Troops
     value:
       number: 15
       unit: percentage
   - attribute: HP
-    conditions: []
     passive: 0
     targetedType: Ranged Troops
     value:
@@ -22,7 +20,6 @@ ascending:
     conditions:
     - Marching
     passive: 0
-    targetedType: ''
     value:
       number: 8
       unit: percentage
@@ -38,9 +35,7 @@ ascending:
       number: 25
       unit: percentage
   - attribute: March Size
-    conditions: []
     passive: 0
-    targetedType: ''
     value:
       number: 8
       unit: percentage
@@ -83,9 +78,7 @@ ascending:
       number: 40
       unit: percentage
   - attribute: March Size
-    conditions: []
     passive: 0
-    targetedType: ''
     value:
       number: 10
       unit: percentage

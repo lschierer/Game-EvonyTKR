@@ -6,14 +6,12 @@ generals:
 levels:
   - buffs:
       - attribute: Attack
-        conditions: []
         passive: 0
         targetedType: Mounted Troops
         value:
           number: 10
           unit: percentage
       - attribute: Training Speed
-        conditions: []
         passive: 1
         targetedType: Mounted Troops
         value:
@@ -23,7 +21,6 @@ levels:
     text: ' Mounted Troop Attack +10% (Local);; Mounted Troop Training Speed +10% (Global) '
   - buffs:
       - attribute: Defense
-        conditions: []
         passive: 0
         targetedType: Mounted Troops
         value:
@@ -44,7 +41,6 @@ levels:
     text: In-Rally Mounted Troop Attack +10% (Local)
   - buffs:
       - attribute: HP
-        conditions: []
         passive: 0
         targetedType: Mounted Troops
         value:
@@ -62,9 +58,7 @@ levels:
     text: ' Mounted Troop HP +10% (Local);; In-Rally Mounted Troop HP +10% (Local) '
   - buffs:
       - attribute: March Size
-        conditions: []
         passive: 0
-        targetedType: ''
         value:
           number: 10
           unit: percentage

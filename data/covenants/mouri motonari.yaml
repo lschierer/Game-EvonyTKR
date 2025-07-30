@@ -14,7 +14,6 @@ levels:
       number: 10
       unit: percentage
   - attribute: Defense
-    conditions: []
     passive: 1
     targetedType: Mounted Troops
     value:
@@ -24,23 +23,19 @@ levels:
   text: ' Attacking Mounted Troop Attack +10% (Local);; Mounted Troop Defense +5% (Global) '
 - buffs:
   - attribute: Defense
-    conditions: []
     passive: 0
     targetedType: Ground Troops
     value:
       number: 10
       unit: percentage
   - attribute: Defense
-    conditions: []
     passive: 0
     targetedType: Mounted Troops
     value:
       number: 10
       unit: percentage
   - attribute: March Size
-    conditions: []
     passive: 0
-    targetedType: ''
     value:
       number: 10
       unit: percentage
@@ -48,7 +43,6 @@ levels:
   text: ' Ground Troop and Mounted Troop Defense +10% (Local);; March Size Capacity +10% (Local) '
 - buffs:
   - attribute: Attack
-    conditions: []
     passive: 0
     targetedType: Mounted Troops
     value:
@@ -69,7 +63,6 @@ levels:
   text: In-Rally Mounted Troop Attack +10% (Local)
 - buffs:
   - attribute: HP
-    conditions: []
     passive: 0
     targetedType: Mounted Troops
     value:
@@ -79,7 +72,6 @@ levels:
   text: Mounted Troop HP +10% (Local)
 - buffs:
   - attribute: Training Capacity
-    conditions: []
     passive: 1
     targetedType: Mounted Troops
     value:
