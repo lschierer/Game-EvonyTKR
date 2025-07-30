@@ -1,10 +1,10 @@
 /* the props */
 @import url('@spectrum-css/tokens/dist/css/index.css');
-@import url('@spectrum-css/typography/index.css');
-@import url('@spectrum-css/icon/index.css');
-@import url('@spectrum-css/link/index.css');
-@import url('@spectrum-css/sidenav/index.css');
-@import url('@spectrum-css/splitview/index.css');
+@import url('@spectrum-css/typography/dist/index.css');
+@import url('@spectrum-css/icon/dist/index.css');
+@import url('@spectrum-css/link/dist/index.css');
+@import url('@spectrum-css/sidenav/dist/index.css');
+@import url('@spectrum-css/splitview/dist/index.css');
 @import url('@spectrum-css/divider/dist/index.css');
 
 :root {

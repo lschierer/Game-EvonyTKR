@@ -68,3 +68,21 @@ glossary:
       in developing a 'General.'  On Generals with four specialties, a fifth "flex specialty" may be attached once the fourth is at least partly developed.
     related_terms:
       - General
+  - term: Server War
+    synonyms:
+      - SvS
+    definition: >-
+      This event occurs every other week, and is one of the primary 'PvP' modes in the game.  During Server War, troops cannot be permenantly killed,
+      a new section of the hospital is opened instead, and troops in this section require the "Source of Life" or "SoL" resource to heal.  There is a limited
+      time window after the end of Server War in which to heal these troops before they are converted to normal killed troops and disappear forever.
+      In Server War, your entire server plays as a single team.  You will be matched against another server based on your past win/loss record in the event,
+      your overall score each of those wins and losses, and how those ratios rank your server against other servers.  Placing well in Server War, individually,
+      is important both for the rewards it grants, and as a milestone to unlock game features.
+  - term: speed-ups
+    definition: >-
+      A slang term for any item that reduces the time duration required to complete some action.  These items may be specific to a particular type
+      of action, or may be generic and usable for any action that allows acceleration.
+  - term: splat
+    definition: >-
+      A slang term for a stupid attack which a reasonably informed player should have realized in advance could only end in massively more negative
+      points earned than positive points earned, and, most likely, minimal damage to the target.

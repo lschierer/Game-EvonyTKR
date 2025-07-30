@@ -4,7 +4,6 @@ use utf8::all;
 use File::FindLib 'lib';
 use Mojo::File;
 use Path::Iterator::Rule;
-require Text::MultiMarkdown;
 require YAML::PP;
 
 package Game::EvonyTKR::Plugins::StaticPages {

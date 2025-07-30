@@ -2,15 +2,10 @@
 title: 'The T1 Defense'
 author:
   - 'Luke Schierer'
-  - 'Redwood'
 order: 3
+css:
+  - '/css/GenericSpectrumTable.css'
 ---
-
-This article leans heavily on a set of king's mails that another
-player, Redwood, on the server I play on, sent out. I am crediting
-him as a contributing author. _*However*_, please note I have
-deviated from his original ideas, but not tested this theory myself
-yet. Use with cation.
 
 If you follow [my recommendation][wall] on wall general, you chose George
 Dewey. He does not have a strong ground buff to start with, so you want to use
@@ -77,7 +72,7 @@ having high stats on individual units, and that is even more true when you are
 defending your keep, because in this situation, you attack _second_; the _other
 guy_ gets to attack first.
 
-However, so far we have only looked at the mounted troops base statistics.  
+However, so far we have only looked at the mounted troops base statistics.
 That is hardly realistic, your average keep gets buffs from a wide variety of
 sources. This includes, but is not limited to:
 
@@ -95,7 +90,7 @@ Most of these will help in the form of percentages. To make just one example,
 lets say you have art treasures Excalibur and Terracotta Army, both at level 3.
 We will take the first table, and see what these do to our figures.
 
-| Tier | Attack | +12% Attack <br/>from Excalibur | +25% in City Attack<br/>from Terracotta Army | Total Attack Value | Number Needed to <br/>Hit 1,000,000 Power |
+| Tier | Attack | +12% Attack <br/>from Excalibur | +25% in City Attack<br>from Terracotta Army | Total Attack Value | Number Needed to <br/>Hit 1,000,000 Power |
 | ---- | ------ | ------------------------------- | -------------------------------------------- | ------------------ | ----------------------------------------- |
 | t1   | 220    | 246.40                          | 275                                          | 301.40             | 3317                                      |
 | t2   | 300    | 336.00                          | 375.00                                       | 411.00             | 2433                                      |
@@ -180,7 +175,7 @@ meat shield the best ability to hit back. If you are ghosting everything else,
 this attack _is_ the bulk of your counter-attack, so that is important.
 
 Regardless of whether or not you are ghosting everything else, it is important
-that your meat shield _survive_. To do that, attack does not actually matter.  
+that your meat shield _survive_. To do that, attack does not actually matter.
 Defense and HP do.
 
 ## The health refines
@@ -198,32 +193,20 @@ Defense and HP do.
 
 ## When you no longer ghost everything else
 
-You focus on t11 and t12 siege, and t12 archers for your defense.
-
-- t11 and t12 troops attack high-end troops before attacking low-end troops.
-  All other tiers _usually_ attack low-end troops first. (I have seen some battle
-  reports that seem to suggest there are some other exceptions that remain to be
-  fully documented).
-- t11 and t12 siege are _much_ cheaper to repair than t13 and t14 siege.
-- If you ever notice a siege attack coming your way, _teleport away as fast as
-  you can._ The only defense against a strong siege attack is to have:
-  - more siege than the attacker
-  - at higher tiers than the attacker.
-- _*NOT*_ counting your t1s and t2s, 60% of your troops should be t11s and t12s.
-  - For siege, 60% of those should be t11s. T12s are not hugely more powerful,
-    but are noticeably more expensive to build and repair.
-  - For ranged, 60% should be t12s. They give you more damage per RSS spent
-    building them than any other tier.
+- When this was originally written, it was reasonable to start building Siege defenses almost immediately.  Given modern rally sizes, that is no longer true.  Hold off on building Siege Machines beyond those needed for layers until you are otherwise doing well as a defensive keep.  Better yet, until one of the better players whom you can trust in your alliance says you are ready.  This is because the only defense against a siege attack is to have
+    * more siege machines (about 4 times as many as the incoming rally)
+    * at higher tiers, counting each pair of tiers as a unified group.
+    * So if they are sending a standard "small siege" rally of t11s, you would need 4 times as many t13/14s as they are sending t11s.  The problem is that this is a *truly massive amount* and that until you have that, it is very easy to lose more in points than you get.  And not just a small loss, a **big** loss. The kind that upsets your team.
+    * The other problem is that as soon as they see that you have this, they can send a "big siege" rally, sending t13s instead of t11s.  Now you *might* be able to hold off t13s with t14s, because the "treat every two layers as a unified whole" thing *starts* to break down from t11 on up, but that still means 4 times as many t14s as they send t13s.  With an even worse point loss if you miss.
 - See the [Next Steps][next] for more details on your layers.
-- Your attack refines need to be on your ranged and siege instead of on your
-  mounted
-  - This is where my co-author and I differ. Refining is expensive, and I dislike some of his advice.
-  - You are no longer depending on your t1 meat shield for your counter-attack.
-  - While the t1s are busy surviving (using those HP and Defense refines), your
-    ranged and siege are damaging the enemy.
-  - This only works if you have _large_ numbers so that you can destroy the
-    incoming attack within a few rounds of any given engagement (the inner unseen
-    mechanics that constitute a single report).
+- You need to start studying reports.
+  - Be sure to study a variety of reports where the enemy has sent different troop types (from the other reports used).
+  - Pay attention to the [buff]/[debuff] section of the reports.  The differences in results may be that you were more closely matched in one report than another.
+  - You should find that you are no longer depending on your t1 meat shield for your counter-attack.
+  - While the t1s are busy surviving (using those HP and Defense refines), you should see that other troops are doing more damage to the enemy.
+  - If so, as distasteful as it is, given how expensive refining is, strongly consisder redoing your attack refines to focus on the troop types doing the most damage in the most cases.
 
-[next]: ../next_steps/
-[wall]: ../../generals/wall/
+[next]: <./next steps>
+[wall]: /Generals/Wall%20Specialists/
+[buff]: /Reference/Glossary#buff
+[debuff]: /Reference/Glossary#debuff

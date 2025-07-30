@@ -1,6 +1,8 @@
 ---
 title: game mechanics
 author: Luke Schierer
+css:
+  - '/css/GenericSpectrumTable.css'
 ---
 
 
@@ -12,8 +14,7 @@ author: Luke Schierer
   - flat refines in particular can mess up the tiering versus attack value
 - counter attack is when the wounded in a layer attack troops in range
 - walls do little to nothing
-- with rally or reinforcement, count each as a separate layer of the same overall even if
-  the same tier/type
+- with rally or reinforcement, count each as a separate layer of the same overall even if the same tier/type
 - Derrick Defies claims debuffs are not cumulative across the rally/reinforcement.
 - He says sub cities are an exception to this.
 - Mixed marches _in general_ work best against weaker opponents (and oddly barbs)
@@ -23,8 +24,7 @@ author: Luke Schierer
 - due to range siege attacks
   - low tier siege attacks ground first
   - mid tier attack range and t1-t4 siege first
-  - t11 will attack t4 and then high tier first because t4 has to move closer so it is in
-    range first, and is the top of the lowest range tier.
+  - t11 will attack t4 and then high tier first because t4 has to move closer so it is in range first, and is the top of the lowest range tier. Really, its all of tiers 1-4 that have to move closer in, but in practice high end siege will start targetting something bigger before targetting t3s (due to its own movement).
 
 Damage = NA(k) \* A/(A+D)
 

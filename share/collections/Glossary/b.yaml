@@ -30,3 +30,8 @@ glossary:
       So for example a "25% increase" Buff would be <Original Value> + <Original Value> * 0.25.
     related_terms:
       - Debuff
+  - term: bubble
+    synonyms:
+      - truce agreement
+    definition: >-
+      A slang term for the game feature allowing you to shield your keep and subordinate cities from attack.

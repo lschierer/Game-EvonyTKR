@@ -17,7 +17,7 @@ who are more experienced to augment my own very minimal time in role.
 
 - You should have at least a +1000% buff for attack in your main troop type.
 - You should have at least a +500% buff for attack in all other troop types.
-- You should have at least a +%00% buff for defence and HP in all troop types.
+- You should have at least a +%X00% buff for defence and HP in all troop types.[^fixme]
 
 Measure this by attacking an empty keep and looking at the report.
 
@@ -26,4 +26,6 @@ Measure this by attacking an empty keep and looking at the report.
 Do not [splat][]. This will just annoy the other players on your server. While
 it might generate lots of points, it will not help your server win.
 
-[splat]: ../../Reference/Glossary#spat
+[splat]: /Reference/Glossary#spat
+
+[^fixme]: I need to get the right value for this.

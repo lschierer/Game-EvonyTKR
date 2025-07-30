@@ -41,8 +41,12 @@ developed set of peace time generals.
 
 ## Important Note about Ascending
 
-The astute reader may have noticed that in the preceding overview section I mentioned cultivating Catherine to an equal extent as Harald, but did not mention ascending her to the same two star level.  This omission was deliberate, and is important.  Catherine is one of several mayors who is not *entirely* a peace time mayor.  While her main skill book, and her specialty buffs are those of a peace time mayor, her ascending buffs are a totally different story.  If you can ascend her, she becomes one of the more valuable Siege HP debuff generals.
+The astute reader may have noticed that in the preceding overview section I mentioned cultivating Catherine to an equal extent as Harald, but did not mention [ascending] her to the same two star level.  This omission was deliberate, and is important.  Catherine is one of several mayors who is not *entirely* a peace time mayor.  While her main skill book, and her specialty [buffs] are those of a peace time mayor, her [ascending] [buffs] are a totally different story.  If you can ascend her, she becomes one of the more valuable Siege HP debuff generals.
 
-This is then a slight, but incredibly significant, caveat to my overall opinion of peace time mayors.  I maintain that the concept of a peace time mayor is a waste of resources for nearly everyone.  However, be careful that you have fully evaluated each mayor, and that you are not ignoring buffs that might truly help you before dismissing a given general *as* a peace time mayor.
+This is then a slight, but incredibly significant, caveat to my overall opinion of peace time mayors.  I maintain that the concept of a peace time mayor is a waste of resources for nearly everyone.  However, be careful that you have fully evaluated each mayor, and that you are not ignoring [buffs] that might truly help you before dismissing a given general *as* a peace time mayor.
 
-To be clear: I am __*NOT*__ recommending using Catherine II as a peace time mayor.  I am recommending that, if you can ascend her, she be used as a *PvP* mayor. There are a other generals that, like her, appear on the surface to be peace time mayors, but have hidden PvP potential.  The reader will need to evaluate these mayors as and against other PvP mayors on the strength of these PvP buffs.
+To be clear: I am __*NOT*__ recommending using Catherine II as a peace time mayor.  I am recommending that, if you can ascend her, she be used as a *[PvP]* mayor. There are a other generals that, like her, appear on the surface to be peace time mayors, but have hidden PvP potential.  The reader will need to evaluate these mayors as and against other PvP mayors on the strength of these [PvP] [buffs].
+
+[PvP]: </Reference/Glossary#PvP>
+[buffs]: /Reference/Glossary#buffs
+[ascending]: /Reference/Glossary/ascend

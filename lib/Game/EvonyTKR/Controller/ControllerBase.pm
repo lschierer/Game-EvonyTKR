@@ -12,7 +12,6 @@ package Game::EvonyTKR::Controller::ControllerBase {
   use Mojo::Base 'Mojolicious::Plugin', -role, -signatures;
   use Log::Log4perl;
   require Mojo::File;
-  require Text::MultiMarkdown;
   require YAML::PP;
   require Data::Printer;
   use Carp;

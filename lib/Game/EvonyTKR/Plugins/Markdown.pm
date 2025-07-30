@@ -5,7 +5,6 @@ use File::FindLib 'lib';
 use Mojo::File;
 use Path::Iterator::Rule;
 require Pandoc;
-require Game::EvonyTKR::Markdown::SpectrumHandler;
 require Data::Printer;
 require YAML::PP;
 require Mojo::DOM58;
@@ -88,6 +87,7 @@ package Game::EvonyTKR::Plugins::Markdown {
       title        => $title,
       order        => $order,
       front_matter => $front_matter,
+      yaml_data    => $front_matter,  # Add this for stash compatibility
       content      => $content,
     };
   }
@@ -142,7 +142,10 @@ package Game::EvonyTKR::Plugins::Markdown {
     $logger->debug("Looking for template: $template.html.ep");
 
     my $parser = Pandoc->new();
-    my $html_content = $parser->convert('gfm' => 'html', $parsedFile->{content});
+    my $html_content = $parser->convert(
+      'gfm+pipe_tables' => 'html',
+      $parsedFile->{content}
+    );
     $html_content = $self->SpectrumFormatting($html_content);
 
 
@@ -213,6 +216,31 @@ package Game::EvonyTKR::Plugins::Markdown {
 
     $dom->find('hr')->each(sub {
       $_->attr(class => 'spectrum-Divider spectrum-Divider--sizeM')
+    });
+
+    # Add table classes
+    $dom->find('table')->each(sub {
+      $_->attr(class => 'spectrum-Table spectrum-Table--sizeM');
+    });
+
+    $dom->find('thead')->each(sub {
+      $_->attr(class => 'spectrum-Table-head');
+    });
+
+    $dom->find('tbody')->each(sub {
+      $_->attr(class => 'spectrum-Table-body');
+    });
+
+    $dom->find('th')->each(sub {
+      $_->attr(class => 'spectrum-Table-headCell');
+    });
+
+    $dom->find('td')->each(sub {
+      $_->attr(class => 'spectrum-Table-cell');
+    });
+
+    $dom->find('tr')->each(sub {
+      $_->attr(class => 'spectrum-Table-row');
     });
 
     # Convert back to HTML string

@@ -140,15 +140,17 @@ more of an attack off as well. You will want to adjust _ONLY THE ATTACK_
 refines if that is the case. For siege only the attack statistic matters, use
 other troop types to keep your siege alive. If you are being attacked _by_
 siege, then your only two options are to dodge the attack (port away) or to
-have more siege and more range than your attacker. Refer back to the [T1 Defense][] for more on this.
+have more siege and more range than your attacker. Refer back to the [T1 Defense] for more on this.
 
-[T1 Defense]: ../02_t1_defense/
+[T1 Defense]: ../t1 defense/
 
 ### for your wall general
 
+You want to change out the attack lines for different troop types depending on what you see in your reports.
+
 - 950+ mounted attack
   - x4 wall general's ax
-  - x3 at least 3 subcities's ring
+  - x3 at least 3 general's ring
 - 450+ ground attack
   - use one line on your wall general's ring for this.
 - 650+ mounted defense

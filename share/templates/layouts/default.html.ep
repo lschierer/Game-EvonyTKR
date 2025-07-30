@@ -8,10 +8,12 @@
 
     <link rel="stylesheet" href="/css/global.css" />
     <link rel="stylesheet" href="/css/spectrum-overrides.css" />
-    % if (stash('yaml_data') && exists stash('yaml_data')->{css}) {
-      % foreach my $css_file (@{stash('yaml_data')->{css}}) {
+    % if (stash('css') ) {
+      % foreach my $css_file (@{stash('css')}) {
         <link rel="stylesheet" href="<%= $css_file %>">
       % }
+    % } else {
+      <!-- no custom css -->
     % }
     <script src="https://cdn.jsdelivr.net/npm/iconify-icon@3.0.0/dist/iconify-icon.min.js"></script>
   </head>

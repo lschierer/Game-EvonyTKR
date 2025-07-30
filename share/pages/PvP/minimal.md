@@ -30,11 +30,11 @@ Now that we have these things firmly in mind, how do you, as a small keep, parti
    as many of these as you can.
 
 If you are willing to invest enough time, I have proven (to myself) that it is
-possible, though very difficult, to even earn your first personal activity
+possible, though very time consuming, to even earn your first personal activity
 chest from these two things alone.
 
-[SvS]: ../../Reference/Glossary/#SvS
-[speed-ups]: ../../Reference/Glossary/#speed-up
+[SvS]: /Reference/Glossary/#SvS
+[speed-ups]: /Reference/Glossary/#speed-up
 
 ### High Risk, Medium Reward Activities
 
@@ -44,15 +44,14 @@ do so, several things.
 1. Spend some time scanning the other server and creating bookmarks of monsters
    to kill, fire spirits to visit, and (if you can) ares statues.
 1. Set a timer. When you first arrive on the other server, you will get a red
-   colored [bubble][]. This will last for five minutes. You want to leave the
-   enemy server _**BEFORE**_ this bubble expires.
-1. The game will _not_ warn you when your bubble expires in any noticeable way.
-   See the previous point
+   colored [bubble]. This will last for five minutes. You want to leave the
+   enemy server _**BEFORE**_ this [bubble] expires.
+1. The game will _not_ warn you when your [bubble] expires in any noticeable way. See the previous point
 1. Attacking a player's keep, tile, relic, camp, temple, or anything else will
-   cause your bubble to drop _**immediately**_.
+   cause your [bubble] to drop _**immediately**_.
 1. Killing boss monsters gives more points than killing normal monsters.
 1. Boss monsters are scored by level, not power. So a normal boss level 5
-   might be worth more than an event boss level 1, even though the event boss
+   is worth more than an event boss level 1, even though the event boss
    is much harder to kill and gives much better things. Are you on the other
    server for loot, or points? (There is a correct answer to this question -
    Points.)
@@ -62,4 +61,4 @@ too long by accident, and end up being attacked. If that happens, you will not
 only have a huge cost in healing, you will have earned a lot of negative points
 for your server and upset a bunch of keeps that are more powerful than you are.
 
-[bubble]: ../../Reference/Glossary/#bubble
+[bubble]: /Reference/Glossary/#bubble
