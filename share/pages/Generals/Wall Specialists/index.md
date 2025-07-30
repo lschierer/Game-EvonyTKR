@@ -24,11 +24,16 @@ any because they will not have any troops to lead. Focus on your [ranged] and
 While you are busy developing these other generals, keep your eye out for
 Shajar al-Durr. If you find her in the tavern (or win her in an event), she
 makes an excellent _**peace time**_ wall general. She will help you get the
-resources you need to do other things.
+resources you need to do other things.  **_NEVER_** use Shajar as a [primary]
+general, even during peace time.  Only ever use her as an [assistant].
+
+[primary]: </Refernce/Glossary#Primary General>
+[assistant]: </Refernce/Glossary#Secondary General>
 
 Eventually however you are ready to grow beyond [ghosting] and to do that,
 you need to have a good set of wall generals. Moreover, you need to have them
-fairly well-developed already, not brand new. You thus must start developing your Wall pair _long_ before you will start to use them, except _maybe_ in Battlefield.
+fairly well-developed already, not brand new. You thus must start developing
+your Wall pair _long_ before you will start to use them, except _maybe_ in Battlefield.
 
 George Dewey is available in the General's Chest in the Tavern. He is
 unquestionably the best main wall defense general available for those who do
@@ -38,33 +43,6 @@ fragments.[^230107-2]
 
 Looking at your troops in your Rally Spot, mentally subtract out your main PvP
 march. You want to think about what is left when that is out attacking someone.
-
-- If the remainder is mostly mounted troops, pick Queen Boudica for your
-  assistant wall general.
-- If the remainder is mostly ground troops, pick Robert the Bruce as your
-  assistant wall general.
-- If the remainder is mostly ranged or siege class troops, look at what is the
-  next most numerous type.
-  - If the next most numerous type is ground, pick between Robert the Bruce and
-    Tran Hung Dao. The former makes your ground troops stronger, the latter
-    focuses on your siege while helping your ground troops.
-  - If the next most numerous type is mounted, pick Queen Boudica.
-
-If none of these describe you, then consider Ly Thuong Kiet, but you really
-ought to question if you are ready to engage in PvP yet.
-
-:::tip
-
-#### Event Participants
-
-If you see any of the following, they are superior choices for assistants available only as part of paid events:
-
-- Leo III - specializes in siege troops. Use him if you plan on building a
-  _**lot**_ of siege type troops.
-- Lautaro - specializes in ground troops with a secondary effect on mounted
-  troops. You can use him in place of either Queen Boudica or Robert the Bruce.
-- Yodo-dono - specializes in ranged troops with a secondary generic boost to HP.
-  :::
 
 [^230107-2]: See [Evony Answers]' article on [ascending].
 

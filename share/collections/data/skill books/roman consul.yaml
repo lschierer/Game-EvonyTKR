@@ -3,6 +3,7 @@ text: Boosts the Gold Production Speed by 75% in Subordinate City when General i
 name: Roman Consul
 buffs:
   - attribute: SubCity Gold Production
-    value: 75
+    value:
+      number: 75
     conditions:
       - When City Mayor for this SubCity
