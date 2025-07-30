@@ -113,5 +113,5 @@ Speed. There are strong arguments both ways.
 - You can begin using a duty general at rally spot level 35
 - Should be continuously assigned.
 
-[debuffs]: ../../Reference/Glossary#debuff
+[debuffs]: ../../Reference/Glossary#Debuff
 [buffs]: ../../Reference/Glossary#buff

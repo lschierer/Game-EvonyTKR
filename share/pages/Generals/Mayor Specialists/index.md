@@ -100,5 +100,5 @@ rather than attempting to do both with one of these lists.
 [ghosting]: /Reference/Glossary#ghost
 [ghost]: /Reference/Glossary#ghost
 [peace]: ../peace_time_subcity_mayors/
-[debuff]: ../../Reference/Glossary/#debuff
+[debuff]: ../../Reference/Glossary/#Debuff
 [buff]: ../../Reference/Glossary/#buff
