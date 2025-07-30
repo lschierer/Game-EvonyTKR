@@ -44,7 +44,6 @@ ascending:
     conditions:
     - When The Main Defense General
     passive: 0
-    targetedType: ''
     value:
       number: 15
       unit: percentage
@@ -90,14 +89,12 @@ ascending:
       number: 20
       unit: percentage
   - attribute: HP
-    conditions: []
     passive: 0
     targetedType: Ground Troops
     value:
       number: 20
       unit: percentage
   - attribute: HP
-    conditions: []
     passive: 0
     targetedType: Mounted Troops
     value:

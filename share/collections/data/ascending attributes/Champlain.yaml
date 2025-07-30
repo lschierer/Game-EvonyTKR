@@ -2,14 +2,12 @@
 ascending:
 - buffs:
   - attribute: Attack
-    conditions: []
     passive: 0
     targetedType: Siege Machines
     value:
       number: 10
       unit: percentage
   - attribute: HP
-    conditions: []
     passive: 0
     targetedType: Siege Machines
     value:
@@ -22,7 +20,6 @@ ascending:
     conditions:
     - Attacking
     passive: 0
-    targetedType: ''
     value:
       number: 8
       unit: percentage
@@ -30,28 +27,24 @@ ascending:
   text: Attacking Troop Death into Wounded Rate +8%
 - buffs:
   - attribute: Attack
-    conditions: []
     passive: 0
     targetedType: Ranged Troops
     value:
       number: 15
       unit: percentage
   - attribute: Attack
-    conditions: []
     passive: 0
     targetedType: Siege Machines
     value:
       number: 15
       unit: percentage
   - attribute: Defense
-    conditions: []
     passive: 0
     targetedType: Ranged Troops
     value:
       number: 15
       unit: percentage
   - attribute: Defense
-    conditions: []
     passive: 0
     targetedType: Siege Machines
     value:
@@ -61,14 +54,12 @@ ascending:
   text: Ranged Troop and Siege Machine Attack +15% and Defense +15%
 - buffs:
   - attribute: Attack
-    conditions: []
     passive: 0
     targetedType: Siege Machines
     value:
       number: 20
       unit: percentage
   - attribute: HP
-    conditions: []
     passive: 0
     targetedType: Siege Machines
     value:
@@ -78,35 +69,30 @@ ascending:
   text: Siege Machine Attack +20% and HP +20%
 - buffs:
   - attribute: Attack
-    conditions: []
     passive: 0
     targetedType: Siege Machines
     value:
       number: 25
       unit: percentage
   - attribute: Defense
-    conditions: []
     passive: 0
     targetedType: Ranged Troops
     value:
       number: 25
       unit: percentage
   - attribute: HP
-    conditions: []
     passive: 0
     targetedType: Ranged Troops
     value:
       number: 25
       unit: percentage
   - attribute: Defense
-    conditions: []
     passive: 0
     targetedType: Siege Machines
     value:
       number: 25
       unit: percentage
   - attribute: HP
-    conditions: []
     passive: 0
     targetedType: Siege Machines
     value:

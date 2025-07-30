@@ -6,14 +6,12 @@ generals:
 levels:
   - buffs:
       - attribute: Attack
-        conditions: []
         passive: 0
         targetedType: Mounted Troops
         value:
           number: 5
           unit: percentage
       - attribute: HP
-        conditions: []
         passive: 0
         targetedType: Mounted Troops
         value:
@@ -27,7 +25,6 @@ levels:
           - Enemy
           - Attacking
         passive: 0
-        targetedType: ''
         value:
           number: 10
           unit: percentage
@@ -35,7 +32,6 @@ levels:
     text: Enemy Wounded into Death when attacking +10% (Local)
   - buffs:
       - attribute: Defense
-        conditions: []
         passive: 0
         targetedType: Mounted Troops
         value:
@@ -45,7 +41,6 @@ levels:
     text: Mounted Troop Defense +10% (Local)
   - buffs:
       - attribute: Training Speed
-        conditions: []
         passive: 1
         targetedType: Mounted Troops
         value:
@@ -55,16 +50,12 @@ levels:
     text: Mounted Troop Training Speed +10% (Global)
   - buffs:
       - attribute: March Size
-        conditions: []
         passive: 0
-        targetedType: ''
         value:
           number: 8
           unit: percentage
       - attribute: Marching Speed
-        conditions: []
         passive: 1
-        targetedType: ''
         value:
           number: 10
           unit: percentage
@@ -72,7 +63,6 @@ levels:
     text: March Size Capacity +8% (Local);;March Speed +10% (Global)
   - buffs:
       - attribute: Attack
-        conditions: []
         passive: 0
         targetedType: Mounted Troops
         value:

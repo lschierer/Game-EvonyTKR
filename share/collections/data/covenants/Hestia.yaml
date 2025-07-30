@@ -28,9 +28,7 @@ levels:
   text: In-Rally Mounted Troop HP +5% (Local)
 - buffs:
   - attribute: Marching Speed
-    conditions: []
     passive: 0
-    targetedType: ''
     value:
       number: 10
       unit: percentage
@@ -57,7 +55,6 @@ levels:
   text: Marching Mounted Troop Defense +10%;;Marching Mounted Troop HP +10%
 - buffs:
   - attribute: Training Speed
-    conditions: []
     passive: 1
     targetedType: Mounted Troops
     value:

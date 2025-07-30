@@ -13,7 +13,6 @@ ascending:
     conditions:
     - Enemy
     passive: 0
-    targetedType: ''
     value:
       number: 10
       unit: percentage
@@ -24,7 +23,6 @@ ascending:
     conditions:
     - Enemy
     passive: 0
-    targetedType: ''
     value:
       number: 10
       unit: percentage
@@ -32,7 +30,6 @@ ascending:
     conditions:
     - When City Mayor for this SubCity
     passive: 0
-    targetedType: ''
     value:
       number: 15
       unit: percentage
@@ -43,7 +40,6 @@ ascending:
     conditions:
     - Enemy
     passive: 0
-    targetedType: ''
     value:
       number: 10
       unit: percentage
@@ -51,7 +47,6 @@ ascending:
     conditions:
     - When City Mayor for this SubCity
     passive: 0
-    targetedType: ''
     value:
       number: 15
       unit: percentage
@@ -78,7 +73,6 @@ ascending:
     conditions:
     - Enemy
     passive: 0
-    targetedType: ''
     value:
       number: 10
       unit: percentage
@@ -105,7 +99,6 @@ ascending:
     conditions:
     - Enemy
     passive: 0
-    targetedType: ''
     value:
       number: 5
       unit: percentage
@@ -113,7 +106,6 @@ ascending:
     conditions:
     - Enemy
     passive: 0
-    targetedType: ''
     value:
       number: 5
       unit: percentage

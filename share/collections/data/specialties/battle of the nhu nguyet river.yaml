@@ -10,9 +10,7 @@ levels:
       number: 0
       unit: percentage
   - attribute: Hospital Capacity
-    conditions: []
     passive: 0
-    targetedType: ''
     value:
       number: 0
       unit: percentage
@@ -28,9 +26,7 @@ levels:
       number: 0
       unit: percentage
   - attribute: Hospital Capacity
-    conditions: []
     passive: 0
-    targetedType: ''
     value:
       number: 0
       unit: percentage
@@ -46,9 +42,7 @@ levels:
       number: 0
       unit: percentage
   - attribute: Hospital Capacity
-    conditions: []
     passive: 0
-    targetedType: ''
     value:
       number: 0
       unit: percentage
@@ -64,9 +58,7 @@ levels:
       number: 0
       unit: percentage
   - attribute: Hospital Capacity
-    conditions: []
     passive: 0
-    targetedType: ''
     value:
       number: 0
       unit: percentage
@@ -82,9 +74,7 @@ levels:
       number: 36
       unit: percentage
   - attribute: Hospital Capacity
-    conditions: []
     passive: 0
-    targetedType: ''
     value:
       number: 16
       unit: percentage

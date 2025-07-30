@@ -22,7 +22,6 @@ ascending:
   - attribute: Death to Wounded
     conditions:
     - Attacking
-    targetedType: ''
     value:
       number: 8
       unit: percentage

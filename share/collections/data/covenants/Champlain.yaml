@@ -6,7 +6,6 @@ generals:
 levels:
 - buffs:
   - attribute: Defense
-    conditions: []
     passive: 0
     targetedType: Siege Machines
     value:
@@ -16,7 +15,6 @@ levels:
   text: Siege Machine Defense +10% (Local)
 - buffs:
   - attribute: Attack
-    conditions: []
     passive: 0
     targetedType: Siege Machines
     value:
@@ -45,9 +43,7 @@ levels:
   text: Reinforcing Siege Machine Defense +10% (Local)
 - buffs:
   - attribute: March Size
-    conditions: []
     passive: 0
-    targetedType: ''
     value:
       number: 6
       unit: percentage
@@ -55,9 +51,7 @@ levels:
   text: March Size Capacity +6% (Local)
 - buffs:
   - attribute: Marching Speed
-    conditions: []
     passive: 1
-    targetedType: ''
     value:
       number: 5
       unit: percentage
@@ -65,7 +59,6 @@ levels:
   text: March Speed +5% (Global)
 - buffs:
   - attribute: HP
-    conditions: []
     passive: 0
     targetedType: Siege Machines
     value:

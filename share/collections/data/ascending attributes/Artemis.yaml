@@ -24,7 +24,6 @@ ascending:
     conditions:
     - Attacking
     passive: 0
-    targetedType: ''
     value:
       number: 8
       unit: percentage
@@ -32,21 +31,18 @@ ascending:
   text: Attacking Troop Death into Wounded Rate +8%
 - buffs:
   - attribute: Attack
-    conditions: []
     passive: 0
     targetedType: Mounted Troops
     value:
       number: 30
       unit: percentage
   - attribute: Defense
-    conditions: []
     passive: 0
     targetedType: Mounted Troops
     value:
       number: 15
       unit: percentage
   - attribute: Defense
-    conditions: []
     passive: 0
     targetedType: Ground Troops
     value:

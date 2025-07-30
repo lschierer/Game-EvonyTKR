@@ -44,7 +44,6 @@ ascending:
     conditions:
     - When The Main Defense General
     passive: 0
-    targetedType: ''
     value:
       number: 20
       unit: percentage

@@ -5,7 +5,6 @@ levels:
     conditions:
     - Monsters
     passive: 0
-    targetedType: ''
     value:
       number: 0
       unit: percentage
@@ -13,7 +12,6 @@ levels:
     conditions:
     - Monsters
     passive: 0
-    targetedType: ''
     value:
       number: 0
       unit: percentage
@@ -24,7 +22,6 @@ levels:
     conditions:
     - Monsters
     passive: 0
-    targetedType: ''
     value:
       number: 0
       unit: percentage
@@ -32,7 +29,6 @@ levels:
     conditions:
     - Monsters
     passive: 0
-    targetedType: ''
     value:
       number: 0
       unit: percentage
@@ -43,7 +39,6 @@ levels:
     conditions:
     - Monsters
     passive: 0
-    targetedType: ''
     value:
       number: 0
       unit: percentage
@@ -51,7 +46,6 @@ levels:
     conditions:
     - Monsters
     passive: 0
-    targetedType: ''
     value:
       number: 0
       unit: percentage
@@ -62,7 +56,6 @@ levels:
     conditions:
     - Monsters
     passive: 0
-    targetedType: ''
     value:
       number: 0
       unit: percentage
@@ -70,7 +63,6 @@ levels:
     conditions:
     - Monsters
     passive: 0
-    targetedType: ''
     value:
       number: 0
       unit: percentage
@@ -81,7 +73,6 @@ levels:
     conditions:
     - Monsters
     passive: 0
-    targetedType: ''
     value:
       number: 20
       unit: percentage
@@ -89,7 +80,6 @@ levels:
     conditions:
     - Monsters
     passive: 0
-    targetedType: ''
     value:
       number: 20
       unit: percentage

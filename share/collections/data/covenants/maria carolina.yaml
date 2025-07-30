@@ -57,7 +57,6 @@ levels:
   text: ' Ground Troop and Mounted Troop Attack +10% (Local);; Ground Troop Defense +5% (Global) '
 - buffs:
   - attribute: March Size
-    targetedType: ''
     value:
       number: 6
       unit: percentage

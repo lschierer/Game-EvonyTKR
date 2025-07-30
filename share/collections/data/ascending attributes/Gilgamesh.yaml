@@ -56,7 +56,6 @@ ascending:
     conditions:
     - When City Mayor for this SubCity
     passive: 0
-    targetedType: ''
     value:
       number: 15
       unit: percentage
@@ -83,7 +82,6 @@ ascending:
     conditions:
     - When City Mayor for this SubCity
     passive: 0
-    targetedType: ''
     value:
       number: 20
       unit: percentage

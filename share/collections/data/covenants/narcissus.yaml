@@ -6,16 +6,12 @@ generals:
 levels:
   - buffs:
       - attribute: March Size
-        conditions: []
         passive: 0
-        targetedType: ''
         value:
           number: 5
           unit: percentage
       - attribute: Marching Speed
-        conditions: []
         passive: 1
-        targetedType: ''
         value:
           number: 10
           unit: percentage
@@ -27,7 +23,6 @@ levels:
           - Enemy
           - Attacking
         passive: 0
-        targetedType: ''
         value:
           number: 10
           unit: percentage
@@ -35,7 +30,6 @@ levels:
     text: Enemy Wounded into Death when attacking +10% (Local)
   - buffs:
       - attribute: Attack
-        conditions: []
         passive: 1
         targetedType: Ground Troops
         value:
@@ -45,7 +39,6 @@ levels:
     text: Ground Troop Attack +5% (Global)
   - buffs:
       - attribute: Attack
-        conditions: []
         passive: 0
         targetedType: Ground Troops
         value:
@@ -55,14 +48,12 @@ levels:
     text: Ground Troop Attack +10% (Local)
   - buffs:
       - attribute: Defense
-        conditions: []
         passive: 0
         targetedType: Ground Troops
         value:
           number: 5
           unit: percentage
       - attribute: HP
-        conditions: []
         passive: 0
         targetedType: Ground Troops
         value:
@@ -72,7 +63,6 @@ levels:
     text: Ground Troop Defense +5% (Local);;Ground Troop HP +15% (Local)
   - buffs:
       - attribute: Defense
-        conditions: []
         passive: 0
         targetedType: Ground Troops
         value:

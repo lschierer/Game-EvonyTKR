@@ -2,21 +2,18 @@
 levels:
   - buffs:
       - attribute: Attack
-        conditions: []
         passive: 0
         targetedType: Ranged Troops
         value:
           number: 5
           unit: percentage
       - attribute: Defense
-        conditions: []
         passive: 0
         targetedType: Ranged Troops
         value:
           number: 4
           unit: percentage
       - attribute: HP
-        conditions: []
         passive: 0
         targetedType: Ranged Troops
         value:
@@ -26,21 +23,18 @@ levels:
     text: Ranged Troop Attack +5%. Ranged Troop Defense +4%. Ranged Troop HP +4%.
   - buffs:
       - attribute: Attack
-        conditions: []
         passive: 0
         targetedType: Ranged Troops
         value:
           number: 5
           unit: percentage
       - attribute: Defense
-        conditions: []
         passive: 0
         targetedType: Ranged Troops
         value:
           number: 4
           unit: percentage
       - attribute: HP
-        conditions: []
         passive: 0
         targetedType: Ranged Troops
         value:
@@ -51,21 +45,18 @@ levels:
 
   - buffs:
       - attribute: Attack
-        conditions: []
         passive: 0
         targetedType: Ranged Troops
         value:
           number: 8
           unit: percentage
       - attribute: Defense
-        conditions: []
         passive: 0
         targetedType: Ranged Troops
         value:
           number: 8
           unit: percentage
       - attribute: HP
-        conditions: []
         passive: 0
         targetedType: Ranged Troops
         value:
@@ -75,21 +66,18 @@ levels:
     text: Ranged Troop Attack +10%. Ranged Troop Defense +8%. Ranged Troop HP +8%.
   - buffs:
       - attribute: Attack
-        conditions: []
         passive: 0
         targetedType: Ranged Troops
         value:
           number: 10
           unit: percentage
       - attribute: Defense
-        conditions: []
         passive: 0
         targetedType: Ranged Troops
         value:
           number: 8
           unit: percentage
       - attribute: HP
-        conditions: []
         passive: 0
         targetedType: Ranged Troops
         value:
@@ -99,21 +87,18 @@ levels:
     text: Ranged Troop Attack +10%. Ranged Troop Defense +8%. Ranged Troop HP +8%.
   - buffs:
       - attribute: Attack
-        conditions: []
         passive: 0
         targetedType: Ranged Troops
         value:
           number: 20
           unit: percentage
       - attribute: Defense
-        conditions: []
         passive: 0
         targetedType: Ranged Troops
         value:
           number: 16
           unit: percentage
       - attribute: HP
-        conditions: []
         passive: 0
         targetedType: Ranged Troops
         value:
