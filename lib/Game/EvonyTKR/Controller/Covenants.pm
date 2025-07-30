@@ -101,7 +101,7 @@ package Game::EvonyTKR::Controller::Covenants {
           if (blessed($covenant) ne 'Game::EvonyTKR::Model::Covenant') {
             $logger->error(
               sprintf(
-'got a blessed: "%s" ref: "%s" instead of a  Game::EvonyTKR::Model::Covenant'
+              'got a blessed: "%s" ref: "%s" instead of a  Game::EvonyTKR::Model::Covenant'
               ),
               blessed($covenant),
               Scalar::Util::reftype($covenant)
@@ -119,7 +119,7 @@ package Game::EvonyTKR::Controller::Covenants {
           my $name = $covenant->primary->name;
           if (!defined $name) {
             $logger->error("primary name is undefined in covenant: "
-                . Data::Printer::np($covenant));
+                . ref $covenant);
             next;
           }
 
@@ -139,7 +139,7 @@ package Game::EvonyTKR::Controller::Covenants {
         }
       }
     );
-
+    $logger->debug("end of register method");
   }
 
   sub index($self) {
@@ -148,8 +148,8 @@ package Game::EvonyTKR::Controller::Covenants {
     $logger->debug("Rendering index for $collection");
 
     # Check if markdown exists for this collection
-    my $distDir       = Mojo::File::Share::dist_dir('Game::EvonyTKR');
-    my $markdown_path = $distDir->child("pages/$collection/index.md");
+    my $distDir       = Path::Tiny::path(Mojo::File::Share::dist_dir('Game::EvonyTKR'));
+    my $markdown_path = $distDir->child("pages/Covenants/index.md");
 
     my @parts     = split(/::/, ref($self));
     my $baseClass = pop(@parts);
@@ -158,24 +158,24 @@ package Game::EvonyTKR::Controller::Covenants {
 
     my @items = $self->get_root_manager()->covenantManager->get_all_covenants();
     $logger->debug(
-      sprintf('Items: %s with %s items.', ref(@items), scalar(@items)));
+      sprintf('Items: %s items.', scalar(@items)));
     $self->stash(
       linkBase        => $base,
       items           => \@items,
       collection_name => $collection,
       controller_name => $baseClass,
+      template => 'covenants/index',
     );
 
     if (-f $markdown_path) {
       # Render with markdown
-      $self->stash(template => 'covenants/index');
-
       return $self->render_markdown_file($markdown_path,
         { template => 'covenants/index' });
     }
     else {
+      $logger->debug("no markdown index content found at $markdown_path");
       # Render just the items
-      return $self->render(template => 'Covenants/index');
+      return $self->render(template => 'covenants/index');
     }
   }
 
