@@ -19,3 +19,18 @@ glossary:
       - Primary General
       - Basic Attribute
       - Troop Death to Wounded
+  - term: PvP
+    synonyms:
+      - Player versus Player
+    definition: Playing the game against other human players, as opposed to against a computer player, or against the conditions of the game itself.
+  - term: PvM
+    synonyms:
+      - Player versus Monster
+    definition: >-
+      Playing the game against computer controlled monsters. This game does not have true artificial players, but the monsters in the game do have
+      concepts of attack, defense, and HP that correlate to your own 'basic attributes'
+    related_terms:
+      - Basic Attribute
+      - Attack
+      - Defense
+      - HP

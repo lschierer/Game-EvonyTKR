@@ -25,8 +25,8 @@ glossary:
       - Ascending Attributes
   - term: Attack
     definition: >-
-      A of the 'Basic Attribute' which affects the related troops' attack statistic across all activation conditions, but only when the 'General'
-      is being used as a 'Primary General.'
+      One of the 'Basic Attribute' which affects the related troops' attack statistic across all activation conditions, but only when the 'General'
+      is being used as a 'Primary General.'  This basic attribute affects how much damage you do to others.
     related_terms:
       - Primary General
       - Basic Attribute
