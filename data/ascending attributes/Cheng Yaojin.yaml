@@ -2,28 +2,24 @@
 ascending:
   - buffs:
       - attribute: Attack
-        conditions: []
         passive: 0
         targetedType: Mounted Troops
         value:
           number: 5
           unit: percentage
       - attribute: Attack
-        conditions: []
         passive: 0
         targetedType: Ground Troops
         value:
           number: 5
           unit: percentage
       - attribute: Defense
-        conditions: []
         passive: 0
         targetedType: Mounted Troops
         value:
           number: 10
           unit: percentage
       - attribute: Defense
-        conditions: []
         passive: 0
         targetedType: Ground Troops
         value:
@@ -36,7 +32,6 @@ ascending:
         conditions:
           - Marching
         passive: 0
-        targetedType: ''
         value:
           number: 8
           unit: percentage
@@ -44,14 +39,11 @@ ascending:
     text: Marching Troop Death into Wounded Rate +8%
   - buffs:
       - attribute: March Size
-        conditions: []
         passive: 0
-        targetedType: ''
         value:
           number: 10
           unit: percentage
       - attribute: Attack
-        conditions: []
         passive: 0
         targetedType: Mounted Troops
         value:
@@ -61,14 +53,12 @@ ascending:
     text: March Size Capacity +10%, Mounted Troop Attack +20%
   - buffs:
       - attribute: Defense
-        conditions: []
         passive: 0
         targetedType: Mounted Troops
         value:
           number: 10
           unit: percentage
       - attribute: HP
-        conditions: []
         passive: 0
         targetedType: Mounted Troops
         value:
@@ -78,42 +68,36 @@ ascending:
     text: Mounted Troop Defense +10% and HP +10%
   - buffs:
       - attribute: Attack
-        conditions: []
         passive: 0
         targetedType: Mounted Troops
         value:
           number: 20
           unit: percentage
       - attribute: Attack
-        conditions: []
         passive: 0
         targetedType: Ground Troops
         value:
           number: 20
           unit: percentage
       - attribute: Defense
-        conditions: []
         passive: 0
         targetedType: Mounted Troops
         value:
           number: 15
           unit: percentage
       - attribute: Defense
-        conditions: []
         passive: 0
         targetedType: Ground Troops
         value:
           number: 15
           unit: percentage
       - attribute: HP
-        conditions: []
         passive: 0
         targetedType: Mounted Troops
         value:
           number: 15
           unit: percentage
       - attribute: HP
-        conditions: []
         passive: 0
         targetedType: Ground Troops
         value:

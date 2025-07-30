@@ -8,13 +8,11 @@ ascending:
         value:
           number: 10
           unit: percentage
-        conditions: []
       - attribute: Defense
         troop: Siege Machines
         value:
           number: 5
           unit: percentage
-        conditions: []
   - level: red2
     text: Marching Troop Death into Wounded Rate +8%.
     buffs:
@@ -33,19 +31,16 @@ ascending:
         value:
           number: 10
           unit: percentage
-        conditions: []
       - attribute: HP
         troop: Ranged Troops
         value:
           number: 10
           unit: percentage
-        conditions: []
       - attribute: HP
         troop: Siege Machines
         value:
           number: 10
           unit: percentage
-        conditions: []
   - level: red4
     text: Ranged Troop and Siege Machine Attack +20% and HP +10%
     buffs:
@@ -54,25 +49,21 @@ ascending:
         value:
           number: 20
           unit: percentage
-        conditions: []
       - attribute: Attack
         troop: Siege Machines
         value:
           number: 20
           unit: percentage
-        conditions: []
       - attribute: HP
         troop: Ranged Troops
         value:
           number: 10
           unit: percentage
-        conditions: []
       - attribute: HP
         troop: Siege Machines
         value:
           number: 10
           unit: percentage
-        conditions: []
   - level: red5
     text: Siege Machine Attack +30%, Defense and HP +15%
     buffs:
@@ -81,18 +72,15 @@ ascending:
         value:
           number: 30
           unit: percentage
-        conditions: []
       - attribute: Defense
         troop: Siege Machines
         value:
           number: 15
           unit: percentage
-        conditions: []
       - attribute: HP
         troop: Siege Machines
         value:
           number: 15
           unit: percentage
-        conditions: []
 general: Melisande
 id: Melisande

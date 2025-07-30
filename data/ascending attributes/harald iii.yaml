@@ -2,14 +2,12 @@
 ascending:
 - buffs:
   - attribute: Attack
-    conditions: []
     passive: 0
     targetedType: Ranged Troops
     value:
       number: 10
       unit: percentage
   - attribute: Defense
-    conditions: []
     passive: 0
     targetedType: Ground Troops
     value:
@@ -23,7 +21,6 @@ ascending:
     - leading the army
     - Attacking
     passive: 0
-    targetedType: ''
     value:
       number: 10
       unit: percentage
@@ -34,7 +31,6 @@ ascending:
     conditions:
     - When Rallying
     passive: 0
-    targetedType: ''
     value:
       number: 8
       unit: percentage
@@ -42,14 +38,12 @@ ascending:
   text: When General is launching Alliance War, Rally Capacity +8%.
 - buffs:
   - attribute: Attack
-    conditions: []
     passive: 0
     targetedType: Ranged Troops
     value:
       number: 10
       unit: percentage
   - attribute: HP
-    conditions: []
     passive: 0
     targetedType: Ground Troops
     value:
@@ -59,21 +53,18 @@ ascending:
   text: Ranged Troop Attack +10%, Ground Troop HP +10%.
 - buffs:
   - attribute: Attack
-    conditions: []
     passive: 0
     targetedType: Ranged Troops
     value:
       number: 10
       unit: percentage
   - attribute: Defense
-    conditions: []
     passive: 0
     targetedType: Ground Troops
     value:
       number: 10
       unit: percentage
   - attribute: HP
-    conditions: []
     passive: 0
     targetedType: Ground Troops
     value:

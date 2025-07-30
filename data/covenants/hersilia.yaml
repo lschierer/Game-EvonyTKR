@@ -17,7 +17,6 @@ levels:
   text: ' Ranged Troop and Siege Machine Attack +15% (Local);; In-Rally Siege Machine Defense +15% (Local) '
 - buffs:
   - attribute: HP
-    conditions: []
     passive: 0
     targetedType: Siege Machines
     value:
@@ -35,9 +34,7 @@ levels:
   text: ' Siege Machine HP +10% (Local);; In-Rally Siege Machine Attack +5% (Global) '
 - buffs:
   - attribute: March Size
-    conditions: []
     passive: 0
-    targetedType: ''
     value:
       number: 10
       unit: percentage
@@ -45,7 +42,6 @@ levels:
   text: March Size Capacity +10% (Local)
 - buffs:
   - attribute: Defense
-    conditions: []
     passive: 1
     targetedType: Siege Machines
     value:
@@ -66,7 +62,6 @@ levels:
   text: Defending Siege Machine Attack +10% (Local)
 - buffs:
   - attribute: Attack
-    conditions: []
     passive: 0
     targetedType: Siege Machines
     value:

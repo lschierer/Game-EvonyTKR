@@ -5,7 +5,6 @@ buffs:
   - Enemy
   - leading the army
   passive: 0
-  targetedType: ''
   value:
     number: 15
     unit: percentage

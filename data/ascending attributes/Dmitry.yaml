@@ -40,9 +40,7 @@ ascending:
     text: Reinforcing Ground Troop Defense +15% and HP +15%
   - buffs:
       - attribute: March Size
-        conditions: []
         passive: 0
-        targetedType: ''
         value:
           number: 10
           unit: percentage

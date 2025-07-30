@@ -4,7 +4,6 @@ buffs:
   conditions:
   - When City Mayor for this SubCity
   passive: 0
-  targetedType: ''
   value:
     number: 75
     unit: percentage

@@ -6,7 +6,6 @@ generals:
 levels:
 - buffs:
   - attribute: Attack
-    conditions: []
     passive: 0
     targetedType: Ranged Troops
     value:
@@ -35,9 +34,7 @@ levels:
   text: Attacking Ranged Troop Defense +10% (Local)
 - buffs:
   - attribute: Marching Speed
-    conditions: []
     passive: 0
-    targetedType: ''
     value:
       number: 10
       unit: percentage
@@ -45,7 +42,6 @@ levels:
   text: March Speed +10% (Local)
 - buffs:
   - attribute: HP
-    conditions: []
     passive: 0
     targetedType: Ranged Troops
     value:
@@ -55,7 +51,6 @@ levels:
   text: Ranged Troop HP +10% (Local)
 - buffs:
   - attribute: Training Speed
-    conditions: []
     passive: 1
     targetedType: Ranged Troops
     value:

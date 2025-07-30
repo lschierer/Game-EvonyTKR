@@ -2,28 +2,24 @@
 ascending:
 - buffs:
   - attribute: Attack
-    conditions: []
     passive: 0
     targetedType: Ranged Troops
     value:
       number: 5
       unit: percentage
   - attribute: Attack
-    conditions: []
     passive: 0
     targetedType: Siege Machines
     value:
       number: 5
       unit: percentage
   - attribute: HP
-    conditions: []
     passive: 0
     targetedType: Ranged Troops
     value:
       number: 10
       unit: percentage
   - attribute: HP
-    conditions: []
     passive: 0
     targetedType: Siege Machines
     value:
@@ -36,7 +32,6 @@ ascending:
     conditions:
     - Marching
     passive: 0
-    targetedType: ''
     value:
       number: 8
       unit: percentage
@@ -44,21 +39,18 @@ ascending:
   text: Marching Troop Death into Wounded Rate +8%
 - buffs:
   - attribute: Attack
-    conditions: []
     passive: 0
     targetedType: Ranged Troops
     value:
       number: 20
       unit: percentage
   - attribute: Defense
-    conditions: []
     passive: 0
     targetedType: Ranged Troops
     value:
       number: 20
       unit: percentage
   - attribute: HP
-    conditions: []
     passive: 0
     targetedType: Ranged Troops
     value:
@@ -68,23 +60,19 @@ ascending:
   text: Ranged Troop Attack +20%, Defense and HP +20%
 - buffs:
   - attribute: Defense
-    conditions: []
     passive: 0
     targetedType: Ranged Troops
     value:
       number: 5
       unit: percentage
   - attribute: HP
-    conditions: []
     passive: 0
     targetedType: Ranged Troops
     value:
       number: 5
       unit: percentage
   - attribute: March Size
-    conditions: []
     passive: 0
-    targetedType: ''
     value:
       number: 8
       unit: percentage
@@ -92,21 +80,18 @@ ascending:
   text: Ranged Troop Defense and HP +5%, March Size Capacity +8%
 - buffs:
   - attribute: Attack
-    conditions: []
     passive: 0
     targetedType: Ranged Troops
     value:
       number: 20
       unit: percentage
   - attribute: Defense
-    conditions: []
     passive: 0
     targetedType: Ranged Troops
     value:
       number: 15
       unit: percentage
   - attribute: HP
-    conditions: []
     passive: 0
     targetedType: Ranged Troops
     value:

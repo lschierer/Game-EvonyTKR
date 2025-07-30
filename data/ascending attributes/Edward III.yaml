@@ -2,28 +2,24 @@
 ascending:
 - buffs:
   - attribute: Defense
-    conditions: []
     passive: 0
     targetedType: Ranged Troops
     value:
       number: 8
       unit: percentage
   - attribute: Defense
-    conditions: []
     passive: 0
     targetedType: Siege Machines
     value:
       number: 8
       unit: percentage
   - attribute: HP
-    conditions: []
     passive: 0
     targetedType: Ranged Troops
     value:
       number: 8
       unit: percentage
   - attribute: HP
-    conditions: []
     passive: 0
     targetedType: Siege Machines
     value:
@@ -36,7 +32,6 @@ ascending:
     conditions:
     - Marching
     passive: 0
-    targetedType: ''
     value:
       number: 10
       unit: percentage
@@ -44,14 +39,11 @@ ascending:
   text: Marching Troop Death into Wounded Rate +10%.
 - buffs:
   - attribute: March Size
-    conditions: []
     passive: 0
-    targetedType: ''
     value:
       number: 6
       unit: percentage
   - attribute: Attack
-    conditions: []
     passive: 0
     targetedType: Ranged Troops
     value:
@@ -61,21 +53,18 @@ ascending:
   text: March Size Capacity +6%, Ranged Troop Attack +10%.
 - buffs:
   - attribute: Attack
-    conditions: []
     passive: 0
     targetedType: Ranged Troops
     value:
       number: 10
       unit: percentage
   - attribute: Attack
-    conditions: []
     passive: 0
     targetedType: Siege Machines
     value:
       number: 10
       unit: percentage
   - attribute: Defense
-    conditions: []
     passive: 0
     targetedType: Ranged Troops
     value:
@@ -85,14 +74,12 @@ ascending:
   text: Ranged Troop and Siege Machine Attack +10%, Ranged Troop Defense +15%.
 - buffs:
   - attribute: Attack
-    conditions: []
     passive: 0
     targetedType: Ranged Troops
     value:
       number: 20
       unit: percentage
   - attribute: HP
-    conditions: []
     passive: 0
     targetedType: Ranged Troops
     value:

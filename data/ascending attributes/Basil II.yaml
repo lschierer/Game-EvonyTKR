@@ -45,7 +45,6 @@ ascending:
     - leading the army
     - Attacking
     passive: 0
-    targetedType: ''
     value:
       number: 10
       unit: percentage
@@ -56,7 +55,6 @@ ascending:
     conditions:
     - When Rallying
     passive: 0
-    targetedType: ''
     value:
       number: 8
       unit: percentage

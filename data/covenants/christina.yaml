@@ -6,7 +6,6 @@ generals:
 levels:
 - buffs:
   - attribute: Attack
-    conditions: []
     passive: 0
     targetedType: Siege Machines
     value:
@@ -16,7 +15,6 @@ levels:
   text: Siege Machine Attack +5% (Local)
 - buffs:
   - attribute: Training Speed
-    conditions: []
     passive: 1
     targetedType: Siege Machines
     value:
@@ -26,7 +24,6 @@ levels:
   text: Siege Machine Training Speed +10% (Global)
 - buffs:
   - attribute: HP
-    conditions: []
     passive: 0
     targetedType: Siege Machines
     value:
@@ -36,7 +33,6 @@ levels:
   text: Siege Machine HP +10% (Local)
 - buffs:
   - attribute: Defense
-    conditions: []
     passive: 0
     targetedType: Siege Machines
     value:
@@ -73,9 +69,7 @@ levels:
       number: 10
       unit: percentage
   - attribute: March Size
-    conditions: []
     passive: 0
-    targetedType: ''
     value:
       number: 5
       unit: percentage
