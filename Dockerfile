@@ -78,6 +78,12 @@ RUN chown -R mojo:mojo /home/mojo
 RUN apt-get update && \
   apt-get install -y sudo
 
+# Install Pandoc
+RUN apt-get update && apt-get install -y pandoc && rm -rf /var/lib/apt/lists/*
+
+# Verify installation
+RUN pandoc --version
+
 COPY share/scripts/dockerEntrypoint.sh /usr/local/bin/dockerEntrypoint.sh
 RUN chmod +x /usr/local/bin/dockerEntrypoint.sh
 
