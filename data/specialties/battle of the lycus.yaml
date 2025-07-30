@@ -7,7 +7,7 @@ levels:
         value:
           number: 2
         conditions:
-          - When City Mayor for this Subcity
+          - When City Mayor for this SubCity
   - level: Blue
     text: Death into Survival Rate in this Subordinate City +2%
     buffs:
@@ -15,7 +15,7 @@ levels:
         value:
           number: 2
         conditions:
-          - When City Mayor for this Subcity
+          - When City Mayor for this SubCity
   - level: Purple
     text: Death into Survival Rate in this Subordinate City +3%
     buffs:
@@ -23,7 +23,7 @@ levels:
         value:
           number: 3
         conditions:
-          - When City Mayor for this Subcity
+          - When City Mayor for this SubCity
   - level: Orange
     text: Death into Survival Rate in this Subordinate City +3%
     buffs:
@@ -31,7 +31,7 @@ levels:
         value:
           number: 3
         conditions:
-          - When City Mayor for this Subcity
+          - When City Mayor for this SubCity
   - level: Gold
     text: Death into Survival Rate in this Subordinate City +6%
     buffs:
@@ -39,4 +39,4 @@ levels:
         value:
           number: 6
         conditions:
-          - When City Mayor for this Subcity
+          - When City Mayor for this SubCity

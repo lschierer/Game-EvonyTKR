@@ -5,7 +5,7 @@ ascending:
         value:
           number: 15
         conditions:
-          - When the Main Defense Deneral
+          - When The Main Defense General
           - In City
       - attribute: HP
         troop: Mounted Troops
@@ -13,7 +13,7 @@ ascending:
           number: 10
           unit: percentage
         conditions:
-          - When the Main Defense Deneral
+          - When The Main Defense General
           - In City
       - attribute: Defense
         troop: Ground Troops
@@ -21,7 +21,7 @@ ascending:
           number: 15
           unit: percentage
         conditions:
-          - When the Main Defense Deneral
+          - When The Main Defense General
           - In City
       - attribute: HP
         troop: Ground Troops
@@ -29,7 +29,7 @@ ascending:
           number: 10
           unit: percentage
         conditions:
-          - When the Main Defense Deneral
+          - When The Main Defense General
           - In City
     level: red1
     text: When General is the Main City Defense General, In-city Mounted Troop and Ground Troop Defense +15% and HP +10%.
@@ -39,7 +39,7 @@ ascending:
           number: 20
           unit: percentage
         conditions:
-          - When the Main Defense Deneral
+          - When The Main Defense General
     level: red2
     text: When General is the Main City Defense General, Hospital Capacity +20%.
   - buffs:
@@ -49,7 +49,7 @@ ascending:
           number: 30
           unit: percentage
         conditions:
-          - When the Main Defense Deneral
+          - When The Main Defense General
           - In City
       - attribute: HP
         troop: Ground Troops
@@ -57,7 +57,7 @@ ascending:
           number: 20
           unit: percentage
         conditions:
-          - When the Main Defense Deneral
+          - When The Main Defense General
           - In City
       - attribute: HP
         troop: Mounted Troops
@@ -65,7 +65,7 @@ ascending:
           number: 20
           unit: percentage
         conditions:
-          - When the Main Defense Deneral
+          - When The Main Defense General
           - In City
     level: red3
     text: When General is the Main City Defense General, In-city Ranged Troop Defense +30%, In-city Ground Troop and Mounted Troop HP +20%.
@@ -76,7 +76,7 @@ ascending:
           number: 30
           unit: percentage
         conditions:
-          - When the Main Defense Deneral
+          - When The Main Defense General
           - In City
       - attribute: Defense
         troop: Ground Troops
@@ -84,7 +84,7 @@ ascending:
           number: 30
           unit: percentage
         conditions:
-          - When the Main Defense Deneral
+          - When The Main Defense General
           - In City
       - attribute: Defense
         troop: Mounted Troops
@@ -92,7 +92,7 @@ ascending:
           number: 30
           unit: percentage
         conditions:
-          - When the Main Defense Deneral
+          - When The Main Defense General
           - In City
     level: red4
     text: When General is the Main City Defense General, In-city Ranged Troop HP +30%, In-city Ground Troop and Mounted Troop Defense +30%.
@@ -103,7 +103,7 @@ ascending:
           number: 20
           unit: percentage
         conditions:
-          - When the Main Defense Deneral
+          - When The Main Defense General
           - In City
       - attribute: Defense
         troop: Ranged Troops
@@ -111,7 +111,7 @@ ascending:
           number: 30
           unit: percentage
         conditions:
-          - When the Main Defense Deneral
+          - When The Main Defense General
           - In City
       - attribute: HP
         troop: Ranged Troops
@@ -119,7 +119,7 @@ ascending:
           number: 30
           unit: percentage
         conditions:
-          - When the Main Defense Deneral
+          - When The Main Defense General
           - In City
     level: red5
     text: When General is the Main City Defense General, In-city Ranged Troop Attack +20%, Defense and HP +30%.
