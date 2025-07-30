@@ -1,0 +1,42 @@
+name: Battle of the Lycus
+levels:
+  - level: Green
+    text: Death into Survival Rate in this Subordinate City +2%
+    buffs:
+      - attribute: Death to Survival
+        value:
+          number: 2
+        conditions:
+          - When City Mayor for this Subcity
+  - level: Blue
+    text: Death into Survival Rate in this Subordinate City +2%
+    buffs:
+      - attribute: Death to Survival
+        value:
+          number: 2
+        conditions:
+          - When City Mayor for this Subcity
+  - level: Purple
+    text: Death into Survival Rate in this Subordinate City +3%
+    buffs:
+      - attribute: Death to Survival
+        value:
+          number: 3
+        conditions:
+          - When City Mayor for this Subcity
+  - level: Orange
+    text: Death into Survival Rate in this Subordinate City +3%
+    buffs:
+      - attribute: Death to Survival
+        value:
+          number: 3
+        conditions:
+          - When City Mayor for this Subcity
+  - level: Gold
+    text: Death into Survival Rate in this Subordinate City +6%
+    buffs:
+      - attribute: Death to Survival
+        value:
+          number: 6
+        conditions:
+          - When City Mayor for this Subcity
