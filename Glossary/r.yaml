@@ -1,0 +1,9 @@
+# yaml-language-server: $schema=schema.json
+
+glossary:
+  - term: RSS
+    synonyms:
+      - Resources
+    definition: >-
+      One of food, lumber, stone, or ore, which can be either generated in your keep, collected, purchased, or won.  Resources
+      are required both for the construction of buildings and the training of troops.
