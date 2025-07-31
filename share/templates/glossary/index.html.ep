@@ -14,8 +14,9 @@
         <dl>
           <% foreach my $term_obj (@{ getTermsByLetter($letter) }) { %>
             <% my $term = $term_obj->term; %>
+            <% my $term_target = $term =~ s/ /_/gr; %>
             <dt class="spectrum-Heading spectrum-Heading--sizeS">
-              <a id="<%= $term %>" href="#<%= $term %>" class="spectrum-Link spectrum-Link--quiet spectrum-Link--secondary">
+              <a id="<%= $term_target %>" href="#<%= $term_target %>" class="spectrum-Link spectrum-Link--quiet spectrum-Link--secondary">
                 <%= $term %>
               </a>
             </dt>
@@ -27,7 +28,8 @@
               <dd>
                 Synonyms: <ul>
                   <% foreach my $s (sort @syn) { %>
-                    <li><a href="#<%= $s %>" class="spectrum-Link spectrum-Link--secondary"><%= $s %></a></li>
+                    <% my $st = $s =~ s/ /_/gr; %>
+                    <li><a href="#<%= $st %>" class="spectrum-Link spectrum-Link--secondary"><%= $s %></a></li>
                   <% } %>
                 </ul>
               </dd>
@@ -37,7 +39,8 @@
               <dd>
                 See also: <ul>
                   <% foreach my $r (sort @related) { %>
-                    <li><a href="#<%= $r %>" class="spectrum-Link spectrum-Link--secondary"><%= $r %></a></li>
+                    <% my $rt = $r =~ s/ /_/gr; %>
+                    <li><a href="#<%= $rt %>" class="spectrum-Link spectrum-Link--secondary"><%= $r %></a></li>
                   <% } %>
                 </ul>
               </dd>

@@ -58,8 +58,8 @@ Attacking and Reinforcing.
 Also, if you decide to go after the Pans every other week, consider a PvM
 primary general who is compatible with one of your main PvP generals.  Use the PvM general as a Monster Primary and your PvP general as its assistant. Give the PvM general Ranged Monster books.
 
-[Attacking Archer Pairs table]: </Generals/Archer%20Specialists/Attacking/pair-comparison>
+[Attacking Archer Pairs table]:./Generals/Archer%20Specialists/Attackingpair-comparison>
 
-[buff]: ../../Reference/Glossary/#buff
-[buffs]: ../../Reference/Glossary/#buff
-[Overview]: ../overview/
+[buff]./Reference/Glossary#buff
+[buffs]./Reference/Glossary#buff
+[Overview]: ./overview

@@ -11,4 +11,4 @@ even un-tested, as I am still just starting my own SvS journey in many ways. If
 you allow a mixed metaphor, Take anything you find here with a grain of
 salt, because your mileage may vary.
 
-[SVS]: ../../Reference/Glossary/#SvS
+[SVS]: /Reference/Glossary/#SvS

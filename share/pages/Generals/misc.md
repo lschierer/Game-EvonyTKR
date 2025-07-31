@@ -12,7 +12,7 @@ contains a lot of useful background information if you want to understand how I
 arrived at these conclusions. If you just want to be told what to do, you can
 skip it and dive right in here.
 
-[Overview]: ../overview/
+[Overview]: ./overview
 
 :::
 Interestingly, this advice applies almost equally well to both free players and
@@ -62,7 +62,7 @@ several different things.
    selling a general seems like a waste of gold, however the things that
    activating your general's hall unlocks is worth the cost.
 
-[Duty]: ../duty/
-[General's Hall]: ../../Reference/Glossary/#Generals_Hall
-[RSS]: ../../Reference/Glossary/#RSS
-[Mayors]: ../mayors/
+[Duty]: ./duty
+[General's Hall]./Reference/Glossary#Generals_Hall
+[RSS]./Reference/Glossary#RSS
+[Mayors]: ./mayors

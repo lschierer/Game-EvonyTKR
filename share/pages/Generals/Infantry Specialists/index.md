@@ -12,7 +12,7 @@ contains a lot of useful background information if you want to understand how
 I arrived at these conclusions. If you just want to be told what to do, you
 can skip it and dive right in here.
 
-[Overview]: ../overview/
+[Overview]: ./overview
 
 </aside>
 
@@ -53,6 +53,6 @@ ranged, and one for mounted. Elise stinks without a dragon. While Ludwig is
 not quite as attractive as Elise, he suffers from the same fatal flaw, and so
 should be avoided for the same reason.  At the time of writing, both Elise and Ludwig are hopelessly outclassed even with dragons by generals with [covenants] anyway.
 
-[Mounted]: ../mounted/
-[Ranged]: ../ranged/
-[Wall]: ../wall/
+[Mounted]: ./mounted
+[Ranged]: ./ranged
+[Wall]: ./wall

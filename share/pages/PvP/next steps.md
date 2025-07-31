@@ -142,7 +142,7 @@ other troop types to keep your siege alive. If you are being attacked _by_
 siege, then your only two options are to dodge the attack (port away) or to
 have more siege and more range than your attacker. Refer back to the [T1 Defense] for more on this.
 
-[T1 Defense]: ../t1 defense/
+[T1 Defense]: ./t1 defense
 
 ### for your wall general
 

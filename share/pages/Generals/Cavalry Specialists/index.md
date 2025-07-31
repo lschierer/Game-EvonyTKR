@@ -12,7 +12,7 @@ contains a lot of useful background information if you want to understand how
 I arrived at these conclusions. If you just want to be told what to do, you
 can skip it and dive right in here.
 
-[Overview]: ../overview/
+[Overview]: ./overview
 
 </aside>
 
@@ -79,8 +79,8 @@ Set up several copies of Theodora with
 and use the Rally Card to join as many rallies as possible using this general.  Optionally pair her with Spartacus
 to reduce your Stamina usage ([Ascend] Spartacus, which is free, and only requires fragments).
 
-[primary general]: </Reference/Glossary#primary general>
-[PvP]: /Reference/Glossary#PvP
-[PvM]: /Reference/Glossary#PvM
-[assistant]: /Reference/Glossary#assistant
-[Ascend]: /Reference/Glossary#ascend
+[primary general]:./ReferenceGlossary#primary general>
+[PvP]./ReferenceGlossary#PvP
+[PvM]./ReferenceGlossary#PvM
+[assistant]./ReferenceGlossary#assistant
+[Ascend]./ReferenceGlossary#ascend

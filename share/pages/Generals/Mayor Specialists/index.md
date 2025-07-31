@@ -11,7 +11,7 @@ contains a lot of useful background information if you want to understand how
 I arrived at these conclusions. If you just want to be told what to do, you
 can skip it and dive right in here.
 
-[Overview]: ../overview/
+[Overview]: ./overview
 
 </aside>
 
@@ -97,8 +97,8 @@ is that a free or light spender is probably better off specializing with
 generals from either the attack debuff set or the toughness debuff set,
 rather than attempting to do both with one of these lists.
 
-[ghosting]: /Reference/Glossary#ghost
-[ghost]: /Reference/Glossary#ghost
-[peace]: ../peace_time_subcity_mayors/
-[debuff]: ../../Reference/Glossary/#Debuff
-[buff]: ../../Reference/Glossary/#buff
+[ghosting]./ReferenceGlossary#ghost
+[ghost]./ReferenceGlossary#ghost
+[peace]: ./peace_time_subcity_mayors
+[debuff]./Reference/Glossary#Debuff
+[buff]./Reference/Glossary#buff

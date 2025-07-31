@@ -63,13 +63,13 @@ As you look at the ordered list below, realize that you may not have the
 general that you want to work on today. In other words, **_plan_** rather than accept compromises based on the generals you randomly happen to get first.
 
 1. Decide if you care about running rallies yourself, or if you are content
-   to only join them. If you do, you need a good monster general pair. This is different than a mounted PVP pair (the generals you pick for each role are different). If you care about running rallies, this general and his/her assistant needs to be your priority. ([2 generals](../mounted/))
+   to only join them. If you do, you need a good monster general pair. This is different than a mounted PVP pair (the generals you pick for each role are different). If you care about running rallies, this general and h./her assistant needs to be your priority. ([2 generals](../mounted))
 
 2. Decide on make-up of your main PVP march. This will determine your main
    PVP general and main PVP assistant. If you run rallies, this will be the *second* general you look at. If you do not, this will be the *first*. (2 generals)
 
 3. Decide *one* troop type that you will (eventually) have a TON of.[^Note]
-   This need not be the same as your main PVP march (particularly if you run rallies). You will *someday* use this as the bulk of your meat shield and the bulk of your keep's defenses. Look for Wall Defense generals that complement this troop type. You need a main general and an assistant general. The main general will be the *third* general you max out. ([2 generals](../wall/))
+   This need not be the same as your main PVP march (particularly if you run rallies). You will *someday* use this as the bulk of your meat shield and the bulk of your keep's defenses. Look for Wall Defense generals that complement this troop type. You need a main general and an assistant general. The main general will be the *third* general you max out. ([2 generals](./wall))
 
 4. Look for generals that are specialized as duty generals for your keep and
    other buildings. If you find one for a building that is too small to get a
@@ -79,10 +79,10 @@ general that you want to work on today. In other words, **_plan_** rather than a
 
 5. Look for generals that are specialized as "debuff" generals. These will be
    your sub city mayors. You have to be careful with these. If you do not
-   plan on investing rune stones on these, they rate _very_ differently than if you do plan on investing rune stones on them.[^scn] ([between 4 and 8 generals needed, depending on how many sub cities you have](../mayors/))
+   plan on investing rune stones on these, they rate _very_ differently than if you do plan on investing rune stones on them.[^scn] ([between 4 and 8 generals needed, depending on how many sub cities you have](./mayors))
 
 6. Look for Baibars and Queen Jindock. You will someday want five
-   Theodora/Baibars and five Queen Jindock generals. Take your time finding these, but if you see one and you have slots available, do not pass them up. Use Theodora and Baibars to join rallies; use Jindock to gather. ([10 generals](../misc/))
+   Theodo./Baibars and five Queen Jindock generals. Take your time finding these, but if you see one and you have slots available, do not pass them up. Use Theodora and Baibars to join rallies; use Jindock to gather. ([10 generals](../misc))
 
 
 ### Picking a Primary General
@@ -136,13 +136,13 @@ Remember, that ascending an assistant *can* help activate a covenant *some* but
 
 [^Note]: **_DO NOT_** start building a ton of this troop type *yet*.  You need to be able to [ghost].  Your total number of troops should be less than or equal to the size of your march (with march increase [buffs]) times the number of marches you have available to you.
 
-[ghost]: /Reference/Glossary#ghost
-[buff]: /Reference/Glossary#buff
-[buffs]: /Reference/Glossary#buff
-[ascend]: /Reference/Glossary#ascend
-[PvP]: /Reference/Glossary#PvP
-[PvM]: /Reference/Glossary#PvM
-[ghost]: /Reference/Glossary#ghost
+[ghost]./ReferenceGlossary#ghost
+[buff]./ReferenceGlossary#buff
+[buffs]./ReferenceGlossary#buff
+[ascend]./ReferenceGlossary#ascend
+[PvP]./ReferenceGlossary#PvP
+[PvM]./ReferenceGlossary#PvM
+[ghost]./ReferenceGlossary#ghost
 
 [^many]: "Many" tokens is defined as:
     * _**NO MATTER WHAT, NO LESS THAN 50**_ tokens.

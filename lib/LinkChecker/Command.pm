@@ -95,7 +95,7 @@ class LinkChecker::Command {
           return 404;
         }
       }
-      if $abs_uri->path !~ /\.(css|js|png|jpg|gif|pdf)$/i {  # cannot find links to check in these files.
+      if ($uri->path !~ /\.(css|js|png|jpg|gif|pdf)$/i ){  # cannot find links to check in these files.
         my $extractor = HTML::LinkExtor->new(undef, $url);
         $extractor->parse($response->{content});
         my @links = $extractor->links;
