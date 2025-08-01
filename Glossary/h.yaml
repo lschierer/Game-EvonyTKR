@@ -3,5 +3,5 @@
 glossary:
   - term: HP
     definition: >-
-      One of the 'Basic Attribute' which affects the related troops' health statistic.  Generals do not themselves have an HP attribute, but rather affect
+      One of the 'Basic Attributes' which affects the related troops' health statistic.  Generals do not themselves have an HP attribute, but rather affect
       HP attribute of the troops they lead.  Thus it is a basic attribute not of Generals, but of troops.
