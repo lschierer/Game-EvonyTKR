@@ -16,7 +16,7 @@
             <% my $term = $term_obj->term; %>
             <% my $term_target = $term =~ s/ /_/gr; %>
             <dt class="spectrum-Heading spectrum-Heading--sizeS">
-              <a id="<%= $term_target %>" href="#<%= $term_target %>" class="spectrum-Link spectrum-Link--quiet spectrum-Link--secondary">
+              <a id="<%= lc($term_target); %>" href="#<%= lc($term_target) %>" class="spectrum-Link spectrum-Link--quiet spectrum-Link--secondary">
                 <%= $term %>
               </a>
             </dt>
@@ -29,7 +29,16 @@
                 Synonyms: <ul>
                   <% foreach my $s (sort @syn) { %>
                     <% my $st = $s =~ s/ /_/gr; %>
-                    <li><a href="#<%= $st %>" class="spectrum-Link spectrum-Link--secondary"><%= $s %></a></li>
+                    <% $st = lc($st); %>
+                    <li>
+                      <a
+                        id="<%= $st %>"
+                        href="#<%= $st %>"
+                        class="spectrum-Link spectrum-Link--secondary"
+                      >
+                        <%= $s %>
+                      </a>
+                    </li>
                   <% } %>
                 </ul>
               </dd>
@@ -40,6 +49,7 @@
                 See also: <ul>
                   <% foreach my $r (sort @related) { %>
                     <% my $rt = $r =~ s/ /_/gr; %>
+                    <% $rt = lc($rt); %>
                     <li><a href="#<%= $rt %>" class="spectrum-Link spectrum-Link--secondary"><%= $r %></a></li>
                   <% } %>
                 </ul>
