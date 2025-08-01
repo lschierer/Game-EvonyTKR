@@ -5,7 +5,7 @@ glossary:
     definition: A General's built-in SkillBook may have additional attributes that can be activated.  Activating these attributes is called 'Ascending' the General, who is then 'Ascended.'  This activation will require fragments of the General whose additional attributes are being activated.  For most, but not all, Gold or Red level Historical Generals, this will require 'Blood of Ares.'
     related_terms:
       - General
-      - SkilllBook
+      - SkillBook
       - Ascending
       - Ascended
       - Blood of Ares
