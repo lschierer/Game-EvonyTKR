@@ -106,10 +106,11 @@ class Game::EvonyTKR::Model::Covenant::Manager :
 
         # Find buffs for this category
         my @buffs;
-        if(exists $oc->{buff}){
-          @buffs = @{$oc->{buff}};
-        }elsif(exists $oc->{buffs}){
-          @buffs = @{$oc->{buffs}};
+        if (exists $oc->{buff}) {
+          @buffs = @{ $oc->{buff} };
+        }
+        elsif (exists $oc->{buffs}) {
+          @buffs = @{ $oc->{buffs} };
         }
         foreach my $ob (@buffs) {
           my $b = Game::EvonyTKR::Model::Buff->from_hash($ob);

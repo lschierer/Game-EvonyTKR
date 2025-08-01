@@ -8,17 +8,16 @@ require Path::Tiny;
 require YAML::PP;
 use namespace::clean;
 
-class Game::EvonyTKR::Model::Glossary :
-  isa(Game::EvonyTKR::Shared::Constants) {
+class Game::EvonyTKR::Model::Glossary : isa(Game::EvonyTKR::Shared::Constants) {
   use Carp;
 
-  field $term : param  :reader;
-  field $definition : param :reader;
-  field $synonyms : param :reader //= [];
-  field $related_terms : param :reader //= [];
-  field $examples : param :reader //= [];
-  field $owner : param :reader //= '';
-  field $status : param :reader //= 'approved';
+  field $term          : param : reader;
+  field $definition    : param : reader;
+  field $synonyms      : param : reader //= [];
+  field $related_terms : param : reader //= [];
+  field $examples      : param : reader //= [];
+  field $owner         : param : reader //= '';
+  field $status        : param : reader //= 'approved';
 
   # Check if this term matches a search (term or synonym)
   method matches_search($search_term) {
@@ -39,13 +38,13 @@ class Game::EvonyTKR::Model::Glossary :
   # Convert to hash for JSON serialization
   method to_hash() {
     return {
-      term => $term,
-      definition => $definition,
-      synonyms => $synonyms,
+      term          => $term,
+      definition    => $definition,
+      synonyms      => $synonyms,
       related_terms => $related_terms,
-      examples => $examples,
-      owner => $owner,
-      status => $status,
+      examples      => $examples,
+      owner         => $owner,
+      status        => $status,
     };
   }
 

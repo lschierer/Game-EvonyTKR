@@ -101,7 +101,7 @@ package Game::EvonyTKR::Controller::Covenants {
           if (blessed($covenant) ne 'Game::EvonyTKR::Model::Covenant') {
             $logger->error(
               sprintf(
-              'got a blessed: "%s" ref: "%s" instead of a  Game::EvonyTKR::Model::Covenant'
+'got a blessed: "%s" ref: "%s" instead of a  Game::EvonyTKR::Model::Covenant'
               ),
               blessed($covenant),
               Scalar::Util::reftype($covenant)
@@ -118,8 +118,8 @@ package Game::EvonyTKR::Controller::Covenants {
           }
           my $name = $covenant->primary->name;
           if (!defined $name) {
-            $logger->error("primary name is undefined in covenant: "
-                . ref $covenant);
+            $logger->error(
+              "primary name is undefined in covenant: " . ref $covenant);
             next;
           }
 
@@ -148,7 +148,8 @@ package Game::EvonyTKR::Controller::Covenants {
     $logger->debug("Rendering index for $collection");
 
     # Check if markdown exists for this collection
-    my $distDir       = Path::Tiny::path(Mojo::File::Share::dist_dir('Game::EvonyTKR'));
+    my $distDir =
+      Path::Tiny::path(Mojo::File::Share::dist_dir('Game::EvonyTKR'));
     my $markdown_path = $distDir->child("pages/Covenants/index.md");
 
     my @parts     = split(/::/, ref($self));
@@ -157,14 +158,13 @@ package Game::EvonyTKR::Controller::Covenants {
     $logger->debug("Covenants index method has base $base");
 
     my @items = $self->get_root_manager()->covenantManager->get_all_covenants();
-    $logger->debug(
-      sprintf('Items: %s items.', scalar(@items)));
+    $logger->debug(sprintf('Items: %s items.', scalar(@items)));
     $self->stash(
       linkBase        => $base,
       items           => \@items,
       collection_name => $collection,
       controller_name => $baseClass,
-      template => 'covenants/index',
+      template        => 'covenants/index',
     );
 
     if (-f $markdown_path) {

@@ -18,13 +18,11 @@ package Game::EvonyTKR::Controller::ConflictGroups {
   use List::AllUtils qw( all any none );
   use Carp;
 
-
   sub controller_name ($self) {
     return "ConflictGroups";
   }
 
   my $base = '/Reference/Conflict Groups';
-
 
   sub getBase($self) {
     return $base;
@@ -45,9 +43,8 @@ package Game::EvonyTKR::Controller::ConflictGroups {
       }
     );
 
-    my $routes = $app->routes->any($base);
+    my $routes          = $app->routes->any($base);
     my $controller_name = $self->controller_name();
-
 
     $routes->get('/')
       ->to(controller => $controller_name, action => 'index')
@@ -61,49 +58,48 @@ package Game::EvonyTKR::Controller::ConflictGroups {
     });
 
     my $gcm = $app->get_root_manager->generalConflictGroupManager;
-    if(not defined $gcm) {
+    if (not defined $gcm) {
       $logger->logcroak("No ConflictManager in manager");
     }
 
     $app->plugins->on(
       'evonytkrtips_initialized' => sub($self, $manager) {
         $logger->debug(
-          "evonytkrtips_initialized sub has controller_name $controller_name"
-        );
+          "evonytkrtips_initialized sub has controller_name $controller_name");
 
-        if(not defined $gcm) {
+        if (not defined $gcm) {
           $logger->logcroak("No ConflictManager in manager");
         }
-        my %allConflictGroups = %{$gcm->get_conflict_groups()};
+        my %allConflictGroups = %{ $gcm->get_conflict_groups() };
         $logger->info(sprintf(
           'there are %s conflict groups to build routes for',
-          scalar keys %allConflictGroups
-        ));
+          scalar keys %allConflictGroups));
 
         foreach my $key (keys %allConflictGroups) {
           $logger->debug("Building Reference Routes for $key.");
-          my $gr = "${base}/${key}";
+          my $gr  = "${base}/${key}";
           my $grn = "${key}ReferenceRoute";
 
-          $routes->get("/${key}" => {conflictGroupId => $key })
+          $routes->get("/${key}" => { conflictGroupId => $key })
             ->to(controller => 'ConflictGroups', action => 'show')
             ->name($grn);
 
           $app->add_navigation_item({
-            parent  => $base,
-            path    => $gr,
-            order   => 60,
-            title   => "Details for " . $allConflictGroups{$key}->name,
+            parent => $base,
+            path   => $gr,
+            order  => 60,
+            title  => "Details for " . $allConflictGroups{$key}->name,
           });
         }
-      });
+      }
+    );
   }
 
   sub index ($self) {
-    my $logger     = Log::Log4perl->get_logger(__PACKAGE__);
+    my $logger = Log::Log4perl->get_logger(__PACKAGE__);
     $logger->debug("Rendering index for " . __PACKAGE__);
 
-    my $items = $self->get_manager()->get_conflict_groups();
+    my $items     = $self->get_manager()->get_conflict_groups();
     my @parts     = split(/::/, ref($self));
     my $baseClass = pop(@parts);
     my $base      = $self->getBase();
@@ -134,9 +130,9 @@ package Game::EvonyTKR::Controller::ConflictGroups {
     }
     $logger->debug("retrieved conflict group " . $cg->name);
     $self->stash(
-      template  => '/general conflict groups/details',
-      item      => $cg,
-      layout    => 'default',
+      template => '/general conflict groups/details',
+      item     => $cg,
+      layout   => 'default',
     );
     return $self->render();
 

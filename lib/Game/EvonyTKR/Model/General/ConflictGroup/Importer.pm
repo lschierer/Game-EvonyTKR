@@ -16,9 +16,9 @@ class Game::EvonyTKR::Model::General::ConflictGroup::Importer :
   use List::AllUtils qw( any none uniq );
   our $VERSION = 'v0.0.1';
 
-  field $outputDir : reader : param;
+  field $outputDir     : reader : param;
   field $generals_file : param //= Path::Tiny::path('EvansFullGeneralInfo.csv');
-  field $groups_file : param //=
+  field $groups_file   : param //=
     Path::Tiny::path('EvAnsConflictGroupDefinitions.csv');
 
   field $myUUIDBase : reader;
@@ -92,12 +92,12 @@ class Game::EvonyTKR::Model::General::ConflictGroup::Importer :
     $grp_csv->column_names(@$grp_header);
 
     while (my $row = $grp_csv->getline_hr($grp_fh)) {
-      my $key   = $row->{Skill}                    // next;
+      my $key   = $row->{Skill}                                     // next;
       my $combo = $row->{'Primary Troop/Skill Classification Code'} // next;
       $code_parts{$key} = [
         $row->{'Primary Troop/Skill Classification Code'} // '',
-        $row->{'Troop & Skill Combination Code'} // '',
-        $row->{'Action Code'}            // '',
+        $row->{'Troop & Skill Combination Code'}          // '',
+        $row->{'Action Code'}                             // '',
       ];
     }
     close $grp_fh;

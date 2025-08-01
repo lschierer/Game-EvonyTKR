@@ -15,9 +15,9 @@ class Game::EvonyTKR::Converter::General :
   use List::AllUtils qw( first all any none );
   use namespace::autoclean;
 
-  field $tree : param;
+  field $tree      : param;
   field $outputDir : param;
-  field $debug : param //= 0;
+  field $debug     : param //= 0;
 
   field $name = '';
 

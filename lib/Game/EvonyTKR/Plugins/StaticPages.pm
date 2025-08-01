@@ -20,7 +20,7 @@ package Game::EvonyTKR::Plugins::StaticPages {
     # Add helper to check if a static route exists
     $app->helper(
       static_route_name_for => sub ($c, $path) {
-        return $static_routes{$path};  # undef if not present
+        return $static_routes{$path};    # undef if not present
       }
     );
 
@@ -51,14 +51,15 @@ package Game::EvonyTKR::Plugins::StaticPages {
         }
       )->name("static_$route_path");
       my $requested_path = $route_path =~ s{^/}{}r;
-      $logger->debug("storing $requested_path in static_routes hash for $route_path");
+      $logger->debug(
+        "storing $requested_path in static_routes hash for $route_path");
       $static_routes{$requested_path} = "static_$route_path";
 
       my $parsedFile = $app->parse_markdown_frontmatter($file_path);
       if ($parsedFile) {
         # Check for case-insensitive navigation conflicts before adding
         my $normalized_route = lc($route_path);
-        my $has_conflict = 0;
+        my $has_conflict     = 0;
 
         # Check if any existing navigation item conflicts (case-insensitive)
         my $existing_nav = $app->get_existing_navigation_items() || {};
@@ -67,7 +68,9 @@ package Game::EvonyTKR::Plugins::StaticPages {
         foreach my $existing_path (keys %$existing_nav) {
           if (lc($existing_path) eq $normalized_route) {
             $has_conflict = 1;
-            $logger->debug("Skipping static page navigation for '$route_path' - conflicts with existing '$existing_path'");
+            $logger->debug(
+"Skipping static page navigation for '$route_path' - conflicts with existing '$existing_path'"
+            );
             last;
           }
         }

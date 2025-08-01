@@ -21,10 +21,10 @@ class Game::EvonyTKR::Converter::AscendingAttributes :
   # PODNAME: Game::EvonyTKR::Converter::AscendingAttributes
 
   # input fields
-  field $tree : param : reader;
+  field $tree      : param : reader;
   field $outputDir : param;
-  field $debug : param //= 0;
-  field $red : param   //= 1;
+  field $debug     : param //= 0;
+  field $red       : param //= 1;
 
   ADJUST {
     $self->logger->debug(sprintf(

@@ -83,14 +83,15 @@ class Game::EvonyTKR::Model::Book::Manager :
 
       my $buffCount = 0;
 
-
       my @buffs;
-      if(exists $object->{buff}){
-        @buffs = @{$object->{buff}};
-      }elsif(exists $object->{buffs}){
-        @buffs = @{$object->{buffs}};
+      if (exists $object->{buff}) {
+        @buffs = @{ $object->{buff} };
       }
-      $self->logger->debug(sprintf('Book %s has %s buffs in YAML', $name, scalar @buffs));
+      elsif (exists $object->{buffs}) {
+        @buffs = @{ $object->{buffs} };
+      }
+      $self->logger->debug(
+        sprintf('Book %s has %s buffs in YAML', $name, scalar @buffs));
 
       foreach my $ob (@buffs) {
         my $b = Game::EvonyTKR::Model::Buff->from_hash($ob);

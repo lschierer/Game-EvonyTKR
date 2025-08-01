@@ -87,7 +87,7 @@ package Game::EvonyTKR::Plugins::Markdown {
       title        => $title,
       order        => $order,
       front_matter => $front_matter,
-      yaml_data    => $front_matter,  # Add this for stash compatibility
+      yaml_data    => $front_matter,    # Add this for stash compatibility
       content      => $content,
     };
   }
@@ -141,13 +141,31 @@ package Game::EvonyTKR::Plugins::Markdown {
       "Template paths: " . join(", ", @{ $c->app->renderer->paths }));
     $logger->debug("Looking for template: $template.html.ep");
 
-    my $parser = Pandoc->new();
+    my $parser           = Pandoc->new();
+    my $customCommonMark = join('+',
+      qw(commonmark alerts attributes autolink_bare_uris footnotes implicit_header_references pipe_tables raw_html rebase_relative_paths smart gfm_auto_identifiers)
+    );
     my $html_content = $parser->convert(
-      'gfm+pipe_tables' => 'html',
+      $customCommonMark => 'html',
       $parsedFile->{content}
     );
-    $html_content = $self->SpectrumFormatting($html_content);
 
+    # Temporary debug logging for images
+    if ($html_content =~ /<img/) {
+      $logger->debug("Found img tags in HTML output");
+    }
+    else {
+      $logger->debug(
+        "No img tags found in HTML output. Raw content contains: "
+          . (
+          $parsedFile->{content} =~ /!\[.*?\]\(.*?\)/
+          ? "image markdown syntax"
+          : "no image markdown syntax"
+          )
+      );
+    }
+
+    $html_content = $self->SpectrumFormatting($html_content);
 
     $logger->debug("html is now $html_content");
     # Add markdown content to stash but don't override existing content
@@ -191,17 +209,20 @@ package Game::EvonyTKR::Plugins::Markdown {
 
     # Add paragraph classes
     $dom->find('p')->each(sub {
-      $_->attr(class => "spectrum-Body spectrum-Body--serif spectrum-Body--sizeM");
+      $_->attr(
+        class => "spectrum-Body spectrum-Body--serif spectrum-Body--sizeM");
     });
 
     # Add list item classes
     $dom->find('li')->each(sub {
-      $_->attr(class => "spectrum-Body spectrum-Body--serif spectrum-Body--sizeM");
+      $_->attr(
+        class => "spectrum-Body spectrum-Body--serif spectrum-Body--sizeM");
     });
 
     # Add link classes
     $dom->find('a')->each(sub {
-      $_->attr(class => "spectrum-Link spectrum-Link--primary spectrum-Link--quiet");
+      $_->attr(
+        class => "spectrum-Link spectrum-Link--primary spectrum-Link--quiet");
     });
 
     # Add emphasis class
@@ -215,7 +236,7 @@ package Game::EvonyTKR::Plugins::Markdown {
     });
 
     $dom->find('hr')->each(sub {
-      $_->attr(class => 'spectrum-Divider spectrum-Divider--sizeM')
+      $_->attr(class => 'spectrum-Divider spectrum-Divider--sizeM');
     });
 
     # Add table classes

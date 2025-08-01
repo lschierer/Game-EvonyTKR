@@ -38,7 +38,8 @@ package Game::EvonyTKR::Plugins::Navigation {
         my $path = $item->{path};
 
         # DEBUG: Log all paths being registered
-        $log->debug("NAVIGATION: Registering path '$path' with title '$item->{title}'");
+        $log->debug(
+          "NAVIGATION: Registering path '$path' with title '$item->{title}'");
 
         if ($rejected_items_by_path->{$path}) {
           $log->debug("Skipping rejected path $path");

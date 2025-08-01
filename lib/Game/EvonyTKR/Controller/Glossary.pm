@@ -25,7 +25,6 @@ package Game::EvonyTKR::Controller::Glossary {
     $logger->info("Registering routes for " . ref($self));
     $self->SUPER::register($app, $config);
 
-
     my @parts     = split(/::/, ref($self));
     my $baseClass = pop(@parts);
 
@@ -49,27 +48,30 @@ package Game::EvonyTKR::Controller::Glossary {
 
     $app->helper(
       getDefinitionForTerm => sub ($self, $term) {
-        return $self->app->get_root_manager->glossaryManager->getDefinitionForTerm($term);
+        return
+          $self->app->get_root_manager->glossaryManager->getDefinitionForTerm(
+          $term);
       }
     );
 
     $app->helper(
       getTermsByLetter => sub ($self, $letter) {
-        return $self->app->get_root_manager->glossaryManager->getByLetter($letter);
+        return $self->app->get_root_manager->glossaryManager->getByLetter(
+          $letter);
       }
     );
 
   }
 
   sub index($c) {
-    my $logger     = Log::Log4perl->get_logger(__PACKAGE__);
+    my $logger = Log::Log4perl->get_logger(__PACKAGE__);
     $logger->debug("Start of index method for " . __PACKAGE__);
     my $glossary_manager = $c->app->get_root_manager->glossaryManager;
-    my $terms = $glossary_manager->getAll();
+    my $terms            = $glossary_manager->getAll();
 
     $c->render(
-        template => 'glossary/index',
-        available_letters => $glossary_manager->getAvailableLetters(),
+      template          => 'glossary/index',
+      available_letters => $glossary_manager->getAvailableLetters(),
     );
 
   }

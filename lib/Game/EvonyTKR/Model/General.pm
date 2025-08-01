@@ -44,12 +44,12 @@ class Game::EvonyTKR::Model::General : isa(Game::EvonyTKR::Shared::Constants) {
 
   ADJUST {
     my @errors;
-    unless($self->can('_isTrue') && $self->_isTrue() ){
-      Log::Log4perl->logcroak("unexpected value: " . blessed($self) );
+    unless ($self->can('_isTrue') && $self->_isTrue()) {
+      Log::Log4perl->logcroak("unexpected value: " . blessed($self));
     }
-    if(not defined $type) {
-    push @errors,
-      sprintf('type must be one of %s', join(', ', @{ $self->GeneralKeys }));
+    if (not defined $type) {
+      push @errors,
+        sprintf('type must be one of %s', join(', ', @{ $self->GeneralKeys }));
     }
     elsif (ref $type) {
       foreach my $t1 (@{$type}) {

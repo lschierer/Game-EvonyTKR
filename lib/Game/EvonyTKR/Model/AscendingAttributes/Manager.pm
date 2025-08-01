@@ -64,8 +64,9 @@ class Game::EvonyTKR::Model::AscendingAttributes::Manager :
           $self->logger->error(
 "filename and internal name do not match for file '$file' with name '$object->{general}'"
           );
-        } else {
-          $self->logger->info("using object name " . $object->{general})
+        }
+        else {
+          $self->logger->info("using object name " . $object->{general});
         }
         $name = $object->{general};
       }

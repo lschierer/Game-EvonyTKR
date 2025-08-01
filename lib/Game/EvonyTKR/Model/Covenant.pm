@@ -27,9 +27,9 @@ class Game::EvonyTKR::Model::Covenant : isa(Game::EvonyTKR::Shared::Constants) {
   my $debug = 1;
 
   field $primary : reader : param;
-  field $one : param;
-  field $two : param;
-  field $three : param;
+  field $one     : param;
+  field $two     : param;
+  field $three   : param;
 
   field $secondary : reader;
 

@@ -470,7 +470,7 @@ class Game::EvonyTKR::Shared::Constants : isa(Game::EvonyTKR::Model::Logger) {
     Readonly::Scalar my $temp => {
       'In-Rally'                   => "When Rallying",
       'in rally'                   => 'When Rallying',
-      'Reduces Monster'            => "Monsters",          # debuff version
+      'Reduces Monster'            => "Monsters",               # debuff version
       'brings any dragon'          => 'brings a dragon',
       'brings any sacred dragon'   => 'brings a sacred dragon',
       'brings dragon'              => 'brings a dragon',
@@ -614,12 +614,13 @@ class Game::EvonyTKR::Shared::Constants : isa(Game::EvonyTKR::Model::Logger) {
   };
 
   method AscendingAttributeLevelName ($level) {
-    if($level =~ /red/) {
-      if(exists $redAscendingLevelNames->{$level}){
+    if ($level =~ /red/) {
+      if (exists $redAscendingLevelNames->{$level}) {
         return $redAscendingLevelNames->{$level};
       }
-    } else {
-      if(exists $purpleAscendingLevelNames->{$level}){
+    }
+    else {
+      if (exists $purpleAscendingLevelNames->{$level}) {
         return $purpleAscendingLevelNames->{$level};
       }
     }

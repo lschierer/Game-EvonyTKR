@@ -27,17 +27,17 @@ class Game::EvonyTKR::Converter::Covenant :
 
   # input fields
 
-  field $tree : param;
+  field $tree      : param;
   field $outputDir : param;
-  field $debug : param //= 0;
+  field $debug     : param //= 0;
 
   # internal control fields
   field $parser  = Game::EvonyTKR::Shared::Parser->new();
   field $helpers = Game::EvonyTKR::Converter::Helpers->new(debug => $debug);
 
   # output fields
-  field $primary : reader;
-  field $supporting : reader = [];
+  field $primary      : reader;
+  field $supporting   : reader = [];
   field $covenantHash : reader;
 
   ADJUST {

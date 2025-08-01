@@ -81,7 +81,7 @@ class Game::EvonyTKR::Model::General::Manager :
       $generals->{$name} = Game::EvonyTKR::Model::General->new(
         name            => $name,
         type            => $object->{type},
-        ascending       => $object->{ascending} ,
+        ascending       => $object->{ascending},
         builtInBookName => $object->{book},
         specialtyNames  => $object->{specialties},
       );

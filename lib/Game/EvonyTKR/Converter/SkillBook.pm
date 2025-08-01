@@ -22,8 +22,8 @@ class Game::EvonyTKR::Converter::SkillBook :
   use namespace::autoclean;
 
   field $outputDir : param;
-  field $debug : param //= 0;
-  field $tree : param;
+  field $debug     : param //= 0;
+  field $tree      : param;
 
   ADJUST {
     $self->logger->debug(sprintf(

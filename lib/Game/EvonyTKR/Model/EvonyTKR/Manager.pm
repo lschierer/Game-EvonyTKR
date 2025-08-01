@@ -15,14 +15,14 @@ use namespace::clean;
 class Game::EvonyTKR::Model::EvonyTKR::Manager :
   isa(Game::EvonyTKR::Shared::Constants) {
 
-  field $SourceDir : reader : param;
-  field $generalManager : reader;
+  field $SourceDir                   : reader : param;
+  field $generalManager              : reader;
   field $generalConflictGroupManager : reader;
-  field $bookManager : reader;
-  field $specialtyManager : reader;
-  field $ascendingAttributesManager : reader;
-  field $covenantManager : reader;
-  field $glossaryManager :reader;
+  field $bookManager                 : reader;
+  field $specialtyManager            : reader;
+  field $ascendingAttributesManager  : reader;
+  field $covenantManager             : reader;
+  field $glossaryManager             : reader;
 
   # computed types
   field $generalPairManager : reader;
@@ -41,9 +41,8 @@ class Game::EvonyTKR::Model::EvonyTKR::Manager :
 
     $SourceDir = Path::Tiny::path($SourceDir);
 
-    $glossaryManager = Game::EvonyTKR::Model::Glossary::Manager->new(
-      SourceDir   => $SourceDir,
-    );
+    $glossaryManager =
+      Game::EvonyTKR::Model::Glossary::Manager->new(SourceDir => $SourceDir,);
 
     $generalPairManager = Game::EvonyTKR::Model::General::Pair::Manager->new(
       rootManager          => $self,

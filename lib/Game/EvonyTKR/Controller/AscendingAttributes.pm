@@ -67,7 +67,8 @@ package Game::EvonyTKR::Controller::AscendingAttributes {
       ascending_level_names => sub($c, $level = '', $printable = 0) {
         $logger->debug(sprintf(
           'ascending_level_names helper started, level is %s, printable is %s',
-          defined $level ? $level : '', defined $printable ? $printable : 0,
+          defined $level     ? $level     : '',
+          defined $printable ? $printable : 0,
         ));
 
         # Case 1: Return all level values (for dropdown values)
@@ -107,13 +108,19 @@ package Game::EvonyTKR::Controller::AscendingAttributes {
         }
 
         # Case 2: Return a specific level's name
-        if($printable){
+        if ($printable) {
           return $c->app->get_root_manager->AscendingAttributeLevelName($level);
-        } else {
-          if($level =~ /red/) {
-            return first {$_ =~ /level/} $c->app->get_root_manager->AscendingAttributeLevelValues(1);
-          } else {
-            return first {$_ =~ /level/} $c->app->get_root_manager->AscendingAttributeLevelValues(0);
+        }
+        else {
+          if ($level =~ /red/) {
+            return
+              first { $_ =~ /level/ }
+              $c->app->get_root_manager->AscendingAttributeLevelValues(1);
+          }
+          else {
+            return
+              first { $_ =~ /level/ }
+              $c->app->get_root_manager->AscendingAttributeLevelValues(0);
           }
         }
         return 'none';

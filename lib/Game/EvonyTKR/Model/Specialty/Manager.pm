@@ -67,7 +67,7 @@ class Game::EvonyTKR::Model::Specialty::Manager :
       if (exists $object->{name}) {
         # some files are lower case, get the proper case sensitive name
         $name = $object->{name};
-        if($object->{name} !~ /$name/i ) {
+        if ($object->{name} !~ /$name/i) {
           $self->logger->warn("$name does not match " . $object->{name});
         }
       }
@@ -78,19 +78,21 @@ class Game::EvonyTKR::Model::Specialty::Manager :
         my $level = $ol->{level};
         $self->logger->debug("attempting import of $level for $name");
         my @buffs;
-        if(exists $ol->{buff}){
-          @buffs = @{$ol->{buff}};
-        }elsif(exists $ol->{buffs}){
-          @buffs = @{$ol->{buffs}};
+        if (exists $ol->{buff}) {
+          @buffs = @{ $ol->{buff} };
+        }
+        elsif (exists $ol->{buffs}) {
+          @buffs = @{ $ol->{buffs} };
         }
         foreach my $ob (@buffs) {
           my $b = Game::EvonyTKR::Model::Buff->from_hash($ob);
           $specialties->{$name}->addBuff($level, $b);
         }
       }
-      if(exists $specialties->{$name}){
+      if (exists $specialties->{$name}) {
         $self->logger->debug("imported $name as: " . $specialties->{$name});
-      } else {
+      }
+      else {
         $self->logger->error("failed to import $name");
       }
     }

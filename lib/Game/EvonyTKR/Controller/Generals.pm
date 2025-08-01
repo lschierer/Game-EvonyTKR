@@ -126,8 +126,7 @@ package Game::EvonyTKR::Controller::Generals {
       }
     );
     # two routes for directory indices
-    $mainRoutes->get('/:uiTarget')
-    ->requires(is_valid_uiTarget => 1)->to(
+    $mainRoutes->get('/:uiTarget')->requires(is_valid_uiTarget => 1)->to(
       controller => 'Generals',
       action     => 'uiTarget_index',
     )->name('General_dynamic_uiTarget_index');
@@ -137,15 +136,29 @@ package Game::EvonyTKR::Controller::Generals {
     $app->routes->add_condition(
       is_valid_uiTarget => sub ($route, $c, $captures, $arg) {
         my $uiTarget = $captures->{uiTarget};
-        my @valid_routes = $c->general_routing->get_routes_for_uiTarget($uiTarget);
+        my @valid_routes =
+          $c->general_routing->get_routes_for_uiTarget($uiTarget);
         return !!@valid_routes;
       }
     );
 
-    $mainRoutes->get('/:uiTarget/:buffActivation')->to(
+    # check that :uiTarget/:buffActivation is a valid route combination
+    $app->routes->add_condition(
+      is_valid_buffActivation => sub ($route, $c, $captures, $arg) {
+        my $uiTarget       = $captures->{uiTarget};
+        my $buffActivation = $captures->{buffActivation};
+        my $route_obj =
+          $c->general_routing->lookup_route($uiTarget, $buffActivation);
+        return !!$route_obj;
+      }
+    );
+
+    $mainRoutes->get('/:uiTarget/:buffActivation')
+      ->requires(is_valid_buffActivation => 1)
+      ->to(
       controller => 'Generals',
       action     => 'buffActivation_index',
-    )->name('General_dynamic_buffActivation_index');
+      )->name('General_dynamic_buffActivation_index');
     # two routes for the user interface
     $mainRoutes->get('/:uiTarget/:buffActivation/comparison')->to(
       controller => 'Generals',
@@ -255,7 +268,8 @@ package Game::EvonyTKR::Controller::Generals {
     );
 
     if (-f $markdown_path) {
-      $logger->debug("rendering /Generals/ with markdown index content from $markdown_path");
+      $logger->debug(
+        "rendering /Generals/ with markdown index content from $markdown_path");
       # Render with markdown
       $self->stash(template => '/generals/index');
 
@@ -572,14 +586,14 @@ package Game::EvonyTKR::Controller::Generals {
 
     unless ($data_model->checkCovenantLevel($primaryCovenantLevel)) {
       $logger->warn(
-        "Invalid primaryCovenantLevel: $primaryCovenantLevel, using 'civilization'"
+"Invalid primaryCovenantLevel: $primaryCovenantLevel, using 'civilization'"
       );
       $primaryCovenantLevel = 'civilization';
     }
 
     unless ($data_model->checkCovenantLevel($secondaryCovenantLevel)) {
       $logger->warn(
-        "Invalid secondaryCovenantLevel: $secondaryCovenantLevel, using 'civilization'"
+"Invalid secondaryCovenantLevel: $secondaryCovenantLevel, using 'civilization'"
       );
       $secondaryCovenantLevel = 'civilization';
     }
@@ -703,16 +717,16 @@ package Game::EvonyTKR::Controller::Generals {
     } } @pairs;
 
     @json_data = sort {
-        # First compare primary->name
-        my $primary_cmp = $a->{primary}->{name} cmp $b->{primary}->{name};
+      # First compare primary->name
+      my $primary_cmp = $a->{primary}->{name} cmp $b->{primary}->{name};
 
-        # If primary names are the same, compare secondary->name
-        if ($primary_cmp == 0) {
-            return $a->{secondary}->{name} cmp $b->{secondary}->{name};
-        }
+      # If primary names are the same, compare secondary->name
+      if ($primary_cmp == 0) {
+        return $a->{secondary}->{name} cmp $b->{secondary}->{name};
+      }
 
-        # Otherwise, return the primary name comparison result
-        return $primary_cmp;
+      # Otherwise, return the primary name comparison result
+      return $primary_cmp;
     } @json_data;
 
     $self->render(json => { data => \@json_data });
@@ -963,14 +977,16 @@ package Game::EvonyTKR::Controller::Generals {
         status => 404
       );
     }
-    $logger->info(sprintf(
-'Computing Pair Buffs for %s/%s Buff Activation %s, targetType %s ascendingLevel %s primary CovenantLevel %s primary Specialties %s secondary CovenantLevel %s secondary Specialties %s',
+    my $sprintfTemplate =
+      'Computing Pair Buffs for %s/%s Buff Activation %s, ' +
+      'targetType %s ascendingLevel %s primary CovenantLevel %s ' +
+'primary Specialties %s secondary CovenantLevel %s secondary Specialties %s';
+    $logger->info(sprintf($sprintfTemplate,
       $pair->primary->name,            $pair->secondary->name,
       $buffActivation,                 $route_meta->{generalType},
       $ascendingLevel,                 $primaryCovenantLevel,
       join(', ', @primarySpecialties), $secondaryCovenantLevel,
-      join(', ', @secondarySpecialties),
-    ));
+      join(', ', @secondarySpecialties),));
     $pair->updateBuffsAndDebuffs(
       $route_meta->{generalType}, $ascendingLevel,
       $primaryCovenantLevel,      \@primarySpecialties,
