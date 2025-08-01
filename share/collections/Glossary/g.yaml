@@ -20,7 +20,7 @@ glossary:
       - Primary General
       - Secondary General
       - SkillBook
-      - Specialties
+      - Specialty
       - Spiritual Beast
       - Wall General
   - term: ghost
@@ -30,3 +30,19 @@ glossary:
   - term: Generals Hall
     definition: >-
       One of the primary buildings on the Battle of Constantinople map that can be occupied to gain points.
+  - term: gear
+    synonyms:
+      - armor
+      - armour
+    definition: >-
+      Each 'General' deployed in any capacity, either as part of a march, as a mayor, or as a duty officer, can be assigned items.  These items
+      are most typically armor, but also include (in the same slots) things like hats and cloaks, and so can more properly be called by the generic
+      words "gear" or "clothing."  I have chosen "gear."  In either case, the important thing is that each of these items has certain intrinsic
+      'buffs' and 'debuffs', and can be 'refined' to contain others.  Depending on the use case, and on activation conditions (if any) on the
+      'buffs' (or debuffs) provided, it may or may not be necessary for the 'General' to wear the gear full time, it may be possible to have the configs:
+      gear on the 'General' only while assigning the 'General.'
+    related_terms:
+      - General
+      - buff
+      - debuff
+      - refining

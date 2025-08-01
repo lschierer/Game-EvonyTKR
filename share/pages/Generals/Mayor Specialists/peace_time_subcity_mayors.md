@@ -3,6 +3,8 @@ title: 'Peace Time Sub-City Mayors'
 layout: standard
 author: 'Luke Schierer'
 order: 100
+css:
+ - /css/cardGrid.css
 ---
 
 ## Peace Time Mayors as a Concept
@@ -11,18 +13,73 @@ Periodically someone asks about Catherine II, or another of the peace time
 subcity mayors. To answer this question, we need to compare the two following
 generals.
 
-<CardGrid>
-  <Card title="Catherine II">
-    ![Catherine II](/assets/generals/Catherine_II.jpg) This instance of
-    Catherine II has been only partially cultivated. * Leadership: +201 *
-    Attack: +119 * Defense: +143 * Politics: +214
-  </Card>
-  <Card title="Harald">
-    ![Harald](/assets/generals/Harald.jpg) This instance of Harald has
-    been extensively cultivated. * Leadership: +500 * Attack: +258 * Defense:
-    +284 * Politics: +500
-  </Card>
-</CardGrid>
+<div class="cardgrid">
+  <div class="spectrum-Card">
+    <div class="spectrum-Card-preview">
+      <div class="spectrum-Asset"><img class=
+      "spectrum-Asset-image" src=
+      "/images/cultivation_examples/Catherine_II.jpg"></div>
+    </div>
+    <div class="spectrum-Card-body">
+      <div class="spectrum-Card-header centered">
+        <div class="spectrum-Card-title">
+          Catherine II
+        </div>
+      </div>
+      <div class="spectrum-Card-content">
+        <div class="spectrum-Card-description" markdown="1">
+          This instance of Catherine II has been only partially
+          cultivated.
+        </div>
+      </div>
+    </div>
+    <div class="spectrum-Card-footer">
+      <dl>
+          <dt>Leadership</dt>
+          <dd>+201</dd>
+          <dt>Attack</dt>
+          <dd>+119</dd>
+          <dt>Defense</dt>
+          <dd>+143</dd>
+          <dt>Politics</dt>
+          <dd>+214</dd>
+        </dl>
+    </div>
+  </div>
+  <div class="spectrum-Card">
+    <div class="spectrum-Card-preview">
+      <div class="spectrum-Asset"><img class=
+      "spectrum-Asset-image" src=
+      "/images/cultivation_examples/Harald.jpg"></div>
+    </div>
+    <div class="spectrum-Card-body">
+      <div class="spectrum-Card-header centered">
+        <div class="spectrum-Card-title">
+          Harald
+        </div>
+      </div>
+      <div class="spectrum-Card-content">
+        <div class="spectrum-Card-description" markdown="1">
+          This instance of Harald has been extensively
+          cultivated.
+        </div>
+      </div>
+    </div>
+    <div class="spectrum-Card-footer">
+      <dl>
+        <dt>Leadership</dt>
+        <dd>+500</dd>
+        <dt>Attack</dt>
+        <dd>+258</dd>
+        <dt>Defense</dt>
+        <dd>+284</dd>
+        <dt>Politics</dt>
+        <dd>+500</dd>
+      </dl>
+    </div>
+  </div>
+</div>
+
 
 Both mayors have been put on the same subcity in turn. Mayor number 1,
 Catherine, results in an average training speed of +329.79% while mayor number
@@ -41,12 +98,13 @@ developed set of peace time generals.
 
 ## Important Note about Ascending
 
-The astute reader may have noticed that in the preceding overview section I mentioned cultivating Catherine to an equal extent as Harald, but did not mention [ascending] her to the same two star level.  This omission was deliberate, and is important.  Catherine is one of several mayors who is not *entirely* a peace time mayor.  While her main skill book, and her specialty [buffs] are those of a peace time mayor, her [ascending] [buffs] are a totally different story.  If you can ascend her, she becomes one of the more valuable Siege HP debuff generals.
+The astute reader may have noticed that in the preceding concept section I mentioned cultivating Catherine to an equal extent as Harald, but did not mention [ascending] her to the same two star level.  This omission was deliberate, and is important.  It is not merely that in this *particular* example neither mayor was [ascended] to any extent, rather Catherine is one of several mayors who is not *entirely* a peace time mayor.  While her main skill book, and her specialty [buffs] are those of a peace time mayor, her [ascending] [buffs] are a totally different story.  If you can ascend her, she becomes one of the more valuable Siege HP debuff generals.
 
 This is then a slight, but incredibly significant, caveat to my overall opinion of peace time mayors.  I maintain that the concept of a peace time mayor is a waste of resources for nearly everyone.  However, be careful that you have fully evaluated each mayor, and that you are not ignoring [buffs] that might truly help you before dismissing a given general *as* a peace time mayor.
 
 To be clear: I am __*NOT*__ recommending using Catherine II as a peace time mayor.  I am recommending that, if you can ascend her, she be used as a *[PvP]* mayor. There are a other generals that, like her, appear on the surface to be peace time mayors, but have hidden PvP potential.  The reader will need to evaluate these mayors as and against other PvP mayors on the strength of these [PvP] [buffs].
 
-[PvP]: </Reference/Glossary#PvP>
+[PvP]: /Reference/Glossary#pvp
 [buffs]: /Reference/Glossary#buffs
 [ascending]: /Reference/Glossary/ascend
+[ascended]: /Reference/Glossary/ascend

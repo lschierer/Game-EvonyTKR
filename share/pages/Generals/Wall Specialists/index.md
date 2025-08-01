@@ -6,14 +6,11 @@ author:
 order: 7
 ---
 
-<aside class="note">
+<aside class="note" markdown="1">
 In the [Overview], I explain my thinking. This is a fairly long article, but
 contains a lot of useful background information if you want to understand how
 I arrived at these conclusions. If you just want to be told what to do, you
 can skip it and dive right in here.
-
-[Overview]: ./overview
-
 </aside>
 
 When you first start out, you ought to be [ghosting] your troops whenever you
@@ -27,8 +24,6 @@ makes an excellent _**peace time**_ wall general. She will help you get the
 resources you need to do other things.  **_NEVER_** use Shajar as a [primary]
 general, even during peace time.  Only ever use her as an [assistant].
 
-[primary]:./RefernceGlossary#Primary General>
-[assistant]:./RefernceGlossary#Secondary General>
 
 Eventually however you are ready to grow beyond [ghosting] and to do that,
 you need to have a good set of wall generals. Moreover, you need to have them
@@ -47,8 +42,11 @@ march. You want to think about what is left when that is out attacking someone.
 [^230107-2]: See [Evony Answers]' article on [ascending].
 
 [Evony Answers]: https://www.evonyanswers.com
-[ascending]: http.//www.evonyanswers.com/postevony-ascending-enhancement-awakened-upgrades
+[ascending]: http://www.evonyanswers.com/post/evony-ascending-enhancement-awakened-upgrades
 [ranged]: ./ranged
 [Overview]: ./overview
 [mounted]: ./mounted
-[ghosting]: http.//www.evonytkrguide.com/guidesevony-tkr-guide-to-ghosting-troops
+[ghosting]: http://www.evonytkrguide.com/guides/evony-tkr-guide-to-ghosting-troops
+[primary]: /Reference/Glossary#primary_General
+[assistant]: /Reference/Glossary#secondary_general
+[Overview]: ./overview

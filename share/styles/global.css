@@ -170,6 +170,12 @@ a.spectrum-SideNav-itemLink > iconify-icon {
   margin: 0.5em 1em;
 }
 
+div.note {
+  padding: 0 3rem;
+
+  --mod-body-font-color: var(--spectrum-green-800);
+}
+
 aside.note {
   padding: 0 3rem;
   color: var(--spectrum-green-800);

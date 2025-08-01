@@ -5,13 +5,11 @@ author: 'Luke Schierer'
 order: 8
 ---
 
-<aside class="note">
+<aside class="note" markdown="1">
 In the [Overview], I explain my thinking. This is a fairly long article, but
 contains a lot of useful background information if you want to understand how
 I arrived at these conclusions. If you just want to be told what to do, you
 can skip it and dive right in here.
-
-[Overview]: ./overview
 
 </aside>
 
@@ -97,8 +95,10 @@ is that a free or light spender is probably better off specializing with
 generals from either the attack debuff set or the toughness debuff set,
 rather than attempting to do both with one of these lists.
 
-[ghosting]./ReferenceGlossary#ghost
-[ghost]./ReferenceGlossary#ghost
-[peace]: ./peace_time_subcity_mayors
-[debuff]./Reference/Glossary#Debuff
-[buff]./Reference/Glossary#buff
+[Overview]: ./overview
+[buff]: /Reference/Glossary#buff
+[debuff]: /Reference/Glossary#debuff
+[ghost]: /Reference/Glossary#ghost
+[ghosting]: /Reference/Glossary#ghost
+[peace]: </Generals/Mayor Specialists/peace_time_subcity_mayors>
+[Mayor Comparison Table]: </Generals/Mayor Specialists/Mayor/comparison>
