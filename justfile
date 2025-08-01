@@ -24,17 +24,22 @@ deps: prepare npmdeps
   ./Build installdeps --cpan_client 'cpanm -n'
   perl ./scripts/update_git_meta.pl
 
+[working-directory: 'share']
+images:
+  rsync -a --delete images/ public/images/
+  rsync -a --delete collections/data/images/generals/ public/images/generals/
 
 [working-directory: 'share']
-css: npmdeps
+css: npmdeps images
   pnpm build:css
-  rsync -a --delete ts/css public/
+  rsync -a --delete ts/css/ public/css/
 
-build: deps css
+
+build: prepare deps css images
   ./Build manifest
   ./Build
 
-dev: deps css
+dev: deps css images
   rm -f "${HOME}/var/log/Perl/dist/Game-Evony/*.log"
   morbo --watch ./share --watch ./lib ./scripts/game-evonytkr
 
