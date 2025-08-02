@@ -19,4 +19,5 @@ buffs:
     number: 25
     unit: percentage
 name: Faith of Queen
-text: Increases in-city mounted troops’ attack by 30%, and in-city siege machines’ attack by 25% when General is the Main City Defense General.
+text: >-
+  Increases in-city mounted troops' attack by 30%, and in-city siege machines' attack by 25% when General is the Main City Defense General.

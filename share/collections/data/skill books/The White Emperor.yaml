@@ -1,7 +1,7 @@
 ---
 name: The White Emperor
 text: >-
-  Increases your mounted troops’ attack and defense by 30% and reduces enemy ranged troops’ attack by 20% when General is leading the army to attack.
+  Increases your mounted troops' attack and defense by 30% and reduces enemy ranged troops' attack by 20% when General is leading the army to attack.
 buffs:
   - attribute: Attack
     conditions:

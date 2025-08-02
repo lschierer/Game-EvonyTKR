@@ -37,4 +37,5 @@ buffs:
     number: 40
     unit: percentage
 name: Goddess of the Hunt
-text: Increases mounted troops’ attack and defense by 50% and increases ground troops and mounted troops’ HP by 40% when General is leading the army to attack.
+text: >-
+  Increases mounted troops' attack and defense by 50% and increases ground troops and mounted troops' HP by 40% when General is leading the army to attack.

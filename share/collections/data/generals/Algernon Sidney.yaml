@@ -13,7 +13,7 @@ basic_attributes:
     base: 102
     increment: 7.87
 book: >-
-  Patriot’s Radiance
+  Patriot's Radiance
 specialties:
   - Ranged Troop Assault
   - Siege

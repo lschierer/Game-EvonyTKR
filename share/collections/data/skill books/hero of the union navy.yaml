@@ -37,4 +37,5 @@ buffs:
     number: 20
     unit: percentage
 name: Hero of the Union Navy
-text: Reduces enemy ranged troops and siege machines’ attack by 10% and enemy ground troops and mounted troops’ defense by 20% when General is leading the army.
+text: >-
+  Reduces enemy ranged troops and siege machines' attack by 10% and enemy ground troops and mounted troops' defense by 20% when General is leading the army.

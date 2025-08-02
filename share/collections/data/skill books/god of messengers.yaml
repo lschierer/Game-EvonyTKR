@@ -24,4 +24,5 @@ buffs:
     number: 12
     unit: percentage
 name: God of Messengers
-text: Increases mounted troops’ attack and HP by 50% and March Size by 12% when General is leading the army.
+text: >-
+  Increases mounted troops' attack and HP by 50% and March Size by 12% when General is leading the army.

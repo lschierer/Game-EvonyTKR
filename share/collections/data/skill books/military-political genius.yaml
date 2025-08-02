@@ -28,4 +28,5 @@ buffs:
     number: 25
     unit: percentage
 name: Military-political Genius
-text: Reduces enemy ranged troops and siege machines’ attack by 15% and enemy ground troops’ attack by 25% when General is leading the army.
+text: >-
+  Reduces enemy ranged troops and siege machines' attack by 15% and enemy ground troops' attack by 25% when General is leading the army.

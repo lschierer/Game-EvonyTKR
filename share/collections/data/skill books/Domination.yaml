@@ -8,4 +8,5 @@ buffs:
     number: 75
     unit: percentage
 name: Domination
-text: Boosts the Gold Production Speed by 75% in Subordinate City when General is the Mayor.
+text: >-
+  Boosts the Gold Production Speed by 75% in Subordinate City when General is the Mayor.

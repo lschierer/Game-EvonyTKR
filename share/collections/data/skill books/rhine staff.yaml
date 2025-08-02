@@ -21,4 +21,5 @@ buffs:
     value:
       number: 25
 name: Rhine Staff
-text: Siege Machine Attack +40%. Ranged Troop and Siege Machine Defense +25%. Ranged Troop and Siege Machine HP +25%.
+text: >-
+  Siege Machine Attack +40%. Ranged Troop and Siege Machine Defense +25%. Ranged Troop and Siege Machine HP +25%.

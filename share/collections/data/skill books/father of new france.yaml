@@ -33,4 +33,5 @@ buffs:
     number: 40
     unit: percentage
 name: Father of New France
-text: Increases siege machines’ attack and HP by 50% and ranged troops and siege machines’ defense by 40% when General is leading the army.
+text: >-
+  Increases siege machines' attack and HP by 50% and ranged troops and siege machines' defense by 40% when General is leading the army.

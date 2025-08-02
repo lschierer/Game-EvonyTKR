@@ -15,4 +15,5 @@ buffs:
     number: 30
     unit: percentage
 name: Chivalry
-text: Increases the Construction Speed by 50% and troops’ training speed by 30% in Subordinate City when General is the Mayor.
+text: >-
+  Increases the Construction Speed by 50% and troops' training speed by 30% in Subordinate City when General is the Mayor.

@@ -37,4 +37,5 @@ buffs:
     number: 15
     unit: percentage
 name: Ironhanded Leader
-text: Increases ground troops and mounted troops’ attack by 30% and increases ground troops and mounted troops’ defense by 15% when General is leading the army to attack.
+text: >-
+  Increases ground troops and mounted troops' attack by 30% and increases ground troops and mounted troops' defense by 15% when General is leading the army to attack.

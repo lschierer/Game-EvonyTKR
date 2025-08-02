@@ -50,4 +50,5 @@ buffs:
     number: 40
     unit: percentage
 name: Monarchy Restoration
-text: Increases mounted troops’ attack by 50% when General is leading the army to attack. Increases ground troops and mounted troops’ defense and HP by 40% when General brings any Dragon or Spiritual Beast to attack.
+text: >-
+  Increases mounted troops' attack by 50% when General is leading the army to attack. Increases ground troops and mounted troops' defense and HP by 40% when General brings any Dragon or Spiritual Beast to attack.

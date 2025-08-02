@@ -12,12 +12,12 @@ basic_attributes:
   politics:
     base: 115
     increment: 8.54
-book: Judgment Knight
+book: Wave-Breaking Pioneer
 name: James Cook
 specialties:
   - Ranged Troop Formation
   - Bash
-  - Sage
+  - Ranged Troop Ares
   - Global Exploration
 stars: red5
 type:

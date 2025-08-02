@@ -39,4 +39,5 @@ buffs:
     number: 35
     unit: percentage
 name: High King of Ireland
-text: Increases ranged troops’ attack and HP by 50% when General is leading the army to attack. Increases ranged troops and siege machines’ defense by 35% when General brings any Dragon or Spiritual Beast to attack.
+text: >-
+  Increases ranged troops' attack and HP by 50% when General is leading the army to attack. Increases ranged troops and siege machines' defense by 35% when General brings any Dragon or Spiritual Beast to attack.

@@ -18,4 +18,5 @@ buffs:
     number: 35
     unit: percentage
 name: Fire on the Sea
-text: Increases in-city troops’ attack by 10%, and in-city siege machines’ attack by another 35% when General is the Main City Defense General.
+text: >-
+  Increases in-city troops' attack by 10%, and in-city siege machines' attack by another 35% when General is the Main City Defense General.

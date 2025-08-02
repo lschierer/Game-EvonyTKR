@@ -1,4 +1,5 @@
 ---
 buffs: []
 name: The Great Khan
-text: Increases March Size by 15% when General is leading the army.
+text: >-
+  Increases March Size by 15% when General is leading the army.
