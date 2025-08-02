@@ -28,4 +28,5 @@ buffs:
     number: 20
     unit: percentage
 name: Ocean Squadrons
-text: Increases in-city mounted troops’ HP by 15%, and in-city ranged troops and siege machines’ attack by 20% when General is the Main City Defense General.
+text: >-
+  Increases in-city mounted troops' HP by 15%, and in-city ranged troops and siege machines' attack by 20% when General is the Main City Defense General.

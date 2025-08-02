@@ -1,5 +1,6 @@
 ---
-text: Boosts the Gold Production Speed by 75% in Subordinate City when General is the Mayor.
+text: >-
+  Boosts the Gold Production Speed by 75% in Subordinate City when General is the Mayor.
 name: Roman Consul
 buffs:
   - attribute: SubCity Gold Production

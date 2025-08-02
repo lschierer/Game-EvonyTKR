@@ -28,4 +28,5 @@ buffs:
     number: 30
     unit: percentage
 name: Battle of Kircholm
-text: Reduces enemy mounted troops’ attack by 25% and enemy siege machines’ defense and HP by 30% when General is leading the army.
+text: >-
+  Reduces enemy mounted troops' attack by 25% and enemy siege machines' defense and HP by 30% when General is leading the army.

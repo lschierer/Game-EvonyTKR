@@ -25,4 +25,5 @@ buffs:
       number: 40
       unit: percentage
 name: Iron-Willed Queen
-text: Increases ground troops’ attack and HP by 50% and ground troops’ defense by 40% when General is leading the army.
+text: >-
+  Increases ground troops' attack and HP by 50% and ground troops' defense by 40% when General is leading the army.

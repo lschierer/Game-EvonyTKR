@@ -18,4 +18,5 @@ buffs:
     number: 15
     unit: percentage
 name: Curses
-text: Reduces enemy troops’ defense by 15% and enemy ground troops’ defense by another 15% when General is leading the army.
+text: >-
+  Reduces enemy troops' defense by 15% and enemy ground troops' defense by another 15% when General is leading the army.

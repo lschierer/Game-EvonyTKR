@@ -9,4 +9,5 @@ buffs:
     number: 25
     unit: percentage
 name: Father of Conquest
-text: Grants you a 25% Double Items Drop Rate from Monsters when General is leading the army.
+text: >-
+  Grants you a 25% Double Items Drop Rate from Monsters when General is leading the army.

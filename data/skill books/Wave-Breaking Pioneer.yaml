@@ -1,0 +1,24 @@
+name: Wave-Breaking Pioneer
+text: >-
+  Increases ranged troops' attack by 50% and increases ranged troops and siege machines' defense and HP by 40% when General is leading the army.
+buffs:
+  - attribute: Attack
+    troop: Ranged Troops
+    value:
+      number: 50
+  - attribute: Defense
+    troop: Ranged Troops
+    value:
+      number: 40
+  - attribute: HP
+    troop: Ranged Troops
+    value:
+      number: 40
+  - attribute: Defense
+    troop: Siege Machines
+    value:
+      number: 40
+  - attribute: HP
+    troop: Siege Machines
+    value:
+      number: 40

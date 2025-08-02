@@ -1,6 +1,7 @@
 ---
 name: Young Conqueror
-text: Increases ground troops and mounted troops’ attack by 35% when General is leading the army.
+text: >-
+  Increases ground troops and mounted troops' attack by 35% when General is leading the army.
 buffs:
   - attribute: Attack
     targetedType: Mounted Troops

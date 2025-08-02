@@ -28,4 +28,5 @@ buffs:
     number: 15
     unit: percentage
 name: Chief of Expedition
-text: Reduces enemy ranged troops’ attack by 25% and enemy ground troops and mounted troops HP by 15% when General is leading the army.
+text: >-
+  Reduces enemy ranged troops' attack by 25% and enemy ground troops and mounted troops HP by 15% when General is leading the army.
