@@ -28,4 +28,5 @@ buffs:
     number: 30
     unit: percentage
 name: Hero of Don River
-text: Increases the ground troops’ defense and HP by 20% and ranged troops’ attack by 30% when General is leading the army to reinforce.
+text: >-
+  Increases the ground troops' defense and HP by 20% and ranged troops' attack by 30% when General is leading the army to reinforce.

@@ -28,4 +28,5 @@ buffs:
     number: 40
     unit: percentage
 name: The Learned Queen
-text: Increases siege machines’ attack and defense by 50% and siege machines’ HP by 40% when General is leading the army to attack.
+text: >-
+  Increases siege machines' attack and defense by 50% and siege machines' HP by 40% when General is leading the army to attack.

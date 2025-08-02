@@ -26,4 +26,5 @@ buffs:
     number: 25
     unit: percentage
 name: The 300 Spartans
-text: Increases in-city ground troops’ attack and HP by 30% and in-city ranged troops’ attack by 25% when General is the Main City Defense General.
+text: >-
+  Increases in-city ground troops' attack and HP by 30% and in-city ranged troops' attack by 25% when General is the Main City Defense General.

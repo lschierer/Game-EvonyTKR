@@ -17,4 +17,5 @@ buffs:
     number: 25
     unit: percentage
 name: The Heartless
-text: Increases ranged troops’ attack by 30% and ground troops’ defense by 25% when General is leading the army.
+text: >-
+  Increases ranged troops' attack by 30% and ground troops' defense by 25% when General is leading the army.

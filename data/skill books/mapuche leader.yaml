@@ -37,4 +37,5 @@ buffs:
     number: 20
     unit: percentage
 name: Mapuche Leader
-text: Increases in-city ground troops and mounted troops’ attack by 25% and in-city ground troops’ defense and HP by 20% when General is the Main City Defense General.
+text: >-
+  Increases in-city ground troops and mounted troops' attack by 25% and in-city ground troops' defense and HP by 20% when General is the Main City Defense General.

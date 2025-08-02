@@ -17,4 +17,5 @@ buffs:
     number: 10
     unit: percentage
 name: King of the Vikings
-text: Reduces enemy troops’ attack by 10% and reduces enemy troops’ HP by 10% when General is leading the army.
+text: >-
+  Reduces enemy troops' attack by 10% and reduces enemy troops' HP by 10% when General is leading the army.

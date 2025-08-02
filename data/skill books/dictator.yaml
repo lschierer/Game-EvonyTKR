@@ -26,4 +26,5 @@ buffs:
     number: 15
     unit: percentage
 name: Dictator
-text: Increases mounted troops’ attack by 45% when General is leading the army to attack Monsters. Increases ground troops and mounted troops’ attack by 15% when General brings any dragon.
+text: >-
+  Increases mounted troops' attack by 45% when General is leading the army to attack Monsters. Increases ground troops and mounted troops' attack by 15% when General brings any dragon.

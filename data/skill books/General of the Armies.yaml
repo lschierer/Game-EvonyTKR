@@ -1,6 +1,7 @@
 ---
 name: General of the Armies
-text: Increases mounted troops’ attack and HP by 40% and March Size by 15% when General is leading the army.
+text: >-
+  Increases mounted troops' attack and HP by 40% and March Size by 15% when General is leading the army.
 buffs:
   - attribute: Attack
     targetedType: Mounted Troops

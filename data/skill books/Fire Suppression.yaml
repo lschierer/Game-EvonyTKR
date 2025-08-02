@@ -33,4 +33,5 @@ buffs:
     number: 15
     unit: percentage
 name: Fire Suppression
-text: Reduces enemy ranged troops and siege machines’ defense by 15% and increases your ranged troops and siege machines’ attack by 15% when General is leading the army.
+text: >-
+  Reduces enemy ranged troops and siege machines' defense by 15% and increases your ranged troops and siege machines' attack by 15% when General is leading the army.

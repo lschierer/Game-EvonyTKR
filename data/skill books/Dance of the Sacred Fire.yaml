@@ -39,4 +39,5 @@ buffs:
     number: 40
     unit: percentage
 name: Dance of the Sacred Fire
-text: Increases mounted troops’ attack and defense by 45% when General is leading the army to attack. Increases ground troops and mounted troops’ HP by 40% when General brings any Dragon or Spiritual Beast to attack.
+text: >-
+  Increases mounted troops' attack and defense by 45% when General is leading the army to attack. Increases ground troops and mounted troops' HP by 40% when General brings any Dragon or Spiritual Beast to attack.

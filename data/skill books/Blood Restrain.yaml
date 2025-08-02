@@ -27,4 +27,5 @@ buffs:
     number: 20
     unit: percentage
 name: Blood Restrain
-text: Increases mounted troops and ranged troops’ attack by 15% when General is leading the army to attack. Increases ranged troops’ attack by another 20% when the General brings any dragon.
+text: >-
+  Increases mounted troops and ranged troops' attack by 15% when General is leading the army to attack. Increases ranged troops' attack by another 20% when the General brings any dragon.

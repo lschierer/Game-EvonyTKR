@@ -28,4 +28,5 @@ buffs:
     number: 35
     unit: percentage
 name: Nordic Hammer
-text: Increases ground troops and mounted troops’ attack by 15% and ranged troops’ attack by 35% when General is leading the army to attack.
+text: >-
+  Increases ground troops and mounted troops' attack by 15% and ranged troops' attack by 35% when General is leading the army to attack.

@@ -25,4 +25,5 @@ buffs:
     number: 35
     unit: percentage
 name: Prophecy Key
-text: Increases ground troops’ attack by 45% and ground troops’ defense and HP by 35% when General is leading the army.
+text: >-
+  Increases ground troops' attack by 45% and ground troops' defense and HP by 35% when General is leading the army.

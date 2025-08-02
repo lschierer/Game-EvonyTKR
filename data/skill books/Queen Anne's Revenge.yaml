@@ -1,5 +1,9 @@
 ---
-name: Queen Annes Revenge
+name: >-
+  Queen Anne's Revenge
+text: >-
+  Increases siege machines attack and defense by 30% when General is leading the army.
+  Increases ranged troops and siege machines attack by 10% when General brings any dragon or Spiritual Beast.
 buffs:
   - attribute: Attack
     targetedType: Siege Machines

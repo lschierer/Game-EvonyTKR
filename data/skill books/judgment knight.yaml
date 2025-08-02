@@ -41,4 +41,5 @@ buffs:
     number: 40
     unit: percentage
 name: Judgment Knight
-text: Increases ranged troops’ attack by 50% and increases ranged troops and siege machines’ defense and HP by 40% when General is leading the army.
+text: >-
+  Increases ranged troops' attack by 50% and increases ranged troops and siege machines' defense and HP by 40% when General is leading the army.

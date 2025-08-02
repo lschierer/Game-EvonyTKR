@@ -37,4 +37,5 @@ buffs:
     number: 15
     unit: percentage
 name: Germanic Hero
-text: Reduces enemy ground troops and mounted troops’ HP by 10% and enemy ranged troops and siege machines’ attack by 15% when General is leading the army.
+text: >-
+  Reduces enemy ground troops and mounted troops' HP by 10% and enemy ranged troops and siege machines' attack by 15% when General is leading the army.

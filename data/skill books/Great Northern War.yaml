@@ -36,4 +36,5 @@ buffs:
     number: 10
     unit: percentage
 name: Great Northern War
-text: Increases ranged troops’ attack by 40% and increases the March Size and ranged troops and siege machines’ defense by 10% when General is leading the army to attack.
+text: >-
+  Increases ranged troops' attack by 40% and increases the March Size and ranged troops and siege machines' defense by 10% when General is leading the army to attack.
