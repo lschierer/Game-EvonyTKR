@@ -60,7 +60,7 @@ package Game::EvonyTKR::Controller::Generals {
 
     $app->helper(
       general_routing => sub {
-        state $routing = Game::EvonyTKR::Control::General::Routing->new(
+        state $routing = Game::EvonyTKR::Control::Generals::Routing->new(
           debug => $app->mode eq 'development',);
         return $routing;
       }
@@ -535,7 +535,7 @@ package Game::EvonyTKR::Controller::Generals {
     my $slug_buff = $self->stash('buffActivation');
 
     # Lookup route metadata
-    my $routing    = Game::EvonyTKR::Control::General::Routing->new;
+    my $routing    = Game::EvonyTKR::Control::Generals::Routing->new;
     my $route_meta = $routing->lookup_route($slug_ui, $slug_buff);
 
     unless ($route_meta) {
@@ -682,7 +682,7 @@ package Game::EvonyTKR::Controller::Generals {
     my $slug_buff = $self->stash('buffActivation');
 
     # Lookup route metadata
-    my $routing    = Game::EvonyTKR::Control::General::Routing->new;
+    my $routing    = Game::EvonyTKR::Control::Generals::Routing->new;
     my $route_meta = $routing->lookup_route($slug_ui, $slug_buff);
 
     unless ($route_meta) {
@@ -873,7 +873,7 @@ package Game::EvonyTKR::Controller::Generals {
     my $slug_buff     = $self->stash('buffActivation');
 
     # Lookup route metadata
-    my $routing    = Game::EvonyTKR::Control::General::Routing->new;
+    my $routing    = Game::EvonyTKR::Control::Generals::Routing->new;
     my $route_meta = $routing->lookup_route($slug_ui, $slug_buff);
 
     unless ($route_meta) {
@@ -978,15 +978,17 @@ package Game::EvonyTKR::Controller::Generals {
       );
     }
     my $sprintfTemplate =
-      'Computing Pair Buffs for %s/%s Buff Activation %s, ' +
-      'targetType %s ascendingLevel %s primary CovenantLevel %s ' +
-'primary Specialties %s secondary CovenantLevel %s secondary Specialties %s';
+      'Computing Pair Buffs for %s/%s Buff Activation %s, ' .
+      'targetType %s ascendingLevel %s primary CovenantLevel %s ' .
+      'primary Specialties %s secondary CovenantLevel %s ' .
+      'secondary Specialties %s';
     $logger->info(sprintf($sprintfTemplate,
       $pair->primary->name,            $pair->secondary->name,
       $buffActivation,                 $route_meta->{generalType},
       $ascendingLevel,                 $primaryCovenantLevel,
       join(', ', @primarySpecialties), $secondaryCovenantLevel,
-      join(', ', @secondarySpecialties),));
+      join(', ', @secondarySpecialties)));
+
     $pair->updateBuffsAndDebuffs(
       $route_meta->{generalType}, $ascendingLevel,
       $primaryCovenantLevel,      \@primarySpecialties,

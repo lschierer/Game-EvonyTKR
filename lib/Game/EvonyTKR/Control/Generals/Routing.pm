@@ -10,7 +10,7 @@ require Game::EvonyTKR::Model::General::Pair;
 require Game::EvonyTKR::Model::General::Pair::Manager;
 use namespace::clean;
 
-class Game::EvonyTKR::Control::General::Routing :
+class Game::EvonyTKR::Control::Generals::Routing :
   isa(Game::EvonyTKR::Shared::Constants) {
   use Carp;
 
