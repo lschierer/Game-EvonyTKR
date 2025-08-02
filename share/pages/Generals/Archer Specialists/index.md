@@ -1,17 +1,16 @@
 ---
 layout: standard
-title: 'Picking your first ranged pair'
+title: Picking your first ranged pair
 author:
   - 'Luke Schierer'
 order: 7
 ---
 
-<aside class="note">
-In the [Overview], I explain my thinking. This is a fairly long article, but
-contains a lot of useful background information if you want to understand how
-I arrived at these conclusions. If you just want to be told what to do, you
-can skip it and dive right in here.
-</aside>
+> !NOTE
+> In the [Overview], I explain my thinking. This is a fairly long article, but
+> contains a lot of useful background information if you want to understand how
+> I arrived at these conclusions. If you just want to be told what to do, you
+> can skip it and dive right in here.
 
 ### For Free to Play Players :
 
@@ -58,8 +57,8 @@ Attacking and Reinforcing.
 Also, if you decide to go after the Pans every other week, consider a PvM
 primary general who is compatible with one of your main PvP generals.  Use the PvM general as a Monster Primary and your PvP general as its assistant. Give the PvM general Ranged Monster books.
 
-[Attacking Archer Pairs table]:./Generals/Archer%20Specialists/Attackingpair-comparison>
+[Attacking Archer Pairs table]: /Generals/Archer%20Specialists/Attackingpair-comparison
 
-[buff]./Reference/Glossary#buff
-[buffs]./Reference/Glossary#buff
+[buff]: /Reference/Glossary#buff
+[buffs]: /Reference/Glossary#buff
 [Overview]: ./overview
