@@ -11,7 +11,7 @@ pnpm i
 podman build --platform linux/arm64 -t evonytkrtips:latest ../../
 
 # Create ECR repository (if it doesn't exist)
-if aws --profile personal --region 'us-east-2' ecr describe-repositories | jq '.repositories.[].repositoryName' | grep -q evonytkrtips ; then
+if aws --profile personal --region ${AWS_REGION} ecr describe-repositories | jq '.repositories.[].repositoryName' | grep -q evonytkrtips ; then
   echo "repository already exists, not attempting creation."
 else
   aws --profile ${AWS_PROFILE} --region ${AWS_REGION} ecr create-repository --repository-name evonytkrtips
@@ -71,6 +71,8 @@ for CLUSTER in $CLUSTERS; do
   # For prod environments
   if $PROD && echo "$CLUSTER" | grep -q -- '-prod-'; then
     echo "Processing prod cluster: $CLUSTER"
+    podman tag evonytkrtips:latest ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/evonytkrtips:stable
+    podman push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/evonytkrtips:stable
 
     # Get the first service in the cluster
     SERVICE=$(aws --profile personal --region us-east-2 ecs list-services --cluster "$CLUSTER" | jq -r '.serviceArns[0]')

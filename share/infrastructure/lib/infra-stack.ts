@@ -13,9 +13,12 @@ import * as cdk from 'aws-cdk-lib';
 import * as iam from 'aws-cdk-lib/aws-iam';
 
 interface MojoliciousStackProps extends StackProps {
+  environment: string;
+  CidrRange: string;
   domainName: string;
   appSubdomain: string;
   hostedZoneId: string;
+  zoneName: string;
   containerPort: number;
   cpu: number;
   memory: number;
@@ -66,15 +69,24 @@ export class MojoliciousStack extends Stack {
     );
 
     // Create ACM certificate
-    const certificate = new acm.Certificate(this, 'EvonyTKRTipsCertificate', {
-      domainName: fullDomainName,
+    const certificate = new acm.Certificate(this, 'UnifiedCert', {
+      domainName: `${props.appSubdomain}.${props.domainName}`,
+      subjectAlternativeNames:
+        props.environment === 'prod' ? ['evonytkrtips.net'] : [],
       validation: acm.CertificateValidation.fromDns(hostedZone),
     });
 
-    // Create VPC
     const vpc = new ec2.Vpc(this, 'EvonyTKRTipsVpc', {
+      ipAddresses: ec2.IpAddresses.cidr(props.CidrRange),
       maxAzs: 2,
-      natGateways: 1,
+      natGateways: 0,
+      subnetConfiguration: [
+        {
+          name: 'public',
+          subnetType: ec2.SubnetType.PUBLIC,
+          cidrMask: 28,
+        },
+      ],
     });
 
     // Create ECS cluster
@@ -170,7 +182,7 @@ export class MojoliciousStack extends Stack {
       taskDefinition,
       desiredCount: props.desiredCount,
       enableExecuteCommand: true,
-      assignPublicIp: false,
+      assignPublicIp: true,
       securityGroups: [albSG, serviceSG],
     });
 
@@ -219,6 +231,16 @@ export class MojoliciousStack extends Stack {
     });
 
     // Create Route53 record
+    if (props.environment === 'prod') {
+      new route53.ARecord(this, 'RootDomainRecord', {
+        zone: hostedZone,
+        recordName: '', // root domain
+        target: route53.RecordTarget.fromAlias(
+          new targets.LoadBalancerTarget(lb),
+        ),
+      });
+    }
+
     new route53.ARecord(this, 'EvonyTKRTipsDNSRecord', {
       zone: hostedZone,
       recordName: props.appSubdomain,
@@ -270,7 +292,7 @@ export class MojoliciousStack extends Stack {
           '-p',
           'region=${AWS_REGION}',
           '-p',
-          's3_key_format=/logs/%Y/%m/%d/${filepath[2]}/%H%M%S-${HOSTNAME}.log',
+          's3_key_format=/logs/%Y/%m/%d/${filename}-%H%M%S-${HOSTNAME}.log',
           '-p',
           'total_file_size=10M',
           '-p',
