@@ -123,6 +123,7 @@ class Game::EvonyTKR::Shared::Constants : isa(Game::EvonyTKR::Model::Logger) {
   ADJUST {
     Readonly::Scalar my $temp => {
       'death into wounded rate'        => 'Death to Wounded',
+      'death-turning-wounded rate'     => 'Death to Wounded',
       'death into survival rate'       => 'Death to Survival',
       'march size increase'            => 'March Size',
       'march size capacity'            => 'March Size',
