@@ -1,0 +1,130 @@
+---
+ascending:
+- buffs:
+  - attribute: Attack
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 15
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 10
+      unit: percentage
+  level: red1
+  text: Marching Siege Machine Attack +15% and Defense +10%
+- buffs:
+  - attribute: Death to Wounded
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: ''
+    value:
+      number: 8
+      unit: percentage
+  level: red2
+  text: Marching Troop Death into Wounded Rate +8%
+- buffs:
+  - attribute: Attack
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 20
+      unit: percentage
+  - attribute: Attack
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 20
+      unit: percentage
+  - attribute: March Size
+    conditions: []
+    passive: 0
+    targetedType: ''
+    value:
+      number: 10
+      unit: percentage
+  level: red3
+  text: Marching Ranged Troop and Siege Machine Attack +20%, March Size Capacity +10%
+- buffs:
+  - attribute: Defense
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 15
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 15
+      unit: percentage
+  level: red4
+  text: Marching Siege Machine Defense +15% and HP +15%
+- buffs:
+  - attribute: Attack
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 40
+      unit: percentage
+  - attribute: Attack
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 40
+      unit: percentage
+  - attribute: March Size
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 12
+      unit: percentage
+  - attribute: Marching Speed
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 12
+      unit: percentage
+  - attribute: March Size
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 12
+      unit: percentage
+  - attribute: Marching Speed
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 12
+      unit: percentage
+  level: red5
+  text: Marching Ranged Troop and Siege Machine Attack +40%, March Size Capacity and March Speed +12%
+general: Theobald I
+id: Theobald I

@@ -1,0 +1,24 @@
+ascending: 'true'
+basic_attributes:
+  attack:
+    base: 134
+    increment: 9.12
+  defense:
+    base: 128
+    increment: 8.82
+  leadership:
+    base: 131
+    increment: 8.88
+  politics:
+    base: 100
+    increment: 7.92
+book: Iron-first Commander
+name: Stephen II
+specialties:
+  - Siege Machine Assault
+  - Bash
+  - Siege Machine Ares
+  - Peacekeeper
+stars: red5
+type:
+  - siege_specialist

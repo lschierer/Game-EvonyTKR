@@ -1,0 +1,118 @@
+---
+ascending:
+- buffs:
+  - attribute: Attack
+    conditions:
+    - Attacking
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 10
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - Attacking
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 15
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - Attacking
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 15
+      unit: percentage
+  level: red1
+  text: Attacking Siege Machine Attack +10%, Defense and HP +15%
+- buffs:
+  - attribute: Death to Wounded
+    conditions:
+    - Attacking
+    passive: 0
+    targetedType: ''
+    value:
+      number: 8
+      unit: percentage
+  level: red2
+  text: Attacking Troop Death into Wounded Rate +8%
+- buffs:
+  - attribute: Attack
+    conditions:
+    - Attacking
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 25
+      unit: percentage
+  - attribute: Attack
+    conditions:
+    - Attacking
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 25
+      unit: percentage
+  - attribute: Defense
+    conditions: []
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 25
+      unit: percentage
+  level: red3
+  text: Attacking Ranged Troop and Siege Machine Attack +25%, Attacking Siege Machine Defense +25%
+- buffs:
+  - attribute: Attack
+    conditions: []
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 20
+      unit: percentage
+  - attribute: Attack
+    conditions: []
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 20
+      unit: percentage
+  - attribute: HP
+    conditions: []
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 30
+      unit: percentage
+  level: red4
+  text: Ranged Troop and Siege Machine Attack +20%, Siege Machine HP +30%
+- buffs:
+  - attribute: Attack
+    conditions:
+    - Attacking
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 40
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - Attacking
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 40
+      unit: percentage
+  - attribute: March Size
+    conditions: []
+    passive: 0
+    targetedType: ''
+    value:
+      number: 12
+      unit: percentage
+  level: red5
+  text: Attacking Siege Machine Attack and Defense +40%, March Size Capacity +12%
+general: Romulus
+id: Romulus

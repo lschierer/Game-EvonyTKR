@@ -1,0 +1,31 @@
+---
+buffs:
+- attribute: Attack
+  conditions:
+  - leading the army
+  - Attacking
+  passive: 0
+  targetedType: Siege Machines
+  value:
+    number: 45
+    unit: percentage
+- attribute: HP
+  conditions:
+  - leading the army
+  - Attacking
+  passive: 0
+  targetedType: Siege Machines
+  value:
+    number: 45
+    unit: percentage
+- attribute: Defense
+  conditions:
+  - leading the army
+  - Attacking
+  passive: 0
+  targetedType: Siege Machines
+  value:
+    number: 40
+    unit: percentage
+name: War of Champagne
+text: Increases siege machines’ attack and HP by 45% and siege machines’ defense by 40% when General is leading the army to attack.

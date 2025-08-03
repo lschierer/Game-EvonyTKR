@@ -1,0 +1,84 @@
+---
+generals:
+  - Pompey
+  - Gaius Octavius
+  - Hersilia
+levels:
+  - buffs:
+      - attribute: Defense
+        conditions:
+          - Attacking
+        passive: 0
+        targetedType: Siege Machines
+        value:
+          number: 10
+          unit: percentage
+    category: war
+    text: Attacking Siege Machine Defense +10% (Local)
+  - buffs:
+      - attribute: Death to Wounded
+        conditions:
+          - Attacking
+        value:
+          number: 5
+          unit: percentage
+    category: peace
+    text: The death-turning-wounded rate of troops when they are attacking +5% (Local)
+  - buffs:
+      - attribute: Attack
+        conditions:
+          - Attacking
+        passive: 0
+        targetedType: Siege Machines
+        value:
+          number: 10
+          unit: percentage
+    category: honor
+    text: Attacking Siege Machine Attack +10% (Local)
+  - buffs:
+      - attribute: Marching Speed
+        conditions: []
+        passive: 1
+        targetedType: ''
+        value:
+          number: 5
+          unit: percentage
+    category: cooperation
+    text: March Speed +5% (Global)
+  - buffs:
+      - attribute: HP
+        conditions:
+          - Attacking
+        passive: 0
+        targetedType: Siege Machines
+        value:
+          number: 15
+          unit: percentage
+      - attribute: Attack
+        conditions: []
+        passive: 1
+        targetedType: Siege Machines
+        value:
+          number: 5
+          unit: percentage
+    category: faith
+    text: ' Attacking Siege Machine HP +15% (Local);; Siege Machine Attack +5% (Global) '
+  - buffs:
+      - attribute: HP
+        conditions:
+          - When Rallying
+        passive: 0
+        targetedType: Siege Machines
+        value:
+          number: 10
+          unit: percentage
+      - attribute: March Size
+        conditions: []
+        passive: 0
+        targetedType: ''
+        value:
+          number: 8
+          unit: percentage
+    category: civilization
+    text: ' In-Rally Siege Machine HP +10% (Local);; March Size Capacity +8% (Local) '
+name: Romulus
