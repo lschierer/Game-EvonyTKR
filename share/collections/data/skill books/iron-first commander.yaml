@@ -1,0 +1,27 @@
+---
+buffs:
+  - attribute: Attack
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 50
+      unit: percentage
+  - attribute: Defense
+    conditions:
+      - leading the army
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 40
+      unit: percentage
+  - attribute: HP
+    conditions:
+      - leading the army
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 40
+      unit: percentage
+name: Iron-first Commander
+text: >-
+  Increases siege machines' attack by 50% and siege machines' defense and HP by 40% when General is leading the army.
