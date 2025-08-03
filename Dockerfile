@@ -76,10 +76,12 @@ RUN chown -R mojo:mojo /home/mojo
 # create an init script to set /home/mojo/var permissions
 
 RUN apt-get update && \
-  apt-get install -y sudo
+  apt-get install -y sudo && rm -rf /var/lib/apt/lists/*
 
 # Install Pandoc
-RUN apt-get update && apt-get install -y pandoc && rm -rf /var/lib/apt/lists/*
+RUN curl -L https://github.com/jgm/pandoc/releases/download/3.2/pandoc-3.2-1-arm64.deb -o /tmp/pandoc.deb \
+  && dpkg -i /tmp/pandoc.deb \
+  && rm /tmp/pandoc.deb
 
 # Verify installation
 RUN pandoc --version
