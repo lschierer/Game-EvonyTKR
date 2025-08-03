@@ -7,8 +7,8 @@ glossary:
       Both are the same in that they are attached to a 'General' and provide
       'Buffs' and/or 'Debuffs' to your game play.  These may be 'unconditional'
       in that they affect your game play all the time for as long as you
-      own the 'General' or they may be 'conditional' in that they only configs:
-      take effect when you use the 'General' in the specified way. configs:
+      own the 'General' or they may be 'conditional' in that they only
+      take effect when you use the 'General' in the specified way.
       'Other' skill books are further subdivided into 'Military,' 'Development,'
       'Subordinate City,' 'Debuff', and 'Officer' Books.  These differ only
       in how you can obtain them, and in which situations you might use them.
@@ -32,6 +32,7 @@ glossary:
   - term: Secondary General
     synonyms:
       - Assistant General
+      - Assistant
     related_terms:
       - SkillBook
       - Specialty
@@ -78,7 +79,7 @@ glossary:
       In Server War, your entire server plays as a single team.  You will be matched against another server based on your past win/loss record in the event,
       your overall score each of those wins and losses, and how those ratios rank your server against other servers.  Placing well in Server War, individually,
       is important both for the rewards it grants, and as a milestone to unlock game features.
-  - term: speed-ups
+  - term: speed-up
     definition: >-
       A slang term for any item that reduces the time duration required to complete some action.  These items may be specific to a particular type
       of action, or may be generic and usable for any action that allows acceleration.
@@ -86,3 +87,16 @@ glossary:
     definition: >-
       A slang term for a stupid attack which a reasonably informed player should have realized in advance could only end in massively more negative
       points earned than positive points earned, and, most likely, minimal damage to the target.
+  - term: Senate
+    related_terms:
+      - Buff
+      - Debuff
+      - Generals
+      - Ascended
+    definition: |
+      The Senate is perhaps the most complicated building in the game.  This building has a number of slots to which Generals can be appointed.
+      Each of these slots matches subsets of your Generals based on the roles they specialize in, Ground Specialists, or Mounted Specialists for example.
+      The slot provides a variable amount of Buffs and (in some cases) Debuffs based on:
+      * the degree to which the appointed General has been ascended
+      * the degree to which the slot has been promoted
+      * the degree to which that set of slots has been upgraded.

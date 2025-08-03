@@ -39,7 +39,7 @@ glossary:
       are most typically armor, but also include (in the same slots) things like hats and cloaks, and so can more properly be called by the generic
       words "gear" or "clothing."  I have chosen "gear."  In either case, the important thing is that each of these items has certain intrinsic
       'buffs' and 'debuffs', and can be 'refined' to contain others.  Depending on the use case, and on activation conditions (if any) on the
-      'buffs' (or debuffs) provided, it may or may not be necessary for the 'General' to wear the gear full time, it may be possible to have the configs:
+      'buffs' (or debuffs) provided, it may or may not be necessary for the 'General' to wear the gear full time, it may be possible to have the
       gear on the 'General' only while assigning the 'General.'
     related_terms:
       - General

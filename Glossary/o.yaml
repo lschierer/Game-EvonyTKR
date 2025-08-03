@@ -1,0 +1,16 @@
+# yaml-language-server: $schema=schema.json
+
+glossary:
+  - term: Officer
+    related_terms:
+      - General
+      - Basic Attribute
+      - SkillBook
+      - Specialty
+    synonyms:
+      - Duty Officer
+      - Duty General
+    definition: >-
+      A general placed in charge of one of several buildings within your keep.  Depending on the General's Basic Attributes and overall power,
+      the General will activate buffs from the building.  If the General is specialized for being in charge of that building, the General's
+      SkillBook and one or more of his Specialties will also activate as well.
