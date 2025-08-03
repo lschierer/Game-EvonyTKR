@@ -6,7 +6,7 @@ order: 2
 ## Introduction
 
 Contrary to the common recommendation out there, I believe that participation
-in [SvS][] is open and accessible to everyone, as long as you are smart about
+in [SvS] is open and accessible to everyone, as long as you are smart about
 it. _**That does not mean you are going to go out and attack anyone.**_
 
 There are several numbers to keep in mind:
@@ -33,8 +33,8 @@ If you are willing to invest enough time, I have proven (to myself) that it is
 possible, though very time consuming, to even earn your first personal activity
 chest from these two things alone.
 
-[SvS]: /Reference/Glossary/#SvS
-[speed-ups]: /Reference/Glossary/#speed-up
+[SvS]: /Reference/Glossary/#svs
+[speed-ups]: /Reference/Glossary#speed-up
 
 ### High Risk, Medium Reward Activities
 
@@ -61,4 +61,4 @@ too long by accident, and end up being attacked. If that happens, you will not
 only have a huge cost in healing, you will have earned a lot of negative points
 for your server and upset a bunch of keeps that are more powerful than you are.
 
-[bubble]: /Reference/Glossary/#bubble
+[bubble]: /Reference/Glossary#bubble

@@ -7,3 +7,28 @@ glossary:
     definition: >-
       One of food, lumber, stone, or ore, which can be either generated in your keep, collected, purchased, or won.  Resources
       are required both for the construction of buildings and the training of troops.
+  - term: Refining
+    related_terms:
+      - Buff
+      - Dragon
+      - Gear
+    definition: >-
+      The act of adding 'Buff' attributes to a 'Dragon', or piece of 'Gear'.  This will require some the consumption of items, most typically gold and refining stones, however the precise items varies with what you are refining.
+  - term: Refine
+    related_terms:
+      - Buff
+      - Refining
+      - Gear
+      - Dragon
+    synonyms:
+      - Refines
+    definition: >-
+      One or more of the extra 'Buff' attributes added to a 'Dragon,'  or piece of 'Gear.'  A refine can add either a 'flat buff' or a 'percentage buff.'
+      Refines are the primary way of obtaining 'flat buffs.'
+  - term: Rune Stones
+    related_terms:
+      - Specialty
+    definition: >-
+      This item comes in four varieties.  Each variety relates to one of the four Specialties. You need increasing amounts of the correct Rune Stone
+      to raise the level of the corresponding Specialty.  Additionally, Flex Specialties use combinations of (eventually) all four types, although the
+      lower levels require both fewer stones and fewer types.

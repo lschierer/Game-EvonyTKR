@@ -6,21 +6,19 @@ author:
 order: 9
 ---
 
-<aside class="note">
-In the [Overview], I explain my thinking. This is a fairly long article, but
-contains a lot of useful background information if you want to understand how
-I arrived at these conclusions. If you just want to be told what to do, you
-can skip it and dive right in here.
+> [!NOTE]
+> In the [Overview], I explain my thinking. This is a fairly long article, but
+> contains a lot of useful background information if you want to understand how
+> I arrived at these conclusions. If you just want to be told what to do, you
+> can skip it and dive right in here.
 
 [Overview]: ./overview
-
-</aside>
 
 Your Siege generals will be the _last_ PvP generals you invest [rune stones]
 and [BoA] on. This is because siege troops require gems to heal.
 
-[rune stones]./Reference/Glossary#rune_stones
-[BoA]./Reference/Glossary#BoA
+[rune stones]: /Reference/Glossary#rune_stones
+[BoA]: /Reference/Glossary#boa
 
 ### For Free to Play Players and Light Spenders:
 

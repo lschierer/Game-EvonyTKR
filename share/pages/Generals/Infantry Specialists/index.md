@@ -6,15 +6,14 @@ author:
 order: 8
 ---
 
-<aside class="note">
-In the [Overview], I explain my thinking. This is a fairly long article, but
-contains a lot of useful background information if you want to understand how
-I arrived at these conclusions. If you just want to be told what to do, you
-can skip it and dive right in here.
+> [!NOTE]
+> In the [Overview], I explain my thinking. This is a fairly long article, but
+> contains a lot of useful background information if you want to understand how
+> I arrived at these conclusions. If you just want to be told what to do, you
+> can skip it and dive right in here.
 
 [Overview]: ./overview
 
-</aside>
 
 ### For Free to Play Players:
 
@@ -33,17 +32,14 @@ As your sixth skill book, there's a fair amount of debate. Pick either
 * Ground (Movement) Speed
 * Siege Range Bonus
 
-:::caution
-
-#### Specific General Notes
-
-- Some of the ground generals with the highest attack [buffs] have *very* low HP and defense [buffs].
-  Survivability is absolutely crucial in ground troops, and so the balance between the attack statistic and the other two
-  will be different for this type.  Your milage may vary.
-- Note that a number of desirable choices conflict with one or more of the above skill books.  If that happens, fill in with ranged skill books.
-- Note that some generals have march size buffs in their built in skill book, and yet do *not* conflict with the march size book.  If you have one of
-  these, give that one the March Size book.
-  :::
+> [!CAUTION]
+> **Specific General Notes**
+> - Some of the ground generals with the highest attack [buffs] have *very* low HP and defense [buffs].
+>   Survivability is absolutely crucial in ground troops, and so the balance between the attack statistic and the other two
+>   will be different for this type.  Your milage may vary.
+> - Note that a number of desirable choices conflict with one or more of the above skill books.  If that happens, fill in with ranged skill books.
+> - Note that some generals have march size buffs in their built in skill book, and yet do *not* conflict with the march size book.  If you have one of
+>   these, give that one the March Size book.
 
 ### For light spenders
 
@@ -56,3 +52,5 @@ should be avoided for the same reason.  At the time of writing, both Elise and L
 [Mounted]: ./mounted
 [Ranged]: ./ranged
 [Wall]: ./wall
+[buffs]: /Reference/Glossary#buffs
+[covenants]: /Reference/Glossary#covenant

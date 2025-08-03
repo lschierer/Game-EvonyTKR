@@ -1,0 +1,12 @@
+# yaml-language-server: $schema=schema.json
+
+glossary:
+  - term: Wall General
+    synonyms:
+      - Main Defense General
+    definition: >-
+      A 'General' assigned to the Wall.  This 'General' will be in charge of any defensive action should anyone attack your keep.  The 'General' will utilize any and all troops in your keep unless they are in the bunker.
+      The Wall General may be assigned an 'Assistant General.'
+    related_terms:
+      - General
+      - Assistant General

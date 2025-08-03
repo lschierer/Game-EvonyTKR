@@ -22,7 +22,7 @@ glossary:
       Each 'General' has a slots that can be filled to provide additional 'Buffs' and 'Debuffs.' One of these is for the Dragon or 'Spiritual Beast.'
       A Dragon and 'Spiritual Beast' are mutually exclusive, and fill the same role in the game, but differ in quality.  A Dragon offers a wider
       variety of 'Buffs' and 'Debuffs', in that the Dragon can be refined, with four slots for Buffs that the user selects from the refining attributes.
-      Additionally, the Dragon offers greater room for growth in the value of its built-in 'Buffs' (or 'Debuffs'), in that the Dragon itself can be configs:
+      Additionally, the Dragon offers greater room for growth in the value of its built-in 'Buffs' (or 'Debuffs'), in that the Dragon itself can be
       leveled more extensively, and some of these Buffs/Debuffs are leveled independantly as 'Talents.'
     related_terms:
       - Buff

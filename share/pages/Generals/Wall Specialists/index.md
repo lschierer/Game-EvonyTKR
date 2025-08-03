@@ -6,12 +6,11 @@ author:
 order: 7
 ---
 
-<aside class="note" markdown="1">
-In the [Overview], I explain my thinking. This is a fairly long article, but
-contains a lot of useful background information if you want to understand how
-I arrived at these conclusions. If you just want to be told what to do, you
-can skip it and dive right in here.
-</aside>
+> [!NOTE]
+> In the [Overview], I explain my thinking. This is a fairly long article, but
+> contains a lot of useful background information if you want to understand how
+> I arrived at these conclusions. If you just want to be told what to do, you
+> can skip it and dive right in here.
 
 When you first start out, you ought to be [ghosting] your troops whenever you
 might be attacked. As a result, your Wall generals are not going to help you
@@ -43,10 +42,10 @@ march. You want to think about what is left when that is out attacking someone.
 
 [Evony Answers]: https://www.evonyanswers.com
 [ascending]: http://www.evonyanswers.com/post/evony-ascending-enhancement-awakened-upgrades
-[ranged]: ./ranged
+[ranged]: <./Archer Specialists>
 [Overview]: ./overview
-[mounted]: ./mounted
+[mounted]: <./Cavalry Specialists>
 [ghosting]: http://www.evonytkrguide.com/guides/evony-tkr-guide-to-ghosting-troops
-[primary]: /Reference/Glossary#primary_General
+[primary]: /Reference/Glossary#primary_general
 [assistant]: /Reference/Glossary#secondary_general
 [Overview]: ./overview

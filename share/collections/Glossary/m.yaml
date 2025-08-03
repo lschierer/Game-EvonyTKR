@@ -1,0 +1,15 @@
+# yaml-language-server: $schema=schema.json
+
+glossary:
+  - term: Mayor
+    related_terms:
+      - General
+      - Subordinate City
+      - Basic Attribute
+      - Buff
+    definition: >-
+      A General placed in in charge of a 'Subordinate City.'  This General will, depending on its 'Basic Attributes,'
+      activate 'Buffs' from simply owning the city.  It will also lead any troops in the City, and if and only if
+      a General is present, these troops can (optionally, depending on toggles set), assist either your main keep, or other
+      Subordinate Cities, in their defense if attacked.  If a General is present, Subordinate City troops may also accompany
+      you on solo attacks.

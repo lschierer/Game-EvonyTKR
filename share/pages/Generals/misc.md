@@ -63,6 +63,6 @@ several different things.
    activating your general's hall unlocks is worth the cost.
 
 [Duty]: ./duty
-[General's Hall]./Reference/Glossary#Generals_Hall
-[RSS]./Reference/Glossary#RSS
-[Mayors]: ./mayors
+[General's Hall]: /Reference/Glossary#generals_hall
+[RSS]: /Reference/Glossary#rss
+[Mayors]: <./Mayor Specialists>

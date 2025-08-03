@@ -209,4 +209,4 @@ Defense and HP do.
 [next]: <./next steps>
 [wall]: /Generals/Wall%20Specialists/
 [buff]: /Reference/Glossary#buff
-[debuff]: /Reference/Glossary#Debuff
+[debuff]: /Reference/Glossary#debuff

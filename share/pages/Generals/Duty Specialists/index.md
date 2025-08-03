@@ -7,15 +7,14 @@ sortOrder: 6
 ---
 
 
-<aside class="note">
-In the [Overview], I explain my thinking. This is a fairly long article, but
-contains a lot of useful background information if you want to understand how
-I arrived at these conclusions. If you just want to be told what to do, you
-can skip it and dive right in here.
+> [!NOTE]
+> In the [Overview], I explain my thinking. This is a fairly long article, but
+> contains a lot of useful background information if you want to understand how
+> I arrived at these conclusions. If you just want to be told what to do, you
+> can skip it and dive right in here.
 
 [Overview]: ./overview
 
-</aside>
 
 ## In General (no pun intended)
 
@@ -56,11 +55,10 @@ officers. This is highly advantageous. In rough terms, there is either
 - A duty officer is necessary whenever you are initiating the healing of
   troops. The officer need not stay assigned for the full duration.
 
-:::tip
-Some strong players actively dislike having a hospital duty officer, they
-prefer to rely on Source of Life rather than on Hospital Capacity and Healing
-Speed. There are strong arguments both ways.
-:::
+> [!TIP]
+> Some strong players actively dislike having a hospital duty officer, they
+> prefer to rely on Source of Life rather than on Hospital Capacity and Healing
+> Speed. There are strong arguments both ways.
 
 ### Keep
 
@@ -113,5 +111,5 @@ Speed. There are strong arguments both ways.
 - You can begin using a duty general at rally spot level 35
 - Should be continuously assigned.
 
-[debuffs]./Reference/Glossary#Debuff
-[buffs]./Reference/Glossary#buff
+[debuffs]: /Reference/Glossary#debuff
+[buffs]: /Reference/Glossary#buff
