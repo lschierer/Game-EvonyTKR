@@ -1,0 +1,153 @@
+---
+levels:
+  - buffs:
+      - attribute: Attack
+        conditions:
+          - Marching
+        passive: 0
+        targetedType: Siege Machines
+        value:
+          number: 3
+          unit: percentage
+      - attribute: Defense
+        conditions:
+          - Marching
+        passive: 0
+        targetedType: Siege Machines
+        value:
+          number: 3
+          unit: percentage
+      - attribute: HP
+        conditions:
+          - Marching
+        passive: 0
+        targetedType: Siege Machines
+        value:
+          number: 3
+          unit: percentage
+    level: Green
+    text: >-
+      Attacking Siege Machine Attack +3%
+      Attacking Siege Machine Defense +3%
+      Attacking Siege Machine HP +3%
+  - buffs:
+      - attribute: Attack
+        conditions:
+          - Marching
+        passive: 0
+        targetedType: Siege Machines
+        value:
+          number: 4
+          unit: percentage
+      - attribute: Defense
+        conditions:
+          - Marching
+        passive: 0
+        targetedType: Siege Machines
+        value:
+          number: 4
+          unit: percentage
+      - attribute: HP
+        conditions:
+          - Marching
+        passive: 0
+        targetedType: Siege Machines
+        value:
+          number: 4
+          unit: percentage
+    level: Blue
+    text: >-
+      Attacking Siege Machine Attack +4%
+      Attacking Siege Machine Defense +4%
+      Attacking Siege Machine HP +4%
+  - buffs:
+      - attribute: Attack
+        conditions:
+          - Marching
+        passive: 0
+        targetedType: Siege Machines
+        value:
+          number: 7
+          unit: percentage
+      - attribute: Defense
+        conditions:
+          - Marching
+        passive: 0
+        targetedType: Siege Machines
+        value:
+          number: 7
+          unit: percentage
+      - attribute: HP
+        conditions:
+          - Marching
+        passive: 0
+        targetedType: Siege Machines
+        value:
+          number: 7
+          unit: percentage
+    level: Purple
+    text: >-
+      Attacking Siege Machine Attack +7%
+      Attacking Siege Machine Defense +7%
+      Attacking Siege Machine HP +7%
+  - buffs:
+      - attribute: Attack
+        conditions:
+          - Marching
+        passive: 0
+        targetedType: Siege Machines
+        value:
+          number: 7
+          unit: percentage
+      - attribute: Defense
+        conditions:
+          - Marching
+        passive: 0
+        targetedType: Siege Machines
+        value:
+          number: 7
+          unit: percentage
+      - attribute: HP
+        conditions:
+          - Marching
+        passive: 0
+        targetedType: Siege Machines
+        value:
+          number: 7
+          unit: percentage
+    level: Orange
+    text: >-
+      Attacking Siege Machine Attack +7%
+      Attacking Siege Machine Defense +7%
+      Attacking Siege Machine HP +7%
+  - buffs:
+      - attribute: Attack
+        conditions:
+          - Marching
+        passive: 0
+        targetedType: Siege Machines
+        value:
+          number: 14
+          unit: percentage
+      - attribute: Defense
+        conditions:
+          - Marching
+        passive: 0
+        targetedType: Siege Machines
+        value:
+          number: 14
+          unit: percentage
+      - attribute: HP
+        conditions:
+          - Marching
+        passive: 0
+        targetedType: Siege Machines
+        value:
+          number: 14
+          unit: percentage
+    level: Purple
+    text: >-
+      Attacking Siege Machine Attack +14%
+      Attacking Siege Machine Defense +14%
+      Attacking Siege Machine HP +14%
+name: Troubadour

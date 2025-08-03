@@ -1,0 +1,24 @@
+ascending: 'true'
+basic_attributes:
+  attack:
+    base: 128
+    increment: 9.17
+  defense:
+    base: 131
+    increment: 9.21
+  leadership:
+    base: 135
+    increment: 9.35
+  politics:
+    base: 99
+    increment: 6.88
+book: War of Champagne
+name: Theobald I
+specialties:
+  - Siege Machine Formation
+  - Bash
+  - Siege Machine Ares
+  - Troubadour
+stars: red5
+type:
+  - siege_specialist

@@ -1,0 +1,24 @@
+ascending: 'true'
+basic_attributes:
+  attack:
+    base: 123
+    increment: 8.62
+  defense:
+    base: 125
+    increment: 8.67
+  leadership:
+    base: 131
+    increment: 8.95
+  politics:
+    base: 117
+    increment: 8.49
+book: Father of Rome
+name: Romulus
+specialties:
+  - Siege Machine Assault
+  - Bash
+  - Siege Machine Ares
+  - Imperial Era
+stars: red5
+type:
+  - siege_specialist
