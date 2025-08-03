@@ -13,6 +13,11 @@ package Game::EvonyTKR::Plugins::Markdown {
   use Mojo::Base 'Mojolicious::Plugin', -strict, -signatures;
   use Carp;
 
+  my $customCommonMark = join('+',
+    qw(commonmark alerts attributes autolink_bare_uris footnotes implicit_header_references pipe_tables raw_html rebase_relative_paths smart gfm_auto_identifiers)
+  );
+
+
   sub register ($self, $app, $config) {
     my $logger = Log::Log4perl->get_logger(__PACKAGE__);
     $logger->info("Registering static page routes");
@@ -24,6 +29,9 @@ package Game::EvonyTKR::Plugins::Markdown {
         return $self->_render_markdown_file($c, $file_path, $opts);
       }
     );
+
+    $app->helper(render_markdown_snippet => \&_render_markdown_snippet);
+    $app->helper(spectrum_formatting => \&SpectrumFormatting);
 
     $app->helper(
       parse_markdown_frontmatter => sub ($c, $file_path) {
@@ -92,6 +100,23 @@ package Game::EvonyTKR::Plugins::Markdown {
     };
   }
 
+  sub _render_markdown_snippet ($self, $snippet) {
+    my $logger = Log::Log4perl->get_logger(__PACKAGE__);
+    if(not defined $snippet or length($snippet) == 0){
+      $logger->warn('snippet must be present!!');
+      return '';
+    }
+
+    my $parser       = Pandoc->new();
+    my $html_content = $parser->convert(
+      $customCommonMark => 'html',
+      $snippet
+    );
+    $html_content = $self->app->spectrum_formatting($html_content);
+    $logger->debug("html_content for snippet is $html_content");
+    return $html_content;
+  }
+
   # Private method to render markdown file
   sub _render_markdown_file ($self, $c, $file_path, $opts = {}) {
     if (not defined $opts) {
@@ -142,9 +167,6 @@ package Game::EvonyTKR::Plugins::Markdown {
     $logger->debug("Looking for template: $template.html.ep");
 
     my $parser           = Pandoc->new();
-    my $customCommonMark = join('+',
-      qw(commonmark alerts attributes autolink_bare_uris footnotes implicit_header_references pipe_tables raw_html rebase_relative_paths smart gfm_auto_identifiers)
-    );
     my $html_content = $parser->convert(
       $customCommonMark => 'html',
       $parsedFile->{content}
