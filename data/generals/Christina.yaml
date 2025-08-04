@@ -11,7 +11,7 @@ basic_attributes:
     increment: 8.83
   politics:
     base: 109
-    increment: '8.00'
+    increment: 8.00
 book: The Learned Queen
 name: Christina
 specialties:
