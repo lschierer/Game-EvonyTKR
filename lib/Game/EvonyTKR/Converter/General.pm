@@ -145,6 +145,19 @@ class Game::EvonyTKR::Converter::General :
     }
   }
 
+  method clean_number ($raw, $label = 'value') {
+    # Strip quotes and leading/trailing whitespace
+    $raw =~ s/^\s*["']?|["']?\s*$//g if defined $raw;
+
+    # Attempt numeric coercion only if it looks right
+    if (defined $raw && $raw =~ /^-?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?$/) {
+      my $num = 0 + $raw;
+      return $num;
+    }
+
+    die "Invalid numeric $label: '$raw'";
+  }
+
   method getPrimaryFields_Template1 {
     my $container = $tree->look_down(
       '_tag'  => 'div',
@@ -204,7 +217,8 @@ qr/elementor-element-(?:\w){1,9}.elementor-widget.elementor-widget-theme-post-co
       for my $i (0 .. $#keys) {
         my $key     = $keys[$i];
         my $text    = $paras[$i]->as_trimmed_text;
-        my ($value) = $text =~ /\Q$key\E\s*:\s*([0-9.]+)/i;
+        my ($raw) = $text =~ /\Q$key\E\s*:\s*(\S+)/i;
+        my $value = clean_number($raw, $key);
         if (defined $value) {
           $self->logger->debug("setting $key to $value");
           my $ba = Game::EvonyTKR::Model::BasicAttribute->new(
