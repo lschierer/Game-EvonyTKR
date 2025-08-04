@@ -20,7 +20,7 @@ package Game::EvonyTKR::Plugins::Markdown {
 
   sub register ($self, $app, $config) {
     my $logger = Log::Log4perl->get_logger(__PACKAGE__);
-    $logger->info("Registering static page routes");
+    $logger->info(sprintf('initializing %s.', __PACKAGE__));
 
     # Add helper method for rendering markdown files
     $app->helper(
