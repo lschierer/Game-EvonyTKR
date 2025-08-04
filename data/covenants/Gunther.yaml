@@ -5,7 +5,7 @@ generals:
   - Charles the Great
 levels:
   - category: War
-    type: personal
+    passive: 0
     buffs:
       - attribute: Wounded to Death
         conditions:
@@ -15,9 +15,9 @@ levels:
           number: 5
           unit: percentage
   - category: Cooperation
-    type: personal
     buffs:
       - attribute: Defense
+        passive: 0
         targetedType: Ranged Troops
         conditions:
           - When Rallying
@@ -32,29 +32,27 @@ levels:
           number: 5
           unit: percentage
   - category: Peace
-    type: passive
     buffs:
       - attribute: Training Speed
+        passive: 1
         targetedType: Siege Machines
         value:
           number: 5
           unit: percentage
   - category: Faith
-    type: personal
     buffs:
       - attribute: March Size
+        passive: 0
         value:
           number: 10
           unit: percentage
-  - category: Faith
-    type: passive
-    buffs:
       - attribute: HP
+        passive: 1
         value:
           number: 10
           unit: percentage
   - category: Honor
-    type: personal
+    passive: 0
     buffs:
       - attribute: Attack
         targetedType: Siege Machines
@@ -64,7 +62,7 @@ levels:
           number: 8
           unit: percentage
   - category: Civilization
-    type: personal
+    passive: 0
     buffs:
       - attribute: Defense
         targetedType: Siege Machines
