@@ -16,11 +16,13 @@
       <!-- no custom css -->
     % }
     <script src="https://cdn.jsdelivr.net/npm/iconify-icon@3.0.0/dist/iconify-icon.min.js"></script>
-    <script
-      type="module"
-      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8360834774752607"
-    ></script>
-    <meta name="google-adsense-account" content="ca-pub-8360834774752607" />
+    <% if (app->mode eq 'production') { %>
+      <script
+        type="module"
+        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8360834774752607"
+      ></script>
+      <meta name="google-adsense-account" content="ca-pub-8360834774752607" />
+    <% } %>
   </head>
   <% my $classes = sprintf('spectrum spectrum--medium spectrum--light spectrum-Typography light-theme light %s', $sidebar ? 'with-sidebar' : ''); %>
   <body class=" <%= $classes %>">

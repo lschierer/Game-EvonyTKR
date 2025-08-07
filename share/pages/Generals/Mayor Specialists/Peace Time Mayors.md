@@ -1,7 +1,7 @@
 ---
-title: 'Peace Time Sub-City Mayors'
+title: Peace Time Sub-City Mayors
 layout: standard
-author: 'Luke Schierer'
+author: Luke Schierer
 order: 100
 css:
  - /css/cardGrid.css

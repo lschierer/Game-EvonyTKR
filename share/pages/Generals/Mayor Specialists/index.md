@@ -96,5 +96,5 @@ rather than attempting to do both with one of these lists.
 [debuff]: /Reference/Glossary#debuff
 [ghost]: /Reference/Glossary#ghost
 [ghosting]: /Reference/Glossary#ghost
-[peace]: </Generals/Mayor Specialists/peace_time_subcity_mayors>
+[peace]: </Generals/Mayor Specialists/Peace Time Mayors>
 [Mayor Comparison Table]: </Generals/Mayor Specialists/Mayor/comparison>
