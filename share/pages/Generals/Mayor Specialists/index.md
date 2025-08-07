@@ -91,7 +91,7 @@ is that a free or light spender is probably better off specializing with
 generals from either the attack debuff set or the toughness debuff set,
 rather than attempting to do both with one of these lists.
 
-[Overview]: ./overview
+[Overview]: /Generals/overview
 [buff]: /Reference/Glossary#buff
 [debuff]: /Reference/Glossary#debuff
 [ghost]: /Reference/Glossary#ghost

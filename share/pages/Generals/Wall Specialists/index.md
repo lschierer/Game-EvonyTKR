@@ -42,10 +42,9 @@ march. You want to think about what is left when that is out attacking someone.
 
 [Evony Answers]: https://www.evonyanswers.com
 [ascending]: http://www.evonyanswers.com/post/evony-ascending-enhancement-awakened-upgrades
-[ranged]: <./Archer Specialists>
-[Overview]: ./overview
-[mounted]: <./Cavalry Specialists>
+[ranged]: </Generals/Archer Specialists>
+[mounted]: </Generals/Cavalry Specialists>
 [ghosting]: http://www.evonytkrguide.com/guides/evony-tkr-guide-to-ghosting-troops
 [primary]: /Reference/Glossary#primary_general
 [assistant]: /Reference/Glossary#secondary_general
-[Overview]: ./overview
+[Overview]: /Generals/overview

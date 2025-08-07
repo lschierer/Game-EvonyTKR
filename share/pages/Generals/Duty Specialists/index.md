@@ -13,7 +13,7 @@ sortOrder: 6
 > I arrived at these conclusions. If you just want to be told what to do, you
 > can skip it and dive right in here.
 
-[Overview]: ./overview
+[Overview]: /Generals/overview
 
 
 ## In General (no pun intended)

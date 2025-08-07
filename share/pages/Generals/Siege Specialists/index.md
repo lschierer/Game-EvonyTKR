@@ -12,7 +12,7 @@ order: 9
 > I arrived at these conclusions. If you just want to be told what to do, you
 > can skip it and dive right in here.
 
-[Overview]: ./overview
+[Overview]: /Generals/overview
 
 Your Siege generals will be the _last_ PvP generals you invest [rune stones]
 and [BoA] on. This is because siege troops require gems to heal.

@@ -143,9 +143,9 @@ Remember, that ascending an assistant *can* help activate a covenant *some* but
 [PvP]: /Reference/Glossary#pvp
 [PvM]: /Reference/Glossary#pvm
 [ghost]: /Reference/Glossary#ghost
-[Cav]: <./Cavalry Specialists>
-[Wall]: <./Wall Specialists>
-[Mayors]: <./Mayor Specialists>
+[Cav]: </Generals/Cavalry Specialists>
+[Wall]: </Generals/Wall Specialists>
+[Mayors]: </Generals/Mayor Specialists>
 
 [^many]: "Many" tokens is defined as:
     * _**NO MATTER WHAT, NO LESS THAN 50**_ tokens.

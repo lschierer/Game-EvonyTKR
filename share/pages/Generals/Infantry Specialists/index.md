@@ -12,7 +12,7 @@ order: 8
 > I arrived at these conclusions. If you just want to be told what to do, you
 > can skip it and dive right in here.
 
-[Overview]: ./overview
+[Overview]: /Generals/overview
 
 
 ### For Free to Play Players:
@@ -49,8 +49,8 @@ ranged, and one for mounted. Elise stinks without a dragon. While Ludwig is
 not quite as attractive as Elise, he suffers from the same fatal flaw, and so
 should be avoided for the same reason.  At the time of writing, both Elise and Ludwig are hopelessly outclassed even with dragons by generals with [covenants] anyway.
 
-[Mounted]: ./mounted
-[Ranged]: ./ranged
-[Wall]: ./wall
+[Mounted]: </Generals/Cavalry Specialists>
+[Ranged]: </Generals/Archer Specialists>
+[Wall]: </Generals/Wall Specialists>
 [buffs]: /Reference/Glossary#buffs
 [covenants]: /Reference/Glossary#covenant

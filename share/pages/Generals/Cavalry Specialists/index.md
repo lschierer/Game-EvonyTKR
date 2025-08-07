@@ -79,4 +79,4 @@ to reduce your Stamina usage ([Ascend] Spartacus, which is free, and only requir
 [PvM]:  /Reference/Glossary#pvm
 [assistant]: /Reference/Glossary#assistant
 [Ascend]: /Reference/Glossary#ascend
-[Overview]: ./overview
+[Overview]: /Generals/overview

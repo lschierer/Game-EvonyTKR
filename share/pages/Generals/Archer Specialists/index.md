@@ -61,4 +61,4 @@ primary general who is compatible with one of your main PvP generals.  Use the P
 
 [buff]: /Reference/Glossary#buff
 [buffs]: /Reference/Glossary#buff
-[Overview]: ./overview
+[Overview]: /Generals/overview

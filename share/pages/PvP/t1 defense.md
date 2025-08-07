@@ -206,7 +206,7 @@ Defense and HP do.
   - While the t1s are busy surviving (using those HP and Defense refines), you should see that other troops are doing more damage to the enemy.
   - If so, as distasteful as it is, given how expensive refining is, strongly consisder redoing your attack refines to focus on the troop types doing the most damage in the most cases.
 
-[next]: <./next steps>
-[wall]: /Generals/Wall%20Specialists/
+[next]: </PvP/next steps>
+[wall]: </Generals/Wall Specialists>
 [buff]: /Reference/Glossary#buff
 [debuff]: /Reference/Glossary#debuff
