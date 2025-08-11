@@ -1,0 +1,22 @@
+name: Prince of Lanling
+text: >-
+  Increases ground troops' attack and defense by 55% and ground troops' HP by 40% when General is leading the army.
+buffs:
+  - attribute: Attack
+    troop: Ground Troops
+    value:
+      number: 55
+    conditions:
+      - leading the army
+  - attribute: defense
+    troop: Ground Troops
+    value:
+      number: 55
+    conditions:
+      - leading the army
+  - attribute: hp
+    troop: Ground Troops
+    value:
+      number: 40
+    conditions:
+      - leading the army

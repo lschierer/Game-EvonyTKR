@@ -1,0 +1,70 @@
+general: Gao Changgong
+id: Gao Changgong
+ascending:
+  - level: red1
+    text: Ground Troop Attack and HP +10%
+    buffs:
+      - attribute: Attack
+        troop: Ground Troops
+        value:
+          number: 10
+      - attribute: HP
+        troop: Ground Troops
+        value:
+          number: 10
+  - level: red2
+    text: Attacking Troop Death into Wounded Rate +8%
+    buffs:
+      - attribute: Death to Wounded
+        value:
+          number: 8
+        conditions:
+          - Attacking
+  - level: red3
+    text: Ground Troop Attack +20%, Ground Troop and Mounted Troop Defense +10%
+    buffs:
+      - attribute: Attack
+        troop: Ground Troops
+        value:
+          number: 20
+      - attribute: Defense
+        troop: Ground Troops
+        value:
+          number: 10
+      - attribute: Defense
+        troop: Mounted Troops
+        value:
+          number: 10
+  - level: red4
+    text: Ground Troop and Mounted Troop Attack and HP +15%
+    buffs:
+      - attribute: Attack
+        troop: Ground Troops
+        value:
+          number: 15
+      - attribute: Attack
+        troop: Mounted Troops
+        value:
+          number: 15
+      - attribute: HP
+        troop: Ground Troops
+        value:
+          number: 15
+      - attribute: HP
+        troop: Mounted Troops
+        value:
+          number: 15
+  - level: red5
+    text: Ground Troop Attack and Defense +25%, March Size Capacity +8%
+    buffs:
+      - attribute: Attack
+        troop: Ground Troops
+        value:
+          number: 25
+      - attribute: Defense
+        troop: Ground Troops
+        value:
+          number: 25
+      - attribute: March Size
+        value:
+          number: 8
