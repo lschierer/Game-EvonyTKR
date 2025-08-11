@@ -118,7 +118,7 @@ class GitRepo::Reader {
       foreach my $key (keys %{$authors}) {
         my $name  = $authors->{$key}->{name};
         my $email = $authors->{$key}->{email};
-        push @result, sprintf('%s <%s>', $name, $email);
+        push @result, $name;
       }
       return join(', ', @result);
     }

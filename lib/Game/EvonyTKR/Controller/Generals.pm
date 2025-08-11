@@ -135,21 +135,25 @@ package Game::EvonyTKR::Controller::Generals {
     # too broad a match and prevents anything else from matching.
     $app->routes->add_condition(
       is_valid_uiTarget => sub ($route, $c, $captures, $arg) {
-        my $uiTarget = $captures->{uiTarget};
-        my @valid_routes =
-          $c->general_routing->get_routes_for_uiTarget($uiTarget);
-        return !!@valid_routes;
+        my $ui = $captures->{uiTarget};
+        # make this deterministic: compare exact left side of key
+        my $slug = $c->general_routing->_slugify($ui);
+        my $ok = 0;
+        for my $key (keys $c->general_routing->validRoutes->%*) {
+          my ($left) = split /\|/, $key, 2;
+          if ($left eq $slug) { $ok = 1; last }
+        }
+        return $ok;
       }
     );
 
     # check that :uiTarget/:buffActivation is a valid route combination
     $app->routes->add_condition(
       is_valid_buffActivation => sub ($route, $c, $captures, $arg) {
-        my $uiTarget       = $captures->{uiTarget};
-        my $buffActivation = $captures->{buffActivation};
-        my $route_obj =
-          $c->general_routing->lookup_route($uiTarget, $buffActivation);
-        return !!$route_obj;
+        my ($ui, $buff) = @$captures{qw(uiTarget buffActivation)};
+        my $ok = $c->general_routing->has_route($ui, $buff) ? 1 : 0;
+        $c->app->log->debug("check ui='$ui' buff='$buff' -> $ok");
+        return $ok;  # never die here
       }
     );
 
