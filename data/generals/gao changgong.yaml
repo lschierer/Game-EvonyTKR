@@ -1,0 +1,25 @@
+name: Gao Changgong
+general: Gao Changgong
+ascending: true
+basic_attributes:
+  attack:
+    base: 123
+    increment: 8.63
+  defense:
+    base: 125
+    increment: 8.85
+  leadership:
+    base: 130
+    increment: 8.96
+  politics:
+    base: 119
+    increment: 8.33
+book: Prince of Lanling
+specialties:
+  - Ground Troop Assault
+  - Formation
+  - Ground Troop Ares
+  - Song of the Prince of Lanling
+stars: red5
+type:
+  - ground_specialist
