@@ -252,6 +252,14 @@ package Game::EvonyTKR::Controller::Generals {
     my $collection = collection_name();
     $logger->debug("Rendering index for $collection");
 
+    my $rp = $self->req->url->path->to_string;
+    # Remove trailing slash from pages
+    if ($rp =~ qr{/$}) {
+      my $canonical = $rp;
+      $canonical =~ s{/$}{};
+      return $self->redirect_to($canonical, 301);
+    }
+
     # Check if markdown exists for this collection
     my $distDir       = Mojo::File::Share::dist_dir('Game::EvonyTKR');
     my $markdown_path = $distDir->child("pages/Generals/index.md");
@@ -291,6 +299,14 @@ package Game::EvonyTKR::Controller::Generals {
     my $logger   = Log::Log4perl->get_logger(__PACKAGE__);
     my $uiTarget = $self->param('uiTarget');
 
+    my $rp = $self->req->url->path->to_string;
+    # Remove trailing slash from pages
+    if ($rp =~ qr{/$}) {
+      my $canonical = $rp;
+      $canonical =~ s{/$}{};
+      return $self->redirect_to($canonical, 301);
+    }
+
     my @valid_routes =
       $self->general_routing->get_routes_for_uiTarget($uiTarget);
     $logger->debug("found valid_routes "
@@ -329,6 +345,14 @@ package Game::EvonyTKR::Controller::Generals {
     my $logger         = Log::Log4perl->get_logger(__PACKAGE__);
     my $uiTarget       = $self->param('uiTarget');
     my $buffActivation = $self->param('buffActivation');
+
+    my $rp = $self->req->url->path->to_string;
+    # Remove trailing slash from pages
+    if ($rp =~ qr{/$}) {
+      my $canonical = $rp;
+      $canonical =~ s{/$}{};
+      return $self->redirect_to($canonical, 301);
+    }
 
     my $route =
       $self->general_routing->lookup_route($uiTarget, $buffActivation);
@@ -370,6 +394,14 @@ package Game::EvonyTKR::Controller::Generals {
     $logger->debug("start of show method");
     my $name;
     $name = $self->param('name');
+
+    my $rp = $self->req->url->path->to_string;
+    # Remove trailing slash from pages
+    if ($rp =~ qr{/$}) {
+      my $canonical = $rp;
+      $canonical =~ s{/$}{};
+      return $self->redirect_to($canonical, 301);
+    }
 
     $logger->debug("show detects name $name, showing details.");
     my $calculate_buffs = $self->param('calculate_buffs') // 0;
