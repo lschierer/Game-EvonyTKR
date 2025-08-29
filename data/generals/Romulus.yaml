@@ -1,4 +1,4 @@
-ascending: 'true'
+ascending: "true"
 basic_attributes:
   attack:
     base: 123
