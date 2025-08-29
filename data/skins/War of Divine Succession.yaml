@@ -1,0 +1,26 @@
+name: War of Divine Succession
+generals:
+  - general: Hatshepsut
+    buffs:
+      - attribute: HP
+        class: Ground Troops
+        passive: 1
+        conditions:
+          - Enemy
+          - When Rallying
+        value:
+          number: 5
+      - attribute: HP
+        class: Mounted Troops
+        passive: 1
+        conditions:
+          - Enemy
+          - When Rallying
+        value:
+          number: 5
+      - attribute: Attack
+        class: Ranged Troops
+        conditions:
+          - Attacking
+        value:
+          number: 8
