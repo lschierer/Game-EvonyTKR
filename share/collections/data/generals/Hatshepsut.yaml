@@ -1,0 +1,25 @@
+ascending: true
+basic_attributes:
+  leadership:
+    base: 124
+    increment: 9.12
+  attack:
+    base: 131
+    increment: 8.60
+  defense:
+    base: 124
+    increment: 8.75
+  politics:
+    base: 118
+    increment: 8.39
+book: Maatkare
+specialties:
+  - Ranged Troop Formation
+  - Siege
+  - Ranged Troop Ares
+  - Era of Prosperity
+stars: red5
+type:
+  - ranged_specialist
+general: Hatshepsut
+name: Hatshepsut
