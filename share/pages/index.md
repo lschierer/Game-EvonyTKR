@@ -16,7 +16,7 @@ Much of the information here comes from other authors' work on other sites. In p
 
 - [Evony Answers](https://www.evonyanswers.com/)
 - [Derrick Defies](https://www.youtube.com/@DerrickDefies)
-- [https://evonyguidewiki.com/](https://evonyguidewiki.com/)
+- [Evony Guide Wiki](https://evonyguidewiki.com/)
 - [Theria Games](https://theriagames.com/evony-wiki/)
 - [One Chilled Gamer](https://onechilledgamer.com/)
 - [Evony The King's Return Guides](https://www.evonytkrguide.com/)

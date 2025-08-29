@@ -76,7 +76,7 @@ RUN chown -R mojo:mojo /home/mojo
 # create an init script to set /home/mojo/var permissions
 
 RUN apt-get update && \
-  apt-get install -y sudo && rm -rf /var/lib/apt/lists/*
+  apt-get install -y sudo gosu && rm -rf /var/lib/apt/lists/*
 
 # Install Pandoc
 RUN curl -L https://github.com/jgm/pandoc/releases/download/3.2/pandoc-3.2-1-arm64.deb -o /tmp/pandoc.deb \
@@ -93,5 +93,5 @@ RUN chmod +x /usr/local/bin/dockerEntrypoint.sh
 EXPOSE 3000
 ENTRYPOINT ["/usr/local/bin/dockerEntrypoint.sh"]
 #CMD ["nc", "-v", "-l", "0.0.0.0", "3000"]
-CMD ["perl", "scripts/game-evonytkr", "prefork", "-m", "preprod"]
+#CMD ["perl", "scripts/game-evonytkr", "prefork", "-m", "preprod"]
 #CMD ["perl", "scripts/game-evonytkr", "prefork", "-m", "production"]

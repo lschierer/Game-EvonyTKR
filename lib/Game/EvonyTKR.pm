@@ -4,7 +4,10 @@ use utf8::all;
 use File::FindLib 'lib';
 require YAML::PP;
 require Game::EvonyTKR::Model::Logger;
+require Game::EvonyTKR::Logger::MojoLog4Perl;
 require Game::EvonyTKR::Logger::Config;
+require Log::Log4perl;
+
 #require Game::EvonyTKR::Controller::Root;
 require Game::EvonyTKR::Controller::ControllerBase;
 require Game::EvonyTKR::Model::EvonyTKR::Manager;
@@ -13,15 +16,15 @@ require GitRepo::Reader;
 package Game::EvonyTKR {
   use Mojo::Base 'Mojolicious', -strict, -signatures;
   use Mojo::File::Share qw(dist_dir );
-  use Log::Log4perl;
-  use Log::Log4perl::Config;
-  Log::Log4perl::Config->utf8(1);
   use Carp;
   our $VERSION = 'v0.50.0';
 
   sub startup ($self) {
-    Log::Log4perl::Config->utf8(1);
+
+    my $config = $self->plugin('NotYAMLConfig' => { module => 'YAML::PP' });
     my $distDir = dist_dir('Game::EvonyTKR');
+    my $mode         = $self->mode;
+    $self->config(distDir        => $distDir);
     my $home    = Mojo::Home->new->detect;
 
     # Template and static paths
@@ -29,51 +32,37 @@ package Game::EvonyTKR {
     push @{ $self->static->paths },   $distDir->child('public')->to_string;
 
     # Load YAML config
-    my $config = $self->plugin('NotYAMLConfig' => { module => 'YAML::PP' });
+
     $self->secrets($config->{secrets});
     $self->plugin('DefaultHelpers');
 
     $self->defaults(layout => 'default');
 
     # Logging setup
-    my $mode         = $self->mode;
-    my $loggerConfig = Game::EvonyTKR::Logger::Config->new($mode);
-    my $logConfig;
 
-    eval {
-      $logConfig = $loggerConfig->path($mode, $distDir);
-      1;
-    } or do {
-      my $error = $@ || "Unknown error";
-      $self->log->warn("Could not find Log4perl config: $error");
-    };
 
-    if ($logConfig && -f $logConfig) {
-      my $logDir = $loggerConfig->getLogDir();
-      if (!-d $logDir) {
-        $logDir->mkdir({ mode => 0755 });
-      }
-      say "init for log4perl at $logConfig " . ref($logConfig);
-      Log::Log4perl::init($logConfig->canonpath());
-      my $log4perl_logger = Log::Log4perl->get_logger('Game.EvonyTKR');
+    my $lc = Game::EvonyTKR::Logger::Config->new('Game-EvonyTKR');
+    my $log4perl_logger = $lc->init($mode);
+    my $app_log         = Game::EvonyTKR::Logger::MojoLog4Perl->new(
+      l4p => Log::Log4perl->get_logger('Game-EvonyTKR'),);
+    $self->log($app_log);
 
-      my %logLevel = (
-        development => 'ALL',
-        production  => 'INFO',
-      );
-
-      $self->log->handle(undef);    # Disable default Mojo logger
-      $self->log->level('debug');
-      $self->log->on(
-        message => sub ($log, $level, @lines) {
-          my $msg = join "\n", @lines;
-          $log4perl_logger->$level($msg) if $log4perl_logger->can($level);
+    $self->helper(
+      logger => sub ($c, $cat) {
+        if (length($cat) == 0) {
+          $self->log->error('got a logger request with zero length cat!');
+          $cat = 'Game-EvonyTKR-Unknown';
         }
-      );
+        else {
+          $self->log->info("got a cat '$cat'");
+        }
+        Log::Log4perl::Config->utf8(1);
+        my $logger = Log::Log4perl->get_logger($cat);
+        return $logger;
+      }
+    );
 
-      $self->log->info("✅ Log4perl initialized from $logConfig");
-    }
-
+    $self->log->info("Mojolicious Logging initialized");
     my $RootManager =
       Game::EvonyTKR::Model::EvonyTKR::Manager->new(SourceDir => $distDir,);
 

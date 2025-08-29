@@ -1,73 +1,81 @@
 use v5.42.0;
-use experimental qw(class);
 use utf8::all;
+use experimental qw(class);
 use File::FindLib 'lib';
-use File::HomeDir;
 require File::Share;
+use File::HomeDir;
 require Path::Tiny;
-use namespace::autoclean;
+require Log::Log4perl;
+require Log::Log4perl::Config;
 
 package Game::EvonyTKR::Logger::Config {
   use Carp;
-  use File::FindLib 'lib';
-  our $VERSION = 'v0.30.0';
+  use Log::Log4perl qw(:levels);
 
-  my @logLevels = qw(
-    FATAL
-    ERROR
-    WARN
-    INFO
-    DEBUG
-    TRACE
-  );
+  our $config_file;
+  our $logger;
+  our $dist_name = '';
 
-  sub new ($class, $m = 'production') {
-    say "Game::EvonyTKR::Logger::Config new sub";
-    my $self = { mode => $m, };
+  sub new ($class, $provided_dist_name) {
+    unless (defined($provided_dist_name) && length($provided_dist_name)) {
+      croak("distname is required!!");
+    }
+    my $self = {};
+    $dist_name = $provided_dist_name;
     bless $self, $class;
   }
 
-  sub path(
-    $self,
-    $m = 'production',
-    $dd = File::Share::dist_dir('Game-EvonyTKR')
-  ) {
-    my $confFile;
-    if ($m ne $self->{mode}) {
-      $self->{mode} = $m;
+  sub get_config_file ($self, $mode = 'production') {
+
+    my $dir = Path::Tiny::path(File::Share::dist_dir($dist_name));
+    $config_file = $dir->child("log4perl.${mode}.conf");
+    if (!-f -r $config_file) {
+      Log::Log4perl->easy_init($ERROR);
+      my $logger = Log::Log4perl->get_logger($dist_name);
+      $logger->logcroak("$config_file does not exist or is not readable.");
     }
-    if ($self->{mode} eq 'production') {
-      $confFile = Path::Tiny::path($dd)->child('log4perl.conf');
-    }
-    else {
-      my $mode = $self->{mode};
-      $confFile = Path::Tiny::path($dd)->child("log4perl.$mode.conf");
-    }
-    if (!-T -s -r $confFile) {
-      croak("$confFile does not exist");
-    }
-    return $confFile;
+    return $config_file;
   }
 
   sub getLogDir {
-    my $home = File::HomeDir->my_home;
-    my $logDir =
-      Path::Tiny::path($home)->child('var/log/Perl/dist/Game-Evony/');
+    my $home    = File::HomeDir->my_home;
+    my $segment = $dist_name =~ s/::/-/gr;
+    my $logDir  = Path::Tiny::path($home)->child("/var/log/Perl/dist/$segment");
     return $logDir;
+  }
+
+  sub init ($self, $mode = 'production') {
+    my $cf;
+    unless (defined $config_file) {
+      $cf = $self->get_config_file($mode);
+    }
+    else {
+      $cf = $config_file;
+    }
+
+    # set up the target directory
+    my $target = $self->getLogDir();
+    $target->mkdir({ mode => 0755 });
+
+    Log::Log4perl::Config->utf8(1);
+    if ($mode =~ /production/i) {
+      Log::Log4perl::init_and_watch($config_file->absolute->canonpath, 10);
+    }
+    else {
+      Log::Log4perl::init($config_file->absolute->canonpath);
+    }
+    $logger = Log::Log4perl->get_logger($dist_name);
+    $logger->info("logging initialized using $cf for mode $mode");
+    return $logger;
+  }
+
+  sub get_logger ($self) {
+    unless (defined $logger) {
+      $self->init();
+    }
+    return $logger;
   }
 
 }
 1;
-
 __END__
-
-# ABSTRACT: manage the log4perl configuration
-
-=pod
-
-=head1 DESCRIPTION
-
-Configuration information for Log4Perl including methods for finding what directory
-to write logs to, and for finding the log4perl configuration file.
-
-=cut

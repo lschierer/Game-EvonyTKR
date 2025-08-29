@@ -62,6 +62,7 @@ my $builder = Module::Build->new(
       'Mojo::Util'                  => '0',
       'Mojolicious::Commands'       => '0',
       'Mojolicious::Controller'     => '0',
+      'MojoLog4Perl'                => '0',
       'Mojolicious::Plugin'         => '0',
       'Mojolicious::Plugin::DefaultHelpers' => '0',
       'Mojolicious::Plugin::Module::Loader' => '0',

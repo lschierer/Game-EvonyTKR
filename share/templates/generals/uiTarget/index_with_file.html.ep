@@ -8,10 +8,20 @@
     <%== $content %>
     <hr role="separator" class=" spectrum-Divider spectrum-Divider--sizeM " >
     <div class="link-grid spectrum-ButtonGroup spectrum-ButtonGroup--sizeM ">
-      <% foreach my $route ($routes->@*) { %>
+      <% foreach my $route (sort { %>
+       % my $auit = $a->{uiTarget};
+       % my $buit = $b->{uiTarget};
+       % my $uitc = $auit cmp $buit;
+       % if($uitc == 0) {
+       %   my $aba = $a->{buffActivation};
+       %   my $bba = $b->{buffActivation};
+       %   return $aba cmp $bba;
+       % }
+       % return $uitc;
+      <% } $routes->@* ) { %>
         <button
           class="link-item spectrum-Button spectrum-Button--outline spectrum-Button--primary spectrum-Button--sizeM spectrum-ButtonGroup-item "
-          onclick="document.location='/Generals/<%= $uiTarget %>/<%= $route->{buffActivation} %>'"
+          onclick="document.location='/Generals/<%= $route->{uiTarget} %>/<%= $route->{buffActivation} %>'"
           >
             <span <span class="spectrum-Button-label"><%= $route->{uiTarget} %> for <%= $route->{buffActivation} %> Use</span>
         </button>

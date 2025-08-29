@@ -1,184 +1,179 @@
 levels:
   - buffs:
-      - attribute:
-          - attribute: Attack
-            troop: Ranged Troops
-            value:
-              number: 5
-            conditions:
-              - Attacking
-          - attribute: Defense
-            troop: Siege Machines
-            value:
-              number: 4
-            conditions:
-              - Attacking
-          - attribute: Defense
-            troop: Ranged Troops
-            value:
-              number: 4
-            conditions:
-              - Attacking
-          - attribute: HP
-            troop: Ranged Troops
-            value:
-              number: 4
-            conditions:
-              - Attacking
-          - attribute: HP
-            troop: Siege Machines
-            value:
-              number: 4
-            conditions:
-              - Attacking
+      - attribute: Attack
+        troop: Ranged Troops
+        value:
+          number: 5
+        conditions:
+          - Attacking
+      - attribute: Defense
+        troop: Siege Machines
+        value:
+          number: 4
+        conditions:
+          - Attacking
+      - attribute: Defense
+        troop: Ranged Troops
+        value:
+          number: 4
+        conditions:
+          - Attacking
+      - attribute: HP
+        troop: Ranged Troops
+        value:
+          number: 4
+        conditions:
+          - Attacking
+      - attribute: HP
+        troop: Siege Machines
+        value:
+          number: 4
+        conditions:
+          - Attacking
     level: Green
     text: >-
       Attacking Ranged Troop Attack +5%.
       Attacking Siege Machine and Ranged Troop Defense +4%.
       Attacking Ranged Troop and Siege Machine HP +4%.
   - buffs:
-      - attribute:
-          - attribute: Attack
-            troop: Ranged Troops
-            value:
-              number: 6
-            conditions:
-              - Attacking
-          - attribute: Defense
-            troop: Siege Machines
-            value:
-              number: 4
-            conditions:
-              - Attacking
-          - attribute: Defense
-            troop: Ranged Troops
-            value:
-              number: 4
-            conditions:
-              - Attacking
-          - attribute: HP
-            troop: Ranged Troops
-            value:
-              number: 4
-            conditions:
-              - Attacking
-          - attribute: HP
-            troop: Siege Machines
-            value:
-              number: 4
-            conditions:
-              - Attacking
+      - attribute: Attack
+        troop: Ranged Troops
+        value:
+          number: 6
+        conditions:
+          - Attacking
+      - attribute: Defense
+        troop: Siege Machines
+        value:
+          number: 4
+        conditions:
+          - Attacking
+      - attribute: Defense
+        troop: Ranged Troops
+        value:
+          number: 4
+        conditions:
+          - Attacking
+      - attribute: HP
+        troop: Ranged Troops
+        value:
+          number: 4
+        conditions:
+          - Attacking
+      - attribute: HP
+        troop: Siege Machines
+        value:
+          number: 4
+        conditions:
+          - Attacking
     level: Blue
     text: >-
       Attacking Ranged Troop Attack +6%.
       Attacking Siege Machine and Ranged Troop Defense +4%.
       Attacking Ranged Troop and Siege Machine HP +4%.
   - buffs:
-      - attribute:
-          - attribute: Attack
-            troop: Ranged Troops
-            value:
-              number: 11
-            conditions:
-              - Attacking
-          - attribute: Defense
-            troop: Siege Machines
-            value:
-              number: 8
-            conditions:
-              - Attacking
-          - attribute: Defense
-            troop: Ranged Troops
-            value:
-              number: 8
-            conditions:
-              - Attacking
-          - attribute: HP
-            troop: Ranged Troops
-            value:
-              number: 8
-            conditions:
-              - Attacking
-          - attribute: HP
-            troop: Siege Machines
-            value:
-              number: 8
-            conditions:
-              - Attacking
+      - attribute: Attack
+        troop: Ranged Troops
+        value:
+          number: 11
+        conditions:
+          - Attacking
+      - attribute: Defense
+        troop: Siege Machines
+        value:
+          number: 8
+        conditions:
+          - Attacking
+      - attribute: Defense
+        troop: Ranged Troops
+        value:
+          number: 8
+        conditions:
+          - Attacking
+      - attribute: HP
+        troop: Ranged Troops
+        value:
+          number: 8
+        conditions:
+          - Attacking
+      - attribute: HP
+        troop: Siege Machines
+        value:
+          number: 8
+        conditions:
+          - Attacking
     level: Purple
     text: >-
       Attacking Ranged Troop Attack +11%.
       Attacking Siege Machine and Ranged Troop Defense +8%.
       Attacking Ranged Troop and Siege Machine HP +8%.
   - buffs:
-      - attribute:
-          - attribute: Attack
-            troop: Ranged Troops
-            value:
-              number: 11
-            conditions:
-              - Attacking
-          - attribute: Defense
-            troop: Siege Machines
-            value:
-              number: 8
-            conditions:
-              - Attacking
-          - attribute: Defense
-            troop: Ranged Troops
-            value:
-              number: 8
-            conditions:
-              - Attacking
-          - attribute: HP
-            troop: Ranged Troops
-            value:
-              number: 8
-            conditions:
-              - Attacking
-          - attribute: HP
-            troop: Siege Machines
-            value:
-              number: 8
-            conditions:
-              - Attacking
+      - attribute: Attack
+        troop: Ranged Troops
+        value:
+          number: 11
+        conditions:
+          - Attacking
+      - attribute: Defense
+        troop: Siege Machines
+        value:
+          number: 8
+        conditions:
+          - Attacking
+      - attribute: Defense
+        troop: Ranged Troops
+        value:
+          number: 8
+        conditions:
+          - Attacking
+      - attribute: HP
+        troop: Ranged Troops
+        value:
+          number: 8
+        conditions:
+          - Attacking
+      - attribute: HP
+        troop: Siege Machines
+        value:
+          number: 8
+        conditions:
+          - Attacking
     level: Orange
     text: >-
       Attacking Ranged Troop Attack +11%.
       Attacking Siege Machine and Ranged Troop Defense +8%.
       Attacking Ranged Troop and Siege Machine HP +8%.
   - buffs:
-      - attribute:
-          - attribute: Attack
-            troop: Ranged Troops
-            value:
-              number: 22
-            conditions:
-              - Attacking
-          - attribute: Defense
-            troop: Siege Machines
-            value:
-              number: 16
-            conditions:
-              - Attacking
-          - attribute: Defense
-            troop: Ranged Troops
-            value:
-              number: 16
-            conditions:
-              - Attacking
-          - attribute: HP
-            troop: Ranged Troops
-            value:
-              number: 16
-            conditions:
-              - Attacking
-          - attribute: HP
-            troop: Siege Machines
-            value:
-              number: 16
-            conditions:
-              - Attacking
+      - attribute: Attack
+        troop: Ranged Troops
+        value:
+          number: 22
+        conditions:
+          - Attacking
+      - attribute: Defense
+        troop: Siege Machines
+        value:
+          number: 16
+        conditions:
+          - Attacking
+      - attribute: Defense
+        troop: Ranged Troops
+        value:
+          number: 16
+        conditions:
+          - Attacking
+      - attribute: HP
+        troop: Ranged Troops
+        value:
+          number: 16
+        conditions:
+          - Attacking
+      - attribute: HP
+        troop: Siege Machines
+        value:
+          number: 16
+        conditions:
+          - Attacking
     level: Gold
     text: >-
       Attacking Ranged Troop Attack +22%.
