@@ -1,0 +1,78 @@
+ascending:
+  - buffs:
+      - attribute: Attack
+        troop: Ranged Troops
+        value:
+          number: 10
+        conditions:
+          - Attacking
+      - attribute: Defense
+        troop: Ranged Troops
+        value:
+          number: 10
+        conditions:
+          - Attacking
+    level: red1
+    text: Attacking Ranged Troop Attack and Defense +10%
+  - buffs:
+      - attribute: Death to Wounded
+        conditions:
+          - Attacking
+        value:
+          number: 8
+          unit: percentage
+    level: red2
+    text: Attacking Troop Death into Wounded Rate +8%
+  - buffs:
+      - attribute: Attack
+        class: Ranged Troops
+        conditions:
+          - Attacking
+        value:
+          number: 15
+      - attribute: March Size
+        value:
+          number: 6
+    level: red3
+    text: When attacking, Ranged Troop Attack +15%, March Size Capacity +6%
+  - buffs:
+      - attribute: Attack
+        class: Ranged Troops
+        conditions:
+          - Attacking
+        value:
+          number: 15
+      - attribute: Attack
+        class: Siege Machines
+        conditions:
+          - Attacking
+        value:
+          number: 15
+      - attribute: HP
+        class: Ranged Troops
+        conditions:
+          - Attacking
+        value:
+          number: 15
+    level: red4
+    text: When attacking, Ranged Troop and Siege Machine Attack +15%, Ranged Troop HP +15%
+  - buffs:
+      - attribute: Attack
+        class: Ranged Troops
+        conditions:
+          - Attacking
+        value:
+          number: 35
+      - attribute: Defense
+        class: Ranged Troops
+        conditions:
+          - Attacking
+        value:
+          number: 35
+      - attribute: March Size
+        value:
+          number: 8
+    level: red5
+    text: Attacking Ranged Troop Attack and Defense +35%, March Size Capacity +8%
+general: Hatshepsut
+id: Hatshepsut
