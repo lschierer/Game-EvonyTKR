@@ -10,6 +10,7 @@ buffs:
   - attribute: Attack
     targetedType: Mounted Troops
     conditions:
+      - leading the army
       - Attacking
     value:
       number: 35
@@ -17,6 +18,7 @@ buffs:
   - attribute: Defense
     targetedType: Mounted Troops
     conditions:
+      - leading the army
       - Attacking
     value:
       number: 35

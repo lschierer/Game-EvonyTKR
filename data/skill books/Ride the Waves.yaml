@@ -5,6 +5,8 @@ text: >-
 buffs:
   - attribute: Attack
     targetedType: Mounted Troops
+    conditions:
+      - Attacking
     value:
       number: 45
       unit: percentage

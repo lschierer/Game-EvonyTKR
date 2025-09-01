@@ -5,11 +5,15 @@ text: >-
 buffs:
   - attribute: Attack
     targetedType: Mounted Troops
+    conditions:
+      - leading the army
     value:
       number: 40
       unit: percentage
   - attribute: HP
     targetedType: Mounted Troops
+    conditions:
+      - leading the army
     value:
       number: 40
       unit: percentage
