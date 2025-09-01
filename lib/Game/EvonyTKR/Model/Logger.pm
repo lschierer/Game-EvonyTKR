@@ -33,8 +33,8 @@ class Game::EvonyTKR::Model::Logger {
 
   method trace { $self->logger->trace(@_) }
   method debug { $self->logger->debug(@_) }
-  method info  { $self->logger->info (@_) }
-  method warn  { $self->logger->warn (@_) }
+  method info  { $self->logger->info(@_) }
+  method warn  { $self->logger->warn(@_) }
   method error { $self->logger->error(@_) }
   method fatal { $self->logger->fatal(@_) }
 
@@ -60,8 +60,8 @@ class Game::EvonyTKR::Model::Logger {
 
   method get_logger($cat = $category) {
     # If you use a Log4perl config, make sure it's already initialized elsewhere
-    Log::Log4perl::Config->utf8(1)
-      ;    # only if you really need this, and you've loaded that module
+    #Log::Log4perl::Config->utf8(1);
+    # only if you really need this, and you've loaded that module
     $logger = Log::Log4perl->get_logger($cat);    # <-- set the field directly
     return $logger;
   }

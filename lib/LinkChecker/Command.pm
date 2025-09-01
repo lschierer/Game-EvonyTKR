@@ -47,7 +47,7 @@ class LinkChecker::Command {
 
     # Process queue until empty
     while (@urls_to_check) {
-      my $url = shift @urls_to_check;  # FIFO: take from front
+      my $url = shift @urls_to_check;    # FIFO: take from front
       $self->check_url($url);
     }
 
@@ -141,14 +141,20 @@ class LinkChecker::Command {
               unless (exists $checked_urls{$abs_url_str}) {
                 # Check if already in queue to avoid duplicates
                 unless (grep { $_ eq $abs_url_str } @urls_to_check) {
-                  # Only add to queue for recursive checking if it's the same domain
+              # Only add to queue for recursive checking if it's the same domain
                   if ($start_hostname eq $abs_uri->host) {
-                    push @urls_to_check, $abs_url_str;  # Add to end of queue for recursive checking
-                    $logger->debug("Added internal URL $abs_url_str to queue for recursive checking");
-                  } else {
+                    push @urls_to_check,
+                      $abs_url_str; # Add to end of queue for recursive checking
+                    $logger->debug(
+"Added internal URL $abs_url_str to queue for recursive checking"
+                    );
+                  }
+                  else {
                     # External URL - check it directly but don't recurse
                     $self->check_single_url($abs_url_str);
-                    $logger->debug("Checked external URL $abs_url_str directly (no recursion)");
+                    $logger->debug(
+"Checked external URL $abs_url_str directly (no recursion)"
+                    );
                   }
                 }
               }
@@ -182,9 +188,12 @@ class LinkChecker::Command {
         'Detected Broken external page %s via status %s - %s.',
         $url, $response->{status}, $response->{reason}
       ));
-    } else {
-      $logger->debug(
-        sprintf('External page %s returned status %s.', $url, $response->{status}));
+    }
+    else {
+      $logger->debug(sprintf(
+        'External page %s returned status %s.',
+        $url, $response->{status}
+      ));
     }
 
     return $response->{status};
@@ -194,17 +203,21 @@ class LinkChecker::Command {
     foreach my $parent_url (keys %checked_urls) {
       next unless exists $checked_urls{$parent_url}->{children};
 
-      foreach my $child_href (keys %{ $checked_urls{$parent_url}->{children} }) {
-        next unless $checked_urls{$parent_url}->{children}->{$child_href} eq 'pending';
+      foreach my $child_href (keys %{ $checked_urls{$parent_url}->{children} })
+      {
+        next
+          unless $checked_urls{$parent_url}->{children}->{$child_href} eq
+          'pending';
 
         # Convert relative href to absolute URL to find in checked_urls
-        my $abs_uri = URI->new($child_href)->abs($parent_url);
+        my $abs_uri     = URI->new($child_href)->abs($parent_url);
         my $abs_url_str = $abs_uri->as_string;
 
         if (exists $checked_urls{$abs_url_str}) {
           $checked_urls{$parent_url}->{children}->{$child_href} =
             $checked_urls{$abs_url_str}->{status};
-        } else {
+        }
+        else {
           $logger->warn("Could not find status for child URL: $abs_url_str");
           $checked_urls{$parent_url}->{children}->{$child_href} = 'unknown';
         }

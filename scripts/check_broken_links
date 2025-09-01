@@ -8,18 +8,19 @@ use Carp;
 
 require LinkChecker::Command;
 
-my $startUrl = 'http://localhost:3000'; # default to assuming a local Mojolicious instance
+my $startUrl =
+  'http://localhost:3000';    # default to assuming a local Mojolicious instance
 my $debug = 0;
-my $help = 0;
+my $help  = 0;
 
 GetOptions(
-  'url=s'   => \$startUrl,
-  'debug'   => \$debug,
-  'help'    => \$help,
+  'url=s' => \$startUrl,
+  'debug' => \$debug,
+  'help'  => \$help,
 ) or die "Error in command line arguments\n";
 
 if ($help) {
-    print <<HELP;
+  print <<HELP;
 Usage: $0 [options]
 
 Options:
@@ -28,12 +29,12 @@ Options:
   --help          Display this help message
 
 HELP
-exit 0;
+  exit 0;
 }
 
 my $checker = LinkChecker::Command->new(
-  debug     => $debug,
-  startUrl  => $startUrl,
+  debug    => $debug,
+  startUrl => $startUrl,
 );
 
 $checker->execute();

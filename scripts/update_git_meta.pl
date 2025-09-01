@@ -28,39 +28,42 @@ my $logger = Log::Log4perl->get_logger;
 # 1. Read git metadata
 my $distDir = Path::Tiny::path(dist_dir('Game::EvonyTKR'));
 $logger->info("distDir is $distDir");
-my $reader = GitRepo::Reader->new( source_dir => $distDir->parent() );
+my $reader = GitRepo::Reader->new(source_dir => $distDir->parent());
 
 my $oldest_dt = $reader->find_copyright_range();
 my $year_range;
 if ($oldest_dt) {
-    my $this_year = DateTime->now->year;
-    my $start_year = $oldest_dt->year;
-    $year_range = ($start_year == $this_year)
-        ? "$this_year"
-        : "$start_year-$this_year";
-} else {
-    $year_range = DateTime->now->year;
+  my $this_year  = DateTime->now->year;
+  my $start_year = $oldest_dt->year;
+  $year_range =
+    ($start_year == $this_year)
+    ? "$this_year"
+    : "$start_year-$this_year";
+}
+else {
+  $year_range = DateTime->now->year;
 }
 
 my $authors = $reader->find_authors();
 $logger->info("Found authors " . Data::Printer::np($authors));
 
 # 2. Load config file
-my $yaml   = YAML::PP->new;
+my $yaml        = YAML::PP->new;
 my $config_path = $distDir->parent()->child('game-evony_t_k_r.yml');
 
 $logger->info("Reading config from $config_path");
 my $config_data = {};
 if ($config_path->is_file) {
-    $config_data = $yaml->load_string($config_path->slurp_utf8);
-} else {
+  $config_data = $yaml->load_string($config_path->slurp_utf8);
+}
+else {
   $logger->error("config file $config_path is not found.");
 }
 
 # 3. Inject metadata
 $config_data->{git_meta} = {
-    copyright => $year_range,
-    authors   => $authors,
+  copyright => $year_range,
+  authors   => $authors,
 };
 
 # 4. Write back

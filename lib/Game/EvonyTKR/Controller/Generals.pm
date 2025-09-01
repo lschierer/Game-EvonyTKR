@@ -138,7 +138,7 @@ package Game::EvonyTKR::Controller::Generals {
         my $ui = $captures->{uiTarget};
         # make this deterministic: compare exact left side of key
         my $slug = $c->general_routing->_slugify($ui);
-        my $ok = 0;
+        my $ok   = 0;
         for my $key (keys $c->general_routing->validRoutes->%*) {
           my ($left) = split /\|/, $key, 2;
           if ($left eq $slug) { $ok = 1; last }
@@ -153,7 +153,7 @@ package Game::EvonyTKR::Controller::Generals {
         my ($ui, $buff) = @$captures{qw(uiTarget buffActivation)};
         my $ok = $c->general_routing->has_route($ui, $buff) ? 1 : 0;
         $c->app->log->debug("check ui='$ui' buff='$buff' -> $ok");
-        return $ok;  # never die here
+        return $ok;    # never die here
       }
     );
 
@@ -1014,10 +1014,10 @@ package Game::EvonyTKR::Controller::Generals {
       );
     }
     my $sprintfTemplate =
-      'Computing Pair Buffs for %s/%s Buff Activation %s, ' .
-      'targetType %s ascendingLevel %s primary CovenantLevel %s ' .
-      'primary Specialties %s secondary CovenantLevel %s ' .
-      'secondary Specialties %s';
+        'Computing Pair Buffs for %s/%s Buff Activation %s, '
+      . 'targetType %s ascendingLevel %s primary CovenantLevel %s '
+      . 'primary Specialties %s secondary CovenantLevel %s '
+      . 'secondary Specialties %s';
     $logger->info(sprintf($sprintfTemplate,
       $pair->primary->name,            $pair->secondary->name,
       $buffActivation,                 $route_meta->{generalType},

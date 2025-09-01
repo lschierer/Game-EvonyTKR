@@ -19,6 +19,13 @@ class Game::EvonyTKR::Model::Buff::Value :
 
   field $unit : reader : param //= 'flat';
 
+  method clone {
+    return __CLASS__->new(
+      number => $number,
+      unit   => $unit,
+    );
+  }
+
   method validate() {
     my @errors;
 

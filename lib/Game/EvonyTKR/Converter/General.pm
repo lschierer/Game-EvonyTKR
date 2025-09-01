@@ -150,8 +150,9 @@ class Game::EvonyTKR::Converter::General :
     $raw =~ s/^\s*["']?|["']?\s*$//g if defined $raw;
 
     # Attempt numeric coercion only if it looks right
-    if (defined $raw && $raw =~ /^-?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?$/) {
-      my $num = 0 + $raw;
+    if (defined $raw && $raw =~ /^-?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?$/)
+    {
+      my $num = 0+ $raw;
       return $num;
     }
 
@@ -215,8 +216,8 @@ qr/elementor-element-(?:\w){1,9}.elementor-widget.elementor-widget-theme-post-co
     }
     else {
       for my $i (0 .. $#keys) {
-        my $key     = $keys[$i];
-        my $text    = $paras[$i]->as_trimmed_text;
+        my $key   = $keys[$i];
+        my $text  = $paras[$i]->as_trimmed_text;
         my ($raw) = $text =~ /\Q$key\E\s*:\s*(\S+)/i;
         my $value = clean_number($raw, $key);
         if (defined $value) {

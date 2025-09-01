@@ -46,6 +46,21 @@ class Game::EvonyTKR::Shared::Constants : isa(Game::EvonyTKR::Model::Logger) {
     $GeneralKeys = \@temp;
   }
 
+  field $GeneralTypes2TroopTypes : reader;
+
+  ADJUST {
+    Readonly::Hash my %temp => {
+      ground_specialist  => 'Ground Troops',
+      mounted_specialist => 'Mounted Troops',
+      ranged_specialist  => 'Ranged Troops',
+      siege_specialist   => 'Siege Machines',
+      mayor              => 'ALL',
+      officer            => 'ALL',
+      wall               => 'ALL',
+    };
+    $GeneralTypes2TroopTypes = \%temp;
+  }
+
   field $TroopTypeValues : reader;
 
   ADJUST {

@@ -107,53 +107,83 @@ class Game::EvonyTKR::Model::General::ConflictGroup::Importer :
 
   method importAndMap() {
     my $group_members = $self->loadGenerals();
-    my $group_links   = $self->loadGroupLinkDefinitions();
 
-    my %part_index;    # key = part value, value = [ group keys... ]
-
-    # First, index all parts of all groups
+    my %index;    # "$primary|$action" => [ group_names... ]
     foreach my $group_name (keys %$group_members) {
-      my @parts = split /-/, $group_name;
-      for my $part (@parts) {
-        push @{ $part_index{$part} }, $group_name;
+      next unless defined $group_name && $group_name =~ /\S/;
+      my ($primaries, $action) = $self->_primaries_and_action($group_name);
+      next unless @$primaries && length $action;
+
+      for my $p (@$primaries) {
+        push @{ $index{"$p|$action"} }, $group_name;
       }
     }
 
     foreach my $group_name (keys %$group_members) {
-      my @parts = split /-/, $group_name;
+      my ($primaries, $action) = $self->_primaries_and_action($group_name);
       my %linked;
-      my $uuid    = $self->_generate_uuid($group_name);
-      my @members = @{ $group_members->{$group_name} };
 
-      $self->logger->debug("Checking $group_name parts: @parts");
-
-      # Check for conflicts based on any matching part, regardless of position
-      for my $part (@parts) {
-        my $linked_groups = $part_index{$part} // [];
-        $self->logger->debug("  Part = $part, linked → @$linked_groups");
-
-        foreach my $conflict (@$linked_groups) {
-          next if $conflict eq $group_name;
-          $self->logger->debug("    Linked: $group_name ↔ $conflict");
-          $linked{$conflict} = 1;
+      for my $p (@$primaries) {
+        my $bucket = $index{"$p|$action"} // [];
+        for my $other (@$bucket) {
+          next if $other eq $group_name;
+          $linked{$other} = 1;
         }
       }
 
+      my $uuid         = $self->_generate_uuid($group_name);
+      my @members      = @{ $group_members->{$group_name} // [] };
       my @linked_uuids = map { $self->_generate_uuid($_) } sort keys %linked;
 
-      my $conflict = {
+      $conflictGroups->{$group_name} = {
         id      => $uuid,
         name    => $group_name,
         members => \@members,
         others  => \@linked_uuids,
       };
-
-      $conflictGroups->{$group_name} = $conflict;
     }
 
     $self->logger->info(
       "Generated " . scalar(keys %{$conflictGroups}) . " conflict groups");
     return $conflictGroups;
+  }
+
+  method _primaries_and_action ($group_name) {
+    my @parts      = split /-/, $group_name;
+    my $action_raw = @parts ? $parts[-1] : '';
+    my $action     = $self->_normalize_action($action_raw);
+
+    my @primaries;
+    if (@parts) {
+      # First segment may be 'MT', 'MT1M', or 'MT&GR', 'MT1M&GR2X', etc
+      my @raws = split /&/, $parts[0];
+      for my $r (@raws) {
+        my $norm = $self->_normalize_primary($r);
+        push @primaries, $norm if defined $norm;
+      }
+    }
+
+    # dedupe and sort for stable keys
+    my %seen;
+    @primaries = grep { !$seen{$_}++ } @primaries;
+    @primaries = sort @primaries;
+
+    return (\@primaries, $action);
+  }
+
+  method _normalize_primary ($p) {
+    return 'GR' if $p =~ /^GR/i;    # GR, GR1X, GR-anything → GR
+    return 'RA' if $p =~ /^RA/i;    # RA*, RA1M, etc. → RA
+    return 'MT' if $p =~ /^MT/i;    # MT*, MT1M, etc. → MT
+    return 'SG' if $p =~ /^SG/i;    # SG* → SG
+    return undef;
+  }
+
+  method _normalize_action ($a) {
+  # Keep your canonical action codes here. If you have synonyms, normalize them.
+  # Examples:
+  # return 'wBM' if $a eq 'wMA'; # if you decide wMA ≡ monsters context
+    return $a;    # as-is for now
   }
 
   method normalize_name ($raw_name, $original = '') {

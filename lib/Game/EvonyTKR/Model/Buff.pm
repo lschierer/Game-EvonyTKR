@@ -33,8 +33,43 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Shared::Constants) {
 
   field $passive : reader : writer : param //= 0;
 
+  field $DISABLED : reader : writer = 0;
+
+  # --- deep clone that preserves scalar/array/undef type ---
+  method clone {
+    my $copy = __CLASS__->new(
+      attribute        => $attribute,
+      debuffConditions => [$debuffConditions ? @$debuffConditions : ()],
+      buffConditions   => [$buffConditions   ? @$buffConditions   : ()],
+      passive          => $passive,
+      value            => $value->clone,
+    );
+
+    if (!defined $targetedType) {
+      $copy->set_target(undef);
+    }
+    elsif (ref($targetedType) eq 'ARRAY') {
+      $copy->set_target([$targetedType->@*]);
+    }
+    else {
+      $copy->set_target($targetedType);    # scalar
+    }
+
+    return $copy;
+  }
+
+  my method _normalize_target ($s) {
+    return '' unless defined $s;
+    $s =~ s/'s\b//g;
+    my @letters = ($s =~ /\b([A-Za-z])/g);
+    my $abbr    = uc join('', @letters);     # "Mounted Troops" -> "MT", etc.
+        # Map to canonical troop codes if you prefer:
+        # return 'RA' if $abbr eq 'RT'; # etc.
+    return $abbr;
+  }
+
   method conditions() {
-    my @result;
+    my @result = ();
 
     # Check if debuffConditions exists and is an array reference
     if (defined $self->debuffConditions()
@@ -48,17 +83,29 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Shared::Constants) {
       push @result, @{ $self->buffConditions() };
     }
 
-    return @result;
+    return \@result;
   }
 
   method set_target ($tt) {
+    return unless defined($tt);
     if (any { $_ eq $tt } values %{ $self->TroopTypeValues }) {
+      if(defined($targetedType)) {
+        $self->logger->warn(sprintf('warning, overwriting existing value "%s" with "%s"',
+        $targetedType, $tt));
+      }
       $targetedType = $tt;
     }
   }
 
   method set_condition ($condition) {
     my $logger = $self->logger();
+
+    if ($attribute eq 'March Size') {
+      # march size *cannot* take a condition
+      $self->logger->debug(
+        'skipping non-operative conditon on March Size attribute');
+      return 1;
+    }
 
     # Check if the condition is a valid buff condition
     if (any { $condition eq $_ } keys %{ $self->BuffConditionValues }) {
@@ -301,7 +348,7 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Shared::Constants) {
     return 1;
   }
 
-  sub from_hash ($self, $hashref) {
+  sub from_hash ($self, $hashref, $logger) {
     my $v = Game::EvonyTKR::Model::Buff::Value->new(
       number => abs($hashref->{value}->{number}),
       unit   => $hashref->{value}->{unit} // 'percentage',
@@ -312,9 +359,12 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Shared::Constants) {
       value     => $v,
     );
     if (exists $hashref->{targetedType}) {
+      $logger->debug(
+        'found targetedType in hashref: ' . $hashref->{targetedType});
       $r->set_target($hashref->{targetedType});
     }
     if (exists $hashref->{troop}) {
+      $logger->debug('found troop in hashref: ' . $hashref->{troop});
       $r->set_target($hashref->{troop});
     }
     if (exists $hashref->{condition}) {
@@ -332,25 +382,26 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Shared::Constants) {
 
   method to_hash {
     my $c;
-    my $conditionCount = scalar $self->conditions();
+    my $conditionCount = scalar @{ $self->conditions() };
     $self->logger()->debug("in to_hash, I have $conditionCount conditions");
+    my $rc;
     if ($conditionCount) {
-      my @rc = $self->conditions();
-      $c = \@rc;
+      $rc = $self->conditions();
     }
     else {
       $c = [];
     }
-    return {
-      attribute => $attribute,
-      value     => {
-        number => $value->number(),
-        unit   => $value->unit(),
+    my $r = {
+      attribute     => $attribute,
+      value         => {
+        number      => $value->number(),
+        unit        => $value->unit(),
       },
-      passive      => $passive,
-      targetedType => length($targetedType) > 0 ? $targetedType : '',
-      conditions   => $c,
+      passive       => $passive,
+      targetedType  => $targetedType,
+      conditions    => $rc,
     };
+    return $r;
   }
 
   method TO_JSON {

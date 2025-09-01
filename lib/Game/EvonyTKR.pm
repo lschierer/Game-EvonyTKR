@@ -21,11 +21,11 @@ package Game::EvonyTKR {
 
   sub startup ($self) {
 
-    my $config = $self->plugin('NotYAMLConfig' => { module => 'YAML::PP' });
+    my $config  = $self->plugin('NotYAMLConfig' => { module => 'YAML::PP' });
     my $distDir = dist_dir('Game::EvonyTKR');
-    my $mode         = $self->mode;
-    $self->config(distDir        => $distDir);
-    my $home    = Mojo::Home->new->detect;
+    my $mode    = $self->mode;
+    $self->config(distDir => $distDir);
+    my $home = Mojo::Home->new->detect;
 
     # Template and static paths
     push @{ $self->renderer->paths }, $distDir->child('templates')->to_string;
@@ -40,8 +40,7 @@ package Game::EvonyTKR {
 
     # Logging setup
 
-
-    my $lc = Game::EvonyTKR::Logger::Config->new('Game-EvonyTKR');
+    my $lc              = Game::EvonyTKR::Logger::Config->new('Game-EvonyTKR');
     my $log4perl_logger = $lc->init($mode);
     my $app_log         = Game::EvonyTKR::Logger::MojoLog4Perl->new(
       l4p => Log::Log4perl->get_logger('Game-EvonyTKR'),);

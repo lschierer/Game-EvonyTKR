@@ -7,6 +7,8 @@ require Game::EvonyTKR::Model::Buff;
 require Game::EvonyTKR::Model::Buff::Value;
 require Game::EvonyTKR::Model::Buff::Matcher;
 require JSON::PP;
+require Sereal::Encoder;
+require Sereal::Decoder;
 use namespace::clean;
 
 class Game::EvonyTKR::Model::Book : isa(Game::EvonyTKR::Shared::Constants) {
@@ -20,8 +22,17 @@ class Game::EvonyTKR::Model::Book : isa(Game::EvonyTKR::Shared::Constants) {
     'fallback' => 0;
 
   field $name : reader : param;
-  field $buff : reader = [];
+  field $buff = [];
   field $text : reader : param //= '';
+  state $ENC = Sereal::Encoder->new({ snappy => 1 });
+  state $DEC = Sereal::Decoder->new({});
+
+  method buff {
+    #my $out;
+    #$DEC->decode($ENC->encode($buff), $out);
+    #return $out;
+    return [$buff->@*];
+  }
 
   method get_buffs (
     $attribute, $matching_type,
@@ -121,14 +132,6 @@ class Game::EvonyTKR::Model::Book : isa(Game::EvonyTKR::Shared::Constants) {
     else {
       $self->logger->warn("Not adding buff: not an object (reftype=$reftype)");
     }
-  }
-
-  method getBuffs {
-    if (!defined $buff) {
-      $self->logger->warn("getBuffs: buff is undefined in book $name");
-      return [];
-    }
-    return $buff;
   }
 
   method to_hash {

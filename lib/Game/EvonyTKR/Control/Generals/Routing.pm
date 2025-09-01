@@ -43,15 +43,15 @@ class Game::EvonyTKR::Control::Generals::Routing :
   method has_route ($uiTarget, $buffActivation) {
     my $slug_ui   = $self->_slugify($uiTarget);
     my $slug_buff = $self->_slugify($buffActivation);
-    my $key = "$slug_ui|$slug_buff";
+    my $key       = "$slug_ui|$slug_buff";
     return exists $validRoutes->{$key};
   }
 
   method try_lookup_route ($uiTarget, $buffActivation) {
     my $slug_ui   = $self->_slugify($uiTarget);
     my $slug_buff = $self->_slugify($buffActivation);
-    my $key = "$slug_ui|$slug_buff";
-    return $validRoutes->{$key}; # undef if missing; NO croak
+    my $key       = "$slug_ui|$slug_buff";
+    return $validRoutes->{$key};    # undef if missing; NO croak
   }
 
   method lookup_route ($slug_ui, $slug_buff,) {

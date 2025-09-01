@@ -94,7 +94,7 @@ class Game::EvonyTKR::Model::Book::Manager :
         sprintf('Book %s has %s buffs in YAML', $name, scalar @buffs));
 
       foreach my $ob (@buffs) {
-        my $b = Game::EvonyTKR::Model::Buff->from_hash($ob);
+        my $b = Game::EvonyTKR::Model::Buff->from_hash($ob, $self->logger);
         $books->{$name}->addBuff($b);
       }
 

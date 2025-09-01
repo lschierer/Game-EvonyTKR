@@ -36,7 +36,7 @@ class Game::EvonyTKR::Model::General : isa(Game::EvonyTKR::Shared::Constants) {
 
   field $builtInBookName : reader : param;
 
-  field $builtInBook : reader = undef;
+  field $builtInBook : reader : writer = undef;
 
   field $specialtyNames : reader : param;
 

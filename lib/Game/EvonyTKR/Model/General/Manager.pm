@@ -94,7 +94,8 @@ class Game::EvonyTKR::Model::General::Manager :
         );
         $generals->{$name}->basicAttributes->setAttribute($baKey, $ba);
       }
-
+      $self->logger->debug(
+        sprintf('%s successfully imported', $generals->{$name}->name));
     }
     my $countImported = scalar keys %$generals;
     $self->logger->info(

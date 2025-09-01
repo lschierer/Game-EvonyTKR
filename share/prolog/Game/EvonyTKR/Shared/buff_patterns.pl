@@ -205,10 +205,10 @@ buff_pattern(Buffs) -->
   {extract_value(ValueAtom2,Value2)},
   {
     Buffs = [
-      buff(Attr1a, Troop1, Value1, []),
-      buff(Attr1b, Troop1, Value1, []),
-      buff(Attr1c, Troop1, Value1, []),
-      buff(Attr2, '', Value2, [])
+      buff(Attr1a, Troop1, Value1, [Cond2]),
+      buff(Attr1b, Troop1, Value1, [Cond2]),
+      buff(Attr1c, Troop1, Value1, [Cond2]),
+      buff(Attr2, '', Value2, [Cond2])
     ]
   },
   {format("DEBUG: '1T3A1Vand1AVC' matched: '~w'~n", [Buffs])}.
@@ -411,8 +411,8 @@ buff_pattern(Buffs) -->
   {extract_value(ValueAtom2,Value2)},
   {
     Buffs = [
-      buff(Attr1,  Troop1a, Value1, [Cond1]),
-      buff(Attr1,  Troop1b, Value1, [Cond1]),
+      buff(Attr1,  Troop1a, Value1, [Cond1, Cond2]),
+      buff(Attr1,  Troop1b, Value1, [Cond1, Cond2]),
       buff(Attr2,  Troop2a, Value2, [Cond2]),
       buff(Attr2,  Troop2b, Value2, [Cond2])
     ]
@@ -433,8 +433,8 @@ buff_pattern(Buffs) -->
   {extract_value(ValueAtom2,Value2)},
   {
     Buffs = [
-      buff(Attr1a,  Troop1, Value1, [Cond1]),
-      buff(Attr1b,  Troop1, Value1, [Cond1]),
+      buff(Attr1a,  Troop1, Value1, [Cond1,Cond2b]),
+      buff(Attr1b,  Troop1, Value1, [Cond1,Cond2b]),
       buff(Attr2,  Troop2, Value2, [Cond2a, Cond2b])
     ]
   },
@@ -455,7 +455,7 @@ buff_pattern(Buffs) -->
   {extract_value(ValueAtom2b,Value2b)},
   {
     Buffs = [
-      buff(Attr1, Troop1, Value1, []),
+      buff(Attr1, Troop1, Value1, [Cond2a,Cond2b]),
       buff(Attr2a, Troop2a, Value2a, [Cond2a,Cond2b]),
       buff(Attr2a, Troop2b, Value2a, [Cond2a,Cond2b]),
       buff(Attr2b, Troop2a, Value2b, [Cond2a,Cond2b]),

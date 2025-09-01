@@ -23,31 +23,17 @@ class Game::EvonyTKR::Model::General::ConflictGroup::Manager :
   field $general_to_groups_index = {};
 
   field $totalConflicts = {
-    'March Size Increase'  => ['27c65eef-7ae7-5192-9320-23721fc16d1b',],
-    "Mounted Troop Attack" => [
-      '1e4a92f6-39e4-5fae-a150-158442b1b93e',
-      '51ab85e0-906f-5c75-b31d-b89613933fb8',
-    ],
-    'Monster Mounted Attack Increase' => [
-      '9c236ce6-4506-5a99-bcb5-5ae2da859cae',
-      'bf61cd9f-20ee-5fbc-8556-cad7e9219ae2',
-      'c4216fa6-2ff1-5876-89c1-0de34fab0125',
-      'd563fe9f-ed0c-56cb-8322-dc1645fe7c42',
-      'e69ef6f5-0a56-5510-b2a7-53fa238e2142',
-      'fd591957-81e8-5881-97f4-e9e8778662f9',
-    ],
+    'March Size Increase'  => ['c0dc4005-17cb-5904-b92c-8a2159ea486e',],
+    "Mounted Troop Attack" => ['7a1d0650-ea3c-5ef7-9a56-5475979c3b09',],
+    'Monster Mounted Attack Increase' =>
+      ['7a1d0650-ea3c-5ef7-9a56-5475979c3b09',],
     'March Speed Increase Skill' => [],
   };
 
   field $partialConflcits = {
     'Increase Double Drop from Monsters' => [],
-    'March Size Increase'                => [
-      '49334784-699a-5074-885e-837068986e97',
-      '54e76995-987c-5006-b7b1-93b4733b67fe',
-      'ba1d667a-3be2-5f7c-8e1d-215200e76209',
-      '905cd852-5ded-5d02-8f10-57e0054a48bd'
-    ],
-    "Mounted Troop Attack" => [],
+    'March Size Increase'  => ['b54dd5f0-bd21-5551-9c96-21cf5e8fc345',],
+    "Mounted Troop Attack" => ['',],
     'Mounted Troop HP'     => ['e69ef6f5-0a56-5510-b2a7-53fa238e2142',],
   };
 

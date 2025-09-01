@@ -17,7 +17,6 @@ package Game::EvonyTKR::Plugins::Markdown {
     qw(commonmark alerts attributes autolink_bare_uris footnotes implicit_header_references pipe_tables raw_html rebase_relative_paths smart gfm_auto_identifiers)
   );
 
-
   sub register ($self, $app, $config) {
     my $logger = Log::Log4perl->get_logger(__PACKAGE__);
     $logger->info(sprintf('initializing %s.', __PACKAGE__));
@@ -31,7 +30,7 @@ package Game::EvonyTKR::Plugins::Markdown {
     );
 
     $app->helper(render_markdown_snippet => \&_render_markdown_snippet);
-    $app->helper(spectrum_formatting => \&SpectrumFormatting);
+    $app->helper(spectrum_formatting     => \&SpectrumFormatting);
 
     $app->helper(
       parse_markdown_frontmatter => sub ($c, $file_path) {
@@ -102,7 +101,7 @@ package Game::EvonyTKR::Plugins::Markdown {
 
   sub _render_markdown_snippet ($self, $snippet) {
     my $logger = Log::Log4perl->get_logger(__PACKAGE__);
-    if(not defined $snippet or length($snippet) == 0){
+    if (not defined $snippet or length($snippet) == 0) {
       $logger->warn('snippet must be present!!');
       return '';
     }
@@ -166,7 +165,7 @@ package Game::EvonyTKR::Plugins::Markdown {
       "Template paths: " . join(", ", @{ $c->app->renderer->paths }));
     $logger->debug("Looking for template: $template.html.ep");
 
-    my $parser           = Pandoc->new();
+    my $parser       = Pandoc->new();
     my $html_content = $parser->convert(
       $customCommonMark => 'html',
       $parsedFile->{content}
