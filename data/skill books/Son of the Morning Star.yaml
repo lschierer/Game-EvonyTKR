@@ -1,22 +1,19 @@
 ---
 buffs:
-- attribute: March Size
-  conditions:
-  - leading the army
-  - Attacking
-  passive: 0
-  value:
-    number: 10
-    unit: percentage
-- attribute: Attack
-  conditions:
-  - leading the army
-  - Attacking
-  passive: 0
-  targetedType: Mounted Troops
-  value:
-    number: 40
-    unit: percentage
+  - attribute: March Size
+    passive: 0
+    value:
+      number: 10
+      unit: percentage
+  - attribute: Attack
+    conditions:
+      - leading the army
+      - Attacking
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 40
+      unit: percentage
 name: Son of the Morning Star
 text: >-
   Increases the March Size by 10% and mounted troops' attack by 40% when General is leading the army to attack.

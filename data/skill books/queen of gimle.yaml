@@ -16,6 +16,5 @@ buffs:
     value:
       number: 40
   - attribute: March Size
-    troop: ''
     value:
       number: 8
