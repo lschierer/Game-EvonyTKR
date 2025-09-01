@@ -16,8 +16,6 @@ buffs:
       number: 45
       unit: percentage
   - attribute: March Size
-    conditions:
-      - Attacking
     value:
       number: 8
       unit: percentage

@@ -1,0 +1,10 @@
+name: Atrophy
+text: >-
+  Reduces enemy troops' attack by 15% when General is leading the army
+buffs:
+  - attribute: Attack
+    value:
+      number: 15
+    conditions:
+      - Enemy
+      - leading the army
