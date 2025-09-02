@@ -21,6 +21,7 @@ my $collection_dir = $dist_dir->child("collections/data");
 
 
 require Game::EvonyTKR::Model::General::Conflict;
+require Game::EvonyTKR::Model::General::Conflict::Book;
 
 # Manager setup
 my $RootManager = Game::EvonyTKR::Model::EvonyTKR::Manager->new(SourceDir => $dist_dir);
@@ -31,6 +32,7 @@ my @generals = values %{ $RootManager->generalManager->get_all_generals() };
 $logger->debug(sprintf('retrieved %s generals from manager', scalar(@generals)));
 
 $RootManager->bookManager->importAll($collection_dir->child('skill books'));
+$RootManager->bookManager->importAll($collection_dir->child('generic books'));
 my @books = $RootManager->bookManager->get_all_books->@*;
 
 my $conflicts = Game::EvonyTKR::Model::General::Conflict->new(
@@ -131,6 +133,23 @@ ok(are_generals_compatible_either_role($Louis, $Marcus), 'Louis IX/Marcus Agripp
 ok(are_generals_compatible_either_role($Louis, $KA), 'Louis IX/King Arthur work');
 ok(are_generals_compatible_either_role($Louis, $Douglas), 'Louis IX/Douglas work');
 done_testing();
+};
+
+my $bc = Game::EvonyTKR::Model::General::Conflict::Book->new(
+  rootManager => $RootManager,
+);
+
+my $l4ra = $RootManager->bookManager->getBook('Level 4 Ranged Troop Attack');
+
+subtest 'Books ready for testing' => sub {
+isa_ok($l4ra, ['Game::EvonyTKR::Model::Book'], sprintf('%s is a ::Model::Book', 'Level 4 Ranged Troop Attack'));
+
+done_testing();
+};
+
+subtest 'Partial Conflicts with Books' => sub {
+  ok($bc->is_general_and_book_compatible($Elektra, $l4ra, { same_side => 1,}), 'Elektra and L4 Ranged Troop Attack work');
+  done_testing();
 };
 
 done_testing();

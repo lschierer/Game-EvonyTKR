@@ -4,6 +4,7 @@ use utf8::all;
 use File::FindLib 'lib';
 require Data::Printer;
 require Game::EvonyTKR::Model::Buff::Value;
+require Game::EvonyTKR::Model::General::Conflict::Book;
 require JSON::PP;
 
 class Game::EvonyTKR::Model::Buff::Summarizer :
@@ -23,6 +24,9 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
 
   # Input parameters
   field $rootManager    : param;
+  field $bc = Game::EvonyTKR::Model::General::Conflict::Book->new(
+    rootManager => $rootManager,
+  );
   field $general        : param;
   field $isPrimary      : reader : param //= 1;
   field $targetType     : reader : param //= '';
@@ -271,9 +275,9 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
     if ($isPrimary) {
       my $standardSkill = $self->getStandardSkillValue($attribute, $buffType);
       $total += $standardSkill;
-      $self->logger->debug(
-"adding standard skillbook value $standardSkill for attribute $attribute and buff type $buffType."
-      );
+      $self->logger->debug(sprintf(
+      'adding standard skillbook value %s  for attribute %s  and buff type %s',
+      $standardSkill, $attribute, $buffType));
     }
 
     # Add buff values from various sources
@@ -288,35 +292,41 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
   method getStandardSkillValue($attribute, $troopType) {
     my $total = 0;
     my $tt    = $troopType =~ s/ Troops$//r;    # Remove " Troops" suffix
-    if (
-      $attribute eq 'March Size'
-      && $rootManager->generalConflictGroupManager->is_book_compatible(
-        'March Size Increase',
-        $general->name
-      )
-    ) {
-      $total += 12;
+    if ($attribute eq 'March Size') {
+      my $MS = $rootManager->bookManager->getBook('Level 4 March Size');
+      if($bc->is_general_and_book_compatible($general, $MS, { same_side => 1,})){
+        $total += 12;
+      }
     }
     elsif ($attribute =~ /(Attack|Defense|HP)/) {
 
-      if (
-        $troopType ne 'Overall'
-        && $rootManager->generalConflictGroupManager->is_book_compatible(
-          "$tt $attribute Increase",
-          $general->name
-        )
-      ) {
-        $total += 25;
+      if ($troopType ne 'Overall') {
+        my $btt = $tt;
+        $btt =~ s/(Ranged|Ground|Mounted)/$1 Troop/;
+        $btt  =~ s/Siege Machines/Siege Machine/;
+        my $book = $rootManager->bookManager->getBook("Level 4 $btt $attribute");
+
+        if($book && $bc->is_general_and_book_compatible($general, $book, { same_side => 1,})){
+          $total += 25;
+        }elsif(!defined($book)) {
+          $self->logger->error(sprintf('no book found for %s',
+          "Level 4 $btt $attribute"));
+        }
       }
     }
     if ($activationType eq 'PvM') {
       if ($attribute =~ /(Attack|Defense|HP)/) {
         if ($troopType ne 'Overall') {
-          if ($rootManager->generalConflictGroupManager->is_book_compatible(
-            "Monster $tt $attribute Increase",
-            $general->name
-          )) {
-            $total += 45;
+          my $btt = $tt =~ s/(Ranged|Ground|Mounted)/$1 Troop/r;
+          $btt = $tt =~ s/Siege Machines/Siege Machine/r;
+          my $book = $rootManager->bookManager->getBook("Level 4 $btt $attribute Against Monsters");
+
+          if($book && $bc->is_general_and_book_compatible($general, $book, { same_side => 1,})){
+            $total += 25;
+          }elsif(!defined($book)) {
+
+            $self->logger->error(sprintf('no book found for %s',
+            "Level 4 $btt $attribute Against Monsters"));
           }
         }
       }

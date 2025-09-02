@@ -13,7 +13,7 @@ class Game::EvonyTKR::Model::General::Conflict :
   use List::AllUtils qw( any none uniq all );
 
   ### input fields
-  field $rootManager : param;
+  field $rootManager : param :reader ;
   field $build_index : param //= 0;
   field $assume_g1_is_main : param : reader : writer //= 1;
 
@@ -26,11 +26,6 @@ class Game::EvonyTKR::Model::General::Conflict :
   field $allow_city_buffs : param : writer //= 0;    # In City / Mayor
   field $allow_wall_buffs : param : writer //= 0;    # Main City Defense
   field $officer_eval     : param : writer //= 0;
-
-  field $generals;
-  ADJUST {
-    $generals = $rootManager->generalManager->get_all_generals;
-  }
 
   state %PASSIVE = ('you own the General' => 1,);
 
@@ -153,8 +148,8 @@ class Game::EvonyTKR::Model::General::Conflict :
   # with overlapping troop scope (besides this exact entry)?
   my method _has_any_group_entry_in_context {
     my ($entry, $side_entries) = @_;
-    my $S  = $entry->{state_key_conflict}     // '';
-    my $As = $entry->{attributes}[0] // '';    # singleton by definition here
+    my $S  = $entry->{state_key_conflict} // '';
+    my $As = $entry->{attributes}[0]      // '';  # singleton by definition here
     return 0 unless $self->&is_triad($As);
 
     for my $x (@{ $side_entries // [] }) {
@@ -202,7 +197,7 @@ class Game::EvonyTKR::Model::General::Conflict :
     return join "\t", sort @c;
   }
 
-   my method _conflict_key_from_entry ($e) {
+  my method _conflict_key_from_entry ($e) {
     my $attrs  = $self->&_join_set(@{ $e->{attributes}    // [] });
     my $troops = $self->&_join_set(@{ $e->{targetedTypes} // [] });
     my $state  = $e->{state_key_conflict} // '';
@@ -249,7 +244,8 @@ class Game::EvonyTKR::Model::General::Conflict :
     # state/unit/value must match to even consider merging
     return 0 if $A->{valueNumber} != $B->{valueNumber};
     return 0 if ($A->{valueUnit} // '') ne ($B->{valueUnit} // '');
-    return 0 if (($A->{state_key_strict} // '') ne ($B->{state_key_strict} // ''));
+    return 0
+      if (($A->{state_key_strict} // '') ne ($B->{state_key_strict} // ''));
 
     my $same_troops =
       $self->&_same_set($A->{targetedTypes}, $B->{targetedTypes});
@@ -382,8 +378,12 @@ class Game::EvonyTKR::Model::General::Conflict :
       }
     }
 
-    my $m1 = $ProcessedGenerals->{ $g1->name }->{$role1} // ($ProcessedGenerals->{ $g1->name }->{$role1} = $self->&build_meta_for($g1, $role1));
-    my $m2 = $ProcessedGenerals->{ $g2->name }->{$role2} // ($ProcessedGenerals->{ $g2->name }->{$role2} = $self->&build_meta_for($g2, $role2));
+    my $m1 = $ProcessedGenerals->{ $g1->name }->{$role1}
+      // ($ProcessedGenerals->{ $g1->name }->{$role1} =
+        $self->&build_meta_for($g1, $role1));
+    my $m2 = $ProcessedGenerals->{ $g2->name }->{$role2}
+      // ($ProcessedGenerals->{ $g2->name }->{$role2} =
+        $self->&build_meta_for($g2, $role2));
     # no overlapping troop classes
 
     $self->logger->debug(sprintf(
@@ -558,8 +558,9 @@ class Game::EvonyTKR::Model::General::Conflict :
                   return 0;
                 }
 
-     # blank vs scoped → your existing “pure single AT” carve-out still applies;
-     # otherwise conflict, same as you had.
+                # blank vs scoped → your existing
+                # “pure single AT” carve-out still applies;
+                # otherwise conflict, same as you had.
                 if ((length($Sg) == 0) ^ (length($Ss) == 0)) {
                   my $blank_is_grp = (length($Sg) == 0);
                   my $blank        = $blank_is_grp ? $grp : $sng;
@@ -631,8 +632,8 @@ class Game::EvonyTKR::Model::General::Conflict :
             if (!$blank1 && $S1 eq $S2) {
               $self->logger->debug('non-triad: same state -> conflict');
               # e1, e2 are the two meta entries you’re currently adjudicating
-              my $bucket_key = $self->_conflict_key_from_entry($e1);
-              $bucket_key ||= $self->_conflict_key_from_entry($e2);
+              my $bucket_key = $self->&_conflict_key_from_entry($e1);
+              $bucket_key ||= $self->&_conflict_key_from_entry($e2);
 
               $self->&_index_group_conflict($bucket_key, $g1->name);
               $self->&_index_group_conflict($bucket_key, $g2->name);
@@ -682,8 +683,8 @@ class Game::EvonyTKR::Model::General::Conflict :
     # reset indexes if re-run
     $groups_by_conflict_type = {};
     $by_general              = {};
-
-    my @gs = sort { $a->name cmp $b->name } values %{ $generals // {} };
+    my $generals = values $rootManager->generalManager->get_all_generals->%*;
+    my @gs = sort { $a->name cmp $b->name } @{ $generals };
     my $N  = @gs;
 
     # cache warm (optional; safe to skip if build_meta_for already caches)
@@ -715,7 +716,7 @@ class Game::EvonyTKR::Model::General::Conflict :
 
   # Call from ADJUST (or expose explicit methods you call in tests)
   ADJUST {
-    $self->&build_conflicts_index() if $build_index;
+    #$self->&build_conflicts_index() if $build_index;
   }
 
 }

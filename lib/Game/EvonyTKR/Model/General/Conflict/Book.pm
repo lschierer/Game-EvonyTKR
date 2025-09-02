@@ -12,7 +12,6 @@ class Game::EvonyTKR::Model::General::Conflict::Book :
   use Carp;
 
   #root manager instance
-  field $rm : param;
 
   field $booknames = [
     "Level 1 Ground Troop Attack Against Monster",
@@ -117,7 +116,7 @@ class Game::EvonyTKR::Model::General::Conflict::Book :
 
   ADJUST {
     foreach my $name (@$booknames) {
-      $books->{$name} = $rm->bookManager->getBook($name);
+      $books->{$name} = $self->rootManager->bookManager->getBook($name);
     }
     lock_hash(%$books);
   }
@@ -217,63 +216,76 @@ class Game::EvonyTKR::Model::General::Conflict::Book :
     return $r;
   }
 
-  method is_general_and_book_compatible($general, $book) {
-    unless (exists $self->ProcessedGenerals->{ $general->name }) {
-      $self->logger->error("General has not been processed for conflicts yet.");
-      return 0;
-    }
-    my $m1 = $self->ProcessedGenerals->{ $general->name };
-    my $m2 = $ProcessedBooks->{ $book->name }
-      // ($ProcessedBooks->{ $book->name } = $self->build_meta_for($book));
+  # 0=conflict, 1=partial (same-side only), 2=compatible
+  # returns 0 (conflict), 1 (partial), or 2 (compatible)
+  # 0=conflict, 1=partial (same-side only), 2=compatible
+  my method _score_book_hit ($ge, $be, $same_side) {
+    my $attr = $be->{attributes}[0] // '';
+    return 2 unless List::AllUtils::any { $_ eq $attr } @{ $ge->{attributes} // [] };
+    return 2 unless $self->_intersect($ge->{targetedTypes}, $be->{targetedTypes});
 
-    # Quick reject: if book is troop-scoped and there’s no overlap at all
+    # Condless attributes (MS/SP/SC/DD) keep your existing behavior:
+    if ($be->{is_condless}) {
+      return ($same_side && $self->is_stackable_same_side($attr, ''))
+        ? 1  # partial: stacks on same side
+        : 0; # conflict otherwise
+    }
+
+    # Pick the proper state keys:
+    my $Sg = $same_side ? ($ge->{state_key_strict}   // '')
+                        : ($ge->{state_key_conflict} // '');
+    my $Sb = $same_side ? ($be->{state_key_strict}   // '')
+                        : ($be->{state_key_conflict} // '');
+
+    my $blank_g = (length($Sg) == 0);
+    my $blank_b = (length($Sb) == 0);
+
+    # Non-condless, triad-like behavior:
+    # - both blank => conflict
+    return 0 if ($blank_g && $blank_b);
+
+    # - both non-blank and equal => conflict
+    return 0 if (!$blank_g && !$blank_b && $Sg eq $Sb);
+
+    # - blank vs non-blank => compatible
+    return 2 if ($blank_g ^ $blank_b);
+
+    # - different non-blank states => compatible
+    return 2;
+  }
+
+  # Main entry: returns 0/1/2 overall (min across all pairs)
+  method is_general_and_book_compatible ($general, $book, $opts) {
+    my $same_side = $opts->{same_side} // 0;
+
+    $self->logger->debug(sprintf('comparing %s with %s and opts %s',
+    $general->name, $book->name, Data::Printer::np($opts, multiline => 0)));
+
+    my $pg = $self->ProcessedGenerals->{$general->name}
+      or return 0; # or throw; general not preprocessed
+
+    my $m1 = $pg->{conflict} // $pg;
+    my $m2 = $ProcessedBooks->{$book->name} //= $self->build_meta_for($book);
+
+    $self->logger->debug(sprintf('meta for general %s is %s',
+    $general->name, Data::Printer::np($m1)));
+    $self->logger->debug(sprintf('meta for book %s is %s',
+    $book->name, Data::Printer::np($m2)));
+
+    # If book is troop-scoped but has no overlap with general at all, it's compatible.
     if ($m2->{prim_mask} && !($m1->{prim_mask} & $m2->{prim_mask})) {
-      return 1;    # compatible
+      return 2;
     }
 
-    # Compare each entry; book entries are singletons (no “packages”)
-    for my $e1 (@{ $m1->{meta_buffs} // [] }) {
-      for my $eb (@{ $m2->{meta_buffs} // [] }) {
-        # 1) attribute must match
-        my $book_attr = $eb->{attributes}[0] // '';
-        next
-          unless List::AllUtils::any { $_ eq $book_attr }
-        @{ $e1->{attributes} // [] };
-
-        # 2) condless (MS/SP/SC/DD) -> conflict on attribute match alone
-        if ($eb->{is_condless}) {
-          $self->logger->debug(
-            "Book <$book_attr> (condless) conflicts with $general->{name}");
-          return 0;
-        }
-
-        # 3) troop overlap (for troop-scoped books)
-        next
-          unless $self->_intersect($e1->{targetedTypes}, $eb->{targetedTypes});
-
-      # 4) state interplay
-      # Your meta already strips 'leading the army', so books are usually blank.
-        my $S1 = $e1->{state_key} // '';
-        my $S2 = $eb->{state_key} // '';
-
-        my $blank1 = (length($S1) == 0);
-        my $blank2 = (length($S2) == 0);
-
-        # Same rules for triad and non-triad here (books are singletons):
-        # - both blank -> conflict
-        # - same non-blank -> conflict
-        # - blank vs non-blank -> conflict
-        # - different non-blank -> allow
-        return 0 if ($blank1  && $blank2);
-        return 0 if (!$blank1 && !$blank2 && $S1 eq $S2);
-        return 0 if ($blank1 ^ $blank2);
-
-        # else: different non-blank states → compatible for this pair
+    my $best = 2; # start fully compatible
+    for my $ge (@{ $m1->{meta_buffs} // [] }) {
+      for my $be (@{ $m2->{meta_buffs} // [] }) {
+        my $score = $self->&_score_book_hit($ge, $be, $same_side);
+        $best = $score if $score < $best;  # 0 beats 1 beats 2
+        return 0 if $best == 0;            # short-circuit on hard conflict
       }
     }
-
-    return 1;    # no collisions found
-
+    return $best;  # 1=partial, 2=compatible
   }
 
 }
