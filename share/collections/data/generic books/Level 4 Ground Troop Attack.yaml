@@ -1,0 +1,8 @@
+name: Level 4 Ground Troop Attack
+text: Increases Ground Troop by 25% when General is leading the army.
+buffs:
+  - attribute: Attack
+    targetedType: Ground Troops
+    value:
+      number: 25
+      unit: percentage

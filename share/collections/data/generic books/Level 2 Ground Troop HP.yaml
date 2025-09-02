@@ -1,0 +1,8 @@
+name: Level 2 Ground Troop HP
+text: Increases Ground Troop by 15% when General is leading the army.
+buffs:
+  - attribute: HP
+    targetedType: Ground Troops
+    value:
+      number: 15
+      unit: percentage

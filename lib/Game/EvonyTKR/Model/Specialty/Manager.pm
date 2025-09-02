@@ -85,7 +85,7 @@ class Game::EvonyTKR::Model::Specialty::Manager :
           @buffs = @{ $ol->{buffs} };
         }
         foreach my $ob (@buffs) {
-          my $b = Game::EvonyTKR::Model::Buff->from_hash($ob);
+          my $b = Game::EvonyTKR::Model::Buff->from_hash($ob, $self->logger);
           $specialties->{$name}->addBuff($level, $b);
         }
       }

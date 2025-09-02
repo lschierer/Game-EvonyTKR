@@ -1,0 +1,8 @@
+name: Level 4 Ground Troop Defense
+text: Increases Ground Troop by 25% when General is leading the army.
+buffs:
+  - attribute: Defense
+    targetedType: Ground Troops
+    value:
+      number: 25
+      unit: percentage

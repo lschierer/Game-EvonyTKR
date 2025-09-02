@@ -89,9 +89,11 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Shared::Constants) {
   method set_target ($tt) {
     return unless defined($tt);
     if (any { $_ eq $tt } values %{ $self->TroopTypeValues }) {
-      if(defined($targetedType)) {
-        $self->logger->warn(sprintf('warning, overwriting existing value "%s" with "%s"',
-        $targetedType, $tt));
+      if (defined($targetedType)) {
+        $self->logger->warn(sprintf(
+          'warning, overwriting existing value "%s" with "%s"',
+          $targetedType, $tt
+        ));
       }
       $targetedType = $tt;
     }
@@ -392,14 +394,14 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Shared::Constants) {
       $c = [];
     }
     my $r = {
-      attribute     => $attribute,
-      value         => {
-        number      => $value->number(),
-        unit        => $value->unit(),
+      attribute => $attribute,
+      value     => {
+        number => $value->number(),
+        unit   => $value->unit(),
       },
-      passive       => $passive,
-      targetedType  => $targetedType,
-      conditions    => $rc,
+      passive      => $passive,
+      targetedType => $targetedType,
+      conditions   => $rc,
     };
     return $r;
   }

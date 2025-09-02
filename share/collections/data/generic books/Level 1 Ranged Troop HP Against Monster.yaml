@@ -1,0 +1,8 @@
+name: Level 1 Ranged Troop HP Against Monster
+text: Increases Ranged Troop by 15% when General is leading the army.
+buffs:
+  - attribute: HP
+    targetedType: Ranged Troops
+    value:
+      number: 15
+      unit: percentage

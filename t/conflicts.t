@@ -58,6 +58,7 @@ my $Elektra     = $RootManager->generalManager->getGeneral('Elektra');
 my $Franz       = $RootManager->generalManager->getGeneral('Franz Joseph I');
 my $Douglas     = $RootManager->generalManager->getGeneral('Douglas');
 my $Marcus      = $RootManager->generalManager->getGeneral('Marcus Agrippa');
+my $Louis       = $RootManager->generalManager->getGeneral('Louis IX');
 
 subtest 'All Generals have types to test against' => sub {
   for my $g (values %{ $RootManager->generalManager->get_all_generals }) {
@@ -87,6 +88,7 @@ subtest 'Ensure Generals are Pressent for further tests' => sub {
   isa_ok($Franz, ['Game::EvonyTKR::Model::General'], sprintf('%s is a ::Model::General', 'Franz Joseph I'));
   isa_ok($Douglas, ['Game::EvonyTKR::Model::General'], sprintf('%s is a ::Model::General', 'Douglas'));
   isa_ok($Marcus, ['Game::EvonyTKR::Model::General'], sprintf('%s is a ::Model::General', 'Marcus Agrippa'));
+  isa_ok($Louis, ['Game::EvonyTKR::Model::General'], sprintf('%s is a ::Model::General', 'Louis IX'));
 
   done_testing();
 };
@@ -94,36 +96,42 @@ subtest 'Ensure Generals are Pressent for further tests' => sub {
 $conflicts->set_asst_has_dragon(1);
 $conflicts->set_asst_has_spirit(1);
 
-#Washington (Prime) vs Marco Polo → compatible (different actions)
+subtest 'Conflicting Generals' => sub {
 ok(!are_generals_compatible_either_role($AETHEL,$CAESAR), 'Aethelflaed/Ceasar conflict');
-ok(are_generals_compatible_either_role($Cheng,$Haakon), 'Cheng Yaojin/Haakon work');
+ok(!are_generals_compatible_either_role($Douglas,$Marcus), 'Douglas/Marcus Agrippa conflict');
+ok(!are_generals_compatible_either_role($Elektra,$Franz), 'Elektra/Franz Joseph I conflict');
+ok(!are_generals_compatible_either_role($Hermes, $WASH), 'Hermes/Washington Prime conflict');
 ok(!are_generals_compatible_either_role($Hermes,$Barbarossa), 'Hermes/Barbarossa conflict');
 ok(!are_generals_compatible_either_role($Hermes,$Haakon), 'Hermes/Haakon conflict');
 ok(!are_generals_compatible_either_role($Hermes,$KA), 'Hermes/King Arthur conflict');
-ok(!are_generals_compatible_either_role($Hermes, $WASH), 'Hermes/Washington Prime conflict');
 ok(!are_generals_compatible_either_role($Laudon,$Cheng), 'Laudon/Cheng Yaojin conflict');
-ok(are_generals_compatible_either_role($Laudon,$Haakon), 'Laudon/Haakon work');
-ok(are_generals_compatible_either_role($MARCO,$DF), 'Marco Polo/David Farragut work (no overlaping types)');
 ok(!are_generals_compatible_either_role($MARCO,$GO), 'Marco/Gaius Octavius confict');
-ok(are_generals_compatible_either_role($MARCO,$Haakon), 'Marco Polo/Haakon work');
 ok(!are_generals_compatible_either_role($MARCO,$Jayavarman), 'Marco Polo/Jayavarman II conflict');
-ok(are_generals_compatible_either_role($MARCO,$SC), 'Marco/Sun Ce works');
-ok(are_generals_compatible_either_role($MARCO, $WASH, ), 'Marco Polo/Washington Prime work');
 ok(!are_generals_compatible_either_role($WASH, $Barbarossa), 'Washington Prime/Barbarossa conflict');
 ok(!are_generals_compatible_either_role($WASH, $Custer), 'Washington Prime/George A. Custer conflict');
 ok(!are_generals_compatible_either_role($WASH, $KA), 'Washington Prime/King Arthur conflict');
-ok(!are_generals_compatible_either_role($Elektra,$Franz), 'Elektra/Franz Joseph I conflict');
+ok(!are_generals_compatible_either_role($Louis, $Franz), 'Louis IX/Franz Joseph I conflict');
+ok(!are_generals_compatible_either_role($Louis, $Elektra), 'Louis IX/Elektra conflict');
+done_testing();
+};
+
+
+subtest 'Working Pairs' => sub {
+ok(are_generals_compatible_either_role($Cheng,$Haakon), 'Cheng Yaojin/Haakon work');
+ok(are_generals_compatible_either_role($Douglas,$Franz), 'Douglas/Franz Joseph I work');
 ok(are_generals_compatible_either_role($Elektra,$Douglas), 'Elektra/Douglas work');
 ok(are_generals_compatible_either_role($Elektra,$Marcus), 'Elektra/Marcus Agrippa work');
-ok(!are_generals_compatible_either_role($Douglas,$Marcus), 'Douglas/Marcus Agrippa conflict');
-ok(are_generals_compatible_either_role($Douglas,$Franz), 'Douglas/Franz Joseph I work');
+ok(are_generals_compatible_either_role($Laudon,$Haakon), 'Laudon/Haakon work');
+ok(are_generals_compatible_either_role($MARCO, $WASH, ), 'Marco Polo/Washington Prime work');
+ok(are_generals_compatible_either_role($MARCO,$DF), 'Marco Polo/David Farragut work (no overlaping types)');
+ok(are_generals_compatible_either_role($MARCO,$Haakon), 'Marco Polo/Haakon work');
+ok(are_generals_compatible_either_role($MARCO,$SC), 'Marco/Sun Ce works');
 ok(are_generals_compatible_either_role($Marcus,$Franz), 'Marcus Agrippa/Franz Joseph I work');
-
-# Monster-only buff vs no-conditions buff w/ same attr → conflict (rule 3.A)
-#ok( $conflicts->{$GEN1}{ $GEN2 }, 'Scoped conditions vs none can conflict');
-
-# Two different conditions → no conflict (rule 3.B)
-#ok(!$conflicts->{$X}{ $Y }, 'Different conditions do not conflict');
+ok(are_generals_compatible_either_role($Louis, $Marcus), 'Louis IX/Marcus Agrippa work');
+ok(are_generals_compatible_either_role($Louis, $KA), 'Louis IX/King Arthur work');
+ok(are_generals_compatible_either_role($Louis, $Douglas), 'Louis IX/Douglas work');
+done_testing();
+};
 
 done_testing();
 

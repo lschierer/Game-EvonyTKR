@@ -113,7 +113,7 @@ class Game::EvonyTKR::Model::Covenant::Manager :
           @buffs = @{ $oc->{buffs} };
         }
         foreach my $ob (@buffs) {
-          my $b = Game::EvonyTKR::Model::Buff->from_hash($ob);
+          my $b = Game::EvonyTKR::Model::Buff->from_hash($ob, $self->logger);
           $covenants->{$name}->addBuff($category, $b);
         }
       }

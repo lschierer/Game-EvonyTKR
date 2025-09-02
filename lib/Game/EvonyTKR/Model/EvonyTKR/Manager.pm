@@ -45,9 +45,8 @@ class Game::EvonyTKR::Model::EvonyTKR::Manager :
       Game::EvonyTKR::Model::Glossary::Manager->new(SourceDir => $SourceDir,);
 
     $generalPairManager = Game::EvonyTKR::Model::General::Pair::Manager->new(
-      rootManager          => $self,
-      generalManager       => $generalManager,
-      conflictGroupManager => $generalConflictGroupManager
+      rootManager    => $self,
+      generalManager => $generalManager,
     );
 
   }
@@ -69,6 +68,7 @@ class Game::EvonyTKR::Model::EvonyTKR::Manager :
 
     $self->logger->info(" starting import of books.");
     $bookManager->importAll($collectionDir->child('skill books'));
+    $bookManager->importAll($collectionDir->child('generic books'));
     $self->logger->info("import of books complete");
 
     $self->logger->info(" starting import of specialties.");

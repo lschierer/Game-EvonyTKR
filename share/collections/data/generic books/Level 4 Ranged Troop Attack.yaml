@@ -1,0 +1,8 @@
+name: Level 4 Ranged Troop Attack
+text: Increases Ranged Troop by 25% when General is leading the army.
+buffs:
+  - attribute: Attack
+    targetedType: Ranged Troops
+    value:
+      number: 25
+      unit: percentage

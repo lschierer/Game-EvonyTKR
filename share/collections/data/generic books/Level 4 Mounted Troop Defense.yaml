@@ -1,0 +1,8 @@
+name: Level 4 Mounted Troop Defense
+text: Increases Mounted Troop by 25% when General is leading the army.
+buffs:
+  - attribute: Defense
+    targetedType: Mounted Troops
+    value:
+      number: 25
+      unit: percentage

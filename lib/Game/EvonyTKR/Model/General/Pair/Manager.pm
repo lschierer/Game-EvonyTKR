@@ -3,6 +3,7 @@ use experimental qw(class);
 use utf8::all;
 require Data::Printer;
 require Game::EvonyTKR::Model::General::Pair;
+require Game::EvonyTKR::Model::General::Conflict;
 
 class Game::EvonyTKR::Model::General::Pair::Manager :
   isa(Game::EvonyTKR::Shared::Constants) {
@@ -10,9 +11,15 @@ class Game::EvonyTKR::Model::General::Pair::Manager :
     'bool'     => sub { $_[0]->_isTrue() },
     'fallback' => 0;
 
-  field $rootManager          : param;
-  field $generalManager       : param;
-  field $conflictGroupManager : param;
+  field $rootManager    : param;
+  field $generalManager : param;
+  field $conflicts = Game::EvonyTKR::Model::General::Conflict->new(
+    rootManager      => $rootManager,
+    build_index      => 1,
+    asst_has_dragon  => 1,
+    asst_has_spirit  => 1,
+    allow_wall_buffs => 1,
+  );
   field $pairs_by_type = {};    # e.g., { Mounted => [ [genA, genB], ... ] }
 
   method get_pairs_by_type($type) {
@@ -34,7 +41,6 @@ class Game::EvonyTKR::Model::General::Pair::Manager :
 
   method build_pairs() {
     my $generals     = $generalManager->get_all_generals();
-    my $conflicts    = $conflictGroupManager;
     my $generalCount = scalar keys %{$generals};
     $self->logger->debug("building pairs out of $generalCount");
     foreach my $primary (values %{$generals}) {
@@ -45,8 +51,7 @@ class Game::EvonyTKR::Model::General::Pair::Manager :
           $primary->name, $secondary->name
         ));
         next
-          unless $conflicts->are_generals_compatible($primary->name,
-          $secondary->name);
+          unless $conflicts->are_generals_compatible($primary, $secondary);
 
         $self->logger->debug(sprintf(
           'no conflict, testing %s and %s for common type.',

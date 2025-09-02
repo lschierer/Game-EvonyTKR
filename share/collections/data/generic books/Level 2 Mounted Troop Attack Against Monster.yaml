@@ -1,0 +1,8 @@
+name: Level 2 Mounted Troop Attack Against Monster
+text: Increases Mounted Troop by 25% when General is leading the army.
+buffs:
+  - attribute: Attack
+    targetedType: Mounted Troops
+    value:
+      number: 25
+      unit: percentage
