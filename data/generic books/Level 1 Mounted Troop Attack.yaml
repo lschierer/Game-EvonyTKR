@@ -1,0 +1,8 @@
+name: Level 1 Mounted Troop Attack
+text: Increases Mounted Troop by 10% when General is leading the army.
+buffs:
+  - attribute: Attack
+    targetedType: Mounted Troops
+    value:
+      number: 10
+      unit: percentage
