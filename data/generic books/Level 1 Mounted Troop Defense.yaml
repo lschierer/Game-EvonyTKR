@@ -1,0 +1,8 @@
+name: Level 1 Mounted Troop Defense
+text: Increases Mounted Troop by 10% when General is leading the army.
+buffs:
+  - attribute: Defense
+    targetedType: Mounted Troops
+    value:
+      number: 10
+      unit: percentage

@@ -1,0 +1,7 @@
+name: Level 4 March Size
+text: Increases March Size by 12% when General is leading the army.
+buffs:
+  - attribute: March Size
+    value:
+      number: 12
+      unit: percentage

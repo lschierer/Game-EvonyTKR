@@ -1,0 +1,8 @@
+name: Level 1 Ground Troop Defense
+text: Increases Ground Troop by 10% when General is leading the army.
+buffs:
+  - attribute: Defense
+    targetedType: Ground Troops
+    value:
+      number: 10
+      unit: percentage

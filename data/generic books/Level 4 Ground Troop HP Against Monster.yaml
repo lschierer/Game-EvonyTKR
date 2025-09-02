@@ -1,0 +1,8 @@
+name: Level 4 Ground Troop HP Against Monster
+text: Increases Ground Troop by 45% when General is leading the army.
+buffs:
+  - attribute: HP
+    targetedType: Ground Troops
+    value:
+      number: 45
+      unit: percentage

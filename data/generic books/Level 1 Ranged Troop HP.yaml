@@ -1,0 +1,8 @@
+name: Level 1 Ranged Troop HP
+text: Increases Ranged Troop by 10% when General is leading the army.
+buffs:
+  - attribute: HP
+    targetedType: Ranged Troops
+    value:
+      number: 10
+      unit: percentage
