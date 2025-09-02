@@ -33,13 +33,13 @@ function parseArgs(argv: string[]): CliArgs {
 }
 
 async function buildCSS({ outDir, minify }: CliArgs) {
-  const stylesDir = path.resolve('styles');
+  const stylesDir = path.resolve('share/styles');
   const outputDir = path.resolve(outDir);
 
   try {
     const result = await stylelint.lint({
       configFile: 'stylelint.config.js',
-      files: 'styles/*.css',
+      files: 'share/styles/*.css',
       fix: true,
     });
     // do things with result.report, result.errored, and result.results

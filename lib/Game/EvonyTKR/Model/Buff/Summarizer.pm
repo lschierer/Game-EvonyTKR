@@ -4,7 +4,6 @@ use utf8::all;
 use File::FindLib 'lib';
 require Data::Printer;
 require Game::EvonyTKR::Model::Buff::Value;
-require Game::EvonyTKR::Model::General::Conflict::Book;
 require JSON::PP;
 
 class Game::EvonyTKR::Model::Buff::Summarizer :
@@ -24,9 +23,7 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
 
   # Input parameters
   field $rootManager    : param;
-  field $bc = Game::EvonyTKR::Model::General::Conflict::Book->new(
-    rootManager => $rootManager,
-  );
+  field $bc = $rootManager->conflictDetector;
   field $general        : param;
   field $isPrimary      : reader : param //= 1;
   field $targetType     : reader : param //= '';

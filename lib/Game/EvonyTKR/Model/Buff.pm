@@ -89,7 +89,7 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Shared::Constants) {
   method set_target ($tt) {
     return unless defined($tt);
     if (any { $_ eq $tt } values %{ $self->TroopTypeValues }) {
-      if (defined($targetedType)) {
+      if (defined($targetedType) && length($targetedType)) {
         $self->logger->warn(sprintf(
           'warning, overwriting existing value "%s" with "%s"',
           $targetedType, $tt

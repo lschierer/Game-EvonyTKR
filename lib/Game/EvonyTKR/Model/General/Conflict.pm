@@ -89,7 +89,7 @@ class Game::EvonyTKR::Model::General::Conflict :
 
   # ---------- Helpers ----------
 
-  my method _join_set (@xs) {
+  method _join_set (@xs) {
     my %u;
     $u{$_}++ for grep { defined && length } @xs;
     join('+', sort keys %u);
@@ -260,7 +260,7 @@ class Game::EvonyTKR::Model::General::Conflict :
     return 0;
   }
 
-  my method build_meta_for ($general, $role) {
+  method build_meta_for ($general, $role) {
     $self->logger->debug("building meta for " . $general->name);
     my $book = $rootManager->bookManager->getBook($general->builtInBookName)
       or $self->logger->logcroak("Book not found for " . $general->name);
@@ -683,7 +683,8 @@ class Game::EvonyTKR::Model::General::Conflict :
     # reset indexes if re-run
     $groups_by_conflict_type = {};
     $by_general              = {};
-    my $generals = values $rootManager->generalManager->get_all_generals->%*;
+    my $generals;
+    @$generals = values $rootManager->generalManager->get_all_generals->%*;
     my @gs = sort { $a->name cmp $b->name } @{ $generals };
     my $N  = @gs;
 
@@ -716,7 +717,7 @@ class Game::EvonyTKR::Model::General::Conflict :
 
   # Call from ADJUST (or expose explicit methods you call in tests)
   ADJUST {
-    #$self->&build_conflicts_index() if $build_index;
+    $self->&build_conflicts_index() if $build_index;
   }
 
 }

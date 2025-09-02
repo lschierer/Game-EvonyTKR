@@ -27,7 +27,7 @@ import {
 import * as z from 'zod';
 import SpectrumTokensCSS from '@spectrum-css/tokens/dist/index.css' with { type: 'css' };
 import SpectrumProgressBarCSS from '@spectrum-css/progressbar/dist/index.css' with { type: 'css' };
-import GeneralTableCSS from '../css/GeneralTable.css' with { type: 'css' };
+import GeneralTableCSS from '../../share/tmp/css/GeneralTable.css' with { type: 'css' };
 
 // Zod Schemas
 const BasicAttribute = z.object({ base: z.number(), increment: z.number() });

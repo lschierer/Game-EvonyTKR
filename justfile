@@ -11,15 +11,12 @@ prepare:
   mise install
   perl Build.PL
 
-[working-directory: 'share']
 npmdeps:
   pnpm install
-  rm -rf public
-  mkdir -p public/assets
-  mkdir -p public/css
-  mkdir -p public/images
-  mkdir -p public/js
-  mkdir -p public/types
+  rm -rf share/public/js
+  rm -rf share/public/types
+  mkdir -p share/public/js
+  mkdir -p share/public/types
   pnpm build:css
   pnpm build:ts
 
@@ -35,10 +32,9 @@ images:
   rsync -a --delete images/ public/images/
   rsync -a --delete collections/data/images/generals/ public/images/generals/
 
-[working-directory: 'share']
 css: npmdeps images
   pnpm build:css
-  rsync -a --delete ts/css/ public/css/
+  rsync -a --delete share/tmp/css/ share/public/css/
 
 
 build: prepare deps css images

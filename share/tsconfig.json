@@ -9,6 +9,6 @@
     "declarationDir": "./public/types"
   },
   "exclude": ["**/node_modules/**", "**/cdk.out/**"],
-  "include": ["./ts/**/*.ts", "./scripts/*.ts", "./types/*.d.ts"],
+  "include": ["./ts/**/*.ts", "./scripts/*.ts", "./share/types/*.d.ts"],
   "references": [{ "path": "./infrastructure" }]
 }

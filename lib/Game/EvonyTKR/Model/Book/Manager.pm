@@ -100,7 +100,7 @@ class Game::EvonyTKR::Model::Book::Manager :
 
       $self->logger->debug("Finished importing book '$name' with "
           . scalar @{ $books->{$name}->buff }
-          . " buffs");
+          . " buffs: " . Data::Printer::np($books->{$name}, multiline => 0));
     }
     my $countImported = scalar keys %$books;
     $self->logger->info(

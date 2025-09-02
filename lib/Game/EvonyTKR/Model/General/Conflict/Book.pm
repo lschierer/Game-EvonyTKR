@@ -13,115 +13,15 @@ class Game::EvonyTKR::Model::General::Conflict::Book :
 
   #root manager instance
 
-  field $booknames = [
-    "Level 1 Ground Troop Attack Against Monster",
-    "Level 1 Ground Troop Attack",
-    "Level 1 Ground Troop Defense Against Monster",
-    "Level 1 Ground Troop Defense",
-    "Level 1 Ground Troop HP Against Monster",
-    "Level 1 Ground Troop HP",
-    "Level 1 Luck",
-    "Level 1 March Size",
-    "Level 1 Mounted Troop Attack Against Monster",
-    "Level 1 Mounted Troop Attack",
-    "Level 1 Mounted Troop Defense Against Monster",
-    "Level 1 Mounted Troop Defense",
-    "Level 1 Mounted Troop HP Against Monster",
-    "Level 1 Mounted Troop HP",
-    "Level 1 Ranged Troop Attack Against Monster",
-    "Level 1 Ranged Troop Attack",
-    "Level 1 Ranged Troop Defense Against Monster",
-    "Level 1 Ranged Troop Defense",
-    "Level 1 Ranged Troop HP Against Monster",
-    "Level 1 Ranged Troop HP",
-    "Level 1 Siege Machine Attack",
-    "Level 1 Siege Machine Defense",
-    "Level 1 Siege Machine HP",
-    "Level 2 Ground Troop Attack Against Monster",
-    "Level 2 Ground Troop Attack",
-    "Level 2 Ground Troop Defense Against Monster",
-    "Level 2 Ground Troop Defense",
-    "Level 2 Ground Troop HP Against Monster",
-    "Level 2 Ground Troop HP",
-    "Level 2 Luck",
-    "Level 2 March Size",
-    "Level 2 Mounted Troop Attack Against Monster",
-    "Level 2 Mounted Troop Attack",
-    "Level 2 Mounted Troop Defense Against Monster",
-    "Level 2 Mounted Troop Defense",
-    "Level 2 Mounted Troop HP Against Monster",
-    "Level 2 Mounted Troop HP",
-    "Level 2 Ranged Troop Attack Against Monster",
-    "Level 2 Ranged Troop Attack",
-    "Level 2 Ranged Troop Defense Against Monster",
-    "Level 2 Ranged Troop Defense",
-    "Level 2 Ranged Troop HP Against Monster",
-    "Level 2 Ranged Troop HP",
-    "Level 2 Siege Machine Attack",
-    "Level 2 Siege Machine Defense",
-    "Level 2 Siege Machine HP",
-    "Level 3 Ground Troop Attack Against Monster",
-    "Level 3 Ground Troop Attack",
-    "Level 3 Ground Troop Defense Against Monster",
-    "Level 3 Ground Troop Defense",
-    "Level 3 Ground Troop HP Against Monster",
-    "Level 3 Ground Troop HP",
-    "Level 3 Luck",
-    "Level 3 March Size",
-    "Level 3 Mounted Troop Attack Against Monster",
-    "Level 3 Mounted Troop Attack",
-    "Level 3 Mounted Troop Defense Against Monster",
-    "Level 3 Mounted Troop Defense",
-    "Level 3 Mounted Troop HP Against Monster",
-    "Level 3 Mounted Troop HP",
-    "Level 3 Ranged Troop Attack Against Monster",
-    "Level 3 Ranged Troop Attack",
-    "Level 3 Ranged Troop Defense Against Monster",
-    "Level 3 Ranged Troop Defense",
-    "Level 3 Ranged Troop HP Against Monster",
-    "Level 3 Ranged Troop HP",
-    "Level 3 Siege Machine Attack",
-    "Level 3 Siege Machine Defense",
-    "Level 3 Siege Machine HP",
-    "Level 4 Ground Troop Attack Against Monster",
-    "Level 4 Ground Troop Attack",
-    "Level 4 Ground Troop Defense Against Monster",
-    "Level 4 Ground Troop Defense",
-    "Level 4 Ground Troop HP Against Monster",
-    "Level 4 Ground Troop HP",
-    "Level 4 Luck",
-    "Level 4 March Size",
-    "Level 4 Mounted Troop Attack Against Monster",
-    "Level 4 Mounted Troop Attack",
-    "Level 4 Mounted Troop Defense Against Monster",
-    "Level 4 Mounted Troop Defense",
-    "Level 4 Mounted Troop HP Against Monster",
-    "Level 4 Mounted Troop HP",
-    "Level 4 Ranged Troop Attack Against Monster",
-    "Level 4 Ranged Troop Attack",
-    "Level 4 Ranged Troop Defense Against Monster",
-    "Level 4 Ranged Troop Defense",
-    "Level 4 Ranged Troop HP Against Monster",
-    "Level 4 Ranged Troop HP",
-    "Level 4 Siege Machine Attack",
-    "Level 4 Siege Machine Defense",
-    "Level 4 Siege Machine HP",
-  ];
 
-  field $books = {};
 
   field $ProcessedBooks = {};
 
   field $conflicts_by_book_name = {};
 
-  ADJUST {
-    foreach my $name (@$booknames) {
-      $books->{$name} = $self->rootManager->bookManager->getBook($name);
-    }
-    lock_hash(%$books);
-  }
 
-  my method build_meta_for ($book) {
+
+  method build_book_meta_for ($book) {
     $self->logger->debug("building meta for " . $book->name);
 
     my @buffs = $book->buff->@*;    # already-cloned
@@ -144,10 +44,11 @@ class Game::EvonyTKR::Model::General::Conflict::Book :
     # ---- Phase A: merge entries with same TROOP set (union attributes) ----
     my %by_troop;    # key: state|val|unit|troops_string -> entry
     for my $e (@prim) {
-      # Skip non-troop lines (MS/SP/SC/DD) — keep them as is; no troops_string
-      my $troops_s = $e->{targetedTypes_string} // '';
+      # Initialize targetedTypes_string if not present
+      $e->{targetedTypes_string} = $self->_join_set(@{ $e->{targetedTypes} // [] });
+      my $troops_s = $e->{targetedTypes_string};
       my $key      = join('|',
-        ($e->{state_key}   // ''),
+        ($e->{state_key_strict}   // ''),
         ($e->{valueNumber} // 0),
         ($e->{valueUnit}   // ''), $troops_s,);
       if (my $acc = $by_troop{$key}) {
@@ -177,7 +78,7 @@ class Game::EvonyTKR::Model::General::Conflict::Book :
       # Non-troop lines: no troops_string; merge by attributes as is
       my $attrs_s = $e->{attributes_string} // '';
       my $key     = join('|',
-        ($e->{state_key}   // ''),
+        ($e->{state_key_strict}   // ''),
         ($e->{valueNumber} // 0),
         ($e->{valueUnit}   // ''), $attrs_s,);
       if (my $acc = $by_attr{$key}) {
@@ -219,13 +120,24 @@ class Game::EvonyTKR::Model::General::Conflict::Book :
   # 0=conflict, 1=partial (same-side only), 2=compatible
   # returns 0 (conflict), 1 (partial), or 2 (compatible)
   # 0=conflict, 1=partial (same-side only), 2=compatible
-  my method _score_book_hit ($ge, $be, $same_side) {
+  method _score_book_hit ($ge, $be, $same_side, $general_name = '') {
     my $attr = $be->{attributes}[0] // '';
     return 2 unless List::AllUtils::any { $_ eq $attr } @{ $ge->{attributes} // [] };
     return 2 unless $self->_intersect($ge->{targetedTypes}, $be->{targetedTypes});
 
     # Condless attributes (MS/SP/SC/DD) keep your existing behavior:
     if ($be->{is_condless}) {
+      # Special case for March Size: only certain generals can stack it
+      if ($attr eq 'March Size' && $general_name) {
+        # Hardcoded list of generals whose March Size can stack (compound books)
+        my %stackable_march_size_generals = (
+          'George A Custer' => 1,
+          # Add other generals with compound March Size books here
+        );
+        my $can_stack = exists $stackable_march_size_generals{$general_name};
+        return ($same_side && $can_stack) ? 1 : 0;
+      }
+
       return ($same_side && $self->is_stackable_same_side($attr, ''))
         ? 1  # partial: stacks on same side
         : 0; # conflict otherwise
@@ -254,6 +166,17 @@ class Game::EvonyTKR::Model::General::Conflict::Book :
     return 2;
   }
 
+  method is_stackable_same_side ($attr, $state) {
+    # Other stackable attributes (not March Size, which is handled specially)
+    my %stackable = (
+      'MS' => 1,
+      'MARCHING SPEED' => 1,
+      'STAMINA COST' => 1,
+      'DOUBLE ITEMS DROP RATE' => 1,
+    );
+    return exists $stackable{$attr};
+  }
+
   # Main entry: returns 0/1/2 overall (min across all pairs)
   method is_general_and_book_compatible ($general, $book, $opts) {
     my $same_side = $opts->{same_side} // 0;
@@ -261,16 +184,15 @@ class Game::EvonyTKR::Model::General::Conflict::Book :
     $self->logger->debug(sprintf('comparing %s with %s and opts %s',
     $general->name, $book->name, Data::Printer::np($opts, multiline => 0)));
 
-    my $pg = $self->ProcessedGenerals->{$general->name}
-      or return 0; # or throw; general not preprocessed
-
-    my $m1 = $pg->{conflict} // $pg;
-    my $m2 = $ProcessedBooks->{$book->name} //= $self->build_meta_for($book);
+    # Build general meta if not already done
+    my $m1 = $self->ProcessedGenerals->{$general->name}->{main} //=
+      $self->build_meta_for($general, 'main');
+    my $m2 = $ProcessedBooks->{$book->name} //= $self->build_book_meta_for($book);
 
     $self->logger->debug(sprintf('meta for general %s is %s',
-    $general->name, Data::Printer::np($m1)));
+    $general->name, Data::Printer::np($m1, multiline => 1)));
     $self->logger->debug(sprintf('meta for book %s is %s',
-    $book->name, Data::Printer::np($m2)));
+    $book->name, Data::Printer::np($m2, multiline => 1)));
 
     # If book is troop-scoped but has no overlap with general at all, it's compatible.
     if ($m2->{prim_mask} && !($m1->{prim_mask} & $m2->{prim_mask})) {
@@ -280,7 +202,7 @@ class Game::EvonyTKR::Model::General::Conflict::Book :
     my $best = 2; # start fully compatible
     for my $ge (@{ $m1->{meta_buffs} // [] }) {
       for my $be (@{ $m2->{meta_buffs} // [] }) {
-        my $score = $self->&_score_book_hit($ge, $be, $same_side);
+        my $score = $self->_score_book_hit($ge, $be, $same_side, $general->name);
         $best = $score if $score < $best;  # 0 beats 1 beats 2
         return 0 if $best == 0;            # short-circuit on hard conflict
       }

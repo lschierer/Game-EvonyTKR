@@ -2,6 +2,7 @@
   "$schema": "https://json.schemastore.org/tsconfig",
   "extends": "@tsconfig/node22/tsconfig.json",
   "compilerOptions": {
+    "allowImportingTsExtensions": true,
     "esModuleInterop": true,
     "lib": ["ES2023", "DOM", "DOM.Iterable"],
     "module": "ESNext",
@@ -16,15 +17,18 @@
     "useDefineForClassFields": true,
     "isolatedModules": false,
     "forceConsistentCasingInFileNames": true,
-    "types": ["node"],
+    "types": [
+      "node",
+      "./share/types/myGlobals.d.ts",
+      "./share/types/postcss-extend.d.ts"
+    ],
     "noEmit": true,
     "composite": true,
     "rootDir": ".",
     "baseUrl": "./",
-    "outDir": "./public/types",
-    "declarationDir": "./public/types"
+    "outDir": "./share/public/types",
+    "declarationDir": "./share/public/types"
   },
   "exclude": ["**/node_modules/**", "**/cdk.out/**"],
-  "include": ["commitlint.config.js"],
-  "references": [{ "path": "./share" }]
+  "include": ["./lib/**/*.ts", "./scripts/*.ts", "./infrastructure/**/*.ts"]
 }

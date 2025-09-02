@@ -25,3 +25,4 @@ share/infrastructure/cdk.out
 
 *.d.ts.map
 tsconfig.build.tsbuildinfo
+share/tmp

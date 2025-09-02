@@ -3,7 +3,6 @@ use experimental qw(class);
 use utf8::all;
 require Data::Printer;
 require Game::EvonyTKR::Model::General::Pair;
-require Game::EvonyTKR::Model::General::Conflict;
 
 class Game::EvonyTKR::Model::General::Pair::Manager :
   isa(Game::EvonyTKR::Shared::Constants) {
@@ -13,13 +12,7 @@ class Game::EvonyTKR::Model::General::Pair::Manager :
 
   field $rootManager    : param;
   field $generalManager : param;
-  field $conflicts = Game::EvonyTKR::Model::General::Conflict->new(
-    rootManager      => $rootManager,
-    build_index      => 1,
-    asst_has_dragon  => 1,
-    asst_has_spirit  => 1,
-    allow_wall_buffs => 1,
-  );
+  field $conflicts = $rootManager->conflictDetector;
   field $pairs_by_type = {};    # e.g., { Mounted => [ [genA, genB], ... ] }
 
   method get_pairs_by_type($type) {

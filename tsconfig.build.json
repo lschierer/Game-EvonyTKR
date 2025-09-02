@@ -2,10 +2,14 @@
   "$schema": "https://json.schemastore.org/tsconfig",
   "extends": "./tsconfig.json",
   "compilerOptions": {
+    "allowImportingTsExtensions": false,
     "noEmit": false,
     "declaration": true,
     "declarationMap": true,
     "emitDeclarationOnly": true,
+    "outDir": "./share/public/",
+    "declarationDir": "./share/public/types",
     "composite": true
-  }
+  },
+  "include": ["./lib/**/*.ts", "./share/infrastructure/lib/**/*.ts"]
 }

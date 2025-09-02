@@ -1,15 +1,32 @@
 <link rel="stylesheet" href="/css/collectionIndex.css" />
 
 <div class="collection-list">
-  <ul class="collection-grid">
-    <% if ($items && ref $items eq 'HASH'  ) { %>
-      <% foreach my $key (sort {$items->{$a}->name cmp $items->{$b}->name} keys %{ $items} ) { %>
-        <li class="collection-item">
-          <a href="/Reference/Conflict Groups/<%= $key %>/">
-            <%= $items->{$key}->name %>
-          </a>
-        </li>
-      <% } %>
+  <h2>Conflict Groups by Type</h2>
+  <% if ($groups && ref $groups eq 'HASH') { %>
+    <% foreach my $conflict_key (sort keys %{ $groups }) { %>
+      <div class="conflict-group">
+        <h3><%= $conflict_key %></h3>
+        <ul class="general-list">
+          <% foreach my $general_name (sort @{ $groups->{$conflict_key} }) { %>
+            <li><%= $general_name %></li>
+          <% } %>
+        </ul>
+      </div>
     <% } %>
-  </ul>
+  <% } else { %>
+    <p>No conflict groups found.</p>
+  <% } %>
+
+  <h2>Individual Conflicts</h2>
+  <% if ($pairs && ref $pairs eq 'HASH') { %>
+    <ul class="conflict-pairs">
+      <% foreach my $general1 (sort keys %{ $pairs }) { %>
+        <% foreach my $general2 (sort keys %{ $pairs->{$general1} }) { %>
+          <li><%= $general1 %> ↔ <%= $general2 %></li>
+        <% } %>
+      <% } %>
+    </ul>
+  <% } else { %>
+    <p>No individual conflicts found.</p>
+  <% } %>
 </div>

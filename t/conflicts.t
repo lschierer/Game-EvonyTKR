@@ -114,6 +114,7 @@ ok(!are_generals_compatible_either_role($WASH, $Custer), 'Washington Prime/Georg
 ok(!are_generals_compatible_either_role($WASH, $KA), 'Washington Prime/King Arthur conflict');
 ok(!are_generals_compatible_either_role($Louis, $Franz), 'Louis IX/Franz Joseph I conflict');
 ok(!are_generals_compatible_either_role($Louis, $Elektra), 'Louis IX/Elektra conflict');
+ok(!are_generals_compatible_either_role($Jayavarman, $GO), 'Jayavarman II/Gaius Octavius conflict');
 done_testing();
 };
 
@@ -140,15 +141,26 @@ my $bc = Game::EvonyTKR::Model::General::Conflict::Book->new(
 );
 
 my $l4ra = $RootManager->bookManager->getBook('Level 4 Ranged Troop Attack');
+my $l4ms = $RootManager->bookManager->getBook('Level 4 March Size');
 
 subtest 'Books ready for testing' => sub {
 isa_ok($l4ra, ['Game::EvonyTKR::Model::Book'], sprintf('%s is a ::Model::Book', 'Level 4 Ranged Troop Attack'));
+isa_ok($l4ms, ['Game::EvonyTKR::Model::Book'], sprintf('%s is a ::Model::Book', 'Level 4 March Size'));
 
 done_testing();
 };
 
 subtest 'Partial Conflicts with Books' => sub {
-  ok($bc->is_general_and_book_compatible($Elektra, $l4ra, { same_side => 1,}), 'Elektra and L4 Ranged Troop Attack work');
+  ok($bc->is_general_and_book_compatible($Elektra, $l4ra, { same_side => 1,}), 'Elektra and L4 Ranged Troop Attack work (same side)');
+  ok(!$bc->is_general_and_book_compatible($Elektra, $l4ra, { same_side => 0,}), 'Elektra and L4 Ranged Troop Attack conflict (other side)');
+  ok($bc->is_general_and_book_compatible($Custer, $l4ms, { same_side => 1,}), 'George A. Custer and L4 March Size work (same side)');
+  ok(!$bc->is_general_and_book_compatible($Custer, $l4ms, { same_side => 0,}), 'George A. Custer and L4 March Size conflict (other side)');
+  done_testing();
+};
+
+subtest 'Full Conflicts with Books' => sub {
+  ok(!$bc->is_general_and_book_compatible($KA, $l4ms, { same_side => 1,}), 'King Arthur and Level 4 March Size conflict (same side)');
+  ok(!$bc->is_general_and_book_compatible($KA, $l4ms, { same_side => 0,}), 'King Arthur and Level 4 March Size conflict (other side)');
   done_testing();
 };
 

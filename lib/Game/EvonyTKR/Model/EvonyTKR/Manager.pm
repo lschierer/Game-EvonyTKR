@@ -9,6 +9,7 @@ require Game::EvonyTKR::Model::Specialty::Manager;
 require Game::EvonyTKR::Model::AscendingAttributes::Manager;
 require Game::EvonyTKR::Model::Covenant::Manager;
 require Game::EvonyTKR::Model::Glossary::Manager;
+require Game::EvonyTKR::Model::General::Conflict::Book;
 use namespace::clean;
 
 class Game::EvonyTKR::Model::EvonyTKR::Manager :
@@ -24,6 +25,7 @@ class Game::EvonyTKR::Model::EvonyTKR::Manager :
 
   # computed types
   field $generalPairManager : reader;
+  field $conflictDetector   : reader : writer;
 
   ADJUST {
     # first the import types
@@ -40,10 +42,20 @@ class Game::EvonyTKR::Model::EvonyTKR::Manager :
     $glossaryManager =
       Game::EvonyTKR::Model::Glossary::Manager->new(SourceDir => $SourceDir,);
 
+    $conflictDetector = Game::EvonyTKR::Model::General::Conflict::Book->new(
+      rootManager => $self,
+      build_index => 1,
+      asst_has_dragon => 1,
+      asst_has_spirit => 1,
+      allow_wall_buffs => 1,
+    );
+
     $generalPairManager = Game::EvonyTKR::Model::General::Pair::Manager->new(
       rootManager    => $self,
       generalManager => $generalManager,
     );
+
+
 
   }
 
