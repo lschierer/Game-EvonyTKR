@@ -1,6 +1,3 @@
-packages:
-  - share
-  - share/infrastructure
 onlyBuiltDependencies:
   - esbuild
   - unrs-resolver

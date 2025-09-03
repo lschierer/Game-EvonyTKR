@@ -1,4 +1,5 @@
-^share\/infrastructure
+^share\/infrastructure/
+^share\/infrastructure/node_modules/
 ^share\/infrastructure\/.*
 ^share\/infrastructure\/.*\/.*
 ^share/node_modules/

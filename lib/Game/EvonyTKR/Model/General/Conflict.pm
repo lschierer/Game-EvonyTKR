@@ -716,7 +716,7 @@ class Game::EvonyTKR::Model::General::Conflict :
   }
 
   # Call from ADJUST (or expose explicit methods you call in tests)
-  ADJUST {
+  method start_indexing {
     $self->&build_conflicts_index() if $build_index;
   }
 

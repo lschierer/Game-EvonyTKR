@@ -44,7 +44,7 @@ class Game::EvonyTKR::Model::EvonyTKR::Manager :
 
     $conflictDetector = Game::EvonyTKR::Model::General::Conflict::Book->new(
       rootManager => $self,
-      build_index => 1,
+      build_index => 0,
       asst_has_dragon => 1,
       asst_has_spirit => 1,
       allow_wall_buffs => 1,
@@ -88,6 +88,10 @@ class Game::EvonyTKR::Model::EvonyTKR::Manager :
     $self->logger->info("import of covenants complete");
 
     $glossaryManager->importAll($SourceDir->child("collections/Glossary"));
+
+    $self->logger->info('staring conflict indexing');
+    $conflictDetector->start_indexing();
+    $self->logger->info('conflict indexing complete');
 
     $self->logger->info("root import complete");
 

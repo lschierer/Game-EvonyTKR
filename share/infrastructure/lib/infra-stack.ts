@@ -148,7 +148,7 @@ export class MojoliciousStack extends Stack {
         interval: Duration.seconds(30),
         timeout: Duration.seconds(5),
         retries: 3,
-        startPeriod: Duration.seconds(120), // wait this long before running the first check
+        startPeriod: Duration.seconds(240), // wait this long before running the first check
       },
     });
 
