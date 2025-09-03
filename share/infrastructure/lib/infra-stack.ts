@@ -187,6 +187,7 @@ export class MojoliciousStack extends Stack {
       desiredCount: props.desiredCount,
       enableExecuteCommand: true,
       assignPublicIp: true,
+      healthCheckGracePeriod: Duration.seconds(300),
       securityGroups: [albSG, serviceSG],
     });
 
