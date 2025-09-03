@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import { Stack, type StackProps, Duration, CfnOutput } from 'aws-cdk-lib';
 import { type Construct } from 'constructs';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
@@ -135,6 +136,9 @@ export class MojoliciousStack extends Stack {
         MOJO_MODE: 'production',
         MOJO_LISTEN: `http://0.0.0.0:${props.containerPort}`,
         HOME: '/home/mojo',
+        IMAGE_TAG: props.imageTag,
+        IMAGE_URI: `${repository.repositoryUri}:${props.imageTag}`,
+        DEPLOYMENT_TIME: new Date().toISOString(),
       },
       healthCheck: {
         command: [
@@ -144,7 +148,7 @@ export class MojoliciousStack extends Stack {
         interval: Duration.seconds(30),
         timeout: Duration.seconds(5),
         retries: 3,
-        startPeriod: Duration.seconds(10), // wait this long before running the first check
+        startPeriod: Duration.seconds(120), // wait this long before running the first check
       },
     });
 

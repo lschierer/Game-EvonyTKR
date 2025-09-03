@@ -1,6 +1,6 @@
 import { App } from 'aws-cdk-lib';
 
-import { MojoliciousStack } from '../lib/infra-stack.ts';
+import { MojoliciousStack } from '../share/infrastructure/lib/infra-stack.ts';
 
 const app = new App();
 

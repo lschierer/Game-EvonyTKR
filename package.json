@@ -4,13 +4,9 @@
   "description": "This is primarily a Perl project, but deploys using CDK (and thus typescript)",
   "type": "module",
   "scripts": {
-    "cdk": "cdk",
-    "deploy": "cdk deploy",
-    "synth": "cdk synth",
-    "diff": "cdk diff",
-    "bootstrap": "cdk bootstrap",
     "build:css": "rimraf ./share/tmp/css ; mkdir -p ./share/tmp/css/ ; tsx ./scripts/build-css.ts ./share/tmp/css/",
-    "build:ts": "tsc -p ./tsconfig.build.json && tsx ./scripts/build-ts.ts"
+    "build:ts": "tsc -p ./tsconfig.build.json && tsx ./scripts/build-ts.ts",
+    "app": "tsx scripts/infra.ts"
   },
   "author": "Luke Schierer <luke@schierer.org>",
   "license": "ISC",
@@ -68,7 +64,7 @@
     "constructs": "^10.4.2",
     "cssnano": "^7.1.1",
     "esbuild": "^0.25.9",
-    "esbuild-plugin-lit-css": "^3.0.2",
+    "esbuild-plugin-lit-css": "^4.0.0",
     "eslint": "^9.34.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-import": "^2.32.0",
@@ -99,8 +95,7 @@
     "ts-node": "^10.9.2",
     "tsx": "^4.20.5",
     "typescript": "^5.9.2",
-    "typescript-eslint": "^8.42.0",
-    "zod": "^4.0.5"
+    "typescript-eslint": "^8.42.0"
   },
   "lint-staged": {
     "*.json": [

@@ -1,7 +1,7 @@
 % layout 'default';
 <link rel="stylesheet" href="/css/GeneralTable.css" />
 <script  type="module" >
-  import "/js/Generals/GeneralTable.js";
+  import "/js/lib/Generals/GeneralTable.js";
 </script>
 
 <div class="general-comparison">

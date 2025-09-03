@@ -1,5 +1,5 @@
 {
-  "app": "pnpm exec tsx share/infrastructure/bin/infra.ts",
+  "app": "pnpm exec tsx scripts/infra.ts",
   "watch": {
     "include": ["**"],
     "exclude": [

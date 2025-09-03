@@ -12,11 +12,10 @@ WORKDIR /app
 
 # Copy package files first for better caching
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-COPY share/package.json share/pnpm-lock.yaml ./share/
 
 # Install Node.js dependencies
 # This is the specific ones that Mojolicious will need to serve as assets.
-RUN cd share && pnpm install --frozen-lockfile --prod
+RUN pnpm install --frozen-lockfile --prod
 
 FROM perl:5.42 as builder
 
@@ -53,7 +52,6 @@ FROM builder
 WORKDIR /opt/Game-EvonyTKR
 
 COPY --from=npmBuilder /app/node_modules ./
-COPY --from=npmBuilder /app/share/node_modules ./share/
 
 # Create a non-root user
 # Mojolicious will create the log directory using Path::Tiny

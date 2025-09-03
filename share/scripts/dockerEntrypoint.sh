@@ -38,6 +38,6 @@ if [[ -z "${MOJO_MODE}" ]]; then
   MOJO_MODE='production'
 fi
 pwd
-ls -l ./scripts/game-evonytkr
+ls -l ./bin/game-evonytkr
 
-exec gosu "$APP_USER" perl ./scripts/game-evonytkr prefork -m "${MOJO_MODE}"
+exec gosu "$APP_USER" perl ./bin/game-evonytkr prefork -m "${MOJO_MODE}"

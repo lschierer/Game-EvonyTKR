@@ -1,6 +1,20 @@
 
 .build
-share/infrastructure
+.dataprinter
+.gitignore
+.mailmap
+.prettierignore
+.prettierrc.json
+.stylelintrc.scss.json
+cdk.context.json
+cdk.json
 cdk.out
+commitlint.config.json
 node_modules
+share/infrastructure
 share/node_modules
+share/tmp
+stylelint.config.js
+tsconfig.build.json
+tsconfig.json
+weaver.ini

@@ -17,6 +17,7 @@ package Game::EvonyTKR {
   use Mojo::Base 'Mojolicious', -strict, -signatures;
   use Mojo::File::Share qw(dist_dir );
   use Carp;
+  use Env qw(DEPLOYMENT_TIME HOSTNAME IMAGE_TAG IMAGE_URI);
   our $VERSION = 'v0.50.0';
 
   sub startup ($self) {
@@ -24,7 +25,17 @@ package Game::EvonyTKR {
     my $config  = $self->plugin('NotYAMLConfig' => { module => 'YAML::PP' });
     my $distDir = dist_dir('Game::EvonyTKR');
     my $mode    = $self->mode;
+    $self->config(APP_START_TIME => time());
+    Env::import();
     $self->config(distDir => $distDir);
+    $self->config(
+      'EvonyTKR-Environment' => {
+        DEPLOYMENT_TIME => $DEPLOYMENT_TIME,
+        HOSTNAME        => $HOSTNAME,
+        IMAGE_TAG       => $IMAGE_TAG,
+        IMAGE_URI       => $IMAGE_URI,
+      }
+    );
     my $home = Mojo::Home->new->detect;
 
     # Template and static paths
@@ -69,6 +80,17 @@ package Game::EvonyTKR {
 
     $self->helper(get_root_manager => sub { return $RootManager });
     $self->helper(get_repo_data    => sub { return $RepoData });
+
+    foreach my $envkey (keys %{ $self->config->{'EvonyTKR-Environment'} }) {
+      if (defined $envkey) {
+        my $envValue = $self->config->{'EvonyTKR-Environment'}->{$envkey}
+          // 'Undefined';
+        $self->log->info("EvonyTKR-Environnment variable $envkey is $envValue");
+      }
+      else {
+        $self->log->warn('undefined envkey in EvonyTKR-Environment!');
+      }
+    }
 
     # Instantiate and attach shared model manager
     # Run rootImport once on first dispatch

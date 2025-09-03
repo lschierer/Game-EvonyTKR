@@ -43,9 +43,15 @@ build: prepare deps css images
 
 dev: deps css images
   rm -f "${HOME}/var/log/Perl/dist/Game-Evony/*.log"
-  morbo --watch ./share --watch ./lib ./scripts/game-evonytkr
+  morbo --watch ./share --watch ./lib ./bin/game-evonytkr
 
 quickdev:
   echo "${HOME}/var/log/Perl/dist/Game-Evony/*.log"
   rm -f "${HOME}/var/log/Perl/dist/Game-Evony/*.log"
-  morbo --watch ./share --watch ./lib ./scripts/game-evonytkr
+  morbo --watch ./share --watch ./lib ./bin/game-evonytkr
+
+deploy-dev: build
+  pnpm cdk --profile personal deploy --context env=dev
+
+deploy-prod: build
+  pnpm cdk --profile personal deploy --context env=prod
