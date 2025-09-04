@@ -1,11 +1,12 @@
-const DEBUG: boolean = false;
+const DEBUG: boolean = true;
 // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 if (DEBUG) {
   console.log(`DEBUG enabled for ${new URL(import.meta.url).pathname}`);
 }
 
 const fileDebug: Record<string, boolean> = {
-  '/Generals/GeneralsTable.ts': true,
+  'lib/Generals/GeneralTable.ts': true,
+  'lib/partials/level_settings_form.ts': true,
 };
 
 function isAbsolutePath(path: string): boolean {
@@ -42,7 +43,7 @@ const debugFunction = (myName: string): boolean => {
       console.log(`got path ${myName}`);
     }
   }
-  return fileDebug[myName];
+  return !!fileDebug[myName];
 };
 
 export default debugFunction;

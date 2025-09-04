@@ -5,12 +5,6 @@
 </script>
 
 <div class="general-comparison">
-  <%= include 'partials/level_settings_form',
-      mode                  => $mode,
-      covenantLevel         => $covenantLevel,
-      ascendingLevel        => $ascendingLevel,
-      specialties          => $specialties,
-  %>
 
   <div class="general-table-container">
     <general-table

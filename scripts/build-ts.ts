@@ -43,7 +43,29 @@ async function main() {
     target: 'es2020',
     sourcemap: true,
     outExtension: { '.js': '.js' },
-    plugins: [litCssPlugin()],
+    plugins: [
+      litCssPlugin(),
+      {
+        name: 'per-file-constant',
+        setup(build) {
+          build.onLoad({ filter: /\.ts$/ }, async (args) => {
+            const relativePath = path.relative(process.cwd(), args.path);
+            const contents = await fs.promises.readFile(args.path, 'utf8');
+
+            // Find all instances of a special token and replace with the file path
+            const modifiedContents = contents.replace(
+              /__FILE_PATH__/g,
+              JSON.stringify(relativePath),
+            );
+
+            return {
+              contents: modifiedContents,
+              loader: 'ts',
+            };
+          });
+        },
+      },
+    ],
   });
 
   // Fix imports in the generated JS files to include .js extensions

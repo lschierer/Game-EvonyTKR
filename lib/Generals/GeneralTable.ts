@@ -1,17 +1,14 @@
 // This component supports both single-general and general-pair modes.
 // It progressively loads full data row-by-row from the appropriate endpoint.
 import debugFunction from '../localDebug';
-const DEBUG = debugFunction(new URL(import.meta.url).pathname);
+const DEBUG = debugFunction(__FILE_PATH__);
+console.log(`DEBUG is set to ${DEBUG} for ${__FILE_PATH__}`);
 
 import 'iconify-icon';
 import { customElement, property, state } from 'lit/decorators.js';
-import {
-  html,
-  type CSSResultGroup,
-  LitElement,
-  type PropertyValues,
-} from 'lit';
+import { html, type CSSResultGroup, LitElement } from 'lit';
 import { repeat } from 'lit/directives/repeat.js';
+import { Signal, SignalWatcher } from '@lit-labs/signals';
 
 import {
   getCoreRowModel,
@@ -28,6 +25,8 @@ import * as z from 'zod';
 import SpectrumTokensCSS from '@spectrum-css/tokens/dist/index.css' with { type: 'css' };
 import SpectrumProgressBarCSS from '@spectrum-css/progressbar/dist/index.css' with { type: 'css' };
 import GeneralTableCSS from '../../share/tmp/css/GeneralTable.css' with { type: 'css' };
+
+import { LevelSettings } from '../partials/level_settings_form';
 
 // Zod Schemas
 const BasicAttribute = z.object({ base: z.number(), increment: z.number() });
@@ -132,23 +131,10 @@ const tableHeaders = new Map<string, string>([
 ]);
 
 @customElement('general-table')
-export class GeneralTable extends LitElement {
+export class GeneralTable extends SignalWatcher(LitElement) {
   @property({ type: String }) mode: 'pair' | 'single' = 'single';
   @property({ type: String }) generalType = '';
   @property({ type: String }) uiTarget = '';
-  @property({ type: String }) public ascendingLevel: string = 'red5';
-  @property({ type: String }) public primaryCovenantLevel: string =
-    'civilization';
-  @property({ type: String }) public primarySpecialty1: string = 'gold';
-  @property({ type: String }) public primarySpecialty2: string = 'gold';
-  @property({ type: String }) public primarySpecialty3: string = 'gold';
-  @property({ type: String }) public primarySpecialty4: string = 'gold';
-  @property({ type: String }) public secondaryCovenantLevel: string =
-    'civilization';
-  @property({ type: String }) public secondarySpecialty1: string = 'gold';
-  @property({ type: String }) public secondarySpecialty2: string = 'gold';
-  @property({ type: String }) public secondarySpecialty3: string = 'gold';
-  @property({ type: String }) public secondarySpecialty4: string = 'gold';
   @property({ type: String }) public allowedBuffActivation: string = 'Overall';
 
   @state() private _sorting: SortingState = [];
@@ -160,36 +146,28 @@ export class GeneralTable extends LitElement {
   private _bgFetchTimer?: number;
   private tableController = new TableController<RowData>(this);
 
-  static styles: CSSResultGroup = [
-    SpectrumTokensCSS,
-    SpectrumProgressBarCSS,
-    GeneralTableCSS,
-  ];
+  protected primarySettings: LevelSettings = new LevelSettings();
+  protected secondarySettings: LevelSettings | undefined;
 
-  /* eslint-disable-next-line  @typescript-eslint/no-misused-promises */
-  override async firstUpdated() {
-    this.columns = this.generateColumns();
-    const stubData = await this.fetchStubPairs();
-    this.nameList = [...stubData];
-    this.startBackgroundFetch();
-  }
+  private abortController: AbortController | undefined;
 
-  protected override willUpdate(_changedProperties: PropertyValues) {
-    if (
-      _changedProperties.has('ascendingLevel') ||
-      _changedProperties.has('primaryCovenantLevel') ||
-      _changedProperties.has('primarySpecialty1') ||
-      _changedProperties.has('primarySpecialty2') ||
-      _changedProperties.has('primarySpecialty3') ||
-      _changedProperties.has('primarySpecialty4') ||
-      _changedProperties.has('secondaryCovenantLevel') ||
-      _changedProperties.has('secondarySpecialty1') ||
-      _changedProperties.has('secondarySpecialty2') ||
-      _changedProperties.has('secondarySpecialty3') ||
-      _changedProperties.has('secondarySpecialty4') ||
-      _changedProperties.has('allowedBuffActivation')
-    ) {
+  private setupDataWatcher() {
+    const fetchData = async () => {
+      if (DEBUG) {
+        console.log('fetchData triggered');
+      }
+
+      if (this.abortController) {
+        this.abortController.abort();
+      }
+      this.abortController = new AbortController();
+      await this.updateComplete;
+
       this.nameList.forEach((nameStub) => {
+        if (DEBUG) {
+          console.log('Setting nameStub to stale');
+        }
+
         nameStub.current = 'stale';
         if (this.batchSize >= 10) {
           if (DEBUG) {
@@ -197,9 +175,58 @@ export class GeneralTable extends LitElement {
           }
           this.batchSize = this.maxBatch;
         }
+        if (DEBUG) {
+          console.log(`calling startBackgroundFetch`);
+        }
         this.startBackgroundFetch();
       });
+      // Re-establish watcher after callback
+      // this appears to be unneeded now despite the docs.
+      //this.setupDataWatcher();
+    };
+
+    const watcher = new Signal.subtle.Watcher(fetchData);
+    if (DEBUG) {
+      console.log(`setting watchers on settings`);
     }
+    watcher.watch(this.primarySettings.covenantLevel);
+    watcher.watch(this.primarySettings.ascendingLevel);
+    for (let i = 0; i < 4; i++) {
+      watcher.watch(this.primarySettings.specialtyLevels[i]);
+    }
+    if (this.mode === 'pair') {
+      watcher.watch(this.secondarySettings!.covenantLevel);
+      for (let i = 0; i < 4; i++) {
+        watcher.watch(this.secondarySettings!.specialtyLevels[i]);
+      }
+    }
+  }
+
+  static styles: CSSResultGroup = [
+    SpectrumTokensCSS,
+    SpectrumProgressBarCSS,
+    GeneralTableCSS,
+  ];
+
+  override connectedCallback(): void {
+    super.connectedCallback();
+    if (this.mode === 'pair') {
+      this.secondarySettings = new LevelSettings();
+    } else if (!this.uiTarget.localeCompare('Mayor Specialists')) {
+      this.primarySettings.FormTitle = 'Mayor';
+    } else {
+      this.primarySettings.FormTitle = 'General';
+    }
+  }
+  /* eslint-disable-next-line  @typescript-eslint/no-misused-promises */
+  override async firstUpdated() {
+    this.columns = this.generateColumns();
+    const stubData = await this.fetchStubPairs();
+    this.nameList = [...stubData];
+    // a signal won't fire until a menu changes,
+    // kick off the first data fetch manually
+    this.startBackgroundFetch();
+    this.setupDataWatcher();
   }
 
   private generateColumns(): ColumnDef<RowData>[] {
@@ -345,20 +372,22 @@ export class GeneralTable extends LitElement {
       const params = new URLSearchParams({
         primary: pairStub.primary.name,
         secondary: pairStub.secondary.name,
-        ascendingLevel: this.ascendingLevel,
-        primaryCovenantLevel: this.primaryCovenantLevel,
-        primarySpecialty1: this.primarySpecialty1,
-        primarySpecialty2: this.primarySpecialty2,
-        primarySpecialty3: this.primarySpecialty3,
-        primarySpecialty4: this.primarySpecialty4,
-        secondaryCovenantLevel: this.secondaryCovenantLevel,
-        secondarySpecialty1: this.secondarySpecialty1,
-        secondarySpecialty2: this.secondarySpecialty2,
-        secondarySpecialty3: this.secondarySpecialty3,
-        secondarySpecialty4: this.secondarySpecialty4,
+        ascendingLevel: this.primarySettings.ascendingLevel.get(),
+        primaryCovenantLevel: this.primarySettings.covenantLevel.get(),
+        primarySpecialty1: this.primarySettings.specialtyLevels[0].get(),
+        primarySpecialty2: this.primarySettings.specialtyLevels[1].get(),
+        primarySpecialty3: this.primarySettings.specialtyLevels[2].get(),
+        primarySpecialty4: this.primarySettings.specialtyLevels[3].get(),
+        secondaryCovenantLevel: this.secondarySettings!.covenantLevel.get(),
+        secondarySpecialty1: this.secondarySettings!.specialtyLevels[0].get(),
+        secondarySpecialty2: this.secondarySettings!.specialtyLevels[1].get(),
+        secondarySpecialty3: this.secondarySettings!.specialtyLevels[2].get(),
+        secondarySpecialty4: this.secondarySettings!.specialtyLevels[3].get(),
       });
       const url = `${basePath}?${params.toString()}`;
-      const res = await fetch(url);
+      const res = await fetch(url, {
+        signal: this.abortController?.signal,
+      });
       if (!res.ok) {
         throw new Error(`HTTP error ${res.status}`);
       }
@@ -374,16 +403,18 @@ export class GeneralTable extends LitElement {
     } else {
       const params = new URLSearchParams({
         generalType: this.generalType,
-        ascendingLevel: this.ascendingLevel,
-        covenantLevel: this.primaryCovenantLevel,
-        specialty1: this.primarySpecialty1,
-        specialty2: this.primarySpecialty2,
-        specialty3: this.primarySpecialty3,
-        specialty4: this.primarySpecialty4,
+        ascendingLevel: this.primarySettings.ascendingLevel.get(),
+        covenantLevel: this.primarySettings.covenantLevel.get(),
+        specialty1: this.primarySettings.specialtyLevels[0].get(),
+        specialty2: this.primarySettings.specialtyLevels[1].get(),
+        specialty3: this.primarySettings.specialtyLevels[2].get(),
+        specialty4: this.primarySettings.specialtyLevels[3].get(),
       });
 
       const url = `${basePath}?name=${encodeURIComponent(stub.primary.name)}&${params.toString()}`;
-      const res = await fetch(url);
+      const res = await fetch(url, {
+        signal: this.abortController?.signal,
+      });
       if (!res.ok) {
         throw new Error(`HTTP error ${res.status}`);
       }
@@ -473,6 +504,8 @@ export class GeneralTable extends LitElement {
     });
     let rowIndex = 1;
     return html`
+      ${this.primarySettings}
+      ${this.mode === 'pair' ? this.secondarySettings : ''}
       ${loadingCount > 0
         ? html` <div id="table-loading">
             <div class=" spectrum-ProgressBar " role="progressbar">

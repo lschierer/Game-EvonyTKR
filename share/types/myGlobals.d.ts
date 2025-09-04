@@ -1,7 +1,9 @@
 // ./src/globals.d.ts
 
 // Recognize all CSS files as module imports.
-declare module "*.css" {
+declare module '*.css' {
   const stylesheet: CSSStyleSheet;
   export default stylesheet;
 }
+
+declare const __FILE_PATH__: string;

@@ -20,7 +20,7 @@
 <!-- covenantCategoryValues is <%= Data::Printer::np($covenantCategoryValues) %> -->
 <!-- ascendingLevelValues is <%= Data::Printer::np($ascendingLevelValues) %> -->
 <!-- specialtyLevelValues is <%= Data::Printer::np($specialtyLevelValues) %> -->
-<link rel="stylesheet" href="/css/level_settings_form.css" />
+<level-settings></level-settings>
 <div class="settings-form">
   <h3 class="spectrum-Heading spectrum-Heading--sizeS"><%= $mode eq 'pair' ? 'Primary General' : $linkTarget %> </h3>
     <% if ($mode eq 'single' || $mode eq 'pair') { %>

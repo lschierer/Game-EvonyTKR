@@ -3,3 +3,14 @@
 @import url('@spectrum-css/fieldgroup/index.css');
 @import url('@spectrum-css/picker/dist/index.css');
 @import url('@spectrum-css/button/dist/index.css');
+
+:host {
+  --mod-form-grid-template-columns-labels-above: repeat(
+    auto-fit,
+    minmax(15em, 1fr)
+  );
+}
+
+div.settings-form form#settings-form {
+  width: 100%;
+}

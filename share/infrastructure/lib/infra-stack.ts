@@ -361,7 +361,7 @@ export class MojoliciousStack extends Stack {
           }
         };
       `),
-      timeout: Duration.minutes(30),
+      timeout: Duration.minutes(15),
       environment: {
         STACK_NAME: Stack.of(this).stackName,
         MAX_AGE_MS: String(hours * 60 * 60 * 1000),

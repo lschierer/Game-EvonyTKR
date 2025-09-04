@@ -33,8 +33,9 @@ images:
   rsync -a --delete collections/data/images/generals/ public/images/generals/
 
 css: npmdeps images
+  rm -rf share/public/css
+  mkdir -p share/public/css
   pnpm build:css
-  rsync -a --delete share/tmp/css/ share/public/css/
 
 
 build: prepare deps css images
@@ -51,7 +52,7 @@ quickdev:
   morbo --watch ./share --watch ./lib ./bin/game-evonytkr
 
 deploy-dev: build
-  pnpm cdk --profile personal deploy --context env=dev
+watchexec --exts css,pm,ep,js -w lib/ -w bin/ -w share/templates/ -w share/public/ -w share/collections/data/ --restart morbo ./bin/game-evonytkr
 
 deploy-prod: build
   pnpm cdk --profile personal deploy --context env=prod
