@@ -86,9 +86,6 @@ importers:
       '@tanstack/virtual-core':
         specifier: ^3.13.12
         version: 3.13.12
-      '@types/sprintf-js':
-        specifier: ^1.1.4
-        version: 1.1.4
       iconify-icon:
         specifier: ^3.0.0
         version: 3.0.0
@@ -147,6 +144,9 @@ importers:
       '@types/postcss-sorting':
         specifier: ^8.0.2
         version: 8.0.2
+      '@types/sprintf-js':
+        specifier: ^1.1.4
+        version: 1.1.4
       '@typescript-eslint/parser':
         specifier: ^8.42.0
         version: 8.42.0(eslint@9.34.0(jiti@2.5.1))(typescript@5.9.2)
