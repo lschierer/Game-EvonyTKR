@@ -31,15 +31,15 @@ export class LevelSettings extends SignalWatcher(LitElement) {
   @property({ type: String })
   public FormTitle: string = 'Primary General';
 
-  @property({ type: String, reflect: true })
+  @property({ type: String })
   public covenantLevel: Signal.State<CovenantCategoryValues> =
     signal('civilization');
 
-  @property({ type: String, reflect: true })
+  @property({ type: String })
   public ascendingLevel: Signal.State<AscendingAttributeLevelValues> =
     signal('red5');
 
-  @property({ type: Array, reflect: true })
+  @property({ type: Array })
   public specialtyLevels: Signal.State<SpecialtyLevelValues>[] = new Array<
     Signal.State<SpecialtyLevelValues>
   >();
@@ -76,9 +76,7 @@ export class LevelSettings extends SignalWatcher(LitElement) {
       if (valid.error) {
         console.error(`Invalid value ${target.value} provided`);
       } else {
-        this.updateComplete.then(() => {
-          signal.set(valid.data); // valid.data is now type T
-        });
+        signal.set(valid.data); // valid.data is now type T
       }
     };
   }
@@ -87,7 +85,7 @@ export class LevelSettings extends SignalWatcher(LitElement) {
     return html`
       <div class="spectrum-Form-item">
         <label
-          for="primaryCovenantLevel"
+          for="covenantLevel"
           class="spectrum-FieldLabel spectrum-FieldLabel--sizeM"
         >
           Covenant Level:

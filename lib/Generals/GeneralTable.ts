@@ -6,9 +6,9 @@ console.log(`DEBUG is set to ${DEBUG} for ${__FILE_PATH__}`);
 
 import 'iconify-icon';
 import { customElement, property, state } from 'lit/decorators.js';
-import { html, type CSSResultGroup, LitElement } from 'lit';
+import { type CSSResultGroup, LitElement } from 'lit';
 import { repeat } from 'lit/directives/repeat.js';
-import { Signal, SignalWatcher } from '@lit-labs/signals';
+import { Signal, SignalWatcher, html } from '@lit-labs/signals';
 
 import {
   getCoreRowModel,
@@ -24,7 +24,7 @@ import {
 import * as z from 'zod';
 import SpectrumTokensCSS from '@spectrum-css/tokens/dist/index.css' with { type: 'css' };
 import SpectrumProgressBarCSS from '@spectrum-css/progressbar/dist/index.css' with { type: 'css' };
-import GeneralTableCSS from '../../share/tmp/css/GeneralTable.css' with { type: 'css' };
+import GeneralTableCSS from '../../share/public/css/GeneralTable.css' with { type: 'css' };
 
 import { LevelSettings } from '../partials/level_settings_form';
 
@@ -143,19 +143,22 @@ export class GeneralTable extends SignalWatcher(LitElement) {
 
   private dataMap = new Map<number, RowData>();
   private tableData: RowData[] = [];
-  private _bgFetchTimer?: number;
   private tableController = new TableController<RowData>(this);
+  private dataRunId = Math.floor(Date.now() / 1000);
 
   protected primarySettings: LevelSettings = new LevelSettings();
   protected secondarySettings: LevelSettings | undefined;
 
   private abortController: AbortController | undefined;
+  private settingsWatcher:
+    | InstanceType<typeof Signal.subtle.Watcher>
+    | undefined;
 
   private setupDataWatcher() {
+    if (this.settingsWatcher) return;
+
     const fetchData = async () => {
-      if (DEBUG) {
-        console.log('fetchData triggered');
-      }
+      if (DEBUG) console.log('[watcher] settings changed → refetch');
 
       if (this.abortController) {
         this.abortController.abort();
@@ -163,41 +166,25 @@ export class GeneralTable extends SignalWatcher(LitElement) {
       this.abortController = new AbortController();
       await this.updateComplete;
 
-      this.nameList.forEach((nameStub) => {
-        if (DEBUG) {
-          console.log('Setting nameStub to stale');
-        }
-
-        nameStub.current = 'stale';
-        if (this.batchSize >= 10) {
-          if (DEBUG) {
-            console.log('resetting batch size');
-          }
-          this.batchSize = this.maxBatch;
-        }
-        if (DEBUG) {
-          console.log(`calling startBackgroundFetch`);
-        }
-        this.startBackgroundFetch();
-      });
-      // Re-establish watcher after callback
-      // this appears to be unneeded now despite the docs.
-      //this.setupDataWatcher();
+      for (let i = 0; i < this.nameList.length; i++) {
+        this.nameList[i].current = 'stale';
+      }
+      this.startBackgroundFetch();
     };
 
-    const watcher = new Signal.subtle.Watcher(fetchData);
+    this.settingsWatcher = new Signal.subtle.Watcher(fetchData);
     if (DEBUG) {
       console.log(`setting watchers on settings`);
     }
-    watcher.watch(this.primarySettings.covenantLevel);
-    watcher.watch(this.primarySettings.ascendingLevel);
+    this.settingsWatcher.watch(this.primarySettings.covenantLevel);
+    this.settingsWatcher.watch(this.primarySettings.ascendingLevel);
     for (let i = 0; i < 4; i++) {
-      watcher.watch(this.primarySettings.specialtyLevels[i]);
+      this.settingsWatcher.watch(this.primarySettings.specialtyLevels[i]);
     }
     if (this.mode === 'pair') {
-      watcher.watch(this.secondarySettings!.covenantLevel);
+      this.settingsWatcher.watch(this.secondarySettings!.covenantLevel);
       for (let i = 0; i < 4; i++) {
-        watcher.watch(this.secondarySettings!.specialtyLevels[i]);
+        this.settingsWatcher.watch(this.secondarySettings!.specialtyLevels[i]);
       }
     }
   }
@@ -218,6 +205,15 @@ export class GeneralTable extends SignalWatcher(LitElement) {
       this.primarySettings.FormTitle = 'General';
     }
   }
+
+  override disconnectedCallback() {
+    if (this.settingsWatcher) {
+      this.settingsWatcher.unwatch(); // clean up if supported
+    }
+
+    super.disconnectedCallback();
+  }
+
   /* eslint-disable-next-line  @typescript-eslint/no-misused-promises */
   override async firstUpdated() {
     this.columns = this.generateColumns();
@@ -236,11 +232,11 @@ export class GeneralTable extends SignalWatcher(LitElement) {
         id: 'rowIndex',
         header: '#',
         enableSorting: false,
-        size: 50,
-        cell: ({ table, row }) => {
-          const index = table.getRowModel().rows.indexOf(row) + 1;
-          return html`${index}`;
-        },
+        enableResizing: false,
+        minSize: 48,
+        size: 56,
+        maxSize: 64,
+        meta: { isIndex: true }, // handy flag for render branch
       },
     ];
 
@@ -362,7 +358,10 @@ export class GeneralTable extends SignalWatcher(LitElement) {
     return [];
   }
 
-  private async fetchRow(index: number): Promise<RowData> {
+  private async fetchRow(
+    index: number,
+    runId: number,
+  ): Promise<RowData | undefined> {
     this.nameList[index].current = 'pending';
     const stub = this.nameList[index];
 
@@ -394,7 +393,9 @@ export class GeneralTable extends SignalWatcher(LitElement) {
       const json = (await res.json()) as object;
       const parsed = GeneralPair.safeParse(json);
       if (parsed.success) {
-        return parsed.data;
+        if (runId === this.dataRunId) {
+          return parsed.data;
+        }
       } else {
         console.error(parsed.error.message);
         console.error(`recieved: `, res.text());
@@ -420,17 +421,21 @@ export class GeneralTable extends SignalWatcher(LitElement) {
       }
       const json = (await res.json()) as object;
       const parsed = GeneralData.safeParse(json);
-      if (parsed.success) return parsed.data;
-      throw new Error(parsed.error.message);
+      if (parsed.success) {
+        if (runId === this.dataRunId) {
+          return parsed.data;
+        }
+      } else {
+        throw new Error(parsed.error.message);
+      }
     }
+    return;
   }
 
   private maxBatch = 6;
   private batchSize = this.maxBatch;
   private startBackgroundFetch() {
-    if (this._bgFetchTimer) return;
-    this._bgFetchTimer = 1;
-
+    this.dataRunId = Math.floor(Date.now() / 1000);
     const maxConcurrency = this.batchSize;
     const pending = new Set<number>();
 
@@ -450,10 +455,12 @@ export class GeneralTable extends SignalWatcher(LitElement) {
         pending.delete(i);
         active++;
 
-        this.fetchRow(i)
+        this.fetchRow(i, this.dataRunId)
           .then((full) => {
             this.nameList[i].current = 'current';
-            this.dataMap.set(i, full);
+            if (full) {
+              this.dataMap.set(i, full);
+            }
           })
           .catch((err: unknown) => {
             console.error(`Fetch failed for row ${i}`, err);
@@ -469,7 +476,6 @@ export class GeneralTable extends SignalWatcher(LitElement) {
 
       if (active === 0 && pending.size === 0) {
         console.log('✅ All rows fetched');
-        this._bgFetchTimer = undefined;
         this.updateTableData();
       }
     };
@@ -502,7 +508,6 @@ export class GeneralTable extends SignalWatcher(LitElement) {
       getSortedRowModel: getSortedRowModel(),
       getCoreRowModel: getCoreRowModel(),
     });
-    let rowIndex = 1;
     return html`
       ${this.primarySettings}
       ${this.mode === 'pair' ? this.secondarySettings : ''}
@@ -561,7 +566,7 @@ export class GeneralTable extends SignalWatcher(LitElement) {
               table.getRowModel().rows,
               (row) => row.id,
               (row, index) => {
-                const currentIndex = rowIndex++;
+                const currentIndex = index + 1;
                 const isStale = this.nameList[index]?.current === 'stale';
                 return html`<tr
                   class="spectrum-Table-row ${isStale ? 'stale-row' : ''}"
@@ -571,9 +576,9 @@ export class GeneralTable extends SignalWatcher(LitElement) {
                     (cell) => cell.id,
                     (cell) => {
                       if (cell.column.id === 'rowIndex') {
-                        rowIndex++;
                         return html`
-                          <span class="spectrum-Body spectrum-Body--sizeM"
+                          <span
+                            class="index-column spectrum-Body spectrum-Body--sizeM"
                             >${currentIndex}</span
                           >
                         `;
