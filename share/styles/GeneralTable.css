@@ -45,7 +45,9 @@ div#table-loading {
 }
 
 tr.stale-row {
-  background-color: var(--surface-2);
+  --spectrum-table-cell-background-color: var(--surface-2);
+
+  background-color: var(--spectrum-table-cell-background-color);
 }
 
 thead,

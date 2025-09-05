@@ -142,52 +142,16 @@ export class GeneralTable extends SignalWatcher(LitElement) {
   @state() private nameList: RowStub[] = [];
 
   private dataMap = new Map<number, RowData>();
-  private tableData: RowData[] = [];
+  @state() private tableData: RowData[] = [];
   private tableController = new TableController<RowData>(this);
   private dataRunId = Math.floor(Date.now() / 1000);
 
   protected primarySettings: LevelSettings = new LevelSettings();
   protected secondarySettings: LevelSettings | undefined;
 
-  private abortController: AbortController | undefined;
   private settingsWatcher:
     | InstanceType<typeof Signal.subtle.Watcher>
     | undefined;
-
-  private setupDataWatcher() {
-    if (this.settingsWatcher) return;
-
-    const fetchData = async () => {
-      if (DEBUG) console.log('[watcher] settings changed → refetch');
-
-      if (this.abortController) {
-        this.abortController.abort();
-      }
-      this.abortController = new AbortController();
-      await this.updateComplete;
-
-      for (let i = 0; i < this.nameList.length; i++) {
-        this.nameList[i].current = 'stale';
-      }
-      this.startBackgroundFetch();
-    };
-
-    this.settingsWatcher = new Signal.subtle.Watcher(fetchData);
-    if (DEBUG) {
-      console.log(`setting watchers on settings`);
-    }
-    this.settingsWatcher.watch(this.primarySettings.covenantLevel);
-    this.settingsWatcher.watch(this.primarySettings.ascendingLevel);
-    for (let i = 0; i < 4; i++) {
-      this.settingsWatcher.watch(this.primarySettings.specialtyLevels[i]);
-    }
-    if (this.mode === 'pair') {
-      this.settingsWatcher.watch(this.secondarySettings!.covenantLevel);
-      for (let i = 0; i < 4; i++) {
-        this.settingsWatcher.watch(this.secondarySettings!.specialtyLevels[i]);
-      }
-    }
-  }
 
   static styles: CSSResultGroup = [
     SpectrumTokensCSS,
@@ -199,6 +163,8 @@ export class GeneralTable extends SignalWatcher(LitElement) {
     super.connectedCallback();
     if (this.mode === 'pair') {
       this.secondarySettings = new LevelSettings();
+      this.secondarySettings.is_primary = false;
+      this.secondarySettings.FormTitle = 'Secondary General';
     } else if (!this.uiTarget.localeCompare('Mayor Specialists')) {
       this.primarySettings.FormTitle = 'Mayor';
     } else {
@@ -384,9 +350,7 @@ export class GeneralTable extends SignalWatcher(LitElement) {
         secondarySpecialty4: this.secondarySettings!.specialtyLevels[3].get(),
       });
       const url = `${basePath}?${params.toString()}`;
-      const res = await fetch(url, {
-        signal: this.abortController?.signal,
-      });
+      const res = await fetch(url);
       if (!res.ok) {
         throw new Error(`HTTP error ${res.status}`);
       }
@@ -395,6 +359,13 @@ export class GeneralTable extends SignalWatcher(LitElement) {
       if (parsed.success) {
         if (runId === this.dataRunId) {
           return parsed.data;
+        } else {
+          // this fetch got old data, but because the row was 'pending'
+          // the new loop will not have created a fetchRow call for it.
+          // mark this row as stale so that the new loop that *made*
+          // this request obsolte can call fetchRow for this row.
+          this.nameList[index].current = 'stale';
+          return;
         }
       } else {
         console.error(parsed.error.message);
@@ -413,9 +384,7 @@ export class GeneralTable extends SignalWatcher(LitElement) {
       });
 
       const url = `${basePath}?name=${encodeURIComponent(stub.primary.name)}&${params.toString()}`;
-      const res = await fetch(url, {
-        signal: this.abortController?.signal,
-      });
+      const res = await fetch(url);
       if (!res.ok) {
         throw new Error(`HTTP error ${res.status}`);
       }
@@ -432,12 +401,58 @@ export class GeneralTable extends SignalWatcher(LitElement) {
     return;
   }
 
-  private maxBatch = 6;
-  private batchSize = this.maxBatch;
+  private setupDataWatcher() {
+    if (this.settingsWatcher) return;
+
+    const fetchData = async () => {
+      if (DEBUG) console.log('[watcher] settings changed → refetch');
+
+      if (this.nameList.length) {
+        this.invalidateData();
+      }
+
+      await this.updateComplete;
+      this.startBackgroundFetch();
+    };
+
+    this.settingsWatcher = new Signal.subtle.Watcher(fetchData);
+    if (DEBUG) {
+      console.log(`setting watchers on settings`);
+    }
+    this.settingsWatcher.watch(this.primarySettings.covenantLevel);
+    this.settingsWatcher.watch(this.primarySettings.ascendingLevel);
+    for (let i = 0; i < 4; i++) {
+      this.settingsWatcher.watch(this.primarySettings.specialtyLevels[i]);
+    }
+    if (this.mode === 'pair') {
+      this.settingsWatcher.watch(this.secondarySettings!.covenantLevel);
+      for (let i = 0; i < 4; i++) {
+        this.settingsWatcher.watch(this.secondarySettings!.specialtyLevels[i]);
+      }
+    }
+  }
+
+  private invalidateData() {
+    for (let i = 0; i < this.nameList.length; i++) {
+      if (this.nameList[i].current !== 'stale') {
+        this.nameList[i].current = 'stale';
+      }
+    }
+  }
+
   private startBackgroundFetch() {
-    this.dataRunId = Math.floor(Date.now() / 1000);
-    const maxConcurrency = this.batchSize;
+    // ensure ids are always unique even if not strictly time accurate.
+    let newId = Math.floor(Date.now() / 1000);
+    while (newId <= this.dataRunId) {
+      newId++;
+    }
+    this.dataRunId = newId;
     const pending = new Set<number>();
+    if (DEBUG) {
+      console.log(
+        `startBackgroundFetch starting with id ${this.dataRunId} and for nameList ${this.nameList.length}`,
+      );
+    }
 
     // Initialize with all rows needing fetch
     this.nameList.forEach((row, i) => {
@@ -447,40 +462,61 @@ export class GeneralTable extends SignalWatcher(LitElement) {
       }
     });
 
-    let active = 0;
+    this.maybeLaunchMore(this.dataRunId, pending);
+  }
 
-    const maybeLaunchMore = () => {
-      while (active < maxConcurrency && pending.size > 0) {
-        const [i] = pending; // grab one from the set
-        pending.delete(i);
-        active++;
-
-        this.fetchRow(i, this.dataRunId)
-          .then((full) => {
-            this.nameList[i].current = 'current';
-            if (full) {
-              this.dataMap.set(i, full);
-            }
-          })
-          .catch((err: unknown) => {
-            console.error(`Fetch failed for row ${i}`, err);
-            this.nameList[i].current = 'stale';
-            pending.add(i); // Retry later
-          })
-          .finally(() => {
-            active--;
-            maybeLaunchMore(); // continue the pipeline
-            this.updateTableData();
-          });
+  private maxBatch = 6;
+  private maybeLaunchMore(myRunId: number, pending: Set<number>) {
+    if (DEBUG) {
+      console.log(
+        `maybeLaunchMore with runId ${myRunId} and pending ${pending.size} remaining`,
+      );
+    }
+    if (myRunId !== this.dataRunId || pending.size === 0) return;
+    // Launch batch of 6
+    let count = 0;
+    const pi = pending.values();
+    const promises = new Array<Promise<RowData | undefined>>();
+    const batch = new Array<number>();
+    while (count < this.maxBatch) {
+      const i = pi.next().value;
+      if (i) {
+        promises.push(this.fetchRow(i, myRunId));
+        batch.push(i);
       }
+      count++;
+    }
 
-      if (active === 0 && pending.size === 0) {
-        console.log('✅ All rows fetched');
-        this.updateTableData();
+    // use then, not await, so as not to block the UI
+    void Promise.allSettled(promises).then((results) => {
+      // Process results and handle retries
+      results.forEach((result, idx) => {
+        const index = batch[idx];
+        if (result.status === 'rejected') {
+          console.error(`Fetch failed for row ${index}`, result.reason);
+          this.nameList[index].current = 'stale';
+        } else if (result.value) {
+          const r = result.value;
+          this.nameList[index].current = 'current';
+          this.dataMap.set(index, r);
+          // Do not delete from pending until we are done with
+          // updates to it.
+          pending.delete(index);
+        } else {
+          this.nameList[index].current = 'stale';
+        }
+      });
+      this.updateTableData();
+      if (myRunId === this.dataRunId && pending.size > 0) {
+        this.maybeLaunchMore(myRunId, pending);
+      } else {
+        if (DEBUG) {
+          console.warn(
+            `myRunId: ${myRunId}; dataRunId: ${this.dataRunId}; pending size: ${pending.size}`,
+          );
+        }
       }
-    };
-
-    maybeLaunchMore();
+    });
   }
 
   private updateTableData() {
@@ -568,6 +604,7 @@ export class GeneralTable extends SignalWatcher(LitElement) {
               (row, index) => {
                 const currentIndex = index + 1;
                 const isStale = this.nameList[index]?.current === 'stale';
+
                 return html`<tr
                   class="spectrum-Table-row ${isStale ? 'stale-row' : ''}"
                 >

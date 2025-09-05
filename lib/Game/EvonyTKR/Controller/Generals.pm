@@ -41,8 +41,9 @@ package Game::EvonyTKR::Controller::Generals {
     return $self->app->get_root_manager->generalManager;
   }
 
+  my $logger;
   sub register($self, $app, $config = {}) {
-    my $logger = Log::Log4perl->get_logger(__PACKAGE__);
+    $logger = Log::Log4perl->get_logger(__PACKAGE__);
     $logger->info("Registering routes for " . ref($self));
     $self->SUPER::register($app, $config);
 
@@ -152,7 +153,7 @@ package Game::EvonyTKR::Controller::Generals {
       is_valid_buffActivation => sub ($route, $c, $captures, $arg) {
         my ($ui, $buff) = @$captures{qw(uiTarget buffActivation)};
         my $ok = $c->general_routing->has_route($ui, $buff) ? 1 : 0;
-        $c->app->log->debug("check ui='$ui' buff='$buff' -> $ok");
+        $logger->debug("check ui='$ui' buff='$buff' -> $ok");
         return $ok;    # never die here
       }
     );
@@ -248,7 +249,6 @@ package Game::EvonyTKR::Controller::Generals {
   }
 
   sub index($self) {
-    my $logger     = Log::Log4perl->get_logger(__PACKAGE__);
     my $collection = collection_name();
     $logger->debug("Rendering index for $collection");
 
@@ -296,7 +296,6 @@ package Game::EvonyTKR::Controller::Generals {
   }
 
   sub uiTarget_index($self) {
-    my $logger   = Log::Log4perl->get_logger(__PACKAGE__);
     my $uiTarget = $self->param('uiTarget');
 
     my $rp = $self->req->url->path->to_string;
@@ -342,7 +341,6 @@ package Game::EvonyTKR::Controller::Generals {
   }
 
   sub buffActivation_index($self) {
-    my $logger         = Log::Log4perl->get_logger(__PACKAGE__);
     my $uiTarget       = $self->param('uiTarget');
     my $buffActivation = $self->param('buffActivation');
 
@@ -390,7 +388,6 @@ package Game::EvonyTKR::Controller::Generals {
   }
 
   sub show ($self) {
-    my $logger = Log::Log4perl->get_logger(ref($self));
     $logger->debug("start of show method");
     my $name;
     $name = $self->param('name');
@@ -496,7 +493,6 @@ package Game::EvonyTKR::Controller::Generals {
   }
 
   sub singleTable ($self) {
-    my $logger  = Log::Log4perl->get_logger(__PACKAGE__);
     my $distDir = Mojo::File::Share::dist_dir('Game::EvonyTKR');
 
     my $slug_ui   = $self->stash('uiTarget');          # from captured route
@@ -564,7 +560,6 @@ package Game::EvonyTKR::Controller::Generals {
   }
 
   sub pairTable ($self) {
-    my $logger  = Log::Log4perl->get_logger(__PACKAGE__);
     my $distDir = Mojo::File::Share::dist_dir('Game::EvonyTKR');
 
     my $slug_ui   = $self->stash('uiTarget');
@@ -667,7 +662,6 @@ package Game::EvonyTKR::Controller::Generals {
   }
 
   sub singleData ($self) {
-    my $logger    = Log::Log4perl->get_logger(__PACKAGE__);
     my $distDir   = Mojo::File::Share::dist_dir('Game::EvonyTKR');
     my $slug_ui   = $self->stash('uiTarget');          # from captured route
     my $slug_buff = $self->stash('buffActivation');    # from captured route
@@ -713,7 +707,6 @@ package Game::EvonyTKR::Controller::Generals {
   }
 
   sub pairData ($self) {
-    my $logger    = Log::Log4perl->get_logger(__PACKAGE__);
     my $slug_ui   = $self->stash('uiTarget');
     my $slug_buff = $self->stash('buffActivation');
 
@@ -769,7 +762,6 @@ package Game::EvonyTKR::Controller::Generals {
   }
 
   sub singleRow ($self) {
-    my $logger    = Log::Log4perl->get_logger(__PACKAGE__);
     my $name      = $self->param('name');
     my $isPrimary = $self->param('isPrimary') // 1;         # Default to primary
 
@@ -902,7 +894,6 @@ package Game::EvonyTKR::Controller::Generals {
   }
 
   sub pairRow ($self) {
-    my $logger        = Log::Log4perl->get_logger(__PACKAGE__);
     my $primaryName   = Mojo::Util::url_unescape($self->param('primary'));
     my $secondaryName = Mojo::Util::url_unescape($self->param('secondary'));
     my $slug_ui       = $self->stash('uiTarget');

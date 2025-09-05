@@ -36,8 +36,8 @@ class Game::EvonyTKR::Model::General::Pair::Manager :
     my $generals     = $generalManager->get_all_generals();
     my $generalCount = scalar keys %{$generals};
     $self->logger->debug("building pairs out of $generalCount");
-    foreach my $primary (values %{$generals}) {
-      foreach my $secondary (values %{$generals}) {
+    foreach my $primary (sort{ $a->name cmp $b->name } values %{$generals}) {
+      foreach my $secondary (sort { $a->name cmp $b->name } values %{$generals}) {
         next if $primary->name eq $secondary->name;
         $self->logger->debug(sprintf(
           'testing if %s and %s conflict.',
