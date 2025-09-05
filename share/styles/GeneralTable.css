@@ -44,10 +44,24 @@ div#table-loading {
   cursor: pointer;
 }
 
-tr.stale-row {
-  --spectrum-table-cell-background-color: var(--surface-2);
+tr.spectrum-Table-row.stale,
+tr.spectrum-Table-row.pending {
+  /* stylelint-disable-next-line custom-property-pattern */
+  --mod-table-row-background-color--quiet: var(--surface-2);
+  --mod-table-row-background-color: var(--surface-2);
 
-  background-color: var(--spectrum-table-cell-background-color);
+  /* stylelint-disable-next-line custom-property-pattern */
+  background-color: var(--mod-table-row-background-color--quiet);
+}
+
+tr.error {
+  /* stylelint-disable-next-line custom-property-pattern */
+  --mod-table-row-background-color--quiet: var(--spectrum-red-200);
+  --mod-table-row-background-color: var(--spectrum-red-200);
+  --mod-table-row-text-color: var(--spectrum-red-1000);
+
+  /* stylelint-disable-next-line custom-property-pattern */
+  background-color: var(--mod-table-row-background-color--quiet);
 }
 
 thead,

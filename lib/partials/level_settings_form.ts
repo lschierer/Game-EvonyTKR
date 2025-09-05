@@ -24,6 +24,11 @@ import {
 import SpectrumTokensCSS from '@spectrum-css/tokens/dist/index.css' with { type: 'css' };
 import LevelSettingsFormCSS from '../../share/public/css/level_settings_form.css' with { type: 'css' };
 
+type SpecialtyLookupType = Record<
+  0 | 1 | 2 | 3,
+  Signal.State<SpecialtyLevelValues>
+>;
+
 @customElement('level-settings')
 export class LevelSettings extends SignalWatcher(LitElement) {
   static styles: CSSResultGroup = [SpectrumTokensCSS, LevelSettingsFormCSS];
@@ -44,17 +49,18 @@ export class LevelSettings extends SignalWatcher(LitElement) {
   public ascendingLevel: Signal.State<AscendingAttributeLevelValues> =
     signal('red5');
 
-  @property({ type: Array })
-  public specialtyLevels: Signal.State<SpecialtyLevelValues>[] = new Array<
-    Signal.State<SpecialtyLevelValues>
-  >();
+  @property({ type: String })
+  public specialtyLevel1: Signal.State<SpecialtyLevelValues> = signal('gold');
 
-  constructor() {
-    super();
-    for (let i = 0; i < 4; i++) {
-      this.specialtyLevels[i] = new Signal.State<SpecialtyLevelValues>('gold');
-    }
-  }
+  @property({ type: String })
+  public specialtyLevel2: Signal.State<SpecialtyLevelValues> = signal('gold');
+
+  @property({ type: String })
+  public specialtyLevel3: Signal.State<SpecialtyLevelValues> = signal('gold');
+
+  @property({ type: String })
+  public specialtyLevel4: Signal.State<SpecialtyLevelValues> = signal('gold');
+
   protected willUpdate(_changedProperties: PropertyValues): void {
     if (DEBUG) {
       if (_changedProperties.has('covenantLevel')) {
@@ -63,10 +69,17 @@ export class LevelSettings extends SignalWatcher(LitElement) {
       if (_changedProperties.has('ascendingLevel')) {
         console.log(`ascendingLevel: ${this.ascendingLevel}`);
       }
-      if (_changedProperties.has('specialtyLevels')) {
-        for (let i = 0; i < 4; i++) {
-          console.log(`specialtyLevel${i}: ${this.specialtyLevels[i].get()}`);
-        }
+      if (_changedProperties.has('specialtyLevel1')) {
+        console.log(`specialtyLevel1: ${this.specialtyLevel1}`);
+      }
+      if (_changedProperties.has('specialtyLevel2')) {
+        console.log(`specialtyLevel1: ${this.specialtyLevel2}`);
+      }
+      if (_changedProperties.has('specialtyLevel3')) {
+        console.log(`specialtyLevel1: ${this.specialtyLevel3}`);
+      }
+      if (_changedProperties.has('specialtyLevel4')) {
+        console.log(`specialtyLevel1: ${this.specialtyLevel4}`);
       }
     }
   }
@@ -169,10 +182,27 @@ export class LevelSettings extends SignalWatcher(LitElement) {
     return template;
   }
 
+  private SpecialtyLookup = (index: 0 | 1 | 2 | 3) => {
+    const lookup: SpecialtyLookupType = {
+      [0]: this.specialtyLevel1,
+      [1]: this.specialtyLevel2,
+      [2]: this.specialtyLevel3,
+      [3]: this.specialtyLevel4,
+    };
+    return lookup[index];
+  };
+
   private get specialtyConstraints() {
-    const first3Gold = this.specialtyLevels
-      .slice(0, 3)
-      .every((level) => level.get() === 'gold');
+    const first3GoldArray = new Array<boolean>();
+    first3GoldArray.push(
+      this.specialtyLevel1.get() === 'gold',
+      this.specialtyLevel2.get() === 'gold',
+      this.specialtyLevel3.get() === 'gold',
+    );
+    const first3Gold = first3GoldArray.reduce((accumulator, current) => {
+      accumulator = accumulator && current;
+      return accumulator;
+    }, true);
     return {
       first3Gold,
       fourthOptions: first3Gold
@@ -184,6 +214,7 @@ export class LevelSettings extends SignalWatcher(LitElement) {
   }
 
   private onSpecialtyChange(
+    signal: Signal.State<SpecialtyLevelValues>,
     index: number,
     target: EventTarget | HTMLSelectElement | null,
   ) {
@@ -193,30 +224,36 @@ export class LevelSettings extends SignalWatcher(LitElement) {
     }
     const valid = SpecialtyLevelValues.safeParse(newValue);
     if (valid.success) {
-      this.specialtyLevels[index].set(valid.data);
+      signal.set(valid.data);
       if (DEBUG) {
-        console.log(
-          `specialtyLevels ${index} now ${this.specialtyLevels[index].get()}`,
-        );
+        console.log(`specialtyLevels ${index} now ${signal.get()}`);
       }
     }
 
     // Auto-adjust 4th specialty based on constraint
     if (index < 3) {
-      const first3Gold = this.specialtyLevels
-        .slice(0, 3)
-        .every((level) => level.get() === 'gold');
+      const first3GoldArray = new Array<boolean>();
+      first3GoldArray.push(
+        this.specialtyLevel1.get() === 'gold',
+        this.specialtyLevel2.get() === 'gold',
+        this.specialtyLevel3.get() === 'gold',
+      );
+      const first3Gold = first3GoldArray.reduce((accumulator, current) => {
+        accumulator = accumulator && current;
+        return accumulator;
+      }, true);
+
       if (DEBUG) {
         console.log(`onSpecialtyChange ${index} first3Gold ${first3Gold}`);
       }
-      if (first3Gold && this.specialtyLevels[3].get() === 'none') {
-        this.specialtyLevels[3].set('green');
-      } else if (!first3Gold && this.specialtyLevels[3].get() !== 'none') {
-        this.specialtyLevels[3].set('none');
+      if (first3Gold && this.specialtyLevel4.get() === 'none') {
+        this.specialtyLevel4.set('green');
+      } else if (!first3Gold && this.specialtyLevel4.get() !== 'none') {
+        this.specialtyLevel4.set('none');
       }
       if (DEBUG) {
         console.log(
-          `onSpecialtyChange ${index} first3Gold ${first3Gold} ${this.specialtyLevels[3].get()}`,
+          `onSpecialtyChange ${index} first3Gold ${first3Gold} ${this.specialtyLevel4.get()}`,
         );
       }
     }
@@ -226,16 +263,8 @@ export class LevelSettings extends SignalWatcher(LitElement) {
   protected renderSpecialitycombos() {
     let template = html``;
     for (let i = 0; i < 4; i++) {
-      let specialty = this.specialtyLevels[i];
-      if (!specialty) {
-        if (DEBUG) {
-          console.warn(
-            `specialty ${i} was unset in render, defaulting to gold.`,
-          );
-        }
-        specialty = new Signal.State<SpecialtyLevelValues>('gold');
-        this.specialtyLevels[i] = specialty;
-      } else if (DEBUG) {
+      const specialty = this.SpecialtyLookup(i as 0 | 1 | 2 | 3);
+      if (DEBUG) {
         console.log(`render for specialty ${i} has value ${specialty.get()}`);
       }
       template = html`${template}
@@ -251,7 +280,8 @@ export class LevelSettings extends SignalWatcher(LitElement) {
               id="specialty${i}"
               name="specialty${i}"
               class="spectrum-Picker spectrum-Picker--sizeM"
-              @change="${(e: Event) => this.onSpecialtyChange(i, e.target)}"
+              @change="${(e: Event) =>
+                this.onSpecialtyChange(specialty, i, e.target)}"
             >
               ${repeat(
                 SpecialtyLevelValues.values.values(),

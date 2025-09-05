@@ -93,14 +93,14 @@ type GeneralPair = z.infer<typeof GeneralPair>;
 
 const GeneralDataStub = z.object({
   primary: z.object({ name: z.string() }),
-  current: z.enum(['stale', 'pending', 'current']).optional(),
+  current: z.literal(['stale', 'pending', 'current', 'error']).optional(),
 });
 type GeneralDataStub = z.infer<typeof GeneralDataStub>;
 
 const GeneralPairStub = z.object({
   primary: z.object({ name: z.string() }),
   secondary: z.object({ name: z.string() }),
-  current: z.enum(['stale', 'pending', 'current']).optional(),
+  current: z.literal(['stale', 'pending', 'current', 'error']).optional(),
 });
 type GeneralPairStub = z.infer<typeof GeneralPairStub>;
 
@@ -339,15 +339,15 @@ export class GeneralTable extends SignalWatcher(LitElement) {
         secondary: pairStub.secondary.name,
         ascendingLevel: this.primarySettings.ascendingLevel.get(),
         primaryCovenantLevel: this.primarySettings.covenantLevel.get(),
-        primarySpecialty1: this.primarySettings.specialtyLevels[0].get(),
-        primarySpecialty2: this.primarySettings.specialtyLevels[1].get(),
-        primarySpecialty3: this.primarySettings.specialtyLevels[2].get(),
-        primarySpecialty4: this.primarySettings.specialtyLevels[3].get(),
+        primarySpecialty1: this.primarySettings.specialtyLevel1.get(),
+        primarySpecialty2: this.primarySettings.specialtyLevel2.get(),
+        primarySpecialty3: this.primarySettings.specialtyLevel3.get(),
+        primarySpecialty4: this.primarySettings.specialtyLevel4.get(),
         secondaryCovenantLevel: this.secondarySettings!.covenantLevel.get(),
-        secondarySpecialty1: this.secondarySettings!.specialtyLevels[0].get(),
-        secondarySpecialty2: this.secondarySettings!.specialtyLevels[1].get(),
-        secondarySpecialty3: this.secondarySettings!.specialtyLevels[2].get(),
-        secondarySpecialty4: this.secondarySettings!.specialtyLevels[3].get(),
+        secondarySpecialty1: this.secondarySettings!.specialtyLevel1.get(),
+        secondarySpecialty2: this.secondarySettings!.specialtyLevel2.get(),
+        secondarySpecialty3: this.secondarySettings!.specialtyLevel3.get(),
+        secondarySpecialty4: this.secondarySettings!.specialtyLevel4.get(),
       });
       const url = `${basePath}?${params.toString()}`;
       const res = await fetch(url);
@@ -377,10 +377,10 @@ export class GeneralTable extends SignalWatcher(LitElement) {
         generalType: this.generalType,
         ascendingLevel: this.primarySettings.ascendingLevel.get(),
         covenantLevel: this.primarySettings.covenantLevel.get(),
-        specialty1: this.primarySettings.specialtyLevels[0].get(),
-        specialty2: this.primarySettings.specialtyLevels[1].get(),
-        specialty3: this.primarySettings.specialtyLevels[2].get(),
-        specialty4: this.primarySettings.specialtyLevels[3].get(),
+        specialty1: this.primarySettings.specialtyLevel1.get(),
+        specialty2: this.primarySettings.specialtyLevel2.get(),
+        specialty3: this.primarySettings.specialtyLevel3.get(),
+        specialty4: this.primarySettings.specialtyLevel4.get(),
       });
 
       const url = `${basePath}?name=${encodeURIComponent(stub.primary.name)}&${params.toString()}`;
@@ -413,6 +413,9 @@ export class GeneralTable extends SignalWatcher(LitElement) {
 
       await this.updateComplete;
       this.startBackgroundFetch();
+      if (this.settingsWatcher) {
+        this.settingsWatcher.watch();
+      }
     };
 
     this.settingsWatcher = new Signal.subtle.Watcher(fetchData);
@@ -421,14 +424,16 @@ export class GeneralTable extends SignalWatcher(LitElement) {
     }
     this.settingsWatcher.watch(this.primarySettings.covenantLevel);
     this.settingsWatcher.watch(this.primarySettings.ascendingLevel);
-    for (let i = 0; i < 4; i++) {
-      this.settingsWatcher.watch(this.primarySettings.specialtyLevels[i]);
-    }
+    this.settingsWatcher.watch(this.primarySettings.specialtyLevel1);
+    this.settingsWatcher.watch(this.primarySettings.specialtyLevel2);
+    this.settingsWatcher.watch(this.primarySettings.specialtyLevel3);
+    this.settingsWatcher.watch(this.primarySettings.specialtyLevel4);
     if (this.mode === 'pair') {
       this.settingsWatcher.watch(this.secondarySettings!.covenantLevel);
-      for (let i = 0; i < 4; i++) {
-        this.settingsWatcher.watch(this.secondarySettings!.specialtyLevels[i]);
-      }
+      this.settingsWatcher.watch(this.secondarySettings!.specialtyLevel1);
+      this.settingsWatcher.watch(this.secondarySettings!.specialtyLevel2);
+      this.settingsWatcher.watch(this.secondarySettings!.specialtyLevel3);
+      this.settingsWatcher.watch(this.secondarySettings!.specialtyLevel4);
     }
   }
 
@@ -438,6 +443,7 @@ export class GeneralTable extends SignalWatcher(LitElement) {
         this.nameList[i].current = 'stale';
       }
     }
+    this.requestUpdate();
   }
 
   private startBackgroundFetch() {
@@ -479,13 +485,15 @@ export class GeneralTable extends SignalWatcher(LitElement) {
     const promises = new Array<Promise<RowData | undefined>>();
     const batch = new Array<number>();
     while (count < this.maxBatch) {
-      const i = pi.next().value;
-      if (i) {
-        promises.push(this.fetchRow(i, myRunId));
-        batch.push(i);
-      }
+      const next = pi.next();
+      if (next.done) break; // <— end of Set
+      const i = next.value as number;
+      promises.push(this.fetchRow(i, myRunId));
+      batch.push(i);
       count++;
     }
+
+    if (batch.length === 0) return; // <— avoid tight recursion when nothing was launched
 
     // use then, not await, so as not to block the UI
     void Promise.allSettled(promises).then((results) => {
@@ -603,10 +611,21 @@ export class GeneralTable extends SignalWatcher(LitElement) {
               (row) => row.id,
               (row, index) => {
                 const currentIndex = index + 1;
-                const isStale = this.nameList[index]?.current === 'stale';
+                const rowState = this.nameList[index]?.current
+                  ? this.nameList[index]?.current
+                  : 'current';
+                const title =
+                  rowState === 'stale'
+                    ? 'Showing previous values; updating…'
+                    : rowState === 'pending'
+                      ? 'Refreshing…'
+                      : rowState === 'error'
+                        ? 'Failed to refresh; will retry on next change'
+                        : '';
 
                 return html`<tr
-                  class="spectrum-Table-row ${isStale ? 'stale-row' : ''}"
+                  class="spectrum-Table-row ${rowState}"
+                  title=${title}
                 >
                   ${repeat(
                     row.getVisibleCells(),
