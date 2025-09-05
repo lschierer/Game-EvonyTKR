@@ -5,10 +5,12 @@ const DEBUG = debugFunction(__FILE_PATH__);
 console.log(`DEBUG is set to ${DEBUG} for ${__FILE_PATH__}`);
 
 import 'iconify-icon';
+//import { sprintf } from 'sprintf-js';
+
 import { customElement, property, state } from 'lit/decorators.js';
-import { type CSSResultGroup, LitElement } from 'lit';
+import { type CSSResultGroup, LitElement, type PropertyValues } from 'lit';
 import { repeat } from 'lit/directives/repeat.js';
-import { Signal, SignalWatcher, html } from '@lit-labs/signals';
+import { Signal, SignalWatcher, html, computed } from '@lit-labs/signals';
 
 import {
   getCoreRowModel,
@@ -27,6 +29,11 @@ import SpectrumProgressBarCSS from '@spectrum-css/progressbar/dist/index.css' wi
 import GeneralTableCSS from '../../share/public/css/GeneralTable.css' with { type: 'css' };
 
 import { LevelSettings } from '../partials/level_settings_form';
+import {
+  AscendingAttributeLevelValues,
+  CovenantCategoryValues,
+  SpecialtyLevelValues,
+} from '../Game/EvonyTKR/Shared/Constants';
 
 // Zod Schemas
 const BasicAttribute = z.object({ base: z.number(), increment: z.number() });
@@ -148,6 +155,7 @@ export class GeneralTable extends SignalWatcher(LitElement) {
 
   protected primarySettings: LevelSettings = new LevelSettings();
   protected secondarySettings: LevelSettings | undefined;
+  protected lastFilterSettings: string = '';
 
   private settingsWatcher:
     | InstanceType<typeof Signal.subtle.Watcher>
@@ -170,6 +178,9 @@ export class GeneralTable extends SignalWatcher(LitElement) {
     } else {
       this.primarySettings.FormTitle = 'General';
     }
+    // this must happen *after* the 2 level settings forms are set up just above.
+    this.loadFromUrl();
+    //window.addEventListener('popstate', this.handlePopState);
   }
 
   override disconnectedCallback() {
@@ -188,7 +199,19 @@ export class GeneralTable extends SignalWatcher(LitElement) {
     // a signal won't fire until a menu changes,
     // kick off the first data fetch manually
     this.startBackgroundFetch();
-    this.setupDataWatcher();
+  }
+
+  protected override updated(_changedProperties: PropertyValues): void {
+    super.updated(_changedProperties);
+    const params = this.urlParams.get();
+    const newURL = `${window.location.pathname}?${params.toString()}`;
+    window.history.replaceState(null, '', newURL);
+    const currentHash = this.filterSettings.get();
+    if (this.lastFilterSettings.localeCompare(currentHash)) {
+      this.lastFilterSettings = currentHash;
+      this.invalidateData();
+      this.startBackgroundFetch();
+    }
   }
 
   private generateColumns(): ColumnDef<RowData>[] {
@@ -278,6 +301,136 @@ export class GeneralTable extends SignalWatcher(LitElement) {
 
     return columns;
   }
+
+  protected handlePopState = () => {
+    this.loadFromUrl();
+  };
+
+  private urlParams = computed(() => {
+    const params = new URLSearchParams();
+
+    if (this.primarySettings) {
+      params.set('ascendingLevel', this.primarySettings.ascendingLevel.get());
+      params.set(
+        'primaryCovenantLevel',
+        this.primarySettings.covenantLevel.get(),
+      );
+      let p = this.mode === 'single' ? 'specialty1' : 'primarySpecialty1';
+      params.set(p, this.primarySettings.specialtyLevel1.get());
+      p = this.mode === 'single' ? 'specialty2' : 'primarySpecialty2';
+      params.set(p, this.primarySettings.specialtyLevel2.get());
+      p = this.mode === 'single' ? 'specialty3' : 'primarySpecialty3';
+      params.set(p, this.primarySettings.specialtyLevel3.get());
+      p = this.mode === 'single' ? 'specialty4' : 'primarySpecialty4';
+      params.set(p, this.primarySettings.specialtyLevel4.get());
+    } else {
+      if (DEBUG) {
+        console.error('this.primarySettings is undefined');
+      }
+    }
+
+    if (this.mode === 'pair') {
+      if (this.secondarySettings) {
+        params.set(
+          'ascendingLevel',
+          this.secondarySettings.ascendingLevel.get(),
+        );
+        params.set(
+          'secondaryCovenantLevel',
+          this.secondarySettings.covenantLevel.get(),
+        );
+        let p = 'secondarySpecialty1';
+        params.set(p, this.secondarySettings.specialtyLevel1.get());
+        p = 'secondarySpecialty2';
+        params.set(p, this.secondarySettings.specialtyLevel2.get());
+        p = 'secondarySpecialty3';
+        params.set(p, this.secondarySettings.specialtyLevel3.get());
+        p = 'secondarySpecialty4';
+        params.set(p, this.secondarySettings.specialtyLevel4.get());
+      } else {
+        if (DEBUG) {
+          console.error('this.secondarySettings is undefined');
+        }
+      }
+    }
+    return params;
+  });
+
+  private loadFromUrl = () => {
+    const params = new URLSearchParams(window.location.search);
+
+    const setParam = <T>(
+      paramName: string,
+      validator: z.ZodType<T>,
+      signal: Signal.State<T>,
+    ) => {
+      if (params.has(paramName)) {
+        const valid = validator.safeParse(params.get(paramName));
+        if (valid.success) {
+          signal.set(valid.data);
+        }
+      }
+    };
+
+    setParam(
+      'ascendingLevel',
+      AscendingAttributeLevelValues,
+      this.primarySettings.ascendingLevel,
+    );
+    setParam(
+      'primaryCovenantLevel',
+      CovenantCategoryValues,
+      this.primarySettings.covenantLevel,
+    );
+    setParam(
+      this.mode === 'single' ? 'specialty1' : 'primarySpecialty1',
+      SpecialtyLevelValues,
+      this.primarySettings.specialtyLevel1,
+    );
+    setParam(
+      this.mode === 'single' ? 'specialty2' : 'primarySpecialty2',
+      SpecialtyLevelValues,
+      this.primarySettings.specialtyLevel2,
+    );
+    setParam(
+      this.mode === 'single' ? 'specialty3' : 'primarySpecialty3',
+      SpecialtyLevelValues,
+      this.primarySettings.specialtyLevel3,
+    );
+    setParam(
+      this.mode === 'single' ? 'specialty4' : 'primarySpecialty4',
+      SpecialtyLevelValues,
+      this.primarySettings.specialtyLevel4,
+    );
+
+    if (this.mode === 'pair') {
+      setParam(
+        'secondaryCovenantLevel',
+        CovenantCategoryValues,
+        this.secondarySettings!.covenantLevel,
+      );
+      setParam(
+        'secondarySpecialty1',
+        SpecialtyLevelValues,
+        this.secondarySettings!.specialtyLevel1,
+      );
+      setParam(
+        'secondarySpecialty2',
+        SpecialtyLevelValues,
+        this.secondarySettings!.specialtyLevel2,
+      );
+      setParam(
+        'secondarySpecialty3',
+        SpecialtyLevelValues,
+        this.secondarySettings!.specialtyLevel3,
+      );
+      setParam(
+        'secondarySpecialty4',
+        SpecialtyLevelValues,
+        this.secondarySettings!.specialtyLevel4,
+      );
+    }
+  };
 
   private urlConversion(scope: 'data' | 'row'): string {
     let basePath = window.location.pathname.replace(/\/$/, '');
@@ -401,41 +554,28 @@ export class GeneralTable extends SignalWatcher(LitElement) {
     return;
   }
 
-  private setupDataWatcher() {
-    if (this.settingsWatcher) return;
-
-    const fetchData = async () => {
-      if (DEBUG) console.log('[watcher] settings changed → refetch');
-
-      if (this.nameList.length) {
-        this.invalidateData();
-      }
-
-      await this.updateComplete;
-      this.startBackgroundFetch();
-      if (this.settingsWatcher) {
-        this.settingsWatcher.watch();
-      }
+  private filterSettings = computed(() => {
+    const fs = {
+      primary: {
+        ascendingLevel: this.primarySettings.ascendingLevel.get(),
+        covenantLevel: this.primarySettings.covenantLevel.get(),
+        specialtyLevel1: this.primarySettings.specialtyLevel1.get(),
+        specialtyLevel2: this.primarySettings.specialtyLevel2.get(),
+        specialtyLevel3: this.primarySettings.specialtyLevel3.get(),
+        specialtyLevel4: this.primarySettings.specialtyLevel4.get(),
+      },
+      ...(this.secondarySettings && {
+        secondary: {
+          covenantLevel: this.secondarySettings.covenantLevel.get(),
+          specialtyLevel1: this.secondarySettings.specialtyLevel1.get(),
+          specialtyLevel2: this.secondarySettings.specialtyLevel2.get(),
+          specialtyLevel3: this.secondarySettings.specialtyLevel3.get(),
+          specialtyLevel4: this.secondarySettings.specialtyLevel4.get(),
+        },
+      }),
     };
-
-    this.settingsWatcher = new Signal.subtle.Watcher(fetchData);
-    if (DEBUG) {
-      console.log(`setting watchers on settings`);
-    }
-    this.settingsWatcher.watch(this.primarySettings.covenantLevel);
-    this.settingsWatcher.watch(this.primarySettings.ascendingLevel);
-    this.settingsWatcher.watch(this.primarySettings.specialtyLevel1);
-    this.settingsWatcher.watch(this.primarySettings.specialtyLevel2);
-    this.settingsWatcher.watch(this.primarySettings.specialtyLevel3);
-    this.settingsWatcher.watch(this.primarySettings.specialtyLevel4);
-    if (this.mode === 'pair') {
-      this.settingsWatcher.watch(this.secondarySettings!.covenantLevel);
-      this.settingsWatcher.watch(this.secondarySettings!.specialtyLevel1);
-      this.settingsWatcher.watch(this.secondarySettings!.specialtyLevel2);
-      this.settingsWatcher.watch(this.secondarySettings!.specialtyLevel3);
-      this.settingsWatcher.watch(this.secondarySettings!.specialtyLevel4);
-    }
-  }
+    return JSON.stringify(fs);
+  });
 
   private invalidateData() {
     for (let i = 0; i < this.nameList.length; i++) {

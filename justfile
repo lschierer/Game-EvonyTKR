@@ -49,10 +49,10 @@ dev: deps css images
 quickdev:
   echo "${HOME}/var/log/Perl/dist/Game-Evony/*.log"
   rm -f "${HOME}/var/log/Perl/dist/Game-Evony/*.log"
-  morbo --watch ./share --watch ./lib ./bin/game-evonytkr
+  watchexec --exts css,pm,ep,js -w lib/ -w bin/ -w share/templates/ -w share/public/ -w share/collections/data/ --restart morbo ./bin/game-evonytkr
 
 deploy-dev: build
-  watchexec --exts css,pm,ep,js -w lib/ -w bin/ -w share/templates/ -w share/public/ -w share/collections/data/ --restart morbo ./bin/game-evonytkr
+  pnpm cdk --profile personal deploy --context env=dev
 
 deploy-prod: build
   pnpm cdk --profile personal deploy --context env=prod
