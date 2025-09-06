@@ -195,6 +195,9 @@ export class GeneralTable extends SignalWatcher(LitElement) {
   override async firstUpdated() {
     this.columns = this.generateColumns();
     const stubData = await this.fetchStubPairs();
+    this.primarySettings.generals = stubData.map((sd) => sd.primary.name);
+    this.primarySettings.requestUpdate();
+
     this.nameList = [...stubData];
     // a signal won't fire until a menu changes,
     // kick off the first data fetch manually

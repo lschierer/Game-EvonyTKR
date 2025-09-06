@@ -17,11 +17,8 @@ npmdeps:
   rm -rf share/public/types
   mkdir -p share/public/js
   mkdir -p share/public/types
-  pnpm build:css
-  pnpm build:ts
 
 #find node_modules/evonytkrtips-data/share/ -name '*.csv' -exec sh -c 'iconv -f macroman -t utf-8 "$1" > "$(basename "$1")"' _ {} \;
-
 
 deps: prepare npmdeps
   ./Build installdeps --cpan_client 'cpanm -n'
@@ -32,17 +29,20 @@ images:
   rsync -a --delete images/ public/images/
   rsync -a --delete collections/data/images/generals/ public/images/generals/
 
+# final trusted build of css after
 css: npmdeps images
   rm -rf share/public/css
   mkdir -p share/public/css
   pnpm build:css
 
+ts: npmdeps css
+  pnpm build:ts
 
-build: prepare deps css images
+build: prepare deps css images ts
   ./Build manifest
   ./Build
 
-dev: deps css images
+dev: deps css images build
   rm -f "${HOME}/var/log/Perl/dist/Game-Evony/*.log"
   watchexec --exts css,pm,ep,js -w lib/ -w bin/ -w share/templates/ -w share/public/ -w share/collections/data/ --restart morbo ./bin/game-evonytkr
 
@@ -56,3 +56,7 @@ deploy-dev: build
 
 deploy-prod: build
   pnpm cdk --profile personal deploy --context env=prod
+
+[working-directory: 'share/infrastructure']
+dev-image: build
+  ./bin/build-image.sh -d

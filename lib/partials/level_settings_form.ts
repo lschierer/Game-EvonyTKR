@@ -12,6 +12,7 @@ import {
 } from 'lit';
 import { repeat } from 'lit/directives/repeat.js';
 import { Signal, SignalWatcher, signal } from '@lit-labs/signals';
+import { SignalArray } from 'signal-utils/array';
 
 import * as z from 'zod';
 import {
@@ -28,6 +29,11 @@ type SpecialtyLookupType = Record<
   0 | 1 | 2 | 3,
   Signal.State<SpecialtyLevelValues>
 >;
+
+interface GeneralOption {
+  name: string;
+  selected: boolean;
+}
 
 @customElement('level-settings')
 export class LevelSettings extends SignalWatcher(LitElement) {
@@ -61,6 +67,11 @@ export class LevelSettings extends SignalWatcher(LitElement) {
   @property({ type: String })
   public specialtyLevel4: Signal.State<SpecialtyLevelValues> = signal('gold');
 
+  @property({ type: String })
+  public generalFilterLabel: string = 'Selected Primary Generals';
+  private _generalOptions = new SignalArray<GeneralOption>([]);
+  private _dropdownOpen = new Signal.State(false);
+
   protected willUpdate(_changedProperties: PropertyValues): void {
     if (DEBUG) {
       if (_changedProperties.has('covenantLevel')) {
@@ -82,6 +93,105 @@ export class LevelSettings extends SignalWatcher(LitElement) {
         console.log(`specialtyLevel1: ${this.specialtyLevel4}`);
       }
     }
+  }
+
+  get selectedCount(): number {
+    return this._generalOptions.filter((opt: GeneralOption) => opt.selected)
+      .length;
+  }
+
+  get displayText(): string {
+    const count = this.selectedCount;
+    const total = this._generalOptions.length;
+    if (count === 0) return 'Select generals...';
+    if (count === total) return 'All selected';
+    return `${count} selected`;
+  }
+
+  get selectedGenerals() {
+    return this._generalOptions
+      .filter((opt: GeneralOption) => opt.selected)
+      .map((opt) => opt.name);
+  }
+
+  set generals(generalNames: string[]) {
+    this._generalOptions = SignalArray.from(
+      generalNames.map((n) => {
+        const go: GeneralOption = {
+          name: n,
+          selected: true,
+        };
+        return go;
+      }),
+    );
+  }
+
+  toggleGeneral(name: string) {
+    const index = this._generalOptions.findIndex(
+      (opt: GeneralOption) => opt.name === name,
+    );
+    if (index >= 0) {
+      const preToggle = this._generalOptions[index].selected;
+      this._generalOptions[index].selected = !preToggle;
+    }
+  }
+
+  protected renderGeneralFilter() {
+    return html`
+      <div class="multi-select">
+        <label
+          class=" spectrum-FieldLabel spectrum-FieldLabel--sizeM "
+          id="generalOptions"
+        >
+          ${this.generalFilterLabel}
+        </label>
+        <div class="generalOptions popover"></div>
+
+        <button
+          aria-haspopup="listbox"
+          type="button"
+          class=" spectrum-Picker spectrum-Picker--sizeM "
+          @click=${() => this._dropdownOpen.set(!this._dropdownOpen.get())}
+        >
+          <span class=" spectrum-Picker-label is-placeholder ">
+            Select Generals
+          </span>
+          <iconify-icon
+            icon="ion:chevron-down-outline"
+            width="none"
+            class="generalOptions popover"
+          ></iconify-icon>
+        </button>
+        <div
+          role="presentation"
+          class=" spectrum-Popover spectrum-Popover--sizeM spectrum-Popover--bottom-start "
+          id="generalOptions-popover"
+        >
+          <ul
+            class=" spectrum-Menu spectrum-Menu--sizeM "
+            id="menu-8bqe9"
+            role="menu"
+            aria-labelledby="menu-label-1lofs"
+            aria-disabled="false"
+          >
+            ${this._generalOptions.map((option) => {
+              return html`
+                <li
+                  class="spectrum-Menu-item"
+                  id="${option.name.replaceAll(/ /, '_')}"
+                  role="menuitem"
+                  aria-selected="${option.selected ? 'true' : 'false'}"
+                  aria-disabled="false"
+                  tabindex="0"
+                >
+                  <span class="spectrum-Menu-itemLabel"> ${option.name} </span>
+                </li>
+              `;
+            })}
+          </ul>
+        </div>
+      </div>
+    `;
   }
 
   private handleLevelChange<T>(
@@ -325,6 +435,7 @@ export class LevelSettings extends SignalWatcher(LitElement) {
         >
           ${this.renderCovenantcombo()} ${this.renderAscendingcombo()}
           ${this.renderSpecialitycombos()}
+          ${this._generalOptions.length ? this.renderGeneralFilter() : ''}
         </form>
       </div>
     `;
