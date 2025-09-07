@@ -1,0 +1,77 @@
+name: Hangul
+levels:
+  - level: green
+    text: >-
+      Increases Gold Production Speed in Subordinate City 4%
+      Increases Construction Speed in Subordinate City 4%
+    buffs:
+      - attribute: SubCity Gold Production
+        conditions:
+          - When City Mayor for this SubCity
+        value:
+          number: 4
+      - attribute: SubCity Construction Speed
+        conditions:
+          - When City Mayor for this SubCity
+        value:
+          number: 4
+  - level: blue
+    text: >-
+      Increases Gold Production Speed in Subordinate City 4%
+      Increases Construction Speed in Subordinate City 4%
+    buffs:
+      - attribute: SubCity Gold Production
+        conditions:
+          - When City Mayor for this SubCity
+        value:
+          number: 4
+      - attribute: SubCity Construction Speed
+        conditions:
+          - When City Mayor for this SubCity
+        value:
+          number: 4
+  - level: purple
+    text: >-
+      Increases Gold Production Speed in Subordinate City 8%
+      Increases Construction Speed in Subordinate City 8%
+    buffs:
+      - attribute: SubCity Gold Production
+        conditions:
+          - When City Mayor for this SubCity
+        value:
+          number: 8
+      - attribute: SubCity Construction Speed
+        conditions:
+          - When City Mayor for this SubCity
+        value:
+          number: 8
+  - level: orange
+    text: >-
+      Increases Gold Production Speed in Subordinate City 8%
+      Increases Construction Speed in Subordinate City 8%
+    buffs:
+      - attribute: SubCity Gold Production
+        conditions:
+          - When City Mayor for this SubCity
+        value:
+          number: 8
+      - attribute: SubCity Construction Speed
+        conditions:
+          - When City Mayor for this SubCity
+        value:
+          number: 8
+  - level: gold
+    text: >-
+      Increases Gold Production Speed in Subordinate City 16%
+      Increases Construction Speed in Subordinate City 16%
+    buffs:
+      - attribute: SubCity Gold Production
+        conditions:
+          - When City Mayor for this SubCity
+        value:
+          number: 16
+      - attribute: SubCity Construction Speed
+        conditions:
+          - When City Mayor for this SubCity
+        value:
+          number: 16
