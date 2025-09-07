@@ -472,13 +472,10 @@ package Game::EvonyTKR::Controller::Generals {
         $self->stash(
           'buff-summaries' => {
             # For backward compatibility
-            marchIncrease =>
-              $summarizer->getBuffForTypeAndKey($targetType, 'March Size'),
-            attackIncrease =>
-              $summarizer->getBuffForTypeAndKey($targetType, 'Attack'),
-            defenseIncrease =>
-              $summarizer->getBuffForTypeAndKey($targetType, 'Defense'),
-            hpIncrease => $summarizer->getBuffForTypeAndKey($targetType, 'HP'),
+            marchIncrease => $summarizer->buffValues->{$targetType}->{'March Size'},
+            attackIncrease => $summarizer->buffValues->{$targetType}->{'Attack'},
+            defenseIncrease => $summarizer->buffValues->{$targetType}->{'Defense'},
+            hpIncrease => $summarizer->buffValues->{$targetType}->{'HP'},
 
             # Full granular data
             buffValues   => $summarizer->buffValues,
@@ -847,42 +844,27 @@ package Game::EvonyTKR::Controller::Generals {
     $summarizer->updateBuffs();
     $summarizer->updateDebuffs();
 
+    unless ($generalType =~ /(Ground|Mounted|Ranged|Siege)/i) {
+      $generalType = 'Overall';
+    }
+
     my $result = {
-      marchbuff => $summarizer->getBuffForTypeAndKey(
-        $route_meta->{generalType},
-        'March Size'
-      ),
-      attackbuff =>
-        $summarizer->getBuffForTypeAndKey($route_meta->{generalType}, 'Attack'),
-      defensebuff => $summarizer->getBuffForTypeAndKey(
-        $route_meta->{generalType}, 'Defense'
-      ),
-      hpbuff =>
-        $summarizer->getBuffForTypeAndKey($route_meta->{generalType}, 'HP'),
-      groundattackdebuff =>
-        $summarizer->getDebuffForTypeAndKey('Ground Troops', 'Attack'),
-      grounddefensedebuff =>
-        $summarizer->getDebuffForTypeAndKey('Ground Troops', 'Defense'),
-      groundhpdebuff =>
-        $summarizer->getDebuffForTypeAndKey('Ground Troops', 'HP'),
-      mountedattackdebuff =>
-        $summarizer->getDebuffForTypeAndKey('Mounted Troops', 'Attack'),
-      mounteddefensedebuff =>
-        $summarizer->getDebuffForTypeAndKey('Mounted Troops', 'Defense'),
-      mountedhpdebuff =>
-        $summarizer->getDebuffForTypeAndKey('Mounted Troops', 'HP'),
-      rangedattackdebuff =>
-        $summarizer->getDebuffForTypeAndKey('Ranged Troops', 'Attack'),
-      rangeddefensedebuff =>
-        $summarizer->getDebuffForTypeAndKey('Ranged Troops', 'Defense'),
-      rangedhpdebuff =>
-        $summarizer->getDebuffForTypeAndKey('Ranged Troops', 'HP'),
-      siegeattackdebuff =>
-        $summarizer->getDebuffForTypeAndKey('Siege Machines', 'Attack'),
-      siegedefensedebuff =>
-        $summarizer->getDebuffForTypeAndKey('Siege Machines', 'Defense'),
-      siegehpdebuff =>
-        $summarizer->getDebuffForTypeAndKey('Siege Machines', 'HP'),
+      marchbuff             => $summarizer->buffValues->{$generalType}->{'March Size'},
+      attackbuff            => $summarizer->buffValues->{$generalType}->{'Attack'},
+      defensebuff           => $summarizer->buffValues->{$generalType}->{'Defense'},
+      hpbuff                => $summarizer->buffValues->{$generalType}->{'HP'},
+      groundattackdebuff    => $summarizer->debuffValues->{'Ground Troops'}->{'Attack'},
+      grounddefensedebuff   => $summarizer->debuffValues->{'Ground Troops'}->{'Defense'},
+      groundhpdebuff        => $summarizer->debuffValues->{'Ground Troops'}->{'HP'},
+      mountedattackdebuff   => $summarizer->debuffValues->{'Mounted Troops'}->{'Attack'},
+      mounteddefensedebuff  => $summarizer->debuffValues->{'Mounted Troops'}->{'Defense'},
+      mountedhpdebuff       => $summarizer->debuffValues->{'Mounted Troops'}->{'HP'},
+      rangedattackdebuff    => $summarizer->debuffValues->{'Ranged Troops'}->{'Attack'},
+      rangeddefensedebuff   => $summarizer->debuffValues->{'Ranged Troops'}->{'Defense'},
+      rangedhpdebuff        => $summarizer->debuffValues->{'Ranged Troops'}->{'HP'},
+      siegeattackdebuff     => $summarizer->debuffValues->{'Siege Machines'}->{'Attack'},
+      siegedefensedebuff    => $summarizer->debuffValues->{'Siege Machines'}->{'Defense'},
+      siegehpdebuff         => $summarizer->debuffValues->{'Siege Machines'}->{'HP'},
     };
     if ($isPrimary) {
       $result->{primary} = $general;

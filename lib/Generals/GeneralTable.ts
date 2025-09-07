@@ -98,16 +98,19 @@ const GeneralPair = PairBuffs.extend(BuffFields.shape);
 type GeneralData = z.infer<typeof GeneralData>;
 type GeneralPair = z.infer<typeof GeneralPair>;
 
+const RowState = z.literal(['stale', 'pending', 'current', 'error', 'ignore']);
+type RowState = z.infer<typeof RowState>;
+
 const GeneralDataStub = z.object({
   primary: z.object({ name: z.string() }),
-  current: z.literal(['stale', 'pending', 'current', 'error']).optional(),
+  current: RowState.optional(),
 });
 type GeneralDataStub = z.infer<typeof GeneralDataStub>;
 
 const GeneralPairStub = z.object({
   primary: z.object({ name: z.string() }),
   secondary: z.object({ name: z.string() }),
-  current: z.literal(['stale', 'pending', 'current', 'error']).optional(),
+  current: RowState.optional(),
 });
 type GeneralPairStub = z.infer<typeof GeneralPairStub>;
 
@@ -181,6 +184,27 @@ export class GeneralTable extends SignalWatcher(LitElement) {
     // this must happen *after* the 2 level settings forms are set up just above.
     this.loadFromUrl();
     //window.addEventListener('popstate', this.handlePopState);
+    this.addEventListener('form_updated', (e) => {
+      if (DEBUG) {
+        console.log(`got a form_updated event`);
+      }
+      const detail = (e as CustomEvent).detail;
+      if (detail['is_primary' as keyof typeof detail]) {
+        if (DEBUG) {
+          console.log(`primary form changed`);
+        }
+      } else {
+        if (DEBUG) {
+          console.log(`secondary form changed`);
+        }
+      }
+      const currentHash = this.filterSettings.get();
+      if (this.lastFilterSettings.localeCompare(currentHash)) {
+        this.lastFilterSettings = currentHash;
+        this.invalidateData();
+        this.startBackgroundFetch();
+      }
+    });
   }
 
   override disconnectedCallback() {
@@ -195,7 +219,10 @@ export class GeneralTable extends SignalWatcher(LitElement) {
   override async firstUpdated() {
     this.columns = this.generateColumns();
     const stubData = await this.fetchStubPairs();
-    this.primarySettings.generals = stubData.map((sd) => sd.primary.name);
+    const primaries = Array.from(
+      new Map(stubData.map((sd) => [sd.primary.name, true])).keys(),
+    );
+    this.primarySettings.generals = primaries;
     this.primarySettings.requestUpdate();
 
     this.nameList = [...stubData];
@@ -209,12 +236,6 @@ export class GeneralTable extends SignalWatcher(LitElement) {
     const params = this.urlParams.get();
     const newURL = `${window.location.pathname}?${params.toString()}`;
     window.history.replaceState(null, '', newURL);
-    const currentHash = this.filterSettings.get();
-    if (this.lastFilterSettings.localeCompare(currentHash)) {
-      this.lastFilterSettings = currentHash;
-      this.invalidateData();
-      this.startBackgroundFetch();
-    }
   }
 
   private generateColumns(): ColumnDef<RowData>[] {
@@ -566,6 +587,8 @@ export class GeneralTable extends SignalWatcher(LitElement) {
         specialtyLevel2: this.primarySettings.specialtyLevel2.get(),
         specialtyLevel3: this.primarySettings.specialtyLevel3.get(),
         specialtyLevel4: this.primarySettings.specialtyLevel4.get(),
+        selectedCount: this.primarySettings.selectedCount.get(),
+        selected: this.primarySettings.selectedGenerals.get().join('|'),
       },
       ...(this.secondarySettings && {
         secondary: {
@@ -582,8 +605,16 @@ export class GeneralTable extends SignalWatcher(LitElement) {
 
   private invalidateData() {
     for (let i = 0; i < this.nameList.length; i++) {
-      if (this.nameList[i].current !== 'stale') {
-        this.nameList[i].current = 'stale';
+      const name = this.nameList[i].primary.name;
+      const selected = this.primarySettings.selectedGenerals
+        .get()
+        .find((n) => n === name);
+      if (selected) {
+        if (this.nameList[i].current !== 'stale') {
+          this.nameList[i].current = 'stale';
+        }
+      } else {
+        this.nameList[i].current = 'ignore';
       }
     }
     this.requestUpdate();
@@ -605,6 +636,9 @@ export class GeneralTable extends SignalWatcher(LitElement) {
 
     // Initialize with all rows needing fetch
     this.nameList.forEach((row, i) => {
+      if (row.current === 'ignore') {
+        return;
+      }
       if (!row.current || row.current === 'stale') {
         pending.add(i);
         this.nameList[i].current = 'pending';
@@ -672,14 +706,29 @@ export class GeneralTable extends SignalWatcher(LitElement) {
 
   private updateTableData() {
     this.tableData = this.nameList
-      .map((_, i) => this.dataMap.get(i))
+      .map((row, i) =>
+        row.current !== 'ignore' ? this.dataMap.get(i) : undefined,
+      )
       .filter((x): x is RowData => !!x);
+
+    this._visibleIndexMap = this.nameList
+      .map((row, i) =>
+        row.current !== 'ignore' && this.dataMap.has(i) ? i : -1,
+      )
+      .filter((i) => i !== -1);
+
     this.requestUpdate();
   }
 
+  // add a field:
+  private _visibleIndexMap: number[] = [];
+
   override render() {
+    const totalCount = this.nameList.filter(
+      (r) => r.current !== 'ignore',
+    ).length;
     const loadingCount = this.nameList.filter(
-      (r) => r.current !== 'current',
+      (r) => r.current !== 'current' && r.current !== 'ignore',
     ).length;
     const table = this.tableController.table({
       columns: this.columns,
@@ -695,7 +744,10 @@ export class GeneralTable extends SignalWatcher(LitElement) {
       getSortedRowModel: getSortedRowModel(),
       getCoreRowModel: getCoreRowModel(),
     });
+    const cfs = this.filterSettings.get();
     return html`
+      <span style="display: none">${cfs}</span>
+
       ${this.primarySettings}
       ${this.mode === 'pair' ? this.secondarySettings : ''}
       ${loadingCount > 0
@@ -704,13 +756,13 @@ export class GeneralTable extends SignalWatcher(LitElement) {
               <div class="spectrum-ProgressBar-track">
                 <div
                   class="spectrum-ProgressBar-fill"
-                  style="inline-size: ${((this.nameList.length - loadingCount) /
-                    this.nameList.length) *
+                  style="inline-size: ${((totalCount - loadingCount) /
+                    totalCount) *
                   100}%;"
                 ></div>
               </div>
               <div class="spectrum-ProgressBar-label">
-                Refreshing ${loadingCount} of ${this.nameList.length} rows...
+                Refreshing ${loadingCount} of ${totalCount} rows...
               </div>
             </div>
           </div>`
@@ -753,10 +805,10 @@ export class GeneralTable extends SignalWatcher(LitElement) {
               table.getRowModel().rows,
               (row) => row.id,
               (row, index) => {
+                const originalIndex = this._visibleIndexMap[index];
                 const currentIndex = index + 1;
-                const rowState = this.nameList[index]?.current
-                  ? this.nameList[index]?.current
-                  : 'current';
+                const rowState =
+                  this.nameList[originalIndex]?.current ?? 'current';
                 const title =
                   rowState === 'stale'
                     ? 'Showing previous values; updating…'
@@ -773,23 +825,19 @@ export class GeneralTable extends SignalWatcher(LitElement) {
                   ${repeat(
                     row.getVisibleCells(),
                     (cell) => cell.id,
-                    (cell) => {
-                      if (cell.column.id === 'rowIndex') {
-                        return html`
-                          <span
+                    (cell) =>
+                      cell.column.id === 'rowIndex'
+                        ? html`<span
                             class="index-column spectrum-Body spectrum-Body--sizeM"
-                            >${currentIndex}</span
                           >
-                        `;
-                      } else {
-                        return html`<td class="spectrum-Table-cell">
-                          ${flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext(),
-                          )}
-                        </td>`;
-                      }
-                    },
+                            ${currentIndex}
+                          </span>`
+                        : html`<td class="spectrum-Table-cell">
+                            ${flexRender(
+                              cell.column.columnDef.cell,
+                              cell.getContext(),
+                            )}
+                          </td>`,
                   )}
                 </tr>`;
               },

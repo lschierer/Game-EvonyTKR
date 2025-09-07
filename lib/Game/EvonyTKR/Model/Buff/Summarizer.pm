@@ -64,50 +64,6 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
     'Overall'        => { 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
   };
 
-  method getBuffForTypeAndKey ($tt, $key) {
-    # normalize $tt
-    $tt = $self->_getTroopTypeForTarget($tt);
-    if (exists $buffValues->{$tt}) {
-      if (exists $buffValues->{$tt}->{$key}) {
-        return $buffValues->{$tt}->{$key};
-      }
-      $self->logger->error("$key is not a valid key for buffValues at $tt");
-    }
-    $self->logger->error("$tt is not a valid troop type for buffValues");
-    return 0;
-  }
-
-  method getDebuffForTypeAndKey ($tt, $key) {
-    # normalize $tt
-    $tt = $self->_getTroopTypeForTarget($key);
-    if (exists $debuffValues->{$tt}) {
-      if (exists $debuffValues->{$tt}->{$key}) {
-        return $debuffValues->{$tt}->{$key};
-      }
-      $self->logger->error("$key is not a valid key for debuffValues at $tt");
-    }
-    $self->logger->error("$tt is not a valid troop type for debuffValues");
-    return 0;
-  }
-
-  # Helper method to determine troop type from targetType
-  method _getTroopTypeForTarget($tt = $targetType) {
-    if ($tt =~ /Ground/i) {
-      return 'Ground Troops';
-    }
-    elsif ($tt =~ /Mounted/i) {
-      return 'Mounted Troops';
-    }
-    elsif ($tt =~ /Ranged/i) {
-      return 'Ranged Troops';
-    }
-    elsif ($tt =~ /Siege/i) {
-      return 'Siege Machines';
-    }
-    else {
-      return 'Overall';
-    }
-  }
 
   # Main update methods
   method updateBuffs() {

@@ -2,30 +2,6 @@
 
 @import url('@spectrum-css/table/dist/index.css');
 @import url('@spectrum-css/overlay/index.css');
-@import url('@spectrum-css/picker/index.css');
-@import url('@spectrum-css/fieldgroup/index.css');
-@import url('@spectrum-css/fieldlabel/index.css');
-
-div.generalOptions.popover {
-  --spectrum-popover-height: 15em;
-  --spectrum-popover-width: 15em;
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-iconify-icon.generalOptions.popover {
-  max-width: 1.5em;
-  height: 1em;
-  display: inline-block;
-  box-sizing: border-box;
-}
-
-div#generaloptions-popover {
-  inset-block-start: 100%;
-  inset-inline-start: 0;
-}
 
 div#table-loading {
   width: calc(100% - 4rem);

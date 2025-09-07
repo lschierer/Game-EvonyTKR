@@ -1,16 +1,71 @@
-@import url('@spectrum-css/form/index.css');
-@import url('@spectrum-css/fieldlabel/index.css');
-@import url('@spectrum-css/fieldgroup/index.css');
-@import url('@spectrum-css/picker/dist/index.css');
-@import url('@spectrum-css/button/dist/index.css');
-
 :host {
   --mod-form-grid-template-columns-labels-above: repeat(
     auto-fit,
     minmax(15em, 1fr)
+  );
+  --spectrum-popover-height: 20em;
+  --spectrum-popover-width: 20em;
+  --mod-popover-background-color: var(--surface-1);
+  --mod-picker-button-icon-color: var(--text-1);
+  --mod-picker-button-border-color: var(--text-1);
+  --mod-menu-item-label-icon-color-default: var(
+    --spectrum-positive-visual-color
   );
 }
 
 div.settings-form form#settings-form {
   width: 100%;
 }
+
+#general-options-picker {
+  opacity: 0; /* hide native box */
+  position: absolute;
+  inset: 0;
+}
+
+.picker-label {
+  pointer-events: none;
+  color: var(--text-1);
+}
+
+.row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+div#general-filter-popover {
+  inset-block-start: 100%;
+  inset-inline-start: 0;
+  z-index: 1000;
+}
+
+iconify-icon.spectrum-PickerButton-fill {
+  width: 1.5em;
+  height: 1.5em;
+  border-color: var(--mod-picker-button-border-color);
+  color: var(--mod-picker-button-icon-color);
+}
+
+li iconify-icon.spectrum-Icon.hidden {
+  width: 1em;
+  height: 1em;
+  display: none;
+}
+
+li.is-selected iconify-icon.general-filter-selection-icon {
+  width: 1em;
+  height: 1em;
+  display: inline-block;
+}
+
+/* Make checkbox click not steal focus from LI */
+
+/* div#general-filter-popover input[type='checkbox'] {
+  margin-right: 0.5rem;
+  } */

@@ -11,8 +11,7 @@ import {
   type PropertyValues,
 } from 'lit';
 import { repeat } from 'lit/directives/repeat.js';
-import { Signal, SignalWatcher, signal } from '@lit-labs/signals';
-import { SignalArray } from 'signal-utils/array';
+import { Signal, SignalWatcher, signal, computed } from '@lit-labs/signals';
 
 import * as z from 'zod';
 import {
@@ -22,6 +21,16 @@ import {
   SpecialtyLevelValues,
 } from '../Game/EvonyTKR/Shared/Constants';
 
+import SpectrumButton from '@spectrum-css/button/dist/index.css' with { type: 'css' };
+import SpectrumDivider from '@spectrum-css/divider/dist/index.css' with { type: 'css' };
+import SpectrumFieldGroup from '@spectrum-css/fieldgroup/dist/index.css' with { type: 'css' };
+import SpectrumFieldLabel from '@spectrum-css/fieldlabel/dist/index.css' with { type: 'css' };
+import SpectrumIcon from '@spectrum-css/icon/dist/index.css' with { type: 'css' };
+import SpectrumForm from '@spectrum-css/form/dist/index.css' with { type: 'css' };
+import SpectrumMenu from '@spectrum-css/menu/dist/index.css' with { type: 'css' };
+import SpectrumPicker from '@spectrum-css/picker/dist/index.css' with { type: 'css' };
+import SpectrumPickerButton from '@spectrum-css/pickerbutton/dist/index.css' with { type: 'css' };
+import SpectrumPopOver from '@spectrum-css/popover/dist/index.css' with { type: 'css' };
 import SpectrumTokensCSS from '@spectrum-css/tokens/dist/index.css' with { type: 'css' };
 import LevelSettingsFormCSS from '../../share/public/css/level_settings_form.css' with { type: 'css' };
 
@@ -37,7 +46,20 @@ interface GeneralOption {
 
 @customElement('level-settings')
 export class LevelSettings extends SignalWatcher(LitElement) {
-  static styles: CSSResultGroup = [SpectrumTokensCSS, LevelSettingsFormCSS];
+  static styles: CSSResultGroup = [
+    SpectrumTokensCSS,
+    SpectrumButton,
+    SpectrumDivider,
+    SpectrumFieldGroup,
+    SpectrumFieldLabel,
+    SpectrumForm,
+    SpectrumIcon,
+    SpectrumMenu,
+    SpectrumPicker,
+    SpectrumPickerButton,
+    SpectrumPopOver,
+    LevelSettingsFormCSS,
+  ];
 
   @property({ type: Boolean })
   public is_primary: boolean = true;
@@ -48,29 +70,43 @@ export class LevelSettings extends SignalWatcher(LitElement) {
     : 'Secondary General';
 
   @property({ type: String })
+  public generalFilterLabel: string = 'Selected Primary Generals';
+
   public covenantLevel: Signal.State<CovenantCategoryValues> =
     signal('civilization');
 
-  @property({ type: String })
   public ascendingLevel: Signal.State<AscendingAttributeLevelValues> =
     signal('red5');
 
-  @property({ type: String })
   public specialtyLevel1: Signal.State<SpecialtyLevelValues> = signal('gold');
 
-  @property({ type: String })
   public specialtyLevel2: Signal.State<SpecialtyLevelValues> = signal('gold');
 
-  @property({ type: String })
   public specialtyLevel3: Signal.State<SpecialtyLevelValues> = signal('gold');
 
-  @property({ type: String })
   public specialtyLevel4: Signal.State<SpecialtyLevelValues> = signal('gold');
 
-  @property({ type: String })
-  public generalFilterLabel: string = 'Selected Primary Generals';
-  private _generalOptions = new SignalArray<GeneralOption>([]);
-  private _dropdownOpen = new Signal.State(false);
+  private menuOpen: Signal.State<boolean> = signal(false);
+
+  private _generalOptions = new Array<GeneralOption>();
+
+  private namesRev = signal(0);
+
+  public selectedGenerals: Signal.State<string[]> = signal([]);
+
+  public revision: number = 0;
+
+  private filterText = signal('');
+
+  private filteredOptions = computed(() => {
+    this.namesRev.get(); // depend on list changes
+    const q = this.filterText.get().trim().toLocaleLowerCase();
+    if (!q) return [...this._generalOptions];
+    // simple contains; upgrade to fuzzy later if you want
+    return this._generalOptions.filter((o) =>
+      o.name.toLocaleLowerCase().includes(q),
+    );
+  });
 
   protected willUpdate(_changedProperties: PropertyValues): void {
     if (DEBUG) {
@@ -95,100 +131,199 @@ export class LevelSettings extends SignalWatcher(LitElement) {
     }
   }
 
-  get selectedCount(): number {
-    return this._generalOptions.filter((opt: GeneralOption) => opt.selected)
-      .length;
-  }
-
-  get displayText(): string {
-    const count = this.selectedCount;
-    const total = this._generalOptions.length;
-    if (count === 0) return 'Select generals...';
-    if (count === total) return 'All selected';
-    return `${count} selected`;
-  }
-
-  get selectedGenerals() {
-    return this._generalOptions
-      .filter((opt: GeneralOption) => opt.selected)
-      .map((opt) => opt.name);
-  }
-
-  set generals(generalNames: string[]) {
-    this._generalOptions = SignalArray.from(
-      generalNames.map((n) => {
-        const go: GeneralOption = {
-          name: n,
-          selected: true,
-        };
-        return go;
+  protected override updated(_changedProperties: PropertyValues): void {
+    super.updated(_changedProperties);
+    this.dispatchEvent(
+      new CustomEvent('form_updated', {
+        detail: {
+          revision: this.revision,
+          is_primary: this.is_primary,
+        },
+        bubbles: true,
+        composed: true,
       }),
     );
+    this.revision++;
   }
 
-  toggleGeneral(name: string) {
-    const index = this._generalOptions.findIndex(
-      (opt: GeneralOption) => opt.name === name,
+  public selectedCount = computed(
+    () =>
+      this._generalOptions.filter((o) => o.selected).map((o) => o.name).length,
+  );
+
+  set generals(names: string[]) {
+    this._generalOptions = names.map((n) => ({ name: n, selected: true }));
+    this.selectedGenerals.set(names.slice());
+    this.namesRev.set(this.namesRev.get() + 1);
+    this.requestUpdate(); // to re-render the menu immediately
+  }
+
+  private toggleByName(name: string) {
+    const i = this._generalOptions.findIndex((o) => o.name === name);
+    if (i >= 0) {
+      const cv = this._generalOptions[i].selected;
+      this._generalOptions[i].selected = !cv;
+    }
+    this.selectedGenerals.set(
+      this._generalOptions.filter((go) => go.selected).map((go) => go.name),
     );
-    if (index >= 0) {
-      const preToggle = this._generalOptions[index].selected;
-      this._generalOptions[index].selected = !preToggle;
+    this.requestUpdate();
+  }
+
+  private selectFiltered(value: boolean) {
+    if (DEBUG) console.log(`setting filtered to ${value}`);
+    const visible = new Set(this.filteredOptions.get().map((o) => o.name));
+    let changed = false;
+    for (const o of this._generalOptions) {
+      if (!visible.has(o.name)) continue;
+      if (o.selected !== value) {
+        o.selected = value;
+        changed = true;
+      }
+    }
+    if (changed) {
+      this.selectedGenerals.set(
+        this._generalOptions.filter((go) => go.selected).map((go) => go.name),
+      );
+      this.requestUpdate();
     }
   }
 
+  private onFilterInput = (e: Event) => {
+    const v = (e.currentTarget as HTMLInputElement).value;
+    this.filterText.set(v);
+  };
+
   protected renderGeneralFilter() {
+    const filtered = this.filteredOptions.get();
     return html`
-      <div class="multi-select">
+      <div class="spectrum-Form-item">
         <label
-          class=" spectrum-FieldLabel spectrum-FieldLabel--sizeM "
-          id="generalOptions"
+          for="general-filter"
+          class="spectrum-FieldLabel spectrum-FieldLabel--sizeM"
         >
           ${this.generalFilterLabel}
         </label>
-        <div class="generalOptions popover"></div>
+        <div class="spectrum-Form-itemField row">
+          <input
+            id="general-filter"
+            type="search"
+            class="spectrum-Textfield spectrum-Textfield--sizeM"
+            placeholder="Filter generals…"
+            @input=${this.onFilterInput}
+            aria-label="Filter generals"
+          ></input>
 
-        <button
-          aria-haspopup="listbox"
-          type="button"
-          class=" spectrum-Picker spectrum-Picker--sizeM "
-          @click=${() => this._dropdownOpen.set(!this._dropdownOpen.get())}
-        >
-          <span class=" spectrum-Picker-label is-placeholder ">
-            Select Generals
-          </span>
-          <iconify-icon
-            icon="ion:chevron-down-outline"
-            width="none"
-            class="generalOptions popover"
-          ></iconify-icon>
-        </button>
-        <div
-          role="presentation"
-          class=" spectrum-Popover spectrum-Popover--sizeM spectrum-Popover--bottom-start "
-          id="generalOptions-popover"
-        >
-          <ul
-            class=" spectrum-Menu spectrum-Menu--sizeM "
-            id="menu-8bqe9"
-            role="menu"
-            aria-labelledby="menu-label-1lofs"
-            aria-disabled="false"
-          >
-            ${this._generalOptions.map((option) => {
-              return html`
-                <li
-                  class="spectrum-Menu-item"
-                  id="${option.name.replaceAll(/ /, '_')}"
-                  role="menuitem"
-                  aria-selected="${option.selected ? 'true' : 'false'}"
-                  aria-disabled="false"
-                  tabindex="0"
-                >
-                  <span class="spectrum-Menu-itemLabel"> ${option.name} </span>
-                </li>
-              `;
-            })}
-          </ul>
+          <div class="dropdown">
+            <button
+              type="button"
+              class="spectrum-PickerButton spectrum-PickerButton--uiicononly spectrum-PickerButton--right spectrum-PickerButton--sizeM ${
+                this.menuOpen.get() ? 'is-open' : ''
+              }"
+              aria-haspopup="true"
+              aria-expanded=${this.menuOpen.get() ? 'true' : 'false'}
+              @click=${() => {
+                let mo = this.menuOpen.get();
+                console.log(
+                  `clicked picker button; it was ${mo ? 'true' : 'false'}`,
+                );
+                this.menuOpen.set(!this.menuOpen.get());
+                mo = this.menuOpen.get();
+                console.log(`it is now ${mo ? 'true' : 'false'}`);
+              }}
+            >
+              <div class="spectrum-PickerButton-fill">
+                <iconify-icon icon="${this.menuOpen.get() ? 'gg:chevron-up-r' : 'gg:chevron-down-r'}" width="none" class="spectrum-PickerButton-fill"></iconify-icon>
+              </div>
+            </button>
+
+            ${
+              this.menuOpen.get()
+                ? html`
+                    <div
+                      id="general-filter-popover"
+                      role="presentation"
+                      class="spectrum-Popover is-open spectrum-Popover--sizeM spectrum-Popover--bottom-left"
+                    >
+                      <ul
+                        class="spectrum-Menu spectrum-Menu--sizeM is-selectableMultiple"
+                        role="group"
+                      >
+                        <!-- Select all / none -->
+                        <li
+                          class="spectrum-Menu-item "
+                          role="menuitem"
+                          @click=${() => this.selectFiltered(true)}
+                          tabindex="0"
+                        >
+                          <span class="spectrum-Menu-itemLabel"
+                            >Select all (filtered)</span
+                          >
+                        </li>
+                        <li
+                          class="spectrum-Menu-item"
+                          role="menuitem"
+                          @click=${() => this.selectFiltered(false)}
+                          tabindex="0"
+                        >
+                          <span class="spectrum-Menu-itemLabel"
+                            >Select none (filtered)</span
+                          >
+                        </li>
+
+                        <!-- Divider -->
+                        <li
+                          class="spectrum-Divider spectrum-Divider--sizeM"
+                          role="separator"
+                        ></li>
+
+                        <!-- Checkable options -->
+                        ${filtered
+                          .sort((a, b) => {
+                            return a.name.localeCompare(b.name);
+                          })
+                          .map(
+                            (opt, index) => html`
+                              <li
+                                class="spectrum-Menu-item ${opt.selected
+                                  ? 'is-selected'
+                                  : ''}"
+                                role="option"
+                                aria-selected="${opt.selected
+                                  ? 'true'
+                                  : 'false'}"
+                                tabindex="0"
+                                @click=${() => this.toggleByName(opt.name)}
+                              >
+                                <iconify-icon
+                                  icon="tabler:circle-check"
+                                  width="none"
+                                  class="spectrum-Icon spectrum-Icon--medium spectrum-Menu-itemIcon ${opt.selected
+                                    ? ''
+                                    : 'hidden'}"
+                                ></iconify-icon>
+                                <span class="spectrum-Menu-itemLabel">
+                                  ${opt.name}
+                                </span>
+                              </li>
+                            `,
+                          )}
+                        ${filtered.length === 0
+                          ? html` <li
+                              class="spectrum-Menu-item is-disabled"
+                              tabindex="-1"
+                            >
+                              <span class="spectrum-Menu-itemLabel"
+                                >No matches</span
+                              >
+                            </li>`
+                          : null}
+                      </ul>
+                    </div>
+                  `
+                : null
+            }
+          </div>
         </div>
       </div>
     `;
