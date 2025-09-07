@@ -1,0 +1,66 @@
+generals:
+  - William Marshal
+  - Edward III
+  - James Cook
+levels:
+  - category: war
+    text: Siege Machine HP + 5%
+    buffs:
+      - attribute: HP
+        troop: Siege Machines
+        value:
+          number: 5
+  - category: cooperation
+    text: Siege Machine Training Speed +10% (Global)
+    buffs:
+      - attribute: Training Speed
+        passive: 1
+        troop: Siege Machines
+        value:
+          number: 10
+  - category: peace
+    text: Siege Machine Defense +10%
+    buffs:
+      - attribute: Defense
+        troop: Siege Machines
+        value:
+          number: 10
+  - category: faith
+    text: >-
+      Siege Machine Attack +5%.
+      Reinforcing Siege Machine HP +5% (Global).
+    buffs:
+      - attribute: Attack
+        troop: Siege Machines
+        value:
+          number: 5
+      - attribute: HP
+        troop: Siege Machines
+        passive: 1
+        conditions:
+          - Reinforcing
+        value:
+          number: 5
+  - category: honor
+    text: Attacking Siege Machine Attack +10%
+    buffs:
+      - attribute: Attack
+        troop: Siege Machines
+        value:
+          number: 10
+        conditions:
+          - Attacking
+  - category: civilization
+    text: >-
+      Reinforcing Siege Machine Attack +20%.
+      March Size Capacity +10%.
+    buffs:
+      - attribute: March Size
+        value:
+          number: 10
+      - attribute: Attack
+        troop: Siege Machines
+        conditions:
+          - Reinforcing
+        value:
+          number: 20
