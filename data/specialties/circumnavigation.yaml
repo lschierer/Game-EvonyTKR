@@ -1,0 +1,92 @@
+name: Circumnavigation
+levels:
+  - level: green
+    text: >-
+      Siege Machine Attack +5%.
+      Siege Machine Defense +4%.
+      Siege Machine HP +4%.
+    buffs:
+      - attribute: Attack
+        troop: Siege Machines
+        value:
+          number: 5
+      - attribute: Defense
+        troop: Siege Machines
+        value:
+          number: 4
+      - attribute: HP
+        troop: Siege Machines
+        value:
+          number: 4
+  - level: blue
+    text: >-
+      Siege Machine Attack +6%.
+      Siege Machine Defense +4%.
+      Siege Machine HP +4%.
+    buffs:
+      - attribute: Attack
+        troop: Siege Machines
+        value:
+          number: 6
+      - attribute: Defense
+        troop: Siege Machines
+        value:
+          number: 4
+      - attribute: HP
+        troop: Siege Machines
+        value:
+          number: 4
+  - level: purple
+    text: >-
+      Siege Machine Attack +11%.
+      Siege Machine Defense +8%.
+      Siege Machine HP +8%.
+    buffs:
+      - attribute: Attack
+        troop: Siege Machines
+        value:
+          number: 11
+      - attribute: Defense
+        troop: Siege Machines
+        value:
+          number: 8
+      - attribute: HP
+        troop: Siege Machines
+        value:
+          number: 8
+  - level: orange
+    text: >-
+      Siege Machine Attack +11%.
+      Siege Machine Defense +8%.
+      Siege Machine HP +8%.
+    buffs:
+      - attribute: Attack
+        troop: Siege Machines
+        value:
+          number: 11
+      - attribute: Defense
+        troop: Siege Machines
+        value:
+          number: 8
+      - attribute: HP
+        troop: Siege Machines
+        value:
+          number: 8
+  - level: gold
+    text: >-
+      Siege Machine Attack +22%.
+      Siege Machine Defense +16%.
+      Siege Machine HP +16%.
+    buffs:
+      - attribute: Attack
+        troop: Siege Machines
+        value:
+          number: 22
+      - attribute: Defense
+        troop: Siege Machines
+        value:
+          number: 16
+      - attribute: HP
+        troop: Siege Machines
+        value:
+          number: 16
