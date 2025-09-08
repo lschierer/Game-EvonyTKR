@@ -60,13 +60,13 @@ package Game::EvonyTKR::Converter {
     my $debug = $opt->{debug} ? 1 : 0;
 
     Log::Log4perl::Config->utf8(1);
-    my $loggerConfig = Game::EvonyTKR::Logger::Config->new('test');
+    my $loggerConfig = Game::EvonyTKR::Logger::Config->new('Game::EvonyTKR');
     my $logConfig;
     if ($debug) {
       $logConfig = Path::Tiny->cwd()->child('share/log4perl.development.conf ');
     }
     else {
-      $logConfig = Path::Tiny->cwd()->child('share/log4perl.conf ');
+      $logConfig = Path::Tiny->cwd()->child('share/log4perl.production.conf ');
     }
     Log::Log4perl::init($logConfig->canonpath());
     my $logger = Log::Log4perl->get_logger(__PACKAGE__);
