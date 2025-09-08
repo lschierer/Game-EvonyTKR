@@ -28,7 +28,7 @@
                         <dd><%= $buff->targetedType %></dd>
                     <% } %>
                     <% if (scalar $buff->conditions() > 0 ) { %>
-                      <% my @conditions = $buff->conditions(); %>
+                      <% my @conditions = $buff->conditions()->@*; %>
                         <dt>Conditions:</dt>
                         <% foreach my $condition (@conditions) { %>
                           <dd><%= $condition %></dd>
