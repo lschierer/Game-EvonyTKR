@@ -1,0 +1,42 @@
+name: Siege of Detroit
+text: >-
+  Increases in-city ground troops and mounted troops’ attack and HP by 30%, and in-city ground troops’ attack and defense by 20% when General is the Main City Defense General.
+buffs:
+  - attribute: Attack
+    troops: Ground Troops
+    conditions:
+      - In City
+    value:
+      number: 30
+  - attribute: Attack
+    troops: Mounted Troops
+    conditions:
+      - In City
+    value:
+      number: 30
+  - attribute: HP
+    troops: Ground Troops
+    conditions:
+      - In City
+    value:
+      number: 30
+  - attribute: HP
+    troops: Mounted Troops
+    conditions:
+      - In City
+    value:
+      number: 30
+  - attribute: Attack
+    class: Ground Troops
+    conditions:
+      - When The Main Defense General
+      - In City
+    value:
+      number: 20
+  - attribute: Defense
+    class: Ground Troops
+    conditions:
+      - When The Main Defense General
+      - In City
+    value:
+      number: 20
