@@ -44,7 +44,7 @@ build: prepare deps css images ts
 
 dev: deps css images build
   rm -f "${HOME}/var/log/Perl/dist/Game-Evony/*.log"
-  watchexec --exts css,pm,ep,js -w lib/ -w bin/ -w share/templates/ -w share/public/ -w share/collections/data/ --restart morbo ./bin/game-evonytkr
+  watchexec --exts css,pm,ep,js,yaml -w lib/ -w bin/ -w share/templates/ -w share/public/ -w share/collections/data/ --restart morbo ./bin/game-evonytkr
 
 quickdev:
   echo "${HOME}/var/log/Perl/dist/Game-Evony/*.log"
