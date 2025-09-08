@@ -1,0 +1,24 @@
+ascending: 'true'
+basic_attributes:
+  attack:
+    base: 118
+    increment: 8.92
+  defense:
+    base: 118
+    increment: 8.90
+  leadership:
+    base: 118
+    increment: 8.95
+  politics:
+    base: 112
+    increment: 8.52
+book: Siege of Detroit
+name: Isaac Brock
+specialties:
+  - Ground Troop Defense
+  - Defensive
+  - Ground Troop Ares
+  - The Hero of Upper Canada
+stars: red5
+type:
+  - wall
