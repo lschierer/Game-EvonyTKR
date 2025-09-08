@@ -1,0 +1,124 @@
+---
+ascending:
+  - level: red1
+    text: >-
+      When General is the Main City Defense General, In-city Mounted Troop and Ground Troop Attack +5% and HP +5%.
+    buffs:
+      - attribute: Attack
+        troop: Mounted Troops
+        value:
+          number: 5
+        conditions:
+          - When The Main Defense General
+          - In City
+      - attribute: HP
+        troop: Mounted Troops
+        value:
+          number: 5
+        conditions:
+          - When The Main Defense General
+          - In City
+      - attribute: Attack
+        troop: Ground Troops
+        value:
+          number: 5
+        conditions:
+          - When The Main Defense General
+          - In City
+      - attribute: HP
+        troop: Ground Troops
+        value:
+          number: 5
+        conditions:
+          - When The Main Defense General
+          - In City
+  - level: red2
+    text: >-
+      When General is the Main City Defense General, Hospital Capacity +20%, In-city Ground Troop Attack +5%.
+    buffs:
+      - attribute: Hospital Capacity
+        value:
+          number: 20
+        conditions:
+          - When The Main Defense General
+      - attribute: Attack
+        troop: Ground Troops
+        value:
+          number: 5
+        conditions:
+          - In City
+  - level: red3
+    text: >-
+      When General is the Main City Defense General, In-city Ranged Troop and Siege Machine Defense +15% and HP +15%.
+    buffs:
+      - attribute: Defense
+        troop: Ranged Troops
+        value:
+          number: 15
+        conditions:
+          - When The Main Defense General
+          - In City
+      - attribute: HP
+        troop: Ranged Troops
+        value:
+          number: 15
+        conditions:
+          - When The Main Defense General
+          - In City
+      - attribute: Defense
+        troop: Siege Machines
+        value:
+          number: 15
+        conditions:
+          - When The Main Defense General
+          - In City
+      - attribute: HP
+        troop: Siege Machines
+        value:
+          number: 15
+        conditions:
+          - When The Main Defense General
+          - In City
+  - level: red4
+    text: >-
+      When General is the Main City Defense General, In-city Troops Defense +10% and HP +10%.
+    buffs:
+      - attribute: Defense
+        value:
+          number: 10
+        conditions:
+          - When The Main Defense General
+          - In City
+      - attribute: HP
+        value:
+          number: 10
+        conditions:
+          - When The Main Defense General
+          - In City
+  - level: red5
+    text: >-
+      When General is the Main City Defense General, In-city Ground Troop Attack +40%, Defense and HP +20%.
+    buffs:
+      - attribute: Attack
+        troop: Ground Troops
+        value:
+          number: 40
+        conditions:
+          - When The Main Defense General
+          - In City
+      - attribute: Defense
+        troop: Ground Troops
+        value:
+          number: 20
+        conditions:
+          - When The Main Defense General
+          - In City
+      - attribute: HP
+        troop: Ground Troops
+        value:
+          number: 20
+        conditions:
+          - When The Main Defense General
+          - In City
+general: Isaac Brock
+id: Isaac Brock
