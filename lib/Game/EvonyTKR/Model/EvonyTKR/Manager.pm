@@ -15,21 +15,21 @@ use namespace::clean;
 class Game::EvonyTKR::Model::EvonyTKR::Manager :
   isa(Game::EvonyTKR::Shared::Constants) {
 
-  field $SourceDir                   : reader : param;
-  field $generalManager              : reader;
-  field $bookManager                 : reader;
-  field $specialtyManager            : reader;
-  field $ascendingAttributesManager  : reader;
-  field $covenantManager             : reader;
-  field $glossaryManager             : reader;
+  field $SourceDir                  : reader : param;
+  field $generalManager             : reader;
+  field $bookManager                : reader;
+  field $specialtyManager           : reader;
+  field $ascendingAttributesManager : reader;
+  field $covenantManager            : reader;
+  field $glossaryManager            : reader;
 
   # computed types
   field $generalPairManager : reader;
-  field $conflictDetector   : reader : writer;
+  field $conflictDetector : reader : writer;
 
   ADJUST {
     # first the import types
-    $generalManager = Game::EvonyTKR::Model::General::Manager->new();
+    $generalManager   = Game::EvonyTKR::Model::General::Manager->new();
     $bookManager      = Game::EvonyTKR::Model::Book::Manager->new();
     $specialtyManager = Game::EvonyTKR::Model::Specialty::Manager->new();
     $ascendingAttributesManager =
@@ -43,10 +43,10 @@ class Game::EvonyTKR::Model::EvonyTKR::Manager :
       Game::EvonyTKR::Model::Glossary::Manager->new(SourceDir => $SourceDir,);
 
     $conflictDetector = Game::EvonyTKR::Model::General::Conflict::Book->new(
-      rootManager => $self,
-      build_index => 0,
-      asst_has_dragon => 1,
-      asst_has_spirit => 1,
+      rootManager      => $self,
+      build_index      => 0,
+      asst_has_dragon  => 1,
+      asst_has_spirit  => 1,
       allow_wall_buffs => 1,
     );
 
@@ -54,8 +54,6 @@ class Game::EvonyTKR::Model::EvonyTKR::Manager :
       rootManager    => $self,
       generalManager => $generalManager,
     );
-
-
 
   }
 

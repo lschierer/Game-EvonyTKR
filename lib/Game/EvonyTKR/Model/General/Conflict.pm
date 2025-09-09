@@ -13,7 +13,7 @@ class Game::EvonyTKR::Model::General::Conflict :
   use List::AllUtils qw( any none uniq all );
 
   ### input fields
-  field $rootManager : param :reader ;
+  field $rootManager : param : reader;
   field $build_index : param //= 0;
   field $assume_g1_is_main : param : reader : writer //= 1;
 
@@ -685,7 +685,7 @@ class Game::EvonyTKR::Model::General::Conflict :
     $by_general              = {};
     my $generals;
     @$generals = values $rootManager->generalManager->get_all_generals->%*;
-    my @gs = sort { $a->name cmp $b->name } @{ $generals };
+    my @gs = sort { $a->name cmp $b->name } @{$generals};
     my $N  = @gs;
 
     # cache warm (optional; safe to skip if build_meta_for already caches)

@@ -63,7 +63,7 @@
     "@types/postcss-import": "^14.0.3",
     "@types/postcss-sorting": "^8.0.2",
     "@types/sprintf-js": "^1.1.4",
-    "@typescript-eslint/parser": "^8.42.0",
+    "@typescript-eslint/parser": "^8.43.0",
     "autoprefixer": "^10.4.21",
     "aws-cdk": "^2.1029.0",
     "aws-cdk-lib": "^2.214.0",
@@ -101,7 +101,7 @@
     "ts-node": "^10.9.2",
     "tsx": "^4.20.5",
     "typescript": "^5.9.2",
-    "typescript-eslint": "^8.42.0"
+    "typescript-eslint": "^8.43.0"
   },
   "lint-staged": {
     "*.json": [

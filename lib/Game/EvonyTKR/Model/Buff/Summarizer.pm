@@ -22,7 +22,7 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
   our $VERSION = 'v0.30.0';
 
   # Input parameters
-  field $rootManager    : param;
+  field $rootManager : param;
   field $bc = $rootManager->conflictDetector;
   field $general        : param;
   field $isPrimary      : reader : param //= 1;
@@ -63,7 +63,6 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
     'Siege Machines' => { 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
     'Overall'        => { 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
   };
-
 
   # Main update methods
   method updateBuffs() {
@@ -229,8 +228,9 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
       my $standardSkill = $self->getStandardSkillValue($attribute, $buffType);
       $total += $standardSkill;
       $self->logger->debug(sprintf(
-      'adding standard skillbook value %s  for attribute %s  and buff type %s',
-      $standardSkill, $attribute, $buffType));
+'adding standard skillbook value %s  for attribute %s  and buff type %s',
+        $standardSkill, $attribute, $buffType
+      ));
     }
 
     # Add buff values from various sources
@@ -247,7 +247,9 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
     my $tt    = $troopType =~ s/ Troops$//r;    # Remove " Troops" suffix
     if ($attribute eq 'March Size') {
       my $MS = $rootManager->bookManager->getBook('Level 4 March Size');
-      if($bc->is_general_and_book_compatible($general, $MS, { same_side => 1,})){
+      if (
+        $bc->is_general_and_book_compatible($general, $MS, { same_side => 1, }))
+      {
         $total += 12;
       }
     }
@@ -256,14 +258,21 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
       if ($troopType ne 'Overall') {
         my $btt = $tt;
         $btt =~ s/(Ranged|Ground|Mounted)/$1 Troop/;
-        $btt  =~ s/Siege Machines/Siege Machine/;
-        my $book = $rootManager->bookManager->getBook("Level 4 $btt $attribute");
+        $btt =~ s/Siege Machines/Siege Machine/;
+        my $book =
+          $rootManager->bookManager->getBook("Level 4 $btt $attribute");
 
-        if($book && $bc->is_general_and_book_compatible($general, $book, { same_side => 1,})){
+        if (
+          $book
+          && $bc->is_general_and_book_compatible(
+            $general, $book, { same_side => 1, }
+          )
+        ) {
           $total += 25;
-        }elsif(!defined($book)) {
-          $self->logger->error(sprintf('no book found for %s',
-          "Level 4 $btt $attribute"));
+        }
+        elsif (!defined($book)) {
+          $self->logger->error(sprintf(
+            'no book found for %s', "Level 4 $btt $attribute"));
         }
       }
     }
@@ -272,14 +281,21 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
         if ($troopType ne 'Overall') {
           my $btt = $tt =~ s/(Ranged|Ground|Mounted)/$1 Troop/r;
           $btt = $tt =~ s/Siege Machines/Siege Machine/r;
-          my $book = $rootManager->bookManager->getBook("Level 4 $btt $attribute Against Monsters");
+          my $book = $rootManager->bookManager->getBook(
+            "Level 4 $btt $attribute Against Monsters");
 
-          if($book && $bc->is_general_and_book_compatible($general, $book, { same_side => 1,})){
+          if (
+            $book
+            && $bc->is_general_and_book_compatible(
+              $general, $book, { same_side => 1, }
+            )
+          ) {
             $total += 25;
-          }elsif(!defined($book)) {
+          }
+          elsif (!defined($book)) {
 
             $self->logger->error(sprintf('no book found for %s',
-            "Level 4 $btt $attribute Against Monsters"));
+              "Level 4 $btt $attribute Against Monsters"));
           }
         }
       }

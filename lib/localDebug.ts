@@ -6,6 +6,7 @@ if (DEBUG) {
 
 const fileDebug: Record<string, boolean> = {
   'lib/Generals/GeneralTable.ts': true,
+  'lib/Generals/PairTableData.ts': true,
   'lib/partials/level_settings_form.ts': true,
 };
 

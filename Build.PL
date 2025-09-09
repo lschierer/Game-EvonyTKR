@@ -10,8 +10,11 @@ my $builder = Module::Build->new(
   dist_abstract =>
 'Display and Evaluate information about Generals, Buffs, and DeBuffs for the Evony TKR Game',
   create_makefile_pl => 0,    #'traditional',
-  script_files       => ['bin/game-evonytkr', 'scripts/create-general', 'scripts/check_broken_links'],
-  share_dir          => {
+  script_files       => [
+    'bin/game-evonytkr', 'scripts/create-general',
+    'scripts/check_broken_links'
+  ],
+  share_dir => {
     dist => ['share'], # This tells Module::Build to install the share directory
   },
   create_readme => 0,

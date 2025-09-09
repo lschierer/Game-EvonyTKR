@@ -13,13 +13,9 @@ class Game::EvonyTKR::Model::General::Conflict::Book :
 
   #root manager instance
 
-
-
   field $ProcessedBooks = {};
 
   field $conflicts_by_book_name = {};
-
-
 
   method build_book_meta_for ($book) {
     $self->logger->debug("building meta for " . $book->name);
@@ -45,12 +41,13 @@ class Game::EvonyTKR::Model::General::Conflict::Book :
     my %by_troop;    # key: state|val|unit|troops_string -> entry
     for my $e (@prim) {
       # Initialize targetedTypes_string if not present
-      $e->{targetedTypes_string} = $self->_join_set(@{ $e->{targetedTypes} // [] });
+      $e->{targetedTypes_string} =
+        $self->_join_set(@{ $e->{targetedTypes} // [] });
       my $troops_s = $e->{targetedTypes_string};
       my $key      = join('|',
-        ($e->{state_key_strict}   // ''),
-        ($e->{valueNumber} // 0),
-        ($e->{valueUnit}   // ''), $troops_s,);
+        ($e->{state_key_strict} // ''),
+        ($e->{valueNumber}      // 0),
+        ($e->{valueUnit}        // ''), $troops_s,);
       if (my $acc = $by_troop{$key}) {
         push @{ $acc->{attributes} }, @{ $e->{attributes} };
         $acc->{grouped_attr} = 1;    # now definitely grouped by attr
@@ -78,9 +75,9 @@ class Game::EvonyTKR::Model::General::Conflict::Book :
       # Non-troop lines: no troops_string; merge by attributes as is
       my $attrs_s = $e->{attributes_string} // '';
       my $key     = join('|',
-        ($e->{state_key_strict}   // ''),
-        ($e->{valueNumber} // 0),
-        ($e->{valueUnit}   // ''), $attrs_s,);
+        ($e->{state_key_strict} // ''),
+        ($e->{valueNumber}      // 0),
+        ($e->{valueUnit}        // ''), $attrs_s,);
       if (my $acc = $by_attr{$key}) {
         push @{ $acc->{targetedTypes} }, @{ $e->{targetedTypes} // [] };
         $acc->{troop_bit} |= ($e->{troop_bit} // 0);
@@ -122,8 +119,10 @@ class Game::EvonyTKR::Model::General::Conflict::Book :
   # 0=conflict, 1=partial (same-side only), 2=compatible
   method _score_book_hit ($ge, $be, $same_side, $general_name = '') {
     my $attr = $be->{attributes}[0] // '';
-    return 2 unless List::AllUtils::any { $_ eq $attr } @{ $ge->{attributes} // [] };
-    return 2 unless $self->_intersect($ge->{targetedTypes}, $be->{targetedTypes});
+    return 2
+      unless List::AllUtils::any { $_ eq $attr } @{ $ge->{attributes} // [] };
+    return 2
+      unless $self->_intersect($ge->{targetedTypes}, $be->{targetedTypes});
 
     # Condless attributes (MS/SP/SC/DD) keep your existing behavior:
     if ($be->{is_condless}) {
@@ -139,15 +138,19 @@ class Game::EvonyTKR::Model::General::Conflict::Book :
       }
 
       return ($same_side && $self->is_stackable_same_side($attr, ''))
-        ? 1  # partial: stacks on same side
-        : 0; # conflict otherwise
+        ? 1     # partial: stacks on same side
+        : 0;    # conflict otherwise
     }
 
     # Pick the proper state keys:
-    my $Sg = $same_side ? ($ge->{state_key_strict}   // '')
-                        : ($ge->{state_key_conflict} // '');
-    my $Sb = $same_side ? ($be->{state_key_strict}   // '')
-                        : ($be->{state_key_conflict} // '');
+    my $Sg =
+      $same_side
+      ? ($ge->{state_key_strict}   // '')
+      : ($ge->{state_key_conflict} // '');
+    my $Sb =
+      $same_side
+      ? ($be->{state_key_strict}   // '')
+      : ($be->{state_key_conflict} // '');
 
     my $blank_g = (length($Sg) == 0);
     my $blank_b = (length($Sb) == 0);
@@ -169,9 +172,9 @@ class Game::EvonyTKR::Model::General::Conflict::Book :
   method is_stackable_same_side ($attr, $state) {
     # Other stackable attributes (not March Size, which is handled specially)
     my %stackable = (
-      'MS' => 1,
-      'MARCHING SPEED' => 1,
-      'STAMINA COST' => 1,
+      'MS'                     => 1,
+      'MARCHING SPEED'         => 1,
+      'STAMINA COST'           => 1,
       'DOUBLE ITEMS DROP RATE' => 1,
     );
     return exists $stackable{$attr};
@@ -181,33 +184,41 @@ class Game::EvonyTKR::Model::General::Conflict::Book :
   method is_general_and_book_compatible ($general, $book, $opts) {
     my $same_side = $opts->{same_side} // 0;
 
-    $self->logger->debug(sprintf('comparing %s with %s and opts %s',
-    $general->name, $book->name, Data::Printer::np($opts, multiline => 0)));
+    $self->logger->debug(sprintf(
+      'comparing %s with %s and opts %s',
+      $general->name, $book->name, Data::Printer::np($opts, multiline => 0)
+    ));
 
     # Build general meta if not already done
-    my $m1 = $self->ProcessedGenerals->{$general->name}->{main} //=
+    my $m1 = $self->ProcessedGenerals->{ $general->name }->{main} //=
       $self->build_meta_for($general, 'main');
-    my $m2 = $ProcessedBooks->{$book->name} //= $self->build_book_meta_for($book);
+    my $m2 = $ProcessedBooks->{ $book->name } //=
+      $self->build_book_meta_for($book);
 
-    $self->logger->debug(sprintf('meta for general %s is %s',
-    $general->name, Data::Printer::np($m1, multiline => 1)));
-    $self->logger->debug(sprintf('meta for book %s is %s',
-    $book->name, Data::Printer::np($m2, multiline => 1)));
+    $self->logger->debug(sprintf(
+      'meta for general %s is %s',
+      $general->name, Data::Printer::np($m1, multiline => 1)
+    ));
+    $self->logger->debug(sprintf(
+      'meta for book %s is %s',
+      $book->name, Data::Printer::np($m2, multiline => 1)
+    ));
 
-    # If book is troop-scoped but has no overlap with general at all, it's compatible.
+# If book is troop-scoped but has no overlap with general at all, it's compatible.
     if ($m2->{prim_mask} && !($m1->{prim_mask} & $m2->{prim_mask})) {
       return 2;
     }
 
-    my $best = 2; # start fully compatible
+    my $best = 2;    # start fully compatible
     for my $ge (@{ $m1->{meta_buffs} // [] }) {
       for my $be (@{ $m2->{meta_buffs} // [] }) {
-        my $score = $self->_score_book_hit($ge, $be, $same_side, $general->name);
-        $best = $score if $score < $best;  # 0 beats 1 beats 2
-        return 0 if $best == 0;            # short-circuit on hard conflict
+        my $score =
+          $self->_score_book_hit($ge, $be, $same_side, $general->name);
+        $best = $score if $score < $best;    # 0 beats 1 beats 2
+        return 0       if $best == 0;        # short-circuit on hard conflict
       }
     }
-    return $best;  # 1=partial, 2=compatible
+    return $best;                            # 1=partial, 2=compatible
   }
 
 }

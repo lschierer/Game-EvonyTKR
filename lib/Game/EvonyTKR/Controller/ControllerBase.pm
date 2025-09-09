@@ -34,10 +34,10 @@ package Game::EvonyTKR::Controller::ControllerBase {
         my $APP_START_TIME = $app->config->{'APP_START_TIME'};
         $c->render(
           json => {
-            status  => 'ok',
-            mode    => $app->mode // 'unknown',
-            version => $app->VERSION,
-            time    => scalar localtime,
+            status              => 'ok',
+            mode                => $app->mode // 'unknown',
+            version             => $app->VERSION,
+            time                => scalar localtime,
             app_started_at      => scalar(localtime($APP_START_TIME)),
             app_uptime_seconds  => time() - $APP_START_TIME,
             build_time          => $app->config->{'version'}->{'build-time'},

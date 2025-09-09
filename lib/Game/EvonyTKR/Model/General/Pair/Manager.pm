@@ -12,7 +12,7 @@ class Game::EvonyTKR::Model::General::Pair::Manager :
 
   field $rootManager    : param;
   field $generalManager : param;
-  field $conflicts = $rootManager->conflictDetector;
+  field $conflicts     = $rootManager->conflictDetector;
   field $pairs_by_type = {};    # e.g., { Mounted => [ [genA, genB], ... ] }
 
   method get_pairs_by_type($type) {
@@ -36,8 +36,9 @@ class Game::EvonyTKR::Model::General::Pair::Manager :
     my $generals     = $generalManager->get_all_generals();
     my $generalCount = scalar keys %{$generals};
     $self->logger->debug("building pairs out of $generalCount");
-    foreach my $primary (sort{ $a->name cmp $b->name } values %{$generals}) {
-      foreach my $secondary (sort { $a->name cmp $b->name } values %{$generals}) {
+    foreach my $primary (sort { $a->name cmp $b->name } values %{$generals}) {
+      foreach
+        my $secondary (sort { $a->name cmp $b->name } values %{$generals}) {
         next if $primary->name eq $secondary->name;
         $self->logger->debug(sprintf(
           'testing if %s and %s conflict.',

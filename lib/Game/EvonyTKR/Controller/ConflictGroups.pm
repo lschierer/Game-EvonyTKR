@@ -29,7 +29,7 @@ package Game::EvonyTKR::Controller::ConflictGroups {
     $logger->info("Registering routes for " . ref($self));
     $self->SUPER::register($app, $config);
 
-    my $routes = $app->routes->any($base);
+    my $routes          = $app->routes->any($base);
     my $controller_name = $self->controller_name();
 
     $routes->get('/')
@@ -49,12 +49,12 @@ package Game::EvonyTKR::Controller::ConflictGroups {
     $logger->debug("Rendering conflict groups index");
 
     my $detector = $self->get_conflict_detector();
-    my $groups = $detector->groups_by_conflict_type;
-    my $pairs = $detector->by_general;
+    my $groups   = $detector->groups_by_conflict_type;
+    my $pairs    = $detector->by_general;
 
     $self->stash(
-      groups => $groups,
-      pairs => $pairs,
+      groups   => $groups,
+      pairs    => $pairs,
       linkBase => $base,
     );
 
