@@ -59,6 +59,7 @@ my $builder = Module::Build->new(
     'Mojo::File'                          => '0',
     'Mojo::File::Share'                   => '0',
     'Mojo::Util'                          => '0',
+    'Mojo::UserAgent'                     => '0',
     'Mojolicious::Commands'               => '0',
     'Mojolicious::Controller'             => '0',
     'Mojolicious::Plugin'                 => '0',

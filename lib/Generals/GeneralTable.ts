@@ -164,6 +164,9 @@ export class GeneralTable extends SignalWatcher(LitElement) {
     | InstanceType<typeof Signal.subtle.Watcher>
     | undefined;
 
+  private updateDebounceTimer: number | NodeJS.Timeout | undefined;
+  private currentEventSource: EventSource | undefined;
+
   static styles: CSSResultGroup = [
     SpectrumTokensCSS,
     SpectrumProgressBarCSS,
@@ -201,8 +204,20 @@ export class GeneralTable extends SignalWatcher(LitElement) {
       const currentHash = this.filterSettings.get();
       if (this.lastFilterSettings.localeCompare(currentHash)) {
         this.lastFilterSettings = currentHash;
+        if (this.updateDebounceTimer) {
+          clearTimeout(this.updateDebounceTimer);
+        }
+
+        // Close existing SSE connection
+        if (this.currentEventSource) {
+          this.currentEventSource.close();
+        }
+
         this.invalidateData();
-        this.startBackgroundFetch();
+        // Debounce the actual SSE request
+        this.updateDebounceTimer = setTimeout(() => {
+          this.startBackgroundFetch();
+        }, 300); // 300ms debounce
       }
     });
   }
@@ -228,7 +243,10 @@ export class GeneralTable extends SignalWatcher(LitElement) {
     this.nameList = [...stubData];
     // a signal won't fire until a menu changes,
     // kick off the first data fetch manually
-    this.startBackgroundFetch();
+    // Debounce the actual SSE request
+    this.updateDebounceTimer = setTimeout(() => {
+      this.startBackgroundFetch();
+    }, 300); // 300ms debounce
   }
 
   protected override updated(_changedProperties: PropertyValues): void {
@@ -456,7 +474,7 @@ export class GeneralTable extends SignalWatcher(LitElement) {
     }
   };
 
-  private urlConversion(scope: 'data' | 'row'): string {
+  private urlConversion(scope: 'data' | 'row' | 'details'): string {
     let basePath = window.location.pathname.replace(/\/$/, '');
 
     basePath = decodeURIComponent(basePath);
@@ -466,6 +484,15 @@ export class GeneralTable extends SignalWatcher(LitElement) {
         basePath = basePath.replace('pair-comparison', 'pair/data.json');
       } else {
         basePath = basePath.replace('comparison', 'data.json');
+      }
+    } else if (scope === 'details') {
+      if (this.mode === 'pair') {
+        basePath = basePath.replace(
+          'pair-comparison',
+          `${this.dataRunId}/pair-details-stream`,
+        );
+      } else {
+        basePath = basePath.replace('comparison', 'primary/row.json');
       }
     } else {
       if (this.mode === 'pair') {
@@ -620,6 +647,35 @@ export class GeneralTable extends SignalWatcher(LitElement) {
     this.requestUpdate();
   }
 
+  private updateRowFromStream = (data: Object) => {
+    if (this.mode === 'pair') {
+      const parsed = GeneralPair.safeParse(data);
+
+      if (parsed.success) {
+        const index = this.nameList.findIndex((nle) => {
+          if (!nle.primary.name.localeCompare(parsed.data.primary.name)) {
+            return !(nle as GeneralPair).secondary.name.localeCompare(
+              parsed.data.secondary.name,
+            );
+          }
+          return false;
+        });
+        if (DEBUG) {
+          console.log(
+            `updating row ${this.nameList[index].primary.name}/${(this.nameList[index] as GeneralPair).secondary.name}`,
+          );
+        }
+        if (index >= 0) {
+          this.nameList[index] = parsed.data;
+          this.nameList[index].current = 'current';
+        }
+      } else {
+        console.error(parsed.error.message);
+        throw new Error(parsed.error.message);
+      }
+    }
+  };
+
   private startBackgroundFetch() {
     // ensure ids are always unique even if not strictly time accurate.
     let newId = Math.floor(Date.now() / 1000);
@@ -627,25 +683,52 @@ export class GeneralTable extends SignalWatcher(LitElement) {
       newId++;
     }
     this.dataRunId = newId;
-    const pending = new Set<number>();
     if (DEBUG) {
       console.log(
         `startBackgroundFetch starting with id ${this.dataRunId} and for nameList ${this.nameList.length}`,
       );
     }
+    const params = this.urlParams.get();
+    const url = `${this.urlConversion('details')}?${params}`;
+    this.currentEventSource = new EventSource(url);
+    this.currentEventSource.onmessage = (event) => {
+      const message: Object = JSON.parse(event.data) as Object;
+      // typescript keeps insisting that message['runId' as keyof typeof message] is a function type.
+      // force it to be a number with zod.
+      const valid = z
+        .number()
+        .safeParse(message['runId' as keyof typeof message]);
+      if (!valid.success) {
+        console.error(`invalid event from ${url}`);
+      }
+      const runId = valid.data;
 
-    // Initialize with all rows needing fetch
-    this.nameList.forEach((row, i) => {
-      if (row.current === 'ignore') {
+      if (DEBUG) {
+        console.log(`Received SSE event with runId ${runId}:`, message);
+      }
+
+      // Ignore messages from old streams
+      if (runId !== this.dataRunId) {
+        if (DEBUG) {
+          console.log(
+            `Ignoring old runId ${runId}, current is ${this.dataRunId}`,
+          );
+        }
         return;
       }
-      if (!row.current || row.current === 'stale') {
-        pending.add(i);
-        this.nameList[i].current = 'pending';
-      }
-    });
 
-    this.maybeLaunchMore(this.dataRunId, pending);
+      // Pass the actual row data, not the wrapper
+      this.updateRowFromStream(message['data' as keyof typeof message]);
+    };
+
+    this.currentEventSource.onerror = (e) => {
+      console.error('EventSource failed:', e);
+      this.currentEventSource?.close();
+    };
+    this.currentEventSource.addEventListener('complete', () => {
+      this.currentEventSource?.close();
+      this.currentEventSource = undefined;
+    });
   }
 
   private maxBatch = 6;

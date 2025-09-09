@@ -2,6 +2,7 @@ use v5.42.0;
 use experimental qw(class);
 use utf8::all;
 use File::FindLib 'lib';
+require JSON::PP;;
 require Game::EvonyTKR::Model::General;
 require Game::EvonyTKR::Model::General::Manager;
 require Game::EvonyTKR::Model::General::Pair;
@@ -189,10 +190,10 @@ package Game::EvonyTKR::Controller::Generals {
       controller => 'Generals',
       action     => 'singleRow',
     )->name('Generals_dynamic_singleRow');
-    $mainRoutes->get('/:uiTarget/:buffActivation/pair-row.json')->to(
+    $mainRoutes->get('/:uiTarget/:buffActivation/:run_id/pair-details-stream')->to(
       controller => 'Generals',
-      action     => 'pairRow',
-    )->name('Generals_dynamic_pairRow');
+      action     => 'stream_pair_details',
+    )->name('Generals_dynamic_pairDetails');
 
     foreach my $route ($app->general_routing->all_valid_routes()) {
       $logger->debug("building nav items for "
@@ -613,16 +614,12 @@ package Game::EvonyTKR::Controller::Generals {
     }
 
     unless ($data_model->checkCovenantLevel($primaryCovenantLevel)) {
-      $logger->warn(
-"Invalid primaryCovenantLevel: $primaryCovenantLevel, using 'civilization'"
-      );
+      $logger->warn(sprintf('Invalid primaryCovenantLevel: %s, using "civilization"', $primaryCovenantLevel));
       $primaryCovenantLevel = 'civilization';
     }
 
     unless ($data_model->checkCovenantLevel($secondaryCovenantLevel)) {
-      $logger->warn(
-"Invalid secondaryCovenantLevel: $secondaryCovenantLevel, using 'civilization'"
-      );
+      $logger->warn(sprintf('Invalid secondaryCovenantLevel: %s, using "civilization"', $secondaryCovenantLevel));
       $secondaryCovenantLevel = 'civilization';
     }
 
@@ -782,9 +779,8 @@ package Game::EvonyTKR::Controller::Generals {
     my $buffActivation = $route_meta->{buffActivation};
     my $uiTarget       = $route_meta->{uiTarget};
 
-    $logger->debug(
-"Computing general buffs for $name (isPrimary=$isPrimary, uiTarget=$uiTarget)"
-    );
+    $logger->debug(sprintf('Computing general buffs for  %s, (isPrimary=%s, uiTarget=%s)',
+    $name, $isPrimary, $uiTarget));
 
     # Get query parameters with defaults
     my $ascendingLevel = $self->param('ascendingLevel') // 'red5';
@@ -873,6 +869,196 @@ package Game::EvonyTKR::Controller::Generals {
       $result->{secondary} = $general;
     }
     return $self->render(json => $result);
+  }
+
+  sub stream_pair_details ($c) {
+    my $json = JSON::PP->new->allow_blessed->convert_blessed->canonical->utf8();
+    my $slug_ui       = $c->stash('uiTarget');
+    my $slug_buff     = $c->stash('buffActivation');
+    my $run_id    = $c->stash('run_id');
+
+    $logger->info(sprintf('stream_pair_details called uiTarget: %s; buffActivation: %s; run_id: %s',
+    $slug_ui, $slug_buff, $run_id));
+
+    # Lookup route metadata
+    my $routing    = Game::EvonyTKR::Control::Generals::Routing->new;
+    my $route_meta = $routing->lookup_route($slug_ui, $slug_buff);
+
+    unless ($route_meta) {
+      $logger->error("Invalid pair route: $slug_ui | $slug_buff");
+
+      if ($c->app->mode eq 'development') {
+        $logger->debug("Known valid routes:");
+        $routing->each_valid_route(
+          sub ($key, $meta) {
+            $logger->debug("  $key => " . Data::Printer::np($meta));
+          }
+        );
+      }
+      return $c->render_not_found;
+    }
+
+    my $generalType    = $route_meta->{generalType};
+    my $buffActivation = $route_meta->{buffActivation};
+    my $uiTarget       = $route_meta->{uiTarget};
+    my $pm    = $c->app->get_general_pair_manager();
+    my $pairs;
+    @$pairs = $pm->get_pairs_by_type($generalType)->@*;
+    @$pairs = sort {
+      my $pc = $a->primary->name cmp $b->primary->name;
+      if($pc == 0){
+        return $a->secondary->name cmp $b->secondary->name;
+      }
+      return $pc;
+    } $pairs->@*;
+
+    $logger->info(sprintf('There are %s pairs compute details for.', scalar(@$pairs)));
+
+    my $ascendingLevel       = $c->param('ascendingLevel') // 'red5';
+    my $primaryCovenantLevel = $c->param('primaryCovenantLevel')
+      // 'civilization';
+    my @primarySpecialties;
+    push @primarySpecialties, $c->param('primarySpecialty1') // 'gold';
+    push @primarySpecialties, $c->param('primarySpecialty2') // 'gold';
+    push @primarySpecialties, $c->param('primarySpecialty3') // 'gold';
+    push @primarySpecialties, $c->param('primarySpecialty4') // 'gold';
+    my $secondaryCovenantLevel = $c->param('secondaryCovenantLevel')
+      // 'civilization';
+    my @secondarySpecialties;
+    push @secondarySpecialties, $c->param('secondarySpecialty1') // 'gold';
+    push @secondarySpecialties, $c->param('secondarySpecialty2') // 'gold';
+    push @secondarySpecialties, $c->param('secondarySpecialty3') // 'gold';
+    push @secondarySpecialties, $c->param('secondarySpecialty4') // 'gold';
+
+    # Validate parameters using enums from Game::EvonyTKR::Model::Data
+    my $data_model = Game::EvonyTKR::Model::Data->new();
+
+    # Validate ascending level
+    if (!$data_model->checkAscendingLevel($ascendingLevel)) {
+      $logger->warn(
+        "Invalid ascendingLevel: $ascendingLevel, using default 'red5'");
+      $ascendingLevel = 'red5';
+    }
+
+    if (!$data_model->checkCovenantLevel($primaryCovenantLevel)) {
+      $logger->warn(sprintf('Invalid covenantLevel: %s, using default "civilization"', $primaryCovenantLevel));
+      $primaryCovenantLevel = 'civilization';
+    }
+
+    @primarySpecialties =
+      $data_model->normalizeSpecialtyLevels(@primarySpecialties);
+
+    if (!$data_model->checkCovenantLevel($secondaryCovenantLevel)) {
+    $logger->warn(sprintf('Invalid covenantLevel: %s, using default "civilization"', $secondaryCovenantLevel));
+      $secondaryCovenantLevel = 'civilization';
+    }
+
+    @secondarySpecialties =
+      $data_model->normalizeSpecialtyLevels(@secondarySpecialties);
+
+    my $typeMap = {
+      'Ground Specialists'  => 'ground_specialist',
+      'Ranged Specialists'  => 'ranged_specialist',
+      'Siege Specialists'   => 'siege_specialist',
+      'Mounted Specialists' => 'mounted_specialist',
+      'Wall Specialists'    => 'wall',
+    };
+    $c->render_later;
+    $c->res->headers->content_type('text/event-stream');
+    $c->res->headers->add('Cache-Control' => 'no-cache');
+    $c->res->headers->add('Connection' => 'keep-alive');
+    $c->inactivity_timeout(300);
+    # Change content type and finalize response headers
+    $c->write_sse;
+
+    my $index = 0;
+    my $loop = Mojo::IOLoop->new;
+    my $loopId;
+   $loopId = $loop->recurring(0.05 => sub {
+      if ($index >= scalar(@$pairs)) {
+        $logger->info("$index is larger than ". scalar(@$pairs));
+        $loop->emit(complete => 1);
+        $loop->remove($loopId);
+        return;
+      }
+      my $pair = $pairs->[$index++];
+      my $sprintfTemplate =
+          'Computing Pair Buffs for %s: %s/%s Buff Activation %s, '
+        . 'targetType %s ascendingLevel %s primary CovenantLevel %s '
+        . 'primary Specialties %s secondary CovenantLevel %s '
+        . 'secondary Specialties %s';
+      $logger->info(sprintf($sprintfTemplate, $index,
+        $pair->primary->name,            $pair->secondary->name,
+        $buffActivation,                 $route_meta->{generalType},
+        $ascendingLevel,                 $primaryCovenantLevel,
+        join(', ', @primarySpecialties), $secondaryCovenantLevel,
+        join(', ', @secondarySpecialties)));
+
+      $pair->updateBuffsAndDebuffs(
+        $route_meta->{generalType}, $ascendingLevel,
+        $primaryCovenantLevel,      \@primarySpecialties,
+        $secondaryCovenantLevel,    \@secondarySpecialties,
+        $buffActivation
+      );
+
+      my $buffKey = $route_meta->{generalType} =~ s/_/ /r;
+      $buffKey =~ s/(\w)(\w+) specialist/\U$1\L$2 \UT\Lroops/;
+      $buffKey =~ s/Siege Troops/Siege Machines/;
+      $logger->debug("buffKey is $buffKey");
+
+      my $row_data = {
+        "primary"            => $pair->primary,
+        "secondary"          => $pair->secondary,
+        "attackbuff"         => $pair->buffValues->{$buffKey}->{'Attack'},
+        "defensebuff"        => $pair->buffValues->{$buffKey}->{'Defense'},
+        "hpbuff"             => $pair->buffValues->{$buffKey}->{'HP'},
+        "marchbuff"          => $pair->buffValues->{$buffKey}->{'March Size'},
+        "groundattackdebuff" =>
+          $pair->debuffValues->{'Ground Troops'}->{'Attack'},
+        "grounddefensedebuff" =>
+          $pair->debuffValues->{'Ground Troops'}->{'Defense'},
+        "groundhpdebuff"      => $pair->debuffValues->{'Ground Troops'}->{'HP'},
+        "mountedattackdebuff" =>
+          $pair->debuffValues->{'Mounted Troops'}->{'Attack'},
+        "mounteddefensedebuff" =>
+          $pair->debuffValues->{'Mounted Troops'}->{'Defense'},
+        "mountedhpdebuff"    => $pair->debuffValues->{'Mounted Troops'}->{'HP'},
+        "rangedattackdebuff" =>
+          $pair->debuffValues->{'Ranged Troops'}->{'Attack'},
+        "rangeddefensedebuff" =>
+          $pair->debuffValues->{'Ranged Troops'}->{'Defense'},
+        "rangedhpdebuff"    => $pair->debuffValues->{'Ranged Troops'}->{'HP'},
+        "siegeattackdebuff" =>
+          $pair->debuffValues->{'Siege Machines'}->{'Attack'},
+        "siegedefensedebuff" =>
+          $pair->debuffValues->{'Siege Machines'}->{'Defense'},
+        "siegehpdebuff" => $pair->debuffValues->{'Siege Machines'}->{'HP'},
+      };
+      my $encoded = $json->encode($row_data);
+      $logger->info("encoded string is $encoded");
+
+      $loop->emit(result => $row_data);
+    });
+
+    $loop->on(error => sub ($e, $err) {
+      $logger->error('SSE Loop Error: $err') if $err;
+    });
+    $loop->on(complete => sub{
+      $c->write_sse(data => {complete => 1});
+    });
+    $loop->on(result => sub ($subprocess, $result) {
+      $logger->info('SSE loop result emitter firing for js: ' . Data::Printer::np($result));
+      $c->write_sse({
+        runId => $run_id,
+        data  => $result->{result}
+      });
+    });
+
+    $loop->on(finish => sub {
+      $logger->info('SSE loop complete');
+    });
+    $loop->start;
+    $logger->info(sprintf('stream_pair_details uiTarget: %s; buffActivation: %s; run_id: %s complete.',$slug_ui, $slug_buff, $run_id));
   }
 
   sub pairRow ($self) {
