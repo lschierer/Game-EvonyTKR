@@ -1045,6 +1045,7 @@ package Game::EvonyTKR::Controller::Generals {
     });
     $loop->on(complete => sub{
       $c->write_sse(data => {complete => 1});
+      $loop->reset;
     });
     $loop->on(result => sub ($subprocess, $result) {
       $logger->info('SSE loop result emitter firing for js: ' . Data::Printer::np($result));
