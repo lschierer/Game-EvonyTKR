@@ -95,6 +95,9 @@ importers:
       '@tanstack/lit-virtual':
         specifier: ^3.13.12
         version: 3.13.12(lit@3.3.1)
+      '@tanstack/store':
+        specifier: ^0.7.5
+        version: 0.7.5
       '@tanstack/table-core':
         specifier: ^8.21.3
         version: 8.21.3
@@ -1528,6 +1531,9 @@ packages:
     resolution: {integrity: sha512-I1mGyQCCHT3GbKT2pUvyALHc7HPF9n/6FJzDFS3Ej6TuHNbCl2LN7/X3E+pVUtlFf4nZWRVH/TTlD7iO5y2iqQ==}
     peerDependencies:
       lit: ^3.1.0
+
+  '@tanstack/store@0.7.5':
+    resolution: {integrity: sha512-qd/OjkjaFRKqKU4Yjipaen/EOB9MyEg6Wr9fW103RBPACf1ZcKhbhcu2S5mj5IgdPib6xFIgCUti/mKVkl+fRw==}
 
   '@tanstack/table-core@8.21.3':
     resolution: {integrity: sha512-ldZXEhOBb8Is7xLs01fR3YEc3DERiz5silj8tnGkFZytt1abEvl/GhUmCE0PMLaMPTa3Jk4HbKmRlHmu+gCftg==}
@@ -5964,6 +5970,8 @@ snapshots:
     dependencies:
       '@tanstack/virtual-core': 3.13.12
       lit: 3.3.1
+
+  '@tanstack/store@0.7.5': {}
 
   '@tanstack/table-core@8.21.3': {}
 

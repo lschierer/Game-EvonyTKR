@@ -40,6 +40,7 @@
     "@spectrum-css/ui-icons": "^1.1.2",
     "@tanstack/lit-table": "^8.21.3",
     "@tanstack/lit-virtual": "^3.13.12",
+    "@tanstack/store": "^0.7.5",
     "@tanstack/table-core": "^8.21.3",
     "@tanstack/virtual-core": "^3.13.12",
     "iconify-icon": "^3.0.0",

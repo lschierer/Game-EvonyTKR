@@ -1,4 +1,4 @@
-const DEBUG: boolean = true;
+const DEBUG: boolean = false;
 // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 if (DEBUG) {
   console.log(`DEBUG enabled for ${new URL(import.meta.url).pathname}`);
@@ -7,11 +7,13 @@ if (DEBUG) {
 const fileDebug: Record<string, boolean> = {
   'lib/Generals/GeneralTable.ts': false,
   'lib/partials/level_settings_form.ts': false,
-  'lib/Generals/PairTable.ts': true,
-  'lib/Generals/PairTableContext.ts': true,
-  'lib/Generals/PairTableData.ts': true,
-  'lib/Generals/PairTableState.ts': true,
-  'lib/Generals/pair_level_settings_form.ts': true,
+  'lib/Generals/PairTable.ts': false,
+  'lib/Generals/PairTableContext.ts': false,
+  'lib/Generals/PairTableData.ts': false,
+  'lib/Generals/PairTableState.ts': false,
+  'lib/Generals/pair_level_settings_form.ts': false,
+  'lib/Generals/Pair/data.ts': true,
+  'lib/Generals/Pair/filter.ts': true,
 };
 
 function isAbsolutePath(path: string): boolean {

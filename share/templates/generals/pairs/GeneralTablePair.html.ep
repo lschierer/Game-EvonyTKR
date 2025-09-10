@@ -5,34 +5,17 @@
 <link rel="stylesheet" href="/css/GeneralTable.css" />
 <script type="module">
   // force the loading order by putting in the same script tag
-  import "/js/lib/Generals/PairTableState.js";
-  import "/js/lib/Generals/PairTableContext.js";
-  import "/js/lib/Generals/PairTableData.js";
-  import "/js/lib/Generals/pair_level_settings_form.js";
+  import "/js/lib/Generals/Pair/data.js";
+  import "/js/lib/Generals/Pair/filter.js";
+
 </script>
 
 <div class="general-comparison">
-
-  <pair-context>
-    <level-settings
-      form_title="<%= $PrimaryFormTitle %>"
-      is_primary
-    ></level-settings>
-    <level-settings
-      form_title="<%= $SecondaryFormTitle %>"
-    ></level-settings>
-    <table-data>
-
-    </table-data>
-
-  </pair-context>
   <div class="general-table-container">
-    <general-table
-      mode='pair'
-      generaltype="<%= $generalType %>"
-      uiTarget="<%= $uiTarget %>"
-      allowedBuffActivation="<%= $buffActivation %>"
-
-      ></general-table>
+    <pair-filter is_primary>
+      <pair-filter>
+        <pair-data></pair-data>
+      </pair-filter>
+    </pair-filter>
   </div>
 </div>
