@@ -4,14 +4,11 @@
 
 <link rel="stylesheet" href="/css/GeneralTable.css" />
 <script type="module">
+  // force the loading order by putting in the same script tag
   import "/js/lib/Generals/PairTableState.js";
   import "/js/lib/Generals/PairTableContext.js";
-</script>
-<script type="module">
-  import "/js/lib/Generals/pair_level_settings_form.js";
-</script>
-<script type="module">
   import "/js/lib/Generals/PairTableData.js";
+  import "/js/lib/Generals/pair_level_settings_form.js";
 </script>
 
 <div class="general-comparison">

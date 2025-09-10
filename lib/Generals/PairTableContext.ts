@@ -3,40 +3,32 @@ const DEBUG = debugFunction(__FILE_PATH__);
 console.log(`DEBUG is set to ${DEBUG} for ${__FILE_PATH__}`);
 
 import { LitElement, html } from 'lit';
-import { ContextRoot, createContext, ContextProvider } from '@lit/context';
+import { ContextRoot, provide } from '@lit/context';
 
 import {
   GeneralPairsTableState,
   Filter,
-  type PairBuffFilter,
-  type PairState,
+  //type PairBuffFilter,
+  //type PairState,
+  filterContext,
+  rowContext,
 } from './PairTableState';
 
-export const filterContext = createContext<PairBuffFilter>(
-  Symbol('filter-context'),
-);
-
-export const rowContext = createContext<PairState>(Symbol('row-context'));
-
 export class PairContextProvider extends LitElement {
-  public filterState = new ContextProvider(document.body, {
-    context: filterContext,
-    initialValue: Filter,
-  });
+  @provide({ context: filterContext })
+  private filterState = Filter;
 
-  public rowState = new ContextProvider(document.body, {
-    context: rowContext,
-    initialValue: GeneralPairsTableState,
-  });
+  @provide({ context: rowContext })
+  public rowState = GeneralPairsTableState;
 
   constructor() {
     super();
-    const root = new ContextRoot();
-    root.attach(document.body);
   }
 
   override connectedCallback() {
     super.connectedCallback();
+    const root = new ContextRoot();
+    root.attach(document.body);
     if (DEBUG) {
       console.log(
         `PairContextProvider connected, providing: filterState: ${this.filterState}; rowState: ${this.rowState}`,

@@ -9,7 +9,9 @@
     "emitDeclarationOnly": true,
     "outDir": "./share/public/",
     "declarationDir": "./share/public/types",
-    "composite": true
+    "composite": true,
+    "experimentalDecorators": true,
+    "useDefineForClassFields": false
   },
   "include": ["./lib/**/*.ts", "./share/infrastructure/lib/**/*.ts"]
 }

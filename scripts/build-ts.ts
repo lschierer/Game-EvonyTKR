@@ -34,6 +34,7 @@ async function main() {
   console.log(`Building with esbuild: ${JSON.stringify(entryPoints)}`);
   await build({
     entryPoints,
+    tsconfig: path.join(process.cwd(), 'tsconfig.build.json'),
     outdir: 'share/public/js',
     outbase: './',
     bundle: true,

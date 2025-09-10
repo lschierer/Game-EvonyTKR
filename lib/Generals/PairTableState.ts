@@ -1,4 +1,5 @@
 import { signal, computed, type Signal } from '@lit-labs/signals';
+import { createContext } from '@lit/context';
 
 import {
   AscendingAttributeLevelValues,
@@ -105,3 +106,9 @@ export class PairState {
 }
 
 export const GeneralPairsTableState: PairState = new PairState();
+
+export const filterContext = createContext<PairBuffFilter>(
+  Symbol.for('filter-context'),
+);
+
+export const rowContext = createContext<PairState>(Symbol.for('row-context'));

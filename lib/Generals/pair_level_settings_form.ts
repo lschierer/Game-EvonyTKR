@@ -45,7 +45,7 @@ interface GeneralOption {
   selected: boolean;
 }
 
-import { filterContext, rowContext } from './PairTableContext';
+import { filterContext, rowContext } from './PairTableState';
 
 export class LevelSettings extends SignalWatcher(LitElement) {
   static styles: CSSResultGroup = [

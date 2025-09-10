@@ -15,8 +15,13 @@ import { signal, SignalWatcher, type Signal } from '@lit-labs/signals';
 
 import { reaction } from 'signal-utils/subtle/reaction';
 
-import { type PairState, type PairBuffFilter } from './PairTableState';
-import { filterContext, rowContext } from './PairTableContext';
+import {
+  type PairState,
+  type PairBuffFilter,
+  filterContext,
+  rowContext,
+} from './PairTableState';
+
 //import { GeneralPair, GeneralPairStub } from './GeneralRowSchemas';
 
 @customElement('table-data')
