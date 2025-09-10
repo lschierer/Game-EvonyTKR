@@ -1,29 +1,41 @@
 % layout 'default';
+% my $PrimaryFormTitle = 'Primary General';
+% my $SecondaryFormTitle = 'Secondary General';
+
 <link rel="stylesheet" href="/css/GeneralTable.css" />
-<script  type="module" >
-  import "/js/lib/Generals/GeneralTable.js";
+<script type="module">
+  import "/js/lib/Generals/PairTableState.js";
+  import "/js/lib/Generals/PairTableContext.js";
+</script>
+<script type="module">
+  import "/js/lib/Generals/pair_level_settings_form.js";
+</script>
+<script type="module">
+  import "/js/lib/Generals/PairTableData.js";
 </script>
 
 <div class="general-comparison">
 
+  <pair-context>
+    <level-settings
+      form_title="<%= $PrimaryFormTitle %>"
+      is_primary
+    ></level-settings>
+    <level-settings
+      form_title="<%= $SecondaryFormTitle %>"
+    ></level-settings>
+    <table-data>
 
+    </table-data>
+
+  </pair-context>
   <div class="general-table-container">
     <general-table
       mode='pair'
       generaltype="<%= $generalType %>"
       uiTarget="<%= $uiTarget %>"
-      ascendingLevel="<%= $ascendingLevel %>"
       allowedBuffActivation="<%= $buffActivation %>"
-      primaryCovenantLevel="<%= $primaryCovenantLevel %>"
-      primarySpecialty1="<%= $primarySpecialties->[0] %>"
-      primarySpecialty2="<%= $primarySpecialties->[1] %>"
-      primarySpecialty3="<%= $primarySpecialties->[2] %>"
-      primarySpecialty4="<%= $primarySpecialties->[3] %>"
-      secondaryCovenantLevel="<%= $secondaryCovenantLevel %>"
-      secondarySpecialty1="<%= $secondarySpecialties->[0] %>"
-      secondarySpecialty2="<%= $secondarySpecialties->[1] %>"
-      secondarySpecialty3="<%= $secondarySpecialties->[2] %>"
-      secondarySpecialty4="<%= $secondarySpecialties->[3] %>"
+
       ></general-table>
   </div>
 </div>

@@ -8,29 +8,116 @@ import 'iconify-icon';
 //import { sprintf } from 'sprintf-js';
 
 import { customElement, property, state } from 'lit/decorators.js';
-import { LitElement, type CSSResultGroup } from 'lit';
-//import { repeat } from 'lit/directives/repeat.js';
-import { SignalWatcher, html, computed } from '@lit-labs/signals';
+import { type CSSResultGroup, LitElement, type PropertyValues } from 'lit';
+import { repeat } from 'lit/directives/repeat.js';
+import { Signal, SignalWatcher, html, computed } from '@lit-labs/signals';
 
 import {
-  //getCoreRowModel,
-  //getSortedRowModel,
+  getCoreRowModel,
+  getSortedRowModel,
   TableController,
   type ColumnDef,
   type SortingState,
   type CellContext,
   type HeaderContext,
-  //flexRender,
+  flexRender,
 } from '@tanstack/lit-table';
 
+import * as z from 'zod';
 import SpectrumTokensCSS from '@spectrum-css/tokens/dist/index.css' with { type: 'css' };
 import SpectrumProgressBarCSS from '@spectrum-css/progressbar/dist/index.css' with { type: 'css' };
 import GeneralTableCSS from '../../share/public/css/GeneralTable.css' with { type: 'css' };
 
-// Zod Schemas
-import { GeneralPairStub, GeneralPair } from './GeneralRowSchemas';
+import { LevelSettings } from '../partials/level_settings_form';
+import {
+  AscendingAttributeLevelValues,
+  CovenantCategoryValues,
+  SpecialtyLevelValues,
+} from '../Game/EvonyTKR/Shared/Constants';
 
-import { PairTableData } from './PairTableData';
+// Zod Schemas
+const BasicAttribute = z.object({ base: z.number(), increment: z.number() });
+type BasicAttribute = z.infer<typeof BasicAttribute>;
+const BasicAttributes = z.object({
+  attack: BasicAttribute,
+  defense: BasicAttribute,
+  leadership: BasicAttribute,
+  politics: BasicAttribute,
+});
+
+const General = z.object({
+  ascending: z.union([
+    z.boolean(),
+    z.literal('true'),
+    z.literal('false'),
+    z.literal(1),
+    z.literal(0),
+  ]),
+  basicAttributes: BasicAttributes,
+  builtInBookName: z.string(),
+  id: z.string(),
+  name: z.string(),
+  specialtyNames: z.array(z.string()),
+  type: z.array(z.string()),
+});
+type General = z.infer<typeof General>;
+
+const PairBuffs = z.object({
+  primary: General,
+  secondary: General,
+});
+type PairBuffs = z.infer<typeof PairBuffs>;
+
+const SingleBuffs = z.object({
+  primary: General,
+});
+type SingleBuffs = z.infer<typeof SingleBuffs>;
+
+const BuffFields = z.object({
+  marchbuff: z.number(),
+  attackbuff: z.number(),
+  defensebuff: z.number(),
+  hpbuff: z.number(),
+  groundattackdebuff: z.number(),
+  grounddefensedebuff: z.number(),
+  groundhpdebuff: z.number(),
+  mountedattackdebuff: z.number(),
+  mounteddefensedebuff: z.number(),
+  mountedhpdebuff: z.number(),
+  rangedattackdebuff: z.number(),
+  rangeddefensedebuff: z.number(),
+  rangedhpdebuff: z.number(),
+  siegeattackdebuff: z.number(),
+  siegedefensedebuff: z.number(),
+  siegehpdebuff: z.number(),
+});
+type BuffFields = z.infer<typeof BuffFields>;
+
+const GeneralData = SingleBuffs.extend(BuffFields.shape);
+const GeneralPair = PairBuffs.extend(BuffFields.shape);
+type GeneralData = z.infer<typeof GeneralData>;
+type GeneralPair = z.infer<typeof GeneralPair>;
+
+const RowState = z.literal(['stale', 'pending', 'current', 'error', 'ignore']);
+type RowState = z.infer<typeof RowState>;
+
+const GeneralDataStub = z.object({
+  primary: z.object({ name: z.string() }),
+  current: RowState.optional(),
+});
+type GeneralDataStub = z.infer<typeof GeneralDataStub>;
+
+const GeneralPairStub = z.object({
+  primary: z.object({ name: z.string() }),
+  secondary: z.object({ name: z.string() }),
+  current: RowState.optional(),
+});
+type GeneralPairStub = z.infer<typeof GeneralPairStub>;
+
+const RowData = z.union([GeneralData, GeneralPair]);
+type RowData = z.infer<typeof RowData>;
+const RowStub = z.union([GeneralDataStub, GeneralPairStub]);
+type RowStub = z.infer<typeof RowStub>;
 
 const tableHeaders = new Map<string, string>([
   ['primary', 'Primary'],
@@ -60,16 +147,22 @@ export class GeneralTable extends SignalWatcher(LitElement) {
   @property({ type: String }) uiTarget = '';
   @property({ type: String }) public allowedBuffActivation: string = 'Overall';
 
-  //@state() private _sorting: SortingState = [];
-  //@state() private columns: ColumnDef<GeneralPair>[] = [];
-  //@state() private nameList: GeneralPairStub[] = [];
+  @state() private _sorting: SortingState = [];
+  @state() private columns: ColumnDef<RowData>[] = [];
+  @state() private nameList: RowStub[] = [];
 
-  //private dataMap = new Map<number, GeneralPair>();
-  //@state() private tableData: GeneralPair[] = [];
-  //private tableController = new TableController<GeneralPair>(this);
-  private TableDataController: PairTableData | null = null;
+  private dataMap = new Map<number, RowData>();
+  @state() private tableData: RowData[] = [];
+  private tableController = new TableController<RowData>(this);
+  private dataRunId = Math.floor(Date.now() / 1000);
 
+  protected primarySettings: LevelSettings = new LevelSettings();
+  protected secondarySettings: LevelSettings | undefined;
   protected lastFilterSettings: string = '';
+
+  private settingsWatcher:
+    | InstanceType<typeof Signal.subtle.Watcher>
+    | undefined;
 
   static styles: CSSResultGroup = [
     SpectrumTokensCSS,
@@ -77,29 +170,20 @@ export class GeneralTable extends SignalWatcher(LitElement) {
     GeneralTableCSS,
   ];
 
-  override async connectedCallback() {
-    void super.connectedCallback();
-    if (DEBUG) {
-      console.log(`GeneralTable mode is ${this.mode}`);
-    }
-    this.TableDataController = new PairTableData(this);
+  override connectedCallback(): void {
+    super.connectedCallback();
     if (this.mode === 'pair') {
-      if (!this.TableDataController.secondarySettings) {
-        console.error('error creating secondary settings form');
-      } else {
-        this.TableDataController.secondarySettings!.is_primary = false;
-        this.TableDataController.secondarySettings!.FormTitle =
-          'Secondary General';
-        this.TableDataController.secondarySettings.requestUpdate();
-      }
+      this.secondarySettings = new LevelSettings();
+      this.secondarySettings.is_primary = false;
+      this.secondarySettings.FormTitle = 'Secondary General';
     } else if (!this.uiTarget.localeCompare('Mayor Specialists')) {
-      this.TableDataController.primarySettings.FormTitle = 'Mayor';
+      this.primarySettings.FormTitle = 'Mayor';
     } else {
-      this.TableDataController.primarySettings.FormTitle = 'General';
-      this.TableDataController.primarySettings.requestUpdate();
+      this.primarySettings.FormTitle = 'General';
     }
-
     // this must happen *after* the 2 level settings forms are set up just above.
+    this.loadFromUrl();
+    //window.addEventListener('popstate', this.handlePopState);
     this.addEventListener('form_updated', (e) => {
       if (DEBUG) {
         console.log(`got a form_updated event`);
@@ -117,24 +201,46 @@ export class GeneralTable extends SignalWatcher(LitElement) {
       const currentHash = this.filterSettings.get();
       if (this.lastFilterSettings.localeCompare(currentHash)) {
         this.lastFilterSettings = currentHash;
-
-        // Debounce the actual SSE request
+        this.invalidateData();
+        this.startBackgroundFetch();
       }
     });
   }
 
   override disconnectedCallback() {
+    if (this.settingsWatcher) {
+      this.settingsWatcher.unwatch(); // clean up if supported
+    }
+
     super.disconnectedCallback();
   }
 
   /* eslint-disable-next-line  @typescript-eslint/no-misused-promises */
   override async firstUpdated() {
     this.columns = this.generateColumns();
+    const stubData = await this.fetchStubPairs();
+    const primaries = Array.from(
+      new Map(stubData.map((sd) => [sd.primary.name, true])).keys(),
+    );
+    this.primarySettings.generals = primaries;
+    this.primarySettings.requestUpdate();
+
+    this.nameList = [...stubData];
+    // a signal won't fire until a menu changes,
+    // kick off the first data fetch manually
+    this.startBackgroundFetch();
   }
 
-  private generateColumns(): ColumnDef<GeneralPair>[] {
+  protected override updated(_changedProperties: PropertyValues): void {
+    super.updated(_changedProperties);
+    const params = this.urlParams.get();
+    const newURL = `${window.location.pathname}?${params.toString()}`;
+    window.history.replaceState(null, '', newURL);
+  }
+
+  private generateColumns(): ColumnDef<RowData>[] {
     // Create a columns array starting with the static index column
-    const columns: ColumnDef<GeneralPair>[] = [
+    const columns: ColumnDef<RowData>[] = [
       {
         id: 'rowIndex',
         header: '#',
@@ -166,7 +272,7 @@ export class GeneralTable extends SignalWatcher(LitElement) {
         return true;
       })
       .map((key) => {
-        const accessorFn = (row: GeneralPair) => {
+        const accessorFn = (row: RowData) => {
           /* eslint-disable-next-line  @typescript-eslint/no-unnecessary-condition */
           if (!row) return null;
           if (key === 'primary') return (row as GeneralPair).primary.name;
@@ -179,13 +285,13 @@ export class GeneralTable extends SignalWatcher(LitElement) {
           accessorFn,
           enableSorting: true,
           sortDescFirst: key !== 'primary' && key !== 'secondary',
-          cell: (info: CellContext<GeneralPair, unknown>) => {
+          cell: (info: CellContext<RowData, unknown>) => {
             const value = info.getValue();
             return typeof value === 'number'
               ? value.toLocaleString()
               : (value ?? '');
           },
-          header: (info: HeaderContext<GeneralPair, unknown>) => {
+          header: (info: HeaderContext<RowData, unknown>) => {
             const sortIndex = info.table
               .getState()
               .sorting.findIndex((s) => s.id === info.column.id);
@@ -220,79 +326,430 @@ export class GeneralTable extends SignalWatcher(LitElement) {
     return columns;
   }
 
+  protected handlePopState = () => {
+    this.loadFromUrl();
+  };
+
+  private urlParams = computed(() => {
+    const params = new URLSearchParams();
+
+    if (this.primarySettings) {
+      params.set('ascendingLevel', this.primarySettings.ascendingLevel.get());
+      params.set(
+        'primaryCovenantLevel',
+        this.primarySettings.covenantLevel.get(),
+      );
+      let p = this.mode === 'single' ? 'specialty1' : 'primarySpecialty1';
+      params.set(p, this.primarySettings.specialtyLevel1.get());
+      p = this.mode === 'single' ? 'specialty2' : 'primarySpecialty2';
+      params.set(p, this.primarySettings.specialtyLevel2.get());
+      p = this.mode === 'single' ? 'specialty3' : 'primarySpecialty3';
+      params.set(p, this.primarySettings.specialtyLevel3.get());
+      p = this.mode === 'single' ? 'specialty4' : 'primarySpecialty4';
+      params.set(p, this.primarySettings.specialtyLevel4.get());
+    } else {
+      if (DEBUG) {
+        console.error('this.primarySettings is undefined');
+      }
+    }
+
+    if (this.mode === 'pair') {
+      if (this.secondarySettings) {
+        params.set(
+          'ascendingLevel',
+          this.secondarySettings.ascendingLevel.get(),
+        );
+        params.set(
+          'secondaryCovenantLevel',
+          this.secondarySettings.covenantLevel.get(),
+        );
+        let p = 'secondarySpecialty1';
+        params.set(p, this.secondarySettings.specialtyLevel1.get());
+        p = 'secondarySpecialty2';
+        params.set(p, this.secondarySettings.specialtyLevel2.get());
+        p = 'secondarySpecialty3';
+        params.set(p, this.secondarySettings.specialtyLevel3.get());
+        p = 'secondarySpecialty4';
+        params.set(p, this.secondarySettings.specialtyLevel4.get());
+      } else {
+        if (DEBUG) {
+          console.error('this.secondarySettings is undefined');
+        }
+      }
+    }
+    return params;
+  });
+
+  private loadFromUrl = () => {
+    const params = new URLSearchParams(window.location.search);
+
+    const setParam = <T>(
+      paramName: string,
+      validator: z.ZodType<T>,
+      signal: Signal.State<T>,
+    ) => {
+      if (params.has(paramName)) {
+        const valid = validator.safeParse(params.get(paramName));
+        if (valid.success) {
+          signal.set(valid.data);
+        }
+      }
+    };
+
+    setParam(
+      'ascendingLevel',
+      AscendingAttributeLevelValues,
+      this.primarySettings.ascendingLevel,
+    );
+    setParam(
+      'primaryCovenantLevel',
+      CovenantCategoryValues,
+      this.primarySettings.covenantLevel,
+    );
+    setParam(
+      this.mode === 'single' ? 'specialty1' : 'primarySpecialty1',
+      SpecialtyLevelValues,
+      this.primarySettings.specialtyLevel1,
+    );
+    setParam(
+      this.mode === 'single' ? 'specialty2' : 'primarySpecialty2',
+      SpecialtyLevelValues,
+      this.primarySettings.specialtyLevel2,
+    );
+    setParam(
+      this.mode === 'single' ? 'specialty3' : 'primarySpecialty3',
+      SpecialtyLevelValues,
+      this.primarySettings.specialtyLevel3,
+    );
+    setParam(
+      this.mode === 'single' ? 'specialty4' : 'primarySpecialty4',
+      SpecialtyLevelValues,
+      this.primarySettings.specialtyLevel4,
+    );
+
+    if (this.mode === 'pair') {
+      setParam(
+        'secondaryCovenantLevel',
+        CovenantCategoryValues,
+        this.secondarySettings!.covenantLevel,
+      );
+      setParam(
+        'secondarySpecialty1',
+        SpecialtyLevelValues,
+        this.secondarySettings!.specialtyLevel1,
+      );
+      setParam(
+        'secondarySpecialty2',
+        SpecialtyLevelValues,
+        this.secondarySettings!.specialtyLevel2,
+      );
+      setParam(
+        'secondarySpecialty3',
+        SpecialtyLevelValues,
+        this.secondarySettings!.specialtyLevel3,
+      );
+      setParam(
+        'secondarySpecialty4',
+        SpecialtyLevelValues,
+        this.secondarySettings!.specialtyLevel4,
+      );
+    }
+  };
+
+  private urlConversion(scope: 'data' | 'row'): string {
+    let basePath = window.location.pathname.replace(/\/$/, '');
+
+    basePath = decodeURIComponent(basePath);
+
+    if (scope === 'data') {
+      if (this.mode === 'pair') {
+        basePath = basePath.replace('pair-comparison', 'pair/data.json');
+      } else {
+        basePath = basePath.replace('comparison', 'data.json');
+      }
+    } else {
+      if (this.mode === 'pair') {
+        basePath = basePath.replace('pair-comparison', 'pair-row.json');
+      } else {
+        basePath = basePath.replace('comparison', 'primary/row.json');
+      }
+    }
+    if (DEBUG) {
+      console.log(`urlConversion returning ${basePath}`);
+    }
+    return basePath;
+  }
+
+  private async fetchStubPairs(): Promise<RowStub[]> {
+    const url = this.urlConversion('data');
+
+    if (DEBUG) {
+      console.log(`[fetchStubPairs] Mode: ${this.mode}, URL: ${url}`);
+    }
+
+    const res = await fetch(url);
+    const json = (await res.json()) as object;
+
+    const result =
+      this.mode === 'pair'
+        ? GeneralPairStub.array().safeParse(json['data' as keyof typeof json])
+        : GeneralDataStub.array().safeParse(json);
+
+    if (result.success) return result.data;
+
+    console.error('[fetchStubPairs] Stub validation failed', result.error);
+    return [];
+  }
+
+  private async fetchRow(
+    index: number,
+    runId: number,
+  ): Promise<RowData | undefined> {
+    this.nameList[index].current = 'pending';
+    const stub = this.nameList[index];
+
+    const basePath = this.urlConversion('row');
+    if (this.mode === 'pair') {
+      const pairStub = stub as GeneralPairStub;
+      const params = new URLSearchParams({
+        primary: pairStub.primary.name,
+        secondary: pairStub.secondary.name,
+        ascendingLevel: this.primarySettings.ascendingLevel.get(),
+        primaryCovenantLevel: this.primarySettings.covenantLevel.get(),
+        primarySpecialty1: this.primarySettings.specialtyLevel1.get(),
+        primarySpecialty2: this.primarySettings.specialtyLevel2.get(),
+        primarySpecialty3: this.primarySettings.specialtyLevel3.get(),
+        primarySpecialty4: this.primarySettings.specialtyLevel4.get(),
+        secondaryCovenantLevel: this.secondarySettings!.covenantLevel.get(),
+        secondarySpecialty1: this.secondarySettings!.specialtyLevel1.get(),
+        secondarySpecialty2: this.secondarySettings!.specialtyLevel2.get(),
+        secondarySpecialty3: this.secondarySettings!.specialtyLevel3.get(),
+        secondarySpecialty4: this.secondarySettings!.specialtyLevel4.get(),
+      });
+      const url = `${basePath}?${params.toString()}`;
+      const res = await fetch(url);
+      if (!res.ok) {
+        throw new Error(`HTTP error ${res.status}`);
+      }
+      const json = (await res.json()) as object;
+      const parsed = GeneralPair.safeParse(json);
+      if (parsed.success) {
+        if (runId === this.dataRunId) {
+          return parsed.data;
+        } else {
+          // this fetch got old data, but because the row was 'pending'
+          // the new loop will not have created a fetchRow call for it.
+          // mark this row as stale so that the new loop that *made*
+          // this request obsolte can call fetchRow for this row.
+          this.nameList[index].current = 'stale';
+          return;
+        }
+      } else {
+        console.error(parsed.error.message);
+        console.error(`recieved: `, res.text());
+        throw new Error(parsed.error.message);
+      }
+    } else {
+      const params = new URLSearchParams({
+        generalType: this.generalType,
+        ascendingLevel: this.primarySettings.ascendingLevel.get(),
+        covenantLevel: this.primarySettings.covenantLevel.get(),
+        specialty1: this.primarySettings.specialtyLevel1.get(),
+        specialty2: this.primarySettings.specialtyLevel2.get(),
+        specialty3: this.primarySettings.specialtyLevel3.get(),
+        specialty4: this.primarySettings.specialtyLevel4.get(),
+      });
+
+      const url = `${basePath}?name=${encodeURIComponent(stub.primary.name)}&${params.toString()}`;
+      const res = await fetch(url);
+      if (!res.ok) {
+        throw new Error(`HTTP error ${res.status}`);
+      }
+      const json = (await res.json()) as object;
+      const parsed = GeneralData.safeParse(json);
+      if (parsed.success) {
+        if (runId === this.dataRunId) {
+          return parsed.data;
+        }
+      } else {
+        throw new Error(parsed.error.message);
+      }
+    }
+    return;
+  }
+
   private filterSettings = computed(() => {
     const fs = {
       primary: {
-        ascendingLevel:
-          this.TableDataController!.primarySettings.ascendingLevel.get(),
-        covenantLevel:
-          this.TableDataController!.primarySettings.covenantLevel.get(),
-        specialtyLevel1:
-          this.TableDataController!.primarySettings.specialtyLevel1.get(),
-        specialtyLevel2:
-          this.TableDataController!.primarySettings.specialtyLevel2.get(),
-        specialtyLevel3:
-          this.TableDataController!.primarySettings.specialtyLevel3.get(),
-        specialtyLevel4:
-          this.TableDataController!.primarySettings.specialtyLevel4.get(),
-        selectedCount:
-          this.TableDataController!.primarySettings.selectedCount.get(),
-        selected:
-          this.TableDataController!.primarySettings.selectedGenerals.get().join(
-            '|',
-          ),
+        ascendingLevel: this.primarySettings.ascendingLevel.get(),
+        covenantLevel: this.primarySettings.covenantLevel.get(),
+        specialtyLevel1: this.primarySettings.specialtyLevel1.get(),
+        specialtyLevel2: this.primarySettings.specialtyLevel2.get(),
+        specialtyLevel3: this.primarySettings.specialtyLevel3.get(),
+        specialtyLevel4: this.primarySettings.specialtyLevel4.get(),
+        selectedCount: this.primarySettings.selectedCount.get(),
+        selected: this.primarySettings.selectedGenerals.get().join('|'),
       },
-      ...(this.TableDataController!.secondarySettings && {
+      ...(this.secondarySettings && {
         secondary: {
-          covenantLevel:
-            this.TableDataController!.secondarySettings.covenantLevel.get(),
-          specialtyLevel1:
-            this.TableDataController!.secondarySettings.specialtyLevel1.get(),
-          specialtyLevel2:
-            this.TableDataController!.secondarySettings.specialtyLevel2.get(),
-          specialtyLevel3:
-            this.TableDataController!.secondarySettings.specialtyLevel3.get(),
-          specialtyLevel4:
-            this.TableDataController!.secondarySettings.specialtyLevel4.get(),
+          covenantLevel: this.secondarySettings.covenantLevel.get(),
+          specialtyLevel1: this.secondarySettings.specialtyLevel1.get(),
+          specialtyLevel2: this.secondarySettings.specialtyLevel2.get(),
+          specialtyLevel3: this.secondarySettings.specialtyLevel3.get(),
+          specialtyLevel4: this.secondarySettings.specialtyLevel4.get(),
         },
       }),
     };
     return JSON.stringify(fs);
   });
 
+  private invalidateData() {
+    for (let i = 0; i < this.nameList.length; i++) {
+      const name = this.nameList[i].primary.name;
+      const selected = this.primarySettings.selectedGenerals
+        .get()
+        .find((n) => n === name);
+      if (selected) {
+        if (this.nameList[i].current !== 'stale') {
+          this.nameList[i].current = 'stale';
+        }
+      } else {
+        this.nameList[i].current = 'ignore';
+      }
+    }
+    this.requestUpdate();
+  }
+
+  private startBackgroundFetch() {
+    // ensure ids are always unique even if not strictly time accurate.
+    let newId = Math.floor(Date.now() / 1000);
+    while (newId <= this.dataRunId) {
+      newId++;
+    }
+    this.dataRunId = newId;
+    const pending = new Set<number>();
+    if (DEBUG) {
+      console.log(
+        `startBackgroundFetch starting with id ${this.dataRunId} and for nameList ${this.nameList.length}`,
+      );
+    }
+
+    // Initialize with all rows needing fetch
+    this.nameList.forEach((row, i) => {
+      if (row.current === 'ignore') {
+        return;
+      }
+      if (!row.current || row.current === 'stale') {
+        pending.add(i);
+        this.nameList[i].current = 'pending';
+      }
+    });
+
+    this.maybeLaunchMore(this.dataRunId, pending);
+  }
+
+  private maxBatch = 6;
+  private maybeLaunchMore(myRunId: number, pending: Set<number>) {
+    if (DEBUG) {
+      console.log(
+        `maybeLaunchMore with runId ${myRunId} and pending ${pending.size} remaining`,
+      );
+    }
+    if (myRunId !== this.dataRunId || pending.size === 0) return;
+    // Launch batch of 6
+    let count = 0;
+    const pi = pending.values();
+    const promises = new Array<Promise<RowData | undefined>>();
+    const batch = new Array<number>();
+    while (count < this.maxBatch) {
+      const next = pi.next();
+      if (next.done) break; // <— end of Set
+      const i = next.value as number;
+      promises.push(this.fetchRow(i, myRunId));
+      batch.push(i);
+      count++;
+    }
+
+    if (batch.length === 0) return; // <— avoid tight recursion when nothing was launched
+
+    // use then, not await, so as not to block the UI
+    void Promise.allSettled(promises).then((results) => {
+      // Process results and handle retries
+      results.forEach((result, idx) => {
+        const index = batch[idx];
+        if (result.status === 'rejected') {
+          console.error(`Fetch failed for row ${index}`, result.reason);
+          this.nameList[index].current = 'stale';
+        } else if (result.value) {
+          const r = result.value;
+          this.nameList[index].current = 'current';
+          this.dataMap.set(index, r);
+          // Do not delete from pending until we are done with
+          // updates to it.
+          pending.delete(index);
+        } else {
+          this.nameList[index].current = 'stale';
+        }
+      });
+      this.updateTableData();
+      if (myRunId === this.dataRunId && pending.size > 0) {
+        this.maybeLaunchMore(myRunId, pending);
+      } else {
+        if (DEBUG) {
+          console.warn(
+            `myRunId: ${myRunId}; dataRunId: ${this.dataRunId}; pending size: ${pending.size}`,
+          );
+        }
+      }
+    });
+  }
+
+  private updateTableData() {
+    this.tableData = this.nameList
+      .map((row, i) =>
+        row.current !== 'ignore' ? this.dataMap.get(i) : undefined,
+      )
+      .filter((x): x is RowData => !!x);
+
+    this._visibleIndexMap = this.nameList
+      .map((row, i) =>
+        row.current !== 'ignore' && this.dataMap.has(i) ? i : -1,
+      )
+      .filter((i) => i !== -1);
+
+    this.requestUpdate();
+  }
+
   // add a field:
-  //private _visibleIndexMap: number[] = [];
+  private _visibleIndexMap: number[] = [];
 
   override render() {
-    this.tableData = this.TableDataController!.rows.get().filter(
-      (gp): gp is GeneralPair => gp !== undefined,
-    );
-    const totalCount = this.TableDataController!.rows.get().length;
-    const loadingCount = this.TableDataController!.master_row_list.filter(
+    const totalCount = this.nameList.filter(
+      (r) => r.current !== 'ignore',
+    ).length;
+    const loadingCount = this.nameList.filter(
       (r) => r.current !== 'current' && r.current !== 'ignore',
     ).length;
-    //const table = this.tableController.table({
-    //  columns: this.columns,
-    //  data: this.tableData,
-    //  state: { sorting: this._sorting },
-    //  onSortingChange: (updaterOrValue) => {
-    //    this._sorting =
-    //      typeof updaterOrValue === 'function'
-    //        ? updaterOrValue(this._sorting)
-    //        : updaterOrValue;
-    //    this.requestUpdate();
-    //  },
-    //  getSortedRowModel: getSortedRowModel(),
-    //  getCoreRowModel: getCoreRowModel(),
-    //});
+    const table = this.tableController.table({
+      columns: this.columns,
+      data: this.tableData,
+      state: { sorting: this._sorting },
+      onSortingChange: (updaterOrValue) => {
+        this._sorting =
+          typeof updaterOrValue === 'function'
+            ? updaterOrValue(this._sorting)
+            : updaterOrValue;
+        this.requestUpdate();
+      },
+      getSortedRowModel: getSortedRowModel(),
+      getCoreRowModel: getCoreRowModel(),
+    });
     const cfs = this.filterSettings.get();
     return html`
       <span style="display: none">${cfs}</span>
-      ${this.TableDataController
-        ? this.TableDataController.display()
-        : DEBUG
-          ? html`<span>No Controller</span>`
-          : ''}
+
+      ${this.primarySettings}
+      ${this.mode === 'pair' ? this.secondarySettings : ''}
       ${loadingCount > 0
         ? html` <div id="table-loading">
             <div class=" spectrum-ProgressBar " role="progressbar">
@@ -312,354 +769,82 @@ export class GeneralTable extends SignalWatcher(LitElement) {
         : ''}
       <div
         class="general-pairs-table spectrum-Table spectrum-Table-scroller spectrum-Table--quiet spectrum-Table--sizeM spectrum-Table--compact"
-      ></div>
+      >
+        <table class="spectrum-Table-main">
+          <thead class="spectrum-Table-head">
+            ${repeat(
+              table.getHeaderGroups(),
+              (hg) => hg.id,
+              (hg) =>
+                html`<tr>
+                  ${repeat(
+                    hg.headers,
+                    (h) => h.id,
+                    (h) =>
+                      html`<th
+                        colspan=${h.colSpan}
+                        class="spectrum-Table-headCell is-sortable"
+                      >
+                        ${h.isPlaceholder
+                          ? null
+                          : html`<div
+                              @click=${h.column.getToggleSortingHandler()}
+                            >
+                              ${flexRender(
+                                h.column.columnDef.header,
+                                h.getContext(),
+                              )}
+                            </div>`}
+                      </th>`,
+                  )}
+                </tr>`,
+            )}
+          </thead>
+          <tbody class="spectrum-Table-body">
+            ${repeat(
+              table.getRowModel().rows,
+              (row) => row.id,
+              (row, index) => {
+                const originalIndex = this._visibleIndexMap[index];
+                const currentIndex = index + 1;
+                const rowState =
+                  this.nameList[originalIndex]?.current ?? 'current';
+                const title =
+                  rowState === 'stale'
+                    ? 'Showing previous values; updating…'
+                    : rowState === 'pending'
+                      ? 'Refreshing…'
+                      : rowState === 'error'
+                        ? 'Failed to refresh; will retry on next change'
+                        : '';
+
+                return html`<tr
+                  class="spectrum-Table-row ${rowState}"
+                  title=${title}
+                >
+                  ${repeat(
+                    row.getVisibleCells(),
+                    (cell) => cell.id,
+                    (cell) =>
+                      cell.column.id === 'rowIndex'
+                        ? html`<span
+                            class="index-column spectrum-Body spectrum-Body--sizeM"
+                          >
+                            ${currentIndex}
+                          </span>`
+                        : html`<td class="spectrum-Table-cell">
+                            ${flexRender(
+                              cell.column.columnDef.cell,
+                              cell.getContext(),
+                            )}
+                          </td>`,
+                  )}
+                </tr>`;
+              },
+            )}
+          </tbody>
+        </table>
+      </div>
     `;
   }
 }
-//public async fetchRow(
-//  index: number,
-//  runId: number,
-//): Promise<GeneralPair | undefined> {
-//  this.nameList[index].current = 'pending';
-//  const stub = this.nameList[index];
-//
-//  const basePath = this.urlConversion('row');
-//  if (this.mode === 'pair') {
-//    const pairStub = stub as GeneralPairStub;
-//    const params = new URLSearchParams({
-//      primary: pairStub.primary.name,
-//      secondary: pairStub.secondary.name,
-//      ascendingLevel: this.TableDataController.primarySettings.ascendingLevel.get(),
-//      primaryCovenantLevel: this.TableDataController.primarySettings.covenantLevel.get(),
-//      primarySpecialty1: this.TableDataController.primarySettings.specialtyLevel1.get(),
-//      primarySpecialty2: this.TableDataController.primarySettings.specialtyLevel2.get(),
-//      primarySpecialty3: this.TableDataController.primarySettings.specialtyLevel3.get(),
-//      primarySpecialty4: this.TableDataController.primarySettings.specialtyLevel4.get(),
-//      secondaryCovenantLevel: this.TableDataController.secondarySettings!.covenantLevel.get(),
-//      secondarySpecialty1: this.TableDataController.secondarySettings!.specialtyLevel1.get(),
-//      secondarySpecialty2: this.TableDataController.secondarySettings!.specialtyLevel2.get(),
-//      secondarySpecialty3: this.TableDataController.secondarySettings!.specialtyLevel3.get(),
-//      secondarySpecialty4: this.TableDataController.secondarySettings!.specialtyLevel4.get(),
-//    });
-//    const url = `${basePath}?${params.toString()}`;
-//    const res = await fetch(url);
-//    if (!res.ok) {
-//      throw new Error(`HTTP error ${res.status}`);
-//    }
-//    const json = (await res.json()) as object;
-//    const parsed = GeneralPair.safeParse(json);
-//    if (parsed.success) {
-//      if (runId === this.dataRunId) {
-//        return parsed.data;
-//      } else {
-//        // this fetch got old data, but because the row was 'pending'
-//        // the new loop will not have created a fetchRow call for it.
-//        // mark this row as stale so that the new loop that *made*
-//        // this request obsolte can call fetchRow for this row.
-//        this.nameList[index].current = 'stale';
-//        return;
-//      }
-//    } else {
-//      console.error(parsed.error.message);
-//      console.error(`recieved: `, res.text());
-//      throw new Error(parsed.error.message);
-//    }
-//  } else {
-//    const params = new URLSearchParams({
-//      generalType: this.generalType,
-//      ascendingLevel: this.TableDataController.primarySettings.ascendingLevel.get(),
-//      covenantLevel: this.TableDataController.primarySettings.covenantLevel.get(),
-//      specialty1: this.TableDataController.primarySettings.specialtyLevel1.get(),
-//      specialty2: this.TableDataController.primarySettings.specialtyLevel2.get(),
-//      specialty3: this.TableDataController.primarySettings.specialtyLevel3.get(),
-//      specialty4: this.TableDataController.primarySettings.specialtyLevel4.get(),
-//    });
-
-//    const url = `${basePath}?name=${encodeURIComponent(stub.primary.name)}&${params.toString()}`;
-//    const res = await fetch(url);
-//    if (!res.ok) {
-//      throw new Error(`HTTP error ${res.status}`);
-//    }
-//    const json = (await res.json()) as object;
-//    const parsed = GeneralData.safeParse(json);
-//    if (parsed.success) {
-//      if (runId === this.dataRunId) {
-//        return parsed.data;
-//      }
-//    } else {
-//      throw new Error(parsed.error.message);
-//    }
-//  }
-//  return;
-//}
-
-//private startBackgroundFetch() {
-//  // ensure ids are always unique even if not strictly time accurate.
-//  let newId = Math.floor(Date.now() / 1000);
-//  while (newId <= this.dataRunId) {
-//    newId++;
-//  }
-//  this.dataRunId = newId;
-//  if (DEBUG) {
-//    console.log(
-//      `startBackgroundFetch starting with id ${this.dataRunId} and for nameList ${this.nameList.length}`,
-//    );
-//  }
-//  const params = this.urlParams.get();
-//  const url = `${this.urlConversion('details')}?${params.toString()}`;
-//  if (DEBUG) {
-//    console.log(`data url is ${url.toString}`);
-//  }
-//
-//  this.currentEventSource = new EventSource(url);
-//  this.currentEventSource.onmessage = (event) => {
-//    const message: Object = JSON.parse(event.data) as Object;
-//    // typescript keeps insisting that message['runId' as keyof typeof message] is a function type.
-//    // force it to be a number with zod.
-//    const valid = z
-//      .number()
-//      .safeParse(message['runId' as keyof typeof message]);
-//    if (!valid.success) {
-//      console.error(`invalid event from ${url}`);
-//    }
-//    const runId = valid.data;
-//
-//    if (DEBUG) {
-//      console.log(`Received SSE event with runId ${runId}:`, message);
-//    }
-//
-//    // Ignore messages from old streams
-//    if (runId !== this.dataRunId) {
-//      if (DEBUG) {
-//        console.log(
-//          `Ignoring old runId ${runId}, current is ${this.dataRunId}`,
-//        );
-//      }
-//      return;
-//    }
-//
-//    // Pass the actual row data, not the wrapper
-//    this.updateRowFromStream(message['data' as keyof typeof message]);
-//  };
-//
-//  this.currentEventSource.onerror = (e) => {
-//    console.error('EventSource failed:', e);
-//    this.currentEventSource?.close();
-//    this.currentEventSource = undefined;
-//  };
-//  this.currentEventSource.addEventListener('complete', () => {
-//    this.currentEventSource?.close();
-//    this.currentEventSource = undefined;
-//  });
-//}
-//
-//private updateTableData() {
-//  this.tableData = this.nameList
-//    .map((row, i) =>
-//      row.current !== 'ignore' ? this.dataMap.get(i) : undefined,
-//    )
-//    .filter((x): x is GeneralPair => !!x);
-//
-//  this._visibleIndexMap = this.nameList
-//    .map((row, i) =>
-//      row.current !== 'ignore' && this.dataMap.has(i) ? i : -1,
-//    )
-//    .filter((i) => i !== -1);
-//
-//  this.requestUpdate();
-//}
-//
-// private updateRowFromStream = (data: Object) => {
-//   if (this.mode === 'pair') {
-//     const parsed = GeneralPair.safeParse(data);
-//
-//     if (parsed.success) {
-//       const index = this.nameList.findIndex((nle) => {
-//         if (!nle.primary.name.localeCompare(parsed.data.primary.name)) {
-//           return !(nle as GeneralPair).secondary.name.localeCompare(
-//             parsed.data.secondary.name,
-//           );
-//         }
-//         return false;
-//       });
-//       if (DEBUG) {
-//         console.log(
-//           `updating row ${this.nameList[index].primary.name}/${(this.nameList[index] as GeneralPair).secondary.name}`,
-//         );
-//       }
-//       if (index >= 0) {
-//         this.nameList[index] = parsed.data;
-//         this.nameList[index].current = 'current';
-//       }
-//     } else {
-//       console.error(parsed.error.message);
-//       throw new Error(parsed.error.message);
-//     }
-//   }
-//   this.updateTableData();
-// };
-//
-//private invalidateData() {
-//  for (let i = 0; i < this.nameList.length; i++) {
-//    //const name = this.nameList[i].primary.name;
-//    const selected = new Array<string>();
-//    //const selected = this.TableDataController.primarySettings.selectedGenerals
-//    //  .get()
-//    //  .find((n) => n === name);
-//    if (selected) {
-//      if (this.nameList[i].current !== 'stale') {
-//        this.nameList[i].current = 'stale';
-//      }
-//    } else {
-//      this.nameList[i].current = 'ignore';
-//    }
-//  }
-//  this.requestUpdate();
-//}
-
-//<table class="spectrum-Table-main">
-//
-//  <thead class="spectrum-Table-head">
-//
-//    ${repeat(
-//
-//      table.getHeaderGroups(),
-//
-//      (hg) => hg.id,
-//
-//      (hg) =>
-//
-//        html`<tr>
-//
-//          ${repeat(
-//
-//            hg.headers,
-//
-//            (h) => h.id,
-//
-//            (h) =>
-//
-//              html`<th
-//
-//                colspan=${h.colSpan}
-//
-//                class="spectrum-Table-headCell is-sortable"
-//
-//              >
-//
-//                ${h.isPlaceholder
-//
-//                  ? null
-//
-//                  : html`<div
-//
-//                      @click=${h.column.getToggleSortingHandler()}
-//
-//                    >
-//
-//                      ${flexRender(
-//
-//                        h.column.columnDef.header,
-//
-//                        h.getContext(),
-//
-//                      )}
-//
-//                    </div>`}
-//
-//              </th>`,
-//
-//          )}
-//
-//        </tr>`,
-//
-//    )}
-//
-//  </thead>
-//
-//  <tbody class="spectrum-Table-body">
-//
-//    ${repeat(
-//
-//      table.getRowModel().rows,
-//
-//      (row) => row.id,
-//
-//      (row, index) => {
-//
-//        const originalIndex = this._visibleIndexMap[index];
-//
-//        const currentIndex = index + 1;
-//
-//        const rowState =
-//
-//          this.nameList[originalIndex]?.current ?? 'current';
-//
-//        const title =
-//
-//          rowState === 'stale'
-//
-//            ? 'Showing previous values; updating…'
-//
-//            : rowState === 'pending'
-//
-//              ? 'Refreshing…'
-//
-//              : rowState === 'error'
-//
-//                ? 'Failed to refresh; will retry on next change'
-//
-//                : '';
-//
-//        return html`<tr
-//
-//          class="spectrum-Table-row ${rowState}"
-//
-//          title=${title}
-//
-//        >
-//
-//          ${repeat(
-//
-//            row.getVisibleCells(),
-//
-//            (cell) => cell.id,
-//
-//            (cell) =>
-//
-//              cell.column.id === 'rowIndex'
-//
-//                ? html`<span
-//
-//                    class="index-column spectrum-Body spectrum-Body--sizeM"
-//
-//                  >
-//
-//                    ${currentIndex}
-//
-//                  </span>`
-//
-//                : html`<td class="spectrum-Table-cell">
-//
-//                    ${flexRender(
-//
-//                      cell.column.columnDef.cell,
-//
-//                      cell.getContext(),
-//
-//                    )}
-//
-//                  </td>`,
-//
-//          )}
-//
-//        </tr>`;
-//
-//      },
-//
-//    )}
-//
-//  </tbody>
-//
-//</table>
-//

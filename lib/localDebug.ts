@@ -5,9 +5,13 @@ if (DEBUG) {
 }
 
 const fileDebug: Record<string, boolean> = {
-  'lib/Generals/GeneralTable.ts': true,
+  'lib/Generals/GeneralTable.ts': false,
+  'lib/partials/level_settings_form.ts': false,
+  'lib/Generals/PairTable.ts': true,
+  'lib/Generals/PairTableContext.ts': true,
   'lib/Generals/PairTableData.ts': true,
-  'lib/partials/level_settings_form.ts': true,
+  'lib/Generals/PairTableState.ts': true,
+  'lib/Generals/pair_level_settings_form.ts': true,
 };
 
 function isAbsolutePath(path: string): boolean {

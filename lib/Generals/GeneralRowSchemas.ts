@@ -83,6 +83,7 @@ export const GeneralPairStub = z.object({
   secondary: z.object({ name: z.string() }),
   current: RowState.optional(),
   runId: z.number().optional(),
+  selected: z.boolean().optional(),
 });
 export type GeneralPairStub = z.infer<typeof GeneralPairStub>;
 
