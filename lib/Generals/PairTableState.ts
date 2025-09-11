@@ -6,7 +6,6 @@ import {
   CovenantCategoryValues,
   SpecialtyLevelValues,
 } from '../Game/EvonyTKR/Shared/Constants';
-
 import { GeneralPair, GeneralPairStub } from './GeneralRowSchemas';
 
 export interface BuffFilter {

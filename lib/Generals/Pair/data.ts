@@ -9,8 +9,12 @@ import { Store } from '@tanstack/store';
 
 import {
   AscendingAttributeLevelValues,
+  CovenantCategoryValues,
   AscendingOptions,
 } from '../../Game/EvonyTKR/Shared/Constants';
+
+import { SpecialtyStore } from '../specialtyStore';
+import { PairStore } from './pairStore';
 
 export class PairData extends LitElement {
   readonly ascendingMap: AscendingOptions = {
@@ -44,18 +48,155 @@ export class PairData extends LitElement {
     },
   });
 
+  @property({ attribute: false })
+  public primaryCovenantLevel = new Store('none', {
+    onUpdate: () => {
+      const valid = CovenantCategoryValues.safeParse(
+        this.primaryCovenantLevel.state,
+      );
+      if (!valid.success) {
+        if (DEBUG) {
+          console.error('invalid ascending level', valid.error);
+        }
+        this.primaryCovenantLevel.setState(this.primaryCovenantLevel.prevState);
+      } else if (DEBUG) {
+        console.log(`Primary CovenantCategory validated at ${valid.data}`);
+      }
+    },
+  });
+
+  @property({ attribute: false })
+  public secondaryCovenantLevel = new Store('none', {
+    onUpdate: () => {
+      const valid = CovenantCategoryValues.safeParse(
+        this.secondaryCovenantLevel.state,
+      );
+      if (!valid.success) {
+        if (DEBUG) {
+          console.error('invalid ascending level', valid.error);
+        }
+        this.secondaryCovenantLevel.setState(
+          this.secondaryCovenantLevel.prevState,
+        );
+      } else if (DEBUG) {
+        console.log(`Secondary CovenantCategory validated at ${valid.data}`);
+      }
+    },
+  });
+
+  // Primary and secondary specialty groups
+  @property({ attribute: false })
+  primarySpecialties = new SpecialtyStore();
+
+  @property({ attribute: false })
+  secondarySpecialties = new SpecialtyStore();
+
+  @property({ attribute: false })
+  pairStore: PairStore = new PairStore();
+
   connectedCallback(): void {
     super.connectedCallback();
     this.ascendingLevel.subscribe(() => this.requestUpdate());
+    this.primaryCovenantLevel.subscribe(() => this.requestUpdate());
+    this.secondaryCovenantLevel.subscribe(() => this.requestUpdate());
+    this.primarySpecialties.subscribe(() => this.requestUpdate());
+    this.secondarySpecialties.subscribe(() => this.requestUpdate());
+    this.pairStore.subscribe(() => this.requestUpdate());
   }
+
+  protected renderPairStoreDebug = () => {
+    let template = html``;
+    for (const key in Object.keys(this.pairStore.store.state.rows)) {
+      const value = this.pairStore.store.state.rows[key];
+      template = html`
+        <dd>
+          <dl>
+            <dt>Primary:</dt>
+            <dd>${value.primary}</dd>
+            <dt>Secondary:</dt>
+            <dd>${value.secondary}</dd>
+            <dt>State:</dt>
+            <dd>${value.state}</dd>
+            <dt>Data:</dt>
+            <dd>${value.data}</dd>
+          </dl>
+        </dd>
+      `;
+    }
+    template = html`
+      <dl>
+        <dt>catalogRev</dt>
+        <dd>${this.pairStore.store.state.catalogRev}</dd>
+        <dt>selectionRev</dt>
+        <dd>${this.pairStore.store.state.selectionRev}</dd>
+        <dt>runId</dt>
+        <dd>${this.pairStore.store.state.runId}</dd>
+        <dt>catalog</dt>
+        ${this.pairStore.store.state.catalog.map((ce) => {
+          return html` <dd>${ce.primary} / ${ce.secondary}</dd> `;
+        })}
+        <dt>streaming</dt>
+        <dd>${this.pairStore.store.state.streaming}</dd>
+        <dt>rows</dt>
+        <dd>${template}</dd>
+      </dl>
+    `;
+    return template;
+  };
+
+  protected renderSpecialtyDebug = (primary: boolean) => {
+    let template = html``;
+    for (let i = 1; i <= 4; i++) {
+      let s;
+      if (primary) {
+        s = this.primarySpecialties.get(i as 1 | 2 | 3 | 4);
+      } else {
+        s = this.secondarySpecialties.get(i as 1 | 2 | 3 | 4);
+      }
+      template = html`${template}
+        <li><strong>${i}</strong>: ${s}</li> `;
+    }
+    template = html`
+      <ul>
+        ${template}
+      </ul>
+    `;
+    return template;
+  };
 
   protected render(): TemplateResult {
     return html`
       ${DEBUG
         ? html`
-            <div>
-              <span class="title">ascendingLevel</span>:
-              ${this.ascendingLevel.state}
+            <div class="pair-store">
+              <h4>Pair Store</h4>
+              ${this.renderPairStoreDebug()}
+            </div>
+            <div class="primary">
+              <h4>Primary General Buff Filter Options</h4>
+              <div>
+                <span class="title">ascendingLevel</span>:
+                ${this.ascendingLevel.state}
+              </div>
+              <div>
+                <span class="title">covenantCategory</span>:
+                ${this.primaryCovenantLevel.state}
+              </div>
+              <div>
+                <span class="title">Specialty Levels</span>:
+                ${this.renderSpecialtyDebug(true)}
+              </div>
+            </div>
+            <div class="secondary">
+              <h4>Secondary General Buff Filter Options</h4>
+              <div>
+                <span class="title">covenantCategory</span>:
+                ${this.secondaryCovenantLevel.state}
+              </div>
+              <div>
+                <span class="title">Specialty Levels</span>:
+                ${this.renderSpecialtyDebug(false)}
+              </div>
             </div>
           `
         : ''}

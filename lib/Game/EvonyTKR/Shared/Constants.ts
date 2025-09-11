@@ -16,6 +16,14 @@ CovenantCategoryValues.register(EvonySharedConstants, {
   description: 'lower cased names of the covenant categories',
 });
 
+export const CovenantCategoryOptions = z
+  .record(CovenantCategoryValues, z.string())
+  .register(EvonySharedConstants, {
+    description:
+      'map type for mapping machine readable covenant names to human readable names',
+  });
+export type CovenantCategoryOptions = z.infer<typeof CovenantCategoryOptions>;
+
 export const AscendingAttributeLevelNames = z.literal([
   'None',
   '1 Purple Star',
@@ -56,9 +64,21 @@ export const AscendingOptions = z.record(
 );
 export type AscendingOptions = z.infer<typeof AscendingOptions>;
 
+export const FOURTH_ALLOWED_WHEN_GOLD = z.literal([
+  'green',
+  'blue',
+  'purple',
+  'orange',
+  'gold',
+]);
+export type FOURTH_ALLOWED_WHEN_GOLD = z.infer<typeof FOURTH_ALLOWED_WHEN_GOLD>;
+
 export const SpecialtyLevelValues = z
-  .literal(['none', 'green', 'blue', 'purple', 'orange', 'gold'])
+  .literal(['none', ...FOURTH_ALLOWED_WHEN_GOLD.values])
   .register(EvonySharedConstants, {
     description: 'lower case names of the Speciality Levels',
   });
 export type SpecialtyLevelValues = z.infer<typeof SpecialtyLevelValues>;
+
+export const SpecialtyLevelOptions = z.record(SpecialtyLevelValues, z.string());
+export type SpecialtyLevelOptions = z.infer<typeof SpecialtyLevelOptions>;

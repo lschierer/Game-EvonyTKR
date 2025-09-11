@@ -12,8 +12,8 @@
 
 <div class="general-comparison">
   <div class="general-table-container">
-    <pair-filter is_primary>
-      <pair-filter>
+    <pair-filter is_primary form_title="<%= $PrimaryFormTitle %>">
+      <pair-filter form_title="<%= $SecondaryFormTitle %>">
         <pair-data></pair-data>
       </pair-filter>
     </pair-filter>

@@ -86,8 +86,3 @@ export const GeneralPairStub = z.object({
   selected: z.boolean().optional(),
 });
 export type GeneralPairStub = z.infer<typeof GeneralPairStub>;
-
-export const RowData = z.union([GeneralData, GeneralPair]);
-export type RowData = z.infer<typeof RowData>;
-export const RowStub = z.union([GeneralDataStub, GeneralPairStub]);
-export type RowStub = z.infer<typeof RowStub>;
