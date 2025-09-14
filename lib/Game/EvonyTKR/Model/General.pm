@@ -5,6 +5,7 @@ use File::FindLib 'lib';
 require Data::Printer;
 require Game::EvonyTKR::Model::BasicAttributes;
 require JSON::PP;
+require Mojo::JSON;
 require Log::Log4perl;
 
 class Game::EvonyTKR::Model::General : isa(Game::EvonyTKR::Shared::Constants) {
@@ -114,15 +115,17 @@ class Game::EvonyTKR::Model::General : isa(Game::EvonyTKR::Shared::Constants) {
   }
 
   method TO_JSON {
-    return $self->to_hash();
-  }
-
-  method as_string {
-    my $json =
-      JSON::PP->new->utf8->pretty->canonical(1)
+    return JSON::PP->new->utf8(1)->pretty->canonical(1)
       ->allow_blessed(1)
       ->convert_blessed(1)
       ->encode($self->to_hash());
+  }
+
+  method as_string {
+    my $json = JSON::PP->new->utf8(0)->pretty->canonical(1)
+      ->allow_blessed(1)
+      ->convert_blessed(1)
+      ->encode($self->to_hash())
     return $json;
   }
 

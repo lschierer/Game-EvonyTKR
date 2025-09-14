@@ -7,15 +7,20 @@
   // force the loading order by putting in the same script tag
   import "/js/lib/Generals/Pair/data.js";
   import "/js/lib/Generals/Pair/filter.js";
-
+  import "/js/lib/Generals/Pair/PairPicker.js";
+  import "/js/lib/Generals/Pair/PairTable.js";
 </script>
 
 <div class="general-comparison">
   <div class="general-table-container">
-    <pair-filter is_primary form_title="<%= $PrimaryFormTitle %>">
-      <pair-filter form_title="<%= $SecondaryFormTitle %>">
-        <pair-data></pair-data>
+      <pair-filter is_primary form_title="<%= $PrimaryFormTitle %>">
+        <pair-filter form_title="<%= $SecondaryFormTitle %>">
+          <pair-picker>
+            <pair-table>
+              <pair-data></pair-data>
+            </pair-table>
+          </pair-picker>
+        </pair-filter>
       </pair-filter>
-    </pair-filter>
   </div>
 </div>

@@ -1,30 +1,6 @@
 import * as z from 'zod';
 
-const BasicAttribute = z.object({ base: z.number(), increment: z.number() });
-type BasicAttribute = z.infer<typeof BasicAttribute>;
-const BasicAttributes = z.object({
-  attack: BasicAttribute,
-  defense: BasicAttribute,
-  leadership: BasicAttribute,
-  politics: BasicAttribute,
-});
-
-const General = z.object({
-  ascending: z.union([
-    z.boolean(),
-    z.literal('true'),
-    z.literal('false'),
-    z.literal(1),
-    z.literal(0),
-  ]),
-  basicAttributes: BasicAttributes,
-  builtInBookName: z.string(),
-  id: z.string(),
-  name: z.string(),
-  specialtyNames: z.array(z.string()),
-  type: z.array(z.string()),
-});
-type General = z.infer<typeof General>;
+import { General } from 'lib/Game/EvonyTKR/Shared/EvonySchemas';
 
 const PairBuffs = z.object({
   primary: General,

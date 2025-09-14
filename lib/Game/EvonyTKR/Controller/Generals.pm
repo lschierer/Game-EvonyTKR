@@ -10,12 +10,15 @@ require Game::EvonyTKR::Model::General::Pair::Manager;
 require Game::EvonyTKR::Model::Buff::Summarizer;
 require Game::EvonyTKR::Control::Generals::Routing;
 require Game::EvonyTKR::Model::Data;
+
+require UUID;
 require Data::Printer;
 use namespace::clean;
 
 package Game::EvonyTKR::Controller::Generals {
   use Mojo::Base 'Game::EvonyTKR::Controller::ControllerBase';
   require Mojo::Util;
+  use Mojo::JSON     qw(decode_json encode_json);
   use List::AllUtils qw( all any none );
   use Carp;
 
@@ -29,6 +32,8 @@ package Game::EvonyTKR::Controller::Generals {
   my $base = '/Generals';
 
   my $reference_base = '/Reference/Generals';
+
+  my $session_store = {};
 
   sub getReferenceBase($self) {
     return $reference_base;
@@ -181,21 +186,21 @@ package Game::EvonyTKR::Controller::Generals {
       controller => 'Generals',
       action     => 'singleData',
     )->name('Generals_dynamic_singleData');
-    $mainRoutes->get('/:uiTarget/:buffActivation/pair/data.json')->to(
+    $mainRoutes->any(
+      ['GET', 'POST'] => '/:uiTarget/:buffActivation/pair/data.json')->to(
       controller => 'Generals',
-      action     => 'pairData',
-    )->name('Generals_dynamic_pairData');
+      action     => 'pairCatalog',
+      )->name('Generals_dynamic_pairCatalog');
 
     # two routes to generate data on a single row within the table
     $mainRoutes->get('/:uiTarget/:buffActivation/:isPrimary/row.json')->to(
       controller => 'Generals',
       action     => 'singleRow',
     )->name('Generals_dynamic_singleRow');
-    $mainRoutes->get('/:uiTarget/:buffActivation/:run_id/pair-details-stream')
-      ->to(
+    $mainRoutes->get('/:uiTarget/:buffActivation/pair-details-stream')->to(
       controller => 'Generals',
       action     => 'stream_pair_details',
-      )->name('Generals_dynamic_pairDetails');
+    )->name('Generals_dynamic_pairDetails');
 
     foreach my $route ($app->general_routing->all_valid_routes()) {
       $logger->debug("building nav items for "
@@ -329,7 +334,7 @@ package Game::EvonyTKR::Controller::Generals {
     # Check for static content
     my $distDir       = Mojo::File::Share::dist_dir('Game::EvonyTKR');
     my $markdown_path = $distDir->child("pages/Generals/$uiTarget/index.md");
-    $logger->info("looking for index at $markdown_path");
+    $logger->debug("looking for index at $markdown_path");
 
     if (-f $markdown_path) {
       # Render with markdown
@@ -711,9 +716,22 @@ package Game::EvonyTKR::Controller::Generals {
     }
   }
 
-  sub pairData ($self) {
-    my $slug_ui   = $self->stash('uiTarget');
-    my $slug_buff = $self->stash('buffActivation');
+  sub pairCatalog ($self) {
+    my $slug_ui             = $self->stash('uiTarget');
+    my $slug_buff           = $self->stash('buffActivation');
+    my $requested_primaries = [];
+
+    if ($self->req->method eq 'POST') {
+      my $json_data = $self->req->json;
+      $requested_primaries = $json_data->{primaries} // [];
+    }
+
+    my $uidseed = join(', ', @$requested_primaries) . ' ' . UUID::uuid7();
+    $logger->debug("uidseed is '$uidseed'");
+
+    my $session_id =
+      UUID::uuid5($self->app->get_root_manager()->UUID5_base, $uidseed);
+    $logger->debug("final session_id is '$session_id'");
 
     # Lookup route metadata
     my $routing    = Game::EvonyTKR::Control::Generals::Routing->new;
@@ -747,23 +765,62 @@ package Game::EvonyTKR::Controller::Generals {
     # Return just the basic pair information without computing buffs
     my @json_data = map { {
       primary   => { name => $_->primary->name },
-      secondary => { name => $_->secondary->name }
+      secondary => { name => $_->secondary->name },
     } } @pairs;
 
     @json_data = sort {
       # First compare primary->name
-      my $primary_cmp = $a->{primary}->{name} cmp $b->{primary}->{name};
+      my $primary_cmp = $a->{primary} cmp $b->{primary};
 
       # If primary names are the same, compare secondary->name
       if ($primary_cmp == 0) {
-        return $a->{secondary}->{name} cmp $b->{secondary}->{name};
+        return $a->{secondary} cmp $b->{secondary};
       }
 
       # Otherwise, return the primary name comparison result
       return $primary_cmp;
     } @json_data;
 
-    $self->render(json => { data => \@json_data });
+    my $json = JSON::PP->new->utf8->allow_blessed->convert_blessed->canonical;
+
+    # if there were requested primaries, filter to only include those
+    if (scalar @$requested_primaries) {
+
+      my %requested = map { $_ => 1 } @$requested_primaries;
+      my @filtered;
+      foreach my $entry (@json_data) {
+        if (exists $requested{ $entry->{primary} }) {
+          $logger->debug(sprintf(
+            '%s was requsted for session %s',
+            $entry->{primary}, $session_id
+          ));
+          push @filtered, $entry;
+        }
+      }
+
+      $session_store->{$session_id} = \@filtered;
+      my $response = $json->encode({
+        sessionId => $session_id,
+        selected  => \@filtered,
+      });
+
+      $self->res->headers->content_type('application/json; charset=utf-8');
+      return $self->render(data => $response);
+    }
+    else {
+      $logger->debug(
+        "no requested primaries for session '$session_id' returning full list: "
+          . Data::Printer::np(@json_data));
+      $session_store->{$session_id} = \@json_data;
+
+      my $response = $json->encode({
+        sessionId => $session_id,
+        selected  => \@json_data,
+      });
+      $logger->debug("response is '$response'");
+      $self->res->headers->content_type('application/json; charset=utf-8');
+      return $self->render(data => $response);
+    }
   }
 
   sub singleRow ($self) {
@@ -893,15 +950,31 @@ package Game::EvonyTKR::Controller::Generals {
   }
 
   sub stream_pair_details ($c) {
-    my $json = JSON::PP->new->allow_blessed->convert_blessed->canonical->utf8;
-    my $slug_ui   = $c->stash('uiTarget');
-    my $slug_buff = $c->stash('buffActivation');
-    my $run_id    = $c->stash('run_id');
 
+    my $slug_ui    = $c->stash('uiTarget');
+    my $slug_buff  = $c->stash('buffActivation');
+    my $run_id     = 0+ $c->param('runId');
+    my $session_id = $c->param('sessionId');
+    unless (defined($session_id)) {
+      $logger->error('Session ID must be defined!');
+      return $c->render_not_found;
+    }
+    my $selected =
+      exists $session_store->{$session_id} ? $session_store->{$session_id} : [];
 
-    $logger->info(sprintf(
-      'stream_pair_details called url: %s, uiTarget: %s; buffActivation: %s; run_id: %s',
-      $c->req->url->path->to_string, $slug_ui, $slug_buff, $run_id
+    $logger->debug(sprintf(
+      'stream_pair_details called url: %s,'
+        . ' uiTarget: %s; buffActivation: %s; run_id: %s',
+      $c->req->url->path->to_string,
+      $slug_ui, $slug_buff, 0+ $run_id
+    ));
+
+    $logger->debug(sprintf(
+      'session info: sessionId: %s; selected: %s',
+      $session_id // 'Not Present',
+      join ', ',
+      map { sprintf('%s/%s', $_->{primary}->{name}, $_->{secondary}->{name}) }
+        @$selected
     ));
 
     # Lookup route metadata
@@ -921,6 +994,9 @@ package Game::EvonyTKR::Controller::Generals {
       }
       return $c->render_not_found;
     }
+    $c->render_later;
+    $c->write_sse;
+    $c->inactivity_timeout(300);
 
     my $generalType    = $route_meta->{generalType};
     my $buffActivation = $route_meta->{buffActivation};
@@ -936,8 +1012,10 @@ package Game::EvonyTKR::Controller::Generals {
       return $pc;
     } $pairs->@*;
 
-    $logger->info(
-      sprintf('There are %s pairs compute details for.', scalar(@$pairs)));
+    $logger->debug(sprintf(
+      'There are %s pairs compute details for %s.',
+      scalar(@$pairs), $session_id
+    ));
 
     my $ascendingLevel       = $c->param('ascendingLevel') // 'red5';
     my $primaryCovenantLevel = $c->param('primaryCovenantLevel')
@@ -955,7 +1033,61 @@ package Game::EvonyTKR::Controller::Generals {
     push @secondarySpecialties, $c->param('secondarySpecialty3') // 'gold';
     push @secondarySpecialties, $c->param('secondarySpecialty4') // 'gold';
 
-    # Validate parameters using enums from Game::EvonyTKR::Model::Data
+    my $validated_params = $c->validatePairParams(
+      $ascendingLevel,      $primaryCovenantLevel,
+      \@primarySpecialties, $secondaryCovenantLevel,
+      \@secondarySpecialties,
+    );
+
+    $validated_params->{buffActivation} = $buffActivation;
+    $validated_params->{route_meta}     = $route_meta;
+
+    my $typeMap = {
+      'Ground Specialists'  => 'ground_specialist',
+      'Ranged Specialists'  => 'ranged_specialist',
+      'Siege Specialists'   => 'siege_specialist',
+      'Mounted Specialists' => 'mounted_specialist',
+      'Wall Specialists'    => 'wall',
+    };
+
+    $validated_params->{typeMap} = $typeMap;
+
+    my $i = 0;
+    my $tid;
+    my $json = JSON::PP->new->utf8->convert_blessed->allow_blessed->canonical;
+    $tid = Mojo::IOLoop->recurring(
+      0.05 => sub {
+        # client gone? stop
+        if ($c->tx->is_finished) {
+          Mojo::IOLoop->remove($tid);
+          return;
+        }
+
+        # finished all rows -> send a named event and close
+        if ($i >= @$pairs) {
+          my $done = $json->encode({ runId => 0+ $run_id });
+          $c->write("event: complete\n");
+          $c->write("data: $done\n\n");
+          Mojo::IOLoop->remove($tid);
+          return;
+        }
+
+        my $pair = $pairs->[$i++];
+        $c->pair_event($c, $validated_params, $pair, $run_id);
+      }
+    );
+
+    # If the browser closes, remove the timer
+    $c->on(
+      finish => sub {
+        delete $session_store->{$session_id};
+        Mojo::IOLoop->remove($tid) if defined $tid;
+      }
+    );
+  }
+
+  sub validatePairParams($self, $ascendingLevel, $primaryCovenantLevel,
+    $primarySpecialties, $secondaryCovenantLevel, $secondarySpecialties,) {
     my $data_model = Game::EvonyTKR::Model::Data->new();
 
     # Validate ascending level
@@ -973,8 +1105,8 @@ package Game::EvonyTKR::Controller::Generals {
       $primaryCovenantLevel = 'civilization';
     }
 
-    @primarySpecialties =
-      $data_model->normalizeSpecialtyLevels(@primarySpecialties);
+    @$primarySpecialties =
+      $data_model->normalizeSpecialtyLevels(@$primarySpecialties);
 
     if (!$data_model->checkCovenantLevel($secondaryCovenantLevel)) {
       $logger->warn(
@@ -984,123 +1116,83 @@ package Game::EvonyTKR::Controller::Generals {
       $secondaryCovenantLevel = 'civilization';
     }
 
-    @secondarySpecialties =
-      $data_model->normalizeSpecialtyLevels(@secondarySpecialties);
+    @$secondarySpecialties =
+      $data_model->normalizeSpecialtyLevels(@$secondarySpecialties);
 
-    my $typeMap = {
-      'Ground Specialists'  => 'ground_specialist',
-      'Ranged Specialists'  => 'ranged_specialist',
-      'Siege Specialists'   => 'siege_specialist',
-      'Mounted Specialists' => 'mounted_specialist',
-      'Wall Specialists'    => 'wall',
+    return {
+      ascendingLevel         => $ascendingLevel,
+      primaryCovenantLevel   => $primaryCovenantLevel,
+      primarySpecialties     => $primarySpecialties,
+      secondaryCovenantLevel => $secondaryCovenantLevel,
+      secondarySpecialties   => $secondarySpecialties,
     };
-
-    $c->render_later;
-    $c->res->headers->content_type('text/event-stream');
-    $c->res->headers->add('Cache-Control'     => 'no-cache');
-    $c->res->headers->add('Connection'        => 'keep-alive');
-    $c->res->headers->add('X-Accel-Buffering' => 'no')
-      ;    # nginx/proxy friendliness
-    $c->inactivity_timeout(300);
-
-    # Flush headers & open the stream with a comment/ping
-    $c->write(": stream opened\n\n");
-
-    my $i = 0;
-    my $tid;
-    $tid = Mojo::IOLoop->recurring(
-      0.05 => sub {
-        # client gone? stop
-        if ($c->tx->is_finished) {
-          Mojo::IOLoop->remove($tid);
-          return;
-        }
-
-        # finished all rows -> send a named event and close
-        if ($i >= @$pairs) {
-          my $done = $json->encode({ runId => 0+ $run_id });
-          $c->write("event: complete\n");
-          $c->write("data: $done\n\n");
-          Mojo::IOLoop->remove($tid);
-# optional: $c->finish; (many SSE endpoints keep the TCP open for further events;
-# here we’re done, so finishing is fine)
-          return;
-        }
-
-        my $pair = $pairs->[$i++];
-
-        my $sprintfTemplate =
-            'Computing Pair Buffs for %s: %s/%s Buff Activation %s, '
-          . 'targetType %s ascendingLevel %s primary CovenantLevel %s '
-          . 'primary Specialties %s secondary CovenantLevel %s '
-          . 'secondary Specialties %s';
-        $logger->info(sprintf($sprintfTemplate,
-          $i,                         $pair->primary->name,
-          $pair->secondary->name,     $buffActivation,
-          $route_meta->{generalType}, $ascendingLevel,
-          $primaryCovenantLevel,      join(', ', @primarySpecialties),
-          $secondaryCovenantLevel,    join(', ', @secondarySpecialties)));
-
-        $pair->updateBuffsAndDebuffs(
-          $route_meta->{generalType}, $ascendingLevel,
-          $primaryCovenantLevel,      \@primarySpecialties,
-          $secondaryCovenantLevel,    \@secondarySpecialties,
-          $buffActivation
-        );
-
-        my $buffKey = $route_meta->{generalType} =~ s/_/ /r;
-        $buffKey =~ s/(\w)(\w+) specialist/\U$1\L$2 \UT\Lroops/;
-        $buffKey =~ s/Siege Troops/Siege Machines/;
-        $logger->debug("buffKey is $buffKey");
-
-        # build the row payload
-        my $row = {
-          primary =>
-            $pair->primary,    # blessed -> JSON::PP convert_blessed handles it
-          secondary          => $pair->secondary,
-          attackbuff         => $pair->buffValues->{$buffKey}{'Attack'},
-          defensebuff        => $pair->buffValues->{$buffKey}{'Defense'},
-          hpbuff             => $pair->buffValues->{$buffKey}{'HP'},
-          marchbuff          => $pair->buffValues->{$buffKey}{'March Size'},
-          groundattackdebuff =>
-            $pair->debuffValues->{'Ground Troops'}{'Attack'},
-          grounddefensedebuff =>
-            $pair->debuffValues->{'Ground Troops'}{'Defense'},
-          groundhpdebuff      => $pair->debuffValues->{'Ground Troops'}{'HP'},
-          mountedattackdebuff =>
-            $pair->debuffValues->{'Mounted Troops'}{'Attack'},
-          mounteddefensedebuff =>
-            $pair->debuffValues->{'Mounted Troops'}{'Defense'},
-          mountedhpdebuff    => $pair->debuffValues->{'Mounted Troops'}{'HP'},
-          rangedattackdebuff =>
-            $pair->debuffValues->{'Ranged Troops'}{'Attack'},
-          rangeddefensedebuff =>
-            $pair->debuffValues->{'Ranged Troops'}{'Defense'},
-          rangedhpdebuff    => $pair->debuffValues->{'Ranged Troops'}{'HP'},
-          siegeattackdebuff =>
-            $pair->debuffValues->{'Siege Machines'}{'Attack'},
-          siegedefensedebuff =>
-            $pair->debuffValues->{'Siege Machines'}{'Defense'},
-          siegehpdebuff => $pair->debuffValues->{'Siege Machines'}{'HP'},
-        };
-
-        # one JSON object per message; include runId inside the data payload
-        my $payload = $json->encode({ runId => 0+ $run_id, data => $row });
-
-        # default event (“message”): just send data:
-        $c->write_sse({type => 'row', text => $payload});
-      }
-    );
-
-    # If the browser closes, remove the timer
-    $c->on(
-      finish => sub {
-        Mojo::IOLoop->remove($tid) if defined $tid;
-      }
-    );
   }
 
+  sub pair_event($self, $c, $validated_params, $pair, $run_id) {
+    my $json = JSON::PP->new->utf8(0)->convert_blessed->allow_blessed->canonical;
+    my $sprintfTemplate =
+        'Computing Pair Buffs: %s/%s Buff Activation %s, '
+      . 'targetType %s ascendingLevel %s primary CovenantLevel %s '
+      . 'primary Specialties %s secondary CovenantLevel %s '
+      . 'secondary Specialties %s';
+    $logger->debug(sprintf($sprintfTemplate,
+      $pair->primary->name,
+      $pair->secondary->name,     $validated_params->{buffActivation},
+      $validated_params->{route_meta}->{generalType},
+      $validated_params->{ascendingLevel},
+      $validated_params->{primaryCovenantLevel},
+      join(', ', $validated_params->{primarySpecialties}->@*),
+      $validated_params->{secondaryCovenantLevel},
+      join(', ', $validated_params->{secondarySpecialties}->@*)
+    ));
 
+    $pair->updateBuffsAndDebuffs(
+      $validated_params->{route_meta}->{generalType},
+      $validated_params->{ascendingLevel},
+      $validated_params->{primaryCovenantLevel},
+      $validated_params->{primarySpecialties},
+      $validated_params->{secondaryCovenantLevel},
+      $validated_params->{secondarySpecialties},
+      $validated_params->{buffActivation}
+    );
+
+    my $buffKey = $validated_params->{route_meta}->{generalType} =~ s/_/ /r;
+    $buffKey =~ s/(\w)(\w+) specialist/\U$1\L$2 \UT\Lroops/;
+    $buffKey =~ s/Siege Troops/Siege Machines/;
+    $logger->debug("buffKey is $buffKey");
+    $logger->debug("primary to string is " . $pair->primary->to_string());
+
+    # build the row payload
+    my $row = {
+      primary              => $pair->primary->to_hash,
+      secondary            => $pair->secondary->to_hash,
+      attackbuff           => $pair->buffValues->{$buffKey}{'Attack'},
+      defensebuff          => $pair->buffValues->{$buffKey}{'Defense'},
+      hpbuff               => $pair->buffValues->{$buffKey}{'HP'},
+      marchbuff            => $pair->buffValues->{$buffKey}{'March Size'},
+      groundattackdebuff   => $pair->debuffValues->{'Ground Troops'}{'Attack'},
+      grounddefensedebuff  => $pair->debuffValues->{'Ground Troops'}{'Defense'},
+      groundhpdebuff       => $pair->debuffValues->{'Ground Troops'}{'HP'},
+      mountedattackdebuff  => $pair->debuffValues->{'Mounted Troops'}{'Attack'},
+      mounteddefensedebuff =>
+        $pair->debuffValues->{'Mounted Troops'}{'Defense'},
+      mountedhpdebuff     => $pair->debuffValues->{'Mounted Troops'}{'HP'},
+      rangedattackdebuff  => $pair->debuffValues->{'Ranged Troops'}{'Attack'},
+      rangeddefensedebuff => $pair->debuffValues->{'Ranged Troops'}{'Defense'},
+      rangedhpdebuff      => $pair->debuffValues->{'Ranged Troops'}{'HP'},
+      siegeattackdebuff   => $pair->debuffValues->{'Siege Machines'}{'Attack'},
+      siegedefensedebuff  => $pair->debuffValues->{'Siege Machines'}{'Defense'},
+      siegehpdebuff       => $pair->debuffValues->{'Siege Machines'}{'HP'},
+    };
+
+    # one JSON object per message; include runId inside the data payload
+    my $payload = $json->encode({ runId => 0+ $run_id, data => $row });
+    $logger->debug(sprintf('row payload is %s', $payload));
+
+    # default event (“message”): just send data:
+    $c->write_sse({ type => 'pair', data => $payload });
+
+  }
 
 }
 

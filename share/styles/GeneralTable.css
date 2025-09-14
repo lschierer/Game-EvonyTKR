@@ -44,6 +44,8 @@ div#table-loading {
   cursor: pointer;
 }
 
+td.spectrum-Table-cell.stale,
+td.spectrum-Table-cell.pending,
 tr.spectrum-Table-row.stale,
 tr.spectrum-Table-row.pending {
   /* stylelint-disable-next-line custom-property-pattern */
@@ -54,7 +56,8 @@ tr.spectrum-Table-row.pending {
   background-color: var(--mod-table-row-background-color--quiet);
 }
 
-tr.error {
+td.spectrum-Table-cell.error,
+tr.spectrum-Table-row.error {
   /* stylelint-disable-next-line custom-property-pattern */
   --mod-table-row-background-color--quiet: var(--spectrum-red-200);
   --mod-table-row-background-color: var(--spectrum-red-200);

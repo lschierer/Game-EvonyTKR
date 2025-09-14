@@ -16,6 +16,7 @@ const fileDebug: Record<string, boolean> = {
   'lib/Generals/pair_level_settings_form.ts': false,
   'lib/Generals/specialtyStore.ts': true,
   'lib/partials/level_settings_form.ts': false,
+  'lib/Generals/Pair/PairPicker.ts': true,
 };
 
 function isAbsolutePath(path: string): boolean {

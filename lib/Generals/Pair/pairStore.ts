@@ -17,6 +17,10 @@ export const pairKey = (p: string, s: string) => `${p}${SEP}${s}`;
 export type Key = string;
 
 export type RowState = 'stale' | 'pending' | 'current' | 'error' | 'ignore';
+export interface Stub {
+  primary: string;
+  secondary: string;
+}
 
 export interface RowEntry {
   key: Key;
@@ -28,7 +32,7 @@ export interface RowEntry {
 
 interface PairsState {
   // Catalog sent first by the server as “stubs”
-  catalog: Array<{ primary: string; secondary: string }>;
+  catalog: Array<Stub>;
   catalogRev: number; // bump when catalog changes (to signal menus)
 
   // Fast lookup for rows (both stub-only and full data)
@@ -46,6 +50,8 @@ interface PairsState {
 }
 
 export class PairStore {
+  readonly sessionId: Store<string> = new Store<string>('');
+
   readonly store: Store<PairsState> = new Store<PairsState>(
     {
       catalog: [],
@@ -81,6 +87,18 @@ export class PairStore {
 
   public setCatalog(stubs: GPSA) {
     this.store.setState((prev) => {
+      if (!stubs) {
+        if (DEBUG) {
+          console.error('stubs not defined in setCatalog!!');
+        }
+        return prev;
+      }
+      if (!Array.isArray(stubs)) {
+        if (DEBUG) {
+          console.error(`stubs is not an array, ${JSON.stringify(stubs)}`);
+        }
+        return prev;
+      }
       const catalog = stubs.map((s) => ({
         primary: s.primary.name,
         secondary: s.secondary.name,
@@ -98,23 +116,46 @@ export class PairStore {
 
       // expectedCount is how many we *could* receive for this run (subject to selection)
       // We don’t filter here; filtering is applied at render/update time via state=ignore
+      // If this is the first catalog (empty selectedPrimaries), select all primaries by default
+      const selectedPrimaries =
+        prev.selectedPrimaries.size === 0
+          ? new Set(catalog.map((c) => c.primary))
+          : prev.selectedPrimaries;
+
+      const expectedCount =
+        selectedPrimaries.size > 0
+          ? catalog.filter((entry) => selectedPrimaries.has(entry.primary))
+              .length
+          : catalog.length;
+
       return {
         ...prev,
         catalog,
         catalogRev: prev.catalogRev + 1,
         rows,
-        expectedCount: catalog.length,
+        selectedPrimaries,
+        expectedCount,
         receivedCount: 0, // will increment as full rows arrive
       };
     });
   }
 
   public setSelectedPrimaries(names: string[]) {
-    this.store.setState((prev) => ({
-      ...prev,
-      selectedPrimaries: new Set(names),
-      selectionRev: prev.selectionRev + 1,
-    }));
+    this.store.setState((prev) => {
+      const selectedPrimaries = new Set(names);
+      // Recalculate expectedCount based on catalog entries with selected primaries
+      const expectedCount = this.store.state.catalog.filter((entry) =>
+        selectedPrimaries.has(entry.primary),
+      ).length;
+
+      return {
+        ...prev,
+        selectedPrimaries,
+        selectionRev: prev.selectionRev + 1,
+        expectedCount,
+      };
+    });
+    this.recomputeIgnoreStates();
   }
 
   protected applySelectionToRows(base: PairsState): PairsState {
@@ -144,7 +185,8 @@ export class PairStore {
       runId: newRunId,
       streaming: 'open',
       receivedCount: 0,
-      // expectedCount stays as set by latest catalog; if catalog arrives *after* beginRun, setCatalog will update it
+      // expectedCount stays as set by latest catalog;
+      // if catalog arrives *after* beginRun, setCatalog will update it
     }));
     // Optionally set all non-ignored rows to 'pending'
     this.store.setState((prev) => {
@@ -166,15 +208,26 @@ export class PairStore {
   upsertRowFromStream(runId: number, payload: unknown) {
     const parsed = GeneralPair.safeParse(payload);
     if (!parsed.success) {
-      // You may want to log and mark a row error if you can compute a key from payload
+      if (DEBUG) {
+        console.error('invalid payload: ', parsed.error);
+      }
       return;
+    } else if (DEBUG) {
+      console.log(`received row event: `, JSON.stringify(parsed.data));
     }
     const gp = parsed.data;
     const key = pairKey(gp.primary.name, gp.secondary.name);
 
     this.store.setState((prev) => {
       // Ignore old runs
-      if (runId !== prev.runId) return prev;
+      if (runId !== prev.runId) {
+        if (DEBUG) {
+          console.error(
+            `runId ${runId} does not match previous id ${prev.runId}`,
+          );
+        }
+        return prev;
+      }
 
       const old = prev.rows[key];
       // If row is not in catalog yet (rare ordering), create it
@@ -204,21 +257,61 @@ export class PairStore {
     });
   }
 
-  public openPairsStream(url: string) {
+  public getCatalog = async (url: string) => {
+    let p = new Array<string>();
+    if (this.store.state.selectedPrimaries) {
+      p = [...this.store.state.selectedPrimaries];
+    }
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ primaries: p }),
+    });
+
+    if (!response.ok) {
+      if (DEBUG) {
+        console.error('error getting catalog: ', response.statusText);
+      }
+    }
+    const ro = (await response.json()) as {
+      sessionId: string;
+      selected: GPSA;
+    };
+
+    this.sessionId.setState(ro.sessionId);
+    const valid = GPSA.safeParse(ro.selected);
+    if (!valid.success) {
+      console.error('invalid catalog payload');
+      return;
+    }
+    const sp = new Set<string>();
+    if (valid.success) {
+      valid.data.map((s) => {
+        sp.add(s.primary.name);
+      });
+    }
+
+    this.setCatalog(valid.data);
+    this.recomputeIgnoreStates();
+  };
+
+  public openPairsStream(
+    url: string,
+    params: URLSearchParams,
+    sessionId: string,
+  ) {
     // Create a new monotonic runId
     const runId = Math.max(Date.now(), this.store.state.runId + 1);
     this.beginRun(runId);
+    params.set('runId', `${runId}`);
+    params.set('sessionId', sessionId);
 
-    const es = new EventSource(url);
-
-    es.addEventListener('catalog', (e: MessageEvent) => {
-      const payload = JSON.parse(e.data) as Array<{
-        primary: { name: string };
-        secondary: { name: string };
-      }>;
-      this.setCatalog(payload);
-      this.recomputeIgnoreStates();
-    });
+    const sourceUrl = `${url}?${params.toString()}`;
+    if (DEBUG) {
+      console.log(`sourceUrl is ${sourceUrl}`);
+    }
+    const es = new EventSource(sourceUrl);
 
     es.addEventListener('pair', (e: MessageEvent) => {
       const msg = JSON.parse(e.data);

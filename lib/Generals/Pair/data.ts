@@ -14,7 +14,7 @@ import {
 } from '../../Game/EvonyTKR/Shared/Constants';
 
 import { SpecialtyStore } from '../specialtyStore';
-import { PairStore } from './pairStore';
+import { pairKey, PairStore } from './pairStore';
 
 export class PairData extends LitElement {
   readonly ascendingMap: AscendingOptions = {
@@ -94,41 +94,80 @@ export class PairData extends LitElement {
   @property({ attribute: false })
   pairStore: PairStore = new PairStore();
 
+  @property({ attribute: false })
+  public queryParams = new Store<URLSearchParams>(new URLSearchParams());
+
   connectedCallback(): void {
     super.connectedCallback();
-    this.ascendingLevel.subscribe(() => this.requestUpdate());
-    this.primaryCovenantLevel.subscribe(() => this.requestUpdate());
-    this.secondaryCovenantLevel.subscribe(() => this.requestUpdate());
-    this.primarySpecialties.subscribe(() => this.requestUpdate());
-    this.secondarySpecialties.subscribe(() => this.requestUpdate());
+    this.ascendingLevel.subscribe(() => {
+      this.updateFilterParams();
+      this.requestUpdate();
+    });
+    this.primaryCovenantLevel.subscribe(() => {
+      this.updateFilterParams();
+      this.requestUpdate();
+    });
+    this.secondaryCovenantLevel.subscribe(() => {
+      this.updateFilterParams();
+      this.requestUpdate();
+    });
+    this.primarySpecialties.subscribe(() => {
+      this.updateFilterParams();
+      this.requestUpdate();
+    });
+    this.secondarySpecialties.subscribe(() => {
+      this.updateFilterParams();
+      this.requestUpdate();
+    });
     this.pairStore.subscribe(() => this.requestUpdate());
   }
 
+  public updateFilterParams() {
+    const params = this.queryParams.state;
+    params.set('ascendingLevel', this.ascendingLevel.state);
+    params.set('primaryCovenantLevel', this.primaryCovenantLevel.state);
+    params.set('secondaryCovenantLevel', this.primaryCovenantLevel.state);
+    params.set('primarySpecialty1', this.primarySpecialties.store.state.s1);
+    params.set('primarySpecialty2', this.primarySpecialties.store.state.s2);
+    params.set('primarySpecialty3', this.primarySpecialties.store.state.s3);
+    params.set('primarySpecialty4', this.primarySpecialties.store.state.s4);
+    params.set('secondarySpecialty1', this.secondarySpecialties.store.state.s1);
+    params.set('secondarySpecialty2', this.secondarySpecialties.store.state.s2);
+    params.set('secondarySpecialty3', this.secondarySpecialties.store.state.s3);
+    params.set('secondarySpecialty4', this.secondarySpecialties.store.state.s4);
+    this.queryParams.setState(params);
+  }
+
   protected renderPairStoreDebug = () => {
-    let template = html``;
-    for (const key in Object.keys(this.pairStore.store.state.rows)) {
+    const rowsTemplate = this.pairStore.store.state.catalog.map((entry) => {
+      const key = pairKey(entry.primary, entry.secondary);
       const value = this.pairStore.store.state.rows[key];
-      template = html`
+      return html`
         <dd>
           <dl>
             <dt>Primary:</dt>
-            <dd>${value.primary}</dd>
+            <dd>${entry.primary}</dd>
             <dt>Secondary:</dt>
-            <dd>${value.secondary}</dd>
+            <dd>${entry.secondary}</dd>
             <dt>State:</dt>
-            <dd>${value.state}</dd>
+            <dd>${value ? value.state : 'missing'}</dd>
             <dt>Data:</dt>
-            <dd>${value.data}</dd>
+            <dd>${value ? JSON.stringify(value.data) : 'no data'}</dd>
           </dl>
         </dd>
       `;
-    }
-    template = html`
+    });
+
+    return html`
       <dl>
         <dt>catalogRev</dt>
         <dd>${this.pairStore.store.state.catalogRev}</dd>
         <dt>selectionRev</dt>
         <dd>${this.pairStore.store.state.selectionRev}</dd>
+        <dt>selectedPrimaries</dt>
+        <dd>${this.pairStore.store.state.selectedPrimaries}</dd>
+        <dt>expectedCount</dt>
+        <dd>${this.pairStore.store.state.expectedCount}</dd>
         <dt>runId</dt>
         <dd>${this.pairStore.store.state.runId}</dd>
         <dt>catalog</dt>
@@ -138,10 +177,9 @@ export class PairData extends LitElement {
         <dt>streaming</dt>
         <dd>${this.pairStore.store.state.streaming}</dd>
         <dt>rows</dt>
-        <dd>${template}</dd>
+        ${rowsTemplate}
       </dl>
     `;
-    return template;
   };
 
   protected renderSpecialtyDebug = (primary: boolean) => {
