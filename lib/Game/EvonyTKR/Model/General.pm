@@ -125,7 +125,7 @@ class Game::EvonyTKR::Model::General : isa(Game::EvonyTKR::Shared::Constants) {
     my $json = JSON::PP->new->utf8(0)->pretty->canonical(1)
       ->allow_blessed(1)
       ->convert_blessed(1)
-      ->encode($self->to_hash())
+      ->encode($self->to_hash());
     return $json;
   }
 

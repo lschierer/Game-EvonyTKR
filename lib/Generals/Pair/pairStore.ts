@@ -206,6 +206,9 @@ export class PairStore {
   }
 
   upsertRowFromStream(runId: number, payload: unknown) {
+    if (DEBUG) {
+      console.log('upsertRowFromStream called with runId:', runId);
+    }
     const parsed = GeneralPair.safeParse(payload);
     if (!parsed.success) {
       if (DEBUG) {
@@ -313,10 +316,47 @@ export class PairStore {
     }
     const es = new EventSource(sourceUrl);
 
+    if (DEBUG) {
+      console.log('EventSource created for:', sourceUrl);
+    }
+
+    es.onopen = (event) => {
+      if (DEBUG) {
+        console.log('EventSource opened:', event);
+      }
+    };
+
+    es.onerror = (event) => {
+      if (DEBUG) {
+        console.error('EventSource error:', event);
+      }
+    };
+
+    es.onmessage = (event) => {
+      if (DEBUG) {
+        console.log('EventSource received generic message:', event.data);
+      }
+    };
+
     es.addEventListener('pair', (e: MessageEvent) => {
-      const msg = JSON.parse(e.data);
+      if (DEBUG) {
+        console.log('received pair event:', e.data);
+      }
+      const jsonString = atob(e.data);
+      const msg = JSON.parse(jsonString);
+      if (DEBUG) {
+        console.log('parsed pair message:', msg);
+      }
       // Suggested shape for server event: { runId: number, data: GeneralPair }
-      if (msg.runId !== runId) return; // guard
+      if (msg.runId !== runId) {
+        if (DEBUG) {
+          console.warn(`pair event runId mismatch: ${msg.runId} !== ${runId}`);
+        }
+        return; // guard
+      }
+      if (DEBUG) {
+        console.log('calling upsertRowFromStream with:', msg.data);
+      }
       this.upsertRowFromStream(runId, msg.data);
     });
 
@@ -324,7 +364,11 @@ export class PairStore {
       es.close();
       this.endRun(runId);
     });
-
+    es.addEventListener('message', (e) => {
+      if (DEBUG) {
+        console.log(`message event handler`, e.data);
+      }
+    });
     es.onerror = () => {
       es.close();
       this.endRun(runId);

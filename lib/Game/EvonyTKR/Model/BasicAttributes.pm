@@ -21,7 +21,8 @@ class Game::EvonyTKR::Model::BasicAttributes :
     '<=>' => \&_comparison,
     '=='  => \&_equality,
     '!='  => \&_inequality,
-    '""'  => \&as_string;
+    '""'  => \&as_string,
+    'fallback' => 1;
 
   field $attributes : reader;
 

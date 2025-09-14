@@ -140,7 +140,12 @@ export class PairPicker extends LitElement {
       history.replaceState(null, '', qs ? `${base}?${qs}` : base);
       if (this.data) {
         this.data.updateFilterParams();
-        this.restartStream();
+        if (this.data && this.data.pairStore.sessionId.state) {
+          const sid = this.data.pairStore.sessionId.state;
+          if (sid.length > 1) {
+            this.restartStream();
+          }
+        }
       }
       // Restart stream with new params
     });
@@ -168,7 +173,12 @@ export class PairPicker extends LitElement {
       this.data.pairStore.subscribe(() => this.requestUpdate());
       this.data.queryParams.subscribe(() => {
         this.requestUpdate();
-        this.restartStream();
+        if (this.data && this.data.pairStore.sessionId.state) {
+          const sid = this.data.pairStore.sessionId.state;
+          if (sid.length > 1) {
+            this.restartStream();
+          }
+        }
       });
       let path = window.location.pathname;
       path = path.replace('-comparison', '/data.json');
@@ -178,7 +188,17 @@ export class PairPicker extends LitElement {
       }
       this.data.pairStore.getCatalog(catalogUrl.toString());
 
-      this.data.pairStore.sessionId.subscribe(() => this.restartStream());
+      this.data.pairStore.sessionId.subscribe(() => {
+        if (this.data && this.data.pairStore.sessionId.state) {
+          const sid = this.data.pairStore.sessionId.state;
+          if (sid.length > 1) {
+            if (DEBUG) {
+              console.log(`sid is "${sid}"`);
+            }
+            this.restartStream();
+          }
+        }
+      });
     }
   }
 

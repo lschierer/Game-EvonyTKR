@@ -18,7 +18,8 @@ use namespace::clean;
 package Game::EvonyTKR::Controller::Generals {
   use Mojo::Base 'Game::EvonyTKR::Controller::ControllerBase';
   require Mojo::Util;
-  use Mojo::JSON     qw(decode_json encode_json);
+  use Mojo::JSON     qw(to_json encode_json);
+  use MIME::Base64 qw(encode_base64);
   use List::AllUtils qw( all any none );
   use Carp;
 
@@ -781,8 +782,6 @@ package Game::EvonyTKR::Controller::Generals {
       return $primary_cmp;
     } @json_data;
 
-    my $json = JSON::PP->new->utf8->allow_blessed->convert_blessed->canonical;
-
     # if there were requested primaries, filter to only include those
     if (scalar @$requested_primaries) {
 
@@ -799,13 +798,11 @@ package Game::EvonyTKR::Controller::Generals {
       }
 
       $session_store->{$session_id} = \@filtered;
-      my $response = $json->encode({
+
+      return $self->render(json => {
         sessionId => $session_id,
         selected  => \@filtered,
       });
-
-      $self->res->headers->content_type('application/json; charset=utf-8');
-      return $self->render(data => $response);
     }
     else {
       $logger->debug(
@@ -813,13 +810,10 @@ package Game::EvonyTKR::Controller::Generals {
           . Data::Printer::np(@json_data));
       $session_store->{$session_id} = \@json_data;
 
-      my $response = $json->encode({
+      return $self->render(json => {
         sessionId => $session_id,
         selected  => \@json_data,
       });
-      $logger->debug("response is '$response'");
-      $self->res->headers->content_type('application/json; charset=utf-8');
-      return $self->render(data => $response);
     }
   }
 
@@ -955,9 +949,9 @@ package Game::EvonyTKR::Controller::Generals {
     my $slug_buff  = $c->stash('buffActivation');
     my $run_id     = 0+ $c->param('runId');
     my $session_id = $c->param('sessionId');
-    unless (defined($session_id)) {
-      $logger->error('Session ID must be defined!');
-      return $c->render_not_found;
+    unless (defined($session_id) && length($session_id)) {
+      $logger->error('Session ID must be present!');
+      return $c->helpers->reply->not_found;
     }
     my $selected =
       exists $session_store->{$session_id} ? $session_store->{$session_id} : [];
@@ -970,7 +964,7 @@ package Game::EvonyTKR::Controller::Generals {
     ));
 
     $logger->debug(sprintf(
-      'session info: sessionId: %s; selected: %s',
+      'session info: sessionId: "%s"; selected: %s',
       $session_id // 'Not Present',
       join ', ',
       map { sprintf('%s/%s', $_->{primary}->{name}, $_->{secondary}->{name}) }
@@ -1054,7 +1048,7 @@ package Game::EvonyTKR::Controller::Generals {
 
     my $i = 0;
     my $tid;
-    my $json = JSON::PP->new->utf8->convert_blessed->allow_blessed->canonical;
+
     $tid = Mojo::IOLoop->recurring(
       0.05 => sub {
         # client gone? stop
@@ -1065,9 +1059,8 @@ package Game::EvonyTKR::Controller::Generals {
 
         # finished all rows -> send a named event and close
         if ($i >= @$pairs) {
-          my $done = $json->encode({ runId => 0+ $run_id });
-          $c->write("event: complete\n");
-          $c->write("data: $done\n\n");
+          my $payload = encode_json({ runId => 0+ $run_id });
+          $c->write_sse({type => 'complete', text => $payload });
           Mojo::IOLoop->remove($tid);
           return;
         }
@@ -1129,7 +1122,7 @@ package Game::EvonyTKR::Controller::Generals {
   }
 
   sub pair_event($self, $c, $validated_params, $pair, $run_id) {
-    my $json = JSON::PP->new->utf8(0)->convert_blessed->allow_blessed->canonical;
+
     my $sprintfTemplate =
         'Computing Pair Buffs: %s/%s Buff Activation %s, '
       . 'targetType %s ascendingLevel %s primary CovenantLevel %s '
@@ -1186,11 +1179,19 @@ package Game::EvonyTKR::Controller::Generals {
     };
 
     # one JSON object per message; include runId inside the data payload
+    my $json = JSON::PP->new->utf8(0)->allow_blessed->convert_blessed->canonical;
+
     my $payload = $json->encode({ runId => 0+ $run_id, data => $row });
-    $logger->debug(sprintf('row payload is %s', $payload));
+    $logger->debug(sprintf('row is %s, json is %s',
+    Data::Printer::np($row, multiline => 0),
+    $payload,
+    ));
+    $payload = encode_base64($payload);
+
+    $c->write_sse({ type => 'pair', text => $payload });
 
     # default event (“message”): just send data:
-    $c->write_sse({ type => 'pair', data => $payload });
+    $c->write_sse({ type => 'pair', text => $payload });
 
   }
 
