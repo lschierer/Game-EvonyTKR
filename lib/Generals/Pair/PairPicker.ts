@@ -203,6 +203,7 @@ export class PairPicker extends LitElement {
   }
 
   readonly onFilterInput = (e: Event) => {
+    e.stopPropagation();
     const target = e.target as HTMLInputElement;
     this.filterText.setState(target.value.toLowerCase());
   };

@@ -195,16 +195,21 @@ export class PairTable extends LitElement {
         const entry = this.data?.pairStore.store.state.rows[key];
         return entry;
       })
-      .filter((e) => !!e);
+      .filter((e) => !!e)
+      .sort((a, b) => {
+        const p = a.primary.localeCompare(b.primary);
+        if (!p) {
+          return a.secondary.localeCompare(b.secondary);
+        } else {
+          return p;
+        }
+      });
   };
 
   override render() {
     if (!this.data) {
       return html` <span>Pending Data</span> `;
     }
-    const totalCount = this.data.pairStore.store.state.expectedCount;
-    const recievedCount = this.data.pairStore.store.state.receivedCount;
-    const remainingCount = totalCount - recievedCount;
 
     this.table = this.tableController.table({
       columns: this.columns,
@@ -222,23 +227,6 @@ export class PairTable extends LitElement {
     });
 
     return html`
-      ${remainingCount > 0
-        ? html`
-            <div id="table-loading">
-              <div class=" spectrum-ProgressBar " role="progressbar">
-                <div class="spectrum-ProgressBar-track">
-                  <div
-                    class="spectrum-ProgressBar-fill"
-                    style="inline-size: ${(recievedCount / totalCount) * 100}%;"
-                  ></div>
-                </div>
-                <div class="spectrum-ProgressBar-label">
-                  Refreshing ${remainingCount} of ${totalCount} rows...
-                </div>
-              </div>
-            </div>
-          `
-        : ''}
       ${DEBUG ? html` table is ${typeof this.table} ` : ''}
       <div
         class="general-pairs-table spectrum-Table spectrum-Table-scroller spectrum-Table--quiet spectrum-Table--sizeM spectrum-Table--compact"

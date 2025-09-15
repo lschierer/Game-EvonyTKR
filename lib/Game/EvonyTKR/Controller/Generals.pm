@@ -1049,32 +1049,22 @@ package Game::EvonyTKR::Controller::Generals {
     my $i = 0;
     my $tid;
 
-    $tid = Mojo::IOLoop->recurring(
-      0.05 => sub {
-        # client gone? stop
-        if ($c->tx->is_finished) {
-          Mojo::IOLoop->remove($tid);
-          return;
-        }
+    foreach my $pair (@$pairs){
+      $c->pair_event($c, $validated_params, $pair, $run_id);
+    }
 
-        # finished all rows -> send a named event and close
-        if ($i >= @$pairs) {
-          my $payload = encode_json({ runId => 0+ $run_id });
-          $c->write_sse({type => 'complete', text => $payload });
-          Mojo::IOLoop->remove($tid);
-          return;
-        }
+    my $payload = encode_json({ runId => 0+ $run_id });
+    $c->write_sse({type => 'complete', text => $payload });
+    if(exists $session_store->{$session_id}){
+      delete $session_store->{$session_id};
+    }
 
-        my $pair = $pairs->[$i++];
-        $c->pair_event($c, $validated_params, $pair, $run_id);
-      }
-    );
-
-    # If the browser closes, remove the timer
+    # If the browser closes, remove the stored session
     $c->on(
       finish => sub {
-        delete $session_store->{$session_id};
-        Mojo::IOLoop->remove($tid) if defined $tid;
+        if(exists $session_store->{$session_id}){
+          delete $session_store->{$session_id};
+        }
       }
     );
   }
