@@ -3,6 +3,9 @@ use experimental qw(class);
 use utf8::all;
 use File::FindLib 'lib';
 require JSON::PP;
+require Mojo::Promise;
+require Mojo::IOLoop::Subprocess;
+require List::Util;
 require Game::EvonyTKR::Model::General;
 require Game::EvonyTKR::Model::General::Manager;
 require Game::EvonyTKR::Model::General::Pair;
@@ -19,7 +22,7 @@ package Game::EvonyTKR::Controller::Generals {
   use Mojo::Base 'Game::EvonyTKR::Controller::ControllerBase';
   require Mojo::Util;
   use Mojo::JSON     qw(to_json encode_json);
-  use MIME::Base64 qw(encode_base64);
+  use MIME::Base64   qw(encode_base64);
   use List::AllUtils qw( all any none );
   use Carp;
 
@@ -799,10 +802,12 @@ package Game::EvonyTKR::Controller::Generals {
 
       $session_store->{$session_id} = \@filtered;
 
-      return $self->render(json => {
-        sessionId => $session_id,
-        selected  => \@filtered,
-      });
+      return $self->render(
+        json => {
+          sessionId => $session_id,
+          selected  => \@filtered,
+        }
+      );
     }
     else {
       $logger->debug(
@@ -810,10 +815,12 @@ package Game::EvonyTKR::Controller::Generals {
           . Data::Printer::np(@json_data));
       $session_store->{$session_id} = \@json_data;
 
-      return $self->render(json => {
-        sessionId => $session_id,
-        selected  => \@json_data,
-      });
+      return $self->render(
+        json => {
+          sessionId => $session_id,
+          selected  => \@json_data,
+        }
+      );
     }
   }
 
@@ -944,6 +951,9 @@ package Game::EvonyTKR::Controller::Generals {
   }
 
   sub stream_pair_details ($c) {
+    $c->res->headers->content_type('text/event-stream');
+    $c->res->headers->content_encoding('utf-8');
+    $c->res->headers->add('Cache-Control', 'no-cache');
 
     my $slug_ui    = $c->stash('uiTarget');
     my $slug_buff  = $c->stash('buffActivation');
@@ -951,7 +961,9 @@ package Game::EvonyTKR::Controller::Generals {
     my $session_id = $c->param('sessionId');
     unless (defined($session_id) && length($session_id)) {
       $logger->error('Session ID must be present!');
-      return $c->helpers->reply->not_found;
+      my $payload = encode_json({ runId => 0+ $run_id });
+      $c->write_sse({ type => 'complete', text => $payload });
+      return;
     }
     my $selected =
       exists $session_store->{$session_id} ? $session_store->{$session_id} : [];
@@ -986,11 +998,10 @@ package Game::EvonyTKR::Controller::Generals {
           }
         );
       }
-      return $c->render_not_found;
+      my $payload = encode_json({ runId => 0+ $run_id });
+      $c->write_sse({ type => 'complete', text => $payload });
+      return;
     }
-    $c->render_later;
-    $c->write_sse;
-    $c->inactivity_timeout(300);
 
     my $generalType    = $route_meta->{generalType};
     my $buffActivation = $route_meta->{buffActivation};
@@ -1046,23 +1057,123 @@ package Game::EvonyTKR::Controller::Generals {
 
     $validated_params->{typeMap} = $typeMap;
 
-    my $i = 0;
-    my $tid;
+    $c->render_later;
+    $c->write_sse;
+    $c->inactivity_timeout(300);
 
-    foreach my $pair (@$pairs){
-      $c->pair_event($c, $validated_params, $pair, $run_id);
+    my @promises;
+    my @subs;
+
+    my $index = 0;
+    my $batch_size = 10;
+    my $maxIndex = scalar(@$pairs) - 1;
+
+    while($index < $maxIndex){
+      my $end = $index + $batch_size -1;
+      my $start = $index;
+      $end = List::Util::min($end, $maxIndex);
+      $logger->debug("processing $start to $end");
+      my $subprocess = Mojo::IOLoop::Subprocess->new;
+
+      $subprocess->on(progress => sub ($subprocess, @data) {
+          my ($result) = @data;
+          $logger->debug("progress event detected");
+          $c->write_sse({ type => 'pair', text => $result });
+      });
+
+      my $promise = $subprocess->run_p( sub ($subprocess) {
+        say("sub process for index $start to $end");
+        for my $i ($start..$end) {
+          my $pair = $pairs->[$i];
+            $logger->debug(sprintf('processing pair %s/%s',
+            $pair->primary->name, $pair->secondary->name));
+            # Do all the heavy computation here
+            $pair->updateBuffsAndDebuffs(
+              $validated_params->{route_meta}->{generalType},
+              $validated_params->{ascendingLevel},
+              $validated_params->{primaryCovenantLevel},
+              $validated_params->{primarySpecialties},
+              $validated_params->{secondaryCovenantLevel},
+              $validated_params->{secondarySpecialties},
+              $validated_params->{buffActivation}
+            );
+
+            my $buffKey =
+              $validated_params->{route_meta}->{generalType} =~ s/_/ /r;
+            $buffKey =~ s/(\w)(\w+) specialist/\U$1\L$2 \UT\Lroops/;
+            $buffKey =~ s/Siege Troops/Siege Machines/;
+            $logger->debug("buffKey is $buffKey");
+            $logger->debug("primary to string is " . $pair->primary->to_string());
+
+            # build the row payload
+            my $row = {
+              primary            => $pair->primary->to_hash,
+              secondary          => $pair->secondary->to_hash,
+              attackbuff         => $pair->buffValues->{$buffKey}{'Attack'},
+              defensebuff        => $pair->buffValues->{$buffKey}{'Defense'},
+              hpbuff             => $pair->buffValues->{$buffKey}{'HP'},
+              marchbuff          => $pair->buffValues->{$buffKey}{'March Size'},
+              groundattackdebuff =>
+                $pair->debuffValues->{'Ground Troops'}{'Attack'},
+              grounddefensedebuff =>
+                $pair->debuffValues->{'Ground Troops'}{'Defense'},
+              groundhpdebuff      => $pair->debuffValues->{'Ground Troops'}{'HP'},
+              mountedattackdebuff =>
+                $pair->debuffValues->{'Mounted Troops'}{'Attack'},
+              mounteddefensedebuff =>
+                $pair->debuffValues->{'Mounted Troops'}{'Defense'},
+              mountedhpdebuff    => $pair->debuffValues->{'Mounted Troops'}{'HP'},
+              rangedattackdebuff =>
+                $pair->debuffValues->{'Ranged Troops'}{'Attack'},
+              rangeddefensedebuff =>
+                $pair->debuffValues->{'Ranged Troops'}{'Defense'},
+              rangedhpdebuff    => $pair->debuffValues->{'Ranged Troops'}{'HP'},
+              siegeattackdebuff =>
+                $pair->debuffValues->{'Siege Machines'}{'Attack'},
+              siegedefensedebuff =>
+                $pair->debuffValues->{'Siege Machines'}{'Defense'},
+              siegehpdebuff => $pair->debuffValues->{'Siege Machines'}{'HP'},
+            };
+
+            # one JSON object per message; include runId inside the data payload
+            my $json =
+              JSON::PP->new->utf8(0)->allow_blessed->convert_blessed->canonical;
+
+            my $payload = $json->encode({ runId => 0+ $run_id, data => $row });
+            $logger->debug(sprintf(
+              'row is %s, json is %s',
+              Data::Printer::np($row, multiline => 0), $payload,
+            ));
+            my $result= encode_base64($payload);
+            $subprocess->progress($result);
+        }
+        # sleep to allow the event to be caught before the subprocess is harvested
+        # once the subprocess is harvested, the listener is also harvested
+        sleep(5);
+      });
+      push @subs, $subprocess;
+
+      push @promises, $promise;
+
+      $promise->catch(sub {
+        $logger->error(sprintf('error in promise for subloop %s to %s',
+        $index, $end));
+      });
+       $subprocess->ioloop->start unless $subprocess->ioloop->is_running;
+       $index = $end + 1;
+       $logger->debug("ending index is $index");
     }
 
-    my $payload = encode_json({ runId => 0+ $run_id });
-    $c->write_sse({type => 'complete', text => $payload });
-    if(exists $session_store->{$session_id}){
-      delete $session_store->{$session_id};
-    }
+    my $all = Mojo::Promise->all(@promises);
+    $all->then(sub {
+      my $payload = encode_json({ runId => $run_id });
+      $c->write_sse({ type => 'complete', text => $payload });
+    });
 
     # If the browser closes, remove the stored session
     $c->on(
       finish => sub {
-        if(exists $session_store->{$session_id}){
+        if (exists $session_store->{$session_id}) {
           delete $session_store->{$session_id};
         }
       }
@@ -1111,79 +1222,7 @@ package Game::EvonyTKR::Controller::Generals {
     };
   }
 
-  sub pair_event($self, $c, $validated_params, $pair, $run_id) {
 
-    my $sprintfTemplate =
-        'Computing Pair Buffs: %s/%s Buff Activation %s, '
-      . 'targetType %s ascendingLevel %s primary CovenantLevel %s '
-      . 'primary Specialties %s secondary CovenantLevel %s '
-      . 'secondary Specialties %s';
-    $logger->debug(sprintf($sprintfTemplate,
-      $pair->primary->name,
-      $pair->secondary->name,     $validated_params->{buffActivation},
-      $validated_params->{route_meta}->{generalType},
-      $validated_params->{ascendingLevel},
-      $validated_params->{primaryCovenantLevel},
-      join(', ', $validated_params->{primarySpecialties}->@*),
-      $validated_params->{secondaryCovenantLevel},
-      join(', ', $validated_params->{secondarySpecialties}->@*)
-    ));
-
-    $pair->updateBuffsAndDebuffs(
-      $validated_params->{route_meta}->{generalType},
-      $validated_params->{ascendingLevel},
-      $validated_params->{primaryCovenantLevel},
-      $validated_params->{primarySpecialties},
-      $validated_params->{secondaryCovenantLevel},
-      $validated_params->{secondarySpecialties},
-      $validated_params->{buffActivation}
-    );
-
-    my $buffKey = $validated_params->{route_meta}->{generalType} =~ s/_/ /r;
-    $buffKey =~ s/(\w)(\w+) specialist/\U$1\L$2 \UT\Lroops/;
-    $buffKey =~ s/Siege Troops/Siege Machines/;
-    $logger->debug("buffKey is $buffKey");
-    $logger->debug("primary to string is " . $pair->primary->to_string());
-
-    # build the row payload
-    my $row = {
-      primary              => $pair->primary->to_hash,
-      secondary            => $pair->secondary->to_hash,
-      attackbuff           => $pair->buffValues->{$buffKey}{'Attack'},
-      defensebuff          => $pair->buffValues->{$buffKey}{'Defense'},
-      hpbuff               => $pair->buffValues->{$buffKey}{'HP'},
-      marchbuff            => $pair->buffValues->{$buffKey}{'March Size'},
-      groundattackdebuff   => $pair->debuffValues->{'Ground Troops'}{'Attack'},
-      grounddefensedebuff  => $pair->debuffValues->{'Ground Troops'}{'Defense'},
-      groundhpdebuff       => $pair->debuffValues->{'Ground Troops'}{'HP'},
-      mountedattackdebuff  => $pair->debuffValues->{'Mounted Troops'}{'Attack'},
-      mounteddefensedebuff =>
-        $pair->debuffValues->{'Mounted Troops'}{'Defense'},
-      mountedhpdebuff     => $pair->debuffValues->{'Mounted Troops'}{'HP'},
-      rangedattackdebuff  => $pair->debuffValues->{'Ranged Troops'}{'Attack'},
-      rangeddefensedebuff => $pair->debuffValues->{'Ranged Troops'}{'Defense'},
-      rangedhpdebuff      => $pair->debuffValues->{'Ranged Troops'}{'HP'},
-      siegeattackdebuff   => $pair->debuffValues->{'Siege Machines'}{'Attack'},
-      siegedefensedebuff  => $pair->debuffValues->{'Siege Machines'}{'Defense'},
-      siegehpdebuff       => $pair->debuffValues->{'Siege Machines'}{'HP'},
-    };
-
-    # one JSON object per message; include runId inside the data payload
-    my $json = JSON::PP->new->utf8(0)->allow_blessed->convert_blessed->canonical;
-
-    my $payload = $json->encode({ runId => 0+ $run_id, data => $row });
-    $logger->debug(sprintf('row is %s, json is %s',
-    Data::Printer::np($row, multiline => 0),
-    $payload,
-    ));
-    $payload = encode_base64($payload);
-
-    $c->write_sse({ type => 'pair', text => $payload });
-
-    # default event (“message”): just send data:
-    $c->write_sse({ type => 'pair', text => $payload });
-
-  }
 
 }
 

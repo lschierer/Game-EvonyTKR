@@ -90,8 +90,6 @@ export class PairPicker extends LitElement {
   ];
 
   protected data?: PairData;
-  private currentES?: EventSource;
-  private submitDebounce?: number;
 
   @property({ type: String })
   public generalFilterLabel: String = 'General';
@@ -104,58 +102,6 @@ export class PairPicker extends LitElement {
 
   protected override firstUpdated(_changedProperties: PropertyValues): void {
     super.firstUpdated(_changedProperties);
-    const form = this.renderRoot.querySelector<HTMLFormElement>(
-      '#general-picker-form',
-    )!;
-
-    form.addEventListener('formdata', (e: Event) => {
-      const fd = (e as unknown as { formData: FormData }).formData;
-      // Clear previous
-      fd.delete('primaries[]');
-
-      // Inject current selection from the store
-      const selected =
-        this.data?.pairStore.store.state.selectedPrimaries ?? new Set<string>();
-      for (const name of selected) fd.append('primaries[]', name);
-    });
-
-    // Intercept native submit
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const fd = new FormData(form);
-
-      // If you didn’t add hidden inputs for selection, fill via `formdata` event (see below),
-      // or manually inject here:
-      // for (const name of this.data!.pairStore.store.state.selectedPrimaries) {
-      //   fd.append('primaries[]', name);
-      // }
-
-      // Build URL
-      const params = new URLSearchParams();
-      for (const [k, v] of fd.entries()) params.append(k, String(v));
-
-      // Keep URL shareable
-      const base = location.pathname;
-      const qs = params.toString();
-      history.replaceState(null, '', qs ? `${base}?${qs}` : base);
-      if (this.data) {
-        this.data.updateFilterParams();
-        if (this.data && this.data.pairStore.sessionId.state) {
-          const sid = this.data.pairStore.sessionId.state;
-          if (sid.length > 1) {
-            this.restartStream();
-          }
-        }
-      }
-      // Restart stream with new params
-    });
-
-    // Auto-submit on any change (debounced)
-    form.addEventListener('change', () => this.requestSubmitDebounced(form));
-    form.addEventListener('input', () => this.requestSubmitDebounced(form));
-
-    // Optionally: pulse once on mount to hydrate based on existing URL
-    form.requestSubmit();
   }
 
   override connectedCallback(): void {
@@ -171,15 +117,7 @@ export class PairPicker extends LitElement {
     }
     if (this.data) {
       this.data.pairStore.subscribe(() => this.requestUpdate());
-      this.data.queryParams.subscribe(() => {
-        this.requestUpdate();
-        if (this.data && this.data.pairStore.sessionId.state) {
-          const sid = this.data.pairStore.sessionId.state;
-          if (sid.length > 1) {
-            this.restartStream();
-          }
-        }
-      });
+
       let path = window.location.pathname;
       path = path.replace('-comparison', '/data.json');
       const catalogUrl = new URL(path, window.location.toString());
@@ -187,18 +125,6 @@ export class PairPicker extends LitElement {
         console.log(`using catalog Url ${catalogUrl.toString()}`);
       }
       this.data.pairStore.getCatalog(catalogUrl.toString());
-
-      this.data.pairStore.sessionId.subscribe(() => {
-        if (this.data && this.data.pairStore.sessionId.state) {
-          const sid = this.data.pairStore.sessionId.state;
-          if (sid.length > 1) {
-            if (DEBUG) {
-              console.log(`sid is "${sid}"`);
-            }
-            this.restartStream();
-          }
-        }
-      });
     }
   }
 
@@ -207,27 +133,6 @@ export class PairPicker extends LitElement {
     const target = e.target as HTMLInputElement;
     this.filterText.setState(target.value.toLowerCase());
   };
-
-  private requestSubmitDebounced(form: HTMLFormElement) {
-    if (this.submitDebounce) clearTimeout(this.submitDebounce);
-    this.submitDebounce = window.setTimeout(() => form.requestSubmit(), 250);
-  }
-
-  private restartStream() {
-    if (!this.data) return;
-    let sp = window.location.pathname;
-    sp = sp.replace('-comparison', '-details-stream');
-    const streamUrl = new URL(sp, window.location.toString());
-    if (this.currentES) {
-      this.currentES.close();
-    }
-    this.currentES = this.data.pairStore.openPairsStream(
-      streamUrl.toString(),
-      this.data.queryParams.state,
-      this.data.pairStore.sessionId.state,
-    );
-    this.data.pairStore.recomputeIgnoreStates();
-  }
 
   private toggleMenu = (e: Event) => {
     e.preventDefault(); // belt & suspenders
@@ -246,14 +151,12 @@ export class PairPicker extends LitElement {
 
   private selectFiltered = (primary: string, newState: boolean) => {
     if (!this.data) return;
-    const current = new Set([
-      ...this.data.pairStore.store.state.selectedPrimaries,
-    ]);
+    const current = new Set();
     const isSelected = current.has(primary);
     const willSelect = newState ?? !isSelected;
     if (willSelect && !isSelected) current.add(primary);
     if (!willSelect && isSelected) current.delete(primary);
-    this.data.pairStore.setSelectedPrimaries([...current]);
+
     let path = window.location.pathname;
     path = path.replace('-comparison', '/data.json');
     const catalogUrl = new URL(path, window.location.toString());
@@ -276,8 +179,8 @@ export class PairPicker extends LitElement {
       );
 
       for (const primary of filteredPrimaries) {
-        const itemSelected =
-          this.data.pairStore.store.state.selectedPrimaries.has(primary);
+        const itemSelected = true;
+
         const noSpaces = primary.replaceAll(' ', '');
         rowTemplate = html`${rowTemplate}
           <li

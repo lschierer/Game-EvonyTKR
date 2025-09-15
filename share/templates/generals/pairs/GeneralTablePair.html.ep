@@ -9,6 +9,7 @@
   import "/js/lib/Generals/Pair/filter.js";
   import "/js/lib/Generals/Pair/PairPicker.js";
   import "/js/lib/Generals/Pair/PairTable.js";
+  import "/js/lib/Generals/Pair/HistoryManager.js";
 </script>
 
 <div class="general-comparison">
@@ -17,7 +18,9 @@
         <pair-filter form_title="<%= $SecondaryFormTitle %>">
           <pair-picker>
             <pair-table>
-              <pair-data></pair-data>
+              <history-manager>
+                <pair-data></pair-data>
+              </history-manager>
             </pair-table>
           </pair-picker>
         </pair-filter>

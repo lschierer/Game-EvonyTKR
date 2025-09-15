@@ -18,10 +18,10 @@ class Game::EvonyTKR::Model::BasicAttributes :
 
   use File::FindLib 'lib';
   use overload
-    '<=>' => \&_comparison,
-    '=='  => \&_equality,
-    '!='  => \&_inequality,
-    '""'  => \&as_string,
+    '<=>'      => \&_comparison,
+    '=='       => \&_equality,
+    '!='       => \&_inequality,
+    '""'       => \&as_string,
     'fallback' => 1;
 
   field $attributes : reader;

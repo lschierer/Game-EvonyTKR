@@ -166,12 +166,6 @@ export class PairData extends LitElement {
       <dl>
         <dt>catalogRev</dt>
         <dd>${this.pairStore.store.state.catalogRev}</dd>
-        <dt>selectionRev</dt>
-        <dd>${this.pairStore.store.state.selectionRev}</dd>
-        <dt>selectedPrimaries</dt>
-        <dd>${this.pairStore.store.state.selectedPrimaries}</dd>
-        <dt>expectedCount</dt>
-        <dd>${this.pairStore.store.state.expectedCount}</dd>
         <dt>runId</dt>
         <dd>${this.pairStore.store.state.runId}</dd>
         <dt>catalog</dt>
