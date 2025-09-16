@@ -82,6 +82,7 @@ class Game::EvonyTKR::Model::General::Manager :
         name            => $name,
         type            => $object->{type},
         ascending       => $object->{ascending},
+        stars           => $object->{stars},
         builtInBookName => $object->{book},
         specialtyNames  => $object->{specialties},
       );

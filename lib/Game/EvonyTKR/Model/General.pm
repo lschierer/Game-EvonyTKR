@@ -31,6 +31,7 @@ class Game::EvonyTKR::Model::General : isa(Game::EvonyTKR::Shared::Constants) {
   field $type : reader : param;
 
   field $ascending : reader : param //= 0;
+  field $stars     : reader : param //= 'none';
 
   field $basicAttributes : reader =
     Game::EvonyTKR::Model::BasicAttributes->new();
@@ -66,6 +67,14 @@ class Game::EvonyTKR::Model::General : isa(Game::EvonyTKR::Shared::Constants) {
         sprintf('type must be one of %s, not "%s"',
         Data::Printer::np($self->GeneralKeys()), $type);
     }
+    my @valv;
+    map {push @valv, $_ } $self->AscendingAttributeLevelValues();
+    map {push @valv, $_ } $self->AscendingAttributeLevelValues(0);
+    if (none { $stars =~ /$_/ } @valv) {
+      push @errors,
+        sprintf('stars must be one of %s, not "%s"',
+        join(',', @valv), $stars);
+    }
     if (@errors) {
       $self->logger()->logcroak(join ', ' => @errors);
     }
@@ -100,6 +109,31 @@ class Game::EvonyTKR::Model::General : isa(Game::EvonyTKR::Shared::Constants) {
         $specialties->[$sn_index] = $specialty;
       }
     }
+  }
+
+  method can_afford_ascending_level($requestedLevel) {
+    my @valv;
+    map { push @valv, $_ }$self->AscendingAttributeLevelValues();
+    map { push @valv, $_ }$self->AscendingAttributeLevelValues(0);
+    if (any { $requestedLevel eq $_ } @valv) {
+      my %ranks = (
+        none    => 0,
+        purple1 => 1,
+        purple2 => 2,
+        purple3 => 3,
+        purple4 => 4,
+        purple5 => 5,
+        red1    => 6,
+        red2    => 7,
+        red3    => 8,
+        red4    => 9,
+        red5    => 10
+      );
+      my $mr = $ranks{$stars};
+      my $rr = $ranks{$requestedLevel};
+      return $rr <= $mr;
+    }
+    return 0;
   }
 
   method to_hash {

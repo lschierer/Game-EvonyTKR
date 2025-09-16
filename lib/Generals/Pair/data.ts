@@ -15,9 +15,10 @@ import {
 
 import { SpecialtyStore } from '../specialtyStore';
 import { pairKey, PairStore } from './pairStore';
+import { PrimaryFilterStore } from './primaryFilterStore';
 
 export class PairData extends LitElement {
-  static VERSION = '0.2';
+  static VERSION = '0.3';
   readonly ascendingMap: AscendingOptions = {
     none: 'None',
     purple1: '1 Purple Star',
@@ -96,6 +97,9 @@ export class PairData extends LitElement {
   pairStore: PairStore = new PairStore();
 
   @property({ attribute: false })
+  primaryFilter: PrimaryFilterStore = new PrimaryFilterStore();
+
+  @property({ attribute: false })
   public queryParams = new Store<URLSearchParams>(new URLSearchParams());
 
   connectedCallback(): void {
@@ -124,6 +128,7 @@ export class PairData extends LitElement {
       this.requestUpdate();
     });
     this.pairStore.subscribe(() => this.requestUpdate());
+    this.primaryFilter.subscribe(() => this.requestUpdate());
   }
 
   public updateFilterParams() {

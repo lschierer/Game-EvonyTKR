@@ -114,13 +114,20 @@ export class PairStore {
     });
   }
 
-  public getCatalog = async (url: string) => {
-    const response = await fetch(url, {
+  public updateCatalog = async (selectedPrimaries: string[] = []) => {
+    const isUpdate: boolean = selectedPrimaries.length !== 0;
+
+    let path = window.location.pathname;
+    path = path.replace('-comparison', '/data.json');
+    const catalogUrl = new URL(path, window.location.toString());
+    if (DEBUG) {
+      console.log(`using catalog Url ${catalogUrl.toString()}`);
+    }
+    const response = await fetch(catalogUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ primaries: [] }),
+      body: JSON.stringify({ primaries: selectedPrimaries }),
     });
-
     if (!response.ok) {
       if (DEBUG) {
         console.error('error getting catalog: ', response.statusText);
@@ -131,12 +138,12 @@ export class PairStore {
       selected: GPSA;
     };
 
-    this.sessionId.setState(ro.sessionId);
     const valid = GPSA.safeParse(ro.selected);
     if (!valid.success) {
       console.error('invalid catalog payload');
       return;
     }
+    this.sessionId.setState(ro.sessionId);
     const sp = new Set<string>();
     if (valid.success) {
       valid.data.map((s) => {
@@ -144,7 +151,18 @@ export class PairStore {
       });
     }
 
-    this.setCatalog(valid.data);
+    if (!isUpdate) {
+      this.setCatalog(valid.data);
+    }
+  };
+
+  public getCatalog = () => {
+    if (!this.store.state.catalog || this.store.state.catalog.length === 0) {
+      this.updateCatalog().then(() => {
+        return [...this.store.state.catalog];
+      });
+    }
+    return [...this.store.state.catalog];
   };
 
   public togglePairIgnoreState(primaryName: string, secondaryName: string) {
@@ -157,15 +175,31 @@ export class PairStore {
         pair.state = 'ignore';
       }
     }
+    const rows = {
+      ...this.store.state.rows,
+      [key]: pair,
+    };
+    this.store.setState((prev) => {
+      return {
+        ...prev,
+        rows,
+      } as PairsState;
+    });
   }
 
   public toggleAllIgnoredForPrimary(primaryName: string) {
+    if (DEBUG) {
+      console.log(`toggling all for ${primaryName}`);
+    }
     const pairs = this.store.state.catalog.filter((ce) => {
       if (!ce.primary.localeCompare(primaryName)) {
         return true;
       }
       return false;
     });
+    if (DEBUG) {
+      console.log(`toggling ${pairs.length} for ${primaryName}`);
+    }
     pairs.forEach((pair) => {
       this.togglePairIgnoreState(pair.primary, pair.secondary);
     });
@@ -198,22 +232,31 @@ export class PairStore {
         return prev;
       }
 
+      let rows;
       const old = prev.rows[key];
-      // If row is not in catalog yet (rare ordering), create it
-      const baseRow: RowEntry = old ?? {
-        key,
-        primary: gp.primary.name,
-        secondary: gp.secondary.name,
-        state: 'stale',
-      };
+      if (old) {
+        if (old.state !== 'ignore') {
+          old.state = 'current';
+        }
 
-      // Apply selection: if primary not selected, keep ignore
-      const state: RowState = 'current';
-
-      const rows = {
-        ...prev.rows,
-        [key]: { ...baseRow, data: gp, state },
-      };
+        old.data = gp;
+        rows = {
+          ...prev.rows,
+          [key]: old,
+        };
+      } else {
+        const baseRow: RowEntry = {
+          key,
+          primary: gp.primary.name,
+          secondary: gp.secondary.name,
+          state: 'current',
+          data: gp,
+        };
+        rows = {
+          ...prev.rows,
+          [key]: baseRow,
+        };
+      }
 
       return { ...prev, rows } as PairsState;
     });
@@ -245,7 +288,7 @@ export class PairStore {
     );
   }
 
-  public openPairsStream(
+  protected openPairsStream(
     url: string,
     params: URLSearchParams,
     sessionId: string,
@@ -287,9 +330,6 @@ export class PairStore {
     };
 
     es.addEventListener('pair', (e: MessageEvent) => {
-      if (DEBUG) {
-        console.log('received pair event:', e.data);
-      }
       const jsonString = atob(e.data);
       const msg = JSON.parse(jsonString);
       if (DEBUG) {
@@ -327,6 +367,8 @@ export class PairStore {
       console.log(
         'restartStream called, current ES exists:',
         !!this._currentES,
+        ' state is ',
+        this._currentES?.readyState,
       );
       console.trace('restartStream call stack');
     }
@@ -335,9 +377,12 @@ export class PairStore {
     sp = sp.replace('-comparison', '-details-stream');
     const streamUrl = new URL(sp, window.location.toString());
 
-    if (this._currentES) {
+    if (!!this._currentES) {
       if (DEBUG) {
-        console.log('Closing existing EventSource');
+        console.log(
+          'Closing existing EventSource, state is ',
+          this._currentES?.readyState,
+        );
       }
       this._currentES.close();
     }

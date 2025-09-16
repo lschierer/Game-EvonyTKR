@@ -6,7 +6,6 @@ import {
   html,
   css,
   LitElement,
-  type PropertyValues,
   type CSSResultGroup,
   type TemplateResult,
 } from 'lit';
@@ -48,6 +47,11 @@ export class PairPicker extends LitElement {
       :host {
         --mod-textfield-width: 20em;
       }
+
+      div.settings-form {
+        padding-top: 0.5em;
+      }
+
       div.general-filter-popover-wrapper {
         --spectrum-popover-height: 142px;
         --spectrum-popover-width: 89px;
@@ -100,34 +104,32 @@ export class PairPicker extends LitElement {
   @property({ attribute: false })
   protected filterText = new Store<string>('');
 
-  protected override firstUpdated(_changedProperties: PropertyValues): void {
-    super.firstUpdated(_changedProperties);
-  }
-
-  @property({ attribute: false })
-  public selectedPrimaries = new Store<string[]>([]);
-
   override connectedCallback(): void {
     super.connectedCallback();
     this.menuOpen.subscribe(() => this.requestUpdate());
     this.filterText.subscribe(() => this.requestUpdate());
+
     const qr = this.querySelector('pair-data');
     if (qr) {
       if (DEBUG) {
         console.log('found data');
       }
       this.data = qr as PairData;
+      this.data.primaryFilter.subscribe(() => this.requestUpdate());
     }
     if (this.data) {
-      this.data.pairStore.subscribe(() => this.requestUpdate());
+      this.data.pairStore.subscribe(() => {
+        if (!this.data) return;
+        // Update available primaries when catalog changes
+        const primaries = new Set<string>();
+        for (const entry of this.data.pairStore.getCatalog()) {
+          primaries.add(entry.primary);
+        }
+        this.data.primaryFilter.setAvailable([...primaries]);
+        this.requestUpdate();
+      });
 
-      let path = window.location.pathname;
-      path = path.replace('-comparison', '/data.json');
-      const catalogUrl = new URL(path, window.location.toString());
-      if (DEBUG) {
-        console.log(`using catalog Url ${catalogUrl.toString()}`);
-      }
-      this.data.pairStore.getCatalog(catalogUrl.toString());
+      void this.data.pairStore.updateCatalog();
     }
   }
 
@@ -154,35 +156,36 @@ export class PairPicker extends LitElement {
 
   private selectFiltered = (primary: string, newState: boolean) => {
     if (!this.data) return;
-    const current = new Set();
-    const isSelected = current.has(primary);
-    const willSelect = newState ?? !isSelected;
-    if (willSelect && !isSelected) current.add(primary);
-    if (!willSelect && isSelected) current.delete(primary);
 
-    let path = window.location.pathname;
-    path = path.replace('-comparison', '/data.json');
-    const catalogUrl = new URL(path, window.location.toString());
-    this.data.pairStore.getCatalog(catalogUrl.toString());
+    const wasSelected = this.data.primaryFilter.isSelected(primary);
+    const willSelect = newState ?? !wasSelected;
+
+    if (willSelect !== wasSelected) {
+      if (DEBUG) {
+        console.log(
+          `selectFiltered changing primary ${primary} from ${wasSelected} to ${willSelect}`,
+        );
+      }
+      this.data.primaryFilter.toggle(primary);
+      this.data.pairStore.toggleAllIgnoredForPrimary(primary);
+    }
   };
 
   protected renderGeneralFilter() {
     let rowTemplate = html``;
-    const primaries = new Set<string>();
-    if (this.data) {
-      for (const entry of this.data.pairStore.store.state.catalog) {
-        primaries.add(entry.primary);
-      }
 
+    if (this.data) {
       // Filter primaries based on the search text
       const filterText = this.filterText.state;
-      const filteredPrimaries = [...primaries].filter(
-        (primary) =>
-          filterText === '' || primary.toLowerCase().includes(filterText),
-      );
+      const filteredPrimaries = this.data.primaryFilter
+        .getAvailable()
+        .filter(
+          (primary) =>
+            filterText === '' || primary.toLowerCase().includes(filterText),
+        );
 
       for (const primary of filteredPrimaries) {
-        const itemSelected = true;
+        const itemSelected = this.data.primaryFilter.isSelected(primary);
 
         const noSpaces = primary.replaceAll(' ', '');
         rowTemplate = html`${rowTemplate}

@@ -85,7 +85,7 @@ export class PairTable extends LitElement {
       this.data = qr as data.PairData;
     }
     if (this.data) {
-      this.data.pairStore.subscribe(() => {
+      this.data.pairStore.store.subscribe(() => {
         this.updateTableData();
         this.requestUpdate();
       });
@@ -196,6 +196,12 @@ export class PairTable extends LitElement {
         return entry;
       })
       .filter((e) => !!e)
+      .filter((e) => {
+        if (e.state === 'ignore') {
+          return false;
+        }
+        return true;
+      })
       .sort((a, b) => {
         const p = a.primary.localeCompare(b.primary);
         if (!p) {

@@ -74,6 +74,11 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
       $specialty4,     $covenantLevel,
     ));
 
+    if(!$general->can_afford_ascending_level($ascendingLevel) ) {
+      $self->logger->warn("requsted level '$ascendingLevel' is higher than " . $general->stars);
+      $ascendingLevel = 'none';
+    }
+
     foreach my $troopType (keys %$buffValues) {
       foreach my $attribute (keys %{ $buffValues->{$troopType} }) {
         $buffValues->{$troopType}->{$attribute} =
@@ -94,6 +99,10 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
       $ascendingLevel, $specialty1, $specialty2, $specialty3,
       $specialty4,     $covenantLevel,
     ));
+
+    if(!$general->can_afford_ascending_level($ascendingLevel) ) {
+      $ascendingLevel = 'none';
+    }
 
     foreach my $troopType (keys %$debuffValues) {
       foreach my $attribute (keys %{ $debuffValues->{$troopType} }) {

@@ -5,7 +5,6 @@ console.log(`DEBUG is set to ${DEBUG} for ${__FILE_PATH__}`);
 import { customElement } from 'lit/decorators.js';
 
 import { PairData } from './data';
-import { type PairPicker } from './PairPicker';
 import { LitElement, html, type TemplateResult } from 'lit';
 
 @customElement('state-manager')
@@ -48,14 +47,14 @@ export class StateManager extends LitElement {
           }
         }
       });
-    }
-    const gf = this.querySelector('pair-picker') as PairPicker | null;
-    if (gf) {
-      gf.selectedPrimaries.subscribe(() => {
-        const current = gf.selectedPrimaries.state;
-        const previous = gf.selectedPrimaries.prevState;
+      this.data.primaryFilter.subscribe(() => {
+        if (!this.data) return;
+        const current = [...this.data.primaryFilter.store.state.selected];
+        const previous = [...this.data.primaryFilter.store.prevState.selected];
+
         current.sort();
         previous.sort();
+
         let refresh: boolean = false;
         // if there are *less* rows, the change to the ignore state will be
         // picked up by a pairStore subscription
@@ -69,7 +68,7 @@ export class StateManager extends LitElement {
           refresh = !current.every((value, index) => value === previous[index]);
         }
         if (refresh && this.data) {
-          this.data.pairStore.restartStream(this.data.queryParams.state);
+          this.data.pairStore.updateCatalog([...current]);
         }
       });
     }

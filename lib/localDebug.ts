@@ -6,18 +6,18 @@ if (DEBUG) {
 
 const fileDebug: Record<string, boolean> = {
   'lib/Generals/GeneralTable.ts': false,
-  'lib/Generals/Pair/data.ts': true,
-  'lib/Generals/Pair/filter.ts': true,
-  'lib/Generals/Pair/pairStore.ts': true,
+  'lib/Generals/Pair/data.ts': false,
+  'lib/Generals/Pair/filter.ts': false,
+  'lib/Generals/Pair/pairStore.ts': false,
   'lib/Generals/PairTable.ts': false,
   'lib/Generals/PairTableContext.ts': false,
   'lib/Generals/PairTableData.ts': false,
   'lib/Generals/PairTableState.ts': false,
   'lib/Generals/pair_level_settings_form.ts': false,
-  'lib/Generals/specialtyStore.ts': true,
+  'lib/Generals/specialtyStore.ts': false,
   'lib/partials/level_settings_form.ts': false,
-  'lib/Generals/Pair/PairPicker.ts': true,
-  'lib/Generals/Pair/PairTable.ts': true,
+  'lib/Generals/Pair/PairPicker.ts': false,
+  'lib/Generals/Pair/PairTable.ts': false,
 };
 
 function isAbsolutePath(path: string): boolean {
