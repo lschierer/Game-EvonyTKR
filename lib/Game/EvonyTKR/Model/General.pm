@@ -68,12 +68,11 @@ class Game::EvonyTKR::Model::General : isa(Game::EvonyTKR::Shared::Constants) {
         Data::Printer::np($self->GeneralKeys()), $type);
     }
     my @valv;
-    map {push @valv, $_ } $self->AscendingAttributeLevelValues();
-    map {push @valv, $_ } $self->AscendingAttributeLevelValues(0);
+    map { push @valv, $_ } $self->AscendingAttributeLevelValues();
+    map { push @valv, $_ } $self->AscendingAttributeLevelValues(0);
     if (none { $stars =~ /$_/ } @valv) {
       push @errors,
-        sprintf('stars must be one of %s, not "%s"',
-        join(',', @valv), $stars);
+        sprintf('stars must be one of %s, not "%s"', join(',', @valv), $stars);
     }
     if (@errors) {
       $self->logger()->logcroak(join ', ' => @errors);
@@ -113,8 +112,8 @@ class Game::EvonyTKR::Model::General : isa(Game::EvonyTKR::Shared::Constants) {
 
   method can_afford_ascending_level($requestedLevel) {
     my @valv;
-    map { push @valv, $_ }$self->AscendingAttributeLevelValues();
-    map { push @valv, $_ }$self->AscendingAttributeLevelValues(0);
+    map { push @valv, $_ } $self->AscendingAttributeLevelValues();
+    map { push @valv, $_ } $self->AscendingAttributeLevelValues(0);
     if (any { $requestedLevel eq $_ } @valv) {
       my %ranks = (
         none    => 0,

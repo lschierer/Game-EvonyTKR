@@ -188,7 +188,7 @@ package Game::EvonyTKR::Controller::Generals {
     # two routes to generate the lists of names
     $mainRoutes->get('/:uiTarget/:buffActivation/data.json')->to(
       controller => 'Generals',
-      action     => 'singleData',
+      action     => 'singleCatalog',
     )->name('Generals_dynamic_singleData');
     $mainRoutes->any(
       ['GET', 'POST'] => '/:uiTarget/:buffActivation/pair/data.json')->to(
@@ -197,10 +197,11 @@ package Game::EvonyTKR::Controller::Generals {
       )->name('Generals_dynamic_pairCatalog');
 
     # two routes to generate data on a single row within the table
-    $mainRoutes->get('/:uiTarget/:buffActivation/:isPrimary/row.json')->to(
+    $mainRoutes->get('/:uiTarget/:buffActivation/:isPrimary/details-stream')
+      ->to(
       controller => 'Generals',
-      action     => 'singleRow',
-    )->name('Generals_dynamic_singleRow');
+      action     => 'stream_single_details',
+      )->name('Generals_dynamic_singleDetails');
     $mainRoutes->get('/:uiTarget/:buffActivation/pair-details-stream')->to(
       controller => 'Generals',
       action     => 'stream_pair_details',
@@ -553,9 +554,6 @@ package Game::EvonyTKR::Controller::Generals {
       generalType    => $generalType,
       buffActivation => $buffActivation,
       uiTarget       => $uiTarget,
-      covenantLevel  => $covenantLevel,
-      ascendingLevel => $ascendingLevel,
-      specialties    => \@specialties,
     );
 
     my $markdown_path =
@@ -675,21 +673,44 @@ package Game::EvonyTKR::Controller::Generals {
     return $self->render;
   }
 
-  sub singleData ($self) {
-    my $distDir   = Mojo::File::Share::dist_dir('Game::EvonyTKR');
-    my $slug_ui   = $self->stash('uiTarget');          # from captured route
-    my $slug_buff = $self->stash('buffActivation');    # from captured route
+  sub singleCatalog ($self) {
+    my $distDir            = Mojo::File::Share::dist_dir('Game::EvonyTKR');
+    my $slug_ui            = $self->stash('uiTarget');
+    my $slug_buff          = $self->stash('buffActivation');
+    my $requested_generals = [];
 
-    # Lookup full route metadata
+    if ($self->req->method eq 'POST') {
+      my $json_data = $self->req->json;
+      $requested_generals = $json_data->{generals} // [];
+    }
+
+    my $uidseed = join(', ', @$requested_generals) . ' ' . UUID::uuid7();
+    $logger->debug("uidseed is '$uidseed'");
+
+    my $session_id =
+      UUID::uuid5($self->app->get_root_manager()->UUID5_base, $uidseed);
+    $logger->debug("final session_id is '$session_id'");
+
+    # Lookup route metadata
     my $routing    = $self->general_routing;
     my $route_meta = $routing->lookup_route($slug_ui, $slug_buff);
 
     unless ($route_meta) {
       $logger->error("Invalid route combo: $slug_ui / $slug_buff");
+      if ($self->app->mode eq 'development') {
+        $logger->debug("Known valid routes:");
+        $routing->each_valid_route(
+          sub ($key, $meta) {
+            $logger->debug("  $key => " . Data::Printer::np($meta),
+              multiline => 0);
+          }
+        );
+      }
+
       return $self->reply->not_found;
     }
 
-    # Extract validated route metadata
+    # Extract metadata
     my $generalType    = $route_meta->{generalType};
     my $buffActivation = $route_meta->{buffActivation};
     my $uiTarget       = $route_meta->{uiTarget};
@@ -699,24 +720,60 @@ package Game::EvonyTKR::Controller::Generals {
     while (my ($key, $general) = each(%{ $gm->get_all_generals() })) {
       $logger->debug(
         "inspecting '$key', first need to see if it is a $generalType."
-          . Data::Printer::np($general));
+          . Data::Printer::np($general, multiline => 0));
       if (none { lc($_) eq $generalType } @{ $general->type }) {
         $logger->debug("none of "
             . $general->name
             . "'s types: "
-            . Data::Printer::np($general->type)
+            . Data::Printer::np($general->type, multiline => 0)
             . "match as a $generalType.");
         next;
       }
-
-      my $result = { primary => $general, };
-      push @selected, $result;
+      push @selected, $general;
     }
-    if (scalar @selected) {
-      return $self->render(json => \@selected);
+
+    $logger->debug(
+      sprintf('There are %s generals to return.', scalar(@selected)));
+
+    # Return just the basic name information without computing buffs
+    my @names = map { $_->name } @selected;
+
+    @names = sort(@names);
+
+    # if there were requested primaries, filter to only include those
+    if (scalar @$requested_generals) {
+
+      my %requested = map { $_ => 1 } @$requested_generals;
+      my @filtered;
+      foreach my $entry (@names) {
+        if (exists $requested{$entry}) {
+          $logger->debug(sprintf(
+            '%s was requsted for session %s', $entry, $session_id));
+          push @filtered, $entry;
+        }
+      }
+
+      $session_store->{$session_id} = \@filtered;
+
+      return $self->render(
+        json => {
+          sessionId => $session_id,
+          selected  => \@filtered,
+        }
+      );
     }
     else {
-      return $self->render(json => {});
+      $logger->debug(
+        "no requested primaries for session '$session_id' returning full list: "
+          . Data::Printer::np(@names));
+      $session_store->{$session_id} = \@names;
+
+      return $self->render(
+        json => {
+          sessionId => $session_id,
+          selected  => \@names,
+        }
+      );
     }
   }
 
@@ -824,130 +881,234 @@ package Game::EvonyTKR::Controller::Generals {
     }
   }
 
-  sub singleRow ($self) {
-    my $name      = $self->param('name');
-    my $isPrimary = $self->param('isPrimary') // 1;    # Default to primary
+  sub stream_single_details ($c) {
+    $c->res->headers->content_type('text/event-stream');
+    $c->res->headers->content_encoding('utf-8');
+    $c->res->headers->add('Cache-Control', 'no-cache');
 
-    if ($isPrimary eq 'primary')   { $isPrimary = 1; }
-    if ($isPrimary eq 'secondary') { $isPrimary = 0; }
+    my $slug_ui    = $c->stash('uiTarget');
+    my $slug_buff  = $c->stash('buffActivation');
+    my $run_id     = 0+ $c->param('runId');
+    my $session_id = $c->param('sessionId');
+    unless (defined($session_id) && length($session_id)) {
+      $logger->error('Session ID must be present!');
+      my $payload = encode_json({ runId => 0+ $run_id });
+      $c->write_sse({ type => 'complete', text => $payload });
+      return;
+    }
+    my $selected =
+      exists $session_store->{$session_id} ? $session_store->{$session_id} : [];
 
-    my $slug_ui   = $self->stash('uiTarget');          # from captured route
-    my $slug_buff = $self->stash('buffActivation');    # from captured route
+    $logger->debug(sprintf(
+      'stream_single_details called url: %s,'
+        . ' uiTarget: %s; buffActivation: %s; run_id: %s',
+      $c->req->url->path->to_string,
+      $slug_ui, $slug_buff, 0+ $run_id
+    ));
 
-    # Lookup full route metadata
-    my $routing    = $self->general_routing;
+    $logger->debug(sprintf(
+      'session info: sessionId: "%s"; selected: %s',
+      $session_id // 'Not Present',
+      join ', ', @$selected
+    ));
+
+    # Lookup route metadata
+    my $routing    = Game::EvonyTKR::Control::Generals::Routing->new;
     my $route_meta = $routing->lookup_route($slug_ui, $slug_buff);
 
     unless ($route_meta) {
-      $logger->error("Invalid route combo: $slug_ui / $slug_buff");
-      return $self->reply->not_found;
+      $logger->error("Invalid single route: $slug_ui | $slug_buff");
+
+      if ($c->app->mode eq 'development') {
+        $logger->debug("Known valid routes:");
+        $routing->each_valid_route(
+          sub ($key, $meta) {
+            $logger->debug("  $key => " . Data::Printer::np($meta));
+          }
+        );
+      }
+      my $payload = encode_json({ runId => 0+ $run_id });
+      $c->write_sse({ type => 'complete', text => $payload });
+      return;
     }
 
-    # Extract validated route metadata
+    $c->render_later;
+    $c->write_sse;
+    $c->inactivity_timeout(300);
+
     my $generalType    = $route_meta->{generalType};
     my $buffActivation = $route_meta->{buffActivation};
     my $uiTarget       = $route_meta->{uiTarget};
+    my $gm             = $c->app->get_general_manager();
+    my $rows;
 
-    $logger->debug(sprintf(
-      'Computing general buffs for  %s, (isPrimary=%s, uiTarget=%s)',
-      $name, $isPrimary, $uiTarget
-    ));
-
-    # Get query parameters with defaults
-    my $ascendingLevel = $self->param('ascendingLevel') // 'red5';
-    my $covenantLevel  = $self->param('covenantLevel')
-      // $self->param('primaryCovenantLevel') // 'civilization';
-    my @specialties;
-    push @specialties,
-      $self->param('primarySpecialty1') // $self->param('specialty1') // 'gold';
-    push @specialties,
-      $self->param('primarySpecialty2') // $self->param('specialty2') // 'gold';
-    push @specialties,
-      $self->param('primarySpecialty3') // $self->param('specialty3') // 'gold';
-    push @specialties,
-      $self->param('primarySpecialty4') // $self->param('specialty4') // 'gold';
-
-    # Validate parameters using enums from Game::EvonyTKR::Model::Data
-    my $data_model = Game::EvonyTKR::Model::Data->new();
-
-    # Validate ascending level
-    if (!$data_model->checkAscendingLevel($ascendingLevel)) {
-      $logger->warn(
-        "Invalid ascendingLevel: $ascendingLevel, using default 'red5'");
-      $ascendingLevel = 'red5';
-    }
-    else {
-      $logger->debug(
-        "mayor_comparison_json using ascendingLevel $ascendingLevel");
-    }
-
-    # Validate specialty levels
-    @specialties = $data_model->normalizeSpecialtyLevels(@specialties);
-
-    my $general =
-      $self->app->get_root_manager->generalManager->getGeneral($name);
-
-    if (!$general) {
-      return $self->render(
-        json   => { error => "General not found" },
-        status => 404
-      );
-    }
-
-    my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
-      rootManager    => $self->app->get_root_manager(),
-      general        => $general,
-      isPrimary      => $isPrimary,
-      targetType     => $route_meta->{generalType},
-      activationType => $buffActivation,
-      ascendingLevel => $ascendingLevel,
-      covenantLevel  => $covenantLevel,
-      specialty1     => $specialties[0],
-      specialty2     => $specialties[1],
-      specialty3     => $specialties[2],
-      specialty4     => $specialties[3],
-    );
-
-    $summarizer->updateBuffs();
-    $summarizer->updateDebuffs();
-
-    unless ($generalType =~ /(Ground|Mounted|Ranged|Siege)/i) {
-      $generalType = 'Overall';
-    }
-
-    my $result = {
-      marchbuff   => $summarizer->buffValues->{$generalType}->{'March Size'},
-      attackbuff  => $summarizer->buffValues->{$generalType}->{'Attack'},
-      defensebuff => $summarizer->buffValues->{$generalType}->{'Defense'},
-      hpbuff      => $summarizer->buffValues->{$generalType}->{'HP'},
-      groundattackdebuff =>
-        $summarizer->debuffValues->{'Ground Troops'}->{'Attack'},
-      grounddefensedebuff =>
-        $summarizer->debuffValues->{'Ground Troops'}->{'Defense'},
-      groundhpdebuff => $summarizer->debuffValues->{'Ground Troops'}->{'HP'},
-      mountedattackdebuff =>
-        $summarizer->debuffValues->{'Mounted Troops'}->{'Attack'},
-      mounteddefensedebuff =>
-        $summarizer->debuffValues->{'Mounted Troops'}->{'Defense'},
-      mountedhpdebuff => $summarizer->debuffValues->{'Mounted Troops'}->{'HP'},
-      rangedattackdebuff =>
-        $summarizer->debuffValues->{'Ranged Troops'}->{'Attack'},
-      rangeddefensedebuff =>
-        $summarizer->debuffValues->{'Ranged Troops'}->{'Defense'},
-      rangedhpdebuff    => $summarizer->debuffValues->{'Ranged Troops'}->{'HP'},
-      siegeattackdebuff =>
-        $summarizer->debuffValues->{'Siege Machines'}->{'Attack'},
-      siegedefensedebuff =>
-        $summarizer->debuffValues->{'Siege Machines'}->{'Defense'},
-      siegehpdebuff => $summarizer->debuffValues->{'Siege Machines'}->{'HP'},
+    my $typeMap = {
+      'Ground Specialists'  => 'ground_specialist',
+      'Ranged Specialists'  => 'ranged_specialist',
+      'Siege Specialists'   => 'siege_specialist',
+      'Mounted Specialists' => 'mounted_specialist',
+      'Wall Specialists'    => 'wall',
     };
-    if ($isPrimary) {
-      $result->{primary} = $general;
+
+    my @promises;
+    my @subs;
+
+    my $validated_params = $c->validateSingleParams();
+    $validated_params->{buffActivation} = $buffActivation;
+    $validated_params->{route_meta}     = $route_meta;
+    $validated_params->{typeMap}        = $typeMap;
+
+    my $valid = {};
+    map { $valid->{$_} => 1 } @$selected;
+    foreach my $general (sort { $a->name cmp $b->name }
+      values $gm->get_all_generals()->%*) {
+
+      if (scalar(@$selected) && exists $valid->{ $general->name }) {
+        push @$rows, $general;
+      }
+      elsif (any { $_ eq $generalType } $general->type->@*) {
+        push @$rows, $general;
+      }
+      if ($validated_params) {
+
+        push @$rows,
+          {
+          general => $general,
+          params  => $validated_params,
+          };
+      }
     }
-    else {
-      $result->{secondary} = $general;
+
+    my @batch_ranges;
+    my $index      = 0;
+    my $batch_size = 10;
+    my $maxIndex   = scalar(@$rows) - 1;
+
+    while ($index < $maxIndex) {
+      my $end = List::Util::min($index + $batch_size - 1, $maxIndex);
+      push @batch_ranges, [$index, $end];
+      $index = $end + 1;
     }
-    return $self->render(json => $result);
+
+    Mojo::Promise->map(
+      { concurrency => 25 },    # This replaces your unlimited spawning
+      sub {
+        my ($start, $end) = @{ $_[0] };    # Current batch range
+        $logger->debug("processing $start to $end");
+
+        my $subprocess = Mojo::IOLoop::Subprocess->new;
+        $subprocess->on(
+          progress => sub ($subprocess, @data) {
+            my ($result) = @data;
+            $logger->debug("progress event detected");
+            $c->write_sse({ type => 'row', text => $result });
+          }
+        );
+
+        return $subprocess->run_p(sub {
+          $logger->debug("sub process for index $start to $end");
+          for my $i ($start .. $end) {
+            my $general = $rows->[$i];
+            $logger->debug(sprintf('processing general %s', $general->name,));
+            my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
+              rootManager    => $c->app->get_root_manager(),
+              general        => $general,
+              isPrimary      => $validated_params->{isPrimary},
+              targetType     => $validated_params->{targetType},
+              activationType => $validated_params->{buffActivation},
+              ascendingLevel => $validated_params->{ascendingLevel},
+              covenantLevel  => $validated_params->{covenantLevel},
+              specialty1     => $validated_params->{specialties}->[0],
+              specialty2     => $validated_params->{specialties}->[1],
+              specialty3     => $validated_params->{specialties}->[2],
+              specialty4     => $validated_params->{specialties}->[3],
+            );
+            # Do all the heavy computation here
+            $summarizer->updateBuffsAndDebuffs(
+              $validated_params->{route_meta}->{generalType},
+              $validated_params->{ascendingLevel},
+              $validated_params->{covenantLevel},
+              $validated_params->{specialties},
+              $validated_params->{buffActivation}
+            );
+
+            my $buffKey =
+              $validated_params->{route_meta}->{generalType} =~ s/_/ /r;
+            $buffKey =~ s/(\w)(\w+) specialist/\U$1\L$2 \UT\Lroops/;
+            $buffKey =~ s/Siege Troops/Siege Machines/;
+            $logger->debug("buffKey is $buffKey");
+
+            # build the row payload
+            my $row = {
+              general     => $general->to_hash,
+              attackbuff  => $summarizer->buffValues->{$buffKey}{'Attack'},
+              defensebuff => $summarizer->buffValues->{$buffKey}{'Defense'},
+              hpbuff      => $summarizer->buffValues->{$buffKey}{'HP'},
+              marchbuff   => $summarizer->buffValues->{$buffKey}{'March Size'},
+              groundattackdebuff =>
+                $summarizer->debuffValues->{'Ground Troops'}{'Attack'},
+              grounddefensedebuff =>
+                $summarizer->debuffValues->{'Ground Troops'}{'Defense'},
+              groundhpdebuff =>
+                $summarizer->debuffValues->{'Ground Troops'}{'HP'},
+              mountedattackdebuff =>
+                $summarizer->debuffValues->{'Mounted Troops'}{'Attack'},
+              mounteddefensedebuff =>
+                $summarizer->debuffValues->{'Mounted Troops'}{'Defense'},
+              mountedhpdebuff =>
+                $summarizer->debuffValues->{'Mounted Troops'}{'HP'},
+              rangedattackdebuff =>
+                $summarizer->debuffValues->{'Ranged Troops'}{'Attack'},
+              rangeddefensedebuff =>
+                $summarizer->debuffValues->{'Ranged Troops'}{'Defense'},
+              rangedhpdebuff =>
+                $summarizer->debuffValues->{'Ranged Troops'}{'HP'},
+              siegeattackdebuff =>
+                $summarizer->debuffValues->{'Siege Machines'}{'Attack'},
+              siegedefensedebuff =>
+                $summarizer->debuffValues->{'Siege Machines'}{'Defense'},
+              siegehpdebuff =>
+                $summarizer->debuffValues->{'Siege Machines'}{'HP'},
+            };
+
+            # one JSON object per message; include runId inside the data payload
+            my $json =
+              JSON::PP->new->utf8(0)->allow_blessed->convert_blessed->canonical;
+
+            my $payload = $json->encode({ runId => 0+ $run_id, data => $row });
+            $logger->debug(sprintf(
+              'row is %s, json is %s',
+              Data::Printer::np($row, multiline => 0), $payload,
+            ));
+            my $result = encode_base64($payload);
+            $subprocess->progress($result);
+          }
+      # sleep to allow the event to be caught before the subprocess is harvested
+      # once the subprocess is harvested, the listener is also harvested
+          sleep(5);
+        })->catch(sub {
+          $logger->error(
+            sprintf('error in promise for subloop %s to %s', $start, $end));
+          return undef;    # Return something so map can continue
+        });
+        ;                  # Same as before
+      },
+      @batch_ranges        # Process each batch range
+    )->then(sub {
+      my $payload = encode_json({ runId => $run_id });
+      $c->write_sse({ type => 'complete', text => $payload });
+    })->catch(sub {
+      $logger->error('Overall map operation failed');
+    });
+
+    # If the browser closes, remove the stored session
+    $c->on(
+      finish => sub {
+        if (exists $session_store->{$session_id}) {
+          delete $session_store->{$session_id};
+        }
+      }
+    );
   }
 
   sub stream_pair_details ($c) {
@@ -1226,6 +1387,47 @@ package Game::EvonyTKR::Controller::Generals {
       primarySpecialties     => $primarySpecialties,
       secondaryCovenantLevel => $secondaryCovenantLevel,
       secondarySpecialties   => $secondarySpecialties,
+    };
+  }
+
+  sub validateSingleParams($self, $c) {
+    my $data_model = Game::EvonyTKR::Model::Data->new();
+
+    my $isPrimary      = $c->param('isPrimary')      // 1;
+    my $ascendingLevel = $c->param('ascendingLevel') // 'red5';
+    my $covenantLevel  = $c->param('covenantLevel')  // 'civilization';
+    my @specialties;
+    push @specialties, $c->param('specialty1') // 'gold';
+    push @specialties, $c->param('specialty2') // 'gold';
+    push @specialties, $c->param('specialty3') // 'gold';
+    push @specialties, $c->param('specialty4') // 'gold';
+
+    if ($isPrimary) {
+      # Validate ascending level
+      if (!$data_model->checkAscendingLevel($ascendingLevel)) {
+        $logger->warn(
+          "Invalid ascendingLevel: $ascendingLevel, using default 'red5'");
+        $ascendingLevel = 'red5';
+      }
+    }
+    else {
+      $ascendingLevel = 'none';
+    }
+
+    if (!$data_model->checkCovenantLevel($covenantLevel)) {
+      $logger->warn(
+        sprintf('Invalid covenantLevel: %s, using default "civilization"',
+          $covenantLevel)
+      );
+      $covenantLevel = 'civilization';
+    }
+
+    @specialties = $data_model->normalizeSpecialtyLevels(@specialties);
+
+    return {
+      ascendingLevel => $ascendingLevel,
+      covenantLevel  => $covenantLevel,
+      specialties    => \@specialties,
     };
   }
 

@@ -74,8 +74,9 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
       $specialty4,     $covenantLevel,
     ));
 
-    if(!$general->can_afford_ascending_level($ascendingLevel) ) {
-      $self->logger->warn("requsted level '$ascendingLevel' is higher than " . $general->stars);
+    if (!$general->can_afford_ascending_level($ascendingLevel)) {
+      $self->logger->warn(
+        "requsted level '$ascendingLevel' is higher than " . $general->stars);
       $ascendingLevel = 'none';
     }
 
@@ -100,7 +101,7 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
       $specialty4,     $covenantLevel,
     ));
 
-    if(!$general->can_afford_ascending_level($ascendingLevel) ) {
+    if (!$general->can_afford_ascending_level($ascendingLevel)) {
       $ascendingLevel = 'none';
     }
 
