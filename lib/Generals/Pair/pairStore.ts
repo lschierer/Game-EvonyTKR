@@ -147,6 +147,30 @@ export class PairStore {
     this.setCatalog(valid.data);
   };
 
+  public togglePairIgnoreState(primaryName: string, secondaryName: string) {
+    const key = pairKey(primaryName, secondaryName);
+    const pair = this.store.state.rows[key];
+    if (pair) {
+      if (pair.state === 'ignore') {
+        pair.state = 'stale';
+      } else {
+        pair.state = 'ignore';
+      }
+    }
+  }
+
+  public toggleAllIgnoredForPrimary(primaryName: string) {
+    const pairs = this.store.state.catalog.filter((ce) => {
+      if (!ce.primary.localeCompare(primaryName)) {
+        return true;
+      }
+      return false;
+    });
+    pairs.forEach((pair) => {
+      this.togglePairIgnoreState(pair.primary, pair.secondary);
+    });
+  }
+
   upsertRowFromStream(runId: number, payload: unknown) {
     if (DEBUG) {
       console.log('upsertRowFromStream called with runId:', runId);

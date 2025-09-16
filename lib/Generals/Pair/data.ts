@@ -17,7 +17,7 @@ import { SpecialtyStore } from '../specialtyStore';
 import { pairKey, PairStore } from './pairStore';
 
 export class PairData extends LitElement {
-  static VERSION = '0.1.4';
+  static VERSION = '0.2';
   readonly ascendingMap: AscendingOptions = {
     none: 'None',
     purple1: '1 Purple Star',

@@ -104,6 +104,9 @@ export class PairPicker extends LitElement {
     super.firstUpdated(_changedProperties);
   }
 
+  @property({ attribute: false })
+  public selectedPrimaries = new Store<string[]>([]);
+
   override connectedCallback(): void {
     super.connectedCallback();
     this.menuOpen.subscribe(() => this.requestUpdate());

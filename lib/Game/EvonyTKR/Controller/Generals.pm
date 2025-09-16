@@ -1064,111 +1064,113 @@ package Game::EvonyTKR::Controller::Generals {
     my @promises;
     my @subs;
 
+
+    my @batch_ranges;
     my $index = 0;
     my $batch_size = 10;
     my $maxIndex = scalar(@$pairs) - 1;
 
-    while($index < $maxIndex){
-      my $end = $index + $batch_size -1;
-      my $start = $index;
-      $end = List::Util::min($end, $maxIndex);
-      $logger->debug("processing $start to $end");
-      my $subprocess = Mojo::IOLoop::Subprocess->new;
-
-      $subprocess->on(progress => sub ($subprocess, @data) {
-          my ($result) = @data;
-          $logger->debug("progress event detected");
-          $c->write_sse({ type => 'pair', text => $result });
-      });
-
-      my $promise = $subprocess->run_p( sub ($subprocess) {
-        say("sub process for index $start to $end");
-        for my $i ($start..$end) {
-          my $pair = $pairs->[$i];
-            $logger->debug(sprintf('processing pair %s/%s',
-            $pair->primary->name, $pair->secondary->name));
-            # Do all the heavy computation here
-            $pair->updateBuffsAndDebuffs(
-              $validated_params->{route_meta}->{generalType},
-              $validated_params->{ascendingLevel},
-              $validated_params->{primaryCovenantLevel},
-              $validated_params->{primarySpecialties},
-              $validated_params->{secondaryCovenantLevel},
-              $validated_params->{secondarySpecialties},
-              $validated_params->{buffActivation}
-            );
-
-            my $buffKey =
-              $validated_params->{route_meta}->{generalType} =~ s/_/ /r;
-            $buffKey =~ s/(\w)(\w+) specialist/\U$1\L$2 \UT\Lroops/;
-            $buffKey =~ s/Siege Troops/Siege Machines/;
-            $logger->debug("buffKey is $buffKey");
-            $logger->debug("primary to string is " . $pair->primary->to_string());
-
-            # build the row payload
-            my $row = {
-              primary            => $pair->primary->to_hash,
-              secondary          => $pair->secondary->to_hash,
-              attackbuff         => $pair->buffValues->{$buffKey}{'Attack'},
-              defensebuff        => $pair->buffValues->{$buffKey}{'Defense'},
-              hpbuff             => $pair->buffValues->{$buffKey}{'HP'},
-              marchbuff          => $pair->buffValues->{$buffKey}{'March Size'},
-              groundattackdebuff =>
-                $pair->debuffValues->{'Ground Troops'}{'Attack'},
-              grounddefensedebuff =>
-                $pair->debuffValues->{'Ground Troops'}{'Defense'},
-              groundhpdebuff      => $pair->debuffValues->{'Ground Troops'}{'HP'},
-              mountedattackdebuff =>
-                $pair->debuffValues->{'Mounted Troops'}{'Attack'},
-              mounteddefensedebuff =>
-                $pair->debuffValues->{'Mounted Troops'}{'Defense'},
-              mountedhpdebuff    => $pair->debuffValues->{'Mounted Troops'}{'HP'},
-              rangedattackdebuff =>
-                $pair->debuffValues->{'Ranged Troops'}{'Attack'},
-              rangeddefensedebuff =>
-                $pair->debuffValues->{'Ranged Troops'}{'Defense'},
-              rangedhpdebuff    => $pair->debuffValues->{'Ranged Troops'}{'HP'},
-              siegeattackdebuff =>
-                $pair->debuffValues->{'Siege Machines'}{'Attack'},
-              siegedefensedebuff =>
-                $pair->debuffValues->{'Siege Machines'}{'Defense'},
-              siegehpdebuff => $pair->debuffValues->{'Siege Machines'}{'HP'},
-            };
-
-            # one JSON object per message; include runId inside the data payload
-            my $json =
-              JSON::PP->new->utf8(0)->allow_blessed->convert_blessed->canonical;
-
-            my $payload = $json->encode({ runId => 0+ $run_id, data => $row });
-            $logger->debug(sprintf(
-              'row is %s, json is %s',
-              Data::Printer::np($row, multiline => 0), $payload,
-            ));
-            my $result= encode_base64($payload);
-            $subprocess->progress($result);
-        }
-        # sleep to allow the event to be caught before the subprocess is harvested
-        # once the subprocess is harvested, the listener is also harvested
-        sleep(5);
-      });
-      push @subs, $subprocess;
-
-      push @promises, $promise;
-
-      $promise->catch(sub {
-        $logger->error(sprintf('error in promise for subloop %s to %s',
-        $index, $end));
-      });
-       $subprocess->ioloop->start unless $subprocess->ioloop->is_running;
-       $index = $end + 1;
-       $logger->debug("ending index is $index");
+    while($index < $maxIndex) {
+        my $end = List::Util::min($index + $batch_size - 1, $maxIndex);
+        push @batch_ranges, [$index, $end];
+        $index = $end + 1;
     }
 
-    my $all = Mojo::Promise->all(@promises);
-    $all->then(sub {
+    Mojo::Promise->map(
+        { concurrency => 25 }, # This replaces your unlimited spawning
+        sub {
+            my ($start, $end) = @{$_[0]}; # Current batch range
+            $logger->debug("processing $start to $end");
+
+            my $subprocess = Mojo::IOLoop::Subprocess->new;
+            $subprocess->on(progress => sub  ($subprocess, @data) {
+              my ($result) = @data;
+              $logger->debug("progress event detected");
+              $c->write_sse({ type => 'pair', text => $result });
+            });
+
+            return $subprocess->run_p(sub {
+            $logger->debug("sub process for index $start to $end");
+            for my $i ($start..$end) {
+              my $pair = $pairs->[$i];
+                $logger->debug(sprintf('processing pair %s/%s',
+                $pair->primary->name, $pair->secondary->name));
+                # Do all the heavy computation here
+                $pair->updateBuffsAndDebuffs(
+                  $validated_params->{route_meta}->{generalType},
+                  $validated_params->{ascendingLevel},
+                  $validated_params->{primaryCovenantLevel},
+                  $validated_params->{primarySpecialties},
+                  $validated_params->{secondaryCovenantLevel},
+                  $validated_params->{secondarySpecialties},
+                  $validated_params->{buffActivation}
+                );
+
+                my $buffKey =
+                  $validated_params->{route_meta}->{generalType} =~ s/_/ /r;
+                $buffKey =~ s/(\w)(\w+) specialist/\U$1\L$2 \UT\Lroops/;
+                $buffKey =~ s/Siege Troops/Siege Machines/;
+                $logger->debug("buffKey is $buffKey");
+                $logger->debug("primary to string is " . $pair->primary->to_string());
+
+                # build the row payload
+                my $row = {
+                  primary            => $pair->primary->to_hash,
+                  secondary          => $pair->secondary->to_hash,
+                  attackbuff         => $pair->buffValues->{$buffKey}{'Attack'},
+                  defensebuff        => $pair->buffValues->{$buffKey}{'Defense'},
+                  hpbuff             => $pair->buffValues->{$buffKey}{'HP'},
+                  marchbuff          => $pair->buffValues->{$buffKey}{'March Size'},
+                  groundattackdebuff =>
+                    $pair->debuffValues->{'Ground Troops'}{'Attack'},
+                  grounddefensedebuff =>
+                    $pair->debuffValues->{'Ground Troops'}{'Defense'},
+                  groundhpdebuff      => $pair->debuffValues->{'Ground Troops'}{'HP'},
+                  mountedattackdebuff =>
+                    $pair->debuffValues->{'Mounted Troops'}{'Attack'},
+                  mounteddefensedebuff =>
+                    $pair->debuffValues->{'Mounted Troops'}{'Defense'},
+                  mountedhpdebuff    => $pair->debuffValues->{'Mounted Troops'}{'HP'},
+                  rangedattackdebuff =>
+                    $pair->debuffValues->{'Ranged Troops'}{'Attack'},
+                  rangeddefensedebuff =>
+                    $pair->debuffValues->{'Ranged Troops'}{'Defense'},
+                  rangedhpdebuff    => $pair->debuffValues->{'Ranged Troops'}{'HP'},
+                  siegeattackdebuff =>
+                    $pair->debuffValues->{'Siege Machines'}{'Attack'},
+                  siegedefensedebuff =>
+                    $pair->debuffValues->{'Siege Machines'}{'Defense'},
+                  siegehpdebuff => $pair->debuffValues->{'Siege Machines'}{'HP'},
+                };
+
+                # one JSON object per message; include runId inside the data payload
+                my $json =
+                  JSON::PP->new->utf8(0)->allow_blessed->convert_blessed->canonical;
+
+                my $payload = $json->encode({ runId => 0+ $run_id, data => $row });
+                $logger->debug(sprintf(
+                  'row is %s, json is %s',
+                  Data::Printer::np($row, multiline => 0), $payload,
+                ));
+                my $result= encode_base64($payload);
+                $subprocess->progress($result);
+            }
+            # sleep to allow the event to be caught before the subprocess is harvested
+            # once the subprocess is harvested, the listener is also harvested
+            sleep(5);
+            }) ->catch(sub {
+                           $logger->error(sprintf('error in promise for subloop %s to %s', $start, $end));
+                           return undef; # Return something so map can continue
+                       });;   # Same as before
+        },
+        @batch_ranges  # Process each batch range
+    )->then(sub {
       my $payload = encode_json({ runId => $run_id });
       $c->write_sse({ type => 'complete', text => $payload });
+    })->catch(sub {
+        $logger->error('Overall map operation failed');
     });
+
 
     # If the browser closes, remove the stored session
     $c->on(

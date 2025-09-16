@@ -2,28 +2,25 @@
 % my $PrimaryFormTitle = 'Primary General';
 % my $SecondaryFormTitle = 'Secondary General';
 
-<link rel="stylesheet" href="/css/GeneralTable.css" />
+<link rel="stylesheet" href="/css/GeneralTable.css" type="text/css">
 <script type="module">
-  // force the loading order by putting in the same script tag
-  import "/js/lib/Generals/Pair/data.js";
-  import "/js/lib/Generals/Pair/filter.js";
-  import "/js/lib/Generals/Pair/PairPicker.js";
-  import "/js/lib/Generals/Pair/PairTable.js";
-  import "/js/lib/Generals/Pair/HistoryManager.js";
+  import "/js/lib/Generals/Pair/index.js";
 </script>
 
 <div class="general-comparison">
   <div class="general-table-container">
-      <pair-filter is_primary form_title="<%= $PrimaryFormTitle %>">
-        <pair-filter form_title="<%= $SecondaryFormTitle %>">
-          <pair-picker>
-            <pair-table>
-              <history-manager>
+
+      <state-manager>
+        <pair-filter is_primary form_title="<%= $PrimaryFormTitle %>">
+          <pair-filter form_title="<%= $SecondaryFormTitle %>">
+            <pair-picker>
+              <pair-table>
                 <pair-data></pair-data>
-              </history-manager>
-            </pair-table>
-          </pair-picker>
+              </pair-table>
+            </pair-picker>
+          </pair-filter>
         </pair-filter>
-      </pair-filter>
+      </state-manager>
+
   </div>
 </div>
