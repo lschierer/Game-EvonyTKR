@@ -13,10 +13,6 @@ prepare:
 
 npmdeps:
   pnpm install
-  rm -rf share/public/js
-  rm -rf share/public/types
-  mkdir -p share/public/js
-  mkdir -p share/public/types
 
 #find node_modules/evonytkrtips-data/share/ -name '*.csv' -exec sh -c 'iconv -f macroman -t utf-8 "$1" > "$(basename "$1")"' _ {} \;
 
@@ -36,6 +32,10 @@ css: npmdeps images
   pnpm build:css
 
 ts: npmdeps css
+  rm -rf share/public/js
+  mkdir -p share/public/js
+  rm -rf share/public/types
+  mkdir -p share/public/types
   pnpm build:ts
 
 build: prepare deps css images ts
