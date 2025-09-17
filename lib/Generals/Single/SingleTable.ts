@@ -147,6 +147,7 @@ export class SingleTable extends LitElement {
           id: key,
           accessorFn,
           enableSorting: true,
+          sortUndefined: 'last',
           sortDescFirst: key !== 'primary',
           cell: (info: CellContext<SingleGeneralState, unknown>) => {
             const value = info.getValue();
@@ -178,7 +179,7 @@ export class SingleTable extends LitElement {
                 : null}
             </div>`;
           },
-        };
+        } as ColumnDef<SingleGeneralState>;
       });
 
     columns.push(...dynamicColumns);

@@ -149,6 +149,7 @@ export class PairTable extends LitElement {
           id: key,
           accessorFn,
           enableSorting: true,
+          sortUndefined: 'last',
           sortDescFirst: key !== 'primary' && key !== 'secondary',
           cell: (info: CellContext<RowEntry, unknown>) => {
             const value = info.getValue();
@@ -180,7 +181,7 @@ export class PairTable extends LitElement {
                 : null}
             </div>`;
           },
-        };
+        } as ColumnDef<RowEntry>;
       });
 
     columns.push(...dynamicColumns);
