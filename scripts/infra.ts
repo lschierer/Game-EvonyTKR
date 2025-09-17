@@ -19,7 +19,7 @@ const envConfigs: Record<string, EnvConfig> = {
     subdomain: 'dev',
     desiredCount: 1,
     cpu: 2048,
-    memory: 3072,
+    memory: 4096,
     imageTag: 'latest',
   },
   prod: {
