@@ -31,11 +31,10 @@ import {
 } from '@tanstack/lit-table';
 
 import * as data from './data';
-import { type RowEntry, pairKey } from './singleStore';
+import type { SingleGeneralState } from '../GeneralRowSchemas';
 
 const tableHeaders = new Map<string, string>([
   ['primary', 'Primary'],
-  ['secondary', 'Secondary'],
   ['marchbuff', 'March Size'],
   ['attackbuff', 'Attack'],
   ['defensebuff', 'Defense'],
@@ -54,20 +53,20 @@ const tableHeaders = new Map<string, string>([
   ['siegehpdebuff', 'Siege HP Debuff'],
 ]);
 
-@customElement('pair-table')
-export class PairTable extends LitElement {
+@customElement('single-table')
+export class SingleTable extends LitElement {
   @property({ type: String }) generalType = '';
   @property({ type: String }) uiTarget = '';
   @property({ type: String }) public allowedBuffActivation: string = 'Overall';
 
   @state() private _sorting: SortingState = [];
-  @state() private columns: ColumnDef<RowEntry>[] = [];
+  @state() private columns: ColumnDef<SingleGeneralState>[] = [];
 
-  private table?: Table<RowEntry>;
-  @state() private tableData: RowEntry[] = [];
-  private tableController = new TableController<RowEntry>(this);
+  private table?: Table<SingleGeneralState>;
+  @state() private tableData: SingleGeneralState[] = [];
+  private tableController = new TableController<SingleGeneralState>(this);
 
-  private data?: data.PairData;
+  private data?: data.SingleData;
 
   static styles: CSSResultGroup = [
     SpectrumTokensCSS,
@@ -77,12 +76,12 @@ export class PairTable extends LitElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
-    const qr = this.querySelector('pair-data');
+    const qr = this.querySelector('single-data');
     if (qr) {
       if (DEBUG) {
         console.log('found data');
       }
-      this.data = qr as data.PairData;
+      this.data = qr as data.SingleData;
     }
     if (this.data) {
       this.data.generalStore.store.subscribe(() => {
@@ -101,8 +100,8 @@ export class PairTable extends LitElement {
     this.columns = this.generateColumns();
   }
 
-  protected generateColumns: () => ColumnDef<RowEntry>[] = () => {
-    const columns: ColumnDef<RowEntry>[] = [
+  protected generateColumns: () => ColumnDef<SingleGeneralState>[] = () => {
+    const columns: ColumnDef<SingleGeneralState>[] = [
       {
         id: 'rowIndex',
         header: '#',
@@ -134,10 +133,9 @@ export class PairTable extends LitElement {
         return true;
       })
       .map((key) => {
-        const accessorFn = (row: RowEntry) => {
+        const accessorFn = (row: SingleGeneralState) => {
           if (!row) return null;
           else if (key === 'primary') return row.primary;
-          else if (key === 'secondary') return row.secondary;
           else {
             if (!row.data) {
               return undefined;
@@ -149,14 +147,14 @@ export class PairTable extends LitElement {
           id: key,
           accessorFn,
           enableSorting: true,
-          sortDescFirst: key !== 'primary' && key !== 'secondary',
-          cell: (info: CellContext<RowEntry, unknown>) => {
+          sortDescFirst: key !== 'primary',
+          cell: (info: CellContext<SingleGeneralState, unknown>) => {
             const value = info.getValue();
             return typeof value === 'number'
               ? value.toLocaleString()
               : (value ?? '');
           },
-          header: (info: HeaderContext<RowEntry, unknown>) => {
+          header: (info: HeaderContext<SingleGeneralState, unknown>) => {
             const sortIndex = info.table
               .getState()
               .sorting.findIndex((s) => s.id === info.column.id);
@@ -191,7 +189,7 @@ export class PairTable extends LitElement {
     if (!this.data) return;
     this.tableData = this.data.generalStore.store.state.catalog
       .map((ce) => {
-        const key = pairKey(ce.primary, ce.secondary);
+        const key = ce.primary;
         const entry = this.data?.generalStore.store.state.rows[key];
         return entry;
       })
@@ -203,12 +201,7 @@ export class PairTable extends LitElement {
         return true;
       })
       .sort((a, b) => {
-        const p = a.primary.localeCompare(b.primary);
-        if (!p) {
-          return a.secondary.localeCompare(b.secondary);
-        } else {
-          return p;
-        }
+        return a.primary.localeCompare(b.primary);
       });
   };
 
@@ -235,7 +228,7 @@ export class PairTable extends LitElement {
     return html`
       ${DEBUG ? html` table is ${typeof this.table} ` : ''}
       <div
-        class="general-pairs-table spectrum-Table spectrum-Table-scroller spectrum-Table--quiet spectrum-Table--sizeM spectrum-Table--compact"
+        class="generals-table spectrum-Table spectrum-Table-scroller spectrum-Table--quiet spectrum-Table--sizeM spectrum-Table--compact"
       >
         <table class="spectrum-Table-main">
           <thead class="spectrum-Table-head">

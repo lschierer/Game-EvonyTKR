@@ -14,10 +14,10 @@ import {
 } from '../../Game/EvonyTKR/Shared/Constants';
 
 import { SpecialtyStore } from '../specialtyStore';
-import { pairKey, PairStore } from './singleStore';
+import { GeneralStore } from './singleStore';
 import { PrimaryFilterStore } from './generalFilterStore';
 
-export class PairData extends LitElement {
+export class SingleData extends LitElement {
   static VERSION = '0.3';
   readonly ascendingMap: AscendingOptions = {
     none: 'None',
@@ -70,7 +70,7 @@ export class PairData extends LitElement {
   specialties = new SpecialtyStore();
 
   @property({ attribute: false })
-  generalStore: PairStore = new PairStore();
+  generalStore: GeneralStore = new GeneralStore();
 
   @property({ attribute: false })
   buffFilter: PrimaryFilterStore = new PrimaryFilterStore();
@@ -81,7 +81,7 @@ export class PairData extends LitElement {
   connectedCallback(): void {
     super.connectedCallback();
     if (DEBUG) {
-      console.log(`version is ${PairData.VERSION}`);
+      console.log(`version is ${SingleData.VERSION}`);
     }
     this.ascendingLevel.subscribe(() => {
       this.updateFilterParams();
@@ -112,17 +112,15 @@ export class PairData extends LitElement {
     this.queryParams.setState(params);
   }
 
-  protected renderPairStoreDebug = () => {
+  protected renderSingleStoreDebug = () => {
     const rowsTemplate = this.generalStore.store.state.catalog.map((entry) => {
-      const key = pairKey(entry.primary, entry.secondary);
+      const key = entry.primary;
       const value = this.generalStore.store.state.rows[key];
       return html`
         <dd>
           <dl>
             <dt>Primary:</dt>
             <dd>${entry.primary}</dd>
-            <dt>Secondary:</dt>
-            <dd>${entry.secondary}</dd>
             <dt>State:</dt>
             <dd>${value ? value.state : 'missing'}</dd>
             <dt>Data:</dt>
@@ -140,7 +138,7 @@ export class PairData extends LitElement {
         <dd>${this.generalStore.store.state.runId}</dd>
         <dt>catalog</dt>
         ${this.generalStore.store.state.catalog.map((ce) => {
-          return html` <dd>${ce.primary} / ${ce.secondary}</dd> `;
+          return html` <dd>${ce.primary}</dd> `;
         })}
         <dt>streaming</dt>
         <dd>${this.generalStore.store.state.streaming}</dd>
@@ -169,9 +167,9 @@ export class PairData extends LitElement {
     return html`
       ${DEBUG
         ? html`
-            <div class="pair-store">
-              <h4>Pair Store</h4>
-              ${this.renderPairStoreDebug()}
+            <div class="single-store">
+              <h4>Single Store</h4>
+              ${this.renderSingleStoreDebug()}
             </div>
             <div class="primary">
               <h4>General Buff Filter Options</h4>
@@ -194,5 +192,5 @@ export class PairData extends LitElement {
   }
 }
 if (!customElements.get('single-data')) {
-  customElements.define('single-data', PairData);
+  customElements.define('single-data', SingleData);
 }

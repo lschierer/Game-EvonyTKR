@@ -4,24 +4,24 @@ console.log(`DEBUG is set to ${DEBUG} for ${__FILE_PATH__}`);
 
 import { customElement } from 'lit/decorators.js';
 
-import { PairData } from './data';
+import { SingleData } from './data';
 import { LitElement, html, type TemplateResult } from 'lit';
 
 @customElement('state-manager')
 export class StateManager extends LitElement {
-  protected data?: PairData;
+  protected data?: SingleData;
 
   protected render(): TemplateResult {
     return html`<slot></slot>`;
   }
 
   connectedCallback(): void {
-    const qr = this.querySelector('pair-data');
+    const qr = this.querySelector('single-data');
     if (qr) {
       if (DEBUG) {
         console.log('found data');
       }
-      this.data = qr as PairData;
+      this.data = qr as SingleData;
     }
     if (this.data) {
       this.data.queryParams.subscribe(() => {
@@ -57,9 +57,9 @@ export class StateManager extends LitElement {
 
         let refresh: boolean = false;
         // if there are *less* rows, the change to the ignore state will be
-        // picked up by a pairStore subscription
+        // picked up by a singleStore subscription
         // if the row count is the *same* I test if all the values are the same
-        // if the values have changed, there is at least one pair I need new data
+        // if the values have changed, there is at least one general I need new data
         // for, and I need to refresh.
         // if there are *more rows* then there *must be* new data needed.
         if (current.length > previous.length) {

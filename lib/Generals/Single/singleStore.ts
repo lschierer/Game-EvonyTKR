@@ -5,49 +5,31 @@ console.log(`DEBUG is set to ${DEBUG} for ${__FILE_PATH__}`);
 import { Store } from '@tanstack/store';
 import z from 'zod';
 
-import { GeneralPair, GeneralPairStub } from '../GeneralRowSchemas';
+import { GeneralData, SingleGeneralState } from '../GeneralRowSchemas';
 
-const GPSA = GeneralPairStub.array();
-type GPSA = z.infer<typeof GPSA>;
+const GSA = SingleGeneralState.array();
+type GSA = z.infer<typeof GSA>;
 
-// Stable row key: "Primary ␟ Secondary" (use a char you're sure won’t appear in names)
-const SEP = '\u241F'; // SYMBOL FOR UNIT SEPARATOR
-export const pairKey = (p: string, s: string) => `${p}${SEP}${s}`;
+type GeneralRecord = Record<string, SingleGeneralState>;
 
-export type Key = string;
-
-export type RowState = 'stale' | 'pending' | 'current' | 'error' | 'ignore';
-export interface Stub {
-  primary: string;
-  secondary: string;
-}
-
-export interface RowEntry {
-  key: Key;
-  primary: string;
-  secondary: string;
-  state: RowState; // UI state
-  data?: GeneralPair; // present once fetched/validated
-}
-
-interface PairsState {
+interface GeneralState {
   // Catalog sent first by the server as “stubs”
-  catalog: Array<Stub>;
+  catalog: Array<SingleGeneralState>;
   catalogRev: number; // bump when catalog changes (to signal menus)
 
   // Fast lookup for rows (both stub-only and full data)
-  rows: Record<Key, RowEntry>;
+  rows: GeneralRecord;
 
   // Streaming run control
   runId: number;
   streaming: 'idle' | 'open' | 'closing';
 }
 
-export class PairStore {
+export class GeneralStore {
   readonly sessionId: Store<string> = new Store<string>('');
   protected _currentES?: EventSource;
 
-  readonly store: Store<PairsState> = new Store<PairsState>(
+  readonly store: Store<GeneralState> = new Store<GeneralState>(
     {
       catalog: [],
       catalogRev: 0,
@@ -59,7 +41,7 @@ export class PairStore {
       updateFn: (prev) => (updater) => {
         const next =
           typeof updater === 'function'
-            ? (updater as (p: PairsState) => PairsState)(prev)
+            ? (updater as (p: GeneralState) => GeneralState)(prev)
             : updater;
 
         return next;
@@ -75,7 +57,7 @@ export class PairStore {
     return this.store.subscribe(cb);
   }
 
-  public setCatalog(stubs: GPSA) {
+  public setCatalog(stubs: GSA) {
     this.store.setState((prev) => {
       if (!stubs) {
         if (DEBUG) {
@@ -89,19 +71,17 @@ export class PairStore {
         }
         return prev;
       }
-      const catalog = stubs.map((s) => ({
-        primary: s.primary.name,
-        secondary: s.secondary.name,
+      const catalog: GSA = stubs.map((s) => ({
+        primary: s.primary,
       }));
 
       // Build/refresh rows map from stubs; keep any existing data if keys match
-      const rows: Record<Key, RowEntry> = { ...prev.rows };
-      for (const { primary, secondary } of catalog) {
-        const key = pairKey(primary, secondary);
-        const existing = rows[key];
-        rows[key] = existing
-          ? { ...existing, primary, secondary }
-          : { key, primary, secondary, state: 'stale' };
+      const rows: GeneralRecord = { ...prev.rows };
+      for (const { primary } of catalog) {
+        const existing = rows[primary];
+        rows[primary] = existing
+          ? { ...existing, primary }
+          : { primary, state: 'stale' };
       }
 
       return {
@@ -110,7 +90,7 @@ export class PairStore {
         catalogRev: prev.catalogRev + 1,
         rows,
         receivedCount: 0, // will increment as full rows arrive
-      } as PairsState;
+      } as GeneralState;
     });
   }
 
@@ -118,7 +98,7 @@ export class PairStore {
     const isUpdate: boolean = selectedPrimaries.length !== 0;
 
     let path = window.location.pathname;
-    path = path.replace('-comparison', '/data.json');
+    path = path.replace('comparison', 'data.json');
     const catalogUrl = new URL(path, window.location.toString());
     if (DEBUG) {
       console.log(`using catalog Url ${catalogUrl.toString()}`);
@@ -135,10 +115,10 @@ export class PairStore {
     }
     const ro = (await response.json()) as {
       sessionId: string;
-      selected: GPSA;
+      selected: GSA;
     };
 
-    const valid = GPSA.safeParse(ro.selected);
+    const valid = GSA.safeParse(ro.selected);
     if (!valid.success) {
       console.error('invalid catalog payload');
       return;
@@ -147,7 +127,7 @@ export class PairStore {
     const sp = new Set<string>();
     if (valid.success) {
       valid.data.map((s) => {
-        sp.add(s.primary.name);
+        sp.add(s.primary);
       });
     }
 
@@ -165,25 +145,25 @@ export class PairStore {
     return [...this.store.state.catalog];
   };
 
-  public togglePairIgnoreState(primaryName: string, secondaryName: string) {
-    const key = pairKey(primaryName, secondaryName);
-    const pair = this.store.state.rows[key];
-    if (pair) {
-      if (pair.state === 'ignore') {
-        pair.state = 'stale';
+  public toggleIgnoreState(primaryName: string) {
+    const key = primaryName;
+    const row = this.store.state.rows[key];
+    if (row) {
+      if (row.state === 'ignore') {
+        row.state = 'stale';
       } else {
-        pair.state = 'ignore';
+        row.state = 'ignore';
       }
     }
     const rows = {
       ...this.store.state.rows,
-      [key]: pair,
+      [key]: row,
     };
     this.store.setState((prev) => {
       return {
         ...prev,
         rows,
-      } as PairsState;
+      } as GeneralState;
     });
   }
 
@@ -191,17 +171,17 @@ export class PairStore {
     if (DEBUG) {
       console.log(`toggling all for ${primaryName}`);
     }
-    const pairs = this.store.state.catalog.filter((ce) => {
+    const rows = this.store.state.catalog.filter((ce) => {
       if (!ce.primary.localeCompare(primaryName)) {
         return true;
       }
       return false;
     });
     if (DEBUG) {
-      console.log(`toggling ${pairs.length} for ${primaryName}`);
+      console.log(`toggling ${rows.length} for ${primaryName}`);
     }
-    pairs.forEach((pair) => {
-      this.togglePairIgnoreState(pair.primary, pair.secondary);
+    rows.forEach((row) => {
+      this.toggleIgnoreState(row.primary);
     });
   }
 
@@ -209,7 +189,7 @@ export class PairStore {
     if (DEBUG) {
       console.log('upsertRowFromStream called with runId:', runId);
     }
-    const parsed = GeneralPair.safeParse(payload);
+    const parsed = GeneralData.safeParse(payload);
     if (!parsed.success) {
       if (DEBUG) {
         console.error('invalid payload: ', parsed.error);
@@ -219,9 +199,9 @@ export class PairStore {
       console.log(`received row event: `, JSON.stringify(parsed.data));
     }
     const gp = parsed.data;
-    const key = pairKey(gp.primary.name, gp.secondary.name);
+    const key = gp.primary.name;
 
-    this.store.setState((prev: PairsState) => {
+    this.store.setState((prev: GeneralState) => {
       // Ignore old runs
       if (runId !== prev.runId) {
         if (DEBUG) {
@@ -245,10 +225,8 @@ export class PairStore {
           [key]: old,
         };
       } else {
-        const baseRow: RowEntry = {
-          key,
+        const baseRow: SingleGeneralState = {
           primary: gp.primary.name,
-          secondary: gp.secondary.name,
           state: 'current',
           data: gp,
         };
@@ -258,7 +236,7 @@ export class PairStore {
         };
       }
 
-      return { ...prev, rows } as PairsState;
+      return { ...prev, rows } as GeneralState;
     });
   }
 
@@ -288,7 +266,7 @@ export class PairStore {
     );
   }
 
-  protected openPairsStream(
+  protected openDetailsStream(
     url: string,
     params: URLSearchParams,
     sessionId: string,
@@ -329,16 +307,15 @@ export class PairStore {
       }
     };
 
-    es.addEventListener('pair', (e: MessageEvent) => {
+    es.addEventListener('row', (e: MessageEvent) => {
       const jsonString = atob(e.data);
       const msg = JSON.parse(jsonString);
       if (DEBUG) {
-        console.log('parsed pair message:', msg);
+        console.log('parsed row message:', msg);
       }
-      // Suggested shape for server event: { runId: number, data: GeneralPair }
       if (msg.runId !== runId) {
         if (DEBUG) {
-          console.warn(`pair event runId mismatch: ${msg.runId} !== ${runId}`);
+          console.warn(`row event runId mismatch: ${msg.runId} !== ${runId}`);
         }
         return; // guard
       }
@@ -374,7 +351,7 @@ export class PairStore {
     }
 
     let sp = window.location.pathname;
-    sp = sp.replace('-comparison', '-details-stream');
+    sp = sp.replace('comparison', '1/details-stream');
     const streamUrl = new URL(sp, window.location.toString());
 
     if (!!this._currentES) {
@@ -386,7 +363,7 @@ export class PairStore {
       }
       this._currentES.close();
     }
-    this._currentES = this.openPairsStream(
+    this._currentES = this.openDetailsStream(
       streamUrl.toString(),
       params,
       this.sessionId.state,

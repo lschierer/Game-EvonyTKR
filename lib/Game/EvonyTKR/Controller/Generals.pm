@@ -186,7 +186,7 @@ package Game::EvonyTKR::Controller::Generals {
     )->name('General_dynamic_pairTable');
 
     # two routes to generate the lists of names
-    $mainRoutes->get('/:uiTarget/:buffActivation/data.json')->to(
+    $mainRoutes->any(['GET', 'POST'] => '/:uiTarget/:buffActivation/data.json')->to(
       controller => 'Generals',
       action     => 'singleCatalog',
     )->name('Generals_dynamic_singleData');
@@ -554,6 +554,7 @@ package Game::EvonyTKR::Controller::Generals {
       generalType    => $generalType,
       buffActivation => $buffActivation,
       uiTarget       => $uiTarget,
+      PrimaryFormTitle  => $generalType =~ /Mayor/i ? 'Mayor' : 'General',
     );
 
     my $markdown_path =
@@ -736,9 +737,9 @@ package Game::EvonyTKR::Controller::Generals {
       sprintf('There are %s generals to return.', scalar(@selected)));
 
     # Return just the basic name information without computing buffs
-    my @names = map { $_->name } @selected;
+    my @names = map { {primary => $_->name } } @selected;
 
-    @names = sort(@names);
+    @names = sort { $a->{primary} cmp $b->{primary} } @names;
 
     # if there were requested primaries, filter to only include those
     if (scalar @$requested_generals) {
@@ -909,7 +910,7 @@ package Game::EvonyTKR::Controller::Generals {
     $logger->debug(sprintf(
       'session info: sessionId: "%s"; selected: %s',
       $session_id // 'Not Present',
-      join ', ', @$selected
+      join ', ', map { $_->{primary} } @$selected
     ));
 
     # Lookup route metadata
@@ -959,7 +960,7 @@ package Game::EvonyTKR::Controller::Generals {
     $validated_params->{typeMap}        = $typeMap;
 
     my $valid = {};
-    map { $valid->{$_} => 1 } @$selected;
+    map { $valid->{ $_->{primary} } => 1 } @$selected;
     foreach my $general (sort { $a->name cmp $b->name }
       values $gm->get_all_generals()->%*) {
 
@@ -968,14 +969,6 @@ package Game::EvonyTKR::Controller::Generals {
       }
       elsif (any { $_ eq $generalType } $general->type->@*) {
         push @$rows, $general;
-      }
-      if ($validated_params) {
-
-        push @$rows,
-          {
-          general => $general,
-          params  => $validated_params,
-          };
       }
     }
 
@@ -1000,6 +993,10 @@ package Game::EvonyTKR::Controller::Generals {
         $subprocess->on(
           progress => sub ($subprocess, @data) {
             my ($result) = @data;
+            if(!$c->tx || $c->tx->is_finished){
+              $logger->info("transaction finished before write_sse called for $result");
+              return;
+            }
             $logger->debug("progress event detected");
             $c->write_sse({ type => 'row', text => $result });
           }
@@ -1024,13 +1021,8 @@ package Game::EvonyTKR::Controller::Generals {
               specialty4     => $validated_params->{specialties}->[3],
             );
             # Do all the heavy computation here
-            $summarizer->updateBuffsAndDebuffs(
-              $validated_params->{route_meta}->{generalType},
-              $validated_params->{ascendingLevel},
-              $validated_params->{covenantLevel},
-              $validated_params->{specialties},
-              $validated_params->{buffActivation}
-            );
+            $summarizer->updateBuffs();
+            $summarizer->updateDebuffs();
 
             my $buffKey =
               $validated_params->{route_meta}->{generalType} =~ s/_/ /r;
@@ -1040,7 +1032,7 @@ package Game::EvonyTKR::Controller::Generals {
 
             # build the row payload
             my $row = {
-              general     => $general->to_hash,
+              primary     => $general->to_hash,
               attackbuff  => $summarizer->buffValues->{$buffKey}{'Attack'},
               defensebuff => $summarizer->buffValues->{$buffKey}{'Defense'},
               hpbuff      => $summarizer->buffValues->{$buffKey}{'HP'},
@@ -1083,12 +1075,11 @@ package Game::EvonyTKR::Controller::Generals {
             my $result = encode_base64($payload);
             $subprocess->progress($result);
           }
-      # sleep to allow the event to be caught before the subprocess is harvested
-      # once the subprocess is harvested, the listener is also harvested
-          sleep(5);
+
         })->catch(sub {
+          my $err = shift;
           $logger->error(
-            sprintf('error in promise for subloop %s to %s', $start, $end));
+            sprintf('error in promise for subloop %s to %s : "%s". ', $start, $end, $err ? $err : 'Unknown'));
           return undef;    # Return something so map can continue
         });
         ;                  # Same as before
@@ -1104,6 +1095,7 @@ package Game::EvonyTKR::Controller::Generals {
     # If the browser closes, remove the stored session
     $c->on(
       finish => sub {
+        $_->kill('TERM') for @subs;
         if (exists $session_store->{$session_id}) {
           delete $session_store->{$session_id};
         }
@@ -1246,6 +1238,10 @@ package Game::EvonyTKR::Controller::Generals {
         $subprocess->on(
           progress => sub ($subprocess, @data) {
             my ($result) = @data;
+            if(!$c->tx || $c->tx->is_finished){
+              $logger->info("transaction finished before write_sse called for $result");
+              return;
+            }
             $logger->debug("progress event detected");
             $c->write_sse({ type => 'pair', text => $result });
           }
@@ -1320,9 +1316,7 @@ package Game::EvonyTKR::Controller::Generals {
             my $result = encode_base64($payload);
             $subprocess->progress($result);
           }
-      # sleep to allow the event to be caught before the subprocess is harvested
-      # once the subprocess is harvested, the listener is also harvested
-          sleep(5);
+
         })->catch(sub {
           $logger->error(
             sprintf('error in promise for subloop %s to %s', $start, $end));
@@ -1341,6 +1335,7 @@ package Game::EvonyTKR::Controller::Generals {
     # If the browser closes, remove the stored session
     $c->on(
       finish => sub {
+         $_->kill('TERM') for @subs;
         if (exists $session_store->{$session_id}) {
           delete $session_store->{$session_id};
         }
@@ -1390,7 +1385,7 @@ package Game::EvonyTKR::Controller::Generals {
     };
   }
 
-  sub validateSingleParams($self, $c) {
+  sub validateSingleParams($c) {
     my $data_model = Game::EvonyTKR::Model::Data->new();
 
     my $isPrimary      = $c->param('isPrimary')      // 1;

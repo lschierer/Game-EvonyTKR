@@ -47,12 +47,12 @@ export const RowState = z.literal([
 ]);
 export type RowState = z.infer<typeof RowState>;
 
-export const GeneralDataStub = z.object({
-  primary: z.object({ name: z.string() }),
-  current: RowState.optional(),
-  runId: z.number().optional(),
+export const SingleGeneralState = z.object({
+  primary: z.string(),
+  state: RowState.optional(),
+  data: GeneralData.optional(),
 });
-export type GeneralDataStub = z.infer<typeof GeneralDataStub>;
+export type SingleGeneralState = z.infer<typeof SingleGeneralState>;
 
 export const GeneralPairStub = z.object({
   primary: z.object({ name: z.string() }),

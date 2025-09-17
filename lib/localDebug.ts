@@ -14,6 +14,13 @@ const fileDebug: Record<string, boolean> = {
   'lib/Generals/Pair/pairStore.ts': false,
   'lib/Generals/UrlBinder.ts': false,
   'lib/Generals/specialtyStore.ts': false,
+  'lib/Generals/Single/buffFilter.ts': true,
+  'lib/Generals/Single/data.ts': true,
+  'lib/Generals/Single/generalFilterStore.ts': true,
+  'lib/Generals/Single/singleStore.ts': true,
+  'lib/Generals/Single/SinglePicker.ts': true,
+  'lib/Generals/Single/SingleTable.ts': true,
+  'lib/Generals/Single/StateManager.ts': true,
 };
 
 function isAbsolutePath(path: string): boolean {

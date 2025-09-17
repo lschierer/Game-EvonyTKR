@@ -24,7 +24,7 @@ import SpectrumPopOver from '@spectrum-css/popover/dist/index.css' with { type: 
 import SpectrumTokensCSS from '@spectrum-css/tokens/dist/index.css' with { type: 'css' };
 import LevelSettingsFormCSS from '../../../share/public/css/level_settings_form.css' with { type: 'css' };
 
-import { type PairData } from './data';
+import { type SingleData } from './data';
 import {
   //AscendingAttributeLevelValues,
   type CovenantCategoryOptions,
@@ -35,8 +35,8 @@ import {
 
 import { UrlBinder, type ParamRow } from '../UrlBinder';
 
-@customElement('pair-filter')
-export class PairFilter extends LitElement {
+@customElement('buff-filter')
+export class BuffFilter extends LitElement {
   static styles: CSSResultGroup = [
     SpectrumTokensCSS,
     SpectrumButton,
@@ -52,7 +52,7 @@ export class PairFilter extends LitElement {
     LevelSettingsFormCSS,
   ];
 
-  protected data?: PairData;
+  protected data?: SingleData;
 
   @property({ type: Boolean })
   public is_primary: boolean = false;
@@ -73,12 +73,12 @@ export class PairFilter extends LitElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
-    const qr = this.querySelector('pair-data');
+    const qr = this.querySelector('single-data');
     if (qr) {
       if (DEBUG) {
         console.log('found data');
       }
-      this.data = qr as PairData;
+      this.data = qr as SingleData;
       const rows = this.UrlParamHandler();
       if (rows) {
         this.binder = new UrlBinder(rows);
@@ -185,10 +185,10 @@ export class PairFilter extends LitElement {
   protected renderCovenantCombo = () => {
     let template = html``;
     if (this.data) {
-      for (const key of Object.keys(PairFilter.covenantCategoryOptions)) {
+      for (const key of Object.keys(BuffFilter.covenantCategoryOptions)) {
         const value =
-          PairFilter.covenantCategoryOptions[
-            key as keyof typeof PairFilter.covenantCategoryOptions
+          BuffFilter.covenantCategoryOptions[
+            key as keyof typeof BuffFilter.covenantCategoryOptions
           ];
         const selected = !this.data.covenantLevel.state.localeCompare(key);
         template = html`${template}
@@ -242,7 +242,7 @@ export class PairFilter extends LitElement {
 
       return html`
         <option value=${opt} ?selected=${selected} ?disabled=${disabled}>
-          ${PairFilter.specialtyLevelOptions[opt]}
+          ${BuffFilter.specialtyLevelOptions[opt]}
         </option>
       `;
     };

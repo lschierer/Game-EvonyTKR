@@ -26,10 +26,10 @@ import SpectrumPopOver from '@spectrum-css/popover/dist/index.css' with { type: 
 import SpectrumTokensCSS from '@spectrum-css/tokens/dist/index.css' with { type: 'css' };
 import SpectrumTextField from '@spectrum-css/textfield/dist/index.css' with { type: 'css' };
 
-import { PairData } from './data';
+import { SingleData } from './data';
 
-@customElement('pair-picker')
-export class PairPicker extends LitElement {
+@customElement('general-picker')
+export class GeneralPicker extends LitElement {
   static styles: CSSResultGroup = [
     SpectrumTokensCSS,
     SpectrumButton,
@@ -93,7 +93,7 @@ export class PairPicker extends LitElement {
     `,
   ];
 
-  protected data?: PairData;
+  protected data?: SingleData;
 
   @property({ type: String })
   public generalFilterLabel: String = 'General';
@@ -109,12 +109,12 @@ export class PairPicker extends LitElement {
     this.menuOpen.subscribe(() => this.requestUpdate());
     this.filterText.subscribe(() => this.requestUpdate());
 
-    const qr = this.querySelector('pair-data');
+    const qr = this.querySelector('single-data');
     if (qr) {
       if (DEBUG) {
         console.log('found data');
       }
-      this.data = qr as PairData;
+      this.data = qr as SingleData;
       this.data.buffFilter.subscribe(() => this.requestUpdate());
     }
     if (this.data) {
