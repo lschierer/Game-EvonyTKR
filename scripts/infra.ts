@@ -27,7 +27,7 @@ const envConfigs: Record<string, EnvConfig> = {
     subdomain: 'www',
     desiredCount: 2,
     cpu: 4096,
-    memory: 6144,
+    memory: 8192,
     imageTag: 'stable',
   },
 };
