@@ -1,0 +1,31 @@
+name: Sun King
+text: >-
+  Increases mounted troops' attack, defense and HP by 40% when General is leading the army to attack.
+  Increases mounted troops' attack by another 15% when General brings any Dragon or Spiritual Beast to attack.
+buffs:
+  - attribute: Attack
+    targetedType: Mounted Troops
+    conditions:
+      - Attacking
+    value:
+      number: 40
+  - attribute: Defense
+    targetedType: Mounted Troops
+    conditions:
+      - Attacking
+    value:
+      number: 40
+  - attribute: HP
+    targetedType: Mounted Troops
+    conditions:
+      - Attacking
+    value:
+      number: 40
+  - attribute: Attack
+    targetedType: Mounted Troops
+    conditions:
+      - brings a dragon
+      - brings a spiritual beast
+      - Attacking
+    value:
+      number: 15
