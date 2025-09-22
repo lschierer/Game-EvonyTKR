@@ -1,6 +1,7 @@
 import { App } from 'aws-cdk-lib';
 
 import { MojoliciousStack } from '../share/infrastructure/lib/infra-stack.ts';
+import { MojoliciousStack as Mojo2 } from 'share/infrastructure/lib/main-stack.ts';
 
 const app = new App();
 
@@ -50,6 +51,28 @@ new MojoliciousStack(app, `evonytkrtips-${environment}-stack`, {
   desiredCount: config.desiredCount,
   ecrRepositoryName: 'evonytkrtips', // ECR repository name
   imageTag: config.imageTag,
+  env: {
+    account: '699040795025',
+    region: 'us-east-2',
+  },
+  crossRegionReferences: true,
+  tags: {
+    Environment: environment,
+    Application: 'EvonyTKRTips',
+  },
+});
+
+new Mojo2(app, `evonytkrtips-${environment}-stack2`, {
+  environment: environment,
+  CidrRange: config.CidrRange,
+  domainName: 'evonytkrtips.net', // Your Route53 domain
+  appSubdomain: config.subdomain,
+  hostedZoneId: hostedZoneId, // Your Route53 hosted zone ID
+  zoneName: zoneName,
+  mojoPort: 3000, // Port your Mojolicious app listens on
+  cpu: config.cpu,
+  memory: config.memory,
+  desiredCount: config.desiredCount,
   env: {
     account: '699040795025',
     region: 'us-east-2',
