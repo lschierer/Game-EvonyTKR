@@ -39,6 +39,8 @@ package Game::EvonyTKR::Controller::Generals {
 
   my $session_store = {};
 
+  my $max_concurrency = 5;
+
   sub getReferenceBase($self) {
     return $reference_base;
   }
@@ -984,7 +986,7 @@ package Game::EvonyTKR::Controller::Generals {
     }
 
     Mojo::Promise->map(
-      { concurrency => 5 },    # This replaces your unlimited spawning
+      { concurrency => $max_concurrency },    # This replaces your unlimited spawning
       sub {
         my ($start, $end) = @{ $_[0] };    # Current batch range
         $logger->debug("processing $start to $end");
@@ -1229,7 +1231,7 @@ package Game::EvonyTKR::Controller::Generals {
     }
 
     Mojo::Promise->map(
-      { concurrency => 5 },    # This replaces your unlimited spawning
+      { concurrency => $max_concurrency },    # This replaces your unlimited spawning
       sub {
         my ($start, $end) = @{ $_[0] };    # Current batch range
         $logger->debug("processing $start to $end");
