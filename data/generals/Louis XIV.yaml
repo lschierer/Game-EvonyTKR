@@ -1,0 +1,24 @@
+ascending: 1
+basic_attributes:
+  attack:
+    base: 133
+    increment: 8.93
+  defense:
+    base: 121
+    increment: 8.64
+  leadership:
+    base: 128
+    increment: 8.75
+  politics:
+    base: 115
+    increment: 8.53
+book: Sun King
+name: Louis XIV
+specialties:
+  - Mounted Troop Formation
+  - Annihilation
+  - Mounted Troop Ares
+  - I am the state
+stars: red5
+type:
+  - mounted_specialist

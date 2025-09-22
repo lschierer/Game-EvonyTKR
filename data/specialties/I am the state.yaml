@@ -1,0 +1,122 @@
+name: I am the state
+levels:
+  - level: green
+    text: >-
+      Attacking Mounted Troop Attack +5%.
+      Attacking mounted Troop Defense +4%.
+      Attacking mounted Troop HP +4%.
+    buffs:
+      - attribute: Attack
+        troop: Mounted Troops
+        conditions:
+          - Attacking
+        value:
+          number: 5
+      - attribute: Defense
+        troop: Mounted Troops
+        conditions:
+          - Attacking
+        value:
+          number: 4
+      - attribute: HP
+        troop: Mounted Troops
+        conditions:
+          - Attacking
+        value:
+          number: 4
+  - level: blue
+    text: >-
+      Attacking Mounted Troop Attack +5%.
+      Attacking mounted Troop Defense +4%.
+      Attacking mounted Troop HP +4%.
+    buffs:
+      - attribute: Attack
+        troop: Mounted Troops
+        conditions:
+          - Attacking
+        value:
+          number: 5
+      - attribute: Defense
+        troop: Mounted Troops
+        conditions:
+          - Attacking
+        value:
+          number: 4
+      - attribute: HP
+        troop: Mounted Troops
+        conditions:
+          - Attacking
+        value:
+          number: 4
+  - level: purple
+    text: >-
+      Attacking Mounted Troop Attack +10%.
+      Attacking mounted Troop Defense +8%.
+      Attacking mounted Troop HP +8%.
+    buffs:
+      - attribute: Attack
+        troop: Mounted Troops
+        conditions:
+          - Attacking
+        value:
+          number: 10
+      - attribute: Defense
+        troop: Mounted Troops
+        conditions:
+          - Attacking
+        value:
+          number: 8
+      - attribute: HP
+        troop: Mounted Troops
+        conditions:
+          - Attacking
+        value:
+          number: 8
+  - level: orange
+    text: >-
+      Attacking Mounted Troop Attack +10%.
+      Attacking mounted Troop Defense +8%.
+      Attacking mounted Troop HP +8%.
+    buffs:
+      - attribute: Attack
+        troop: Mounted Troops
+        conditions:
+          - Attacking
+        value:
+          number: 10
+      - attribute: Defense
+        troop: Mounted Troops
+        conditions:
+          - Attacking
+        value:
+          number: 8
+      - attribute: HP
+        troop: Mounted Troops
+        conditions:
+          - Attacking
+        value:
+          number: 8
+  - level: gold
+    text: >-
+      Attacking Mounted Troop Attack +20%.
+      Attacking mounted Troop Defense +16%.
+      Attacking mounted Troop HP +16%.
+    buffs:
+      - attribute: Attack
+        troop: Mounted Troops
+        conditions:
+          - Attacking
+        value:
+          number: 20
+      - attribute: Defense
+        troop: Mounted Troops
+        conditions:
+          - Attacking
+        value:
+          number: 16
+      - attribute: HP
+        troop: Mounted Troops
+        conditions:
+          - Attacking
+        value:
+          number: 16
