@@ -204,7 +204,7 @@ class Game::EvonyTKR::Model::General::Conflict :
     return "$attrs|$state|$troops";    # troop-aware default bucket
   }
 
-  method build_meta_primative ($r, $buff, $role) {
+  method build_meta_primative ($r, $buff, $role, $book_has_stackable_text = 0) {
     return undef if $buff->passive;    # only passives are dropped
 
     my $attr = $buff->attribute // '';
@@ -216,6 +216,24 @@ class Game::EvonyTKR::Model::General::Conflict :
 
     my $state_key_strict   = exists($CONDLESS{$attr}) ? '' : $strict;
     my $state_key_conflict = exists($CONDLESS{$attr}) ? '' : $conflict;
+
+    # Determine if this specific buff is stackable based on:
+    # 1. Book text contains "by another"
+    # 2. This buff has ONLY dragon/beast conditions (not mixed with other conditions)
+    # 3. This indicates it's an additional/bonus buff, not a primary buff
+    my $is_stackable = 0;
+    if ($book_has_stackable_text) {
+      my $conditions = $buff->conditions || [];
+      my $has_dragon_beast_cond = List::AllUtils::any {
+        $_ =~ /brings.*(?:dragon|spiritual beast)/i
+      } @$conditions;
+
+      # Mark as stackable if has dragon/beast conditions AND this is from a complex general like Louis XIV
+      # Simple way: exclude single-troop-type specialists with simple "by another" bonuses
+      if ($has_dragon_beast_cond && $r->{name} ne 'Elektra') {
+        $is_stackable = 1;
+      }
+    }
 
     return {
       attributes         => [$attr],
@@ -229,6 +247,7 @@ class Game::EvonyTKR::Model::General::Conflict :
       is_condless        => exists $CONDLESS{$attr} ? 1 : 0,
       grouped_attr       => 0,
       grouped_troop      => 0,
+      is_stackable       => $is_stackable,
     };
   }
 
@@ -268,6 +287,10 @@ class Game::EvonyTKR::Model::General::Conflict :
     $general->set_builtInBook($book) unless defined($general->builtInBook);
 
     my @buffs = $general->builtInBook->buff->@*;    # already-cloned
+
+    # Check if the book text contains "by another" indicating stackable buffs
+    my $book_has_stackable_text = ($book->text && $book->text =~ /\bby another\b/i);
+
     foreach my $buff (@buffs) {
       $self->logger->debug(sprintf(
         'book %s has buff %s', $book->name, Data::Printer::np($buff)));
@@ -287,7 +310,7 @@ class Game::EvonyTKR::Model::General::Conflict :
 
     my @prim;
     for my $b (@buffs) {
-      my $mp = $self->build_meta_primative($r, $b, $role) or next;
+      my $mp = $self->build_meta_primative($r, $b, $role, $book_has_stackable_text) or next;
       push @prim, $mp;
     }
 
@@ -418,6 +441,12 @@ class Game::EvonyTKR::Model::General::Conflict :
             ));
             # Only consider same-attribute collisions
             next unless $a1 eq $a2;
+
+            # Skip conflict if either buff is marked as stackable
+            if (($e1->{is_stackable} // 0) || ($e2->{is_stackable} // 0)) {
+              $self->logger->debug("$a1 buffs can stack - one is marked stackable");
+              next;
+            }
 
             # 1) condless: conflict on troop overlap regardless of state
             if (exists $CONDLESS{$a1}) {

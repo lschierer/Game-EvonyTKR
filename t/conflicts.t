@@ -61,6 +61,8 @@ my $Franz       = $RootManager->generalManager->getGeneral('Franz Joseph I');
 my $Douglas     = $RootManager->generalManager->getGeneral('Douglas');
 my $Marcus      = $RootManager->generalManager->getGeneral('Marcus Agrippa');
 my $Louis       = $RootManager->generalManager->getGeneral('Louis IX');
+my $LouisXIV    = $RootManager->generalManager->getGeneral('Louis XIV');
+my $OlavII      = $RootManager->generalManager->getGeneral('Olav II');
 
 subtest 'All Generals have types to test against' => sub {
   for my $g (values %{ $RootManager->generalManager->get_all_generals }) {
@@ -91,6 +93,8 @@ subtest 'Ensure Generals are Pressent for further tests' => sub {
   isa_ok($Douglas, ['Game::EvonyTKR::Model::General'], sprintf('%s is a ::Model::General', 'Douglas'));
   isa_ok($Marcus, ['Game::EvonyTKR::Model::General'], sprintf('%s is a ::Model::General', 'Marcus Agrippa'));
   isa_ok($Louis, ['Game::EvonyTKR::Model::General'], sprintf('%s is a ::Model::General', 'Louis IX'));
+  isa_ok($LouisXIV, ['Game::EvonyTKR::Model::General'], sprintf('%s is a ::Model::General', 'Louis XIV'));
+  isa_ok($OlavII, ['Game::EvonyTKR::Model::General'], sprintf('%s is a ::Model::General', 'Olav II'));
 
   done_testing();
 };
@@ -133,6 +137,12 @@ ok(are_generals_compatible_either_role($Marcus,$Franz), 'Marcus Agrippa/Franz Jo
 ok(are_generals_compatible_either_role($Louis, $Marcus), 'Louis IX/Marcus Agrippa work');
 ok(are_generals_compatible_either_role($Louis, $KA), 'Louis IX/King Arthur work');
 ok(are_generals_compatible_either_role($Louis, $Douglas), 'Louis IX/Douglas work');
+done_testing();
+};
+
+subtest 'Louis XIV Stackable Buffs Test' => sub {
+ok(are_generals_compatible_either_role($LouisXIV, $OlavII), 'Louis XIV/Olav II should work (stackable)');
+ok(are_generals_compatible_either_role($LouisXIV, $MARCO), 'Louis XIV/Marco Polo should work (stackable)');
 done_testing();
 };
 
