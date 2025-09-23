@@ -220,6 +220,56 @@ class Game::EvonyTKR::Model::Covenant : isa(Game::EvonyTKR::Shared::Constants) {
     return $json;
   }
 
+  sub from_hash($self, $object, $rootManager, $logger = undef) {
+    if(!exists $object->{name}){
+      if(defined($logger)){
+        $logger->logcroak('object must have name attribute.');
+        return;
+      }else {
+        croak('object must have name attribute.');
+        return;
+      }
+    }
+    my $name = $object->{name};
+    my $primary = $rootManager->generalManager->getGeneral($name);
+    unless ($primary) {
+      if(defined($logger)){
+        $logger->error("Cannot find primary general for covenant $name");
+      }
+      return;
+    }
+    if(defined($logger)) {
+      $logger->debug("found primary general for $name, starting import.");
+      $logger->debug(
+        "generals for $name are " . join(", ", @{ $object->{generals} }));
+    }
+
+    my $o = Game::EvonyTKR::Model::Covenant->new(
+      primary => $primary,
+      one     => $object->{generals}->[0],
+      two     => $object->{generals}->[1],
+      three   => $object->{generals}->[2],
+    );
+
+    foreach my $oc (@{ $object->{levels} }) {
+      my $category = $oc->{category};
+
+      # Find buffs for this category
+      my @buffs;
+      if (exists $oc->{buff}) {
+        @buffs = @{ $oc->{buff} };
+      }
+      elsif (exists $oc->{buffs}) {
+        @buffs = @{ $oc->{buffs} };
+      }
+      foreach my $ob (@buffs) {
+        my $b = Game::EvonyTKR::Model::Buff->from_hash($ob, $logger);
+        $o->addBuff($category, $b);
+      }
+    }
+    return $o;
+  }
+
 };
 1;
 

@@ -2,6 +2,7 @@ use v5.42.0;
 use experimental qw(class);
 use utf8::all;
 use File::FindLib 'lib';
+require YAML::PP;
 require Game::EvonyTKR::Model::Book::BuiltinBook;
 require Game::EvonyTKR::Model::Book::Manager;
 use namespace::clean;
@@ -89,39 +90,39 @@ package Game::EvonyTKR::Controller::Covenants {
     # register routes that cannot exist until after the manager class has
     # done its thing only after initialization
     $app->plugins->on(
-      'evonytkrtips_initialized' => sub($self, $manager) {
+      'generals_loaded' => sub($self, $manager) {
         $logger->debug(
-          "evonytkrtips_initialized sub has controller_name $controller_name.");
+          "generals_loaded sub has controller_name $controller_name.");
 
         if (not defined $manager) {
           $logger->logcroak('No Manager Defined');
         }
         my $base = getBase($self);
-        foreach my $covenant ($manager->covenantManager->get_all_covenants()) {
-          if (blessed($covenant) ne 'Game::EvonyTKR::Model::Covenant') {
-            $logger->error(
-              sprintf(
-'got a blessed: "%s" ref: "%s" instead of a  Game::EvonyTKR::Model::Covenant'
-              ),
-              blessed($covenant),
-              Scalar::Util::reftype($covenant)
-            );
-            next;
+
+        my $cd = Mojo::File->new($app->config('distDir'))->child('collections/data/covenants/');
+        for my $covenantFile ($cd->list_tree->each){
+          $logger->info(sprintf('inspecting file %s', $covenantFile));
+          my $data   = $covenantFile->slurp('UTF-8');
+          my $name = $covenantFile->basename('.yaml');
+          my $object = YAML::PP->new(
+            schema       => [qw/ + Perl /],
+            yaml_version => ['1.2', '1.1'],
+          )->load_string($data);
+
+            $logger->trace(
+            "$object imported, looks like " . Data::Printer::np($object));
+
+          if (exists $object->{name}) {
+            if ($object->{name} !~ /$name/i) {
+                $logger->error(sprintf('filename and internal name do not match for file "%s" with name "%s"',
+                $covenantFile, $object->{name}));
+            }
+            $name = $object->{name};
           }
-          elsif (!defined $covenant->primary) {
-            $logger->error("Covenant with undefined primary!! "
-                . Data::Printer::np($covenant));
-            next;
-          }
-          else {
-            $logger->debug("building route for " . $covenant->primary->name);
-          }
-          my $name = $covenant->primary->name;
-          if (!defined $name) {
-            $logger->error(
-              "primary name is undefined in covenant: " . ref $covenant);
-            next;
-          }
+
+          my $covenant = Game::EvonyTKR::Model::Covenant->from_hash($object, $manager, $logger);
+          $manager->covenantManager->add_covenant($covenant);
+          $logger->debug("building route for " . $covenant->primary->name);
 
           my $clean_name = $name;
           $clean_name =~ s{^/}{};
@@ -137,6 +138,7 @@ package Game::EvonyTKR::Controller::Covenants {
             order  => 50,
           });
         }
+        $app->plugins->emit(covenants_loaded => $manager);
       }
     );
     $logger->debug("end of register method");

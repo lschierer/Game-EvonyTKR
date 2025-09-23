@@ -3,6 +3,7 @@ use experimental qw(class);
 use utf8::all;
 use File::FindLib 'lib';
 require JSON::PP;
+require YAML::PP;
 require Mojo::Promise;
 require Mojo::IOLoop::Subprocess;
 require List::Util;
@@ -117,26 +118,45 @@ package Game::EvonyTKR::Controller::Generals {
           $logger->logcroak("general manager must be defined");
         }
 
-        while (my ($k, $v) = each %{ $gm->get_all_generals() }) {
-          $logger->debug("building Reference Routes for $k");
+        my $cd = Mojo::File->new($app->config('distDir'))->child('collections/data/generals/');
+        for my $generalFile ($cd->list_tree->each){
+          $logger->info("inspecting file $generalFile");
+          my $data = $generalFile->slurp('UTF-8');
+          my $ho = YAML::PP->new(
+            schema       => [qw/ + Perl /],
+            yaml_version => ['1.2', '1.1'],
+          )->load_string($data);
+          my $g = Game::EvonyTKR::Model::General->from_hash($ho, $logger);
+          $gm->add_general($g);
+          $logger->debug(sprintf('imported general %s from file %s', $g->name, $generalFile));
+          my $name = $g->name;
 
-          my $gr  = "/Reference/Generals/$k";
-          my $grn = "${k}ReferenceRoute";
+          $logger->debug("building Reference Routes for $name");
+
+          my $gr  = "/Reference/Generals/$name";
+          my $grn = "${name}ReferenceRoute";
           $grn =~ s/ /_/g;
 
-          $referenceRoutes->get("/$k" => { name => $k })
+          $referenceRoutes->get("/$name" => { name => $name })
             ->to(controller => 'Generals', action => 'show')
             ->name($grn);
 
           $app->add_navigation_item({
-            title  => "Detials for $k",
+            title  => "Detials for $name",
             path   => $gr,
             parent => '/Reference/Generals',
             order  => 20,
           });
-
         }
-
+        $app->plugins->emit(generals_loaded => $manager);
+        $manager->logger->info('staring conflict indexing');
+        $manager->conflictDetector->start_indexing();
+        $manager->logger->info('conflict indexing complete');
+        $app->plugins->emit(conficts_loaded => $manager);
+        $manager->logger->info("starting build pairs");
+        $manager->generalPairManager->build_pairs();
+        $manager->logger->info("build pairs complete");
+        $app->plugins->emit(pairs_loaded => $manager);
       }
     );
     # two routes for directory indices

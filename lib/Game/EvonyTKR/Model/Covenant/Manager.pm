@@ -34,6 +34,14 @@ class Game::EvonyTKR::Model::Covenant::Manager :
 
   field $covenants = {};
 
+  method add_covenant ($nc) {
+    if(Scalar::Util::blessed($nc) eq 'Game::EvonyTKR::Model::Covenant'){
+      if(!exists $covenants->{$nc->primary->name}){
+        $covenants->{$nc->primary->name} = $nc;
+      }
+    }
+  }
+
   method getCovenant ($name) {
     if (exists $covenants->{$name}) {
       return $covenants->{$name};

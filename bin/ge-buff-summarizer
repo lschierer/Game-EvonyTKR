@@ -1,0 +1,95 @@
+#!/usr/bin/env perl
+use v5.40;
+use experimental qw(class);
+use utf8::all;
+use File::FindLib 'lib';
+require Path::Tiny;
+require Data::Printer;
+require Log::Log4perl;
+require Game::EvonyTKR;
+require Game::EvonyTKR::Logger::Config;
+require Game::EvonyTKR::Shared::Constants;
+
+App::Game::EvonyTKR::External::Buff::Summarizer->new()->run($_);
+
+class App::Game::EvonyTKR::External::Buff::Summarizer : isa(Game::EvonyTKR::Shared::Constants) {
+  use Getopt::Long;
+  use Carp;
+  use Log::Log4perl qw(:levels);
+
+  field $debug_enabled = 0;
+  field $logger;
+
+  field $mode;
+
+  ADJUST {
+    my $home     = Path::Tiny::path(File::HomeDir->my_home());
+
+
+  }
+
+  method opt_spec {
+    my %opt;
+    GetOptions(
+      'debug'     => \$opt{debug},
+      'general1=s'  => \$opt{general1},
+      'general2=s'  => \$opt{general2},
+      'mode=s'      => \$opt{mode},
+    ) or die("Error in command line arguments\n");
+
+    unless(length($opt{mode})){
+      croak('--mode is required');
+    }
+    unless($opt{mode} eq 'single' or $opt{mode} eq 'pair'){
+      croak(sprintf('mode must be "single" or "pair" not "%s".', $opt{mode}));
+    }
+    $mode = $opt{mode};
+
+    unless(length($opt{general1})){
+      croak('--general1 is required');
+    }
+    if($mode eq 'pair'){
+      unless(length($opt{general2})){
+        croak('--general2 is required in pair mode');
+      }
+    } else {
+      if(length($opt{general2})){
+        croak('--general2 is not permitted in single mode');
+      }
+    }
+    return \%opt;
+  }
+
+  method run ($args){
+
+    my $opt = $self->opt_spec();
+    my $lc = Game::EvonyTKR::Logger::Config->new('Game::EvonyTKR');
+
+    my $log4perl_logger;
+    if($opt->{debug}){
+      $debug_enabled = 1;
+      $log4perl_logger = $lc->init('development');
+      $logger = Log::Log4perl->get_logger(__CLASS__);
+      $logger->level($DEBUG);
+    } else {
+      $log4perl_logger = $lc->init('production');
+      $logger = Log::Log4perl->get_logger(__CLASS__);
+    }
+
+    $self->execute($opt, $args);
+
+  }
+
+  method execute($opt, $args){
+    if($mode eq 'pair'){
+      $logger->info(sprintf('general 1 is "%s"; general 2 is "%s"',
+      $opt->{general1}, $opt->{general2}));
+    } else {
+      $logger->info(sprintf('general 1 is "%s"', $opt->{general1}));
+    }
+  }
+
+}
+1;
+
+__END__

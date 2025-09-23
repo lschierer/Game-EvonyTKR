@@ -163,6 +163,37 @@ class Game::EvonyTKR::Model::General : isa(Game::EvonyTKR::Shared::Constants) {
     return $json;
   }
 
+  sub from_hash ($self, $ho, $logger = undef) {
+    if(!exists $ho->{name}) {
+      if(defined($logger)){
+        $logger->logcroak('hash object must contain a name attribute.');
+        return undef;
+      } else {
+        croak('hash object must contain a name attribute.');
+        return undef;
+      }
+    }
+    my $o = Game::EvonyTKR::Model::General->new(
+      name            => $ho->{name},
+      type            => $ho->{type},
+      ascending       => $ho->{ascending},
+      stars           => $ho->{stars},
+      builtInBookName => $ho->{book},
+      specialtyNames  => $ho->{specialties},
+    );
+
+    foreach my $baKey (keys %{ $ho->{basic_attributes} }) {
+      my $ba = Game::EvonyTKR::Model::BasicAttribute->new(
+        attribute_name => $baKey,
+        base           => $ho->{basic_attributes}->{$baKey}->{base},
+        increment      => $ho->{basic_attributes}->{$baKey}->{increment},
+      );
+      $o->basicAttributes->setAttribute($baKey, $ba);
+    }
+
+    return $o;
+  }
+
 }
 1;
 
