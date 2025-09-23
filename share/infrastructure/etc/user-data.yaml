@@ -1,0 +1,172 @@
+#cloud-config
+package_upgrade: true
+packages:
+  - autoconf
+  - autoconf-archive
+  - automake
+  - bison
+  - certbot
+  - curl
+  - flex
+  - gcc
+  - gcc-13-locales
+  - gettext
+  - git
+  - gnu-standards
+  - libtool
+  - make
+  - nginx
+  - openssh-server
+  - python3-certbot-nginx
+  - rsync
+  - unattended-upgrades
+  - update-notifier-common
+users:
+  - default
+  - name: mojo
+    homedir: /opt/mojo
+    system: true
+    shell: /sbin/nologin
+    groups: www-data
+  - name: luke
+    shell: /bin/bash
+    sudo: 'ALL=(ALL) NOPASSWD:ALL'
+    groups: users, admin, adm, man, sudo, operator, src, staff, crontab
+    ssh_authorized_keys:
+      - ecdsa-sha2-nistp521 AAAAE2VjZHNhLXNoYTItbmlzdHA1MjEAAAAIbmlzdHA1MjEAAACFBABn9dVXygIvLoJrcSA71/PNcPRPxg0FBmU1QkVIPToc4cfBP9oiyGkiRJ33kz9zaL1lseB75XGoz01W0lex2/9zjAHGxDdo9byoemhtKlGXoWZ43rRfuZtXPQkLLFhONmVfG1eK5Bct4M314N4WrmbxyRg5froEvK10yqrPzeagleCywQ== lschiere@a07817adb134.ant.amazon.com
+      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDos5u8SSJXO8BcmKrjfUjxz8y9KwmfTXfhetEcPQ1bSCY/fIaebvKJG4YJ0OmFKBQLW63MTnKp9iScw9OQp0mE5q/EMQj30iXu/q6ufYoGG5U9NAr4D6wH9XEUvwS6TrDXGphseGDxZk1ZspfdMR+c/XAALgyNVnzhaqW7k1KNJjUzw9ZzVFTDWcYOKFPgOorQIjTmn3y1B6NhQ179N7yB/6NiOKLn3gwNB3/jm9WidnnGHXA940nFIBNv7Ml0jSRChXd/57+VahVzqAxo8NlpiKfLHQPj7VjwBA7s7/gB67X7vnr/sERda8EmEu0sWgCZ9V1i1eOn0B2SKojhXJIpI2kMLDrZIP0RR9hdgqatRE13wNTYzbGPlSUhOCDaiiHOuBYqNbFYhCfV0fPo0CuHPn/04pbFnRU5KDdsyhjk4oa90Df1oq/X3bfAtj1d0gfrt0SVBa9TUh4Hi6vYFBQ5YRmY3YPk2xUsJxnDTYmocizqYZLU6RCPwVMkZrxIOflS96LGVLoqVVLRXLm1UVAkGViWB9ezhT1fxoyjF2s9xT2oRY8bmro+cep/N8Dk9YfAGrJRjLGKu185+ssB+WfpB2ZjA3OMK+6NPwn573S4lO0ftatbqOZSUQ4U4zxZJE8gMtBs8tAhdRsBj6JRd30OB2bSWdwiaEErPzvAaW3uzQ== luke@schierer@opus001.schierer.org
+runcmd:
+  - export HOSTNAME='REPLACEHOSTNAME'; hostname ${HOSTNAME}
+  - export HOSTNAME='REPLACEHOSTNAME'; hostnamectl set-hostname ${HOSTNAME}
+  - export HOSTNAME='REPLACEHOSTNAME'; echo "127.0.1.1 ${HOSTNAME} ${HOSTNAME}.localdoamin" >> /etc/hosts
+  - apt-get update
+  - apt-get dist-upgrade -y
+  - mkdir -p /opt/mojo/var/run
+  - chown -R mojo:www-data /opt/mojo
+  - mkdir -p /opt/mojo/bin
+  - |
+    cat > /opt/mojo/bin/mojo.sh << 'EOF'
+    #!/bin/bash
+
+    source ${HOME}/.bash_profile || exit 1
+
+    cd /opt/mojo/app || exit 2
+
+    hypnotoad ./bin/game-evonytkr
+
+    HR=$?;
+
+    if [ -z "$HR" ]; then
+     exit 0;
+    else
+     echo "hypno returned $HR";
+     exit $HR;
+    fi
+
+    EOF
+  - chown -R mojo:mojo /opt/mojo
+  - chmod +x /opt/mojo/bin/mojo.sh
+  - |
+    cat > /etc/systemd/system/mojolicious.service << 'EOF'
+    [Unit]
+    Description=Game Evony TKR Mojolicious Server
+    After=network.target
+
+    [Service]
+    Type=forking
+    User=mojo
+    PIDFile=/opt/mojo/app/bin/hypnotoad.pid
+    ExecStart=/opt/mojo/bin/mojo.sh
+    ExecReload=/bin/kill -USR2 $MAINPID
+    TimeoutStartSec=900
+    KillMode=mixed
+    Restart=always
+
+    [Install]
+    WantedBy=multi-user.target
+
+    EOF
+  - |
+    export H=$( grep 127.0.1.1 /etc/hosts | cut -d ' ' -f 3 | cut -d '.' -f 1); cat > /etc/nginx/sites-available/mojoproxy << EOF
+    upstream myapp {
+      server 127.0.1.1:8080;
+    }
+    server {
+      listen                80;
+      server_name           ${H}.evonytkrtips.net www.${H}.evonytkrtips.net evonytkrtips.net;
+      return                301 https://$host$request_uri;
+    }
+    server {
+      listen 443 ssl;
+      server_name           ${H}.evonytkrtips.net www.${H}.evonytkrtips.net evonytkrtips.net;
+      ssl_certificate       /etc/nginx/ssl/evonytkrtips.net.crt;
+      ssl_certificate_key   /etc/nginx/ssl/evonytkrtips.net.key;
+      ssl_protocols         TLSv1 TLSv1.1 TLSv1.2 TLSv1.3;
+      ssl_ciphers           HIGH:!aNULL:!MD5;
+      ssl_session_timeout   15m;
+      location / {
+        proxy_pass http://myapp;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host \$host;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+      }
+    }
+    EOF
+  - ln -s /etc/nginx/sites-available/mojoproxy /etc/nginx/sites-enabled/
+  - sudo -u mojo touch /opt/mojo/.bash_profile
+  - sudo -u mojo -s /bin/bash -c "curl https://mise.run | sh"
+  - sudo -u mojo -s /bin/bash -c "echo 'eval \"\$(/opt/mojo/.local/bin/mise activate bash)\"' >> ~/.bash_profile"
+  - echo 'export PATH="/opt/mojo/.local/bin/:$HOME/bin:$PATH"' >> /opt/mojo/.bash_profile
+  - sudo -u mojo -s /bin/bash -l -c "git clone -b streaming https://github.com/lschierer/Game-EvonyTKR.git /opt/mojo/app"
+  - sudo -u mojo -s /bin/bash -l -c "cd /opt/mojo/app && mise trust"
+  - sudo -u mojo -s /bin/bash -l -c "cd /opt/mojo/app && mise install"
+  # my just file does not install these two modules nor are they included by default with perl.
+  - sudo -u mojo -s /bin/bash -l -c "cd /opt/mojo/app && cpanm -n utf8::all Module::Build"
+  - sudo -u mojo -s /bin/bash -l -c "cd /opt/mojo/app && just build"
+  - mkdir /etc/nginx/ssl
+  # if there is not a cert present where the nginx config states, then
+  # when certbot runs, it checks the ngnix config syntax for correctness and it will fail
+  - openssl req -x509 -newkey rsa:2048 -keyout /etc/nginx/ssl/evonytkrtips.net.key -out /etc/nginx/ssl/evonytkrtips.net.crt -days 365 -nodes -subj "/C=US/ST=State/L=City/O=Org/OU=OrgUnit/CN=localhost"
+  - chown -R www-data:www-data /etc/nginx/ssl
+  # sleep briefly to ensure that cdk has actually created the DNS records or certbot will fail
+  - sleep 60 && export H=$( grep 127.0.1.1 /etc/hosts | cut -d ' ' -f 3 | cut -d '.' -f 1); certbot certonly --nginx -m 'staff@schierer.org' --agree-tos -d "${H}.evonytkrtips.net" -d "www.REPLACE2.evonytkrtips.net" -d "REPLACE2.evonytkrtips.net" --non-interactive
+  - rm /etc/nginx/ssl/evonytkrtips.net.key /etc/nginx/ssl/evonytkrtips.net.crt
+  # certbot *reads* the nginx config file then ignores it and places the certs where it likes
+  - export H=$( grep 127.0.1.1 /etc/hosts | cut -d ' ' -f 3 | cut -d '.' -f 1); ln -s /etc/letsencrypt/live/${H}.evonytkrtips.net/privkey.pem /etc/nginx/ssl/evonytkrtips.net.key
+  - export H=$( grep 127.0.1.1 /etc/hosts | cut -d ' ' -f 3 | cut -d '.' -f 1); ln -s /etc/letsencrypt/live/${H}.evonytkrtips.net/fullchain.pem /etc/nginx/ssl/evonytkrtips.net.crt
+  - systemctl enable mojolicious
+  # several of the previous processes cache quite a bit, prevent OOM
+  # this is *probably* only needed in dev, as even without this it works fine
+  # on the auto retry systemctl does
+  - sync && echo 3 > /proc/sys/vm/drop_caches
+  - systemctl start mojolicious
+  - systemctl reload nginx
+  - dpkg-reconfigure -plow unattended-upgrades
+  - systemctl enable unattended-upgrades
+  - |
+    cat > /usr/local/bin/deploy-mojo << 'EOF'
+    #!/bin/bash
+    set -e
+
+    echo "Pulling latest code..."
+    sudo -u mojo -s /bin/bash -l -c "cd /opt/mojo/app && git pull"
+
+    echo "Building application..."
+    sudo -u mojo -s /bin/bash -l -c "cd /opt/mojo/app && just build"
+
+    echo "Reloading Hypnotoad..."
+    if [ -f /opt/mojo/app/bin/hypnotoad.pid ]; then
+        PID=$(cat /opt/mojo/app/bin/hypnotoad.pid)
+        sudo kill -USR2 ${PID}
+        echo "Sent USR2 to PID ${PID}"
+    else
+        echo "PID file not found, restarting service..."
+        sudo systemctl restart mojolicious
+    fi
+
+    echo "Deployment complete!"
+    EOF
+  - chmod +x /usr/local/bin/deploy-mojo

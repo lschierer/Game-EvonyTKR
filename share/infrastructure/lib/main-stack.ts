@@ -1,9 +1,8 @@
-import { Stack, type StackProps, Duration, CfnOutput } from 'aws-cdk-lib';
+import { Stack, type StackProps, Duration } from 'aws-cdk-lib';
 import { type Construct } from 'constructs';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 
 import * as route53 from 'aws-cdk-lib/aws-route53';
-import * as targets from 'aws-cdk-lib/aws-route53-targets';
 
 import * as iam from 'aws-cdk-lib/aws-iam';
 import {
@@ -28,10 +27,11 @@ export interface MojoliciousStackProps extends StackProps {
 }
 
 export class MojoliciousStack extends Stack {
+  readonly applicationURL;
   constructor(scope: Construct, id: string, props: MojoliciousStackProps) {
     super(scope, id, props);
 
-    const fullDomainName = `${props.appSubdomain}.${props.domainName}`;
+    this.applicationURL = `${props.appSubdomain}.${props.domainName}`;
 
     // Import existing hosted zone
     const hostedZone = route53.HostedZone.fromHostedZoneAttributes(
@@ -78,7 +78,25 @@ export class MojoliciousStack extends Stack {
 
     new route53.ARecord(this, 'EvonyTKRTipsDNSRecord', {
       zone: hostedZone,
-      recordName: props.appSubdomain,
+      recordName: `${props.appSubdomain}2`,
+      target: route53.RecordTarget.fromIpAddresses(
+        InstanceStack.instance.instancePublicIp,
+      ),
+      ttl: Duration.minutes(5),
+    });
+
+    new route53.ARecord(this, 'EvonyTKRTipsWWWDNSRecord', {
+      zone: hostedZone,
+      recordName: `www.${props.appSubdomain}2`,
+      target: route53.RecordTarget.fromIpAddresses(
+        InstanceStack.instance.instancePublicIp,
+      ),
+      ttl: Duration.minutes(5),
+    });
+
+    new route53.ARecord(this, 'InstanceDNSRecord', {
+      zone: hostedZone,
+      recordName: `${InstanceStack.hostname}`,
       target: route53.RecordTarget.fromIpAddresses(
         InstanceStack.instance.instancePublicIp,
       ),

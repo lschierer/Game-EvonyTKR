@@ -70,6 +70,7 @@ my $builder = Module::Build->new(
     'Mojolicious::Plugin::Module::Loader' => '0',
     'Mojolicious::Routes'                 => '0',
     'Mojolicious::Routes::Route'          => '0',
+    'Mojo::Server::Hypnotoad'             => '0',
     'Moose'                               => '0',
     'Moose::Autobox'                      => '0',
     'Pandoc'                              => '0',
