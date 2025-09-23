@@ -110,7 +110,7 @@ package Game::EvonyTKR::Controller::Generals {
     }
 
     $app->plugins->on(
-      'evonytkrtips_initialized' => sub($self, $manager) {
+      'evonytkrtips_initialized' => sub($c, $manager) {
         $logger->debug(
           "evonytkrtips_initialized sub has controller_name $controller_name.");
 
@@ -119,46 +119,32 @@ package Game::EvonyTKR::Controller::Generals {
         }
 
         my $cd = Mojo::File->new($app->config('distDir'))->child('collections/data/generals/');
-        for my $generalFile ($cd->list_tree->each){
-          $logger->info("inspecting file $generalFile");
-          my $data = $generalFile->slurp('UTF-8');
-          my $ho = YAML::PP->new(
-            schema       => [qw/ + Perl /],
-            yaml_version => ['1.2', '1.1'],
-          )->load_string($data);
-          my $g = Game::EvonyTKR::Model::General->from_hash($ho, $logger);
-          $gm->add_general($g);
-          $logger->debug(sprintf('imported general %s from file %s', $g->name, $generalFile));
-          my $name = $g->name;
+        my @files = $cd->list_tree->each;
 
-          $logger->debug("building Reference Routes for $name");
+        $logger->info("Starting async import of " . scalar(@files) . " general files");
 
-          my $gr  = "/Reference/Generals/$name";
-          my $grn = "${name}ReferenceRoute";
-          $grn =~ s/ /_/g;
+        # Import generals async
+        $self->_import_generals_async($app, \@files, $gm, $controller_name, $referenceRoutes, sub {
+          $logger->info("All generals loaded, emitting signal");
+          $app->plugins->emit(generals_loaded => $manager);
 
-          $referenceRoutes->get("/$name" => { name => $name })
-            ->to(controller => 'Generals', action => 'show')
-            ->name($grn);
+          # Start conflict processing async
+          $manager->logger->info('starting conflict indexing');
+          $self->_process_conflicts_async($manager, sub {
+            $manager->logger->info('conflict indexing complete');
+            $app->plugins->emit(conficts_loaded => $manager);
 
-          $app->add_navigation_item({
-            title  => "Detials for $name",
-            path   => $gr,
-            parent => '/Reference/Generals',
-            order  => 20,
+            # Start pair processing async
+            $manager->logger->info("starting build pairs");
+            $self->_build_pairs_async($manager, sub {
+              $manager->logger->info("build pairs complete");
+              $app->plugins->emit(pairs_loaded => $manager);
+            });
           });
-        }
-        $app->plugins->emit(generals_loaded => $manager);
-        $manager->logger->info('staring conflict indexing');
-        $manager->conflictDetector->start_indexing();
-        $manager->logger->info('conflict indexing complete');
-        $app->plugins->emit(conficts_loaded => $manager);
-        $manager->logger->info("starting build pairs");
-        $manager->generalPairManager->build_pairs();
-        $manager->logger->info("build pairs complete");
-        $app->plugins->emit(pairs_loaded => $manager);
+        });
       }
     );
+
     # two routes for directory indices
     $mainRoutes->get('/:uiTarget')->requires(is_valid_uiTarget => 1)->to(
       controller => 'Generals',
@@ -282,6 +268,105 @@ package Game::EvonyTKR::Controller::Generals {
     }
 
   }
+
+  sub _import_generals_async($self, $app, $files, $gm, $controller_name, $referenceRoutes, $callback) {
+    my $logger = Log::Log4perl->get_logger(__PACKAGE__);
+    my @files_copy = @$files;
+    my $total = @files_copy;
+    my $processed = 0;
+
+    my $process_next_batch;
+    $process_next_batch = sub {
+      my $batch_size = 5; # Process 5 files per tick
+      my $batch_count = 0;
+
+      while (@files_copy && $batch_count < $batch_size) {
+        my $generalFile = shift @files_copy;
+        $batch_count++;
+        $processed++;
+
+        eval {
+          $logger->info("importing file $generalFile ($processed/$total)");
+          my $data = $generalFile->slurp('UTF-8');
+          my $ho = YAML::PP->new(
+            schema       => [qw/ + Perl /],
+            yaml_version => ['1.2', '1.1'],
+          )->load_string($data);
+          my $g = Game::EvonyTKR::Model::General->from_hash($ho, $logger);
+          $gm->add_general($g);
+          $logger->debug(sprintf('imported general %s from file %s', $g->name, $generalFile));
+
+          # Build routes for this general
+          $self->_build_general_routes($g, $app, $controller_name, $referenceRoutes);
+        };
+        if ($@) {
+          $logger->error("Error processing $generalFile: $@");
+        }
+      }
+
+      if (@files_copy) {
+        # Schedule next batch
+        Mojo::IOLoop->next_tick($process_next_batch);
+      } else {
+        # All done
+        $callback->();
+      }
+    };
+
+    # Start processing
+    $process_next_batch->();
+  }
+
+  sub _build_general_routes($self, $general, $app, $controller_name, $referenceRoutes) {
+    my $logger = Log::Log4perl->get_logger(__PACKAGE__);
+    my $name = $general->name;
+
+    $logger->debug("building Reference Routes for $name");
+
+    my $gr  = "/Reference/Generals/$name";
+    my $grn = "${name}ReferenceRoute";
+    $grn =~ s/ /_/g;
+
+    $referenceRoutes->get("/$name" => { name => $name })
+      ->to(controller => 'Generals', action => 'show')
+      ->name($grn);
+
+    $app->add_navigation_item({
+      title  => "Details for $name",
+      path   => $gr,
+      parent => '/Reference/Generals',
+      order  => 20,
+    });
+  }
+
+  sub _process_conflicts_async($self, $manager, $callback) {
+    # Break up conflict processing into chunks
+    Mojo::IOLoop->next_tick(sub {
+      eval {
+        $manager->conflictDetector->start_indexing();
+        $callback->();
+      };
+      if ($@) {
+        $manager->logger->error("Error in conflict processing: $@");
+        $callback->(); # Continue anyway
+      }
+    });
+  }
+
+  sub _build_pairs_async($self, $manager, $callback) {
+    # Break up pair building into chunks
+    Mojo::IOLoop->next_tick(sub {
+      eval {
+        $manager->generalPairManager->build_pairs();
+        $callback->();
+      };
+      if ($@) {
+        $manager->logger->error("Error in pair building: $@");
+        $callback->(); # Continue anyway
+      }
+    });
+  }
+
 
   sub index($self) {
     my $collection = collection_name();
@@ -1451,3 +1536,7 @@ package Game::EvonyTKR::Controller::Generals {
 }
 
 1;
+
+
+
+# Add these helper methods to the Generals controller:
