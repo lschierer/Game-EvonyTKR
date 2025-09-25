@@ -191,6 +191,36 @@ class Game::EvonyTKR::Model::Specialty : isa(Game::EvonyTKR::Shared::Constants)
     }
   }
 
+  sub from_hash ($self, $object, $logger = undef) {
+    unless (defined($logger)) {
+      $logger = Log::Log4perl->get_logger(Scalar::Util::blessed($self));
+    }
+
+    my $s = Game::EvonyTKR::Model::Specialty->new(name => $object->{name});
+    foreach my $ol (@{ $object->{levels} }) {
+      my $level = $ol->{level};
+      $logger->debug(
+        sprintf('attempting import of %s for %s', $level, $object->{name}));
+      my @buffs;
+      if (exists $ol->{buff}) {
+        @buffs = @{ $ol->{buff} };
+      }
+      elsif (exists $ol->{buffs}) {
+        @buffs = @{ $ol->{buffs} };
+      }
+      foreach my $ob (@buffs) {
+        my $b = Game::EvonyTKR::Model::Buff->from_hash($ob, $logger);
+        $s->addBuff($level, $b);
+      }
+      $logger->debug(sprintf(
+        'added %s buffs to level %s for specialty %s ',
+        scalar @{ $s->levels->{ lc($level) }->{buffs} }, $level,
+        $object->{name}
+      ));
+    }
+    return $s;
+  }
+
 }
 
 1;

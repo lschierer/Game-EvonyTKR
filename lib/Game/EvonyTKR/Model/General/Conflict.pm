@@ -13,7 +13,6 @@ class Game::EvonyTKR::Model::General::Conflict :
   use List::AllUtils qw( any none uniq all );
 
   ### input fields
-  field $rootManager : param : reader;
   field $build_index : param //= 0;
   field $assume_g1_is_main : param : reader : writer //= 1;
 
@@ -187,8 +186,10 @@ class Game::EvonyTKR::Model::General::Conflict :
     # Always drop non-operative flags
     @c = grep { not exists $ALWAYS_DROP{$_} } @c;
 
- # In conflict-mode, also drop presence toggles so that a book’s
- # "leading the army" line lines up with a general’s "brings a dragon" always-on
+    # In conflict-mode,
+    # also drop presence toggles so that a book’s
+    # "leading the army" line lines up with a
+    # general’s "brings a dragon" always-on
     if ($mode eq 'conflict') {
       @c = grep { not exists $PRESENCE_TOGGLE{$_} } @c;
     }
@@ -217,19 +218,20 @@ class Game::EvonyTKR::Model::General::Conflict :
     my $state_key_strict   = exists($CONDLESS{$attr}) ? '' : $strict;
     my $state_key_conflict = exists($CONDLESS{$attr}) ? '' : $conflict;
 
-    # Determine if this specific buff is stackable based on:
-    # 1. Book text contains "by another"
-    # 2. This buff has ONLY dragon/beast conditions (not mixed with other conditions)
-    # 3. This indicates it's an additional/bonus buff, not a primary buff
+# Determine if this specific buff is stackable based on:
+# 1. Book text contains "by another"
+# 2. This buff has ONLY dragon/beast conditions (not mixed with other conditions)
+# 3. This indicates it's an additional/bonus buff, not a primary buff
     my $is_stackable = 0;
     if ($book_has_stackable_text) {
-      my $conditions = $buff->conditions || [];
+      my $conditions            = $buff->conditions || [];
       my $has_dragon_beast_cond = List::AllUtils::any {
         $_ =~ /brings.*(?:dragon|spiritual beast)/i
-      } @$conditions;
+      }
+      @$conditions;
 
-      # Mark as stackable if has dragon/beast conditions AND this is from a complex general like Louis XIV
-      # Simple way: exclude single-troop-type specialists with simple "by another" bonuses
+# Mark as stackable if has dragon/beast conditions AND this is from a complex general like Louis XIV
+# Simple way: exclude single-troop-type specialists with simple "by another" bonuses
       if ($has_dragon_beast_cond && $r->{name} ne 'Elektra') {
         $is_stackable = 1;
       }
@@ -281,19 +283,26 @@ class Game::EvonyTKR::Model::General::Conflict :
 
   method build_meta_for ($general, $role) {
     $self->logger->debug("building meta for " . $general->name);
-    my $book = $rootManager->bookManager->getBook($general->builtInBookName)
-      or $self->logger->logcroak("Book not found for " . $general->name);
-
-    $general->set_builtInBook($book) unless defined($general->builtInBook);
+    unless (defined($general->builtInBook)) {
+      $self->logger->logcroak(sprintf(
+        'general %s must have the builtInBook already populated.',
+        $general->name));
+      return;
+    }
 
     my @buffs = $general->builtInBook->buff->@*;    # already-cloned
 
     # Check if the book text contains "by another" indicating stackable buffs
-    my $book_has_stackable_text = ($book->text && $book->text =~ /\bby another\b/i);
+    my $book_has_stackable_text =
+      (    $general->builtInBook->text
+        && $general->builtInBook->text =~ /\bby another\b/i);
 
     foreach my $buff (@buffs) {
       $self->logger->debug(sprintf(
-        'book %s has buff %s', $book->name, Data::Printer::np($buff)));
+        'book %s has buff %s',
+        $general->builtInBook->name,
+        Data::Printer::np($buff)
+      ));
     }
 
     my $r = {
@@ -310,7 +319,9 @@ class Game::EvonyTKR::Model::General::Conflict :
 
     my @prim;
     for my $b (@buffs) {
-      my $mp = $self->build_meta_primative($r, $b, $role, $book_has_stackable_text) or next;
+      my $mp =
+        $self->build_meta_primative($r, $b, $role, $book_has_stackable_text)
+        or next;
       push @prim, $mp;
     }
 
@@ -444,7 +455,8 @@ class Game::EvonyTKR::Model::General::Conflict :
 
             # Skip conflict if either buff is marked as stackable
             if (($e1->{is_stackable} // 0) || ($e2->{is_stackable} // 0)) {
-              $self->logger->debug("$a1 buffs can stack - one is marked stackable");
+              $self->logger->debug(
+                "$a1 buffs can stack - one is marked stackable");
               next;
             }
 
@@ -510,7 +522,8 @@ class Game::EvonyTKR::Model::General::Conflict :
                     $e1->{targetedTypes_string} eq $e2->{targetedTypes_string})
                   {
                     $self->logger->debug(sprintf(
-'%s for %s and %s for %s are the same targetedTypes group',
+                      '%s for %s and %s for %s are '
+                        . 'the same targetedTypes group',
                       Data::Printer::np($e1->{targetedTypes}), $g1->name,
                       Data::Printer::np($e2->{targetedTypes}), $g2->name,
                     ));
@@ -708,7 +721,7 @@ class Game::EvonyTKR::Model::General::Conflict :
 
   # Optional: build the per-general conflicts hash using are_generals_compatible
   # Optional: build all pairwise conflicts and bucketed indices at startup
-  my method build_conflicts_index {
+  my method build_conflicts_index($rootManager) {
     # reset indexes if re-run
     $groups_by_conflict_type = {};
     $by_general              = {};

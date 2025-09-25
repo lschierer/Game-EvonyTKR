@@ -5,7 +5,6 @@ use File::FindLib 'lib';
 require JSON::PP;
 require YAML::PP;
 require Mojo::Promise;
-require Mojo::IOLoop::Subprocess;
 require List::Util;
 require Game::EvonyTKR::Model::General;
 require Game::EvonyTKR::Model::General::Manager;
@@ -22,9 +21,13 @@ use namespace::clean;
 package Game::EvonyTKR::Controller::Generals {
   use Mojo::Base 'Game::EvonyTKR::Controller::ControllerBase';
   require Mojo::Util;
+  use Mojo::IOLoop;
   use Mojo::JSON     qw(to_json encode_json);
   use MIME::Base64   qw(encode_base64);
   use List::AllUtils qw( all any none );
+
+  use IPC::Open3;
+  use Symbol 'gensym';
   use Carp;
 
   # Specify which collection this controller handles
@@ -40,7 +43,7 @@ package Game::EvonyTKR::Controller::Generals {
 
   my $session_store = {};
 
-  my $max_concurrency = 5;
+  my $max_concurrency = 15;
 
   sub getReferenceBase($self) {
     return $reference_base;
@@ -118,30 +121,45 @@ package Game::EvonyTKR::Controller::Generals {
           $logger->logcroak("general manager must be defined");
         }
 
-        my $cd = Mojo::File->new($app->config('distDir'))->child('collections/data/generals/');
+        my $cd = Mojo::File->new($app->config('distDir'))
+          ->child('collections/data/generals/');
         my @files = $cd->list_tree->each;
 
-        $logger->info("Starting async import of " . scalar(@files) . " general files");
+        $logger->info(
+          "Starting async import of " . scalar(@files) . " general files");
 
         # Import generals async
-        $self->_import_generals_async($app, \@files, $gm, $controller_name, $referenceRoutes, sub {
-          $logger->info("All generals loaded, emitting signal");
-          $app->plugins->emit(generals_loaded => $manager);
+        $self->_import_generals_async(
+          $app,
+          \@files,
+          $gm,
+          $controller_name,
+          $referenceRoutes,
+          sub {
+            $logger->info("All generals loaded, emitting signal");
+            $app->plugins->emit(generals_loaded => $manager);
 
-          # Start conflict processing async
-          $manager->logger->info('starting conflict indexing');
-          $self->_process_conflicts_async($manager, sub {
-            $manager->logger->info('conflict indexing complete');
-            $app->plugins->emit(conficts_loaded => $manager);
+            # Start conflict processing async
+            $manager->logger->info('starting conflict indexing');
+            $self->_process_conflicts_async(
+              $manager,
+              sub {
+                $manager->logger->info('conflict indexing complete');
+                $app->plugins->emit(conficts_loaded => $manager);
 
-            # Start pair processing async
-            $manager->logger->info("starting build pairs");
-            $self->_build_pairs_async($manager, sub {
-              $manager->logger->info("build pairs complete");
-              $app->plugins->emit(pairs_loaded => $manager);
-            });
-          });
-        });
+                # Start pair processing async
+                $manager->logger->info("starting build pairs");
+                $self->_build_pairs_async(
+                  $manager,
+                  sub {
+                    $manager->logger->info("build pairs complete");
+                    $app->plugins->emit(pairs_loaded => $manager);
+                  }
+                );
+              }
+            );
+          }
+        );
       }
     );
 
@@ -194,10 +212,11 @@ package Game::EvonyTKR::Controller::Generals {
     )->name('General_dynamic_pairTable');
 
     # two routes to generate the lists of names
-    $mainRoutes->any(['GET', 'POST'] => '/:uiTarget/:buffActivation/data.json')->to(
+    $mainRoutes->any(['GET', 'POST'] => '/:uiTarget/:buffActivation/data.json')
+      ->to(
       controller => 'Generals',
       action     => 'singleCatalog',
-    )->name('Generals_dynamic_singleData');
+      )->name('Generals_dynamic_singleData');
     $mainRoutes->any(
       ['GET', 'POST'] => '/:uiTarget/:buffActivation/pair/data.json')->to(
       controller => 'Generals',
@@ -269,15 +288,16 @@ package Game::EvonyTKR::Controller::Generals {
 
   }
 
-  sub _import_generals_async($self, $app, $files, $gm, $controller_name, $referenceRoutes, $callback) {
-    my $logger = Log::Log4perl->get_logger(__PACKAGE__);
+  sub _import_generals_async($self, $app, $files, $gm, $controller_name,
+    $referenceRoutes, $callback) {
+    my $logger     = Log::Log4perl->get_logger(__PACKAGE__);
     my @files_copy = @$files;
-    my $total = @files_copy;
-    my $processed = 0;
+    my $total      = @files_copy;
+    my $processed  = 0;
 
     my $process_next_batch;
     $process_next_batch = sub {
-      my $batch_size = 5; # Process 5 files per tick
+      my $batch_size  = 5;    # Process 5 files per tick
       my $batch_count = 0;
 
       while (@files_copy && $batch_count < $batch_size) {
@@ -288,16 +308,19 @@ package Game::EvonyTKR::Controller::Generals {
         eval {
           $logger->info("importing file $generalFile ($processed/$total)");
           my $data = $generalFile->slurp('UTF-8');
-          my $ho = YAML::PP->new(
+          my $ho   = YAML::PP->new(
             schema       => [qw/ + Perl /],
             yaml_version => ['1.2', '1.1'],
           )->load_string($data);
           my $g = Game::EvonyTKR::Model::General->from_hash($ho, $logger);
           $gm->add_general($g);
-          $logger->debug(sprintf('imported general %s from file %s', $g->name, $generalFile));
+          $logger->debug(
+            sprintf('imported general %s from file %s', $g->name, $generalFile)
+          );
 
           # Build routes for this general
-          $self->_build_general_routes($g, $app, $controller_name, $referenceRoutes);
+          $self->_build_general_routes($g, $app, $controller_name,
+            $referenceRoutes);
         };
         if ($@) {
           $logger->error("Error processing $generalFile: $@");
@@ -307,7 +330,8 @@ package Game::EvonyTKR::Controller::Generals {
       if (@files_copy) {
         # Schedule next batch
         Mojo::IOLoop->next_tick($process_next_batch);
-      } else {
+      }
+      else {
         # All done
         $callback->();
       }
@@ -317,9 +341,10 @@ package Game::EvonyTKR::Controller::Generals {
     $process_next_batch->();
   }
 
-  sub _build_general_routes($self, $general, $app, $controller_name, $referenceRoutes) {
+  sub _build_general_routes($self, $general, $app, $controller_name,
+    $referenceRoutes) {
     my $logger = Log::Log4perl->get_logger(__PACKAGE__);
-    my $name = $general->name;
+    my $name   = $general->name;
 
     $logger->debug("building Reference Routes for $name");
 
@@ -348,7 +373,7 @@ package Game::EvonyTKR::Controller::Generals {
       };
       if ($@) {
         $manager->logger->error("Error in conflict processing: $@");
-        $callback->(); # Continue anyway
+        $callback->();    # Continue anyway
       }
     });
   }
@@ -362,11 +387,10 @@ package Game::EvonyTKR::Controller::Generals {
       };
       if ($@) {
         $manager->logger->error("Error in pair building: $@");
-        $callback->(); # Continue anyway
+        $callback->();    # Continue anyway
       }
     });
   }
-
 
   sub index($self) {
     my $collection = collection_name();
@@ -570,10 +594,20 @@ package Game::EvonyTKR::Controller::Generals {
           $targetType = $general->type;
         }
         $targetType //= '';    # Default to empty string if undefined
+        $targetType =~ s/_/ /;
+        $targetType =~ s/(\w)(\w+) specialist/\U$1\L$2 \UT\Lroops/;
+        $targetType =~ s/Siege Troops/Siege Machines/;
+
         $logger->debug("Using $targetType as targetType for $name");
         my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
-          rootManager    => $self->app->get_root_manager(),
-          general        => $general,
+          general => $general,
+          books => $self->app->get_root_manager()->bookManager->get_all_books(),
+          covenant => $self->app->get_root_manager()
+            ->covenantManager->getCovenant($general->name),
+          ascendingAttributes => $self->app->get_root_manager()
+            ->ascendingAttributesManager->getAscendingAttributes(
+            $general->name
+            ),
           isPrimary      => 1,
           targetType     => $targetType,
           activationType => 'Attacking',
@@ -593,12 +627,12 @@ package Game::EvonyTKR::Controller::Generals {
           'buff-summaries' => {
             # For backward compatibility
             marchIncrease =>
-              $summarizer->buffValues->{$targetType}->{'March Size'},
-            attackIncrease =>
-              $summarizer->buffValues->{$targetType}->{'Attack'},
+              $summarizer->buffValues->{$targetType}->{'March Size'} // 0,
+            attackIncrease => $summarizer->buffValues->{$targetType}->{'Attack'}
+              // 0,
             defenseIncrease =>
-              $summarizer->buffValues->{$targetType}->{'Defense'},
-            hpIncrease => $summarizer->buffValues->{$targetType}->{'HP'},
+              $summarizer->buffValues->{$targetType}->{'Defense'} // 0,
+            hpIncrease => $summarizer->buffValues->{$targetType}->{'HP'} // 0,
 
             # Full granular data
             buffValues   => $summarizer->buffValues,
@@ -656,12 +690,12 @@ package Game::EvonyTKR::Controller::Generals {
 
     # Stash data for template rendering
     $self->stash(
-      template       => 'generals/GeneralTableSingle',
-      mode           => 'single',
-      generalType    => $generalType,
-      buffActivation => $buffActivation,
-      uiTarget       => $uiTarget,
-      PrimaryFormTitle  => $generalType =~ /Mayor/i ? 'Mayor' : 'General',
+      template         => 'generals/GeneralTableSingle',
+      mode             => 'single',
+      generalType      => $generalType,
+      buffActivation   => $buffActivation,
+      uiTarget         => $uiTarget,
+      PrimaryFormTitle => $generalType =~ /Mayor/i ? 'Mayor' : 'General',
     );
 
     my $markdown_path =
@@ -844,7 +878,7 @@ package Game::EvonyTKR::Controller::Generals {
       sprintf('There are %s generals to return.', scalar(@selected)));
 
     # Return just the basic name information without computing buffs
-    my @names = map { {primary => $_->name } } @selected;
+    my @names = map { { primary => $_->name } } @selected;
 
     @names = sort { $a->{primary} cmp $b->{primary} } @names;
 
@@ -1017,7 +1051,8 @@ package Game::EvonyTKR::Controller::Generals {
     $logger->debug(sprintf(
       'session info: sessionId: "%s"; selected: %s',
       $session_id // 'Not Present',
-      join ', ', map { $_->{primary} } @$selected
+      join ', ',
+      map { $_->{primary} } @$selected
     ));
 
     # Lookup route metadata
@@ -1091,7 +1126,8 @@ package Game::EvonyTKR::Controller::Generals {
     }
 
     Mojo::Promise->map(
-      { concurrency => $max_concurrency },    # This replaces your unlimited spawning
+      { concurrency => $max_concurrency }
+      ,    # This replaces your unlimited spawning
       sub {
         my ($start, $end) = @{ $_[0] };    # Current batch range
         $logger->debug("processing $start to $end");
@@ -1100,8 +1136,9 @@ package Game::EvonyTKR::Controller::Generals {
         $subprocess->on(
           progress => sub ($subprocess, @data) {
             my ($result) = @data;
-            if(!$c->tx || $c->tx->is_finished){
-              $logger->info("transaction finished before write_sse called for $result");
+            if (!$c->tx || $c->tx->is_finished) {
+              $logger->info(
+                "transaction finished before write_sse called for $result");
               return;
             }
             $logger->debug("progress event detected");
@@ -1115,8 +1152,15 @@ package Game::EvonyTKR::Controller::Generals {
             my $general = $rows->[$i];
             $logger->debug(sprintf('processing general %s', $general->name,));
             my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
-              rootManager    => $c->app->get_root_manager(),
-              general        => $general,
+              general => $general,
+              books   =>
+                $c->app->get_root_manager()->bookManager->get_all_books(),
+              covenant => $c->app->get_root_manager()
+                ->covenantManager->getCovenant($general->name),
+              ascendingAttributes => $c->app->get_root_manager()
+                ->ascendingAttributesManager->getAscendingAttributes(
+                $general->name
+                ),
               isPrimary      => $validated_params->{isPrimary},
               targetType     => $validated_params->{targetType},
               activationType => $validated_params->{buffActivation},
@@ -1185,8 +1229,10 @@ package Game::EvonyTKR::Controller::Generals {
 
         })->catch(sub {
           my $err = shift;
-          $logger->error(
-            sprintf('error in promise for subloop %s to %s : "%s". ', $start, $end, $err ? $err : 'Unknown'));
+          $logger->error(sprintf(
+            'error in promise for subloop %s to %s : "%s". ',
+            $start, $end, $err ? $err : 'Unknown'
+          ));
           return undef;    # Return something so map can continue
         });
         ;                  # Same as before
@@ -1319,130 +1365,115 @@ package Game::EvonyTKR::Controller::Generals {
 
     $c->render_later;
     $c->write_sse;
-    $c->inactivity_timeout(300);
+    $c->inactivity_timeout(1200);
 
-    my @promises;
     my @subs;
+    # Simple process-by-process approach instead of batching
+    my $completed_processes = {};
+    my $total_processes     = scalar(@$pairs);
+    my $max_index           = scalar(@$pairs) - 1;
+    my $active_processes    = 0;
+    my $pair_index          = 0;
 
-    my @batch_ranges;
-    my $index      = 0;
-    my $batch_size = 10;
-    my $maxIndex   = scalar(@$pairs) - 1;
+    for my $index (0 .. $max_index) {
+      my $pair = $pairs->[$index];
 
-    while ($index < $maxIndex) {
-      my $end = List::Util::min($index + $batch_size - 1, $maxIndex);
-      push @batch_ranges, [$index, $end];
-      $index = $end + 1;
+      # Build args hash for the Worker class
+      my $args = {
+        mode                 => 'pair',
+        runId                => $run_id,
+        general1             => $pair->primary->name,
+        general2             => $pair->secondary->name,
+        targetType           => $validated_params->{route_meta}->{generalType},
+        activationType       => $validated_params->{buffActivation},
+        ascendingLevel       => $validated_params->{ascendingLevel},
+        primaryCovenantLevel => $validated_params->{primaryCovenantLevel},
+        primarySpecialty1    => $validated_params->{primarySpecialties}->[0],
+        primarySpecialty2    => $validated_params->{primarySpecialties}->[1],
+        primarySpecialty3    => $validated_params->{primarySpecialties}->[2],
+        primarySpecialty4    => $validated_params->{primarySpecialties}->[3],
+        secondaryCovenantLevel => $validated_params->{secondaryCovenantLevel},
+        secondarySpecialty1 => $validated_params->{secondarySpecialties}->[0],
+        secondarySpecialty2 => $validated_params->{secondarySpecialties}->[1],
+        secondarySpecialty3 => $validated_params->{secondarySpecialties}->[2],
+        secondarySpecialty4 => $validated_params->{secondarySpecialties}->[3],
+      };
+
+      $logger->debug("Minion backend: " . ref($c->app->minion->backend));
+      $logger->debug("Enqueueing job for pair index: $index");
+      my $jid = $c->app->minion->enqueue(
+        pair_worker => [$args],
+        {
+          delay => ($index * 0.1) + rand(0.5),
+          notes => {
+            pair_index  => $index,
+            run_id      => $run_id,
+            session_id  => $session_id,
+          }
+        }
+      );
+      $logger->debug("Enqueued job with ID: $jid");
+      push @subs, $jid;
+
     }
 
-    Mojo::Promise->map(
-      { concurrency => $max_concurrency },    # This replaces your unlimited spawning
-      sub {
-        my ($start, $end) = @{ $_[0] };    # Current batch range
-        $logger->debug("processing $start to $end");
+    my $timer;
+    my $sent_jobs = {};  # Track which jobs we've already sent
 
-        my $subprocess = Mojo::IOLoop::Subprocess->new;
-        $subprocess->on(
-          progress => sub ($subprocess, @data) {
-            my ($result) = @data;
-            if(!$c->tx || $c->tx->is_finished){
-              $logger->info("transaction finished before write_sse called for $result");
-              return;
-            }
-            $logger->debug("progress event detected");
-            $c->write_sse({ type => 'pair', text => $result });
-          }
-        );
+    $timer = Mojo::IOLoop->recurring(0.1 => sub($ioloop) {
+      $logger->debug('recurring event loop fired');
+      if (!$c->tx || $c->tx->is_finished) {
+        $logger->debug("Client disconnected, stopping timer");
+        Mojo::IOLoop->remove($timer) if $timer;
+        return;
+      }
 
-        return $subprocess->run_p(sub {
-          $logger->debug("sub process for index $start to $end");
-          for my $i ($start .. $end) {
-            my $pair = $pairs->[$i];
-            $logger->debug(sprintf(
-              'processing pair %s/%s',
-              $pair->primary->name, $pair->secondary->name
-            ));
-            # Do all the heavy computation here
-            $pair->updateBuffsAndDebuffs(
-              $validated_params->{route_meta}->{generalType},
-              $validated_params->{ascendingLevel},
-              $validated_params->{primaryCovenantLevel},
-              $validated_params->{primarySpecialties},
-              $validated_params->{secondaryCovenantLevel},
-              $validated_params->{secondarySpecialties},
-              $validated_params->{buffActivation}
-            );
+      foreach my $jid (@subs) {
+        next if $sent_jobs->{$jid};  # Skip already sent
 
-            my $buffKey =
-              $validated_params->{route_meta}->{generalType} =~ s/_/ /r;
-            $buffKey =~ s/(\w)(\w+) specialist/\U$1\L$2 \UT\Lroops/;
-            $buffKey =~ s/Siege Troops/Siege Machines/;
-            $logger->debug("buffKey is $buffKey");
-            $logger->debug(
-              "primary to string is " . $pair->primary->to_string());
+        my $job = $c->app->minion->job($jid);
+        next unless $job;
 
-            # build the row payload
-            my $row = {
-              primary            => $pair->primary->to_hash,
-              secondary          => $pair->secondary->to_hash,
-              attackbuff         => $pair->buffValues->{$buffKey}{'Attack'},
-              defensebuff        => $pair->buffValues->{$buffKey}{'Defense'},
-              hpbuff             => $pair->buffValues->{$buffKey}{'HP'},
-              marchbuff          => $pair->buffValues->{$buffKey}{'March Size'},
-              groundattackdebuff =>
-                $pair->debuffValues->{'Ground Troops'}{'Attack'},
-              grounddefensedebuff =>
-                $pair->debuffValues->{'Ground Troops'}{'Defense'},
-              groundhpdebuff => $pair->debuffValues->{'Ground Troops'}{'HP'},
-              mountedattackdebuff =>
-                $pair->debuffValues->{'Mounted Troops'}{'Attack'},
-              mounteddefensedebuff =>
-                $pair->debuffValues->{'Mounted Troops'}{'Defense'},
-              mountedhpdebuff => $pair->debuffValues->{'Mounted Troops'}{'HP'},
-              rangedattackdebuff =>
-                $pair->debuffValues->{'Ranged Troops'}{'Attack'},
-              rangeddefensedebuff =>
-                $pair->debuffValues->{'Ranged Troops'}{'Defense'},
-              rangedhpdebuff    => $pair->debuffValues->{'Ranged Troops'}{'HP'},
-              siegeattackdebuff =>
-                $pair->debuffValues->{'Siege Machines'}{'Attack'},
-              siegedefensedebuff =>
-                $pair->debuffValues->{'Siege Machines'}{'Defense'},
-              siegehpdebuff => $pair->debuffValues->{'Siege Machines'}{'HP'},
-            };
+        my $info = $job->info;
+        next unless $info && $info->{state} eq 'finished';
 
-            # one JSON object per message; include runId inside the data payload
-            my $json =
-              JSON::PP->new->utf8(0)->allow_blessed->convert_blessed->canonical;
+        $logger->debug("Found completed job $jid, sending SSE");
+        $sent_jobs->{$jid} = 1;
 
-            my $payload = $json->encode({ runId => 0+ $run_id, data => $row });
-            $logger->debug(sprintf(
-              'row is %s, json is %s',
-              Data::Printer::np($row, multiline => 0), $payload,
-            ));
-            my $result = encode_base64($payload);
-            $subprocess->progress($result);
-          }
+        if ($info->{notes} && $info->{notes}->{result}) {
+          $c->write_sse({ type => 'pair', text => $info->{notes}->{result} });
+        }
+      }
 
-        })->catch(sub {
-          $logger->error(
-            sprintf('error in promise for subloop %s to %s', $start, $end));
-          return undef;    # Return something so map can continue
-        });
-        ;                  # Same as before
-      },
-      @batch_ranges        # Process each batch range
-    )->then(sub {
-      my $payload = encode_json({ runId => $run_id });
-      $c->write_sse({ type => 'complete', text => $payload });
-    })->catch(sub {
-      $logger->error('Overall map operation failed');
+      # Check if all done
+      my $completed_count = scalar(keys %$sent_jobs);
+      if ($completed_count >= $total_processes) {
+        Mojo::IOLoop->remove($timer);
+        my $payload = encode_json({ runId => $run_id });
+        $c->write_sse({ type => 'complete', text => $payload });
+      }
     });
 
-    # If the browser closes, remove the stored session
     $c->on(
       finish => sub {
-         $_->kill('TERM') for @subs;
+        $logger->debug(
+          "Client disconnected, canceling " . scalar(@subs) . " jobs");
+        Mojo::IOLoop->remove($timer);
+        foreach my $jid (@subs) {
+          my $job = $c->app->minion->job($jid);
+          if ($job) {
+            my $state = $job->info->{state};
+            if ($state eq 'inactive') {
+              $job->remove;
+              $logger->debug("Removed inactive job $jid");
+            }
+            elsif ($state eq 'active') {
+              $job->kill();
+              $logger->debug(sprintf('Killed active job %s', ($jid // 'unknown jid')));
+            }
+          }
+        }
+
         if (exists $session_store->{$session_id}) {
           delete $session_store->{$session_id};
         }
@@ -1536,7 +1567,5 @@ package Game::EvonyTKR::Controller::Generals {
 }
 
 1;
-
-
 
 # Add these helper methods to the Generals controller:

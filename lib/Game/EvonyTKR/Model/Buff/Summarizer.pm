@@ -4,6 +4,8 @@ use utf8::all;
 use File::FindLib 'lib';
 require Data::Printer;
 require Game::EvonyTKR::Model::Buff::Value;
+require Game::EvonyTKR::Model::General::Conflict::Book;
+
 require JSON::PP;
 
 class Game::EvonyTKR::Model::Buff::Summarizer :
@@ -21,13 +23,16 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
 
   our $VERSION = 'v0.30.0';
 
+  field $bc = Game::EvonyTKR::Model::General::Conflict::Book->new();
+
   # Input parameters
-  field $rootManager : param;
-  field $bc = $rootManager->conflictDetector;
-  field $general        : param;
-  field $isPrimary      : reader : param //= 1;
-  field $targetType     : reader : param //= '';
-  field $activationType : reader : param //= 'Overall';
+  field $general             : param;
+  field $books               : param = [];
+  field $covenant            : param;
+  field $ascendingAttributes : param;
+  field $isPrimary           : reader : param //= 1;
+  field $targetType          : reader : param //= '';
+  field $activationType      : reader : param //= 'Overall';
 
   # these are needed now
   field $ascendingLevel : reader : param //= 'red5';
@@ -256,10 +261,10 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
     my $total = 0;
     my $tt    = $troopType =~ s/ Troops$//r;    # Remove " Troops" suffix
     if ($attribute eq 'March Size') {
-      my $MS = $rootManager->bookManager->getBook('Level 4 March Size');
-      if (
-        $bc->is_general_and_book_compatible($general, $MS, { same_side => 1, }))
-      {
+      my $MS = List::AllUtils::first { $_->name =~ /March Size/ } @$books;
+      if (defined($MS)
+        && $bc->is_general_and_book_compatible($general, $MS,
+          { same_side => 1, })) {
         $total += 12;
       }
     }
@@ -270,7 +275,8 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
         $btt =~ s/(Ranged|Ground|Mounted)/$1 Troop/;
         $btt =~ s/Siege Machines/Siege Machine/;
         my $book =
-          $rootManager->bookManager->getBook("Level 4 $btt $attribute");
+          List::AllUtils::first { $_->name =~ /Level 4 $btt $attribute$/ }
+        @$books;
 
         if (
           $book
@@ -282,7 +288,11 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
         }
         elsif (!defined($book)) {
           $self->logger->error(sprintf(
-            'no book found for %s', "Level 4 $btt $attribute"));
+            'no book found for "%s" from %s',
+            "Level 4 $btt $attribute",
+            join ', ',
+            map { sprintf('"%s"', $_->name) } @$books
+          ));
         }
       }
     }
@@ -291,8 +301,10 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
         if ($troopType ne 'Overall') {
           my $btt = $tt =~ s/(Ranged|Ground|Mounted)/$1 Troop/r;
           $btt = $tt =~ s/Siege Machines/Siege Machine/r;
-          my $book = $rootManager->bookManager->getBook(
-            "Level 4 $btt $attribute Against Monsters");
+          my $book = List::AllUtils::first {
+            $_->name =~ /Level 4 $btt $attribute  Against Monsters/
+          }
+          @$books;
 
           if (
             $book
@@ -349,8 +361,8 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
     );
 
     $self->logger->info(
-"summarize_from_sources has $total after summarize_book for $attribute/$summaryType"
-    );
+          "summarize_from_sources has $total after summarize_book "
+        . "for $attribute/$summaryType");
 
     # Covenant buffs
     $total += $self->summarize_covenant_for_attribute(
@@ -403,14 +415,7 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
     # Ensure book is loaded
     if (not defined $general->builtInBook
       && length($general->builtInBookName) > 0) {
-      if (defined $rootManager) {
-        $self->logger()
-          ->debug("requesting populateBuiltInBook for " . $general->name());
-        $general->populateBuiltInBook($rootManager->bookManager);
-      }
-      else {
-        $self->logger->logcroak("No Root Manager Available");
-      }
+      $self->logger->logcroak('Book must be loaded first!!');
     }
 
     my $book = $general->builtInBook();
@@ -448,7 +453,6 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
   ) {
     my $total = 0;
 
-    my $covenant = $rootManager->covenantManager->getCovenant($general->name);
     if ($covenant) {
       $self->logger->debug("Found covenant for "
           . $general->name
@@ -459,9 +463,10 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
         $covenantLevel, $attribute,      $matching_type,
         $summaryType,   $buffConditions, $debuffConditions
       );
-      $self->logger->debug(
-"retrieved $cv as total $attribute for level $covenantLevel of covenant for "
-          . $general->name);
+      $self->logger->debug(sprintf(
+        'retrieved %s as total %s for level %s of covenant for %s',
+        $cv, $attribute, $covenantLevel, $general->name
+      ));
       $total += $cv;
     }
 
@@ -490,7 +495,7 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
       $self->logger->debug(
         "processing " . $general->name . " $sn at level $sl");
 
-      my $specialty = $rootManager->specialtyManager->getSpecialty($sn);
+      my $specialty = $general->specialties->[$sn_index];
       if ($specialty) {
         $self->logger->debug(
           sprintf('checking %s for %s', $specialty->name, $attribute));
@@ -525,8 +530,7 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
   ) {
     my $total = 0;
 
-    my $aa = $rootManager->ascendingAttributesManager->getAscendingAttributes(
-      $general->name);
+    my $aa = $ascendingAttributes;
     if ($aa) {
       $self->logger->debug(
         "retrieved ascendingAttribute buffs for " . $general->name);
@@ -546,7 +550,8 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
     }
 
     $self->logger->debug(sprintf(
-'returning %s as Ascending Attributes total for attribute "%s" with "%s" and "%s"',
+      'returning %s as Ascending Attributes total for '
+        . 'attribute "%s" with "%s" and "%s"',
       $total,                      $attribute,
       join(",", @$buffConditions), join(", ", @$debuffConditions),
     ));

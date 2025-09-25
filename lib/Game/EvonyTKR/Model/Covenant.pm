@@ -220,29 +220,25 @@ class Game::EvonyTKR::Model::Covenant : isa(Game::EvonyTKR::Shared::Constants) {
     return $json;
   }
 
-  sub from_hash($self, $object, $rootManager, $logger = undef) {
-    if(!exists $object->{name}){
-      if(defined($logger)){
-        $logger->logcroak('object must have name attribute.');
-        return;
-      }else {
-        croak('object must have name attribute.');
-        return;
-      }
+  sub from_hash($self, $object, $primary, $logger = undef) {
+    unless (defined($logger)) {
+      $logger = Log::Log4perl->get_logger(Scalar::Util::blessed($self));
     }
-    my $name = $object->{name};
-    my $primary = $rootManager->generalManager->getGeneral($name);
-    unless ($primary) {
-      if(defined($logger)){
-        $logger->error("Cannot find primary general for covenant $name");
-      }
+    if (!exists $object->{name}) {
+      $logger->logcroak('object must have name attribute.');
       return;
     }
-    if(defined($logger)) {
-      $logger->debug("found primary general for $name, starting import.");
-      $logger->debug(
-        "generals for $name are " . join(", ", @{ $object->{generals} }));
+    my $name = $object->{name};
+    unless (Scalar::Util::blessed($primary) eq 'Game::EvonyTKR::Model::General')
+    {
+      $logger->error(
+"primary general must be of type Game::EvonyTKR::Model::General for covenant $name"
+      );
+      return;
     }
+    $logger->debug("found primary general for $name, starting import.");
+    $logger->debug(
+      "generals for $name are " . join(", ", @{ $object->{generals} }));
 
     my $o = Game::EvonyTKR::Model::Covenant->new(
       primary => $primary,
@@ -253,6 +249,11 @@ class Game::EvonyTKR::Model::Covenant : isa(Game::EvonyTKR::Shared::Constants) {
 
     foreach my $oc (@{ $object->{levels} }) {
       my $category = $oc->{category};
+      unless (defined($category) && length($category)) {
+        $logger->logcroak(
+          'invalid category!! ' . Data::Printer::np($object, multiline => 0));
+        return;
+      }
 
       # Find buffs for this category
       my @buffs;

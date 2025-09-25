@@ -24,10 +24,10 @@ class Game::EvonyTKR::Model::General::Manager :
 
   field $generals = {};
 
-  method add_general($ng){
-    if(Scalar::Util::blessed($ng) eq 'Game::EvonyTKR::Model::General'){
-      if(!exists $generals->{$ng->name}){
-        $generals->{$ng->name} = $ng;
+  method add_general($ng) {
+    if (Scalar::Util::blessed($ng) eq 'Game::EvonyTKR::Model::General') {
+      if (!exists $generals->{ $ng->name }) {
+        $generals->{ $ng->name } = $ng;
       }
     }
   }

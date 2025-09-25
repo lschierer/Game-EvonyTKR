@@ -4,10 +4,10 @@ use utf8::all;
 use File::FindLib 'lib';
 require Data::Printer;
 require Game::EvonyTKR::Model::Buff;
+require Game::EvonyTKR::Model::Book;
 
-class Game::EvonyTKR::Model::Book::SkillBook : isa(Game::EvonyTKR::Model::Book)
-{
-# PODNAME: Game::EvonyTKR::Model::Book::SkillBook
+class Game::EvonyTKR::Model::Book::Builtin : isa(Game::EvonyTKR::Model::Book) {
+# PODNAME: Game::EvonyTKR::Model::Book::Builtin
   use List::AllUtils qw( any none );
   use namespace::autoclean;
   use Carp;
@@ -19,35 +19,25 @@ class Game::EvonyTKR::Model::Book::SkillBook : isa(Game::EvonyTKR::Model::Book)
   our $VERSION = 'v0.30.0';
   my $debug = 1;
 
-  field $level : reader : param;
-
-  ADJUST {
-    # Validate level is between 1 and 5
-    if ($level < 1 || $level > 5) {
-      $self->logger()
-        ->logcroak("SkillBook level must be between 1 and 5, got $level");
-    }
-  }
-
-  method to_hash {
-    my $hashRef = $self->SUPER::to_hash;
-    $hashRef->{level} = $level;
-    return $hashRef;
+  method toHashRef {
+    return {
+      name => $self->name,
+      text => $self->text,
+      buff => $self->buff,
+    };
   }
 
   method TO_JSON {
-    return $self->to_hash();
+    return $self->toHashRef();
   }
 
   sub from_hash ($self, $object, $logger = undef) {
     unless (defined($logger)) {
       $logger = Log::Log4perl->get_logger(Scalar::Util::blessed($self));
     }
-    my ($level) = $object->{name} =~ /Level (\d+)/;
-    my $bb = Game::EvonyTKR::Model::Book::SkillBook->new(
-      name  => $object->{name},
-      level => $level,
-      text  => $object->{text} // '',
+    my $bb = Game::EvonyTKR::Model::Book::Builtin->new(
+      name => $object->{name},
+      text => $object->{text} // '',
     );
     my $buffCount = 0;
 
@@ -80,14 +70,13 @@ class Game::EvonyTKR::Model::Book::SkillBook : isa(Game::EvonyTKR::Model::Book)
 
 __END__
 
-#ABSTRACT: Model for non-builtin Skill Books that can be equipped to Generals
+#ABSTRACT: Model of the Books that come built-in with Generals
 
 =pod
 
 =head1 DESCRIPTION
 
-SkillBooks are books that can be equipped to Generals. Unlike Builtins,
-these have levels and can be upgraded.
+Generals have books built in.  This describes/models the books.
 
 =cut
 

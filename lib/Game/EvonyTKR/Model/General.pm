@@ -164,11 +164,12 @@ class Game::EvonyTKR::Model::General : isa(Game::EvonyTKR::Shared::Constants) {
   }
 
   sub from_hash ($self, $ho, $logger = undef) {
-    if(!exists $ho->{name}) {
-      if(defined($logger)){
+    if (!exists $ho->{name}) {
+      if (defined($logger)) {
         $logger->logcroak('hash object must contain a name attribute.');
         return undef;
-      } else {
+      }
+      else {
         croak('hash object must contain a name attribute.');
         return undef;
       }

@@ -44,6 +44,8 @@ class Game::EvonyTKR::Model::General::Pair::Manager :
           'testing if %s and %s conflict.',
           $primary->name, $secondary->name
         ));
+        $primary->populateBuiltInBook($rootManager->bookManager);
+        $secondary->populateBuiltInBook($rootManager->bookManager);
         next
           unless $conflicts->are_generals_compatible($primary, $secondary);
 

@@ -121,6 +121,10 @@ class Game::EvonyTKR::Model::Data : isa(Game::EvonyTKR::Shared::Constants) {
   }
 
   method checkCovenantLevel ($proposedLevel) {
+    unless (defined($proposedLevel) && length($proposedLevel)) {
+      $self->logger->error("Invalid proposed level!!! $proposedLevel");
+      return 0;
+    }
     my $check = {};
     foreach my $key ($self->CovenantCategoryValues->@*) {
       $check->{$key} = 1;

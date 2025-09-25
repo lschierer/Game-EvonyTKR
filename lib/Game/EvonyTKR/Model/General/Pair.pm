@@ -140,8 +140,12 @@ class Game::EvonyTKR::Model::General::Pair :
     }
 
     my $primarySummarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
-      rootManager    => $rootManager,
-      general        => $primary,
+      general  => $primary,
+      covenant => $self->app->get_root_manager()
+        ->covenantManager->getCovenant($primary->name),
+      ascendingAttributes => $self->app->get_root_manager()
+        ->ascendingAttributesManager->getAscendingAttributes($primary->name),
+      books          => $rootManager->bookManager->get_all_books(),
       isPrimary      => 1,
       targetType     => $generalType,
       activationType => $buffActivation,
@@ -157,9 +161,13 @@ class Game::EvonyTKR::Model::General::Pair :
       keepLevel    => $keepLevel,
     );
     my $secondarySummarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
-      rootManager    => $rootManager,
-      general        => $secondary,
-      isPrimary      => 1,
+      general  => $secondary,
+      covenant => $self->app->get_root_manager()
+        ->covenantManager->getCovenant($secondary->name),
+      ascendingAttributes => $self->app->get_root_manager()
+        ->ascendingAttributesManager->getAscendingAttributes($secondary->name),
+      books          => $rootManager->bookManager->get_all_books(),
+      isPrimary      => 0,
       targetType     => $generalType,
       activationType => $buffActivation,
 

@@ -3,6 +3,8 @@ use experimental qw(class);
 use utf8::all;
 use File::FindLib 'lib';
 require YAML::PP;
+require Minion::Backend::SQLite;
+require Mojolicious::Plugin::Minion;
 require Game::EvonyTKR::Model::Logger;
 require Game::EvonyTKR::Logger::MojoLog4Perl;
 require Game::EvonyTKR::Logger::Config;
@@ -11,6 +13,7 @@ require Log::Log4perl;
 #require Game::EvonyTKR::Controller::Root;
 require Game::EvonyTKR::Controller::ControllerBase;
 require Game::EvonyTKR::Model::EvonyTKR::Manager;
+require Game::EvonyTKR::External::Buff::Worker;
 require GitRepo::Reader;
 
 package Game::EvonyTKR {
@@ -114,6 +117,9 @@ package Game::EvonyTKR {
     # Register infrastructure plugins in specific order
 
     # First Plugins that provide helpers but do not define routes
+    $self->plugin(Minion => { SQLite => 'sqlite:minion.db' });
+    # Minion worker
+    $self->plugin('Game::EvonyTKR::External::Buff::Worker');
     # Markdown
     $self->plugin('Game::EvonyTKR::Plugins::Markdown');
     # Navigation

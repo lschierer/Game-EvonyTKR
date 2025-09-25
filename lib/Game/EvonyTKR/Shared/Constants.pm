@@ -11,12 +11,12 @@ require Log::Log4perl::Config;
 class Game::EvonyTKR::Shared::Constants : isa(Game::EvonyTKR::Model::Logger) {
   # PODNAME: Game::EvonyTKR::Shared::Constants
   use File::Share ':all';
-  use Carp;
   use List::AllUtils qw( first all any none );
-  use UUID           qw(uuid5);
   use Readonly;
+  use UUID qw(uuid5);
   use namespace::autoclean;
   use File::FindLib 'lib';
+  use Carp;
   our $VERSION = 'v0.01.0';
 
   field $distDir : reader;
@@ -115,6 +115,7 @@ class Game::EvonyTKR::Shared::Constants : isa(Game::EvonyTKR::Model::Logger) {
       'Leadership',
       "March Size",
       "Marching Speed",
+      'Range',
       'Politics',
       "Rally Capacity",
       "Resources Production",
@@ -137,6 +138,7 @@ class Game::EvonyTKR::Shared::Constants : isa(Game::EvonyTKR::Model::Logger) {
 
   ADJUST {
     Readonly::Scalar my $temp => {
+      'Attack Range'                   => 'Range',
       'death into wounded rate'        => 'Death to Wounded',
       'death-turning-wounded rate'     => 'Death to Wounded',
       'death into survival rate'       => 'Death to Survival',

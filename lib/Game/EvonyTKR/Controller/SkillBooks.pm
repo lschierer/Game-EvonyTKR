@@ -2,7 +2,7 @@ use v5.42.0;
 use experimental qw(class);
 use utf8::all;
 use File::FindLib 'lib';
-require Game::EvonyTKR::Model::Book::BuiltinBook;
+require Game::EvonyTKR::Model::Book::Builtin;
 require Game::EvonyTKR::Model::Book::Manager;
 use namespace::clean;
 

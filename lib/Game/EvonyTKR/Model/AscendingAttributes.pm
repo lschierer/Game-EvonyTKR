@@ -239,6 +239,38 @@ class Game::EvonyTKR::Model::AscendingAttributes :
     }
   }
 
+  sub from_hash($self, $object, $logger = undef) {
+    unless (defined($logger)) {
+      $logger = Log::Log4perl->get_logger(Scalar::Util::blessed($self));
+    }
+    unless (exists $object->{ascending}
+      && ref($object->{ascending}) eq 'ARRAY') {
+      $logger->logcroak(sprintf(
+'object has unexpected format for an Ascending Attribute. Object is "%s"',
+        Data::Printer::np($object, multiline => 0)));
+      return;
+    }
+    my $an = $object->{general};
+    unless (length($an)) {
+      $logger->logcroak('object must have a "general" attribute');
+      return;
+    }
+    $logger->debug("starting import for ascending attribute $an");
+    my $aa = Game::EvonyTKR::Model::AscendingAttributes->new(general => $an);
+    foreach my $oa (@{ $object->{ascending} }) {
+      my $level = $oa->{level};
+      foreach my $ob (@{ $oa->{buffs} }) {
+        my $b = Game::EvonyTKR::Model::Buff->from_hash($ob, $logger);
+        $aa->addBuff($level, $b);
+        $logger->debug(sprintf(
+          '%s now has %s buffs at level %s',
+          $an, scalar($aa->ascending->{$level}->{buffs}->@*), $level,
+        ));
+      }
+    }
+    return $aa;
+  }
+
 }
 
 1;

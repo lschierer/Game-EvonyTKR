@@ -43,7 +43,6 @@ class Game::EvonyTKR::Model::EvonyTKR::Manager :
       Game::EvonyTKR::Model::Glossary::Manager->new(SourceDir => $SourceDir,);
 
     $conflictDetector = Game::EvonyTKR::Model::General::Conflict::Book->new(
-      rootManager      => $self,
       build_index      => 0,
       asst_has_dragon  => 1,
       asst_has_spirit  => 1,

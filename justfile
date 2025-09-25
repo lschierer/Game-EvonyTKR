@@ -47,9 +47,9 @@ dev: deps css images build
   watchexec --exts css,pm,ep,js,yaml -w lib/ -w bin/ -w share/templates/ -w share/public/ -w share/collections/data/ --restart morbo ./bin/game-evonytkr
 
 quickdev:
-  echo "${HOME}/var/log/Perl/dist/Game-Evony/*.log"
-  rm -f "${HOME}/var/log/Perl/dist/Game-Evony/*.log"
-  watchexec --exts css,pm,ep,js -w lib/ -w bin/ -w share/templates/ -w share/public/ -w share/collections/data/ --restart morbo ./bin/game-evonytkr
+  rm -vf "${HOME}/var/log/Perl/dist/Game-EvonyTKR/*.log"
+  rm -v minion.db*
+  ./scripts/dev.sh
 
 deploy-dev: build
   pnpm cdk --profile personal deploy --context env=dev
