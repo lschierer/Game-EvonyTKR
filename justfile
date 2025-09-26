@@ -48,7 +48,6 @@ dev: deps css images build
 
 quickdev:
   rm -vf "${HOME}/var/log/Perl/dist/Game-EvonyTKR/*.log"
-  rm -v minion.db*
   ./scripts/dev.sh
 
 deploy-dev: build

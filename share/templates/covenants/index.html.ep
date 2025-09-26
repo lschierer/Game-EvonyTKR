@@ -3,7 +3,7 @@
 <div class="collection-list">
   <ul class="collection-grid">
     <% if ($items && ref $items eq 'ARRAY') { %>
-      <% foreach my $item ( $items->@* ) { %>
+      <% foreach my $item ( sort { $a->primary->name cmp $b->primary->name } $items->@* ) { %>
         <% if (not defined $item or not defined $item->primary) { %>
           <!-- <%= Data::Printer::np($item) %> -->
           next;

@@ -42,6 +42,16 @@ package Game::EvonyTKR::Controller::ConflictGroups {
       parent => '/Reference/',
       order  => 60,
     });
+
+    $app->plugins->on(general_loaded => sub {
+      my ($plugin, $data) = @_;
+      my $manager = $app->get_root_manager();
+      my $gm = $data->{manager};
+      my $general = $data->{general};
+      $manager->conflictDetector->process_single_general($general, $gm);
+      $logger->debug(sprintf('conflict detection triggered for %s', $general->name));
+      $app->plugins->emit(conflicts_computed => { manager => $manager, general => $general});
+    });
   }
 
   sub index ($self) {

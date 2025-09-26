@@ -719,6 +719,7 @@ class Game::EvonyTKR::Model::General::Conflict :
     return 1;  # compatible (no conflicting active/active identical-state pairs)
   }
 
+
   # Optional: build the per-general conflicts hash using are_generals_compatible
   # Optional: build all pairwise conflicts and bucketed indices at startup
   my method build_conflicts_index($rootManager) {
@@ -761,6 +762,34 @@ class Game::EvonyTKR::Model::General::Conflict :
   method start_indexing {
     $self->&build_conflicts_index() if $build_index;
   }
+
+  method process_single_general($general, $generalManager) {
+    # Build meta for both roles for this general
+    $self->build_meta_for($general, 'main');
+    $self->build_meta_for($general, 'assistant');
+
+    my @existing = values $generalManager->get_all_generals()->%*;
+    return if(scalar @existing == 0);
+
+    # Compare this general against all previously loaded generals
+    for my $existing_general (@existing) {
+      next if $existing_general->name eq $general->name;
+
+      # Test both orientations
+      my $prev = $assume_g1_is_main;
+
+      # Orientation A: new general = main, existing = assistant
+      $self->set_assume_g1_is_main(1);
+      $self->are_generals_compatible($general, $existing_general);
+
+      # Orientation B: existing = main, new general = assistant
+      $self->set_assume_g1_is_main(0);
+      $self->are_generals_compatible($existing_general, $general);
+
+      $self->set_assume_g1_is_main($prev);
+    }
+  }
+
 
 }
 1;

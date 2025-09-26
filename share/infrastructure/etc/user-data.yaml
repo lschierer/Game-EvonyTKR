@@ -4,6 +4,7 @@ packages:
   - autoconf
   - autoconf-archive
   - automake
+  - build-essential
   - bison
   - certbot
   - curl
@@ -14,11 +15,16 @@ packages:
   - git
   - gnu-standards
   - libtool
+  - libgd-dev
+  - libssl-dev
+  - libzip-dev
+  - pkg-config
   - make
   - nginx
   - openssh-server
   - python3-certbot-nginx
   - rsync
+  - unzip
   - unattended-upgrades
   - update-notifier-common
 users:
@@ -43,29 +49,26 @@ runcmd:
   - apt-get dist-upgrade -y
   - mkdir -p /opt/mojo/var/run
   - chown -R mojo:www-data /opt/mojo
-  - mkdir -p /opt/mojo/bin
   - |
-    cat > /opt/mojo/bin/mojo.sh << 'EOF'
-    #!/bin/bash
+    cat > /etc/systemd/system/mojolicious-worker.service << 'EOF'
+    [Unit]
+    Description=Game Evony TKR Minion Worker
+    After=network.target
 
-    source ${HOME}/.bash_profile || exit 1
+    [Service]
+    Type=simple
+    User=mojo
+    WorkingDirectory=/opt/mojo/app
+    ExecStart=/opt/mojo/bin/mojo-worker.sh
+    Nice=10
+    IOSchedulingClass=2
+    IOSchedulingPriority=4
+    Restart=always
+    RestartSec=5
 
-    cd /opt/mojo/app || exit 2
-
-    hypnotoad ./bin/game-evonytkr
-
-    HR=$?;
-
-    if [ -z "$HR" ]; then
-     exit 0;
-    else
-     echo "hypno returned $HR";
-     exit $HR;
-    fi
-
+    [Install]
+    WantedBy=multi-user.target
     EOF
-  - chown -R mojo:mojo /opt/mojo
-  - chmod +x /opt/mojo/bin/mojo.sh
   - |
     cat > /etc/systemd/system/mojolicious.service << 'EOF'
     [Unit]
@@ -117,15 +120,7 @@ runcmd:
     EOF
   - ln -s /etc/nginx/sites-available/mojoproxy /etc/nginx/sites-enabled/
   - sudo -u mojo touch /opt/mojo/.bash_profile
-  - sudo -u mojo -s /bin/bash -c "curl https://mise.run | sh"
-  - sudo -u mojo -s /bin/bash -c "echo 'eval \"\$(/opt/mojo/.local/bin/mise activate bash)\"' >> ~/.bash_profile"
   - echo 'export PATH="/opt/mojo/.local/bin/:$HOME/bin:$PATH"' >> /opt/mojo/.bash_profile
-  - sudo -u mojo -s /bin/bash -l -c "git clone -b streaming https://github.com/lschierer/Game-EvonyTKR.git /opt/mojo/app"
-  - sudo -u mojo -s /bin/bash -l -c "cd /opt/mojo/app && mise trust"
-  - sudo -u mojo -s /bin/bash -l -c "cd /opt/mojo/app && mise install"
-  # my just file does not install these two modules nor are they included by default with perl.
-  - sudo -u mojo -s /bin/bash -l -c "cd /opt/mojo/app && cpanm -n utf8::all Module::Build"
-  - sudo -u mojo -s /bin/bash -l -c "cd /opt/mojo/app && just build"
   - mkdir /etc/nginx/ssl
   # if there is not a cert present where the nginx config states, then
   # when certbot runs, it checks the ngnix config syntax for correctness and it will fail
@@ -137,13 +132,10 @@ runcmd:
   # certbot *reads* the nginx config file then ignores it and places the certs where it likes
   - export H=$( grep 127.0.1.1 /etc/hosts | cut -d ' ' -f 3 | cut -d '.' -f 1); ln -s /etc/letsencrypt/live/${H}.evonytkrtips.net/privkey.pem /etc/nginx/ssl/evonytkrtips.net.key
   - export H=$( grep 127.0.1.1 /etc/hosts | cut -d ' ' -f 3 | cut -d '.' -f 1); ln -s /etc/letsencrypt/live/${H}.evonytkrtips.net/fullchain.pem /etc/nginx/ssl/evonytkrtips.net.crt
-  - systemctl enable mojolicious
   # several of the previous processes cache quite a bit, prevent OOM
   # this is *probably* only needed in dev, as even without this it works fine
   # on the auto retry systemctl does
   - sync && echo 3 > /proc/sys/vm/drop_caches
-  - systemctl start mojolicious
-  - systemctl reload nginx
   - dpkg-reconfigure -plow unattended-upgrades
   - systemctl enable unattended-upgrades
   - |

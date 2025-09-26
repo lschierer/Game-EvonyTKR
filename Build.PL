@@ -88,6 +88,7 @@ my $builder = Module::Build->new(
     'Types::Common'                       => '0',
     'Types::Standard'                     => '0',
     'Unicode::Normalize'                  => '0',
+    'Unicode::CaseFold'                   => '0',
     'Util::Any'                           => '0',
     'UUID'                                => '0',
     'X500::DN'                            => '0',

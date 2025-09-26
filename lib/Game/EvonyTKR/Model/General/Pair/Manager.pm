@@ -32,11 +32,14 @@ class Game::EvonyTKR::Model::General::Pair::Manager :
     return sort keys %{$pairs_by_type};
   }
 
-  method build_pairs() {
-    my $generals     = $generalManager->get_all_generals();
-    my $generalCount = scalar keys %{$generals};
-    $self->logger->debug("building pairs out of $generalCount");
-    foreach my $primary (sort { $a->name cmp $b->name } values %{$generals}) {
+  method build_pairs($primary) {
+     my $generals = $generalManager->get_all_generals();
+     my %initial_counts;
+     foreach my $type (keys %{$pairs_by_type}) {
+       my $tc = scalar @{ $pairs_by_type->{$type} };
+       $initial_counts{$type} = $tc;
+     }
+
       foreach
         my $secondary (sort { $a->name cmp $b->name } values %{$generals}) {
         next if $primary->name eq $secondary->name;
@@ -73,15 +76,16 @@ class Game::EvonyTKR::Model::General::Pair::Manager :
           push @{ $pairs_by_type->{$t} }, $pair;
         }
       }
-    }
-    my $pairTypeCount = scalar keys %{$pairs_by_type};
-    $self->logger->info("returning $pairTypeCount sets of pairs.");
-    $self->logger->debug(
-      "returning " . join(', ', keys %{$pairs_by_type}) . " types of pairs.");
+
+    my $total_added = 0;
     foreach my $type (keys %{$pairs_by_type}) {
-      my $tc = scalar @{ $pairs_by_type->{$type} };
-      $self->logger->debug("returning $tc pairs for $type");
+      my $tc = scalar @{ $pairs_by_type->{$type} } // 0;
+      my $delta = $tc - ($initial_counts{$type} //0);
+      $total_added += $delta;
+      $self->logger->debug(sprintf('general %s has %s pairs for type %s',
+      $primary->name, $delta, $type));
     }
+    $self->logger->info(sprintf('there are %s pairs for %s', $total_added, $primary->name));
 
   }
 }

@@ -139,29 +139,17 @@ package Game::EvonyTKR::Controller::Generals {
             $logger->info("All generals loaded, emitting signal");
             $app->plugins->emit(generals_loaded => $manager);
 
-            # Start conflict processing async
-            $manager->logger->info('starting conflict indexing');
-            $self->_process_conflicts_async(
-              $manager,
-              sub {
-                $manager->logger->info('conflict indexing complete');
-                $app->plugins->emit(conficts_loaded => $manager);
-
-                # Start pair processing async
-                $manager->logger->info("starting build pairs");
-                $self->_build_pairs_async(
-                  $manager,
-                  sub {
-                    $manager->logger->info("build pairs complete");
-                    $app->plugins->emit(pairs_loaded => $manager);
-                  }
-                );
-              }
-            );
           }
         );
       }
     );
+
+    $app->plugins->on(conflicts_computed => sub {
+      my ($plugin, $data) = @_;
+      my $manager = $data->{manager};
+      my $general = $data->{general};
+      $manager->generalPairManager->build_pairs($general);
+    });
 
     # two routes for directory indices
     $mainRoutes->get('/:uiTarget')->requires(is_valid_uiTarget => 1)->to(
@@ -195,44 +183,47 @@ package Game::EvonyTKR::Controller::Generals {
       }
     );
 
-    $mainRoutes->get('/:uiTarget/:buffActivation')
-      ->requires(is_valid_buffActivation => 1)
-      ->to(
-      controller => 'Generals',
-      action     => 'buffActivation_index',
-      )->name('General_dynamic_buffActivation_index');
-    # two routes for the user interface
-    $mainRoutes->get('/:uiTarget/:buffActivation/comparison')->to(
-      controller => 'Generals',
-      action     => 'singleTable',
-    )->name('General_dynamic_singleTable');
-    $mainRoutes->get('/:uiTarget/:buffActivation/pair-comparison')->to(
-      controller => 'Generals',
-      action     => 'pairTable',
-    )->name('General_dynamic_pairTable');
+    eval {
+      $mainRoutes->get('/:uiTarget/:buffActivation')
+        ->requires(is_valid_buffActivation => 1)
+        ->to(
+        controller => 'Generals',
+        action     => 'buffActivation_index',
+        )->name('General_dynamic_buffActivation_index');
+      # two routes for the user interface
+      $mainRoutes->get('/:uiTarget/:buffActivation/comparison')->to(
+        controller => 'Generals',
+        action     => 'singleTable',
+      )->name('General_dynamic_singleTable');
+      $mainRoutes->get('/:uiTarget/:buffActivation/pair-comparison')->to(
+        controller => 'Generals',
+        action     => 'pairTable',
+      )->name('General_dynamic_pairTable');
 
-    # two routes to generate the lists of names
-    $mainRoutes->any(['GET', 'POST'] => '/:uiTarget/:buffActivation/data.json')
-      ->to(
-      controller => 'Generals',
-      action     => 'singleCatalog',
-      )->name('Generals_dynamic_singleData');
-    $mainRoutes->any(
-      ['GET', 'POST'] => '/:uiTarget/:buffActivation/pair/data.json')->to(
-      controller => 'Generals',
-      action     => 'pairCatalog',
-      )->name('Generals_dynamic_pairCatalog');
+      # two routes to generate the lists of names
+      $mainRoutes->any(['GET', 'POST'] => '/:uiTarget/:buffActivation/data.json')
+        ->to(
+        controller => 'Generals',
+        action     => 'singleCatalog',
+        )->name('Generals_dynamic_singleData');
+      $mainRoutes->any(
+        ['GET', 'POST'] => '/:uiTarget/:buffActivation/pair/data.json')->to(
+        controller => 'Generals',
+        action     => 'pairCatalog',
+        )->name('Generals_dynamic_pairCatalog');
 
-    # two routes to generate data on a single row within the table
-    $mainRoutes->get('/:uiTarget/:buffActivation/:isPrimary/details-stream')
-      ->to(
-      controller => 'Generals',
-      action     => 'stream_single_details',
-      )->name('Generals_dynamic_singleDetails');
-    $mainRoutes->get('/:uiTarget/:buffActivation/pair-details-stream')->to(
-      controller => 'Generals',
-      action     => 'stream_pair_details',
-    )->name('Generals_dynamic_pairDetails');
+      # two routes to generate data on a single row within the table
+      $mainRoutes->get('/:uiTarget/:buffActivation/:isPrimary/details-stream')
+        ->to(
+        controller => 'Generals',
+        action     => 'stream_single_details',
+        )->name('Generals_dynamic_singleDetails');
+      $mainRoutes->get('/:uiTarget/:buffActivation/pair-details-stream')->to(
+        controller => 'Generals',
+        action     => 'stream_pair_details',
+      )->name('Generals_dynamic_pairDetails');
+      1;
+    };
 
     foreach my $route ($app->general_routing->all_valid_routes()) {
       $logger->debug("building nav items for "
@@ -321,6 +312,9 @@ package Game::EvonyTKR::Controller::Generals {
           # Build routes for this general
           $self->_build_general_routes($g, $app, $controller_name,
             $referenceRoutes);
+          my $bm = $app->get_root_manager->bookManager();
+          $g->populateBuiltInBook($bm);
+          $app->plugins->emit(general_loaded => { manager => $gm, general => $g});
         };
         if ($@) {
           $logger->error("Error processing $generalFile: $@");
@@ -373,20 +367,6 @@ package Game::EvonyTKR::Controller::Generals {
       };
       if ($@) {
         $manager->logger->error("Error in conflict processing: $@");
-        $callback->();    # Continue anyway
-      }
-    });
-  }
-
-  sub _build_pairs_async($self, $manager, $callback) {
-    # Break up pair building into chunks
-    Mojo::IOLoop->next_tick(sub {
-      eval {
-        $manager->generalPairManager->build_pairs();
-        $callback->();
-      };
-      if ($@) {
-        $manager->logger->error("Error in pair building: $@");
         $callback->();    # Continue anyway
       }
     });
@@ -740,6 +720,19 @@ package Game::EvonyTKR::Controller::Generals {
     my $generalType    = $route_meta->{generalType};
     my $buffActivation = $route_meta->{buffActivation};
     my $uiTarget       = $route_meta->{uiTarget};
+
+    my $pair_count = 0;
+    for my $type (keys %{$self->app->pairManager->pairs_by_type}) {
+      $pair_count += scalar @{$self->app->pairManager->pairs_by_type->{$generalType}};
+    }
+    if ($pair_count == 0) {
+       # Pairs not loaded yet, show loading page
+       return $self->render(
+         template => 'generals/pairs/loading',
+         message => 'Pairs are still being built. Please refresh in a moment.',
+         refresh_seconds => 5
+       );
+     }
 
     # Fetch query params with defaults
     my $ascendingLevel       = $self->param('ascendingLevel') // 'red5';
@@ -1248,6 +1241,7 @@ package Game::EvonyTKR::Controller::Generals {
     # If the browser closes, remove the stored session
     $c->on(
       finish => sub {
+
         $_->kill('TERM') for @subs;
         if (exists $session_store->{$session_id}) {
           delete $session_store->{$session_id};
@@ -1417,59 +1411,70 @@ package Game::EvonyTKR::Controller::Generals {
 
     }
 
-    my $timer;
-    my $sent_jobs = {};  # Track which jobs we've already sent
+    my @promises;
 
-    $timer = Mojo::IOLoop->recurring(0.1 => sub($ioloop) {
-      $logger->debug('recurring event loop fired');
-      if (!$c->tx || $c->tx->is_finished) {
-        $logger->debug("Client disconnected, stopping timer");
-        Mojo::IOLoop->remove($timer) if $timer;
-        return;
-      }
+    foreach my $jid (@subs) {
+      my $job = $c->app->minion->job($jid);
 
-      foreach my $jid (@subs) {
-        next if $sent_jobs->{$jid};  # Skip already sent
-
-        my $job = $c->app->minion->job($jid);
-        next unless $job;
-
-        my $info = $job->info;
-        next unless $info && $info->{state} eq 'finished';
-
-        $logger->debug("Found completed job $jid, sending SSE");
-        $sent_jobs->{$jid} = 1;
-
-        if ($info->{notes} && $info->{notes}->{result}) {
-          $c->write_sse({ type => 'pair', text => $info->{notes}->{result} });
+      my $promise = $c->app->minion->result_p($jid)->then(sub {
+        return if !$c->tx || $c->tx->is_finished;
+        my $result = shift;
+        if(defined($result) && ref($result) eq 'HASH'){
+          $logger->debug("job $jid result is " . Data::Printer::np($result));
+          if($result->{result}->{status} eq 'complete') {
+            $c->write_sse({ type => 'pair', text => $result->{result}->{result} });
+          }
         }
-      }
+        return $result;
+      })->catch(sub {
+        my $err = shift;
+        $logger->error("Job $jid failed: " . Data::Printer::np($err, multiline => 0));
+        return undef;  # Return something for Promise->all
+      });
 
-      # Check if all done
-      my $completed_count = scalar(keys %$sent_jobs);
-      if ($completed_count >= $total_processes) {
-        Mojo::IOLoop->remove($timer);
+      push @promises, $promise;
+    }
+
+    # Send completion when ALL jobs are done
+    Mojo::Promise->all(@promises)->then(sub {
+      $logger->debug("all jobs complete promise handler starting timer");
+      return if !$c->tx || $c->tx->is_finished;
+      # I cannot know which order the promise handlers will
+      # run in, I *need* this one to be *after* all the individual
+      # job handlers have run.
+      Mojo::IOLoop->timer(10 => sub ($loop) {
+        $logger->debug('all jobs complete promise handler sending complete event');
         my $payload = encode_json({ runId => $run_id });
         $c->write_sse({ type => 'complete', text => $payload });
-      }
+      });
+
+    })->catch(sub {
+      $logger->error("Some jobs failed in batch");
     });
+
+
 
     $c->on(
       finish => sub {
         $logger->debug(
           "Client disconnected, canceling " . scalar(@subs) . " jobs");
-        Mojo::IOLoop->remove($timer);
         foreach my $jid (@subs) {
           my $job = $c->app->minion->job($jid);
           if ($job) {
-            my $state = $job->info->{state};
+            my $info = $job->info;
+            next unless $info;  # Job might be gone
+            my $state = $info->{state};
             if ($state eq 'inactive') {
               $job->remove;
               $logger->debug("Removed inactive job $jid");
             }
-            elsif ($state eq 'active') {
-              $job->kill();
-              $logger->debug(sprintf('Killed active job %s', ($jid // 'unknown jid')));
+            elsif ($state eq 'active' && $info->{pid}) {
+              eval { $job->kill(); };
+              if ($@) {
+                $logger->debug("Failed to kill job $jid: $@");
+              } else {
+                $logger->debug("Killed active job $jid");
+              }
             }
           }
         }

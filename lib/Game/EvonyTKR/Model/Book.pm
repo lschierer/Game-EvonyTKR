@@ -101,7 +101,7 @@ class Game::EvonyTKR::Model::Book : isa(Game::EvonyTKR::Shared::Constants) {
 
       if (scalar @classStack > 3) {
         if ($classStack[3] eq 'Buff') {
-          $self->logger->info("adding $newBuff to $name");
+          $self->logger->debug("adding $newBuff to $name");
 
           # Check if $buff is defined and is an array reference
           if (!defined $buff) {

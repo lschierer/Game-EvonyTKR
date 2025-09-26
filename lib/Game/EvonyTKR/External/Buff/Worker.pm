@@ -47,7 +47,11 @@ package Game::EvonyTKR::External::Buff::Worker {
           my $result = $worker->calculate_buffs($args);
           $logger->debug(sprintf('result is %s', $result));
           $job->note(result => $result);
-          $job->finish({ status => 'complete' });
+          my $runId = $args->{runId};
+          $job->finish({
+            status => 'complete',
+            result  => $result,
+          });
         };
         if ($@) {
           $logger->error("Job " . $job->id . " failed: $@");
@@ -61,6 +65,9 @@ package Game::EvonyTKR::External::Buff::Worker {
   class WorkerLogic : isa(Game::EvonyTKR::Shared::Constants) {
     use Hash::Util    qw(lock_hash lock_hash_recurse lock_value);
     use Log::Log4perl qw(:levels);
+    use Unicode::Normalize;
+    use Unicode::CaseFold qw(fc);
+    use Encode qw(is_utf8 decode_utf8 encode_utf8);
     use Carp;
 
     field $debug_enabled : param = 0;
@@ -200,7 +207,7 @@ package Game::EvonyTKR::External::Buff::Worker {
     method worker_croak ($error_msg) {
       if ($debug_enabled) {
         if (defined($logger)) {
-          $self->worker_croak($error_msg);
+          $logger->logcroak($error_msg);
         }
         else {
           croak($error_msg);
@@ -788,10 +795,24 @@ package Game::EvonyTKR::External::Buff::Worker {
     method load_general ($name) {
       $logger->debug('collection_dir is ' . $collection_dir->realpath());
       my $generals_dir = $collection_dir->child('generals');
-      my $general_file = $generals_dir->child("${name}.yaml");
-      unless ($general_file->is_file()) {
+      my $normalized_name = $self->normalize_name($name);
+      my ($general_file) = grep {
+          my $normalized_file = $self->normalize_name($_->basename('.yaml'));
+          $normalized_file eq $normalized_name;
+      } $generals_dir->children;
+
+      unless (defined($general_file) && $general_file->is_file()) {
+        $logger->debug("+++Missing General: '$name' ;; '$normalized_name'");
+        $logger->debug('+++Raw general name: ' . unpack("H*", encode_utf8($name)));
+        $logger->debug("+++After normalize_quotes: " . unpack("H*", encode_utf8($normalized_name)));
+        $logger->debug('+++Available files: ');
+        foreach my $child ($generals_dir->children){
+          my $cn = decode_utf8($child->basename =~ s/\.yaml$//r);
+          $logger->debug("+++'$cn' (bytes: " . unpack("H*", encode_utf8($cn)) . ")");
+        }
+
         $self->worker_croak(
-          "No YAML file present for $name in $collection_dir");
+          "No YAML file present for $name in $generals_dir");
         return;
       }
       my $data    = $general_file->slurp_utf8;
@@ -805,7 +826,14 @@ package Game::EvonyTKR::External::Buff::Worker {
     method load_covenant ($primary) {
       my $name            = $primary->name;
       my $covenants_dir   = $collection_dir->child('covenants');
-      my ($covenant_file) = $covenants_dir->children(qr/^\Q$name\E\.yaml$/i);
+      # Normalize both the search name and filenames
+      my $normalized_name = $self->normalize_name($name);
+
+      my ($covenant_file) = grep {
+        my $normalized_file = $self->normalize_name($_->basename('.yaml'));
+          $normalized_file eq $normalized_name;
+      } $covenants_dir->children;
+
       if (defined($covenant_file) && $covenant_file->is_file()) {
         my $data   = $covenant_file->slurp_utf8;
         my $object = $ypp->load_string($data);
@@ -813,8 +841,7 @@ package Game::EvonyTKR::External::Buff::Worker {
           Game::EvonyTKR::Model::Covenant->from_hash($object, $primary,
           $logger);
         return $c;
-      }
-      else {
+      } else {
         # not all generals *do* have convenants, so this is *probably* expected
         $logger->info("No covenant available for $name.");
       }
@@ -824,13 +851,14 @@ package Game::EvonyTKR::External::Buff::Worker {
     method load_specialities ($general) {
       my $specialty_dir = $collection_dir->child('specialties');
       foreach my $specialty_name ($general->specialtyNames->@*) {
-        my ($specialty_file) =
-          $specialty_dir->children(qr/^\Q$specialty_name\E\.yaml$/i);
+
+        my $normalized_name = $self->normalize_name($specialty_name);
+        my ($specialty_file) = grep {
+            my $normalized_file = $self->normalize_name($_->basename('.yaml'));
+            $normalized_file eq $normalized_name;
+        } $specialty_dir->children;
+
         if (defined($specialty_file) && $specialty_file->is_file()) {
-          $logger->debug(sprintf(
-            'found specialty file %s for specialty %s',
-            $specialty_file, $specialty_name
-          ));
           my $data   = $specialty_file->slurp_utf8;
           my $object = $ypp->load_string($data);
           my $s = Game::EvonyTKR::Model::Specialty->from_hash($object, $logger);
@@ -838,6 +866,11 @@ package Game::EvonyTKR::External::Buff::Worker {
         }
         else {
           # specialties *should* exist.
+          $logger->debug("----Available specialty files:");
+          for my $file ($specialty_dir->children) {
+            my $name = decode_utf8($file->basename =~ s/\.yaml$//r);
+            $logger->debug("----'$name' (bytes: " . unpack("H*", encode_utf8($name)) . ")");
+          }
           $self->worker_croak(sprintf(
             'specialty "%s" for general "%s" not found.',
             $specialty_name, $general->name
@@ -849,7 +882,12 @@ package Game::EvonyTKR::External::Buff::Worker {
     method load_builtin_book ($general) {
       my $book_dir    = $collection_dir->child('skill books');
       my $book_name   = $general->builtInBookName;
-      my ($book_file) = $book_dir->children(qr/^\Q$book_name\E\.yaml$/i);
+      my $normalized_name = $self->normalize_name($book_name);
+      my ($book_file) = grep {
+          my $normalized_file = $self->normalize_name($_->basename('.yaml'));
+          $normalized_file eq $normalized_name;
+      } $book_dir->children;
+
       if (defined($book_file) && $book_file->is_file()) {
         $logger->debug(
           sprintf('found book file %s for book %s', $book_file, $book_name));
@@ -876,14 +914,19 @@ package Game::EvonyTKR::External::Buff::Worker {
       }
       my $ascending_attr_dir = $collection_dir->child('ascending attributes');
       my $name               = $general->name;
-      my ($aa_file) = $ascending_attr_dir->children(qr/^\Q$name\E\.yaml$/i);
+      my $normalized_name = $self->normalize_name($name);
+
+      my ($aa_file) = grep {
+          my $normalized_file = $self->normalize_name($_->basename('.yaml'));
+          $normalized_file eq $normalized_name;
+      } $ascending_attr_dir->children;
+
       if (defined($aa_file) && $aa_file->is_file()) {
         my $data   = $aa_file->slurp_utf8;
         my $object = $ypp->load_string($data);
         my $aa =
           Game::EvonyTKR::Model::AscendingAttributes->from_hash($object,
           $logger);
-
       }
       else {
         $self->worker_croak(sprintf(
@@ -953,6 +996,13 @@ package Game::EvonyTKR::External::Buff::Worker {
       return \@books;
     }
 
+    method normalize_name ($name) {
+      my $dn = is_utf8($name) ? $name : decode_utf8($name);
+      my $nn = fc(NFKD($dn));
+      $nn =~ s/[’''‛`´]/'/g;
+      $nn =~ s/[""‟]/"/g;    # Quotes
+      return $nn;
+    }
   }
 }
 1;

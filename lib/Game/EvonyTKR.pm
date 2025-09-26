@@ -117,7 +117,11 @@ package Game::EvonyTKR {
     # Register infrastructure plugins in specific order
 
     # First Plugins that provide helpers but do not define routes
-    $self->plugin(Minion => { SQLite => 'sqlite:minion.db' });
+    my $dbPath = Mojo::File->new('minion.db');
+
+
+    $self->log->debug("dbPath is $dbPath");
+    $self->plugin(Minion => { SQLite => "sqlite:$dbPath" });
     # Minion worker
     $self->plugin('Game::EvonyTKR::External::Buff::Worker');
     # Markdown

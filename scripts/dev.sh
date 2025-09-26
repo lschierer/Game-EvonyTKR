@@ -13,8 +13,15 @@ trap cleanup EXIT INT TERM
 
 # Start Minion worker in background
 echo "Starting Minion workers..."
-for i in $(seq 1 10); do
-  ./bin/game-evonytkr minion worker -j 2 &
+
+if [ -f minion.db ]; then
+  rm -fv minion.db*
+fi
+
+touch minion.db
+
+for i in $(seq 1 5); do
+  nice -n 10 ./bin/game-evonytkr minion worker -j 10 &
   WORKER_PID=$!
   echo "Worker PID: $WORKER_PID"
 done

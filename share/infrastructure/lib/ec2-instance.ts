@@ -1,6 +1,8 @@
 import { NestedStack, Stack } from 'aws-cdk-lib';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
+import * as s3Assets from 'aws-cdk-lib/aws-s3-assets';
 import * as fs from 'fs';
+import * as cdk from 'aws-cdk-lib';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -27,6 +29,10 @@ export class UbuntuInstance extends NestedStack {
   ) {
     super(scope, id);
 
+    const instanceRole = new cdk.aws_iam.Role(this, 'InstanceRole', {
+      assumedBy: new cdk.aws_iam.ServicePrincipal('ec2.amazonaws.com'),
+    });
+
     // slightly randomize the hostname so that if I need to iterate
     // on the way the ec2 instance is built, letsencrypt sees different account names
     this.hostname =
@@ -42,7 +48,31 @@ export class UbuntuInstance extends NestedStack {
       'REPLACE2.',
       props.environment === 'prod' ? '' : `${props.environment}2.`,
     );
-    const userData = ec2.UserData.custom(userDataFile);
+    const cloud_user_data = ec2.UserData.custom(userDataFile);
+    const mojoBinAsset = new s3Assets.Asset(this, 'MyScriptAsset', {
+      path: path.join(__dirname, '../mojobin'),
+    });
+    mojoBinAsset.grantRead(instanceRole);
+    const shellCommands = ec2.UserData.forLinux();
+    shellCommands.addCommands(
+      'add-apt-repository universe',
+      'apt install -y awscli',
+      'snap install aws-cli --classic',
+      `aws s3 cp s3://${mojoBinAsset.s3BucketName}/${mojoBinAsset.s3ObjectKey} /tmp/mojobin.zip`,
+      'mkdir -p /opt/mojo/bin',
+      'cd /opt/mojo/bin',
+      'unzip /tmp/mojobin.zip',
+      'chown -R mojo:mojo /opt/mojo',
+      'chmod +x /opt/mojo/bin/*.sh',
+      'sudo -u mojo -s /bin/bash -l -c /opt/mojo/bin/bootstrap.sh',
+      'systemctl start mojolicious',
+      'systemctl reload nginx',
+    );
+
+    // Combine them with MultiPart
+    const userData = new ec2.MultipartUserData();
+    userData.addUserDataPart(cloud_user_data, ec2.MultipartBody.SHELL_SCRIPT);
+    userData.addUserDataPart(shellCommands, ec2.MultipartBody.SHELL_SCRIPT);
 
     const instanceSize = !props.environment.localeCompare('dev')
       ? ec2.InstanceSize.SMALL
@@ -57,6 +87,7 @@ export class UbuntuInstance extends NestedStack {
     );
 
     this.instance = new ec2.Instance(this, 'Instance', {
+      role: instanceRole,
       userData,
       userDataCausesReplacement: true,
       vpc: props.vpc,
