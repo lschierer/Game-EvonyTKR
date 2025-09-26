@@ -134,7 +134,8 @@ package Game::EvonyTKR::Controller::Covenants {
 
       while (@files_copy && $batch_count < $batch_size) {
         my $covenantFile = shift @files_copy;
-        $covenantFile = Mojo::File->new(Encode::decode_utf8($covenantFile->to_string));
+        $covenantFile =
+          Mojo::File->new(Encode::decode_utf8($covenantFile->to_string));
         $batch_count++;
         $processed++;
 
@@ -154,8 +155,8 @@ package Game::EvonyTKR::Controller::Covenants {
           if (exists $object->{name}) {
             if ($object->{name} !~ /$name/i) {
               $logger->error(sprintf(
-              'filename and internal name do not match '
-              . 'for file "%s" with name "%s"',
+                'filename and internal name do not match '
+                  . 'for file "%s" with name "%s"',
                 $covenantFile, $object->{name}
               ));
             }

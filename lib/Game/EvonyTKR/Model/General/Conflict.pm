@@ -719,7 +719,6 @@ class Game::EvonyTKR::Model::General::Conflict :
     return 1;  # compatible (no conflicting active/active identical-state pairs)
   }
 
-
   # Optional: build the per-general conflicts hash using are_generals_compatible
   # Optional: build all pairwise conflicts and bucketed indices at startup
   my method build_conflicts_index($rootManager) {
@@ -769,7 +768,7 @@ class Game::EvonyTKR::Model::General::Conflict :
     $self->build_meta_for($general, 'assistant');
 
     my @existing = values $generalManager->get_all_generals()->%*;
-    return if(scalar @existing == 0);
+    return if (scalar @existing == 0);
 
     # Compare this general against all previously loaded generals
     for my $existing_general (@existing) {
@@ -789,7 +788,6 @@ class Game::EvonyTKR::Model::General::Conflict :
       $self->set_assume_g1_is_main($prev);
     }
   }
-
 
 }
 1;

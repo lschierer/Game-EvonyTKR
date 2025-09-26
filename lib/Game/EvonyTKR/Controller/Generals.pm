@@ -144,12 +144,14 @@ package Game::EvonyTKR::Controller::Generals {
       }
     );
 
-    $app->plugins->on(conflicts_computed => sub {
-      my ($plugin, $data) = @_;
-      my $manager = $data->{manager};
-      my $general = $data->{general};
-      $manager->generalPairManager->build_pairs($general);
-    });
+    $app->plugins->on(
+      conflicts_computed => sub {
+        my ($plugin, $data) = @_;
+        my $manager = $data->{manager};
+        my $general = $data->{general};
+        $manager->generalPairManager->build_pairs($general);
+      }
+    );
 
     # two routes for directory indices
     $mainRoutes->get('/:uiTarget')->requires(is_valid_uiTarget => 1)->to(
@@ -201,8 +203,8 @@ package Game::EvonyTKR::Controller::Generals {
       )->name('General_dynamic_pairTable');
 
       # two routes to generate the lists of names
-      $mainRoutes->any(['GET', 'POST'] => '/:uiTarget/:buffActivation/data.json')
-        ->to(
+      $mainRoutes->any(
+        ['GET', 'POST'] => '/:uiTarget/:buffActivation/data.json')->to(
         controller => 'Generals',
         action     => 'singleCatalog',
         )->name('Generals_dynamic_singleData');
@@ -286,13 +288,13 @@ package Game::EvonyTKR::Controller::Generals {
     my $total      = @files_copy;
     my $processed  = 0;
 
-    my $process_next_batch;
-    $process_next_batch = sub {
-      my $batch_size  = 5;    # Process 5 files per tick
-      my $batch_count = 0;
+    my $batch_size  = 1;    #trying to preserve responsiveness of the main loop.
+    my $batch_count = 0;
+    foreach my $generalFile (@files_copy) {
+      $logger->info(
+        sprintf('there are %s files remaining', scalar(@files_copy)));
+      Mojo::IOLoop->next_tick(sub {
 
-      while (@files_copy && $batch_count < $batch_size) {
-        my $generalFile = shift @files_copy;
         $batch_count++;
         $processed++;
 
@@ -314,25 +316,18 @@ package Game::EvonyTKR::Controller::Generals {
             $referenceRoutes);
           my $bm = $app->get_root_manager->bookManager();
           $g->populateBuiltInBook($bm);
-          $app->plugins->emit(general_loaded => { manager => $gm, general => $g});
+          $app->plugins->emit(
+            general_loaded => { manager => $gm, general => $g });
         };
         if ($@) {
           $logger->error("Error processing $generalFile: $@");
         }
-      }
 
-      if (@files_copy) {
-        # Schedule next batch
-        Mojo::IOLoop->next_tick($process_next_batch);
-      }
-      else {
-        # All done
-        $callback->();
-      }
-    };
+      });
+    }
+    # All done
+    $callback->();
 
-    # Start processing
-    $process_next_batch->();
   }
 
   sub _build_general_routes($self, $general, $app, $controller_name,
@@ -722,17 +717,18 @@ package Game::EvonyTKR::Controller::Generals {
     my $uiTarget       = $route_meta->{uiTarget};
 
     my $pair_count = 0;
-    for my $type (keys %{$self->app->pairManager->pairs_by_type}) {
-      $pair_count += scalar @{$self->app->pairManager->pairs_by_type->{$generalType}};
+    for my $type (keys %{ $self->app->pairManager->pairs_by_type }) {
+      $pair_count +=
+        scalar @{ $self->app->pairManager->pairs_by_type->{$generalType} };
     }
     if ($pair_count == 0) {
-       # Pairs not loaded yet, show loading page
-       return $self->render(
-         template => 'generals/pairs/loading',
-         message => 'Pairs are still being built. Please refresh in a moment.',
-         refresh_seconds => 5
-       );
-     }
+      # Pairs not loaded yet, show loading page
+      return $self->render(
+        template => 'generals/pairs/loading',
+        message  => 'Pairs are still being built. Please refresh in a moment.',
+        refresh_seconds => 5
+      );
+    }
 
     # Fetch query params with defaults
     my $ascendingLevel       = $self->param('ascendingLevel') // 'red5';
@@ -1400,9 +1396,9 @@ package Game::EvonyTKR::Controller::Generals {
         {
           delay => ($index * 0.1) + rand(0.5),
           notes => {
-            pair_index  => $index,
-            run_id      => $run_id,
-            session_id  => $session_id,
+            pair_index => $index,
+            run_id     => $run_id,
+            session_id => $session_id,
           }
         }
       );
@@ -1419,17 +1415,19 @@ package Game::EvonyTKR::Controller::Generals {
       my $promise = $c->app->minion->result_p($jid)->then(sub {
         return if !$c->tx || $c->tx->is_finished;
         my $result = shift;
-        if(defined($result) && ref($result) eq 'HASH'){
+        if (defined($result) && ref($result) eq 'HASH') {
           $logger->debug("job $jid result is " . Data::Printer::np($result));
-          if($result->{result}->{status} eq 'complete') {
-            $c->write_sse({ type => 'pair', text => $result->{result}->{result} });
+          if ($result->{result}->{status} eq 'complete') {
+            $c->write_sse(
+              { type => 'pair', text => $result->{result}->{result} });
           }
         }
         return $result;
       })->catch(sub {
         my $err = shift;
-        $logger->error("Job $jid failed: " . Data::Printer::np($err, multiline => 0));
-        return undef;  # Return something for Promise->all
+        $logger->error(
+          "Job $jid failed: " . Data::Printer::np($err, multiline => 0));
+        return undef;    # Return something for Promise->all
       });
 
       push @promises, $promise;
@@ -1442,17 +1440,18 @@ package Game::EvonyTKR::Controller::Generals {
       # I cannot know which order the promise handlers will
       # run in, I *need* this one to be *after* all the individual
       # job handlers have run.
-      Mojo::IOLoop->timer(10 => sub ($loop) {
-        $logger->debug('all jobs complete promise handler sending complete event');
-        my $payload = encode_json({ runId => $run_id });
-        $c->write_sse({ type => 'complete', text => $payload });
-      });
+      Mojo::IOLoop->timer(
+        10 => sub ($loop) {
+          $logger->debug(
+            'all jobs complete promise handler sending complete event');
+          my $payload = encode_json({ runId => $run_id });
+          $c->write_sse({ type => 'complete', text => $payload });
+        }
+      );
 
     })->catch(sub {
       $logger->error("Some jobs failed in batch");
     });
-
-
 
     $c->on(
       finish => sub {
@@ -1462,7 +1461,7 @@ package Game::EvonyTKR::Controller::Generals {
           my $job = $c->app->minion->job($jid);
           if ($job) {
             my $info = $job->info;
-            next unless $info;  # Job might be gone
+            next unless $info;    # Job might be gone
             my $state = $info->{state};
             if ($state eq 'inactive') {
               $job->remove;
@@ -1472,7 +1471,8 @@ package Game::EvonyTKR::Controller::Generals {
               eval { $job->kill(); };
               if ($@) {
                 $logger->debug("Failed to kill job $jid: $@");
-              } else {
+              }
+              else {
                 $logger->debug("Killed active job $jid");
               }
             }
