@@ -1,8 +1,13 @@
 ---
 git_meta:
-  authors: Wags-SMITE, Luke S. Schierer
+  authors: Luke S. Schierer, Wags-SMITE
   copyright: 2023-2025
+hypnotoad:
+  workers: 2
+  accepts: 0
+  clients: 10
+  listen:
+    - 'http://*:3000'
+  proxy: 1
 secrets:
   - e0deeacd35ce3e6c4b07a33ae421a4704636f001
-hypnotoad:
-  proxy: 1
