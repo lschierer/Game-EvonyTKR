@@ -10,6 +10,8 @@ package Game::EvonyTKR::Controller::ConflictGroups {
   use List::AllUtils qw( all any none );
   use Carp;
 
+  my $logger;
+
   sub controller_name ($self) {
     return "ConflictGroups";
   }
@@ -20,17 +22,22 @@ package Game::EvonyTKR::Controller::ConflictGroups {
     return $base;
   }
 
+  my $rootManager;
+
   sub get_conflict_detector ($self) {
-    return $self->app->get_root_manager->conflictDetector;
+    return $rootManager->conflictDetector;
   }
 
-  sub register($self, $app, $config = {}) {
-    my $logger = Log::Log4perl->get_logger(__PACKAGE__);
-    $logger->info("Registering routes for " . ref($self));
-    $self->SUPER::register($app, $config);
+  state @conflict_queue = ();
+
+  sub register($c, $app, $config = {}) {
+    $logger = Log::Log4perl->get_logger(__PACKAGE__);
+    $logger->info("Registering routes for " . ref($c));
+    $c->SUPER::register($app, $config);
+    $rootManager = $app->get_root_manager();
 
     my $routes          = $app->routes->any($base);
-    my $controller_name = $self->controller_name();
+    my $controller_name = $c->controller_name();
 
     $routes->get('/')
       ->to(controller => $controller_name, action => 'index')
@@ -46,31 +53,40 @@ package Game::EvonyTKR::Controller::ConflictGroups {
     $app->plugins->on(
       general_loaded => sub {
         my ($plugin, $data) = @_;
-        my $manager = $app->get_root_manager();
-        my $gm      = $data->{manager};
         my $general = $data->{general};
-        # I want a fairly extensive delay,
-        # I want to push these out past many
-        # of the generals loading.
-        my $delay = 10 + rand(10.0);
-        $logger->info(sprintf(
-        'ConflictGroups Controller saw general_loaded event for %s, waiting %s',
-        $general->name, $delay
-        ));
-        Mojo::IOLoop->timer(
-          $delay => sub {
-          $logger->debug(
-            sprintf('conflict detection triggered for %s', $general->name));
-          $manager->conflictDetector->process_single_general($general, $gm);
-          $app->plugins->emit(
-            conflicts_computed => { manager => $manager, general => $general });
-        });
+        unless (defined($general)) {
+          $logger->error('general is undefined in general_loaded callback');
+          return;
+        }
+        push @conflict_queue, $general;
       }
     );
+
+    $app->plugins->on(
+      generals_loaded => sub {
+        foreach my $general (@conflict_queue) {
+          my $delay = 10 + rand(10.0);
+          Mojo::IOLoop->timer(
+            $delay => sub {
+              $c->load_one_general($general, $app);
+            }
+          );
+        }
+      }
+    );
+
+  }
+
+  sub load_one_general($c, $general, $app) {
+    my $gm               = $app->get_root_manager()->generalManager;
+    my $conflictDetector = $c->get_conflict_detector();
+
+    $logger->info(sprintf('load_one_general called for %s', $general->name));
+    $conflictDetector->process_single_general($general, $gm);
+    $app->plugins->emit(conflicts_computed => { general => $general });
   }
 
   sub index ($self) {
-    my $logger = Log::Log4perl->get_logger(__PACKAGE__);
     $logger->debug("Rendering conflict groups index");
 
     my $detector = $self->get_conflict_detector();
