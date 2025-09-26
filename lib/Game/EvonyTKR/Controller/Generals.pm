@@ -112,25 +112,24 @@ package Game::EvonyTKR::Controller::Generals {
         my $cd = Mojo::File->new($app->config('distDir'))
           ->child('collections/data/generals/');
         my @files = $cd->list_tree->each;
+        $gm->set_expectedTotal(scalar(@files));
 
         foreach my $generalFile (@files) {
           my $delay = rand(4.0);
           Mojo::IOLoop->timer(
             $delay => sub {
-              my $promise = Mojo::Promise->new(sub {
-                unless ($manager) {
-                  $logger->error(
-                    "manager is not defined when processing $generalFile");
-                  return;
-                }
-                unless ($app) {
-                  $logger->error(
-                    "app is not defined when processing $generalFile");
-                  return;
-                }
-                $logger->debug("processing $generalFile");
-                return $self->_import_general($generalFile, $app, $manager);
-              });
+              unless ($manager) {
+                $logger->error(
+                  "manager is not defined when processing $generalFile");
+                return;
+              }
+              unless ($app) {
+                $logger->error(
+                  "app is not defined when processing $generalFile");
+                return;
+              }
+              $logger->debug("processing $generalFile");
+              return $self->_import_general($generalFile, $app, $manager);
             }
           );
         }
@@ -145,9 +144,13 @@ package Game::EvonyTKR::Controller::Generals {
         my $general = $data->{general};
         $self->_build_general_routes($general, $app, $controller_name,
           $referenceRoutes);
+
+        if($manager->generalManager->fully_populated()){
+          $logger->info('general manager reports all generals are loaded');
+          $app->plugins->emit(generals_loaded => { manager => $manager });
+        }
       }
     );
-
 
     # a routes for single general tables
     # and the index routes for troop type categories that go under /Generals
@@ -257,43 +260,35 @@ package Game::EvonyTKR::Controller::Generals {
   # when this gets called,
   # $something is some sort of anon function that has access to random things.
   sub _import_general($something, $generalFile, $app, $manager) {
-    my $interval = 0.01 + rand(0.04);
-    $logger->debug(
-      "_import_general called for $generalFile, interval is $interval");
-    Mojo::IOLoop->timer(
-      $interval => sub {
-        $logger->debug("timer fired for $generalFile");
-        eval {
-          $logger->info("importing file $generalFile");
-          my $data = $generalFile->slurp('UTF-8');
-          my $ho   = YAML::PP->new(
-            schema       => [qw/ + Perl /],
-            yaml_version => ['1.2', '1.1'],
-          )->load_string($data);
-          my $g = Game::EvonyTKR::Model::General->from_hash($ho, $logger);
-          if (!$manager) {
-            $logger->error(
-              "manager is not defined in _import_general for $generalFile");
-            return;
-          }
-          my $gm = $manager->generalManager;
-          $gm->add_general($g);
-          $logger->debug(
-            sprintf('imported general %s from file %s', $g->name, $generalFile)
-          );
-
-          # Build routes for this general
-
-          my $bm = $manager->bookManager();
-          $g->populateBuiltInBook($bm);
-          $app->plugins->emit(
-            general_loaded => { manager => $gm, general => $g });
-        };
-        if ($@) {
-          $logger->error("Error processing $generalFile: $@");
-        }
+    $logger->debug("_import_general called for $generalFile");
+    $logger->debug("timer fired for $generalFile");
+    eval {
+      $logger->info("importing file $generalFile");
+      my $data = $generalFile->slurp('UTF-8');
+      my $ho   = YAML::PP->new(
+        schema       => [qw/ + Perl /],
+        yaml_version => ['1.2', '1.1'],
+      )->load_string($data);
+      my $g = Game::EvonyTKR::Model::General->from_hash($ho, $logger);
+      if (!$manager) {
+        $logger->error(
+          "manager is not defined in _import_general for $generalFile");
+        return;
       }
-    );
+      my $gm = $manager->generalManager;
+      $gm->add_general($g);
+      $logger->debug(
+        sprintf('imported general %s from file %s', $g->name, $generalFile));
+
+      # Build routes for this general
+
+      my $bm = $manager->bookManager();
+      $g->populateBuiltInBook($bm);
+      $app->plugins->emit(general_loaded => { manager => $gm, general => $g });
+    };
+    if ($@) {
+      $logger->error("Error processing $generalFile: $@");
+    }
   }
 
   sub _build_general_routes($self, $general, $app, $controller_name,

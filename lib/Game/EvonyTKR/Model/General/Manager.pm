@@ -23,6 +23,12 @@ class Game::EvonyTKR::Model::General::Manager :
     'fallback' => 0;
 
   field $generals = {};
+  field $expectedTotal : writer = 0;
+
+  method fully_populated {
+    my $loaded = keys $generals->%*;
+    return $loaded >= $expectedTotal;
+  }
 
   method add_general($ng) {
     if (Scalar::Util::blessed($ng) eq 'Game::EvonyTKR::Model::General') {
@@ -42,6 +48,8 @@ class Game::EvonyTKR::Model::General::Manager :
     }
     return 0;
   }
+
+
 
   method importAll ($SourceDir) {
     $SourceDir = Path::Tiny::path($SourceDir);
