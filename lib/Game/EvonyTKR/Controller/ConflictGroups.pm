@@ -49,7 +49,10 @@ package Game::EvonyTKR::Controller::ConflictGroups {
         my $manager = $app->get_root_manager();
         my $gm      = $data->{manager};
         my $general = $data->{general};
-        my $delay = rand(4.0);
+        # I want a fairly extensive delay,
+        # I want to push these out past many
+        # of the generals loading.
+        my $delay = 10 + rand(10.0);
         $logger->info(sprintf(
         'ConflictGroups Controller saw general_loaded event for %s, waiting %s',
         $general->name, $delay
