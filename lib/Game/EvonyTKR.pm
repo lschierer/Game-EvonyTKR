@@ -141,6 +141,9 @@ package Game::EvonyTKR {
 
     # configure to tell it that I will be behind an ELB/ALB.
     #$self->reverse_proxy(1);
+    Mojo::IOLoop->next_tick(sub ($ioloop) {
+      $self->plugins->emit(worker_started => { app => $self });
+    });
   }
 };
 

@@ -55,7 +55,7 @@ package Game::EvonyTKR::Controller::Generals {
     return $self->app->get_root_manager->generalManager;
   }
 
-
+  my $promise_chain;
 
   sub register($self, $app, $config = {}) {
     $logger = Log::Log4perl->get_logger(__PACKAGE__);
@@ -75,7 +75,8 @@ package Game::EvonyTKR::Controller::Generals {
         return $routing;
       }
     );
-    $app->plugins->emit(general_routing_available => {routing => $app->general_routing});
+    $app->plugins->emit(
+      general_routing_available => { routing => $app->general_routing });
 
     my $controller_name = $self->controller_name();
 
@@ -99,120 +100,112 @@ package Game::EvonyTKR::Controller::Generals {
       order  => 10,
     });
 
-    my $gm = $app->get_root_manager->generalManager;
+    my $manager = $app->get_root_manager;
+
+    my $gm = $manager->generalManager;
     if (not defined $gm) {
-      $logger->logcroak('No pair manager in manager');
+      $logger->logcroak('No general manager in manager');
     }
 
     $app->plugins->on(
-      'evonytkrtips_initialized' => sub($c, $manager) {
-        $logger->debug(
-          "evonytkrtips_initialized sub has controller_name $controller_name.");
-
-        if (not defined $gm) {
-          $logger->logcroak("general manager must be defined");
-        }
-
+      worker_started => sub {
         my $cd = Mojo::File->new($app->config('distDir'))
           ->child('collections/data/generals/');
         my @files = $cd->list_tree->each;
 
-        $logger->info(
-          "Starting async import of " . scalar(@files) . " general files");
-
-        my $processed = 0;
-        my $total = scalar(@files);
         foreach my $generalFile (@files) {
-          #spread the hypnotoad workers out very slightly
-          my $interval = 0.01 + rand(0.04);
-          Mojo::IOLoop->recurring( $interval => sub {
-
-            $processed++;
-
-            eval {
-              $logger->info("importing file $generalFile ($processed/$total)");
-              my $data = $generalFile->slurp('UTF-8');
-              my $ho   = YAML::PP->new(
-                schema       => [qw/ + Perl /],
-                yaml_version => ['1.2', '1.1'],
-              )->load_string($data);
-              my $g = Game::EvonyTKR::Model::General->from_hash($ho, $logger);
-              $gm->add_general($g);
-              $logger->debug(
-                sprintf('imported general %s from file %s', $g->name, $generalFile)
-              );
-
-              # Build routes for this general
-              $self->_build_general_routes($g, $app, $controller_name,
-                $referenceRoutes);
-              my $bm = $app->get_root_manager->bookManager();
-              $g->populateBuiltInBook($bm);
-              $app->plugins->emit(
-                general_loaded => { manager => $gm, general => $g });
-            };
-            if ($@) {
-              $logger->error("Error processing $generalFile: $@");
+          my $delay = rand(4.0);
+          Mojo::IOLoop->timer(
+            $delay => sub {
+              my $promise = Mojo::Promise->new(sub {
+                unless ($manager) {
+                  $logger->error(
+                    "manager is not defined when processing $generalFile");
+                  return;
+                }
+                unless ($app) {
+                  $logger->error(
+                    "app is not defined when processing $generalFile");
+                  return;
+                }
+                $logger->debug("processing $generalFile");
+                return $self->_import_general($generalFile, $app, $manager);
+              });
             }
-
-          });
+          );
         }
       }
     );
 
-    # two routes for directory indices
-    $mainRoutes->get('/:uiTarget')->requires(is_valid_uiTarget => 1)->to(
-      controller => 'Generals',
-      action     => 'uiTarget_index',
-    )->name('General_dynamic_uiTarget_index');
-
-    # check that :uiTarget is a valid route, otherwise this becomes
-    # too broad a match and prevents anything else from matching.
-    $app->routes->add_condition(
-      is_valid_uiTarget => sub ($route, $c, $captures, $arg) {
-        my $ui = $captures->{uiTarget};
-        # make this deterministic: compare exact left side of key
-        my $slug = $c->general_routing->_slugify($ui);
-        my $ok   = 0;
-        for my $key (keys $c->general_routing->validRoutes->%*) {
-          my ($left) = split /\|/, $key, 2;
-          if ($left eq $slug) { $ok = 1; last }
-        }
-        return $ok;
+    $app->plugins->on(
+      general_loaded => sub {
+        my ($plugin, $data) = @_;
+        my $manager = $app->get_root_manager();
+        my $gm      = $data->{manager};
+        my $general = $data->{general};
+        $self->_build_general_routes($general, $app, $controller_name,
+          $referenceRoutes);
       }
     );
 
-    # check that :uiTarget/:buffActivation is a valid route combination
-    $app->routes->add_condition(
-      is_valid_buffActivation => sub ($route, $c, $captures, $arg) {
-        my ($ui, $buff) = @$captures{qw(uiTarget buffActivation)};
-        my $ok = $c->general_routing->has_route($ui, $buff) ? 1 : 0;
-        $logger->debug("check ui='$ui' buff='$buff' -> $ok");
-        return $ok;    # never die here
-      }
-    );
 
+    # a routes for single general tables
+    # and the index routes for troop type categories that go under /Generals
+    # and thus are managed by this controller
     eval {
+      # route for directory indices
+      $mainRoutes->get('/:uiTarget')->requires(is_valid_uiTarget => 1)->to(
+        controller => 'Generals',
+        action     => 'uiTarget_index',
+      )->name('General_dynamic_uiTarget_index');
+
+      # check that :uiTarget is a valid route, otherwise this becomes
+      # too broad a match and prevents anything else from matching.
+      $app->routes->add_condition(
+        is_valid_uiTarget => sub ($route, $c, $captures, $arg) {
+          my $ui = $captures->{uiTarget};
+          # make this deterministic: compare exact left side of key
+          my $slug = $c->general_routing->_slugify($ui);
+          my $ok   = 0;
+          for my $key (keys $c->general_routing->validRoutes->%*) {
+            my ($left) = split /\|/, $key, 2;
+            if ($left eq $slug) { $ok = 1; last }
+          }
+          return $ok;
+        }
+      );
+
+      # check that :uiTarget/:buffActivation is a valid route combination
+      $app->routes->add_condition(
+        is_valid_buffActivation => sub ($route, $c, $captures, $arg) {
+          my ($ui, $buff) = @$captures{qw(uiTarget buffActivation)};
+          my $ok = $c->general_routing->has_route($ui, $buff) ? 1 : 0;
+          $logger->debug("check ui='$ui' buff='$buff' -> $ok");
+          return $ok;    # never die here
+        }
+      );
+      # route for directory indices
       $mainRoutes->get('/:uiTarget/:buffActivation')
         ->requires(is_valid_buffActivation => 1)
         ->to(
         controller => 'Generals',
         action     => 'buffActivation_index',
         )->name('General_dynamic_buffActivation_index');
-      # two routes for the user interface
+
+      # routes for the user interface for single general tables
       $mainRoutes->get('/:uiTarget/:buffActivation/comparison')->to(
         controller => 'Generals',
         action     => 'singleTable',
       )->name('General_dynamic_singleTable');
 
-      # two routes to generate the lists of names
+      # route to generate the lists of names for single general tables
       $mainRoutes->any(
         ['GET', 'POST'] => '/:uiTarget/:buffActivation/data.json')->to(
         controller => 'Generals',
         action     => 'singleCatalog',
         )->name('Generals_dynamic_singleData');
 
-
-      # two routes to generate data on a single row within the table
+      # route to generate data on a single row within the table
       $mainRoutes->get('/:uiTarget/:buffActivation/:isPrimary/details-stream')
         ->to(
         controller => 'Generals',
@@ -222,6 +215,7 @@ package Game::EvonyTKR::Controller::Generals {
       1;
     };
 
+    # nav items for the routes we just builtin the eval block
     foreach my $route ($app->general_routing->all_valid_routes()) {
       $logger->debug("building nav items for "
           . $route->{uiTarget} . "|"
@@ -256,22 +250,50 @@ package Game::EvonyTKR::Controller::Generals {
           $route->{uiTarget}, $route->{buffActivation}),
         order => 20 + ($route->{order} || 0),
       });
-
     }
 
   }
 
-  sub _import_generals_async($self, $app, $files, $gm, $controller_name,
-    $referenceRoutes, $callback) {
-    my @files_copy = @$files;
-    my $total      = @files_copy;
-    my $processed  = 0;
+  # when this gets called,
+  # $something is some sort of anon function that has access to random things.
+  sub _import_general($something, $generalFile, $app, $manager) {
+    my $interval = 0.01 + rand(0.04);
+    $logger->debug(
+      "_import_general called for $generalFile, interval is $interval");
+    Mojo::IOLoop->timer(
+      $interval => sub {
+        $logger->debug("timer fired for $generalFile");
+        eval {
+          $logger->info("importing file $generalFile");
+          my $data = $generalFile->slurp('UTF-8');
+          my $ho   = YAML::PP->new(
+            schema       => [qw/ + Perl /],
+            yaml_version => ['1.2', '1.1'],
+          )->load_string($data);
+          my $g = Game::EvonyTKR::Model::General->from_hash($ho, $logger);
+          if (!$manager) {
+            $logger->error(
+              "manager is not defined in _import_general for $generalFile");
+            return;
+          }
+          my $gm = $manager->generalManager;
+          $gm->add_general($g);
+          $logger->debug(
+            sprintf('imported general %s from file %s', $g->name, $generalFile)
+          );
 
-    my $batch_size  = 1;    #trying to preserve responsiveness of the main loop.
-    my $batch_count = 0;
+          # Build routes for this general
 
-    # All done
-    $callback->();
+          my $bm = $manager->bookManager();
+          $g->populateBuiltInBook($bm);
+          $app->plugins->emit(
+            general_loaded => { manager => $gm, general => $g });
+        };
+        if ($@) {
+          $logger->error("Error processing $generalFile: $@");
+        }
+      }
+    );
   }
 
   sub _build_general_routes($self, $general, $app, $controller_name,
@@ -616,7 +638,6 @@ package Game::EvonyTKR::Controller::Generals {
     }
   }
 
-
   sub singleCatalog ($self) {
     my $distDir            = Mojo::File::Share::dist_dir('Game::EvonyTKR');
     my $slug_ui            = $self->stash('uiTarget');
@@ -720,7 +741,6 @@ package Game::EvonyTKR::Controller::Generals {
       );
     }
   }
-
 
   sub stream_single_details ($c) {
     $c->res->headers->content_type('text/event-stream');
