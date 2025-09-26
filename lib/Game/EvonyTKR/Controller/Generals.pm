@@ -123,7 +123,9 @@ package Game::EvonyTKR::Controller::Generals {
         my $processed = 0;
         my $total = scalar(@files);
         foreach my $generalFile (@files) {
-          Mojo::IOLoop->next_tick(sub {
+          #spread the hypnotoad workers out very slightly
+          my $interval = 0.01 + rand(0.04);
+          Mojo::IOLoop->recurring( $interval => sub {
 
             $processed++;
 
