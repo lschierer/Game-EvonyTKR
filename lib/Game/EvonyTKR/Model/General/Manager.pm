@@ -49,8 +49,6 @@ class Game::EvonyTKR::Model::General::Manager :
     return 0;
   }
 
-
-
   method importAll ($SourceDir) {
     $SourceDir = Path::Tiny::path($SourceDir);
     if (!$SourceDir->is_dir()) {

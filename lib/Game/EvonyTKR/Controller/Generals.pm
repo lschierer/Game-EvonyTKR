@@ -145,7 +145,7 @@ package Game::EvonyTKR::Controller::Generals {
         $self->_build_general_routes($general, $app, $controller_name,
           $referenceRoutes);
 
-        if($manager->generalManager->fully_populated()){
+        if ($manager->generalManager->fully_populated()) {
           $logger->info('general manager reports all generals are loaded');
           $app->plugins->emit(generals_loaded => { manager => $manager });
         }
