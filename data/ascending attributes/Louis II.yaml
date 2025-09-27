@@ -1,0 +1,105 @@
+general: Louis II
+id: Louis II
+ascending:
+  - level: red1
+    text: >-
+      Attacking Ground Troop Attack +15%, Defense and HP +10%
+    buffs:
+      - attribute: Attack
+        troop: Ground Troops
+        value:
+          number: 15
+        conditions:
+          - Attacking
+      - attribute: Defense
+        troop: Ground Troops
+        value:
+          number: 10
+        conditions:
+          - Attacking
+      - attribute: HP
+        troop: Ground Troops
+        value:
+          number: 10
+        conditions:
+          - Attacking
+  - level: red2
+    text: >-
+      Attacking Troop Death into Wounded Rate +8%
+    buffs:
+      - attribute: Death to Wounded
+        conditions:
+          - Marching
+        value:
+          number: 8
+          unit: percentage
+  - level: red3
+    text: >-
+      Attacking Ground Troop Attack +25%, Attacking Ground Troop and Mounted Troop Defense +25%
+    buffs:
+      - attribute: Attack
+        troop: Ground Troops
+        value:
+          number: 25
+        conditions:
+          - Attacking
+      - attribute: Defense
+        troop: Ground Troops
+        conditions:
+          - Attacking
+        value:
+          number: 25
+      - attribute: Defense
+        troop: Mounted Troops
+        value:
+          number: 25
+        conditions:
+          - Attacking
+  - level: red4
+    text: >-
+      Attacking Mounted Troop and Ground Troop HP +25%, March Size Capacity +10%
+    buffs:
+      - attribute: HP
+        troop: Ground Troops
+        conditions:
+          - Attacking
+        value:
+          number: 25
+          unit: percentage
+      - attribute: HP
+        troop: Mounted Troops
+        value:
+          number: 25
+        conditions:
+          - Attacking
+      - attribute: March Size
+        value:
+          number: 10
+  - level: red5
+    text: >-
+      Attacking Mounted Troop and Ground Troop Attack +40%, Attacking Ground Troop Defense and HP +25%
+    buffs:
+      - attribute: Attack
+        troop: Mounted Troops
+        value:
+          number: 40
+        conditions:
+          - Attacking
+      - attribute: Attack
+        troop: Ground Troops
+        value:
+          number: 40
+        conditions:
+          - Attacking
+      - attribute: Defense
+        troop: Ground Troops
+        value:
+          number: 25
+        conditions:
+          - Attacking
+      - attribute: HP
+        troop: Ground Troops
+        value:
+          number: 25
+        conditions:
+          - Attacking
