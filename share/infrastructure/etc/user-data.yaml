@@ -41,6 +41,7 @@ users:
     ssh_authorized_keys:
       - ecdsa-sha2-nistp521 AAAAE2VjZHNhLXNoYTItbmlzdHA1MjEAAAAIbmlzdHA1MjEAAACFBABn9dVXygIvLoJrcSA71/PNcPRPxg0FBmU1QkVIPToc4cfBP9oiyGkiRJ33kz9zaL1lseB75XGoz01W0lex2/9zjAHGxDdo9byoemhtKlGXoWZ43rRfuZtXPQkLLFhONmVfG1eK5Bct4M314N4WrmbxyRg5froEvK10yqrPzeagleCywQ== lschiere@a07817adb134.ant.amazon.com
       - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDos5u8SSJXO8BcmKrjfUjxz8y9KwmfTXfhetEcPQ1bSCY/fIaebvKJG4YJ0OmFKBQLW63MTnKp9iScw9OQp0mE5q/EMQj30iXu/q6ufYoGG5U9NAr4D6wH9XEUvwS6TrDXGphseGDxZk1ZspfdMR+c/XAALgyNVnzhaqW7k1KNJjUzw9ZzVFTDWcYOKFPgOorQIjTmn3y1B6NhQ179N7yB/6NiOKLn3gwNB3/jm9WidnnGHXA940nFIBNv7Ml0jSRChXd/57+VahVzqAxo8NlpiKfLHQPj7VjwBA7s7/gB67X7vnr/sERda8EmEu0sWgCZ9V1i1eOn0B2SKojhXJIpI2kMLDrZIP0RR9hdgqatRE13wNTYzbGPlSUhOCDaiiHOuBYqNbFYhCfV0fPo0CuHPn/04pbFnRU5KDdsyhjk4oa90Df1oq/X3bfAtj1d0gfrt0SVBa9TUh4Hi6vYFBQ5YRmY3YPk2xUsJxnDTYmocizqYZLU6RCPwVMkZrxIOflS96LGVLoqVVLRXLm1UVAkGViWB9ezhT1fxoyjF2s9xT2oRY8bmro+cep/N8Dk9YfAGrJRjLGKu185+ssB+WfpB2ZjA3OMK+6NPwn573S4lO0ftatbqOZSUQ4U4zxZJE8gMtBs8tAhdRsBj6JRd30OB2bSWdwiaEErPzvAaW3uzQ== luke@schierer@opus001.schierer.org
+      - ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAgEAzzFE5saXFWaM8aJscVuqSk48EcrcOvZ1tdFSgyQkK7eH/oBnZGvAyouRtmpavwUDIUelpmfVyaMdDX606ml5ZAQkodn4Nhje5v1jJ/32Wi3gIs6kosjdsB8ew6v2LIWuVVJrz+ZsjaoALAqjYmetPbtKo42u6Ai95otWBt2NxEUZx2LrLG/6MtxrXspcrmatDZGDiDSz7KOHP2O4j7c48tLG5naaLeT5ZoPRFNhVUVujyedc1s02TtHbvQ3sICgwNxx9B4HkFLuegtWhYwFretZJzhDrEY2olFtwbQR2r4TGJLYIrudj6G06HN7zfVf7Csd+LFW7HF5aztGHwm3g907jjzmG1U3ptfAqmR5bffJXhlbemD/++0Hs+f4ta2eevTZZUwRnGpM1Y9lfFip2d3UiiNgdblhbnmPlEPZhkPgcxE5rwsHClnZ2rUsDgTaWyRoiegvxIGmArcTt5133/Y8eNkCS9/opxzqRsmZ0eNcovyjpCXoa/CXT37uOZgzjf9DcVZCtenIZyZPGLxYrqlwOJBKHLYua6k1+fQ+/v+Qq+/R0RtMW6Of3L8akx+2MQnvG4lwutVsih0Ohg49G1JkJn6/5h8NIDbE5zcBQIa4tTQOO9I3A32pjyg9XH2WnUl5PZDBOaj/TKM6t+qMlLQwePZCpZ62nQ4rL3vRCPjk= lukeschierer@minimus.local
 runcmd:
   - echo 'vm.swappiness=0' >> /etc/sysctl.conf
   - export HOSTNAME='REPLACEHOSTNAME'; hostname ${HOSTNAME}
@@ -93,7 +94,7 @@ runcmd:
   - |
     export H=$( grep 127.0.1.1 /etc/hosts | cut -d ' ' -f 3 | cut -d '.' -f 1); cat > /etc/nginx/sites-available/mojoproxy << EOF
     upstream myapp {
-      server 127.0.1.1:8080;
+      server 127.0.1.1:3000;
     }
     server {
       listen                80;

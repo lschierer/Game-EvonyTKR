@@ -20,6 +20,11 @@ cd /opt/mojo/app
 
 mise trust
 mise install
+mise reshim
+
+cd /opt/mojo/app
+
+which cpanm
 
 cpanm -n utf8::all Module::Build
 

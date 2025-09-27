@@ -62,11 +62,11 @@ export class UbuntuInstance extends NestedStack {
       'mkdir -p /opt/mojo/bin',
       'cd /opt/mojo/bin',
       'unzip /tmp/mojobin.zip',
-      'cp .bash_profile /opt/mojo/.bashrc',
-      'mv .bash_profile /opt/mojo',
       'chown -R mojo:mojo /opt/mojo',
       'chmod +x /opt/mojo/bin/*.sh',
       'sudo -u mojo -s /bin/bash -l -c /opt/mojo/bin/bootstrap.sh',
+      'cp .bash_profile /opt/mojo/.bashrc',
+      'mv .bash_profile /opt/mojo',
       'systemctl start mojolicious',
       'systemctl reload nginx',
     );

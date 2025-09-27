@@ -111,8 +111,7 @@ package Game::EvonyTKR::Controller::Covenants {
               my $covenantFile =
                 Mojo::File->new(Encode::decode_utf8($file->to_string));
               eval {
-                $logger->info(
-                  "importing covenant file $covenantFile ");
+                $logger->info("importing covenant file $covenantFile ");
                 my $data   = $covenantFile->slurp('UTF-8');
                 my $name   = $covenantFile->basename('.yaml');
                 my $object = YAML::PP->new(

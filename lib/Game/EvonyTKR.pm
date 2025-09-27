@@ -14,6 +14,7 @@ require Log::Log4perl;
 require Game::EvonyTKR::Controller::ControllerBase;
 require Game::EvonyTKR::Model::EvonyTKR::Manager;
 require Game::EvonyTKR::External::Buff::Worker;
+require Game::EvonyTKR::External::Conflicts::Worker;
 require GitRepo::Reader;
 
 package Game::EvonyTKR {
@@ -123,6 +124,8 @@ package Game::EvonyTKR {
     $self->plugin(Minion => { SQLite => "sqlite:$dbPath" });
     # Minion worker
     $self->plugin('Game::EvonyTKR::External::Buff::Worker');
+
+    $self->plugin('Game::EvonyTKR::External::Conflicts::Worker');
     # Markdown
     $self->plugin('Game::EvonyTKR::Plugins::Markdown');
     # Navigation
