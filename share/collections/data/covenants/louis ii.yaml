@@ -1,0 +1,69 @@
+name: Louis II
+generals:
+  - El Cid
+  - Roland
+  - Baldwin IV
+levels:
+  - category: war
+    text: Attacking Ground Troop Defense +10%
+    buffs:
+      - attribute: Defense
+        troops: Ground Troops
+        conditions:
+          - Attacking
+        value:
+          number: 10
+  - category: cooperation
+    text: Ground Troop Training Capacity +10% (Global)
+    buffs:
+      - attribute: Training Capacity
+        passive: 1
+        troops: Ground Trooops
+        value:
+          number: 10
+  - category: peace
+    text: Ground Troop Attack +10%
+    buffs:
+      - attribute: Attack
+        troops: Ground Troops
+        value:
+          number: 10
+  - category: faith
+    text: >-
+      Ground Troop Defense +10%.
+      Attacking Ground Troop Attack +5% (Global).
+    buffs:
+      - attribute: Defense
+        troops: Ground Troops
+        value:
+          number: 10
+      - attribute: Attack
+        troops: Ground Troops
+        passive: 1
+        conditions:
+          - Attacking
+        value:
+          number: 5
+  - category: honor
+    text: In-Rally Ground Troop Attack +10%
+    buffs:
+      - attribute: Attack
+        troops: Ground Troops
+        conditions:
+          - When Rallying
+        value:
+          number: 10
+  - category: civilization
+    text: >-
+      Attacking Ground Troop HP +10%.
+      March Size Capacity +8%.
+    buffs:
+      - attribute: HP
+        troops: Ground Troops
+        conditions:
+          - Attacking
+        value:
+          number: 10
+      - attribute: March Size
+        value:
+          number: 8

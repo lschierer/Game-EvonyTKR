@@ -1,0 +1,22 @@
+name: Liberator of Bari
+text: >-
+  Increases ground troops' attack and HP by 55% and ground troops' defense by 40% when General is leading hte army to attack.
+buffs:
+  - attribute: Attack
+    troop: Ground Troops
+    value:
+      number: 55
+    conditions:
+      - Attacking
+  - attribute: HP
+    troop: Ground Troops
+    value:
+      number: 55
+    conditions:
+      - Attacking
+  - attribute: Defense
+    troop: Ground Troops
+    value:
+      number: 40
+    conditions:
+      - Attacking
