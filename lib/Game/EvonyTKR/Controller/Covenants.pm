@@ -8,6 +8,7 @@ use namespace::clean;
 package Game::EvonyTKR::Controller::Covenants {
   use Mojo::Base 'Game::EvonyTKR::Controller::ControllerBase';
 
+  my $logger;
   # Specify which collection this controller handles
   sub collection_name {
     return 'covenants';
@@ -30,14 +31,14 @@ package Game::EvonyTKR::Controller::Covenants {
   }
 
   # Register this when the application starts
-  sub register($self, $app, $config = {}) {
-    my $logger = Log::Log4perl->get_logger(__PACKAGE__);
-    $logger->info("Registering routes for " . ref($self));
-    $self->SUPER::register($app, $config);
+  sub register($c, $app, $config = {}) {
+    $logger = Log::Log4perl->get_logger(__PACKAGE__);
+    $logger->info("Registering routes for " . ref($c));
+    $c->SUPER::register($app, $config);
 
     $app->helper(
       get_covenant_manager => sub {
-        return $self->app->get_root_manager->covenantManager;
+        return $c->app->get_root_manager->covenantManager;
       }
     );
 
@@ -59,16 +60,16 @@ package Game::EvonyTKR::Controller::Covenants {
 
     $app->add_navigation_item({
       title => 'Details of General Covenants',
-      path  => $self->getBase(),
+      path  => $c->getBase(),
       order => 50,
     });
 
-    my @parts     = split(/::/, ref($self));
+    my @parts     = split(/::/, ref($c));
     my $baseClass = pop(@parts);
 
     my $controller_name =
-        $self->can('controller_name')
-      ? $self->controller_name()
+        $c->can('controller_name')
+      ? $c->controller_name()
       : $baseClass;
 
     $logger->debug("got controller_name $controller_name.");
@@ -81,17 +82,16 @@ package Game::EvonyTKR::Controller::Covenants {
     # for backwards compatibility
     $mainRoutes->any('/details')->to(
       cb => sub ($c) {
-        $c->redirect_to($self->getBase());
+        $c->redirect_to($c->getBase());
       }
     );
 
     # register routes that cannot exist until after the manager class has
     # done its thing only after initialization
     $app->plugins->on(
-      'generals_loaded' => sub($c, $manager) {
-        $logger->debug(
-          "generals_loaded sub has controller_name $controller_name.");
+      'generals_loaded' => sub {
 
+        my $manager = $app->get_root_manager();
         if (not defined $manager) {
           $logger->logcroak('No Manager Defined');
         }
@@ -103,100 +103,63 @@ package Game::EvonyTKR::Controller::Covenants {
         $logger->info(
           "Starting async import of " . scalar(@files) . " covenant files");
 
-        # Import covenants async
-        $self->_import_covenants_async(
-          $app,
-          \@files,
-          $manager,
-          $controller_name,
-          $mainRoutes,
-          sub {
-            $logger->info("All covenants loaded, emitting signal");
-            $app->plugins->emit(covenants_loaded => $manager);
-          }
-        );
+        foreach my $file (@files) {
+          my $delay = rand(4.0);
+          Mojo::IOLoop->timer(
+            $delay => sub {
+              $logger->debug("callback for covenant file $file");
+              my $covenantFile =
+                Mojo::File->new(Encode::decode_utf8($file->to_string));
+              eval {
+                $logger->info(
+                  "importing covenant file $covenantFile ");
+                my $data   = $covenantFile->slurp('UTF-8');
+                my $name   = $covenantFile->basename('.yaml');
+                my $object = YAML::PP->new(
+                  schema       => [qw/ + Perl /],
+                  yaml_version => ['1.2', '1.1'],
+                )->load_string($data);
+
+                $logger->trace(
+                  "$object imported, looks like " . Data::Printer::np($object));
+
+                if (exists $object->{name}) {
+                  if ($object->{name} !~ /$name/i) {
+                    $logger->error(sprintf(
+                      'filename and internal name do not match '
+                        . 'for file "%s" with name "%s"',
+                      $covenantFile, $object->{name}
+                    ));
+                  }
+                  $name = $object->{name};
+                }
+
+                my $primary = $manager->generalManager->getGeneral($name);
+                unless ($primary) {
+                  $logger->error("cannot find primary for covenant $name");
+                  return;
+                }
+                my $covenant =
+                  Game::EvonyTKR::Model::Covenant->from_hash($object, $primary,
+                  $logger);
+                $manager->covenantManager->add_covenant($covenant);
+
+                # Build routes for this covenant
+                $c->_build_covenant_routes($covenant, $name, $app,
+                  $controller_name, $mainRoutes);
+              };
+              if ($@) {
+                $logger->error("Error processing $covenantFile: $@");
+              }
+            }
+          );
+        }
       }
     );
     $logger->debug("end of register method");
   }
 
-  sub _import_covenants_async($self, $app, $files, $manager, $controller_name,
-    $mainRoutes, $callback) {
-    my $logger     = Log::Log4perl->get_logger(__PACKAGE__);
-    my @files_copy = @$files;
-    my $total      = @files_copy;
-    my $processed  = 0;
-
-    my $process_next_batch;
-    $process_next_batch = sub {
-      my $batch_size  = 8;    # Process 8 files per tick (covenants are simpler)
-      my $batch_count = 0;
-
-      while (@files_copy && $batch_count < $batch_size) {
-        my $covenantFile = shift @files_copy;
-        $covenantFile =
-          Mojo::File->new(Encode::decode_utf8($covenantFile->to_string));
-        $batch_count++;
-        $processed++;
-
-        eval {
-          $logger->info(
-            "importing covenant file $covenantFile ($processed/$total)");
-          my $data   = $covenantFile->slurp('UTF-8');
-          my $name   = $covenantFile->basename('.yaml');
-          my $object = YAML::PP->new(
-            schema       => [qw/ + Perl /],
-            yaml_version => ['1.2', '1.1'],
-          )->load_string($data);
-
-          $logger->trace(
-            "$object imported, looks like " . Data::Printer::np($object));
-
-          if (exists $object->{name}) {
-            if ($object->{name} !~ /$name/i) {
-              $logger->error(sprintf(
-                'filename and internal name do not match '
-                  . 'for file "%s" with name "%s"',
-                $covenantFile, $object->{name}
-              ));
-            }
-            $name = $object->{name};
-          }
-
-          my $primary = $manager->generalManager->getGeneral($name);
-          unless ($primary) {
-            $logger->error("cannot find primary for covenant $name");
-            return;
-          }
-          my $covenant =
-            Game::EvonyTKR::Model::Covenant->from_hash($object, $primary,
-            $logger);
-          $manager->covenantManager->add_covenant($covenant);
-
-          # Build routes for this covenant
-          $self->_build_covenant_routes($covenant, $name, $app,
-            $controller_name, $mainRoutes);
-        };
-        if ($@) {
-          $logger->error("Error processing $covenantFile: $@");
-        }
-      }
-
-      if (@files_copy) {
-        # Schedule next batch
-        Mojo::IOLoop->next_tick($process_next_batch);
-      }
-      else {
-        # All done
-        $callback->();
-      }
-    };
-
-    # Start processing
-    $process_next_batch->();
-  }
-
-  sub _build_covenant_routes($self, $covenant, $name, $app, $controller_name,
+  sub _build_covenant_routes($c, $covenant, $name, $app, $controller_name,
     $mainRoutes) {
     my $logger = Log::Log4perl->get_logger(__PACKAGE__);
 
