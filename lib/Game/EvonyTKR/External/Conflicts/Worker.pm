@@ -48,6 +48,24 @@ package Game::EvonyTKR::External::Conflicts::Worker {
       $bookManager->importAll($collectionDir->child('skill books'));
       $bookManager->importAll($collectionDir->child('generic books'));
       # Create conflict detector
+
+      foreach my $general (values $generalManager->get_all_generals()->%*) {
+        unless($general){
+          $self->logger->error('ConflictWorkerLogic: undefined general in general manager!!');
+          next;
+        }
+        $general->populateBuiltInBook($bookManager);
+      }
+
+      # Process conflicts for this general
+      my $general = $generalManager->getGeneral($general_name);
+      unless($general){
+        $self->logger->error(sprintf('ConflictWorkerLogic: general "%s" is not available in the general manager! Available Generals are: %s',
+        $general_name, join ', ', sort map { $_->name } values $generalManager->get_all_generals()->%* ));
+        return;
+      }
+      $general->populateBuiltInBook($bookManager);
+
       my $conflictDetector =
         Game::EvonyTKR::Model::General::Conflict::Book->new(
         build_index      => 1,
@@ -56,13 +74,6 @@ package Game::EvonyTKR::External::Conflicts::Worker {
         allow_wall_buffs => 1,
         );
 
-      foreach my $general (values $generalManager->get_all_generals()->%*) {
-        $general->populateBuiltInBook($bookManager);
-      }
-
-      # Process conflicts for this general
-      my $general = $generalManager->getGeneral($general_name);
-      $general->populateBuiltInBook($bookManager);
       $conflictDetector->process_single_general($general, $generalManager);
 
       # Extract and return results

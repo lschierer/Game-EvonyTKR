@@ -56,6 +56,7 @@ class Game::EvonyTKR::Model::General::Manager :
 "Game::EvonyTKR::Model::General::Manager requires a directory, not $SourceDir"
       );
     }
+    $self->logger->debug("general collection dir is $SourceDir");
     my $rule = Path::Iterator::Rule->new();
     $rule->name(qr/\.ya?ml$/);
     $rule->file->nonempty;
@@ -66,6 +67,8 @@ class Game::EvonyTKR::Model::General::Manager :
         sorted          => 1,
       }
     );
+
+
     while (defined(my $file = $iter->())) {
       # work around for UTF8 filenames not importing correctly by default.
       $file = Path::Tiny::path(Encode::decode('utf8', $file));
@@ -86,29 +89,13 @@ class Game::EvonyTKR::Model::General::Manager :
         }
         $name = $object->{name};
       }
-
-      unless (exists $object->{type} and length($object->{type}) > 0) {
-        $self->logger->error("$name is missing type!!");
-        next;
+      my $g = Game::EvonyTKR::Model::General->from_hash($object, $self->logger);
+      unless($g) {
+        $self->logger->error('General failed to create from file %s', $file);
+        return;
       }
+      $self->add_general($g);
 
-      $generals->{$name} = Game::EvonyTKR::Model::General->new(
-        name            => $name,
-        type            => $object->{type},
-        ascending       => $object->{ascending},
-        stars           => $object->{stars},
-        builtInBookName => $object->{book},
-        specialtyNames  => $object->{specialties},
-      );
-
-      foreach my $baKey (keys %{ $object->{basic_attributes} }) {
-        my $ba = Game::EvonyTKR::Model::BasicAttribute->new(
-          attribute_name => $baKey,
-          base           => $object->{basic_attributes}->{$baKey}->{base},
-          increment      => $object->{basic_attributes}->{$baKey}->{increment},
-        );
-        $generals->{$name}->basicAttributes->setAttribute($baKey, $ba);
-      }
       $self->logger->debug(
         sprintf('%s successfully imported', $generals->{$name}->name));
     }
