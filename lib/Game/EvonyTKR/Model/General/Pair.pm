@@ -14,10 +14,9 @@ class Game::EvonyTKR::Model::General::Pair :
     '""'       => \&as_string,
     'fallback' => 1;
 
-  field $primary     : reader : param;
-  field $secondary   : reader : param;
-  field $rootManager : reader = undef;
-  field $targetType  : reader;
+  field $primary    : reader : param;
+  field $secondary  : reader : param;
+  field $targetType : reader;
 
   field %total_computed_buffs_cache;
   field $current_cache_key : reader : writer;
@@ -25,15 +24,6 @@ class Game::EvonyTKR::Model::General::Pair :
   ADJUST {
     $targetType =
       ref($primary->type) eq 'ARRAY' ? $primary->type->[0] : $primary->type;
-  }
-
-  method setRootManager ($nm) {
-    if (Scalar::Util::blessed $nm eq 'Game::EvonyTKR::Model::EvonyTKR::Manager')
-    {
-      $rootManager = $nm;
-      return 1;
-    }
-    return 0;
   }
 
   method setTargetType ($tt) {
@@ -93,107 +83,6 @@ class Game::EvonyTKR::Model::General::Pair :
           $primary->{$category}->{$type} + $secondary->{$category}->{$type};
       }
     }
-  }
-
-  method updateBuffsAndDebuffs (
-    $generalType = '',    # this was determined by which table was requested
-    $primaryAscending       = 'red5',
-    $primaryCovenantLevel   = 'civilization',
-    $primarySpecialties     = ['gold', 'gold', 'gold', 'gold',],
-    $secondaryCovenantLevel = 'civilization',
-    $secondarySpecialties   = ['gold', 'gold', 'gold', 'gold',],
-    $buffActivation =
-      'Overall',          # this was determined by which table was requested
-
-    $keepLevel      = 40, # I have plans for this value but do not use it yet
-    $primaryLevel   = 45, # I have plans for this value but do not use it yet
-    $secondaryLevel = 45, # I have plans for this value but do not use it yet
-  ) {
-    if (!$primary) {
-      $self->logger->logcroak("NO PRIMARY DEFINED FOR PAIR");
-      return;
-    }
-    if (!$secondary) {
-      $self->logger->logcroak("NO SECONDARY DEFINED FOR PAIR");
-      return;
-    }
-    $current_cache_key = sprintf(
-      '%s-%s-%s-%s-%s-%s-%s',
-      $generalType,                    $buffActivation,
-      $primaryAscending,               $primaryCovenantLevel,
-      join('-', @$primarySpecialties), $secondaryCovenantLevel,
-      join('-', @$secondarySpecialties)
-    );
-
-    if (exists $total_computed_buffs_cache{$current_cache_key}) {
-      $self->logger->info(sprintf(
-        'Cache hit for "%s". There are "%s" cache entries.',
-        $current_cache_key, scalar keys %total_computed_buffs_cache
-      ));
-      return;
-    }
-    else {
-      $self->logger->info(sprintf(
-        'Cache miss for "%s". There are "%s" cache entries.',
-        $current_cache_key, scalar keys %total_computed_buffs_cache
-      ));
-    }
-
-    my $primarySummarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
-      general  => $primary,
-      covenant => $self->app->get_root_manager()
-        ->covenantManager->getCovenant($primary->name),
-      ascendingAttributes => $self->app->get_root_manager()
-        ->ascendingAttributesManager->getAscendingAttributes($primary->name),
-      books          => $rootManager->bookManager->get_all_books(),
-      isPrimary      => 1,
-      targetType     => $generalType,
-      activationType => $buffActivation,
-
-      ascendingLevel => $primaryAscending,
-      covenantLevel  => $primaryCovenantLevel,
-      specialty1     => $primarySpecialties->[0],
-      specialty2     => $primarySpecialties->[1],
-      specialty3     => $primarySpecialties->[2],
-      specialty4     => $primarySpecialties->[3],
-
-      generalLevel => $primaryLevel,
-      keepLevel    => $keepLevel,
-    );
-    my $secondarySummarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
-      general  => $secondary,
-      covenant => $self->app->get_root_manager()
-        ->covenantManager->getCovenant($secondary->name),
-      ascendingAttributes => $self->app->get_root_manager()
-        ->ascendingAttributesManager->getAscendingAttributes($secondary->name),
-      books          => $rootManager->bookManager->get_all_books(),
-      isPrimary      => 0,
-      targetType     => $generalType,
-      activationType => $buffActivation,
-
-      ascendingLevel => 'none',
-      covenantLevel  => $secondaryCovenantLevel,
-      specialty1     => $secondarySpecialties->[0],
-      specialty2     => $secondarySpecialties->[1],
-      specialty3     => $secondarySpecialties->[2],
-      specialty4     => $secondarySpecialties->[3],
-
-      generalLevel => $secondaryLevel,
-      keepLevel    => $keepLevel,
-    );
-
-    $self->_compute_total_buffs($primarySummarizer, $secondarySummarizer);
-
-    $self->_compute_total_debuffs($primarySummarizer, $secondarySummarizer);
-
-    $self->logger->debug(sprintf(
-      'updated pair %s/%s buffs %s debuffs %s.',
-      $primary->name,
-      $secondary->name,
-      Data::Printer::np($self->buffValues),
-      Data::Printer::np($self->debuffValues),
-    ));
-
   }
 
   # Method to convert to hash

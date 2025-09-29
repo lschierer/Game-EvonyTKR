@@ -18,7 +18,6 @@ require UUID;
 require Data::Printer;
 use namespace::clean;
 
-
 package Game::EvonyTKR::Controller::Pairs {
   use Mojo::Base 'Game::EvonyTKR::Controller::ControllerBase';
   require Mojo::Util;
@@ -35,11 +34,13 @@ package Game::EvonyTKR::Controller::Pairs {
   my $max_concurrency = 15;
 
   my $reference_base = '/Reference/Generals';
+
   sub getReferenceBase($self) {
     return $reference_base;
   }
 
   my $base = '/Generals';
+
   sub getBase($self) {
     return $base;
   }
@@ -48,70 +49,215 @@ package Game::EvonyTKR::Controller::Pairs {
     return $self->app->get_root_manager->generalManager;
   }
 
-  sub register($self, $app, $config = {}) {
+  sub getPairs ($c) {
+    state $pairs_by_type = {};
+    return $pairs_by_type;
+  }
+
+  sub register($c, $app, $config = {}) {
     $logger = Log::Log4perl->get_logger(__PACKAGE__);
-    $logger->info("Registering routes for " . ref($self));
-    $self->SUPER::register($app, $config);
+    $logger->info("Registering routes for " . ref($c));
+    $c->SUPER::register($app, $config);
 
     $app->helper(
-      get_general_pair_manager => sub {
-        return $app->get_root_manager->generalPairManager;
+      get_general_pairs => sub {
+        return $c->getPairs();
       }
     );
 
-    my $mainRoutes      = $app->routes->any($base);
+    my $mainRoutes = $app->routes->any($base);
 
     $app->plugins->on(
-      conflicts_computed => sub {
-        my ($plugin, $data) = @_;
-        my $manager = $data->{manager};
-        my $general = $data->{general};
-        $manager->generalPairManager->build_pairs($general);
+      conflicts_complete => sub {
+        $c->monitor_pair_builder($app);
       }
     );
 
-    $app->plugins->on(general_routing_available => sub {
-      $mainRoutes->get('/:uiTarget/:buffActivation/pair-comparison')->to(
-        controller => 'Generals',
-        action     => 'pairTable',
-      )->name('General_dynamic_pairTable');
+    $app->plugins->on(
+      general_routing_available => sub {
+        $mainRoutes->get('/:uiTarget/:buffActivation/pair-comparison')->to(
+          controller => 'Generals',
+          action     => 'pairTable',
+        )->name('General_dynamic_pairTable');
 
-      $mainRoutes->any(
-        ['GET', 'POST'] => '/:uiTarget/:buffActivation/pair/data.json')->to(
-        controller => 'Generals',
-        action     => 'pairCatalog',
-        )->name('Generals_dynamic_pairCatalog');
+        $mainRoutes->any(
+          ['GET', 'POST'] => '/:uiTarget/:buffActivation/pair/data.json')->to(
+          controller => 'Generals',
+          action     => 'pairCatalog',
+          )->name('Generals_dynamic_pairCatalog');
 
         $mainRoutes->get('/:uiTarget/:buffActivation/pair-details-stream')->to(
           controller => 'Generals',
           action     => 'stream_pair_details',
         )->name('Generals_dynamic_pairDetails');
 
-      foreach my $route ($app->general_routing->all_valid_routes()) {
-        $logger->debug("building nav items for "
-            . $route->{uiTarget} . "|"
-            . $route->{buffActivation});
-        my $printableUI = $route->{uiTarget} =~ s/-/ /rg;
+        foreach my $route ($app->general_routing->all_valid_routes()) {
+          $logger->debug("building nav items for "
+              . $route->{uiTarget} . "|"
+              . $route->{buffActivation});
+          my $printableUI = $route->{uiTarget} =~ s/-/ /rg;
 
-        # Add pair comparison navigation item if applicable
-        if ($route->{has_pairs}) {
-          my $pair_path = sprintf('/Generals/%s/%s/pair-comparison',
-            $route->{uiTarget}, $route->{buffActivation});
-          $app->add_navigation_item({
-            title => sprintf(
-              '%s %s Pair Comparison',
-              $printableUI, $route->{buffActivation}
-            ),
-            path   => $pair_path,
-            parent => sprintf('/Generals/%s/%s',
-              $route->{uiTarget}, $route->{buffActivation}),
-            order => 50 + ($route->{order} || 0),
-          });
+          # Add pair comparison navigation item if applicable
+          if ($route->{has_pairs}) {
+            my $pair_path = sprintf('/Generals/%s/%s/pair-comparison',
+              $route->{uiTarget}, $route->{buffActivation});
+            $app->add_navigation_item({
+              title => sprintf(
+                '%s %s Pair Comparison',
+                $printableUI, $route->{buffActivation}
+              ),
+              path   => $pair_path,
+              parent => sprintf('/Generals/%s/%s',
+                $route->{uiTarget}, $route->{buffActivation}),
+              order => 50 + ($route->{order} || 0),
+            });
+          }
         }
       }
-    });
+    );
+  }
 
+  sub monitor_pair_builder ($c, $app) {
+    my $delay = 10 + rand(10.0);
+    state $processedJobs = {};
+    my $loop;
+    $loop = Mojo::IOLoop->recurring(
+      $delay => sub {
+        eval {
+          my $total = $app->minion->jobs({
+            tasks => ['build_pairs_for_primary'],
+          })->total;
+          $logger->debug("Successfully got total: $total");
+        };
+        if ($@) {
+          $logger->error("Error getting total jobs: $@");
+          return;
+        }
 
+        my $stillWorking;
+        eval {
+          $stillWorking = $app->minion->jobs({
+            tasks  => ['build_pairs_for_primary'],
+            states => ['active', 'inactive'],
+          })->total;
+          $logger->debug("Successfully got stillWorking: $stillWorking");
+        };
+        if ($@) {
+          $logger->error("Error getting stillWorking count: $@");
+          return;
+        }
+        eval {
+          $logger->debug("About to enter each subroute looking for failed");
+
+          $app->minion->jobs({
+            tasks  => ['build_pairs_for_primary'],
+            states => ['failed']
+          })->each(sub {
+            my $info = $_;
+            $logger->debug(sprintf(
+              'in while loop for job id %s with state %s',
+              $info->{id}, $info->{state}
+            ));
+
+            my $state = $info->{state};
+
+            if ($state eq 'failed') {
+              $logger->debug(sprintf(
+                'task of type detect_conflicts_for_general ' . 'failed: %s, %s',
+                $info->{id}, Data::Printer::np($info)
+              ));
+              return;
+            }
+          });
+        };
+        if ($@) {
+          $logger->error(
+            "error inspecting failed tasks in monitor_pair_builder: $@");
+          return undef;
+        }
+
+        eval {
+          $app->minion->jobs({
+            tasks  => ['build_pairs_for_primary'],
+            states => ['finished']
+          })->each(sub {
+            my $info = $_;
+            $logger->debug(sprintf(
+              'in while loop for job id %s with state %s',
+              $info->{id}, $info->{state}
+            ));
+
+            my $state = $info->{state};
+
+            if ($state eq 'finished') {
+              return if $processedJobs->{ $info->{id} };
+              $processedJobs->{ $info->{id} } = 1;
+              Mojo::IOLoop->timer(
+                $delay => sub {
+                  my $result = $info->{result};
+                  $logger->debug(sprintf(
+                    'result for job id %s is %s', $info->{id}, $result
+                  ));
+                  my $notes = $info->{notes};
+
+                  if ($result =~ /Pairs Created for /) {
+                    my $newPairs = $notes->{pairs_by_type};
+                    if ($newPairs) {
+                      my $pairs_by_type = $c->getPairs();
+                      foreach my $type (keys %{$newPairs}) {
+                        my @all;
+                        if (exists $pairs_by_type->{$type}
+                          && defined $pairs_by_type->{$type}) {
+                          push @all, @{ $pairs_by_type->{$type} };
+                        }
+                        foreach my $np ($newPairs->{$type}->@*) {
+                          my $primary = $app->get_root_manager()
+                            ->generalManager->getGeneral($np->{primary});
+                          my $secondary = $app->get_root_manager()
+                            ->generalManager->getGeneral($np->{secondary});
+                          if ($primary && $secondary) {
+                            my $pair =
+                              Game::EvonyTKR::Model::General::Pair->new(
+                              primary   => $primary,
+                              secondary => $secondary,
+                              );
+                            if (
+                              none {
+                                     $_->primary->name eq $pair->primary->name
+                                  && $_->secondary->name eq
+                                  $pair->secondary->name
+                              } @all
+                            ) {
+                              push @all, $pair;
+                            }
+                          }
+                        }
+                        @{ $pairs_by_type->{$type} } = @all;
+                      }
+                    }
+                  }
+                  else {
+                    $logger->error("final result is unexpected: $result");
+                  }
+                }
+              );
+            }
+            $logger->debug(
+              'All jobs checked for this iteration of the outer loop');
+            if ($stillWorking == 0) {
+              $logger->info('All Pairs Built.');
+              Mojo::IOLoop->stop($loop);
+            }
+          });
+        };
+        if ($@) {
+          $logger->error(
+            "error inspecting finished tasks in monitor_pair_builder: $@");
+          return undef;
+        }
+
+      }
+    );
   }
 
   sub pairTable ($self) {
@@ -145,9 +291,9 @@ package Game::EvonyTKR::Controller::Pairs {
     my $uiTarget       = $route_meta->{uiTarget};
 
     my $pair_count = 0;
-    for my $type (keys %{ $self->app->pairManager->pairs_by_type }) {
+    for my $type (keys %{ $self->getPairs() }) {
       $pair_count +=
-        scalar @{ $self->app->pairManager->pairs_by_type->{$generalType} };
+        scalar @{ $self->getPairs()->{$generalType} };
     }
     if ($pair_count == 0) {
       # Pairs not loaded yet, show loading page
@@ -273,8 +419,7 @@ package Game::EvonyTKR::Controller::Pairs {
     my $buffActivation = $route_meta->{buffActivation};
     my $uiTarget       = $route_meta->{uiTarget};
 
-    my $pm    = $self->app->get_general_pair_manager();
-    my @pairs = @{ $pm->get_pairs_by_type($generalType) };
+    my @pairs = @{ $self->getPairs()->{$generalType} };
 
     $logger->debug(sprintf('There are %s pairs to return.', scalar(@pairs)));
 
@@ -392,9 +537,8 @@ package Game::EvonyTKR::Controller::Pairs {
     my $generalType    = $route_meta->{generalType};
     my $buffActivation = $route_meta->{buffActivation};
     my $uiTarget       = $route_meta->{uiTarget};
-    my $pm             = $c->app->get_general_pair_manager();
     my $pairs;
-    @$pairs = $pm->get_pairs_by_type($generalType)->@*;
+    @$pairs = $c->getPairs()->{$generalType}->@*;
     @$pairs = sort {
       my $pc = $a->primary->name cmp $b->primary->name;
       if ($pc == 0) {
@@ -541,6 +685,7 @@ package Game::EvonyTKR::Controller::Pairs {
 
     })->catch(sub {
       $logger->error("Some jobs failed in batch");
+      return undef;
     });
 
     $c->on(
@@ -617,6 +762,5 @@ package Game::EvonyTKR::Controller::Pairs {
       secondarySpecialties   => $secondarySpecialties,
     };
   }
-
 
 }

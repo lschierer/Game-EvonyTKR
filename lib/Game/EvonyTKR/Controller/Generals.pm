@@ -55,12 +55,10 @@ package Game::EvonyTKR::Controller::Generals {
     return $self->app->get_root_manager->generalManager;
   }
 
-  my $promise_chain;
-
-  sub register($self, $app, $config = {}) {
+  sub register($c, $app, $config = {}) {
     $logger = Log::Log4perl->get_logger(__PACKAGE__);
-    $logger->info("Registering routes for " . ref($self));
-    $self->SUPER::register($app, $config);
+    $logger->info("Registering routes for " . ref($c));
+    $c->SUPER::register($app, $config);
 
     $app->helper(
       get_general_manager => sub {
@@ -78,7 +76,7 @@ package Game::EvonyTKR::Controller::Generals {
     $app->plugins->emit(
       general_routing_available => { routing => $app->general_routing });
 
-    my $controller_name = $self->controller_name();
+    my $controller_name = $c->controller_name();
 
     $logger->debug("got controller_name $controller_name.");
 
@@ -111,10 +109,10 @@ package Game::EvonyTKR::Controller::Generals {
       worker_started => sub {
         my $cd = Mojo::File->new($app->config('distDir'))
           ->child('collections/data/generals/');
-        my @files = $cd->list_tree->each;
+        my @files = $cd->list_tree->grep(sub {qr/\.y\{a\}?ml$/})->each;
         $gm->set_expectedTotal(scalar(@files));
 
-        foreach my $generalFile (@files) {
+        foreach my $generalFile (sort @files) {
           my $delay = rand(4.0);
           Mojo::IOLoop->timer(
             $delay => sub {
@@ -129,7 +127,33 @@ package Game::EvonyTKR::Controller::Generals {
                 return;
               }
               $logger->debug("processing $generalFile");
-              return $self->_import_general($generalFile, $app, $manager);
+              eval {
+                my $data = $generalFile->slurp('UTF-8');
+                my $ho   = YAML::PP->new(
+                  schema       => [qw/ + Perl /],
+                  yaml_version => ['1.2', '1.1'],
+                )->load_string($data);
+                my $g = Game::EvonyTKR::Model::General->from_hash($ho, $logger);
+                unless ($g) {
+                  $logger->error(sprintf(
+                    'failed to build general from %s', $generalFile));
+                  return undef;
+                }
+
+                my $gm = $app->get_root_manager()->generalManager;
+                $gm->add_general($g);
+                $logger->debug(sprintf(
+                  'imported general %s from file %s',
+                  $g->name, $generalFile
+                ));
+
+                my $bm = $app->get_root_manager()->bookManager();
+                $g->populateBuiltInBook($bm);
+                $app->plugins->emit(general_loaded => { general => $g });
+              };
+              if ($@) {
+                $logger->error("Error processing $generalFile: $@");
+              }
             }
           );
         }
@@ -139,15 +163,21 @@ package Game::EvonyTKR::Controller::Generals {
     $app->plugins->on(
       general_loaded => sub {
         my ($plugin, $data) = @_;
-        my $manager = $app->get_root_manager();
-        my $gm      = $data->{manager};
-        my $general = $data->{general};
-        $self->_build_general_routes($general, $app, $controller_name,
-          $referenceRoutes);
+        eval {
+          my $manager = $app->get_root_manager();
+          my $gm      = $data->{manager};
+          my $general = $data->{general};
+          $c->_build_general_routes($general, $app, $controller_name,
+            $referenceRoutes);
 
-        if ($manager->generalManager->fully_populated()) {
-          $logger->info('general manager reports all generals are loaded');
-          $app->plugins->emit(generals_loaded => { manager => $manager });
+          if ($manager->generalManager->fully_populated()) {
+            $logger->info('general manager reports all generals are loaded');
+            $app->plugins->emit(generals_loaded => { manager => $manager });
+          }
+        };
+        if ($@) {
+          $logger->error("Error in Generals general_loaded callback: $@");
+          return undef;
         }
       }
     );
@@ -253,41 +283,6 @@ package Game::EvonyTKR::Controller::Generals {
           $route->{uiTarget}, $route->{buffActivation}),
         order => 20 + ($route->{order} || 0),
       });
-    }
-
-  }
-
-  # when this gets called,
-  # $something is some sort of anon function that has access to random things.
-  sub _import_general($something, $generalFile, $app, $manager) {
-    $logger->debug("_import_general called for $generalFile");
-    $logger->debug("timer fired for $generalFile");
-    eval {
-      $logger->info("importing file $generalFile");
-      my $data = $generalFile->slurp('UTF-8');
-      my $ho   = YAML::PP->new(
-        schema       => [qw/ + Perl /],
-        yaml_version => ['1.2', '1.1'],
-      )->load_string($data);
-      my $g = Game::EvonyTKR::Model::General->from_hash($ho, $logger);
-      if (!$manager) {
-        $logger->error(
-          "manager is not defined in _import_general for $generalFile");
-        return;
-      }
-      my $gm = $manager->generalManager;
-      $gm->add_general($g);
-      $logger->debug(
-        sprintf('imported general %s from file %s', $g->name, $generalFile));
-
-      # Build routes for this general
-
-      my $bm = $manager->bookManager();
-      $g->populateBuiltInBook($bm);
-      $app->plugins->emit(general_loaded => { manager => $gm, general => $g });
-    };
-    if ($@) {
-      $logger->error("Error processing $generalFile: $@");
     }
   }
 
@@ -957,6 +952,7 @@ package Game::EvonyTKR::Controller::Generals {
       $c->write_sse({ type => 'complete', text => $payload });
     })->catch(sub {
       $logger->error('Overall map operation failed');
+      return undef;
     });
 
     # If the browser closes, remove the stored session

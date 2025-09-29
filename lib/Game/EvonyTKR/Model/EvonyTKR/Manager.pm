@@ -4,7 +4,6 @@ use utf8::all;
 require Path::Tiny;
 require Game::EvonyTKR::Model::Book::Manager;
 require Game::EvonyTKR::Model::General::Manager;
-require Game::EvonyTKR::Model::General::Pair::Manager;
 require Game::EvonyTKR::Model::Specialty::Manager;
 require Game::EvonyTKR::Model::AscendingAttributes::Manager;
 require Game::EvonyTKR::Model::Covenant::Manager;
@@ -49,11 +48,6 @@ class Game::EvonyTKR::Model::EvonyTKR::Manager :
       allow_wall_buffs => 1,
     );
 
-    $generalPairManager = Game::EvonyTKR::Model::General::Pair::Manager->new(
-      rootManager    => $self,
-      generalManager => $generalManager,
-    );
-
   }
 
   method rootImport () {
@@ -61,10 +55,6 @@ class Game::EvonyTKR::Model::EvonyTKR::Manager :
 
     my $collectionDir = $SourceDir->child("collections/data");
     $self->logger->info("starting root import");
-
-    #$self->logger->info("starting import of generals.");
-    #$generalManager->importAll($collectionDir->child("generals"));
-    #$self->logger->info("import of generals complete.");
 
     $self->logger->info(" starting import of books.");
     $bookManager->importAll($collectionDir->child('skill books'));
@@ -80,24 +70,10 @@ class Game::EvonyTKR::Model::EvonyTKR::Manager :
       $collectionDir->child('ascending attributes'));
     $self->logger->info("import of ascending attributes complete");
 
-    #$self->logger->info(" starting import of covenants.");
-    #$covenantManager->importAll($collectionDir->child('covenants'));
-    #$self->logger->info("import of covenants complete");
-
     $glossaryManager->importAll($SourceDir->child("collections/Glossary"));
-
-    #$self->logger->info('staring conflict indexing');
-    #$conflictDetector->start_indexing();
-    #$self->logger->info('conflict indexing complete');
 
     $self->logger->info("root import complete");
 
-    # then the computed types
-    #$self->logger->info("starting computed types");
-    #$self->logger->info("starting build pairs");
-    #$generalPairManager->build_pairs();
-    #$self->logger->info("build pairs complete");
-    #$self->logger->info("computed types complete");
   }
 
 }

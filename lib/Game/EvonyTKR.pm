@@ -15,6 +15,7 @@ require Game::EvonyTKR::Controller::ControllerBase;
 require Game::EvonyTKR::Model::EvonyTKR::Manager;
 require Game::EvonyTKR::External::Buff::Worker;
 require Game::EvonyTKR::External::Conflicts::Worker;
+require Game::EvonyTKR::External::General::PairBuilder;
 require GitRepo::Reader;
 
 package Game::EvonyTKR {
@@ -126,6 +127,7 @@ package Game::EvonyTKR {
     $self->plugin('Game::EvonyTKR::External::Buff::Worker');
 
     $self->plugin('Game::EvonyTKR::External::Conflicts::Worker');
+    $self->plugin('Game::EvonyTKR::External::General::PairBuilder');
     # Markdown
     $self->plugin('Game::EvonyTKR::Plugins::Markdown');
     # Navigation

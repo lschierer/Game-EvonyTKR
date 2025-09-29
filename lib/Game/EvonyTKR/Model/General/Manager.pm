@@ -68,7 +68,6 @@ class Game::EvonyTKR::Model::General::Manager :
       }
     );
 
-
     while (defined(my $file = $iter->())) {
       # work around for UTF8 filenames not importing correctly by default.
       $file = Path::Tiny::path(Encode::decode('utf8', $file));
@@ -90,7 +89,7 @@ class Game::EvonyTKR::Model::General::Manager :
         $name = $object->{name};
       }
       my $g = Game::EvonyTKR::Model::General->from_hash($object, $self->logger);
-      unless($g) {
+      unless ($g) {
         $self->logger->error('General failed to create from file %s', $file);
         return;
       }

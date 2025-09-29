@@ -55,108 +55,49 @@ package Game::EvonyTKR::Controller::ConflictGroups {
       $logger->error('detect_conflicts_for_general task did not define!!!');
     }
 
-    my @conflictJobs;
-    my @completedJobs;
-
-    $app->plugins->on(
-      general_loaded => sub {
-        my ($plugin, $data) = @_;
-        my $general = $data->{general};
-        unless (defined($general)) {
-          $logger->error('general is undefined in general_loaded callback');
-          return;
+    $app->plugins->on(conflicts_complete => sub {
+      my ($plugin, $data) = @_;
+      my $conflicts = $data->{conflicts} // {};
+      $logger->debug(sprintf('data from conflicts_complete signal is %s', Data::Printer::np($conflicts)));
+      my $cd = $app->get_root_manager()->conflictDetector;
+      if($cd) {
+        if(exists $conflicts->{by_general} ) {
+          foreach my $gn (keys $conflicts->{by_general}->%*) {
+            $logger->debug("conflicts by general for $gn");
+            if(ref($conflicts->{by_general}->{$gn}) eq 'HASH'){
+              foreach my $og ($conflicts->{by_general}->{$gn}->%*){
+                next if (Scalar::Util::looks_like_number($og) && $og == 1);
+                $cd->by_general->{$gn}->{$og} = 1;
+              }
+            }else {
+              $logger->warn(sprintf('conflicts by general for %s is a %s',
+              $gn, ref($conflicts->{by_general}->{$gn})));
+            }
+          }
         }
-        my $jid = $app->minion->enqueue(
-          detect_conflicts_for_general => [{
-            general_name => $general->name
-          }]
-        );
-        push @conflictJobs, $jid;
+
+        if(exists $conflicts->{groups_by_conflict_type}){
+          foreach my $key1 (keys $conflicts->{groups_by_conflict_type}->%* ) {
+            $logger->debug(sprintf('conflicts for group ref: %s, contains: "%s"', ref($key1),  $key1));
+            my $group = $conflicts->{groups_by_conflict_type}->{$key1};
+            if(ref($group) eq 'ARRAY') {
+              my @all = @{ $group };
+              if(exists $cd->groups_by_conflict_type->{$key1}){
+                push @all, @{ $cd->groups_by_conflict_type->{$key1} };
+                @all = List::AllUtils::uniq @all;
+              }
+              $cd->groups_by_conflict_type->{$key1} = \@all;
+            } else {
+              $logger->warn(sprintf('conflict by type %s is a %s',
+              $group, ref($conflicts->{groups_by_conflict_type}->{$group})));
+            }
+
+          }
+          @{ $cd->groups_by_conflict_type->{group} } = List::AllUtils::uniq @{ $cd->groups_by_conflict_type->{group} };
+        }
       }
-    );
+    });
 
-    $app->plugins->on(
-      generals_loaded => sub {
-        unless (ref(\@conflict_queue) eq 'ARRAY') {
-          $logger->error('conflict queue is not an array!!!');
-          return;
-        }
-
-        my $conflictDetector = $c->get_conflict_detector();
-        $logger->debug(sprintf('there are %s jobs registered in @conflictJobs',
-        scalar @conflictJobs));
-
-        foreach my $jid (@conflictJobs) {
-
-          unless (defined $jid) {
-            $logger->error('undefined jid in conflictJobs!!');
-            next;
-          }
-          $logger->debug("inspecting jid $jid");
-          my $job = $app->minion->job($jid);
-          unless($job){
-            $logger->error("undefined job for $jid");
-            next;
-          }
-          my $delay = 10 + rand(10.0);
-          Mojo::IOLoop->timer(
-            $delay => sub {
-              $app->minion->result_p($jid)->then(sub {
-                my $result = shift;
-                if (defined($result) && ref($result) eq 'HASH') {
-                  $logger->debug("job $jid result is " . Data::Printer::np($result));
-                  my $notes = $result->{notes} || {};
-                  my $finalResult = $result->{result};
-                  if ($finalResult =~ /Conflicts detected for/) {
-                    # Extract conflict cache data from job notes
-
-                    my $conflicts = $notes->{conflicts};
-                    if($conflicts) {
-                      foreach my $general (keys $conflicts->{by_general}->%* ) {
-                        $logger->debug("conflicts in by_general for $general");
-                        foreach my $og ( $conflicts->{by_general}->{$general}->%* ){
-                          $logger->debug("conflicts in by_general for $general with $og");
-                          $conflictDetector->by_general->{$general}->{$og} = 1;
-                        }
-                      }
-                      foreach my $group (keys $conflicts->{groups_by_conflict_type}->%* ) {
-                        $logger->debug("conflicts in groups_by_conflict_type for $group " . Data::Printer::np($conflicts->{groups_by_conflict_type}->{$group} ));
-                        my @all;
-                        if(exists $conflictDetector->groups_by_conflict_type->{$group} && defined $conflictDetector->groups_by_conflict_type->{$group}) {
-                          push @all, @{ $conflictDetector->groups_by_conflict_type->{$group} };
-                        }
-                        push @all, @{ $conflicts->{groups_by_conflict_type}->{$group} };
-                        @{ $conflictDetector->groups_by_conflict_type->{$group} } =
-                        List::AllUtils::uniq @all;
-                      }
-                    }
-                  } else {
-                    $logger->error("final result is unexpected: $finalResult");
-                  }
-                }
-                return 1;
-              })->catch(sub {
-                my $err = shift;
-                $logger->error(
-                  "Job $jid failed: " . Data::Printer::np($err, multiline => 0));
-                return undef;
-              });
-              push @completedJobs, $jid;
-            });
-        }
-
-        if(scalar(@completedJobs) == scalar(@conflictJobs)) {
-           $app->plugins->emit('conflicts_complete');
-        } else {
-          $logger->error(sprintf(
-            'Job completion mismatch: %d completed vs %d total jobs',
-            scalar @completedJobs, scalar @conflictJobs
-          ));
-          if ($app->mode eq 'development') {
-            croak 'Job completion count mismatch in development mode';
-          }
-        }
-      });
   }
 
   sub index ($c) {
@@ -164,9 +105,9 @@ package Game::EvonyTKR::Controller::ConflictGroups {
 
     my $detector = $c->get_conflict_detector();
     $logger->debug(sprintf('there are %s generals in the by_general index',
-    scalar keys $detector->by_general->%* ));
-    my $groups   = $detector->groups_by_conflict_type;
-    my $pairs    = $detector->by_general;
+      scalar keys $detector->by_general->%*));
+    my $groups = $detector->groups_by_conflict_type;
+    my $pairs  = $detector->by_general;
 
     $c->stash(
       groups   => $groups,

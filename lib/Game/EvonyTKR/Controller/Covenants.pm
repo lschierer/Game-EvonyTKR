@@ -90,68 +90,73 @@ package Game::EvonyTKR::Controller::Covenants {
     # done its thing only after initialization
     $app->plugins->on(
       'generals_loaded' => sub {
+        eval {
+          my $manager = $app->get_root_manager();
+          if (not defined $manager) {
+            $logger->logcroak('No Manager Defined');
+          }
 
-        my $manager = $app->get_root_manager();
-        if (not defined $manager) {
-          $logger->logcroak('No Manager Defined');
-        }
+          my $cd = Mojo::File->new($app->config('distDir'))
+            ->child('collections/data/covenants/');
+          my @files = $cd->list_tree->each;
 
-        my $cd = Mojo::File->new($app->config('distDir'))
-          ->child('collections/data/covenants/');
-        my @files = $cd->list_tree->each;
+          $logger->info(
+            "Starting async import of " . scalar(@files) . " covenant files");
 
-        $logger->info(
-          "Starting async import of " . scalar(@files) . " covenant files");
+          foreach my $file (@files) {
+            my $delay = rand(4.0);
+            Mojo::IOLoop->timer(
+              $delay => sub {
+                $logger->debug("callback for covenant file $file");
+                my $covenantFile =
+                  Mojo::File->new(Encode::decode_utf8($file->to_string));
+                eval {
+                  $logger->info("importing covenant file $covenantFile ");
+                  my $data   = $covenantFile->slurp('UTF-8');
+                  my $name   = $covenantFile->basename('.yaml');
+                  my $object = YAML::PP->new(
+                    schema       => [qw/ + Perl /],
+                    yaml_version => ['1.2', '1.1'],
+                  )->load_string($data);
 
-        foreach my $file (@files) {
-          my $delay = rand(4.0);
-          Mojo::IOLoop->timer(
-            $delay => sub {
-              $logger->debug("callback for covenant file $file");
-              my $covenantFile =
-                Mojo::File->new(Encode::decode_utf8($file->to_string));
-              eval {
-                $logger->info("importing covenant file $covenantFile ");
-                my $data   = $covenantFile->slurp('UTF-8');
-                my $name   = $covenantFile->basename('.yaml');
-                my $object = YAML::PP->new(
-                  schema       => [qw/ + Perl /],
-                  yaml_version => ['1.2', '1.1'],
-                )->load_string($data);
+                  $logger->trace("$object imported, looks like "
+                      . Data::Printer::np($object));
 
-                $logger->trace(
-                  "$object imported, looks like " . Data::Printer::np($object));
-
-                if (exists $object->{name}) {
-                  if ($object->{name} !~ /$name/i) {
-                    $logger->error(sprintf(
-                      'filename and internal name do not match '
-                        . 'for file "%s" with name "%s"',
-                      $covenantFile, $object->{name}
-                    ));
+                  if (exists $object->{name}) {
+                    if ($object->{name} !~ /$name/i) {
+                      $logger->error(sprintf(
+                        'filename and internal name do not match '
+                          . 'for file "%s" with name "%s"',
+                        $covenantFile, $object->{name}
+                      ));
+                    }
+                    $name = $object->{name};
                   }
-                  $name = $object->{name};
-                }
 
-                my $primary = $manager->generalManager->getGeneral($name);
-                unless ($primary) {
-                  $logger->error("cannot find primary for covenant $name");
-                  return;
-                }
-                my $covenant =
-                  Game::EvonyTKR::Model::Covenant->from_hash($object, $primary,
-                  $logger);
-                $manager->covenantManager->add_covenant($covenant);
+                  my $primary = $manager->generalManager->getGeneral($name);
+                  unless ($primary) {
+                    $logger->error("cannot find primary for covenant $name");
+                    return;
+                  }
+                  my $covenant =
+                    Game::EvonyTKR::Model::Covenant->from_hash($object,
+                    $primary, $logger);
+                  $manager->covenantManager->add_covenant($covenant);
 
-                # Build routes for this covenant
-                $c->_build_covenant_routes($covenant, $name, $app,
-                  $controller_name, $mainRoutes);
-              };
-              if ($@) {
-                $logger->error("Error processing $covenantFile: $@");
+                  # Build routes for this covenant
+                  $c->_build_covenant_routes($covenant, $name, $app,
+                    $controller_name, $mainRoutes);
+                };
+                if ($@) {
+                  $logger->error("Error processing $covenantFile: $@");
+                }
               }
-            }
-          );
+            );
+          }
+        };
+        if ($@) {
+          $logger->error("Error in Covenants generals_loaded callback: $@");
+          return undef;
         }
       }
     );
