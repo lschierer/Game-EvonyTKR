@@ -56,6 +56,7 @@ package Game::EvonyTKR::Controller::ConflictGroups {
     }
 
     $app->plugins->on(conflicts_complete => sub {
+      $logger->info('Conflict Update detected');
       my ($plugin, $data) = @_;
       my $conflicts = $data->{conflicts} // {};
       $logger->debug(sprintf('data from conflicts_complete signal is %s', Data::Printer::np($conflicts)));

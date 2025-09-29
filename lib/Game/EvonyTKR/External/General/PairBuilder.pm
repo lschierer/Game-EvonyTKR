@@ -18,7 +18,9 @@ package Game::EvonyTKR::External::General::PairBuilder {
   use experimental qw(class);
   use Carp;
 
+  my $logger;
   sub register ($self, $app, $conf = {}) {
+    $logger = Log::Log4perl->get_logger(__PACKAGE__);
     $app->minion->add_task(
       build_pairs_for_primary => sub ($job, $args) {
         my $worker = PairBuilderWorkerLogic->new();
@@ -27,6 +29,167 @@ package Game::EvonyTKR::External::General::PairBuilder {
         $job->finish("Pairs Created for " . $args->{general_name});
       }
     );
+
+    state $PairBuildingStarted = 0;
+    $app->minion->add_task(
+      monitor_pair_builder => sub  {
+        my $job = shift;
+        my $generals = shift;
+        state $processedJobs = {};
+        my $app = $job->app;
+        my $pairs_by_type = $app->get_general_pairs();
+
+        if(!$PairMonitorStarted){
+          foreach my $general (@$generals) {
+            #enqueue a job to build pairs for this general;
+          }
+        }
+
+        my $loop;
+        $loop = Mojo::IOLoop->recurring( 5 => sub {
+          eval {
+            my $total = $app->minion->jobs({
+              tasks => ['build_pairs_for_primary'],
+            })->total;
+            $logger->debug("Successfully got total: $total");
+          };
+          if ($@) {
+            $logger->error("Error getting total jobs: $@");
+            return;
+          }
+
+          my $stillWorking;
+          eval {
+            $stillWorking = $app->minion->jobs({
+              tasks  => ['build_pairs_for_primary'],
+              states => ['active', 'inactive'],
+            })->total;
+            $logger->debug("Successfully got stillWorking: $stillWorking");
+          };
+          if ($@) {
+            $logger->error("Error getting stillWorking count: $@");
+            return;
+          }
+
+          $logger->debug("About to enter each subroute looking for failed");
+          $app->minion->jobs({
+            tasks  => ['build_pairs_for_primary'],
+            states => ['failed']
+          })->each(sub {
+            my $info = $_;
+            $logger->debug(sprintf(
+              'in while loop for job id %s with state %s',
+              $info->{id}, $info->{state}
+            ));
+
+            my $state = $info->{state};
+
+            if ($state eq 'failed') {
+              $logger->debug(sprintf(
+                'task of type build_pairs_for_primary ' . 'failed: %s, %s',
+                $info->{id}, Data::Printer::np($info)
+              ));
+              return;
+            }
+          });
+
+          $app->minion->jobs({
+            tasks  => ['build_pairs_for_primary'],
+            states => ['finished']
+          })->each(sub {
+            my $info = $_;
+            $logger->debug(sprintf(
+              'in while loop for job id %s with state %s',
+              $info->{id}, $info->{state}
+            ));
+
+            my $state = $info->{state};
+
+            if ($state eq 'finished') {
+              return if $processedJobs->{ $info->{id} };
+              $processedJobs->{ $info->{id} } = 1;
+              Mojo::IOLoop->timer( 5 => sub {
+                my $result = $info->{result};
+                $logger->debug(sprintf(
+                  'result for job id %s is %s', $info->{id}, $result
+                ));
+                my $notes = $info->{notes};
+
+                if ($result =~ /Pairs Created for /) {
+                  my $newPairs = $notes->{pairs_by_type};
+                  if ($newPairs) {
+
+                    foreach my $type (keys %{$newPairs}) {
+                      my @all;
+                      if (exists $pairs_by_type->{$type}
+                        && defined $pairs_by_type->{$type}) {
+                        push @all, @{ $pairs_by_type->{$type} };
+                      }
+                      foreach my $np ($newPairs->{$type}->@*) {
+                        my $p = $app->get_root_manager()
+                          ->generalManager->getGeneral($np->{primary});
+                        my $s = $app->get_root_manager()
+                          ->generalManager->getGeneral($np->{secondary});
+                        if ($p && $s) {
+                          my $pair =
+                            Game::EvonyTKR::Model::General::Pair->new(
+                            primary   => $p,
+                            secondary => $s,
+                            );
+                          if (
+                            none {
+                                    $_->primary->name eq $pair->primary->name
+                                && $_->secondary->name eq
+                                $pair->secondary->name
+                            } @all
+                          ) {
+                            push @all, $pair;
+                          }
+                        }
+                      }
+                      @{ $pairs_by_type->{$type} } = @all;
+                    }
+                  }
+                }
+                else {
+                  $logger->error("final result is unexpected: $result");
+                }
+              });
+            }
+            $logger->debug(
+              'All jobs checked for this iteration of the outer loop');
+            if ($stillWorking == 0) {
+              $logger->info('All Pairs Built.');
+              Mojo::IOLoop->stop($loop);
+            }
+          });
+        });
+
+
+        Mojo::IOLoop->start() unless Mojo::IOLoop->is_running();
+      }
+    );
+
+    state $PairMonitorStarted = 0;
+    $app->plugins->on(conflicts_complete => sub {
+      return if ($PairMonitorStarted);
+      $PairMonitorStarted = 1;
+      my $jid = $app->minion->enqueue(monitor_pair_builder => [],{ priority  => 30 });
+      my $loop;
+      $loop = Mojo::IOLoop->recurring( 15 => sub {
+        my $job = $app->minion->job($jid);
+        if ($job) {
+          my $state = $job->info->{state};
+          if ($state eq 'failed') {
+            $logger->error("Pair Building Monitor $jid failed.");
+            return;
+          }
+          elsif ($state eq 'finished') {
+            my $notes = $job->info->{notes};
+          }
+        }
+      });
+    });
   }
 
   class PairBuilderWorkerLogic : isa(Game::EvonyTKR::Shared::Constants) {
@@ -60,7 +223,7 @@ package Game::EvonyTKR::External::General::PairBuilder {
       foreach my $general (values $generalManager->get_all_generals()->%*) {
         unless ($general) {
           $self->logger->error(
-            'ConflictWorkerLogic: undefined general in general manager!!');
+            'PairBuilderWorkerLogic: undefined general in general manager!!');
           next;
         }
         $general->populateBuiltInBook($bookManager);
