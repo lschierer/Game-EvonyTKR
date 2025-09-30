@@ -30,18 +30,49 @@ package Game::EvonyTKR::External::General::PairBuilder {
       }
     );
 
+    state $PairMonitorStarted = 0;
+    $app->plugins->on(conflicts_complete => sub {
+      return if ($PairMonitorStarted);
+      $PairMonitorStarted = 1;
+      my ($plugin, $data) = @_;
+      my $conflicts = $data->{conflicts} // {};
+      my @generals;
+     @generals = keys $conflicts->{by_general} unless (!$conflicts);
+     $logger->debug(sprintf('there are %s generals from the conficts by_general keys.',
+     scalar @generals));
+      my $jid = $app->minion->enqueue(monitor_pair_builder => [{
+        generals => \@generals
+      }],{ priority  => 30 });
+      my $loop;
+      $loop = Mojo::IOLoop->recurring( 15 => sub {
+        my $job = $app->minion->job($jid);
+        if ($job) {
+          my $state = $job->info->{state};
+          if ($state eq 'failed') {
+            $logger->error("Pair Building Monitor $jid failed.");
+            return;
+          }
+          elsif ($state eq 'finished') {
+            my $notes = $job->info->{notes};
+          }
+        }
+      });
+    });
+
     state $PairBuildingStarted = 0;
     $app->minion->add_task(
       monitor_pair_builder => sub  {
         my $job = shift;
-        my $generals = shift;
+        my $args = shift;
+        $logger->debug(sprintf('monitor_pair_builder task sees %s generals in args',
+        scalar @{ $args->{generals } }));
         state $processedJobs = {};
         my $app = $job->app;
-        my $pairs_by_type = $app->get_general_pairs();
+        my $pairs_by_type = {};
 
         if(!$PairMonitorStarted){
-          foreach my $general (@$generals) {
-            #enqueue a job to build pairs for this general;
+          foreach my $general ( $args->{generals}->@* ) {
+            my $jid = $app->minion->enqueue( build_pairs_for_primary => { general_name => $general });
           }
         }
 
@@ -170,26 +201,7 @@ package Game::EvonyTKR::External::General::PairBuilder {
       }
     );
 
-    state $PairMonitorStarted = 0;
-    $app->plugins->on(conflicts_complete => sub {
-      return if ($PairMonitorStarted);
-      $PairMonitorStarted = 1;
-      my $jid = $app->minion->enqueue(monitor_pair_builder => [],{ priority  => 30 });
-      my $loop;
-      $loop = Mojo::IOLoop->recurring( 15 => sub {
-        my $job = $app->minion->job($jid);
-        if ($job) {
-          my $state = $job->info->{state};
-          if ($state eq 'failed') {
-            $logger->error("Pair Building Monitor $jid failed.");
-            return;
-          }
-          elsif ($state eq 'finished') {
-            my $notes = $job->info->{notes};
-          }
-        }
-      });
-    });
+
   }
 
   class PairBuilderWorkerLogic : isa(Game::EvonyTKR::Shared::Constants) {
