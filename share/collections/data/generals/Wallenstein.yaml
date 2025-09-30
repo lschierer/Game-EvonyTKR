@@ -13,7 +13,6 @@ basic_attributes:
     base: 104
     increment: 8.5
 book: Bohemian Pioneer
-display: summary
 specialties:
   - Ranged Troop Assault
   - Bash
