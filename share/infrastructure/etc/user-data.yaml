@@ -24,6 +24,7 @@ packages:
   - openssh-server
   - python3-certbot-nginx
   - rsync
+  - sysstat
   - unzip
   - unattended-upgrades
   - update-notifier-common
@@ -44,6 +45,9 @@ users:
       - ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAgEAzzFE5saXFWaM8aJscVuqSk48EcrcOvZ1tdFSgyQkK7eH/oBnZGvAyouRtmpavwUDIUelpmfVyaMdDX606ml5ZAQkodn4Nhje5v1jJ/32Wi3gIs6kosjdsB8ew6v2LIWuVVJrz+ZsjaoALAqjYmetPbtKo42u6Ai95otWBt2NxEUZx2LrLG/6MtxrXspcrmatDZGDiDSz7KOHP2O4j7c48tLG5naaLeT5ZoPRFNhVUVujyedc1s02TtHbvQ3sICgwNxx9B4HkFLuegtWhYwFretZJzhDrEY2olFtwbQR2r4TGJLYIrudj6G06HN7zfVf7Csd+LFW7HF5aztGHwm3g907jjzmG1U3ptfAqmR5bffJXhlbemD/++0Hs+f4ta2eevTZZUwRnGpM1Y9lfFip2d3UiiNgdblhbnmPlEPZhkPgcxE5rwsHClnZ2rUsDgTaWyRoiegvxIGmArcTt5133/Y8eNkCS9/opxzqRsmZ0eNcovyjpCXoa/CXT37uOZgzjf9DcVZCtenIZyZPGLxYrqlwOJBKHLYua6k1+fQ+/v+Qq+/R0RtMW6Of3L8akx+2MQnvG4lwutVsih0Ohg49G1JkJn6/5h8NIDbE5zcBQIa4tTQOO9I3A32pjyg9XH2WnUl5PZDBOaj/TKM6t+qMlLQwePZCpZ62nQ4rL3vRCPjk= lukeschierer@minimus.local
 runcmd:
   - echo 'vm.swappiness=0' >> /etc/sysctl.conf
+  - echo 'vm.overcommit_memory=2' >> /etc/sysctl.conf
+  - echo 'vm.vfs_cache_pressure=50' >> /etc/sysctl.conf
+  - systemctl is-active sysstat
   - export HOSTNAME='REPLACEHOSTNAME'; hostname ${HOSTNAME}
   - export HOSTNAME='REPLACEHOSTNAME'; hostnamectl set-hostname ${HOSTNAME}
   - export HOSTNAME='REPLACEHOSTNAME'; echo "127.0.1.1 ${HOSTNAME} ${HOSTNAME}.localdoamin" >> /etc/hosts
@@ -145,21 +149,31 @@ runcmd:
     #!/bin/bash
     set -e
 
+    # Define variables for service and app paths for clarity
+    SERVICE_NAME="mojolicious"
+    APP_PATH="/opt/mojo/app"
+    APP_USER="mojo"
+
     echo "Pulling latest code..."
-    sudo -u mojo -s /bin/bash -l -c "cd /opt/mojo/app && git pull"
+    sudo -u ${APP_USER} -s /bin/bash -l -c "cd ${APP_PATH} && git pull"
 
     echo "Building application..."
-    sudo -u mojo -s /bin/bash -l -c "cd /opt/mojo/app && just build"
+    sudo -u ${APP_USER} -s /bin/bash -l -c "cd ${APP_PATH} && just build"
 
-    echo "Reloading Hypnotoad..."
-    if [ -f /opt/mojo/app/bin/hypnotoad.pid ]; then
-        PID=$(cat /opt/mojo/app/bin/hypnotoad.pid)
-        sudo kill -USR2 ${PID}
-        echo "Sent USR2 to PID ${PID}"
-    else
-        echo "PID file not found, restarting service..."
-        sudo systemctl restart mojolicious
-    fi
+    echo "Restarting service..."
+    # Stop the service cleanly
+    sudo systemctl stop ${SERVICE_NAME}
+
+    # Wait for the service to fully stop and memory to be released
+    # Adjust the sleep duration as needed, but 5 seconds is a safe starting point.
+    echo "Waiting for service to stop..."
+    sleep 5
+
+    # Start the new version
+    sudo systemctl start ${SERVICE_NAME}
+
+    echo "Checking service status..."
+    sudo systemctl status ${SERVICE_NAME}
 
     echo "Deployment complete!"
     EOF
