@@ -19,6 +19,8 @@ packages:
   - libssl-dev
   - libzip-dev
   - pkg-config
+  - python3
+  - pipx
   - make
   - nginx
   - openssh-server
@@ -44,57 +46,23 @@ users:
       - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDos5u8SSJXO8BcmKrjfUjxz8y9KwmfTXfhetEcPQ1bSCY/fIaebvKJG4YJ0OmFKBQLW63MTnKp9iScw9OQp0mE5q/EMQj30iXu/q6ufYoGG5U9NAr4D6wH9XEUvwS6TrDXGphseGDxZk1ZspfdMR+c/XAALgyNVnzhaqW7k1KNJjUzw9ZzVFTDWcYOKFPgOorQIjTmn3y1B6NhQ179N7yB/6NiOKLn3gwNB3/jm9WidnnGHXA940nFIBNv7Ml0jSRChXd/57+VahVzqAxo8NlpiKfLHQPj7VjwBA7s7/gB67X7vnr/sERda8EmEu0sWgCZ9V1i1eOn0B2SKojhXJIpI2kMLDrZIP0RR9hdgqatRE13wNTYzbGPlSUhOCDaiiHOuBYqNbFYhCfV0fPo0CuHPn/04pbFnRU5KDdsyhjk4oa90Df1oq/X3bfAtj1d0gfrt0SVBa9TUh4Hi6vYFBQ5YRmY3YPk2xUsJxnDTYmocizqYZLU6RCPwVMkZrxIOflS96LGVLoqVVLRXLm1UVAkGViWB9ezhT1fxoyjF2s9xT2oRY8bmro+cep/N8Dk9YfAGrJRjLGKu185+ssB+WfpB2ZjA3OMK+6NPwn573S4lO0ftatbqOZSUQ4U4zxZJE8gMtBs8tAhdRsBj6JRd30OB2bSWdwiaEErPzvAaW3uzQ== luke@schierer@opus001.schierer.org
       - ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAgEAzzFE5saXFWaM8aJscVuqSk48EcrcOvZ1tdFSgyQkK7eH/oBnZGvAyouRtmpavwUDIUelpmfVyaMdDX606ml5ZAQkodn4Nhje5v1jJ/32Wi3gIs6kosjdsB8ew6v2LIWuVVJrz+ZsjaoALAqjYmetPbtKo42u6Ai95otWBt2NxEUZx2LrLG/6MtxrXspcrmatDZGDiDSz7KOHP2O4j7c48tLG5naaLeT5ZoPRFNhVUVujyedc1s02TtHbvQ3sICgwNxx9B4HkFLuegtWhYwFretZJzhDrEY2olFtwbQR2r4TGJLYIrudj6G06HN7zfVf7Csd+LFW7HF5aztGHwm3g907jjzmG1U3ptfAqmR5bffJXhlbemD/++0Hs+f4ta2eevTZZUwRnGpM1Y9lfFip2d3UiiNgdblhbnmPlEPZhkPgcxE5rwsHClnZ2rUsDgTaWyRoiegvxIGmArcTt5133/Y8eNkCS9/opxzqRsmZ0eNcovyjpCXoa/CXT37uOZgzjf9DcVZCtenIZyZPGLxYrqlwOJBKHLYua6k1+fQ+/v+Qq+/R0RtMW6Of3L8akx+2MQnvG4lwutVsih0Ohg49G1JkJn6/5h8NIDbE5zcBQIa4tTQOO9I3A32pjyg9XH2WnUl5PZDBOaj/TKM6t+qMlLQwePZCpZ62nQ4rL3vRCPjk= lukeschierer@minimus.local
 runcmd:
-  - echo 'vm.swappiness=0' >> /etc/sysctl.conf
-  - echo 'vm.overcommit_memory=2' >> /etc/sysctl.conf
-  - echo 'vm.vfs_cache_pressure=50' >> /etc/sysctl.conf
-  - systemctl is-active sysstat
   - export HOSTNAME='REPLACEHOSTNAME'; hostname ${HOSTNAME}
   - export HOSTNAME='REPLACEHOSTNAME'; hostnamectl set-hostname ${HOSTNAME}
   - export HOSTNAME='REPLACEHOSTNAME'; echo "127.0.1.1 ${HOSTNAME} ${HOSTNAME}.localdoamin" >> /etc/hosts
+  - |
+    cat > /etc/sysctl.d/local.conf << 'EOF'
+    vm.swappiness=0
+    vm.overcommit_memory=0
+    vm.vfs_cache_pressure=90
+    EOF
+  - service procps force-reload
+  - systemctl is-active sysstat
+  - add-apt-repository -y universe
   - apt-get update
   - apt-get dist-upgrade -y
   - mkdir -p /opt/mojo/var/run
+  - mkdir -p /opt/mojo/bin
   - chown -R mojo:www-data /opt/mojo
-  - |
-    cat > /etc/systemd/system/mojolicious-worker.service << 'EOF'
-    [Unit]
-    Description=Game Evony TKR Minion Worker
-    After=network.target
-
-    [Service]
-    Type=simple
-    User=mojo
-    WorkingDirectory=/opt/mojo/app
-    ExecStart=/opt/mojo/bin/mojo-worker.sh
-    Nice=10
-    IOSchedulingClass=2
-    IOSchedulingPriority=4
-    Restart=always
-    RestartSec=5
-
-    [Install]
-    WantedBy=multi-user.target
-    EOF
-  - |
-    cat > /etc/systemd/system/mojolicious.service << 'EOF'
-    [Unit]
-    Description=Game Evony TKR Mojolicious Server
-    After=network.target
-
-    [Service]
-    Type=forking
-    User=mojo
-    PIDFile=/opt/mojo/app/bin/hypnotoad.pid
-    ExecStart=/opt/mojo/bin/mojo.sh
-    ExecReload=/bin/kill -USR2 $MAINPID
-    TimeoutStartSec=900
-    KillMode=mixed
-    Restart=always
-
-    [Install]
-    WantedBy=multi-user.target
-
-    EOF
   - |
     export H=$( grep 127.0.1.1 /etc/hosts | cut -d ' ' -f 3 | cut -d '.' -f 1); cat > /etc/nginx/sites-available/mojoproxy << EOF
     upstream myapp {
@@ -142,39 +110,45 @@ runcmd:
   # this is *probably* only needed in dev, as even without this it works fine
   # on the auto retry systemctl does
   - sync && echo 3 > /proc/sys/vm/drop_caches
-  - dpkg-reconfigure -plow unattended-upgrades
   - systemctl enable unattended-upgrades
   - |
-    cat > /usr/local/bin/deploy-mojo << 'EOF'
-    #!/bin/bash
-    set -e
+    cat > /etc/systemd/system/mojolicious-worker.service << 'EOF'
+    [Unit]
+    Description=Game Evony TKR Minion Worker
+    After=network.target
 
-    # Define variables for service and app paths for clarity
-    SERVICE_NAME="mojolicious"
-    APP_PATH="/opt/mojo/app"
-    APP_USER="mojo"
+    [Service]
+    Type=simple
+    User=mojo
+    WorkingDirectory=/opt/mojo/app
+    ExecStart=/opt/mojo/bin/mojo-worker.sh
+    Nice=10
+    IOSchedulingClass=2
+    IOSchedulingPriority=4
+    Restart=always
+    RestartSec=5
 
-    echo "Pulling latest code..."
-    sudo -u ${APP_USER} -s /bin/bash -l -c "cd ${APP_PATH} && git pull"
-
-    echo "Building application..."
-    sudo -u ${APP_USER} -s /bin/bash -l -c "cd ${APP_PATH} && just build"
-
-    echo "Restarting service..."
-    # Stop the service cleanly
-    sudo systemctl stop ${SERVICE_NAME}
-
-    # Wait for the service to fully stop and memory to be released
-    # Adjust the sleep duration as needed, but 5 seconds is a safe starting point.
-    echo "Waiting for service to stop..."
-    sleep 5
-
-    # Start the new version
-    sudo systemctl start ${SERVICE_NAME}
-
-    echo "Checking service status..."
-    sudo systemctl status ${SERVICE_NAME}
-
-    echo "Deployment complete!"
+    [Install]
+    WantedBy=multi-user.target
     EOF
-  - chmod +x /usr/local/bin/deploy-mojo
+  - |
+    cat > /etc/systemd/system/mojolicious.service << 'EOF'
+    [Unit]
+    Description=Game Evony TKR Mojolicious Server
+    After=network.target
+
+    [Service]
+    Type=forking
+    User=mojo
+    PIDFile=/opt/mojo/app/bin/hypnotoad.pid
+    ExecStart=/opt/mojo/bin/mojo.sh
+    ExecReload=/bin/kill -USR2 $MAINPID
+    TimeoutStartSec=900
+    KillMode=mixed
+    Restart=always
+
+    [Install]
+    WantedBy=multi-user.target
+
+    EOF
+  - systemctl enable mojolicious

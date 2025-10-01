@@ -3,6 +3,7 @@ import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as s3Assets from 'aws-cdk-lib/aws-s3-assets';
 import * as fs from 'fs';
 import * as cdk from 'aws-cdk-lib';
+import * as yaml from 'js-yaml';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -48,37 +49,51 @@ export class UbuntuInstance extends NestedStack {
       'REPLACE2.',
       props.environment === 'prod' ? '' : `${props.environment}2.`,
     );
-    const cloud_user_data = ec2.UserData.custom(userDataFile);
+
+    const cloud_user_data: Record<string, unknown> = yaml.load(
+      userDataFile,
+    ) as Record<string, unknown>;
+    cloud_user_data.runcmd =
+      cloud_user_data['runcmd' as keyof typeof cloud_user_data] || [];
     const mojoBinAsset = new s3Assets.Asset(this, 'MyScriptAsset', {
       path: path.join(__dirname, '../mojobin'),
     });
     mojoBinAsset.grantRead(instanceRole);
     const shellCommands = ec2.UserData.forLinux();
     shellCommands.addCommands(
-      'add-apt-repository universe',
-      'apt install -y awscli',
-      'snap install aws-cli --classic',
-      `aws s3 cp s3://${mojoBinAsset.s3BucketName}/${mojoBinAsset.s3ObjectKey} /tmp/mojobin.zip`,
+      'curl "https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip" -o "awscliv2.zip"',
+      'unzip awscliv2.zip',
+      'sudo ./aws/install',
+    );
+    const localPath = shellCommands.addS3DownloadCommand({
+      bucket: mojoBinAsset.bucket,
+      bucketKey: mojoBinAsset.s3ObjectKey,
+    });
+    shellCommands.addCommands(
       'mkdir -p /opt/mojo/bin',
       'cd /opt/mojo/bin',
-      'unzip /tmp/mojobin.zip',
+      `unzip ${localPath}`,
       'chown -R mojo:mojo /opt/mojo',
       'chmod +x /opt/mojo/bin/*.sh',
+      'mv .bash* /opt/mojo/',
+      'cp /opt/mojo/bin/deploy-mojo.sh /usr/local/bin',
+      'chmod 0755 /opt/mojo/bin/deploy-mojo.sh',
       'sudo -u mojo -s /bin/bash -l -c /opt/mojo/bin/bootstrap.sh',
-      'cp .bash_profile /opt/mojo/.bashrc',
-      'mv .bash_profile /opt/mojo',
+    );
+    shellCommands.addCommands(
       'systemctl start mojolicious',
       'systemctl reload nginx',
     );
+    (cloud_user_data.runcmd as Array<string>).push(shellCommands.render());
 
     // Combine them with MultiPart
-    const userData = new ec2.MultipartUserData();
-    userData.addUserDataPart(cloud_user_data, ec2.MultipartBody.SHELL_SCRIPT);
-    userData.addUserDataPart(shellCommands, ec2.MultipartBody.SHELL_SCRIPT);
+    const userData = ec2.UserData.custom(
+      `#cloud-config\n${yaml.dump(cloud_user_data)}`,
+    );
 
     const instanceSize = !props.environment.localeCompare('dev')
-      ? ec2.InstanceSize.SMALL
-      : ec2.InstanceSize.MEDIUM;
+      ? ec2.InstanceSize.MEDIUM
+      : ec2.InstanceSize.LARGE;
 
     const ec2SecGroup = new ec2.SecurityGroup(
       this,

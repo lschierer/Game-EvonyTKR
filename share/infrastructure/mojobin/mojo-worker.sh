@@ -13,14 +13,10 @@ cleanup() {
 cd /opt/mojo/app || exit 2
 
 # Run the workears
-for i in {1..3}; do
-  echo "Starting worker $i"
-  ./bin/game-evonytkr minion worker -j 15 -I 5 &
-  HR=$?;
-  if [! -z "$HR" ]; then
-    echo "worker returned $HR";
-    exit $HR;
-  fi
-done
+./bin/game-evonytkr minion worker -j 5 -I 2 &
+if [! -z "$HR" ]; then
+  echo "worker returned $HR";
+  exit $HR;
+fi
 
 wait

@@ -20,11 +20,9 @@ fi
 
 touch minion.db
 
-for i in $(seq 1 5); do
-  nice -n 10 ./bin/game-evonytkr minion worker -j 10 &
-  WORKER_PID=$!
-  echo "Worker PID: $WORKER_PID"
-done
+nice -n 10 ./bin/game-evonytkr minion worker -j 10 -I 5 &
+WORKER_PID=$!
+echo "Worker PID: $WORKER_PID"
 
 
 # Start web server with watchexec
