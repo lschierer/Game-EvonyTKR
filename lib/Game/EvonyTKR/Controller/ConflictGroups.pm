@@ -55,49 +55,64 @@ package Game::EvonyTKR::Controller::ConflictGroups {
       $logger->error('detect_conflicts_for_general task did not define!!!');
     }
 
-    $app->plugins->on(conflicts_complete => sub {
-      $logger->info('Conflict Update detected');
-      my ($plugin, $data) = @_;
-      my $conflicts = $data->{conflicts} // {};
-      $logger->debug(sprintf('data from conflicts_complete signal is %s', Data::Printer::np($conflicts)));
-      my $cd = $app->get_root_manager()->conflictDetector;
-      if($cd) {
-        if(exists $conflicts->{by_general} ) {
-          foreach my $gn (keys $conflicts->{by_general}->%*) {
-            $logger->debug("conflicts by general for $gn");
-            if(ref($conflicts->{by_general}->{$gn}) eq 'HASH'){
-              foreach my $og ($conflicts->{by_general}->{$gn}->%*){
-                next if (Scalar::Util::looks_like_number($og) && $og == 1);
-                $cd->by_general->{$gn}->{$og} = 1;
+    $app->plugins->on(
+      conflicts_complete => sub {
+        $logger->info('Conflict Update detected');
+        my ($plugin, $data) = @_;
+        my $conflicts = $data->{conflicts} // {};
+        $logger->debug(
+          sprintf('data from conflicts_complete signal is %s',
+            Data::Printer::np($conflicts))
+        );
+        my $cd = $app->get_root_manager()->conflictDetector;
+        if ($cd) {
+          if (exists $conflicts->{by_general}) {
+            foreach my $gn (keys $conflicts->{by_general}->%*) {
+              $logger->debug("conflicts by general for $gn");
+              if (ref($conflicts->{by_general}->{$gn}) eq 'HASH') {
+                foreach my $og ($conflicts->{by_general}->{$gn}->%*) {
+                  next if (Scalar::Util::looks_like_number($og) && $og == 1);
+                  $cd->by_general->{$gn}->{$og} = 1;
+                }
               }
-            }else {
-              $logger->warn(sprintf('conflicts by general for %s is a %s',
-              $gn, ref($conflicts->{by_general}->{$gn})));
+              else {
+                $logger->warn(sprintf(
+                  'conflicts by general for %s is a %s',
+                  $gn, ref($conflicts->{by_general}->{$gn})
+                ));
+              }
             }
           }
-        }
 
-        if(exists $conflicts->{groups_by_conflict_type}){
-          foreach my $key1 (keys $conflicts->{groups_by_conflict_type}->%* ) {
-            $logger->debug(sprintf('conflicts for group ref: %s, contains: "%s"', ref($key1),  $key1));
-            my $group = $conflicts->{groups_by_conflict_type}->{$key1};
-            if(ref($group) eq 'ARRAY') {
-              my @all = @{ $group };
-              if(exists $cd->groups_by_conflict_type->{$key1}){
-                push @all, @{ $cd->groups_by_conflict_type->{$key1} };
-                @all = List::AllUtils::uniq @all;
+          if (exists $conflicts->{groups_by_conflict_type}) {
+            foreach my $key1 (keys $conflicts->{groups_by_conflict_type}->%*) {
+              $logger->debug(sprintf(
+                'conflicts for group ref: %s, contains: "%s"',
+                ref($key1), $key1
+              ));
+              my $group = $conflicts->{groups_by_conflict_type}->{$key1};
+              if (ref($group) eq 'ARRAY') {
+                my @all = @{$group};
+                if (exists $cd->groups_by_conflict_type->{$key1}) {
+                  push @all, @{ $cd->groups_by_conflict_type->{$key1} };
+                  @all = List::AllUtils::uniq @all;
+                }
+                $cd->groups_by_conflict_type->{$key1} = \@all;
               }
-              $cd->groups_by_conflict_type->{$key1} = \@all;
-            } else {
-              $logger->warn(sprintf('conflict by type %s is a %s',
-              $group, ref($conflicts->{groups_by_conflict_type}->{$group})));
-            }
+              else {
+                $logger->warn(sprintf(
+                  'conflict by type %s is a %s',
+                  $group, ref($conflicts->{groups_by_conflict_type}->{$group})
+                ));
+              }
 
+            }
+            @{ $cd->groups_by_conflict_type->{group} } =
+              List::AllUtils::uniq @{ $cd->groups_by_conflict_type->{group} };
           }
-          @{ $cd->groups_by_conflict_type->{group} } = List::AllUtils::uniq @{ $cd->groups_by_conflict_type->{group} };
         }
       }
-    });
+    );
 
   }
 

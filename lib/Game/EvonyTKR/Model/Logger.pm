@@ -27,8 +27,8 @@ class Game::EvonyTKR::Model::Logger {
     my $v = $DEV_MODE // $PERL_ENV // $MOJO_MODE // '';
     $_debug = ($v && $v !~ /^(?:0|false|prod(?:uction)?)$/i) ? 1 : 0;
 
-    $self->get_logger
-      ;   # initialize on construction (merged from a pre-existing ADJUST block)
+    # initialize on construction (merged from a pre-existing ADJUST block)
+    $self->get_logger;
   }
 
   method trace { $self->logger->trace(@_) }

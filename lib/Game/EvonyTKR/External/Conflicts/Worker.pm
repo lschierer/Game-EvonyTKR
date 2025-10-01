@@ -32,7 +32,7 @@ package Game::EvonyTKR::External::Conflicts::Worker {
     );
 
     $app->minion->add_task(
-      monitor_conflict_jobs => sub  {
+      monitor_conflict_jobs => sub {
         my $job = shift;
         my $app = $job->app;
         $logger->debug('calling monitor_conflict_jobs');
@@ -44,7 +44,10 @@ package Game::EvonyTKR::External::Conflicts::Worker {
     $app->plugins->on(
       generals_loaded => sub {
         if (!$ConflictProcessingStarted) {
-          my $jid = $app->minion->enqueue(monitor_conflict_jobs => [],{ priority  => 30 });
+          my $jid = $app->minion->enqueue(
+            monitor_conflict_jobs => [],
+            { priority => 30 }
+          );
           my $loop;
           $loop = Mojo::IOLoop->recurring(
             15 => sub {
@@ -58,7 +61,9 @@ package Game::EvonyTKR::External::Conflicts::Worker {
                 elsif ($state eq 'finished') {
                   my $notes = $job->info->{notes};
 
-                  $app->plugins->emit('conflicts_complete' => {conflicts => $notes });
+                  $app->plugins->emit(
+                    'conflicts_complete' => { conflicts => $notes });
+                  Mojo::IOLoop->remove($loop);
                 }
               }
             }
@@ -96,7 +101,7 @@ package Game::EvonyTKR::External::Conflicts::Worker {
 
     my $by_general              = {};
     my $groups_by_conflict_type = {};
-    my $processedJobs = {};
+    my $processedJobs           = {};
 
     my $loop;
     $loop = Mojo::IOLoop->recurring(
@@ -166,14 +171,14 @@ package Game::EvonyTKR::External::Conflicts::Worker {
           })->each(sub {
             my $info = $_;
             $logger->debug(sprintf('checking job %s', $info->{id}));
-            $self->handle_finished_job( $info, $processedJobs, $by_general,
+            $self->handle_finished_job($info, $processedJobs, $by_general,
               $groups_by_conflict_type);
           });
 
           $logger->debug('all jobs checked in this iteration of outer loop');
           if ($stillWorking == 0) {
             $logger->info('all Conflicts computed');
-            Mojo::IOLoop->stop($loop);
+            Mojo::IOLoop->remove($loop);
           }
           else {
             $logger->debug("there are $stillWorking tasks remaining");
@@ -190,7 +195,6 @@ package Game::EvonyTKR::External::Conflicts::Worker {
     );
 
     Mojo::IOLoop->start($loop) unless Mojo::IOLoop->is_running;
-
 
   }
 
@@ -212,7 +216,8 @@ package Game::EvonyTKR::External::Conflicts::Worker {
           $logger->debug(sprintf(
             'result for job id %s is %s', $info->{id}, $result));
           my $notes = $info->{notes};
-          $something->process_results($result, $notes, $by_general, $groups_by_conflict_type);
+          $something->process_results($result, $notes, $by_general,
+            $groups_by_conflict_type);
 
         }
       );
@@ -222,7 +227,8 @@ package Game::EvonyTKR::External::Conflicts::Worker {
     }
   }
 
-  sub process_results ($job, $result, $notes, $by_general, $groups_by_conflict_type) {
+  sub process_results ($job, $result, $notes, $by_general,
+    $groups_by_conflict_type) {
     if ($result =~ /Conflicts detected for/) {
       my $conflicts = $notes->{conflicts};
       if ($conflicts) {
@@ -236,8 +242,7 @@ package Game::EvonyTKR::External::Conflicts::Worker {
             $by_general->{$general}->{$og} = 1;
           }
         }
-        foreach
-          my $group (keys $conflicts->{groups_by_conflict_type}->%*) {
+        foreach my $group (keys $conflicts->{groups_by_conflict_type}->%*) {
           $logger->debug(
             sprintf(
               'conflicts in ' . 'groups_by_conflict_type' . ' for %s: ',
@@ -253,8 +258,7 @@ package Game::EvonyTKR::External::Conflicts::Worker {
             push @all, @{ $groups_by_conflict_type->{$group} };
           }
           push @all, @{ $conflicts->{groups_by_conflict_type}->{$group} };
-          @{ $groups_by_conflict_type->{$group} } =
-            List::AllUtils::uniq @all;
+          @{ $groups_by_conflict_type->{$group} } = List::AllUtils::uniq @all;
         }
       }
     }
@@ -269,6 +273,10 @@ package Game::EvonyTKR::External::Conflicts::Worker {
     use Unicode::CaseFold qw(fc);
     use Encode            qw(is_utf8 decode_utf8 encode_utf8);
     use Carp;
+
+    ADJUST {
+      $self->get_logger('Game::EvonyTKR::External::Conflicts::Worker');
+    }
 
     method process_general($args) {
       my $general_name = $args->{general_name};
@@ -296,10 +304,10 @@ package Game::EvonyTKR::External::Conflicts::Worker {
       my $general = $generalManager->getGeneral($general_name);
       unless ($general) {
         $self->logger->error(sprintf(
-        'ConflictWorkerLogic: general "%s" is not available '.
-        'in the general manager! Available Generals are: %s',
+          'ConflictWorkerLogic: general "%s" is not available '
+            . 'in the general manager! Available Generals are: %s',
           $general_name,
-          join ', ',
+          join 'conflicts_complete, ',
           sort map { $_->name } values $generalManager->get_all_generals()->%*
         ));
         return;

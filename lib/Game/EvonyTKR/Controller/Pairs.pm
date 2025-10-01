@@ -45,11 +45,13 @@ package Game::EvonyTKR::Controller::Pairs {
     return $base;
   }
 
-  sub get_manager ($self) {
-    return $self->app->get_root_manager->generalManager;
+  my $gm;
+
+  sub get_manager {
+    return $gm;
   }
 
-  sub getPairs ($c) {
+  sub getPairs {
     state $pairs_by_type = {};
     return $pairs_by_type;
   }
@@ -59,6 +61,8 @@ package Game::EvonyTKR::Controller::Pairs {
     $logger->info("Registering routes for " . ref($c));
     $c->SUPER::register($app, $config);
 
+    $gm = $app->get_root_manager->generalManager;
+
     $app->helper(
       get_general_pairs => sub {
         return $c->getPairs();
@@ -67,21 +71,24 @@ package Game::EvonyTKR::Controller::Pairs {
 
     my $mainRoutes = $app->routes->any($base);
 
+    $app->plugins->on(pairs_complete    => \&pair_receiver);
+    $app->plugins->on(pairs_in_progress => \&pair_receiver);
+
     $app->plugins->on(
       general_routing_available => sub {
         $mainRoutes->get('/:uiTarget/:buffActivation/pair-comparison')->to(
-          controller => 'Generals',
+          controller => 'Pairs',
           action     => 'pairTable',
         )->name('General_dynamic_pairTable');
 
         $mainRoutes->any(
           ['GET', 'POST'] => '/:uiTarget/:buffActivation/pair/data.json')->to(
-          controller => 'Generals',
+          controller => 'Pairs',
           action     => 'pairCatalog',
           )->name('Generals_dynamic_pairCatalog');
 
         $mainRoutes->get('/:uiTarget/:buffActivation/pair-details-stream')->to(
-          controller => 'Generals',
+          controller => 'Pairs',
           action     => 'stream_pair_details',
         )->name('Generals_dynamic_pairDetails');
 
@@ -111,7 +118,45 @@ package Game::EvonyTKR::Controller::Pairs {
     );
   }
 
+  sub pair_receiver {
+    my $something = shift;
+    my $pairs     = shift;
+    $logger->debug('pair_receiver called: ' . Data::Printer::np($pairs));
+    my $pairs_by_type = __PACKAGE__->getPairs();
+    my $gm            = __PACKAGE__->get_manager();
+    unless (ref($pairs) eq 'HASH') {
+      $logger->error(sprintf(
+        'pair_receiver got a %s instead of a HASH', ref($pairs)));
+      return;
+    }
 
+    foreach my $type (sort keys $pairs->%*) {
+      $logger->debug("pairs for type '$type'");
+      my $increment = 0;
+      foreach my $p ($pairs->{$type}->@*) {
+        unless (
+          List::AllUtils::any {
+            $_->primary->name eq $p->{primary}
+              && $_->secondary->name eq $p->{secondary}
+          }
+          @{ $pairs_by_type->{$type} }
+        ) {
+        $increment++;
+          my $primary   = $gm->getGeneral($p->{primary});
+          my $secondary = $gm->getGeneral($p->{secondary});
+          if ($primary && $secondary) {
+            my $pair = Game::EvonyTKR::Model::General::Pair->new(
+              primary   => $primary,
+              secondary => $secondary,
+            );
+            push @{ $pairs_by_type->{$type} }, $pair;
+          }
+        }
+      }
+      $logger->debug(sprintf('there are %s pairs of type %s added',
+      $increment, $type));
+    }
+  }
 
   sub pairTable ($self) {
     my $distDir = Mojo::File::Share::dist_dir('Game::EvonyTKR');
