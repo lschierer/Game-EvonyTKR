@@ -72,7 +72,7 @@ package Game::EvonyTKR {
           $self->log->info("got a cat '$cat'");
         }
         Log::Log4perl::Config->utf8(1);
-        my $logger = Log::Log4perl->get_logger($cat);
+        my $logger = $log4perl_logger->get_logger($cat);
         return $logger;
       }
     );
