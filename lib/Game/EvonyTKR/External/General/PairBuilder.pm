@@ -99,7 +99,10 @@ package Game::EvonyTKR::External::General::PairBuilder {
             my $lock = $app->minion->lock('build_pairs_for_primary' . $general, 360);
             next unless $lock;
             my $jid = $app->minion->enqueue(
-              build_pairs_for_primary => [{ general_name => $general }], {priority => 5 });
+              build_pairs_for_primary => [{ general_name => $general }], {
+              priority  => 5,
+              attempts  => 5,
+            });
           }
         }
 
