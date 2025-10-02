@@ -3,11 +3,13 @@ git_meta:
   authors: Luke S. Schierer, Wags-SMITE
   copyright: 2023-2025
 hypnotoad:
-  workers: 2
-  accepts: 0
+  accepts: 10000
   clients: 10
+  heartbeat_interval: 10
+  heartbeat_timeout: 180
   listen:
     - 'http://*:3000'
   proxy: 1
+  workers: 2
 secrets:
   - e0deeacd35ce3e6c4b07a33ae421a4704636f001
