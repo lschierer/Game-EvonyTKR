@@ -1,1 +1,1 @@
-source .bashrc
+source /opt/mojo/.bashrc
