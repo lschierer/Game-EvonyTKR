@@ -123,6 +123,9 @@ package Game::EvonyTKR {
 
     $self->log->debug("dbPath is $dbPath");
     $self->plugin(Minion => { SQLite => "sqlite:$dbPath" });
+    if($mode eq 'development'){
+      $self->minion->remove_after(7200);
+    }
     # Minion worker
     $self->plugin('Game::EvonyTKR::External::Buff::Worker');
 
