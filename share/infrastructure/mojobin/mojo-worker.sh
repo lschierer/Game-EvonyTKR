@@ -12,11 +12,14 @@ cleanup() {
 # Change to app directory
 cd /opt/mojo/app || exit 2
 
-# Run the workears
-./bin/game-evonytkr minion worker -j 5 -I 2 &
-if [! -z "$HR" ]; then
-  echo "worker returned $HR";
-  exit $HR;
+./bin/game-evonytkr minion worker -j 15 -s 1 -S 1 -L 4 &
+WORKER_RETURN=$?
+WORKER_PID=$!
+if [! -z "$WORKER_RETURN" ]; then
+  echo "worker returned $WORKER_RETURN";
+  exit $WORKER_RETURN;
+else
+  renice --priority 10 --pid ${WORKER_PID}
 fi
 
 wait

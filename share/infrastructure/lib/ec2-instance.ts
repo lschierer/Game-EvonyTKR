@@ -81,6 +81,9 @@ export class UbuntuInstance extends NestedStack {
       'sudo -u mojo -s /bin/bash -l -c /opt/mojo/bin/bootstrap.sh',
     );
     shellCommands.addCommands(
+      'systemctl enable mojolicious',
+      'systemctl enable mojolicious-worker',
+      'systemctl start mojolicious-worker',
       'systemctl start mojolicious',
       'systemctl reload nginx',
     );
