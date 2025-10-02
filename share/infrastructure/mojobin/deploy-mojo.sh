@@ -7,6 +7,7 @@ APP_PATH="/opt/mojo/app"
 APP_USER="mojo"
 
 echo "Pulling latest code..."
+sudo -u ${APP_USER} -s /bin/bash -l -c "cd ${APP_PATH} && git reset --hard"
 sudo -u ${APP_USER} -s /bin/bash -l -c "cd ${APP_PATH} && git pull"
 
 echo "Stopping service..."
