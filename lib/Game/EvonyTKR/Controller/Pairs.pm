@@ -526,7 +526,7 @@ package Game::EvonyTKR::Controller::Pairs {
       my $jid = $c->app->minion->enqueue(
         pair_worker => [$args],
         {
-          delay => ($index * 0.1) + rand(0.5),
+          delay => ($index * 0.001) + rand(0.5),
           notes => {
             pair_index => $index,
             run_id     => $run_id,
