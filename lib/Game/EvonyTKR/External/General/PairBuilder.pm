@@ -91,7 +91,7 @@ package Game::EvonyTKR::External::General::PairBuilder {
 
         if (!$PairMonitorStarted) {
           foreach my $general ($args->{generals}->@*) {
-            my $lock = $app->minion->lock('build_pairs_for_primary' . $general, 3600);
+            my $lock = $app->minion->lock('build_pairs_for_primary' . $general, 360);
             next unless $lock;
             my $jid = $app->minion->enqueue(
               build_pairs_for_primary => [{ general_name => $general }]);

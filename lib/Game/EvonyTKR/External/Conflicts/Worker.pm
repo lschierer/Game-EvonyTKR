@@ -81,7 +81,7 @@ package Game::EvonyTKR::External::Conflicts::Worker {
             $logger->error('general is undefined in general_loaded callback');
             return;
           }
-          my $lock = $app->minion->lock('detect_conflicts_for_general' . $general->name, 3600);
+          my $lock = $app->minion->lock('detect_conflicts_for_general' . $general->name, 360);
           return unless $lock;
           my $jid = $app->minion->enqueue(
             detect_conflicts_for_general => [{
