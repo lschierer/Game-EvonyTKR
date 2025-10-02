@@ -59,7 +59,7 @@ package Game::EvonyTKR {
     my $lc              = Game::EvonyTKR::Logger::Config->new('Game-EvonyTKR');
     my $log4perl_logger = $lc->init($mode);
     my $app_log         = Game::EvonyTKR::Logger::MojoLog4Perl->new(
-      l4p => Log::Log4perl->get_logger('Game-EvonyTKR'),);
+      l4p => $log4perl_logger->get_logger('Game-EvonyTKR'),);
     $self->log($app_log);
 
     $self->helper(
