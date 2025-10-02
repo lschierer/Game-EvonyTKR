@@ -30,14 +30,14 @@ sudo -u ${APP_USER} -s /bin/bash -l -c "cd ${APP_PATH} && ./Build manifest"
 sudo -u ${APP_USER} -s /bin/bash -l -c "cd ${APP_PATH} && perl ./scripts/update_git_meta.pl"
 sudo -u ${APP_USER} -s /bin/bash -l -c "cd ${APP_PATH} && ./Build"
 
+echo "Restarting workers"
+sudo systemctl restart "${SERVICE_NAME}-worker"
+sudo systemctl status "${SERVICE_NAME}-worker"
+
 # Start the new version
 sudo systemctl start ${SERVICE_NAME}
 
 echo "Checking service status..."
 sudo systemctl status ${SERVICE_NAME}
-
-echo "Restarting workers"
-sudo systemctl restart "${SERVICE_NAME}-worker"
-sudo systemctl status "${SERVICE_NAME}-worker"
 
 echo "Deployment complete!"
