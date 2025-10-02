@@ -303,6 +303,14 @@ package Game::EvonyTKR::External::General::PairBuilder {
         if ($general) {
           $self->build_pairs($general);
         }
+      } elsif(exists $args->{all} && $args->{all}){
+        foreach my $general (sort { $a->name cmp $b->name } values $generalManager->get_all_generals()->%*) {
+          $self->build_pairs($general);
+        }
+      } else {
+        $self->logger->error(
+        'one of general_name or all must be provided to '.'the build_pairs_for_primary job.'
+        );
       }
     }
 

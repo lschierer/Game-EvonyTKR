@@ -29,6 +29,7 @@ class Game::EvonyTKR::Model::Logger {
 
     # initialize on construction (merged from a pre-existing ADJUST block)
     $self->get_logger;
+    $logger->debug('logging module debug set to ' . $_debug ? 'true' : 'false');
   }
 
   method trace { $self->logger->trace(@_) }
