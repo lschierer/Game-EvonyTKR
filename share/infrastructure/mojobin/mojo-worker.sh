@@ -12,7 +12,7 @@ cleanup() {
 # Change to app directory
 cd /opt/mojo/app || exit 2
 
-./bin/game-evonytkr minion worker -j 15 -s 1 -S 1 -L 4 &
+./bin/game-evonytkr minion worker -j 6 -s 1 -S 1 -L 4 &
 WORKER_RETURN=$?
 WORKER_PID=$!
 if [! -z "$WORKER_RETURN" ]; then
