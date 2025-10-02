@@ -1,0 +1,83 @@
+---
+name: Holy Knight
+levels:
+  - level: "Green"
+    buffs:
+      - attribute: Attack
+        conditions:
+          - Marching
+        targetedType: Ranged Troops
+        value:
+          number: 3
+          unit: percentage
+      - attribute: Attack
+        conditions:
+          - Marching
+        targetedType: Mounted Troops
+        value:
+          number: 3
+          unit: percentage
+  - level: "Blue"
+    buffs:
+      - attribute: Attack
+        conditions:
+          - Marching
+        targetedType: Ranged Troops
+        value:
+          number: 3
+          unit: percentage
+      - attribute: Attack
+        conditions:
+          - Marching
+        targetedType: Mounted Troops
+        value:
+          number: 3
+          unit: percentage
+  - level: "Purple"
+    buffs:
+      - attribute: Attack
+        conditions:
+          - Marching
+        targetedType: Ranged Troops
+        value:
+          number: 5
+          unit: percentage
+      - attribute: Attack
+        conditions:
+          - Marching
+        targetedType: Mounted Troops
+        value:
+          number: 5
+          unit: percentage
+  - level: "Orange"
+    buffs:
+      - attribute: Attack
+        conditions:
+          - Marching
+        targetedType: Ranged Troops
+        value:
+          number: 5
+          unit: percentage
+      - attribute: Attack
+        conditions:
+          - Marching
+        targetedType: Mounted Troops
+        value:
+          number: 5
+          unit: percentage
+  - level: "Gold"
+    buffs:
+      - attribute: Attack
+        conditions:
+          - Marching
+        targetedType: Ranged Troops
+        value:
+          number: 10
+          unit: percentage
+      - attribute: Attack
+        conditions:
+          - Marching
+        targetedType: Mounted Troops
+        value:
+          number: 10
+          unit: percentage

@@ -1,0 +1,113 @@
+---
+name: Battle of Pelagonia
+levels:
+  - level: "Green"
+    buffs:
+      - attribute: Attack
+        targetedType: Ranged Troops
+        value:
+          number: 4
+          unit: percentage
+      - attribute: Defense
+        targetedType: Ranged Troops
+        value:
+          number: 2
+          unit: percentage
+      - attribute: HP
+        targetedType: Ranged Troops
+        value:
+          number: 1
+          unit: percentage
+      - attribute: HP
+        targetedType: Siege Machines
+        value:
+          number: 1
+          unit: percentage
+  - level: "Blue"
+    buffs:
+      - attribute: Attack
+        targetedType: Ranged Troops
+        value:
+          number: 4
+          unit: percentage
+      - attribute: Defense
+        targetedType: Ranged Troops
+        value:
+          number: 2
+          unit: percentage
+      - attribute: HP
+        targetedType: Siege Machines
+        value:
+          number: 1
+          unit: percentage
+      - attribute: HP
+        targetedType: Ranged Troops
+        value:
+          number: 1
+          unit: percentage
+  - level: "Purple"
+    buffs:
+      - attribute: Attack
+        targetedType: Ranged Troops
+        value:
+          number: 8
+          unit: percentage
+      - attribute: Defense
+        targetedType: Ranged Troops
+        value:
+          number: 4
+          unit: percentage
+      - attribute: HP
+        targetedType: Siege Machines
+        value:
+          number: 2
+          unit: percentage
+      - attribute: HP
+        targetedType: Ranged Troops
+        value:
+          number: 2
+          unit: percentage
+  - level: "Orange"
+    buffs:
+      - attribute: Attack
+        targetedType: Ranged Troops
+        value:
+          number: 8
+          unit: percentage
+      - attribute: Defense
+        targetedType: Ranged Troops
+        value:
+          number: 4
+          unit: percentage
+      - attribute: HP
+        targetedType: Siege Machines
+        value:
+          number: 2
+          unit: percentage
+      - attribute: HP
+        targetedType: Ranged Troops
+        value:
+          number: 2
+          unit: percentage
+  - level: "Gold"
+    buffs:
+      - attribute: Attack
+        targetedType: Ranged Troops
+        value:
+          number: 16
+          unit: percentage
+      - attribute: Defense
+        targetedType: Ranged Troops
+        value:
+          number: 8
+          unit: percentage
+      - attribute: HP
+        targetedType: Ranged Troops
+        value:
+          number: 4
+          unit: percentage
+      - attribute: HP
+        targetedType: Siege Machines
+        value:
+          number: 4
+          unit: percentage

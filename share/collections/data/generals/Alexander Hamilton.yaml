@@ -1,0 +1,24 @@
+ascending: true
+basic_attributes:
+  attack:
+    base: 125
+    increment: 8.74
+  defense:
+    base: 129
+    increment: 8.93
+  leadership:
+    base: 123
+    increment: 8.74
+  politics:
+    base: 119
+    increment: 8.36
+book: Father of American Finance
+name: Alexander Hamilton
+specialties:
+  - Ground Troop Formation
+  - Formation
+  - Ground Troop Ares
+  - Implied Powers
+stars: red5
+type:
+  - ground_specialist

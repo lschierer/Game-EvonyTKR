@@ -1,0 +1,87 @@
+name: Battle of Tours
+levels:
+  - level: green
+    buffs:
+      - attribute: Death to Survival
+        conditions:
+          - When City Mayor for this SubCity
+        value:
+          number: 1
+          unit: percentage
+      - attribute: SubCity Construction Speed
+        conditions:
+          - When City Mayor for this SubCity
+        value:
+          number: 4
+          unit: percentage
+    text: >-
+      Increases Construction Speed in Subordinate City +4%.
+      Death into Survival Rate in this Subordinate City +1%.
+  - level: blue
+    buffs:
+      - attribute: Death to Survival
+        conditions:
+          - When City Mayor for this SubCity
+        value:
+          number: 1
+          unit: percentage
+      - attribute: SubCity Construction Speed
+        conditions:
+          - When City Mayor for this SubCity
+        value:
+          number: 4
+          unit: percentage
+    text: >-
+      Increases Construction Speed in Subordinate City +4%.
+      Death into Survival Rate in this Subordinate City +1%.
+  - level: purple
+    buffs:
+      - attribute: Death to Survival
+        conditions:
+          - When City Mayor for this SubCity
+        value:
+          number: 2
+          unit: percentage
+      - attribute: SubCity Construction Speed
+        conditions:
+          - When City Mayor for this SubCity
+        value:
+          number: 8
+          unit: percentage
+    text: >-
+      Increases Construction Speed in Subordinate City +8%.
+      Death into Survival Rate in this Subordinate City +2%.
+  - level: orange
+    buffs:
+      - attribute: Death to Survival
+        conditions:
+          - When City Mayor for this SubCity
+        value:
+          number: 2
+          unit: percentage
+      - attribute: SubCity Construction Speed
+        conditions:
+          - When City Mayor for this SubCity
+        value:
+          number: 8
+          unit: percentage
+    text: >-
+      Increases Construction Speed in Subordinate City +8%.
+      Death into Survival Rate in this Subordinate City +2%.
+  - level: gold
+    buffs:
+      - attribute: Death to Survival
+        conditions:
+          - When City Mayor for this SubCity
+        value:
+          number: 4
+          unit: percentage
+      - attribute: SubCity Construction Speed
+        conditions:
+          - When City Mayor for this SubCity
+        value:
+          number: 16
+          unit: percentage
+    text: >-
+      Increases Construction Speed in Subordinate City +16%.
+      Death into Survival Rate in this Subordinate City +4%.

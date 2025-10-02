@@ -1,0 +1,35 @@
+---
+name: Unstoppable Force
+buffs:
+  - attribute: Attack
+    targetedType: Ranged Troops
+    conditions:
+      - Attacking
+    value:
+      number: 45
+      unit: percentage
+  - attribute: Defense
+    targetedType: Ranged Troops
+    conditions:
+      - Attacking
+    value:
+      number: 45
+      unit: percentage
+  - attribute: HP
+    targetedType: Ranged Troops
+    conditions:
+      - brings a spiritual beast
+      - brings a dragon
+      - Attacking
+    value:
+      number: 35
+      unit: percentage
+  - attribute: HP
+    targetedType: Siege Machines
+    conditions:
+      - brings a spiritual beast
+      - brings a dragon
+      - Attacking
+    value:
+      number: 35
+      unit: percentage

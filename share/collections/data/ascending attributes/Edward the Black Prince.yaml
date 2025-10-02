@@ -1,0 +1,60 @@
+ascending:
+  - level: red1
+    buffs:
+      - attribute: Attack
+        targetedType: Ranged Troops
+        value:
+          number: 5
+          unit: percentage
+      - attribute: Defense
+        conditions:
+          - Enemy
+        targetedType: Mounted Troops
+        value:
+          number: -15
+          unit: percentage
+  - level: red2
+    buffs:
+      - attribute: Wounded to Death
+        conditions:
+          - Enemy
+          - In City
+        value:
+          number: 8
+          unit: percentage
+  - level: red3
+    buffs:
+      - attribute: March Size
+        value:
+          number: 10
+          unit: percentage
+  - level: red4
+    buffs:
+      - attribute: Attack
+        targetedType: Ranged Troops
+        value:
+          number: 10
+          unit: percentage
+      - attribute: HP
+        conditions:
+          - Enemy
+        targetedType: Mounted Troops
+        value:
+          number: -20
+          unit: percentage
+  - level: red5
+    buffs:
+      - attribute: Attack
+        targetedType: Ranged Troops
+        value:
+          number: 15
+          unit: percentage
+      - attribute: Attack
+        conditions:
+          - Enemy
+        targetedType: Mounted Troops
+        value:
+          number: -5
+          unit: percentage
+general: Edward the Black Prince
+id: Edward the Black Prince

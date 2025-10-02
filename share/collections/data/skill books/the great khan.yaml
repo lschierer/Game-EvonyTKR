@@ -1,0 +1,10 @@
+---
+buffs:
+  - attribute: March Size
+    passive: 0
+    value:
+      number: 15
+      unit: percentage
+name: The Great Khan
+text: >-
+  Increases March Size by 15% when General is leading the army.

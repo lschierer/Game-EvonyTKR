@@ -1,0 +1,12 @@
+# yaml-language-server: $schema=schema.json
+
+glossary:
+  - term: leadership
+    definition: >-
+      One of the 'Basic Attributes' which affects the related troops' across all activation conditions, but only when the 'General'
+      is being used as a 'Primary General.'  This attribute affects the Subordinate City Training Speed if the 'General' is used
+      as a 'Mayor.'  It affects the 'HP' of any troops this 'General' is in charge of.  Lastly, if the 'General' is a 'Primary General'
+      for a march, it affects the March Speed.
+    related_terms:
+      - Primary General
+      - Basic Attribute

@@ -1,0 +1,26 @@
+ascending: true
+basic_attributes:
+  attack:
+    base: 109
+    increment: 8.25
+  defense:
+    base: 116
+    increment: 8.76
+  leadership:
+    base: 116
+    increment: 8.67
+  politics:
+    base: 111
+    increment: 8.73
+book: Hero of Don River
+specialties:
+  - Ranged Troop Formation
+  - Snipe
+  - Ranged Troop Ares
+  - Battle of Kulikovo
+stars: red5
+type:
+  - ranged_specialist
+  - ground_specialist
+general: Dmitry
+name: Dmitry

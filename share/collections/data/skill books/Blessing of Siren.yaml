@@ -1,0 +1,54 @@
+---
+buffs:
+- attribute: Attack
+  conditions:
+  - leading the army
+  - Attacking
+  passive: 0
+  targetedType: Ranged Troops
+  value:
+    number: 25
+    unit: percentage
+- attribute: Attack
+  conditions:
+  - brings a dragon
+  - Attacking
+  - brings a spiritual beast
+  passive: 0
+  targetedType: Ranged Troops
+  value:
+    number: 15
+    unit: percentage
+- attribute: Defense
+  conditions:
+  - brings a dragon
+  - Attacking
+  - brings a spiritual beast
+  passive: 0
+  targetedType: Ranged Troops
+  value:
+    number: 15
+    unit: percentage
+- attribute: Attack
+  conditions:
+  - brings a dragon
+  - Attacking
+  - brings a spiritual beast
+  passive: 0
+  targetedType: Siege Machines
+  value:
+    number: 15
+    unit: percentage
+- attribute: Defense
+  conditions:
+  - brings a dragon
+  - Attacking
+  - brings a spiritual beast
+  passive: 0
+  targetedType: Siege Machines
+  value:
+    number: 15
+    unit: percentage
+name: Blessing of Siren
+text: >-
+  Increases ranged troops' attack by 25% when General is leading the army to attack. Increases ranged troops and siege machines' attack and defense by 15% when General brings any dragon or spiritual beast to attack.

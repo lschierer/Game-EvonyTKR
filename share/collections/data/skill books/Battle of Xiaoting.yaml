@@ -1,0 +1,24 @@
+---
+name: Battle of Xiaoting
+buffs:
+  - attribute: Attack
+    targetedType: Ground Troops
+    conditions:
+      - Attacking
+    value:
+      number: 45
+      unit: percentage
+  - attribute: Defense
+    targetedType: Ground Troops
+    conditions:
+      - Attacking
+    value:
+      number: 30
+      unit: percentage
+  - attribute: Defense
+    targetedType: Mounted Troops
+    conditions:
+      - Attacking
+    value:
+      number: 30
+      unit: percentage

@@ -1,0 +1,26 @@
+ascending: true
+basic_attributes:
+  leadership:
+    base: 129
+    increment: 8.89
+  attack:
+    base: 137
+    increment: 9.37
+  defense:
+    base: 124
+    increment: 8.24
+  politics:
+    base: 102
+    increment: 7.87
+book: >-
+  Patriot's Radiance
+specialties:
+  - Ranged Troop Assault
+  - Siege
+  - Ranged Troop Ares
+  - Whig Patriot
+stars: red5
+type:
+  - ranged_specialist
+general: Algernon Sidney
+name: Algernon Sidney

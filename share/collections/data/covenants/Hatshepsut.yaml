@@ -1,0 +1,71 @@
+generals:
+  - Saladin
+  - Ramesses II
+  - Ahmose I
+levels:
+  - buffs:
+      - attribute: HP
+        conditions:
+          - Attacking
+        class: Ranged Troops
+        value:
+          number: 10
+    category: war
+    text: Attacking Ranged Troop HP +10%
+  - buffs:
+      - attribute: Training Speed
+        class: Ranged Troops
+        passive: 1
+        value:
+          number: 10
+    category: cooperation
+    text: Ranged Troop Training Speed +10% (Global)
+  - buffs:
+      - attribute: Attack
+        class: Ranged Troops
+        conditions:
+          - Reinforcing
+        value:
+          number: 10
+    category: peace
+    text: Reinforcing Ranged Troop Attack +10%
+  - buffs:
+      - attribute: Attack
+        class: Ranged Troops
+        conditions:
+          - Attacking
+        value:
+          number: 10
+      - attribute: Defense
+        passive: 1
+        class: Ranged Troops
+        conditions:
+          - Attacking
+        value:
+          number: 5
+    category: faith
+    text: >-
+      Attacking Ranged Troop Attack +10%.
+      Attacking Ranged Troop Defense +5% (Global)
+  - buffs:
+      - attribute: Attack
+        class: Ranged Troops
+        value:
+          number: 10
+    category: honor
+    text: Ranged Troop Attack +10%
+  - buffs:
+      - attribute: Defense
+        class: Ranged Troops
+        conditions:
+          - Attacking
+        value:
+          number: 10
+      - attribute: March Size
+        value:
+          number: 5
+    category: civilization
+    text: >-
+      Ranged Troop Defense +10%.
+      March Size Capacity +5%
+name: Hatshepsut

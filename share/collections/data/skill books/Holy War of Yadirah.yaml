@@ -1,0 +1,21 @@
+---
+name: Holy War of Yadirah
+buffs:
+  - attribute: Attack
+    conditions:
+      - Attacking
+    targetedType: Siege Machines
+    value:
+      number: 40
+      unit: percentage
+  - attribute: HP
+    conditions:
+      - Attacking
+    targetedType: Siege Machines
+    value:
+      number: 40
+      unit: percentage
+  - attribute: March Size
+    value:
+      number: 12
+      unit: percentage

@@ -1,0 +1,27 @@
+---
+buffs:
+- attribute: Attack
+  passive: 0
+  targetedType: Ranged Troops
+  value:
+    number: 25
+    unit: percentage
+- attribute: Attack
+  conditions:
+  - leading the army
+  passive: 0
+  targetedType: Siege Machines
+  value:
+    number: 25
+    unit: percentage
+- attribute: Defense
+  conditions:
+  - leading the army
+  passive: 0
+  targetedType: Ranged Troops
+  value:
+    number: 15
+    unit: percentage
+name: Knights of the Garter
+text: >-
+  Increases ranged troops and siege machines' attack by 25% and increases ranged troops' defense by 15% when General is leading the army.

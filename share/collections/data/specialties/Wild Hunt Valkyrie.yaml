@@ -1,0 +1,78 @@
+---
+levels:
+- buffs:
+  - attribute: Attack
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: HP
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 0
+      unit: percentage
+  level: Green
+  text: ''
+- buffs:
+  - attribute: Attack
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: HP
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 0
+      unit: percentage
+  level: Blue
+  text: ''
+- buffs:
+  - attribute: Attack
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: HP
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 0
+      unit: percentage
+  level: Purple
+  text: ''
+- buffs:
+  - attribute: Attack
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: HP
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 0
+      unit: percentage
+  level: Orange
+  text: ''
+- buffs:
+  - attribute: Attack
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 30
+      unit: percentage
+  - attribute: HP
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 30
+      unit: percentage
+  level: Gold
+  text: Ground Troop Attack +30%, Ground Troop HP +30%
+name: Wild Hunt Valkyrie

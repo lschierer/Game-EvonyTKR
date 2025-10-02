@@ -1,0 +1,24 @@
+---
+name: King of Rhine
+buffs:
+  - attribute: HP
+    conditions:
+      - Marching
+    targetedType: Siege Machines
+    value:
+      number: 10
+      unit: percentage
+  - attribute: Attack
+    conditions:
+      - Enemy
+    targetedType: Ranged Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: Attack
+    conditions:
+      - Enemy
+    targetedType: Siege Machines
+    value:
+      number: 10
+      unit: percentage

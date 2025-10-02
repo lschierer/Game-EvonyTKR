@@ -1,0 +1,29 @@
+---
+buffs:
+- attribute: Attack
+  passive: 0
+  targetedType: Ground Troops
+  value:
+    number: 15
+    unit: percentage
+- attribute: Attack
+  conditions:
+  - leading the army
+  - Attacking
+  passive: 0
+  targetedType: Mounted Troops
+  value:
+    number: 15
+    unit: percentage
+- attribute: Attack
+  conditions:
+  - leading the army
+  - Attacking
+  passive: 0
+  targetedType: Mounted Troops
+  value:
+    number: 20
+    unit: percentage
+name: Master of Strategy
+text: >-
+  Increases ground troops and mounted troops' attack by 15% and increases mounted troops' attack by another 20% when General is leading the army to attack.

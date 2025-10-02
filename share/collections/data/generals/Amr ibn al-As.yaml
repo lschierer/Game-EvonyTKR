@@ -1,0 +1,25 @@
+ascending: true
+basic_attributes:
+  leadership:
+    base: 113
+    increment: 0
+  attack:
+    base: 106
+    increment: 0
+  defense:
+    base: 107
+    increment: 0
+  politics:
+    base: 118
+    increment: 0
+book: Military-political Genius
+specialties:
+  - Ground Troop Assault
+  - Suppress
+  - Ground Troop Ares
+  - Siege of Babylon Fortress
+stars: red5
+type:
+  - mayor
+general: Amr ibn al-As
+name: Amr ibn al-As

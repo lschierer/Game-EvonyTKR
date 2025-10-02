@@ -1,0 +1,130 @@
+---
+ascending:
+- buffs:
+  - attribute: Defense
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 10
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 10
+      unit: percentage
+  level: red1
+  text: Marching Ranged Troop and Siege Machine Defense +10% and HP +10%.
+- buffs:
+  - attribute: Wounded to Death
+    conditions:
+    - Enemy
+    - In City
+    passive: 0
+    value:
+      number: 10
+      unit: percentage
+  level: red2
+  text: Enemy In-city Troop Wounded into Death rate +10%.
+- buffs:
+  - attribute: Rally Capacity
+    conditions:
+    - When Rallying
+    passive: 0
+    value:
+      number: 8
+      unit: percentage
+  level: red3
+  text: When General is launching Alliance War, Rally Capacity +8%.
+- buffs:
+  - attribute: Attack
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: Attack
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 10
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 15
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 15
+      unit: percentage
+  level: red4
+  text: Marching Ranged Troop and Siege Machine Attack +10% and Defense +15%.
+- buffs:
+  - attribute: Attack
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 15
+      unit: percentage
+  - attribute: Attack
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 15
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 15
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 15
+      unit: percentage
+  level: red5
+  text: Marching Ranged Troop and Siege Machine Attack +15% and HP +15%.
+general: Eleanor
+id: Eleanor

@@ -1,0 +1,43 @@
+---
+name: Hunter
+levels:
+  - level: Green
+    buffs:
+      - attribute: Attack
+        conditions:
+          - Monsters
+        value:
+          number: 1
+          unit: percentage
+  - level: Blue
+    buffs:
+      - attribute: Attack
+        conditions:
+          - Monsters
+        value:
+          number: 2
+          unit: percentage
+  - level: Purple
+    buffs:
+      - attribute: Attack
+        conditions:
+          - Monsters
+        value:
+          number: 3
+          unit: percentage
+  - level: Orange
+    buffs:
+      - attribute: Attack
+        conditions:
+          - Monsters
+        value:
+          number: 3
+          unit: percentage
+  - level: Gold
+    buffs:
+      - attribute: Attack
+        conditions:
+          - Monsters
+        value:
+          number: 6
+          unit: percentage

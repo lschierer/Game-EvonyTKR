@@ -1,0 +1,87 @@
+name: The Hero of Upper Canada
+levels:
+  - level: Green
+    text: In City Troop HP +1%. In City Ground Troop Attack +4%. In City Ground Troop Defense +1%.
+    Buffs:
+      - attribute: HP
+        value: 1
+        conditions:
+          - In City
+      - attribute: Attack
+        troop: Ground Troops
+        value: 4
+        conditions:
+          - In City
+      - attribute: Defense
+        troop: Ground Troops
+        value: 1
+        conditions:
+          - In City
+  - level: Blue
+    text: In City Troop HP +1%. In City Ground Troop Attack +4%. In City Ground Troop Defense +2%.
+    Buffs:
+      - attribute: HP
+        value: 1
+        conditions:
+          - In City
+      - attribute: Attack
+        troop: Ground Troops
+        value: 4
+        conditions:
+          - In City
+      - attribute: Defense
+        troop: Ground Troops
+        value: 2
+        conditions:
+          - In City
+  - level: Purple
+    text: In City Troop HP +2%. In City Ground Troop Attack +8%. In City Ground Troop Defense +3%.
+    Buffs:
+      - attribute: HP
+        value: 2
+        conditions:
+          - In City
+      - attribute: Attack
+        troop: Ground Troops
+        value: 8
+        conditions:
+          - In City
+      - attribute: Defense
+        troop: Ground Troops
+        value: 3
+        conditions:
+          - In City
+  - level: Orange
+    text: In City Troop HP +2%. In City Ground Troop Attack +8%. In City Ground Troop Defense +3%.
+    Buffs:
+      - attribute: HP
+        value: 2
+        conditions:
+          - In City
+      - attribute: Attack
+        troop: Ground Troops
+        value: 8
+        conditions:
+          - In City
+      - attribute: Defense
+        troop: Ground Troops
+        value: 3
+        conditions:
+          - In City
+  - level: Gold
+    text: In City Troop HP +4%. In City Ground Troop Attack +16%. In City Ground Troop Defense +6%.
+    Buffs:
+      - attribute: HP
+        value: 4
+        conditions:
+          - In City
+      - attribute: Attack
+        troop: Ground Troops
+        value: 16
+        conditions:
+          - In City
+      - attribute: Defense
+        troop: Ground Troops
+        value: 6
+        conditions:
+          - In City

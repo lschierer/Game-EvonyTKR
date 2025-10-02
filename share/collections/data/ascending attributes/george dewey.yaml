@@ -1,0 +1,152 @@
+---
+ascending:
+- buffs:
+  - attribute: Defense
+    conditions:
+    - When The Main Defense General
+    - In City
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 30
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - When The Main Defense General
+    - In City
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 20
+      unit: percentage
+  level: red1
+  text: When General is the Main City Defense General, In-city Mounted Troop Defense +30% and HP +20%.
+- buffs:
+  - attribute: Hospital Capacity
+    conditions:
+    - When The Main Defense General
+    passive: 0
+    value:
+      number: 20
+      unit: percentage
+  level: red2
+  text: When General is the Main City Defense General, Hospital Capacity +20%.
+- buffs:
+  - attribute: Attack
+    conditions:
+    - When The Main Defense General
+    - In City
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 10
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - When The Main Defense General
+    - In City
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 20
+      unit: percentage
+  - attribute: Attack
+    conditions:
+    - When The Main Defense General
+    - In City
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - When The Main Defense General
+    - In City
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 20
+      unit: percentage
+  level: red3
+  text: When General is the Main City Defense General, In-city Siege Machine and Ranged Troop Attack +10% and HP +20%.
+- buffs:
+  - attribute: Attack
+    conditions:
+    - When The Main Defense General
+    - In City
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 10
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - When The Main Defense General
+    - In City
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 30
+      unit: percentage
+  - attribute: Attack
+    conditions:
+    - When The Main Defense General
+    - In City
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - When The Main Defense General
+    - In City
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 30
+      unit: percentage
+  level: red4
+  text: When General is the Main City Defense General, In-city Siege Machine and Ranged Troop Attack +10% and HP +30%.
+- buffs:
+  - attribute: HP
+    conditions:
+    - In City
+    - When The Main Defense General
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 15
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - In City
+    - When The Main Defense General
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 25
+      unit: percentage
+  - attribute: Attack
+    conditions:
+    - In City
+    - When The Main Defense General
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 20
+      unit: percentage
+  - attribute: Attack
+    conditions:
+    - In City
+    - When The Main Defense General
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 20
+      unit: percentage
+  level: red5
+  text: Increases In-city Mounted Troop HP by 15%, Defense by 25% and In-city Ranged Troop and Siege Machine Attack by 20% when General is the Main City Defense General.
+general: George Dewey
+id: George Dewey

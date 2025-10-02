@@ -1,0 +1,30 @@
+---
+buffs:
+- attribute: Attack
+  conditions:
+  - In City
+  passive: 0
+  targetedType: Ground Troops
+  value:
+    number: 30
+    unit: percentage
+- attribute: HP
+  conditions:
+  - In City
+  passive: 0
+  targetedType: Ground Troops
+  value:
+    number: 30
+    unit: percentage
+- attribute: Attack
+  conditions:
+  - In City
+  - When The Main Defense General
+  passive: 0
+  targetedType: Ranged Troops
+  value:
+    number: 25
+    unit: percentage
+name: The 300 Spartans
+text: >-
+  Increases in-city ground troops' attack and HP by 30% and in-city ranged troops' attack by 25% when General is the Main City Defense General.

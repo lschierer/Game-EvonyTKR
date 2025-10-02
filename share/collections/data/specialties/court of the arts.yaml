@@ -1,0 +1,98 @@
+---
+levels:
+  - buffs:
+      - attribute: Attack
+        troop: Ground Troops
+        value:
+          number: 4
+      - attribute: Attack
+        troop: Mounted Troops
+        value:
+          number: 4
+          unit: percentage
+      - attribute: HP
+        troop: Ground Troops
+        value:
+          number: 4
+      - attribute: March Size
+        value:
+          number: 1
+    level: Green
+    text: 'Ground Troop and Mounted Troop Attack +4%. Ground Troop HP +4%. March Size Capacity +1%.'
+  - buffs:
+      - attribute: Attack
+        troop: Ground Troops
+        value:
+          number: 4
+      - attribute: Attack
+        troop: Mounted Troops
+        value:
+          number: 4
+          unit: percentage
+      - attribute: HP
+        troop: Ground Troops
+        value:
+          number: 4
+      - attribute: March Size
+        value:
+          number: 1
+    level: Blue
+    text: 'Ground Troop and Mounted Troop Attack +4%. Ground Troop HP +4%. March Size Capacity +1%.'
+  - buffs:
+      - attribute: Attack
+        troop: Ground Troops
+        value:
+          number: 4
+      - attribute: Attack
+        troop: Mounted Troops
+        value:
+          number: 4
+          unit: percentage
+      - attribute: HP
+        troop: Ground Troops
+        value:
+          number: 4
+      - attribute: March Size
+        value:
+          number: 1
+    level: Purple
+    text: 'Ground Troop and Mounted Troop Attack +4%. Ground Troop HP +4%. March Size Capacity +1%.'
+  - buffs:
+      - attribute: Attack
+        troop: Ground Troops
+        value:
+          number: 8
+      - attribute: Attack
+        troop: Mounted Troops
+        value:
+          number: 8
+          unit: percentage
+      - attribute: HP
+        troop: Ground Troops
+        value:
+          number: 8
+      - attribute: March Size
+        value:
+          number: 2
+    level: Orange
+    text: 'Ground Troop and Mounted Troop Attack +8%. Ground Troop HP +8%. March Size Capacity +2%.'
+  - buffs:
+      - attribute: Attack
+        troop: Ground Troops
+        value:
+          number: 16
+      - attribute: Attack
+        troop: Mounted Troops
+        value:
+          number: 16
+          unit: percentage
+      - attribute: HP
+        troop: Ground Troops
+        value:
+          number: 16
+      - attribute: March Size
+        value:
+          number: 3
+    level: Gold
+    text: 'Ground Troop and Mounted Troop Attack +16%. Ground Troop HP +16%. March Size Capacity +3%.'
+name: Court of the Arts

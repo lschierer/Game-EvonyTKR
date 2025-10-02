@@ -1,0 +1,80 @@
+name: Gunther
+generals:
+  - Melisande
+  - Douglas
+  - Charles the Great
+levels:
+  - category: War
+    passive: 0
+    buffs:
+      - attribute: Wounded to Death
+        conditions:
+          - Enemy
+          - Attacking
+        value:
+          number: 5
+          unit: percentage
+  - category: Cooperation
+    buffs:
+      - attribute: Defense
+        passive: 0
+        targetedType: Ranged Troops
+        conditions:
+          - When Rallying
+        value:
+          number: 5
+          unit: percentage
+      - attribute: Defense
+        targetedType: Siege Machines
+        conditions:
+          - When Rallying
+        value:
+          number: 5
+          unit: percentage
+  - category: Peace
+    buffs:
+      - attribute: Training Speed
+        passive: 1
+        targetedType: Siege Machines
+        value:
+          number: 5
+          unit: percentage
+  - category: Faith
+    buffs:
+      - attribute: March Size
+        passive: 0
+        value:
+          number: 10
+          unit: percentage
+      - attribute: HP
+        passive: 1
+        value:
+          number: 10
+          unit: percentage
+  - category: Honor
+    passive: 0
+    buffs:
+      - attribute: Attack
+        targetedType: Siege Machines
+        conditions:
+          - Marching
+        value:
+          number: 8
+          unit: percentage
+  - category: Civilization
+    passive: 0
+    buffs:
+      - attribute: Defense
+        targetedType: Siege Machines
+        conditions:
+          - Marching
+        value:
+          number: 10
+          unit: percentage
+      - attribute: HP
+        targetedType: Siege Machines
+        conditions:
+          - Marching
+        value:
+          number: 10
+          unit: percentage

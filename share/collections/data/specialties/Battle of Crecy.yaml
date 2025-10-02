@@ -1,0 +1,63 @@
+---
+name: Battle of Crecy
+levels:
+  - level: "Green"
+    buffs:
+      - attribute: Attack
+        targetedType: Ranged Troops
+        value:
+          number: 3
+          unit: percentage
+      - attribute: HP
+        targetedType: Ranged Troops
+        value:
+          number: 1
+          unit: percentage
+  - level: "Blue"
+    buffs:
+      - attribute: Attack
+        targetedType: Ranged Troops
+        value:
+          number: 4
+          unit: percentage
+      - attribute: HP
+        targetedType: Ranged Troops
+        value:
+          number: 2
+          unit: percentage
+  - level: "Purple"
+    buffs:
+      - attribute: Attack
+        targetedType: Ranged Troops
+        value:
+          number: 7
+          unit: percentage
+      - attribute: HP
+        targetedType: Ranged Troops
+        value:
+          number: 3
+          unit: percentage
+  - level: "Orange"
+    buffs:
+      - attribute: Attack
+        targetedType: Ranged Troops
+        value:
+          number: 7
+          unit: percentage
+      - attribute: HP
+        targetedType: Ranged Troops
+        value:
+          number: 3
+          unit: percentage
+  - level: "Gold"
+    buffs:
+      - attribute: Attack
+        targetedType: Ranged Troops
+        value:
+          number: 14
+          unit: percentage
+      - attribute: HP
+        targetedType: Ranged Troops
+        value:
+          number: 6
+          unit: percentage

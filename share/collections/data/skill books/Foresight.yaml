@@ -1,0 +1,31 @@
+---
+name: Foresight
+text: >-
+  Increases ground troops and mounted troops' attack by 40% and increases mounted troops' defense and HP by 25% when General is leading the army.
+buffs:
+  - attribute: Attack
+    conditions:
+      - Attacking
+    targetedType: Mounted Troops
+    value:
+      number: 40
+      unit: percentage
+  - attribute: Attack
+    targetedType: Ground Troops
+    value:
+      number: 40
+      unit: percentage
+  - conditions:
+      - Attacking
+    attribute: Defense
+    targetedType: Mounted Troops
+    value:
+      number: 25
+      unit: percentage
+  - conditions:
+      - Attacking
+    attribute: HP
+    targetedType: Mounted Troops
+    value:
+      number: 25
+      unit: percentage

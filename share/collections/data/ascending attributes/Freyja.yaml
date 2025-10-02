@@ -1,0 +1,104 @@
+---
+ascending:
+  - level: "red1"
+    buffs:
+      - attribute: HP
+        conditions:
+          - When Defending Outside The Main City
+        targetedType: Ground Troops
+        value:
+          number: 20
+          unit: percentage
+      - attribute: Attack
+        conditions:
+          - When Defending Outside The Main City
+        targetedType: Ground Troops
+        value:
+          number: 10
+          unit: percentage
+  - level: "red2"
+    buffs:
+      - attribute: Death to Wounded
+        conditions:
+          - When Defending Outside The Main City
+        value:
+          number: 8
+          unit: percentage
+      - attribute: Attack
+        conditions:
+          - When Defending Outside The Main City
+        targetedType: Ground Troops
+        value:
+          number: 10
+          unit: percentage
+      - attribute: Attack
+        conditions:
+          - When Defending Outside The Main City
+        targetedType: Mounted Troops
+        value:
+          number: 10
+          unit: percentage
+  - level: "red3"
+    buffs:
+      - attribute: March Size
+        value:
+          number: 12
+          unit: percentage
+      - attribute: Attack
+        conditions:
+          - When Defending Outside The Main City
+        targetedType: Ground Troops
+        value:
+          number: 10
+          unit: percentage
+      - attribute: Attack
+        conditions:
+          - When Defending Outside The Main City
+        targetedType: Mounted Troops
+        value:
+          number: 10
+          unit: percentage
+  - level: "red4"
+    buffs:
+      - attribute: HP
+        targetedType: Ground Troops
+        value:
+          number: 30
+          unit: percentage
+      - attribute: Attack
+        conditions:
+          - When Defending Outside The Main City
+        targetedType: Ground Troops
+        value:
+          number: 15
+          unit: percentage
+      - attribute: Attack
+        conditions:
+          - When Defending Outside The Main City
+        targetedType: Mounted Troops
+        value:
+          number: 15
+          unit: percentage
+  - level: "red5"
+    buffs:
+      - attribute: Attack
+        targetedType: Ground Troops
+        value:
+          number: 50
+          unit: percentage
+      - attribute: Attack
+        conditions:
+          - When Defending Outside The Main City
+        targetedType: Ground Troops
+        value:
+          number: 35
+          unit: percentage
+      - attribute: Defense
+        conditions:
+          - When Defending Outside The Main City
+        targetedType: Ground Troops
+        value:
+          number: 35
+          unit: percentage
+general: Freyja
+id: Freyja

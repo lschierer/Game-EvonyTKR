@@ -1,0 +1,69 @@
+name: Frigg
+generals:
+  - Tomyris
+  - Theodora
+  - Gnarr
+levels:
+  - category: War
+    type: personal
+    buffs:
+      - attribute: Wounded to Death
+        conditions:
+          - Enemy
+          - Attacking
+        value:
+          number: 5
+          unit: percentage
+  - category: Cooperation
+    type: personal
+    buffs:
+      - attribute: HP
+        targetedType: Ground Troops
+        value:
+          number: 10
+          unit: percentage
+  - category: Peace
+    type: passive
+    buffs:
+      - attribute: Training Speed
+        targetedType: Ground Troops
+        value:
+          number: 5
+          unit: percentage
+  - category: Faith
+    type: personal
+    buffs:
+      - attribute: Defense
+        targetedType: Ground Troops
+        conditions:
+          - When Rallying
+        value:
+          number: 10
+          unit: percentage
+  - category: Faith
+    type: passive
+    buffs:
+      - attribute: Marching Speed
+        value:
+          number: 15
+          unit: percentage
+  - category: Honor
+    type: personal
+    buffs:
+      - attribute: March Size
+        value:
+          number: 8
+          unit: percentage
+  - category: Civilization
+    type: personal
+    buffs:
+      - attribute: Attack
+        targetedType: Ground Troops
+        value:
+          number: 10
+          unit: percentage
+      - attribute: Defense
+        targetedType: Ground Troops
+        value:
+          number: 10
+          unit: percentage

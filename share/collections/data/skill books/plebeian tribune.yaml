@@ -1,0 +1,32 @@
+---
+buffs:
+- attribute: Attack
+  conditions:
+  - Enemy
+  - leading the army
+  passive: 0
+  targetedType: Ranged Troops
+  value:
+    number: 35
+    unit: percentage
+- attribute: HP
+  conditions:
+  - Enemy
+  - leading the army
+  passive: 0
+  targetedType: Ground Troops
+  value:
+    number: 10
+    unit: percentage
+- attribute: HP
+  conditions:
+  - Enemy
+  - leading the army
+  passive: 0
+  targetedType: Mounted Troops
+  value:
+    number: 10
+    unit: percentage
+name: Plebeian Tribune
+text: >-
+  Reduces enemy ranged troops' attack by 35% and enemy ground troops and mounted troops' HP by 10% when General is leading the army.

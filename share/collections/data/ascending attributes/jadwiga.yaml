@@ -1,0 +1,161 @@
+---
+ascending:
+- buffs:
+  - attribute: Defense
+    conditions:
+    - When The Main Defense General
+    - In City
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 15
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - When The Main Defense General
+    - In City
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - When The Main Defense General
+    - In City
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 15
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - When The Main Defense General
+    - In City
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 10
+      unit: percentage
+  level: red1
+  text: When General is the Main City Defense General, In-city Mounted Troop and Ground Troop Defense +15% and HP +10%.
+- buffs:
+  - attribute: Hospital Capacity
+    conditions:
+    - When The Main Defense General
+    passive: 0
+    value:
+      number: 20
+      unit: percentage
+  level: red2
+  text: When General is the Main City Defense General, Hospital Capacity +20%.
+- buffs:
+  - attribute: Attack
+    conditions:
+    - When The Main Defense General
+    - In City
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - When The Main Defense General
+    - In City
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 20
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - When The Main Defense General
+    - In City
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 20
+      unit: percentage
+  level: red3
+  text: When General is the Main City Defense General, In-city Mounted Troop Attack +10% and In-city Ground Troop and Mounted Troop HP +20%.
+- buffs:
+  - attribute: Attack
+    conditions:
+    - When The Main Defense General
+    - In City
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 20
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - When The Main Defense General
+    - In City
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 25
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - When The Main Defense General
+    - In City
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 25
+      unit: percentage
+  level: red4
+  text: When General is the Main City Defense General, In-city Mounted Troop Attack +20% and In-city Ground Troop and Mounted Troop Defense +25%.
+- buffs:
+  - attribute: Attack
+    conditions:
+    - When The Main Defense General
+    - In City
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 30
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - When The Main Defense General
+    - In City
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - When The Main Defense General
+    - In City
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - When The Main Defense General
+    - In City
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - When The Main Defense General
+    - In City
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 10
+      unit: percentage
+  level: red5
+  text: When General is the Main City Defense General, In-city Siege Machine Attack +30%, In-city Ground Troop and Mounted Troop Defense and HP +10%.
+general: Jadwiga
+id: Jadwiga

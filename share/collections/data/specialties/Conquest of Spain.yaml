@@ -1,0 +1,82 @@
+name: Conquest of Spain
+levels:
+  - level: Green
+    buffs:
+      - attribute: Training Speed
+        targetedType: Ground Troops
+        conditions:
+          - When Appointed as Barracks Officer
+        value:
+          number: 3
+          unit: percentage
+      - attribute: Training Capacity
+        targetedType: Ground Troops
+        conditions:
+          - When Appointed as Barracks Officer
+        value:
+          number: 2
+          unit: percentage
+  - level: Blue
+    buffs:
+      - attribute: Training Speed
+        targetedType: Ground Troops
+        conditions:
+          - When Appointed as Barracks Officer
+        value:
+          number: 3
+          unit: percentage
+      - attribute: Training Capacity
+        targetedType: Ground Troops
+        conditions:
+          - When Appointed as Barracks Officer
+        value:
+          number: 2
+          unit: percentage
+  - level: Purple
+    buffs:
+      - attribute: Training Speed
+        targetedType: Ground Troops
+        conditions:
+          - When Appointed as Barracks Officer
+        value:
+          number: 5
+          unit: percentage
+      - attribute: Training Capacity
+        targetedType: Ground Troops
+        conditions:
+          - When Appointed as Barracks Officer
+        value:
+          number: 4
+          unit: percentage
+  - level: Orange
+    buffs:
+      - attribute: Training Speed
+        targetedType: Ground Troops
+        conditions:
+          - When Appointed as Barracks Officer
+        value:
+          number: 5
+          unit: percentage
+      - attribute: Training Capacity
+        targetedType: Ground Troops
+        conditions:
+          - When Appointed as Barracks Officer
+        value:
+          number: 4
+          unit: percentage
+  - level: Gold
+    buffs:
+      - attribute: Training Speed
+        targetedType: Ground Troops
+        conditions:
+          - When Appointed as Barracks Officer
+        value:
+          number: 10
+          unit: percentage
+      - attribute: Training Capacity
+        targetedType: Ground Troops
+        conditions:
+          - When Appointed as Barracks Officer
+        value:
+          number: 8
+          unit: percentage

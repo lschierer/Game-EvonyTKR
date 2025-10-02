@@ -1,0 +1,76 @@
+name: Olav II
+generals:
+  - Gustavus Adolphus
+  - Sweyn Forkbeard
+  - Charles XII
+levels:
+  - category: War
+    type: personal
+    buffs:
+      - attribute: HP
+        targetedType: Mounted Troops
+        conditions:
+          - Attacking
+        value:
+          number: 10
+          unit: percentage
+  - category: Cooperation
+    type: passive
+    buffs:
+      - attribute: Training Speed
+        targetedType: Mounted Troops
+        value:
+          number: 10
+          unit: percentage
+  - category: Peace
+    type: personal
+    buffs:
+      - attribute: Attack
+        targetedType: Mounted Troops
+        conditions:
+          - When Rallying
+        value:
+          number: 10
+          unit: percentage
+  - category: Faith
+    type: personal
+    buffs:
+      - attribute: Defense
+        targetedType: Mounted Troops
+        conditions:
+          - Attacking
+        value:
+          number: 10
+          unit: percentage
+  - category: Faith
+    type: passive
+    buffs:
+      - attribute: Attack
+        targetedType: Mounted Troops
+        conditions:
+          - Attacking
+        value:
+          number: 5
+          unit: percentage
+  - category: Honor
+    type: personal
+    buffs:
+      - attribute: Attack
+        targetedType: Mounted Troops
+        value:
+          number: 10
+          unit: percentage
+  - category: Civilization
+    type: personal
+    buffs:
+      - attribute: HP
+        targetedType: Mounted Troops
+        conditions:
+          - When Rallying
+        value:
+          number: 15
+          unit: percentage
+      - attribute: March Size
+        value:
+          number: 8
+          unit: percentage

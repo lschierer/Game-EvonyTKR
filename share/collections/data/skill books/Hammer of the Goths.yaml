@@ -1,0 +1,25 @@
+name: Hammer of the Goths
+text: >-
+  Reduces enemy ground troops' attack by 50% and enemy ground troops and mounted troops' defense by 40% when General is leading the army.
+buffs:
+  - attribute: Attack
+    troop: Ground Troops
+    value:
+      number: 50
+    conditions:
+      - Enemy
+      - leading the army
+  - attribute: Defense
+    troop: Ground Troops
+    value:
+      number: 40
+    conditions:
+      - Enemy
+      - leading the army
+  - attribute: Defense
+    troop: Mounted Troops
+    value:
+      number: 40
+    conditions:
+      - Enemy
+      - leading the army

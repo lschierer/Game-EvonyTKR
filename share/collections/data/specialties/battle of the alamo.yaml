@@ -1,0 +1,123 @@
+---
+levels:
+- buffs:
+  - attribute: Attack
+    conditions:
+    - In City
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Attack
+    conditions:
+    - In City
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Hospital Capacity
+    passive: 0
+    value:
+      number: 0
+      unit: percentage
+  level: Green
+  text: ''
+- buffs:
+  - attribute: Attack
+    conditions:
+    - In City
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Attack
+    conditions:
+    - In City
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Hospital Capacity
+    passive: 0
+    value:
+      number: 0
+      unit: percentage
+  level: Blue
+  text: ''
+- buffs:
+  - attribute: Attack
+    conditions:
+    - In City
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Attack
+    conditions:
+    - In City
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Hospital Capacity
+    passive: 0
+    value:
+      number: 0
+      unit: percentage
+  level: Purple
+  text: ''
+- buffs:
+  - attribute: Attack
+    conditions:
+    - In City
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Attack
+    conditions:
+    - In City
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Hospital Capacity
+    passive: 0
+    value:
+      number: 0
+      unit: percentage
+  level: Orange
+  text: ''
+- buffs:
+  - attribute: Attack
+    conditions:
+    - In City
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 26
+      unit: percentage
+  - attribute: Attack
+    conditions:
+    - In City
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 26
+      unit: percentage
+  - attribute: Hospital Capacity
+    passive: 0
+    value:
+      number: 16
+      unit: percentage
+  level: Gold
+  text: In-city Ground Troop and Mounted Troop Attack +26%, Hospital Capacity +16%
+name: Battle of the Alamo

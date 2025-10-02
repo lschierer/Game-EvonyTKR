@@ -1,0 +1,71 @@
+name: Suchet
+generals:
+  - Napoleon
+  - Soult
+  - Louis IX
+levels:
+  - category: War
+    type: personal
+    buffs:
+      - attribute: Attack
+        targetedType: Ground Troops
+        value:
+          number: 5
+          unit: percentage
+  - category: War
+    type: passive
+    buffs:
+      - attribute: Training Capacity
+        targetedType: Ground Troops
+        value:
+          number: 5
+          unit: percentage
+  - category: Cooperation
+    type: passive
+    buffs:
+      - attribute: Deserter Capacity
+        value:
+          number: 10
+          unit: percentage
+  - category: Peace
+    type: personal
+    buffs:
+      - attribute: Defense
+        targetedType: Ground Troops
+        value:
+          number: 10
+          unit: percentage
+  - category: Faith
+    type: personal
+    buffs:
+      - attribute: Defense
+        targetedType: Ground Troops
+        conditions:
+          - When Rallying
+        value:
+          number: 10
+          unit: percentage
+  - category: Honor
+    type: personal
+    buffs:
+      - attribute: Attack
+        targetedType: Ground Troops
+        conditions:
+          - When Rallying
+        value:
+          number: 15
+          unit: percentage
+  - category: Civilization
+    type: personal
+    buffs:
+      - attribute: Attack
+        targetedType: Ground Troops
+        conditions:
+          - Marching
+        value:
+          number: 10
+          unit: percentage
+      - attribute: March Size
+        value:
+          number: 5
+          unit: percentage

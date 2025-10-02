@@ -1,0 +1,85 @@
+---
+ascending:
+  - level: "red1"
+    buffs:
+      - attribute: Attack
+        targetedType: Mounted Troops
+        value:
+          number: 5
+          unit: percentage
+      - attribute: HP
+        targetedType: Mounted Troops
+        value:
+          number: 15
+          unit: percentage
+  - level: "red2"
+    buffs:
+      - attribute: Death to Wounded
+        conditions:
+          - Marching
+        value:
+          number: 8
+          unit: percentage
+  - level: "red3"
+    buffs:
+      - attribute: Attack
+        conditions:
+          - Marching
+        targetedType: Mounted Troops
+        value:
+          number: 8
+          unit: percentage
+      - attribute: HP
+        conditions:
+          - Marching
+        targetedType: Mounted Troops
+        value:
+          number: 5
+          unit: percentage
+  - level: "red4"
+    buffs:
+      - attribute: Defense
+        targetedType: Ground Troops
+        value:
+          number: 20
+          unit: percentage
+      - attribute: Defense
+        targetedType: Mounted Troops
+        value:
+          number: 20
+          unit: percentage
+      - attribute: HP
+        targetedType: Ground Troops
+        value:
+          number: 30
+          unit: percentage
+      - attribute: HP
+        targetedType: Mounted Troops
+        value:
+          number: 30
+          unit: percentage
+  - level: "red5"
+    buffs:
+      - attribute: Attack
+        conditions:
+          - Marching
+        targetedType: Mounted Troops
+        value:
+          number: 25
+          unit: percentage
+      - attribute: Defense
+        conditions:
+          - Marching
+        targetedType: Mounted Troops
+        value:
+          number: 15
+          unit: percentage
+      - attribute: HP
+        conditions:
+          - Marching
+        targetedType: Mounted Troops
+        value:
+          number: 15
+          unit: percentage
+general: Jayavarman II
+id: Jayavarman II

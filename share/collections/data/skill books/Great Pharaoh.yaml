@@ -1,0 +1,18 @@
+---
+name: Great Pharaoh
+buffs:
+  - attribute: Attack
+    targetedType: Siege Machines
+    value:
+      number: 20
+      unit: percentage
+  - attribute: Defense
+    targetedType: Siege Machines
+    value:
+      number: 20
+      unit: percentage
+  - attribute: HP
+    targetedType: Ground Troops
+    value:
+      number: 10
+      unit: percentage

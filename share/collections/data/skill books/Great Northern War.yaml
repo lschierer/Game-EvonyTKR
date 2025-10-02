@@ -1,0 +1,37 @@
+---
+buffs:
+  - attribute: Attack
+    conditions:
+      - leading the army
+      - Attacking
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 40
+      unit: percentage
+  - attribute: March Size
+    passive: 0
+    value:
+      number: 10
+      unit: percentage
+  - attribute: Defense
+    conditions:
+      - leading the army
+      - Attacking
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: Defense
+    conditions:
+      - leading the army
+      - Attacking
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 10
+      unit: percentage
+name: Great Northern War
+text: >-
+  Increases ranged troops' attack by 40% and increases the March Size and ranged troops and siege machines' defense by 10% when General is leading the army to attack.

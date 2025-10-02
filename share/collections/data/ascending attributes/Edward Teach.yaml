@@ -1,0 +1,69 @@
+---
+ascending:
+- buffs:
+  - attribute: Attack
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 5
+      unit: percentage
+  - attribute: Defense
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 15
+      unit: percentage
+  level: red1
+  text: Siege Machine Attack +5% and Defense +15%.
+- buffs:
+  - attribute: Death to Wounded
+    conditions:
+    - Marching
+    passive: 0
+    value:
+      number: 8
+      unit: percentage
+  level: red2
+  text: Marching Troop Death into Wounded Rate +8%.
+- buffs:
+  - attribute: Attack
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 5
+      unit: percentage
+  - attribute: Rally Capacity
+    conditions:
+    - When Rallying
+    passive: 0
+    value:
+      number: 8
+      unit: percentage
+  level: red3
+  text: Siege Machine Attack +5%; when General is launching Alliance War, Rally Capacity +8%.
+- buffs:
+  - attribute: HP
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 55
+      unit: percentage
+  level: red4
+  text: Siege Machine HP +55%.
+- buffs:
+  - attribute: Attack
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 25
+      unit: percentage
+  - attribute: Defense
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 25
+      unit: percentage
+  level: red5
+  text: Siege Machine Attack +25% and Defense +25%.
+general: Edward Teach
+id: Edward Teach

@@ -1,0 +1,110 @@
+---
+ascending:
+  - level: "red1"
+    buffs:
+      - attribute: Attack
+        conditions:
+          - Marching
+        targetedType: Ground Troops
+        value:
+          number: 10
+          unit: percentage
+      - attribute: Attack
+        conditions:
+          - Marching
+        targetedType: Mounted Troops
+        value:
+          number: 10
+          unit: percentage
+      - attribute: Defense
+        conditions:
+          - Marching
+        targetedType: Ground Troops
+        value:
+          number: 5
+          unit: percentage
+      - attribute: HP
+        conditions:
+          - Marching
+        targetedType: Ground Troops
+        value:
+          number: 5
+          unit: percentage
+      - attribute: Defense
+        conditions:
+          - Marching
+        targetedType: Mounted Troops
+        value:
+          number: 5
+          unit: percentage
+      - attribute: HP
+        conditions:
+          - Marching
+        targetedType: Mounted Troops
+        value:
+          number: 5
+          unit: percentage
+  - level: "red2"
+    buffs:
+      - attribute: Death to Wounded
+        conditions:
+          - Marching
+        value:
+          number: 10
+          unit: percentage
+  - level: "red3"
+    buffs:
+      - attribute: Attack
+        conditions:
+          - Marching
+        targetedType: Ground Troops
+        value:
+          number: 15
+          unit: percentage
+      - attribute: Attack
+        conditions:
+          - Marching
+        targetedType: Mounted Troops
+        value:
+          number: 15
+          unit: percentage
+      - attribute: March Size
+        conditions:
+          - Marching
+        value:
+          number: 8
+          unit: percentage
+  - level: "red4"
+    buffs:
+      - attribute: Defense
+        conditions:
+          - Marching
+        targetedType: Mounted Troops
+        value:
+          number: 25
+          unit: percentage
+      - attribute: HP
+        conditions:
+          - Marching
+        targetedType: Mounted Troops
+        value:
+          number: 30
+          unit: percentage
+  - level: "red5"
+    buffs:
+      - attribute: Attack
+        conditions:
+          - Marching
+        targetedType: Mounted Troops
+        value:
+          number: 35
+          unit: percentage
+      - attribute: Defense
+        conditions:
+          - Marching
+        targetedType: Mounted Troops
+        value:
+          number: 30
+          unit: percentage
+general: Napoleon Prime
+id: Napoleon Prime

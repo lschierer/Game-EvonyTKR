@@ -1,0 +1,83 @@
+---
+levels:
+- buffs:
+  - attribute: March Size
+    passive: 0
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Wounded to Death
+    conditions:
+    - Enemy
+    - Attacking
+    passive: 0
+    value:
+      number: 0
+      unit: percentage
+  level: Green
+  text: ''
+- buffs:
+  - attribute: March Size
+    passive: 0
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Wounded to Death
+    conditions:
+    - Enemy
+    - Attacking
+    passive: 0
+    value:
+      number: 0
+      unit: percentage
+  level: Blue
+  text: ''
+- buffs:
+  - attribute: March Size
+    passive: 0
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Wounded to Death
+    conditions:
+    - Enemy
+    - Attacking
+    passive: 0
+    value:
+      number: 0
+      unit: percentage
+  level: Purple
+  text: ''
+- buffs:
+  - attribute: March Size
+    passive: 0
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Wounded to Death
+    conditions:
+    - Enemy
+    - Attacking
+    passive: 0
+    value:
+      number: 0
+      unit: percentage
+  level: Orange
+  text: ''
+- buffs:
+  - attribute: March Size
+    passive: 0
+    value:
+      number: 10
+      unit: percentage
+  - attribute: Wounded to Death
+    conditions:
+    - Enemy
+    - Attacking
+    passive: 0
+    value:
+      number: 10
+      unit: percentage
+  level: Gold
+  text: March Size Capacity +10%, Enemy Wounded into Death when attacking +10%
+name: Battle of Bukhara

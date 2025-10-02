@@ -1,0 +1,85 @@
+name: John Hunyadi
+generals:
+  - Matthias I
+  - Jadwiga
+  - Suleiman the Magnificent
+levels:
+  - category: War
+    type: personal
+    buffs:
+      - attribute: HP
+        targetedType: Ranged Troops
+        value:
+          number: 5
+          unit: percentage
+      - attribute: HP
+        targetedType: Siege Machines
+        value:
+          number: 5
+          unit: percentage
+  - category: Cooperation
+    type: passive
+    buffs:
+      - attribute: Deserter Capacity
+        value:
+          number: 10
+          unit: percentage
+  - category: Peace
+    type: personal
+    buffs:
+      - attribute: Attack
+        targetedType: Siege Machines
+        value:
+          number: 5
+          unit: percentage
+  - category: Faith
+    type: passive
+    buffs:
+      - attribute: HP
+        targetedType: Ranged Troops
+        conditions:
+          - Enemy
+        value:
+          number: 8
+          unit: percentage
+      - attribute: HP
+        targetedType: Siege Machines
+        conditions:
+          - Enemy
+        value:
+          number: 8
+          unit: percentage
+  - category: Honor
+    type: personal
+    buffs:
+      - attribute: Attack
+        targetedType: Ranged Troops
+        conditions:
+          - When Rallying
+        value:
+          number: 5
+          unit: percentage
+      - attribute: Attack
+        targetedType: Siege Machines
+        conditions:
+          - When Rallying
+        value:
+          number: 5
+          unit: percentage
+      - attribute: Attack
+        targetedType: Siege Machines
+        conditions:
+          - When Rallying
+        value:
+          number: 10
+          unit: percentage
+  - category: Civilization
+    type: personal
+    buffs:
+      - attribute: Attack
+        targetedType: Siege Machines
+        conditions:
+          - Marching
+        value:
+          number: 15
+          unit: percentage

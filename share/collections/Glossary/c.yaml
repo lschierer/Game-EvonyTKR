@@ -1,0 +1,23 @@
+# yaml-language-server: $schema=schema.json
+
+glossary:
+  - term: Covenant
+    definition: >-
+      One of several aspects of a 'General' that requires activation, and once activated, provides 'Buffs' and/or 'Debuffs'.
+      Covenants are restricted to relatively new generals at this time, with no indication that the game will retrofit
+      older 'Generals' with them.  A Covenant is unique in that it requires multiple 'Generals' to activate the Covenant
+      on any one 'General.'  Each level of the Covenant is activated in part by taking the 'Basic Attributes' of the affected
+      'General' and the three other 'Generals' listed in his/her Covenant, and adding them together.  Each level has a minimum
+      required value.  In addition, a certain amount of a resource called Covenant Stones, which at this time have no other use,
+      must be expended.
+    related_terms:
+      - General
+      - Basic Attribute
+      - Buff
+      - Debuff
+  - term: Culture
+    definition: |
+      One of several ways to get buffs from either your main keep or a 'Subordinate City.' See also [Evony Culture Guide], [Evony Guide: Best Cultures And Using Each Effectively]
+
+      [Evony Culture Guide]: https://onechilledgamer.com/evony-culture-guide/
+      [Evony Guide: Best Cultures And Using Each Effectively]: https://www.evonytkrguide.com/guides/evony-tkr-guide-best-cultures-and-using-each-effectively

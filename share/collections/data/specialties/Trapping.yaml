@@ -1,0 +1,72 @@
+name: Trapping
+levels:
+  - level: Green
+    buffs:
+      - attribute: SubCity Training Speed
+        conditions:
+          - When City Mayor for this SubCity
+        value:
+          number: 2
+          unit: percentage
+      - attribute: SubCity Death to Survival
+        conditions:
+          - When City Mayor for this SubCity
+        value:
+          number: 1
+          unit: percentage
+  - level: Blue
+    buffs:
+      - attribute: SubCity Training Speed
+        conditions:
+          - When City Mayor for this SubCity
+        value:
+          number: 2
+          unit: percentage
+      - attribute: SubCity Death to Survival
+        conditions:
+          - When City Mayor for this SubCity
+        value:
+          number: 1
+          unit: percentage
+  - level: Purple
+    buffs:
+      - attribute: SubCity Training Speed
+        conditions:
+          - When City Mayor for this SubCity
+        value:
+          number: 4
+          unit: percentage
+      - attribute: SubCity Death to Survival
+        conditions:
+          - When City Mayor for this SubCity
+        value:
+          number: 1
+          unit: percentage
+  - level: Orange
+    buffs:
+      - attribute: SubCity Training Speed
+        conditions:
+          - When City Mayor for this SubCity
+        value:
+          number: 4
+          unit: percentage
+      - attribute: SubCity Death to Survival
+        conditions:
+          - When City Mayor for this SubCity
+        value:
+          number: 1
+          unit: percentage
+  - level: Gold
+    buffs:
+      - attribute: SubCity Training Speed
+        conditions:
+          - When City Mayor for this SubCity
+        value:
+          number: 8
+          unit: percentage
+      - attribute: SubCity Death to Survival
+        conditions:
+          - When City Mayor for this SubCity
+        value:
+          number: 2
+          unit: percentage

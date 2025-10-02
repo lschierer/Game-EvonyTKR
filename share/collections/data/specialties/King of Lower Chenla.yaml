@@ -1,0 +1,178 @@
+---
+name: King of Lower Chenla
+levels:
+  - level: "Green"
+    buffs:
+      - attribute: Attack
+        targetedType: Mounted Troops
+        value:
+          number: 4
+          unit: percentage
+      - attribute: HP
+        conditions:
+          - Attacking
+        targetedType: Mounted Troops
+        value:
+          number: 1
+          unit: percentage
+      - attribute: HP
+        conditions:
+          - Attacking
+        targetedType: Ground Troops
+        value:
+          number: 1
+          unit: percentage
+      - attribute: Defense
+        conditions:
+          - Attacking
+        targetedType: Mounted Troops
+        value:
+          number: 2
+          unit: percentage
+      - attribute: Defense
+        conditions:
+          - Attacking
+        targetedType: Ground Troops
+        value:
+          number: 2
+          unit: percentage
+  - level: "Blue"
+    buffs:
+      - attribute: Attack
+        targetedType: Mounted Troops
+        value:
+          number: 4
+          unit: percentage
+      - attribute: HP
+        conditions:
+          - Attacking
+        targetedType: Mounted Troops
+        value:
+          number: 1
+          unit: percentage
+      - attribute: HP
+        conditions:
+          - Attacking
+        targetedType: Ground Troops
+        value:
+          number: 1
+          unit: percentage
+      - attribute: Defense
+        conditions:
+          - Attacking
+        targetedType: Mounted Troops
+        value:
+          number: 2
+          unit: percentage
+      - attribute: Defense
+        conditions:
+          - Attacking
+        targetedType: Ground Troops
+        value:
+          number: 2
+          unit: percentage
+  - level: "Purple"
+    buffs:
+      - attribute: Attack
+        targetedType: Mounted Troops
+        value:
+          number: 8
+          unit: percentage
+      - attribute: HP
+        conditions:
+          - Attacking
+        targetedType: Mounted Troops
+        value:
+          number: 2
+          unit: percentage
+      - attribute: HP
+        conditions:
+          - Attacking
+        targetedType: Ground Troops
+        value:
+          number: 2
+          unit: percentage
+      - attribute: Defense
+        conditions:
+          - Attacking
+        targetedType: Mounted Troops
+        value:
+          number: 4
+          unit: percentage
+      - attribute: Defense
+        conditions:
+          - Attacking
+        targetedType: Ground Troops
+        value:
+          number: 4
+          unit: percentage
+  - level: "Orange"
+    buffs:
+      - attribute: Attack
+        targetedType: Mounted Troops
+        value:
+          number: 8
+          unit: percentage
+      - attribute: HP
+        conditions:
+          - Attacking
+        targetedType: Mounted Troops
+        value:
+          number: 2
+          unit: percentage
+      - attribute: HP
+        conditions:
+          - Attacking
+        targetedType: Ground Troops
+        value:
+          number: 2
+          unit: percentage
+      - attribute: Defense
+        conditions:
+          - Attacking
+        targetedType: Mounted Troops
+        value:
+          number: 4
+          unit: percentage
+      - attribute: Defense
+        conditions:
+          - Attacking
+        targetedType: Ground Troops
+        value:
+          number: 4
+          unit: percentage
+  - level: "Gold"
+    buffs:
+      - attribute: Attack
+        targetedType: Mounted Troops
+        value:
+          number: 16
+          unit: percentage
+      - attribute: HP
+        conditions:
+          - Attacking
+        targetedType: Mounted Troops
+        value:
+          number: 4
+          unit: percentage
+      - attribute: HP
+        conditions:
+          - Attacking
+        targetedType: Ground Troops
+        value:
+          number: 4
+          unit: percentage
+      - attribute: Defense
+        conditions:
+          - Attacking
+        targetedType: Mounted Troops
+        value:
+          number: 8
+          unit: percentage
+      - attribute: Defense
+        conditions:
+          - Attacking
+        targetedType: Ground Troops
+        value:
+          number: 8
+          unit: percentage

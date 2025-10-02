@@ -1,0 +1,82 @@
+name: Battle of Chalons
+levels:
+  - level: Green
+    buffs:
+      - attribute: Attack
+        targetedType: Ground Troops
+        conditions:
+          - Enemy
+        value:
+          number: 3
+          unit: percentage
+      - attribute: HP
+        targetedType: Ground Troops
+        conditions:
+          - Enemy
+        value:
+          number: 3
+          unit: percentage
+  - level: Blue
+    buffs:
+      - attribute: Attack
+        targetedType: Ground Troops
+        conditions:
+          - Enemy
+        value:
+          number: 3
+          unit: percentage
+      - attribute: HP
+        targetedType: Ground Troops
+        conditions:
+          - Enemy
+        value:
+          number: 3
+          unit: percentage
+  - level: Purple
+    buffs:
+      - attribute: Attack
+        targetedType: Ground Troops
+        conditions:
+          - Enemy
+        value:
+          number: 5
+          unit: percentage
+      - attribute: HP
+        targetedType: Ground Troops
+        conditions:
+          - Enemy
+        value:
+          number: 5
+          unit: percentage
+  - level: Orange
+    buffs:
+      - attribute: Attack
+        targetedType: Ground Troops
+        conditions:
+          - Enemy
+        value:
+          number: 5
+          unit: percentage
+      - attribute: HP
+        targetedType: Ground Troops
+        conditions:
+          - Enemy
+        value:
+          number: 5
+          unit: percentage
+  - level: Gold
+    buffs:
+      - attribute: Attack
+        targetedType: Ground Troops
+        conditions:
+          - Enemy
+        value:
+          number: 10
+          unit: percentage
+      - attribute: HP
+        targetedType: Ground Troops
+        conditions:
+          - Enemy
+        value:
+          number: 10
+          unit: percentage

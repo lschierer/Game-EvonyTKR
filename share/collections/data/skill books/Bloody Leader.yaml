@@ -1,0 +1,19 @@
+---
+buffs:
+  - attribute: March Size
+    passive: 0
+    value:
+      number: 10
+      unit: percentage
+  - attribute: Attack
+    conditions:
+      - leading the army
+      - Attacking
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 15
+      unit: percentage
+name: Bloody Leader
+text: >-
+  Increases the March Size by 10% and mounted troops' attack by 15% when General is leading the army to attack.

@@ -1,0 +1,26 @@
+ascending: true
+basic_attributes:
+  attack:
+    base: 114
+    increment: 8.81
+  defense:
+    base: 120
+    increment: 9.35
+  leadership:
+    base: 113
+    increment: 8.78
+  politics:
+    base: 101
+    increment: 8.52
+book: The White Emperor
+display: summary
+specialties:
+  - Mounted Troop Assault
+  - Snipe
+  - War God
+  - Battle of Guinegate
+stars: red5
+type:
+  - mounted_specialist
+general: Maximilian I
+name: Maximilian I

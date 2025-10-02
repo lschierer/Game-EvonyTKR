@@ -1,0 +1,24 @@
+ascending: 'true'
+basic_attributes:
+  attack:
+    base: 120
+    increment: 0
+  defense:
+    base: 115
+    increment: 0
+  leadership:
+    base: 114
+    increment: 0
+  politics:
+    base: 100
+    increment: 0
+book: Conquering Hero
+name: Zachary Taylor
+specialties:
+  - Ranged Troop Assault
+  - Ambush
+  - War God
+  - Battle of Buena Vista
+stars: red5
+type:
+  - wall

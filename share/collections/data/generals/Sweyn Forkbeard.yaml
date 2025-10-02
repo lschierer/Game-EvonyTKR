@@ -1,0 +1,26 @@
+ascending: true
+basic_attributes:
+  attack:
+    base: 115
+    increment: 8.82
+  defense:
+    base: 117
+    increment: 8.87
+  leadership:
+    base: 124
+    increment: 9.15
+  politics:
+    base: 109
+    increment: 8.69
+book: Viking King
+display: summary
+specialties:
+  - Ground Troop Defense
+  - Formation
+  - Ground Troop Ares
+  - Battle of Svolder
+stars: red5
+type:
+  - ground_specialist
+general: Sweyn Forkbeard
+name: Sweyn Forkbeard

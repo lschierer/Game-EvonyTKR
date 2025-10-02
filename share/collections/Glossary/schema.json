@@ -1,0 +1,53 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Glossary Vocabulary",
+  "description": "A vocabulary/glossary definition for terms used within a project.",
+  "type": "object",
+  "properties": {
+    "glossary": {
+      "type": "array",
+      "description": "A list of terms defined in the glossary.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "term": {
+            "type": "string",
+            "description": "The term being defined.",
+            "minLength": 1
+          },
+          "definition": {
+            "type": "string",
+            "description": "The definition of the term.",
+            "minLength": 1
+          },
+          "synonyms": {
+            "type": "array",
+            "description": "A list of synonyms for the term (optional).",
+            "items": { "type": "string" }
+          },
+          "related_terms": {
+            "type": "array",
+            "description": "A list of related terms (optional).",
+            "items": { "type": "string" }
+          },
+          "examples": {
+            "type": "array",
+            "description": "Examples illustrating the use of the term (optional).",
+            "items": { "type": "string" }
+          },
+          "owner": {
+            "type": "string",
+            "description": "The owner or responsible party for the term (optional)."
+          },
+          "status": {
+            "type": "string",
+            "description": "The status of the term (e.g., 'approved', 'draft', 'deprecated') (optional).",
+            "enum": ["approved", "draft", "deprecated", "reviewed"]
+          }
+        },
+        "required": ["term", "definition"]
+      }
+    }
+  },
+  "required": ["glossary"]
+}

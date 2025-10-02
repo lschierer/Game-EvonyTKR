@@ -1,0 +1,16 @@
+---
+name: Bohemian Pioneer
+buffs:
+  - attribute: Attack
+    targetedType: Ranged Troops
+    conditions:
+      - Attacking
+    value:
+      number: 10
+      unit: percentage
+  - attribute: Rally Capacity
+    conditions:
+      - When Rallying
+    value:
+      number: 10
+      unit: percentage

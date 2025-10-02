@@ -1,0 +1,40 @@
+---
+buffs:
+  - attribute: Attack
+    conditions:
+      - leading the army
+      - Attacking
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 55
+      unit: percentage
+  - attribute: HP
+    conditions:
+      - leading the army
+      - Attacking
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 55
+      unit: percentage
+  - attribute: Defense
+    conditions:
+      - leading the army
+      - Attacking
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 35
+      unit: percentage
+  - attribute: Defense
+    conditions:
+      - leading the army
+      - Attacking
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 35
+      unit: percentage
+name: Father of Rome
+text: Increases siege machines’ attack and HP by 55% and increases ranged troops and siege machines’ defense by 35% when General is leading the army to attack.

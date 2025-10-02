@@ -1,0 +1,108 @@
+---
+levels:
+- buffs:
+  - attribute: Attack
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: HP
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Attack
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 0
+      unit: percentage
+  level: Green
+  text: ''
+- buffs:
+  - attribute: Attack
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: HP
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Attack
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 0
+      unit: percentage
+  level: Blue
+  text: ''
+- buffs:
+  - attribute: Attack
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: HP
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Attack
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 0
+      unit: percentage
+  level: Purple
+  text: ''
+- buffs:
+  - attribute: Attack
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: HP
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Attack
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 0
+      unit: percentage
+  level: Orange
+  text: ''
+- buffs:
+  - attribute: Attack
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: HP
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: Attack
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 25
+      unit: percentage
+  level: Gold
+  text: Ground Troop Attack +10%, Ground Troop HP +10%, Ranged Troop Attack +25%
+name: Thunderfury

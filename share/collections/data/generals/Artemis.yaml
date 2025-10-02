@@ -1,0 +1,25 @@
+ascending: true
+basic_attributes:
+  leadership:
+    base: 123
+    increment: 8.63
+  attack:
+    base: 135
+    increment: 8.89
+  defense:
+    base: 126
+    increment: 8.81
+  politics:
+    base: 113
+    increment: 8.42
+book: Goddess of the Hunt
+specialties:
+  - Mounted Troop Defense
+  - Strike
+  - Mounted Troop Ares
+  - Arrow of the Forest
+stars: red5
+type:
+  - mounted_specialist
+general: Artemis
+name: Artemis

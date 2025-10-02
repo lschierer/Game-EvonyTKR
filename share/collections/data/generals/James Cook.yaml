@@ -1,0 +1,24 @@
+ascending: 'true'
+basic_attributes:
+  attack:
+    base: 130
+    increment: 8.86
+  defense:
+    base: 127
+    increment: 8.65
+  leadership:
+    base: 124
+    increment: 8.72
+  politics:
+    base: 115
+    increment: 8.54
+book: Wave-Breaking Pioneer
+name: James Cook
+specialties:
+  - Ranged Troop Formation
+  - Bash
+  - Ranged Troop Ares
+  - Global Exploration
+stars: red5
+type:
+  - ranged_specialist

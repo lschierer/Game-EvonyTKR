@@ -1,0 +1,63 @@
+---
+name: Legendary Knight
+levels:
+  - level: Green
+    buffs:
+      - attribute: Attack
+        conditions:
+          - Enemy
+        value:
+          number: 1
+          unit: percentage
+      - attribute: March Size
+        value:
+          number: 1
+          unit: percentage
+  - level: Blue
+    buffs:
+      - attribute: Attack
+        conditions:
+          - Enemy
+        value:
+          number: 1
+          unit: percentage
+      - attribute: March Size
+        value:
+          number: 1
+          unit: percentage
+  - level: Purple
+    buffs:
+      - attribute: Attack
+        conditions:
+          - Enemy
+        value:
+          number: 1
+          unit: percentage
+      - attribute: March Size
+        value:
+          number: 2
+          unit: percentage
+  - level: Orange
+    buffs:
+      - attribute: Attack
+        conditions:
+          - Enemy
+        value:
+          number: 1
+          unit: percentage
+      - attribute: March Size
+        value:
+          number: 2
+          unit: percentage
+  - level: Purple
+    buffs:
+      - attribute: Attack
+        conditions:
+          - Enemy
+        value:
+          number: 2
+          unit: percentage
+      - attribute: March Size
+        value:
+          number: 4
+          unit: percentage

@@ -1,0 +1,25 @@
+ascending: true
+basic_attributes:
+  leadership:
+    base: 110
+    increment: 8.83
+  attack:
+    base: 109
+    increment: 8.37
+  defense:
+    base: 106
+    increment: 8.62
+  politics:
+    base: 113
+    increment: 8.97
+book: Chief of Expedition
+specialties:
+  - Mounted Troop Assault
+  - Snipe
+  - Ruler
+  - The North Sea Empire
+stars: red5
+type:
+  - mayor
+general: Cnut the Great
+name: Cnut the Great

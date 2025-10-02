@@ -1,0 +1,40 @@
+---
+name: Governor of Transalpine Gaul
+text: >-
+  Increases ranged troops' attack by 40% and increases ranged troops and siege machines' defense and HP by 30% when General is leading the army to attack.
+buffs:
+  - attribute: Attack
+    targetedType: Ranged Troops
+    conditions:
+      - Attacking
+    value:
+      number: 40
+      unit: percentage
+  - attribute: Defense
+    conditions:
+      - Attacking
+    targetedType: Ranged Troops
+    value:
+      number: 30
+      unit: percentage
+  - attribute: Defense
+    conditions:
+      - Attacking
+    targetedType: Siege Machines
+    value:
+      number: 30
+      unit: percentage
+  - attribute: HP
+    conditions:
+      - Attacking
+    targetedType: Ranged Troops
+    value:
+      number: 30
+      unit: percentage
+  - attribute: HP
+    conditions:
+      - Attacking
+    targetedType: Siege Machines
+    value:
+      number: 30
+      unit: percentage

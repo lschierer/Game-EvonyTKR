@@ -1,0 +1,84 @@
+---
+ascending:
+  - level: "red1"
+    buffs:
+      - attribute: Attack
+        targetedType: Ground Troops
+        value:
+          number: 10
+          unit: percentage
+      - attribute: HP
+        targetedType: Ground Troops
+        value:
+          number: 10
+          unit: percentage
+      - attribute: HP
+        targetedType: Mounted Troops
+        value:
+          number: 10
+          unit: percentage
+  - level: "red2"
+    buffs:
+      - attribute: Death to Wounded
+        conditions:
+          - Marching
+        value:
+          number: 10
+          unit: percentage
+  - level: "red3"
+    buffs:
+      - attribute: Rally Capacity
+        conditions:
+          - When Rallying
+        value:
+          number: 8
+          unit: percentage
+  - level: "red4"
+    buffs:
+      - attribute: Attack
+        targetedType: Mounted Troops
+        conditions:
+          - Marching
+        value:
+          number: 15
+          unit: percentage
+      - attribute: Attack
+        targetedType: Ground Troops
+        conditions:
+          - Marching
+        value:
+          number: 15
+          unit: percentage
+      - attribute: Defense
+        targetedType: Mounted Troops
+        conditions:
+          - Marching
+        value:
+          number: 15
+          unit: percentage
+      - attribute: Defense
+        targetedType: Ground Troops
+        conditions:
+          - Marching
+        value:
+          number: 15
+          unit: percentage
+  - level: "red5"
+    buffs:
+      - attribute: Attack
+        targetedType: Ground Troops
+        value:
+          number: 25
+          unit: percentage
+      - attribute: Defense
+        targetedType: Ground Troops
+        value:
+          number: 15
+          unit: percentage
+      - attribute: HP
+        targetedType: Ground Troops
+        value:
+          number: 15
+          unit: percentage
+general: Pyrrhus
+id: Pyrrhus

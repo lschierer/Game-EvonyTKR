@@ -1,0 +1,35 @@
+---
+buffs:
+  - attribute: Attack
+    troop: Ranged Troops
+    value:
+      number: 55
+    conditions:
+      - leading the army
+      - Attacking
+  - attribute: hp
+    troop: Ranged Troops
+    value:
+      number: 55
+    conditions:
+      - leading the army
+      - Attacking
+  - attribute: Defense
+    troop: Ranged Troops
+    value:
+      number: 40
+    conditions:
+      - brings a dragon
+      - Attacking
+      - brings a spiritual beast
+  - attribute: Defense
+    troop: Siege Machines
+    value:
+      number: 40
+    conditions:
+      - brings a dragon
+      - Attacking
+      - brings a spiritual beast
+name: Maatkare
+text: >-
+  Increases ranged troops' attack and HP by 55% when General is leading the army to attack. Increases ranged troops and siege machines' defense by 40% when General brings any Dragon or Spiritual Beast to attack.

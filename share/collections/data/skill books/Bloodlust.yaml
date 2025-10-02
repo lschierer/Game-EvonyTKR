@@ -1,0 +1,10 @@
+name: Bloodlust
+text: >-
+  Reduces enemy troops' HP by 15% when General is leading the army
+buffs:
+  - attribute: HP
+    value:
+      number: 15
+    conditions:
+      - Enemy
+      - leading the army

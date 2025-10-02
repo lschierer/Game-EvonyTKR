@@ -1,0 +1,23 @@
+---
+name: Duke of Albufera
+buffs:
+  - attribute: Attack
+    targetedType: Ground Troops
+    value:
+      number: 45
+      unit: percentage
+  - attribute: HP
+    targetedType: Ground Troops
+    value:
+      number: 45
+      unit: percentage
+  - attribute: Defense
+    targetedType: Ground Troops
+    value:
+      number: 25
+      unit: percentage
+  - attribute: Defense
+    targetedType: Mounted Troops
+    value:
+      number: 25
+      unit: percentage

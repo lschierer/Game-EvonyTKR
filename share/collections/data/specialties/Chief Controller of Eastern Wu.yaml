@@ -1,0 +1,88 @@
+---
+name: Chief Controller of Eastern Wu
+levels:
+  - level: Green
+    buffs:
+      - attribute: Attack
+        targetedType: Ground Troops
+        value:
+          number: 4
+          unit: percentage
+      - attribute: Defense
+        targetedType: Ground Troops
+        value:
+          number: 3
+          unit: percentage
+      - attribute: Defense
+        targetedType: Mounted Troops
+        value:
+          number: 3
+          unit: percentage
+  - level: Blue
+    buffs:
+      - attribute: Attack
+        targetedType: Ground Troops
+        value:
+          number: 4
+          unit: percentage
+      - attribute: Defense
+        targetedType: Ground Troops
+        value:
+          number: 4
+          unit: percentage
+      - attribute: Defense
+        targetedType: Mounted Troops
+        value:
+          number: 4
+          unit: percentage
+  - level: Purple
+    buffs:
+      - attribute: Attack
+        targetedType: Ground Troops
+        value:
+          number: 8
+          unit: percentage
+      - attribute: Defense
+        targetedType: Ground Troops
+        value:
+          number: 7
+          unit: percentage
+      - attribute: Defense
+        targetedType: Mounted Troops
+        value:
+          number: 7
+          unit: percentage
+  - level: Orange
+    buffs:
+      - attribute: Attack
+        targetedType: Ground Troops
+        value:
+          number: 8
+          unit: percentage
+      - attribute: Defense
+        targetedType: Ground Troops
+        value:
+          number: 7
+          unit: percentage
+      - attribute: Defense
+        targetedType: Mounted Troops
+        value:
+          number: 7
+          unit: percentage
+  - level: Orange
+    buffs:
+      - attribute: Attack
+        targetedType: Ground Troops
+        value:
+          number: 16
+          unit: percentage
+      - attribute: Defense
+        targetedType: Ground Troops
+        value:
+          number: 14
+          unit: percentage
+      - attribute: Defense
+        targetedType: Mounted Troops
+        value:
+          number: 14
+          unit: percentage

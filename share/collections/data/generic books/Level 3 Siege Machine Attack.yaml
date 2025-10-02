@@ -1,0 +1,8 @@
+name: Level 3 Siege Machine Attack
+text: Increases Siege Machine by 20% when General is leading the army.
+buffs:
+  - attribute: Attack
+    targetedType: Siege Machines
+    value:
+      number: 20
+      unit: percentage

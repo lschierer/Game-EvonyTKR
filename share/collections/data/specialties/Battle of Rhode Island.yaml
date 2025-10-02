@@ -1,0 +1,68 @@
+---
+name: Battle of Rhode Island
+levels:
+  - level: Green
+    buffs:
+      - attribute: Attack
+        targetedType: Siege Machines
+        value:
+          number: 3
+          unit: percentage
+      - attribute: HP
+        conditions:
+          - Enemy
+        value:
+          number: 1
+          unit: percentage
+  - level: Blue
+    buffs:
+      - attribute: Attack
+        targetedType: Siege Machines
+        value:
+          number: 3
+          unit: percentage
+      - attribute: HP
+        conditions:
+          - Enemy
+        value:
+          number: 1
+          unit: percentage
+  - level: Purple
+    buffs:
+      - attribute: Attack
+        targetedType: Siege Machines
+        value:
+          number: 5
+          unit: percentage
+      - attribute: HP
+        conditions:
+          - Enemy
+        value:
+          number: 2
+          unit: percentage
+  - level: Orange
+    buffs:
+      - attribute: Attack
+        targetedType: Siege Machines
+        value:
+          number: 5
+          unit: percentage
+      - attribute: HP
+        conditions:
+          - Enemy
+        value:
+          number: 2
+          unit: percentage
+  - level: Gold
+    buffs:
+      - attribute: Attack
+        targetedType: Siege Machines
+        value:
+          number: 10
+          unit: percentage
+      - attribute: HP
+        conditions:
+          - Enemy
+        value:
+          number: 4
+          unit: percentage

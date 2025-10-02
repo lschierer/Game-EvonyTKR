@@ -1,0 +1,808 @@
+Skill,Count,Primary Troop/Skill Classification Code,Primary Troop/Skill Classification Description,Troop & Skill Combination Code,Troop Combination Description,Skill Combination Description,Action Code,Action Description
+,,,,,,,,
+EM,1,,,EM,,Empty,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+MS,1,,,MS,,March Size Increase,,
+MS-RA&SG-DF-wAT,1,MS-RA,Range & Siege,12,,Defense Increase,A,Attacking
+Future,0,,,,,,,
+Future,0,,,,,,,
+RC,1,,,RC,,Rally Capacity Increase,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+DD-wMA,1,DD-MA,Double Drop Increase,,,,M,Monster Attacking
+RS-wMA,1,RS-MA,Reduce Stamina,,,,M,Monster Attacking
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+RM-AT-wMA,1,RM,Reduce Monster,1,,Attack Increase,M,Monster Attacking
+RM-DF-wMA,1,RM,Reduce Monster,2,,Defense Increase,M,Monster Attacking
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+TR-WtD-wLD,1,TR-WtD,Troop Wounded to Death,,,,L,Leading
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+TR-WtD-wAT,1,TR-WtD,Troop Wounded to Death,,,,A,Attacking
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+TR-DtW-wLD,1,TR-DtW,Troop Death to Wounded,,,,L,Leading
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+TR-DtW-wAT,1,TR-DtW,Troop Death to Wounded,,,,A,Attacking
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+ET-WtD-wLD,1,ET-WtD,Enemy Troop Wounded to Death,,,,L,Leading
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+ET-WtD-wAT,1,ET-WtD,Enemy Troop Wounded to Death,,,,A,Attacking
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+RE-TR-AT-wLD,1,RE-TR,Reduce Enemy All-Troop,1,,Attack Increase,L,Leading
+RE-TR-DF-wLD,1,RE-TR,Reduce Enemy All-Troop,2,,Defense Increase,L,Leading
+RE-TR-HP-wLD,1,RE-TR,Reduce Enemy All-Troop,3,,HP Increase,L,Leading
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+RE-GR-AT-wLD,1,RE-GR,Reduce Enemy Ground,1,,Attack Increase,L,Leading
+RE-GR-DF-wLD,1,RE-GR,Reduce Enemy Ground,2,,Defense Increase,L,Leading
+RE-GR-HP-wLD,1,RE-GR,Reduce Enemy Ground,3,,HP Increase,L,Leading
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+RE-GR&MT-AT-wLD,1,RE-GR,Reduce Enemy Ground & Mounted,11,,Attack Increase,L,Leading
+RE-GR&MT-DF-wLD,1,RE-GR,Reduce Enemy Ground & Mounted,12,,Defense Increase,L,Leading
+RE-GR&MT-HP-wLD,1,RE-GR,Reduce Enemy Ground & Mounted,13,,HP Increase,L,Leading
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+RE-RA-AT-wLD,1,RE-RA,Reduce Enemy Ranged,1,,Attack Increase,L,Leading
+RE-RA-DF-wLD,1,RE-RA,Reduce Enemy Ranged,2,,Defense Increase,L,Leading
+RE-RA-HP-wLD,1,RE-RA,Reduce Enemy Ranged,3,,HP Increase,L,Leading
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+RE-RA&SG-AT-wLD,1,RE-RA,Reduce Enemy Ranged & Siege,11,,Attack Increase,L,Leading
+RE-RA&SG-DF-wLD,1,RE-RA,Reduce Enemy Ranged & Siege,12,,Defense Increase,L,Leading
+RE-RA&SG-HP-wLD,1,RE-RA,Reduce Enemy Ranged & Siege,13,,HP Increase,L,Leading
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+RE-MT-AT-wLD,1,RE-MT,Reduce Enemy Mounted,1,,Attack Increase,L,Leading
+RE-MT-DF-wLD,1,RE-MT,Reduce Enemy Mounted,2,,Defense Increase,L,Leading
+RE-MT-HP-wLD,1,RE-MT,Reduce Enemy Mounted,3,,HP Increase,L,Leading
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+RE-MT&GR-AT-wLD,1,RE-MT,Reduce Enemy Mounted & Ground,11,,Attack Increase,L,Leading
+RE-MT&GR-DF-wLD,1,RE-MT,Reduce Enemy Mounted & Ground,12,,Defense Increase,L,Leading
+RE-MT&GR-HP-wLD,1,RE-MT,Reduce Enemy Mounted & Ground,13,,HP Increase,L,Leading
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+RE-SG-AT-wLD,1,RE-SG,Reduce Enemy Siege,1,,Attack Increase,L,Leading
+RE-SG-DF-wLD,1,RE-SG,Reduce Enemy Siege,2,,Defense Increase,L,Leading
+RE-SG-HP-wLD,1,RE-SG,Reduce Enemy Siege,3,,HP Increase,L,Leading
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+RE-SG&RA-AT-wLD,1,RE-SG,Reduce Enemy Siege & Ranged,11,,Attack Increase,L,Leading
+RE-SG&RA-DF-wLD,1,RE-SG,Reduce Enemy Siege & Ranged,12,,Defense Increase,L,Leading
+RE-SG&RA-HP-wLD,1,RE-SG,Reduce Enemy Siege & Ranged,13,,HP Increase,L,Leading
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+RE-TR-AT-wAT,1,RE-TR,,1,,Attack Increase,A,Attacking
+RE-TR-DF-wAT,1,RE-TR,,2,,Defense Increase,A,Attacking
+RE-TR-HP-wAT,1,RE-TR,,3,,HP Increase,A,Attacking
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+RE-GR-AT-wAT,1,RE-GR,,1,,Attack Increase,A,Attacking
+RE-GR-DF-wAT,1,RE-GR,,2,,Defense Increase,A,Attacking
+RE-GR-HP-wAT,1,RE-GR,,3,,HP Increase,A,Attacking
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+RE-GR&MT-AT-wAT,1,RE-GR,,11,,Attack Increase,A,Attacking
+RE-GR&MT-DF-wAT,1,RE-GR,,12,,Defense Increase,A,Attacking
+RE-GR&MT-HP-wAT,1,RE-GR,,13,,HP Increase,A,Attacking
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+RE-RA-AT-wAT,1,RE-RA,,1,,Attack Increase,A,Attacking
+RE-RA-DF-wAT,1,RE-RA,,2,,Defense Increase,A,Attacking
+RE-RA-HP-wAT,1,RE-RA,,3,,HP Increase,A,Attacking
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+RE-RA&SG-AT-wAT,1,RE-RA,,11,,Attack Increase,A,Attacking
+RE-RA&SG-DF-wAT,1,RE-RA,,12,,Defense Increase,A,Attacking
+RE-RA&SG-HP-wAT,1,RE-RA,,13,,HP Increase,A,Attacking
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+RE-MT-AT-wAT,1,RE-MT,,1,,Attack Increase,A,Attacking
+RE-MT-DF-wAT,1,RE-MT,,2,,Defense Increase,A,Attacking
+RE-MT-HP-wAT,1,RE-MT,,3,,HP Increase,A,Attacking
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+RE-MT&GR-AT-wAT,1,RE-MT,,11,,Attack Increase,A,Attacking
+RE-MT&GR-DF-wAT,1,RE-MT,,12,,Defense Increase,A,Attacking
+RE-MT&GR-HP-wAT,1,RE-MT,,13,,HP Increase,A,Attacking
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+RE-SG-AT-wAT,1,RE-SG,,1,,Attack Increase,A,Attacking
+RE-SG-DF-wAT,1,RE-SG,,2,,Defense Increase,A,Attacking
+RE-SG-HP-wAT,1,RE-SG,,3,,HP Increase,A,Attacking
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+RE-SG&RA-AT-wAT,1,RE-SG,,11,,Attack Increase,A,Attacking
+RE-SG&RA-DF-wAT,1,RE-SG,,12,,Defense Increase,A,Attacking
+RE-SG&RA-HP-wAT,1,RE-SG,,13,,HP Increase,A,Attacking
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+TR-AT-wLD,1,TR,All-Troop,1,All-Troop,Attack Increase,L,Leading
+TR-DF-wLD,1,TR,All-Troop,2,All-Troop,Defense Increase,L,Leading
+TR-HP-wLD,1,TR,All-Troop,3,All-Troop,HP Increase,L,Leading
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+TR-AT-wAT,1,TR,All-Troop,1,All-Troop,Attack Increase,A,Attacking
+TR-DF-wAT,1,TR,All-Troop,2,All-Troop,Defense Increase,A,Attacking
+TR-HP-wAT,1,TR,All-Troop,3,All-Troop,HP Increase,A,Attacking
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+GR-AT-wLD,1,GR,Ground,1,Ground,Attack Increase,L,Leading
+GR-DF-wLD,1,GR,Ground,2,Ground,Defense Increase,L,Leading
+GR-HP-wLD,1,GR,Ground,3,Ground,HP Increase,L,Leading
+GR-AT&DF-wLD,1,GR,Ground,4,Ground,Attack & Defense Increase,L,Leading
+GR-AT&HP-wLD,1,GR,Ground,5,Ground,Attack & HP Increase,L,Leading
+GR-AT&DF&HP-wLD,1,GR,Ground,6,Ground,"Attack, Defense & HP Increase",L,Leading
+GR-DF&HP-wLD,1,GR,Ground,7,Ground,Defense & HP Increase,L,Leading
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+GR&MT-AT-wLD,1,GR,Ground,11,Ground & Mounted,Attack Increase,L,Leading
+GR&MT-DF-wLD,1,GR,Ground,12,Ground & Mounted,Defense Increase,L,Leading
+GR&MT-HP-wLD,1,GR,Ground,13,Ground & Mounted,HP Increase,L,Leading
+GR&MT-AT&DF-wLD,1,GR,Ground,14,Ground & Mounted,Attack & Defense Increase,L,Leading
+GR&MT-AT&HP-wLD,1,GR,Ground,15,Ground & Mounted,Attack & HP Increase,L,Leading
+GR&MT-AT&DF&HP-wLD,1,GR,Ground,16,Ground & Mounted,"Attack, Defense & HP Increase",L,Leading
+GR&MT-DF&HP-wLD,1,GR,Ground,17,Ground & Mounted,Defense & HP Increase,L,Leading
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+GR&RA-AT-wLD,1,GR,Ground,21,Ground & Ranged,Attack Increase,L,Leading
+GR&RA-DF-wLD,1,GR,Ground,22,Ground & Ranged,Defense Increase,L,Leading
+GR&RA-HP-wLD,1,GR,Ground,23,Ground & Ranged,HP Increase,L,Leading
+GR&RA-AT&DF-wLD,1,GR,Ground,24,Ground & Ranged,Attack & Defense Increase,L,Leading
+GR&RA-AT&HP-wLD,1,GR,Ground,25,Ground & Ranged,Attack & HP Increase,L,Leading
+GR&RA-AT&DF&HP-wLD,1,GR,Ground,26,Ground & Ranged,"Attack, Defense & HP Increase",L,Leading
+GR&RA-DF&HP-wLD,1,GR,Ground,27,Ground & Ranged,Defense & HP Increase,L,Leading
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+GR&SG-AT-wLD,1,GR,Ground,31,Ground & Siege,Attack Increase,L,Leading
+GR&SG-DF-wLD,1,GR,Ground,32,Ground & Siege,Defense Increase,L,Leading
+GR&SG-HP-wLD,1,GR,Ground,33,Ground & Siege,HP Increase,L,Leading
+GR&SG-AT&DF-wLD,1,GR,Ground,34,Ground & Siege,Attack & Defense Increase,L,Leading
+GR&SG-AT&HP-wLD,1,GR,Ground,35,Ground & Siege,Attack & HP Increase,L,Leading
+GR&SG-AT&DF&HP-wLD,1,GR,Ground,36,Ground & Siege,"Attack, Defense & HP Increase",L,Leading
+GR&SG-DF&HP-wLD,1,GR,Ground,37,Ground & Siege,Defense & HP Increase,L,Leading
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+GR-AT-wAT,1,GR,Ground,1,Ground,Attack Increase,A,Attacking
+GR-DF-wAT,1,GR,Ground,2,Ground,Defense Increase,A,Attacking
+GR-HP-wAT,1,GR,Ground,3,Ground,HP Increase,A,Attacking
+GR-AT&DF-wAT,1,GR,Ground,4,Ground,Attack & Defense Increase,A,Attacking
+GR-AT&HP-wAT,1,GR,Ground,5,Ground,Attack & HP Increase,A,Attacking
+GR-AT&DF&HP-wAT,1,GR,Ground,6,Ground,"Attack, Defense & HP Increase",A,Attacking
+GR-DF&HP-wAT,1,GR,Ground,7,Ground,Defense & HP Increase,A,Attacking
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+GR&MT-AT-wAT,1,GR,Ground,11,Ground & Mounted,Attack Increase,A,Attacking
+GR&MT-DF-wAT,1,GR,Ground,12,Ground & Mounted,Defense Increase,A,Attacking
+GR&MT-HP-wAT,1,GR,Ground,13,Ground & Mounted,HP Increase,A,Attacking
+GR&MT-AT&DF-wAT,1,GR,Ground,14,Ground & Mounted,Attack & Defense Increase,A,Attacking
+GR&MT-AT&HP-wAT,1,GR,Ground,15,Ground & Mounted,Attack & HP Increase,A,Attacking
+GR&MT-AT&DF&HP-wAT,1,GR,Ground,16,Ground & Mounted,"Attack, Defense & HP Increase",A,Attacking
+GR&MT-DF&HP-wAT,1,GR,Ground,17,Ground & Mounted,Defense & HP Increase,A,Attacking
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+GR&RA-AT-wAT,1,GR,Ground,21,Ground & Ranged,Attack Increase,A,Attacking
+GR&RA-DF-wAT,1,GR,Ground,22,Ground & Ranged,Defense Increase,A,Attacking
+GR&RA-HP-wAT,1,GR,Ground,23,Ground & Ranged,HP Increase,A,Attacking
+GR&RA-AT&DF-wAT,1,GR,Ground,24,Ground & Ranged,Attack & Defense Increase,A,Attacking
+GR&RA-AT&HP-wAT,1,GR,Ground,25,Ground & Ranged,Attack & HP Increase,A,Attacking
+GR&RA-AT&DF&HP-wAT,1,GR,Ground,26,Ground & Ranged,"Attack, Defense & HP Increase",A,Attacking
+GR&RA-DF&HP-wAT,1,GR,Ground,27,Ground & Ranged,Defense & HP Increase,A,Attacking
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+GR&SG-AT-wAT,1,GR,Ground,31,Ground & Siege,Attack Increase,A,Attacking
+GR&SG-DF-wAT,1,GR,Ground,32,Ground & Siege,Defense Increase,A,Attacking
+GR&SG-HP-wAT,1,GR,Ground,33,Ground & Siege,HP Increase,A,Attacking
+GR&SG-AT&DF-wAT,1,GR,Ground,34,Ground & Siege,Attack & Defense Increase,A,Attacking
+GR&SG-AT&HP-wAT,1,GR,Ground,35,Ground & Siege,Attack & HP Increase,A,Attacking
+GR&SG-AT&DF&HP-wAT,1,GR,Ground,36,Ground & Siege,"Attack, Defense & HP Increase",A,Attacking
+GR&SG-DF&HP-wAT,1,GR,Ground,37,Ground & Siege,Defense & HP Increase,A,Attacking
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+GR-AT-wRN,1,GR,Ground,1,Ground,Attack Increase,R,Reinforcing
+GR-DF-wRN,1,GR,Ground,2,Ground,Defense Increase,R,Reinforcing
+GR-HP-wRN,1,GR,Ground,3,Ground,HP Increase,R,Reinforcing
+GR-AT&DF-wRN,1,GR,Ground,4,Ground,Attack & Defense Increase,R,Reinforcing
+GR-AT&HP-wRN,1,GR,Ground,5,Ground,Attack & HP Increase,R,Reinforcing
+GR-AT&DF&HP-wRN,1,GR,Ground,6,Ground,"Attack, Defense & HP Increase",R,Reinforcing
+GR-DF&HP-wRN,1,GR,Ground,7,Ground,Defense & HP Increase,R,Reinforcing
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+GR&MT-AT-wRN,1,GR,Ground,11,Ground & Mounted,Attack Increase,R,Reinforcing
+GR&MT-DF-wRN,1,GR,Ground,12,Ground & Mounted,Defense Increase,R,Reinforcing
+GR&MT-HP-wRN,1,GR,Ground,13,Ground & Mounted,HP Increase,R,Reinforcing
+GR&MT-AT&DF-wRN,1,GR,Ground,14,Ground & Mounted,Attack & Defense Increase,R,Reinforcing
+GR&MT-AT&HP-wRN,1,GR,Ground,15,Ground & Mounted,Attack & HP Increase,R,Reinforcing
+GR&MT-AT&DF&HP-wRN,1,GR,Ground,16,Ground & Mounted,"Attack, Defense & HP Increase",R,Reinforcing
+GR&MT-DF&HP-wRN,1,GR,Ground,17,Ground & Mounted,Defense & HP Increase,R,Reinforcing
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+GR&RA-AT-wRN,1,GR,Ground,21,Ground & Ranged,Attack Increase,R,Reinforcing
+GR&RA-DF-wRN,1,GR,Ground,22,Ground & Ranged,Defense Increase,R,Reinforcing
+GR&RA-HP-wRN,1,GR,Ground,23,Ground & Ranged,HP Increase,R,Reinforcing
+GR&RA-AT&DF-wRN,1,GR,Ground,24,Ground & Ranged,Attack & Defense Increase,R,Reinforcing
+GR&RA-AT&HP-wRN,1,GR,Ground,25,Ground & Ranged,Attack & HP Increase,R,Reinforcing
+GR&RA-AT&DF&HP-wRN,1,GR,Ground,26,Ground & Ranged,"Attack, Defense & HP Increase",R,Reinforcing
+GR&RA-DF&HP-wRN,1,GR,Ground,27,Ground & Ranged,Defense & HP Increase,R,Reinforcing
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+GR&SG-AT-wRN,1,GR,Ground,31,Ground & Siege,Attack Increase,R,Reinforcing
+GR&SG-DF-wRN,1,GR,Ground,32,Ground & Siege,Defense Increase,R,Reinforcing
+GR&SG-HP-wRN,1,GR,Ground,33,Ground & Siege,HP Increase,R,Reinforcing
+GR&SG-AT&DF-wRN,1,GR,Ground,34,Ground & Siege,Attack & Defense Increase,R,Reinforcing
+GR&SG-AT&HP-wRN,1,GR,Ground,35,Ground & Siege,Attack & HP Increase,R,Reinforcing
+GR&SG-AT&DF&HP-wRN,1,GR,Ground,36,Ground & Siege,"Attack, Defense & HP Increase",R,Reinforcing
+GR&SG-DF&HP-wRN,1,GR,Ground,37,Ground & Siege,Defense & HP Increase,R,Reinforcing
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+GR-AT-wDO,1,GR,Ground,1,Ground,Attack Increase,D,Defending Outside City
+GR-DF-wDO,1,GR,Ground,2,Ground,Defense Increase,D,Defending Outside City
+GR-HP-wDO,1,GR,Ground,3,Ground,HP Increase,D,Defending Outside City
+GR-AT&DF-wDO,1,GR,Ground,4,Ground,Attack & Defense Increase,D,Defending Outside City
+GR-AT&HP-wDO,1,GR,Ground,5,Ground,Attack & HP Increase,D,Defending Outside City
+GR-AT&DF&HP-wDO,1,GR,Ground,6,Ground,"Attack, Defense & HP Increase",D,Defending Outside City
+GR-DF&HP-wDO,1,GR,Ground,7,Ground,Defense & HP Increase,D,Defending Outside City
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+GR&MT-AT-wDO,1,GR,Ground,11,Ground & Mounted,Attack Increase,D,Defending Outside City
+GR&MT-DF-wDO,1,GR,Ground,12,Ground & Mounted,Defense Increase,D,Defending Outside City
+GR&MT-HP-wDO,1,GR,Ground,13,Ground & Mounted,HP Increase,D,Defending Outside City
+GR&MT-AT&DF-wDO,1,GR,Ground,14,Ground & Mounted,Attack & Defense Increase,D,Defending Outside City
+GR&MT-AT&HP-wDO,1,GR,Ground,15,Ground & Mounted,Attack & HP Increase,D,Defending Outside City
+GR&MT-AT&DF&HP-wDO,1,GR,Ground,16,Ground & Mounted,"Attack, Defense & HP Increase",D,Defending Outside City
+GR&MT-DF&HP-wDO,1,GR,Ground,17,Ground & Mounted,Defense & HP Increase,D,Defending Outside City
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+GR&RA-AT-wDO,1,GR,Ground,21,Ground & Ranged,Attack Increase,D,Defending Outside City
+GR&RA-DF-wDO,1,GR,Ground,22,Ground & Ranged,Defense Increase,D,Defending Outside City
+GR&RA-HP-wDO,1,GR,Ground,23,Ground & Ranged,HP Increase,D,Defending Outside City
+GR&RA-AT&DF-wDO,1,GR,Ground,24,Ground & Ranged,Attack & Defense Increase,D,Defending Outside City
+GR&RA-AT&HP-wDO,1,GR,Ground,25,Ground & Ranged,Attack & HP Increase,D,Defending Outside City
+GR&RA-AT&DF&HP-wDO,1,GR,Ground,26,Ground & Ranged,"Attack, Defense & HP Increase",D,Defending Outside City
+GR&RA-DF&HP-wDO,1,GR,Ground,27,Ground & Ranged,Defense & HP Increase,D,Defending Outside City
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+GR&SG-AT-wDO,1,GR,Ground,31,Ground & Siege,Attack Increase,D,Defending Outside City
+GR&SG-DF-wDO,1,GR,Ground,32,Ground & Siege,Defense Increase,D,Defending Outside City
+GR&SG-HP-wDO,1,GR,Ground,33,Ground & Siege,HP Increase,D,Defending Outside City
+GR&SG-AT&DF-wDO,1,GR,Ground,34,Ground & Siege,Attack & Defense Increase,D,Defending Outside City
+GR&SG-AT&HP-wDO,1,GR,Ground,35,Ground & Siege,Attack & HP Increase,D,Defending Outside City
+GR&SG-AT&DF&HP-wDO,1,GR,Ground,36,Ground & Siege,"Attack, Defense & HP Increase",D,Defending Outside City
+GR&SG-DF&HP-wDO,1,GR,Ground,37,Ground & Siege,Defense & HP Increase,D,Defending Outside City
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+RA-AT-wLD,1,RA,Ranged,1,Ranged,Attack Increase,L,Leading
+RA-DF-wLD,1,RA,Ranged,2,Ranged,Defense Increase,L,Leading
+RA-HP-wLD,1,RA,Ranged,3,Ranged,HP Increase,L,Leading
+RA-AT&DF-wLD,1,RA,Ranged,4,Ranged,Attack & Defense Increase,L,Leading
+RA-AT&HP-wLD,1,RA,Ranged,5,Ranged,Attack & HP Increase,L,Leading
+RA-AT&DF&HP-wLD,1,RA,Ranged,6,Ranged,"Attack, Defense & HP Increase",L,Leading
+RA-DF&HP-wLD,1,RA,Ranged,7,Ranged,Defense & HP Increase,L,Leading
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+RA&SG-AT-wLD,1,RA,Ranged,11,Ranged & Siege,Attack Increase,L,Leading
+RA&SG-DF-wLD,1,RA,Ranged,12,Ranged & Siege,Defense Increase,L,Leading
+RA&SG-HP-wLD,1,RA,Ranged,13,Ranged & Siege,HP Increase,L,Leading
+RA&SG-AT&DF-wLD,1,RA,Ranged,14,Ranged & Siege,Attack & Defense Increase,L,Leading
+RA&SG-AT&HP-wLD,1,RA,Ranged,15,Ranged & Siege,Attack & HP Increase,L,Leading
+RA&SG-AT&DF&HP-wLD,1,RA,Ranged,16,Ranged & Siege,"Attack, Defense & HP Increase",L,Leading
+RA&SG-DF&HP-wLD,1,RA,Ranged,17,Ranged & Siege,Defense & HP Increase,L,Leading
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+RA&GR-AT-wLD,1,RA,Ranged,21,Ranged & Ground,Attack Increase,L,Leading
+RA&GR-DF-wLD,1,RA,Ranged,22,Ranged & Ground,Defense Increase,L,Leading
+RA&GR-HP-wLD,1,RA,Ranged,23,Ranged & Ground,HP Increase,L,Leading
+RA&GR-AT&DF-wLD,1,RA,Ranged,24,Ranged & Ground,Attack & Defense Increase,L,Leading
+RA&GR-AT&HP-wLD,1,RA,Ranged,25,Ranged & Ground,Attack & HP Increase,L,Leading
+RA&GR-AT&DF&HP-wLD,1,RA,Ranged,26,Ranged & Ground,"Attack, Defense & HP Increase",L,Leading
+RA&GR-DF&HP-wLD,1,RA,Ranged,27,Ranged & Ground,Defense & HP Increase,L,Leading
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+RA&MT-AT-wLD,1,RA,Ranged,31,Ranged & Mounted,Attack Increase,L,Leading
+RA&MT-DF-wLD,1,RA,Ranged,32,Ranged & Mounted,Defense Increase,L,Leading
+RA&MT-HP-wLD,1,RA,Ranged,33,Ranged & Mounted,HP Increase,L,Leading
+RA&MT-AT&DF-wLD,1,RA,Ranged,34,Ranged & Mounted,Attack & Defense Increase,L,Leading
+RA&MT-AT&HP-wLD,1,RA,Ranged,35,Ranged & Mounted,Attack & HP Increase,L,Leading
+RA&MT-AT&DF&HP-wLD,1,RA,Ranged,36,Ranged & Mounted,"Attack, Defense & HP Increase",L,Leading
+RA&MT-DF&HP-wLD,1,RA,Ranged,37,Ranged & Mounted,Defense & HP Increase,L,Leading
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+RA-AT-wAT,1,RA,Ranged,1,Ranged,Attack Increase,A,Attacking
+RA-DF-wAT,1,RA,Ranged,2,Ranged,Defense Increase,A,Attacking
+RA-HP-wAT,1,RA,Ranged,3,Ranged,HP Increase,A,Attacking
+RA-AT&DF-wAT,1,RA,Ranged,4,Ranged,Attack & Defense Increase,A,Attacking
+RA-AT&HP-wAT,1,RA,Ranged,5,Ranged,Attack & HP Increase,A,Attacking
+RA-AT&DF&HP-wAT,1,RA,Ranged,6,Ranged,"Attack, Defense & HP Increase",A,Attacking
+RA-DF&HP-wAT,1,RA,Ranged,7,Ranged,Defense & HP Increase,A,Attacking
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+RA&SG-AT-wAT,1,RA,Ranged,11,Ranged & Siege,Attack Increase,A,Attacking
+RA&SG-DF-wAT,1,RA,Ranged,12,Ranged & Siege,Defense Increase,A,Attacking
+RA&SG-HP-wAT,1,RA,Ranged,13,Ranged & Siege,HP Increase,A,Attacking
+RA&SG-AT&DF-wAT,1,RA,Ranged,14,Ranged & Siege,Attack & Defense Increase,A,Attacking
+RA&SG-AT&HP-wAT,1,RA,Ranged,15,Ranged & Siege,Attack & HP Increase,A,Attacking
+RA&SG-AT&DF&HP-wAT,1,RA,Ranged,16,Ranged & Siege,"Attack, Defense & HP Increase",A,Attacking
+RA&SG-DF&HP-wAT,1,RA,Ranged,17,Ranged & Siege,Defense & HP Increase,A,Attacking
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+RA&GR-AT-wAT,1,RA,Ranged,21,Ranged & Ground,Attack Increase,A,Attacking
+RA&GR-DF-wAT,1,RA,Ranged,22,Ranged & Ground,Defense Increase,A,Attacking
+RA&GR-HP-wAT,1,RA,Ranged,23,Ranged & Ground,HP Increase,A,Attacking
+RA&GR-AT&DF-wAT,1,RA,Ranged,24,Ranged & Ground,Attack & Defense Increase,A,Attacking
+RA&GR-AT&HP-wAT,1,RA,Ranged,25,Ranged & Ground,Attack & HP Increase,A,Attacking
+RA&GR-AT&DF&HP-wAT,1,RA,Ranged,26,Ranged & Ground,"Attack, Defense & HP Increase",A,Attacking
+RA&GR-DF&HP-wAT,1,RA,Ranged,27,Ranged & Ground,Defense & HP Increase,A,Attacking
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+RA&MT-AT-wAT,1,RA,Ranged,31,Ranged & Mounted,Attack Increase,A,Attacking
+RA&MT-DF-wAT,1,RA,Ranged,32,Ranged & Mounted,Defense Increase,A,Attacking
+RA&MT-HP-wAT,1,RA,Ranged,33,Ranged & Mounted,HP Increase,A,Attacking
+RA&MT-AT&DF-wAT,1,RA,Ranged,34,Ranged & Mounted,Attack & Defense Increase,A,Attacking
+RA&MT-AT&HP-wAT,1,RA,Ranged,35,Ranged & Mounted,Attack & HP Increase,A,Attacking
+RA&MT-AT&DF&HP-wAT,1,RA,Ranged,36,Ranged & Mounted,"Attack, Defense & HP Increase",A,Attacking
+RA&MT-DF&HP-wAT,1,RA,Ranged,37,Ranged & Mounted,Defense & HP Increase,A,Attacking
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+RA-AT-wRN,1,RA,Ranged,1,Ranged,Attack Increase,R,Reinforcing
+RA-DF-wRN,1,RA,Ranged,2,Ranged,Defense Increase,R,Reinforcing
+RA-HP-wRN,1,RA,Ranged,3,Ranged,HP Increase,R,Reinforcing
+RA-AT&DF-wRN,1,RA,Ranged,4,Ranged,Attack & Defense Increase,R,Reinforcing
+RA-AT&HP-wRN,1,RA,Ranged,5,Ranged,Attack & HP Increase,R,Reinforcing
+RA-AT&DF&HP-wRN,1,RA,Ranged,6,Ranged,"Attack, Defense & HP Increase",R,Reinforcing
+RA-DF&HP-wRN,1,RA,Ranged,7,Ranged,Defense & HP Increase,R,Reinforcing
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+RA&SG-AT-wRN,1,RA,Ranged,11,Ranged & Siege,Attack Increase,R,Reinforcing
+RA&SG-DF-wRN,1,RA,Ranged,12,Ranged & Siege,Defense Increase,R,Reinforcing
+RA&SG-HP-wRN,1,RA,Ranged,13,Ranged & Siege,HP Increase,R,Reinforcing
+RA&SG-AT&DF-wRN,1,RA,Ranged,14,Ranged & Siege,Attack & Defense Increase,R,Reinforcing
+RA&SG-AT&HP-wRN,1,RA,Ranged,15,Ranged & Siege,Attack & HP Increase,R,Reinforcing
+RA&SG-AT&DF&HP-wRN,1,RA,Ranged,16,Ranged & Siege,"Attack, Defense & HP Increase",R,Reinforcing
+RA&SG-DF&HP-wRN,1,RA,Ranged,17,Ranged & Siege,Defense & HP Increase,R,Reinforcing
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+RA&GR-AT-wRN,1,RA,Ranged,21,Ranged & Ground,Attack Increase,R,Reinforcing
+RA&GR-DF-wRN,1,RA,Ranged,22,Ranged & Ground,Defense Increase,R,Reinforcing
+RA&GR-HP-wRN,1,RA,Ranged,23,Ranged & Ground,HP Increase,R,Reinforcing
+RA&GR-AT&DF-wRN,1,RA,Ranged,24,Ranged & Ground,Attack & Defense Increase,R,Reinforcing
+RA&GR-AT&HP-wRN,1,RA,Ranged,25,Ranged & Ground,Attack & HP Increase,R,Reinforcing
+RA&GR-AT&DF&HP-wRN,1,RA,Ranged,26,Ranged & Ground,"Attack, Defense & HP Increase",R,Reinforcing
+RA&GR-DF&HP-wRN,1,RA,Ranged,27,Ranged & Ground,Defense & HP Increase,R,Reinforcing
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+RA&MT-AT-wRN,1,RA,Ranged,31,Ranged & Mounted,Attack Increase,R,Reinforcing
+RA&MT-DF-wRN,1,RA,Ranged,32,Ranged & Mounted,Defense Increase,R,Reinforcing
+RA&MT-HP-wRN,1,RA,Ranged,33,Ranged & Mounted,HP Increase,R,Reinforcing
+RA&MT-AT&DF-wRN,1,RA,Ranged,34,Ranged & Mounted,Attack & Defense Increase,R,Reinforcing
+RA&MT-AT&HP-wRN,1,RA,Ranged,35,Ranged & Mounted,Attack & HP Increase,R,Reinforcing
+RA&MT-AT&DF&HP-wRN,1,RA,Ranged,36,Ranged & Mounted,"Attack, Defense & HP Increase",R,Reinforcing
+RA&MT-DF&HP-wRN,1,RA,Ranged,37,Ranged & Mounted,Defense & HP Increase,R,Reinforcing
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+RA-AT-wDO,1,RA,Ranged,1,Ranged,Attack Increase,D,Defending Outside City
+RA-DF-wDO,1,RA,Ranged,2,Ranged,Defense Increase,D,Defending Outside City
+RA-HP-wDO,1,RA,Ranged,3,Ranged,HP Increase,D,Defending Outside City
+RA-AT&DF-wDO,1,RA,Ranged,4,Ranged,Attack & Defense Increase,D,Defending Outside City
+RA-AT&HP-wDO,1,RA,Ranged,5,Ranged,Attack & HP Increase,D,Defending Outside City
+RA-AT&DF&HP-wDO,1,RA,Ranged,6,Ranged,"Attack, Defense & HP Increase",D,Defending Outside City
+RA-DF&HP-wDO,1,RA,Ranged,7,Ranged,Defense & HP Increase,D,Defending Outside City
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+RA&SG-AT-wDO,1,RA,Ranged,11,Ranged & Siege,Attack Increase,D,Defending Outside City
+RA&SG-DF-wDO,1,RA,Ranged,12,Ranged & Siege,Defense Increase,D,Defending Outside City
+RA&SG-HP-wDO,1,RA,Ranged,13,Ranged & Siege,HP Increase,D,Defending Outside City
+RA&SG-AT&DF-wDO,1,RA,Ranged,14,Ranged & Siege,Attack & Defense Increase,D,Defending Outside City
+RA&SG-AT&HP-wDO,1,RA,Ranged,15,Ranged & Siege,Attack & HP Increase,D,Defending Outside City
+RA&SG-AT&DF&HP-wDO,1,RA,Ranged,16,Ranged & Siege,"Attack, Defense & HP Increase",D,Defending Outside City
+RA&SG-DF&HP-wDO,1,RA,Ranged,17,Ranged & Siege,Defense & HP Increase,D,Defending Outside City
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+RA&GR-AT-wDO,1,RA,Ranged,21,Ranged & Ground,Attack Increase,D,Defending Outside City
+RA&GR-DF-wDO,1,RA,Ranged,22,Ranged & Ground,Defense Increase,D,Defending Outside City
+RA&GR-HP-wDO,1,RA,Ranged,23,Ranged & Ground,HP Increase,D,Defending Outside City
+RA&GR-AT&DF-wDO,1,RA,Ranged,24,Ranged & Ground,Attack & Defense Increase,D,Defending Outside City
+RA&GR-AT&HP-wDO,1,RA,Ranged,25,Ranged & Ground,Attack & HP Increase,D,Defending Outside City
+RA&GR-AT&DF&HP-wDO,1,RA,Ranged,26,Ranged & Ground,"Attack, Defense & HP Increase",D,Defending Outside City
+RA&GR-DF&HP-wDO,1,RA,Ranged,27,Ranged & Ground,Defense & HP Increase,D,Defending Outside City
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+RA&MT-AT-wDO,1,RA,Ranged,31,Ranged & Mounted,Attack Increase,D,Defending Outside City
+RA&MT-DF-wDO,1,RA,Ranged,32,Ranged & Mounted,Defense Increase,D,Defending Outside City
+RA&MT-HP-wDO,1,RA,Ranged,33,Ranged & Mounted,HP Increase,D,Defending Outside City
+RA&MT-AT&DF-wDO,1,RA,Ranged,34,Ranged & Mounted,Attack & Defense Increase,D,Defending Outside City
+RA&MT-AT&HP-wDO,1,RA,Ranged,35,Ranged & Mounted,Attack & HP Increase,D,Defending Outside City
+RA&MT-AT&DF&HP-wDO,1,RA,Ranged,36,Ranged & Mounted,"Attack, Defense & HP Increase",D,Defending Outside City
+RA&MT-DF&HP-wDO,1,RA,Ranged,37,Ranged & Mounted,Defense & HP Increase,D,Defending Outside City
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+RA-AT-wSW,1,RA,Ranged,1,Ranged,Attack Increase,S,Server War
+RA-DF-wSW,1,RA,Ranged,2,Ranged,Defense Increase,S,Server War
+RA-HP-wSW,1,RA,Ranged,3,Ranged,HP Increase,S,Server War
+RA-AT&DF-wSW,1,RA,Ranged,4,Ranged,Attack & Defense Increase,S,Server War
+RA-AT&HP-wSW,1,RA,Ranged,5,Ranged,Attack & HP Increase,S,Server War
+RA-AT&DF&HP-wSW,1,RA,Ranged,6,Ranged,"Attack, Defense & HP Increase",S,Server War
+RA-DF&HP-wSW,1,RA,Ranged,7,Ranged,Defense & HP Increase,S,Server War
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+RA&SG-AT-wSW,1,RA,Ranged,11,Ranged & Siege,Attack Increase,S,Server War
+RA&SG-DF-wSW,1,RA,Ranged,12,Ranged & Siege,Defense Increase,S,Server War
+RA&SG-HP-wSW,1,RA,Ranged,13,Ranged & Siege,HP Increase,S,Server War
+RA&SG-AT&DF-wSW,1,RA,Ranged,14,Ranged & Siege,Attack & Defense Increase,S,Server War
+RA&SG-AT&HP-wSW,1,RA,Ranged,15,Ranged & Siege,Attack & HP Increase,S,Server War
+RA&SG-AT&DF&HP-wSW,1,RA,Ranged,16,Ranged & Siege,"Attack, Defense & HP Increase",S,Server War
+RA&SG-DF&HP-wSW,1,RA,Ranged,17,Ranged & Siege,Defense & HP Increase,S,Server War
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+RA&GR-AT-wSW,1,RA,Ranged,21,Ranged & Ground,Attack Increase,S,Server War
+RA&GR-DF-wSW,1,RA,Ranged,22,Ranged & Ground,Defense Increase,S,Server War
+RA&GR-HP-wSW,1,RA,Ranged,23,Ranged & Ground,HP Increase,S,Server War
+RA&GR-AT&DF-wSW,1,RA,Ranged,24,Ranged & Ground,Attack & Defense Increase,S,Server War
+RA&GR-AT&HP-wSW,1,RA,Ranged,25,Ranged & Ground,Attack & HP Increase,S,Server War
+RA&GR-AT&DF&HP-wSW,1,RA,Ranged,26,Ranged & Ground,"Attack, Defense & HP Increase",S,Server War
+RA&GR-DF&HP-wSW,1,RA,Ranged,27,Ranged & Ground,Defense & HP Increase,S,Server War
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+RA&MT-AT-wSW,1,RA,Ranged,31,Ranged & Mounted,Attack Increase,S,Server War
+RA&MT-DF-wSW,1,RA,Ranged,32,Ranged & Mounted,Defense Increase,S,Server War
+RA&MT-HP-wSW,1,RA,Ranged,33,Ranged & Mounted,HP Increase,S,Server War
+RA&MT-AT&DF-wSW,1,RA,Ranged,34,Ranged & Mounted,Attack & Defense Increase,S,Server War
+RA&MT-AT&HP-wSW,1,RA,Ranged,35,Ranged & Mounted,Attack & HP Increase,S,Server War
+RA&MT-AT&DF&HP-wSW,1,RA,Ranged,36,Ranged & Mounted,"Attack, Defense & HP Increase",S,Server War
+RA&MT-DF&HP-wSW,1,RA,Ranged,37,Ranged & Mounted,Defense & HP Increase,S,Server War
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+MT-AT-wLD,1,MT,Mounted,1,Mounted,Attack Increase,L,Leading
+MT-DF-wLD,1,MT,Mounted,2,Mounted,Defense Increase,L,Leading
+MT-HP-wLD,1,MT,Mounted,3,Mounted,HP Increase,L,Leading
+MT-AT&DF-wLD,1,MT,Mounted,4,Mounted,Attack & Defense Increase,L,Leading
+MT-AT&HP-wLD,1,MT,Mounted,5,Mounted,Attack & HP Increase,L,Leading
+MT-AT&DF&HP-wLD,1,MT,Mounted,6,Mounted,"Attack, Defense & HP Increase",L,Leading
+MT-DF&HP-wLD,1,MT,Mounted,7,Mounted,Defense & HP Increase,L,Leading
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+MT&RA-AT-wLD,1,MT,Mounted,21,Mounted & Ranged,Attack Increase,L,Leading
+MT&RA-DF-wLD,1,MT,Mounted,22,Mounted & Ranged,Defense Increase,L,Leading
+MT&RA-HP-wLD,1,MT,Mounted,23,Mounted & Ranged,HP Increase,L,Leading
+MT&RA-AT&DF-wLD,1,MT,Mounted,24,Mounted & Ranged,Attack & Defense Increase,L,Leading
+MT&RA-AT&HP-wLD,1,MT,Mounted,25,Mounted & Ranged,Attack & HP Increase,L,Leading
+MT&RA-AT&DF&HP-wLD,1,MT,Mounted,26,Mounted & Ranged,"Attack, Defense & HP Increase",L,Leading
+MT&RA-DF&HP-wLD,1,MT,Mounted,27,Mounted & Ranged,Defense & HP Increase,L,Leading
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+MT&SG-AT-wLD,1,MT,Mounted,31,Mounted & Siege,Attack Increase,L,Leading
+MT&SG-DF-wLD,1,MT,Mounted,32,Mounted & Siege,Defense Increase,L,Leading
+MT&SG-HP-wLD,1,MT,Mounted,33,Mounted & Siege,HP Increase,L,Leading
+MT&SG-AT&DF-wLD,1,MT,Mounted,34,Mounted & Siege,Attack & Defense Increase,L,Leading
+MT&SG-AT&HP-wLD,1,MT,Mounted,35,Mounted & Siege,Attack & HP Increase,L,Leading
+MT&SG-AT&DF&HP-wLD,1,MT,Mounted,36,Mounted & Siege,"Attack, Defense & HP Increase",L,Leading
+MT&SG-DF&HP-wLD,1,MT,Mounted,37,Mounted & Siege,Defense & HP Increase,L,Leading
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+MT-AT-wAT,1,MT,Mounted,1,Mounted,Attack Increase,A,Attacking
+MT-DF-wAT,1,MT,Mounted,2,Mounted,Defense Increase,A,Attacking
+MT-HP-wAT,1,MT,Mounted,3,Mounted,HP Increase,A,Attacking
+MT-AT&DF-wAT,1,MT,Mounted,4,Mounted,Attack & Defense Increase,A,Attacking
+MT-AT&HP-wAT,1,MT,Mounted,5,Mounted,Attack & HP Increase,A,Attacking
+MT-AT&DF&HP-wAT,1,MT,Mounted,6,Mounted,"Attack, Defense & HP Increase",A,Attacking
+MT-DF&HP-wAT,1,MT,Mounted,7,Mounted,Defense & HP Increase,A,Attacking
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+MT&RA-AT-wAT,1,MT,Mounted,21,Mounted & Ranged,Attack Increase,A,Attacking
+MT&RA-DF-wAT,1,MT,Mounted,22,Mounted & Ranged,Defense Increase,A,Attacking
+MT&RA-HP-wAT,1,MT,Mounted,23,Mounted & Ranged,HP Increase,A,Attacking
+MT&RA-AT&DF-wAT,1,MT,Mounted,24,Mounted & Ranged,Attack & Defense Increase,A,Attacking
+MT&RA-AT&HP-wAT,1,MT,Mounted,25,Mounted & Ranged,Attack & HP Increase,A,Attacking
+MT&RA-AT&DF&HP-wAT,1,MT,Mounted,26,Mounted & Ranged,"Attack, Defense & HP Increase",A,Attacking
+MT&RA-DF&HP-wAT,1,MT,Mounted,27,Mounted & Ranged,Defense & HP Increase,A,Attacking
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+MT&SG-AT-wAT,1,MT,Mounted,31,Mounted & Siege,Attack Increase,A,Attacking
+MT&SG-DF-wAT,1,MT,Mounted,32,Mounted & Siege,Defense Increase,A,Attacking
+MT&SG-HP-wAT,1,MT,Mounted,33,Mounted & Siege,HP Increase,A,Attacking
+MT&SG-AT&DF-wAT,1,MT,Mounted,34,Mounted & Siege,Attack & Defense Increase,A,Attacking
+MT&SG-AT&HP-wAT,1,MT,Mounted,35,Mounted & Siege,Attack & HP Increase,A,Attacking
+MT&SG-AT&DF&HP-wAT,1,MT,Mounted,36,Mounted & Siege,"Attack, Defense & HP Increase",A,Attacking
+MT&SG-DF&HP-wAT,1,MT,Mounted,37,Mounted & Siege,Defense & HP Increase,A,Attacking
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+MT-AT-wRN,1,MT,Mounted,1,Mounted,Attack Increase,R,Reinforcing
+MT-DF-wRN,1,MT,Mounted,2,Mounted,Defense Increase,R,Reinforcing
+MT-HP-wRN,1,MT,Mounted,3,Mounted,HP Increase,R,Reinforcing
+MT-AT&DF-wRN,1,MT,Mounted,4,Mounted,Attack & Defense Increase,R,Reinforcing
+MT-AT&HP-wRN,1,MT,Mounted,5,Mounted,Attack & HP Increase,R,Reinforcing
+MT-AT&DF&HP-wRN,1,MT,Mounted,6,Mounted,"Attack, Defense & HP Increase",R,Reinforcing
+MT-DF&HP-wRN,1,MT,Mounted,7,Mounted,Defense & HP Increase,R,Reinforcing
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+MT&RA-AT-wRN,1,MT,Mounted,21,Mounted & Ranged,Attack Increase,R,Reinforcing
+MT&RA-DF-wRN,1,MT,Mounted,22,Mounted & Ranged,Defense Increase,R,Reinforcing
+MT&RA-HP-wRN,1,MT,Mounted,23,Mounted & Ranged,HP Increase,R,Reinforcing
+MT&RA-AT&DF-wRN,1,MT,Mounted,24,Mounted & Ranged,Attack & Defense Increase,R,Reinforcing
+MT&RA-AT&HP-wRN,1,MT,Mounted,25,Mounted & Ranged,Attack & HP Increase,R,Reinforcing
+MT&RA-AT&DF&HP-wRN,1,MT,Mounted,26,Mounted & Ranged,"Attack, Defense & HP Increase",R,Reinforcing
+MT&RA-DF&HP-wRN,1,MT,Mounted,27,Mounted & Ranged,Defense & HP Increase,R,Reinforcing
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+MT&SG-AT-wRN,1,MT,Mounted,31,Mounted & Siege,Attack Increase,R,Reinforcing
+MT&SG-DF-wRN,1,MT,Mounted,32,Mounted & Siege,Defense Increase,R,Reinforcing
+MT&SG-HP-wRN,1,MT,Mounted,33,Mounted & Siege,HP Increase,R,Reinforcing
+MT&SG-AT&DF-wRN,1,MT,Mounted,34,Mounted & Siege,Attack & Defense Increase,R,Reinforcing
+MT&SG-AT&HP-wRN,1,MT,Mounted,35,Mounted & Siege,Attack & HP Increase,R,Reinforcing
+MT&SG-AT&DF&HP-wRN,1,MT,Mounted,36,Mounted & Siege,"Attack, Defense & HP Increase",R,Reinforcing
+MT&SG-DF&HP-wRN,1,MT,Mounted,37,Mounted & Siege,Defense & HP Increase,R,Reinforcing
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+MT-AT-wDO,1,MT,Mounted,1,Mounted,Attack Increase,D,Defending Outside City
+MT-DF-wDO,1,MT,Mounted,2,Mounted,Defense Increase,D,Defending Outside City
+MT-HP-wDO,1,MT,Mounted,3,Mounted,HP Increase,D,Defending Outside City
+MT-AT&DF-wDO,1,MT,Mounted,4,Mounted,Attack & Defense Increase,D,Defending Outside City
+MT-AT&HP-wDO,1,MT,Mounted,5,Mounted,Attack & HP Increase,D,Defending Outside City
+MT-AT&DF&HP-wDO,1,MT,Mounted,6,Mounted,"Attack, Defense & HP Increase",D,Defending Outside City
+MT-DF&HP-wDO,1,MT,Mounted,7,Mounted,Defense & HP Increase,D,Defending Outside City
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+MT&RA-AT-wDO,1,MT,Mounted,21,Mounted & Ranged,Attack Increase,D,Defending Outside City
+MT&RA-DF-wDO,1,MT,Mounted,22,Mounted & Ranged,Defense Increase,D,Defending Outside City
+MT&RA-HP-wDO,1,MT,Mounted,23,Mounted & Ranged,HP Increase,D,Defending Outside City
+MT&RA-AT&DF-wDO,1,MT,Mounted,24,Mounted & Ranged,Attack & Defense Increase,D,Defending Outside City
+MT&RA-AT&HP-wDO,1,MT,Mounted,25,Mounted & Ranged,Attack & HP Increase,D,Defending Outside City
+MT&RA-AT&DF&HP-wDO,1,MT,Mounted,26,Mounted & Ranged,"Attack, Defense & HP Increase",D,Defending Outside City
+MT&RA-DF&HP-wDO,1,MT,Mounted,27,Mounted & Ranged,Defense & HP Increase,D,Defending Outside City
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+MT&SG-AT-wDO,1,MT,Mounted,31,Mounted & Siege,Attack Increase,D,Defending Outside City
+MT&SG-DF-wDO,1,MT,Mounted,32,Mounted & Siege,Defense Increase,D,Defending Outside City
+MT&SG-HP-wDO,1,MT,Mounted,33,Mounted & Siege,HP Increase,D,Defending Outside City
+MT&SG-AT&DF-wDO,1,MT,Mounted,34,Mounted & Siege,Attack & Defense Increase,D,Defending Outside City
+MT&SG-AT&HP-wDO,1,MT,Mounted,35,Mounted & Siege,Attack & HP Increase,D,Defending Outside City
+MT&SG-AT&DF&HP-wDO,1,MT,Mounted,36,Mounted & Siege,"Attack, Defense & HP Increase",D,Defending Outside City
+MT&SG-DF&HP-wDO,1,MT,Mounted,37,Mounted & Siege,Defense & HP Increase,D,Defending Outside City
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+MT-AT-wMA,1,MT,Mounted,1,Mounted,Attack Increase,M,Monster Attacking
+MT-DF-wMA,1,MT,Mounted,2,Mounted,Defense Increase,M,Monster Attacking
+MT-HP-wMA,1,MT,Mounted,3,Mounted,HP Increase,M,Monster Attacking
+MT-AT&DF-wMA,1,MT,Mounted,4,Mounted,Attack & Defense Increase,M,Monster Attacking
+MT-AT&HP-wMA,1,MT,Mounted,5,Mounted,Attack & HP Increase,M,Monster Attacking
+MT-AT&DF&HP-wMA,1,MT,Mounted,6,Mounted,"Attack, Defense & HP Increase",M,Monster Attacking
+MT-DF&HP-wMA,1,MT,Mounted,7,Mounted,Defense & HP Increase,M,Monster Attacking
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+MT&GR-AT-wMA,1,MT,Mounted,11,Mounted & Ground,Attack Increase,M,Monster Attacking
+MT&GR-DF-wMA,1,MT,Mounted,12,Mounted & Ground,Defense Increase,M,Monster Attacking
+MT&GR-HP-wMA,1,MT,Mounted,13,Mounted & Ground,HP Increase,M,Monster Attacking
+MT&GR-AT&DF-wMA,1,MT,Mounted,14,Mounted & Ground,Attack & Defense Increase,M,Monster Attacking
+MT&GR-AT&HP-wMA,1,MT,Mounted,15,Mounted & Ground,Attack & HP Increase,M,Monster Attacking
+MT&GR-AT&DF&HP-wMA,1,MT,Mounted,16,Mounted & Ground,"Attack, Defense & HP Increase",M,Monster Attacking
+MT&GR-DF&HP-wMA,1,MT,Mounted,17,Mounted & Ground,Defense & HP Increase,M,Monster Attacking
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+MT&RA-AT-wMA,1,MT,Mounted,21,Mounted & Ranged,Attack Increase,M,Monster Attacking
+MT&RA-DF-wMA,1,MT,Mounted,22,Mounted & Ranged,Defense Increase,M,Monster Attacking
+MT&RA-HP-wMA,1,MT,Mounted,23,Mounted & Ranged,HP Increase,M,Monster Attacking
+MT&RA-AT&DF-wMA,1,MT,Mounted,24,Mounted & Ranged,Attack & Defense Increase,M,Monster Attacking
+MT&RA-AT&HP-wMA,1,MT,Mounted,25,Mounted & Ranged,Attack & HP Increase,M,Monster Attacking
+MT&RA-AT&DF&HP-wMA,1,MT,Mounted,26,Mounted & Ranged,"Attack, Defense & HP Increase",M,Monster Attacking
+MT&RA-DF&HP-wMA,1,MT,Mounted,27,Mounted & Ranged,Defense & HP Increase,M,Monster Attacking
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+MT&SG-AT-wMA,1,MT,Mounted,31,Mounted & Siege,Attack Increase,M,Monster Attacking
+MT&SG-DF-wMA,1,MT,Mounted,32,Mounted & Siege,Defense Increase,M,Monster Attacking
+MT&SG-HP-wMA,1,MT,Mounted,33,Mounted & Siege,HP Increase,M,Monster Attacking
+MT&SG-AT&DF-wMA,1,MT,Mounted,34,Mounted & Siege,Attack & Defense Increase,M,Monster Attacking
+MT&SG-AT&HP-wMA,1,MT,Mounted,35,Mounted & Siege,Attack & HP Increase,M,Monster Attacking
+MT&SG-AT&DF&HP-wMA,1,MT,Mounted,36,Mounted & Siege,"Attack, Defense & HP Increase",M,Monster Attacking
+MT&SG-DF&HP-wMA,1,MT,Mounted,37,Mounted & Siege,Defense & HP Increase,M,Monster Attacking
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+SG-AT-wLD,1,SG,Siege,1,Siege,Attack Increase,L,Leading
+SG-DF-wLD,1,SG,Siege,2,Siege,Defense Increase,L,Leading
+SG-HP-wLD,1,SG,Siege,3,Siege,HP Increase,L,Leading
+SG-AT&DF-wLD,1,SG,Siege,4,Siege,Attack & Defense Increase,L,Leading
+SG-AT&HP-wLD,1,SG,Siege,5,Siege,Attack & HP Increase,L,Leading
+SG-AT&DF&HP-wLD,1,SG,Siege,6,Siege,"Attack, Defense & HP Increase",L,Leading
+SG-DF&HP-wLD,1,SG,Siege,7,Siege,Defense & HP Increase,L,Leading
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+SG&GR-AT-wLD,1,SG,Siege,21,Siege & Ground,Attack Increase,L,Leading
+SG&GR-DF-wLD,1,SG,Siege,22,Siege & Ground,Defense Increase,L,Leading
+SG&GR-HP-wLD,1,SG,Siege,23,Siege & Ground,HP Increase,L,Leading
+SG&GR-AT&DF-wLD,1,SG,Siege,24,Siege & Ground,Attack & Defense Increase,L,Leading
+SG&GR-AT&HP-wLD,1,SG,Siege,25,Siege & Ground,Attack & HP Increase,L,Leading
+SG&GR-AT&DF&HP-wLD,1,SG,Siege,26,Siege & Ground,"Attack, Defense & HP Increase",L,Leading
+SG&GR-DF&HP-wLD,1,SG,Siege,27,Siege & Ground,Defense & HP Increase,L,Leading
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+SG&MT-AT-wLD,1,SG,Siege,31,Siege & Mounted,Attack Increase,L,Leading
+SG&MT-DF-wLD,1,SG,Siege,32,Siege & Mounted,Defense Increase,L,Leading
+SG&MT-HP-wLD,1,SG,Siege,33,Siege & Mounted,HP Increase,L,Leading
+SG&MT-AT&DF-wLD,1,SG,Siege,34,Siege & Mounted,Attack & Defense Increase,L,Leading
+SG&MT-AT&HP-wLD,1,SG,Siege,35,Siege & Mounted,Attack & HP Increase,L,Leading
+SG&MT-AT&DF&HP-wLD,1,SG,Siege,36,Siege & Mounted,"Attack, Defense & HP Increase",L,Leading
+SG&MT-DF&HP-wLD,1,SG,Siege,37,Siege & Mounted,Defense & HP Increase,L,Leading
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+SG-AT-wAT,1,SG,Siege,1,Siege,Attack Increase,A,Attacking
+SG-DF-wAT,1,SG,Siege,2,Siege,Defense Increase,A,Attacking
+SG-HP-wAT,1,SG,Siege,3,Siege,HP Increase,A,Attacking
+SG-AT&DF-wAT,1,SG,Siege,4,Siege,Attack & Defense Increase,A,Attacking
+SG-AT&HP-wAT,1,SG,Siege,5,Siege,Attack & HP Increase,A,Attacking
+SG-AT&DF&HP-wAT,1,SG,Siege,6,Siege,"Attack, Defense & HP Increase",A,Attacking
+SG-DF&HP-wAT,1,SG,Siege,7,Siege,Defense & HP Increase,A,Attacking
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+SG&GR-AT-wAT,1,SG,Siege,21,Siege & Ground,Attack Increase,A,Attacking
+SG&GR-DF-wAT,1,SG,Siege,22,Siege & Ground,Defense Increase,A,Attacking
+SG&GR-HP-wAT,1,SG,Siege,23,Siege & Ground,HP Increase,A,Attacking
+SG&GR-AT&DF-wAT,1,SG,Siege,24,Siege & Ground,Attack & Defense Increase,A,Attacking
+SG&GR-AT&HP-wAT,1,SG,Siege,25,Siege & Ground,Attack & HP Increase,A,Attacking
+SG&GR-AT&DF&HP-wAT,1,SG,Siege,26,Siege & Ground,"Attack, Defense & HP Increase",A,Attacking
+SG&GR-DF&HP-wAT,1,SG,Siege,27,Siege & Ground,Defense & HP Increase,A,Attacking
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+SG&MT-AT-wAT,1,SG,Siege,31,Siege & Mounted,Attack Increase,A,Attacking
+SG&MT-DF-wAT,1,SG,Siege,32,Siege & Mounted,Defense Increase,A,Attacking
+SG&MT-HP-wAT,1,SG,Siege,33,Siege & Mounted,HP Increase,A,Attacking
+SG&MT-AT&DF-wAT,1,SG,Siege,34,Siege & Mounted,Attack & Defense Increase,A,Attacking
+SG&MT-AT&HP-wAT,1,SG,Siege,35,Siege & Mounted,Attack & HP Increase,A,Attacking
+SG&MT-AT&DF&HP-wAT,1,SG,Siege,36,Siege & Mounted,"Attack, Defense & HP Increase",A,Attacking
+SG&MT-DF&HP-wAT,1,SG,Siege,37,Siege & Mounted,Defense & HP Increase,A,Attacking
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+SG-AT-wRN,1,SG,Siege,1,Siege,Attack Increase,R,Reinforcing
+SG-DF-wRN,1,SG,Siege,2,Siege,Defense Increase,R,Reinforcing
+SG-HP-wRN,1,SG,Siege,3,Siege,HP Increase,R,Reinforcing
+SG-AT&DF-wRN,1,SG,Siege,4,Siege,Attack & Defense Increase,R,Reinforcing
+SG-AT&HP-wRN,1,SG,Siege,5,Siege,Attack & HP Increase,R,Reinforcing
+SG-AT&DF&HP-wRN,1,SG,Siege,6,Siege,"Attack, Defense & HP Increase",R,Reinforcing
+SG-DF&HP-wRN,1,SG,Siege,7,Siege,Defense & HP Increase,R,Reinforcing
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+SG&GR-AT-wRN,1,SG,Siege,21,Siege & Ground,Attack Increase,R,Reinforcing
+SG&GR-DF-wRN,1,SG,Siege,22,Siege & Ground,Defense Increase,R,Reinforcing
+SG&GR-HP-wRN,1,SG,Siege,23,Siege & Ground,HP Increase,R,Reinforcing
+SG&GR-AT&DF-wRN,1,SG,Siege,24,Siege & Ground,Attack & Defense Increase,R,Reinforcing
+SG&GR-AT&HP-wRN,1,SG,Siege,25,Siege & Ground,Attack & HP Increase,R,Reinforcing
+SG&GR-AT&DF&HP-wRN,1,SG,Siege,26,Siege & Ground,"Attack, Defense & HP Increase",R,Reinforcing
+SG&GR-DF&HP-wRN,1,SG,Siege,27,Siege & Ground,Defense & HP Increase,R,Reinforcing
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+SG&MT-AT-wRN,1,SG,Siege,31,Siege & Mounted,Attack Increase,R,Reinforcing
+SG&MT-DF-wRN,1,SG,Siege,32,Siege & Mounted,Defense Increase,R,Reinforcing
+SG&MT-HP-wRN,1,SG,Siege,33,Siege & Mounted,HP Increase,R,Reinforcing
+SG&MT-AT&DF-wRN,1,SG,Siege,34,Siege & Mounted,Attack & Defense Increase,R,Reinforcing
+SG&MT-AT&HP-wRN,1,SG,Siege,35,Siege & Mounted,Attack & HP Increase,R,Reinforcing
+SG&MT-AT&DF&HP-wRN,1,SG,Siege,36,Siege & Mounted,"Attack, Defense & HP Increase",R,Reinforcing
+SG&MT-DF&HP-wRN,1,SG,Siege,37,Siege & Mounted,Defense & HP Increase,R,Reinforcing
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+SG-AT-wDO,1,SG,Siege,1,Siege,Attack Increase,D,Defending Outside City
+SG-DF-wDO,1,SG,Siege,2,Siege,Defense Increase,D,Defending Outside City
+SG-HP-wDO,1,SG,Siege,3,Siege,HP Increase,D,Defending Outside City
+SG-AT&DF-wDO,1,SG,Siege,4,Siege,Attack & Defense Increase,D,Defending Outside City
+SG-AT&HP-wDO,1,SG,Siege,5,Siege,Attack & HP Increase,D,Defending Outside City
+SG-AT&DF&HP-wDO,1,SG,Siege,6,Siege,"Attack, Defense & HP Increase",D,Defending Outside City
+SG-DF&HP-wDO,1,SG,Siege,7,Siege,Defense & HP Increase,D,Defending Outside City
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+SG&GR-AT-wDO,1,SG,Siege,21,Siege & Ground,Attack Increase,D,Defending Outside City
+SG&GR-DF-wDO,1,SG,Siege,22,Siege & Ground,Defense Increase,D,Defending Outside City
+SG&GR-HP-wDO,1,SG,Siege,23,Siege & Ground,HP Increase,D,Defending Outside City
+SG&GR-AT&DF-wDO,1,SG,Siege,24,Siege & Ground,Attack & Defense Increase,D,Defending Outside City
+SG&GR-AT&HP-wDO,1,SG,Siege,25,Siege & Ground,Attack & HP Increase,D,Defending Outside City
+SG&GR-AT&DF&HP-wDO,1,SG,Siege,26,Siege & Ground,"Attack, Defense & HP Increase",D,Defending Outside City
+SG&GR-DF&HP-wDO,1,SG,Siege,27,Siege & Ground,Defense & HP Increase,D,Defending Outside City
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,
+SG&MT-AT-wDO,1,SG,Siege,31,Siege & Mounted,Attack Increase,D,Defending Outside City
+SG&MT-DF-wDO,1,SG,Siege,32,Siege & Mounted,Defense Increase,D,Defending Outside City
+SG&MT-HP-wDO,1,SG,Siege,33,Siege & Mounted,HP Increase,D,Defending Outside City
+SG&MT-AT&DF-wDO,1,SG,Siege,34,Siege & Mounted,Attack & Defense Increase,D,Defending Outside City
+SG&MT-AT&HP-wDO,1,SG,Siege,35,Siege & Mounted,Attack & HP Increase,D,Defending Outside City
+SG&MT-AT&DF&HP-wDO,1,SG,Siege,36,Siege & Mounted,"Attack, Defense & HP Increase",D,Defending Outside City
+SG&MT-DF&HP-wDO,1,SG,Siege,37,Siege & Mounted,Defense & HP Increase,D,Defending Outside City
+Future,0,,,,,,,
+Future,0,,,,,,,
+Future,0,,,,,,,

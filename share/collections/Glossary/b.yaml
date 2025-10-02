@@ -1,0 +1,49 @@
+# yaml-language-server: $schema=schema.json
+
+glossary:
+  - term: Blazon
+    related_terms:
+      - Buff
+      - Refines
+    definition: >-
+      You get 4 groups of blazons, one for each troop type, available by clicking on the buildings that train troops.
+      Each group has six individual blazons, and three presets for using them.
+        troop type offers two sets of blazons. You get additional 'buffs' if you fill the preset in use with blazons that
+        all come from the same set. Each Blazon can be upgraded, by combining other blazons into it. This results in additional, entirely
+        random buffs being added.  This lottery process is one of the more fustrating in the Game. Each can also be Cultivated, enhancing
+        the buffs added through the lottery.
+  - term: Blood of Ares
+    synonyms:
+      - BoA
+    definition: >-
+      Blood of Ares is one of several items that can be either won or purchased in the game.  This item is used primarily for activating a
+      General's Ascending Attributes, but can also be used to unlock certain attributes of Senate seats.
+    related_terms:
+      - Ascending Attributes
+      - General
+      - Senate
+  - term: Basic Attribute
+    definition: >-
+      One of 'Politics', 'Leadership', 'Attack', or 'Defense'.  These attributes are built in to each 'General' and indirectly provide
+      a variety of different 'Buffs.'
+    related_terms:
+      - Politics
+      - Leadership
+      - Attack
+      - Defense
+      - General
+      - Buff
+  - term: Buff
+    definition: >-
+      This is a slang term that indicates that an attribute is being increased.  The implication is that it is strong, or "Buff" after this
+      multiplier has been applied.  Despite the use of the word 'multiplier' here in the definition, Buffs are only *sometimes* in fact actually
+      a multiplication operation on the base statistic.  A 'Flat Buff' is an addition opeation, the resulting statistic is <Original Value> + <Buff Value>.
+      A Percentage or Standard Buff is a multiplicative operation: <Original Value> + <Original Value> * <Buff Value expressed as a decimal>.
+      So for example a "25% increase" Buff would be <Original Value> + <Original Value> * 0.25.
+    related_terms:
+      - Debuff
+  - term: bubble
+    synonyms:
+      - truce agreement
+    definition: >-
+      A slang term for the game feature allowing you to shield your keep and subordinate cities from attack.

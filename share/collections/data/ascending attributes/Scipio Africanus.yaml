@@ -1,0 +1,89 @@
+---
+ascending:
+  - level: "red1"
+    buffs:
+      - attribute: Attack
+        conditions:
+          - Attacking
+        targetedType: Ground Troops
+        value:
+          number: 15
+          unit: percentage
+      - attribute: Defense
+        conditions:
+          - Attacking
+        targetedType: Mounted Troops
+        value:
+          number: 15
+          unit: percentage
+      - attribute: Defense
+        conditions:
+          - Attacking
+        targetedType: Ground Troops
+        value:
+          number: 15
+          unit: percentage
+  - level: "red2"
+    buffs:
+      - attribute: Death to Wounded
+        conditions:
+          - Attacking
+        value:
+          number: 10
+          unit: percentage
+  - level: "red3"
+    buffs:
+      - attribute: Rally Capacity
+        conditions:
+          - When Rallying
+        value:
+          number: 8
+          unit: percentage
+  - level: "red4"
+    buffs:
+      - attribute: Defense
+        conditions:
+          - Attacking
+        targetedType: Mounted Troops
+        value:
+          number: 35
+          unit: percentage
+      - attribute: Defense
+        conditions:
+          - Attacking
+        targetedType: Ground Troops
+        value:
+          number: 35
+          unit: percentage
+  - level: "red5"
+    buffs:
+      - attribute: Attack
+        conditions:
+          - Attacking
+        targetedType: Ground Troops
+        value:
+          number: 20
+          unit: percentage
+      - attribute: HP
+        conditions:
+          - Attacking
+        targetedType: Ground Troops
+        value:
+          number: 15
+          unit: percentage
+      - attribute: Defense
+        conditions:
+          - Attacking
+        targetedType: Mounted Troops
+        value:
+          number: 10
+          unit: percentage
+      - attribute: HP
+        conditions:
+          - Attacking
+        targetedType: Ground Troops
+        value:
+          number: 10
+          unit: percentage
+general: Scipio Africanus
+id: Scipio Africanus

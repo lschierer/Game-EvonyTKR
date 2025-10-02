@@ -1,0 +1,75 @@
+name: Merlin
+generals:
+  - King Arthur
+  - Alfred the Great
+  - Beowulf
+levels:
+  - category: War
+    type: personal
+    buffs:
+      - attribute: March Size
+        value:
+          number: 5
+          unit: percentage
+  - category: Cooperation
+    type: personal
+    buffs:
+      - attribute: HP
+        targetedType: Ranged Troops
+        conditions:
+          - Marching
+        value:
+          number: 10
+          unit: percentage
+  - category: Peace
+    type: passive
+    buffs:
+      - attribute: Training Speed
+        targetedType: Ranged Troops
+        value:
+          number: 5
+          unit: percentage
+  - category: Faith
+    type: personal
+    buffs:
+      - attribute: Defense
+        targetedType: Ranged Troops
+        conditions:
+          - When Rallying
+        value:
+          number: 10
+          unit: percentage
+  - category: Faith
+    type: passive
+    buffs:
+      - attribute: Marching Speed
+        value:
+          number: 10
+          unit: percentage
+  - category: Honor
+    type: personal
+    buffs:
+      - attribute: HP
+        targetedType: Ranged Troops
+        conditions:
+          - When Rallying
+        value:
+          number: 5
+          unit: percentage
+  - category: Civilization
+    type: personal
+    buffs:
+      - attribute: Attack
+        targetedType: Ranged Troops
+        conditions:
+          - Marching
+        value:
+          number: 5
+          unit: percentage
+      - attribute: Defense
+        targetedType: Ranged Troops
+        conditions:
+          - Marching
+        value:
+          number: 5
+          unit: percentage

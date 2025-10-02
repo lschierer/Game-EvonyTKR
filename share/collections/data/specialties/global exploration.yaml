@@ -1,0 +1,118 @@
+---
+levels:
+  - buffs:
+      - attribute: Attack
+        passive: 0
+        targetedType: Ranged Troops
+        value:
+          number: 4
+          unit: percentage
+      - attribute: HP
+        passive: 0
+        targetedType: Ranged Troops
+        value:
+          number: 3
+          unit: percentage
+      - attribute: March Size
+        passive: 0
+        value:
+          number: 1
+          unit: percentage
+    level: Green
+    text: >-
+      Ranged Troop Attack +4%.
+      Ranged Troop HP +3%.
+      March Size Capacity +1%.
+  - buffs:
+      - attribute: Attack
+        passive: 0
+        targetedType: Ranged Troops
+        value:
+          number: 5
+          unit: percentage
+      - attribute: HP
+        passive: 0
+        targetedType: Ranged Troops
+        value:
+          number: 3
+          unit: percentage
+      - attribute: March Size
+        passive: 0
+        value:
+          number: 1
+          unit: percentage
+    level: Blue
+    text: >-
+      Ranged Troop Attack +5%.
+      Ranged Troop HP +3%.
+      March Size Capacity +1%.
+  - buffs:
+      - attribute: Attack
+        passive: 0
+        targetedType: Ranged Troops
+        value:
+          number: 9
+          unit: percentage
+      - attribute: HP
+        passive: 0
+        targetedType: Ranged Troops
+        value:
+          number: 6
+          unit: percentage
+      - attribute: March Size
+        passive: 0
+        value:
+          number: 2
+          unit: percentage
+    level: Purple
+    text: >-
+      Ranged Troop Attack +9%.
+      Ranged Troop HP +6%.
+      March Size Capacity +2%.
+  - buffs:
+      - attribute: Attack
+        passive: 0
+        targetedType: Ranged Troops
+        value:
+          number: 9
+          unit: percentage
+      - attribute: HP
+        passive: 0
+        targetedType: Ranged Troops
+        value:
+          number: 6
+          unit: percentage
+      - attribute: March Size
+        passive: 0
+        value:
+          number: 2
+          unit: percentage
+    level: Orange
+    text: >-
+      Ranged Troop Attack +9%.
+      Ranged Troop HP +6%.
+      March Size Capacity +2%.
+  - buffs:
+      - attribute: Attack
+        passive: 0
+        targetedType: Ranged Troops
+        value:
+          number: 18
+          unit: percentage
+      - attribute: HP
+        passive: 0
+        targetedType: Ranged Troops
+        value:
+          number: 12
+          unit: percentage
+      - attribute: March Size
+        passive: 0
+        value:
+          number: 4
+          unit: percentage
+    level: Gold
+    text: >-
+      Ranged Troop Attack +18%.
+      Ranged Troop HP +12%.
+      March Size Capacity +4%.
+name: Global Exploration

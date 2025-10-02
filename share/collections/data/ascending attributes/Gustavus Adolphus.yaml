@@ -1,0 +1,57 @@
+ascending:
+  - level: red1
+    buffs:
+      - attribute: HP
+        conditions:
+          - Enemy
+        targetedType: Ranged Troops
+        value:
+          number: -15
+          unit: percentage
+      - attribute: HP
+        conditions:
+          - Enemy
+        targetedType: Siege Machines
+        value:
+          number: -15
+          unit: percentage
+  - level: red2
+    buffs:
+      - attribute: Death to Wounded
+        conditions:
+          - Marching
+        value:
+          number: 8
+          unit: percentage
+  - level: red3
+    buffs:
+      - attribute: March Size
+        value:
+          number: 10
+          unit: percentage
+  - level: red4
+    buffs:
+      - attribute: Attack
+        targetedType: Ranged Troops
+        value:
+          number: 10
+          unit: percentage
+      - attribute: Attack
+        targetedType: Siege Machines
+        value:
+          number: 10
+          unit: percentage
+  - level: red5
+    buffs:
+      - attribute: Attack
+        targetedType: Ranged Troops
+        value:
+          number: 15
+          unit: percentage
+      - attribute: Attack
+        targetedType: Siege Machines
+        value:
+          number: 15
+          unit: percentage
+general: Gustavus Adolphus
+id: Gustavus Adolphus

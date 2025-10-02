@@ -1,0 +1,53 @@
+---
+name: Guard of Owl and Serpent
+buffs:
+  - attribute: Attack
+    conditions:
+      - Attacking
+    targetedType: Siege Machines
+    value:
+      number: 35
+      unit: percentage
+  - attribute: Defense
+    conditions:
+      - Attacking
+    targetedType: Siege Machines
+    value:
+      number: 35
+      unit: percentage
+  - attribute: Attack
+    conditions:
+      - brings a dragon
+      - brings a spiritual beast
+      - Attacking
+    targetedType: Ranged Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: HP
+    conditions:
+      - brings a dragon
+      - brings a spiritual beast
+      - Attacking
+    targetedType: Ranged Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: Attack
+    conditions:
+      - brings a dragon
+      - brings a spiritual beast
+      - Attacking
+    targetedType: Siege Machines
+    value:
+      number: 10
+      unit: percentage
+  - attribute: HP
+    conditions:
+      - brings a dragon
+      - brings a spiritual beast
+      - Attacking
+    targetedType: Siege Machines
+    value:
+      number: 10
+      unit: percentage

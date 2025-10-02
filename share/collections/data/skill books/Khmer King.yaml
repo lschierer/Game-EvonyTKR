@@ -1,0 +1,40 @@
+---
+name: Khmer King
+text: >-
+  Increases mounted troops' attack by 45% and increases ground troops and mounted troops' defense and HP by 25% when General is leading the army to attack.
+buffs:
+  - attribute: Attack
+    conditions:
+      - Attacking
+    targetedType: Mounted Troops
+    value:
+      number: 45
+      unit: percentage
+  - attribute: Defense
+    conditions:
+      - Attacking
+    targetedType: Ground Troops
+    value:
+      number: 25
+      unit: percentage
+  - attribute: Defense
+    conditions:
+      - Attacking
+    targetedType: Mounted Troops
+    value:
+      number: 25
+      unit: percentage
+  - attribute: HP
+    conditions:
+      - Attacking
+    targetedType: Ground Troops
+    value:
+      number: 25
+      unit: percentage
+  - attribute: HP
+    conditions:
+      - Attacking
+    targetedType: Mounted Troops
+    value:
+      number: 25
+      unit: percentage

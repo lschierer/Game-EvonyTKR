@@ -1,0 +1,117 @@
+name: Battle of Nesjar
+levels:
+  - level: Green
+    buffs:
+      - attribute: Attack
+        targetedType: Mounted Troops
+        conditions:
+          - Attacking
+        value:
+          number: 4
+          unit: percentage
+      - attribute: Defense
+        targetedType: Mounted Troops
+        conditions:
+          - Attacking
+        value:
+          number: 3
+          unit: percentage
+      - attribute: HP
+        targetedType: Mounted Troops
+        conditions:
+          - Attacking
+        value:
+          number: 3
+          unit: percentage
+  - level: Blue
+    buffs:
+      - attribute: Attack
+        targetedType: Mounted Troops
+        conditions:
+          - Attacking
+        value:
+          number: 6
+          unit: percentage
+      - attribute: Defense
+        targetedType: Mounted Troops
+        conditions:
+          - Attacking
+        value:
+          number: 4
+          unit: percentage
+      - attribute: HP
+        targetedType: Mounted Troops
+        conditions:
+          - Attacking
+        value:
+          number: 4
+          unit: percentage
+  - level: Purple
+    buffs:
+      - attribute: Attack
+        targetedType: Mounted Troops
+        conditions:
+          - Attacking
+        value:
+          number: 10
+          unit: percentage
+      - attribute: Defense
+        targetedType: Mounted Troops
+        conditions:
+          - Attacking
+        value:
+          number: 7
+          unit: percentage
+      - attribute: HP
+        targetedType: Mounted Troops
+        conditions:
+          - Attacking
+        value:
+          number: 7
+          unit: percentage
+  - level: Orange
+    buffs:
+      - attribute: Attack
+        targetedType: Mounted Troops
+        conditions:
+          - Attacking
+        value:
+          number: 10
+          unit: percentage
+      - attribute: Defense
+        targetedType: Mounted Troops
+        conditions:
+          - Attacking
+        value:
+          number: 7
+          unit: percentage
+      - attribute: HP
+        targetedType: Mounted Troops
+        conditions:
+          - Attacking
+        value:
+          number: 7
+          unit: percentage
+  - level: Gold
+    buffs:
+      - attribute: Attack
+        targetedType: Mounted Troops
+        conditions:
+          - Attacking
+        value:
+          number: 20
+          unit: percentage
+      - attribute: Defense
+        targetedType: Mounted Troops
+        conditions:
+          - Attacking
+        value:
+          number: 14
+          unit: percentage
+      - attribute: HP
+        targetedType: Mounted Troops
+        conditions:
+          - Attacking
+        value:
+          number: 14
+          unit: percentage

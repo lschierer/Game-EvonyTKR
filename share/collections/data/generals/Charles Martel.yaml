@@ -1,0 +1,25 @@
+ascending: true
+basic_attributes:
+  attack:
+    base: 103
+    increment: 8.16
+  defense:
+    base: 116
+    increment: 8.33
+  leadership:
+    base: 110
+    increment: 8.42
+  politics:
+    base: 107
+    increment: 8.64
+book: Chivalry
+specialties:
+  - Ground Troop Defense
+  - Trapping
+  - Ruler
+  - Battle of Tours
+stars: red5
+type:
+  - mayor
+general: Charles Martel
+name: Charles Martel

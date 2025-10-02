@@ -1,0 +1,87 @@
+name: Battle of Megiddo
+levels:
+  - level: Green
+    buffs:
+      - attribute: Attack
+        targetedType: Ranged Troops
+        value:
+          number: 0
+          unit: percentage
+      - attribute: Defense
+        targetedType: Ranged Troops
+        value:
+          number: 0
+          unit: percentage
+      - attribute: Defense
+        targetedType: Ground Troops
+        value:
+          number: 0
+          unit: percentage
+  - level: Blue
+    buffs:
+      - attribute: Attack
+        targetedType: Ranged Troops
+        value:
+          number: 0
+          unit: percentage
+      - attribute: Defense
+        targetedType: Ranged Troops
+        value:
+          number: 0
+          unit: percentage
+      - attribute: Defense
+        targetedType: Ground Troops
+        value:
+          number: 0
+          unit: percentage
+  - level: Purple
+    buffs:
+      - attribute: Attack
+        targetedType: Ranged Troops
+        value:
+          number: 0
+          unit: percentage
+      - attribute: Defense
+        targetedType: Ranged Troops
+        value:
+          number: 0
+          unit: percentage
+      - attribute: Defense
+        targetedType: Ground Troops
+        value:
+          number: 0
+          unit: percentage
+  - level: Orange
+    buffs:
+      - attribute: Attack
+        targetedType: Ranged Troops
+        value:
+          number: 0
+          unit: percentage
+      - attribute: Defense
+        targetedType: Ranged Troops
+        value:
+          number: 0
+          unit: percentage
+      - attribute: Defense
+        targetedType: Ground Troops
+        value:
+          number: 0
+          unit: percentage
+  - level: Gold
+    buffs:
+      - attribute: Attack
+        targetedType: Ranged Troops
+        value:
+          number: 20
+          unit: percentage
+      - attribute: Defense
+        targetedType: Ranged Troops
+        value:
+          number: 20
+          unit: percentage
+      - attribute: Defense
+        targetedType: Ground Troops
+        value:
+          number: 20
+          unit: percentage

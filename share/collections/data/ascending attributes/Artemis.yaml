@@ -1,0 +1,116 @@
+---
+ascending:
+- buffs:
+  - attribute: Defense
+    conditions:
+    - Attacking
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 20
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - Attacking
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 20
+      unit: percentage
+  level: red1
+  text: Attacking Mounted Troop Defense +20% and HP +20%
+- buffs:
+  - attribute: Death to Wounded
+    conditions:
+    - Attacking
+    passive: 0
+    value:
+      number: 8
+      unit: percentage
+  level: red2
+  text: Attacking Troop Death into Wounded Rate +8%
+- buffs:
+  - attribute: Attack
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 30
+      unit: percentage
+  - attribute: Defense
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 15
+      unit: percentage
+  - attribute: Defense
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 15
+      unit: percentage
+  level: red3
+  text: Mounted Troop Attack +30%, Mounted Troop and Ground Troop Defense +15%
+- buffs:
+  - attribute: Attack
+    conditions:
+    - Attacking
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 20
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - Attacking
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 20
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - Attacking
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 20
+      unit: percentage
+  level: red4
+  text: Attacking Mounted Troop Attack +20%, Attacking Ground Troop and Mounted Troop HP +20%
+- buffs:
+  - attribute: Attack
+    conditions:
+    - Attacking
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 40
+      unit: percentage
+  - attribute: Attack
+    conditions:
+    - Attacking
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 40
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - Attacking
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 25
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - Attacking
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 25
+      unit: percentage
+  level: red5
+  text: When attacking, Ground Troop and Mounted Troop Attack +40%, Mounted Troop Defense and HP +25%
+general: Artemis
+id: Artemis

@@ -1,0 +1,8 @@
+name: Level 4 Siege Machine Defense
+text: Increases Siege Machine by 25% when General is leading the army.
+buffs:
+  - attribute: Defense
+    targetedType: Siege Machines
+    value:
+      number: 25
+      unit: percentage

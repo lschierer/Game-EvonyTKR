@@ -1,0 +1,78 @@
+---
+name: Battle of Guinegate
+levels:
+  - level: "Green"
+    buffs:
+      - attribute: Attack
+        targetedType: Mounted Troops
+        value:
+          number: 3
+          unit: percentage
+      - attribute: Defense
+        conditions:
+          - Enemy
+          - Attacking
+        targetedType: Ranged Troops
+        value:
+          number: 3
+          unit: percentage
+  - level: "Blue"
+    buffs:
+      - attribute: Attack
+        targetedType: Mounted Troops
+        value:
+          number: 3
+          unit: percentage
+      - attribute: Defense
+        conditions:
+          - Enemy
+          - Attacking
+        targetedType: Ranged Troops
+        value:
+          number: 3
+          unit: percentage
+  - level: "Purple"
+    buffs:
+      - attribute: Attack
+        targetedType: Mounted Troops
+        value:
+          number: 6
+          unit: percentage
+      - attribute: Defense
+        conditions:
+          - Enemy
+          - Attacking
+        targetedType: Ranged Troops
+        value:
+          number: 6
+          unit: percentage
+  - level: "Orange"
+    buffs:
+      - attribute: Attack
+        targetedType: Mounted Troops
+        value:
+          number: 6
+          unit: percentage
+      - attribute: Defense
+        conditions:
+          - Enemy
+          - Attacking
+        targetedType: Ranged Troops
+        value:
+          number: 6
+          unit: percentage
+  - level: "Gold"
+    buffs:
+      - attribute: Attack
+        targetedType: Mounted Troops
+        value:
+          number: 12
+          unit: percentage
+      - attribute: Defense
+        conditions:
+          - Enemy
+          - Attacking
+        targetedType: Ranged Troops
+        value:
+          number: 12
+          unit: percentage

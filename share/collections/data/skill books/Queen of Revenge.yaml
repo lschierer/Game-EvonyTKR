@@ -1,0 +1,16 @@
+---
+name: Queen of Revenge
+buffs:
+  - attribute: Attack
+    conditions:
+      - Attacking
+    targetedType: Ranged Troops
+    value:
+      number: 35
+      unit: percentage
+  - attribute: Rally Capacity
+    conditions:
+      - When Rallying
+    value:
+      number: 5
+      unit: percentage

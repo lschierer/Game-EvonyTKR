@@ -1,0 +1,72 @@
+name: Pacify
+levels:
+  - level: Green
+    buffs:
+      - attribute: SubCity Gold Production
+        conditions:
+          - When City Mayor for this SubCity
+        value:
+          number: 4
+          unit: percentage
+      - attribute: SubCity Construction Speed
+        conditions:
+          - When City Mayor for this SubCity
+        value:
+          number: 4
+          unit: percentage
+  - level: Blue
+    buffs:
+      - attribute: SubCity Gold Production
+        conditions:
+          - When City Mayor for this SubCity
+        value:
+          number: 4
+          unit: percentage
+      - attribute: SubCity Construction Speed
+        conditions:
+          - When City Mayor for this SubCity
+        value:
+          number: 4
+          unit: percentage
+  - level: Purple
+    buffs:
+      - attribute: SubCity Gold Production
+        conditions:
+          - When City Mayor for this SubCity
+        value:
+          number: 7
+          unit: percentage
+      - attribute: SubCity Construction Speed
+        conditions:
+          - When City Mayor for this SubCity
+        value:
+          number: 7
+          unit: percentage
+  - level: Orange
+    buffs:
+      - attribute: SubCity Gold Production
+        conditions:
+          - When City Mayor for this SubCity
+        value:
+          number: 7
+          unit: percentage
+      - attribute: SubCity Construction Speed
+        conditions:
+          - When City Mayor for this SubCity
+        value:
+          number: 7
+          unit: percentage
+  - level: Gold
+    buffs:
+      - attribute: SubCity Gold Production
+        conditions:
+          - When City Mayor for this SubCity
+        value:
+          number: 14
+          unit: percentage
+      - attribute: SubCity Construction Speed
+        conditions:
+          - When City Mayor for this SubCity
+        value:
+          number: 14
+          unit: percentage

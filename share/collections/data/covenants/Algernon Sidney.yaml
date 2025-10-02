@@ -1,0 +1,83 @@
+---
+generals:
+  - William Wallace
+  - John Churchill
+  - Merlin
+levels:
+  - buffs:
+      - attribute: Attack
+        conditions:
+          - Marching
+        passive: 0
+        targetedType: Ranged Troops
+        value:
+          number: 5
+          unit: percentage
+    category: war
+    text: Marching Ranged Troop Attack +5% (Local)
+  - buffs:
+      - attribute: March Size
+        passive: 0
+        value:
+          number: 8
+          unit: percentage
+      - attribute: Marching Speed
+        passive: 1
+        value:
+          number: 10
+          unit: percentage
+    category: faith
+    text: Marching Size Capacity +8% (Local);;March Speed +10% (Global)
+  - buffs:
+      - attribute: Attack
+        conditions:
+          - Reinforcing
+        passive: 1
+        targetedType: Ranged Troops
+        value:
+          number: 5
+          unit: percentage
+    category: cooperation
+    text: Reinforcing Ranged Troop Attack +5% (Global)
+  - buffs:
+      - attribute: Attack
+        conditions:
+          - Marching
+        passive: 0
+        targetedType: Ranged Troops
+        value:
+          number: 5
+          unit: percentage
+      - attribute: HP
+        conditions:
+          - Marching
+        passive: 0
+        targetedType: Ranged Troops
+        value:
+          number: 10
+          unit: percentage
+    category: civilization
+    text: Marching Ranged Troop Attack +5% (Local);;Marching Ranged Troop HP +10% (Local)
+  - buffs:
+      - attribute: Defense
+        conditions:
+          - Marching
+        passive: 0
+        targetedType: Ranged Troops
+        value:
+          number: 5
+          unit: percentage
+    category: honor
+    text: Marching Ranged Troop Defense +5% (Local)
+  - buffs:
+      - attribute: Attack
+        conditions:
+          - Marching
+        passive: 0
+        targetedType: Ranged Troops
+        value:
+          number: 5
+          unit: percentage
+    category: peace
+    text: Marching Ranged Troop Attack +5% (Local)
+name: Algernon Sidney

@@ -1,0 +1,104 @@
+---
+ascending:
+- buffs:
+  - attribute: Attack
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 15
+      unit: percentage
+  - attribute: HP
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 10
+      unit: percentage
+  level: red1
+  text: Ranged Troop Attack +15% and HP +10%
+- buffs:
+  - attribute: Death to Wounded
+    conditions:
+    - Marching
+    passive: 0
+    value:
+      number: 8
+      unit: percentage
+  level: red2
+  text: Marching Troop Death into Wounded Rate +8%
+- buffs:
+  - attribute: Attack
+    conditions:
+    - Attacking
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 25
+      unit: percentage
+  - attribute: March Size
+    passive: 0
+    value:
+      number: 8
+      unit: percentage
+  level: red3
+  text: When attacking, Ranged Troop Attack +25%, March Size Capacity +8%
+- buffs:
+  - attribute: Defense
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 15
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 15
+      unit: percentage
+  level: red4
+  text: Marching Ranged Troop Defense +15% and HP +15%
+- buffs:
+  - attribute: Attack
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 40
+      unit: percentage
+  - attribute: Attack
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 40
+      unit: percentage
+  - attribute: March Size
+    passive: 0
+    value:
+      number: 10
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 10
+      unit: percentage
+  level: red5
+  text: Marching Ranged Troop and Siege Machine Attack +40%, March Size Capacity and Marching Ranged Troop and Siege Machine HP +10%
+general: Algernon Sidney
+id: Algernon Sidney

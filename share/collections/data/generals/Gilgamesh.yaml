@@ -1,0 +1,25 @@
+ascending: true
+basic_attributes:
+  leadership:
+    base: 109
+    increment: 8.85
+  attack:
+    base: 117
+    increment: 8.77
+  defense:
+    base: 111
+    increment: 8.88
+  politics:
+    base: 121
+    increment: 8.64
+book: King of Uruk
+specialties:
+  - Ground Troop Defense
+  - Sabotage
+  - War God
+  - Slay Gugalanna
+stars: red5
+type:
+  - mayor
+general: Gilgamesh
+name: Gilgamesh

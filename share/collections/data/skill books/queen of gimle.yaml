@@ -1,0 +1,20 @@
+name: Queen of Gimle
+text: >-
+  Increases siege machines' attack, defense and HP by 40% and March Size by 8% when General is leading the army.
+buffs:
+  - attribute: Attack
+    troop: Siege Machines
+    value:
+      number: 40
+      unit: percentage
+  - attribute: Defense
+    troop: Siege Machines
+    value:
+      number: 40
+  - attribute: HP
+    troop: Siege Machines
+    value:
+      number: 40
+  - attribute: March Size
+    value:
+      number: 8

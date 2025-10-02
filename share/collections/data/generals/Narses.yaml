@@ -1,0 +1,25 @@
+ascending: true
+basic_attributes:
+  leadership:
+    base: 120
+    increment: 8.85
+  attack:
+    base: 114
+    increment: 8.97
+  defense:
+    base: 118
+    increment: 8.73
+  politics:
+    base: 112
+    increment: 8.81
+book: Hammer of the Goths
+specialties:
+  - Mounted Troop Assault
+  - Snipe
+  - War God
+  - Battle of Taginae
+stars: red5
+type:
+  - mayor
+general: Narses
+name: Narses

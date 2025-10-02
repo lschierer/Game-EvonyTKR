@@ -1,0 +1,41 @@
+---
+buffs:
+- attribute: Attack
+  conditions:
+  - leading the army
+  - Attacking
+  passive: 0
+  targetedType: Ground Troops
+  value:
+    number: 50
+    unit: percentage
+- attribute: Defense
+  conditions:
+  - leading the army
+  - Attacking
+  passive: 0
+  targetedType: Ground Troops
+  value:
+    number: 50
+    unit: percentage
+- attribute: HP
+  conditions:
+  - leading the army
+  - Attacking
+  passive: 0
+  targetedType: Ground Troops
+  value:
+    number: 35
+    unit: percentage
+- attribute: HP
+  conditions:
+  - leading the army
+  - Attacking
+  passive: 0
+  targetedType: Mounted Troops
+  value:
+    number: 35
+    unit: percentage
+name: Duke of Burgundy
+text: >-
+  Increases ground troops' attack and defense by 50% and increases ground troops and mounted troops' HP by 35% when General is leading the army to attack.

@@ -1,0 +1,69 @@
+---
+ascending:
+  - level: "red1"
+    buffs:
+      - conditions:
+          - Attacking
+        attribute: Attack
+        targetedType: Mounted Troops
+        value:
+          number: 15
+          unit: percentage
+      - attribute: Defense
+        targetedType: Mounted Troops
+        conditions:
+          - Attacking
+        value:
+          number: 10
+          unit: percentage
+  - level: "red2"
+    buffs:
+      - attribute: Wounded to Death
+        conditions:
+          - Enemy
+          - In City
+        value:
+          number: 10
+          unit: percentage
+  - level: "red3"
+    buffs:
+      - attribute: Rally Capacity
+        conditions:
+          - When Rallying
+        value:
+          number: 8
+          unit: percentage
+  - level: "red4"
+    buffs:
+      - attribute: Defense
+        conditions:
+          - Marching
+        targetedType: Mounted Troops
+        value:
+          number: 15
+          unit: percentage
+      - attribute: HP
+        conditions:
+          - Marching
+        targetedType: Mounted Troops
+        value:
+          number: 15
+          unit: percentage
+  - level: "red5"
+    buffs:
+      - attribute: Attack
+        conditions:
+          - Attacking
+        targetedType: Mounted Troops
+        value:
+          number: 25
+          unit: percentage
+      - attribute: Defense
+        conditions:
+          - Attacking
+        targetedType: Mounted Troops
+        value:
+          number: 20
+          unit: percentage
+general: Zhao Yun
+id: Zhao Yun

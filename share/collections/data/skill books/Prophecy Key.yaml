@@ -1,0 +1,29 @@
+---
+buffs:
+- attribute: Attack
+  conditions:
+  - leading the army
+  passive: 0
+  targetedType: Ground Troops
+  value:
+    number: 45
+    unit: percentage
+- attribute: Defense
+  conditions:
+  - leading the army
+  passive: 0
+  targetedType: Ground Troops
+  value:
+    number: 35
+    unit: percentage
+- attribute: HP
+  conditions:
+  - leading the army
+  passive: 0
+  targetedType: Ground Troops
+  value:
+    number: 35
+    unit: percentage
+name: Prophecy Key
+text: >-
+  Increases ground troops' attack by 45% and ground troops' defense and HP by 35% when General is leading the army.

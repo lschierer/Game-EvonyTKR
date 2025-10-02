@@ -1,0 +1,64 @@
+---
+levels:
+  - buffs:
+      - attribute: Marching Speed
+        value:
+          number: 1
+          unit: percentage
+      - attribute: Double Items Drop Rate
+        conditions:
+          - Against Monsters
+        value:
+          number: 2
+          unit: percentage
+    level: Green
+  - buffs:
+      - attribute: Marching Speed
+        value:
+          number: 1
+          unit: percentage
+      - attribute: Double Items Drop Rate
+        conditions:
+          - Against Monsters
+        value:
+          number: 2
+          unit: percentage
+    level: Blue
+  - buffs:
+      - attribute: Marching Speed
+        value:
+          number: 2
+          unit: percentage
+      - attribute: Double Items Drop Rate
+        conditions:
+          - Against Monsters
+        value:
+          number: 3
+          unit: percentage
+    level: Purple
+  - buffs:
+      - attribute: Marching Speed
+        value:
+          number: 2
+          unit: percentage
+      - attribute: Double Items Drop Rate
+        conditions:
+          - Against Monsters
+        value:
+          number: 3
+          unit: percentage
+    level: Orange
+  - buffs:
+      - attribute: Marching Speed
+        value:
+          number: 4
+          unit: percentage
+      - attribute: Double Items Drop Rate
+        conditions:
+          - Against Monsters
+        value:
+          number: 8
+          unit: percentage
+    level: Gold
+    text: March Time Reduction +10%, Double Items Drop Rate from Monsters +16%
+name: Battle of Ain Zara

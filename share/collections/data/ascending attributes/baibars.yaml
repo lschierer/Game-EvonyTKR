@@ -1,0 +1,68 @@
+---
+ascending:
+  - buffs:
+      - attribute: Defense
+        conditions:
+          - Against Monsters
+        passive: 0
+        value:
+          number: 5
+          unit: percentage
+      - attribute: HP
+        conditions:
+          - Against Monsters
+        passive: 0
+        value:
+          number: 10
+          unit: percentage
+    level: red1
+    text: When attacking Monsters, Troops Defense +5% and HP +10%.
+  - buffs:
+      - attribute: Defense
+        conditions:
+          - Against Monsters
+        passive: 0
+        value:
+          number: 20
+          unit: percentage
+    level: red2
+    text: When attacking Monsters, Troops Defense +20%.
+  - buffs:
+      - attribute: HP
+        conditions:
+          - Against Monsters
+        passive: 0
+        value:
+          number: 20
+          unit: percentage
+    level: red3
+    text: When attacking Monsters, Troops HP +20%.
+  - buffs:
+      - attribute: Defense
+        conditions:
+          - Against Monsters
+        passive: 0
+        value:
+          number: 15
+          unit: percentage
+      - attribute: HP
+        conditions:
+          - Against Monsters
+        passive: 0
+        value:
+          number: 10
+          unit: percentage
+    level: red4
+    text: When attacking Monsters, Troops Defense +15% and HP +10%.
+  - buffs:
+      - attribute: Attack
+        conditions:
+          - Against Monsters
+        passive: 0
+        value:
+          number: 20
+          unit: percentage
+    level: red5
+    text: When attacking Monsters, Troops Attack +20%.
+general: Baibars
+id: Baibars

@@ -1,0 +1,21 @@
+---
+buffs:
+- attribute: Attack
+  conditions:
+  - leading the army
+  passive: 0
+  targetedType: Ranged Troops
+  value:
+    number: 30
+    unit: percentage
+- attribute: Defense
+  conditions:
+  - leading the army
+  passive: 0
+  targetedType: Ground Troops
+  value:
+    number: 25
+    unit: percentage
+name: The Heartless
+text: >-
+  Increases ranged troops' attack by 30% and ground troops' defense by 25% when General is leading the army.

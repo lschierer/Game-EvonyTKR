@@ -1,0 +1,138 @@
+---
+ascending:
+- buffs:
+  - attribute: Defense
+    conditions:
+    - Enemy
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - Enemy
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 10
+      unit: percentage
+  level: red1
+  text: Enemy Ranged Troop and Siege Machine Defense -10%.
+- buffs:
+  - attribute: Defense
+    conditions:
+    - Enemy
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 15
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - Enemy
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 15
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - Enemy
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 15
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - Enemy
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 15
+      unit: percentage
+  level: red2
+  text: Enemy Ranged Troop and Siege Machine Defense and HP -15%.
+- buffs:
+  - attribute: Attack
+    conditions:
+    - Enemy
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: Attack
+    conditions:
+    - Enemy
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 10
+      unit: percentage
+  - attribute: Death to Survival
+    conditions:
+    - When City Mayor for this SubCity
+    passive: 0
+    value:
+      number: 10
+      unit: percentage
+  level: red3
+  text: Enemy Ranged Troop and Siege Machine Attack -10%; when General is the Mayor, Death into Survival Rate in this Subordinate City +10%.
+- buffs:
+  - attribute: Defense
+    conditions:
+    - Enemy
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 20
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - Enemy
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 20
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - Enemy
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 20
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - Enemy
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 20
+      unit: percentage
+  level: red4
+  text: Enemy Ranged Troop and Siege Machine Defense and HP -20%.
+- buffs:
+  - attribute: Attack
+    conditions:
+    - Enemy
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 25
+      unit: percentage
+  - attribute: Attack
+    conditions:
+    - Enemy
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 25
+      unit: percentage
+  level: red5
+  text: Enemy Ranged Troop and Siege Machine Attack -25%.
+general: Catherine II
+id: Catherine II

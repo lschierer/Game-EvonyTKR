@@ -1,0 +1,82 @@
+---
+generals:
+- Casimir Pulaski
+- Nathanael Greene
+- Washington (Prime)
+levels:
+- buffs:
+  - attribute: Training Speed
+    passive: 1
+    targetedType: Ground Troops
+    value:
+      number: 10
+      unit: percentage
+  category: cooperation
+  text: Ground Troop Training Speed +10% (Global)
+- buffs:
+  - attribute: HP
+    conditions:
+    - Attacking
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 10
+      unit: percentage
+  category: war
+  text: Attacking Ground Troop HP +10% (Local)
+- buffs:
+  - attribute: Attack
+    conditions:
+    - Attacking
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - Attacking
+    passive: 1
+    targetedType: Ground Troops
+    value:
+      number: 5
+      unit: percentage
+  category: faith
+  text: ' Attacking Ground Troop Attack +10% (Local);; Attacking Ground Troop Defense +5% (Global) '
+- buffs:
+  - attribute: March Size
+    passive: 0
+    value:
+      number: 8
+      unit: percentage
+  category: honor
+  text: March Size Capacity +8% (Local)
+- buffs:
+  - attribute: Attack
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - When Rallying
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 10
+      unit: percentage
+  category: civilization
+  text: ' Ground Troop Attack +10% (Local);; In-Rally Ground Troop HP +10% (Local) '
+- buffs:
+  - attribute: Attack
+    conditions:
+    - When Rallying
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 10
+      unit: percentage
+  category: peace
+  text: In-Rally Ground Troop Attack +10% (Local)
+name: Alexander Hamilton

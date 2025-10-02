@@ -1,0 +1,103 @@
+---
+name: Battle of Blenheim
+levels:
+  - level: "Green"
+    buffs:
+      - attribute: Attack
+        conditions:
+          - Marching
+        targetedType: Siege Machines
+        value:
+          number: 3
+          unit: percentage
+      - attribute: Defense
+        conditions:
+          - Marching
+        targetedType: Siege Machines
+        value:
+          number: 1
+          unit: percentage
+      - attribute: Rally Capacity
+        value:
+          number: 1
+          unit: percentage
+  - level: "Blue"
+    buffs:
+      - attribute: Attack
+        conditions:
+          - Marching
+        targetedType: Siege Machines
+        value:
+          number: 3
+          unit: percentage
+      - attribute: Defense
+        conditions:
+          - Marching
+        targetedType: Siege Machines
+        value:
+          number: 2
+          unit: percentage
+      - attribute: Rally Capacity
+        value:
+          number: 1
+          unit: percentage
+  - level: "Purple"
+    buffs:
+      - attribute: Attack
+        conditions:
+          - Marching
+        targetedType: Siege Machines
+        value:
+          number: 6
+          unit: percentage
+      - attribute: Defense
+        conditions:
+          - Marching
+        targetedType: Siege Machines
+        value:
+          number: 3
+          unit: percentage
+      - attribute: Rally Capacity
+        value:
+          number: 1
+          unit: percentage
+  - level: "Orange"
+    buffs:
+      - attribute: Attack
+        conditions:
+          - Marching
+        targetedType: Siege Machines
+        value:
+          number: 6
+          unit: percentage
+      - attribute: Defense
+        conditions:
+          - Marching
+        targetedType: Siege Machines
+        value:
+          number: 3
+          unit: percentage
+      - attribute: Rally Capacity
+        value:
+          number: 2
+          unit: percentage
+  - level: "Gold"
+    buffs:
+      - attribute: Attack
+        conditions:
+          - Marching
+        targetedType: Siege Machines
+        value:
+          number: 12
+          unit: percentage
+      - attribute: Defense
+        conditions:
+          - Marching
+        targetedType: Siege Machines
+        value:
+          number: 6
+          unit: percentage
+      - attribute: Rally Capacity
+        value:
+          number: 3
+          unit: percentage

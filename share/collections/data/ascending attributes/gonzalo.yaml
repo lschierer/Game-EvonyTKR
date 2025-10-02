@@ -1,0 +1,92 @@
+---
+ascending:
+- buffs:
+  - attribute: Attack
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: Defense
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 10
+      unit: percentage
+  level: red1
+  text: Ranged Troop Attack and Defense +10%
+- buffs:
+  - attribute: Death to Wounded
+    conditions:
+    - Attacking
+    passive: 0
+    value:
+      number: 8
+      unit: percentage
+  level: red2
+  text: Attacking Troop Death into Wounded Rate +8%
+- buffs:
+  - attribute: Attack
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 15
+      unit: percentage
+  - attribute: Attack
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 15
+      unit: percentage
+  - attribute: HP
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 15
+      unit: percentage
+  level: red3
+  text: Ranged Troop and Siege Machine Attack +15%, Ranged Troop HP +15%
+- buffs:
+  - attribute: Defense
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 15
+      unit: percentage
+  - attribute: Defense
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 15
+      unit: percentage
+  - attribute: HP
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 15
+      unit: percentage
+  - attribute: HP
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 15
+      unit: percentage
+  level: red4
+  text: Ranged Troop and Siege Machine Defense and HP +15%
+- buffs:
+  - attribute: Attack
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 40
+      unit: percentage
+  - attribute: Defense
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 40
+      unit: percentage
+  level: red5
+  text: Ranged Troop Attack and Defense +40%
+general: Gonzalo
+id: Gonzalo

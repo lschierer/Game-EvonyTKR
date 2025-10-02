@@ -1,0 +1,48 @@
+---
+levels:
+- buffs:
+  - attribute: HP
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 0
+      unit: percentage
+  level: Green
+  text: ''
+- buffs:
+  - attribute: HP
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 0
+      unit: percentage
+  level: Blue
+  text: ''
+- buffs:
+  - attribute: HP
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 0
+      unit: percentage
+  level: Purple
+  text: ''
+- buffs:
+  - attribute: HP
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 0
+      unit: percentage
+  level: Orange
+  text: ''
+- buffs:
+  - attribute: HP
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 50
+      unit: percentage
+  level: Gold
+  text: Mounted Troop HP +50%
+name: Battle of Anegawa

@@ -1,0 +1,80 @@
+---
+generals:
+- Franz Joseph
+- Isabella I
+- Maximillian I
+levels:
+- buffs:
+  - attribute: March Size
+    passive: 0
+    value:
+      number: 6
+      unit: percentage
+  category: peace
+  text: March Size Capacity +6% (Local)
+- buffs:
+  - attribute: Training Capacity
+    passive: 1
+    targetedType: Ground Troops
+    value:
+      number: 10
+      unit: percentage
+  category: cooperation
+  text: Ground Troop Training Capacity +10% (Global)
+- buffs:
+  - attribute: Attack
+    conditions:
+    - Attacking
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 10
+      unit: percentage
+  category: war
+  text: Attacking Ground Troop Attack +10% (Local)
+- buffs:
+  - attribute: Attack
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 5
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - Attacking
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 10
+      unit: percentage
+  category: civilization
+  text: ' Ground Troop Attack +5% (Local);; Attacking Ground Troop Defense +10% (Local) '
+- buffs:
+  - attribute: Defense
+    conditions:
+    - When Rallying
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 10
+      unit: percentage
+  category: honor
+  text: In-Rally Ground Troop Defense +10% (Local)
+- buffs:
+  - attribute: Defense
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - Attacking
+    passive: 1
+    targetedType: Ground Troops
+    value:
+      number: 5
+      unit: percentage
+  category: faith
+  text: ' Ground Troop Defense +10% (Local);; Attacking Ground Troop HP +5% (Global) '
+name: Charles V

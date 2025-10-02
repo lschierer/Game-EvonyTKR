@@ -1,0 +1,32 @@
+---
+buffs:
+- attribute: Attack
+  conditions:
+  - leading the army
+  - Attacking
+  passive: 0
+  targetedType: Siege Machines
+  value:
+    number: 50
+    unit: percentage
+- attribute: Defense
+  conditions:
+  - leading the army
+  - Attacking
+  passive: 0
+  targetedType: Siege Machines
+  value:
+    number: 50
+    unit: percentage
+- attribute: HP
+  conditions:
+  - leading the army
+  - Attacking
+  passive: 0
+  targetedType: Siege Machines
+  value:
+    number: 40
+    unit: percentage
+name: The Learned Queen
+text: >-
+  Increases siege machines' attack and defense by 50% and siege machines' HP by 40% when General is leading the army to attack.

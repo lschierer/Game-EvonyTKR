@@ -1,0 +1,32 @@
+---
+buffs:
+- attribute: Attack
+  conditions:
+  - Enemy
+  - leading the army
+  passive: 0
+  targetedType: Ground Troops
+  value:
+    number: 35
+    unit: percentage
+- attribute: HP
+  conditions:
+  - Enemy
+  - leading the army
+  passive: 0
+  targetedType: Ground Troops
+  value:
+    number: 20
+    unit: percentage
+- attribute: HP
+  conditions:
+  - Enemy
+  - leading the army
+  passive: 0
+  targetedType: Mounted Troops
+  value:
+    number: 20
+    unit: percentage
+name: Great King of Persia
+text: >-
+  Reduces enemy ground troops' attack by 35%, and enemy ground troops and mounted troops' HP by 20% when General is leading the army.

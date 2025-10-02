@@ -1,0 +1,108 @@
+---
+levels:
+- buffs:
+  - attribute: Attack
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Defense
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 0
+      unit: percentage
+  - attribute: HP
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 0
+      unit: percentage
+  level: Green
+  text: ''
+- buffs:
+  - attribute: Attack
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Defense
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 0
+      unit: percentage
+  - attribute: HP
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 0
+      unit: percentage
+  level: Blue
+  text: ''
+- buffs:
+  - attribute: Attack
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Defense
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 0
+      unit: percentage
+  - attribute: HP
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 0
+      unit: percentage
+  level: Purple
+  text: ''
+- buffs:
+  - attribute: Attack
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Defense
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 0
+      unit: percentage
+  - attribute: HP
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 0
+      unit: percentage
+  level: Orange
+  text: ''
+- buffs:
+  - attribute: Attack
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 45
+      unit: percentage
+  - attribute: Defense
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 35
+      unit: percentage
+  - attribute: HP
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 35
+      unit: percentage
+  level: Gold
+  text: Siege Machine Attack +45%, Siege Machine Defense +35%, Siege Machine HP +35%
+name: Golden Route

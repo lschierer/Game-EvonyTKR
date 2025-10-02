@@ -1,0 +1,117 @@
+---
+name: Dawn Goddess
+levels:
+  - level: "Green"
+    buffs:
+      - attribute: Attack
+        conditions:
+          - When Defending Outside The Main City
+        targetedType: Ground Troops
+        value:
+          number: 5
+          unit: percentage
+      - attribute: Defense
+        conditions:
+          - When Defending Outside The Main City
+        targetedType: Ground Troops
+        value:
+          number: 5
+          unit: percentage
+      - attribute: HP
+        conditions:
+          - When Defending Outside The Main City
+        value:
+          number: 4
+          unit: percentage
+  - level: "Blue"
+    buffs:
+      - attribute: Attack
+        conditions:
+          - When Defending Outside The Main City
+        targetedType: Ground Troops
+        value:
+          number: 5
+          unit: percentage
+      - attribute: Defense
+        conditions:
+          - When Defending Outside The Main City
+        targetedType: Ground Troops
+        value:
+          number: 5
+          unit: percentage
+      - attribute: HP
+        conditions:
+          - When Defending Outside The Main City
+        targetedType: Ground Troops
+        value:
+          number: 4
+          unit: percentage
+  - level: "Purple"
+    buffs:
+      - attribute: Attack
+        conditions:
+          - When Defending Outside The Main City
+        targetedType: Ground Troops
+        value:
+          number: 10
+          unit: percentage
+      - attribute: Defense
+        conditions:
+          - When Defending Outside The Main City
+        targetedType: Ground Troops
+        value:
+          number: 10
+          unit: percentage
+      - attribute: HP
+        conditions:
+          - When Defending Outside The Main City
+        targetedType: Ground Troops
+        value:
+          number: 8
+          unit: percentage
+  - level: "Orange"
+    buffs:
+      - attribute: Attack
+        conditions:
+          - When Defending Outside The Main City
+        targetedType: Ground Troops
+        value:
+          number: 10
+          unit: percentage
+      - attribute: Defense
+        conditions:
+          - When Defending Outside The Main City
+        targetedType: Ground Troops
+        value:
+          number: 10
+          unit: percentage
+      - attribute: HP
+        conditions:
+          - When Defending Outside The Main City
+        targetedType: Ground Troops
+        value:
+          number: 8
+          unit: percentage
+  - level: "Gold"
+    buffs:
+      - attribute: Attack
+        conditions:
+          - When Defending Outside The Main City
+        targetedType: Ground Troops
+        value:
+          number: 20
+          unit: percentage
+      - attribute: Defense
+        conditions:
+          - When Defending Outside The Main City
+        targetedType: Ground Troops
+        value:
+          number: 20
+          unit: percentage
+      - attribute: HP
+        conditions:
+          - When Defending Outside The Main City
+        targetedType: Ground Troops
+        value:
+          number: 16
+          unit: percentage

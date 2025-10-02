@@ -1,0 +1,78 @@
+---
+levels:
+- buffs:
+  - attribute: Attack
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Defense
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 0
+      unit: percentage
+  level: Green
+  text: ''
+- buffs:
+  - attribute: Attack
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Defense
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 0
+      unit: percentage
+  level: Blue
+  text: ''
+- buffs:
+  - attribute: Attack
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Defense
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 0
+      unit: percentage
+  level: Purple
+  text: ''
+- buffs:
+  - attribute: Attack
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 0
+      unit: percentage
+  - attribute: Defense
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 0
+      unit: percentage
+  level: Orange
+  text: ''
+- buffs:
+  - attribute: Attack
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: Defense
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 10
+      unit: percentage
+  level: Gold
+  text: Mounted Troop Attack +10%, Mounted Troop Defense +10%
+name: Mounted Troop Formations

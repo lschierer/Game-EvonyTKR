@@ -1,0 +1,26 @@
+---
+name: Silesian Wars
+text: >-
+  Increases mounted troops' attack by 40% and mounted troops' defense and HP by 15% when General is leading the army.
+buffs:
+  - attribute: Attack
+    targetedType: Mounted Troops
+    conditions:
+      - leading the army
+    value:
+      number: 40
+      unit: percentage
+  - attribute: HP
+    targetedType: Mounted Troops
+    conditions:
+      - leading the army
+    value:
+      number: 15
+      unit: percentage
+  - attribute: Defense
+    targetedType: Mounted Troops
+    conditions:
+      - leading the army
+    value:
+      number: 15
+      unit: percentage

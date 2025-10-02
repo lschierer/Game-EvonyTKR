@@ -1,0 +1,28 @@
+---
+name: >-
+  Dragon's Song
+text: >-
+  Increases ground troops and mounted troops' HP by 30% when General is leading the army to attack. Increases ground troops' attack by 30% when General brings any dragon to attack.
+buffs:
+  - attribute: HP
+    targetedType: Ground Troops
+    conditions:
+      - Attacking
+    value:
+      number: 30
+      unit: percentage
+  - attribute: HP
+    targetedType: Mounted Troops
+    conditions:
+      - Attacking
+    value:
+      number: 30
+      unit: percentage
+  - attribute: Attack
+    conditions:
+      - brings a dragon
+      - Attacking
+    targetedType: Ground Troops
+    value:
+      number: 30
+      unit: percentage

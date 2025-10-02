@@ -1,0 +1,13 @@
+---
+name: Red Demon
+buffs:
+  - attribute: Attack
+    targetedType: Mounted Troops
+    value:
+      number: 25
+      unit: percentage
+  - attribute: HP
+    targetedType: Mounted Troops
+    value:
+      number: 40
+      unit: percentage

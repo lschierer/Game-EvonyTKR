@@ -1,0 +1,24 @@
+ascending: 1
+basic_attributes:
+  attack:
+    base: 121
+    increment: 8.66
+  defense:
+    base: 121
+    increment: 8.66
+  leadership:
+    base: 126
+    increment: 8.83
+  politics:
+    base: 109
+    increment: 8.00
+book: The Learned Queen
+name: Christina
+specialties:
+  - Siege Machine Formation
+  - Bash
+  - Siege Machine Ares
+  - Peace of Westphalia
+stars: red5
+type:
+  - siege_specialist

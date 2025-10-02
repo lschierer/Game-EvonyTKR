@@ -1,0 +1,26 @@
+ascending: true
+basic_attributes:
+  attack:
+    base: 114
+    increment: 8.83
+  defense:
+    base: 116
+    increment: 8.96
+  leadership:
+    base: 115
+    increment: 8.92
+  politics:
+    base: 115
+    increment: 8.64
+book: Blood Restrain
+display: summary
+specialties:
+  - Ranged Troop Formation
+  - Siege
+  - War God
+  - The Tale of the Bamboo Cutter
+stars: red5
+type:
+  - ranged_specialist
+general: Princess Kaguya
+name: Princess Kaguya

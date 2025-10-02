@@ -1,0 +1,23 @@
+---
+name: Athenian Phalanx
+buffs:
+  - attribute: Attack
+    targetedType: Ground Troops
+    value:
+      number: 45
+      unit: percentage
+  - attribute: HP
+    targetedType: Ground Troops
+    value:
+      number: 45
+      unit: percentage
+  - attribute: Defense
+    targetedType: Ground Troops
+    value:
+      number: 40
+      unit: percentage
+  - attribute: HP
+    targetedType: Mounted Troops
+    value:
+      number: 40
+      unit: percentage

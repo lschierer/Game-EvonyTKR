@@ -1,0 +1,25 @@
+---
+name: The Dragon Wakes
+text: >-
+  Increases mounted troops' attack by 25% when General is leading the army, and by extra 15% when General brings any dragon. Increases March Speed by 10% when you own the General.
+buffs:
+  - attribute: Attack
+    targetedType: Mounted Troops
+    value:
+      number: 25
+      unit: percentage
+  - attribute: Attack
+    conditions:
+      - brings a dragon
+      - Attacking
+    targetedType: Mounted Troops
+    value:
+      number: 15
+      unit: percentage
+  - attribute: Marching Speed
+    conditions:
+      - you own the General
+    passive: 1
+    value:
+      number: 10
+      unit: percentage

@@ -1,0 +1,133 @@
+---
+levels:
+  - buffs:
+      - attribute: Attack
+        conditions:
+          - Marching
+        passive: 0
+        targetedType: Ranged Troops
+        value:
+          number: 0
+          unit: percentage
+      - attribute: Defense
+        conditions:
+          - Attacking
+        passive: 0
+        targetedType: Siege Machines
+        value:
+          number: 0
+          unit: percentage
+      - attribute: Defense
+        conditions:
+          - Attacking
+        passive: 0
+        targetedType: Ranged Troops
+        value:
+          number: 0
+          unit: percentage
+    level: Green
+  - buffs:
+      - attribute: Attack
+        conditions:
+          - Marching
+        passive: 0
+        targetedType: Ranged Troops
+        value:
+          number: 0
+          unit: percentage
+      - attribute: Defense
+        conditions:
+          - Attacking
+        passive: 0
+        targetedType: Siege Machines
+        value:
+          number: 0
+          unit: percentage
+      - attribute: Defense
+        conditions:
+          - Attacking
+        passive: 0
+        targetedType: Ranged Troops
+        value:
+          number: 0
+          unit: percentage
+    level: Blue
+  - buffs:
+      - attribute: Attack
+        conditions:
+          - Marching
+        passive: 0
+        targetedType: Ranged Troops
+        value:
+          number: 0
+          unit: percentage
+      - attribute: Defense
+        conditions:
+          - Attacking
+        passive: 0
+        targetedType: Siege Machines
+        value:
+          number: 0
+          unit: percentage
+      - attribute: Defense
+        conditions:
+          - Attacking
+        passive: 0
+        targetedType: Ranged Troops
+        value:
+          number: 0
+          unit: percentage
+    level: Purple
+  - buffs:
+      - attribute: Attack
+        conditions:
+          - Marching
+        passive: 0
+        targetedType: Ranged Troops
+        value:
+          number: 0
+          unit: percentage
+      - attribute: Defense
+        conditions:
+          - Attacking
+        passive: 0
+        targetedType: Siege Machines
+        value:
+          number: 0
+          unit: percentage
+      - attribute: Defense
+        conditions:
+          - Attacking
+        passive: 0
+        targetedType: Ranged Troops
+        value:
+          number: 0
+          unit: percentage
+    level: Orange
+  - buffs:
+      - attribute: Attack
+        conditions:
+          - Marching
+        passive: 0
+        targetedType: Ranged Troops
+        value:
+          number: 35
+          unit: percentage
+      - attribute: Defense
+        conditions:
+          - Attacking
+        passive: 0
+        targetedType: Siege Machines
+        value:
+          number: 40
+          unit: percentage
+      - attribute: Defense
+        conditions:
+          - Attacking
+        passive: 0
+        targetedType: Ranged Troops
+        value:
+          number: 40
+          unit: percentage
+    level: Gold
+name: Old Knight

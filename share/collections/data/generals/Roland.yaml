@@ -1,0 +1,26 @@
+ascending: true
+basic_attributes:
+  attack:
+    base: 118
+    increment: 8.91
+  defense:
+    base: 117
+    increment: 9.05
+  leadership:
+    base: 105
+    increment: 8.55
+  politics:
+    base: 100
+    increment: 8.35
+book: Glory Knight
+display: summary
+specialties:
+  - Mounted Troop Formation
+  - Annihilation
+  - Mounted Troop Ares
+  - Paladin
+stars: red5
+type:
+  - mounted_specialist
+general: Roland
+name: Roland

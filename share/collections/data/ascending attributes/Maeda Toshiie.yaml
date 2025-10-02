@@ -1,0 +1,89 @@
+---
+ascending:
+  - level: "red1"
+    buffs:
+      - attribute: Attack
+        targetedType: Ground Troops
+        conditions:
+          - Attacking
+        value:
+          number: 5
+          unit: percentage
+      - attribute: Defense
+        targetedType: Ground Troops
+        conditions:
+          - Attacking
+        value:
+          number: 155
+          unit: percentage
+  - level: "red2"
+    buffs:
+      - attribute: Death to Wounded
+        conditions:
+          - Marching
+        value:
+          number: 10
+          unit: percentage
+  - level: "red3"
+    buffs:
+      - attribute: Rally Capacity
+        conditions:
+          - When Rallying
+        value:
+          number: 8
+          unit: percentage
+  - level: "red4"
+    buffs:
+      - attribute: Attack
+        conditions:
+          - Marching
+        targetedType: Mounted Troops
+        value:
+          number: 10
+          unit: percentage
+      - attribute: Attack
+        conditions:
+          - Marching
+        targetedType: Ground Troops
+        value:
+          number: 10
+          unit: percentage
+      - attribute: Defense
+        conditions:
+          - Marching
+        targetedType: Mounted Troops
+        value:
+          number: 20
+          unit: percentage
+      - attribute: Defense
+        conditions:
+          - Marching
+        targetedType: Ground Troops
+        value:
+          number: 20
+          unit: percentage
+  - level: "red5"
+    buffs:
+      - attribute: Attack
+        conditions:
+          - Marching
+        targetedType: Ground Troops
+        value:
+          number: 15
+          unit: percentage
+      - attribute: HP
+        conditions:
+          - Marching
+        targetedType: Ground Troops
+        value:
+          number: 20
+          unit: percentage
+      - attribute: HP
+        conditions:
+          - Marching
+        targetedType: Mounted Troops
+        value:
+          number: 20
+          unit: percentage
+general: Maeda Toshiie
+id: Maeda Toshiie

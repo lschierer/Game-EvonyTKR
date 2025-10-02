@@ -1,0 +1,24 @@
+name: Queen of Caria
+buffs:
+  - attribute: Defense
+    targetedType: Ranged Troops
+    conditions:
+      - Attacking
+    value:
+      number: 55
+      unit: percentage
+  - attribute: Attack
+    targetedType: Ranged Troops
+    conditions:
+      - Attacking
+    value:
+      number: 55
+      unit: percentage
+  - attribute: HP
+    conditions:
+      - Attacking
+    value:
+      number: 35
+      unit: percentage
+text: >-
+  Increases ranged troops' attack and defense by 55% and HP by 35% when General is leading the army to attack.

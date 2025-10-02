@@ -1,0 +1,83 @@
+---
+generals:
+- Margaret I
+- Harald III
+- Ragnar
+levels:
+- buffs:
+  - attribute: HP
+    conditions:
+    - When Rallying
+    passive: 1
+    targetedType: Mounted Troops
+    value:
+      number: 10
+      unit: percentage
+  category: cooperation
+  text: In-Rally Mounted Troop HP +10% (Global)
+- buffs:
+  - attribute: March Size
+    passive: 0
+    value:
+      number: 8
+      unit: percentage
+  category: war
+  text: March Size Capacity +8% (Local)
+- buffs:
+  - attribute: HP
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: Attack
+    conditions:
+    - Attacking
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 5
+      unit: percentage
+  - attribute: Attack
+    conditions:
+    - Attacking
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 5
+      unit: percentage
+  category: civilization
+  text: Mounted Troop HP +10% (Local);;Attacking Mounted Troop and Ground Troop Attack +5% (Local)
+- buffs:
+  - attribute: Defense
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 10
+      unit: percentage
+  category: peace
+  text: Mounted Troop Defense +10% (Local)
+- buffs:
+  - attribute: Attack
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 5
+      unit: percentage
+  - attribute: Training Capacity
+    passive: 1
+    targetedType: Mounted Troops
+    value:
+      number: 10
+      unit: percentage
+  category: faith
+  text: Mounted Troop Attack +5% (Local);;Mounted Troop Training Capacity +10% (Global)
+- buffs:
+  - attribute: Marching Speed
+    passive: 0
+    value:
+      number: 10
+      unit: percentage
+  category: honor
+  text: March Speed +10% (Local)
+name: Haakon Haraldsson

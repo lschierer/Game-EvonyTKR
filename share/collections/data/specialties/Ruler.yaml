@@ -1,0 +1,43 @@
+---
+name: Ruler
+levels:
+  - level: Green
+    buffs:
+      - attribute: SubCity Troop Capacity
+        conditions:
+          - When City Mayor for this SubCity
+        value:
+          number: 4
+          unit: percentage
+  - level: Blue
+    buffs:
+      - attribute: SubCity Troop Capacity
+        conditions:
+          - When City Mayor for this SubCity
+        value:
+          number: 4
+          unit: percentage
+  - level: Purple
+    buffs:
+      - attribute: SubCity Troop Capacity
+        conditions:
+          - When City Mayor for this SubCity
+        value:
+          number: 7
+          unit: percentage
+  - level: Orange
+    buffs:
+      - attribute: SubCity Troop Capacity
+        conditions:
+          - When City Mayor for this SubCity
+        value:
+          number: 7
+          unit: percentage
+  - level: Gold
+    buffs:
+      - attribute: SubCity Troop Capacity
+        conditions:
+          - When City Mayor for this SubCity
+        value:
+          number: 14
+          unit: percentage

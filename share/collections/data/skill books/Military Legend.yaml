@@ -1,0 +1,19 @@
+name: Military Legend
+text: >-
+  Increases ground troops' attack by 30% and ground troops and mounted troops' HP by 15% when General is leading the army.
+buffs:
+  - attribute: Attack
+    targetedType: Ground Troops
+    value:
+      number: 30
+      unit: percentage
+  - attribute: HP
+    targetedType: Ground Troops
+    value:
+      number: 15
+      unit: percentage
+  - attribute: HP
+    targetedType: Mounted Troops
+    value:
+      number: 15
+      unit: percentage

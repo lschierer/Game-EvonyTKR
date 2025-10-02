@@ -1,0 +1,25 @@
+ascending: true
+basic_attributes:
+  attack:
+    base: 113
+    increment: 8.77
+  defense:
+    base: 112
+    increment: 8.88
+  leadership:
+    base: 110
+    increment: 8.85
+  politics:
+    base: 103
+    increment: 8.64
+book: King of the Vikings
+specialties:
+  - Siege Machine Assault
+  - Sabotage
+  - "King's Ambition"
+  - Harald Bluetooth
+stars: red5
+type:
+  - mayor
+general: Harald
+name: Harald

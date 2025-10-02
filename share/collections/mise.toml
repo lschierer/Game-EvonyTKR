@@ -1,0 +1,6 @@
+[tools]
+gh = "latest"
+jq = "latest"
+perl = "latest"
+pnpm = "10"
+yq = "latest"

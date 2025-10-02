@@ -1,0 +1,63 @@
+---
+name: King of the Black Army
+levels:
+  - level: Green
+    buffs:
+      - attribute: Attack
+        targetedType: Ranged Troops
+        value:
+          number: 2
+          unit: percentage
+      - attribute: Attack
+        targetedType: Siege Machines
+        value:
+          number: 2
+          unit: percentage
+  - level: Blue
+    buffs:
+      - attribute: Attack
+        targetedType: Ranged Troops
+        value:
+          number: 2
+          unit: percentage
+      - attribute: Attack
+        targetedType: Siege Machines
+        value:
+          number: 2
+          unit: percentage
+  - level: Purple
+    buffs:
+      - attribute: Attack
+        targetedType: Ranged Troops
+        value:
+          number: 4
+          unit: percentage
+      - attribute: Attack
+        targetedType: Siege Machines
+        value:
+          number: 4
+          unit: percentage
+  - level: Orange
+    buffs:
+      - attribute: Attack
+        targetedType: Ranged Troops
+        value:
+          number: 4
+          unit: percentage
+      - attribute: Attack
+        targetedType: Siege Machines
+        value:
+          number: 4
+          unit: percentage
+  - level: Gold
+    buffs:
+      - attribute: Attack
+        targetedType: Ranged Troops
+        value:
+          number: 8
+          unit: percentage
+      - attribute: Attack
+        targetedType: Siege Machines
+        value:
+          number: 8
+          unit: percentage

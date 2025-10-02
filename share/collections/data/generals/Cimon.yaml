@@ -1,0 +1,24 @@
+ascending: 1
+basic_attributes:
+  attack:
+    base: 106
+    increment: 8.12
+  defense:
+    base: 130
+    increment: 9.22
+  leadership:
+    base: 128
+    increment: 9.01
+  politics:
+    base: 115
+    increment: 8.65
+book: Delian League
+name: Cimon
+specialties:
+  - Ground Troop Defense
+  - Snipe
+  - Unparalleled Leader
+  - Ten Strategoi
+stars: red5
+type:
+  - mayor

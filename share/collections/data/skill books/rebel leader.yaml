@@ -1,0 +1,28 @@
+name: Rebel Leader
+text: >-
+  Increases in city ground troops and mounted troops' HP by 15% and in city mounted troops' attack by 30% when General is the Main City Defense General.
+buffs:
+  - attribute: HP
+    troop: Ground Troops
+    value:
+      number: 15
+      unit: percentage
+    conditions:
+      - In City
+      - When The Main Defense General
+  - attribute: HP
+    troop: Mounted Troops
+    value:
+      number: 15
+      unit: percentage
+    conditions:
+      - In City
+      - When The Main Defense General
+  - attribute: Attack
+    troop: Mounted Troops
+    value:
+      number: 30
+      unit: percentage
+    conditions:
+      - In City
+      - When The Main Defense General

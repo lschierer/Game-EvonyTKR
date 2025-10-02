@@ -1,0 +1,137 @@
+levels:
+  - level: green
+    text: >-
+      Siege Machine Attack +5%.
+      Siege Machine Defense +4%.
+      Siege Machine HP +4%.
+    buffs:
+      - attribute: Attack
+        conditions: null
+        passive: 0
+        targetedType: Siege Machines
+        value:
+          number: 5
+          unit: percentage
+      - attribute: Defense
+        conditions: null
+        passive: 0
+        targetedType: Siege Machines
+        value:
+          number: 4
+          unit: percentage
+      - attribute: HP
+        conditions: null
+        passive: 0
+        targetedType: Siege Machines
+        value:
+          number: 4
+          unit: percentage
+  - level: blue
+    text: >-
+      Siege Machine Attack +6%.
+      Siege Machine Defense +4%.
+      Siege Machine HP +4%.
+    buffs:
+      - attribute: Attack
+        conditions: null
+        passive: 0
+        targetedType: Siege Machines
+        value:
+          number: 6
+          unit: percentage
+      - attribute: Defense
+        conditions: null
+        passive: 0
+        targetedType: Siege Machines
+        value:
+          number: 4
+          unit: percentage
+      - attribute: HP
+        conditions: null
+        passive: 0
+        targetedType: Siege Machines
+        value:
+          number: 4
+          unit: percentage
+  - level: purple
+    text: >-
+      Siege Machine Attack +11%.
+      Siege Machine Defense +8%.
+      Siege Machine HP +8%.
+    buffs:
+      - attribute: Attack
+        conditions: null
+        passive: 0
+        targetedType: Siege Machines
+        value:
+          number: 11
+          unit: percentage
+      - attribute: Defense
+        conditions: null
+        passive: 0
+        targetedType: Siege Machines
+        value:
+          number: 8
+          unit: percentage
+      - attribute: HP
+        conditions: null
+        passive: 0
+        targetedType: Siege Machines
+        value:
+          number: 8
+          unit: percentage
+  - level: orange
+    text: >-
+      Siege Machine Attack +11%.
+      Siege Machine Defense +8%.
+      Siege Machine HP +8%.
+    buffs:
+      - attribute: Attack
+        conditions: null
+        passive: 0
+        targetedType: Siege Machines
+        value:
+          number: 11
+          unit: percentage
+      - attribute: Defense
+        conditions: null
+        passive: 0
+        targetedType: Siege Machines
+        value:
+          number: 8
+          unit: percentage
+      - attribute: HP
+        conditions: null
+        passive: 0
+        targetedType: Siege Machines
+        value:
+          number: 8
+          unit: percentage
+  - level: gold
+    text: >-
+      Siege Machine Attack +22%.
+      Siege Machine Defense +16%.
+      Siege Machine HP +16%.
+    buffs:
+      - attribute: Attack
+        conditions: null
+        passive: 0
+        targetedType: Siege Machines
+        value:
+          number: 22
+          unit: percentage
+      - attribute: Defense
+        conditions: null
+        passive: 0
+        targetedType: Siege Machines
+        value:
+          number: 16
+          unit: percentage
+      - attribute: HP
+        conditions: null
+        passive: 0
+        targetedType: Siege Machines
+        value:
+          number: 16
+          unit: percentage
+name: Circumnavigation

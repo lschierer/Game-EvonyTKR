@@ -1,0 +1,53 @@
+---
+levels:
+- buffs:
+  - attribute: Attack
+    conditions:
+    - In City
+    passive: 0
+    value:
+      number: 0
+      unit: percentage
+  level: Green
+  text: ''
+- buffs:
+  - attribute: Attack
+    conditions:
+    - In City
+    passive: 0
+    value:
+      number: 0
+      unit: percentage
+  level: Blue
+  text: ''
+- buffs:
+  - attribute: Attack
+    conditions:
+    - In City
+    passive: 0
+    value:
+      number: 0
+      unit: percentage
+  level: Purple
+  text: ''
+- buffs:
+  - attribute: Attack
+    conditions:
+    - In City
+    passive: 0
+    value:
+      number: 0
+      unit: percentage
+  level: Orange
+  text: ''
+- buffs:
+  - attribute: Attack
+    conditions:
+    - In City
+    passive: 0
+    value:
+      number: 6
+      unit: percentage
+  level: Gold
+  text: In City Troop Attack +6%
+name: Fortification

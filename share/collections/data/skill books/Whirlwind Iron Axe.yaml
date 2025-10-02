@@ -1,0 +1,45 @@
+---
+buffs:
+- attribute: Attack
+  conditions:
+  - leading the army
+  passive: 0
+  targetedType: Mounted Troops
+  value:
+    number: 45
+    unit: percentage
+- attribute: Defense
+  conditions:
+  - leading the army
+  passive: 0
+  targetedType: Ground Troops
+  value:
+    number: 35
+    unit: percentage
+- attribute: Defense
+  conditions:
+  - leading the army
+  passive: 0
+  targetedType: Mounted Troops
+  value:
+    number: 35
+    unit: percentage
+- attribute: HP
+  conditions:
+  - leading the army
+  passive: 0
+  targetedType: Ground Troops
+  value:
+    number: 35
+    unit: percentage
+- attribute: HP
+  conditions:
+  - leading the army
+  passive: 0
+  targetedType: Mounted Troops
+  value:
+    number: 35
+    unit: percentage
+name: Whirlwind Iron Axe
+text: >-
+  Increases mounted troops' attack by 45% and increases ground troops and mounted troops' defense and HP by 35% when General is leading the army.

@@ -1,0 +1,88 @@
+---
+name: Ode to Knight
+levels:
+  - level: "Green"
+    buffs:
+      - attribute: Attack
+        targetedType: Mounted Troops
+        value:
+          number: 2
+          unit: percentage
+      - attribute: Defense
+        targetedType: Mounted Troops
+        value:
+          number: 1
+          unit: percentage
+      - attribute: HP
+        targetedType: Mounted Troops
+        value:
+          number: 1
+          unit: percentage
+  - level: "Blue"
+    buffs:
+      - attribute: Attack
+        targetedType: Mounted Troops
+        value:
+          number: 3
+          unit: percentage
+      - attribute: Defense
+        targetedType: Mounted Troops
+        value:
+          number: 2
+          unit: percentage
+      - attribute: HP
+        targetedType: Mounted Troops
+        value:
+          number: 2
+          unit: percentage
+  - level: "Purple"
+    buffs:
+      - attribute: Attack
+        targetedType: Mounted Troops
+        value:
+          number: 5
+          unit: percentage
+      - attribute: Defense
+        targetedType: Mounted Troops
+        value:
+          number: 3
+          unit: percentage
+      - attribute: HP
+        targetedType: Mounted Troops
+        value:
+          number: 3
+          unit: percentage
+  - level: "Orange"
+    buffs:
+      - attribute: Attack
+        targetedType: Mounted Troops
+        value:
+          number: 5
+          unit: percentage
+      - attribute: Defense
+        targetedType: Mounted Troops
+        value:
+          number: 3
+          unit: percentage
+      - attribute: HP
+        targetedType: Mounted Troops
+        value:
+          number: 3
+          unit: percentage
+  - level: "Gold"
+    buffs:
+      - attribute: Attack
+        targetedType: Mounted Troops
+        value:
+          number: 10
+          unit: percentage
+      - attribute: Defense
+        targetedType: Mounted Troops
+        value:
+          number: 6
+          unit: percentage
+      - attribute: HP
+        targetedType: Mounted Troops
+        value:
+          number: 6
+          unit: percentage

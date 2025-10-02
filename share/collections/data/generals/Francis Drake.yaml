@@ -1,0 +1,24 @@
+ascending: 'true'
+basic_attributes:
+  attack:
+    base: 131
+    increment: 8.87
+  defense:
+    base: 125
+    increment: 8.82
+  leadership:
+    base: 125
+    increment: 8.79
+  politics:
+    base: 116
+    increment: 8.38
+book: Royal Navy Vice Admiral
+name: Francis Drake
+specialties:
+  - Siege Machine Defense
+  - Bash
+  - Siege Machine Ares
+  - Circumnavigation
+stars: red5
+type:
+  - siege_specialist

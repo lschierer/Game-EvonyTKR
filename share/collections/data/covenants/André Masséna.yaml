@@ -1,0 +1,99 @@
+name: André Masséna
+generals:
+  - Roland
+  - Turenne
+  - Bertrand du Guesclin
+levels:
+  - category: War
+    type: personal
+    buffs:
+      - attribute: Defense
+        conditions:
+          - Monsters
+        value:
+          number: 8
+          unit: percentage
+  - category: Cooperation
+    type: passive
+    buffs:
+      - attribute: Marching Speed
+        value:
+          number: 15
+          unit: percentage
+  - category: Peace
+    type: personal
+    buffs:
+      - attribute: Defense
+        targetedType: Mounted Troops
+        conditions:
+          - When Rallying
+        value:
+          number: 10
+          unit: percentage
+      - attribute: Attack
+        targetedType: Mounted Troops
+        conditions:
+          - Marching
+        value:
+          number: 10
+          unit: percentage
+  - category: Faith
+    type: passive
+    buffs:
+      - attribute: Attack
+        targetedType: Ranged Troops
+        conditions:
+          - Enemy
+        value:
+          number: 5
+          unit: percentage
+      - attribute: Attack
+        targetedType: Siege Machines
+        conditions:
+          - Enemy
+        value:
+          number: 5
+          unit: percentage
+  - category: Honor
+    type: personal
+    buffs:
+      - attribute: Attack
+        targetedType: Ranged Troops
+        conditions:
+          - Enemy
+          - Attacking
+        value:
+          number: 5
+          unit: percentage
+      - attribute: Attack
+        targetedType: Siege Machines
+        conditions:
+          - Enemy
+          - Attacking
+        value:
+          number: 5
+          unit: percentage
+  - category: Civilization
+    type: personal
+    buffs:
+      - attribute: Attack
+        targetedType: Ground Troops
+        conditions:
+          - When Rallying
+        value:
+          number: 10
+          unit: percentage
+      - attribute: Attack
+        targetedType: Mounted Troops
+        conditions:
+          - When Rallying
+        value:
+          number: 10
+          unit: percentage
+      - attribute: Attack
+        targetedType: Mounted Troops
+        conditions:
+          - When Rallying
+        value:
+          number: 10
+          unit: percentage

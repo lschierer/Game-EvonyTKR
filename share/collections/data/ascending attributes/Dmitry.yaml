@@ -1,0 +1,96 @@
+---
+ascending:
+  - buffs:
+      - attribute: Attack
+        conditions:
+          - Reinforcing
+        passive: 0
+        targetedType: Ranged Troops
+        value:
+          number: 15
+          unit: percentage
+      - attribute: Defense
+        conditions:
+          - Reinforcing
+        passive: 0
+        targetedType: Ground Troops
+        value:
+          number: 10
+          unit: percentage
+    level: red1
+    text: Reinforcing Ranged Troop Attack +15%, Reinforcing Ground Troop Defense +10%
+  - buffs:
+      - attribute: Defense
+        conditions:
+          - Reinforcing
+        passive: 0
+        targetedType: Ground Troops
+        value:
+          number: 15
+          unit: percentage
+      - attribute: HP
+        conditions:
+          - Reinforcing
+        passive: 0
+        targetedType: Ground Troops
+        value:
+          number: 15
+          unit: percentage
+    level: red2
+    text: Reinforcing Ground Troop Defense +15% and HP +15%
+  - buffs:
+      - attribute: March Size
+        passive: 0
+        value:
+          number: 10
+          unit: percentage
+    level: red3
+    text: March Size Capacity +10%
+  - buffs:
+      - attribute: Attack
+        conditions:
+          - Reinforcing
+        passive: 0
+        targetedType: Ranged Troops
+        value:
+          number: 10
+          unit: percentage
+      - attribute: HP
+        conditions:
+          - Reinforcing
+        passive: 0
+        targetedType: Ground Troops
+        value:
+          number: 20
+          unit: percentage
+    level: red4
+    text: Reinforcing Ranged Troop Attack +10%, Reinforcing Ground Troop HP +20%
+  - buffs:
+      - attribute: Attack
+        conditions:
+          - Reinforcing
+        passive: 0
+        targetedType: Ranged Troops
+        value:
+          number: 15
+          unit: percentage
+      - attribute: Defense
+        conditions:
+          - Reinforcing
+        passive: 0
+        targetedType: Ground Troops
+        value:
+          number: 15
+          unit: percentage
+      - attribute: HP
+        conditions:
+          - Reinforcing
+        passive: 0
+        targetedType: Ground Troops
+        value:
+          number: 15
+          unit: percentage
+    level: red5
+    text: Reinforcing Ranged Troop Attack +15%, Reinforcing Ground Troop Defense and HP +15%
+general: Dmitry
+id: Dmitry

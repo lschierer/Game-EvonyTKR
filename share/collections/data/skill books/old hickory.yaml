@@ -1,0 +1,16 @@
+name: Old Hickory
+buffs:
+  - attribute: Attack
+    targetedType: Ranged Troops
+    conditions:
+      - Enemy
+    value:
+      number: 20
+      unit: percentage
+  - attribute: HP
+    targetedType: Mounted Troops
+    value:
+      number: 20
+      unit: percentage
+text: >-
+  Reduces enemy ranged troops' attack by 20% and mounted troops' HP by 20% when General is leading the army.

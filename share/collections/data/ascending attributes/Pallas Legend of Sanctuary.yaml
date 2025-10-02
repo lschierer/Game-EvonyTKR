@@ -1,0 +1,94 @@
+---
+ascending:
+  - level: "red1"
+    buffs:
+      - attribute: Attack
+        conditions:
+          - Marching
+        targetedType: Siege Machines
+        value:
+          number: 10
+          unit: percentage
+      - attribute: HP
+        conditions:
+          - Marching
+        targetedType: Ranged Troops
+        value:
+          number: 15
+          unit: percentage
+      - attribute: HP
+        conditions:
+          - Marching
+        targetedType: Siege Machines
+        value:
+          number: 15
+          unit: percentage
+  - level: "red2"
+    buffs:
+      - attribute: Death to Wounded
+        conditions:
+          - Marching
+        value:
+          number: 10
+          unit: percentage
+  - level: "red3"
+    buffs:
+      - attribute: Attack
+        conditions:
+          - Marching
+        targetedType: Siege Machines
+        value:
+          number: 15
+          unit: percentage
+      - attribute: March Size
+        value:
+          number: 8
+          unit: percentage
+  - level: "red4"
+    buffs:
+      - attribute: Defense
+        conditions:
+          - Marching
+        targetedType: Ranged Troops
+        value:
+          number: 20
+          unit: percentage
+      - attribute: Defense
+        conditions:
+          - Marching
+        targetedType: Siege Machines
+        value:
+          number: 20
+          unit: percentage
+      - attribute: HP
+        conditions:
+          - Marching
+        targetedType: Ranged Troops
+        value:
+          number: 25
+          unit: percentage
+      - attribute: HP
+        conditions:
+          - Marching
+        targetedType: Siege Machines
+        value:
+          number: 25
+          unit: percentage
+  - level: "red5"
+    buffs:
+      - attribute: Attack
+        conditions:
+          - Marching
+        targetedType: Siege Machines
+        value:
+          number: 25
+          unit: percentage
+      - attribute: Defense
+        conditions:
+          - Marching
+        targetedType: Siege Machines
+        value:
+          number: 35
+          unit: percentage
+general: Pallas Legend of Sanctuary
+id: Pallas Legend of Sanctuary

@@ -1,0 +1,82 @@
+name: Blood of War
+levels:
+  - level: Green
+    buffs:
+      - attribute: Attack
+        targetedType: Mounted Troops
+        conditions:
+          - Enemy
+        value:
+          number: 3
+          unit: percentage
+      - attribute: HP
+        targetedType: Ground Troops
+        conditions:
+          - Enemy
+        value:
+          number: 2
+          unit: percentage
+  - level: Blue
+    buffs:
+      - attribute: Attack
+        targetedType: Mounted Troops
+        conditions:
+          - Enemy
+        value:
+          number: 3
+          unit: percentage
+      - attribute: HP
+        targetedType: Ground Troops
+        conditions:
+          - Enemy
+        value:
+          number: 2
+          unit: percentage
+  - level: Purple
+    buffs:
+      - attribute: Attack
+        targetedType: Mounted Troops
+        conditions:
+          - Enemy
+        value:
+          number: 6
+          unit: percentage
+      - attribute: HP
+        targetedType: Ground Troops
+        conditions:
+          - Enemy
+        value:
+          number: 4
+          unit: percentage
+  - level: Orange
+    buffs:
+      - attribute: Attack
+        targetedType: Mounted Troops
+        conditions:
+          - Enemy
+        value:
+          number: 6
+          unit: percentage
+      - attribute: HP
+        targetedType: Ground Troops
+        conditions:
+          - Enemy
+        value:
+          number: 4
+          unit: percentage
+  - level: Gold
+    buffs:
+      - attribute: Attack
+        targetedType: Mounted Troops
+        conditions:
+          - Enemy
+        value:
+          number: 12
+          unit: percentage
+      - attribute: HP
+        targetedType: Ground Troops
+        conditions:
+          - Enemy
+        value:
+          number: 8
+          unit: percentage

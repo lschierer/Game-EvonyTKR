@@ -1,0 +1,12 @@
+---
+buffs:
+- attribute: SubCity Gold Production
+  conditions:
+  - When City Mayor for this SubCity
+  passive: 0
+  value:
+    number: 75
+    unit: percentage
+name: Domination
+text: >-
+  Boosts the Gold Production Speed by 75% in Subordinate City when General is the Mayor.

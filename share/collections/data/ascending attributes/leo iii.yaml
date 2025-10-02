@@ -1,0 +1,95 @@
+---
+ascending:
+- buffs:
+  - attribute: Defense
+    conditions:
+    - When The Main Defense General
+    - In City
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 15
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - When The Main Defense General
+    - In City
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 15
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - When The Main Defense General
+    - In City
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 15
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - When The Main Defense General
+    - In City
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 15
+      unit: percentage
+  level: red1
+  text: When General is the Main City Defense General, In-city Mounted Troop and Ground Troop Defense +15% and HP +15%.
+- buffs:
+  - attribute: Hospital Capacity
+    conditions:
+    - When The Main Defense General
+    passive: 0
+    value:
+      number: 20
+      unit: percentage
+  level: red2
+  text: When General is the Main City Defense General, Hospital Capacity +20%.
+- buffs:
+  - attribute: Defense
+    conditions:
+    - When The Main Defense General
+    - In City
+    passive: 0
+    value:
+      number: 20
+      unit: percentage
+  level: red3
+  text: When General is the Main City Defense General, In-city Troops Defense +20%.
+- buffs:
+  - attribute: HP
+    conditions:
+    - When The Main Defense General
+    - In City
+    passive: 0
+    value:
+      number: 20
+      unit: percentage
+  level: red4
+  text: When General is the Main City Defense General, In-city Troops HP +20%.
+- buffs:
+  - attribute: Attack
+    conditions:
+    - When The Main Defense General
+    - In City
+    passive: 0
+    value:
+      number: 10
+      unit: percentage
+  - attribute: Attack
+    conditions:
+    - When The Main Defense General
+    - In City
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 15
+      unit: percentage
+  level: red5
+  text: When General is the Main City Defense General, In-city Troops Attack +10% and Extra +15% for In-city Siege Machine.
+general: Leo III
+id: Leo III

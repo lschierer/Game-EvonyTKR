@@ -1,0 +1,136 @@
+---
+ascending:
+- buff:
+  - attribute: Attack
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 5
+      unit: percentage
+  - attribute: Attack
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 5
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 15
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 15
+      unit: percentage
+  level: red1
+  text: Marching Ranged Troop and Siege Machine Attack +5% and Defense +15%.
+- buff:
+  - attribute: Wounded to Death
+    conditions:
+    - Enemy
+    - In City
+    passive: 0
+    value:
+      number: 10
+      unit: percentage
+  level: red2
+  text: Enemy In-city Troop Wounded into Death rate +10%.
+- buff:
+  - attribute: Defense
+    conditions:
+    - Attacking
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 15
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - Attacking
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 15
+      unit: percentage
+  - attribute: March Size
+    passive: 0
+    value:
+      number: 6
+      unit: percentage
+  level: red3
+  text: When attacking, Ranged Troop and Siege Machine Defense +15%, March Size Capacity +6%.
+- buff:
+  - attribute: Attack
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: Attack
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 10
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 20
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 20
+      unit: percentage
+  level: red4
+  text: Marching Ranged Troop and Siege Machine Attack +10% and Defense +20%.
+- buff:
+  - attribute: Attack
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 15
+      unit: percentage
+  - attribute: Defense
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 25
+      unit: percentage
+  - attribute: HP
+    conditions:
+    - Marching
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 25
+      unit: percentage
+  level: red5
+  text: Marching Ranged Troop Attack +15%, Defense and HP +25%.
+general: Charles XII
+id: Charles XII

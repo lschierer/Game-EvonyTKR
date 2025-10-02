@@ -1,0 +1,48 @@
+# yaml-language-server: $schema=schema.json
+
+glossary:
+  - term: General
+    definition: >-
+      The game provides characters called 'Generals' that perform a number of roles.  The common theme to these roles is that the Generals provide
+      you with 'Buffs' and 'Debuffs' which you can activate either by owning the General or by using the General. Generals provide these 'Buffs'
+      and 'Debuffs' by way of 'Basic Attributes', 'SkillBooks', 'Ascending Attributes', 'Specialties', 'Covenants', any 'Gear' assigned to that
+      General, and any 'Dragon' or 'Spiritual Beast' assigned.
+    related_terms:
+      - Ascending Attributes
+      - Basic Attribute
+      - Buff
+      - Covenant
+      - Debuff
+      - Dragon
+      - Gear
+      - Mayor
+      - Officer
+      - Primary General
+      - Secondary General
+      - SkillBook
+      - Specialty
+      - Spiritual Beast
+      - Wall General
+  - term: ghost
+    definition: >-
+      To take all troops in your keep, and distribute them across your available marches, such that if an enemy attacks, there are no troops
+      available in the keep to either kill or wound.
+  - term: Generals Hall
+    definition: >-
+      One of the primary buildings on the Battle of Constantinople map that can be occupied to gain points.
+  - term: gear
+    synonyms:
+      - armor
+      - armour
+    definition: >-
+      Each 'General' deployed in any capacity, either as part of a march, as a mayor, or as a duty officer, can be assigned items.  These items
+      are most typically armor, but also include (in the same slots) things like hats and cloaks, and so can more properly be called by the generic
+      words "gear" or "clothing."  I have chosen "gear."  In either case, the important thing is that each of these items has certain intrinsic
+      'buffs' and 'debuffs', and can be 'refined' to contain others.  Depending on the use case, and on activation conditions (if any) on the
+      'buffs' (or debuffs) provided, it may or may not be necessary for the 'General' to wear the gear full time, it may be possible to have the
+      gear on the 'General' only while assigning the 'General.'
+    related_terms:
+      - General
+      - buff
+      - debuff
+      - refining

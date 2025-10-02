@@ -1,0 +1,32 @@
+---
+buffs:
+- attribute: Attack
+  conditions:
+  - Enemy
+  - leading the army
+  passive: 0
+  targetedType: Ranged Troops
+  value:
+    number: 15
+    unit: percentage
+- attribute: Attack
+  conditions:
+  - Enemy
+  - leading the army
+  passive: 0
+  targetedType: Siege Machines
+  value:
+    number: 15
+    unit: percentage
+- attribute: Attack
+  conditions:
+  - Enemy
+  - leading the army
+  passive: 0
+  targetedType: Ground Troops
+  value:
+    number: 25
+    unit: percentage
+name: Military-political Genius
+text: >-
+  Reduces enemy ranged troops and siege machines' attack by 15% and enemy ground troops' attack by 25% when General is leading the army.

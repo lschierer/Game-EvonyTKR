@@ -1,0 +1,85 @@
+---
+ascending:
+- buffs:
+  - attribute: Attack
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: HP
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 10
+      unit: percentage
+  level: red1
+  text: Mounted Troop Attack and HP +10%
+- buffs:
+  - attribute: Death to Wounded
+    conditions:
+    - Attacking
+    passive: 0
+    value:
+      number: 8
+      unit: percentage
+  level: red2
+  text: Attacking Troop Death into Wounded Rate +8%
+- buffs:
+  - attribute: Attack
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 20
+      unit: percentage
+  - attribute: Defense
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 20
+      unit: percentage
+  level: red3
+  text: Mounted Troop Attack and Defense +20%
+- buffs:
+  - attribute: HP
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 15
+      unit: percentage
+  - attribute: March Size
+    passive: 0
+    value:
+      number: 8
+      unit: percentage
+  level: red4
+  text: Mounted Troop HP +15%, March Size Capacity +8%
+- buffs:
+  - attribute: Defense
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 30
+      unit: percentage
+  - attribute: HP
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 30
+      unit: percentage
+  - attribute: Attack
+    passive: 0
+    targetedType: Ground Troops
+    value:
+      number: 25
+      unit: percentage
+  - attribute: Attack
+    passive: 0
+    targetedType: Mounted Troops
+    value:
+      number: 25
+      unit: percentage
+  level: red5
+  text: Mounted Troop Defense and HP +30%, Ground Troop and Mounted Troop Attack +25%
+general: Mouri Motonari
+id: Mouri Motonari

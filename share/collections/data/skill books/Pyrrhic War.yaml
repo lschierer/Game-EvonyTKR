@@ -1,0 +1,23 @@
+---
+name: Pyrrhic War
+buffs:
+  - attribute: Attack
+    targetedType: Ground Troops
+    value:
+      number: 35
+      unit: percentage
+  - attribute: Defense
+    targetedType: Ground Troops
+    value:
+      number: 35
+      unit: percentage
+  - attribute: HP
+    targetedType: Ground Troops
+    value:
+      number: 15
+      unit: percentage
+  - attribute: HP
+    targetedType: Mounted Troops
+    value:
+      number: 15
+      unit: percentage

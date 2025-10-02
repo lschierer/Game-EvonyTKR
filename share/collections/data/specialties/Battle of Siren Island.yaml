@@ -1,0 +1,83 @@
+---
+name: Battle of Siren Island
+levels:
+  - level: "Green"
+    buffs:
+      - attribute: Attack
+        conditions:
+          - Attacking
+        targetedType: Siege Machines
+        value:
+          number: 4
+          unit: percentage
+      - attribute: Attack
+        conditions:
+          - Attacking
+        targetedType: Ranged Troops
+        value:
+          number: 4
+          unit: percentage
+  - level: "Blue"
+    buffs:
+      - attribute: Attack
+        conditions:
+          - Attacking
+        targetedType: Siege Machines
+        value:
+          number: 4
+          unit: percentage
+      - attribute: Attack
+        conditions:
+          - Attacking
+        targetedType: Ranged Troops
+        value:
+          number: 4
+          unit: percentage
+  - level: "Purple"
+    buffs:
+      - attribute: Attack
+        conditions:
+          - Attacking
+        targetedType: Siege Machines
+        value:
+          number: 8
+          unit: percentage
+      - attribute: Attack
+        conditions:
+          - Attacking
+        targetedType: Ranged Troops
+        value:
+          number: 8
+          unit: percentage
+  - level: "Orange"
+    buffs:
+      - attribute: Attack
+        conditions:
+          - Attacking
+        targetedType: Siege Machines
+        value:
+          number: 8
+          unit: percentage
+      - attribute: Attack
+        conditions:
+          - Attacking
+        targetedType: Ranged Troops
+        value:
+          number: 8
+          unit: percentage
+  - level: "Gold"
+    buffs:
+      - attribute: Attack
+        conditions:
+          - Attacking
+        targetedType: Siege Machines
+        value:
+          number: 16
+          unit: percentage
+      - attribute: Attack
+        conditions:
+          - Attacking
+        targetedType: Ranged Troops
+        value:
+          number: 16
+          unit: percentage

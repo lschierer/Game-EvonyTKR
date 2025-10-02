@@ -1,0 +1,7 @@
+name: Level 4 Luck
+text: Grants you a 18% Double Items Drop Rate from Monsters when General is leading the army.
+buffs:
+  - attribute: Double Items Drop Rate
+    value:
+      number: 18
+      unit: percentage

@@ -1,0 +1,45 @@
+---
+buffs:
+- attribute: Attack
+  conditions:
+  - leading the army
+  passive: 0
+  targetedType: Ranged Troops
+  value:
+    number: 50
+    unit: percentage
+- attribute: Defense
+  conditions:
+  - leading the army
+  passive: 0
+  targetedType: Ranged Troops
+  value:
+    number: 40
+    unit: percentage
+- attribute: Defense
+  conditions:
+  - leading the army
+  passive: 0
+  targetedType: Siege Machines
+  value:
+    number: 40
+    unit: percentage
+- attribute: HP
+  conditions:
+  - leading the army
+  passive: 0
+  targetedType: Ranged Troops
+  value:
+    number: 40
+    unit: percentage
+- attribute: HP
+  conditions:
+  - leading the army
+  passive: 0
+  targetedType: Siege Machines
+  value:
+    number: 40
+    unit: percentage
+name: Imperial Authority
+text: >-
+  Increases ranged troops' attack by 50% and increases ranged troops and siege machines' defense and HP by 40% when General is leading the army.

@@ -1,0 +1,183 @@
+---
+name: War of Succession
+levels:
+  - level: Green
+    buffs:
+      - attribute: Attack
+        targetedType: Mounted Troops
+        conditions:
+          - Against Monsters
+        value:
+          number: 2
+          unit: percentage
+      - attribute: Attack
+        targetedType: Ground Troops
+        conditions:
+          - Against Monsters
+        value:
+          number: 2
+          unit: percentage
+      - attribute: Defense
+        targetedType: Mounted Troops
+        conditions:
+          - Against Monsters
+        value:
+          number: 2
+          unit: percentage
+      - attribute: Defense
+        targetedType: Ground Troops
+        conditions:
+          - Against Monsters
+        value:
+          number: 2
+          unit: percentage
+      - attribute: Marching Speed to Monsters
+        conditions:
+          - Against Monsters
+        value:
+          number: 3
+          unit: percentage
+  - level: Blue
+    buffs:
+      - attribute: Attack
+        targetedType: Mounted Troops
+        conditions:
+          - Against Monsters
+        value:
+          number: 3
+          unit: percentage
+      - attribute: Attack
+        targetedType: Ground Troops
+        conditions:
+          - Against Monsters
+        value:
+          number: 3
+          unit: percentage
+      - attribute: Defense
+        targetedType: Mounted Troops
+        conditions:
+          - Against Monsters
+        value:
+          number: 3
+          unit: percentage
+      - attribute: Defense
+        targetedType: Ground Troops
+        conditions:
+          - Against Monsters
+        value:
+          number: 3
+          unit: percentage
+      - attribute: Marching Speed to Monsters
+        conditions:
+          - Against Monsters
+        value:
+          number: 3
+          unit: percentage
+  - level: Purple
+    buffs:
+      - attribute: Attack
+        targetedType: Mounted Troops
+        conditions:
+          - Against Monsters
+        value:
+          number: 5
+          unit: percentage
+      - attribute: Attack
+        targetedType: Ground Troops
+        conditions:
+          - Against Monsters
+        value:
+          number: 5
+          unit: percentage
+      - attribute: Defense
+        targetedType: Mounted Troops
+        conditions:
+          - Against Monsters
+        value:
+          number: 6
+          unit: percentage
+      - attribute: Defense
+        targetedType: Ground Troops
+        conditions:
+          - Against Monsters
+        value:
+          number: 5
+          unit: percentage
+      - attribute: Marching Speed to Monsters
+        conditions:
+          - Against Monsters
+        value:
+          number: 6
+          unit: percentage
+  - level: Orange
+    buffs:
+      - attribute: Attack
+        targetedType: Mounted Troops
+        conditions:
+          - Against Monsters
+        value:
+          number: 5
+          unit: percentage
+      - attribute: Attack
+        targetedType: Ground Troops
+        conditions:
+          - Against Monsters
+        value:
+          number: 5
+          unit: percentage
+      - attribute: Defense
+        targetedType: Mounted Troops
+        conditions:
+          - Against Monsters
+        value:
+          number: 5
+          unit: percentage
+      - attribute: Defense
+        targetedType: Ground Troops
+        conditions:
+          - Against Monsters
+        value:
+          number: 5
+          unit: percentage
+      - attribute: Marching Speed to Monsters
+        conditions:
+          - Against Monsters
+        value:
+          number: 6
+          unit: percentage
+  - level: Gold
+    buffs:
+      - attribute: Attack
+        targetedType: Mounted Troops
+        conditions:
+          - Against Monsters
+        value:
+          number: 10
+          unit: percentage
+      - attribute: Attack
+        targetedType: Ground Troops
+        conditions:
+          - Against Monsters
+        value:
+          number: 10
+          unit: percentage
+      - attribute: Defense
+        targetedType: Mounted Troops
+        conditions:
+          - Against Monsters
+        value:
+          number: 10
+          unit: percentage
+      - attribute: Defense
+        targetedType: Ground Troops
+        conditions:
+          - Against Monsters
+        value:
+          number: 10
+          unit: percentage
+      - attribute: Marching Speed to Monsters
+        conditions:
+          - Against Monsters
+        value:
+          number: 12
+          unit: percentage

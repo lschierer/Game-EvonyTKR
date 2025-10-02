@@ -1,0 +1,21 @@
+---
+buffs:
+- attribute: Attack
+  conditions:
+  - Enemy
+  - leading the army
+  passive: 0
+  value:
+    number: 10
+    unit: percentage
+- attribute: HP
+  conditions:
+  - Enemy
+  - leading the army
+  passive: 0
+  value:
+    number: 10
+    unit: percentage
+name: King of the Vikings
+text: >-
+  Reduces enemy troops' attack by 10% and reduces enemy troops' HP by 10% when General is leading the army.

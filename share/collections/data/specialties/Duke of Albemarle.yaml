@@ -1,0 +1,102 @@
+name: Duke of Albemarle
+levels:
+  - level: Green
+    buffs:
+      - attribute: Attack
+        targetedType: Mounted Troops
+        conditions:
+          - Attacking
+        value:
+          number: 5
+      - attribute: HP
+        targetedType: Mounted Troops
+        conditions:
+          - Attacking
+        value:
+          number: 3
+      - attribute: Defense
+        targetedType: Mounted Troops
+        conditions:
+          - Attacking
+        value:
+          number: 3
+  - level: Blue
+    buffs:
+      - attribute: Attack
+        targetedType: Mounted Troops
+        conditions:
+          - Attacking
+        value:
+          number: 5
+      - attribute: HP
+        targetedType: Mounted Troops
+        conditions:
+          - Attacking
+        value:
+          number: 3
+      - attribute: Defense
+        targetedType: Mounted Troops
+        conditions:
+          - Attacking
+        value:
+          number: 3
+  - level: Purple
+    buffs:
+      - attribute: Attack
+        targetedType: Mounted Troops
+        conditions:
+          - Attacking
+        value:
+          number: 10
+      - attribute: HP
+        targetedType: Mounted Troops
+        conditions:
+          - Attacking
+        value:
+          number: 6
+      - attribute: Defense
+        targetedType: Mounted Troops
+        conditions:
+          - Attacking
+        value:
+          number: 6
+  - level: Orange
+    buffs:
+      - attribute: Attack
+        targetedType: Mounted Troops
+        conditions:
+          - Attacking
+        value:
+          number: 10
+      - attribute: HP
+        targetedType: Mounted Troops
+        conditions:
+          - Attacking
+        value:
+          number: 6
+      - attribute: Defense
+        targetedType: Mounted Troops
+        conditions:
+          - Attacking
+        value:
+          number: 6
+  - level: Gold
+    buffs:
+      - attribute: Attack
+        targetedType: Mounted Troops
+        conditions:
+          - Attacking
+        value:
+          number: 20
+      - attribute: HP
+        targetedType: Mounted Troops
+        conditions:
+          - Attacking
+        value:
+          number: 12
+      - attribute: Defense
+        targetedType: Mounted Troops
+        conditions:
+          - Attacking
+        value:
+          number: 12

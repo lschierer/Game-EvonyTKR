@@ -1,0 +1,103 @@
+---
+ascending:
+- buffs:
+  - attribute: Attack
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 5
+      unit: percentage
+  - attribute: Attack
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 5
+      unit: percentage
+  - attribute: HP
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 10
+      unit: percentage
+  - attribute: HP
+    passive: 0
+    targetedType: Siege Machines
+    value:
+      number: 10
+      unit: percentage
+  level: red1
+  text: Ranged Troop and Siege Machine Attack +5% and HP +10%
+- buffs:
+  - attribute: Death to Wounded
+    conditions:
+    - Marching
+    passive: 0
+    value:
+      number: 8
+      unit: percentage
+  level: red2
+  text: Marching Troop Death into Wounded Rate +8%
+- buffs:
+  - attribute: Attack
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 20
+      unit: percentage
+  - attribute: Defense
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 20
+      unit: percentage
+  - attribute: HP
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 20
+      unit: percentage
+  level: red3
+  text: Ranged Troop Attack +20%, Defense and HP +20%
+- buffs:
+  - attribute: Defense
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 5
+      unit: percentage
+  - attribute: HP
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 5
+      unit: percentage
+  - attribute: March Size
+    passive: 0
+    value:
+      number: 8
+      unit: percentage
+  level: red4
+  text: Ranged Troop Defense and HP +5%, March Size Capacity +8%
+- buffs:
+  - attribute: Attack
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 20
+      unit: percentage
+  - attribute: Defense
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 15
+      unit: percentage
+  - attribute: HP
+    passive: 0
+    targetedType: Ranged Troops
+    value:
+      number: 15
+      unit: percentage
+  level: red5
+  text: Ranged Troop Attack +20%, Defense and HP +15%
+general: Tachibana Ginchiyo
+id: Tachibana Ginchiyo

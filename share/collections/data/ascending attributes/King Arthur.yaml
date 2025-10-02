@@ -1,0 +1,61 @@
+---
+ascending:
+  - level: "red1"
+    buffs:
+      - attribute: Attack
+        targetedType: Mounted Troops
+        conditions:
+          - Marching
+        value:
+          number: 20
+          unit: percentage
+  - level: "red2"
+    buffs:
+      - attribute: Wounded to Death
+        conditions:
+          - Marching
+        value:
+          number: 8
+          unit: percentage
+  - level: "red3"
+    buffs:
+      - attribute: Rally Capacity
+        conditions:
+          - When Rallying
+        value:
+          number: 8
+          unit: percentage
+  - level: "red4"
+    buffs:
+      - attribute: Defense
+        targetedType: Mounted Troops
+        conditions:
+          - Marching
+        value:
+          number: 20
+          unit: percentage
+      - attribute: HP
+        targetedType: Mounted Troops
+        conditions:
+          - Marching
+        value:
+          number: 20
+          unit: percentage
+  - level: "red5"
+    buffs:
+      - attribute: Attack
+        targetedType: Mounted Troops
+        conditions:
+          - Marching
+        value:
+          number: 15
+          unit: percentage
+      - attribute: Attack
+        targetedType: Ranged Troops
+        conditions:
+          - Marching
+        value:
+          number: 15
+          unit: percentage
+general: King Arthur
+id: King Arthur

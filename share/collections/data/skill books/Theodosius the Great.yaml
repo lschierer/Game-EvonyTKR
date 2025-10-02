@@ -1,0 +1,21 @@
+---
+name: Theodosius the Great
+buffs:
+  - attribute: Attack
+    targetedType: Siege Machines
+    conditions:
+      - Attacking
+    value:
+      number: 45
+      unit: percentage
+  - attribute: Defense
+    targetedType: Siege Machines
+    conditions:
+      - Attacking
+    value:
+      number: 45
+      unit: percentage
+  - attribute: March Size
+    value:
+      number: 8
+      unit: percentage

@@ -1,0 +1,66 @@
+---
+ascending:
+  - level: "red1"
+    buffs:
+      - attribute: Attack
+        conditions:
+          - Marching
+        targetedType: Mounted Troops
+        value:
+          number: 15
+          unit: percentage
+  - level: "red2"
+    buffs:
+      - attribute: Death to Wounded
+        conditions:
+          - Marching
+        value:
+          number: 8
+          unit: percentage
+  - level: "red3"
+    buffs:
+      - attribute: March Size
+        value:
+          number: 10
+          unit: percentage
+  - level: "red4"
+    buffs:
+      - attribute: HP
+        targetedType: Mounted Troops
+        conditions:
+          - Marching
+        value:
+          number: 25
+          unit: percentage
+      - attribute: Defense
+        targetedType: Mounted Troops
+        conditions:
+          - Marching
+        value:
+          number: 25
+          unit: percentage
+  - level: "red5"
+    buffs:
+      - attribute: HP
+        targetedType: Mounted Troops
+        conditions:
+          - Marching
+        value:
+          number: 15
+          unit: percentage
+      - attribute: Defense
+        targetedType: Mounted Troops
+        conditions:
+          - Marching
+        value:
+          number: 15
+          unit: percentage
+      - attribute: Attack
+        targetedType: Mounted Troops
+        conditions:
+          - Marching
+        value:
+          number: 15
+          unit: percentage
+general: Roland
+id: Roland

@@ -1,0 +1,76 @@
+---
+ascending:
+  - level: red1
+    buffs:
+      - attribute: Attack
+        troops: Ranged Troops
+        value:
+          number: 10
+          unit: percentage
+      - attribute: Defense
+        troops: Ranged Troops
+        value:
+          number: 10
+          unit: percentage
+      - attribute: Defense
+        troops: Siege Machines
+        value:
+          number: 10
+          unit: percentage
+  - level: red2
+    buffs:
+      - attribute: Death to Wounded
+        conditions:
+          - Marching
+        value:
+          number: 10
+          unit: percentage
+  - level: red3
+    buffs:
+      - attribute: HP
+        troops: Ranged Troops
+        value:
+          number: 15
+          unit: percentage
+      - attribute: Rally Capacity
+        conditions:
+          - When Rallying
+        value:
+          number: 6
+          unit: percentage
+  - level: red4
+    buffs:
+      - attribute: Defense
+        troops: Ranged Troops
+        value:
+          number: 15
+          unit: percentage
+      - attribute: Defense
+        troops: Siege Machines
+        value:
+          number: 15
+          unit: percentage
+      - attribute: HP
+        troops: Ranged Troops
+        value:
+          number: 15
+          unit: percentage
+      - attribute: HP
+        troops: Siege Machines
+        value:
+          number: 15
+          unit: percentage
+  - level: red5
+    buffs:
+      - attribute: Attack
+        troops: Ranged Troops
+        value:
+          number: 30
+          unit: percentage
+      - attribute: Defense
+        troops: Ranged Troops
+        value:
+          number: 15
+          unit: percentage
+general: Louis IX
+id: Louis IX

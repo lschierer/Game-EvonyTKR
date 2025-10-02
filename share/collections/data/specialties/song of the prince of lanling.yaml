@@ -1,0 +1,107 @@
+name: Song of the Prince of Lanling
+levels:
+  - level: Green
+    text: >-
+      Ground Troop and Mounted Troop Attack +4%
+      Ground Troop Defense +4%
+      March Size Capacity +1%
+    buffs:
+      - attribute: Attack
+        troop: Ground Troops
+        value:
+          number: 4
+      - attribute: Attack
+        troop: Mounted Troops
+        value:
+          number: 4
+      - attribute: Defense
+        troop: Ground Troops
+        value:
+          number: 4
+      - attribute: March Size
+        value:
+          number: 1
+  - level: Blue
+    text: >-
+      Ground Troop and Mounted Troop Attack +5%
+      Ground Troop Defense +5%
+      March Size Capacity +1%
+    buffs:
+      - attribute: Attack
+        troop: Ground Troops
+        value:
+          number: 5
+      - attribute: Attack
+        troop: Mounted Troops
+        value:
+          number: 5
+      - attribute: Defense
+        troop: Ground Troops
+        value:
+          number: 5
+      - attribute: March Size
+        value:
+          number: 1
+  - level: Purple
+    text: >-
+      Ground Troop and Mounted Troop Attack +9%
+      Ground Troop Defense +9%
+      March Size Capacity +2%
+    buffs:
+      - attribute: Attack
+        troop: Ground Troops
+        value:
+          number: 9
+      - attribute: Attack
+        troop: Mounted Troops
+        value:
+          number: 9
+      - attribute: Defense
+        troop: Ground Troops
+        value:
+          number: 9
+      - attribute: March Size
+        value:
+          number: 2
+  - level: Orange
+    text: >-
+      Ground Troop and Mounted Troop Attack +9%
+      Ground Troop Defense +9%
+      March Size Capacity +2%
+    buffs:
+      - attribute: Attack
+        troop: Ground Troops
+        value:
+          number: 9
+      - attribute: Attack
+        troop: Mounted Troops
+        value:
+          number: 9
+      - attribute: Defense
+        troop: Ground Troops
+        value:
+          number: 9
+      - attribute: March Size
+        value:
+          number: 2
+  - level: Gold
+    text: >-
+      Ground Troop and Mounted Troop Attack +18%
+      Ground Troop Defense +18%
+      March Size Capacity +2%
+    buffs:
+      - attribute: Attack
+        troop: Ground Troops
+        value:
+          number: 18
+      - attribute: Attack
+        troop: Mounted Troops
+        value:
+          number: 18
+      - attribute: Defense
+        troop: Ground Troops
+        value:
+          number: 18
+      - attribute: March Size
+        value:
+          number: 2

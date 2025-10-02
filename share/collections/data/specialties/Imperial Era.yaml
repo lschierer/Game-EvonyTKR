@@ -1,0 +1,92 @@
+name: Imperial Era
+levels:
+  - level: Green
+    text: Attacking Siege Machine Attack +5%. Attacking Siege Machine HP +3% March Size Capacity +1%.
+    buffs:
+      - attribute: Attack
+        troop: Siege Machines
+        value:
+          number: 5
+        conditions:
+          - Attacking
+      - attribute: HP
+        troop: Siege Machines
+        value:
+          number: 3
+        conditions:
+          - Attacking
+      - attribute: March Size
+        value:
+          number: 1
+  - level: Blue
+    text: Attacking Siege Machine Attack +6%. Attacking Siege Machine HP +4% March Size Capacity +1%.
+    buffs:
+      - attribute: Attack
+        troop: Siege Machines
+        value:
+          number: 6
+        conditions:
+          - Attacking
+      - attribute: hp
+        troop: Siege Machines
+        value:
+          number: 4
+        conditions:
+          - Attacking
+      - attribute: March Size
+        value:
+          number: 1
+  - level: Purple
+    text: Attacking Siege Machine Attack +11%. Attacking Siege Machine HP +7% March Size Capacity +1%.
+    buffs:
+      - attribute: Attack
+        troop: Siege Machines
+        value:
+          number: 11
+        conditions:
+          - Attacking
+      - attribute: HP
+        troop: Siege Machines
+        value:
+          number: 7
+        conditions:
+          - Attacking
+      - attribute: March Size
+        value:
+          number: 1
+  - level: Orange
+    text: Attacking Siege Machine Attack +11%. Attacking Siege Machine HP +7% March Size Capacity +2%.
+    buffs:
+      - attribute: Attack
+        troop: Siege Machines
+        value:
+          number: 11
+        conditions:
+          - Attacking
+      - attribute: HP
+        troop: Siege Machines
+        value:
+          number: 7
+        conditions:
+          - Attacking
+      - attribute: March Size
+        value:
+          number: 2
+  - level: Gold
+    text: Attacking Siege Machine Attack +22%. Attacking Siege Machine HP +14% March Size Capacity +3%.
+    buffs:
+      - attribute: Attack
+        troop: Siege Machines
+        value:
+          number: 22
+        conditions:
+          - Attacking
+      - attribute: HP
+        troop: Siege Machines
+        value:
+          number: 14
+        conditions:
+          - Attacking
+      - attribute: March Size
+        value:
+          number: 3

@@ -1,0 +1,26 @@
+ascending: true
+basic_attributes:
+  attack:
+    base: 118
+    increment: 8.91
+  defense:
+    base: 112
+    increment: 8.79
+  leadership:
+    base: 119
+    increment: 8.97
+  politics:
+    base: 112
+    increment: 8.72
+book: Holy War of Yadirah
+display: summary
+specialties:
+  - Siege Machine Defense
+  - Bash
+  - Siege Machine Ares
+  - Demigod Hero
+stars: red5
+type:
+  - siege_specialist
+general: Kleos
+name: Kleos

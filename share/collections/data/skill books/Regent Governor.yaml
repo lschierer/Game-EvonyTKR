@@ -1,0 +1,31 @@
+---
+name: Regent Governor
+buffs:
+  - attribute: Attack
+    conditions:
+      - Attacking
+    targetedType: Ranged Troops
+    value:
+      number: 4
+      unit: percentage
+  - attribute: Attack
+    conditions:
+      - Attacking
+    targetedType: Siege Machines
+    value:
+      number: 45
+      unit: percentage
+  - attribute: Defense
+    conditions:
+      - Attacking
+    targetedType: Siege Machines
+    value:
+      number: 15
+      unit: percentage
+  - attribute: HP
+    conditions:
+      - Attacking
+    targetedType: Siege Machines
+    value:
+      number: 15
+      unit: percentage

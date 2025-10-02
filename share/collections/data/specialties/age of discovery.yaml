@@ -1,0 +1,12 @@
+name: Age of Discovery
+levels:
+  - level: Green
+    text: When General brings any dragon Attacking Siege Machine Attack +3%. When General brings any dragon March Size Capacity +1%.
+  - level: Blue
+    text: When General brings any dragon Attacking Siege Machine Attack +3%. When General brings any dragon March Size Capacity +1%.
+  - level: Purple
+    text: When General brings any dragon Attacking Siege Machine Attack +6%. When General brings any dragon March Size Capacity +2%.
+  - level: Orange
+    text: When General brings any dragon Attacking Siege Machine Attack +6%. When General brings any dragon March Size Capacity +2%.
+  - level: Gold
+    text: When General brings any dragon Attacking Siege Machine Attack +12%. When General brings any dragon March Size Capacity +4%.

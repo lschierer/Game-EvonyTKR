@@ -1,0 +1,108 @@
+---
+levels:
+  - buffs:
+      - attribute: Attack
+        passive: 0
+        targetedType: Ranged Troops
+        value:
+          number: 4
+          unit: percentage
+      - attribute: Defense
+        passive: 0
+        targetedType: Ranged Troops
+        value:
+          number: 3
+          unit: percentage
+      - attribute: HP
+        passive: 0
+        targetedType: Ranged Troops
+        value:
+          number: 3
+          unit: percentage
+    level: Green
+    text: Ranged Troop Attack +4%. Ranged Troop Defense +3%. Ranged Troop HP +3%.
+  - buffs:
+      - attribute: Attack
+        passive: 0
+        targetedType: Ranged Troops
+        value:
+          number: 4
+          unit: percentage
+      - attribute: Defense
+        passive: 0
+        targetedType: Ranged Troops
+        value:
+          number: 3
+          unit: percentage
+      - attribute: HP
+        passive: 0
+        targetedType: Ranged Troops
+        value:
+          number: 3
+          unit: percentage
+    level: Blue
+    text: Ranged Troop Attack +4%. Ranged Troop Defense +3%. Ranged Troop HP +3%.
+  - buffs:
+      - attribute: Attack
+        passive: 0
+        targetedType: Ranged Troops
+        value:
+          number: 8
+          unit: percentage
+      - attribute: Defense
+        passive: 0
+        targetedType: Ranged Troops
+        value:
+          number: 6
+          unit: percentage
+      - attribute: HP
+        passive: 0
+        targetedType: Ranged Troops
+        value:
+          number: 6
+          unit: percentage
+    level: Purple
+    text: Ranged Troop Attack +8%. Ranged Troop Defense +6%. Ranged Troop HP +6%.
+  - buffs:
+      - attribute: Attack
+        passive: 0
+        targetedType: Ranged Troops
+        value:
+          number: 8
+          unit: percentage
+      - attribute: Defense
+        passive: 0
+        targetedType: Ranged Troops
+        value:
+          number: 6
+          unit: percentage
+      - attribute: HP
+        passive: 0
+        targetedType: Ranged Troops
+        value:
+          number: 6
+          unit: percentage
+    level: Orange
+    text: Ranged Troop Attack +8%. Ranged Troop Defense +6%. Ranged Troop HP +6%.
+  - buffs:
+      - attribute: Attack
+        passive: 0
+        targetedType: Ranged Troops
+        value:
+          number: 16
+          unit: percentage
+      - attribute: Defense
+        passive: 0
+        targetedType: Ranged Troops
+        value:
+          number: 12
+          unit: percentage
+      - attribute: HP
+        passive: 0
+        targetedType: Ranged Troops
+        value:
+          number: 12
+          unit: percentage
+    level: Gold
+    text: Ranged Troop Attack +16%. Ranged Troop Defense +12%. Ranged Troop HP +12%.
+name: Austro-Hungarian Compromise

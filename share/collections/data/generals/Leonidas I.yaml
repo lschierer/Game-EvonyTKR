@@ -1,0 +1,24 @@
+ascending: 'true'
+basic_attributes:
+  attack:
+    base: 112
+    increment: 0
+  defense:
+    base: 120
+    increment: 0
+  leadership:
+    base: 110
+    increment: 0
+  politics:
+    base: 103
+    increment: 0
+book: The 300 Spartans
+name: Leonidas I
+specialties:
+  - Ground Troop Assault
+  - Defensive
+  - Ground Troop Ares
+  - Battle of Thermopylae
+stars: red5
+type:
+  - wall

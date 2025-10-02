@@ -1,0 +1,69 @@
+ascending:
+  - level: red1
+    buffs:
+      - attribute: Attack
+        conditions:
+          - Enemy
+        targetedType: Ground Troops
+        value:
+          number: -15
+          unit: percentage
+      - attribute: Attack
+        conditions:
+          - Enemy
+        targetedType: Ranged Troops
+        value:
+          number: -15
+          unit: percentage
+  - level: red2
+    buffs:
+      - attribute: SubCity Training Speed
+        value:
+          number: 30
+          unit: percentage
+  - level: red3
+    buffs:
+      - attribute: Attack
+        conditions:
+          - Enemy
+        targetedType: Ground Troops
+        value:
+          number: -15
+          unit: percentage
+      - attribute: Attack
+        conditions:
+          - Enemy
+        targetedType: Mounted Troops
+        value:
+          number: -15
+          unit: percentage
+      - attribute: Death to Survival
+        conditions:
+          - When City Mayor for this SubCity
+        value:
+          number: 10
+          unit: percentage
+  - level: red4
+    buffs:
+      - attribute: Attack
+        conditions:
+          - Enemy
+        value:
+          number: -10
+          unit: percentage
+  - level: red5
+    buffs:
+      - attribute: Defense
+        conditions:
+          - Enemy
+        value:
+          number: -10
+          unit: percentage
+      - attribute: HP
+        conditions:
+          - Enemy
+        value:
+          number: -10
+          unit: percentage
+general: Jester
+id: Jester

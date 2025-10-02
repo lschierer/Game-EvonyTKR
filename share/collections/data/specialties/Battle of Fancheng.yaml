@@ -1,0 +1,118 @@
+---
+name: Battle of Fancheng
+levels:
+  - level: "Green"
+    buffs:
+      - attribute: Attack
+        conditions:
+          - Marching
+        targetedType: Mounted Troops
+        value:
+          number: 2
+          unit: percentage
+      - attribute: Attack
+        conditions:
+          - Marching
+        targetedType: Mounted Troops
+        value:
+          number: 2
+          unit: percentage
+      - attribute: HP
+        conditions:
+          - Marching
+        targetedType: Ground Troops
+        value:
+          number: 3
+          unit: percentage
+  - level: "Blue"
+    buffs:
+      - attribute: Attack
+        conditions:
+          - Marching
+        targetedType: Ground Troops
+        value:
+          number: 2
+          unit: percentage
+      - attribute: Attack
+        conditions:
+          - Marching
+        targetedType: Mounted Troops
+        value:
+          number: 2
+          unit: percentage
+      - attribute: HP
+        conditions:
+          - Marching
+        targetedType: Ground Troops
+        value:
+          number: 3
+          unit: percentage
+  - level: "Purple"
+    buffs:
+      - attribute: Attack
+        conditions:
+          - Marching
+        targetedType: Ground Troops
+        value:
+          number: 4
+          unit: percentage
+      - attribute: Attack
+        conditions:
+          - Marching
+        targetedType: Mounted Troops
+        value:
+          number: 4
+          unit: percentage
+      - attribute: HP
+        conditions:
+          - Marching
+        targetedType: Ground Troops
+        value:
+          number: 6
+          unit: percentage
+  - level: "Orange"
+    buffs:
+      - attribute: Attack
+        conditions:
+          - Marching
+        targetedType: Ground Troops
+        value:
+          number: 4
+          unit: percentage
+      - attribute: Attack
+        conditions:
+          - Marching
+        targetedType: Mounted Troops
+        value:
+          number: 4
+          unit: percentage
+      - attribute: HP
+        conditions:
+          - Marching
+        targetedType: Ground Troops
+        value:
+          number: 6
+          unit: percentage
+  - level: "Gold"
+    buffs:
+      - attribute: Attack
+        conditions:
+          - Marching
+        targetedType: Ground Troops
+        value:
+          number: 8
+          unit: percentage
+      - attribute: Attack
+        conditions:
+          - Marching
+        targetedType: Mounted Troops
+        value:
+          number: 8
+          unit: percentage
+      - attribute: HP
+        conditions:
+          - Marching
+        targetedType: Ground Troops
+        value:
+          number: 12
+          unit: percentage

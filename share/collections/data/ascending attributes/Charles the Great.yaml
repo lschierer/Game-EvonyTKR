@@ -1,0 +1,95 @@
+---
+ascending:
+  - level: "red1"
+    buffs:
+      - attribute: Attack
+        targetedType: Ranged Troops
+        conditions:
+          - Enemy
+        value:
+          number: 15
+          unit: percentage
+      - attribute: Attack
+        targetedType: Siege Machines
+        conditions:
+          - Enemy
+        value:
+          number: 15
+          unit: percentage
+  - level: "red2"
+    buffs:
+      - attribute: Defense
+        conditions:
+          - Enemy
+        targetedType: Ranged Troops
+        value:
+          number: 5
+          unit: percentage
+      - attribute: Defense
+        conditions:
+          - Enemy
+        targetedType: Siege Machines
+        value:
+          number: 5
+          unit: percentage
+      - attribute: SubCity Training Speed
+        conditions:
+          - When City Mayor for this SubCity
+        value:
+          number: 30
+          unit: percentage
+  - level: "red3"
+    buffs:
+      - attribute: HP
+        conditions:
+          - Enemy
+        targetedType: Ranged Troops
+        value:
+          number: 5
+          unit: percentage
+      - attribute: HP
+        conditions:
+          - Enemy
+        targetedType: Siege Machines
+        value:
+          number: 5
+          unit: percentage
+      - attribute: Death to Survival
+        conditions:
+          - When City Mayor for this SubCity
+        value:
+          number: 20
+          unit: percentage
+  - level: "red4"
+    buffs:
+      - attribute: Attack
+        conditions:
+          - Enemy
+        value:
+          number: 10
+          unit: percentage
+  - level: "red5"
+    buffs:
+      - attribute: Attack
+        targetedType: Ranged Troops
+        conditions:
+          - Enemy
+        value:
+          number: 20
+          unit: percentage
+      - attribute: Defense
+        targetedType: Ranged Troops
+        conditions:
+          - Enemy
+        value:
+          number: 15
+          unit: percentage
+      - attribute: HP
+        targetedType: Ranged Troops
+        conditions:
+          - Enemy
+        value:
+          number: 15
+          unit: percentage
+general: Charles the Great
+id: Charles the Great
