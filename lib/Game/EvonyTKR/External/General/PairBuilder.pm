@@ -39,11 +39,14 @@ package Game::EvonyTKR::External::General::PairBuilder {
         $PairMonitorStarted = 1;
         my ($plugin, $data) = @_;
         my $conflicts = $data->{conflicts} // {};
+        my $finalBatch = $data->{final} // 0;
+        return unless($finalBatch);
         my @generals;
         @generals = keys $conflicts->{by_general}->%* unless (!$conflicts);
         $logger->debug(sprintf(
           'there are %s generals from the conficts by_general keys.',
           scalar @generals));
+
         my $jid = $app->minion->enqueue(
           monitor_pair_builder => [{
             generals => \@generals
@@ -64,7 +67,9 @@ package Game::EvonyTKR::External::General::PairBuilder {
                 my $notes         = $job->info->{notes};
                 my $pairs_by_type = $notes->{pairs_by_type};
                 $app->plugins->emit(pairs_complete => $pairs_by_type);
+
                 Mojo::IOLoop->remove($loop);
+                $PairMonitorStarted = 0;
               }
               else {
                 my $notes         = $job->info->{notes};
@@ -94,7 +99,7 @@ package Game::EvonyTKR::External::General::PairBuilder {
             my $lock = $app->minion->lock('build_pairs_for_primary' . $general, 360);
             next unless $lock;
             my $jid = $app->minion->enqueue(
-              build_pairs_for_primary => [{ general_name => $general }]);
+              build_pairs_for_primary => [{ general_name => $general }], {priority => 5 });
           }
         }
 

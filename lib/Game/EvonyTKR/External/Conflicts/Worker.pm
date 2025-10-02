@@ -24,11 +24,13 @@ package Game::EvonyTKR::External::Conflicts::Worker {
     $logger = Log::Log4perl->get_logger(__PACKAGE__);
     $app->minion->add_task(
       detect_conflicts_for_general => sub ($job, $args) {
+        return $job->retry({delay => 30}) unless my $guard = $app->minion->guard('detect_conflicts_in_progress', 60, {limit => 4 });
+
         my $worker = ConflictWorkerLogic->new();
         my $result = $worker->process_general($args);
         $job->note(conflicts => $result);
         $job->finish("Conflicts detected for " . $args->{general_name});
-      }
+      },
     );
 
     $app->minion->add_task(
@@ -62,8 +64,15 @@ package Game::EvonyTKR::External::Conflicts::Worker {
                   my $notes = $job->info->{notes};
 
                   $app->plugins->emit(
-                    'conflicts_complete' => { conflicts => $notes });
+                    'conflicts_complete' => {
+                      conflicts => $notes,
+                      final     => 1,
+                    });
                   Mojo::IOLoop->remove($loop);
+                }
+                else {
+                  my $notes = $job->info->{notes};
+                  $app->plugins->emit('conflicts_complete' => { conflicts => $notes});
                 }
               }
             }
@@ -86,7 +95,7 @@ package Game::EvonyTKR::External::Conflicts::Worker {
           my $jid = $app->minion->enqueue(
             detect_conflicts_for_general => [{
               general_name => $general->name
-            }],
+            }], { priority => 10 }
           );
         };
         if ($@) {
