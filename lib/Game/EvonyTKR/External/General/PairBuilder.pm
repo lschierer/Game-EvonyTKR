@@ -102,7 +102,7 @@ package Game::EvonyTKR::External::General::PairBuilder {
         # Assume at least one is working until proved otherwise
         my $stillWorking = 1;
         $loop = Mojo::IOLoop->recurring(
-          5 => sub {
+          10 => sub {
             eval {
               my $total = $app->minion->jobs({
                 tasks => ['build_pairs_for_primary'],
