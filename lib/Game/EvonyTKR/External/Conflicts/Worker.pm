@@ -24,7 +24,7 @@ package Game::EvonyTKR::External::Conflicts::Worker {
     $logger = Log::Log4perl->get_logger(__PACKAGE__);
     $app->minion->add_task(
       detect_conflicts_for_general => sub ($job, $args) {
-        return $job->retry({delay => 30}) unless my $guard = $app->minion->guard('detect_conflicts_in_progress', 45, {limit => 4 });
+        return $job->retry({delay => 30}) unless my $guard = $app->minion->guard('detect_conflicts_in_progress', 45, {limit => 5 });
 
         my $worker = ConflictWorkerLogic->new();
         my $result = $worker->process_general($args);
