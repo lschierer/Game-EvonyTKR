@@ -64,7 +64,7 @@ package Game::EvonyTKR::Logger::Config {
       Log::Log4perl::init_and_watch($config_file->absolute->canonpath, 10);
     }
     else {
-      Log::Log4perl::init_once($config_file->absolute->canonpath);
+      Log::Log4perl::init_and_watch($config_file->absolute->canonpath,20);
     }
     Log::Log4perl::Config->utf8(1);
     $logger = Log::Log4perl->get_logger($dist_name);

@@ -59,7 +59,7 @@ package Game::EvonyTKR {
     my $lc              = Game::EvonyTKR::Logger::Config->new('Game-EvonyTKR');
     my $log4perl_logger = $lc->init($mode);
     my $app_log         = Game::EvonyTKR::Logger::MojoLog4Perl->new(
-      l4p => $log4perl_logger->get_logger('Game-EvonyTKR'),);
+      l4p => $log4perl_logger,);
     $self->log($app_log);
 
     $self->helper(
@@ -72,7 +72,7 @@ package Game::EvonyTKR {
           $self->log->info("got a cat '$cat'");
         }
         Log::Log4perl::Config->utf8(1);
-        my $logger = $log4perl_logger->get_logger($cat);
+        my $logger = $log4perl_logger;
         return $logger;
       }
     );
