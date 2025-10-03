@@ -24,7 +24,10 @@ package Game::EvonyTKR::External::Conflicts::Worker {
     $logger = Log::Log4perl->get_logger(__PACKAGE__);
     $app->minion->add_task(
       detect_conflicts_for_general => sub ($job, $args) {
-        return $job->retry({delay => 30}) unless my $guard = $app->minion->guard('detect_conflicts_in_progress', 45, {limit => 5 });
+        my $limit = $app->mode eq 'dev' ? 9 : 5;
+        return $job->retry({ delay => 30 })
+          unless my $guard = $app->minion->guard('detect_conflicts_in_progress',
+          45, { limit => $limit });
 
         my $worker = ConflictWorkerLogic->new();
         my $result = $worker->process_general($args);
@@ -67,12 +70,14 @@ package Game::EvonyTKR::External::Conflicts::Worker {
                     'conflicts_complete' => {
                       conflicts => $notes,
                       final     => 1,
-                    });
+                    }
+                  );
                   Mojo::IOLoop->remove($loop);
                 }
                 else {
                   my $notes = $job->info->{notes};
-                  $app->plugins->emit('conflicts_complete' => { conflicts => $notes});
+                  $app->plugins->emit(
+                    'conflicts_complete' => { conflicts => $notes });
                 }
               }
             }
@@ -90,14 +95,17 @@ package Game::EvonyTKR::External::Conflicts::Worker {
             $logger->error('general is undefined in general_loaded callback');
             return;
           }
-          my $lock = $app->minion->lock('detect_conflicts_for_general' . $general->name, 360);
+          my $lock =
+            $app->minion->lock('detect_conflicts_for_general' . $general->name,
+            360);
           return unless $lock;
           my $jid = $app->minion->enqueue(
             detect_conflicts_for_general => [{
               general_name => $general->name
-            }], {
-              priority  => 10,
-              attempts  => 3,
+            }],
+            {
+              priority => 10,
+              attempts => 3,
             }
           );
         };

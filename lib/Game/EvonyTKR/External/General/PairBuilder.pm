@@ -25,17 +25,20 @@ package Game::EvonyTKR::External::General::PairBuilder {
     $app->minion->add_task(
       build_pairs_for_primary => sub ($job, $args) {
         # no more than 5 total pair builders at a time
-        return $job->retry({delay => 5 }) unless my $guard1 = $job->app->minion->guard("pair_builders", 30, { limit => 5});
+        return $job->retry({ delay => 5 })
+          unless my $guard1 =
+          $job->app->minion->guard("pair_builders", 30, { limit => 5 });
         my $gn = $args->{general_name} // '';
 
         # can't build pairs for an unknown general
-        unless (length($gn)){
+        unless (length($gn)) {
           $logger->error("General name is empty");
           return $job->finish('General name is empty');
         }
 
         # no more than one for this specific general
-        return $job->finish(sprintf('pairs already in progress for %s', $gn)) unless my $guard2 = $app->minion->guard("build_pairs_for_$gn",10);
+        return $job->finish(sprintf('pairs already in progress for %s', $gn))
+          unless my $guard2 = $app->minion->guard("build_pairs_for_$gn", 10);
 
         # actually do the work
         my $worker = PairBuilderWorkerLogic->new();
@@ -48,185 +51,148 @@ package Game::EvonyTKR::External::General::PairBuilder {
 
     $app->minion->add_task(
       build_all_pairs => sub ($job, $args) {
-        return $job->finish('pairs already being built') unless my $guard = $app->minion->guard('build_all_pairs', 60);
+        return $job->finish('pairs already being built')
+          unless my $guard = $app->minion->guard('build_all_pairs', 60);
         my $app = $job->app;
 
         $logger->info("Building All Pairs");
         my $conflicts = $args->{conflicts} // {};
         my @generals;
-        @generals = keys $conflicts->{by_general}->%* unless (!$conflicts);
+        @generals = List::AllUtils::uniq sort keys $conflicts->{by_general}->%* unless (!$conflicts);
         $logger->debug(sprintf(
           'there are %s generals from the conficts by_general keys.',
           scalar @generals));
         my @pairBuilders;
-        foreach my $general (@generals){
-          my $jid = $app->minion->enqueue(build_pairs_for_primary => [{ general_name => $general }], {
-            priority  => 10,
-            attempts  => 5,
-            delay     => (0.1 + rand(0.5)),
-          });
+
+        foreach my $general (@generals) {
+          my $jid = $app->minion->enqueue(
+            build_pairs_for_primary => [{ general_name => $general }],
+            {
+              priority => 10,
+              attempts => 5,
+              delay    => (0.1 + rand(0.5)),
+            }
+          );
           push @pairBuilders, $jid;
         }
         $job->note(pairs_builders => \@pairBuilders);
         $job->finish('pair builders launched');
-      });
-
-    $app->minion->add_task(monitor_pair_building => sub ($job, $args) {
-      my $pairs_by_type = {};
-
-      my $builder_jid = $args->{builder_jid};
-      unless ($builder_jid) {
-        $logger->error("no builder provided to monitor!");
-        $job->finish('no builder to monitor!');
       }
-      my $builder = $job->app->minion->job($builder_jid);
-      unless ($builder) {
-        $logger->error("No builder found for $builder_jid");
-        $job->finish("No builder found for $builder_jid");
-      }
-      my $conflicts = $args->{conflicts};
-      unless ($conflicts) {
-        $logger->error("No conflicts provided for monitor_pair_building");
-        $job->finish('No conflicts provided for monitor_pair_building');
-      }
+    );
 
-      my $loop;
-      $loop = Mojo::IOLoop->recurring( 15 => sub {
+    $app->minion->add_task(
+      monitor_pair_building => sub ($job, $args) {
+        my $pairs_by_type = {};
 
-        if($builder->info->{state} eq 'failed'){
-          unless ($builder->info->{retries} >= 5 ){
-            $logger->error(sprintf('build spawner has failed %s times.', $builder->info->{retries}));
-            Mojo::IOLoop->remove($loop);
-            $job->finish(sprintf('build spawner has failed %s times.', $builder->info->{retries}));
-          }
-          $builder->retry({delay => 300 });
-          return;
-        } elsif ($builder->info->{state} eq 'finished') {
-          my $builders = $builder->info->{notes}{pairs_builders};
-          unless(scalar(@$builders)){
-            $logger->error('no builders found from pair builder job!!');
-            Mojo::IOLoop->remove($loop);
-            $job->finish('no builders found from pair builder job!!');
-          }
-          my $isFailed = 0;
-          my $inProgress = 0;
-          while (my $info = $job->app->minion->jobs({ids => [ $builders->@* ] })->next ) {
-            if($info->{state} eq 'failed' || $isFailed) {
-              if(!$isFailed){
-                $logger->error(sprintf('failed job %s detected. cancelling jobs.', $info->{id}));
-              } else {
-                $logger->debug(sprintf('cleaning up job %s after failure detected', $info->{id}));
+        my $builder_jid = $args->{builder_jid};
+        unless ($builder_jid) {
+          $logger->error("no builder provided to monitor!");
+          $job->finish('no builder to monitor!');
+        }
+        my $builder = $job->app->minion->job($builder_jid);
+        unless ($builder) {
+          $logger->error("No builder found for $builder_jid");
+          $job->finish("No builder found for $builder_jid");
+        }
+        my $conflicts = $args->{conflicts};
+        unless ($conflicts) {
+          $logger->error("No conflicts provided for monitor_pair_building");
+          $job->finish('No conflicts provided for monitor_pair_building');
+        }
+
+        my $loop;
+        $loop = Mojo::IOLoop->recurring(
+          15 => sub {
+
+            if ($builder->info->{state} eq 'failed') {
+              unless ($builder->info->{retries} >= 5) {
+                $logger->error(
+                  sprintf('build spawner has failed %s times.',
+                    $builder->info->{retries})
+                );
+                Mojo::IOLoop->remove($loop);
+                $job->finish(
+                  sprintf('build spawner has failed %s times.',
+                    $builder->info->{retries})
+                );
               }
-              $isFailed = 1;
-              $job->app->minion->job($info->{id})->remove;
-            } elsif ( $info->{state} eq 'finished') {
-              __PACKAGE__->handle_result($info, $pairs_by_type);
-              $job->note(pairs_in_progress => $pairs_by_type);
-            } else {
-              $inProgress++;
+              $builder->retry({ delay => 300 });
+              return;
+            }
+            elsif ($builder->info->{state} eq 'finished') {
+              my $builders = $builder->info->{notes}{pairs_builders};
+              unless (scalar(@$builders)) {
+                $logger->error('no builders found from pair builder job!!');
+                Mojo::IOLoop->remove($loop);
+                $job->finish('no builders found from pair builder job!!');
+              }
+              my $isFailed   = 0;
+              my $inProgress = 0;
+              while (my $info =
+                $job->app->minion->jobs({ ids => [$builders->@*] })->next) {
+                if ($info->{state} eq 'failed' || $isFailed) {
+                  if (!$isFailed) {
+                    $logger->error(
+                      sprintf('failed job %s detected. cancelling jobs.',
+                        $info->{id})
+                    );
+                  }
+                  else {
+                    $logger->debug(
+                      sprintf('cleaning up job %s after failure detected',
+                        $info->{id})
+                    );
+                  }
+                  $isFailed = 1;
+                  $job->app->minion->job($info->{id})->remove;
+                }
+                elsif ($info->{state} eq 'finished') {
+                  __PACKAGE__->handle_result($info, $pairs_by_type);
+                  $job->note(pairs_in_progress => $pairs_by_type);
+                }
+                else {
+                  $inProgress++;
+                }
+              }
+              if ($inProgress > 0) {
+                $logger->info("there are $inProgress pair builders remaining");
+                return;
+              }
+              else {
+                $logger->info("All Pair Builders Complete");
+                $job->note(pairs_complete => $pairs_by_type);
+                $Mojo::IOLoop->remove($loop);
+                return $job->finish(pairs_complete => $pairs_by_type);
+              }
             }
           }
-          if($inProgress > 0){
-            $logger->info("there are $inProgress pair builders remaining");
-            return;
-          } else {
-            $logger->info("All Pair Builders Complete");
-            $job->note(pairs_complete => $pairs_by_type);
-            $Mojo::IOLoop->remove($loop);
-            return $job->finish(pairs_complete => $pairs_by_type);
-          }
-        }
-      });
-      Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
-    });
-
-    $app->plugins->on(conflicts_complete => sub {
-    my ($plugin, $data) = @_;
-    my $conflicts = $data->{conflicts} // {};
-    my $finalBatch = $data->{final} // 0;
-    return unless($finalBatch);
-
-      unless( my $guard = $app->minion->guard('monitor_pair_building', 300)) {
-        $logger->warn('monitor_pair_building already present');
-        return;
+        );
+        Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
       }
+    );
 
-      my $builder_jid = $app->minion->enqueue(build_all_pairs => [{
-        conflicts => $conflicts
-      }]);
+    state $buildingPairs = 0;
+    $app->plugins->on(
+      conflicts_complete => sub {
+        my ($plugin, $data) = @_;
+        my $conflicts  = $data->{conflicts} // {};
 
-      my $monitor_jid = $app->minion->enqueue(monitor_pair_building => [{
-        conflicts   => $conflicts,
-        builder_jid => $builder_jid,
-      }]);
-
-      my $loop;
-      $loop = Mojo::IOLoop->recurring( 5 => sub {
-        my $job = $app->minion->job($monitor_jid);
-        unless($job) {
-          $logger->error("no job found for $monitor_jid");
-          Mojo::IOLoop->remove($loop);
+        if($buildingPairs) {
+          $logger->warn('monitor_pair_building already present');
           return;
         }
-        if ($job->info->{state} eq 'failed') {
-          $logger->error("monitor job $monitor_jid failed!!");
-          Mojo::IOLoop->remove($loop);
-          return;
-        }
+        $buildingPairs = 1;
 
-        if ($job->info->{state} eq 'finished'){
-          $logger->info("monitor_pair_building finished successfully");
-          my $pairs_by_type = $job->info->{notes}{pairs_complete};
-          $app->plugins->emit(pairs_complete => $pairs_by_type);
-          Mojo::IOLoop->remove($loop);
-          return;
-        }
-
-        my $pairs_by_type = $job->info->{notes}{pairs_in_progress};
-        $app->plugins->emit(pairs_in_progress => $pairs_by_type);
-      });
-      Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
+        my $pairBuilderLogic = PairBuilderLogic->new(
+          app       => $app,
+          conflicts => $conflicts,
+        );
+        $pairBuilderLogic->monitor_and_build();
     });
-
- }
-
-
-  sub handle_result ($something, $info, $pairs_by_type) {
-    my $result = $info->{result};
-    $logger->debug(sprintf('result for job id %s is %s', $info->{id}, $result));
-    my $notes = $info->{notes};
-
-    if ($result =~ /Pairs Created for /) {
-      my $newPairs = $notes->{pairs_by_type};
-      if ($newPairs) {
-
-        foreach my $type (keys %{$newPairs}) {
-          my @all;
-          if (exists $pairs_by_type->{$type}
-            && defined $pairs_by_type->{$type}) {
-            push @all, @{ $pairs_by_type->{$type} };
-          }
-          foreach my $np ($newPairs->{$type}->@*) {
-            if (
-              List::AllUtils::none {
-                $_->{primary} eq $np->{primary}
-                  && $_->{secondary} eq $np->{secondary}
-              }
-              @all
-            ) {
-              push @all, $np;
-            }
-          }
-          $pairs_by_type->{$type} = \@all;
-        }
-      }
-    }
-    else {
-      $logger->error("final result is unexpected: $result");
-    }
   }
 
-  class PairBuilderWorkerLogic : isa(Game::EvonyTKR::Shared::Constants) {
+
+  class PairBuilderLogic : isa(Game::EvonyTKR::Shared::Constants) {
     use Log::Log4perl qw(:levels);
     use Unicode::Normalize;
     use Unicode::CaseFold qw(fc);
@@ -236,6 +202,9 @@ package Game::EvonyTKR::External::General::PairBuilder {
     ADJUST {
       $self->get_logger('Game::EvonyTKR::External::General::PairBuilder');
     }
+
+    field $app : param;
+    field $conflicts : param = {};
 
     field $pairs_by_type : reader = {};
 
@@ -249,27 +218,76 @@ package Game::EvonyTKR::External::General::PairBuilder {
       allow_wall_buffs => 1,
       );
 
-    method execute($args) {
+    field $generals = [];
 
+
+    method monitor_and_build {
+
+      $self->setup_generals();
+
+      $app->plugins->on(conflicts_complete => sub {
+        my ($plugin, $data) = @_;
+        my $conflicts  = $data->{conflicts} // {};
+        $self->logger->debug('conflict data update detected by PairBuilderLogic');
+        $self->prune_pairs();
+      });
+
+
+    }
+
+    method setup_generals {
+      # isolate the use of the generalManager here
+      # because long term I want to get rid of it.
       my $dist_dir = Path::Tiny::path(File::Share::dist_dir('Game::EvonyTKR'));
       my $collectionDir = $dist_dir->child("collections/data");
       $generalManager->importAll($collectionDir->child("generals"));
       $bookManager->importAll($collectionDir->child('skill books'));
       $bookManager->importAll($collectionDir->child('generic books'));
-      # Create conflict detector
 
-      foreach my $general (values $generalManager->get_all_generals()->%*) {
+      foreach my $general (sort {$a->name cmp $b->name} values $generalManager->get_all_generals()->%*) {
         unless ($general) {
           $self->logger->error(
             'PairBuilderWorkerLogic: undefined general in general manager!!');
           next;
         }
         $general->populateBuiltInBook($bookManager);
+        push @$generals, $general;
       }
+    }
+
+    method prune_pairs {
+      foreach my $general_name (sort keys $conflicts->{by_general}->%*) {
+        my $general;
+        foreach my $type (keys $pairs_by_type->%*) {
+          my $generals = $pairs_by_type->{$type};
+          $general = List::AllUtils::first { $_->name eq $general_name } $general->@*;
+          last if $general;
+        }
+        next unless($general);
+        # a given general may be in multiple types.
+        foreach my $type (keys $pairs_by_type->%*) {
+          @{ $pairs_by_type->{$type}} = grep {
+            my $pair = $_;
+            not (
+              $pair->primary->name eq $general->name and
+              List::AllUtils::any { $_ eq $pair->secondary->name } $conflicts->{by_general}->{$general->name}->@*
+            );
+          } @{ $pairs_by_type};
+        }
+      }
+
+    }
+
+
+    method execute($args) {
+
+
+      # Create conflict detector
+
 
       my $conflicts = $args->{conflicts};
       if ($conflicts) {
-        foreach my $general ($conflicts->{by_general}->%*) {
+        foreach my $general (sort keys $conflicts->{by_general}->%*) {
           foreach my $og ($conflicts->{by_general}->{$general}->%*) {
             $conflictDetector->by_general->{$general}->{$og} = 1;
           }

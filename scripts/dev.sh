@@ -20,7 +20,7 @@ fi
 
 touch minion.db
 
-nice -n 10 ./bin/game-evonytkr minion worker -j 10 -I 5 &
+nice -n 10 ./bin/game-evonytkr minion worker -j 15 -s 1 -S 1 &
 WORKER_PID=$!
 echo "Worker PID: $WORKER_PID"
 

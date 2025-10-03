@@ -141,7 +141,7 @@ package Game::EvonyTKR::Controller::Pairs {
           }
           @{ $pairs_by_type->{$type} }
         ) {
-        $increment++;
+          $increment++;
           my $primary   = $gm->getGeneral($p->{primary});
           my $secondary = $gm->getGeneral($p->{secondary});
           if ($primary && $secondary) {
@@ -153,8 +153,8 @@ package Game::EvonyTKR::Controller::Pairs {
           }
         }
       }
-      $logger->debug(sprintf('there are %s pairs of type %s added',
-      $increment, $type));
+      $logger->debug(sprintf(
+        'there are %s pairs of type %s added', $increment, $type));
     }
   }
 

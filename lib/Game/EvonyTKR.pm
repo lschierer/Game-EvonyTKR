@@ -58,8 +58,8 @@ package Game::EvonyTKR {
 
     my $lc              = Game::EvonyTKR::Logger::Config->new('Game-EvonyTKR');
     my $log4perl_logger = $lc->init($mode);
-    my $app_log         = Game::EvonyTKR::Logger::MojoLog4Perl->new(
-      l4p => $log4perl_logger,);
+    my $app_log =
+      Game::EvonyTKR::Logger::MojoLog4Perl->new(l4p => $log4perl_logger,);
     $self->log($app_log);
 
     $self->helper(
@@ -123,7 +123,7 @@ package Game::EvonyTKR {
 
     $self->log->debug("dbPath is $dbPath");
     $self->plugin(Minion => { SQLite => "sqlite:$dbPath" });
-    if($mode eq 'development'){
+    if ($mode eq 'development') {
       $self->minion->remove_after(7200);
     }
     # Minion worker
