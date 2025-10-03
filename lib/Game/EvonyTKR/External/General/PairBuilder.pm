@@ -5,6 +5,7 @@ use File::FindLib 'lib';
 require Data::Printer;
 require File::Share;
 require JSON::PP;
+require YAML::PP;
 require Log::Log4perl;
 require MIME::Base64;
 require Path::Tiny;
@@ -13,7 +14,111 @@ require Game::EvonyTKR::Logger::Config;
 require Game::EvonyTKR::Shared::Constants;
 require Game::EvonyTKR::Model::General;
 
-package Game::EvonyTKR::External::General::PairBuilder {
+class Game::EvonyTKR::External::General::PairBuilder : isa(Game::EvonyTKR::Shared::Constants) {
+  use Unicode::Normalize;
+  use Unicode::CaseFold qw(fc);
+  use Encode            qw(is_utf8 decode_utf8 encode_utf8);
+  use Carp;
+
+  field $app            : param;
+  field $job            : param;
+  field $general_names  : param = [];
+  field $conflicts      : param = {};
+
+  field $dist_dir = Path::Tiny::path(File::Share::dist_dir('Game::EvonyTKR'));
+  field $generals   = {};
+  field $builderJobs = [];
+
+  ADJUST {
+    my $collectionDir = $dist_dir->child('collections/data');
+    my $generalsDir = $collectionDir->child('generals');
+    my $bookDir = $collectionDir->child('skill books');
+    my $ypp = YAML::PP->new(
+      schema       => [qw/ + Perl /],
+      yaml_version => ['1.2', '1.1'],
+    );
+    foreach my $gn ($general_names->@*){
+      my ($file) = grep {
+        my $nf = $self->normalize_name($_->basename('.yaml'));
+        my $nn = $self->normalize_name($gn);
+        $nf eq $nn;
+      } $generalsDir->children;
+      unless(defined($file) && $file->is_file()) {
+        $self->worker_croak("no yaml file found for $gn");
+        next;
+      }
+      my $data   = $file->slurp_utf8;
+      my $gho = $ypp->load_string($data);
+      my $general = Game::EvonyTKR::Model::General->from_hash($gho, $self->logger);
+
+      my ($bookFile) = grep {
+        my $nf = $self->normalize_name($_->basename('.yaml'));
+        my $nn = $self->normalize_name($general->builtInBookName);
+        $nf eq $nn;
+      } $bookDir->children;
+      unless(defined($bookFile) && $bookFile->is_file()){
+        $self->worker_croak(sprintf('no yaml file found for "%s"', $general->builtInBookName));
+        next;
+      }
+      my $bd = $bookFile->slurp_utf8;
+      my $bho = $ypp->load_string($bd);
+      my $book = Game::EvonyTKR::Model::Book::Builtin->from_hash($bho, $self->logger);
+      unless(Scalar::Util::blessed($book) eq
+        'Game::EvonyTKR::Model::Book::Builtin') {
+        $self->worker_croak('failed to import book ' . $general->builtInBookName);
+        next;
+      }
+      $general->set_builtInBook($book);
+
+      $generals->{$general->name} = $general;
+    }
+  }
+
+  ADJUST {
+    $app->minion->add_task(build_pairs_for_primary => sub ($job, $args){
+      my $general_name = $args->{general_name};
+      unless(length($general_name)){
+        $self->logger->error('general_name not provided to build_pairs_for_primary');
+        return $job->finish('general_name not provided to build_pairs_for_primary');
+      }
+      return $job->finish(sprintf('build_pairs_for_primary for %s already launched', $general_name))
+        unless my $bppGuard = $app->minion->guard("build_pairs_for_primary_${general_name}", 360);
+      $self->build_pairs_for_primary($general_name);
+    });
+  }
+
+  method execute {
+    if(scalar(keys $generals->%*) > 0){
+      $self->build_all_pairs();
+    }
+
+  }
+
+  method build_all_pairs {
+    foreach my $general (sort {$a->name cmp $b->name } values $generals->%*){
+      my $jid = $app->minion->enqueue(build_pairs_for_primary => [{
+        general_name => $general->name,
+      }], {
+        priority  => -1,
+        attempts  => 5,
+        expire    => 7200,
+      });
+      push @$builderJobs, $jid;
+      $self->logger->debug(sprintf('pair builder kicked off for general "%s" with jid %s', $general->name, $jid));
+    }
+  }
+
+  method normalize_name ($name) {
+    my $dn = is_utf8($name) ? $name : decode_utf8($name);
+    my $nn = fc(NFKD($dn));
+    $nn =~ s/[’''‛`´]/'/g;
+    $nn =~ s/[""‟]/"/g;      # Quotes
+    return $nn;
+  }
+}
+1;
+__END__
+
   use Mojo::Base 'Mojolicious::Plugin', -signatures;
   use experimental qw(class);
   use Carp;
@@ -40,8 +145,14 @@ package Game::EvonyTKR::External::General::PairBuilder {
         return $job->finish(sprintf('pairs already in progress for %s', $gn))
           unless my $guard2 = $app->minion->guard("build_pairs_for_$gn", 10);
 
+        my $conflicts = $args->{conflicts} // {};
+
         # actually do the work
-        my $worker = PairBuilderWorkerLogic->new();
+        my $worker = PairBuilderLogic->new(
+          app         => $job->app,
+          conflicts   => $conflicts,
+          job         => $job,
+        );
         $worker->execute($args);
         my $result = $worker->pairs_by_type;
         $job->note(pairs_by_type => $result);
@@ -49,127 +160,18 @@ package Game::EvonyTKR::External::General::PairBuilder {
       }
     );
 
-    $app->minion->add_task(
-      build_all_pairs => sub ($job, $args) {
-        return $job->finish('pairs already being built')
-          unless my $guard = $app->minion->guard('build_all_pairs', 60);
-        my $app = $job->app;
+    $app->minion->add_task(monitor_and_build => sub ($job, $args) {
+      return $job->finish('only one monitor_and_build job allowed')
+        unless my $mbGuard = $app->minion->guard('monitor_and_build', 3600);
 
-        $logger->info("Building All Pairs");
-        my $conflicts = $args->{conflicts} // {};
-        my @generals;
-        @generals = List::AllUtils::uniq sort keys $conflicts->{by_general}->%* unless (!$conflicts);
-        $logger->debug(sprintf(
-          'there are %s generals from the conficts by_general keys.',
-          scalar @generals));
-        my @pairBuilders;
-
-        foreach my $general (@generals) {
-          my $jid = $app->minion->enqueue(
-            build_pairs_for_primary => [{ general_name => $general }],
-            {
-              priority => 10,
-              attempts => 5,
-              delay    => (0.1 + rand(0.5)),
-            }
-          );
-          push @pairBuilders, $jid;
-        }
-        $job->note(pairs_builders => \@pairBuilders);
-        $job->finish('pair builders launched');
-      }
-    );
-
-    $app->minion->add_task(
-      monitor_pair_building => sub ($job, $args) {
-        my $pairs_by_type = {};
-
-        my $builder_jid = $args->{builder_jid};
-        unless ($builder_jid) {
-          $logger->error("no builder provided to monitor!");
-          $job->finish('no builder to monitor!');
-        }
-        my $builder = $job->app->minion->job($builder_jid);
-        unless ($builder) {
-          $logger->error("No builder found for $builder_jid");
-          $job->finish("No builder found for $builder_jid");
-        }
         my $conflicts = $args->{conflicts};
-        unless ($conflicts) {
-          $logger->error("No conflicts provided for monitor_pair_building");
-          $job->finish('No conflicts provided for monitor_pair_building');
-        }
-
-        my $loop;
-        $loop = Mojo::IOLoop->recurring(
-          15 => sub {
-
-            if ($builder->info->{state} eq 'failed') {
-              unless ($builder->info->{retries} >= 5) {
-                $logger->error(
-                  sprintf('build spawner has failed %s times.',
-                    $builder->info->{retries})
-                );
-                Mojo::IOLoop->remove($loop);
-                $job->finish(
-                  sprintf('build spawner has failed %s times.',
-                    $builder->info->{retries})
-                );
-              }
-              $builder->retry({ delay => 300 });
-              return;
-            }
-            elsif ($builder->info->{state} eq 'finished') {
-              my $builders = $builder->info->{notes}{pairs_builders};
-              unless (scalar(@$builders)) {
-                $logger->error('no builders found from pair builder job!!');
-                Mojo::IOLoop->remove($loop);
-                $job->finish('no builders found from pair builder job!!');
-              }
-              my $isFailed   = 0;
-              my $inProgress = 0;
-              while (my $info =
-                $job->app->minion->jobs({ ids => [$builders->@*] })->next) {
-                if ($info->{state} eq 'failed' || $isFailed) {
-                  if (!$isFailed) {
-                    $logger->error(
-                      sprintf('failed job %s detected. cancelling jobs.',
-                        $info->{id})
-                    );
-                  }
-                  else {
-                    $logger->debug(
-                      sprintf('cleaning up job %s after failure detected',
-                        $info->{id})
-                    );
-                  }
-                  $isFailed = 1;
-                  $job->app->minion->job($info->{id})->remove;
-                }
-                elsif ($info->{state} eq 'finished') {
-                  __PACKAGE__->handle_result($info, $pairs_by_type);
-                  $job->note(pairs_in_progress => $pairs_by_type);
-                }
-                else {
-                  $inProgress++;
-                }
-              }
-              if ($inProgress > 0) {
-                $logger->info("there are $inProgress pair builders remaining");
-                return;
-              }
-              else {
-                $logger->info("All Pair Builders Complete");
-                $job->note(pairs_complete => $pairs_by_type);
-                $Mojo::IOLoop->remove($loop);
-                return $job->finish(pairs_complete => $pairs_by_type);
-              }
-            }
-          }
+        my $pairBuilderLogic = PairBuilderLogic->new(
+          app       => $app,
+          conflicts => $conflicts,
+          job       => $job,
         );
-        Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
-      }
-    );
+        return $pairBuilderLogic->monitor_and_build();
+    });
 
     state $buildingPairs = 0;
     $app->plugins->on(
@@ -177,22 +179,56 @@ package Game::EvonyTKR::External::General::PairBuilder {
         my ($plugin, $data) = @_;
         my $conflicts  = $data->{conflicts} // {};
 
+        my $jid;
         if($buildingPairs) {
           $logger->warn('monitor_pair_building already present');
           return;
         }
         $buildingPairs = 1;
-
-        my $pairBuilderLogic = PairBuilderLogic->new(
-          app       => $app,
+        $jid = $app->minion->enqueue(monitor_and_build => [{
           conflicts => $conflicts,
-        );
-        $pairBuilderLogic->monitor_and_build();
+        }], {
+          priority  => 90,
+          attempts  => 5,
+          delay     => 30,
+        });
+        my $loop;
+        $loop = Mojo::IOLoop->recurring(10 => sub {
+          my $job = $app->minion->job($jid);
+          if($job) {
+            my $notes = $job->info->{notes};
+            if($notes) {
+              if(exists $notes->{pairs_by_type} && ref($notes->{pairs_by_type}) eq 'HASH'){
+                $app->plugins->emit(pairs_by_type => $notes->{pairs_by_type});
+              }
+            }
+            if($job->info->{state} eq 'finished'){
+              Mojo::IOLoop->remove($loop);
+              return;
+            }
+          } else {
+            $logger->warn("no job available for jid $jid");
+            Mojo::IOLoop->remove($loop);
+            return;
+          }
+        });
     });
   }
 
+  $app->minion->add_task('prune_pairs' => sub ($job, $args){
+    my $conflicts = $args->{conflicts};
+    my $pairs = $args->{pairs_by_type};
+    my $pairBuilderLogic = PairBuilderLogic->new(
+      app             => $app,
+      conflicts       => $conflicts,
+      pairs_by_type   => $pairs,
+      job             => $job,
+    );
+    return $pairBuilderLogic->prune_pairs();
+  });
 
-  class PairBuilderLogic : isa(Game::EvonyTKR::Shared::Constants) {
+
+  class PairBuilderLogic  {
     use Log::Log4perl qw(:levels);
     use Unicode::Normalize;
     use Unicode::CaseFold qw(fc);
@@ -204,9 +240,11 @@ package Game::EvonyTKR::External::General::PairBuilder {
     }
 
     field $app : param;
+    field $job : param;
     field $conflicts : param = {};
 
-    field $pairs_by_type : reader = {};
+
+    field $pairs_by_type : param : reader = {};
 
     field $generalManager = Game::EvonyTKR::Model::General::Manager->new();
     field $bookManager    = Game::EvonyTKR::Model::Book::Manager->new();
@@ -219,20 +257,17 @@ package Game::EvonyTKR::External::General::PairBuilder {
       );
 
     field $generals = [];
+    field $builderTasks = {};
+    field $finalConflictSetSeen : reader : writer = 0;
 
-
-    method monitor_and_build {
-
+    ADJUST {
       $self->setup_generals();
+    }
 
-      $app->plugins->on(conflicts_complete => sub {
-        my ($plugin, $data) = @_;
-        my $conflicts  = $data->{conflicts} // {};
-        $self->logger->debug('conflict data update detected by PairBuilderLogic');
-        $self->prune_pairs();
-      });
-
-
+    method monitor_and_build  {
+      $self->spawn_pair_builders();
+      $self->monitor_pair_building();
+      $self->prune_task();
     }
 
     method setup_generals {
@@ -255,7 +290,48 @@ package Game::EvonyTKR::External::General::PairBuilder {
       }
     }
 
+    method spawn_pair_builders {
+      $self->logger->info(sprintf('Creating Pair Builder Tasks for %s generals', scalar(@$generals)));
+      foreach my $general (sort {$a->name cmp $b->name } $generals->@* ){
+        my $jid = $app->minion->enqueue(build_pairs_for_primary => [{
+          general_name      => $general->name,
+          conflicts         => $conflicts,
+        }] => {
+          priority  => 1,
+          attempts  => 10,
+          delay     => 30,
+          expire    => 300,
+        });
+        if($jid){
+          $builderTasks->{$general->name} = {
+            jid     => $jid,
+            state   => $app->minion->job($jid)->info->{state},
+          };
+        }
+      }
+    }
+
+    method prune_task {
+      my $jid = $app->minion->enqueue(prune_pairs => [{
+        conflicts     => $conflicts,
+        pairs_by_type => $pairs_by_type,
+      }]);
+      my $loop;
+      my $result;
+      return->
+      Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
+      return $result;
+    }
+
     method prune_pairs {
+      foreach my $type (keys $pairs_by_type->%*){
+        $self->logger->debug(sprintf('There are %s pairs of type %s and %s conflicts ',
+        scalar($pairs_by_type->{$type}->@* ), $type, scalar(keys $conflicts->{by_general}->%*) ));
+      }
+      if(scalar(keys $pairs_by_type->%*) == 0){
+        $self->logger->warn('No pairs to prune.');
+        return;
+      }
       foreach my $general_name (sort keys $conflicts->{by_general}->%*) {
         my $general;
         foreach my $type (keys $pairs_by_type->%*) {
@@ -266,6 +342,7 @@ package Game::EvonyTKR::External::General::PairBuilder {
         next unless($general);
         # a given general may be in multiple types.
         foreach my $type (keys $pairs_by_type->%*) {
+
           @{ $pairs_by_type->{$type}} = grep {
             my $pair = $_;
             not (
@@ -275,39 +352,75 @@ package Game::EvonyTKR::External::General::PairBuilder {
           } @{ $pairs_by_type};
         }
       }
-
+      $job->note(pairs_by_type => $pairs_by_type);
+      $job->finish("Pairs Filtered");
     }
 
+    method monitor_pair_building {
+      my $loop;
+      $loop = Mojo::IOLoop->recurring(5 => sub {
+        my $jobs;
+        $jobs = $app->minion->jobs({
+          states  => ['failed'],
+          tasks   => ['build_pairs_for_primary'],
+        });
+        while (my $info = $jobs->next) {
+          unless ($info->{retries} >= 5 ){
+            next;
+          }
+          $self->logger->error(sprintf('build_pairs_for_primary job %s failed: %s',
+          $info->{id}, $info->{result}));
+          $app->minion->job($info->{id})->remove;
+        }
+        $jobs = undef;
+        $jobs = $app->minion->jobs({
+          states  => ['finished'],
+          tasks   => ['build_pairs_for_primary'],
+        });
+        my $sendUpdate = 0;
+        $sendUpdate = 1 if ($jobs->total > 0);
+        while (my $info = $jobs->next) {
+          if($info->{result} =~ /Pairs Created for /){
+            my $newPairs = $info->{notes}{pairs_by_type};
+            foreach my $type (keys $newPairs->%*){
+              $self->logger->debug("adding pairs for $type");
+              my @all;
+              if(exists $pairs_by_type->{$type} && ref($pairs_by_type->{$type}) eq 'ARRAY'){
+                push @all, $pairs_by_type->{$type}->@*;
+              }
+              push @all, $newPairs->{$type}->@*;
+              $pairs_by_type->{$type} = [ List::AllUtils::uniqby { $_->primary->name . '/' . $_->secondary->name } @all ];
+            }
+          } else {
+            $self->logger->error(sprintf('unexpected result for job %s: %s',
+            $info->{id}, Data::Printer::np($info)));
+          }
+        }
+        if($sendUpdate){
+          $sendUpdate = 0;
+          $job->note(pairs_by_type => $pairs_by_type);
+        }
+        $jobs = undef;
+        $jobs = $app->minion->jobs({
+          states  => ['active', 'inactive'],
+          tasks   => ['build_pairs_for_primary'],
+        });
+        if($jobs->total == 0){
+          $self->logger->info("Pair building Complete");
+          Mojo::IOLoop->remove($loop);
+          $job->note(pairs_by_type => $pairs_by_type);
+          return $job->finish("Pair building Complete");
+        }
+      });
+      Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
+    }
 
     method execute($args) {
 
-
-      # Create conflict detector
-
-
-      my $conflicts = $args->{conflicts};
-      if ($conflicts) {
-        foreach my $general (sort keys $conflicts->{by_general}->%*) {
-          foreach my $og ($conflicts->{by_general}->{$general}->%*) {
-            $conflictDetector->by_general->{$general}->{$og} = 1;
-          }
-        }
-        foreach my $group (keys $conflicts->{groups_by_conflict_type}->%*) {
-          my @all;
-          if (exists $conflictDetector->groups_by_conflict_type->{$group}
-            && defined $conflictDetector->groups_by_conflict_type->{$group}) {
-            push @all,
-              @{ $conflictDetector->groups_by_conflict_type->{$group} };
-          }
-          push @all, @{ $conflicts->{groups_by_conflict_type}->{$group} };
-          @{ $conflictDetector->groups_by_conflict_type->{$group} } =
-            List::AllUtils::uniq @all;
-        }
-      }
-
-      my $generalName = $args->{general_name};
-      if ($generalName) {
-        my $general = $generalManager->getGeneral($generalName);
+      my $general_name = $args->{general_name};
+      if ($general_name) {
+        $self->debug(sprintf('building pairs for %s', $general_name));
+        my $general = $generalManager->getGeneral($general_name);
         if ($general) {
           $self->build_pairs($general);
         }

@@ -172,7 +172,7 @@ package Game::EvonyTKR::Controller::Generals {
 
           if ($manager->generalManager->fully_populated()) {
             $logger->info('general manager reports all generals are loaded');
-            $app->plugins->emit(generals_loaded => { manager => $manager });
+            $app->plugins->emit(generals_loaded => { manager => $manager, generals => $manager->generalManager->get_all_generals() });
           }
         };
         if ($@) {
