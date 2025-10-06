@@ -10,7 +10,6 @@ require MIME::Base64;
 require Path::Tiny;
 require YAML::PP;
 require Game::EvonyTKR;
-require Game::EvonyTKR::Logger::Config;
 require Game::EvonyTKR::Shared::Constants;
 require Game::EvonyTKR::Model::General;
 require Game::EvonyTKR::Model::BasicAttributes;
@@ -33,19 +32,19 @@ package Game::EvonyTKR::External::Buff::Worker {
   my $logger;
 
   sub register ($self, $app, $conf) {
-    $logger = Log::Log4perl->get_logger(__PACKAGE__);
+    $logger = $app->get_logger(__PACKAGE__);
 
     $app->minion->add_task(
       pair_worker => sub ($job, $args) {
         eval {
-          $logger->debug(sprintf(
+          $logger->DEBUG(sprintf(
             'pair worker job starting for runId %s pair %s/%s',
             $args->{runId}, $args->{general1}, $args->{general2},
           ));
           my $debug  = $app->mode eq 'development';
           my $worker = WorkerLogic->new(debug_enabled => $debug);
           my $result = $worker->calculate_buffs($args);
-          $logger->debug(sprintf('result is %s', $result));
+          $logger->DEBUG(sprintf('result is %s', $result));
           $job->note(result => $result);
           my $runId = $args->{runId};
           $job->finish({
@@ -54,7 +53,7 @@ package Game::EvonyTKR::External::Buff::Worker {
           });
         };
         if ($@) {
-          $logger->error("Job " . $job->id . " failed: $@");
+          $logger->ERR("Job " . $job->id . " failed: $@");
           $job->fail($@);
         }
 
@@ -207,7 +206,8 @@ package Game::EvonyTKR::External::Buff::Worker {
     method worker_croak ($error_msg) {
       if ($debug_enabled) {
         if (defined($logger)) {
-          $logger->logcroak($error_msg);
+          $logger->ERR($error_msg);
+          croak($error_msg);
         }
         else {
           croak($error_msg);
@@ -215,7 +215,7 @@ package Game::EvonyTKR::External::Buff::Worker {
       }
       else {
         if (defined($logger)) {
-          $logger->error($error_msg);
+          $logger->ERR($error_msg);
         }
         my $error_response = {
           runId => 0+ $runId,
@@ -295,12 +295,12 @@ package Game::EvonyTKR::External::Buff::Worker {
           ref $general1->type eq 'ARRAY'
           ? $general1->type->[0]
           : $general1->type;
-        $logger->warn('targetType was not set!!'
+        $logger->WARN('targetType was not set!!'
             . 'falling back to the first type from general1'
             . $type);
         $opt->{targetType} = $type;
       }
-      $logger->info('targetType is ' . $opt->{targetType});
+      $logger->INFO('targetType is ' . $opt->{targetType});
 
       if ($opt->{general2} && length($opt->{general2})) {
         $general2 = $self->load_general($opt->{general2});
@@ -315,11 +315,11 @@ package Game::EvonyTKR::External::Buff::Worker {
 
       # Validate ascending level
       unless ($opt->{ascendingLevel} && length($opt->{ascendingLevel})) {
-        $logger->warn('undefined ascendingLevel, using default "red5"');
+        $logger->WARN('undefined ascendingLevel, using default "red5"');
         $opt->{ascendingLevel} = 'red5';
       }
       unless ($validator->checkAscendingLevel($opt->{ascendingLevel})) {
-        $logger->warn(sprintf(
+        $logger->WARN(sprintf(
           'Invalid ascendingLevel: "%s" , using default "red5"',
           $opt->{ascendingLevel}));
         $opt->{ascendingLevel} = 'red5';
@@ -327,14 +327,14 @@ package Game::EvonyTKR::External::Buff::Worker {
 
       unless ($opt->{primaryCovenantLevel}
         && length($opt->{primaryCovenantLevel})) {
-        $logger->warn(
+        $logger->WARN(
           'convenant level not defined, using default "civilization"');
         $opt->{primaryCovenantLevel} = 'civilization';
       }
       unless ($validator->checkCovenantLevel($opt->{primaryCovenantLevel})) {
-        $logger->warn(
+        $logger->WARN(
           sprintf('Invalid covenantLevel using default "civilization"'));
-        $logger->warn('invalid value was ' . $opt->{primaryCovenantLevel});
+        $logger->WARN('invalid value was ' . $opt->{primaryCovenantLevel});
         $opt->{primaryCovenantLevel} = 'civilization';
       }
 
@@ -377,14 +377,14 @@ package Game::EvonyTKR::External::Buff::Worker {
 
       unless ($opt->{secondaryCovenantLevel}
         && length($opt->{secondaryCovenantLevel})) {
-        $logger->warn(
+        $logger->WARN(
           'convenant level not defined, using default "civilization"');
         $opt->{secondaryCovenantLevel} = 'civilization';
       }
       unless ($validator->checkCovenantLevel($opt->{secondaryCovenantLevel})) {
-        $logger->warn(
+        $logger->WARN(
           sprintf('Invalid covenantLevel using default "civilization"'));
-        $logger->warn('invalid value was ' . $opt->{secondaryCovenantLevel});
+        $logger->WARN('invalid value was ' . $opt->{secondaryCovenantLevel});
         $opt->{secondaryCovenantLevel} = 'civilization';
       }
 
@@ -440,7 +440,7 @@ package Game::EvonyTKR::External::Buff::Worker {
       $params    = $self->validatePairParams($opt);
       $covenant1 = $self->load_covenant($general1);
       if (defined($covenant1)) {
-        $logger->debug(
+        $logger->DEBUG(
           'covenant1 is ' . Data::Printer::np($covenant1, multiline => 0));
         unless (Scalar::Util::reftype($covenant1)) {
           $self->worker_croak(
@@ -460,7 +460,7 @@ package Game::EvonyTKR::External::Buff::Worker {
 
       $covenant2 = $self->load_covenant($general2);
       if (defined($covenant2)) {
-        $logger->debug(
+        $logger->DEBUG(
           'covenant2 is ' . Data::Printer::np($covenant2, multiline => 0));
         unless (Scalar::Util::reftype($covenant2)) {
           $self->worker_croak(
@@ -521,7 +521,7 @@ package Game::EvonyTKR::External::Buff::Worker {
       my $bk = $params->{targetType} =~ s/_/ /r;
       $bk =~ s/(\w)(\w+) specialist/\U$1\L$2 \UT\Lroops/;
       $bk =~ s/Siege Troops/Siege Machines/;
-      $logger->debug("buffKey is " . Data::Printer::np($bk, multiline => 0));
+      $logger->DEBUG("buffKey is " . Data::Printer::np($bk, multiline => 0));
 
       my $tsum = {};
 
@@ -529,7 +529,7 @@ package Game::EvonyTKR::External::Buff::Worker {
         my $t =
           $bsum1->buffValues->{$bk}->{$type} +
           $bsum2->buffValues->{$bk}->{$type};
-        $logger->debug(sprintf(
+        $logger->DEBUG(sprintf(
           'for type %s, bsum1 is %s, bsum2 is %s total is %s',
           $type,
           $bsum1->buffValues->{$bk}->{$type},
@@ -539,12 +539,12 @@ package Game::EvonyTKR::External::Buff::Worker {
       }
 
       foreach my $category (keys %{ $bsum1->debuffValues }) {
-        $self->logger->debug("calc debuffs for $category");
+        $self->logger->DEBUG("calc debuffs for $category");
         foreach my $type (keys %{ $bsum1->debuffValues->{$category} }) {
           $tsum->{debuffValues}->{$category}->{$type} =
             $bsum1->debuffValues->{$category}->{$type} +
             $bsum2->debuffValues->{$category}->{$type};
-          $self->logger->debug("calc debuffs for $category -> $type: "
+          $self->logger->DEBUG("calc debuffs for $category -> $type: "
               . $tsum->{debuffValues}->{$category}->{$type});
         }
       }
@@ -582,16 +582,16 @@ package Game::EvonyTKR::External::Buff::Worker {
 
       my $payload = $json->encode({ runId => 0+ $opt->{runId}, data => $row });
 
-      $logger->debug(sprintf(
+      $logger->DEBUG(sprintf(
         'row is %s, payload is %s',
         Data::Printer::np($row, multiline => 0), $payload
       ));
 
       my $result = MIME::Base64::encode_base64($payload, '');
       if ($debug_enabled) {
-        $self->logger->debug("payload is $payload");
+        $self->logger->DEBUG("payload is $payload");
       }
-      $self->logger->info($result);
+      $self->logger->INFO($result);
       return $result;
     }
 
@@ -617,22 +617,22 @@ package Game::EvonyTKR::External::Buff::Worker {
           ref $general1->type eq 'ARRAY'
           ? $general1->type->[0]
           : $general1->type;
-        $logger->warn('targetType was not set!!'
+        $logger->WARN('targetType was not set!!'
             . 'falling back to the first type from general1'
             . $type);
         $opt->{targetType} = $type;
       }
-      $logger->info('targetType is ' . $opt->{targetType});
+      $logger->INFO('targetType is ' . $opt->{targetType});
 
       if ($opt->{isPrimary}) {
         # Validate ascending level
         unless (
           defined($opt->{ascendingLevel} && length($opt->{ascendingLevel}))) {
-          $logger->warn('undefined ascendingLevel, using default "red5"');
+          $logger->WARN('undefined ascendingLevel, using default "red5"');
           $opt->{ascendingLevel} = 'red5';
         }
         unless ($validator->checkAscendingLevel($opt->{ascendingLevel})) {
-          $logger->warn(sprintf(
+          $logger->WARN(sprintf(
             'Invalid ascendingLevel: "%s" , using default "red5"',
             $opt->{ascendingLevel}));
           $opt->{ascendingLevel} = 'red5';
@@ -644,14 +644,14 @@ package Game::EvonyTKR::External::Buff::Worker {
 
       unless ($opt->{primaryCovenantLevel}
         && length($opt->{primaryCovenantLevel})) {
-        $logger->warn(
+        $logger->WARN(
           'convenant level not defined, using default "civilization"');
         $opt->{primaryCovenantLevel} = 'civilization';
       }
       unless ($validator->checkCovenantLevel($opt->{primaryCovenantLevel})) {
-        $logger->warn(
+        $logger->WARN(
           sprintf('Invalid covenantLevel using default "civilization"'));
-        $logger->warn('invalid value was ' . $opt->{primaryCovenantLevel});
+        $logger->WARN('invalid value was ' . $opt->{primaryCovenantLevel});
         $opt->{primaryCovenantLevel} = 'civilization';
       }
 
@@ -704,7 +704,7 @@ package Game::EvonyTKR::External::Buff::Worker {
       $params    = $self->validateSingleParams($opt);
       $covenant1 = $self->load_covenant($general1);
       if (defined($covenant1)) {
-        $logger->debug(
+        $logger->DEBUG(
           'covenant1 is ' . Data::Printer::np($covenant1, multiline => 0));
         unless (Scalar::Util::reftype($covenant1)) {
           $self->worker_croak(
@@ -748,7 +748,7 @@ package Game::EvonyTKR::External::Buff::Worker {
       my $bk = $params->{targetType} =~ s/_/ /r;
       $bk =~ s/(\w)(\w+) specialist/\U$1\L$2 \UT\Lroops/;
       $bk =~ s/Siege Troops/Siege Machines/;
-      $logger->debug("buffKey is " . Data::Printer::np($bk, multiline => 0));
+      $logger->DEBUG("buffKey is " . Data::Printer::np($bk, multiline => 0));
 
       my $row = {
         primary             => $general1->to_hash,
@@ -779,21 +779,21 @@ package Game::EvonyTKR::External::Buff::Worker {
 
       my $payload = $json->encode({ runId => 0+ $opt->{runId}, data => $row });
 
-      $logger->debug(sprintf(
+      $logger->DEBUG(sprintf(
         'row is %s, payload is %s',
         Data::Printer::np($row, multiline => 0), $payload
       ));
 
       my $result = MIME::Base64::encode_base64($payload);
       if ($debug_enabled) {
-        $self->logger->debug("payload is $payload");
+        $self->logger->DEBUG("payload is $payload");
       }
-      $self->logger->info($result);
+      $self->logger->INFO($result);
       return $result;
     }
 
     method load_general ($name) {
-      $logger->debug('collection_dir is ' . $collection_dir->realpath());
+      $logger->DEBUG('collection_dir is ' . $collection_dir->realpath());
       my $generals_dir    = $collection_dir->child('generals');
       my $normalized_name = $self->normalize_name($name);
       my ($general_file)  = grep {
@@ -802,15 +802,15 @@ package Game::EvonyTKR::External::Buff::Worker {
       } $generals_dir->children;
 
       unless (defined($general_file) && $general_file->is_file()) {
-        $logger->debug("+++Missing General: '$name' ;; '$normalized_name'");
-        $logger->debug(
+        $logger->DEBUG("+++Missing General: '$name' ;; '$normalized_name'");
+        $logger->DEBUG(
           '+++Raw general name: ' . unpack("H*", encode_utf8($name)));
-        $logger->debug("+++After normalize_quotes: "
+        $logger->DEBUG("+++After normalize_quotes: "
             . unpack("H*", encode_utf8($normalized_name)));
-        $logger->debug('+++Available files: ');
+        $logger->DEBUG('+++Available files: ');
         foreach my $child ($generals_dir->children) {
           my $cn = decode_utf8($child->basename =~ s/\.yaml$//r);
-          $logger->debug(
+          $logger->DEBUG(
             "+++'$cn' (bytes: " . unpack("H*", encode_utf8($cn)) . ")");
         }
 
@@ -820,7 +820,7 @@ package Game::EvonyTKR::External::Buff::Worker {
       my $data    = $general_file->slurp_utf8;
       my $object  = $ypp->load_string($data);
       my $general = Game::EvonyTKR::Model::General->from_hash($object, $logger);
-      $logger->debug(sprintf('general "%s" has been created', $general->name));
+      $logger->DEBUG(sprintf('general "%s" has been created', $general->name));
 
       return $general;
     }
@@ -846,7 +846,7 @@ package Game::EvonyTKR::External::Buff::Worker {
       }
       else {
         # not all generals *do* have convenants, so this is *probably* expected
-        $logger->info("No covenant available for $name.");
+        $logger->INFO("No covenant available for $name.");
       }
       return undef;
     }
@@ -869,10 +869,10 @@ package Game::EvonyTKR::External::Buff::Worker {
         }
         else {
           # specialties *should* exist.
-          $logger->debug("----Available specialty files:");
+          $logger->DEBUG("----Available specialty files:");
           for my $file ($specialty_dir->children) {
             my $name = decode_utf8($file->basename =~ s/\.yaml$//r);
-            $logger->debug(
+            $logger->DEBUG(
               "----'$name' (bytes: " . unpack("H*", encode_utf8($name)) . ")");
           }
           $self->worker_croak(sprintf(
@@ -893,7 +893,7 @@ package Game::EvonyTKR::External::Buff::Worker {
       } $book_dir->children;
 
       if (defined($book_file) && $book_file->is_file()) {
-        $logger->debug(
+        $logger->DEBUG(
           sprintf('found book file %s for book %s', $book_file, $book_name));
         my $data   = $book_file->slurp_utf8;
         my $object = $ypp->load_string($data);
@@ -904,7 +904,7 @@ package Game::EvonyTKR::External::Buff::Worker {
           $self->worker_croak('failed to import book ' . $book_name);
           return;
         }
-        $logger->debug('imported book "%s"', $book->name);
+        $logger->DEBUG('imported book "%s"', $book->name);
         $general->set_builtInBook($book);
 
       }
@@ -912,7 +912,7 @@ package Game::EvonyTKR::External::Buff::Worker {
 
     method load_ascending_attributes ($general) {
       unless ($general->ascending) {
-        $logger->info(
+        $logger->INFO(
           sprintf('general "%s" cannot be ascended.', $general->name));
         return;
       }
@@ -960,7 +960,7 @@ package Game::EvonyTKR::External::Buff::Worker {
           my $book =
             Game::EvonyTKR::Model::Book::SkillBook->from_hash($object, $logger);
 
-          $logger->info(sprintf(
+          $logger->INFO(sprintf(
             'picked book %s for general %s',
             $book->name, $general->name
           ));
@@ -969,7 +969,7 @@ package Game::EvonyTKR::External::Buff::Worker {
 
         }
         else {
-          $logger->warn("cannot find file for $book_name");
+          $logger->WARN("cannot find file for $book_name");
           next;
         }
       }
@@ -988,7 +988,7 @@ package Game::EvonyTKR::External::Buff::Worker {
                 Game::EvonyTKR::Model::Book::SkillBook->from_hash($object,
                 $logger);
 
-              $logger->debug(sprintf(
+              $logger->DEBUG(sprintf(
                 'picked book %s for general %s',
                 $book->name, $general->name
               ));

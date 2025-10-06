@@ -16,6 +16,7 @@ package Game::EvonyTKR::Controller::ControllerBase {
   require Data::Printer;
   use Carp;
 
+  my $logger;
   my $base = '';
   my $routes;
 
@@ -24,8 +25,8 @@ package Game::EvonyTKR::Controller::ControllerBase {
   }
 
   sub register($self, $app, $config = {}) {
-    my $logger = Log::Log4perl->get_logger(__PACKAGE__);
-    $logger->info("ControllerBase register function");
+    $logger = $app->get_logger(__PACKAGE__);
+    $logger->INFO("ControllerBase register function");
 
     my $routes = $app->routes;
 

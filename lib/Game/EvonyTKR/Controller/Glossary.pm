@@ -7,6 +7,8 @@ use namespace::clean;
 package Game::EvonyTKR::Controller::Glossary {
   use Mojo::Base 'Game::EvonyTKR::Controller::ControllerBase';
 
+  my $logger;
+
   sub controller_name ($self) {
     return "Glossary";
   }
@@ -19,8 +21,8 @@ package Game::EvonyTKR::Controller::Glossary {
   }
 
   sub register($self, $app, $config = {}) {
-    my $logger = Log::Log4perl->get_logger(__PACKAGE__);
-    $logger->info("Registering routes for " . ref($self));
+    $logger = $app->get_logger(__PACKAGE__);
+    $logger->INFO("Registering routes for " . ref($self));
     $self->SUPER::register($app, $config);
 
     my @parts     = split(/::/, ref($self));
@@ -31,7 +33,7 @@ package Game::EvonyTKR::Controller::Glossary {
       ? $self->controller_name()
       : $baseClass;
 
-    $logger->debug("got controller_name $controller_name.");
+    $logger->DEBUG("got controller_name $controller_name.");
 
     my $mainRoutes = $app->routes->any($base);
     $mainRoutes->get('/')
@@ -62,8 +64,7 @@ package Game::EvonyTKR::Controller::Glossary {
   }
 
   sub index($c) {
-    my $logger = Log::Log4perl->get_logger(__PACKAGE__);
-    $logger->debug("Start of index method for " . __PACKAGE__);
+    $logger->DEBUG("Start of index method for " . __PACKAGE__);
     my $glossary_manager = $c->app->get_root_manager->glossaryManager;
     my $terms            = $glossary_manager->getAll();
 

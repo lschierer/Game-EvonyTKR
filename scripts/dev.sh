@@ -20,12 +20,14 @@ fi
 
 touch minion.db
 
+export MOJO_MODE='development';
+
 nice -n 10 ./bin/game-evonytkr minion worker -j 10 -s 1 -S 1 &
 nice -n 10 ./bin/game-evonytkr minion worker -j 2 -s 1  &
 nice -n 10 ./bin/game-evonytkr minion worker -j 2 -S 1  &
 nice -n 10 ./bin/game-evonytkr minion worker -j 1 &
-WORKER_PID=$!
-echo "Worker PID: $WORKER_PID"
+#WORKER_PID=$!
+#echo "Worker PID: $WORKER_PID"
 
 
 # Start web server with watchexec

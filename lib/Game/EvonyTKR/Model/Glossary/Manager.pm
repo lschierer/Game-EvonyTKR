@@ -21,10 +21,10 @@ class Game::EvonyTKR::Model::Glossary::Manager :
   method importAll($glossaryDir = undef) {
     $glossaryDir //= $SourceDir->child('collections/Glossary');
 
-    $self->logger->info("Starting import of glossary from $glossaryDir");
+    $self->logger->INFO("Starting import of glossary from $glossaryDir");
 
     unless (-d $glossaryDir) {
-      $self->logger->warn("Glossary directory $glossaryDir does not exist");
+      $self->logger->WARN("Glossary directory $glossaryDir does not exist");
       return;
     }
 
@@ -32,35 +32,35 @@ class Game::EvonyTKR::Model::Glossary::Manager :
     my @yaml_files = $glossaryDir->children(qr/\.ya?ml$/);
 
     foreach my $file (@yaml_files) {
-      $self->logger->debug("Processing glossary file: $file");
+      $self->logger->DEBUG("Processing glossary file: $file");
       $self->_import_file($file);
     }
 
     $self->_build_letter_index();
 
     my $term_count = scalar keys %$terms;
-    $self->logger->info("Glossary import complete. Loaded $term_count terms.");
+    $self->logger->INFO("Glossary import complete. Loaded $term_count terms.");
   }
 
   method _import_file($file) {
     my $yaml = YAML::PP->new();
 
     my $success = eval {
-      $self->logger->debug("Loading YAML from $file");
+      $self->logger->DEBUG("Loading YAML from $file");
       my $data = $yaml->load_file($file);
-      $self->logger->debug(
+      $self->logger->DEBUG(
         "YAML loaded successfully: " . Data::Printer::np($data));
 
       unless ($data && $data->{glossary} && ref($data->{glossary}) eq 'ARRAY') {
-        $self->logger->warn("Invalid glossary structure in $file");
+        $self->logger->WARN("Invalid glossary structure in $file");
         return 0;
       }
 
-      $self->logger->debug(
+      $self->logger->DEBUG(
         "Processing " . scalar(@{ $data->{glossary} }) . " terms from $file");
 
       foreach my $term_data (@{ $data->{glossary} }) {
-        $self->logger->debug(
+        $self->logger->DEBUG(
           "Creating term object for: " . ($term_data->{term} // 'UNDEFINED'));
 
         my $term_obj = Game::EvonyTKR::Model::Glossary->new(
@@ -77,7 +77,7 @@ class Game::EvonyTKR::Model::Glossary::Manager :
         my $key = lc($term_data->{term});
         $terms->{$key} = $term_obj;
 
-        $self->logger->debug("Successfully loaded term: " . $term_data->{term});
+        $self->logger->DEBUG("Successfully loaded term: " . $term_data->{term});
       }
 
       return 1;    # Explicit success
@@ -85,7 +85,7 @@ class Game::EvonyTKR::Model::Glossary::Manager :
 
     if (!$success) {
       my $error = $@ || "Unknown error";
-      $self->logger->error("Failed to load glossary file $file: $error");
+      $self->logger->ERR("Failed to load glossary file $file: $error");
     }
   }
 

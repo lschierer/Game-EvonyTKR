@@ -26,14 +26,14 @@ class Game::EvonyTKR::Model::AscendingAttributes::Manager :
     if (exists $ascendingAttributes->{$name}) {
       return $ascendingAttributes->{$name};
     }
-    $self->logger->warn("failed to find Ascending Attribute $name");
+    $self->logger->WARN("failed to find Ascending Attribute $name");
     return 0;
   }
 
   method importAll ($SourceDir) {
     $SourceDir = Path::Tiny::path($SourceDir);
     if (!$SourceDir->is_dir()) {
-      $self->logger->logcroak(
+      $self->dev_guard(
 "Game::EvonyTKR::Model::AscendingAttributes::Manager requires a directory, not $SourceDir"
       );
     }
@@ -50,7 +50,7 @@ class Game::EvonyTKR::Model::AscendingAttributes::Manager :
     while (defined(my $file = $iter->())) {
       # work around for UTF8 filenames not importing correctly by default.
       $file = Path::Tiny::path(Encode::decode('utf8', $file));
-      $self->logger->debug("AscendingAttributes::Manager importing $file");
+      $self->logger->DEBUG("AscendingAttributes::Manager importing $file");
       my $basename = $file->basename('.yaml');
       my $name     = $basename;
 
@@ -61,12 +61,12 @@ class Game::EvonyTKR::Model::AscendingAttributes::Manager :
       )->load_string($data);
       if (exists $object->{general}) {
         if ($object->{general} !~ /$name/i) {
-          $self->logger->error(
+          $self->logger->ERR(
 "filename and internal name do not match for file '$file' with name '$object->{general}'"
           );
         }
         else {
-          $self->logger->info("using object name " . $object->{general});
+          $self->logger->INFO("using object name " . $object->{general});
         }
         $name = $object->{general};
       }
@@ -75,11 +75,11 @@ class Game::EvonyTKR::Model::AscendingAttributes::Manager :
         Game::EvonyTKR::Model::AscendingAttributes->new(general => $name,);
       unless (exists $object->{ascending}
         && ref($object->{ascending}) eq 'ARRAY') {
-        $self->logger->error("object has unexpected format for '$name': "
+        $self->logger->ERR("object has unexpected format for '$name': "
             . Data::Printer::np($object));
         next;
       }
-      $self->logger->debug("starting import for $name");
+      $self->logger->DEBUG("starting import for $name");
       foreach my $oa (@{ $object->{ascending} }) {
         my $level = $oa->{level};
         foreach my $ob (@{ $oa->{buffs} }) {
@@ -103,7 +103,7 @@ class Game::EvonyTKR::Model::AscendingAttributes::Manager :
             }
           }
           $ascendingAttributes->{$name}->addBuff($level, $b);
-          $self->logger->debug(sprintf(
+          $self->logger->DEBUG(sprintf(
             '%s now has %s buffs at level %s',
             $name,
             scalar(
@@ -113,14 +113,14 @@ class Game::EvonyTKR::Model::AscendingAttributes::Manager :
           ));
         }
       }
-      $self->logger->debug(sprintf('imported %s %s',
+      $self->logger->DEBUG(sprintf('imported %s %s',
         $name,
         exists $ascendingAttributes->{$name}
         ? 'successfully'
         : 'unsuccessfully'));
     }
     my $countImported = scalar keys %$ascendingAttributes;
-    $self->logger->info(
+    $self->logger->INFO(
 "Game::EvonyTKR::Model::AscendingAttributes::Manager imported $countImported ascendingAttributes"
     );
     return $countImported;

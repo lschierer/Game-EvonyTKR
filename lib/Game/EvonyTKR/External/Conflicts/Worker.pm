@@ -9,7 +9,6 @@ require Log::Log4perl;
 require MIME::Base64;
 require Path::Tiny;
 require Game::EvonyTKR;
-require Game::EvonyTKR::Logger::Config;
 require Game::EvonyTKR::Shared::Constants;
 require Game::EvonyTKR::Model::General;
 

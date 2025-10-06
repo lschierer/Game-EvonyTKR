@@ -26,7 +26,7 @@ class Game::EvonyTKR::Model::Specialty::Manager :
     if (exists $specialties->{$name}) {
       return $specialties->{$name};
     }
-    $self->logger->warn("failed to find specialty $name");
+    $self->logger->WARN("failed to find specialty $name");
     return 0;
   }
 
@@ -39,7 +39,7 @@ class Game::EvonyTKR::Model::Specialty::Manager :
   method importAll ($SourceDir) {
     $SourceDir = Path::Tiny::path($SourceDir);
     if (!$SourceDir->is_dir()) {
-      $self->logger->logcroak(
+      $self->dev_guard(
         "Model::Specialty::Manager requires a directory, not $SourceDir");
     }
     my $rule = Path::Iterator::Rule->new();
@@ -55,7 +55,7 @@ class Game::EvonyTKR::Model::Specialty::Manager :
     while (defined(my $file = $iter->())) {
       # work around for UTF8 filenames not importing correctly by default.
       $file = Path::Tiny::path(Encode::decode('utf8', $file));
-      $self->logger->debug("Specialty::Manager importing $file");
+      $self->logger->DEBUG("Specialty::Manager importing $file");
       my $basename = $file->basename('.yaml');
       my $name     = $basename;
 
@@ -68,7 +68,7 @@ class Game::EvonyTKR::Model::Specialty::Manager :
         # some files are lower case, get the proper case sensitive name
         $name = $object->{name};
         if ($object->{name} !~ /$name/i) {
-          $self->logger->warn("$name does not match " . $object->{name});
+          $self->logger->WARN("$name does not match " . $object->{name});
         }
       }
 
@@ -76,7 +76,7 @@ class Game::EvonyTKR::Model::Specialty::Manager :
         Game::EvonyTKR::Model::Specialty->new(name => $name,);
       foreach my $ol (@{ $object->{levels} }) {
         my $level = $ol->{level};
-        $self->logger->debug("attempting import of $level for $name");
+        $self->logger->DEBUG("attempting import of $level for $name");
         my @buffs;
         if (exists $ol->{buff}) {
           @buffs = @{ $ol->{buff} };
@@ -90,14 +90,14 @@ class Game::EvonyTKR::Model::Specialty::Manager :
         }
       }
       if (exists $specialties->{$name}) {
-        $self->logger->debug("imported $name as: " . $specialties->{$name});
+        $self->logger->DEBUG("imported $name as: " . $specialties->{$name});
       }
       else {
-        $self->logger->error("failed to import $name");
+        $self->logger->ERR("failed to import $name");
       }
     }
     my $countImported = scalar keys %$specialties;
-    $self->logger->info(
+    $self->logger->INFO(
       "Model::Specialty::Manager imported $countImported specialties");
     return $countImported;
   }

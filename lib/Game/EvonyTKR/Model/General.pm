@@ -81,7 +81,7 @@ class Game::EvonyTKR::Model::General : isa(Game::EvonyTKR::Shared::Constants) {
     if (ref $type) {
       my @ts = @{$type};
       my $ut = $ts[0];
-      $self->logger->debug("using type $ut");
+      $self->logger->DEBUG("using type $ut");
       my $uuid5base = $self->UUID5_Generals()->{$ut};
       $id = uuid5($uuid5base, $name);
     }
@@ -102,7 +102,7 @@ class Game::EvonyTKR::Model::General : isa(Game::EvonyTKR::Shared::Constants) {
   method populateSpecialties ($specialtyManager) {
     foreach my $sn_index (0 .. scalar(@{$specialtyNames})) {
       my $sn = $specialtyNames->[$sn_index];
-      $self->logger->debug("populating $sn");
+      $self->logger->DEBUG("populating $sn");
       my $specialty = $specialtyManager->getSpecialty($sn);
       if ($specialty) {
         $specialties->[$sn_index] = $specialty;
@@ -166,7 +166,7 @@ class Game::EvonyTKR::Model::General : isa(Game::EvonyTKR::Shared::Constants) {
   sub from_hash ($self, $ho, $logger = undef) {
     if (!exists $ho->{name}) {
       if (defined($logger)) {
-        $logger->logcroak('hash object must contain a name attribute.');
+        $logger->ERR('hash object must contain a name attribute.');
         return undef;
       }
       else {

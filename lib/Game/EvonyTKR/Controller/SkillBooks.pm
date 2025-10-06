@@ -9,6 +9,7 @@ use namespace::clean;
 package Game::EvonyTKR::Controller::SkillBooks {
   use Mojo::Base 'Game::EvonyTKR::Controller::ControllerBase';
 
+  my $logger;
   # Specify which collection this controller handles
   sub collection_name {
     return 'skill books';
@@ -32,8 +33,8 @@ package Game::EvonyTKR::Controller::SkillBooks {
 
   # Register this when the application starts
   sub register($self, $app, $config = {}) {
-    my $logger = Log::Log4perl->get_logger(__PACKAGE__);
-    $logger->info("Registering routes for " . ref($self));
+    $logger = $app->get_logger(__PACKAGE__);
+    $logger->INFO("Registering routes for " . ref($self));
     $self->SUPER::register($app, $config);
 
     $app->helper(
@@ -56,7 +57,7 @@ package Game::EvonyTKR::Controller::SkillBooks {
       ? $self->controller_name()
       : $baseClass;
 
-    $logger->debug("got controller_name $controller_name.");
+    $logger->DEBUG("got controller_name $controller_name.");
 
     my $mainRoutes = $app->routes->any($base);
     $mainRoutes->get('/')
@@ -74,11 +75,11 @@ package Game::EvonyTKR::Controller::SkillBooks {
     # done its thing only after initialization
     $app->plugins->on(
       'evonytkrtips_initialized' => sub($self, $manager) {
-        $logger->debug(
+        $logger->DEBUG(
           "evonytkrtips_initialized sub has controller_name $controller_name.");
 
         if (not defined $manager) {
-          $logger->logcroak('No Manager Defined');
+          $app->log->logcroak('No Manager Defined');
         }
         my $base = getBase($self);
         foreach my $book (@{ $manager->bookManager->get_all_books() }) {
@@ -103,13 +104,13 @@ package Game::EvonyTKR::Controller::SkillBooks {
 
     $app->helper(
       get_builtin_book_text => sub ($c, $book_name) {
-        $app->log->debug("get_builtin_book_text for book '$book_name'");
+        $logger->DEBUG("get_builtin_book_text for book '$book_name'");
         my $book = $c->app->get_root_manager->bookManager->getBook($book_name);
         if ($book) {
           return $book->text();
         }
         else {
-          $logger->warn("No book found for '$book_name'");
+          $logger->WARN("No book found for '$book_name'");
         }
         return "";
       }
@@ -117,9 +118,8 @@ package Game::EvonyTKR::Controller::SkillBooks {
   }
 
   sub index($self) {
-    my $logger     = Log::Log4perl->get_logger(__PACKAGE__);
     my $collection = collection_name();
-    $logger->debug("Rendering index for $collection");
+    $logger->DEBUG("Rendering index for $collection");
 
     # Check if markdown exists for this collection
     my $distDir       = Mojo::File::Share::dist_dir('Game::EvonyTKR');
@@ -128,10 +128,10 @@ package Game::EvonyTKR::Controller::SkillBooks {
     my @parts     = split(/::/, ref($self));
     my $baseClass = pop(@parts);
     my $base      = $self->getBase();
-    $logger->debug("SkillBooks index method has base $base");
+    $logger->DEBUG("SkillBooks index method has base $base");
 
     my $items = $self->get_root_manager()->bookManager->get_all_books();
-    $logger->debug(
+    $logger->DEBUG(
       sprintf('Items: %s with %s items.', ref($items), scalar(@$items)));
     $self->stash(
       linkBase        => $base,
@@ -154,19 +154,19 @@ package Game::EvonyTKR::Controller::SkillBooks {
   }
 
   sub show ($self) {
-    my $logger = Log::Log4perl->get_logger(ref($self));
-    $logger->debug("start of show method");
+    my $app->log = Log::Log4perl->get_app->log(ref($self));
+    $logger->DEBUG("start of show method");
     my $name;
     $name = $self->param('name');
-    $logger->debug("show detects name $name, showing details.");
+    $logger->DEBUG("show detects name $name, showing details.");
 
     my $book = $self->get_root_manager()->bookManager->getBook($name);
 
     unless ($book) {
-      $logger->error("skill book '$name' was not found.");
+      $logger->ERR("skill book '$name' was not found.");
       $self->reply->not_found;
     }
-    $logger->debug("retrieved skill book $book");
+    $logger->DEBUG("retrieved skill book $book");
 
     $self->stash(
       item     => $book,

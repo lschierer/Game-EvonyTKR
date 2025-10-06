@@ -33,10 +33,10 @@ class Game::EvonyTKR::Model::General::Conflict :
   ### output fields
 
   # { attribute(s) => condition(s) => [ generals... ] }
-  field $groups_by_conflict_type : reader = {};
+  field $groups_by_conflict_type : writer : reader = {};
 
   # { general => { other_general => 1, ... } }
-  field $by_general : reader = {};
+  field $by_general : writer : reader = {};
 
   field %PBIT = (GR => 1, RA => 2, MT => 4, SG => 8);
   ADJUST {
@@ -282,9 +282,9 @@ class Game::EvonyTKR::Model::General::Conflict :
   }
 
   method build_meta_for ($general, $role) {
-    $self->logger->debug("building meta for " . $general->name);
+    $self->logger->DEBUG("building meta for " . $general->name);
     unless (defined($general->builtInBook)) {
-      $self->logger->logcroak(sprintf(
+      $self->dev_guard(sprintf(
         'general %s must have the builtInBook already populated.',
         $general->name));
       return;
@@ -298,7 +298,7 @@ class Game::EvonyTKR::Model::General::Conflict :
         && $general->builtInBook->text =~ /\bby another\b/i);
 
     foreach my $buff (@buffs) {
-      $self->logger->debug(sprintf(
+      $self->logger->DEBUG(sprintf(
         'book %s has buff %s',
         $general->builtInBook->name,
         Data::Printer::np($buff)
@@ -393,7 +393,7 @@ class Game::EvonyTKR::Model::General::Conflict :
   }
 
   method are_generals_compatible ($g1, $g2) {
-    $self->logger->debug(sprintf(
+    $self->logger->DEBUG(sprintf(
       'testing %s and %s for compatibility', $g1->name, $g2->name));
 
     my $role1 = $assume_g1_is_main ? 'main'      : 'assistant';
@@ -401,13 +401,13 @@ class Game::EvonyTKR::Model::General::Conflict :
 
     if ($assume_g1_is_main) {
       if (exists $by_general->{ $g1->name }) {
-        $self->logger->debug('returning cached conflict');
+        $self->logger->DEBUG('returning cached conflict');
         return 0 if (exists $by_general->{ $g1->name }->{ $g2->name });
       }
     }
     else {
       if (exists $by_general->{ $g2->name }) {
-        $self->logger->debug('returning cached conflict');
+        $self->logger->DEBUG('returning cached conflict');
         return 0 if (exists $by_general->{ $g2->name }->{ $g1->name });
       }
     }
@@ -420,7 +420,7 @@ class Game::EvonyTKR::Model::General::Conflict :
         $self->&build_meta_for($g2, $role2));
     # no overlapping troop classes
 
-    $self->logger->debug(sprintf(
+    $self->logger->DEBUG(sprintf(
       'm1 for %s is %s; m2 for %s is %s',
       $g1->name, Data::Printer::np($m1, multiline => 1),
       $g2->name, Data::Printer::np($m2, multiline => 1),
@@ -446,7 +446,7 @@ class Game::EvonyTKR::Model::General::Conflict :
         # Now go attribute-by-attribute to keep logic precise
         for my $a1 (@{ $e1->{attributes} // [] }) {
           for my $a2 (@{ $e2->{attributes} // [] }) {
-            $self->logger->debug(sprintf(
+            $self->logger->DEBUG(sprintf(
               'comparing %s for %s with %s for %s',
               $a1, $g1->name, $a2, $g2->name
             ));
@@ -455,14 +455,14 @@ class Game::EvonyTKR::Model::General::Conflict :
 
             # Skip conflict if either buff is marked as stackable
             if (($e1->{is_stackable} // 0) || ($e2->{is_stackable} // 0)) {
-              $self->logger->debug(
+              $self->logger->DEBUG(
                 "$a1 buffs can stack - one is marked stackable");
               next;
             }
 
             # 1) condless: conflict on troop overlap regardless of state
             if (exists $CONDLESS{$a1}) {
-              $self->logger->debug("$a1 conflict (condless)");
+              $self->logger->DEBUG("$a1 conflict (condless)");
               # e1, e2 are the two meta entries you’re currently adjudicating
               my $bucket_key = $self->&_conflict_key_from_entry($e1);
               $bucket_key ||= $self->&_conflict_key_from_entry($e2);
@@ -499,7 +499,7 @@ class Game::EvonyTKR::Model::General::Conflict :
                 # for this troop scope, allow it;
                 # otherwise, conflict:
                 #if ($x_blank || $y_blank) {
-                #  $self->logger->debug(
+                #  $self->logger->DEBUG(
                 #    'triad: unconditional vs scoped -> conflict');
                 #  return 0;
                 #}
@@ -513,7 +513,7 @@ class Game::EvonyTKR::Model::General::Conflict :
               if ($G1 && $G2) {
                 #they both *have* groups. *are they the same??*
                 if ($e1->{attributes_string} eq $e2->{attributes_string}) {
-                  $self->logger->debug(sprintf(
+                  $self->logger->DEBUG(sprintf(
                     '%s for %s and %s for %s are the same attribute group',
                     Data::Printer::np($e1->{attributes}), $g1->name,
                     Data::Printer::np($e2->{attributes}), $g2->name,
@@ -521,7 +521,7 @@ class Game::EvonyTKR::Model::General::Conflict :
                   if (
                     $e1->{targetedTypes_string} eq $e2->{targetedTypes_string})
                   {
-                    $self->logger->debug(sprintf(
+                    $self->logger->DEBUG(sprintf(
                       '%s for %s and %s for %s are '
                         . 'the same targetedTypes group',
                       Data::Printer::np($e1->{targetedTypes}), $g1->name,
@@ -575,12 +575,12 @@ class Game::EvonyTKR::Model::General::Conflict :
                 if ($Sg eq $Ss) {
                   if ($self->&_has_any_group_entry_in_context($sng, $sng_side))
                   {
-                    $self->logger->debug(
+                    $self->logger->DEBUG(
                       'single side also has a grouped entry in-context -> allow'
                     );
                     next;
                   }
-                  $self->logger->debug(
+                  $self->logger->DEBUG(
                     'grouped vs single, same state -> conflict');
                   # e1, e2 are the two meta entries
                   # you’re currently adjudicating
@@ -616,11 +616,11 @@ class Game::EvonyTKR::Model::General::Conflict :
                   );
 
                   if ($blank_is_pure_single_at) {
-                    $self->logger->debug(
+                    $self->logger->DEBUG(
                       'pure single AT (Sun Ce style) -> allow');
                     next;
                   }
-                  $self->logger->debug('blank vs scoped -> conflict');
+                  $self->logger->DEBUG('blank vs scoped -> conflict');
                  # e1, e2 are the two meta entries you’re currently adjudicating
                   my $bucket_key = $self->&_conflict_key_from_entry($e1);
                   $bucket_key ||= $self->&_conflict_key_from_entry($e2);
@@ -637,13 +637,13 @@ class Game::EvonyTKR::Model::General::Conflict :
 
                   return 0;
                 }
-                $self->logger->debug('different non-blank states → compatible');
+                $self->logger->DEBUG('different non-blank states → compatible');
                 # different non-blank states → compatible
                 next;
               }
               else {
                 # standalone vs standalone in the same state → conflict
-                $self->logger->debug(
+                $self->logger->DEBUG(
                   'triad: standalone vs standalone (same state) -> conflict');
                 # e1, e2 are the two meta entries you’re currently adjudicating
                 my $bucket_key = $self->&_conflict_key_from_entry($e1);
@@ -672,7 +672,7 @@ class Game::EvonyTKR::Model::General::Conflict :
 
             # both non-blank and equal -> conflict
             if (!$blank1 && $S1 eq $S2) {
-              $self->logger->debug('non-triad: same state -> conflict');
+              $self->logger->DEBUG('non-triad: same state -> conflict');
               # e1, e2 are the two meta entries you’re currently adjudicating
               my $bucket_key = $self->&_conflict_key_from_entry($e1);
               $bucket_key ||= $self->&_conflict_key_from_entry($e2);
@@ -692,7 +692,7 @@ class Game::EvonyTKR::Model::General::Conflict :
 
             # both blank -> conflict (always-on, same troop + attribute)
             if ($blank1 && $blank2) {
-              $self->logger->debug('non-triad: both blank -> conflict');
+              $self->logger->DEBUG('non-triad: both blank -> conflict');
               # e1, e2 are the two meta entries you’re currently adjudicating
               my $bucket_key = $self->_conflict_key_from_entry($e1);
               $bucket_key ||= $self->_conflict_key_from_entry($e2);

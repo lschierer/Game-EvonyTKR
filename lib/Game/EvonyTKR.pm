@@ -5,10 +5,6 @@ use File::FindLib 'lib';
 require YAML::PP;
 require Minion::Backend::SQLite;
 require Mojolicious::Plugin::Minion;
-require Game::EvonyTKR::Model::Logger;
-require Game::EvonyTKR::Logger::MojoLog4Perl;
-require Game::EvonyTKR::Logger::Config;
-require Log::Log4perl;
 
 #require Game::EvonyTKR::Controller::Root;
 require Game::EvonyTKR::Controller::ControllerBase;
@@ -20,6 +16,8 @@ require GitRepo::Reader;
 package Game::EvonyTKR {
   use Mojo::Base 'Mojolicious', -strict, -signatures;
   use Mojo::File::Share qw(dist_dir );
+  use Game::EvonyTKR::Shared::Logger;
+  use MojoX::Log::Fast;
   use Carp;
   use Env qw(DEPLOYMENT_TIME HOSTNAME IMAGE_TAG IMAGE_URI);
   our $VERSION = 'v0.50.0';
@@ -54,29 +52,16 @@ package Game::EvonyTKR {
     $self->defaults(layout => 'default');
 
     # Logging setup
+    my $logger = Game::EvonyTKR::Shared::Logger::get_logger('Game::EvonyTKR');
+    $self->log( MojoX::Log::Fast->new($logger));
 
-    my $lc              = Game::EvonyTKR::Logger::Config->new('Game-EvonyTKR');
-    my $log4perl_logger = $lc->init($mode);
-    my $app_log =
-      Game::EvonyTKR::Logger::MojoLog4Perl->new(l4p => $log4perl_logger,);
-    $self->log($app_log);
+    $self->helper(get_logger => sub ($self, $caller) {
+      return Game::EvonyTKR::Shared::Logger::get_logger($caller);
+    });
 
-    $self->helper(
-      logger => sub ($c, $cat) {
-        if (length($cat) == 0) {
-          $self->log->error('got a logger request with zero length cat!');
-          $cat = 'Game-EvonyTKR-Unknown';
-        }
-        else {
-          $self->log->info("got a cat '$cat'");
-        }
-        Log::Log4perl::Config->utf8(1);
-        my $logger = $log4perl_logger;
-        return $logger;
-      }
-    );
-
-    $self->log->info("Mojolicious Logging initialized");
+    $self->log->info(sprintf(
+    'Mojolicious Logging initialized',
+    ));
     my $RootManager =
       Game::EvonyTKR::Model::EvonyTKR::Manager->new(SourceDir => $distDir,);
 
@@ -101,6 +86,7 @@ package Game::EvonyTKR {
     $self->hook(
       before_server_start => sub {
         state $initialized = do {
+          $self->log->info('testing general André Masséna');
           $self->log->info("⚙️  Running rootImport...");
           $RootManager->rootImport();
           $self->log->info("✅ rootImport completed.");
@@ -142,8 +128,8 @@ package Game::EvonyTKR {
     );
 
     # Last the Static Pages
-    $self->plugin('Game::EvonyTKR::Plugins::StaticPages')
-      ;    # Register last for lowest priority
+    # Register last for lowest priority
+    #$self->plugin('Game::EvonyTKR::Plugins::StaticPages');
 
     # configure to tell it that I will be behind an ELB/ALB.
     #$self->reverse_proxy(1);

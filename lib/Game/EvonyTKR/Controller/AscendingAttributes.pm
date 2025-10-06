@@ -12,6 +12,8 @@ package Game::EvonyTKR::Controller::AscendingAttributes {
   use List::AllUtils qw(uniq first);
   use Carp;
 
+  my $logger;
+
   # Specify which collection this controller handles
   sub collection_name {'ascending attributes'}
 
@@ -32,15 +34,15 @@ package Game::EvonyTKR::Controller::AscendingAttributes {
   # Override loadItem to add any Ascending Attributes-specific processing
 
   sub register($self, $app, $config = {}) {
-    my $logger = Log::Log4perl->get_logger(__PACKAGE__);
-    $logger->info("Registering routes for " . ref($self));
+    $logger = $app->get_logger(__PACKAGE__);
+    $logger->INFO("Registering routes for " . ref($self));
     $self->SUPER::register($app, $config);
 
     my $distDir    = Mojo::File::Share::dist_dir('Game::EvonyTKR');
     my $collection = $self->collection_name;
     my $SourceDir  = $distDir->child("collections/$collection");
 
-    $logger->info(
+    $logger->INFO(
 "Successfully loaded Ascending Attributes manager with collection from $SourceDir"
     );
 
@@ -65,7 +67,7 @@ package Game::EvonyTKR::Controller::AscendingAttributes {
 
     $app->helper(
       ascending_level_names => sub($c, $level = '', $printable = 0) {
-        $logger->debug(sprintf(
+        $logger->DEBUG(sprintf(
           'ascending_level_names helper started, level is %s, printable is %s',
           defined $level     ? $level     : '',
           defined $printable ? $printable : 0,
@@ -86,7 +88,7 @@ package Game::EvonyTKR::Controller::AscendingAttributes {
               $combined{$ln}++;
             }
             my @unique = sort keys(%combined);
-            $logger->debug("derived unique keys " . join(', ', @unique));
+            $logger->DEBUG("derived unique keys " . join(', ', @unique));
             return \@unique;
           }
           else {
@@ -102,7 +104,7 @@ package Game::EvonyTKR::Controller::AscendingAttributes {
               $combined{$ln}++;
             }
             my @unique = sort keys(%combined);
-            $logger->debug("derived unique keys " . join(', ', @unique));
+            $logger->DEBUG("derived unique keys " . join(', ', @unique));
             return \@unique;
           }
         }
@@ -134,7 +136,7 @@ package Game::EvonyTKR::Controller::AscendingAttributes {
             ->getAscendingAttributes($name);
           if ( Scalar::Util::reftype($item) eq 'OBJECT'
             && blessed($item) eq 'Game::EvonyTKR::Model::AscendingAttributes') {
-            $logger->debug("rendering get_ascending_section for $name");
+            $logger->DEBUG("rendering get_ascending_section for $name");
             return $c->render_to_string(
               item     => $item,
               template => '/ascending attributes/details',
@@ -142,10 +144,10 @@ package Game::EvonyTKR::Controller::AscendingAttributes {
             );
           }
           else {
-            $logger->warn(
+            $logger->WARN(
               "get_ascending_section cannot find Ascending Attributes for $name"
             );
-            $logger->debug(sprintf(
+            $logger->DEBUG(sprintf(
               "searching for $name, instead got %s %s",
               Scalar::Util::reftype($item),
               blessed($item)
@@ -153,7 +155,7 @@ package Game::EvonyTKR::Controller::AscendingAttributes {
           }
         }
         else {
-          $logger->warn("cannot get_ascending_section without a name");
+          $logger->WARN("cannot get_ascending_section without a name");
         }
         return "";
       }

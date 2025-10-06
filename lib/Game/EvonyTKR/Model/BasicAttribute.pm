@@ -140,7 +140,7 @@ class Game::EvonyTKR::Model::BasicAttribute :
       ) / 100,
       3
     );
-    $self->logger->debug(
+    $self->logger->DEBUG(
       "found total basic attribute value of $result for $name");
     return $result;
   }

@@ -10,102 +10,202 @@ require Log::Log4perl;
 require MIME::Base64;
 require Path::Tiny;
 require Game::EvonyTKR;
-require Game::EvonyTKR::Logger::Config;
 require Game::EvonyTKR::Shared::Constants;
 require Game::EvonyTKR::Model::General;
 
-class Game::EvonyTKR::External::General::PairBuilder : isa(Game::EvonyTKR::Shared::Constants) {
+class Game::EvonyTKR::External::General::PairBuilder :
+  isa(Game::EvonyTKR::Shared::Constants) {
   use Unicode::Normalize;
   use Unicode::CaseFold qw(fc);
   use Encode            qw(is_utf8 decode_utf8 encode_utf8);
   use Carp;
 
-  field $app            : param;
-  field $job            : param;
-  field $general_names  : param = [];
-  field $conflicts      : param = {};
+  field $app           : param;
+  field $job           : param;
+  field $general_names : param = [];
+  field $conflicts     : param = {};
 
   field $dist_dir = Path::Tiny::path(File::Share::dist_dir('Game::EvonyTKR'));
-  field $generals   = {};
+  field $generals = {};
   field $builderJobs = [];
+  field $conflictDetector =
+    Game::EvonyTKR::Model::General::Conflict::Book->new(
+    build_index      => 1,
+    asst_has_dragon  => 1,
+    asst_has_spirit  => 1,
+    allow_wall_buffs => 1,
+    );
+
+  field $pairs_by_type : reader = {};
+
+  ADJUST {
+    $self->log_config($app->mode);
+  }
 
   ADJUST {
     my $collectionDir = $dist_dir->child('collections/data');
-    my $generalsDir = $collectionDir->child('generals');
-    my $bookDir = $collectionDir->child('skill books');
+    my $generalsDir   = $collectionDir->child('generals');
+    my $bookDir       = $collectionDir->child('skill books');
+
+    if (exists($conflicts->{by_general})
+      && ref($conflicts->{by_general}) eq 'HASH') {
+      $conflictDetector->set_by_general($conflicts->{by_general});
+    }
+    if (exists($conflicts->{groups_by_conflict_type})
+      && ref($conflicts->{groups_by_conflict_type}) eq 'HASH') {
+      $conflictDetector->set_groups_by_conflict_type(
+        $conflicts->{groups_by_conflict_type});
+    }
+
     my $ypp = YAML::PP->new(
       schema       => [qw/ + Perl /],
       yaml_version => ['1.2', '1.1'],
     );
-    foreach my $gn ($general_names->@*){
+    foreach my $gn ($general_names->@*) {
       my ($file) = grep {
         my $nf = $self->normalize_name($_->basename('.yaml'));
         my $nn = $self->normalize_name($gn);
         $nf eq $nn;
       } $generalsDir->children;
-      unless(defined($file) && $file->is_file()) {
+      unless (defined($file) && $file->is_file()) {
         $self->worker_croak("no yaml file found for $gn");
         next;
       }
-      my $data   = $file->slurp_utf8;
-      my $gho = $ypp->load_string($data);
-      my $general = Game::EvonyTKR::Model::General->from_hash($gho, $self->logger);
+      my $data = $file->slurp_utf8;
+      my $gho  = $ypp->load_string($data);
+      my $general =
+        Game::EvonyTKR::Model::General->from_hash($gho, $self->logger);
 
       my ($bookFile) = grep {
         my $nf = $self->normalize_name($_->basename('.yaml'));
         my $nn = $self->normalize_name($general->builtInBookName);
         $nf eq $nn;
       } $bookDir->children;
-      unless(defined($bookFile) && $bookFile->is_file()){
-        $self->worker_croak(sprintf('no yaml file found for "%s"', $general->builtInBookName));
+      unless (defined($bookFile) && $bookFile->is_file()) {
+        $self->worker_croak(
+          sprintf('no yaml file found for "%s"', $general->builtInBookName));
         next;
       }
-      my $bd = $bookFile->slurp_utf8;
+      my $bd  = $bookFile->slurp_utf8;
       my $bho = $ypp->load_string($bd);
-      my $book = Game::EvonyTKR::Model::Book::Builtin->from_hash($bho, $self->logger);
-      unless(Scalar::Util::blessed($book) eq
-        'Game::EvonyTKR::Model::Book::Builtin') {
-        $self->worker_croak('failed to import book ' . $general->builtInBookName);
+      my $book =
+        Game::EvonyTKR::Model::Book::Builtin->from_hash($bho, $self->logger);
+      unless (
+        Scalar::Util::blessed($book) eq 'Game::EvonyTKR::Model::Book::Builtin')
+      {
+        $self->worker_croak(
+          'failed to import book ' . $general->builtInBookName);
         next;
       }
       $general->set_builtInBook($book);
 
-      $generals->{$general->name} = $general;
+      $generals->{ $general->name } = $general;
     }
   }
 
   ADJUST {
-    $app->minion->add_task(build_pairs_for_primary => sub ($job, $args){
-      my $general_name = $args->{general_name};
-      unless(length($general_name)){
-        $self->logger->error('general_name not provided to build_pairs_for_primary');
-        return $job->finish('general_name not provided to build_pairs_for_primary');
+    $app->minion->add_task(
+      build_pairs_for_primary => sub ($job, $args) {
+        $self->log_config($app->mode);
+        my $general_name = $args->{general_name};
+        unless (length($general_name)) {
+          $self->logger->error(
+            'general_name not provided to build_pairs_for_primary');
+          return $job->finish(
+            'general_name not provided to build_pairs_for_primary');
+        }
+        return $job->finish(
+          sprintf('build_pairs_for_primary for %s already launched',
+            $general_name)
+          )
+          unless my $bppGuard =
+          $app->minion->guard("build_pairs_for_primary_${general_name}", 360);
+        return $self->build_pairs_for_primary($general_name);
       }
-      return $job->finish(sprintf('build_pairs_for_primary for %s already launched', $general_name))
-        unless my $bppGuard = $app->minion->guard("build_pairs_for_primary_${general_name}", 360);
-      $self->build_pairs_for_primary($general_name);
-    });
-  }
-
-  method execute {
-    if(scalar(keys $generals->%*) > 0){
-      $self->build_all_pairs();
-    }
+    );
 
   }
 
   method build_all_pairs {
-    foreach my $general (sort {$a->name cmp $b->name } values $generals->%*){
-      my $jid = $app->minion->enqueue(build_pairs_for_primary => [{
-        general_name => $general->name,
-      }], {
-        priority  => -1,
-        attempts  => 5,
-        expire    => 7200,
-      });
+    foreach my $general (sort { $a->name cmp $b->name } values $generals->%*) {
+      my $jid = $app->minion->enqueue(
+        build_pairs_for_primary => [{
+          general_name => $general->name,
+        }],
+        {
+          priority => -1,
+          attempts =>  5,
+          expire   => 7200,
+        }
+      );
       push @$builderJobs, $jid;
-      $self->logger->debug(sprintf('pair builder kicked off for general "%s" with jid %s', $general->name, $jid));
+      $self->logger->debug(sprintf(
+        'pair builder kicked off for general "%s" with jid %s',
+        $general->name, $jid
+      ));
     }
+
+  }
+
+  method build_pairs_for_primary ($general_name) {
+    my $primary = $generals->{$general_name};
+    unless ($primary) {
+      $self->logger->error("general for $general_name not found!");
+      return $job->finish("general for $general_name not found!");
+    }
+
+    my %initial_counts;
+    foreach my $type (keys %{$pairs_by_type}) {
+      my $tc = scalar @{ $pairs_by_type->{$type} } // 0;
+      $initial_counts{$type} = $tc;
+    }
+
+    foreach my $secondary (sort { $a->name cmp $b->name } values %{$generals}) {
+      next if $primary->name eq $secondary->name;
+      $self->logger->debug(sprintf(
+        'testing if %s and %s conflict.',
+        $primary->name, $secondary->name
+      ));
+      next
+        unless $conflictDetector->are_generals_compatible($primary, $secondary);
+
+      $self->logger->debug(sprintf(
+        'no conflict, testing %s and %s for common type.',
+        $primary->name, $secondary->name
+      ));
+      my $primary_types     = $primary->type   // [];
+      my $secondary_types   = $secondary->type // [];
+      my %primary_types_map = map  { $_ => 1 } @$primary_types;
+      my @common            = grep { $primary_types_map{$_} } @$secondary_types;
+      @common = sort @common;
+      next unless (scalar(@common) > 0);
+
+      my $pair = {
+        primary   => $primary->name,
+        secondary => $secondary->name,
+      };
+
+      for my $t (@common) {
+        $self->logger->debug(sprintf(
+          '%s <-> %s as %s', $pair->{primary}, $pair->{secondary}, $t));
+        push @{ $pairs_by_type->{$t} }, $pair;
+      }
+    }
+
+    my $total_added = 0;
+    foreach my $type (keys %{$pairs_by_type}) {
+      my $tc    = scalar @{ $pairs_by_type->{$type} } // 0;
+      my $delta = $tc - ($initial_counts{$type} // 0);
+      $total_added += $delta;
+      $self->logger->debug(sprintf(
+        'general %s has %s pairs for type %s',
+        $primary->name, $delta, $type
+      ));
+    }
+    $self->logger->info(
+      sprintf('there are %s pairs for %s', $total_added, $primary->name));
+    $job->note(pairs_by_type => $pairs_by_type);
+    return $job->finish({ pairs_by_type => $pairs_by_type });
   }
 
   method normalize_name ($name) {
@@ -248,13 +348,7 @@ __END__
 
     field $generalManager = Game::EvonyTKR::Model::General::Manager->new();
     field $bookManager    = Game::EvonyTKR::Model::Book::Manager->new();
-    field $conflictDetector =
-      Game::EvonyTKR::Model::General::Conflict::Book->new(
-      build_index      => 1,
-      asst_has_dragon  => 1,
-      asst_has_spirit  => 1,
-      allow_wall_buffs => 1,
-      );
+
 
     field $generals = [];
     field $builderTasks = {};
@@ -428,59 +522,6 @@ __END__
     }
 
     method build_pairs($primary) {
-      my $generals = $generalManager->get_all_generals();
-      my %initial_counts;
-      foreach my $type (keys %{$pairs_by_type}) {
-        my $tc = scalar @{ $pairs_by_type->{$type} } // 0;
-        $initial_counts{$type} = $tc;
-      }
-
-      foreach
-        my $secondary (sort { $a->name cmp $b->name } values %{$generals}) {
-        next if $primary->name eq $secondary->name;
-        $self->logger->debug(sprintf(
-          'testing if %s and %s conflict.',
-          $primary->name, $secondary->name
-        ));
-        next
-          unless $conflictDetector->are_generals_compatible($primary,
-          $secondary);
-
-        $self->logger->debug(sprintf(
-          'no conflict, testing %s and %s for common type.',
-          $primary->name, $secondary->name
-        ));
-        my $primary_types     = $primary->type   // [];
-        my $secondary_types   = $secondary->type // [];
-        my %primary_types_map = map { $_ => 1 } @$primary_types;
-        my @common = grep { $primary_types_map{$_} } @$secondary_types;
-        @common = sort @common;
-        next unless (scalar(@common) > 0);
-
-        my $pair = {
-          primary   => $primary->name,
-          secondary => $secondary->name,
-        };
-
-        for my $t (@common) {
-          $self->logger->debug(sprintf('%s <-> %s as %s',
-            $pair->{primary}, $pair->{secondary}, $t));
-          push @{ $pairs_by_type->{$t} }, $pair;
-        }
-      }
-
-      my $total_added = 0;
-      foreach my $type (keys %{$pairs_by_type}) {
-        my $tc    = scalar @{ $pairs_by_type->{$type} } // 0;
-        my $delta = $tc - ($initial_counts{$type} // 0);
-        $total_added += $delta;
-        $self->logger->debug(sprintf(
-          'general %s has %s pairs for type %s',
-          $primary->name, $delta, $type
-        ));
-      }
-      $self->logger->info(
-        sprintf('there are %s pairs for %s', $total_added, $primary->name));
 
     }
   }

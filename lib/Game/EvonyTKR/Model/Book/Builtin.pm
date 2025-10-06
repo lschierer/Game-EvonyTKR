@@ -48,7 +48,7 @@ class Game::EvonyTKR::Model::Book::Builtin : isa(Game::EvonyTKR::Model::Book) {
     elsif (exists $object->{buffs}) {
       @buffs = @{ $object->{buffs} };
     }
-    $logger->debug(
+    $logger->DEBUG(
       sprintf('Book %s has %s buffs in YAML', $object->{name}, scalar @buffs));
 
     foreach my $ob (@buffs) {
@@ -56,7 +56,7 @@ class Game::EvonyTKR::Model::Book::Builtin : isa(Game::EvonyTKR::Model::Book) {
       $bb->addBuff($b);
     }
 
-    $logger->debug(sprintf(
+    $logger->DEBUG(sprintf(
       'Finished importing book "%s" with %s buffs: %s',
       $object->{name},
       scalar @{ $bb->buff },

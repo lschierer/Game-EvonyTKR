@@ -39,15 +39,15 @@ class Game::EvonyTKR::Model::Covenant : isa(Game::EvonyTKR::Shared::Constants) {
     my $step1 = {};
     my $name  = $primary->name;
 #if(blessed $one ne 'Game::EvonyTKR::Model::General') {
-#  $self->logger->logcroak("one of $name must be of type 'Game::EvonyTKR::Model::General' not " . blessed($one));
+#  $self->dev_guard("one of $name must be of type 'Game::EvonyTKR::Model::General' not " . blessed($one));
 #}
     $step1->{one} = $one;
 #if(blessed $two ne 'Game::EvonyTKR::Model::General') {
-#  $self->logger->logcroak("two of $name  must be of type 'Game::EvonyTKR::Model::General' not " . blessed($two));
+#  $self->dev_guard("two of $name  must be of type 'Game::EvonyTKR::Model::General' not " . blessed($two));
 #}
     $step1->{two} = $two;
 #if(blessed $three ne 'Game::EvonyTKR::Model::General') {
-#  $self->logger->logcroak("three of $name  must be of type 'Game::EvonyTKR::Model::General' not " . blessed($three));
+#  $self->dev_guard("three of $name  must be of type 'Game::EvonyTKR::Model::General' not " . blessed($three));
 #}
     $step1->{three} = $three;
 
@@ -62,7 +62,7 @@ class Game::EvonyTKR::Model::Covenant : isa(Game::EvonyTKR::Shared::Constants) {
     #Covenants only have these levels.
     my $step1 = {};
     foreach my $key ($self->CovenantCategoryValues->@*) {
-      $self->logger->debug("initializing covenantLevel $key");
+      $self->logger->DEBUG("initializing covenantLevel $key");
       if ($key eq 'None') {
         next;
       }
@@ -80,7 +80,7 @@ class Game::EvonyTKR::Model::Covenant : isa(Game::EvonyTKR::Shared::Constants) {
         next;
       }
       my $al = 10000 + $index * 2 * 1000;
-      $self->logger()->trace("setting activationLevel for $lv to $al");
+      $self->logger->DEBUG("setting activationLevel for $lv to $al");
       $categories->{$lv}->{activationLevel} = $al;
     }
   }
@@ -93,7 +93,7 @@ class Game::EvonyTKR::Model::Covenant : isa(Game::EvonyTKR::Shared::Constants) {
     $includePassive   = 0,
   ) {
     my $logger = $self->logger;
-    $logger->debug(
+    $logger->DEBUG(
       "Calculating ascending buffs for level: $level, attribute: $attribute");
 
     # For buff matching, don't pass debuff conditions
@@ -114,7 +114,7 @@ class Game::EvonyTKR::Model::Covenant : isa(Game::EvonyTKR::Shared::Constants) {
     my %level_index  = map { $valid_levels->[$_] => $_ } 0 .. $#$valid_levels;
 
     unless (exists $level_index{$level}) {
-      $logger->debug("Invalid level: $level");
+      $logger->DEBUG("Invalid level: $level");
       return 0;
     }
 
@@ -126,7 +126,7 @@ class Game::EvonyTKR::Model::Covenant : isa(Game::EvonyTKR::Shared::Constants) {
       my $level_name = $valid_levels->[$i];
       my $buffs      = $categories->{$level_name}->{buffs};
 
-      $logger->debug(
+      $logger->DEBUG(
         "Checking level '$level_name' with " . scalar(@$buffs) . " buffs");
 
       foreach my $buff (@$buffs) {
@@ -142,15 +142,15 @@ class Game::EvonyTKR::Model::Covenant : isa(Game::EvonyTKR::Shared::Constants) {
           $logID
         )) {
           my $val = $buff->value->number;
-          $logger->debug("  ➤ Match found. Adding $val to total.");
+          $logger->DEBUG("  ➤ Match found. Adding $val to total.");
           $total += $val;
         }
         else {
-          $logger->debug("  ✗ No match found.");
+          $logger->DEBUG("  ✗ No match found.");
         }
       }
     }
-    $logger->debug($primary->name
+    $logger->DEBUG($primary->name
         . " has Total $total for level '$level' and attribute '$attribute'");
     return $total;
   }
@@ -158,14 +158,14 @@ class Game::EvonyTKR::Model::Covenant : isa(Game::EvonyTKR::Shared::Constants) {
   method addBuff ($level, $nb) {
     my $red = 1;
     if (!blessed($nb) || blessed($nb) ne "Game::EvonyTKR::Model::Buff") {
-      $self->logger->error(sprintf(
+      $self->logger->ERR(sprintf(
         'attempting to add buff of type %s not "Game::EvonyTKR::Model::Buff"',
         !blessed($nb) ? Scalar::Util::reftype($nb) : blessed($nb)));
       exit 0;
     }
 
     if (none { $level =~ /$_/i } @{ $self->CovenantCategoryValues }) {
-      $self->logger->error(sprintf(
+      $self->logger->ERR(sprintf(
         'level should be one of %s, not %s',
         join(', ', @{ $self->covenantLevels }), $level
       ));
@@ -177,13 +177,13 @@ class Game::EvonyTKR::Model::Covenant : isa(Game::EvonyTKR::Shared::Constants) {
     my $count = -1;
     $level = lc($level);
     if (!exists $categories->{$level}) {
-      $self->logger->error(
+      $self->logger->ERR(
         "category $level is not a valid key for covenantlevels!!");
     }
     else {
       push @{ $categories->{$level}->{buffs} }, $nb;
       $count = scalar @{ $categories->{$level}->{buffs} };
-      $self->logger->debug("Added buff for attribute '"
+      $self->logger->DEBUG("Added buff for attribute '"
           . $nb->attribute
           . "' to covenant level '$level', now has $count buffs");
     }
@@ -225,19 +225,20 @@ class Game::EvonyTKR::Model::Covenant : isa(Game::EvonyTKR::Shared::Constants) {
       $logger = Log::Log4perl->get_logger(Scalar::Util::blessed($self));
     }
     if (!exists $object->{name}) {
-      $logger->logcroak('object must have name attribute.');
+      $logger->ERR('object must have name attribute.');
       return;
     }
     my $name = $object->{name};
     unless (Scalar::Util::blessed($primary) eq 'Game::EvonyTKR::Model::General')
     {
-      $logger->error(
-"primary general must be of type Game::EvonyTKR::Model::General for covenant $name"
+      $logger->ERR(
+      "primary general must be of type ".
+      "Game::EvonyTKR::Model::General for covenant $name"
       );
       return;
     }
-    $logger->debug("found primary general for $name, starting import.");
-    $logger->debug(
+    $logger->DEBUG("found primary general for $name, starting import.");
+    $logger->DEBUG(
       "generals for $name are " . join(", ", @{ $object->{generals} }));
 
     my $o = Game::EvonyTKR::Model::Covenant->new(
@@ -250,7 +251,7 @@ class Game::EvonyTKR::Model::Covenant : isa(Game::EvonyTKR::Shared::Constants) {
     foreach my $oc (@{ $object->{levels} }) {
       my $category = $oc->{category};
       unless (defined($category) && length($category)) {
-        $logger->logcroak(
+        $logger->ERR(
           'invalid category!! ' . Data::Printer::np($object, multiline => 0));
         return;
       }

@@ -10,16 +10,14 @@ package Game::EvonyTKR::Plugins::StaticPages {
   use Mojo::Base 'Mojolicious::Plugin';
   use Carp;
 
+  my $logger;
   my %static_routes;
 
-  my $logger;
-
   sub register ($self, $app, $config) {
-    $logger = $app->logger(__PACKAGE__);
-    $logger->info(sprintf(
-      'register function for %s with logging category %s.',
-      __PACKAGE__, $logger->category()
-    ));
+    $logger = $app->get_logger(__PACKAGE__);;
+    $logger->INFO(sprintf(
+      'register function for %s.',
+      __PACKAGE__, ));
 
     # Add helper to check if a static route exists
     $app->helper(
@@ -29,7 +27,7 @@ package Game::EvonyTKR::Plugins::StaticPages {
     );
 
     foreach my $static_entry ($self->build_routes($app)) {
-      $logger->info(sprintf(
+      $logger->INFO(sprintf(
         'Adding route "%s" for file "%s"',
         $static_entry->{route},
         $static_entry->{path}
@@ -72,7 +70,7 @@ package Game::EvonyTKR::Plugins::StaticPages {
       my $file_path     = Mojo::File->new($file);
       my $relative_path = $file_path->to_rel($pages_dir);
       my $route_path    = $self->file_path_to_route($relative_path);
-      $logger->debug(
+      $logger->DEBUG(
         "Considering static route: $route_path for file: $relative_path");
 
       my $parsedFile = $app->parse_markdown_frontmatter($file_path);
@@ -81,12 +79,12 @@ package Game::EvonyTKR::Plugins::StaticPages {
         my $has_conflict     = 0;
 
         my $existing_nav = $app->get_existing_navigation_items() || {};
-        $logger->debug(sprintf('comparing against %s existing nav entries.',
+        $logger->DEBUG(sprintf('comparing against %s existing nav entries.',
           scalar keys %$existing_nav));
         foreach my $existing_path (keys %$existing_nav) {
           if (fc($existing_path) eq fc($normalized_route)) {
             $has_conflict = 1;
-            $logger->debug(sprintf(
+            $logger->DEBUG(sprintf(
               'Skipping static page navigation for "%s"'
                 . ' - conflicts with existing "%s"',
               $route_path, $existing_path,
@@ -96,7 +94,7 @@ package Game::EvonyTKR::Plugins::StaticPages {
         }
 
         unless ($has_conflict) {
-          $logger->debug(
+          $logger->DEBUG(
             sprintf('Registering "%s" as static route, no conflicts present',
               $route_path)
           );

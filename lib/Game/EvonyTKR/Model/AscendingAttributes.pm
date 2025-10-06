@@ -63,7 +63,7 @@ class Game::EvonyTKR::Model::AscendingAttributes :
     $matching_type    = 'buff'
   ) {
     my $logger = $self->logger;
-    $logger->debug(
+    $logger->DEBUG(
 "Calculating ascending buffs for level: $level, attribute: $attribute, matching_type: $matching_type"
     );
 
@@ -80,7 +80,7 @@ class Game::EvonyTKR::Model::AscendingAttributes :
       @valid_levels = $self->AscendingAttributeLevelValues(0);    # purple
     }
     else {
-      $logger->warn("Invalid ascending level: $level");
+      $logger->WARN("Invalid ascending level: $level");
       return 0;
     }
 
@@ -88,20 +88,20 @@ class Game::EvonyTKR::Model::AscendingAttributes :
     return 0 unless exists $level_index{$level};
 
     my $target_index = $level_index{$level};
-    $self->logger->debug(
+    $self->logger->DEBUG(
       "my ascending hash looks like " . Data::Printer::np($ascending));
     my $total = 0;
     for my $i (1 .. $target_index) {    # skip index 0 ('None')
       my $lvl = $valid_levels[$i];
       if (not exists $ascending->{$level}) {
-        $logger->error(sprintf(
+        $logger->ERR(sprintf(
           '%s is not a valid level, must be one of %s',
           $lvl, join(', ', keys %$ascending),
         ));
       }
       my $buffs = $ascending->{$lvl}->{buffs} // [];
 
-      $logger->debug(
+      $logger->DEBUG(
         "Checking level $lvl with " . scalar(@{$buffs}) . " buffs");
 
       foreach my $buff (@$buffs) {
@@ -110,7 +110,7 @@ class Game::EvonyTKR::Model::AscendingAttributes :
           Game::EvonyTKR::Model::Buff::Matcher->new(toTest => $buff);
 
         # Debug: Log what we're about to test
-        $logger->debug(
+        $logger->DEBUG(
           $logID
             . sprintf(
 "Testing buff: attr=%s, targetType=%s, buffConds=%s, debuffConds=%s, matching_type=%s",
@@ -134,7 +134,7 @@ class Game::EvonyTKR::Model::AscendingAttributes :
           $match_debuff_conditions = $debuffConditions;
         }
 
-        $logger->debug(
+        $logger->DEBUG(
           $logID
             . sprintf(
             "Calling matcher with: buffConds=%s, debuffConds=%s",
@@ -149,30 +149,30 @@ class Game::EvonyTKR::Model::AscendingAttributes :
           $logID
         )) {
           my $val = $buff->value->number;
-          $logger->debug("$logID  ➤ Match found. Adding $val to total.");
+          $logger->DEBUG("$logID  ➤ Match found. Adding $val to total.");
           $total += $val;
         }
         else {
-          $logger->debug("$logID  ✗ No match found.");
+          $logger->DEBUG("$logID  ✗ No match found.");
         }
       }
     }
 
-    $logger->debug("Total for $level/$attribute: $total");
+    $logger->DEBUG("Total for $level/$attribute: $total");
     return $total;
   }
 
   method addBuff ($level, $nb) {
     my $red = 1;
     if (!blessed($nb) || blessed($nb) ne "Game::EvonyTKR::Model::Buff") {
-      $self->logger->error(sprintf(
+      $self->logger->ERR(sprintf(
         'attempting to add buff of type %s not "Game::EvonyTKR::Model::Buff"',
         !blessed($nb) ? Scalar::Util::reftype($nb) : blessed($nb)));
       exit 0;
     }
 
     if ($level !~ /(purple|red)[0-9]{1}/i) {
-      $self->logger->error(sprintf(
+      $self->logger->ERR(sprintf(
         'level should be one of %s, not %s',
         join(
           ', ',
@@ -189,7 +189,7 @@ class Game::EvonyTKR::Model::AscendingAttributes :
       $red = 0;
     }
     if (none { $_ eq $level } $self->AscendingAttributeLevelValues($red)) {
-      $self->logger->debug(
+      $self->logger->DEBUG(
         "$level must be one of "
           . join(
           ', ',
@@ -203,7 +203,7 @@ class Game::EvonyTKR::Model::AscendingAttributes :
     }
 
     push @{ $ascending->{$level}->{buffs} }, $nb;
-    $self->logger->debug(
+    $self->logger->DEBUG(
       "$level now has " . scalar @{ $ascending->{$level}->{buffs} } . " buffs");
     return scalar @{ $ascending->{$level}->{buffs} };
   }
@@ -245,24 +245,24 @@ class Game::EvonyTKR::Model::AscendingAttributes :
     }
     unless (exists $object->{ascending}
       && ref($object->{ascending}) eq 'ARRAY') {
-      $logger->logcroak(sprintf(
-'object has unexpected format for an Ascending Attribute. Object is "%s"',
+      $logger->ERR(sprintf(
+      'object has unexpected format for an '. 'Ascending Attribute. Object is "%s"',
         Data::Printer::np($object, multiline => 0)));
       return;
     }
     my $an = $object->{general};
     unless (length($an)) {
-      $logger->logcroak('object must have a "general" attribute');
+      $logger->ERR('object must have a "general" attribute');
       return;
     }
-    $logger->debug("starting import for ascending attribute $an");
+    $logger->DEBUG("starting import for ascending attribute $an");
     my $aa = Game::EvonyTKR::Model::AscendingAttributes->new(general => $an);
     foreach my $oa (@{ $object->{ascending} }) {
       my $level = $oa->{level};
       foreach my $ob (@{ $oa->{buffs} }) {
         my $b = Game::EvonyTKR::Model::Buff->from_hash($ob, $logger);
         $aa->addBuff($level, $b);
-        $logger->debug(sprintf(
+        $logger->DEBUG(sprintf(
           '%s now has %s buffs at level %s',
           $an, scalar($aa->ascending->{$level}->{buffs}->@*), $level,
         ));

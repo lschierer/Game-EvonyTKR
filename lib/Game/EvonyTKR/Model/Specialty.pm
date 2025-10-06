@@ -63,7 +63,7 @@ class Game::EvonyTKR::Model::Specialty : isa(Game::EvonyTKR::Shared::Constants)
     $level = lc($level)
       ;    # sanitize the data from the user - level names must be lower case
     my $logger = $self->logger;
-    $logger->debug(
+    $logger->DEBUG(
       "Calculating buffs for $name level: $level, attribute: $attribute");
 
     return 0 if not defined $level or $level =~ /none/i;
@@ -104,7 +104,7 @@ class Game::EvonyTKR::Model::Specialty : isa(Game::EvonyTKR::Shared::Constants)
       my $current_level = $level_hierarchy[$i];
       my $buffs         = $levels_by_name->{$current_level}->{buffs} // [];
 
-      $logger->debug("Checking $name level $current_level with "
+      $logger->DEBUG("Checking $name level $current_level with "
           . scalar(@{$buffs})
           . " buffs");
 
@@ -118,18 +118,18 @@ class Game::EvonyTKR::Model::Specialty : isa(Game::EvonyTKR::Shared::Constants)
           $logID
         )) {
           my $val = $buff->value->number;
-          $logger->debug(
+          $logger->DEBUG(
 "$logID  ➤ Match found at $name level $current_level. Adding $val to total."
           );
           $total += $val;
         }
         else {
-          $logger->debug("$logID  ✗ No match found.");
+          $logger->DEBUG("$logID  ✗ No match found.");
         }
       }
     }
 
-    $logger->debug(
+    $logger->DEBUG(
       "Total for $name $level/$attribute/$targetedType/$matching_type: $total");
     return $total;
 
@@ -138,7 +138,7 @@ class Game::EvonyTKR::Model::Specialty : isa(Game::EvonyTKR::Shared::Constants)
   method addBuff ($level, $nb) {
 
     if (!blessed($nb) || blessed($nb) ne "Game::EvonyTKR::Model::Buff") {
-      $self->logger->error(sprintf(
+      $self->logger->ERR(sprintf(
         'attempting to add buff of type %s not "Game::EvonyTKR::Model::Buff"',
         !blessed($nb) ? Scalar::Util::reftype($nb) : blessed($nb)));
       exit 0;
@@ -146,7 +146,7 @@ class Game::EvonyTKR::Model::Specialty : isa(Game::EvonyTKR::Shared::Constants)
 
     # the data files apparently have bad cases in them for level names.
     if (none { $_ =~ /$level/i } $self->SpecialtyLevelValues->@*) {
-      $self->logger->error(sprintf(
+      $self->logger->ERR(sprintf(
         'level should be one of %s, not %s',
         join(', ', $self->SpecialtyLevelValues->@*), $level
       ));
@@ -154,7 +154,7 @@ class Game::EvonyTKR::Model::Specialty : isa(Game::EvonyTKR::Shared::Constants)
     }
     $level = lc($level);
     push @{ $levels->{$level}->{buffs} }, $nb;
-    $self->logger->debug(sprintf(
+    $self->logger->DEBUG(sprintf(
       'specialty %s at %s now has buffs %s.',
       $name, $level, Data::Printer::np($levels->{$level}->{buffs})
     ));
@@ -199,7 +199,7 @@ class Game::EvonyTKR::Model::Specialty : isa(Game::EvonyTKR::Shared::Constants)
     my $s = Game::EvonyTKR::Model::Specialty->new(name => $object->{name});
     foreach my $ol (@{ $object->{levels} }) {
       my $level = $ol->{level};
-      $logger->debug(
+      $logger->DEBUG(
         sprintf('attempting import of %s for %s', $level, $object->{name}));
       my @buffs;
       if (exists $ol->{buff}) {
@@ -212,7 +212,7 @@ class Game::EvonyTKR::Model::Specialty : isa(Game::EvonyTKR::Shared::Constants)
         my $b = Game::EvonyTKR::Model::Buff->from_hash($ob, $logger);
         $s->addBuff($level, $b);
       }
-      $logger->debug(sprintf(
+      $logger->DEBUG(sprintf(
         'added %s buffs to level %s for specialty %s ',
         scalar @{ $s->levels->{ lc($level) }->{buffs} }, $level,
         $object->{name}

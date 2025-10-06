@@ -96,7 +96,7 @@ class Game::EvonyTKR::Model::General::Importer :
       $generals->{ $go->{name} } = $general;
     }
     my $generalCount = scalar keys %{$generals};
-    $self->logger->debug("returning $generalCount generals");
+    $self->logger->DEBUG("returning $generalCount generals");
     return $generals;
   }
 

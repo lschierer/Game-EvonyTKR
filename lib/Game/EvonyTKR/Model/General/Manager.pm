@@ -52,11 +52,11 @@ class Game::EvonyTKR::Model::General::Manager :
   method importAll ($SourceDir) {
     $SourceDir = Path::Tiny::path($SourceDir);
     if (!$SourceDir->is_dir()) {
-      $self->logger->logcroak(
+      $self->dev_guard(
 "Game::EvonyTKR::Model::General::Manager requires a directory, not $SourceDir"
       );
     }
-    $self->logger->debug("general collection dir is $SourceDir");
+    $self->logger->DEBUG("general collection dir is $SourceDir");
     my $rule = Path::Iterator::Rule->new();
     $rule->name(qr/\.ya?ml$/);
     $rule->file->nonempty;
@@ -71,7 +71,7 @@ class Game::EvonyTKR::Model::General::Manager :
     while (defined(my $file = $iter->())) {
       # work around for UTF8 filenames not importing correctly by default.
       $file = Path::Tiny::path(Encode::decode('utf8', $file));
-      $self->logger->debug("General::Manager importing $file");
+      $self->logger->DEBUG("General::Manager importing $file");
       my $basename = $file->basename('.yaml');
       my $name     = $basename;
 
@@ -82,7 +82,7 @@ class Game::EvonyTKR::Model::General::Manager :
       )->load_string($data);
       if (exists $object->{name}) {
         if ($name ne $object->{name}) {
-          $self->logger->error(
+          $self->logger->ERR(
 "filename and internal name do not match for file '$file' with name '$object->{name}'"
           );
         }
@@ -90,16 +90,16 @@ class Game::EvonyTKR::Model::General::Manager :
       }
       my $g = Game::EvonyTKR::Model::General->from_hash($object, $self->logger);
       unless ($g) {
-        $self->logger->error('General failed to create from file %s', $file);
+        $self->logger->ERR('General failed to create from file %s', $file);
         return;
       }
       $self->add_general($g);
 
-      $self->logger->debug(
+      $self->logger->DEBUG(
         sprintf('%s successfully imported', $generals->{$name}->name));
     }
     my $countImported = scalar keys %$generals;
-    $self->logger->info(
+    $self->logger->INFO(
       "Game::EvonyTKR::Model::General::Manager imported $countImported Generals"
     );
     return $countImported;

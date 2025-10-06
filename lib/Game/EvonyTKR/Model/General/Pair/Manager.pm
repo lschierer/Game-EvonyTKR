@@ -22,7 +22,7 @@ class Game::EvonyTKR::Model::General::Pair::Manager :
       $pairs = $pairs_by_type->{$type} // [];
     }
     else {
-      $self->logger->error("invalid type $type requested");
+      $self->logger->ERR("invalid type $type requested");
     }
 
     return [@{$pairs}];    # shallow copy to protect internal structure
@@ -42,7 +42,7 @@ class Game::EvonyTKR::Model::General::Pair::Manager :
 
     foreach my $secondary (sort { $a->name cmp $b->name } values %{$generals}) {
       next if $primary->name eq $secondary->name;
-      $self->logger->debug(sprintf(
+      $self->logger->DEBUG(sprintf(
         'testing if %s and %s conflict.',
         $primary->name, $secondary->name
       ));
@@ -51,7 +51,7 @@ class Game::EvonyTKR::Model::General::Pair::Manager :
       next
         unless $conflicts->are_generals_compatible($primary, $secondary);
 
-      $self->logger->debug(sprintf(
+      $self->logger->DEBUG(sprintf(
         'no conflict, testing %s and %s for common type.',
         $primary->name, $secondary->name
       ));
@@ -61,7 +61,7 @@ class Game::EvonyTKR::Model::General::Pair::Manager :
       my @common            = grep { $primary_types_map{$_} } @$secondary_types;
       @common = sort @common;
       next unless @common;
-      $self->logger->debug(sprintf(
+      $self->logger->DEBUG(sprintf(
         '%s and %s pair based on %s',
         $primary->name, $secondary->name, Data::Printer::np(@common)
       ));
@@ -81,12 +81,12 @@ class Game::EvonyTKR::Model::General::Pair::Manager :
       my $tc    = scalar @{ $pairs_by_type->{$type} } // 0;
       my $delta = $tc - ($initial_counts{$type} // 0);
       $total_added += $delta;
-      $self->logger->debug(sprintf(
+      $self->logger->DEBUG(sprintf(
         'general %s has %s pairs for type %s',
         $primary->name, $delta, $type
       ));
     }
-    $self->logger->info(
+    $self->logger->INFO(
       sprintf('there are %s pairs for %s', $total_added, $primary->name));
 
   }

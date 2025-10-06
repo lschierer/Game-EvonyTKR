@@ -54,25 +54,25 @@ class Game::EvonyTKR::Model::EvonyTKR::Manager :
     # first the imported types
 
     my $collectionDir = $SourceDir->child("collections/data");
-    $self->logger->info("starting root import");
+    $self->logger->INFO("starting root import");
 
-    $self->logger->info(" starting import of books.");
+    $self->logger->INFO(" starting import of books.");
     $bookManager->importAll($collectionDir->child('skill books'));
     $bookManager->importAll($collectionDir->child('generic books'));
-    $self->logger->info("import of books complete");
+    $self->logger->INFO("import of books complete");
 
-    $self->logger->info(" starting import of specialties.");
+    $self->logger->INFO(" starting import of specialties.");
     $specialtyManager->importAll($collectionDir->child('specialties'));
-    $self->logger->info("import of specialties complete");
+    $self->logger->INFO("import of specialties complete");
 
-    $self->logger->info(" starting import of ascending attributes.");
+    $self->logger->INFO(" starting import of ascending attributes.");
     $ascendingAttributesManager->importAll(
       $collectionDir->child('ascending attributes'));
-    $self->logger->info("import of ascending attributes complete");
+    $self->logger->INFO("import of ascending attributes complete");
 
     $glossaryManager->importAll($SourceDir->child("collections/Glossary"));
 
-    $self->logger->info("root import complete");
+    $self->logger->INFO("root import complete");
 
   }
 

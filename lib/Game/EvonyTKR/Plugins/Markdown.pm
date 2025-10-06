@@ -13,18 +13,20 @@ package Game::EvonyTKR::Plugins::Markdown {
   use Mojo::Base 'Mojolicious::Plugin', -strict, -signatures;
   use Carp;
 
+  my $logger;
+
   my $customCommonMark = join('+',
     qw(commonmark alerts attributes autolink_bare_uris footnotes implicit_header_references pipe_tables raw_html rebase_relative_paths smart gfm_auto_identifiers)
   );
 
   sub register ($self, $app, $config) {
-    my $logger = Log::Log4perl->get_logger(__PACKAGE__);
-    $logger->info(sprintf('initializing %s.', __PACKAGE__));
+    $logger = $app->get_logger(__PACKAGE__);
+    $logger->INFO(sprintf('initializing %s.', __PACKAGE__));
 
     # Add helper method for rendering markdown files
     $app->helper(
       render_markdown_file => sub ($c, $file_path, $opts = {}) {
-        $logger->debug("render_markdown_file requested for '$file_path'");
+        $logger->DEBUG("render_markdown_file requested for '$file_path'");
         return $self->_render_markdown_file($c, $file_path, $opts);
       }
     );
@@ -41,10 +43,10 @@ package Game::EvonyTKR::Plugins::Markdown {
 
   sub _parse_markdown_frontmatter {
     my ($self, $file_path) = @_;
-    my $logger = Log::Log4perl->get_logger(__PACKAGE__);
+
 
     unless ($file_path && $file_path->isa('Mojo::File')) {
-      $logger->error("file_path must be a 'Mojo::File' not "
+      $logger->ERR("file_path must be a 'Mojo::File' not "
           . (ref($file_path) || 'undefined'));
       return 0;
     }
@@ -55,14 +57,14 @@ package Game::EvonyTKR::Plugins::Markdown {
           $file_path = $file_path->child('index.md');
         }
         else {
-          $logger->error(
+          $logger->ERR(
             "Cannot render a directory without an index.md file for $file_path"
           );
           return 0;
         }
       }
       else {
-        $logger->error("Markdown file not found: $file_path");
+        $logger->ERR("Markdown file not found: $file_path");
         return 0;
       }
     }
@@ -79,7 +81,7 @@ package Game::EvonyTKR::Plugins::Markdown {
       my $yaml = $1;
       eval { $front_matter = $ypp->load_string($yaml); };
       if ($@) {
-        $logger->error("Error parsing YAML front matter: $@");
+        $logger->ERR("Error parsing YAML front matter: $@");
       }
       elsif (ref $front_matter eq 'HASH') {
         # Use title from front matter if available
@@ -100,9 +102,9 @@ package Game::EvonyTKR::Plugins::Markdown {
   }
 
   sub _render_markdown_snippet ($self, $snippet) {
-    my $logger = Log::Log4perl->get_logger(__PACKAGE__);
+
     if (not defined $snippet or length($snippet) == 0) {
-      $logger->warn('snippet must be present!!');
+      $logger->WARN('snippet must be present!!');
       return '';
     }
 
@@ -112,7 +114,7 @@ package Game::EvonyTKR::Plugins::Markdown {
       $snippet
     );
     $html_content = $self->app->spectrum_formatting($html_content);
-    $logger->debug("html_content for snippet is $html_content");
+    $logger->DEBUG("html_content for snippet is $html_content");
     return $html_content;
   }
 
@@ -121,22 +123,22 @@ package Game::EvonyTKR::Plugins::Markdown {
     if (not defined $opts) {
       $opts = {};
     }
-    my $logger = Log::Log4perl->get_logger(__PACKAGE__);
+
 
     my $startstash = $c->stash();
     my @stashkeys  = keys %$startstash;
-    $logger->debug("stash at start of _render_markdown_file has keys "
+    $logger->DEBUG("stash at start of _render_markdown_file has keys "
         . join(", ", @stashkeys));
 
     unless ($file_path && $file_path->isa('Mojo::File')) {
-      $logger->error("file_path must be a 'Mojo::File' not "
+      $logger->ERR("file_path must be a 'Mojo::File' not "
           . (ref($file_path) || 'undefined'));
       return $c->reply->not_found;
     }
 
     my $parsedFile = $self->_parse_markdown_frontmatter($file_path);
     unless ($parsedFile) {
-      $logger->error("error parsing front matter for $file_path");
+      $logger->ERR("error parsing front matter for $file_path");
       return $c->reply->not_found;
     }
 
@@ -154,16 +156,16 @@ package Game::EvonyTKR::Plugins::Markdown {
     $layout =~ s/standard/default/;
     $c->stash(layout => $layout) unless exists $c->stash->{layout};
 
-    $logger->trace("layout is " . $c->stash('layout'));
+    $logger->DEBUG("layout is " . $c->stash('layout'));
 
     # Use template from options, then stash, then default to 'markdown'
     my $template = $opts->{template} // $c->stash('template') // 'markdown';
-    $logger->debug("Using template: $template");
+    $logger->DEBUG("Using template: $template");
 
     # Debug template paths
-    $logger->debug(
+    $logger->DEBUG(
       "Template paths: " . join(", ", @{ $c->app->renderer->paths }));
-    $logger->debug("Looking for template: $template.html.ep");
+    $logger->DEBUG("Looking for template: $template.html.ep");
 
     my $parser       = Pandoc->new();
     my $html_content = $parser->convert(
@@ -173,10 +175,10 @@ package Game::EvonyTKR::Plugins::Markdown {
 
     # Temporary debug logging for images
     if ($html_content =~ /<img/) {
-      $logger->debug("Found img tags in HTML output");
+      $logger->DEBUG("Found img tags in HTML output");
     }
     else {
-      $logger->debug(
+      $logger->DEBUG(
         "No img tags found in HTML output. Raw content contains: "
           . (
           $parsedFile->{content} =~ /!\[.*?\]\(.*?\)/
@@ -188,7 +190,7 @@ package Game::EvonyTKR::Plugins::Markdown {
 
     $html_content = $self->SpectrumFormatting($html_content);
 
-    $logger->debug("html is now $html_content");
+    $logger->DEBUG("html is now $html_content");
     # Add markdown content to stash but don't override existing content
     if (!exists $c->stash->{markdown_content}) {
       $c->stash(markdown_content => $html_content);
@@ -197,13 +199,13 @@ package Game::EvonyTKR::Plugins::Markdown {
     # Use existing content if available, otherwise use markdown content
     my $content  = $c->stash('content') // $html_content;
     my $endstash = $c->stash();
-    $logger->debug("items type before render: "
+    $logger->DEBUG("items type before render: "
         . (ref($endstash->{items}) || 'not a reference'));
     if (ref($endstash->{items}) eq 'HASH') {
-      $logger->debug(
+      $logger->DEBUG(
         "items has " . scalar(keys %{ $endstash->{items} }) . " keys");
     }
-    $logger->debug("finally decided on template $template");
+    $logger->DEBUG("finally decided on template $template");
     return $c->render(
       template => $template,
       layout   => $c->stash('layout'),

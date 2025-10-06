@@ -46,7 +46,7 @@ class Game::EvonyTKR::Model::Covenant::Manager :
     if (exists $covenants->{$name}) {
       return $covenants->{$name};
     }
-    $self->logger->info("failed to find covenant $name");
+    $self->logger->INFO("failed to find covenant $name");
     return 0;
   }
 
@@ -57,7 +57,7 @@ class Game::EvonyTKR::Model::Covenant::Manager :
   method importAll ($SourceDir) {
     $SourceDir = Path::Tiny::path($SourceDir);
     if (!$SourceDir->is_dir()) {
-      $self->logger->logcroak(
+      $self->dev_guard(
         "Model::Covenant::Manager requires a directory, not $SourceDir");
     }
     my $rule = Path::Iterator::Rule->new();
@@ -73,7 +73,7 @@ class Game::EvonyTKR::Model::Covenant::Manager :
     while (defined(my $file = $iter->())) {
       # work around for UTF8 filenames not importing correctly by default.
       $file = Path::Tiny::path(Encode::decode('utf8', $file));
-      $self->logger->debug("Covenant::Manager importing $file");
+      $self->logger->DEBUG("Covenant::Manager importing $file");
       my $basename = $file->basename('.yaml');
       my $name     = $basename;
 
@@ -82,11 +82,11 @@ class Game::EvonyTKR::Model::Covenant::Manager :
         schema       => [qw/ + Perl /],
         yaml_version => ['1.2', '1.1'],
       )->load_string($data);
-      $self->logger->trace(
+      $self->logger->DEBUG(
         "$object imported, looks like " . Data::Printer::np($object));
       if (exists $object->{name}) {
         if ($object->{name} !~ /$name/i) {
-          $self->logger->error(
+          $self->logger->ERR(
 "filename and internal name do not match for file '$file' with name '$object->{name}'"
           );
         }
@@ -95,11 +95,11 @@ class Game::EvonyTKR::Model::Covenant::Manager :
 
       my $primary = $rootManager->generalManager->getGeneral($name);
       unless ($primary) {
-        $self->logger->error("Cannot find primary general for covenant $name");
+        $self->logger->ERR("Cannot find primary general for covenant $name");
         next;
       }
-      $self->logger->debug("found primary general for $name, starting import.");
-      $self->logger->debug(
+      $self->logger->DEBUG("found primary general for $name, starting import.");
+      $self->logger->DEBUG(
         "generals for $name are " . join(", ", @{ $object->{generals} }));
 
       $covenants->{$name} = Game::EvonyTKR::Model::Covenant->new(
@@ -125,13 +125,13 @@ class Game::EvonyTKR::Model::Covenant::Manager :
           $covenants->{$name}->addBuff($category, $b);
         }
       }
-      $self->logger->debug(
+      $self->logger->DEBUG(
         "import of $file for $name complete.  covenant created: "
           . Data::Printer::np($covenants->{$name}));
 
     }
     my $countImported = scalar keys %$covenants;
-    $self->logger->info(
+    $self->logger->INFO(
       "Model::Covenant::Manager imported $countImported covenants");
     return $countImported;
   }

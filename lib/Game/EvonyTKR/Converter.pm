@@ -19,7 +19,6 @@ package Game::EvonyTKR::Converter {
   require Game::EvonyTKR::Converter::Specialty;
   require Game::EvonyTKR::Converter::Covenant;
   require Game::EvonyTKR::Shared::Parser;
-  require Game::EvonyTKR::Logger::Config;
   use Carp;
   use Sereal::Encoder;
   use Sereal::Decoder;
@@ -58,18 +57,6 @@ package Game::EvonyTKR::Converter {
     binmode(STDERR, ":utf8");
 
     my $debug = $opt->{debug} ? 1 : 0;
-
-    Log::Log4perl::Config->utf8(1);
-    my $loggerConfig = Game::EvonyTKR::Logger::Config->new('Game::EvonyTKR');
-    my $logConfig;
-    if ($debug) {
-      $logConfig = Path::Tiny->cwd()->child('share/log4perl.development.conf ');
-    }
-    else {
-      $logConfig = Path::Tiny->cwd()->child('share/log4perl.production.conf ');
-    }
-    Log::Log4perl::init($logConfig->canonpath());
-    my $logger = Log::Log4perl->get_logger(__PACKAGE__);
 
     my $dd = Path::Tiny::path(File::Share::dist_dir('Game-EvonyTKR'));
 

@@ -9,6 +9,7 @@ package Game::EvonyTKR::Controller::Covenants {
   use Mojo::Base 'Game::EvonyTKR::Controller::ControllerBase';
 
   my $logger;
+
   # Specify which collection this controller handles
   sub collection_name {
     return 'covenants';
@@ -32,8 +33,8 @@ package Game::EvonyTKR::Controller::Covenants {
 
   # Register this when the application starts
   sub register($c, $app, $config = {}) {
-    $logger = Log::Log4perl->get_logger(__PACKAGE__);
-    $logger->info("Registering routes for " . ref($c));
+    $logger = $app->get_logger(__PACKAGE__);
+    $logger->INFO("Registering routes for " . ref($c));
     $c->SUPER::register($app, $config);
 
     $app->helper(
@@ -72,7 +73,7 @@ package Game::EvonyTKR::Controller::Covenants {
       ? $c->controller_name()
       : $baseClass;
 
-    $logger->debug("got controller_name $controller_name.");
+    $logger->DEBUG("got controller_name $controller_name.");
 
     my $mainRoutes = $app->routes->any($base);
     $mainRoutes->get('/')
@@ -93,25 +94,25 @@ package Game::EvonyTKR::Controller::Covenants {
         eval {
           my $manager = $app->get_root_manager();
           if (not defined $manager) {
-            $logger->logcroak('No Manager Defined');
+            $app->log->logcroak('No Manager Defined');
           }
 
           my $cd = Mojo::File->new($app->config('distDir'))
             ->child('collections/data/covenants/');
           my @files = $cd->list_tree->each;
 
-          $logger->info(
+          $logger->INFO(
             "Starting async import of " . scalar(@files) . " covenant files");
 
           foreach my $file (@files) {
             my $delay = rand(4.0);
             Mojo::IOLoop->timer(
               $delay => sub {
-                $logger->debug("callback for covenant file $file");
+                $logger->DEBUG("callback for covenant file $file");
                 my $covenantFile =
                   Mojo::File->new(Encode::decode_utf8($file->to_string));
                 eval {
-                  $logger->info("importing covenant file $covenantFile ");
+                  $logger->INFO("importing covenant file $covenantFile ");
                   my $data   = $covenantFile->slurp('UTF-8');
                   my $name   = $covenantFile->basename('.yaml');
                   my $object = YAML::PP->new(
@@ -119,12 +120,12 @@ package Game::EvonyTKR::Controller::Covenants {
                     yaml_version => ['1.2', '1.1'],
                   )->load_string($data);
 
-                  $logger->trace("$object imported, looks like "
+                  $logger->DEBUG("$object imported, looks like "
                       . Data::Printer::np($object));
 
                   if (exists $object->{name}) {
                     if ($object->{name} !~ /$name/i) {
-                      $logger->error(sprintf(
+                      $logger->ERR(sprintf(
                         'filename and internal name do not match '
                           . 'for file "%s" with name "%s"',
                         $covenantFile, $object->{name}
@@ -135,12 +136,12 @@ package Game::EvonyTKR::Controller::Covenants {
 
                   my $primary = $manager->generalManager->getGeneral($name);
                   unless ($primary) {
-                    $logger->error("cannot find primary for covenant $name");
+                    $logger->ERR("cannot find primary for covenant $name");
                     return;
                   }
                   my $covenant =
                     Game::EvonyTKR::Model::Covenant->from_hash($object,
-                    $primary, $logger);
+                    $primary, $app->log);
                   $manager->covenantManager->add_covenant($covenant);
 
                   # Build routes for this covenant
@@ -148,26 +149,25 @@ package Game::EvonyTKR::Controller::Covenants {
                     $controller_name, $mainRoutes);
                 };
                 if ($@) {
-                  $logger->error("Error processing $covenantFile: $@");
+                  $logger->ERR("Error processing $covenantFile: $@");
                 }
               }
             );
           }
         };
         if ($@) {
-          $logger->error("Error in Covenants generals_loaded callback: $@");
+          $logger->ERR("Error in Covenants generals_loaded callback: $@");
           return undef;
         }
       }
     );
-    $logger->debug("end of register method");
+    $logger->DEBUG("end of register method");
   }
 
   sub _build_covenant_routes($c, $covenant, $name, $app, $controller_name,
     $mainRoutes) {
-    my $logger = Log::Log4perl->get_logger(__PACKAGE__);
 
-    $logger->debug("building route for " . $covenant->primary->name);
+    $logger->DEBUG("building route for " . $covenant->primary->name);
 
     my $clean_name = $name;
     $clean_name =~ s{^/}{};
@@ -185,9 +185,9 @@ package Game::EvonyTKR::Controller::Covenants {
   }
 
   sub index($self) {
-    my $logger     = Log::Log4perl->get_logger(__PACKAGE__);
+    my $app->log     = Log::Log4perl->get_app->log(__PACKAGE__);
     my $collection = collection_name();
-    $logger->debug("Rendering index for $collection");
+    $logger->DEBUG("Rendering index for $collection");
 
     # Check if markdown exists for this collection
     my $distDir =
@@ -197,10 +197,10 @@ package Game::EvonyTKR::Controller::Covenants {
     my @parts     = split(/::/, ref($self));
     my $baseClass = pop(@parts);
     my $base      = $self->getBase();
-    $logger->debug("Covenants index method has base $base");
+    $logger->DEBUG("Covenants index method has base $base");
 
     my @items = $self->get_root_manager()->covenantManager->get_all_covenants();
-    $logger->debug(sprintf('Items: %s items.', scalar(@items)));
+    $logger->DEBUG(sprintf('Items: %s items.', scalar(@items)));
     $self->stash(
       linkBase        => $base,
       items           => \@items,
@@ -215,27 +215,27 @@ package Game::EvonyTKR::Controller::Covenants {
         { template => 'covenants/index' });
     }
     else {
-      $logger->debug("no markdown index content found at $markdown_path");
+      $logger->DEBUG("no markdown index content found at $markdown_path");
       # Render just the items
       return $self->render(template => 'covenants/index');
     }
   }
 
   sub show ($self) {
-    my $logger = Log::Log4perl->get_logger(ref($self));
-    $logger->debug("start of show method");
+    my $app->log = Log::Log4perl->get_app->log(ref($self));
+    $logger->DEBUG("start of show method");
     my $name;
     $name = $self->param('name');
-    $logger->debug("show detects name $name, showing details.");
+    $logger->DEBUG("show detects name $name, showing details.");
 
     my $covenant =
       $self->get_root_manager()->covenantManager->getCovenant($name);
 
     unless ($covenant) {
-      $logger->error("covenant for '$name' was not found.");
+      $logger->ERR("covenant for '$name' was not found.");
       $self->reply->not_found;
     }
-    $logger->debug("retrieved covenant $covenant");
+    $logger->DEBUG("retrieved covenant $covenant");
 
     $self->stash(
       item     => $covenant,

@@ -31,8 +31,8 @@ package Game::EvonyTKR::Controller::ConflictGroups {
   state @conflict_queue = ();
 
   sub register($c, $app, $config = {}) {
-    $logger = Log::Log4perl->get_logger(__PACKAGE__);
-    $logger->info("Registering routes for " . ref($c));
+    $logger = $app->get_logger(__PACKAGE__);
+    $logger->INFO("Registering routes for " . ref($c));
     $c->SUPER::register($app, $config);
     $rootManager = $app->get_root_manager();
 
@@ -52,15 +52,15 @@ package Game::EvonyTKR::Controller::ConflictGroups {
 
     my $defined_tasks = $app->minion->tasks;
     unless (exists $defined_tasks->{detect_conflicts_for_general}) {
-      $logger->error('detect_conflicts_for_general task did not define!!!');
+      $logger->ERR('detect_conflicts_for_general task did not define!!!');
     }
 
     $app->plugins->on(
       conflicts_complete => sub {
-        $logger->info('Conflict Update detected');
+        $logger->INFO('Conflict Update detected');
         my ($plugin, $data) = @_;
         my $conflicts = $data->{conflicts} // {};
-        $logger->debug(
+        $logger->DEBUG(
           sprintf('data from conflicts_complete signal is %s',
             Data::Printer::np($conflicts))
         );
@@ -68,7 +68,7 @@ package Game::EvonyTKR::Controller::ConflictGroups {
         if ($cd) {
           if (exists $conflicts->{by_general}) {
             foreach my $gn (keys $conflicts->{by_general}->%*) {
-              $logger->debug("conflicts by general for $gn");
+              $logger->DEBUG("conflicts by general for $gn");
               if (ref($conflicts->{by_general}->{$gn}) eq 'HASH') {
                 foreach my $og ($conflicts->{by_general}->{$gn}->%*) {
                   next if (Scalar::Util::looks_like_number($og) && $og == 1);
@@ -76,7 +76,7 @@ package Game::EvonyTKR::Controller::ConflictGroups {
                 }
               }
               else {
-                $logger->warn(sprintf(
+                $logger->WARN(sprintf(
                   'conflicts by general for %s is a %s',
                   $gn, ref($conflicts->{by_general}->{$gn})
                 ));
@@ -86,7 +86,7 @@ package Game::EvonyTKR::Controller::ConflictGroups {
 
           if (exists $conflicts->{groups_by_conflict_type}) {
             foreach my $key1 (keys $conflicts->{groups_by_conflict_type}->%*) {
-              $logger->debug(sprintf(
+              $logger->DEBUG(sprintf(
                 'conflicts for group ref: %s, contains: "%s"',
                 ref($key1), $key1
               ));
@@ -100,7 +100,7 @@ package Game::EvonyTKR::Controller::ConflictGroups {
                 $cd->groups_by_conflict_type->{$key1} = \@all;
               }
               else {
-                $logger->warn(sprintf(
+                $logger->WARN(sprintf(
                   'conflict by type %s is a %s',
                   $group, ref($conflicts->{groups_by_conflict_type}->{$group})
                 ));
@@ -117,10 +117,10 @@ package Game::EvonyTKR::Controller::ConflictGroups {
   }
 
   sub index ($c) {
-    $logger->debug("Rendering conflict groups index");
+    $c->logger->DEBUG("Rendering conflict groups index");
 
     my $detector = $c->get_conflict_detector();
-    $logger->debug(sprintf('there are %s generals in the by_general index',
+    $c->logger->DEBUG(sprintf('there are %s generals in the by_general index',
       scalar keys $detector->by_general->%*));
     my $groups = $detector->groups_by_conflict_type;
     my $pairs  = $detector->by_general;

@@ -31,21 +31,21 @@ class Game::EvonyTKR::Model::Book::Manager :
   method getBook ($name) {
     if (exists $books->{$name}) {
       my $book = $books->{$name};
-      $self->logger->debug(sprintf(
+      $self->logger->DEBUG(sprintf(
         'getBook for "%s" found book "%s" with %s buffs and type %s',
         $name, $book->name, scalar @{ $book->buff },
         blessed($book)
       ));
       return $book;
     }
-    $self->logger->debug("getBook for '$name' found no book");
+    $self->logger->DEBUG("getBook for '$name' found no book");
     return 0;
   }
 
   method importAll ($SourceDir) {
     $SourceDir = Path::Tiny::path($SourceDir);
     if (!$SourceDir->is_dir()) {
-      $self->logger->logcroak(
+      $self->dev_guard(
 "Game::EvonyTKR::Model::Book::Manager requires a directory, not $SourceDir"
       );
     }
@@ -62,7 +62,7 @@ class Game::EvonyTKR::Model::Book::Manager :
     while (defined(my $file = $iter->())) {
       # work around for UTF8 filenames not importing correctly by default.
       $file = Path::Tiny::path(Encode::decode('utf8', $file));
-      $self->logger->debug("Book::Manager importing $file");
+      $self->logger->DEBUG("Book::Manager importing $file");
       my $basename = $file->basename('.yaml');
       my $name     = $basename;
 
@@ -75,7 +75,7 @@ class Game::EvonyTKR::Model::Book::Manager :
         $name = $object->{name};
       }
 
-      $self->logger->debug("Creating book '$name' from file $file");
+      $self->logger->DEBUG("Creating book '$name' from file $file");
       $books->{$name} = Game::EvonyTKR::Model::Book->new(
         name => $name,
         text => $object->{text} // '',
@@ -90,7 +90,7 @@ class Game::EvonyTKR::Model::Book::Manager :
       elsif (exists $object->{buffs}) {
         @buffs = @{ $object->{buffs} };
       }
-      $self->logger->debug(
+      $self->logger->DEBUG(
         sprintf('Book %s has %s buffs in YAML', $name, scalar @buffs));
 
       foreach my $ob (@buffs) {
@@ -98,13 +98,13 @@ class Game::EvonyTKR::Model::Book::Manager :
         $books->{$name}->addBuff($b);
       }
 
-      $self->logger->debug("Finished importing book '$name' with "
+      $self->logger->DEBUG("Finished importing book '$name' with "
           . scalar @{ $books->{$name}->buff }
           . " buffs: "
           . Data::Printer::np($books->{$name}, multiline => 0));
     }
     my $countImported = scalar keys %$books;
-    $self->logger->info(
+    $self->logger->INFO(
       "Game::EvonyTKR::Model::Book::Manager imported $countImported books");
     return $countImported;
   }

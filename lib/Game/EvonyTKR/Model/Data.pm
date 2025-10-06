@@ -27,7 +27,7 @@ class Game::EvonyTKR::Model::Data : isa(Game::EvonyTKR::Shared::Constants) {
     }
 
     if (none { $_ eq $proposed } $self->AllowedBuffActivationValues->@*) {
-      $self->logger->warn(
+      $self->logger->WARN(
 "validateBuffActivation detected illegal Buff Activation Condition $proposed"
       );
       return 0;
@@ -44,7 +44,7 @@ class Game::EvonyTKR::Model::Data : isa(Game::EvonyTKR::Shared::Constants) {
 
     # Ensure we have exactly 4 specialties
     if (scalar @specialties != 4) {
-      $logger->warn("Expected 4 specialties, got " . scalar @specialties);
+      $logger->WARN("Expected 4 specialties, got " . scalar @specialties);
       return 0;
     }
 
@@ -52,7 +52,7 @@ class Game::EvonyTKR::Model::Data : isa(Game::EvonyTKR::Shared::Constants) {
     foreach my $index (0 .. 3) {
       my $level = $specialties[$index];
       if (none { $_ =~ /$level/i } @{ $self->SpecialtyLevelValues }) {
-        $logger->warn("Invalid specialty level at index $index: $level");
+        $logger->WARN("Invalid specialty level at index $index: $level");
         return 0;
       }
     }
@@ -61,13 +61,13 @@ class Game::EvonyTKR::Model::Data : isa(Game::EvonyTKR::Shared::Constants) {
     my $all_gold = all { $_ eq 'gold' } @specialties[0 .. 2];
 
     if ($all_gold && $specialties[3] eq 'none') {
-      $logger->warn(
+      $logger->WARN(
         "When specialties 1-3 are all gold, specialty 4 cannot be 'none'");
       return 0;
     }
 
     if (!$all_gold && $specialties[3] ne 'none') {
-      $logger->warn(
+      $logger->WARN(
         "When specialties 1-3 are not all gold, specialty 4 must be 'none'");
       return 0;
     }
@@ -81,7 +81,7 @@ class Game::EvonyTKR::Model::Data : isa(Game::EvonyTKR::Shared::Constants) {
 
     # Ensure we have exactly 4 specialties
     if (scalar @normalized != 4) {
-      $logger->warn("Expected 4 specialties, got "
+      $logger->WARN("Expected 4 specialties, got "
           . scalar @normalized
           . ". Padding with defaults.");
       while (scalar @normalized < 4) {
@@ -93,7 +93,7 @@ class Game::EvonyTKR::Model::Data : isa(Game::EvonyTKR::Shared::Constants) {
     # Validate and normalize each specialty level
     foreach my $index (0 .. 3) {
       if (none { $_ eq $normalized[$index] } $self->SpecialtyLevelValues->@*) {
-        $logger->warn(
+        $logger->WARN(
 "Invalid specialty level at index $index: $normalized[$index], using default"
         );
         $normalized[$index] = 'gold';
@@ -104,14 +104,14 @@ class Game::EvonyTKR::Model::Data : isa(Game::EvonyTKR::Shared::Constants) {
     my $all_gold = all { $_ eq 'gold' } @normalized[0 .. 2];
 
     if ($all_gold && $normalized[3] eq 'none') {
-      $logger->warn(
+      $logger->WARN(
 "When specialties 1-3 are all gold, specialty 4 cannot be 'none'. Setting to gold."
       );
       $normalized[3] = 'gold';
     }
 
     if (!$all_gold && $normalized[3] ne 'none') {
-      $logger->warn(
+      $logger->WARN(
 "When specialties 1-3 are not all gold, specialty 4 must be 'none'. Setting to none."
       );
       $normalized[3] = 'none';
@@ -122,7 +122,7 @@ class Game::EvonyTKR::Model::Data : isa(Game::EvonyTKR::Shared::Constants) {
 
   method checkCovenantLevel ($proposedLevel) {
     unless (defined($proposedLevel) && length($proposedLevel)) {
-      $self->logger->error("Invalid proposed level!!! $proposedLevel");
+      $self->logger->ERR("Invalid proposed level!!! $proposedLevel");
       return 0;
     }
     my $check = {};

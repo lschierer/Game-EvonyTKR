@@ -9,6 +9,7 @@ package Game::EvonyTKR::Controller::Specialties {
   use Mojo::Base 'Game::EvonyTKR::Controller::ControllerBase';
   use List::AllUtils qw( all any none first);
 
+  my $logger;
   # Specify which collection this controller handles
   sub collection_name {'Specialties'}
 
@@ -27,8 +28,8 @@ package Game::EvonyTKR::Controller::Specialties {
   }
 
   sub register($self, $app, $config = {}) {
-    my $logger = Log::Log4perl->get_logger(__PACKAGE__);
-    $logger->info("Registering routes for " . ref($self));
+    $logger = $app->get_logger(__PACKAGE__);
+    $logger->INFO("Registering routes for " . ref($self));
     $self->SUPER::register($app, $config);
 
     $app->add_navigation_item({
@@ -46,7 +47,7 @@ package Game::EvonyTKR::Controller::Specialties {
       ? $self->controller_name()
       : $baseClass;
 
-    $logger->debug("got controller_name $controller_name.");
+    $logger->DEBUG("got controller_name $controller_name.");
 
     my $mainRoutes = $app->routes->any($base);
 
@@ -56,11 +57,12 @@ package Game::EvonyTKR::Controller::Specialties {
 
     $app->plugins->on(
       'evonytkrtips_initialized' => sub($self, $manager) {
-        $logger->debug(
+        $logger->DEBUG(
           "evonytkrtips_initialized sub has controller_name $controller_name.");
 
         if (not defined $manager) {
-          $logger->logcroak('No Manager Defined');
+          $logger->ERR('No Manager Defined');
+          return;
         }
 
         foreach
@@ -82,7 +84,7 @@ package Game::EvonyTKR::Controller::Specialties {
             order  => 40,
           });
 
-          $logger->debug(
+          $logger->DEBUG(
 "added route and nav item for name '$name' cleaned to '$clean_name' with path '$base/$name'"
           );
         }
@@ -93,7 +95,7 @@ package Game::EvonyTKR::Controller::Specialties {
     my $collection = $self->collection_name;
     my $SourceDir  = $distDir->child("collections/$collection");
 
-    $logger->info(
+    $logger->INFO(
       "Successfully loaded Specialty manager with collection from $SourceDir");
 
     $app->helper(
@@ -106,13 +108,12 @@ package Game::EvonyTKR::Controller::Specialties {
     $app->helper(
       specialty_level_names => sub ($c, $level = '', $printable = 0) {
         $level //= '';    # Ensure defined
-        my $logger = Log::Log4perl->get_logger(__PACKAGE__);
         if (length($level) == 0) {
           my $nameList = [];
           foreach
             my $orig_name ($c->app->get_root_manager->SpecialtyLevelValues->@*)
           {
-            $logger->debug(
+            $logger->DEBUG(
               "specialty_level_names evaluating specialty level name $orig_name"
             );
             my $name;
@@ -127,7 +128,7 @@ package Game::EvonyTKR::Controller::Specialties {
           return $nameList;
         }
         else {
-          $logger->debug(
+          $logger->DEBUG(
             "specialty_level_names sees levels"
               . Data::Printer::np(
               $c->app->get_root_manager->SpecialtyLevelValues->@*
@@ -165,9 +166,8 @@ package Game::EvonyTKR::Controller::Specialties {
   }
 
   sub index($self) {
-    my $logger     = Log::Log4perl->get_logger(__PACKAGE__);
     my $collection = collection_name();
-    $logger->debug("Rendering index for $collection");
+    $logger->DEBUG("Rendering index for $collection");
 
     # Check if markdown exists for this collection
     my $distDir       = Mojo::File::Share::dist_dir('Game::EvonyTKR');
@@ -176,10 +176,10 @@ package Game::EvonyTKR::Controller::Specialties {
     my @parts     = split(/::/, ref($self));
     my $baseClass = pop(@parts);
     my $base      = $self->getBase();
-    $logger->debug("Specialties index method has base $base");
+    $logger->DEBUG("Specialties index method has base $base");
 
     my $items = $self->get_specialty_manager()->get_all_specialties();
-    $logger->debug(
+    $logger->DEBUG(
       sprintf('Items: %s with %s items.', ref($items), scalar(@$items)));
     $self->stash(
       linkBase        => $base,
@@ -202,20 +202,19 @@ package Game::EvonyTKR::Controller::Specialties {
   }
 
   sub show ($self) {
-    my $logger = Log::Log4perl->get_logger(ref($self));
-    $logger->debug("start of show method");
+    $logger->DEBUG("start of show method");
     my $name;
     $name = $self->param('name');
-    $logger->debug("show detects name $name, showing details.");
+    $logger->DEBUG("show detects name $name, showing details.");
 
     my $specialty =
       $self->get_root_manager->specialtyManager->getSpecialty($name);
 
     unless ($specialty) {
-      $logger->error("speciality '$name' was not found.");
+      $logger->ERR("speciality '$name' was not found.");
       $self->reply->not_found;
     }
-    $logger->debug("retrieved specialty $specialty");
+    $logger->DEBUG("retrieved specialty $specialty");
 
     $self->stash(
       item     => $specialty,

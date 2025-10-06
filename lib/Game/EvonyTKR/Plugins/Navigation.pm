@@ -10,6 +10,7 @@ package Game::EvonyTKR::Plugins::Navigation {
   use Carp;
   require Log::Log4perl;
 
+  my $logger;
   my %nav_items_by_path;
   my %raw_paths;
 
@@ -19,18 +20,16 @@ package Game::EvonyTKR::Plugins::Navigation {
     '/index'          => 1,
   };
 
-  sub register {
-    my ($self, $app, $config) = @_;
-    my $logger = Log::Log4perl->get_logger(__PACKAGE__);
-    $logger->info("Registering navigation plugin");
+  sub register ($self, $app, $config = {}) {
+    $logger = $app->get_logger(__PACKAGE__);
+    $logger->INFO("Registering navigation plugin");
 
     $app->helper(
       add_navigation_item => sub {
         my ($c, $item) = @_;
-        my $log = Log::Log4perl->get_logger(__PACKAGE__);
 
         unless (ref $item eq 'HASH' && $item->{path}) {
-          $log->error(
+          $logger->ERR(
             "Invalid item (missing path): " . Data::Printer::np($item));
           return;
         }
@@ -38,16 +37,16 @@ package Game::EvonyTKR::Plugins::Navigation {
         my $path = $item->{path};
 
         # DEBUG: Log all paths being registered
-        $log->debug(
+        $logger->DEBUG(
           "NAVIGATION: Registering path '$path' with title '$item->{title}'");
 
         if ($rejected_items_by_path->{$path}) {
-          $log->debug("Skipping rejected path $path");
+          $logger->DEBUG("Skipping rejected path $path");
           return;
         }
 
         unless (exists $item->{title}) {
-          $log->error("Item rejected: missing title for $path");
+          $logger->ERR("Item rejected: missing title for $path");
           return;
         }
 
@@ -64,7 +63,7 @@ package Game::EvonyTKR::Plugins::Navigation {
             $nav_items_by_path{$path} = $item;
           }
           elsif (!exists $existing->{order}) {
-            $log->error("Duplicate navigation item at $path without order");
+            $logger->ERR("Duplicate navigation item at $path without order");
           }
         }
         else {
@@ -142,7 +141,6 @@ package Game::EvonyTKR::Plugins::Navigation {
 
   sub _prune_and_sort {
     my ($self, $tree, $prefix) = @_;
-    my $logger = Log::Log4perl->get_logger(__PACKAGE__);
     my @result;
 
     foreach my $key (sort keys %$tree) {
@@ -168,7 +166,7 @@ package Game::EvonyTKR::Plugins::Navigation {
       $a->{order} <=> $b->{order}
         || lc($a->{title}) cmp lc($b->{title})
     } @result;
-    $logger->debug(
+    $logger->DEBUG(
       "_prune_and_sort returning result " . Data::Printer::np(@result));
     return \@result;
   }
