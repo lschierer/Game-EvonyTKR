@@ -15,15 +15,7 @@ use Log::Log4perl;
 require Data::Printer;
 
 # Setup logging
-Log::Log4perl::init(\<<'EOT');
-log4perl.rootLogger              = INFO, Screen
-log4perl.appender.Screen         = Log::Log4perl::Appender::Screen
-log4perl.appender.Screen.stderr  = 1
-log4perl.appender.Screen.layout  = Log::Log4perl::Layout::PatternLayout
-log4perl.appender.Screen.layout.ConversionPattern = %d [%p] %m%n
-EOT
-
-my $logger = Log::Log4perl->get_logger;
+my $logger = Game::EvonyTKR::Shared::Logger::get_logger(__PACKAGE__);
 
 # 1. Read git metadata
 my $distDir = Path::Tiny::path(dist_dir('Game::EvonyTKR'));
