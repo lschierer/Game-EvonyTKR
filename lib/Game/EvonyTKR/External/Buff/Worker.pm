@@ -61,7 +61,7 @@ package Game::EvonyTKR::External::Buff::Worker {
   }
 
   class WorkerLogic : isa(Game::EvonyTKR::Shared::Constants) {
-    use Hash::Util    qw(lock_hash lock_hash_recurse lock_value);
+    use Hash::Util qw(lock_hash lock_hash_recurse lock_value);
     use Unicode::Normalize;
     use Unicode::CaseFold qw(fc);
     use Encode            qw(is_utf8 decode_utf8 encode_utf8);

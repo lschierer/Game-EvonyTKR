@@ -713,7 +713,6 @@ class Game::EvonyTKR::Shared::Constants : isa(Game::EvonyTKR::Model::Logger) {
     return $nn;
   }
 
-
   method toHashRef {
     return {};
   }

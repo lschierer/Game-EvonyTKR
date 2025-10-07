@@ -19,9 +19,9 @@ class Game::EvonyTKR::External::General::PairBuilder :
   use Encode            qw(is_utf8 decode_utf8 encode_utf8);
   use Carp;
 
-  field $app           : param;
+  field $app : param;
 
-  field $conflicts     : param = {};
+  field $conflicts : param = {};
 
   field $dist_dir = Path::Tiny::path(File::Share::dist_dir('Game::EvonyTKR'));
   field $generals = {};
@@ -40,24 +40,29 @@ class Game::EvonyTKR::External::General::PairBuilder :
     return {
       build_all_pairs => sub($job, $args) {
         my $logger = Game::EvonyTKR::Shared::Logger::get_logger(__PACKAGE__);
-        return $job->finish('only one pair builder kickoff') unless my $guard = $job->app->minion->guard('build_all_pairs', 360);
-        my $collectionDir = Mojo::File->new($app->config('distDir'))
-          ->child('collections/data/');
-        my $generalsDir   = $collectionDir->child('generals');
+        return $job->finish('only one pair builder kickoff')
+          unless my $guard = $job->app->minion->guard('build_all_pairs', 360);
+        my $collectionDir =
+          Mojo::File->new($app->config('distDir'))->child('collections/data/');
+        my $generalsDir = $collectionDir->child('generals');
         my @files = $generalsDir->list_tree->grep(sub {qr/\.y\{a\}?ml$/})->each;
 
         foreach my $generalFile (sort @files) {
           $generalFile = Mojo::File->new($generalFile);
           my $general_name = $generalFile->basename('.yaml');
-          $logger->DEBUG("general_name $general_name for generalFile $generalFile");
+          $logger->DEBUG(
+            "general_name $general_name for generalFile $generalFile");
           $general_name = $self->normalize_name($general_name);
-          my $child = $job->app->minion->enqueue(build_pairs_for_primary => [{
-            general_name => $general_name}] => {
-            priority  => 1,
-            attempts  => 5,
-            delay     => 1 + rand(0.5),
-            expire    => 3600,
-          });
+          my $child = $job->app->minion->enqueue(
+            build_pairs_for_primary => [{
+              general_name => $general_name
+            }] => {
+              priority => 1,
+              attempts => 5,
+              delay    => 1 + rand(0.5),
+              expire   => 3600,
+            }
+          );
           push @$builderJobs, $child;
         }
         $job->note(builderJobs => $builderJobs);
@@ -67,8 +72,7 @@ class Game::EvonyTKR::External::General::PairBuilder :
         my $logger = Game::EvonyTKR::Shared::Logger::get_logger(__PACKAGE__);
         my $general_name = $args->{general_name};
         unless (length($general_name)) {
-          $logger->ERR(
-            'general_name not provided to build_pairs_for_primary');
+          $logger->ERR('general_name not provided to build_pairs_for_primary');
           return $job->finish(
             'general_name not provided to build_pairs_for_primary');
         }
@@ -78,27 +82,27 @@ class Game::EvonyTKR::External::General::PairBuilder :
           )
           unless my $bppGuard =
           $app->minion->guard("build_pairs_for_primary_${general_name}", 360);
-        my $pb = Game::EvonyTKR::External::General::PairBuilder->new(
-          app   => $job->app,
-        );
+        my $pb =
+          Game::EvonyTKR::External::General::PairBuilder->new(app => $job->app,
+          );
         $pb->load_generals();
         return $pb->build_pairs_for_primary($job, $general_name);
       },
       monitor_pair_builders => sub ($job, $args) {
-          my $logger = Game::EvonyTKR::Shared::Logger::get_logger(__PACKAGE__);
+        my $logger = Game::EvonyTKR::Shared::Logger::get_logger(__PACKAGE__);
 
-          # Retrieve existing 'pairs_by_type' state from job notes
-          my $pbt = $job->info->{notes}->{pairs_by_type} // {};
+        # Retrieve existing 'pairs_by_type' state from job notes
+        my $pbt = $job->info->{notes}->{pairs_by_type} // {};
 
-          return $job->finish('monitor_pair_builders already launched')
-            unless $job->app->minion->guard('monitor_pair_builders', 300);
+        return $job->finish('monitor_pair_builders already launched')
+          unless $job->app->minion->guard('monitor_pair_builders', 300);
 
-          my $pb = Game::EvonyTKR::External::General::PairBuilder->new(
-            app            => $job->app,
-            pairs_by_type  => $pbt  # Use existing state
-          );
+        my $pb = Game::EvonyTKR::External::General::PairBuilder->new(
+          app           => $job->app,
+          pairs_by_type => $pbt         # Use existing state
+        );
 
-          return $pb->monitor_pair_builders($job);
+        return $pb->monitor_pair_builders($job);
       },
     };
   }
@@ -109,104 +113,139 @@ class Game::EvonyTKR::External::General::PairBuilder :
       yaml_version => ['1.2', '1.1'],
     );
 
-    my $collectionDir = Mojo::File->new($app->config('distDir'))
-      ->child('collections/data/');
-    my $bookDir       = $collectionDir->child('skill books');
-    my $generalsDir   = $collectionDir->child('generals');
+    my $collectionDir =
+      Mojo::File->new($app->config('distDir'))->child('collections/data/');
+    my $bookDir     = $collectionDir->child('skill books');
+    my $generalsDir = $collectionDir->child('generals');
 
     my @files = $generalsDir->list_tree->grep(sub {qr/\.y\{a\}?ml$/})->each;
     my $expectedTotal = scalar(@files);
 
     @files = sort @files;
 
-    foreach my $index ( 0 .. $#files ){
+    foreach my $index (0 .. $#files) {
       my $generalFile = $files[$index];
       $self->logger->DEBUG("processing $generalFile, $index of $expectedTotal");
-        my $data = $generalFile->slurp('UTF-8');
-        my $ho   = YAML::PP->new(
-          schema       => [qw/ + Perl /],
-          yaml_version => ['1.2', '1.1'],
-        )->load_string($data);
-        my $g =
-          Game::EvonyTKR::Model::General->from_hash($ho, $app->log);
-        unless ($g) {
-          $self->logger->ERR(sprintf(
-            'failed to build general from %s', $generalFile));
-          return undef;
-        }
+      my $data = $generalFile->slurp('UTF-8');
+      my $ho   = YAML::PP->new(
+        schema       => [qw/ + Perl /],
+        yaml_version => ['1.2', '1.1'],
+      )->load_string($data);
+      my $g = Game::EvonyTKR::Model::General->from_hash($ho, $app->log);
+      unless ($g) {
+        $self->logger->ERR(sprintf(
+          'failed to build general from %s', $generalFile));
+        return undef;
+      }
 
-        my ($bookFile) = grep {
-          my $nf = $self->normalize_name($_->basename('.yaml'));
-          my $nn = $self->normalize_name($g->builtInBookName);
-          $nf eq $nn;
-        } $bookDir->list_tree->grep(sub {qr/\.y\{a\}?ml$/})->each;
-        unless (defined($bookFile) ) {
-          $self->worker_croak(
-            sprintf('no yaml file found for "%s"', $g->builtInBookName));
-          next;
-        }
-        my $bd   = $bookFile->slurp('UTF-8');
-        my $bho  = YAML::PP->new(
-          schema       => [qw/ + Perl /],
-          yaml_version => ['1.2', '1.1'],
-        )->load_string($bd);
-        my $book = Game::EvonyTKR::Model::Book::Builtin->from_hash($bho);
+      my ($bookFile) = grep {
+        my $nf = $self->normalize_name($_->basename('.yaml'));
+        my $nn = $self->normalize_name($g->builtInBookName);
+        $nf eq $nn;
+      } $bookDir->list_tree->grep(sub {qr/\.y\{a\}?ml$/})->each;
+      unless (defined($bookFile)) {
+        $self->worker_croak(
+          sprintf('no yaml file found for "%s"', $g->builtInBookName));
+        next;
+      }
+      my $bd  = $bookFile->slurp('UTF-8');
+      my $bho = YAML::PP->new(
+        schema       => [qw/ + Perl /],
+        yaml_version => ['1.2', '1.1'],
+      )->load_string($bd);
+      my $book = Game::EvonyTKR::Model::Book::Builtin->from_hash($bho);
 
-        unless($book && Scalar::Util::blessed($book) eq 'Game::EvonyTKR::Model::Book::Builtin') {
-          $self->logger->ERR(sprintf('failed to import book for file "%s", necessary for general "%s"', $bookFile, $g->name));
-          next;
-        }
-        $g->set_builtInBook($book);
+      unless ($book
+        && Scalar::Util::blessed($book) eq
+        'Game::EvonyTKR::Model::Book::Builtin') {
+        $self->logger->ERR(
+          sprintf(
+            'failed to import book for file "%s", necessary for general "%s"',
+            $bookFile, $g->name
+          )
+        );
+        next;
+      }
+      $g->set_builtInBook($book);
 
-        $generals->{$self->normalize_name($g->name)} = $g;
-        $self->logger->DEBUG(sprintf('imported %s, general %s of %s', $g->name, scalar keys $generals->%*, $expectedTotal));
+      $generals->{ $self->normalize_name($g->name) } = $g;
+      $self->logger->DEBUG(
+        sprintf(
+          'imported %s, general %s of %s',
+          $g->name, scalar keys $generals->%*,
+          $expectedTotal
+        )
+      );
     }
-    $self->logger->INFO(sprintf('imported %s of %s generals', scalar keys $generals->%*, $expectedTotal));
+    $self->logger->INFO(
+      sprintf(
+        'imported %s of %s generals',
+        scalar keys $generals->%*,
+        $expectedTotal
+      )
+    );
   }
 
   method monitor_pair_builders ($monitor_job) {
     my $jobs = $app->minion->jobs({ tasks => ['build_pairs_for_primary'] });
-    $self->logger->INFO(sprintf('starting monitor_pair_builders %s for %s jobs', $monitor_job->info->{id}, $jobs->total));
+    $self->logger->INFO(
+      sprintf(
+        'starting monitor_pair_builders %s for %s jobs',
+        $monitor_job->info->{id},
+        $jobs->total
+      )
+    );
     my $something_incomplete = 0;
-    my $something_failed = 0;
-    $jobs->each(sub{
+    my $something_failed     = 0;
+    $jobs->each(sub {
       my $info = $_;
       $self->logger->DEBUG(sprintf('inspecting job %s', $info->{id}));
-      if($info->{state} eq 'failed'){
+      if ($info->{state} eq 'failed') {
         $self->logger->ERR(sprintf(
-          'monitor_pair_builders found pair builder JID %s failed with result "%s"',
+'monitor_pair_builders found pair builder JID %s failed with result "%s"',
           $info->{id}, $info->{result}
         ));
         $something_failed++;
         return;
       }
-      if($info->{state} eq 'finished'){
+      if ($info->{state} eq 'finished') {
         $self->logger->DEBUG(sprintf(
-          'monitor_pair_builders found pair builder JID %s finished with result "%s"',
+'monitor_pair_builders found pair builder JID %s finished with result "%s"',
           $info->{id}, $info->{result}
         ));
         my $ngp = $info->{notes}->{pairs_by_type};
-        $self->logger->INFO(sprintf('monitor_pair_builders results from jid %s: %s', $info->{id}, Data::Printer::np($ngp)));
+        $self->logger->INFO(
+          sprintf(
+            'monitor_pair_builders results from jid %s: %s',
+            $info->{id}, Data::Printer::np($ngp)
+          )
+        );
         $self->merge_new_pairs($ngp);
         return;
       }
 
       # at least one job is in progress, retry later.
       # storing the interum results for progressive progress
-       $monitor_job->note(pairs_by_type => $pairs_by_type);
-      $self->logger->DEBUG(sprintf('monitor_pair_builders found job %s is incomplete, triggering retry', $info->{id}));
+      $monitor_job->note(pairs_by_type => $pairs_by_type);
+      $self->logger->DEBUG(
+        sprintf(
+          'monitor_pair_builders found job %s is incomplete, triggering retry',
+          $info->{id})
+      );
       $something_incomplete++;
       return $monitor_job->retry({ delay => 10 });
     });
 
     $monitor_job->note(pairs_by_type => $pairs_by_type);
-    if($something_failed){
-      return $monitor_job->finish("monitor_pair_builders found $something_failed jobs failed");
+    if ($something_failed) {
+      return $monitor_job->finish(
+        "monitor_pair_builders found $something_failed jobs failed");
     }
-    if($something_incomplete){
+    if ($something_incomplete) {
       return $monitor_job->retry({
-        delay => 10,
-        result  => "monitor_pair_builders found $something_incomplete jobs incomplete"
+        delay  => 10,
+        result =>
+          "monitor_pair_builders found $something_incomplete jobs incomplete"
       });
     }
     return $monitor_job->finish('all pair builders complete');
@@ -231,17 +270,17 @@ class Game::EvonyTKR::External::General::PairBuilder :
   }
 
   method build_all_pairs {
-    my $collectionDir = Mojo::File->new($app->config('distDir'))
-      ->child('collections/data/');
-    my $bookDir       = $collectionDir->child('skill books');
-    my $generalsDir   = $collectionDir->child('generals');
+    my $collectionDir =
+      Mojo::File->new($app->config('distDir'))->child('collections/data/');
+    my $bookDir     = $collectionDir->child('skill books');
+    my $generalsDir = $collectionDir->child('generals');
 
     my @files = $generalsDir->list_tree->grep(sub {qr/\.y\{a\}?ml$/})->each;
     my $expectedTotal = scalar(@files);
 
     @files = sort @files;
 
-    foreach my $index ( 0 .. $#files ){
+    foreach my $index (0 .. $#files) {
       my $generalFile = $files[$index];
       $self->logger->DEBUG("processing $generalFile, $index of $expectedTotal");
       $generalFile = Mojo::File->new($generalFile);
@@ -249,7 +288,7 @@ class Game::EvonyTKR::External::General::PairBuilder :
       $self->logger->DEBUG("Found name $general_name from file $generalFile");
       my $jid = $app->minion->enqueue(
         build_pairs_for_primary => [{
-          general_name  => $self->normalize_name($general_name),
+          general_name => $self->normalize_name($general_name),
         }],
         {
           priority => -1,
@@ -267,10 +306,14 @@ class Game::EvonyTKR::External::General::PairBuilder :
   }
 
   method build_pairs_for_primary ($job, $general_name) {
-    my $primary = $generals->{$self->normalize_name($general_name)};
+    my $primary = $generals->{ $self->normalize_name($general_name) };
     unless ($primary) {
       $self->logger->ERR("general for $general_name not found!");
-      $self->logger->DEBUG(sprintf('available generals are %s', join ', ', sort keys $generals->%*));
+      $self->logger->DEBUG(
+        sprintf(
+          'available generals are %s', join ', ', sort keys $generals->%*
+        )
+      );
       return $job->finish("general for $general_name not found!");
     }
 

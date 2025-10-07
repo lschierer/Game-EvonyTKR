@@ -222,7 +222,7 @@ class Game::EvonyTKR::Model::Covenant : isa(Game::EvonyTKR::Shared::Constants) {
 
   sub from_hash($self, $object, $primary, $logger = undef) {
     unless (defined($logger)) {
-    $logger = Game::EvonyTKR::Shared::Logger::get_logger(__PACKAGE__);
+      $logger = Game::EvonyTKR::Shared::Logger::get_logger(__PACKAGE__);
     }
     if (!exists $object->{name}) {
       $logger->ERR('object must have name attribute.');

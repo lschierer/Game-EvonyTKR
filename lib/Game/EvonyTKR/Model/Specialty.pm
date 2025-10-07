@@ -121,12 +121,10 @@ class Game::EvonyTKR::Model::Specialty : isa(Game::EvonyTKR::Shared::Constants)
           $logID
         )) {
           my $val = $buff->value->number;
-          $self->logger->DEBUG(
-            sprintf(
-              '%s  ➤ Match found at %s level %s. Adding %s to total.',
-              $logID, $name, $current_level, $val
-            )
-          );
+          $self->logger->DEBUG(sprintf(
+            '%s  ➤ Match found at %s level %s. Adding %s to total.',
+            $logID, $name, $current_level, $val
+          ));
           $total += $val;
         }
         else {

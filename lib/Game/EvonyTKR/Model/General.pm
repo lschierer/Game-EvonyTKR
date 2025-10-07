@@ -16,10 +16,10 @@ class Game::EvonyTKR::Model::General : isa(Game::EvonyTKR::Shared::Constants) {
   use Carp;
   use File::FindLib 'lib';
   use overload
-    '""'        => \&as_string,
-    'eq'        => \&equality,
-    'bool'      => sub { $_[0]->_isTrue() },
-    "fallback"  => 1;
+    '""'       => \&as_string,
+    'eq'       => \&equality,
+    'bool'     => sub { $_[0]->_isTrue() },
+    "fallback" => 1;
 
   our $VERSION = 'v0.30.0';
   my $debug = 1;
@@ -48,7 +48,7 @@ class Game::EvonyTKR::Model::General : isa(Game::EvonyTKR::Shared::Constants) {
     my @errors;
     unless ($self->can('_isTrue') && $self->_isTrue()) {
       $self->logger->ERR(sprintf('unexpected value: %s', blessed($self)));
-      croak(sprintf('unexpected value: %s', blessed($self));
+      croak(sprintf('unexpected value: %s', blessed($self)));
     }
     if (not defined $type) {
       push @errors,
@@ -138,13 +138,17 @@ class Game::EvonyTKR::Model::General : isa(Game::EvonyTKR::Shared::Constants) {
 
   method equality ($other, $swap = 0) {
     my ($a, $b) = $swap ? ($other, $self) : ($self, $other);
-    if(blessed($a) && $a->isa(__CLASS__) && blessed($b) && $b->isa(__CLASS__) ){
+    if (blessed($a) && $a->isa(__CLASS__) && blessed($b) && $b->isa(__CLASS__))
+    {
       return $a->id eq $b->id;
-    }elsif(blessed($a) && $a->isa(__CLASS__)){
+    }
+    elsif (blessed($a) && $a->isa(__CLASS__)) {
       return $a->name eq "$b";
-    }elsif(blessed($b) && $b->isa(__CLASS__)){
+    }
+    elsif (blessed($b) && $b->isa(__CLASS__)) {
       return $b->name eq "$a";
-    } else {
+    }
+    else {
       $self->ERR('This should not happen, one MUST be a class!');
       return "$a" eq "$b";
     }

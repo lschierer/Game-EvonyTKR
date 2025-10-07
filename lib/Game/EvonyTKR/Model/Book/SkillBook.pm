@@ -41,7 +41,7 @@ class Game::EvonyTKR::Model::Book::SkillBook : isa(Game::EvonyTKR::Model::Book)
 
   sub from_hash ($self, $object, $logger = undef) {
     unless (defined($logger)) {
-    $logger = Game::EvonyTKR::Shared::Logger::get_logger(__PACKAGE__);
+      $logger = Game::EvonyTKR::Shared::Logger::get_logger(__PACKAGE__);
     }
     my ($level) = $object->{name} =~ /Level (\d+)/;
     my $bb = Game::EvonyTKR::Model::Book::SkillBook->new(

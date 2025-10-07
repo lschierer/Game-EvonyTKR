@@ -19,7 +19,8 @@ class GitRepo::Reader {
 
   field $source_dir : param : reader //= './';
   field $git_repo   : reader;
-  field $logger     : reader = Game::EvonyTKR::Shared::Logger::get_logger(__PACKAGE__);
+  field $logger     : reader =
+    Game::EvonyTKR::Shared::Logger::get_logger(__PACKAGE__);
 
   field $oldest  = 0;
   field $authors = {};
