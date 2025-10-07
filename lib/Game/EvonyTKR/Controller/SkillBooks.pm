@@ -79,7 +79,8 @@ package Game::EvonyTKR::Controller::SkillBooks {
           "evonytkrtips_initialized sub has controller_name $controller_name.");
 
         if (not defined $manager) {
-          $app->log->logcroak('No Manager Defined');
+          $logger->ERR('No Manager Defined');
+          croak('No Manager Defined');
         }
         my $base = getBase($self);
         foreach my $book (@{ $manager->bookManager->get_all_books() }) {

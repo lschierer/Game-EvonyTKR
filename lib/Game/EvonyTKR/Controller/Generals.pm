@@ -102,7 +102,8 @@ package Game::EvonyTKR::Controller::Generals {
 
     my $gm = $manager->generalManager;
     if (not defined $gm) {
-      $app->log->logcroak('No general manager in manager');
+      $logger->ERR('No general manager in manager');
+      croak('No general manager in manager');
     }
 
     $app->plugins->on(
@@ -133,7 +134,7 @@ package Game::EvonyTKR::Controller::Generals {
                   yaml_version => ['1.2', '1.1'],
                 )->load_string($data);
                 my $g =
-                  Game::EvonyTKR::Model::General->from_hash($ho, $app->log);
+                  Game::EvonyTKR::Model::General->from_hash($ho, $logger);
                 unless ($g) {
                   $logger->ERR(sprintf(
                     'failed to build general from %s', $generalFile));
@@ -746,7 +747,7 @@ package Game::EvonyTKR::Controller::Generals {
     my $run_id     = 0+ $c->param('runId');
     my $session_id = $c->param('sessionId');
     unless (defined($session_id) && length($session_id)) {
-      $c->app->log->error('Session ID must be present!');
+      $logger->ERR('Session ID must be present!');
       my $payload = encode_json({ runId => 0+ $run_id });
       $c->write_sse({ type => 'complete', text => $payload });
       return;
@@ -754,14 +755,14 @@ package Game::EvonyTKR::Controller::Generals {
     my $selected =
       exists $session_store->{$session_id} ? $session_store->{$session_id} : [];
 
-    $c->app->log->debug(sprintf(
+    $logger->DEBUG(sprintf(
       'stream_single_details called url: %s,'
         . ' uiTarget: %s; buffActivation: %s; run_id: %s',
       $c->req->url->path->to_string,
       $slug_ui, $slug_buff, 0+ $run_id
     ));
 
-    $c->app->log->debug(sprintf(
+    $logger->DEBUG(sprintf(
       'session info: sessionId: "%s"; selected: %s',
       $session_id // 'Not Present',
       join ', ',
@@ -773,13 +774,13 @@ package Game::EvonyTKR::Controller::Generals {
     my $route_meta = $routing->lookup_route($slug_ui, $slug_buff);
 
     unless ($route_meta) {
-      $c->app->log->error("Invalid single route: $slug_ui | $slug_buff");
+      $logger->ERR("Invalid single route: $slug_ui | $slug_buff");
 
       if ($c->app->mode eq 'development') {
-        $c->app->log->debug("Known valid routes:");
+        $logger->DEBUG("Known valid routes:");
         $routing->each_valid_route(
           sub ($key, $meta) {
-            $c->app->log->debug("  $key => " . Data::Printer::np($meta));
+            $logger->DEBUG("  $key => " . Data::Printer::np($meta));
           }
         );
       }
@@ -843,27 +844,27 @@ package Game::EvonyTKR::Controller::Generals {
       ,    # This replaces your unlimited spawning
       sub {
         my ($start, $end) = @{ $_[0] };    # Current batch range
-        $c->app->log->debug("processing $start to $end");
+        $logger->DEBUG("processing $start to $end");
 
         my $subprocess = Mojo::IOLoop::Subprocess->new;
         $subprocess->on(
           progress => sub ($subprocess, @data) {
             my ($result) = @data;
             if (!$c->tx || $c->tx->is_finished) {
-              $c->app->log->info(
+              $logger->INFO(
                 "transaction finished before write_sse called for $result");
               return;
             }
-            $c->app->log->debug("progress event detected");
+            $logger->DEBUG("progress event detected");
             $c->write_sse({ type => 'row', text => $result });
           }
         );
 
         return $subprocess->run_p(sub {
-          $c->app->log->debug("sub process for index $start to $end");
+          $logger->DEBUG("sub process for index $start to $end");
           for my $i ($start .. $end) {
             my $general = $rows->[$i];
-            $c->app->log->debug(
+            $logger->DEBUG(
               sprintf('processing general %s', $general->name,));
             my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
               general => $general,
@@ -893,7 +894,7 @@ package Game::EvonyTKR::Controller::Generals {
               $validated_params->{route_meta}->{generalType} =~ s/_/ /r;
             $buffKey =~ s/(\w)(\w+) specialist/\U$1\L$2 \UT\Lroops/;
             $buffKey =~ s/Siege Troops/Siege Machines/;
-            $c->app->log->debug("buffKey is $buffKey");
+            $logger->DEBUG("buffKey is $buffKey");
 
             # build the row payload
             my $row = {
@@ -933,7 +934,7 @@ package Game::EvonyTKR::Controller::Generals {
               JSON::PP->new->utf8(0)->allow_blessed->convert_blessed->canonical;
 
             my $payload = $json->encode({ runId => 0+ $run_id, data => $row });
-            $c->app->log->debug(sprintf(
+            $logger->DEBUG(sprintf(
               'row is %s, json is %s',
               Data::Printer::np($row, multiline => 0), $payload,
             ));
@@ -943,7 +944,7 @@ package Game::EvonyTKR::Controller::Generals {
 
         })->catch(sub {
           my $err = shift;
-          $c->app->log->error(sprintf(
+          $logger->ERR(sprintf(
             'error in promise for subloop %s to %s : "%s". ',
             $start, $end, $err ? $err : 'Unknown'
           ));
@@ -956,7 +957,7 @@ package Game::EvonyTKR::Controller::Generals {
       my $payload = encode_json({ runId => $run_id });
       $c->write_sse({ type => 'complete', text => $payload });
     })->catch(sub {
-      $c->app->log->error('Overall map operation failed');
+      $logger->ERR('Overall map operation failed');
       return undef;
     });
 
@@ -987,7 +988,7 @@ package Game::EvonyTKR::Controller::Generals {
     if ($isPrimary) {
       # Validate ascending level
       if (!$data_model->checkAscendingLevel($ascendingLevel)) {
-        $c->app->log->warn(
+        $logger->WARN(
           "Invalid ascendingLevel: $ascendingLevel, using default 'red5'");
         $ascendingLevel = 'red5';
       }
@@ -997,7 +998,7 @@ package Game::EvonyTKR::Controller::Generals {
     }
 
     if (!$data_model->checkCovenantLevel($covenantLevel)) {
-      $c->app->log->warn(
+      $logger->WARN(
         sprintf('Invalid covenantLevel: %s, using default "civilization"',
           $covenantLevel)
       );

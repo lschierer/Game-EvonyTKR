@@ -191,7 +191,9 @@ class Game::EvonyTKR::Model::Book : isa(Game::EvonyTKR::Shared::Constants) {
     $type->check($text)
       or push @errors => sprintf('$text must contain a string, not %s', $text);
     if (@errors) {
-      $self->logger()->logcroak(join(', ' => @errors));
+      $self->logger->ERR(join ', ', @errors);
+      croak(join ', ', @errors);
+      return;
     }
   }
 

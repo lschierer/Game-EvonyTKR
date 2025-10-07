@@ -94,7 +94,8 @@ package Game::EvonyTKR::Controller::Covenants {
         eval {
           my $manager = $app->get_root_manager();
           if (not defined $manager) {
-            $app->log->logcroak('No Manager Defined');
+            $logger->ERR('No Manager Defined');
+            croak('No Manager Defined');
           }
 
           my $cd = Mojo::File->new($app->config('distDir'))

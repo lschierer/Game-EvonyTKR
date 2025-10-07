@@ -202,7 +202,9 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Shared::Constants) {
       or push @errors => "passive must be 0 or 1, not $passive";
 
     if (@errors) {
-      $self->logger()->logcroak(join(', ' => @errors));
+      $self->logger->ERR(join ', ', @errors);
+      croak(join ', ', @errors);
+      return;
     }
 
     $value->validate();

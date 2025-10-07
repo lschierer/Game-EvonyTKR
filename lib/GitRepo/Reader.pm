@@ -47,13 +47,13 @@ class GitRepo::Reader {
 
         my $current   = new Date::Manip::Date;
         my $timestamp = $log->author_gmtime;
-        $logger->debug("retrieved timestamp $timestamp from the log");
+        $logger->DEBUG("retrieved timestamp $timestamp from the log");
         if (not $oldest) {
-          $logger->info("setting initial time to $timestamp");
+          $logger->INFO("setting initial time to $timestamp");
           $oldest = $timestamp;
         }
         elsif ($timestamp < $oldest) {
-          $logger->debug("$timestamp is older than $oldest");
+          $logger->DEBUG("$timestamp is older than $oldest");
           $oldest = $timestamp;
         }
       }
@@ -62,7 +62,7 @@ class GitRepo::Reader {
     # this is a separate test because the while loop might not actually succeed
     if ($oldest) {
       my $dt = DateTime->from_epoch(epoch => $oldest,);
-      $logger->info($dt->year . " is the oldest year in the repo.");
+      $logger->INFO($dt->year . " is the oldest year in the repo.");
       return $dt;
     }
     return 0;
@@ -80,22 +80,22 @@ class GitRepo::Reader {
 
       if ($mailmap_file->is_file()) {
         $mailmap = 1;
-        $logger->info("mailmap '$mailmap_file' found");
+        $logger->INFO("mailmap '$mailmap_file' found");
       }
       else {
         $mailmap = 0;
-        $logger->warn("No mailmap file at $mailmap_file");
+        $logger->WARN("No mailmap file at $mailmap_file");
       }
 
       while (my $log = $iter->next) {
-        $logger->debug("inspecting " . $log->author_name);
+        $logger->DEBUG("inspecting " . $log->author_name);
         my $email = $log->author_email;
         my $name  = $log->author_name;
         if ($mailmap) {
           my $mm_check =
             $git_repo->run('check-mailmap', sprintf('%s <%s>', $name, $email));
           if ($mm_check && $mm_check !~ /^fatal:/) {
-            $logger->debug("mm_check is '$mm_check'");
+            $logger->DEBUG("mm_check is '$mm_check'");
             if ($mm_check =~ /^(.*?)\s*<([^>]+)>/) {
               $name  = $1;
               $email = $2;
@@ -103,7 +103,7 @@ class GitRepo::Reader {
           }
         }
         if (!exists $authors->{$name}) {
-          $logger->debug("adding '$name'");
+          $logger->DEBUG("adding '$name'");
           $authors->{$name} = {
             name  => $name,
             email => $email,

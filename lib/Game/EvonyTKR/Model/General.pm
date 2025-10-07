@@ -76,7 +76,9 @@ class Game::EvonyTKR::Model::General : isa(Game::EvonyTKR::Shared::Constants) {
         sprintf('stars must be one of %s, not "%s"', join(',', @valv), $stars);
     }
     if (@errors) {
-      $self->logger()->logcroak(join ', ' => @errors);
+      $self->logger->ERR(join ', ', @errors);
+      croak(join ', ', @errors);
+      return;
     }
 
     if (ref $type) {

@@ -70,17 +70,20 @@ package Game::EvonyTKR::Converter {
     }
     elsif ($opt->mode eq 'all') {
       if (length($opt->url) == 0) {
-        $logger->logcroak("A URL is required with --all");
+        $logger->ERR('A URL is required with --all');
+        croak('A URL is required with --all');
         exit -1;
       }
       $self->doAll($logger, $opt->url, $opt->debug);
     }
     else {
       if (length($opt->mode) > 0) {
-        $logger->logcroak(sprintf('Mode %s is not supported.', $opt->mode));
+        $logger->ERR(sprintf('Mode %s is not supported.', $opt->mode));
+        croak(sprintf('Mode %s is not supported.', $opt->mode));
       }
       else {
-        $logger->logcroak("missing mode option");
+        $logger->ERR('missing mode option');
+        croak("missing mode option");
       }
     }
 
@@ -88,12 +91,13 @@ package Game::EvonyTKR::Converter {
   }
 
   sub doAll ($self, $logger, $url, $debug) {
-    $logger->debug("::Converter->doAll started.");
+    $logger->DEBUG("::Converter->doAll started.");
     my $dd       = Path::Tiny::path(File::Share::dist_dir('Game-EvonyTKR'));
     my $ua       = LWP::UserAgent->new;
     my $response = $ua->get($url);
     unless ($response->is_success) {
-      $logger->logcroak("Failed to fetch $url: ", $response->status_line);
+      $logger->ERR(sprintf('Failed to fetch %s: %s', $url, $response->status_line));
+      croak(sprintf('Failed to fetch %s: %s', $url, $response->status_line));
     }
     my $tree = HTML::TreeBuilder->new;
     $tree->parse_content($response->decoded_content);
@@ -101,7 +105,7 @@ package Game::EvonyTKR::Converter {
     my $encoder = Sereal::Encoder->new({ freeze_callbacks => 1 });
     my $decoder = Sereal::Decoder->new;
 
-    $logger->debug("tree is " . Data::Printer::np($tree));
+    $logger->DEBUG("tree is " . Data::Printer::np($tree));
     $tree->look_down(_tag => 'script')->delete()
       for $tree->look_down(_tag => 'script');
     my $serialized = $encoder->encode($tree);

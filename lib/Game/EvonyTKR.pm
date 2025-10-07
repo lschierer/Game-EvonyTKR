@@ -53,7 +53,7 @@ package Game::EvonyTKR {
 
     # Logging setup
     my $logger = Game::EvonyTKR::Shared::Logger::get_logger('Game::EvonyTKR');
-    $self->log(MojoX::Log::Fast->new($logger));
+    $logger(MojoX::Log::Fast->new($logger));
 
     $self->helper(
       get_logger => sub ($self, $caller) {
@@ -61,7 +61,7 @@ package Game::EvonyTKR {
       }
     );
 
-    $self->log->info(sprintf('Mojolicious Logging initialized',));
+    $logger->INFO(sprintf('Mojolicious Logging initialized',));
     my $RootManager =
       Game::EvonyTKR::Model::EvonyTKR::Manager->new(SourceDir => $distDir,);
 
@@ -74,10 +74,10 @@ package Game::EvonyTKR {
       if (defined $envkey) {
         my $envValue = $self->config->{'EvonyTKR-Environment'}->{$envkey}
           // 'Undefined';
-        $self->log->info("EvonyTKR-Environnment variable $envkey is $envValue");
+        $logger->INFO("EvonyTKR-Environnment variable $envkey is $envValue");
       }
       else {
-        $self->log->warn('undefined envkey in EvonyTKR-Environment!');
+        $logger->WARN('undefined envkey in EvonyTKR-Environment!');
       }
     }
 
@@ -86,10 +86,9 @@ package Game::EvonyTKR {
     $self->hook(
       before_server_start => sub {
         state $initialized = do {
-          $self->log->info('testing general André Masséna');
-          $self->log->info("⚙️  Running rootImport...");
+          $logger->INFO("⚙️  Running rootImport...");
           $RootManager->rootImport();
-          $self->log->info("✅ rootImport completed.");
+          $logger->INFO("✅ rootImport completed.");
           $self->plugins->emit(evonytkrtips_initialized => $RootManager);
           1;
         };
@@ -106,7 +105,7 @@ package Game::EvonyTKR {
     # First Plugins that provide helpers but do not define routes
     my $dbPath = Mojo::File->new('minion.db');
 
-    $self->log->debug("dbPath is $dbPath");
+    $logger->DEBUG("dbPath is $dbPath");
     $self->plugin(Minion => { SQLite => "sqlite:$dbPath" });
     if ($mode eq 'development') {
       $self->minion->remove_after(7200);
