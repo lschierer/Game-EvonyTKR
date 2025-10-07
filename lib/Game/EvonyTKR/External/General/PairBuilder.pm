@@ -158,43 +158,35 @@ class Game::EvonyTKR::External::General::PairBuilder :
       unless ($book
         && Scalar::Util::blessed($book) eq
         'Game::EvonyTKR::Model::Book::Builtin') {
-        $self->logger->ERR(
-          sprintf(
-            'failed to import book for file "%s", necessary for general "%s"',
-            $bookFile, $g->name
-          )
-        );
+        $self->logger->ERR(sprintf(
+          'failed to import book for file "%s", necessary for general "%s"',
+          $bookFile, $g->name
+        ));
         next;
       }
       $g->set_builtInBook($book);
 
       $generals->{ $self->normalize_name($g->name) } = $g;
-      $self->logger->DEBUG(
-        sprintf(
-          'imported %s, general %s of %s',
-          $g->name, scalar keys $generals->%*,
-          $expectedTotal
-        )
-      );
-    }
-    $self->logger->INFO(
-      sprintf(
-        'imported %s of %s generals',
-        scalar keys $generals->%*,
+      $self->logger->DEBUG(sprintf(
+        'imported %s, general %s of %s',
+        $g->name, scalar keys $generals->%*,
         $expectedTotal
-      )
-    );
+      ));
+    }
+    $self->logger->INFO(sprintf(
+      'imported %s of %s generals',
+      scalar keys $generals->%*,
+      $expectedTotal
+    ));
   }
 
   method monitor_pair_builders ($monitor_job) {
     my $jobs = $app->minion->jobs({ tasks => ['build_pairs_for_primary'] });
-    $self->logger->INFO(
-      sprintf(
-        'starting monitor_pair_builders %s for %s jobs',
-        $monitor_job->info->{id},
-        $jobs->total
-      )
-    );
+    $self->logger->INFO(sprintf(
+      'starting monitor_pair_builders %s for %s jobs',
+      $monitor_job->info->{id},
+      $jobs->total
+    ));
     my $something_incomplete = 0;
     my $something_failed     = 0;
     $jobs->each(sub {
@@ -214,12 +206,10 @@ class Game::EvonyTKR::External::General::PairBuilder :
           $info->{id}, $info->{result}
         ));
         my $ngp = $info->{notes}->{pairs_by_type};
-        $self->logger->INFO(
-          sprintf(
-            'monitor_pair_builders results from jid %s: %s',
-            $info->{id}, Data::Printer::np($ngp)
-          )
-        );
+        $self->logger->INFO(sprintf(
+          'monitor_pair_builders results from jid %s: %s',
+          $info->{id}, Data::Printer::np($ngp)
+        ));
         $self->merge_new_pairs($ngp);
         return;
       }
@@ -227,11 +217,9 @@ class Game::EvonyTKR::External::General::PairBuilder :
       # at least one job is in progress, retry later.
       # storing the interum results for progressive progress
       $monitor_job->note(pairs_by_type => $pairs_by_type);
-      $self->logger->DEBUG(
-        sprintf(
-          'monitor_pair_builders found job %s is incomplete, triggering retry',
-          $info->{id})
-      );
+      $self->logger->DEBUG(sprintf(
+        'monitor_pair_builders found job %s is incomplete, triggering retry',
+        $info->{id}));
       $something_incomplete++;
       return $monitor_job->retry({ delay => 10 });
     });
@@ -309,11 +297,10 @@ class Game::EvonyTKR::External::General::PairBuilder :
     my $primary = $generals->{ $self->normalize_name($general_name) };
     unless ($primary) {
       $self->logger->ERR("general for $general_name not found!");
-      $self->logger->DEBUG(
-        sprintf(
-          'available generals are %s', join ', ', sort keys $generals->%*
-        )
-      );
+      $self->logger->DEBUG(sprintf(
+        'available generals are %s',
+        join ', ', sort keys $generals->%*
+      ));
       return $job->finish("general for $general_name not found!");
     }
 

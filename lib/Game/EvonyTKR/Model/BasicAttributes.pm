@@ -78,8 +78,7 @@ class Game::EvonyTKR::Model::BasicAttributes :
     }
 
     if (not exists $self->attributes()->{$attributeName}) {
-      $self->logger
-        ->ERR(sprintf(
+      $self->logger->ERR(sprintf(
 '$self->attributes()->{$attributeName} does not exist for $attributeName %s',
         $attributeName));
       return;
@@ -119,8 +118,16 @@ class Game::EvonyTKR::Model::BasicAttributes :
     my @classList  = split(/::/, $otherClass);
     if ($classList[2] ne 'BasicAttributes') {
       my $od = Data::Printer::p $other;
-      $self->logger->ERR(sprintf('Game::EvonyTKR::Model::BasicAttributes ' . 'comparison operator cannot take a %s', $od));
-      croak(sprintf('Game::EvonyTKR::Model::BasicAttributes ' . 'comparison operator cannot take a %s', $od));
+      $self->logger->ERR(sprintf(
+        'Game::EvonyTKR::Model::BasicAttributes '
+          . 'comparison operator cannot take a %s',
+        $od
+      ));
+      croak(sprintf(
+        'Game::EvonyTKR::Model::BasicAttributes '
+          . 'comparison operator cannot take a %s',
+        $od
+      ));
       return;
     }
     else {
@@ -135,8 +142,16 @@ class Game::EvonyTKR::Model::BasicAttributes :
     my @classList  = split(/::/, $otherClass);
     if ($classList[2] ne 'BasicAttributes') {
       my $od = Data::Printer::p $other;
-      $self->logger->ERR(sprintf('Game::EvonyTKR::Model::BasicAttributes ' . 'equality operator cannot take a %s', $od));
-      croak(sprintf('Game::EvonyTKR::Model::BasicAttributes ' . 'equality operator cannot take a %s', $od));
+      $self->logger->ERR(sprintf(
+        'Game::EvonyTKR::Model::BasicAttributes '
+          . 'equality operator cannot take a %s',
+        $od
+      ));
+      croak(sprintf(
+        'Game::EvonyTKR::Model::BasicAttributes '
+          . 'equality operator cannot take a %s',
+        $od
+      ));
       return;
     }
     else {
@@ -151,8 +166,16 @@ class Game::EvonyTKR::Model::BasicAttributes :
     my @classList  = split(/::/, $otherClass);
     if ($classList[2] ne 'BasicAttributes') {
       my $od = Data::Printer::p $other;
-      $self->logger->ERR(sprintf('Game::EvonyTKR::Model::BasicAttributes ' . 'inequality operator cannot take a %s', $od));
-      croak(sprintf('Game::EvonyTKR::Model::BasicAttributes ' . 'inequality operator cannot take a %s', $od));
+      $self->logger->ERR(sprintf(
+        'Game::EvonyTKR::Model::BasicAttributes '
+          . 'inequality operator cannot take a %s',
+        $od
+      ));
+      croak(sprintf(
+        'Game::EvonyTKR::Model::BasicAttributes '
+          . 'inequality operator cannot take a %s',
+        $od
+      ));
       return;
     }
     else {

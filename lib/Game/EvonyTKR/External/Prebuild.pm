@@ -167,14 +167,12 @@ package Game::EvonyTKR::External::Prebuild {
           }
           $jobsState->{$jid} = $job->info;
           if ($job->info->{state} eq 'failed') {
-            $logger->ERR(
-              sprintf(
-                'failed job %s for task %s, result %s',
-                $jid,
-                $job->info->{task},
-                $job->info->{result}
-              )
-            );
+            $logger->ERR(sprintf(
+              'failed job %s for task %s, result %s',
+              $jid,
+              $job->info->{task},
+              $job->info->{result}
+            ));
             $self->note(
               ERROR => sprintf(
                 'failed job %s: %s',
@@ -215,12 +213,10 @@ package Game::EvonyTKR::External::Prebuild {
           $self->finish('All Monitored Jobs Complete');
         }
         else {
-          $logger->DEBUG(
-            sprintf(
-              'found %s complete, expected %s',
-              scalar(@complete), scalar(@expectedComplete)
-            )
-          );
+          $logger->DEBUG(sprintf(
+            'found %s complete, expected %s',
+            scalar(@complete), scalar(@expectedComplete)
+          ));
         }
       }
     );

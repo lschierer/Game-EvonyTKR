@@ -133,8 +133,7 @@ package Game::EvonyTKR::Controller::Generals {
                   schema       => [qw/ + Perl /],
                   yaml_version => ['1.2', '1.1'],
                 )->load_string($data);
-                my $g =
-                  Game::EvonyTKR::Model::General->from_hash($ho, $logger);
+                my $g = Game::EvonyTKR::Model::General->from_hash($ho, $logger);
                 unless ($g) {
                   $logger->ERR(sprintf(
                     'failed to build general from %s', $generalFile));
@@ -864,8 +863,7 @@ package Game::EvonyTKR::Controller::Generals {
           $logger->DEBUG("sub process for index $start to $end");
           for my $i ($start .. $end) {
             my $general = $rows->[$i];
-            $logger->DEBUG(
-              sprintf('processing general %s', $general->name,));
+            $logger->DEBUG(sprintf('processing general %s', $general->name,));
             my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
               general => $general,
               books   =>

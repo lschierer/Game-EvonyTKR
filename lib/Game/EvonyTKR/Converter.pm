@@ -96,7 +96,8 @@ package Game::EvonyTKR::Converter {
     my $ua       = LWP::UserAgent->new;
     my $response = $ua->get($url);
     unless ($response->is_success) {
-      $logger->ERR(sprintf('Failed to fetch %s: %s', $url, $response->status_line));
+      $logger->ERR(
+        sprintf('Failed to fetch %s: %s', $url, $response->status_line));
       croak(sprintf('Failed to fetch %s: %s', $url, $response->status_line));
     }
     my $tree = HTML::TreeBuilder->new;

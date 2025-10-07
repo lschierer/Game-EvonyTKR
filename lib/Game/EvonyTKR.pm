@@ -53,7 +53,7 @@ package Game::EvonyTKR {
 
     # Logging setup
     my $logger = Game::EvonyTKR::Shared::Logger::get_logger('Game::EvonyTKR');
-    $logger(MojoX::Log::Fast->new($logger));
+    $self->log(MojoX::Log::Fast->new($logger));
 
     $self->helper(
       get_logger => sub ($self, $caller) {

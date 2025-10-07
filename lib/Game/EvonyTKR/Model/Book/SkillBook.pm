@@ -24,7 +24,8 @@ class Game::EvonyTKR::Model::Book::SkillBook : isa(Game::EvonyTKR::Model::Book)
   ADJUST {
     # Validate level is between 1 and 5
     if ($level < 1 || $level > 5) {
-      $self->logger->ERR(sprintf('Skillbook level must be between 1 and 5, got %s', $level));
+      $self->logger->ERR(
+        sprintf('Skillbook level must be between 1 and 5, got %s', $level));
       croak(sprintf('Skillbook level must be between 1 and 5, got %s', $level));
       return;
     }
