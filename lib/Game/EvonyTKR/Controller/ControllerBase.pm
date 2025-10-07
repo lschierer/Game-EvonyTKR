@@ -10,7 +10,6 @@ use namespace::clean;
 package Game::EvonyTKR::Controller::ControllerBase {
   use Mojo::Base 'Mojolicious::Controller';
   use Mojo::Base 'Mojolicious::Plugin', -role, -signatures;
-  use Log::Log4perl;
   require Mojo::File;
   require YAML::PP;
   require Data::Printer;
