@@ -44,7 +44,6 @@ package Game::EvonyTKR::Plugins::Markdown {
   sub _parse_markdown_frontmatter {
     my ($self, $file_path) = @_;
 
-
     unless ($file_path && $file_path->isa('Mojo::File')) {
       $logger->ERR("file_path must be a 'Mojo::File' not "
           . (ref($file_path) || 'undefined'));
@@ -123,7 +122,6 @@ package Game::EvonyTKR::Plugins::Markdown {
     if (not defined $opts) {
       $opts = {};
     }
-
 
     my $startstash = $c->stash();
     my @stashkeys  = keys %$startstash;

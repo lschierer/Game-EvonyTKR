@@ -13,22 +13,21 @@ package Game::EvonyTKR::Shared::Logger {
 
   our @EXPORT_OK = qw( get_logger );
   our $lfConfig;
+
   BEGIN {
-    my $home = Mojo::File->new(File::HomeDir::Tiny::home);
+    my $home    = Mojo::File->new(File::HomeDir::Tiny::home);
     my $logPath = $home->child('/var/log/Perl/dist/Game-EvonyTKR/root.log');
-    $logPath->dirname->make_path({mode => 0711});
+    $logPath->dirname->make_path({ mode => 0711 });
     $logPath->touch;
     my $fh = $logPath->open('>>');
     $fh->autoflush(1);
     $lfConfig = {
-     level  => 'DEBUG',
-     type   => 'fh',
-     fh     => $fh,
-     prefix => '[%L] %D %T %P %F: ',
-   };
+      level  => 'DEBUG',
+      type   => 'fh',
+      fh     => $fh,
+      prefix => '[%L] %D %T %P %F: ',
+    };
   }
-
-
 
   # Possible values are: 'ERR', 'WARN', 'NOTICE', 'INFO', 'DEBUG'
   my $module_log_masks = {
@@ -59,7 +58,8 @@ package Game::EvonyTKR::Shared::Logger {
     'Game::EvonyTKR::Model::Glossary'                 => 'WARN',
     'Game::EvonyTKR::Model::Data'                     => 'WARN',
     'Game::EvonyTKR::Model::General'                  => 'WARN',
-    'Game::EvonyTKR::External::General::PairBuilder'  => 'WARN',
+    'Game::EvonyTKR::External::General::PairBuilder'  => 'DEBUG',
+    'Game::EvonyTKR::External::Prebuild'              => 'DEBUG',
     'PairBuilderLogic'                                => 'WARN',
     'ConflictWorkerLogic'                             => 'WARN',
     'WorkerLogic'                                     => 'WARN',
@@ -67,9 +67,9 @@ package Game::EvonyTKR::Shared::Logger {
     'GitRepo::Reader'                                 => 'WARN',
   };
 
-  sub get_logger ( $caller) {
+  sub get_logger ($caller) {
     my $log_level = $module_log_masks->{$caller} // 'WARN';
-    my $logger =  Log::Fast->new($lfConfig);
+    my $logger    = Log::Fast->new($lfConfig);
     $logger->config({
       level => $log_level,
     });

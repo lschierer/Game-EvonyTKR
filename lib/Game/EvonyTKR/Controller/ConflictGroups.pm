@@ -50,11 +50,6 @@ package Game::EvonyTKR::Controller::ConflictGroups {
       order  => 60,
     });
 
-    my $defined_tasks = $app->minion->tasks;
-    unless (exists $defined_tasks->{detect_conflicts_for_general}) {
-      $logger->ERR('detect_conflicts_for_general task did not define!!!');
-    }
-
     $app->plugins->on(
       conflicts_complete => sub {
         $logger->INFO('Conflict Update detected');

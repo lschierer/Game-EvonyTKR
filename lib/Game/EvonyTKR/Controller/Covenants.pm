@@ -185,7 +185,7 @@ package Game::EvonyTKR::Controller::Covenants {
   }
 
   sub index($self) {
-    my $app->log     = Log::Log4perl->get_app->log(__PACKAGE__);
+    my $app->log = Log::Log4perl->get_app->log(__PACKAGE__);
     my $collection = collection_name();
     $logger->DEBUG("Rendering index for $collection");
 

@@ -14,10 +14,8 @@ package Game::EvonyTKR::Plugins::StaticPages {
   my %static_routes;
 
   sub register ($self, $app, $config) {
-    $logger = $app->get_logger(__PACKAGE__);;
-    $logger->INFO(sprintf(
-      'register function for %s.',
-      __PACKAGE__, ));
+    $logger = $app->get_logger(__PACKAGE__);
+    $logger->INFO(sprintf('register function for %s.', __PACKAGE__,));
 
     # Add helper to check if a static route exists
     $app->helper(

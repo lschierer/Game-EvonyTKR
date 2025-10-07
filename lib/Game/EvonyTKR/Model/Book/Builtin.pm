@@ -31,11 +31,9 @@ class Game::EvonyTKR::Model::Book::Builtin : isa(Game::EvonyTKR::Model::Book) {
     return $self->toHashRef();
   }
 
-  sub from_hash ($self, $object, $logger = undef) {
-    unless (defined($logger)) {
-      $logger = Log::Log4perl->get_logger(Scalar::Util::blessed($self));
-    }
-    my $bb = Game::EvonyTKR::Model::Book::Builtin->new(
+  sub from_hash ($class, $object,) {
+    my $logger = Game::EvonyTKR::Shared::Logger::get_logger($class);
+    my $bb     = Game::EvonyTKR::Model::Book::Builtin->new(
       name => $object->{name},
       text => $object->{text} // '',
     );
@@ -52,7 +50,7 @@ class Game::EvonyTKR::Model::Book::Builtin : isa(Game::EvonyTKR::Model::Book) {
       sprintf('Book %s has %s buffs in YAML', $object->{name}, scalar @buffs));
 
     foreach my $ob (@buffs) {
-      my $b = Game::EvonyTKR::Model::Buff->from_hash($ob, $logger);
+      my $b = Game::EvonyTKR::Model::Buff->from_hash($ob);
       $bb->addBuff($b);
     }
 

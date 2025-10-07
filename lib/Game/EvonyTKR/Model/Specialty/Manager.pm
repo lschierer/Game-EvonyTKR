@@ -71,30 +71,13 @@ class Game::EvonyTKR::Model::Specialty::Manager :
           $self->logger->WARN("$name does not match " . $object->{name});
         }
       }
-
-      $specialties->{$name} =
-        Game::EvonyTKR::Model::Specialty->new(name => $name,);
-      foreach my $ol (@{ $object->{levels} }) {
-        my $level = $ol->{level};
-        $self->logger->DEBUG("attempting import of $level for $name");
-        my @buffs;
-        if (exists $ol->{buff}) {
-          @buffs = @{ $ol->{buff} };
-        }
-        elsif (exists $ol->{buffs}) {
-          @buffs = @{ $ol->{buffs} };
-        }
-        foreach my $ob (@buffs) {
-          my $b = Game::EvonyTKR::Model::Buff->from_hash($ob, $self->logger);
-          $specialties->{$name}->addBuff($level, $b);
-        }
+      unless (exists($object->{name}) && length($object->{name})) {
+        $self->logger->WARN(
+          "Object must have a name to create a Specialty. Skipping $file");
+        next;
       }
-      if (exists $specialties->{$name}) {
-        $self->logger->DEBUG("imported $name as: " . $specialties->{$name});
-      }
-      else {
-        $self->logger->ERR("failed to import $name");
-      }
+      my $s = Game::EvonyTKR::Model::Specialty->from_hash($object);
+      $specialties->{$name} = $s if defined($s);
     }
     my $countImported = scalar keys %$specialties;
     $self->logger->INFO(

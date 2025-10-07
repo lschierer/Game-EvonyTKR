@@ -50,8 +50,12 @@ class Game::EvonyTKR::Model::Specialty : isa(Game::EvonyTKR::Shared::Constants)
   }
 
   ADJUST {
-    my $specialtybase = uuid5($self->UUID5_base, 'Specialty');
-    $id = uuid5($specialtybase, $name);
+    if (defined($self) && defined($self->UUID5_base)) {
+      my $specialtybase = uuid5($self->UUID5_base, 'Specialty');
+      if (defined($name)) {
+        $id = uuid5($specialtybase, $name);
+      }
+    }
   }
 
   method get_buffs_at_level (
@@ -62,8 +66,7 @@ class Game::EvonyTKR::Model::Specialty : isa(Game::EvonyTKR::Shared::Constants)
   ) {
     $level = lc($level)
       ;    # sanitize the data from the user - level names must be lower case
-    my $logger = $self->logger;
-    $logger->DEBUG(
+    $self->logger->DEBUG(
       "Calculating buffs for $name level: $level, attribute: $attribute");
 
     return 0 if not defined $level or $level =~ /none/i;
@@ -104,7 +107,7 @@ class Game::EvonyTKR::Model::Specialty : isa(Game::EvonyTKR::Shared::Constants)
       my $current_level = $level_hierarchy[$i];
       my $buffs         = $levels_by_name->{$current_level}->{buffs} // [];
 
-      $logger->DEBUG("Checking $name level $current_level with "
+      $self->logger->DEBUG("Checking $name level $current_level with "
           . scalar(@{$buffs})
           . " buffs");
 
@@ -118,18 +121,21 @@ class Game::EvonyTKR::Model::Specialty : isa(Game::EvonyTKR::Shared::Constants)
           $logID
         )) {
           my $val = $buff->value->number;
-          $logger->DEBUG(
-"$logID  ➤ Match found at $name level $current_level. Adding $val to total."
+          $self->logger->DEBUG(
+            sprintf(
+              '%s  ➤ Match found at %s level %s. Adding %s to total.',
+              $logID, $name, $current_level, $val
+            )
           );
           $total += $val;
         }
         else {
-          $logger->DEBUG("$logID  ✗ No match found.");
+          $self->logger->DEBUG("$logID  ✗ No match found.");
         }
       }
     }
 
-    $logger->DEBUG(
+    $self->logger->DEBUG(
       "Total for $name $level/$attribute/$targetedType/$matching_type: $total");
     return $total;
 
@@ -191,9 +197,11 @@ class Game::EvonyTKR::Model::Specialty : isa(Game::EvonyTKR::Shared::Constants)
     }
   }
 
-  sub from_hash ($self, $object, $logger = undef) {
-    unless (defined($logger)) {
-      $logger = Log::Log4perl->get_logger(Scalar::Util::blessed($self));
+  sub from_hash ($class, $object,) {
+    my $logger = Game::EvonyTKR::Shared::Logger::get_logger($class);
+    unless (exists($object->{name}) && length($object->{name})) {
+      $logger->ERR('Name is required to create a Specialty.');
+      return undef;
     }
 
     my $s = Game::EvonyTKR::Model::Specialty->new(name => $object->{name});
@@ -209,7 +217,7 @@ class Game::EvonyTKR::Model::Specialty : isa(Game::EvonyTKR::Shared::Constants)
         @buffs = @{ $ol->{buffs} };
       }
       foreach my $ob (@buffs) {
-        my $b = Game::EvonyTKR::Model::Buff->from_hash($ob, $logger);
+        my $b = Game::EvonyTKR::Model::Buff->from_hash($ob);
         $s->addBuff($level, $b);
       }
       $logger->DEBUG(sprintf(

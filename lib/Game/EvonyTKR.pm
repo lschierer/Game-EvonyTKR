@@ -53,15 +53,15 @@ package Game::EvonyTKR {
 
     # Logging setup
     my $logger = Game::EvonyTKR::Shared::Logger::get_logger('Game::EvonyTKR');
-    $self->log( MojoX::Log::Fast->new($logger));
+    $self->log(MojoX::Log::Fast->new($logger));
 
-    $self->helper(get_logger => sub ($self, $caller) {
-      return Game::EvonyTKR::Shared::Logger::get_logger($caller);
-    });
+    $self->helper(
+      get_logger => sub ($self, $caller) {
+        return Game::EvonyTKR::Shared::Logger::get_logger($caller);
+      }
+    );
 
-    $self->log->info(sprintf(
-    'Mojolicious Logging initialized',
-    ));
+    $self->log->info(sprintf('Mojolicious Logging initialized',));
     my $RootManager =
       Game::EvonyTKR::Model::EvonyTKR::Manager->new(SourceDir => $distDir,);
 
@@ -114,6 +114,11 @@ package Game::EvonyTKR {
     # Minion worker
     $self->plugin('Game::EvonyTKR::External::Buff::Worker');
 
+    #I need the admin dashboard to debug, but its a risk in production
+    if ($self->mode eq 'development') {
+      $self->plugin('Minion::Admin');
+    }
+
     $self->plugin('Game::EvonyTKR::External::Prebuild');
     # Markdown
     $self->plugin('Game::EvonyTKR::Plugins::Markdown');
@@ -129,7 +134,7 @@ package Game::EvonyTKR {
 
     # Last the Static Pages
     # Register last for lowest priority
-    #$self->plugin('Game::EvonyTKR::Plugins::StaticPages');
+    $self->plugin('Game::EvonyTKR::Plugins::StaticPages');
 
     # configure to tell it that I will be behind an ELB/ALB.
     #$self->reverse_proxy(1);

@@ -246,8 +246,10 @@ class Game::EvonyTKR::Model::AscendingAttributes :
     unless (exists $object->{ascending}
       && ref($object->{ascending}) eq 'ARRAY') {
       $logger->ERR(sprintf(
-      'object has unexpected format for an '. 'Ascending Attribute. Object is "%s"',
-        Data::Printer::np($object, multiline => 0)));
+        'object has unexpected format for an '
+          . 'Ascending Attribute. Object is "%s"',
+        Data::Printer::np($object, multiline => 0)
+      ));
       return;
     }
     my $an = $object->{general};

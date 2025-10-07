@@ -231,10 +231,8 @@ class Game::EvonyTKR::Model::Covenant : isa(Game::EvonyTKR::Shared::Constants) {
     my $name = $object->{name};
     unless (Scalar::Util::blessed($primary) eq 'Game::EvonyTKR::Model::General')
     {
-      $logger->ERR(
-      "primary general must be of type ".
-      "Game::EvonyTKR::Model::General for covenant $name"
-      );
+      $logger->ERR("primary general must be of type "
+          . "Game::EvonyTKR::Model::General for covenant $name");
       return;
     }
     $logger->DEBUG("found primary general for $name, starting import.");
@@ -265,7 +263,7 @@ class Game::EvonyTKR::Model::Covenant : isa(Game::EvonyTKR::Shared::Constants) {
         @buffs = @{ $oc->{buffs} };
       }
       foreach my $ob (@buffs) {
-        my $b = Game::EvonyTKR::Model::Buff->from_hash($ob, $logger);
+        my $b = Game::EvonyTKR::Model::Buff->from_hash($ob);
         $o->addBuff($category, $b);
       }
     }

@@ -122,8 +122,7 @@ package Game::EvonyTKR::Controller::Generals {
                 return;
               }
               unless ($app) {
-                $logger->ERR(
-                  "app is not defined when processing $generalFile");
+                $logger->ERR("app is not defined when processing $generalFile");
                 return;
               }
               $logger->DEBUG("processing $generalFile");
@@ -133,7 +132,8 @@ package Game::EvonyTKR::Controller::Generals {
                   schema       => [qw/ + Perl /],
                   yaml_version => ['1.2', '1.1'],
                 )->load_string($data);
-                my $g = Game::EvonyTKR::Model::General->from_hash($ho, $app->log);
+                my $g =
+                  Game::EvonyTKR::Model::General->from_hash($ho, $app->log);
                 unless ($g) {
                   $logger->ERR(sprintf(
                     'failed to build general from %s', $generalFile));
@@ -293,7 +293,7 @@ package Game::EvonyTKR::Controller::Generals {
 
   sub _build_general_routes($self, $general, $app, $controller_name,
     $referenceRoutes) {
-    my $name   = $general->name;
+    my $name = $general->name;
 
     $logger->DEBUG("building Reference Routes for $name");
 
@@ -863,7 +863,8 @@ package Game::EvonyTKR::Controller::Generals {
           $c->app->log->debug("sub process for index $start to $end");
           for my $i ($start .. $end) {
             my $general = $rows->[$i];
-            $c->app->log->debug(sprintf('processing general %s', $general->name,));
+            $c->app->log->debug(
+              sprintf('processing general %s', $general->name,));
             my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
               general => $general,
               books   =>

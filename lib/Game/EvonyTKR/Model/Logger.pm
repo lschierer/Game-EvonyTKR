@@ -6,9 +6,9 @@ use namespace::autoclean;
 class Game::EvonyTKR::Model::Logger {
   #PODNAME: Game::EvonyTKR::Model::Logger
   use Carp;
-  use Scalar::Util  qw(blessed);
-  use JSON::PP      ();
-  use Env           qw(DEV_MODE PERL_ENV MOJO_MODE);
+  use Scalar::Util qw(blessed);
+  use JSON::PP     ();
+  use Env          qw(DEV_MODE PERL_ENV MOJO_MODE);
   use Game::EvonyTKR::Shared::Logger;
   our $VERSION = 'v0.31.0';
 
@@ -19,14 +19,11 @@ class Game::EvonyTKR::Model::Logger {
 
   field $logger : reader;                   # readonly accessor -> $obj->logger
 
-  field $_debug : reader = 0;
-
   ADJUST {
     # decide dev-ness; prefer DEV_MODE, else PERL_ENV/MOJO_MODE
-    my $v = $DEV_MODE // $PERL_ENV // $MOJO_MODE // '';
-    $_debug = ($v && $v !~ /^(?:0|false|prod(?:uction)?)$/i) ? 1 : 0;
     $logger = Game::EvonyTKR::Shared::Logger::get_logger(__CLASS__);
-    $logger->DEBUG('logging module debug set to ' . $_debug ? 'true' : 'false');
+    $logger->DEBUG(
+      sprintf('logging set to "%s" for "%s"', $logger->level(), __CLASS__));
   }
 
   method trace { $self->logger->DEBUG(@_) }
@@ -52,14 +49,14 @@ class Game::EvonyTKR::Model::Logger {
 
   method dev_guard ($msg, $level = 'WARN') {
     if ($self->_debug) { $self->logger->ERR($msg), croak($msg) }
-    else               { $self->logger->ERR( $msg) }
+    else               { $self->logger->ERR($msg) }
     return;
   }
 
   # ----- Optional helpers for DDP / JSON -----
 
   method to_hash {
-    return {  };
+    return {};
   }
 
   method TO_JSON {

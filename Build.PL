@@ -51,6 +51,7 @@ my $builder = Module::Build->new(
     'List::AllUtils'                      => '0',
     'List::MoreUtils'                     => '0',
     'List::Util'                          => '0',
+    'List::UtilsBy'                       => '0',
     'Log::Fast'                           => '0',
     'Math::Round'                         => '0',
     'Minion::Backend::SQLite'             => '0',
@@ -100,7 +101,7 @@ my $builder = Module::Build->new(
     'overload'                            => '0',
   },
   recommends => {
-
+    'Mojolicious::Plugin::Minion::Admin' => '0',
   },
   configure_requires => {
     'Module::Build' => '0.42'
