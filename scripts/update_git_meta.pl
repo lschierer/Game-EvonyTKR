@@ -11,7 +11,7 @@ require Path::Tiny;
 use GitRepo::Reader;
 require YAML::PP;
 use DateTime;
-use Log::Log4perl;
+require Game::EvonyTKR::Shared::Logger;
 require Data::Printer;
 
 # Setup logging
