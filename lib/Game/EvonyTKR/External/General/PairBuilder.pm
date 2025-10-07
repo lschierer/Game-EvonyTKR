@@ -70,6 +70,15 @@ class Game::EvonyTKR::External::General::PairBuilder :
       },
       build_pairs_for_primary => sub ($job, $args) {
         my $logger = Game::EvonyTKR::Shared::Logger::get_logger(__PACKAGE__);
+        # about 5 minutes
+        my $limit_length = 300;
+        unless(my $taskLimit = $job->minion->guard('build_pairs_for_primary', $limit_length, {
+        limit => 3 })) {
+          $logger->info('Concurrency limit hit for build_pairs_for_primary');
+          # delay a random amount up to the limit length to allow for jobs not taking the full time
+          return $job->retry({ delay => rand($limit_length) });
+        }
+
         my $general_name = $args->{general_name};
         unless (length($general_name)) {
           $logger->ERR('general_name not provided to build_pairs_for_primary');
