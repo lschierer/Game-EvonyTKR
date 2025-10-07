@@ -6,16 +6,13 @@ require Data::Printer;
 require HTTP::Tiny;
 require HTML::LinkExtor;
 require URI;
+require Game::EvonyTKR::Shared::Logger;
 
 class LinkChecker::Command {
   use List::AllUtils qw( any none );
-  use Log::Log4perl  qw(:easy);
-  use Log::Log4perl::Config;
-  use Log::Log4perl qw(:levels);
   use namespace::autoclean;
   use Carp;
   our $VERSION = 'v0.30.0';
-  Log::Log4perl::Config->utf8(1);
 
   field $debug : param //= 0;
 
@@ -32,14 +29,7 @@ class LinkChecker::Command {
   }
 
   ADJUST {
-    if ($debug) {
-      Log::Log4perl->easy_init($DEBUG);
-    }
-    else {
-      Log::Log4perl->easy_init($WARN);
-    }
-
-    $logger = Log::Log4perl->get_logger(__CLASS__);
+    $logger = Game::EvonyTKR::Shared::Logger::get_logger(__CLASS__);
   }
 
   method execute {

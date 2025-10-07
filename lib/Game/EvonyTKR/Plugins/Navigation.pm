@@ -8,7 +8,6 @@ use namespace::clean;
 package Game::EvonyTKR::Plugins::Navigation {
   use Mojo::Base 'Mojolicious::Plugin';
   use Carp;
-  require Log::Log4perl;
 
   my $logger;
   my %nav_items_by_path;

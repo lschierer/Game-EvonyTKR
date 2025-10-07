@@ -5,7 +5,6 @@ use File::FindLib 'lib';
 require Data::Printer;
 require File::Share;
 require JSON::PP;
-require Log::Log4perl;
 require MIME::Base64;
 require Path::Tiny;
 require Game::EvonyTKR;
@@ -20,7 +19,7 @@ package Game::EvonyTKR::External::Conflicts::Worker {
   my $logger;
 
   sub register ($self, $app, $conf = {}) {
-    $logger = Log::Log4perl->get_logger(__PACKAGE__);
+    $logger = Game::EvonyTKR::Shared::Logger::get_logger(__PACKAGE__);
     $app->minion->add_task(
       detect_conflicts_for_general => sub ($job, $args) {
         my $limit = $app->mode eq 'dev' ? 9 : 5;
@@ -127,7 +126,7 @@ package Game::EvonyTKR::External::Conflicts::Worker {
     my $loop;
     $loop = Mojo::IOLoop->recurring(
       10 => sub {
-        $logger = Log::Log4perl->get_logger(__PACKAGE__);
+        $logger = Game::EvonyTKR::Shared::Logger::get_logger(__PACKAGE__);
         eval {
           my $total = $app->minion->jobs({
             tasks => ['detect_conflicts_for_general'],
@@ -289,7 +288,6 @@ package Game::EvonyTKR::External::Conflicts::Worker {
   }
 
   class ConflictWorkerLogic : isa(Game::EvonyTKR::Shared::Constants) {
-    use Log::Log4perl qw(:levels);
     use Unicode::Normalize;
     use Unicode::CaseFold qw(fc);
     use Encode            qw(is_utf8 decode_utf8 encode_utf8);

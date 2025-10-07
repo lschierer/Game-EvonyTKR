@@ -5,7 +5,6 @@ use File::FindLib 'lib';
 require Data::Printer;
 require File::Share;
 require JSON::PP;
-require Log::Log4perl;
 require MIME::Base64;
 require Path::Tiny;
 require YAML::PP;
@@ -63,7 +62,6 @@ package Game::EvonyTKR::External::Buff::Worker {
 
   class WorkerLogic : isa(Game::EvonyTKR::Shared::Constants) {
     use Hash::Util    qw(lock_hash lock_hash_recurse lock_value);
-    use Log::Log4perl qw(:levels);
     use Unicode::Normalize;
     use Unicode::CaseFold qw(fc);
     use Encode            qw(is_utf8 decode_utf8 encode_utf8);
@@ -194,7 +192,7 @@ package Game::EvonyTKR::External::Buff::Worker {
 
     ADJUST {
 
-      $logger = Log::Log4perl->get_logger(__CLASS__);
+      $logger = Game::EvonyTKR::Shared::Logger::get_logger(__CLASS__);
 
       lock_hash_recurse(%$BestSkillBooks);
       my $distdir = File::Share::dist_dir('Game::EvonyTKR');

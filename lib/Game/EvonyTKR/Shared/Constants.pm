@@ -6,7 +6,6 @@ require Data::Printer;
 require JSON::PP;
 require X500::DN;
 require X500::RDN;
-require Log::Log4perl::Config;
 
 class Game::EvonyTKR::Shared::Constants : isa(Game::EvonyTKR::Model::Logger) {
   # PODNAME: Game::EvonyTKR::Shared::Constants

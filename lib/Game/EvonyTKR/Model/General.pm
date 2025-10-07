@@ -6,7 +6,6 @@ require Data::Printer;
 require Game::EvonyTKR::Model::BasicAttributes;
 require JSON::PP;
 require Mojo::JSON;
-require Log::Log4perl;
 
 class Game::EvonyTKR::Model::General : isa(Game::EvonyTKR::Shared::Constants) {
 # PODNAME: Game::EvonyTKR::Model::General
@@ -48,7 +47,8 @@ class Game::EvonyTKR::Model::General : isa(Game::EvonyTKR::Shared::Constants) {
   ADJUST {
     my @errors;
     unless ($self->can('_isTrue') && $self->_isTrue()) {
-      Log::Log4perl->logcroak("unexpected value: " . blessed($self));
+      $self->logger->ERR(sprintf('unexpected value: %s', blessed($self)));
+      croak(sprintf('unexpected value: %s', blessed($self));
     }
     if (not defined $type) {
       push @errors,

@@ -185,7 +185,6 @@ package Game::EvonyTKR::Controller::Covenants {
   }
 
   sub index($self) {
-    my $app->log = Log::Log4perl->get_app->log(__PACKAGE__);
     my $collection = collection_name();
     $logger->DEBUG("Rendering index for $collection");
 
@@ -222,7 +221,6 @@ package Game::EvonyTKR::Controller::Covenants {
   }
 
   sub show ($self) {
-    my $app->log = Log::Log4perl->get_app->log(ref($self));
     $logger->DEBUG("start of show method");
     my $name;
     $name = $self->param('name');

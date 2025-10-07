@@ -5,7 +5,6 @@ use File::FindLib 'lib';
 require Data::Printer;
 require File::Share;
 require JSON::PP;
-require Log::Log4perl;
 require MIME::Base64;
 require Path::Tiny;
 require Game::EvonyTKR;

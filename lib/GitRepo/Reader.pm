@@ -2,6 +2,7 @@ use experimental qw(class);
 use utf8::all;
 use File::FindLib 'lib';
 require Data::Printer;
+require Game::EvonyTKR::Shared::Logger;
 
 class GitRepo::Reader {
   our $VERSION = '0.00.1';
@@ -15,11 +16,10 @@ class GitRepo::Reader {
   use List::Util     qw(uniq);
   use List::AllUtils qw( uniqstr );
   use HTML::Entities qw(encode_entities);
-  require Log::Log4perl;
 
   field $source_dir : param : reader //= './';
   field $git_repo   : reader;
-  field $logger     : reader = Log::Log4perl->get_logger(__PACKAGE__);
+  field $logger     : reader = Game::EvonyTKR::Shared::Logger::get_logger(__PACKAGE__);
 
   field $oldest  = 0;
   field $authors = {};

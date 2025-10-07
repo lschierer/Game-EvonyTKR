@@ -33,7 +33,7 @@ class Game::EvonyTKR::Model::Logger {
   method error { $self->logger->ERR(@_) }
   method fatal { $self->logger->ERR(@_) }
 
-  # Normalize $level to a Log::Log4perl constant if a string is given
+  # Normalize $level to a constant if a string is given
   method _norm_level ($level) {
     return $level if defined $level && $level =~ /^\d+$/;   # already a constant
     my %by_name = (

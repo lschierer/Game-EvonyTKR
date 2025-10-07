@@ -241,7 +241,7 @@ class Game::EvonyTKR::Model::AscendingAttributes :
 
   sub from_hash($self, $object, $logger = undef) {
     unless (defined($logger)) {
-      $logger = Log::Log4perl->get_logger(Scalar::Util::blessed($self));
+      $logger = Game::EvonyTKR::Shared::Logger::get_logger(__PACKAGE__);
     }
     unless (exists $object->{ascending}
       && ref($object->{ascending}) eq 'ARRAY') {
