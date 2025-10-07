@@ -19,7 +19,7 @@ my $logger = Game::EvonyTKR::Shared::Logger::get_logger(__PACKAGE__);
 
 # 1. Read git metadata
 my $distDir = Path::Tiny::path(dist_dir('Game::EvonyTKR'));
-$logger->info("distDir is $distDir");
+$logger->INFO("distDir is $distDir");
 my $reader = GitRepo::Reader->new(source_dir => $distDir->parent());
 
 my $oldest_dt = $reader->find_copyright_range();
@@ -37,19 +37,19 @@ else {
 }
 
 my $authors = $reader->find_authors();
-$logger->info("Found authors " . Data::Printer::np($authors));
+$logger->INFO("Found authors " . Data::Printer::np($authors));
 
 # 2. Load config file
 my $yaml        = YAML::PP->new;
 my $config_path = $distDir->parent()->child('game-evony_t_k_r.yml');
 
-$logger->info("Reading config from $config_path");
+$logger->INFO("Reading config from $config_path");
 my $config_data = {};
 if ($config_path->is_file) {
   $config_data = $yaml->load_string($config_path->slurp_utf8);
 }
 else {
-  $logger->error("config file $config_path is not found.");
+  $logger->ERR("config file $config_path is not found.");
 }
 
 # 3. Inject metadata
@@ -59,7 +59,7 @@ $config_data->{git_meta} = {
 };
 
 # 4. Write back
-$logger->info("Updating git_meta section with year '$year_range' and authors");
+$logger->INFO("Updating git_meta section with year '$year_range' and authors");
 $config_path->spew_utf8($yaml->dump_string($config_data));
 
-$logger->info("Config updated.");
+$logger->INFO("Config updated.");
