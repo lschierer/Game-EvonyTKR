@@ -72,7 +72,7 @@ package Game::EvonyTKR::Controller::Pairs {
     my $mainRoutes = $app->routes->any($base);
 
     $app->plugins->on(pairs_complete    => \&pair_receiver);
-    $app->plugins->on(pairs_in_progress => \&pair_receiver);
+    $app->plugins->on(pairs_by_type => \&pair_receiver);
 
     $app->plugins->on(
       general_routing_available => sub {
@@ -150,6 +150,8 @@ package Game::EvonyTKR::Controller::Pairs {
               secondary => $secondary,
             );
             push @{ $pairs_by_type->{$type} }, $pair;
+          } else {
+            $logger->WARN('missing generals for pair: ' . Data::Printer::np($p, multiline => 0));
           }
         }
       }

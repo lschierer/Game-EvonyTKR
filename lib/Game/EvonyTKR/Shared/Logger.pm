@@ -40,7 +40,7 @@ package Game::EvonyTKR::Shared::Logger {
     'Game::EvonyTKR::Shared::Logger'                  => 'WARN',
     'Game::EvonyTKR::Converter'                       => 'WARN',
     'Game::EvonyTKR::Controller::SkillBooks'          => 'WARN',
-    'Game::EvonyTKR::Controller::Pairs'               => 'WARN',
+    'Game::EvonyTKR::Controller::Pairs'               => 'DEBUG',
     'Game::EvonyTKR::Controller::Covenants'           => 'WARN',
     'Game::EvonyTKR::Controller::Generals'            => 'WARN',
     'Game::EvonyTKR::Controller::ConflictGroups'      => 'WARN',

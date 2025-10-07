@@ -60,10 +60,42 @@ package Game::EvonyTKR::External::Prebuild {
         $OnlyOnePrebuild = 1;
 
         if (my $guard = $app->minion->guard('external_prebuild', 0)) {
-          $self->startPrebuild($app);
+          my $prebuildJid = $self->startPrebuild($app);
+          $self->monitorPrebuild($app, $prebuildJid);
         }
       }
     });
+  }
+
+  sub monitorPrebuild ($plugin, $app, $prebuildJid) {
+    my $loop;
+    my $retryCount = 0;
+    my $maxRetries = 5;
+    $loop = Mojo::IOLoop->recurring( 10 => sub {
+      my $job = $app->minion->job($prebuildJid);
+      unless($job){
+        $logger->ERR("prebuildJid $prebuildJid is not associated with a valid job.");
+        $retryCount++;
+        if($retryCount >= $maxRetries){
+          Mojo::IOLoop->remove($loop);
+        }
+        return;
+      }
+      my $notes = $job->info->{notes} // {};
+      my $pairs_by_type = $app->get_general_pairs();
+      foreach my $key (keys $notes->%*){
+        if($key eq 'pairs_by_type'){
+          $pairs_by_type = $notes->{$key};
+          $logger->DEBUG('detected pairs_by_type update: ' . Data::Printer::np($pairs_by_type, multiline => 0));
+          $app->plugins->emit(pairs_by_type => $pairs_by_type);
+        }
+      }
+      if($job->info->{state} eq 'finished'){
+        $app->plugins->emit(pairs_complete => $pairs_by_type);
+        Mojo::IOLoop->remove($loop);
+      }
+    });
+    Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
   }
 
   sub startPrebuild ($self, $app) {
@@ -83,7 +115,7 @@ package Game::EvonyTKR::External::Prebuild {
         }
       );
     }
-
+    return $prebuildJid;
   }
 
   sub run ($self, @args) {
