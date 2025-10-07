@@ -74,7 +74,7 @@ class Game::EvonyTKR::External::General::PairBuilder :
         my $limit_length = 300;
         unless(my $taskLimit = $job->minion->guard('build_pairs_for_primary', $limit_length, {
         limit => 3 })) {
-          $logger->info('Concurrency limit hit for build_pairs_for_primary');
+          $logger->INFO('Concurrency limit hit for build_pairs_for_primary');
           # delay a random amount up to the limit length to allow for jobs not taking the full time
           return $job->retry({ delay => rand($limit_length) });
         }
