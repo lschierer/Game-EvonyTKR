@@ -58,7 +58,7 @@ package Game::EvonyTKR::Shared::Logger {
     'Game::EvonyTKR::Model::Glossary'                 => 'WARN',
     'Game::EvonyTKR::Model::Data'                     => 'WARN',
     'Game::EvonyTKR::Model::General'                  => 'WARN',
-    'Game::EvonyTKR::External::General::PairBuilder'  => 'DEBUG',
+    'Game::EvonyTKR::External::General::PairBuilder'  => 'INFO',
     'Game::EvonyTKR::External::Prebuild'              => 'DEBUG',
     'PairBuilderLogic'                                => 'WARN',
     'ConflictWorkerLogic'                             => 'WARN',

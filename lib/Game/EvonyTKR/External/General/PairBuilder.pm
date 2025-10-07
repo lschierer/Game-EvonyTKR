@@ -34,7 +34,7 @@ class Game::EvonyTKR::External::General::PairBuilder :
     allow_wall_buffs => 1,
     );
 
-  field $pairs_by_type : reader = {};
+  field $pairs_by_type : param : reader = {};
 
   method get_tasks {
     return {
@@ -60,12 +60,14 @@ class Game::EvonyTKR::External::General::PairBuilder :
           });
           push @$builderJobs, $child;
         }
-        return $builderJobs;
+        $job->note(builderJobs => $builderJobs);
+        return $job->finish('all builder jobs started');
       },
       build_pairs_for_primary => sub ($job, $args) {
+        my $logger = Game::EvonyTKR::Shared::Logger::get_logger(__PACKAGE__);
         my $general_name = $args->{general_name};
         unless (length($general_name)) {
-          $self->logger->ERR(
+          $logger->ERR(
             'general_name not provided to build_pairs_for_primary');
           return $job->finish(
             'general_name not provided to build_pairs_for_primary');
@@ -76,18 +78,27 @@ class Game::EvonyTKR::External::General::PairBuilder :
           )
           unless my $bppGuard =
           $app->minion->guard("build_pairs_for_primary_${general_name}", 360);
-        return $self->build_pairs_for_primary($job, $general_name);
+        my $pb = Game::EvonyTKR::External::General::PairBuilder->new(
+          app   => $job->app,
+        );
+        $pb->load_generals();
+        return $pb->build_pairs_for_primary($job, $general_name);
       },
       monitor_pair_builders => sub ($job, $args) {
-        my $logger = Game::EvonyTKR::Shared::Logger::get_logger(__PACKAGE__);
-        return $job->finish('monitor_pair_builders already launched')
-          unless $app->minion->guard('monitor_pair_builders', 360);
-        my $pb = $args->{pairBuilder};
-        if (length(Scalar::Util::blessed($pb)) && Scalar::Util::blessed($pb) eq 'Game::EvonyTKR::External::General::PairBuilder') {
+          my $logger = Game::EvonyTKR::Shared::Logger::get_logger(__PACKAGE__);
+
+          # Retrieve existing 'pairs_by_type' state from job notes
+          my $pbt = $job->info->{notes}->{pairs_by_type} // {};
+
+          return $job->finish('monitor_pair_builders already launched')
+            unless $job->app->minion->guard('monitor_pair_builders', 300);
+
+          my $pb = Game::EvonyTKR::External::General::PairBuilder->new(
+            app            => $job->app,
+            pairs_by_type  => $pbt  # Use existing state
+          );
+
           return $pb->monitor_pair_builders($job);
-        }elsif(!length(Scalar::Util::blessed($pb))){
-          $logger->ERR(sprintf('$pb has no value with scalar util blessed.: %s', Data::Printer::np($pb)));
-        }
       },
     };
   }
@@ -111,7 +122,6 @@ class Game::EvonyTKR::External::General::PairBuilder :
     foreach my $index ( 0 .. $#files ){
       my $generalFile = $files[$index];
       $self->logger->DEBUG("processing $generalFile, $index of $expectedTotal");
-      eval {
         my $data = $generalFile->slurp('UTF-8');
         my $ho   = YAML::PP->new(
           schema       => [qw/ + Perl /],
@@ -129,14 +139,17 @@ class Game::EvonyTKR::External::General::PairBuilder :
           my $nf = $self->normalize_name($_->basename('.yaml'));
           my $nn = $self->normalize_name($g->builtInBookName);
           $nf eq $nn;
-        } $bookDir->children;
-        unless (defined($bookFile) && $bookFile->is_file()) {
+        } $bookDir->list_tree->grep(sub {qr/\.y\{a\}?ml$/})->each;
+        unless (defined($bookFile) ) {
           $self->worker_croak(
             sprintf('no yaml file found for "%s"', $g->builtInBookName));
           next;
         }
-        my $bd   = $bookFile->slurp_utf8;
-        my $bho  = $ypp->load_string($bd);
+        my $bd   = $bookFile->slurp('UTF-8');
+        my $bho  = YAML::PP->new(
+          schema       => [qw/ + Perl /],
+          yaml_version => ['1.2', '1.1'],
+        )->load_string($bd);
         my $book = Game::EvonyTKR::Model::Book::Builtin->from_hash($bho);
 
         unless($book && Scalar::Util::blessed($book) eq 'Game::EvonyTKR::Model::Book::Builtin') {
@@ -146,52 +159,55 @@ class Game::EvonyTKR::External::General::PairBuilder :
         $g->set_builtInBook($book);
 
         $generals->{$self->normalize_name($g->name)} = $g;
-
-      }
+        $self->logger->DEBUG(sprintf('imported %s, general %s of %s', $g->name, scalar keys $generals->%*, $expectedTotal));
     }
-  }
-
-  method monitor_pair_building {
-    my $jid = $app->minion->enqueue(
-      monitor_pair_builders => [{ pairBuilder => $self }],
-      {
-        priority => 10,
-        attempts => 5,
-        expire   => 7200,
-      }
-    );
-    return $jid;
+    $self->logger->INFO(sprintf('imported %s of %s generals', scalar keys $generals->%*, $expectedTotal));
   }
 
   method monitor_pair_builders ($monitor_job) {
-
     my $jobs = $app->minion->jobs({ tasks => ['build_pairs_for_primary'] });
-    while (my $info = $jobs->next) {
-      my $pbJid = $info->{id};
-      my $pbJob = $app->minion->jobs($pbJid);
-      unless ($pbJob) {
-        $self->logger->ERR(
-          "pair builder JID $pbJid does not have a valid job associated.");
-        next;
-      }
-      if ($info->{state} eq 'failed') {
+    $self->logger->INFO(sprintf('starting monitor_pair_builders %s for %s jobs', $monitor_job->info->{id}, $jobs->total));
+    my $something_incomplete = 0;
+    my $something_failed = 0;
+    $jobs->each(sub{
+      my $info = $_;
+      $self->logger->DEBUG(sprintf('inspecting job %s', $info->{id}));
+      if($info->{state} eq 'failed'){
         $self->logger->ERR(sprintf(
-          'pair builder JID %s failed with result "%s"',
-          $pbJid, $info->{result}
+          'monitor_pair_builders found pair builder JID %s failed with result "%s"',
+          $info->{id}, $info->{result}
         ));
-        next;
+        $something_failed++;
+        return;
       }
-      if ($info->{state} eq 'finished') {
+      if($info->{state} eq 'finished'){
         $self->logger->DEBUG(sprintf(
-          'pair builder JID %s finished with result "%s"',
-          $pbJid, $info->{result}
+          'monitor_pair_builders found pair builder JID %s finished with result "%s"',
+          $info->{id}, $info->{result}
         ));
-        my $ngp = $info->notes->{pairs_by_type};
+        my $ngp = $info->{notes}->{pairs_by_type};
+        $self->logger->INFO(sprintf('monitor_pair_builders results from jid %s: %s', $info->{id}, Data::Printer::np($ngp)));
         $self->merge_new_pairs($ngp);
-        next;
+        return;
       }
+
       # at least one job is in progress, retry later.
+      # storing the interum results for progressive progress
+       $monitor_job->note(pairs_by_type => $pairs_by_type);
+      $self->logger->DEBUG(sprintf('monitor_pair_builders found job %s is incomplete, triggering retry', $info->{id}));
+      $something_incomplete++;
       return $monitor_job->retry({ delay => 10 });
+    });
+
+    $monitor_job->note(pairs_by_type => $pairs_by_type);
+    if($something_failed){
+      return $monitor_job->finish("monitor_pair_builders found $something_failed jobs failed");
+    }
+    if($something_incomplete){
+      return $monitor_job->retry({
+        delay => 10,
+        result  => "monitor_pair_builders found $something_incomplete jobs incomplete"
+      });
     }
     return $monitor_job->finish('all pair builders complete');
   }
@@ -204,7 +220,7 @@ class Game::EvonyTKR::External::General::PairBuilder :
         push @all, $pairs_by_type->{$type}->@*;
       }
       my @unique =
-        List::UtilsBy::uniq_by { $_->primary->name . '/' . $_->secondary->name }
+        List::UtilsBy::uniq_by { $_->{primary} . '/' . $_->{secondary} }
       @all;
       $pairs_by_type->{$type} = \@unique;
       $self->logger->DEBUG(sprintf(
@@ -215,11 +231,25 @@ class Game::EvonyTKR::External::General::PairBuilder :
   }
 
   method build_all_pairs {
-    $self->load_generals();
-    foreach my $general (sort { $a->name cmp $b->name } values $generals->%*) {
+    my $collectionDir = Mojo::File->new($app->config('distDir'))
+      ->child('collections/data/');
+    my $bookDir       = $collectionDir->child('skill books');
+    my $generalsDir   = $collectionDir->child('generals');
+
+    my @files = $generalsDir->list_tree->grep(sub {qr/\.y\{a\}?ml$/})->each;
+    my $expectedTotal = scalar(@files);
+
+    @files = sort @files;
+
+    foreach my $index ( 0 .. $#files ){
+      my $generalFile = $files[$index];
+      $self->logger->DEBUG("processing $generalFile, $index of $expectedTotal");
+      $generalFile = Mojo::File->new($generalFile);
+      my $general_name = $self->normalize_name($generalFile->basename('.yaml'));
+      $self->logger->DEBUG("Found name $general_name from file $generalFile");
       my $jid = $app->minion->enqueue(
         build_pairs_for_primary => [{
-          general_name => $self->normalize_name($general->name),
+          general_name  => $self->normalize_name($general_name),
         }],
         {
           priority => -1,
@@ -230,7 +260,7 @@ class Game::EvonyTKR::External::General::PairBuilder :
       push @$builderJobs, $jid;
       $self->logger->DEBUG(sprintf(
         'pair builder kicked off for general "%s" with jid %s',
-        $general->name, $jid
+        $general_name, $jid
       ));
     }
     return $builderJobs;
