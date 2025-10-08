@@ -81,10 +81,8 @@ export class UbuntuInstance extends NestedStack {
       'sudo -u mojo -s /bin/bash -l -c /opt/mojo/bin/bootstrap.sh',
     );
     shellCommands.addCommands(
-      'systemctl enable mojolicious',
       'systemctl enable mojolicious-worker',
       'systemctl start mojolicious-worker',
-      'systemctl start mojolicious',
       'systemctl reload nginx',
     );
     (cloud_user_data.runcmd as Array<string>).push(shellCommands.render());
@@ -95,7 +93,7 @@ export class UbuntuInstance extends NestedStack {
     );
 
     const instanceSize = !props.environment.localeCompare('dev')
-      ? ec2.InstanceSize.MEDIUM
+      ? ec2.InstanceSize.LARGE
       : ec2.InstanceSize.LARGE;
 
     const ec2SecGroup = new ec2.SecurityGroup(
@@ -111,10 +109,7 @@ export class UbuntuInstance extends NestedStack {
       userData,
       userDataCausesReplacement: true,
       vpc: props.vpc,
-      instanceType: ec2.InstanceType.of(
-        ec2.InstanceClass.BURSTABLE4_GRAVITON,
-        instanceSize,
-      ),
+      instanceType: ec2.InstanceType.of(ec2.InstanceClass.T4G, instanceSize),
       securityGroup: ec2SecGroup,
       machineImage: this.genericLinuxImage(),
       vpcSubnets: { subnetType: ec2.SubnetType.PUBLIC },
