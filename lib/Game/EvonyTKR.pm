@@ -86,10 +86,10 @@ package Game::EvonyTKR {
     $self->hook(
       before_server_start => sub {
         state $initialized = do {
-          $logger->INFO("⚙️  Running rootImport...");
-          $RootManager->rootImport();
-          $logger->INFO("✅ rootImport completed.");
-          $self->plugins->emit(evonytkrtips_initialized => $RootManager);
+          #$logger->INFO("⚙️  Running rootImport...");
+          #$RootManager->rootImport();
+          #$logger->INFO("✅ rootImport completed.");
+          #$self->plugins->emit(evonytkrtips_initialized => $RootManager);
           1;
         };
       }
@@ -138,7 +138,9 @@ package Game::EvonyTKR {
     # configure to tell it that I will be behind an ELB/ALB.
     #$self->reverse_proxy(1);
     Mojo::IOLoop->next_tick(sub ($ioloop) {
-      $self->plugins->emit(worker_started => { app => $self });
+      if(Scalar::Util::blessed($self) eq 'Game::EvonyTKR') {
+        $self->plugins->emit(mojo_worker_started => { app => $self });
+      }
     });
   }
 };

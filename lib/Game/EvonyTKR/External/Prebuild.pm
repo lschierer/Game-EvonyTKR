@@ -54,7 +54,7 @@ package Game::EvonyTKR::External::Prebuild {
     }
 
     $app->plugins->on(
-      worker_started => sub {
+      mojo_worker_started => sub {
         if (!$OnlyOnePrebuild) {
           $OnlyOnePrebuild = 1;
 
