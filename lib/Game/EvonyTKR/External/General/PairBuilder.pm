@@ -217,7 +217,7 @@ class Game::EvonyTKR::External::General::PairBuilder :
         my $ngp = $info->{notes}->{pairs_by_type};
         $self->logger->INFO(sprintf(
           'monitor_pair_builders results from jid %s: %s',
-          $info->{id}, Data::Printer::np($ngp)
+          $info->{id}, Data::Printer::np($ngp, multiline => 0)
         ));
         $self->merge_new_pairs($ngp);
         return;

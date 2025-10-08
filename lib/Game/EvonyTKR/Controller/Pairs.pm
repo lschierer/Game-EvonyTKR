@@ -121,7 +121,7 @@ package Game::EvonyTKR::Controller::Pairs {
   sub pair_receiver {
     my $something = shift;
     my $pairs     = shift;
-    $logger->DEBUG('pair_receiver called: ' . Data::Printer::np($pairs));
+    $logger->DEBUG('pair_receiver called: ' . Data::Printer::np($pairs, multiline => 0));
     my $pairs_by_type = __PACKAGE__->getPairs();
     my $gm            = __PACKAGE__->get_manager();
     unless (ref($pairs) eq 'HASH') {
@@ -179,7 +179,7 @@ package Game::EvonyTKR::Controller::Pairs {
         $logger->DEBUG("Known valid routes:");
         $routing->each_valid_route(
           sub ($key, $meta) {
-            $logger->DEBUG("  $key => " . Data::Printer::np($meta));
+            $logger->DEBUG("  $key => " . Data::Printer::np($meta, multiline => 0));
           }
         );
       }
@@ -308,7 +308,7 @@ package Game::EvonyTKR::Controller::Pairs {
         $logger->DEBUG("Known valid routes:");
         $routing->each_valid_route(
           sub ($key, $meta) {
-            $logger->DEBUG("  $key => " . Data::Printer::np($meta));
+            $logger->DEBUG("  $key => " . Data::Printer::np($meta, multiline => 0));
           }
         );
       }
@@ -371,7 +371,7 @@ package Game::EvonyTKR::Controller::Pairs {
     else {
       $logger->DEBUG(
         "no requested primaries for session '$session_id' returning full list: "
-          . Data::Printer::np(@json_data));
+          . Data::Printer::np(@json_data, multiline => 0));
       $session_store->{$session_id} = \@json_data;
 
       return $self->render(
@@ -427,7 +427,7 @@ package Game::EvonyTKR::Controller::Pairs {
         $logger->DEBUG("Known valid routes:");
         $routing->each_valid_route(
           sub ($key, $meta) {
-            $logger->DEBUG("  $key => " . Data::Printer::np($meta));
+            $logger->DEBUG("  $key => " . Data::Printer::np($meta, multiline => 0));
           }
         );
       }
@@ -552,7 +552,7 @@ package Game::EvonyTKR::Controller::Pairs {
         return if !$c->tx || $c->tx->is_finished;
         my $result = shift;
         if (defined($result) && ref($result) eq 'HASH') {
-          $logger->DEBUG("job $jid result is " . Data::Printer::np($result));
+          $logger->DEBUG("job $jid result is " . Data::Printer::np($result, multiline => 0));
           if ($result->{result}->{status} eq 'complete') {
             $c->write_sse(
               { type => 'pair', text => $result->{result}->{result} });
