@@ -45,7 +45,7 @@ package Game::EvonyTKR::Shared::Logger {
     'Game::EvonyTKR::Controller::Generals'            => 'DEBUG',
     'Game::EvonyTKR::Controller::ConflictGroups'      => 'WARN',
     'Game::EvonyTKR::Controller::AscendingAttributes' => 'INFO',
-    'Game::EvonyTKR::Controller::Specialties'         => 'WARN',
+    'Game::EvonyTKR::Controller::Specialties'         => 'DEBUG',
     'Game::EvonyTKR::Controller::ControllerBase'      => 'WARN',
     'Game::EvonyTKR::Controller::Glossary'            => 'WARN',
     'Game::EvonyTKR::External::Conflicts::Worker'     => 'WARN',

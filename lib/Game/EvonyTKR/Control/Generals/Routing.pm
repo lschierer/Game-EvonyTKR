@@ -5,9 +5,7 @@ use File::FindLib 'lib';
 require Data::Printer;
 require Path::Tiny;
 require Game::EvonyTKR::Model::General;
-require Game::EvonyTKR::Model::General::Manager;
 require Game::EvonyTKR::Model::General::Pair;
-require Game::EvonyTKR::Model::General::Pair::Manager;
 use namespace::clean;
 
 class Game::EvonyTKR::Control::Generals::Routing :

@@ -7,9 +7,7 @@ require YAML::PP;
 require Mojo::Promise;
 require List::Util;
 require Game::EvonyTKR::Model::General;
-require Game::EvonyTKR::Model::General::Manager;
 require Game::EvonyTKR::Model::General::Pair;
-require Game::EvonyTKR::Model::General::Pair::Manager;
 require Game::EvonyTKR::Model::Buff::Summarizer;
 require Game::EvonyTKR::Control::Generals::Routing;
 require Game::EvonyTKR::Model::Data;
@@ -45,15 +43,9 @@ package Game::EvonyTKR::Controller::Pairs {
     return $base;
   }
 
-  my $gm;
-
-  sub get_manager {
-    return $gm;
-  }
-
   sub getPairs {
-    state $pairs_by_type = {};
-    return $pairs_by_type;
+    state %pairs_by_type;
+    return \%pairs_by_type;
   }
 
   sub register($c, $app, $config = {}) {

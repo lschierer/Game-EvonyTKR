@@ -2,7 +2,7 @@ use v5.42.0;
 use experimental qw(class);
 use utf8::all;
 use File::FindLib 'lib';
-require Game::EvonyTKR::Model::Specialty::Manager;
+require Game::EvonyTKR::Model::Specialty;
 use namespace::clean;
 
 package Game::EvonyTKR::Controller::Specialties {
@@ -27,10 +27,15 @@ package Game::EvonyTKR::Controller::Specialties {
     return "Specialties";
   }
 
-  sub register($self, $app, $config = {}) {
+  sub get_all_specialties {
+    state %specialties;
+    return \%specialties;
+  }
+
+  sub register($c, $app, $config = {}) {
     $logger = $app->get_logger(__PACKAGE__);
-    $logger->INFO("Registering routes for " . ref($self));
-    $self->SUPER::register($app, $config);
+    $logger->INFO("Registering routes for " . ref($c));
+    $c->SUPER::register($app, $config);
 
     $app->add_navigation_item({
       title  => 'Details of General Specialties',
@@ -39,79 +44,47 @@ package Game::EvonyTKR::Controller::Specialties {
       order  => 40,
     });
 
-    my @parts     = split(/::/, ref($self));
+    my @parts     = split(/::/, ref($c));
     my $baseClass = pop(@parts);
 
     my $controller_name =
-        $self->can('controller_name')
-      ? $self->controller_name()
+        $c->can('controller_name')
+      ? $c->controller_name()
       : $baseClass;
 
     $logger->DEBUG("got controller_name $controller_name.");
 
     my $mainRoutes = $app->routes->any($base);
 
+
     $mainRoutes->get('/')
       ->to(controller => $controller_name, action => 'index')
       ->name("${base}_index");
 
     $app->plugins->on(
-      'evonytkrtips_initialized' => sub($self, $manager) {
+      'mojo_worker_started' => sub($self, $manager) {
         $logger->DEBUG(
-          "evonytkrtips_initialized sub has controller_name $controller_name.");
+          "mojo_worker_started sub has controller_name $controller_name.");
+        $c->load_specialities($app);
 
-        if (not defined $manager) {
-          $logger->ERR('No Manager Defined');
-          return;
-        }
-
-        foreach
-          my $specialty (@{ $manager->specialtyManager->get_all_specialties() })
-        {
-          my $name = $specialty->name;
-
-          my $clean_name = $name;
-          $clean_name =~ s{^/}{};
-
-          $mainRoutes->get($clean_name => { name => $clean_name })
-            ->to(controller => $controller_name, action => 'show')
-            ->name("${base}_show");
-
-          $app->add_navigation_item({
-            title  => "Details for $name",
-            path   => "$base/$name",
-            parent => "$base",
-            order  => 40,
-          });
-
-          $logger->DEBUG(
-"added route and nav item for name '$name' cleaned to '$clean_name' with path '$base/$name'"
-          );
-        }
-      }
-    );
-
-    my $distDir    = Mojo::File::Share::dist_dir('Game::EvonyTKR');
-    my $collection = $self->collection_name;
-    my $SourceDir  = $distDir->child("collections/$collection");
-
-    $logger->INFO(
-      "Successfully loaded Specialty manager with collection from $SourceDir");
+        $app->plugins->on(specialties_imported => sub ($self, $args){
+          $c->build_routes($app, $mainRoutes, $controller_name);
+        });
+      });
 
     $app->helper(
-      get_specialty_manager => sub {
-        my $self = shift;
-        return $self->app->get_root_manager->specialtyManager;
+      get_all_specialties => sub {
+        return $c->get_all_specialties;
       }
     );
 
     $app->helper(
-      specialty_level_names => sub ($c, $level = '', $printable = 0) {
+      specialty_level_names => sub ($self, $level = '', $printable = 0) {
         $level //= '';    # Ensure defined
         if (length($level) == 0) {
           my $nameList = [];
           foreach
-            my $orig_name ($c->app->get_root_manager->SpecialtyLevelValues->@*)
+            my $orig_name ($c->SUPER::getConstants->SpecialtyLevelValues->@*)
           {
             $logger->DEBUG(
               "specialty_level_names evaluating specialty level name $orig_name"
@@ -131,17 +104,94 @@ package Game::EvonyTKR::Controller::Specialties {
           $logger->DEBUG(
             "specialty_level_names sees levels"
               . Data::Printer::np(
-              $c->app->get_root_manager->SpecialtyLevelValues->@*
+              $c->SUPER::getConstants->SpecialtyLevelValues->@*
               )
           );
           my $match = first { $level =~ /$_/i }
-            $c->app->get_root_manager->SpecialtyLevelValues->@*;
+            $c->SUPER::getConstants->SpecialtyLevelValues->@*;
           $match =~ s/(\w)(\w*)/\U$1\L$2/;
           return $match;
         }
       }
     );
 
+  }
+
+  sub build_routes ($c, $app, $mainRoutes, $controller_name){
+    foreach my $specialty (values $c->get_all_specialties()->%* ) {
+      my $name = $specialty->name;
+
+      my $clean_name = $name;
+      $clean_name =~ s{^/}{};
+
+      $mainRoutes->get($clean_name => { name => $clean_name })
+        ->to(controller => $controller_name, action => 'show')
+        ->name("${base}_show");
+
+      $app->add_navigation_item({
+        title  => "Details for $name",
+        path   => "$base/$name",
+        parent => "$base",
+        order  => 40,
+      });
+
+      $logger->DEBUG(
+        sprintf('added route and nav item for name "%s" ', $name) .
+        sprintf('cleaned to "%s" with path "%s/%s"', $clean_name, $base, $name)
+      );
+    }
+  }
+
+  sub load_single_specialty($c, $app, $fileName, $index) {
+    # some filenames have UTF-8 characters.
+    # these import oddly unless handled carefully.
+    my $specialtyFile =
+      Mojo::File->new(Encode::decode_utf8($fileName->to_string));
+    $logger->DEBUG("importing Specialty file $specialtyFile ");
+    my $data   = $specialtyFile->slurp('UTF-8');
+    my $hashObject = YAML::PP->new(
+      schema       => [qw/ + Perl /],
+      yaml_version => ['1.2', '1.1'],
+    )->load_string($data);
+    unless(exists $hashObject->{name} && length($hashObject->{name})){
+      $logger->ERR(sprintf('Name is required for a Specialty.  ' . 'Cannot Import %s', $specialtyFile));
+      return;
+    }
+
+    my $s = Game::EvonyTKR::Model::Specialty->from_hash($hashObject);
+    unless($s) {
+      $logger->ERR(sprintf('Failed to import Specialty from %s.', $specialtyFile));
+      return;
+    }
+    $c->get_all_specialties()->{$c->SUPER::getConstants->normalize($s->name)} = $s;
+    $logger->DEBUG(sprintf('successfully imported %s from %s', $s->name, $specialtyFile));
+    $app->plugins->emit(specialty_imported => {specialty => $s});
+  }
+
+  sub load_specialities ($c, $app) {
+    my $expectedTotal = 0;
+
+    $app->plugins->on(specialty_imported => sub($self, $args) {
+      my $specialty = $args->{speciality};
+      my $alls = $c->get_all_specialties();
+      my $count = scalar( keys $alls->%* );
+      if($count >= $expectedTotal){
+        $logger->INFO(sprintf('All %s Specialties imported.', $count));
+        $app->plugins->emit(specialties_imported => {count => $count });
+      }else {
+        $logger->DEBUG(sprintf('imported %s of %s Specialties.', $count, $expectedTotal));
+      }
+    });
+
+    Mojo::File->new($app->config('distDir'))
+    ->child('collections/data/specialties/')->list_tree->grep(sub {qr/\.y\{a\}?ml$/})->each(sub ($e, $index) {
+      $expectedTotal++;
+      my $delay = rand(4.0);
+      Mojo::IOLoop->timer($delay => sub{
+        $c->load_single_specialty($app, $e, $index);
+      });
+    });
+    $logger->INFO(sprintf('Async import of %s specialities started.', $expectedTotal));
   }
 
   sub sort_levels($self, $levels) {
@@ -157,7 +207,8 @@ package Game::EvonyTKR::Controller::Specialties {
     # Return sorted array
     return [
       sort {
-  # Use the defined order if available, otherwise fall back to string comparison
+      # Use the defined order if available,
+      # otherwise fall back to string comparison
         ($level_order{ $a->{level} } // 999)
           <=> ($level_order{ $b->{level} } // 999)
           || $a->{level} cmp $b->{level}
@@ -165,7 +216,7 @@ package Game::EvonyTKR::Controller::Specialties {
     ];
   }
 
-  sub index($self) {
+  sub index($c) {
     my $collection = collection_name();
     $logger->DEBUG("Rendering index for $collection");
 
@@ -173,15 +224,15 @@ package Game::EvonyTKR::Controller::Specialties {
     my $distDir       = Mojo::File::Share::dist_dir('Game::EvonyTKR');
     my $markdown_path = $distDir->child("pages/$collection/index.md");
 
-    my @parts     = split(/::/, ref($self));
+    my @parts     = split(/::/, ref($c));
     my $baseClass = pop(@parts);
-    my $base      = $self->getBase();
+    my $base      = $c->getBase();
     $logger->DEBUG("Specialties index method has base $base");
 
-    my $items = $self->get_specialty_manager()->get_all_specialties();
+    my $items = $c->get_all_specialties();
     $logger->DEBUG(
       sprintf('Items: %s with %s items.', ref($items), scalar(@$items)));
-    $self->stash(
+    $c->stash(
       linkBase        => $base,
       items           => $items,
       collection_name => $collection,
@@ -190,38 +241,38 @@ package Game::EvonyTKR::Controller::Specialties {
 
     if (-f $markdown_path) {
       # Render with markdown
-      $self->stash(template => 'specialties/index');
+      $c->stash(template => 'specialties/index');
 
-      return $self->render_markdown_file($markdown_path,
+      return $c->render_markdown_file($markdown_path,
         { template => 'specialties/index' });
     }
     else {
       # Render just the items
-      return $self->render(template => 'specialties/index');
+      return $c->render(template => 'specialties/index');
     }
   }
 
-  sub show ($self) {
+  sub show ($c) {
     $logger->DEBUG("start of show method");
     my $name;
-    $name = $self->param('name');
+    $name = $c->param('name');
     $logger->DEBUG("show detects name $name, showing details.");
 
     my $specialty =
-      $self->get_root_manager->specialtyManager->getSpecialty($name);
+      $c->get_all_specialties->{$c->SUPER::getConstants->normalize($name)};
 
     unless ($specialty) {
       $logger->ERR("speciality '$name' was not found.");
-      $self->reply->not_found;
+      return $c->reply->not_found;
     }
     $logger->DEBUG("retrieved specialty $specialty");
 
-    $self->stash(
+    $c->stash(
       item     => $specialty,
       template => 'specialties/details',
       layout   => 'default',
     );
-    return $self->render();
+    return $c->render();
   }
 
 }

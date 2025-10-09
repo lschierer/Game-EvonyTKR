@@ -7,7 +7,6 @@ require YAML::PP;
 require Mojo::Promise;
 require List::Util;
 require Game::EvonyTKR::Model::General;
-require Game::EvonyTKR::Model::General::Manager;
 require Game::EvonyTKR::Model::General::Pair;
 require Game::EvonyTKR::Model::General::Pair::Manager;
 require Game::EvonyTKR::Model::Buff::Summarizer;
@@ -236,12 +235,12 @@ package Game::EvonyTKR::Controller::Generals {
     #first define variables and state
     my $completion_state = {
       skill_books_loaded          => 0,
+      specialties_imported        => 0,
       ascending_attributes_loaded => 0,
     };
 
     my $check_prerequisites = sub {
-      if ( $completion_state->{skill_books_loaded}
-        && $completion_state->{ascending_attributes_loaded}) {
+      if ( List::AllUtils::none { $_ == 0 } values $completion_state->%* ) {
         $logger->INFO('starting to load generals');
         $c->load_generals($app);
       }
@@ -273,6 +272,14 @@ package Game::EvonyTKR::Controller::Generals {
         $check_prerequisites->();
       }
     );
+
+    $app->plugins->on(
+      specialties_imported => sub {
+        $completion_state->{specialties_imported} = 1;
+        $check_prerequisites->();
+      }
+    );
+
     $logger->DEBUG(sprintf('all handlers registered for %s', blessed($c)));
   }
 
@@ -281,7 +288,7 @@ package Game::EvonyTKR::Controller::Generals {
     my $g  = $c->get_generals()->{$nn};
     if (not defined $g) {
       $logger->WARN(sprintf(
-'no general named "%s" normalized to "%s" found. Available Generals: %s',
+      'no general named "%s" normalized '.'to "%s" found. Available Generals: %s',
         $name, $nn, join ', ', keys $c->get_generals()->%*
       ));
     }
@@ -351,6 +358,16 @@ package Game::EvonyTKR::Controller::Generals {
       return;
     }
     $g->set_builtInBook($book);
+
+    foreach my $sn ( $g->specialtyNames->@* ) {
+      my $specialty = $app->get_all_specialties->{$c->SUPER::getConstants->normalize($sn)};
+      unless($specialty){
+        $logger->ERR(sprintf('cannot find specialty "%s" for general "%s".', $sn, $g->name));
+        return;
+      }
+      push @{ $g->specialties }, $specialty;
+    }
+
     $generals->{ $c->SUPER::getConstants->normalize($g->name) } = $g;
     $app->plugins->emit(general_loaded => { general => $g });
   }
@@ -585,9 +602,7 @@ package Game::EvonyTKR::Controller::Generals {
 
         if (none { $_ eq $covenantLevel }
           @{ $data_model->CovenantCategoryValues }) {
-          $logger->WARN(
-"Invalid covenantLevel: $covenantLevel, using default 'civilization'"
-          );
+          $logger->WARN(sprintf('Invalid covenantLevel: %s , using default "civilization"',$covenantLevel));
           $covenantLevel = 'civilization';
         }
 

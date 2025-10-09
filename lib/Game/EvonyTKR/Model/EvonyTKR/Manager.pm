@@ -2,10 +2,6 @@ use v5.42.0;
 use experimental qw(class);
 use utf8::all;
 require Path::Tiny;
-require Game::EvonyTKR::Model::General::Manager;
-require Game::EvonyTKR::Model::Specialty::Manager;
-require Game::EvonyTKR::Model::AscendingAttributes::Manager;
-require Game::EvonyTKR::Model::Covenant::Manager;
 require Game::EvonyTKR::Model::Glossary::Manager;
 require Game::EvonyTKR::Model::General::Conflict::Book;
 use namespace::clean;
@@ -14,20 +10,13 @@ class Game::EvonyTKR::Model::EvonyTKR::Manager :
   isa(Game::EvonyTKR::Shared::Constants) {
 
   field $SourceDir                  : reader : param;
-  field $generalManager             : reader;
-  field $bookManager                : reader;
-  field $specialtyManager           : reader;
-  field $ascendingAttributesManager : reader;
-  field $covenantManager            : reader;
   field $glossaryManager            : reader;
 
   # computed types
-  field $generalPairManager : reader;
   field $conflictDetector : reader : writer;
 
   ADJUST {
     # first the import types
-    $specialtyManager = Game::EvonyTKR::Model::Specialty::Manager->new();
 
     $SourceDir = Path::Tiny::path($SourceDir);
 
@@ -48,10 +37,6 @@ class Game::EvonyTKR::Model::EvonyTKR::Manager :
 
     my $collectionDir = $SourceDir->child("collections/data");
     $self->logger->INFO("starting root import");
-
-    $self->logger->INFO(" starting import of specialties.");
-    $specialtyManager->importAll($collectionDir->child('specialties'));
-    $self->logger->INFO("import of specialties complete");
 
     $glossaryManager->importAll($SourceDir->child("collections/Glossary"));
 

@@ -3,6 +3,7 @@ use experimental qw(class);
 use utf8::all;
 use File::FindLib 'lib';
 require YAML::PP;
+require Game::EvonyTKR::Model::Covenant;
 use namespace::clean;
 
 package Game::EvonyTKR::Controller::Covenants {
