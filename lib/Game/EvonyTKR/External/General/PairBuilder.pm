@@ -77,10 +77,17 @@ class Game::EvonyTKR::External::General::PairBuilder :
         my $logger = Game::EvonyTKR::Shared::Logger::get_logger(__PACKAGE__);
         # about 5 minutes
         my $limit_length = 300;
-        unless(my $taskLimit = $job->minion->guard('build_pairs_for_primary', $limit_length, {
-        limit => 3 })) {
+        unless (
+          my $taskLimit = $job->minion->guard(
+            'build_pairs_for_primary',
+            $limit_length,
+            {
+              limit => 3
+            }
+          )
+        ) {
           $logger->INFO('Concurrency limit hit for build_pairs_for_primary');
-          # delay a random amount up to the limit length to allow for jobs not taking the full time
+# delay a random amount up to the limit length to allow for jobs not taking the full time
           return $job->retry({ delay => rand($limit_length) });
         }
 
@@ -208,8 +215,8 @@ class Game::EvonyTKR::External::General::PairBuilder :
       $self->logger->DEBUG(sprintf('inspecting job %s', $info->{id}));
       if ($info->{state} eq 'failed') {
         $self->logger->ERR(sprintf(
-        'monitor_pair_builders found pair builder '.
-        'JID %s failed with result "%s"',
+          'monitor_pair_builders found pair builder '
+            . 'JID %s failed with result "%s"',
           $info->{id}, $info->{result}
         ));
         $something_failed++;
@@ -217,8 +224,8 @@ class Game::EvonyTKR::External::General::PairBuilder :
       }
       if ($info->{state} eq 'finished') {
         $self->logger->DEBUG(sprintf(
-          'monitor_pair_builders found pair builder '.
-          'JID %s finished with result "%s"',
+          'monitor_pair_builders found pair builder '
+            . 'JID %s finished with result "%s"',
           $info->{id}, $info->{result}
         ));
         my $ngp = $info->{notes}->{pairs_by_type};

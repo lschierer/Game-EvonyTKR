@@ -104,7 +104,7 @@ runcmd:
   - echo 'export PATH="/opt/mojo/.local/bin/:$HOME/bin:$PATH"' >> /opt/mojo/.bash_profile
   - mkdir /etc/nginx/ssl
   # if there is not a cert present where the nginx config states, then
-  # when certbot runs, it checks the ngnix config syntax for correctness and it will fail
+  # when certbot runs, it checks the nginx config syntax for correctness and it will fail
   - openssl req -x509 -newkey rsa:2048 -keyout /etc/nginx/ssl/evonytkrtips.net.key -out /etc/nginx/ssl/evonytkrtips.net.crt -days 365 -nodes -subj "/C=US/ST=State/L=City/O=Org/OU=OrgUnit/CN=localhost"
   - chown -R www-data:www-data /etc/nginx/ssl
   # sleep briefly to ensure that cdk has actually created the DNS records or certbot will fail

@@ -73,10 +73,12 @@ package Game::EvonyTKR::Controller::Generals {
     $app->helper(
       get_general => sub ($self, $name) {
         my $nn = $c->SUPER::getConstants()->normalize($name);
-        my $g = $c->get_generals()->{$nn};
-        if(not defined $g){
-          $logger->WARN(sprintf('no general named "%s" normalized to "%s" found. Available Generals: ',
-          $name, $nn, join ', ', keys $c->get_generals()->%* ));
+        my $g  = $c->get_generals()->{$nn};
+        if (not defined $g) {
+          $logger->WARN(sprintf(
+'no general named "%s" normalized to "%s" found. Available Generals: ',
+            $name, $nn, join ', ', keys $c->get_generals()->%*
+          ));
         }
         return $g;
       }
@@ -142,35 +144,38 @@ package Game::EvonyTKR::Controller::Generals {
                 return;
               }
               $logger->DEBUG("processing $generalFile");
-                my $data = $generalFile->slurp('UTF-8');
-                my $ho   = YAML::PP->new(
-                  schema       => [qw/ + Perl /],
-                  yaml_version => ['1.2', '1.1'],
-                )->load_string($data);
-                my $g = Game::EvonyTKR::Model::General->from_hash($ho, $logger);
-                unless ($g) {
-                  $logger->ERR(sprintf(
-                    'failed to build general from %s', $generalFile));
-                    return;
+              my $data = $generalFile->slurp('UTF-8');
+              my $ho   = YAML::PP->new(
+                schema       => [qw/ + Perl /],
+                yaml_version => ['1.2', '1.1'],
+              )->load_string($data);
+              my $g = Game::EvonyTKR::Model::General->from_hash($ho, $logger);
+              unless ($g) {
+                $logger->ERR(sprintf(
+                  'failed to build general from %s', $generalFile));
+                return;
+              }
+              if ($g->ascending) {
+                my $aa = $app->get_ascendingattributes_for_general($g);
+                unless ($aa) {
+                  $logger->ERR(
+                    sprintf(
+'no ascending attributes found for ascendable general "%s".',
+                      $g->name)
+                  );
+                  return;
                 }
-                if($g->ascending){
-                  my $aa = $app->get_ascendingattributes_for_general($g);
-                  unless ($aa) {
-                    $logger->ERR(sprintf('no ascending attributes found for ascendable general "%s".', $g->name));
-                    return;
-                  }
-                  $g->set_ascendingAttribute($aa);
-                }
+                $g->set_ascendingAttribute($aa);
+              }
 
-                $generals->{$g->normalize($g->name)} = $g;
-                $logger->DEBUG(sprintf(
-                  'imported general %s from file %s',
-                  $g->name, $generalFile
-                ));
+              $generals->{ $g->normalize($g->name) } = $g;
+              $logger->DEBUG(sprintf(
+                'imported general %s from file %s',
+                $g->name, $generalFile
+              ));
 
-
-                $g->populateBuiltInBook($bm);
-                $app->plugins->emit(general_loaded => { general => $g });
+              $g->populateBuiltInBook($bm);
+              $app->plugins->emit(general_loaded => { general => $g });
             }
           );
         }
@@ -185,7 +190,7 @@ package Game::EvonyTKR::Controller::Generals {
           my $general = $data->{general};
           $c->_build_general_routes($general, $app, $controller_name,
             $referenceRoutes);
-          my $generals = $c->get_generals();
+          my $generals     = $c->get_generals();
           my $currentTotal = keys $generals->%*;
           if ($currentTotal >= $expectedTotal) {
             $logger->INFO('all generals are loaded');
@@ -470,11 +475,11 @@ package Game::EvonyTKR::Controller::Generals {
 
   sub show ($c) {
     $logger->DEBUG("start of show method");
-    unless ($c){
+    unless ($c) {
       $logger->ERR('controller must be defined for show method to work');
       return;
     }
-    unless ($c->app){
+    unless ($c->app) {
       $logger->ERR('controller app attribute is undefined');
       return;
     }
@@ -493,7 +498,7 @@ package Game::EvonyTKR::Controller::Generals {
     my $calculate_buffs = $c->param('calculate_buffs') // 0;
 
     my $general = $c->get_general($name);
-    unless($general){
+    unless ($general) {
       $logger->ERR("No general found for name $name in the 'show' route.");
       return $c->reply->not_found;
     }
@@ -510,12 +515,13 @@ package Game::EvonyTKR::Controller::Generals {
         push @specialties, $c->param('specialty2') // 'gold';
         push @specialties, $c->param('specialty3') // 'gold';
         push @specialties, $c->param('specialty4') // 'gold';
-        my $data_model  = Game::EvonyTKR::Model::Data->new();
+        my $data_model = Game::EvonyTKR::Model::Data->new();
 
-        if (none { $_ eq $covenantLevel } @{ $data_model->CovenantCategoryValues })
-        {
+        if (none { $_ eq $covenantLevel }
+          @{ $data_model->CovenantCategoryValues }) {
           $logger->WARN(
-            "Invalid covenantLevel: $covenantLevel, using default 'civilization'");
+"Invalid covenantLevel: $covenantLevel, using default 'civilization'"
+          );
           $covenantLevel = 'civilization';
         }
 
@@ -546,20 +552,20 @@ package Game::EvonyTKR::Controller::Generals {
 
         $logger->DEBUG("Using $targetType as targetType for $name");
         my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
-          general => $general,
-          books => $c->app->get_root_manager()->bookManager->get_all_books(),
+          general  => $general,
+          books    => $c->app->get_root_manager()->bookManager->get_all_books(),
           covenant => $c->app->get_root_manager()
             ->covenantManager->getCovenant($general->name),
           ascendingAttributes => $general->ascendingAttribute,
-          isPrimary      => 1,
-          targetType     => $targetType,
-          activationType => 'Attacking',
-          ascendingLevel => $ascendingLevel,
-          covenantLevel  => $covenantLevel,
-          specialty1     => $specialties[0],
-          specialty2     => $specialties[1],
-          specialty3     => $specialties[2],
-          specialty4     => $specialties[3],
+          isPrimary           => 1,
+          targetType          => $targetType,
+          activationType      => 'Attacking',
+          ascendingLevel      => $ascendingLevel,
+          covenantLevel       => $covenantLevel,
+          specialty1          => $specialties[0],
+          specialty2          => $specialties[1],
+          specialty3          => $specialties[2],
+          specialty4          => $specialties[3],
         );
 
         $summarizer->updateBuffs();
@@ -585,9 +591,10 @@ package Game::EvonyTKR::Controller::Generals {
         );
       }
 
-      if($c && $c->app){
+      if ($c && $c->app) {
         return $c->render(template => 'generals/details');
-      } else {
+      }
+      else {
         $logger->ERR('missing app!!');
       }
     }
@@ -841,8 +848,9 @@ package Game::EvonyTKR::Controller::Generals {
 
     my $valid = {};
     map { $valid->{ $_->{primary} } => 1 } @$selected;
-    foreach my $general (sort { $a->name cmp $b->name }
-      values $c->get_generals()->%*) {
+    foreach
+      my $general (sort { $a->name cmp $b->name } values $c->get_generals()->%*)
+    {
 
       if (scalar(@$selected) && exists $valid->{ $general->name }) {
         push @$rows, $general;

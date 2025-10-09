@@ -69,16 +69,20 @@ package Game::EvonyTKR::Controller::Pairs {
 
     my $mainRoutes = $app->routes->any($base);
 
-    $app->plugins->on(pairs_complete => sub {
-      my $plugin = shift @_;
-      my @args = @_;
-      $c->pair_receiver($app, @args);
-    });
-    $app->plugins->on(pairs_by_type  => sub {
-      my $plugin = shift @_;
-      my @args = @_;
-      $c->pair_receiver($app, @args);
-    } );
+    $app->plugins->on(
+      pairs_complete => sub {
+        my $plugin = shift @_;
+        my @args   = @_;
+        $c->pair_receiver($app, @args);
+      }
+    );
+    $app->plugins->on(
+      pairs_by_type => sub {
+        my $plugin = shift @_;
+        my @args   = @_;
+        $c->pair_receiver($app, @args);
+      }
+    );
 
     $app->plugins->on(
       general_routing_available => sub {
@@ -125,8 +129,9 @@ package Game::EvonyTKR::Controller::Pairs {
   }
 
   sub pair_receiver ($c, $app, @args) {
-    my $pairs     = shift( @args) ;
-    $logger->DEBUG('pair_receiver called: ' . Data::Printer::np($pairs, multiline => 0));
+    my $pairs = shift(@args);
+    $logger->DEBUG(
+      'pair_receiver called: ' . Data::Printer::np($pairs, multiline => 0));
     my $pairs_by_type = __PACKAGE__->getPairs();
 
     unless (ref($pairs) eq 'HASH') {
@@ -147,8 +152,10 @@ package Game::EvonyTKR::Controller::Pairs {
           @{ $pairs_by_type->{$type} }
         ) {
           $increment++;
-          my $primary   = $app->get_general($c->SUPER::getConstants->normalize($p->{primary}));
-          my $secondary = $app->get_general($c->SUPER::getConstants->normalize($p->{secondary}));
+          my $primary = $app->get_general(
+            $c->SUPER::getConstants->normalize($p->{primary}));
+          my $secondary = $app->get_general(
+            $c->SUPER::getConstants->normalize($p->{secondary}));
           if ($primary && $secondary) {
             my $pair = Game::EvonyTKR::Model::General::Pair->new(
               primary   => $primary,
@@ -184,7 +191,8 @@ package Game::EvonyTKR::Controller::Pairs {
         $logger->DEBUG("Known valid routes:");
         $routing->each_valid_route(
           sub ($key, $meta) {
-            $logger->DEBUG("  $key => " . Data::Printer::np($meta, multiline => 0));
+            $logger->DEBUG(
+              "  $key => " . Data::Printer::np($meta, multiline => 0));
           }
         );
       }
@@ -313,7 +321,8 @@ package Game::EvonyTKR::Controller::Pairs {
         $logger->DEBUG("Known valid routes:");
         $routing->each_valid_route(
           sub ($key, $meta) {
-            $logger->DEBUG("  $key => " . Data::Printer::np($meta, multiline => 0));
+            $logger->DEBUG(
+              "  $key => " . Data::Printer::np($meta, multiline => 0));
           }
         );
       }
@@ -432,7 +441,8 @@ package Game::EvonyTKR::Controller::Pairs {
         $logger->DEBUG("Known valid routes:");
         $routing->each_valid_route(
           sub ($key, $meta) {
-            $logger->DEBUG("  $key => " . Data::Printer::np($meta, multiline => 0));
+            $logger->DEBUG(
+              "  $key => " . Data::Printer::np($meta, multiline => 0));
           }
         );
       }
@@ -557,7 +567,8 @@ package Game::EvonyTKR::Controller::Pairs {
         return if !$c->tx || $c->tx->is_finished;
         my $result = shift;
         if (defined($result) && ref($result) eq 'HASH') {
-          $logger->DEBUG("job $jid result is " . Data::Printer::np($result, multiline => 0));
+          $logger->DEBUG(
+            "job $jid result is " . Data::Printer::np($result, multiline => 0));
           if ($result->{result}->{status} eq 'complete') {
             $c->write_sse(
               { type => 'pair', text => $result->{result}->{result} });

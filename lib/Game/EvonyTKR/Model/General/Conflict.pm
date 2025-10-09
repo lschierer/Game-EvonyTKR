@@ -762,12 +762,12 @@ class Game::EvonyTKR::Model::General::Conflict :
     $self->&build_conflicts_index() if $build_index;
   }
 
-  method process_single_general($general, $generalManager) {
+  method process_single_general($general, $generals) {
     # Build meta for both roles for this general
     $self->build_meta_for($general, 'main');
     $self->build_meta_for($general, 'assistant');
 
-    my @existing = values $generalManager->get_all_generals()->%*;
+    my @existing = values $generals->%*;
     return if (scalar @existing == 0);
 
     # Compare this general against all previously loaded generals
