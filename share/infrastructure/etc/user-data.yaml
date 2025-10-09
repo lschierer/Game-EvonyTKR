@@ -60,6 +60,13 @@ runcmd:
   - add-apt-repository -y universe
   - apt-get update
   - apt-get dist-upgrade -y
+  # Steps to install amazon-ssm-agent manually
+  - apt-get remove --purge -y snapd
+  - curl "https://s3.amazonaws.com/amazon-ssm-region/path/to/amazon-ssm-agent.deb" -o "/tmp/amazon-ssm-agent.deb"
+  - dpkg -i /tmp/amazon-ssm-agent.deb
+  - systemctl enable amazon-ssm-agent
+  - systemctl start amazon-ssm-agent
+  # set up the mojo user and environment
   - mkdir -p /opt/mojo/var/run
   - mkdir -p /opt/mojo/bin
   - chown -R mojo:www-data /opt/mojo
