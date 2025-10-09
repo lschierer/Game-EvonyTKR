@@ -129,18 +129,7 @@ package Game::EvonyTKR::External::Prebuild {
     #wait to ensure the workers have the new tasks
     sleep 15;
 
-    my $jobsState = {};
-    my $jid;
-    $jid = $self->app->minion->enqueue(
-      build_all_pairs => [{}] => {
-        priority => 50,
-        attempts => 5,
-        expire   => 720,
-      }
-    );
-    $jobsState->{$jid} = $self->app->minion->job($jid)->info;
-
-    $jid = $self->app->minion->enqueue(
+    my $monitorJid = $self->app->minion->enqueue(
       monitor_pair_builders => [{}] => {
         priority => 90,
         attempts => 5,
@@ -148,78 +137,80 @@ package Game::EvonyTKR::External::Prebuild {
         expire   => 7200,
       }
     );
-    $jobsState->{$jid} = $self->app->minion->job($jid)->info;
 
     my $loop;
-    $loop = Mojo::IOLoop->recurring(
-      10 => sub {
-        my @expectedComplete = keys $jobsState->%*;
-        my @jids             = sort keys $jobsState->%*;
-        foreach my $index (0 .. $#jids) {
-          my $jid = $jids[$index];
-          my $job = $self->app->minion->job($jid);
-          unless ($job) {
-            $logger->ERR("No Job available for previously recorded jid $jid");
-            $self->note(
-              ERROR => "No Job available for previously recorded jid $jid");
-            Mojo::IOLoop->remove($loop);
-            $self->finish('Invalid tracked JID');
-          }
-          $jobsState->{$jid} = $job->info;
-          if ($job->info->{state} eq 'failed') {
-            $logger->ERR(sprintf(
-              'failed job %s for task %s, result %s',
-              $jid,
-              $job->info->{task},
-              $job->info->{result}
-            ));
-            $self->note(
-              ERROR => sprintf(
-                'failed job %s: %s',
-                $job->info->{task},
-                $job->info->{result}
-              )
-            );
-            Mojo::IOLoop->remove($loop);
-            $self->finish('failed tracked task');
-          }
-          if ($job->info->{state} eq 'finished') {
-            $self->note($job->info->{task} => $job->info->{result});
-            if ( $job->info->{task} eq 'build_all_pairs'
-              && $job->info->{result} ne 'all builder jobs started') {
-              $jobsState->{$jid}->{state} = 'unexpected';
-              next;
-            }
-            if ($job->info->{task} eq 'monitor_pair_builders') {
-              $self->note(pairs_by_type => $job->info->{notes}->{pairs_by_type}
-                  // {});
-              if ($job->info->{result} ne 'all pair builders complete') {
-                $jobsState->{$jid}->{state} = 'pending';
-                next;
-              }
-            }
-          }
-          if ($job->info->{task} eq 'monitor_pair_builders') {
-            $self->note(pairs_by_type => $job->info->{notes}->{pairs_by_type}
-                // {});
-          }
-        }
+    $loop = Mojo::IOLoop->recurring(10 => sub {
+      # Check for any successful completions
+      my $completed_pairs = $self->app->minion->jobs({
+        tasks => ['build_all_pairs'],
+        states => ['finished']
+      })->total;
 
-        my @complete = grep { $_->{state} eq 'finished' } values $jobsState->%*;
-        if (scalar(@expectedComplete) == scalar(@complete)) {
-          $logger->INFO('All Monitored Jobs Complete');
-          $self->note(complete => 'All Monitored Jobs Complete');
-          Mojo::IOLoop->remove($loop);
-          $self->finish('All Monitored Jobs Complete');
-        }
-        else {
-          $logger->DEBUG(sprintf(
-            'found %s complete, expected %s',
-            scalar(@complete), scalar(@expectedComplete)
-          ));
+      # Check for any still running
+      my $active_pairs = $self->app->minion->jobs({
+        tasks => ['build_all_pairs'],
+        states => ['active', 'inactive']
+      })->total;
+
+      # Check for any failures (optional - decide if you want to handle this)
+      my $failed_pairs = $self->app->minion->jobs({
+        tasks => ['build_all_pairs'],
+        states => ['failed']
+      })->total;
+
+      # none have been kicked off, do so.
+      my $enqueueBuilder = 0;
+      if($completed_pairs == 0 && $active_pairs == 0 && $failed_pairs == 0){
+        $enqueueBuilder = 1;
+      } elsif( $completed_pairs == 0 && $active_pairs == 0 ){
+        # one failed, check how many times its retried
+        my $stillRetrying = 0;
+        $self->app->minion->jobs({
+          tasks => ['build_all_pairs'],
+          states => ['failed']
+        })->each(sub{
+          my $info = $_;
+          if($info->{retried} <= $info->{attempts}){
+            $stillRetrying = 1;
+          }
+        });
+        if($stillRetrying == 0){
+          $enqueueBuilder = 1;
         }
       }
-    );
+      if($enqueueBuilder){
+        $self->app->minion->enqueue(
+          build_all_pairs => [{}] => {
+            priority => 50,
+            attempts => 5,
+            expire   => 720,
+          }
+        );
+      }
+      my $monitorJob = $self->app->minion->job($monitorJid);
+      unless($monitorJob){
+        $logger->ERR("No job associated with monitorJid $monitorJid");
+        Mojo::IOLoop->remove($loop);
+        $self->finish("No job associated with monitorJid $monitorJid");
+      }
+      if($monitorJob->info->{state} eq 'failed'){
+        $logger->ERR("Monitor job failed: $monitorJob->info->{result}");
+        Mojo::IOLoop->remove($loop);
+        $self->finish("Monitor job failed: $monitorJob->info->{result}");
+      }
+      if($monitorJob->info->{state} eq 'finished'){
+         $self->note(pairs_by_type => ($monitorJob->info->{notes}->{pairs_by_type} // {}));
+        if($monitorJob->info->{result} eq 'all pair builders complete'){
+          if($completed_pairs == 0 && $active_pairs){
+            $logger->INFO('All Monitored Jobs Complete');
+            $self->note(complete => 'All Monitored Jobs Complete');
+            Mojo::IOLoop->remove($loop);
+            $self->finish('All Monitored Jobs Complete');
+          }
+        }
+      }
+    });
+
     Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
   }
 }

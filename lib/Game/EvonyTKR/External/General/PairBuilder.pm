@@ -40,8 +40,13 @@ class Game::EvonyTKR::External::General::PairBuilder :
     return {
       build_all_pairs => sub($job, $args) {
         my $logger = Game::EvonyTKR::Shared::Logger::get_logger(__PACKAGE__);
+        # a guard is released on process completion.
+        # my intent is that no matter now many hypnotoad workers there are,
+        # only one build_all_pairs job gets spawned not just _now_ but *at all*
+        # because they can consume the shared minion worker pool results.
+        # recall that build_all_pairs is a job spawner - it does no work itself.
         return $job->finish('only one pair builder kickoff')
-          unless my $guard = $job->app->minion->guard('build_all_pairs', 360);
+          unless my $guard = $job->app->minion->lock('build_all_pairs', 7200);
         my $collectionDir =
           Mojo::File->new($app->config('distDir'))->child('collections/data/');
         my $generalsDir = $collectionDir->child('generals');
@@ -71,7 +76,7 @@ class Game::EvonyTKR::External::General::PairBuilder :
       build_pairs_for_primary => sub ($job, $args) {
         my $logger = Game::EvonyTKR::Shared::Logger::get_logger(__PACKAGE__);
         # about 5 minutes
-        my $limit_length = 7200;
+        my $limit_length = 300;
         unless(my $taskLimit = $job->minion->guard('build_pairs_for_primary', $limit_length, {
         limit => 3 })) {
           $logger->INFO('Concurrency limit hit for build_pairs_for_primary');
@@ -203,7 +208,8 @@ class Game::EvonyTKR::External::General::PairBuilder :
       $self->logger->DEBUG(sprintf('inspecting job %s', $info->{id}));
       if ($info->{state} eq 'failed') {
         $self->logger->ERR(sprintf(
-'monitor_pair_builders found pair builder JID %s failed with result "%s"',
+        'monitor_pair_builders found pair builder '.
+        'JID %s failed with result "%s"',
           $info->{id}, $info->{result}
         ));
         $something_failed++;
@@ -211,7 +217,8 @@ class Game::EvonyTKR::External::General::PairBuilder :
       }
       if ($info->{state} eq 'finished') {
         $self->logger->DEBUG(sprintf(
-'monitor_pair_builders found pair builder JID %s finished with result "%s"',
+          'monitor_pair_builders found pair builder '.
+          'JID %s finished with result "%s"',
           $info->{id}, $info->{result}
         ));
         my $ngp = $info->{notes}->{pairs_by_type};

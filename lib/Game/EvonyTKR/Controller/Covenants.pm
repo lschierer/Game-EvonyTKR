@@ -135,7 +135,7 @@ package Game::EvonyTKR::Controller::Covenants {
                     $name = $object->{name};
                   }
 
-                  my $primary = $manager->generalManager->getGeneral($name);
+                  my $primary = $app->get_general($name);
                   unless ($primary) {
                     $logger->ERR("cannot find primary for covenant $name");
                     return;

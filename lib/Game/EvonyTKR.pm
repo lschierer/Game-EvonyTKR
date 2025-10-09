@@ -139,6 +139,7 @@ package Game::EvonyTKR {
     #$self->reverse_proxy(1);
     Mojo::IOLoop->next_tick(sub ($ioloop) {
       if(Scalar::Util::blessed($self) eq 'Game::EvonyTKR') {
+        $logger->INFO('mojo_worker_started');
         $self->plugins->emit(mojo_worker_started => { app => $self });
       }
     });

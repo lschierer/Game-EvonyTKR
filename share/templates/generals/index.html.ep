@@ -7,7 +7,7 @@
     <% if ($items && ref $items eq 'HASH') { %>
       <% foreach my $key (sort(keys(%$items))) { %>
         <li class="collection-item">
-          <a href="/Reference/Generals/<%= $key %>/">
+          <a href="/Reference/Generals/<%= $items->{$key}->name %>/">
             <%= $items->{$key}->name %>
           </a>
         </li>

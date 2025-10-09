@@ -47,12 +47,6 @@ class Game::EvonyTKR::Model::Logger {
     return $by_name{ lc($level // '') } // 'WARN';
   }
 
-  method dev_guard ($msg, $level = 'WARN') {
-    if ($self->_debug) { $self->logger->ERR($msg), croak($msg) }
-    else               { $self->logger->ERR($msg) }
-    return;
-  }
-
   # ----- Optional helpers for DDP / JSON -----
 
   method to_hash {

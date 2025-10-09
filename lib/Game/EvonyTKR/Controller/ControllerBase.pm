@@ -23,6 +23,11 @@ package Game::EvonyTKR::Controller::ControllerBase {
     return $base;
   }
 
+  sub getConstants {
+    state $constants = Game::EvonyTKR::Shared::Constants->new();
+    return $constants;
+  }
+
   sub register($self, $app, $config = {}) {
     $logger = $app->get_logger(__PACKAGE__);
     $logger->INFO("ControllerBase register function");

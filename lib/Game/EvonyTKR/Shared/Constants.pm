@@ -712,8 +712,8 @@ class Game::EvonyTKR::Shared::Constants : isa(Game::EvonyTKR::Model::Logger) {
   }
 
   method normalize ($name) {
-    my $dn = is_utf8($name) ? $name : decode_utf8($name);
-    my $nn = fc(NFKD($dn));
+    my $dn = Encode::is_utf8($name) ? $name : Encode::decode_utf8($name);
+    my $nn = Unicode::CaseFold::fc(Unicode::Normalize::NFKD($dn));
     $nn =~ s/[’''‛`´]/'/g;
     $nn =~ s/[""‟]/"/g;      # Quotes
     return $nn;

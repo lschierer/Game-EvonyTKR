@@ -61,8 +61,6 @@ package Game::EvonyTKR::Controller::Pairs {
     $logger->INFO("Registering routes for " . ref($c));
     $c->SUPER::register($app, $config);
 
-    $gm = $app->get_root_manager->generalManager;
-
     $app->helper(
       get_general_pairs => sub {
         return $c->getPairs();
@@ -71,8 +69,16 @@ package Game::EvonyTKR::Controller::Pairs {
 
     my $mainRoutes = $app->routes->any($base);
 
-    $app->plugins->on(pairs_complete => \&pair_receiver);
-    $app->plugins->on(pairs_by_type  => \&pair_receiver);
+    $app->plugins->on(pairs_complete => sub {
+      my $plugin = shift @_;
+      my @args = @_;
+      $c->pair_receiver($app, @args);
+    });
+    $app->plugins->on(pairs_by_type  => sub {
+      my $plugin = shift @_;
+      my @args = @_;
+      $c->pair_receiver($app, @args);
+    } );
 
     $app->plugins->on(
       general_routing_available => sub {
@@ -118,12 +124,11 @@ package Game::EvonyTKR::Controller::Pairs {
     );
   }
 
-  sub pair_receiver {
-    my $something = shift;
-    my $pairs     = shift;
+  sub pair_receiver ($c, $app, @args) {
+    my $pairs     = shift( @args) ;
     $logger->DEBUG('pair_receiver called: ' . Data::Printer::np($pairs, multiline => 0));
     my $pairs_by_type = __PACKAGE__->getPairs();
-    my $gm            = __PACKAGE__->get_manager();
+
     unless (ref($pairs) eq 'HASH') {
       $logger->ERR(sprintf(
         'pair_receiver got a %s instead of a HASH', ref($pairs)));
@@ -142,8 +147,8 @@ package Game::EvonyTKR::Controller::Pairs {
           @{ $pairs_by_type->{$type} }
         ) {
           $increment++;
-          my $primary   = $gm->getGeneral($p->{primary});
-          my $secondary = $gm->getGeneral($p->{secondary});
+          my $primary   = $app->get_general($c->SUPER::getConstants->normalize($p->{primary}));
+          my $secondary = $app->get_general($c->SUPER::getConstants->normalize($p->{secondary}));
           if ($primary && $secondary) {
             my $pair = Game::EvonyTKR::Model::General::Pair->new(
               primary   => $primary,

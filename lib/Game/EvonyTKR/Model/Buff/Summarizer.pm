@@ -97,7 +97,8 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
 
   method updateDebuffs() {
     if (!$general) {
-      $self->dev_guard("NO GENERAL ASSIGNED FOR " . blessed($self));
+      $self->logger->ERR("NO GENERAL ASSIGNED FOR " . blessed($self));
+      return;
     }
     $self->logger->INFO(sprintf(
 'updateDebuffs called for %s with isPrimary "%s" targetType "%s" activationType "%s", general set to %s %s %s %s %s %s',
@@ -415,7 +416,8 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
     # Ensure book is loaded
     if (not defined $general->builtInBook
       && length($general->builtInBookName) > 0) {
-      $self->dev_guard('Book must be loaded first!!');
+      $self->logger->ERR('Book must be loaded first!!');
+      return;
     }
 
     my $book = $general->builtInBook();

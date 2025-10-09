@@ -31,6 +31,10 @@ class Game::EvonyTKR::Model::General : isa(Game::EvonyTKR::Shared::Constants) {
   field $type : reader : param;
 
   field $ascending : reader : param //= 0;
+
+  #store the actual ::Model::AscendingAttribute objecet
+  field $ascendingAttribute : reader : writer;
+
   field $stars     : reader : param //= 'none';
 
   field $basicAttributes : reader =
