@@ -224,25 +224,22 @@ class Game::EvonyTKR::External::General::ConflictFinder :
 
     my $general = $generals->{$general_name};
     unless ($general) {
-      $self->logger->ERR(
-        sprintf(
-          'General not found for %s in job %s',
-          $general_name, $parent->info->{id}
-        )
-      );
-      return $parent->finish(
-        sprintf(
-          'General not found for %s in job %s',
-          $general_name, $parent->info->{id}
-        )
-      );
+      $self->logger->ERR(sprintf(
+        'General not found for %s in job %s',
+        $general_name, $parent->info->{id}
+      ));
+      return $parent->finish(sprintf(
+        'General not found for %s in job %s',
+        $general_name, $parent->info->{id}
+      ));
     }
 
     $conflictDetector->process_single_general($general, $generals);
     $self->merge_results($parent);
-    $parent->note(groups_by_conflict_type => $conflictDetector->groups_by_conflict_type);
-    $parent->note(by_general  => $conflictDetector->by_general);
-    $parent->note(complete => 1);
+    $parent->note(
+      groups_by_conflict_type => $conflictDetector->groups_by_conflict_type);
+    $parent->note(by_general => $conflictDetector->by_general);
+    $parent->note(complete   => 1);
     $parent->finish(sprintf('conflicts detected for %s', $general_name));
   }
 

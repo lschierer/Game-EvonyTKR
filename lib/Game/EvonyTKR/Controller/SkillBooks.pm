@@ -3,7 +3,7 @@ use experimental qw(class);
 use utf8::all;
 use File::FindLib 'lib';
 require Game::EvonyTKR::Model::Book::Builtin;
-require Game::EvonyTKR::Model::Book::Manager;
+require Game::EvonyTKR::Model::Book::SkillBook;
 use namespace::clean;
 
 package Game::EvonyTKR::Controller::SkillBooks {
@@ -31,30 +31,36 @@ package Game::EvonyTKR::Controller::SkillBooks {
     return $base;
   }
 
-  # Register this when the application starts
-  sub register($self, $app, $config = {}) {
-    $logger = $app->get_logger(__PACKAGE__);
-    $logger->INFO("Registering routes for " . ref($self));
-    $self->SUPER::register($app, $config);
+  sub getBuiltInBoooks {
+    state %builtinBooks;
+    return \%builtinBooks;
+  }
 
-    $app->helper(
-      get_builtinbook_manager => sub {
-        return $self->app->get_root_manager->bookManager;
-      }
-    );
+  sub getGenericBooks {
+    state %genericBooks;
+    return \%genericBooks;
+  }
+
+  # Register this when the application starts
+  sub register($c, $app, $config = {}) {
+    $logger = $app->get_logger(__PACKAGE__);
+    $logger->INFO("Registering routes for " . ref($c));
+    $c->SUPER::register($app, $config);
+
+    $c->load_books($app);
 
     $app->add_navigation_item({
       title => 'Details of General Skill Books',
-      path  => $self->getBase(),
+      path  => $c->getBase(),
       order => 30,
     });
 
-    my @parts     = split(/::/, ref($self));
+    my @parts     = split(/::/, ref($c));
     my $baseClass = pop(@parts);
 
     my $controller_name =
-        $self->can('controller_name')
-      ? $self->controller_name()
+        $c->can('controller_name')
+      ? $c->controller_name()
       : $baseClass;
 
     $logger->DEBUG("got controller_name $controller_name.");
@@ -67,23 +73,49 @@ package Game::EvonyTKR::Controller::SkillBooks {
     # for backwards compatibility
     $mainRoutes->any('/details')->to(
       cb => sub ($c) {
-        $c->redirect_to($self->getBase());
+        $c->redirect_to($c->getBase());
       }
     );
 
-    # register routes that cannot exist until after the manager class has
-    # done its thing only after initialization
-    $app->plugins->on(
-      'evonytkrtips_initialized' => sub($self, $manager) {
-        $logger->DEBUG(
-          "evonytkrtips_initialized sub has controller_name $controller_name.");
+    $app->helper(
+      get_builtin_books => sub {
+        return $c->getBuiltInBoooks();
+      }
+    );
 
-        if (not defined $manager) {
-          $logger->ERR('No Manager Defined');
-          croak('No Manager Defined');
+    $app->helper(
+      get_builtin_book_text => sub ($self, $book_name) {
+        $logger->DEBUG("get_builtin_book_text for book '$book_name'");
+
+        $book_name = $c->SUPER::getConstants->normalize($book_name);
+        my $book = $c->getBuiltInBoooks()->{$book_name};
+
+        if ($book) {
+          return $book->text();
         }
-        my $base = getBase($self);
-        foreach my $book (@{ $manager->bookManager->get_all_books() }) {
+        else {
+          $logger->WARN("No book found for '$book_name'");
+        }
+        return "";
+      }
+    );
+
+    $app->helper(
+      get_generic_books => sub ($self) {
+        return $c->getGenericBooks();
+      }
+    );
+
+    $app->plugins->on(
+      all_books_loaded => sub {
+        $logger->DEBUG(sprintf(
+          '%s register method all_books_loaded handler', blessed($c),));
+        my @allBooks;
+        push @allBooks,
+          sort { $a->name cmp $b->name } values $c->getBuiltInBoooks()->%*;
+        push @allBooks,
+          sort { $a->name cmp $b->name } values $c->getGenericBooks()->%*;
+        foreach my $book (@allBooks) {
           my $name = $book->name;
 
           my $clean_name = $name;
@@ -102,18 +134,98 @@ package Game::EvonyTKR::Controller::SkillBooks {
         }
       }
     );
+  }
 
-    $app->helper(
-      get_builtin_book_text => sub ($c, $book_name) {
-        $logger->DEBUG("get_builtin_book_text for book '$book_name'");
-        my $book = $c->app->get_root_manager->bookManager->getBook($book_name);
-        if ($book) {
-          return $book->text();
+  sub load_books ($c, $app) {
+    my $allBB           = $c->getBuiltInBoooks();
+    my $allGB           = $c->getGenericBooks();
+    my $expectedTotal   = 0;
+    my $allFilesStarted = 0;
+
+    # register the listener first to ensure all events are captured.
+    $app->plugins->on(
+      skillbook_loaded => sub {
+        my @sbNames;
+        push @sbNames, sort keys $allBB->%*;
+        push @sbNames, sort keys $allGB->%*;
+        if (scalar(@sbNames) >= $expectedTotal && $allFilesStarted) {
+          $logger->INFO(sprintf('All %s books loaded.', $expectedTotal));
+          $app->plugins->emit(all_books_loaded => {all_books_loaded => 1});
+        } else {
+          $logger->DEBUG(sprintf('%s of %s books loaded. all files %s started.',
+          scalar(@sbNames), $expectedTotal, $allFilesStarted ? 'are' : 'are not yet' ));
         }
-        else {
-          $logger->WARN("No book found for '$book_name'");
-        }
-        return "";
+      }
+    );
+
+    Mojo::File->new($app->config('distDir'))
+      ->child('collections/data/skill books/')
+      ->list_tree->grep(sub {qr/\.y\{a\}?ml$/})->each(
+      sub ($e, $index) {
+        $expectedTotal++;
+        my $delay = 5 + rand(5.0);
+        Mojo::IOLoop->timer(
+          $delay => sub {
+            $c->import_single_book($app, $allBB, $e, $index);
+          }
+        );
+      }
+      );
+
+    Mojo::File->new($app->config('distDir'))
+      ->child('collections/data/generic books/')
+      ->list_tree->grep(sub {qr/\.y\{a\}?ml$/})->each(
+      sub ($e, $index) {
+        $expectedTotal++;
+        my $delay = 5 + rand(5.0);
+        Mojo::IOLoop->timer(
+          $delay => sub {
+            $c->import_single_book($app, $allGB, $e, $index, 0);
+          }
+        );
+      }
+      );
+
+# the $allFilesStarted is to ensure that both each blocks have fully processed
+# before the if inside this handler can match. As the two list_tree blocks are
+# syncronous (the delayed subs happen out of band, when their timers expire),
+# each will iterate all files before reaching this line to set $allFilesStarted to
+# true and thus ungate the final signal.
+    $allFilesStarted = 1;
+
+  }
+
+  sub import_single_book($c, $app, $collection, $sbFile, $index, $builtin = 1) {
+    $logger->DEBUG("processing $sbFile");
+
+    my $data       = $sbFile->slurp('UTF-8');
+    my $hashObject = YAML::PP->new(
+      schema       => [qw/ + Perl /],
+      yaml_version => ['1.2', '1.1'],
+    )->load_string($data);
+    my $sb;
+    if ($builtin) {
+      $sb = Game::EvonyTKR::Model::Book::Builtin->from_hash($hashObject);
+    }
+    else {
+      $sb = Game::EvonyTKR::Model::Book::SkillBook->from_hash($hashObject);
+    }
+    unless ($sb) {
+      $logger->ERR(
+        sprintf(
+          'failed to build %s book %s from %s.',
+          $builtin ? 'Builtin' : 'Generic', $index, $sbFile
+        )
+      );
+      return;
+    }
+    $collection->{ $c->SUPER::getConstants->normalize($sb->name) } = $sb;
+    $logger->DEBUG(sprintf('imported %s book %s as %s, for %s in collection.',
+    $builtin ? 'Builtin' : 'Generic', $index, $sb->name, scalar(keys $collection->%* ), ));
+    $app->plugins->emit(
+      skillbook_loaded => {
+        skillbook => $sb,
+        name      => $c->SUPER::getConstants->normalize($sb->name),
       }
     );
   }

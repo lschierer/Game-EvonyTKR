@@ -41,10 +41,8 @@ class Game::EvonyTKR::Model::Book::SkillBook : isa(Game::EvonyTKR::Model::Book)
     return $self->to_hash();
   }
 
-  sub from_hash ($self, $object, $logger = undef) {
-    unless (defined($logger)) {
-      $logger = Game::EvonyTKR::Shared::Logger::get_logger(__PACKAGE__);
-    }
+  sub from_hash ($class, $object, ) {
+    my $logger = Game::EvonyTKR::Shared::Logger::get_logger($class);
     my ($level) = $object->{name} =~ /Level (\d+)/;
     my $bb = Game::EvonyTKR::Model::Book::SkillBook->new(
       name  => $object->{name},
@@ -64,7 +62,7 @@ class Game::EvonyTKR::Model::Book::SkillBook : isa(Game::EvonyTKR::Model::Book)
       sprintf('Book %s has %s buffs in YAML', $object->{name}, scalar @buffs));
 
     foreach my $ob (@buffs) {
-      my $b = Game::EvonyTKR::Model::Buff->from_hash($ob, $logger);
+      my $b = Game::EvonyTKR::Model::Buff->from_hash($ob);
       $bb->addBuff($b);
     }
 

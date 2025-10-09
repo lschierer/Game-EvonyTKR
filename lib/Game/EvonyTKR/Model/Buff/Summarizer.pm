@@ -262,7 +262,7 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
     my $total = 0;
     my $tt    = $troopType =~ s/ Troops$//r;    # Remove " Troops" suffix
     if ($attribute eq 'March Size') {
-      my $MS = List::AllUtils::first { $_->name =~ /March Size/ } @$books;
+      my $MS = List::AllUtils::first { $_->name =~ /March Size/ } values $books->%* ;
       if (defined($MS)
         && $bc->is_general_and_book_compatible($general, $MS,
           { same_side => 1, })) {
@@ -277,7 +277,7 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
         $btt =~ s/Siege Machines/Siege Machine/;
         my $book =
           List::AllUtils::first { $_->name =~ /Level 4 $btt $attribute$/ }
-        @$books;
+        values $books->%*;
 
         if (
           $book
@@ -292,7 +292,7 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
             'no book found for "%s" from %s',
             "Level 4 $btt $attribute",
             join ', ',
-            map { sprintf('"%s"', $_->name) } @$books
+            map { sprintf('"%s"', $_->name) } values $books->%*
           ));
         }
       }
@@ -305,7 +305,7 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
           my $book = List::AllUtils::first {
             $_->name =~ /Level 4 $btt $attribute  Against Monsters/
           }
-          @$books;
+          values $books->%*;
 
           if (
             $book

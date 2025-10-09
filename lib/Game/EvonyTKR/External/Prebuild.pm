@@ -40,9 +40,8 @@ package Game::EvonyTKR::External::Prebuild {
     $pairBuilder =
       Game::EvonyTKR::External::General::PairBuilder->new(app => $app,);
 
-    $conflictFinder = Game::EvonyTKR::External::General::ConflictFinder->new(
-      app => $app,
-    );
+    $conflictFinder =
+      Game::EvonyTKR::External::General::ConflictFinder->new(app => $app,);
 
     my $pbTasks = $pairBuilder->get_tasks();
     foreach my $task_name (keys $pbTasks->%*) {

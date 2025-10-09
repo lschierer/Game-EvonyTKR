@@ -236,12 +236,10 @@ package Game::EvonyTKR::Controller::AscendingAttributes {
 'no ascending attributes found for general named "%s" normalized to "%s"',
         $g->name, $nn
       ));
-      $logger->DEBUG(
-        sprintf(
-          'available ascending attributes are %s',
-          join ', ', map { sprintf('"%s"', $_) } sort keys $all->%*
-        )
-      );
+      $logger->DEBUG(sprintf(
+        'available ascending attributes are %s',
+        join ', ', map { sprintf('"%s"', $_) } sort keys $all->%*
+      ));
     }
     return $aa;
   }

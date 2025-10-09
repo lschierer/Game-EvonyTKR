@@ -99,13 +99,6 @@ class Game::EvonyTKR::Model::General : isa(Game::EvonyTKR::Shared::Constants) {
 
   }
 
-  method populateBuiltInBook($bookManager) {
-    my $bb = $bookManager->getBook($builtInBookName);
-    if ($bb) {
-      $builtInBook = $bb;
-    }
-  }
-
   method populateSpecialties ($specialtyManager) {
     foreach my $sn_index (0 .. scalar(@{$specialtyNames})) {
       my $sn = $specialtyNames->[$sn_index];

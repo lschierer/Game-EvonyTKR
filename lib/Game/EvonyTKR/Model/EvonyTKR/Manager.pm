@@ -2,7 +2,6 @@ use v5.42.0;
 use experimental qw(class);
 use utf8::all;
 require Path::Tiny;
-require Game::EvonyTKR::Model::Book::Manager;
 require Game::EvonyTKR::Model::General::Manager;
 require Game::EvonyTKR::Model::Specialty::Manager;
 require Game::EvonyTKR::Model::AscendingAttributes::Manager;
@@ -28,13 +27,7 @@ class Game::EvonyTKR::Model::EvonyTKR::Manager :
 
   ADJUST {
     # first the import types
-    $generalManager   = Game::EvonyTKR::Model::General::Manager->new();
-    $bookManager      = Game::EvonyTKR::Model::Book::Manager->new();
     $specialtyManager = Game::EvonyTKR::Model::Specialty::Manager->new();
-    $ascendingAttributesManager =
-      Game::EvonyTKR::Model::AscendingAttributes::Manager->new();
-    $covenantManager =
-      Game::EvonyTKR::Model::Covenant::Manager->new(rootManager => $self,);
 
     $SourceDir = Path::Tiny::path($SourceDir);
 
@@ -56,19 +49,9 @@ class Game::EvonyTKR::Model::EvonyTKR::Manager :
     my $collectionDir = $SourceDir->child("collections/data");
     $self->logger->INFO("starting root import");
 
-    $self->logger->INFO(" starting import of books.");
-    $bookManager->importAll($collectionDir->child('skill books'));
-    $bookManager->importAll($collectionDir->child('generic books'));
-    $self->logger->INFO("import of books complete");
-
     $self->logger->INFO(" starting import of specialties.");
     $specialtyManager->importAll($collectionDir->child('specialties'));
     $self->logger->INFO("import of specialties complete");
-
-    $self->logger->INFO(" starting import of ascending attributes.");
-    $ascendingAttributesManager->importAll(
-      $collectionDir->child('ascending attributes'));
-    $self->logger->INFO("import of ascending attributes complete");
 
     $glossaryManager->importAll($SourceDir->child("collections/Glossary"));
 
