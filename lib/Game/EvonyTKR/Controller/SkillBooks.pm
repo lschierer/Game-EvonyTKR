@@ -150,10 +150,14 @@ package Game::EvonyTKR::Controller::SkillBooks {
         push @sbNames, sort keys $allGB->%*;
         if (scalar(@sbNames) >= $expectedTotal && $allFilesStarted) {
           $logger->INFO(sprintf('All %s books loaded.', $expectedTotal));
-          $app->plugins->emit(all_books_loaded => {all_books_loaded => 1});
-        } else {
-          $logger->DEBUG(sprintf('%s of %s books loaded. all files %s started.',
-          scalar(@sbNames), $expectedTotal, $allFilesStarted ? 'are' : 'are not yet' ));
+          $app->plugins->emit(all_books_loaded => { all_books_loaded => 1 });
+        }
+        else {
+          $logger->DEBUG(sprintf(
+            '%s of %s books loaded. all files %s started.',
+            scalar(@sbNames), $expectedTotal,
+            $allFilesStarted ? 'are' : 'are not yet'
+          ));
         }
       }
     );
@@ -211,17 +215,19 @@ package Game::EvonyTKR::Controller::SkillBooks {
       $sb = Game::EvonyTKR::Model::Book::SkillBook->from_hash($hashObject);
     }
     unless ($sb) {
-      $logger->ERR(
-        sprintf(
-          'failed to build %s book %s from %s.',
-          $builtin ? 'Builtin' : 'Generic', $index, $sbFile
-        )
-      );
+      $logger->ERR(sprintf(
+        'failed to build %s book %s from %s.',
+        $builtin ? 'Builtin' : 'Generic',
+        $index, $sbFile
+      ));
       return;
     }
     $collection->{ $c->SUPER::getConstants->normalize($sb->name) } = $sb;
-    $logger->DEBUG(sprintf('imported %s book %s as %s, for %s in collection.',
-    $builtin ? 'Builtin' : 'Generic', $index, $sb->name, scalar(keys $collection->%* ), ));
+    $logger->DEBUG(sprintf(
+      'imported %s book %s as %s, for %s in collection.',
+      $builtin ? 'Builtin' : 'Generic', $index,
+      $sb->name,                        scalar(keys $collection->%*),
+    ));
     $app->plugins->emit(
       skillbook_loaded => {
         skillbook => $sb,

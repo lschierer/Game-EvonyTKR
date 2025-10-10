@@ -262,7 +262,8 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
     my $total = 0;
     my $tt    = $troopType =~ s/ Troops$//r;    # Remove " Troops" suffix
     if ($attribute eq 'March Size') {
-      my $MS = List::AllUtils::first { $_->name =~ /March Size/ } values $books->%* ;
+      my $MS =
+        List::AllUtils::first { $_->name =~ /March Size/ } values $books->%*;
       if (defined($MS)
         && $bc->is_general_and_book_compatible($general, $MS,
           { same_side => 1, })) {
@@ -291,8 +292,7 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
           $self->logger->ERR(sprintf(
             'no book found for "%s" from %s',
             "Level 4 $btt $attribute",
-            join ', ',
-            map { sprintf('"%s"', $_->name) } values $books->%*
+            join ', ', map { sprintf('"%s"', $_->name) } values $books->%*
           ));
         }
       }

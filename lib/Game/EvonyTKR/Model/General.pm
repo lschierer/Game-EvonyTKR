@@ -96,7 +96,6 @@ class Game::EvonyTKR::Model::General : isa(Game::EvonyTKR::Shared::Constants) {
       my $uuid5base = $self->UUID5_Generals()->{$type};
       $id = uuid5($uuid5base, $self->normalize($name));
     }
-
   }
 
   method populateSpecialties ($specialtyManager) {
@@ -181,36 +180,34 @@ class Game::EvonyTKR::Model::General : isa(Game::EvonyTKR::Shared::Constants) {
     return $json;
   }
 
-  sub from_hash ($self, $ho, $logger = undef) {
-    if (!exists $ho->{name}) {
-      if (defined($logger)) {
-        $logger->ERR('hash object must contain a name attribute.');
-        return undef;
-      }
-      else {
-        croak('hash object must contain a name attribute.');
-        return undef;
-      }
+  sub from_hash ($self, $hashObject) {
+    my $logger;
+    unless (defined($logger)) {
+      $logger = Game::EvonyTKR::Shared::Logger::get_logger(__PACKAGE__);
     }
-    my $o = Game::EvonyTKR::Model::General->new(
-      name            => $ho->{name},
-      type            => $ho->{type},
-      ascending       => $ho->{ascending},
-      stars           => $ho->{stars},
-      builtInBookName => $ho->{book},
-      specialtyNames  => $ho->{specialties},
+    if (!exists $hashObject->{name}) {
+      $logger->ERR('hash object must contain a name attribute.');
+      return undef;
+    }
+    my $g = Game::EvonyTKR::Model::General->new(
+      name            => $hashObject->{name},
+      type            => $hashObject->{type},
+      ascending       => $hashObject->{ascending},
+      stars           => $hashObject->{stars},
+      builtInBookName => $hashObject->{book},
+      specialtyNames  => $hashObject->{specialties},
     );
 
-    foreach my $baKey (keys %{ $ho->{basic_attributes} }) {
+    foreach my $baKey (keys %{ $hashObject->{basic_attributes} }) {
       my $ba = Game::EvonyTKR::Model::BasicAttribute->new(
         attribute_name => $baKey,
-        base           => $ho->{basic_attributes}->{$baKey}->{base},
-        increment      => $ho->{basic_attributes}->{$baKey}->{increment},
+        base           => $hashObject->{basic_attributes}->{$baKey}->{base},
+        increment => $hashObject->{basic_attributes}->{$baKey}->{increment},
       );
-      $o->basicAttributes->setAttribute($baKey, $ba);
+      $g->basicAttributes->setAttribute($baKey, $ba);
     }
 
-    return $o;
+    return $g;
   }
 
 }

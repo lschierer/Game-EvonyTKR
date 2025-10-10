@@ -67,9 +67,11 @@ package Game::EvonyTKR::Controller::Generals {
     $c->setup_helpers($app);
     $c->setup_event_handlers($app);
 
-    $app->plugins->on(mojo_worker_started => sub {
-      $c->setup_routes($app);
-    });
+    $app->plugins->on(
+      mojo_worker_started => sub {
+        $c->setup_routes($app);
+      }
+    );
   }
 
   sub setup_helpers($c, $app) {
@@ -174,10 +176,12 @@ package Game::EvonyTKR::Controller::Generals {
         action     => 'stream_single_details',
         )->name('Generals_dynamic_singleDetails');
     };
-    if($@){
-      my $error = sprintf('error building dynamic routes for Generals Controller: %s', $@);
+    if ($@) {
+      my $error =
+        sprintf('error building dynamic routes for Generals Controller: %s',
+        $@);
       $logger->ERR($error);
-      if($app->mode eq 'development'){
+      if ($app->mode eq 'development') {
         croak($error);
       }
     }
@@ -240,7 +244,7 @@ package Game::EvonyTKR::Controller::Generals {
     };
 
     my $check_prerequisites = sub {
-      if ( List::AllUtils::none { $_ == 0 } values $completion_state->%* ) {
+      if (List::AllUtils::none { $_ == 0 } values $completion_state->%*) {
         $logger->INFO('starting to load generals');
         $c->load_generals($app);
       }
@@ -288,7 +292,8 @@ package Game::EvonyTKR::Controller::Generals {
     my $g  = $c->get_generals()->{$nn};
     if (not defined $g) {
       $logger->WARN(sprintf(
-      'no general named "%s" normalized '.'to "%s" found. Available Generals: %s',
+        'no general named "%s" normalized '
+          . 'to "%s" found. Available Generals: %s',
         $name, $nn, join ', ', keys $c->get_generals()->%*
       ));
     }
@@ -320,13 +325,13 @@ package Game::EvonyTKR::Controller::Generals {
     }
 
     $logger->DEBUG("processing $generalFile");
-    my $data = $generalFile->slurp('UTF-8');
-    my $ho   = YAML::PP->new(
+    my $data       = $generalFile->slurp('UTF-8');
+    my $hashObject = YAML::PP->new(
       schema       => [qw/ + Perl /],
       yaml_version => ['1.2', '1.1'],
     )->load_string($data);
 
-    my $g = Game::EvonyTKR::Model::General->from_hash($ho, $logger);
+    my $g = Game::EvonyTKR::Model::General->from_hash($hashObject);
     unless ($g) {
       $logger->ERR(sprintf('failed to build general from %s', $generalFile));
       return;
@@ -359,10 +364,14 @@ package Game::EvonyTKR::Controller::Generals {
     }
     $g->set_builtInBook($book);
 
-    foreach my $sn ( $g->specialtyNames->@* ) {
-      my $specialty = $app->get_all_specialties->{$c->SUPER::getConstants->normalize($sn)};
-      unless($specialty){
-        $logger->ERR(sprintf('cannot find specialty "%s" for general "%s".', $sn, $g->name));
+    foreach my $sn ($g->specialtyNames->@*) {
+      my $specialty =
+        $app->get_all_specialties->{ $c->SUPER::getConstants->normalize($sn) };
+      unless ($specialty) {
+        $logger->ERR(sprintf(
+          'cannot find specialty "%s" for general "%s".',
+          $sn, $g->name
+        ));
         return;
       }
       push @{ $g->specialties }, $specialty;
@@ -602,7 +611,10 @@ package Game::EvonyTKR::Controller::Generals {
 
         if (none { $_ eq $covenantLevel }
           @{ $data_model->CovenantCategoryValues }) {
-          $logger->WARN(sprintf('Invalid covenantLevel: %s , using default "civilization"',$covenantLevel));
+          $logger->WARN(
+            sprintf('Invalid covenantLevel: %s , using default "civilization"',
+              $covenantLevel)
+          );
           $covenantLevel = 'civilization';
         }
 
@@ -633,9 +645,9 @@ package Game::EvonyTKR::Controller::Generals {
 
         $logger->DEBUG("Using $targetType as targetType for $name");
         my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
-          general  => $general,
-          books    => $c->app->get_generic_books(),
-          covenant => $c->app->getCovenant($general->name),
+          general             => $general,
+          books               => $c->app->get_generic_books(),
+          covenant            => $c->app->getCovenant($general->name),
           ascendingAttributes => $general->ascendingAttribute,
           isPrimary           => 1,
           targetType          => $targetType,

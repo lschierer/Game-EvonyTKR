@@ -9,8 +9,8 @@ use namespace::clean;
 class Game::EvonyTKR::Model::EvonyTKR::Manager :
   isa(Game::EvonyTKR::Shared::Constants) {
 
-  field $SourceDir                  : reader : param;
-  field $glossaryManager            : reader;
+  field $SourceDir : reader : param;
+  field $glossaryManager : reader;
 
   # computed types
   field $conflictDetector : reader : writer;

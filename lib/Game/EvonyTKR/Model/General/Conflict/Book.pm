@@ -11,8 +11,6 @@ class Game::EvonyTKR::Model::General::Conflict::Book :
   use List::AllUtils qw( any none uniq all );
   use Carp;
 
-  #root manager instance
-
   field $ProcessedBooks = {};
 
   field $conflicts_by_book_name = {};

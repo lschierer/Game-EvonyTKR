@@ -56,7 +56,6 @@ package Game::EvonyTKR::Controller::Specialties {
 
     my $mainRoutes = $app->routes->any($base);
 
-
     $mainRoutes->get('/')
       ->to(controller => $controller_name, action => 'index')
       ->name("${base}_index");
@@ -67,10 +66,13 @@ package Game::EvonyTKR::Controller::Specialties {
           "mojo_worker_started sub has controller_name $controller_name.");
         $c->load_specialities($app);
 
-        $app->plugins->on(specialties_imported => sub ($self, $args){
-          $c->build_routes($app, $mainRoutes, $controller_name);
-        });
-      });
+        $app->plugins->on(
+          specialties_imported => sub ($self, $args) {
+            $c->build_routes($app, $mainRoutes, $controller_name);
+          }
+        );
+      }
+    );
 
     $app->helper(
       get_all_specialties => sub {
@@ -84,8 +86,7 @@ package Game::EvonyTKR::Controller::Specialties {
         if (length($level) == 0) {
           my $nameList = [];
           foreach
-            my $orig_name ($c->SUPER::getConstants->SpecialtyLevelValues->@*)
-          {
+            my $orig_name ($c->SUPER::getConstants->SpecialtyLevelValues->@*) {
             $logger->DEBUG(
               "specialty_level_names evaluating specialty level name $orig_name"
             );
@@ -117,8 +118,8 @@ package Game::EvonyTKR::Controller::Specialties {
 
   }
 
-  sub build_routes ($c, $app, $mainRoutes, $controller_name){
-    foreach my $specialty (values $c->get_all_specialties()->%* ) {
+  sub build_routes ($c, $app, $mainRoutes, $controller_name) {
+    foreach my $specialty (values $c->get_all_specialties()->%*) {
       my $name = $specialty->name;
 
       my $clean_name = $name;
@@ -136,8 +137,11 @@ package Game::EvonyTKR::Controller::Specialties {
       });
 
       $logger->DEBUG(
-        sprintf('added route and nav item for name "%s" ', $name) .
-        sprintf('cleaned to "%s" with path "%s/%s"', $clean_name, $base, $name)
+        sprintf('added route and nav item for name "%s" ', $name)
+          . sprintf(
+          'cleaned to "%s" with path "%s/%s"',
+          $clean_name, $base, $name
+          )
       );
     }
   }
@@ -148,50 +152,66 @@ package Game::EvonyTKR::Controller::Specialties {
     my $specialtyFile =
       Mojo::File->new(Encode::decode_utf8($fileName->to_string));
     $logger->DEBUG("importing Specialty file $specialtyFile ");
-    my $data   = $specialtyFile->slurp('UTF-8');
+    my $data       = $specialtyFile->slurp('UTF-8');
     my $hashObject = YAML::PP->new(
       schema       => [qw/ + Perl /],
       yaml_version => ['1.2', '1.1'],
     )->load_string($data);
-    unless(exists $hashObject->{name} && length($hashObject->{name})){
-      $logger->ERR(sprintf('Name is required for a Specialty.  ' . 'Cannot Import %s', $specialtyFile));
+    unless (exists $hashObject->{name} && length($hashObject->{name})) {
+      $logger->ERR(sprintf(
+        'Name is required for a Specialty.  ' . 'Cannot Import %s',
+        $specialtyFile
+      ));
       return;
     }
 
     my $s = Game::EvonyTKR::Model::Specialty->from_hash($hashObject);
-    unless($s) {
-      $logger->ERR(sprintf('Failed to import Specialty from %s.', $specialtyFile));
+    unless ($s) {
+      $logger->ERR(
+        sprintf('Failed to import Specialty from %s.', $specialtyFile));
       return;
     }
-    $c->get_all_specialties()->{$c->SUPER::getConstants->normalize($s->name)} = $s;
-    $logger->DEBUG(sprintf('successfully imported %s from %s', $s->name, $specialtyFile));
-    $app->plugins->emit(specialty_imported => {specialty => $s});
+    $c->get_all_specialties()->{ $c->SUPER::getConstants->normalize($s->name) }
+      = $s;
+    $logger->DEBUG(
+      sprintf('successfully imported %s from %s', $s->name, $specialtyFile));
+    $app->plugins->emit(specialty_imported => { specialty => $s });
   }
 
   sub load_specialities ($c, $app) {
     my $expectedTotal = 0;
 
-    $app->plugins->on(specialty_imported => sub($self, $args) {
-      my $specialty = $args->{speciality};
-      my $alls = $c->get_all_specialties();
-      my $count = scalar( keys $alls->%* );
-      if($count >= $expectedTotal){
-        $logger->INFO(sprintf('All %s Specialties imported.', $count));
-        $app->plugins->emit(specialties_imported => {count => $count });
-      }else {
-        $logger->DEBUG(sprintf('imported %s of %s Specialties.', $count, $expectedTotal));
+    $app->plugins->on(
+      specialty_imported => sub($self, $args) {
+        my $specialty = $args->{speciality};
+        my $alls      = $c->get_all_specialties();
+        my $count     = scalar(keys $alls->%*);
+        if ($count >= $expectedTotal) {
+          $logger->INFO(sprintf('All %s Specialties imported.', $count));
+          $app->plugins->emit(specialties_imported => { count => $count });
+        }
+        else {
+          $logger->DEBUG(
+            sprintf('imported %s of %s Specialties.', $count, $expectedTotal));
+        }
       }
-    });
+    );
 
     Mojo::File->new($app->config('distDir'))
-    ->child('collections/data/specialties/')->list_tree->grep(sub {qr/\.y\{a\}?ml$/})->each(sub ($e, $index) {
-      $expectedTotal++;
-      my $delay = rand(4.0);
-      Mojo::IOLoop->timer($delay => sub{
-        $c->load_single_specialty($app, $e, $index);
-      });
-    });
-    $logger->INFO(sprintf('Async import of %s specialities started.', $expectedTotal));
+      ->child('collections/data/specialties/')
+      ->list_tree->grep(sub {qr/\.y\{a\}?ml$/})->each(
+      sub ($e, $index) {
+        $expectedTotal++;
+        my $delay = rand(4.0);
+        Mojo::IOLoop->timer(
+          $delay => sub {
+            $c->load_single_specialty($app, $e, $index);
+          }
+        );
+      }
+      );
+    $logger->INFO(
+      sprintf('Async import of %s specialities started.', $expectedTotal));
   }
 
   sub sort_levels($self, $levels) {
@@ -207,8 +227,8 @@ package Game::EvonyTKR::Controller::Specialties {
     # Return sorted array
     return [
       sort {
-      # Use the defined order if available,
-      # otherwise fall back to string comparison
+        # Use the defined order if available,
+        # otherwise fall back to string comparison
         ($level_order{ $a->{level} } // 999)
           <=> ($level_order{ $b->{level} } // 999)
           || $a->{level} cmp $b->{level}
@@ -259,7 +279,7 @@ package Game::EvonyTKR::Controller::Specialties {
     $logger->DEBUG("show detects name $name, showing details.");
 
     my $specialty =
-      $c->get_all_specialties->{$c->SUPER::getConstants->normalize($name)};
+      $c->get_all_specialties->{ $c->SUPER::getConstants->normalize($name) };
 
     unless ($specialty) {
       $logger->ERR("speciality '$name' was not found.");

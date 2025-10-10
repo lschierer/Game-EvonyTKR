@@ -48,15 +48,20 @@ package Game::EvonyTKR::Controller::Covenants {
         return $c->get_all_covenants();
       }
     );
-    $app->helper(getCovenant => sub($self, $general) {
-      my $name;
-      if(blessed($general) && $general->isa('Game::EvonyTKR::Model::General')){
-        $name = $general->name;
-      } else {
-        $name = $general;
+    $app->helper(
+      getCovenant => sub($self, $general) {
+        my $name;
+        if (blessed($general)
+          && $general->isa('Game::EvonyTKR::Model::General')) {
+          $name = $general->name;
+        }
+        else {
+          $name = $general;
+        }
+        return $c->get_all_covenants()
+          ->{ $c->SUPER::getConstants->normalize($name) };
       }
-      return $c->get_all_covenants()->{$c->SUPER::getConstants->normalize($name)}
-    });
+    );
 
     $app->helper(
       covenant_category_names => sub ($c, $printable = 0) {
@@ -102,18 +107,23 @@ package Game::EvonyTKR::Controller::Covenants {
       }
     );
 
-    $app->plugins->on( all_covenants_imported => sub {
-      foreach my $covenant (sort {$a->primary->name cmp $b->primary->name} values $c->get_all_covenants()->%*) {
-        $c->_build_covenant_routes($covenant, $covenant->primary->name, $app, $controller_name, $mainRoutes);
+    $app->plugins->on(
+      all_covenants_imported => sub {
+        foreach my $covenant (sort { $a->primary->name cmp $b->primary->name }
+          values $c->get_all_covenants()->%*) {
+          $c->_build_covenant_routes($covenant, $covenant->primary->name,
+            $app, $controller_name, $mainRoutes);
+        }
       }
-    });
+    );
 
     # register routes that cannot exist until after the manager class has
     # done its thing only after initialization
     $app->plugins->on(
       'generals_loaded' => sub {
         $c->load_covenants($app);
-        });
+      }
+    );
 
     $logger->DEBUG("end of register method");
   }
@@ -124,13 +134,16 @@ package Game::EvonyTKR::Controller::Covenants {
     my $covenantFile =
       Mojo::File->new(Encode::decode_utf8($fileName->to_string));
     $logger->DEBUG("importing covenant file $covenantFile ");
-    my $data   = $covenantFile->slurp('UTF-8');
+    my $data       = $covenantFile->slurp('UTF-8');
     my $hashObject = YAML::PP->new(
       schema       => [qw/ + Perl /],
       yaml_version => ['1.2', '1.1'],
     )->load_string($data);
-    unless(exists $hashObject->{name} && length($hashObject->{name})){
-      $logger->ERR(sprintf('Name is required for a Covenant.  ' . 'Cannot Import %s', $covenantFile));
+    unless (exists $hashObject->{name} && length($hashObject->{name})) {
+      $logger->ERR(sprintf(
+        'Name is required for a Covenant.  ' . 'Cannot Import %s',
+        $covenantFile
+      ));
       return;
     }
     my $primary = $app->get_general($hashObject->{name});
@@ -139,40 +152,49 @@ package Game::EvonyTKR::Controller::Covenants {
       return;
     }
     my $covenant =
-      Game::EvonyTKR::Model::Covenant->from_hash($hashObject,
-      $primary);
-    unless($covenant){
+      Game::EvonyTKR::Model::Covenant->from_hash($hashObject, $primary);
+    unless ($covenant) {
       $logger->ERR(sprintf('failed to build covenant from %s.', $covenantFile));
       return;
     }
     my $allc = $app->get_all_covenants();
-    $allc->{$c->SUPER::getConstants()->normalize($covenant->primary->name)} = $covenant;
+    $allc->{ $c->SUPER::getConstants()->normalize($covenant->primary->name) } =
+      $covenant;
     $app->plugins->emit(covenant_imported => { covenant => $covenant });
   }
 
   sub load_covenants ($c, $app) {
     my $expectedTotal = 0;
 
-    $app->plugins->on(covenant_imported => sub {
-      my $covenant = $_->{covenant};
+    $app->plugins->on(
+      covenant_imported => sub {
+        my $covenant = $_->{covenant};
 
-      my $allc = $app->get_all_covenants();
-      my $count = scalar(keys $allc->%*);
-      if($count >= $expectedTotal){
-        $logger->INFO(sprintf('Finished importing %s covenants', $count));
-        $app->plugins->emit(all_covenants_imported => {covenants_imported => $count });
+        my $allc  = $app->get_all_covenants();
+        my $count = scalar(keys $allc->%*);
+        if ($count >= $expectedTotal) {
+          $logger->INFO(sprintf('Finished importing %s covenants', $count));
+          $app->plugins->emit(
+            all_covenants_imported => { covenants_imported => $count });
+        }
       }
-    });
+    );
 
     Mojo::File->new($app->config('distDir'))
-      ->child('collections/data/covenants/')->list_tree->grep(sub {qr/\.y\{a\}?ml$/})->each(sub ($e, $index) {
-      my $delay = rand (4.0);
-      Mojo::IOLoop->timer($delay => sub {
-        $expectedTotal++;
-        $c->import_single_covenant($app, $e, $index);
-      });
-    });
-    $logger->INFO(sprintf('Async import of %s covenant files started', $expectedTotal));
+      ->child('collections/data/covenants/')
+      ->list_tree->grep(sub {qr/\.y\{a\}?ml$/})->each(
+      sub ($e, $index) {
+        my $delay = rand(4.0);
+        Mojo::IOLoop->timer(
+          $delay => sub {
+            $expectedTotal++;
+            $c->import_single_covenant($app, $e, $index);
+          }
+        );
+      }
+      );
+    $logger->INFO(
+      sprintf('Async import of %s covenant files started', $expectedTotal));
   }
 
   sub _build_covenant_routes($c, $covenant, $name, $app, $controller_name,
