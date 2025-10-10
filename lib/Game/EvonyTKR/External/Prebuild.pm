@@ -40,12 +40,8 @@ package Game::EvonyTKR::External::Prebuild {
     $pairBuilder =
       Game::EvonyTKR::External::General::PairBuilder->new(app => $app,);
 
-    $conflictFinder =
-      Game::EvonyTKR::External::General::ConflictFinder->new(app => $app,);
-
-    my $pbTasks = $pairBuilder->get_tasks();
-    foreach my $task_name (keys $pbTasks->%*) {
-      my $task = $pbTasks->{$task_name};
+    foreach my $task_name (keys $pairBuilder->tasks->%*) {
+      my $task = $pairBuilder->tasks->{$task_name};
       $app->minion->add_task(
         $task_name => sub($job, @args) {
           $logger->DEBUG("Running task $task_name");
@@ -53,10 +49,24 @@ package Game::EvonyTKR::External::Prebuild {
           $job->finish();
         }
       );
-      my $tasks = $app->minion->tasks();
-      my @tns   = keys %$tasks;
-      $logger->DEBUG(sprintf('registered tasks include %s', join ', ', @tns));
     }
+
+    $conflictFinder =
+      Game::EvonyTKR::External::General::ConflictFinder->new(app => $app,);
+
+    foreach my $task_name (keys $conflictFinder->tasks->%*) {
+      my $task = $conflictFinder->tasks->{$task_name};
+      $app->minion->add_task(
+        $task_name => sub($job, @args) {
+          $logger->DEBUG("Running task $task_name");
+          my $result = $task->($job, @args) // "task $task_name complete";
+          $job->finish($result);
+        }
+      );
+    }
+    my $tasks = $app->minion->tasks();
+    my @tns   = keys %$tasks;
+    $logger->DEBUG(sprintf('registered tasks include %s', join ', ', @tns));
 
     $app->plugins->on(
       mojo_worker_started => sub {
@@ -186,6 +196,7 @@ package Game::EvonyTKR::External::Prebuild {
           }
         }
         if ($enqueueBuilder) {
+          $logger->INFO('enqueing new build_all_pairs');
           $self->app->minion->enqueue(
             build_all_pairs => [{}] => {
               priority => 50,
