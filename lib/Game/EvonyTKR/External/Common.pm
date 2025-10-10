@@ -25,6 +25,14 @@ class Game::EvonyTKR::External::Common : isa(Game::EvonyTKR::Shared::Constants)
     Mojo::File->new($app->config('distDir'))->child('collections/data/');
 
   field $generals : reader = {};
+  field $conflictDetector =
+    Game::EvonyTKR::Model::General::Conflict::Book->new(
+    build_index      => 1,
+    asst_has_dragon  => 1,
+    asst_has_spirit  => 1,
+    allow_wall_buffs => 1,
+    );
+
 
   method load_builtinBook ($bookName, $generalName) {
     my $bookDir = $collectionDir->child('skill books');

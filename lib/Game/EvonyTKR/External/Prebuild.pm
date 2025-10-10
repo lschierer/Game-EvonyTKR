@@ -12,7 +12,6 @@ require Game::EvonyTKR::Shared::Constants;
 require Game::EvonyTKR::Shared::Logger;
 require Game::EvonyTKR::Model::General;
 require Game::EvonyTKR::External::General::PairBuilder;
-require Game::EvonyTKR::External::General::ConflictFinder;
 
 package Game::EvonyTKR::External::Prebuild {
   use Mojo::Base 'Minion::Job', -signatures;
@@ -29,7 +28,6 @@ package Game::EvonyTKR::External::Prebuild {
   state $OnlyOnePrebuild = 0;
 
   my $pairBuilder;
-  my $conflictFinder;
 
   sub register ($self, $app, $conf = {}) {
     $logger = $self->log_config();
@@ -51,19 +49,6 @@ package Game::EvonyTKR::External::Prebuild {
       );
     }
 
-    $conflictFinder =
-      Game::EvonyTKR::External::General::ConflictFinder->new(app => $app,);
-
-    foreach my $task_name (keys $conflictFinder->tasks->%*) {
-      my $task = $conflictFinder->tasks->{$task_name};
-      $app->minion->add_task(
-        $task_name => sub($job, @args) {
-          $logger->DEBUG("Running task $task_name");
-          my $result = $task->($job, @args) // "task $task_name complete";
-          $job->finish($result);
-        }
-      );
-    }
     my $tasks = $app->minion->tasks();
     my @tns   = keys %$tasks;
     $logger->DEBUG(sprintf('registered tasks include %s', join ', ', @tns));

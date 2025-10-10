@@ -50,7 +50,7 @@ package Game::EvonyTKR::Shared::Logger {
     'Game::EvonyTKR::Controller::Glossary'            => 'WARN',
     'Game::EvonyTKR::External::Conflicts::Worker'     => 'WARN',
     'Game::EvonyTKR::External::Buff::Worker'          => 'WARN',
-    'Game::EvonyTKR::External::Common'                => 'DEBUG',
+    'Game::EvonyTKR::External::Common'                => 'INFO',
     'Game::EvonyTKR::External::Prebuild'              => 'INFO',
     'Game::EvonyTKR::Model::Book::SkillBook'          => 'INFO',
     'Game::EvonyTKR::Model::Book::Builtin'            => 'WARN',

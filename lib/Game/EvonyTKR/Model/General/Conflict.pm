@@ -789,6 +789,23 @@ class Game::EvonyTKR::Model::General::Conflict :
     }
   }
 
+  method preseed ($nbg, $ngbct) {
+    foreach my $gn (keys $nbg->%*){
+      foreach my $og (keys $nbg->{$gn}->%* ){
+        $by_general->{$gn}->{$og} = 1;
+      }
+    }
+
+    foreach my $ct (keys $ngbct->%* ){
+      my @all;
+      push @all, $ngbct->{$ct}->@*;
+      if( exists $groups_by_conflict_type->{$ct} ){
+        push @all, $groups_by_conflict_type->{$ct}->@*;
+      }
+      @all = List::AllUtils::uniq @all;
+      $groups_by_conflict_type->{$ct} = \@all;
+    }
+  }
 }
 1;
 __END__

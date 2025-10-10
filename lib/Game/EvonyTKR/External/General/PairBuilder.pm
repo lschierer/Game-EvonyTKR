@@ -23,13 +23,7 @@ class Game::EvonyTKR::External::General::PairBuilder :
 
   field $dist_dir = Path::Tiny::path(File::Share::dist_dir('Game::EvonyTKR'));
   field $builderJobs = [];
-  field $conflictDetector =
-    Game::EvonyTKR::Model::General::Conflict::Book->new(
-    build_index      => 1,
-    asst_has_dragon  => 1,
-    asst_has_spirit  => 1,
-    allow_wall_buffs => 1,
-    );
+
 
   field $pairs_by_type : param : reader = {};
 
@@ -167,6 +161,10 @@ class Game::EvonyTKR::External::General::PairBuilder :
           $info->{id}, Data::Printer::np($ngp, multiline => 0)
         ));
         $self->merge_new_pairs($ngp);
+        $self->conflictDetector->preseed(
+          ($info->{notes}->{by_general} // {} ),
+          ($info->{notes}->{groups_by_conflict_type} // {}),
+        );
         return;
       }
 
@@ -177,10 +175,12 @@ class Game::EvonyTKR::External::General::PairBuilder :
         'monitor_pair_builders found job %s is incomplete, triggering retry',
         $info->{id}));
       $something_incomplete++;
-      return $monitor_job->retry({ delay => 10 });
+      return;
     });
 
-    $monitor_job->note(pairs_by_type => $pairs_by_type);
+    $monitor_job->note(pairs_by_type            => $pairs_by_type);
+    $monitor_job->note(by_general               => $self->conflictDetector->by_general );
+    $monitor_job->note(groups_by_conflict_type  => $self->conflictDetector->groups_by_conflict_type);
     if ($something_failed) {
       return $monitor_job->finish(
         "monitor_pair_builders found $something_failed jobs failed");
@@ -240,7 +240,7 @@ class Game::EvonyTKR::External::General::PairBuilder :
         $primary->name, $secondary->name
       ));
       next
-        unless $conflictDetector->are_generals_compatible($primary, $secondary);
+        unless $self->conflictDetector->are_generals_compatible($primary, $secondary);
 
       $self->logger->DEBUG(sprintf(
         'no conflict, testing %s and %s for common type.',
@@ -277,7 +277,9 @@ class Game::EvonyTKR::External::General::PairBuilder :
     }
     $self->logger->INFO(
       sprintf('there are %s pairs for %s', $total_added, $primary->name));
-    $job->note(pairs_by_type => $pairs_by_type);
+    $job->note(pairs_by_type            => $pairs_by_type);
+    $job->note(by_general               => $self->conflictDetector->by_general);
+    $job->note(groups_by_conflict_type  => $self->conflictDetector->groups_by_conflict_type);
     return $job->finish({ pairs_by_type => $pairs_by_type });
   }
 
