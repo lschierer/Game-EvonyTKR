@@ -8,7 +8,6 @@ require Mojolicious::Plugin::Minion;
 
 #require Game::EvonyTKR::Controller::Root;
 require Game::EvonyTKR::Controller::ControllerBase;
-require Game::EvonyTKR::Model::EvonyTKR::Manager;
 require Game::EvonyTKR::External::Buff::Worker;
 require Game::EvonyTKR::External::Prebuild;
 require GitRepo::Reader;
@@ -62,12 +61,9 @@ package Game::EvonyTKR {
     );
 
     $logger->INFO(sprintf('Mojolicious Logging initialized',));
-    my $RootManager =
-      Game::EvonyTKR::Model::EvonyTKR::Manager->new(SourceDir => $distDir,);
 
     my $RepoData = GitRepo::Reader->new(source_dir => $distDir,);
 
-    $self->helper(get_root_manager => sub { return $RootManager });
     $self->helper(get_repo_data    => sub { return $RepoData });
 
     foreach my $envkey (keys %{ $self->config->{'EvonyTKR-Environment'} }) {
@@ -81,19 +77,6 @@ package Game::EvonyTKR {
       }
     }
 
-    # Instantiate and attach shared model manager
-    # Run rootImport once on first dispatch
-    $self->hook(
-      before_server_start => sub {
-        state $initialized = do {
-          #$logger->INFO("⚙️  Running rootImport...");
-          #$RootManager->rootImport();
-          #$logger->INFO("✅ rootImport completed.");
-          #$self->plugins->emit(evonytkrtips_initialized => $RootManager);
-          1;
-        };
-      }
-    );
     # Set namespaces
     push @{ $self->routes->namespaces },  'Game::EvonyTKR::Controller';
     push @{ $self->plugins->namespaces }, 'Game::EvonyTKR::Plugins';

@@ -24,20 +24,27 @@ package Game::EvonyTKR::Controller::ConflictGroups {
 
   my $rootManager;
 
-  sub get_conflict_detector ($self) {
-    return $rootManager->conflictDetector;
+  sub get_conflict_detector {
+    state $cd = Game::EvonyTKR::Model::General::Conflict::Book->new(
+      build_index      => 1,
+      asst_has_dragon  => 1,
+      asst_has_spirit  => 1,
+      allow_wall_buffs => 1,
+    );
+    return $cd;
   }
-
-  state @conflict_queue = ();
 
   sub register($c, $app, $config = {}) {
     $logger = $app->get_logger(__PACKAGE__);
     $logger->INFO("Registering routes for " . ref($c));
     $c->SUPER::register($app, $config);
-    $rootManager = $app->get_root_manager();
 
     my $routes          = $app->routes->any($base);
     my $controller_name = $c->controller_name();
+
+    $app->helper(get_conflict_detector => sub {
+      return $c->get_conflict_detector();
+    });
 
     $routes->get('/')
       ->to(controller => $controller_name, action => 'index')
@@ -51,20 +58,17 @@ package Game::EvonyTKR::Controller::ConflictGroups {
     });
 
     $app->plugins->on(
-      conflicts_complete => sub {
+      conflicts_complete => sub ($self, $data) {
         $logger->INFO('Conflict Update detected');
-        my ($plugin, $data) = @_;
-        my $conflicts = $data->{conflicts} // {};
         $logger->DEBUG(
           sprintf('data from conflicts_complete signal is %s',
-            Data::Printer::np($conflicts))
+            Data::Printer::np($data))
         );
-        my $cd = $app->get_root_manager()->conflictDetector;
+        my $cd = $c->get_conflict_detector();
         if ($cd) {
-
           $cd->preseed(
-            ($conflicts->{by_general} // {}),
-            ($conflicts->{groups_by_conflict_type} // {})
+            ($data->{by_general} // {}),
+            ($data->{groups_by_conflict_type} // {})
           );
         }
       }
@@ -73,10 +77,10 @@ package Game::EvonyTKR::Controller::ConflictGroups {
   }
 
   sub index ($c) {
-    $c->logger->DEBUG("Rendering conflict groups index");
+    $logger->DEBUG("Rendering conflict groups index");
 
     my $detector = $c->get_conflict_detector();
-    $c->logger->DEBUG(sprintf('there are %s generals in the by_general index',
+    $logger->DEBUG(sprintf('there are %s generals in the by_general index',
       scalar keys $detector->by_general->%*));
     my $groups = $detector->groups_by_conflict_type;
     my $pairs  = $detector->by_general;

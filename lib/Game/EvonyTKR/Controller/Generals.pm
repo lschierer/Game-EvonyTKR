@@ -66,12 +66,8 @@ package Game::EvonyTKR::Controller::Generals {
 
     $c->setup_helpers($app);
     $c->setup_event_handlers($app);
+    $c->setup_routes($app);
 
-    $app->plugins->on(
-      mojo_worker_started => sub {
-        $c->setup_routes($app);
-      }
-    );
   }
 
   sub setup_helpers($c, $app) {
@@ -426,31 +422,31 @@ package Game::EvonyTKR::Controller::Generals {
     });
   }
 
-  sub index($self) {
+  sub index($c) {
     my $collection = collection_name();
     $logger->DEBUG("Rendering index for $collection");
 
-    my $rp = $self->req->url->path->to_string;
+    my $rp = $c->req->url->path->to_string;
     # Remove trailing slash from pages
     if ($rp =~ qr{/$}) {
       my $canonical = $rp;
       $canonical =~ s{/$}{};
-      return $self->redirect_to($canonical, 301);
+      return $c->redirect_to($canonical, 301);
     }
 
     # Check if markdown exists for this collection
     my $distDir       = Mojo::File::Share::dist_dir('Game::EvonyTKR');
     my $markdown_path = $distDir->child("pages/Generals/index.md");
 
-    my @parts     = split(/::/, ref($self));
+    my @parts     = split(/::/, ref($c));
     my $baseClass = pop(@parts);
-    my $base      = $self->getBase();
+    my $base      = $c->getBase();
     $logger->DEBUG("Generals index method has base $base");
 
-    my $items = $self->get_generals();
+    my $items = $c->get_generals();
     $logger->DEBUG(
       sprintf('Items: %s with %s keys.', ref($items), scalar(keys %$items)));
-    $self->stash(
+    $c->stash(
       linkBase        => $base,
       items           => $items,
       collection_name => $collection,
@@ -461,15 +457,15 @@ package Game::EvonyTKR::Controller::Generals {
       $logger->DEBUG(
         "rendering /Generals/ with markdown index content from $markdown_path");
       # Render with markdown
-      $self->stash(template => '/generals/index');
+      $c->stash(template => '/generals/index');
 
-      return $self->render_markdown_file($markdown_path,
+      return $c->render_markdown_file($markdown_path,
         { template => 'generals/index' });
     }
     else {
       $logger->DEBUG("no markdown index content found at $markdown_path");
       # Render just the items
-      return $self->render(template => '/generals/index');
+      return $c->render(template => '/generals/index');
     }
   }
 

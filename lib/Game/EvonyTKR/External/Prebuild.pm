@@ -93,8 +93,17 @@ package Game::EvonyTKR::External::Prebuild {
             $app->plugins->emit(pairs_by_type => $pairs_by_type);
           }
         }
+
+        my $by_general              = $job->info->{by_general} // {};
+        my $groups_by_conflict_type = $job->info->{groups_by_conflict_type} // {};
+
+
         if ($job->info->{state} eq 'finished') {
           $app->plugins->emit(pairs_complete => $pairs_by_type);
+          $app->plugins->emit(conflicts_complete  => {
+            by_general              => $by_general,
+            groups_by_conflict_type => $groups_by_conflict_type,
+          });
           Mojo::IOLoop->remove($loop);
         }
       }
@@ -202,8 +211,12 @@ package Game::EvonyTKR::External::Prebuild {
           $self->finish("Monitor job failed: $monitorJob->info->{result}");
         }
         if ($monitorJob->info->{state} eq 'finished') {
-          $self->note(pairs_by_type =>
-              ($monitorJob->info->{notes}->{pairs_by_type} // {}));
+          my $notes = $monitorJob->info->{notes};
+          $self->note(
+            pairs_by_type           => ($notes->{pairs_by_type} // {}),
+            by_general              => ($notes->{by_general} // {}),
+            groups_by_conflict_type => ($notes->{groups_by_conflict_type} // {}),
+          );
           if ($monitorJob->info->{result} eq 'all pair builders complete') {
             if ($completed_pairs == 0 && $active_pairs) {
               $logger->INFO('All Monitored Jobs Complete');
