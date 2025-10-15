@@ -5,14 +5,13 @@ use File::FindLib 'lib';
 require YAML::PP;
 require Minion::Backend::SQLite;
 require Mojolicious::Plugin::Minion;
-require File::HomeDir::Tiny;
 
 #require Game::EvonyTKR::Controller::Root;
 require Game::EvonyTKR::Controller::ControllerBase;
+require Game::EvonyTKR::External::JobBase;
 require Game::EvonyTKR::External::Buff::Worker;
 require Game::EvonyTKR::External::Prebuild;
 require Game::EvonyTKR::Log::Config;
-require MojoX::Log::Log4perl;
 
 require GitRepo::Reader;
 
@@ -55,14 +54,13 @@ package Game::EvonyTKR {
     $self->defaults(layout => 'default');
 
     # Logging setup
-    my $log4perlConfig = sprintf('%s/log4perl.%s.conf', $distDir, $mode );
-    unless (-f -r $log4perlConfig){
-      carp("$log4perlConfig does not exist.");
-    }
-    $self->log( MojoX::Log::Log4perl->new( $log4perlConfig ) );
+    my $l4p = Game::EvonyTKR::Log::Config->logger();
     Log::Any::Adapter->set('Log4perl');
 
-    $self->log->info(sprintf('Mojolicious Logging initialized from "%s"', $log4perlConfig));
+    $self->plugin('Log::Any' => {logger => 'Log::Log4perl'});
+
+
+    $self->log->info(sprintf('Mojolicious Logging initialized'));
 
     my $RepoData = GitRepo::Reader->new(source_dir => $distDir,);
 

@@ -13,9 +13,9 @@ require Game::EvonyTKR::Model::General;
 require Game::EvonyTKR::External::General::Pair::Workflow;
 
 
+
 package Game::EvonyTKR::External::Prebuild {
-  use Mojo::Base 'Minion::Job', -signatures;
-  use Mojo::Base 'Mojolicious::Plugin', -role, -signatures;
+  use Mojo::Base 'Game::EvonyTKR::External::JobBase', -signatures;
   use experimental qw(class);
   use Carp;
 
@@ -24,7 +24,8 @@ package Game::EvonyTKR::External::Prebuild {
   state $OnlyOnePrebuild = 0;
 
   sub register ($self, $app, $conf = {}) {
-    $logger = $app->log;
+    $self->SUPER::register($app, $conf);
+    $logger = Log::Log4perl->get_logger(__PACKAGE__);
     $logger->debug(sprintf('register function for "%s"', __PACKAGE__));
 
     # Register main prebuild orchestration task
@@ -141,6 +142,7 @@ package Game::EvonyTKR::External::Prebuild {
 
   # Main prebuild orchestration job
   sub run ($self, @args) {
+    $self->SUPER::run(@args);
     $logger->debug('Prebuild orchestration starting');
 
      #Start pair building workflow

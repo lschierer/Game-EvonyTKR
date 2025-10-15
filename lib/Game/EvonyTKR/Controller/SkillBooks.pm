@@ -43,7 +43,7 @@ package Game::EvonyTKR::Controller::SkillBooks {
 
   # Register this when the application starts
   sub register($c, $app, $config = {}) {
-    $logger = $app->log;
+    $logger = Log::Log4perl->get_logger(__PACKAGE__);
     $logger->info("Registering routes for " . ref($c));
     $c->SUPER::register($app, $config);
 

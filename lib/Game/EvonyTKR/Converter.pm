@@ -24,7 +24,7 @@ package Game::EvonyTKR::Converter {
   use Sereal::Decoder;
   our $VERSION = 'v0.01.0';
 
-  my $logger = $app->log;
+  my $logger = Log::Log4perl->get_logger(__PACKAGE__);
 
   sub opt_spec {
     return (

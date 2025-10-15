@@ -6,15 +6,15 @@ require Data::Printer;
 require Game::EvonyTKR::External::General::Pair::Builder;
 
 package Game::EvonyTKR::External::General::Pair::Workflow {
-  use Mojo::Base 'Minion::Job', -signatures;
-  use Mojo::Base 'Mojolicious::Plugin', -role, -signatures;
+  use Mojo::Base 'Game::EvonyTKR::External::JobBase', -signatures;
   use experimental qw(class);
   use Carp;
 
   my $logger;
 
   sub register ($self, $app, $conf = {}) {
-    $logger = $app->log;
+    $self->SUPER::register($app, $conf);
+    $logger = Log::Log4perl->get_logger(__PACKAGE__);
     $logger->debug('Registering pair workflow tasks');
 
     # Job spawner - creates individual pair building jobs
@@ -71,6 +71,7 @@ package Game::EvonyTKR::External::General::Pair::Workflow {
   }
 
   sub run ($self, $args) {
+    $self->SUPER::run($args);
     $logger->debug('monitor_pair_builders task starting');
 
     # Allow multiple monitors (one per hypnotoad worker)

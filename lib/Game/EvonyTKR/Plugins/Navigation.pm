@@ -20,7 +20,7 @@ package Game::EvonyTKR::Plugins::Navigation {
   };
 
   sub register ($self, $app, $config = {}) {
-    $logger = $app->log;
+    $logger = Log::Log4perl->get_logger(__PACKAGE__);
     $logger->info("Registering navigation plugin");
 
     $app->helper(

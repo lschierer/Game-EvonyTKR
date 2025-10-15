@@ -31,7 +31,7 @@ package Game::EvonyTKR::External::Buff::Worker {
   my $logger;
 
   sub register ($self, $app, $conf) {
-    $logger = $app->log;
+    $logger = Log::Log4perl->get_logger(__PACKAGE__);
 
     $app->minion->add_task(
       pair_worker => sub ($job, $args) {
