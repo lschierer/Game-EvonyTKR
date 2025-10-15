@@ -51,12 +51,12 @@ package Game::EvonyTKR {
     $self->defaults(layout => 'default');
 
     # Logging setup
-    my $logger = Game::EvonyTKR::Shared::Logger::get_logger('Game::EvonyTKR');
+    my $logger = Game::EvonyTKR::Shared::Logger->get_logger('Game::EvonyTKR');
     $self->log(MojoX::Log::Fast->new($logger));
 
     $self->helper(
       get_logger => sub ($self, $caller) {
-        return Game::EvonyTKR::Shared::Logger::get_logger($caller);
+        return Game::EvonyTKR::Shared::Logger->get_logger($caller);
       }
     );
 
@@ -64,7 +64,7 @@ package Game::EvonyTKR {
 
     my $RepoData = GitRepo::Reader->new(source_dir => $distDir,);
 
-    $self->helper(get_repo_data    => sub { return $RepoData });
+    $self->helper(get_repo_data => sub { return $RepoData });
 
     foreach my $envkey (keys %{ $self->config->{'EvonyTKR-Environment'} }) {
       if (defined $envkey) {

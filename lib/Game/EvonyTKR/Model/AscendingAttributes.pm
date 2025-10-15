@@ -240,7 +240,7 @@ class Game::EvonyTKR::Model::AscendingAttributes :
   }
 
   sub from_hash($self, $object) {
-    my $logger = Game::EvonyTKR::Shared::Logger::get_logger(__PACKAGE__);
+    my $logger = Game::EvonyTKR::Shared::Logger->get_logger(__PACKAGE__);
     unless (exists $object->{ascending}
       && ref($object->{ascending}) eq 'ARRAY') {
       $logger->ERR(sprintf(

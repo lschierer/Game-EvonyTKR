@@ -29,7 +29,7 @@ class LinkChecker::Command {
   }
 
   ADJUST {
-    $logger = Game::EvonyTKR::Shared::Logger::get_logger(__CLASS__);
+    $logger = Game::EvonyTKR::Shared::Logger->get_logger(__CLASS__);
   }
 
   method execute {

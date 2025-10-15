@@ -21,7 +21,7 @@ class Game::EvonyTKR::Model::Logger {
 
   ADJUST {
     # decide dev-ness; prefer DEV_MODE, else PERL_ENV/MOJO_MODE
-    $logger = Game::EvonyTKR::Shared::Logger::get_logger(__CLASS__);
+    $logger = Game::EvonyTKR::Shared::Logger->get_logger(__CLASS__);
     $logger->DEBUG(
       sprintf('logging set to "%s" for "%s"', $logger->level(), __CLASS__));
   }

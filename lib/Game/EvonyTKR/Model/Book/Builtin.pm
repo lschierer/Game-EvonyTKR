@@ -32,7 +32,7 @@ class Game::EvonyTKR::Model::Book::Builtin : isa(Game::EvonyTKR::Model::Book) {
   }
 
   sub from_hash ($class, $object,) {
-    my $logger = Game::EvonyTKR::Shared::Logger::get_logger($class);
+    my $logger = Game::EvonyTKR::Shared::Logger->get_logger($class);
     my $bb     = Game::EvonyTKR::Model::Book::Builtin->new(
       name => $object->{name},
       text => $object->{text} // '',

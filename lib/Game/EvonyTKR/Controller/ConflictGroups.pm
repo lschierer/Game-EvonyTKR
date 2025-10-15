@@ -42,9 +42,11 @@ package Game::EvonyTKR::Controller::ConflictGroups {
     my $routes          = $app->routes->any($base);
     my $controller_name = $c->controller_name();
 
-    $app->helper(get_conflict_detector => sub {
-      return $c->get_conflict_detector();
-    });
+    $app->helper(
+      get_conflict_detector => sub {
+        return $c->get_conflict_detector();
+      }
+    );
 
     $routes->get('/')
       ->to(controller => $controller_name, action => 'index')
@@ -66,10 +68,8 @@ package Game::EvonyTKR::Controller::ConflictGroups {
         );
         my $cd = $c->get_conflict_detector();
         if ($cd) {
-          $cd->preseed(
-            ($data->{by_general} // {}),
-            ($data->{groups_by_conflict_type} // {})
-          );
+          $cd->preseed(($data->{by_general} // {}),
+            ($data->{groups_by_conflict_type} // {}));
         }
       }
     );

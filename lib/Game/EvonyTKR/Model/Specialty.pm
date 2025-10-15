@@ -196,7 +196,7 @@ class Game::EvonyTKR::Model::Specialty : isa(Game::EvonyTKR::Shared::Constants)
   }
 
   sub from_hash ($class, $object,) {
-    my $logger = Game::EvonyTKR::Shared::Logger::get_logger($class);
+    my $logger = Game::EvonyTKR::Shared::Logger->get_logger($class);
     unless (exists($object->{name}) && length($object->{name})) {
       $logger->ERR('Name is required to create a Specialty.');
       return undef;

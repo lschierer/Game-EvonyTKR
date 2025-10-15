@@ -353,7 +353,7 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Shared::Constants) {
   }
 
   sub from_hash ($class, $hashref) {
-    my $logger = Game::EvonyTKR::Shared::Logger::get_logger($class);
+    my $logger = Game::EvonyTKR::Shared::Logger->get_logger($class);
     my $v      = Game::EvonyTKR::Model::Buff::Value->new(
       number => abs($hashref->{value}->{number}),
       unit   => $hashref->{value}->{unit} // 'percentage',

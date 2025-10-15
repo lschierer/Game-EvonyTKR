@@ -379,7 +379,6 @@ package Game::EvonyTKR::Controller::Generals {
 
   sub handle_general_loaded($c, $app, $data) {
     eval {
-      my $manager         = $app->get_root_manager();
       my $general         = $data->{general};
       my $controller_name = $c->controller_name();
       my $referenceRoutes = $app->routes->any($reference_base);

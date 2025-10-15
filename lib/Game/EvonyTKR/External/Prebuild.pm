@@ -11,7 +11,8 @@ require Game::EvonyTKR;
 require Game::EvonyTKR::Shared::Constants;
 require Game::EvonyTKR::Shared::Logger;
 require Game::EvonyTKR::Model::General;
-require Game::EvonyTKR::External::General::PairBuilder;
+require Game::EvonyTKR::External::General::Pair::Workflow;
+
 
 package Game::EvonyTKR::External::Prebuild {
   use Mojo::Base 'Minion::Job', -signatures;
@@ -21,56 +22,76 @@ package Game::EvonyTKR::External::Prebuild {
 
   my $logger;
 
-  sub log_config ($self) {
-    $logger = Game::EvonyTKR::Shared::Logger::get_logger(__PACKAGE__);
-  }
-
   state $OnlyOnePrebuild = 0;
 
-  my $pairBuilder;
-
   sub register ($self, $app, $conf = {}) {
-    $logger = $self->log_config();
+    $logger = Game::EvonyTKR::Shared::Logger->get_logger(__PACKAGE__);
     $logger->DEBUG(sprintf('register function for "%s"', __PACKAGE__));
 
+    # Register main prebuild orchestration task
     $app->minion->add_task(external_prebuild => __PACKAGE__);
+    $app->plugin('Game::EvonyTKR::External::General::Pair::Workflow');
 
-    $pairBuilder =
-      Game::EvonyTKR::External::General::PairBuilder->new(app => $app,);
-
-    foreach my $task_name (keys $pairBuilder->tasks->%*) {
-      my $task = $pairBuilder->tasks->{$task_name};
-      $app->minion->add_task(
-        $task_name => sub($job, @args) {
-          $logger->DEBUG("Running task $task_name");
-          $task->($job, @args);
-          $job->finish();
-        }
-      );
-    }
-
+    # Register pair workflow tasks
+    #$app->plugin('Game::EvonyTKR::External::General::Pair::Workflow');
     my $tasks = $app->minion->tasks();
     my @tns   = keys %$tasks;
     $logger->DEBUG(sprintf('registered tasks include %s', join ', ', @tns));
 
+    my $pair_workflow_loaded = 1;
     $app->plugins->on(
-      mojo_worker_started => sub {
-        if (!$OnlyOnePrebuild) {
-          $OnlyOnePrebuild = 1;
-
-          if (my $guard = $app->minion->guard('external_prebuild', 0)) {
-            my $prebuildJid = $self->startPrebuild($app);
-            $self->monitorPrebuild($app, $prebuildJid);
-          }
-        }
+      pair_workflow_loaded => sub {
+        $pair_workflow_loaded = 1;
       }
     );
+
+    my $mojo_worker_started = 0;
+    $app->plugins->on(
+      mojo_worker_started => sub {
+        $mojo_worker_started = 1;
+        my $loop;
+        $loop = Mojo::IOLoop->recurring(
+          5 => sub {
+            if ($pair_workflow_loaded) {
+              if (!$OnlyOnePrebuild) {
+                $OnlyOnePrebuild = 1;
+
+                if (my $guard = $app->minion->guard('external_prebuild', 0)) {
+                  my $prebuildJid = $self->startPrebuild($app);
+                  $self->monitorPrebuild($app, $prebuildJid);
+                }
+              } else {
+                $logger->DEBUG('OnlyOnePrebuild prevented restart');
+              }
+             Mojo::IOLoop->remove($loop);
+            } else {
+              $logger->DEBUG(sprintf('mojo_worker_started is %s; pair_workflow_loaded is %s.',
+              $mojo_worker_started ? 'true' : 'false', $pair_workflow_loaded ? 'true' : 'false'));
+            }
+          });
+        Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
+      }
+    );
+
+  }
+
+  sub startPrebuild ($self, $app) {
+    my $jid = $app->minion->enqueue(
+      'external_prebuild' => [{}] => {
+        priority => 100,
+        attempts => 3,
+        expire   => 7200,
+      }
+    );
+    $logger->INFO("Started prebuild orchestrator job $jid");
+    return $jid;
   }
 
   sub monitorPrebuild ($plugin, $app, $prebuildJid) {
     my $loop;
     my $retryCount = 0;
     my $maxRetries = 5;
+
     $loop = Mojo::IOLoop->recurring(
       10 => sub {
         my $job = $app->minion->job($prebuildJid);
@@ -83,63 +104,58 @@ package Game::EvonyTKR::External::Prebuild {
           }
           return;
         }
-        my $notes         = $job->info->{notes} // {};
-        my $pairs_by_type = $app->get_general_pairs();
-        foreach my $key (keys $notes->%*) {
-          if ($key eq 'pairs_by_type') {
-            $pairs_by_type = $notes->{$key};
-            $logger->DEBUG('detected pairs_by_type update: '
-                . Data::Printer::np($pairs_by_type, multiline => 0));
-            $app->plugins->emit(pairs_by_type => $pairs_by_type);
-          }
+
+        my $info  = $job->info;
+        my $notes = $info->{notes} // {};
+
+        # Check for pairs completion and emit to Mojolicious
+        if (my $pairs_by_type = $notes->{pairs_by_type}) {
+          $logger->DEBUG('detected pairs_by_type update');
+          $app->plugins->emit(pairs_by_type => $pairs_by_type);
         }
 
-        my $by_general              = $job->info->{by_general} // {};
-        my $groups_by_conflict_type = $job->info->{groups_by_conflict_type} // {};
+        # Check for conflicts completion and emit to Mojolicious
+        if (my $conflicts = $notes->{conflicts}) {
+          $logger->DEBUG('detected conflicts update');
+          $app->plugins->emit(conflicts_complete => $conflicts);
+        }
 
-
-        if ($job->info->{state} eq 'finished') {
-          $app->plugins->emit(pairs_complete => $pairs_by_type);
-          $app->plugins->emit(conflicts_complete  => {
-            by_general              => $by_general,
-            groups_by_conflict_type => $groups_by_conflict_type,
-          });
+        # Check if prebuild is complete
+        if ($info->{state} eq 'finished') {
+          $logger->INFO('Prebuild orchestration complete');
+          $app->plugins->emit(
+            prebuild_complete => {
+              pairs     => $notes->{pairs_by_type},
+              conflicts => $notes->{conflicts}
+            }
+          );
+          Mojo::IOLoop->remove($loop);
+        }
+        elsif ($info->{state} eq 'failed') {
+          $logger->ERR(
+            "Prebuild failed: " . ($info->{result} // 'unknown error'));
           Mojo::IOLoop->remove($loop);
         }
       }
     );
-    Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
   }
 
-  sub startPrebuild ($self, $app) {
-    # Skip if this is admin interface
-    if ($app->can('req') && $app->req && $app->req->url->path =~ m{^/minion}) {
-      $OnlyOnePrebuild = 0;
-      return;
-    }
-    my $prebuildJid;
-    if (not defined $prebuildJid) {
-      $prebuildJid = $app->minion->enqueue(
-        external_prebuild => [] => {
-          priority => 100,
-          attempts => 5,
-          expire   => 7200,
-          unique   => 'external_prebuild',
-        }
-      );
-    }
-    return $prebuildJid;
-  }
-
+  # Main prebuild orchestration job
   sub run ($self, @args) {
-    $logger->DEBUG(sprintf('%s run method starting',            __PACKAGE__));
-    $logger->DEBUG(sprintf('%s run method escaped guard check', __PACKAGE__));
+    $logger->DEBUG('Prebuild orchestration starting');
 
-    #wait to ensure the workers have the new tasks
-    sleep 15;
+     #Start pair building workflow
+    my $pair_workflow_jid = $self->app->minion->enqueue(
+      'build_all_pairs' => [{}] => {
+        priority => 50,
+        attempts => 5,
+        expire   => 3600,
+      }
+    );
 
-    my $monitorJid = $self->app->minion->enqueue(
-      monitor_pair_builders => [{}] => {
+    # Start monitoring
+    my $monitor_jid = $self->app->minion->enqueue(
+      'monitor_pair_builders' => [{}] => {
         priority => 90,
         attempts => 5,
         delay    => 15,
@@ -147,83 +163,40 @@ package Game::EvonyTKR::External::Prebuild {
       }
     );
 
+    # Monitor completion
     my $loop;
     $loop = Mojo::IOLoop->recurring(
       10 => sub {
-        # Check for any successful completions
+        # Check if pair workflow completed
         my $completed_pairs = $self->app->minion->jobs({
           tasks  => ['build_all_pairs'],
           states => ['finished']
         })->total;
 
-        # Check for any still running
         my $active_pairs = $self->app->minion->jobs({
           tasks  => ['build_all_pairs'],
           states => ['active', 'inactive']
         })->total;
 
-        # Check for any failures (optional - decide if you want to handle this)
-        my $failed_pairs = $self->app->minion->jobs({
-          tasks  => ['build_all_pairs'],
-          states => ['failed']
-        })->total;
+        # Check monitor job for results
+        my $monitor_job = $self->app->minion->job($monitor_jid);
+        if (
 
-        # none have been kicked off, do so.
-        my $enqueueBuilder = 0;
-        if ($completed_pairs == 0 && $active_pairs == 0 && $failed_pairs == 0) {
-          $enqueueBuilder = 1;
-        }
-        elsif ($completed_pairs == 0 && $active_pairs == 0) {
-          # one failed, check how many times its retried
-          my $stillRetrying = 0;
-          $self->app->minion->jobs({
-            tasks  => ['build_all_pairs'],
-            states => ['failed']
-          })->each(sub {
-            my $info = $_;
-            if ($info->{retried} <= $info->{attempts}) {
-              $stillRetrying = 1;
-            }
-          });
-          if ($stillRetrying == 0) {
-            $enqueueBuilder = 1;
-          }
-        }
-        if ($enqueueBuilder) {
-          $logger->INFO('enqueing new build_all_pairs');
-          $self->app->minion->enqueue(
-            build_all_pairs => [{}] => {
-              priority => 50,
-              attempts => 5,
-              expire   => 720,
-            }
-          );
-        }
-        my $monitorJob = $self->app->minion->job($monitorJid);
-        unless ($monitorJob) {
-          $logger->ERR("No job associated with monitorJid $monitorJid");
-          Mojo::IOLoop->remove($loop);
-          $self->finish("No job associated with monitorJid $monitorJid");
-        }
-        if ($monitorJob->info->{state} eq 'failed') {
-          $logger->ERR("Monitor job failed: $monitorJob->info->{result}");
-          Mojo::IOLoop->remove($loop);
-          $self->finish("Monitor job failed: $monitorJob->info->{result}");
-        }
-        if ($monitorJob->info->{state} eq 'finished') {
-          my $notes = $monitorJob->info->{notes};
-          $self->note(
-            pairs_by_type           => ($notes->{pairs_by_type} // {}),
-            by_general              => ($notes->{by_general} // {}),
-            groups_by_conflict_type => ($notes->{groups_by_conflict_type} // {}),
-          );
-          if ($monitorJob->info->{result} eq 'all pair builders complete') {
-            if ($completed_pairs == 0 && $active_pairs) {
-              $logger->INFO('All Monitored Jobs Complete');
-              $self->note(complete => 'All Monitored Jobs Complete');
-              Mojo::IOLoop->remove($loop);
-              $self->finish('All Monitored Jobs Complete');
-            }
+            ($monitor_job && $monitor_job->info->{state} eq 'finished') ||
+            ($monitor_job && $monitor_job->info->{state} eq 'inactive' && $monitor_job->info->{retries} > 0)
+          ) {
+          # Collect incremental results
+          my $pairs_by_type = $monitor_job->info->{notes}->{pairs_by_type}
+            // {};
+          my $conflicts = $monitor_job->info->{notes}->{conflicts} // {};
+
+          $self->note(pairs_by_type => $pairs_by_type);
+          $self->note(conflicts     => $conflicts);
+
+          # if result is final
+          if (exists($monitor_job->info->{result}) && length($monitor_job->info->{result}) && $monitor_job->info->{result} eq 'all pair builders complete') {
+            Mojo::IOLoop->remove($loop);
+            $self->finish('Prebuild orchestration complete');
           }
         }
       }
@@ -232,5 +205,5 @@ package Game::EvonyTKR::External::Prebuild {
     Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
   }
 }
+
 1;
-__END__

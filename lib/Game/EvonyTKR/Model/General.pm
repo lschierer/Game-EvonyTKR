@@ -183,7 +183,7 @@ class Game::EvonyTKR::Model::General : isa(Game::EvonyTKR::Shared::Constants) {
   sub from_hash ($self, $hashObject) {
     my $logger;
     unless (defined($logger)) {
-      $logger = Game::EvonyTKR::Shared::Logger::get_logger(__PACKAGE__);
+      $logger = Game::EvonyTKR::Shared::Logger->get_logger(__PACKAGE__);
     }
     if (!exists $hashObject->{name}) {
       $logger->ERR('hash object must contain a name attribute.');
