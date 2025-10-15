@@ -12,6 +12,7 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Shared::Constants) {
   use namespace::autoclean;
   use Types::Common qw( t );
   use Carp;
+  use Log::Any qw($log);
   use File::FindLib 'lib';
   use overload
     '""'       => \&as_string,
@@ -90,7 +91,7 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Shared::Constants) {
     return unless defined($tt);
     if (any { $_ eq $tt } values %{ $self->TroopTypeValues }) {
       if (defined($targetedType) && length($targetedType)) {
-        $self->logger->WARN(sprintf(
+        $self->logger->warn(sprintf(
           'warning, overwriting existing value "%s" with "%s"',
           $targetedType, $tt
         ));
@@ -104,7 +105,7 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Shared::Constants) {
 
     if ($attribute eq 'March Size') {
       # march size *cannot* take a condition
-      $self->logger->DEBUG(
+      $self->logger->debug(
         'skipping non-operative conditon on March Size attribute');
       return 1;
     }
@@ -119,7 +120,7 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Shared::Constants) {
         push @$buffConditions, $condition;
       }
 
-      $logger->DEBUG("Added buff condition: $condition");
+      $logger->debug("Added buff condition: $condition");
       return 1;
     }
 
@@ -133,12 +134,12 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Shared::Constants) {
         push @$debuffConditions, $condition;
       }
 
-      $logger->DEBUG("Added debuff condition: $condition");
+      $logger->debug("Added debuff condition: $condition");
       return 1;
     }
 
     # If we get here, the condition wasn't valid
-    $logger->ERR(
+    $logger->error(
       "Invalid condition: '$condition'. Must be one of: "
         . join(", ",
         keys %{ $self->BuffConditionValues },
@@ -155,7 +156,7 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Shared::Constants) {
 
     # Check if we got an array reference instead of a flat array
     if (@tbc == 1 && ref($tbc[0]) eq 'ARRAY') {
-      $self->logger->ERR("needed to flatten buffConditions"
+      $self->logger->error("needed to flatten buffConditions"
           . Data::Printer::np($buffConditions));
       @tbc = @{ $tbc[0] };    # Flatten it
     }
@@ -179,7 +180,7 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Shared::Constants) {
     # Check if we got an array reference instead of a flat array
     if (@tdc == 1 && ref($tdc[0]) eq 'ARRAY') {
       @tdc = @{ $tdc[0] };    # Flatten it
-      $self->logger->ERR("needed to flatten debuffConditions");
+      $self->logger->error("needed to flatten debuffConditions");
     }
 
     # Find elements in @tdc that are not in the valid debuff conditions
@@ -202,7 +203,7 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Shared::Constants) {
       or push @errors => "passive must be 0 or 1, not $passive";
 
     if (@errors) {
-      $self->logger->ERR(join ', ', @errors);
+      $self->logger->error(join ', ', @errors);
       croak(join ', ', @errors);
       return;
     }
@@ -238,10 +239,10 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Shared::Constants) {
         "Marching",
         "When Rallying",
       ];
-      $logger->DEBUG("Empty buff conditions provided, using defaults instead");
+      $logger->debug("Empty buff conditions provided, using defaults instead");
     }
 
-    $logger->DEBUG(sprintf(
+    $logger->debug(sprintf(
 'Checking match for buff: attr=%s, targetType=%s, buff conditions=%s, debuff conditions=%s',
       $attribute,
       $targetedType,
@@ -267,11 +268,11 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Shared::Constants) {
 
         if (exists $general_to_targeted{$short}) {
           $test_targetedType = $general_to_targeted{$short};
-          $logger->DEBUG(
+          $logger->debug(
             "Normalized test_targetedType to '$test_targetedType'");
         }
         else {
-          $logger->WARN(
+          $logger->warn(
             "Unrecognized general specialist key: $test_targetedType");
           return 0;
         }
@@ -279,7 +280,7 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Shared::Constants) {
 
       # Match against the buff's targetedTypes
       if ($targetedType ne $test_targetedType) {
-        $logger->DEBUG(sprintf(
+        $logger->debug(sprintf(
           '  ✗ Rejected: test_targetedType "%s" not matched by "%s"',
           $test_targetedType, $targetedType
         ));
@@ -293,7 +294,7 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Shared::Constants) {
     # If test_debuffConditions is empty, reject any buff with debuff conditions
     if (scalar @$test_debuffConditions == 0) {
       if ($has_debuff_conditions) {
-        $logger->DEBUG(
+        $logger->debug(
           "  ✗ Rejected: buff has debuff conditions but none were requested");
         return 0;
       }
@@ -302,14 +303,14 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Shared::Constants) {
     elsif ($has_debuff_conditions) {
       foreach my $condition (@$debuffConditions) {
         if (none { $_ eq $condition } @$test_debuffConditions) {
-          $logger->DEBUG(
+          $logger->debug(
             "  ✗ Rejected: debuff condition '$condition' not in allowed list");
           return 0;
         }
       }
     }
     else {
-      $logger->DEBUG(
+      $logger->debug(
 "  ✗ Rejected: debuff conditions are not present in buff and are required."
       );
       return 0;
@@ -322,12 +323,12 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Shared::Constants) {
     if (scalar @$test_buffConditions > 0) {
       # A buff with no conditions should match when conditions are specified
       if (!$has_buff_conditions) {
-        $logger->DEBUG(
+        $logger->debug(
           "  ✓ Buff has no conditions, accepting unconditional buff");
         # Continue to the end of the function
       }
       else {
-        $logger->DEBUG("Checking buff conditions: "
+        $logger->debug("Checking buff conditions: "
             . join(', ', @$buffConditions)
             . " against allowed: "
             . join(', ', @$test_buffConditions));
@@ -336,7 +337,7 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Shared::Constants) {
         my %allowed_conditions = map { $_ => 1 } @$test_buffConditions;
         foreach my $condition (@$buffConditions) {
           if (!exists $allowed_conditions{$condition}) {
-            $logger->DEBUG(
+            $logger->debug(
               "  ✗ Rejected: buff condition '$condition' not in allowed list");
             return 0;
           }
@@ -345,15 +346,15 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Shared::Constants) {
       }
     }
     else {
-      $logger->ERR("NO TEST BUFF CONDITIONS!!");
+      $logger->error("NO TEST BUFF CONDITIONS!!");
     }
 
-    $logger->DEBUG("  ✓ Buff matched");
+    $logger->debug("  ✓ Buff matched");
     return 1;
   }
 
   sub from_hash ($class, $hashref) {
-    my $logger = Game::EvonyTKR::Shared::Logger->get_logger($class);
+    my $logger = $log;
     my $v      = Game::EvonyTKR::Model::Buff::Value->new(
       number => abs($hashref->{value}->{number}),
       unit   => $hashref->{value}->{unit} // 'percentage',
@@ -364,12 +365,12 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Shared::Constants) {
       value     => $v,
     );
     if (exists $hashref->{targetedType}) {
-      $logger->DEBUG(
+      $logger->debug(
         'found targetedType in hashref: ' . $hashref->{targetedType});
       $r->set_target($hashref->{targetedType});
     }
     if (exists $hashref->{troop}) {
-      $logger->DEBUG('found troop in hashref: ' . $hashref->{troop});
+      $logger->debug('found troop in hashref: ' . $hashref->{troop});
       $r->set_target($hashref->{troop});
     }
     if (exists $hashref->{condition}) {
@@ -388,7 +389,7 @@ class Game::EvonyTKR::Model::Buff : isa(Game::EvonyTKR::Shared::Constants) {
   method to_hash {
     my $c;
     my $conditionCount = scalar @{ $self->conditions() };
-    $self->logger->DEBUG("in to_hash, I have $conditionCount conditions");
+    $self->logger->debug("in to_hash, I have $conditionCount conditions");
     my $rc;
     if ($conditionCount) {
       $rc = $self->conditions();

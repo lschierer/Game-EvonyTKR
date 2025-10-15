@@ -59,7 +59,7 @@ class Game::EvonyTKR::Model::BasicAttributes :
 
   method setAttribute($attributeName, $newAttribute) {
     if (none { $_ =~ $attributeName } @attributeNames) {
-      $self->logger->ERR(sprintf(
+      $self->logger->error(sprintf(
         'attributeName must be one of %s, not %s',
         Data::Printer::np($self->AttributeValues),
         $attributeName,
@@ -69,7 +69,7 @@ class Game::EvonyTKR::Model::BasicAttributes :
 
     my @nac = split(/::/, blessed $newAttribute);
     if ($nac[3] ne 'BasicAttribute') {
-      $self->logger->ERR(sprintf(
+      $self->logger->error(sprintf(
         'newAttribute must be a %s not a %s',
         'Game::EvonyTKR::Model::BasicAttribute',
         blessed $newAttribute
@@ -78,7 +78,7 @@ class Game::EvonyTKR::Model::BasicAttributes :
     }
 
     if (not exists $self->attributes()->{$attributeName}) {
-      $self->logger->ERR(sprintf(
+      $self->logger->error(sprintf(
 '$self->attributes()->{$attributeName} does not exist for $attributeName %s',
         $attributeName));
       return;
@@ -118,7 +118,7 @@ class Game::EvonyTKR::Model::BasicAttributes :
     my @classList  = split(/::/, $otherClass);
     if ($classList[2] ne 'BasicAttributes') {
       my $od = Data::Printer::p $other;
-      $self->logger->ERR(sprintf(
+      $self->logger->error(sprintf(
         'Game::EvonyTKR::Model::BasicAttributes '
           . 'comparison operator cannot take a %s',
         $od
@@ -142,7 +142,7 @@ class Game::EvonyTKR::Model::BasicAttributes :
     my @classList  = split(/::/, $otherClass);
     if ($classList[2] ne 'BasicAttributes') {
       my $od = Data::Printer::p $other;
-      $self->logger->ERR(sprintf(
+      $self->logger->error(sprintf(
         'Game::EvonyTKR::Model::BasicAttributes '
           . 'equality operator cannot take a %s',
         $od
@@ -166,7 +166,7 @@ class Game::EvonyTKR::Model::BasicAttributes :
     my @classList  = split(/::/, $otherClass);
     if ($classList[2] ne 'BasicAttributes') {
       my $od = Data::Printer::p $other;
-      $self->logger->ERR(sprintf(
+      $self->logger->error(sprintf(
         'Game::EvonyTKR::Model::BasicAttributes '
           . 'inequality operator cannot take a %s',
         $od
@@ -199,7 +199,7 @@ class Game::EvonyTKR::Model::BasicAttributes :
       return $self->politics();
     }
     else {
-      $self->logger->ERR('invalid attribute requested');
+      $self->logger->error('invalid attribute requested');
       croak('invalid attribute requested');
       return;
     }

@@ -76,7 +76,7 @@ class Game::EvonyTKR::Converter::General :
       stars       => 'red5',
       type        => '',
     };
-    $self->logger->DEBUG(sprintf('general is %s', Data::Printer::np($data)));
+    $self->logger->debug(sprintf('general is %s', Data::Printer::np($data)));
     say YAML::PP->new(
       schema       => [qw/ + Perl /],
       yaml_version => ['1.2', '1.1'],
@@ -86,7 +86,7 @@ class Game::EvonyTKR::Converter::General :
 
   method execute {
     say "=== Basic Stats ===";
-    $self->logger->INFO("=== Basic Stats ===");
+    $self->logger->info("=== Basic Stats ===");
     $self->getPrimaryFields();
     $self->printYAML();
   }
@@ -107,12 +107,12 @@ class Game::EvonyTKR::Converter::General :
     );
 
     unless ($container) {
-      $self->logger->ERROR("Cannot find $container for stats");
+      $self->logger->errorOR("Cannot find $container for stats");
       return;
     }
     my $statsTable = $container->look_down('_tag' => 'table');
     unless ($statsTable) {
-      $self->logger->ERROR("Cannot find $statsTable for stats");
+      $self->logger->errorOR("Cannot find $statsTable for stats");
       return;
     }
     my @rows = $statsTable->look_down('_tag', 'tr');
@@ -171,7 +171,7 @@ qr/elementor-element-(?:\w){1,9}.elementor-widget.elementor-widget-theme-post-co
       return [];
     }
     if ($debug) {
-      $self->logger->DEBUG("Found container: " . $container->starttag());
+      $self->logger->debug("Found container: " . $container->starttag());
     }
 
     # Get all h2 and h3 elements in reading order
@@ -199,11 +199,11 @@ qr/elementor-element-(?:\w){1,9}.elementor-widget.elementor-widget-theme-post-co
 
     my $targetH2 = $headers[$start_index];
     unless ($targetH2) {
-      $self->logger->ERROR("Cannot find targetH2");
+      $self->logger->errorOR("Cannot find targetH2");
     }
 
     $name = $targetH2->as_trimmed_text =~ s/(.+?)\s*[-–—]\s*Stats:/$1/r;
-    $self->logger->DEBUG("name is $name");
+    $self->logger->debug("name is $name");
 
     my $statsH3 = $headers[$start_index + 1];
     # the attributes are in the next 4 paragraph elements.
@@ -211,7 +211,7 @@ qr/elementor-element-(?:\w){1,9}.elementor-widget.elementor-widget-theme-post-co
     my @paras = $helpers->find_all_p_after_element($statsH3);
 
     if (@paras < @keys) {
-      $self->logger->ERROR(
+      $self->logger->errorOR(
         "Expected 4 stats <p> tags after H3, found " . scalar @paras);
     }
     else {
@@ -221,7 +221,7 @@ qr/elementor-element-(?:\w){1,9}.elementor-widget.elementor-widget-theme-post-co
         my ($raw) = $text =~ /\Q$key\E\s*:\s*(\S+)/i;
         my $value = clean_number($raw, $key);
         if (defined $value) {
-          $self->logger->DEBUG("setting $key to $value");
+          $self->logger->debug("setting $key to $value");
           my $ba = Game::EvonyTKR::Model::BasicAttribute->new(
             base           => $value,
             increment      => 0,
@@ -230,7 +230,7 @@ qr/elementor-element-(?:\w){1,9}.elementor-widget.elementor-widget-theme-post-co
           $basic->setAttribute($key, $ba);
         }
         else {
-          $self->logger->WARN("Could not extract $key value from '$text'");
+          $self->logger->warn("Could not extract $key value from '$text'");
         }
       }
     }

@@ -20,15 +20,15 @@ class Game::EvonyTKR::External::General::Pair::Builder :
 
   # Build pairs for a specific primary general
   method build_pairs_for_primary ($job, $general_name) {
-    $self->logger->INFO("Building pairs for primary general: $general_name");
+    $self->logger->info("Building pairs for primary general: $general_name");
 
     # Load all generals for comparison
     $self->load_generals($job->info->{task});
 
     my $primary = $self->generals->{ $self->normalize($general_name) };
     unless ($primary) {
-      $self->logger->ERR("General '$general_name' not found!");
-      $self->logger->DEBUG(sprintf(
+      $self->logger->error("General '$general_name' not found!");
+      $self->logger->debug(sprintf(
         'Available generals: %s',
         join ', ', sort keys $self->generals->%*
       ));
@@ -51,13 +51,13 @@ class Game::EvonyTKR::External::General::Pair::Builder :
       my $delta         = $current_count - ($initial_counts{$type} // 0);
       $total_added += $delta;
 
-      $self->logger->DEBUG(sprintf(
+      $self->logger->debug(sprintf(
         'General %s added %d pairs for type %s',
         $primary->name, $delta, $type
       ));
     }
 
-    $self->logger->INFO(sprintf(
+    $self->logger->info(sprintf(
       'General %s: added %d total pairs', $primary->name, $total_added
     ));
 
@@ -83,7 +83,7 @@ class Game::EvonyTKR::External::General::Pair::Builder :
     {
       next if $primary->name eq $secondary->name;
 
-      $self->logger->DEBUG(sprintf(
+      $self->logger->debug(sprintf(
         'Testing compatibility: %s <-> %s',
         $primary->name, $secondary->name
       ));
@@ -92,7 +92,7 @@ class Game::EvonyTKR::External::General::Pair::Builder :
       unless (
         $self->conflictDetector->are_generals_compatible($primary, $secondary))
       {
-        $self->logger->DEBUG(sprintf(
+        $self->logger->debug(sprintf(
           'Conflict detected: %s <-> %s',
           $primary->name, $secondary->name
         ));
@@ -129,7 +129,7 @@ class Game::EvonyTKR::External::General::Pair::Builder :
     };
 
     for my $type (@$common_types) {
-      $self->logger->DEBUG(sprintf(
+      $self->logger->debug(sprintf(
         'Creating pair: %s <-> %s (type: %s)',
         $pair->{primary}, $pair->{secondary}, $type
       ));
@@ -147,7 +147,7 @@ class Game::EvonyTKR::External::General::Pair::Builder :
       tasks => ['build_pairs_for_primary']
     });
 
-    $self->logger->INFO(sprintf(
+    $self->logger->info(sprintf(
       'Monitoring %d pair building jobs (monitor job: %s)',
       $jobs->total, $monitor_job->info->{id}
     ));
@@ -159,11 +159,11 @@ class Game::EvonyTKR::External::General::Pair::Builder :
     # Process each job
     $jobs->each(sub {
       my $info = $_;
-      $self->logger->DEBUG(sprintf(
+      $self->logger->debug(sprintf(
         'Inspecting job %s (state: %s)', $info->{id}, $info->{state}));
 
       if ($info->{state} eq 'failed') {
-        $self->logger->ERR(sprintf(
+        $self->logger->error(sprintf(
           'Pair builder job %s failed: %s',
           $info->{id}, $info->{result} // 'unknown error'
         ));
@@ -193,7 +193,7 @@ class Game::EvonyTKR::External::General::Pair::Builder :
 
     # Determine next action
     if ($something_incomplete > 0) {
-      $self->logger->DEBUG(sprintf(
+      $self->logger->debug(sprintf(
         'Monitor: %d incomplete, %d completed, %d failed - retrying in 30s',
         $something_incomplete, $completed_jobs, $something_failed
       ));
@@ -201,7 +201,7 @@ class Game::EvonyTKR::External::General::Pair::Builder :
     }
 
     if ($completed_jobs > 0) {
-      $self->logger->INFO(sprintf(
+      $self->logger->info(sprintf(
         'All pair builders complete: %d succeeded, %d failed',
         $completed_jobs, $something_failed
       ));
@@ -209,7 +209,7 @@ class Game::EvonyTKR::External::General::Pair::Builder :
     }
 
     # No jobs found - this shouldn't happen
-    $self->logger->WARN('No pair building jobs found');
+    $self->logger->warn('No pair building jobs found');
     return $monitor_job->finish('no pair building jobs found');
   }
 
@@ -238,7 +238,7 @@ class Game::EvonyTKR::External::General::Pair::Builder :
         $job_conflicts->{groups_by_conflict_type} // {});
     }
 
-    $self->logger->DEBUG(sprintf(
+    $self->logger->debug(sprintf(
       'Merged results from job %s', $job_info->{id}));
   }
 }

@@ -2,6 +2,7 @@ use v5.42.0;
 use experimental qw(class);
 use utf8::all;
 use namespace::autoclean;
+require Log::Log4perl;
 
 class Game::EvonyTKR::Model::Logger {
   #PODNAME: Game::EvonyTKR::Model::Logger
@@ -9,7 +10,6 @@ class Game::EvonyTKR::Model::Logger {
   use Scalar::Util qw(blessed);
   use JSON::PP     ();
   use Env          qw(DEV_MODE PERL_ENV MOJO_MODE);
-  use Game::EvonyTKR::Shared::Logger;
   our $VERSION = 'v0.31.0';
 
   use overload
@@ -21,17 +21,15 @@ class Game::EvonyTKR::Model::Logger {
 
   ADJUST {
     # decide dev-ness; prefer DEV_MODE, else PERL_ENV/MOJO_MODE
-    $logger = Game::EvonyTKR::Shared::Logger->get_logger(__CLASS__);
-    $logger->DEBUG(
-      sprintf('logging set to "%s" for "%s"', $logger->level(), __CLASS__));
+    $logger = Log::Log4perl->get_logger(__CLASS__);
   }
 
-  method trace { $self->logger->DEBUG(@_) }
-  method debug { $self->logger->DEBUG(@_) }
-  method info  { $self->logger->INFO(@_) }
-  method warn  { $self->logger->WARN(@_) }
-  method error { $self->logger->ERR(@_) }
-  method fatal { $self->logger->ERR(@_) }
+  method trace { $self->logger->debug(@_) }
+  method debug { $self->logger->debug(@_) }
+  method info  { $self->logger->info(@_) }
+  method warn  { $self->logger->warn(@_) }
+  method error { $self->logger->error(@_) }
+  method fatal { $self->logger->error(@_) }
 
   # Normalize $level to a constant if a string is given
   method _norm_level ($level) {

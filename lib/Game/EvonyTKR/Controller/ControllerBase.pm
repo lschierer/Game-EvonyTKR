@@ -29,8 +29,8 @@ package Game::EvonyTKR::Controller::ControllerBase {
   }
 
   sub register($self, $app, $config = {}) {
-    $logger = $app->get_logger(__PACKAGE__);
-    $logger->INFO("ControllerBase register function");
+    $logger = $app->log;
+    $logger->info("ControllerBase register function");
 
     my $routes = $app->routes;
 

@@ -28,7 +28,7 @@ class Game::EvonyTKR::Model::General::ConflictGroup :
   method get_other_conflicts() {
     my %copy = %{$other_conflicts};
     Hash::Util::lock_hash(%copy);    # prevents adding/deleting top-level keys
-    $self->logger->DEBUG(
+    $self->logger->debug(
       "get_other_conflicts will return " . Data::Printer::np(%copy));
     return \%copy;
   }
@@ -50,7 +50,7 @@ class Game::EvonyTKR::Model::General::ConflictGroup :
 
     my $name = $raw_name;
     if (length $original) {
-      $self->logger->DEBUG("Normalized '$original' → '$name'")
+      $self->logger->debug("Normalized '$original' → '$name'")
         if $name ne $original;
     }
     return $name;
@@ -59,23 +59,23 @@ class Game::EvonyTKR::Model::General::ConflictGroup :
   method build_expanded_conflicts($all_groups) {
     # Index your own primary generals
     my %is_primary = map { $self->normalize_name($_) => 1 } @$primary_generals;
-    $self->logger->DEBUG("build_expanded_conflicts for $name detects primarys "
+    $self->logger->debug("build_expanded_conflicts for $name detects primarys "
         . Data::Printer::np(%is_primary));
 
     # Add all of your own to expanded
     $expanded_conflicts->{ $self->normalize_name($_) } = 1 for keys %is_primary;
 
-    $self->logger->DEBUG(
+    $self->logger->debug(
       "linked groups for $name are " . Data::Printer::np($linked_groups));
     # Traverse linked groups
     for my $linked_id (@$linked_groups) {
       my $linked = $all_groups->{"$linked_id"};
-      $self->logger->DEBUG(
+      $self->logger->debug(
         sprintf('traversing %s / %s', $linked->name, $linked->id));
       next unless $linked;
 
       for my $general (@{ $linked->primary_generals }) {
-        $self->logger->DEBUG(sprintf(
+        $self->logger->debug(sprintf(
           'linked group %s adding %s to %s',
           $linked->name, $general, $self->name
         ));
@@ -84,7 +84,7 @@ class Game::EvonyTKR::Model::General::ConflictGroup :
         $other_conflicts->{$norm}    = 1 unless $is_primary{$norm};
       }
     }
-    $self->logger->DEBUG(
+    $self->logger->debug(
       "other_conflicts is " . Data::Printer::np($other_conflicts));
     return $self;
   }

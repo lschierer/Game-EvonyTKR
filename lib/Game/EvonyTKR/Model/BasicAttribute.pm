@@ -106,7 +106,7 @@ class Game::EvonyTKR::Model::BasicAttribute :
     $tp->check($newIncrement)
       or push @errors => "increment must be positive, not $newIncrement";
     if (scalar @errors >= 1) {
-      $self->logger->ERR(join(', ', @errors));
+      $self->logger->error(join(', ', @errors));
       return;
     }
     else {
@@ -140,7 +140,7 @@ class Game::EvonyTKR::Model::BasicAttribute :
       ) / 100,
       3
     );
-    $self->logger->DEBUG(
+    $self->logger->debug(
       "found total basic attribute value of $result for $name");
     return $result;
   }
@@ -168,7 +168,7 @@ class Game::EvonyTKR::Model::BasicAttribute :
         "attribute name must be one of " . Data::Printer::np @AttributeNames;
     }
     if (scalar @errors >= 1) {
-      $self->logger->ERR(join ', ', @errors);
+      $self->logger->error(join ', ', @errors);
       croak(join ', ', @errors);
       return;
     }
@@ -180,7 +180,7 @@ class Game::EvonyTKR::Model::BasicAttribute :
     my @classList  = split(/::/, $otherClass);
     if ($classList[2] ne 'BasicAttribute') {
       my $od = Data::Printer::p $other;
-      $self->logger->ERR(sprintf(
+      $self->logger->error(sprintf(
         'Game::EvonyTKR::Model::BasicAttribute '
           . 'comparison operator cannot take a %s',
         $od
@@ -196,7 +196,7 @@ class Game::EvonyTKR::Model::BasicAttribute :
       my $mt = $self->total();
       my $ot = $other->total();
       if ($self->attribute_name() cmp $other->attribute_name()) {
-        $self->logger->WARN(sprintf(
+        $self->logger->warn(sprintf(
 'you probably did not intend to compare to different attributes: %s %s',
           $self->attribute_name(),
           $other->attribute_name()
@@ -213,7 +213,7 @@ class Game::EvonyTKR::Model::BasicAttribute :
       my @classList = split(/::/, $otherClass);
       if ($classList[2] ne 'BasicAttribute') {
         my $od = Data::Printer::p $other;
-        $self->logger->ERR(sprintf(
+        $self->logger->error(sprintf(
           'Game::EvonyTKR::Model::BasicAttribute '
             . 'equality operator cannot take a %s',
           $od
@@ -243,7 +243,7 @@ class Game::EvonyTKR::Model::BasicAttribute :
     my @classList  = split(/::/, $otherClass);
     if ($classList[2] ne 'BasicAttribute') {
       my $od = Data::Printer::p $other;
-      $self->logger->ERR(sprintf(
+      $self->logger->error(sprintf(
         'Game::EvonyTKR::Model::BasicAttribute '
           . 'inequality operator cannot take a %s',
         $od

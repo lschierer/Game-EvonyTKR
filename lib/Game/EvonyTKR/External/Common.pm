@@ -42,7 +42,7 @@ class Game::EvonyTKR::External::Common : isa(Game::EvonyTKR::Shared::Constants)
       $nf eq $nn;
     } $bookDir->list_tree->grep(sub {qr/\.y\{a\}?ml$/})->each;
     unless (defined($bookFile)) {
-      $self->logger->ERR(sprintf('no yaml file found for "%s"', $bookName));
+      $self->logger->error(sprintf('no yaml file found for "%s"', $bookName));
       return;
     }
     my $bd  = $bookFile->slurp('UTF-8');
@@ -55,7 +55,7 @@ class Game::EvonyTKR::External::Common : isa(Game::EvonyTKR::Shared::Constants)
     unless ($book
       && Scalar::Util::blessed($book)
       && $book->isa('Game::EvonyTKR::Model::Book::Builtin')) {
-      $self->logger->ERR(sprintf(
+      $self->logger->error(sprintf(
         'failed to import book for file "%s", necessary for general "%s"',
         $bookFile, $generalName
       ));
@@ -65,7 +65,7 @@ class Game::EvonyTKR::External::Common : isa(Game::EvonyTKR::Shared::Constants)
   }
 
   method load_single_general ($generalFile, $index) {
-    $self->logger->DEBUG("processing $generalFile, file # $index");
+    $self->logger->debug("processing $generalFile, file # $index");
     my $data       = $generalFile->slurp('UTF-8');
     my $hashObject = YAML::PP->new(
       schema       => [qw/ + Perl /],
@@ -73,24 +73,24 @@ class Game::EvonyTKR::External::Common : isa(Game::EvonyTKR::Shared::Constants)
     )->load_string($data);
     my $g = Game::EvonyTKR::Model::General->from_hash($hashObject);
     unless ($g) {
-      $self->logger->ERR(sprintf(
+      $self->logger->error(sprintf(
         'failed to build general from %s', $generalFile));
       return undef;
     }
 
     my $bb = $self->load_builtinBook($g->builtInBookName, $g->name);
     unless ($bb) {
-      $self->logger->ERR(
+      $self->logger->error(
         sprintf('No Builtin Book for %s available.', $g->name));
       return;
     }
     $g->set_builtInBook($bb);
     $generals->{ $self->normalize($g->name) } = $g;
-    $self->logger->DEBUG(sprintf('imported general %s.', $g->name));
+    $self->logger->debug(sprintf('imported general %s.', $g->name));
   }
 
   method load_generals ($taskName) {
-    $self->logger->DEBUG(
+    $self->logger->debug(
       sprintf('starting load_generals with %s generals present',
         scalar(keys $generals->%*))
     );
@@ -105,18 +105,18 @@ class Game::EvonyTKR::External::Common : isa(Game::EvonyTKR::Shared::Constants)
       sub($generalFile, $index) {
         $expectedTotal++;
         $self->load_single_general($generalFile, $index);
-        $self->logger->DEBUG(sprintf('there are now %s generals loaded',
+        $self->logger->debug(sprintf('there are now %s generals loaded',
           scalar(keys $generals->%*)));
       }
     );
     if (scalar(keys $generals->%*) ne $expectedTotal) {
-      $self->logger->ERR(sprintf(
+      $self->logger->error(sprintf(
         'loaded count %s does not equal expected count %s.',
         scalar(keys $generals->%*),
         $expectedTotal
       ));
     }
-    $self->logger->INFO(sprintf(
+    $self->logger->info(sprintf(
       'imported %s generals for task %s',
       scalar(keys $generals->%*), $taskName
     ));

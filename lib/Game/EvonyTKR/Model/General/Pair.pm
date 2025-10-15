@@ -52,13 +52,13 @@ class Game::EvonyTKR::Model::General::Pair :
     $secondarySummarizer->updateBuffs();
     my $primary   = $primarySummarizer->buffValues;
     my $secondary = $secondarySummarizer->buffValues;
-    $self->logger->DEBUG("primary is " . Data::Printer::np($primary));
-    $self->logger->DEBUG("secondary is " . Data::Printer::np($secondary));
+    $self->logger->debug("primary is " . Data::Printer::np($primary));
+    $self->logger->debug("secondary is " . Data::Printer::np($secondary));
 
     foreach my $category (keys %$primary) {
-      $self->logger->DEBUG("computing buff total for category $category");
+      $self->logger->debug("computing buff total for category $category");
       foreach my $type (keys %{ $primary->{$category} }) {
-        $self->logger->DEBUG(
+        $self->logger->debug(
           "computing buff total for category $category type $type");
         $total_computed_buffs_cache{$current_cache_key}->{buffValues}
           ->{$category}->{$type} =
@@ -75,9 +75,9 @@ class Game::EvonyTKR::Model::General::Pair :
     my $secondary = $secondarySummarizer->debuffValues;
 
     foreach my $category (keys %$primary) {
-      $self->logger->DEBUG("calc debuffs for $category");
+      $self->logger->debug("calc debuffs for $category");
       foreach my $type (keys %{ $primary->{$category} }) {
-        $self->logger->DEBUG("calc debuffs for $type");
+        $self->logger->debug("calc debuffs for $type");
         $total_computed_buffs_cache{$current_cache_key}->{debuffValues}
           ->{$category}->{$type} =
           $primary->{$category}->{$type} + $secondary->{$category}->{$type};
@@ -98,7 +98,7 @@ class Game::EvonyTKR::Model::General::Pair :
       if ($tt eq 'Wall Troops') {
         $tt = 'Overall';
       }
-      $self->logger->DEBUG("looking for type $tt");
+      $self->logger->debug("looking for type $tt");
     }
     return {
       primary             => $primary,

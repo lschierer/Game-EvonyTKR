@@ -43,8 +43,8 @@ package Game::EvonyTKR::Controller::SkillBooks {
 
   # Register this when the application starts
   sub register($c, $app, $config = {}) {
-    $logger = $app->get_logger(__PACKAGE__);
-    $logger->INFO("Registering routes for " . ref($c));
+    $logger = $app->log;
+    $logger->info("Registering routes for " . ref($c));
     $c->SUPER::register($app, $config);
 
     $c->load_books($app);
@@ -63,7 +63,7 @@ package Game::EvonyTKR::Controller::SkillBooks {
       ? $c->controller_name()
       : $baseClass;
 
-    $logger->DEBUG("got controller_name $controller_name.");
+    $logger->debug("got controller_name $controller_name.");
 
     my $mainRoutes = $app->routes->any($base);
     $mainRoutes->get('/')
@@ -85,7 +85,7 @@ package Game::EvonyTKR::Controller::SkillBooks {
 
     $app->helper(
       get_builtin_book_text => sub ($self, $book_name) {
-        $logger->DEBUG("get_builtin_book_text for book '$book_name'");
+        $logger->debug("get_builtin_book_text for book '$book_name'");
 
         $book_name = $c->SUPER::getConstants->normalize($book_name);
         my $book = $c->getBuiltInBoooks()->{$book_name};
@@ -94,7 +94,7 @@ package Game::EvonyTKR::Controller::SkillBooks {
           return $book->text();
         }
         else {
-          $logger->WARN("No book found for '$book_name'");
+          $logger->warn("No book found for '$book_name'");
         }
         return "";
       }
@@ -108,7 +108,7 @@ package Game::EvonyTKR::Controller::SkillBooks {
 
     $app->plugins->on(
       all_books_loaded => sub {
-        $logger->DEBUG(sprintf(
+        $logger->debug(sprintf(
           '%s register method all_books_loaded handler', blessed($c),));
         my @allBooks;
         push @allBooks,
@@ -149,11 +149,11 @@ package Game::EvonyTKR::Controller::SkillBooks {
         push @sbNames, sort keys $allBB->%*;
         push @sbNames, sort keys $allGB->%*;
         if (scalar(@sbNames) >= $expectedTotal && $allFilesStarted) {
-          $logger->INFO(sprintf('All %s books loaded.', $expectedTotal));
+          $logger->info(sprintf('All %s books loaded.', $expectedTotal));
           $app->plugins->emit(all_books_loaded => { all_books_loaded => 1 });
         }
         else {
-          $logger->DEBUG(sprintf(
+          $logger->debug(sprintf(
             '%s of %s books loaded. all files %s started.',
             scalar(@sbNames), $expectedTotal,
             $allFilesStarted ? 'are' : 'are not yet'
@@ -200,7 +200,7 @@ package Game::EvonyTKR::Controller::SkillBooks {
   }
 
   sub import_single_book($c, $app, $collection, $sbFile, $index, $builtin = 1) {
-    $logger->DEBUG("processing $sbFile");
+    $logger->debug("processing $sbFile");
 
     my $data       = $sbFile->slurp('UTF-8');
     my $hashObject = YAML::PP->new(
@@ -215,7 +215,7 @@ package Game::EvonyTKR::Controller::SkillBooks {
       $sb = Game::EvonyTKR::Model::Book::SkillBook->from_hash($hashObject);
     }
     unless ($sb) {
-      $logger->ERR(sprintf(
+      $logger->error(sprintf(
         'failed to build %s book %s from %s.',
         $builtin ? 'Builtin' : 'Generic',
         $index, $sbFile
@@ -223,7 +223,7 @@ package Game::EvonyTKR::Controller::SkillBooks {
       return;
     }
     $collection->{ $c->SUPER::getConstants->normalize($sb->name) } = $sb;
-    $logger->DEBUG(sprintf(
+    $logger->debug(sprintf(
       'imported %s book %s as %s, for %s in collection.',
       $builtin ? 'Builtin' : 'Generic', $index,
       $sb->name,                        scalar(keys $collection->%*),
@@ -238,7 +238,7 @@ package Game::EvonyTKR::Controller::SkillBooks {
 
   sub index($self) {
     my $collection = collection_name();
-    $logger->DEBUG("Rendering index for $collection");
+    $logger->debug("Rendering index for $collection");
 
     # Check if markdown exists for this collection
     my $distDir       = Mojo::File::Share::dist_dir('Game::EvonyTKR');
@@ -247,10 +247,10 @@ package Game::EvonyTKR::Controller::SkillBooks {
     my @parts     = split(/::/, ref($self));
     my $baseClass = pop(@parts);
     my $base      = $self->getBase();
-    $logger->DEBUG("SkillBooks index method has base $base");
+    $logger->debug("SkillBooks index method has base $base");
 
     my $items = $self->get_root_manager()->bookManager->get_all_books();
-    $logger->DEBUG(
+    $logger->debug(
       sprintf('Items: %s with %s items.', ref($items), scalar(@$items)));
     $self->stash(
       linkBase        => $base,
@@ -273,18 +273,18 @@ package Game::EvonyTKR::Controller::SkillBooks {
   }
 
   sub show ($self) {
-    $logger->DEBUG("start of show method");
+    $logger->debug("start of show method");
     my $name;
     $name = $self->param('name');
-    $logger->DEBUG("show detects name $name, showing details.");
+    $logger->debug("show detects name $name, showing details.");
 
     my $book = $self->get_root_manager()->bookManager->getBook($name);
 
     unless ($book) {
-      $logger->ERR("skill book '$name' was not found.");
+      $logger->error("skill book '$name' was not found.");
       $self->reply->not_found;
     }
-    $logger->DEBUG("retrieved skill book $book");
+    $logger->debug("retrieved skill book $book");
 
     $self->stash(
       item     => $book,

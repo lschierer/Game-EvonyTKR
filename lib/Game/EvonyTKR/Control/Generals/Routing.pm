@@ -25,10 +25,10 @@ class Game::EvonyTKR::Control::Generals::Routing :
   }
 
   method get_routes_for_uiTarget ($uiTarget) {
-    $self->logger->DEBUG("looking for routes for $uiTarget");
+    $self->logger->debug("looking for routes for $uiTarget");
     my @results;
     my $slug = $self->_slugify($uiTarget);
-    $self->logger->DEBUG("slug for $uiTarget is $slug");
+    $self->logger->debug("slug for $uiTarget is $slug");
     foreach my $key (keys %$validRoutes) {
       if ($key =~ /^$slug/) {
         push @results, $validRoutes->{$key};
@@ -61,11 +61,11 @@ class Game::EvonyTKR::Control::Generals::Routing :
     }
     if ($debug) {
       my @r = $self->all_valid_routes();
-      $self->logger->ERR("$key is not a valid route. Valid routes are "
+      $self->logger->error("$key is not a valid route. Valid routes are "
           . Data::Printer::np($validRoutes));
     }
     else {
-      $self->logger->ERR("$key is not a valid route.");
+      $self->logger->error("$key is not a valid route.");
       croak("$key is not a valid route.");
     }
     return 0;

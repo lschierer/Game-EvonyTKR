@@ -3,7 +3,6 @@ use experimental qw(class);
 use utf8::all;
 use File::FindLib 'lib';
 require Data::Printer;
-require Game::EvonyTKR::Shared::Logger;
 require Game::EvonyTKR::External::General::Pair::Builder;
 
 package Game::EvonyTKR::External::General::Pair::Workflow {
@@ -15,13 +14,13 @@ package Game::EvonyTKR::External::General::Pair::Workflow {
   my $logger;
 
   sub register ($self, $app, $conf = {}) {
-    $logger = Game::EvonyTKR::Shared::Logger->get_logger(__PACKAGE__);
-    $logger->DEBUG('Registering pair workflow tasks');
+    $logger = $app->log;
+    $logger->debug('Registering pair workflow tasks');
 
     # Job spawner - creates individual pair building jobs
     $app->minion->add_task(
       build_all_pairs => sub ($job, $args) {
-        $logger->DEBUG('build_all_pairs task starting');
+        $logger->debug('build_all_pairs task starting');
 
         # Prevent multiple spawners with 2-hour lock
         return $job->finish('only one pair builder kickoff')
@@ -34,7 +33,7 @@ package Game::EvonyTKR::External::General::Pair::Workflow {
     # Individual pair builder job
     $app->minion->add_task(
       build_pairs_for_primary => sub ($job, $args) {
-        $logger->DEBUG('build_pairs_for_primary task starting');
+        $logger->debug('build_pairs_for_primary task starting');
 
         # Concurrency limiting
         my $limit_length = 300;
@@ -43,13 +42,13 @@ package Game::EvonyTKR::External::General::Pair::Workflow {
             'build_pairs_for_primary', $limit_length, { limit => 3 }
           )
         ) {
-          $logger->INFO('Concurrency limit hit for build_pairs_for_primary');
+          $logger->info('Concurrency limit hit for build_pairs_for_primary');
           return $job->retry({ delay => rand($limit_length) });
         }
 
         my $general_name = $args->{general_name};
         unless (length($general_name)) {
-          $logger->ERR('general_name not provided to build_pairs_for_primary');
+          $logger->error('general_name not provided to build_pairs_for_primary');
           return $job->finish(
             'general_name not provided to build_pairs_for_primary');
         }
@@ -72,14 +71,14 @@ package Game::EvonyTKR::External::General::Pair::Workflow {
   }
 
   sub run ($self, $args) {
-    $logger->DEBUG('monitor_pair_builders task starting');
+    $logger->debug('monitor_pair_builders task starting');
 
     # Allow multiple monitors (one per hypnotoad worker)
     return $self->monitor_pair_building_progress($self, $args);
   }
 
   sub spawn_pair_jobs ($self, $job, $args) {
-    $logger->INFO('Spawning individual pair building jobs');
+    $logger->info('Spawning individual pair building jobs');
 
     my @builderJobs;
 
@@ -95,7 +94,7 @@ package Game::EvonyTKR::External::General::Pair::Workflow {
         );
         $general_name = $builder->normalize($general_name);
 
-        $logger->DEBUG("Enqueueing job for general: $general_name");
+        $logger->debug("Enqueueing job for general: $general_name");
 
         my $child_jid = $job->app->minion->enqueue(
           build_pairs_for_primary => [{ general_name => $general_name }] => {
@@ -111,13 +110,13 @@ package Game::EvonyTKR::External::General::Pair::Workflow {
       );
 
     $job->note(builderJobs => \@builderJobs);
-    $logger->INFO(sprintf('%d builder jobs started', scalar @builderJobs));
+    $logger->info(sprintf('%d builder jobs started', scalar @builderJobs));
 
     return $job->finish('all builder jobs started');
   }
 
   sub build_pairs_for_general ($self, $job, $general_name) {
-    $logger->INFO("Building pairs for general: $general_name");
+    $logger->info("Building pairs for general: $general_name");
 
     # Create builder instance for this specific job
     my $builder = Game::EvonyTKR::External::General::Pair::Builder->new(
@@ -131,7 +130,7 @@ package Game::EvonyTKR::External::General::Pair::Workflow {
   }
 
   sub monitor_pair_building_progress ($self, $job, $args) {
-    $logger->INFO('Starting pair building progress monitor');
+    $logger->info('Starting pair building progress monitor');
 
     # Get existing state from job notes
     my $existing_pairs = $job->info->{notes}->{pairs_by_type} // {};

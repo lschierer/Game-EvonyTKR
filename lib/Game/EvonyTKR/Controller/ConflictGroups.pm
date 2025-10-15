@@ -35,8 +35,8 @@ package Game::EvonyTKR::Controller::ConflictGroups {
   }
 
   sub register($c, $app, $config = {}) {
-    $logger = $app->get_logger(__PACKAGE__);
-    $logger->INFO("Registering routes for " . ref($c));
+    $logger = $app->log;
+    $logger->info("Registering routes for " . ref($c));
     $c->SUPER::register($app, $config);
 
     my $routes          = $app->routes->any($base);
@@ -61,8 +61,8 @@ package Game::EvonyTKR::Controller::ConflictGroups {
 
     $app->plugins->on(
       conflicts_complete => sub ($self, $data) {
-        $logger->INFO('Conflict Update detected');
-        $logger->DEBUG(
+        $logger->info('Conflict Update detected');
+        $logger->debug(
           sprintf('data from conflicts_complete signal is %s',
             Data::Printer::np($data))
         );
@@ -77,10 +77,10 @@ package Game::EvonyTKR::Controller::ConflictGroups {
   }
 
   sub index ($c) {
-    $logger->DEBUG("Rendering conflict groups index");
+    $logger->debug("Rendering conflict groups index");
 
     my $detector = $c->get_conflict_detector();
-    $logger->DEBUG(sprintf('there are %s generals in the by_general index',
+    $logger->debug(sprintf('there are %s generals in the by_general index',
       scalar keys $detector->by_general->%*));
     my $groups = $detector->groups_by_conflict_type;
     my $pairs  = $detector->by_general;

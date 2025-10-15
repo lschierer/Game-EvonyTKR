@@ -39,8 +39,8 @@ package Game::EvonyTKR::Controller::Covenants {
 
   # Register this when the application starts
   sub register($c, $app, $config = {}) {
-    $logger = $app->get_logger(__PACKAGE__);
-    $logger->INFO("Registering routes for " . ref($c));
+    $logger = $app->log;
+    $logger->info("Registering routes for " . ref($c));
     $c->SUPER::register($app, $config);
 
     $app->helper(
@@ -93,7 +93,7 @@ package Game::EvonyTKR::Controller::Covenants {
       ? $c->controller_name()
       : $baseClass;
 
-    $logger->DEBUG("got controller_name $controller_name.");
+    $logger->debug("got controller_name $controller_name.");
 
     my $mainRoutes = $app->routes->any($base);
     $mainRoutes->get('/')
@@ -125,7 +125,7 @@ package Game::EvonyTKR::Controller::Covenants {
       }
     );
 
-    $logger->DEBUG("end of register method");
+    $logger->debug("end of register method");
   }
 
   sub import_single_covenant ($c, $app, $fileName, $index) {
@@ -133,14 +133,14 @@ package Game::EvonyTKR::Controller::Covenants {
     # these import oddly unless handled carefully.
     my $covenantFile =
       Mojo::File->new(Encode::decode_utf8($fileName->to_string));
-    $logger->DEBUG("importing covenant file $covenantFile ");
+    $logger->debug("importing covenant file $covenantFile ");
     my $data       = $covenantFile->slurp('UTF-8');
     my $hashObject = YAML::PP->new(
       schema       => [qw/ + Perl /],
       yaml_version => ['1.2', '1.1'],
     )->load_string($data);
     unless (exists $hashObject->{name} && length($hashObject->{name})) {
-      $logger->ERR(sprintf(
+      $logger->error(sprintf(
         'Name is required for a Covenant.  ' . 'Cannot Import %s',
         $covenantFile
       ));
@@ -148,13 +148,13 @@ package Game::EvonyTKR::Controller::Covenants {
     }
     my $primary = $app->get_general($hashObject->{name});
     unless ($primary) {
-      $logger->ERR("cannot find primary for covenant $hashObject->{name}");
+      $logger->error("cannot find primary for covenant $hashObject->{name}");
       return;
     }
     my $covenant =
       Game::EvonyTKR::Model::Covenant->from_hash($hashObject, $primary);
     unless ($covenant) {
-      $logger->ERR(sprintf('failed to build covenant from %s.', $covenantFile));
+      $logger->error(sprintf('failed to build covenant from %s.', $covenantFile));
       return;
     }
     my $allc = $app->get_all_covenants();
@@ -173,7 +173,7 @@ package Game::EvonyTKR::Controller::Covenants {
         my $allc  = $app->get_all_covenants();
         my $count = scalar(keys $allc->%*);
         if ($count >= $expectedTotal) {
-          $logger->INFO(sprintf('Finished importing %s covenants', $count));
+          $logger->info(sprintf('Finished importing %s covenants', $count));
           $app->plugins->emit(
             all_covenants_imported => { covenants_imported => $count });
         }
@@ -193,14 +193,14 @@ package Game::EvonyTKR::Controller::Covenants {
         );
       }
       );
-    $logger->INFO(
+    $logger->info(
       sprintf('Async import of %s covenant files started', $expectedTotal));
   }
 
   sub _build_covenant_routes($c, $covenant, $name, $app, $controller_name,
     $mainRoutes) {
 
-    $logger->DEBUG("building route for " . $covenant->primary->name);
+    $logger->debug("building route for " . $covenant->primary->name);
 
     my $clean_name = $name;
     $clean_name =~ s{^/}{};
@@ -219,7 +219,7 @@ package Game::EvonyTKR::Controller::Covenants {
 
   sub index($self) {
     my $collection = collection_name();
-    $logger->DEBUG("Rendering index for $collection");
+    $logger->debug("Rendering index for $collection");
 
     # Check if markdown exists for this collection
     my $distDir =
@@ -229,10 +229,10 @@ package Game::EvonyTKR::Controller::Covenants {
     my @parts     = split(/::/, ref($self));
     my $baseClass = pop(@parts);
     my $base      = $self->getBase();
-    $logger->DEBUG("Covenants index method has base $base");
+    $logger->debug("Covenants index method has base $base");
 
     my @items = $self->get_root_manager()->covenantManager->get_all_covenants();
-    $logger->DEBUG(sprintf('Items: %s items.', scalar(@items)));
+    $logger->debug(sprintf('Items: %s items.', scalar(@items)));
     $self->stash(
       linkBase        => $base,
       items           => \@items,
@@ -247,26 +247,26 @@ package Game::EvonyTKR::Controller::Covenants {
         { template => 'covenants/index' });
     }
     else {
-      $logger->DEBUG("no markdown index content found at $markdown_path");
+      $logger->debug("no markdown index content found at $markdown_path");
       # Render just the items
       return $self->render(template => 'covenants/index');
     }
   }
 
   sub show ($self) {
-    $logger->DEBUG("start of show method");
+    $logger->debug("start of show method");
     my $name;
     $name = $self->param('name');
-    $logger->DEBUG("show detects name $name, showing details.");
+    $logger->debug("show detects name $name, showing details.");
 
     my $covenant =
       $self->get_root_manager()->covenantManager->getCovenant($name);
 
     unless ($covenant) {
-      $logger->ERR("covenant for '$name' was not found.");
+      $logger->error("covenant for '$name' was not found.");
       $self->reply->not_found;
     }
-    $logger->DEBUG("retrieved covenant $covenant");
+    $logger->debug("retrieved covenant $covenant");
 
     $self->stash(
       item     => $covenant,

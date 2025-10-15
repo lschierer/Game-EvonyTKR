@@ -5,18 +5,22 @@ use File::FindLib 'lib';
 require YAML::PP;
 require Minion::Backend::SQLite;
 require Mojolicious::Plugin::Minion;
+require File::HomeDir::Tiny;
 
 #require Game::EvonyTKR::Controller::Root;
 require Game::EvonyTKR::Controller::ControllerBase;
 require Game::EvonyTKR::External::Buff::Worker;
 require Game::EvonyTKR::External::Prebuild;
+require Game::EvonyTKR::Log::Config;
+require MojoX::Log::Log4perl;
+
 require GitRepo::Reader;
 
 package Game::EvonyTKR {
   use Mojo::Base 'Mojolicious', -strict, -signatures;
   use Mojo::File::Share qw(dist_dir );
-  use Game::EvonyTKR::Shared::Logger;
-  use MojoX::Log::Fast;
+  use Log::Log4perl;
+  use Log::Any::Adapter;
   use Carp;
   use Env qw(DEPLOYMENT_TIME HOSTNAME IMAGE_TAG IMAGE_URI);
   our $VERSION = 'v0.50.0';
@@ -51,16 +55,14 @@ package Game::EvonyTKR {
     $self->defaults(layout => 'default');
 
     # Logging setup
-    my $logger = Game::EvonyTKR::Shared::Logger->get_logger('Game::EvonyTKR');
-    $self->log(MojoX::Log::Fast->new($logger));
+    my $log4perlConfig = sprintf('%s/log4perl.%s.conf', $distDir, $mode );
+    unless (-f -r $log4perlConfig){
+      carp("$log4perlConfig does not exist.");
+    }
+    $self->log( MojoX::Log::Log4perl->new( $log4perlConfig ) );
+    Log::Any::Adapter->set('Log4perl');
 
-    $self->helper(
-      get_logger => sub ($self, $caller) {
-        return Game::EvonyTKR::Shared::Logger->get_logger($caller);
-      }
-    );
-
-    $logger->INFO(sprintf('Mojolicious Logging initialized',));
+    $self->log->info(sprintf('Mojolicious Logging initialized from "%s"', $log4perlConfig));
 
     my $RepoData = GitRepo::Reader->new(source_dir => $distDir,);
 
@@ -70,10 +72,10 @@ package Game::EvonyTKR {
       if (defined $envkey) {
         my $envValue = $self->config->{'EvonyTKR-Environment'}->{$envkey}
           // 'Undefined';
-        $logger->INFO("EvonyTKR-Environnment variable $envkey is $envValue");
+        $self->log->info("EvonyTKR-Environnment variable $envkey is $envValue");
       }
       else {
-        $logger->WARN('undefined envkey in EvonyTKR-Environment!');
+        $self->log->warn('undefined envkey in EvonyTKR-Environment!');
       }
     }
 
@@ -88,7 +90,7 @@ package Game::EvonyTKR {
     # First Plugins that provide helpers but do not define routes
     my $dbPath = Mojo::File->new('minion.db');
 
-    $logger->DEBUG("dbPath is $dbPath");
+    $self->log->debug("dbPath is $dbPath");
     $self->plugin(Minion => { SQLite => "sqlite:$dbPath" });
     if ($mode eq 'development') {
       $self->minion->remove_after(7200);
@@ -122,7 +124,7 @@ package Game::EvonyTKR {
     #$self->reverse_proxy(1);
     Mojo::IOLoop->next_tick(sub ($ioloop) {
       if (Scalar::Util::blessed($self) eq 'Game::EvonyTKR') {
-        $logger->INFO('mojo_worker_started');
+        $self->log->info('mojo_worker_started');
         $self->plugins->emit(mojo_worker_started => { app => $self });
       }
     });

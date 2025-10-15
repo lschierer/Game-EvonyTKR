@@ -24,7 +24,7 @@ package Game::EvonyTKR::Converter {
   use Sereal::Decoder;
   our $VERSION = 'v0.01.0';
 
-  my $logger = Game::EvonyTKR::Shared::Logger->get_logger(__PACKAGE__);
+  my $logger = $app->log;
 
   sub opt_spec {
     return (
@@ -70,7 +70,7 @@ package Game::EvonyTKR::Converter {
     }
     elsif ($opt->mode eq 'all') {
       if (length($opt->url) == 0) {
-        $logger->ERR('A URL is required with --all');
+        $logger->error('A URL is required with --all');
         croak('A URL is required with --all');
         exit -1;
       }
@@ -78,11 +78,11 @@ package Game::EvonyTKR::Converter {
     }
     else {
       if (length($opt->mode) > 0) {
-        $logger->ERR(sprintf('Mode %s is not supported.', $opt->mode));
+        $logger->error(sprintf('Mode %s is not supported.', $opt->mode));
         croak(sprintf('Mode %s is not supported.', $opt->mode));
       }
       else {
-        $logger->ERR('missing mode option');
+        $logger->error('missing mode option');
         croak("missing mode option");
       }
     }
@@ -91,12 +91,12 @@ package Game::EvonyTKR::Converter {
   }
 
   sub doAll ($self, $logger, $url, $debug) {
-    $logger->DEBUG("::Converter->doAll started.");
+    $DEBUG("::Converter->doAll started.");
     my $dd       = Path::Tiny::path(File::Share::dist_dir('Game-EvonyTKR'));
     my $ua       = LWP::UserAgent->new;
     my $response = $ua->get($url);
     unless ($response->is_success) {
-      $logger->ERR(
+      $logger->error(
         sprintf('Failed to fetch %s: %s', $url, $response->status_line));
       croak(sprintf('Failed to fetch %s: %s', $url, $response->status_line));
     }
@@ -106,7 +106,7 @@ package Game::EvonyTKR::Converter {
     my $encoder = Sereal::Encoder->new({ freeze_callbacks => 1 });
     my $decoder = Sereal::Decoder->new;
 
-    $logger->DEBUG("tree is " . Data::Printer::np($tree));
+    $DEBUG("tree is " . Data::Printer::np($tree));
     $tree->look_down(_tag => 'script')->delete()
       for $tree->look_down(_tag => 'script');
     my $serialized = $encoder->encode($tree);

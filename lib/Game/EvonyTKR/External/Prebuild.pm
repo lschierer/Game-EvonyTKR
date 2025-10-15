@@ -9,7 +9,6 @@ require MIME::Base64;
 require Path::Tiny;
 require Game::EvonyTKR;
 require Game::EvonyTKR::Shared::Constants;
-require Game::EvonyTKR::Shared::Logger;
 require Game::EvonyTKR::Model::General;
 require Game::EvonyTKR::External::General::Pair::Workflow;
 
@@ -25,8 +24,8 @@ package Game::EvonyTKR::External::Prebuild {
   state $OnlyOnePrebuild = 0;
 
   sub register ($self, $app, $conf = {}) {
-    $logger = Game::EvonyTKR::Shared::Logger->get_logger(__PACKAGE__);
-    $logger->DEBUG(sprintf('register function for "%s"', __PACKAGE__));
+    $logger = $app->log;
+    $logger->debug(sprintf('register function for "%s"', __PACKAGE__));
 
     # Register main prebuild orchestration task
     $app->minion->add_task(external_prebuild => __PACKAGE__);
@@ -36,7 +35,7 @@ package Game::EvonyTKR::External::Prebuild {
     #$app->plugin('Game::EvonyTKR::External::General::Pair::Workflow');
     my $tasks = $app->minion->tasks();
     my @tns   = keys %$tasks;
-    $logger->DEBUG(sprintf('registered tasks include %s', join ', ', @tns));
+    $logger->debug(sprintf('registered tasks include %s', join ', ', @tns));
 
     my $pair_workflow_loaded = 1;
     $app->plugins->on(
@@ -61,11 +60,11 @@ package Game::EvonyTKR::External::Prebuild {
                   $self->monitorPrebuild($app, $prebuildJid);
                 }
               } else {
-                $logger->DEBUG('OnlyOnePrebuild prevented restart');
+                $logger->debug('OnlyOnePrebuild prevented restart');
               }
              Mojo::IOLoop->remove($loop);
             } else {
-              $logger->DEBUG(sprintf('mojo_worker_started is %s; pair_workflow_loaded is %s.',
+              $logger->debug(sprintf('mojo_worker_started is %s; pair_workflow_loaded is %s.',
               $mojo_worker_started ? 'true' : 'false', $pair_workflow_loaded ? 'true' : 'false'));
             }
           });
@@ -83,7 +82,7 @@ package Game::EvonyTKR::External::Prebuild {
         expire   => 7200,
       }
     );
-    $logger->INFO("Started prebuild orchestrator job $jid");
+    $logger->info("Started prebuild orchestrator job $jid");
     return $jid;
   }
 
@@ -96,7 +95,7 @@ package Game::EvonyTKR::External::Prebuild {
       10 => sub {
         my $job = $app->minion->job($prebuildJid);
         unless ($job) {
-          $logger->ERR(
+          $logger->error(
             "prebuildJid $prebuildJid is not associated with a valid job.");
           $retryCount++;
           if ($retryCount >= $maxRetries) {
@@ -110,19 +109,19 @@ package Game::EvonyTKR::External::Prebuild {
 
         # Check for pairs completion and emit to Mojolicious
         if (my $pairs_by_type = $notes->{pairs_by_type}) {
-          $logger->DEBUG('detected pairs_by_type update');
+          $logger->debug('detected pairs_by_type update');
           $app->plugins->emit(pairs_by_type => $pairs_by_type);
         }
 
         # Check for conflicts completion and emit to Mojolicious
         if (my $conflicts = $notes->{conflicts}) {
-          $logger->DEBUG('detected conflicts update');
+          $logger->debug('detected conflicts update');
           $app->plugins->emit(conflicts_complete => $conflicts);
         }
 
         # Check if prebuild is complete
         if ($info->{state} eq 'finished') {
-          $logger->INFO('Prebuild orchestration complete');
+          $logger->info('Prebuild orchestration complete');
           $app->plugins->emit(
             prebuild_complete => {
               pairs     => $notes->{pairs_by_type},
@@ -132,7 +131,7 @@ package Game::EvonyTKR::External::Prebuild {
           Mojo::IOLoop->remove($loop);
         }
         elsif ($info->{state} eq 'failed') {
-          $logger->ERR(
+          $logger->error(
             "Prebuild failed: " . ($info->{result} // 'unknown error'));
           Mojo::IOLoop->remove($loop);
         }
@@ -142,7 +141,7 @@ package Game::EvonyTKR::External::Prebuild {
 
   # Main prebuild orchestration job
   sub run ($self, @args) {
-    $logger->DEBUG('Prebuild orchestration starting');
+    $logger->debug('Prebuild orchestration starting');
 
      #Start pair building workflow
     my $pair_workflow_jid = $self->app->minion->enqueue(

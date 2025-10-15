@@ -16,11 +16,11 @@ class Game::EvonyTKR::Model::General::Conflict::Book :
   field $conflicts_by_book_name = {};
 
   method build_book_meta_for ($book) {
-    $self->logger->DEBUG("building meta for " . $book->name);
+    $self->logger->debug("building meta for " . $book->name);
 
     my @buffs = $book->buff->@*;    # already-cloned
     foreach my $buff (@buffs) {
-      $self->logger->DEBUG(sprintf(
+      $self->logger->debug(sprintf(
         'book %s has buff %s', $book->name, Data::Printer::np($buff)));
     }
 
@@ -182,7 +182,7 @@ class Game::EvonyTKR::Model::General::Conflict::Book :
   method is_general_and_book_compatible ($general, $book, $opts) {
     my $same_side = $opts->{same_side} // 0;
 
-    $self->logger->DEBUG(sprintf(
+    $self->logger->debug(sprintf(
       'comparing %s with %s and opts %s',
       $general->name, $book->name, Data::Printer::np($opts, multiline => 0)
     ));
@@ -193,11 +193,11 @@ class Game::EvonyTKR::Model::General::Conflict::Book :
     my $m2 = $ProcessedBooks->{ $book->name } //=
       $self->build_book_meta_for($book);
 
-    $self->logger->DEBUG(sprintf(
+    $self->logger->debug(sprintf(
       'meta for general %s is %s',
       $general->name, Data::Printer::np($m1, multiline => 1)
     ));
-    $self->logger->DEBUG(sprintf(
+    $self->logger->debug(sprintf(
       'meta for book %s is %s',
       $book->name, Data::Printer::np($m2, multiline => 1)
     ));

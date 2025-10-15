@@ -2,7 +2,6 @@ use experimental qw(class);
 use utf8::all;
 use File::FindLib 'lib';
 require Data::Printer;
-require Game::EvonyTKR::Shared::Logger;
 
 class GitRepo::Reader {
   our $VERSION = '0.00.1';
@@ -13,14 +12,15 @@ class GitRepo::Reader {
   use Git::Repository;
   require Git::Repository::Log::Iterator;
   require Path::Tiny;
+  use Log::Any qw($log);
   use List::Util     qw(uniq);
   use List::AllUtils qw( uniqstr );
   use HTML::Entities qw(encode_entities);
 
   field $source_dir : param : reader //= './';
   field $git_repo   : reader;
-  field $logger     : reader =
-    Game::EvonyTKR::Shared::Logger->get_logger(__PACKAGE__);
+  field $logger     : reader = $log;
+
 
   field $oldest  = 0;
   field $authors = {};
@@ -47,13 +47,13 @@ class GitRepo::Reader {
 
         my $current   = new Date::Manip::Date;
         my $timestamp = $log->author_gmtime;
-        $logger->DEBUG("retrieved timestamp $timestamp from the log");
+        $logger->debug("retrieved timestamp $timestamp from the log");
         if (not $oldest) {
-          $logger->INFO("setting initial time to $timestamp");
+          $logger->info("setting initial time to $timestamp");
           $oldest = $timestamp;
         }
         elsif ($timestamp < $oldest) {
-          $logger->DEBUG("$timestamp is older than $oldest");
+          $logger->debug("$timestamp is older than $oldest");
           $oldest = $timestamp;
         }
       }
@@ -62,7 +62,7 @@ class GitRepo::Reader {
     # this is a separate test because the while loop might not actually succeed
     if ($oldest) {
       my $dt = DateTime->from_epoch(epoch => $oldest,);
-      $logger->INFO($dt->year . " is the oldest year in the repo.");
+      $logger->info($dt->year . " is the oldest year in the repo.");
       return $dt;
     }
     return 0;
@@ -80,22 +80,22 @@ class GitRepo::Reader {
 
       if ($mailmap_file->is_file()) {
         $mailmap = 1;
-        $logger->INFO("mailmap '$mailmap_file' found");
+        $logger->info("mailmap '$mailmap_file' found");
       }
       else {
         $mailmap = 0;
-        $logger->WARN("No mailmap file at $mailmap_file");
+        $logger->warn("No mailmap file at $mailmap_file");
       }
 
       while (my $log = $iter->next) {
-        $logger->DEBUG("inspecting " . $log->author_name);
+        $logger->debug("inspecting " . $log->author_name);
         my $email = $log->author_email;
         my $name  = $log->author_name;
         if ($mailmap) {
           my $mm_check =
             $git_repo->run('check-mailmap', sprintf('%s <%s>', $name, $email));
           if ($mm_check && $mm_check !~ /^fatal:/) {
-            $logger->DEBUG("mm_check is '$mm_check'");
+            $logger->debug("mm_check is '$mm_check'");
             if ($mm_check =~ /^(.*?)\s*<([^>]+)>/) {
               $name  = $1;
               $email = $2;
@@ -103,7 +103,7 @@ class GitRepo::Reader {
           }
         }
         if (!exists $authors->{$name}) {
-          $logger->DEBUG("adding '$name'");
+          $logger->debug("adding '$name'");
           $authors->{$name} = {
             name  => $name,
             email => $email,

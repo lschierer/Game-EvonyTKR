@@ -41,7 +41,7 @@ class Game::EvonyTKR::Model::Book : isa(Game::EvonyTKR::Shared::Constants) {
     $debuffConditions = [],
   ) {
     my $logger = $self->logger;
-    $logger->DEBUG("Calculating buffs for $name, attribute: $attribute");
+    $logger->debug("Calculating buffs for $name, attribute: $attribute");
 
     my $total = 0;
 
@@ -66,71 +66,71 @@ class Game::EvonyTKR::Model::Book : isa(Game::EvonyTKR::Shared::Constants) {
         $logID
       )) {
         my $val = $b->value->number;
-        $logger->DEBUG("  ➤ Match found. Adding $val to total.");
+        $logger->debug("  ➤ Match found. Adding $val to total.");
         $total += $val;
       }
       else {
-        $logger->DEBUG("  ✗ No match found.");
+        $logger->debug("  ✗ No match found.");
       }
     }
 
-    $logger->DEBUG("$name: total for attribute '$attribute': $total");
+    $logger->debug("$name: total for attribute '$attribute': $total");
     return $total;
   }
 
   method addBuff ($newBuff) {
-    $self->logger->DEBUG("addBuff called for book '$name'");
+    $self->logger->debug("addBuff called for book '$name'");
 
     if (!defined $newBuff) {
-      $self->logger->WARN("addBuff: newBuff is undefined");
+      $self->logger->warn("addBuff: newBuff is undefined");
       return;
     }
 
     my $reftype = Scalar::Util::reftype($newBuff);
     my $blessed = Scalar::Util::blessed($newBuff);
 
-    $self->logger->DEBUG(
+    $self->logger->debug(
       "addBuff: newBuff reftype=$reftype, blessed=" . ($blessed // 'undef'));
 
     if ($reftype eq 'OBJECT') {
       my $classList = $blessed;
-      $self->logger->DEBUG("Adding buff of class $classList to book $name");
+      $self->logger->debug("Adding buff of class $classList to book $name");
 
       my @classStack = split(/::/, $classList);
-      $self->logger->DEBUG("Class stack: " . join(", ", @classStack));
+      $self->logger->debug("Class stack: " . join(", ", @classStack));
 
       if (scalar @classStack > 3) {
         if ($classStack[3] eq 'Buff') {
-          $self->logger->DEBUG("adding $newBuff to $name");
+          $self->logger->debug("adding $newBuff to $name");
 
           # Check if $buff is defined and is an array reference
           if (!defined $buff) {
-            $self->logger->WARN("$buff is undefined in book $name");
+            $self->logger->warn("$buff is undefined in book $name");
             $buff = [];
           }
           elsif (ref($buff) ne 'ARRAY') {
-            $self->logger->WARN(
+            $self->logger->warn(
               "$buff is not an array reference in book $name");
             $buff = [];
           }
 
           push @{$buff}, $newBuff;
-          $self->logger->DEBUG(
+          $self->logger->debug(
             "Book $name now has " . scalar @{$buff} . " buffs");
         }
         else {
-          $self->logger->WARN("Not adding buff: class stack position 2 is "
+          $self->logger->warn("Not adding buff: class stack position 2 is "
               . $classStack[2]
               . " not 'Buff'.");
         }
       }
       else {
-        $self->logger->WARN(
+        $self->logger->warn(
           "Not adding buff: class stack has fewer than 3 elements");
       }
     }
     else {
-      $self->logger->WARN("Not adding buff: not an object (reftype=$reftype)");
+      $self->logger->warn("Not adding buff: not an object (reftype=$reftype)");
     }
   }
 
@@ -191,7 +191,7 @@ class Game::EvonyTKR::Model::Book : isa(Game::EvonyTKR::Shared::Constants) {
     $type->check($text)
       or push @errors => sprintf('$text must contain a string, not %s', $text);
     if (@errors) {
-      $self->logger->ERR(join ', ', @errors);
+      $self->logger->error(join ', ', @errors);
       croak(join ', ', @errors);
       return;
     }

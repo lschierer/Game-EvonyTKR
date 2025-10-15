@@ -27,11 +27,11 @@ class Game::EvonyTKR::Converter::AscendingAttributes :
   field $red       : param //= 1;
 
   ADJUST {
-    $self->logger->DEBUG(sprintf(
+    $self->logger->debug(sprintf(
 '%s assumes that the class or module calling it has generated the required grammar for %s',
       __CLASS__, 'Game::EvonyTKR::Shared::Parser'
     ));
-    $self->logger->DEBUG(sprintf(
+    $self->logger->debug(sprintf(
 '%s assumes that the class or module calling it has also correctly set up the $tree field.',
       __CLASS__));
     # do not assume we were properly passed
@@ -104,9 +104,9 @@ class Game::EvonyTKR::Converter::AscendingAttributes :
 
   method execute {
     say "=== Ascending AscendingAttributes Text to YAML Converter ===";
-    $self->logger->INFO(
+    $self->logger->info(
       "=== Ascending AscendingAttributes Text to YAML Converter ===");
-    $self->logger->DEBUG(
+    $self->logger->debug(
       sprintf('ascending getMainText sees tree with length %s',
         length($tree->as_XML()))
     );
@@ -142,7 +142,7 @@ class Game::EvonyTKR::Converter::AscendingAttributes :
     my $filename = lc($name);
     $filename = "${filename}.yaml";
     if (!$outputDir->is_dir()) {
-      $self->logger->ERR(
+      $self->logger->error(
         "$outputDir is not a directory!!!" . $outputDir->stat());
     }
     $outputDir->child($filename)->touch();
@@ -178,7 +178,7 @@ class Game::EvonyTKR::Converter::AscendingAttributes :
       'class' => qr/stats-table/,
     );
     if ($statsTable) {
-      $self->logger->DEBUG("Calling Template2 for ascending attributes");
+      $self->logger->debug("Calling Template2 for ascending attributes");
       $self->GetMainText_Template2();
     }
     else {
@@ -193,17 +193,17 @@ class Game::EvonyTKR::Converter::AscendingAttributes :
       my $items = $helpers->extract_ul_details($ascendingUL);
       foreach my $index (0 .. (scalar(@{$items}) - 1)) {
         my $key = sprintf('%s%s', $red ? 'red' : 'purple', $index + 1,);
-        $self->logger->DEBUG("computed key '$key'");
+        $self->logger->debug("computed key '$key'");
         my $line = $items->[$index];
-        $self->logger->DEBUG("found line '$line'");
+        $self->logger->debug("found line '$line'");
         $line =~ s/^\s+|\s+$//g;
         $line =~ s/^\d\s+Star\s*[-–—]\s*(.+)$/$1/;
         $data->{$key}->{text} = $line;
-        $self->logger->DEBUG(sprintf('added "%s" to "%s"', $line, $key));
+        $self->logger->debug(sprintf('added "%s" to "%s"', $line, $key));
       }
     }
     else {
-      $self->logger->ERR("Could not find the required ul");
+      $self->logger->error("Could not find the required ul");
     }
   }
 
@@ -213,24 +213,24 @@ class Game::EvonyTKR::Converter::AscendingAttributes :
       'class' => qr/\w+-ascension-buffs/,
     );
     unless ($container) {
-      $self->logger->ERR("Cound not find ascension-buffs container");
+      $self->logger->error("Cound not find ascension-buffs container");
       return;
     }
-    $self->logger->DEBUG("found container " . $container->starttag);
+    $self->logger->debug("found container " . $container->starttag);
     my $h4 = $container->look_down('_tag' => qr/^h4$/);
-    $self->logger->DEBUG(sprintf('h4 is "%s"', $h4->as_trimmed_text));
+    $self->logger->debug(sprintf('h4 is "%s"', $h4->as_trimmed_text));
     $name = $h4->as_trimmed_text =~
       s/Evony\s+(.+?)(?:[’']s)?\s+Ascension\s+Buffs/$1/r;
     $name =~
       s/[\x{0022}\x{0027}\x{2018}\x{2019}\x{201C}\x{201D}\x{0060}\x{00B4}]//g;
-    $self->logger->DEBUG("name is $name");
+    $self->logger->debug("name is $name");
     my $ascendingUL = $helpers->find_next_ul_after_element($h4);
 
     unless (length($name)) {
-      $self->logger->ERR("Cound not find name in document.");
+      $self->logger->error("Cound not find name in document.");
     }
     unless ($ascendingUL) {
-      $self->logger->ERR("Cound not find UL in ascension-buffs container.");
+      $self->logger->error("Cound not find UL in ascension-buffs container.");
     }
     $self->Extract_Lines_from_UL($ascendingUL);
   }
@@ -252,7 +252,7 @@ s/[\x{0022}\x{0027}\x{2018}\x{2019}\x{201C}\x{201D}\x{0060}\x{00B4}]s//g;
       $name =~ s/^\s+|\s+$//g;
     }
     else {
-      $self->logger->ERR("Cannot determine name for this general.");
+      $self->logger->error("Cannot determine name for this general.");
       return;
     }
 
@@ -267,7 +267,7 @@ qr/elementor-element-(?:\w){1,9}.elementor-widget.elementor-widget-theme-post-co
       return [];
     }
     if ($debug) {
-      $self->logger->DEBUG("Found container: " . $container->starttag());
+      $self->logger->debug("Found container: " . $container->starttag());
     }
 
     # Get all h2 and h3 elements in reading order
@@ -317,10 +317,10 @@ qr/elementor-element-(?:\w){1,9}.elementor-widget.elementor-widget-theme-post-co
       }
     }
     unless (length($name)) {
-      $self->logger->ERR("Could not find name in document.");
+      $self->logger->error("Could not find name in document.");
     }
     unless (defined $ascendingUL) {
-      $self->logger->ERR("Cound not find ul for parsing.");
+      $self->logger->error("Cound not find ul for parsing.");
     }
   }
 }

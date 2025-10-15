@@ -39,7 +39,7 @@ class Game::EvonyTKR::Model::Buff::Value :
       "number must be a positive floating point number, not '$number'";
 
     if (scalar @errors >= 1) {
-      $self->logger->ERR(join ', ', @errors);
+      $self->logger->error(join ', ', @errors);
       croak(join ', ', @errors);
       return;
     }

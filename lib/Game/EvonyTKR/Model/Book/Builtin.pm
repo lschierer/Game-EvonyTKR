@@ -12,6 +12,7 @@ class Game::EvonyTKR::Model::Book::Builtin : isa(Game::EvonyTKR::Model::Book) {
   use namespace::autoclean;
   use Carp;
   use File::FindLib 'lib';
+  use Log::Any qw($log);
   use overload
     '""'       => \&TO_JSON,
     'fallback' => 0;
@@ -32,7 +33,7 @@ class Game::EvonyTKR::Model::Book::Builtin : isa(Game::EvonyTKR::Model::Book) {
   }
 
   sub from_hash ($class, $object,) {
-    my $logger = Game::EvonyTKR::Shared::Logger->get_logger($class);
+    my $logger = $log;
     my $bb     = Game::EvonyTKR::Model::Book::Builtin->new(
       name => $object->{name},
       text => $object->{text} // '',
@@ -46,7 +47,7 @@ class Game::EvonyTKR::Model::Book::Builtin : isa(Game::EvonyTKR::Model::Book) {
     elsif (exists $object->{buffs}) {
       @buffs = @{ $object->{buffs} };
     }
-    $logger->DEBUG(
+    $logger->debug(
       sprintf('Book %s has %s buffs in YAML', $object->{name}, scalar @buffs));
 
     foreach my $ob (@buffs) {
@@ -54,7 +55,7 @@ class Game::EvonyTKR::Model::Book::Builtin : isa(Game::EvonyTKR::Model::Book) {
       $bb->addBuff($b);
     }
 
-    $logger->DEBUG(sprintf(
+    $logger->debug(sprintf(
       'Finished importing book "%s" with %s buffs: %s',
       $object->{name},
       scalar @{ $bb->buff },

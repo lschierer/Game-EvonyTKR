@@ -12,6 +12,7 @@ class Game::EvonyTKR::Model::General : isa(Game::EvonyTKR::Shared::Constants) {
   use List::AllUtils qw( any none );
   use Types::Common  qw( t is_Num is_Str);
   use UUID           qw(uuid5);
+  use Log::Any qw($log);
   use namespace::autoclean;
   use Carp;
   use File::FindLib 'lib';
@@ -51,7 +52,7 @@ class Game::EvonyTKR::Model::General : isa(Game::EvonyTKR::Shared::Constants) {
   ADJUST {
     my @errors;
     unless ($self->can('_isTrue') && $self->_isTrue()) {
-      $self->logger->ERR(sprintf('unexpected value: %s', blessed($self)));
+      $self->logger->error(sprintf('unexpected value: %s', blessed($self)));
       croak(sprintf('unexpected value: %s', blessed($self)));
     }
     if (not defined $type) {
@@ -80,7 +81,7 @@ class Game::EvonyTKR::Model::General : isa(Game::EvonyTKR::Shared::Constants) {
         sprintf('stars must be one of %s, not "%s"', join(',', @valv), $stars);
     }
     if (@errors) {
-      $self->logger->ERR(join ', ', @errors);
+      $self->logger->error(join ', ', @errors);
       croak(join ', ', @errors);
       return;
     }
@@ -88,7 +89,7 @@ class Game::EvonyTKR::Model::General : isa(Game::EvonyTKR::Shared::Constants) {
     if (ref $type) {
       my @ts = @{$type};
       my $ut = $ts[0];
-      $self->logger->DEBUG("using type $ut");
+      $self->logger->debug("using type $ut");
       my $uuid5base = $self->UUID5_Generals()->{$ut};
       $id = uuid5($uuid5base, $name);
     }
@@ -101,7 +102,7 @@ class Game::EvonyTKR::Model::General : isa(Game::EvonyTKR::Shared::Constants) {
   method populateSpecialties ($specialtyManager) {
     foreach my $sn_index (0 .. scalar(@{$specialtyNames})) {
       my $sn = $specialtyNames->[$sn_index];
-      $self->logger->DEBUG("populating $sn");
+      $self->logger->debug("populating $sn");
       my $specialty = $specialtyManager->getSpecialty($sn);
       if ($specialty) {
         $specialties->[$sn_index] = $specialty;
@@ -183,10 +184,10 @@ class Game::EvonyTKR::Model::General : isa(Game::EvonyTKR::Shared::Constants) {
   sub from_hash ($self, $hashObject) {
     my $logger;
     unless (defined($logger)) {
-      $logger = Game::EvonyTKR::Shared::Logger->get_logger(__PACKAGE__);
+      $logger = $log;
     }
     if (!exists $hashObject->{name}) {
-      $logger->ERR('hash object must contain a name attribute.');
+      $logger->error('hash object must contain a name attribute.');
       return undef;
     }
     my $g = Game::EvonyTKR::Model::General->new(

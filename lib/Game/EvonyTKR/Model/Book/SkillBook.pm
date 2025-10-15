@@ -12,6 +12,7 @@ class Game::EvonyTKR::Model::Book::SkillBook : isa(Game::EvonyTKR::Model::Book)
   use namespace::autoclean;
   use Carp;
   use File::FindLib 'lib';
+  use Log::Any qw($log);
   use overload
     '""'       => \&TO_JSON,
     'fallback' => 0;
@@ -24,7 +25,7 @@ class Game::EvonyTKR::Model::Book::SkillBook : isa(Game::EvonyTKR::Model::Book)
   ADJUST {
     # Validate level is between 1 and 5
     if ($level < 1 || $level > 5) {
-      $self->logger->ERR(
+      $self->logger->error(
         sprintf('Skillbook level must be between 1 and 5, got %s', $level));
       croak(sprintf('Skillbook level must be between 1 and 5, got %s', $level));
       return;
@@ -42,7 +43,7 @@ class Game::EvonyTKR::Model::Book::SkillBook : isa(Game::EvonyTKR::Model::Book)
   }
 
   sub from_hash ($class, $object,) {
-    my $logger  = Game::EvonyTKR::Shared::Logger->get_logger($class);
+    my $logger  = $log;
     my ($level) = $object->{name} =~ /Level (\d+)/;
     my $bb      = Game::EvonyTKR::Model::Book::SkillBook->new(
       name  => $object->{name},
@@ -58,7 +59,7 @@ class Game::EvonyTKR::Model::Book::SkillBook : isa(Game::EvonyTKR::Model::Book)
     elsif (exists $object->{buffs}) {
       @buffs = @{ $object->{buffs} };
     }
-    $logger->DEBUG(
+    $logger->debug(
       sprintf('Book %s has %s buffs in YAML', $object->{name}, scalar @buffs));
 
     foreach my $ob (@buffs) {
@@ -66,7 +67,7 @@ class Game::EvonyTKR::Model::Book::SkillBook : isa(Game::EvonyTKR::Model::Book)
       $bb->addBuff($b);
     }
 
-    $logger->DEBUG(sprintf(
+    $logger->debug(sprintf(
       'Finished importing book "%s" with %s buffs: %s',
       $object->{name},
       scalar @{ $bb->buff },

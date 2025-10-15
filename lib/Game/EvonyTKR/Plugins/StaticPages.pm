@@ -14,8 +14,8 @@ package Game::EvonyTKR::Plugins::StaticPages {
   my %static_routes;
 
   sub register ($self, $app, $config) {
-    $logger = $app->get_logger(__PACKAGE__);
-    $logger->INFO(sprintf('register function for %s.', __PACKAGE__,));
+    $logger = $app->log;
+    $logger->info(sprintf('register function for %s.', __PACKAGE__,));
 
     # Add helper to check if a static route exists
     $app->helper(
@@ -25,7 +25,7 @@ package Game::EvonyTKR::Plugins::StaticPages {
     );
 
     foreach my $static_entry ($self->build_routes($app)) {
-      $logger->INFO(sprintf(
+      $logger->info(sprintf(
         'Adding route "%s" for file "%s"',
         $static_entry->{route},
         $static_entry->{path}
@@ -68,7 +68,7 @@ package Game::EvonyTKR::Plugins::StaticPages {
       my $file_path     = Mojo::File->new($file);
       my $relative_path = $file_path->to_rel($pages_dir);
       my $route_path    = $self->file_path_to_route($relative_path);
-      $logger->DEBUG(
+      $logger->debug(
         "Considering static route: $route_path for file: $relative_path");
 
       my $parsedFile = $app->parse_markdown_frontmatter($file_path);
@@ -77,12 +77,12 @@ package Game::EvonyTKR::Plugins::StaticPages {
         my $has_conflict     = 0;
 
         my $existing_nav = $app->get_existing_navigation_items() || {};
-        $logger->DEBUG(sprintf('comparing against %s existing nav entries.',
+        $logger->debug(sprintf('comparing against %s existing nav entries.',
           scalar keys %$existing_nav));
         foreach my $existing_path (keys %$existing_nav) {
           if (fc($existing_path) eq fc($normalized_route)) {
             $has_conflict = 1;
-            $logger->DEBUG(sprintf(
+            $logger->debug(sprintf(
               'Skipping static page navigation for "%s"'
                 . ' - conflicts with existing "%s"',
               $route_path, $existing_path,
@@ -92,7 +92,7 @@ package Game::EvonyTKR::Plugins::StaticPages {
         }
 
         unless ($has_conflict) {
-          $logger->DEBUG(
+          $logger->debug(
             sprintf('Registering "%s" as static route, no conflicts present',
               $route_path)
           );
