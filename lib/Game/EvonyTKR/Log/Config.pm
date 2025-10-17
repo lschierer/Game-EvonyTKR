@@ -74,6 +74,7 @@ package Game::EvonyTKR::Log::Config {
     'Game::EvonyTKR::Model::Book::SkillBook'          => 'INFO',
     'Game::EvonyTKR::Model::Book::Builtin'            => 'WARN',
     'Game::EvonyTKR::Model::Book::Manager'            => 'WARN',
+    'Game::EvonyTKR::Model::Book'                     => 'WARN',
     'Game::EvonyTKR::Model::Covenant'                 => 'WARN',
     'Game::EvonyTKR::Model::Glossary::Manager'        => 'WARN',
     'Game::EvonyTKR::Model::Glossary'                 => 'WARN',

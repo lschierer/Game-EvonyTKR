@@ -35,32 +35,7 @@ package Game::EvonyTKR::External::General::Pair::Workflow {
       build_pairs_for_primary => sub ($job, $args) {
         $logger->debug('build_pairs_for_primary task starting');
 
-        # Concurrency limiting
-        my $limit_length = 300;
-        unless (
-          my $taskLimit = $job->minion->guard(
-            'build_pairs_for_primary', $limit_length, { limit => 3 }
-          )
-        ) {
-          $logger->info('Concurrency limit hit for build_pairs_for_primary');
-          return $job->retry({ delay => rand($limit_length) });
-        }
-
-        my $general_name = $args->{general_name};
-        unless (length($general_name)) {
-          $logger->error('general_name not provided to build_pairs_for_primary');
-          return $job->finish(
-            'general_name not provided to build_pairs_for_primary');
-        }
-
-        # Prevent duplicate jobs for same general
-        return $job->finish(
-          "build_pairs_for_primary for $general_name already launched")
-          unless my $bppGuard =
-          $job->app->minion->guard("build_pairs_for_primary_${general_name}",
-          360);
-
-        return $self->build_pairs_for_general($job, $general_name);
+        return $self->build_pairs_for_general($job, $args);
       }
     );
 
@@ -116,9 +91,38 @@ package Game::EvonyTKR::External::General::Pair::Workflow {
     return $job->finish('all builder jobs started');
   }
 
-  sub build_pairs_for_general ($self, $job, $general_name) {
-    $logger->info("Building pairs for general: $general_name");
+  sub build_pairs_for_general ($self, $job, $args) {
+    # Concurrency limiting
+    my $limit_length = 300;
+    unless (
+      my $taskLimit = $job->minion->guard(
+        'build_pairs_for_primary', $limit_length, { limit => 3 }
+      )
+    ) {
+      $logger->info('Concurrency limit hit for build_pairs_for_primary');
+      return $job->retry({ delay => rand($limit_length) });
+    }
 
+    my $general_name = $args->{general_name};
+    unless (length($general_name)) {
+      $logger->error('general_name not provided to build_pairs_for_primary');
+      return $job->finish(
+        'general_name not provided to build_pairs_for_primary');
+    }
+
+    # Prevent duplicate jobs for same general
+    return $job->finish(
+      "build_pairs_for_primary for $general_name already launched")
+      unless my $bppGuard =
+      $job->app->minion->guard("build_pairs_for_primary_${general_name}",
+      360);
+
+    $logger->info("Building pairs for general: $general_name");
+    my $testExternalCommonLog = Log::Log4perl->get_logger('Game::EvonyTKR::External::Common');
+    $logger->info(sprintf('in %s, Log::Log4perl %s initialized. External::Common has level %s',
+      __PACKAGE__, Log::Log4perl->initialized() ? 'is' : 'is not',
+      Log::Log4perl::Level::to_level($testExternalCommonLog->level())
+    ));
     # Create builder instance for this specific job
     my $builder = Game::EvonyTKR::External::General::Pair::Builder->new(
       app => $job->app,

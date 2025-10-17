@@ -3,6 +3,7 @@ use experimental qw(class);
 use utf8::all;
 use namespace::autoclean;
 require Log::Log4perl;
+require Game::EvonyTKR::Log::Config;
 
 class Game::EvonyTKR::Model::Logger {
   #PODNAME: Game::EvonyTKR::Model::Logger
@@ -17,12 +18,26 @@ class Game::EvonyTKR::Model::Logger {
     'bool'     => sub { $_[0]->_isTrue },
     'fallback' => 0;                        # allow Perl defaults for the rest
 
-  field $logger : reader;                   # readonly accessor -> $obj->logger
+    sub get_effective_caller {
+        my $depth = 1;
+        while (my $caller = caller($depth++)) {
+            # Ignore known non-class contexts (e.g., eval)
+            next if $caller =~ /^(eval|main)$/;
 
-  ADJUST {
-    # decide dev-ness; prefer DEV_MODE, else PERL_ENV/MOJO_MODE
-    $logger = Log::Log4perl->get_logger(__CLASS__);
-  }
+            # Return first valid class found
+            return $caller if $caller->isa('Game::EvonyTKR::Model::Logger');
+        }
+        # Fallback to a default strategy
+        return blessed(shift) || ref(shift);
+    }
+
+    method logger {
+      my $effective_class = get_effective_caller($self);
+
+      my $log = Log::Log4perl->get_logger($effective_class);
+      $log->debug("effective_class is $effective_class");
+      return $log;
+    }
 
   method trace { $self->logger->debug(@_) }
   method debug { $self->logger->debug(@_) }
