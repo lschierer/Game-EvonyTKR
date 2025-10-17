@@ -114,8 +114,8 @@
 <style>
 .settings-form {
   background-color: var(--surface-1);
-  --mod-form-grid-template-columns-labels-above: repeat(10, 1fr);
-  --mod-form-inline-size: 100%;
+  --spectrum-form-grid-template-columns-labels-above: repeat(10, 1fr);
+  --spectrum-form-inline-size: 100%;
 
   div#primarySubmit,
   div#secondarySubmit {

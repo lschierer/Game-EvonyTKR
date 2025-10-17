@@ -44,23 +44,24 @@
   --logo-vertical-margin: 2px;
 
   /* customize the spectrum-css tokens */
-  --mod-button-background-color-default: var(--text-1);
-  --mod-button-content-color-default: var(--text-3);
-  --mod-divider-background-color: var(--text-1);
-  --mod-body-font-color: var(--text-1);
-  --mod-heading-font-color: var(--text-1);
-  --mod-splitview-background-color: var(--surface-1);
-  --mod-table-header-background-color-scrollable: var(--text-1);
-  --mod-table-header-background-color: var(--text-1);
+  --spectrum-button-background-color-default: var(--text-1);
+  --spectrum-button-content-color-default: var(--text-3);
+  --spectrum-divider-background-color: var(--text-1);
+  --spectrum-body-font-color: var(--text-1);
+  --spectrum-heading-font-color: var(--text-1);
+  --spectrum-heading-color: var(--text-1);
+  --spectrum-splitview-background-color: var(--surface-1);
+  --spectrum-table-header-background-color-scrollable: var(--text-1);
+  --spectrum-table-header-background-color: var(--text-1);
   /* stylelint-disable-next-line custom-property-pattern */
-  --mod-table-header-background-color--quiet: var(--text-1);
-  --mod-table-header-text-color: var(--text-2);
+  --spectrum-table-header-background-color--quiet: var(--text-1);
+  --spectrum-table-header-text-color: var(--text-2);
   /* stylelint-disable-next-line custom-property-pattern */
-  --mod-table-row-background-color--quiet: var(--surface-1);
-  --mod-table-row-background-color-hover: var(--surface-3);
-  --mod-table-row-background-color: var(--surface-1);
-  --mod-table-row-text-color: var(--text-1);
-  --mod-button-border-color-default: var(--surface-2);
+  --spectrum-table-row-background-color--quiet: var(--surface-1);
+  --spectrum-table-row-background-color-hover: var(--surface-3);
+  --spectrum-table-row-background-color: var(--surface-1);
+  --spectrum-table-row-text-color: var(--text-1);
+  --spectrum-button-border-color-default: var(--surface-2);
 }
 
 html {
@@ -160,9 +161,9 @@ li
 .is-selected > ul a {
   color: var(
     --highcontrast-sidenav-font-color,
-    var(--mod-sidenav-font-color)
+    var(--spectrum-sidenav-font-color)
   ) !important;
-  background-color: var(--mod-sidenav-background-default) !important;
+  background-color: var(--spectrum-sidenav-background-default) !important;
 }
 
 a.spectrum-SideNav-itemLink > iconify-icon {
@@ -173,27 +174,30 @@ a.spectrum-SideNav-itemLink > iconify-icon {
 div.note {
   padding: 0 3rem;
 
-  --mod-body-font-color: var(--spectrum-green-800);
+  --spectrum-body-font-color: var(--spectrum-green-800);
 }
 
 div.caution {
   padding: 0 3rem;
 
-  --mod-body-font-color: var(--spectrum-orange-800);
+  --spectrum-body-font-color: var(--spectrum-orange-800);
 }
 
 div.tip {
   padding: 0 3rem;
 
-  --mod-body-font-color: var(--spectrum-blue-800);
+  --spectrum-body-font-color: var(--spectrum-blue-800);
 }
 
 aside.note {
   padding: 0 3rem;
   color: var(--spectrum-green-800);
   font-family: var(
-    --mod-body-serif-font-family,
+    --spectrum-body-serif-font-family,
     var(--spectrum-body-serif-font-family)
   );
-  line-height: var(--mod-body-line-height, var(--spectrum-body-line-height));
+  line-height: var(
+    --spectrum-body-line-height,
+    var(--spectrum-body-line-height)
+  );
 }

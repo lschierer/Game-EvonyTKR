@@ -1,0 +1,144 @@
+header {
+  /*
+   * This is duplicate, but the global one in global.css
+   * is being overridden and I'm unsure why.  Having this
+   * here scopes it sufficiently local that it actually
+   * takes affect.
+  */
+  --spectrum-heading-color: var(--text-1);
+}
+
+div.header {
+  height: var(--header-height);
+  width: 100vw;
+  background-color: var(--spectrum-heading-color);
+  color: var(--text-2);
+  padding: var(--size-1);
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: 2fr 4fr 1fr;
+  gap: 0 1rem;
+  align-items: center;
+}
+
+div.site-title-section {
+  grid-column: 1;
+  grid-row: 1 / -1;
+  display: grid;
+  box-sizing: border-box;
+  grid-template-rows: subgrid;
+  grid-template-columns: 1fr 5fr;
+}
+
+div.logo-container {
+  display: block;
+  box-sizing: border-box;
+  grid-row: 1/-1;
+  grid-column: 1 / 1;
+  max-height: var(--header-height);
+  margin: 2px 0;
+}
+
+svg.site-logo {
+  display: block;
+  width: auto;
+  height: 90%;
+  max-height: var(--header-height);
+}
+
+div.title-container {
+  display: block;
+  box-sizing: border-box;
+  grid-row: 1/-1;
+  grid-column: 2/-1;
+  overflow: hidden;
+  text-wrap: nowrap;
+  white-space: nowrap;
+  max-height: var(--header-height);
+}
+
+span.site-title.spectrum-Heading {
+  background-color: var(--spectrum-heading-font-color);
+  color: var(--text-2);
+  box-sizing: border-box;
+  margin: auto 0; /* center vertically */
+  font-size: var(--spectrum-heading-size-m);
+  line-height: var(--spectrum-heading-line-height-m);
+}
+
+@media (width >= 1016px) {
+  span.site-title.spectrum-Heading {
+    font-size: var(--spectrum-heading-size-l);
+    line-height: var(--spectrum-heading-line-height-l);
+  }
+}
+
+@media (width >= 1286px) {
+  span.site-title.spectrum-Heading {
+    font-size: var(--spectrum-heading-size-xl);
+    line-height: var(--spectrum-heading-line-height-xl);
+  }
+}
+
+@media (width >= 1401px) {
+  span.site-title.spectrum-Heading {
+    font-size: var(--spectrum-heading-size-xxl);
+    line-height: var(--spectrum-heading-line-height-xxl);
+  }
+}
+
+a.site-title {
+  --spectrum-link-text-color: var(--text-2);
+  --spectrum-link-text-color-secondary-hover: var(--text-2);
+  --spectrum-link-text-color-secondary-focus: var(--text-2);
+}
+
+div.nav-section {
+  grid-column: 2/3;
+  grid-row: 1/-1;
+  display: grid;
+  grid-template-rows: subgrid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 0 1em;
+  justify-content: space-between;
+
+  --spectrum-heading-font-color: var(--text-2);
+}
+
+div.nav-section > div.nav-item {
+  grid-row: 1/-1;
+  grid-column-end: span 1;
+  margin: auto 0;
+}
+
+div.social-icons-section {
+  grid-row: 1/-1;
+  grid-column-end: span 1;
+  display: grid;
+  grid-template-rows: subgrid;
+  justify-content: end;
+  align-items: center;
+  grid-auto-columns: 1fr;
+  margin: 2em;
+
+  --social-icon-size: var(--size-7);
+  --spectrum-heading-font-color: var(--text-2);
+}
+
+div.social-icons-section > div.nav-item {
+  justify-self: end;
+}
+
+iconify-icon.social-icons.nav-item {
+  height: var(--social-icon-size);
+  width: var(--social-icon-size);
+}
+
+iconify-icon#github {
+  color: var(--github-green);
+}
+
+div.nav-item > a.social-icons.nav-item {
+  height: fit-content;
+  width: fit-content;
+}

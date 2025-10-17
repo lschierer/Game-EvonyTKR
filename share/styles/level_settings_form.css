@@ -1,14 +1,14 @@
 :host {
-  --mod-form-grid-template-columns-labels-above: repeat(
+  --spectrum-form-grid-template-columns-labels-above: repeat(
     auto-fit,
     minmax(15em, 1fr)
   );
   --spectrum-popover-height: 20em;
   --spectrum-popover-width: 20em;
-  --mod-popover-background-color: var(--surface-1);
-  --mod-picker-button-icon-color: var(--text-1);
-  --mod-picker-button-border-color: var(--text-1);
-  --mod-menu-item-label-icon-color-default: var(
+  --spectrum-popover-background-color: var(--surface-1);
+  --spectrum-picker-button-icon-color: var(--text-1);
+  --spectrum-picker-button-border-color: var(--text-1);
+  --spectrum-menu-item-label-icon-color-default: var(
     --spectrum-positive-visual-color
   );
 }
@@ -48,8 +48,8 @@ div#general-filter-popover {
 iconify-icon.spectrum-PickerButton-fill {
   width: 1.5em;
   height: 1.5em;
-  border-color: var(--mod-picker-button-border-color);
-  color: var(--mod-picker-button-icon-color);
+  border-color: var(--spectrum-picker-button-border-color);
+  color: var(--spectrum-picker-button-icon-color);
 }
 
 li iconify-icon.spectrum-Icon.hidden {

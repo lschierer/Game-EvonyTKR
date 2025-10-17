@@ -10,7 +10,7 @@
 table,
 thead,
 th {
-  --mod-table-header-background-color-scrollable: var(--surface-1);
+  --spectrum-table-header-background-color-scrollable: var(--surface-1);
 }
 
 thead,
