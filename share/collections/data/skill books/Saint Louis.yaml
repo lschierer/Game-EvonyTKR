@@ -1,5 +1,7 @@
 ---
 name: Saint Louis
+text: >-
+  Increases ranged troops’ attack by 40% and ranged troops’ defense by 45% when General is leading the army
 buffs:
   - attribute: Attack
     targetedType: Ranged Troops
@@ -8,6 +10,8 @@ buffs:
       unit: percentage
   - attribute: Defense
     targetedType: Ranged Troops
+    conditions:
+      - leading the army
     value:
       number: 45
       unit: percentage

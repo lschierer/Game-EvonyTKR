@@ -1,0 +1,8 @@
+name: Level 4 Siege Machine Range Bonus
+text: >-
+  Increases Siege Machine’s Attack Range by 200% when General is leading the army.
+buffs:
+  - attribute: Range
+    troops: Siege Machines
+    value:
+      number: 200

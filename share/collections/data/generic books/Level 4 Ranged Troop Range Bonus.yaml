@@ -1,0 +1,8 @@
+name: Level 4 Ranged Troop Range Bonus
+text: >-
+  Increases Ranged Troop’s Attack Range by 100% when General is leading the army.
+buffs:
+  - attribute: Range
+    troops: Ranged Troops
+    value:
+      number: 100

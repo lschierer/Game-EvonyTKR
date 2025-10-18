@@ -1,0 +1,25 @@
+name: Louis II
+general: Louis II
+ascending: true
+basic_attributes:
+  attack:
+    base: 129
+    increment: 8.90
+  defense:
+    base: 127
+    increment: 8.68
+  leadership:
+    base: 129
+    increment: 8.90
+  politics:
+    base: 112
+    increment: 8.38
+book: Liberator of Bari
+specialties:
+  - Ground Troop Defense
+  - Formation
+  - Ground Troop Ares
+  - Emperor of Italy
+stars: red5
+type:
+  - ground_specialist

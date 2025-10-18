@@ -1,0 +1,72 @@
+general: Louis XIV
+id: Louis XIV
+ascending:
+  - level: red1
+    text: Attacking Mounted Troop Attack and Defense +15%.
+    buffs:
+      - attribute: Attack
+        troop: Mounted Troops
+        value:
+          number: 15
+        conditions:
+          - Attacking
+      - attribute: Defense
+        troop: Mounted Troops
+        value:
+          number: 15
+        conditions:
+          - Attacking
+  - level: red2
+    text: Attacking Troop Death into Wounded Rate +8%.
+    buffs:
+      - attribute: Death to Wounded
+        conditions:
+          - Marching
+        value:
+          number: 8
+          unit: percentage
+  - level: red3
+    text: When attacking, Mounted Troop Attack +25%, Match Size Capacity +5%.
+    buffs:
+      - attribute: Attack
+        troop: Mounted Troops
+        value:
+          number: 25
+        conditions:
+          - Attacking
+      - attribute: March Size
+        value:
+          number: 5
+  - level: red4
+    text: Attacking Mounted Troop Defense and HP +20%.
+    buffs:
+      - attribute: Defense
+        troop: Mounted Troops
+        value:
+          number: 20
+        conditions:
+          - Attacking
+      - attribute: HP
+        troop: Mounted Troops
+        value:
+          number: 20
+        conditions:
+          - Attacking
+  - level: red5
+    text: Attacking Mounted Troop Attack and HP +40%, March Size Capacity +8%.
+    buffs:
+      - attribute: Attack
+        troop: Mounted Troops
+        value:
+          number: 40
+        conditions:
+          - Attacking
+      - attribute: HP
+        troop: Mounted Troops
+        value:
+          number: 40
+        conditions:
+          - Attacking
+      - attribute: March Size
+        value:
+          number: 8
