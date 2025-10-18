@@ -35,7 +35,6 @@ class Game::EvonyTKR::Model::Logger {
       my $effective_class = get_effective_caller($self);
 
       my $log = Log::Log4perl->get_logger($effective_class);
-      $log->debug("effective_class is $effective_class");
       return $log;
     }
 

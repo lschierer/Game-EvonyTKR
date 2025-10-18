@@ -47,7 +47,7 @@ package Game::EvonyTKR::External::Prebuild {
 
     my $mojo_worker_started = 0;
     $app->plugins->on(
-      mojo_worker_started => sub {
+      generals_loaded => sub {
         $mojo_worker_started = 1;
         my $loop;
         $loop = Mojo::IOLoop->recurring(
@@ -72,7 +72,6 @@ package Game::EvonyTKR::External::Prebuild {
         Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
       }
     );
-
   }
 
   sub startPrebuild ($self, $app) {

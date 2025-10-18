@@ -71,6 +71,9 @@ class Game::EvonyTKR::External::General::Pair::Builder :
       }
     );
 
+    # Emit signal for incremental results
+    $self->app->plugins->emit(pairs_by_type => $pairs_by_type);
+
     return $job->finish(
       "Completed pairs for $general_name: $total_added pairs added");
   }
@@ -205,6 +208,10 @@ class Game::EvonyTKR::External::General::Pair::Builder :
         'All pair builders complete: %d succeeded, %d failed',
         $completed_jobs, $something_failed
       ));
+
+      # Emit completion signal with final merged results
+      $self->app->plugins->emit(pairs_complete => $pairs_by_type);
+
       return $monitor_job->finish('all pair builders complete');
     }
 

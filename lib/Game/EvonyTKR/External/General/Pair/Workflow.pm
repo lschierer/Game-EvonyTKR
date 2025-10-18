@@ -49,8 +49,19 @@ package Game::EvonyTKR::External::General::Pair::Workflow {
     $self->SUPER::run($args);
     $logger->debug('monitor_pair_builders task starting');
 
-    # Allow multiple monitors (one per hypnotoad worker)
-    return $self->monitor_pair_building_progress($self, $args);
+    $logger->info('Starting pair building progress monitor');
+
+    # Get existing state from job notes
+    my $existing_pairs = $self->info->{notes}->{pairs_by_type} // {};
+
+    # Create builder instance with existing state
+    my $builder = Game::EvonyTKR::External::General::Pair::Builder->new(
+      app           => $self->app,
+      pairs_by_type => $existing_pairs
+    );
+
+    # Execute monitoring logic
+    return $builder->monitor_pair_builders($self);
   }
 
   sub spawn_pair_jobs ($self, $job, $args) {
@@ -132,22 +143,6 @@ package Game::EvonyTKR::External::General::Pair::Workflow {
     my $result = $builder->build_pairs_for_primary($job, $general_name);
 
     return $result;
-  }
-
-  sub monitor_pair_building_progress ($self, $job, $args) {
-    $logger->info('Starting pair building progress monitor');
-
-    # Get existing state from job notes
-    my $existing_pairs = $job->info->{notes}->{pairs_by_type} // {};
-
-    # Create builder instance with existing state
-    my $builder = Game::EvonyTKR::External::General::Pair::Builder->new(
-      app           => $job->app,
-      pairs_by_type => $existing_pairs
-    );
-
-    # Execute monitoring logic
-    return $builder->monitor_pair_builders($job);
   }
 }
 

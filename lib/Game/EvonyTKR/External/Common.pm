@@ -19,7 +19,7 @@ class Game::EvonyTKR::External::Common : isa(Game::EvonyTKR::Shared::Constants)
   use Encode            qw(is_utf8 decode_utf8 encode_utf8);
   use Carp;
 
-  field $app : param;
+  field $app : param : reader;
   field $tasks : reader = {};
   field $collectionDir =
     Mojo::File->new($app->config('distDir'))->child('collections/data/');
@@ -33,24 +33,6 @@ class Game::EvonyTKR::External::Common : isa(Game::EvonyTKR::Shared::Constants)
     asst_has_spirit  => 1,
     allow_wall_buffs => 1,
     );
-
-  ADJUST {
-    $self->testLogSetting();
-  }
-
-  method testLogSetting {
-
-    # Get the current logging level for the logger's category
-    my $current_level = Log::Log4perl::Level::to_level($self->logger->level());
-
-    # Get the logger category
-    my $category = $self->logger->category();
-
-    $self->logger->info(sprintf('in %s, Log::Log4perl %s initialized. External::Common has level %s category %s',
-      blessed($self), Log::Log4perl->initialized() ? 'is' : 'is not',
-      $current_level, $category,
-    ));
-  }
 
   method load_builtinBook ($bookName, $generalName) {
     my $bookDir = $collectionDir->child('skill books');
@@ -84,7 +66,6 @@ class Game::EvonyTKR::External::Common : isa(Game::EvonyTKR::Shared::Constants)
 
   method load_single_general ($generalFile, $index) {
     $self->logger->debug("processing $generalFile, file # $index");
-    $self->testLogSetting();
     my $data       = $generalFile->slurp('UTF-8');
     my $hashObject = YAML::PP->new(
       schema       => [qw/ + Perl /],
@@ -106,6 +87,7 @@ class Game::EvonyTKR::External::Common : isa(Game::EvonyTKR::Shared::Constants)
     $g->set_builtInBook($bb);
     $generals->{ $self->normalize($g->name) } = $g;
     $self->logger->debug(sprintf('imported general %s.', $g->name));
+    return $g;
   }
 
   method load_generals ($taskName) {

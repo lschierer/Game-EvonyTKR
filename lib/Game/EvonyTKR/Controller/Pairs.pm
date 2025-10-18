@@ -48,6 +48,11 @@ package Game::EvonyTKR::Controller::Pairs {
     return \%pairs_by_type;
   }
 
+  sub getDataModel {
+    state $dm = Game::EvonyTKR::Model::Data->new();
+    return $dm;
+  }
+
   sub register($c, $app, $config = {}) {
     $logger = Log::Log4perl->get_logger(__PACKAGE__);
     $logger->info("Registering routes for " . ref($c));
@@ -144,10 +149,8 @@ package Game::EvonyTKR::Controller::Pairs {
           @{ $pairs_by_type->{$type} }
         ) {
           $increment++;
-          my $primary = $app->get_general(
-            $c->SUPER::getConstants->normalize($p->{primary}));
-          my $secondary = $app->get_general(
-            $c->SUPER::getConstants->normalize($p->{secondary}));
+          my $primary = $app->get_general($p->{primary});
+          my $secondary = $app->get_general($p->{secondary});
           if ($primary && $secondary) {
             my $pair = Game::EvonyTKR::Model::General::Pair->new(
               primary   => $primary,
@@ -299,7 +302,7 @@ package Game::EvonyTKR::Controller::Pairs {
     $logger->debug("uidseed is '$uidseed'");
 
     my $session_id =
-      UUID::uuid5($self->app->get_root_manager()->UUID5_base, $uidseed);
+      UUID::uuid5($self->getDataModel->UUID5_base, $uidseed);
     $logger->debug("final session_id is '$session_id'");
 
     # Lookup route metadata
@@ -329,7 +332,7 @@ package Game::EvonyTKR::Controller::Pairs {
 
     my @pairs = @{ $self->getPairs()->{$generalType} };
 
-    $$logger->debug(sprintf('There are %s pairs to return.', scalar(@pairs)));
+    $logger->debug(sprintf('There are %s pairs to return.', scalar(@pairs)));
 
     # Return just the basic pair information without computing buffs
     my @json_data = map { {
