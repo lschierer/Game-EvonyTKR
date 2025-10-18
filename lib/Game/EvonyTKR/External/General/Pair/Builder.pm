@@ -71,6 +71,7 @@ class Game::EvonyTKR::External::General::Pair::Builder :
       }
     );
 
+    $job->app->plugins->emit(pairs_by_type => $pairs_by_type);
     return $job->finish(
       "Completed pairs for $general_name: $total_added pairs added");
   }

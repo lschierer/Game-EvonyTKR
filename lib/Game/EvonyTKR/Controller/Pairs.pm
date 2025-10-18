@@ -76,8 +76,6 @@ package Game::EvonyTKR::Controller::Pairs {
       }
     );
 
-    $app->plugins->on(
-      general_routing_available => sub {
         $mainRoutes->get('/:uiTarget/:buffActivation/pair-comparison')->to(
           controller => 'Pairs',
           action     => 'pairTable',
@@ -116,8 +114,6 @@ package Game::EvonyTKR::Controller::Pairs {
             });
           }
         }
-      }
-    );
   }
 
   sub pair_receiver ($c, $app, @args) {
@@ -299,7 +295,7 @@ package Game::EvonyTKR::Controller::Pairs {
     $logger->debug("uidseed is '$uidseed'");
 
     my $session_id =
-      UUID::uuid5($self->app->get_root_manager()->UUID5_base, $uidseed);
+      UUID::uuid5($self->SUPER::getConstants->UUID5_base, $uidseed);
     $logger->debug("final session_id is '$session_id'");
 
     # Lookup route metadata
