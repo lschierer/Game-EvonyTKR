@@ -56,7 +56,6 @@ package Game::EvonyTKR::Controller::Generals {
     $logger->info("Registering routes for " . ref($c));
     $c->SUPER::register($app, $config);
 
-
     $c->setup_event_handlers($app);
     $c->setup_helpers($app);
     $c->setup_routes($app);
@@ -64,9 +63,11 @@ package Game::EvonyTKR::Controller::Generals {
   }
 
   sub setup_helpers($c, $app) {
-    $app->helper(setup_general_storage => sub {
-      return $c->setup_general_storage($app);
-    });
+    $app->helper(
+      setup_general_storage => sub {
+        return $c->setup_general_storage($app);
+      }
+    );
 
     $app->helper(
       get_generals => sub {
@@ -241,21 +242,28 @@ package Game::EvonyTKR::Controller::Generals {
       if (List::AllUtils::none { $_ == 0 } values $completion_state->%*) {
         $logger->info('setting up general storage');
         my $generals = $app->get_generals();
-        if(not defined($generals) or ( ref($generals) eq 'HASH' && scalar keys $generals->%* == 0)){
+        if (not defined($generals)
+          or (ref($generals) eq 'HASH' && scalar keys $generals->%* == 0)) {
           $logger->info('No Generals pre-populated, kicking off import');
           $c->load_generals($app);
-        } elsif(ref($generals) ne 'HASH') {
-          $logger->error(sprintf('get_generals returned a "%s"', length(ref($generals)) ? ref($generals) : $generals ));
+        }
+        elsif (ref($generals) ne 'HASH') {
+          $logger->error(
+            sprintf('get_generals returned a "%s"',
+              length(ref($generals)) ? ref($generals) : $generals)
+          );
         }
       }
     };
 
     # then define handlers in reverse order of use for safety
 
-    $app->plugins->on(general_loader_job_ready => sub {
-      $completion_state->{general_loader_job_ready} = 1;
-      $check_prerequisites->();
-    });
+    $app->plugins->on(
+      general_loader_job_ready => sub {
+        $completion_state->{general_loader_job_ready} = 1;
+        $check_prerequisites->();
+      }
+    );
 
     $app->plugins->on(
       general_loaded => sub {
@@ -293,73 +301,90 @@ package Game::EvonyTKR::Controller::Generals {
   }
 
   sub get_general_by_name($c, $name) {
-    my $nn = $c->SUPER::getConstants()->normalize($name);
+    my $nn       = $c->SUPER::getConstants()->normalize($name);
     my $generals = $c->SUPER::get_shared_data('generals');
-    if(scalar keys $generals->%* == 0){
+    if (scalar keys $generals->%* == 0) {
       $logger->error("There are no generals loaded.");
       return undef;
     }
-    my $g  = $generals->{$nn};
+    my $g = $generals->{$nn};
     if (not defined $g) {
       $logger->warn(sprintf(
         'no general named "%s" normalized '
           . 'to "%s" found. Available Generals: %s',
-        $name, $nn, sort join ', ', keys $generals->%*
+        $name, $nn,
+        sort join ', ',
+        keys $generals->%*
       ));
     }
     return $g;
   }
 
-  sub setup_general_storage($c, $app){
-    $c->SUPER::get_or_load_data('generals', sub ($self, $precomputed_data = undef) {
-      return $precomputed_data if $precomputed_data;
-      my $generals = {};
-      return $generals;
-    });
+  sub setup_general_storage($c, $app) {
+    $c->SUPER::get_or_load_data(
+      'generals',
+      sub ($self, $precomputed_data = undef) {
+        return $precomputed_data if $precomputed_data;
+        my $generals = {};
+        return $generals;
+      }
+    );
   }
 
   sub load_generals($c, $app) {
-    my $cd       = Mojo::File->new($app->config('distDir'))
+    my $cd = Mojo::File->new($app->config('distDir'))
       ->child('collections/data/generals/');
     my @files = $cd->list_tree->grep(sub {qr/\.y\{a\}?ml$/})->each;
     $c->{expectedTotal} = scalar(@files);
-    $logger->info(sprintf('there are %s generals to load', $c->{expectedTotal}));
-    $cd->list_tree->grep(sub {qr/\.y\{a\}?ml$/})->each(sub ($gfItem, $index){
-      $logger->debug(sprintf('loading file # %s: %s', $index, $gfItem));
-      my $general_name = $gfItem->basename('.yaml');
-      my $jid = $app->minion->enqueue(load_general => [{general_name => $general_name, index => $index}]);
-      my $loop;
-      $loop = Mojo::IOLoop->recurring(5 => sub {
-        my $info = $app->minion->job($jid)->info;
-        if(defined($info) && exists($info->{result}) && length($info->{result}) && $info->{result} =~ m/general loaded/) {
-          my $generals = $app->get_generals();
-          my $nn = $c->SUPER::getConstants->normalize($general_name);
-          my $general = $generals->{$nn};
-          unless($general){
-            $logger->error(sprintf('no general in shared data for %s despite positive result',
-            $general_name));
-            Mojo::IOLoop->remove($loop);
-            return;
-          }
+    $logger->info(
+      sprintf('there are %s generals to load', $c->{expectedTotal}));
+    $cd->list_tree->grep(sub {qr/\.y\{a\}?ml$/})->each(
+      sub ($gfItem, $index) {
+        $logger->debug(sprintf('loading file # %s: %s', $index, $gfItem));
+        my $general_name = $gfItem->basename('.yaml');
+        my $jid          = $app->minion->enqueue(
+          load_general => [{ general_name => $general_name, index => $index }]);
+        my $loop;
+        $loop = Mojo::IOLoop->recurring(
+          5 => sub {
+            my $info = $app->minion->job($jid)->info;
+            if ( defined($info)
+              && exists($info->{result})
+              && length($info->{result})
+              && $info->{result} =~ m/general loaded/) {
+              my $generals = $app->get_generals();
+              my $nn       = $c->SUPER::getConstants->normalize($general_name);
+              my $general  = $generals->{$nn};
+              unless ($general) {
+                $logger->error(sprintf(
+                  'no general in shared data for %s despite positive result',
+                  $general_name));
+                Mojo::IOLoop->remove($loop);
+                return;
+              }
 
-          $c->_build_general_routes($general, $app);
-          my $gc = scalar keys $generals->%*;
-          if($gc == $c->{expectedTotal}){
-            $logger->info(sprintf('all generals are loaded: %s generals', $gc));
-            $app->plugins->emit(generals_loaded => { generals => $generals });
+              $c->_build_general_routes($general, $app);
+              my $gc = scalar keys $generals->%*;
+              if ($gc == $c->{expectedTotal}) {
+                $logger->info(
+                  sprintf('all generals are loaded: %s generals', $gc));
+                $app->plugins->emit(
+                  generals_loaded => { generals => $generals });
+              }
+              Mojo::IOLoop->remove($loop);
+            }
+            elsif ($info->{state} eq 'finished') {
+              $logger->warn('unexpected finished state: %s', $info->{result});
+              Mojo::IOLoop->remove($loop);
+            }
           }
-          Mojo::IOLoop->remove($loop);
-        }elsif ($info->{state} eq 'finished'){
-          $logger->warn('unexpected finished state: %s', $info->{result});
-          Mojo::IOLoop->remove($loop);
-        }
-      });
-      Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
-    });
+        );
+        Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
+      }
+    );
   }
 
-
-  sub _build_general_routes($self, $general, $app, ) {
+  sub _build_general_routes($self, $general, $app,) {
     my $name = $general->name;
 
     $logger->debug("building Reference Routes for $name");
@@ -756,7 +781,8 @@ package Game::EvonyTKR::Controller::Generals {
     my $uiTarget       = $route_meta->{uiTarget};
 
     my @selected;
-    while (my ($key, $general) = each(%{ $self->SUPER::get_shared_data('generals') })) {
+    while (my ($key, $general) =
+      each(%{ $self->SUPER::get_shared_data('generals') })) {
       $logger->debug(
         "inspecting '$key', first need to see if it is a $generalType."
           . Data::Printer::np($general, multiline => 0));
@@ -895,9 +921,8 @@ package Game::EvonyTKR::Controller::Generals {
 
     my $valid = {};
     map { $valid->{ $_->{primary} } => 1 } @$selected;
-    foreach
-      my $general (sort { $a->name cmp $b->name } values $c->SUPER::get_shared_data('generals')->%*)
-    {
+    foreach my $general (sort { $a->name cmp $b->name }
+      values $c->SUPER::get_shared_data('generals')->%*) {
 
       if (scalar(@$selected) && exists $valid->{ $general->name }) {
         push @$rows, $general;

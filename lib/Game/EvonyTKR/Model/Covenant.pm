@@ -18,7 +18,7 @@ class Game::EvonyTKR::Model::Covenant : isa(Game::EvonyTKR::Shared::Constants) {
   use namespace::autoclean;
   use File::FindLib 'lib';
   use List::AllUtils qw( any none );
-  use Log::Any qw($log);
+  use Log::Any       qw($log);
   use Carp;
   use overload
     '""'       => \&as_string,

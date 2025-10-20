@@ -6,8 +6,8 @@
   require YAML::PP;
   require Game::EvonyTKR::Model::General;
 
-
-  class Game::EvonyTKR::External::Buff::Computer : isa(Game::EvonyTKR::External::Common) {
+  class Game::EvonyTKR::External::Buff::Computer :
+    isa(Game::EvonyTKR::External::Common) {
     use Hash::Util qw(lock_hash lock_hash_recurse lock_value);
     use Unicode::Normalize;
     use Unicode::CaseFold qw(fc);
@@ -146,11 +146,11 @@
 
     method worker_croak ($error_msg) {
       if ($debug_enabled) {
-          $self->logger->error($error_msg);
-          croak($error_msg);
+        $self->logger->error($error_msg);
+        croak($error_msg);
       }
       else {
-          $self->logger->error($error_msg);
+        $self->logger->error($error_msg);
         my $error_response = {
           runId => 0+ $runId,
           error => $error_msg
@@ -268,7 +268,8 @@
       unless ($validator->checkCovenantLevel($opt->{primaryCovenantLevel})) {
         $self->logger->warn(
           sprintf('Invalid covenantLevel using default "civilization"'));
-        $self->logger->warn('invalid value was ' . $opt->{primaryCovenantLevel});
+        $self->logger->warn(
+          'invalid value was ' . $opt->{primaryCovenantLevel});
         $opt->{primaryCovenantLevel} = 'civilization';
       }
 
@@ -318,7 +319,8 @@
       unless ($validator->checkCovenantLevel($opt->{secondaryCovenantLevel})) {
         $self->logger->warn(
           sprintf('Invalid covenantLevel using default "civilization"'));
-        $self->logger->warn('invalid value was ' . $opt->{secondaryCovenantLevel});
+        $self->logger->warn(
+          'invalid value was ' . $opt->{secondaryCovenantLevel});
         $opt->{secondaryCovenantLevel} = 'civilization';
       }
 
@@ -455,7 +457,8 @@
       my $bk = $params->{targetType} =~ s/_/ /r;
       $bk =~ s/(\w)(\w+) specialist/\U$1\L$2 \UT\Lroops/;
       $bk =~ s/Siege Troops/Siege Machines/;
-      $self->logger->debug("buffKey is " . Data::Printer::np($bk, multiline => 0));
+      $self->logger->debug(
+        "buffKey is " . Data::Printer::np($bk, multiline => 0));
 
       my $tsum = {};
 
@@ -585,7 +588,8 @@
       unless ($validator->checkCovenantLevel($opt->{primaryCovenantLevel})) {
         $self->logger->warn(
           sprintf('Invalid covenantLevel using default "civilization"'));
-        $self->logger->warn('invalid value was ' . $opt->{primaryCovenantLevel});
+        $self->logger->warn(
+          'invalid value was ' . $opt->{primaryCovenantLevel});
         $opt->{primaryCovenantLevel} = 'civilization';
       }
 
@@ -682,7 +686,8 @@
       my $bk = $params->{targetType} =~ s/_/ /r;
       $bk =~ s/(\w)(\w+) specialist/\U$1\L$2 \UT\Lroops/;
       $bk =~ s/Siege Troops/Siege Machines/;
-      $self->logger->debug("buffKey is " . Data::Printer::np($bk, multiline => 0));
+      $self->logger->debug(
+        "buffKey is " . Data::Printer::np($bk, multiline => 0));
 
       my $row = {
         primary             => $general1->to_hash,
@@ -726,7 +731,6 @@
       return $result;
     }
 
-
     method load_covenant ($primary) {
       my $name          = $primary->name;
       my $covenants_dir = $collection_dir->child('covenants');
@@ -766,7 +770,8 @@
         if (defined($specialty_file) && $specialty_file->is_file()) {
           my $data   = $specialty_file->slurp_utf8;
           my $object = $ypp->load_string($data);
-          my $s = Game::EvonyTKR::Model::Specialty->from_hash($object, $self->logger);
+          my $s =
+            Game::EvonyTKR::Model::Specialty->from_hash($object, $self->logger);
           push @{ $general->specialties }, $s;
         }
         else {
@@ -800,7 +805,8 @@
         my $data   = $book_file->slurp_utf8;
         my $object = $ypp->load_string($data);
         my $book =
-          Game::EvonyTKR::Model::Book::Builtin->from_hash($object, $self->logger);
+          Game::EvonyTKR::Model::Book::Builtin->from_hash($object,
+          $self->logger);
         unless (Scalar::Util::blessed($book) eq
           'Game::EvonyTKR::Model::Book::Builtin') {
           $self->worker_croak('failed to import book ' . $book_name);
@@ -860,7 +866,8 @@
           my $data   = $book_file->slurp_utf8;
           my $object = $ypp->load_string($data);
           my $book =
-            Game::EvonyTKR::Model::Book::SkillBook->from_hash($object, $self->logger);
+            Game::EvonyTKR::Model::Book::SkillBook->from_hash($object,
+            $self->logger);
 
           $self->logger->info(sprintf(
             'picked book %s for general %s',
@@ -911,6 +918,5 @@
     }
   }
 
-
-1;
+  1;
 __END__

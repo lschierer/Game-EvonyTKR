@@ -5,294 +5,80 @@ use utf8::all;
 use File::FindLib 'lib';
 require Math::Round;
 
-class Game::EvonyTKR::Model::BasicAttribute :
-  isa(Game::EvonyTKR::Shared::Constants) {
-# PODNAME: Game::EvonyTKR::Model::BasicAttribute
+package Game::EvonyTKR::Util::BasicAttribute {
+  use Mojo::Base -role, -signatures;
+  use Mojo::Base 'Game::EvonyTKR::Shared::Constants::BuffConstants', -role;
   use Carp;
   use List::AllUtils qw( any none );
-  use Types::Common  qw( t is_Num is_Str);
   use Scalar::Util   qw(blessed);
   use Data::Printer;
   use Hash::Util;
   require JSON::PP;
   use namespace::autoclean;
-  use overload
-    '""'       => \&TO_JSON,
-    '.'        => \&concat,
-    "fallback" => 0;
 # VERSION
 
   use File::FindLib 'lib';
-  use overload
-    '<=>'      => \&_comparison,
-    '=='       => \&_equality,
-    'eq'       => \&_equality,
-    '!='       => \&_inequality,
-    '""'       => \&as_string,
-    "fallback" => 0;
 
-  field $base : reader : param //= 0;
+  my $logger = Game::EvonyTKR::Log::Config->logger();
 
-  field $increment : reader : param //= 0;
-
-  field $attribute_name : reader : param;
-
-  field $EvansAdjustment = 2.4867;
-
-  field %BasicAESAdjustment = (
-    'none'    => 0,
-    'purple1' => 0,
-    'purple2' => 0,
-    'purple3' => 0,
-    'purple4' => 0,
-    'purple5' => 0,
-    'red1'    => 10,
-    'red2'    => 20,
-    'red3'    => 30,
-    'red4'    => 40,
-    'red5'    => 50,
-  );
-
-  ADJUST {
-    Hash::Util::lock_keys(%BasicAESAdjustment);
-    my @errors = ();
-
-    my $tp = t('PositiveOrZeroNum');
-    is_Num($base)
-      or push @errors => "base must be a number, not $base";
-    $tp->check($base)
-      or push @errors => "base must be positive, not $base";
-
-    $tp = t('PositiveOrZeroNum');
-    is_Num($increment)
-      or push @errors => "increment must be a number, not $increment";
-    $tp->check($increment)
-      or push @errors => "increment must be positive, not $increment";
-
-    is_Str($attribute_name)
-      or push @errors => "attribute name must be a string, not $attribute_name";
-
-    if (none { $attribute_name =~ /$_/i } @{ $self->AttributeValues }) {
+  sub validate ($self) {
+    my @errors;
+    unless (Scalar::Util::looks_like_number($self->base) && $self->base >= 0) {
       push @errors,
-        "attribute name is $attribute_name, not one of "
-        . Data::Printer::np $self->AttributeValues;
+        sprintf('base must be a positive number, not "%s"', $self->base);
     }
+    unless (Scalar::Util::looks_like_number($ba->increment)
+      && $self->increment >= 0) {
+      push @errors,
+        sprintf('increment must be a positive number, not "%s"',
+        $self->increment);
+    }
+    unless ((not Scalar::Util::looks_like_number($self->attribute_name))
+      && length($self->attribute_name)) {
+      push @errors,
+        sprintf('attribute_name is a required string, not "%s"',
+        $self->attribute_name);
+    }
+    unless (any { $_ =~ /$self->attribute_name/i }
+      $self->BasicAttributeTypes->@*) {
+      push @errors,
+        sprintf('attribute_name must be one of %s, not "%s"',
+        join ', ', $self->BasicAttributeTypes->@*);
+    }
+
     if (scalar @errors >= 1) {
-      croak(join(', ' => @errors));
+      $logger->logcroak(join(', ' => @errors));
     }
   }
 
-  method setBase($newBase = 0) {
+  sub setBase ($self, $newBase = 0) {
     my @errors = ();
-    my $tp     = t('PositiveOrZeroNum');
-    is_Num($newBase)
+    Scalar::Util::looks_like_number($newBase)
       or push @errors => "base must be a number, not $newBase";
-    $tp->check($newBase)
-      or push @errors => "base must be positive, not $newBase";
+    unless ($newBase >= 0) push @errors =>
+      "base must be positive, not $newBase";
     if (scalar @errors >= 1) {
-      $self->logger()->logerror(join(', ', @errors));
+      $logger ()->logerror(join(', ', @errors));
       return;
     }
     else {
-      $base = $newBase;
+      $self->base = $newBase;
     }
   }
 
-  method setIncrement($newIncrement = 0) {
+  sub setIncrement ($self, $newIncrement = 0) {
     my @errors = ();
-    my $tp     = t('PositiveOrZeroNum');
-    is_Num($newIncrement)
+
+    Scalar::Util::looks_like_number($newIncrement)
       or push @errors => "increment must be a number, not $newIncrement";
-    $tp->check($newIncrement)
-      or push @errors => "increment must be positive, not $newIncrement";
+    unless ($newIncrement >= 0) push @errors =>
+      "increment must be positive, not $newIncrement";
     if (scalar @errors >= 1) {
-      $self->logger->error(join(', ', @errors));
+      $logger->error(join(', ', @errors));
       return;
     }
     else {
-      $increment = $newIncrement;
-    }
-  }
-
-  # =ROUND(((900*0.1)+(((L131+(M131*2.4867*44))*1.1+50+520)-900)*0.2)/100,3)
-  #https://evonyguidewiki.com/en/general-cultivate-en/
-  method total(
-    $level  = 1,
-    $stars  = 'none',
-    $name   = "GeneralName",
-    $attrib = "Attribute"
-  ) {
-    my $AES_adjustment = 0;
-    my $cultivation    = 520;
-    if (exists $BasicAESAdjustment{$stars}) {
-      $AES_adjustment = $BasicAESAdjustment{$stars};
-    }
-    # The EvansAdjustment may be intended to partially account for the variable
-    # amount of attribute increase per star a general gets for the first five
-    # stars.  This varies per general and does not seem to be tracked by anyone.
-    my $sa     = $BasicAESAdjustment{$stars};
-    my $result = Math::Round::round((
-        (900 * 0.1) + ((
-            ($base + ($increment * $EvansAdjustment * $level)) * 1.1 +
-              $sa + $cultivation
-          ) - 900
-        ) * 0.2
-      ) / 100,
-      3
-    );
-    $self->logger->debug(
-      "found total basic attribute value of $result for $name");
-    return $result;
-  }
-
-  method validation {
-    my @errors         = ();
-    my @AttributeNames = $self->AttributeNames();
-
-    my $tp = t('PositiveOrZeroNum');
-    is_Num($base)
-      or push @errors => "base must be a number, not $base";
-    $tp->check($base)
-      or push @errors => "base must be positive, not $base";
-
-    $tp = t('PositiveOrZeroNum');
-    is_Num($increment)
-      or push @errors => "increment must be a number, not $increment";
-    $tp->check($increment)
-      or push @errors => "increment must be positive, not $increment";
-
-    is_Str($attribute_name)
-      or push @errors => "attribute name must be a string, not $attribute_name";
-    if (none { $_ eq $attribute_name } @AttributeNames) {
-      push @errors,
-        "attribute name must be one of " . Data::Printer::np @AttributeNames;
-    }
-    if (scalar @errors >= 1) {
-      $self->logger->error(join ', ', @errors);
-      croak(join ', ', @errors);
-      return;
-    }
-
-  }
-
-  method _comparison ($other, $swap = 0) {
-    my $otherClass = blessed $other;
-    my @classList  = split(/::/, $otherClass);
-    if ($classList[2] ne 'BasicAttribute') {
-      my $od = Data::Printer::p $other;
-      $self->logger->error(sprintf(
-        'Game::EvonyTKR::Model::BasicAttribute '
-          . 'comparison operator cannot take a %s',
-        $od
-      ));
-      croak(sprintf(
-        'Game::EvonyTKR::Model::BasicAttributes '
-          . 'comparison operator cannot take a %s',
-        $od
-      ));
-      return;
-    }
-    else {
-      my $mt = $self->total();
-      my $ot = $other->total();
-      if ($self->attribute_name() cmp $other->attribute_name()) {
-        $self->logger->warn(sprintf(
-'you probably did not intend to compare to different attributes: %s %s',
-          $self->attribute_name(),
-          $other->attribute_name()
-        ));
-        return $self->attribute_name() cmp $other->attribute_name();
-      }
-      return $mt <=> $ot;
-    }
-  }
-
-  method _equality ($other, $swap = 0) {
-    my $otherClass = blessed $other;
-    if (defined($otherClass) && length($otherClass) > 0) {
-      my @classList = split(/::/, $otherClass);
-      if ($classList[2] ne 'BasicAttribute') {
-        my $od = Data::Printer::p $other;
-        $self->logger->error(sprintf(
-          'Game::EvonyTKR::Model::BasicAttribute '
-            . 'equality operator cannot take a %s',
-          $od
-        ));
-        croak(sprintf(
-          'Game::EvonyTKR::Model::BasicAttributes '
-            . 'equality operator cannot take a %s',
-          $od
-        ));
-        return;
-      }
-      else {
-        my $mt = $self->total();
-        my $ot = $other->total();
-        return (($mt == $ot)
-            and ($self->attribute_name() eq $other->attribute_name()));
-      }
-    }
-    else {
-      return 0;
-    }
-
-  }
-
-  method _inequality ($other, $swap = 0) {
-    my $otherClass = blessed $other;
-    my @classList  = split(/::/, $otherClass);
-    if ($classList[2] ne 'BasicAttribute') {
-      my $od = Data::Printer::p $other;
-      $self->logger->error(sprintf(
-        'Game::EvonyTKR::Model::BasicAttribute '
-          . 'inequality operator cannot take a %s',
-        $od
-      ));
-      croak(sprintf(
-        'Game::EvonyTKR::Model::BasicAttributes '
-          . 'inequality operator cannot take a %s',
-        $od
-      ));
-      return;
-    }
-    else {
-      my $mt = $self->total();
-      my $ot = $other->total();
-      return (
-             ($mt != $ot)
-          or ($self->attribute_name() ne $other->attribute_name())
-      );
-    }
-  }
-
-  method to_hash {
-    return {
-      base      => $base,
-      increment => $increment,
-    };
-  }
-
-  # Method for JSON serialization
-  method TO_JSON {
-    return $self->to_hash();
-  }
-
-  # Stringification method using JSON
-  method as_string {
-    my $json =
-      JSON::PP->new->utf8->pretty->canonical(1)
-      ->allow_blessed(1)
-      ->convert_blessed(1)
-      ->encode($self->to_hash());
-    return $json;
-  }
-
-  method concat($other, $swap) {
-    if ($swap) {
-      return $other . $self->as_string();
-    }
-    else {
-      return $self->as_string() . $other;
+      $self->increment = $newIncrement;
     }
   }
 

@@ -6,7 +6,7 @@ package Game::EvonyTKR::External::JobBase {
   my $logger;
 
   # Initialize Log4perl for all job-based classes
-  sub register ($self, $app, $conf = {}){
+  sub register ($self, $app, $conf = {}) {
     unless (Log::Log4perl->initialized()) {
       $logger = Game::EvonyTKR::Log::Config->logger();
     }

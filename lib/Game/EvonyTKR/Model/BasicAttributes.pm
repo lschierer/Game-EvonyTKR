@@ -4,190 +4,93 @@ use utf8::all;
 
 use File::FindLib 'lib';
 require Game::EvonyTKR::Shared::Constants;
-package Game::EvonyTKR::Model::BasicAttributes {
+require Game::EvonyTKR::Model::BasicAttribute;
+require JSON::PP;
+use namespace::autoclean;
 
+package Game::EvonyTKR::Model::BasicAttributes {
+  use Mojo::Base -base, -signatures;
+  use Mojo::Base 'Game::EvonyTKR::Shared::Constants::BuffConstants', -role;
+# VERSION
   use Carp;
   use List::AllUtils qw( any none first );
-  use Types::Common  qw( t is_Num is_Str);
   use Data::Printer;
-  require Game::EvonyTKR::Model::BasicAttribute;
-  require JSON::PP;
-  use namespace::autoclean;
-# VERSION
-
   use File::FindLib 'lib';
   use overload
     '<=>'      => \&_comparison,
     '=='       => \&_equality,
-    '!='       => \&_inequality,
     '""'       => \&as_string,
     'fallback' => 1;
 
-  sub new ($class, %args) {
-    my $self = {
-      attributeNames      => qw(attack leadership defense politics),
-      attributes          => {
-        attack            => Game::EvonyTKR::Model::BasicAttribute->new(
-          attribute_name  => first { $_ =~ /attack/i } @{ $self->AttributeValues }
-        ),
-        defense           => Game::EvonyTKR::Model::BasicAttribute->new(
-          attribute_name  => first { $_ =~ /defense/i } @{ $self->AttributeValues }),
-        leadership        => Game::EvonyTKR::Model::BasicAttribute->new(
-          attribute_name  => first { $_ =~ /leadership/i } @{ $self->AttributeValues }),
-        politics          => Game::EvonyTKR::Model::BasicAttribute->new(
-          attribute_name  => first { $_ =~ /politics/i } @{ $self->AttributeValues }),
-      },
-    };
-    bless $self, $class;
-    return $self;
+  my $logger = Game::EvonyTKR::Log::Config->logger();
+
+  # Store as a hash for easy access
+  has '_attributes' => sub { {} };
+
+  # Add/set an attribute (fluent interface)
+  sub set_attribute ($self, $basic_attr) {
+    my $name = $basic_attr->attribute_name;
+    $logger->logcroak("Invalid attribute name: $name")
+      unless grep { $_ eq $name } $self->BasicAttributeTypes->@*;
+
+    $self->_attributes->{$name} = $basic_attr;
+    return $self;    # fluent
   }
 
-  method setAttribute($attributeName, $newAttribute) {
-    if (none { $_ =~ $attributeName } @attributeNames) {
-      $self->logger->error(sprintf(
-        'attributeName must be one of %s, not %s',
-        Data::Printer::np($self->AttributeValues),
-        $attributeName,
-      ));
-      return;
+  # Get specific attribute
+  sub get_attribute ($self, $name) {
+    return $self->_attributes->{$name};
+  }
+
+  for $stat (
+    Game::EvonyTKR::Shared::Constants::BuffConstants->BasicAttributeTypes->@*) {
+    __PACKAGE__->attr(
+      [] => sub ($self) {
+        return $self->get_attribute($stat);
+      }
+    );
+  }
+
+  # Validate we have all 4
+  sub validate ($self) {
+    my $attrs = $self->_attributes;
+    for my $required ($self->BasicAttributeTypes->@*) {
+      $logger->logcroak("Missing required attribute: $required")
+        unless exists $attrs->{$required};
     }
-
-    my @nac = split(/::/, blessed $newAttribute);
-    if ($nac[3] ne 'BasicAttribute') {
-      $self->logger->error(sprintf(
-        'newAttribute must be a %s not a %s',
-        'Game::EvonyTKR::Model::BasicAttribute',
-        blessed $newAttribute
-      ));
-      return;
-    }
-
-    if (not exists $self->attributes()->{$attributeName}) {
-      $self->logger->error(sprintf(
-'$self->attributes()->{$attributeName} does not exist for $attributeName %s',
-        $attributeName));
-      return;
-    }
-
-    $self->attributes()->{$attributeName} = $newAttribute;
-
+    return 1;
   }
 
   method total($level = 1, $stars = 'none', $name = "GeneralName") {
-    my $total = $self->attack()->total($level, $stars, $name, 'attack');
-    $total += $self->leadership->total($level, $stars, $name, 'leadership');
-    $total += $self->defense->total($level, $stars, $name, 'defense');
-    $total += $self->politics->total($level, $stars, $name, 'politics');
+    my $total = 0;
+    for $stat (
+      Game::EvonyTKR::Shared::Constants::BuffConstants->BasicAttributeTypes->@*)
+    {
+      $total += $self->get_attribute($stat)->total($level, $stars, $name);
+    }
     return $total;
   }
 
-  method score(
-    $level      = 1,
-    $stars      = 'none',
-    $name       = "GeneralName",
-    $multiplier = 0
-  ) {
-    my $score =
-      $self->attack->score($level, $stars, $name, $multiplier, 'attack');
-    $score += $self->leadership->score($level, $stars, $name, $multiplier,
-      'leadership');
-    $score +=
-      $self->defense->score($level, $stars, $name, $multiplier, 'defense');
-    $score +=
-      $self->politics->score($level, $stars, $name, $multiplier, 'politics');
-    return $score;
+  sub _comparison ($self, $other, $swap = 0) {
+    die "Cannot compare BasicAttributes with " . ref($other)
+      unless blessed($other) && $other->isa(__PACKAGE__);
+
+    my $my_total    = $self->total();
+    my $other_total = $other->total();
+
+    return $swap ? $other_total <=> $my_total : $my_total <=> $other_total;
   }
 
-  method _comparison ($other, $swap = 0) {
-    my $otherClass = blessed $other;
-    my @classList  = split(/::/, $otherClass);
-    if ($classList[2] ne 'BasicAttributes') {
-      my $od = Data::Printer::p $other;
-      $self->logger->error(sprintf(
-        'Game::EvonyTKR::Model::BasicAttributes '
-          . 'comparison operator cannot take a %s',
-        $od
-      ));
-      croak(sprintf(
-        'Game::EvonyTKR::Model::BasicAttributes '
-          . 'comparison operator cannot take a %s',
-        $od
-      ));
-      return;
-    }
-    else {
-      my $mt = $self->total();
-      my $ot = $other->total();
-      return $mt <=> $ot;
-    }
-  }
+  sub _equality ($self, $other, $swap = 0) {
+    return 0 unless blessed($other) && $other->isa(__PACKAGE__);
 
-  method _equality ($other, $swap = 0) {
-    my $otherClass = blessed $other;
-    my @classList  = split(/::/, $otherClass);
-    if ($classList[2] ne 'BasicAttributes') {
-      my $od = Data::Printer::p $other;
-      $self->logger->error(sprintf(
-        'Game::EvonyTKR::Model::BasicAttributes '
-          . 'equality operator cannot take a %s',
-        $od
-      ));
-      croak(sprintf(
-        'Game::EvonyTKR::Model::BasicAttributes '
-          . 'equality operator cannot take a %s',
-        $od
-      ));
-      return;
+    # Check each attribute for equality
+    for my $stat ($self->BasicAttributeTypes->@*) {
+      my $mine   = $self->get_attribute($stat);
+      my $theirs = $other->get_attribute($stat);
+      return 0 unless $mine == $theirs;    # Uses BasicAttribute's equality
     }
-    else {
-      my $mt = $self->total();
-      my $ot = $other->total();
-      return $mt == $ot;
-    }
-  }
-
-  method _inequality ($other, $swap = 0) {
-    my $otherClass = blessed $other;
-    my @classList  = split(/::/, $otherClass);
-    if ($classList[2] ne 'BasicAttributes') {
-      my $od = Data::Printer::p $other;
-      $self->logger->error(sprintf(
-        'Game::EvonyTKR::Model::BasicAttributes '
-          . 'inequality operator cannot take a %s',
-        $od
-      ));
-      croak(sprintf(
-        'Game::EvonyTKR::Model::BasicAttributes '
-          . 'inequality operator cannot take a %s',
-        $od
-      ));
-      return;
-    }
-    else {
-      my $mt = $self->total();
-      my $ot = $other->total();
-      return $mt != $ot;
-    }
-  }
-
-  method getReaderForAttribute($attrib) {
-    if ($attrib =~ /attack/i) {
-      return $self->attack();
-    }
-    elsif ($attrib =~ /leadership/i) {
-      return $self->leadership();
-    }
-    elsif ($attrib =~ /defense/i) {
-      return $self->defense();
-    }
-    elsif ($attrib =~ /politics/i) {
-      return $self->politics();
-    }
-    else {
-      $self->logger->error('invalid attribute requested');
-      croak('invalid attribute requested');
-      return;
-    }
+    return 1;
   }
 
   method to_hash {
@@ -207,7 +110,7 @@ package Game::EvonyTKR::Model::BasicAttributes {
   # Stringification method using JSON
   method as_string {
     my $json =
-      JSON::PP->new->utf8->pretty->canonical(1)
+      JSON::PP->new->utf8->canonical(1)
       ->allow_blessed(1)
       ->convert_blessed(1)
       ->encode($self->to_hash());

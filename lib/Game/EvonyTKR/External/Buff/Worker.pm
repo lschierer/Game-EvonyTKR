@@ -24,7 +24,7 @@ require Game::EvonyTKR::Model::Specialty;
 require Game::EvonyTKR::Model::Data;
 require Game::EvonyTKR::External::Buff::Computer;
 
-package Game::EvonyTKR::External::Buff::Worker  {
+package Game::EvonyTKR::External::Buff::Worker {
   use Mojo::Base 'Game::EvonyTKR::External::JobBase', -signatures;
   use experimental qw(class);
   use Carp;
@@ -42,7 +42,8 @@ package Game::EvonyTKR::External::Buff::Worker  {
             $args->{runId}, $args->{general1}, $args->{general2},
           ));
           my $debug  = $app->mode eq 'development';
-          my $worker = Game::EvonyTKR::External::Buff::Computer->new(debug_enabled => $debug);
+          my $worker = Game::EvonyTKR::External::Buff::Computer->new(
+            debug_enabled => $debug);
           $worker->load_generals($job->info->{task});
           my $result = $worker->calculate_buffs($args);
           $logger->debug(sprintf('result is %s', $result));
@@ -61,7 +62,6 @@ package Game::EvonyTKR::External::Buff::Worker  {
       }
     );
   }
-
 
 }
 1;

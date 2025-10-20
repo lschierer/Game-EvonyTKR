@@ -40,7 +40,7 @@ package Game::EvonyTKR::External::General::Pair::Workflow {
     );
 
     # Monitor and aggregator job
-    $app->minion->add_task( monitor_pair_builders => __PACKAGE__ );
+    $app->minion->add_task(monitor_pair_builders => __PACKAGE__);
 
     $app->plugins->emit(pair_workflow_loaded => {});
   }
@@ -77,8 +77,7 @@ package Game::EvonyTKR::External::General::Pair::Workflow {
 
         # Normalize the general name
         my $builder = Game::EvonyTKR::External::General::Pair::Builder->new(
-          app => $job->app,
-        );
+          app => $job->app,);
         $general_name = $builder->normalize($general_name);
 
         $logger->debug("Enqueueing job for general: $general_name");
@@ -125,19 +124,20 @@ package Game::EvonyTKR::External::General::Pair::Workflow {
     return $job->finish(
       "build_pairs_for_primary for $general_name already launched")
       unless my $bppGuard =
-      $job->app->minion->guard("build_pairs_for_primary_${general_name}",
-      360);
+      $job->app->minion->guard("build_pairs_for_primary_${general_name}", 360);
 
     $logger->info("Building pairs for general: $general_name");
-    my $testExternalCommonLog = Log::Log4perl->get_logger('Game::EvonyTKR::External::Common');
-    $logger->info(sprintf('in %s, Log::Log4perl %s initialized. External::Common has level %s',
-      __PACKAGE__, Log::Log4perl->initialized() ? 'is' : 'is not',
+    my $testExternalCommonLog =
+      Log::Log4perl->get_logger('Game::EvonyTKR::External::Common');
+    $logger->info(sprintf(
+      'in %s, Log::Log4perl %s initialized. External::Common has level %s',
+      __PACKAGE__,
+      Log::Log4perl->initialized() ? 'is' : 'is not',
       Log::Log4perl::Level::to_level($testExternalCommonLog->level())
     ));
     # Create builder instance for this specific job
-    my $builder = Game::EvonyTKR::External::General::Pair::Builder->new(
-      app => $job->app,
-    );
+    my $builder =
+      Game::EvonyTKR::External::General::Pair::Builder->new(app => $job->app,);
 
     # Execute the pair building logic
     my $result = $builder->build_pairs_for_primary($job, $general_name);

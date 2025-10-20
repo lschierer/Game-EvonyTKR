@@ -57,8 +57,7 @@ package Game::EvonyTKR {
     my $l4p = Game::EvonyTKR::Log::Config->logger();
     Log::Any::Adapter->set('Log4perl');
 
-    $self->plugin('Log::Any' => {logger => 'Log::Log4perl'});
-
+    $self->plugin('Log::Any' => { logger => 'Log::Log4perl' });
 
     $self->log->info(sprintf('Mojolicious Logging initialized'));
 

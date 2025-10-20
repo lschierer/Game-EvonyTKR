@@ -25,30 +25,37 @@ package Game::EvonyTKR::External::General::Loader {
 
   sub run ($job, @args) {
     $job->SUPER::run(@args);
-    my $params = shift @args;
+    my $params       = shift @args;
     my $general_name = $params->{general_name};
 
-    my $index = $params->{index};
-    my $worker = Game::EvonyTKR::External::Common->new(
-      app     => $job->app,
-    );
+    my $index  = $params->{index};
+    my $worker = Game::EvonyTKR::External::Common->new(app => $job->app,);
     my $collectionDir =
       Mojo::File->new($job->app->config('distDir'))->child('collections/data/');
-    my $generalsDir   = $collectionDir->child('generals');
-    my ($generalFile) = $generalsDir->list_tree->grep(sub {qr/\.y\{a\}?ml$/})->grep(sub {qr/$general_name/i})->head(1)->each;
-    unless($generalFile) {
+    my $generalsDir = $collectionDir->child('generals');
+    my ($generalFile) =
+      $generalsDir->list_tree->grep(sub {qr/\.y\{a\}?ml$/})
+      ->grep(sub {qr/$general_name/i})
+      ->head(1)
+      ->each;
+
+    unless ($generalFile) {
       $logger->error("no file found for general with name $general_name");
       return $job->finish("no file found for general with name $general_name");
     }
     my $general = $worker->load_single_general($generalFile, $index);
-    unless($general){
-      $logger->error("No general returned by load_single_general for general with name $general_name");
-      return $job->finish("No general returned by load_single_general for general with name $general_name");
+    unless ($general) {
+      $logger->error(
+"No general returned by load_single_general for general with name $general_name"
+      );
+      return $job->finish(
+"No general returned by load_single_general for general with name $general_name"
+      );
     }
     my $generals = $job->app->get_shared_data('generals');
-    $generals->{$general->normalize($general->name)} = $general;
+    $generals->{ $general->normalize($general->name) } = $general;
     $job->app->set_shared_data('generals', $generals);
-    $logger->info(sprintf('general loaded: %s',$general->name));
-    return $job->finish(sprintf('general loaded: %s',$general->name));
+    $logger->info(sprintf('general loaded: %s', $general->name));
+    return $job->finish(sprintf('general loaded: %s', $general->name));
   }
 }

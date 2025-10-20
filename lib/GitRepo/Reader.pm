@@ -12,7 +12,7 @@ class GitRepo::Reader {
   use Git::Repository;
   require Git::Repository::Log::Iterator;
   require Path::Tiny;
-  use Log::Any qw($log);
+  use Log::Any       qw($log);
   use List::Util     qw(uniq);
   use List::AllUtils qw( uniqstr );
   use HTML::Entities qw(encode_entities);
@@ -20,7 +20,6 @@ class GitRepo::Reader {
   field $source_dir : param : reader //= './';
   field $git_repo   : reader;
   field $logger     : reader = $log;
-
 
   field $oldest  = 0;
   field $authors = {};

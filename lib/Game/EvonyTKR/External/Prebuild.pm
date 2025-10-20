@@ -12,8 +12,6 @@ require Game::EvonyTKR::Shared::Constants;
 require Game::EvonyTKR::Model::General;
 require Game::EvonyTKR::External::General::Pair::Workflow;
 
-
-
 package Game::EvonyTKR::External::Prebuild {
   use Mojo::Base 'Game::EvonyTKR::External::JobBase', -signatures;
   use experimental qw(class);
@@ -60,15 +58,21 @@ package Game::EvonyTKR::External::Prebuild {
                   my $prebuildJid = $self->startPrebuild($app);
                   $self->monitorPrebuild($app, $prebuildJid);
                 }
-              } else {
+              }
+              else {
                 $logger->debug('OnlyOnePrebuild prevented restart');
               }
-             Mojo::IOLoop->remove($loop);
-            } else {
-              $logger->debug(sprintf('mojo_worker_started is %s; pair_workflow_loaded is %s.',
-              $mojo_worker_started ? 'true' : 'false', $pair_workflow_loaded ? 'true' : 'false'));
+              Mojo::IOLoop->remove($loop);
             }
-          });
+            else {
+              $logger->debug(sprintf(
+                'mojo_worker_started is %s; pair_workflow_loaded is %s.',
+                $mojo_worker_started  ? 'true' : 'false',
+                $pair_workflow_loaded ? 'true' : 'false'
+              ));
+            }
+          }
+        );
         Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
       }
     );
@@ -144,7 +148,7 @@ package Game::EvonyTKR::External::Prebuild {
     $self->SUPER::run(@args);
     $logger->debug('Prebuild orchestration starting');
 
-     #Start pair building workflow
+    #Start pair building workflow
     my $pair_workflow_jid = $self->app->minion->enqueue(
       'build_all_pairs' => [{}] => {
         priority => 50,
@@ -182,9 +186,11 @@ package Game::EvonyTKR::External::Prebuild {
         my $monitor_job = $self->app->minion->job($monitor_jid);
         if (
 
-            ($monitor_job && $monitor_job->info->{state} eq 'finished') ||
-            ($monitor_job && $monitor_job->info->{state} eq 'inactive' && $monitor_job->info->{retries} > 0)
-          ) {
+          ($monitor_job && $monitor_job->info->{state} eq 'finished')
+          || ( $monitor_job
+            && $monitor_job->info->{state} eq 'inactive'
+            && $monitor_job->info->{retries} > 0)
+        ) {
           # Collect incremental results
           my $pairs_by_type = $monitor_job->info->{notes}->{pairs_by_type}
             // {};
@@ -194,7 +200,9 @@ package Game::EvonyTKR::External::Prebuild {
           $self->note(conflicts     => $conflicts);
 
           # if result is final
-          if (exists($monitor_job->info->{result}) && length($monitor_job->info->{result}) && $monitor_job->info->{result} eq 'all pair builders complete') {
+          if ( exists($monitor_job->info->{result})
+            && length($monitor_job->info->{result})
+            && $monitor_job->info->{result} eq 'all pair builders complete') {
             Mojo::IOLoop->remove($loop);
             $self->finish('Prebuild orchestration complete');
           }

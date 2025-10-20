@@ -30,18 +30,18 @@ package Game::EvonyTKR::Controller::ControllerBase {
   }
 
   my $memd = Cache::Memcached::Fast->new({
-      servers => ['127.0.0.1:11211'],
+    servers => ['127.0.0.1:11211'],
   });
 
   sub set_memcache_value($c, $key, $value, $expiration = 0) {
     $memd->set($key, $value, $expiration);
   }
 
-  sub get_memcache_value($c, $key){
+  sub get_memcache_value($c, $key) {
     return $memd->get($key);
   }
 
-  sub delete_memcache_value($c, $key){
+  sub delete_memcache_value($c, $key) {
     $memd->delete($key);
   }
 
@@ -51,17 +51,23 @@ package Game::EvonyTKR::Controller::ControllerBase {
 
     my $routes = $app->routes;
 
-    $app->helper(set_memcache_value => sub ($self, $key, $value, $expiration = 0){
-      $c->set_memcache_value($key, $value, $expiration);
-    });
+    $app->helper(
+      set_memcache_value => sub ($self, $key, $value, $expiration = 0) {
+        $c->set_memcache_value($key, $value, $expiration);
+      }
+    );
 
-    $app->helper(get_memcache_value => sub ($self, $key) {
-      $c->get_memcache_value($key);
-    });
+    $app->helper(
+      get_memcache_value => sub ($self, $key) {
+        $c->get_memcache_value($key);
+      }
+    );
 
-    $app->helper(delete_memcache_value => sub ($self, $key){
-      $c->delete_memcache_value($key);
-    });
+    $app->helper(
+      delete_memcache_value => sub ($self, $key) {
+        $c->delete_memcache_value($key);
+      }
+    );
 
     $routes->get('/health')->to(
       cb => sub($self) {

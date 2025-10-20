@@ -154,7 +154,8 @@ package Game::EvonyTKR::Controller::Covenants {
     my $covenant =
       Game::EvonyTKR::Model::Covenant->from_hash($hashObject, $primary);
     unless ($covenant) {
-      $logger->error(sprintf('failed to build covenant from %s.', $covenantFile));
+      $logger->error(
+        sprintf('failed to build covenant from %s.', $covenantFile));
       return;
     }
     my $allc = $app->get_all_covenants();

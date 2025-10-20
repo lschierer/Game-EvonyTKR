@@ -18,25 +18,25 @@ class Game::EvonyTKR::Model::Logger {
     'bool'     => sub { $_[0]->_isTrue },
     'fallback' => 0;                        # allow Perl defaults for the rest
 
-    sub get_effective_caller {
-        my $depth = 1;
-        while (my $caller = caller($depth++)) {
-            # Ignore known non-class contexts (e.g., eval)
-            next if $caller =~ /^(eval|main)$/;
+  sub get_effective_caller {
+    my $depth = 1;
+    while (my $caller = caller($depth++)) {
+      # Ignore known non-class contexts (e.g., eval)
+      next if $caller =~ /^(eval|main)$/;
 
-            # Return first valid class found
-            return $caller if $caller->isa('Game::EvonyTKR::Model::Logger');
-        }
-        # Fallback to a default strategy
-        return blessed(shift) || ref(shift);
+      # Return first valid class found
+      return $caller if $caller->isa('Game::EvonyTKR::Model::Logger');
     }
+    # Fallback to a default strategy
+    return blessed(shift) || ref(shift);
+  }
 
-    method logger {
-      my $effective_class = get_effective_caller($self);
+  method logger {
+    my $effective_class = get_effective_caller($self);
 
-      my $log = Log::Log4perl->get_logger($effective_class);
-      return $log;
-    }
+    my $log = Log::Log4perl->get_logger($effective_class);
+    return $log;
+  }
 
   method trace { $self->logger->debug(@_) }
   method debug { $self->logger->debug(@_) }

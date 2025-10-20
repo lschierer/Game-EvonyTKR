@@ -125,8 +125,7 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
       elsif ($cond =~ /against[_ ]monsters/i && $is_debuff) {
         $cond = 'Monsters';
         $r    = $buff->set_condition($cond);
-        $self->DEBUG(
-          "Added buff condition: $cond ; set_condition result: $r");
+        $self->DEBUG("Added buff condition: $cond ; set_condition result: $r");
       }
       else {
         $self->DEBUG("Processing condition: '$cond'");
@@ -202,8 +201,7 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
     # Direct lookup first
     if (exists $condition_map{$lower_condition}) {
       my $result = $condition_map{$lower_condition};
-      $self->DEBUG(
-        "Direct lookup found: '$lower_condition' -> '$result'");
+      $self->DEBUG("Direct lookup found: '$lower_condition' -> '$result'");
       return $result;
     }
 

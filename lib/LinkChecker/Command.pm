@@ -33,7 +33,7 @@ class LinkChecker::Command {
   }
 
   method execute {
-    $INFO("Starting checking at $startUrl");
+    $INFO ("Starting checking at $startUrl");
 
     # Process queue until empty
     while (@urls_to_check) {
@@ -41,7 +41,7 @@ class LinkChecker::Command {
       $self->check_url($url);
     }
 
-    $INFO("Url Checking complete");
+    $INFO ("Url Checking complete");
 
     # Update children statuses now that all URLs are processed
     $self->update_children_statuses();
@@ -65,25 +65,24 @@ class LinkChecker::Command {
     my $uri = URI->new($url);
 
     if (exists $checked_urls{$url}) {
-      $DEBUG("$url has already been checked. Skipping.");
+      $DEBUG ("$url has already been checked. Skipping.");
       return $checked_urls{$url}->{status};
     }
 
-    $INFO("Checking $url");
+    $INFO ("Checking $url");
 
     my $response = HTTP::Tiny->new->get($url);
     $checked_urls{$url}->{status} = $response->{status};
 
     unless ($response->{success}) {
-      $WARN(sprintf(
+      $WARN (sprintf(
         'Detected Broken page %s via status %s - %s.',
         $url, $response->{status}, $response->{reason}
       ));
       return $response->{status};
     }
 
-    $DEBUG(
-      sprintf('Page %s returned status %s.', $url, $response->{status}));
+    $DEBUG (sprintf('Page %s returned status %s.', $url, $response->{status}));
 
     if ($response->{content} && length($response->{content}) && $recurse) {
       my $content = $response->{content};
@@ -101,7 +100,7 @@ class LinkChecker::Command {
         }
 
         unless ($fragment_found) {
-          $WARN("Fragment #$frag NOT found on page $url");
+          $WARN ("Fragment #$frag NOT found on page $url");
           $checked_urls{$url}->{status} =
             404;    # Override the successful page status
           return 404;
@@ -114,7 +113,7 @@ class LinkChecker::Command {
         my @links = $extractor->links;
 
         my $hostname = $uri->host;
-        $INFO("extracted hostname $hostname");
+        $INFO ("extracted hostname $hostname");
 
         foreach my $link_array (sort @links) {
           my ($tag, %attrs) = @$link_array;
@@ -122,7 +121,7 @@ class LinkChecker::Command {
 
           if ($href) {
             my $abs_uri = URI->new($href)->abs($url);
-            $DEBUG("found url to check: $abs_uri");
+            $DEBUG ("found url to check: $abs_uri");
 
             unless ($abs_uri->scheme eq 'mailto') {    # Avoid email links
               my $abs_url_str = $abs_uri->as_string;
@@ -135,14 +134,14 @@ class LinkChecker::Command {
                   if ($start_hostname eq $abs_uri->host) {
                     push @urls_to_check,
                       $abs_url_str; # Add to end of queue for recursive checking
-                    $DEBUG(
+                    $DEBUG (
 "Added internal URL $abs_url_str to queue for recursive checking"
                     );
                   }
                   else {
                     # External URL - check it directly but don't recurse
                     $self->check_single_url($abs_url_str);
-                    $DEBUG(
+                    $DEBUG (
 "Checked external URL $abs_url_str directly (no recursion)"
                     );
                   }
@@ -164,23 +163,23 @@ class LinkChecker::Command {
   method check_single_url ($url) {
     # This method checks a single URL without recursion (for external links)
     if (exists $checked_urls{$url}) {
-      $DEBUG("$url has already been checked. Skipping.");
+      $DEBUG ("$url has already been checked. Skipping.");
       return $checked_urls{$url}->{status};
     }
 
-    $INFO("Checking external URL $url (no recursion)");
+    $INFO ("Checking external URL $url (no recursion)");
 
     my $response = HTTP::Tiny->new->get($url);
     $checked_urls{$url}->{status} = $response->{status};
 
     unless ($response->{success}) {
-      $WARN(sprintf(
+      $WARN (sprintf(
         'Detected Broken external page %s via status %s - %s.',
         $url, $response->{status}, $response->{reason}
       ));
     }
     else {
-      $DEBUG(sprintf(
+      $DEBUG (sprintf(
         'External page %s returned status %s.',
         $url, $response->{status}
       ));
@@ -208,7 +207,7 @@ class LinkChecker::Command {
             $checked_urls{$abs_url_str}->{status};
         }
         else {
-          $WARN("Could not find status for child URL: $abs_url_str");
+          $WARN ("Could not find status for child URL: $abs_url_str");
           $checked_urls{$parent_url}->{children}->{$child_href} = 'unknown';
         }
       }

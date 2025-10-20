@@ -6,6 +6,7 @@ require Game::EvonyTKR::Model::BasicAttribute;
 
 use File::FindLib 'lib';
 require Game::EvonyTKR::Shared::Constants;
+
 package Game::EvonyTKR::Util::BasicAttributes {
 
   use Carp;
@@ -32,7 +33,8 @@ package Game::EvonyTKR::Util::BasicAttributes {
       return;
     }
 
-    unless(ref($newAttribute) && $newAttribute->isa('Game::EvonyTKR::Model::BasicAttribute')) {
+    unless (ref($newAttribute)
+      && $newAttribute->isa('Game::EvonyTKR::Model::BasicAttribute')) {
       $logger->error(sprintf(
         'newAttribute must be a %s not a %s',
         'Game::EvonyTKR::Model::BasicAttribute',
@@ -41,11 +43,10 @@ package Game::EvonyTKR::Util::BasicAttributes {
       return;
     }
 
-    unless(ref($bas) && $bas->isa('Game::EvonyTKR::Model::BasicAttributes')){
+    unless (ref($bas) && $bas->isa('Game::EvonyTKR::Model::BasicAttributes')) {
       $logger->error(sprintf(
-        'second paramter to setAttribute must be a "Game::EvonyTKR::Model::BasicAttribute" not %s',
-        blessed($bas),
-      ));
+'second paramter to setAttribute must be a "Game::EvonyTKR::Model::BasicAttribute" not %s',
+        blessed($bas),));
       return;
     }
 

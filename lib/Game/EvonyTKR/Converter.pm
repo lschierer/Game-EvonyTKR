@@ -91,7 +91,7 @@ package Game::EvonyTKR::Converter {
   }
 
   sub doAll ($self, $logger, $url, $debug) {
-    $DEBUG("::Converter->doAll started.");
+    $logger->debug("::Converter->doAll started.");
     my $dd       = Path::Tiny::path(File::Share::dist_dir('Game-EvonyTKR'));
     my $ua       = LWP::UserAgent->new;
     my $response = $ua->get($url);
@@ -106,7 +106,7 @@ package Game::EvonyTKR::Converter {
     my $encoder = Sereal::Encoder->new({ freeze_callbacks => 1 });
     my $decoder = Sereal::Decoder->new;
 
-    $DEBUG("tree is " . Data::Printer::np($tree));
+    $logger->debug("tree is " . Data::Printer::np($tree));
     $tree->look_down(_tag => 'script')->delete()
       for $tree->look_down(_tag => 'script');
     my $serialized = $encoder->encode($tree);

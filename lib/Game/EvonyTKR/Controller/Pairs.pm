@@ -149,7 +149,7 @@ package Game::EvonyTKR::Controller::Pairs {
           @{ $pairs_by_type->{$type} }
         ) {
           $increment++;
-          my $primary = $app->get_general($p->{primary});
+          my $primary   = $app->get_general($p->{primary});
           my $secondary = $app->get_general($p->{secondary});
           if ($primary && $secondary) {
             my $pair = Game::EvonyTKR::Model::General::Pair->new(
@@ -301,8 +301,7 @@ package Game::EvonyTKR::Controller::Pairs {
     my $uidseed = join(', ', @$requested_primaries) . ' ' . UUID::uuid7();
     $logger->debug("uidseed is '$uidseed'");
 
-    my $session_id =
-      UUID::uuid5($self->getDataModel->UUID5_base, $uidseed);
+    my $session_id = UUID::uuid5($self->getDataModel->UUID5_base, $uidseed);
     $logger->debug("final session_id is '$session_id'");
 
     # Lookup route metadata
