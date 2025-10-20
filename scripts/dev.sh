@@ -21,6 +21,7 @@ fi
 touch minion.db
 
 export MOJO_MODE='development';
+/opt/homebrew/opt/memcached/bin/memcached -l localhost &
 
 nice -n 10 ./bin/game-evonytkr minion worker -j 10 -s -10 -S 50 &
 nice -n 10 ./bin/game-evonytkr minion worker -j 2 -s 1  &
