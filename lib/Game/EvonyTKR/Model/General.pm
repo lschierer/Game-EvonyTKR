@@ -1,272 +1,85 @@
-use v5.42.0;
-use experimental qw(class);
-use utf8::all;
-use File::FindLib 'lib';
-require Data::Printer;
-require Game::EvonyTKR::Model::BasicAttributes;
-require JSON::PP;
-require Mojo::JSON;
+package Game::EvonyTKR::Model::General {
+    use strict;
+    use warnings;
+    use JSON::PP;
+    use Game::EvonyTKR::Model::BasicAttributes;
 
-class Game::EvonyTKR::Model::General : isa(Game::EvonyTKR::Shared::Constants) {
-# PODNAME: Game::EvonyTKR::Model::General
-  use List::AllUtils qw( any none );
-  use Types::Common  qw( t is_Num is_Str);
-  use UUID           qw(uuid5);
-  use Log::Any qw($log);
-  use namespace::autoclean;
-  use Carp;
-  use File::FindLib 'lib';
-  use overload
-    '""'       => \&as_string,
-    'eq'       => \&equality,
-    'bool'     => sub { $_[0]->_isTrue() },
-    "fallback" => 1;
+    use overload
+        '""'       => \&as_string,
+        'eq'       => \&equality,
+        'bool'     => sub { $_[0]->_isTrue() },
+        "fallback" => 1;
 
-  our $VERSION = 'v0.30.0';
-  my $debug = 1;
+    our $VERSION = 'v0.40.0';
 
-  field $id : reader;
-
-  field $name : reader : param;
-
-  field $type : reader : param;
-
-  field $ascending : reader : param //= 0;
-
-  #store the actual ::Model::AscendingAttribute objecet
-  field $ascendingAttribute : reader : writer;
-
-  field $stars : reader : param //= 'none';
-
-  field $basicAttributes : reader =
-    Game::EvonyTKR::Model::BasicAttributes->new();
-
-  field $builtInBookName : reader : param;
-
-  field $builtInBook : reader : writer = undef;
-
-  field $specialtyNames : reader : param;
-
-  field $specialties : reader //= [];
-
-  ADJUST {
-    my @errors;
-    unless ($self->can('_isTrue') && $self->_isTrue()) {
-      $self->logger->error(sprintf('unexpected value: %s', blessed($self)));
-      croak(sprintf('unexpected value: %s', blessed($self)));
+    sub new ($class, %args) {
+        my $self = {
+            id                  => $args{id} // undef,
+            name                => $args{name} // undef,
+            type                => $args{type} // undef,
+            ascending           => $args{ascending} // 0,
+            ascendingAttribute  => $args{ascendingAttribute} // undef,
+            stars               => $args{stars} // 'none',
+            basicAttributes     => Game::EvonyTKR::Model::BasicAttributes->new(),
+            builtInBookName     => $args{builtInBookName} // undef,
+            builtInBook         => undef,
+            specialtyNames      => $args{specialtyNames} // [],
+            specialties         => [],
+        };
+        bless $self, $class;
+        return $self;
     }
-    if (not defined $type) {
-      push @errors,
-        sprintf('type must be one of %s', join(', ', @{ $self->GeneralKeys }));
+
+    sub to_hash {
+        my $self = shift;
+        return {
+            id              => $self->{id},
+            name            => $self->{name},
+            type            => $self->{type},
+            basicAttributes => $self->{basicAttributes},
+            ascending       => $self->{ascending},
+            builtInBookName => $self->{builtInBookName},
+            specialtyNames  => $self->{specialtyNames},
+        };
     }
-    elsif (ref $type) {
-      foreach my $t1 (@{$type}) {
-        if (none { $t1 =~ /$_/i } @{ $self->GeneralKeys }) {
-          push @errors,
-            sprintf('type must be one of %s, not %s',
-            Data::Printer::np($self->GeneralKeys()->values()), $t1);
-        }
+
+    sub TO_JSON {
+        my $self = shift;
+        return JSON::PP->new->utf8(1)->pretty->canonical(1)
+            ->allow_blessed(1)
+            ->convert_blessed(1)
+            ->encode($self->to_hash());
+    }
+
+    sub as_string {
+        my $self = shift;
+        my $json = JSON::PP->new->utf8(0)->pretty->canonical(1)
+            ->allow_blessed(1)
+            ->convert_blessed(1)
+            ->encode($self->to_hash());
+        return $json;
+    }
+
+    sub equality($self, $other, $swap = 0 ){
+      my $one = $swap ? $other  : $self;
+      my $two = $swap ? $self   : $other;
+      my $on = '';
+      my $tn = '';
+      if(ref($one) && $one->isa('Game::EvonyTKR::Model::General')) {
+        $on = $one->{name};
+      } else {
+        $on = "$one";
       }
-    }
-    elsif (none { $type =~ /$_/i } @{ $self->GeneralKeys }) {
-      push @errors,
-        sprintf('type must be one of %s, not "%s"',
-        Data::Printer::np($self->GeneralKeys()), $type);
-    }
-    my @valv;
-    map { push @valv, $_ } $self->AscendingAttributeLevelValues();
-    map { push @valv, $_ } $self->AscendingAttributeLevelValues(0);
-    if (none { $stars =~ /$_/ } @valv) {
-      push @errors,
-        sprintf('stars must be one of %s, not "%s"', join(',', @valv), $stars);
-    }
-    if (@errors) {
-      $self->logger->error(join ', ', @errors);
-      croak(join ', ', @errors);
-      return;
-    }
-
-    if (ref $type) {
-      my @ts = @{$type};
-      my $ut = $ts[0];
-      $self->logger->debug("using type $ut");
-      my $uuid5base = $self->UUID5_Generals()->{$ut};
-      $id = uuid5($uuid5base, $name);
-    }
-    else {
-      my $uuid5base = $self->UUID5_Generals()->{$type};
-      $id = uuid5($uuid5base, $self->normalize($name));
-    }
-  }
-
-  method populateSpecialties ($specialtyManager) {
-    foreach my $sn_index (0 .. scalar(@{$specialtyNames})) {
-      my $sn = $specialtyNames->[$sn_index];
-      $self->logger->debug("populating $sn");
-      my $specialty = $specialtyManager->getSpecialty($sn);
-      if ($specialty) {
-        $specialties->[$sn_index] = $specialty;
+      if(ref($two) && $two->isa('Game::EvonyTKR::Model::General')){
+        $tn = $two->{name};
+      } else {
+        $tn = "$two";
       }
+      return $on eq $tn;
     }
-  }
-
-  method can_afford_ascending_level($requestedLevel) {
-    my @valv;
-    map { push @valv, $_ } $self->AscendingAttributeLevelValues();
-    map { push @valv, $_ } $self->AscendingAttributeLevelValues(0);
-    if (any { $requestedLevel eq $_ } @valv) {
-      my %ranks = (
-        none    => 0,
-        purple1 => 1,
-        purple2 => 2,
-        purple3 => 3,
-        purple4 => 4,
-        purple5 => 5,
-        red1    => 6,
-        red2    => 7,
-        red3    => 8,
-        red4    => 9,
-        red5    => 10
-      );
-      my $mr = $ranks{$stars};
-      my $rr = $ranks{$requestedLevel};
-      return $rr <= $mr;
-    }
-    return 0;
-  }
-
-  method equality ($other, $swap = 0) {
-    my ($a, $b) = $swap ? ($other, $self) : ($self, $other);
-    if (blessed($a) && $a->isa(__CLASS__) && blessed($b) && $b->isa(__CLASS__))
-    {
-      return $a->id eq $b->id;
-    }
-    elsif (blessed($a) && $a->isa(__CLASS__)) {
-      return $a->name eq "$b";
-    }
-    elsif (blessed($b) && $b->isa(__CLASS__)) {
-      return $b->name eq "$a";
-    }
-    else {
-      $self->ERR('This should not happen, one MUST be a class!');
-      return "$a" eq "$b";
-    }
-  }
-
-  method to_hash {
-    return {
-      id              => $id,
-      name            => $name,
-      type            => $type,
-      basicAttributes => $basicAttributes,
-      ascending       => $ascending,
-      builtInBookName => $builtInBookName,
-      specialtyNames  => $specialtyNames,
-    };
-  }
-
-  method TO_JSON {
-    return JSON::PP->new->utf8(1)->pretty->canonical(1)
-      ->allow_blessed(1)
-      ->convert_blessed(1)
-      ->encode($self->to_hash());
-  }
-
-  method as_string {
-    my $json =
-      JSON::PP->new->utf8(0)->pretty->canonical(1)
-      ->allow_blessed(1)
-      ->convert_blessed(1)
-      ->encode($self->to_hash());
-    return $json;
-  }
-
-  sub from_hash ($self, $hashObject) {
-    my $logger;
-    unless (defined($logger)) {
-      $logger = $log;
-    }
-    if (!exists $hashObject->{name}) {
-      $logger->error('hash object must contain a name attribute.');
-      return undef;
-    }
-    my $g = Game::EvonyTKR::Model::General->new(
-      name            => $hashObject->{name},
-      type            => $hashObject->{type},
-      ascending       => $hashObject->{ascending},
-      stars           => $hashObject->{stars},
-      builtInBookName => $hashObject->{book},
-      specialtyNames  => $hashObject->{specialties},
-    );
-
-    foreach my $baKey (keys %{ $hashObject->{basic_attributes} }) {
-      my $ba = Game::EvonyTKR::Model::BasicAttribute->new(
-        attribute_name => $baKey,
-        base           => $hashObject->{basic_attributes}->{$baKey}->{base},
-        increment => $hashObject->{basic_attributes}->{$baKey}->{increment},
-      );
-      $g->basicAttributes->setAttribute($baKey, $ba);
-    }
-
-    return $g;
-  }
 
 }
+
 1;
 
 __END__
-#ABSTRACT: how to store a General in memory
-
-=pod
-
-=head1 DESCRIPTION
-
-I am not doing true MVC because I am using yaml files as the persistence layer instead of a database.  This class stores a General in memory so that the Controller need not read
-in and parse the YAML every time.
-
-=cut
-
-=method new($name)
-
-Create an instance of a Model::General with name $name.
-
-=method name()
-
-returns the general's name.
-
-=cut
-
-=method type()
-
-returns the general's type, which must be one of the values from Game::EvonyTKR::Model::Data->GeneralKeys()
-
-=cut
-1;
-
-__END__
-#ABSTRACT: how to store a General in memory
-
-=pod
-
-=head1 DESCRIPTION
-
-I am not doing true MVC because I am using yaml files as the persistence layer instead of a database.  This class stores a General in memory so that the Controller need not read
-in and parse the YAML every time.
-
-=cut
-
-=method new($name)
-
-Create an instance of a Model::General with name $name.
-
-=method name()
-
-returns the general's name.
-
-=cut
-
-=method type()
-
-returns the general's type, which must be one of the values from Game::EvonyTKR::Model::Data->GeneralKeys()
-
-=cut

@@ -5,7 +5,6 @@ use File::FindLib 'lib';
 require Data::Printer;
 require Mojolicious::Controller;
 require Mojolicious::Plugin;
-use Cache::Memcached;
 use namespace::clean;
 
 package Game::EvonyTKR::Controller::ControllerBase {
@@ -14,6 +13,7 @@ package Game::EvonyTKR::Controller::ControllerBase {
   require Mojo::File;
   require YAML::PP;
   require Data::Printer;
+  use Cache::Memcached::Fast;
   use Carp;
 
   my $logger;
@@ -29,35 +29,20 @@ package Game::EvonyTKR::Controller::ControllerBase {
     return $constants;
   }
 
-  # Get process-local data with lazy loading
-  sub get_process_data($self, $key, $loader_sub) {
-    state %process_cache;
-    
-    unless (exists $process_cache{$key}) {
-      $process_cache{$key} = $loader_sub->($self);
-      $logger->debug("Loaded '$key' into process cache");
-    }
-    
-    return $process_cache{$key};
+  my $memd = Cache::Memcached::Fast->new({
+      servers => ['127.0.0.1:11211'],
+  });
+
+  sub set_memcache_value($c, $key, $value, $expiration = 0) {
+    $memd->set($key, $value, $expiration);
   }
 
-  # Clear process cache for a key (for dynamic data updates)
-  sub clear_process_data($self, $key) {
-    state %process_cache;
-    delete $process_cache{$key};
-    $logger->debug("Cleared '$key' from process cache");
+  sub get_memcache_value($c, $key){
+    return $memd->get($key);
   }
 
-  # Set coordination flag in memcached (for signaling between processes)
-  sub set_coordination_flag($self, $flag, $value = 1) {
-    state $memd = Cache::Memcached->new({servers => ['127.0.0.1:11211']});
-    return $memd->set("flag_$flag", $value, 300); # 5 minute expiry
-  }
-
-  # Check coordination flag
-  sub get_coordination_flag($self, $flag) {
-    state $memd = Cache::Memcached->new({servers => ['127.0.0.1:11211']});
-    return $memd->get("flag_$flag");
+  sub delete_memcache_value($c, $key){
+    $memd->delete($key);
   }
 
   sub register($c, $app, $config = {}) {
@@ -66,20 +51,16 @@ package Game::EvonyTKR::Controller::ControllerBase {
 
     my $routes = $app->routes;
 
-    $app->helper(get_process_data => sub($self, $key, $loader_sub) {
-      return $c->get_process_data($key, $loader_sub);
+    $app->helper(set_memcache_value => sub ($self, $key, $value, $expiration = 0){
+      $c->set_memcache_value($key, $value, $expiration);
     });
 
-    $app->helper(clear_process_data => sub($self, $key) {
-      return $c->clear_process_data($key);
+    $app->helper(get_memcache_value => sub ($self, $key) {
+      $c->get_memcache_value($key);
     });
 
-    $app->helper(set_coordination_flag => sub($self, $flag, $value = 1) {
-      return $c->set_coordination_flag($flag, $value);
-    });
-
-    $app->helper(get_coordination_flag => sub($self, $flag) {
-      return $c->get_coordination_flag($flag);
+    $app->helper(delete_memcache_value => sub ($self, $key){
+      $c->delete_memcache_value($key);
     });
 
     $routes->get('/health')->to(

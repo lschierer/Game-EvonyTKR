@@ -1,10 +1,12 @@
 use v5.42.0;
 use experimental qw(class);
 use utf8::all;
+require Game::EvonyTKR::Model::BasicAttributes;
+require Game::EvonyTKR::Model::BasicAttribute;
 
 use File::FindLib 'lib';
 require Game::EvonyTKR::Shared::Constants;
-package Game::EvonyTKR::Model::BasicAttributes {
+package Game::EvonyTKR::Util::BasicAttributes {
 
   use Carp;
   use List::AllUtils qw( any none first );
@@ -16,35 +18,13 @@ package Game::EvonyTKR::Model::BasicAttributes {
 # VERSION
 
   use File::FindLib 'lib';
-  use overload
-    '<=>'      => \&_comparison,
-    '=='       => \&_equality,
-    '!='       => \&_inequality,
-    '""'       => \&as_string,
-    'fallback' => 1;
+  my constants = Game::EvonyTKR::Shared::Constants->new();
 
-  sub new ($class, %args) {
-    my $self = {
-      attributeNames      => qw(attack leadership defense politics),
-      attributes          => {
-        attack            => Game::EvonyTKR::Model::BasicAttribute->new(
-          attribute_name  => first { $_ =~ /attack/i } @{ $self->AttributeValues }
-        ),
-        defense           => Game::EvonyTKR::Model::BasicAttribute->new(
-          attribute_name  => first { $_ =~ /defense/i } @{ $self->AttributeValues }),
-        leadership        => Game::EvonyTKR::Model::BasicAttribute->new(
-          attribute_name  => first { $_ =~ /leadership/i } @{ $self->AttributeValues }),
-        politics          => Game::EvonyTKR::Model::BasicAttribute->new(
-          attribute_name  => first { $_ =~ /politics/i } @{ $self->AttributeValues }),
-      },
-    };
-    bless $self, $class;
-    return $self;
-  }
+  my $logger = Game::EvonyTKR::Log::Config->logger();
 
-  method setAttribute($attributeName, $newAttribute) {
+  sub setAttribute($self, $bas, $attributeName, $newAttribute) {
     if (none { $_ =~ $attributeName } @attributeNames) {
-      $self->logger->error(sprintf(
+      $logger->error(sprintf(
         'attributeName must be one of %s, not %s',
         Data::Printer::np($self->AttributeValues),
         $attributeName,
@@ -52,9 +32,8 @@ package Game::EvonyTKR::Model::BasicAttributes {
       return;
     }
 
-    my @nac = split(/::/, blessed $newAttribute);
-    if ($nac[3] ne 'BasicAttribute') {
-      $self->logger->error(sprintf(
+    unless(ref($newAttribute) && $newAttribute->isa('Game::EvonyTKR::Model::BasicAttribute')) {
+      $logger->error(sprintf(
         'newAttribute must be a %s not a %s',
         'Game::EvonyTKR::Model::BasicAttribute',
         blessed $newAttribute
@@ -62,8 +41,16 @@ package Game::EvonyTKR::Model::BasicAttributes {
       return;
     }
 
+    unless(ref($bas) && $bas->isa('Game::EvonyTKR::Model::BasicAttributes')){
+      $logger->error(sprintf(
+        'second paramter to setAttribute must be a "Game::EvonyTKR::Model::BasicAttribute" not %s',
+        blessed($bas),
+      ));
+      return;
+    }
+
     if (not exists $self->attributes()->{$attributeName}) {
-      $self->logger->error(sprintf(
+      $logger->error(sprintf(
 '$self->attributes()->{$attributeName} does not exist for $attributeName %s',
         $attributeName));
       return;
@@ -103,7 +90,7 @@ package Game::EvonyTKR::Model::BasicAttributes {
     my @classList  = split(/::/, $otherClass);
     if ($classList[2] ne 'BasicAttributes') {
       my $od = Data::Printer::p $other;
-      $self->logger->error(sprintf(
+      $logger->error(sprintf(
         'Game::EvonyTKR::Model::BasicAttributes '
           . 'comparison operator cannot take a %s',
         $od
@@ -127,7 +114,7 @@ package Game::EvonyTKR::Model::BasicAttributes {
     my @classList  = split(/::/, $otherClass);
     if ($classList[2] ne 'BasicAttributes') {
       my $od = Data::Printer::p $other;
-      $self->logger->error(sprintf(
+      $logger->error(sprintf(
         'Game::EvonyTKR::Model::BasicAttributes '
           . 'equality operator cannot take a %s',
         $od
@@ -151,7 +138,7 @@ package Game::EvonyTKR::Model::BasicAttributes {
     my @classList  = split(/::/, $otherClass);
     if ($classList[2] ne 'BasicAttributes') {
       my $od = Data::Printer::p $other;
-      $self->logger->error(sprintf(
+      $logger->error(sprintf(
         'Game::EvonyTKR::Model::BasicAttributes '
           . 'inequality operator cannot take a %s',
         $od
@@ -184,7 +171,7 @@ package Game::EvonyTKR::Model::BasicAttributes {
       return $self->politics();
     }
     else {
-      $self->logger->error('invalid attribute requested');
+      $logger->error('invalid attribute requested');
       croak('invalid attribute requested');
       return;
     }

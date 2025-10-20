@@ -23,6 +23,7 @@ my $builder = Module::Build->new(
     'App::Cmd::Simple'                    => '0',
     'Carp'                                => '0',
     'Cwd'                                 => '0',
+    'Cache::Memcached::Fast'              => '0',
     'Data::Compare'                       => '0',
     'Data::Printer'                       => '0',
     'Date::Manip'                         => '0',
