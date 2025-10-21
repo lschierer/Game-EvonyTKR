@@ -29,10 +29,10 @@ package Game::EvonyTKR::Log::Config {
       $config .= "log4perl.appender.LOGFILE.filename = $logFile\n";
       $config .= "log4perl.appender.LOGFILE.mode = append\n";
       $config .= "log4perl.appender.LOGFILE.utf8 = 1\n";
-      $config .=
-"log4perl.appender.LOGFILE.layout = Log::Log4perl::Layout::PatternLayout\n";
-      $config .=
-"log4perl.appender.LOGFILE.layout.ConversionPattern = [%p] %d (%C line %L) %m%n\n";
+      $config .= "log4perl.appender.LOGFILE.layout = "
+        . "Log::Log4perl::Layout::PatternLayout\n";
+      $config .= "log4perl.appender.LOGFILE.layout.ConversionPattern = "
+        . "[%p] %d (%C line %L) %m%n\n";
       my $levels = __PACKAGE__->logLevels();
 
       foreach my $package (keys %$levels) {
@@ -45,12 +45,6 @@ package Game::EvonyTKR::Log::Config {
 
     my $l4p = Log::Log4perl->get_logger('Game::EvonyTKR');
     $l4p->info(sprintf('Logging initialized in %s', __PACKAGE__));
-    my $testExternalCommonLog =
-      Log::Log4perl->get_logger('Game::EvonyTKR::External::Common');
-    $l4p->debug(
-      sprintf('testExternalCommonLog is at log level %s',
-        Log::Log4perl::Level::to_level($testExternalCommonLog->level()))
-    );
     return $l4p;
   }
 
@@ -81,7 +75,8 @@ package Game::EvonyTKR::Log::Config {
       'Game::EvonyTKR::Model::Book::Builtin'              => 'WARN',
       'Game::EvonyTKR::Model::Book::Manager'              => 'WARN',
       'Game::EvonyTKR::Model::Book::SkillBook'            => 'INFO',
-      'Game::EvonyTKR::Model::Buff'                       => 'WARN',
+      'Game::EvonyTKR::Model::Buff'                       => 'DEBUG',
+      'Game::EvonyTKR::Model::Buff::Matcher'              => 'DEBUG',
       'Game::EvonyTKR::Model::Covenant'                   => 'WARN',
       'Game::EvonyTKR::Model::Data'                       => 'WARN',
       'Game::EvonyTKR::Model::General'                    => 'WARN',

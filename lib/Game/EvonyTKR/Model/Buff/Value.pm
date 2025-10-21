@@ -1,12 +1,11 @@
 use v5.42.0;
-use experimental qw(class);
 use utf8::all;
 use File::FindLib 'lib';
 require JSON::PP;
+use namespace::autoclean;
 
 package Game::EvonyTKR::Model::Buff::Value {
-  use namespace::autoclean;
-  use Mojo::Base 'Game::EvonyTKR::Util::Buff::Value', -role;
+  use Mojo::Base -base, -signatures;
 
   use Carp;
   use File::FindLib 'lib';
@@ -14,11 +13,11 @@ package Game::EvonyTKR::Model::Buff::Value {
     '""'       => \&as_string,
     'fallback' => 0;
 
-  has 'number' = 0;
-  has 'unit'   = 'flat';
+  has 'number' => 0;
+  has 'unit'   => 'flat';
 
   sub clone ($self) {
-    return __CLASS__->new(
+    return __PACKAGE__->new(
       number => $self->number,
       unit   => $self->unit,
     );

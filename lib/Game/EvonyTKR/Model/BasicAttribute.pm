@@ -1,8 +1,11 @@
 use v5.42.0;
 use utf8::all;
-
 use File::FindLib 'lib';
 require Math::Round;
+require JSON::PP;
+require Game::EvonyTKR::Shared::Constants::BuffConstants;
+require Game::EvonyTKR::Util::BasicAttribute;
+use namespace::autoclean;
 
 package Game::EvonyTKR::Model::BasicAttribute {
   use Mojo::Base -base, -signatures;
@@ -12,9 +15,7 @@ package Game::EvonyTKR::Model::BasicAttribute {
   use List::AllUtils qw( any none );
   use Scalar::Util   qw(blessed);
   use Data::Printer;
-  use Hash::Util;
-  require JSON::PP;
-  use namespace::autoclean;
+  use Const::Fast;
   use File::FindLib 'lib';
   use overload
     '<=>'      => \&_comparison,
@@ -27,11 +28,11 @@ package Game::EvonyTKR::Model::BasicAttribute {
 
   my $logger = Game::EvonyTKR::Log::Config->logger();
 
-  has 'attribute_name';
+  has 'attribute_name'      => '';
   has ['base', 'increment'] => 0;
-  has 'EvansAdjustment'     => '2.4867';
+  has 'EvansAdjustment'     => 2.4867;
   has 'BasicAESAdjustment'  => sub {
-    my $hash = {
+    const my $hash = {
       'none'    => 0,
       'purple1' => 0,
       'purple2' => 0,
@@ -44,7 +45,6 @@ package Game::EvonyTKR::Model::BasicAttribute {
       'red4'    => 40,
       'red5'    => 50,
     };
-    Hash::Util::lock_keys(%$hash);
     return $hash;
   };
 
@@ -55,13 +55,13 @@ package Game::EvonyTKR::Model::BasicAttribute {
     my $AES_adjustment = 0;
     # This cultivation value is the maximum realistic value possible.
     my $cultivation = 520;
-    if (exists $self->BasicAESAdjustment{$stars}) {
-      $AES_adjustment = $BasicAESAdjustment{$stars};
+    if (exists $self->BasicAESAdjustment->{$stars}) {
+      $AES_adjustment = $self->BasicAESAdjustment->{$stars};
     }
     # The EvansAdjustment may be intended to partially account for the variable
     # amount of attribute increase per star a general gets for the first five
     # stars.  This varies per general and does not seem to be tracked by anyone.
-    my $sa     = $BasicAESAdjustment{$stars};
+    my $sa     = $self->BasicAESAdjustment->{$stars};
     my $result = Math::Round::round((
         (900 * 0.1) + (((
               $self->base + ($self->increment * $self->EvansAdjustment * $level)

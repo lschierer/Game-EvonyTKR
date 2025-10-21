@@ -3,26 +3,29 @@ use experimental qw(class);
 use utf8::all;
 use File::FindLib 'lib';
 require Data::Printer;
+require Game::EvonyTKR::Shared::Constants::BuffConstants;
+require Game::EvonyTKR::Shared::Constants::GeneralConstants;
+use namespace::autoclean;
 
 package Game::EvonyTKR::Util::Buff::Value {
   use Mojo::Base -role, -signatures;
   use Mojo::Base 'Game::EvonyTKR::Shared::Constants::BuffConstants',    -role;
   use Mojo::Base 'Game::EvonyTKR::Shared::Constants::GeneralConstants', -role;
-  use namespace::autoclean;
   use Carp;
   use File::FindLib 'lib';
+  use Log::Any qw($log);
 
-  my $logger = Game::EvonyTKR::Log::Config->logger();
+  my $logger = $log;
 
   sub validate ($self) {
     my @errors;
 
-    if ($unit ne 'flat' and $unit ne 'percentage') {
-      push @errors, "unit must be 'flat' or 'percentage' not '$unit'";
+    if ($self->unit ne 'flat' and $self->unit ne 'percentage') {
+      push @errors, "unit must be 'flat' or 'percentage' not '$self->unit'";
     }
-    unless (Scalar::Util::looks_like_number($number)) {
+    unless (Scalar::Util::looks_like_number($self->number)) {
       push @errors,
-        "number must be a positive floating point number, not '$number'";
+        "number must be a positive floating point number, not '$self->number'";
     }
 
     if (scalar @errors >= 1) {

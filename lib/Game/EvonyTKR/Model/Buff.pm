@@ -2,18 +2,21 @@ use v5.42.0;
 use utf8::all;
 use File::FindLib 'lib';
 require Data::Printer;
-require Game::EvonyTKR::Model::Buff::Value;
 require JSON::PP;
+require Game::EvonyTKR::Model::Buff::Value;
+require Game::EvonyTKR::Util::Buff;
+require Game::EvonyTKR::Shared::Constants::BuffConstants;
+require Game::EvonyTKR::Role::Logger;
 use namespace::autoclean;
 
 package Game::EvonyTKR::Model::Buff {
-  use Mojo::Base -base,                        -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Util::Buff', -role;
+  use Mojo::Base -base,                          -signatures;
+  use Mojo::Base 'Game::EvonyTKR::Role::Logger', -role;
+  use Mojo::Base 'Game::EvonyTKR::Util::Buff',   -role;
   use Mojo::Base 'Game::EvonyTKR::Shared::Constants::BuffConstants', -role;
 
   use List::AllUtils qw( any none );
   use Carp;
-  use Log::Any qw($log);
   use File::FindLib 'lib';
   use overload
     '""'       => \&as_string,
@@ -21,14 +24,12 @@ package Game::EvonyTKR::Model::Buff {
     'fallback' => 0;
 
   our $VERSION = 'v0.30.0';
-  my $logger = $log;
 
   has ['attribute', 'targetedType'] => undef;
   has 'value' => sub { Game::EvonyTKR::Model::Buff::Value->new() };
   has ['debuffConditions', 'buffConditions'] => sub { [] };
   has ['passive', 'DISABLED']                => 0;
 
-  # --- deep clone that preserves scalar/array/undef type ---
   sub clone ($self) {
     my $copy = __PACKAGE__->new(
       attribute        => $self->attribute,
@@ -77,7 +78,7 @@ package Game::EvonyTKR::Model::Buff {
       if (defined($self->targetedType)) {
         if (ref($self->targetedType) eq 'ARRAY' or length($self->targetedType))
         {
-          $logger->warn(sprintf(
+          $self->logger->warn(sprintf(
             'warning, overwriting existing value "%s" with "%s"',
             $self->targetedType,
             ref($tt) eq 'ARRAY'
@@ -87,13 +88,13 @@ package Game::EvonyTKR::Model::Buff {
           ));
         }
         else {
-          $logger->error(
+          $self->logger->error(
             sprintf('unexpected targedType: "%s"', ref($self->targetedType)));
         }
       }
       foreach my $ttv ($tt->@*) {
         unless (any { $_ eq $tt } values $self->TroopTypeValues->%*) {
-          $logger->error(
+          $self->logger->error(
             sprintf('illegal value in new targetedType value: %s', $ttv));
           return;
         }
@@ -104,7 +105,7 @@ package Game::EvonyTKR::Model::Buff {
       if (defined($self->targetedType)) {
         if (ref($self->targetedType) eq 'ARRAY' or length($self->targetedType))
         {
-          $logger->warn(sprintf(
+          $self->logger->warn(sprintf(
             'warning, overwriting existing value "%s" with "%s"',
             $self->targetedType,
             ref($tt) eq 'ARRAY'
@@ -114,7 +115,7 @@ package Game::EvonyTKR::Model::Buff {
           ));
         }
         else {
-          $logger->error(
+          $self->logger->error(
             sprintf('unexpected targedType: "%s"', ref($self->targetedType)));
         }
       }
@@ -124,24 +125,25 @@ package Game::EvonyTKR::Model::Buff {
 
   sub set_condition ($self, $condition) {
 
-    if ($attribute eq 'March Size') {
+    print STDERR "DEBUG: set_condition called with: $condition\n";
+    print STDERR "DEBUG: logger method exists: " . (defined $self->can('logger') ? 'YES' : 'NO') . "\n";
+
+    if ($self->attribute eq 'March Size') {
       # march size *cannot* take a condition
-      $self->logger->debug(
+      $self->logger->info(
         'skipping non-operative conditon on March Size attribute');
       return 1;
     }
 
     # Check if the condition is a valid buff condition
     if (any { $condition eq $_ } keys $self->BuffConditionValues->%*) {
-      # Initialize the array if it doesn't exist
-      $buffConditions //= [];
 
       # Add the condition if it's not already there
       unless (grep { $_ eq $condition } $self->buffConditions->@*) {
         push @{ $self->buffConditions }, $condition;
       }
 
-      $logger->debug("Added buff condition: $condition");
+      $self->logger->debug("Added buff condition: $condition");
       return 1;
     }
 
@@ -149,15 +151,15 @@ package Game::EvonyTKR::Model::Buff {
     if (any { $condition eq $_ } $self->DebuffConditionValues->@*) {
       # Add the condition if it's not already there
       unless (grep { $_ eq $condition } $self->debuffConditions->@*) {
-        push @{$debuffConditions}, $condition;
+        push @{ $self->debuffConditions }, $condition;
       }
 
-      $logger->debug("Added debuff condition: $condition");
+      $self->logger->debug("Added debuff condition: $condition");
       return 1;
     }
 
     # If we get here, the condition wasn't valid
-    $logger->error(
+    $self->logger->error(
       "Invalid condition: '$condition'. Must be one of: "
         . join(", ",
         keys $self->BuffConditionValues->%*,
@@ -169,7 +171,7 @@ package Game::EvonyTKR::Model::Buff {
   sub to_hash ($self) {
     my $c;
     my $conditionCount = scalar @{ $self->conditions() };
-    $logger->debug("in to_hash, I have $conditionCount conditions");
+    $self->logger->debug("in to_hash, I have $conditionCount conditions");
     my $rc;
     if ($conditionCount) {
       $rc = $self->conditions();

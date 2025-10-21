@@ -2,21 +2,23 @@ use v5.42.0;
 use utf8::all;
 use File::FindLib 'lib';
 require Data::Printer;
-require Game::EvonyTKR::Model::Buff::Value;
 require JSON::PP;
+require Game::EvonyTKR::Util::Common;
+require Game::EvonyTKR::Shared::Constants::BuffConstants;
+require Game::EvonyTKR::Role::Logger;
 use namespace::autoclean;
 
 package Game::EvonyTKR::Util::Buff {
-  use Mojo::Base 'Game::EvonyTKR::Util::Common', -base, -signatures;
+  use Mojo::Base -role, -signatures;
+  use Mojo::Base 'Game::EvonyTKR::Util::Common', -role;
   use Mojo::Base 'Game::EvonyTKR::Shared::Constants::BuffConstants', -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Logger', -role;
 
   use List::AllUtils qw( any none );
   use Carp;
-  use Log::Any qw($log);
   use File::FindLib 'lib';
 
   our $VERSION = 'v0.30.0';
-  my $logger = $log;
 
   sub validate ($self) {
     my @errors;
@@ -26,7 +28,7 @@ package Game::EvonyTKR::Util::Buff {
     # Check if we got an array reference instead of a flat array
     if (@tbc == 1 && ref($tbc[0]) eq 'ARRAY') {
       $self->logger->error("needed to flatten buffConditions"
-          . Data::Printer::np($buffConditions));
+          . Data::Printer::np($self->buffConditions));
       @tbc = @{ $tbc[0] };    # Flatten it
     }
 
@@ -38,13 +40,13 @@ package Game::EvonyTKR::Util::Buff {
     if (@invalid) {
       foreach my $iv (@invalid) {
         push @errors,
-          sprintf(
-'Detected illegal value "%s" in buffConditions. All values must be one of: %s',
+          sprintf('Detected illegal value "%s" in buffConditions. '
+            . 'All values must be one of: %s',
           $iv, join(', ', keys %{ $self->BuffConditionValues }));
       }
     }
 
-    my @tdc = @{$debuffConditions};
+    my @tdc = @{ $self->debuffConditions };
 
     # Check if we got an array reference instead of a flat array
     if (@tdc == 1 && ref($tdc[0]) eq 'ARRAY') {
@@ -61,22 +63,22 @@ package Game::EvonyTKR::Util::Buff {
     if (@invalid) {
       foreach my $iv (@invalid) {
         push @errors,
-          sprintf(
-'Detected illegal value "%s" in debuffConditions. All values must be one of: %s',
+          sprintf('Detected illegal value "%s" in debuffConditions. '
+            . 'All values must be one of: %s',
           $iv, join(', ', @{ $self->DebuffConditionValues }));
       }
     }
 
-    my $type = t('BoolLike');
-    $type->check($passive)
-      or push @errors => "passive must be 0 or 1, not $passive";
+    unless ($self->passive == 0 || $self->passive == 1) {
+      push @errors, "passive must be 0 or 1, not $self->passive";
+    }
 
     if (@errors) {
-      $logger->logcroak(join ', ', @errors);
+      $self->logger->logcroak(join ', ', @errors);
       return;
     }
 
-    $value->validate();
+    $self->value->validate();
 
   }
 
@@ -93,26 +95,34 @@ package Game::EvonyTKR::Util::Buff {
     $test_buffConditions   = [],
     $test_debuffConditions = [],
   ) {
-
+    print STDERR "DEBUG: match_buff called for attribute: $test_attribute\n";
+    my $no_op_Conditions = [
+      "brings a dragon",
+      'brings a sacred dragon',
+      'brings a spiritual beast',
+      'During SvS',
+      'leading the army',
+      'you own the General',
+    ];
     # Override empty array with defaults
     if (scalar @$test_buffConditions == 0) {
-      $test_buffConditions = [
-        "Attacking",
-        "brings a dragon",
-        "brings dragon or beast to attack",
-        "dragon to the attack",
-        "leading the army to attack",
-        "Marching",
-        "When Rallying",
-      ];
-      $logger->debug("Empty buff conditions provided, using defaults instead");
+      #$test_buffConditions = [
+      #  "Attacking",
+      #  "brings a dragon",
+      #  "brings dragon or beast to attack",
+      #  "dragon to the attack",
+      #  "leading the army to attack",
+      #  "Marching",
+      #  "When Rallying",
+      #];
+      $self->logger->warn("Empty buff conditions provided!!");
     }
 
-    $logger->debug(sprintf(
+    $self->logger->debug(sprintf(
       'Checking match for buff: attr=%s, targetType=%s, '
         . 'buff conditions=%s, debuff conditions=%s',
       $self->attribute,
-      $targetedType,
+      $self->targetedType,
       join(', ',
         ref $self->buffConditions eq 'ARRAY' ? @{ $self->buffConditions } : ()),
       join(', ',
@@ -127,20 +137,21 @@ package Game::EvonyTKR::Util::Buff {
     # Check targetedType match if provided
     if (length($test_targetedType) && length($self->targetedType)) {
       # targetType often comes from generals, convert it for use here.
-      if (exists $self->$GeneralTypes2TroopTypes{$test_targetedType}) {
+      if (exists $self->GeneralTypes2TroopTypes->{$test_targetedType}) {
         $test_targetedType =
-          $self->$GeneralTypes2TroopTypes{$test_targetedType};
-        $logger->debug("Normalized test_targetedType to '$test_targetedType'");
+          $self->GeneralTypes2TroopTypes->{$test_targetedType};
+        $self->logger->debug(
+          "Normalized test_targetedType to '$test_targetedType'");
       }
       else {
-        $logger->warn(
+        $self->logger->warn(
           "Unrecognized general specialist key: $test_targetedType");
         return 0;
       }
 
       # Match against the buff's targetedTypes
       if ($self->targetedType ne $test_targetedType) {
-        $logger->debug(sprintf(
+        $self->logger->debug(sprintf(
           '  ✗ Rejected: test_targetedType "%s" not matched by "%s"',
           $test_targetedType, $self->targetedType
         ));
@@ -156,7 +167,7 @@ package Game::EvonyTKR::Util::Buff {
         }
       }
       if ($match == 0) {
-        $logger->debug(sprintf(
+        $self->logger->debug(sprintf(
           '  ✗ Rejected: test_targetedType "%s" not matched by "%s"',
           $test_targetedType, join ', ', $self->targetedType->@*
         ));
@@ -170,7 +181,7 @@ package Game::EvonyTKR::Util::Buff {
     # If test_debuffConditions is empty, reject any buff with debuff conditions
     if (scalar @$test_debuffConditions == 0) {
       if ($has_debuff_conditions) {
-        $logger->debug(
+        $self->logger->debug(
           "  ✗ Rejected: buff has debuff conditions but none were requested");
         return 0;
       }
@@ -180,14 +191,14 @@ package Game::EvonyTKR::Util::Buff {
     elsif ($has_debuff_conditions) {
       foreach my $condition ($self->debuffConditions->@*) {
         if (none { $_ eq $condition } @$test_debuffConditions) {
-          $logger->debug(
+          $self->logger->debug(
             "  ✗ Rejected: debuff condition '$condition' not in allowed list");
           return 0;
         }
       }
     }
     else {
-      $logger->debug("  ✗ Rejected: debuff conditions are not "
+      $self->logger->debug("  ✗ Rejected: debuff conditions are not "
           . "present in buff and are required.");
       return 0;
     }
@@ -197,42 +208,38 @@ package Game::EvonyTKR::Util::Buff {
 
     # If test_buffConditions is provided,
     # check that all buff conditions are in the allowed list
+    my %allowed_conditions;
     if (scalar @$test_buffConditions > 0) {
-      # A buff with no conditions should match when conditions are specified
-      if (!$has_buff_conditions) {
-        $logger->debug(
-          "  ✓ Buff has no conditions, accepting unconditional buff");
-        # Continue to the end of the function
-      }
-      else {
-        $logger->debug("Checking buff conditions: "
-            . join(', ', $self->buffConditions->@*)
-            . " against allowed: "
-            . join(', ', @$test_buffConditions));
-
-        # Check if ANY of the buff's conditions are NOT in the allowed list
-        my %allowed_conditions = map { $_ => 1 } @$test_buffConditions;
-        foreach my $condition (@$buffConditions) {
-          if (!exists $allowed_conditions{$condition}) {
-            $logger->debug(
-              "  ✗ Rejected: buff condition '$condition' not in allowed list");
-            return 0;
-          }
-        }
-
-      }
+      %allowed_conditions =
+        map { $_ => 1 } ($test_buffConditions->@*, $no_op_Conditions->@*);
     }
     else {
-      $logger->error("NO TEST BUFF CONDITIONS!!");
+      %allowed_conditions = map { $_ => 1 } $no_op_Conditions->@*;
     }
 
-    $logger->debug("  ✓ Buff matched");
+    # A buff with no conditions should match when conditions are specified
+    if (!$has_buff_conditions) {
+      $self->logger->debug(
+        "  ✓ Buff has no conditions, accepting unconditional buff");
+      # Continue to the end of the function
+    }
+    else {
+      foreach my $condition ($self->buffConditions->@*) {
+        if (!exists $allowed_conditions{$condition}) {
+          $self->logger->debug(
+            "  ✗ Rejected: buff condition '$condition' not in allowed list");
+          return 0;    #####<---- Line 220
+        }
+      }
+    }
+
+    $self->logger->debug("  ✓ Buff matched");
     return 1;
   }
 
   sub from_hash ($class, $hashref) {
-    my $logger = $log;
-    my $v      = Game::EvonyTKR::Model::Buff::Value->new(
+    my $logger = Log::Log4perl->get_logger(__PACKAGE__);
+    my $v = Game::EvonyTKR::Model::Buff::Value->new(
       number => abs($hashref->{value}->{number}),
       unit   => ($hashref->{value}->{unit} // 'percentage'),
     );

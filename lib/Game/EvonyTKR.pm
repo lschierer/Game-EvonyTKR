@@ -10,7 +10,7 @@ require Mojolicious::Plugin::Minion;
 require Game::EvonyTKR::Controller::ControllerBase;
 require Game::EvonyTKR::External::JobBase;
 require Game::EvonyTKR::External::Buff::Worker;
-require Game::EvonyTKR::External::Prebuild;
+#require Game::EvonyTKR::External::Prebuild;
 require Game::EvonyTKR::Log::Config;
 
 require GitRepo::Reader;

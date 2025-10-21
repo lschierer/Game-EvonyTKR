@@ -23,6 +23,16 @@ class Game::EvonyTKR::Model::Buff::Matcher :
     siege   => 'Siege Machines',
   );
 
+  # Conditions that are equivalent to having no condition
+  field $no_op_Conditions = [
+    "brings a dragon",
+    'brings a sacred dragon',
+    'brings a spiritual beast',
+    'During SvS',
+    'leading the army',
+    'you own the General',
+  ];
+
   method matchTargetedType($test_tt, $logID) {
     if (length $toTest->targetedType) {
       # test_tt often comes from generals, convert it for use here.
@@ -93,18 +103,27 @@ class Game::EvonyTKR::Model::Buff::Matcher :
 
   method matchBuffConditions ($testBuffs, $logID) {
     if (scalar @{ $toTest->buffConditions }) {
-      if (scalar @{$testBuffs} == 0) {
-        $self->logger->debug($logID
-            . '  ✗ Rejected: This buff has conditions, and none are allowed.');
-        return 0;
+      my %allowed_conditions;
+      if (scalar @$testBuffs > 0) {
+        %allowed_conditions =
+          map { $_ => 1 } ($testBuffs->@*, $no_op_Conditions->@*);
       }
+      else {
+        %allowed_conditions = map { $_ => 1 } $no_op_Conditions->@*;
+      }
+      $self->logger->debug(
+        sprintf(
+          '%s  Processing: This buff has %s conditions.',
+          $logID, scalar @{ $toTest->buffConditions }
+        )
+      );
       foreach my $condition (@{ $toTest->buffConditions }) {
-        if (none { $_ eq $condition } @{$testBuffs}) {
+        if (none { exists $allowed_conditions{$_} } @{$testBuffs}) {
           $self->logger->debug(
             $logID
               . sprintf(
-              '  ✗ Rejected: This buff has %s, which is not one of %s.',
-              $condition, join(', ', @{$testBuffs}),
+              '%s  ✗ Rejected: This buff has %s, which is not one of %s.',
+              $logID, $condition, join(', ', sort keys %allowed_conditions),
               )
           );
           return 0;
@@ -132,16 +151,16 @@ class Game::EvonyTKR::Model::Buff::Matcher :
 
     if (scalar @$testBuffs == 0 && scalar @$testDebuffs == 0) {
       $testBuffs = [
-        "Attacking",
-        "brings a dragon",
-        "brings dragon or beast to attack",
-        "dragon to the attack",
-        "leading the army to attack",
-        "Marching",
-        "When Rallying",
+        # "Attacking",
+        # "brings a dragon",
+        # "brings dragon or beast to attack",
+        # "dragon to the attack",
+        # "leading the army to attack",
+        # "Marching",
+        # "When Rallying",
       ];
-      $self->logger->debug(
-        "$logID Empty buff conditions provided, using defaults instead");
+      $self->logger->warn(
+        "$logID Empty buff conditions provided, using empty defaults instead");
     }
     if (length($test_tt)) {
       if (!$self->matchTargetedType($test_tt, $logID)) {
@@ -156,7 +175,8 @@ class Game::EvonyTKR::Model::Buff::Matcher :
     }
     if (!$self->matchBuffConditions($testBuffs, $logID)) {
       $self->logger->debug(
-        "$logID Rejecting based on " . join(', ', @{$testBuffs}));
+        sprintf('%s Rjecting based on: %s.', $logID, join(', ', @{$testBuffs}))
+      );
       return 0;
     }
     $self->logger->debug("accepted $logID");

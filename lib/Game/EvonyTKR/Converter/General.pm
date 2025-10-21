@@ -54,20 +54,20 @@ class Game::EvonyTKR::Converter::General :
       name             => $name,
       basic_attributes => {
         leadership => {
-          base      => $basic->leadership->base,
-          increment => $basic->leadership->increment,
+          base      => $basic->get_attribute('leadership')->base,
+          increment => $basic->get_attribute('leadership')->increment,
         },
         attack => {
-          base      => $basic->attack->base,
-          increment => $basic->attack->increment,
+          base      => $basic->get_attribute('attack')->base,
+          increment => $basic->get_attribute('attack')->increment,
         },
         defense => {
-          base      => $basic->defense->base,
-          increment => $basic->defense->increment,
+          base      => $basic->get_attribute('defense')->base,
+          increment => $basic->get_attribute('defense')->increment,
         },
         politics => {
-          base      => $basic->politics->base,
-          increment => $basic->politics->increment,
+          base      => $basic->get_attribute('politics')->base,
+          increment => $basic->get_attribute('politics')->increment,
         },
       },
       book        => '',

@@ -1,11 +1,9 @@
 use v5.42.0;
 use experimental qw(class);
 use utf8::all;
-
 use File::FindLib 'lib';
-require Game::EvonyTKR::Shared::Constants;
-require Game::EvonyTKR::Model::BasicAttribute;
 require JSON::PP;
+require Game::EvonyTKR::Shared::Constants::BuffConstants;
 use namespace::autoclean;
 
 package Game::EvonyTKR::Model::BasicAttributes {
@@ -42,15 +40,6 @@ package Game::EvonyTKR::Model::BasicAttributes {
     return $self->_attributes->{$name};
   }
 
-  for $stat (
-    Game::EvonyTKR::Shared::Constants::BuffConstants->BasicAttributeTypes->@*) {
-    __PACKAGE__->attr(
-      [] => sub ($self) {
-        return $self->get_attribute($stat);
-      }
-    );
-  }
-
   # Validate we have all 4
   sub validate ($self) {
     my $attrs = $self->_attributes;
@@ -61,9 +50,9 @@ package Game::EvonyTKR::Model::BasicAttributes {
     return 1;
   }
 
-  method total($level = 1, $stars = 'none', $name = "GeneralName") {
+  sub total($self, $level = 1, $stars = 'none', $name = "GeneralName") {
     my $total = 0;
-    for $stat (
+    foreach my $stat (
       Game::EvonyTKR::Shared::Constants::BuffConstants->BasicAttributeTypes->@*)
     {
       $total += $self->get_attribute($stat)->total($level, $stars, $name);
@@ -93,22 +82,22 @@ package Game::EvonyTKR::Model::BasicAttributes {
     return 1;
   }
 
-  method to_hash {
+  sub to_hash ($self) {
     return {
-      attack     => $attributes->{attack},
-      defense    => $attributes->{defense},
-      leadership => $attributes->{leadership},
-      politics   => $attributes->{politics},
+      attack     => $self->_attribute->{attack},
+      defense    => $self->_attribute->{defense},
+      leadership => $self->_attribute->{leadership},
+      politics   => $self->_attribute->{politics},
     };
   }
 
   # Method for JSON serialization
-  method TO_JSON {
+  sub TO_JSON ($self) {
     return $self->to_hash();
   }
 
   # Stringification method using JSON
-  method as_string {
+  sub as_string ($self) {
     my $json =
       JSON::PP->new->utf8->canonical(1)
       ->allow_blessed(1)

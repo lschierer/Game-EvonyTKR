@@ -1,33 +1,38 @@
 use v5.42.0;
-use experimental qw(class);
 use utf8::all;
 use File::FindLib 'lib';
 require Data::Printer;
-require Game::EvonyTKR::Model::Buff;
-require Game::EvonyTKR::Model::Buff::Value;
-require Game::EvonyTKR::Model::Buff::Matcher;
 require JSON::PP;
-require Sereal::Encoder;
-require Sereal::Decoder;
-use namespace::clean;
+require Scalar::Util;
+require Game::EvonyTKR::Model::Buff::Matcher;
+require Game::EvonyTKR::Util::Common;
+require Game::EvonyTKR::Shared::Constants::BuffConstants;
+require Game::EvonyTKR::Shared::Constants::GeneralConstants;
+use namespace::autoclean;
 
 package Game::EvonyTKR::Util::Book {
-  use Mojo::Base 'Game::EvonyTKR::Util::Common', -base, -signatures;
+  use Mojo::Base -role,                          -signatures;
+  use Mojo::Base 'Game::EvonyTKR::Util::Common', -role;
   use Mojo::Base 'Game::EvonyTKR::Shared::Constants::BuffConstants',    -role;
   use Mojo::Base 'Game::EvonyTKR::Shared::Constants::GeneralConstants', -role;
-  use Carp;
   use Log::Any       qw($log);
   use List::AllUtils qw( any none );
+  use Carp;
 
   my $logger = $log;
 
-  sub get_buffs ($self) (
-    $attribute, $matching_type,
+  sub get_buffs (
+    $self, $attribute, $matching_type,
     $targetedType     = '',
     $conditions       = [],
     $debuffConditions = [],
   ) {
-    $logger->debug("Calculating buffs for $name, attribute: $attribute");
+    $logger->debug(
+      sprintf(
+        'Calculating buffs for "%s", attribute: "%s"',
+        $self->name, $attribute
+      )
+    );
 
     my $total = 0;
 
@@ -60,12 +65,17 @@ package Game::EvonyTKR::Util::Book {
       }
     }
 
-    $logger->debug("$name: total for attribute '$attribute': $total");
+    $logger->debug(
+      sprintf(
+        '"%s": total for attribute "%s": "%s"',
+        $self->name, $attribute, $total
+      )
+    );
     return $total;
   }
 
   sub addBuff ($self, $newBuff) {
-    $logger->debug("addBuff called for book '$name'");
+    $logger->debug(sprintf('addBuff called for book "%s"', $self->name));
 
     if (!defined $newBuff) {
       $logger->warn("addBuff: newBuff is undefined");
@@ -82,19 +92,24 @@ package Game::EvonyTKR::Util::Book {
 
     if ($reftype eq 'OBJECT') {
       my $classList = $blessed;
-      $logger->debug("Adding buff of class $classList to book $name");
+      $logger->debug(
+        sprintf(
+          'Adding buff of class "%s" to book "%s"',
+          $classList, $self->name
+        )
+      );
 
       my @classStack = split(/::/, $classList);
       $logger->debug("Class stack: " . join(", ", @classStack));
 
       if (scalar @classStack > 3) {
         if ($classStack[3] eq 'Buff') {
-          $logger->debug("adding $newBuff to $name");
+          $logger->debug(sprintf('adding %s to %s', $newBuff, $self->name));
 
           push @{ $self->buffs }, $newBuff;
           $logger->debug(sprintf(
             'Book "%s" now has "%s" buffs',
-            $name, scalar @{ $self->buffs }
+            $self->name, scalar @{ $self->buffs }
           ));
         }
         else {
@@ -126,11 +141,13 @@ package Game::EvonyTKR::Util::Book {
         }
       }
     }
-    unless (not Scalar::Util::looks_like_number($name)) {
-      push @errors => sprintf('$name must contain a string, not %s', $name);
+    unless (not Scalar::Util::looks_like_number($self->name)) {
+      push @errors =>
+        sprintf('$name must contain a string, not %s', $self->name);
     }
-    unless (not Scalar::Util::looks_like_number($text)) {
-      push @errors => sprintf('$text must contain a string, not %s', $text);
+    unless (not Scalar::Util::looks_like_number($self->text)) {
+      push @errors =>
+        sprintf('$text must contain a string, not %s', $self->text);
     }
     if (@errors) {
       $logger->logcroak(join ', ', @errors);

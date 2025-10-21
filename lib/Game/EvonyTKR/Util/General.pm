@@ -3,13 +3,14 @@ use experimental qw(class);
 use utf8::all;
 use File::FindLib 'lib';
 require Data::Printer;
-require Game::EvonyTKR::Model::BasicAttributes;
 require JSON::PP;
 require Mojo::JSON;
-require Game::EvonyTKR::Shared::Constants;
+require Game::EvonyTKR::Util::Common;
+require Game::EvonyTKR::Shared::Constants::BuffConstants;
+require Game::EvonyTKR::Shared::Constants::AscendingAttributes;
 
 package Game::EvonyTKR::Util::General {
-  use Mojo::Base 'Game::EvonyTKR::Util::Common', -role, -signatures;
+  use Mojo::Base 'Game::EvonyTKR::Util::Common', -signatures;
   use Mojo::Base 'Game::EvonyTKR::Shared::Constants::BuffConstants', -role;
   use Mojo::Base 'Game::EvonyTKR::Shared::Constants::AscendingAttributes',
     -role;
@@ -28,7 +29,7 @@ package Game::EvonyTKR::Util::General {
 
   sub validate($self) {
     my @errors;
-    unless (exists($self->type)) {
+    unless (exists $self->GeneralKeys->{ $self->type }) {
       push @errors,
         sprintf('type must be one of %s', join(', ', @{ $self->GeneralKeys }));
     }
@@ -43,19 +44,22 @@ package Game::EvonyTKR::Util::General {
     }
     elsif (none { $self->type =~ /$_/i } @{ $self->GeneralKeys }) {
       push @errors,
-        sprintf('type must be one of %s, not "%s"',
-        join(', ', @{ $self->GeneralKeys }), $type);
+        sprintf(
+        'type must be one of %s, not "%s"',
+        join(', ', @{ $self->GeneralKeys }),
+        $self->type
+        );
     }
 
     my @valv;
     map { push @valv, $_ } $self->AscendingAttributeLevelValues();
     map { push @valv, $_ } $self->AscendingAttributeLevelValues(0);
-    if (none { $general->stars =~ /$_/ } @valv) {
+    if (none { $self->stars =~ /$_/ } @valv) {
       push @errors,
         sprintf(
         'stars must be one of %s, not "%s"',
         join(',', @valv),
-        $general->stars
+        $self->stars
         );
     }
 
@@ -73,11 +77,11 @@ package Game::EvonyTKR::Util::General {
       my $ut = $ts[0];
       $logger->debug("using type $ut");
       my $uuid5base = $self->UUID5_Generals->{$ut};
-      $general->{id} = uuid5($uuid5base, $name);
+      $self->id = uuid5($uuid5base, $self->name);
     }
     else {
       my $uuid5base = $self->UUID5_Generals->{ $self->type };
-      $id = uuid5($uuid5base, $self->normalize($self->name));
+      $self->id = uuid5($uuid5base, $self->normalize($self->name));
     }
   }
 
@@ -89,12 +93,12 @@ package Game::EvonyTKR::Util::General {
       $logger->debug("populating $sn");
       my $specialty = $allSpecialties->{$sn};
       if ($specialty) {
-        $specialties->[$sn_index] = $specialty;
+        $self->specialties->[$sn_index] = $specialty;
       }
       else {
         $logger->error(sprintf(
           'Missing specialty number %s for general "%s": "%s" ',
-          $sn_index, $general->{name}, $sn
+          $sn_index, $self->name, $sn
         ));
       }
     }

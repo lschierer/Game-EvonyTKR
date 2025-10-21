@@ -1,25 +1,19 @@
 use v5.42.0;
 use experimental qw(class);
 use utf8::all;
-require Game::EvonyTKR::Model::BasicAttributes;
-require Game::EvonyTKR::Model::BasicAttribute;
 
 use File::FindLib 'lib';
-require Game::EvonyTKR::Shared::Constants;
+use namespace::autoclean;
 
 package Game::EvonyTKR::Util::BasicAttributes {
-
+  use Mojo::Base -role, -signatures;
   use Carp;
   use List::AllUtils qw( any none first );
-  use Types::Common  qw( t is_Num is_Str);
   use Data::Printer;
-  require Game::EvonyTKR::Model::BasicAttribute;
   require JSON::PP;
-  use namespace::autoclean;
 # VERSION
 
   use File::FindLib 'lib';
-  my constants = Game::EvonyTKR::Shared::Constants->new();
 
   my $logger = Game::EvonyTKR::Log::Config->logger();
 
@@ -45,15 +39,19 @@ package Game::EvonyTKR::Util::BasicAttributes {
 
     unless (ref($bas) && $bas->isa('Game::EvonyTKR::Model::BasicAttributes')) {
       $logger->error(sprintf(
-'second paramter to setAttribute must be a "Game::EvonyTKR::Model::BasicAttribute" not %s',
-        blessed($bas),));
+        'second paramter to setAttribute must be a '
+          . '"Game::EvonyTKR::Model::BasicAttribute" not %s',
+        blessed($bas),
+      ));
       return;
     }
 
     if (not exists $self->attributes()->{$attributeName}) {
       $logger->error(sprintf(
-'$self->attributes()->{$attributeName} does not exist for $attributeName %s',
-        $attributeName));
+        '$self->attributes()->{$attributeName} does not '
+          . 'exist for $attributeName %s',
+        $attributeName
+      ));
       return;
     }
 

@@ -5,9 +5,10 @@ require Data::Printer;
 require X500::DN;
 require X500::RDN;
 require Hash::Util;
+require Game::EvonyTKR::Util::Common;
 
 package Game::EvonyTKR::Shared::Constants::GeneralConstants {
-  use Mojo::Base 'Game::EvonyTKR::Util::Common', -base, -signatures;
+  use Mojo::Base 'Game::EvonyTKR::Util::Common', -signatures;
   use Const::Fast;
   use Carp;
   use UUID qw(uuid5);
@@ -36,8 +37,7 @@ package Game::EvonyTKR::Shared::Constants::GeneralConstants {
     wall               => 'ALL',
   );
 
-  has 'UUID5_Generals' => sub {
-    my $self = shift;
+  has 'UUID5_Generals' => sub ($self) {
     state $uuids = {};
 
     unless (scalar keys %$uuids > 0) {

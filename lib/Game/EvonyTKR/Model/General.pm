@@ -10,28 +10,36 @@ package Game::EvonyTKR::Model::General {
   use Mojo::Base 'Game::EvonyTKR::Shared::Constants::GeneralConstants', -role;
   use Mojo::Base 'Game::EvonyTKR::Util::General',                       -role;
   use JSON::PP;
+  use UUID qw(uuid5);
   use File::FindLib 'lib';
   use Carp;
   use overload
     '""'       => \&as_string,
     'eq'       => \&equality,
-    'bool'     => sub { $_[0]->_isTrue() },
+    'bool'     => \&_isTrue,
     "fallback" => 1;
 
   our $VERSION = 'v0.40.0';
 
-  has 'id' = sub {
-    UUID::uuid5($self->UUID5_Generals->{$general_type}, $general->name);
+  has 'id' => sub ($self) {
+    my $general_type =
+      ref($self->type) eq 'ARRAY' ? $self->type->[0] : $self->type;
+    if (exists $self->UUID5_Generals->{$general_type}) {
+      return uuid5($self->UUID5_Generals->{$general_type}, $self->name);
     }
-    has ['name', 'type', 'ascendingAttribute', 'builtInBookName', 'builtInBook']
-    = undef;
-  has ['specialtyNames', 'specialties'] = [];
-  has 'ascending'       = 0;
-  has 'stars'           = 'none';
-  has 'basicAttributes' = Game::EvonyTKR::Model::BasicAttributes->new();
+    return $self->name;
+  };
 
-  sub to_hash {
-    my $self = shift;
+  has ['name', 'type', 'ascendingAttribute', 'builtInBookName',
+    'builtInBook'] => undef;
+
+  has ['specialtyNames', 'specialties'] => sub { [] };
+  has 'ascending'                       => 0;
+  has 'stars'                           => 'none';
+  has 'basicAttributes' =>
+    sub { return Game::EvonyTKR::Model::BasicAttributes->new() };
+
+  sub to_hash ($self) {
     return {
       id              => $self->id,
       name            => $self->name,
@@ -43,8 +51,7 @@ package Game::EvonyTKR::Model::General {
     };
   }
 
-  sub TO_JSON {
-    my $self = shift;
+  sub TO_JSON ($self) {
     return JSON::PP->new->utf8(1)->pretty->canonical(1)
       ->allow_blessed(1)
       ->convert_blessed(1)
@@ -79,6 +86,14 @@ package Game::EvonyTKR::Model::General {
       $tn = "$two";
     }
     return $on eq $tn;
+  }
+
+  sub _isTrue ($self) {
+    return
+         defined($self)
+      && ref($self)
+      && blessed($self)
+      && blessed($self) eq __PACKAGE__;
   }
 
 }

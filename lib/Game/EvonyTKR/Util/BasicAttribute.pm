@@ -4,6 +4,8 @@ use utf8::all;
 
 use File::FindLib 'lib';
 require Math::Round;
+require Game::EvonyTKR::Shared::Constants::BuffConstants;
+use namespace::autoclean;
 
 package Game::EvonyTKR::Util::BasicAttribute {
   use Mojo::Base -role, -signatures;
@@ -14,7 +16,6 @@ package Game::EvonyTKR::Util::BasicAttribute {
   use Data::Printer;
   use Hash::Util;
   require JSON::PP;
-  use namespace::autoclean;
 # VERSION
 
   use File::FindLib 'lib';
@@ -27,7 +28,7 @@ package Game::EvonyTKR::Util::BasicAttribute {
       push @errors,
         sprintf('base must be a positive number, not "%s"', $self->base);
     }
-    unless (Scalar::Util::looks_like_number($ba->increment)
+    unless (Scalar::Util::looks_like_number($self->increment)
       && $self->increment >= 0) {
       push @errors,
         sprintf('increment must be a positive number, not "%s"',
@@ -47,7 +48,7 @@ package Game::EvonyTKR::Util::BasicAttribute {
     }
 
     if (scalar @errors >= 1) {
-      $logger->logcroak(join(', ' => @errors));
+      $logger->logcroak(join ', ', @errors);
     }
   }
 
@@ -55,10 +56,11 @@ package Game::EvonyTKR::Util::BasicAttribute {
     my @errors = ();
     Scalar::Util::looks_like_number($newBase)
       or push @errors => "base must be a number, not $newBase";
-    unless ($newBase >= 0) push @errors =>
-      "base must be positive, not $newBase";
+    unless ($newBase >= 0) {
+      push @errors, "base must be positive, not $newBase";
+    }
     if (scalar @errors >= 1) {
-      $logger ()->logerror(join(', ', @errors));
+      $logger->logerror(join(', ', @errors));
       return;
     }
     else {
@@ -71,8 +73,9 @@ package Game::EvonyTKR::Util::BasicAttribute {
 
     Scalar::Util::looks_like_number($newIncrement)
       or push @errors => "increment must be a number, not $newIncrement";
-    unless ($newIncrement >= 0) push @errors =>
-      "increment must be positive, not $newIncrement";
+    unless ($newIncrement >= 0) {
+      push @errors, "increment must be positive, not $newIncrement";
+    }
     if (scalar @errors >= 1) {
       $logger->error(join(', ', @errors));
       return;
