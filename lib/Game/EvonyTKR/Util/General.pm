@@ -24,7 +24,7 @@ package Game::EvonyTKR::Util::General {
   our $VERSION = 'v0.40.0';
   my $debug = 1;
 
-  my $logger = Game::EvonyTKR::Log::Config->logger();
+  my $logger = $log;
 
   sub validate($self) {
     my @errors;

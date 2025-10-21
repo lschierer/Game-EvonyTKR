@@ -7,8 +7,8 @@ require X500::RDN;
 require Hash::Util;
 
 package Game::EvonyTKR::Shared::Constants::GeneralConstants {
-  use Mojo::Base 'Game::EvonyTKR::Util::Common', -role, -signatures;
-  use Constant::Fast;
+  use Mojo::Base 'Game::EvonyTKR::Util::Common', -base, -signatures;
+  use Const::Fast;
   use Carp;
   use UUID qw(uuid5);
 

@@ -2,53 +2,36 @@ use v5.42.0;
 use experimental qw(class);
 use utf8::all;
 use File::FindLib 'lib';
-require JSON::PP;
+require Data::Printer;
 
-package Game::EvonyTKR::Model::Buff::Value {
+package Game::EvonyTKR::Util::Buff::Value {
+  use Mojo::Base -role, -signatures;
+  use Mojo::Base 'Game::EvonyTKR::Shared::Constants::BuffConstants',    -role;
+  use Mojo::Base 'Game::EvonyTKR::Shared::Constants::GeneralConstants', -role;
   use namespace::autoclean;
-  use Mojo::Base 'Game::EvonyTKR::Util::Buff::Value', -role;
-
   use Carp;
   use File::FindLib 'lib';
-  use overload
-    '""'       => \&as_string,
-    'fallback' => 0;
 
-  has 'number' = 0;
-  has 'unit'   = 'flat';
+  my $logger = Game::EvonyTKR::Log::Config->logger();
 
-  sub clone ($self) {
-    return __CLASS__->new(
-      number => $self->number,
-      unit   => $self->unit,
-    );
+  sub validate ($self) {
+    my @errors;
+
+    if ($unit ne 'flat' and $unit ne 'percentage') {
+      push @errors, "unit must be 'flat' or 'percentage' not '$unit'";
+    }
+    unless (Scalar::Util::looks_like_number($number)) {
+      push @errors,
+        "number must be a positive floating point number, not '$number'";
+    }
+
+    if (scalar @errors >= 1) {
+      $self->logger->error(join ', ', @errors);
+      croak(join ', ', @errors);
+      return;
+    }
   }
 
-  sub toHashRef ($self) {
-    return {
-      number => $self->number,
-      unit   => $self->unit,
-    };
-  }
-
-  sub TO_JSON {
-    my $self = shift;
-    return JSON::PP->new->utf8(1)->pretty->canonical(1)
-      ->allow_blessed(1)
-      ->convert_blessed(1)
-      ->encode($self->to_hash());
-  }
-
-  sub as_string {
-    my $self = shift;
-    my $json =
-      JSON::PP->new->utf8(1)
-      ->canonical(1)
-      ->allow_blessed(1)
-      ->convert_blessed(1)
-      ->encode($self->to_hash());
-    return $json;
-  }
 }
 1;
 

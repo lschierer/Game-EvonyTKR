@@ -4,12 +4,12 @@ use utf8::all;
 use File::FindLib 'lib';
 require Data::Printer;
 require Game::EvonyTKR::Model::Buff;
+use namespace::autoclean;
 
-class Game::EvonyTKR::Model::Book::SkillBook : isa(Game::EvonyTKR::Model::Book)
-{
-# PODNAME: Game::EvonyTKR::Model::Book::SkillBook
+package Game::EvonyTKR::Model::Book::SkillBook {
+  use Mojo::Base 'Game::EvonyTKR::Model::Book',           -base;
+  use Mojo::Base 'Game::EvonyTKR::Util::Book::SkillBook', -role;
   use List::AllUtils qw( any none );
-  use namespace::autoclean;
   use Carp;
   use File::FindLib 'lib';
   use Log::Any qw($log);
@@ -20,62 +20,13 @@ class Game::EvonyTKR::Model::Book::SkillBook : isa(Game::EvonyTKR::Model::Book)
   our $VERSION = 'v0.30.0';
   my $debug = 1;
 
-  field $level : reader : param;
+  has 'level' = 1;
 
-  ADJUST {
-    # Validate level is between 1 and 5
-    if ($level < 1 || $level > 5) {
-      $self->logger->error(
-        sprintf('Skillbook level must be between 1 and 5, got %s', $level));
-      croak(sprintf('Skillbook level must be between 1 and 5, got %s', $level));
-      return;
-    }
-  }
-
-  method to_hash {
+  sub to_hash ($self) {
     my $hashRef = $self->SUPER::to_hash;
-    $hashRef->{level} = $level;
+    $hashRef->{level} = $self->level;
     return $hashRef;
   }
-
-  method TO_JSON {
-    return $self->to_hash();
-  }
-
-  sub from_hash ($class, $object,) {
-    my $logger  = $log;
-    my ($level) = $object->{name} =~ /Level (\d+)/;
-    my $bb      = Game::EvonyTKR::Model::Book::SkillBook->new(
-      name  => $object->{name},
-      level => $level,
-      text  => $object->{text} // '',
-    );
-    my $buffCount = 0;
-
-    my @buffs;
-    if (exists $object->{buff}) {
-      @buffs = @{ $object->{buff} };
-    }
-    elsif (exists $object->{buffs}) {
-      @buffs = @{ $object->{buffs} };
-    }
-    $logger->debug(
-      sprintf('Book %s has %s buffs in YAML', $object->{name}, scalar @buffs));
-
-    foreach my $ob (@buffs) {
-      my $b = Game::EvonyTKR::Model::Buff->from_hash($ob);
-      $bb->addBuff($b);
-    }
-
-    $logger->debug(sprintf(
-      'Finished importing book "%s" with %s buffs: %s',
-      $object->{name},
-      scalar @{ $bb->buff },
-      Data::Printer::np($bb, multiline => 0)
-    ));
-    return $bb;
-  }
-
 }
 1;
 

@@ -6,7 +6,7 @@ require Hash::Util;
 
 package Game::EvonyTKR::Shared::Constants::AscendingAttributes {
   use Mojo::Base -role, -signatures;
-  use Constant::Fast;
+  use Const::Fast;
   use Carp;
 
   const our %redAscendingLevelNames => (

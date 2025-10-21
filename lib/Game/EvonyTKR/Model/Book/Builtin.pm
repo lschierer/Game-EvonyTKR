@@ -2,14 +2,13 @@ use v5.42.0;
 use experimental qw(class);
 use utf8::all;
 use File::FindLib 'lib';
-require Data::Printer;
 require Game::EvonyTKR::Model::Buff;
 require Game::EvonyTKR::Model::Book;
+use namespace::autoclean;
 
-class Game::EvonyTKR::Model::Book::Builtin : isa(Game::EvonyTKR::Model::Book) {
-# PODNAME: Game::EvonyTKR::Model::Book::Builtin
-  use List::AllUtils qw( any none );
-  use namespace::autoclean;
+package Game::EvonyTKR::Model::Book::Builtin {
+  use Mojo::Base 'Game::EvonyTKR::Model::Book',         -base;
+  use Mojo::Base 'Game::EvonyTKR::Util::Book::Builtin', -role;
   use Carp;
   use File::FindLib 'lib';
   use Log::Any qw($log);
@@ -18,51 +17,8 @@ class Game::EvonyTKR::Model::Book::Builtin : isa(Game::EvonyTKR::Model::Book) {
     'fallback' => 0;
 
   our $VERSION = 'v0.30.0';
-  my $debug = 1;
 
-  method toHashRef {
-    return {
-      name => $self->name,
-      text => $self->text,
-      buff => $self->buff,
-    };
-  }
-
-  method TO_JSON {
-    return $self->toHashRef();
-  }
-
-  sub from_hash ($class, $object,) {
-    my $logger = $log;
-    my $bb     = Game::EvonyTKR::Model::Book::Builtin->new(
-      name => $object->{name},
-      text => $object->{text} // '',
-    );
-    my $buffCount = 0;
-
-    my @buffs;
-    if (exists $object->{buff}) {
-      @buffs = @{ $object->{buff} };
-    }
-    elsif (exists $object->{buffs}) {
-      @buffs = @{ $object->{buffs} };
-    }
-    $logger->debug(
-      sprintf('Book %s has %s buffs in YAML', $object->{name}, scalar @buffs));
-
-    foreach my $ob (@buffs) {
-      my $b = Game::EvonyTKR::Model::Buff->from_hash($ob);
-      $bb->addBuff($b);
-    }
-
-    $logger->debug(sprintf(
-      'Finished importing book "%s" with %s buffs: %s',
-      $object->{name},
-      scalar @{ $bb->buff },
-      Data::Printer::np($bb, multiline => 0)
-    ));
-    return $bb;
-  }
+  my $logger = $log;
 
 }
 1;
