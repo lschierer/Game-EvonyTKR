@@ -10,6 +10,7 @@ class Game::EvonyTKR::Model::General::Pair :
   require Game::EvonyTKR::Model::Buff::Summarizer;
   use List::AllUtils qw( all any none );
   use Readonly;
+  use Carp;
   use overload
     '""'       => \&as_string,
     'fallback' => 1;

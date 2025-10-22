@@ -20,6 +20,7 @@ use namespace::clean;
 
 package Game::EvonyTKR::Controller::Generals {
   use Mojo::Base 'Game::EvonyTKR::Controller::ControllerBase';
+  use Mojo::Base 'Game::EvonyTKR::Role::Cache', -role;
   require Mojo::Util;
   use Mojo::IOLoop;
   use Mojo::JSON     qw(to_json encode_json);
@@ -29,8 +30,6 @@ package Game::EvonyTKR::Controller::Generals {
   use IPC::Open3;
   use Symbol 'gensym';
   use Carp;
-
-  my $logger;
 
   # Specify which collection this controller handles
   sub collection_name {'generals'}
@@ -51,10 +50,15 @@ package Game::EvonyTKR::Controller::Generals {
     return $base;
   }
 
+  my $cache;
+
   sub register($c, $app, $config = {}) {
-    $logger = Log::Log4perl->get_logger(__PACKAGE__);
-    $logger->info("Registering routes for " . ref($c));
+    $c->logger->info("Registering routes for " . ref($c));
     $c->SUPER::register($app, $config);
+
+    $cache = $c->create_cache({
+      namespace => 'generals:',
+    });
 
     $c->setup_event_handlers($app);
     $c->setup_helpers($app);
@@ -63,21 +67,16 @@ package Game::EvonyTKR::Controller::Generals {
   }
 
   sub setup_helpers($c, $app) {
-    $app->helper(
-      setup_general_storage => sub {
-        return $c->setup_general_storage($app);
-      }
-    );
 
     $app->helper(
-      get_generals => sub {
-        return $c->SUPER::get_shared_data('generals');
+      get_generals => sub ($self, $store) {
+        return $c->get_all_items($store);
       }
     );
 
     $app->helper(
       get_general => sub ($self, $name) {
-        return $c->get_general_by_name($name);
+        return $c->get_value($name, $cache);
       }
     );
 
@@ -95,7 +94,7 @@ package Game::EvonyTKR::Controller::Generals {
 
   sub setup_routes($c, $app) {
     my $controller_name = $c->controller_name();
-    $logger->debug("got controller_name $controller_name.");
+    $c->logger->debug("got controller_name $controller_name.");
 
     my $mainRoutes      = $app->routes->any($base);
     my $referenceRoutes = $app->routes->any($reference_base);
@@ -138,7 +137,7 @@ package Game::EvonyTKR::Controller::Generals {
         is_valid_buffActivation => sub ($route, $c, $captures, $arg) {
           my ($ui, $buff) = @$captures{qw(uiTarget buffActivation)};
           my $ok = $c->general_routing->has_route($ui, $buff) ? 1 : 0;
-          $logger->debug("check ui='$ui' buff='$buff' -> $ok");
+          $c->logger->debug("check ui='$ui' buff='$buff' -> $ok");
           return $ok;    # never die here
         }
       );
@@ -174,7 +173,7 @@ package Game::EvonyTKR::Controller::Generals {
       my $error =
         sprintf('error building dynamic routes for Generals Controller: %s',
         $@);
-      $logger->error($error);
+      $c->logger->error($error);
       if ($app->mode eq 'development') {
         croak($error);
       }
@@ -192,7 +191,7 @@ package Game::EvonyTKR::Controller::Generals {
 
     # nav items for the dynamic routes
     foreach my $route ($app->general_routing->all_valid_routes()) {
-      $logger->debug("building nav items for "
+      $c->logger->debug("building nav items for "
           . $route->{uiTarget} . "|"
           . $route->{buffActivation});
       my $printableUI = $route->{uiTarget} =~ s/-/ /rg;
@@ -240,15 +239,15 @@ package Game::EvonyTKR::Controller::Generals {
 
     my $check_prerequisites = sub {
       if (List::AllUtils::none { $_ == 0 } values $completion_state->%*) {
-        $logger->info('setting up general storage');
-        my $generals = $app->get_generals();
+        $c->logger->info('setting up general storage');
+        my $generals = $app->get_generals($cache);
         if (not defined($generals)
           or (ref($generals) eq 'HASH' && scalar keys $generals->%* == 0)) {
-          $logger->info('No Generals pre-populated, kicking off import');
+          $c->logger->info('No Generals pre-populated, kicking off import');
           $c->load_generals($app);
         }
         elsif (ref($generals) ne 'HASH') {
-          $logger->error(
+          $c->logger->error(
             sprintf('get_generals returned a "%s"',
               length(ref($generals)) ? ref($generals) : $generals)
           );
@@ -297,19 +296,19 @@ package Game::EvonyTKR::Controller::Generals {
       }
     );
 
-    $logger->debug(sprintf('all handlers registered for %s', blessed($c)));
+    $c->logger->debug(sprintf('all handlers registered for %s', blessed($c)));
   }
 
   sub get_general_by_name($c, $name) {
     my $nn       = $c->SUPER::getConstants()->normalize($name);
     my $generals = $c->SUPER::get_shared_data('generals');
     if (scalar keys $generals->%* == 0) {
-      $logger->error("There are no generals loaded.");
+      $c->logger->error("There are no generals loaded.");
       return undef;
     }
     my $g = $generals->{$nn};
     if (not defined $g) {
-      $logger->warn(sprintf(
+      $c->logger->warn(sprintf(
         'no general named "%s" normalized '
           . 'to "%s" found. Available Generals: %s',
         $name, $nn,
@@ -321,7 +320,7 @@ package Game::EvonyTKR::Controller::Generals {
   }
 
   sub setup_general_storage($c, $app) {
-    $c->SUPER::get_or_load_data(
+    $c->SUPER::get(
       'generals',
       sub ($self, $precomputed_data = undef) {
         return $precomputed_data if $precomputed_data;
@@ -336,11 +335,11 @@ package Game::EvonyTKR::Controller::Generals {
       ->child('collections/data/generals/');
     my @files = $cd->list_tree->grep(sub {qr/\.y\{a\}?ml$/})->each;
     $c->{expectedTotal} = scalar(@files);
-    $logger->info(
+    $c->logger->info(
       sprintf('there are %s generals to load', $c->{expectedTotal}));
     $cd->list_tree->grep(sub {qr/\.y\{a\}?ml$/})->each(
       sub ($gfItem, $index) {
-        $logger->debug(sprintf('loading file # %s: %s', $index, $gfItem));
+        $c->logger->debug(sprintf('loading file # %s: %s', $index, $gfItem));
         my $general_name = $gfItem->basename('.yaml');
         my $jid          = $app->minion->enqueue(
           load_general => [{ general_name => $general_name, index => $index }]);
@@ -352,11 +351,11 @@ package Game::EvonyTKR::Controller::Generals {
               && exists($info->{result})
               && length($info->{result})
               && $info->{result} =~ m/general loaded/) {
-              my $generals = $app->get_generals();
+              my $generals = $app->get_generals($cache);
               my $nn       = $c->SUPER::getConstants->normalize($general_name);
               my $general  = $generals->{$nn};
               unless ($general) {
-                $logger->error(sprintf(
+                $c->logger->error(sprintf(
                   'no general in shared data for %s despite positive result',
                   $general_name));
                 Mojo::IOLoop->remove($loop);
@@ -366,7 +365,7 @@ package Game::EvonyTKR::Controller::Generals {
               $c->_build_general_routes($general, $app);
               my $gc = scalar keys $generals->%*;
               if ($gc == $c->{expectedTotal}) {
-                $logger->info(
+                $c->logger->info(
                   sprintf('all generals are loaded: %s generals', $gc));
                 $app->plugins->emit(
                   generals_loaded => { generals => $generals });
@@ -374,7 +373,8 @@ package Game::EvonyTKR::Controller::Generals {
               Mojo::IOLoop->remove($loop);
             }
             elsif ($info->{state} eq 'finished') {
-              $logger->warn('unexpected finished state: %s', $info->{result});
+              $c->logger->warn('unexpected finished state: %s',
+                $info->{result});
               Mojo::IOLoop->remove($loop);
             }
           }
@@ -387,7 +387,7 @@ package Game::EvonyTKR::Controller::Generals {
   sub _build_general_routes($self, $general, $app,) {
     my $name = $general->name;
 
-    $logger->debug("building Reference Routes for $name");
+    $self->logger->debug("building Reference Routes for $name");
     my $referenceRoutes = $app->routes->any($reference_base);
 
     my $gr  = "/Reference/Generals/$name";
@@ -408,7 +408,7 @@ package Game::EvonyTKR::Controller::Generals {
 
   sub index($c) {
     my $collection = collection_name();
-    $logger->debug("Rendering index for $collection");
+    $c->logger->debug("Rendering index for $collection");
 
     my $rp = $c->req->url->path->to_string;
     # Remove trailing slash from pages
@@ -425,10 +425,10 @@ package Game::EvonyTKR::Controller::Generals {
     my @parts     = split(/::/, ref($c));
     my $baseClass = pop(@parts);
     my $base      = $c->getBase();
-    $logger->debug("Generals index method has base $base");
+    $c->logger->debug("Generals index method has base $base");
 
     my $items = $c->SUPER::get_shared_data('generals');
-    $logger->debug(
+    $c->logger->debug(
       sprintf('Items: %s with %s keys.', ref($items), scalar(keys %$items)));
     $c->stash(
       linkBase        => $base,
@@ -438,7 +438,7 @@ package Game::EvonyTKR::Controller::Generals {
     );
 
     if (-f $markdown_path) {
-      $logger->debug(
+      $c->logger->debug(
         "rendering /Generals/ with markdown index content from $markdown_path");
       # Render with markdown
       $c->stash(template => '/generals/index');
@@ -447,7 +447,7 @@ package Game::EvonyTKR::Controller::Generals {
         { template => 'generals/index' });
     }
     else {
-      $logger->debug("no markdown index content found at $markdown_path");
+      $c->logger->debug("no markdown index content found at $markdown_path");
       # Render just the items
       return $c->render(template => '/generals/index');
     }
@@ -466,7 +466,7 @@ package Game::EvonyTKR::Controller::Generals {
 
     my @valid_routes =
       $self->general_routing->get_routes_for_uiTarget($uiTarget);
-    $logger->debug("found valid_routes "
+    $self->logger->debug("found valid_routes "
         . Data::Printer::np(@valid_routes)
         . "for $uiTarget");
     # Validate the uiTarget parameter
@@ -484,7 +484,7 @@ package Game::EvonyTKR::Controller::Generals {
     # Check for static content
     my $distDir       = Mojo::File::Share::dist_dir('Game::EvonyTKR');
     my $markdown_path = $distDir->child("pages/Generals/$uiTarget/index.md");
-    $logger->debug("looking for index at $markdown_path");
+    $self->logger->debug("looking for index at $markdown_path");
 
     if (-f $markdown_path) {
       # Render with markdown
@@ -546,13 +546,13 @@ package Game::EvonyTKR::Controller::Generals {
   }
 
   sub show ($c) {
-    $logger->debug("start of show method");
+    $c->logger->debug("start of show method");
     unless ($c) {
-      $logger->error('controller must be defined for show method to work');
+      $c->logger->error('controller must be defined for show method to work');
       return;
     }
     unless ($c->app) {
-      $logger->error('controller app attribute is undefined');
+      $c->logger->error('controller app attribute is undefined');
       return;
     }
     my $name;
@@ -566,15 +566,15 @@ package Game::EvonyTKR::Controller::Generals {
       return $c->redirect_to($canonical, 301);
     }
 
-    $logger->debug("show detects name $name, showing details.");
+    $c->logger->debug("show detects name $name, showing details.");
     my $calculate_buffs = $c->param('calculate_buffs') // 0;
 
     my $general = $c->get_general($name);
     unless ($general) {
-      $logger->error("No general found for name $name in the 'show' route.");
+      $c->logger->error("No general found for name $name in the 'show' route.");
       return $c->reply->not_found;
     }
-    $logger->debug("got general of type " . blessed $general);
+    $c->logger->debug("got general of type " . blessed $general);
 
     if ($general) {
       $c->stash(item => $general);
@@ -591,7 +591,7 @@ package Game::EvonyTKR::Controller::Generals {
 
         if (none { $_ eq $covenantLevel }
           @{ $data_model->CovenantCategoryValues }) {
-          $logger->warn(
+          $c->logger->warn(
             sprintf('Invalid covenantLevel: %s , using default "civilization"',
               $covenantLevel)
           );
@@ -601,14 +601,14 @@ package Game::EvonyTKR::Controller::Generals {
         # Validate ascending level
         if (none { $_ eq $ascendingLevel }
           $data_model->AscendingAttributeLevelValues()) {
-          $logger->warn(
+          $c->logger->warn(
             "Invalid ascendingLevel: $ascendingLevel, using default 'red5'");
           $ascendingLevel = 'red5';
         }
 
         @specialties = $data_model->normalizeSpecialtyLevels(@specialties);
 
-        $logger->debug(
+        $c->logger->debug(
           "show method sees a request for display of calculated buff summaries."
         );
         my $targetType;
@@ -623,7 +623,7 @@ package Game::EvonyTKR::Controller::Generals {
         $targetType =~ s/(\w)(\w+) specialist/\U$1\L$2 \UT\Lroops/;
         $targetType =~ s/Siege Troops/Siege Machines/;
 
-        $logger->debug("Using $targetType as targetType for $name");
+        $c->logger->debug("Using $targetType as targetType for $name");
         my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
           general             => $general,
           books               => $c->app->get_generic_books(),
@@ -667,25 +667,25 @@ package Game::EvonyTKR::Controller::Generals {
         return $c->render(template => 'generals/details');
       }
       else {
-        $logger->error('missing app!!');
+        $c->logger->error('missing app!!');
       }
     }
     $c->SUPER::show();
   }
 
-  sub singleTable ($self) {
+  sub singleTable ($c) {
     my $distDir = Mojo::File::Share::dist_dir('Game::EvonyTKR');
 
-    my $slug_ui   = $self->stash('uiTarget');          # from captured route
-    my $slug_buff = $self->stash('buffActivation');    # from captured route
+    my $slug_ui   = $c->stash('uiTarget');          # from captured route
+    my $slug_buff = $c->stash('buffActivation');    # from captured route
 
     # Lookup full route metadata
-    my $routing    = $self->general_routing;
+    my $routing    = $c->general_routing;
     my $route_meta = $routing->lookup_route($slug_ui, $slug_buff);
 
     unless ($route_meta) {
-      $logger->error("Invalid route combo: $slug_ui / $slug_buff");
-      return $self->reply->not_found;
+      $c->logger->error("Invalid route combo: $slug_ui / $slug_buff");
+      return $c->reply->not_found;
     }
 
     # Extract validated route metadata
@@ -694,21 +694,21 @@ package Game::EvonyTKR::Controller::Generals {
     my $uiTarget       = $route_meta->{uiTarget};
 
     # Get query parameters with defaults
-    my $covenantLevel  = $self->param('covenantLevel')  // 'civilization';
-    my $ascendingLevel = $self->param('ascendingLevel') // 'red5';
-    my @specialties    = map { $self->param("specialty$_") // 'gold' } (1 .. 4);
+    my $covenantLevel  = $c->param('covenantLevel')  // 'civilization';
+    my $ascendingLevel = $c->param('ascendingLevel') // 'red5';
+    my @specialties    = map { $c->param("specialty$_") // 'gold' } (1 .. 4);
 
     # Validate parameters
     my $data_model = Game::EvonyTKR::Model::Data->new;
 
     if (!$data_model->checkCovenantLevel($covenantLevel)) {
-      $logger->warn(
+      $c->logger->warn(
         "Invalid covenantLevel: $covenantLevel, using default 'civilization'");
       $covenantLevel = 'civilization';
     }
 
     if (!$data_model->checkAscendingLevel($ascendingLevel)) {
-      $logger->warn(
+      $c->logger->warn(
         "Invalid ascendingLevel: $ascendingLevel, using default 'red5'");
       $ascendingLevel = 'red5';
     }
@@ -716,7 +716,7 @@ package Game::EvonyTKR::Controller::Generals {
     @specialties = $data_model->normalizeSpecialtyLevels(@specialties);
 
     # Stash data for template rendering
-    $self->stash(
+    $c->stash(
       template         => 'generals/GeneralTableSingle',
       mode             => 'single',
       generalType      => $generalType,
@@ -729,12 +729,12 @@ package Game::EvonyTKR::Controller::Generals {
       $distDir->child("pages/Generals/$uiTarget/comparison.md");
 
     if (-f $markdown_path) {
-      $logger->debug("Rendering from markdown index file");
-      return $self->render_markdown_file($markdown_path);
+      $c->logger->debug("Rendering from markdown index file");
+      return $c->render_markdown_file($markdown_path);
     }
     else {
-      $logger->debug("Rendering without markdown file");
-      return $self->render;
+      $c->logger->debug("Rendering without markdown file");
+      return $c->render;
     }
   }
 
@@ -750,23 +750,23 @@ package Game::EvonyTKR::Controller::Generals {
     }
 
     my $uidseed = join(', ', @$requested_generals) . ' ' . UUID::uuid7();
-    $logger->debug("uidseed is '$uidseed'");
+    $self->logger->debug("uidseed is '$uidseed'");
 
     my $session_id =
       UUID::uuid5($self->app->get_root_manager()->UUID5_base, $uidseed);
-    $logger->debug("final session_id is '$session_id'");
+    $self->logger->debug("final session_id is '$session_id'");
 
     # Lookup route metadata
     my $routing    = $self->general_routing;
     my $route_meta = $routing->lookup_route($slug_ui, $slug_buff);
 
     unless ($route_meta) {
-      $logger->error("Invalid route combo: $slug_ui / $slug_buff");
+      $self->logger->error("Invalid route combo: $slug_ui / $slug_buff");
       if ($self->app->mode eq 'development') {
-        $logger->debug("Known valid routes:");
+        $self->logger->debug("Known valid routes:");
         $routing->each_valid_route(
           sub ($key, $meta) {
-            $logger->debug("  $key => " . Data::Printer::np($meta),
+            $self->logger->debug("  $key => " . Data::Printer::np($meta),
               multiline => 0);
           }
         );
@@ -783,11 +783,11 @@ package Game::EvonyTKR::Controller::Generals {
     my @selected;
     while (my ($key, $general) =
       each(%{ $self->SUPER::get_shared_data('generals') })) {
-      $logger->debug(
+      $self->logger->debug(
         "inspecting '$key', first need to see if it is a $generalType."
           . Data::Printer::np($general, multiline => 0));
       if (none { lc($_) eq $generalType } @{ $general->type }) {
-        $logger->debug("none of "
+        $self->logger->debug("none of "
             . $general->name
             . "'s types: "
             . Data::Printer::np($general->type, multiline => 0)
@@ -797,7 +797,7 @@ package Game::EvonyTKR::Controller::Generals {
       push @selected, $general;
     }
 
-    $logger->debug(
+    $self->logger->debug(
       sprintf('There are %s generals to return.', scalar(@selected)));
 
     # Return just the basic name information without computing buffs
@@ -812,7 +812,7 @@ package Game::EvonyTKR::Controller::Generals {
       my @filtered;
       foreach my $entry (@names) {
         if (exists $requested{$entry}) {
-          $logger->debug(sprintf(
+          $self->logger->debug(sprintf(
             '%s was requsted for session %s', $entry, $session_id));
           push @filtered, $entry;
         }
@@ -828,7 +828,7 @@ package Game::EvonyTKR::Controller::Generals {
       );
     }
     else {
-      $logger->debug(
+      $self->logger->debug(
         "no requested primaries for session '$session_id' returning full list: "
           . Data::Printer::np(@names));
       $session_store->{$session_id} = \@names;
@@ -852,7 +852,7 @@ package Game::EvonyTKR::Controller::Generals {
     my $run_id     = 0+ $c->param('runId');
     my $session_id = $c->param('sessionId');
     unless (defined($session_id) && length($session_id)) {
-      $logger->error('Session ID must be present!');
+      $c->logger->error('Session ID must be present!');
       my $payload = encode_json({ runId => 0+ $run_id });
       $c->write_sse({ type => 'complete', text => $payload });
       return;
@@ -860,14 +860,14 @@ package Game::EvonyTKR::Controller::Generals {
     my $selected =
       exists $session_store->{$session_id} ? $session_store->{$session_id} : [];
 
-    $logger->debug(sprintf(
+    $c->logger->debug(sprintf(
       'stream_single_details called url: %s,'
         . ' uiTarget: %s; buffActivation: %s; run_id: %s',
       $c->req->url->path->to_string,
       $slug_ui, $slug_buff, 0+ $run_id
     ));
 
-    $logger->debug(sprintf(
+    $c->logger->debug(sprintf(
       'session info: sessionId: "%s"; selected: %s',
       $session_id // 'Not Present',
       join ', ',
@@ -879,13 +879,13 @@ package Game::EvonyTKR::Controller::Generals {
     my $route_meta = $routing->lookup_route($slug_ui, $slug_buff);
 
     unless ($route_meta) {
-      $logger->error("Invalid single route: $slug_ui | $slug_buff");
+      $c->logger->error("Invalid single route: $slug_ui | $slug_buff");
 
       if ($c->app->mode eq 'development') {
-        $logger->debug("Known valid routes:");
+        $c->logger->debug("Known valid routes:");
         $routing->each_valid_route(
           sub ($key, $meta) {
-            $logger->debug("  $key => " . Data::Printer::np($meta));
+            $c->logger->debug("  $key => " . Data::Printer::np($meta));
           }
         );
       }
@@ -948,27 +948,28 @@ package Game::EvonyTKR::Controller::Generals {
       ,    # This replaces your unlimited spawning
       sub {
         my ($start, $end) = @{ $_[0] };    # Current batch range
-        $logger->debug("processing $start to $end");
+        $c->logger->debug("processing $start to $end");
 
         my $subprocess = Mojo::IOLoop::Subprocess->new;
         $subprocess->on(
           progress => sub ($subprocess, @data) {
             my ($result) = @data;
             if (!$c->tx || $c->tx->is_finished) {
-              $logger->info(
+              $c->logger->info(
                 "transaction finished before write_sse called for $result");
               return;
             }
-            $logger->debug("progress event detected");
+            $c->logger->debug("progress event detected");
             $c->write_sse({ type => 'row', text => $result });
           }
         );
 
         return $subprocess->run_p(sub {
-          $logger->debug("sub process for index $start to $end");
+          $c->logger->debug("sub process for index $start to $end");
           for my $i ($start .. $end) {
             my $general = $rows->[$i];
-            $logger->debug(sprintf('processing general %s', $general->name,));
+            $c->logger->debug(
+              sprintf('processing general %s', $general->name,));
             my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
               general => $general,
               books   =>
@@ -997,7 +998,7 @@ package Game::EvonyTKR::Controller::Generals {
               $validated_params->{route_meta}->{generalType} =~ s/_/ /r;
             $buffKey =~ s/(\w)(\w+) specialist/\U$1\L$2 \UT\Lroops/;
             $buffKey =~ s/Siege Troops/Siege Machines/;
-            $logger->debug("buffKey is $buffKey");
+            $c->logger->debug("buffKey is $buffKey");
 
             # build the row payload
             my $row = {
@@ -1037,7 +1038,7 @@ package Game::EvonyTKR::Controller::Generals {
               JSON::PP->new->utf8(0)->allow_blessed->convert_blessed->canonical;
 
             my $payload = $json->encode({ runId => 0+ $run_id, data => $row });
-            $logger->debug(sprintf(
+            $c->logger->debug(sprintf(
               'row is %s, json is %s',
               Data::Printer::np($row, multiline => 0), $payload,
             ));
@@ -1047,7 +1048,7 @@ package Game::EvonyTKR::Controller::Generals {
 
         })->catch(sub {
           my $err = shift;
-          $logger->error(sprintf(
+          $c->logger->error(sprintf(
             'error in promise for subloop %s to %s : "%s". ',
             $start, $end, $err ? $err : 'Unknown'
           ));
@@ -1060,7 +1061,7 @@ package Game::EvonyTKR::Controller::Generals {
       my $payload = encode_json({ runId => $run_id });
       $c->write_sse({ type => 'complete', text => $payload });
     })->catch(sub {
-      $logger->error('Overall map operation failed');
+      $c->logger->error('Overall map operation failed');
       return undef;
     });
 
@@ -1091,7 +1092,7 @@ package Game::EvonyTKR::Controller::Generals {
     if ($isPrimary) {
       # Validate ascending level
       if (!$data_model->checkAscendingLevel($ascendingLevel)) {
-        $logger->warn(
+        $c->logger->warn(
           "Invalid ascendingLevel: $ascendingLevel, using default 'red5'");
         $ascendingLevel = 'red5';
       }
@@ -1101,7 +1102,7 @@ package Game::EvonyTKR::Controller::Generals {
     }
 
     if (!$data_model->checkCovenantLevel($covenantLevel)) {
-      $logger->warn(
+      $c->logger->warn(
         sprintf('Invalid covenantLevel: %s, using default "civilization"',
           $covenantLevel)
       );

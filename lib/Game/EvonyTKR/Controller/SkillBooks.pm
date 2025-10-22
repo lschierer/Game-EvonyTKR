@@ -2,12 +2,14 @@ use v5.42.0;
 use experimental qw(class);
 use utf8::all;
 use File::FindLib 'lib';
-require Game::EvonyTKR::Model::Book::Builtin;
-require Game::EvonyTKR::Model::Book::SkillBook;
+require Game::EvonyTKR::Model::Book;
+require Game::EvonyTKR::Role::Book::Builtin;
+require Game::EvonyTKR::Role::Book::SkillBook;
 use namespace::clean;
 
 package Game::EvonyTKR::Controller::SkillBooks {
   use Mojo::Base 'Game::EvonyTKR::Controller::ControllerBase';
+  use Carp;
 
   my $logger;
   # Specify which collection this controller handles
@@ -207,13 +209,8 @@ package Game::EvonyTKR::Controller::SkillBooks {
       schema       => [qw/ + Perl /],
       yaml_version => ['1.2', '1.1'],
     )->load_string($data);
-    my $sb;
-    if ($builtin) {
-      $sb = Game::EvonyTKR::Model::Book::Builtin->from_hash($hashObject);
-    }
-    else {
-      $sb = Game::EvonyTKR::Model::Book::SkillBook->from_hash($hashObject);
-    }
+    my $sb = Game::EvonyTKR::Model::Book->from_hash($hashObject);
+
     unless ($sb) {
       $logger->error(sprintf(
         'failed to build %s book %s from %s.',

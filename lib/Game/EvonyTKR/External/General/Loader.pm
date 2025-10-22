@@ -8,18 +8,20 @@ require Game::EvonyTKR::External::Common;
 
 package Game::EvonyTKR::External::General::Loader {
   use Mojo::Base 'Game::EvonyTKR::External::JobBase', -signatures;
+  use Mojo::Base 'Game::EvonyTKR::Role::Cache',       -role;
   use Mojo::File;
   use experimental qw(class);
   use Carp;
 
   my $logger;
+  my $cache;
 
   sub register ($taskClass, $app, $conf = {}) {
     $taskClass->SUPER::register($app, $conf);
     $logger = Log::Log4perl->get_logger(__PACKAGE__);
     $logger->debug('Registering pair workflow tasks');
     $app->minion->add_task(load_general => __PACKAGE__);
-    $app->setup_general_storage($app);
+    $cache = $taskClass->create_cache({ namespace => 'generals:' });
     $app->plugins->emit(general_loader_job_ready => 1);
   }
 
@@ -52,9 +54,9 @@ package Game::EvonyTKR::External::General::Loader {
 "No general returned by load_single_general for general with name $general_name"
       );
     }
-    my $generals = $job->app->get_shared_data('generals');
+    my $generals = $job->app->get_generals($cache);
     $generals->{ $general->normalize($general->name) } = $general;
-    $job->app->set_shared_data('generals', $generals);
+    $job->set_value($general->normalize($general->name), $general, $cache);
     $logger->info(sprintf('general loaded: %s', $general->name));
     return $job->finish(sprintf('general loaded: %s', $general->name));
   }

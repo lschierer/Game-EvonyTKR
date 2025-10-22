@@ -4,17 +4,15 @@ use utf8::all;
 
 use File::FindLib 'lib';
 require Math::Round;
-require Game::EvonyTKR::Shared::Constants::BuffConstants;
 use namespace::autoclean;
 
-package Game::EvonyTKR::Util::BasicAttribute {
-  use Mojo::Base -role, -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Shared::Constants::BuffConstants', -role;
+package Game::EvonyTKR::Role::BasicAttribute {
+  use Mojo::Base 'Game::EvonyTKR::Role::Common';
+  use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants', -role;
   use Carp;
   use List::AllUtils qw( any none );
   use Scalar::Util   qw(blessed);
   use Data::Printer;
-  use Hash::Util;
   require JSON::PP;
 # VERSION
 

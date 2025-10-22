@@ -12,6 +12,7 @@ use Mojo::Base 'Markdent::Handler::HTMLStream::Fragment', -strict, -signatures;
 use Markdent::CheckedOutput;
 use Markdent::Types;
 use Params::ValidationCompiler qw( validation_for );
+use Carp;
 
 # Override the start_paragraph method to add Spectrum CSS classes
 sub start_paragraph {

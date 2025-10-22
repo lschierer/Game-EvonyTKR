@@ -6,6 +6,7 @@ require Game::EvonyTKR::Model::General::Pair;
 
 class Game::EvonyTKR::Model::General::Pair::Manager :
   isa(Game::EvonyTKR::Shared::Constants) {
+  use Carp;
   use overload
     'bool'     => sub { $_[0]->_isTrue() },
     'fallback' => 0;

@@ -1,7 +1,12 @@
+use v5.42.0;
+use utf8::all;
+use File::FindLib 'lib';
+
 package Game::EvonyTKR::External::JobBase {
   use Mojo::Base 'Minion::Job', -signatures;
   use Mojo::Base 'Mojolicious::Plugin', -role, -signatures;
   use Game::EvonyTKR::Log::Config;
+  use Carp;
 
   my $logger;
 

@@ -2,12 +2,11 @@ use v5.42.0;
 use utf8::all;
 use File::FindLib 'lib';
 require JSON::PP;
-require Game::EvonyTKR::Util::Book;
 use namespace::clean;
 
 package Game::EvonyTKR::Model::Book {
   use Mojo::Base -base,                        -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Util::Book', -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Book', -role;
   use Log::Any qw($log);
   use Carp;
   use overload
@@ -27,10 +26,23 @@ package Game::EvonyTKR::Model::Book {
   }
 
   sub to_hash ($self) {
-    return {
+    my $hash = {
       name  => $self->name,
       buffs => $self->buffs,
     };
+    if (length($self->text)) {
+      $hash->{text} = $self->text;
+    }
+    if ($self->can('validate_level')) {
+      $hash->{level} = $self->level;
+    }
+    $hash->{_roles} = [
+      $self->can('is_builtin') ? 'Game::EvonyTKR::Role::Book::Builtin' : (),
+      $self->can('validate_level')
+      ? 'Game::EvonyTKR::Role::Book::SkillBook'
+      : (),
+    ];
+    return $hash;
   }
 
   sub TO_JSON {
@@ -42,6 +54,9 @@ package Game::EvonyTKR::Model::Book {
   }
 
   sub as_string ($self) {
+    if ($self->can('validate_level')) {
+      return sprintf('"%s %s: %s"', $self->level, $self->name, $self->text);
+    }
     return sprintf('"%s: %s"', $self->name, $self->text);
   }
 
@@ -51,7 +66,7 @@ package Game::EvonyTKR::Model::Book {
     return "$one" . "$two";
   }
 
-  sub _isTrue ($self) {
+  sub _isTrue ($self, $other = undef, $swap = undef) {
     return
          defined($self)
       && ref($self)

@@ -50,14 +50,14 @@ class Game::EvonyTKR::External::Common : isa(Game::EvonyTKR::Shared::Constants)
       schema       => [qw/ + Perl /],
       yaml_version => ['1.2', '1.1'],
     )->load_string($bd);
-    my $book = Game::EvonyTKR::Model::Book::Builtin->from_hash($bho);
+    my $book = Game::EvonyTKR::Model::Book->from_hash($bho)->with_roles('Game::EvonyTKR::Role::Book::Builtin');
 
     unless ($book
       && Scalar::Util::blessed($book)
-      && $book->isa('Game::EvonyTKR::Model::Book::Builtin')) {
+      && $book->isa('Game::EvonyTKR::Model::Book')) {
       $self->logger->error(sprintf(
-        'failed to import book for file "%s", necessary for general "%s"',
-        $bookFile, $generalName
+        'failed to import book for file "%s", necessary for general "%s". Recieved a %s',
+        $bookFile, $generalName, Scalar::Util::blessed($book),
       ));
       return;
     }
@@ -84,7 +84,7 @@ class Game::EvonyTKR::External::Common : isa(Game::EvonyTKR::Shared::Constants)
         sprintf('No Builtin Book for %s available.', $g->name));
       return;
     }
-    $g->set_builtInBook($bb);
+    $g->builtInBook($bb);
     $generals->{ $self->normalize($g->name) } = $g;
     $self->logger->debug(sprintf('imported general %s.', $g->name));
     return $g;

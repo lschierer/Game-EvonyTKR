@@ -7,6 +7,7 @@ use namespace::autoclean;
 
 package Game::EvonyTKR::Role::Logger {
   use Mojo::Base -role, -signatures;
+  use Carp;
 
   sub get_effective_caller {
     my $depth = 1;
@@ -23,8 +24,8 @@ package Game::EvonyTKR::Role::Logger {
 
   sub logger ($self) {
     my $effective_class = get_effective_caller($self);
-    print STDERR "effective_class is $effective_class for "
-      . blessed($self) . "\n";
+    #print STDERR "effective_class is $effective_class for "
+    #  . blessed($self) . "\n";
 
     my $log = Log::Log4perl->get_logger($effective_class);
     return $log;

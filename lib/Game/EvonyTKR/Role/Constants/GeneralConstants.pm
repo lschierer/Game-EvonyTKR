@@ -5,10 +5,9 @@ require Data::Printer;
 require X500::DN;
 require X500::RDN;
 require Hash::Util;
-require Game::EvonyTKR::Util::Common;
 
-package Game::EvonyTKR::Shared::Constants::GeneralConstants {
-  use Mojo::Base 'Game::EvonyTKR::Util::Common', -signatures;
+package Game::EvonyTKR::Role::Constants::GeneralConstants {
+  use Mojo::Base 'Game::EvonyTKR::Role::Common', -signatures;
   use Const::Fast;
   use Carp;
   use UUID qw(uuid5);
@@ -23,9 +22,36 @@ package Game::EvonyTKR::Shared::Constants::GeneralConstants {
     wall               => 1,
   );
 
-  sub GeneralKeys {
-    return sort keys %generalKeys;
-  }
+  has 'GeneralKeys' => sub ($self) {
+    my @gk;
+    push @gk, sort keys %generalKeys;
+    $self->logger->debug(sprintf(
+      'there are %s keys from generalKeys', scalar @gk));
+    return \@gk;
+  };
+
+  has 'ValidateGeneralType' => sub($self, $tt) {
+    if(ref($tt) eq 'ARRAY'){
+      my $valid = 0;
+      foreach my $stt ($tt->@*){
+        $valid = $self->ValidateGeneralType($stt);
+        last if($valid == 0);
+      }
+      return $valid;
+    } elsif(ref($tt)) {
+      $self->logger->error(sprintf('General Type Must be an Array or a Scalar, not %s',
+      ref($tt)));
+      return 0;
+    } else {
+      if (none {$_ eq $tt } $self->GeneralKeys() ){
+        $self->logger->error(sprintf(
+        'General Type must be one of %s, not %s',
+        join ', ', $self->GeneralKeys(), $tt ));
+        return 0;
+      }
+      return 1;
+    }
+  };
 
   const our %GeneralTypes2TroopTypes => (
     ground_specialist  => 'Ground Troops',

@@ -7,8 +7,8 @@ require Game::EvonyTKR::Shared::Constants::BuffConstants;
 require Game::EvonyTKR::Shared::Constants::GeneralConstants;
 use namespace::autoclean;
 
-package Game::EvonyTKR::Util::Buff::Value {
-  use Mojo::Base -role, -signatures;
+package Game::EvonyTKR::Role::Buff::Value {
+  use Mojo::Base 'Game::EvonyTKR::Role::Common';
   use Mojo::Base 'Game::EvonyTKR::Shared::Constants::BuffConstants',    -role;
   use Mojo::Base 'Game::EvonyTKR::Shared::Constants::GeneralConstants', -role;
   use Carp;

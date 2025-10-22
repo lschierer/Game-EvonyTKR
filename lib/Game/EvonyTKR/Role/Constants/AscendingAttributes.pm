@@ -4,7 +4,7 @@ use File::FindLib 'lib';
 require Data::Printer;
 require Hash::Util;
 
-package Game::EvonyTKR::Shared::Constants::AscendingAttributes {
+package Game::EvonyTKR::Role::Constants::AscendingAttributes {
   use Mojo::Base -role, -signatures;
   use Const::Fast;
   use Carp;

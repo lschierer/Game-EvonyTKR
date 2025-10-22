@@ -3,12 +3,11 @@ use experimental qw(class);
 use utf8::all;
 use File::FindLib 'lib';
 require JSON::PP;
-require Game::EvonyTKR::Shared::Constants::BuffConstants;
 use namespace::autoclean;
 
 package Game::EvonyTKR::Model::BasicAttributes {
-  use Mojo::Base -base, -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Shared::Constants::BuffConstants', -role;
+  use Mojo::Base -base,                                   -signatures;
+  use Mojo::Base 'Game::EvonyTKR::Role::BasicAttributes', -role;
 # VERSION
   use Carp;
   use List::AllUtils qw( any none first );
@@ -20,20 +19,8 @@ package Game::EvonyTKR::Model::BasicAttributes {
     '""'       => \&as_string,
     'fallback' => 1;
 
-  my $logger = Game::EvonyTKR::Log::Config->logger();
-
   # Store as a hash for easy access
   has '_attributes' => sub { {} };
-
-  # Add/set an attribute (fluent interface)
-  sub set_attribute ($self, $basic_attr) {
-    my $name = $basic_attr->attribute_name;
-    $logger->logcroak("Invalid attribute name: $name")
-      unless grep { $_ eq $name } $self->BasicAttributeTypes->@*;
-
-    $self->_attributes->{$name} = $basic_attr;
-    return $self;    # fluent
-  }
 
   # Get specific attribute
   sub get_attribute ($self, $name) {
@@ -44,7 +31,7 @@ package Game::EvonyTKR::Model::BasicAttributes {
   sub validate ($self) {
     my $attrs = $self->_attributes;
     for my $required ($self->BasicAttributeTypes->@*) {
-      $logger->logcroak("Missing required attribute: $required")
+      $self->logger->logcroak("Missing required attribute: $required")
         unless exists $attrs->{$required};
     }
     return 1;
@@ -53,8 +40,7 @@ package Game::EvonyTKR::Model::BasicAttributes {
   sub total($self, $level = 1, $stars = 'none', $name = "GeneralName") {
     my $total = 0;
     foreach my $stat (
-      Game::EvonyTKR::Shared::Constants::BuffConstants->BasicAttributeTypes->@*)
-    {
+      Game::EvonyTKR::Role::Constants::BuffConstants->BasicAttributeTypes->@*) {
       $total += $self->get_attribute($stat)->total($level, $stars, $name);
     }
     return $total;

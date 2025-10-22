@@ -5,19 +5,14 @@ use File::FindLib 'lib';
 require Data::Printer;
 require JSON::PP;
 require Mojo::JSON;
-require Game::EvonyTKR::Util::Common;
-require Game::EvonyTKR::Shared::Constants::BuffConstants;
-require Game::EvonyTKR::Shared::Constants::AscendingAttributes;
 
-package Game::EvonyTKR::Util::General {
-  use Mojo::Base 'Game::EvonyTKR::Util::Common', -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Shared::Constants::BuffConstants', -role;
-  use Mojo::Base 'Game::EvonyTKR::Shared::Constants::AscendingAttributes',
-    -role;
+package Game::EvonyTKR::Role::General {
+  use Mojo::Base 'Game::EvonyTKR::Role::Common',                   -signatures;
+  use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants', -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants',    -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Constants::AscendingAttributes', -role;
   use List::AllUtils qw( any none );
-  use Types::Common  qw( t is_Num is_Str);
   use UUID           qw(uuid5);
-  use Log::Any       qw($log);
   use namespace::autoclean;
   use Carp;
   use File::FindLib 'lib';
@@ -25,30 +20,17 @@ package Game::EvonyTKR::Util::General {
   our $VERSION = 'v0.40.0';
   my $debug = 1;
 
-  my $logger = $log;
-
   sub validate($self) {
     my @errors;
-    unless (exists $self->GeneralKeys->{ $self->type }) {
+    if (not defined $self->GeneralKeys) {
+      $self->logger->logcroak('GeneralKeys is not defined in a General');
+    }
+    if (not defined $self->type) {
       push @errors,
         sprintf('type must be one of %s', join(', ', @{ $self->GeneralKeys }));
     }
-    if (ref($self->type)) {
-      foreach my $t1 ($self->type->@*) {
-        if (none { $t1 =~ /$_/i } @{ $self->GeneralKeys }) {
-          push @errors,
-            sprintf('type must be one of %s, not %s',
-            join(', ', @{ $self->GeneralKeys }), $t1);
-        }
-      }
-    }
-    elsif (none { $self->type =~ /$_/i } @{ $self->GeneralKeys }) {
-      push @errors,
-        sprintf(
-        'type must be one of %s, not "%s"',
-        join(', ', @{ $self->GeneralKeys }),
-        $self->type
-        );
+    elsif(not $self->ValidateGeneralType($self->type)) {
+      push @errors, 'General Type Failed Validation';
     }
 
     my @valv;
@@ -75,7 +57,7 @@ package Game::EvonyTKR::Util::General {
       my @ts;
       push @ts, $self->type->@*;
       my $ut = $ts[0];
-      $logger->debug("using type $ut");
+      $self->logger->debug("using type $ut");
       my $uuid5base = $self->UUID5_Generals->{$ut};
       $self->id = uuid5($uuid5base, $self->name);
     }
@@ -90,13 +72,13 @@ package Game::EvonyTKR::Util::General {
     push @specialtyNames, $self->specialtyNames->@*;
     foreach my $sn_index (0 .. scalar(@specialtyNames)) {
       my $sn = $specialtyNames[$sn_index];
-      $logger->debug("populating $sn");
+      $self->logger->debug("populating $sn");
       my $specialty = $allSpecialties->{$sn};
       if ($specialty) {
         $self->specialties->[$sn_index] = $specialty;
       }
       else {
-        $logger->error(sprintf(
+        $self->logger->error(sprintf(
           'Missing specialty number %s for general "%s": "%s" ',
           $sn_index, $self->name, $sn
         ));
@@ -133,7 +115,7 @@ package Game::EvonyTKR::Util::General {
     my $logger = Game::EvonyTKR::Log::Config->logger();
 
     if (!exists $hashObject->{name}) {
-      $logger->error('hash object must contain a name attribute.');
+      $self->logger->error('hash object must contain a name attribute.');
       return undef;
     }
 
@@ -146,7 +128,7 @@ package Game::EvonyTKR::Util::General {
       specialtyNames  => $hashObject->{specialties},
     );
     unless ($g->validate()) {
-      $logger->error('Invalid Hash Object.');
+      $self->logger->error('Invalid Hash Object.');
       return;
     }
 

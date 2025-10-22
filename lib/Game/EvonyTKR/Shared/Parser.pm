@@ -15,6 +15,7 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
   use IPC::Open3;
   use open qw(:std :utf8);
   use Symbol 'gensym';
+  use Carp;
   use namespace::autoclean;
 
   # Simplified normalize_buff - parses Prolog output format

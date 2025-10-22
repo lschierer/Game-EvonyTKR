@@ -8,6 +8,7 @@ use namespace::clean;
 package Game::EvonyTKR::Controller::Specialties {
   use Mojo::Base 'Game::EvonyTKR::Controller::ControllerBase';
   use List::AllUtils qw( all any none first);
+  use Carp;
 
   my $logger;
   # Specify which collection this controller handles

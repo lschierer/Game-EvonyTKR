@@ -8,7 +8,7 @@ require Mojo::JSON;
 require X500::DN;
 require X500::RDN;
 
-package Game::EvonyTKR::Util::Common {
+package Game::EvonyTKR::Role::Common {
   use Mojo::Base -role,                          -signatures;
   use Mojo::Base 'Game::EvonyTKR::Role::Logger', -role;
   use Carp;

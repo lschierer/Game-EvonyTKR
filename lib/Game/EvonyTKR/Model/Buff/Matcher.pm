@@ -111,12 +111,10 @@ class Game::EvonyTKR::Model::Buff::Matcher :
       else {
         %allowed_conditions = map { $_ => 1 } $no_op_Conditions->@*;
       }
-      $self->logger->debug(
-        sprintf(
-          '%s  Processing: This buff has %s conditions.',
-          $logID, scalar @{ $toTest->buffConditions }
-        )
-      );
+      $self->logger->debug(sprintf(
+        '%s  Processing: This buff has %s conditions.',
+        $logID, scalar @{ $toTest->buffConditions }
+      ));
       foreach my $condition (@{ $toTest->buffConditions }) {
         if (none { exists $allowed_conditions{$_} } @{$testBuffs}) {
           $self->logger->debug(

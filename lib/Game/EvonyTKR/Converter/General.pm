@@ -14,6 +14,7 @@ class Game::EvonyTKR::Converter::General :
   isa(Game::EvonyTKR::Shared::Constants) {
   use List::AllUtils qw( first all any none );
   use namespace::autoclean;
+  use Carp;
 
   field $tree      : param;
   field $outputDir : param;

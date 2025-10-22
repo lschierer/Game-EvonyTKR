@@ -4,16 +4,11 @@ use File::FindLib 'lib';
 require Data::Printer;
 require JSON::PP;
 require Game::EvonyTKR::Model::Buff::Value;
-require Game::EvonyTKR::Util::Buff;
-require Game::EvonyTKR::Shared::Constants::BuffConstants;
-require Game::EvonyTKR::Role::Logger;
 use namespace::autoclean;
 
 package Game::EvonyTKR::Model::Buff {
-  use Mojo::Base -base,                          -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Role::Logger', -role;
-  use Mojo::Base 'Game::EvonyTKR::Util::Buff',   -role;
-  use Mojo::Base 'Game::EvonyTKR::Shared::Constants::BuffConstants', -role;
+  use Mojo::Base -base,                        -signatures;
+  use Mojo::Base 'Game::EvonyTKR::Role::Buff', -role;
 
   use List::AllUtils qw( any none );
   use Carp;
@@ -119,14 +114,11 @@ package Game::EvonyTKR::Model::Buff {
             sprintf('unexpected targedType: "%s"', ref($self->targetedType)));
         }
       }
-      $self->targetedType = $tt;
+      $self->targetedType($tt);
     }
   }
 
   sub set_condition ($self, $condition) {
-
-    print STDERR "DEBUG: set_condition called with: $condition\n";
-    print STDERR "DEBUG: logger method exists: " . (defined $self->can('logger') ? 'YES' : 'NO') . "\n";
 
     if ($self->attribute eq 'March Size') {
       # march size *cannot* take a condition

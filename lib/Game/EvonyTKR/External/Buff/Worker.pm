@@ -13,8 +13,6 @@ require Game::EvonyTKR::External::Buff::Computer;
 require Game::EvonyTKR::Model::AscendingAttributes;
 require Game::EvonyTKR::Model::BasicAttribute;
 require Game::EvonyTKR::Model::BasicAttributes;
-require Game::EvonyTKR::Model::Book::Builtin;
-require Game::EvonyTKR::Model::Book::SkillBook;
 require Game::EvonyTKR::Model::Book;
 require Game::EvonyTKR::Model::Buff::Summarizer;
 require Game::EvonyTKR::Model::Buff;
@@ -22,6 +20,8 @@ require Game::EvonyTKR::Model::Covenant;
 require Game::EvonyTKR::Model::Data;
 require Game::EvonyTKR::Model::General;
 require Game::EvonyTKR::Model::Specialty;
+require Game::EvonyTKR::Role::Book::Builtin;
+require Game::EvonyTKR::Role::Book::SkillBook;
 require Game::EvonyTKR::Shared::Constants;
 
 package Game::EvonyTKR::External::Buff::Worker {

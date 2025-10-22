@@ -5,10 +5,8 @@ use File::FindLib 'lib';
 require UUID;
 
 package Game::EvonyTKR::Model::General {
-  use Mojo::Base -base, -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Shared::Constants::BuffConstants',    -role;
-  use Mojo::Base 'Game::EvonyTKR::Shared::Constants::GeneralConstants', -role;
-  use Mojo::Base 'Game::EvonyTKR::Util::General',                       -role;
+  use Mojo::Base -base,                           -signatures;
+  use Mojo::Base 'Game::EvonyTKR::Role::General', -role;
   use JSON::PP;
   use UUID qw(uuid5);
   use File::FindLib 'lib';
@@ -88,7 +86,7 @@ package Game::EvonyTKR::Model::General {
     return $on eq $tn;
   }
 
-  sub _isTrue ($self) {
+  sub _isTrue ($self, @args) {
     return
          defined($self)
       && ref($self)

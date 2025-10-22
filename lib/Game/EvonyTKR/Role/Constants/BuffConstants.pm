@@ -4,9 +4,8 @@ use File::FindLib 'lib';
 require Data::Printer;
 require Hash::Util;
 
-package Game::EvonyTKR::Shared::Constants::BuffConstants {
-  use Mojo::Base -role,                          -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Role::Logger', -role;
+package Game::EvonyTKR::Role::Constants::BuffConstants {
+  use Mojo::Base 'Game::EvonyTKR::Role::Common', -signatures;
   use Const::Fast;
   use Carp;
 
@@ -32,6 +31,11 @@ package Game::EvonyTKR::Shared::Constants::BuffConstants {
       return '';
     }
   }
+
+  has 'basic_types' => sub {
+    const my $tmp => [ 'leadership', 'attack', 'defense', 'politics' ];
+    return $tmp;
+  };
 
   has 'BuffActivationValues' => sub {
     const my $hash = {
@@ -88,9 +92,13 @@ package Game::EvonyTKR::Shared::Constants::BuffConstants {
     return $tmp;
   };
 
-  sub AttributeValues ($self) {
-    return sort keys $self->attributeValues->%*;
-  }
+  has 'AttributeValues' => sub ($self) {
+    my @av;
+    push @av, sort keys $self->attributeValues->%*;
+    $self->logger->debug(sprintf('there are %s attribute values',
+    scalar @av));
+    return \@av;
+  };
 
   has 'basicAttributeTypes' => sub {
     const my $tmp = {
@@ -107,7 +115,7 @@ package Game::EvonyTKR::Shared::Constants::BuffConstants {
   }
 
   has 'BuffConditionValues' => sub {
-    const my $hash = {
+    const my $hash => {
       'Against Monsters' => {
         "Overall"     => 0,
         "PvM"         => 1,

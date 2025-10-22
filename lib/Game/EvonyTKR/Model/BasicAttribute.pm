@@ -3,14 +3,11 @@ use utf8::all;
 use File::FindLib 'lib';
 require Math::Round;
 require JSON::PP;
-require Game::EvonyTKR::Shared::Constants::BuffConstants;
-require Game::EvonyTKR::Util::BasicAttribute;
 use namespace::autoclean;
 
 package Game::EvonyTKR::Model::BasicAttribute {
-  use Mojo::Base -base, -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Shared::Constants::BuffConstants', -role;
-  use Mojo::Base 'Game::EvonyTKR::Util::BasicAttribute',             -role;
+  use Mojo::Base -base,                                  -signatures;
+  use Mojo::Base 'Game::EvonyTKR::Role::BasicAttribute', -role;
   use Carp;
   use List::AllUtils qw( any none );
   use Scalar::Util   qw(blessed);

@@ -43,6 +43,7 @@ my $builder = Module::Build->new(
     'HTML::TreeBuilder'                   => '0',
     'HTTP::Tiny'                          => '0',
     'Hash::Util'                          => '0',
+    'IO::Compress::Gzip'                  => '0',
     'IO::Socket::IP'                      => '0',
     'IO::Socket::SSL'                     => '0',
     'IPC::Open3'                          => '0',

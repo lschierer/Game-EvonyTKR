@@ -3,16 +3,12 @@ use utf8::all;
 use File::FindLib 'lib';
 require Data::Printer;
 require JSON::PP;
-require Game::EvonyTKR::Util::Common;
-require Game::EvonyTKR::Shared::Constants::BuffConstants;
-require Game::EvonyTKR::Role::Logger;
 use namespace::autoclean;
 
-package Game::EvonyTKR::Util::Buff {
-  use Mojo::Base -role, -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Util::Common', -role;
-  use Mojo::Base 'Game::EvonyTKR::Shared::Constants::BuffConstants', -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::Logger', -role;
+package Game::EvonyTKR::Role::Buff {
+  use Mojo::Base -role,                                            -signatures;
+  use Mojo::Base 'Game::EvonyTKR::Role::Common',                   -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants', -role;
 
   use List::AllUtils qw( any none );
   use Carp;
@@ -239,7 +235,7 @@ package Game::EvonyTKR::Util::Buff {
 
   sub from_hash ($class, $hashref) {
     my $logger = Log::Log4perl->get_logger(__PACKAGE__);
-    my $v = Game::EvonyTKR::Model::Buff::Value->new(
+    my $v      = Game::EvonyTKR::Model::Buff::Value->new(
       number => abs($hashref->{value}->{number}),
       unit   => ($hashref->{value}->{unit} // 'percentage'),
     );

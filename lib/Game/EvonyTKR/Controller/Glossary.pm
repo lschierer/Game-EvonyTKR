@@ -6,6 +6,7 @@ use namespace::clean;
 
 package Game::EvonyTKR::Controller::Glossary {
   use Mojo::Base 'Game::EvonyTKR::Controller::ControllerBase';
+  use Carp;
 
   my $logger;
 

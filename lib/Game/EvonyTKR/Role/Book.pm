@@ -5,21 +5,14 @@ require Data::Printer;
 require JSON::PP;
 require Scalar::Util;
 require Game::EvonyTKR::Model::Buff::Matcher;
-require Game::EvonyTKR::Util::Common;
-require Game::EvonyTKR::Shared::Constants::BuffConstants;
-require Game::EvonyTKR::Shared::Constants::GeneralConstants;
 use namespace::autoclean;
 
-package Game::EvonyTKR::Util::Book {
-  use Mojo::Base -role,                          -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Util::Common', -role;
-  use Mojo::Base 'Game::EvonyTKR::Shared::Constants::BuffConstants',    -role;
-  use Mojo::Base 'Game::EvonyTKR::Shared::Constants::GeneralConstants', -role;
-  use Log::Any       qw($log);
+package Game::EvonyTKR::Role::Book {
+  use Mojo::Base 'Game::EvonyTKR::Role::Common';
+  use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants',    -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants', -role;
   use List::AllUtils qw( any none );
   use Carp;
-
-  my $logger = $log;
 
   sub get_buffs (
     $self, $attribute, $matching_type,
@@ -27,12 +20,10 @@ package Game::EvonyTKR::Util::Book {
     $conditions       = [],
     $debuffConditions = [],
   ) {
-    $logger->debug(
-      sprintf(
-        'Calculating buffs for "%s", attribute: "%s"',
-        $self->name, $attribute
-      )
-    );
+    $self->logger->debug(sprintf(
+      'Calculating buffs for "%s", attribute: "%s"',
+      $self->name, $attribute
+    ));
 
     my $total = 0;
 
@@ -57,73 +48,71 @@ package Game::EvonyTKR::Util::Book {
         $logID
       )) {
         my $val = $b->value->number;
-        $logger->debug("  ➤ Match found. Adding $val to total.");
+        $self->logger->debug("  ➤ Match found. Adding $val to total.");
         $total += $val;
       }
       else {
-        $logger->debug("  ✗ No match found.");
+        $self->logger->debug("  ✗ No match found.");
       }
     }
 
-    $logger->debug(
-      sprintf(
-        '"%s": total for attribute "%s": "%s"',
-        $self->name, $attribute, $total
-      )
-    );
+    $self->logger->debug(sprintf(
+      '"%s": total for attribute "%s": "%s"',
+      $self->name, $attribute, $total
+    ));
     return $total;
   }
 
   sub addBuff ($self, $newBuff) {
-    $logger->debug(sprintf('addBuff called for book "%s"', $self->name));
+    $self->logger->debug(sprintf('addBuff called for book "%s"', $self->name));
 
     if (!defined $newBuff) {
-      $logger->warn("addBuff: newBuff is undefined");
+      $self->logger->warn("addBuff: newBuff is undefined");
       return;
     }
 
     my $reftype = Scalar::Util::reftype($newBuff);
     my $blessed = Scalar::Util::blessed($newBuff);
 
-    $logger->debug(sprintf(
+    $self->logger->debug(sprintf(
       'addBuff: newBuff reftype="%s", blessed="%s"',
       $reftype, ($blessed // 'undef')
     ));
 
     if ($reftype eq 'OBJECT') {
       my $classList = $blessed;
-      $logger->debug(
-        sprintf(
-          'Adding buff of class "%s" to book "%s"',
-          $classList, $self->name
-        )
-      );
+      $self->logger->debug(sprintf(
+        'Adding buff of class "%s" to book "%s"',
+        $classList, $self->name
+      ));
 
       my @classStack = split(/::/, $classList);
-      $logger->debug("Class stack: " . join(", ", @classStack));
+      $self->logger->debug("Class stack: " . join(", ", @classStack));
 
       if (scalar @classStack > 3) {
         if ($classStack[3] eq 'Buff') {
-          $logger->debug(sprintf('adding %s to %s', $newBuff, $self->name));
+          $self->logger->debug(
+            sprintf('adding %s to %s', $newBuff, $self->name));
 
           push @{ $self->buffs }, $newBuff;
-          $logger->debug(sprintf(
+          $self->logger->debug(sprintf(
             'Book "%s" now has "%s" buffs',
             $self->name, scalar @{ $self->buffs }
           ));
         }
         else {
-          $logger->warn(sprintf(
+          $self->logger->warn(sprintf(
             'Not adding buff: class stack position 2 is "%s" not "Buff"',
             $classStack[2]));
         }
       }
       else {
-        $logger->warn("Not adding buff: class stack has fewer than 3 elements");
+        $self->logger->warn(
+          "Not adding buff: class stack has fewer than 3 elements");
       }
     }
     else {
-      $logger->warn("Not adding buff: not an object (reftype=$reftype)");
+      $self->logger->warn("Not adding buff: not an object (reftype=$reftype)");
     }
   }
 
@@ -150,9 +139,30 @@ package Game::EvonyTKR::Util::Book {
         sprintf('$text must contain a string, not %s', $self->text);
     }
     if (@errors) {
-      $logger->logcroak(join ', ', @errors);
+      $self->logger->logcroak(join ', ', @errors);
       return;
     }
+  }
+
+  sub from_hash($class, $object) {
+    my $b;
+    if (exists $object->{level}) {
+      $b = Game::EvonyTKR::Model::Book->new(
+        name  => $object->{name},
+        buffs => ($object->{buffs} // []),
+      )->with_roles('Game::EvonyTKR::Role::Book::SkillBook');
+      $b->level($object->{level});
+    }
+    else {
+      $b = Game::EvonyTKR::Model::Book->new(
+        name  => $object->{name},
+        buffs => $object->{buffs} // [],
+      )->with_roles('Game::EvonyTKR::Role::Book::Builtin');
+    }
+    if (exists $object->{text}) {
+      $b->text($object->{text});
+    }
+    return $b;
   }
 
 }
