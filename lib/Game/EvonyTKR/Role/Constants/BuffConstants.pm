@@ -33,7 +33,7 @@ package Game::EvonyTKR::Role::Constants::BuffConstants {
   }
 
   has 'basic_types' => sub {
-    const my $tmp => [ 'leadership', 'attack', 'defense', 'politics' ];
+    const my $tmp => ['leadership', 'attack', 'defense', 'politics'];
     return $tmp;
   };
 
@@ -95,8 +95,7 @@ package Game::EvonyTKR::Role::Constants::BuffConstants {
   has 'AttributeValues' => sub ($self) {
     my @av;
     push @av, sort keys $self->attributeValues->%*;
-    $self->logger->debug(sprintf('there are %s attribute values',
-    scalar @av));
+    $self->logger->debug(sprintf('there are %s attribute values', scalar @av));
     return \@av;
   };
 

@@ -31,22 +31,25 @@ package Game::EvonyTKR::Role::Constants::GeneralConstants {
   };
 
   has 'ValidateGeneralType' => sub($self, $tt) {
-    if(ref($tt) eq 'ARRAY'){
+    if (ref($tt) eq 'ARRAY') {
       my $valid = 0;
-      foreach my $stt ($tt->@*){
+      foreach my $stt ($tt->@*) {
         $valid = $self->ValidateGeneralType($stt);
-        last if($valid == 0);
+        last if ($valid == 0);
       }
       return $valid;
-    } elsif(ref($tt)) {
-      $self->logger->error(sprintf('General Type Must be an Array or a Scalar, not %s',
-      ref($tt)));
+    }
+    elsif (ref($tt)) {
+      $self->logger->error(sprintf(
+        'General Type Must be an Array or a Scalar, not %s', ref($tt)));
       return 0;
-    } else {
-      if (none {$_ eq $tt } $self->GeneralKeys() ){
+    }
+    else {
+      if (none { $_ eq $tt } $self->GeneralKeys()) {
         $self->logger->error(sprintf(
-        'General Type must be one of %s, not %s',
-        join ', ', $self->GeneralKeys(), $tt ));
+          'General Type must be one of %s, not %s',
+          join ', ', $self->GeneralKeys(), $tt
+        ));
         return 0;
       }
       return 1;

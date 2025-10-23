@@ -17,6 +17,7 @@ require GitRepo::Reader;
 
 package Game::EvonyTKR {
   use Mojo::Base 'Mojolicious', -strict, -signatures;
+  use Mojo::Loader      qw(find_modules load_class);
   use Mojo::File::Share qw(dist_dir );
   use Log::Log4perl;
   use Log::Any::Adapter;
@@ -106,12 +107,14 @@ package Game::EvonyTKR {
     # Navigation
     $self->plugin('Game::EvonyTKR::Plugins::Navigation');
 
-    # Then Controller Plugins
-    $self->plugin(
-      'Module::Loader' => {
-        plugin_namespaces => ['Game::EvonyTKR::Controller']
-      }
-    );
+    my @controllerplugins = find_modules 'Game::EvonyTKR::Controller';
+    foreach my $module (@controllerplugins) {
+      eval {
+        load_class $module;
+        $self->plugin($module);
+      };
+      $self->log->warn("loading module '$module' failed: $@") if $@;
+    }
 
     # Last the Static Pages
     # Register last for lowest priority

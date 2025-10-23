@@ -5,6 +5,7 @@ require Data::Printer;
 require JSON::PP;
 require Scalar::Util;
 require Game::EvonyTKR::Model::Buff::Matcher;
+require Game::EvonyTKR::Model::Buff;
 use namespace::autoclean;
 
 package Game::EvonyTKR::Role::Book {
@@ -78,42 +79,44 @@ package Game::EvonyTKR::Role::Book {
       'addBuff: newBuff reftype="%s", blessed="%s"',
       $reftype, ($blessed // 'undef')
     ));
-
-    if ($reftype eq 'OBJECT') {
-      my $classList = $blessed;
-      $self->logger->debug(sprintf(
-        'Adding buff of class "%s" to book "%s"',
-        $classList, $self->name
+    unless ($blessed && $newBuff->isa('Game::EvonyTKR::Model::Buff')) {
+      $self->logger->logcroak(sprintf(
+        'not adding totally bogus buff: reftype="%s", blessed="%s"',
+        $reftype, ($blessed // 'undef')
       ));
+      return;
+    }
 
-      my @classStack = split(/::/, $classList);
-      $self->logger->debug("Class stack: " . join(", ", @classStack));
+    my $classList = $blessed;
+    $self->logger->debug(sprintf(
+      'Adding buff of class "%s" to book "%s"',
+      $classList, $self->name
+    ));
 
-      if (scalar @classStack > 3) {
-        if ($classStack[3] eq 'Buff') {
-          $self->logger->debug(
-            sprintf('adding %s to %s', $newBuff, $self->name));
+    my @classStack = split(/::/, $classList);
+    $self->logger->debug("Class stack: " . join(", ", @classStack));
 
-          push @{ $self->buffs }, $newBuff;
-          $self->logger->debug(sprintf(
-            'Book "%s" now has "%s" buffs',
-            $self->name, scalar @{ $self->buffs }
-          ));
-        }
-        else {
-          $self->logger->warn(sprintf(
-            'Not adding buff: class stack position 2 is "%s" not "Buff"',
-            $classStack[2]));
-        }
+    if (scalar @classStack > 3) {
+      if ($classStack[3] eq 'Buff') {
+        $self->logger->debug(sprintf('adding %s to %s', $newBuff, $self->name));
+
+        push @{ $self->buffs }, $newBuff;
+        $self->logger->debug(sprintf(
+          'Book "%s" now has "%s" buffs',
+          $self->name, scalar @{ $self->buffs }
+        ));
       }
       else {
-        $self->logger->warn(
-          "Not adding buff: class stack has fewer than 3 elements");
+        $self->logger->warn(sprintf(
+          'Not adding buff: class stack position 2 is "%s" not "Buff"',
+          $classStack[2]));
       }
     }
     else {
-      $self->logger->warn("Not adding buff: not an object (reftype=$reftype)");
+      $self->logger->warn(
+        "Not adding buff: class stack has fewer than 3 elements");
     }
+
   }
 
   sub validate($self) {
@@ -147,20 +150,25 @@ package Game::EvonyTKR::Role::Book {
   sub from_hash($class, $object) {
     my $b;
     if (exists $object->{level}) {
-      $b = Game::EvonyTKR::Model::Book->new(
-        name  => $object->{name},
-        buffs => ($object->{buffs} // []),
-      )->with_roles('Game::EvonyTKR::Role::Book::SkillBook');
+      $b = Game::EvonyTKR::Model::Book->new(name => $object->{name},)
+        ->with_roles('Game::EvonyTKR::Role::Book::SkillBook');
       $b->level($object->{level});
     }
     else {
       $b = Game::EvonyTKR::Model::Book->new(
         name  => $object->{name},
-        buffs => $object->{buffs} // [],
       )->with_roles('Game::EvonyTKR::Role::Book::Builtin');
     }
     if (exists $object->{text}) {
       $b->text($object->{text});
+    }
+    my $oba;
+    $oba = $object->{buffs} if exists $object->{buffs};
+    $oba = $object->{buff}  if ((not defined($oba)) and exists $object->{buff});
+    $oba = []               if (not defined $oba);
+    foreach my $ob (values $oba->@*) {
+      my $nb = Game::EvonyTKR::Model::Buff->from_hash($ob);
+      $b->addBuff($nb);
     }
     return $b;
   }

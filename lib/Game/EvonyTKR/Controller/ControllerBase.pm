@@ -30,7 +30,7 @@ package Game::EvonyTKR::Controller::ControllerBase {
 
   sub register($c, $app, $config = {}) {
     $logger = Log::Log4perl->get_logger(__PACKAGE__);
-    $logger->info("ControllerBase register function");
+    $logger->debug("ControllerBase register function");
 
     my $routes = $app->routes;
 

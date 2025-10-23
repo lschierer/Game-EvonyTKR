@@ -31,12 +31,12 @@ package Game::EvonyTKR::Role::Logger {
     return $log;
   }
 
-  sub trace { my $self = shift; $self->logger->debug(@_); }
-  sub debug { my $self = shift; $self->logger->debug(@_); }
-  sub info  { my $self = shift; $self->logger->info(@_); }
-  sub warn  { my $self = shift; $self->logger->warn(@_); }
-  sub error { my $self = shift; $self->logger->error(@_); }
-  sub fatal { my $self = shift; $self->logger->error(@_); }
+  has 'trace' => sub { my $self = shift; $self->logger->debug(@_); };
+  has 'debug' => sub { my $self = shift; $self->logger->debug(@_); };
+  has 'info'  => sub { my $self = shift; $self->logger->info(@_); };
+  has 'warn'  => sub { my $self = shift; $self->logger->warn(@_); };
+  has 'error' => sub { my $self = shift; $self->logger->error(@_); };
+  has 'fatal' => sub { my $self = shift; $self->logger->logcroak(@_); };
 }
 1;
 __END__

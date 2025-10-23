@@ -42,7 +42,7 @@ package Game::EvonyTKR::External::General::Pair::Workflow {
     # Monitor and aggregator job
     $app->minion->add_task(monitor_pair_builders => __PACKAGE__);
 
-    $app->plugins->emit(pair_workflow_loaded => {});
+    $app->plugins->emit(pair_workflow_loaded => 1);
   }
 
   sub run ($self, $args) {

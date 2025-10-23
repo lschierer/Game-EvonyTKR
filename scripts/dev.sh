@@ -22,6 +22,13 @@ touch minion.db
 
 export MOJO_MODE='development';
 /opt/homebrew/opt/memcached/bin/memcached -l localhost &
+export MEM_RESULT=$?;
+if [ $MEM_RESULT -eq 0 ]; then
+  echo "memcached launched successfully"
+else
+  echo "memcached failed to launch $MEM_RESULT"
+  exit $MEM_RESULT;
+fi
 
 nice -n 10 ./bin/game-evonytkr minion worker -j 10 -s -10 -S 50 &
 nice -n 10 ./bin/game-evonytkr minion worker -j 2 -s 1  &

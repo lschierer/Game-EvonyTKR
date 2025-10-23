@@ -241,7 +241,7 @@ package Game::EvonyTKR::Role::Buff {
     );
     my $r = Game::EvonyTKR::Model::Buff->new(
       attribute => $hashref->{attribute},
-      passive   => ($hashref->{passive} // 0),
+      passive   => $hashref->{passive} // 0,
       value     => $v,
     );
     if (exists $hashref->{targetedType}) {

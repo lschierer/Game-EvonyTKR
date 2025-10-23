@@ -7,16 +7,18 @@ require JSON::PP;
 require Mojo::JSON;
 require X500::DN;
 require X500::RDN;
+require Unicode::CaseFold;
 
 package Game::EvonyTKR::Role::Common {
-  use Mojo::Base -role,                          -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Role::Logger', -role;
+  use Mojo::Base -role, -signatures;
   use Carp;
   use UUID qw(uuid5);
+  use Unicode::CaseFold qw(fc);
+  use Unicode::Normalize qw(NFKD);
 
   sub normalize ($self, $name) {
     my $dn = Encode::is_utf8($name) ? $name : Encode::decode_utf8($name);
-    my $nn = Unicode::CaseFold::fc(Unicode::Normalize::NFKD($dn));
+    my $nn = fc(NFKD($dn));
     $nn =~ s/[’''‛`´]/'/g;
     $nn =~ s/[""‟]/"/g;      # Quotes
     return $nn;

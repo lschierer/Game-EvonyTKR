@@ -5,8 +5,8 @@ require JSON::PP;
 use namespace::autoclean;
 
 package Game::EvonyTKR::Model::Buff::Value {
-  use Mojo::Base -base, -signatures;
-
+  use Mojo::Base -base,                          -signatures;
+  use Mojo::Base 'Game::EvonyTKR::Role::Logger', -role;
   use Carp;
   use File::FindLib 'lib';
   use overload

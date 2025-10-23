@@ -8,6 +8,7 @@ use namespace::autoclean;
 package Game::EvonyTKR::Model::BasicAttributes {
   use Mojo::Base -base,                                   -signatures;
   use Mojo::Base 'Game::EvonyTKR::Role::BasicAttributes', -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Logger',          -role;
 # VERSION
   use Carp;
   use List::AllUtils qw( any none first );
@@ -19,29 +20,29 @@ package Game::EvonyTKR::Model::BasicAttributes {
     '""'       => \&as_string,
     'fallback' => 1;
 
-  # Store as a hash for easy access
-  has '_attributes' => sub { {} };
+  has 'attack' => sub {
+    Game::EvonyTKR::Role::BasicAttribute->new(attribute_name => 'attack');
+  };
+  has 'leadership' => sub {
+    Game::EvonyTKR::Role::BasicAttribute->new(attribute_name => 'leadership');
+  };
+  has 'defense' => sub {
+    Game::EvonyTKR::Role::BasicAttribute->new(attribute_name => 'defense');
+  };
+  has 'politics' => sub {
+    Game::EvonyTKR::Role::BasicAttribute->new(attribute_name => 'politics');
+  };
 
   # Get specific attribute
   sub get_attribute ($self, $name) {
-    return $self->_attributes->{$name};
-  }
-
-  # Validate we have all 4
-  sub validate ($self) {
-    my $attrs = $self->_attributes;
-    for my $required ($self->BasicAttributeTypes->@*) {
-      $self->logger->logcroak("Missing required attribute: $required")
-        unless exists $attrs->{$required};
-    }
-    return 1;
+    return $self->$name;
   }
 
   sub total($self, $level = 1, $stars = 'none', $name = "GeneralName") {
     my $total = 0;
     foreach my $stat (
       Game::EvonyTKR::Role::Constants::BuffConstants->BasicAttributeTypes->@*) {
-      $total += $self->get_attribute($stat)->total($level, $stars, $name);
+      $total += $self->$stat->total($level, $stars, $name);
     }
     return $total;
   }
@@ -61,8 +62,8 @@ package Game::EvonyTKR::Model::BasicAttributes {
 
     # Check each attribute for equality
     for my $stat ($self->BasicAttributeTypes->@*) {
-      my $mine   = $self->get_attribute($stat);
-      my $theirs = $other->get_attribute($stat);
+      my $mine   = $self->$stat;
+      my $theirs = $other->$stat;
       return 0 unless $mine == $theirs;    # Uses BasicAttribute's equality
     }
     return 1;
@@ -70,10 +71,10 @@ package Game::EvonyTKR::Model::BasicAttributes {
 
   sub to_hash ($self) {
     return {
-      attack     => $self->_attribute->{attack},
-      defense    => $self->_attribute->{defense},
-      leadership => $self->_attribute->{leadership},
-      politics   => $self->_attribute->{politics},
+      attack     => $self->attack,
+      defense    => $self->defense,
+      leadership => $self->leadership,
+      politics   => $self->politics,
     };
   }
 

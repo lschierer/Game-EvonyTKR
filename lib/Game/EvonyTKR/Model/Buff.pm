@@ -7,9 +7,9 @@ require Game::EvonyTKR::Model::Buff::Value;
 use namespace::autoclean;
 
 package Game::EvonyTKR::Model::Buff {
-  use Mojo::Base -base,                        -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Role::Buff', -role;
-
+  use Mojo::Base -base,                          -signatures;
+  use Mojo::Base 'Game::EvonyTKR::Role::Buff',   -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Logger', -role;
   use List::AllUtils qw( any none );
   use Carp;
   use File::FindLib 'lib';
@@ -188,7 +188,7 @@ package Game::EvonyTKR::Model::Buff {
     return $self->to_hash();
   }
 
-  sub as_string ($self) {
+  sub as_string ($self, @args) {
     my $json =
       JSON::PP->new->utf8->pretty->allow_blessed(1)
       ->convert_blessed(1)

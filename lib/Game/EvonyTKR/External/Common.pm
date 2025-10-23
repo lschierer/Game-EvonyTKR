@@ -21,8 +21,13 @@ class Game::EvonyTKR::External::Common : isa(Game::EvonyTKR::Shared::Constants)
 
   field $app : param : reader;
   field $tasks : reader = {};
-  field $collectionDir =
-    Mojo::File->new($app->config('distDir'))->child('collections/data/');
+  field $collectionDir;
+
+  ADJUST {
+    my $mh = Mojo::Home->new;
+    $mh->detect('Game::EvonyTKR');
+    $collectionDir = Mojo::File->new($mh->child('share/collections/data/'));
+  }
 
   field $generals : reader = {};
   #there needs to be a reader so child classes can see it.
@@ -50,15 +55,21 @@ class Game::EvonyTKR::External::Common : isa(Game::EvonyTKR::Shared::Constants)
       schema       => [qw/ + Perl /],
       yaml_version => ['1.2', '1.1'],
     )->load_string($bd);
-    my $book = Game::EvonyTKR::Model::Book->from_hash($bho)->with_roles('Game::EvonyTKR::Role::Book::Builtin');
+    my $book = Game::EvonyTKR::Model::Book->from_hash($bho);
 
-    unless ($book
-      && Scalar::Util::blessed($book)
-      && $book->isa('Game::EvonyTKR::Model::Book')) {
-      $self->logger->error(sprintf(
-        'failed to import book for file "%s", necessary for general "%s". Recieved a %s',
+    unless ($book && Scalar::Util::blessed($book)) {
+      $self->logger->logcroak(sprintf(
+        'failed to load book for file "%s", '
+          . 'necessary for general "%s". Recieved a %s',
         $bookFile, $generalName, Scalar::Util::blessed($book),
       ));
+      return;
+    }
+    unless ($book->isa('Game::EvonyTKR::Model::Book')) {
+      $self->logger->logcroak(
+        sprintf('returned book from constructor is wrong class "%s"',
+          Scalar::Util::blessed($book))
+      );
       return;
     }
     return $book;
@@ -79,14 +90,19 @@ class Game::EvonyTKR::External::Common : isa(Game::EvonyTKR::Shared::Constants)
     }
 
     my $bb = $self->load_builtinBook($g->builtInBookName, $g->name);
-    unless ($bb) {
-      $self->logger->error(
+    unless ($bb
+      && Scalar::Util::blessed($bb)
+      && $bb->isa('Game::EvonyTKR::Model::Book')) {
+      $self->logger->logcroak(
         sprintf('No Builtin Book for %s available.', $g->name));
       return;
+    } else {
+      $self->logger->debug(sprintf('%s is in fact a %s which %s',
+      $bb->name, blessed($bb), $bb->isa('Game::EvonyTKR::Model::Book') ? 'isa Game::EvonyTKR::Model::Book' : 'fails isa Game::EvonyTKR::Model::Book'));
     }
     $g->builtInBook($bb);
     $generals->{ $self->normalize($g->name) } = $g;
-    $self->logger->debug(sprintf('imported general %s.', $g->name));
+    $self->logger->debug(sprintf('returning general %s.', $g->name));
     return $g;
   }
 
@@ -118,7 +134,7 @@ class Game::EvonyTKR::External::Common : isa(Game::EvonyTKR::Shared::Constants)
       ));
     }
     $self->logger->info(sprintf(
-      'imported %s generals for task %s',
+      'loaded %s generals for task %s',
       scalar(keys $generals->%*), $taskName
     ));
   }

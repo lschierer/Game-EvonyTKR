@@ -8,6 +8,7 @@ use namespace::autoclean;
 package Game::EvonyTKR::Model::BasicAttribute {
   use Mojo::Base -base,                                  -signatures;
   use Mojo::Base 'Game::EvonyTKR::Role::BasicAttribute', -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Logger',         -role;
   use Carp;
   use List::AllUtils qw( any none );
   use Scalar::Util   qw(blessed);

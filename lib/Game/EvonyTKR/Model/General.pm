@@ -7,6 +7,7 @@ require UUID;
 package Game::EvonyTKR::Model::General {
   use Mojo::Base -base,                           -signatures;
   use Mojo::Base 'Game::EvonyTKR::Role::General', -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Logger',  -role;
   use JSON::PP;
   use UUID qw(uuid5);
   use File::FindLib 'lib';

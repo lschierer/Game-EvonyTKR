@@ -7,57 +7,104 @@ require Data::Printer;
 require Game::EvonyTKR::External::Common;
 
 package Game::EvonyTKR::External::General::Loader {
-  use Mojo::Base 'Game::EvonyTKR::External::JobBase', -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Role::Cache',       -role;
+  use Mojo::Base 'Game::EvonyTKR::External::JobBase',          -signatures;
+  use Mojo::Base 'Game::EvonyTKR::Role::Logger',               -role;
+  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Generals', -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Common',               -role;
   use Mojo::File;
   use experimental qw(class);
   use Carp;
 
-  my $logger;
-  my $cache;
-
   sub register ($taskClass, $app, $conf = {}) {
     $taskClass->SUPER::register($app, $conf);
-    $logger = Log::Log4perl->get_logger(__PACKAGE__);
-    $logger->debug('Registering pair workflow tasks');
+    $taskClass->logger->debug('Registering General Loader workflow tasks');
     $app->minion->add_task(load_general => __PACKAGE__);
-    $cache = $taskClass->create_cache({ namespace => 'generals:' });
+
     $app->plugins->emit(general_loader_job_ready => 1);
   }
 
   sub run ($job, @args) {
     $job->SUPER::run(@args);
+    $job->logger->debug(
+      sprintf('::General::Loader log level is %s',
+        Log::Log4perl::Level::to_level($job->logger->level()))
+    );
     my $params       = shift @args;
-    my $general_name = $params->{general_name};
-
-    my $index  = $params->{index};
+    my $general_name = $job->normalize($params->{general_name});
+    my $index        = $params->{index};
+    my @suffixlist   = ('.yaml', '.yml');
+    state $generalCache;
+    unless (
+      my $lock = $job->app->minion->guard(
+        "load_general: $general_name",
+        300, { limit => 1 }
+      )
+    ) {
+      $job->finish(sprintf(
+        'import for "%s" has already started; %s exiting.',
+        $general_name, $index
+      ));
+    }
     my $worker = Game::EvonyTKR::External::Common->new(app => $job->app,);
     my $collectionDir =
       Mojo::File->new($job->app->config('distDir'))->child('collections/data/');
     my $generalsDir = $collectionDir->child('generals');
-    my ($generalFile) =
-      $generalsDir->list_tree->grep(sub {qr/\.y\{a\}?ml$/})
-      ->grep(sub {qr/$general_name/i})
-      ->head(1)
-      ->each;
+    my ($generalFile) = $generalsDir->list->sort->grep(sub {
+      my $b = $job->normalize($_->basename(@suffixlist));
+      if ($_ =~ m/\.y[a]?ml$/ && $b eq $general_name) {
+        return 1;
+      }
+      return 0;
+    })->head(1)->each;
 
     unless ($generalFile) {
-      $logger->error("no file found for general with name $general_name");
-      return $job->finish("no file found for general with name $general_name");
+      $job->logger->error("no file found for general with name $general_name");
+      return $job->fail("no file found for general with name $general_name");
     }
-    my $general = $worker->load_single_general($generalFile, $index);
+    my $general;
+    $generalCache = $job->create_general_cache() unless defined($generalCache);
+    $general = $job->get_general($general_name,$generalCache);
+    if(defined($general) &&
+      ref($general) eq 'HASH' &&
+      blessed($general) && $general->isa('Game::EvonyTKR::Model::General')) {
+      my $result = sprintf('returning already loaded general %s', $general_name);
+      $job->logger->info($result);
+      return $job->finish($result);
+    }
+    $general = $worker->load_single_general($generalFile, $index);
     unless ($general) {
-      $logger->error(
-"No general returned by load_single_general for general with name $general_name"
+      my $result = sprintf(
+        'No general returned by load_single_general'
+          . ' for general with name "%s"',
+        $general_name
       );
-      return $job->finish(
-"No general returned by load_single_general for general with name $general_name"
-      );
+      $job->logger->error($result);
+      return $job->fail($result);
     }
-    my $generals = $job->app->get_generals($cache);
-    $generals->{ $general->normalize($general->name) } = $general;
-    $job->set_value($general->normalize($general->name), $general, $cache);
-    $logger->info(sprintf('general loaded: %s', $general->name));
-    return $job->finish(sprintf('general loaded: %s', $general->name));
+
+    $generalCache = $job->create_general_cache() unless defined($generalCache);
+    my $storeResult = $job->add_general($general->normalize($general->name),
+      $general, $generalCache);
+    my $result;
+    if (defined $storeResult && $storeResult eq '1') {
+      $result = sprintf('general cached: %s', $job->normalize($general->name));
+      $job->logger->info($result);
+    }
+    elsif (defined $storeResult && $storeResult eq '0') {
+      my $result = sprintf('add_general reports inability to set "%s"',
+        $job->normalize($general->name));
+      $job->logger->error($result);
+      return $job->info->fail($result);
+    }
+    else {
+      my $result = sprintf(
+        'add_general reports "%s" error setting "%s"',
+        defined $result ? $result : 'unknown',
+        $job->normalize($general->name)
+      );
+      $job->logger->error($result);
+      return $job->info->fail($result);
+    }
+    return $job->finish($result);
   }
 }

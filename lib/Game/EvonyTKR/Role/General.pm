@@ -29,7 +29,7 @@ package Game::EvonyTKR::Role::General {
       push @errors,
         sprintf('type must be one of %s', join(', ', @{ $self->GeneralKeys }));
     }
-    elsif(not $self->ValidateGeneralType($self->type)) {
+    elsif (not $self->ValidateGeneralType($self->type)) {
       push @errors, 'General Type Failed Validation';
     }
 
@@ -148,58 +148,3 @@ package Game::EvonyTKR::Role::General {
 1;
 
 __END__
-#ABSTRACT: how to store a General in memory
-
-=pod
-
-=head1 DESCRIPTION
-
-I am not doing true MVC because I am using yaml files as the persistence layer instead of a database.  This class stores a General in memory so that the Controller need not read
-in and parse the YAML every time.
-
-=cut
-
-=method new($name)
-
-Create an instance of a Model::General with name $name.
-
-=method name()
-
-returns the general's name.
-
-=cut
-
-=method type()
-
-returns the general's type, which must be one of the values from Game::EvonyTKR::Model::Data->GeneralKeys()
-
-=cut
-1;
-
-__END__
-#ABSTRACT: how to store a General in memory
-
-=pod
-
-=head1 DESCRIPTION
-
-I am not doing true MVC because I am using yaml files as the persistence layer instead of a database.  This class stores a General in memory so that the Controller need not read
-in and parse the YAML every time.
-
-=cut
-
-=method new($name)
-
-Create an instance of a Model::General with name $name.
-
-=method name()
-
-returns the general's name.
-
-=cut
-
-=method type()
-
-returns the general's type, which must be one of the values from Game::EvonyTKR::Model::Data->GeneralKeys()
-
-=cut
