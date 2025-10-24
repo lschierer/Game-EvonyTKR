@@ -73,13 +73,8 @@ package Game::EvonyTKR::Controller::Generals {
     } or do {
       say "Error in setup_helpers: $@";
     };
-    eval {
-      say 'calling setup_routes';
-      $c->setup_routes($app);
-      1;
-    } or do {
-      say "Error in setup_routes: $@";
-    };
+    say 'calling setup_routes';
+    $c->setup_routes($app);
 
     say sprintf('%s register complete', __PACKAGE__);
   }
@@ -245,12 +240,12 @@ package Game::EvonyTKR::Controller::Generals {
       # check that :uiTarget is a valid route, otherwise this becomes
       # too broad a match and prevents anything else from matching.
       $app->routes->add_condition(
-        is_valid_uiTarget => sub ($route, $c, $captures, $arg) {
+        is_valid_uiTarget => sub ($route, $controller, $captures, $arg) {
           my $ui = $captures->{uiTarget};
           # make this deterministic: compare exact left side of key
-          my $slug = $c->general_routing->_slugify($ui);
+          my $slug = $app->general_routing->_slugify($ui);
           my $ok   = 0;
-          for my $key (keys $c->general_routing->validRoutes->%*) {
+          for my $key (keys $app->general_routing->validRoutes->%*) {
             my ($left) = split /\|/, $key, 2;
             if ($left eq $slug) { $ok = 1; last }
           }
@@ -260,9 +255,9 @@ package Game::EvonyTKR::Controller::Generals {
 
       # check that :uiTarget/:buffActivation is a valid route combination
       $app->routes->add_condition(
-        is_valid_buffActivation => sub ($route, $c, $captures, $arg) {
+        is_valid_buffActivation => sub ($route, $controller, $captures, $arg) {
           my ($ui, $buff) = @$captures{qw(uiTarget buffActivation)};
-          my $ok = $c->general_routing->has_route($ui, $buff) ? 1 : 0;
+          my $ok = $app->general_routing->has_route($ui, $buff) ? 1 : 0;
           $c->logger->debug("check ui='$ui' buff='$buff' -> $ok");
           return $ok;    # never die here
         }

@@ -125,11 +125,8 @@ package Game::EvonyTKR::Role::Cache {
     @keys = grep {length} @keys;
     $self->logger->debug(sprintf('get_all_items found %s keys', scalar @keys));
     my $gmr = $client->get_multi(@keys);
-    $self->logger->debug(
-      sprintf(
-        'get_all_items get_multi returned %s items', scalar keys $gmr->%*
-      )
-    );
+    $self->logger->debug(sprintf('get_all_items get_multi returned %s items',
+      scalar keys $gmr->%*));
 
     if (scalar keys $gmr->%* == 0 && scalar @keys > 0) {
       my $key  = $keys[0];

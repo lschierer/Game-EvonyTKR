@@ -14,7 +14,7 @@ require Game::EvonyTKR::Model::Data;
 require Mojo::Util;
 require UUID;
 require Data::Printer;
-use namespace::clean;
+use namespace::autoclean;
 
 package Game::EvonyTKR::Controller::Pairs {
   use Mojo::Base 'Game::EvonyTKR::Controller::ControllerBase';
@@ -54,17 +54,34 @@ package Game::EvonyTKR::Controller::Pairs {
   }
 
   sub register($c, $app, $config = {}) {
-    $c->logger->info("Registering routes for " . ref($c));
     $c->SUPER::register($app, $config);
+    $c->logger->info("Registering routes for " . ref($c));
+
+    my $mainRoutes = $app->routes->any($base);
+
+    eval {
+      say "calling Pairs setup_event_handlers";
+      $c->setup_event_handlers($app);
+    } or do {
+      $c->logger->error('setup_event_handlers failed ' . $@);
+    };
+
+    eval {
+      $c->setup_routes($app);
+      1;
+    } or do {
+      say "route setup failed in Pairs controller";
+      $c->logger->error("route setup failed in Pairs controller");
+    };
 
     $app->helper(
       get_general_pairs => sub {
         return $c->getPairs();
       }
     );
+  }
 
-    my $mainRoutes = $app->routes->any($base);
-
+  sub setup_event_handlers ($c, $app) {
     $app->plugins->on(
       pairs_complete => sub {
         my $plugin = shift @_;
@@ -72,6 +89,7 @@ package Game::EvonyTKR::Controller::Pairs {
         $c->pair_receiver($app, @args);
       }
     );
+
     $app->plugins->on(
       pairs_by_type => sub {
         my $plugin = shift @_;
@@ -80,48 +98,96 @@ package Game::EvonyTKR::Controller::Pairs {
       }
     );
 
-    $app->plugins->on(
-      general_routing_available => sub {
-        $mainRoutes->get('/:uiTarget/:buffActivation/pair-comparison')->to(
-          controller => 'Pairs',
-          action     => 'pairTable',
-        )->name('General_dynamic_pairTable');
+  }
 
-        $mainRoutes->any(
-          ['GET', 'POST'] => '/:uiTarget/:buffActivation/pair/data.json')->to(
-          controller => 'Pairs',
-          action     => 'pairCatalog',
-          )->name('Generals_dynamic_pairCatalog');
+  sub setup_routes ($c, $app,) {
+    say 'starting setup routes for Pairs';
+    my @parts = split '::', __PACKAGE__;
+    my $general_routing;
 
-        $mainRoutes->get('/:uiTarget/:buffActivation/pair-details-stream')->to(
-          controller => 'Pairs',
-          action     => 'stream_pair_details',
-        )->name('Generals_dynamic_pairDetails');
+    my $controller_name = $parts[$#parts] // 'unknown_controller';
 
-        foreach my $route ($app->general_routing->all_valid_routes()) {
-          $c->logger->debug("building nav items for "
-              . $route->{uiTarget} . "|"
-              . $route->{buffActivation});
-          my $printableUI = $route->{uiTarget} =~ s/-/ /rg;
+    $c->logger->debug("got controller_name $controller_name.");
+    my $mainRoutes = $app->routes->any($base);
 
-          # Add pair comparison navigation item if applicable
-          if ($route->{has_pairs}) {
-            my $pair_path = sprintf('/Generals/%s/%s/pair-comparison',
-              $route->{uiTarget}, $route->{buffActivation});
-            $app->add_navigation_item({
-              title => sprintf(
-                '%s %s Pair Comparison',
-                $printableUI, $route->{buffActivation}
-              ),
-              path   => $pair_path,
-              parent => sprintf('/Generals/%s/%s',
-                $route->{uiTarget}, $route->{buffActivation}),
-              order => 50 + ($route->{order} || 0),
-            });
+    if (defined($app->renderer->helpers->{general_routing})) {
+      $general_routing = $app->general_routing;
+    }
+    else {
+      $c->logger->debug('general_routing not available yet');
+    }
+    state $retryCount = 0;
+    unless (defined($general_routing)) {
+      my $grerror =
+        'General Routing Object not available in Pairs setup_routes';
+      say $grerror;
+      $c->logger->error($grerror);
+      my $delay = 1 + rand($retryCount);
+      if ($retryCount++ < 100) {
+        Mojo::IOLoop->delay(
+          $delay => sub {
+            $c->setup_routes($app);
           }
-        }
+        );
       }
-    );
+      return;
+    }
+
+    eval {
+      $mainRoutes->get('/:uiTarget/:buffActivation/pair-comparison')->to(
+        controller => 'Pairs',
+        action     => 'pairTable',
+      )->name('General_dynamic_pairTable');
+      1;
+    } or do {
+      $c->logger->error('failed to set up General_dynamic_pairTable');
+    };
+
+    eval {
+      $mainRoutes->any(
+        ['GET', 'POST'] => '/:uiTarget/:buffActivation/pair/data.json')->to(
+        controller => 'Pairs',
+        action     => 'pairCatalog',
+        )->name('Generals_dynamic_pairCatalog');
+      1;
+    } or do {
+      $c->logger->error('failed to set up Generals_dynamic_pairCatalog');
+    };
+
+    eval {
+      $mainRoutes->get('/:uiTarget/:buffActivation/pair-details-stream')->to(
+        controller => 'Pairs',
+        action     => 'stream_pair_details',
+      )->name('Generals_dynamic_pairDetails');
+      1;
+    } or do {
+      $c->logger->error('failed to set up Generals_dynamic_pairDetails');
+    };
+
+    foreach my $route ($general_routing->all_valid_routes()) {
+      $c->logger->debug("building nav items for "
+          . $route->{uiTarget} . "|"
+          . $route->{buffActivation});
+      my $printableUI = $route->{uiTarget} =~ s/-/ /rg;
+
+      # Add pair comparison navigation item if applicable
+      if ($route->{has_pairs}) {
+        my $pair_path = sprintf('/Generals/%s/%s/pair-comparison',
+          $route->{uiTarget}, $route->{buffActivation});
+
+        $app->add_navigation_item({
+          title => sprintf(
+            '%s %s Pair Comparison',
+            $printableUI, $route->{buffActivation}
+          ),
+          path   => $pair_path,
+          parent => sprintf('/Generals/%s/%s',
+            $route->{uiTarget}, $route->{buffActivation}),
+          order => 50 + ($route->{order} || 0),
+        });
+        $c->logger->debug(sprintf('built route %s',));
+      }
+    }
   }
 
   sub pair_receiver ($c, $app, @args) {
