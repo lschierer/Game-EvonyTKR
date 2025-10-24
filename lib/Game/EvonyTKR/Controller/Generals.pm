@@ -200,7 +200,7 @@ package Game::EvonyTKR::Controller::Generals {
       general_routing_available => sub {
         say 'general_routing_available signal recieved';
         $c->logger->debug('general_routing_available signal recieved');
-        my $delay = 10;
+        my $delay = 2;
         Mojo::IOLoop->timer(
           $delay => sub {
             say "$delay second timer complete";

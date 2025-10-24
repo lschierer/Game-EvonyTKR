@@ -31,9 +31,14 @@
               <% foreach my $buff (@{ $item->ascending->{$level}->{buffs} }) { %>
                 <dl>
                   <dt>Attribute: </dt><dd><%= $buff->attribute %></dd>
-                  <% if ( length $buff->targetedType  > 0 ) { %>
-                      <dt>Troop Type: </dt>
-                      <dd><%= $buff->targetedType %></dd>
+                  <% if (defined($buff->targetedType) && Scalar::Util::reftype($buff->targetedType) ) { %>
+                    <dt>Troop Types: </dt>
+                    <% foreach my $tt ($buff->targetedType->@*) { %>
+                      <dd><%= $tt %></dd>
+                    <% } %>
+                  <% } elsif (defined($buff->targetedType) && length $buff->targetedType  > 0 ) { %>
+                    <dt>Troop Type: </dt>
+                    <dd><%= $buff->targetedType %></dd>
                   <% } %>
                   <% if ( scalar @{$buff->conditions()} ) { %>
                     <dt>Condition(s): </dt>
