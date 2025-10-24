@@ -112,12 +112,9 @@ package Game::EvonyTKR {
 
         $self->plugin('Game::EvonyTKR::Plugins::Markdown');
         # Navigation
-        eval {
-          $self->plugin('Game::EvonyTKR::Plugins::Navigation');
-        } or do {
+        eval { $self->plugin('Game::EvonyTKR::Plugins::Navigation'); } or do {
           $l4p->logcroak('Failed to load Navigation Plugin');
         };
-
 
         my @controllerplugins = find_modules 'Game::EvonyTKR::Controller';
         foreach my $module (@controllerplugins) {
@@ -125,7 +122,7 @@ package Game::EvonyTKR {
             load_class $module;
             $self->plugin($module);
           };
-          if($@){
+          if ($@) {
             print STDERR "Error caught loading module: $@";
             $l4p->logcroak("loading module '$module' failed: $@");
           }

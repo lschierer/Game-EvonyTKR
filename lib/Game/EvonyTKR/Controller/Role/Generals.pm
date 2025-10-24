@@ -59,8 +59,8 @@ package Game::EvonyTKR::Controller::Role::Generals {
         && $general->isa('Game::EvonyTKR::Model::General')
         && $general->name eq $name) {
         $self->logger->error(sprintf(
-        'retrieved unexpected general: expected: '.
-        '"%s" ne recieved: "%s" - a %s',
+          'retrieved unexpected general: expected: '
+            . '"%s" ne recieved: "%s" - a %s',
           $name, $general->name, blessed($general)
         ));
         return;

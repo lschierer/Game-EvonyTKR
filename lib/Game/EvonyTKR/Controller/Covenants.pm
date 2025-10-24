@@ -26,35 +26,34 @@ package Game::EvonyTKR::Controller::Covenants {
 
   my $base = '/Reference/Covenants';
 
- ## in part because parent classes use this to override different values of $base
- sub getBase($self) {
-   $base =~ s{/$}{};
-   return $base;
- }
+  ## in part because parent classes use this to override different values of $base
+  sub getBase($self) {
+    $base =~ s{/$}{};
+    return $base;
+  }
 
- sub get_all_covenants {
-   state %convenants;
-   return \%convenants;
- }
+  sub get_all_covenants {
+    state %convenants;
+    return \%convenants;
+  }
 
- sub get_covenant_by_name ($c, $name) {
-   my $nn = $c->normalize($name);
-   my $cov = $c->get_all_covenants->{$nn};
-   unless($cov){
-     $c->logger->warn(sprintf('no covenant found for %s normalized to %s',
-     $name, $nn));
-   }
-   return $cov;
- }
+  sub get_covenant_by_name ($c, $name) {
+    my $nn  = $c->normalize($name);
+    my $cov = $c->get_all_covenants->{$nn};
+    unless ($cov) {
+      $c->logger->warn(sprintf(
+        'no covenant found for %s normalized to %s', $name, $nn));
+    }
+    return $cov;
+  }
 
   # Register this when the application starts
   sub register($c, $app, $config = {}) {
     $c->SUPER::register($app, $config);
     say sprintf('Registering routes for %s', __PACKAGE__);
-      $c->logger->info(sprintf('Registering routes for %s', __PACKAGE__));
+    $c->logger->info(sprintf('Registering routes for %s', __PACKAGE__));
 
-
-    eval{
+    eval {
       say sprintf('setup_helpers for %s', __PACKAGE__);
       $c->setup_helpers($app);
       1;
@@ -68,18 +67,21 @@ package Game::EvonyTKR::Controller::Covenants {
       say sprintf('setup_routes for %s', __PACKAGE__);
       $c->setup_routes($app);
       1;
-    }or do {
+    } or do {
       my $em = sprintf('setup_routes failed in %s', __PACKAGE__);
       $c->logger->error($em);
       say $em;
     };
 
     eval {
-      $generalCache = $c->create_general_cache() unless(defined($generalCache));
+      $generalCache = $c->create_general_cache()
+        unless (defined($generalCache));
 
-      Mojo::IOLoop->timer(1 => sub{
-        $c->load_covenants($app);
-      });
+      Mojo::IOLoop->timer(
+        1 => sub {
+          $c->load_covenants($app);
+        }
+      );
       1;
     } or do {
       $c->logger->error('load covenants setup failed in register');
@@ -128,7 +130,7 @@ package Game::EvonyTKR::Controller::Covenants {
     );
   }
 
-  sub setup_helpers($c, $app){
+  sub setup_helpers($c, $app) {
     $app->helper(
       get_all_covenants => sub {
         return $c->get_all_covenants();
@@ -189,21 +191,28 @@ package Game::EvonyTKR::Controller::Covenants {
   sub load_covenants ($c, $app) {
     my $expectedTotal = 0;
 
-    my $generals = $c->get_generals($generalCache) // {};
-    my $generalCount = $c->get_value('generalCount', $generalCache) // -1;
+    my $generals      = $c->get_generals($generalCache)              // {};
+    my $generalCount  = $c->get_value('generalCount', $generalCache) // -1;
     my $recievedCount = scalar keys $generals->%*;
     state $retryCount = 0;
-    unless($recievedCount >= $generalCount){
+    unless ($recievedCount >= $generalCount) {
       my $delay = 10 * rand($retryCount);
-      if($retryCount++ < 100){
-        $c->logger->info(sprintf('rc generals: %s; gc generals: %s.  delaying load_covenants by %s, %s retry',
-        $recievedCount, $generalCount, $delay, $retryCount));
-        Mojo::IOLoop->timer($delay => sub {
-          $c->load_covenants($app);
-        });
-      } else {
-        $c->logger->error(sprintf('rc generals: %s; gc generals: %s.  max retries hit, failing to load covenants.',
-        $recievedCount, $generalCount,));
+      if ($retryCount++ < 100) {
+        $c->logger->info(sprintf(
+'rc generals: %s; gc generals: %s.  delaying load_covenants by %s, %s retry',
+          $recievedCount, $generalCount, $delay, $retryCount
+        ));
+        Mojo::IOLoop->timer(
+          $delay => sub {
+            $c->load_covenants($app);
+          }
+        );
+      }
+      else {
+        $c->logger->error(sprintf(
+'rc generals: %s; gc generals: %s.  max retries hit, failing to load covenants.',
+          $recievedCount, $generalCount,
+        ));
       }
       return;
     }
