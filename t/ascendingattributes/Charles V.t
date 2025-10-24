@@ -45,9 +45,9 @@ subtest 'Charles V Ascending Attributes' => sub {
       match_buff(
         $hb,
         attribute  => 'Attack',
-        class     => 'Ground Troops',
+        class      => 'Ground Troops',
         value      => 15,
-        conditions => [ ]
+        conditions => []
       ),
       '15% Ground Troops Attack buff ()'
     );

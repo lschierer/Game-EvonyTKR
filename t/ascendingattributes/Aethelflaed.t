@@ -35,8 +35,9 @@ diag 'start of Aethelflaed Ascending Attributes';
 subtest 'Aethelflaed Ascending Attributes' => sub {
 
   subtest '1 Star' => sub {
-    my $text = 'When attacking Monsters, Mounted Troop HP +30%, Troops Defense +10%.';
-    my $hb   = testText($text);
+    my $text =
+      'When attacking Monsters, Mounted Troop HP +30%, Troops Defense +10%.';
+    my $hb = testText($text);
 
     is scalar(@{$hb}), 2, "Final Buff Count";
 
@@ -65,8 +66,9 @@ subtest 'Aethelflaed Ascending Attributes' => sub {
   };
 
   subtest '2 Star' => sub {
-    my $text = 'When attacking Monsters, Monsters Defense -10%, Troops HP +15%.';
-    my $hb   = testText($text);
+    my $text =
+      'When attacking Monsters, Monsters Defense -10%, Troops HP +15%.';
+    my $hb = testText($text);
 
     is scalar(@{$hb}), 2, "Final Buff Count";
 
@@ -94,8 +96,9 @@ subtest 'Aethelflaed Ascending Attributes' => sub {
   };
 
   subtest '3 Star' => sub {
-    my $text = 'When attacking Monsters, Monsters Attack -10%, Troops Defense +20%.';
-    my $hb   = testText($text);
+    my $text =
+      'When attacking Monsters, Monsters Attack -10%, Troops Defense +20%.';
+    my $hb = testText($text);
 
     is scalar(@{$hb}), 2, "Final Buff Count";
 
@@ -123,8 +126,9 @@ subtest 'Aethelflaed Ascending Attributes' => sub {
   };
 
   subtest '4 Star' => sub {
-    my $text = 'When attacking Monsters, Mounted Troop Attack +15%, Troops HP +20%.';
-    my $hb   = testText($text);
+    my $text =
+      'When attacking Monsters, Mounted Troop Attack +15%, Troops HP +20%.';
+    my $hb = testText($text);
 
     is scalar(@{$hb}), 2, "Final Buff Count";
 
@@ -153,8 +157,9 @@ subtest 'Aethelflaed Ascending Attributes' => sub {
   };
 
   subtest '5 Star' => sub {
-    my $text = 'When attacking Monsters, Mounted Troop Attack +20%, Troops Defense and HP +10%.';
-    my $hb   = testText($text);
+    my $text =
+'When attacking Monsters, Mounted Troop Attack +20%, Troops Defense and HP +10%.';
+    my $hb = testText($text);
 
     is scalar(@{$hb}), 3, "Final Buff Count";
 

@@ -17,12 +17,13 @@ use Log::Log4perl qw(:levels);
 #Log::Log4perl->easy_init($DEBUG);  #
 
 my $loggerConfig = Game::EvonyTKR::Logger::Config->new('test');
-my $logConfig = Path::Tiny->cwd()->child('share/log4perl.test.conf ');
+my $logConfig    = Path::Tiny->cwd()->child('share/log4perl.test.conf ');
 say $logConfig->absolute();
 Log::Log4perl::init($logConfig->canonpath());
 
 my $parser = Game::EvonyTKR::Shared::Parser->new();
-$parser->logger->level($DEBUG);   # <-- tried each solution with and without this line
+$parser->logger->level($DEBUG)
+  ;    # <-- tried each solution with and without this line
 $parser->generate_grammar();
 
 use List::MoreUtils qw(uniq);
@@ -32,19 +33,20 @@ use List::MoreUtils qw(uniq);
 
 diag 'start of Hero of the Union Navy Skill Book';
 subtest 'Hero of the Union Navy Skill Book' => sub {
-  my $text = "Reduces enemy ranged troops and siege machines’ attack by 10% and enemy ground troops and mounted troops’ defense by 20% when General is leading the army.";
+  my $text =
+"Reduces enemy ranged troops and siege machines’ attack by 10% and enemy ground troops and mounted troops’ defense by 20% when General is leading the army.";
 
-  my $hb   = testText($text);
+  my $hb = testText($text);
 
   is scalar(@{$hb}), 4, "Final Buff Count";
 
   ok(
     match_buff(
       $hb,
-      attribute   => 'Attack',
-      class       => 'Ranged Troops',
-      value       => 10,
-      conditions  => ['Enemy', 'leading the army']
+      attribute  => 'Attack',
+      class      => 'Ranged Troops',
+      value      => 10,
+      conditions => ['Enemy', 'leading the army']
     ),
     '10% Ranged Troops Attack debuff (Enemny leading the army)'
   );
@@ -52,10 +54,10 @@ subtest 'Hero of the Union Navy Skill Book' => sub {
   ok(
     match_buff(
       $hb,
-      attribute   => 'Attack',
-      class       => 'Siege Machines',
-      value       => 10,
-      conditions  => ['Enemy', 'leading the army']
+      attribute  => 'Attack',
+      class      => 'Siege Machines',
+      value      => 10,
+      conditions => ['Enemy', 'leading the army']
     ),
     '10% Siege Machines Attack debuff (Enemny leading the army)'
   );
@@ -63,10 +65,10 @@ subtest 'Hero of the Union Navy Skill Book' => sub {
   ok(
     match_buff(
       $hb,
-      attribute   => 'Defense',
-      class       => "Ground Troops",
-      value       => 20,
-      conditions  => ['Enemy', 'leading the army']
+      attribute  => 'Defense',
+      class      => "Ground Troops",
+      value      => 20,
+      conditions => ['Enemy', 'leading the army']
     ),
     "20% Ground Troops Defense buff ('Enemy', 'leading the army')"
   );
@@ -74,10 +76,10 @@ subtest 'Hero of the Union Navy Skill Book' => sub {
   ok(
     match_buff(
       $hb,
-      attribute   => 'Defense',
-      class       => "Mounted Troops",
-      value       => 20,
-      conditions  => ['Enemy', 'leading the army']
+      attribute  => 'Defense',
+      class      => "Mounted Troops",
+      value      => 20,
+      conditions => ['Enemy', 'leading the army']
     ),
     "20% Mounted Troops Defense buff ('Enemy', 'leading the army')"
   );

@@ -44,9 +44,9 @@ subtest 'Gonzalo Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute  => 'Attack',
-        value      => 10,
-        class      => 'Ranged Troops',
+        attribute => 'Attack',
+        value     => 10,
+        class     => 'Ranged Troops',
       ),
       '10% Ranged Troops Attack buff ()'
     );
@@ -54,9 +54,9 @@ subtest 'Gonzalo Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute  => 'Defense',
-        value      => 10,
-        class      => 'Ranged Troops',
+        attribute => 'Defense',
+        value     => 10,
+        class     => 'Ranged Troops',
       ),
       '10% Ranged Troops Defense buff ()'
     );
@@ -65,17 +65,18 @@ subtest 'Gonzalo Ascending Attributes' => sub {
   };
 
   subtest '3 Star' => sub {
-    my $text = 'Ranged Troop and Siege Machine Attack +15%, Ranged Troop HP +15%';
-    my $hb   = testText($text);
+    my $text =
+      'Ranged Troop and Siege Machine Attack +15%, Ranged Troop HP +15%';
+    my $hb = testText($text);
 
     is scalar(@{$hb}), 3, "Final Buff Count";
 
     ok(
       match_buff(
         $hb,
-        attribute   => 'Attack',
-        class       => 'Siege Machines',
-        value       => 15,
+        attribute => 'Attack',
+        class     => 'Siege Machines',
+        value     => 15,
       ),
       '15% Siege Machines Attack buff ()'
     );
@@ -83,9 +84,9 @@ subtest 'Gonzalo Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute   => 'Attack',
-        class       => 'Ranged Troops',
-        value       => 15,
+        attribute => 'Attack',
+        class     => 'Ranged Troops',
+        value     => 15,
       ),
       '15% Ranged Troops Attack buff ()'
     );
@@ -93,9 +94,9 @@ subtest 'Gonzalo Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute   => 'HP',
-        class       => 'Ranged Troops',
-        value       => 15,
+        attribute => 'HP',
+        class     => 'Ranged Troops',
+        value     => 15,
       ),
       '15% Ranged Troops HP buff ()'
     );
@@ -112,9 +113,9 @@ subtest 'Gonzalo Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute  => 'Defense',
-        value      => 15,
-        class      => 'Ranged Troops',
+        attribute => 'Defense',
+        value     => 15,
+        class     => 'Ranged Troops',
       ),
       '15% Ranged Troops Defense buff ()'
     );
@@ -122,9 +123,9 @@ subtest 'Gonzalo Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute  => 'Defense',
-        value      => 15,
-        class      => 'Siege Machines',
+        attribute => 'Defense',
+        value     => 15,
+        class     => 'Siege Machines',
       ),
       '15% Siege Machines Defense buff ()'
     );
@@ -132,9 +133,9 @@ subtest 'Gonzalo Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute  => 'HP',
-        value      => 15,
-        class      => 'Ranged Troops',
+        attribute => 'HP',
+        value     => 15,
+        class     => 'Ranged Troops',
       ),
       '15% Ranged Troops HP buff ()'
     );
@@ -142,9 +143,9 @@ subtest 'Gonzalo Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute  => 'HP',
-        value      => 15,
-        class      => 'Siege Machines',
+        attribute => 'HP',
+        value     => 15,
+        class     => 'Siege Machines',
       ),
       '15% Siege Machines HP buff ()'
     );
@@ -161,9 +162,9 @@ subtest 'Gonzalo Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute  => 'Attack',
-        value      => 40,
-        class      => 'Ranged Troops',
+        attribute => 'Attack',
+        value     => 40,
+        class     => 'Ranged Troops',
       ),
       '40% Ranged Troops Attack buff ()'
     );
@@ -171,9 +172,9 @@ subtest 'Gonzalo Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute  => 'Defense',
-        value      => 40,
-        class      => 'Ranged Troops',
+        attribute => 'Defense',
+        value     => 40,
+        class     => 'Ranged Troops',
       ),
       '40% Ranged Troops Defense buff ()'
     );

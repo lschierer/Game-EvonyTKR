@@ -17,12 +17,13 @@ use Log::Log4perl qw(:levels);
 #Log::Log4perl->easy_init($DEBUG);  #
 
 my $loggerConfig = Game::EvonyTKR::Logger::Config->new('test');
-my $logConfig = Path::Tiny->cwd()->child('share/log4perl.test.conf ');
+my $logConfig    = Path::Tiny->cwd()->child('share/log4perl.test.conf ');
 say $logConfig->absolute();
 Log::Log4perl::init($logConfig->canonpath());
 
 my $parser = Game::EvonyTKR::Shared::Parser->new();
-$parser->logger->level($DEBUG);   # <-- tried each solution with and without this line
+$parser->logger->level($DEBUG)
+  ;    # <-- tried each solution with and without this line
 $parser->generate_grammar();
 
 use List::MoreUtils qw(uniq);
@@ -32,7 +33,8 @@ use List::MoreUtils qw(uniq);
 
 diag 'start of Old Hickory Skill Book';
 subtest 'Old Hickory Skill Book' => sub {
-  my $text = "Reduces enemy ranged troops’ attack by 20% and mounted troops’ HP by 20% when General is leading the army.";
+  my $text =
+"Reduces enemy ranged troops’ attack by 20% and mounted troops’ HP by 20% when General is leading the army.";
 
   my @fragments = $parser->tokenize_buffs($text);
   my @hashedBuffs;
@@ -44,19 +46,19 @@ subtest 'Old Hickory Skill Book' => sub {
     push(@hashedBuffs, @nb);
   }
   diag "hashedBuffs is " . ref @hashedBuffs;
-    diag "hashedBuffs size " . scalar(@hashedBuffs);
-    for my $i (0 .. $#hashedBuffs) {
-        diag "hashedBuffs[$i] = " . Data::Printer::np($hashedBuffs[$i]);
-    }
-    is scalar(@hashedBuffs), 2, 'Parsed 2 Old Hickory buffs';
+  diag "hashedBuffs size " . scalar(@hashedBuffs);
+  for my $i (0 .. $#hashedBuffs) {
+    diag "hashedBuffs[$i] = " . Data::Printer::np($hashedBuffs[$i]);
+  }
+  is scalar(@hashedBuffs), 2, 'Parsed 2 Old Hickory buffs';
 
   ok(
     match_buff(
       \@hashedBuffs,
-      attribute   => 'Attack',
-      value       => 20,
-      class       => 'Ranged Troops',
-      conditions  => ['Enemy','leading the army']
+      attribute  => 'Attack',
+      value      => 20,
+      class      => 'Ranged Troops',
+      conditions => ['Enemy', 'leading the army']
     ),
     '20% Ranged Troop Attack debuff (leading the army)'
   );
@@ -64,10 +66,10 @@ subtest 'Old Hickory Skill Book' => sub {
   ok(
     match_buff(
       \@hashedBuffs,
-      attribute   => 'HP',
-      value       => 20,
-      class       => 'Mounted Troops',
-      conditions  => ['Enemy','leading the army']
+      attribute  => 'HP',
+      value      => 20,
+      class      => 'Mounted Troops',
+      conditions => ['Enemy', 'leading the army']
     ),
     '20% Mounted Troop HP debuff (leading the army)'
   );

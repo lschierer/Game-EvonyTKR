@@ -44,8 +44,8 @@ subtest 'Dmitry Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute  => 'March Size',
-        value      => 10,
+        attribute => 'March Size',
+        value     => 10,
       ),
       '10% March Size buff ()'
     );
@@ -54,8 +54,9 @@ subtest 'Dmitry Ascending Attributes' => sub {
   };
 
   subtest '5 Star' => sub {
-    my $text = 'Reinforcing Ranged Troop Attack +15%, Reinforcing Ground Troop Defense and HP +15%';
-    my $hb   = testText($text);
+    my $text =
+'Reinforcing Ranged Troop Attack +15%, Reinforcing Ground Troop Defense and HP +15%';
+    my $hb = testText($text);
 
     is scalar(@{$hb}), 3, "Final Buff Count";
     # (2 troops × 2 attributes)
@@ -63,9 +64,9 @@ subtest 'Dmitry Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute  => 'Attack',
-        value      => 15,
-        class      => 'Ranged Troops',
+        attribute => 'Attack',
+        value     => 15,
+        class     => 'Ranged Troops',
         condition => ['Reinforcing']
       ),
       '15% Ranged Troops Attack buff (Reinforcing)'
@@ -74,9 +75,9 @@ subtest 'Dmitry Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute  => 'Defense',
-        value      => 15,
-        class      => 'Ground Troops',
+        attribute => 'Defense',
+        value     => 15,
+        class     => 'Ground Troops',
         condition => ['Reinforcing']
       ),
       '15% Ground Troops Defense buff (Reinforcing)'
@@ -85,9 +86,9 @@ subtest 'Dmitry Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute  => 'HP',
-        value      => 15,
-        class      => 'Ground Troops',
+        attribute => 'HP',
+        value     => 15,
+        class     => 'Ground Troops',
         condition => ['Reinforcing']
       ),
       '15% Ground Troops HP buff (Reinforcing)'

@@ -61,8 +61,7 @@ class BuffSummarizerTest : isa(Game::EvonyTKR::Shared::Constants) {
     $ascendingAttributesManager =
       Game::EvonyTKR::Model::AscendingAttributes::Manager->new();
     $covenantManager =
-      Game::EvonyTKR::Model::Covenant::Manager->new(rootManager => $self,
-      );
+      Game::EvonyTKR::Model::Covenant::Manager->new(rootManager => $self,);
   }
 
   method generalManager()              { return $generalManager; }
@@ -154,9 +153,9 @@ subtest "Marco Polo with all values set to 'none'" => sub {
     $summarizer->buffValues->{'Ground Troops'},
     {
       'March Size' => 12,
-      'Attack'              => 25,
-      'Defense'             => 25,
-      'HP'                  => 25
+      'Attack'     => 25,
+      'Defense'    => 25,
+      'HP'         => 25
     },
     "Ground troop buffs should match expected values"
   );
@@ -165,9 +164,9 @@ subtest "Marco Polo with all values set to 'none'" => sub {
     $summarizer->buffValues->{'Mounted Troops'},
     {
       'March Size' => 12,
-      'Attack'              => 70,
-      'Defense'             => 65,
-      'HP'                  => 65
+      'Attack'     => 70,
+      'Defense'    => 65,
+      'HP'         => 65
     },
     "Mounted troop buffs should match expected values"
   );
@@ -176,9 +175,9 @@ subtest "Marco Polo with all values set to 'none'" => sub {
     $summarizer->buffValues->{'Ranged Troops'},
     {
       'March Size' => 12,
-      'Attack'              => 25,
-      'Defense'             => 25,
-      'HP'                  => 25
+      'Attack'     => 25,
+      'Defense'    => 25,
+      'HP'         => 25
     },
     "Ranged troop buffs should match expected values"
   );
@@ -187,9 +186,9 @@ subtest "Marco Polo with all values set to 'none'" => sub {
     $summarizer->buffValues->{'Siege Machines'},
     {
       'March Size' => 12,
-      'Attack'              => 25,
-      'Defense'             => 25,
-      'HP'                  => 25
+      'Attack'     => 25,
+      'Defense'    => 25,
+      'HP'         => 25
     },
     "Siege Machines buffs should match expected values"
   );
@@ -233,9 +232,9 @@ subtest "Aethelflaed with all values set to 'none'" => sub {
     $summarizer->buffValues->{'Ground Troops'},
     {
       'March Size' => 12,
-      'Attack'              => 70,
-      'Defense'             => 70,
-      'HP'                  => 70
+      'Attack'     => 70,
+      'Defense'    => 70,
+      'HP'         => 70
     },
     "Ground troop buffs should match expected values"
   );
@@ -244,9 +243,9 @@ subtest "Aethelflaed with all values set to 'none'" => sub {
     $summarizer->buffValues->{'Mounted Troops'},
     {
       'March Size' => 12,
-      'Attack'              => 80,
-      'Defense'             => 125,
-      'HP'                  => 70
+      'Attack'     => 80,
+      'Defense'    => 125,
+      'HP'         => 70
     },
     "Mounted troop buffs should match expected values"
   );
@@ -255,9 +254,9 @@ subtest "Aethelflaed with all values set to 'none'" => sub {
     $summarizer->buffValues->{'Ranged Troops'},
     {
       'March Size' => 12,
-      'Attack'              => 70,
-      'Defense'             => 70,
-      'HP'                  => 70
+      'Attack'     => 70,
+      'Defense'    => 70,
+      'HP'         => 70
     },
     "Ranged troop buffs should match expected values"
   );
@@ -266,9 +265,9 @@ subtest "Aethelflaed with all values set to 'none'" => sub {
     $summarizer->buffValues->{'Siege Machines'},
     {
       'March Size' => 12,
-      'Attack'              => 70,
-      'Defense'             => 70,
-      'HP'                  => 70
+      'Attack'     => 70,
+      'Defense'    => 70,
+      'HP'         => 70
     },
     "Siege Machines buffs should match expected values"
   );
@@ -315,9 +314,9 @@ subtest "Marco Polo with Red1 ascending, all else none" => sub {
     $summarizer->buffValues->{'Ground Troops'},
     {
       'March Size' => 12,
-      'Attack'              => 25,
-      'Defense'             => 25,
-      'HP'                  => 25
+      'Attack'     => 25,
+      'Defense'    => 25,
+      'HP'         => 25
     },
     "Ground troop buffs should match expected values"
   );
@@ -326,9 +325,9 @@ subtest "Marco Polo with Red1 ascending, all else none" => sub {
     $summarizer->buffValues->{'Mounted Troops'},
     {
       'March Size' => 12,
-      'Attack'              => 95,
-      'Defense'             => 65,
-      'HP'                  => 80
+      'Attack'     => 95,
+      'Defense'    => 65,
+      'HP'         => 80
     },
     "Mounted troop buffs should match expected values"
   );
@@ -337,9 +336,9 @@ subtest "Marco Polo with Red1 ascending, all else none" => sub {
     $summarizer->buffValues->{'Ranged Troops'},
     {
       'March Size' => 12,
-      'Attack'              => 25,
-      'Defense'             => 25,
-      'HP'                  => 25
+      'Attack'     => 25,
+      'Defense'    => 25,
+      'HP'         => 25
     },
     "Ranged troop buffs should match expected values"
   );
@@ -348,9 +347,9 @@ subtest "Marco Polo with Red1 ascending, all else none" => sub {
     $summarizer->buffValues->{'Siege Machines'},
     {
       'March Size' => 12,
-      'Attack'              => 25,
-      'Defense'             => 25,
-      'HP'                  => 25
+      'Attack'     => 25,
+      'Defense'    => 25,
+      'HP'         => 25
     },
     "Siege Machines buffs should match expected values"
   );
@@ -394,9 +393,9 @@ subtest "Marco Polo with Red2 ascending, all else none" => sub {
     $summarizer->buffValues->{'Ground Troops'},
     {
       'March Size' => 12,
-      'Attack'              => 25,
-      'Defense'             => 25,
-      'HP'                  => 25
+      'Attack'     => 25,
+      'Defense'    => 25,
+      'HP'         => 25
     },
     "Ground troop buffs should match expected values"
   );
@@ -405,9 +404,9 @@ subtest "Marco Polo with Red2 ascending, all else none" => sub {
     $summarizer->buffValues->{'Mounted Troops'},
     {
       'March Size' => 12,
-      'Attack'              => 95,
-      'Defense'             => 65,
-      'HP'                  => 80
+      'Attack'     => 95,
+      'Defense'    => 65,
+      'HP'         => 80
     },
     "Mounted troop buffs should match expected values"
   );
@@ -416,9 +415,9 @@ subtest "Marco Polo with Red2 ascending, all else none" => sub {
     $summarizer->buffValues->{'Ranged Troops'},
     {
       'March Size' => 12,
-      'Attack'              => 25,
-      'Defense'             => 25,
-      'HP'                  => 25
+      'Attack'     => 25,
+      'Defense'    => 25,
+      'HP'         => 25
     },
     "Ranged troop buffs should match expected values"
   );
@@ -427,9 +426,9 @@ subtest "Marco Polo with Red2 ascending, all else none" => sub {
     $summarizer->buffValues->{'Siege Machines'},
     {
       'March Size' => 12,
-      'Attack'              => 25,
-      'Defense'             => 25,
-      'HP'                  => 25
+      'Attack'     => 25,
+      'Defense'    => 25,
+      'HP'         => 25
     },
     "Siege Machines buffs should match expected values"
   );
@@ -473,9 +472,9 @@ subtest "Marco Polo with Red3 ascending, all else none" => sub {
     $summarizer->buffValues->{'Ground Troops'},
     {
       'March Size' => 20,
-      'Attack'              => 25,
-      'Defense'             => 25,
-      'HP'                  => 25
+      'Attack'     => 25,
+      'Defense'    => 25,
+      'HP'         => 25
     },
     "Ground troop buffs should match expected values"
   );
@@ -484,9 +483,9 @@ subtest "Marco Polo with Red3 ascending, all else none" => sub {
     $summarizer->buffValues->{'Mounted Troops'},
     {
       'March Size' => 20,
-      'Attack'              => 125,
-      'Defense'             => 65,
-      'HP'                  => 80
+      'Attack'     => 125,
+      'Defense'    => 65,
+      'HP'         => 80
     },
     "Mounted troop buffs should match expected values"
   );
@@ -495,9 +494,9 @@ subtest "Marco Polo with Red3 ascending, all else none" => sub {
     $summarizer->buffValues->{'Ranged Troops'},
     {
       'March Size' => 20,
-      'Attack'              => 25,
-      'Defense'             => 25,
-      'HP'                  => 25
+      'Attack'     => 25,
+      'Defense'    => 25,
+      'HP'         => 25
     },
     "Ranged troop buffs should match expected values"
   );
@@ -506,9 +505,9 @@ subtest "Marco Polo with Red3 ascending, all else none" => sub {
     $summarizer->buffValues->{'Siege Machines'},
     {
       'March Size' => 20,
-      'Attack'              => 25,
-      'Defense'             => 25,
-      'HP'                  => 25
+      'Attack'     => 25,
+      'Defense'    => 25,
+      'HP'         => 25
     },
     "Siege Machines buffs should match expected values"
   );
@@ -552,9 +551,9 @@ subtest "Marco Polo with Red4 ascending, all else none" => sub {
     $summarizer->buffValues->{'Ground Troops'},
     {
       'March Size' => 20,
-      'Attack'              => 25,
-      'Defense'             => 25,
-      'HP'                  => 25
+      'Attack'     => 25,
+      'Defense'    => 25,
+      'HP'         => 25
     },
     "Ground troop buffs should match expected values"
   );
@@ -563,9 +562,9 @@ subtest "Marco Polo with Red4 ascending, all else none" => sub {
     $summarizer->buffValues->{'Mounted Troops'},
     {
       'March Size' => 20,
-      'Attack'              => 125,
-      'Defense'             => 65,
-      'HP'                  => 80
+      'Attack'     => 125,
+      'Defense'    => 65,
+      'HP'         => 80
     },
     "Mounted troop buffs should match expected values"
   );
@@ -574,9 +573,9 @@ subtest "Marco Polo with Red4 ascending, all else none" => sub {
     $summarizer->buffValues->{'Ranged Troops'},
     {
       'March Size' => 20,
-      'Attack'              => 25,
-      'Defense'             => 25,
-      'HP'                  => 25
+      'Attack'     => 25,
+      'Defense'    => 25,
+      'HP'         => 25
     },
     "Ranged troop buffs should match expected values"
   );
@@ -585,9 +584,9 @@ subtest "Marco Polo with Red4 ascending, all else none" => sub {
     $summarizer->buffValues->{'Siege Machines'},
     {
       'March Size' => 20,
-      'Attack'              => 25,
-      'Defense'             => 25,
-      'HP'                  => 25
+      'Attack'     => 25,
+      'Defense'    => 25,
+      'HP'         => 25
     },
     "Siege Machines buffs should match expected values"
   );
@@ -631,9 +630,9 @@ subtest "Marco Polo with Red5 ascending, all else none" => sub {
     $summarizer->buffValues->{'Ground Troops'},
     {
       'March Size' => 20,
-      'Attack'              => 25,
-      'Defense'             => 25,
-      'HP'                  => 25
+      'Attack'     => 25,
+      'Defense'    => 25,
+      'HP'         => 25
     },
     "Ground troop buffs should match expected values"
   );
@@ -642,9 +641,9 @@ subtest "Marco Polo with Red5 ascending, all else none" => sub {
     $summarizer->buffValues->{'Mounted Troops'},
     {
       'March Size' => 20,
-      'Attack'              => 165,
-      'Defense'             => 90,
-      'HP'                  => 105
+      'Attack'     => 165,
+      'Defense'    => 90,
+      'HP'         => 105
     },
     "Mounted troop buffs should match expected values"
   );
@@ -653,9 +652,9 @@ subtest "Marco Polo with Red5 ascending, all else none" => sub {
     $summarizer->buffValues->{'Ranged Troops'},
     {
       'March Size' => 20,
-      'Attack'              => 25,
-      'Defense'             => 25,
-      'HP'                  => 25
+      'Attack'     => 25,
+      'Defense'    => 25,
+      'HP'         => 25
     },
     "Ranged troop buffs should match expected values"
   );
@@ -664,9 +663,9 @@ subtest "Marco Polo with Red5 ascending, all else none" => sub {
     $summarizer->buffValues->{'Siege Machines'},
     {
       'March Size' => 20,
-      'Attack'              => 25,
-      'Defense'             => 25,
-      'HP'                  => 25
+      'Attack'     => 25,
+      'Defense'    => 25,
+      'HP'         => 25
     },
     "Siege Machines buffs should match expected values"
   );
@@ -710,9 +709,9 @@ subtest "Marco Polo with Green 1st specialty, all else none" => sub {
     $summarizer->buffValues->{'Ground Troops'},
     {
       'March Size' => 12,
-      'Attack'              => 25,
-      'Defense'             => 25,
-      'HP'                  => 25
+      'Attack'     => 25,
+      'Defense'    => 25,
+      'HP'         => 25
     },
     "Ground troop buffs should match expected values"
   );
@@ -721,9 +720,9 @@ subtest "Marco Polo with Green 1st specialty, all else none" => sub {
     $summarizer->buffValues->{'Mounted Troops'},
     {
       'March Size' => 12,
-      'Attack'              => 71,
-      'Defense'             => 66,
-      'HP'                  => 65
+      'Attack'     => 71,
+      'Defense'    => 66,
+      'HP'         => 65
     },
     "Mounted troop buffs should match expected values"
   );
@@ -732,9 +731,9 @@ subtest "Marco Polo with Green 1st specialty, all else none" => sub {
     $summarizer->buffValues->{'Ranged Troops'},
     {
       'March Size' => 12,
-      'Attack'              => 25,
-      'Defense'             => 25,
-      'HP'                  => 25
+      'Attack'     => 25,
+      'Defense'    => 25,
+      'HP'         => 25
     },
     "Ranged troop buffs should match expected values"
   );
@@ -743,9 +742,9 @@ subtest "Marco Polo with Green 1st specialty, all else none" => sub {
     $summarizer->buffValues->{'Siege Machines'},
     {
       'March Size' => 12,
-      'Attack'              => 25,
-      'Defense'             => 25,
-      'HP'                  => 25
+      'Attack'     => 25,
+      'Defense'    => 25,
+      'HP'         => 25
     },
     "Siege Machines buffs should match expected values"
   );
@@ -789,9 +788,9 @@ subtest "Marco Polo with Blue 1st specialty, all else none" => sub {
     $summarizer->buffValues->{'Ground Troops'},
     {
       'March Size' => 12,
-      'Attack'              => 25,
-      'Defense'             => 25,
-      'HP'                  => 25
+      'Attack'     => 25,
+      'Defense'    => 25,
+      'HP'         => 25
     },
     "Ground troop buffs should match expected values"
   );
@@ -800,9 +799,9 @@ subtest "Marco Polo with Blue 1st specialty, all else none" => sub {
     $summarizer->buffValues->{'Mounted Troops'},
     {
       'March Size' => 12,
-      'Attack'              => 72,
-      'Defense'             => 67,
-      'HP'                  => 65
+      'Attack'     => 72,
+      'Defense'    => 67,
+      'HP'         => 65
     },
     "Mounted troop buffs should match expected values"
   );
@@ -811,9 +810,9 @@ subtest "Marco Polo with Blue 1st specialty, all else none" => sub {
     $summarizer->buffValues->{'Ranged Troops'},
     {
       'March Size' => 12,
-      'Attack'              => 25,
-      'Defense'             => 25,
-      'HP'                  => 25
+      'Attack'     => 25,
+      'Defense'    => 25,
+      'HP'         => 25
     },
     "Ranged troop buffs should match expected values"
   );
@@ -822,9 +821,9 @@ subtest "Marco Polo with Blue 1st specialty, all else none" => sub {
     $summarizer->buffValues->{'Siege Machines'},
     {
       'March Size' => 12,
-      'Attack'              => 25,
-      'Defense'             => 25,
-      'HP'                  => 25
+      'Attack'     => 25,
+      'Defense'    => 25,
+      'HP'         => 25
     },
     "Siege Machines buffs should match expected values"
   );
@@ -868,9 +867,9 @@ subtest "Marco Polo with Purple 1st specialty, all else none" => sub {
     $summarizer->buffValues->{'Ground Troops'},
     {
       'March Size' => 12,
-      'Attack'              => 25,
-      'Defense'             => 25,
-      'HP'                  => 25
+      'Attack'     => 25,
+      'Defense'    => 25,
+      'HP'         => 25
     },
     "Ground troop buffs should match expected values"
   );
@@ -879,9 +878,9 @@ subtest "Marco Polo with Purple 1st specialty, all else none" => sub {
     $summarizer->buffValues->{'Mounted Troops'},
     {
       'March Size' => 12,
-      'Attack'              => 74,
-      'Defense'             => 69,
-      'HP'                  => 65
+      'Attack'     => 74,
+      'Defense'    => 69,
+      'HP'         => 65
     },
     "Mounted troop buffs should match expected values"
   );
@@ -890,9 +889,9 @@ subtest "Marco Polo with Purple 1st specialty, all else none" => sub {
     $summarizer->buffValues->{'Ranged Troops'},
     {
       'March Size' => 12,
-      'Attack'              => 25,
-      'Defense'             => 25,
-      'HP'                  => 25
+      'Attack'     => 25,
+      'Defense'    => 25,
+      'HP'         => 25
     },
     "Ranged troop buffs should match expected values"
   );
@@ -901,9 +900,9 @@ subtest "Marco Polo with Purple 1st specialty, all else none" => sub {
     $summarizer->buffValues->{'Siege Machines'},
     {
       'March Size' => 12,
-      'Attack'              => 25,
-      'Defense'             => 25,
-      'HP'                  => 25
+      'Attack'     => 25,
+      'Defense'    => 25,
+      'HP'         => 25
     },
     "Siege Machines buffs should match expected values"
   );
@@ -947,9 +946,9 @@ subtest "Marco Polo with Orange 1st specialty, all else none" => sub {
     $summarizer->buffValues->{'Ground Troops'},
     {
       'March Size' => 12,
-      'Attack'              => 25,
-      'Defense'             => 25,
-      'HP'                  => 25
+      'Attack'     => 25,
+      'Defense'    => 25,
+      'HP'         => 25
     },
     "Ground troop buffs should match expected values"
   );
@@ -958,9 +957,9 @@ subtest "Marco Polo with Orange 1st specialty, all else none" => sub {
     $summarizer->buffValues->{'Mounted Troops'},
     {
       'March Size' => 12,
-      'Attack'              => 76,
-      'Defense'             => 71,
-      'HP'                  => 65
+      'Attack'     => 76,
+      'Defense'    => 71,
+      'HP'         => 65
     },
     "Mounted troop buffs should match expected values"
   );
@@ -969,9 +968,9 @@ subtest "Marco Polo with Orange 1st specialty, all else none" => sub {
     $summarizer->buffValues->{'Ranged Troops'},
     {
       'March Size' => 12,
-      'Attack'              => 25,
-      'Defense'             => 25,
-      'HP'                  => 25
+      'Attack'     => 25,
+      'Defense'    => 25,
+      'HP'         => 25
     },
     "Ranged troop buffs should match expected values"
   );
@@ -980,9 +979,9 @@ subtest "Marco Polo with Orange 1st specialty, all else none" => sub {
     $summarizer->buffValues->{'Siege Machines'},
     {
       'March Size' => 12,
-      'Attack'              => 25,
-      'Defense'             => 25,
-      'HP'                  => 25
+      'Attack'     => 25,
+      'Defense'    => 25,
+      'HP'         => 25
     },
     "Siege Machines buffs should match expected values"
   );
@@ -1026,9 +1025,9 @@ subtest "Marco Polo with Gold 1st specialty, all else none" => sub {
     $summarizer->buffValues->{'Ground Troops'},
     {
       'March Size' => 12,
-      'Attack'              => 25,
-      'Defense'             => 25,
-      'HP'                  => 25
+      'Attack'     => 25,
+      'Defense'    => 25,
+      'HP'         => 25
     },
     "Ground troop buffs should match expected values"
   );
@@ -1037,9 +1036,9 @@ subtest "Marco Polo with Gold 1st specialty, all else none" => sub {
     $summarizer->buffValues->{'Mounted Troops'},
     {
       'March Size' => 12,
-      'Attack'              => 80,
-      'Defense'             => 75,
-      'HP'                  => 65
+      'Attack'     => 80,
+      'Defense'    => 75,
+      'HP'         => 65
     },
     "Mounted troop buffs should match expected values"
   );
@@ -1048,9 +1047,9 @@ subtest "Marco Polo with Gold 1st specialty, all else none" => sub {
     $summarizer->buffValues->{'Ranged Troops'},
     {
       'March Size' => 12,
-      'Attack'              => 25,
-      'Defense'             => 25,
-      'HP'                  => 25
+      'Attack'     => 25,
+      'Defense'    => 25,
+      'HP'         => 25
     },
     "Ranged troop buffs should match expected values"
   );
@@ -1059,9 +1058,9 @@ subtest "Marco Polo with Gold 1st specialty, all else none" => sub {
     $summarizer->buffValues->{'Siege Machines'},
     {
       'March Size' => 12,
-      'Attack'              => 25,
-      'Defense'             => 25,
-      'HP'                  => 25
+      'Attack'     => 25,
+      'Defense'    => 25,
+      'HP'         => 25
     },
     "Siege Machines buffs should match expected values"
   );
@@ -1131,25 +1130,29 @@ subtest "Marco Polo with all maxed out" => sub {
     $summarizer->buffValues->{'Ground Troops'},
     {
       'March Size' => 41,
-      'Attack'              => 35,
-      'Defense'             => 25,
-      'HP'                  => 25,
+      'Attack'     => 35,
+      'Defense'    => 25,
+      'HP'         => 25,
     },
     "Ground troop buffs should match expected values"
   );
 
-  is($summarizer->buffValues->{'Mounted Troops'}->{'March Size'}, 41, "Marco Polo Attacking March Size");
-  is($summarizer->buffValues->{'Mounted Troops'}->{'Attack'}, 265, "Marco Polo Attacking Attack");
-  is($summarizer->buffValues->{'Mounted Troops'}->{'Defense'}, 120, "Marco Polo Attacking Defense");
-  is($summarizer->buffValues->{'Mounted Troops'}->{'HP'}, 155, "Marco Polo Attacking HP");
+  is($summarizer->buffValues->{'Mounted Troops'}->{'March Size'},
+    41, "Marco Polo Attacking March Size");
+  is($summarizer->buffValues->{'Mounted Troops'}->{'Attack'},
+    265, "Marco Polo Attacking Attack");
+  is($summarizer->buffValues->{'Mounted Troops'}->{'Defense'},
+    120, "Marco Polo Attacking Defense");
+  is($summarizer->buffValues->{'Mounted Troops'}->{'HP'},
+    155, "Marco Polo Attacking HP");
 
   is_deeply(
     $summarizer->buffValues->{'Ranged Troops'},
     {
       'March Size' => 41,
-      'Attack'              => 25,
-      'Defense'             => 25,
-      'HP'                  => 25
+      'Attack'     => 25,
+      'Defense'    => 25,
+      'HP'         => 25
     },
     "Ranged troop buffs should match expected values"
   );
@@ -1158,9 +1161,9 @@ subtest "Marco Polo with all maxed out" => sub {
     $summarizer->buffValues->{'Siege Machines'},
     {
       'March Size' => 41,
-      'Attack'              => 25,
-      'Defense'             => 25,
-      'HP'                  => 25
+      'Attack'     => 25,
+      'Defense'    => 25,
+      'HP'         => 25
     },
     "Siege Machines buffs should match expected values"
   );
@@ -1168,9 +1171,9 @@ subtest "Marco Polo with all maxed out" => sub {
   is_deeply(
     $summarizer->debuffValues->{'Ground Troops'},
     {
-      'Attack'              => 0,
-      'Defense'             => 10,
-      'HP'                  => 10
+      'Attack'  => 0,
+      'Defense' => 10,
+      'HP'      => 10
     },
     "Ground troop debuffs should match expected values"
   );
@@ -1178,9 +1181,9 @@ subtest "Marco Polo with all maxed out" => sub {
   is_deeply(
     $summarizer->debuffValues->{'Mounted Troops'},
     {
-      'Attack'              => 0,
-      'Defense'             => 10,
-      'HP'                  => 10
+      'Attack'  => 0,
+      'Defense' => 10,
+      'HP'      => 10
     },
     "Mounted troop debuffs should match expected values"
   );
@@ -1188,9 +1191,9 @@ subtest "Marco Polo with all maxed out" => sub {
   is_deeply(
     $summarizer->debuffValues->{'Ranged Troops'},
     {
-      'Attack'              => 0,
-      'Defense'             => 0,
-      'HP'                  => 0
+      'Attack'  => 0,
+      'Defense' => 0,
+      'HP'      => 0
     },
     "Ranged troop debuffs should match expected values"
   );
@@ -1198,9 +1201,9 @@ subtest "Marco Polo with all maxed out" => sub {
   is_deeply(
     $summarizer->debuffValues->{'Siege Machines'},
     {
-      'Attack'              => 0,
-      'Defense'             => 0,
-      'HP'                  => 0
+      'Attack'  => 0,
+      'Defense' => 0,
+      'HP'      => 0
     },
     "Siege Machines debuffs should match expected values"
   );
@@ -1231,9 +1234,9 @@ subtest "Aethelflaed with all maxed out" => sub {
     $summarizer->buffValues->{'Ground Troops'},
     {
       'March Size' => 12,
-      'Attack'              => 100,
-      'Defense'             => 140,
-      'HP'                  => 115
+      'Attack'     => 100,
+      'Defense'    => 140,
+      'HP'         => 115
     },
     "Ground troop buffs should match expected values"
   );
@@ -1242,9 +1245,9 @@ subtest "Aethelflaed with all maxed out" => sub {
     $summarizer->buffValues->{'Mounted Troops'},
     {
       'March Size' => 12,
-      'Attack'              => 155,
-      'Defense'             => 205,
-      'HP'                  => 155
+      'Attack'     => 155,
+      'Defense'    => 205,
+      'HP'         => 155
     },
     "Mounted troop buffs should match expected values"
   );
@@ -1253,9 +1256,9 @@ subtest "Aethelflaed with all maxed out" => sub {
     $summarizer->buffValues->{'Ranged Troops'},
     {
       'March Size' => 12,
-      'Attack'              => 70,
-      'Defense'             => 110,
-      'HP'                  => 115
+      'Attack'     => 70,
+      'Defense'    => 110,
+      'HP'         => 115
     },
     "Ranged troop buffs should match expected values"
   );
@@ -1264,9 +1267,9 @@ subtest "Aethelflaed with all maxed out" => sub {
     $summarizer->buffValues->{'Siege Machines'},
     {
       'March Size' => 12,
-      'Attack'              => 70,
-      'Defense'             => 110,
-      'HP'                  => 115
+      'Attack'     => 70,
+      'Defense'    => 110,
+      'HP'         => 115
     },
     "Siege Machines buffs should match expected values"
   );

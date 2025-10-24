@@ -17,12 +17,13 @@ use Log::Log4perl qw(:levels);
 #Log::Log4perl->easy_init($DEBUG);  #
 
 my $loggerConfig = Game::EvonyTKR::Logger::Config->new('test');
-my $logConfig = Path::Tiny->cwd()->child('share/log4perl.test.conf ');
+my $logConfig    = Path::Tiny->cwd()->child('share/log4perl.test.conf ');
 say $logConfig->absolute();
 Log::Log4perl::init($logConfig->canonpath());
 
 my $parser = Game::EvonyTKR::Shared::Parser->new();
-$parser->logger->level($DEBUG);   # <-- tried each solution with and without this line
+$parser->logger->level($DEBUG)
+  ;    # <-- tried each solution with and without this line
 $parser->generate_grammar();
 
 use List::MoreUtils qw(uniq);
@@ -32,9 +33,10 @@ use List::MoreUtils qw(uniq);
 
 diag 'start of Roman Emperor Skill Book';
 subtest 'Roman Emperor Skill Book' => sub {
-  my $text = "Reduces enemy ground troops and mounted troops’ attack by 20% when General is leading the army. Increases Subordinate City troops’ death to survival rate by 10% when General is the Mayor.";
+  my $text =
+"Reduces enemy ground troops and mounted troops’ attack by 20% when General is leading the army. Increases Subordinate City troops’ death to survival rate by 10% when General is the Mayor.";
 
-  my $hb   = testText($text);
+  my $hb = testText($text);
 
   is scalar(@{$hb}), 3, "Final Buff Count";
 

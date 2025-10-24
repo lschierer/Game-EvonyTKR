@@ -44,9 +44,9 @@ subtest 'David Farragut Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute  => 'Defense',
-        value      => 10,
-        class      => 'Ranged Troops',
+        attribute => 'Defense',
+        value     => 10,
+        class     => 'Ranged Troops',
         condition => ['Enemy']
       ),
       '10% Ranged Troops Defense debuff ()'
@@ -55,9 +55,9 @@ subtest 'David Farragut Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute  => 'Defense',
-        value      => 10,
-        class      => 'Siege Machines',
+        attribute => 'Defense',
+        value     => 10,
+        class     => 'Siege Machines',
         condition => ['Enemy']
       ),
       '10% Siege Machines Defense debuff ()'
@@ -66,9 +66,9 @@ subtest 'David Farragut Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute  => 'HP',
-        value      => 10,
-        class      => 'Ranged Troops',
+        attribute => 'HP',
+        value     => 10,
+        class     => 'Ranged Troops',
         condition => ['Enemy']
       ),
       '10% Ranged Troops HP debuff ()'
@@ -77,9 +77,9 @@ subtest 'David Farragut Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute  => 'HP',
-        value      => 10,
-        class      => 'Siege Machines',
+        attribute => 'HP',
+        value     => 10,
+        class     => 'Siege Machines',
         condition => ['Enemy']
       ),
       '10% Siege Machines HP debuff ()'
@@ -89,8 +89,9 @@ subtest 'David Farragut Ascending Attributes' => sub {
   };
 
   subtest '5 Star' => sub {
-    my $text = 'Enemy Ranged Troop and Siege Machines Attack, Defense and HP -10%.';
-    my $hb   = testText($text);
+    my $text =
+      'Enemy Ranged Troop and Siege Machines Attack, Defense and HP -10%.';
+    my $hb = testText($text);
 
     is scalar(@{$hb}), 6, "Final Buff Count";
     # (2 troops × 2 attributes)
@@ -98,9 +99,9 @@ subtest 'David Farragut Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute  => 'Attack',
-        value      => 10,
-        class      => 'Ranged Troops',
+        attribute => 'Attack',
+        value     => 10,
+        class     => 'Ranged Troops',
         condition => ['Enemy']
       ),
       '10% Ranged Troops Attack debuff ()'
@@ -109,9 +110,9 @@ subtest 'David Farragut Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute  => 'Attack',
-        value      => 10,
-        class      => 'Siege Machines',
+        attribute => 'Attack',
+        value     => 10,
+        class     => 'Siege Machines',
         condition => ['Enemy']
       ),
       '10% Siege Machines Defense debuff ()'
@@ -120,9 +121,9 @@ subtest 'David Farragut Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute  => 'Defense',
-        value      => 10,
-        class      => 'Ranged Troops',
+        attribute => 'Defense',
+        value     => 10,
+        class     => 'Ranged Troops',
         condition => ['Enemy']
       ),
       '10% Ranged Troops Defense debuff ()'
@@ -131,9 +132,9 @@ subtest 'David Farragut Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute  => 'Defense',
-        value      => 10,
-        class      => 'Siege Machines',
+        attribute => 'Defense',
+        value     => 10,
+        class     => 'Siege Machines',
         condition => ['Enemy']
       ),
       '10% Siege Machines Defense debuff ()'
@@ -142,9 +143,9 @@ subtest 'David Farragut Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute  => 'HP',
-        value      => 10,
-        class      => 'Ranged Troops',
+        attribute => 'HP',
+        value     => 10,
+        class     => 'Ranged Troops',
         condition => ['Enemy']
       ),
       '10% Ranged Troops HP debuff ()'
@@ -153,9 +154,9 @@ subtest 'David Farragut Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute  => 'HP',
-        value      => 10,
-        class      => 'Siege Machines',
+        attribute => 'HP',
+        value     => 10,
+        class     => 'Siege Machines',
         condition => ['Enemy']
       ),
       '10% Siege Machines HP debuff ()'

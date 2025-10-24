@@ -44,9 +44,9 @@ subtest 'Champlain Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute  => 'Attack',
-        value      => 10,
-        class      => 'Siege Machines',
+        attribute => 'Attack',
+        value     => 10,
+        class     => 'Siege Machines',
       ),
       'Siege Machines 10% Attack buff ()'
     );
@@ -54,9 +54,9 @@ subtest 'Champlain Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute  => 'HP',
-        value      => 10,
-        class      => 'Siege Machines',
+        attribute => 'HP',
+        value     => 10,
+        class     => 'Siege Machines',
       ),
       'Siege Machines 10% HP buff ()'
     );
@@ -73,9 +73,9 @@ subtest 'Champlain Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute   => 'Attack',
-        class       => 'Siege Machines',
-        value       => 15,
+        attribute => 'Attack',
+        class     => 'Siege Machines',
+        value     => 15,
       ),
       '15% Siege Machines Attack buff ()'
     );
@@ -83,9 +83,9 @@ subtest 'Champlain Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute   => 'Defense',
-        class       => 'Siege Machines',
-        value       => 15,
+        attribute => 'Defense',
+        class     => 'Siege Machines',
+        value     => 15,
       ),
       '15% Siege Machines Defense buff ()'
     );
@@ -93,9 +93,9 @@ subtest 'Champlain Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute   => 'Attack',
-        class       => 'Ranged Troops',
-        value       => 15,
+        attribute => 'Attack',
+        class     => 'Ranged Troops',
+        value     => 15,
       ),
       '15% Ranged Troops Attack buff ()'
     );
@@ -103,9 +103,9 @@ subtest 'Champlain Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute   => 'Defense',
-        class       => 'Ranged Troops',
-        value       => 15,
+        attribute => 'Defense',
+        class     => 'Ranged Troops',
+        value     => 15,
       ),
       '15% Ranged Troops Defense buff ()'
     );
@@ -122,9 +122,9 @@ subtest 'Champlain Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute  => 'Attack',
-        value      => 20,
-        class      => 'Siege Machines',
+        attribute => 'Attack',
+        value     => 20,
+        class     => 'Siege Machines',
       ),
       'Siege Machines 20% Attack buff ()'
     );
@@ -132,9 +132,9 @@ subtest 'Champlain Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute  => 'HP',
-        value      => 20,
-        class      => 'Siege Machines',
+        attribute => 'HP',
+        value     => 20,
+        class     => 'Siege Machines',
       ),
       'Siege Machines 20% HP buff ()'
     );
@@ -143,17 +143,18 @@ subtest 'Champlain Ascending Attributes' => sub {
   };
 
   subtest '5 Star' => sub {
-    my $text = 'Siege Machine Attack +25%, Ranged Troop and Siege Machine Defense and HP +25%';
-    my $hb   = testText($text);
+    my $text =
+'Siege Machine Attack +25%, Ranged Troop and Siege Machine Defense and HP +25%';
+    my $hb = testText($text);
 
     is scalar(@{$hb}), 5, "Final Buff Count";
 
     ok(
       match_buff(
         $hb,
-        attribute  => 'Attack',
-        value      => 25,
-        class      => 'Siege Machines',
+        attribute => 'Attack',
+        value     => 25,
+        class     => 'Siege Machines',
       ),
       'Siege Machines 25% Attack buff ()'
     );
@@ -161,9 +162,9 @@ subtest 'Champlain Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute  => 'Defense',
-        value      => 25,
-        class      => 'Siege Machines',
+        attribute => 'Defense',
+        value     => 25,
+        class     => 'Siege Machines',
       ),
       'Siege Machines 25% Defense buff ()'
     );
@@ -171,9 +172,9 @@ subtest 'Champlain Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute  => 'Defense',
-        value      => 25,
-        class      => 'Ranged Troops',
+        attribute => 'Defense',
+        value     => 25,
+        class     => 'Ranged Troops',
       ),
       'Ranged Troops 25% Defense buff ()'
     );
@@ -181,9 +182,9 @@ subtest 'Champlain Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute  => 'HP',
-        value      => 25,
-        class      => 'Siege Machines',
+        attribute => 'HP',
+        value     => 25,
+        class     => 'Siege Machines',
       ),
       'Siege Machines 25% HP buff ()'
     );
@@ -191,9 +192,9 @@ subtest 'Champlain Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute  => 'HP',
-        value      => 25,
-        class      => 'Ranged Troops',
+        attribute => 'HP',
+        value     => 25,
+        class     => 'Ranged Troops',
       ),
       'Ranged Troops 25% HP buff ()'
     );

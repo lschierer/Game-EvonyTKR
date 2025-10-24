@@ -14,9 +14,8 @@ $logger->info('Test script logging configured');
 
 require_ok('Game::EvonyTKR::Role::Logger');
 
-
 package Test::Package {
-  use Mojo::Base -base, -signatures;
+  use Mojo::Base -base,                          -signatures;
   use Mojo::Base 'Game::EvonyTKR::Role::Logger', -role;
 
   sub testMethod ($self) {

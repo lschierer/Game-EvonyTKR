@@ -16,12 +16,13 @@ use Log::Log4perl qw(:levels);
 #Log::Log4perl->easy_init($DEBUG);  #
 
 my $loggerConfig = Game::EvonyTKR::Logger::Config->new('test');
-my $logConfig = Path::Tiny->cwd()->child('share/log4perl.test.conf ');
+my $logConfig    = Path::Tiny->cwd()->child('share/log4perl.test.conf ');
 say $logConfig->absolute();
 Log::Log4perl::init($logConfig->canonpath());
 
 my $parser = Game::EvonyTKR::Shared::Parser->new();
-$parser->logger->level($DEBUG);   # <-- tried each solution with and without this line
+$parser->logger->level($DEBUG)
+  ;    # <-- tried each solution with and without this line
 $parser->generate_grammar();
 
 use List::MoreUtils qw(uniq);
@@ -80,8 +81,6 @@ sub match_buff {
     return $ok;
   } @$buffs;
 }
-
-
 
 subtest 'Alessandra Red3 - Single buff with condition' => sub {
   my $text = "When General is launching Alliance War, Rally Capacity +8%";

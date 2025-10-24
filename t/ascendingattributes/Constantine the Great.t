@@ -35,8 +35,9 @@ diag 'start of Constantine the Great Ascending Attributes';
 subtest 'Constantine the Great Ascending Attributes' => sub {
 
   subtest '1 Star' => sub {
-    my $text = 'Enemy Ground Troop and Mounted Troop Attack -10% and Defense -10%.';
-    my $hb   = testText($text);
+    my $text =
+      'Enemy Ground Troop and Mounted Troop Attack -10% and Defense -10%.';
+    my $hb = testText($text);
 
     is scalar(@{$hb}), 4, "Final Buff Count";
     # (2 troops × 2 attributes)
@@ -44,9 +45,9 @@ subtest 'Constantine the Great Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute  => 'Attack',
-        value      => 10,
-        class      => 'Ground Troops',
+        attribute => 'Attack',
+        value     => 10,
+        class     => 'Ground Troops',
         condition => ['Enemy']
       ),
       '10% Ground Troops Attack debuff ()'
@@ -55,9 +56,9 @@ subtest 'Constantine the Great Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute  => 'Attack',
-        value      => 10,
-        class      => 'Mounted Troops',
+        attribute => 'Attack',
+        value     => 10,
+        class     => 'Mounted Troops',
         condition => ['Enemy']
       ),
       '10% Mounted Troops Attack debuff ()'
@@ -66,9 +67,9 @@ subtest 'Constantine the Great Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute  => 'Defense',
-        value      => 10,
-        class      => 'Ground Troops',
+        attribute => 'Defense',
+        value     => 10,
+        class     => 'Ground Troops',
         condition => ['Enemy']
       ),
       '10% Ground Troops Defense debuff ()'
@@ -77,9 +78,9 @@ subtest 'Constantine the Great Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute  => 'Defense',
-        value      => 10,
-        class      => 'Mounted Troops',
+        attribute => 'Defense',
+        value     => 10,
+        class     => 'Mounted Troops',
         condition => ['Enemy']
       ),
       '10% Mounted Troops Defense debuff ()'
@@ -98,9 +99,9 @@ subtest 'Constantine the Great Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute  => 'Attack',
-        value      => 15,
-        class      => 'Ground Troops',
+        attribute => 'Attack',
+        value     => 15,
+        class     => 'Ground Troops',
         condition => ['Enemy']
       ),
       '15% Ground Troops Attack debuff ()'
@@ -109,9 +110,9 @@ subtest 'Constantine the Great Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute  => 'Attack',
-        value      => 15,
-        class      => 'Mounted Troops',
+        attribute => 'Attack',
+        value     => 15,
+        class     => 'Mounted Troops',
         condition => ['Enemy']
       ),
       '15% Mounted Troops Attack debuff ()'
@@ -120,9 +121,9 @@ subtest 'Constantine the Great Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute  => 'HP',
-        value      => 15,
-        class      => 'Ground Troops',
+        attribute => 'HP',
+        value     => 15,
+        class     => 'Ground Troops',
         condition => ['Enemy']
       ),
       '15% Ground Troops HP debuff ()'
@@ -131,9 +132,9 @@ subtest 'Constantine the Great Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute  => 'HP',
-        value      => 15,
-        class      => 'Mounted Troops',
+        attribute => 'HP',
+        value     => 15,
+        class     => 'Mounted Troops',
         condition => ['Enemy']
       ),
       '15% Mounted Troops HP debuff ()'

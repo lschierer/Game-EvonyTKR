@@ -36,8 +36,9 @@ diag 'start of Basil II Ascending Attributes';
 subtest 'Basil II Ascending Attributes' => sub {
 
   subtest '1 Star' => sub {
-    my $text = 'Increases Mounted Troop and Ground Troop Attack by 10% and Defense by 10% when General is leading the army to attack.';
-    my $hb   = testText($text);
+    my $text =
+'Increases Mounted Troop and Ground Troop Attack by 10% and Defense by 10% when General is leading the army to attack.';
+    my $hb = testText($text);
 
     is scalar(@{$hb}), 4, "Final Buff Count";
 
@@ -45,7 +46,7 @@ subtest 'Basil II Ascending Attributes' => sub {
       match_buff(
         $hb,
         attribute  => 'Attack',
-        class     => 'Mounted Troops',
+        class      => 'Mounted Troops',
         value      => 10,
         conditions => ['leading the army', 'Attacking']
       ),
@@ -56,7 +57,7 @@ subtest 'Basil II Ascending Attributes' => sub {
       match_buff(
         $hb,
         attribute  => 'Attack',
-        class     => 'Ground Troops',
+        class      => 'Ground Troops',
         value      => 10,
         conditions => ['leading the army', 'Attacking']
       ),
@@ -67,7 +68,7 @@ subtest 'Basil II Ascending Attributes' => sub {
       match_buff(
         $hb,
         attribute  => 'Defense',
-        class     => 'Mounted Troops',
+        class      => 'Mounted Troops',
         value      => 10,
         conditions => ['leading the army', 'Attacking']
       ),
@@ -78,7 +79,7 @@ subtest 'Basil II Ascending Attributes' => sub {
       match_buff(
         $hb,
         attribute  => 'Defense',
-        class     => 'Ground Troops',
+        class      => 'Ground Troops',
         value      => 10,
         conditions => ['leading the army', 'Attacking']
       ),
@@ -99,34 +100,33 @@ subtest 'Basil II Ascending Attributes' => sub {
         $hb,
         attribute  => 'Rally Capacity',
         value      => 8,
-        conditions => ['When Rallying' ]
+        conditions => ['When Rallying']
       ),
       '8% Rally Capacity buff (When Rallying)'
     );
 
-    done_testing()
+    done_testing();
   };
 
   subtest '4 Star' => sub {
-    my $text = 'Increases Mounted Troop and Ground Troop Attack by 10% and HP by 10% when General is leading the army to attack.';
-    my $hb   = testText($text);
+    my $text =
+'Increases Mounted Troop and Ground Troop Attack by 10% and HP by 10% when General is leading the army to attack.';
+    my $hb = testText($text);
 
     is scalar(@{$hb}), 4, "Final Buff Count";
 
-
-    done_testing()
+    done_testing();
   };
 
   subtest '5 Star' => sub {
-    my $text = 'Increases Mounted Troop and Ground Troop Attack by 10%, Defense by 10% and HP by 10% when General is leading the army to attack.';
-    my $hb   = testText($text);
+    my $text =
+'Increases Mounted Troop and Ground Troop Attack by 10%, Defense by 10% and HP by 10% when General is leading the army to attack.';
+    my $hb = testText($text);
 
     is scalar(@{$hb}), 6, "Final Buff Count";
 
-
-    done_testing()
+    done_testing();
   };
-
 
   done_testing();
 };

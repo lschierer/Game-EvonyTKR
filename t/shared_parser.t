@@ -17,12 +17,13 @@ use Log::Log4perl qw(:levels);
 #Log::Log4perl->easy_init($DEBUG);  #
 
 my $loggerConfig = Game::EvonyTKR::Logger::Config->new('test');
-my $logConfig = Path::Tiny->cwd()->child('share/log4perl.test.conf ');
+my $logConfig    = Path::Tiny->cwd()->child('share/log4perl.test.conf ');
 say $logConfig->absolute();
 Log::Log4perl::init($logConfig->canonpath());
 
 my $parser = Game::EvonyTKR::Shared::Parser->new();
-$parser->logger->level($DEBUG);   # <-- tried each solution with and without this line
+$parser->logger->level($DEBUG)
+  ;    # <-- tried each solution with and without this line
 $parser->generate_grammar();
 
 use List::MoreUtils qw(uniq);
@@ -85,32 +86,33 @@ sub match_buff {
 subtest 'fake singlebuff book' => sub {
   my $text =
     'increases mounted troops attack by 45% when general is leading the army.';
-    my @fragments = $parser->tokenize_buffs($text);
-    my @hashedBuffs;
-    foreach my $frag (@fragments) {
-      diag "frag is " . Data::Printer::np($frag);
-      my @nb = $parser->normalize_buff($frag);
-      push(@hashedBuffs, @nb);
-    }
+  my @fragments = $parser->tokenize_buffs($text);
+  my @hashedBuffs;
+  foreach my $frag (@fragments) {
+    diag "frag is " . Data::Printer::np($frag);
+    my @nb = $parser->normalize_buff($frag);
+    push(@hashedBuffs, @nb);
+  }
 
-    if(scalar @hashedBuffs > 0 ) {
-      diag "buffs are now " . Data::Printer::np(@hashedBuffs);
-    } else {
-      diag "No buffs returned."
-    }
+  if (scalar @hashedBuffs > 0) {
+    diag "buffs are now " . Data::Printer::np(@hashedBuffs);
+  }
+  else {
+    diag "No buffs returned.";
+  }
 
-    is scalar(@hashedBuffs), 1, 'Parsed 1 buffs';
+  is scalar(@hashedBuffs), 1, 'Parsed 1 buffs';
 
-    ok(
-      match_buff(
-        \@hashedBuffs,
-        attribute  => 'Attack',
-        value      => 45,
-        class      => 'Mounted Troops',
-        conditions => ['leading the army']
-      ),
-      'Mounted Troops 45% attack buff (leading the army)'
-    );
+  ok(
+    match_buff(
+      \@hashedBuffs,
+      attribute  => 'Attack',
+      value      => 45,
+      class      => 'Mounted Troops',
+      conditions => ['leading the army']
+    ),
+    'Mounted Troops 45% attack buff (leading the army)'
+  );
   done_testing();
 
 };

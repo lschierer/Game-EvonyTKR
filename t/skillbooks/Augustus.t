@@ -17,12 +17,13 @@ use Log::Log4perl qw(:levels);
 #Log::Log4perl->easy_init($DEBUG);  #
 
 my $loggerConfig = Game::EvonyTKR::Logger::Config->new('test');
-my $logConfig = Path::Tiny->cwd()->child('share/log4perl.test.conf ');
+my $logConfig    = Path::Tiny->cwd()->child('share/log4perl.test.conf ');
 say $logConfig->absolute();
 Log::Log4perl::init($logConfig->canonpath());
 
 my $parser = Game::EvonyTKR::Shared::Parser->new();
-$parser->logger->level($DEBUG);   # <-- tried each solution with and without this line
+$parser->logger->level($DEBUG)
+  ;    # <-- tried each solution with and without this line
 $parser->generate_grammar();
 
 use List::MoreUtils qw(uniq);
@@ -32,18 +33,19 @@ use List::MoreUtils qw(uniq);
 
 diag 'start of Augustus Skill Book';
 subtest 'Augustus Skill Book' => sub {
-  my $text = "Increases mounted troops’ attack by 40% and ranged troops’ attack by 15% when General is leading the army to attack.";
+  my $text =
+"Increases mounted troops’ attack by 40% and ranged troops’ attack by 15% when General is leading the army to attack.";
 
-  my $hb   = testText($text);
+  my $hb = testText($text);
 
   is scalar(@{$hb}), 2, "Final Buff Count";
 
   ok(
     match_buff(
       $hb,
-      attribute  => 'Attack',
-      class      => 'Mounted Troops',
-      value      => 40,
+      attribute => 'Attack',
+      class     => 'Mounted Troops',
+      value     => 40,
     ),
     '40% Mounted Troops Attack buff (leading the army, Attacking)'
   );

@@ -35,8 +35,9 @@ diag 'start of Cimon Ascending Attributes';
 subtest 'Cimon Ascending Attributes' => sub {
 
   subtest '1 Star' => sub {
-    my $text = 'Enemy Ground Troop and Mounted Troop Attack -10%, Defense and HP -10%';
-    my $hb   = testText($text);
+    my $text =
+      'Enemy Ground Troop and Mounted Troop Attack -10%, Defense and HP -10%';
+    my $hb = testText($text);
 
     is scalar(@{$hb}), 6, "Final Buff Count";
     # (2 troops × 2 attributes)
@@ -44,10 +45,10 @@ subtest 'Cimon Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute   => 'Attack',
-        value       => 10,
-        class       => 'Ground Troops',
-        condition   => ['Enemy']
+        attribute => 'Attack',
+        value     => 10,
+        class     => 'Ground Troops',
+        condition => ['Enemy']
       ),
       'Ground Troops 10% Attack debuff ()'
     );
@@ -55,10 +56,10 @@ subtest 'Cimon Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute   => 'Attack',
-        value       => 10,
-        class       => 'Mounted Troops',
-        condition   => ['Enemy']
+        attribute => 'Attack',
+        value     => 10,
+        class     => 'Mounted Troops',
+        condition => ['Enemy']
       ),
       'Mounted Troops 10% Attack debuff ()'
     );
@@ -66,10 +67,10 @@ subtest 'Cimon Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute   => 'Defense',
-        value       => 10,
-        class       => 'Ground Troops',
-        condition   => ['Enemy']
+        attribute => 'Defense',
+        value     => 10,
+        class     => 'Ground Troops',
+        condition => ['Enemy']
       ),
       'Ground Troops 10% Defense debuff ()'
     );
@@ -77,10 +78,10 @@ subtest 'Cimon Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute   => 'Defense',
-        value       => 10,
-        class       => 'Mounted Troops',
-        condition   => ['Enemy']
+        attribute => 'Defense',
+        value     => 10,
+        class     => 'Mounted Troops',
+        condition => ['Enemy']
       ),
       'Mounted Troops 10% Defense debuff ()'
     );
@@ -88,10 +89,10 @@ subtest 'Cimon Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute   => 'HP',
-        value       => 10,
-        class       => 'Ground Troops',
-        condition   => ['Enemy']
+        attribute => 'HP',
+        value     => 10,
+        class     => 'Ground Troops',
+        condition => ['Enemy']
       ),
       'Ground Troops 10% HP debuff ()'
     );
@@ -99,10 +100,10 @@ subtest 'Cimon Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute   => 'HP',
-        value       => 10,
-        class       => 'Mounted Troops',
-        condition   => ['Enemy']
+        attribute => 'HP',
+        value     => 10,
+        class     => 'Mounted Troops',
+        condition => ['Enemy']
       ),
       'Mounted Troops 10% HP debuff ()'
     );
@@ -111,17 +112,18 @@ subtest 'Cimon Ascending Attributes' => sub {
   };
 
   subtest '4 Star' => sub {
-    my $text = 'Enemy Ranged Troop and Siege Machine Attack -15%, Defense and HP -15%';
-    my $hb   = testText($text);
+    my $text =
+      'Enemy Ranged Troop and Siege Machine Attack -15%, Defense and HP -15%';
+    my $hb = testText($text);
 
     is scalar(@{$hb}), 6, "Final Buff Count";
 
     ok(
       match_buff(
         $hb,
-        attribute  => 'Attack',
-        value      => 15,
-        class      => 'Siege Machines',
+        attribute => 'Attack',
+        value     => 15,
+        class     => 'Siege Machines',
         condition => ['Enemy']
       ),
       'Siege Machines 15% Attack debuff (Enemy)'
@@ -130,9 +132,9 @@ subtest 'Cimon Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute  => 'Attack',
-        value      => 15,
-        class      => 'Ranged Troops',
+        attribute => 'Attack',
+        value     => 15,
+        class     => 'Ranged Troops',
         condition => ['Enemy']
       ),
       'Ranged Troops 15% Attack debuff (Enemy)'
@@ -141,9 +143,9 @@ subtest 'Cimon Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute  => 'Defense',
-        value      => 15,
-        class      => 'Siege Machines',
+        attribute => 'Defense',
+        value     => 15,
+        class     => 'Siege Machines',
         condition => ['Enemy']
       ),
       'Siege Machines 15% Defense debuff (Enemy)'
@@ -152,9 +154,9 @@ subtest 'Cimon Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute  => 'Defense',
-        value      => 15,
-        class      => 'Ranged Troops',
+        attribute => 'Defense',
+        value     => 15,
+        class     => 'Ranged Troops',
         condition => ['Enemy']
       ),
       'Ranged Troops 15% Defense debuff (Enemy)'
@@ -163,9 +165,9 @@ subtest 'Cimon Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute  => 'HP',
-        value      => 15,
-        class      => 'Siege Machines',
+        attribute => 'HP',
+        value     => 15,
+        class     => 'Siege Machines',
         condition => ['Enemy']
       ),
       'Siege Machines 15% HP debuff (Enemy)'
@@ -174,9 +176,9 @@ subtest 'Cimon Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute  => 'HP',
-        value      => 15,
-        class      => 'Ranged Troops',
+        attribute => 'HP',
+        value     => 15,
+        class     => 'Ranged Troops',
         condition => ['Enemy']
       ),
       'Ranged Troops 15% HP debuff (Enemy)'

@@ -14,12 +14,13 @@ use Log::Log4perl qw(:levels);
 #Log::Log4perl->easy_init($DEBUG);  #
 
 my $loggerConfig = Game::EvonyTKR::Logger::Config->new('test');
-my $logConfig = Path::Tiny->cwd()->child('share/log4perl.test.conf ');
+my $logConfig    = Path::Tiny->cwd()->child('share/log4perl.test.conf ');
 say $logConfig->absolute();
 Log::Log4perl::init($logConfig->canonpath());
 
 my $parser = Game::EvonyTKR::Shared::Parser->new();
-$parser->logger->level($DEBUG);   # <-- tried each solution with and without this line
+$parser->logger->level($DEBUG)
+  ;    # <-- tried each solution with and without this line
 
 use List::MoreUtils qw(uniq);
 
@@ -118,7 +119,7 @@ subtest 'Dictator Skill Book' => sub {
     my @nb = $parser->normalize_buff($frag);
     push(@hashedBuffs, @nb);
   }
-  diag  "final buffs are " . Data::Printer::np(@hashedBuffs);
+  diag "final buffs are " . Data::Printer::np(@hashedBuffs);
   is scalar(@hashedBuffs), 3, 'Parsed 3 buffs';
 
   ok(
@@ -149,7 +150,7 @@ subtest 'Dictator Skill Book' => sub {
       attribute  => 'Attack',
       value      => 45,
       class      => 'Mounted Troops',
-      conditions => ["leading the army",'Against Monsters']
+      conditions => ["leading the army", 'Against Monsters']
     ),
     'Mounted Troops 45% attack buff (Against Monsters)'
   );
@@ -459,12 +460,12 @@ subtest 'Alessandra Red5 - Mixed comma and and' => sub {
   done_testing;
 };
 
-
 diag "start of Aethelflaed Ascending Attributes";
 
 #1 Star When attacking Monsters, Mounted Troop HP +30%, Troops Defense +10%.
 subtest 'Aethelflaed’s Red1' => sub {
-  my $text = "When attacking Monsters, Mounted Troop HP +30%, Troops Defense +10%.";
+  my $text =
+    "When attacking Monsters, Mounted Troop HP +30%, Troops Defense +10%.";
 
   my @fragments = $parser->tokenize_buffs($text);
   my @hashedBuffs;
@@ -499,7 +500,6 @@ subtest 'Aethelflaed’s Red1' => sub {
 
   done_testing;
 };
-
 
 #2 Star When attacking Monsters, Monsters Defense -10%, Troops HP +15%.
 subtest 'Aethelflaed’s Red2' => sub {
@@ -540,7 +540,8 @@ subtest 'Aethelflaed’s Red2' => sub {
 
 #3 Star When attacking Monsters, Monsters Attack -10%, Troops Defense +20%.
 subtest 'Aethelflaed’s Red3' => sub {
-  my $text = "When attacking Monsters, Monsters Attack -10%, Troops Defense +20%.";
+  my $text =
+    "When attacking Monsters, Monsters Attack -10%, Troops Defense +20%.";
 
   my @fragments = $parser->tokenize_buffs($text);
   my @hashedBuffs;
@@ -577,7 +578,8 @@ subtest 'Aethelflaed’s Red3' => sub {
 
 #4 Star When attacking Monsters, Mounted Troop Attack +15%, Troops HP +20%.
 subtest 'Aethelflaed’s Red4' => sub {
-  my $text = "When attacking Monsters, Mounted Troop Attack +15%, Troops HP +20%.";
+  my $text =
+    "When attacking Monsters, Mounted Troop Attack +15%, Troops HP +20%.";
 
   my @fragments = $parser->tokenize_buffs($text);
   my @hashedBuffs;
@@ -615,7 +617,8 @@ subtest 'Aethelflaed’s Red4' => sub {
 
 #5 Star When attacking Monsters, Mounted Troop Attack +20%, Troops Defense and HP +10%.
 subtest 'Aethelflaed’s Red5' => sub {
-  my $text = "When attacking Monsters, Mounted Troop Attack +20%, Troops Defense and HP +10%.";
+  my $text =
+"When attacking Monsters, Mounted Troop Attack +20%, Troops Defense and HP +10%.";
 
   my @fragments = $parser->tokenize_buffs($text);
   my @hashedBuffs;
@@ -658,7 +661,6 @@ subtest 'Aethelflaed’s Red5' => sub {
     'Generic 10% HP buff (Against Monsters)'
   );
 
-
   done_testing;
 };
 
@@ -666,7 +668,8 @@ subtest 'Aethelflaed’s Red5' => sub {
 # Increases mounted troops’ attack by 50% when General is leading the army to attack. Increases ground troops and mounted troops’ defense and HP by 40% when General brings any Dragon or Spiritual Beast to attack.
 diag 'start of Monarchy Restoration Skill Book';
 subtest 'Monarchy Restoration Skill Book' => sub {
-  my $text = "Increases mounted troops’ attack by 50% when General is leading the army to attack. Increases ground troops and mounted troops’ defense and HP by 40% when General brings any Dragon or Spiritual Beast to attack.";
+  my $text =
+"Increases mounted troops’ attack by 50% when General is leading the army to attack. Increases ground troops and mounted troops’ defense and HP by 40% when General brings any Dragon or Spiritual Beast to attack.";
 
   my @fragments = $parser->tokenize_buffs($text);
   my @hashedBuffs;
@@ -681,10 +684,10 @@ subtest 'Monarchy Restoration Skill Book' => sub {
   ok(
     match_buff(
       \@hashedBuffs,
-      attribute   => 'Attack',
-      value       => 50,
-      class       => 'Mounted Troops',
-      conditions  => ['leading the army', 'Attacking']
+      attribute  => 'Attack',
+      value      => 50,
+      class      => 'Mounted Troops',
+      conditions => ['leading the army', 'Attacking']
     ),
     '50% Mounted Troop Attack buff (Attacking)'
   );
@@ -692,10 +695,10 @@ subtest 'Monarchy Restoration Skill Book' => sub {
   ok(
     match_buff(
       \@hashedBuffs,
-      attribute   => 'Defense',
-      value       => 40,
-      class       => 'Ground Troops',
-      conditions  => ['brings a dragon', 'brings a spiritual beast', 'Attacking']
+      attribute  => 'Defense',
+      value      => 40,
+      class      => 'Ground Troops',
+      conditions => ['brings a dragon', 'brings a spiritual beast', 'Attacking']
     ),
     '40% Ground Troop Defense buff (conditional Attacking)'
   );
@@ -703,10 +706,10 @@ subtest 'Monarchy Restoration Skill Book' => sub {
   ok(
     match_buff(
       \@hashedBuffs,
-      attribute   => 'HP',
-      value       => 40,
-      class       => 'Ground Troops',
-      conditions  => ['brings a dragon', 'brings a spiritual beast', 'Attacking']
+      attribute  => 'HP',
+      value      => 40,
+      class      => 'Ground Troops',
+      conditions => ['brings a dragon', 'brings a spiritual beast', 'Attacking']
     ),
     '40% Ground Troop HP buff (conditional Attacking)'
   );
@@ -714,10 +717,10 @@ subtest 'Monarchy Restoration Skill Book' => sub {
   ok(
     match_buff(
       \@hashedBuffs,
-      attribute   => 'Defense',
-      value       => 40,
-      class       => 'Mounted Troops',
-      conditions  => ['brings a dragon', 'brings a spiritual beast', 'Attacking']
+      attribute  => 'Defense',
+      value      => 40,
+      class      => 'Mounted Troops',
+      conditions => ['brings a dragon', 'brings a spiritual beast', 'Attacking']
     ),
     '40% Mounted Troop Defense buff (conditional Attacking)'
   );
@@ -725,10 +728,10 @@ subtest 'Monarchy Restoration Skill Book' => sub {
   ok(
     match_buff(
       \@hashedBuffs,
-      attribute   => 'HP',
-      value       => 40,
-      class       => 'Mounted Troops',
-      conditions  => ['brings a dragon', 'brings a spiritual beast', 'Attacking']
+      attribute  => 'HP',
+      value      => 40,
+      class      => 'Mounted Troops',
+      conditions => ['brings a dragon', 'brings a spiritual beast', 'Attacking']
     ),
     '40% Mounted Troop HP buff (conditional Attacking)'
   );
@@ -740,7 +743,8 @@ subtest 'Monarchy Restoration Skill Book' => sub {
 # Increases mounted troops’ attack by 50% when General is leading the army to attack. Increases mounted troops’ defense and HP by 30% when General brings any Dragon or Spiritual Beast to attack.
 diag 'start of Napoleonic Wars Skill Book';
 subtest 'Napoleonic Wars Skill Book' => sub {
-  my $text = "Increases mounted troops’ attack by 50% when General is leading the army to attack. Increases mounted troops’ defense and HP by 30% when General brings any Dragon or Spiritual Beast to attack.";
+  my $text =
+"Increases mounted troops’ attack by 50% when General is leading the army to attack. Increases mounted troops’ defense and HP by 30% when General brings any Dragon or Spiritual Beast to attack.";
 
   my @fragments = $parser->tokenize_buffs($text);
   my @hashedBuffs;
@@ -755,10 +759,10 @@ subtest 'Napoleonic Wars Skill Book' => sub {
   ok(
     match_buff(
       \@hashedBuffs,
-      attribute   => 'Attack',
-      value       => 50,
-      class       => 'Mounted Troops',
-      conditions  => ['leading the army', 'Attacking']
+      attribute  => 'Attack',
+      value      => 50,
+      class      => 'Mounted Troops',
+      conditions => ['leading the army', 'Attacking']
     ),
     '50% Mounted Troop Attack buff (Attacking)'
   );
@@ -766,10 +770,10 @@ subtest 'Napoleonic Wars Skill Book' => sub {
   ok(
     match_buff(
       \@hashedBuffs,
-      attribute   => 'Defense',
-      value       => 30,
-      class       => 'Mounted Troops',
-      conditions  => ['brings a dragon', 'brings a spiritual beast', 'Attacking']
+      attribute  => 'Defense',
+      value      => 30,
+      class      => 'Mounted Troops',
+      conditions => ['brings a dragon', 'brings a spiritual beast', 'Attacking']
     ),
     '40% Mounted Troop Defense buff (conditional Attacking)'
   );
@@ -777,16 +781,15 @@ subtest 'Napoleonic Wars Skill Book' => sub {
   ok(
     match_buff(
       \@hashedBuffs,
-      attribute   => 'HP',
-      value       => 30,
-      class       => 'Mounted Troops',
-      conditions  => ['brings a dragon', 'brings a spiritual beast', 'Attacking']
+      attribute  => 'HP',
+      value      => 30,
+      class      => 'Mounted Troops',
+      conditions => ['brings a dragon', 'brings a spiritual beast', 'Attacking']
     ),
     '40% Mounted Troop HP buff (conditional Attacking)'
   );
 
   done_testing;
 };
-
 
 done_testing;

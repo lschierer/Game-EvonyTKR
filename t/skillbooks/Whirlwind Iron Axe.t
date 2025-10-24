@@ -17,12 +17,13 @@ use Log::Log4perl qw(:levels);
 #Log::Log4perl->easy_init($DEBUG);  #
 
 my $loggerConfig = Game::EvonyTKR::Logger::Config->new('test');
-my $logConfig = Path::Tiny->cwd()->child('share/log4perl.test.conf ');
+my $logConfig    = Path::Tiny->cwd()->child('share/log4perl.test.conf ');
 say $logConfig->absolute();
 Log::Log4perl::init($logConfig->canonpath());
 
 my $parser = Game::EvonyTKR::Shared::Parser->new();
-$parser->logger->level($DEBUG);   # <-- tried each solution with and without this line
+$parser->logger->level($DEBUG)
+  ;    # <-- tried each solution with and without this line
 $parser->generate_grammar();
 
 use List::MoreUtils qw(uniq);
@@ -32,7 +33,8 @@ use List::MoreUtils qw(uniq);
 
 diag 'start of Whirlwind Iron Axe Skill Book';
 subtest 'Whirlwind Iron Axe Skill Book' => sub {
-  my $text = "Increases mounted troops’ attack by 45% and increases ground troops and mounted troops’ defense and HP by 35% when General is leading the army.";
+  my $text =
+"Increases mounted troops’ attack by 45% and increases ground troops and mounted troops’ defense and HP by 35% when General is leading the army.";
 
   my @fragments = $parser->tokenize_buffs($text);
   my @hashedBuffs;
@@ -44,19 +46,19 @@ subtest 'Whirlwind Iron Axe Skill Book' => sub {
     push(@hashedBuffs, @nb);
   }
   diag "hashedBuffs is " . ref @hashedBuffs;
-    diag "hashedBuffs size " . scalar(@hashedBuffs);
-    for my $i (0 .. $#hashedBuffs) {
-        diag "hashedBuffs[$i] = " . Data::Printer::np($hashedBuffs[$i]);
-    }
-    is scalar(@hashedBuffs), 5, 'Parsed 5 Whirlwind Iron Axe buffs';
+  diag "hashedBuffs size " . scalar(@hashedBuffs);
+  for my $i (0 .. $#hashedBuffs) {
+    diag "hashedBuffs[$i] = " . Data::Printer::np($hashedBuffs[$i]);
+  }
+  is scalar(@hashedBuffs), 5, 'Parsed 5 Whirlwind Iron Axe buffs';
 
   ok(
     match_buff(
       \@hashedBuffs,
-      attribute   => 'Attack',
-      value       => 45,
-      class       => 'Mounted Troops',
-      conditions  => ['leading the army']
+      attribute  => 'Attack',
+      value      => 45,
+      class      => 'Mounted Troops',
+      conditions => ['leading the army']
     ),
     '45% Mounted Troop Attack buff (leading the army)'
   );
@@ -64,10 +66,10 @@ subtest 'Whirlwind Iron Axe Skill Book' => sub {
   ok(
     match_buff(
       \@hashedBuffs,
-      attribute   => 'Defense',
-      value       => 35,
-      class       => 'Ground Troops',
-      conditions  => ['leading the army']
+      attribute  => 'Defense',
+      value      => 35,
+      class      => 'Ground Troops',
+      conditions => ['leading the army']
     ),
     '35% Ground Troop Defense buff (leading the army)'
   );
@@ -75,10 +77,10 @@ subtest 'Whirlwind Iron Axe Skill Book' => sub {
   ok(
     match_buff(
       \@hashedBuffs,
-      attribute   => 'Defense',
-      value       => 35,
-      class       => 'Mounted Troops',
-      conditions  => ['leading the army']
+      attribute  => 'Defense',
+      value      => 35,
+      class      => 'Mounted Troops',
+      conditions => ['leading the army']
     ),
     '35% Mounted Troop Defense buff (leading the army)'
   );
@@ -86,10 +88,10 @@ subtest 'Whirlwind Iron Axe Skill Book' => sub {
   ok(
     match_buff(
       \@hashedBuffs,
-      attribute   => 'HP',
-      value       => 35,
-      class       => 'Ground Troops',
-      conditions  => ['leading the army']
+      attribute  => 'HP',
+      value      => 35,
+      class      => 'Ground Troops',
+      conditions => ['leading the army']
     ),
     '35% Ground Troop HP buff (leading the army)'
   );
@@ -97,10 +99,10 @@ subtest 'Whirlwind Iron Axe Skill Book' => sub {
   ok(
     match_buff(
       \@hashedBuffs,
-      attribute   => 'HP',
-      value       => 35,
-      class       => 'Mounted Troops',
-      conditions  => ['leading the army']
+      attribute  => 'HP',
+      value      => 35,
+      class      => 'Mounted Troops',
+      conditions => ['leading the army']
     ),
     '35% Mounted Troop HP buff (leading the army)'
   );

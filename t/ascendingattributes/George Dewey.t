@@ -35,8 +35,9 @@ diag 'start of George Dewey Ascending Attributes';
 subtest 'George Dewey Ascending Attributes' => sub {
 
   subtest '1 Star' => sub {
-    my $text = 'When General is the Main City Defense General, In-city Mounted Troop Defense +30% and HP +20%.';
-    my $hb   = testText($text);
+    my $text =
+'When General is the Main City Defense General, In-city Mounted Troop Defense +30% and HP +20%.';
+    my $hb = testText($text);
 
     is scalar(@{$hb}), 2, "Final Buff Count";
     # (2 troops × 2 attributes)
@@ -44,10 +45,10 @@ subtest 'George Dewey Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute   => 'Defense',
-        value       => 30,
-        class       => 'Mounted Troops',
-        condition   => ['When The Main Defense General', 'In City']
+        attribute => 'Defense',
+        value     => 30,
+        class     => 'Mounted Troops',
+        condition => ['When The Main Defense General', 'In City']
       ),
       '30% Mounted Troops Defense buff (When The Main Defense General In City)'
     );
@@ -55,10 +56,10 @@ subtest 'George Dewey Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute   => 'HP',
-        value       => 20,
-        class       => 'Mounted Troops',
-        condition   => ['When The Main Defense General', 'In City']
+        attribute => 'HP',
+        value     => 20,
+        class     => 'Mounted Troops',
+        condition => ['When The Main Defense General', 'In City']
       ),
       '20% Mounted Troops HP buff (When The Main Defense General In City)'
     );
@@ -67,8 +68,9 @@ subtest 'George Dewey Ascending Attributes' => sub {
   };
 
   subtest '2 Star' => sub {
-    my $text = 'When General is the Main City Defense General, Hospital Capacity +20%.';
-    my $hb   = testText($text);
+    my $text =
+      'When General is the Main City Defense General, Hospital Capacity +20%.';
+    my $hb = testText($text);
 
     is scalar(@{$hb}), 1, "Final Buff Count";
     # (2 troops × 2 attributes)
@@ -76,9 +78,9 @@ subtest 'George Dewey Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute   => 'Hospital Capacity',
-        value       => 20,
-        condition   => ['When The Main Defense General']
+        attribute => 'Hospital Capacity',
+        value     => 20,
+        condition => ['When The Main Defense General']
       ),
       '20% Hospital Capacity buff (When The Main Defense General)'
     );
@@ -87,8 +89,9 @@ subtest 'George Dewey Ascending Attributes' => sub {
   };
 
   subtest '3 Star' => sub {
-    my $text = 'When General is the Main City Defense General, In-city Siege Machine and Ranged Troop Attack +10% and HP +20%.';
-    my $hb   = testText($text);
+    my $text =
+'When General is the Main City Defense General, In-city Siege Machine and Ranged Troop Attack +10% and HP +20%.';
+    my $hb = testText($text);
 
     is scalar(@{$hb}), 4, "Final Buff Count";
     # (2 troops × 2 attributes)
@@ -96,10 +99,10 @@ subtest 'George Dewey Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute   => 'Attack',
-        value       => 10,
-        class       => 'Siege Machines',
-        condition   => ['When The Main Defense General', 'In City']
+        attribute => 'Attack',
+        value     => 10,
+        class     => 'Siege Machines',
+        condition => ['When The Main Defense General', 'In City']
       ),
       '10% Siege Machines Attack buff (When The Main Defense General In City)'
     );
@@ -107,10 +110,10 @@ subtest 'George Dewey Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute   => 'HP',
-        value       => 20,
-        class       => 'Siege Machines',
-        condition   => ['When The Main Defense General', 'In City']
+        attribute => 'HP',
+        value     => 20,
+        class     => 'Siege Machines',
+        condition => ['When The Main Defense General', 'In City']
       ),
       '20% Siege Machines HP buff (When The Main Defense General In City)'
     );
@@ -118,10 +121,10 @@ subtest 'George Dewey Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute   => 'Attack',
-        value       => 10,
-        class       => 'Ranged Troops',
-        condition   => ['When The Main Defense General', 'In City']
+        attribute => 'Attack',
+        value     => 10,
+        class     => 'Ranged Troops',
+        condition => ['When The Main Defense General', 'In City']
       ),
       '10% Ranged Troops Attack buff (When The Main Defense General In City)'
     );
@@ -129,10 +132,10 @@ subtest 'George Dewey Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute   => 'HP',
-        value       => 20,
-        class       => 'Ranged Troops',
-        condition   => ['When The Main Defense General', 'In City']
+        attribute => 'HP',
+        value     => 20,
+        class     => 'Ranged Troops',
+        condition => ['When The Main Defense General', 'In City']
       ),
       '20% Ranged Troops HP buff (When The Main Defense General In City)'
     );
@@ -141,8 +144,9 @@ subtest 'George Dewey Ascending Attributes' => sub {
   };
 
   subtest '5 Star' => sub {
-    my $text = 'Increases In-city Mounted Troop HP by 15%, Defense by 25% and In-city Ranged Troop and Siege Machine Attack by 20% when General is the Main City Defense General.';
-    my $hb   = testText($text);
+    my $text =
+'Increases In-city Mounted Troop HP by 15%, Defense by 25% and In-city Ranged Troop and Siege Machine Attack by 20% when General is the Main City Defense General.';
+    my $hb = testText($text);
 
     is scalar(@{$hb}), 4, "Final Buff Count";
     # (2 troops × 2 attributes)
@@ -150,10 +154,10 @@ subtest 'George Dewey Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute   => 'HP',
-        value       => 15,
-        class       => 'Mounted Troops',
-        condition   => ['When The Main Defense General', 'In City']
+        attribute => 'HP',
+        value     => 15,
+        class     => 'Mounted Troops',
+        condition => ['When The Main Defense General', 'In City']
       ),
       '15% Mounted Troops HP buff (When The Main Defense General In City)'
     );
@@ -161,10 +165,10 @@ subtest 'George Dewey Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute   => 'Defense',
-        value       => 25,
-        class       => 'Mounted Troops',
-        condition   => ['When The Main Defense General', 'In City']
+        attribute => 'Defense',
+        value     => 25,
+        class     => 'Mounted Troops',
+        condition => ['When The Main Defense General', 'In City']
       ),
       '25% Mounted Troops Defense buff (When The Main Defense General In City)'
     );
@@ -172,10 +176,10 @@ subtest 'George Dewey Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute   => 'Attack',
-        value       => 20,
-        class       => 'Ranged Troops',
-        condition   => ['When The Main Defense General', 'In City']
+        attribute => 'Attack',
+        value     => 20,
+        class     => 'Ranged Troops',
+        condition => ['When The Main Defense General', 'In City']
       ),
       '20% Ranged Troops Attack buff (When The Main Defense General In City)'
     );
@@ -183,10 +187,10 @@ subtest 'George Dewey Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute   => 'Attack',
-        value       => 20,
-        class       => 'Siege Machines',
-        condition   => ['When The Main Defense General', 'In City']
+        attribute => 'Attack',
+        value     => 20,
+        class     => 'Siege Machines',
+        condition => ['When The Main Defense General', 'In City']
       ),
       '20% Siege Machines Attack buff (When The Main Defense General In City)'
     );

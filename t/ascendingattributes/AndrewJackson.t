@@ -67,8 +67,9 @@ subtest 'Andrew Jackson Ascending Attributes' => sub {
   };
 
   subtest '2 Star' => sub {
-    my $text = 'Enemy Ground Troop and Mounted Troop HP -10%; when General is the Mayor, Training Speed in this Subordinate City +10%.';
-    my $hb   = testText($text);
+    my $text =
+'Enemy Ground Troop and Mounted Troop HP -10%; when General is the Mayor, Training Speed in this Subordinate City +10%.';
+    my $hb = testText($text);
 
     is scalar(@{$hb}), 3, "Final Buff Count";
 
@@ -107,8 +108,9 @@ subtest 'Andrew Jackson Ascending Attributes' => sub {
     done_testing();
   };
   subtest '3 Star' => sub {
-    my $text = 'Enemy Ground Troop and Mounted Troop Defense -10%; when General is the Mayor, Death into Survival Rate in this Subordinate City +10%.';
-    my $hb   = testText($text);
+    my $text =
+'Enemy Ground Troop and Mounted Troop Defense -10%; when General is the Mayor, Death into Survival Rate in this Subordinate City +10%.';
+    my $hb = testText($text);
 
     is scalar(@{$hb}), 3, "Final Buff Count";
 
@@ -167,8 +169,9 @@ subtest 'Andrew Jackson Ascending Attributes' => sub {
   };
 
   subtest '5 Star' => sub {
-    my $text = 'Enemy Ranged Troop Attack -20%, Enemy Ground Troop and Mounted Troop Defense -10%.';
-    my $hb   = testText($text);
+    my $text =
+'Enemy Ranged Troop Attack -20%, Enemy Ground Troop and Mounted Troop Defense -10%.';
+    my $hb = testText($text);
 
     is scalar(@{$hb}), 3, "Final Buff Count";
 

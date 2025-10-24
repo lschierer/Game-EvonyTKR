@@ -35,8 +35,9 @@ diag 'start of Flavius Aetus Ascending Attributes';
 subtest 'Flavius Aetus Ascending Attributes' => sub {
 
   subtest '1 Star' => sub {
-    my $text = 'Enemy Ranged Troop and Siege Machine Attack -5%, Enemy Ground Troop Defense -10%.';
-    my $hb   = testText($text);
+    my $text =
+'Enemy Ranged Troop and Siege Machine Attack -5%, Enemy Ground Troop Defense -10%.';
+    my $hb = testText($text);
 
     is scalar(@{$hb}), 3, "Final Buff Count";
     # (2 troops × 2 attributes)
@@ -44,10 +45,10 @@ subtest 'Flavius Aetus Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute   => 'Attack',
-        value       => 5,
-        class       => 'Ranged Troops',
-        condition   => ['Enemy']
+        attribute => 'Attack',
+        value     => 5,
+        class     => 'Ranged Troops',
+        condition => ['Enemy']
       ),
       '5% Ranged Troops Attack debuff ()'
     );
@@ -55,10 +56,10 @@ subtest 'Flavius Aetus Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute   => 'Attack',
-        value       => 5,
-        class       => 'Siege Machines',
-        condition   => ['Enemy']
+        attribute => 'Attack',
+        value     => 5,
+        class     => 'Siege Machines',
+        condition => ['Enemy']
       ),
       '5% Siege Machines Attack debuff ()'
     );
@@ -66,10 +67,10 @@ subtest 'Flavius Aetus Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute   => 'Defense',
-        value       => 10,
-        class       => 'Ground Troops',
-        condition   => ['Enemy']
+        attribute => 'Defense',
+        value     => 10,
+        class     => 'Ground Troops',
+        condition => ['Enemy']
       ),
       '10% Ground Troops Defense debuff ()'
     );
@@ -78,8 +79,9 @@ subtest 'Flavius Aetus Ascending Attributes' => sub {
   };
 
   subtest '2 Star' => sub {
-    my $text = 'Enemy Ground Troop HP -10%; when General is Mayor, Training Speed in this Subordinate City +15%.';
-    my $hb   = testText($text);
+    my $text =
+'Enemy Ground Troop HP -10%; when General is Mayor, Training Speed in this Subordinate City +15%.';
+    my $hb = testText($text);
 
     is scalar(@{$hb}), 2, "Final Buff Count";
     # (2 troops × 2 attributes)
@@ -87,10 +89,10 @@ subtest 'Flavius Aetus Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute   => 'HP',
-        value       => 10,
-        class       => 'Ground Troops',
-        condition   => ['Enemy', 'When City Mayor for this SubCity']
+        attribute => 'HP',
+        value     => 10,
+        class     => 'Ground Troops',
+        condition => ['Enemy', 'When City Mayor for this SubCity']
       ),
       '10% Ground Troops Attack debuff (When City Mayor for this SubCity)'
     );
@@ -98,9 +100,9 @@ subtest 'Flavius Aetus Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute   => 'SubCity Training Speed',
-        value       => 15,
-        condition   => ['When City Mayor for this SubCity']
+        attribute => 'SubCity Training Speed',
+        value     => 15,
+        condition => ['When City Mayor for this SubCity']
       ),
       '15% SubCity Training Speed buff (When City Mayor for this SubCity)'
     );
@@ -109,8 +111,9 @@ subtest 'Flavius Aetus Ascending Attributes' => sub {
   };
 
   subtest '3 Star' => sub {
-    my $text = 'Enemy Ground Troop Defense -20%; when General is Mayor, Death into Survival Rate in this Subordinate City +15%.';
-    my $hb   = testText($text);
+    my $text =
+'Enemy Ground Troop Defense -20%; when General is Mayor, Death into Survival Rate in this Subordinate City +15%.';
+    my $hb = testText($text);
 
     is scalar(@{$hb}), 2, "Final Buff Count";
     # (2 troops × 2 attributes)
@@ -118,10 +121,10 @@ subtest 'Flavius Aetus Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute   => 'Defense',
-        value       => 20,
-        class       => 'Ground Troops',
-        condition   => ['Enemy',]
+        attribute => 'Defense',
+        value     => 20,
+        class     => 'Ground Troops',
+        condition => ['Enemy',]
       ),
       '20% Ground Troops Defense debuff ()'
     );
@@ -129,9 +132,9 @@ subtest 'Flavius Aetus Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute   => 'SubCity Death to Survival',
-        value       => 15,
-        condition   => ['When City Mayor for this SubCity']
+        attribute => 'SubCity Death to Survival',
+        value     => 15,
+        condition => ['When City Mayor for this SubCity']
       ),
       '15% SubCity Death to Survival buff (When City Mayor for this SubCity)'
     );
@@ -140,8 +143,9 @@ subtest 'Flavius Aetus Ascending Attributes' => sub {
   };
 
   subtest '4 Star' => sub {
-    my $text = 'Enemy Ranged Troop and Siege Machine Attack -10%, Enemy Ground Troop HP -10%.';
-    my $hb   = testText($text);
+    my $text =
+'Enemy Ranged Troop and Siege Machine Attack -10%, Enemy Ground Troop HP -10%.';
+    my $hb = testText($text);
 
     is scalar(@{$hb}), 3, "Final Buff Count";
     # (2 troops × 2 attributes)
@@ -149,10 +153,10 @@ subtest 'Flavius Aetus Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute   => 'Attack',
-        value       => 10,
-        class       => 'Ranged Troops',
-        condition   => ['Enemy',]
+        attribute => 'Attack',
+        value     => 10,
+        class     => 'Ranged Troops',
+        condition => ['Enemy',]
       ),
       '10% Ranged Troops Defense debuff ()'
     );
@@ -160,10 +164,10 @@ subtest 'Flavius Aetus Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute   => 'Attack',
-        value       => 10,
-        class       => 'Siege Machines',
-        condition   => ['Enemy',]
+        attribute => 'Attack',
+        value     => 10,
+        class     => 'Siege Machines',
+        condition => ['Enemy',]
       ),
       '10% Siege Machines Attack debuff ()'
     );
@@ -171,10 +175,10 @@ subtest 'Flavius Aetus Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute   => 'HP',
-        value       => 10,
-        class       => 'Ground Troops',
-        condition   => ['Enemy',]
+        attribute => 'HP',
+        value     => 10,
+        class     => 'Ground Troops',
+        condition => ['Enemy',]
       ),
       '10% Ground Troops HP debuff ()'
     );
@@ -183,8 +187,9 @@ subtest 'Flavius Aetus Ascending Attributes' => sub {
   };
 
   subtest '5 Star' => sub {
-    my $text = 'Enemy Ranged Troop and Siege Machine Attack -15%, Enemy Ground Troop Defense and HP -15%.';
-    my $hb   = testText($text);
+    my $text =
+'Enemy Ranged Troop and Siege Machine Attack -15%, Enemy Ground Troop Defense and HP -15%.';
+    my $hb = testText($text);
 
     is scalar(@{$hb}), 4, "Final Buff Count";
     # (2 troops × 2 attributes)
@@ -192,10 +197,10 @@ subtest 'Flavius Aetus Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute   => 'Attack',
-        value       => 15,
-        class       => 'Ranged Troops',
-        condition   => ['Enemy',]
+        attribute => 'Attack',
+        value     => 15,
+        class     => 'Ranged Troops',
+        condition => ['Enemy',]
       ),
       '15% Ranged Troops Defense debuff ()'
     );
@@ -203,10 +208,10 @@ subtest 'Flavius Aetus Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute   => 'Attack',
-        value       => 15,
-        class       => 'Siege Machines',
-        condition   => ['Enemy',]
+        attribute => 'Attack',
+        value     => 15,
+        class     => 'Siege Machines',
+        condition => ['Enemy',]
       ),
       '15% Siege Machines Attack debuff ()'
     );
@@ -214,10 +219,10 @@ subtest 'Flavius Aetus Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute   => 'Defense',
-        value       => 15,
-        class       => 'Ground Troops',
-        condition   => ['Enemy',]
+        attribute => 'Defense',
+        value     => 15,
+        class     => 'Ground Troops',
+        condition => ['Enemy',]
       ),
       '15% Ground Troops Defense debuff ()'
     );
@@ -225,10 +230,10 @@ subtest 'Flavius Aetus Ascending Attributes' => sub {
     ok(
       match_buff(
         $hb,
-        attribute   => 'HP',
-        value       => 15,
-        class       => 'Ground Troops',
-        condition   => ['Enemy',]
+        attribute => 'HP',
+        value     => 15,
+        class     => 'Ground Troops',
+        condition => ['Enemy',]
       ),
       '15% Ground Troops HP debuff ()'
     );

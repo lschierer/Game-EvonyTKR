@@ -35,8 +35,9 @@ diag 'start of Alessandra Ascending Attributes';
 subtest 'Alessandra Ascending Attributes' => sub {
 
   subtest '1 Star' => sub {
-    my $text = 'Marching Ground Troop and Mounted Troop Defense +10% and HP +10%';
-    my $hb   = testText($text);
+    my $text =
+      'Marching Ground Troop and Mounted Troop Defense +10% and HP +10%';
+    my $hb = testText($text);
 
     is scalar(@{$hb}), 4, "Final Buff Count";
     # (2 troops × 2 attributes)

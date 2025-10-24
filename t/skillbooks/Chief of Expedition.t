@@ -17,12 +17,13 @@ use Log::Log4perl qw(:levels);
 #Log::Log4perl->easy_init($DEBUG);  #
 
 my $loggerConfig = Game::EvonyTKR::Logger::Config->new('test');
-my $logConfig = Path::Tiny->cwd()->child('share/log4perl.test.conf ');
+my $logConfig    = Path::Tiny->cwd()->child('share/log4perl.test.conf ');
 say $logConfig->absolute();
 Log::Log4perl::init($logConfig->canonpath());
 
 my $parser = Game::EvonyTKR::Shared::Parser->new();
-$parser->logger->level($DEBUG);   # <-- tried each solution with and without this line
+$parser->logger->level($DEBUG)
+  ;    # <-- tried each solution with and without this line
 $parser->generate_grammar();
 
 use List::MoreUtils qw(uniq);
@@ -32,19 +33,20 @@ use List::MoreUtils qw(uniq);
 
 diag 'start of Chief of Expedition Skill Book';
 subtest 'Chief of Expedition Skill Book' => sub {
-  my $text = "Reduces enemy ranged troops’ attack by 25% and enemy ground troops and mounted troops HP by 15% when General is leading the army.";
+  my $text =
+"Reduces enemy ranged troops’ attack by 25% and enemy ground troops and mounted troops HP by 15% when General is leading the army.";
 
-  my $hb   = testText($text);
+  my $hb = testText($text);
 
   is scalar(@{$hb}), 3, "Final Buff Count";
 
   ok(
     match_buff(
       $hb,
-      attribute   => 'Attack',
-      value       => 25,
-      class       => 'Ranged Troops',
-      conditions  => ['Enemy', 'leading the army']
+      attribute  => 'Attack',
+      value      => 25,
+      class      => 'Ranged Troops',
+      conditions => ['Enemy', 'leading the army']
     ),
     '25% Ranged Troops Attack debuff (Enemy leading the army)'
   );
@@ -52,10 +54,10 @@ subtest 'Chief of Expedition Skill Book' => sub {
   ok(
     match_buff(
       $hb,
-      attribute   => 'HP',
-      value       => 15,
-      class       => 'Ground Troops',
-      conditions  => ['Enemy', 'leading the army']
+      attribute  => 'HP',
+      value      => 15,
+      class      => 'Ground Troops',
+      conditions => ['Enemy', 'leading the army']
     ),
     '15% Ranged Troops HP debuff (Enemy leading the army)'
   );
@@ -63,10 +65,10 @@ subtest 'Chief of Expedition Skill Book' => sub {
   ok(
     match_buff(
       $hb,
-      attribute   => 'HP',
-      value       => 15,
-      class       => 'Mounted Troops',
-      conditions  => ['Enemy', 'leading the army']
+      attribute  => 'HP',
+      value      => 15,
+      class      => 'Mounted Troops',
+      conditions => ['Enemy', 'leading the army']
     ),
     '15% Mounted Troops HP debuff (Enemy leading the army)'
   );

@@ -17,7 +17,6 @@ use Test::Deep;
 use Test::More;
 use List::MoreUtils qw(uniq);
 
-
 require Game::EvonyTKR;
 require Game::EvonyTKR::Logger::Config;
 require Game::EvonyTKR::Shared::Constants;
@@ -31,7 +30,7 @@ require Game::EvonyTKR::Model::Specialty::Manager;
 
 # set up logging that my Corina classes can use
 my $loggerConfig = Game::EvonyTKR::Logger::Config->new('test');
-my $logConfig = Path::Tiny->cwd()->child('share/log4perl.test.conf');
+my $logConfig    = Path::Tiny->cwd()->child('share/log4perl.test.conf');
 say $logConfig->absolute();
 Log::Log4perl::Config->utf8(1);
 Log::Log4perl::init($logConfig->canonpath());
@@ -56,47 +55,62 @@ $RootManager->generalConflictGroupManager->importAll(
   $collectionDir->child('general conflict groups'));
 $logger->info("import of conflict groups complete");
 
-
 # Now test conflict group functionality before building pairs
 $logger->info("Testing conflict group functionality...");
 
 # Test 1: Verify conflict groups were imported
-my $conflictGroups = $RootManager->generalConflictGroupManager->get_conflict_groups();
+my $conflictGroups =
+  $RootManager->generalConflictGroupManager->get_conflict_groups();
 ok(scalar keys %$conflictGroups > 0, "Conflict groups were imported");
 diag("Found " . (scalar keys %$conflictGroups) . " conflict groups");
 
 # Test 2: Test specific conflict group methods using known conflict data
 # Conflict group 1939fb94-7382-53f6-858c-ba57897c0126: Algernon Sidney conflicts with Ragnar, Eleanor, Gunther, Princess Kaguya, and Zucca
-my @conflictingGenerals = ("Algernon Sidney", "Ragnar", "Eleanor", "Gunther", "Princess Kaguya", "Zucca");
+my @conflictingGenerals = (
+  "Algernon Sidney", "Ragnar", "Eleanor", "Gunther",
+  "Princess Kaguya", "Zucca"
+);
 
 # Test that Algernon Sidney conflicts with each of the others
-my $algernonSidney = $RootManager->generalManager->getGeneral("Algernon Sidney");
+my $algernonSidney =
+  $RootManager->generalManager->getGeneral("Algernon Sidney");
 ok($algernonSidney, "Found Algernon Sidney general");
 
 if ($algernonSidney) {
-    foreach my $conflictingName ("Ragnar", "Eleanor", "Gunther", "Princess Kaguya", "Zucca") {
-        my $conflictingGeneral = $RootManager->generalManager->getGeneral($conflictingName);
+  foreach
+    my $conflictingName ("Ragnar", "Eleanor", "Gunther", "Princess Kaguya",
+    "Zucca") {
+    my $conflictingGeneral =
+      $RootManager->generalManager->getGeneral($conflictingName);
 
-        SKIP: {
-            skip "General $conflictingName not found", 1 unless $conflictingGeneral;
+  SKIP: {
+      skip "General $conflictingName not found", 1 unless $conflictingGeneral;
 
-            my $compatible = $RootManager->generalConflictGroupManager->are_generals_compatible($algernonSidney->name, $conflictingGeneral->name);
-            ok($compatible == 0, "Algernon Sidney should conflict with $conflictingName");
+      my $compatible =
+        $RootManager->generalConflictGroupManager->are_generals_compatible(
+        $algernonSidney->name, $conflictingGeneral->name);
+      ok($compatible == 0,
+        "Algernon Sidney should conflict with $conflictingName");
 
-            if ($compatible) {
-                diag("ERROR: Algernon Sidney does not conflict with $conflictingName but should! -- $compatible");
-            }
-        }
+      if ($compatible) {
+        diag(
+"ERROR: Algernon Sidney does not conflict with $conflictingName but should! -- $compatible"
+        );
+      }
     }
+  }
 
-    # Test that generals within the conflict group also conflict with each other
-    my $ragnar = $RootManager->generalManager->getGeneral("Ragnar");
-    my $eleanor = $RootManager->generalManager->getGeneral("Eleanor");
+  # Test that generals within the conflict group also conflict with each other
+  my $ragnar  = $RootManager->generalManager->getGeneral("Ragnar");
+  my $eleanor = $RootManager->generalManager->getGeneral("Eleanor");
 
-    if ($ragnar && $eleanor) {
-        my $compatible = $RootManager->generalConflictGroupManager->are_generals_compatible($ragnar->name, $eleanor->name);
-        ok($compatible == 0, "Ragnar should conflict with Eleanor (same conflict group)");
-    }
+  if ($ragnar && $eleanor) {
+    my $compatible =
+      $RootManager->generalConflictGroupManager->are_generals_compatible(
+      $ragnar->name, $eleanor->name);
+    ok($compatible == 0,
+      "Ragnar should conflict with Eleanor (same conflict group)");
+  }
 }
 
 # Now build pairs and test for conflicts
@@ -110,21 +124,26 @@ my %allPairs;
 my $conflictingPairs = 0;
 my @foundConflicts;
 
-foreach my $pt (@pairTypes){
+foreach my $pt (@pairTypes) {
   my @pairs = @{ $RootManager->generalPairManager->get_pairs_by_type($pt) };
-  diag (sprintf('there are %s pairs of type %s.', scalar @pairs, $pt));
+  diag(sprintf('there are %s pairs of type %s.', scalar @pairs, $pt));
   foreach my $pair (@pairs) {
-    my $primary = $pair->primary;
+    my $primary   = $pair->primary;
     my $secondary = $pair->secondary;
-    my $pairKey = sprintf('%s-%s', $pair->primary->name, $pair->secondary->name);
+    my $pairKey =
+      sprintf('%s-%s', $pair->primary->name, $pair->secondary->name);
     $allPairs{$pairKey} = $pair;
 
     # Check if this pair should conflict
-    if (not $RootManager->generalConflictGroupManager->are_generals_compatible($primary->name, $secondary->name)) {
-        $conflictingPairs++;
-        my $conflictInfo = $primary->name . " <-> " . $secondary->name;
-        push @foundConflicts, $conflictInfo;
-        diag("CONFLICT FOUND: $conflictInfo");
+    if (
+      not $RootManager->generalConflictGroupManager->are_generals_compatible(
+        $primary->name, $secondary->name
+      )
+    ) {
+      $conflictingPairs++;
+      my $conflictInfo = $primary->name . " <-> " . $secondary->name;
+      push @foundConflicts, $conflictInfo;
+      diag("CONFLICT FOUND: $conflictInfo");
     }
   }
 
@@ -135,32 +154,40 @@ diag("Total pairs created: " . (scalar keys %allPairs));
 diag("Conflicting pairs found: $conflictingPairs");
 
 if (@foundConflicts) {
-    diag("Specific conflicts found:");
-    foreach my $conflict (@foundConflicts) {
-        diag("  - $conflict");
-    }
+  diag("Specific conflicts found:");
+  foreach my $conflict (@foundConflicts) {
+    diag("  - $conflict");
+  }
 }
 
 # Test 4: Specifically check for the known Algernon Sidney conflicts
 
 if ($algernonSidney) {
-    foreach my $conflictingName ("Ragnar", "Eleanor", "Gunther", "Princess Kaguya", "Zucca") {
-        my $conflictingGeneral = $RootManager->generalManager->getGeneral($conflictingName);
-        next unless $conflictingGeneral;
+  foreach
+    my $conflictingName ("Ragnar", "Eleanor", "Gunther", "Princess Kaguya",
+    "Zucca") {
+    my $conflictingGeneral =
+      $RootManager->generalManager->getGeneral($conflictingName);
+    next unless $conflictingGeneral;
 
-        # Check if a pair was incorrectly created between these two
-        my $pairKey1 = $algernonSidney->name . "-" . $conflictingGeneral->name;
-        my $pairKey2 = $conflictingGeneral->name . "-" . $algernonSidney->name;
+    # Check if a pair was incorrectly created between these two
+    my $pairKey1 = $algernonSidney->name . "-" . $conflictingGeneral->name;
+    my $pairKey2 = $conflictingGeneral->name . "-" . $algernonSidney->name;
 
-        my $foundPair = $allPairs{$pairKey1} || $allPairs{$pairKey2};
+    my $foundPair = $allPairs{$pairKey1} || $allPairs{$pairKey2};
 
-        if ($foundPair) {
-            fail("Pair should not exist between Algernon Sidney and $conflictingName");
-            diag("Found prohibited pair: " . $foundPair->primary->name . " <-> " . $foundPair->secondary->name);
-        } else {
-            pass("Correctly excluded pair between Algernon Sidney and $conflictingName");
-        }
+    if ($foundPair) {
+      fail(
+        "Pair should not exist between Algernon Sidney and $conflictingName");
+      diag( "Found prohibited pair: "
+          . $foundPair->primary->name . " <-> "
+          . $foundPair->secondary->name);
     }
+    else {
+      pass(
+        "Correctly excluded pair between Algernon Sidney and $conflictingName");
+    }
+  }
 }
 
 done_testing();

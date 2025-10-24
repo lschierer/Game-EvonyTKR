@@ -12,8 +12,8 @@ require Game::EvonyTKR;
 require Scalar::Util;
 
 # Load required modules
-require_ok( 'Game::EvonyTKR::Shared::Constants' );
-require_ok( 'Game::EvonyTKR' );
+require_ok('Game::EvonyTKR::Shared::Constants');
+require_ok('Game::EvonyTKR');
 
 use Log::Log4perl;
 
@@ -29,6 +29,7 @@ EOT
 
 my $constants = Game::EvonyTKR::Shared::Constants->new();
 
-ok(Scalar::Util::blessed($constants) eq 'Game::EvonyTKR::Shared::Constants', 'Constants Object created');
+ok(Scalar::Util::blessed($constants) eq 'Game::EvonyTKR::Shared::Constants',
+  'Constants Object created');
 
 done_testing();
