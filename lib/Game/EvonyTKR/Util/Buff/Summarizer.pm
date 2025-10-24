@@ -8,7 +8,7 @@ require Game::EvonyTKR::Model::General::Conflict::Book;
 
 require JSON::PP;
 
-class Game::EvonyTKR::Model::Buff::Summarizer :
+class Game::EvonyTKR::Util::Buff::Summarizer :
   isa(Game::EvonyTKR::Shared::Constants) {
   # PODNAME: Game::EvonyTKR::Model::Buff
   use List::AllUtils qw( any none );
@@ -26,7 +26,7 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
   field $bc = Game::EvonyTKR::Model::General::Conflict::Book->new();
 
   # Input parameters
-  field $general             : param;
+  field $general             : param //= undef;
   field $books               : param = [];
   field $covenant            : param;
   field $ascendingAttributes : param;
