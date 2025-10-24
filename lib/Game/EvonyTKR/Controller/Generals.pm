@@ -26,6 +26,7 @@ package Game::EvonyTKR::Controller::Generals {
   use Mojo::Base 'Game::EvonyTKR::Controller::Role::Generals', -role,
     -signatures;
   use Mojo::IOLoop;
+  use Mojo::Promise;
   use Mojo::JSON     qw(to_json encode_json);
   use MIME::Base64   qw(encode_base64);
   use List::AllUtils qw( all any none );
@@ -58,24 +59,43 @@ package Game::EvonyTKR::Controller::Generals {
 
     $cache = $c->create_general_cache();
 
-    $c->setup_event_handlers($app);
-    $c->setup_helpers($app);
-    $c->setup_routes($app);
+    eval {
+      say "calling setup_event_handlers";
+      $c->setup_event_handlers($app);
+      1;
+    } or do {
+        say "Error in setup_event_handlers: $@";
+    };
+    eval {
+      say 'calling setup_helpers';
+      $c->setup_helpers($app);
+      1;
+    } or do {
+        say "Error in setup_helpers: $@";
+    };
+    eval {
+      say 'calling setup_routes';
+      $c->setup_routes($app);
+      1;
+    } or do {
+        say "Error in setup_routes: $@";
+    };
 
-    Mojo::IOLoop->next_tick(sub {
-      $c->setup_generals($app);
-    });
+    say sprintf('%s register complete', __PACKAGE__);
   }
 
   sub setup_generals($c, $app){
     my $loop;
     state $receivedGenerals = 0;
-    $loop = Mojo::IOLoop->recurring( 5 => sub {
+    $loop = Mojo::IOLoop->recurring( 10 => sub {
       my $generalCount = $c->get_value('generalCount', $cache) // -1;
+      $c->logger->debug(sprintf('setup_generals: receivedGenerals: %s; generalCount: %s',
+      $receivedGenerals,$generalCount));
       if($generalCount > 0 && $receivedGenerals < $generalCount){
         my $generals = $c->get_generals($cache);
         if(defined($generals) && ref($generals) eq 'HASH'){
           foreach my $general (values $generals->%*){
+            # emit a signal to break out of this loop and stay async.
             $app->plugins->emit(general_loaded => {general => $general});
             $receivedGenerals++;
           }
@@ -97,9 +117,95 @@ package Game::EvonyTKR::Controller::Generals {
       }
     );
 
+    say "general_routing_available emitting";
     $app->plugins->emit(
       general_routing_available => { routing => $app->general_routing });
   }
+
+  sub setup_event_handlers($c, $app) {
+
+    #first define variables and state
+    my $completion_state = {
+      skill_books_loaded          => 0,
+      specialties_imported        => 0,
+      ascending_attributes_loaded => 0,
+      general_loader_job_ready    => 0,
+    };
+
+    my $check_prerequisites = sub {
+      if (List::AllUtils::none { $_ == 0 } values $completion_state->%*) {
+        $c->logger->info(sprintf('%s Ready to Get Generals', __PACKAGE__));
+
+      } else {
+        $c->logger->info(sprintf('%s not Ready to Get Generals yet: %s',
+        __PACKAGE__, Data::Printer::np($completion_state, multiline => 0)));
+      }
+    };
+
+    # then define handlers in reverse order of use for safety
+
+    $app->plugins->on(
+      general_loader_job_ready => sub {
+        $completion_state->{general_loader_job_ready} = 1;
+        $check_prerequisites->();
+      }
+    );
+
+    $app->plugins->on(
+      general_loaded => sub {
+        my ($plugin, $data) = @_;
+        my $general = $data->{'general'};
+        $c->logger->info(sprintf('%s detected %s loaded. Building Routes.',
+        __PACKAGE__, $general->name));
+        $c->_build_general_routes($general, $app);
+      }
+    );
+
+    # last define things that will trigger them.
+    # which might be more handlers, see above about
+    # reverse order of use.
+
+    $app->plugins->on(
+      ascending_attributes_imported => sub {
+        $completion_state->{ascending_attributes_loaded} = 1;
+        $check_prerequisites->();
+      }
+    );
+
+    $app->plugins->on(
+      all_books_loaded => sub {
+        $completion_state->{skill_books_loaded} = 1;
+        $check_prerequisites->();
+      }
+    );
+
+    $app->plugins->on(
+      specialties_imported => sub {
+        $completion_state->{specialties_imported} = 1;
+        $check_prerequisites->();
+      }
+    );
+
+    $app->plugins->on(
+      general_routing_available => sub {
+        say 'general_routing_available signal recieved';
+        $c->logger->debug('general_routing_available signal recieved');
+        my $delay = 10;
+        Mojo::IOLoop->timer( $delay => sub {
+          say "$delay second timer complete";
+          eval {
+            $c->setup_generals($app);
+            1;
+          } or do {
+            say "problem in setup_generals";
+          }
+        });
+      }
+    );
+
+    $c->logger->debug(sprintf('all handlers registered for %s', blessed($c)));
+  }
+
 
   sub setup_routes($c, $app) {
     my $controller_name = $c->controller_name();
@@ -236,72 +342,6 @@ package Game::EvonyTKR::Controller::Generals {
     }
   }
 
-  sub setup_event_handlers($c, $app) {
-
-    #first define variables and state
-    my $completion_state = {
-      skill_books_loaded          => 0,
-      specialties_imported        => 0,
-      ascending_attributes_loaded => 0,
-      general_loader_job_ready    => 0,
-    };
-
-    my $check_prerequisites = sub {
-      if (List::AllUtils::none { $_ == 0 } values $completion_state->%*) {
-        $c->logger->info(sprintf('%s Ready to Get Generals', __PACKAGE__));
-
-      } else {
-        $c->logger->info(sprintf('%s not Ready to Get Generals yet: %s',
-        __PACKAGE__, Data::Printer::np($completion_state, multiline => 0)));
-      }
-    };
-
-    # then define handlers in reverse order of use for safety
-
-    $app->plugins->on(
-      general_loader_job_ready => sub {
-        $completion_state->{general_loader_job_ready} = 1;
-        $check_prerequisites->();
-      }
-    );
-
-    $app->plugins->on(
-      general_loaded => sub {
-        my ($plugin, $data) = @_;
-        my $general = $data->{'general'};
-        $c->logger->info(sprintf('%s detected %s loaded. Building Routes.',
-        __PACKAGE__, $general->name));
-        $c->_build_general_routes($general, $app);
-      }
-    );
-
-    # last define things that will trigger them.
-    # which might be more handlers, see above about
-    # reverse order of use.
-
-    $app->plugins->on(
-      ascending_attributes_imported => sub {
-        $completion_state->{ascending_attributes_loaded} = 1;
-        $check_prerequisites->();
-      }
-    );
-
-    $app->plugins->on(
-      all_books_loaded => sub {
-        $completion_state->{skill_books_loaded} = 1;
-        $check_prerequisites->();
-      }
-    );
-
-    $app->plugins->on(
-      specialties_imported => sub {
-        $completion_state->{specialties_imported} = 1;
-        $check_prerequisites->();
-      }
-    );
-
-    $c->logger->debug(sprintf('all handlers registered for %s', blessed($c)));
-  }
 
   sub _build_general_routes($self, $general, $app,) {
     my $name = $general->name;
@@ -488,7 +528,7 @@ package Game::EvonyTKR::Controller::Generals {
     $c->logger->debug("show detects name $name, showing details.");
     my $calculate_buffs = $c->param('calculate_buffs') // 0;
 
-    my $general = $c->get_general($name);
+    my $general = $c->get_general($name,$cache);
     unless ($general) {
       $c->logger->error("No general found for name $name in the 'show' route.");
       return $c->reply->not_found;

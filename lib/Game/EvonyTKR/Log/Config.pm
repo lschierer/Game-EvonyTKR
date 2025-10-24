@@ -18,25 +18,25 @@ package Game::EvonyTKR::Log::Config {
     my $userHome = File::HomeDir::Tiny::home();
     my @parts    = split '::', __PACKAGE__;
     my $base     = join '-', @parts[0 .. 1];
-    my $logFile  = Mojo::File->new(
-      sprintf('%s/var/log/Perl/dist/%s/root.log', $userHome, $base));
+    my $logDir  = Mojo::File->new(
+      sprintf('%s/var/log/Perl/dist/%s', $userHome, $base));
     # Create directory if needed
-    $logFile->dirname->make_path({ mode => 0711 })
-      unless -d $logFile->dirname;
-    return $logFile;
+    $logDir->make_path({ mode => 0711 })
+      unless -d $logDir->to_abs->to_string;
+    return $logDir;
   }
 
   sub appender_setup {
-    my $logFile = __PACKAGE__->logFileLocation();
-    my $config  = "log4perl.rootLogger = INFO, LOGFILE\n";
-    $config .= "log4perl.appender.LOGFILE = Log::Log4perl::Appender::File\n";
-    $config .= "log4perl.appender.LOGFILE.filename = $logFile\n";
-    $config .= "log4perl.appender.LOGFILE.mode = append\n";
-    $config .= "log4perl.appender.LOGFILE.utf8 = 1\n";
-    $config .= "log4perl.appender.LOGFILE.layout = "
-      . "Log::Log4perl::Layout::PatternLayout\n";
-    $config .= "log4perl.appender.LOGFILE.layout.ConversionPattern = "
-      . "[%p] %d (%C line %L) %m%n\n";
+    my $logDir = __PACKAGE__->logFileLocation();
+    my $config  = qq(
+      log4perl.rootLogger = INFO, LOGFILE
+      log4perl.appender.LOGFILE = Log::Log4perl::Appender::File
+      log4perl.appender.LOGFILE.filename = $logDir/app-$$.log
+      log4perl.appender.LOGFILE.mode = append
+      log4perl.appender.LOGFILE.utf8 = 1
+      log4perl.appender.LOGFILE.layout = Log::Log4perl::Layout::PatternLayout
+      log4perl.appender.LOGFILE.layout.ConversionPattern = [%p] %d (%C line %L) %m%n
+    );
     return $config;
   }
 
@@ -80,7 +80,7 @@ package Game::EvonyTKR::Log::Config {
       'Game::EvonyTKR::Controller::ConflictGroups'           => 'WARN',
       'Game::EvonyTKR::Controller::ControllerBase'           => 'INFO',
       'Game::EvonyTKR::Controller::Covenants'                => 'WARN',
-      'Game::EvonyTKR::Controller::Generals'                 => 'INFO',
+      'Game::EvonyTKR::Controller::Generals'                 => 'DEBUG',
       'Game::EvonyTKR::Controller::Glossary'                 => 'WARN',
       'Game::EvonyTKR::Controller::Pairs'                    => 'INFO',
       'Game::EvonyTKR::Controller::Role::Generals'           => 'DEBUG',

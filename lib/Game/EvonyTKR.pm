@@ -103,31 +103,44 @@ package Game::EvonyTKR {
 
     $self->plugin('Game::EvonyTKR::External::Prebuild');
     # Markdown
-    $self->plugin('Game::EvonyTKR::Plugins::Markdown');
-    # Navigation
-    $self->plugin('Game::EvonyTKR::Plugins::Navigation');
 
-    my @controllerplugins = find_modules 'Game::EvonyTKR::Controller';
-    foreach my $module (@controllerplugins) {
+    $self->hook(before_server_start => sub {
+      my $processmsg = "Detected non-minion process '$0' at pid $$";
+      $self->log->info($processmsg);
+      say $processmsg;
+
+      $self->plugin('Game::EvonyTKR::Plugins::Markdown');
+      # Navigation
+      $self->plugin('Game::EvonyTKR::Plugins::Navigation');
+
+      my @controllerplugins = find_modules 'Game::EvonyTKR::Controller';
+      foreach my $module (@controllerplugins) {
       eval {
         load_class $module;
         $self->plugin($module);
       };
       $self->log->warn("loading module '$module' failed: $@") if $@;
+      }
+
+      # Last the Static Pages
+      # Register last for lowest priority
+      $self->plugin('Game::EvonyTKR::Plugins::StaticPages');
+    });
+    if ($self->isa('Game::EvonyTKR') && $self->can('build_controller')) {
+
     }
 
-    # Last the Static Pages
-    # Register last for lowest priority
-    $self->plugin('Game::EvonyTKR::Plugins::StaticPages');
 
-    # configure to tell it that I will be behind an ELB/ALB.
-    #$self->reverse_proxy(1);
-    Mojo::IOLoop->next_tick(sub ($ioloop) {
+
+      # configure to tell it that I will be behind an ELB/ALB.
+      #$self->reverse_proxy(1);
+      Mojo::IOLoop->next_tick(sub ($ioloop) {
       if (Scalar::Util::blessed($self) eq 'Game::EvonyTKR') {
         $self->log->info('mojo_worker_started');
         $self->plugins->emit(mojo_worker_started => { app => $self });
       }
-    });
+      });
+
   }
 };
 

@@ -222,7 +222,7 @@ package Game::EvonyTKR::External::Prebuild {
       unless defined $generalCache;
     my $distDir = Mojo::Home->new;
     $distDir->detect('Game::EvonyTKR');
-    my $generalCount = 0;
+    my $generalCount = -1;
     state $general_import_started = 0;
     my $loop1;
     $loop1 = Mojo::IOLoop->recurring(
@@ -230,11 +230,11 @@ package Game::EvonyTKR::External::Prebuild {
         if ($plugin->prebuildPrerequisites && $general_import_started == 0) {
           $general_import_started = 1;
           $generalCount           = $plugin->launch_general_import($distDir);
+          $plugin->set_value('generalCount', $generalCount, $generalCache);
           Mojo::IOLoop->remove($loop1);
         }
       }
     );
-    $plugin->set_value('generalCount', $generalCount, $generalCache);
 
     my $generalDir = Mojo::File->new(
       $distDir->child('share', 'collections', 'data', 'generals'));

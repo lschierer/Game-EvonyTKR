@@ -11,21 +11,21 @@ require Game::EvonyTKR::Model::General::Pair;
 require Game::EvonyTKR::Model::Buff::Summarizer;
 require Game::EvonyTKR::Control::Generals::Routing;
 require Game::EvonyTKR::Model::Data;
-
+require Mojo::Util;
 require UUID;
 require Data::Printer;
 use namespace::clean;
 
 package Game::EvonyTKR::Controller::Pairs {
   use Mojo::Base 'Game::EvonyTKR::Controller::ControllerBase';
-  require Mojo::Util;
+  use Mojo::Base 'Game::EvonyTKR::Role::Logger', -role, -signatures;
+  use Mojo::Base 'Game::EvonyTKR::Role::Common', -role, -signatures;
+  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Generals', -role;
   use Mojo::IOLoop;
   use Mojo::JSON     qw(to_json encode_json);
   use MIME::Base64   qw(encode_base64);
   use List::AllUtils qw( all any none );
   use Carp;
-
-  my $logger;
 
   my $session_store = {};
 
@@ -54,8 +54,7 @@ package Game::EvonyTKR::Controller::Pairs {
   }
 
   sub register($c, $app, $config = {}) {
-    $logger = Log::Log4perl->get_logger(__PACKAGE__);
-    $logger->info("Registering routes for " . ref($c));
+    $c->logger->info("Registering routes for " . ref($c));
     $c->SUPER::register($app, $config);
 
     $app->helper(
@@ -100,7 +99,7 @@ package Game::EvonyTKR::Controller::Pairs {
         )->name('Generals_dynamic_pairDetails');
 
         foreach my $route ($app->general_routing->all_valid_routes()) {
-          $logger->debug("building nav items for "
+          $c->logger->debug("building nav items for "
               . $route->{uiTarget} . "|"
               . $route->{buffActivation});
           my $printableUI = $route->{uiTarget} =~ s/-/ /rg;
@@ -127,18 +126,18 @@ package Game::EvonyTKR::Controller::Pairs {
 
   sub pair_receiver ($c, $app, @args) {
     my $pairs = shift(@args);
-    $logger->debug(
+    $c->logger->debug(
       'pair_receiver called: ' . Data::Printer::np($pairs, multiline => 0));
     my $pairs_by_type = __PACKAGE__->getPairs();
 
     unless (ref($pairs) eq 'HASH') {
-      $logger->error(sprintf(
+      $c->logger->error(sprintf(
         'pair_receiver got a %s instead of a HASH', ref($pairs)));
       return;
     }
 
     foreach my $type (sort keys $pairs->%*) {
-      $logger->debug("pairs for type '$type'");
+      $c->logger->debug("pairs for type '$type'");
       my $increment = 0;
       foreach my $p ($pairs->{$type}->@*) {
         unless (
@@ -159,40 +158,40 @@ package Game::EvonyTKR::Controller::Pairs {
             push @{ $pairs_by_type->{$type} }, $pair;
           }
           else {
-            $logger->warn('missing generals for pair: '
+            $c->logger->warn('missing generals for pair: '
                 . Data::Printer::np($p, multiline => 0));
           }
         }
       }
-      $logger->debug(sprintf(
+      $c->logger->debug(sprintf(
         'there are %s pairs of type %s added', $increment, $type));
     }
   }
 
-  sub pairTable ($self) {
+  sub pairTable ($c) {
     my $distDir = Mojo::File::Share::dist_dir('Game::EvonyTKR');
 
-    my $slug_ui   = $self->stash('uiTarget');
-    my $slug_buff = $self->stash('buffActivation');
+    my $slug_ui   = $c->stash('uiTarget');
+    my $slug_buff = $c->stash('buffActivation');
 
     # Lookup route metadata
     my $routing    = Game::EvonyTKR::Control::Generals::Routing->new;
     my $route_meta = $routing->lookup_route($slug_ui, $slug_buff);
 
     unless ($route_meta) {
-      $logger->error("Invalid pair route: $slug_ui | $slug_buff");
+      $c->logger->error("Invalid pair route: $slug_ui | $slug_buff");
 
-      if ($self->app->mode eq 'development') {
-        $logger->debug("Known valid routes:");
+      if ($c->app->mode eq 'development') {
+        $c->logger->debug("Known valid routes:");
         $routing->each_valid_route(
           sub ($key, $meta) {
-            $logger->debug(
+            $c->logger->debug(
               "  $key => " . Data::Printer::np($meta, multiline => 0));
           }
         );
       }
 
-      return $self->render_not_found;
+      return $c->render_not_found;
     }
 
     # Extract metadata
@@ -201,13 +200,13 @@ package Game::EvonyTKR::Controller::Pairs {
     my $uiTarget       = $route_meta->{uiTarget};
 
     my $pair_count = 0;
-    for my $type (keys %{ $self->getPairs() }) {
+    for my $type (keys %{ $c->getPairs() }) {
       $pair_count +=
-        scalar @{ $self->getPairs()->{$generalType} };
+        scalar @{ $c->getPairs()->{$generalType} };
     }
     if ($pair_count == 0) {
       # Pairs not loaded yet, show loading page
-      return $self->render(
+      return $c->render(
         template => 'generals/pairs/loading',
         message  => 'Pairs are still being built. Please refresh in a moment.',
         refresh_seconds => 5
@@ -215,33 +214,33 @@ package Game::EvonyTKR::Controller::Pairs {
     }
 
     # Fetch query params with defaults
-    my $ascendingLevel       = $self->param('ascendingLevel') // 'red5';
-    my $primaryCovenantLevel = $self->param('primaryCovenantLevel')
+    my $ascendingLevel       = $c->param('ascendingLevel') // 'red5';
+    my $primaryCovenantLevel = $c->param('primaryCovenantLevel')
       // 'civilization';
-    my $secondaryCovenantLevel = $self->param('secondaryCovenantLevel')
+    my $secondaryCovenantLevel = $c->param('secondaryCovenantLevel')
       // 'civilization';
 
     my @primarySpecialties =
-      map { $self->param("primarySpecialty$_") // 'gold' } (1 .. 4);
+      map { $c->param("primarySpecialty$_") // 'gold' } (1 .. 4);
     my @secondarySpecialties =
-      map { $self->param("secondarySpecialty$_") // 'gold' } (1 .. 4);
+      map { $c->param("secondarySpecialty$_") // 'gold' } (1 .. 4);
 
     # Validate
     my $data_model = Game::EvonyTKR::Model::Data->new;
 
     unless ($data_model->validateBuffActivation($buffActivation)) {
-      $logger->warn(
+      $c->logger->warn(
         "Invalid Buff Activation: $buffActivation, using 'Overall'");
       $buffActivation = 'Overall';
     }
 
     unless ($data_model->checkAscendingLevel($ascendingLevel)) {
-      $logger->warn("Invalid ascendingLevel: $ascendingLevel, using 'red5'");
+      $c->logger->warn("Invalid ascendingLevel: $ascendingLevel, using 'red5'");
       $ascendingLevel = 'red5';
     }
 
     unless ($data_model->checkCovenantLevel($primaryCovenantLevel)) {
-      $logger->warn(
+      $c->logger->warn(
         sprintf('Invalid primaryCovenantLevel: %s, using "civilization"',
           $primaryCovenantLevel)
       );
@@ -249,7 +248,7 @@ package Game::EvonyTKR::Controller::Pairs {
     }
 
     unless ($data_model->checkCovenantLevel($secondaryCovenantLevel)) {
-      $logger->warn(
+      $c->logger->warn(
         sprintf('Invalid secondaryCovenantLevel: %s, using "civilization"',
           $secondaryCovenantLevel)
       );
@@ -261,7 +260,7 @@ package Game::EvonyTKR::Controller::Pairs {
     @secondarySpecialties =
       $data_model->normalizeSpecialtyLevels(@secondarySpecialties);
 
-    $self->stash(
+    $c->stash(
       template               => 'generals/pairs/GeneralTablePair',
       mode                   => 'pair',
       generalType            => $generalType,
@@ -280,48 +279,48 @@ package Game::EvonyTKR::Controller::Pairs {
       "pages/Generals/$uiTarget/$buffActivation/pair comparison.md");
 
     if (-f $markdown_path) {
-      $logger->debug("Rendering from markdown index file");
-      return $self->render_markdown_file($markdown_path);
+      $c->logger->debug("Rendering from markdown index file");
+      return $c->render_markdown_file($markdown_path);
     }
 
-    $logger->debug("Rendering without markdown file");
-    return $self->render;
+    $c->logger->debug("Rendering without markdown file");
+    return $c->render;
   }
 
-  sub pairCatalog ($self) {
-    my $slug_ui             = $self->stash('uiTarget');
-    my $slug_buff           = $self->stash('buffActivation');
+  sub pairCatalog ($c) {
+    my $slug_ui             = $c->stash('uiTarget');
+    my $slug_buff           = $c->stash('buffActivation');
     my $requested_primaries = [];
 
-    if ($self->req->method eq 'POST') {
-      my $json_data = $self->req->json;
+    if ($c->req->method eq 'POST') {
+      my $json_data = $c->req->json;
       $requested_primaries = $json_data->{primaries} // [];
     }
 
     my $uidseed = join(', ', @$requested_primaries) . ' ' . UUID::uuid7();
-    $logger->debug("uidseed is '$uidseed'");
+    $c->logger->debug("uidseed is '$uidseed'");
 
-    my $session_id = UUID::uuid5($self->getDataModel->UUID5_base, $uidseed);
-    $logger->debug("final session_id is '$session_id'");
+    my $session_id = UUID::uuid5($c->getDataModel->UUID5_base, $uidseed);
+    $c->logger->debug("final session_id is '$session_id'");
 
     # Lookup route metadata
     my $routing    = Game::EvonyTKR::Control::Generals::Routing->new;
     my $route_meta = $routing->lookup_route($slug_ui, $slug_buff);
 
     unless ($route_meta) {
-      $logger->error("Invalid pair route: $slug_ui | $slug_buff");
+      $c->logger->error("Invalid pair route: $slug_ui | $slug_buff");
 
-      if ($self->app->mode eq 'development') {
-        $logger->debug("Known valid routes:");
+      if ($c->app->mode eq 'development') {
+        $c->logger->debug("Known valid routes:");
         $routing->each_valid_route(
           sub ($key, $meta) {
-            $logger->debug(
+            $c->logger->debug(
               "  $key => " . Data::Printer::np($meta, multiline => 0));
           }
         );
       }
 
-      return $self->render_not_found;
+      return $c->render_not_found;
     }
 
     # Extract metadata
@@ -329,9 +328,9 @@ package Game::EvonyTKR::Controller::Pairs {
     my $buffActivation = $route_meta->{buffActivation};
     my $uiTarget       = $route_meta->{uiTarget};
 
-    my @pairs = @{ $self->getPairs()->{$generalType} };
+    my @pairs = @{ $c->getPairs()->{$generalType} };
 
-    $logger->debug(sprintf('There are %s pairs to return.', scalar(@pairs)));
+    $c->logger->debug(sprintf('There are %s pairs to return.', scalar(@pairs)));
 
     # Return just the basic pair information without computing buffs
     my @json_data = map { {
@@ -359,7 +358,7 @@ package Game::EvonyTKR::Controller::Pairs {
       my @filtered;
       foreach my $entry (@json_data) {
         if (exists $requested{ $entry->{primary} }) {
-          $logger->debug(sprintf(
+          $c->logger->debug(sprintf(
             '%s was requsted for session %s',
             $entry->{primary}, $session_id
           ));
@@ -369,7 +368,7 @@ package Game::EvonyTKR::Controller::Pairs {
 
       $session_store->{$session_id} = \@filtered;
 
-      return $self->render(
+      return $c->render(
         json => {
           sessionId => $session_id,
           selected  => \@filtered,
@@ -377,12 +376,12 @@ package Game::EvonyTKR::Controller::Pairs {
       );
     }
     else {
-      $logger->debug(
+      $c->logger->debug(
         "no requested primaries for session '$session_id' returning full list: "
           . Data::Printer::np(@json_data, multiline => 0));
       $session_store->{$session_id} = \@json_data;
 
-      return $self->render(
+      return $c->render(
         json => {
           sessionId => $session_id,
           selected  => \@json_data,
@@ -401,7 +400,7 @@ package Game::EvonyTKR::Controller::Pairs {
     my $run_id     = 0+ $c->param('runId');
     my $session_id = $c->param('sessionId');
     unless (defined($session_id) && length($session_id)) {
-      $logger->error('Session ID must be present!');
+      $c->logger->error('Session ID must be present!');
       my $payload = encode_json({ runId => 0+ $run_id });
       $c->write_sse({ type => 'complete', text => $payload });
       return;
@@ -409,14 +408,14 @@ package Game::EvonyTKR::Controller::Pairs {
     my $selected =
       exists $session_store->{$session_id} ? $session_store->{$session_id} : [];
 
-    $logger->debug(sprintf(
+    $c->logger->debug(sprintf(
       'stream_pair_details called url: %s,'
         . ' uiTarget: %s; buffActivation: %s; run_id: %s',
       $c->req->url->path->to_string,
       $slug_ui, $slug_buff, 0+ $run_id
     ));
 
-    $logger->debug(sprintf(
+    $c->logger->debug(sprintf(
       'session info: sessionId: "%s"; selected: %s',
       $session_id // 'Not Present',
       join ', ',
@@ -429,13 +428,13 @@ package Game::EvonyTKR::Controller::Pairs {
     my $route_meta = $routing->lookup_route($slug_ui, $slug_buff);
 
     unless ($route_meta) {
-      $logger->error("Invalid pair route: $slug_ui | $slug_buff");
+      $c->logger->error("Invalid pair route: $slug_ui | $slug_buff");
 
       if ($c->app->mode eq 'development') {
-        $logger->debug("Known valid routes:");
+        $c->logger->debug("Known valid routes:");
         $routing->each_valid_route(
           sub ($key, $meta) {
-            $logger->debug(
+            $c->logger->debug(
               "  $key => " . Data::Printer::np($meta, multiline => 0));
           }
         );
@@ -458,7 +457,7 @@ package Game::EvonyTKR::Controller::Pairs {
       return $pc;
     } $pairs->@*;
 
-    $logger->debug(sprintf(
+    $c->logger->debug(sprintf(
       'There are %s pairs compute details for %s.',
       scalar(@$pairs), $session_id
     ));
@@ -534,8 +533,8 @@ package Game::EvonyTKR::Controller::Pairs {
         secondarySpecialty4 => $validated_params->{secondarySpecialties}->[3],
       };
 
-      $logger->debug("Minion backend: " . ref($c->app->minion->backend));
-      $logger->debug("Enqueueing job for pair index: $index");
+      $c->logger->debug("Minion backend: " . ref($c->app->minion->backend));
+      $c->logger->debug("Enqueueing job for pair index: $index");
       my $jid = $c->app->minion->enqueue(
         pair_worker => [$args],
         {
@@ -547,7 +546,7 @@ package Game::EvonyTKR::Controller::Pairs {
           }
         }
       );
-      $logger->debug("Enqueued job with ID: $jid");
+      $c->logger->debug("Enqueued job with ID: $jid");
       push @subs, $jid;
 
     }
@@ -561,7 +560,7 @@ package Game::EvonyTKR::Controller::Pairs {
         return if !$c->tx || $c->tx->is_finished;
         my $result = shift;
         if (defined($result) && ref($result) eq 'HASH') {
-          $logger->debug(
+          $c->logger->debug(
             "job $jid result is " . Data::Printer::np($result, multiline => 0));
           if ($result->{result}->{status} eq 'complete') {
             $c->write_sse(
@@ -571,7 +570,7 @@ package Game::EvonyTKR::Controller::Pairs {
         return $result;
       })->catch(sub {
         my $err = shift;
-        $logger->error(
+        $c->logger->error(
           "Job $jid failed: " . Data::Printer::np($err, multiline => 0));
         return undef;    # Return something for Promise->all
       });
@@ -581,14 +580,14 @@ package Game::EvonyTKR::Controller::Pairs {
 
     # Send completion when ALL jobs are done
     Mojo::Promise->all(@promises)->then(sub {
-      $logger->debug("all jobs complete promise handler starting timer");
+      $c->logger->debug("all jobs complete promise handler starting timer");
       return if !$c->tx || $c->tx->is_finished;
       # I cannot know which order the promise handlers will
       # run in, I *need* this one to be *after* all the individual
       # job handlers have run.
       Mojo::IOLoop->timer(
         10 => sub ($loop) {
-          $logger->debug(
+          $c->logger->debug(
             'all jobs complete promise handler sending complete event');
           my $payload = encode_json({ runId => $run_id });
           $c->write_sse({ type => 'complete', text => $payload });
@@ -596,13 +595,13 @@ package Game::EvonyTKR::Controller::Pairs {
       );
 
     })->catch(sub {
-      $logger->error("Some jobs failed in batch");
+      $c->logger->error("Some jobs failed in batch");
       return undef;
     });
 
     $c->on(
       finish => sub {
-        $logger->debug(
+        $c->logger->debug(
           "Client disconnected, canceling " . scalar(@subs) . " jobs");
         foreach my $jid (@subs) {
           my $job = $c->app->minion->job($jid);
@@ -612,15 +611,15 @@ package Game::EvonyTKR::Controller::Pairs {
             my $state = $info->{state};
             if ($state eq 'inactive') {
               $job->remove;
-              $logger->debug("Removed inactive job $jid");
+              $c->logger->debug("Removed inactive job $jid");
             }
             elsif ($state eq 'active' && $info->{pid}) {
               eval { $job->kill(); };
               if ($@) {
-                $logger->debug("Failed to kill job $jid: $@");
+                $c->logger->debug("Failed to kill job $jid: $@");
               }
               else {
-                $logger->debug("Killed active job $jid");
+                $c->logger->debug("Killed active job $jid");
               }
             }
           }
@@ -639,13 +638,13 @@ package Game::EvonyTKR::Controller::Pairs {
 
     # Validate ascending level
     if (!$data_model->checkAscendingLevel($ascendingLevel)) {
-      $logger->warn(
+      $self->logger->warn(
         "Invalid ascendingLevel: $ascendingLevel, using default 'red5'");
       $ascendingLevel = 'red5';
     }
 
     if (!$data_model->checkCovenantLevel($primaryCovenantLevel)) {
-      $logger->warn(
+      $self->logger->warn(
         sprintf('Invalid covenantLevel: %s, using default "civilization"',
           $primaryCovenantLevel)
       );
@@ -656,7 +655,7 @@ package Game::EvonyTKR::Controller::Pairs {
       $data_model->normalizeSpecialtyLevels(@$primarySpecialties);
 
     if (!$data_model->checkCovenantLevel($secondaryCovenantLevel)) {
-      $logger->warn(
+      $self->logger->warn(
         sprintf('Invalid covenantLevel: %s, using default "civilization"',
           $secondaryCovenantLevel)
       );
