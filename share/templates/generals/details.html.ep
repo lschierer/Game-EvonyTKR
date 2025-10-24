@@ -2,9 +2,9 @@
 % title 'General Details: ' . $item->name;
 
 <link rel="stylesheet" href="/css/collectionDetails.css" />
-<% use Scalar::Util qw(reftype); %>
+<% use Scalar::Util qw(reftype blessed); %>
 <div class="general-details">
-  <% if( $item && reftype $item eq 'OBJECT' && $item->isa('Game::EvonyTKR::Model::General')) { %>
+  <% if( defined($item) && $item->isa('Game::EvonyTKR::Model::General')) { %>
     <h2 class="spectrum-Heading spectrum-Heading--sizeXL">Details for <%= $item->name %></h2>
     <div class="basicInfo">
       <div class="baseStats">
@@ -100,7 +100,8 @@
     </div>
   <% } else { %>
     <!-- <%= Scalar::Util::reftype $item; %> -->
-    <!-- <%= $item->isa('Game::EvonyTKR::General'); %> -->
+    <!-- <%= sprintf('item is %sa Game::EvonyTKR::Model::General', $item->isa('Game::EvonyTKR::Model::General') ? '' : 'not '); %> -->
+    <!-- <%= blessed($item); %> -->
   <% } %>
 
   % if (stash 'buff-summaries') {
