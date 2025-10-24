@@ -12,8 +12,8 @@ require Unicode::CaseFold;
 package Game::EvonyTKR::Role::Common {
   use Mojo::Base -role, -signatures;
   use Carp;
-  use UUID qw(uuid5);
-  use Unicode::CaseFold qw(fc);
+  use UUID               qw(uuid5);
+  use Unicode::CaseFold  qw(fc);
   use Unicode::Normalize qw(NFKD);
 
   sub normalize ($self, $name) {

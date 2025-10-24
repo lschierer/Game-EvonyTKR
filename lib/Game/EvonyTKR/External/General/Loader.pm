@@ -63,11 +63,13 @@ package Game::EvonyTKR::External::General::Loader {
     }
     my $general;
     $generalCache = $job->create_general_cache() unless defined($generalCache);
-    $general = $job->get_general($general_name,$generalCache);
-    if(defined($general) &&
-      ref($general) eq 'HASH' &&
-      blessed($general) && $general->isa('Game::EvonyTKR::Model::General')) {
-      my $result = sprintf('returning already loaded general %s', $general_name);
+    $general      = $job->get_general($general_name, $generalCache);
+    if ( defined($general)
+      && ref($general) eq 'HASH'
+      && blessed($general)
+      && $general->isa('Game::EvonyTKR::Model::General')) {
+      my $result =
+        sprintf('returning already loaded general %s', $general_name);
       $job->logger->info($result);
       return $job->finish($result);
     }

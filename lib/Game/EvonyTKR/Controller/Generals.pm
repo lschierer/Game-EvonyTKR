@@ -64,46 +64,51 @@ package Game::EvonyTKR::Controller::Generals {
       $c->setup_event_handlers($app);
       1;
     } or do {
-        say "Error in setup_event_handlers: $@";
+      say "Error in setup_event_handlers: $@";
     };
     eval {
       say 'calling setup_helpers';
       $c->setup_helpers($app);
       1;
     } or do {
-        say "Error in setup_helpers: $@";
+      say "Error in setup_helpers: $@";
     };
     eval {
       say 'calling setup_routes';
       $c->setup_routes($app);
       1;
     } or do {
-        say "Error in setup_routes: $@";
+      say "Error in setup_routes: $@";
     };
 
     say sprintf('%s register complete', __PACKAGE__);
   }
 
-  sub setup_generals($c, $app){
+  sub setup_generals($c, $app) {
     my $loop;
     state $receivedGenerals = 0;
-    $loop = Mojo::IOLoop->recurring( 10 => sub {
-      my $generalCount = $c->get_value('generalCount', $cache) // -1;
-      $c->logger->debug(sprintf('setup_generals: receivedGenerals: %s; generalCount: %s',
-      $receivedGenerals,$generalCount));
-      if($generalCount > 0 && $receivedGenerals < $generalCount){
-        my $generals = $c->get_generals($cache);
-        if(defined($generals) && ref($generals) eq 'HASH'){
-          foreach my $general (values $generals->%*){
-            # emit a signal to break out of this loop and stay async.
-            $app->plugins->emit(general_loaded => {general => $general});
-            $receivedGenerals++;
+    $loop = Mojo::IOLoop->recurring(
+      10 => sub {
+        my $generalCount = $c->get_value('generalCount', $cache) // -1;
+        $c->logger->debug(sprintf(
+          'setup_generals: receivedGenerals: %s; generalCount: %s',
+          $receivedGenerals, $generalCount
+        ));
+        if ($generalCount > 0 && $receivedGenerals < $generalCount) {
+          my $generals = $c->get_generals($cache);
+          if (defined($generals) && ref($generals) eq 'HASH') {
+            foreach my $general (values $generals->%*) {
+              # emit a signal to break out of this loop and stay async.
+              $app->plugins->emit(general_loaded => { general => $general });
+              $receivedGenerals++;
+            }
           }
         }
-      }elsif($generalCount > 0){
-        Mojo::IOLoop->remove($loop);
+        elsif ($generalCount > 0) {
+          Mojo::IOLoop->remove($loop);
+        }
       }
-    });
+    );
     Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
   }
 
@@ -136,9 +141,12 @@ package Game::EvonyTKR::Controller::Generals {
       if (List::AllUtils::none { $_ == 0 } values $completion_state->%*) {
         $c->logger->info(sprintf('%s Ready to Get Generals', __PACKAGE__));
 
-      } else {
-        $c->logger->info(sprintf('%s not Ready to Get Generals yet: %s',
-        __PACKAGE__, Data::Printer::np($completion_state, multiline => 0)));
+      }
+      else {
+        $c->logger->info(sprintf(
+          '%s not Ready to Get Generals yet: %s',
+          __PACKAGE__, Data::Printer::np($completion_state, multiline => 0)
+        ));
       }
     };
 
@@ -155,8 +163,10 @@ package Game::EvonyTKR::Controller::Generals {
       general_loaded => sub {
         my ($plugin, $data) = @_;
         my $general = $data->{'general'};
-        $c->logger->info(sprintf('%s detected %s loaded. Building Routes.',
-        __PACKAGE__, $general->name));
+        $c->logger->info(sprintf(
+          '%s detected %s loaded. Building Routes.',
+          __PACKAGE__, $general->name
+        ));
         $c->_build_general_routes($general, $app);
       }
     );
@@ -191,21 +201,22 @@ package Game::EvonyTKR::Controller::Generals {
         say 'general_routing_available signal recieved';
         $c->logger->debug('general_routing_available signal recieved');
         my $delay = 10;
-        Mojo::IOLoop->timer( $delay => sub {
-          say "$delay second timer complete";
-          eval {
-            $c->setup_generals($app);
-            1;
-          } or do {
-            say "problem in setup_generals";
+        Mojo::IOLoop->timer(
+          $delay => sub {
+            say "$delay second timer complete";
+            eval {
+              $c->setup_generals($app);
+              1;
+            } or do {
+              say "problem in setup_generals";
+            }
           }
-        });
+        );
       }
     );
 
     $c->logger->debug(sprintf('all handlers registered for %s', blessed($c)));
   }
-
 
   sub setup_routes($c, $app) {
     my $controller_name = $c->controller_name();
@@ -341,7 +352,6 @@ package Game::EvonyTKR::Controller::Generals {
       });
     }
   }
-
 
   sub _build_general_routes($self, $general, $app,) {
     my $name = $general->name;
@@ -528,7 +538,7 @@ package Game::EvonyTKR::Controller::Generals {
     $c->logger->debug("show detects name $name, showing details.");
     my $calculate_buffs = $c->param('calculate_buffs') // 0;
 
-    my $general = $c->get_general($name,$cache);
+    my $general = $c->get_general($name, $cache);
     unless ($general) {
       $c->logger->error("No general found for name $name in the 'show' route.");
       return $c->reply->not_found;

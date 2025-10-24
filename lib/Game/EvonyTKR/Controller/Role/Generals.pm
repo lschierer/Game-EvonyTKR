@@ -16,20 +16,17 @@ package Game::EvonyTKR::Controller::Role::Generals {
   our $decoder = Sereal::Decoder->new();
 
   our $encoder = Sereal::Encoder->new({
-    canonical           => 1,
-    no_shared_hashkeys  => 1,
-    freeze_callbacks    => 1,
-    freeze_unknown      => 1,
+    canonical          => 1,
+    no_shared_hashkeys => 1,
+    freeze_callbacks   => 1,
+    freeze_unknown     => 1,
   });
 
-
   sub create_general_cache ($self) {
-    $self->logger->debug(
-      sprintf(
-        '%s log level is %s',
-        __PACKAGE__, Log::Log4perl::Level::to_level($self->logger->level())
-      )
-    );
+    $self->logger->debug(sprintf(
+      '%s log level is %s',
+      __PACKAGE__, Log::Log4perl::Level::to_level($self->logger->level())
+    ));
     state $cache;
     $cache = $self->create_cache({
       namespace => $namespace,
@@ -40,7 +37,7 @@ package Game::EvonyTKR::Controller::Role::Generals {
 
   sub add_general ($self, $name, $general, $store) {
     my $key = $name =~ s/ /_/gr;
-    my $eg = $encoder->encode($general);
+    my $eg  = $encoder->encode($general);
     my $ar  = $self->add_item($key, $eg, $store);
     $self->logger->debug(
       "attempting to add key '$key' for name '$name' was '$ar'");
@@ -49,27 +46,32 @@ package Game::EvonyTKR::Controller::Role::Generals {
 
   sub get_general ($self, $name, $store) {
     state $generals = {};
-    if(exists $generals->{$self->normalize($name)}){
+    if (exists $generals->{ $self->normalize($name) }) {
       $self->logger->debug("Returning general $name from local cache");
-      return $generals->{$self->normalize($name)};
+      return $generals->{ $self->normalize($name) };
     }
     my $key = $name =~ s/ /_/gr;
     $key = $self->normalize($key);
     my $eg = $self->get_value($key, $store);
-    if(defined($eg) && length($eg)){
-      $decoder->decode($eg, my $general );
-      unless(blessed($general) &&
-      $general->isa('Game::EvonyTKR::Model::General') &&
-      $general->name eq $name) {
-        $self->logger->error(sprintf('retrieved unexpected general: expected: "%s" ne recieved: "%s" - a %s',
-        $name, $general->name, blessed($general) ));
+    if (defined($eg) && length($eg)) {
+      $decoder->decode($eg, my $general);
+      unless (blessed($general)
+        && $general->isa('Game::EvonyTKR::Model::General')
+        && $general->name eq $name) {
+        $self->logger->error(sprintf(
+'retrieved unexpected general: expected: "%s" ne recieved: "%s" - a %s',
+          $name, $general->name, blessed($general)
+        ));
         return;
       }
-      $generals->{$self->normalize($general->name)} = $general;
+      $generals->{ $self->normalize($general->name) } = $general;
       return $general;
-    } else {
-      $self->logger->warn(sprintf('unable to retrieve encoded general for %s with key %s',
-      $name, $key));
+    }
+    else {
+      $self->logger->warn(sprintf(
+        'unable to retrieve encoded general for %s with key %s',
+        $name, $key
+      ));
     }
   }
 
@@ -96,18 +98,18 @@ package Game::EvonyTKR::Controller::Role::Generals {
 
     my $result = {};
     foreach my $key (keys $all->%*) {
-      unless(defined($key) && length($key)){
+      unless (defined($key) && length($key)) {
         $self->logger->error("bogus key in get_all_items result!!");
         next;
       }
       my $ev = $all->{$key};
-      unless(defined($ev) && length($ev)) {
+      unless (defined($ev) && length($ev)) {
         $self->logger->error("key '$key' points at undef!!");
         next;
       }
-      $decoder->decode($ev, my $item );
-      my $name  = $key =~ s/_/ /rg;
-      $result->{$self->normalize($name)} = $item;
+      $decoder->decode($ev, my $item);
+      my $name = $key =~ s/_/ /rg;
+      $result->{ $self->normalize($name) } = $item;
     }
     return $result;
   }

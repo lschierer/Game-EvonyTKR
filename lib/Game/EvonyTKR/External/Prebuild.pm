@@ -238,7 +238,7 @@ package Game::EvonyTKR::External::Prebuild {
 
     my $generalDir = Mojo::File->new(
       $distDir->child('share', 'collections', 'data', 'generals'));
-    my @suffixlist            = ('.yaml', '.yml');
+    my @suffixlist = ('.yaml', '.yml');
     my @yaml_files = $generalDir->list->map(sub {
       my $e = $_;
       if ($e->to_string =~ m/\.y[a]?ml$/) {
@@ -276,12 +276,13 @@ package Game::EvonyTKR::External::Prebuild {
               expire   => 3600,
             }
           );
-        } elsif ($cachedCount >= $generalCount - 5) {
+        }
+        elsif ($cachedCount >= $generalCount - 5) {
           # We're missing exactly one - let's find which one
-          my %cached_names = map { $_ => 1 } keys $generals->%*;
+          my %cached_names     = map { $_ => 1 } keys $generals->%*;
           my $missing_generals = [];
           for my $yaml_file (@yaml_files) {
-            my $general_name = $yaml_file =~ s/\.ya?ml$//r;
+            my $general_name    = $yaml_file =~ s/\.ya?ml$//r;
             my $normalized_name = $plugin->normalize($general_name);
             unless (exists $cached_names{$normalized_name}) {
               push @$missing_generals, $general_name;
@@ -289,11 +290,11 @@ package Game::EvonyTKR::External::Prebuild {
           }
           $plugin->logger->error(sprintf(
             'Missing %d general(s): %s (cached: %d, expected: %d)',
-            scalar(@$missing_generals),
-            join(', ', @$missing_generals),
-            $cachedCount, $generalCount
+            scalar(@$missing_generals), join(', ', @$missing_generals),
+            $cachedCount,               $generalCount
           ));
-        } else {
+        }
+        else {
           $plugin->logger->debug(sprintf(
             'cached count %s less than expected count %s; generals is %s',
             $cachedCount, $generalCount, ref($generals)

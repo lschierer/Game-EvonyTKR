@@ -18,8 +18,8 @@ package Game::EvonyTKR::Log::Config {
     my $userHome = File::HomeDir::Tiny::home();
     my @parts    = split '::', __PACKAGE__;
     my $base     = join '-', @parts[0 .. 1];
-    my $logDir  = Mojo::File->new(
-      sprintf('%s/var/log/Perl/dist/%s', $userHome, $base));
+    my $logDir =
+      Mojo::File->new(sprintf('%s/var/log/Perl/dist/%s', $userHome, $base));
     # Create directory if needed
     $logDir->make_path({ mode => 0711 })
       unless -d $logDir->to_abs->to_string;
@@ -28,7 +28,7 @@ package Game::EvonyTKR::Log::Config {
 
   sub appender_setup {
     my $logDir = __PACKAGE__->logFileLocation();
-    my $config  = qq(
+    my $config = qq(
       log4perl.rootLogger = INFO, LOGFILE
       log4perl.appender.LOGFILE = Log::Log4perl::Appender::File
       log4perl.appender.LOGFILE.filename = $logDir/app-$$.log

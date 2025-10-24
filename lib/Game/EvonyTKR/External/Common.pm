@@ -96,9 +96,16 @@ class Game::EvonyTKR::External::Common : isa(Game::EvonyTKR::Shared::Constants)
       $self->logger->logcroak(
         sprintf('No Builtin Book for %s available.', $g->name));
       return;
-    } else {
-      $self->logger->debug(sprintf('%s is in fact a %s which %s',
-      $bb->name, blessed($bb), $bb->isa('Game::EvonyTKR::Model::Book') ? 'isa Game::EvonyTKR::Model::Book' : 'fails isa Game::EvonyTKR::Model::Book'));
+    }
+    else {
+      $self->logger->debug(sprintf(
+        '%s is in fact a %s which %s',
+        $bb->name,
+        blessed($bb),
+        $bb->isa('Game::EvonyTKR::Model::Book')
+        ? 'isa Game::EvonyTKR::Model::Book'
+        : 'fails isa Game::EvonyTKR::Model::Book'
+      ));
     }
     $g->builtInBook($bb);
     $generals->{ $self->normalize($g->name) } = $g;

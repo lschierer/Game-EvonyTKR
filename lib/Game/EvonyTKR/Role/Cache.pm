@@ -16,8 +16,8 @@ package Game::EvonyTKR::Role::Cache {
     compress_ratio     => 0.9,
     compress_methods   =>
       [\&IO::Compress::Gzip::gzip, \&IO::Uncompress::Gunzip::gunzip],
-    utf8              => 1,
-    nowait            => 1,
+    utf8   => 1,
+    nowait => 1,
   );
 
   sub default_client($self) {
@@ -61,8 +61,9 @@ package Game::EvonyTKR::Role::Cache {
       if (defined $gets_result) {
         ($cas_token, $current_keys,) = @$gets_result;
         $self->logger->debug(sprintf(
-        '%s: found current keys "%s" for cas_token "%s"',
-        $logkey, $current_keys, $cas_token));
+          '%s: found current keys "%s" for cas_token "%s"',
+          $logkey, $current_keys, $cas_token
+        ));
         $current_keys = '' unless defined($current_keys);
         # Add our key if it's not already there
         my @keys = grep {length} split ',', $current_keys;
@@ -70,7 +71,8 @@ package Game::EvonyTKR::Role::Cache {
         unless (grep { $_ eq $key } @keys) {
           # sort the keys for easier debugging.
           push @keys, $key;
-          $new_keys = join ',', sort { "$a" cmp "$b" } List::AllUtils::uniq @keys;
+          $new_keys = join ',',
+            sort { "$a" cmp "$b" } List::AllUtils::uniq @keys;
         }
         else {
           $self->logger->warn(
@@ -117,29 +119,25 @@ package Game::EvonyTKR::Role::Cache {
     $client //= $self->default_client;
 
     my $casr = $client->gets('_all_keys') // [undef, ''];
-    $self->logger->debug(
-      sprintf(
-        'get_all_items casr %s', Data::Printer::np($casr, multiline => 0)
-      )
-    );
+    $self->logger->debug(sprintf('get_all_items casr %s',
+      Data::Printer::np($casr, multiline => 0)));
     my @keys = uniq split ',', $casr->[1];
     @keys = grep {length} @keys;
     $self->logger->debug(sprintf('get_all_items found %s keys', scalar @keys));
     my $gmr = $client->get_multi(@keys);
     $self->logger->debug(
-      sprintf('get_all_items get_multi returned %s items',
-        scalar keys $gmr->%*)
+      sprintf(
+        'get_all_items get_multi returned %s items', scalar keys $gmr->%*
+      )
     );
 
     if (scalar keys $gmr->%* == 0 && scalar @keys > 0) {
       my $key  = $keys[0];
       my $test = $client->get($key);
-      $self->logger->debug(
-        sprintf(
-          'get_all_items test get returned %s for key %s',
-          Data::Printer::np($test, multiline => 0), $key
-        )
-      );
+      $self->logger->debug(sprintf(
+        'get_all_items test get returned %s for key %s',
+        Data::Printer::np($test, multiline => 0), $key
+      ));
     }
     return $gmr;
   }

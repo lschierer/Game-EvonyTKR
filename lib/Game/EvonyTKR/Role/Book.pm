@@ -155,9 +155,8 @@ package Game::EvonyTKR::Role::Book {
       $b->level($object->{level});
     }
     else {
-      $b = Game::EvonyTKR::Model::Book->new(
-        name  => $object->{name},
-      )->with_roles('Game::EvonyTKR::Role::Book::Builtin');
+      $b = Game::EvonyTKR::Model::Book->new(name => $object->{name},)
+        ->with_roles('Game::EvonyTKR::Role::Book::Builtin');
     }
     if (exists $object->{text}) {
       $b->text($object->{text});
