@@ -1,0 +1,99 @@
+general: Charles VI
+id: Charles VI
+ascending:
+  - level: red1
+    text: Attacking Ranged Troop Attack +15% and Defense +20%
+    buffs:
+      - attribute: attack
+        conditions:
+          - Attacking
+        targetedType: Ranged Troops
+        value:
+          number: 15
+          unit: percentage
+      - attribute: defense
+        conditions:
+          - Attacking
+        targetedType: Ranged Troops
+        value:
+          number: 20
+          unit: percentage
+  - level: red2
+    text: Attacking Troop Death into Wounded +8%
+    buffs:
+      - attribute: Death to Wounded
+        conditions:
+          - Attacking
+        passive: 0
+        value:
+          number: 8
+          unit: percentage
+  - level: red3
+    text: When attacking, Ranged Troop and Siege Machine Attack +25%, Ranged Troop HP +30%
+    buffs:
+      - attribute: attack
+        targetedType: Ranged Troops
+        conditions:
+          - Attacking
+        value:
+          number: 25
+          unit: percentage
+      - attribute: attack
+        targetedType: Siege Machines
+        conditions:
+          - Attacking
+        value:
+          number: 25
+          unit: percentage
+      - attribute: hp
+        targetedType: Ranged Troops
+        conditions:
+          - Attacking
+        value:
+          number: 30
+          unit: percentage
+  - level: red4
+    text: When attacking, Ranged Toop and Siege Machine Defense +30%, March Size Capacity +10%
+    buffs:
+      - attribute: defense
+        targetedType: Ranged Troops
+        conditions:
+          - Attacking
+        value:
+          number: 30
+          unit: percentage
+      - attribute: defense
+        targetedType: Siege Machines
+        conditions:
+          - Attacking
+        value:
+          number: 30
+          unit: percentage
+      - attribute: March Size
+        value:
+          number: 10
+          unit: percentage
+  - level: red5
+    text: Attacking Ranged Troop Attack, Defense and HP +40%
+    buffs:
+      - attribute: attack
+        targetedType: Ranged Troops
+        conditions:
+          - Attacking
+        value:
+          number: 40
+          unit: percentage
+      - attribute: defense
+        targetedType: Ranged Troops
+        conditions:
+          - Attacking
+        value:
+          number: 40
+          unit: percentage
+      - attribute: hp
+        targetedType: Ranged Troops
+        conditions:
+          - Attacking
+        value:
+          number: 40
+          unit: percentage
