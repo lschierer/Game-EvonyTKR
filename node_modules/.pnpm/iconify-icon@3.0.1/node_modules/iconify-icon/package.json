@@ -1,0 +1,79 @@
+{
+  "name": "iconify-icon",
+  "description": "Icon web component that loads icon data on demand. Over 200,000 icons to choose from",
+  "author": "Vjacheslav Trushkin <cyberalien@gmail.com> (https://iconify.design)",
+  "version": "3.0.1",
+  "license": "MIT",
+  "main": "./dist/iconify-icon.cjs",
+  "types": "./dist/iconify-icon.d.ts",
+  "jsdelivr": "./dist/iconify-icon.min.js",
+  "unpkg": "./dist/iconify-icon.min.js",
+  "module": "./dist/iconify-icon.mjs",
+  "bugs": "https://github.com/iconify/iconify/issues",
+  "homepage": "https://iconify.design/",
+  "funding": "https://github.com/sponsors/cyberalien",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/iconify/iconify.git",
+    "directory": "iconify-icon/icon"
+  },
+  "exports": {
+    ".": {
+      "require": "./dist/iconify-icon.cjs",
+      "import": "./dist/iconify-icon.mjs",
+      "types": "./dist/iconify-icon.d.ts",
+      "default": "./dist/iconify-icon.min.js"
+    },
+    "./dist/iconify": {
+      "require": "./dist/iconify-icon.cjs",
+      "import": "./dist/iconify-icon.mjs",
+      "types": "./dist/iconify-icon.d.ts",
+      "default": "./dist/iconify-icon.min.js"
+    },
+    "./dist/iconify.min": {
+      "require": "./dist/iconify-icon.cjs",
+      "import": "./dist/iconify-icon.mjs",
+      "types": "./dist/iconify-icon.d.ts",
+      "default": "./dist/iconify-icon.min.js"
+    },
+    "./*": "./*"
+  },
+  "dependencies": {
+    "@iconify/types": "^2.0.0"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.3.1",
+    "@eslint/js": "^9.31.0",
+    "@microsoft/api-extractor": "^7.52.9",
+    "@rollup/plugin-node-resolve": "^15.3.1",
+    "@rollup/plugin-replace": "^6.0.2",
+    "@rollup/plugin-terser": "^0.4.4",
+    "@types/jest": "^29.5.14",
+    "@types/jsdom": "^21.1.7",
+    "@types/node": "^22.16.5",
+    "@typescript-eslint/eslint-plugin": "^8.38.0",
+    "cross-env": "^7.0.3",
+    "eslint": "^9.31.0",
+    "globals": "^15.15.0",
+    "jsdom": "^25.0.1",
+    "rimraf": "^6.0.1",
+    "rollup": "^4.45.1",
+    "ts-jest": "^29.4.0",
+    "typescript": "^5.8.3",
+    "vitest": "^2.1.9",
+    "@iconify/core": "^4.1.0",
+    "@iconify/utils": "^3.0.2"
+  },
+  "scripts": {
+    "clean": "rimraf lib dist tsconfig.tsbuildinfo",
+    "lint": "eslint src/**/*.ts",
+    "prebuild": "pnpm run lint && pnpm run clean",
+    "build": "node build",
+    "build:api": "api-extractor run --local --verbose",
+    "build:lib": "tsc -b",
+    "build:dist": "rollup -c rollup.config.mjs",
+    "test:jest": "vitest --config vitest.config.js",
+    "test:mjs": "cross-env NODE_OPTIONS=--experimental-vm-modules node tests/import-test.mjs",
+    "test": "pnpm run test:jest && pnpm run test:mjs"
+  }
+}

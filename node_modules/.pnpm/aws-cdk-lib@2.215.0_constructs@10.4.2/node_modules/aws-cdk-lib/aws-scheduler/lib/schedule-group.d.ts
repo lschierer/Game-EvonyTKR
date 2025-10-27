@@ -1,0 +1,234 @@
+import { Construct } from 'constructs';
+import * as cloudwatch from '../../aws-cloudwatch';
+import * as iam from '../../aws-iam';
+import { IResource, RemovalPolicy, Resource } from '../../core';
+/**
+ * Properties for a Schedule Group.
+ */
+export interface ScheduleGroupProps {
+    /**
+     * The name of the schedule group.
+     *
+     * Up to 64 letters (uppercase and lowercase), numbers, hyphens, underscores and dots are allowed.
+     *
+     * @default - A unique name will be generated
+     */
+    readonly scheduleGroupName?: string;
+    /**
+     * The removal policy for the group. If the group is removed also all schedules are removed.
+     *
+     * @default RemovalPolicy.RETAIN
+     */
+    readonly removalPolicy?: RemovalPolicy;
+}
+/**
+ * Interface representing a created or an imported `ScheduleGroup`.
+ */
+export interface IScheduleGroup extends IResource {
+    /**
+     * The name of the schedule group
+     *
+     * @attribute
+     */
+    readonly scheduleGroupName: string;
+    /**
+     * The arn of the schedule group
+     *
+     * @attribute
+     */
+    readonly scheduleGroupArn: string;
+    /**
+     * Return the given named metric for this group schedules
+     *
+     * @default - sum over 5 minutes
+     */
+    metric(metricName: string, props?: cloudwatch.MetricOptions): cloudwatch.Metric;
+    /**
+     * Metric for the number of invocations that were throttled because it exceeds your service quotas.
+     *
+     * @see https://docs.aws.amazon.com/scheduler/latest/UserGuide/scheduler-quotas.html
+     *
+     * @default - sum over 5 minutes
+     */
+    metricThrottled(props?: cloudwatch.MetricOptions): cloudwatch.Metric;
+    /**
+     * Metric for all invocation attempts.
+     *
+     * @default - sum over 5 minutes
+     */
+    metricAttempts(props?: cloudwatch.MetricOptions): cloudwatch.Metric;
+    /**
+     * Emitted when the target returns an exception after EventBridge Scheduler calls the target API.
+     *
+     * @default - sum over 5 minutes
+     */
+    metricTargetErrors(props?: cloudwatch.MetricOptions): cloudwatch.Metric;
+    /**
+     * Metric for invocation failures due to API throttling by the target.
+     *
+     * @default - sum over 5 minutes
+     */
+    metricTargetThrottled(props?: cloudwatch.MetricOptions): cloudwatch.Metric;
+    /**
+     * Metric for dropped invocations when EventBridge Scheduler stops attempting to invoke the target after a schedule's retry policy has been exhausted.
+     *
+     * @default - sum over 5 minutes
+     */
+    metricDropped(props?: cloudwatch.MetricOptions): cloudwatch.Metric;
+    /**
+     * Metric for invocations delivered to the DLQ
+     *
+     * @default - sum over 5 minutes
+     */
+    metricSentToDLQ(props?: cloudwatch.MetricOptions): cloudwatch.Metric;
+    /**
+     * Metric for failed invocations that also failed to deliver to DLQ.
+     *
+     * @default - sum over 5 minutes
+     */
+    metricFailedToBeSentToDLQ(errorCode?: string, props?: cloudwatch.MetricOptions): cloudwatch.Metric;
+    /**
+     * Metric for delivery of failed invocations to DLQ when the payload of the event sent to the DLQ exceeds the maximum size allowed by Amazon SQS.
+     *
+     * @default - sum over 5 minutes
+     */
+    metricSentToDLQTruncated(props?: cloudwatch.MetricOptions): cloudwatch.Metric;
+    /**
+     * Grant the indicated permissions on this group to the given principal
+     */
+    grant(grantee: iam.IGrantable, ...actions: string[]): iam.Grant;
+    /**
+     * Grant list and get schedule permissions for schedules in this group to the given principal
+     */
+    grantReadSchedules(identity: iam.IGrantable): iam.Grant;
+    /**
+     * Grant create and update schedule permissions for schedules in this group to the given principal
+     */
+    grantWriteSchedules(identity: iam.IGrantable): iam.Grant;
+    /**
+     * Grant delete schedule permission for schedules in this group to the given principal
+     */
+    grantDeleteSchedules(identity: iam.IGrantable): iam.Grant;
+}
+declare abstract class ScheduleGroupBase extends Resource implements IScheduleGroup {
+    /**
+     * The name of the schedule group
+     *
+     * @attribute
+     */
+    abstract readonly scheduleGroupName: string;
+    /**
+     * The arn of the schedule group
+     *
+     * @attribute
+     */
+    abstract readonly scheduleGroupArn: string;
+    /**
+     * Return the given named metric for this schedule group
+     *
+     * @default - sum over 5 minutes
+     */
+    metric(metricName: string, props?: cloudwatch.MetricOptions): cloudwatch.Metric;
+    /**
+     * Metric for the number of invocations that were throttled because it exceeds your service quotas.
+     *
+     * @see https://docs.aws.amazon.com/scheduler/latest/UserGuide/scheduler-quotas.html
+     *
+     * @default - sum over 5 minutes
+     */
+    metricThrottled(props?: cloudwatch.MetricOptions): cloudwatch.Metric;
+    /**
+     * Metric for all invocation attempts.
+     *
+     * @default - sum over 5 minutes
+     */
+    metricAttempts(props?: cloudwatch.MetricOptions): cloudwatch.Metric;
+    /**
+     * Emitted when the target returns an exception after EventBridge Scheduler calls the target API.
+     *
+     * @default - sum over 5 minutes
+     */
+    metricTargetErrors(props?: cloudwatch.MetricOptions): cloudwatch.Metric;
+    /**
+     * Metric for invocation failures due to API throttling by the target.
+     *
+     * @default - sum over 5 minutes
+     */
+    metricTargetThrottled(props?: cloudwatch.MetricOptions): cloudwatch.Metric;
+    /**
+     * Metric for dropped invocations when EventBridge Scheduler stops attempting to invoke the target after a schedule's retry policy has been exhausted.
+     *
+     * @default - sum over 5 minutes
+     */
+    metricDropped(props?: cloudwatch.MetricOptions): cloudwatch.Metric;
+    /**
+     * Metric for invocations delivered to the DLQ
+     *
+     * @default - sum over 5 minutes
+     */
+    metricSentToDLQ(props?: cloudwatch.MetricOptions): cloudwatch.Metric;
+    /**
+     * Metric for failed invocations that also failed to deliver to DLQ.
+     *
+     * @default - sum over 5 minutes
+     */
+    metricFailedToBeSentToDLQ(errorCode?: string, props?: cloudwatch.MetricOptions): cloudwatch.Metric;
+    /**
+     * Metric for delivery of failed invocations to DLQ when the payload of the event sent to the DLQ exceeds the maximum size allowed by Amazon SQS.
+     *
+     * @default - sum over 5 minutes
+     */
+    metricSentToDLQTruncated(props?: cloudwatch.MetricOptions): cloudwatch.Metric;
+    /**
+     * Grant the indicated permissions on this schedule group to the given principal
+     */
+    grant(grantee: iam.IGrantable, ...actions: string[]): iam.Grant;
+    private arnForScheduleInGroup;
+    /**
+     * Grant list and get schedule permissions for schedules in this group to the given principal
+     */
+    grantReadSchedules(identity: iam.IGrantable): iam.Grant;
+    /**
+     * Grant create and update schedule permissions for schedules in this group to the given principal
+     */
+    grantWriteSchedules(identity: iam.IGrantable): iam.Grant;
+    /**
+     * Grant delete schedule permission for schedules in this group to the given principal
+     */
+    grantDeleteSchedules(identity: iam.IGrantable): iam.Grant;
+}
+/**
+ * A Schedule Group.
+ * @resource AWS::Scheduler::ScheduleGroup
+ */
+export declare class ScheduleGroup extends ScheduleGroupBase {
+    /** Uniquely identifies this class. */
+    static readonly PROPERTY_INJECTION_ID: string;
+    /**
+     * Import an external schedule group by ARN.
+     *
+     * @param scope construct scope
+     * @param id construct id
+     * @param scheduleGroupArn the ARN of the schedule group to import (e.g. `arn:aws:scheduler:region:account-id:schedule-group/group-name`)
+     */
+    static fromScheduleGroupArn(scope: Construct, id: string, scheduleGroupArn: string): IScheduleGroup;
+    /**
+     * Import a default schedule group.
+     *
+     * @param scope construct scope
+     * @param id construct id
+     */
+    static fromDefaultScheduleGroup(scope: Construct, id: string): IScheduleGroup;
+    /**
+     * Import an existing schedule group with a given name.
+     *
+     * @param scope construct scope
+     * @param id construct id
+     * @param scheduleGroupName the name of the existing schedule group to import
+     */
+    static fromScheduleGroupName(scope: Construct, id: string, scheduleGroupName: string): IScheduleGroup;
+    readonly scheduleGroupName: string;
+    readonly scheduleGroupArn: string;
+    constructor(scope: Construct, id: string, props?: ScheduleGroupProps);
+}
+export {};

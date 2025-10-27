@@ -1,0 +1,17 @@
+@import url('@spectrum-css/button/dist/index.css');
+
+div.collection-list {
+  padding: var(--size-4) var(--size-3);
+}
+
+.collection-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: var(--size-3);
+  list-style: none;
+  padding: 0;
+}
+
+.collection-item {
+  padding: var(--size-3);
+}

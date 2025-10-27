@@ -1,0 +1,15 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.canCollectTelemetry = canCollectTelemetry;
+/**
+ * Whether or not we collect telemetry
+ */
+function canCollectTelemetry(args, context) {
+    if ((['true', '1'].includes(process.env.CDK_DISABLE_CLI_TELEMETRY ?? '')) ||
+        ['false', false].includes(context.get('cli-telemetry')) ||
+        (args['version-reporting'] !== undefined && !args['version-reporting'])) /* aliased with telemetry option */ {
+        return false;
+    }
+    return true;
+}
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiY29sbGVjdC10ZWxlbWV0cnkuanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyJjb2xsZWN0LXRlbGVtZXRyeS50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiOztBQUtBLGtEQVFDO0FBWEQ7O0dBRUc7QUFDSCxTQUFnQixtQkFBbUIsQ0FBQyxJQUFTLEVBQUUsT0FBZ0I7SUFDN0QsSUFBSSxDQUFDLENBQUMsTUFBTSxFQUFFLEdBQUcsQ0FBQyxDQUFDLFFBQVEsQ0FBQyxPQUFPLENBQUMsR0FBRyxDQUFDLHlCQUF5QixJQUFJLEVBQUUsQ0FBQyxDQUFDO1FBQ3ZFLENBQUMsT0FBTyxFQUFFLEtBQUssQ0FBQyxDQUFDLFFBQVEsQ0FBQyxPQUFPLENBQUMsR0FBRyxDQUFDLGVBQWUsQ0FBQyxDQUFDO1FBQ3ZELENBQUMsSUFBSSxDQUFDLG1CQUFtQixDQUFDLEtBQUssU0FBUyxJQUFJLENBQUMsSUFBSSxDQUFDLG1CQUFtQixDQUFDLENBQUMsRUFBRSxtQ0FBbUMsQ0FBQyxDQUFDO1FBQzlHLE9BQU8sS0FBSyxDQUFDO0lBQ2YsQ0FBQztJQUVELE9BQU8sSUFBSSxDQUFDO0FBQ2QsQ0FBQyIsInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB0eXBlIHsgQ29udGV4dCB9IGZyb20gJy4uLy4uL2FwaS9jb250ZXh0JztcblxuLyoqXG4gKiBXaGV0aGVyIG9yIG5vdCB3ZSBjb2xsZWN0IHRlbGVtZXRyeVxuICovXG5leHBvcnQgZnVuY3Rpb24gY2FuQ29sbGVjdFRlbGVtZXRyeShhcmdzOiBhbnksIGNvbnRleHQ6IENvbnRleHQpOiBib29sZWFuIHtcbiAgaWYgKChbJ3RydWUnLCAnMSddLmluY2x1ZGVzKHByb2Nlc3MuZW52LkNES19ESVNBQkxFX0NMSV9URUxFTUVUUlkgPz8gJycpKSB8fFxuICAgIFsnZmFsc2UnLCBmYWxzZV0uaW5jbHVkZXMoY29udGV4dC5nZXQoJ2NsaS10ZWxlbWV0cnknKSkgfHxcbiAgICAoYXJnc1sndmVyc2lvbi1yZXBvcnRpbmcnXSAhPT0gdW5kZWZpbmVkICYmICFhcmdzWyd2ZXJzaW9uLXJlcG9ydGluZyddKSkgLyogYWxpYXNlZCB3aXRoIHRlbGVtZXRyeSBvcHRpb24gKi8ge1xuICAgIHJldHVybiBmYWxzZTtcbiAgfVxuXG4gIHJldHVybiB0cnVlO1xufVxuIl19

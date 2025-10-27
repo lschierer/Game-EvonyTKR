@@ -1,0 +1,15 @@
+# Installation
+> `npm install --save @types/postcss-import`
+
+# Summary
+This package contains type definitions for postcss-import (https://github.com/postcss/postcss-import#readme).
+
+# Details
+Files were exported from https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/postcss-import.
+
+### Additional Details
+ * Last updated: Tue, 07 Nov 2023 09:09:39 GMT
+ * Dependencies: [postcss](https://npmjs.com/package/postcss)
+
+# Credits
+These definitions were written by [Remco Haszing](https://github.com/remcohaszing).

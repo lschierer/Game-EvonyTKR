@@ -1,0 +1,36 @@
+@import url('@spectrum-css/table/index.css');
+
+.general-details {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.general-info {
+  margin-bottom: 2rem;
+}
+
+.buff-summaries {
+  margin-top: 2rem;
+}
+
+.buff-summaries h3 {
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.spectrum-Table {
+  margin-bottom: 2rem;
+  width: 100%;
+}
+
+/* Highlight the troop type that matches the general's targetType */
+.highlight-row {
+  background-color: var(--spectrum-global-color-static-blue-200);
+}
+
+/* Add some spacing between sections */
+.section-divider {
+  margin: 2rem 0;
+  border-top: 1px solid var(--spectrum-global-color-gray-200);
+}

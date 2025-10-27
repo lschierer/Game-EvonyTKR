@@ -1,0 +1,8 @@
+import { IConstruct } from 'constructs';
+/**
+ * Breadth-first iterator over the construct tree
+ */
+export declare function iterateBfs(root: IConstruct): Generator<{
+    construct: IConstruct;
+    parent: IConstruct | undefined;
+}, void, unknown>;

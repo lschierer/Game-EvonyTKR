@@ -1,0 +1,14 @@
+import * as cxapi from '@aws-cdk/cx-api';
+import type { IoHelper } from '../../lib/api-private';
+import type { SdkProvider, IReadLock } from '../api';
+import type { Configuration } from '../cli/user-configuration';
+export interface ExecProgramResult {
+    readonly assembly: cxapi.CloudAssembly;
+    readonly lock: IReadLock;
+}
+/** Invokes the cloud executable and returns JSON output */
+export declare function execProgram(aws: SdkProvider, ioHelper: IoHelper, config: Configuration): Promise<ExecProgramResult>;
+/**
+ * Creates an assembly with error handling
+ */
+export declare function createAssembly(appDir: string): cxapi.CloudAssembly;

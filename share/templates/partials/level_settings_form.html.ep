@@ -1,0 +1,179 @@
+%# share/templates/partials/level_settings_form.html.ep
+<%
+  # Default parameters
+  my $mode = stash('mode') // 'single';  # 'single' or 'pair'
+  my $linkTarget = stash('linkTarget') // 'Primary';
+  my $ascendingLevel = stash('ascendingLevel') // 'red5';
+  my $primaryCovenantLevel = stash('primaryCovenantLevel') // stash('covenantLevel') // 'civilization';
+  my $primarySpecialties = stash('primarySpecialties') // stash('specialties') // [ qw( gold gold gold gold ) ];
+  my $secondaryCovenantLevel = stash('secondaryCovenantLevel') // 'civilization';
+  my $secondarySpecialties = stash('secondarySpecialties') // [ qw( gold gold gold gold ) ];
+
+  # Get enum values
+  my $covenantCategoryValues = get_root_manager->CovenantCategoryValues // [];
+  my $ascendingLevelValues = ascending_level_names() // []; # Get values
+  my $specialtyLevelValues = specialty_level_names() // [];
+%>
+
+<!-- $ascendingLevel is <%= $ascendingLevel %> -->
+<!-- $primarySpecialties is <%= Data::Printer::np($primarySpecialties) %> -->
+<!-- covenantCategoryValues is <%= Data::Printer::np($covenantCategoryValues) %> -->
+<!-- ascendingLevelValues is <%= Data::Printer::np($ascendingLevelValues) %> -->
+<!-- specialtyLevelValues is <%= Data::Printer::np($specialtyLevelValues) %> -->
+<level-settings></level-settings>
+<div class="settings-form">
+  <h3 class="spectrum-Heading spectrum-Heading--sizeS"><%= $mode eq 'pair' ? 'Primary General' : $linkTarget %> </h3>
+    <% if ($mode eq 'single' || $mode eq 'pair') { %>
+      <form id="primary-settings-form" class="spectrum-Form spectrum-Form--labelsAbove spectrum-Form--sizeM">
+
+        <div class="spectrum-Form-item">
+          <label for="primaryCovenantLevel" class="spectrum-FieldLabel spectrum-FieldLabel--sizeM">Covenant Level:</label>
+          <div class="spectrum-Form-itemField">
+            <select id="primaryCovenantLevel" name="primaryCovenantLevel" class="spectrum-Picker spectrum-Picker--sizeM">
+              <% foreach my $level (@{$covenantCategoryValues}) { %>
+                <option value="<%= $level %>" <%= $primaryCovenantLevel eq $level ? 'selected' : '' %>><%= ucfirst($level) %></option>
+              <% } %>
+            </select>
+          </div>
+        </div>
+
+        <div class="spectrum-Form-item">
+          <label for="ascendingLevel" class="spectrum-FieldLabel spectrum-FieldLabel--sizeM">Ascending Level:</label>
+          <div class="spectrum-Form-itemField">
+            <select id="ascendingLevel" name="ascendingLevel" class="spectrum-Picker spectrum-Picker--sizeM">
+              <% foreach my $level (@{$ascendingLevelValues}) { %>
+                <% my $label = ascending_level_names($level, 1); %>
+                <option value="<%= $level %>" <%= $ascendingLevel eq $level ? 'selected' : '' %>><%= $label %></option>
+              <% } %>
+            </select>
+          </div>
+        </div>
+        <% foreach my $index (1..4) { %>
+          <% my $specialty = $primarySpecialties->[$index - 1] // 'none'; %>
+          <div class="spectrum-Form-item">
+            <label for="primarySpecialty<%= $index %>" class="spectrum-FieldLabel spectrum-FieldLabel--sizeM">Specialty <%= $index %>:</label>
+            <div class="spectrum-Form-itemField">
+              <select id="primarySpecialty<%= $index %>" name="<%= $mode eq 'pair' ? "primarySpecialty$index" : "specialty$index" %>" class="spectrum-Picker spectrum-Picker--sizeM">
+                <% foreach my $level (@{$specialtyLevelValues}) { %>
+                  <option value="<%= $level %>" <%= $specialty eq $level ? 'selected' : '' %>><%= ucfirst($level) %></option>
+                <% } %>
+              </select>
+            </div>
+          </div>
+        <% } %>
+
+        <div id="primarySubmit" class="spectrum-Form-item">
+          <div class="spectrum-Form-itemField">
+            <button type="submit" class="spectrum-Button spectrum-Button--primary spectrum-Button--sizeM">
+              <span class="spectrum-Button-label">Apply Settings</span>
+            </button>
+          </div>
+        </div>
+      </form>
+    <% } %>
+
+    <% if ($mode eq 'pair') { %>
+      <h3 class="spectrum-Heading spectrum-Heading--sizeS">Secondary General</h3>
+      <form id="secondary-settings-form" class="spectrum-Form spectrum-Form--labelsAbove spectrum-Form--sizeM">
+        <div class="spectrum-Form-item">
+          <label for="secondaryCovenantLevel" class="spectrum-FieldLabel spectrum-FieldLabel--sizeM">Covenant Level:</label>
+          <div class="spectrum-Form-itemField">
+            <select id="secondaryCovenantLevel" name="secondaryCovenantLevel" class="spectrum-Picker spectrum-Picker--sizeM">
+              <% foreach my $level (@{$covenantCategoryValues}) { %>
+                <option value="<%= $level %>" <%= $secondaryCovenantLevel eq $level ? 'selected' : '' %>><%= ucfirst($level) %></option>
+              <% } %>
+            </select>
+          </div>
+        </div>
+
+        <% foreach my $index (1..4) { %>
+          <% my $specialty = $secondarySpecialties->[$index - 1] // 'none'; %>
+          <div class="spectrum-Form-item">
+            <label for="secondarySpecialty<%= $index %>" class="spectrum-FieldLabel spectrum-FieldLabel--sizeM">Specialty <%= $index %>:</label>
+            <div class="spectrum-Form-itemField">
+              <select id="secondarySpecialty<%= $index %>" name="<%= $mode eq 'pair' ? "secondarySpecialty$index" : "specialty$index" %>" class="spectrum-Picker spectrum-Picker--sizeM">
+                <% foreach my $level (@{$specialtyLevelValues}) { %>
+                  <option value="<%= $level %>" <%= $specialty eq $level ? 'selected' : '' %>><%= ucfirst($level) %></option>
+                <% } %>
+              </select>
+            </div>
+          </div>
+        <% } %>
+
+        <div id="secondarySubmit" class="spectrum-Form-item">
+          <div class="spectrum-Form-itemField">
+            <button type="submit" class="spectrum-Button spectrum-Button--secondary spectrum-Button--sizeM">
+              <span class="spectrum-Button-label">Apply Settings</span>
+            </button>
+          </div>
+        </div>
+      </form>
+    <% } %>
+</div>
+
+<style>
+.settings-form {
+  background-color: var(--surface-1);
+  --mod-form-grid-template-columns-labels-above: repeat(10, 1fr);
+  --mod-form-inline-size: 100%;
+
+  div#primarySubmit,
+  div#secondarySubmit {
+    grid-column: 1/-1;
+  }
+}
+
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Handle form submission
+  document
+  .getElementById('primary-settings-form')
+  .addEventListener('submit', function (e) {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const params = new URLSearchParams(formData);
+    window.location.href = window.location.pathname + '?' + params.toString();
+  });
+});
+% if ($mode eq 'pair') {
+  document
+  .getElementById('secondary-settings-form')
+  .addEventListener('submit', function (e) {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const params = new URLSearchParams(formData);
+    window.location.href = window.location.pathname + '?' + params.toString();
+  });
+% }
+</script>
+%# something about replacing the current script with the following to
+%# to prevent the need to fully refresh the page on form change.
+%# this example doesn't capture the complexity of
+%# both single and pair mode, and I need to think it through.
+%#
+%# const table = document.querySelector('general-table');
+%# const formData = new FormData(e.target);
+%# const params = new URLSearchParams(formData);
+%#
+%# // Update URL without reload
+%# const newUrl = `${window.location.pathname}?${params.toString()}`;
+%# window.history.pushState({}, '', newUrl);
+%#
+%# // Update Lit element props
+%# table.ascendingLevel = params.get('ascendingLevel');
+%# table.primaryCovenantLevel = params.get('primaryCovenantLevel');
+%# table.primarySpecialty1 = params.get('primarySpecialty1');
+%# table.primarySpecialty2 = params.get('primarySpecialty2');
+%# table.primarySpecialty3 = params.get('primarySpecialty3');
+%# table.primarySpecialty4 = params.get('primarySpecialty4');
+%#
+%# // For pair mode:
+%# if (table.mode === 'pair') {
+%#   table.secondaryCovenantLevel = params.get('secondaryCovenantLevel');
+%#   table.secondarySpecialty1 = params.get('secondarySpecialty1');
+%#   table.secondarySpecialty2 = params.get('secondarySpecialty2');
+%#   table.secondarySpecialty3 = params.get('secondarySpecialty3');
+%#   table.secondarySpecialty4 = params.get('secondarySpecialty4');
+%# }

@@ -1,0 +1,58 @@
+@import url('@spectrum-css/card/dist/index.css');
+
+:root {
+  --mod-card-body-padding-block-start: 0.5em;
+  --mod-card-body-padding-block-end: 0.5em;
+  --mod-card-content-margin-top: 0;
+  --mod-card-content-margin-bottom: 0;
+  --mod-card-footer-margin-block-start: 0.5em;
+  --mod-card-footer-padding-block-end: 0.5em;
+  --card-grid-card-width: 25vw;
+  --mod-card-background-color: var(--surface-1);
+  --mod-card-border-color: var(--surface-2);
+  --mod-card-divider-color: var(--surface-2);
+}
+
+.cardgrid {
+  display: grid;
+  grid-auto-columns: 1fr;
+  grid-template-rows: 1fr;
+  grid-auto-flow: column;
+  place-items: center;
+  place-content: space-around;
+}
+
+div.spectrum-Card {
+  height: 35vh;
+  max-width: var(--card-grid-card-width);
+}
+
+div.spectrum-Card-preview {
+  min-height: var(--mod-card-preview-minimum-height);
+  max-width: var(--card-grid-card-width);
+  justify-content: center;
+}
+
+.spectrum-Asset {
+  width: 100%;
+  max-width: var(--card-grid-card-width);
+  height: 100%;
+}
+
+img.spectrum-Asset-image {
+  display: block;
+  margin: 0 auto;
+  height: 100%;
+  max-width: var(--card-grid-card-width);
+  object-fit: contain; /* Scales image to fit while maintaining aspect ratio */
+  object-position: center; /* Centers the image within the container */
+}
+
+div.spectrum-Card-header.centered {
+  justify-content: center;
+}
+
+dl {
+  margin-block: 0;
+  column-count: 2;
+}

@@ -1,0 +1,26 @@
+import { ApiGatewayProps } from './api-gateway';
+import * as apigwv2 from '../../aws-apigatewayv2';
+import * as events from '../../aws-events';
+/**
+ * Use an API Gateway V2 HTTP APIs as a target for Amazon EventBridge rules.
+ */
+export declare class ApiGatewayV2 implements events.IRuleTarget {
+    private readonly props?;
+    private readonly _httpApi;
+    /**
+     * @param httpApi - IHttpApi implementation to use as event target
+     * @param props - Properties to configure the APIGateway target
+     */
+    constructor(httpApi: apigwv2.IHttpApi, props?: ApiGatewayProps | undefined);
+    /**
+     * Returns the target IHttpApi
+     */
+    get iHttpApi(): apigwv2.IHttpApi;
+    /**
+     * Returns a RuleTarget that can be used to trigger this API Gateway HTTP APIs
+     * as a result from an EventBridge event.
+     *
+     * @see https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-use-resource-based.html#eb-api-gateway-permissions
+     */
+    bind(rule: events.IRule, _id?: string): events.RuleTargetConfig;
+}

@@ -1,0 +1,23 @@
+% layout 'default';
+<link rel="stylesheet" href="/css/GeneralTable.css" />
+<script  type="module" >
+  import "/js/lib/Generals/GeneralTable.js";
+</script>
+
+<div class="general-comparison">
+
+  <div class="general-table-container">
+    <general-table
+      mode='single'
+      generaltype="<%= $generalType %>"
+      uiTarget="<%= $uiTarget %>"
+      allowedBuffActivation="<%= $buffActivation %>"
+      ascendingLevel="<%= $ascendingLevel %>"
+      primaryCovenantLevel="<%= $covenantLevel %>"
+      primarySpecialty1="<%= $specialties->[0] %>"
+      primarySpecialty2="<%= $specialties->[1] %>"
+      primarySpecialty3="<%= $specialties->[2] %>"
+      primarySpecialty4="<%= $specialties->[3] %>"
+      ></general-table>
+  </div>
+</div>
