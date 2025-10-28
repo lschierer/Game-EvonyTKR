@@ -51,10 +51,7 @@ package Game::EvonyTKR::Model::General {
   }
 
   sub TO_JSON ($self) {
-    return JSON::PP->new->utf8(1)->pretty->canonical(1)
-      ->allow_blessed(1)
-      ->convert_blessed(1)
-      ->encode($self->to_hash());
+    return $self->to_hash();
   }
 
   sub as_string {

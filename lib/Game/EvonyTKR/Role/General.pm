@@ -114,15 +114,40 @@ package Game::EvonyTKR::Role::General {
   }
 
   sub populateBuiltinBook ($self) {
-    my $books_helper = Game::EvonyTKR::Model::Book->new->with_roles(
-      'Game::EvonyTKR::Role::Logger',
-      'Game::EvonyTKR::Role::Cache',
-      'Game::EvonyTKR::Role::Common',
-      'Game::EvonyTKR::Controller::Role::Books'
-    );
-    my $cache_store = $books_helper->create_book_cache();
-    my $book =
-      $books_helper->get_builtin_book($self->builtInBookName, $cache_store);
+    my ($book, $books_helper, $cache_store);
+
+    eval {
+      $books_helper = Mojo::Base->new->with_roles(
+        'Game::EvonyTKR::Role::Logger',
+        'Game::EvonyTKR::Role::Cache',
+        'Game::EvonyTKR::Role::Common',
+        'Game::EvonyTKR::Controller::Role::Books'
+      );
+    } or do {
+      $self->logger->error(
+        sprintf('eval failed; cannot define book helper: "%s"', $@));
+      return;
+    };
+
+    eval { $cache_store = $books_helper->create_book_cache(); } or do {
+      $self->logger->error(
+        sprintf('eval failed; cannot create book cache from helper: "%s"', $@));
+      return;
+    };
+
+    if (defined($book)) {
+      $self->logger->debug(sprintf(
+        'fetch returned book "%s" with name "%s" for builtInBookName "%s"',
+        blessed($book), $book->can('name') ? $book->name : 'no name method',
+        $self->builtInBookName
+      ));
+    }
+    else {
+      $self->logger->error(
+        sprintf('failed to fetch book for builtin book "%s" from cache',
+          $self->builtInBookName)
+      );
+    }
     $self->builtInBook($book);
     return $self;
   }

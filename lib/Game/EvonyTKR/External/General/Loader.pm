@@ -13,6 +13,7 @@ package Game::EvonyTKR::External::General::Loader {
   use Mojo::Base 'Game::EvonyTKR::Role::Common',               -role;
   use Mojo::File;
   use experimental qw(class);
+  use diagnostics;
   use Carp;
 
   sub register ($taskClass, $app, $conf = {}) {
@@ -146,12 +147,14 @@ package Game::EvonyTKR::External::General::Loader {
     my $max_retries = 10;
     unless (defined($g->builtInBook)
       && Scalar::Util::blessed($g->builtInBook)
-      && $g->builtInBook->isa('Game::EvonyTKR::Model::Book')) {
-      my $errmessage =
-        sprintf('Failed to retrieve builtin book "%s" for general "%s"',
-        $g->builtInBookName, $g->name);
+      && $g->builtInBook->DOES('Game::EvonyTKR::Model::Book')) {
+      my $errmessage = sprintf(
+        'Failed to retrieve builtin book "%s" for general "%s"',
+        ($g->builtInBookName // 'no builtInBookName'),
+        ($g->name            // 'No general Name')
+      );
       if (defined($job) && $job->retries < $max_retries) {
-        $job->note($errmessage);
+        $job->note(error => $errmessage);
         return $job->retry({ delay => 30 });
       }
 
@@ -163,7 +166,7 @@ package Game::EvonyTKR::External::General::Loader {
         '%s is in fact a %s which %s',
         $g->builtInBook->name,
         blessed($g->builtInBook),
-        $g->builtInBook->isa('Game::EvonyTKR::Model::Book')
+        $g->builtInBook->DOES('Game::EvonyTKR::Model::Book')
         ? 'isa Game::EvonyTKR::Model::Book'
         : 'fails isa Game::EvonyTKR::Model::Book'
       ));

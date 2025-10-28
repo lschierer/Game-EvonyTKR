@@ -36,7 +36,7 @@ package Game::EvonyTKR::Controller::SkillBooks {
     return $base;
   }
 
-  sub getBuiltInBoooks ($c, $app) {
+  sub getBuiltInBooks ($c, $app) {
     state %builtinBooks;
     my @bblist = $c->list_generic_books($app);
     foreach my $bbname (@bblist) {
@@ -128,7 +128,7 @@ package Game::EvonyTKR::Controller::SkillBooks {
 
     $app->helper(
       get_builtin_books => sub {
-        return $c->getBuiltInBoooks($app);
+        return $c->getBuiltInBooks($app);
       }
     );
 
@@ -137,7 +137,7 @@ package Game::EvonyTKR::Controller::SkillBooks {
         $c->logger->debug("get_builtin_book_text for book '$book_name'");
 
         $book_name = $c->SUPER::getConstants->normalize($book_name);
-        my $book = $c->getBuiltInBoooks($app)->{$book_name};
+        my $book = $c->getBuiltInBooks($app)->{$book_name};
 
         if ($book) {
           return $book->text();
@@ -161,7 +161,7 @@ package Game::EvonyTKR::Controller::SkillBooks {
           '%s register method all_books_loaded handler', blessed($c),));
         my @allBooks;
         push @allBooks,
-          sort { $a->name cmp $b->name } values $c->getBuiltInBoooks($app)->%*;
+          sort { $a->name cmp $b->name } values $c->getBuiltInBooks($app)->%*;
         foreach my $book (@allBooks) {
           my $name = $book->name;
 
@@ -184,7 +184,7 @@ package Game::EvonyTKR::Controller::SkillBooks {
   }
 
   sub load_books ($c, $app) {
-    my $allBB           = $c->getBuiltInBoooks($app);
+    my $allBB           = $c->getBuiltInBooks($app);
     my $allGB           = $c->getGenericBooks($app);
     my $expectedTotal   = 0;
     my $allFilesStarted = 0;
@@ -292,7 +292,7 @@ package Game::EvonyTKR::Controller::SkillBooks {
     $self->logger->debug("SkillBooks index method has base $base");
 
     my $items;
-    @$items = values $self->getBuiltInBoooks($self->app)->%*;
+    @$items = values $self->getBuiltInBooks($self->app)->%*;
     $self->logger->debug(
       sprintf('Items: %s with %s items.', ref($items), scalar(@$items)));
     $self->stash(

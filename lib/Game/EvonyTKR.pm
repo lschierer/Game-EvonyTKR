@@ -87,8 +87,18 @@ package Game::EvonyTKR {
     my $dbPath = Mojo::File->new('minion.db');
 
     $self->log->debug("dbPath is $dbPath");
-    $self->plugin(Minion => { SQLite => "sqlite:$dbPath" });
+    $self->plugin(
+      Minion => {
+        SQLite =>
+"sqlite:$dbPath?sqlite_use_immediate_transaction=1&busy_timeout=30000",
+      }
+    );
+    # Set additional pragmas after plugin loads
+    $self->minion->backend->sqlite->db->query('PRAGMA journal_mode = WAL');
+    $self->minion->backend->sqlite->db->query('PRAGMA synchronous = NORMAL');
+    $self->minion->backend->sqlite->db->query('PRAGMA temp_store = MEMORY');
     $self->minion->backend->sqlite->db->ping;    # Blocks until backend is ready
+
     if ($mode eq 'development') {
       $self->minion->remove_after(7200);
     }

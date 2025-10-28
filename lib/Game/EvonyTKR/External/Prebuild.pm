@@ -68,11 +68,6 @@ package Game::EvonyTKR::External::Prebuild {
       $plugin->logger->debug(sprintf('task is %s, %s',
         ref($task) // 'undef ref',
         blessed($task) // 'undef blessed'));
-      say sprintf(
-        'task is %s, %s, %s',
-        ref($task) // 'undef ref',
-        blessed($task) // 'undef blessed', "$task"
-      );
     }
     foreach my $prereq ($plugins->@*) {
       $prereqs->{$prereq} = 0;
@@ -86,46 +81,48 @@ package Game::EvonyTKR::External::Prebuild {
       $app->plugin($prereq);
     }
 
-    while (!$plugin->prebuildPrerequisites()) {
-      $plugin->logger->info('prerquisits not met, %s',
-        Data::Printer::np($prereqs, multiline => 0));
-      sleep(5);
-    }
-    $OnlyOnePrebuild = $plugin->get_value('OnlyOnePrebuild');
-    if (!$OnlyOnePrebuild) {
-      $OnlyOnePrebuild = $plugin->set_value('OnlyOnePrebuild', 1);
-      my $jid = 0;
-      if (not(defined($app->minion) && defined($app->minion->backend))) {
-        $plugin->logger->error('$app is in a wierd state');
-        return;
-      }
-      if (my $guard =
-        $app->minion->guard('external_prebuild', 0, { limit => 1 })) {
-        $jid = $app->minion->enqueue(
-          'external_prebuild' => [{}] => {
-            priority => 100,
-            attempts => 3,
-            expire   => 7200,
-          }
-        );
-        $plugin->logger->info("Started prebuild orchestrator job $jid");
-        Mojo::IOLoop->timer(
-          1 => sub {
-            $plugin->monitorPrebuild($app, $jid);
-          }
-        );
-      }
-      else {
-        $plugin->logger->debug(
-          'failed to get external_prebuild guard, not starting.');
-      }
-    }
-    else {
-      $plugin->logger->debug('OnlyOnePrebuild prevented restart');
-    }
+    $plugin->prebuild_init($app);
 
     $plugin->logger->info(
       sprintf('%s register function complete for %s', __PACKAGE__, $$));
+  }
+
+  sub prebuild_init($plugin, $app) {
+    while (!$plugin->prebuildPrerequisites()) {
+      my $msg = sprintf('prerquisits not met, %s',
+        Data::Printer::np($prereqs, multiline => 0));
+      $plugin->logger->info($msg);
+      say($msg);
+      sleep(5);
+    }
+    my $dmc = $plugin->default_client();
+
+    # Try to acquire lock with TTL
+    my $got_lock = $dmc->add('OnlyOnePrebuild', 1, 30);    # 30 second TTL
+    return unless $got_lock;
+
+    # Check for existing active jobs
+    my $active_jobs = $app->minion->jobs(
+      { tasks => ['external_prebuild'], states => ['active'] })->total;
+    return if $active_jobs > 0;
+
+    # Try to get minion guard
+    if (my $guard = $app->minion->guard('external_prebuild', 0, { limit => 1 }))
+    {
+      my $jid = $app->minion->enqueue(
+        'external_prebuild' => [{}] => {
+          priority => 100,
+          attempts => 3,
+          expire   => 7200,
+        }
+      );
+      $plugin->logger->info("Started prebuild orchestrator job $jid");
+
+    }
+    else {
+      $dmc->delete('OnlyOnePrebuild');    # Release so another worker can try
+    }
+
   }
 
   sub prebuildPrerequisites ($plugin, $args = {}) {
@@ -141,54 +138,6 @@ package Game::EvonyTKR::External::Prebuild {
         Data::Printer::np($prereqs, multiline => 0))
     );
     return 0;
-  }
-
-  sub monitorPrebuild ($job, $app, $prebuildJid) {
-    state $retryCount = 0;
-    my $maxRetries = 5;
-
-    my $pbj = $app->minion->job($prebuildJid);
-    unless ($pbj) {
-      my $erm = "prebuildJid $prebuildJid is not associated with a valid job.";
-      $job->logger->error($erm);
-      $retryCount++;
-      if ($retryCount >= $maxRetries) {
-        return $job->fail($erm);
-      }
-      return $job->retry({ delay => 30 });
-    }
-
-    my $info  = $pbj->info;
-    my $notes = $info->{notes} // {};
-
-    # Check for pairs completion and emit to Mojolicious
-    if (my $pairs_by_type = $notes->{pairs_by_type}) {
-      $job->logger->debug('detected pairs_by_type update');
-      $app->plugins->emit(pairs_by_type => $pairs_by_type);
-    }
-
-    # Check for conflicts completion and emit to Mojolicious
-    if (my $conflicts = $notes->{conflicts}) {
-      $job->logger->debug('detected conflicts update');
-      $app->plugins->emit(conflicts_complete => $conflicts);
-    }
-
-    # Check if prebuild is complete
-    if ($info->{state} eq 'finished') {
-      $job->logger->info('Prebuild orchestration complete');
-      $app->plugins->emit(
-        prebuild_complete => {
-          pairs     => $notes->{pairs_by_type},
-          conflicts => $notes->{conflicts}
-        }
-      );
-    }
-    elsif ($info->{state} eq 'failed') {
-      my $erm = "Prebuild failed: " . ($info->{result} // 'unknown error');
-      $job->logger->error($erm);
-      return $job->fail($erm);
-    }
-    return $job->retry({ delay => 5 });
   }
 
   # Main prebuild orchestration job

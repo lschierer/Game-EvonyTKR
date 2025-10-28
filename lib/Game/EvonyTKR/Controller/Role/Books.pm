@@ -8,20 +8,9 @@ package Game::EvonyTKR::Controller::Role::Books {
   use Mojo::Base -role,                         -signatures;
   use Mojo::Base 'Game::EvonyTKR::Role::Cache', -role;
   use List::AllUtils qw(uniq);
-  use Sereal::Encoder;
-  use Sereal::Decoder;
   use Carp;
 
   our $namespace = 'books__';
-
-  our $decoder = Sereal::Decoder->new();
-
-  our $encoder = Sereal::Encoder->new({
-    canonical          => 1,
-    no_shared_hashkeys => 1,
-    freeze_callbacks   => 1,
-    freeze_unknown     => 1,
-  });
 
   sub create_book_cache ($self) {
     $self->logger->debug(sprintf(
@@ -51,7 +40,7 @@ package Game::EvonyTKR::Controller::Role::Books {
 
   sub add_book ($self, $name, $item, $store) {
     my $key = $name =~ s/ /_/gr;
-    my $ei  = $encoder->encode($item);
+    my $ei  = $self->encode_item($item);
     my $ar  = $self->add_item($key, $ei, $store);
     $self->logger->debug(sprintf(
       'attempting to add key "%s" for name "%s" was "%s"',
@@ -69,18 +58,33 @@ package Game::EvonyTKR::Controller::Role::Books {
       return $builtin_books->{ $self->normalize($name) };
     }
     my $key = $name =~ s/ /_/gr;
-    $key = $self->normalize($key);
+    $key = lc($self->normalize($key));
     my $ei = $self->get_value($key, $store);
     if (defined($ei) && length($ei)) {
-      $decoder->decode($ei, my $item);
+      my $item = $self->decode_item($ei,);
       unless (blessed($item)
-        && $item->isa('Game::EvonyTKR::Model::Book')
-        && $item->name eq $name) {
+        && blessed($item) =~ /^Game::EvonyTKR::Model::Book/) {
         $self->logger->error(sprintf(
-          'retrieved unexpected item: expected: '
-            . '"%s" ne recieved: "%s" - a %s',
-          $name, $item->name, blessed($item)
+          'retrieved unexpected item for name "%s" with key "%s": recieved a ref %s; blessed %s: %s',
+          $name,                                $key,
+          ref($item) // 'scalar item', blessed($item) // 'not blessed value', Data::Printer::np($item)
         ));
+        return;
+      }
+      unless ($item->can('name')) {
+        $self->logger->error(sprintf(
+'retrieved item ref type "%s", type "%s" has no name method. object: %s',
+          ref($item), blessed($item), Data::Printer::np($item)
+        ));
+
+      }
+      unless ($item->name eq $name) {
+        $self->logger->error(
+          sprintf(
+            'retrieved wrong item, "%s" ne "%s", key was "%s"',
+            $name, $item->name, $key
+          )
+        );
         return;
       }
       $builtin_books->{ $self->normalize($item->name) } = $item;
@@ -103,11 +107,11 @@ package Game::EvonyTKR::Controller::Role::Books {
       }
     }
     my $key = $name =~ s/ /_/gr;
-    $key = $self->normalize($key);
+    $key = lc($self->normalize($key));
     $key = sprintf('%s_level_%s', $key, $level);
     my $ei = $self->get_value($key, $store);
     if (defined($ei) && length($ei)) {
-      $decoder->decode($ei, my $item);
+      my $item = $self->decode_item($ei,);
       unless (blessed($item)
         && $item->isa('Game::EvonyTKR::Model::Book')
         && $item->name eq $name
@@ -163,7 +167,7 @@ package Game::EvonyTKR::Controller::Role::Books {
         $self->logger->error("key '$key' points at undef!!");
         next;
       }
-      $decoder->decode($ev, my $item);
+      my $item = $self->decode_item($ev,);
       my $result->{total_books}++;
       my $name = $key =~ s/_/ /rg;
       if ($key =~ /_level_/) {

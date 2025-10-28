@@ -9,6 +9,7 @@ package Game::EvonyTKR::External::JobBase {
   use Mojo::Base 'Game::EvonyTKR::Role::Cache',  -role, -signatures;
   use Mojo::Base 'Game::EvonyTKR::Role::Common', -role, -signatures;
   use Mojo::Base 'Game::EvonyTKR::Role::Logger', -role;
+  use diagnostics;
   use Carp;
 
   # Initialize Log4perl for all job-based classes

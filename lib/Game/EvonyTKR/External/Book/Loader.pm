@@ -162,14 +162,16 @@ package Game::EvonyTKR::External::Book::Loader {
     }
 
     my $add_result = $job->add_generic_book($book, $bookCache);
-    if(defined($add_result) && $add_result == 1){
-      my $result =
-        sprintf('imported %s', sprintf('Level %s %s', $book->level, $book->name));
+    if (defined($add_result) && $add_result == 1) {
+      my $result = sprintf('imported %s',
+        sprintf('Level %s %s', $book->level, $book->name));
       $job->logger->info($result);
       $job->note(book_imported => $book);
       return $job->finish($result);
-    } else {
-      my $errmessage = sprintf('add to cache for %s failed: %s', $entry, $add_result // 'undef add result');
+    }
+    else {
+      my $errmessage = sprintf('add to cache for %s failed: %s',
+        $entry, $add_result // 'undef add result');
       $job->logger->error($errmessage);
       return $job->fail($errmessage);
     }
@@ -231,13 +233,15 @@ package Game::EvonyTKR::External::Book::Loader {
       return $job->fail($errmessage);
     }
     my $add_result = $job->add_builtin_book($book, $bookCache);
-    if(defined($add_result) && $add_result == 1) {
+    if (defined($add_result) && $add_result == 1) {
       my $result = sprintf('imported %s', $book->name);
       $job->logger->info($result);
       $job->note(book_imported => $book);
       return $job->finish($result);
-    } else {
-      my $errmessage = sprintf('add to cache for %s failed: %s', $entry, $add_result // 'undef add result');
+    }
+    else {
+      my $errmessage = sprintf('add to cache for %s failed: %s',
+        $entry, $add_result // 'undef add result');
       $job->logger->error($errmessage);
       return $job->fail($errmessage);
     }

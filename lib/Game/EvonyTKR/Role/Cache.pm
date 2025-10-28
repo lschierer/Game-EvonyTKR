@@ -7,7 +7,64 @@ package Game::EvonyTKR::Role::Cache {
   use Mojo::Base -role, -signatures;
   use Cache::Memcached::Fast;
   use List::AllUtils qw(uniq);
+  use JSON::PP;
   use Carp;
+
+  our $json =
+    JSON::PP->new->utf8(1)->pretty(1)
+    ->canonical(1)
+    ->allow_blessed(1)
+    ->convert_blessed(1)
+    ->allow_tags(1);
+
+    sub _add_class_hints ($self, $data) {
+        return $data unless blessed($data);
+
+        my $result = $data->TO_JSON();
+        $result->{__CLASS__} = ref($data);
+
+        # Recursively add hints to nested objects
+        for my $key (keys %$result) {
+            if (ref($result->{$key}) eq 'ARRAY') {
+                $result->{$key} = [map { $self->_add_class_hints($_) } @{$result->{$key}}];
+            } elsif (blessed($result->{$key})) {
+                $result->{$key} = $self->_add_class_hints($result->{$key});
+            }
+        }
+
+        return $result;
+    }
+
+    sub encode_item ($self, $item) {
+        my $data = $self->_add_class_hints($item);
+        return $json->encode($data);
+    }
+
+
+  sub decode_item ($self, $encoded) {
+    my $data = $json->decode($encoded);
+    return $self->_reconstruct_object($data);
+  }
+
+  sub _reconstruct_object ($self, $data) {
+    return $data unless ref($data) eq 'HASH';
+
+    if ($data->{__CLASS__}) {
+      my $class = $data->{__CLASS__};
+      delete $data->{__CLASS__};
+
+      my $obj = $class->new($data);
+      return $data->{_roles} ? $obj->with_roles(@{ $data->{_roles} }) : $obj;
+    }
+
+    # Handle arrays and nested structures
+    for my $key (keys %$data) {
+      $data->{$key} = $self->_reconstruct_object($data->{$key})
+        if ref($data->{$key});
+    }
+
+    return $data;
+  }
 
   our %default_options = (
     servers            => ['127.0.0.1:11211'],

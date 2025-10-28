@@ -38,7 +38,8 @@ package Game::EvonyTKR::Model::Book {
       $hash->{level} = $self->level;
     }
     $hash->{_roles} = [
-      $self->can('is_builtin') ? 'Game::EvonyTKR::Role::Book::Builtin' : (),
+      $self->can('is_builtin')
+        && $self->is_builtin == 1 ? 'Game::EvonyTKR::Role::Book::Builtin' : (),
       $self->can('validate_level')
       ? 'Game::EvonyTKR::Role::Book::SkillBook'
       : (),
@@ -48,13 +49,10 @@ package Game::EvonyTKR::Model::Book {
 
   sub TO_JSON {
     my $self = shift;
-    return JSON::PP->new->utf8(1)->pretty->canonical(1)
-      ->allow_blessed(1)
-      ->convert_blessed(1)
-      ->encode($self->to_hash());
+    return $self->to_hash();
   }
 
-  sub as_string ($self) {
+  sub as_string ($self, @args) {
     if ($self->can('validate_level')) {
       return sprintf('"%s %s: %s"', $self->level, $self->name, $self->text);
     }

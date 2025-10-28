@@ -7,20 +7,9 @@ package Game::EvonyTKR::Controller::Role::Generals {
   use Mojo::Base -role,                         -signatures;
   use Mojo::Base 'Game::EvonyTKR::Role::Cache', -role;
   use List::AllUtils qw(uniq);
-  use Sereal::Encoder;
-  use Sereal::Decoder;
   use Carp;
 
   our $namespace = 'generals__';
-
-  our $decoder = Sereal::Decoder->new();
-
-  our $encoder = Sereal::Encoder->new({
-    canonical          => 1,
-    no_shared_hashkeys => 1,
-    freeze_callbacks   => 1,
-    freeze_unknown     => 1,
-  });
 
   sub create_general_cache ($self) {
     $self->logger->debug(sprintf(
@@ -37,7 +26,7 @@ package Game::EvonyTKR::Controller::Role::Generals {
 
   sub add_general ($self, $name, $general, $store) {
     my $key = $name =~ s/ /_/gr;
-    my $eg  = $encoder->encode($general);
+    my $eg  = $self->encode_item($general);
     my $ar  = $self->add_item($key, $eg, $store);
     $self->logger->debug(
       "attempting to add key '$key' for name '$name' was '$ar'");
@@ -54,7 +43,7 @@ package Game::EvonyTKR::Controller::Role::Generals {
     $key = $self->normalize($key);
     my $eg = $self->get_value($key, $store);
     if (defined($eg) && length($eg)) {
-      $decoder->decode($eg, my $general);
+      my $general = $self->decode_item($eg);
       unless (blessed($general)
         && $general->isa('Game::EvonyTKR::Model::General')
         && $general->name eq $name) {
@@ -108,7 +97,7 @@ package Game::EvonyTKR::Controller::Role::Generals {
         $self->logger->error("key '$key' points at undef!!");
         next;
       }
-      $decoder->decode($ev, my $item);
+      my $item = $self->decode_item($ev);
       my $name = $key =~ s/_/ /rg;
       $result->{ $self->normalize($name) } = $item;
     }

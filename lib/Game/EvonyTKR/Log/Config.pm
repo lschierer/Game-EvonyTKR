@@ -161,6 +161,7 @@ package Game::EvonyTKR::Log::Config {
       'Log::Any::Adapter::PerPackage'                        => 'WARN',
       'PairBuilderLogic'                                     => 'WARN',
       'WorkerLogic'                                          => 'WARN',
+      'Test::Package'                                        => 'DEBUG',
     };
   }
 
