@@ -27,7 +27,8 @@ class Game::EvonyTKR::External::Common : isa(Game::EvonyTKR::Shared::Constants)
   ADJUST {
     my $mh = Mojo::Home->new;
     $mh->detect('Game::EvonyTKR');
-    $collectionDir = Mojo::File->new($mh->to_string)->child('share/collections/data/');
+    $collectionDir =
+      Mojo::File->new($mh->to_string)->child('share/collections/data/');
   }
 
   field $generals : reader = {};
@@ -39,7 +40,6 @@ class Game::EvonyTKR::External::Common : isa(Game::EvonyTKR::Shared::Constants)
     asst_has_spirit  => 1,
     allow_wall_buffs => 1,
     );
-
 
 }
 1;

@@ -53,8 +53,12 @@ package Game::EvonyTKR::Controller::Role::Books {
     my $key = $name =~ s/ /_/gr;
     my $ei  = $encoder->encode($item);
     my $ar  = $self->add_item($key, $ei, $store);
-    $self->logger->debug(
-      "attempting to add key '$key' for name '$name' was '$ar'");
+    $self->logger->debug(sprintf(
+      'attempting to add key "%s" for name "%s" was "%s"',
+      $key  // 'undef key',
+      $name // 'undef name',
+      $ar   // 'undef add result'
+    ));
     return $ar;
   }
 

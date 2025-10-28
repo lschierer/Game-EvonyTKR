@@ -12,6 +12,7 @@ require Game::EvonyTKR::Shared::Constants;
 require Game::EvonyTKR::Model::General;
 require Game::EvonyTKR::External::General::Pair::Workflow;
 require Game::EvonyTKR::External::General::Loader;
+require Game::EvonyTKR::External::General::LoadAll;
 require Game::EvonyTKR::External::Book::Loader;
 require Game::EvonyTKR::External::Book::LoadAllBuiltins;
 require Game::EvonyTKR::External::Book::LoadAllGenerics;
@@ -55,6 +56,7 @@ package Game::EvonyTKR::External::Prebuild {
     $app->minion->add_task(external_prebuild => __PACKAGE__);
     my $plugins = [
       'Game::EvonyTKR::External::General::Loader',
+      'Game::EvonyTKR::External::General::LoadAll',
       'Game::EvonyTKR::External::General::Pair::Workflow',
       'Game::EvonyTKR::External::Book::Loader',
       'Game::EvonyTKR::External::Book::LoadAllBuiltins',
@@ -63,11 +65,9 @@ package Game::EvonyTKR::External::Prebuild {
 
     my @tasks = values $app->minion->tasks->%*;
     foreach my $task (@tasks) {
-      $plugin->logger->debug(
-        sprintf('task is %s, %s',
-          ref($task) // 'undef ref',
-          blessed($task) // 'undef blessed')
-      );
+      $plugin->logger->debug(sprintf('task is %s, %s',
+        ref($task) // 'undef ref',
+        blessed($task) // 'undef blessed'));
       say sprintf(
         'task is %s, %s, %s',
         ref($task) // 'undef ref',
@@ -95,7 +95,7 @@ package Game::EvonyTKR::External::Prebuild {
     if (!$OnlyOnePrebuild) {
       $OnlyOnePrebuild = $plugin->set_value('OnlyOnePrebuild', 1);
       my $jid = 0;
-      if(not (defined($app->minion) && defined($app->minion->backend))){
+      if (not(defined($app->minion) && defined($app->minion->backend))) {
         $plugin->logger->error('$app is in a wierd state');
         return;
       }
@@ -191,47 +191,6 @@ package Game::EvonyTKR::External::Prebuild {
     return $job->retry({ delay => 5 });
   }
 
-  sub launch_general_import ($plugin, $distDir) {
-    my $generalDir = Mojo::File->new(
-      $distDir->child('share', 'collections', 'data', 'generals'));
-    my @suffixlist            = ('.yaml', '.yml');
-    my $generalFileCollection = $generalDir->list->map(sub {
-      my $e = $_;
-      if ($e->to_string =~ m/\.y[a]?ml$/) {
-        return $e->basename(@suffixlist);
-      }
-      else {
-      }
-      return '';
-    })->compact;
-    my $generalCount = $generalFileCollection->size;
-    $plugin->logger->debug(sprintf(
-      'there are %s general files found in "%s" - a %s.',
-      $generalCount, $generalDir, blessed($generalDir)
-    ));
-    my @GeneralFiles = $generalFileCollection->each;
-    foreach my $index (0 .. $#GeneralFiles) {
-      my $general_name = $GeneralFiles[$index];
-      $general_name = $plugin->normalize($general_name);
-      $plugin->logger->info(
-        sprintf('launching import for "%s"', $general_name));
-      # force copies of the variables general_name
-      # and index just in case it matters.
-      $plugin->app->minion->enqueue(
-        load_general => [{
-          general_name => "$general_name",  ##<--  general_name comes from here.
-          index        => 0+ $index,
-        }] => {
-          attempts => 3,
-          delay    => rand(5),
-          priority => 10,
-          expire   => 7200,
-        }
-      );
-    }
-    return $generalCount;
-  }
-
   # Main prebuild orchestration job
   sub run ($job, @args) {
     if (not defined($job)) {
@@ -245,12 +204,10 @@ package Game::EvonyTKR::External::Prebuild {
       return $job->fail($errmessage);
     }
     else {
-      $job->logger->debug(
-        sprintf(
-          'minion in %s is a %s;%s',
-          __PACKAGE__, ref($job->minion), blessed($job->minion)
-        )
-      );
+      $job->logger->debug(sprintf(
+        'minion in %s is a %s;%s',
+        __PACKAGE__, ref($job->minion), blessed($job->minion)
+      ));
     }
     $job->logger->debug('Prebuild orchestration starting');
 
@@ -289,18 +246,42 @@ package Game::EvonyTKR::External::Prebuild {
     $distDir->detect('Game::EvonyTKR');
     my $generalCount = -1;
     state $general_import_started = 0;
+    state $gl;
     my $loop1;
     $loop1 = Mojo::IOLoop->recurring(
       5 => sub {
+        state $gljid;
         if ($job->prebuildPrerequisites && $general_import_started == 0) {
           $general_import_started = 1;
-          $generalCount           = $job->launch_general_import($distDir);
-          $job->set_value('generalCount', $generalCount, $generalCache);
-          Mojo::IOLoop->remove($loop1);
+          $gljid                  = $job->minion->enqueue(
+            load_all_generals => ['prebuild load_all_generals'] => {
+              attempts => 3,
+              delay    => rand(10),
+              expire   => 7200,
+              priority => 10,
+            }
+          );
+          $gl = $job->minion->job($gljid);
+          $gl->on(
+            finish => sub ($glj,) {
+              $generalCount = $glj->notes->{generalCount};
+              $job->set_value('generalCount', $generalCount, $generalCache);
+              Mojo::IOLoop->remove($loop1);
+            }
+          );
+          $gl->on(
+            failed => sub($glj, $err) {
+              Mojo::IOLoop->remove($loop1);
+              my $errmessage = sprintf('general loading failed: %s', $err);
+              $job->logger->error($errmessage);
+              $job->fail($errmessage);
+            }
+          );
         }
       }
     );
 
+    # need the file names for error handling
     my $generalDir = Mojo::File->new(
       $distDir->child('share', 'collections', 'data', 'generals'));
     my @suffixlist = ('.yaml', '.yml');

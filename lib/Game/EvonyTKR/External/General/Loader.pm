@@ -5,7 +5,6 @@ use File::FindLib 'lib';
 require Data::Printer;
 require Game::EvonyTKR::Model::General;
 require Game::EvonyTKR::Model::Book;
-require Game::EvonyTKR::External::Common;
 
 package Game::EvonyTKR::External::General::Loader {
   use Mojo::Base 'Game::EvonyTKR::External::JobBase',          -signatures;
@@ -64,7 +63,6 @@ package Game::EvonyTKR::External::General::Loader {
         $general_name, $index
       ));
     }
-    my $worker = Game::EvonyTKR::External::Common->new(app => $job->app,);
     my $collectionDir =
       Mojo::File->new(Mojo::Home->new->to_string())
       ->child('share/collections/data/');
@@ -93,7 +91,7 @@ package Game::EvonyTKR::External::General::Loader {
       $job->logger->info($result);
       return $job->finish($result);
     }
-    $general = $worker->load_single_general($generalFile, $index);
+    $general = $job->load_single_general($generalFile, $index);
     unless ($general) {
       my $result = sprintf(
         'No general returned by load_single_general'
@@ -116,7 +114,7 @@ package Game::EvonyTKR::External::General::Loader {
       my $result = sprintf('add_general reports inability to set "%s"',
         $job->normalize($general->name));
       $job->logger->error($result);
-      return $job->info->fail($result);
+      return $job->fail($result);
     }
     else {
       my $result = sprintf(
@@ -130,7 +128,7 @@ package Game::EvonyTKR::External::General::Loader {
     return $job->finish($result);
   }
 
-  sub load_single_general ( $job, $generalFile, $index) {
+  sub load_single_general ($job, $generalFile, $index) {
     $job->logger->debug("processing $generalFile, file # $index");
     my $data       = $generalFile->slurp('UTF-8');
     my $hashObject = YAML::PP->new(
@@ -174,41 +172,6 @@ package Game::EvonyTKR::External::General::Loader {
     $job->logger->debug(sprintf('returning general %s.', $g->name));
     return $g;
   }
-
-  sub load_generals ($job, $taskName) {
-    my $generals = $job->info->notes->{generals};
-    my $mh = Mojo::Home->new;
-    $mh->detect('Game::EvonyTKR');
-    my $collectionDir = Mojo::File->new($mh->to_string)->child('share/collections/data/');
-    $job->logger->debug(
-      sprintf('starting load_generals with %s generals present',
-        scalar(keys $generals->%*))
-    );
-    my $ypp = YAML::PP->new(
-      schema       => [qw/ + Perl /],
-      yaml_version => ['1.2', '1.1'],
-    );
-
-    my $generalsDir   = $collectionDir->child('generals');
-    my $expectedTotal = 0;
-    $generalsDir->list_tree->grep(sub {qr/\.y\{a\}?ml$/})->each(
-      sub($generalFile, $index) {
-        $expectedTotal++;
-        $job->load_single_general($generalFile, $index, $job);
-        $job->logger->debug(sprintf('there are now %s generals loaded',
-          scalar(keys $generals->%*)));
-      }
-    );
-    if (scalar(keys $generals->%*) ne $expectedTotal) {
-      $job->logger->error(sprintf(
-        'loaded count %s does not equal expected count %s.',
-        scalar(keys $generals->%*),
-        $expectedTotal
-      ));
-    }
-    $job->logger->info(sprintf(
-      'loaded %s generals for task %s',
-      scalar(keys $generals->%*), $taskName
-    ));
-  }
 }
+1;
+__END__

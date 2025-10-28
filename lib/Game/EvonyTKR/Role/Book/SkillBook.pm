@@ -8,6 +8,10 @@ package Game::EvonyTKR::Role::Book::SkillBook {
 
   has 'level' => 1;
 
+  sub is_builtin {
+    return 0;
+  }
+
   sub validate_level ($self) {
     if ($self->level < 1 || $self->level > 4) {
       $self->logerror(sprintf(

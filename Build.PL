@@ -24,6 +24,7 @@ my $builder = Module::Build->new(
     'Carp'                                => '0',
     'Cwd'                                 => '0',
     'Cache::Memcached::Fast'              => '0',
+    'Const::Fast'                         => '0',
     'Data::Compare'                       => '0',
     'Data::Printer'                       => '0',
     'Date::Manip'                         => '0',

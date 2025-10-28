@@ -149,12 +149,22 @@ package Game::EvonyTKR::Role::Book {
 
   sub from_hash($class, $object) {
     my $b;
-    if (exists $object->{level}) {
-      $b = Game::EvonyTKR::Model::Book->new(name => $object->{name},)
+    if ($object->{name} =~ m/Level [1-4]/i) {
+      $class->logger->debug(
+        sprintf('detected that %s is a Generic book', $object->{name}));
+      my $name = $object->{name} =~ s/Level [1-4]\s+//ir;
+      my $level;
+      if ($object->{name} =~ m/Level ([1-4])/i) {
+        $level = $1;
+      }
+
+      $b = Game::EvonyTKR::Model::Book->new(name => $name,)
         ->with_roles('Game::EvonyTKR::Role::Book::SkillBook');
-      $b->level($object->{level});
+      $b->level($level);
     }
     else {
+      $class->logger->debug(
+        sprintf('detected that %s is a builtin book', $object->{name}));
       $b = Game::EvonyTKR::Model::Book->new(name => $object->{name},)
         ->with_roles('Game::EvonyTKR::Role::Book::Builtin');
     }
