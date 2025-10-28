@@ -9,8 +9,6 @@ require Mojolicious::Plugin::Minion;
 #require Game::EvonyTKR::Controller::Root;
 require Game::EvonyTKR::Controller::ControllerBase;
 require Game::EvonyTKR::External::JobBase;
-require Game::EvonyTKR::External::Buff::Worker;
-#require Game::EvonyTKR::External::Prebuild;
 require Game::EvonyTKR::Log::Config;
 
 require GitRepo::Reader;
@@ -90,11 +88,11 @@ package Game::EvonyTKR {
 
     $self->log->debug("dbPath is $dbPath");
     $self->plugin(Minion => { SQLite => "sqlite:$dbPath" });
+    $self->minion->backend->sqlite->db->ping;    # Blocks until backend is ready
     if ($mode eq 'development') {
       $self->minion->remove_after(7200);
     }
     # Minion worker
-    $self->plugin('Game::EvonyTKR::External::Buff::Worker');
 
     #I need the admin dashboard to debug, but its a risk in production
     if ($self->mode eq 'development') {
@@ -133,9 +131,6 @@ package Game::EvonyTKR {
         $self->plugin('Game::EvonyTKR::Plugins::StaticPages');
       }
     );
-    if ($self->isa('Game::EvonyTKR') && $self->can('build_controller')) {
-
-    }
 
     # configure to tell it that I will be behind an ELB/ALB.
     #$self->reverse_proxy(1);

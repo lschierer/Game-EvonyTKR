@@ -20,12 +20,42 @@ package Game::EvonyTKR::External::JobBase {
     else {
       $plugin->logger->debug("JobBase found Logging configured in register.");
     }
+    if (not defined($app)) {
+      my $errmessage = 'app not defined in register for ' . __PACKAGE__;
+      say $errmessage;
+      $plugin->logger->error($errmessage);
+      return;
+    }
+    unless (defined($app->minion)) {
+      my $errmessage = sprintf('minion undefined in job for %s', __PACKAGE__);
+      $plugin->logger->error($errmessage);
+      say $errmessage;
+      return;
+    }
+    $app->minion->backend->sqlite->db->ping;
+
+    my $signal = __PACKAGE__ =~ s/::/_/gr;
+    $app->plugins->emit($signal => 1);
   }
 
   sub run {
-    my $plugin = shift;
+    my $job = shift;
+    if (not defined($job)) {
+      say 'job not defined in run for ' . __PACKAGE__;
+      return;
+    }
     Game::EvonyTKR::Log::Config->logger();
-    $plugin->logger->debug("JobBase configured Logging in run.");
+    $job->logger->debug("JobBase configured Logging in run.");
+    unless (defined($job->app)) {
+      my $errmessage = sprintf('app undefined in job for %s', __PACKAGE__);
+      $job->logger->error($errmessage);
+      return $job->fail($errmessage);
+    }
+    unless (defined($job->minion)) {
+      my $errmessage = sprintf('minion undefined in job for %s', __PACKAGE__);
+      $job->logger->error($errmessage);
+      return $job->fail($errmessage);
+    }
   }
 }
 

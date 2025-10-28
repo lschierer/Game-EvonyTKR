@@ -12,6 +12,9 @@ require Game::EvonyTKR::Shared::Constants;
 require Game::EvonyTKR::Model::General;
 require Game::EvonyTKR::External::General::Pair::Workflow;
 require Game::EvonyTKR::External::General::Loader;
+require Game::EvonyTKR::External::Book::Loader;
+require Game::EvonyTKR::External::Book::LoadAllBuiltins;
+require Game::EvonyTKR::External::Book::LoadAllGenerics;
 
 package Game::EvonyTKR::External::Prebuild {
   use Mojo::Base 'Game::EvonyTKR::External::JobBase',          -signatures;
@@ -25,53 +28,92 @@ package Game::EvonyTKR::External::Prebuild {
   state $OnlyOnePrebuild = 0;
 
   state $generalCache;
+  state $prereqs = {};
 
   sub register ($plugin, $app, $conf = {}) {
+    if (not defined $plugin) {
+      say '$plugin ont defined in register for ' . __PACKAGE__ . $$;
+      return;
+    }
+    if (not defined($app)) {
+      my $errmessage = 'app not defined in register for ' . __PACKAGE__ . $$;
+      say $errmessage;
+      return;
+    }
     $plugin->SUPER::register($app, $conf);
-    $plugin->logger->debug(sprintf('register function for "%s"', __PACKAGE__));
+
+    unless (defined($app->minion)) {
+      my $errmessage = sprintf('minion undefined in job for %s', __PACKAGE__);
+      $plugin->logger->error($errmessage);
+      say $errmessage;
+      return;
+    }
+    $plugin->logger->debug(
+      sprintf('register function for "%s" %s', __PACKAGE__, $$));
 
     # Register main prebuild orchestration task
     $app->minion->add_task(external_prebuild => __PACKAGE__);
-    $app->plugin('Game::EvonyTKR::External::General::Loader');
-    $app->plugin('Game::EvonyTKR::External::General::Pair::Workflow');
+    my $plugins = [
+      'Game::EvonyTKR::External::General::Loader',
+      'Game::EvonyTKR::External::General::Pair::Workflow',
+      'Game::EvonyTKR::External::Book::Loader',
+      'Game::EvonyTKR::External::Book::LoadAllBuiltins',
+      'Game::EvonyTKR::External::Book::LoadAllGenerics',
+    ];
 
-    # Register pair workflow tasks
-    #$app->plugin('Game::EvonyTKR::External::General::Pair::Workflow');
-    my $tasks = $app->minion->tasks();
-    my @tns   = keys %$tasks;
-    $plugin->logger->debug(
-      sprintf('registered tasks include %s', join ', ', @tns));
-    foreach my $tn (@tns) {
-      if ($tn eq 'pair_worker') {
-        $plugin->prebuildPrerequisites({ pair_workflow_loaded => 1 });
-      }
-      elsif ($tn eq 'load_general') {
-        $plugin->prebuildPrerequisites({ general_loader_job_ready => 1 });
-      }
+    my @tasks = values $app->minion->tasks->%*;
+    foreach my $task (@tasks) {
+      $plugin->logger->debug(
+        sprintf('task is %s, %s',
+          ref($task) // 'undef ref',
+          blessed($task) // 'undef blessed')
+      );
+      say sprintf(
+        'task is %s, %s, %s',
+        ref($task) // 'undef ref',
+        blessed($task) // 'undef blessed', "$task"
+      );
+    }
+    foreach my $prereq ($plugins->@*) {
+      $prereqs->{$prereq} = 0;
+      my $signal = $prereq =~ s/::/_/gr;
+      $app->plugins->on(
+        $signal => sub {
+          $plugin->logger->info(sprintf('detected %s ready', $prereq));
+          return $plugin->prebuildPrerequisites({ $prereq => 1 });
+        }
+      );
+      $app->plugin($prereq);
     }
 
-    my $pair_workflow_loaded = 0;
-    $app->plugins->on(
-      pair_workflow_loaded => sub {
-        return $plugin->prebuildPrerequisites({ pair_workflow_loaded => 1 });
-      }
-    );
-
-    $app->plugins->on(
-      general_loader_job_ready => sub {
-        return $plugin->prebuildPrerequisites(
-          { general_loader_job_ready => 1 });
-      }
-    );
-
+    while (!$plugin->prebuildPrerequisites()) {
+      $plugin->logger->info('prerquisits not met, %s',
+        Data::Printer::np($prereqs, multiline => 0));
+      sleep(5);
+    }
     $OnlyOnePrebuild = $plugin->get_value('OnlyOnePrebuild');
     if (!$OnlyOnePrebuild) {
       $OnlyOnePrebuild = $plugin->set_value('OnlyOnePrebuild', 1);
-
+      my $jid = 0;
+      if(not (defined($app->minion) && defined($app->minion->backend))){
+        $plugin->logger->error('$app is in a wierd state');
+        return;
+      }
       if (my $guard =
         $app->minion->guard('external_prebuild', 0, { limit => 1 })) {
-        my $prebuildJid = $plugin->startPrebuild($app);
-        $plugin->monitorPrebuild($app, $prebuildJid);
+        $jid = $app->minion->enqueue(
+          'external_prebuild' => [{}] => {
+            priority => 100,
+            attempts => 3,
+            expire   => 7200,
+          }
+        );
+        $plugin->logger->info("Started prebuild orchestrator job $jid");
+        Mojo::IOLoop->timer(
+          1 => sub {
+            $plugin->monitorPrebuild($app, $jid);
+          }
+        );
       }
       else {
         $plugin->logger->debug(
@@ -82,21 +124,16 @@ package Game::EvonyTKR::External::Prebuild {
       $plugin->logger->debug('OnlyOnePrebuild prevented restart');
     }
 
-    my $mojo_worker_started = 0;
-
+    $plugin->logger->info(
+      sprintf('%s register function complete for %s', __PACKAGE__, $$));
   }
 
   sub prebuildPrerequisites ($plugin, $args = {}) {
-    state $prereqs = {
-      pair_workflow_loaded     => 0,
-      general_loader_job_ready => 0,
-    };
-
     foreach my $key (keys $args->%*) {
       $prereqs->{$key} = $args->{$key};
     }
 
-    if (List::AllUtils::none { $_ = 0 } values $prereqs->%*) {
+    if (List::AllUtils::none { $_ == 0 } values $prereqs->%*) {
       return 1;
     }
     $plugin->logger->debug(
@@ -106,69 +143,52 @@ package Game::EvonyTKR::External::Prebuild {
     return 0;
   }
 
-  sub startPrebuild ($plugin, $app) {
-    my $jid = $app->minion->enqueue(
-      'external_prebuild' => [{}] => {
-        priority => 100,
-        attempts => 3,
-        expire   => 7200,
-      }
-    );
-    $plugin->logger->info("Started prebuild orchestrator job $jid");
-    return $jid;
-  }
-
-  sub monitorPrebuild ($plugin, $app, $prebuildJid) {
-    my $loop;
-    my $retryCount = 0;
+  sub monitorPrebuild ($job, $app, $prebuildJid) {
+    state $retryCount = 0;
     my $maxRetries = 5;
 
-    $loop = Mojo::IOLoop->recurring(
-      10 => sub {
-        my $job = $app->minion->job($prebuildJid);
-        unless ($job) {
-          $plugin->logger->error(
-            "prebuildJid $prebuildJid is not associated with a valid job.");
-          $retryCount++;
-          if ($retryCount >= $maxRetries) {
-            Mojo::IOLoop->remove($loop);
-          }
-          return;
-        }
-
-        my $info  = $job->info;
-        my $notes = $info->{notes} // {};
-
-        # Check for pairs completion and emit to Mojolicious
-        if (my $pairs_by_type = $notes->{pairs_by_type}) {
-          $plugin->logger->debug('detected pairs_by_type update');
-          $app->plugins->emit(pairs_by_type => $pairs_by_type);
-        }
-
-        # Check for conflicts completion and emit to Mojolicious
-        if (my $conflicts = $notes->{conflicts}) {
-          $plugin->logger->debug('detected conflicts update');
-          $app->plugins->emit(conflicts_complete => $conflicts);
-        }
-
-        # Check if prebuild is complete
-        if ($info->{state} eq 'finished') {
-          $plugin->logger->info('Prebuild orchestration complete');
-          $app->plugins->emit(
-            prebuild_complete => {
-              pairs     => $notes->{pairs_by_type},
-              conflicts => $notes->{conflicts}
-            }
-          );
-          Mojo::IOLoop->remove($loop);
-        }
-        elsif ($info->{state} eq 'failed') {
-          $plugin->logger->error(
-            "Prebuild failed: " . ($info->{result} // 'unknown error'));
-          Mojo::IOLoop->remove($loop);
-        }
+    my $pbj = $app->minion->job($prebuildJid);
+    unless ($pbj) {
+      my $erm = "prebuildJid $prebuildJid is not associated with a valid job.";
+      $job->logger->error($erm);
+      $retryCount++;
+      if ($retryCount >= $maxRetries) {
+        return $job->fail($erm);
       }
-    );
+      return $job->retry({ delay => 30 });
+    }
+
+    my $info  = $pbj->info;
+    my $notes = $info->{notes} // {};
+
+    # Check for pairs completion and emit to Mojolicious
+    if (my $pairs_by_type = $notes->{pairs_by_type}) {
+      $job->logger->debug('detected pairs_by_type update');
+      $app->plugins->emit(pairs_by_type => $pairs_by_type);
+    }
+
+    # Check for conflicts completion and emit to Mojolicious
+    if (my $conflicts = $notes->{conflicts}) {
+      $job->logger->debug('detected conflicts update');
+      $app->plugins->emit(conflicts_complete => $conflicts);
+    }
+
+    # Check if prebuild is complete
+    if ($info->{state} eq 'finished') {
+      $job->logger->info('Prebuild orchestration complete');
+      $app->plugins->emit(
+        prebuild_complete => {
+          pairs     => $notes->{pairs_by_type},
+          conflicts => $notes->{conflicts}
+        }
+      );
+    }
+    elsif ($info->{state} eq 'failed') {
+      my $erm = "Prebuild failed: " . ($info->{result} // 'unknown error');
+      $job->logger->error($erm);
+      return $job->fail($erm);
+    }
+    return $job->retry({ delay => 5 });
   }
 
   sub launch_general_import ($plugin, $distDir) {
@@ -213,12 +233,57 @@ package Game::EvonyTKR::External::Prebuild {
   }
 
   # Main prebuild orchestration job
-  sub run ($plugin, @args) {
-    $plugin->SUPER::run(@args);
-    $plugin->logger->debug('Prebuild orchestration starting');
+  sub run ($job, @args) {
+    if (not defined($job)) {
+      say '$job not defined in run for ' . __PACKAGE__;
+      return;
+    }
+    $job->SUPER::run(@args);
+    unless (defined($job->minion)) {
+      my $errmessage = sprintf('minion undefined in job for %s', __PACKAGE__);
+      $job->logger->error($errmessage);
+      return $job->fail($errmessage);
+    }
+    else {
+      $job->logger->debug(
+        sprintf(
+          'minion in %s is a %s;%s',
+          __PACKAGE__, ref($job->minion), blessed($job->minion)
+        )
+      );
+    }
+    $job->logger->debug('Prebuild orchestration starting');
+
+    # Import Books
+    state $book_import_started = 0;
+    my $book_loop;
+    $book_loop = Mojo::IOLoop->recurring(
+      5 => sub {
+        $job->note(prereqs => Data::Printer::np($prereqs, multiline => 0));
+        if ($job->prebuildPrerequisites && $book_import_started == 0) {
+          $book_import_started = 1;
+          $job->minion->enqueue(
+            load_all_generic_books => [] => {
+              attempts => 3,
+              delay    => 1,
+              expire   => 300,
+              priority => 50,
+            }
+          );
+          $job->minion->enqueue(
+            load_all_builtin_books => [] => {
+              attempts => 3,
+              delay    => 1,
+              expire   => 300,
+              priority => 60,
+            }
+          );
+        }
+      }
+    );
 
     # Import Generals
-    $generalCache = $plugin->create_general_cache()
+    $generalCache = $job->create_general_cache()
       unless defined $generalCache;
     my $distDir = Mojo::Home->new;
     $distDir->detect('Game::EvonyTKR');
@@ -227,10 +292,10 @@ package Game::EvonyTKR::External::Prebuild {
     my $loop1;
     $loop1 = Mojo::IOLoop->recurring(
       5 => sub {
-        if ($plugin->prebuildPrerequisites && $general_import_started == 0) {
+        if ($job->prebuildPrerequisites && $general_import_started == 0) {
           $general_import_started = 1;
-          $generalCount           = $plugin->launch_general_import($distDir);
-          $plugin->set_value('generalCount', $generalCount, $generalCache);
+          $generalCount           = $job->launch_general_import($distDir);
+          $job->set_value('generalCount', $generalCount, $generalCache);
           Mojo::IOLoop->remove($loop1);
         }
       }
@@ -252,24 +317,24 @@ package Game::EvonyTKR::External::Prebuild {
     my $loop2;
     $loop2 = Mojo::IOLoop->recurring(
       5 => sub {
-        unless ($plugin->prebuildPrerequisites && $general_import_started) {
-          $plugin->logger->debug('not ready to start pair building yet.');
+        unless ($job->prebuildPrerequisites && $general_import_started) {
+          $job->logger->debug('not ready to start pair building yet.');
           return;
         }
         # this should be duplicate
         # but I'm having issues.
-        $generalCache = $plugin->create_general_cache()
+        $generalCache = $job->create_general_cache()
           unless defined $generalCache;
-        my $generals    = $plugin->get_generals($generalCache);
+        my $generals    = $job->get_generals($generalCache);
         my $cachedCount = scalar keys $generals->%*;
         if ($cachedCount >= $generalCount) {
-          $plugin->logger->info(sprintf(
+          $job->logger->info(sprintf(
             'cached count %s == expected count %s',
             $cachedCount, $generalCount
           ));
           Mojo::IOLoop->remove($loop2);
           #Start pair building workflow
-          my $pair_workflow_jid = $plugin->app->minion->enqueue(
+          my $pair_workflow_jid = $job->minion->enqueue(
             'build_all_pairs' => [{}] => {
               priority => 50,
               attempts => 5,
@@ -283,19 +348,19 @@ package Game::EvonyTKR::External::Prebuild {
           my $missing_generals = [];
           for my $yaml_file (@yaml_files) {
             my $general_name    = $yaml_file =~ s/\.ya?ml$//r;
-            my $normalized_name = $plugin->normalize($general_name);
+            my $normalized_name = $job->normalize($general_name);
             unless (exists $cached_names{$normalized_name}) {
               push @$missing_generals, $general_name;
             }
           }
-          $plugin->logger->error(sprintf(
+          $job->logger->error(sprintf(
             'Missing %d general(s): %s (cached: %d, expected: %d)',
             scalar(@$missing_generals), join(', ', @$missing_generals),
             $cachedCount,               $generalCount
           ));
         }
         else {
-          $plugin->logger->debug(sprintf(
+          $job->logger->debug(sprintf(
             'cached count %s less than expected count %s; generals is %s',
             $cachedCount, $generalCount, ref($generals)
           ));
@@ -304,7 +369,7 @@ package Game::EvonyTKR::External::Prebuild {
     );
 
     # Start monitoring
-    my $monitor_jid = $plugin->app->minion->enqueue(
+    my $monitor_jid = $job->minion->enqueue(
       'monitor_pair_builders' => [{}] => {
         priority => 90,
         attempts => 5,
@@ -318,18 +383,18 @@ package Game::EvonyTKR::External::Prebuild {
     $loop3 = Mojo::IOLoop->recurring(
       10 => sub {
         # Check if pair workflow completed
-        my $completed_pairs = $plugin->app->minion->jobs({
+        my $completed_pairs = $job->minion->jobs({
           tasks  => ['build_all_pairs'],
           states => ['finished']
         })->total;
 
-        my $active_pairs = $plugin->app->minion->jobs({
+        my $active_pairs = $job->minion->jobs({
           tasks  => ['build_all_pairs'],
           states => ['active', 'inactive']
         })->total;
 
         # Check monitor job for results
-        my $monitor_job = $plugin->app->minion->job($monitor_jid);
+        my $monitor_job = $job->minion->job($monitor_jid);
         if (
 
           ($monitor_job && $monitor_job->info->{state} eq 'finished')
@@ -342,15 +407,15 @@ package Game::EvonyTKR::External::Prebuild {
             // {};
           my $conflicts = $monitor_job->info->{notes}->{conflicts} // {};
 
-          $plugin->note(pairs_by_type => $pairs_by_type);
-          $plugin->note(conflicts     => $conflicts);
+          $job->note(pairs_by_type => $pairs_by_type);
+          $job->note(conflicts     => $conflicts);
 
           # if result is final
           if ( exists($monitor_job->info->{result})
             && length($monitor_job->info->{result})
             && $monitor_job->info->{result} eq 'all pair builders complete') {
             Mojo::IOLoop->remove($loop3);
-            $plugin->finish('Prebuild orchestration complete');
+            $job->finish('Prebuild orchestration complete');
           }
         }
       }

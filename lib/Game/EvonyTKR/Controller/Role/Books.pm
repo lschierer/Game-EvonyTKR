@@ -2,6 +2,7 @@ use v5.42.0;
 use utf8::all;
 use File::FindLib 'lib';
 require Log::Log4perl::Level;
+require Mojo::File;
 
 package Game::EvonyTKR::Controller::Role::Books {
   use Mojo::Base -role,                         -signatures;
@@ -42,7 +43,7 @@ package Game::EvonyTKR::Controller::Role::Books {
   }
 
   sub add_generic_book ($self, $item, $store) {
-    my $nn = s/ /_/gr;
+    my $nn = $item->name =~ s/ /_/gr;
     $nn = $self->normalize($nn);
     my $key = sprintf('%s_level_%s', $nn, $item->level);
     $self->add_book($key, $item, $store);
@@ -67,7 +68,7 @@ package Game::EvonyTKR::Controller::Role::Books {
     $key = $self->normalize($key);
     my $ei = $self->get_value($key, $store);
     if (defined($ei) && length($ei)) {
-      $decoder->decode($eg, my $item);
+      $decoder->decode($ei, my $item);
       unless (blessed($item)
         && $item->isa('Game::EvonyTKR::Model::Book')
         && $item->name eq $name) {
@@ -102,7 +103,7 @@ package Game::EvonyTKR::Controller::Role::Books {
     $key = sprintf('%s_level_%s', $key, $level);
     my $ei = $self->get_value($key, $store);
     if (defined($ei) && length($ei)) {
-      $decoder->decode($eg, my $item);
+      $decoder->decode($ei, my $item);
       unless (blessed($item)
         && $item->isa('Game::EvonyTKR::Model::Book')
         && $item->name eq $name
@@ -169,6 +170,33 @@ package Game::EvonyTKR::Controller::Role::Books {
       }
     }
     return $result;
+  }
+
+  sub list_generic_books ($self, $app) {
+    unless (defined($app)) {
+      $self->logger->logcroak('$app must be defined');
+    }
+    my $collectionDir =
+      Mojo::File->new($app->config('distDir'))->child('collections/data/');
+    my $gbDir      = $collectionDir->child('generic books');
+    my @suffixlist = ('.yaml', '.yml');
+    my @gglist     = $gbDir->list->grep(sub { $_ =~ /\.ya?ml$/ && -f -r $_ })
+      ->sort->map(sub { return $_->basename(@suffixlist) })->each;
+    my @returnlist =
+      List::UtilsBy::uniq_by { lc($self->normalize($_)) } @gglist;
+    return \@returnlist;
+  }
+
+  sub list_builtin_books ($self, $app) {
+    my $collectionDir =
+      Mojo::File->new($app->config('distDir'))->child('collections/data/');
+    my $gbDir      = $collectionDir->child('skill books');
+    my @suffixlist = ('.yaml', '.yml');
+    my @gglist     = $gbDir->list->grep(sub { $_ =~ /\.ya?ml$/ && -f -r $_ })
+      ->sort->map(sub { return $_->basename(@suffixlist) })->each;
+    my @returnlist =
+      List::UtilsBy::uniq_by { lc($self->normalize($_)) } @gglist;
+    return \@returnlist;
   }
 }
 1;

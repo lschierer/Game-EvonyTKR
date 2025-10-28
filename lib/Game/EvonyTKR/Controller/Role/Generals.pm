@@ -114,6 +114,7 @@ package Game::EvonyTKR::Controller::Role::Generals {
     }
     return $result;
   }
+
 }
 1;
 __END__

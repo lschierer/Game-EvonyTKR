@@ -5,6 +5,8 @@ use File::FindLib 'lib';
 require Data::Printer;
 require JSON::PP;
 require Mojo::JSON;
+require Game::EvonyTKR::Model::BasicAttribute;
+require Game::EvonyTKR::Model::BasicAttributes;
 
 package Game::EvonyTKR::Role::General {
   use Mojo::Base 'Game::EvonyTKR::Role::Common',                   -signatures;
@@ -109,6 +111,20 @@ package Game::EvonyTKR::Role::General {
       return $rr <= $mr;
     }
     return 0;
+  }
+
+  sub populateBuiltinBook ($self) {
+    my $books_helper = Game::EvonyTKR::Model::Book->new->with_roles(
+      'Game::EvonyTKR::Role::Logger',
+      'Game::EvonyTKR::Role::Cache',
+      'Game::EvonyTKR::Role::Common',
+      'Game::EvonyTKR::Controller::Role::Books'
+    );
+    my $cache_store = $books_helper->create_book_cache();
+    my $book =
+      $books_helper->get_builtin_book($self->builtInBookName, $cache_store);
+    $self->builtInBook($book);
+    return $self;
   }
 
   sub from_hash ($self, $hashObject) {

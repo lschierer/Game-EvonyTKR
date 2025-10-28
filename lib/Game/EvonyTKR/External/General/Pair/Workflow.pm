@@ -24,7 +24,7 @@ package Game::EvonyTKR::External::General::Pair::Workflow {
 
         # Prevent multiple spawners with 2-hour lock
         return $job->finish('only one pair builder kickoff')
-          unless my $guard = $job->app->minion->lock('build_all_pairs', 7200);
+          unless my $guard = $job->minion->lock('build_all_pairs', 7200);
 
         return $self->spawn_pair_jobs($job, $args);
       }
@@ -42,7 +42,8 @@ package Game::EvonyTKR::External::General::Pair::Workflow {
     # Monitor and aggregator job
     $app->minion->add_task(monitor_pair_builders => __PACKAGE__);
 
-    $app->plugins->emit(pair_workflow_loaded => 1);
+    my $signal = __PACKAGE__ =~ s/::/_/gr;
+    $app->plugins->emit($signal => 1);
   }
 
   sub run ($self, $args) {
@@ -69,8 +70,8 @@ package Game::EvonyTKR::External::General::Pair::Workflow {
 
     my @builderJobs;
 
-    Mojo::File->new($job->app->config('distDir'))
-      ->child('collections/data/generals')
+    Mojo::File->new(Mojo::Home->new->to_string())
+      ->child('share/collections/data/generals')
       ->list_tree->grep(sub {qr/\.y\{a\}?ml$/})->each(
       sub ($e, $index) {
         my $general_name = $e->basename('.yaml');
@@ -82,7 +83,7 @@ package Game::EvonyTKR::External::General::Pair::Workflow {
 
         $logger->debug("Enqueueing job for general: $general_name");
 
-        my $child_jid = $job->app->minion->enqueue(
+        my $child_jid = $job->minion->enqueue(
           build_pairs_for_primary => [{ general_name => $general_name }] => {
             priority => 1,
             attempts => 5,
@@ -124,7 +125,7 @@ package Game::EvonyTKR::External::General::Pair::Workflow {
     return $job->finish(
       "build_pairs_for_primary for $general_name already launched")
       unless my $bppGuard =
-      $job->app->minion->guard("build_pairs_for_primary_${general_name}", 360);
+      $job->minion->guard("build_pairs_for_primary_${general_name}", 360);
 
     $logger->info("Building pairs for general: $general_name");
     my $testExternalCommonLog =

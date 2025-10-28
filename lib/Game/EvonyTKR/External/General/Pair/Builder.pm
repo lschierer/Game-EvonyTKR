@@ -146,7 +146,7 @@ class Game::EvonyTKR::External::General::Pair::Builder :
 
   # Monitor pair building progress and aggregate results
   method monitor_pair_builders ($monitor_job) {
-    my $jobs = $monitor_job->app->minion->jobs({
+    my $jobs = $monitor_job->minion->jobs({
       tasks => ['build_pairs_for_primary']
     });
 

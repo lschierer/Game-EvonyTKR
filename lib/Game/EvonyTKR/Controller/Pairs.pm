@@ -599,7 +599,6 @@ package Game::EvonyTKR::Controller::Pairs {
         secondarySpecialty4 => $validated_params->{secondarySpecialties}->[3],
       };
 
-      $c->logger->debug("Minion backend: " . ref($c->app->minion->backend));
       $c->logger->debug("Enqueueing job for pair index: $index");
       my $jid = $c->app->minion->enqueue(
         pair_worker => [$args],

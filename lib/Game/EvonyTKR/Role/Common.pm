@@ -21,7 +21,7 @@ package Game::EvonyTKR::Role::Common {
     my $nn = fc(NFKD($dn));
     $nn =~ s/[’''‛`´]/'/g;
     $nn =~ s/[""‟]/"/g;      # Quotes
-    return $nn;
+    return lc($nn);
   }
 
   has 'globalDN' => sub {
