@@ -9,7 +9,7 @@ package Game::EvonyTKR::Model::Factory {
   # $type like 'Book', 'General', 'Pair', etc.
   sub build_from_wire ($class, $type, $wire_hash) {
     my $pkg = "Game::EvonyTKR::Model::$type";
-    use_module($pkg);                 # runtime load
+    use_module($pkg);    # runtime load
     return $pkg->from_wire_hash($wire_hash);
   }
 }

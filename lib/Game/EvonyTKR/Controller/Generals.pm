@@ -14,6 +14,7 @@ require Game::EvonyTKR::Model::General::Pair::Manager;
 require Game::EvonyTKR::Model::Buff::Summarizer;
 require Game::EvonyTKR::Control::Generals::Routing;
 require Game::EvonyTKR::Model::Data;
+require Game::EvonyTKR::Service::Cache;
 
 require UUID;
 require Data::Printer;
@@ -57,7 +58,7 @@ package Game::EvonyTKR::Controller::Generals {
     $c->logger->info("Registering routes for " . ref($c));
     $c->SUPER::register($app, $config);
 
-    $cache = $c->create_general_cache();
+    $cache = Game::EvonyTKR::Service::Cache->new();
 
     eval {
       say "calling setup_event_handlers";
@@ -84,13 +85,13 @@ package Game::EvonyTKR::Controller::Generals {
     state $receivedGenerals = 0;
     $loop = Mojo::IOLoop->recurring(
       10 => sub {
-        my $generalCount = $c->get_value('generalCount', $cache) // -1;
+        my $generalCount = $cache->get('generalCount') // -1;
         $c->logger->debug(sprintf(
           'setup_generals: receivedGenerals: %s; generalCount: %s',
           $receivedGenerals, $generalCount
         ));
         if ($generalCount > 0 && $receivedGenerals < $generalCount) {
-          my $generals = $c->get_generals($cache);
+          my $generals = $c->get_generals();
           if (defined($generals) && ref($generals) eq 'HASH') {
             foreach my $general (values $generals->%*) {
               # emit a signal to break out of this loop and stay async.

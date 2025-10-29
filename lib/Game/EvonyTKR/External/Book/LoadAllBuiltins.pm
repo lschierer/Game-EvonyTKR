@@ -34,7 +34,7 @@ package Game::EvonyTKR::External::Book::LoadAllBuiltins {
     $taskClass->logger->debug('Registering Book Loader workflow tasks');
     $app->minion->add_task(load_all_builtin_books => __PACKAGE__);
 
-    say sprintf('emitting signal for %s', __PACKAGE__);
+    $taskClass->logger->info(sprintf('emitting signal for %s', __PACKAGE__));
     my $signal = __PACKAGE__ =~ s/::/_/gr;
     $app->plugins->emit($signal => 1);
   }
@@ -54,7 +54,8 @@ package Game::EvonyTKR::External::Book::LoadAllBuiltins {
       '%s log level is %s',
       __PACKAGE__, Log::Log4perl::Level::to_level($job->logger->level())
     ));
-    my @list = $job->list_builtin_books($job->app)->@*;
+    my @list;
+    push @list, $job->list_builtin_books($job->app)->@*;
     $job->logger->info('list of builtin books is ' . Data::Printer::np(@list));
     my $maxIndex = scalar(@list) - 1;
     foreach my $index (0 .. $maxIndex) {

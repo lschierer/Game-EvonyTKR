@@ -4,25 +4,11 @@ use File::FindLib 'lib';
 require Log::Log4perl::Level;
 
 package Game::EvonyTKR::Controller::Role::Generals {
-  use Mojo::Base -role,                         -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Role::Cache', -role;
+  use Mojo::Base -role, -signatures;
   use List::AllUtils qw(uniq);
   use Carp;
 
   our $namespace = 'generals__';
-
-  sub create_general_cache ($self) {
-    $self->logger->debug(sprintf(
-      '%s log level is %s',
-      __PACKAGE__, Log::Log4perl::Level::to_level($self->logger->level())
-    ));
-    state $cache;
-    $cache = $self->create_cache({
-      namespace => $namespace,
-    })
-      unless (defined $cache);
-    return $cache;
-  }
 
   sub add_general ($self, $name, $general, $store) {
     my $key = $name =~ s/ /_/gr;

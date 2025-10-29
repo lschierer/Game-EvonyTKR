@@ -11,6 +11,7 @@ package Game::EvonyTKR::Model::Buff::Value {
   use File::FindLib 'lib';
   use overload
     '""'       => \&as_string,
+    'bool'     => \&_isTrue,
     'fallback' => 0;
 
   has 'number' => 0;
@@ -45,6 +46,14 @@ package Game::EvonyTKR::Model::Buff::Value {
       ->convert_blessed(1)
       ->encode($self->to_hash());
     return $json;
+  }
+
+  sub _isTrue ($self, $other = undef, $swap = undef) {
+    return
+         defined($self)
+      && ref($self)
+      && blessed($self)
+      && $self->isa('Game::EvonyTKR::Model::Book');
   }
 }
 1;

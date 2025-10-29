@@ -2,7 +2,7 @@ use v5.42.0;
 use utf8::all;
 use File::FindLib 'lib';
 
-package Game::EvonyTKR::Role::Book::SkillBook {
+package Game::EvonyTKR::Model::Role::Book::SkillBook {
   use Mojo::Base 'Game::EvonyTKR::Role::Common', -role;
   use Carp;
 

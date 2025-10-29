@@ -8,7 +8,7 @@ require Game::EvonyTKR::Model::Buff::Matcher;
 require Game::EvonyTKR::Model::Buff;
 use namespace::autoclean;
 
-package Game::EvonyTKR::Role::Book {
+package Game::EvonyTKR::Model::Role::Book {
   use Mojo::Base 'Game::EvonyTKR::Role::Common';
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants',    -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants', -role;
@@ -159,14 +159,14 @@ package Game::EvonyTKR::Role::Book {
       }
 
       $b = Game::EvonyTKR::Model::Book->new(name => $name,)
-        ->with_roles('Game::EvonyTKR::Role::Book::SkillBook');
+        ->with_roles('Game::EvonyTKR::Model::Role::Book::SkillBook');
       $b->level($level);
     }
     else {
       $class->logger->debug(
         sprintf('detected that %s is a builtin book', $object->{name}));
       $b = Game::EvonyTKR::Model::Book->new(name => $object->{name},)
-        ->with_roles('Game::EvonyTKR::Role::Book::Builtin');
+        ->with_roles('Game::EvonyTKR::Model::Role::Book::Builtin');
     }
     if (exists $object->{text}) {
       $b->text($object->{text});

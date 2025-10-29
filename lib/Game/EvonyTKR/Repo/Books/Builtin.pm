@@ -5,11 +5,11 @@ use File::FindLib 'lib';
 # lib/Game/EvonyTKR/Repo/Books.pm
 package Game::EvonyTKR::Repo::Books::Builtin {
   use Mojo::Base -base;
-  use Mojo::Base 'Game::EvonyTKR::Role::Logger',               -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Logger', -role;
   use Sereal::Encoder;
   use Sereal::Decoder;
   use Game::EvonyTKR::Model::Factory ();
-  use Game::EvonyTKR::Service::Cache  ();
+  use Game::EvonyTKR::Service::Cache ();
 
   sub new {
     my ($class) = @_;
@@ -21,7 +21,7 @@ package Game::EvonyTKR::Repo::Books::Builtin {
     return $self;
   }
 
-  sub cache_key_for ($self, $name) { "book__${name}" }
+  sub cache_key_for ($self, $name) {"book__${name}"}
 
   sub get ($self, $name) {
     my $bytes = $self->{cache}->get($self->cache_key_for($name)) or return;
@@ -32,8 +32,12 @@ package Game::EvonyTKR::Repo::Books::Builtin {
   sub put ($self, $book, $ttl = 7200) {
     my $wire  = $book->to_wire_hash;
     my $bytes = $self->{enc}->encode($wire);
-    my $pr = $self->{cache}->set($self->cache_key_for($book->name) => $bytes, $ttl);
-    $self->logger->debug(sprintf('put result for %s was %s', $book->name, defined($pr) ? $pr : 'undefined'));
+    my $pr =
+      $self->{cache}->set($self->cache_key_for($book->name) => $bytes, $ttl);
+    $self->logger->debug(sprintf(
+      'put result for %s was %s',
+      $book->name, defined($pr) ? $pr : 'undefined'
+    ));
     return 1;
   }
 }

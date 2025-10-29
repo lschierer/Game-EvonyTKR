@@ -3,18 +3,14 @@ use experimental qw(class);
 use utf8::all;
 use File::FindLib 'lib';
 require Game::EvonyTKR::Model::Book;
-require Game::EvonyTKR::Role::Book::Builtin;
-require Game::EvonyTKR::Role::Book::SkillBook;
 use namespace::clean;
 
 package Game::EvonyTKR::Controller::SkillBooks {
   use Mojo::Base 'Game::EvonyTKR::Controller::ControllerBase';
   use Mojo::Base 'Game::EvonyTKR::Role::Logger',            -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::Common',            -role;
   use Mojo::Base 'Game::EvonyTKR::Controller::Role::Books', -role;
   use Carp;
 
-  my $bookCache;
   # Specify which collection this controller handles
   sub collection_name {
     return 'skill books';
@@ -38,17 +34,27 @@ package Game::EvonyTKR::Controller::SkillBooks {
 
   sub getBuiltInBooks ($c, $app) {
     state %builtinBooks;
-    my @bblist = $c->list_generic_books($app);
-    foreach my $bbname (@bblist) {
+    my $bblist = $c->list_builtin_books($app);
+    $c->logger->debug(
+      sprintf(
+        'got a list of %s builtin books: %s',
+        scalar @$bblist,
+        Data::Printer::np(@$bblist)
+      )
+    );
+    foreach my $bbname ($bblist->@*) {
       unless (length($bbname)
         && exists $builtinBooks{ lc($c->normalize($bbname)) }) {
-        $bookCache = $c->create_book_cache() unless (defined($bookCache));
-        my $bb = $c->get_builtin_book($bbname, $bookCache);
+        my $bb = $c->get_builtin_book($bbname);
         unless (defined($bb)
           && ref($bb)
           && $bb->isa('Game::EvonyTKR::Model::Book')) {
-          $c->logger->error('invalid book retrieved for list entry "%s"',
-            $bbname);
+          $c->logger->error(sprintf(
+            'invalid book retrieved for list entry "%s" : ref %s; blessed %s',
+            $bbname,
+            ref($bb) // 'scalar variable',
+            blessed($bb) // 'not blessed'
+          ));
           next;
         }
         $builtinBooks{ lc($c->normalize($bbname)) } = $bb;
@@ -77,13 +83,12 @@ package Game::EvonyTKR::Controller::SkillBooks {
         next;
       }
       unless (exists $genericBooks{ lc($c->normalize($name)) }->{$level}) {
-        $bookCache = $c->create_book_cache() unless (defined($bookCache));
-        my $gg = $c->get_generic_book($name, $level, $bookCache);
+        my $gg = $c->get_generic_book($name, $level);
         unless (defined($gg)
           && ref($gg)
           && $gg->isa('Game::EvonyTKR::Model::Book')) {
-          $c->logger->error(
-'invalid book retrieved for list entry "%s" split into name "%s" and level %s',
+          $c->logger->error('invalid book retrieved for list entry "%s" '
+              . 'split into name "%s" and level %s',
             $ggname, $name, $level);
           next;
         }
@@ -155,127 +160,181 @@ package Game::EvonyTKR::Controller::SkillBooks {
       }
     );
 
-    $app->plugins->on(
-      all_books_loaded => sub {
-        $c->logger->debug(sprintf(
-          '%s register method all_books_loaded handler', blessed($c),));
-        my @allBooks;
-        push @allBooks,
-          sort { $a->name cmp $b->name } values $c->getBuiltInBooks($app)->%*;
-        foreach my $book (@allBooks) {
-          my $name = $book->name;
-
-          my $clean_name = $name;
-          $clean_name =~ s{^/}{};
-
-          $mainRoutes->get($clean_name => { name => $clean_name })
-            ->to(controller => $controller_name, action => 'show')
-            ->name("${base}_show");
-
-          $app->add_navigation_item({
-            title  => "Details for $name",
-            path   => "$base/$name",
-            parent => $base,
-            order  => 30,
-          });
-        }
-      }
-    );
+    $c->book_route_builder($app, $mainRoutes, $controller_name);
   }
 
-  sub load_books ($c, $app) {
-    my $allBB           = $c->getBuiltInBooks($app);
-    my $allGB           = $c->getGenericBooks($app);
-    my $expectedTotal   = 0;
-    my $allFilesStarted = 0;
+  sub check_book_loading_readiness ($c, $app) {
+    state $jid_builtin;
+    state $jid_generic;
+    state $retries = 0;
+    my $max_retries = 10;
+    my $delayTime   = 0.01;
 
-    # register the listener first to ensure all events are captured.
-    $app->plugins->on(
-      skillbook_loaded => sub {
-        my @sbNames;
-        push @sbNames, sort keys $allBB->%*;
-        push @sbNames, sort keys $allGB->%*;
-        if (scalar(@sbNames) >= $expectedTotal && $allFilesStarted) {
-          $c->logger->info(sprintf('All %s books loaded.', $expectedTotal));
-          $app->plugins->emit(all_books_loaded => { all_books_loaded => 1 });
+    # Find spawner jobs (same logic as route builder)
+    if (not defined $jid_generic) {
+      $app->minion->jobs({ tasks => ['load_all_generic_books'] })->each(sub {
+        my $info = $_;
+        if ($info->{state} eq 'finished') {
+          $jid_generic = $info->{id};
+
         }
-        else {
-          $c->logger->debug(sprintf(
-            '%s of %s books loaded. all files %s started.',
-            scalar(@sbNames), $expectedTotal,
-            $allFilesStarted ? 'are' : 'are not yet'
-          ));
+        elsif ($info->{state} eq 'inactive' || $info->{state} eq 'active') {
+          $jid_generic = $info->{id} unless (defined($jid_generic));
+          $retries     = 0;
         }
+      });
+      if ($retries >= $max_retries) {
+        $c->logger->error('cannot find a generic book loader!');
       }
-    );
-
-    Mojo::File->new($app->config('distDir'))
-      ->child('collections/data/skill books/')
-      ->list_tree->grep(sub {qr/\.y\{a\}?ml$/})->each(
-      sub ($e, $index) {
-        $expectedTotal++;
-        my $delay = 5 + rand(5.0);
+      else {
+        $retries++;
+        $c->logger->debug('cannot find a generic book loader!');
         Mojo::IOLoop->timer(
-          $delay => sub {
-            $c->import_single_book($app, $allBB, $e, $index);
+          $delayTime => sub {
+            return $c->check_book_loading_readiness();
           }
         );
       }
-      );
-
-    Mojo::File->new($app->config('distDir'))
-      ->child('collections/data/generic books/')
-      ->list_tree->grep(sub {qr/\.y\{a\}?ml$/})->each(
-      sub ($e, $index) {
-        $expectedTotal++;
-        my $delay = 5 + rand(5.0);
-        Mojo::IOLoop->timer(
-          $delay => sub {
-            $c->import_single_book($app, $allGB, $e, $index, 0);
-          }
-        );
-      }
-      );
-
-# the $allFilesStarted is to ensure that both each blocks have fully processed
-# before the if inside this handler can match. As the two list_tree blocks are
-# syncronous (the delayed subs happen out of band, when their timers expire),
-# each will iterate all files before reaching this line to set $allFilesStarted to
-# true and thus ungate the final signal.
-    $allFilesStarted = 1;
-
-  }
-
-  sub import_single_book($c, $app, $collection, $sbFile, $index, $builtin = 1) {
-    $c->logger->debug("processing $sbFile");
-
-    my $data       = $sbFile->slurp('UTF-8');
-    my $hashObject = YAML::PP->new(
-      schema       => [qw/ + Perl /],
-      yaml_version => ['1.2', '1.1'],
-    )->load_string($data);
-    my $sb = Game::EvonyTKR::Model::Book->from_hash($hashObject);
-
-    unless ($sb) {
-      $c->logger->error(sprintf(
-        'failed to build %s book %s from %s.',
-        $builtin ? 'Builtin' : 'Generic',
-        $index, $sbFile
-      ));
-      return;
     }
-    $collection->{ $c->SUPER::getConstants->normalize($sb->name) } = $sb;
-    $c->logger->debug(sprintf(
-      'imported %s book %s as %s, for %s in collection.',
-      $builtin ? 'Builtin' : 'Generic', $index,
-      $sb->name,                        scalar(keys $collection->%*),
-    ));
-    $app->plugins->emit(
-      skillbook_loaded => {
-        skillbook => $sb,
-        name      => $c->SUPER::getConstants->normalize($sb->name),
+    unless (defined($jid_builtin)) {
+      $app->minion->jobs({ tasks => ['load_all_builtin_books'] })->each(sub {
+        my $info = $_;
+        if ($info->{state} eq 'finished') {
+          $jid_builtin = $info->{id};
+          $retries     = 0;
+        }
+      });
+      if ($retries >= $max_retries) {
+        $c->logger->error('cannot find a builtin book loader!');
       }
-    );
+      else {
+        $retries++;
+        $c->logger->debug('cannot find a builtin book loader!');
+        Mojo::IOLoop->timer(
+          $delayTime => sub {
+            return $c->check_book_loading_readiness();
+          }
+        );
+      }
+    }
+
+    # Check if spawners are finished
+    my $builtin_job = $c->minion->job($jid_builtin);
+    my $generic_job = $c->minion->job($jid_generic);
+
+    return 0
+      unless $builtin_job->info->{state} eq 'finished'
+      && $generic_job->info->{state} eq 'finished';
+
+    # Count spawned load_book jobs
+    my $spawned_jobs = $c->minion->jobs({ task => 'load_book' })->total;
+
+    # Count expected books
+    my $expected =
+      @{ $c->list_builtin_books($app) } + @{ $c->list_generic_books($app) };
+
+    return $spawned_jobs == $expected;
+  }
+
+  sub book_route_builder ($c, $app, $mainRoutes, $controller_name) {
+    my $delayTime = 5;
+    state ($jid_generic, $jid_builtin);
+    state $retries = 0;
+    my $max_retries = 10;
+    if (not defined $jid_generic) {
+      $app->minion->jobs({ tasks => ['load_all_generic_books'] })->each(sub {
+        my $info = $_;
+        if ($info->{state} eq 'finished') {
+          $jid_generic = $info->{id};
+
+        }
+        elsif ($info->{state} eq 'inactive' || $info->{state} eq 'active') {
+          $jid_generic = $info->{id} unless (defined($jid_generic));
+          $retries     = 0;
+        }
+      });
+      if ($retries >= $max_retries) {
+        $c->logger->error('cannot find a generic book loader!');
+      }
+      else {
+        $retries++;
+        $c->logger->debug('cannot find a generic book loader!');
+        Mojo::IOLoop->timer(
+          $delayTime => sub {
+            return $c->book_route_builder($app, $mainRoutes, $controller_name);
+          }
+        );
+      }
+    }
+
+    unless (defined($jid_builtin)) {
+      $app->minion->jobs({ tasks => ['load_all_builtin_books'] })->each(sub {
+        my $info = $_;
+        if ($info->{state} eq 'finished') {
+          $jid_builtin = $info->{id};
+          $retries     = 0;
+        }
+      });
+      if ($retries >= $max_retries) {
+        $c->logger->error('cannot find a builtin book loader!');
+      }
+      else {
+        $retries++;
+        $c->logger->debug('cannot find a builtin book loader!');
+        Mojo::IOLoop->timer(
+          $delayTime => sub {
+            return $c->book_route_builder($app, $mainRoutes, $controller_name);
+          }
+        );
+      }
+    }
+
+    my $expectedCount = scalar(@{ $c->list_builtin_books($app) });
+    my @allBooks;
+    push @allBooks,
+      sort { lc($a->name) cmp lc($b->name) }
+      values $c->getBuiltInBooks($app)->%*;
+
+    $c->logger->info(sprintf(
+      '%s book_route_builder expected %s, found %s',
+      __PACKAGE__, $expectedCount, scalar(@allBooks)
+    ));
+
+    foreach my $book (@allBooks) {
+      $c->logger->debug(sprintf('building routes for "%s"', $book->name));
+      my $name = $book->name;
+
+      my $clean_name = $name;
+      $clean_name =~ s{^/}{};
+
+      $mainRoutes->get($clean_name => { name => $clean_name })
+        ->to(controller => $controller_name, action => 'show')
+        ->name("${base}_show");
+
+      $app->add_navigation_item({
+        title  => "Details for $name",
+        path   => "$base/$name",
+        parent => $base,
+        order  => 30,
+      });
+    }
+
+    # the loading jobs take longer than I expect it to take to
+    # *start* the jobs to spawn loaders. give it more time by
+    # allowing more retries. Do not delay longer so that
+    # I get incremental progress.
+    if ($expectedCount > scalar(@allBooks) && $retries <= ($max_retries * 10)) {
+      $c->logger->debug(sprintf(
+        'on retry %s, expected %s, found %s',
+        $retries, $expectedCount, scalar(@allBooks)
+      ));
+      $retries++;
+      Mojo::IOLoop->timer(
+        $delayTime / 2 => sub {
+          return $c->book_route_builder($app, $mainRoutes, $controller_name);
+        }
+      );
+    }
   }
 
   sub index($self) {
@@ -321,7 +380,7 @@ package Game::EvonyTKR::Controller::SkillBooks {
     $name = $self->param('name');
     $self->logger->debug("show detects name $name, showing details.");
 
-    my $book = $self->get_root_manager()->bookManager->getBook($name);
+    my $book = $self->get_builtin_book($name);
 
     unless ($book) {
       $self->logger->error("skill book '$name' was not found.");

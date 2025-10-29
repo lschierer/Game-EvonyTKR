@@ -13,13 +13,13 @@ $logger->info('Test script logging configured');
 
 require Game::EvonyTKR::Role::Logger;
 require Game::EvonyTKR::Model::Book;
+require Game::EvonyTKR::Service::Cache;
 
 package Test::Package {
   use Mojo::Base -base,                                     -signatures;
   use Mojo::Base 'Game::EvonyTKR::Role::Logger',            -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::Cache',             -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Common',            -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::Book',            -role;
+  use Mojo::Base 'Game::EvonyTKR::Model::Role::Book',       -role;
   use Mojo::Base 'Game::EvonyTKR::Controller::Role::Books', -role;
 
   state $bookCache;
@@ -27,8 +27,8 @@ package Test::Package {
   sub load_Supreme_Power ($self) {
     my $entry = 'Supreme Power';
     my $book;
-    $bookCache = $self->create_book_cache() unless (defined($bookCache));
-    $book      = $self->get_builtin_book($entry, $bookCache);
+
+    $book      = $self->get_builtin_book($entry);
     my @suffixlist = ('.yaml', '.yml');
 
     if ( defined($book)
@@ -79,7 +79,7 @@ package Test::Package {
     $self->logger->debug(sprintf('got a book "%s" back from Game::EvonyTKR::Model::Book->from_hash',
     $book->name));
 
-    my $add_result = $self->add_builtin_book($book, $bookCache);
+    my $add_result = $self->add_builtin_book($book);
     if (defined($add_result) && $add_result == 1) {
       my $result = sprintf('imported %s', $book->name);
       $self->logger->info($result);
@@ -96,20 +96,18 @@ package Test::Package {
 
   sub retrieve_Supreme_Power ($self){
     my $testBookName = 'Supreme Power';
-    my $cache_store = $self->create_book_cache();
 
     my $key = $testBookName =~ s/ /_/gr;
     $key = lc($self->normalize($key));
 
-    my $book = $self->get_builtin_book($testBookName, $cache_store);
+    my $book = $self->get_builtin_book($testBookName);
     warn "Retrieved book: " . (defined($book) ? ref($book) : 'undef');
 
     unless(defined($book) && blessed($book) && $book->DOES('Game::EvonyTKR::Model::Book')){
-      warn "Cache object: " . ref($cache_store);
-      my $all_items = $self->get_all_items($cache_store);
+      my $all_items = $self->get_all_items();
       warn "Cache keys: " . join(', ', keys %$all_items);
       warn "Looking for key: '$key'";
-      my $raw_value = $cache_store->get($key);
+      my $raw_value = $self->store->get($key);
       warn "Raw cache value: " . (defined($raw_value) ? length($raw_value) . " bytes" : 'undef');
 
       return 0;

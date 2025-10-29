@@ -3,183 +3,98 @@ use utf8::all;
 use File::FindLib 'lib';
 require Log::Log4perl::Level;
 require Mojo::File;
+require Game::EvonyTKR::Service::Cache;
+require Game::EvonyTKR::Model::Factory;
 
 package Game::EvonyTKR::Controller::Role::Books {
-  use Mojo::Base -role,                         -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Role::Cache', -role;
+  use Mojo::Base -role,                          -signatures;
+  use Mojo::Base 'Game::EvonyTKR::Role::Common', -role;
   use List::AllUtils qw(uniq);
+  use List::UtilsBy;
   use Carp;
 
   our $namespace = 'books__';
 
-  sub create_book_cache ($self) {
-    $self->logger->debug(sprintf(
-      '%s log level is %s',
-      __PACKAGE__, Log::Log4perl::Level::to_level($self->logger->level())
-    ));
-    state $cache;
-    $cache = $self->create_cache({
-      namespace => $namespace,
-    })
-      unless (defined $cache);
-    return $cache;
-  }
+  has 'builtin_book_cache' => sub ($self) {
+    return Game::EvonyTKR::Service::Cache->new(namespace => 'builtin_books:');
+  };
 
-  sub add_builtin_book ($self, $item, $store) {
+  has 'generic_book_cache' => sub ($self) {
+    return Game::EvonyTKR::Service::Cache->new(namespace => 'generic_books:');
+  };
+
+  sub add_builtin_book ($self, $item) {
     my $key = $item->name =~ s/ /_/gr;
     $key = $self->normalize($key);
-    $self->add_book($key, $item, $store);
+    return $self->builtin_book_cache->set($key, $item->to_wire_hash());
   }
 
-  sub add_generic_book ($self, $item, $store) {
+  sub add_generic_book ($self, $item) {
     my $nn = $item->name =~ s/ /_/gr;
     $nn = $self->normalize($nn);
     my $key = sprintf('%s_level_%s', $nn, $item->level);
-    $self->add_book($key, $item, $store);
+    return $self->generic_book_cache->set($key, $item->to_wire_hash());
   }
 
-  sub add_book ($self, $name, $item, $store) {
-    my $key = $name =~ s/ /_/gr;
-    my $ei  = $self->encode_item($item);
-    my $ar  = $self->add_item($key, $ei, $store);
-    $self->logger->debug(sprintf(
-      'attempting to add key "%s" for name "%s" was "%s"',
-      $key  // 'undef key',
-      $name // 'undef name',
-      $ar   // 'undef add result'
-    ));
-    return $ar;
-  }
-
-  sub get_builtin_book ($self, $name, $store) {
+  sub get_builtin_book ($self, $name) {
     state $builtin_books = {};
+
+    $self->logger->debug("get_builtin_book called for: $name");
+
     if (exists $builtin_books->{ $self->normalize($name) }) {
       $self->logger->debug("Returning builtin_books $name from local cache");
       return $builtin_books->{ $self->normalize($name) };
     }
-    my $key = $name =~ s/ /_/gr;
-    $key = lc($self->normalize($key));
-    my $ei = $self->get_value($key, $store);
-    if (defined($ei) && length($ei)) {
-      my $item = $self->decode_item($ei,);
-      unless (blessed($item)
-        && blessed($item) =~ /^Game::EvonyTKR::Model::Book/) {
-        $self->logger->error(sprintf(
-'retrieved unexpected item for name "%s" with key "%s": recieved a ref %s; blessed %s: %s',
-          $name,                       $key,
-          ref($item) // 'scalar item', blessed($item) // 'not blessed value',
-          Data::Printer::np($item)
-        ));
-        return;
-      }
-      unless ($item->can('name')) {
-        $self->logger->error(sprintf(
-'retrieved item ref type "%s", type "%s" has no name method. object: %s',
-          ref($item), blessed($item), Data::Printer::np($item)
-        ));
 
-      }
-      unless ($item->name eq $name) {
-        $self->logger->error(sprintf(
-          'retrieved wrong item, "%s" ne "%s", key was "%s"',
-          $name, $item->name, $key
-        ));
-        return;
-      }
-      $builtin_books->{ $self->normalize($item->name) } = $item;
-      return $item;
+    my $key = $name =~ s/ /_/gr;
+    $key = $self->normalize($key);
+    $self->logger->debug("Looking for cache key: $key");
+
+    my $wire_data = $self->builtin_book_cache->get($key);
+    unless (defined($wire_data)) {
+      $self->logger->warn("No wire_data found for key: $key");
+      return;
     }
-    else {
-      $self->logger->warn(sprintf(
-        'unable to retrieve encoded item for %s with key %s',
-        $name, $key
-      ));
+
+    $self->logger->debug("Found wire_data, attempting to build book");
+    my $book =
+      Game::EvonyTKR::Model::Factory->build_from_wire('Book', $wire_data);
+
+    unless (defined($book)) {
+      $self->logger->error("Factory failed to build book from wire_data");
+      return;
     }
+
+    $self->logger->debug("Successfully built book: " . $book->name);
+    $builtin_books->{ $self->normalize($name) } = $book;
+    return $book;
   }
 
-  sub get_generic_book ($self, $name, $level, $store) {
+  sub get_generic_book ($self, $name, $level) {
     state $generic_books = {};
+
     if (exists $generic_books->{ $self->normalize($name) }) {
       if (exists $generic_books->{ $self->normalize($name) }->{$level}) {
         $self->logger->debug("Returning generic book $name from local cache");
         return $generic_books->{ $self->normalize($name) }->{$level};
       }
     }
+
     my $key = $name =~ s/ /_/gr;
-    $key = lc($self->normalize($key));
+    $key = $self->normalize($key);
     $key = sprintf('%s_level_%s', $key, $level);
-    my $ei = $self->get_value($key, $store);
-    if (defined($ei) && length($ei)) {
-      my $item = $self->decode_item($ei,);
-      unless (blessed($item)
-        && $item->isa('Game::EvonyTKR::Model::Book')
-        && $item->name eq $name
-        && $item->level == $level) {
-        $self->logger->error(sprintf(
-          'retrieved unexpected item: expected: '
-            . '"%s" level %s ne recieved: "%s" level %s - a %s',
-          $name, $level, $item->name, $item->level, blessed($item)
-        ));
-        return;
-      }
-      $generic_books->{ $self->normalize($name) }->{$level} = $item;
-      return $item;
-    }
-    else {
-      $self->logger->warn(sprintf(
-        'unable to retrieve encoded item for %s with key %s',
-        $name, $key
-      ));
-    }
-  }
 
-  sub get_all_books ($self, $store) {
-    my $all      = $self->get_all_items($store);
-    my @keys     = keys $all->%*;
-    my $keyCount = scalar @keys;
-    if ($keyCount == 0) {
-      $self->logger->warn(sprintf(
-        'get_all_books helper found %s items', scalar keys $all->%*));
-      my $all_keys = $self->get_value('_all_keys', $store) // '';
-      my @keys     = sort { "$a" cmp "$b" }
-        List::UtilsBy::uniq_by {"$_"} grep {length} split ',', $all_keys;
-      if (length($all_keys) == 0) {
-        $self->logger->warn('No keys present!');
-      }
-      else {
-        $self->logger->warn(sprintf(
-          'get_all_books available keys: %s',
-          join ', ', map {"'$_'"} @keys
-        ));
-      }
-    }
+    my $wire_data = $self->generic_book_cache->get($key);
+    return unless defined($wire_data);
 
-    my $result = {};
-    foreach my $key (keys $all->%*) {
-
-      unless (defined($key) && length($key)) {
-        $self->logger->error("bogus key in get_all_items result!!");
-        next;
-      }
-      my $ev = $all->{$key};
-      unless (defined($ev) && length($ev)) {
-        $self->logger->error("key '$key' points at undef!!");
-        next;
-      }
-      my $item = $self->decode_item($ev,);
-      my $result->{total_books}++;
-      my $name = $key =~ s/_/ /rg;
-      if ($key =~ /_level_/) {
-        $result->{ $self->normalize($name) }->{ $item->level } = $item;
-      }
-      else {
-        $result->{ $self->normalize($name) } = $item;
-      }
-    }
-    return $result;
+    my $book =
+      Game::EvonyTKR::Model::Factory->build_from_wire('Book', $wire_data);
+    $generic_books->{ $self->normalize($name) }->{$level} = $book;
+    return $book;
   }
 
   sub list_generic_books ($self, $app) {
+    my $returnlist;
     unless (defined($app)) {
       $self->logger->logcroak('$app must be defined');
     }
@@ -187,23 +102,41 @@ package Game::EvonyTKR::Controller::Role::Books {
       Mojo::File->new($app->config('distDir'))->child('collections/data/');
     my $gbDir      = $collectionDir->child('generic books');
     my @suffixlist = ('.yaml', '.yml');
-    my @gglist     = $gbDir->list->grep(sub { $_ =~ /\.ya?ml$/ && -f -r $_ })
-      ->sort->map(sub { return $_->basename(@suffixlist) })->each;
-    my @returnlist =
-      List::UtilsBy::uniq_by { lc($self->normalize($_)) } @gglist;
-    return \@returnlist;
+    $gbDir->list->grep(sub { $_ =~ /\.ya?ml$/ && -f -r $_ })->sort->map(sub {
+      my $ib = $_->basename(@suffixlist);
+      $ib = lc($self->normalize($ib));
+      if (List::AllUtils::none { $_ eq $ib } $returnlist->@*) {
+        push @$returnlist, $ib;
+      }
+    });
+
+    return $returnlist;
   }
 
   sub list_builtin_books ($self, $app) {
+    my $returnlist;
+    unless (defined($app)) {
+      $self->logger->logcroak('$app must be defined');
+    }
     my $collectionDir =
       Mojo::File->new($app->config('distDir'))->child('collections/data/');
     my $gbDir      = $collectionDir->child('skill books');
     my @suffixlist = ('.yaml', '.yml');
-    my @gglist     = $gbDir->list->grep(sub { $_ =~ /\.ya?ml$/ && -f -r $_ })
-      ->sort->map(sub { return $_->basename(@suffixlist) })->each;
-    my @returnlist =
-      List::UtilsBy::uniq_by { lc($self->normalize($_)) } @gglist;
-    return \@returnlist;
+    $gbDir->list->grep(sub { $_ =~ /\.ya?ml$/ && -f -r $_ })->sort->map(sub {
+      my $ib = $_->basename(@suffixlist);
+      $ib = lc($self->normalize($ib));
+      if (List::AllUtils::none { $_ eq $ib } $returnlist->@*) {
+        $self->logger->debug(
+          sprintf('adding "%s" to the list of builtins', $ib));
+        push @$returnlist, $ib;
+      }
+      else {
+        $self->logger->debug(
+          sprintf('excluding "%s" from the list of builtins', $ib));
+      }
+    });
+
+    return $returnlist;
   }
 }
 1;

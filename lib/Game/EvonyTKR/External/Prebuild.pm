@@ -45,7 +45,7 @@ package Game::EvonyTKR::External::Prebuild {
     }
     $plugin->SUPER::register($app, $conf);
 
-    my $db = $app->sqlite->db;
+    my $db = $app->minion->backend->sqlite->db;
     ensure_lock_table_sqlite($db);
 
     unless (defined($app->minion)) {
@@ -92,7 +92,6 @@ package Game::EvonyTKR::External::Prebuild {
       sprintf('%s register function complete for %s', __PACKAGE__, $$));
   }
 
-
   sub now_epoch () { int(time()) }
 
   sub ensure_lock_table_sqlite ($db) {
@@ -123,7 +122,7 @@ package Game::EvonyTKR::External::Prebuild {
       );
       1;
     };
-    return 1 if $res && $db->db->dbh->rows;   # inserted → we own it
+    return 1 if $res && $db->dbh->rows;    # inserted → we own it
 
     # 2) If exists, try to take over only if stale
     $res = $db->query(
@@ -132,7 +131,7 @@ package Game::EvonyTKR::External::Prebuild {
        WHERE name = ? AND expires_at < ?',
       $owner, $exp, $now, $name, $now
     );
-    return $res->rows > 0;                    # true if we stole a stale lock
+    return $res->rows > 0;                 # true if we stole a stale lock
   }
 
   sub refresh_lock_sqlite ($db, $name, $owner, $ttl_s) {
@@ -149,10 +148,8 @@ package Game::EvonyTKR::External::Prebuild {
   }
 
   sub release_lock_sqlite ($db, $name, $owner) {
-    my $res = $db->query(
-      'DELETE FROM app_locks WHERE name = ? AND owner = ?',
-      $name, $owner
-    );
+    my $res = $db->query('DELETE FROM app_locks WHERE name = ? AND owner = ?',
+      $name, $owner);
     return $res->rows > 0;
   }
 
@@ -160,7 +157,8 @@ package Game::EvonyTKR::External::Prebuild {
     # wait for prerequisites...
     while (!$plugin->prebuildPrerequisites) { sleep 5 }
 
-    if (my $g = $app->minion->guard('external_prebuild:bootstrap', 15, { limit => 1 })) {
+    if (my $g =
+      $app->minion->guard('external_prebuild:bootstrap', 15, { limit => 1 })) {
       # only the guard holder gets here
       my $existing = $app->minion->jobs({
         tasks  => ['external_prebuild'],
@@ -216,11 +214,11 @@ package Game::EvonyTKR::External::Prebuild {
     }
     $job->logger->debug('Prebuild orchestration starting');
 
-    my $owner = $$ . '@' . ($ENV{HOSTNAME}//'localhost');
+    my $owner = $$ . '@' . ($ENV{HOSTNAME} // 'localhost');
     my $key   = 'prebuild_run';
-    my $ttl   = 60;                     # lock TTL (seconds)
-    my $refresh_every = 20;             # heartbeat interval
-    my $db = $job->app->sqlite->db;
+    my $ttl   = 60;                                         # lock TTL (seconds)
+    my $refresh_every = 20;                                 # heartbeat interval
+    my $db            = $job->minion->backend->sqlite->db;
 
     unless (try_acquire_lock_sqlite($db, $key, $owner, $ttl)) {
       $job->note(skipped => 'another prebuild is running');
@@ -229,114 +227,140 @@ package Game::EvonyTKR::External::Prebuild {
 
     my $alive = 1;
     local $SIG{TERM} = sub { $alive = 0 };
-    my $timer_id = Mojo::IOLoop->recurring($refresh_every => sub {
-      refresh_lock_sqlite($db, $key, $owner, $ttl) or do {
-        $alive = 0;
-        $job->logger->error('Lost runtime lock; stopping prebuild.');
-        Mojo::IOLoop->remove($timer_id) if $timer_id;
-        release_lock_sqlite($db, $key, $owner);   # safe even if we don’t own it
-        $job->fail('lost lock');
-      };
-    });
+    my $timer_id;
+    $timer_id = Mojo::IOLoop->recurring(
+      $refresh_every => sub {
+        refresh_lock_sqlite($db, $key, $owner, $ttl) or do {
+          $alive = 0;
+          $job->logger->error('Lost runtime lock; stopping prebuild.');
+          Mojo::IOLoop->remove($timer_id) if $timer_id;
+          release_lock_sqlite($db, $key, $owner); # safe even if we don’t own it
+          $job->fail('lost lock');
+        };
+      }
+    );
 
     # Import Books
     state $book_import_started = 0;
     # --- Import Books (replaces your existing block) ---
     my ($book_loop, $jid_generic, $jid_builtin);
 
-    $book_loop = Mojo::IOLoop->recurring(5 => sub {
-      # don’t start until prereqs pass
-      return unless $job->prebuildPrerequisites;
-
-      # enqueue once
-      unless ($jid_generic && $jid_builtin) {
-        $jid_generic = $job->minion->enqueue(
-          load_all_generic_books => [] => {
-            attempts => 3, delay => 1, expire => 300, priority => 50,
-          }
-        );
-        $jid_builtin = $job->minion->enqueue(
-          load_all_builtin_books => [] => {
-            attempts => 3, delay => 1, expire => 300, priority => 60,
-          }
-        );
-
-        $job->note(book_jids => { generic => $jid_generic, builtin => $jid_builtin });
-        $job->app->log->info("Queued book imports generic=$jid_generic builtin=$jid_builtin");
-        return; # let the next tick do the monitoring
-      }
-
-      # monitor both
-      my $jg = $job->minion->job($jid_generic);
-      my $jb = $job->minion->job($jid_builtin);
-
-      my $sg = $jg && $jg->info ? $jg->info->{state} : 'unknown';
-      my $sb = $jb && $jb->info ? $jb->info->{state} : 'unknown';
-
-      # bubble up minimal progress to the dashboard
-      $job->note(book_status => { generic => $sg, builtin => $sb });
-
-      # stop once both are terminal
-      my %terminal = map { $_ => 1 } qw(finished failed);
-      if ($terminal{$sg} && $terminal{$sb}) {
-        Mojo::IOLoop->remove($book_loop);
-        $book_loop = undef;
-
-        # optional: fail early if any failed; otherwise continue prebuild
-        if ($sg eq 'failed' || $sb eq 'failed') {
-          my $eg = $jg && $jg->info ? ($jg->info->{result} // $jg->info->{notes}{error}) : undef;
-          my $eb = $jb && $jb->info ? ($jb->info->{result} // $jb->info->{notes}{error}) : undef;
-          my $msg = "book import failed" . ($eg ? " (generic: $eg)" : "") . ($eb ? " (builtin: $eb)" : "");
-          $job->note(book_error => { generic => $eg, builtin => $eb });
-          # if you want the overall prebuild to continue despite book failures, just return here instead:
-          return $job->app->log->error($msg);
+    $book_loop = Mojo::IOLoop->recurring(
+      5 => sub {
+        # don’t start until prereqs pass
+        unless ($job->prebuildPrerequisites) {
+          $job->logger->debug(sprintf('cannot start books import prereqs: %s',
+            Data::Printer::np($prereqs, multiline => 0)));
+          return;
         }
 
-        $job->app->log->info("Book imports complete generic=$sg builtin=$sb");
-      }
-    });
+        # enqueue once
+        unless ($jid_generic && $jid_builtin) {
+          $job->logger->info('launching load_all_generic_books');
+          $jid_generic = $job->minion->enqueue(
+            load_all_generic_books => [] => {
+              attempts => 3,
+              delay    => 1,
+              expire   => 300,
+              priority => 50,
+            }
+          );
+          $job->logger->info('launching load_all_builtin_books');
+          $jid_builtin = $job->minion->enqueue(
+            load_all_builtin_books => [] => {
+              attempts => 3,
+              delay    => 1,
+              expire   => 300,
+              priority => 60,
+            }
+          );
 
-    # Import Generals
-    $generalCache = $job->create_general_cache()
-      unless defined $generalCache;
+          $job->note(
+            book_jids => { generic => $jid_generic, builtin => $jid_builtin });
+          $job->app->log->info(
+            "Queued book imports generic=$jid_generic builtin=$jid_builtin");
+          return;    # let the next tick do the monitoring
+        }
+
+        # monitor both
+        my $jg = $job->minion->job($jid_generic);
+        my $jb = $job->minion->job($jid_builtin);
+
+        my $sg = $jg && $jg->info ? $jg->info->{state} : 'unknown';
+        my $sb = $jb && $jb->info ? $jb->info->{state} : 'unknown';
+
+        # bubble up minimal progress to the dashboard
+        $job->note(book_status => { generic => $sg, builtin => $sb });
+
+        # stop once both are terminal
+        my %terminal = map { $_ => 1 } qw(finished failed);
+        if ($terminal{$sg} && $terminal{$sb}) {
+          Mojo::IOLoop->remove($book_loop);
+          $book_loop = undef;
+
+          # optional: fail early if any failed; otherwise continue prebuild
+          if ($sg eq 'failed' || $sb eq 'failed') {
+            my $eg =
+              $jg && $jg->info
+              ? ($jg->info->{result} // $jg->info->{notes}{error})
+              : undef;
+            my $eb =
+              $jb && $jb->info
+              ? ($jb->info->{result} // $jb->info->{notes}{error})
+              : undef;
+            my $msg =
+                "book import failed"
+              . ($eg ? " (generic: $eg)" : "")
+              . ($eb ? " (builtin: $eb)" : "");
+            $job->note(book_error => { generic => $eg, builtin => $eb });
+# if you want the overall prebuild to continue despite book failures, just return here instead:
+            return $job->app->log->error($msg);
+          }
+
+          $job->app->log->info("Book imports complete generic=$sg builtin=$sb");
+        }
+      }
+    );
+
+    ## Import Generals
     my $distDir = Mojo::Home->new;
     $distDir->detect('Game::EvonyTKR');
     my $generalCount = -1;
     state $general_import_started = 0;
-    state $gl;
-    my $loop1;
-    $loop1 = Mojo::IOLoop->recurring(
-      5 => sub {
-        state $gljid;
-        if ($job->prebuildPrerequisites && $general_import_started == 0) {
-          $general_import_started = 1;
-          $gljid                  = $job->minion->enqueue(
-            load_all_generals => ['prebuild load_all_generals'] => {
-              attempts => 3,
-              delay    => rand(10),
-              expire   => 7200,
-              priority => 10,
-            }
-          );
-          $gl = $job->minion->job($gljid);
-          $gl->on(
-            finish => sub ($glj,) {
-              $generalCount = $glj->notes->{generalCount};
-              $job->set_value('generalCount', $generalCount, $generalCache);
-              Mojo::IOLoop->remove($loop1);
-            }
-          );
-          $gl->on(
-            failed => sub($glj, $err) {
-              Mojo::IOLoop->remove($loop1);
-              my $errmessage = sprintf('general loading failed: %s', $err);
-              $job->logger->error($errmessage);
-              $job->fail($errmessage);
-            }
-          );
-        }
-      }
-    );
+    #state $gl;
+    #my $loop1;
+    #$loop1 = Mojo::IOLoop->recurring(
+    #  5 => sub {
+    #    state $gljid;
+    #    if ($job->prebuildPrerequisites && $general_import_started == 0) {
+    #      $general_import_started = 1;
+    #      $gljid                  = $job->minion->enqueue(
+    #        load_all_generals => ['prebuild load_all_generals'] => {
+    #          attempts => 3,
+    #          delay    => rand(10),
+    #          expire   => 7200,
+    #          priority => 10,
+    #        }
+    #      );
+    #      $gl = $job->minion->job($gljid);
+    #      $gl->on(
+    #        finish => sub ($glj,) {
+    #          $generalCount = $glj->notes->{generalCount};
+    #          $job->set_value('generalCount', $generalCount, $generalCache);
+    #          Mojo::IOLoop->remove($loop1);
+    #        }
+    #      );
+    #      $gl->on(
+    #        failed => sub($glj, $err) {
+    #          Mojo::IOLoop->remove($loop1);
+    #          my $errmessage = sprintf('general loading failed: %s', $err);
+    #          $job->logger->error($errmessage);
+    #          $job->fail($errmessage);
+    #        }
+    #      );
+    #    }
+    #  }
+    #);
 
     # need the file names for error handling
     my $generalDir = Mojo::File->new(

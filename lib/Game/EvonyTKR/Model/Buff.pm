@@ -16,6 +16,7 @@ package Game::EvonyTKR::Model::Buff {
   use overload
     '""'       => \&as_string,
     '.'        => \&concat,
+    'bool'     => \&_isTrue,
     'fallback' => 0;
 
   our $VERSION = 'v0.30.0';
@@ -164,6 +165,19 @@ package Game::EvonyTKR::Model::Buff {
     my $c;
     my $conditionCount = scalar @{ $self->conditions() };
     $self->logger->debug("in to_hash, I have $conditionCount conditions");
+
+    # Debug buff value
+    if (defined($self->value)) {
+      $self->logger->debug(sprintf(
+        "Buff value: number=%s, unit=%s",
+        $self->value->number // 'undef',
+        $self->value->unit   // 'undef'
+      ));
+    }
+    else {
+      $self->logger->warn("Buff value is undefined!");
+    }
+
     my $rc;
     if ($conditionCount) {
       $rc = $self->conditions();
@@ -197,6 +211,35 @@ package Game::EvonyTKR::Model::Buff {
     return $json;
   }
 
+  sub to_wire_hash ($self) {
+    return $self->to_hash();    # to_hash already has everything we need
+  }
+
+  sub from_wire_hash ($class, $w) {
+    my $buff = $class->new(
+      attribute    => $w->{attribute},
+      passive      => $w->{passive} // 0,
+      targetedType => $w->{targetedType},
+    );
+
+    # Set value
+    if ($w->{value}) {
+      $buff->value(Game::EvonyTKR::Model::Buff::Value->new(
+        number => $w->{value}->{number},
+        unit   => $w->{value}->{unit},
+      ));
+    }
+
+    # Set conditions
+    if ($w->{conditions} && @{ $w->{conditions} }) {
+      foreach my $condition (@{ $w->{conditions} }) {
+        $buff->set_condition($condition);
+      }
+    }
+
+    return $buff;
+  }
+
   sub concat($self, $other, $swap) {
     if ($swap) {
       return $other . $self->as_string();
@@ -204,6 +247,14 @@ package Game::EvonyTKR::Model::Buff {
     else {
       return $self->as_string() . $other;
     }
+  }
+
+  sub _isTrue ($self, $other = undef, $swap = undef) {
+    return
+         defined($self)
+      && ref($self)
+      && blessed($self)
+      && $self->isa('Game::EvonyTKR::Model::Book');
   }
 
 }

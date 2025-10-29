@@ -15,8 +15,6 @@ package Game::EvonyTKR::External::Book::Loader {
   use experimental qw(class);
   use Carp;
 
-  state $bookCache;
-
   sub register ($taskClass, $app, $conf = {}) {
     $taskClass->SUPER::register($app, $conf);
     if (not defined($app)) {
@@ -95,7 +93,6 @@ package Game::EvonyTKR::External::Book::Loader {
       ));
     }
     my $book;
-    $bookCache = $job->create_book_cache() unless (defined($bookCache));
     my @parts = split ' ', $entry;
     my $level = $parts[1] unless ($#parts < 1);
     my $name  = join ' ', @parts[2 .. $#parts] unless ($#parts < 2);
@@ -112,7 +109,7 @@ package Game::EvonyTKR::External::Book::Loader {
       $job->fail($errmessage);
       return;
     }
-    $book = $job->get_generic_book($name, $level, $bookCache);
+    $book = $job->get_generic_book($name, $level);
 
     if ( defined($book)
       && ref($book)
@@ -161,7 +158,7 @@ package Game::EvonyTKR::External::Book::Loader {
       return $job->fail($errmessage);
     }
 
-    my $add_result = $job->add_generic_book($book, $bookCache);
+    my $add_result = $job->add_generic_book($book);
     if (defined($add_result) && $add_result == 1) {
       my $result = sprintf('imported %s',
         sprintf('Level %s %s', $book->level, $book->name));
@@ -187,8 +184,7 @@ package Game::EvonyTKR::External::Book::Loader {
       ));
     }
     my $book;
-    $bookCache = $job->create_book_cache() unless (defined($bookCache));
-    $book      = $job->get_builtin_book($entry, $bookCache);
+    $book = $job->get_builtin_book($entry);
 
     if ( defined($book)
       && ref($book)
@@ -232,7 +228,7 @@ package Game::EvonyTKR::External::Book::Loader {
       $job->logger->error($errmessage);
       return $job->fail($errmessage);
     }
-    my $add_result = $job->add_builtin_book($book, $bookCache);
+    my $add_result = $job->add_builtin_book($book);
     if (defined($add_result) && $add_result == 1) {
       my $result = sprintf('imported %s', $book->name);
       $job->logger->info($result);

@@ -20,8 +20,6 @@ require Game::EvonyTKR::Model::Covenant;
 require Game::EvonyTKR::Model::Data;
 require Game::EvonyTKR::Model::General;
 require Game::EvonyTKR::Model::Specialty;
-require Game::EvonyTKR::Role::Book::Builtin;
-require Game::EvonyTKR::Role::Book::SkillBook;
 require Game::EvonyTKR::Shared::Constants;
 
 package Game::EvonyTKR::External::Buff::Worker {

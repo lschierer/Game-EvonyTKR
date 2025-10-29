@@ -6,7 +6,6 @@ require Game::EvonyTKR::Log::Config;
 package Game::EvonyTKR::External::JobBase {
   use Mojo::Base 'Minion::Job',                  -signatures;
   use Mojo::Base 'Mojolicious::Plugin',          -role, -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Role::Cache',  -role, -signatures;
   use Mojo::Base 'Game::EvonyTKR::Role::Common', -role, -signatures;
   use Mojo::Base 'Game::EvonyTKR::Role::Logger', -role;
   use diagnostics;

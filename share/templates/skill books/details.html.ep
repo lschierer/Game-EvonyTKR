@@ -1,7 +1,7 @@
 <div class="builtinbook-details">
   <% if( $item ) { %>
     <% require Scalar::Util; %>
-    <% if( Scalar::Util::reftype($item) eq 'OBJECT' && Scalar::Util::blessed($item) eq 'Game::EvonyTKR::Model::Book') { %>
+    <% if( Scalar::Util::reftype($item) eq 'HASH' && Scalar::Util::blessed($item) =~ /Game::EvonyTKR::Model::Book/) { %>
       <h3><%= $item->name %></h3>
       <p class="description">
         <%= $item->text %>
@@ -12,9 +12,17 @@
             <dl>
               <dt>Attribute: </dt>
               <dd><%= $buff->attribute %>
-              <% if ( length $buff->targetedType  > 0 ) { %>
+              <% if( defined($buff->targetedType)) { %>
                 <dt>Troop Type: </dt>
+                <% if( Scalar::Util::reftype($buff->targetedType) && Scalar::Util::reftype($buff->targetedType) eq 'ARRAY') { %>
+                  <% foreach my $tt ($buff->targetedType->@*) { %>
+                    <dd><%== $tt %></dd>
+                  <% } %>
+                <% } elsif ( length $buff->targetedType  > 0 ) { %>
                   <dd><%= $buff->targetedType %></dd>
+                <% } else { %>
+                  <!-- <%== $buff->targetedType %> -->
+                <% } %>
               <% } %>
               <% if ( scalar $buff->conditions()  ) { %>
                 <dt>Condition(s): </dt>
@@ -35,4 +43,4 @@
   <% } %>
 </div>
 <% require Data::Printer; %>
-<!-- <%= Data::Printer::np($item) %> -->
+<!-- <%== Data::Printer::np($item) %> -->
