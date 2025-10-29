@@ -5,6 +5,7 @@ buffs:
   - attribute: Attack
     value:
       number: 15
+      unit: percentage
     conditions:
       - In City
       - When The Main Defense General
@@ -12,6 +13,7 @@ buffs:
     troop: Ground Troops
     value:
       number: 30
+      unit: percentage
     conditions:
       - In City
       - When The Main Defense General
