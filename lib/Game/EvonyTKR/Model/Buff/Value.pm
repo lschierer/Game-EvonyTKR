@@ -23,19 +23,17 @@ package Game::EvonyTKR::Model::Buff::Value {
     );
   }
 
-  sub toHashRef ($self) {
+  sub to_hash ($self) {
     return {
-      number => $self->number,
-      unit   => $self->unit,
+      __CLASS__ => __PACKAGE__,
+      number    => $self->number,
+      unit      => $self->unit,
     };
   }
 
   sub TO_JSON {
     my $self = shift;
-    return JSON::PP->new->utf8(1)->pretty->canonical(1)
-      ->allow_blessed(1)
-      ->convert_blessed(1)
-      ->encode($self->to_hash());
+    return $self->to_hash();
   }
 
   sub as_string {

@@ -40,6 +40,7 @@ package Game::EvonyTKR::Model::General {
 
   sub to_hash ($self) {
     return {
+      __CLASS__       => __PACKAGE__,
       id              => $self->id,
       name            => $self->name,
       type            => $self->type,

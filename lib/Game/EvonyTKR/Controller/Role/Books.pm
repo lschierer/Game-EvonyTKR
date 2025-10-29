@@ -65,9 +65,10 @@ package Game::EvonyTKR::Controller::Role::Books {
       unless (blessed($item)
         && blessed($item) =~ /^Game::EvonyTKR::Model::Book/) {
         $self->logger->error(sprintf(
-          'retrieved unexpected item for name "%s" with key "%s": recieved a ref %s; blessed %s: %s',
-          $name,                                $key,
-          ref($item) // 'scalar item', blessed($item) // 'not blessed value', Data::Printer::np($item)
+'retrieved unexpected item for name "%s" with key "%s": recieved a ref %s; blessed %s: %s',
+          $name,                       $key,
+          ref($item) // 'scalar item', blessed($item) // 'not blessed value',
+          Data::Printer::np($item)
         ));
         return;
       }
@@ -79,12 +80,10 @@ package Game::EvonyTKR::Controller::Role::Books {
 
       }
       unless ($item->name eq $name) {
-        $self->logger->error(
-          sprintf(
-            'retrieved wrong item, "%s" ne "%s", key was "%s"',
-            $name, $item->name, $key
-          )
-        );
+        $self->logger->error(sprintf(
+          'retrieved wrong item, "%s" ne "%s", key was "%s"',
+          $name, $item->name, $key
+        ));
         return;
       }
       $builtin_books->{ $self->normalize($item->name) } = $item;

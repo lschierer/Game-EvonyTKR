@@ -2,11 +2,10 @@ use v5.42.0;
 use utf8::all;
 use File::FindLib 'lib';
 require JSON::PP;
-use namespace::clean;
+use namespace::autoclean;
 
 package Game::EvonyTKR::Model::Book {
   use Mojo::Base -base,                          -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Role::Book',   -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Logger', -role;
   use Log::Any qw($log);
   use Carp;
@@ -28,8 +27,9 @@ package Game::EvonyTKR::Model::Book {
 
   sub to_hash ($self) {
     my $hash = {
-      name  => $self->name,
-      buffs => $self->buffs,
+      __CLASS__ => __PACKAGE__,
+      name      => $self->name,
+      buffs     => $self->buffs,
     };
     if (length($self->text)) {
       $hash->{text} = $self->text;
@@ -45,6 +45,50 @@ package Game::EvonyTKR::Model::Book {
       : (),
     ];
     return $hash;
+  }
+
+  sub to_wire_hash ($self) {
+    my $hash = {
+      _v        => 1,
+      name      => $self->name,
+      text      => $self->text // '',
+      buffs     => $self->buffs,
+    };
+
+    if ($self->can('validate_level')) {
+      $hash->{level} = $self->level;
+    }
+    $hash->{_roles} = [
+      $self->can('is_builtin')
+        && $self->is_builtin == 1 ? 'Game::EvonyTKR::Role::Book::Builtin' : (),
+      $self->can('validate_level')
+      ? 'Game::EvonyTKR::Role::Book::SkillBook'
+      : (),
+    ];
+    return $hash;
+  }
+
+  sub from_wire_hash ($class, $w) {
+    die "unknown wire version" unless ($w->{_v} // 1) == 1;
+    my $b;
+
+    if(exists $w->{level}){
+      $b = $class->new( name => $w->{name})->with_roles('Game::EvonyTKR::Role::Book::SkillBook');
+      $b->level($w->{level});
+    } else {
+      $b = $class->new( name => $w->{name})->with_roles('Game::EvonyTKR::Role::Book::Builtin');
+    }
+
+    if(exists($w->{text})){
+      $b->text($w->text);
+    }
+
+    my $oba = $w->{buffs};
+    foreach my $ob (values $oba->@*){
+      my $nb = Game::EvonyTKR::Model::Buff->from_hash($ob);
+      $b->addBuff($nb);
+    }
+    return $b;
   }
 
   sub TO_JSON {

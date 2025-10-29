@@ -172,6 +172,7 @@ package Game::EvonyTKR::Model::Buff {
       $c = [];
     }
     my $r = {
+      __CLASS__ => __PACKAGE__,
       attribute => $self->attribute,
       value     => {
         number => $self->value->number(),

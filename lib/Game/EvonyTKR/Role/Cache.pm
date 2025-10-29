@@ -11,35 +11,16 @@ package Game::EvonyTKR::Role::Cache {
   use Carp;
 
   our $json =
-    JSON::PP->new->utf8(1)->pretty(1)
+    JSON::PP->new->utf8(1)
+    ->pretty(1)
     ->canonical(1)
     ->allow_blessed(1)
     ->convert_blessed(1)
     ->allow_tags(1);
 
-    sub _add_class_hints ($self, $data) {
-        return $data unless blessed($data);
-
-        my $result = $data->TO_JSON();
-        $result->{__CLASS__} = ref($data);
-
-        # Recursively add hints to nested objects
-        for my $key (keys %$result) {
-            if (ref($result->{$key}) eq 'ARRAY') {
-                $result->{$key} = [map { $self->_add_class_hints($_) } @{$result->{$key}}];
-            } elsif (blessed($result->{$key})) {
-                $result->{$key} = $self->_add_class_hints($result->{$key});
-            }
-        }
-
-        return $result;
-    }
-
-    sub encode_item ($self, $item) {
-        my $data = $self->_add_class_hints($item);
-        return $json->encode($data);
-    }
-
+  sub encode_item ($self, $item) {
+    return $json->encode($item);
+  }
 
   sub decode_item ($self, $encoded) {
     my $data = $json->decode($encoded);
@@ -51,6 +32,7 @@ package Game::EvonyTKR::Role::Cache {
 
     if ($data->{__CLASS__}) {
       my $class = $data->{__CLASS__};
+      say("_reconstruct_object: class is $class ");
       delete $data->{__CLASS__};
 
       my $obj = $class->new($data);
