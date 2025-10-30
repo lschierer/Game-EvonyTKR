@@ -65,6 +65,7 @@ my $builder = Module::Build->new(
     'Minion::Backend::SQLite'             => '0',
     'Module::Find'                        => '0',
     'Module::Load'                        => '0',
+    'Module::Runtime'                     => '0',
     'Mojo::Base'                          => '0',
     'Mojo::DOM58'                         => '0',
     'Mojo::File'                          => '0',
