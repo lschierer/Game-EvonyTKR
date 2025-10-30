@@ -77,7 +77,7 @@ package Game::EvonyTKR::Controller::Specialties {
 
     $app->helper(
       get_all_specialties => sub {
-        return $c->get_all_specialties;
+        return values $c->get_all_specialties->%*;
       }
     );
 
@@ -167,16 +167,16 @@ package Game::EvonyTKR::Controller::Specialties {
     }
 
     my $s = Game::EvonyTKR::Model::Specialty->from_hash($hashObject);
-    #unless ($s) {
-    #  $logger->error(
-    #    sprintf('Failed to import Specialty from %s.', $specialtyFile));
-    #  return;
-    #}
-    #$c->get_all_specialties()->{ $c->SUPER::getConstants->normalize($s->name) }
-    #  = $s;
-    #$logger->debug(
-    #  sprintf('successfully imported %s from %s', $s->name, $specialtyFile));
-    #$app->plugins->emit(specialty_imported => { specialty => $s });
+    unless ($s) {
+      $logger->error(
+        sprintf('Failed to import Specialty from %s.', $specialtyFile));
+      return;
+    }
+    $c->get_all_specialties()->{ $c->SUPER::getConstants->normalize($s->name) }
+      = $s;
+    $logger->debug(
+      sprintf('successfully imported %s from %s', $s->name, $specialtyFile));
+    $app->plugins->emit(specialty_imported => { specialty => $s });
   }
 
   sub load_specialities ($c, $app) {
@@ -250,7 +250,8 @@ package Game::EvonyTKR::Controller::Specialties {
     my $base      = $c->getBase();
     $logger->debug("Specialties index method has base $base");
 
-    my $items = $c->get_all_specialties();
+    my $items;
+    @{$items} = values $c->get_all_specialties()->%*;
     $logger->debug(
       sprintf('Items: %s with %s items.', ref($items), scalar(@$items)));
     $c->stash(

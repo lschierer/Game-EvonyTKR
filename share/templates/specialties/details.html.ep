@@ -2,7 +2,7 @@
 <div class="specialty-details">
   <% use Scalar::Util; %>
   <% if( $item ) { %>
-    <% if ( Scalar::Util::reftype($item) eq 'OBJECT' && Scalar::Util::blessed($item) eq 'Game::EvonyTKR::Model::Specialty' ) { %>
+    <% if ( Scalar::Util::reftype($item) eq 'HASH' && Scalar::Util::blessed($item) eq 'Game::EvonyTKR::Model::Specialty' ) { %>
       <h3 class="spectrum-Heading spectrum-Heading--sizeL">Buffs Provided at Each Level for <%= $item->name %></h3>
       <table class="spectrum-Table spectrum-Table--sizeM spectrum-Table--quiet" >
         <thead class="spectrum-Table-head">
