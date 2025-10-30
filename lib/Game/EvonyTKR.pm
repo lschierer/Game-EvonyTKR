@@ -90,7 +90,8 @@ package Game::EvonyTKR {
     $self->plugin(
       Minion => {
         SQLite =>
-"sqlite:$dbPath?sqlite_use_immediate_transaction=1&busy_timeout=30000",
+        "sqlite:$dbPath?".
+        'sqlite_use_immediate_transaction=1&busy_timeout=30000',
       }
     );
     # Set additional pragmas after plugin loads

@@ -4,50 +4,110 @@ use utf8::all;
 
 use File::FindLib 'lib';
 require JSON::PP;
+require Data::Printer;
 
 require Game::EvonyTKR::Model::Buff;
 require Game::EvonyTKR::Model::Buff::Value;
 require Game::EvonyTKR::Model::Buff::Matcher;
-use namespace::clean;
+use namespace::autoclean;
 
-class Game::EvonyTKR::Model::Specialty : isa(Game::EvonyTKR::Shared::Constants)
-{
-# PODNAME: Game::EvonyTKR::Model::Specialty
-
-  use Carp;
-  use Data::Printer;
-  use Log::Any qw($log);
-  use List::MoreUtils;
-  use Util::Any -all;
+package Game::EvonyTKR::Model::Specialty {
+  use Mojo::Base -base,                               -signatures;
+  use Mojo::Base 'Game::EvonyTKR::Role::Logger',      -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Common';
+  use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants',    -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants', -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Constants::Specialties', -role;
+  use List::AllUtils qw( any none all );
   use UUID qw(uuid5);
-  use namespace::autoclean;
-# VERSION
-  use Game::EvonyTKR::Model::Logger;
+  use Hash::Util qw(lock_keys);
+  use Carp;
   use overload
     '""'       => \&as_string,
     '.'        => \&concat,
-    'bool'     => sub { $_[0]->_isTrue() },
+    'bool'     => \&_isTrue,
     'fallback' => 0;
 
-  field $id : reader;
-  field $name : reader : param;
+  has ['id', 'name'] => '';
 
-  field $levels : reader;
+  has 'levels' => sub { _init_empty_levels() };
 
-  ADJUST {
-    my $step1 = {};
-
-    foreach my $key ($self->SpecialtyLevelValues->@*) {
-      $step1->{$key} = {
-        level => $key,
-        buffs => [],     # Empty arrayref that can be modified later
-      };
-    }
-
-# Use Readonly::Hash1 for shallow readonly - hash structure is fixed but array contents can change
-    Readonly::Hash1 my %step2 => %{$step1};
-    $levels = \%step2;
+  sub _init_empty_levels () {
+    my %h = map { $_ => { text => '', buffs => [] } } $self->SpecialtyLevelValues->@*;
+    lock_keys(%h);
+    return \%h;
   }
+
+  sub is_valid_level ($class, $level) { exists $class->SpecialtyLevels{$level} }
+
+  # --- YAML -> object (input shape: levels = [ {level, text, buffs}, ... ]) ---
+  sub from_hash ($class, $h) {
+    croak "from_hash expects hashref" unless ref($h) eq 'HASH';
+    my $name = $h->{name} // '';
+    my $levels = _empty_levels();
+
+    my $arr = $h->{levels};
+    croak "levels must be an arrayref" unless ref($arr) eq 'ARRAY';
+
+    foreach my $lv ($h->{levels}->@*){
+      croak "level must have a level attribute" unless (defined($lv->{level}) && length($lv->{level}));
+      croak sprintf('invalid level %s, level must be one of %s', $lv->{level}, join ', ', $class->SpecialtyLevelValues->@*) unless (exists $class->SpecialtyLevels{$lv->{level}});
+      foreach my $b ($lv->{buffs}->@*){
+        push @{ $levels->{ $lv->{level} }{buffs} }, Game::EvonyTKR::Model::Buff->from_hash($b);
+      }
+      $levels->{$lv->{level}}{text}   = $lv->{text} // '';
+    }
+    croak sprintf('extra unexpected levels present.  [%s] must equal [%s]',
+    join ', ' map { $_->{level} } $h->{levels}->@*, join ', '  $class->SpecialtyLevelValues->@* ) unless(scalar($h->{levels}->@*) == scalar(keys $levels->%*));
+
+    return $class->new(name => $name, levels => $levels);
+  }
+
+  # --- object -> YAML (output shape compatible with your current files) ---
+  sub to_hash ($self) {
+    my $hash = {
+      name    => $self->name,
+      id      => $self->id,
+      levels  => [],
+    };
+    foreach my $lv ($self->levels->@*){
+      my $lh = {
+        text  => $lv->{text} // '',
+        buffs => [],
+      };
+      foreach my $b ($lv->{buffs}->@*) {
+        push @{ $lh->{buffs} }, $b->to_hash();
+      }
+      push @{ $hash->{levels} }, $lh;
+    }
+    return $hash;
+  }
+
+  # --- ergonomic helpers ---
+
+  sub get_level ($self, $level) {
+    Carp::croak "unknown level '$level'" unless $LEVEL{$level};
+    return $self->levels->{$level};  # { text => ..., buffs => [...] }
+  }
+
+  sub set_text ($self, $level, $text) {
+    $self->get_level($level)->{text} = $text // '';
+    return $self;
+  }
+
+  sub add_buff ($self, $level, $buff) {
+    push @{ $self->get_level($level)->{buffs} }, $buff;
+    return $self;
+  }
+
+
+}
+1;
+__END__
+{
+
+   ADJUST {
+
 
   ADJUST {
     if (defined($self) && defined($self->UUID5_base)) {
