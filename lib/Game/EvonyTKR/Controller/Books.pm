@@ -21,7 +21,7 @@ package Game::EvonyTKR::Controller::Books {
   }
 
   sub controller_name ($self) {
-    return "SkillBooks";
+    return "Books";
   }
 
   my $base = '/Reference/Skill Books';
@@ -35,13 +35,11 @@ package Game::EvonyTKR::Controller::Books {
   sub getBuiltInBooks ($c, $app) {
     state %builtinBooks;
     my $bblist = $c->list_builtin_books($app);
-    $c->logger->debug(
-      sprintf(
-        'got a list of %s builtin books: %s',
-        scalar @$bblist,
-        Data::Printer::np(@$bblist)
-      )
-    );
+    $c->logger->debug(sprintf(
+      'got a list of %s builtin books: %s',
+      scalar @$bblist,
+      Data::Printer::np(@$bblist)
+    ));
     foreach my $bbname ($bblist->@*) {
       unless (length($bbname)
         && exists $builtinBooks{ lc($c->normalize($bbname)) }) {
@@ -348,7 +346,7 @@ package Game::EvonyTKR::Controller::Books {
     my @parts     = split(/::/, ref($self));
     my $baseClass = pop(@parts);
     my $base      = $self->getBase();
-    $self->logger->debug("SkillBooks index method has base $base");
+    $self->logger->debug("Books index method has base $base");
 
     my $items;
     @$items = values $self->getBuiltInBooks($self->app)->%*;

@@ -89,9 +89,8 @@ package Game::EvonyTKR {
     $self->log->debug("dbPath is $dbPath");
     $self->plugin(
       Minion => {
-        SQLite =>
-        "sqlite:$dbPath?".
-        'sqlite_use_immediate_transaction=1&busy_timeout=30000',
+        SQLite => "sqlite:$dbPath?"
+          . 'sqlite_use_immediate_transaction=1&busy_timeout=30000',
       }
     );
     # Set additional pragmas after plugin loads
