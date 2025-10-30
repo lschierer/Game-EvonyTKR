@@ -29,7 +29,7 @@ package Game::EvonyTKR::Log::Config {
   sub appender_setup {
     my $logDir = __PACKAGE__->logFileLocation();
     my $config = qq(
-      log4perl.rootLogger = INFO, LOGFILE
+      log4perl.rootLogger = WARN, LOGFILE
       log4perl.appender.LOGFILE = Log::Log4perl::Appender::File
       log4perl.appender.LOGFILE.filename = $logDir/app-$$.log
       log4perl.appender.LOGFILE.mode = append
@@ -63,7 +63,7 @@ package Game::EvonyTKR::Log::Config {
 
     my $l4p = Log::Log4perl->get_logger('Game::EvonyTKR');
     if (ref($caller)) {
-      $l4p->info(sprintf(
+      $l4p->WARN(sprintf(
         'Logging initialized in %s by %s',
         __PACKAGE__, ref($caller) ? blessed($caller) : $caller
       ));
@@ -71,22 +71,22 @@ package Game::EvonyTKR::Log::Config {
     return $l4p;
   }
 
-  #(ALL|FATAL|TRACE|DEBUG|WARN|OFF|ERROR|INFO)
+  #(ALL|FATAL|TRACE|WARN|WARN|OFF|ERROR|WARN)
   sub logLevels {
     return {
       'Game::EvonyTKR'                                       => 'WARN',
       'Game::EvonyTKR::Control::Generals::Routing'           => 'WARN',
-      'Game::EvonyTKR::Controller::AscendingAttributes'      => 'INFO',
+      'Game::EvonyTKR::Controller::AscendingAttributes'      => 'WARN',
       'Game::EvonyTKR::Controller::ConflictGroups'           => 'WARN',
-      'Game::EvonyTKR::Controller::ControllerBase'           => 'INFO',
-      'Game::EvonyTKR::Controller::Covenants'                => 'INFO',
-      'Game::EvonyTKR::Controller::Generals'                 => 'INFO',
+      'Game::EvonyTKR::Controller::ControllerBase'           => 'WARN',
+      'Game::EvonyTKR::Controller::Covenants'                => 'WARN',
+      'Game::EvonyTKR::Controller::Generals'                 => 'WARN',
       'Game::EvonyTKR::Controller::Glossary'                 => 'WARN',
-      'Game::EvonyTKR::Controller::Pairs'                    => 'INFO',
-      'Game::EvonyTKR::Controller::Role::Books'              => 'DEBUG',
-      'Game::EvonyTKR::Controller::Role::Generals'           => 'INFO',
-      'Game::EvonyTKR::Controller::SkillBooks'               => 'DEBUG',
-      'Game::EvonyTKR::Controller::Specialties'              => 'INFO',
+      'Game::EvonyTKR::Controller::Pairs'                    => 'WARN',
+      'Game::EvonyTKR::Controller::Role::Books'              => 'WARN',
+      'Game::EvonyTKR::Controller::Role::Generals'           => 'WARN',
+      'Game::EvonyTKR::Controller::SkillBooks'               => 'WARN',
+      'Game::EvonyTKR::Controller::Specialties'              => 'DEBUG',
       'Game::EvonyTKR::Converter'                            => 'WARN',
       'Game::EvonyTKR::Converter::AscendingAttributes'       => 'WARN',
       'Game::EvonyTKR::Converter::Covenant'                  => 'WARN',
@@ -95,34 +95,34 @@ package Game::EvonyTKR::Log::Config {
       'Game::EvonyTKR::Converter::Images'                    => 'WARN',
       'Game::EvonyTKR::Converter::SkillBook'                 => 'WARN',
       'Game::EvonyTKR::Converter::Specialty'                 => 'WARN',
-      'Game::EvonyTKR::External::Book::LoadAllBuiltins'      => 'DEBUG',
-      'Game::EvonyTKR::External::Book::LoadAllGenerics'      => 'DEBUG',
-      'Game::EvonyTKR::External::Book::Loader'               => 'DEBUG',
-      'Game::EvonyTKR::External::Buff::Computer'             => 'INFO',
-      'Game::EvonyTKR::External::Buff::Worker'               => 'DEBUG',
-      'Game::EvonyTKR::External::Common'                     => 'DEBUG',
-      'Game::EvonyTKR::External::General::Loader'            => 'INFO',
-      'Game::EvonyTKR::External::General::Pair::Builder'     => 'INFO',
+      'Game::EvonyTKR::External::Book::LoadAllBuiltins'      => 'WARN',
+      'Game::EvonyTKR::External::Book::LoadAllGenerics'      => 'WARN',
+      'Game::EvonyTKR::External::Book::Loader'               => 'WARN',
+      'Game::EvonyTKR::External::Buff::Computer'             => 'WARN',
+      'Game::EvonyTKR::External::Buff::Worker'               => 'WARN',
+      'Game::EvonyTKR::External::Common'                     => 'WARN',
+      'Game::EvonyTKR::External::General::Loader'            => 'WARN',
+      'Game::EvonyTKR::External::General::Pair::Builder'     => 'WARN',
       'Game::EvonyTKR::External::General::Pair::Summarizer'  => 'WARN',
-      'Game::EvonyTKR::External::General::Pair::Workflow'    => 'INFO',
-      'Game::EvonyTKR::External::JobBase'                    => 'DEBUG',
-      'Game::EvonyTKR::External::Prebuild'                   => 'DEBUG',
+      'Game::EvonyTKR::External::General::Pair::Workflow'    => 'WARN',
+      'Game::EvonyTKR::External::JobBase'                    => 'WARN',
+      'Game::EvonyTKR::External::Prebuild'                   => 'WARN',
       'Game::EvonyTKR::Log::Config'                          => 'WARN',
       'Game::EvonyTKR::Markdown::SpectrumHandler'            => 'WARN',
       'Game::EvonyTKR::Model::AscendingAttributes'           => 'WARN',
       'Game::EvonyTKR::Model::BasicAttribute'                => 'WARN',
       'Game::EvonyTKR::Model::BasicAttributes'               => 'WARN',
-      'Game::EvonyTKR::Model::Book'                          => 'DEBUG',
-      'Game::EvonyTKR::Model::Book::Builtin'                 => 'DEBUG',
+      'Game::EvonyTKR::Model::Book'                          => 'WARN',
+      'Game::EvonyTKR::Model::Book::Builtin'                 => 'WARN',
       'Game::EvonyTKR::Model::Book::Manager'                 => 'WARN',
       'Game::EvonyTKR::Model::Book::SkillBook'               => 'WARN',
-      'Game::EvonyTKR::Model::Buff'                          => 'DEBUG',
+      'Game::EvonyTKR::Model::Buff'                          => 'WARN',
       'Game::EvonyTKR::Model::Buff::Matcher'                 => 'WARN',
       'Game::EvonyTKR::Model::Buff::Summarizer'              => 'WARN',
-      'Game::EvonyTKR::Model::Buff::Value'                   => 'INFO',
+      'Game::EvonyTKR::Model::Buff::Value'                   => 'WARN',
       'Game::EvonyTKR::Model::Covenant'                      => 'WARN',
       'Game::EvonyTKR::Model::Data'                          => 'WARN',
-      'Game::EvonyTKR::Model::General'                       => 'INFO',
+      'Game::EvonyTKR::Model::General'                       => 'WARN',
       'Game::EvonyTKR::Model::General::Conflict'             => 'WARN',
       'Game::EvonyTKR::Model::General::Conflict::Book'       => 'WARN',
       'Game::EvonyTKR::Model::General::ConflictGroup'        => 'WARN',
@@ -135,7 +135,7 @@ package Game::EvonyTKR::Log::Config {
       'Game::EvonyTKR::Model::Role::Book'                    => 'WARN',
       'Game::EvonyTKR::Model::Role::Book::Builtin'           => 'WARN',
       'Game::EvonyTKR::Model::Role::Book::SkillBook'         => 'WARN',
-      'Game::EvonyTKR::Model::Specialty'                     => 'WARN',
+      'Game::EvonyTKR::Model::Specialty'                     => 'DEBUG',
       'Game::EvonyTKR::Plugins::Markdown'                    => 'WARN',
       'Game::EvonyTKR::Plugins::Navigation'                  => 'WARN',
       'Game::EvonyTKR::Plugins::StaticPages'                 => 'WARN',
@@ -144,13 +144,14 @@ package Game::EvonyTKR::Log::Config {
       'Game::EvonyTKR::Role::BasicAttributes'                => 'WARN',
       'Game::EvonyTKR::Role::Buff'                           => 'WARN',
       'Game::EvonyTKR::Role::Buff::Value'                    => 'WARN',
-      'Game::EvonyTKR::Role::Common'                         => 'INFO',
+      'Game::EvonyTKR::Role::Common'                         => 'WARN',
       'Game::EvonyTKR::Role::Constants::AscendingAttributes' => 'WARN',
       'Game::EvonyTKR::Role::Constants::BuffConstants'       => 'WARN',
-      'Game::EvonyTKR::Role::Constants::GeneralConstants'    => 'DEBUG',
-      'Game::EvonyTKR::Role::General'                        => 'INFO',
-      'Game::EvonyTKR::Role::Logger'                         => 'DEBUG',
-      'Game::EvonyTKR::Service::Cache'                       => 'DEBUG',
+      'Game::EvonyTKR::Role::Constants::GeneralConstants'    => 'WARN',
+      'Game::EvonyTKR::Role::Constants::Specialties'         => 'DEBUG',
+      'Game::EvonyTKR::Role::General'                        => 'WARN',
+      'Game::EvonyTKR::Role::Logger'                         => 'WARN',
+      'Game::EvonyTKR::Service::Cache'                       => 'WARN',
       'Game::EvonyTKR::Shared::Constants'                    => 'WARN',
       'Game::EvonyTKR::Shared::Logger'                       => 'WARN',
       'Game::EvonyTKR::Shared::Parser'                       => 'WARN',
@@ -160,7 +161,7 @@ package Game::EvonyTKR::Log::Config {
       'LinkChecker::Command'                                 => 'WARN',
       'Log::Any::Adapter::PerPackage'                        => 'WARN',
       'PairBuilderLogic'                                     => 'WARN',
-      'Test::Package'                                        => 'DEBUG',
+      'Test::Package'                                        => 'WARN',
       'WorkerLogic'                                          => 'WARN',
     };
   }

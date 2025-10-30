@@ -167,16 +167,16 @@ package Game::EvonyTKR::Controller::Specialties {
     }
 
     my $s = Game::EvonyTKR::Model::Specialty->from_hash($hashObject);
-    unless ($s) {
-      $logger->error(
-        sprintf('Failed to import Specialty from %s.', $specialtyFile));
-      return;
-    }
-    $c->get_all_specialties()->{ $c->SUPER::getConstants->normalize($s->name) }
-      = $s;
-    $logger->debug(
-      sprintf('successfully imported %s from %s', $s->name, $specialtyFile));
-    $app->plugins->emit(specialty_imported => { specialty => $s });
+    #unless ($s) {
+    #  $logger->error(
+    #    sprintf('Failed to import Specialty from %s.', $specialtyFile));
+    #  return;
+    #}
+    #$c->get_all_specialties()->{ $c->SUPER::getConstants->normalize($s->name) }
+    #  = $s;
+    #$logger->debug(
+    #  sprintf('successfully imported %s from %s', $s->name, $specialtyFile));
+    #$app->plugins->emit(specialty_imported => { specialty => $s });
   }
 
   sub load_specialities ($c, $app) {
