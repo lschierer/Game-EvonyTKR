@@ -2,3 +2,89 @@ name: Emancipation Proclamation
 text: >-
   Training Speed in this Subordinate City +20%.
   Death into Survival Rate in this Subordinate City +10%
+levels:
+  - level: green
+    text: >-
+      Training Speed in this Subordinate City +2% Applied to Subordinate City Mayor
+      Death into Survival Rate in this Subordinate City +1% Applied to Subordinate City Mayor
+    buffs:
+      - attribute: SubCity Training Speed
+        conditions:
+          - When City Mayor for this SubCity
+        value:
+          number: 2
+          unit: percentage
+      - attribute: SubCity Death to Survival
+        conditions:
+          - - When City Mayor for this SubCity
+        value:
+          number: 1
+          unit: percentage
+  - level: blue
+    text: >-
+      Training Speed in this Subordinate City +2% Applied to Subordinate City Mayor
+      Death into Survival Rate in this Subordinate City +1% Applied to Subordinate City Mayor
+    buffs:
+      - attribute: SubCity Training Speed
+        conditions:
+          - When City Mayor for this SubCity
+        value:
+          number: 2
+          unit: percentage
+      - attribute: SubCity Death to Survival
+        conditions:
+          - - When City Mayor for this SubCity
+        value:
+          number: 1
+          unit: percentage
+  - level: purple
+    text: >-
+      Training Speed in this Subordinate City +4% Applied to Subordinate City Mayor
+      Death into Survival Rate in this Subordinate City +2% Applied to Subordinate City Mayor
+    buffs:
+      - attribute: SubCity Training Speed
+        conditions:
+          - When City Mayor for this SubCity
+        value:
+          number: 4
+          unit: percentage
+      - attribute: SubCity Death to Survival
+        conditions:
+          - - When City Mayor for this SubCity
+        value:
+          number: 2
+          unit: percentage
+  - level: orange
+    text: >-
+      Training Speed in this Subordinate City +4% Applied to Subordinate City Mayor
+      Death into Survival Rate in this Subordinate City +2% Applied to Subordinate City Mayor
+    buffs:
+      - attribute: SubCity Training Speed
+        conditions:
+          - When City Mayor for this SubCity
+        value:
+          number: 4
+          unit: percentage
+      - attribute: SubCity Death to Survival
+        conditions:
+          - - When City Mayor for this SubCity
+        value:
+          number: 2
+          unit: percentage
+  - level: gold
+    text: >-
+      Training Speed in this Subordinate City +8% Applied to Subordinate City Mayor
+      Death into Survival Rate in this Subordinate City +4% Applied to Subordinate City Mayor
+    buffs:
+      - attribute: SubCity Training Speed
+        conditions:
+          - When City Mayor for this SubCity
+        value:
+          number: 8
+          unit: percentage
+      - attribute: SubCity Death to Survival
+        conditions:
+          - - When City Mayor for this SubCity
+        value:
+          number: 4
+          unit: percentage
