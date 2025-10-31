@@ -16,6 +16,8 @@ require Game::EvonyTKR::External::General::LoadAll;
 require Game::EvonyTKR::External::Book::Loader;
 require Game::EvonyTKR::External::Book::LoadAllBuiltins;
 require Game::EvonyTKR::External::Book::LoadAllGenerics;
+require Game::EvonyTKR::External::Specialty::Loader;
+require Game::EvonyTKR::External::Specialty::LoadAllSpecialties;
 
 package Game::EvonyTKR::External::Prebuild {
   use Mojo::Base 'Game::EvonyTKR::External::JobBase',          -signatures;
@@ -66,6 +68,8 @@ package Game::EvonyTKR::External::Prebuild {
       'Game::EvonyTKR::External::Book::Loader',
       'Game::EvonyTKR::External::Book::LoadAllBuiltins',
       'Game::EvonyTKR::External::Book::LoadAllGenerics',
+      'Game::EvonyTKR::External::Specialty::Loader',
+      'Game::EvonyTKR::External::Specialty::LoadAllSpecialties',
     ];
 
     my @tasks = values $app->minion->tasks->%*;
@@ -318,6 +322,61 @@ package Game::EvonyTKR::External::Prebuild {
           }
 
           $job->app->log->info("Book imports complete generic=$sg builtin=$sb");
+        }
+      }
+    );
+
+    # Import Specialties
+    my ($specialty_loop, $jid_specialties);
+
+    $specialty_loop = Mojo::IOLoop->recurring(
+      5 => sub {
+        # don't start until prereqs pass
+        unless ($job->prebuildPrerequisites) {
+          $job->logger->debug('cannot start specialty import prereqs not met');
+          return;
+        }
+
+        # enqueue once
+        unless ($jid_specialties) {
+          $job->logger->info('launching load_all_specialties');
+          $jid_specialties = $job->minion->enqueue(
+            load_all_specialties => [] => {
+              attempts => 3,
+              delay    => 1,
+              expire   => 300,
+              priority => 40,
+            }
+          );
+
+          $job->note(specialty_jid => $jid_specialties);
+          $job->app->log->info("Queued specialty import $jid_specialties");
+          return;
+        }
+
+        # monitor
+        my $js = $job->minion->job($jid_specialties);
+        my $ss = $js && $js->info ? $js->info->{state} : 'unknown';
+
+        $job->note(specialty_status => $ss);
+
+        # stop once terminal
+        my %terminal = map { $_ => 1 } qw(finished failed);
+        if ($terminal{$ss}) {
+          Mojo::IOLoop->remove($specialty_loop);
+          $specialty_loop = undef;
+
+          if ($ss eq 'failed') {
+            my $es =
+              $js && $js->info
+              ? ($js->info->{result} // $js->info->{notes}{error})
+              : undef;
+            my $msg = "specialty import failed" . ($es ? " ($es)" : "");
+            $job->note(specialty_error => $es);
+            return $job->app->log->error($msg);
+          }
+
+          $job->app->log->info("Specialty import complete: $ss");
         }
       }
     );

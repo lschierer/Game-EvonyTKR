@@ -114,6 +114,37 @@ package Game::EvonyTKR::Model::Specialty {
     return $hash;
   }
 
+  sub to_wire_hash ($self) {
+    my $hash = {
+      _v     => 1,
+      id     => $self->id,
+      name   => $self->name,
+      levels => $self->levels,
+    };
+    return $hash;
+  }
+
+  sub from_wire_hash ($class, $w) {
+    die "unknown wire version" unless ($w->{_v} // 1) == 1;
+
+    my $specialty = $class->new(
+      id   => $w->{id} // '',
+      name => $w->{name}
+    );
+
+    # Set levels if they exist
+    if ($w->{levels}) {
+      $specialty->{levels} =
+        $w->{levels};    # Direct assignment since levels is complex
+    }
+
+    return $specialty;
+  }
+
+  sub TO_JSON ($self) {
+    return $self->to_wire_hash();
+  }
+
   sub addBuff ($self, $level, $nb) {
 
     if (!blessed($nb) || blessed($nb) ne "Game::EvonyTKR::Model::Buff") {
@@ -223,11 +254,6 @@ package Game::EvonyTKR::Model::Specialty {
   }
 
   # --- ergonomic helpers ---
-
-  sub TO_JSON {
-    my $self = shift;
-    return $self->to_hash();
-  }
 
   sub as_string {
     my $self = shift;
