@@ -1,24 +1,27 @@
 use v5.42.0;
-use experimental qw(class);
 use utf8::all;
 
 use File::FindLib 'lib';
 require JSON::PP;
+require Data::Printer;
+
 require Game::EvonyTKR::Model::Buff;
 require Game::EvonyTKR::Model::Buff::Value;
 require Game::EvonyTKR::Model::Buff::Matcher;
-use namespace::clean;
+use namespace::autoclean;
 
-class Game::EvonyTKR::Model::AscendingAttributes :
-  isa(Game::EvonyTKR::Shared::Constants) {
-# PODNAME: Game::EvonyTKR::Model::AscendingAttributes
+package Game::EvonyTKR::Model::AscendingAttributes {
+  use Mojo::Base -base,                          -signatures;
+  use Mojo::Base 'Game::EvonyTKR::Role::Logger', -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Common';
+  use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants',       -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants',    -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Constants::AscendingAttributes', -role;
   use Log::Any qw($log);
   use Carp;
   use Data::Printer;
-  require Readonly;
-  use List::MoreUtils;
-  use Util::Any -all;
-  use UUID qw(uuid5);
+  use UUID       qw(uuid5);
+  use Hash::Util qw(lock_keys);
   use namespace::autoclean;
 # VERSION
   use overload
@@ -27,35 +30,34 @@ class Game::EvonyTKR::Model::AscendingAttributes :
     'bool'     => sub { $_[0]->_isTrue() },
     "fallback" => 0;
 
-  field $id : reader;
-  field $general : reader : param;
+  has 'id' => sub ($self) {
+    if (defined($self) && defined($self->UUID5_base)) {
+      my $specialtybase = uuid5($self->UUID5_base, 'Specialty');
+      if (defined($self->name)) {
+        return uuid5($specialtybase, $self->name);
+      }
+    }
+    return '';
+  };
 
-  field $ascending : reader;
+  has 'general' => '';
 
-  ADJUST {
-    my $step1 = {};
-    foreach my $key (
+  has 'attributes' => sub ($self) {
+    return $self->_init_empty_levels();
+  };
+
+  sub _init_empty_levels ($self) {
+    my %h = map { $_ => { text => '', buffs => [], } } (
       $self->AscendingAttributeLevelValues(0),
       $self->AscendingAttributeLevelValues(1)
-    ) {
-      $step1->{$key} = {
-        level => $key,
-        buffs => [],     # Empty arrayref that can be modified later
-      };
-    }
-
-# Use Readonly::Hash1 for shallow readonly - hash structure is fixed but array contents can change
-    Readonly::Hash1 my %step2 => %{$step1};
-    $ascending = \%step2;
+    );
+    lock_keys(%h);
+    $self->logger->debug('h with empty levels is ' . Data::Printer::np(%h));
+    return \%h;
   }
 
-  ADJUST {
-    my $ascendingbase = uuid5($self->UUID5_base, 'Ascending Attributes');
-    $id = uuid5($ascendingbase, $general);
-  }
-
-  method get_buffs_at_level (
-    $level, $attribute,
+  sub get_buffs_at_level (
+    $self, $level, $attribute,
     $targetedType     = '',
     $conditions       = [],
     $debuffConditions = [],
@@ -88,17 +90,17 @@ class Game::EvonyTKR::Model::AscendingAttributes :
 
     my $target_index = $level_index{$level};
     $self->logger->debug(
-      "my ascending hash looks like " . Data::Printer::np($ascending));
+      "my ascending hash looks like " . Data::Printer::np($self->attributes));
     my $total = 0;
     for my $i (1 .. $target_index) {    # skip index 0 ('None')
       my $lvl = $valid_levels[$i];
-      if (not exists $ascending->{$level}) {
+      if (not exists $self->attributes->{$level}) {
         $logger->error(sprintf(
           '%s is not a valid level, must be one of %s',
-          $lvl, join(', ', keys %$ascending),
+          $lvl, join(', ', keys $self->attributes->%*),
         ));
       }
-      my $buffs = $ascending->{$lvl}->{buffs} // [];
+      my $buffs = $self->attributes->{$lvl}->{buffs} // [];
 
       $logger->debug(
         "Checking level $lvl with " . scalar(@{$buffs}) . " buffs");
@@ -112,7 +114,8 @@ class Game::EvonyTKR::Model::AscendingAttributes :
         $logger->debug(
           $logID
             . sprintf(
-"Testing buff: attr=%s, targetType=%s, buffConds=%s, debuffConds=%s, matching_type=%s",
+            'Testing buff: attr=%s, targetType=%s, '
+              . 'buffConds=%s, debuffConds=%s, matching_type=%s',
             $buff->attribute,
             $buff->targetedType,
             join(',', @{ $buff->buffConditions   // [] }),
@@ -161,7 +164,7 @@ class Game::EvonyTKR::Model::AscendingAttributes :
     return $total;
   }
 
-  method addBuff ($level, $nb) {
+  sub addBuff ($self, $level, $nb) {
     my $red = 1;
     if (!blessed($nb) || blessed($nb) ne "Game::EvonyTKR::Model::Buff") {
       $self->logger->error(sprintf(
@@ -187,7 +190,10 @@ class Game::EvonyTKR::Model::AscendingAttributes :
     if ($level =~ /purple/i) {
       $red = 0;
     }
-    if (none { $_ eq $level } $self->AscendingAttributeLevelValues($red)) {
+    if (
+      List::AllUtils::none { $_ eq $level }
+      $self->AscendingAttributeLevelValues($red)
+    ) {
       $self->logger->debug(
         "$level must be one of "
           . join(
@@ -201,27 +207,31 @@ class Game::EvonyTKR::Model::AscendingAttributes :
       return 0;
     }
 
-    push @{ $ascending->{$level}->{buffs} }, $nb;
-    $self->logger->debug(
-      "$level now has " . scalar @{ $ascending->{$level}->{buffs} } . " buffs");
-    return scalar @{ $ascending->{$level}->{buffs} };
+    push @{ $self->attributes->{$level}->{buffs} }, $nb;
+    $self->logger->debug("$level now has "
+        . scalar @{ $self->attributes->{$level}->{buffs} }
+        . " buffs");
+    return scalar @{ $self->attributes->{$level}->{buffs} };
   }
 
-  method to_hash {
+  sub to_hash {
+    my $self = shift;
     return {
-      id        => $id,
-      general   => $general,
-      ascending => $ascending,
+      id        => $self->id,
+      general   => $self->general,
+      ascending => $self->attributes,
     };
   }
 
   # Method for JSON serialization
-  method TO_JSON {
+  sub TO_JSON {
+    my $self = shift;
     return $self->to_hash();
   }
 
   # Stringification method using JSON
-  method as_string {
+  sub as_string {
+    my $self = shift;
     my $json =
       JSON::PP->new->utf8->pretty->allow_blessed(1)
       ->convert_blessed(1)
@@ -229,7 +239,7 @@ class Game::EvonyTKR::Model::AscendingAttributes :
     return $json;
   }
 
-  method concat($other, $swap) {
+  sub concat($self, $other, $swap) {
     if ($swap) {
       return $other . $self->as_string();
     }
@@ -238,7 +248,7 @@ class Game::EvonyTKR::Model::AscendingAttributes :
     }
   }
 
-  sub from_hash($self, $object) {
+  sub from_hash($class, $object) {
     my $logger = $log;
     unless (exists $object->{ascending}
       && ref($object->{ascending}) eq 'ARRAY') {
@@ -263,7 +273,7 @@ class Game::EvonyTKR::Model::AscendingAttributes :
         $aa->addBuff($level, $b);
         $logger->debug(sprintf(
           '%s now has %s buffs at level %s',
-          $an, scalar($aa->ascending->{$level}->{buffs}->@*), $level,
+          $an, scalar($aa->attributes->{$level}->{buffs}->@*), $level,
         ));
       }
     }

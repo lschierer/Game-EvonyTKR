@@ -15,7 +15,7 @@ package Game::EvonyTKR::Controller::Role::Specialties {
 
   sub add_specialty ($self, $specialty) {
     my $key = lc($self->normalize($specialty->name));
-    $key =~ s/ /_/r;
+    $key =~ s/ /_/g;
     return $self->specialty_cache->set($key, $specialty->to_wire_hash());
   }
 
@@ -25,7 +25,7 @@ package Game::EvonyTKR::Controller::Role::Specialties {
     $self->logger->debug("get_specialty called for: $name");
 
     my $normalized_name = lc($self->normalize($name));
-    $normalized_name =~ s/ /_/r;
+    $normalized_name =~ s/ /_/g;
     if (exists $specialties->{$normalized_name}) {
       $self->logger->debug("Returning specialty $name from local cache");
       return $specialties->{$normalized_name};

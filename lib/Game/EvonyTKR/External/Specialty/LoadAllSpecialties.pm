@@ -52,12 +52,10 @@ package Game::EvonyTKR::External::Specialty::LoadAllSpecialties {
           priority => 20,
         }
       );
-      $job->logger->debug(
-        sprintf(
-          'Enqueued load_specialty job %s for file %s',
-          $job_id, $file->basename
-        )
-      );
+      $job->logger->debug(sprintf(
+        'Enqueued load_specialty job %s for file %s',
+        $job_id, $file->basename
+      ));
     }
 
     $job->logger->info('LoadAllSpecialties job completed');

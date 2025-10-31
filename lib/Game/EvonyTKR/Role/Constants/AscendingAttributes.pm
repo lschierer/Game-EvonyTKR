@@ -9,31 +9,37 @@ package Game::EvonyTKR::Role::Constants::AscendingAttributes {
   use Const::Fast;
   use Carp;
 
-  const our %redAscendingLevelNames => (
-    red1 => '1 Red Star',
-    red2 => '2 Red Stars',
-    red3 => '3 Red Stars',
-    red4 => '4 Red Stars',
-    red5 => '5 Red Stars',
-  );
+  sub redAscendingLevelNames {
+    const my %tmp => (
+      red1 => '1 Red Star',
+      red2 => '2 Red Stars',
+      red3 => '3 Red Stars',
+      red4 => '4 Red Stars',
+      red5 => '5 Red Stars',
+    );
+    return \%tmp;
+  }
 
-  const our %purpleAscendingLevelNames => (
-    purple1 => '1 Purple Star',
-    purple2 => '2 Purple Stars',
-    purple3 => '3 Purple Stars',
-    purple4 => '4 Purple Stars',
-    purple5 => '5 Purple Stars',
-  );
+  sub purpleAscendingLevelNames {
+    const my %tmp => (
+      purple1 => '1 Purple Star',
+      purple2 => '2 Purple Stars',
+      purple3 => '3 Purple Stars',
+      purple4 => '4 Purple Stars',
+      purple5 => '5 Purple Stars',
+    );
+    return \%tmp;
+  }
 
   sub AscendingAttributeLevelName ($self, $level) {
     if ($level =~ /red/) {
-      if (exists $redAscendingLevelNames{$level}) {
-        return $redAscendingLevelNames{$level};
+      if (exists $self->redAscendingLevelNames->{$level}) {
+        return $self->redAscendingLevelNames->{$level};
       }
     }
     else {
-      if (exists $purpleAscendingLevelNames{$level}) {
-        return $purpleAscendingLevelNames{$level};
+      if (exists $self->purpleAscendingLevelNames->{$level}) {
+        return $self->purpleAscendingLevelNames->{$level};
       }
     }
     return 'None';
@@ -43,10 +49,10 @@ package Game::EvonyTKR::Role::Constants::AscendingAttributes {
     my @result;
     push @result, 'none';
     if ($isRed) {
-      push @result, sort(keys %redAscendingLevelNames);
+      push @result, sort(keys $self->redAscendingLevelNames->%*);
     }
     else {
-      push @result, sort(keys %purpleAscendingLevelNames);
+      push @result, sort(keys $self->purpleAscendingLevelNames->%*);
     }
     return @result;
   }
@@ -54,7 +60,7 @@ package Game::EvonyTKR::Role::Constants::AscendingAttributes {
   sub AscendingAttributeLevelNames ($self, $isRed = 1) {
     my @result = ('None');
     my @valid  = $self->AscendingAttributeLevelValues($isRed);
-    my $aan = $isRed ? \%redAscendingLevelNames : \%purpleAscendingLevelNames;
+    my $aan    = $isRed ? redAscendingLevelNames : purpleAscendingLevelNames;
 
     foreach my $index (1 .. 5) {
       my $key = $valid[$index];

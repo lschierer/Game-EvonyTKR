@@ -1,5 +1,5 @@
 % require Scalar::Util;
-% if( $item && Scalar::Util::reftype($item) eq 'OBJECT' && Scalar::Util::blessed($item) eq 'Game::EvonyTKR::Model::AscendingAttributes') {
+% if( $item && Scalar::Util::reftype($item) eq 'HASH' && Scalar::Util::blessed($item) eq 'Game::EvonyTKR::Model::AscendingAttributes') {
 %   my @sorted_levels = ($item->AscendingAttributeLevelValues(0), $item->AscendingAttributeLevelValues(1));
 %   my $firstWithBuff;
 %   foreach my $l ( @sorted_levels) {
