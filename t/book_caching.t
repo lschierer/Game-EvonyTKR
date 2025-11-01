@@ -116,7 +116,7 @@ package Test::Package {
   }
 
   sub retrieve_Supreme_Power_with_helper ($self) {
-    my ($book, $books_helper, $cache_store);
+    my ($book, $books_helper);
     my $testBookName = 'Supreme Power';
     eval {
       $books_helper = Mojo::Base->new->with_roles(
@@ -131,9 +131,10 @@ package Test::Package {
       return;
     };
 
-    eval { $cache_store = $books_helper->create_book_cache(); } or do {
-      $self->logger->error(
-        sprintf('eval failed; cannot create book cache from helper: "%s"', $@));
+    eval {
+      $book = $books_helper->get_builtin_book($testBookName);
+    } or do {
+      $self->logger->error(sprintf('eval failed; cannot get book from helper: %s', $@));
       return;
     };
 
