@@ -38,14 +38,6 @@ package Game::EvonyTKR::Role::Common {
     my $ns_base = uuid5(dns => 'perl.org');
     return uuid5($ns_base, $self->globalDN->getX500String());
   };
-
-  sub _isTrue ($self, $other = undef, $swap = undef) {
-    return
-         defined($self)
-      && ref($self)
-      && blessed($self)
-      && $self->isa(__PACKAGE__);
-  }
 }
 1;
 __END__

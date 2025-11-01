@@ -127,7 +127,7 @@ package Game::EvonyTKR::Model::Book {
          defined($self)
       && ref($self)
       && blessed($self)
-      && $self->isa('Game::EvonyTKR::Model::Book');
+      && $self->isa(__PACKAGE__);
   }
 }
 1;

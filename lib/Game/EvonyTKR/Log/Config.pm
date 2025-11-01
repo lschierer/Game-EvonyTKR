@@ -113,7 +113,7 @@ package Game::EvonyTKR::Log::Config {
       'Game::EvonyTKR::External::General::Pair::Summarizer'       => 'WARN',
       'Game::EvonyTKR::External::General::Pair::Workflow'         => 'WARN',
       'Game::EvonyTKR::External::JobBase'                         => 'WARN',
-      'Game::EvonyTKR::External::Prebuild'                        => 'INFO',
+      'Game::EvonyTKR::External::Prebuild'                        => 'DEBUG',
       'Game::EvonyTKR::External::Specialties::LoadAllSpecialties' => 'INFO',
       'Game::EvonyTKR::External::Specialties::Loader'             => 'INFO',
       'Game::EvonyTKR::Log::Config'                               => 'WARN',

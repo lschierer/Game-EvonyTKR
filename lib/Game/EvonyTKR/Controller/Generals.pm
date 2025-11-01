@@ -23,7 +23,6 @@ use namespace::clean;
 package Game::EvonyTKR::Controller::Generals {
   use Mojo::Base 'Game::EvonyTKR::Controller::ControllerBase';
   use Mojo::Base 'Game::EvonyTKR::Role::Logger', -role, -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Role::Common', -role, -signatures;
   use Mojo::Base 'Game::EvonyTKR::Controller::Role::Generals', -role,
     -signatures;
   use Mojo::IOLoop;
@@ -392,7 +391,7 @@ package Game::EvonyTKR::Controller::Generals {
     my $base      = $c->getBase();
     $c->logger->debug("Generals index method has base $base");
 
-    my $items = $c->get_generals($cache) // {};
+    my $items = $c->get_generals() // {};
     $c->logger->debug(
       sprintf('Items: %s with %s keys.', ref($items), scalar(keys %$items)));
     $c->stash(

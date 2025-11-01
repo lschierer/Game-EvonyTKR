@@ -10,7 +10,8 @@ require Path::Tiny;
 require Game::EvonyTKR;
 require Game::EvonyTKR::Shared::Constants;
 require Game::EvonyTKR::Model::General;
-require Game::EvonyTKR::External::General::Pair::Workflow;
+require Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders;
+require Game::EvonyTKR::External::General::Pair::CreatePairs;
 require Game::EvonyTKR::External::General::Loader;
 require Game::EvonyTKR::External::General::LoadAll;
 require Game::EvonyTKR::External::Book::Loader;
@@ -64,7 +65,8 @@ package Game::EvonyTKR::External::Prebuild {
     my $plugins = [
       'Game::EvonyTKR::External::General::Loader',
       'Game::EvonyTKR::External::General::LoadAll',
-      'Game::EvonyTKR::External::General::Pair::Workflow',
+      'Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders',
+      'Game::EvonyTKR::External::General::Pair::CreatePairs',
       'Game::EvonyTKR::External::Book::Loader',
       'Game::EvonyTKR::External::Book::LoadAllBuiltins',
       'Game::EvonyTKR::External::Book::LoadAllGenerics',
@@ -87,7 +89,12 @@ package Game::EvonyTKR::External::Prebuild {
           return $plugin->prebuildPrerequisites({ $prereq => 1 });
         }
       );
-      $app->plugin($prereq);
+      eval {
+        $app->plugin($prereq);
+      } or do {
+        $plugin->logger->error("Error loading task plugin $prereq: $@");
+      };
+
     }
 
     $plugin->prebuild_init($app);
@@ -317,7 +324,8 @@ package Game::EvonyTKR::External::Prebuild {
               . ($eg ? " (generic: $eg)" : "")
               . ($eb ? " (builtin: $eb)" : "");
             $job->note(book_error => { generic => $eg, builtin => $eb });
-# if you want the overall prebuild to continue despite book failures, just return here instead:
+              # if you want the overall prebuild to continue despite book failures,
+              # just return here instead:
             return $job->app->log->error($msg);
           }
 
@@ -386,40 +394,52 @@ package Game::EvonyTKR::External::Prebuild {
     $distDir->detect('Game::EvonyTKR');
     my $generalCount = -1;
     state $general_import_started = 0;
-    #state $gl;
-    #my $loop1;
-    #$loop1 = Mojo::IOLoop->recurring(
-    #  5 => sub {
-    #    state $gljid;
-    #    if ($job->prebuildPrerequisites && $general_import_started == 0) {
-    #      $general_import_started = 1;
-    #      $gljid                  = $job->minion->enqueue(
-    #        load_all_generals => ['prebuild load_all_generals'] => {
-    #          attempts => 3,
-    #          delay    => rand(10),
-    #          expire   => 7200,
-    #          priority => 10,
-    #        }
-    #      );
-    #      $gl = $job->minion->job($gljid);
-    #      $gl->on(
-    #        finish => sub ($glj,) {
-    #          $generalCount = $glj->notes->{generalCount};
-    #          $job->set_value('generalCount', $generalCount, $generalCache);
-    #          Mojo::IOLoop->remove($loop1);
-    #        }
-    #      );
-    #      $gl->on(
-    #        failed => sub($glj, $err) {
-    #          Mojo::IOLoop->remove($loop1);
-    #          my $errmessage = sprintf('general loading failed: %s', $err);
-    #          $job->logger->error($errmessage);
-    #          $job->fail($errmessage);
-    #        }
-    #      );
-    #    }
-    #  }
-    #);
+    state $gl;
+    my $loop1;
+    $loop1 = Mojo::IOLoop->recurring(
+      5 => sub {
+        state $gljid;
+        if ($job->prebuildPrerequisites && $general_import_started == 0) {
+          $general_import_started = 1;
+          $gljid                  = $job->minion->enqueue(
+            load_all_generals => ['prebuild load_all_generals'] => {
+              attempts => 3,
+              delay    => 5 + rand(10),
+              expire   => 7200,
+              priority => 10,
+            }
+          );
+          $job->note(load_all_generals  => 'started');
+          $gl = $job->minion->job($gljid);
+        } elsif(defined($gl)) {
+          if(defined $gl->info->{notes}->{generalCount}){
+            $generalCount = $gl->info->{notes}->{generalCount};
+            $job->note(load_all_generals  => 'finished');
+            $job->note(generalCount => $generalCount);
+            $job->logger->info(sprintf('Found General Count in Notes: %s', $generalCount));
+            $job->general_cache->set('generalCount', $generalCount);
+            Mojo::IOLoop->remove($loop1);
+          }
+          if($gl->info->{state} =~ /failed/i){
+            Mojo::IOLoop->remove($loop1);
+            $job->note(load_all_generals  => 'failed');
+            my $errmessage = sprintf('general loading failed: %s', $gl->info->{result});
+            $job->logger->error($errmessage);
+            $job->fail($errmessage);
+          }
+          if($gl->info->{state} =~ /finished/i){
+            $generalCount = $gl->info->{notes}->{generalCount};
+            $job->note(load_all_generals  => 'finished');
+            $job->general_cache->set('generalCount', $generalCount);
+            $job->logger->info(sprintf('General loading finished: %s', $gl->info->{result} // 'no result'));
+            Mojo::IOLoop->remove($loop1);
+          }
+        } else {
+          $job->logger->warn(sprintf('unexpected loop1 state. prereqs: %s; general_import_started: %s; gl: %s ',
+          $job->prebuildPrerequisites, $general_import_started ? 'true': 'false', defined($gl) ? $gl : 'undefined'));
+        }
+      }
+    );
 
     # need the file names for error handling
     my $generalDir = Mojo::File->new(
@@ -444,11 +464,9 @@ package Game::EvonyTKR::External::Prebuild {
         }
         # this should be duplicate
         # but I'm having issues.
-        $generalCache = $job->create_general_cache()
-          unless defined $generalCache;
-        my $generals    = $job->get_generals($generalCache);
+        my $generals    = $job->get_generals();
         my $cachedCount = scalar keys $generals->%*;
-        if ($cachedCount >= $generalCount) {
+        if ($cachedCount >= $generalCount && $generalCount >= 0 ) {
           $job->logger->info(sprintf(
             'cached count %s == expected count %s',
             $cachedCount, $generalCount
@@ -456,7 +474,7 @@ package Game::EvonyTKR::External::Prebuild {
           Mojo::IOLoop->remove($loop2);
           #Start pair building workflow
           my $pair_workflow_jid = $job->minion->enqueue(
-            'build_all_pairs' => [{}] => {
+            'load_all_pair_builders' => [] => {
               priority => 50,
               attempts => 5,
               expire   => 3600,
@@ -491,7 +509,7 @@ package Game::EvonyTKR::External::Prebuild {
 
     # Start monitoring
     my $monitor_jid = $job->minion->enqueue(
-      'monitor_pair_builders' => [{}] => {
+      'monitor_create_pairs' => [{}] => {
         priority => 90,
         attempts => 5,
         delay    => 15,
@@ -505,12 +523,12 @@ package Game::EvonyTKR::External::Prebuild {
       10 => sub {
         # Check if pair workflow completed
         my $completed_pairs = $job->minion->jobs({
-          tasks  => ['build_all_pairs'],
+          tasks  => ['load_all_pair_builders'],
           states => ['finished']
         })->total;
 
         my $active_pairs = $job->minion->jobs({
-          tasks  => ['build_all_pairs'],
+          tasks  => ['load_all_pair_builders'],
           states => ['active', 'inactive']
         })->total;
 

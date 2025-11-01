@@ -27,7 +27,7 @@ package Game::EvonyTKR::Model::AscendingAttributes {
   use overload
     '""'       => \&as_string,
     '.'        => \&concat,
-    'bool'     => sub { $_[0]->_isTrue() },
+    'bool'     => \&_isTrue,
     "fallback" => 0;
 
   has 'id' => sub ($self) {
@@ -280,6 +280,13 @@ package Game::EvonyTKR::Model::AscendingAttributes {
     return $aa;
   }
 
+  sub _isTrue ($self, $other = undef, $swap = undef) {
+    return
+         defined($self)
+      && ref($self)
+      && blessed($self)
+      && $self->isa(__PACKAGE__);
+  }
 }
 
 1;

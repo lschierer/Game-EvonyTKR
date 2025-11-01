@@ -268,6 +268,13 @@ package Game::EvonyTKR::Model::Specialty {
     return "$self" . "$other";
   }
 
+  sub _isTrue ($self, $other = undef, $swap = undef) {
+    return
+         defined($self)
+      && ref($self)
+      && blessed($self)
+      && $self->isa(__PACKAGE__);
+  }
 }
 1;
 __END__

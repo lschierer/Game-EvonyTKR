@@ -69,6 +69,31 @@ package Game::EvonyTKR::Role::Constants::AscendingAttributes {
 
     return @result;
   }
+
+  sub can_afford_ascending_level($self, $requestedLevel) {
+    my @valv;
+    map { push @valv, $_ } $self->AscendingAttributeLevelValues();
+    map { push @valv, $_ } $self->AscendingAttributeLevelValues(0);
+    if (any { $requestedLevel eq $_ } @valv) {
+      my %ranks = (
+        none    => 0,
+        purple1 => 1,
+        purple2 => 2,
+        purple3 => 3,
+        purple4 => 4,
+        purple5 => 5,
+        red1    => 6,
+        red2    => 7,
+        red3    => 8,
+        red4    => 9,
+        red5    => 10
+      );
+      my $mr = $ranks{ $self->stars };
+      my $rr = $ranks{$requestedLevel};
+      return $rr <= $mr;
+    }
+    return 0;
+  }
 }
 1;
 __END__
