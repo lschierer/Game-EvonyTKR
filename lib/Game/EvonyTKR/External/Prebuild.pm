@@ -12,6 +12,7 @@ require Game::EvonyTKR::Shared::Constants;
 require Game::EvonyTKR::Model::General;
 require Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders;
 require Game::EvonyTKR::External::General::Pair::CreatePairs;
+require Game::EvonyTKR::External::General::Pair::MonitorCreatePairs;
 require Game::EvonyTKR::External::General::Loader;
 require Game::EvonyTKR::External::General::LoadAll;
 require Game::EvonyTKR::External::Book::Loader;
@@ -67,6 +68,7 @@ package Game::EvonyTKR::External::Prebuild {
       'Game::EvonyTKR::External::General::LoadAll',
       'Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders',
       'Game::EvonyTKR::External::General::Pair::CreatePairs',
+      'Game::EvonyTKR::External::General::Pair::MonitorCreatePairs',
       'Game::EvonyTKR::External::Book::Loader',
       'Game::EvonyTKR::External::Book::LoadAllBuiltins',
       'Game::EvonyTKR::External::Book::LoadAllGenerics',
@@ -507,7 +509,7 @@ package Game::EvonyTKR::External::Prebuild {
       }
     );
 
-    # Start monitoring
+    # Start monitoring create_pairs jobs
     my $monitor_jid = $job->minion->enqueue(
       'monitor_create_pairs' => [{}] => {
         priority => 90,

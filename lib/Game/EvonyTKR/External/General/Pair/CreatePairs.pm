@@ -112,17 +112,26 @@ package Game::EvonyTKR::External::General::Pair::CreatePairs {
         scalar @pairs, $general_name, $type));
     }
 
-    # Store conflict data
+    # Return conflict data in notes for monitor job to merge
     my $conflict_data = {
       by_general => $conflict_detector->by_general,
       groups_by_conflict_type => $conflict_detector->groups_by_conflict_type,
     };
 
-    my $conflict_key = sprintf('%s_%s_conflicts', $self->normalize($general_name), $type);
-    $self->conflict_cache->set($conflict_key, $conflict_data);
+    $self->note(
+      pairs_created => scalar @pairs,
+      conflicts_found => $conflicts_found,
+      by_general => $conflict_data->{by_general},
+      groups_by_conflict_type => $conflict_data->{groups_by_conflict_type},
+      general_name => $general_name,
+      type => $type,
+    );
 
     $self->logger->info(sprintf('CreatePairs completed for %s/%s: %d pairs, %d conflicts',
       $general_name, $type, scalar @pairs, $conflicts_found));
+
+    return sprintf('Created %d pairs for %s/%s with %d conflicts',
+      scalar @pairs, $general_name, $type, $conflicts_found);
   }
 }
 
