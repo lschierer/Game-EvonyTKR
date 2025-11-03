@@ -8,12 +8,29 @@ package Game::EvonyTKR::External::General::LoadAll {
   use Mojo::Base 'Game::EvonyTKR::Role::Common',      -role;
   use Mojo::File;
 
-  sub register ($plugin, $app, $conf = {}) {
+  sub register ($taskClass, $app, $conf = {}) {
+    $taskClass->SUPER::register($app, $conf);
     $app->minion->add_task(load_all_generals => __PACKAGE__);
-    $app->plugins->emit('Game_EvonyTKR_External_General_LoadAll');
+    my $signal = __PACKAGE__ =~ s/::/_/gr;
+    $app->plugins->emit($signal => 1);
   }
 
   sub run ($job, @args) {
+    if (not defined($job)) {
+      say 'job not defined in run for ' . __PACKAGE__;
+      return;
+    }
+    $job->SUPER::run(@args);
+    unless (defined($job->minion)) {
+      my $errmessage = sprintf('minion undefined in job for %s', __PACKAGE__);
+      $job->logger->error($errmessage);
+      return $job->fail($errmessage);
+    }
+    $job->logger->debug(sprintf(
+      '%s log level is %s',
+      __PACKAGE__, Log::Log4perl::Level::to_level($job->logger->level())
+    ));
+
     $job->logger->info('Starting LoadAll generals job');
 
     my $app = $job->app;

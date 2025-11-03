@@ -64,14 +64,14 @@ package Game::EvonyTKR::External::Prebuild {
     # Register main prebuild orchestration task
     $app->minion->add_task(external_prebuild => __PACKAGE__);
     my $plugins = [
-      'Game::EvonyTKR::External::General::Loader',
-      'Game::EvonyTKR::External::General::LoadAll',
-      'Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders',
-      'Game::EvonyTKR::External::General::Pair::CreatePairs',
-      'Game::EvonyTKR::External::General::Pair::MonitorCreatePairs',
       'Game::EvonyTKR::External::Book::Loader',
       'Game::EvonyTKR::External::Book::LoadAllBuiltins',
       'Game::EvonyTKR::External::Book::LoadAllGenerics',
+      'Game::EvonyTKR::External::General::Loader',
+      'Game::EvonyTKR::External::General::LoadAll',
+      'Game::EvonyTKR::External::General::Pair::CreatePairs',
+      'Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders',
+      'Game::EvonyTKR::External::General::Pair::MonitorCreatePairs',
       'Game::EvonyTKR::External::Specialty::Loader',
       'Game::EvonyTKR::External::Specialty::LoadAllSpecialties',
     ];

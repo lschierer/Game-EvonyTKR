@@ -8,35 +8,51 @@ package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
   use Mojo::Base 'Game::EvonyTKR::Controller::Role::Generals', -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants', -role;
 
-  sub register ($plugin, $app, $conf = {}) {
+  sub register ($taskClass, $app, $conf = {}) {
+    $taskClass->SUPER::register($app, $conf);
     $app->minion->add_task(load_all_pair_builders => __PACKAGE__);
-    $app->plugins->emit('Game_EvonyTKR_External_General_Pair_LoadAllPairBuilders');
+    my $signal = __PACKAGE__ =~ s/::/_/gr;
+    $app->plugins->emit($signal => 1);
   }
 
-  sub run ($self, @args) {
-    $self->logger->info('Starting LoadAllPairBuilders job');
+  sub run ($job, @args) {
+    if (not defined($job)) {
+      say 'job not defined in run for ' . __PACKAGE__;
+      return;
+    }
+    $job->SUPER::run(@args);
+    unless (defined($job->minion)) {
+      my $errmessage = sprintf('minion undefined in job for %s', __PACKAGE__);
+      $job->logger->error($errmessage);
+      return $job->fail($errmessage);
+    }
+    $job->logger->debug(sprintf(
+      '%s log level is %s',
+      __PACKAGE__, Log::Log4perl::Level::to_level($job->logger->level())
+    ));
+    $job->logger->info('Starting LoadAllPairBuilders job');
 
     # Get all generals from cache
-    my $generals = $self->get_generals();
+    my $generals = $job->get_generals();
     my @general_names = keys %$generals;
 
-    $self->logger->info(sprintf('Found %d generals to process', scalar @general_names));
+    $job->logger->info(sprintf('Found %d generals to process', scalar @general_names));
 
     # Get all valid general types
-    my @general_types = $self->GeneralKeys();
+    my @general_types = $job->GeneralKeys();
 
     # Spawn CreatePairs jobs for each general/type combination
     my $job_count = 0;
     foreach my $general_name (@general_names) {
       foreach my $type (@general_types) {
-        my $job_id = $self->minion->enqueue('create_pairs' => [$general_name, $type]);
-        $self->logger->debug(sprintf('Enqueued create_pairs job %s for general %s, type %s',
+        my $job_id = $job->minion->enqueue('create_pairs' => [$general_name, $type]);
+        $job->logger->debug(sprintf('Enqueued create_pairs job %s for general %s, type %s',
           $job_id, $general_name, $type));
         $job_count++;
       }
     }
 
-    $self->logger->info(sprintf('LoadAllPairBuilders job completed, spawned %d create_pairs jobs', $job_count));
+    $job->logger->info(sprintf('LoadAllPairBuilders job completed, spawned %d create_pairs jobs', $job_count));
   }
 }
 
