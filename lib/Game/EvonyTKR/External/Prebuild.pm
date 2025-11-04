@@ -477,7 +477,7 @@ package Game::EvonyTKR::External::Prebuild {
         }
         # this should be duplicate
         # but I'm having issues.
-        my $generals    = $job->get_generals();
+        my $generals    = $job->get_generals($job->app);
         my $cachedCount = scalar keys $generals->%*;
         if ($cachedCount >= $generalCount && $generalCount >= 0) {
           $job->logger->info(sprintf(
@@ -565,6 +565,13 @@ package Game::EvonyTKR::External::Prebuild {
           if ( exists($monitor_job->info->{result})
             && length($monitor_job->info->{result})
             && $monitor_job->info->{result} eq 'all pair builders complete') {
+            
+            # Set completion flag in cache
+            require Game::EvonyTKR::Service::Cache;
+            my $cache = Game::EvonyTKR::Service::Cache->new(namespace => 'pairs:');
+            $cache->set('pair_building_complete', 1);
+            $job->logger->info('Set pair_building_complete flag in cache');
+            
             Mojo::IOLoop->remove($loop3);
             Mojo::IOLoop->remove($timer_id) if $timer_id;
             release_lock_sqlite($db, $key, $owner);

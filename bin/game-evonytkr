@@ -9,8 +9,43 @@ use lib curfile->dirname->sibling('lib')->to_string;
 require Game::EvonyTKR;
 
 use Mojolicious::Commands;
+use POSIX qw(setsid);
 
-# Start the app
+# Check if we should start workers
+my $start_workers = $ENV{START_MINION_WORKERS} // 1;
+my $worker_count = $ENV{MINION_WORKERS} // 4;
+
+if ($start_workers && !$ENV{MINION_WORKER_CHILD}) {
+  # Track worker PIDs for cleanup
+  my @worker_pids;
+  
+  # Fork worker processes
+  for my $i (1..$worker_count) {
+    if (my $pid = fork()) {
+      # Parent process - track PID
+      push @worker_pids, $pid;
+      next;
+    } elsif (defined $pid) {
+      # Child process - start worker with lower priority
+      $ENV{MINION_WORKER_CHILD} = 1;
+      setsid();
+      # Set nice priority so workers don't starve the web app
+      POSIX::nice(10);
+      exec($^X, $0, 'minion', 'worker');
+      exit;
+    } else {
+      die "Fork failed: $!";
+    }
+  }
+  
+  # Set up signal handlers to clean up workers
+  $SIG{INT} = $SIG{TERM} = sub {
+    kill 'TERM', @worker_pids;
+    exit;
+  };
+}
+
+# Start the app (or worker if we're a child)
 Mojolicious::Commands->start_app('Game::EvonyTKR');
 # ABSTRACT: command wrapper for the Game::EvonyTKR Mojolicious application
 

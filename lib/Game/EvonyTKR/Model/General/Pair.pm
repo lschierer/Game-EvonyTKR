@@ -4,10 +4,75 @@ use utf8::all;
 require JSON::PP;
 require Scalar::Util;
 
-class Game::EvonyTKR::Model::General::Pair :
-  isa(Game::EvonyTKR::Shared::Constants) {
-  require Game::EvonyTKR::Model::General;
-  require Game::EvonyTKR::Model::Buff::Summarizer;
+require Game::EvonyTKR::Model::General;
+
+package Game::EvonyTKR::Model::General::Pair {
+  use Mojo::Base -base,                                            -signatures;
+  use Mojo::Base 'Game::EvonyTKR::Role::Common',                   -signatures;
+  use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants', -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants',    -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Constants::AscendingAttributes', -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Logger',                         -role;
+  use UUID           qw(uuid5);
+  use List::AllUtils qw( any none );
+  use File::FindLib 'lib';
+  use Carp;
+  use overload
+    '""'       => \&to_string,
+    '<=>'      => \&compare,
+    'cmp'      => \&compare,
+    'bool'     => \&_isTrue,
+    "fallback" => 1;
+
+    has ['primary', 'secondary', 'type'] => undef;
+
+    sub to_hash ($self) {
+      my $h = {
+        primary   => $self->primary->to_hash(),
+        secondary => $self->secondary->to_hash(),
+        type      => $self->type,
+      };
+      return $h;
+    }
+
+    sub to_string {
+      my $self = shift;
+      my $json =
+        JSON::PP->new->utf8(0)->pretty->canonical(1)
+        ->allow_blessed(1)
+        ->convert_blessed(1)
+        ->encode($self->to_hash());
+      return $json;
+    }
+
+    sub compare ($self, $other, $swapped = undef) {
+      my ($a, $b) = $swapped ? ($other, $self) : ($self, $other);
+      if($a && Scalar::Util::blessed($a) =~ /Game::EvonyTKR::Model::General::Pair/ ){
+        if($b && Scalar::Util::blessed($b) =~ /Game::EvonyTKR::Model::General::Pair/) {
+          return $a->primary->name cmp $b->primary->name ||
+            $a->secondary->name cmp $b->secondary->name;
+        } else {
+          return $a->primary->name cmp "$b" ||
+          $a->secondary->name cmp "$b";
+        }
+      } elsif($b && Scalar::Util::blessed($b) =~ /Game::EvonyTKR::Model::General::Pair/) {
+        return "$a" cmp $b->primary->name ||
+          "$a" cmp $b->secondary->name;
+      } else {
+        return "$a" cmp "$b";
+      }
+    }
+
+    sub _isTrue ($self, $other = undef, $swap = undef) {
+      return
+           defined($self)
+        && ref($self)
+        && blessed($self)
+        && $self->isa(__PACKAGE__);
+    }
+}
+1;
+__END__
   use List::AllUtils qw( all any none );
   use Readonly;
   use Carp;

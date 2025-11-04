@@ -30,16 +30,16 @@ else
   exit $MEM_RESULT;
 fi
 
-nice -n 10 ./bin/game-evonytkr minion worker -j 10 -s -10 -S 50 &
-nice -n 10 ./bin/game-evonytkr minion worker -j 2 -s 1  &
-nice -n 10 ./bin/game-evonytkr minion worker -j 2  &
-nice -n 10 ./bin/game-evonytkr minion worker -j 1 &
+#nice -n 10 ./bin/game-evonytkr minion worker -j 10 -s -10 -S 50 &
+#nice -n 10 ./bin/game-evonytkr minion worker -j 2 -s 1  &
+#nice -n 10 ./bin/game-evonytkr minion worker -j 2  &
+#nice -n 10 ./bin/game-evonytkr minion worker -j 1 &
 #WORKER_PID=$!
 #echo "Worker PID: $WORKER_PID"
 
 
 # Start web server with watchexec
 echo "Starting web server with file watching..."
-watchexec --exts css,pm,ep,js -w lib/ -w bin/ -w share/templates/ -w share/public/ -w share/collections/data/ --restart ./bin/game-evonytkr daemon -m development
-#./bin/game-evonytkr daemon -m development
+#watchexec --exts css,pm,ep,js -w lib/ -w bin/ -w share/templates/ -w share/public/ -w share/collections/data/ --restart ./bin/game-evonytkr daemon -m development
+./bin/game-evonytkr daemon -m development
 # This will run cleanup when watchexec exits

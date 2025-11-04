@@ -37,6 +37,11 @@ package Game::EvonyTKR::Service::Cache {
     return $instances->{$ns_key};
   }
 
+  sub add ($self, $key, $data) {
+    my $encoded = $encoder->encode($data);
+    return $self->instance->add($key, $encoded);
+  }
+
   sub set ($self, $key, $data) {
     my $encoded = $encoder->encode($data);
     return $self->instance->set($key, $encoded);

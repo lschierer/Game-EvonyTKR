@@ -128,6 +128,13 @@ package Game::EvonyTKR::Model::Buff {
       return 1;
     }
 
+    if(ref($condition) && ref($condition) eq 'ARRAY'){
+      foreach my $c ($condition->@*){
+        $self->set_condition($c);
+      }
+      return;
+    }
+
     # Check if the condition is a valid buff condition
     if (any { $condition eq $_ } keys $self->BuffConditionValues->%*) {
 

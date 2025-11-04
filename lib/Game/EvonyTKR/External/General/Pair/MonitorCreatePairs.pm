@@ -4,11 +4,17 @@ use File::FindLib 'lib';
 
 package Game::EvonyTKR::External::General::Pair::MonitorCreatePairs {
   use Mojo::Base 'Game::EvonyTKR::External::JobBase', -signatures;
+  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Pairs', -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants', -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Logger',      -role;
   require Game::EvonyTKR::Service::Cache;
 
   sub register ($taskClass, $app, $conf = {}) {
     $taskClass->SUPER::register($app, $conf);
+
+    # make sure the base hash exists in memcache for merging into
+    $taskClass->setup_pairs_by_type();
+
     $app->minion->add_task(monitor_create_pairs => __PACKAGE__);
     my $signal = __PACKAGE__ =~ s/::/_/gr;
     $app->plugins->emit($signal => 1);
@@ -46,7 +52,7 @@ package Game::EvonyTKR::External::General::Pair::MonitorCreatePairs {
     my $active_count    = 0;
     my $finished_count = 0;
     my $failed_count   = 0;
-    
+
     # Get processed jobs from notes to preserve state across retries
     my $processed_jobs = $job->info->{notes}->{processed_jobs} // {};
 
@@ -70,7 +76,7 @@ package Game::EvonyTKR::External::General::Pair::MonitorCreatePairs {
 
         if ($state eq 'finished') {
           $finished_count++;
-          
+
           # Skip if we've already processed this job
           next if $processed_jobs->{$job_id};
           $processed_jobs->{$job_id} = 1;
@@ -110,6 +116,11 @@ package Game::EvonyTKR::External::General::Pair::MonitorCreatePairs {
           };
           if(defined($notes->{pairs})){
             push @{$total_pairs}, $notes->{pairs}->@*;
+            foreach my $pair ($total_pairs->@*){
+              # I do not need to run a ->to_hash() here
+              # because I have not yet instantiated any sort of object
+              $job->add_wire_pair($pair);
+            }
           }
           $total_conflicts += $notes->{conflicts_found} // 0;
           $job->note(

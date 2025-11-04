@@ -67,9 +67,13 @@ package Game::EvonyTKR::Controller::ConflictGroups {
     $c->merge_cached_conflicts($app);
   }
 
+  has 'conflict_cache' => sub ($self) {
+    return Game::EvonyTKR::Service::Cache->new(namespace => 'conflicts:');
+  };
+
   sub merge_cached_conflicts($c, $app){
     my $cd = $c->get_conflict_detector();
-    my $cc = $c->pair_cache();
+    my $cc = $c->conflict_cache();
     my $merged = $cc->get('merged_conflicts') // {};
     $c->logger->debug(sprintf('merged_conflicts is %s',
     Data::Printer::np($merged)));
@@ -96,8 +100,14 @@ package Game::EvonyTKR::Controller::ConflictGroups {
       push @{ $cd->groups_by_conflict_type->{$conflict_type} },
         @{ $groups_by_conflict_type->{$conflict_type} // [] };
     }
-    my $finished = $cc->get('conflicts_complete');
-    unless($finished){
+    
+    # Check if there are still active create_pairs jobs
+    my $active_jobs = $app->minion->jobs({
+      tasks => ['create_pairs'],
+      states => ['active', 'inactive']
+    })->total;
+    
+    unless($active_jobs == 0){
       Mojo::IOLoop->timer(5 => sub {
         $c->merge_cached_conflicts($app);
       });

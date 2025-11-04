@@ -20,6 +20,8 @@ package Game::EvonyTKR::Controller::Pairs {
   use Mojo::Base 'Game::EvonyTKR::Controller::ControllerBase';
   use Mojo::Base 'Game::EvonyTKR::Role::Logger', -role, -signatures;
   use Mojo::Base 'Game::EvonyTKR::Controller::Role::Generals', -role;
+  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Pairs', -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants', -role;
   use Mojo::IOLoop;
   use Mojo::JSON     qw(to_json encode_json);
   use MIME::Base64   qw(encode_base64);
@@ -42,14 +44,13 @@ package Game::EvonyTKR::Controller::Pairs {
     return $base;
   }
 
+  has 'conflict_cache' => sub ($job) {
+    return Game::EvonyTKR::Service::Cache->new(namespace => 'conflicts:');
+  };
+
   sub getPairs {
     state %pairs_by_type;
     return \%pairs_by_type;
-  }
-
-  sub getDataModel {
-    state $dm = Game::EvonyTKR::Model::Data->new();
-    return $dm;
   }
 
   sub register($c, $app, $config = {}) {
@@ -58,16 +59,10 @@ package Game::EvonyTKR::Controller::Pairs {
 
     my $mainRoutes = $app->routes->any($base);
 
-    eval {
-      say "calling Pairs setup_event_handlers";
-      $c->setup_event_handlers($app);
-    } or do {
-      $c->logger->error('setup_event_handlers failed ' . $@);
-    };
+    $c->setup_pairs_by_type();
 
     eval {
       $c->setup_routes($app);
-      1;
     } or do {
       say "route setup failed in Pairs controller";
       $c->logger->error("route setup failed in Pairs controller");
@@ -78,25 +73,73 @@ package Game::EvonyTKR::Controller::Pairs {
         return $c->getPairs();
       }
     );
+    Mojo::IOLoop->timer(30 => sub {
+      $c->merge_pairs_from_cache($app);
+    });
   }
 
-  sub setup_event_handlers ($c, $app) {
-    $app->plugins->on(
-      pairs_complete => sub {
-        my $plugin = shift @_;
-        my @args   = @_;
-        $c->pair_receiver($app, @args);
-      }
-    );
+  sub merge_pairs_from_cache ($c, $app) {
+    my $pairs = $c->getPairs();
 
-    $app->plugins->on(
-      pairs_by_type => sub {
-        my $plugin = shift @_;
-        my @args   = @_;
-        $c->pair_receiver($app, @args);
-      }
-    );
+    # Check if pair building is complete
+    my $pair_cache = $c->pair_cache();
+    my $is_complete = $pair_cache->get('pair_building_complete');
 
+    if (!$is_complete) {
+      $c->logger->debug('Pair building not complete yet, will retry');
+      Mojo::IOLoop->timer(5 => sub {
+        $c->merge_pairs_from_cache($app);
+      });
+      return;
+    }
+
+    my $merged_pairs = $pair_cache->get_pairs_by_type();
+
+    if ($merged_pairs ) {
+      $c->logger->info('Processing pairs from merged_pairs');
+
+      my $generals = $c->get_generals();
+      foreach my $typeKey (keys $merged_pairs->%*){
+        my $generalList = $merged_pairs->{$typeKey};
+        foreach my $wp ($generalList->@*){
+          my $pk = lc($c->normalize($wp->{primary}));
+          $pk =~ s/ /_/g;
+          my $primary = $generals->{$pk};
+          unless($primary){
+            $c->logger->error(sprintf(
+            'cannot find primary %s with key %s',
+            $wp->{primary}, $pk));
+            next;
+          }
+
+          my $sk = lc($c->normalize($wp->{secondary}));
+          $sk =~ s/ /_/g;
+          my $secondary = $generals->{$sk};
+          unless($secondary){
+            $c->logger->error(sprintf(
+            'cannot find secondary %s with key %s',
+            $wp->{secondary}, $sk));
+            next;
+          }
+
+          my $type = $wp->{type};
+
+          my $pair = Game::EvonyTKR::Model::General::Pair->new(
+            primary   => $primary,
+            secondary => $secondary,
+            type      => $type,
+          );
+
+          $pairs->{$type} //= [];
+          $pairs->{$type} = [List::AllUtils::uniq($pair, @{$pairs->{$type}})];
+        }
+      }
+
+      $c->logger->info(sprintf('Processed pairs from cache. Total types: %d',
+        scalar keys %$pairs));
+    } else {
+      $c->logger->warn('Pair building complete but no merged conflict data found');
+    }
   }
 
   sub setup_routes ($c, $app,) {
@@ -129,10 +172,16 @@ package Game::EvonyTKR::Controller::Pairs {
           }
         );
       }
-      return;
+      return 0;
     }
 
     eval {
+      # Diagnostic route for pairs by type
+      $mainRoutes->get('/diagnostic/:type')->to(
+        controller => 'Pairs',
+        action     => 'diagnostic_pairs_by_type',
+      )->name('pairs_diagnostic_by_type');
+
       $mainRoutes->get('/:uiTarget/:buffActivation/pair-comparison')->to(
         controller => 'Pairs',
         action     => 'pairTable',
@@ -187,50 +236,29 @@ package Game::EvonyTKR::Controller::Pairs {
         $c->logger->debug(sprintf('built route %s',));
       }
     }
+    return 1;
   }
 
-  sub pair_receiver ($c, $app, @args) {
-    my $pairs = shift(@args);
-    $c->logger->debug(
-      'pair_receiver called: ' . Data::Printer::np($pairs, multiline => 0));
-    my $pairs_by_type = __PACKAGE__->getPairs();
 
-    unless (ref($pairs) eq 'HASH') {
-      $c->logger->error(sprintf(
-        'pair_receiver got a %s instead of a HASH', ref($pairs)));
-      return;
+
+  sub diagnostic_pairs_by_type ($c) {
+    my $type = $c->param('type');
+
+    # Validate type against GeneralKeys
+    unless (grep { $_ eq $type } $c->GeneralKeys()->@*) {
+      return $c->render(text => "Invalid type: $type. Valid types: " . join(', ', $c->GeneralKeys()), status => 400);
     }
 
-    foreach my $type (sort keys $pairs->%*) {
-      $c->logger->debug("pairs for type '$type'");
-      my $increment = 0;
-      foreach my $p ($pairs->{$type}->@*) {
-        unless (
-          List::AllUtils::any {
-            $_->primary->name eq $p->{primary}
-              && $_->secondary->name eq $p->{secondary}
-          }
-          @{ $pairs_by_type->{$type} }
-        ) {
-          $increment++;
-          my $primary   = $app->get_general($p->{primary});
-          my $secondary = $app->get_general($p->{secondary});
-          if ($primary && $secondary) {
-            my $pair = Game::EvonyTKR::Model::General::Pair->new(
-              primary   => $primary,
-              secondary => $secondary,
-            );
-            push @{ $pairs_by_type->{$type} }, $pair;
-          }
-          else {
-            $c->logger->warn('missing generals for pair: '
-                . Data::Printer::np($p, multiline => 0));
-          }
-        }
-      }
-      $c->logger->debug(sprintf(
-        'there are %s pairs of type %s added', $increment, $type));
-    }
+    my $pairs = $c->getPairs();
+    my $pairs_for_type = $pairs->{$type} // [];
+
+    $c->render(
+      template => 'pairs/diagnostic',
+      type => $type,
+      pairs => $pairs_for_type,
+      pair_count => scalar @$pairs_for_type,
+      all_types => [$c->GeneralKeys()->@*],
+    );
   }
 
   sub pairTable ($c) {
@@ -365,7 +393,7 @@ package Game::EvonyTKR::Controller::Pairs {
     my $uidseed = join(', ', @$requested_primaries) . ' ' . UUID::uuid7();
     $c->logger->debug("uidseed is '$uidseed'");
 
-    my $session_id = UUID::uuid5($c->getDataModel->UUID5_base, $uidseed);
+    my $session_id = UUID::uuid5($c->UUID5_base, $uidseed);
     $c->logger->debug("final session_id is '$session_id'");
 
     # Lookup route metadata

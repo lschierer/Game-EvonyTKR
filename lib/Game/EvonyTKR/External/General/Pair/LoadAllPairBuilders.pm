@@ -33,7 +33,7 @@ package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
     $job->logger->info('Starting LoadAllPairBuilders job');
 
     # Get all generals from cache
-    my $generals = $job->get_generals();
+    my $generals = $job->get_generals($job->app);
 
     $job->logger->info(
       sprintf('Found %d generals to process', scalar keys %$generals));
@@ -42,11 +42,11 @@ package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
     my $job_count = 0;
     foreach my $general_name (keys %$generals) {
       my $general = $generals->{$general_name};
-      
+
       # Handle scalar vs array types for this general
       my $general_types = $general->type // [];
       $general_types = [$general_types] unless ref($general_types) eq 'ARRAY';
-      
+
       # Create jobs for each type this general supports
       foreach my $type (@$general_types) {
         my $job_id =

@@ -90,7 +90,7 @@ package Game::EvonyTKR::Controller::Generals {
           $receivedGenerals, $generalCount
         ));
         if ($generalCount > 0 && $receivedGenerals < $generalCount) {
-          my $generals = $c->get_generals();
+          my $generals = $c->get_generals($app);
           if (defined($generals) && ref($generals) eq 'HASH') {
             foreach my $general (values $generals->%*) {
               # emit a signal to break out of this loop and stay async.
@@ -391,7 +391,7 @@ package Game::EvonyTKR::Controller::Generals {
     my $base      = $c->getBase();
     $c->logger->debug("Generals index method has base $base");
 
-    my $items = $c->get_generals() // {};
+    my $items = $c->get_generals($c->app) // {};
     $c->logger->debug(
       sprintf('Items: %s with %s keys.', ref($items), scalar(keys %$items)));
     $c->stash(

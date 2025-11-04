@@ -1,0 +1,37 @@
+% layout 'default';
+% title "Pairs Diagnostic - $type";
+
+<h1>Pairs Diagnostic for Type: <%= $type %></h1>
+
+<p><strong>Pair Count:</strong> <%= $pair_count %></p>
+
+<h2>All Available Types:</h2>
+<ul>
+% for my $available_type (@$all_types) {
+  <li><a href="/Generals/diagnostic/<%= $available_type %>"><%= $available_type %></a></li>
+% }
+</ul>
+
+<h2>Pairs for <%= $type %>:</h2>
+% if ($pair_count > 0) {
+<table border="1">
+  <thead>
+    <tr>
+      <th>Primary</th>
+      <th>Secondary</th>
+      <th>Type</th>
+    </tr>
+  </thead>
+  <tbody>
+    % for my $pair (@$pairs) {
+    <tr>
+      <td><%= $pair->{primary} %></td>
+      <td><%= $pair->{secondary} %></td>
+      <td><%= $pair->{type} %></td>
+    </tr>
+    % }
+  </tbody>
+</table>
+% } else {
+<p>No pairs found for type <%= $type %>.</p>
+% }

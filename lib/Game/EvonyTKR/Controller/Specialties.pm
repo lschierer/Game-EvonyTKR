@@ -36,12 +36,16 @@ package Game::EvonyTKR::Controller::Specialties {
       scalar @{$specialty_list},
       Data::Printer::np($specialty_list)
     ));
-    my %specialties;
+    state %specialties;
 
     foreach my $name (@$specialty_list) {
+      my $key = lc($self->normalize($name));
+      $key =~ s/ /_/g;
+      next if(exists $specialties{$key});
+
       my $specialty = $self->get_specialty($name);
       if ($specialty) {
-        $specialties{ $self->normalize($name) } = $specialty;
+        $specialties{ $key } = $specialty;
       }
     }
 

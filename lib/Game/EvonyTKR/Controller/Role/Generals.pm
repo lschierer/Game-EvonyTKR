@@ -78,9 +78,9 @@ package Game::EvonyTKR::Controller::Role::Generals {
     return \@returnlist;
   }
 
-  sub get_generals ($self) {
+  sub get_generals ($self, $app) {
     # Get all generals from cache
-    my $general_list = $self->list_generals($self->app);
+    my $general_list = $self->list_generals($app);
     my %generals;
 
     foreach my $name (@$general_list) {
