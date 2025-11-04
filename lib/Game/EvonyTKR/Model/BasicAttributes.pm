@@ -84,7 +84,7 @@ package Game::EvonyTKR::Model::BasicAttributes {
   }
 
   # Stringification method using JSON
-  sub as_string  {
+  sub as_string {
     my $self = shift;
     my $json =
       JSON::PP->new->utf8->canonical(1)

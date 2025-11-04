@@ -23,17 +23,19 @@ package Game::EvonyTKR::Controller::Role::Generals {
 
   sub get_general ($self, $name) {
     state $generals = {};
-    return if(not length($name));
+    return if (not length($name));
 
     $self->logger->debug("get_general called for: $name");
 
     my $normalized_name = lc($self->normalize($name)) // '';
-    return unless(length($normalized_name));
-    $self->logger->debug(sprintf('key "%s" for name "%s"',
-    $normalized_name, $name));
+    return unless (length($normalized_name));
+    $self->logger->debug(sprintf(
+      'key "%s" for name "%s"', $normalized_name, $name));
     $normalized_name =~ s/ /_/g;
-    $self->logger->debug(sprintf('key after spaces removed: "%s", for name "%s"',
-    $normalized_name, $name));
+    $self->logger->debug(sprintf(
+      'key after spaces removed: "%s", for name "%s"',
+      $normalized_name, $name
+    ));
 
     if (exists $generals->{$normalized_name}) {
       $self->logger->debug("Returning general $name from local cache");

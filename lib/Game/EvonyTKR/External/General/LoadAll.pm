@@ -45,13 +45,17 @@ package Game::EvonyTKR::External::General::LoadAll {
       sprintf('Found %d general files to load', scalar @files));
 
     foreach my $file (@files) {
-      my $job_id = $job->minion->enqueue('load_general' => [$job->normalize($file->to_string)]);
-      $job->logger->debug(
-        sprintf(
-          'Enqueued load_general job %s for file %s',
-          $job_id, $file->basename
-        )
-      );
+      my $job_id = $job->minion->enqueue(
+        'load_general' => [$job->normalize($file->to_string)] => {
+        attempts => 3,
+        delay    => rand(10),
+        expire   => 300,
+        priority => 20,
+        });
+      $job->logger->debug(sprintf(
+        'Enqueued load_general job %s for file %s',
+        $job_id, $file->basename
+      ));
     }
     $job->note(generalCount => scalar(@files));
     $job->logger->info('LoadAll generals job completed');

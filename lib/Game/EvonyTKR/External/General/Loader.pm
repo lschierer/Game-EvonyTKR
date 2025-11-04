@@ -3,7 +3,7 @@ use utf8::all;
 use File::FindLib 'lib';
 
 package Game::EvonyTKR::External::General::Loader {
-  use Mojo::Base 'Game::EvonyTKR::External::JobBase',                                -signatures;
+  use Mojo::Base 'Game::EvonyTKR::External::JobBase',          -signatures;
   use Mojo::Base 'Game::EvonyTKR::Role::Logger',               -role;
   use Mojo::Base 'Game::EvonyTKR::Controller::Role::Generals', -role;
   use Mojo::File;
@@ -38,13 +38,13 @@ package Game::EvonyTKR::External::General::Loader {
     my $app = $job->app;
     my $collectionDir =
       Mojo::File->new($app->config('distDir'))->child('collections/data/');
-    my $generalDir = $collectionDir->child('generals');
-    my @suffixList = ('.yaml', '.yml');
+    my $generalDir    = $collectionDir->child('generals');
+    my @suffixList    = ('.yaml', '.yml');
     my ($generalFile) = $generalDir->list->grep(sub {
       my $nn = $job->normalize($filename);
       $nn = Mojo::File->new($nn)->basename(@suffixList);
       my $cf = $job->normalize($_->basename(@suffixList));
-      if($nn eq $cf){
+      if ($nn eq $cf) {
         return 1;
       }
       return 0;
@@ -80,7 +80,7 @@ package Game::EvonyTKR::External::General::Loader {
       );
       if ($job->retries < $max_retries) {
         $job->note(error => $errmessage);
-        return $job->retry({ delay => 30 });
+        return $job->retry({ delay => 15 });
       }
       $job->logger->error($errmessage);
       return $job->fail($errmessage);

@@ -284,7 +284,7 @@ class Game::EvonyTKR::Model::General::Conflict :
   method build_meta_for ($general, $role) {
     $self->logger->debug("building meta for " . $general->name);
     unless (defined($general->builtInBook)) {
-      $self->dev_guard(sprintf(
+      $self->logger->logcroak(sprintf(
         'general %s must have the builtInBook already populated.',
         $general->name));
       return;

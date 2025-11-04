@@ -3,12 +3,12 @@ use utf8::all;
 use File::FindLib 'lib';
 
 package Game::EvonyTKR::External::General::Pair::CreatePairs {
-  use Mojo::Base 'Game::EvonyTKR::External::JobBase', -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Role::Logger', -role;
+  use Mojo::Base 'Game::EvonyTKR::External::JobBase',          -signatures;
+  use Mojo::Base 'Game::EvonyTKR::Role::Logger',               -role;
   use Mojo::Base 'Game::EvonyTKR::Controller::Role::Generals', -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants', -role;
   require Game::EvonyTKR::Service::Cache;
-  require Game::EvonyTKR::Model::General::Conflict;
+  require Game::EvonyTKR::Model::General::Conflict::Book;
 
   sub register ($taskClass, $app, $conf = {}) {
     $taskClass->SUPER::register($app, $conf);
@@ -40,7 +40,8 @@ package Game::EvonyTKR::External::General::Pair::CreatePairs {
       '%s log level is %s',
       __PACKAGE__, Log::Log4perl::Level::to_level($job->logger->level())
     ));
-    $job->logger->debug("Creating pairs for general: $general_name, type: $type");
+    $job->logger->debug(
+      "Creating pairs for general: $general_name, type: $type");
 
     # Validate the type
     unless ($job->ValidateGeneralType($type)) {
@@ -55,12 +56,28 @@ package Game::EvonyTKR::External::General::Pair::CreatePairs {
     unless ($primary) {
       return $job->fail("General '$general_name' not found");
     }
+    $primary->populateBuiltinBook();
+
+    unless($primary->builtInBook){
+      my $errmessage = sprintf('failed to populate builtInBook %s for %s',
+      $primary->builtInBookName, $primary->name);
+      $job->logger->error($errmessage);
+      return $job->fail($errmessage);
+    }
 
     # Filter generals for the specified type (excluding primary)
     my @matching_generals;
     foreach my $general (values %$generals) {
       next if $general->name eq $primary->name;  # Skip self
+      $general->populateBuiltinBook();
+      unless($general->builtInBook){
+        my $errmessage = sprintf('failed to populate builtInBook %s for %s',
+        $general->builtInBookName, $general->name);
+        $job->logger->error($errmessage);
+        next;
+      }
 
+      # Check if this general supports the target type
       my $general_types = $general->type // [];
       $general_types = [$general_types] unless ref($general_types) eq 'ARRAY';
 
@@ -80,74 +97,74 @@ package Game::EvonyTKR::External::General::Pair::CreatePairs {
 
     # Build pairs with matching generals
     foreach my $secondary (@matching_generals) {
-      $job->logger->debug(sprintf('Testing compatibility: %s <-> %s',
-        $primary->name, $secondary->name));
-
       # Check for conflicts
-      unless ($conflict_detector->are_generals_compatible($primary, $secondary)) {
-        $job->logger->debug(sprintf('Conflict detected: %s <-> %s',
-          $primary->name, $secondary->name));
+      $job->logger->debug(sprintf(
+        'Testing compatibility: %s <-> %s',
+        $primary->name, $secondary->name
+      ));
+      unless ($conflict_detector->are_generals_compatible($primary, $secondary))
+      {
+        $job->logger->debug(sprintf(
+          'Conflict detected: %s <-> %s',
+          $primary->name, $secondary->name
+        ));
         $conflicts_found++;
         next;
       }
 
-      # Find common troop types between primary and secondary
-      my $primary_types = $primary->type // [];
-      $primary_types = [$primary_types] unless ref($primary_types) eq 'ARRAY';
+      # Since we already filtered for matching type, just create the pair
+      my $pair = {
+        primary   => $primary->name,
+        secondary => $secondary->name,
+        type      => $type,
+      };
 
-      my $secondary_types = $secondary->type // [];
-      $secondary_types = [$secondary_types] unless ref($secondary_types) eq 'ARRAY';
+      push @pairs, $pair;
 
-      my %primary_types_map = map { $_ => 1 } @$primary_types;
-      my @common_types = grep { $primary_types_map{$_} } @$secondary_types;
+      $job->logger->debug(sprintf('Created pair: %s <-> %s (type: %s)',
+        $pair->{primary}, $pair->{secondary}, $type));
 
-      next unless @common_types;
+      # Return conflict data in notes for monitor job to merge
+      my $conflict_data = {
+        by_general              => $conflict_detector->by_general,
+        groups_by_conflict_type => $conflict_detector->groups_by_conflict_type,
+      };
 
-      # Create pair for each common type that matches our target type
-      foreach my $common_type (@common_types) {
-        next unless $common_type eq $type;  # Only create pairs for the requested type
-
-        my $pair = {
-          primary   => $primary->name,
-          secondary => $secondary->name,
-          type      => $common_type,
-        };
-
-        push @pairs, $pair;
-
-        $job->logger->debug(sprintf('Created pair: %s <-> %s (type: %s)',
-          $pair->{primary}, $pair->{secondary}, $common_type));
-      }
+      $job->note(
+        pairs_created           => scalar @pairs,
+        pairs                   => \@pairs,
+        conflicts_found         => $conflicts_found,
+        by_general              => $conflict_data->{by_general},
+        groups_by_conflict_type => $conflict_data->{groups_by_conflict_type},
+        general_name            => $general_name,
+        type                    => $type,
+      );
     }
 
     # Store pairs in cache
     if (@pairs) {
-      my $cache_key = sprintf('%s_%s', $job->normalize($general_name), $type);
+      my $cache_key = sprintf('%s_%s', lc($job->normalize($general_name)), $type);
+      $cache_key =~ s/ /_/g;
       $job->pair_cache->set($cache_key, \@pairs);
-      $job->logger->info(sprintf('Stored %d pairs for %s/%s',
-        scalar @pairs, $general_name, $type));
+      $job->logger->info(sprintf(
+        'Stored %d pairs for %s/%s',
+        scalar @pairs,
+        $general_name, $type
+      ));
     }
 
-    # Return conflict data in notes for monitor job to merge
-    my $conflict_data = {
-      by_general => $conflict_detector->by_general,
-      groups_by_conflict_type => $conflict_detector->groups_by_conflict_type,
-    };
 
-    $job->note(
-      pairs_created => scalar @pairs,
-      conflicts_found => $conflicts_found,
-      by_general => $conflict_data->{by_general},
-      groups_by_conflict_type => $conflict_data->{groups_by_conflict_type},
-      general_name => $general_name,
-      type => $type,
-    );
+    $job->logger->info(sprintf(
+      'CreatePairs completed for %s/%s: %d pairs, %d conflicts',
+      $general_name, $type, scalar @pairs,
+      $conflicts_found
+    ));
 
-    $job->logger->info(sprintf('CreatePairs completed for %s/%s: %d pairs, %d conflicts',
-      $general_name, $type, scalar @pairs, $conflicts_found));
-
-    return sprintf('Created %d pairs for %s/%s with %d conflicts',
-      scalar @pairs, $general_name, $type, $conflicts_found);
+    return $job->finish(sprintf(
+      'Created %d pairs for %s as %s with %d conflicts',
+      scalar @pairs,
+      $general_name, ref($type)? join(',', $type->@*) : $type, $conflicts_found
+    ));
   }
 }
 

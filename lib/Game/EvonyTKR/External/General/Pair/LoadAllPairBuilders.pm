@@ -3,8 +3,8 @@ use utf8::all;
 use File::FindLib 'lib';
 
 package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
-  use Mojo::Base 'Game::EvonyTKR::External::JobBase', -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Role::Logger', -role;
+  use Mojo::Base 'Game::EvonyTKR::External::JobBase',          -signatures;
+  use Mojo::Base 'Game::EvonyTKR::Role::Logger',               -role;
   use Mojo::Base 'Game::EvonyTKR::Controller::Role::Generals', -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants', -role;
 
@@ -34,25 +34,35 @@ package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
 
     # Get all generals from cache
     my $generals = $job->get_generals();
-    my @general_names = keys %$generals;
 
-    $job->logger->info(sprintf('Found %d generals to process', scalar @general_names));
-
-    # Get all valid general types
-    my @general_types = $job->GeneralKeys();
+    $job->logger->info(
+      sprintf('Found %d generals to process', scalar keys %$generals));
 
     # Spawn CreatePairs jobs for each general/type combination
     my $job_count = 0;
-    foreach my $general_name (@general_names) {
-      foreach my $type (@general_types) {
-        my $job_id = $job->minion->enqueue('create_pairs' => [$general_name, $type]);
-        $job->logger->debug(sprintf('Enqueued create_pairs job %s for general %s, type %s',
-          $job_id, $general_name, $type));
+    foreach my $general_name (keys %$generals) {
+      my $general = $generals->{$general_name};
+      
+      # Handle scalar vs array types for this general
+      my $general_types = $general->type // [];
+      $general_types = [$general_types] unless ref($general_types) eq 'ARRAY';
+      
+      # Create jobs for each type this general supports
+      foreach my $type (@$general_types) {
+        my $job_id =
+          $job->minion->enqueue('create_pairs' => [$general_name, $type]);
+        $job->logger->debug(sprintf(
+          'Enqueued create_pairs job %s for general %s, type %s',
+          $job_id, $general_name, $type
+        ));
         $job_count++;
       }
     }
 
-    $job->logger->info(sprintf('LoadAllPairBuilders job completed, spawned %d create_pairs jobs', $job_count));
+    $job->logger->info(
+      sprintf('LoadAllPairBuilders job completed, spawned %d create_pairs jobs',
+        $job_count)
+    );
   }
 }
 

@@ -107,13 +107,19 @@ package Game::EvonyTKR::Model::General {
       return;
     };
 
-    eval {
-      $book = $books_helper->get_builtin_book($self->builtInBookName);
-    } or do {
-      $self->logger->error(sprintf('eval failed; cannot get book from helper: %s', $@));
-      $self->logger->debug(sprintf('available books: %s', join ', ', map { sprintf('"%s"', %_) } $books_helper->list_builtin_books->@* ));
+    eval { $book = $books_helper->get_builtin_book($self->builtInBookName); }
+      or do {
+      $self->logger->error(
+        sprintf('eval failed; cannot get book from helper: %s', $@));
+      $self->logger->debug(
+        sprintf(
+          'available books: %s',
+          join ', ',
+          map { sprintf('"%s"', %_) } $books_helper->list_builtin_books->@*
+        )
+      );
       return;
-    };
+      };
 
     if (defined($book)) {
       $self->logger->debug(sprintf(

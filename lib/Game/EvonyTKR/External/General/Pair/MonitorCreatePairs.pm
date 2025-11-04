@@ -4,7 +4,7 @@ use File::FindLib 'lib';
 
 package Game::EvonyTKR::External::General::Pair::MonitorCreatePairs {
   use Mojo::Base 'Game::EvonyTKR::External::JobBase', -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Role::Logger', -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Logger',      -role;
   require Game::EvonyTKR::Service::Cache;
 
   sub register ($taskClass, $app, $conf = {}) {
@@ -35,62 +35,102 @@ package Game::EvonyTKR::External::General::Pair::MonitorCreatePairs {
     ));
     $job->logger->info('Starting MonitorCreatePairs job');
 
-    my $check_interval = 10; # seconds
-    my $max_wait = 300; # 5 minutes max wait
-    my $waited = 0;
+    my $check_interval = 10;     # seconds
+    my $max_wait       = 300;    # 5 minutes max wait
+    state $waited         = 0;
 
     my %merged_by_general;
     my %merged_groups_by_conflict_type;
-    my $total_pairs = 0;
+    my $total_pairs     = [];
     my $total_conflicts = 0;
+    my $active_count    = 0;
+    my $finished_count = 0;
+    my $failed_count   = 0;
+    
+    # Get processed jobs from notes to preserve state across retries
+    my $processed_jobs = $job->info->{notes}->{processed_jobs} // {};
 
-    while ($waited < $max_wait) {
+    if ($waited < $max_wait) {
       # Get all create_pairs jobs
+
       my $jobs = $job->minion->jobs({
-        tasks => ['create_pairs'],
+        tasks  => ['create_pairs'],
         states => ['finished', 'failed', 'active', 'inactive']
       });
 
-      my $finished_count = 0;
-      my $active_count = 0;
-      my $failed_count = 0;
+      if($jobs->total == 0){
+        $waited += $check_interval;
+        return $job-retry({delay => $check_interval});
+      }
 
       # Process finished jobs and accumulate conflict data
       while (my $job_info = $jobs->next) {
         my $state = $job_info->{state};
+        my $job_id = $job_info->{id};
 
         if ($state eq 'finished') {
           $finished_count++;
+          
+          # Skip if we've already processed this job
+          next if $processed_jobs->{$job_id};
+          $processed_jobs->{$job_id} = 1;
 
           # Extract conflict data from notes
           my $notes = $job_info->{notes} // {};
+          $job->logger->debug(sprintf('Processing new job %s with notes', $job_id));
 
           if ($notes->{by_general}) {
+            $job->logger->debug(sprintf('by_general in job is %s',
+            Data::Printer::np($notes->{by_general})));
             # Merge by_general data
-            foreach my $general (keys %{$notes->{by_general}}) {
+            foreach my $general (keys %{ $notes->{by_general} }) {
               $merged_by_general{$general} //= {};
-              foreach my $other_general (keys %{$notes->{by_general}{$general}}) {
-                $merged_by_general{$general}{$other_general} = 1;
+              foreach
+                my $other_general (keys %{ $notes->{by_general}->{$general} }) {
+                $merged_by_general{$general}->{$other_general} = 1;
               }
             }
           }
 
           if ($notes->{groups_by_conflict_type}) {
+            $job->logger->debug(sprintf('groups_by_conflict_type in job is %s',
+            Data::Printer::np($notes->{groups_by_conflict_type})));
             # Merge groups_by_conflict_type data
-            foreach my $conflict_type (keys %{$notes->{groups_by_conflict_type}}) {
+            foreach
+              my $conflict_type (keys $notes->{groups_by_conflict_type}->%* ) {
               $merged_groups_by_conflict_type{$conflict_type} //= [];
-              push @{$merged_groups_by_conflict_type{$conflict_type}},
-                   @{$notes->{groups_by_conflict_type}{$conflict_type} // []};
+              push @{ $merged_groups_by_conflict_type{$conflict_type} },
+                @{ $notes->{groups_by_conflict_type}{$conflict_type} // [] };
             }
           }
 
-          $total_pairs += $notes->{pairs_created} // 0;
+          my $current_conflict_data = {
+            by_general              => \%merged_by_general,
+            groups_by_conflict_type => \%merged_groups_by_conflict_type,
+          };
+          if(defined($notes->{pairs})){
+            push @{$total_pairs}, $notes->{pairs}->@*;
+          }
           $total_conflicts += $notes->{conflicts_found} // 0;
+          $job->note(
+            finished_jobs   => $finished_count,
+            total_pairs     => scalar(@{$total_pairs}),
+            pairs           => $total_pairs,
+            total_conflicts => $total_conflicts,
+            conflicts       => $current_conflict_data,
+          );
 
-        } elsif ($state eq 'active' || $state eq 'inactive') {
+        }
+        elsif ($state eq 'active' || $state eq 'inactive') {
           $active_count++;
-        } elsif ($state eq 'failed') {
+          $job->note(active_jobs     => $active_count,);
+        }
+        elsif ($state eq 'failed') {
           $failed_count++;
+          my $errmessage = sprintf('found failed job %s', $job_info->{id});
+          $job->logger->error($errmessage);
+          $job->note(failed_jobs     => $failed_count,);
+          return $job->fail($errmessage);
         }
       }
 
@@ -101,25 +141,18 @@ package Game::EvonyTKR::External::General::Pair::MonitorCreatePairs {
 
       # Update progress notes
       $job->note(
-        finished_jobs => $finished_count,
-        active_jobs => $active_count,
-        failed_jobs => $failed_count,
-        total_pairs => $total_pairs,
+        finished_jobs   => $finished_count,
+        active_jobs     => $active_count,
+        failed_jobs     => $failed_count,
+        total_pairs     => $total_pairs,
         total_conflicts => $total_conflicts,
+        processed_jobs  => $processed_jobs,  # Preserve state across retries
       );
-
-      # If no more active jobs, we're done
-      if ($active_count == 0) {
-        last;
-      }
-
-      sleep $check_interval;
-      $waited += $check_interval;
     }
 
     # Store the merged conflict data
     my $final_conflict_data = {
-      by_general => \%merged_by_general,
+      by_general              => \%merged_by_general,
       groups_by_conflict_type => \%merged_groups_by_conflict_type,
     };
 
@@ -127,18 +160,24 @@ package Game::EvonyTKR::External::General::Pair::MonitorCreatePairs {
 
     # Final notes
     $job->note(
-      pairs_by_type => { total => $total_pairs },
-      conflicts => $final_conflict_data,
-      total_pairs => $total_pairs,
+      pairs_by_type   => { total => $total_pairs },
+      conflicts       => $final_conflict_data,
+      total_pairs     => $total_pairs,
       total_conflicts => $total_conflicts,
     );
 
     $job->logger->info(sprintf(
-      'MonitorCreatePairs completed: %d total pairs, %d total conflicts, %d generals with conflicts',
+      'MonitorCreatePairs completed: '
+      .'%d total pairs, %d total conflicts, '
+      .'%d generals with conflicts',
       $total_pairs, $total_conflicts, scalar keys %merged_by_general
     ));
-
-    return 'all pair builders complete';
+    if($active_count >= 1) {
+      $waited += $check_interval;
+      return $job->retry({delay => $check_interval});
+    }
+    $job->conflict_cache->set('conflicts_complete', 1);
+    return $job->finish('all pair builders complete');
   }
 }
 
