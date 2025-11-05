@@ -41,11 +41,11 @@ package Game::EvonyTKR::Controller::Specialties {
     foreach my $name (@$specialty_list) {
       my $key = lc($self->normalize($name));
       $key =~ s/ /_/g;
-      next if(exists $specialties{$key});
+      next if (exists $specialties{$key});
 
       my $specialty = $self->get_specialty($name);
       if ($specialty) {
-        $specialties{ $key } = $specialty;
+        $specialties{$key} = $specialty;
       }
     }
 

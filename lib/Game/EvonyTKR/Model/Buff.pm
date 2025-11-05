@@ -128,8 +128,8 @@ package Game::EvonyTKR::Model::Buff {
       return 1;
     }
 
-    if(ref($condition) && ref($condition) eq 'ARRAY'){
-      foreach my $c ($condition->@*){
+    if (ref($condition) && ref($condition) eq 'ARRAY') {
+      foreach my $c ($condition->@*) {
         $self->set_condition($c);
       }
       return;

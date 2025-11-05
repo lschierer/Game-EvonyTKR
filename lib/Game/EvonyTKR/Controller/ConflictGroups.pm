@@ -8,7 +8,7 @@ use namespace::autoclean;
 
 package Game::EvonyTKR::Controller::ConflictGroups {
   use Mojo::Base 'Game::EvonyTKR::Controller::ControllerBase';
-  use Mojo::Base 'Game::EvonyTKR::Role::Logger',               -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Logger', -role;
   use List::AllUtils qw( all any none );
   use Carp;
 
@@ -71,46 +71,46 @@ package Game::EvonyTKR::Controller::ConflictGroups {
     return Game::EvonyTKR::Service::Cache->new(namespace => 'conflicts:');
   };
 
-  sub merge_cached_conflicts($c, $app){
-    my $cd = $c->get_conflict_detector();
-    my $cc = $c->conflict_cache();
+  sub merge_cached_conflicts($c, $app) {
+    my $cd     = $c->get_conflict_detector();
+    my $cc     = $c->conflict_cache();
     my $merged = $cc->get('merged_conflicts') // {};
-    $c->logger->debug(sprintf('merged_conflicts is %s',
-    Data::Printer::np($merged)));
+    $c->logger->debug(sprintf(
+      'merged_conflicts is %s', Data::Printer::np($merged)));
     my $by_general = {};
-    if(exists $merged->{by_general}){
+    if (exists $merged->{by_general}) {
       $by_general = $merged->{by_general};
     }
-    foreach my $general (keys $by_general->%* ) {
+    foreach my $general (keys $by_general->%*) {
       $cd->by_general->{$general} //= {};
-      foreach
-        my $other_general (keys $by_general->{$general}->%* ) {
+      foreach my $other_general (keys $by_general->{$general}->%*) {
         $cd->by_general->{$general}->{$other_general} = 1;
       }
     }
 
     my $groups_by_conflict_type = {};
-    if(exists $merged->{groups_by_conflict_type}){
+    if (exists $merged->{groups_by_conflict_type}) {
       $groups_by_conflict_type = $merged->{groups_by_conflict_type} // {};
     }
 
-    foreach
-      my $conflict_type (keys $groups_by_conflict_type->%* ) {
+    foreach my $conflict_type (keys $groups_by_conflict_type->%*) {
       $cd->groups_by_conflict_type->{$conflict_type} //= [];
       push @{ $cd->groups_by_conflict_type->{$conflict_type} },
         @{ $groups_by_conflict_type->{$conflict_type} // [] };
     }
-    
+
     # Check if there are still active create_pairs jobs
     my $active_jobs = $app->minion->jobs({
-      tasks => ['create_pairs'],
+      tasks  => ['create_pairs'],
       states => ['active', 'inactive']
     })->total;
-    
-    unless($active_jobs == 0){
-      Mojo::IOLoop->timer(5 => sub {
-        $c->merge_cached_conflicts($app);
-      });
+
+    unless ($active_jobs == 0) {
+      Mojo::IOLoop->timer(
+        5 => sub {
+          $c->merge_cached_conflicts($app);
+        }
+      );
     }
   }
 

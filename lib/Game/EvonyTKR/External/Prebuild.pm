@@ -444,8 +444,8 @@ package Game::EvonyTKR::External::Prebuild {
         }
         else {
           $job->logger->warn(sprintf(
-          'unexpected loop1 state. prereqs: %s; '
-          .'general_import_started: %s; gl: %s ',
+            'unexpected loop1 state. prereqs: %s; '
+              . 'general_import_started: %s; gl: %s ',
             $job->prebuildPrerequisites,
             $general_import_started ? 'true' : 'false',
             defined($gl)            ? $gl    : 'undefined'
@@ -565,13 +565,14 @@ package Game::EvonyTKR::External::Prebuild {
           if ( exists($monitor_job->info->{result})
             && length($monitor_job->info->{result})
             && $monitor_job->info->{result} eq 'all pair builders complete') {
-            
+
             # Set completion flag in cache
             require Game::EvonyTKR::Service::Cache;
-            my $cache = Game::EvonyTKR::Service::Cache->new(namespace => 'pairs:');
+            my $cache =
+              Game::EvonyTKR::Service::Cache->new(namespace => 'pairs:');
             $cache->set('pair_building_complete', 1);
             $job->logger->info('Set pair_building_complete flag in cache');
-            
+
             Mojo::IOLoop->remove($loop3);
             Mojo::IOLoop->remove($timer_id) if $timer_id;
             release_lock_sqlite($db, $key, $owner);

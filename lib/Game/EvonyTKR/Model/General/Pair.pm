@@ -24,52 +24,59 @@ package Game::EvonyTKR::Model::General::Pair {
     'bool'     => \&_isTrue,
     "fallback" => 1;
 
-    has ['primary', 'secondary', 'type'] => undef;
+  has ['primary', 'secondary', 'type'] => undef;
 
-    sub to_hash ($self) {
-      my $h = {
-        primary   => $self->primary->to_hash(),
-        secondary => $self->secondary->to_hash(),
-        type      => $self->type,
-      };
-      return $h;
-    }
+  sub to_hash ($self) {
+    my $h = {
+      primary   => $self->primary->to_hash(),
+      secondary => $self->secondary->to_hash(),
+      type      => $self->type,
+    };
+    return $h;
+  }
 
-    sub to_string {
-      my $self = shift;
-      my $json =
-        JSON::PP->new->utf8(0)->pretty->canonical(1)
-        ->allow_blessed(1)
-        ->convert_blessed(1)
-        ->encode($self->to_hash());
-      return $json;
-    }
+  sub to_string {
+    my $self = shift;
+    my $json =
+      JSON::PP->new->utf8(0)->pretty->canonical(1)
+      ->allow_blessed(1)
+      ->convert_blessed(1)
+      ->encode($self->to_hash());
+    return $json;
+  }
 
-    sub compare ($self, $other, $swapped = undef) {
-      my ($a, $b) = $swapped ? ($other, $self) : ($self, $other);
-      if($a && Scalar::Util::blessed($a) =~ /Game::EvonyTKR::Model::General::Pair/ ){
-        if($b && Scalar::Util::blessed($b) =~ /Game::EvonyTKR::Model::General::Pair/) {
-          return $a->primary->name cmp $b->primary->name ||
-            $a->secondary->name cmp $b->secondary->name;
-        } else {
-          return $a->primary->name cmp "$b" ||
-          $a->secondary->name cmp "$b";
-        }
-      } elsif($b && Scalar::Util::blessed($b) =~ /Game::EvonyTKR::Model::General::Pair/) {
-        return "$a" cmp $b->primary->name ||
-          "$a" cmp $b->secondary->name;
-      } else {
-        return "$a" cmp "$b";
+  sub compare ($self, $other, $swapped = undef) {
+    my ($a, $b) = $swapped ? ($other, $self) : ($self, $other);
+    if ($a
+      && Scalar::Util::blessed($a) =~ /Game::EvonyTKR::Model::General::Pair/) {
+      if ($b
+        && Scalar::Util::blessed($b) =~ /Game::EvonyTKR::Model::General::Pair/)
+      {
+        return $a->primary->name cmp $b->primary->name
+          || $a->secondary->name cmp $b->secondary->name;
+      }
+      else {
+        return $a->primary->name cmp "$b"
+          || $a->secondary->name cmp "$b";
       }
     }
-
-    sub _isTrue ($self, $other = undef, $swap = undef) {
-      return
-           defined($self)
-        && ref($self)
-        && blessed($self)
-        && $self->isa(__PACKAGE__);
+    elsif ($b
+      && Scalar::Util::blessed($b) =~ /Game::EvonyTKR::Model::General::Pair/) {
+      return "$a" cmp $b->primary->name
+        || "$a" cmp $b->secondary->name;
     }
+    else {
+      return "$a" cmp "$b";
+    }
+  }
+
+  sub _isTrue ($self, $other = undef, $swap = undef) {
+    return
+         defined($self)
+      && ref($self)
+      && blessed($self)
+      && $self->isa(__PACKAGE__);
+  }
 }
 1;
 __END__

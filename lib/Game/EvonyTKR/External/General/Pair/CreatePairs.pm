@@ -52,15 +52,15 @@ package Game::EvonyTKR::External::General::Pair::CreatePairs {
     my $generals = $job->get_generals($job->app);
 
     # Find the primary general
-    my $primary = $generals->{$job->normalize($general_name)};
+    my $primary = $generals->{ $job->normalize($general_name) };
     unless ($primary) {
       return $job->fail("General '$general_name' not found");
     }
     $primary->populateBuiltinBook();
 
-    unless($primary->builtInBook){
+    unless ($primary->builtInBook) {
       my $errmessage = sprintf('failed to populate builtInBook %s for %s',
-      $primary->builtInBookName, $primary->name);
+        $primary->builtInBookName, $primary->name);
       $job->logger->error($errmessage);
       return $job->fail($errmessage);
     }
@@ -68,11 +68,11 @@ package Game::EvonyTKR::External::General::Pair::CreatePairs {
     # Filter generals for the specified type (excluding primary)
     my @matching_generals;
     foreach my $general (values %$generals) {
-      next if $general->name eq $primary->name;  # Skip self
+      next if $general->name eq $primary->name;    # Skip self
       $general->populateBuiltinBook();
-      unless($general->builtInBook){
+      unless ($general->builtInBook) {
         my $errmessage = sprintf('failed to populate builtInBook %s for %s',
-        $general->builtInBookName, $general->name);
+          $general->builtInBookName, $general->name);
         $job->logger->error($errmessage);
         next;
       }
@@ -86,8 +86,11 @@ package Game::EvonyTKR::External::General::Pair::CreatePairs {
       }
     }
 
-    $job->logger->info(sprintf('Found %d generals of type %s to pair with %s',
-      scalar @matching_generals, $type, $general_name));
+    $job->logger->info(sprintf(
+      'Found %d generals of type %s to pair with %s',
+      scalar @matching_generals,
+      $type, $general_name
+    ));
 
     # Initialize conflict detector
     my $conflict_detector = Game::EvonyTKR::Model::General::Conflict->new();
@@ -121,8 +124,10 @@ package Game::EvonyTKR::External::General::Pair::CreatePairs {
 
       push @pairs, $pair;
 
-      $job->logger->debug(sprintf('Created pair: %s <-> %s (type: %s)',
-        $pair->{primary}, $pair->{secondary}, $type));
+      $job->logger->debug(sprintf(
+        'Created pair: %s <-> %s (type: %s)',
+        $pair->{primary}, $pair->{secondary}, $type
+      ));
 
       # Return conflict data in notes for monitor job to merge
       my $conflict_data = {
@@ -143,7 +148,8 @@ package Game::EvonyTKR::External::General::Pair::CreatePairs {
 
     # Store pairs in cache
     if (@pairs) {
-      my $cache_key = sprintf('%s_%s', lc($job->normalize($general_name)), $type);
+      my $cache_key =
+        sprintf('%s_%s', lc($job->normalize($general_name)), $type);
       $cache_key =~ s/ /_/g;
       $job->pair_cache->set($cache_key, \@pairs);
       $job->logger->info(sprintf(
@@ -153,7 +159,6 @@ package Game::EvonyTKR::External::General::Pair::CreatePairs {
       ));
     }
 
-
     $job->logger->info(sprintf(
       'CreatePairs completed for %s/%s: %d pairs, %d conflicts',
       $general_name, $type, scalar @pairs,
@@ -162,8 +167,8 @@ package Game::EvonyTKR::External::General::Pair::CreatePairs {
 
     return $job->finish(sprintf(
       'Created %d pairs for %s as %s with %d conflicts',
-      scalar @pairs,
-      $general_name, ref($type)? join(',', $type->@*) : $type, $conflicts_found
+      scalar @pairs,                             $general_name,
+      ref($type) ? join(',', $type->@*) : $type, $conflicts_found
     ));
   }
 }

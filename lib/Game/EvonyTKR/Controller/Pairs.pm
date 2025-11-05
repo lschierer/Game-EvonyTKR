@@ -19,8 +19,8 @@ use namespace::autoclean;
 package Game::EvonyTKR::Controller::Pairs {
   use Mojo::Base 'Game::EvonyTKR::Controller::ControllerBase';
   use Mojo::Base 'Game::EvonyTKR::Role::Logger', -role, -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Generals', -role;
-  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Pairs', -role;
+  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Generals',        -role;
+  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Pairs',           -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants', -role;
   use Mojo::IOLoop;
   use Mojo::JSON     qw(to_json encode_json);
@@ -61,9 +61,7 @@ package Game::EvonyTKR::Controller::Pairs {
 
     $c->setup_pairs_by_type();
 
-    eval {
-      $c->setup_routes($app);
-    } or do {
+    eval { $c->setup_routes($app); } or do {
       say "route setup failed in Pairs controller";
       $c->logger->error("route setup failed in Pairs controller");
     };
@@ -73,52 +71,58 @@ package Game::EvonyTKR::Controller::Pairs {
         return $c->getPairs();
       }
     );
-    Mojo::IOLoop->timer(30 => sub {
-      $c->merge_pairs_from_cache($app);
-    });
+    Mojo::IOLoop->timer(
+      30 => sub {
+        $c->merge_pairs_from_cache($app);
+      }
+    );
   }
 
   sub merge_pairs_from_cache ($c, $app) {
     my $pairs = $c->getPairs();
 
     # Check if pair building is complete
-    my $pair_cache = $c->pair_cache();
+    my $pair_cache  = $c->pair_cache();
     my $is_complete = $pair_cache->get('pair_building_complete');
 
     if (!$is_complete) {
       $c->logger->debug('Pair building not complete yet, will retry');
-      Mojo::IOLoop->timer(5 => sub {
-        $c->merge_pairs_from_cache($app);
-      });
+      Mojo::IOLoop->timer(
+        5 => sub {
+          $c->merge_pairs_from_cache($app);
+        }
+      );
       return;
     }
 
     my $merged_pairs = $pair_cache->get_pairs_by_type();
 
-    if ($merged_pairs ) {
+    if ($merged_pairs) {
       $c->logger->info('Processing pairs from merged_pairs');
 
       my $generals = $c->get_generals();
-      foreach my $typeKey (keys $merged_pairs->%*){
+      foreach my $typeKey (keys $merged_pairs->%*) {
         my $generalList = $merged_pairs->{$typeKey};
-        foreach my $wp ($generalList->@*){
+        foreach my $wp ($generalList->@*) {
           my $pk = lc($c->normalize($wp->{primary}));
           $pk =~ s/ /_/g;
           my $primary = $generals->{$pk};
-          unless($primary){
+          unless ($primary) {
             $c->logger->error(sprintf(
-            'cannot find primary %s with key %s',
-            $wp->{primary}, $pk));
+              'cannot find primary %s with key %s',
+              $wp->{primary}, $pk
+            ));
             next;
           }
 
           my $sk = lc($c->normalize($wp->{secondary}));
           $sk =~ s/ /_/g;
           my $secondary = $generals->{$sk};
-          unless($secondary){
+          unless ($secondary) {
             $c->logger->error(sprintf(
-            'cannot find secondary %s with key %s',
-            $wp->{secondary}, $sk));
+              'cannot find secondary %s with key %s',
+              $wp->{secondary}, $sk
+            ));
             next;
           }
 
@@ -131,14 +135,16 @@ package Game::EvonyTKR::Controller::Pairs {
           );
 
           $pairs->{$type} //= [];
-          $pairs->{$type} = [List::AllUtils::uniq($pair, @{$pairs->{$type}})];
+          $pairs->{$type} = [List::AllUtils::uniq($pair, @{ $pairs->{$type} })];
         }
       }
 
       $c->logger->info(sprintf('Processed pairs from cache. Total types: %d',
         scalar keys %$pairs));
-    } else {
-      $c->logger->warn('Pair building complete but no merged conflict data found');
+    }
+    else {
+      $c->logger->warn(
+        'Pair building complete but no merged conflict data found');
     }
   }
 
@@ -239,25 +245,27 @@ package Game::EvonyTKR::Controller::Pairs {
     return 1;
   }
 
-
-
   sub diagnostic_pairs_by_type ($c) {
     my $type = $c->param('type');
 
     # Validate type against GeneralKeys
     unless (grep { $_ eq $type } $c->GeneralKeys()->@*) {
-      return $c->render(text => "Invalid type: $type. Valid types: " . join(', ', $c->GeneralKeys()), status => 400);
+      return $c->render(
+        text => "Invalid type: $type. Valid types: "
+          . join(', ', $c->GeneralKeys()),
+        status => 400
+      );
     }
 
-    my $pairs = $c->getPairs();
+    my $pairs          = $c->getPairs();
     my $pairs_for_type = $pairs->{$type} // [];
 
     $c->render(
-      template => 'pairs/diagnostic',
-      type => $type,
-      pairs => $pairs_for_type,
+      template   => 'pairs/diagnostic',
+      type       => $type,
+      pairs      => $pairs_for_type,
       pair_count => scalar @$pairs_for_type,
-      all_types => [$c->GeneralKeys()->@*],
+      all_types  => [$c->GeneralKeys()->@*],
     );
   }
 

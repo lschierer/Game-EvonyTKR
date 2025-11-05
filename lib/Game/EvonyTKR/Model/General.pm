@@ -111,13 +111,11 @@ package Game::EvonyTKR::Model::General {
       or do {
       $self->logger->error(
         sprintf('eval failed; cannot get book from helper: %s', $@));
-      $self->logger->debug(
-        sprintf(
-          'available books: %s',
-          join ', ',
-          map { sprintf('"%s"', %_) } $books_helper->list_builtin_books->@*
-        )
-      );
+      $self->logger->debug(sprintf(
+        'available books: %s',
+        join ', ',
+        map { sprintf('"%s"', %_) } $books_helper->list_builtin_books->@*
+      ));
       return;
       };
 
