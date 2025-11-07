@@ -9,7 +9,10 @@ package Game::EvonyTKR::Controller::Role::Generals {
   use Mojo::Base 'Game::EvonyTKR::Role::Common', -role;
   use List::AllUtils qw(uniq);
   use List::UtilsBy;
+  use Log::Any;
   use Carp;
+
+  my $logger = Log::Any->get_logger(category => __PACKAGE__);
 
   has 'general_cache' => sub ($self) {
     return Game::EvonyTKR::Service::Cache->new(namespace => 'generals:');
@@ -25,48 +28,48 @@ package Game::EvonyTKR::Controller::Role::Generals {
     state $generals = {};
     return if (not length($name));
 
-    $self->logger->debug("get_general called for: $name");
+    $logger->debug("get_general called for: $name");
 
     my $normalized_name = lc($self->normalize($name)) // '';
     return unless (length($normalized_name));
-    $self->logger->debug(sprintf(
+    $logger->debug(sprintf(
       'key "%s" for name "%s"', $normalized_name, $name));
     $normalized_name =~ s/ /_/g;
-    $self->logger->debug(sprintf(
+    $logger->debug(sprintf(
       'key after spaces removed: "%s", for name "%s"',
       $normalized_name, $name
     ));
 
     if (exists $generals->{$normalized_name}) {
-      $self->logger->debug("Returning general $name from local cache");
+      $logger->debug("Returning general $name from local cache");
       return $generals->{$normalized_name};
     }
 
-    $self->logger->debug("Looking for cache key: $normalized_name");
+    $logger->debug("Looking for cache key: $normalized_name");
 
     my $wire_data = $self->general_cache->get($normalized_name);
     unless (defined($wire_data)) {
-      $self->logger->warn("No wire_data found for key: $normalized_name");
+      $logger->warn("No wire_data found for key: $normalized_name");
       return;
     }
 
-    $self->logger->debug("Found wire_data, attempting to build general");
+    $logger->debug("Found wire_data, attempting to build general");
     my $general =
       Game::EvonyTKR::Model::Factory->build_from_wire('General', $wire_data);
 
     unless (defined($general)) {
-      $self->logger->error("Factory failed to build general from wire_data");
+      $logger->error("Factory failed to build general from wire_data");
       return;
     }
 
-    $self->logger->debug("Successfully built general: " . $general->name);
+    $logger->debug("Successfully built general: " . $general->name);
     $generals->{$normalized_name} = $general;
     return $general;
   }
 
   sub list_generals ($self, $app) {
     unless (defined($app)) {
-      $self->logger->logcroak('$app must be defined');
+      $logger->logcroak('$app must be defined');
     }
     my $collectionDir =
       Mojo::File->new($app->config('distDir'))->child('collections/data/');
@@ -86,7 +89,9 @@ package Game::EvonyTKR::Controller::Role::Generals {
     foreach my $name (@$general_list) {
       my $general = $self->get_general($name);
       if ($general) {
-        $generals{ $self->normalize($name) } = $general;
+        my $key = lc($self->normalize($name));
+        $key =~ s/ /_/g;
+        $generals{$key} = $general;
       }
     }
 

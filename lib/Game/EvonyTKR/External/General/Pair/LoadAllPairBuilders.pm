@@ -30,6 +30,9 @@ package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
       '%s log level is %s',
       __PACKAGE__, Log::Log4perl::Level::to_level($job->logger->level())
     ));
+
+    return if $job->are_prereqs_outstanding();
+
     $job->logger->info('Starting LoadAllPairBuilders job');
 
     # Get all generals from cache
@@ -64,6 +67,41 @@ package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
         $job_count)
     );
   }
+
+  sub are_prereqs_outstanding ($job) {
+      my $generalLoaderFinishedCount = $job->app->minion->jobs({
+          tasks  => ['load_general'],
+          states => ['finished'],
+      })->total // 0;
+
+      my $generalLoaderPendingCount = $job->app->minion->jobs({
+          tasks  => ['load_general'],
+          states => ['active', 'inactive'],
+      })->total // 0;
+
+      my $generalLoaderFailedCount = $job->app->minion->jobs({
+          tasks  => ['load_general'],
+          states => ['failed'],
+      })->total // 0;
+
+      if ($generalLoaderFailedCount > 0) {
+          return $job->fail('cannot build pairs if general import failed');
+      }
+
+      $job->note(generalLoaderPendingCount => $generalLoaderPendingCount);
+
+      if ($generalLoaderPendingCount > 0) {
+          my $delay = List::Util::min(2 * $generalLoaderPendingCount, 30);
+          return $job->retry({ delay => $delay });
+      }
+
+      if ($generalLoaderFinishedCount > 0) {
+          return 0;  # Ready to proceed
+      }
+
+      return $job->fail('no general loading jobs found');
+  }
+
 }
 
 1;

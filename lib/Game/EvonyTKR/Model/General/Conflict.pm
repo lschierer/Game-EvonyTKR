@@ -797,13 +797,8 @@ class Game::EvonyTKR::Model::General::Conflict :
     }
 
     foreach my $ct (keys $ngbct->%*) {
-      my @all;
-      push @all, $ngbct->{$ct}->@*;
-      if (exists $groups_by_conflict_type->{$ct}) {
-        push @all, $groups_by_conflict_type->{$ct}->@*;
-      }
-      @all = List::AllUtils::uniq @all;
-      $groups_by_conflict_type->{$ct} = \@all;
+      my $all = [ List::AllUtils::uniq ($ngbct->{$ct}->@*, $groups_by_conflict_type->{$ct}->@*) ];
+      $groups_by_conflict_type->{$ct} = $all;
     }
   }
 }

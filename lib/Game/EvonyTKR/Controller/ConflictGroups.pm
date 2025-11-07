@@ -64,53 +64,60 @@ package Game::EvonyTKR::Controller::ConflictGroups {
       order  => 60,
     });
 
-    $c->merge_cached_conflicts($app);
+    $c->schedule_cached_coflicts_merge($app);
   }
 
-  has 'conflict_cache' => sub ($self) {
-    return Game::EvonyTKR::Service::Cache->new(namespace => 'conflicts:');
-  };
-
-  sub merge_cached_conflicts($c, $app) {
-    my $cd     = $c->get_conflict_detector();
-    my $cc     = $c->conflict_cache();
-    my $merged = $cc->get('merged_conflicts') // {};
-    $c->logger->debug(sprintf(
-      'merged_conflicts is %s', Data::Printer::np($merged)));
-    my $by_general = {};
-    if (exists $merged->{by_general}) {
-      $by_general = $merged->{by_general};
-    }
-    foreach my $general (keys $by_general->%*) {
-      $cd->by_general->{$general} //= {};
-      foreach my $other_general (keys $by_general->{$general}->%*) {
-        $cd->by_general->{$general}->{$other_general} = 1;
+  sub do_merge_cached_conflicts ($c, $app, $cd, $cc, $merged) {
+    if (my $by_general = $merged->{by_general}) {
+      while (my ($general, $conflicts) = each %$by_general) {
+        $cd->by_general->{$general} = { %{$cd->by_general->{$general} // {}}, %$conflicts };
       }
     }
 
-    my $groups_by_conflict_type = {};
-    if (exists $merged->{groups_by_conflict_type}) {
-      $groups_by_conflict_type = $merged->{groups_by_conflict_type} // {};
+    if (my $groups = $merged->{groups_by_conflict_type}) {
+      while (my ($type, $new_groups) = each %$groups) {
+        my $existing = $cd->groups_by_conflict_type->{$type} //= [];
+        my %seen = map { $_ => 1 } @$existing;
+        push @$existing, grep { !$seen{$_}++ } @$new_groups;
+      }
     }
+  }
 
-    foreach my $conflict_type (keys $groups_by_conflict_type->%*) {
-      $cd->groups_by_conflict_type->{$conflict_type} //= [];
-      push @{ $cd->groups_by_conflict_type->{$conflict_type} },
-        @{ $groups_by_conflict_type->{$conflict_type} // [] };
-    }
+  sub schedule_cached_coflicts_merge($c, $app) {
+    my $cd = $c->get_conflict_detector();
+    my $cc = $c->conflict_cache();
 
-    # Check if there are still active create_pairs jobs
     my $active_jobs = $app->minion->jobs({
-      tasks  => ['create_pairs'],
+      tasks  => ['external_prebuild', 'monitor_create_pairs', 'create_pairs'],
       states => ['active', 'inactive']
     })->total;
 
-    unless ($active_jobs == 0) {
-      Mojo::IOLoop->timer(
-        5 => sub {
-          $c->merge_cached_conflicts($app);
-        }
-      );
+    # Track what we've already processed to avoid reprocessing
+    state $last_processed_timestamp = 0;
+
+    my ($cas_token, $merged) = $cc->gets('merged_conflicts');
+    unless ($merged || $active_jobs) {
+      # merged will not be set for quite a while,
+      # as about 600 jobs have to complete before
+      # the first conflict iformation is available.
+      # Do not return early unless there is both
+      # a lack of data to process and a lack of
+      # jobs to give us data in the future.
+      return;
+    };
+
+    my $current_timestamp = $merged->{timestamp} // 0;
+    unless($current_timestamp <= $last_processed_timestamp) {
+      $last_processed_timestamp = $current_timestamp;
+
+      # Process only new data efficiently
+      $c->do_merge_cached_conflicts($app, $cd, $cc, $merged);
+    }
+
+    # Check jobs less frequently and with shorter timeout
+
+    if ($active_jobs > 0) {
+      Mojo::IOLoop->timer(60 => sub { $c->schedule_cached_coflicts_merge($app) });
     }
   }
 

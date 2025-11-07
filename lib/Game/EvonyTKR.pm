@@ -114,19 +114,9 @@ package Game::EvonyTKR {
       ->migrate;
 
     $app->minion->repair;
+    $app->plugin('Game::EvonyTKR::Plugins::Sqlite');
 
-    $db->query(q{
-        CREATE TABLE IF NOT EXISTS app_locks(
-          name        TEXT PRIMARY KEY,
-          owner       TEXT NOT NULL,
-          expires_at  INTEGER NOT NULL,
-          updated_at  INTEGER NOT NULL
-        )
-      });
-
-    $db->query(q{
-        CREATE INDEX IF NOT EXISTS app_locks_expires_idx ON app_locks(expires_at)
-      });
+    $app->ensure_lock_table_sqlite($db);
 
     if ($app->mode eq 'development') {
       # no long lived jobs in case I forget ot erase the sqlite file
@@ -225,7 +215,7 @@ package Game::EvonyTKR {
   sub stop_all ($app, $pgid) {
     # First try TERM (graceful), then KILL after a grace period
     kill 'TERM', -$pgid;
-    my $deadline = time + 8;
+    my $deadline = time + 30;
     while (time < $deadline) { select undef, undef, undef, 0.1 }
     kill 'KILL', -$pgid;
     exit 0;

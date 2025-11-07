@@ -89,8 +89,10 @@ package Game::EvonyTKR::External::General::Loader {
     # Add to cache
     $job->add_general($general);
 
-    $job->logger->info(
-      sprintf('Successfully loaded general: %s', $general->name));
+    my $message = sprintf('Successfully loaded general: %s', $general->name);
+    $job->logger->info($message);
+    $job->note(general => $general);
+    $job->finish($message);
   }
 
 }

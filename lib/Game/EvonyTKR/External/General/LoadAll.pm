@@ -31,6 +31,8 @@ package Game::EvonyTKR::External::General::LoadAll {
       __PACKAGE__, Log::Log4perl::Level::to_level($job->logger->level())
     ));
 
+    return if($job->are_prereqs_outstanding());
+
     $job->logger->info('Starting LoadAll generals job');
 
     my $app = $job->app;
@@ -59,6 +61,87 @@ package Game::EvonyTKR::External::General::LoadAll {
       ));
     }
     $job->note(generalCount => scalar(@files));
-    $job->logger->info('LoadAll generals job completed');
+    my $message = 'LoadAll generals job completed';
+    $job->logger->info($message);
+    return $job->finish($message);
+  }
+
+  sub are_prereqs_outstanding ($job) {
+    my $bookLoaderFinishedCount = $job->app->minion->jobs({
+      tasks  => ['load_book'],
+      states => ['finished'],
+    })->total // 0;
+    my $bookLoaderPendingCount = $job->app->minion->jobs({
+      tasks  => ['load_book'],
+      states => ['active', 'inactive'],
+    })->total // 0;
+
+    my $bookLoaderFailedCount = $job->app->minion->jobs({
+      tasks  => ['load_book'],
+      states => ['failed'],
+    })->total // 0;
+
+    my $specialtyLoaderFinishedCount = $job->app->minion->jobs({
+      tasks  => ['load_specialty'],
+      states => ['finished'],
+    })->total // 0;
+    my $specialtyLoaderPendingCount = $job->app->minion->jobs({
+      tasks  => ['load_specialty'],
+      states => ['active', 'inactive'],
+    })->total // 0;
+    my $specialtyLoaderFailedCount = $job->app->minion->jobs({
+      tasks  => ['load_specialty'],
+      states => ['failed'],
+    })->total // 0;
+
+    $job->logger->debug(sprintf('Job query results: book_pending=%d, specialty_pending=%d',
+      $bookLoaderPendingCount, $specialtyLoaderPendingCount));
+
+    if ($bookLoaderFailedCount > 0) {
+      return $job->fail(
+        'cannot import generals if book import was not successful');
+    }
+    if ($specialtyLoaderFailedCount > 0) {
+      return $job->fail(
+        'cannot import generals if specialty import was not successful');
+    }
+
+    $job->note(bookLoaderPendingCount      => $bookLoaderPendingCount);
+    $job->note(specialtyLoaderPendingCount => $specialtyLoaderPendingCount);
+
+    if ($bookLoaderPendingCount > 0 || $specialtyLoaderPendingCount > 0) {
+      # delay a max of 30 seconds
+      my $delay = List::Util::min(2 * $bookLoaderPendingCount, 30);
+      $job->logger->debug(sprintf(
+        'kicking off retry with delay %s due to %s',
+        $delay,
+        sprintf(
+          'pending books: %s; pending specialties: %s',
+          $bookLoaderPendingCount, $specialtyLoaderPendingCount
+        )
+      ));
+      return $job->retry({ delay => $delay });
+    }
+
+    if ($bookLoaderFinishedCount > 0 && $specialtyLoaderFinishedCount > 0) {
+      return 0;
+    }
+
+    if ($bookLoaderFinishedCount == 0) {
+      return $job->fail(sprintf(
+        '%s must be started before %s is launched',
+        'book loading', __PACKAGE__
+      ));
+    }
+
+    if ($specialtyLoaderFinishedCount == 0) {
+      return $job->fail(sprintf(
+        '%s must be started before %s is launched',
+        'specialty loading', __PACKAGE__
+      ));
+    }
+
+    #fall back value, should not be reached.
+    return 1;
   }
 }

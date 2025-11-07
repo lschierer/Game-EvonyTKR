@@ -55,6 +55,21 @@ package Game::EvonyTKR::Service::Cache {
     return $data;
   }
 
+  sub gets ($self, $key) {
+    my $cas_val = $self->instance->gets($key);
+    if (defined $cas_val) {
+      my $encoded = $$cas_val[1];
+      $decoder->decode($encoded, my $data);
+      $$cas_val[1] = $data;
+    }
+    return $cas_val;
+  }
+
+  sub cas ($self, $key, $cas, $value) {
+    my $encoded = $encoder->encode($value);
+    return $self->instance->cas($key, $cas, $encoded);
+  }
+
   sub delete ($self, $key) {
     return $self->instance->delete($key);
   }

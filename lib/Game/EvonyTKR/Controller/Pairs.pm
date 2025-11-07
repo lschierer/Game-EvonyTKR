@@ -85,66 +85,62 @@ package Game::EvonyTKR::Controller::Pairs {
     my $pair_cache  = $c->pair_cache();
     my $is_complete = $pair_cache->get('pair_building_complete');
 
+    my $all_pairs = $c->get_all_pairs();
+
+    if ($all_pairs) {
+      my @new_pairs;
+      $c->logger->info('Processing pairs from all_pairs');
+
+      my $generals = $c->get_generals($app);
+      $c->logger->debug('available general keys for building pairs: ',
+      join(', ', map {sprintf('"%s"', $_ ) } sort keys $generals->%* ));
+      foreach my $wire_pair ($all_pairs->@*) {
+        my $pk = lc($c->normalize($wire_pair->{primary}));
+        $pk =~ s/ /_/g;
+        my $primary = $generals->{$pk};
+        unless ($primary) {
+          $c->logger->error(sprintf(
+            'cannot find primary %s with key %s',
+            $wire_pair->{primary}, $pk
+          ));
+          next;
+        }
+        my $sk = lc($c->normalize($wire_pair->{secondary}));
+        $sk =~ s/ /_/g;
+        my $secondary = $generals->{$sk};
+        unless ($secondary) {
+          $c->logger->error(sprintf(
+            'cannot find secondary %s with key %s',
+            $wire_pair->{secondary}, $sk
+          ));
+          next;
+        }
+        my $type = $wire_pair->{type};
+        my $pair = Game::EvonyTKR::Model::General::Pair->new(
+          primary   => $primary,
+          secondary => $secondary,
+          type      => $type,
+        );
+        push @new_pairs, $pair;
+
+      }
+      my $pairs = $c->merge_into_pairs_by_type($pairs, @new_pairs);
+      $c->logger->info(sprintf('Processed pairs from cache. Total types: %d',
+        scalar keys %$pairs));
+    }
+    elsif($is_complete) {
+      $c->logger->warn(
+        'Pair building complete but no merged conflict data found');
+    }
+
     if (!$is_complete) {
       $c->logger->debug('Pair building not complete yet, will retry');
       Mojo::IOLoop->timer(
-        5 => sub {
+        60 => sub {
           $c->merge_pairs_from_cache($app);
         }
       );
       return;
-    }
-
-    my $merged_pairs = $pair_cache->get_pairs_by_type();
-
-    if ($merged_pairs) {
-      $c->logger->info('Processing pairs from merged_pairs');
-
-      my $generals = $c->get_generals();
-      foreach my $typeKey (keys $merged_pairs->%*) {
-        my $generalList = $merged_pairs->{$typeKey};
-        foreach my $wp ($generalList->@*) {
-          my $pk = lc($c->normalize($wp->{primary}));
-          $pk =~ s/ /_/g;
-          my $primary = $generals->{$pk};
-          unless ($primary) {
-            $c->logger->error(sprintf(
-              'cannot find primary %s with key %s',
-              $wp->{primary}, $pk
-            ));
-            next;
-          }
-
-          my $sk = lc($c->normalize($wp->{secondary}));
-          $sk =~ s/ /_/g;
-          my $secondary = $generals->{$sk};
-          unless ($secondary) {
-            $c->logger->error(sprintf(
-              'cannot find secondary %s with key %s',
-              $wp->{secondary}, $sk
-            ));
-            next;
-          }
-
-          my $type = $wp->{type};
-
-          my $pair = Game::EvonyTKR::Model::General::Pair->new(
-            primary   => $primary,
-            secondary => $secondary,
-            type      => $type,
-          );
-
-          $pairs->{$type} //= [];
-          $pairs->{$type} = [List::AllUtils::uniq($pair, @{ $pairs->{$type} })];
-        }
-      }
-
-      $c->logger->info(sprintf('Processed pairs from cache. Total types: %d',
-        scalar keys %$pairs));
-    }
-    else {
-      $c->logger->warn(
-        'Pair building complete but no merged conflict data found');
     }
   }
 

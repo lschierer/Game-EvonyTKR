@@ -40,6 +40,6 @@ fi
 
 # Start web server with watchexec
 echo "Starting web server with file watching..."
-#watchexec --exts css,pm,ep,js -w lib/ -w bin/ -w share/templates/ -w share/public/ -w share/collections/data/ --restart ./bin/game-evonytkr daemon -m development
-./bin/game-evonytkr daemon -m development
+watchexec --exts css,pm,ep,js -w lib/ -w bin/ -w templates/ -w share/public/ -w share/collections/data/ --restart ./bin/game-evonytkr daemon -m development
+#./bin/game-evonytkr daemon -m development
 # This will run cleanup when watchexec exits

@@ -19,20 +19,65 @@ package Game::EvonyTKR::Controller::Role::Pairs {
     foreach my $key ($self->GeneralKeys->@*) {
       $pairs->{$key} = [];
     }
-    return $self->pair_cache->add('pairs_by_type', $pairs);
+    my $success = $self->pair_cache->add('pairs_by_type', $pairs);
+    my $verify  = $self->pair_cache->get('pairs_by_type');
+    $self->logger->debug(sprintf(
+      'After add with return value "%s", stored value: %s',
+      defined($success) ? $success : 'undef return',
+      Data::Printer::np($verify)
+    ));
+    return (defined($success) && length($success) && $success ne '0');
   }
 
   sub add_wire_pair ($self, $wire_pair) {
-    my $key = sprintf('%s/%s/%s',
-      lc($self->normalize($wire_pair->{type})),
-      lc($self->normalize($wire_pair->{primary})),
-      lc($self->normalize($wire_pair->{secondary})),
-    );
-    $key =~ s/ /_/g;
-    my $cas_val = $self->pair_cache->gets('pairs_by_type');
-    if (defined($cas_val)) {
+    my $key = $self->wire_pair_to_key($wire_pair);
+    my $cas_val;
+
+    $cas_val = $self->pair_cache->gets('pair_list');
+    if(defined($cas_val) && length($$cas_val[1]) > 0){
+      my $longstring = $$cas_val[1];
+      my $pair_list;
+     @$pair_list = split ';', $longstring;
+      $longstring = join ';', List::AllUtils::uniq ($key, $pair_list->@*);
+      $$cas_val[1] = $longstring;
+    } elsif (defined($cas_val) && length($$cas_val[1]) == 0) {
+      $$cas_val[1] = $key;
+    } elsif (defined($cas_val) && $$cas_val[1] == 0){
+      $$cas_val[1] = $key;
+    } else {
+      my $result = $self->pair_cache->add('pair_list', $key);
+      if(not defined($result) || $result == 0){
+        $self->logger->error('could neither retrieve nor add pair_list');
+      }
+      return $result;
+    }
+    $self->pair_cache->cas('pair_list', @$cas_val);
+    $cas_val = undef;
+
+    $cas_val = $self->pair_cache->gets('pairs_by_type');
+
+    if (defined($cas_val) && ref($$cas_val[1]) eq 'HASH') {
       $$cas_val[1] = $self->merge_into_pairs_by_type($$cas_val[1], $wire_pair);
       $self->pair_cache->cas('pairs_by_type', @$cas_val);
+    }
+    elsif (defined($cas_val) && not defined($cas_val->[1])) {
+      $cas_val->[1] = $self->merge_into_pairs_by_type({}, $wire_pair);
+    }
+    elsif (defined($cas_val) && $cas_val->[1] == 0) {
+      my $result = $self->setup_pairs_by_type();
+      if ($result) {
+        return $self->add_wire_pair($wire_pair);
+      }
+      else {
+        $self->logger->error(sprintf('error setting up pairs_by_type: %s.',
+          defined($result) ? $result : 'undef result'));
+        return $result;
+      }
+    }
+    else {
+      $self->logger->error(
+        sprintf('cannot get pairs_by_type %s.', Data::Printer::np($cas_val)));
+      return undef;
     }
 
     return $self->pair_cache->set($key, $wire_pair);
@@ -52,7 +97,7 @@ package Game::EvonyTKR::Controller::Role::Pairs {
       $pairs_by_type->{ $np->{type} } //= [];
       $pairs_by_type->{ $np->{type} } = [
         List::UtilsBy::uniq_by {
-          sprintf('%s/%s/%s', $_->{type}, $_->{primary}, $_->{secondary})
+          $self->wire_pair_to_key($_)
         }
         ($np, $pairs_by_type->{ $np->{type} }->@*)
       ];
@@ -62,6 +107,32 @@ package Game::EvonyTKR::Controller::Role::Pairs {
 
   sub get_pairs_by_type ($self) {
     return $self->pair_cache->get('pairs_by_type');
+  }
+
+  sub get_all_pairs ($self) {
+    my $key_list = $self->pair_cache->get('pair_list') // '';
+    my $keys = [split ';', $key_list];
+    my $pairs = [];
+    foreach my $pair_key ($keys->@*){
+      my $pair = $self->pair_cache->get($pair_key);
+      unless($pair){
+        $self->logger->error("failed to get $pair_key");
+        next;
+      }
+      push @{ $pairs }, $pair;
+    }
+    return $pairs;
+  }
+
+  sub wire_pair_to_key($self, $wire_pair) {
+    my $key = sprintf('%s/%s/%s',
+      $wire_pair->{type},
+      $self->normalize($wire_pair->{primary}),
+      $self->normalize($wire_pair->{secondary}),
+    );
+    $key = lc($key);
+    $key =~ s/ /_/g;
+    return $key;
   }
 
 }

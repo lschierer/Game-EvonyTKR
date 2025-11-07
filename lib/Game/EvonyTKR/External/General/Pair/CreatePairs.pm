@@ -6,6 +6,7 @@ package Game::EvonyTKR::External::General::Pair::CreatePairs {
   use Mojo::Base 'Game::EvonyTKR::External::JobBase',          -signatures;
   use Mojo::Base 'Game::EvonyTKR::Role::Logger',               -role;
   use Mojo::Base 'Game::EvonyTKR::Controller::Role::Generals', -role;
+  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Pairs', -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants', -role;
   require Game::EvonyTKR::Service::Cache;
   require Game::EvonyTKR::Model::General::Conflict::Book;
@@ -16,10 +17,6 @@ package Game::EvonyTKR::External::General::Pair::CreatePairs {
     my $signal = __PACKAGE__ =~ s/::/_/gr;
     $app->plugins->emit($signal => 1);
   }
-
-  has 'pair_cache' => sub ($job) {
-    return Game::EvonyTKR::Service::Cache->new(namespace => 'pairs:');
-  };
 
   has 'conflict_cache' => sub ($job) {
     return Game::EvonyTKR::Service::Cache->new(namespace => 'conflicts:');
@@ -144,19 +141,6 @@ package Game::EvonyTKR::External::General::Pair::CreatePairs {
         general_name            => $general_name,
         type                    => $type,
       );
-    }
-
-    # Store pairs in cache
-    if (@pairs) {
-      my $cache_key =
-        sprintf('%s_%s', lc($job->normalize($general_name)), $type);
-      $cache_key =~ s/ /_/g;
-      $job->pair_cache->set($cache_key, \@pairs);
-      $job->logger->info(sprintf(
-        'Stored %d pairs for %s/%s',
-        scalar @pairs,
-        $general_name, $type
-      ));
     }
 
     $job->logger->info(sprintf(

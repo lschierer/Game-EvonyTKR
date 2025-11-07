@@ -23,11 +23,11 @@
     </tr>
   </thead>
   <tbody>
-    % for my $pair (@$pairs) {
+    % for my $pair (sort @$pairs) {
     <tr>
-      <td><%= $pair->{primary} %></td>
-      <td><%= $pair->{secondary} %></td>
-      <td><%= $pair->{type} %></td>
+      <td><%== $pair->primary->name %></td>
+      <td><%== $pair->secondary->name %></td>
+      <td><%== $pair->type %></td>
     </tr>
     % }
   </tbody>

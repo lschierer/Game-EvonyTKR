@@ -21,16 +21,16 @@ package Game::EvonyTKR::Model::BasicAttributes {
     'fallback' => 1;
 
   has 'attack' => sub {
-    Game::EvonyTKR::Role::BasicAttribute->new(attribute_name => 'attack');
+    Game::EvonyTKR::Model::BasicAttribute->new(attribute_name => 'attack');
   };
   has 'leadership' => sub {
-    Game::EvonyTKR::Role::BasicAttribute->new(attribute_name => 'leadership');
+    Game::EvonyTKR::Model::BasicAttribute->new(attribute_name => 'leadership');
   };
   has 'defense' => sub {
-    Game::EvonyTKR::Role::BasicAttribute->new(attribute_name => 'defense');
+    Game::EvonyTKR::Model::BasicAttribute->new(attribute_name => 'defense');
   };
   has 'politics' => sub {
-    Game::EvonyTKR::Role::BasicAttribute->new(attribute_name => 'politics');
+    Game::EvonyTKR::Model::BasicAttribute->new(attribute_name => 'politics');
   };
 
   # Get specific attribute
