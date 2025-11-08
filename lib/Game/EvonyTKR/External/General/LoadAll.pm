@@ -31,7 +31,7 @@ package Game::EvonyTKR::External::General::LoadAll {
       __PACKAGE__, Log::Log4perl::Level::to_level($job->logger->level())
     ));
 
-    return if($job->are_prereqs_outstanding());
+    return if ($job->are_prereqs_outstanding());
 
     $job->logger->info('Starting LoadAll generals job');
 
@@ -94,8 +94,10 @@ package Game::EvonyTKR::External::General::LoadAll {
       states => ['failed'],
     })->total // 0;
 
-    $job->logger->debug(sprintf('Job query results: book_pending=%d, specialty_pending=%d',
-      $bookLoaderPendingCount, $specialtyLoaderPendingCount));
+    $job->logger->debug(sprintf(
+      'Job query results: book_pending=%d, specialty_pending=%d',
+      $bookLoaderPendingCount, $specialtyLoaderPendingCount
+    ));
 
     if ($bookLoaderFailedCount > 0) {
       return $job->fail(

@@ -32,8 +32,7 @@ package Game::EvonyTKR::Controller::Role::Generals {
 
     my $normalized_name = lc($self->normalize($name)) // '';
     return unless (length($normalized_name));
-    $logger->debug(sprintf(
-      'key "%s" for name "%s"', $normalized_name, $name));
+    $logger->debug(sprintf('key "%s" for name "%s"', $normalized_name, $name));
     $normalized_name =~ s/ /_/g;
     $logger->debug(sprintf(
       'key after spaces removed: "%s", for name "%s"',

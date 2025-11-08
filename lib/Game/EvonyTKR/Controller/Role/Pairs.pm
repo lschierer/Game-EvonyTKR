@@ -14,6 +14,10 @@ package Game::EvonyTKR::Controller::Role::Pairs {
     return Game::EvonyTKR::Service::Cache->new(namespace => 'pairs__');
   };
 
+  has 'conflict_cache' => sub ($job) {
+    return Game::EvonyTKR::Service::Cache->new(namespace => 'conflicts__');
+  };
+
   sub setup_pairs_by_type ($self) {
     my $pairs = {};
     foreach my $key ($self->GeneralKeys->@*) {
@@ -34,19 +38,22 @@ package Game::EvonyTKR::Controller::Role::Pairs {
     my $cas_val;
 
     $cas_val = $self->pair_cache->gets('pair_list');
-    if(defined($cas_val) && length($$cas_val[1]) > 0){
+    if (defined($cas_val) && length($$cas_val[1]) > 0) {
       my $longstring = $$cas_val[1];
       my $pair_list;
-     @$pair_list = split ';', $longstring;
-      $longstring = join ';', List::AllUtils::uniq ($key, $pair_list->@*);
+      @$pair_list  = split ';', $longstring;
+      $longstring  = join ';', List::AllUtils::uniq($key, $pair_list->@*);
       $$cas_val[1] = $longstring;
-    } elsif (defined($cas_val) && length($$cas_val[1]) == 0) {
+    }
+    elsif (defined($cas_val) && length($$cas_val[1]) == 0) {
       $$cas_val[1] = $key;
-    } elsif (defined($cas_val) && $$cas_val[1] == 0){
+    }
+    elsif (defined($cas_val) && $$cas_val[1] == 0) {
       $$cas_val[1] = $key;
-    } else {
+    }
+    else {
       my $result = $self->pair_cache->add('pair_list', $key);
-      if(not defined($result) || $result == 0){
+      if (not defined($result) || $result == 0) {
         $self->logger->error('could neither retrieve nor add pair_list');
       }
       return $result;
@@ -94,13 +101,20 @@ package Game::EvonyTKR::Controller::Role::Pairs {
         ));
         next;
       }
+
       $pairs_by_type->{ $np->{type} } //= [];
-      $pairs_by_type->{ $np->{type} } = [
-        List::UtilsBy::uniq_by {
+      $pairs_by_type->{ $np->{type} } = [ $np, $pairs_by_type->{ $np->{type} }->@* ];
+    }
+
+    foreach my $type (keys $pairs_by_type->%*){
+      $pairs_by_type->{$type} =  [
+        sort { $self->wire_pair_to_key($a) cmp $self->wire_pair_to_key($b) }
+         List::UtilsBy::uniq_by {
           $self->wire_pair_to_key($_)
-        }
-        ($np, $pairs_by_type->{ $np->{type} }->@*)
-      ];
+        } $pairs_by_type->{$type}->@* ];
+
+      $self->logger->debug(sprintf('after merge, there are %s %s type pairs',
+      scalar($pairs_by_type->{$type}->@*), $type));
     }
     return $pairs_by_type;
   }
@@ -111,15 +125,15 @@ package Game::EvonyTKR::Controller::Role::Pairs {
 
   sub get_all_pairs ($self) {
     my $key_list = $self->pair_cache->get('pair_list') // '';
-    my $keys = [split ';', $key_list];
-    my $pairs = [];
-    foreach my $pair_key ($keys->@*){
+    my $keys     = [split ';', $key_list];
+    my $pairs    = [];
+    foreach my $pair_key ($keys->@*) {
       my $pair = $self->pair_cache->get($pair_key);
-      unless($pair){
+      unless ($pair) {
         $self->logger->error("failed to get $pair_key");
         next;
       }
-      push @{ $pairs }, $pair;
+      push @{$pairs}, $pair;
     }
     return $pairs;
   }

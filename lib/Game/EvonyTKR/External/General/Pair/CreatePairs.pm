@@ -6,7 +6,7 @@ package Game::EvonyTKR::External::General::Pair::CreatePairs {
   use Mojo::Base 'Game::EvonyTKR::External::JobBase',          -signatures;
   use Mojo::Base 'Game::EvonyTKR::Role::Logger',               -role;
   use Mojo::Base 'Game::EvonyTKR::Controller::Role::Generals', -role;
-  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Pairs', -role;
+  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Pairs',    -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants', -role;
   require Game::EvonyTKR::Service::Cache;
   require Game::EvonyTKR::Model::General::Conflict::Book;
@@ -42,6 +42,7 @@ package Game::EvonyTKR::External::General::Pair::CreatePairs {
 
     # Validate the type
     unless ($job->ValidateGeneralType($type)) {
+      $job->logger->error("Invalid general type: $type");
       return $job->fail("Invalid general type: $type");
     }
 
@@ -51,6 +52,7 @@ package Game::EvonyTKR::External::General::Pair::CreatePairs {
     # Find the primary general
     my $primary = $generals->{ $job->normalize($general_name) };
     unless ($primary) {
+      $job->logger->error("General '$general_name' not found");
       return $job->fail("General '$general_name' not found");
     }
     $primary->populateBuiltinBook();

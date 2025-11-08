@@ -42,7 +42,10 @@ package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
       sprintf('Found %d generals to process', scalar keys %$generals));
 
     # Spawn CreatePairs jobs for each general/type combination
-    my $job_count = 0;
+    my $job_count     = 0;
+    my @current_batch = ();
+    my $batch_count   = 0;
+
     foreach my $general_name (keys %$generals) {
       my $general = $generals->{$general_name};
 
@@ -58,48 +61,78 @@ package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
           'Enqueued create_pairs job %s for general %s, type %s',
           $job_id, $general_name, $type
         ));
+
+        push @current_batch, $job_id;
         $job_count++;
+
+        # Spawn ReduceBatch when we have 10 jobs
+        if (@current_batch >= 10) {
+          my $reduce_jid = $job->minion->enqueue(
+            'reduce_batch' => [] => {
+              parents  => [@current_batch],
+              priority => 50,
+            }
+          );
+          $job->logger->debug(sprintf(
+            'Spawned reduce_batch job %s for batch %d (%d jobs)',
+            $reduce_jid, ++$batch_count, scalar(@current_batch)
+          ));
+          @current_batch = ();
+        }
       }
     }
 
-    $job->logger->info(
-      sprintf('LoadAllPairBuilders job completed, spawned %d create_pairs jobs',
-        $job_count)
-    );
+    # Spawn final ReduceBatch for remaining jobs
+    if (@current_batch > 0) {
+      my $reduce_jid = $job->minion->enqueue(
+        'reduce_batch' => [] => {
+          parents => [@current_batch]
+        }
+      );
+      $job->logger->debug(sprintf(
+        'Spawned final reduce_batch job %s for batch %d (%d jobs)',
+        $reduce_jid, ++$batch_count, scalar(@current_batch)
+      ));
+    }
+
+    $job->logger->info(sprintf(
+'LoadAllPairBuilders completed: spawned %d create_pairs jobs in %d batches',
+      $job_count, $batch_count
+    ));
   }
 
   sub are_prereqs_outstanding ($job) {
-      my $generalLoaderFinishedCount = $job->app->minion->jobs({
-          tasks  => ['load_general'],
-          states => ['finished'],
-      })->total // 0;
+    my $generalLoaderFinishedCount = $job->app->minion->jobs({
+      tasks  => ['load_general'],
+      states => ['finished'],
+    })->total // 0;
 
-      my $generalLoaderPendingCount = $job->app->minion->jobs({
-          tasks  => ['load_general'],
-          states => ['active', 'inactive'],
-      })->total // 0;
+    my $generalLoaderPendingCount = $job->app->minion->jobs({
+      tasks  => ['load_general'],
+      states => ['active', 'inactive'],
+    })->total // 0;
 
-      my $generalLoaderFailedCount = $job->app->minion->jobs({
-          tasks  => ['load_general'],
-          states => ['failed'],
-      })->total // 0;
+    my $generalLoaderFailedCount = $job->app->minion->jobs({
+      tasks  => ['load_general'],
+      states => ['failed'],
+    })->total // 0;
 
-      if ($generalLoaderFailedCount > 0) {
-          return $job->fail('cannot build pairs if general import failed');
-      }
+    if ($generalLoaderFailedCount > 0) {
+      return $job->fail('cannot build pairs if general import failed');
+    }
 
-      $job->note(generalLoaderPendingCount => $generalLoaderPendingCount);
+    $job->note(generalLoaderPendingCount => $generalLoaderPendingCount);
 
-      if ($generalLoaderPendingCount > 0) {
-          my $delay = List::Util::min(2 * $generalLoaderPendingCount, 30);
-          return $job->retry({ delay => $delay });
-      }
+    if ($generalLoaderPendingCount > 0) {
+      my $delay = List::Util::min(2 * $generalLoaderPendingCount, 30);
+      return $job->retry({ delay => $delay });
+    }
 
-      if ($generalLoaderFinishedCount > 0) {
-          return 0;  # Ready to proceed
-      }
+    if ($generalLoaderFinishedCount > 0) {
+      return 0;    # Ready to proceed
+    }
 
-      return $job->fail('no general loading jobs found');
+    return $job->fail('no general loading jobs found');
   }
 
 }

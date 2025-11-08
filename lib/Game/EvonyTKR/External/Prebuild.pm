@@ -12,7 +12,8 @@ require Game::EvonyTKR::Shared::Constants;
 require Game::EvonyTKR::Model::General;
 require Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders;
 require Game::EvonyTKR::External::General::Pair::CreatePairs;
-require Game::EvonyTKR::External::General::Pair::MonitorCreatePairs2;
+require Game::EvonyTKR::External::General::Pair::ReduceCoordinator;
+require Game::EvonyTKR::External::General::Pair::ReduceBatch;
 require Game::EvonyTKR::External::MonitorLoaders;
 require Game::EvonyTKR::External::General::Loader;
 require Game::EvonyTKR::External::General::LoadAll;
@@ -36,7 +37,7 @@ package Game::EvonyTKR::External::Prebuild {
   state $OnlyOnePrebuild = 0;
 
   state $generalCache;
-  state $prereqs = {};
+  state $prereqs  = {};
   state $monitors = {};
 
   sub register ($plugin, $app, $conf = {}) {
@@ -70,7 +71,8 @@ package Game::EvonyTKR::External::Prebuild {
       'Game::EvonyTKR::External::General::Loader',
       'Game::EvonyTKR::External::General::Pair::CreatePairs',
       'Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders',
-      'Game::EvonyTKR::External::General::Pair::MonitorCreatePairs2',
+      'Game::EvonyTKR::External::General::Pair::ReduceCoordinator',
+      'Game::EvonyTKR::External::General::Pair::ReduceBatch',
       'Game::EvonyTKR::External::MonitorLoaders',
       'Game::EvonyTKR::External::Specialty::LoadAllSpecialties',
       'Game::EvonyTKR::External::Specialty::Loader',
@@ -106,9 +108,11 @@ package Game::EvonyTKR::External::Prebuild {
   sub prebuild_init ($plugin, $app) {
     # wait for prerequisites...
     if (!$plugin->prebuildPrerequisites) {
-      Mojo::IOLoop->timer( 5 => sub {
-        $plugin->prebuild_init($app);
-      });
+      Mojo::IOLoop->timer(
+        5 => sub {
+          $plugin->prebuild_init($app);
+        }
+      );
     }
 
     if (my $g =
@@ -183,17 +187,15 @@ package Game::EvonyTKR::External::Prebuild {
     unless ($job->prebuildPrerequisites) {
       $job->logger->debug(sprintf('cannot start prebuild; prereqs: %s',
         Data::Printer::np($prereqs, multiline => 0)));
-      return $job->retry({delay => $refresh_every});
+      return $job->retry({ delay => $refresh_every });
     }
-
-
     my $timer_id;
-    Mojo::IOLoop->timer(1 => sub{
-      $job->prebuild_db_lock($timer_id);
-    });
-    Mojo::IOLoop->timer(1 => sub{
-      $job->monitor_prebuild($timer_id);
-    });
+    Mojo::IOLoop->timer(
+      0.01 => sub {
+        $job->logger->debug("prebuild obtaining db lock");
+        $job->prebuild_db_lock($timer_id);
+      }
+    );
 
     my $loaderJobDefs = {
       load_all_generic_books => {
@@ -235,8 +237,8 @@ package Game::EvonyTKR::External::Prebuild {
 
     $job->logger->info('launching jobs to spawn loaders.');
 
-    my @loaderJids;
-    foreach my $jobname (keys $loaderJobDefs->%*) {
+    my $loaderJids = [];
+    foreach my $jobname (sort keys $loaderJobDefs->%*) {
       my $args   = $loaderJobDefs->{$jobname}->{args} // [];
       my $params = $loaderJobDefs->{$jobname}         // {};
       delete($params->{args}) if (exists $params->{args});
@@ -245,36 +247,60 @@ package Game::EvonyTKR::External::Prebuild {
         $job->minion->enqueue($jobname => [$args->@*] => { $params->%* });
       if (defined($jid)) {
         $job->note($jobname => $jid);
-        $job->logger->debug(sprintf(
-          'launched %s with jid %s', $jobname, $jid));
-        push @loaderJids, $jid;
+        $job->logger->debug(sprintf('launched %s with jid %s', $jobname, $jid));
+        push @{$loaderJids}, $jid;
       }
       else {
         my $errmessage = sprintf('failed to launch %s', $jobname);
         $job->logger->error($errmessage);
+        Mojo::IOLoop->remove($timer_id) if ($timer_id);
         return $job->fail($errmessage);
       }
     }
 
-    if (scalar(@loaderJids) == keys($loaderJobDefs->%*)) {
+    if (scalar(@$loaderJids) == keys($loaderJobDefs->%*)) {
       $job->logger->info('all job spawners launched');
     }
     else {
-      my $errmessage = sprintf(
-        'launched %s spawners, expected %s. ',
-        scalar(@loaderJids), keys($loaderJobDefs->%*)
-      );
+      my $errmessage = sprintf('launched %s spawners, expected %s. ',
+        scalar(@$loaderJids), keys($loaderJobDefs->%*));
       $job->logger->error($errmessage);
-      $job->fail($errmessage);
+      Mojo::IOLoop->remove($timer_id) if ($timer_id);
+      return $job->fail($errmessage);
     }
 
-    while(List::AllUtils::any {$_ ne 'finished'} values $monitors->%*){
-      sleep 5;
+    my $monitor_names = [
+      sort grep { $_ =~ /(?:monitor|coordinator)/i }
+        keys $job->minion->tasks->%*
+    ];
+
+    foreach my $mn ($monitor_names->@*) {
+
+      unless (
+        $job->minion->jobs({
+          tasks  => [$mn],
+          states => ['active', 'inactive', 'finished'],
+        })->total > 0
+      ) {
+        my $mj = $job->minion->enqueue(
+          $mn => [] => {
+            attempts => 5,
+            delay    => 10,
+            expire   => 2000,
+            priority => 90,
+            parents  => $loaderJids
+          }
+        );
+        $monitors->{$mn} = $mj;
+      }
     }
-    $job->finish('Prebuild Complete');
+
+    Mojo::IOLoop->remove($timer_id) if ($timer_id);
+    $job->finish('Prebuild spawning complete');
   }
 
-  sub prebuild_db_lock($job, $timer_id){
+  sub prebuild_db_lock($job, $db, $job_key, $owner, $ttl, $timer_id,
+    $refresh_every) {
     $timer_id = Mojo::IOLoop->recurring(
       $refresh_every => sub {
         $job->logger->info('prebuild db lock loop');
@@ -290,73 +316,6 @@ package Game::EvonyTKR::External::Prebuild {
     Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
   }
 
-  sub monitor_prebuild($job, $timer_id) {
-    my $monitor_names = [];
-    @{$monitor_names} = grep {$_ =~ /monitor/ } keys $job->minion->tasks->%*;
-
-    my $monitorTimer;
-    $monitorTimer = Mojo::IOLoop->recurring(5 => sub{
-
-      my @loaderJids;
-      $job->minion->jobs({
-        tasks   => [$monitor_names->@*],
-      })->each(sub {
-        my $info = $_;
-        push @loaderJids, $info->{id};
-      });
-
-      unless(scalar(@loaderJids) > 0){
-        Mojo::IOLoop->timer(1 => sub{
-          $job->monitor_prebuild($timer_id);
-        });
-      }
-
-      foreach my $mn ($monitor_names->@*){
-        my $monitor_args = [];
-        push @{ $monitor_args }, \@loaderJids;
-
-        unless($job->minion->jobs({
-          tasks   => [$mn],
-          states  => ['active','inactive','finished'],
-        })->total > 0){
-          my $mj = $job->minion->enqueue($mn => [ $monitor_args->@* ] => {
-            attempts => 5,
-            delay    => 10,
-            expire   => 200,
-            priority => 90,
-          });
-          $monitors->{$mn} = $mj;
-        }
-
-        $job->minion->jobs({
-          tasks   => [$mn],
-          states  => ['active','inactive','finished'],
-        })->each(sub{
-          my $info = $_;
-          $job->logger->info(sprintf('found %s with jid %s', $mn, $info->{id}));
-          if($info->{state} eq 'failed'){
-            Mojo::IOLoop->remove($monitorTimer);
-            Mojo::IOLoop->remove($timer_id);
-            my $errmessage = sprintf('monitor %s failed: %s', $info->{id}, $info->{result});
-            $job->logger->error($errmessage);
-            return $job->fail($errmessage);
-          }
-          if($info->{state} eq 'finished'){
-            $job->logger->info(sprintf('monitor %s finished: %s', $info->{id}, ($info->{result} // 'no result')));
-            $monitors->{$mn} = 'finished';
-          }
-        });
-      }
-
-      if(List::AllUtils::all {$_ eq 'finished'} values $monitors->%*){
-        $job->logger->info('All Monitors Finished');
-        Mojo::IOLoop->remove($monitorTimer);
-        Mojo::IOLoop->remove($timer_id);
-        return $job->finish('All Monitors Finished');
-      }
-    });
-    Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
-  }
 }
 
 1;

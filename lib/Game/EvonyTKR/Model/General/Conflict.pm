@@ -797,7 +797,11 @@ class Game::EvonyTKR::Model::General::Conflict :
     }
 
     foreach my $ct (keys $ngbct->%*) {
-      my $all = [ List::AllUtils::uniq ($ngbct->{$ct}->@*, $groups_by_conflict_type->{$ct}->@*) ];
+      my $all = [
+        List::AllUtils::uniq(
+          $ngbct->{$ct}->@*, $groups_by_conflict_type->{$ct}->@*
+        )
+      ];
       $groups_by_conflict_type->{$ct} = $all;
     }
   }
