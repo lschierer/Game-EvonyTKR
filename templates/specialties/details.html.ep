@@ -20,24 +20,11 @@
               <% my $label = specialty_level_names($key, 1); %>
               <% my $level = $item->levels->{$key}; %>
               <td class="spectrum-Table-cell <%= $level->{level} %>">
-                <% foreach my $buff (@{ $level->{buffs} }) { %>
-                  <dl>
-                    <dt>Attribute: </dt><dd><%= $buff->attribute %></dd>
-                    <dt>Targed Type: </dt>
-                    <% if ( length $buff->targetedType  > 0 ) { %>
-                        <dt>Troop Type: </dt>
-                        <dd><%= $buff->targetedType %></dd>
-                    <% } %>
-                    <% if (scalar @{$buff->conditions()} > 0 ) { %>
-                      <% my @conditions = $buff->conditions()->@*; %>
-                        <dt>Conditions:</dt>
-                        <% foreach my $condition (@conditions) { %>
-                          <dd><%= $condition %></dd>
-                        <% } %>
-                    <% } %>
-                    <dt>Value: </dt><dd><%= $buff->value->number %><%= $buff->value->unit eq 'percentage' ? '%' : '' %></dd>
-                  </dl>
-                <% } %>
+                <ul>
+                  <% foreach my $buff  (@{ $level->{buffs} }) { %>
+                    <%= include 'buffs/single', buff => $buff %>
+                  <% } %>
+                </ul>
               </td>
             <% } %>
           </tr>

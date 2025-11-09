@@ -8,32 +8,7 @@
       </p>
       <ul>
         <% foreach my $buff  (@{ $item->buff }) { %>
-          <li>
-            <dl>
-              <dt>Attribute: </dt>
-              <dd><%= $buff->attribute %>
-              <% if( defined($buff->targetedType)) { %>
-                <dt>Troop Type: </dt>
-                <% if( Scalar::Util::reftype($buff->targetedType) && Scalar::Util::reftype($buff->targetedType) eq 'ARRAY') { %>
-                  <% foreach my $tt ($buff->targetedType->@*) { %>
-                    <dd><%== $tt %></dd>
-                  <% } %>
-                <% } elsif ( length $buff->targetedType  > 0 ) { %>
-                  <dd><%= $buff->targetedType %></dd>
-                <% } else { %>
-                  <!-- <%== $buff->targetedType %> -->
-                <% } %>
-              <% } %>
-              <% if ( scalar $buff->conditions()  ) { %>
-                <dt>Condition(s): </dt>
-                <% foreach my $condition ($buff->conditions()->@* ) { %>
-                  <dd><%= $condition %></dd>
-                <% } %>
-              <% } %>
-              <dt>Value: </dt>
-              <dd><%= $buff->value->number %><%= $buff->value->unit eq 'percentage' ? '%' : '' %></dd>
-            </dl>
-          </li>
+          <%= include 'buffs/single', buff => $buff %>
         <% } %>
       </ul>
     <% } else { %>
