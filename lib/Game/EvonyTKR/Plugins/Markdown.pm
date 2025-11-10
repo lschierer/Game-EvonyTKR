@@ -14,6 +14,7 @@ package Game::EvonyTKR::Plugins::Markdown {
   use Carp;
 
   my $logger;
+  state $pandoc;
 
   my $customCommonMark = join('+',
     qw(commonmark alerts attributes autolink_bare_uris footnotes implicit_header_references pipe_tables raw_html rebase_relative_paths smart gfm_auto_identifiers)
@@ -22,6 +23,9 @@ package Game::EvonyTKR::Plugins::Markdown {
   sub register ($self, $app, $config) {
     $logger = Log::Log4perl->get_logger(__PACKAGE__);
     $logger->info(sprintf('initializing %s.', __PACKAGE__));
+
+    $pandoc = Pandoc->new();
+    #TODO: figure out fallback Markdown parsing if Pandoc isn't available.
 
     # Add helper method for rendering markdown files
     $app->helper(
@@ -107,8 +111,8 @@ package Game::EvonyTKR::Plugins::Markdown {
       return '';
     }
 
-    my $parser       = Pandoc->new();
-    my $html_content = $parser->convert(
+
+    my $html_content = $pandoc->convert(
       $customCommonMark => 'html',
       $snippet
     );
@@ -165,8 +169,7 @@ package Game::EvonyTKR::Plugins::Markdown {
       "Template paths: " . join(", ", @{ $c->app->renderer->paths }));
     $logger->debug("Looking for template: $template.html.ep");
 
-    my $parser       = Pandoc->new();
-    my $html_content = $parser->convert(
+    my $html_content = $pandoc->convert(
       $customCommonMark => 'html',
       $parsedFile->{content}
     );

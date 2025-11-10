@@ -6,6 +6,7 @@ use namespace::autoclean;
 
 package Game::EvonyTKR::Controller::Specialties {
   use Mojo::Base 'Game::EvonyTKR::Controller::ControllerBase';
+  use Mojo::Base 'Game::EvonyTKR::Role::Common';
   use Mojo::Base 'Game::EvonyTKR::Role::Logger',                  -role;
   use Mojo::Base 'Game::EvonyTKR::Controller::Role::Specialties', -role;
   use List::AllUtils qw( all any none first);
@@ -28,28 +29,17 @@ package Game::EvonyTKR::Controller::Specialties {
     return "Specialties";
   }
 
-  sub get_all_specialties ($self, $app) {
-    # Get all specialties from cache
-    my $specialty_list = $self->list_specialties($app);
-    $self->logger->debug(sprintf(
-      'got list with %s entries, list is %s',
-      scalar @{$specialty_list},
-      Data::Printer::np($specialty_list)
-    ));
-    state %specialties;
+  sub get_all_specialties ($c, $app) {
+    state %specialties;      # normalized_name -> object
+    state $sig;              # signature of expected set we’ve fully hydrated
 
-    foreach my $name (@$specialty_list) {
-      my $key = lc($self->normalize($name));
-      $key =~ s/ /_/g;
-      next if (exists $specialties{$key});
-
-      my $specialty = $self->get_specialty($name);
-      if ($specialty) {
-        $specialties{$key} = $specialty;
-      }
-    }
-
-    return \%specialties;
+    return c->_hydrate_from_list(
+      $app,
+      sub ($app2) { $c->list_specialties($app2) },      # list provider
+      sub ($name) { $c->get_specialty($name) },         # fetch one
+      \%specialties,
+      \$sig,
+    );
   }
 
   sub register($c, $app, $config = {}) {
@@ -83,8 +73,9 @@ package Game::EvonyTKR::Controller::Specialties {
       ->to(controller => $controller_name, action => 'index')
       ->name("${base}_index");
 
-    # Build routes for specialties (similar to books pattern)
-    $c->build_routes($app, $mainRoutes, $controller_name);
+    Mojo::IOLoop->timer(60 => sub{
+      $c->build_routes($app, $mainRoutes, $controller_name);
+    });
 
     $app->helper(
       get_all_specialties => sub {

@@ -10,6 +10,14 @@ package Game::EvonyTKR::Plugins::Sqlite {
   use Carp;
 
   sub register ($self, $app, $config) {
+
+    my $dbPath = Mojo::File->new('minion.db');
+
+    $app->plugin(
+      Minion => {
+        SQLite => "sqlite:$dbPath?sqlite_use_immediate_transaction=1&busy_timeout=30000",
+      }
+    );
     my $db = $app->minion->backend->sqlite->db;
     ensure_lock_table_sqlite($db);
 

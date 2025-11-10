@@ -11,14 +11,14 @@ require Game::EvonyTKR::Controller::ControllerBase;
 require Game::EvonyTKR::External::JobBase;
 require Game::EvonyTKR::Log::Config;
 
-require GitRepo::Reader;
-
 package Game::EvonyTKR {
   use Mojo::Base 'Mojolicious', -strict, -signatures;
   use Log::Any::Adapter;
   use Log::Log4perl;
   use Mojo::File::Share qw(dist_dir );
   use Mojo::Loader      qw(find_modules load_class);
+  use Fcntl qw(:flock);
+  use Mojo::File;
   use POSIX             qw(setsid);
   use Scalar::Util 'weaken';
   use Carp;
@@ -29,14 +29,21 @@ package Game::EvonyTKR {
 
   sub startup ($app) {
     _init_core($app);      # runs in web *and* worker
-    _init_minion($app);    # runs in web *and* worker (tasks visible to workers)
+    _init_minion($app);
 
     # web-only: routes/UI and optional worker spawning
     $app->hook(
       before_server_start => sub ($server, $app) {
-        _init_web($app);    # routes, UIs, helpers that need HTTP server
-        _spawn_minion_workers($app)
-          ;    # optional: only if you want web proc to fork workers
+        # routes, UIs, helpers that need HTTP server
+        _init_web($app);
+          # optional: only if you want web proc to fork workers
+        Mojo::IOLoop->timer(1 => sub {
+          return unless _this_proc_is_a_web_server($server);  # has acceptors?
+          return unless _i_am_the_one_spawner($app);          # spawn once only
+          return if _this_is_a_minion_process();              # don't spawn from minion cmd
+
+          _spawn_minion_workers($app);
+        });
       }
     );
 
@@ -44,6 +51,30 @@ package Game::EvonyTKR {
     Mojo::IOLoop->next_tick(sub {
       $app->plugins->emit(mojo_worker_started => { app => $app });
     });
+  }
+
+
+
+  sub _this_proc_is_a_web_server ($server) {
+    # Minion commands and plain perl procs have no HTTP acceptors
+    my $acceptors = eval { $server->can('acceptors') ? scalar @{$server->acceptors} : 0 } // 0;
+    return $acceptors > 0;
+  }
+
+  sub _this_is_a_minion_process {
+    return 1 if $ENV{MINION_WORKER_CHILD};
+    return 1 if ($ENV{MOJO_COMMAND} && $ENV{MOJO_COMMAND} eq 'minion');
+    # belt-and-suspenders: if started like `script/app minion worker ...`
+    return 1 if grep { $_ eq 'minion' } @ARGV;
+    return 0;
+  }
+
+  sub _i_am_the_one_spawner ($app) {
+    # File lock so only one preforked web worker “wins”
+    state $fh;
+    $fh //= Mojo::File->new($app->home->child('spawn_minion.lock'))->open('>>');
+    return 0 unless $fh;
+    return flock($fh, LOCK_EX | LOCK_NB);  # true only in the first process that grabs it
   }
 
   sub _init_core ($app) {
@@ -86,42 +117,41 @@ package Game::EvonyTKR {
   }
 
   sub _init_minion($app) {
-    # First Plugins that provide helpers but do not define routes
-    my $dbPath = Mojo::File->new('minion.db');
-
-    $app->log->debug("dbPath is $dbPath");
-    $app->plugin(
-      Minion => {
-        SQLite => "sqlite:$dbPath?"
-          . 'sqlite_use_immediate_transaction=1&busy_timeout=30000',
-      }
-    );
-
-    my $db = $app->minion->backend->sqlite->db;
-    $app->minion->backend->sqlite->on(
-      connection => sub ($sqlite, $dbh) {
-        $dbh->do('PRAGMA journal_mode=WAL');
-        $dbh->do('PRAGMA synchronous=NORMAL');
-        $dbh->do('PRAGMA temp_store=MEMORY');
-        $dbh->do('PRAGMA foreign_keys=ON');
-        $dbh->do('PRAGMA busy_timeout=8000');
-      }
-    );
-    $db->ping;    # Blocks until backend is ready
-
-    $app->minion->backend->sqlite->migrations->name('evonytkr')
-      ->from_data('Game::EvonyTKR', 'migrations')
-      ->migrate;
-
-    $app->minion->repair;
+    # this defines helpers needed by both the web and worker processes.
+    #
     $app->plugin('Game::EvonyTKR::Plugins::Sqlite');
 
-    $app->ensure_lock_table_sqlite($db);
+    # Apply PRAGMAs for ALL future connections first
+    my $sqlite = $app->minion->backend->sqlite;
+    $sqlite->on(connection => sub ($sqlite, $dbh) {
+      $dbh->do('PRAGMA journal_mode=WAL');
+      $dbh->do('PRAGMA synchronous=NORMAL');
+      $dbh->do('PRAGMA temp_store=MEMORY');
+      $dbh->do('PRAGMA foreign_keys=ON');
+      $dbh->do('PRAGMA busy_timeout=8000');
+    });
+
+    # Now it's safe to open a handle
+    my $db = $sqlite->db;
+    $db->ping;
+
+    # Run migrations/repair ONLY in the web parent (not in forked or exec'd workers)
+    my $is_worker_child = $ENV{MINION_WORKER_CHILD};
+    my $is_minion_cmd   = ($0 =~ /minion(?:\.pl)?$/i) || ($ENV{MOJO_COMMAND} && $ENV{MOJO_COMMAND} eq 'minion');
+
+    unless ($is_worker_child || $is_minion_cmd) {
+      $sqlite->migrations->name('evonytkr')
+        ->from_data('Game::EvonyTKR', 'migrations')
+        ->migrate;
+
+      $app->minion->repair;
+      $app->ensure_lock_table_sqlite($db);
+    }
 
     if ($app->mode eq 'development') {
-      # no long lived jobs in case I forget ot erase the sqlite file
       $app->minion->remove_after(7200);
     }
+
     $app->plugin('Game::EvonyTKR::External::Prebuild');
   }
 
@@ -138,10 +168,6 @@ package Game::EvonyTKR {
 
     $app->plugin('DefaultHelpers');
     $app->defaults(layout => 'default');
-
-    my $RepoData = GitRepo::Reader->new(source_dir => $distDir,);
-
-    $app->helper(get_repo_data => sub { return $RepoData });
 
     push @{ $app->routes->namespaces },  'Game::EvonyTKR::Controller';
     push @{ $app->plugins->namespaces }, 'Game::EvonyTKR::Controller';
@@ -175,50 +201,42 @@ package Game::EvonyTKR {
     }
   }
 
+  my %WORKER_PIDS;
+
   sub _spawn_minion_workers ($app) {
+    return if $ENV{MINION_WORKER_CHILD};
     my $start_workers = $ENV{START_MINION_WORKERS} // 1;
     my $worker_count  = $ENV{MINION_WORKERS}       // 4;
-    my @worker_pids;
+    return unless $start_workers;
 
-    # ---- Fork workers after DB is ready ----
-    if ($start_workers && !$ENV{MINION_WORKER_CHILD}) {
-      for my $i (1 .. $worker_count) {
-        my $pid = fork();
-        defined $pid or die "fork failed: $!";
-        if ($pid) { push @worker_pids, $pid; next }
+    for (1 .. $worker_count) {
+      my $pid = fork // die "fork failed: $!";
+      if ($pid) { $WORKER_PIDS{$pid} = 1; next }
 
-        # child
-        $ENV{MINION_WORKER_CHILD} = 1;
-        # (optional) remove setsid() so Ctrl-C hits the whole group naturally:
-        # setsid();  # <- comment this OUT so parent can send signals to group
-        POSIX::nice(10);
-
-        # Pick a deterministic concurrency if you want (default may be high)
-        # Replace 5 with what you expect for each child
-        exec($^X, $0, 'minion', 'worker', '-j', '5') or die "exec failed: $!";
-      }
-
-      # Reap children automatically
-      $SIG{CHLD} = 'IGNORE';
-
-      # Graceful shutdown: send TERM to the process group (includes workers)
-      # Make *this* script the group leader, then kill negative PGID on exit.
-      my $pgid = $$;
-      setpgrp(0, 0);    # become group leader
-          # Catch Ctrl-C , TERM and QUIT (all 3 appear to be necessary)
-      $SIG{INT}  = sub { $app->stop_all($pgid) };
-      $SIG{TERM} = sub { $app->stop_all($pgid) };
-      $SIG{QUIT} = sub { $app->stop_all($pgid) };
+      # --- child path ---
+      $ENV{MINION_WORKER_CHILD} = 1;     # prevents recursion on load
+      POSIX::nice(10);
+      exec($^X, $0, 'minion', 'worker', '-j', '5') or die "exec failed: $!";
     }
+
+    # Reap *our* children periodically (doesn't interfere with Mojo/Hypnotoad)
+    Mojo::IOLoop->recurring(1 => sub {
+      while ((my $kid = waitpid(-1, POSIX::WNOHANG)) > 0) {
+        delete $WORKER_PIDS{$kid};
+      }
+    });
   }
 
-  sub stop_all ($app, $pgid) {
-    # First try TERM (graceful), then KILL after a grace period
-    kill 'TERM', -$pgid;
-    my $deadline = time + 30;
-    while (time < $deadline) { select undef, undef, undef, 0.1 }
-    kill 'KILL', -$pgid;
-    exit 0;
+  # Optional: graceful stop on normal shutdown (no signal handlers needed)
+  END {
+    return unless %WORKER_PIDS;
+    kill 'TERM', keys %WORKER_PIDS;
+    my $deadline = time + 10;
+    while (%WORKER_PIDS && time < $deadline) {
+      while ((my $kid = waitpid(-1, POSIX::WNOHANG)) > 0) { delete $WORKER_PIDS{$kid} }
+      select undef, undef, undef, 0.1;
+    }
+    kill 'KILL', keys %WORKER_PIDS if %WORKER_PIDS;
   }
 };
 

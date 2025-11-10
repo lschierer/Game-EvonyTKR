@@ -20,6 +20,8 @@ require Game::EvonyTKR::External::General::LoadAll;
 require Game::EvonyTKR::External::Book::Loader;
 require Game::EvonyTKR::External::Book::LoadAllBuiltins;
 require Game::EvonyTKR::External::Book::LoadAllGenerics;
+require Game::EvonyTKR::External::AscendingAttributes::Loader;
+require Game::EvonyTKR::External::AscendingAttributes::LoadAll;
 require Game::EvonyTKR::External::Specialty::Loader;
 require Game::EvonyTKR::External::Specialty::LoadAllSpecialties;
 
@@ -64,6 +66,8 @@ package Game::EvonyTKR::External::Prebuild {
     # Register main prebuild orchestration task
     $app->minion->add_task(external_prebuild => __PACKAGE__);
     my $plugins = [
+      'Game::EvonyTKR::External::AscendingAttributes::Loader',
+      'Game::EvonyTKR::External::AscendingAttributes::LoadAll',
       'Game::EvonyTKR::External::Book::LoadAllBuiltins',
       'Game::EvonyTKR::External::Book::LoadAllGenerics',
       'Game::EvonyTKR::External::Book::Loader',
@@ -198,6 +202,13 @@ package Game::EvonyTKR::External::Prebuild {
     );
 
     my $loaderJobDefs = {
+      load_all_ascending_attributes => {
+        args     => [],
+        attempts => 3,
+        delay    => 1,
+        expire   => 300,
+        priority => 50,
+      },
       load_all_generic_books => {
         args     => [],
         attempts => 3,

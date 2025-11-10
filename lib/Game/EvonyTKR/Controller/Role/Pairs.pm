@@ -70,7 +70,7 @@ package Game::EvonyTKR::Controller::Role::Pairs {
     elsif (defined($cas_val) && not defined($cas_val->[1])) {
       $cas_val->[1] = $self->merge_into_pairs_by_type({}, $wire_pair);
     }
-    elsif (defined($cas_val) && $cas_val->[1] == 0) {
+    elsif (defined($cas_val) && $cas_val->[1] eq "0") {
       my $result = $self->setup_pairs_by_type();
       if ($result) {
         return $self->add_wire_pair($wire_pair);
@@ -106,16 +106,16 @@ package Game::EvonyTKR::Controller::Role::Pairs {
       $pairs_by_type->{ $np->{type} } = [ $np, $pairs_by_type->{ $np->{type} }->@* ];
     }
 
-    foreach my $type (keys $pairs_by_type->%*){
-      $pairs_by_type->{$type} =  [
-        sort { $self->wire_pair_to_key($a) cmp $self->wire_pair_to_key($b) }
-         List::UtilsBy::uniq_by {
-          $self->wire_pair_to_key($_)
-        } $pairs_by_type->{$type}->@* ];
+    #foreach my $type (keys $pairs_by_type->%*){
+    #  $pairs_by_type->{$type} =  [
+    #    sort { $self->wire_pair_to_key($a) cmp $self->wire_pair_to_key($b) }
+    #     List::UtilsBy::uniq_by {
+    #      $self->wire_pair_to_key($_)
+    #    } $pairs_by_type->{$type}->@* ];
 
-      $self->logger->debug(sprintf('after merge, there are %s %s type pairs',
-      scalar($pairs_by_type->{$type}->@*), $type));
-    }
+    #  $self->logger->debug(sprintf('after merge, there are %s %s type pairs',
+    #  scalar($pairs_by_type->{$type}->@*), $type));
+    #}
     return $pairs_by_type;
   }
 

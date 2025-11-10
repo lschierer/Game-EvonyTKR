@@ -32,9 +32,9 @@ package Game::EvonyTKR::Model::AscendingAttributes {
 
   has 'id' => sub ($self) {
     if (defined($self) && defined($self->UUID5_base)) {
-      my $specialtybase = uuid5($self->UUID5_base, 'Specialty');
-      if (defined($self->name)) {
-        return uuid5($specialtybase, $self->name);
+      my $aabase = uuid5($self->UUID5_base, 'Ascending Attributes');
+      if (defined($self->general)) {
+        return uuid5($aabase, $self->general);
       }
     }
     return '';
@@ -64,9 +64,9 @@ package Game::EvonyTKR::Model::AscendingAttributes {
     $matching_type    = 'buff'
   ) {
     my $logger = $self->logger;
-    $logger->debug(
-"Calculating ascending buffs for level: $level, attribute: $attribute, matching_type: $matching_type"
-    );
+    $logger->debug(sprintf(
+    'Calculating ascending buffs for level: %s, attribute: %s, matching_type: %s',
+    $level, $attribute,$matching_type,));
 
     return 0 if not defined $level or $level eq 'none';
 
@@ -214,6 +214,12 @@ package Game::EvonyTKR::Model::AscendingAttributes {
     return scalar @{ $self->attributes->{$level}->{buffs} };
   }
 
+  sub to_wire_hash ($self) {
+    my $h = $self->to_hash();
+    $h->{id} = $self->id;
+    return $h;
+  }
+
   sub to_hash {
     my $self = shift;
     return {
@@ -246,6 +252,18 @@ package Game::EvonyTKR::Model::AscendingAttributes {
     else {
       return $self->as_string() . $other;
     }
+  }
+
+  sub from_wire_hash($class, $h) {
+    my $logger = $log;
+    my $aa = $class->from_hash($h);
+    unless(defined($aa)) {
+      $logger->error(sprintf('invalid hash object %s for %s->from_wire_hash',
+      Data::Printer::np($h), __PACKAGE__));
+      return;
+    }
+    $aa->id = $h->{id};
+    return $aa;
   }
 
   sub from_hash($class, $object) {

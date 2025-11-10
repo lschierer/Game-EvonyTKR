@@ -51,61 +51,32 @@ package Game::EvonyTKR::Controller::Generals {
   sub getBase($self) {
     return $base;
   }
-  state $cache;
 
   sub register($c, $app, $config = {}) {
     $c->logger->info("Registering routes for " . ref($c));
     $c->SUPER::register($app, $config);
 
-    $cache = Game::EvonyTKR::Service::Cache->new();
 
     eval {
-      say "calling setup_event_handlers";
+      $c->logger->debug(sprintf('%s calling setup_event_handlers', __PACKAGE__));
       $c->setup_event_handlers($app);
       1;
     } or do {
-      say "Error in setup_event_handlers: $@";
+      $c->logger->error(sprintf('%s hit an error in setup_event_handlers: %s', __PACKAGE__, $@));
     };
     eval {
-      say 'calling setup_helpers';
+    $c->logger->debug(sprintf('%s calling setup_helpers', __PACKAGE__));
       $c->setup_helpers($app);
       1;
     } or do {
-      say "Error in setup_helpers: $@";
+      $c->logger->error(sprintf('%s hit an error in setup_helpers: %s', __PACKAGE__, $@));
     };
-    say 'calling setup_routes';
+    $c->logger->debug(sprintf('%s calling setup_routes', __PACKAGE__));
     $c->setup_routes($app);
-
-    say sprintf('%s register complete', __PACKAGE__);
+    $c->logger->debug(sprintf('%s register complete', __PACKAGE__));
   }
 
-  sub setup_generals($c, $app) {
-    my $loop;
-    state $receivedGenerals = 0;
-    $loop = Mojo::IOLoop->recurring(
-      10 => sub {
-        my $generalCount = $cache->get('generalCount') // -1;
-        $c->logger->debug(sprintf(
-          'setup_generals: receivedGenerals: %s; generalCount: %s',
-          $receivedGenerals, $generalCount
-        ));
-        if ($generalCount > 0 && $receivedGenerals < $generalCount) {
-          my $generals = $c->get_generals($app);
-          if (defined($generals) && ref($generals) eq 'HASH') {
-            foreach my $general (values $generals->%*) {
-              # emit a signal to break out of this loop and stay async.
-              $app->plugins->emit(general_loaded => { general => $general });
-              $receivedGenerals++;
-            }
-          }
-        }
-        elsif ($generalCount > 0) {
-          Mojo::IOLoop->remove($loop);
-        }
-      }
-    );
-    Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
-  }
+
 
   sub setup_helpers($c, $app) {
 
@@ -122,97 +93,6 @@ package Game::EvonyTKR::Controller::Generals {
       general_routing_available => { routing => $app->general_routing });
   }
 
-  sub setup_event_handlers($c, $app) {
-
-    #first define variables and state
-    my $completion_state = {
-      skill_books_loaded          => 0,
-      specialties_imported        => 0,
-      ascending_attributes_loaded => 0,
-      general_loader_job_ready    => 0,
-    };
-
-    my $check_prerequisites = sub {
-      if (List::AllUtils::none { $_ == 0 } values $completion_state->%*) {
-        $c->logger->info(sprintf('%s Ready to Get Generals', __PACKAGE__));
-
-      }
-      else {
-        $c->logger->info(sprintf(
-          '%s not Ready to Get Generals yet: %s',
-          __PACKAGE__, Data::Printer::np($completion_state, multiline => 0)
-        ));
-      }
-    };
-
-    # then define handlers in reverse order of use for safety
-
-    $app->plugins->on(
-      general_loader_job_ready => sub {
-        $completion_state->{general_loader_job_ready} = 1;
-        $check_prerequisites->();
-      }
-    );
-
-    $app->plugins->on(
-      general_loaded => sub {
-        my ($plugin, $data) = @_;
-        my $general = $data->{'general'};
-        $c->logger->info(sprintf(
-          '%s detected %s loaded. Building Routes.',
-          __PACKAGE__, $general->name
-        ));
-        $c->_build_general_routes($general, $app);
-      }
-    );
-
-    # last define things that will trigger them.
-    # which might be more handlers, see above about
-    # reverse order of use.
-
-    $app->plugins->on(
-      ascending_attributes_imported => sub {
-        $completion_state->{ascending_attributes_loaded} = 1;
-        $check_prerequisites->();
-      }
-    );
-
-    $app->plugins->on(
-      all_books_loaded => sub {
-        $completion_state->{skill_books_loaded} = 1;
-        $check_prerequisites->();
-      }
-    );
-
-    $app->plugins->on(
-      specialties_imported => sub {
-        $completion_state->{specialties_imported} = 1;
-        $check_prerequisites->();
-      }
-    );
-
-    $app->plugins->on(
-      general_routing_available => sub {
-        say 'general_routing_available signal recieved';
-        $c->logger->debug('general_routing_available signal recieved');
-        my $delay = 2;
-        Mojo::IOLoop->timer(
-          $delay => sub {
-            say "$delay second timer complete";
-            eval {
-              $c->setup_generals($app);
-              1;
-            } or do {
-              say "problem in setup_generals";
-            }
-          }
-        );
-      }
-    );
-
-    $c->logger->debug(sprintf('all handlers registered for %s', blessed($c)));
-  }
-
   sub setup_routes($c, $app) {
     my $controller_name = $c->controller_name();
     $c->logger->debug("got controller_name $controller_name.");
@@ -227,6 +107,20 @@ package Game::EvonyTKR::Controller::Generals {
     $referenceRoutes->get('/')
       ->to(controller => $controller_name, action => 'index');
 
+    eval {
+      foreach my $general ($c->list_generals($app)->@*){
+        $c->_build_general_routes($general, $app);
+      }
+    };
+    if($@){
+      my $error =
+        sprintf('error building dynamic routes for Generals Controller: %s',
+        $@);
+      $c->logger->error($error);
+      if ($app->mode eq 'development') {
+        croak($error);
+      }
+    }
     # a routes for single general tables
     # and the index routes for troop type categories that go under /Generals
     # and thus are managed by this controller
@@ -348,10 +242,26 @@ package Game::EvonyTKR::Controller::Generals {
     }
   }
 
-  sub _build_general_routes($self, $general, $app,) {
-    my $name = $general->name;
+  sub _build_general_routes($c, $general_name, $app,) {
+    my $name = $c->normalize($general_name);
+    # words that do not get capitalized
+    my @articles = qw(a an the);
+    my @capitalized_words;
 
-    $self->logger->debug("building Reference Routes for $name");
+    my @words = split /(\s+)/, $name; # Split by whitespace, keeping the whitespace
+
+    foreach my $word (@words) {
+        # Check if the word (converted to lowercase) is in the articles list
+        if (grep { lc($word) eq $_ } @articles) {
+            push @capitalized_words, lc($word); # Keep articles lowercase
+        } else {
+            push @capitalized_words, ucfirst(lc($word)); # Capitalize first letter
+        }
+    }
+
+    $name = join '', @capitalized_words;
+
+    $c->logger->debug("building Reference Routes for $name");
     my $referenceRoutes = $app->routes->any($reference_base);
 
     my $gr  = "/Reference/Generals/$name";
@@ -511,78 +421,96 @@ package Game::EvonyTKR::Controller::Generals {
 
   sub show ($c) {
     $c->logger->debug("start of show method");
-    unless ($c) {
-      $c->logger->error('controller must be defined for show method to work');
-      return;
-    }
-    unless ($c->app) {
-      $c->logger->error('controller app attribute is undefined');
-      return;
-    }
-    my $name;
-    $name = $c->param('name');
+    my $name = $c->param('name');
 
-    my $rp = $c->req->url->path->to_string;
-    # Remove trailing slash from pages
-    if ($rp =~ qr{/$}) {
-      my $canonical = $rp;
-      $canonical =~ s{/$}{};
+    # Canonicalize trailing slash
+    if ((my $rp = $c->req->url->path->to_string) =~ m{/$}) {
+      (my $canonical = $rp) =~ s{/$}{};
       return $c->redirect_to($canonical, 301);
     }
 
-    $c->logger->debug("show detects name $name, showing details.");
-    my $calculate_buffs = $c->param('calculate_buffs') // 0;
+    my $expected_list = $c->list_generals($c->app) // [];
+    my %expected = map { $_ => 1 } $expected_list->@*;
+    my $expected_total = scalar keys %expected;
 
-    my $general = $c->get_general($name, $cache);
-    unless ($general) {
-      $c->logger->error("No general found for name $name in the 'show' route.");
-      return $c->reply->not_found;
+    # Helper to render "pending" with proper headers / negotiation
+    my $render_pending = sub ($why, $maybe_name = undef) {
+      my $retry = 3;  # seconds
+      my $h = $c->res->headers;
+      $h->header('Retry-After'  => $retry);
+      $h->header('Cache-Control' => 'no-store');
+
+      # JSON/AJAX? return a 202 with status info
+      if (($c->stash('format') // '') eq 'json' || $c->req->is_xhr) {
+        return $c->render(
+          status => 202,
+          json   => {
+            status          => 'pending',
+            reason          => $why,
+            name            => $maybe_name,
+            expected_total  => $expected_total,
+            retry_after_sec => $retry,
+          }
+        );
+      }
+
+      # HTML pending page (include a soft auto-refresh)
+      $c->stash(
+        pending_reason   => $why,
+        pending_name     => $maybe_name,
+        expected_total   => $expected_total,
+        retry_after_sec  => $retry,
+      );
+      # Your template can include: <meta http-equiv="refresh" content="<%= stash('retry_after_sec') %>">
+      return $c->render(status => 202, template => 'generals/pending');
+    };
+
+    # 1) If we don't yet know any generals at all, show global "pending"
+    if ($expected_total == 0) {
+      $c->logger->info("No generals expected yet; returning pending page.");
+      return $render_pending->('none-available-yet');
     }
-    $c->logger->debug("got general of type " . blessed $general);
 
-    if ($general) {
+    # 2) If a name is provided, validate it against the expected list
+    if (defined $name && length $name) {
+      unless ($expected{$name}) {
+        # invalid string: not a known/expected general name → proper 404
+        $c->logger->warn("Unknown general name '$name' (not in expected list).");
+        return $c->reply->not_found;
+      }
+
+      # Name is valid/expected; check if it's loaded
+      my $general = $c->get_general($name);
+      unless ($general) {
+        $c->logger->info("General '$name' expected but not loaded yet; pending.");
+        return $render_pending->('name-expected-but-not-ready', $name);
+      }
+
+      # Loaded -> continue with existing behavior
+      $c->logger->debug("got general of type " . blessed($general));
+      my $calculate_buffs = $c->param('calculate_buffs') // 0;
       $c->stash(item => $general);
 
       if ($calculate_buffs) {
         my $covenantLevel  = $c->param('covenantLevel')  // 'civilization';
         my $ascendingLevel = $c->param('ascendingLevel') // 'red5';
-        my @specialties;
-        push @specialties, $c->param('specialty1') // 'gold';
-        push @specialties, $c->param('specialty2') // 'gold';
-        push @specialties, $c->param('specialty3') // 'gold';
-        push @specialties, $c->param('specialty4') // 'gold';
-        my $data_model = Game::EvonyTKR::Model::Data->new();
+        my @specialties    = map { $c->param($_) // 'gold' } qw(specialty1 specialty2 specialty3 specialty4);
 
-        if (none { $_ eq $covenantLevel }
-          @{ $data_model->CovenantCategoryValues }) {
-          $c->logger->warn(
-            sprintf('Invalid covenantLevel: %s , using default "civilization"',
-              $covenantLevel)
-          );
+        my $data_model = Game::EvonyTKR::Model::Data->new();
+        if (none { $_ eq $covenantLevel } @{ $data_model->CovenantCategoryValues }) {
+          $c->logger->warn("Invalid covenantLevel: $covenantLevel, defaulting.");
           $covenantLevel = 'civilization';
         }
-
-        # Validate ascending level
-        if (none { $_ eq $ascendingLevel }
-          $data_model->AscendingAttributeLevelValues()) {
-          $c->logger->warn(
-            "Invalid ascendingLevel: $ascendingLevel, using default 'red5'");
+        if (none { $_ eq $ascendingLevel } $data_model->AscendingAttributeLevelValues()) {
+          $c->logger->warn("Invalid ascendingLevel: $ascendingLevel, defaulting.");
           $ascendingLevel = 'red5';
         }
-
         @specialties = $data_model->normalizeSpecialtyLevels(@specialties);
 
-        $c->logger->debug(
-          "show method sees a request for display of calculated buff summaries."
-        );
         my $targetType;
-        if (ref $general->type eq 'ARRAY') {
-          $targetType = $general->type->[0] if @{ $general->type };
-        }
-        else {
-          $targetType = $general->type;
-        }
-        $targetType //= '';    # Default to empty string if undefined
+        if (ref $general->type eq 'ARRAY') { $targetType = $general->type->[0] if @{ $general->type } }
+        else                               { $targetType = $general->type }
+        $targetType //= '';
         $targetType =~ s/_/ /;
         $targetType =~ s/(\w)(\w+) specialist/\U$1\L$2 \UT\Lroops/;
         $targetType =~ s/Siege Troops/Siege Machines/;
@@ -607,34 +535,30 @@ package Game::EvonyTKR::Controller::Generals {
         $summarizer->updateBuffs();
         $summarizer->updateDebuffs();
 
-        # Stash the full buff and debuff hashes
-        # for granular access in the template
         $c->stash(
           'buff-summaries' => {
-            # For backward compatibility
-            marchIncrease =>
-              $summarizer->buffValues->{$targetType}->{'March Size'} // 0,
-            attackIncrease => $summarizer->buffValues->{$targetType}->{'Attack'}
-              // 0,
-            defenseIncrease =>
-              $summarizer->buffValues->{$targetType}->{'Defense'} // 0,
-            hpIncrease => $summarizer->buffValues->{$targetType}->{'HP'} // 0,
-
-            # Full granular data
-            buffValues   => $summarizer->buffValues,
-            debuffValues => $summarizer->debuffValues,
+            marchIncrease   => $summarizer->buffValues->{$targetType}->{'March Size'} // 0,
+            attackIncrease  => $summarizer->buffValues->{$targetType}->{'Attack'}     // 0,
+            defenseIncrease => $summarizer->buffValues->{$targetType}->{'Defense'}    // 0,
+            hpIncrease      => $summarizer->buffValues->{$targetType}->{'HP'}         // 0,
+            buffValues      => $summarizer->buffValues,
+            debuffValues    => $summarizer->debuffValues,
           },
         );
       }
 
-      if ($c && $c->app) {
-        return $c->render(template => 'generals/details');
-      }
-      else {
-        $c->logger->error('missing app!!');
-      }
+      return $c->render(template => 'generals/details');
     }
-    $c->SUPER::show();
+
+    # 3) No name provided; if you have an index/list view, it can also be pending
+    # If you want index to wait until anything is loaded:
+    my $any_loaded = 0; # implement your own quick probe if you cache that
+    if (!$any_loaded) {
+      return $render_pending->('index-waits-for-first-load');
+    }
+
+    # else render your index/list
+    return $c->render(template => 'generals/index');
   }
 
   sub singleTable ($c) {

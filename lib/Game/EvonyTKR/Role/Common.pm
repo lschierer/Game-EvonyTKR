@@ -24,6 +24,43 @@ package Game::EvonyTKR::Role::Common {
     return lc($nn);
   }
 
+  # Generic hydrator:
+  #  - $list_cb:   sub ($app) -> arrayref of expected names
+  #  - $fetch_cb:  sub ($name) -> object or undef
+  #  - $state_ref: hashref-like storage (use 'state %cache' in the caller)
+  #  - returns hashref of hydrated objects keyed by normalized name
+  sub _hydrate_from_list ($c, $app, $list_cb, $fetch_cb, $state_ref, $sig_state_ref) {
+
+    my $_norm = sub ($c, $name) {
+      my $k = lc($c->normalize($name) // '');
+      $k =~ s/ /_/g;
+      return $k;
+    };
+
+    my $names = $list_cb->($app) // [];
+    # Build a cheap signature of "what should exist"
+    my $sig = join "\0", sort map { $_norm->($c, $_) } @$names;
+
+    # If signature unchanged, we’re fully up to date
+    return $state_ref if defined $$sig_state_ref && $$sig_state_ref eq $sig;
+
+    # Otherwise, only fetch missing ones
+    for my $name (@$names) {
+      my $key = $_norm->($c, $name);
+
+      next if exists $state_ref->{$key};
+      if (my $obj = $fetch_cb->($name)) {
+        $state_ref->{$key} = $obj;
+      }
+    }
+
+    # If we now cover the full set, bump signature
+    my $have_all = (@$names == scalar grep { exists $state_ref->{ $_norm->($c, $_) } } @$names);
+    $$sig_state_ref = $sig if $have_all;
+
+    return $state_ref;
+  }
+
   has 'globalDN' => sub {
     return X500::DN->new(
       X500::RDN->new('OU' => 'EvonyTKR'),

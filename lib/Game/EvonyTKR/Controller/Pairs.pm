@@ -264,7 +264,7 @@ package Game::EvonyTKR::Controller::Pairs {
     unless (grep { $_ eq $type } $c->GeneralKeys()->@*) {
       return $c->render(
         text => "Invalid type: $type. Valid types: "
-          . join(', ', $c->GeneralKeys()),
+          . join(', ', $c->GeneralKeys()->@*),
         status => 400
       );
     }
