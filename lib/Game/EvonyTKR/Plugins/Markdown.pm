@@ -111,7 +111,6 @@ package Game::EvonyTKR::Plugins::Markdown {
       return '';
     }
 
-
     my $html_content = $pandoc->convert(
       $customCommonMark => 'html',
       $snippet

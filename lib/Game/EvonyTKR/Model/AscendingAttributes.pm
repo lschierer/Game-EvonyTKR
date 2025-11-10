@@ -65,8 +65,9 @@ package Game::EvonyTKR::Model::AscendingAttributes {
   ) {
     my $logger = $self->logger;
     $logger->debug(sprintf(
-    'Calculating ascending buffs for level: %s, attribute: %s, matching_type: %s',
-    $level, $attribute,$matching_type,));
+'Calculating ascending buffs for level: %s, attribute: %s, matching_type: %s',
+      $level, $attribute, $matching_type,
+    ));
 
     return 0 if not defined $level or $level eq 'none';
 
@@ -256,10 +257,12 @@ package Game::EvonyTKR::Model::AscendingAttributes {
 
   sub from_wire_hash($class, $h) {
     my $logger = $log;
-    my $aa = $class->from_hash($h);
-    unless(defined($aa)) {
-      $logger->error(sprintf('invalid hash object %s for %s->from_wire_hash',
-      Data::Printer::np($h), __PACKAGE__));
+    my $aa     = $class->from_hash($h);
+    unless (defined($aa)) {
+      $logger->error(sprintf(
+        'invalid hash object %s for %s->from_wire_hash',
+        Data::Printer::np($h), __PACKAGE__
+      ));
       return;
     }
     $aa->id = $h->{id};

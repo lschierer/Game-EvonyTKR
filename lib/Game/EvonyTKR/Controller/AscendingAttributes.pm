@@ -7,11 +7,12 @@ require Data::Printer;
 use namespace::clean;
 
 package Game::EvonyTKR::Controller::AscendingAttributes {
-  use Mojo::Base 'Game::EvonyTKR::Controller::ControllerBase', -strict, -signatures;
+  use Mojo::Base 'Game::EvonyTKR::Controller::ControllerBase', -strict,
+    -signatures;
   use Mojo::Base 'Game::EvonyTKR::Role::Logger', -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Common';
   use Mojo::Base 'Game::EvonyTKR::Controller::Role::AscendingAttributes', -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::Constants::AscendingAttributes', -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Constants::AscendingAttributes',  -role;
   use List::AllUtils qw(uniq first);
   use Carp;
 
@@ -29,12 +30,12 @@ package Game::EvonyTKR::Controller::AscendingAttributes {
   }
 
   sub get_all_ascending_attributes ($c, $app) {
-    state %aa_by_general;  # normalized general name -> AA object
+    state %aa_by_general;            # normalized general name -> AA object
     state $sig;
 
     return _hydrate_from_list(
       $c, $app,
-      sub ($app2) { $c->list_ascending_attributes($app2) },   # expected AAs
+      sub ($app2) { $c->list_ascending_attributes($app2) },    # expected AAs
       sub ($aa_name) { $c->get_ascending_attribute($aa_name) },
       \%aa_by_general,
       \$sig,
@@ -199,7 +200,8 @@ package Game::EvonyTKR::Controller::AscendingAttributes {
     my $aa  = $all->{$nn};
     unless (defined $aa) {
       $c->logger->error(sprintf(
-        'no ascending attributes found for '.'general named "%s" normalized to "%s"',
+        'no ascending attributes found for '
+          . 'general named "%s" normalized to "%s"',
         $g->name, $nn
       ));
       $c->logger->debug(sprintf(
@@ -229,8 +231,7 @@ package Game::EvonyTKR::Controller::AscendingAttributes {
     $all->{ $c->SUPER::getConstants->normalize($aa->general) } = $aa;
     $c->logger->debug(sprintf(
       'after delay of %s, imported "%s" as "%s" from "%s"',
-      $delay,                                           $aa->general,
-      $c->normalize($aa->general), $fileName
+      $delay, $aa->general, $c->normalize($aa->general), $fileName
     ));
     if ($app) {
       $app->plugins->emit(

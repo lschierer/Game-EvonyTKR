@@ -6,15 +6,16 @@ require JSON::PP;
 use namespace::autoclean;
 
 package Game::EvonyTKR::Model::BasicAttribute {
-  use Mojo::Base -base,                                  -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Role::BasicAttribute', -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::Logger',         -role;
-  use Carp;
+  use Mojo::Base -base,                                            -signatures;
+  use Mojo::Base 'Game::EvonyTKR::Role::Common',                   -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants', -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Logger',                   -role;
   use List::AllUtils qw( any none );
   use Scalar::Util   qw(blessed);
   use Data::Printer;
   use Const::Fast;
   use File::FindLib 'lib';
+  use Carp;
   use overload
     '<=>'      => \&_comparison,
     '=='       => \&_equality,
@@ -23,8 +24,6 @@ package Game::EvonyTKR::Model::BasicAttribute {
     '""'       => \&as_string,
     '.'        => \&concat,
     "fallback" => 0;
-
-  my $logger = Game::EvonyTKR::Log::Config->logger();
 
   has 'attribute_name'      => '';
   has ['base', 'increment'] => 0;
@@ -45,6 +44,69 @@ package Game::EvonyTKR::Model::BasicAttribute {
     };
     return $hash;
   };
+
+  sub validate ($self) {
+    my @errors;
+    unless (Scalar::Util::looks_like_number($self->base) && $self->base >= 0) {
+      push @errors,
+        sprintf('base must be a positive number, not "%s"', $self->base);
+    }
+    unless (Scalar::Util::looks_like_number($self->increment)
+      && $self->increment >= 0) {
+      push @errors,
+        sprintf('increment must be a positive number, not "%s"',
+        $self->increment);
+    }
+    unless ((not Scalar::Util::looks_like_number($self->attribute_name))
+      && length($self->attribute_name)) {
+      push @errors,
+        sprintf('attribute_name is a required string, not "%s"',
+        $self->attribute_name);
+    }
+    unless (any { $_ =~ /$self->attribute_name/i }
+      $self->BasicAttributeTypes->@*) {
+      push @errors,
+        sprintf('attribute_name must be one of %s, not "%s"',
+        join ', ', $self->BasicAttributeTypes->@*);
+    }
+
+    if (scalar @errors >= 1) {
+      $self->logger->logcroak(join ', ', @errors);
+    }
+  }
+
+  sub setBase ($self, $newBase = 0) {
+    my @errors = ();
+    Scalar::Util::looks_like_number($newBase)
+      or push @errors => "base must be a number, not $newBase";
+    unless ($newBase >= 0) {
+      push @errors, "base must be positive, not $newBase";
+    }
+    if (scalar @errors >= 1) {
+      $self->logger->logerror(join(', ', @errors));
+      return;
+    }
+    else {
+      $self->base = $newBase;
+    }
+  }
+
+  sub setIncrement ($self, $newIncrement = 0) {
+    my @errors = ();
+
+    Scalar::Util::looks_like_number($newIncrement)
+      or push @errors => "increment must be a number, not $newIncrement";
+    unless ($newIncrement >= 0) {
+      push @errors, "increment must be positive, not $newIncrement";
+    }
+    if (scalar @errors >= 1) {
+      $self->logger->error(join(', ', @errors));
+      return;
+    }
+    else {
+      $self->increment = $newIncrement;
+    }
+  }
 
   # Calculate total value
   # =ROUND(((900*0.1)+(((L131+(M131*2.4867*44))*1.1+50+520)-900)*0.2)/100,3)
@@ -69,7 +131,7 @@ package Game::EvonyTKR::Model::BasicAttribute {
       ) / 100,
       3
     );
-    $logger->debug(sprintf(
+    $self->logger->debug(sprintf(
       'found total basic %s attribute value of "%s" for "%s"',
       $self->attribute_name, $result, $name
     ));
@@ -81,7 +143,7 @@ package Game::EvonyTKR::Model::BasicAttribute {
     my @classList  = split(/::/, $otherClass);
     if ($classList[2] ne 'BasicAttribute') {
       my $od = Data::Printer::p $other;
-      $logger->error(sprintf(
+      $self->logger->error(sprintf(
         'Game::EvonyTKR::Model::BasicAttribute '
           . 'comparison operator cannot take a %s',
         $od
@@ -97,7 +159,7 @@ package Game::EvonyTKR::Model::BasicAttribute {
       my $mt = $self->total();
       my $ot = $other->total();
       if ($self->attribute_name() cmp $other->attribute_name()) {
-        $logger->warn(sprintf(
+        $self->logger->warn(sprintf(
           'you probably did not intend to compare '
             . 'to different attributes: %s %s',
           $self->attribute_name(),
@@ -115,7 +177,7 @@ package Game::EvonyTKR::Model::BasicAttribute {
       my @classList = split(/::/, $otherClass);
       if ($classList[2] ne 'BasicAttribute') {
         my $od = Data::Printer::p $other;
-        $logger->error(sprintf(
+        $self->logger->error(sprintf(
           'Game::EvonyTKR::Model::BasicAttribute '
             . 'equality operator cannot take a %s',
           $od
@@ -145,7 +207,7 @@ package Game::EvonyTKR::Model::BasicAttribute {
     my @classList  = split(/::/, $otherClass);
     if ($classList[2] ne 'BasicAttribute') {
       my $od = Data::Printer::p $other;
-      $logger->error(sprintf(
+      $self->logger->error(sprintf(
         'Game::EvonyTKR::Model::BasicAttribute '
           . 'inequality operator cannot take a %s',
         $od

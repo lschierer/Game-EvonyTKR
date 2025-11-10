@@ -103,7 +103,8 @@ package Game::EvonyTKR::Controller::Role::Pairs {
       }
 
       $pairs_by_type->{ $np->{type} } //= [];
-      $pairs_by_type->{ $np->{type} } = [ $np, $pairs_by_type->{ $np->{type} }->@* ];
+      $pairs_by_type->{ $np->{type} } =
+        [$np, $pairs_by_type->{ $np->{type} }->@*];
     }
 
     #foreach my $type (keys $pairs_by_type->%*){

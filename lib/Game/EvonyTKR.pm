@@ -17,9 +17,9 @@ package Game::EvonyTKR {
   use Log::Log4perl;
   use Mojo::File::Share qw(dist_dir );
   use Mojo::Loader      qw(find_modules load_class);
-  use Fcntl qw(:flock);
+  use Fcntl             qw(:flock);
   use Mojo::File;
-  use POSIX             qw(setsid);
+  use POSIX qw(setsid);
   use Scalar::Util 'weaken';
   use Carp;
   use Env qw(DEPLOYMENT_TIME HOSTNAME IMAGE_TAG IMAGE_URI);
@@ -28,7 +28,7 @@ package Game::EvonyTKR {
   my $l4p;
 
   sub startup ($app) {
-    _init_core($app);      # runs in web *and* worker
+    _init_core($app);    # runs in web *and* worker
     _init_minion($app);
 
     # web-only: routes/UI and optional worker spawning
@@ -36,14 +36,16 @@ package Game::EvonyTKR {
       before_server_start => sub ($server, $app) {
         # routes, UIs, helpers that need HTTP server
         _init_web($app);
-          # optional: only if you want web proc to fork workers
-        Mojo::IOLoop->timer(1 => sub {
-          return unless _this_proc_is_a_web_server($server);  # has acceptors?
-          return unless _i_am_the_one_spawner($app);          # spawn once only
-          return if _this_is_a_minion_process();              # don't spawn from minion cmd
+        # optional: only if you want web proc to fork workers
+        Mojo::IOLoop->timer(
+          1 => sub {
+            return unless _this_proc_is_a_web_server($server); # has acceptors?
+            return unless _i_am_the_one_spawner($app);         # spawn once only
+            return if _this_is_a_minion_process(); # don't spawn from minion cmd
 
-          _spawn_minion_workers($app);
-        });
+            _spawn_minion_workers($app);
+          }
+        );
       }
     );
 
@@ -53,11 +55,11 @@ package Game::EvonyTKR {
     });
   }
 
-
-
   sub _this_proc_is_a_web_server ($server) {
     # Minion commands and plain perl procs have no HTTP acceptors
-    my $acceptors = eval { $server->can('acceptors') ? scalar @{$server->acceptors} : 0 } // 0;
+    my $acceptors =
+      eval { $server->can('acceptors') ? scalar @{ $server->acceptors } : 0 }
+      // 0;
     return $acceptors > 0;
   }
 
@@ -74,7 +76,9 @@ package Game::EvonyTKR {
     state $fh;
     $fh //= Mojo::File->new($app->home->child('spawn_minion.lock'))->open('>>');
     return 0 unless $fh;
-    return flock($fh, LOCK_EX | LOCK_NB);  # true only in the first process that grabs it
+    return
+      flock($fh, LOCK_EX | LOCK_NB)
+      ;    # true only in the first process that grabs it
   }
 
   sub _init_core ($app) {
@@ -123,21 +127,24 @@ package Game::EvonyTKR {
 
     # Apply PRAGMAs for ALL future connections first
     my $sqlite = $app->minion->backend->sqlite;
-    $sqlite->on(connection => sub ($sqlite, $dbh) {
-      $dbh->do('PRAGMA journal_mode=WAL');
-      $dbh->do('PRAGMA synchronous=NORMAL');
-      $dbh->do('PRAGMA temp_store=MEMORY');
-      $dbh->do('PRAGMA foreign_keys=ON');
-      $dbh->do('PRAGMA busy_timeout=8000');
-    });
+    $sqlite->on(
+      connection => sub ($sqlite, $dbh) {
+        $dbh->do('PRAGMA journal_mode=WAL');
+        $dbh->do('PRAGMA synchronous=NORMAL');
+        $dbh->do('PRAGMA temp_store=MEMORY');
+        $dbh->do('PRAGMA foreign_keys=ON');
+        $dbh->do('PRAGMA busy_timeout=8000');
+      }
+    );
 
     # Now it's safe to open a handle
     my $db = $sqlite->db;
     $db->ping;
 
-    # Run migrations/repair ONLY in the web parent (not in forked or exec'd workers)
+# Run migrations/repair ONLY in the web parent (not in forked or exec'd workers)
     my $is_worker_child = $ENV{MINION_WORKER_CHILD};
-    my $is_minion_cmd   = ($0 =~ /minion(?:\.pl)?$/i) || ($ENV{MOJO_COMMAND} && $ENV{MOJO_COMMAND} eq 'minion');
+    my $is_minion_cmd   = ($0 =~ /minion(?:\.pl)?$/i)
+      || ($ENV{MOJO_COMMAND} && $ENV{MOJO_COMMAND} eq 'minion');
 
     unless ($is_worker_child || $is_minion_cmd) {
       $sqlite->migrations->name('evonytkr')
@@ -214,17 +221,19 @@ package Game::EvonyTKR {
       if ($pid) { $WORKER_PIDS{$pid} = 1; next }
 
       # --- child path ---
-      $ENV{MINION_WORKER_CHILD} = 1;     # prevents recursion on load
+      $ENV{MINION_WORKER_CHILD} = 1;    # prevents recursion on load
       POSIX::nice(10);
       exec($^X, $0, 'minion', 'worker', '-j', '5') or die "exec failed: $!";
     }
 
     # Reap *our* children periodically (doesn't interfere with Mojo/Hypnotoad)
-    Mojo::IOLoop->recurring(1 => sub {
-      while ((my $kid = waitpid(-1, POSIX::WNOHANG)) > 0) {
-        delete $WORKER_PIDS{$kid};
+    Mojo::IOLoop->recurring(
+      1 => sub {
+        while ((my $kid = waitpid(-1, POSIX::WNOHANG)) > 0) {
+          delete $WORKER_PIDS{$kid};
+        }
       }
-    });
+    );
   }
 
   # Optional: graceful stop on normal shutdown (no signal handlers needed)
@@ -233,7 +242,9 @@ package Game::EvonyTKR {
     kill 'TERM', keys %WORKER_PIDS;
     my $deadline = time + 10;
     while (%WORKER_PIDS && time < $deadline) {
-      while ((my $kid = waitpid(-1, POSIX::WNOHANG)) > 0) { delete $WORKER_PIDS{$kid} }
+      while ((my $kid = waitpid(-1, POSIX::WNOHANG)) > 0) {
+        delete $WORKER_PIDS{$kid};
+      }
       select undef, undef, undef, 0.1;
     }
     kill 'KILL', keys %WORKER_PIDS if %WORKER_PIDS;

@@ -5,8 +5,10 @@ require JSON::PP;
 use namespace::autoclean;
 
 package Game::EvonyTKR::Model::Buff::Value {
-  use Mojo::Base -base,                          -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Role::Logger', -role;
+  use Mojo::Base -base,                                            -signatures;
+  use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants', -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants', -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Logger',                      -role;
   use Carp;
   use File::FindLib 'lib';
   use overload
@@ -22,6 +24,24 @@ package Game::EvonyTKR::Model::Buff::Value {
       number => $self->number,
       unit   => $self->unit,
     );
+  }
+
+  sub validate ($self) {
+    my @errors;
+
+    if ($self->unit ne 'flat' and $self->unit ne 'percentage') {
+      push @errors, "unit must be 'flat' or 'percentage' not '$self->unit'";
+    }
+    unless (Scalar::Util::looks_like_number($self->number)) {
+      push @errors,
+        "number must be a positive floating point number, not '$self->number'";
+    }
+
+    if (scalar @errors >= 1) {
+      $self->logger->error(join ', ', @errors);
+      croak(join ', ', @errors);
+      return;
+    }
   }
 
   sub to_hash ($self) {

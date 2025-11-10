@@ -39,7 +39,8 @@ package Game::EvonyTKR::External::AscendingAttributes::LoadAll {
     my $ascendingAttributesDir = $collectionDir->child('ascending attributes');
 
     my @files =
-      $ascendingAttributesDir->list->grep(sub { $_ =~ /\.ya?ml$/ && -f -r $_ })->each;
+      $ascendingAttributesDir->list->grep(sub { $_ =~ /\.ya?ml$/ && -f -r $_ })
+      ->each;
 
     $job->logger->info(
       sprintf('Found %d ascendingAttributes files to load', scalar @files));
@@ -59,7 +60,8 @@ package Game::EvonyTKR::External::AscendingAttributes::LoadAll {
       ));
     }
 
-    $job->ascending_attribute_cache->set(total_ascending_attributes => scalar(@files));
+    $job->ascending_attribute_cache->set(
+      total_ascending_attributes => scalar(@files));
 
     my $msg = 'load_all_ascending_attributes job completed';
     $job->logger->info($msg);

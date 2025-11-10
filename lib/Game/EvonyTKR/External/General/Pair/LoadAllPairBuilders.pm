@@ -6,7 +6,7 @@ package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
   use Mojo::Base 'Game::EvonyTKR::External::JobBase',          -signatures;
   use Mojo::Base 'Game::EvonyTKR::Role::Logger',               -role;
   use Mojo::Base 'Game::EvonyTKR::Controller::Role::Generals', -role;
-  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Pairs', -role;
+  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Pairs',    -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants', -role;
 
   sub register ($taskClass, $app, $conf = {}) {

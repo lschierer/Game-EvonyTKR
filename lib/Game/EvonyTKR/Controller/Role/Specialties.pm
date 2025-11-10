@@ -5,7 +5,7 @@ require Game::EvonyTKR::Service::Cache;
 require Game::EvonyTKR::Model::Factory;
 
 package Game::EvonyTKR::Controller::Role::Specialties {
-  use Mojo::Base -role,                          -signatures;
+  use Mojo::Base -role, -signatures;
   use Carp;
 
   has 'specialty_cache' => sub ($self) {

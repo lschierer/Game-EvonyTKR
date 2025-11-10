@@ -5,17 +5,19 @@ require Game::EvonyTKR::Service::Cache;
 require Game::EvonyTKR::Model::Factory;
 
 package Game::EvonyTKR::Controller::Role::AscendingAttributes {
-  use Mojo::Base -role,                          -signatures;
+  use Mojo::Base -role, -signatures;
   use Carp;
 
   has 'ascending_attribute_cache' => sub ($self) {
-    return Game::EvonyTKR::Service::Cache->new(namespace => 'ascending_attributes__');
+    return Game::EvonyTKR::Service::Cache->new(
+      namespace => 'ascending_attributes__');
   };
 
   sub add_ascending_attribute ($self, $ascendingAttribute) {
     my $key = lc($self->normalize($ascendingAttribute->general));
     $key =~ s/ /_/g;
-    return $self->ascending_attribute_cache->set($key, $ascendingAttribute->to_wire_hash());
+    return $self->ascending_attribute_cache->set($key,
+      $ascendingAttribute->to_wire_hash());
   }
 
   sub get_ascending_attribute ($self, $name) {
@@ -26,7 +28,8 @@ package Game::EvonyTKR::Controller::Role::AscendingAttributes {
     my $normalized_name = lc($self->normalize($name));
     $normalized_name =~ s/ /_/g;
     if (exists $AscendingAttributes->{$normalized_name}) {
-      $self->logger->debug("Returning Ascending Attribute $name from local cache");
+      $self->logger->debug(
+        "Returning Ascending Attribute $name from local cache");
       return $AscendingAttributes->{$normalized_name};
     }
 
@@ -38,16 +41,20 @@ package Game::EvonyTKR::Controller::Role::AscendingAttributes {
       return;
     }
 
-    $self->logger->debug("Found wire_data, attempting to build AscendingAttribute");
+    $self->logger->debug(
+      "Found wire_data, attempting to build AscendingAttribute");
     my $ascendingAttribute =
-      Game::EvonyTKR::Model::Factory->build_from_wire('AscendingAttribute', $wire_data);
+      Game::EvonyTKR::Model::Factory->build_from_wire('AscendingAttribute',
+      $wire_data);
 
     unless (defined($ascendingAttribute)) {
-      $self->logger->error("Factory failed to build AscendingAttribute from wire_data");
+      $self->logger->error(
+        "Factory failed to build AscendingAttribute from wire_data");
       return;
     }
 
-    $self->logger->debug("Successfully built ascendingAttribute: " . $ascendingAttribute->general);
+    $self->logger->debug(
+      "Successfully built ascendingAttribute: " . $ascendingAttribute->general);
     $AscendingAttributes->{$normalized_name} = $ascendingAttribute;
     return $ascendingAttribute;
   }
@@ -59,8 +66,9 @@ package Game::EvonyTKR::Controller::Role::AscendingAttributes {
     my $collectionDir =
       Mojo::File->new($app->config('distDir'))->child('collections/data/');
     my $AscendingAttributesDir = $collectionDir->child('AscendingAttributes');
-    my @suffixlist   = ('.yaml', '.yml');
-    my @files = $AscendingAttributesDir->list->grep(sub { $_ =~ /\.ya?ml$/ && -f -r $_ })
+    my @suffixlist             = ('.yaml', '.yml');
+    my @files =
+      $AscendingAttributesDir->list->grep(sub { $_ =~ /\.ya?ml$/ && -f -r $_ })
       ->sort->map(sub { return $_->basename(@suffixlist) })->each;
     my @returnlist = List::UtilsBy::uniq_by { lc($self->normalize($_)) } @files;
     return \@returnlist;

@@ -29,7 +29,8 @@ package Game::EvonyTKR::Role::Common {
   #  - $fetch_cb:  sub ($name) -> object or undef
   #  - $state_ref: hashref-like storage (use 'state %cache' in the caller)
   #  - returns hashref of hydrated objects keyed by normalized name
-  sub _hydrate_from_list ($c, $app, $list_cb, $fetch_cb, $state_ref, $sig_state_ref) {
+  sub _hydrate_from_list ($c, $app, $list_cb, $fetch_cb, $state_ref,
+    $sig_state_ref) {
 
     my $_norm = sub ($c, $name) {
       my $k = lc($c->normalize($name) // '');
@@ -55,7 +56,9 @@ package Game::EvonyTKR::Role::Common {
     }
 
     # If we now cover the full set, bump signature
-    my $have_all = (@$names == scalar grep { exists $state_ref->{ $_norm->($c, $_) } } @$names);
+    my $have_all =
+      (@$names == scalar grep { exists $state_ref->{ $_norm->($c, $_) } }
+        @$names);
     $$sig_state_ref = $sig if $have_all;
 
     return $state_ref;

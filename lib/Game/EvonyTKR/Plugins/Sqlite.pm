@@ -15,7 +15,8 @@ package Game::EvonyTKR::Plugins::Sqlite {
 
     $app->plugin(
       Minion => {
-        SQLite => "sqlite:$dbPath?sqlite_use_immediate_transaction=1&busy_timeout=30000",
+        SQLite =>
+"sqlite:$dbPath?sqlite_use_immediate_transaction=1&busy_timeout=30000",
       }
     );
     my $db = $app->minion->backend->sqlite->db;

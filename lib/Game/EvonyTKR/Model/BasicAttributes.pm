@@ -6,9 +6,10 @@ require JSON::PP;
 use namespace::autoclean;
 
 package Game::EvonyTKR::Model::BasicAttributes {
-  use Mojo::Base -base,                                   -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Role::BasicAttributes', -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::Logger',          -role;
+  use Mojo::Base -base,                                            -signatures;
+  use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants', -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants', -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Logger',                      -role;
 # VERSION
   use Carp;
   use List::AllUtils qw( any none first );
@@ -45,6 +46,36 @@ package Game::EvonyTKR::Model::BasicAttributes {
       $total += $self->$stat->total($level, $stars, $name);
     }
     return $total;
+  }
+
+  sub setAttribute($self, $attributeName, $newAttribute) {
+    if (none { $_ =~ $attributeName } $self->basic_types->@*) {
+      $self->logger->error(sprintf(
+        'attributeName must be one of %s, not %s',
+        Data::Printer::np($self->AttributeValues),
+        $attributeName,
+      ));
+      return;
+    }
+
+    unless (ref($newAttribute)
+      && $newAttribute->isa('Game::EvonyTKR::Model::BasicAttribute')) {
+      $self->logger->error(sprintf(
+        'newAttribute must be a %s not a %s',
+        'Game::EvonyTKR::Model::BasicAttribute',
+        blessed $newAttribute
+      ));
+      return;
+    }
+    if ($self->can($attributeName)) {
+      $self->$attributeName($newAttribute);
+    }
+    else {
+      $self->logger->error(sprintf(
+        'cannot find method "%s" in "%s"',
+        $attributeName, blessed($self)
+      ));
+    }
   }
 
   sub _comparison ($self, $other, $swap = 0) {

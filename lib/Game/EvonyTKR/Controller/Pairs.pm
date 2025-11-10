@@ -74,7 +74,8 @@ package Game::EvonyTKR::Controller::Pairs {
     );
   }
 
-  sub do_merge_pairs_from_cache ($c, $app, $pairs, $all_pairs, $is_complete = 0) {
+  sub do_merge_pairs_from_cache ($c, $app, $pairs, $all_pairs, $is_complete = 0)
+  {
 
     my $generals = $c->get_generals($app);
     $c->logger->debug('available general keys for building pairs: ',
