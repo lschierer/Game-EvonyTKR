@@ -1,0 +1,47 @@
+name: Bloody Emperor
+levels:
+  - level: green
+    text: Enemy Troop HP -2%.
+    buffs:
+      - attribute: HP
+        conditions:
+          - Enemy
+        value:
+          number: 2
+          unit: percentage
+  - level: blue
+    text: Enemy Troop HP -2%.
+    buffs:
+      - attribute: HP
+        conditions:
+          - Enemy
+        value:
+          number: 2
+          unit: percentage
+  - level: purple
+    text: Enemy Troop HP -3%.
+    buffs:
+      - attribute: HP
+        conditions:
+          - Enemy
+        value:
+          number: 3
+          unit: percentage
+  - level: orange
+    text: Enemy Troop HP -3%.
+    buffs:
+      - attribute: HP
+        conditions:
+          - Enemy
+        value:
+          number: 3
+          unit: percentage
+  - level: gold
+    text: Enemy Troop HP -6%.
+    buffs:
+      - attribute: HP
+        conditions:
+          - Enemy
+        value:
+          number: 6
+          unit: percentage
