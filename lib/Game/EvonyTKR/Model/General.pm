@@ -259,8 +259,7 @@ package Game::EvonyTKR::Model::General {
 
     # Handle basicAttributes if it exists
     if ($self->basicAttributes) {
-      $hash->{basicAttributes} = $self->basicAttributes->to_hash()
-        if $self->basicAttributes->can('to_hash');
+      $hash->{basicAttributes} = $self->basicAttributes->to_hash();
     }
 
     return $hash;
@@ -268,8 +267,7 @@ package Game::EvonyTKR::Model::General {
 
   sub from_wire_hash ($class, $w) {
     die "unknown wire version" unless ($w->{_v} // 1) == 1;
-
-
+    my $logger = Game::EvonyTKR::Log::Config->logger();
 
     my $general = $class->new(
       name                => $w->{name},
@@ -285,13 +283,11 @@ package Game::EvonyTKR::Model::General {
 
     # Handle basicAttributes if it exists
     if ($w->{basicAttributes}) {
-      if (Game::EvonyTKR::Model::BasicAttributes->can('from_hash')) {
         $general->basicAttributes(
           Game::EvonyTKR::Model::BasicAttributes->from_hash(
             $w->{basicAttributes}
           )
         );
-      }
     }
 
     return $general;

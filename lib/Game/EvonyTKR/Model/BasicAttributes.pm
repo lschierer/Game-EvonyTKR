@@ -100,6 +100,30 @@ package Game::EvonyTKR::Model::BasicAttributes {
     return 1;
   }
 
+  sub from_hash ($class, $hashObject) {
+    my $logger = Game::EvonyTKR::Log::Config->logger();
+    unless(ref($hashObject) eq 'HASH'){
+      $logger->error(sprintf('%s from_hash requires a hash as a parameter, not %s',
+      __PACKAGE__, Data::Printer::np($hashObject)));
+      return;
+    }
+    my $return = $class->new();
+
+    foreach my $baKey (keys $hashObject->%*){
+      unless($return->can($baKey)){
+        $logger->error(sprintf('hash has an invalid key %s', $baKey));
+        return;
+      }
+      my $ba = Game::EvonyTKR::Model::BasicAttribute->new(
+        attribute_name => $baKey,
+        base           => $hashObject->{$baKey}->{base},
+        increment => $hashObject->{$baKey}->{increment},
+      );
+      $return->setAttribute($baKey, $ba);
+    }
+    return $return;
+  }
+
   sub to_hash ($self) {
     return {
       attack     => $self->attack,
