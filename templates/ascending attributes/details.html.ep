@@ -3,7 +3,7 @@
 %   my @sorted_levels = ($item->AscendingAttributeLevelValues(0), $item->AscendingAttributeLevelValues(1));
 %   my $firstWithBuff;
 %   foreach my $l ( @sorted_levels) {
-%     if (exists $item->ascending->{$l} && exists $item->ascending->{$l}->{buffs} && scalar @{ $item->ascending->{$l}->{buffs} } > 0) {
+%     if (exists $item->attributes->{$l} && exists $item->attributes->{$l}->{buffs} && scalar @{ $item->attributes->{$l}->{buffs} } > 0) {
 %        $firstWithBuff = $l;
 %        last;
 %     }
@@ -28,7 +28,7 @@
           <% foreach my $level (@sorted_levels) { %>
             <% if ( $level =~ /none/i ) { next; } %>
             <td class="spectrum-Table-cell <%= $level %>">
-              <% foreach my $buff (@{ $item->ascending->{$level}->{buffs} }) { %>
+              <% foreach my $buff (@{ $item->attributes->{$level}->{buffs} }) { %>
                 <dl>
                   <dt>Attribute: </dt><dd><%= $buff->attribute %></dd>
                   <% if (defined($buff->targetedType) && Scalar::Util::reftype($buff->targetedType) ) { %>

@@ -20,16 +20,16 @@ package Game::EvonyTKR::Controller::Role::AscendingAttributes {
       $ascendingAttribute->to_wire_hash());
   }
 
-  sub get_ascending_attribute ($self, $name) {
+  sub get_ascending_attributes ($self, $name) {
     state $AscendingAttributes = {};
 
-    $self->logger->debug("get_ascending_attribute called for: $name");
+    $self->logger->debug("get_ascending_attributes called for: $name");
 
     my $normalized_name = lc($self->normalize($name));
     $normalized_name =~ s/ /_/g;
     if (exists $AscendingAttributes->{$normalized_name}) {
       $self->logger->debug(
-        "Returning Ascending Attribute $name from local cache");
+        "Returning Ascending Attributes $name from local cache");
       return $AscendingAttributes->{$normalized_name};
     }
 
@@ -42,19 +42,19 @@ package Game::EvonyTKR::Controller::Role::AscendingAttributes {
     }
 
     $self->logger->debug(
-      "Found wire_data, attempting to build AscendingAttribute");
+      "Found wire_data, attempting to build AscendingAttributes");
     my $ascendingAttribute =
-      Game::EvonyTKR::Model::Factory->build_from_wire('AscendingAttribute',
+      Game::EvonyTKR::Model::Factory->build_from_wire('AscendingAttributes',
       $wire_data);
 
     unless (defined($ascendingAttribute)) {
       $self->logger->error(
-        "Factory failed to build AscendingAttribute from wire_data");
+        "Factory failed to build AscendingAttributes from wire_data");
       return;
     }
 
     $self->logger->debug(
-      "Successfully built ascendingAttribute: " . $ascendingAttribute->general);
+      "Successfully built ascendingAttributes: " . $ascendingAttribute->general);
     $AscendingAttributes->{$normalized_name} = $ascendingAttribute;
     return $ascendingAttribute;
   }
@@ -65,7 +65,7 @@ package Game::EvonyTKR::Controller::Role::AscendingAttributes {
     }
     my $collectionDir =
       Mojo::File->new($app->config('distDir'))->child('collections/data/');
-    my $AscendingAttributesDir = $collectionDir->child('AscendingAttributes');
+    my $AscendingAttributesDir = $collectionDir->child('ascending attributes');
     my @suffixlist             = ('.yaml', '.yml');
     my @files =
       $AscendingAttributesDir->list->grep(sub { $_ =~ /\.ya?ml$/ && -f -r $_ })

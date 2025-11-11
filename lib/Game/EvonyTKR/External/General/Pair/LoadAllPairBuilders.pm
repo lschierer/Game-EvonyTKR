@@ -104,37 +104,63 @@ package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
   }
 
   sub are_prereqs_outstanding ($job) {
-    my $generalLoaderFinishedCount = $job->app->minion->jobs({
-      tasks  => ['load_general'],
-      states => ['finished'],
-    })->total // 0;
 
-    my $generalLoaderPendingCount = $job->app->minion->jobs({
-      tasks  => ['load_general'],
-      states => ['active', 'inactive'],
-    })->total // 0;
+    my $prereqs = {
+      load_book                 => 0,
+      load_specialty            => 0,
+      load_ascending_attributes => 0,
+      load_general              => 0,
+    };
 
-    my $generalLoaderFailedCount = $job->app->minion->jobs({
-      tasks  => ['load_general'],
-      states => ['failed'],
-    })->total // 0;
-
-    if ($generalLoaderFailedCount > 0) {
-      return $job->fail('cannot build pairs if general import failed');
+    foreach my $prereq (keys $prereqs->%*){
+      my $prereqFinishedCount = $job->app->minion->jobs({
+        tasks  => [$prereq],
+        states => ['finished'],
+      })->total // 0;
+      my $prereqPendingCount = $job->app->minion->jobs({
+        tasks  => [$prereq],
+        states => ['active', 'inactive'],
+      })->total // 0;
+      my $prereqFailedCount = $job->app->minion->jobs({
+        tasks  => [$prereq],
+        states => ['failed'],
+      })->total // 0;
+      if($prereqFailedCount > 0) {
+        my $errmessage = sprintf('cannot import generals if %s import was not successful.', $prereq);
+        $job->logger->error($errmessage);
+        return $job->fail($errmessage);
+      }
+      $job->note("${prereq}PendingCount" => $prereqPendingCount);
+      if($prereqPendingCount > 0 ) {
+        my $delay = List::Util::min(2 * $prereqPendingCount, 30);
+        $job->logger->debug(sprintf(
+          'kicking off retry with delay %s due to %s',
+          $delay,
+          sprintf(
+            'pending %s: %s',
+            $prereq, $prereqPendingCount
+          )
+        ));
+        return $job->retry({ delay => $delay });
+      }
+      $prereqs->{$prereq} = $prereqFinishedCount;
     }
 
-    $job->note(generalLoaderPendingCount => $generalLoaderPendingCount);
-
-    if ($generalLoaderPendingCount > 0) {
-      my $delay = List::Util::min(2 * $generalLoaderPendingCount, 30);
-      return $job->retry({ delay => $delay });
+    if ( List::AllUtils::all {$_ ne "0" } values $prereqs->%* ) {
+      return 0;
     }
 
-    if ($generalLoaderFinishedCount > 0) {
-      return 0;    # Ready to proceed
+    foreach my $prereq (keys $prereqs->%*){
+      my $prereqFinishedCount = $prereqs->{$prereq};
+      if($prereqFinishedCount == 0){
+        my $errmessage = sprintf('%s must be finished before %s is launched', $prereq, __PACKAGE__);
+        $job->logger->error($errmessage);
+        return $job->fail($errmessage);
+      }
     }
 
-    return $job->fail('no general loading jobs found');
+    #fall back value, should not be reached.
+    return 1;
   }
 
 }

@@ -33,10 +33,10 @@ package Game::EvonyTKR::Controller::AscendingAttributes {
     state %aa_by_general;            # normalized general name -> AA object
     state $sig;
 
-    return _hydrate_from_list(
-      $c, $app,
+    return $c->_hydrate_from_list(
+      $app,
       sub ($app2) { $c->list_ascending_attributes($app2) },    # expected AAs
-      sub ($aa_name) { $c->get_ascending_attribute($aa_name) },
+      sub ($aa_name) { $c->get_ascending_attributes($aa_name) },
       \%aa_by_general,
       \$sig,
     );
@@ -54,14 +54,14 @@ package Game::EvonyTKR::Controller::AscendingAttributes {
         . "manager with collection from $SourceDir");
 
     $app->helper(
-      get_ascending_attributes => sub {
-        return $c->get_ascending_attributes();
+      get_all_ascending_attributes => sub {
+        return $c->get_all_ascending_attributes($app);
       }
     );
 
     $app->helper(
       get_ascendingattributes_for_general => sub ($self, $g) {
-        return $c->get_ascendingattributes_for_general($g);
+        return $c->get_ascendingattributes_for_general($app, $g);
       }
     );
 
@@ -151,15 +151,15 @@ package Game::EvonyTKR::Controller::AscendingAttributes {
           'in get_ascending_section helper, c is %s, c->app is %s',
           blessed($c), defined($c->app) ? blessed($c->app) : 'undefined'
         ));
-        return $c->get_ascending_section($self, $name);
+        return $c->get_ascending_section($self, $app, $name);
       }
     );
   }
 
-  sub get_ascending_section ($c, $caller, $name = '') {
+  sub get_ascending_section ($c, $caller, $app, $name = '') {
     if (length($name)) {
-      my $item = $c->get_ascendingattributes_for_general($name);
-      if ( Scalar::Util::reftype($item) eq 'OBJECT'
+      my $item = $c->get_ascendingattributes_for_general($app, $name);
+      if ( Scalar::Util::reftype($item) && Scalar::Util::reftype($item) eq 'HASH'
         && blessed($item) eq 'Game::EvonyTKR::Model::AscendingAttributes') {
         $c->logger->debug("rendering get_ascending_section for $name");
         return $caller->render_to_string(
@@ -173,8 +173,8 @@ package Game::EvonyTKR::Controller::AscendingAttributes {
           "get_ascending_section cannot find Ascending Attributes for $name");
         $c->logger->debug(sprintf(
           "searching for $name, instead got %s %s",
-          Scalar::Util::reftype($item),
-          blessed($item)
+          Scalar::Util::reftype($item) // '',
+          blessed($item) // ''
         ));
       }
     }
@@ -184,36 +184,41 @@ package Game::EvonyTKR::Controller::AscendingAttributes {
     return "";
   }
 
-  sub get_ascendingattributes_for_general ($c, $g) {
+  sub get_ascendingattributes_for_general ($c, $app, $g) {
 
     my $nn;
+    my $gn;
     if (Scalar::Util::blessed($g) && $g->isa('Game::EvonyTKR::Model::General'))
     {
-      $nn = $g->normalize($g->name);
+      $gn = $g->name;
+      $nn = lc($g->normalize($g->name));
     }
     else {
-      $nn = $c->normalize($g);
+      $gn = "$g";
+      $nn = lc($c->normalize($g));
     }
+    $nn =~ s/ /_/g;
     $c->logger->debug("looking for attributes for $nn");
 
-    my $all = $c->get_ascending_attributes();
+    my $all = $c->get_all_ascending_attributes($app);
     my $aa  = $all->{$nn};
     unless (defined $aa) {
       $c->logger->error(sprintf(
         'no ascending attributes found for '
           . 'general named "%s" normalized to "%s"',
-        $g->name, $nn
+        $gn, $nn
       ));
       $c->logger->debug(sprintf(
         'available ascending attributes are %s',
         join ', ', map { sprintf('"%s"', $_) } sort keys $all->%*
       ));
     }
+    $c->logger->debug(sprintf('found %s for requested key %s', Data::Printer::np($aa), $nn));
     return $aa;
   }
 
   sub import_single_aa_file ($c, $app, $fileName, $delay) {
-    my $all = $c->get_ascending_attributes();
+    my $all = $c->get_all_ascending_attributes();
     $c->logger->debug("processing $fileName");
 
     my $data       = $fileName->slurp('UTF-8');

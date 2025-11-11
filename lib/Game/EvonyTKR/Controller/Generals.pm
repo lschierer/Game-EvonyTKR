@@ -10,7 +10,6 @@ require List::Util;
 
 require Game::EvonyTKR::Model::General;
 require Game::EvonyTKR::Model::General::Pair;
-require Game::EvonyTKR::Model::General::Pair::Manager;
 require Game::EvonyTKR::Model::Buff::Summarizer;
 require Game::EvonyTKR::Control::Generals::Routing;
 require Game::EvonyTKR::Model::Data;
@@ -464,7 +463,8 @@ package Game::EvonyTKR::Controller::Generals {
         expected_total  => $expected_total,
         retry_after_sec => $retry,
       );
-# Your template can include: <meta http-equiv="refresh" content="<%= stash('retry_after_sec') %>">
+      # Your template can include:
+      # <meta http-equiv="refresh" content="<%= stash('retry_after_sec') %>">
       return $c->render(status => 202, template => 'generals/pending');
     };
 

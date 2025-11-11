@@ -67,80 +67,58 @@ package Game::EvonyTKR::External::General::LoadAll {
   }
 
   sub are_prereqs_outstanding ($job) {
-    my $bookLoaderFinishedCount = $job->app->minion->jobs({
-      tasks  => ['load_book'],
-      states => ['finished'],
-    })->total // 0;
-    my $bookLoaderPendingCount = $job->app->minion->jobs({
-      tasks  => ['load_book'],
-      states => ['active', 'inactive'],
-    })->total // 0;
 
-    my $bookLoaderFailedCount = $job->app->minion->jobs({
-      tasks  => ['load_book'],
-      states => ['failed'],
-    })->total // 0;
+    my $prereqs = {
+      load_book                 => 0,
+      load_specialty            => 0,
+      load_ascending_attributes => 0,
+    };
 
-    my $specialtyLoaderFinishedCount = $job->app->minion->jobs({
-      tasks  => ['load_specialty'],
-      states => ['finished'],
-    })->total // 0;
-    my $specialtyLoaderPendingCount = $job->app->minion->jobs({
-      tasks  => ['load_specialty'],
-      states => ['active', 'inactive'],
-    })->total // 0;
-    my $specialtyLoaderFailedCount = $job->app->minion->jobs({
-      tasks  => ['load_specialty'],
-      states => ['failed'],
-    })->total // 0;
-
-    $job->logger->debug(sprintf(
-      'Job query results: book_pending=%d, specialty_pending=%d',
-      $bookLoaderPendingCount, $specialtyLoaderPendingCount
-    ));
-
-    if ($bookLoaderFailedCount > 0) {
-      return $job->fail(
-        'cannot import generals if book import was not successful');
-    }
-    if ($specialtyLoaderFailedCount > 0) {
-      return $job->fail(
-        'cannot import generals if specialty import was not successful');
-    }
-
-    $job->note(bookLoaderPendingCount      => $bookLoaderPendingCount);
-    $job->note(specialtyLoaderPendingCount => $specialtyLoaderPendingCount);
-
-    if ($bookLoaderPendingCount > 0 || $specialtyLoaderPendingCount > 0) {
-      # delay a max of 30 seconds
-      my $delay = List::Util::min(2 * $bookLoaderPendingCount, 30);
-      $job->logger->debug(sprintf(
-        'kicking off retry with delay %s due to %s',
-        $delay,
-        sprintf(
-          'pending books: %s; pending specialties: %s',
-          $bookLoaderPendingCount, $specialtyLoaderPendingCount
-        )
-      ));
-      return $job->retry({ delay => $delay });
+    foreach my $prereq (keys $prereqs->%*){
+      my $prereqFinishedCount = $job->app->minion->jobs({
+        tasks  => [$prereq],
+        states => ['finished'],
+      })->total // 0;
+      my $prereqPendingCount = $job->app->minion->jobs({
+        tasks  => [$prereq],
+        states => ['active', 'inactive'],
+      })->total // 0;
+      my $prereqFailedCount = $job->app->minion->jobs({
+        tasks  => [$prereq],
+        states => ['failed'],
+      })->total // 0;
+      if($prereqFailedCount > 0) {
+        my $errmessage = sprintf('cannot import generals if %s import was not successful.', $prereq);
+        $job->logger->error($errmessage);
+        return $job->fail($errmessage);
+      }
+      $job->note("${prereq}PendingCount" => $prereqPendingCount);
+      if($prereqPendingCount > 0 ) {
+        my $delay = List::Util::min(2 * $prereqPendingCount, 30);
+        $job->logger->debug(sprintf(
+          'kicking off retry with delay %s due to %s',
+          $delay,
+          sprintf(
+            'pending %s: %s',
+            $prereq, $prereqPendingCount
+          )
+        ));
+        return $job->retry({ delay => $delay });
+      }
+      $prereqs->{$prereq} = $prereqFinishedCount;
     }
 
-    if ($bookLoaderFinishedCount > 0 && $specialtyLoaderFinishedCount > 0) {
+    if ( List::AllUtils::all {$_ ne "0" } values $prereqs->%* ) {
       return 0;
     }
 
-    if ($bookLoaderFinishedCount == 0) {
-      return $job->fail(sprintf(
-        '%s must be started before %s is launched',
-        'book loading', __PACKAGE__
-      ));
-    }
-
-    if ($specialtyLoaderFinishedCount == 0) {
-      return $job->fail(sprintf(
-        '%s must be started before %s is launched',
-        'specialty loading', __PACKAGE__
-      ));
+    foreach my $prereq (keys $prereqs->%*){
+      my $prereqFinishedCount = $prereqs->{$prereq};
+      if($prereqFinishedCount == 0){
+        my $errmessage = sprintf('%s must be finished before %s is launched', $prereq, __PACKAGE__);
+        $job->logger->error($errmessage);
+        return $job->fail($errmessage);
+      }
     }
 
     #fall back value, should not be reached.

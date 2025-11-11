@@ -36,7 +36,7 @@ package Game::EvonyTKR::Model::General {
     return $self->name;
   };
 
-  has ['name', 'type', 'ascendingAttribute', 'builtInBookName',
+  has ['name', 'type', 'ascendingAttributes', 'builtInBookName',
     'builtInBook'] => undef;
 
   has ['specialtyNames', 'specialties'] => sub { [] };
@@ -92,6 +92,34 @@ package Game::EvonyTKR::Model::General {
     return 1;
   }
 
+  sub populateAscendingAttributes ($self, ) {
+    return unless $self->ascending;
+
+    my $ascending_helper;
+    eval {
+      $ascending_helper = Mojo::Base->new->with_roles(
+        'Game::EvonyTKR::Role::Logger',
+        'Game::EvonyTKR::Role::Common',
+        'Game::EvonyTKR::Controller::Role::AscendingAttributes'
+      );
+    } or do {
+      $self->logger->error(
+        sprintf('eval failed; cannot define specialty helper: "%s"', $@));
+      return;
+    };
+
+    my $key = lc($self->normalize($self->name));
+    $key =~ s/ /_/g;
+
+    my $aa = $ascending_helper->get_ascending_attributes($key);
+    if($aa){
+      $self->ascendingAttributes($aa);
+    } else {
+      $self->logger->warn(sprintf('failed to find expected ascending attributes for %s. expected keys are %s', $self->name,
+      join ', ', map { sprintf('"%s"', %_) } sort $ascending_helper->list_ascending_attributes));
+    }
+  }
+
   sub populateBuiltinBook ($self) {
     my ($book, $books_helper, $cache_store);
 
@@ -136,13 +164,28 @@ package Game::EvonyTKR::Model::General {
     return $self;
   }
 
-  sub populateSpecialties ($self, $allSpecialties) {
-    my @specialtyNames;
-    push @specialtyNames, $self->specialtyNames->@*;
-    foreach my $sn_index (0 .. scalar(@specialtyNames)) {
-      my $sn = $specialtyNames[$sn_index];
-      $self->logger->debug("populating $sn");
-      my $specialty = $allSpecialties->{$sn};
+  sub populateSpecialties ($self, ) {
+    my $specialty_helper;
+    eval {
+      $specialty_helper = Mojo::Base->new->with_roles(
+        'Game::EvonyTKR::Role::Logger',
+        'Game::EvonyTKR::Role::Common',
+        'Game::EvonyTKR::Controller::Role::Specialties'
+      );
+    } or do {
+      $self->logger->error(
+        sprintf('eval failed; cannot define specialty helper: "%s"', $@));
+      return;
+    };
+
+    foreach my $sn_index (0 .. scalar(@{ $self->specialtyNames })) {
+      my $sn = $self->specialtyNames->[$sn_index];
+      if(!defined($sn) || !length($sn) ){
+        $self->logger->error(sprintf('invalid undef specialty in general %s at index %s', $self->name, $sn_index));
+        next;
+      }
+      $self->logger->debug(sprintf('populating speciality at index %s, name %s', $sn_index, defined($sn) && length($sn) ? $sn : 'undefined'));
+      my $specialty = $specialty_helper->get_specialty($sn);
       if ($specialty) {
         $self->specialties->[$sn_index] = $specialty;
       }
@@ -203,15 +246,15 @@ package Game::EvonyTKR::Model::General {
 
   sub to_wire_hash ($self) {
     my $hash = {
-      _v                 => 1,
-      id                 => $self->id,
-      name               => $self->name,
-      type               => $self->type,
-      ascending          => $self->ascending,
-      builtInBookName    => $self->builtInBookName,
-      specialtyNames     => $self->specialtyNames,
-      stars              => $self->stars,
-      ascendingAttribute => $self->ascendingAttribute,
+      _v                  => 1,
+      id                  => $self->id,
+      name                => $self->name,
+      type                => $self->type,
+      ascending           => $self->ascending,
+      builtInBookName     => $self->builtInBookName,
+      specialtyNames      => $self->specialtyNames,
+      stars               => $self->stars,
+      ascendingAttributes => $self->ascendingAttributes,
     };
 
     # Handle basicAttributes if it exists
@@ -226,15 +269,19 @@ package Game::EvonyTKR::Model::General {
   sub from_wire_hash ($class, $w) {
     die "unknown wire version" unless ($w->{_v} // 1) == 1;
 
+
+
     my $general = $class->new(
-      name               => $w->{name},
-      type               => $w->{type},
-      ascending          => $w->{ascending} // 0,
-      builtInBookName    => $w->{builtInBookName},
-      specialtyNames     => $w->{specialtyNames} // [],
-      stars              => $w->{stars}          // 'none',
-      ascendingAttribute => $w->{ascendingAttribute},
+      name                => $w->{name},
+      type                => $w->{type},
+      ascending           => $w->{ascending} // 0,
+      builtInBookName     => $w->{builtInBookName},
+      specialtyNames      => $w->{specialtyNames} // [],
+      stars               => $w->{stars}          // 'none',
     );
+    $general->populateAscendingAttributes();
+    $general->populateBuiltinBook();
+    $general->populateSpecialties();
 
     # Handle basicAttributes if it exists
     if ($w->{basicAttributes}) {

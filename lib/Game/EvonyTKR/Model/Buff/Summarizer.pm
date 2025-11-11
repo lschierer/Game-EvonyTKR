@@ -386,7 +386,7 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
     );
 
     # Ascending attribute buffs (primary only)
-    if ($isPrimary && $general->ascending) {
+    if ($isPrimary && $general->attributes) {
       $total += $self->summarize_ascendingAttributes_for_attribute(
         $attribute,        $summaryType, $buffConditions,
         $debuffConditions, $matching_type

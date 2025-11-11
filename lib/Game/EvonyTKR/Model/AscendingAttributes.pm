@@ -257,7 +257,27 @@ package Game::EvonyTKR::Model::AscendingAttributes {
 
   sub from_wire_hash($class, $h) {
     my $logger = $log;
-    my $aa     = $class->from_hash($h);
+
+    # Convert wire format (hash-based ascending) back to array format
+    my $converted_h = { %$h }; # shallow copy
+    if (exists $h->{ascending} && ref($h->{ascending}) eq 'HASH') {
+      # Convert hash format to array format expected by from_hash
+      my @ascending_array = ();
+      foreach my $level (sort keys %{$h->{ascending}}) {
+        next if $level eq 'none'; # Skip 'none' level
+        my $level_data = $h->{ascending}->{$level};
+        if ($level_data->{buffs} && @{$level_data->{buffs}}) {
+          push @ascending_array, {
+            level => $level,
+            buffs => $level_data->{buffs},
+            text  => $level_data->{text} // '',
+          };
+        }
+      }
+      $converted_h->{ascending} = \@ascending_array;
+    }
+
+    my $aa = $class->from_hash($converted_h);
     unless (defined($aa)) {
       $logger->error(sprintf(
         'invalid hash object %s for %s->from_wire_hash',
@@ -265,7 +285,7 @@ package Game::EvonyTKR::Model::AscendingAttributes {
       ));
       return;
     }
-    $aa->id = $h->{id};
+    $aa->id($h->{id});
     return $aa;
   }
 
