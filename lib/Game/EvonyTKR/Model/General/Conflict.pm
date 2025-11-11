@@ -38,6 +38,9 @@ class Game::EvonyTKR::Model::General::Conflict :
   # { general => { other_general => 1, ... } }
   field $by_general : writer : reader = {};
 
+  # Cache hit counter for debugging
+  field $cache_hits : reader : writer = 0;
+
   field %PBIT = (GR => 1, RA => 2, MT => 4, SG => 8);
   ADJUST {
     lock_hash_recurse(%PBIT);
@@ -402,13 +405,19 @@ class Game::EvonyTKR::Model::General::Conflict :
     if ($assume_g1_is_main) {
       if (exists $by_general->{ $g1->name }) {
         $self->logger->debug('returning cached conflict');
-        return 0 if (exists $by_general->{ $g1->name }->{ $g2->name });
+        if (exists $by_general->{ $g1->name }->{ $g2->name }) {
+          $cache_hits++;
+          return 0;
+        }
       }
     }
     else {
       if (exists $by_general->{ $g2->name }) {
         $self->logger->debug('returning cached conflict');
-        return 0 if (exists $by_general->{ $g2->name }->{ $g1->name });
+        if (exists $by_general->{ $g2->name }->{ $g1->name }) {
+          $cache_hits++;
+          return 0;
+        }
       }
     }
 

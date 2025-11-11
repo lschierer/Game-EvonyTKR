@@ -23,28 +23,12 @@ package Game::EvonyTKR::Controller::ConflictGroups {
     return $base;
   }
 
-  sub get_conflict_detector {
-    state $cd = Game::EvonyTKR::Model::General::Conflict::Book->new(
-      build_index      => 1,
-      asst_has_dragon  => 1,
-      asst_has_spirit  => 1,
-      allow_wall_buffs => 1,
-    );
-    return $cd;
-  }
-
   sub register($c, $app, $config = {}) {
     $c->logger->info("Registering routes for " . __PACKAGE__);
     $c->SUPER::register($app, $config);
 
     my $routes          = $app->routes->any($base);
     my $controller_name = $c->controller_name();
-
-    $app->helper(
-      get_conflict_detector => sub {
-        return $c->get_conflict_detector();
-      }
-    );
 
     $routes->get('/')
       ->to(controller => $controller_name, action => 'index')

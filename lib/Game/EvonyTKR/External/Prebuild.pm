@@ -234,14 +234,14 @@ package Game::EvonyTKR::External::Prebuild {
         args     => ['prebuild load_all_generals'],
         attempts => 3,
         delay    => 5,
-        expire   => 7200,
+        expire   => 300,
         priority => 10,
       },
       load_all_pair_builders => {
         args     => [],
         attempts => 5,
         delay    => 6,
-        expire   => 7200,
+        expire   => 300,
         priority => 50,
       },
     };
@@ -297,7 +297,7 @@ package Game::EvonyTKR::External::Prebuild {
           $mn => [] => {
             attempts => 5,
             delay    => 10,
-            expire   => 2000,
+            expire   => 2700,
             priority => 90,
             parents  => $loaderJids
           }

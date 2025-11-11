@@ -16,6 +16,7 @@ package Game::EvonyTKR::External::General::Pair::ReduceCoordinator {
   }
 
   state $total_conflicts                = 0;
+  state $total_cache_hits               = 0;
   state $merged_by_general              = {};
   state $merged_groups_by_conflict_type = {};
   state $total_pairs                    = [];
@@ -27,6 +28,7 @@ package Game::EvonyTKR::External::General::Pair::ReduceCoordinator {
     # Initialize merged results from job notes
     my $notes = $job->info->{notes} // {};
     $total_conflicts                = $notes->{total_conflicts}         // 0;
+    $total_cache_hits               = $notes->{total_cache_hits}        // 0;
     $merged_by_general              = $notes->{by_general}              // {};
     $merged_groups_by_conflict_type = $notes->{groups_by_conflict_type} // {};
     $total_pairs                    = $notes->{pairs}                   // [];
@@ -55,6 +57,7 @@ package Game::EvonyTKR::External::General::Pair::ReduceCoordinator {
     $job->note(
       processed               => $processed,
       total_conflicts         => $total_conflicts,
+      total_cache_hits        => $total_cache_hits,
       by_general              => $merged_by_general,
       groups_by_conflict_type => $merged_groups_by_conflict_type,
       total_pairs             => scalar(@$total_pairs),
@@ -72,8 +75,21 @@ package Game::EvonyTKR::External::General::Pair::ReduceCoordinator {
       return $job->retry({ delay => 5 });
     }
 
+    my $cache_effectiveness = $total_conflicts > 0 ? 
+      sprintf("%.1f%%", ($total_cache_hits / $total_conflicts) * 100) : "N/A";
+    
+    $job->logger->info(sprintf(
+      "Cache effectiveness: %d cache hits out of %d total conflicts (%s)",
+      $total_cache_hits, $total_conflicts, $cache_effectiveness
+    ));
+
+    # Set completion flag for Pairs controller
+    $job->pair_cache->set('pair_building_complete', 1);
+    $job->logger->info("Set pair_building_complete flag in cache");
+
     $job->finish(
-      "Merged results from " . scalar(keys %$processed) . " batches");
+      sprintf("Merged results from %d batches - %d conflicts (%d cache hits, %s effectiveness)",
+        scalar(keys %$processed), $total_conflicts, $total_cache_hits, $cache_effectiveness));
   }
 
   sub cache_conflict_results($job, $batch_id) {
@@ -83,6 +99,7 @@ package Game::EvonyTKR::External::General::Pair::ReduceCoordinator {
 
     # Merge batch results
     $total_conflicts += $batch_results->{total_conflicts} // 0;
+    $total_cache_hits += $batch_results->{total_cache_hits} // 0;
 
     if ($batch_results->{by_general}) {
       foreach my $general (keys %{ $batch_results->{by_general} }) {

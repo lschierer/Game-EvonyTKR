@@ -3,6 +3,7 @@ use utf8::all;
 use File::FindLib 'lib';
 require Game::EvonyTKR::Service::Cache;
 require Game::EvonyTKR::Model::Factory;
+require Game::EvonyTKR::Model::General::Conflict;
 
 package Game::EvonyTKR::Controller::Role::Pairs {
   use Mojo::Base -role, -signatures;
@@ -17,6 +18,14 @@ package Game::EvonyTKR::Controller::Role::Pairs {
   has 'conflict_cache' => sub ($job) {
     return Game::EvonyTKR::Service::Cache->new(namespace => 'conflicts__');
   };
+
+  sub get_conflict_detector ($self) {
+    state $cd;
+    unless ($cd) {
+      $cd = $self->initialize_conflict_detector();
+    }
+    return $cd;
+  }
 
   sub setup_pairs_by_type ($self) {
     my $pairs = {};
@@ -35,59 +44,37 @@ package Game::EvonyTKR::Controller::Role::Pairs {
 
   sub add_wire_pair ($self, $wire_pair) {
     my $key = $self->wire_pair_to_key($wire_pair);
-    my $cas_val;
 
-    $cas_val = $self->pair_cache->gets('pair_list');
-    if (defined($cas_val) && length($$cas_val[1]) > 0) {
-      my $longstring = $$cas_val[1];
-      my $pair_list;
-      @$pair_list  = split ';', $longstring;
-      $longstring  = join ';', List::AllUtils::uniq($key, $pair_list->@*);
-      $$cas_val[1] = $longstring;
+    # Store the individual pair first
+    my $store_result = $self->pair_cache->set($key, $wire_pair);
+
+    # Update pair_list efficiently using CAS
+    my $cas_val = $self->pair_cache->gets('pair_list');
+    if (defined($cas_val)) {
+      my $current_list = $$cas_val[1] || '';
+      # Only add if not already present (simple string check)
+      unless (index($current_list, $key) >= 0) {
+        $$cas_val[1] = $current_list ? "$current_list;$key" : $key;
+        $self->pair_cache->cas('pair_list', @$cas_val);
+      }
+    } else {
+      $self->pair_cache->add('pair_list', $key);
     }
-    elsif (defined($cas_val) && length($$cas_val[1]) == 0) {
-      $$cas_val[1] = $key;
-    }
-    elsif (defined($cas_val) && $$cas_val[1] == 0) {
-      $$cas_val[1] = $key;
+
+    return $store_result;
+  }
+
+  sub sort_pair_list($self){
+    my $cas_val = $self->pair_cache->gets('pair_list');
+    if (defined($cas_val)) {
+      my $current_list = $$cas_val[1] || '';
+      my $cl = [sort split ';', $current_list];
+      $$cas_val[1] = join ';', $cl->@*;
+      $self->pair_cache->cas('pair_list', @$cas_val);
     }
     else {
-      my $result = $self->pair_cache->add('pair_list', $key);
-      if (not defined($result) || $result == 0) {
-        $self->logger->error('could neither retrieve nor add pair_list');
-      }
-      return $result;
+      $self->logger->warn('no current pair_list');
     }
-    $self->pair_cache->cas('pair_list', @$cas_val);
-    $cas_val = undef;
-
-    $cas_val = $self->pair_cache->gets('pairs_by_type');
-
-    if (defined($cas_val) && ref($$cas_val[1]) eq 'HASH') {
-      $$cas_val[1] = $self->merge_into_pairs_by_type($$cas_val[1], $wire_pair);
-      $self->pair_cache->cas('pairs_by_type', @$cas_val);
-    }
-    elsif (defined($cas_val) && not defined($cas_val->[1])) {
-      $cas_val->[1] = $self->merge_into_pairs_by_type({}, $wire_pair);
-    }
-    elsif (defined($cas_val) && $cas_val->[1] eq "0") {
-      my $result = $self->setup_pairs_by_type();
-      if ($result) {
-        return $self->add_wire_pair($wire_pair);
-      }
-      else {
-        $self->logger->error(sprintf('error setting up pairs_by_type: %s.',
-          defined($result) ? $result : 'undef result'));
-        return $result;
-      }
-    }
-    else {
-      $self->logger->error(
-        sprintf('cannot get pairs_by_type %s.', Data::Printer::np($cas_val)));
-      return undef;
-    }
-
-    return $self->pair_cache->set($key, $wire_pair);
   }
 
   sub merge_into_pairs_by_type($self, $pairs_by_type, @new_pairs) {
@@ -137,6 +124,52 @@ package Game::EvonyTKR::Controller::Role::Pairs {
       push @{$pairs}, $pair;
     }
     return $pairs;
+  }
+
+  sub initialize_conflict_detector($self, $conflict_detector = undef) {
+    # Create or use provided conflict detector
+    $conflict_detector //= Game::EvonyTKR::Model::General::Conflict::Book->new(
+      build_index      => 1,
+      asst_has_dragon  => 1,
+      asst_has_spirit  => 1,
+      allow_wall_buffs => 1,
+    );
+
+    # Load existing conflict data from cache
+    my $cached_conflicts = $self->conflict_cache->get('merged_conflicts');
+
+    if ($cached_conflicts) {
+      $self->logger->debug('Loading existing conflict data from cache');
+
+      # Merge existing by_general conflicts
+      if (my $by_general = $cached_conflicts->{by_general}) {
+        while (my ($general, $conflicts) = each %$by_general) {
+          $conflict_detector->by_general->{$general} = {
+            %{$conflict_detector->by_general->{$general} // {}},
+            %$conflicts
+          };
+        }
+      }
+
+      # Merge existing groups_by_conflict_type
+      if (my $groups = $cached_conflicts->{groups_by_conflict_type}) {
+        while (my ($type, $cached_groups) = each %$groups) {
+          my $existing = $conflict_detector->groups_by_conflict_type->{$type} //= [];
+          my %seen = map { $_ => 1 } @$existing;
+          push @$existing, grep { !$seen{$_}++ } @$cached_groups;
+        }
+      }
+
+      $self->logger->debug(sprintf(
+        'Initialized conflict detector with %d generals and %d conflict types',
+        scalar(keys %{$conflict_detector->by_general}),
+        scalar(keys %{$conflict_detector->groups_by_conflict_type})
+      ));
+    } else {
+      $self->logger->debug('No existing conflict data found in cache');
+    }
+
+    return $conflict_detector;
   }
 
   sub wire_pair_to_key($self, $wire_pair) {

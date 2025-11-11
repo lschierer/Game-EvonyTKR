@@ -16,6 +16,7 @@ package Game::EvonyTKR::External::General::Pair::ReduceBatch {
   }
 
   state $total_conflicts                = 0;
+  state $total_cache_hits               = 0;
   state $merged_by_general              = {};
   state $merged_groups_by_conflict_type = {};
   state $total_pairs                    = [];
@@ -30,6 +31,7 @@ package Game::EvonyTKR::External::General::Pair::ReduceBatch {
       sprintf('ReduceBatch processing %d parent jobs', scalar(@$job_ids)));
 
     my $batch_id = $job->id;
+    $job->sort_pair_list();
 
     foreach my $job_id (@$job_ids) {
       my $job_info = $job->minion->job($job_id);
@@ -54,6 +56,7 @@ package Game::EvonyTKR::External::General::Pair::ReduceBatch {
       "batch_results:$batch_id",
       {
         total_conflicts         => $total_conflicts,
+        total_cache_hits        => $total_cache_hits,
         by_general              => $merged_by_general,
         groups_by_conflict_type => $merged_groups_by_conflict_type,
         processed_jobs          => scalar(@$job_ids),
@@ -98,6 +101,9 @@ package Game::EvonyTKR::External::General::Pair::ReduceBatch {
 
   sub merge_conflict_results($job, $job_info) {
     my $notes = $job_info->{notes} // {};
+
+    # Aggregate cache hits
+    $total_cache_hits += $notes->{conflict_cache_hits} // 0;
 
     if ($notes->{by_general}) {
       foreach my $general (keys %{ $notes->{by_general} }) {

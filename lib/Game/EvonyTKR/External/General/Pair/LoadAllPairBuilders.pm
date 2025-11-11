@@ -45,10 +45,11 @@ package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
 
     # Spawn CreatePairs jobs for each general/type combination
     my $job_count     = 0;
-    my @current_batch = ();
+    my %type_batches  = (); # Track jobs by type for balanced batching
     my $batch_count   = 0;
+    my %type_counters = (); # Track how many jobs per type
 
-    foreach my $general_name (keys %$generals) {
+    foreach my $general_name (sort keys %$generals) { # Sort for deterministic order
       my $general = $generals->{$general_name};
 
       # Handle scalar vs array types for this general
@@ -57,42 +58,83 @@ package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
 
       # Create jobs for each type this general supports
       foreach my $type (@$general_types) {
-        my $job_id =
-          $job->minion->enqueue('create_pairs' => [$general_name, $type]);
+        $type_counters{$type}++;
+
+        # High priority for first 3 generals of each type
+        my $priority = ($type_counters{$type} <= 10) ?  3 : 1;
+        $priority    = ($type_counters{$type} <=  9) ?  4 : $priority;
+        $priority    = ($type_counters{$type} <=  8) ?  5 : $priority;
+        $priority    = ($type_counters{$type} <=  7) ?  6 : $priority;
+        $priority    = ($type_counters{$type} <=  6) ?  7 : $priority;
+        $priority    = ($type_counters{$type} <=  5) ?  8 : $priority;
+        $priority    = ($type_counters{$type} <=  4) ?  9 : $priority;
+        $priority    = ($type_counters{$type} <=  3) ? 10 : $priority;
+
+        my $job_id = $job->minion->enqueue('create_pairs' => [$general_name, $type] => {
+          priority => $priority,
+          expire   => 2700,
+        });
         $job->logger->debug(sprintf(
-          'Enqueued create_pairs job %s for general %s, type %s',
-          $job_id, $general_name, $type
+          'Enqueued create_pairs job %s for general %s, type %s (priority %d)',
+          $job_id, $general_name, $type, $priority
         ));
 
-        push @current_batch, $job_id;
+        # Add to type-specific batch
+        push @{$type_batches{$type}}, $job_id;
         $job_count++;
 
-        # Spawn ReduceBatch when we have 10 jobs
-        if (@current_batch >= 10) {
-          my $reduce_jid = $job->minion->enqueue(
-            'reduce_batch' => [] => {
-              parents  => [@current_batch],
-              priority => 50,
+        # Check if we can form a complete batch (one job per type)
+        my @available_types = grep { @{$type_batches{$_} // []} > 0 } keys %type_batches;
+        if (@available_types >= 5) { # We have all 5 types available
+          my @current_batch = ();
+          
+          # Take one job from each type
+          foreach my $batch_type (qw(mayor ranged_specialist mounted_specialist siege_specialist ground_specialist)) {
+            if (@{$type_batches{$batch_type} // []} > 0) {
+              push @current_batch, shift @{$type_batches{$batch_type}};
             }
-          );
-          $job->logger->debug(sprintf(
-            'Spawned reduce_batch job %s for batch %d (%d jobs)',
-            $reduce_jid, ++$batch_count, scalar(@current_batch)
-          ));
-          @current_batch = ();
+          }
+          
+          if (@current_batch > 0) {
+            my $reduce_jid = $job->minion->enqueue(
+              'reduce_batch' => [] => {
+                parents  => [@current_batch],
+                priority => 50,
+                expire    => 2700,
+              }
+            );
+            $job->logger->debug(sprintf(
+              'Spawned type-balanced reduce_batch job %s for batch %d (%d jobs)',
+              $reduce_jid, ++$batch_count, scalar(@current_batch)
+            ));
+          }
         }
       }
     }
 
-    # Spawn final ReduceBatch for remaining jobs
-    if (@current_batch > 0) {
+    # Spawn remaining jobs in type-balanced batches
+    while (1) {
+      my @current_batch = ();
+      my $jobs_added = 0;
+      
+      # Try to add one job from each type that has jobs remaining
+      foreach my $type (qw(mayor ranged_specialist mounted_specialist siege_specialist ground_specialist)) {
+        if (@{$type_batches{$type} // []} > 0) {
+          push @current_batch, shift @{$type_batches{$type}};
+          $jobs_added++;
+        }
+      }
+      
+      last if $jobs_added == 0; # No more jobs to process
+      
       my $reduce_jid = $job->minion->enqueue(
         'reduce_batch' => [] => {
-          parents => [@current_batch]
+          parents => [@current_batch],
+          expire  => 2700,
         }
       );
       $job->logger->debug(sprintf(
-        'Spawned final reduce_batch job %s for batch %d (%d jobs)',
+        'Spawned final type-balanced reduce_batch job %s for batch %d (%d jobs)',
         $reduce_jid, ++$batch_count, scalar(@current_batch)
       ));
     }
