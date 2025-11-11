@@ -178,7 +178,7 @@ package Game::EvonyTKR::Model::General {
       return;
     };
 
-    foreach my $sn_index (0 .. scalar(@{ $self->specialtyNames })) {
+    foreach my $sn_index (0 .. scalar($#{ $self->specialtyNames })) {
       my $sn = $self->specialtyNames->[$sn_index];
       if(!defined($sn) || !length($sn) ){
         $self->logger->error(sprintf('invalid undef specialty in general %s at index %s', $self->name, $sn_index));
@@ -191,7 +191,7 @@ package Game::EvonyTKR::Model::General {
       }
       else {
         $self->logger->error(sprintf(
-          'Missing specialty number %s for general "%s": "%s" ',
+          'Missing specialty at index %s for general "%s": "%s" ',
           $sn_index, $self->name, $sn
         ));
       }

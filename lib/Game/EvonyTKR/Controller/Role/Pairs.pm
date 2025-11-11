@@ -107,16 +107,16 @@ package Game::EvonyTKR::Controller::Role::Pairs {
         [$np, $pairs_by_type->{ $np->{type} }->@*];
     }
 
-    #foreach my $type (keys $pairs_by_type->%*){
-    #  $pairs_by_type->{$type} =  [
-    #    sort { $self->wire_pair_to_key($a) cmp $self->wire_pair_to_key($b) }
-    #     List::UtilsBy::uniq_by {
-    #      $self->wire_pair_to_key($_)
-    #    } $pairs_by_type->{$type}->@* ];
+    foreach my $type (keys $pairs_by_type->%*){
+      my %hash = map { $self->wire_pair_to_key($_) => $_ } $pairs_by_type->{$type}->@*;
 
-    #  $self->logger->debug(sprintf('after merge, there are %s %s type pairs',
-    #  scalar($pairs_by_type->{$type}->@*), $type));
-    #}
+      $pairs_by_type->{$type} =  [
+        sort { $self->wire_pair_to_key($a) cmp $self->wire_pair_to_key($b) } values %hash
+      ];
+
+      $self->logger->debug(sprintf('after merge, there are %s %s type pairs',
+      scalar($pairs_by_type->{$type}->@*), $type));
+    }
     return $pairs_by_type;
   }
 
