@@ -44,11 +44,6 @@ package Game::EvonyTKR::Controller::Pairs {
     return $base;
   }
 
-  sub getPairs {
-    state %pairs_by_type;
-    return \%pairs_by_type;
-  }
-
   sub register($c, $app, $config = {}) {
     $c->SUPER::register($app, $config);
     $c->logger->info("Registering routes for " . ref($c));
@@ -62,11 +57,6 @@ package Game::EvonyTKR::Controller::Pairs {
       $c->logger->error("route setup failed in Pairs controller");
     };
 
-    $app->helper(
-      get_general_pairs => sub {
-        return $c->getPairs();
-      }
-    );
     Mojo::IOLoop->timer(
       0.01 => sub {
         $c->schedule_merge_pairs_from_cache($app);
@@ -74,88 +64,24 @@ package Game::EvonyTKR::Controller::Pairs {
     );
   }
 
-  sub do_merge_pairs_from_cache ($c, $app, $pairs, $all_pairs, $is_complete = 0)
-  {
-
-    my $generals = $c->get_generals($app);
-    $c->logger->debug('available general keys for building pairs: ',
-      join(', ', map { sprintf('"%s"', $_) } sort keys $generals->%*));
-    unless (scalar(keys($generals->%*))) {
-      if (!$is_complete) {
-        $c->logger->debug('Generals Not availalbe to build pairs against!');
-        Mojo::IOLoop->timer(
-          60 => sub {
-            $c->schedule_merge_pairs_from_cache($app);
-          }
-        );
-      }
-      return;
-    }
-
-    my @new_pairs;
-    foreach my $wire_pair ($all_pairs->@*) {
-      my $pk = lc($c->normalize($wire_pair->{primary}));
-      $pk =~ s/ /_/g;
-      my $primary = $generals->{$pk};
-      unless ($primary) {
-        $c->logger->error(sprintf(
-          'cannot find primary %s with key %s',
-          $wire_pair->{primary}, $pk
-        ));
-        next;
-      }
-      my $sk = lc($c->normalize($wire_pair->{secondary}));
-      $sk =~ s/ /_/g;
-      my $secondary = $generals->{$sk};
-      unless ($secondary) {
-        $c->logger->error(sprintf(
-          'cannot find secondary %s with key %s',
-          $wire_pair->{secondary}, $sk
-        ));
-        next;
-      }
-      my $type = $wire_pair->{type};
-      my $pair = Game::EvonyTKR::Model::General::Pair->new(
-        primary   => $primary,
-        secondary => $secondary,
-        type      => $type,
-      );
-      push @new_pairs, $pair;
-
-    }
-    Mojo::IOLoop->timer(
-      0.001 => sub {
-        my $pairs = $c->merge_into_pairs_by_type($pairs, @new_pairs);
-        $c->logger->info(sprintf('Processed pairs from cache. Total types: %d',
-          scalar keys %$pairs));
-      }
-    );
-
-  }
-
-  sub schedule_merge_pairs_from_cache ($c, $app) {
-    my $pairs = $c->getPairs();
+  sub schedule_merge_pairs_from_cache ($c, $app, $delay = 0) {
 
     # Check if pair building is complete
-    my $pair_cache  = $c->pair_cache();
-    my $is_complete = $pair_cache->get('pair_building_complete');
+    my $is_complete = $c->pair_cache()->get('pair_building_complete');
+    my $npbt = $c->get_pairs_by_type();
 
-    my $all_pairs = $c->get_all_pairs();
-
-    if ($all_pairs) {
-
-      $c->logger->info('Processing pairs from all_pairs');
-      $c->do_merge_pairs_from_cache($app, $pairs, $all_pairs, $is_complete);
-    }
-    elsif ($is_complete) {
+    unless ($is_complete && !$npbt) {
       $c->logger->warn('Pair building complete but no pairs found to merge');
     }
 
     if (!$is_complete) {
-      $c->logger->debug('Pair building not complete yet, will retry');
+      $delay++;
+      $delay = $delay % 60;
+      $delay = $delay == 0 ? 0.001 : $delay;
+      $c->logger->debug(sprintf('Pair building not complete yet, will retry in %s', $delay));
       Mojo::IOLoop->timer(
-        60 => sub {
-          $c->schedule_merge_pairs_from_cache($app);
+        $delay => sub {
+          $c->schedule_merge_pairs_from_cache($app, $delay);
         }
       );
     }
@@ -270,7 +196,7 @@ package Game::EvonyTKR::Controller::Pairs {
       );
     }
 
-    my $pairs          = $c->getPairs();
+    my $pairs          = $c->get_pairs_by_type();
     my $pairs_for_type = $pairs->{$type} // [];
 
     $c->render(
@@ -314,9 +240,9 @@ package Game::EvonyTKR::Controller::Pairs {
     my $uiTarget       = $route_meta->{uiTarget};
 
     my $pair_count = 0;
-    for my $type (keys %{ $c->getPairs() }) {
+    for my $type (keys %{ $c->get_pairs_by_type() }) {
       $pair_count +=
-        scalar @{ $c->getPairs()->{$generalType} };
+        scalar @{ $c->get_pairs_by_type()->{$generalType} };
     }
     if ($pair_count == 0) {
       # Pairs not loaded yet, show loading page
@@ -442,7 +368,7 @@ package Game::EvonyTKR::Controller::Pairs {
     my $buffActivation = $route_meta->{buffActivation};
     my $uiTarget       = $route_meta->{uiTarget};
 
-    my @pairs = @{ $c->getPairs()->{$generalType} };
+    my @pairs = @{ $c->get_pairs_by_type()->{$generalType} };
 
     $c->logger->debug(sprintf('There are %s pairs to return.', scalar(@pairs)));
 
@@ -562,7 +488,7 @@ package Game::EvonyTKR::Controller::Pairs {
     my $buffActivation = $route_meta->{buffActivation};
     my $uiTarget       = $route_meta->{uiTarget};
     my $pairs;
-    @$pairs = $c->getPairs()->{$generalType}->@*;
+    @$pairs = $c->get_pairs_by_type()->{$generalType}->@*;
     @$pairs = sort {
       my $pc = $a->primary->name cmp $b->primary->name;
       if ($pc == 0) {

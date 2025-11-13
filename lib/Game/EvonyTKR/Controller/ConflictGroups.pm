@@ -77,7 +77,7 @@ package Game::EvonyTKR::Controller::ConflictGroups {
     my $last_run = 0;
     my $found    = 0;
 
-    # Check if prebuild has run at all yet
+    # Check ifprebuild has run at all yet
     my $prebuild_jobs = $app->minion->jobs({
       tasks  => ['external_prebuild'],
       states => ['finished']
@@ -108,6 +108,7 @@ package Game::EvonyTKR::Controller::ConflictGroups {
               $info->{id}, Data::Printer::np($info->{notes}),
               $info->{result}
             ));
+            $c->logger->info(sprintf('setting last_run true for schedule_cached_conflicts_merge'));
             $last_run = 1;
           }
           $found = 1;
@@ -156,7 +157,7 @@ package Game::EvonyTKR::Controller::ConflictGroups {
 
     unless ($merged || $last_run) {
       if ($merged) {
-        $c->do_merge_cached_conflicts($app, $cd, $cc, $merged);
+
       }
       else {
         $c->logger->warn('schedule_cached_conflicts_merge detects finished '
@@ -180,12 +181,11 @@ package Game::EvonyTKR::Controller::ConflictGroups {
       $c->logger->debug(
         'schedule_cached_conflicts_merge calling do_merge_cached_conflicts');
       # Process only new data efficiently
-      $c->do_merge_cached_conflicts($app, $cd, $cc, $merged);
+      $c->get_conflict_detector->preseed($merged->{by_general}, $merged->{groups_by_conflict_type});
     }
     else {
-      $c->logger->debug(
-"$current_timestamp <= $last_processed_timestamp or undefined merged hash."
-      );
+      $c->logger->debug(sprintf('%s <= %s', $current_timestamp, $last_processed_timestamp)) unless not defined($merged);
+      $c->logger->debug('merge hash undefined') if not defined($merged);
     }
 
     # Check jobs less frequently and with shorter timeout

@@ -31,7 +31,6 @@ package Game::EvonyTKR::External::General::Pair::ReduceBatch {
       sprintf('ReduceBatch processing %d parent jobs', scalar(@$job_ids)));
 
     my $batch_id = $job->id;
-    $job->sort_pair_list();
 
     foreach my $job_id (@$job_ids) {
       my $job_info = $job->minion->job($job_id);

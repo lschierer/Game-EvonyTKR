@@ -75,9 +75,9 @@ package Game::EvonyTKR::External::General::Pair::ReduceCoordinator {
       return $job->retry({ delay => 5 });
     }
 
-    my $cache_effectiveness = $total_conflicts > 0 ? 
+    my $cache_effectiveness = $total_conflicts > 0 ?
       sprintf("%.1f%%", ($total_cache_hits / $total_conflicts) * 100) : "N/A";
-    
+
     $job->logger->info(sprintf(
       "Cache effectiveness: %d cache hits out of %d total conflicts (%s)",
       $total_cache_hits, $total_conflicts, $cache_effectiveness
@@ -85,6 +85,7 @@ package Game::EvonyTKR::External::General::Pair::ReduceCoordinator {
 
     # Set completion flag for Pairs controller
     $job->pair_cache->set('pair_building_complete', 1);
+    $job->conflict_cache->set('conflict_building_complete', 1);
     $job->logger->info("Set pair_building_complete flag in cache");
 
     $job->finish(

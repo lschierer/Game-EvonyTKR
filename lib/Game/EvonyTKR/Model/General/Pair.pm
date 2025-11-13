@@ -56,6 +56,57 @@ package Game::EvonyTKR::Model::General::Pair {
     return $json;
   }
 
+  sub to_wire_hash ($self){
+    my $h = {
+      primary   => $self->primary->name,
+      secondary => $self->secondary->name,
+      type      => $self->type,
+    };
+    return $h;
+  }
+
+  sub from_wire_hash ($class, $h) {
+    my $logger = Game::EvonyTKR::Log::Config->logger();
+    unless(exists($h->{primary}) && length($h->{primary})){
+      $logger->error('hash object must contain a primary with a name in it.');
+      return;
+    }
+
+    my $general_helper;
+    eval {
+      $general_helper = Mojo::Base->new->with_roles(
+        'Game::EvonyTKR::Role::Logger',
+        'Game::EvonyTKR::Role::Common',
+        'Game::EvonyTKR::Controller::Role::Generals'
+      );
+    } or do {
+      $logger->error(
+        sprintf('eval failed; cannot define general helper: "%s"', $@));
+      return;
+    };
+    my $primary = $general_helper->get_general($h->{primary});
+    unless($primary){
+      $logger->error(sprintf('cannot retrieve general for %s when creating a pair.', $h->{primary}));
+      return;
+    }
+    my $secondary = $general_helper->get_general($h->{secondary});
+    unless($secondary){
+      $logger->error(sprintf('cannot retrieve general for %s when creating a pair.', $h->{secondary}));
+      return;
+    }
+
+    unless($h && ref($h) && ref($h) eq 'HASH' && exists $h->{type} && length($h->{type})){
+      $logger->error('hash object must contain a type.');
+      return;
+    }
+
+    return $class->new(
+      primary   => $primary,
+      secondary => $secondary,
+      type      => $h->{type},
+    );
+  }
+
   sub compare ($self, $other, $swapped = undef) {
     my ($a, $b) = $swapped ? ($other, $self) : ($self, $other);
     if ($a
