@@ -297,7 +297,7 @@ package Game::EvonyTKR::External::Prebuild {
           $mn => [] => {
             attempts => 5,
             delay    => 10,
-            expire   => 2700,
+            expire   => 3700,
             priority => 90,
             parents  => $loaderJids
           }

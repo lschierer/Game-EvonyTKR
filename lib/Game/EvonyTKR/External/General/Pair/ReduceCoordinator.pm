@@ -83,11 +83,16 @@ package Game::EvonyTKR::External::General::Pair::ReduceCoordinator {
       $total_cache_hits, $total_conflicts, $cache_effectiveness
     ));
 
-    # Set completion flag for Pairs controller
-    $job->pair_cache->set('pair_building_complete', 1);
-    $job->conflict_cache->set('conflict_building_complete', 1);
-    $job->logger->info("Set pair_building_complete flag in cache");
-
+    my $pc = 0;
+    my $cc = 0;
+    do {
+      # Set completion flags for both Pairs and ConflictGroups controllers
+      $pc = $job->pair_cache->set('pair_building_complete', 1);
+      $cc = $job->conflict_cache->set('conflict_building_complete', 1);
+      $job->logger->debug(sprintf('pair_building_complete is %s; conflict_building_complete is %s.',
+      $pc ? 'true' : 'false', $cc ? 'true' : 'false'));
+    }while (!$pc && !$cc);
+    $job->logger->info("Set completion flags in cache");
     $job->finish(
       sprintf("Merged results from %d batches - %d conflicts (%d cache hits, %s effectiveness)",
         scalar(keys %$processed), $total_conflicts, $total_cache_hits, $cache_effectiveness));

@@ -71,135 +71,25 @@ package Game::EvonyTKR::Controller::ConflictGroups {
   }
 
   sub schedule_cached_conflicts_merge($c, $app) {
-    my $cd       = $c->get_conflict_detector();
-    my $cc       = $c->conflict_cache();
-    my $delay    = 30;
-    my $last_run = 0;
-    my $found    = 0;
-
-    # Check ifprebuild has run at all yet
-    my $prebuild_jobs = $app->minion->jobs({
-      tasks  => ['external_prebuild'],
-      states => ['finished']
-    })->total;
-
-    unless ($prebuild_jobs > 0) {
-      $c->logger->debug('schedule_cached_conflicts_merge: '
-          . 'prebuild not finished yet, retrying in '
-          . $delay * 1.5);
-      Mojo::IOLoop->timer(
-        $delay * 1.5 => sub { $c->schedule_cached_conflicts_merge($app) });
+    # Check if conflict building is complete
+    my $conflict_cache = $c->conflict_cache();
+    my $is_complete = $conflict_cache->get('conflict_building_complete');
+    
+    if ($is_complete) {
+      $c->logger->info('Conflict building complete, loading final data');
+      # Load final conflict data
+      my $cached_conflicts = $conflict_cache->get('merged_conflicts');
+      if ($cached_conflicts) {
+        $c->get_conflict_detector(); # This will auto-update from cache
+      }
       return;
     }
-
-    my $active_jobs = $app->minion->jobs({
-      tasks  => ['reduce_coordinator'],
-      states => ['active', 'inactive', 'finished']
-    })->each(sub {
-      my $info = $_;
-      my $job  = $app->minion->job($info->{id});
-      if (defined($job) && $job->info->{state} ne 'failed') {
-        if (defined($info->{notes}->{processed})
-          && scalar(keys($info->{notes}->{processed}->%*)) > 0) {
-          if ($info->{state} eq 'finsihed') {
-            $c->logger->debug(sprintf(
-              'schedule_cached_conflicts_merge found finished '
-                . 'reduce_coordinator jid %s with notes %s and result %s',
-              $info->{id}, Data::Printer::np($info->{notes}),
-              $info->{result}
-            ));
-            $c->logger->info(sprintf('setting last_run true for schedule_cached_conflicts_merge'));
-            $last_run = 1;
-          }
-          $found = 1;
-          return;
-        }
-        else {
-          $c->logger->debug(sprintf(
-            'schedule_cached_conflicts_merge skipping '
-              . 'reduce_coordinator jid %s with notes %s',
-            $info->{id}, Data::Printer::np($info->{notes})
-          ));
-        }
-      }
-      else {
-        $c->logger->error(sprintf(
-          'schedule_cached_conflicts_merge detects '
-            . 'reduce_coordinator %s in error state %s',
-          $info->{id}, $info->{result}
-        ));
-      }
-    });
-
-    unless ($found) {
-      $c->logger->debug('schedule_cached_conflicts_merge has not '
-          . 'found a reduce_coordinator, next run in '
-          . $delay * 2);
-      my $retry_timer;
-      $retry_timer = Mojo::IOLoop->timer(
-        $delay * 2 => sub {
-          $c->logger->debug(sprintf(
-            'retry timer %s fired after %s delay',
-            $retry_timer, $delay * 2
-          ));
-          $c->schedule_cached_conflicts_merge($app);
-        }
-      );
-      $c->logger->debug("Set timer with ID: $retry_timer");
-      return;
-    }
-
-    # Track what we've already processed to avoid reprocessing
-    state $last_processed_timestamp = 0;
-
-    my $cas_val = $c->conflict_cache->gets('merged_conflicts');
-    my $merged  = $$cas_val[1];
-
-    unless ($merged || $last_run) {
-      if ($merged) {
-
-      }
-      else {
-        $c->logger->warn('schedule_cached_conflicts_merge detects finished '
-            . 'reduce_coordinator when $merged is undefined');
-      }
-      $c->logger->info(
-        sprintf('schedule_cached_conflicts_merge complete for %s', __PACKAGE__)
-      );
-      return;
-    }
-
-    $c->logger->debug(sprintf(
-      'schedule_cached_conflicts_merge has cas_val %s and merged %s',
-      Data::Printer::np($cas_val),
-      Data::Printer::np($merged)
-    ));
-
-    my $current_timestamp = $merged->{timestamp} // 0;
-    unless ($current_timestamp <= $last_processed_timestamp) {
-      $last_processed_timestamp = $current_timestamp;
-      $c->logger->debug(
-        'schedule_cached_conflicts_merge calling do_merge_cached_conflicts');
-      # Process only new data efficiently
-      $c->get_conflict_detector->preseed($merged->{by_general}, $merged->{groups_by_conflict_type});
-    }
-    else {
-      $c->logger->debug(sprintf('%s <= %s', $current_timestamp, $last_processed_timestamp)) unless not defined($merged);
-      $c->logger->debug('merge hash undefined') if not defined($merged);
-    }
-
-    # Check jobs less frequently and with shorter timeout
-    if ($last_run == 0) {
-      $c->logger->debug(
-        'schedule_cached_conflicts_merge will rerun in ' . $delay);
-      Mojo::IOLoop->timer(
-        $delay => sub { $c->schedule_cached_conflicts_merge($app) });
-    }
-    else {
-      $c->logger->debug(
-'schedule_cached_conflicts_merge will not run again, last_run was detected.'
-      );
-    }
+    
+    # Not complete yet, retry in 30 seconds
+    $c->logger->debug('Conflict building not complete yet, will retry in 30s');
+    Mojo::IOLoop->timer(
+      30 => sub { $c->schedule_cached_conflicts_merge($app) }
+    );
   }
 
   sub index ($c) {

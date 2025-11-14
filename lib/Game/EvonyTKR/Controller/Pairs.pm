@@ -50,7 +50,9 @@ package Game::EvonyTKR::Controller::Pairs {
 
     my $mainRoutes = $app->routes->any($base);
 
-    $c->setup_pairs_by_type();
+    Mojo::IOLoop->timer(0.001 => sub{
+      $c->setup_pairs_by_type();
+    });
 
     eval { $c->setup_routes($app); } or do {
       say "route setup failed in Pairs controller";
@@ -70,7 +72,7 @@ package Game::EvonyTKR::Controller::Pairs {
     my $is_complete = $c->pair_cache()->get('pair_building_complete');
     my $npbt = $c->get_pairs_by_type();
 
-    unless ($is_complete && !$npbt) {
+    unless ($is_complete && $npbt) {
       $c->logger->warn('Pair building complete but no pairs found to merge');
     }
 
@@ -195,9 +197,10 @@ package Game::EvonyTKR::Controller::Pairs {
         status => 400
       );
     }
-
+    $c->logger->debug('diagnostic_pairs_by_type calling get_pairs_by_type');
     my $pairs          = $c->get_pairs_by_type();
     my $pairs_for_type = $pairs->{$type} // [];
+    $c->logger->debug(sprintf('diagnostic_pairs_by_type has %s pairs of type %s', scalar(@{$pairs_for_type}), $type));
 
     $c->render(
       template   => 'pairs/diagnostic',
