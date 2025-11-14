@@ -585,17 +585,18 @@ package Game::EvonyTKR::Controller::Pairs {
       };
 
       $c->logger->debug("Enqueueing job for pair index: $index");
-      my $jid = $c->app->minion->enqueue(
-        pair_worker => [$args],
-        {
-          delay => ($index * 0.001) + rand(0.5),
-          notes => {
-            pair_index => $index,
-            run_id     => $run_id,
-            session_id => $session_id,
-          }
-        }
-      );
+      my $jid = 0;
+      #$c->app->minion->enqueue(
+      #  pair_worker => [$args],
+      #  {
+      #    delay => ($index * 0.001) + rand(0.5),
+      #    notes => {
+      #      pair_index => $index,
+      #      run_id     => $run_id,
+      #      session_id => $session_id,
+      #    }
+      #  }
+      #);
       $c->logger->debug("Enqueued job with ID: $jid");
       push @subs, $jid;
 
