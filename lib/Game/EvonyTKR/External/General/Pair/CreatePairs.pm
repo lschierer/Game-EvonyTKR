@@ -89,14 +89,17 @@ package Game::EvonyTKR::External::General::Pair::CreatePairs {
 
     # Initialize conflict detector
     my $conflict_detector = $job->initialize_conflict_detector();
-    my $initial_conflicts = scalar(keys %{$conflict_detector->by_general});
-    $job->logger->info(sprintf('Initialized conflict detector with %d existing conflicts', $initial_conflicts));
+    my $initial_conflicts = scalar(keys %{ $conflict_detector->by_general });
+    $job->logger->info(
+      sprintf('Initialized conflict detector with %d existing conflicts',
+        $initial_conflicts)
+    );
 
     my @pairs;
-    my $conflicts_found = 0;
-    my $skipped_existing = 0;
+    my $conflicts_found      = 0;
+    my $skipped_existing     = 0;
     my $compatibility_checks = 0;
-    my $conflict_cache_hits = 0;
+    my $conflict_cache_hits  = 0;
 
     # Build pairs with matching generals
     foreach my $secondary (@matching_generals) {
@@ -118,7 +121,8 @@ package Game::EvonyTKR::External::General::Pair::CreatePairs {
       my $pair_key_ba = $job->wire_pair_to_key($pair_ba);
 
       # Skip if either direction already processed
-      if ($job->pair_cache->get($pair_key_ab) || $job->pair_cache->get($pair_key_ba)) {
+      if ( $job->pair_cache->get($pair_key_ab)
+        || $job->pair_cache->get($pair_key_ba)) {
         $skipped_existing++;
         $job->logger->debug(sprintf(
           'Pair relationship already exists: %s <-> %s (type: %s)',
@@ -130,19 +134,19 @@ package Game::EvonyTKR::External::General::Pair::CreatePairs {
       # Check for conflicts
       $compatibility_checks++;
       my $pre_cache_hits = $conflict_detector->cache_hits;
-      
+
       $job->logger->debug(sprintf(
         'Testing compatibility: %s <-> %s',
         $primary->name, $secondary->name
       ));
-      
+
       unless ($conflict_detector->are_generals_compatible($primary, $secondary))
       {
         # Check if this was a cache hit
         if ($conflict_detector->cache_hits > $pre_cache_hits) {
           $conflict_cache_hits++;
         }
-        
+
         $job->logger->debug(sprintf(
           'Conflict detected: %s <-> %s',
           $primary->name, $secondary->name
@@ -182,14 +186,18 @@ package Game::EvonyTKR::External::General::Pair::CreatePairs {
     );
 
     $job->logger->info(sprintf(
-      'CreatePairs completed for %s/%s: %d pairs, %d conflicts (%d cache hits), %d skipped, %d compatibility checks of %d candidates',
-      $general_name, $type, scalar @pairs, $conflicts_found, $conflict_cache_hits, $skipped_existing, $compatibility_checks, scalar @matching_generals
+'CreatePairs completed for %s/%s: %d pairs, %d conflicts (%d cache hits), %d skipped, %d compatibility checks of %d candidates',
+      $general_name,         $type,
+      scalar @pairs,         $conflicts_found,
+      $conflict_cache_hits,  $skipped_existing,
+      $compatibility_checks, scalar @matching_generals
     ));
 
     return $job->finish(sprintf(
       'Created %d pairs for %s as %s with %d conflicts (%d skipped, %d checks)',
-      scalar @pairs, $general_name,
-      ref($type) ? join(',', $type->@*) : $type, $conflicts_found, $skipped_existing, $compatibility_checks
+      scalar @pairs,                             $general_name,
+      ref($type) ? join(',', $type->@*) : $type, $conflicts_found,
+      $skipped_existing,                         $compatibility_checks
     ));
   }
 }

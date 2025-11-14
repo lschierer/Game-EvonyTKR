@@ -17,7 +17,7 @@ package Game::EvonyTKR::Controller::Role::Pairs {
 
   sub pairs_by_type ($self, $new_pbt = undef) {
     state $pairs_by_type = {};
-    if(defined($new_pbt) && ref($new_pbt) eq 'HASH'){
+    if (defined($new_pbt) && ref($new_pbt) eq 'HASH') {
       $pairs_by_type = $new_pbt;
     }
     return $pairs_by_type;
@@ -25,7 +25,7 @@ package Game::EvonyTKR::Controller::Role::Pairs {
 
   sub conflict_data ($self, $new_cd = undef) {
     state $conflict_data = {};
-    if(defined($new_cd) && ref($new_cd) eq 'HASH'){
+    if (defined($new_cd) && ref($new_cd) eq 'HASH') {
       $conflict_data = $new_cd;
     }
     return $conflict_data;
@@ -37,31 +37,34 @@ package Game::EvonyTKR::Controller::Role::Pairs {
 
   sub add_conflict_data ($self, $by_general, $groups_by_conflict_type) {
     my $cas_val = $self->conflict_cache->gets('merged_conflicts');
-    if(defined($cas_val) && ref($cas_val) eq 'ARRAY'){
-      my $current_data = $$cas_val[1] // { by_general => {}, groups_by_conflict_type => {}, timestamp => time };
+    if (defined($cas_val) && ref($cas_val) eq 'ARRAY') {
+      my $current_data = $$cas_val[1]
+        // { by_general => {}, groups_by_conflict_type => {},
+        timestamp => time };
 
       # Merge by_general data
       foreach my $general (keys %$by_general) {
         $current_data->{by_general}->{$general} //= {};
-        %{$current_data->{by_general}->{$general}} = (
-          %{$current_data->{by_general}->{$general}},
-          %{$by_general->{$general}}
+        %{ $current_data->{by_general}->{$general} } = (
+          %{ $current_data->{by_general}->{$general} },
+          %{ $by_general->{$general} }
         );
       }
 
       # Merge groups_by_conflict_type data
       foreach my $type (keys %$groups_by_conflict_type) {
         $current_data->{groups_by_conflict_type}->{$type} //= [];
-        my %seen = map { $_ => 1 } @{$current_data->{groups_by_conflict_type}->{$type}};
-        push @{$current_data->{groups_by_conflict_type}->{$type}},
-             grep { !$seen{$_}++ } @{$groups_by_conflict_type->{$type}};
+        my %seen = map { $_ => 1 }
+          @{ $current_data->{groups_by_conflict_type}->{$type} };
+        push @{ $current_data->{groups_by_conflict_type}->{$type} },
+          grep { !$seen{$_}++ } @{ $groups_by_conflict_type->{$type} };
       }
 
       $current_data->{timestamp} = time;
       $$cas_val[1] = $current_data;
 
       my $result = $self->conflict_cache->cas('merged_conflicts', @$cas_val);
-      if($result){
+      if ($result) {
         $self->conflict_data($current_data);
         return 1;
       }
@@ -69,11 +72,11 @@ package Game::EvonyTKR::Controller::Role::Pairs {
     return 0;
   }
 
-  sub update_conflict_data ($self, $cd){
+  sub update_conflict_data ($self, $cd) {
     state $all_conflicts_compiled;
     state $last_update_timestamp = 0;
     state $delay;
-    unless($all_conflicts_compiled){
+    unless ($all_conflicts_compiled) {
 
       $delay++;
       $delay = $delay % 60;
@@ -81,33 +84,42 @@ package Game::EvonyTKR::Controller::Role::Pairs {
 
       # Only check for updates occasionally to avoid blocking
       my $now = time;
-      if($now - $last_update_timestamp <= $delay) {
-        $self->logger->debug('update_conflict_data called too frequently, returning.');
+      if ($now - $last_update_timestamp <= $delay) {
+        $self->logger->debug(
+          'update_conflict_data called too frequently, returning.');
         return;
       }
       my $cached_data = $self->conflict_cache->get('merged_conflicts');
-      my $local_data = $self->conflict_data();
+      my $local_data  = $self->conflict_data();
 
-      if ($cached_data && (!$local_data->{timestamp} || $cached_data->{timestamp} > $local_data->{timestamp})) {
-        $cd->preseed($cached_data->{by_general}, $cached_data->{groups_by_conflict_type});
+      if (
+        $cached_data
+        && (!$local_data->{timestamp}
+          || $cached_data->{timestamp} > $local_data->{timestamp})
+      ) {
+        $cd->preseed($cached_data->{by_general},
+          $cached_data->{groups_by_conflict_type});
         $self->conflict_data($cached_data);
       }
       $last_update_timestamp = $now;
 
-      $all_conflicts_compiled = $self->conflict_cache->get('conflict_building_complete');
+      $all_conflicts_compiled =
+        $self->conflict_cache->get('conflict_building_complete');
     }
   }
 
   sub get_conflict_detector ($self) {
     state $cd;
 
-    unless ($cd ) {
+    unless ($cd) {
       $cd = $self->initialize_conflict_detector();
     }
 
-    Mojo::IOLoop->timer(0.001 => sub {
-      $self->update_conflict_data($cd);
-    });
+    Mojo::IOLoop->timer(
+      0.001 => sub {
+        $self->update_conflict_data($cd);
+      }
+    );
 
     return $cd;
   }
@@ -115,7 +127,8 @@ package Game::EvonyTKR::Controller::Role::Pairs {
   sub setup_pairs_by_type ($self) {
     my $pairs = $self->pairs_by_type();
     foreach my $key ($self->GeneralKeys->@*) {
-      $pairs->{$key} = [] unless (ref($pairs) eq 'HASH' && exists $pairs->{$key});
+      $pairs->{$key} = []
+        unless (ref($pairs) eq 'HASH' && exists $pairs->{$key});
     }
     my $success = $self->pair_cache->add('pairs_by_type', $pairs);
     my $verify  = $self->pair_cache->get('pairs_by_type');
@@ -133,17 +146,22 @@ package Game::EvonyTKR::Controller::Role::Pairs {
     my $add_result = 0;
 
     my $pbt_cas_val = $self->pair_cache->gets('pairs_by_type');
-    if(defined($pbt_cas_val) && ref($pbt_cas_val) && ref($pbt_cas_val) eq 'ARRAY'){
+    if ( defined($pbt_cas_val)
+      && ref($pbt_cas_val)
+      && ref($pbt_cas_val) eq 'ARRAY') {
       my $npbt = $$pbt_cas_val[1];
-      my %hash = map { $self->wire_pair_to_key($_) => $_ } ( $wire_pair, $npbt->{ $wire_pair->{type} }->@* );
-      $npbt->{ $wire_pair->{type} } =  [
-        sort { $self->wire_pair_to_key($a) cmp $self->wire_pair_to_key($b) } values %hash
-      ];
+      my %hash = map { $self->wire_pair_to_key($_) => $_ }
+        ($wire_pair, $npbt->{ $wire_pair->{type} }->@*);
+      $npbt->{ $wire_pair->{type} } =
+        [sort { $self->wire_pair_to_key($a) cmp $self->wire_pair_to_key($b) }
+          values %hash];
       $$pbt_cas_val[1] = $npbt;
       my $pbt_result = $self->pair_cache->cas('pairs_by_type', @$pbt_cas_val);
-      if($pbt_result){
-        my $wp_result = $self->pair_cache->add($self->wire_pair_to_key($wire_pair), $wire_pair);
-        if($wp_result){
+      if ($pbt_result) {
+        my $wp_result =
+          $self->pair_cache->add($self->wire_pair_to_key($wire_pair),
+          $wire_pair);
+        if ($wp_result) {
           $self->pairs_by_type($npbt);
           $add_result = 1;
         }
@@ -153,16 +171,19 @@ package Game::EvonyTKR::Controller::Role::Pairs {
     return $add_result;
   }
 
-  sub get_pair ($self, $key){
+  sub get_pair ($self, $key) {
     my $wire_pair = $self->pair_cache->get($key);
-    unless($wire_pair){
+    unless ($wire_pair) {
       $self->logger->warn(sprintf('cannot find pair for key %s', $key));
       return;
     }
     my $pair = Game::EvonyTKR::Model::General::Pair->from_wire_hash($wire_pair);
-    unless($pair){
-      $self->logger->error(sprintf('cannot create pair from wire_pair %s/%s/%s; key %s',
-      $wire_pair->{type}, $wire_pair->{primary}, $wire_pair->{secondary}, $key));
+    unless ($pair) {
+      $self->logger->error(sprintf(
+        'cannot create pair from wire_pair %s/%s/%s; key %s',
+        $wire_pair->{type},      $wire_pair->{primary},
+        $wire_pair->{secondary}, $key
+      ));
       return;
     }
     return $pair;
@@ -173,13 +194,14 @@ package Game::EvonyTKR::Controller::Role::Pairs {
     my $pairs_by_type = $self->pair_cache->get('pairs_by_type') // {};
     state $all_pairs_built;
     state $inflated_pairs = {};
-    unless($all_pairs_built){
+    unless ($all_pairs_built) {
       foreach my $type (keys %$pairs_by_type) {
         $inflated_pairs->{$type} = [];
-        foreach my $wire_pair (@{$pairs_by_type->{$type}}) {
+        foreach my $wire_pair (@{ $pairs_by_type->{$type} }) {
           # Inflate wire pair into proper pair object
-          if (my $pair_obj = Game::EvonyTKR::Model::General::Pair->from_wire_hash($wire_pair)) {
-            push @{$inflated_pairs->{$type}}, $pair_obj;
+          if (my $pair_obj =
+            Game::EvonyTKR::Model::General::Pair->from_wire_hash($wire_pair)) {
+            push @{ $inflated_pairs->{$type} }, $pair_obj;
           }
         }
       }
@@ -188,28 +210,38 @@ package Game::EvonyTKR::Controller::Role::Pairs {
     return $inflated_pairs;
   }
 
-  sub get_pair_list ($self, $requested_type = undef){
-    my $list = [];
+  sub get_pair_list ($self, $requested_type = undef) {
+    my $list          = [];
     my $pairs_by_type = $self->pair_cache->get('pairs_by_type') // {};
 
-    foreach my $type (keys( $pairs_by_type->%* )){
-      if(defined $requested_type && $type ne $requested_type){
-        $self->logger->debug(sprintf('skipping type %s as it does not match requested type %s', $type, $requested_type));
+    foreach my $type (keys($pairs_by_type->%*)) {
+      if (defined $requested_type && $type ne $requested_type) {
+        $self->logger->debug(
+          sprintf(
+            'skipping type %s as it does not match requested type %s',
+            $type, $requested_type
+          )
+        );
         next;
       }
-      $list = [ List::AllUtils::uniq ( $list->@*, map { $self->wire_pair_to_key($_) } $pairs_by_type->{$type}->@* ) ];
+      $list = [
+        List::AllUtils::uniq(
+          $list->@*,
+          map { $self->wire_pair_to_key($_) } $pairs_by_type->{$type}->@*
+        )
+      ];
     }
-    $list = [ sort $list->@*];
+    $list = [sort $list->@*];
     return $list;
   }
 
   sub get_all_pairs ($self) {
-    my $pairs_by_type =$self->get_pairs_by_type() // {};
-    my $pairs = [];
+    my $pairs_by_type = $self->get_pairs_by_type() // {};
+    my $pairs         = [];
 
     # Flatten all pairs from all types
     foreach my $type (keys %$pairs_by_type) {
-      push @$pairs, @{$pairs_by_type->{$type}};
+      push @$pairs, @{ $pairs_by_type->{$type} };
     }
 
     return $pairs;
@@ -230,7 +262,8 @@ package Game::EvonyTKR::Controller::Role::Pairs {
     if ($cached_conflicts) {
       $self->logger->debug('Loading existing conflict data from cache');
 
-      $conflict_detector->preseed($cached_conflicts->{by_general}, $cached_conflicts->{groups_by_conflict_type});
+      $conflict_detector->preseed($cached_conflicts->{by_general},
+        $cached_conflicts->{groups_by_conflict_type});
     }
 
     return $conflict_detector;

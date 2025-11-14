@@ -45,11 +45,12 @@ package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
 
     # Spawn CreatePairs jobs for each general/type combination
     my $job_count     = 0;
-    my %type_batches  = (); # Track jobs by type for balanced batching
+    my %type_batches  = ();    # Track jobs by type for balanced batching
     my $batch_count   = 0;
-    my %type_counters = (); # Track how many jobs per type
+    my %type_counters = ();    # Track how many jobs per type
 
-    foreach my $general_name (sort keys %$generals) { # Sort for deterministic order
+    foreach my $general_name (sort keys %$generals)
+    {                          # Sort for deterministic order
       my $general = $generals->{$general_name};
 
       # Handle scalar vs array types for this general
@@ -61,50 +62,55 @@ package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
         $type_counters{$type}++;
 
         # High priority for first 3 generals of each type
-        my $priority = ($type_counters{$type} <= 10) ?  3 : 1;
-        $priority    = ($type_counters{$type} <=  9) ?  4 : $priority;
-        $priority    = ($type_counters{$type} <=  8) ?  5 : $priority;
-        $priority    = ($type_counters{$type} <=  7) ?  6 : $priority;
-        $priority    = ($type_counters{$type} <=  6) ?  7 : $priority;
-        $priority    = ($type_counters{$type} <=  5) ?  8 : $priority;
-        $priority    = ($type_counters{$type} <=  4) ?  9 : $priority;
-        $priority    = ($type_counters{$type} <=  3) ? 10 : $priority;
+        my $priority = ($type_counters{$type} <= 10) ? 3 : 1;
+        $priority = ($type_counters{$type} <= 9) ? 4  : $priority;
+        $priority = ($type_counters{$type} <= 8) ? 5  : $priority;
+        $priority = ($type_counters{$type} <= 7) ? 6  : $priority;
+        $priority = ($type_counters{$type} <= 6) ? 7  : $priority;
+        $priority = ($type_counters{$type} <= 5) ? 8  : $priority;
+        $priority = ($type_counters{$type} <= 4) ? 9  : $priority;
+        $priority = ($type_counters{$type} <= 3) ? 10 : $priority;
 
-        my $job_id = $job->minion->enqueue('create_pairs' => [$general_name, $type] => {
-          priority => $priority,
-          expire   => 2700,
-        });
+        my $job_id = $job->minion->enqueue(
+          'create_pairs' => [$general_name, $type] => {
+            priority => $priority,
+            expire   => 2700,
+          }
+        );
         $job->logger->debug(sprintf(
           'Enqueued create_pairs job %s for general %s, type %s (priority %d)',
           $job_id, $general_name, $type, $priority
         ));
 
         # Add to type-specific batch
-        push @{$type_batches{$type}}, $job_id;
+        push @{ $type_batches{$type} }, $job_id;
         $job_count++;
 
         # Check if we can form a complete batch (one job per type)
-        my @available_types = grep { @{$type_batches{$_} // []} > 0 } keys %type_batches;
-        if (@available_types >= 5) { # We have all 5 types available
+        my @available_types =
+          grep { @{ $type_batches{$_} // [] } > 0 } keys %type_batches;
+        if (@available_types >= 5) {    # We have all 5 types available
           my @current_batch = ();
-          
+
           # Take one job from each type
-          foreach my $batch_type (qw(mayor ranged_specialist mounted_specialist siege_specialist ground_specialist)) {
-            if (@{$type_batches{$batch_type} // []} > 0) {
-              push @current_batch, shift @{$type_batches{$batch_type}};
+          foreach my $batch_type (
+            qw(mayor ranged_specialist mounted_specialist siege_specialist ground_specialist)
+          ) {
+            if (@{ $type_batches{$batch_type} // [] } > 0) {
+              push @current_batch, shift @{ $type_batches{$batch_type} };
             }
           }
-          
+
           if (@current_batch > 0) {
             my $reduce_jid = $job->minion->enqueue(
               'reduce_batch' => [] => {
                 parents  => [@current_batch],
                 priority => 50,
-                expire    => 2700,
+                expire   => 2700,
               }
             );
             $job->logger->debug(sprintf(
-              'Spawned type-balanced reduce_batch job %s for batch %d (%d jobs)',
+'Spawned type-balanced reduce_batch job %s for batch %d (%d jobs)',
               $reduce_jid, ++$batch_count, scalar(@current_batch)
             ));
           }
@@ -115,18 +121,20 @@ package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
     # Spawn remaining jobs in type-balanced batches
     while (1) {
       my @current_batch = ();
-      my $jobs_added = 0;
-      
+      my $jobs_added    = 0;
+
       # Try to add one job from each type that has jobs remaining
-      foreach my $type (qw(mayor ranged_specialist mounted_specialist siege_specialist ground_specialist)) {
-        if (@{$type_batches{$type} // []} > 0) {
-          push @current_batch, shift @{$type_batches{$type}};
+      foreach my $type (
+        qw(mayor ranged_specialist mounted_specialist siege_specialist ground_specialist)
+      ) {
+        if (@{ $type_batches{$type} // [] } > 0) {
+          push @current_batch, shift @{ $type_batches{$type} };
           $jobs_added++;
         }
       }
-      
-      last if $jobs_added == 0; # No more jobs to process
-      
+
+      last if $jobs_added == 0;    # No more jobs to process
+
       my $reduce_jid = $job->minion->enqueue(
         'reduce_batch' => [] => {
           parents => [@current_batch],
@@ -134,7 +142,7 @@ package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
         }
       );
       $job->logger->debug(sprintf(
-        'Spawned final type-balanced reduce_batch job %s for batch %d (%d jobs)',
+'Spawned final type-balanced reduce_batch job %s for batch %d (%d jobs)',
         $reduce_jid, ++$batch_count, scalar(@current_batch)
       ));
     }
@@ -154,7 +162,7 @@ package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
       load_general              => 0,
     };
 
-    foreach my $prereq (keys $prereqs->%*){
+    foreach my $prereq (keys $prereqs->%*) {
       my $prereqFinishedCount = $job->app->minion->jobs({
         tasks  => [$prereq],
         states => ['finished'],
@@ -167,35 +175,34 @@ package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
         tasks  => [$prereq],
         states => ['failed'],
       })->total // 0;
-      if($prereqFailedCount > 0) {
-        my $errmessage = sprintf('cannot import generals if %s import was not successful.', $prereq);
+      if ($prereqFailedCount > 0) {
+        my $errmessage =
+          sprintf('cannot import generals if %s import was not successful.',
+          $prereq);
         $job->logger->error($errmessage);
         return $job->fail($errmessage);
       }
       $job->note("${prereq}PendingCount" => $prereqPendingCount);
-      if($prereqPendingCount > 0 ) {
+      if ($prereqPendingCount > 0) {
         my $delay = List::Util::min(2 * $prereqPendingCount, 30);
         $job->logger->debug(sprintf(
           'kicking off retry with delay %s due to %s',
-          $delay,
-          sprintf(
-            'pending %s: %s',
-            $prereq, $prereqPendingCount
-          )
+          $delay, sprintf('pending %s: %s', $prereq, $prereqPendingCount)
         ));
         return $job->retry({ delay => $delay });
       }
       $prereqs->{$prereq} = $prereqFinishedCount;
     }
 
-    if ( List::AllUtils::all {$_ ne "0" } values $prereqs->%* ) {
+    if (List::AllUtils::all { $_ ne "0" } values $prereqs->%*) {
       return 0;
     }
 
-    foreach my $prereq (keys $prereqs->%*){
+    foreach my $prereq (keys $prereqs->%*) {
       my $prereqFinishedCount = $prereqs->{$prereq};
-      if($prereqFinishedCount == 0){
-        my $errmessage = sprintf('%s must be finished before %s is launched', $prereq, __PACKAGE__);
+      if ($prereqFinishedCount == 0) {
+        my $errmessage = sprintf('%s must be finished before %s is launched',
+          $prereq, __PACKAGE__);
         $job->logger->error($errmessage);
         return $job->fail($errmessage);
       }

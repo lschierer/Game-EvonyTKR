@@ -74,7 +74,7 @@ package Game::EvonyTKR::External::General::LoadAll {
       load_ascending_attributes => 0,
     };
 
-    foreach my $prereq (keys $prereqs->%*){
+    foreach my $prereq (keys $prereqs->%*) {
       my $prereqFinishedCount = $job->app->minion->jobs({
         tasks  => [$prereq],
         states => ['finished'],
@@ -87,35 +87,34 @@ package Game::EvonyTKR::External::General::LoadAll {
         tasks  => [$prereq],
         states => ['failed'],
       })->total // 0;
-      if($prereqFailedCount > 0) {
-        my $errmessage = sprintf('cannot import generals if %s import was not successful.', $prereq);
+      if ($prereqFailedCount > 0) {
+        my $errmessage =
+          sprintf('cannot import generals if %s import was not successful.',
+          $prereq);
         $job->logger->error($errmessage);
         return $job->fail($errmessage);
       }
       $job->note("${prereq}PendingCount" => $prereqPendingCount);
-      if($prereqPendingCount > 0 ) {
+      if ($prereqPendingCount > 0) {
         my $delay = List::Util::min(2 * $prereqPendingCount, 30);
         $job->logger->debug(sprintf(
           'kicking off retry with delay %s due to %s',
-          $delay,
-          sprintf(
-            'pending %s: %s',
-            $prereq, $prereqPendingCount
-          )
+          $delay, sprintf('pending %s: %s', $prereq, $prereqPendingCount)
         ));
         return $job->retry({ delay => $delay });
       }
       $prereqs->{$prereq} = $prereqFinishedCount;
     }
 
-    if ( List::AllUtils::all {$_ ne "0" } values $prereqs->%* ) {
+    if (List::AllUtils::all { $_ ne "0" } values $prereqs->%*) {
       return 0;
     }
 
-    foreach my $prereq (keys $prereqs->%*){
+    foreach my $prereq (keys $prereqs->%*) {
       my $prereqFinishedCount = $prereqs->{$prereq};
-      if($prereqFinishedCount == 0){
-        my $errmessage = sprintf('%s must be finished before %s is launched', $prereq, __PACKAGE__);
+      if ($prereqFinishedCount == 0) {
+        my $errmessage = sprintf('%s must be finished before %s is launched',
+          $prereq, __PACKAGE__);
         $job->logger->error($errmessage);
         return $job->fail($errmessage);
       }

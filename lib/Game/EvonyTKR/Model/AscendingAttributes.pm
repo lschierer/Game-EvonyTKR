@@ -259,19 +259,20 @@ package Game::EvonyTKR::Model::AscendingAttributes {
     my $logger = $log;
 
     # Convert wire format (hash-based ascending) back to array format
-    my $converted_h = { %$h }; # shallow copy
+    my $converted_h = {%$h};    # shallow copy
     if (exists $h->{ascending} && ref($h->{ascending}) eq 'HASH') {
       # Convert hash format to array format expected by from_hash
       my @ascending_array = ();
-      foreach my $level (sort keys %{$h->{ascending}}) {
-        next if $level eq 'none'; # Skip 'none' level
+      foreach my $level (sort keys %{ $h->{ascending} }) {
+        next if $level eq 'none';    # Skip 'none' level
         my $level_data = $h->{ascending}->{$level};
-        if ($level_data->{buffs} && @{$level_data->{buffs}}) {
-          push @ascending_array, {
+        if ($level_data->{buffs} && @{ $level_data->{buffs} }) {
+          push @ascending_array,
+            {
             level => $level,
             buffs => $level_data->{buffs},
             text  => $level_data->{text} // '',
-          };
+            };
         }
       }
       $converted_h->{ascending} = \@ascending_array;

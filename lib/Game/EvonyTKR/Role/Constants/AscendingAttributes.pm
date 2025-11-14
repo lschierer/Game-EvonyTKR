@@ -72,14 +72,18 @@ package Game::EvonyTKR::Role::Constants::AscendingAttributes {
 
   sub is_valid_level($self, $levelname, $isRed = undef) {
     if (not defined($isRed) || $isRed == 0) {
-      if (List::AllUtils::any { $_ =~ /$levelname/i }
-        $self->AscendingAttributeLevelNames()) {
+      if (
+        List::AllUtils::any { $_ =~ /$levelname/i }
+        $self->AscendingAttributeLevelNames()
+      ) {
         return 1;
       }
     }
     elsif (not defined($isRed) || $isRed == 1) {
-      if (List::AllUtils::any { $_ =~ /$levelname/i }
-        $self->AscendingAttributeLevelNames(1)) {
+      if (
+        List::AllUtils::any { $_ =~ /$levelname/i }
+        $self->AscendingAttributeLevelNames(1)
+      ) {
         return 1;
       }
     }

@@ -159,7 +159,8 @@ package Game::EvonyTKR::Controller::AscendingAttributes {
   sub get_ascending_section ($c, $caller, $app, $name = '') {
     if (length($name)) {
       my $item = $c->get_ascendingattributes_for_general($app, $name);
-      if ( Scalar::Util::reftype($item) && Scalar::Util::reftype($item) eq 'HASH'
+      if ( Scalar::Util::reftype($item)
+        && Scalar::Util::reftype($item) eq 'HASH'
         && blessed($item) eq 'Game::EvonyTKR::Model::AscendingAttributes') {
         $c->logger->debug("rendering get_ascending_section for $name");
         return $caller->render_to_string(
@@ -174,7 +175,7 @@ package Game::EvonyTKR::Controller::AscendingAttributes {
         $c->logger->debug(sprintf(
           "searching for $name, instead got %s %s",
           Scalar::Util::reftype($item) // '',
-          blessed($item) // ''
+          blessed($item)               // ''
         ));
       }
     }
@@ -213,7 +214,8 @@ package Game::EvonyTKR::Controller::AscendingAttributes {
         join ', ', map { sprintf('"%s"', $_) } sort keys $all->%*
       ));
     }
-    $c->logger->debug(sprintf('found %s for requested key %s', Data::Printer::np($aa), $nn));
+    $c->logger->debug(
+      sprintf('found %s for requested key %s', Data::Printer::np($aa), $nn));
     return $aa;
   }
 

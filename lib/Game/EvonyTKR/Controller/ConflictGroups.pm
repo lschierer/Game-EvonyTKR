@@ -73,23 +73,22 @@ package Game::EvonyTKR::Controller::ConflictGroups {
   sub schedule_cached_conflicts_merge($c, $app) {
     # Check if conflict building is complete
     my $conflict_cache = $c->conflict_cache();
-    my $is_complete = $conflict_cache->get('conflict_building_complete');
-    
+    my $is_complete    = $conflict_cache->get('conflict_building_complete');
+
     if ($is_complete) {
       $c->logger->info('Conflict building complete, loading final data');
       # Load final conflict data
       my $cached_conflicts = $conflict_cache->get('merged_conflicts');
       if ($cached_conflicts) {
-        $c->get_conflict_detector(); # This will auto-update from cache
+        $c->get_conflict_detector();    # This will auto-update from cache
       }
       return;
     }
-    
+
     # Not complete yet, retry in 30 seconds
     $c->logger->debug('Conflict building not complete yet, will retry in 30s');
     Mojo::IOLoop->timer(
-      30 => sub { $c->schedule_cached_conflicts_merge($app) }
-    );
+      30 => sub { $c->schedule_cached_conflicts_merge($app) });
   }
 
   sub index ($c) {

@@ -53,8 +53,8 @@ package Game::EvonyTKR::Controller::Role::AscendingAttributes {
       return;
     }
 
-    $self->logger->debug(
-      "Successfully built ascendingAttributes: " . $ascendingAttribute->general);
+    $self->logger->debug("Successfully built ascendingAttributes: "
+        . $ascendingAttribute->general);
     $AscendingAttributes->{$normalized_name} = $ascendingAttribute;
     return $ascendingAttribute;
   }

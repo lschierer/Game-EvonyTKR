@@ -75,8 +75,10 @@ package Game::EvonyTKR::External::General::Pair::ReduceCoordinator {
       return $job->retry({ delay => 5 });
     }
 
-    my $cache_effectiveness = $total_conflicts > 0 ?
-      sprintf("%.1f%%", ($total_cache_hits / $total_conflicts) * 100) : "N/A";
+    my $cache_effectiveness =
+      $total_conflicts > 0
+      ? sprintf("%.1f%%", ($total_cache_hits / $total_conflicts) * 100)
+      : "N/A";
 
     $job->logger->info(sprintf(
       "Cache effectiveness: %d cache hits out of %d total conflicts (%s)",
@@ -89,13 +91,20 @@ package Game::EvonyTKR::External::General::Pair::ReduceCoordinator {
       # Set completion flags for both Pairs and ConflictGroups controllers
       $pc = $job->pair_cache->set('pair_building_complete', 1);
       $cc = $job->conflict_cache->set('conflict_building_complete', 1);
-      $job->logger->debug(sprintf('pair_building_complete is %s; conflict_building_complete is %s.',
-      $pc ? 'true' : 'false', $cc ? 'true' : 'false'));
-    }while (!$pc && !$cc);
+      $job->logger->debug(sprintf(
+        'pair_building_complete is %s; conflict_building_complete is %s.',
+        $pc ? 'true' : 'false',
+        $cc ? 'true' : 'false'
+      ));
+    } while (!$pc && !$cc);
     $job->logger->info("Set completion flags in cache");
     $job->finish(
-      sprintf("Merged results from %d batches - %d conflicts (%d cache hits, %s effectiveness)",
-        scalar(keys %$processed), $total_conflicts, $total_cache_hits, $cache_effectiveness));
+      sprintf(
+"Merged results from %d batches - %d conflicts (%d cache hits, %s effectiveness)",
+        scalar(keys %$processed), $total_conflicts,
+        $total_cache_hits,        $cache_effectiveness
+      )
+    );
   }
 
   sub cache_conflict_results($job, $batch_id) {
@@ -104,7 +113,7 @@ package Game::EvonyTKR::External::General::Pair::ReduceCoordinator {
     return unless $batch_results;
 
     # Merge batch results
-    $total_conflicts += $batch_results->{total_conflicts} // 0;
+    $total_conflicts  += $batch_results->{total_conflicts}  // 0;
     $total_cache_hits += $batch_results->{total_cache_hits} // 0;
 
     if ($batch_results->{by_general}) {
