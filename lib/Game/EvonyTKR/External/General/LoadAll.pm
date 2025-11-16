@@ -31,7 +31,14 @@ package Game::EvonyTKR::External::General::LoadAll {
       __PACKAGE__, Log::Log4perl::Level::to_level($job->logger->level())
     ));
 
-    return if ($job->are_prereqs_outstanding());
+    return if ($job->are_prereqs_outstanding($job->minion, [
+      'load_all_ascending_attributes',
+      'load_all_builtin_books',
+      'load_all_specialties',
+      'load_ascending_attributes',
+      'load_book',
+      'load_specialty',
+    ]));
 
     $job->logger->info('Starting LoadAll generals job');
 
@@ -64,63 +71,5 @@ package Game::EvonyTKR::External::General::LoadAll {
     my $message = 'LoadAll generals job completed';
     $job->logger->info($message);
     return $job->finish($message);
-  }
-
-  sub are_prereqs_outstanding ($job) {
-
-    my $prereqs = {
-      load_book                 => 0,
-      load_specialty            => 0,
-      load_ascending_attributes => 0,
-    };
-
-    foreach my $prereq (keys $prereqs->%*) {
-      my $prereqFinishedCount = $job->app->minion->jobs({
-        tasks  => [$prereq],
-        states => ['finished'],
-      })->total // 0;
-      my $prereqPendingCount = $job->app->minion->jobs({
-        tasks  => [$prereq],
-        states => ['active', 'inactive'],
-      })->total // 0;
-      my $prereqFailedCount = $job->app->minion->jobs({
-        tasks  => [$prereq],
-        states => ['failed'],
-      })->total // 0;
-      if ($prereqFailedCount > 0) {
-        my $errmessage =
-          sprintf('cannot import generals if %s import was not successful.',
-          $prereq);
-        $job->logger->error($errmessage);
-        return $job->fail($errmessage);
-      }
-      $job->note("${prereq}PendingCount" => $prereqPendingCount);
-      if ($prereqPendingCount > 0) {
-        my $delay = List::Util::min(2 * $prereqPendingCount, 30);
-        $job->logger->debug(sprintf(
-          'kicking off retry with delay %s due to %s',
-          $delay, sprintf('pending %s: %s', $prereq, $prereqPendingCount)
-        ));
-        return $job->retry({ delay => $delay });
-      }
-      $prereqs->{$prereq} = $prereqFinishedCount;
-    }
-
-    if (List::AllUtils::all { $_ ne "0" } values $prereqs->%*) {
-      return 0;
-    }
-
-    foreach my $prereq (keys $prereqs->%*) {
-      my $prereqFinishedCount = $prereqs->{$prereq};
-      if ($prereqFinishedCount == 0) {
-        my $errmessage = sprintf('%s must be finished before %s is launched',
-          $prereq, __PACKAGE__);
-        $job->logger->error($errmessage);
-        return $job->fail($errmessage);
-      }
-    }
-
-    #fall back value, should not be reached.
-    return 1;
   }
 }

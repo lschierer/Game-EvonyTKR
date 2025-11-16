@@ -78,6 +78,75 @@ package Game::EvonyTKR::Role::Common {
     my $ns_base = uuid5(dns => 'perl.org');
     return uuid5($ns_base, $self->globalDN->getX500String());
   };
+
+  # Generic prerequisite checker for Minion jobs and controllers
+  # $prereq_tasks: arrayref of task names that must be finished
+  # Returns: 0 if all prereqs met, 1 if outstanding (controllers)
+  #          calls retry/fail for Minion jobs
+  sub are_prereqs_outstanding ($self, $minion, $prereq_tasks) {
+    my $is_minion_job = $self->can('retry') && $self->can('fail') && $self->can('note');
+
+    unless($minion){
+      $self->logger->error('must provide a minion process in which to search for jobs.');
+      return 1;
+    }
+
+    if(scalar(@{ $prereq_tasks }) == 0){
+      $self->logger->error('prereq tasks must be defined.');
+      return 1;
+    }
+
+    my $prereqs = {
+    };
+
+    foreach my $prereq (@$prereq_tasks) {
+      my $prereqFinishedCount = $minion->jobs({
+        tasks  => [$prereq],
+        states => ['finished'],
+      })->total // 0;
+      my $prereqPendingCount = $minion->jobs({
+        tasks  => [$prereq],
+        states => ['active', 'inactive'],
+      })->total // 0;
+      my $prereqFailedCount = $minion->jobs({
+        tasks  => [$prereq],
+        states => ['failed'],
+      })->total // 0;
+
+      if ($prereqFailedCount > 0) {
+        my $errmessage = sprintf('Cannot proceed: %s job failed', $prereq);
+        $self->logger->error($errmessage);
+        return $is_minion_job ? $self->fail($errmessage) : 1;
+      }
+
+      if ($prereqPendingCount > 0) {
+        if ($is_minion_job) {
+          $self->note("${prereq}PendingCount" => $prereqPendingCount);
+          my $delay = List::AllUtils::min(2 * $prereqPendingCount, 30);
+          $self->logger->debug(sprintf(
+            'Retrying with delay %s due to pending %s: %s',
+            $delay, $prereq, $prereqPendingCount
+          ));
+          return $self->retry({ delay => $delay });
+        } else {
+          return 1; # Outstanding prereqs for controller
+        }
+      }
+      $prereqs->{$prereq} = $prereqFinishedCount;
+    }
+
+    if(not defined($prereqs) || ! ref($prereqs) || ref($prereqs) ne 'HASH'){
+      $self->logger->logcroak('prereqs is in an odd state.');
+      return 1;
+    }
+
+    $self->logger->info(sprintf('prereqs are in states %s', Data::Printer::np($prereqs, multiline => 0)));
+
+    if(grep {$_ == "0"} values %{ $prereqs }){
+      return 1
+    }
+    return 0;
+  }
 }
 1;
 __END__

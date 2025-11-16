@@ -38,9 +38,11 @@ package Game::EvonyTKR::Controller::Role::Pairs {
   sub add_conflict_data ($self, $by_general, $groups_by_conflict_type) {
     my $cas_val = $self->conflict_cache->gets('merged_conflicts');
     if (defined($cas_val) && ref($cas_val) eq 'ARRAY') {
-      my $current_data = $$cas_val[1]
-        // { by_general => {}, groups_by_conflict_type => {},
-        timestamp => time };
+      my $current_data = $$cas_val[1] // {
+        by_general              => {},
+        groups_by_conflict_type => {},
+        timestamp               => time
+      };
 
       # Merge by_general data
       foreach my $general (keys %$by_general) {
@@ -195,9 +197,18 @@ package Game::EvonyTKR::Controller::Role::Pairs {
     state $all_pairs_built;
     state $inflated_pairs = {};
     unless ($all_pairs_built) {
-      foreach my $type (keys %$pairs_by_type) {
+      foreach my $type (sort keys %$pairs_by_type) {
+        $self->logger->debug(sprintf('merging %s pairs for type %s', scalar(@{ $pairs_by_type->{$type} }), $type));
         $inflated_pairs->{$type} = [];
+        my $type_starts_at_zero = scalar(@{ $inflated_pairs->{$type} });
         foreach my $wire_pair (@{ $pairs_by_type->{$type} }) {
+          my $wpk = $self->wire_pair_to_key($wire_pair);
+          if(!$type_starts_at_zero && List::AllUtils::any { $wpk eq $self->wire_pair_to_key($_->to_wire_hash()) } $inflated_pairs->{$type}->@* ){
+            $self->logger->debug(sprintf('pair %s is already present', $wpk));
+            next;
+          } else {
+            $self->logger->debug("merging pair $wpk for type $type");
+          }
           # Inflate wire pair into proper pair object
           if (my $pair_obj =
             Game::EvonyTKR::Model::General::Pair->from_wire_hash($wire_pair)) {
@@ -216,12 +227,10 @@ package Game::EvonyTKR::Controller::Role::Pairs {
 
     foreach my $type (keys($pairs_by_type->%*)) {
       if (defined $requested_type && $type ne $requested_type) {
-        $self->logger->debug(
-          sprintf(
-            'skipping type %s as it does not match requested type %s',
-            $type, $requested_type
-          )
-        );
+        $self->logger->debug(sprintf(
+          'skipping type %s as it does not match requested type %s',
+          $type, $requested_type
+        ));
         next;
       }
       $list = [
@@ -245,6 +254,48 @@ package Game::EvonyTKR::Controller::Role::Pairs {
     }
 
     return $pairs;
+  }
+
+  sub validatePairParams($self, $ascendingLevel, $primaryCovenantLevel,
+    $primarySpecialties, $secondaryCovenantLevel, $secondarySpecialties,) {
+    my $data_model = Game::EvonyTKR::Model::Data->new();
+
+    # Validate ascending level
+    if (!$data_model->checkAscendingLevel($ascendingLevel)) {
+      $self->logger->warn(
+        "Invalid ascendingLevel: $ascendingLevel, using default 'red5'");
+      $ascendingLevel = 'red5';
+    }
+
+    if (!$data_model->checkCovenantLevel($primaryCovenantLevel)) {
+      $self->logger->warn(
+        sprintf('Invalid covenantLevel: %s, using default "civilization"',
+          $primaryCovenantLevel)
+      );
+      $primaryCovenantLevel = 'civilization';
+    }
+
+    @$primarySpecialties =
+      $data_model->normalizeSpecialtyLevels(@$primarySpecialties);
+
+    if (!$data_model->checkCovenantLevel($secondaryCovenantLevel)) {
+      $self->logger->warn(
+        sprintf('Invalid covenantLevel: %s, using default "civilization"',
+          $secondaryCovenantLevel)
+      );
+      $secondaryCovenantLevel = 'civilization';
+    }
+
+    @$secondarySpecialties =
+      $data_model->normalizeSpecialtyLevels(@$secondarySpecialties);
+
+    return {
+      ascendingLevel         => $ascendingLevel,
+      primaryCovenantLevel   => $primaryCovenantLevel,
+      primarySpecialties     => $primarySpecialties,
+      secondaryCovenantLevel => $secondaryCovenantLevel,
+      secondarySpecialties   => $secondarySpecialties,
+    };
   }
 
   sub initialize_conflict_detector($self, $conflict_detector = undef) {

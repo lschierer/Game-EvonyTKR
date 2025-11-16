@@ -85,26 +85,35 @@ package Game::EvonyTKR::External::General::Pair::ReduceCoordinator {
       $total_cache_hits, $total_conflicts, $cache_effectiveness
     ));
 
-    my $pc = 0;
-    my $cc = 0;
+    # Set completion flags for both Pairs and ConflictGroups controllers
+    my $pc_verify = 0;
+    my $cc_verify = 0;
     do {
-      # Set completion flags for both Pairs and ConflictGroups controllers
-      $pc = $job->pair_cache->set('pair_building_complete', 1);
-      $cc = $job->conflict_cache->set('conflict_building_complete', 1);
-      $job->logger->debug(sprintf(
-        'pair_building_complete is %s; conflict_building_complete is %s.',
-        $pc ? 'true' : 'false',
-        $cc ? 'true' : 'false'
+      my $pc = $job->pair_cache->set('pair_building_complete', 1);
+      my $cc = $job->conflict_cache->set('conflict_building_complete', 1);
+
+      $job->logger->info(sprintf(
+        "Cache set results: pair_building_complete=%s, conflict_building_complete=%s",
+        defined($pc) ? ($pc ? 'success' : 'failed') : 'undef',
+        defined($cc) ? ($cc ? 'success' : 'failed') : 'undef'
       ));
-    } while (!$pc && !$cc);
-    $job->logger->info("Set completion flags in cache");
-    $job->finish(
-      sprintf(
+
+      # Verify the values were actually set
+      $pc_verify = $job->pair_cache->get('pair_building_complete');
+      $cc_verify = $job->conflict_cache->get('conflict_building_complete');
+
+      $job->logger->info(sprintf(
+        "Cache verification: pair_building_complete=%s, conflict_building_complete=%s",
+        defined($pc_verify) ? $pc_verify : 'undef',
+        defined($cc_verify) ? $cc_verify : 'undef'
+      ));
+    }while(!$pc_verify || !$cc_verify);
+
+    $job->finish(sprintf(
 "Merged results from %d batches - %d conflicts (%d cache hits, %s effectiveness)",
-        scalar(keys %$processed), $total_conflicts,
-        $total_cache_hits,        $cache_effectiveness
-      )
-    );
+      scalar(keys %$processed), $total_conflicts,
+      $total_cache_hits,        $cache_effectiveness
+    ));
   }
 
   sub cache_conflict_results($job, $batch_id) {

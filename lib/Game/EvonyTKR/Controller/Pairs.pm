@@ -72,18 +72,28 @@ package Game::EvonyTKR::Controller::Pairs {
 
     # Check if pair building is complete
     my $is_complete = $c->pair_cache()->get('pair_building_complete');
-    my $npbt        = $c->get_pairs_by_type();
+    my $npbt;
 
-    unless ($is_complete && $npbt) {
-      $c->logger->warn('Pair building complete but no pairs found to merge');
-    }
+    my $repeat = 0;
+    $delay++;
+    my $maxdelay = defined($app->config('mode')) && $app->config('mode') eq 'development' ? 15 : 60;
+    $maxdelay = defined($maxdelay) ? $maxdelay : 60;
+    $delay = $delay % $maxdelay;
+    $delay = $delay == 0 ? 0.001 : $delay;
 
-    if (!$is_complete) {
-      $delay++;
-      $delay = $delay % 60;
-      $delay = $delay == 0 ? 0.001 : $delay;
+    if(!$is_complete){
       $c->logger->debug(
         sprintf('Pair building not complete yet, will retry in %s', $delay));
+      $repeat = 1;
+    } else {
+      $npbt        = $c->get_pairs_by_type();
+      if(!$npbt){
+        $c->logger->debug(sprintf('Pair Building Complete but no pairs by type yet. retry in %s', $delay));
+        $repeat = 1;
+      }
+    }
+
+    if ($repeat) {
       Mojo::IOLoop->timer(
         $delay => sub {
           $c->schedule_merge_pairs_from_cache($app, $delay);
@@ -203,12 +213,10 @@ package Game::EvonyTKR::Controller::Pairs {
     $c->logger->debug('diagnostic_pairs_by_type calling get_pairs_by_type');
     my $pairs          = $c->get_pairs_by_type();
     my $pairs_for_type = $pairs->{$type} // [];
-    $c->logger->debug(
-      sprintf(
-        'diagnostic_pairs_by_type has %s pairs of type %s',
-        scalar(@{$pairs_for_type}), $type
-      )
-    );
+    $c->logger->debug(sprintf(
+      'diagnostic_pairs_by_type has %s pairs of type %s',
+      scalar(@{$pairs_for_type}), $type
+    ));
 
     $c->render(
       template   => 'pairs/diagnostic',
@@ -379,46 +387,28 @@ package Game::EvonyTKR::Controller::Pairs {
     my $buffActivation = $route_meta->{buffActivation};
     my $uiTarget       = $route_meta->{uiTarget};
 
-    my @pairs = @{ $c->get_pairs_by_type()->{$generalType} };
+    my @pairs = sort {
+      $a cmp $b
+    } @{ $c->get_pairs_by_type()->{$generalType} };
 
     $c->logger->debug(sprintf('There are %s pairs to return.', scalar(@pairs)));
-
-    # Return just the basic pair information without computing buffs
-    my @json_data = map { {
-      primary   => { name => $_->primary->name },
-      secondary => { name => $_->secondary->name },
-    } } @pairs;
-
-    @json_data = sort {
-      # First compare primary->name
-      my $primary_cmp = $a->{primary} cmp $b->{primary};
-
-      # If primary names are the same, compare secondary->name
-      if ($primary_cmp == 0) {
-        return $a->{secondary} cmp $b->{secondary};
-      }
-
-      # Otherwise, return the primary name comparison result
-      return $primary_cmp;
-    } @json_data;
 
     # if there were requested primaries, filter to only include those
     if (scalar @$requested_primaries) {
 
       my %requested = map { $_ => 1 } @$requested_primaries;
       my @filtered;
-      foreach my $entry (@json_data) {
-        if (exists $requested{ $entry->{primary} }) {
+      foreach my $entry (@pairs) {
+        if (exists $requested{ $entry->primary->name }) {
           $c->logger->debug(sprintf(
             '%s was requsted for session %s',
-            $entry->{primary}, $session_id
+            $entry->primary->name, $session_id
           ));
-          push @filtered, $entry;
+          push @filtered, $entry->to_wire_hash();
         }
       }
 
       $session_store->{$session_id} = \@filtered;
-
       return $c->render(
         json => {
           sessionId => $session_id,
@@ -427,6 +417,7 @@ package Game::EvonyTKR::Controller::Pairs {
       );
     }
     else {
+      my @json_data = map { $_->to_wire_hash() } @pairs;
       $c->logger->debug(
         "no requested primaries for session '$session_id' returning full list: "
           . Data::Printer::np(@json_data, multiline => 0));
@@ -565,27 +556,40 @@ package Game::EvonyTKR::Controller::Pairs {
 
       # Build args hash for the Worker class
       my $args = {
-        mode                 => 'pair',
-        runId                => $run_id,
-        general1             => $pair->primary->name,
-        general2             => $pair->secondary->name,
-        targetType           => $validated_params->{route_meta}->{generalType},
-        activationType       => $validated_params->{buffActivation},
-        ascendingLevel       => $validated_params->{ascendingLevel},
-        primaryCovenantLevel => $validated_params->{primaryCovenantLevel},
-        primarySpecialty1    => $validated_params->{primarySpecialties}->[0],
-        primarySpecialty2    => $validated_params->{primarySpecialties}->[1],
-        primarySpecialty3    => $validated_params->{primarySpecialties}->[2],
-        primarySpecialty4    => $validated_params->{primarySpecialties}->[3],
-        secondaryCovenantLevel => $validated_params->{secondaryCovenantLevel},
-        secondarySpecialty1 => $validated_params->{secondarySpecialties}->[0],
-        secondarySpecialty2 => $validated_params->{secondarySpecialties}->[1],
-        secondarySpecialty3 => $validated_params->{secondarySpecialties}->[2],
-        secondarySpecialty4 => $validated_params->{secondarySpecialties}->[3],
+        mode                    => 'pair',
+        runId                   => $run_id,
+        general1                => $pair->primary->name,
+        general2                => $pair->secondary->name,
+        targetType              => $validated_params->{route_meta}->{generalType},
+        activationType          => $validated_params->{buffActivation},
+        ascendingLevel          => $validated_params->{ascendingLevel},
+        primaryCovenantLevel    => $validated_params->{primaryCovenantLevel},
+        primarySpecialty1       => $validated_params->{primarySpecialties}->[0],
+        primarySpecialty2       => $validated_params->{primarySpecialties}->[1],
+        primarySpecialty3       => $validated_params->{primarySpecialties}->[2],
+        primarySpecialty4       => $validated_params->{primarySpecialties}->[3],
+        secondaryCovenantLevel  => $validated_params->{secondaryCovenantLevel},
+        secondarySpecialty1     => $validated_params->{secondarySpecialties}->[0],
+        secondarySpecialty2     => $validated_params->{secondarySpecialties}->[1],
+        secondarySpecialty3     => $validated_params->{secondarySpecialties}->[2],
+        secondarySpecialty4     => $validated_params->{secondarySpecialties}->[3],
       };
 
       $c->logger->debug("Enqueueing job for pair index: $index");
       my $jid = 0;
+      $c->app->minion->enqueue(
+        summarize_pair => [
+        $args->{runId},                 $args->{general1},            $args->{general2},
+        $args->{targetType},            $args->{activationType},      $args->{ascendingLevel},
+        $args->{primaryCovenantLevel},  $args->{primarySpecialty1},   $args->{primarySpecialty2},
+        $args->{primarySpecialty3},     $args->{primarySpecialty4},   $args->{secondaryCovenantLevel},
+        $args->{secondarySpecialty1},   $args->{secondarySpecialty2}, $args->{secondarySpecialty3},
+        $args->{secondarySpecialty4},
+        ] => {
+          delay    => ($index * 0.001) + rand(0.5),
+          attempts => 2,
+        }
+      );
       #$c->app->minion->enqueue(
       #  pair_worker => [$args],
       #  {
@@ -682,47 +686,6 @@ package Game::EvonyTKR::Controller::Pairs {
       }
     );
   }
-
-  sub validatePairParams($self, $ascendingLevel, $primaryCovenantLevel,
-    $primarySpecialties, $secondaryCovenantLevel, $secondarySpecialties,) {
-    my $data_model = Game::EvonyTKR::Model::Data->new();
-
-    # Validate ascending level
-    if (!$data_model->checkAscendingLevel($ascendingLevel)) {
-      $self->logger->warn(
-        "Invalid ascendingLevel: $ascendingLevel, using default 'red5'");
-      $ascendingLevel = 'red5';
-    }
-
-    if (!$data_model->checkCovenantLevel($primaryCovenantLevel)) {
-      $self->logger->warn(
-        sprintf('Invalid covenantLevel: %s, using default "civilization"',
-          $primaryCovenantLevel)
-      );
-      $primaryCovenantLevel = 'civilization';
-    }
-
-    @$primarySpecialties =
-      $data_model->normalizeSpecialtyLevels(@$primarySpecialties);
-
-    if (!$data_model->checkCovenantLevel($secondaryCovenantLevel)) {
-      $self->logger->warn(
-        sprintf('Invalid covenantLevel: %s, using default "civilization"',
-          $secondaryCovenantLevel)
-      );
-      $secondaryCovenantLevel = 'civilization';
-    }
-
-    @$secondarySpecialties =
-      $data_model->normalizeSpecialtyLevels(@$secondarySpecialties);
-
-    return {
-      ascendingLevel         => $ascendingLevel,
-      primaryCovenantLevel   => $primaryCovenantLevel,
-      primarySpecialties     => $primarySpecialties,
-      secondaryCovenantLevel => $secondaryCovenantLevel,
-      secondarySpecialties   => $secondarySpecialties,
-    };
-  }
-
 }
+1;
+__END__

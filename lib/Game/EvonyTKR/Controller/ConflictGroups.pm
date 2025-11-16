@@ -8,6 +8,7 @@ use namespace::autoclean;
 
 package Game::EvonyTKR::Controller::ConflictGroups {
   use Mojo::Base 'Game::EvonyTKR::Controller::ControllerBase';
+  use Mojo::Base 'Game::EvonyTKR::Role::Common', -role;
   use Mojo::Base 'Game::EvonyTKR::Controller::Role::Pairs', -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Logger',            -role;
   use List::AllUtils qw( all any none );
@@ -50,45 +51,26 @@ package Game::EvonyTKR::Controller::ConflictGroups {
     );
   }
 
-  sub do_merge_cached_conflicts ($c, $app, $cd, $cc, $merged) {
-    $c->logger->debug(sprintf(
-      'do_merge_cached_conflicts called with merged: %s',
-      Data::Printer::np($merged)));
-    if (my $by_general = $merged->{by_general}) {
-      while (my ($general, $conflicts) = each %$by_general) {
-        $cd->by_general->{$general} =
-          { %{ $cd->by_general->{$general} // {} }, %$conflicts };
-      }
-    }
+  sub schedule_cached_conflicts_merge($c, $app, $delay = 0) {
+    my $is_complete = $c->conflict_cache->get('conflict_building_complete');
 
-    if (my $groups = $merged->{groups_by_conflict_type}) {
-      while (my ($type, $new_groups) = each %$groups) {
-        my $existing = $cd->groups_by_conflict_type->{$type} //= [];
-        my %seen     = map { $_ => 1 } @$existing;
-        push @$existing, grep { !$seen{$_}++ } @$new_groups;
-      }
-    }
-  }
-
-  sub schedule_cached_conflicts_merge($c, $app) {
-    # Check if conflict building is complete
-    my $conflict_cache = $c->conflict_cache();
-    my $is_complete    = $conflict_cache->get('conflict_building_complete');
+    $delay++;
+    $delay = $delay % 60;
+    $delay = $delay ? $delay : 0.01;
 
     if ($is_complete) {
       $c->logger->info('Conflict building complete, loading final data');
-      # Load final conflict data
-      my $cached_conflicts = $conflict_cache->get('merged_conflicts');
-      if ($cached_conflicts) {
-        $c->get_conflict_detector();    # This will auto-update from cache
-      }
+      # calling get_conflict_detector will trigger a refresh
+      Mojo::IOLoop->timer(0.001 => sub{
+        $c->get_conflict_detector();
+      });
       return;
     }
 
     # Not complete yet, retry in 30 seconds
-    $c->logger->debug('Conflict building not complete yet, will retry in 30s');
+    $c->logger->debug(sprintf('Conflict building not complete yet, will retry in %s seconds', $delay));
     Mojo::IOLoop->timer(
-      30 => sub { $c->schedule_cached_conflicts_merge($app) });
+      $delay => sub { $c->schedule_cached_conflicts_merge($app, $delay) });
   }
 
   sub index ($c) {

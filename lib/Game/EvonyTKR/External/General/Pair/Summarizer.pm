@@ -9,7 +9,7 @@ require Game::EvonyTKR::Util::Buff::Summarizer;
 package Game::EvonyTKR::External::General::Pair::Summarizer {
   use Mojo::Base 'Game::EvonyTKR::External::JobBase',              -signatures;
   use Mojo::Base 'Game::EvonyTKR::Role::Logger',                   -role;
-  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Generals',     -role;
+  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Pairs',         -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants', -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants', -role;
   use experimental qw(class);
@@ -140,23 +140,49 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
 
     $generalCache = $job->create_general_cache()
       unless (defined($generalCache));
-    my ($primaryName, $secondaryName, $tt, $activationType, $ascendingLevel) =
-      shift @args;
-    my $primary   = $job->get_general($primaryName,   $generalCache);
-    my $secondary = $job->get_general($secondaryName, $generalCache);
+    my (
+      $runId,                $primaryName,         $secondaryName,
+      $tt,                   $activationType,      $ascendingLevel,
+      $primaryCovenantLevel, $primarySpecialty1,   $primarySpecialty2,
+      $primarySpecialty3,    $primarySpecialty4,   $secondaryCovenantLevel,
+      $secondarySpecialty1,  $secondarySpecialty2, $secondarySpecialty3,
+      $secondarySpecialty4,
+    ) = shift @args;
+
+    my $primarySpecialties = [ $primarySpecialty1, $primarySpecialty2, $primarySpecialty3, $primarySpecialty4 ];
+    my $secondarySpecialties = [ $secondarySpecialty1,  $secondarySpecialty2, $secondarySpecialty3, $secondarySpecialty4 ];
+
+    my $validatedparams = $job->validatePairParams( $ascendingLevel, $primaryCovenantLevel,
+      $primarySpecialties, $secondaryCovenantLevel, $secondarySpecialties,);
+
     my @errmessage;
-    push @errmessage,
-      sprintf('Failed to get %s from generalCache.', $primaryName)
-      unless (defined($primary));
-    push @errmessage,
-      sprintf('Failed to get %s from generalCache.', $secondaryName)
-      unless (defined($secondary));
-    push @errmessage, 'Primary must be a Game::EvonyTKR::Model::General'
-      unless (defined($primary)
-      && $primary->isa('Game::EvonyTKR::Model::General'));
-    push @errmessage, 'Secondary must be a Game::EvonyTKR::Model::General'
-      unless (defined($secondary)
-      && $secondary->isa('Game::EvonyTKR::Model::General'));
+    unless(defined($runId) && length($runId)){
+      push @errmessage, sprintf('runId must be defined');
+    }
+    unless(defined($primaryName) && length($primaryName)){
+      push @errmessage, 'primaryName must be defined';
+    }
+    unless(defined($secondaryName) && length($secondaryName)){
+      push @errmessage, 'secondaryName must be defined';
+    }
+    unless(defined($tt) && length($tt) && $job->ValidateGeneralType($tt)){
+      push @errmessage, sprintf('must provide a valid general type from %s, not "%s"', join(',', map { sprintf('"%s"', $_) } $job->GeneralKeys->@*, defined($tt) ? $tt : 'undefined' ));
+    }
+    unless(defined(activationType && length($activationType) && List::AllUtils::any { $activationType eq $_ } $job->AllowedBuffActivationValues->@* ){
+      push @errmessage, sprintf('must provide a valid activation type from %s, not "%s"',
+      join(',', map { sprintf('"%s"', $_) } $job->AllowedBuffActivationValues->@* ), defined($activationType) ? $activationType : 'undef');
+    }
+
+    my $pair = $job->get_pair($job->wire_pair_to_key({
+      primary   => $primaryName,
+      secondary => $secondaryName,
+      type      => $tt,
+    }));
+
+    unless($pair){
+      push @errmessage, sprintf('cannot retrieve pair for primary "%s", secondary "%s", type "%s"',
+      $primaryName, $secondaryName, $tt);
+    }
 
     if (scalar(@errmessage)) {
       $job->logger->error(join ' ', @errmessage);
@@ -164,42 +190,6 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
       return;
     }
 
-    $pair = Game::EvonyTKR::Model::General::Pair->new(
-      primary   => $primary,
-      secondary => $secondary,
-    );
-
-    $tt = $primary->type if (not defined($tt) && not ref($primary->type));
-    $tt = $primary->type->[0]
-      if (not defined($tt) && ref($primary->type) eq 'ARRAY');
-    unless (defined($tt)) {
-      push @errmessage,
-        sprintf('failed to get targetType for pair %s/%s',
-        $primaryName, $secondaryName);
-      $job->logger->error(join ' ', @errmessage);
-      $job->fail(join ' ', @errmessage);
-      return;
-    }
-    unless (List::AllUtils::any { $tt =~ /^$_/i } $job->GeneralKeys->@*) {
-      push @errmessage,
-        sprintf('%s must be one of %s', $tt, join ', ', $job->GeneralKeys->@*);
-      $job->logger->error(join ' ', @errmessage);
-      $job->fail(join ' ', @errmessage);
-      return;
-    }
-    $pair - setTargetType($tt);
-
-    unless (
-      List::AllUtils::any { $activationType eq $_ }
-      keys $job->BuffActivationValues->%*
-    ) {
-      push @errmessage,
-        sprintf('%s must be one of %s',
-        $activationType, join ', ' keys $job->BuffActivationValues->%*);
-      $job->logger->error(join ' ', @errmessage);
-      $job->fail(join ' ', @errmessage);
-      return;
-    }
 
     #TODO get covenants;
     #TODO get specialties

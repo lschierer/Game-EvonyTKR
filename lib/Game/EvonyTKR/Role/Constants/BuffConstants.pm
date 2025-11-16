@@ -53,9 +53,9 @@ package Game::EvonyTKR::Role::Constants::BuffConstants {
     return $hash;
   };
 
-  sub AllowedBuffActivationValues ($self) {
-    return sort keys $self->BuffActivationValues->%*;
-  }
+  has 'AllowedBuffActivationValues' => sub ($self) {
+    return [ sort keys $self->BuffActivationValues->%* ];
+  };
 
   has 'attributeValues' => sub {
     const my $tmp => {

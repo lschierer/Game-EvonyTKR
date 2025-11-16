@@ -72,18 +72,20 @@ package Game::EvonyTKR::Model::General::Pair {
       return;
     }
 
-    my $general_helper;
-    eval {
-      $general_helper = Mojo::Base->new->with_roles(
-        'Game::EvonyTKR::Role::Logger',
-        'Game::EvonyTKR::Role::Common',
-        'Game::EvonyTKR::Controller::Role::Generals'
-      );
-    } or do {
-      $logger->error(
-        sprintf('eval failed; cannot define general helper: "%s"', $@));
-      return;
-    };
+    state $general_helper;
+    unless ($general_helper) {
+      eval {
+        $general_helper = Mojo::Base->new->with_roles(
+          'Game::EvonyTKR::Role::Logger',
+          'Game::EvonyTKR::Role::Common',
+          'Game::EvonyTKR::Controller::Role::Generals'
+        );
+      } or do {
+        $logger->error(
+          sprintf('eval failed; cannot define general helper: "%s"', $@));
+        return;
+      };
+    }
     my $primary = $general_helper->get_general($h->{primary});
     unless ($primary) {
       $logger->error(

@@ -95,7 +95,7 @@ package Game::EvonyTKR::Model::General {
   sub populateAscendingAttributes ($self,) {
     return unless $self->ascending;
 
-    my $ascending_helper;
+    state $ascending_helper;
     eval {
       $ascending_helper = Mojo::Base->new->with_roles(
         'Game::EvonyTKR::Role::Logger',
@@ -127,7 +127,8 @@ package Game::EvonyTKR::Model::General {
   }
 
   sub populateBuiltinBook ($self) {
-    my ($book, $books_helper, $cache_store);
+    state $books_helper;
+    my ($book, $cache_store);
 
     eval {
       $books_helper = Mojo::Base->new->with_roles(
@@ -171,7 +172,7 @@ package Game::EvonyTKR::Model::General {
   }
 
   sub populateSpecialties ($self,) {
-    my $specialty_helper;
+    state $specialty_helper;
     eval {
       $specialty_helper = Mojo::Base->new->with_roles(
         'Game::EvonyTKR::Role::Logger',
@@ -187,20 +188,16 @@ package Game::EvonyTKR::Model::General {
     foreach my $sn_index (0 .. scalar($#{ $self->specialtyNames })) {
       my $sn = $self->specialtyNames->[$sn_index];
       if (!defined($sn) || !length($sn)) {
-        $self->logger->error(
-          sprintf(
-            'invalid undef specialty in general %s at index %s',
-            $self->name, $sn_index
-          )
-        );
+        $self->logger->error(sprintf(
+          'invalid undef specialty in general %s at index %s',
+          $self->name, $sn_index
+        ));
         next;
       }
-      $self->logger->debug(
-        sprintf(
-          'populating speciality at index %s, name %s',
-          $sn_index, defined($sn) && length($sn) ? $sn : 'undefined'
-        )
-      );
+      $self->logger->debug(sprintf(
+        'populating speciality at index %s, name %s',
+        $sn_index, defined($sn) && length($sn) ? $sn : 'undefined'
+      ));
       my $specialty = $specialty_helper->get_specialty($sn);
       if ($specialty) {
         $self->specialties->[$sn_index] = $specialty;
