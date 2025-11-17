@@ -1,5 +1,4 @@
 use v5.42.0;
-use experimental qw(class);
 use utf8::all;
 
 use File::FindLib 'lib';
@@ -7,96 +6,66 @@ require JSON::PP;
 require Game::EvonyTKR::Model::Buff;
 require Game::EvonyTKR::Model::Buff::Value;
 require Game::EvonyTKR::Model::Buff::Matcher;
-use namespace::clean;
+require Data::Printer;
 
-class Game::EvonyTKR::Model::Covenant : isa(Game::EvonyTKR::Shared::Constants) {
-# PODNAME: Game::EvonyTKR::Model::Covenant
+package Game::EvonyTKR::Model::Covenant {
+  use Mojo::Base -base,                          -signatures;
+  use Mojo::Base 'Game::EvonyTKR::Role::Logger', -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Common';
+  use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants',    -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants', -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Constants::Covenants', -role;
   use builtin qw(indexed);
-  require Data::Printer;
-  require Type::Tiny::Enum;
-  require Readonly;
-  use namespace::autoclean;
   use File::FindLib 'lib';
   use List::AllUtils qw( any none );
+  use Hash::Util     qw(lock_keys);
   use Log::Any       qw($log);
   use Carp;
   use overload
     '""'       => \&as_string,
-    'bool'     => sub { $_[0]->_isTrue() },
+    'bool'     => \&isTrue,
     "fallback" => 1;
 
   my $debug = 1;
 
-  field $primary : reader : param;
-  field $one     : param;
-  field $two     : param;
-  field $three   : param;
+  has ['primary', 'one', 'two', 'three'];
 
-  field $secondary : reader;
+  has 'secondaryKeys' => sub { qw(one two three) };
 
-  field @secondaryKeys : reader = qw( one two three );
-
-  ADJUST {
-    my $step1 = {};
-    my $name  = $primary->name;
-#if(blessed $one ne 'Game::EvonyTKR::Model::General') {
-#  $self->dev_guard("one of $name must be of type 'Game::EvonyTKR::Model::General' not " . blessed($one));
-#}
-    $step1->{one} = $one;
-#if(blessed $two ne 'Game::EvonyTKR::Model::General') {
-#  $self->dev_guard("two of $name  must be of type 'Game::EvonyTKR::Model::General' not " . blessed($two));
-#}
-    $step1->{two} = $two;
-#if(blessed $three ne 'Game::EvonyTKR::Model::General') {
-#  $self->dev_guard("three of $name  must be of type 'Game::EvonyTKR::Model::General' not " . blessed($three));
-#}
-    $step1->{three} = $three;
-
-# Use Readonly::Hash1 for shallow readonly - hash structure is fixed but array contents can change
-    Readonly::Hash1 my %step2 => %{$step1};
-    $secondary = \%step2;
-  }
-
-  field $categories : reader;
-
-  ADJUST {
-    #Covenants only have these levels.
-    my $step1 = {};
-    foreach my $key ($self->CovenantCategoryValues->@*) {
-      $self->logger->debug("initializing covenantLevel $key");
-      if ($key eq 'None') {
-        next;
-      }
-      $step1->{$key} = {
-        type            => "personal",
-        activationLevel => 0,
-        buffs           => []
-      };
-    }
-    Readonly::Hash1 my %step2 => %{$step1};
-    $categories = \%step2;
-
-    for my ($index, $lv) (indexed($self->CovenantCategoryValues->@*)) {
-      if ($lv eq 'None') {
+  has 'categories' => sub ($self) {
+    my $h = {};
+    my $cv = $self->CovenantCategoryValues;
+    $self->logger->debug(sprintf('cv is %s', Data::Printer::np($cv)));
+    foreach my $index (0 .. scalar( $self->CovenantCategoryValues->@* ) ) {
+      my $key = $self->CovenantCategoryValues->[$index];
+      $self->logger->debug(sprintf('key at index %s is %s', $index, $key));
+      if($key eq 'none') {
         next;
       }
       my $al = 10000 + $index * 2 * 1000;
-      $self->logger->debug("setting activationLevel for $lv to $al");
-      $categories->{$lv}->{activationLevel} = $al;
+      $self->logger->debug("setting activationLevel for $key to $al");
+      $h->{$key} = {
+        type            => 'personal',
+        activationLevel => $al,
+        buffs           => [],
+      };
     }
-  }
+    lock_keys(%{ $h });
 
-  method get_buffs_at_level (
-    $level, $attribute, $matching_type,
+    return $h;
+  };
+
+  has 'get_buffs_at_level' => sub (
+    $self, $level, $attribute, $matching_type,
     $targetedType     = '',
     $conditions       = [],
     $debuffConditions = [],
     $includePassive   = 0,
   ) {
-    my $logger = $self->logger;
-    $logger->debug(
-      "Calculating ascending buffs for level: $level, attribute: $attribute");
-
+    $self->logger->debug(sprintf(
+      'Calculating ascending buffs for level: %s, attribute: %s',
+      $level, $attribute
+    ));
     # For buff matching, don't pass debuff conditions
     # For debuff matching, don't pass buff conditions
     my ($match_buff_conditions, $match_debuff_conditions);
@@ -108,14 +77,13 @@ class Game::EvonyTKR::Model::Covenant : isa(Game::EvonyTKR::Shared::Constants) {
       $match_buff_conditions   = $conditions;
       $match_debuff_conditions = $debuffConditions;
     }
-
     return 0 if not defined $level or $level =~ /None/i;
 
     my $valid_levels = $self->CovenantCategoryValues;
     my %level_index  = map { $valid_levels->[$_] => $_ } 0 .. $#$valid_levels;
 
     unless (exists $level_index{$level}) {
-      $logger->debug("Invalid level: $level");
+      $self->logger->debug("Invalid level: $level");
       return 0;
     }
 
@@ -125,11 +93,11 @@ class Game::EvonyTKR::Model::Covenant : isa(Game::EvonyTKR::Shared::Constants) {
 
     for my $i (1 .. $target_index) {    # skip index 0 for 'None'
       my $level_name = $valid_levels->[$i];
-      my $buffs      = $categories->{$level_name}->{buffs};
-
-      $logger->debug(
-        "Checking level '$level_name' with " . scalar(@$buffs) . " buffs");
-
+      my $buffs      = $self->categories->{$level_name}->{buffs};
+      $self->logger->debug(sprintf(
+        'Checking level "%s" with %s buffs.',
+        $level_name, scalar(@$buffs)
+      ));
       foreach my $buff (@$buffs) {
         if ($buff->passive & !$includePassive) {
           next;
@@ -143,20 +111,22 @@ class Game::EvonyTKR::Model::Covenant : isa(Game::EvonyTKR::Shared::Constants) {
           $logID
         )) {
           my $val = $buff->value->number;
-          $logger->debug("  ➤ Match found. Adding $val to total.");
+          $self->logger->debug("  ➤ Match found. Adding $val to total.");
           $total += $val;
         }
         else {
-          $logger->debug("  ✗ No match found.");
+          $self->logger->debug("  ✗ No match found.");
         }
       }
+      $self->logger->debug(sprintf(
+        '%s has Total %s for level "%s" and attribute "%s"',
+        $self->primary->name, $level, $attribute
+      ));
+      return $total;
     }
-    $logger->debug($primary->name
-        . " has Total $total for level '$level' and attribute '$attribute'");
-    return $total;
-  }
+  };
 
-  method addBuff ($level, $nb) {
+  has 'addBuff' => sub ($self, $level, $nb) {
     my $red = 1;
     if (!blessed($nb) || blessed($nb) ne "Game::EvonyTKR::Model::Buff") {
       $self->logger->error(sprintf(
@@ -165,7 +135,7 @@ class Game::EvonyTKR::Model::Covenant : isa(Game::EvonyTKR::Shared::Constants) {
       exit 0;
     }
 
-    if (none { $level =~ /$_/i } @{ $self->CovenantCategoryValues }) {
+    if (List::AllUtils::none { $level =~ /$_/i } $self->CovenantCategoryValues->@* ) {
       $self->logger->error(sprintf(
         'level should be one of %s, not %s',
         join(', ', @{ $self->covenantLevels }), $level
@@ -177,54 +147,51 @@ class Game::EvonyTKR::Model::Covenant : isa(Game::EvonyTKR::Shared::Constants) {
     }
     my $count = -1;
     $level = lc($level);
-    if (!exists $categories->{$level}) {
+    if (!exists $self->categories->{$level}) {
       $self->logger->error(
         "category $level is not a valid key for covenantlevels!!");
     }
     else {
-      push @{ $categories->{$level}->{buffs} }, $nb;
-      $count = scalar @{ $categories->{$level}->{buffs} };
+      push @{ $self->categories->{$level}->{buffs} }, $nb;
+      $count = scalar @{ $self->categories->{$level}->{buffs} };
       $self->logger->debug("Added buff for attribute '"
           . $nb->attribute
           . "' to covenant level '$level', now has $count buffs");
     }
 
     return $count;
+  };
 
-  }
-
-  method to_hash() {
+  has 'to_hash' => sub ($self) {
     my $returnRef = {
-      primary   => $primary->name,
+      primary   => $self->primary->name,
       secondary => {
         #one   => $secondary->{'one'}->name,
         #two   => $secondary->{'two'}->name,
         #three => $secondary->{'three'}->name,
-        one   => $secondary->{'one'},
-        two   => $secondary->{'two'},
-        three => $secondary->{'three'},
+        one   => $self->one,
+        two   => $self->two,
+        three => $self->three,
       },
-      categories => $categories,
+      categories => $self->categories,
     };
-  }
+  };
 
-  method TO_JSON {
+  has 'TO_JSON' => sub ($self) {
     return $self->to_hash();
-  }
+  };
 
-  method as_string {
+  sub as_string ($self) {
     my $json =
       JSON::PP->new->utf8->pretty->canonical(1)
       ->allow_blessed(1)
       ->convert_blessed(1)
       ->encode($self->to_hash());
     return $json;
-  }
+  };
 
-  sub from_hash($self, $object, $primary, $logger = undef) {
-    unless (defined($logger)) {
-      $logger = $log;
-    }
+  sub from_hash($self, $object, $primary, ) {
+    my $logger = $log;
     if (!exists $object->{name}) {
       $logger->error('object must have name attribute.');
       return;
@@ -269,6 +236,14 @@ class Game::EvonyTKR::Model::Covenant : isa(Game::EvonyTKR::Shared::Constants) {
       }
     }
     return $o;
+  }
+
+  sub isTrue ($self, $other = undef, $swap = undef) {
+    return
+         defined($self)
+      && ref($self)
+      && blessed($self)
+      && $self->isa(__PACKAGE__);
   }
 
 };

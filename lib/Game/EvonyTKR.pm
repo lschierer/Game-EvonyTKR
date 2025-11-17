@@ -22,6 +22,7 @@ package Game::EvonyTKR {
   use POSIX qw(setsid);
   use Scalar::Util 'weaken';
   use Carp;
+  use diagnostics;
   use Env qw(DEPLOYMENT_TIME HOSTNAME IMAGE_TAG IMAGE_URI);
   our $VERSION = 'v0.50.0';
 
@@ -189,6 +190,7 @@ package Game::EvonyTKR {
     my @controllerplugins = find_modules 'Game::EvonyTKR::Controller';
     foreach my $module (@controllerplugins) {
       eval {
+        $l4p->debug("loading module $module");
         load_class $module;
         $app->plugin($module);
       };

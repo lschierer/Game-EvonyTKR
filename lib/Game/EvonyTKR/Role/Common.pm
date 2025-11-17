@@ -84,20 +84,21 @@ package Game::EvonyTKR::Role::Common {
   # Returns: 0 if all prereqs met, 1 if outstanding (controllers)
   #          calls retry/fail for Minion jobs
   sub are_prereqs_outstanding ($self, $minion, $prereq_tasks) {
-    my $is_minion_job = $self->can('retry') && $self->can('fail') && $self->can('note');
+    my $is_minion_job =
+      $self->can('retry') && $self->can('fail') && $self->can('note');
 
-    unless($minion){
-      $self->logger->error('must provide a minion process in which to search for jobs.');
+    unless ($minion) {
+      $self->logger->error(
+        'must provide a minion process in which to search for jobs.');
       return 1;
     }
 
-    if(scalar(@{ $prereq_tasks }) == 0){
+    if (scalar(@{$prereq_tasks}) == 0) {
       $self->logger->error('prereq tasks must be defined.');
       return 1;
     }
 
-    my $prereqs = {
-    };
+    my $prereqs = {};
 
     foreach my $prereq (@$prereq_tasks) {
       my $prereqFinishedCount = $minion->jobs({
@@ -128,22 +129,26 @@ package Game::EvonyTKR::Role::Common {
             $delay, $prereq, $prereqPendingCount
           ));
           return $self->retry({ delay => $delay });
-        } else {
-          return 1; # Outstanding prereqs for controller
+        }
+        else {
+          return 1;    # Outstanding prereqs for controller
         }
       }
       $prereqs->{$prereq} = $prereqFinishedCount;
     }
 
-    if(not defined($prereqs) || ! ref($prereqs) || ref($prereqs) ne 'HASH'){
+    if (not defined($prereqs) || !ref($prereqs) || ref($prereqs) ne 'HASH') {
       $self->logger->logcroak('prereqs is in an odd state.');
       return 1;
     }
 
-    $self->logger->info(sprintf('prereqs are in states %s', Data::Printer::np($prereqs, multiline => 0)));
+    $self->logger->info(
+      sprintf('prereqs are in states %s',
+        Data::Printer::np($prereqs, multiline => 0))
+    );
 
-    if(grep {$_ == "0"} values %{ $prereqs }){
-      return 1
+    if (grep { $_ == "0" } values %{$prereqs}) {
+      return 1;
     }
     return 0;
   }

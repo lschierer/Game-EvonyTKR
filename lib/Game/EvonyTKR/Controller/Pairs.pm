@@ -76,19 +76,23 @@ package Game::EvonyTKR::Controller::Pairs {
 
     my $repeat = 0;
     $delay++;
-    my $maxdelay = defined($app->config('mode')) && $app->config('mode') eq 'development' ? 15 : 60;
+    my $maxdelay = defined($app->config('mode'))
+      && $app->config('mode') eq 'development' ? 15 : 60;
     $maxdelay = defined($maxdelay) ? $maxdelay : 60;
-    $delay = $delay % $maxdelay;
-    $delay = $delay == 0 ? 0.001 : $delay;
+    $delay    = $delay % $maxdelay;
+    $delay    = $delay == 0 ? 0.001 : $delay;
 
-    if(!$is_complete){
+    if (!$is_complete) {
       $c->logger->debug(
         sprintf('Pair building not complete yet, will retry in %s', $delay));
       $repeat = 1;
-    } else {
-      $npbt        = $c->get_pairs_by_type();
-      if(!$npbt){
-        $c->logger->debug(sprintf('Pair Building Complete but no pairs by type yet. retry in %s', $delay));
+    }
+    else {
+      $npbt = $c->get_pairs_by_type();
+      if (!$npbt) {
+        $c->logger->debug(sprintf(
+          'Pair Building Complete but no pairs by type yet. retry in %s',
+          $delay));
         $repeat = 1;
       }
     }
@@ -387,9 +391,7 @@ package Game::EvonyTKR::Controller::Pairs {
     my $buffActivation = $route_meta->{buffActivation};
     my $uiTarget       = $route_meta->{uiTarget};
 
-    my @pairs = sort {
-      $a cmp $b
-    } @{ $c->get_pairs_by_type()->{$generalType} };
+    my @pairs = sort { $a cmp $b } @{ $c->get_pairs_by_type()->{$generalType} };
 
     $c->logger->debug(sprintf('There are %s pairs to return.', scalar(@pairs)));
 
@@ -556,35 +558,37 @@ package Game::EvonyTKR::Controller::Pairs {
 
       # Build args hash for the Worker class
       my $args = {
-        mode                    => 'pair',
-        runId                   => $run_id,
-        general1                => $pair->primary->name,
-        general2                => $pair->secondary->name,
-        targetType              => $validated_params->{route_meta}->{generalType},
-        activationType          => $validated_params->{buffActivation},
-        ascendingLevel          => $validated_params->{ascendingLevel},
-        primaryCovenantLevel    => $validated_params->{primaryCovenantLevel},
-        primarySpecialty1       => $validated_params->{primarySpecialties}->[0],
-        primarySpecialty2       => $validated_params->{primarySpecialties}->[1],
-        primarySpecialty3       => $validated_params->{primarySpecialties}->[2],
-        primarySpecialty4       => $validated_params->{primarySpecialties}->[3],
-        secondaryCovenantLevel  => $validated_params->{secondaryCovenantLevel},
-        secondarySpecialty1     => $validated_params->{secondarySpecialties}->[0],
-        secondarySpecialty2     => $validated_params->{secondarySpecialties}->[1],
-        secondarySpecialty3     => $validated_params->{secondarySpecialties}->[2],
-        secondarySpecialty4     => $validated_params->{secondarySpecialties}->[3],
+        mode                 => 'pair',
+        runId                => $run_id,
+        general1             => $pair->primary->name,
+        general2             => $pair->secondary->name,
+        targetType           => $validated_params->{route_meta}->{generalType},
+        activationType       => $validated_params->{buffActivation},
+        ascendingLevel       => $validated_params->{ascendingLevel},
+        primaryCovenantLevel => $validated_params->{primaryCovenantLevel},
+        primarySpecialty1    => $validated_params->{primarySpecialties}->[0],
+        primarySpecialty2    => $validated_params->{primarySpecialties}->[1],
+        primarySpecialty3    => $validated_params->{primarySpecialties}->[2],
+        primarySpecialty4    => $validated_params->{primarySpecialties}->[3],
+        secondaryCovenantLevel => $validated_params->{secondaryCovenantLevel},
+        secondarySpecialty1 => $validated_params->{secondarySpecialties}->[0],
+        secondarySpecialty2 => $validated_params->{secondarySpecialties}->[1],
+        secondarySpecialty3 => $validated_params->{secondarySpecialties}->[2],
+        secondarySpecialty4 => $validated_params->{secondarySpecialties}->[3],
       };
 
       $c->logger->debug("Enqueueing job for pair index: $index");
       my $jid = 0;
       $c->app->minion->enqueue(
         summarize_pair => [
-        $args->{runId},                 $args->{general1},            $args->{general2},
-        $args->{targetType},            $args->{activationType},      $args->{ascendingLevel},
-        $args->{primaryCovenantLevel},  $args->{primarySpecialty1},   $args->{primarySpecialty2},
-        $args->{primarySpecialty3},     $args->{primarySpecialty4},   $args->{secondaryCovenantLevel},
-        $args->{secondarySpecialty1},   $args->{secondarySpecialty2}, $args->{secondarySpecialty3},
-        $args->{secondarySpecialty4},
+          $args->{runId},                $args->{general1},
+          $args->{general2},             $args->{targetType},
+          $args->{activationType},       $args->{ascendingLevel},
+          $args->{primaryCovenantLevel}, $args->{primarySpecialty1},
+          $args->{primarySpecialty2},    $args->{primarySpecialty3},
+          $args->{primarySpecialty4},    $args->{secondaryCovenantLevel},
+          $args->{secondarySpecialty1},  $args->{secondarySpecialty2},
+          $args->{secondarySpecialty3},  $args->{secondarySpecialty4},
         ] => {
           delay    => ($index * 0.001) + rand(0.5),
           attempts => 2,

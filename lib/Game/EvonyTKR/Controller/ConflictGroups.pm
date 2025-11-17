@@ -8,7 +8,7 @@ use namespace::autoclean;
 
 package Game::EvonyTKR::Controller::ConflictGroups {
   use Mojo::Base 'Game::EvonyTKR::Controller::ControllerBase';
-  use Mojo::Base 'Game::EvonyTKR::Role::Common', -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Common',            -role;
   use Mojo::Base 'Game::EvonyTKR::Controller::Role::Pairs', -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Logger',            -role;
   use List::AllUtils qw( all any none );
@@ -61,14 +61,19 @@ package Game::EvonyTKR::Controller::ConflictGroups {
     if ($is_complete) {
       $c->logger->info('Conflict building complete, loading final data');
       # calling get_conflict_detector will trigger a refresh
-      Mojo::IOLoop->timer(0.001 => sub{
-        $c->get_conflict_detector();
-      });
+      Mojo::IOLoop->timer(
+        0.001 => sub {
+          $c->get_conflict_detector();
+        }
+      );
       return;
     }
 
     # Not complete yet, retry in 30 seconds
-    $c->logger->debug(sprintf('Conflict building not complete yet, will retry in %s seconds', $delay));
+    $c->logger->debug(
+      sprintf('Conflict building not complete yet, will retry in %s seconds',
+        $delay)
+    );
     Mojo::IOLoop->timer(
       $delay => sub { $c->schedule_cached_conflicts_merge($app, $delay) });
   }

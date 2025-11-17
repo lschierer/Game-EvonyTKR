@@ -74,7 +74,7 @@ package Game::EvonyTKR::Log::Config {
   #(ALL|FATAL|TRACE|WARN|WARN|OFF|ERROR|WARN)
   sub logLevels {
     return {
-      'Game::EvonyTKR'                                             => 'WARN',
+      'Game::EvonyTKR'                                             => 'DEBUG',
       'Game::EvonyTKR::Control::Generals::Routing'                 => 'WARN',
       'Game::EvonyTKR::Controller::AscendingAttributes'            => 'WARN',
       'Game::EvonyTKR::Controller::ConflictGroups'                 => 'DEBUG',

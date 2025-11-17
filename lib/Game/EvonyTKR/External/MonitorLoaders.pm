@@ -29,14 +29,15 @@ package Game::EvonyTKR::External::MonitorLoaders {
       __PACKAGE__, Log::Log4perl::Level::to_level($job->logger->level())
     ));
 
-    return if $job->are_prereqs_outstanding($job->minion, [
-      'load_all_ascending_attributes',
-      'load_all_builtin_books',
-      'load_all_generals',
-      'load_all_generic_books',
-      'load_all_pair_builders',
-      'load_all_specialties',
-    ]);
+    return
+      if $job->are_prereqs_outstanding(
+      $job->minion,
+      [
+        'load_all_ascending_attributes', 'load_all_builtin_books',
+        'load_all_generals',             'load_all_generic_books',
+        'load_all_pair_builders',        'load_all_specialties',
+      ]
+      );
 
     $job->logger->info(sprintf('starting run of %s', __PACKAGE__));
     my $loader_types = [

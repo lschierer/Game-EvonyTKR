@@ -198,15 +198,24 @@ package Game::EvonyTKR::Controller::Role::Pairs {
     state $inflated_pairs = {};
     unless ($all_pairs_built) {
       foreach my $type (sort keys %$pairs_by_type) {
-        $self->logger->debug(sprintf('merging %s pairs for type %s', scalar(@{ $pairs_by_type->{$type} }), $type));
+        $self->logger->debug(sprintf(
+          'merging %s pairs for type %s',
+          scalar(@{ $pairs_by_type->{$type} }), $type
+        ));
         $inflated_pairs->{$type} = [];
         my $type_starts_at_zero = scalar(@{ $inflated_pairs->{$type} });
         foreach my $wire_pair (@{ $pairs_by_type->{$type} }) {
           my $wpk = $self->wire_pair_to_key($wire_pair);
-          if(!$type_starts_at_zero && List::AllUtils::any { $wpk eq $self->wire_pair_to_key($_->to_wire_hash()) } $inflated_pairs->{$type}->@* ){
+          if (
+            !$type_starts_at_zero && List::AllUtils::any {
+              $wpk eq $self->wire_pair_to_key($_->to_wire_hash())
+            }
+            $inflated_pairs->{$type}->@*
+          ) {
             $self->logger->debug(sprintf('pair %s is already present', $wpk));
             next;
-          } else {
+          }
+          else {
             $self->logger->debug("merging pair $wpk for type $type");
           }
           # Inflate wire pair into proper pair object

@@ -93,7 +93,7 @@ package Game::EvonyTKR::External::General::Pair::ReduceCoordinator {
       my $cc = $job->conflict_cache->set('conflict_building_complete', 1);
 
       $job->logger->info(sprintf(
-        "Cache set results: pair_building_complete=%s, conflict_building_complete=%s",
+"Cache set results: pair_building_complete=%s, conflict_building_complete=%s",
         defined($pc) ? ($pc ? 'success' : 'failed') : 'undef',
         defined($cc) ? ($cc ? 'success' : 'failed') : 'undef'
       ));
@@ -103,11 +103,11 @@ package Game::EvonyTKR::External::General::Pair::ReduceCoordinator {
       $cc_verify = $job->conflict_cache->get('conflict_building_complete');
 
       $job->logger->info(sprintf(
-        "Cache verification: pair_building_complete=%s, conflict_building_complete=%s",
+"Cache verification: pair_building_complete=%s, conflict_building_complete=%s",
         defined($pc_verify) ? $pc_verify : 'undef',
         defined($cc_verify) ? $cc_verify : 'undef'
       ));
-    }while(!$pc_verify || !$cc_verify);
+    } while (!$pc_verify || !$cc_verify);
 
     $job->finish(sprintf(
 "Merged results from %d batches - %d conflicts (%d cache hits, %s effectiveness)",
