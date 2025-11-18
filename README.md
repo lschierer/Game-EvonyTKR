@@ -51,7 +51,8 @@ This is very much a work in progress.
    - **TODO**: Test full general loading and caching
 
 1. **Conflict Detection**
-  - I want this to stay as a pair of corina objects (a parent and child).  Or rather, there is no benefit to converting it as it does precisely what it needs to already.
+  - I want this to stay as a pair of corina objects (a parent and child).  Or rather, there is debatable benefit to converting it as it does precisely what it needs to already.
+  - the exception to the above statement is that it may need performance tuning, and/or tweaking for any flaws in the algorithm that crop up with new test cases.
   - the corinna object contains two hashes that are updated by the object's preseed method. These are what should get cached & transferred over the memcache IPC.
     - groups_by_conflict_type
     - by_general
