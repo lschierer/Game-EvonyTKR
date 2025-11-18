@@ -108,7 +108,7 @@ package Game::EvonyTKR::Controller::Covenants {
     $c->logger->debug(sprintf('Rendering index for %s', __PACKAGE__));
 
     # Check if markdown exists for this collection
-    my $distDir = Mojo::Home->new->detect('Game::EvonyTKR');
+    my $distDir       = Mojo::Home->new->detect('Game::EvonyTKR');
     my $markdown_path = $distDir->child("share/pages/Covenants/index.md");
     $c->logger->debug("markdown_path is $markdown_path");
 

@@ -1,83 +1,97 @@
 use v5.40.0;
 use utf8::all;
 use experimental qw(class);
-use Test::More;
-use List::AllUtils qw( all any none );
+use Test2::V0;
+use List::AllUtils qw( all any none uniq);
 use Devel::Local;
 use File::FindLib 'lib';
+
+
 require Game::EvonyTKR;
+require Game::EvonyTKR::Log::Config;
+require Game::EvonyTKR::Service::Cache;
+require YAML::PP;
+require Path::Tiny;
 require Data::Printer;
-use Game::EvonyTKR::Shared::Parser;
 
 use Log::Log4perl qw(:levels);
-#use Log::Log4perl qw(:easy);       #  <<- Tried these two lines first.
-#Log::Log4perl->easy_init($DEBUG);  #
+my $logger = Game::EvonyTKR::Log::Config->logger('Test::Package');
+$logger->info(sprintf(
+  'Test script logging configured with log level %s',
+  Log::Log4perl::Level::to_level($logger->level()), ));
 
-my $loggerConfig = Game::EvonyTKR::Logger::Config->new('test');
-my $logConfig    = Path::Tiny->cwd()->child('share/log4perl.test.conf ');
-say $logConfig->absolute();
-Log::Log4perl::init($logConfig->canonpath());
+require Game::EvonyTKR::Role::Logger;
+require Game::EvonyTKR::Model::General;
+require Game::EvonyTKR::Model::Covenant;
+require Game::EvonyTKR::Shared::Parser;
+
 
 my $parser = Game::EvonyTKR::Shared::Parser->new();
-$parser->logger->level($DEBUG)
-  ;    # <-- tried each solution with and without this line
+#override what's in Game::EvonyTKR::Log::Config
+$parser->logger->level($DEBUG);
+$parser->generate_grammar();
 
-use List::MoreUtils qw(uniq);
 
-sub match_buff {
-  my ($buffs, %args) = @_;
+package Test::Package {
+  use Mojo::Base -base,                          -signatures;
+  use Mojo::Base 'Game::EvonyTKR::Role::Logger', -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Common', -role;
 
-  return any {
-    my $buff = $_;
+  sub match_buff {
+    my ($buffs, %args) = @_;
+    my @r = any {
+      my $buff = $_;
 
-    my $ok = 1;
+      my $ok = 1;
 
-    if ($buff->attribute ne $args{attribute}) {
-      diag sprintf('attribute test failed: %s ne %s.',
-        $buff->attribute, $args{attribute});
-      $ok = 0;
-    }
-
-    if ($buff->value->number != $args{value}) {
-      diag sprintf('value test failed: %s ne %s.',
-        $buff->value->number, $args{value});
-      $ok = 0;
-    }
-
-    if (defined $args{class}) {
-      if (($buff->targetedType // '') ne $args{class}) {
-        diag sprintf(
-          'class test failed: %s ne %s.',
-          $buff->targetedType // 'undef',
-          $args{class}
-        );
+      if ($buff->attribute ne $args{attribute}) {
+        diag( sprintf('attribute test failed: %s ne %s.',
+          $buff->attribute, $args{attribute}));
         $ok = 0;
       }
-    }
 
-    if (defined $args{conditions} && @{ $args{conditions} }) {
-      if (scalar $buff->conditions() > 0) {
-        my @actual   = $buff->conditions();
-        my @expected = @{ $args{conditions} };
-        my @union    = List::MoreUtils::uniq(@actual, @expected);
-        if ( scalar(@union) != scalar(@actual)
-          || scalar(@actual) != scalar(@expected)) {
-          diag sprintf('conditions mismatch: actual=%s expected=%s union=%s',
-            scalar(@actual), scalar(@expected), scalar(@union));
-          diag('actual: ' . join(', ', @actual));
-          diag('expected: ' . join(', ', @expected));
+      if ($buff->value->number != $args{value}) {
+        diag(sprintf('value test failed: %s ne %s.',$buff->value->number, $args{value}));
+        $ok = 0;
+      }
+
+      if (defined $args{class}) {
+        if (($buff->targetedType // '') ne $args{class}) {
+          diag( sprintf(
+            'class test failed: %s ne %s.',
+            $buff->targetedType // 'undef',
+            $args{class}
+          ));
           $ok = 0;
         }
       }
-      else {
-        diag('expected conditions but none found in buff');
-        $ok = 0;
-      }
-    }
 
-    return $ok;
-  } @$buffs;
+      if (defined $args{conditions} && @{ $args{conditions} }) {
+        if (scalar $buff->conditions() > 0) {
+          my @actual   = $buff->conditions();
+          my @expected = @{ $args{conditions} };
+          my @union    = List::MoreUtils::uniq(@actual, @expected);
+          if ( scalar(@union) != scalar(@actual)
+            || scalar(@actual) != scalar(@expected)) {
+            diag( sprintf('conditions mismatch: actual=%s expected=%s union=%s',
+              scalar(@actual), scalar(@expected), scalar(@union)));
+            diag('actual: ' . join(', ', @actual));
+            diag('expected: ' . join(', ', @expected));
+            $ok = 0;
+          }
+        }
+        else {
+          diag('expected conditions but none found in buff');
+          $ok = 0;
+        }
+      }
+
+      return $ok;
+    } $buffs->@*;
+    return scalar(@r);
+  }
 }
+
 
 subtest 'fake singlebuff book' => sub {
   my $text =
@@ -85,7 +99,7 @@ subtest 'fake singlebuff book' => sub {
   my @fragments = $parser->tokenize_buffs($text);
   my @hashedBuffs;
   foreach my $frag (@fragments) {
-    diag "frag is " . Data::Printer::np($frag);
+    diag ("frag is " . Data::Printer::np($frag));
     my @nb = $parser->normalize_buff($frag);
     push(@hashedBuffs, @nb);
   }
@@ -93,7 +107,7 @@ subtest 'fake singlebuff book' => sub {
   is scalar(@hashedBuffs), 1, 'Parsed 1 buffs';
 
   ok(
-    match_buff(
+    Test::Package->match_buff(
       \@hashedBuffs,
       attribute  => 'Attack',
       value      => 45,
@@ -123,7 +137,7 @@ subtest 'Dictator Skill Book' => sub {
   is scalar(@hashedBuffs), 3, 'Parsed 3 buffs';
 
   ok(
-    match_buff(
+    Test::Package->match_buff(
       \@hashedBuffs,
       attribute  => 'Attack',
       value      => 15,
@@ -134,7 +148,7 @@ subtest 'Dictator Skill Book' => sub {
   );
 
   ok(
-    match_buff(
+    Test::Package->match_buff(
       \@hashedBuffs,
       attribute  => 'Attack',
       value      => 15,
@@ -145,7 +159,7 @@ subtest 'Dictator Skill Book' => sub {
   );
 
   ok(
-    match_buff(
+    Test::Package->match_buff(
       \@hashedBuffs,
       attribute  => 'Attack',
       value      => 45,
@@ -172,7 +186,7 @@ subtest 'Augustus Skill Book' => sub {
   is scalar(@hashedBuffs), 2, 'Parsed 2 buffs';
 
   ok(
-    match_buff(
+    Test::Package->match_buff(
       \@hashedBuffs,
       attribute  => 'Attack',
       value      => 40,
@@ -183,7 +197,7 @@ subtest 'Augustus Skill Book' => sub {
   );
 
   ok(
-    match_buff(
+    Test::Package->match_buff(
       \@hashedBuffs,
       attribute  => 'Attack',
       value      => 15,
@@ -210,7 +224,7 @@ subtest 'Bloody Leader Skill Book' => sub {
   is scalar(@hashedBuffs), 2, 'Parsed 2 buffs';
 
   ok(
-    match_buff(
+    Test::Package->match_buff(
       \@hashedBuffs,
       attribute  => 'Attack',
       value      => 15,
@@ -221,7 +235,7 @@ subtest 'Bloody Leader Skill Book' => sub {
   );
 
   ok(
-    match_buff(
+    Test::Package->match_buff(
       \@hashedBuffs,
       attribute  => 'March Size',
       value      => 10,
@@ -250,7 +264,7 @@ subtest 'Chivalry Skill Book' => sub {
   is scalar(@hashedBuffs), 2, 'Parsed 2 buffs';
 
   ok(
-    match_buff(
+    Test::Package->match_buff(
       \@hashedBuffs,
       attribute  => 'SubCity Construction Speed',
       value      => 50,
@@ -260,7 +274,7 @@ subtest 'Chivalry Skill Book' => sub {
   );
 
   ok(
-    match_buff(
+    Test::Package->match_buff(
       \@hashedBuffs,
       attribute  => 'SubCity Training Speed',
       value      => 30,
@@ -286,7 +300,7 @@ subtest 'Alessandra Red1 - Multiple troops with and' => sub {
   is scalar(@hashedBuffs), 4, 'Parsed 4 buffs (2 troops × 2 attributes)';
 
   ok(
-    match_buff(
+    Test::Package->match_buff(
       \@hashedBuffs,
       attribute  => 'Defense',
       value      => 10,
@@ -297,7 +311,7 @@ subtest 'Alessandra Red1 - Multiple troops with and' => sub {
   );
 
   ok(
-    match_buff(
+    Test::Package->match_buff(
       \@hashedBuffs,
       attribute  => 'HP',
       value      => 10,
@@ -308,7 +322,7 @@ subtest 'Alessandra Red1 - Multiple troops with and' => sub {
   );
 
   ok(
-    match_buff(
+    Test::Package->match_buff(
       \@hashedBuffs,
       attribute  => 'Defense',
       value      => 10,
@@ -319,7 +333,7 @@ subtest 'Alessandra Red1 - Multiple troops with and' => sub {
   );
 
   ok(
-    match_buff(
+    Test::Package->match_buff(
       \@hashedBuffs,
       attribute  => 'HP',
       value      => 10,
@@ -346,7 +360,7 @@ subtest 'Alessandra Red2 - Single debuff' => sub {
   is scalar(@hashedBuffs), 1, 'Parsed 1 buff';
 
   ok(
-    match_buff(
+    Test::Package->match_buff(
       \@hashedBuffs,
       attribute  => 'Wounded to Death',
       value      => 10,
@@ -372,7 +386,7 @@ subtest 'Alessandra Red3 - Single buff with condition' => sub {
   is scalar(@hashedBuffs), 1, 'Parsed 1 buff';
 
   ok(
-    match_buff(
+    Test::Package->match_buff(
       \@hashedBuffs,
       attribute  => 'Rally Capacity',
       value      => 8,
@@ -398,7 +412,7 @@ subtest 'Alessandra Red4 - Single buff' => sub {
   is scalar(@hashedBuffs), 1, 'Parsed 1 buff';
 
   ok(
-    match_buff(
+    Test::Package->match_buff(
       \@hashedBuffs,
       attribute  => 'Defense',
       value      => 50,
@@ -425,7 +439,7 @@ subtest 'Alessandra Red5 - Mixed comma and and' => sub {
   is scalar(@hashedBuffs), 3, 'Parsed 3 buffs';
 
   ok(
-    match_buff(
+    Test::Package->match_buff(
       \@hashedBuffs,
       attribute  => 'Attack',
       value      => 20,
@@ -436,7 +450,7 @@ subtest 'Alessandra Red5 - Mixed comma and and' => sub {
   );
 
   ok(
-    match_buff(
+    Test::Package->match_buff(
       \@hashedBuffs,
       attribute  => 'Defense',
       value      => 20,
@@ -447,7 +461,7 @@ subtest 'Alessandra Red5 - Mixed comma and and' => sub {
   );
 
   ok(
-    match_buff(
+    Test::Package->match_buff(
       \@hashedBuffs,
       attribute  => 'HP',
       value      => 20,
@@ -478,7 +492,7 @@ subtest 'Aethelflaed’s Red1' => sub {
   is scalar(@hashedBuffs), 2, 'Parsed 2 buffs';
 
   ok(
-    match_buff(
+    Test::Package->match_buff(
       \@hashedBuffs,
       attribute  => 'HP',
       value      => 30,
@@ -489,7 +503,7 @@ subtest 'Aethelflaed’s Red1' => sub {
   );
 
   ok(
-    match_buff(
+    Test::Package->match_buff(
       \@hashedBuffs,
       attribute  => 'Defense',
       value      => 10,
@@ -516,7 +530,7 @@ subtest 'Aethelflaed’s Red2' => sub {
   is scalar(@hashedBuffs), 2, 'Parsed 2 buffs';
 
   ok(
-    match_buff(
+    Test::Package->match_buff(
       \@hashedBuffs,
       attribute  => 'Defense',
       value      => 10,
@@ -526,7 +540,7 @@ subtest 'Aethelflaed’s Red2' => sub {
   );
 
   ok(
-    match_buff(
+    Test::Package->match_buff(
       \@hashedBuffs,
       attribute  => 'HP',
       value      => 15,
@@ -554,7 +568,7 @@ subtest 'Aethelflaed’s Red3' => sub {
   is scalar(@hashedBuffs), 2, 'Parsed 2 buffs';
 
   ok(
-    match_buff(
+    Test::Package->match_buff(
       \@hashedBuffs,
       attribute  => 'Attack',
       value      => 10,
@@ -564,7 +578,7 @@ subtest 'Aethelflaed’s Red3' => sub {
   );
 
   ok(
-    match_buff(
+    Test::Package->match_buff(
       \@hashedBuffs,
       attribute  => 'Defense',
       value      => 20,
@@ -592,7 +606,7 @@ subtest 'Aethelflaed’s Red4' => sub {
   is scalar(@hashedBuffs), 2, 'Parsed 2 buffs';
 
   ok(
-    match_buff(
+    Test::Package->match_buff(
       \@hashedBuffs,
       attribute  => 'Attack',
       value      => 15,
@@ -603,7 +617,7 @@ subtest 'Aethelflaed’s Red4' => sub {
   );
 
   ok(
-    match_buff(
+    Test::Package->match_buff(
       \@hashedBuffs,
       attribute  => 'HP',
       value      => 20,
@@ -631,7 +645,7 @@ subtest 'Aethelflaed’s Red5' => sub {
   is scalar(@hashedBuffs), 3, 'Parsed 3 buffs';
 
   ok(
-    match_buff(
+    Test::Package->match_buff(
       \@hashedBuffs,
       attribute  => 'Attack',
       value      => 20,
@@ -642,7 +656,7 @@ subtest 'Aethelflaed’s Red5' => sub {
   );
 
   ok(
-    match_buff(
+    Test::Package->match_buff(
       \@hashedBuffs,
       attribute  => 'Defense',
       value      => 10,
@@ -652,7 +666,7 @@ subtest 'Aethelflaed’s Red5' => sub {
   );
 
   ok(
-    match_buff(
+    Test::Package->match_buff(
       \@hashedBuffs,
       attribute  => 'HP',
       value      => 10,
@@ -682,7 +696,7 @@ subtest 'Monarchy Restoration Skill Book' => sub {
   is scalar(@hashedBuffs), 5, 'Parsed 5 buffs';
 
   ok(
-    match_buff(
+    Test::Package->match_buff(
       \@hashedBuffs,
       attribute  => 'Attack',
       value      => 50,
@@ -693,7 +707,7 @@ subtest 'Monarchy Restoration Skill Book' => sub {
   );
 
   ok(
-    match_buff(
+    Test::Package->match_buff(
       \@hashedBuffs,
       attribute  => 'Defense',
       value      => 40,
@@ -704,7 +718,7 @@ subtest 'Monarchy Restoration Skill Book' => sub {
   );
 
   ok(
-    match_buff(
+    Test::Package->match_buff(
       \@hashedBuffs,
       attribute  => 'HP',
       value      => 40,
@@ -715,7 +729,7 @@ subtest 'Monarchy Restoration Skill Book' => sub {
   );
 
   ok(
-    match_buff(
+    Test::Package->match_buff(
       \@hashedBuffs,
       attribute  => 'Defense',
       value      => 40,
@@ -726,7 +740,7 @@ subtest 'Monarchy Restoration Skill Book' => sub {
   );
 
   ok(
-    match_buff(
+    Test::Package->match_buff(
       \@hashedBuffs,
       attribute  => 'HP',
       value      => 40,
@@ -757,7 +771,7 @@ subtest 'Napoleonic Wars Skill Book' => sub {
   is scalar(@hashedBuffs), 3, 'Parsed 3 buffs';
 
   ok(
-    match_buff(
+    Test::Package->match_buff(
       \@hashedBuffs,
       attribute  => 'Attack',
       value      => 50,
@@ -768,7 +782,7 @@ subtest 'Napoleonic Wars Skill Book' => sub {
   );
 
   ok(
-    match_buff(
+    Test::Package->match_buff(
       \@hashedBuffs,
       attribute  => 'Defense',
       value      => 30,
@@ -779,7 +793,7 @@ subtest 'Napoleonic Wars Skill Book' => sub {
   );
 
   ok(
-    match_buff(
+    Test::Package->match_buff(
       \@hashedBuffs,
       attribute  => 'HP',
       value      => 30,
@@ -793,3 +807,5 @@ subtest 'Napoleonic Wars Skill Book' => sub {
 };
 
 done_testing;
+
+__END__

@@ -4,12 +4,19 @@ use experimental qw(class);
 use Test2::V0;
 use Test2::Plugin::ExitSummary;
 
-# File::Share requires the main module first
 require Game::EvonyTKR;
 require Game::EvonyTKR::Log::Config;
+require Game::EvonyTKR::Service::Cache;
+require YAML::PP;
+require Path::Tiny;
+require Data::Printer;
 
-my $logger = Game::EvonyTKR::Log::Config->logger('Test');
-$logger->info('Test script logging configured');
+use Log::Log4perl qw(:levels);
+my $logger = Game::EvonyTKR::Log::Config->logger('Test::Package');
+$logger->info(sprintf(
+  'Test script logging configured with log level %s',
+  Log::Log4perl::Level::to_level($logger->level()), ));
+
 
 require Game::EvonyTKR::Model::Buff;
 require Game::EvonyTKR::Model::Buff::Matcher;

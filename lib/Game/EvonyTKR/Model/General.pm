@@ -118,7 +118,7 @@ package Game::EvonyTKR::Model::General {
     else {
       $self->logger->warn(sprintf(
         'failed to find expected ascending attributes '
-        .'for %s. expected keys are %s',
+          . 'for %s. expected keys are %s',
         $self->name,
         join ', ',
         map { sprintf('"%s"', %_ // 'undef file') }
@@ -152,8 +152,10 @@ package Game::EvonyTKR::Model::General {
       my $ab = $books_helper->list_builtin_books;
       $self->logger->debug(sprintf(
         'available books: %s',
-        scalar(@{$ab}) ? join ', ',
-        map { sprintf('"%s"', $_) } $ab->@* : 'no books available'
+        scalar(@{$ab})
+        ? join ', ',
+          map { sprintf('"%s"', $_) } $ab->@*
+        : 'no books available'
       ));
       return;
       };

@@ -79,7 +79,7 @@ package Game::EvonyTKR::Controller::Generals {
   }
 
   sub setup_event_handlers ($c, $app) {
-    ...
+    ...;
   }
 
   sub setup_helpers($c, $app) {

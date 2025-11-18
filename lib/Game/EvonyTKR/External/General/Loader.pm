@@ -87,11 +87,11 @@ package Game::EvonyTKR::External::General::Loader {
       return $job->fail($errmessage);
     }
 
-    if($general->ascending){
-      unless($general->populateAscendingAttributes()){
+    if ($general->ascending) {
+      unless ($general->populateAscendingAttributes()) {
         my $errmessage = sprintf(
-        'failed to populate Ascending Attributes'
-        .'for general "%s"', $general->name,
+          'failed to populate Ascending Attributes' . 'for general "%s"',
+          $general->name,
         );
         if ($job->retries < $max_retries) {
           $job->note(error => $errmessage);

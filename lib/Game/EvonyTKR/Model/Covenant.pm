@@ -139,8 +139,10 @@ package Game::EvonyTKR::Model::Covenant {
       exit 0;
     }
 
-    if (List::AllUtils::none { $level =~ /$_/i }
-      $self->CovenantCategoryValues->@*) {
+    if (
+      List::AllUtils::none { $level =~ /$_/i }
+      $self->CovenantCategoryValues->@*
+    ) {
       $self->logger->error(sprintf(
         'level should be one of %s, not %s',
         join(', ', @{ $self->covenantLevels }), $level

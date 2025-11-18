@@ -60,12 +60,10 @@ package Game::EvonyTKR::Controller::Role::Covenants {
     }
 
     unless ($result) {
-      $self->logger->error(
-        sprintf(
-'failed to update "all_covenants" list after %d attempts for key "%s"',
-          $max_attempts, $key
-        )
-      );
+      $self->logger->error(sprintf(
+        'failed to update "all_covenants" list after %d attempts for key "%s"',
+        $max_attempts, $key
+      ));
     }
 
     return $result;
@@ -111,8 +109,14 @@ package Game::EvonyTKR::Controller::Role::Covenants {
     unless (defined($app)) {
       use Cwd;
       $collectionDir = Mojo::File->new(cwd())->child('share/collections/data/');
-      $self->logger->warn(sprintf('collectionDir "%s" infered from cwd "%s"', $collectionDir, cwd()));
-    } else {
+      $self->logger->warn(
+        sprintf(
+          'collectionDir "%s" infered from cwd "%s"',
+          $collectionDir, cwd()
+        )
+      );
+    }
+    else {
       $collectionDir =
         Mojo::File->new($app->config('distDir'))->child('collections/data/');
     }

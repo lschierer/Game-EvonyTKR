@@ -6,100 +6,43 @@ use Test::More;
 use Test::Deep;
 use File::FindLib 'lib';
 use Data::Printer;
-require Path::Tiny;
-require File::ShareDir;
-require Game::EvonyTKR;
 
 # Load required modules
-require Game::EvonyTKR::Model::General::Manager;
+require Data::Printer;
+require File::ShareDir;
 require Game::EvonyTKR::Model::AscendingAttributes::Manager;
-require Game::EvonyTKR::Model::Book::Manager;
-require Game::EvonyTKR::Model::Specialty::Manager;
-require Game::EvonyTKR::Model::Covenant::Manager;
 require Game::EvonyTKR::Model::Buff::Summarizer;
-require Game::EvonyTKR::Model::General::ConflictGroup::Manager;
+require Game::EvonyTKR::Model::Covenant::Manager;
 require Game::EvonyTKR::Model::EvonyTKR::Manager;
+require Game::EvonyTKR::Service::Cache;
 require Game::EvonyTKR::Shared::Constants;
 require Game::EvonyTKR;
+require Path::Tiny;
+require Path::Tiny;
+require YAML::PP;
 
-use Log::Log4perl;
+use Log::Log4perl qw(:levels);
+my $logger = Game::EvonyTKR::Log::Config->logger('Test::Package');
+$logger->info(sprintf(
+  'Test script logging configured with log level %s',
+  Log::Log4perl::Level::to_level($logger->level()), ));
 
-Log::Log4perl::init(\<<'EOT');
-log4perl.rootLogger              = ERROR, Screen
-log4perl.logger.Game.EvonyTKR.Model.Buff = WARN
-log4perl.logger.Game.EvonyTKR.Model.Buff.Summarizer = WARN
 
-log4perl.additivity.Game.EvonyTKR = 0
-log4perl.additivity.Mojolicious = 0
-log4perl.additivity.MojoX = 0
-log4perl.additivity.Web = 0
-
-log4perl.appender.Screen         = Log::Log4perl::Appender::Screen
-log4perl.appender.Screen.stderr = 1
-log4perl.appender.Screen.layout  = PatternLayout
-log4perl.appender.Screen.layout.ConversionPattern = %d [%p] %m%n
-EOT
-
-# Create a test class that mimics the EvonyTKR::Manager structure
+# Create a test class -- this needs to be totally replaced as it was last
+# done mimicing a Corina class that no longer exists.
+# it needs to import books, specialties, covenants,
+# ascending attributes, and generals (in the right order, see how
+# the prereqs map out across the *LoadALL* packages.
 class BuffSummarizerTest : isa(Game::EvonyTKR::Shared::Constants) {
 
-  field $generalManager;
-  field $ascendingAttributesManager;
-  field $bookManager;
-  field $specialtyManager;
-  field $covenantManager;
-  field $generalConflictGroupManager;
+
   field $dataDir = Path::Tiny::path('./share');
 
-  ADJUST {
-    # Import all data similar to EvonyTKR::Manager's rootImport method
-    $generalManager = Game::EvonyTKR::Model::General::Manager->new();
-    $generalConflictGroupManager =
-      Game::EvonyTKR::Model::General::ConflictGroup::Manager->new();
-    $bookManager      = Game::EvonyTKR::Model::Book::Manager->new();
-    $specialtyManager = Game::EvonyTKR::Model::Specialty::Manager->new();
-    $ascendingAttributesManager =
-      Game::EvonyTKR::Model::AscendingAttributes::Manager->new();
-    $covenantManager =
-      Game::EvonyTKR::Model::Covenant::Manager->new(rootManager => $self,);
-  }
-
-  method generalManager()              { return $generalManager; }
-  method ascendingAttributesManager()  { return $ascendingAttributesManager; }
-  method bookManager()                 { return $bookManager; }
-  method specialtyManager()            { return $specialtyManager; }
-  method covenantManager()             { return $covenantManager; }
-  method generalConflictGroupManager() { return $generalConflictGroupManager; }
 
   method rootImport() {
     my $collectionDir = $dataDir->child("collections/data");
     say("starting root import");
 
-    say("starting import of generals.");
-    $generalManager->importAll($collectionDir->child("generals"));
-    say("import of generals complete.");
-
-    say(" starting import of conflict groups.");
-    $generalConflictGroupManager->importAll(
-      $collectionDir->child('general conflict groups'));
-    say("import of conflict groups complete");
-
-    say(" starting import of books.");
-    $bookManager->importAll($collectionDir->child('skill books'));
-    say("import of books complete");
-
-    say(" starting import of specialties.");
-    $specialtyManager->importAll($collectionDir->child('specialties'));
-    say("import of specialties complete");
-
-    say(" starting import of ascending attributes.");
-    $ascendingAttributesManager->importAll(
-      $collectionDir->child('ascending attributes'));
-    say("import of ascending attributes complete");
-
-    say(" starting import of covenants.");
-    $covenantManager->importAll($collectionDir->child('covenants'));
-    say("import of covenants complete");
 
     say("root import complete");
 
