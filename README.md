@@ -51,9 +51,13 @@ This is very much a work in progress.
    - **TODO**: Test full general loading and caching
 
 1. **Conflict Detection**
+  - I want this to stay as a pair of corina objects (a parent and child).  Or rather, there is no benefit to converting it as it does precisely what it needs to already.
+  - the corinna object contains two hashes that are updated by the object's preseed method. These are what should get cached & transferred over the memcache IPC.
+    - groups_by_conflict_type
+    - by_general
   - May need updates after pair building re-enabled
   - Tests need to be updated (testing overlaps with pairs)
-  - currently uses the same Controller role as Pairs. May need to break that out.
+  - currently the Controller is partly broken out (ConflictGroup.pm - see the note on roles above).
 
 1. **General::Pair** - Basic Mojo::Base implementation works, but disabled
    - diagnostic routes may need to become first class user facing routes (where to put them?)
