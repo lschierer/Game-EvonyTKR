@@ -31,12 +31,17 @@ This is very much a work in progress.
 
 ## Rewrite Status (5th Generation - Mojo::Base Architecture)
 
-### Completed Components ✓
-1. **Books** (Builtin and Generic) - Model, Controller, Controller Role, External Jobs all working
+### Reference Pattern (Best Practices) ✓
 1. **Specialties** - Model, Controller, Controller Role, External Jobs all working
 1. **Ascending Attributes** - Model, Controller, Controller Role, External Jobs all working
+   - These represent the mature pattern learned through iteration
 
 ### In Progress Components ⚠
+1. **Books** (Builtin and Generic) - FUNCTIONALLY COMPLETE but needs refactoring
+   - **ISSUE**: Controller spews errors on startup while loaders are pending
+   - **TODO**: Update loading logic to match improved patterns from Specialties/Ascending Attributes
+   - **TODO**: Fix async job waiting/dependency handling to prevent startup errors
+   - Model, Controller, Controller Role, External Jobs all exist but need pattern updates
 1. **Covenants** - Model complete but has bugs, Controller stubbed (~10% functional), External Jobs working
    - **BUG**: `Covenant.pm:172-182` - `to_wire_hash()` missing return statement
    - **TODO**: Complete Controller implementation (index action, helper methods, route setup)
@@ -49,6 +54,7 @@ This is very much a work in progress.
    - **TODO**: Complete remaining model methods
    - **TODO**: Verify all integration points are properly wired
    - **TODO**: Test full general loading and caching
+   - **ISSUE**: Covenants require generals, but do not need a *fully inflated* general that has specialties, ascending attributes, and skill books populated with full models, the names imported from the YAML files are sufficient. However, the *wire* methods do not account for these being optional.  This is primarily an issue in testing.
 
 1. **Conflict Detection**
   - I want this to stay as a pair of corina objects (a parent and child).  Or rather, there is debatable benefit to converting it as it does precisely what it needs to already.
