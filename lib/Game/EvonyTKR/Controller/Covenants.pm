@@ -25,6 +25,8 @@ package Game::EvonyTKR::Controller::Covenants {
   use Mojo::Base 'Game::EvonyTKR::Role::Logger', -role, -signatures;
   use Mojo::Base 'Game::EvonyTKR::Controller::Role::Generals', -role,
     -signatures;
+  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Covenants', -role,
+    -signatures;
   use Mojo::IOLoop;
   use Mojo::Promise;
   use Mojo::JSON     qw(to_json encode_json);
@@ -54,27 +56,93 @@ package Game::EvonyTKR::Controller::Covenants {
     $c->SUPER::register($app, $config);
     $c->logger->info(sprintf('Registering routes for %s', __PACKAGE__));
 
-    #eval {
-    #  say sprintf('setup_helpers for %s', __PACKAGE__);
-    #  $c->setup_helpers($app);
-    #  1;
-    #} or do {
-    #  my $em = sprintf('setup_helpers failed in %s', __PACKAGE__);
-    #  $c->logger->error($em);
-    #  say $em;
-    #};
+    eval {
+      say sprintf('setup_helpers for %s', __PACKAGE__);
+      $c->setup_helpers($app);
+      1;
+    } or do {
+      my $em = sprintf('setup_helpers failed in %s', __PACKAGE__);
+      $c->logger->error($em);
+      say $em;
+    };
 
-    #eval {
-    #  say sprintf('setup_routes for %s', __PACKAGE__);
-    #  $c->setup_routes($app);
-    #  1;
-    #} or do {
-    #  my $em = sprintf('setup_routes failed in %s', __PACKAGE__);
-    #  $c->logger->error($em);
-    #  say $em;
-    #};
+    eval {
+      say sprintf('setup_routes for %s', __PACKAGE__);
+      $c->setup_routes($app);
+      1;
+    } or do {
+      my $em = sprintf('setup_routes failed in %s', __PACKAGE__);
+      $c->logger->error($em);
+      say $em;
+    };
 
     $c->logger->debug("end of register method");
+  }
+
+  sub setup_helpers ($c, $app) {
+
+  }
+
+  sub setup_routes ($c, $app) {
+    $app->add_navigation_item({
+      title => 'Details of General Covenants',
+      path  => $c->getBase(),
+      order => 50,
+    });
+
+    my @parts     = split(/::/, __PACKAGE__);
+    my $baseClass = pop(@parts);
+    my $controller_name =
+        $c->can('controller_name')
+      ? $c->controller_name()
+      : $baseClass;
+    $c->logger->debug("got controller_name $controller_name.");
+
+    my $mainRoutes = $app->routes->any($base);
+    $mainRoutes->get('/')
+      ->to(controller => $controller_name, action => 'index')
+      ->name("${base}_index");
+  }
+
+  sub index($c) {
+    $c->logger->debug(sprintf('Rendering index for %s', __PACKAGE__));
+
+    # Check if markdown exists for this collection
+    my $distDir = Mojo::Home->new->detect('Game::EvonyTKR');
+    my $markdown_path = $distDir->child("share/pages/Covenants/index.md");
+    $c->logger->debug("markdown_path is $markdown_path");
+
+    my @parts     = split(/::/, ref($c));
+    my $baseClass = pop(@parts);
+    my $base      = $c->getBase();
+    $c->logger->debug("Covenants index method has base $base");
+
+    my @items;
+    foreach my $cn ($c->list_covenants($c->app)->@*) {
+      $c->logger->debug("cn is $cn");
+      my $covenant = $c->get_covenant($cn);
+
+    }
+
+    $c->logger->debug(sprintf('Items: %s items.', scalar(@items)));
+    $c->stash(
+      linkBase        => $base,
+      items           => \@items,
+      collection_name => collection_name(),
+      controller_name => $baseClass,
+      template        => 'covenants/index',
+    );
+
+    if (-f $markdown_path) {
+      # Render with markdown
+      return $c->render_markdown_file($markdown_path,
+        { template => 'covenants/index' });
+    }
+    else {
+      $c->logger->debug("no markdown index content found at $markdown_path");
+      # Render just the items
+      return $c->render(template => 'covenants/index');
+    }
   }
 }
 1;
@@ -198,41 +266,7 @@ __END__
   #  });
   }
 
-  sub index($c) {
-  #  my $collection = collection_name();
-  #  $c->logger->debug("Rendering index for $collection");
 
-  #  # Check if markdown exists for this collection
-  #  my $distDir =
-  #    Path::Tiny::path(Mojo::File::Share::dist_dir('Game::EvonyTKR'));
-  #  my $markdown_path = $distDir->child("pages/Covenants/index.md");
-
-  #  my @parts     = split(/::/, __PACKAGE__);
-  #  my $baseClass = pop(@parts);
-  #  my $base      = $c->getBase();
-  #  $c->logger->debug("Covenants index method has base $base");
-
-  #  my @items = values $c->get_all_covenants->%*;
-  #  $c->logger->debug(sprintf('Items: %s items.', scalar(@items)));
-  #  $c->stash(
-  #    linkBase        => $base,
-  #    items           => \@items,
-  #    collection_name => $collection,
-  #    controller_name => $baseClass,
-  #    template        => 'covenants/index',
-  #  );
-
-  #  if (-f $markdown_path) {
-  #    # Render with markdown
-  #    return $c->render_markdown_file($markdown_path,
-  #      { template => 'covenants/index' });
-  #  }
-  #  else {
-  #    $c->logger->debug("no markdown index content found at $markdown_path");
-  #    # Render just the items
-  #    return $c->render(template => 'covenants/index');
-  #  }
-  }
 
   sub show ($c) {
   #  $c->logger->debug("start of show method");

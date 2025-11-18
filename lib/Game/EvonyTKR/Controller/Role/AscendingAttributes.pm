@@ -59,12 +59,17 @@ package Game::EvonyTKR::Controller::Role::AscendingAttributes {
     return $ascendingAttribute;
   }
 
-  sub list_ascending_attributes ($self, $app) {
+  sub list_ascending_attributes ($self, $app = undef) {
+    my $collectionDir;
     unless (defined($app)) {
-      $self->logger->logcroak('$app must be defined');
+      use Cwd;
+      $collectionDir = Mojo::File->new(cwd())->child('share/collections/data/');
+      $self->logger->warn(sprintf('collectionDir "%s" infered from cwd "%s"', $collectionDir, cwd()));
+    } else {
+      $collectionDir =
+        Mojo::File->new($app->config('distDir'))->child('collections/data/');
     }
-    my $collectionDir =
-      Mojo::File->new($app->config('distDir'))->child('collections/data/');
+
     my $AscendingAttributesDir = $collectionDir->child('ascending attributes');
     my @suffixlist             = ('.yaml', '.yml');
     my @files =

@@ -182,14 +182,12 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
           defined($tt) ? $tt : 'undefined')
         );
     }
-    unless (
-      defined(
-        activationType
-          && length($activationType)
-          && List::AllUtils::any { $activationType eq $_ }
-        $job->AllowedBuffActivationValues->@*
-      )
-    ) {
+    unless (defined(
+           activationType
+        && length($activationType)
+        && List::AllUtils::any { $activationType eq $_ }
+      $job->AllowedBuffActivationValues->@*
+    )) {
       push @errmessage,
         sprintf(
         'must provide a valid activation type from %s, not "%s"',

@@ -3,9 +3,9 @@ use utf8::all;
 use File::FindLib 'lib';
 
 package Game::EvonyTKR::External::Covenant::LoadAll {
-  use Mojo::Base 'Game::EvonyTKR::External::JobBase', -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Role::Logger',      -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::Common',      -role;
+  use Mojo::Base 'Game::EvonyTKR::External::JobBase',           -signatures;
+  use Mojo::Base 'Game::EvonyTKR::Role::Logger',                -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Common',                -role;
   use Mojo::Base 'Game::EvonyTKR::Controller::Role::Covenants', -role;
   use Mojo::File;
 
@@ -31,6 +31,18 @@ package Game::EvonyTKR::External::Covenant::LoadAll {
       '%s log level is %s',
       __PACKAGE__, Log::Log4perl::Level::to_level($job->logger->level())
     ));
+
+    return
+      if ($job->are_prereqs_outstanding(
+      $job->minion,
+      [
+        'load_all_ascending_attributes', 'load_all_builtin_books',
+        'load_all_specialties',          'load_ascending_attributes',
+        'load_book',                     'load_specialty',
+        'load_all_generals',             'load_general',
+      ]
+      ));
+
     $job->logger->info('Starting load_all_covenants job');
 
     my $app = $job->app;
@@ -39,8 +51,7 @@ package Game::EvonyTKR::External::Covenant::LoadAll {
     my $CovenantsDir = $collectionDir->child('covenants');
 
     my @files =
-      $CovenantsDir->list->grep(sub { $_ =~ /\.ya?ml$/ && -f -r $_ })
-      ->each;
+      $CovenantsDir->list->grep(sub { $_ =~ /\.ya?ml$/ && -f -r $_ })->each;
 
     $job->logger->info(
       sprintf('Found %d Covenant files to load', scalar @files));
@@ -60,8 +71,7 @@ package Game::EvonyTKR::External::Covenant::LoadAll {
       ));
     }
 
-    $job->covenant_cache->set(
-      total_covenants => scalar(@files));
+    $job->covenant_cache->set(total_covenants => scalar(@files));
 
     my $msg = 'load_all_covenants job completed';
     $job->logger->info($msg);

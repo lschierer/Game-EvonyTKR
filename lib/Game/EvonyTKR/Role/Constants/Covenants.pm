@@ -11,13 +11,13 @@ package Game::EvonyTKR::Role::Constants::Covenants {
 
   has 'CovenantCategories' => sub ($self) {
     const my %tmp => (
-      None          => 0,
-      War           => 1,
-      Cooperation   => 2,
-      Peace         => 3,
-      Faith         => 4,
-      Honor         => 5,
-      Civilization  => 6,
+      None         => 0,
+      War          => 1,
+      Cooperation  => 2,
+      Peace        => 3,
+      Faith        => 4,
+      Honor        => 5,
+      Civilization => 6,
     );
     return \%tmp;
   };
@@ -26,7 +26,7 @@ package Game::EvonyTKR::Role::Constants::Covenants {
     my $cats = $self->CovenantCategories;
     # Sort keys by their numeric value, return lowercase
     my @ordered = sort { $cats->{$a} <=> $cats->{$b} } keys %$cats;
-    return [ map { lc $_ } @ordered ];
+    return [map { lc $_ } @ordered];
   };
 
   has 'CovenantCategoryLabels' => sub ($self) {

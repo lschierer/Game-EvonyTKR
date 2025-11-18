@@ -41,6 +41,7 @@ package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
         'load_all_generals',             'load_all_specialties',
         'load_ascending_attributes',     'load_book',
         'load_general',                  'load_specialty',
+        'load_all_covenants',            'load_covenant',
       ]
       );
 

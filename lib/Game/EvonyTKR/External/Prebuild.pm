@@ -80,6 +80,8 @@ package Game::EvonyTKR::External::Prebuild {
       'Game::EvonyTKR::External::MonitorLoaders',
       'Game::EvonyTKR::External::Specialty::LoadAllSpecialties',
       'Game::EvonyTKR::External::Specialty::Loader',
+      'Game::EvonyTKR::External::Covenant::LoadAll',
+      'Game::EvonyTKR::External::Covenant::Loader',
     ];
 
     my @tasks = values $app->minion->tasks->%*;
@@ -232,6 +234,13 @@ package Game::EvonyTKR::External::Prebuild {
       },
       load_all_generals => {
         args     => ['prebuild load_all_generals'],
+        attempts => 3,
+        delay    => 5,
+        expire   => 300,
+        priority => 10,
+      },
+      load_all_covenants => {
+        args     => [],
         attempts => 3,
         delay    => 5,
         expire   => 300,

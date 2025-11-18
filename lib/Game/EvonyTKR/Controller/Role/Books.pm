@@ -95,13 +95,18 @@ package Game::EvonyTKR::Controller::Role::Books {
     return $book;
   }
 
-  sub list_generic_books ($self, $app) {
+  sub list_generic_books ($self, $app = undef) {
     my $returnlist;
+    my $collectionDir;
     unless (defined($app)) {
-      $logger->logcroak('$app must be defined');
+      use Cwd;
+      $collectionDir = Mojo::File->new(cwd())->child('share/collections/data/');
+      $self->logger->warn(sprintf('collectionDir "%s" infered from cwd "%s"', $collectionDir, cwd()));
+    } else {
+      $collectionDir =
+        Mojo::File->new($app->config('distDir'))->child('collections/data/');
     }
-    my $collectionDir =
-      Mojo::File->new($app->config('distDir'))->child('collections/data/');
+
     my $gbDir      = $collectionDir->child('generic books');
     my @suffixlist = ('.yaml', '.yml');
     $gbDir->list->grep(sub { $_ =~ /\.ya?ml$/ && -f -r $_ })->sort->map(sub {
@@ -115,13 +120,18 @@ package Game::EvonyTKR::Controller::Role::Books {
     return $returnlist;
   }
 
-  sub list_builtin_books ($self, $app) {
+  sub list_builtin_books ($self, $app = undef) {
     my $returnlist;
+    my $collectionDir;
     unless (defined($app)) {
-      $logger->logcroak('$app must be defined');
+      use Cwd;
+      $collectionDir = Mojo::File->new(cwd())->child('share/collections/data/');
+      $self->logger->warn(sprintf('collectionDir "%s" infered from cwd "%s"', $collectionDir, cwd()));
+    } else {
+      $collectionDir =
+        Mojo::File->new($app->config('distDir'))->child('collections/data/');
     }
-    my $collectionDir =
-      Mojo::File->new($app->config('distDir'))->child('collections/data/');
+
     my $gbDir      = $collectionDir->child('skill books');
     my @suffixlist = ('.yaml', '.yml');
     $gbDir->list->grep(sub { $_ =~ /\.ya?ml$/ && -f -r $_ })->sort->map(sub {

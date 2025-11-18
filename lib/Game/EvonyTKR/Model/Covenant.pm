@@ -14,7 +14,11 @@ package Game::EvonyTKR::Model::Covenant {
   use Mojo::Base 'Game::EvonyTKR::Role::Common';
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants',    -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants', -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::Constants::Covenants', -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Constants::Covenants',        -role;
+  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Generals', -role,
+    -signatures;
+  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Covenants', -role,
+    -signatures;
   use builtin qw(indexed);
   use File::FindLib 'lib';
   use List::AllUtils qw( any none );
@@ -30,16 +34,16 @@ package Game::EvonyTKR::Model::Covenant {
 
   has ['primary', 'one', 'two', 'three'];
 
-  has 'secondaryKeys' => sub { qw(one two three) };
+  has 'secondaryKeys' => sub {qw(one two three)};
 
   has 'categories' => sub ($self) {
-    my $h = {};
+    my $h  = {};
     my $cv = $self->CovenantCategoryValues;
     $self->logger->debug(sprintf('cv is %s', Data::Printer::np($cv)));
-    foreach my $index (0 .. scalar( $self->CovenantCategoryValues->@* ) ) {
+    foreach my $index (0 .. scalar($self->CovenantCategoryValues->@*) - 1) {
       my $key = $self->CovenantCategoryValues->[$index];
       $self->logger->debug(sprintf('key at index %s is %s', $index, $key));
-      if($key eq 'none') {
+      if ($key eq 'none') {
         next;
       }
       my $al = 10000 + $index * 2 * 1000;
@@ -50,7 +54,7 @@ package Game::EvonyTKR::Model::Covenant {
         buffs           => [],
       };
     }
-    lock_keys(%{ $h });
+    lock_keys(%{$h});
 
     return $h;
   };
@@ -135,7 +139,8 @@ package Game::EvonyTKR::Model::Covenant {
       exit 0;
     }
 
-    if (List::AllUtils::none { $level =~ /$_/i } $self->CovenantCategoryValues->@* ) {
+    if (List::AllUtils::none { $level =~ /$_/i }
+      $self->CovenantCategoryValues->@*) {
       $self->logger->error(sprintf(
         'level should be one of %s, not %s',
         join(', ', @{ $self->covenantLevels }), $level
@@ -162,10 +167,59 @@ package Game::EvonyTKR::Model::Covenant {
     return $count;
   };
 
+  sub to_wire_hash ($self) {
+    my $h = {
+      primary  => $self->primary->name,
+      generals => [
+        one   => $self->one,
+        two   => $self->two,
+        three => $self->three,
+      ],
+      categories => $self->categories,
+    };
+  }
+
+  sub from_wire_hash ($self, $h) {
+    my $logger = $log;
+    unless (ref($h) && ref($h) eq 'HASH') {
+      my $errmessage = 'from_wire_hash requires a valid hashref';
+      $logger->error($errmessage);
+      croak($errmessage);
+      return;
+    }
+    unless ($h->{primary} && length($h->{primary})) {
+      my $errmessage =
+        'hash provided to from_wire_hash must have an attribute "primary"';
+      $logger->error($errmessage);
+      croak($errmessage);
+      return;
+    }
+    my $primary = $self->get_general($h->{primary});
+    unless ($primary) {
+      my $errmessage =
+        sprintf('%s from_wire_hash cannot find general for name "%s"',
+        __PACKAGE__, $h->{primary});
+      $logger->error($errmessage);
+      croak($errmessage);
+      return;
+    }
+
+    my $covenant = $self->from_hash($h, $primary);
+    unless ($covenant) {
+      my $errmessage =
+        sprintf('%s from_wire_hash cannot create hash from object %s',
+        __PACKAGE__, Data::Printer::np($h, multiline => 0));
+      $logger->error($errmessage);
+      croak($errmessage);
+      return;
+    }
+    return $covenant;
+  }
+
   has 'to_hash' => sub ($self) {
     my $returnRef = {
-      primary   => $self->primary->name,
-      secondary => {
+      primary  => $self->primary->name,
+      generals => {
         #one   => $secondary->{'one'}->name,
         #two   => $secondary->{'two'}->name,
         #three => $secondary->{'three'}->name,
@@ -188,9 +242,9 @@ package Game::EvonyTKR::Model::Covenant {
       ->convert_blessed(1)
       ->encode($self->to_hash());
     return $json;
-  };
+  }
 
-  sub from_hash($self, $object, $primary, ) {
+  sub from_hash($self, $object, $primary,) {
     my $logger = $log;
     if (!exists $object->{name}) {
       $logger->error('object must have name attribute.');

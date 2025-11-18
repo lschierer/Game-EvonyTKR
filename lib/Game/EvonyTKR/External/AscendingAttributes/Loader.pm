@@ -53,8 +53,8 @@ package Game::EvonyTKR::External::AscendingAttributes::Loader {
 
     unless (exists $hashObject->{general} && length($hashObject->{general})) {
       $job->logger->error(sprintf(
-      'general is required for a AscendingAttribute. Cannot import "%s"',
-      $ascendingAttributeFile ));
+        'general is required for a AscendingAttribute. Cannot import "%s"',
+        $ascendingAttributeFile));
       return $job->fail("general is required for a AscendingAttribute");
     }
 

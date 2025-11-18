@@ -36,15 +36,17 @@ package Game::EvonyTKR::External::MonitorLoaders {
         'load_all_ascending_attributes', 'load_all_builtin_books',
         'load_all_generals',             'load_all_generic_books',
         'load_all_pair_builders',        'load_all_specialties',
+        'load_all_covenants',
       ]
       );
 
     $job->logger->info(sprintf('starting run of %s', __PACKAGE__));
     my $loader_types = [
-      'load_general',      'load_book',
-      'load_specialty',    'load_all_generic_books',
-      'load_all_generals', 'load_all_builtin_books',
-      'load_all_specialties',
+      'load_general',         'load_book',
+      'load_specialty',       'load_all_generic_books',
+      'load_all_generals',    'load_all_builtin_books',
+      'load_all_specialties', 'load_all_covenants',
+      'load_covenant',
     ];
 
     my $LoaderFinishedCount = $job->app->minion->jobs({

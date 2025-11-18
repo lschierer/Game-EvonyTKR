@@ -117,13 +117,16 @@ package Game::EvonyTKR::Model::General {
     }
     else {
       $self->logger->warn(sprintf(
-'failed to find expected ascending attributes for %s. expected keys are %s',
+        'failed to find expected ascending attributes '
+        .'for %s. expected keys are %s',
         $self->name,
         join ', ',
-        map { sprintf('"%s"', %_) }
+        map { sprintf('"%s"', %_ // 'undef file') }
           sort $ascending_helper->list_ascending_attributes
       ));
+      return;
     }
+    return 1;
   }
 
   sub populateBuiltinBook ($self) {
@@ -146,10 +149,11 @@ package Game::EvonyTKR::Model::General {
       or do {
       $self->logger->error(
         sprintf('eval failed; cannot get book from helper: %s', $@));
+      my $ab = $books_helper->list_builtin_books;
       $self->logger->debug(sprintf(
         'available books: %s',
-        join ', ',
-        map { sprintf('"%s"', %_) } $books_helper->list_builtin_books->@*
+        scalar(@{$ab}) ? join ', ',
+        map { sprintf('"%s"', $_) } $ab->@* : 'no books available'
       ));
       return;
       };

@@ -78,6 +78,10 @@ package Game::EvonyTKR::Controller::Generals {
     $c->logger->debug(sprintf('%s register complete', __PACKAGE__));
   }
 
+  sub setup_event_handlers ($c, $app) {
+    ...
+  }
+
   sub setup_helpers($c, $app) {
 
     $app->helper(

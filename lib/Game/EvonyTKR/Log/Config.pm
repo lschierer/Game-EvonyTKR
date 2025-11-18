@@ -79,7 +79,7 @@ package Game::EvonyTKR::Log::Config {
       'Game::EvonyTKR::Controller::AscendingAttributes'            => 'WARN',
       'Game::EvonyTKR::Controller::ConflictGroups'                 => 'DEBUG',
       'Game::EvonyTKR::Controller::ControllerBase'                 => 'WARN',
-      'Game::EvonyTKR::Controller::Covenants'                      => 'WARN',
+      'Game::EvonyTKR::Controller::Covenants'                      => 'DEBUG',
       'Game::EvonyTKR::Controller::Generals'                       => 'WARN',
       'Game::EvonyTKR::Controller::Glossary'                       => 'WARN',
       'Game::EvonyTKR::Controller::Pairs'                          => 'DEBUG',
@@ -173,7 +173,7 @@ package Game::EvonyTKR::Log::Config {
       'LinkChecker::Command'                                       => 'WARN',
       'Log::Any::Adapter::PerPackage'                              => 'WARN',
       'PairBuilderLogic'                                           => 'WARN',
-      'Test::Package'                                              => 'WARN',
+      'Test::Package'                                              => 'DEBUG',
       'WorkerLogic'                                                => 'WARN',
     };
   }

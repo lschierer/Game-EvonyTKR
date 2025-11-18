@@ -10,6 +10,7 @@ package Game::EvonyTKR::External::General::Loader {
   use YAML::PP;
   use Scalar::Util;
   require Game::EvonyTKR::Model::General;
+  use Carp;
 
   sub register ($taskClass, $app, $conf = {}) {
     $taskClass->SUPER::register($app, $conf);
@@ -84,6 +85,21 @@ package Game::EvonyTKR::External::General::Loader {
       }
       $job->logger->error($errmessage);
       return $job->fail($errmessage);
+    }
+
+    if($general->ascending){
+      unless($general->populateAscendingAttributes()){
+        my $errmessage = sprintf(
+        'failed to populate Ascending Attributes'
+        .'for general "%s"', $general->name,
+        );
+        if ($job->retries < $max_retries) {
+          $job->note(error => $errmessage);
+          return $job->retry({ delay => 15 });
+        }
+        $job->logger->error($errmessage);
+        return $job->fail($errmessage);
+      }
     }
 
     # Add to cache
