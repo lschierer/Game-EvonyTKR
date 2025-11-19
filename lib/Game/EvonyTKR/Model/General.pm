@@ -284,9 +284,13 @@ package Game::EvonyTKR::Model::General {
     return $hash;
   }
 
-  sub from_wire_hash ($class, $w) {
-    die "unknown wire version" unless ($w->{_v} // 1) == 1;
+  sub from_wire_hash ($class, $w, $opts = {}) {
     my $logger = Game::EvonyTKR::Log::Config->logger();
+    unless (($w->{_v} // 1) == 1 ) {
+      $logger->error('unknown wire version');
+      die "unknown wire version";
+    }
+
 
     my $general = $class->new(
       name            => $w->{name},
@@ -296,9 +300,9 @@ package Game::EvonyTKR::Model::General {
       specialtyNames  => $w->{specialtyNames} // [],
       stars           => $w->{stars}          // 'none',
     );
-    $general->populateAscendingAttributes();
-    $general->populateBuiltinBook();
-    $general->populateSpecialties();
+    $general->populateBuiltinBook() unless (exists $opts->{populateBuiltinBook} && $opts->{populateBuiltinBook} == 0);
+    $general->populateAscendingAttributes() unless (exists $opts->{populateAscendingAttributes} && $opts->{populateAscendingAttributes} == 0);
+    $general->populateSpecialties() unless (exists $opts->{populateSpecialties} && $opts->{populateSpecialties} == 0);
 
     # Handle basicAttributes if it exists
     if ($w->{basicAttributes}) {
