@@ -1,0 +1,25 @@
+# global settings (note that only full line comments are accepted)
+max_depth       = 10
+class.stringify = 1
+show_tainted      = 1
+show_unicode      = 1
+show_lvalue       = 1
+sort_keys      = 1
+indent = 2
+deparse = 1
+class.show_methods       = none
+
+
+# You can set rules that apply only to a specific
+# caller module (in this case, MyApp::Some::Module):
+[MyApp::Some::Module]
+max_depth    = 2
+class.expand = 0
+escape_chars = nonlatin1
+[MyApp::Other::Module]
+multiline = 0
+output    = /var/log/myapp/debug.data
+# use 'quiet' to silence all output from p() and np()
+# called from the specified package.
+[MyApp::Yet::Another]
+quiet = 1

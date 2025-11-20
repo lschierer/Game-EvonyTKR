@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "@tsconfig/node24/tsconfig.json",
+  "compilerOptions": {
+    "allowImportingTsExtensions": true,
+    "esModuleInterop": true,
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "resolveJsonModule": true,
+    "strict": true,
+    "target": "ES2023",
+    "verbatimModuleSyntax": true,
+    "experimentalDecorators": true,
+    "useDefineForClassFields": true,
+    "isolatedModules": false,
+    "forceConsistentCasingInFileNames": true,
+    "types": [
+      "node",
+      "./share/types/myGlobals.d.ts",
+      "./share/types/postcss-extend.d.ts"
+    ],
+    "noEmit": true,
+    "composite": true,
+    "rootDir": ".",
+    "baseUrl": "./",
+    "outDir": "./share/public/types",
+    "declarationDir": "./share/public/types"
+  },
+  "exclude": ["**/node_modules/**", "**/cdk.out/**"],
+  "include": [
+    "./lib/**/*.ts",
+    "./scripts/*.ts",
+    "./share/infrastructure/**/*.ts"
+  ]
+}

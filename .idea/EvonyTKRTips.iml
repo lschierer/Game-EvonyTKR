@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="JAVA_MODULE" version="4">
+  <component name="NewModuleRootManager" inherit-compiler-output="true">
+    <exclude-output />
+    <perl5>
+      <path value="file://$MODULE_DIR$/packages/frontend/lib" type="perl-library" />
+      <path value="file://$MODULE_DIR$/packages/frontend/templates" type="mojo-template" />
+      <path value="file://$MODULE_DIR$/src/EvonyPerl/lib" type="perl-library" />
+    </perl5>
+    <content url="file://$MODULE_DIR$">
+      <excludeFolder url="file://$MODULE_DIR$/.astro" />
+      <excludeFolder url="file://$MODULE_DIR$/.sst" />
+      <excludeFolder url="file://$MODULE_DIR$/.vscode" />
+      <excludeFolder url="file://$MODULE_DIR$/dist" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+</module>
