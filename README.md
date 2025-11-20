@@ -1,5 +1,44 @@
 This is very much a work in progress.
 
+## Common Commands
+
+### Setup and Dependencies
+```bash
+just prepare          # Install mise tools and run perl Build.PL
+just npmdeps          # Install node dependencies via pnpm
+just deps             # Complete dependency setup (Perl + npm)
+```
+
+### Development
+```bash
+just dev              # Full rebuild + watch mode with morbo
+just quickdev         # Fast dev server without full rebuild
+```
+
+### Building
+```bash
+just build            # Full production build (Perl + CSS + TypeScript)
+just css              # Build CSS only (PostCSS + Spectrum CSS)
+just ts               # Build TypeScript only (esbuild compilation)
+just images           # Sync images to public directory
+```
+
+### Testing
+```bash
+./Build test          # Run all Perl tests (Test2::V0 framework)
+```
+
+### Deployment
+```bash
+just deploy-dev       # Deploy to AWS dev stack
+just deploy-prod      # Deploy to AWS production stack
+```
+
+### Code Quality
+```bash
+just tidy             # Format all Perl code with perltidy
+```
+
 ## Design reminders
 
 1.  when adding a type to the buff summarizer I also need to add it to
@@ -43,7 +82,6 @@ This is very much a work in progress.
    - **TODO**: Fix async job waiting/dependency handling to prevent startup errors
    - Model, Controller, Controller Role, External Jobs all exist but need pattern updates
 1. **Covenants** - Model complete but has bugs, Controller stubbed (~10% functional), External Jobs working
-   - **BUG**: `Covenant.pm:172-182` - `to_wire_hash()` missing return statement
    - **TODO**: Complete Controller implementation (index action, helper methods, route setup)
 
 1. **Generals** - Stub version with partial integration
@@ -62,11 +100,11 @@ This is very much a work in progress.
   - the corinna object contains two hashes that are updated by the object's preseed method. These are what should get cached & transferred over the memcache IPC.
     - groups_by_conflict_type
     - by_general
-  - May need updates after pair building re-enabled
-  - Tests need to be updated (testing overlaps with pairs)
+  - May need updates as pair building is tested and improved
+  - known test cases in test files need to be updated (testing overlaps with pairs)
   - currently the Controller is partly broken out (ConflictGroup.pm - see the note on roles above).
 
-1. **General::Pair** - Basic Mojo::Base implementation works, but disabled
+1. **General::Pair** - Basic Mojo::Base implementation works,
    - diagnostic routes may need to become first class user facing routes (where to put them?)
    - **CLEANUP**: Remove abandoned Corinna class code (lines 157-293 in Pair.pm)
    - **TODO**: Re-enable pair building workers

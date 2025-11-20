@@ -160,7 +160,7 @@ When adding a buff type to the summarizer, update ALL of these files:
 
 All controllers follow this pattern:
 ```perl
-sub register ($self, $app, $conf) {
+sub register ($c, $app, $conf) {
     my $routes = $app->routes;
     # Define routes here
 }
@@ -168,7 +168,7 @@ sub register ($self, $app, $conf) {
 
 Minion jobs extend `External/JobBase.pm`:
 ```perl
-sub register ($self, $minion, $app) {
+sub register ($taskClassf, $minion, $app) {
     $minion->add_task(task_name => sub { ... });
 }
 ```
