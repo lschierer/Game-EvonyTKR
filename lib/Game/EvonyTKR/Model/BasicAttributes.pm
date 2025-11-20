@@ -6,10 +6,9 @@ require JSON::PP;
 use namespace::autoclean;
 
 package Game::EvonyTKR::Model::BasicAttributes {
-  use Mojo::Base -base,                                            -signatures;
+  use Mojo::Base 'Game::EvonyTKR::Model::Base';
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants', -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants', -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::Logger',                      -role;
 # VERSION
   use Carp;
   use List::AllUtils qw( any none first );
@@ -41,18 +40,17 @@ package Game::EvonyTKR::Model::BasicAttributes {
 
   sub total($self, $level = 1, $stars = 'none', $name = "GeneralName") {
     my $total = 0;
-    foreach my $stat (
-      Game::EvonyTKR::Role::Constants::BuffConstants->BasicAttributeTypes->@*) {
+    foreach my $stat ($self->BasicAttributeTypes) {
       $total += $self->$stat->total($level, $stars, $name);
     }
     return $total;
   }
 
   sub setAttribute($self, $attributeName, $newAttribute) {
-    if (none { $_ =~ $attributeName } $self->basic_types->@*) {
+    if (none { $_ =~ $attributeName } $self->BasicAttributeTypes) {
       $self->logger->error(sprintf(
         'attributeName must be one of %s, not %s',
-        Data::Printer::np($self->AttributeValues),
+        Data::Printer::np($self->BasicAttributeTypes),
         $attributeName,
       ));
       return;
@@ -92,7 +90,7 @@ package Game::EvonyTKR::Model::BasicAttributes {
     return 0 unless blessed($other) && $other->isa(__PACKAGE__);
 
     # Check each attribute for equality
-    for my $stat ($self->BasicAttributeTypes->@*) {
+    for my $stat ($self->BasicAttributeTypes) {
       my $mine   = $self->$stat;
       my $theirs = $other->$stat;
       return 0 unless $mine == $theirs;    # Uses BasicAttribute's equality

@@ -9,8 +9,6 @@ use namespace::clean;
 package Game::EvonyTKR::Controller::AscendingAttributes {
   use Mojo::Base 'Game::EvonyTKR::Controller::ControllerBase', -strict,
     -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Role::Logger', -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::Common';
   use Mojo::Base 'Game::EvonyTKR::Controller::Role::AscendingAttributes', -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::AscendingAttributes',  -role;
   use List::AllUtils qw(uniq first);

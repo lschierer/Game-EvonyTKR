@@ -126,7 +126,7 @@ package Game::EvonyTKR::Controller::Role::Covenants {
     my @files =
       $covenantsDir->list->grep(sub { $_ =~ /\.ya?ml$/ && -f -r $_ })
       ->sort->map(sub { return $_->basename(@suffixlist) })->each;
-    my @returnlist = uniq_by { lc($self->normalize($_)) } @files;
+    my @returnlist = List::AllUtils::uniq map { lc($self->normalize($_)) } @files;
     return \@returnlist;
   }
 }

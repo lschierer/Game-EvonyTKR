@@ -21,7 +21,6 @@ use namespace::clean;
 
 package Game::EvonyTKR::Controller::Generals {
   use Mojo::Base 'Game::EvonyTKR::Controller::ControllerBase';
-  use Mojo::Base 'Game::EvonyTKR::Role::Logger', -role, -signatures;
   use Mojo::Base 'Game::EvonyTKR::Controller::Role::Generals', -role,
     -signatures;
   use Mojo::IOLoop;

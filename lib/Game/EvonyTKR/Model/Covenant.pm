@@ -9,9 +9,7 @@ require Game::EvonyTKR::Model::Buff::Matcher;
 require Data::Printer;
 
 package Game::EvonyTKR::Model::Covenant {
-  use Mojo::Base -base,                          -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Role::Logger', -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::Common';
+  use Mojo::Base "Game::EvonyTKR::Model::Base";
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants',    -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants', -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::Covenants',        -role;
@@ -179,6 +177,7 @@ package Game::EvonyTKR::Model::Covenant {
       ],
       categories => $self->categories,
     };
+    return $h;
   }
 
   sub from_wire_hash ($self, $h) {

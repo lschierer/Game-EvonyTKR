@@ -6,10 +6,8 @@ require JSON::PP;
 use namespace::autoclean;
 
 package Game::EvonyTKR::Model::BasicAttribute {
-  use Mojo::Base -base,                                            -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Role::Common',                   -role;
+  use Mojo::Base 'Game::EvonyTKR::Model::Base';
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants', -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::Logger',                   -role;
   use List::AllUtils qw( any none );
   use Scalar::Util   qw(blessed);
   use Data::Printer;
@@ -64,10 +62,10 @@ package Game::EvonyTKR::Model::BasicAttribute {
         $self->attribute_name);
     }
     unless (any { $_ =~ /$self->attribute_name/i }
-      $self->BasicAttributeTypes->@*) {
+      $self->BasicAttributeTypes) {
       push @errors,
         sprintf('attribute_name must be one of %s, not "%s"',
-        join ', ', $self->BasicAttributeTypes->@*);
+        join ', ', $self->BasicAttributeTypes);
     }
 
     if (scalar @errors >= 1) {

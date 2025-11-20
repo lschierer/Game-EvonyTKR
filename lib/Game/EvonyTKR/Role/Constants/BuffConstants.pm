@@ -5,7 +5,7 @@ require Data::Printer;
 require Hash::Util;
 
 package Game::EvonyTKR::Role::Constants::BuffConstants {
-  use Mojo::Base 'Game::EvonyTKR::Role::Common', -signatures;
+  use Mojo::Base -role, -signatures;
   use Const::Fast;
   use Carp;
 
@@ -32,10 +32,6 @@ package Game::EvonyTKR::Role::Constants::BuffConstants {
     }
   }
 
-  has 'basic_types' => sub {
-    const my $tmp => ['leadership', 'attack', 'defense', 'politics'];
-    return $tmp;
-  };
 
   has 'BuffActivationValues' => sub {
     const my $hash = {
@@ -99,11 +95,11 @@ package Game::EvonyTKR::Role::Constants::BuffConstants {
     return \@av;
   };
 
-  has 'basicAttributeTypes' => sub {
-    const my $tmp = {
+  sub basicAttributeTypes {
+    const my $tmp => {
       'attack'     => 1,
       'defense'    => 1,
-      'hp'         => 1,
+      'politics'   => 1,
       'leadership' => 1,
     };
     return $tmp;
@@ -111,7 +107,7 @@ package Game::EvonyTKR::Role::Constants::BuffConstants {
 
   sub BasicAttributeTypes ($self) {
     return sort keys $self->basicAttributeTypes->%*;
-  }
+  };
 
   has 'BuffConditionValues' => sub {
     const my $hash => {

@@ -11,9 +11,7 @@ require Game::EvonyTKR::Model::Buff::Matcher;
 use namespace::autoclean;
 
 package Game::EvonyTKR::Model::AscendingAttributes {
-  use Mojo::Base -base,                          -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Role::Logger', -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::Common';
+  use Mojo::Base "Game::EvonyTKR::Model::Base";
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants',       -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants',    -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::AscendingAttributes', -role;

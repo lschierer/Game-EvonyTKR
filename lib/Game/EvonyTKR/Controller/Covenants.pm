@@ -20,9 +20,9 @@ require UUID;
 require Data::Printer;
 use namespace::autoclean;
 
+
 package Game::EvonyTKR::Controller::Covenants {
   use Mojo::Base 'Game::EvonyTKR::Controller::ControllerBase';
-  use Mojo::Base 'Game::EvonyTKR::Role::Logger', -role, -signatures;
   use Mojo::Base 'Game::EvonyTKR::Controller::Role::Generals', -role,
     -signatures;
   use Mojo::Base 'Game::EvonyTKR::Controller::Role::Covenants', -role,
@@ -33,6 +33,7 @@ package Game::EvonyTKR::Controller::Covenants {
   use MIME::Base64   qw(encode_base64);
   use List::AllUtils qw( all any none );
   use Carp;
+  use diagnostics;
 
   # Specify which collection this controller handles
   sub collection_name {
@@ -57,7 +58,7 @@ package Game::EvonyTKR::Controller::Covenants {
     $c->logger->info(sprintf('Registering routes for %s', __PACKAGE__));
 
     eval {
-      say sprintf('setup_helpers for %s', __PACKAGE__);
+      $c->logger->debug(sprintf('setup_helpers for %s', __PACKAGE__));
       $c->setup_helpers($app);
       1;
     } or do {
@@ -67,7 +68,7 @@ package Game::EvonyTKR::Controller::Covenants {
     };
 
     eval {
-      say sprintf('setup_routes for %s', __PACKAGE__);
+      $c->logger->debug(sprintf('setup_routes for %s', __PACKAGE__));
       $c->setup_routes($app);
       1;
     } or do {
@@ -84,6 +85,7 @@ package Game::EvonyTKR::Controller::Covenants {
   }
 
   sub setup_routes ($c, $app) {
+
     $app->add_navigation_item({
       title => 'Details of General Covenants',
       path  => $c->getBase(),
@@ -102,6 +104,23 @@ package Game::EvonyTKR::Controller::Covenants {
     $mainRoutes->get('/')
       ->to(controller => $controller_name, action => 'index')
       ->name("${base}_index");
+
+    foreach my $cn ($c->list_covenants()->@*){
+      $cn = join(' ', map { ucfirst } split / /, $cn);
+      my $path = sprintf('/%s', $cn);
+      my $key = $cn =~ s/ /_/gr;
+
+      $mainRoutes->get($path => { name => $cn })->to(
+        controller => $controller_name, action => 'show'
+      )->name("covenant-${key}");
+
+      $app->add_navigation_item({
+        title => "Details for ${cn}",
+        path  => $path,
+        parent => $c->getBase(),
+        order  => 40,
+      });
+    }
   }
 
   sub index($c) {
@@ -118,10 +137,11 @@ package Game::EvonyTKR::Controller::Covenants {
     $c->logger->debug("Covenants index method has base $base");
 
     my @items;
-    foreach my $cn ($c->list_covenants($c->app)->@*) {
-      $c->logger->debug("cn is $cn");
+    foreach my $cn ($c->list_covenants()->@*) {
+      $cn = join(' ', map { ucfirst } split / /, $cn);
+      my $path = sprintf('%s/%s', $c->getBase(), $cn);
       my $covenant = $c->get_covenant($cn);
-
+      push @items, $cn;
     }
 
     $c->logger->debug(sprintf('Items: %s items.', scalar(@items)));
@@ -144,49 +164,52 @@ package Game::EvonyTKR::Controller::Covenants {
       return $c->render(template => 'covenants/index');
     }
   }
+
+  sub show ($c) {
+    $c->logger->debug("start of show method");
+    my $name;
+    $name = $c->param('name') // '';
+    $c->logger->debug("show detects name $name, showing details.");
+
+    my $outstanding = $c->outstanding_prereqs([
+    'load_all_ascending_attributes', 'load_all_builtin_books',
+    'load_all_specialties',          'load_ascending_attributes',
+    'load_book',                     'load_specialty',
+    'load_all_generals',             'load_general',
+    'load_all_covenants',             'load_covenant',
+    ]);
+
+    if($outstanding ){
+      $c->logger->debug(sprintf('%s prereq check detected outstanding prereqs.', __PACKAGE__));
+      my $delay = $outstanding * 5;
+      return $c->render(
+        template => 'shared/loading',
+        layout => 'default',
+        title => 'Loading',
+        delay => $delay,
+        redirect_url => $c->url_for->to_abs
+      );
+    }
+
+    my $covenant = $c->get_covenant($name);
+
+    unless ($covenant) {
+      $c->logger->error("covenant for '$name' was not found.");
+      $c->reply->not_found;
+    }
+    $c->logger->debug("retrieved covenant $covenant");
+
+    $c->stash(
+      item     => $covenant,
+      template => 'covenants/details',
+      layout   => 'default',
+    );
+    return $c->render();
+  }
+
 }
 1;
 __END__
-
-  sub setup_routes ($c, $app) {
-  #  $app->add_navigation_item({
-  #    title => 'Details of General Covenants',
-  #    path  => $c->getBase(),
-  #    order => 50,
-  #  });
-
-  #  my @parts     = split(/::/, ref($c));
-  #  my $baseClass = pop(@parts);
-
-  #  my $controller_name =
-  #      $c->can('controller_name')
-  #    ? $c->controller_name()
-  #    : $baseClass;
-
-  #  $c->logger->debug("got controller_name $controller_name.");
-
-  #  my $mainRoutes = $app->routes->any($base);
-  #  $mainRoutes->get('/')
-  #    ->to(controller => $controller_name, action => 'index')
-  #    ->name("${base}_index");
-
-  #  # for backwards compatibility
-  #  $mainRoutes->any('/details')->to(
-  #    cb => sub ($c) {
-  #      $c->redirect_to($c->getBase());
-  #    }
-  #  );
-
-  #  $app->plugins->on(
-  #    all_covenants_imported => sub {
-  #      foreach my $covenant (sort { $a->primary->name cmp $b->primary->name }
-  #        values $c->get_all_covenants->%*) {
-  #        $c->_build_covenant_routes($covenant, $covenant->primary->name,
-  #          $app, $controller_name, $mainRoutes);
-  #      }
-  #    }
-  #  );
-  }
 
   sub setup_helpers($c, $app) {
   #  $app->helper(
@@ -268,27 +291,7 @@ __END__
 
 
 
-  sub show ($c) {
-  #  $c->logger->debug("start of show method");
-  #  my $name;
-  #  $name = $c->param('name');
-  #  $c->logger->debug("show detects name $name, showing details.");
 
-  #  my $covenant = $c->app->getCovenant($name);
-
-  #  unless ($covenant) {
-  #    $c->logger->error("covenant for '$name' was not found.");
-  #    $c->reply->not_found;
-  #  }
-  #  $c->logger->debug("retrieved covenant $covenant");
-
-  #  $c->stash(
-  #    item     => $covenant,
-  #    template => 'covenants/details',
-  #    layout   => 'default',
-  #  );
-  #  return $c->render();
-  }
 
 }
 

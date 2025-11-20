@@ -8,9 +8,7 @@ use namespace::autoclean;
 
 package Game::EvonyTKR::Controller::ConflictGroups {
   use Mojo::Base 'Game::EvonyTKR::Controller::ControllerBase';
-  use Mojo::Base 'Game::EvonyTKR::Role::Common',            -role;
   use Mojo::Base 'Game::EvonyTKR::Controller::Role::Pairs', -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::Logger',            -role;
   use List::AllUtils qw( all any none );
   use Carp;
 

@@ -5,7 +5,7 @@ require JSON::PP;
 use namespace::autoclean;
 
 package Game::EvonyTKR::Model::Buff::Value {
-  use Mojo::Base -base,                                            -signatures;
+  use Mojo::Base 'Game::EvonyTKR::Model::Base';
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants', -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants', -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Logger',                      -role;

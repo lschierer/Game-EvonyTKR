@@ -10,6 +10,8 @@ use namespace::clean;
 package Game::EvonyTKR::Controller::ControllerBase {
   use Mojo::Base 'Mojolicious::Controller';
   use Mojo::Base 'Mojolicious::Plugin', -role, -signatures;
+  use Mojo::Base 'Game::EvonyTKR::Role::Logger', -role, -signatures;
+  use Mojo::Base 'Game::EvonyTKR::Role::Common', -role;
   require Mojo::File;
   require YAML::PP;
   require Data::Printer;
@@ -34,6 +36,15 @@ package Game::EvonyTKR::Controller::ControllerBase {
 
     my $routes = $app->routes;
 
+   $app->helper(outstanding_prereqs => sub($self, $prereqs) {
+      if(ref($prereqs) && ref($prereqs) eq 'ARRAY'){
+        return $c->are_prereqs_outstanding($app->minion, $prereqs);
+      } else {
+        $c->logger->error('outstanding_prereqs requires an arrayref.');
+        return 1;
+      }
+   });
+
     $routes->get('/health')->to(
       cb => sub($self) {
         my $APP_START_TIME = $app->config->{'APP_START_TIME'};
@@ -47,13 +58,13 @@ package Game::EvonyTKR::Controller::ControllerBase {
             app_uptime_seconds  => time() - $APP_START_TIME,
             build_time          => $app->config->{'version'}->{'build-time'},
             cdk_deployment_time =>
-              $app->config->{'HPFAN-Environment'}->{'DEPLOYMENT_TIME'}
+              $app->config->{'EvonyTKR-Environment'}->{'DEPLOYMENT_TIME'}
               // 'unknown',
-            container_id => $app->config->{'HPFAN-Environment'}->{'HOSTNAME'}
+            container_id => $app->config->{'EvonyTKR-Environment'}->{'HOSTNAME'}
               // 'unknown',    # ECS sets this automatically
-            image_tag => $app->config->{'HPFAN-Environment'}->{'IMAGE_TAG'}
+            image_tag => $app->config->{'EvonyTKR-Environment'}->{'IMAGE_TAG'}
               // 'unknown',
-            image_uri => $app->config->{'HPFAN-Environment'}->{'IMAGE_URI'}
+            image_uri => $app->config->{'EvonyTKR-Environment'}->{'IMAGE_URI'}
               // 'unknown',
             version    => $app->VERSION,
             git_commit => $app->config->{'version'}->{'git-commit'},

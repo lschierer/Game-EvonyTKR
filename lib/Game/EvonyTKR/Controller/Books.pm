@@ -7,7 +7,6 @@ use namespace::clean;
 
 package Game::EvonyTKR::Controller::Books {
   use Mojo::Base 'Game::EvonyTKR::Controller::ControllerBase';
-  use Mojo::Base 'Game::EvonyTKR::Role::Logger',            -role;
   use Mojo::Base 'Game::EvonyTKR::Controller::Role::Books', -role;
   use Carp;
 

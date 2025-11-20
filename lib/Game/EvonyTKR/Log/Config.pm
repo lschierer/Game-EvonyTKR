@@ -4,7 +4,6 @@ use utf8::all;
 use File::FindLib 'lib';
 require Data::Printer;
 require File::HomeDir::Tiny;
-require File::HomeDir::Tiny;
 require Mojo::File;
 
 package Game::EvonyTKR::Log::Config {
@@ -40,40 +39,10 @@ package Game::EvonyTKR::Log::Config {
     return $config;
   }
 
-  sub logger {
-    my $caller = shift // __PACKAGE__;
-    my $levels = __PACKAGE__->logLevels();
-    unless (Log::Log4perl->initialized()) {
-      my $config = __PACKAGE__->appender_setup();
-      foreach my $package (keys %$levels) {
-        my $level = $levels->{$package};
-        $config .= "log4perl.logger.$package = $level\n";
-      }
 
-      Log::Log4perl->init(\$config);
-    }
-    else {
-      # Force re-initialization to override any auto-config
-      foreach my $package (keys %$levels) {
-        my $level = $levels->{$package};
-        my $ll    = Log::Log4perl->get_logger($package);
-        $ll->level(Log::Log4perl::Level::to_priority($level));
-      }
-    }
-
-    my $l4p = Log::Log4perl->get_logger('Game::EvonyTKR');
-    if (ref($caller)) {
-      $l4p->WARN(sprintf(
-        'Logging initialized in %s by %s',
-        __PACKAGE__, ref($caller) ? blessed($caller) : $caller
-      ));
-    }
-    return $l4p;
-  }
 
   #(ALL|FATAL|TRACE|WARN|WARN|OFF|ERROR|WARN)
-  sub logLevels {
-    return {
+  our $logLevels = {
       'Game::EvonyTKR'                                             => 'DEBUG',
       'Game::EvonyTKR::Control::Generals::Routing'                 => 'WARN',
       'Game::EvonyTKR::Controller::AscendingAttributes'            => 'WARN',
@@ -162,7 +131,7 @@ package Game::EvonyTKR::Log::Config {
       'Game::EvonyTKR::Role::Constants::GeneralConstants'          => 'WARN',
       'Game::EvonyTKR::Role::Constants::Specialties'               => 'WARN',
       'Game::EvonyTKR::Role::General'                              => 'WARN',
-      'Game::EvonyTKR::Role::Logger'                               => 'WARN',
+      'Game::EvonyTKR::Role::Logger'                               => 'DEBUG',
       'Game::EvonyTKR::Service::Cache'                             => 'WARN',
       'Game::EvonyTKR::Shared::Constants'                          => 'WARN',
       'Game::EvonyTKR::Shared::Logger'                             => 'WARN',
@@ -176,8 +145,40 @@ package Game::EvonyTKR::Log::Config {
       'Test::Package'                                              => 'DEBUG',
       'WorkerLogic'                                                => 'WARN',
     };
-  }
 
+    sub logger {
+      state $I_Have_Init;
+      my $caller = shift // __PACKAGE__;
+      unless (Log::Log4perl->initialized()) {
+        my $config = __PACKAGE__->appender_setup();
+        foreach my $package (keys %$logLevels) {
+          my $level = $logLevels->{$package};
+          $config .= "log4perl.logger.$package = $level\n";
+        }
+
+        Log::Log4perl->init(\$config);
+      }
+      elsif(!$I_Have_Init) {
+        $I_Have_Init = 1;
+        # Force re-initialization to override any auto-config
+        foreach my $package (keys %$logLevels) {
+          my $level = $logLevels->{$package};
+          my $ll    = Log::Log4perl->get_logger($package);
+          $ll->level(Log::Log4perl::Level::to_priority($level));
+        }
+      }
+
+      my $p = ref($caller) ? blessed($caller) : $caller;
+      my $l4p = Log::Log4perl->get_logger($p);
+      if (ref($caller)) {
+        $l4p->WARN(sprintf(
+          'Logging initialized in %s by %s as %s',
+          __PACKAGE__, ref($caller) ? blessed($caller) : $caller,
+          $p
+        ));
+      }
+      return $l4p;
+    }
 }
 1;
 __END__

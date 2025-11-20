@@ -7,12 +7,11 @@ require Game::EvonyTKR::Model::Buff::Value;
 use namespace::autoclean;
 
 package Game::EvonyTKR::Model::Buff {
-  use Mojo::Base -base,                                            -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Role::Common',                   -role;
+  use Mojo::Base 'Game::EvonyTKR::Model::Base';
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants', -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::Logger',                   -role;
   use List::AllUtils qw( any none );
   use Carp;
+  use Log::Any       qw($log);
   use File::FindLib 'lib';
   use overload
     '""'       => \&as_string,
@@ -387,7 +386,7 @@ package Game::EvonyTKR::Model::Buff {
   }
 
   sub from_hash ($class, $hashref) {
-    my $logger = Log::Log4perl->get_logger(__PACKAGE__);
+    my $logger = $log;
     my $v      = Game::EvonyTKR::Model::Buff::Value->new(
       number => abs($hashref->{value}->{number}),
       unit   => ($hashref->{value}->{unit} // 'percentage'),
@@ -422,7 +421,7 @@ package Game::EvonyTKR::Model::Buff {
   sub to_hash ($self) {
     my $c;
     my $conditionCount = scalar @{ $self->conditions() };
-    $self->logger->debug("in to_hash, I have $conditionCount conditions");
+    $self->logger->debug(sprintf('in to_hash, I have %s conditions.', 0 + $conditionCount));
 
     # Debug buff value
     if (defined($self->value)) {
@@ -457,10 +456,6 @@ package Game::EvonyTKR::Model::Buff {
     return $r;
   }
 
-  sub TO_JSON ($self) {
-    return $self->to_hash();
-  }
-
   sub as_string ($self, @args) {
     my $json =
       JSON::PP->new->utf8->pretty->allow_blessed(1)
@@ -474,6 +469,7 @@ package Game::EvonyTKR::Model::Buff {
   }
 
   sub from_wire_hash ($class, $w) {
+    my $logger = $log;
     my $buff = $class->new(
       attribute    => $w->{attribute},
       passive      => $w->{passive} // 0,
@@ -494,7 +490,18 @@ package Game::EvonyTKR::Model::Buff {
         $buff->set_condition($condition);
       }
     }
-
+    $logger->debug(sprintf(
+    'from_wire_hash returning a %s buff with '
+    .'attribute "%s"; '
+    .'targetedType "%s" '
+    .'conditions %s '
+    .' and value %s.',
+    $buff->passive ? 'passive' : '',
+    $buff->attribute,
+    ($buff->targetedType // ''),
+    (join ', ', map { sprintf('"%s"', $_) } $buff->conditions->@* // ''),
+    sprintf("%s%s", $buff->value->number, $buff->value->unit eq 'percentage' ? '%' : ' flat'),
+    ));
     return $buff;
   }
 

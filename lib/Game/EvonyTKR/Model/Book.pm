@@ -5,8 +5,7 @@ require JSON::PP;
 use namespace::autoclean;
 
 package Game::EvonyTKR::Model::Book {
-  use Mojo::Base -base,                               -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Role::Logger',      -role;
+  use Mojo::Base "Game::EvonyTKR::Model::Base";
   use Mojo::Base 'Game::EvonyTKR::Model::Role::Book', -role;
   use Carp;
   use overload

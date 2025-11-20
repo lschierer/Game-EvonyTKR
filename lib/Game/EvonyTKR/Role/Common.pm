@@ -147,10 +147,8 @@ package Game::EvonyTKR::Role::Common {
         Data::Printer::np($prereqs, multiline => 0))
     );
 
-    if (grep { $_ == "0" } values %{$prereqs}) {
-      return 1;
-    }
-    return 0;
+    my @outstanding = grep { $_ == "0" } values %{$prereqs};
+    return scalar(@outstanding);
   }
 }
 1;

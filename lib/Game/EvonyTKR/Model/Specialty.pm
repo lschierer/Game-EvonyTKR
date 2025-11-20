@@ -11,9 +11,7 @@ require Game::EvonyTKR::Model::Buff::Matcher;
 use namespace::autoclean;
 
 package Game::EvonyTKR::Model::Specialty {
-  use Mojo::Base -base,                          -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Role::Logger', -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::Common';
+  use Mojo::Base 'Game::EvonyTKR::Model::Base';
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants',    -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants', -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::Specialties',      -role;
@@ -53,7 +51,7 @@ package Game::EvonyTKR::Model::Specialty {
 
   # --- YAML -> object (input shape: levels = [ {level, text, buffs}, ... ]) ---
   sub from_hash ($class, $h) {
-    my $logger = Log::Any->get_logger(category => __PACKAGE__);
+    my $logger = $log;
     croak "from_hash expects hashref" unless ref($h) eq 'HASH';
     my $name = $h->{name} // '';
     $logger->debug(sprintf(
@@ -71,7 +69,8 @@ package Game::EvonyTKR::Model::Specialty {
       unless ($s->is_valid_level(lc($lv->{level}))) {
         my $errmessg = sprintf('invalid level %s, level must be one of %s',
           $lv->{level}, join ', ', $s->SpecialtyLevelValues->@*);
-        $s->logger->logcroak($errmessg);
+        $logger->error($errmessg);
+        croak($errmessg);
       }
 
       foreach my $b ($lv->{buffs}->@*) {
@@ -88,7 +87,7 @@ package Game::EvonyTKR::Model::Specialty {
         join(', ', $s->SpecialtyLevelValues->@*)
       );
     }
-    $s->logger->debug(sprintf(
+    $logger->debug(sprintf(
       's is %s, stringifies as %s',
       Data::Printer::np($s, class => { stringify => 0 }),
       Data::Printer::np($s)
@@ -125,7 +124,11 @@ package Game::EvonyTKR::Model::Specialty {
   }
 
   sub from_wire_hash ($class, $w) {
-    die "unknown wire version" unless ($w->{_v} // 1) == 1;
+    my $logger = $log;
+    unless (($w->{_v} // 1) == 1){
+      $logger->error("unknown wire version");
+      croak("unknown wire version");
+    }
 
     my $specialty = $class->new(
       id   => $w->{id} // '',
@@ -134,8 +137,14 @@ package Game::EvonyTKR::Model::Specialty {
 
     # Set levels if they exist
     if ($w->{levels}) {
-      $specialty->{levels} =
-        $w->{levels};    # Direct assignment since levels is complex
+      foreach my $lv (keys $w->{levels}->%*) {
+        next if $lv eq 'none';
+        $specialty->levels->{$lv}->{text} = $w->{levels}->{$lv}->{text} // '';
+        foreach my $bh ($w->{levels}->{$lv}->{buffs}->@*){
+          my $b = Game::EvonyTKR::Model::Buff->from_wire_hash($bh);
+          push @{ $specialty->levels->{$lv}->{buffs} }, $b;
+        }
+      }
     }
 
     return $specialty;

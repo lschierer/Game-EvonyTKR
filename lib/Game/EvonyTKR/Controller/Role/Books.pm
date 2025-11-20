@@ -8,7 +8,6 @@ require Game::EvonyTKR::Model::Factory;
 
 package Game::EvonyTKR::Controller::Role::Books {
   use Mojo::Base -role,                          -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Role::Common', -role;
   use List::AllUtils qw(uniq);
   use List::UtilsBy;
   use Log::Any;

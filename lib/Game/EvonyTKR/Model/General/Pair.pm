@@ -7,12 +7,10 @@ require Scalar::Util;
 require Game::EvonyTKR::Model::General;
 
 package Game::EvonyTKR::Model::General::Pair {
-  use Mojo::Base -base,                                            -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Role::Common',                   -signatures;
+  use Mojo::Base 'Game::EvonyTKR::Model::Base';
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants', -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants',    -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::AscendingAttributes', -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::Logger',                         -role;
   use UUID           qw(uuid5);
   use List::AllUtils qw( any none );
   use File::FindLib 'lib';
