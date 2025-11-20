@@ -4,14 +4,14 @@ generals:
   - Guan Yu
   - Zhao Yun
 levels:
-  - category: War
+  - category: war
     buffs:
       - attribute: Defense
         targetedType: Ground Troops
         value:
           number: 10
           unit: percentage
-  - category: Cooperation
+  - category: coperation
     buffs:
       - attribute: HP
         passive: 1
@@ -21,14 +21,14 @@ levels:
         value:
           number: 10
           unit: percentage
-  - category: Peace
+  - category: peace
     buffs:
       - attribute: Attack
         targetedType: Ground Troops
         value:
           number: 10
           unit: percentage
-  - category: Faith
+  - category: faith
     buffs:
       - attribute: Marching Speed
         value:
@@ -40,7 +40,7 @@ levels:
         value:
           number: 10
           unit: percentage
-  - category: Honor
+  - category: honor
     buffs:
       - attribute: Attack
         targetedType: Ground Troops
@@ -49,7 +49,7 @@ levels:
         value:
           number: 10
           unit: percentage
-  - category: Civilization
+  - category: civilization
     buffs:
       - attribute: March Size
         value:
