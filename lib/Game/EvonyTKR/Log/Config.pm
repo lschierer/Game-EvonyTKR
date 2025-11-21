@@ -57,6 +57,7 @@ package Game::EvonyTKR::Log::Config {
       'Game::EvonyTKR::Controller::Role::Generals'                 => 'WARN',
       'Game::EvonyTKR::Controller::Role::Pairs'                    => 'DEBUG',
       'Game::EvonyTKR::Controller::Role::Specialties'              => 'WARN',
+      'Game::EvonyTKR::Controller::Role::Covenants'                => 'DEBUG',
       'Game::EvonyTKR::Controller::SkillBooks'                     => 'WARN',
       'Game::EvonyTKR::Controller::Specialties'                    => 'WARN',
       'Game::EvonyTKR::Converter'                                  => 'WARN',
@@ -77,7 +78,8 @@ package Game::EvonyTKR::Log::Config {
       'Game::EvonyTKR::External::Buff::Computer'                   => 'WARN',
       'Game::EvonyTKR::External::Buff::Worker'                     => 'WARN',
       'Game::EvonyTKR::External::Common'                           => 'WARN',
-      'Game::EvonyTKR::External::General::Loader'                  => 'WARN',
+      'Game::EvonyTKR::External::Covenant::LoadAll'                => 'WARN',
+      'Game::EvonyTKR::External::Covenant::Loader'                 => 'DEBUG',
       'Game::EvonyTKR::External::General::LoadAll'                 => 'WARN',
       'Game::EvonyTKR::External::General::Pair::CreatePairs'       => 'DEBUG',
       'Game::EvonyTKR::External::General::Pair::ReduceBatch '      => 'DEBUG',
@@ -88,7 +90,7 @@ package Game::EvonyTKR::Log::Config {
       'Game::EvonyTKR::External::Prebuild'                         => 'DEBUG',
       'Game::EvonyTKR::External::Specialties::LoadAllSpecialties'  => 'WARN',
       'Game::EvonyTKR::External::Specialties::Loader'              => 'WARN',
-      'Game::EvonyTKR::Log::Config'                                => 'WARN',
+      'Game::EvonyTKR::Log::Config'                                => 'INFO',
       'Game::EvonyTKR::Markdown::SpectrumHandler'                  => 'WARN',
       'Game::EvonyTKR::Model::AscendingAttributes'                 => 'WARN',
       'Game::EvonyTKR::Model::BasicAttribute'                      => 'WARN',
@@ -101,7 +103,7 @@ package Game::EvonyTKR::Log::Config {
       'Game::EvonyTKR::Model::Buff::Matcher'                       => 'WARN',
       'Game::EvonyTKR::Model::Buff::Summarizer'                    => 'WARN',
       'Game::EvonyTKR::Model::Buff::Value'                         => 'WARN',
-      'Game::EvonyTKR::Model::Covenant'                            => 'WARN',
+      'Game::EvonyTKR::Model::Covenant'                            => 'DEBUG',
       'Game::EvonyTKR::Model::Data'                                => 'WARN',
       'Game::EvonyTKR::Model::General'                             => 'WARN',
       'Game::EvonyTKR::Model::General::Conflict'                   => 'DEBUG',
@@ -112,7 +114,7 @@ package Game::EvonyTKR::Log::Config {
       'Game::EvonyTKR::Model::General::Pair::Manager'              => 'WARN',
       'Game::EvonyTKR::Model::Glossary'                            => 'WARN',
       'Game::EvonyTKR::Model::Glossary::Manager'                   => 'WARN',
-      'Game::EvonyTKR::Model::Logger'                              => 'WARN',
+      'Game::EvonyTKR::Model::Logger'                              => 'DEBUG',
       'Game::EvonyTKR::Model::Role::Book'                          => 'WARN',
       'Game::EvonyTKR::Model::Role::Book::Builtin'                 => 'WARN',
       'Game::EvonyTKR::Model::Role::Book::SkillBook'               => 'WARN',
@@ -131,7 +133,7 @@ package Game::EvonyTKR::Log::Config {
       'Game::EvonyTKR::Role::Constants::GeneralConstants'          => 'WARN',
       'Game::EvonyTKR::Role::Constants::Specialties'               => 'WARN',
       'Game::EvonyTKR::Role::General'                              => 'WARN',
-      'Game::EvonyTKR::Role::Logger'                               => 'DEBUG',
+      'Game::EvonyTKR::Role::Logger'                               => 'WARN',
       'Game::EvonyTKR::Service::Cache'                             => 'WARN',
       'Game::EvonyTKR::Shared::Constants'                          => 'WARN',
       'Game::EvonyTKR::Shared::Logger'                             => 'WARN',
@@ -140,16 +142,21 @@ package Game::EvonyTKR::Log::Config {
       'Game::EvonyTKR::Util::Buff::Summarizer'                     => 'WARN',
       'GitRepo::Reader'                                            => 'WARN',
       'LinkChecker::Command'                                       => 'WARN',
-      'Log::Any::Adapter::PerPackage'                              => 'WARN',
       'PairBuilderLogic'                                           => 'WARN',
       'Test::Package'                                              => 'DEBUG',
       'WorkerLogic'                                                => 'WARN',
     };
 
-    sub logger {
+    sub logger ($class, $caller = undef) {
+      my $l4p = Log::Log4perl->get_logger($class);
+      $l4p->level(Log::Log4perl::Level::to_priority($logLevels->{$class}));
       state $I_Have_Init;
-      my $caller = shift // __PACKAGE__;
+      $caller //= 'undef::package';
+      $l4p->debug(sprintf('in %s, $class is %s, $caller is %s', __PACKAGE__, $class, $caller));
+
       unless (Log::Log4perl->initialized()) {
+        $I_Have_Init = 1;
+        $l4p->info('l4p not yet initialized');
         my $config = __PACKAGE__->appender_setup();
         foreach my $package (keys %$logLevels) {
           my $level = $logLevels->{$package};
@@ -159,25 +166,26 @@ package Game::EvonyTKR::Log::Config {
         Log::Log4perl->init(\$config);
       }
       elsif(!$I_Have_Init) {
+        $l4p->info('forcing new l4p config');
         $I_Have_Init = 1;
         # Force re-initialization to override any auto-config
         foreach my $package (keys %$logLevels) {
           my $level = $logLevels->{$package};
           my $ll    = Log::Log4perl->get_logger($package);
           $ll->level(Log::Log4perl::Level::to_priority($level));
+          if($logLevels->{__PACKAGE__} eq 'DEBUG'){
+            say
+          }
+
         }
       }
 
-      my $p = ref($caller) ? blessed($caller) : $caller;
-      my $l4p = Log::Log4perl->get_logger($p);
-      if (ref($caller)) {
-        $l4p->WARN(sprintf(
-          'Logging initialized in %s by %s as %s',
-          __PACKAGE__, ref($caller) ? blessed($caller) : $caller,
-          $p
-        ));
-      }
-      return $l4p;
+      my $cl = Log::Log4perl->get_logger($caller);
+      $l4p->debug(sprintf(
+        'returning logger in %s, $class is %s, for %s at level %s',
+        __PACKAGE__, $class, $caller, Log::Log4perl::Level::to_level($cl->level()),
+      ));
+      return $cl;
     }
 }
 1;

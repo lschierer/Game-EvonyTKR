@@ -47,7 +47,6 @@ package Game::EvonyTKR::Model::Covenant {
       my $al = 10000 + $index * 2 * 1000;
       $self->logger->debug("setting activationLevel for $key to $al");
       $h->{$key} = {
-        type            => 'personal',
         activationLevel => $al,
         buffs           => [],
       };
@@ -57,7 +56,7 @@ package Game::EvonyTKR::Model::Covenant {
     return $h;
   };
 
-  has 'get_buffs_at_level' => sub (
+  sub get_buffs_at_level (
     $self, $level, $attribute, $matching_type,
     $targetedType     = '',
     $conditions       = [],
@@ -128,7 +127,7 @@ package Game::EvonyTKR::Model::Covenant {
     }
   };
 
-  has 'addBuff' => sub ($self, $level, $nb) {
+  sub addBuff ($self, $level, $nb) {
     my $red = 1;
     if (!blessed($nb) || blessed($nb) ne "Game::EvonyTKR::Model::Buff") {
       $self->logger->error(sprintf(
@@ -143,7 +142,7 @@ package Game::EvonyTKR::Model::Covenant {
     ) {
       $self->logger->error(sprintf(
         'level should be one of %s, not %s',
-        join(', ', @{ $self->covenantLevels }), $level
+        join(', ', @{ $self->CovenantCategoryValues }), $level
       ));
       return 0;
     }
@@ -167,95 +166,35 @@ package Game::EvonyTKR::Model::Covenant {
     return $count;
   };
 
-  sub to_wire_hash ($self) {
-    my $h = {
-      primary  => $self->primary->name,
-      generals => [
-        one   => $self->one,
-        two   => $self->two,
-        three => $self->three,
-      ],
-      categories => $self->categories,
-    };
-    return $h;
-  }
-
-  sub from_wire_hash ($self, $h) {
-    my $logger = $log;
-    unless (ref($h) && ref($h) eq 'HASH') {
-      my $errmessage = 'from_wire_hash requires a valid hashref';
-      $logger->error($errmessage);
-      croak($errmessage);
-      return;
-    }
-    unless ($h->{primary} && length($h->{primary})) {
-      my $errmessage =
-        'hash provided to from_wire_hash must have an attribute "primary"';
-      $logger->error($errmessage);
-      croak($errmessage);
-      return;
-    }
-    my $primary = $self->get_general($h->{primary});
-    unless ($primary) {
-      my $errmessage =
-        sprintf('%s from_wire_hash cannot find general for name "%s"',
-        __PACKAGE__, $h->{primary});
-      $logger->error($errmessage);
-      croak($errmessage);
-      return;
-    }
-
-    my $covenant = $self->from_hash($h, $primary);
-    unless ($covenant) {
-      my $errmessage =
-        sprintf('%s from_wire_hash cannot create hash from object %s',
-        __PACKAGE__, Data::Printer::np($h, multiline => 0));
-      $logger->error($errmessage);
-      croak($errmessage);
-      return;
-    }
-    return $covenant;
-  }
-
-  has 'to_hash' => sub ($self) {
-    my $returnRef = {
-      primary  => $self->primary->name,
-      generals => {
-        #one   => $secondary->{'one'}->name,
-        #two   => $secondary->{'two'}->name,
-        #three => $secondary->{'three'}->name,
-        one   => $self->one,
-        two   => $self->two,
-        three => $self->three,
-      },
-      categories => $self->categories,
-    };
-  };
-
-  has 'TO_JSON' => sub ($self) {
-    return $self->to_hash();
-  };
-
-  sub as_string ($self) {
-    my $json =
-      JSON::PP->new->utf8->pretty->canonical(1)
-      ->allow_blessed(1)
-      ->convert_blessed(1)
-      ->encode($self->to_hash());
-    return $json;
-  }
-
-  sub from_hash($self, $object, $primary,) {
+  sub from_hash($class, $object) {
     my $logger = $log;
     if (!exists $object->{name}) {
       $logger->error('object must have name attribute.');
       return;
     }
+    $logger->info(sprintf('attempting import of covenant for "%s"', $object->{name}));
     my $name = $object->{name};
-    unless (Scalar::Util::blessed($primary) eq 'Game::EvonyTKR::Model::General')
+    state $general_helper //= do {
+      my $helper = eval {
+        Mojo::Base->new->with_roles(
+          'Game::EvonyTKR::Role::Logger',
+          'Game::EvonyTKR::Role::Common',
+          'Game::EvonyTKR::Controller::Role::Generals'
+        );
+      };
+      if ($@) {
+        $logger->error("Cannot create general helper: $@");
+        return;
+      }
+      $helper;
+    };
+
+    return unless $general_helper;
+
+    my $primary = $general_helper->get_general($name);
+    unless (defined($primary) && ref($primary) && $primary->isa('Game::EvonyTKR::Model::General'))
     {
-      $logger->error("primary general must be of type "
-          . "Game::EvonyTKR::Model::General for covenant $name");
+      $logger->error(sprintf('Could not find general for covenant with name %s', $object->{name}));
       return;
     }
     $logger->debug("found primary general for $name, starting import.");
@@ -285,12 +224,148 @@ package Game::EvonyTKR::Model::Covenant {
       elsif (exists $oc->{buffs}) {
         @buffs = @{ $oc->{buffs} };
       }
+      $logger->debug(sprintf('found %s buffs for convenant %s at level %s',
+      scalar(@buffs), $name, $oc->{category}));
+
       foreach my $ob (@buffs) {
         my $b = Game::EvonyTKR::Model::Buff->from_hash($ob);
         $o->addBuff($category, $b);
       }
     }
     return $o;
+  }
+
+  sub from_wire_hash ($class, $h) {
+    my $logger = $log;
+    unless (ref($h) && ref($h) eq 'HASH') {
+      my $errmessage = 'from_wire_hash requires a valid hashref';
+      $logger->error($errmessage);
+      croak($errmessage);
+      return;
+    }
+    unless ($h->{primary} && length($h->{primary})) {
+      my $errmessage =
+        'hash provided to from_wire_hash must have an attribute "primary"';
+      $logger->error($errmessage);
+      croak($errmessage);
+      return;
+    }
+
+    state $general_helper //= do {
+      my $helper = eval {
+        Mojo::Base->new->with_roles(
+          'Game::EvonyTKR::Role::Logger',
+          'Game::EvonyTKR::Role::Common',
+          'Game::EvonyTKR::Controller::Role::Generals'
+        );
+      };
+      if ($@) {
+        $logger->error("Cannot create general helper: $@");
+        return;
+      }
+      $helper;
+    };
+
+    return unless $general_helper;
+
+    my $primary = $general_helper->get_general($h->{primary});
+    unless (defined($primary) && ref($primary) && $primary->isa('Game::EvonyTKR::Model::General'))
+    {
+      $logger->error(sprintf('Could not find general for covenant with name %s', $h->{primary}));
+      return;
+    }
+    $logger->debug(sprintf('found primary general for "%s", starting import.', $h->{primary}));
+    $logger->debug(sprintf('generals for "%s" are %s', $h->{primary}, join(", ", @{ $h->{generals} }) ));
+
+    my $o = Game::EvonyTKR::Model::Covenant->new(
+      primary => $primary,
+      one     => $h->{generals}->[0],
+      two     => $h->{generals}->[1],
+      three   => $h->{generals}->[2],
+    );
+
+    foreach my $category (keys $h->{categories}->%* ) {
+      unless (defined($category) && length($category)) {
+        $logger->error(
+          'invalid category!! ' . Data::Printer::np($h, multiline => 0));
+        return;
+      }
+
+      my $oc = $h->{categories}->{$category};
+      $o->{categories}->{$category}->{text} = $h->{categories}->{$category}->{text} // '';
+
+      # Find buffs for this category
+      my @buffs;
+      if (exists $oc->{buff}) {
+        @buffs = @{ $oc->{buff} };
+      }
+      elsif (exists $oc->{buffs}) {
+        @buffs = @{ $oc->{buffs} };
+      }
+      $logger->debug(sprintf('found %s buffs for convenant %s at level %s',
+      scalar(@buffs), $h->{primary}, $category));
+
+      foreach my $ob (@buffs) {
+        my $b = Game::EvonyTKR::Model::Buff->from_hash($ob);
+        $o->addBuff($category, $b);
+      }
+    }
+    return $o;
+  }
+
+  sub to_wire_hash ($self) {
+    my $h = {
+      primary  => $self->primary->name,
+      generals => [
+        one   => $self->one,
+        two   => $self->two,
+        three => $self->three,
+      ],
+    };
+    foreach my $key (keys $self->categories->%*){
+      $h->{categories}->{$key}->{activationLevel} = $self->categories->{$key}->{activationLevel} // 0;
+      foreach my $b ($self->categories->{$key}->{buffs}->@*){
+        push @{ $h->{categories}->{$key}->{buffs} },
+          $b->to_wire_hash();
+      }
+    }
+    return $h;
+  }
+
+  sub to_hash ($self) {
+    my $h = {
+      primary  => $self->primary->name,
+      generals => {
+        #one   => $secondary->{'one'}->name,
+        #two   => $secondary->{'two'}->name,
+        #three => $secondary->{'three'}->name,
+        one   => $self->one,
+        two   => $self->two,
+        three => $self->three,
+      },
+
+    };
+    foreach my $key (keys $self->categories->%*){
+      $h->{categories}->{$key}->{activationLevel} = $self->categories->{$key}->{activationLevel} // 0;
+      foreach my $b ($self->categories->{$key}->{buffs}->@*){
+        push @{ $h->{categories}->{$key}->{buffs} },
+          $b->to_wire_hash();
+      }
+    }
+    return $h;
+  };
+
+  sub TO_JSON ($self) {
+    return $self->to_hash();
+  };
+
+  sub as_string ($self) {
+    my $json =
+      JSON::PP->new->utf8->pretty->canonical(1)
+      ->allow_blessed(1)
+      ->convert_blessed(1)
+      ->encode($self->to_hash());
+    return $json;
   }
 
   sub isTrue ($self, $other = undef, $swap = undef) {

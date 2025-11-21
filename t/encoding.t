@@ -15,7 +15,10 @@ use diagnostics;
 use Sereal::Encoder;
 use Sereal::Decoder;
 
-my $logger = Game::EvonyTKR::Log::Config->logger();
+$ENV{'MOJO_MODE'} = 'development';
+
+my $logger = Game::EvonyTKR::Log::Config->logger('Test::Package');
+say 'log level is ' . Log::Log4perl::Level::to_level($logger->level());
 
 my $home = Mojo::Home->new->detect('Game::EvonyTKR');
 
@@ -162,6 +165,74 @@ subtest 'Specialty Encode/Decode' => sub {
   $o4->isa('Game::EvonyTKR::Model::Specialty'),
     'Decoding Specialty $o2');
 
+  done_testing();
+};
+
+subtest 'Basic General Encode/Decode' => sub {
+  require Game::EvonyTKR::Model::General;
+  my $dir = $home->child('share/collections/data/generals');
+
+  ok(-d -r $dir, 'General Collection Directory Exists');
+
+  my @files =  $dir->list->grep(sub { $_ =~ /\.ya?ml$/ && -f -r $_ })
+  ->each;
+
+  ok(scalar(@files) > 1, sprintf('found %s general files', scalar(@files)));
+
+  foreach my $file (@files) {
+    my $hashdata       = $file->slurp('UTF-8');
+    my $hashObject = YAML::PP->new(
+      schema       => [qw/ + Perl /],
+      yaml_version => ['1.2', '1.1'],
+    )->load_string($hashdata);
+    my $object = Game::EvonyTKR::Model::General->from_hash($hashObject);
+
+    ok(defined($object) && $object->isa('Game::EvonyTKR::Model::General'), sprintf('Instantiated General %s', $hashObject->{name}));
+
+    my $data1 = $encoder->encode($object);
+    ok($data1, 'Encoding Covenant $object');
+  }
+
+};
+
+# testing covenants requires that this test file also require memcached
+subtest 'Covenant Encode/Decode' => sub {
+  require Game::EvonyTKR::Model::Covenant;
+  my $dir = $home->child('share/collections/data/covenants');
+
+  ok(-d -r $dir, 'Covenant Collection Directory Exists');
+#
+#  my ($file) =  $dir->list->grep(sub { $_ =~ /\.ya?ml$/ && -f -r $_ })
+#  ->head(1)->each;
+#
+#  ok(-f -r $file, 'Covenant Test File Exists');
+#
+#  my $hashdata       = $file->slurp('UTF-8');
+#  my $hashObject = YAML::PP->new(
+#    schema       => [qw/ + Perl /],
+#    yaml_version => ['1.2', '1.1'],
+#  )->load_string($hashdata);
+#  $logger->debug(sprintf('hash object is %s', Data::Printer::np($hashObject)));
+#
+#  my $o = Game::EvonyTKR::Model::Covenant->from_hash($hashObject);
+#
+#  ok(defined($o) && $o->isa('Game::EvonyTKR::Model::Covenant'), 'Creating Covenant with from_hash');
+#
+#  my $data1 = $encoder->encode($o);
+#  ok($data1, 'Encoding Covenant $o');
+#
+#  my $o2 = $decoder->decode($data1);
+#  ok(defined($o2) &&
+#  $o2->isa('Game::EvonyTKR::Model::Covenant'),
+#    'Decoding Covenant encoded');
+#
+#  my $data2 = $encoder->encode($o2);
+#  ok($data2, 'Encoding Covenant $o2') ;
+#
+#  my $o3 = $decoder->decode($data2);
+#  ok(defined($o3) && $o3->isa('Game::EvonyTKR::Model::Covenant'),
+#    'Decoding Covenant re-encoded');
+#
   done_testing();
 };
 

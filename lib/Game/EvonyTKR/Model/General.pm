@@ -93,18 +93,22 @@ package Game::EvonyTKR::Model::General {
   sub populateAscendingAttributes ($self,) {
     return unless $self->ascending;
 
-    state $ascending_helper;
-    eval {
-      $ascending_helper = Mojo::Base->new->with_roles(
-        'Game::EvonyTKR::Role::Logger',
-        'Game::EvonyTKR::Role::Common',
-        'Game::EvonyTKR::Controller::Role::AscendingAttributes'
-      );
-    } or do {
-      $self->logger->error(
-        sprintf('eval failed; cannot define specialty helper: "%s"', $@));
-      return;
+    state $ascending_helper //= do {
+      my $helper = eval {
+        Mojo::Base->new->with_roles(
+          'Game::EvonyTKR::Role::Logger',
+          'Game::EvonyTKR::Role::Common',
+          'Game::EvonyTKR::Controller::Role::AscendingAttributes'
+        );
+      };
+      if ($@) {
+        $self->logger->error("Cannot create ascending attributes helper: $@");
+        return;
+      }
+      $helper;
     };
+
+    return unless $ascending_helper;
 
     my $key = lc($self->normalize($self->name));
     $key =~ s/ /_/g;
@@ -128,20 +132,24 @@ package Game::EvonyTKR::Model::General {
   }
 
   sub populateBuiltinBook ($self) {
-    state $books_helper;
-    my ($book, $cache_store);
-
-    eval {
-      $books_helper = Mojo::Base->new->with_roles(
-        'Game::EvonyTKR::Role::Logger',
-        'Game::EvonyTKR::Role::Common',
-        'Game::EvonyTKR::Controller::Role::Books'
-      );
-    } or do {
-      $self->logger->error(
-        sprintf('eval failed; cannot define book helper: "%s"', $@));
-      return;
+    state $books_helper //= do {
+      my $helper = eval {
+        Mojo::Base->new->with_roles(
+          'Game::EvonyTKR::Role::Logger',
+          'Game::EvonyTKR::Role::Common',
+          'Game::EvonyTKR::Controller::Role::Books'
+        );
+      };
+      if ($@) {
+        $self->logger->error("Cannot create books helper: $@");
+        return;
+      }
+      $helper;
     };
+
+    return unless $books_helper;
+
+    my $book;
 
     eval { $book = $books_helper->get_builtin_book($self->builtInBookName); }
       or do {
@@ -176,18 +184,22 @@ package Game::EvonyTKR::Model::General {
   }
 
   sub populateSpecialties ($self,) {
-    state $specialty_helper;
-    eval {
-      $specialty_helper = Mojo::Base->new->with_roles(
-        'Game::EvonyTKR::Role::Logger',
-        'Game::EvonyTKR::Role::Common',
-        'Game::EvonyTKR::Controller::Role::Specialties'
-      );
-    } or do {
-      $self->logger->error(
-        sprintf('eval failed; cannot define specialty helper: "%s"', $@));
-      return;
+    state $specialty_helper //= do {
+      my $helper = eval {
+        Mojo::Base->new->with_roles(
+          'Game::EvonyTKR::Role::Logger',
+          'Game::EvonyTKR::Role::Common',
+          'Game::EvonyTKR::Controller::Role::Specialties'
+        );
+      };
+      if ($@) {
+        $self->logger->error("Cannot create specialty helper: $@");
+        return;
+      }
+      $helper;
     };
+
+    return unless $specialty_helper;
 
     foreach my $sn_index (0 .. scalar($#{ $self->specialtyNames })) {
       my $sn = $self->specialtyNames->[$sn_index];

@@ -26,15 +26,17 @@ package Game::EvonyTKR {
   use Env qw(DEPLOYMENT_TIME HOSTNAME IMAGE_TAG IMAGE_URI);
   our $VERSION = 'v0.50.0';
 
-  my $l4p;
 
   sub startup ($app) {
+    state $l4p;
+    $l4p = Game::EvonyTKR::Log::Config->logger(__PACKAGE__) unless(defined($l4p));
     _init_core($app);    # runs in web *and* worker
     _init_minion($app);
 
     # web-only: routes/UI and optional worker spawning
     $app->hook(
       before_server_start => sub ($server, $app) {
+        $l4p = Game::EvonyTKR::Log::Config->logger(__PACKAGE__) unless(defined($l4p));
         # routes, UIs, helpers that need HTTP server
         _init_web($app);
         # optional: only if you want web proc to fork workers
@@ -100,7 +102,7 @@ package Game::EvonyTKR {
     my $home = Mojo::Home->new->detect;
     $app->secrets($config->{secrets});
     # Logging setup
-    $l4p = Game::EvonyTKR::Log::Config->logger();
+
     Log::Any::Adapter->set('Log4perl');
 
     $app->plugin('Log::Any' => { logger => 'Log::Log4perl' });
@@ -184,19 +186,19 @@ package Game::EvonyTKR {
     $app->plugin('Game::EvonyTKR::Plugins::Markdown');
     # Navigation
     eval { $app->plugin('Game::EvonyTKR::Plugins::Navigation'); } or do {
-      $l4p->logcroak('Failed to load Navigation Plugin');
+      $app->log->logcroak('Failed to load Navigation Plugin');
     };
 
     my @controllerplugins = find_modules 'Game::EvonyTKR::Controller';
     foreach my $module (@controllerplugins) {
       eval {
-        $l4p->debug("loading module $module");
+        $app->log->debug("loading module $module");
         load_class $module;
         $app->plugin($module);
       };
       if ($@) {
         print STDERR "Error caught loading module: $@";
-        $l4p->logcroak("loading module '$module' failed: $@");
+        $app->log->logcroak("loading module '$module' failed: $@");
       }
     }
 

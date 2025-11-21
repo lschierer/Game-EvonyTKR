@@ -23,10 +23,9 @@ use namespace::autoclean;
 
 package Game::EvonyTKR::Controller::Covenants {
   use Mojo::Base 'Game::EvonyTKR::Controller::ControllerBase';
-  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Generals', -role,
-    -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Covenants', -role,
-    -signatures;
+  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Generals', -role;
+  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Covenants', -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Constants::Covenants', -role;
   use Mojo::IOLoop;
   use Mojo::Promise;
   use Mojo::JSON     qw(to_json encode_json);
@@ -81,6 +80,14 @@ package Game::EvonyTKR::Controller::Covenants {
   }
 
   sub setup_helpers ($c, $app) {
+
+    $app->helper(covenant_category_labels => sub {
+      return [$c->CovenantCategoryLabels->@*];
+    });
+
+    $app->helper(covenant_category_names => sub {
+      return [$c->CovenantCategoryValues->@*];
+    });
 
   }
 
@@ -197,7 +204,7 @@ package Game::EvonyTKR::Controller::Covenants {
       $c->logger->error("covenant for '$name' was not found.");
       $c->reply->not_found;
     }
-    $c->logger->debug("retrieved covenant $covenant");
+    $c->logger->debug(sprintf('retrieved covenant for "%s": %s', $name, Data::Printer::np($covenant)));
 
     $c->stash(
       item     => $covenant,

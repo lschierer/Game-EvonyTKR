@@ -64,15 +64,8 @@ package Game::EvonyTKR::External::Covenant::Loader {
       push @errors, $errmessage;
     }
 
-    my $primary = $job->get_general($hashObject->{name});
-    unless ($primary) {
-      my $errmessage = sprintf('cannot find general "%s"', $hashObject->{name});
-      push @errors, $errmessage;
-      $job->run_fail(@errors);
-    }
-
     my $covenant =
-      Game::EvonyTKR::Model::Covenant->from_hash($hashObject, $primary);
+      Game::EvonyTKR::Model::Covenant->from_hash($hashObject);
     unless ($covenant) {
       my $errmessage = sprintf('failed to create covenant from %s',
         Data::Printer::np($hashObject, multiline => 0));
