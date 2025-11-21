@@ -1,4 +1,6 @@
 #!/bin/bash -x
+set -e
+set -o pipefail
 
 AWS_REGION='us-east-2';
 AWS_ACCOUNT_ID='699040795025';
@@ -12,6 +14,9 @@ BUILD_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 gsed -i -E "s/^(\s+)git-commit:.*/\1git-commit: ${GIT_COMMIT}/" ../../game-evony_t_k_r.yml ;
 gsed -i -E "s/^(\s+)build-time:.*/\1build-time: ${BUILD_TIME}/" ../../game-evony_t_k_r.yml ;
 
+# remove old build files that muck things up
+rm -f ../../*META*
+rm -f ../../MANIFEST
 
 # # Build your Mojolicious app image
 podman build --platform linux/arm64 -t evonytkrtips:latest ../../

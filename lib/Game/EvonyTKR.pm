@@ -18,7 +18,7 @@ package Game::EvonyTKR {
   use Mojo::File::Share qw(dist_dir );
   use Carp;
   use Env qw(DEPLOYMENT_TIME HOSTNAME IMAGE_TAG IMAGE_URI);
-  our $VERSION = 'v0.50.0';
+  our $VERSION = 'v0.50.1';
 
   sub startup ($self) {
 
