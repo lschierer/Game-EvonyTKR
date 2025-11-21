@@ -148,37 +148,33 @@ package Game::EvonyTKR::Log::Config {
     };
 
     sub logger ($class, $caller = undef) {
-      my $l4p = Log::Log4perl->get_logger($class);
-      $l4p->level(Log::Log4perl::Level::to_priority($logLevels->{$class}));
       state $I_Have_Init;
       $caller //= 'undef::package';
-      $l4p->debug(sprintf('in %s, $class is %s, $caller is %s', __PACKAGE__, $class, $caller));
 
+      # MUST initialize Log4perl BEFORE any logging calls
       unless (Log::Log4perl->initialized()) {
         $I_Have_Init = 1;
-        $l4p->info('l4p not yet initialized');
         my $config = __PACKAGE__->appender_setup();
         foreach my $package (keys %$logLevels) {
           my $level = $logLevels->{$package};
           $config .= "log4perl.logger.$package = $level\n";
         }
-
         Log::Log4perl->init(\$config);
       }
-      elsif(!$I_Have_Init) {
-        $l4p->info('forcing new l4p config');
+      elsif (!$I_Have_Init) {
         $I_Have_Init = 1;
-        # Force re-initialization to override any auto-config
+        # Force re-initialization to override any auto-config from another source
         foreach my $package (keys %$logLevels) {
           my $level = $logLevels->{$package};
           my $ll    = Log::Log4perl->get_logger($package);
           $ll->level(Log::Log4perl::Level::to_priority($level));
-          if($logLevels->{__PACKAGE__} eq 'DEBUG'){
-            say
-          }
-
         }
       }
+
+      # NOW safe to get loggers and log - Log4perl is initialized
+      my $l4p = Log::Log4perl->get_logger($class);
+      $l4p->level(Log::Log4perl::Level::to_priority($logLevels->{$class}));
+      $l4p->debug(sprintf('in %s, $class is %s, $caller is %s', __PACKAGE__, $class, $caller));
 
       my $cl = Log::Log4perl->get_logger($caller);
       $l4p->debug(sprintf(
