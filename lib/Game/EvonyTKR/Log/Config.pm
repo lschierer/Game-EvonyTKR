@@ -2,7 +2,7 @@ use v5.42.0;
 use utf8::all;
 
 package Game::EvonyTKR::Log::Config;
-use Mojo::Base 'Mojo::Log', -role, -signatures;
+use Mojo::Base  -role, -signatures;
 use Log::Log4perl;
 use Log::Log4perl::Level;
 require File::HomeDir::Tiny;
@@ -11,7 +11,7 @@ use Carp;
 
 
 has logger => sub ($self) {
-  my $ec = get_effective_caller($self);
+  my $ec = ref($self) ? ref($self) : $self;
   return __PACKAGE__->get_logger($ec);
 };
 
@@ -79,6 +79,7 @@ sub appender_setup {
       'Game::EvonyTKR::Controller::Generals'                       => 'DEBUG',
       'Game::EvonyTKR::Controller::Glossary'                       => 'WARN',
       'Game::EvonyTKR::Controller::Pairs'                          => 'WARN',
+      'Game::EvonyTKR::Controller::Root'                          => 'DEBUG',
       'Game::EvonyTKR::Controller::Role::AscendingAttributes'      => 'WARN',
       'Game::EvonyTKR::Controller::Role::Books'                    => 'WARN',
       'Game::EvonyTKR::Controller::Role::Generals'                 => 'WARN',
@@ -146,8 +147,8 @@ sub appender_setup {
       'Game::EvonyTKR::Model::Role::Book::Builtin'                 => 'WARN',
       'Game::EvonyTKR::Model::Role::Book::SkillBook'               => 'WARN',
       'Game::EvonyTKR::Model::Specialty'                           => 'WARN',
-      'Game::EvonyTKR::Plugins::Navigation'                        => 'DEBUG',
-      'Game::EvonyTKR::Plugins::StaticPages'                       => 'DEBUG',
+      'Game::EvonyTKR::Plugins::Navigation'                        => 'WARN',
+      'Game::EvonyTKR::Role::StaticPages'                          => 'DEBUG',
       'Game::EvonyTKR::Role::AutoTOJSON'                           => 'WARN',
       'Game::EvonyTKR::Role::BasicAttribute'                       => 'WARN',
       'Game::EvonyTKR::Role::BasicAttributes'                      => 'WARN',

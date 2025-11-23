@@ -185,24 +185,35 @@ package Game::EvonyTKR::Role::MarkdownRenderer {
 
   # Controller method: Render a markdown file as a page
   # This method expects $self to be a Mojolicious::Controller
-  sub render_markdown_page ($self, $file_path, $opts = {}) {
-    my $logger = $self->logger;
-    $opts //= {};
+  sub render_markdown_page ($self, $app, $file_path, $opts = {}) {
+
+    unless(defined($self->app)){
+      $self->logger->error('app is not defined in render_markdown_page');
+      return ;
+    }
 
     my $startstash = $self->stash();
     my @stashkeys  = keys %$startstash;
-    $logger->debug("stash at start of render_markdown_page has keys "
+    $self->logger->debug("stash at start of render_markdown_page has keys "
         . join(", ", @stashkeys));
 
-    unless ($file_path && $file_path->isa('Mojo::File')) {
-      $logger->error("file_path must be a 'Mojo::File' not "
+    unless ($file_path && ref($file_path) && blessed($file_path)) {
+      $self->logger->error("file_path must be a 'Mojo::File' not "
+          . (ref($file_path) || 'undefined'));
+      if(ref($file_path) eq 'HASH') {
+        $self->logger->debug('file path is ' . Data::Printer::np($file_path));
+      }
+      return $self->reply->not_found;
+    }
+    unless($file_path->isa('Mojo::File')){
+      $self->logger->error("file_path must be a 'Mojo::File' not "
           . (ref($file_path) || 'undefined'));
       return $self->reply->not_found;
     }
 
     my $parsedFile = $self->parse_markdown_frontmatter($file_path);
     unless ($parsedFile) {
-      $logger->error("error parsing front matter for $file_path");
+      $self->logger->error("error parsing front matter for $file_path");
       return $self->reply->not_found;
     }
 
@@ -220,25 +231,22 @@ package Game::EvonyTKR::Role::MarkdownRenderer {
     $layout =~ s/standard/default/;
     $self->stash(layout => $layout) unless exists $self->stash->{layout};
 
-    $logger->debug("layout is " . $self->stash('layout'));
+    $self->logger->debug("layout is " . $self->stash('layout'));
 
     # Use template from options, then stash, then default to 'markdown'
     my $template = $opts->{template} // $self->stash('template') // 'markdown';
-    $logger->debug("Using template: $template");
+    $self->logger->debug("Using template: $template");
 
-    # Debug template paths
-    $logger->debug(
-      "Template paths: " . join(", ", @{ $self->app->renderer->paths }));
-    $logger->debug("Looking for template: $template.html.ep");
+    $self->logger->debug("Looking for template: $template.html.ep");
 
     my $html_content = $self->convert_markdown($parsedFile->{content});
 
     # Temporary debug logging for images
     if ($html_content =~ /<img/) {
-      $logger->debug("Found img tags in HTML output");
+      $self->logger->debug("Found img tags in HTML output");
     }
     else {
-      $logger->debug(
+      $self->logger->debug(
         "No img tags found in HTML output. Raw content contains: "
           . (
           $parsedFile->{content} =~ /!\[.*?\]\(.*?\)/
@@ -250,7 +258,7 @@ package Game::EvonyTKR::Role::MarkdownRenderer {
 
     $html_content = $self->spectrum_formatting($html_content);
 
-    $logger->debug("html is now $html_content");
+    $self->logger->debug("html is now $html_content");
     # Add markdown content to stash but don't override existing content
     if (!exists $self->stash->{markdown_content}) {
       $self->stash(markdown_content => $html_content);
@@ -259,13 +267,13 @@ package Game::EvonyTKR::Role::MarkdownRenderer {
     # Use existing content if available, otherwise use markdown content
     my $content  = $self->stash('content') // $html_content;
     my $endstash = $self->stash();
-    $logger->debug("items type before render: "
+    $self->logger->debug("items type before render: "
         . (ref($endstash->{items}) || 'not a reference'));
     if (ref($endstash->{items}) eq 'HASH') {
-      $logger->debug(
+      $self->logger->debug(
         "items has " . scalar(keys %{ $endstash->{items} }) . " keys");
     }
-    $logger->debug("finally decided on template $template");
+    $self->logger->debug("finally decided on template $template");
     return $self->render(
       template => $template,
       layout   => $self->stash('layout'),

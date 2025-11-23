@@ -122,7 +122,7 @@ package Game::EvonyTKR::Controller::Covenants {
 
       $app->add_navigation_item({
         title => "Details for ${cn}",
-        path  => $path,
+        path  => sprintf('%s%s', $c->getBase(),$path),
         parent => $c->getBase(),
         order  => 40,
       });

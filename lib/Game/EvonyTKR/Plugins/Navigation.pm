@@ -21,7 +21,6 @@ package Game::EvonyTKR::Plugins::Navigation {
 
   sub register ($self, $app, $config = {}) {
     my $register_message = sprintf('Registering %s plugin; %s;  %s', __PACKAGE__, $self->debug_log_level(), $self->debug_log_category());
-    say $register_message;
     $self->logger->info($register_message);
 
     $app->helper(

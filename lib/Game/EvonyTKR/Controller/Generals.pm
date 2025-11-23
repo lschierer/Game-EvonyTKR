@@ -17,12 +17,12 @@ require Game::EvonyTKR::Service::Cache;
 
 require UUID;
 require Data::Printer;
-use namespace::clean;
+use namespace::autoclean;
 
 package Game::EvonyTKR::Controller::Generals {
   use Mojo::Base 'Game::EvonyTKR::Controller::ControllerBase';
-  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Generals', -role,
-    -signatures;
+  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Generals', -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::StaticPages', -role;
   use Mojo::IOLoop;
   use Mojo::Promise;
   use Mojo::JSON     qw(to_json encode_json);
@@ -75,6 +75,8 @@ package Game::EvonyTKR::Controller::Generals {
     $c->logger->debug(sprintf('%s calling setup_routes', __PACKAGE__));
     $c->setup_routes($app);
     $c->logger->debug(sprintf('%s register complete', __PACKAGE__));
+
+
   }
 
   sub setup_event_handlers ($c, $app) {
@@ -198,6 +200,8 @@ package Game::EvonyTKR::Controller::Generals {
       }
     }
     $c->setup_navigation($app);
+    $c->static_pages($app, $base);
+    $c->static_pages($app, $reference_base);
   }
 
   sub setup_navigation($c, $app) {
@@ -278,6 +282,7 @@ package Game::EvonyTKR::Controller::Generals {
       ->to(controller => 'Generals', action => 'show')
       ->name($grn);
 
+    $c->logger->debug(sprintf('building general routes, gr: "%s" for name "%s"', $gr, $name));
     $app->add_navigation_item({
       title  => "Details for $name",
       path   => $gr,
@@ -323,7 +328,7 @@ package Game::EvonyTKR::Controller::Generals {
       # Render with markdown
       $c->stash(template => '/generals/index');
 
-      return $c->render_markdown_page($markdown_path,
+      return $c->render_markdown_page($c->app, $markdown_path,
         { template => 'generals/index' });
     }
     else {
@@ -369,7 +374,7 @@ package Game::EvonyTKR::Controller::Generals {
     if (-f $markdown_path) {
       # Render with markdown
       $self->stash(template => "generals/uiTarget/index");
-      return $self->render_markdown_page($markdown_path,
+      return $self->render_markdown_page($self->app, $markdown_path,
         { template => "generals/uiTarget/index_with_file" });
     }
     else {
@@ -415,7 +420,7 @@ package Game::EvonyTKR::Controller::Generals {
       # Render with markdown
       $self->stash(
         template => "generals/uiTarget/buffActivation/index_with_file");
-      return $self->render_markdown_page($markdown_path,
+      return $self->render_markdown_page($self->app, $markdown_path,
         { template => "generals/uiTarget/buffActivation/index_with_file" });
     }
     else {
@@ -637,7 +642,7 @@ package Game::EvonyTKR::Controller::Generals {
 
     if (-f $markdown_path) {
       $c->logger->debug("Rendering from markdown index file");
-      return $c->render_markdown_page($markdown_path);
+      return $c->render_markdown_page($c->app, $markdown_path);
     }
     else {
       $c->logger->debug("Rendering without markdown file");
@@ -816,7 +821,7 @@ package Game::EvonyTKR::Controller::Generals {
     my @generals;
     my $valid = {};
     map { $valid->{ $_->{primary} } = 1 } @$selected;
-    
+
     foreach my $general (sort { $a->name cmp $b->name }
       values $c->get_generals()->%*) {
       if (scalar(@$selected) && exists $valid->{ $general->name }) {
@@ -830,7 +835,7 @@ package Game::EvonyTKR::Controller::Generals {
     my @job_ids;
     for my $index (0 .. $#generals) {
       my $general = $generals[$index];
-      
+
       my $jid = $c->app->minion->enqueue(
         summarize_general => [
           $general->name,
@@ -849,7 +854,7 @@ package Game::EvonyTKR::Controller::Generals {
           attempts => 2,
         }
       );
-      
+
       $c->logger->debug("Enqueued job $jid for $general->name");
       push @job_ids, $jid;
     }
@@ -859,13 +864,13 @@ package Game::EvonyTKR::Controller::Generals {
       my $promise = $c->app->minion->result_p($jid)->then(sub {
         return if !$c->tx || $c->tx->is_finished;
         my $result = shift;
-        
+
         if (defined($result) && ref($result) eq 'HASH') {
           my $general = $c->get_general($result->{general});
           my $buffKey = $generalType =~ s/_/ /r;
           $buffKey =~ s/(\w)(\w+) specialist/\U$1\L$2 \UT\Lroops/;
           $buffKey =~ s/Siege Troops/Siege Machines/;
-          
+
           my $row = {
             primary     => $general->to_hash,
             attackbuff  => $result->{buffs}->{$buffKey}{'Attack'},
@@ -885,7 +890,7 @@ package Game::EvonyTKR::Controller::Generals {
             siegedefensedebuff => $result->{debuffs}->{'Siege Machines'}{'Defense'},
             siegehpdebuff      => $result->{debuffs}->{'Siege Machines'}{'HP'},
           };
-          
+
           my $payload = encode_json({ runId => $run_id, data => $row });
           $c->write_sse({ type => 'row', text => $payload });
         }
@@ -895,14 +900,14 @@ package Game::EvonyTKR::Controller::Generals {
         $c->logger->error("Job $jid failed: " . Data::Printer::np($err));
         return undef;
       });
-      
+
       push @promises, $promise;
     }
 
     Mojo::Promise->all(@promises)->then(sub {
       $c->logger->debug("All jobs complete, sending complete event");
       return if !$c->tx || $c->tx->is_finished;
-      
+
       Mojo::IOLoop->timer(10 => sub {
         my $payload = encode_json({ runId => $run_id });
         $c->write_sse({ type => 'complete', text => $payload });

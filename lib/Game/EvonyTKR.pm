@@ -35,7 +35,7 @@ package Game::EvonyTKR {
     $app->log->info(sprintf('Mojolicious Logging initialized'));
 
     _init_core($app);    # runs in web *and* worker
-    _init_minion($app);
+    #_init_minion($app);
 
     # web-only: routes/UI and optional worker spawning
     $app->hook(
@@ -50,7 +50,7 @@ package Game::EvonyTKR {
             return unless _i_am_the_one_spawner($app);         # spawn once only
             return if _this_is_a_minion_process(); # don't spawn from minion cmd
 
-            _spawn_minion_workers($app);
+            #_spawn_minion_workers($app);
           }
         );
       }
@@ -89,10 +89,12 @@ package Game::EvonyTKR {
   }
 
   sub _init_core ($app) {
-    my $config  = $app->plugin('NotYAMLConfig' => { module => 'YAML::PP' });
     my $distDir = dist_dir('Game::EvonyTKR');
     my $mode    = $app->mode;
+    my $home = Mojo::Home->new->detect;
     Env::import();
+
+    my $config  = $app->plugin('NotYAMLConfig' => { module => 'YAML::PP' });
     $app->config(distDir        => $distDir);
     $app->config(APP_START_TIME => time());
     $app->config(
@@ -103,9 +105,8 @@ package Game::EvonyTKR {
         IMAGE_URI       => $IMAGE_URI,
       }
     );
-    my $home = Mojo::Home->new->detect;
+
     $app->secrets($config->{secrets});
-    # Logging setup
 
     foreach my $envkey (keys %{ $app->config->{'EvonyTKR-Environment'} }) {
       if (defined $envkey) {
@@ -142,7 +143,8 @@ package Game::EvonyTKR {
     my $db = $sqlite->db;
     $db->ping;
 
-# Run migrations/repair ONLY in the web parent (not in forked or exec'd workers)
+    # Run migrations/repair ONLY in the
+    # web parent (not in forked or exec'd workers)
     my $is_worker_child = $ENV{MINION_WORKER_CHILD};
     my $is_minion_cmd   = ($0 =~ /minion(?:\.pl)?$/i)
       || ($ENV{MOJO_COMMAND} && $ENV{MOJO_COMMAND} eq 'minion');
@@ -172,8 +174,6 @@ package Game::EvonyTKR {
       next if ($module eq 'Game::EvonyTKR::External::JobBase');
       $app->plugin($module);
     }
-
-
   }
 
   sub _init_web ($app) {
@@ -201,18 +201,23 @@ package Game::EvonyTKR {
     };
 
     my @controllerplugins = find_modules 'Game::EvonyTKR::Controller';
+    $app->logger->info(sprintf('found %s controller plugins', scalar(@controllerplugins)));
     foreach my $module (@controllerplugins) {
       if(my $e = load_class($module)){
         my $errmessage = sprintf('loading module "%s" failed: %s', $module, $e);
         print STDERR $errmessage;
         $app->log->error($errmessage);
         croak($errmessage);
+      }else {
+        next if($module eq 'Game::EvonyTKR::Controller::ControllerBase');
+        eval {
+          $app->plugin($module);
+          $app->logger->debug("loaded $module");
+        } or do {
+          $app->logger->error(sprintf('failed to load module %s: %s', $module, $@));
+        }
       }
     }
-
-    # Last the Static Pages
-    # Register last for lowest priority
-    $app->plugin('Game::EvonyTKR::Plugins::StaticPages');
 
     if ($app->mode eq 'development') {
       # start the web UI for debugging

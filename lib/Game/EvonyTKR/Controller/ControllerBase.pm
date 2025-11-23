@@ -11,7 +11,7 @@ use namespace::clean;
 package Game::EvonyTKR::Controller::ControllerBase {
   use Mojo::Base 'Mojolicious::Controller';
   use Mojo::Base 'Mojolicious::Plugin', -role, -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Log::Config', -role, -signatures;
+  use Mojo::Base 'Game::EvonyTKR::Log::Config', -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Common', -role;
   use Mojo::Base 'Game::EvonyTKR::Role::MarkdownRenderer', -role;
   require Mojo::File;
@@ -82,6 +82,7 @@ package Game::EvonyTKR::Controller::ControllerBase {
   }
 
   sub index($self) {
+    $self->logger->warn('using index from controller base');
     $self->stash(
       base     => $self->getBase(),
       layout   => 'default',
