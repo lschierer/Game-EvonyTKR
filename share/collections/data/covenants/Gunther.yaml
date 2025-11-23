@@ -14,7 +14,7 @@ levels:
         value:
           number: 5
           unit: percentage
-  - category: coperation
+  - category: cooperation
     buffs:
       - attribute: Defense
         passive: 0

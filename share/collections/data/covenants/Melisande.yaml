@@ -10,7 +10,7 @@ levels:
     value:
       number: 15
       unit: percentage
-  category: coperation
+  category: cooperation
 - buffs:
   - attribute: Attack
     passive: 0

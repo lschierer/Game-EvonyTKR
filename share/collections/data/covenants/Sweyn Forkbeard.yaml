@@ -50,7 +50,7 @@ levels:
     value:
       number: 5
       unit: percentage
-  category: coperation
+  category: cooperation
 - buffs:
   - attribute: Attack
     conditions:

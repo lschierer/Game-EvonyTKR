@@ -13,7 +13,7 @@ levels:
     value:
       number: 10
       unit: percentage
-  category: coperation
+  category: cooperation
 - buffs:
   - attribute: Marching Speed
     passive: 0
