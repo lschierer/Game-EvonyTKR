@@ -35,7 +35,7 @@ package Game::EvonyTKR {
     $app->log->info(sprintf('Mojolicious Logging initialized'));
 
     _init_core($app);    # runs in web *and* worker
-    #_init_minion($app);
+    _init_minion($app);
 
     # web-only: routes/UI and optional worker spawning
     $app->hook(
@@ -50,7 +50,7 @@ package Game::EvonyTKR {
             return unless _i_am_the_one_spawner($app);         # spawn once only
             return if _this_is_a_minion_process(); # don't spawn from minion cmd
 
-            #_spawn_minion_workers($app);
+            _spawn_minion_workers($app);
           }
         );
       }
