@@ -16,6 +16,7 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
   use Types::Common qw( t );
   use Carp;
   use File::FindLib 'lib';
+  use List::AllUtils qw(first any all none uniq);
   use overload
     '""'       => \&as_string,
     '.'        => \&concat,
@@ -26,7 +27,7 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
   field $bc = Game::EvonyTKR::Model::General::Conflict::Book->new();
 
   # Input parameters
-  field $general             : param;
+  field $general             : param //= undef;
   field $books               : param = [];
   field $covenant            : param;
   field $ascendingAttributes : param;
@@ -263,7 +264,7 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
     my $tt    = $troopType =~ s/ Troops$//r;    # Remove " Troops" suffix
     if ($attribute eq 'March Size') {
       my $MS =
-        List::AllUtils::first { $_->name =~ /March Size/ } values $books->%*;
+        first { $_->name =~ /March Size/ } values $books->%*;
       if (defined($MS)
         && $bc->is_general_and_book_compatible($general, $MS,
           { same_side => 1, })) {
@@ -277,7 +278,7 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
         $btt =~ s/(Ranged|Ground|Mounted)/$1 Troop/;
         $btt =~ s/Siege Machines/Siege Machine/;
         my $book =
-          List::AllUtils::first { $_->name =~ /Level 4 $btt $attribute$/ }
+          first { $_->name =~ /Level 4 $btt $attribute$/ }
         values $books->%*;
 
         if (
@@ -302,7 +303,7 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
         if ($troopType ne 'Overall') {
           my $btt = $tt =~ s/(Ranged|Ground|Mounted)/$1 Troop/r;
           $btt = $tt =~ s/Siege Machines/Siege Machine/r;
-          my $book = List::AllUtils::first {
+          my $book = first {
             $_->name =~ /Level 4 $btt $attribute  Against Monsters/
           }
           values $books->%*;
@@ -386,7 +387,7 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
     );
 
     # Ascending attribute buffs (primary only)
-    if ($isPrimary && $general->attributes) {
+    if ($isPrimary && $general->ascending) {
       $total += $self->summarize_ascendingAttributes_for_attribute(
         $attribute,        $summaryType, $buffConditions,
         $debuffConditions, $matching_type

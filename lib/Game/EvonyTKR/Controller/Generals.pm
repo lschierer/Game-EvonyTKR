@@ -803,180 +803,139 @@ package Game::EvonyTKR::Controller::Generals {
 
     $c->render_later;
     $c->write_sse;
-    $c->inactivity_timeout(300);
+    $c->inactivity_timeout(1200);
 
     my $generalType    = $route_meta->{generalType};
     my $buffActivation = $route_meta->{buffActivation};
     my $uiTarget       = $route_meta->{uiTarget};
-    my $rows;
-
-    my $typeMap = {
-      'Ground Specialists'  => 'ground_specialist',
-      'Ranged Specialists'  => 'ranged_specialist',
-      'Siege Specialists'   => 'siege_specialist',
-      'Mounted Specialists' => 'mounted_specialist',
-      'Wall Specialists'    => 'wall',
-    };
-
-    my @promises;
-    my @subs;
 
     my $validated_params = $c->validateSingleParams();
     $validated_params->{buffActivation} = $buffActivation;
     $validated_params->{route_meta}     = $route_meta;
-    $validated_params->{typeMap}        = $typeMap;
 
+    my @generals;
     my $valid = {};
-    map { $valid->{ $_->{primary} } => 1 } @$selected;
+    map { $valid->{ $_->{primary} } = 1 } @$selected;
+    
     foreach my $general (sort { $a->name cmp $b->name }
-      values $c->SUPER::get_shared_data('generals')->%*) {
-
+      values $c->get_generals()->%*) {
       if (scalar(@$selected) && exists $valid->{ $general->name }) {
-        push @$rows, $general;
+        push @generals, $general;
       }
       elsif (any { $_ eq $generalType } $general->type->@*) {
-        push @$rows, $general;
+        push @generals, $general;
       }
     }
 
-    my @batch_ranges;
-    my $index      = 0;
-    my $batch_size = 10;
-    my $maxIndex   = scalar(@$rows) - 1;
-
-    while ($index < $maxIndex) {
-      my $end = List::Util::min($index + $batch_size - 1, $maxIndex);
-      push @batch_ranges, [$index, $end];
-      $index = $end + 1;
+    my @job_ids;
+    for my $index (0 .. $#generals) {
+      my $general = $generals[$index];
+      
+      my $jid = $c->app->minion->enqueue(
+        summarize_general => [
+          $general->name,
+          1,  # isPrimary
+          $generalType,
+          $validated_params->{buffActivation},
+          $validated_params->{ascendingLevel},
+          $validated_params->{covenantLevel},
+          $validated_params->{specialties}->[0],
+          $validated_params->{specialties}->[1],
+          $validated_params->{specialties}->[2],
+          $validated_params->{specialties}->[3],
+          undef,  # books - will be computed
+        ] => {
+          delay    => ($index * 0.001) + rand(0.5),
+          attempts => 2,
+        }
+      );
+      
+      $c->logger->debug("Enqueued job $jid for $general->name");
+      push @job_ids, $jid;
     }
 
-    Mojo::Promise->map(
-      { concurrency => $max_concurrency }
-      ,    # This replaces your unlimited spawning
-      sub {
-        my ($start, $end) = @{ $_[0] };    # Current batch range
-        $c->logger->debug("processing $start to $end");
+    my @promises;
+    foreach my $jid (@job_ids) {
+      my $promise = $c->app->minion->result_p($jid)->then(sub {
+        return if !$c->tx || $c->tx->is_finished;
+        my $result = shift;
+        
+        if (defined($result) && ref($result) eq 'HASH') {
+          my $general = $c->get_general($result->{general});
+          my $buffKey = $generalType =~ s/_/ /r;
+          $buffKey =~ s/(\w)(\w+) specialist/\U$1\L$2 \UT\Lroops/;
+          $buffKey =~ s/Siege Troops/Siege Machines/;
+          
+          my $row = {
+            primary     => $general->to_hash,
+            attackbuff  => $result->{buffs}->{$buffKey}{'Attack'},
+            defensebuff => $result->{buffs}->{$buffKey}{'Defense'},
+            hpbuff      => $result->{buffs}->{$buffKey}{'HP'},
+            marchbuff   => $result->{buffs}->{$buffKey}{'March Size'},
+            groundattackdebuff  => $result->{debuffs}->{'Ground Troops'}{'Attack'},
+            grounddefensedebuff => $result->{debuffs}->{'Ground Troops'}{'Defense'},
+            groundhpdebuff      => $result->{debuffs}->{'Ground Troops'}{'HP'},
+            mountedattackdebuff  => $result->{debuffs}->{'Mounted Troops'}{'Attack'},
+            mounteddefensedebuff => $result->{debuffs}->{'Mounted Troops'}{'Defense'},
+            mountedhpdebuff      => $result->{debuffs}->{'Mounted Troops'}{'HP'},
+            rangedattackdebuff  => $result->{debuffs}->{'Ranged Troops'}{'Attack'},
+            rangeddefensedebuff => $result->{debuffs}->{'Ranged Troops'}{'Defense'},
+            rangedhpdebuff      => $result->{debuffs}->{'Ranged Troops'}{'HP'},
+            siegeattackdebuff  => $result->{debuffs}->{'Siege Machines'}{'Attack'},
+            siegedefensedebuff => $result->{debuffs}->{'Siege Machines'}{'Defense'},
+            siegehpdebuff      => $result->{debuffs}->{'Siege Machines'}{'HP'},
+          };
+          
+          my $payload = encode_json({ runId => $run_id, data => $row });
+          $c->write_sse({ type => 'row', text => $payload });
+        }
+        return $result;
+      })->catch(sub {
+        my $err = shift;
+        $c->logger->error("Job $jid failed: " . Data::Printer::np($err));
+        return undef;
+      });
+      
+      push @promises, $promise;
+    }
 
-        my $subprocess = Mojo::IOLoop::Subprocess->new;
-        $subprocess->on(
-          progress => sub ($subprocess, @data) {
-            my ($result) = @data;
-            if (!$c->tx || $c->tx->is_finished) {
-              $c->logger->info(
-                "transaction finished before write_sse called for $result");
-              return;
-            }
-            $c->logger->debug("progress event detected");
-            $c->write_sse({ type => 'row', text => $result });
-          }
-        );
-
-        return $subprocess->run_p(sub {
-          $c->logger->debug("sub process for index $start to $end");
-          for my $i ($start .. $end) {
-            my $general = $rows->[$i];
-            $c->logger->debug(
-              sprintf('processing general %s', $general->name,));
-            my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
-              general => $general,
-              books   =>
-                $c->app->get_root_manager()->bookManager->get_all_books(),
-              covenant => $c->app->get_root_manager()
-                ->covenantManager->getCovenant($general->name),
-              ascendingAttributes => $c->app->get_root_manager()
-                ->ascendingAttributesManager->getAscendingAttributes(
-                $general->name
-                ),
-              isPrimary      => $validated_params->{isPrimary},
-              targetType     => $validated_params->{targetType},
-              activationType => $validated_params->{buffActivation},
-              ascendingLevel => $validated_params->{ascendingLevel},
-              covenantLevel  => $validated_params->{covenantLevel},
-              specialty1     => $validated_params->{specialties}->[0],
-              specialty2     => $validated_params->{specialties}->[1],
-              specialty3     => $validated_params->{specialties}->[2],
-              specialty4     => $validated_params->{specialties}->[3],
-            );
-            # Do all the heavy computation here
-            $summarizer->updateBuffs();
-            $summarizer->updateDebuffs();
-
-            my $buffKey =
-              $validated_params->{route_meta}->{generalType} =~ s/_/ /r;
-            $buffKey =~ s/(\w)(\w+) specialist/\U$1\L$2 \UT\Lroops/;
-            $buffKey =~ s/Siege Troops/Siege Machines/;
-            $c->logger->debug("buffKey is $buffKey");
-
-            # build the row payload
-            my $row = {
-              primary     => $general->to_hash,
-              attackbuff  => $summarizer->buffValues->{$buffKey}{'Attack'},
-              defensebuff => $summarizer->buffValues->{$buffKey}{'Defense'},
-              hpbuff      => $summarizer->buffValues->{$buffKey}{'HP'},
-              marchbuff   => $summarizer->buffValues->{$buffKey}{'March Size'},
-              groundattackdebuff =>
-                $summarizer->debuffValues->{'Ground Troops'}{'Attack'},
-              grounddefensedebuff =>
-                $summarizer->debuffValues->{'Ground Troops'}{'Defense'},
-              groundhpdebuff =>
-                $summarizer->debuffValues->{'Ground Troops'}{'HP'},
-              mountedattackdebuff =>
-                $summarizer->debuffValues->{'Mounted Troops'}{'Attack'},
-              mounteddefensedebuff =>
-                $summarizer->debuffValues->{'Mounted Troops'}{'Defense'},
-              mountedhpdebuff =>
-                $summarizer->debuffValues->{'Mounted Troops'}{'HP'},
-              rangedattackdebuff =>
-                $summarizer->debuffValues->{'Ranged Troops'}{'Attack'},
-              rangeddefensedebuff =>
-                $summarizer->debuffValues->{'Ranged Troops'}{'Defense'},
-              rangedhpdebuff =>
-                $summarizer->debuffValues->{'Ranged Troops'}{'HP'},
-              siegeattackdebuff =>
-                $summarizer->debuffValues->{'Siege Machines'}{'Attack'},
-              siegedefensedebuff =>
-                $summarizer->debuffValues->{'Siege Machines'}{'Defense'},
-              siegehpdebuff =>
-                $summarizer->debuffValues->{'Siege Machines'}{'HP'},
-            };
-
-            # one JSON object per message; include runId inside the data payload
-            my $json =
-              JSON::PP->new->utf8(0)->allow_blessed->convert_blessed->canonical;
-
-            my $payload = $json->encode({ runId => 0+ $run_id, data => $row });
-            $c->logger->debug(sprintf(
-              'row is %s, json is %s',
-              Data::Printer::np($row, multiline => 0), $payload,
-            ));
-            my $result = encode_base64($payload);
-            $subprocess->progress($result);
-          }
-
-        })->catch(sub {
-          my $err = shift;
-          $c->logger->error(sprintf(
-            'error in promise for subloop %s to %s : "%s". ',
-            $start, $end, $err ? $err : 'Unknown'
-          ));
-          return undef;    # Return something so map can continue
-        });
-        ;                  # Same as before
-      },
-      @batch_ranges        # Process each batch range
-    )->then(sub {
-      my $payload = encode_json({ runId => $run_id });
-      $c->write_sse({ type => 'complete', text => $payload });
+    Mojo::Promise->all(@promises)->then(sub {
+      $c->logger->debug("All jobs complete, sending complete event");
+      return if !$c->tx || $c->tx->is_finished;
+      
+      Mojo::IOLoop->timer(10 => sub {
+        my $payload = encode_json({ runId => $run_id });
+        $c->write_sse({ type => 'complete', text => $payload });
+      });
     })->catch(sub {
-      $c->logger->error('Overall map operation failed');
+      $c->logger->error("Some jobs failed in batch");
       return undef;
     });
 
-    # If the browser closes, remove the stored session
     $c->on(
       finish => sub {
-
-        $_->kill('TERM') for @subs;
+        $c->logger->debug("Client disconnected, canceling " . scalar(@job_ids) . " jobs");
+        foreach my $jid (@job_ids) {
+          my $job = $c->app->minion->job($jid);
+          if ($job) {
+            my $info = $job->info;
+            next unless $info;
+            my $state = $info->{state};
+            if ($state eq 'inactive') {
+              $job->remove;
+              $c->logger->debug("Removed inactive job $jid");
+            }
+            elsif ($state eq 'active' && $info->{pid}) {
+              eval { $job->kill(); };
+              if ($@) {
+                $c->logger->debug("Failed to kill job $jid: $@");
+              }
+              else {
+                $c->logger->debug("Killed active job $jid");
+              }
+            }
+          }
+        }
         if (exists $session_store->{$session_id}) {
           delete $session_store->{$session_id};
         }
@@ -997,7 +956,6 @@ package Game::EvonyTKR::Controller::Generals {
     push @specialties, $c->param('specialty4') // 'gold';
 
     if ($isPrimary) {
-      # Validate ascending level
       if (!$data_model->checkAscendingLevel($ascendingLevel)) {
         $c->logger->warn(
           "Invalid ascendingLevel: $ascendingLevel, using default 'red5'");
@@ -1019,6 +977,7 @@ package Game::EvonyTKR::Controller::Generals {
     @specialties = $data_model->normalizeSpecialtyLevels(@specialties);
 
     return {
+      isPrimary      => $isPrimary,
       ascendingLevel => $ascendingLevel,
       covenantLevel  => $covenantLevel,
       specialties    => \@specialties,

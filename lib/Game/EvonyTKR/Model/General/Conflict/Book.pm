@@ -118,7 +118,7 @@ class Game::EvonyTKR::Model::General::Conflict::Book :
   method _score_book_hit ($ge, $be, $same_side, $general_name = '') {
     my $attr = $be->{attributes}[0] // '';
     return 2
-      unless List::AllUtils::any { $_ eq $attr } @{ $ge->{attributes} // [] };
+      unless any { $_ eq $attr } @{ $ge->{attributes} // [] };
     return 2
       unless $self->_intersect($ge->{targetedTypes}, $be->{targetedTypes});
 

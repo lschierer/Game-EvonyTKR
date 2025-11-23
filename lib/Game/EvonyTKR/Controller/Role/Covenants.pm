@@ -8,6 +8,7 @@ require List::UtilsBy;
 package Game::EvonyTKR::Controller::Role::Covenants {
   use Mojo::Base -role, -signatures;
   use List::UtilsBy qw(uniq_by);
+  use List::AllUtils qw(uniq none all);
   use Carp;
 
   has 'covenant_cache' => sub ($self) {
@@ -126,7 +127,7 @@ package Game::EvonyTKR::Controller::Role::Covenants {
     my @files =
       $covenantsDir->list->grep(sub { $_ =~ /\.ya?ml$/ && -f -r $_ })
       ->sort->map(sub { return $_->basename(@suffixlist) })->each;
-    my @returnlist = List::AllUtils::uniq map { lc($self->normalize($_)) } @files;
+    my @returnlist = uniq map { lc($self->normalize($_)) } @files;
     return \@returnlist;
   }
 }

@@ -56,8 +56,8 @@ package Game::EvonyTKR::Model::General::Pair {
 
   sub to_wire_hash ($self) {
     my $h = {
-      primary   => $self->primary->name,
-      secondary => $self->secondary->name,
+      primary   => { name => $self->primary->name },
+      secondary => { name => $self->secondary->name },
       type      => $self->type,
     };
     return $h;
@@ -65,7 +65,15 @@ package Game::EvonyTKR::Model::General::Pair {
 
   sub from_wire_hash ($class, $h) {
     my $logger = Game::EvonyTKR::Log::Config->logger();
-    unless (exists($h->{primary}) && length($h->{primary})) {
+    
+    my $primary_name = ref($h->{primary}) eq 'HASH' 
+      ? $h->{primary}->{name} 
+      : $h->{primary};
+    my $secondary_name = ref($h->{secondary}) eq 'HASH'
+      ? $h->{secondary}->{name}
+      : $h->{secondary};
+    
+    unless (defined($primary_name) && length($primary_name)) {
       $logger->error('hash object must contain a primary with a name in it.');
       return;
     }
@@ -84,19 +92,19 @@ package Game::EvonyTKR::Model::General::Pair {
         return;
       };
     }
-    my $primary = $general_helper->get_general($h->{primary});
+    my $primary = $general_helper->get_general($primary_name);
     unless ($primary) {
       $logger->error(
         sprintf('cannot retrieve general for %s when creating a pair.',
-          $h->{primary})
+          $primary_name)
       );
       return;
     }
-    my $secondary = $general_helper->get_general($h->{secondary});
+    my $secondary = $general_helper->get_general($secondary_name);
     unless ($secondary) {
       $logger->error(
         sprintf('cannot retrieve general for %s when creating a pair.',
-          $h->{secondary})
+          $secondary_name)
       );
       return;
     }

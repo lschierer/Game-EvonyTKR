@@ -33,6 +33,7 @@ package Game::EvonyTKR::External::Prebuild {
   use POSIX 'strftime';
   use Time::HiRes 'time';
   use experimental qw(class);
+  use List::AllUtils qw(any all none uniq);
   use Carp;
 
   state $OnlyOnePrebuild = 0;
@@ -147,7 +148,7 @@ package Game::EvonyTKR::External::Prebuild {
       $prereqs->{$key} = $args->{$key};
     }
 
-    if (List::AllUtils::none { $_ == 0 } values $prereqs->%*) {
+    if (none { $_ == 0 } values $prereqs->%*) {
       return 1;
     }
     $plugin->logger->debug(

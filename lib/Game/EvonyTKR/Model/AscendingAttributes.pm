@@ -4,7 +4,7 @@ use utf8::all;
 use File::FindLib 'lib';
 require JSON::PP;
 require Data::Printer;
-
+require List::AllUtils;
 require Game::EvonyTKR::Model::Buff;
 require Game::EvonyTKR::Model::Buff::Value;
 require Game::EvonyTKR::Model::Buff::Matcher;
@@ -18,6 +18,7 @@ package Game::EvonyTKR::Model::AscendingAttributes {
   use Log::Any qw($log);
   use Carp;
   use Data::Printer;
+  use List::AllUtils qw (none);
   use UUID       qw(uuid5);
   use Hash::Util qw(lock_keys);
   use namespace::autoclean;
@@ -190,7 +191,7 @@ package Game::EvonyTKR::Model::AscendingAttributes {
       $red = 0;
     }
     if (
-      List::AllUtils::none { $_ eq $level }
+      none { $_ eq $level }
       $self->AscendingAttributeLevelValues($red)
     ) {
       $self->logger->debug(

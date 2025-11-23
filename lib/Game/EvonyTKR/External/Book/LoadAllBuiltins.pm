@@ -10,6 +10,7 @@ package Game::EvonyTKR::External::Book::LoadAllBuiltins {
   use Mojo::Base 'Game::EvonyTKR::External::JobBase',       -signatures;
   use Mojo::Base 'Game::EvonyTKR::Controller::Role::Books', -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Common',            -role;
+  use List::AllUtils qw( any none uniq all );
   use Mojo::File;
   use experimental qw(class);
   use Carp;

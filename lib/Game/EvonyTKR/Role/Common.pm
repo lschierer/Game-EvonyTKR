@@ -15,6 +15,7 @@ package Game::EvonyTKR::Role::Common {
   use UUID               qw(uuid5);
   use Unicode::CaseFold  qw(fc);
   use Unicode::Normalize qw(NFKD);
+  use List::AllUtils qw(min);
 
   sub normalize ($self, $name) {
     my $dn = Encode::is_utf8($name) ? $name : Encode::decode_utf8($name);
@@ -123,7 +124,7 @@ package Game::EvonyTKR::Role::Common {
       if ($prereqPendingCount > 0) {
         if ($is_minion_job) {
           $self->note("${prereq}PendingCount" => $prereqPendingCount);
-          my $delay = List::AllUtils::min(2 * $prereqPendingCount, 30);
+          my $delay = min(2 * $prereqPendingCount, 30);
           $self->logger->debug(sprintf(
             'Retrying with delay %s due to pending %s: %s',
             $delay, $prereq, $prereqPendingCount

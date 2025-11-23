@@ -19,7 +19,7 @@ package Game::EvonyTKR::Model::Covenant {
     -signatures;
   use builtin qw(indexed);
   use File::FindLib 'lib';
-  use List::AllUtils qw( any none );
+  use List::AllUtils qw(first any all none uniq);
   use Hash::Util     qw(lock_keys);
   use Log::Any       qw($log);
   use Carp;
@@ -137,7 +137,7 @@ package Game::EvonyTKR::Model::Covenant {
     }
 
     if (
-      List::AllUtils::none { $level =~ /$_/i }
+      none { $level =~ /$_/i }
       $self->CovenantCategoryValues->@*
     ) {
       $self->logger->error(sprintf(
