@@ -7,6 +7,7 @@ package Game::EvonyTKR::External::General::Pair::ReduceCoordinator {
   use Mojo::Base 'Game::EvonyTKR::Controller::Role::Pairs', -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants', -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Logger',                      -role;
+  use List::AllUtils qw(uniq none all any);
 
   sub register ($taskClass, $app, $conf = {}) {
     $taskClass->SUPER::register($app, $conf);
@@ -139,7 +140,7 @@ package Game::EvonyTKR::External::General::Pair::ReduceCoordinator {
       foreach my $type (keys %{ $batch_results->{groups_by_conflict_type} }) {
         $merged_groups_by_conflict_type->{$type} //= [];
         $merged_groups_by_conflict_type->{$type} = [
-          List::AllUtils::uniq(
+          uniq(
             $merged_groups_by_conflict_type->{$type}->@*,
             $batch_results->{groups_by_conflict_type}->{$type}->@*
           )

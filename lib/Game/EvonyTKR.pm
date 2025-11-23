@@ -162,7 +162,20 @@ package Game::EvonyTKR {
       $app->minion->remove_after(7200);
     }
 
-    $app->plugin('Game::EvonyTKR::External::Prebuild');
+    my @task_plugins = find_modules 'Game::EvonyTKR::External', {recursive => 1};
+    foreach my $module (@task_plugins) {
+      if(my $e = load_class($module)){
+        my $errmessage = sprintf('loading module "%s" failed: %s', $module, $e);
+        print STDERR $errmessage;
+        $app->log->error($errmessage);
+        croak($errmessage);
+      }
+      next if ($module eq 'Game::EvonyTKR::External::Common');
+      next if ($module eq 'Game::EvonyTKR::External::JobBase');
+      $app->plugin($module);
+    }
+
+
   }
 
   sub _init_web ($app) {
@@ -191,14 +204,11 @@ package Game::EvonyTKR {
 
     my @controllerplugins = find_modules 'Game::EvonyTKR::Controller';
     foreach my $module (@controllerplugins) {
-      eval {
-        $app->log->debug("loading module $module");
-        load_class $module;
-        $app->plugin($module);
-      };
-      if ($@) {
-        print STDERR "Error caught loading module: $@";
-        $app->log->logcroak("loading module '$module' failed: $@");
+      if(my $e = load_class($module)){
+        my $errmessage = sprintf('loading module "%s" failed: %s', $module, $e);
+        print STDERR $errmessage;
+        $app->log->error($errmessage);
+        croak($errmessage);
       }
     }
 

@@ -7,7 +7,7 @@ require Game::EvonyTKR::Model::General::Conflict;
 
 package Game::EvonyTKR::Controller::Role::Pairs {
   use Mojo::Base -role, -signatures;
-  use List::AllUtils qw(uniq);
+  use List::AllUtils qw(uniq none all any);
   use List::UtilsBy;
   use Carp;
 
@@ -207,7 +207,7 @@ package Game::EvonyTKR::Controller::Role::Pairs {
         foreach my $wire_pair (@{ $pairs_by_type->{$type} }) {
           my $wpk = $self->wire_pair_to_key($wire_pair);
           if (
-            !$type_starts_at_zero && List::AllUtils::any {
+            !$type_starts_at_zero && any {
               $wpk eq $self->wire_pair_to_key($_->to_wire_hash())
             }
             $inflated_pairs->{$type}->@*
@@ -243,7 +243,7 @@ package Game::EvonyTKR::Controller::Role::Pairs {
         next;
       }
       $list = [
-        List::AllUtils::uniq(
+        uniq(
           $list->@*,
           map { $self->wire_pair_to_key($_) } $pairs_by_type->{$type}->@*
         )

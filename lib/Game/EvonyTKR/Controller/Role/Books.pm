@@ -8,7 +8,7 @@ require Game::EvonyTKR::Model::Factory;
 
 package Game::EvonyTKR::Controller::Role::Books {
   use Mojo::Base -role,                          -signatures;
-  use List::AllUtils qw(uniq);
+  use List::AllUtils qw( any none uniq all );
   use List::UtilsBy;
   use Log::Any;
   use Carp;
@@ -117,7 +117,7 @@ package Game::EvonyTKR::Controller::Role::Books {
     $gbDir->list->grep(sub { $_ =~ /\.ya?ml$/ && -f -r $_ })->sort->map(sub {
       my $ib = $_->basename(@suffixlist);
       $ib = lc($self->normalize($ib));
-      if (List::AllUtils::none { $_ eq $ib } $returnlist->@*) {
+      if (none { $_ eq $ib } $returnlist->@*) {
         push @$returnlist, $ib;
       }
     });
@@ -148,7 +148,7 @@ package Game::EvonyTKR::Controller::Role::Books {
     $gbDir->list->grep(sub { $_ =~ /\.ya?ml$/ && -f -r $_ })->sort->map(sub {
       my $ib = $_->basename(@suffixlist);
       $ib = lc($self->normalize($ib));
-      if (List::AllUtils::none { $_ eq $ib } $returnlist->@*) {
+      if (none { $_ eq $ib } $returnlist->@*) {
         $logger->debug(sprintf('adding "%s" to the list of builtins', $ib));
         push @$returnlist, $ib;
       }

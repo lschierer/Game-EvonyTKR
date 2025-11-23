@@ -228,7 +228,7 @@ class Game::EvonyTKR::Model::General::Conflict :
     my $is_stackable = 0;
     if ($book_has_stackable_text) {
       my $conditions            = $buff->conditions || [];
-      my $has_dragon_beast_cond = List::AllUtils::any {
+      my $has_dragon_beast_cond = any {
         $_ =~ /brings.*(?:dragon|spiritual beast)/i
       }
       @$conditions;
@@ -312,10 +312,10 @@ class Game::EvonyTKR::Model::General::Conflict :
       name     => $general->name,
       role     => $role,
       types    => $general->type // [],
-      is_mayor => List::AllUtils::any { $_ eq 'mayor' }
+      is_mayor => any { $_ eq 'mayor' }
       @{ $general->type // [] },
-      is_wall => List::AllUtils::any { $_ eq 'wall' } @{ $general->type // [] },
-      is_officer => List::AllUtils::any { $_ eq 'officer' }
+      is_wall => any { $_ eq 'wall' } @{ $general->type // [] },
+      is_officer => any { $_ eq 'officer' }
       @{ $general->type // [] },
       meta_buffs => [],    # will push entries
     };
@@ -571,8 +571,8 @@ class Game::EvonyTKR::Model::General::Conflict :
                 my %gt = map { $_ => 1 } @{ $grp->{targetedTypes} // [] };
 
                 my $attr_overlap =
-                  List::AllUtils::any { $ga{$_} } @{ $sng->{attributes} // [] };
-                my $troop_overlap = List::AllUtils::any { $gt{$_} }
+                  any { $ga{$_} } @{ $sng->{attributes} // [] };
+                my $troop_overlap = any { $gt{$_} }
                 @{ $sng->{targetedTypes} // [] };
                 next unless $attr_overlap && $troop_overlap;
 
@@ -807,7 +807,7 @@ class Game::EvonyTKR::Model::General::Conflict :
 
     foreach my $ct (keys $ngbct->%*) {
       my $all = [
-        List::AllUtils::uniq(
+        uniq(
           $ngbct->{$ct}->@*, $groups_by_conflict_type->{$ct}->@*
         )
       ];

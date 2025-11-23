@@ -4,121 +4,32 @@ use utf8::all;
 use File::FindLib 'lib';
 require Data::Printer;
 
-require Game::EvonyTKR::Util::Buff::Summarizer;
+require Game::EvonyTKR::Model::Buff::Summarizer;
 
 package Game::EvonyTKR::External::General::Pair::Summarizer {
   use Mojo::Base 'Game::EvonyTKR::External::JobBase',              -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Role::Logger',                   -role;
   use Mojo::Base 'Game::EvonyTKR::Controller::Role::Pairs',        -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Constants::Books', -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants', -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants', -role;
   use experimental qw(class);
+  use List::AllUtils qw(any all none uniq);
   use Const::Fast;
   use Carp;
 
   state $generalCache;
   state $pair;
 
-  has 'BestSkillBooks' => sub {
-    const my $tmp => {
-      ground_specialist => {
-        default => {
-          'Level 4 Ground Troop Attack'       => 1,
-          'Level 4 March Size'                => 2,
-          'Level 4 Ground Troop HP'           => 3,
-          'Level 4 Ground Troop Defense'      => 4,
-          'Level 4 Siege Machine Range Bonus' => 5,
-          'Level 4 Ranged Troop Range Bonus'  => 6,
-          'Level 4 Ranged Troop Attack'       => 7,
-          'Level 4 Ranged Troop HP'           => 8,
-          'Level 4 Ranged Troop Defense'      => 9,
-          'Level 4 Siege Machine Attack'      => 10,
-        },
-        PvM => {
-          'Level 4 Ground Troop Attack Against Monster'  => 1,
-          'Level 4 Ground Troop Attack'                  => 2,
-          'Level 4 March Size'                           => 3,
-          'Level 4 Ground Troop HP Against Monster'      => 4,
-          'Level 4 Ground Troop HP'                      => 5,
-          'Level 4 Ground Troop Defense Against Monster' => 6,
-          'Level 4 Ground Troop Defense'                 => 7,
-          'Level 4 Luck'                                 => 8,
-        }
-      },
-      mounted_specialist => {
-        default => {
-          'Level 4 Mounted Troop Attack'      => 1,
-          'Level 4 March Size'                => 2,
-          'Level 4 Mounted Troop HP'          => 3,
-          'Level 4 Mounted Troop Defense'     => 4,
-          'Level 4 Siege Machine Range Bonus' => 5,
-          'Level 4 Ranged Troop Range Bonus'  => 6,
-          'Level 4 Ground Troop Attack'       => 7,
-          'Level 4 Ground Troop HP'           => 8,
-          'Level 4 Ground Troop Defense'      => 9,
-          'Level 4 Siege Machine Attack'      => 10,
-        },
-        PvM => {
-          'Level 4 Mounted Troop Attack Against Monster'  => 1,
-          'Level 4 Mounted Troop Attack'                  => 2,
-          'Level 4 March Size'                            => 3,
-          'Level 4 Mounted Troop HP Against Monster'      => 4,
-          'Level 4 Mounted Troop HP'                      => 5,
-          'Level 4 Mounted Troop Defense Against Monster' => 6,
-          'Level 4 Mounted Troop Defense'                 => 7,
-          'Level 4 Luck'                                  => 8,
-        },
-      },
-      ranged_specialist => {
-        default => {
-          'Level 4 Ranged Troop Attack'       => 1,
-          'Level 4 March Size'                => 2,
-          'Level 4 Ranged Troop HP'           => 3,
-          'Level 4 Ranged Troop Defense'      => 4,
-          'Level 4 Ranged Troop Range Bonus'  => 5,
-          'Level 4 Siege Machine Range Bonus' => 6,
-          'Level 4 Mounted Troop Attack'      => 7,
-          'Level 4 Mounted Troop HP'          => 8,
-          'Level 4 Mounted Troop Defense'     => 9,
-          'Level 4 Siege Machine Attack'      => 10,
-        },
-        PvM => {
-          'Level 4 Ranged Troop Attack Against Monster'  => 1,
-          'Level 4 Ranged Troop Attack'                  => 2,
-          'Level 4 March Size'                           => 3,
-          'Level 4 Ranged Troop Range Bonus'             => 4,
-          'Level 4 Ranged Troop HP Against Monster'      => 5,
-          'Level 4 Ranged Troop HP'                      => 6,
-          'Level 4 Ranged Troop Defense Against Monster' => 7,
-          'Level 4 Ranged Troop Defense'                 => 8,
-          'Level 4 Luck'                                 => 9,
-        },
-      },
-      siege_specialist => {
-        default => {
-          'Level 4 Siege Machine Attack'      => 1,
-          'Level 4 March Size'                => 2,
-          'Level 4 Siege Machine HP'          => 3,
-          'Level 4 Siege Machine Defense'     => 4,
-          'Level 4 Siege Machine Range Bonus' => 5,
-          'Level 4 Ranged Troop Range Bonus'  => 6,
-          'Level 4 Ranged Troop Attack'       => 7,
-          'Level 4 Ranged Troop HP'           => 8,
-          'Level 4 Ranged Troop Defense'      => 9,
-          'Level 4 Mounted Troop Attack'      => 10,
-        },
-        # DO NOT USE SIEGE AGAINST MONSTERS!!!
-        PvM => {
-          'Level 4 March Size'                => 1,
-          'Level 4 Siege Machine Attack'      => 2,
-          'Level 4 Siege Machine Range Bonus' => 3,
-          'Level 4 Siege Machine HP'          => 4,
-          'Level 4 Siege Machine Defense'     => 5,
-          'Level 4 Luck'                      => 6,
-        }
-      }
-    };
-    return $tmp;
+  has 'ypp' => sub {
+    state $yp //= YAML::PP->new(
+      schema       => [qw/ + Perl /],
+      yaml_version => ['1.2', '1.1']);
+    return $yp;
+  };
+
+  has 'collection_dir' => sub {
+    my $home = Mojo::Home->new->detect('Game::EvonyTKR');
+    return $home->child('share/collections/data')
   };
 
   # call the first parameter a taskClass here
@@ -183,9 +94,9 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
         );
     }
     unless (defined(
-           activationType
+           $activationType
         && length($activationType)
-        && List::AllUtils::any { $activationType eq $_ }
+        && any { $activationType eq $_ }
       $job->AllowedBuffActivationValues->@*
     )) {
       push @errmessage,
@@ -226,22 +137,21 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
     my $key = $activationType eq 'PvM' ? 'PvM' : 'default';
 
     my @books;
-    my $generic_dir       = $collection_dir->child('generic books');
+    my $generic_dir       = $job->collection_dir->child('generic books');
     my @sorted_book_names = sort {
-      $BestSkillBooks->{$targetType}->{$key}->{$a}
-        <=> $BestSkillBooks->{$targetType}->{$key}->{$b}
-    } keys %{ $BestSkillBooks->{$targetType}->{$key} };
+      $job->BestSkillBooks->{$targetType}->{$key}->{$a}
+        <=> $job->BestSkillBooks->{$targetType}->{$key}->{$b}
+    } keys %{ $job->BestSkillBooks->{$targetType}->{$key} };
 
     foreach my $book_name (@sorted_book_names) {
       my ($book_file) = $generic_dir->children(qr/\Q$book_name\E\.yaml/i);
       if (defined($book_file) && $book_file->is_file()) {
         my $data   = $book_file->slurp_utf8;
-        my $object = $ypp->load_string($data);
+        my $object = $job->ypp->load_string($data);
         my $book =
-          Game::EvonyTKR::Model::Book::SkillBook->from_hash($object,
-          $self->logger);
+          Game::EvonyTKR::Model::Book::SkillBook->from_hash($object,);
 
-        $self->logger->info(sprintf(
+        $job->logger->info(sprintf(
           'picked book %s for general %s', $book->name, $general->name
         ));
         push @books, $book;
@@ -249,7 +159,7 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
 
       }
       else {
-        $self->logger->warn("cannot find file for $book_name");
+        $job->logger->warn("cannot find file for $book_name");
         next;
       }
     }
@@ -258,17 +168,16 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
     foreach my $attr ('Attack', 'Defense', 'HP') {
       foreach my $tt ('Mounted Troop', 'Ranged Troop', 'Ground Troop',
         'Siege Machine') {
-        unless (List::AllUtils::any { $_->name =~ /$tt $attr/ } @books) {
+        unless (any { $_->name =~ /$tt $attr/ } @books) {
           my ($book_file) =
             $generic_dir->children(qr/\QLevel 4 $tt $attr\E\.yaml$/i);
           if ($book_file && $book_file->is_file()) {
             my $data   = $book_file->slurp_utf8;
-            my $object = $ypp->load_string($data);
+            my $object = $job->ypp->load_string($data);
             my $book =
-              Game::EvonyTKR::Model::Book::SkillBook->from_hash($object,
-              $self->logger);
+              Game::EvonyTKR::Model::Book::SkillBook->from_hash($object);
 
-            $self->logger->debug(sprintf(
+            $job->logger->debug(sprintf(
               'picked book %s for general %s',
               $book->name, $general->name
             ));
@@ -279,34 +188,31 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
     }
     return \@books;
     };
-
-  has 'summarize_primary' => sub ($job, $activationType, $targetType) {
-    my $general = $pair->primary;
-    my $bestBooks =
-      $self->load_best_skill_books($general1, $params->{targetType},
-      $opt->{activationType});
-
-    my $summarizer = Game::EvonyTKR::Util::Buff::Summarizer->new(
-      general             => $general,
-      books               => $bestBooks,
-      covenant            => undef,
-      ascendingAttributes => undef,
-      isPrimary           => 1,
-      targetType          => $targetType,
-      activationType      => $activationType,
-      ascendingLevel      => $ascendingLevel,
-      covenantLevel       => undef,
-      specialty1          => undef,
-      specialty2          => undef,
-      specialty3          => undef,
-      specialty4          => undef,
-    );
-    # Do all the heavy computation here
-    $bsum1->updateBuffs();
-    $bsum1->updateDebuffs();
-  };
-
 }
 
 1;
 __END__
+has 'summarize_primary' => sub ($job, $activationType, $targetType) {
+  my $general = $pair->primary;
+  my $bestBooks =
+    $job->load_best_skill_books($general, $targetType, $activationType);
+
+  my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
+    general             => $general,
+    books               => $bestBooks,
+    covenant            => undef,
+    ascendingAttributes => undef,
+    isPrimary           => 1,
+    targetType          => $targetType,
+    activationType      => $activationType,
+    ascendingLevel      => $ascendingLevel,
+    covenantLevel       => undef,
+    specialty1          => undef,
+    specialty2          => undef,
+    specialty3          => undef,
+    specialty4          => undef,
+  );
+  # Do all the heavy computation here
+  $bsum1->updateBuffs();
+  $bsum1->updateDebuffs();
+};
