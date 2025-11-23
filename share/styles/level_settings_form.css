@@ -3,12 +3,12 @@
     auto-fit,
     minmax(15em, 1fr)
   );
-  --spectrum-popover-height: 20em;
-  --spectrum-popover-width: 20em;
-  --spectrum-popover-background-color: var(--surface-1);
-  --spectrum-picker-button-icon-color: var(--text-1);
-  --spectrum-picker-button-border-color: var(--text-1);
-  --spectrum-menu-item-label-icon-color-default: var(
+  --mod-popover-height: 20em;
+  --mod-popover-width: 20em;
+  --mod-popover-background-color: var(--surface-1);
+  --mod-picker-button-icon-color: var(--text-1);
+  --mod-picker-button-border-color: var(--text-1);
+  --mod-menu-item-label-icon-color-default: var(
     --spectrum-positive-visual-color
   );
 }
