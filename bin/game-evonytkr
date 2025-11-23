@@ -7,13 +7,9 @@ use Mojo::Base -strict;
 use Mojo::File qw(curfile);
 use lib curfile->dirname->sibling('lib')->to_string;
 require Game::EvonyTKR;
-require Game::EvonyTKR::Log::Config;
 
 use Mojolicious::Commands;
 
-my $logger = Game::EvonyTKR::Log::Config->logger('Game::EvonyTKR');
-
-$logger->debug('calling start_app from ' . $$);
 # Start the app (or worker if we're a child)
 Mojolicious::Commands->start_app('Game::EvonyTKR');
 # ABSTRACT: command wrapper for the Game::EvonyTKR Mojolicious application

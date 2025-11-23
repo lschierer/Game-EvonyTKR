@@ -5,13 +5,19 @@ use File::FindLib 'lib';
 use Mojo::File;
 use Path::Iterator::Rule;
 require YAML::PP;
+require Game::EvonyTKR::Role::MarkdownRenderer;
 
 package Game::EvonyTKR::Plugins::StaticPages {
   use Mojo::Base 'Mojolicious::Plugin';
+  use Mojo::Base 'Game::EvonyTKR::Role::MarkdownRenderer', -role;
+  use Mojo::Base 'Game::EvonyTKR::Log::Config', -role;
   use Carp;
 
-  my $logger;
+
   my %static_routes;
+
+  # Provide logger() method for MarkdownRenderer role interdependency
+
 
   sub register ($self, $app, $config) {
     $logger = Log::Log4perl->get_logger(__PACKAGE__);
@@ -43,12 +49,12 @@ package Game::EvonyTKR::Plugins::StaticPages {
             }
 
           }
-          return $c->render_markdown_file($static_entry->{path});
+          return $c->render_markdown_page($static_entry->{path});
         }
       );
       $app->add_navigation_item({
         title => $static_entry->{file}->{title},
-        path  => $static_entry->{path},
+        path  => $static_entry->{route},  # Use URL route, not filesystem path
         order => $static_entry->{file}->{order},
       });
     }
@@ -57,7 +63,7 @@ package Game::EvonyTKR::Plugins::StaticPages {
 
   sub build_routes ($self, $app) {
     my $pages_dir =
-      Mojo::File::Share::dist_dir('App::Schierer::HPFan')->child('pages');
+      Mojo::File::Share::dist_dir('Game::EvonyTKR')->child('pages');
 
     my @added_routes;
 
@@ -71,7 +77,7 @@ package Game::EvonyTKR::Plugins::StaticPages {
       $logger->debug(
         "Considering static route: $route_path for file: $relative_path");
 
-      my $parsedFile = $app->parse_markdown_frontmatter($file_path);
+      my $parsedFile = $self->parse_markdown_frontmatter($file_path);
       if ($parsedFile) {
         my $normalized_route = lc($route_path);
         my $has_conflict     = 0;

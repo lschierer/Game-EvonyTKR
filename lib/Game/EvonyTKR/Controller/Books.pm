@@ -362,7 +362,7 @@ package Game::EvonyTKR::Controller::Books {
       # Render with markdown
       $self->stash(template => 'skill books/index');
 
-      return $self->render_markdown_file($markdown_path,
+      return $self->render_markdown_page($markdown_path,
         { template => 'skill books/index' });
     }
     else {

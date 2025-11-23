@@ -5,13 +5,15 @@ use File::FindLib 'lib';
 require Data::Printer;
 require Mojolicious::Controller;
 require Mojolicious::Plugin;
+require Game::EvonyTKR::Role::MarkdownRenderer;
 use namespace::clean;
 
 package Game::EvonyTKR::Controller::ControllerBase {
   use Mojo::Base 'Mojolicious::Controller';
   use Mojo::Base 'Mojolicious::Plugin', -role, -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Role::Logger', -role, -signatures;
+  use Mojo::Base 'Game::EvonyTKR::Log::Config', -role, -signatures;
   use Mojo::Base 'Game::EvonyTKR::Role::Common', -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::MarkdownRenderer', -role;
   require Mojo::File;
   require YAML::PP;
   require Data::Printer;

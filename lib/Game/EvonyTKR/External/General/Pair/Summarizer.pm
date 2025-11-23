@@ -8,7 +8,6 @@ require Game::EvonyTKR::Util::Buff::Summarizer;
 
 package Game::EvonyTKR::External::General::Pair::Summarizer {
   use Mojo::Base 'Game::EvonyTKR::External::JobBase',              -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Role::Logger',                   -role;
   use Mojo::Base 'Game::EvonyTKR::Controller::Role::Pairs',        -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants', -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants', -role;

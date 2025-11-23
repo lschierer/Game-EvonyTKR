@@ -15,6 +15,7 @@ package Game::EvonyTKR {
   use Mojo::Base 'Mojolicious', -strict, -signatures;
   use Log::Any::Adapter;
   use Log::Log4perl;
+  use Mojo::Base 'Game::EvonyTKR::Log::Config', -role, -signatures;
   use Mojo::File::Share qw(dist_dir );
   use Mojo::Loader      qw(find_modules load_class);
   use Fcntl             qw(:flock);
@@ -28,15 +29,18 @@ package Game::EvonyTKR {
 
 
   sub startup ($app) {
-    state $l4p;
-    $l4p = Game::EvonyTKR::Log::Config->logger(__PACKAGE__) unless(defined($l4p));
+    $app->logger->debug('setting up logging');
+    Log::Any::Adapter->set('Log4perl');
+    $app->plugin('Log::Any' => { logger => 'Log::Log4perl' });
+    $app->log->info(sprintf('Mojolicious Logging initialized'));
+
     _init_core($app);    # runs in web *and* worker
     _init_minion($app);
 
     # web-only: routes/UI and optional worker spawning
     $app->hook(
       before_server_start => sub ($server, $app) {
-        $l4p = Game::EvonyTKR::Log::Config->logger(__PACKAGE__) unless(defined($l4p));
+
         # routes, UIs, helpers that need HTTP server
         _init_web($app);
         # optional: only if you want web proc to fork workers
@@ -102,12 +106,6 @@ package Game::EvonyTKR {
     my $home = Mojo::Home->new->detect;
     $app->secrets($config->{secrets});
     # Logging setup
-
-    Log::Any::Adapter->set('Log4perl');
-
-    $app->plugin('Log::Any' => { logger => 'Log::Log4perl' });
-
-    $app->log->info(sprintf('Mojolicious Logging initialized'));
 
     foreach my $envkey (keys %{ $app->config->{'EvonyTKR-Environment'} }) {
       if (defined $envkey) {
@@ -183,10 +181,10 @@ package Game::EvonyTKR {
     push @{ $app->plugins->namespaces }, 'Game::EvonyTKR::Controller';
     push @{ $app->preload_namespaces },  'Game::EvonyTKR::Controller';
 
-    $app->plugin('Game::EvonyTKR::Plugins::Markdown');
     # Navigation
     eval { $app->plugin('Game::EvonyTKR::Plugins::Navigation'); } or do {
-      $app->log->logcroak('Failed to load Navigation Plugin');
+      $app->log->error('Failed to load Navigation Plugin');
+      croak('Failed to load Navigation Plugin');
     };
 
     my @controllerplugins = find_modules 'Game::EvonyTKR::Controller';
@@ -198,7 +196,8 @@ package Game::EvonyTKR {
       };
       if ($@) {
         print STDERR "Error caught loading module: $@";
-        $app->log->logcroak("loading module '$module' failed: $@");
+        #$app->log->error("loading module '$module' failed: $@");
+        croak("loading module '$module' failed: $@");
       }
     }
 

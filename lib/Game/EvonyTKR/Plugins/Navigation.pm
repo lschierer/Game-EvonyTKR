@@ -3,13 +3,13 @@ use experimental qw(class);
 use utf8::all;
 use File::FindLib 'lib';
 require Data::Printer;
-use namespace::clean;
+use namespace::autoclean;
 
 package Game::EvonyTKR::Plugins::Navigation {
   use Mojo::Base 'Mojolicious::Plugin';
+  use Mojo::Base 'Game::EvonyTKR::Log::Config', -role, -signatures;
   use Carp;
 
-  my $logger;
   my %nav_items_by_path;
   my %raw_paths;
 
@@ -20,15 +20,16 @@ package Game::EvonyTKR::Plugins::Navigation {
   };
 
   sub register ($self, $app, $config = {}) {
-    $logger = Log::Log4perl->get_logger(__PACKAGE__);
-    $logger->info("Registering navigation plugin");
+    my $register_message = sprintf('Registering %s plugin; %s;  %s', __PACKAGE__, $self->debug_log_level(), $self->debug_log_category());
+    say $register_message;
+    $self->logger->info($register_message);
 
     $app->helper(
       add_navigation_item => sub {
         my ($c, $item) = @_;
 
         unless (ref $item eq 'HASH' && $item->{path}) {
-          $logger->error(
+          $self->logger->error(
             "Invalid item (missing path): " . Data::Printer::np($item));
           return;
         }
@@ -36,16 +37,16 @@ package Game::EvonyTKR::Plugins::Navigation {
         my $path = $item->{path};
 
         # DEBUG: Log all paths being registered
-        $logger->debug(
+        $self->logger->debug(
           "NAVIGATION: Registering path '$path' with title '$item->{title}'");
 
         if ($rejected_items_by_path->{$path}) {
-          $logger->debug("Skipping rejected path $path");
+          $self->logger->debug("Skipping rejected path $path");
           return;
         }
 
         unless (exists $item->{title}) {
-          $logger->error("Item rejected: missing title for $path");
+          $self->logger->error("Item rejected: missing title for $path");
           return;
         }
 
@@ -62,7 +63,7 @@ package Game::EvonyTKR::Plugins::Navigation {
             $nav_items_by_path{$path} = $item;
           }
           elsif (!exists $existing->{order}) {
-            $logger->error("Duplicate navigation item at $path without order");
+            $self->logger->error("Duplicate navigation item at $path without order");
           }
         }
         else {
@@ -165,7 +166,7 @@ package Game::EvonyTKR::Plugins::Navigation {
       $a->{order} <=> $b->{order}
         || lc($a->{title}) cmp lc($b->{title})
     } @result;
-    $logger->debug(
+    $self->logger->debug(
       "_prune_and_sort returning result " . Data::Printer::np(@result));
     return \@result;
   }

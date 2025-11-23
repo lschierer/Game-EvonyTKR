@@ -162,7 +162,7 @@ package Game::EvonyTKR::Controller::Covenants {
 
     if (-f $markdown_path) {
       # Render with markdown
-      return $c->render_markdown_file($markdown_path,
+      return $c->render_markdown_page($markdown_path,
         { template => 'covenants/index' });
     }
     else {

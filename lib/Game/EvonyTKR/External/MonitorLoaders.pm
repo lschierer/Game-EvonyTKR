@@ -4,7 +4,6 @@ use File::FindLib 'lib';
 
 package Game::EvonyTKR::External::MonitorLoaders {
   use Mojo::Base 'Game::EvonyTKR::External::JobBase', -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Role::Logger',      -role;
 
   sub register ($taskClass, $app, $conf = {}) {
     $taskClass->SUPER::register($app, $conf);

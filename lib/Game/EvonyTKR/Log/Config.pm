@@ -1,63 +1,90 @@
 use v5.42.0;
-use experimental qw(class);
 use utf8::all;
-use File::FindLib 'lib';
-require Data::Printer;
+
+package Game::EvonyTKR::Log::Config;
+use Mojo::Base 'Mojo::Log', -role, -signatures;
+use Log::Log4perl;
+use Log::Log4perl::Level;
 require File::HomeDir::Tiny;
-require Mojo::File;
+require Data::Printer;
+use Carp;
 
-package Game::EvonyTKR::Log::Config {
-  use Log::Log4perl;
-  use Mojo::File::Share qw(dist_dir );
-  use Carp;
 
-  sub logFileLocation {
-    my $mode = $ENV{'MOJO_MODE'} // 'production';
-    say "mode is $mode";
-    my $userHome = File::HomeDir::Tiny::home();
-    my @parts    = split '::', __PACKAGE__;
-    my $base     = join '-', @parts[0 .. 1];
-    my $logDir =
-      Mojo::File->new(sprintf('%s/var/log/Perl/dist/%s', $userHome, $base));
-    # Create directory if needed
-    $logDir->make_path({ mode => 0711 })
-      unless -d $logDir->to_abs->to_string;
-    return $logDir;
+has logger => sub ($self) {
+  my $ec = get_effective_caller($self);
+  return __PACKAGE__->get_logger($ec);
+};
+
+state $rl;
+
+sub debug_log_level ($caller) {
+  return sprintf('log level for %s is %s', ref($caller) ? ref($caller) : $caller, Log::Log4perl::Level::to_level($caller->logger->level()));
+}
+
+sub debug_log_category ($caller) {
+  return sprintf('log category for %s is %s', ref($caller) ? ref($caller) : $caller, $caller->logger->category());
+}
+
+sub get_effective_caller {
+  my $depth = 1;
+  while (my $caller = caller($depth++)) {
+    # Ignore known non-class contexts (e.g., eval)
+    next if $caller =~ /^(eval|main)$/;
+
+    # Return first valid class found
+    if($caller->can('logger')){
+      return $caller unless($caller eq 'Game::EvonyTKR::Role::Logger');
+    }
   }
+  # Fallback to a default strategy
+  return blessed(shift) || ref(shift);
+}
 
-  sub appender_setup {
-    my $logDir = __PACKAGE__->logFileLocation();
-    my $config = qq(
-      log4perl.rootLogger = WARN, LOGFILE
-      log4perl.appender.LOGFILE = Log::Log4perl::Appender::File
-      log4perl.appender.LOGFILE.filename = $logDir/app-$$.log
-      log4perl.appender.LOGFILE.mode = append
-      log4perl.appender.LOGFILE.utf8 = 1
-      log4perl.appender.LOGFILE.layout = Log::Log4perl::Layout::PatternLayout
-      log4perl.appender.LOGFILE.layout.ConversionPattern = [%p] %d (%C line %L) %m%n
-    );
-    return $config;
-  }
+sub logFileLocation {
+  my $mode = $ENV{'MOJO_MODE'} // 'production';
+  say "mode is $mode";
+  my $userHome = File::HomeDir::Tiny::home();
+  my @parts    = split '::', __PACKAGE__;
+  my $base     = join '-', @parts[0 .. 2];
+  my $logDir =
+    Mojo::File->new(sprintf('%s/var/log/Perl/dist/%s', $userHome, $base));
+  # Create directory if needed
+  $logDir->make_path({ mode => 0711 })
+    unless -d $logDir->to_abs->to_string;
+  return $logDir;
+}
 
-
+sub appender_setup {
+  my $logDir = __PACKAGE__->logFileLocation();
+  my $config = qq(
+    log4perl.rootLogger = WARN, LOGFILE
+    log4perl.appender.LOGFILE = Log::Log4perl::Appender::File
+    log4perl.appender.LOGFILE.filename = $logDir/app-$$.log
+    log4perl.appender.LOGFILE.mode = append
+    log4perl.appender.LOGFILE.utf8 = 1
+    log4perl.appender.LOGFILE.layout = Log::Log4perl::Layout::PatternLayout
+    log4perl.appender.LOGFILE.layout.ConversionPattern = [%p] %d (%C line %L) %m%n
+  );
+  return $config;
+}
 
   #(ALL|FATAL|TRACE|WARN|WARN|OFF|ERROR|WARN)
   our $logLevels = {
       'Game::EvonyTKR'                                             => 'DEBUG',
-      'Game::EvonyTKR::Control::Generals::Routing'                 => 'WARN',
+      'Game::EvonyTKR::Control::Generals::Routing'                 => 'DEBUG',
       'Game::EvonyTKR::Controller::AscendingAttributes'            => 'WARN',
-      'Game::EvonyTKR::Controller::ConflictGroups'                 => 'DEBUG',
+      'Game::EvonyTKR::Controller::ConflictGroups'                 => 'WARN',
       'Game::EvonyTKR::Controller::ControllerBase'                 => 'WARN',
-      'Game::EvonyTKR::Controller::Covenants'                      => 'DEBUG',
-      'Game::EvonyTKR::Controller::Generals'                       => 'WARN',
+      'Game::EvonyTKR::Controller::Covenants'                      => 'WARN',
+      'Game::EvonyTKR::Controller::Generals'                       => 'DEBUG',
       'Game::EvonyTKR::Controller::Glossary'                       => 'WARN',
-      'Game::EvonyTKR::Controller::Pairs'                          => 'DEBUG',
+      'Game::EvonyTKR::Controller::Pairs'                          => 'WARN',
       'Game::EvonyTKR::Controller::Role::AscendingAttributes'      => 'WARN',
       'Game::EvonyTKR::Controller::Role::Books'                    => 'WARN',
       'Game::EvonyTKR::Controller::Role::Generals'                 => 'WARN',
-      'Game::EvonyTKR::Controller::Role::Pairs'                    => 'DEBUG',
+      'Game::EvonyTKR::Controller::Role::Pairs'                    => 'WARN',
       'Game::EvonyTKR::Controller::Role::Specialties'              => 'WARN',
-      'Game::EvonyTKR::Controller::Role::Covenants'                => 'DEBUG',
+      'Game::EvonyTKR::Controller::Role::Covenants'                => 'WARN',
       'Game::EvonyTKR::Controller::SkillBooks'                     => 'WARN',
       'Game::EvonyTKR::Controller::Specialties'                    => 'WARN',
       'Game::EvonyTKR::Converter'                                  => 'WARN',
@@ -79,15 +106,15 @@ package Game::EvonyTKR::Log::Config {
       'Game::EvonyTKR::External::Buff::Worker'                     => 'WARN',
       'Game::EvonyTKR::External::Common'                           => 'WARN',
       'Game::EvonyTKR::External::Covenant::LoadAll'                => 'WARN',
-      'Game::EvonyTKR::External::Covenant::Loader'                 => 'DEBUG',
+      'Game::EvonyTKR::External::Covenant::Loader'                 => 'WARN',
       'Game::EvonyTKR::External::General::LoadAll'                 => 'WARN',
-      'Game::EvonyTKR::External::General::Pair::CreatePairs'       => 'DEBUG',
-      'Game::EvonyTKR::External::General::Pair::ReduceBatch '      => 'DEBUG',
-      'Game::EvonyTKR::External::General::Pair::ReduceCoordinator' => 'DEBUG',
+      'Game::EvonyTKR::External::General::Pair::CreatePairs'       => 'WARN',
+      'Game::EvonyTKR::External::General::Pair::ReduceBatch '      => 'WARN',
+      'Game::EvonyTKR::External::General::Pair::ReduceCoordinator' => 'WARN',
       'Game::EvonyTKR::External::General::Pair::Summarizer'        => 'WARN',
       'Game::EvonyTKR::External::General::Pair::Workflow'          => 'WARN',
       'Game::EvonyTKR::External::JobBase'                          => 'WARN',
-      'Game::EvonyTKR::External::Prebuild'                         => 'DEBUG',
+      'Game::EvonyTKR::External::Prebuild'                         => 'WARN',
       'Game::EvonyTKR::External::Specialties::LoadAllSpecialties'  => 'WARN',
       'Game::EvonyTKR::External::Specialties::Loader'              => 'WARN',
       'Game::EvonyTKR::Log::Config'                                => 'INFO',
@@ -103,10 +130,10 @@ package Game::EvonyTKR::Log::Config {
       'Game::EvonyTKR::Model::Buff::Matcher'                       => 'WARN',
       'Game::EvonyTKR::Model::Buff::Summarizer'                    => 'WARN',
       'Game::EvonyTKR::Model::Buff::Value'                         => 'WARN',
-      'Game::EvonyTKR::Model::Covenant'                            => 'DEBUG',
+      'Game::EvonyTKR::Model::Covenant'                            => 'WARN',
       'Game::EvonyTKR::Model::Data'                                => 'WARN',
       'Game::EvonyTKR::Model::General'                             => 'WARN',
-      'Game::EvonyTKR::Model::General::Conflict'                   => 'DEBUG',
+      'Game::EvonyTKR::Model::General::Conflict'                   => 'WARN',
       'Game::EvonyTKR::Model::General::Conflict::Book'             => 'WARN',
       'Game::EvonyTKR::Model::General::ConflictGroup'              => 'WARN',
       'Game::EvonyTKR::Model::General::Importer'                   => 'WARN',
@@ -114,14 +141,13 @@ package Game::EvonyTKR::Log::Config {
       'Game::EvonyTKR::Model::General::Pair::Manager'              => 'WARN',
       'Game::EvonyTKR::Model::Glossary'                            => 'WARN',
       'Game::EvonyTKR::Model::Glossary::Manager'                   => 'WARN',
-      'Game::EvonyTKR::Model::Logger'                              => 'DEBUG',
+      'Game::EvonyTKR::Model::Logger'                              => 'WARN',
       'Game::EvonyTKR::Model::Role::Book'                          => 'WARN',
       'Game::EvonyTKR::Model::Role::Book::Builtin'                 => 'WARN',
       'Game::EvonyTKR::Model::Role::Book::SkillBook'               => 'WARN',
       'Game::EvonyTKR::Model::Specialty'                           => 'WARN',
-      'Game::EvonyTKR::Plugins::Markdown'                          => 'WARN',
-      'Game::EvonyTKR::Plugins::Navigation'                        => 'WARN',
-      'Game::EvonyTKR::Plugins::StaticPages'                       => 'WARN',
+      'Game::EvonyTKR::Plugins::Navigation'                        => 'DEBUG',
+      'Game::EvonyTKR::Plugins::StaticPages'                       => 'DEBUG',
       'Game::EvonyTKR::Role::AutoTOJSON'                           => 'WARN',
       'Game::EvonyTKR::Role::BasicAttribute'                       => 'WARN',
       'Game::EvonyTKR::Role::BasicAttributes'                      => 'WARN',
@@ -134,6 +160,7 @@ package Game::EvonyTKR::Log::Config {
       'Game::EvonyTKR::Role::Constants::Specialties'               => 'WARN',
       'Game::EvonyTKR::Role::General'                              => 'WARN',
       'Game::EvonyTKR::Role::Logger'                               => 'WARN',
+      'Game::EvonyTKR::Role::MarkdownRenderer'                     => 'WARN',
       'Game::EvonyTKR::Service::Cache'                             => 'WARN',
       'Game::EvonyTKR::Shared::Constants'                          => 'WARN',
       'Game::EvonyTKR::Shared::Logger'                             => 'WARN',
@@ -143,13 +170,16 @@ package Game::EvonyTKR::Log::Config {
       'GitRepo::Reader'                                            => 'WARN',
       'LinkChecker::Command'                                       => 'WARN',
       'PairBuilderLogic'                                           => 'WARN',
-      'Test::Package'                                              => 'DEBUG',
+      'Test::Package'                                              => 'WARN',
       'WorkerLogic'                                                => 'WARN',
     };
 
-    sub logger ($class, $caller = undef) {
+    sub get_logger ($class, $caller = undef) {
       state $I_Have_Init;
       $caller //= 'undef::package';
+
+      my $mode = $ENV{'MOJO_MODE'} // 'production';
+      my $default = $mode eq 'development' ? 'DEBUG' : 'WARN';
 
       # MUST initialize Log4perl BEFORE any logging calls
       unless (Log::Log4perl->initialized()) {
@@ -173,16 +203,37 @@ package Game::EvonyTKR::Log::Config {
 
       # NOW safe to get loggers and log - Log4perl is initialized
       my $l4p = Log::Log4perl->get_logger($class);
-      $l4p->level(Log::Log4perl::Level::to_priority($logLevels->{$class}));
-      $l4p->debug(sprintf('in %s, $class is %s, $caller is %s', __PACKAGE__, $class, $caller));
+      $class = ref($class) ? blessed($class) : $class;
+      my $ll = exists $logLevels->{$class} ? Log::Log4perl::Level::to_priority($logLevels->{$class}) : $default;
+      $l4p->level($ll);
+      $l4p->debug(
+        sprintf('in %s, $class is %s, $caller is %s', __PACKAGE__, $class, $caller)
+      );
 
       my $cl = Log::Log4perl->get_logger($caller);
       $l4p->debug(sprintf(
         'returning logger in %s, $class is %s, for %s at level %s',
-        __PACKAGE__, $class, $caller, Log::Log4perl::Level::to_level($cl->level()),
+        __PACKAGE__, $class,
+        $caller, Log::Log4perl::Level::to_level($cl->level()),
       ));
       return $cl;
     }
-}
-1;
-__END__
+
+    sub debug { shift->_fwd(debug => @_) }
+    sub info  { shift->_fwd(info  => @_) }
+    sub warn  { shift->_fwd(warn  => @_) }
+    sub error { shift->_fwd(error => @_) }
+    sub fatal { shift->_fwd(fatal => @_) }
+
+    # (optional) Mojolicious also calls ->trace in some versions
+    sub trace { shift->_fwd(trace => @_) }    # map to debug if you want
+
+    sub _fwd {
+      my ($self, $level, @lines) = @_;
+      my $msg = join('', map { ref($_) ? "$_" : $_ } @lines);
+      $self->logger->$level($msg);
+      return $self;
+    }
+
+    1;
+    __END__

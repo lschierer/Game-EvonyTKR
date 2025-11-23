@@ -78,7 +78,8 @@ package Game::EvonyTKR::Controller::Generals {
   }
 
   sub setup_event_handlers ($c, $app) {
-    ...;
+    $c->logger->debug(sprintf('setup_event_handlers for %s', __PACKAGE__));
+
   }
 
   sub setup_helpers($c, $app) {
@@ -322,7 +323,7 @@ package Game::EvonyTKR::Controller::Generals {
       # Render with markdown
       $c->stash(template => '/generals/index');
 
-      return $c->render_markdown_file($markdown_path,
+      return $c->render_markdown_page($markdown_path,
         { template => 'generals/index' });
     }
     else {
@@ -368,7 +369,7 @@ package Game::EvonyTKR::Controller::Generals {
     if (-f $markdown_path) {
       # Render with markdown
       $self->stash(template => "generals/uiTarget/index");
-      return $self->render_markdown_file($markdown_path,
+      return $self->render_markdown_page($markdown_path,
         { template => "generals/uiTarget/index_with_file" });
     }
     else {
@@ -414,7 +415,7 @@ package Game::EvonyTKR::Controller::Generals {
       # Render with markdown
       $self->stash(
         template => "generals/uiTarget/buffActivation/index_with_file");
-      return $self->render_markdown_file($markdown_path,
+      return $self->render_markdown_page($markdown_path,
         { template => "generals/uiTarget/buffActivation/index_with_file" });
     }
     else {
@@ -636,7 +637,7 @@ package Game::EvonyTKR::Controller::Generals {
 
     if (-f $markdown_path) {
       $c->logger->debug("Rendering from markdown index file");
-      return $c->render_markdown_file($markdown_path);
+      return $c->render_markdown_page($markdown_path);
     }
     else {
       $c->logger->debug("Rendering without markdown file");

@@ -8,7 +8,6 @@ require Game::EvonyTKR::External::Common;
 
 package Game::EvonyTKR::External::Book::LoadAllBuiltins {
   use Mojo::Base 'Game::EvonyTKR::External::JobBase',       -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Role::Logger',            -role;
   use Mojo::Base 'Game::EvonyTKR::Controller::Role::Books', -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Common',            -role;
   use Mojo::File;

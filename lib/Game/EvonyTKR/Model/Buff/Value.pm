@@ -8,7 +8,6 @@ package Game::EvonyTKR::Model::Buff::Value {
   use Mojo::Base 'Game::EvonyTKR::Model::Base';
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants', -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants', -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::Logger',                      -role;
   use Carp;
   use File::FindLib 'lib';
   use overload

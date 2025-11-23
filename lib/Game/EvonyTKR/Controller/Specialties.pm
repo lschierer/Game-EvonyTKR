@@ -200,7 +200,7 @@ package Game::EvonyTKR::Controller::Specialties {
       # Render with markdown
       $c->stash(template => 'specialties/index');
 
-      return $c->render_markdown_file($markdown_path,
+      return $c->render_markdown_page($markdown_path,
         { template => 'specialties/index' });
     }
     else {

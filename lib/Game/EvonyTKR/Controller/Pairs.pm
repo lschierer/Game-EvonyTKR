@@ -342,7 +342,7 @@ package Game::EvonyTKR::Controller::Pairs {
 
     if (-f $markdown_path) {
       $c->logger->debug("Rendering from markdown index file");
-      return $c->render_markdown_file($markdown_path);
+      return $c->render_markdown_page($markdown_path);
     }
 
     $c->logger->debug("Rendering without markdown file");

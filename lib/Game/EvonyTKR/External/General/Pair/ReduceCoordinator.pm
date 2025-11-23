@@ -6,7 +6,6 @@ package Game::EvonyTKR::External::General::Pair::ReduceCoordinator {
   use Mojo::Base 'Game::EvonyTKR::External::JobBase',       -signatures;
   use Mojo::Base 'Game::EvonyTKR::Controller::Role::Pairs', -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants', -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::Logger',                      -role;
 
   sub register ($taskClass, $app, $conf = {}) {
     $taskClass->SUPER::register($app, $conf);
