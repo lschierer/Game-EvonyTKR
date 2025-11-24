@@ -10,9 +10,9 @@ use namespace::clean;
 
 package Game::EvonyTKR::Controller::ControllerBase {
   use Mojo::Base 'Mojolicious::Controller';
-  use Mojo::Base 'Mojolicious::Plugin', -role, -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Log::Config', -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::Common', -role;
+  use Mojo::Base 'Mojolicious::Plugin',                    -role, -signatures;
+  use Mojo::Base 'Game::EvonyTKR::Log::Config',            -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Common',           -role;
   use Mojo::Base 'Game::EvonyTKR::Role::MarkdownRenderer', -role;
   require Mojo::File;
   require YAML::PP;
@@ -38,14 +38,17 @@ package Game::EvonyTKR::Controller::ControllerBase {
 
     my $routes = $app->routes;
 
-   $app->helper(outstanding_prereqs => sub($self, $prereqs) {
-      if(ref($prereqs) && ref($prereqs) eq 'ARRAY'){
-        return $c->are_prereqs_outstanding($app->minion, $prereqs);
-      } else {
-        $c->logger->error('outstanding_prereqs requires an arrayref.');
-        return 1;
+    $app->helper(
+      outstanding_prereqs => sub($self, $prereqs) {
+        if (ref($prereqs) && ref($prereqs) eq 'ARRAY') {
+          return $c->are_prereqs_outstanding($app->minion, $prereqs);
+        }
+        else {
+          $c->logger->error('outstanding_prereqs requires an arrayref.');
+          return 1;
+        }
       }
-   });
+    );
 
     $routes->get('/health')->to(
       cb => sub($self) {

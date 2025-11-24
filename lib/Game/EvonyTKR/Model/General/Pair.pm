@@ -8,7 +8,7 @@ require Game::EvonyTKR::Model::General;
 
 package Game::EvonyTKR::Model::General::Pair {
   use Mojo::Base 'Game::EvonyTKR::Model::Base';
-  use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants', -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants',       -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants',    -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::AscendingAttributes', -role;
   use UUID           qw(uuid5);
@@ -66,10 +66,12 @@ package Game::EvonyTKR::Model::General::Pair {
   sub from_wire_hash ($class, $h) {
     my $logger = Game::EvonyTKR::Log::Config->get_logger();
 
-    my $primary_name = ref($h->{primary}) eq 'HASH'
+    my $primary_name =
+      ref($h->{primary}) eq 'HASH'
       ? $h->{primary}->{name}
       : $h->{primary};
-    my $secondary_name = ref($h->{secondary}) eq 'HASH'
+    my $secondary_name =
+      ref($h->{secondary}) eq 'HASH'
       ? $h->{secondary}->{name}
       : $h->{secondary};
 

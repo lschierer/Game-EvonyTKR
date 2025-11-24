@@ -227,11 +227,9 @@ class Game::EvonyTKR::Model::General::Conflict :
 # 3. This indicates it's an additional/bonus buff, not a primary buff
     my $is_stackable = 0;
     if ($book_has_stackable_text) {
-      my $conditions            = $buff->conditions || [];
-      my $has_dragon_beast_cond = any {
-        $_ =~ /brings.*(?:dragon|spiritual beast)/i
-      }
-      @$conditions;
+      my $conditions = $buff->conditions || [];
+      my $has_dragon_beast_cond =
+        any { $_ =~ /brings.*(?:dragon|spiritual beast)/i } @$conditions;
 
 # Mark as stackable if has dragon/beast conditions AND this is from a complex general like Louis XIV
 # Simple way: exclude single-troop-type specialists with simple "by another" bonuses
@@ -309,14 +307,12 @@ class Game::EvonyTKR::Model::General::Conflict :
     }
 
     my $r = {
-      name     => $general->name,
-      role     => $role,
-      types    => $general->type // [],
-      is_mayor => any { $_ eq 'mayor' }
-      @{ $general->type // [] },
-      is_wall => any { $_ eq 'wall' } @{ $general->type // [] },
-      is_officer => any { $_ eq 'officer' }
-      @{ $general->type // [] },
+      name       => $general->name,
+      role       => $role,
+      types      => $general->type // [],
+      is_mayor   => any { $_ eq 'mayor' } @{ $general->type   // [] },
+      is_wall    => any { $_ eq 'wall' } @{ $general->type    // [] },
+      is_officer => any { $_ eq 'officer' } @{ $general->type // [] },
       meta_buffs => [],    # will push entries
     };
 
@@ -572,8 +568,8 @@ class Game::EvonyTKR::Model::General::Conflict :
 
                 my $attr_overlap =
                   any { $ga{$_} } @{ $sng->{attributes} // [] };
-                my $troop_overlap = any { $gt{$_} }
-                @{ $sng->{targetedTypes} // [] };
+                my $troop_overlap =
+                  any { $gt{$_} } @{ $sng->{targetedTypes} // [] };
                 next unless $attr_overlap && $troop_overlap;
 
                 my $Sg = $grp->{state_key} // '';
@@ -806,11 +802,7 @@ class Game::EvonyTKR::Model::General::Conflict :
     }
 
     foreach my $ct (keys $ngbct->%*) {
-      my $all = [
-        uniq(
-          $ngbct->{$ct}->@*, $groups_by_conflict_type->{$ct}->@*
-        )
-      ];
+      my $all = [uniq($ngbct->{$ct}->@*, $groups_by_conflict_type->{$ct}->@*)];
       $groups_by_conflict_type->{$ct} = $all;
     }
   }

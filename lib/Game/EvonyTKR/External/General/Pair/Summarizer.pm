@@ -9,10 +9,10 @@ require Game::EvonyTKR::Model::Buff::Summarizer;
 package Game::EvonyTKR::External::General::Pair::Summarizer {
   use Mojo::Base 'Game::EvonyTKR::External::JobBase',              -signatures;
   use Mojo::Base 'Game::EvonyTKR::Controller::Role::Pairs',        -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::Constants::Books', -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Constants::Books',         -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants', -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants', -role;
-  use experimental qw(class);
+  use experimental   qw(class);
   use List::AllUtils qw(any all none uniq);
   use Const::Fast;
   use Carp;
@@ -23,13 +23,14 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
   has 'ypp' => sub {
     state $yp //= YAML::PP->new(
       schema       => [qw/ + Perl /],
-      yaml_version => ['1.2', '1.1']);
+      yaml_version => ['1.2', '1.1']
+    );
     return $yp;
   };
 
   has 'collection_dir' => sub {
     my $home = Mojo::Home->new->detect('Game::EvonyTKR');
-    return $home->child('share/collections/data')
+    return $home->child('share/collections/data');
   };
 
   # call the first parameter a taskClass here
@@ -96,8 +97,7 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
     unless (defined(
            $activationType
         && length($activationType)
-        && any { $activationType eq $_ }
-      $job->AllowedBuffActivationValues->@*
+        && any { $activationType eq $_ } $job->AllowedBuffActivationValues->@*
     )) {
       push @errmessage,
         sprintf(
@@ -148,8 +148,7 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
       if (defined($book_file) && $book_file->is_file()) {
         my $data   = $book_file->slurp_utf8;
         my $object = $job->ypp->load_string($data);
-        my $book =
-          Game::EvonyTKR::Model::Book::SkillBook->from_hash($object,);
+        my $book = Game::EvonyTKR::Model::Book::SkillBook->from_hash($object,);
 
         $job->logger->info(sprintf(
           'picked book %s for general %s', $book->name, $general->name

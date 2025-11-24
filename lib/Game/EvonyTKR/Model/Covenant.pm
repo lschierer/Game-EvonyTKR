@@ -124,7 +124,7 @@ package Game::EvonyTKR::Model::Covenant {
       ));
       return $total;
     }
-  };
+  }
 
   sub addBuff ($self, $level, $nb) {
     my $red = 1;
@@ -135,10 +135,7 @@ package Game::EvonyTKR::Model::Covenant {
       exit 0;
     }
 
-    if (
-      none { $level =~ /$_/i }
-      $self->CovenantCategoryValues->@*
-    ) {
+    if (none { $level =~ /$_/i } $self->CovenantCategoryValues->@*) {
       $self->logger->error(sprintf(
         'level should be one of %s, not %s',
         join(', ', @{ $self->CovenantCategoryValues }), $level
@@ -163,7 +160,7 @@ package Game::EvonyTKR::Model::Covenant {
     }
 
     return $count;
-  };
+  }
 
   sub from_hash($class, $object) {
     my $logger = Game::EvonyTKR::Log::Config->get_logger(__PACKAGE__);
@@ -171,13 +168,13 @@ package Game::EvonyTKR::Model::Covenant {
       $logger->error('object must have name attribute.');
       return;
     }
-    $logger->info(sprintf('attempting import of covenant for "%s"', $object->{name}));
+    $logger->info(
+      sprintf('attempting import of covenant for "%s"', $object->{name}));
     my $name = $object->{name};
     state $general_helper //= do {
       my $helper = eval {
         Game::EvonyTKR::Model::Base->new->with_roles(
-          'Game::EvonyTKR::Controller::Role::Generals'
-        );
+          'Game::EvonyTKR::Controller::Role::Generals');
       };
       if ($@) {
         $logger->error("Cannot create general helper: $@");
@@ -189,9 +186,13 @@ package Game::EvonyTKR::Model::Covenant {
     return unless $general_helper;
 
     my $primary = $general_helper->get_general($name);
-    unless (defined($primary) && ref($primary) && $primary->isa('Game::EvonyTKR::Model::General'))
-    {
-      $logger->error(sprintf('Could not find general for covenant with name %s', $object->{name}));
+    unless (defined($primary)
+      && ref($primary)
+      && $primary->isa('Game::EvonyTKR::Model::General')) {
+      $logger->error(
+        sprintf('Could not find general for covenant with name %s',
+          $object->{name})
+      );
       return;
     }
     $logger->debug("found primary general for $name, starting import.");
@@ -221,8 +222,10 @@ package Game::EvonyTKR::Model::Covenant {
       elsif (exists $oc->{buffs}) {
         @buffs = @{ $oc->{buffs} };
       }
-      $logger->debug(sprintf('found %s buffs for convenant %s at level %s',
-      scalar(@buffs), $name, $oc->{category}));
+      $logger->debug(sprintf(
+        'found %s buffs for convenant %s at level %s',
+        scalar(@buffs), $name, $oc->{category}
+      ));
 
       foreach my $ob (@buffs) {
         my $b = Game::EvonyTKR::Model::Buff->from_hash($ob);
@@ -251,8 +254,7 @@ package Game::EvonyTKR::Model::Covenant {
     state $general_helper //= do {
       my $helper = eval {
         Game::EvonyTKR::Model::Base->new->with_roles(
-          'Game::EvonyTKR::Controller::Role::Generals'
-        );
+          'Game::EvonyTKR::Controller::Role::Generals');
       };
       if ($@) {
         $logger->error("Cannot create general helper: $@");
@@ -264,13 +266,21 @@ package Game::EvonyTKR::Model::Covenant {
     return unless $general_helper;
 
     my $primary = $general_helper->get_general($h->{primary});
-    unless (defined($primary) && ref($primary) && $primary->isa('Game::EvonyTKR::Model::General'))
-    {
-      $logger->error(sprintf('Could not find general for covenant with name %s', $h->{primary}));
+    unless (defined($primary)
+      && ref($primary)
+      && $primary->isa('Game::EvonyTKR::Model::General')) {
+      $logger->error(
+        sprintf('Could not find general for covenant with name %s',
+          $h->{primary})
+      );
       return;
     }
-    $logger->debug(sprintf('found primary general for "%s", starting import.', $h->{primary}));
-    $logger->debug(sprintf('generals for "%s" are %s', $h->{primary}, join(", ", @{ $h->{generals} }) ));
+    $logger->debug(sprintf('found primary general for "%s", starting import.',
+      $h->{primary}));
+    $logger->debug(sprintf(
+      'generals for "%s" are %s',
+      $h->{primary}, join(", ", @{ $h->{generals} })
+    ));
 
     my $o = Game::EvonyTKR::Model::Covenant->new(
       primary => $primary,
@@ -279,7 +289,7 @@ package Game::EvonyTKR::Model::Covenant {
       three   => $h->{generals}->[2],
     );
 
-    foreach my $category (keys $h->{categories}->%* ) {
+    foreach my $category (keys $h->{categories}->%*) {
       unless (defined($category) && length($category)) {
         $logger->error(
           'invalid category!! ' . Data::Printer::np($h, multiline => 0));
@@ -287,7 +297,8 @@ package Game::EvonyTKR::Model::Covenant {
       }
 
       my $oc = $h->{categories}->{$category};
-      $o->{categories}->{$category}->{text} = $h->{categories}->{$category}->{text} // '';
+      $o->{categories}->{$category}->{text} =
+        $h->{categories}->{$category}->{text} // '';
 
       # Find buffs for this category
       my @buffs;
@@ -297,8 +308,10 @@ package Game::EvonyTKR::Model::Covenant {
       elsif (exists $oc->{buffs}) {
         @buffs = @{ $oc->{buffs} };
       }
-      $logger->debug(sprintf('found %s buffs for convenant %s at level %s',
-      scalar(@buffs), $h->{primary}, $category));
+      $logger->debug(sprintf(
+        'found %s buffs for convenant %s at level %s',
+        scalar(@buffs), $h->{primary}, $category
+      ));
 
       foreach my $ob (@buffs) {
         my $b = Game::EvonyTKR::Model::Buff->from_hash($ob);
@@ -317,11 +330,11 @@ package Game::EvonyTKR::Model::Covenant {
         three => $self->three,
       ],
     };
-    foreach my $key (keys $self->categories->%*){
-      $h->{categories}->{$key}->{activationLevel} = $self->categories->{$key}->{activationLevel} // 0;
-      foreach my $b ($self->categories->{$key}->{buffs}->@*){
-        push @{ $h->{categories}->{$key}->{buffs} },
-          $b->to_wire_hash();
+    foreach my $key (keys $self->categories->%*) {
+      $h->{categories}->{$key}->{activationLevel} =
+        $self->categories->{$key}->{activationLevel} // 0;
+      foreach my $b ($self->categories->{$key}->{buffs}->@*) {
+        push @{ $h->{categories}->{$key}->{buffs} }, $b->to_wire_hash();
       }
     }
     return $h;
@@ -340,19 +353,19 @@ package Game::EvonyTKR::Model::Covenant {
       },
 
     };
-    foreach my $key (keys $self->categories->%*){
-      $h->{categories}->{$key}->{activationLevel} = $self->categories->{$key}->{activationLevel} // 0;
-      foreach my $b ($self->categories->{$key}->{buffs}->@*){
-        push @{ $h->{categories}->{$key}->{buffs} },
-          $b->to_wire_hash();
+    foreach my $key (keys $self->categories->%*) {
+      $h->{categories}->{$key}->{activationLevel} =
+        $self->categories->{$key}->{activationLevel} // 0;
+      foreach my $b ($self->categories->{$key}->{buffs}->@*) {
+        push @{ $h->{categories}->{$key}->{buffs} }, $b->to_wire_hash();
       }
     }
     return $h;
-  };
+  }
 
   sub TO_JSON ($self) {
     return $self->to_hash();
-  };
+  }
 
   sub as_string ($self) {
     my $json =

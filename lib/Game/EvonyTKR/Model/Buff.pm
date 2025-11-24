@@ -397,7 +397,13 @@ package Game::EvonyTKR::Model::Buff {
     );
     if (exists $hashref->{targetedType}) {
       $logger->debug(
-        'found targetedType in hashref: ' . defined($hashref->{targetedType}) ? ref($hashref->{targetedType}) ? join ', ', map { sprintf('"%s"', $_) } $hashref->{targetedType}->@* : $hashref->{targetedType}: 'undef');
+          'found targetedType in hashref: ' . defined($hashref->{targetedType})
+        ? ref($hashref->{targetedType})
+            ? join ', ',
+            map { sprintf('"%s"', $_) } $hashref->{targetedType}->@*
+            : $hashref->{targetedType}
+        : 'undef'
+      );
       $r->set_target($hashref->{targetedType});
     }
     if (exists $hashref->{troop}) {
@@ -420,7 +426,8 @@ package Game::EvonyTKR::Model::Buff {
   sub to_hash ($self) {
     my $c;
     my $conditionCount = scalar @{ $self->conditions() };
-    $self->logger->debug(sprintf('in to_hash, I have %s conditions.', 0 + $conditionCount));
+    $self->logger->debug(
+      sprintf('in to_hash, I have %s conditions.', 0+ $conditionCount));
 
     # Debug buff value
     if (defined($self->value)) {
@@ -469,7 +476,7 @@ package Game::EvonyTKR::Model::Buff {
 
   sub from_wire_hash ($class, $w) {
     my $logger = Game::EvonyTKR::Log::Config->get_logger();
-    my $buff = $class->new(
+    my $buff   = $class->new(
       attribute    => $w->{attribute},
       passive      => $w->{passive} // 0,
       targetedType => $w->{targetedType},
@@ -490,16 +497,18 @@ package Game::EvonyTKR::Model::Buff {
       }
     }
     $logger->debug(sprintf(
-    'from_wire_hash returning a %s buff with '
-    .'attribute "%s"; '
-    .'targetedType "%s" '
-    .'conditions %s '
-    .' and value %s.',
-    $buff->passive ? 'passive' : '',
-    $buff->attribute,
-    ($buff->targetedType // ''),
-    (join ', ', map { sprintf('"%s"', $_) } $buff->conditions->@* // ''),
-    sprintf("%s%s", $buff->value->number, $buff->value->unit eq 'percentage' ? '%' : ' flat'),
+      'from_wire_hash returning a %s buff with '
+        . 'attribute "%s"; '
+        . 'targetedType "%s" '
+        . 'conditions %s '
+        . ' and value %s.',
+      $buff->passive ? 'passive' : '',
+      $buff->attribute,
+      ($buff->targetedType // ''),
+      (join ', ', map { sprintf('"%s"', $_) } $buff->conditions->@* // ''),
+      sprintf("%s%s",
+        $buff->value->number,
+        $buff->value->unit eq 'percentage' ? '%' : ' flat'),
     ));
     return $buff;
   }

@@ -7,7 +7,7 @@ use namespace::autoclean;
 
 package Game::EvonyTKR::Model::BasicAttributes {
   use Mojo::Base 'Game::EvonyTKR::Model::Base';
-  use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants', -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants',    -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants', -role;
 # VERSION
   use Carp;

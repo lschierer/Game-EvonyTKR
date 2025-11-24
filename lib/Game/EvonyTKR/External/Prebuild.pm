@@ -32,7 +32,7 @@ package Game::EvonyTKR::External::Prebuild {
   use Mojo::File;
   use POSIX 'strftime';
   use Time::HiRes 'time';
-  use experimental qw(class);
+  use experimental   qw(class);
   use List::AllUtils qw(any all none uniq);
   use Carp;
 

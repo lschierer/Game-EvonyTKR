@@ -19,12 +19,11 @@ require UUID;
 require Data::Printer;
 use namespace::autoclean;
 
-
 package Game::EvonyTKR::Controller::Covenants {
   use Mojo::Base 'Game::EvonyTKR::Controller::ControllerBase';
-  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Generals', -role;
+  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Generals',  -role;
   use Mojo::Base 'Game::EvonyTKR::Controller::Role::Covenants', -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::Constants::Covenants', -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Constants::Covenants',  -role;
   use Mojo::IOLoop;
   use Mojo::Promise;
   use Mojo::JSON     qw(to_json encode_json);
@@ -80,13 +79,17 @@ package Game::EvonyTKR::Controller::Covenants {
 
   sub setup_helpers ($c, $app) {
 
-    $app->helper(covenant_category_labels => sub {
-      return [$c->CovenantCategoryLabels->@*];
-    });
+    $app->helper(
+      covenant_category_labels => sub {
+        return [$c->CovenantCategoryLabels->@*];
+      }
+    );
 
-    $app->helper(covenant_category_names => sub {
-      return [$c->CovenantCategoryValues->@*];
-    });
+    $app->helper(
+      covenant_category_names => sub {
+        return [$c->CovenantCategoryValues->@*];
+      }
+    );
 
   }
 
@@ -111,18 +114,19 @@ package Game::EvonyTKR::Controller::Covenants {
       ->to(controller => $controller_name, action => 'index')
       ->name("${base}_index");
 
-    foreach my $cn ($c->list_covenants()->@*){
-      $cn = join(' ', map { ucfirst } split / /, $cn);
+    foreach my $cn ($c->list_covenants()->@*) {
+      $cn = join(' ', map {ucfirst} split / /, $cn);
       my $path = sprintf('/%s', $cn);
-      my $key = $cn =~ s/ /_/gr;
+      my $key  = $cn =~ s/ /_/gr;
 
       $mainRoutes->get($path => { name => $cn })->to(
-        controller => $controller_name, action => 'show'
+        controller => $controller_name,
+        action     => 'show'
       )->name("covenant-${key}");
 
       $app->add_navigation_item({
-        title => "Details for ${cn}",
-        path  => sprintf('%s%s', $c->getBase(),$path),
+        title  => "Details for ${cn}",
+        path   => sprintf('%s%s', $c->getBase(), $path),
         parent => $c->getBase(),
         order  => 40,
       });
@@ -144,8 +148,8 @@ package Game::EvonyTKR::Controller::Covenants {
 
     my @items;
     foreach my $cn ($c->list_covenants()->@*) {
-      $cn = join(' ', map { ucfirst } split / /, $cn);
-      my $path = sprintf('%s/%s', $c->getBase(), $cn);
+      $cn = join(' ', map {ucfirst} split / /, $cn);
+      my $path     = sprintf('%s/%s', $c->getBase(), $cn);
       my $covenant = $c->get_covenant($cn);
       push @items, $cn;
     }
@@ -178,21 +182,22 @@ package Game::EvonyTKR::Controller::Covenants {
     $c->logger->debug("show detects name $name, showing details.");
 
     my $outstanding = $c->outstanding_prereqs([
-    'load_all_ascending_attributes', 'load_all_builtin_books',
-    'load_all_specialties',          'load_ascending_attributes',
-    'load_book',                     'load_specialty',
-    'load_all_generals',             'load_general',
-    'load_all_covenants',             'load_covenant',
+      'load_all_ascending_attributes', 'load_all_builtin_books',
+      'load_all_specialties',          'load_ascending_attributes',
+      'load_book',                     'load_specialty',
+      'load_all_generals',             'load_general',
+      'load_all_covenants',            'load_covenant',
     ]);
 
-    if($outstanding ){
-      $c->logger->debug(sprintf('%s prereq check detected outstanding prereqs.', __PACKAGE__));
+    if ($outstanding) {
+      $c->logger->debug(
+        sprintf('%s prereq check detected outstanding prereqs.', __PACKAGE__));
       my $delay = $outstanding * 5;
       return $c->render(
-        template => 'shared/loading',
-        layout => 'default',
-        title => 'Loading',
-        delay => $delay,
+        template     => 'shared/loading',
+        layout       => 'default',
+        title        => 'Loading',
+        delay        => $delay,
         redirect_url => $c->url_for->to_abs
       );
     }
@@ -203,7 +208,10 @@ package Game::EvonyTKR::Controller::Covenants {
       $c->logger->error("covenant for '$name' was not found.");
       $c->reply->not_found;
     }
-    $c->logger->debug(sprintf('retrieved covenant for "%s": %s', $name, Data::Printer::np($covenant)));
+    $c->logger->debug(sprintf(
+      'retrieved covenant for "%s": %s',
+      $name, Data::Printer::np($covenant)
+    ));
 
     $c->stash(
       item     => $covenant,

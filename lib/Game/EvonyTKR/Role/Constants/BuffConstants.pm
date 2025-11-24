@@ -32,7 +32,6 @@ package Game::EvonyTKR::Role::Constants::BuffConstants {
     }
   }
 
-
   has 'BuffActivationValues' => sub {
     const my $hash = {
       'Overall'     => 1,
@@ -103,11 +102,11 @@ package Game::EvonyTKR::Role::Constants::BuffConstants {
       'leadership' => 1,
     };
     return $tmp;
-  };
+  }
 
   sub BasicAttributeTypes ($self) {
     return sort keys $self->basicAttributeTypes->%*;
-  };
+  }
 
   has 'BuffConditionValues' => sub {
     const my $hash => {

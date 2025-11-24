@@ -5,12 +5,12 @@ require Data::Printer;
 require Game::EvonyTKR::Model::Buff::Summarizer;
 
 package Game::EvonyTKR::External::General::Summarizer {
-  use Mojo::Base 'Game::EvonyTKR::External::JobBase', -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Generals',        -role;
-  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Covenants',       -role;
-  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Books', -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::Constants::Books', -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants',    -role;
+  use Mojo::Base 'Game::EvonyTKR::External::JobBase',              -signatures;
+  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Generals',     -role;
+  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Covenants',    -role;
+  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Books',        -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Constants::Books',         -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants', -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants', -role;
   use Const::Fast;
   use List::AllUtils qw(any all none uniq);
@@ -31,9 +31,11 @@ package Game::EvonyTKR::External::General::Summarizer {
 
   sub register ($taskClass, $app, $conf = {}) {
     $taskClass->SUPER::register($app, $conf);
-    $app->minion->add_task(summarize_general => sub ($job, @args) {
-      $taskClass->new(app => $app, minion => $app->minion)->run($job, @args);
-    });
+    $app->minion->add_task(
+      summarize_general => sub ($job, @args) {
+        $taskClass->new(app => $app, minion => $app->minion)->run($job, @args);
+      }
+    );
     $app->plugins->emit(summarize_general_job_ready => 1);
   }
 
@@ -41,10 +43,9 @@ package Game::EvonyTKR::External::General::Summarizer {
     $job->SUPER::run(@args);
 
     my (
-      $generalName,     $isPrimary,       $targetType,
-      $activationType,  $ascendingLevel,  $covenantLevel,
-      $specialty1,      $specialty2,      $specialty3,
-      $specialty4,      $books,
+      $generalName,    $isPrimary,     $targetType, $activationType,
+      $ascendingLevel, $covenantLevel, $specialty1, $specialty2,
+      $specialty3,     $specialty4,    $books,
     ) = @args;
 
     # Validate required parameters
@@ -84,8 +85,9 @@ package Game::EvonyTKR::External::General::Summarizer {
     my $ascendingAttributes;
     if ($isPrimary && $general->ascending) {
       $general->populateAscendingAttributes();
-      unless($general->ascendingAttributes){
-        my $errmessage = sprintf('failed to get ascending attributes for "%s"', $general->name);
+      unless ($general->ascendingAttributes) {
+        my $errmessage = sprintf('failed to get ascending attributes for "%s"',
+          $general->name);
         $job->logger->error($errmessage);
         $job->fail($errmessage);
       }
@@ -94,20 +96,21 @@ package Game::EvonyTKR::External::General::Summarizer {
 
     # Load books if not provided
     $general->populateBuiltinBook() unless ($general->builtInBook);
-    # TODO: Implement book conflict detection for pairs
-    # TODO: Handle partial conflicts (when other general has conflicting book)
-    # TODO: Verify book compatibility with general
+# TODO: Handle partial conflicts (when other general has conflicting book)
+# It may be worth displaying in the UI even though it doesn't affect a single general
+# TODO: Verify book compatibility with general
     unless ($books && ref($books) eq 'ARRAY' && @$books) {
       $books = [
-        $job->load_best_skill_books(
-          $general, $targetType, $activationType
-          )->@*,
+        $job->load_best_skill_books($general, $targetType, $activationType)->@*,
         $job->load_mandatory_skill_books()->@*,
       ];
     }
 
     # ensure specialities are loaded
-    $general->populateSpecialties() unless( scalar($general->specialties) && all { ref($_) && $_->isa('Game::EvonyTKR::Model::Specialty') } $general->specialties->@* );
+    $general->populateSpecialties()
+      unless (scalar($general->specialties)
+      && all { ref($_) && $_->isa('Game::EvonyTKR::Model::Specialty') }
+      $general->specialties->@*);
 
     # Create summarizer
     my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
@@ -119,11 +122,11 @@ package Game::EvonyTKR::External::General::Summarizer {
       targetType          => $targetType,
       activationType      => $activationType,
       ascendingLevel      => $ascendingLevel // 'red5',
-      covenantLevel       => $covenantLevel // 'civilization',
-      specialty1          => $specialty1 // 'gold',
-      specialty2          => $specialty2 // 'gold',
-      specialty3          => $specialty3 // 'gold',
-      specialty4          => $specialty4 // 'gold',
+      covenantLevel       => $covenantLevel  // 'civilization',
+      specialty1          => $specialty1     // 'gold',
+      specialty2          => $specialty2     // 'gold',
+      specialty3          => $specialty3     // 'gold',
+      specialty4          => $specialty4     // 'gold',
     );
 
     # Compute buffs and debuffs
@@ -132,22 +135,22 @@ package Game::EvonyTKR::External::General::Summarizer {
 
     # Return results
     $job->finish({
-      general    => $generalName,
-      isPrimary  => $isPrimary,
-      buffs      => $summarizer->buffValues,
-      debuffs    => $summarizer->debuffValues,
+      general   => $generalName,
+      isPrimary => $isPrimary,
+      buffs     => $summarizer->buffValues,
+      debuffs   => $summarizer->debuffValues,
     });
   }
 
   sub load_best_skill_books ($job, $general, $targetType, $activationType) {
     my $key = $activationType eq 'PvM' ? 'PvM' : 'default';
 
-    # TODO: Implement book conflict detection
-    # TODO: For pairs, need to check conflicts with other general's books
-    # TODO: Handle partial conflicts (book works for self but conflicts with pair)
+  # TODO: Implement book conflict detection
+  # TODO: For pairs, need to check conflicts with other general's books
+  # TODO: Handle partial conflicts (book works for self but conflicts with pair)
 
     my @books;
-    my $generic_dir = $job->collection_dir->child('generic books');
+    my $generic_dir       = $job->collection_dir->child('generic books');
     my @sorted_book_names = sort {
       $job->BestSkillBooks->{$targetType}->{$key}->{$a}
         <=> $job->BestSkillBooks->{$targetType}->{$key}->{$b}
@@ -157,13 +160,15 @@ package Game::EvonyTKR::External::General::Summarizer {
 
     foreach my $book_name (@sorted_book_names) {
       my $book = $job->get_generic_book($book_name, $level);
-      unless($book && ref($book) && $book->isa('Game::EvonyTKR::Model::Book')){
+      unless ($book && ref($book) && $book->isa('Game::EvonyTKR::Model::Book'))
+      {
         $job->logger->error("Cannot find $book_name");
         next;
       }
-      $job->logger->info(sprintf('Picked book "%s" for "%s"', $book_name, $general->name));
+      $job->logger->info(
+        sprintf('Picked book "%s" for "%s"', $book_name, $general->name));
       push @books, $book;
-      last if (scalar @books >= 3);  # Single general gets 3 books
+      last if (scalar @books >= 3);    # Single general gets 3 books
     }
 
     return \@books;
@@ -174,11 +179,12 @@ package Game::EvonyTKR::External::General::Summarizer {
     my $level = Game::EvonyTKR::Role::Constants::Books->bestLevel;
     # Ensure required books are present for buff summarizer
     foreach my $attr ('Attack', 'Defense', 'HP') {
-      foreach my $tt ('Mounted Troop', 'Ranged Troop', 'Ground Troop', 'Siege Machine') {
+      foreach my $tt ('Mounted Troop', 'Ranged Troop', 'Ground Troop',
+        'Siege Machine') {
         my $book_name = sprintf('Level %s %s %s', $level, $tt, $attr);
         unless (any { $_->name eq $book_name } @books) {
           my $book = $job->get_generic_book($book_name, $level);
-          unless($book){
+          unless ($book) {
             $job->logger->error("Cannot find $book_name");
             next;
           }

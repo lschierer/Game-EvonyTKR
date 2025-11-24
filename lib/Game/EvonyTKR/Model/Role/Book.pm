@@ -10,8 +10,8 @@ require Game::EvonyTKR::Log::Config;
 use namespace::autoclean;
 
 package Game::EvonyTKR::Model::Role::Book {
-  use Mojo::Base -role, -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants',    -role;
+  use Mojo::Base -role,                                            -signatures;
+  use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants', -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants', -role;
   use List::AllUtils qw( any none );
   use Carp;

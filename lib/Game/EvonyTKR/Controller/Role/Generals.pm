@@ -5,7 +5,7 @@ require Game::EvonyTKR::Service::Cache;
 require Game::EvonyTKR::Model::Factory;
 
 package Game::EvonyTKR::Controller::Role::Generals {
-  use Mojo::Base -role,                          -signatures;
+  use Mojo::Base -role, -signatures;
   use List::AllUtils qw(uniq);
   use List::UtilsBy;
   use Log::Any;

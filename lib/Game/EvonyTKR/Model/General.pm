@@ -9,7 +9,7 @@ require Game::EvonyTKR::Model::BasicAttribute;
 
 package Game::EvonyTKR::Model::General {
   use Mojo::Base "Game::EvonyTKR::Model::Base";
-  use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants', -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants',       -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants',    -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::AscendingAttributes', -role;
   use JSON::PP;
@@ -296,11 +296,10 @@ package Game::EvonyTKR::Model::General {
 
   sub from_wire_hash ($class, $w, $opts = {}) {
     my $logger = Game::EvonyTKR::Log::Config->get_logger(__PACKAGE__);
-    unless (($w->{_v} // 1) == 1 ) {
+    unless (($w->{_v} // 1) == 1) {
       $logger->error('unknown wire version');
       die "unknown wire version";
     }
-
 
     my $general = $class->new(
       name            => $w->{name},
@@ -310,9 +309,15 @@ package Game::EvonyTKR::Model::General {
       specialtyNames  => $w->{specialtyNames} // [],
       stars           => $w->{stars}          // 'none',
     );
-    $general->populateBuiltinBook() unless (exists $opts->{populateBuiltinBook} && $opts->{populateBuiltinBook} == 0);
-    $general->populateAscendingAttributes() unless (exists $opts->{populateAscendingAttributes} && $opts->{populateAscendingAttributes} == 0);
-    $general->populateSpecialties() unless (exists $opts->{populateSpecialties} && $opts->{populateSpecialties} == 0);
+    $general->populateBuiltinBook()
+      unless (exists $opts->{populateBuiltinBook}
+      && $opts->{populateBuiltinBook} == 0);
+    $general->populateAscendingAttributes()
+      unless (exists $opts->{populateAscendingAttributes}
+      && $opts->{populateAscendingAttributes} == 0);
+    $general->populateSpecialties()
+      unless (exists $opts->{populateSpecialties}
+      && $opts->{populateSpecialties} == 0);
 
     # Handle basicAttributes if it exists
     if ($w->{basicAttributes}) {

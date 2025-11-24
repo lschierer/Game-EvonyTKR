@@ -7,7 +7,7 @@ require List::UtilsBy;
 
 package Game::EvonyTKR::Controller::Role::Covenants {
   use Mojo::Base -role, -signatures;
-  use List::UtilsBy qw(uniq_by);
+  use List::UtilsBy  qw(uniq_by);
   use List::AllUtils qw(uniq none all);
   use Carp;
 
@@ -110,12 +110,10 @@ package Game::EvonyTKR::Controller::Role::Covenants {
     unless (defined($app)) {
       use Cwd;
       $collectionDir = Mojo::File->new(cwd())->child('share/collections/data/');
-      $self->logger->warn(
-        sprintf(
-          'collectionDir "%s" infered from cwd "%s"',
-          $collectionDir, cwd()
-        )
-      );
+      $self->logger->warn(sprintf(
+        'collectionDir "%s" infered from cwd "%s"',
+        $collectionDir, cwd()
+      ));
     }
     else {
       $collectionDir =

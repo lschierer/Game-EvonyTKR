@@ -6,7 +6,7 @@ package Game::EvonyTKR::External::JobBase {
   use Mojo::Base 'Minion::Job',                  -signatures;
   use Mojo::Base 'Mojolicious::Plugin',          -role, -signatures;
   use Mojo::Base 'Game::EvonyTKR::Role::Common', -role, -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Log::Config', -role;
+  use Mojo::Base 'Game::EvonyTKR::Log::Config',  -role;
   use diagnostics;
   use Carp;
 

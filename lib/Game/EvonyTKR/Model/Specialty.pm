@@ -119,7 +119,7 @@ package Game::EvonyTKR::Model::Specialty {
       my $l = $self->levels->{$lv};
       $levels_data->{$lv} = {
         text  => $l->{text} // '',
-        buffs => [ map { $_->to_wire_hash() } $l->{buffs}->@* ],
+        buffs => [map { $_->to_wire_hash() } $l->{buffs}->@*],
       };
     }
     my $hash = {
@@ -133,7 +133,7 @@ package Game::EvonyTKR::Model::Specialty {
 
   sub from_wire_hash ($class, $w) {
     my $logger = Game::EvonyTKR::Log::Config->get_logger(__PACKAGE__);
-    unless (($w->{_v} // 1) == 1){
+    unless (($w->{_v} // 1) == 1) {
       $logger->error("unknown wire version");
       croak("unknown wire version");
     }
@@ -148,7 +148,7 @@ package Game::EvonyTKR::Model::Specialty {
       foreach my $lv (keys $w->{levels}->%*) {
         next if $lv eq 'none';
         $specialty->levels->{$lv}->{text} = $w->{levels}->{$lv}->{text} // '';
-        foreach my $bh ($w->{levels}->{$lv}->{buffs}->@*){
+        foreach my $bh ($w->{levels}->{$lv}->{buffs}->@*) {
           my $b = Game::EvonyTKR::Model::Buff->from_wire_hash($bh);
           push @{ $specialty->levels->{$lv}->{buffs} }, $b;
         }

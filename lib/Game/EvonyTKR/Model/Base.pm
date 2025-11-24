@@ -3,9 +3,9 @@ use v5.42.0;
 use utf8::all;
 require JSON::PP;
 use File::FindLib 'lib';
-use Mojo::Base -base, -signatures;
+use Mojo::Base -base,                          -signatures;
 use Mojo::Base 'Game::EvonyTKR::Role::Common', -role;
-use Mojo::Base 'Game::EvonyTKR::Log::Config', -role;
+use Mojo::Base 'Game::EvonyTKR::Log::Config',  -role;
 use overload
   '""'       => \&as_string,
   '.'        => \&concat,
@@ -47,7 +47,7 @@ sub concat($self, $other, $swap) {
 
 sub _isTrue ($self, $other = undef, $swap = undef) {
   return
-        defined($self)
+       defined($self)
     && ref($self)
     && blessed($self)
     && $self->isa(__PACKAGE__);

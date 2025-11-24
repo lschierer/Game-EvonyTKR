@@ -187,9 +187,9 @@ package Game::EvonyTKR::Role::MarkdownRenderer {
   # This method expects $self to be a Mojolicious::Controller
   sub render_markdown_page ($self, $app, $file_path, $opts = {}) {
 
-    unless(defined($self->app)){
+    unless (defined($self->app)) {
       $self->logger->error('app is not defined in render_markdown_page');
-      return ;
+      return;
     }
 
     my $startstash = $self->stash();
@@ -200,12 +200,12 @@ package Game::EvonyTKR::Role::MarkdownRenderer {
     unless ($file_path && ref($file_path) && blessed($file_path)) {
       $self->logger->error("file_path must be a 'Mojo::File' not "
           . (ref($file_path) || 'undefined'));
-      if(ref($file_path) eq 'HASH') {
+      if (ref($file_path) eq 'HASH') {
         $self->logger->debug('file path is ' . Data::Printer::np($file_path));
       }
       return $self->reply->not_found;
     }
-    unless($file_path->isa('Mojo::File')){
+    unless ($file_path->isa('Mojo::File')) {
       $self->logger->error("file_path must be a 'Mojo::File' not "
           . (ref($file_path) || 'undefined'));
       return $self->reply->not_found;
@@ -224,7 +224,8 @@ package Game::EvonyTKR::Role::MarkdownRenderer {
     }
 
     # Only set title if not already set
-    $self->stash(title => $parsedFile->{title}) unless exists $self->stash->{title};
+    $self->stash(title => $parsedFile->{title})
+      unless exists $self->stash->{title};
 
     # Only set layout if not already set
     my $layout = $parsedFile->{front_matter}->{layout} // 'default';

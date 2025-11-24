@@ -206,12 +206,9 @@ package Game::EvonyTKR::Controller::Role::Pairs {
         my $type_starts_at_zero = scalar(@{ $inflated_pairs->{$type} });
         foreach my $wire_pair (@{ $pairs_by_type->{$type} }) {
           my $wpk = $self->wire_pair_to_key($wire_pair);
-          if (
-            !$type_starts_at_zero && any {
-              $wpk eq $self->wire_pair_to_key($_->to_wire_hash())
-            }
-            $inflated_pairs->{$type}->@*
-          ) {
+          if (!$type_starts_at_zero
+            && any { $wpk eq $self->wire_pair_to_key($_->to_wire_hash()) }
+            $inflated_pairs->{$type}->@*) {
             $self->logger->debug(sprintf('pair %s is already present', $wpk));
             next;
           }

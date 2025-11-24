@@ -15,8 +15,9 @@ package Game::EvonyTKR::Repo::Books::Generic {
     my ($class) = @_;
     my $self = bless {
       cache => Game::EvonyTKR::Service::Cache::instance(),
-      enc   => Sereal::Encoder->new({ freeze_callbacks => 1, refuse_objects => 1 }),
-      dec   => Sereal::Decoder->new,
+      enc   =>
+        Sereal::Encoder->new({ freeze_callbacks => 1, refuse_objects => 1 }),
+      dec => Sereal::Decoder->new,
     }, $class;
     return $self;
   }

@@ -22,7 +22,7 @@ use namespace::autoclean;
 package Game::EvonyTKR::Controller::Generals {
   use Mojo::Base 'Game::EvonyTKR::Controller::ControllerBase';
   use Mojo::Base 'Game::EvonyTKR::Controller::Role::Generals', -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::StaticPages', -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::StaticPages',          -role;
   use Mojo::IOLoop;
   use Mojo::Promise;
   use Mojo::JSON     qw(to_json encode_json);
@@ -75,7 +75,6 @@ package Game::EvonyTKR::Controller::Generals {
     $c->logger->debug(sprintf('%s calling setup_routes', __PACKAGE__));
     $c->setup_routes($app);
     $c->logger->debug(sprintf('%s register complete', __PACKAGE__));
-
 
   }
 
@@ -187,7 +186,7 @@ package Game::EvonyTKR::Controller::Generals {
       $mainRoutes->get('/:uiTarget/:buffActivation/:isPrimary/details-stream')
         ->to(
         controller => 'Generals',
-        action     => 'stream_single_details',
+        action     => 'single_details_stream',
         )->name('Generals_dynamic_singleDetails');
     };
     if ($@) {
@@ -282,7 +281,8 @@ package Game::EvonyTKR::Controller::Generals {
       ->to(controller => 'Generals', action => 'show')
       ->name($grn);
 
-    $c->logger->debug(sprintf('building general routes, gr: "%s" for name "%s"', $gr, $name));
+    $c->logger->debug(
+      sprintf('building general routes, gr: "%s" for name "%s"', $gr, $name));
     $app->add_navigation_item({
       title  => "Details for $name",
       path   => $gr,
@@ -664,8 +664,7 @@ package Game::EvonyTKR::Controller::Generals {
     my $uidseed = join(', ', @$requested_generals) . ' ' . UUID::uuid7();
     $self->logger->debug("uidseed is '$uidseed'");
 
-    my $session_id =
-      UUID::uuid5($self->UUID5_base, $uidseed);
+    my $session_id = UUID::uuid5($self->UUID5_base, $uidseed);
     $self->logger->debug("final session_id is '$session_id'");
 
     # Lookup route metadata
@@ -739,7 +738,7 @@ package Game::EvonyTKR::Controller::Generals {
     }
   }
 
-  sub stream_single_details ($c) {
+  sub single_details_stream ($c) {
     $c->res->headers->content_type('text/event-stream');
     $c->res->headers->content_encoding('utf-8');
     $c->res->headers->add('Cache-Control', 'no-cache');
@@ -758,7 +757,7 @@ package Game::EvonyTKR::Controller::Generals {
       exists $session_store->{$session_id} ? $session_store->{$session_id} : [];
 
     $c->logger->debug(sprintf(
-      'stream_single_details called url: %s,'
+      'single_details_stream called url: %s,'
         . ' uiTarget: %s; buffActivation: %s; run_id: %s',
       $c->req->url->path->to_string,
       $slug_ui, $slug_buff, 0+ $run_id
@@ -813,13 +812,15 @@ package Game::EvonyTKR::Controller::Generals {
 
         my $general = $c->get_general($name);
         unless ($general) {
-          $c->logger->warn("Could not find general '$name' from selection, skipping");
+          $c->logger->warn(
+            "Could not find general '$name' from selection, skipping");
           next;
         }
 
         # Validate the general matches the requested type
         unless (any { $_ eq $generalType } $general->type->@*) {
-          $c->logger->warn("General '$name' is not of type '$generalType', skipping");
+          $c->logger->warn(
+            "General '$name' is not of type '$generalType', skipping");
           next;
         }
 
@@ -841,7 +842,7 @@ package Game::EvonyTKR::Controller::Generals {
       my $jid = $c->app->minion->enqueue(
         summarize_general => [
           $general->name,
-          1,  # isPrimary
+          1,    # isPrimary
           $generalType,
           $validated_params->{buffActivation},
           $validated_params->{ascendingLevel},
@@ -850,7 +851,7 @@ package Game::EvonyTKR::Controller::Generals {
           $validated_params->{specialties}->[1],
           $validated_params->{specialties}->[2],
           $validated_params->{specialties}->[3],
-          undef,  # books - will be computed
+          undef,    # books - will be computed
         ] => {
           delay    => ($index * 0.001) + rand(0.5),
           priority => 80,
@@ -867,14 +868,13 @@ package Game::EvonyTKR::Controller::Generals {
     foreach my $jid (@job_ids) {
       my $promise = $c->app->minion->result_p($jid)->then(sub {
         return if !$c->tx || $c->tx->is_finished;
-        my $info = shift;
+        my $info   = shift;
         my $result = $info->{result};
 
         if (defined($result) && ref($result) eq 'HASH') {
           my $general = $c->get_general($result->{general});
-          unless($general){
-            $c->logger->error(sprintf(
-              'unable to get general from result: %s',
+          unless ($general) {
+            $c->logger->error(sprintf('unable to get general from result: %s',
               Data::Printer::np($result)));
             next;
           }
@@ -883,23 +883,31 @@ package Game::EvonyTKR::Controller::Generals {
           $buffKey =~ s/Siege Troops/Siege Machines/;
 
           my $row = {
-            primary     => $general->to_hash,
-            attackbuff  => $result->{buffs}->{$buffKey}{'Attack'},
-            defensebuff => $result->{buffs}->{$buffKey}{'Defense'},
-            hpbuff      => $result->{buffs}->{$buffKey}{'HP'},
-            marchbuff   => $result->{buffs}->{$buffKey}{'March Size'},
-            groundattackdebuff  => $result->{debuffs}->{'Ground Troops'}{'Attack'},
-            grounddefensedebuff => $result->{debuffs}->{'Ground Troops'}{'Defense'},
+            primary            => $general->to_hash,
+            attackbuff         => $result->{buffs}->{$buffKey}{'Attack'},
+            defensebuff        => $result->{buffs}->{$buffKey}{'Defense'},
+            hpbuff             => $result->{buffs}->{$buffKey}{'HP'},
+            marchbuff          => $result->{buffs}->{$buffKey}{'March Size'},
+            groundattackdebuff =>
+              $result->{debuffs}->{'Ground Troops'}{'Attack'},
+            grounddefensedebuff =>
+              $result->{debuffs}->{'Ground Troops'}{'Defense'},
             groundhpdebuff      => $result->{debuffs}->{'Ground Troops'}{'HP'},
-            mountedattackdebuff  => $result->{debuffs}->{'Mounted Troops'}{'Attack'},
-            mounteddefensedebuff => $result->{debuffs}->{'Mounted Troops'}{'Defense'},
-            mountedhpdebuff      => $result->{debuffs}->{'Mounted Troops'}{'HP'},
-            rangedattackdebuff  => $result->{debuffs}->{'Ranged Troops'}{'Attack'},
-            rangeddefensedebuff => $result->{debuffs}->{'Ranged Troops'}{'Defense'},
-            rangedhpdebuff      => $result->{debuffs}->{'Ranged Troops'}{'HP'},
-            siegeattackdebuff  => $result->{debuffs}->{'Siege Machines'}{'Attack'},
-            siegedefensedebuff => $result->{debuffs}->{'Siege Machines'}{'Defense'},
-            siegehpdebuff      => $result->{debuffs}->{'Siege Machines'}{'HP'},
+            mountedattackdebuff =>
+              $result->{debuffs}->{'Mounted Troops'}{'Attack'},
+            mounteddefensedebuff =>
+              $result->{debuffs}->{'Mounted Troops'}{'Defense'},
+            mountedhpdebuff    => $result->{debuffs}->{'Mounted Troops'}{'HP'},
+            rangedattackdebuff =>
+              $result->{debuffs}->{'Ranged Troops'}{'Attack'},
+            rangeddefensedebuff =>
+              $result->{debuffs}->{'Ranged Troops'}{'Defense'},
+            rangedhpdebuff    => $result->{debuffs}->{'Ranged Troops'}{'HP'},
+            siegeattackdebuff =>
+              $result->{debuffs}->{'Siege Machines'}{'Attack'},
+            siegedefensedebuff =>
+              $result->{debuffs}->{'Siege Machines'}{'Defense'},
+            siegehpdebuff => $result->{debuffs}->{'Siege Machines'}{'HP'},
           };
 
           my $payload = encode_json({ runId => $run_id, data => $row });
@@ -919,10 +927,12 @@ package Game::EvonyTKR::Controller::Generals {
       $c->logger->debug("All jobs complete, sending complete event");
       return if !$c->tx || $c->tx->is_finished;
 
-      Mojo::IOLoop->timer(10 => sub {
-        my $payload = encode_json({ runId => $run_id });
-        $c->write_sse({ type => 'complete', text => $payload });
-      });
+      Mojo::IOLoop->timer(
+        10 => sub {
+          my $payload = encode_json({ runId => $run_id });
+          $c->write_sse({ type => 'complete', text => $payload });
+        }
+      );
     })->catch(sub {
       $c->logger->error("Some jobs failed in batch");
       return undef;
@@ -930,7 +940,8 @@ package Game::EvonyTKR::Controller::Generals {
 
     $c->on(
       finish => sub {
-        $c->logger->debug("Client disconnected, canceling " . scalar(@job_ids) . " jobs");
+        $c->logger->debug(
+          "Client disconnected, canceling " . scalar(@job_ids) . " jobs");
         foreach my $jid (@job_ids) {
           my $job = $c->app->minion->job($jid);
           if ($job) {

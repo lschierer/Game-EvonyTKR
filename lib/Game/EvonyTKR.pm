@@ -27,7 +27,6 @@ package Game::EvonyTKR {
   use Env qw(DEPLOYMENT_TIME HOSTNAME IMAGE_TAG IMAGE_URI);
   our $VERSION = 'v0.50.0';
 
-
   sub startup ($app) {
     $app->logger->debug('setting up logging');
     Log::Any::Adapter->set('Log4perl');
@@ -91,10 +90,10 @@ package Game::EvonyTKR {
   sub _init_core ($app) {
     my $distDir = dist_dir('Game::EvonyTKR');
     my $mode    = $app->mode;
-    my $home = Mojo::Home->new->detect;
+    my $home    = Mojo::Home->new->detect;
     Env::import();
 
-    my $config  = $app->plugin('NotYAMLConfig' => { module => 'YAML::PP' });
+    my $config = $app->plugin('NotYAMLConfig' => { module => 'YAML::PP' });
     $app->config(distDir        => $distDir);
     $app->config(APP_START_TIME => time());
     $app->config(
@@ -162,9 +161,10 @@ package Game::EvonyTKR {
       $app->minion->remove_after(7200);
     }
 
-    my @task_plugins = find_modules 'Game::EvonyTKR::External', {recursive => 1};
+    my @task_plugins = find_modules 'Game::EvonyTKR::External',
+      { recursive => 1 };
     foreach my $module (@task_plugins) {
-      if(my $e = load_class($module)){
+      if (my $e = load_class($module)) {
         my $errmessage = sprintf('loading module "%s" failed: %s', $module, $e);
         print STDERR $errmessage;
         $app->log->error($errmessage);
@@ -201,20 +201,23 @@ package Game::EvonyTKR {
     };
 
     my @controllerplugins = find_modules 'Game::EvonyTKR::Controller';
-    $app->logger->info(sprintf('found %s controller plugins', scalar(@controllerplugins)));
+    $app->logger->info(
+      sprintf('found %s controller plugins', scalar(@controllerplugins)));
     foreach my $module (@controllerplugins) {
-      if(my $e = load_class($module)){
+      if (my $e = load_class($module)) {
         my $errmessage = sprintf('loading module "%s" failed: %s', $module, $e);
         print STDERR $errmessage;
         $app->log->error($errmessage);
         croak($errmessage);
-      }else {
-        next if($module eq 'Game::EvonyTKR::Controller::ControllerBase');
+      }
+      else {
+        next if ($module eq 'Game::EvonyTKR::Controller::ControllerBase');
         eval {
           $app->plugin($module);
           $app->logger->debug("loaded $module");
         } or do {
-          $app->logger->error(sprintf('failed to load module %s: %s', $module, $@));
+          $app->logger->error(
+            sprintf('failed to load module %s: %s', $module, $@));
         }
       }
     }

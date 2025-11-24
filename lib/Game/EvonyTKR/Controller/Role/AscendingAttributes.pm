@@ -64,12 +64,10 @@ package Game::EvonyTKR::Controller::Role::AscendingAttributes {
     unless (defined($app)) {
       use Cwd;
       $collectionDir = Mojo::File->new(cwd())->child('share/collections/data/');
-      $self->logger->warn(
-        sprintf(
-          'collectionDir "%s" infered from cwd "%s"',
-          $collectionDir, cwd()
-        )
-      );
+      $self->logger->warn(sprintf(
+        'collectionDir "%s" infered from cwd "%s"',
+        $collectionDir, cwd()
+      ));
     }
     else {
       $collectionDir =

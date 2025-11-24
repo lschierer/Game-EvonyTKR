@@ -63,8 +63,7 @@ package Game::EvonyTKR::External::Covenant::Loader {
       push @errors, $errmessage;
     }
 
-    my $covenant =
-      Game::EvonyTKR::Model::Covenant->from_hash($hashObject);
+    my $covenant = Game::EvonyTKR::Model::Covenant->from_hash($hashObject);
     unless ($covenant) {
       my $errmessage = sprintf('failed to create covenant from %s',
         Data::Printer::np($hashObject, multiline => 0));

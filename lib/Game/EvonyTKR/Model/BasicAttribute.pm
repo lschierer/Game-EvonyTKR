@@ -61,8 +61,7 @@ package Game::EvonyTKR::Model::BasicAttribute {
         sprintf('attribute_name is a required string, not "%s"',
         $self->attribute_name);
     }
-    unless (any { $_ =~ /$self->attribute_name/i }
-      $self->BasicAttributeTypes) {
+    unless (any { $_ =~ /$self->attribute_name/i } $self->BasicAttributeTypes) {
       push @errors,
         sprintf('attribute_name must be one of %s, not "%s"',
         join ', ', $self->BasicAttributeTypes);

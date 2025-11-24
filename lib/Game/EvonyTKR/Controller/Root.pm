@@ -26,7 +26,6 @@ package Game::EvonyTKR::Controller::Root {
       order => 0,
     });
 
-
     $app->routes->get('/Reference')->to(
       controller => 'Root',
       action     => 'single_page'
@@ -50,13 +49,12 @@ package Game::EvonyTKR::Controller::Root {
     });
   }
 
-
   sub index ($c) {
-    unless($c){
+    unless ($c) {
       croak('controller is undefined in root index method');
       return;
     }
-    my $home = Mojo::Home->new->detect;
+    my $home       = Mojo::Home->new->detect;
     my $index_path = $home->child('share/pages/index.md');
 
     $c->logger->debug("Rendering root index from $index_path");
@@ -70,12 +68,16 @@ package Game::EvonyTKR::Controller::Root {
       );
     }
 
-    unless($index_path && ref($index_path) && $index_path->isa('Mojo::File')){
+    unless ($index_path && ref($index_path) && $index_path->isa('Mojo::File')) {
       $index_path = Mojo::File->new($index_path);
     }
-    $c->logger->debug(sprintf('root index is a "%s"', $index_path->isa('Mojo::File') ? 'Mojo::File' : ref($index_path) ? ref($index_path) : 'scalar'));
+    $c->logger->debug(sprintf('root index is a "%s"',
+        $index_path->isa('Mojo::File') ? 'Mojo::File'
+      : ref($index_path)               ? ref($index_path)
+      :                                  'scalar'));
 
-    return $c->render_markdown_page($c->app, $index_path,  { template => 'root/index'});
+    return $c->render_markdown_page($c->app, $index_path,
+      { template => 'root/index' });
   }
 }
 

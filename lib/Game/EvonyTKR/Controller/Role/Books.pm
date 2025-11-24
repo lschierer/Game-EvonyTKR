@@ -7,7 +7,7 @@ require Game::EvonyTKR::Service::Cache;
 require Game::EvonyTKR::Model::Factory;
 
 package Game::EvonyTKR::Controller::Role::Books {
-  use Mojo::Base -role,                          -signatures;
+  use Mojo::Base -role, -signatures;
   use List::AllUtils qw( any none uniq all );
   use List::UtilsBy;
   use Log::Any;
@@ -100,12 +100,10 @@ package Game::EvonyTKR::Controller::Role::Books {
     unless (defined($app)) {
       use Cwd;
       $collectionDir = Mojo::File->new(cwd())->child('share/collections/data/');
-      $self->logger->warn(
-        sprintf(
-          'collectionDir "%s" infered from cwd "%s"',
-          $collectionDir, cwd()
-        )
-      );
+      $self->logger->warn(sprintf(
+        'collectionDir "%s" infered from cwd "%s"',
+        $collectionDir, cwd()
+      ));
     }
     else {
       $collectionDir =
@@ -131,12 +129,10 @@ package Game::EvonyTKR::Controller::Role::Books {
     unless (defined($app)) {
       use Cwd;
       $collectionDir = Mojo::File->new(cwd())->child('share/collections/data/');
-      $self->logger->warn(
-        sprintf(
-          'collectionDir "%s" infered from cwd "%s"',
-          $collectionDir, cwd()
-        )
-      );
+      $self->logger->warn(sprintf(
+        'collectionDir "%s" infered from cwd "%s"',
+        $collectionDir, cwd()
+      ));
     }
     else {
       $collectionDir =

@@ -3,7 +3,7 @@ use utf8::all;
 use File::FindLib 'lib';
 
 package Game::EvonyTKR::Service::Cache {
-  use Mojo::Base -base,                          -signatures;
+  use Mojo::Base -base,                         -signatures;
   use Mojo::Base 'Game::EvonyTKR::Log::Config', -role;
   use Cache::Memcached::Fast;
   use Sereal::Encoder;
@@ -29,10 +29,8 @@ package Game::EvonyTKR::Service::Cache {
         servers           => [{ address => '127.0.0.1:11211' }],
         namespace         => 'evonytkr:' . $self->namespace,
         utf8              => 1,    # Encode keys as UTF-8 for unicode support
-        serialize_methods => [
-          sub { $encoder->encode($_[0]) },
-          sub { $decoder->decode($_[0]) }
-        ]
+        serialize_methods =>
+          [sub { $encoder->encode($_[0]) }, sub { $decoder->decode($_[0]) }]
       });
     }
     return $instances->{$ns_key};

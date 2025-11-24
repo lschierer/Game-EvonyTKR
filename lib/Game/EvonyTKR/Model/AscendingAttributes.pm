@@ -18,8 +18,8 @@ package Game::EvonyTKR::Model::AscendingAttributes {
   use Carp;
   use Data::Printer;
   use List::AllUtils qw (none);
-  use UUID       qw(uuid5);
-  use Hash::Util qw(lock_keys);
+  use UUID           qw(uuid5);
+  use Hash::Util     qw(lock_keys);
   use namespace::autoclean;
 # VERSION
   use overload
@@ -189,10 +189,7 @@ package Game::EvonyTKR::Model::AscendingAttributes {
     if ($level =~ /purple/i) {
       $red = 0;
     }
-    if (
-      none { $_ eq $level }
-      $self->AscendingAttributeLevelValues($red)
-    ) {
+    if (none { $_ eq $level } $self->AscendingAttributeLevelValues($red)) {
       $self->logger->debug(
         "$level must be one of "
           . join(
@@ -219,7 +216,7 @@ package Game::EvonyTKR::Model::AscendingAttributes {
       my $l = $self->attributes->{$lv};
       $ascending_data->{$lv} = {
         text  => $l->{text} // '',
-        buffs => [ map { $_->to_wire_hash() } $l->{buffs}->@* ],
+        buffs => [map { $_->to_wire_hash() } $l->{buffs}->@*],
       };
     }
     return {

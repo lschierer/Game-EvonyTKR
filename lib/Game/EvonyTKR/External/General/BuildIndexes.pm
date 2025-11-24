@@ -63,7 +63,8 @@ package Game::EvonyTKR::External::General::BuildIndexes {
     for my $name (@$general_names) {
       my $general = $job->get_general($name);
       unless ($general) {
-        $job->logger->warn(sprintf('Could not fetch general "%s" from cache', $name));
+        $job->logger->warn(
+          sprintf('Could not fetch general "%s" from cache', $name));
         next;
       }
 
@@ -91,7 +92,7 @@ package Game::EvonyTKR::External::General::BuildIndexes {
 
     # Store each type's list in cache
     for my $type (keys %by_type) {
-      my $type_key = "by_type:$type";
+      my $type_key  = "by_type:$type";
       my $keys_list = $by_type{$type};
 
       unless ($job->general_cache->set($type_key, $keys_list)) {
@@ -114,12 +115,11 @@ package Game::EvonyTKR::External::General::BuildIndexes {
 
     my $msg = sprintf(
       'build_general_indexes completed: %d generals indexed into %d types (%s)',
-      $indexed_count, scalar(@type_list), join(', ', @type_list)
-    );
+      $indexed_count, scalar(@type_list), join(', ', @type_list));
     $job->logger->info($msg);
     $job->note(
-      indexed_count   => $indexed_count,
-      types           => \@type_list,
+      indexed_count    => $indexed_count,
+      types            => \@type_list,
       generals_by_type => \%by_type,
     );
     return $job->finish($msg);

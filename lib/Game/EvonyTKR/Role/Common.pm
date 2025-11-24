@@ -15,7 +15,7 @@ package Game::EvonyTKR::Role::Common {
   use UUID               qw(uuid5);
   use Unicode::CaseFold  qw(fc);
   use Unicode::Normalize qw(NFKD);
-  use List::AllUtils qw(min);
+  use List::AllUtils     qw(min);
 
   sub normalize ($self, $name) {
     my $dn = Encode::is_utf8($name) ? $name : Encode::decode_utf8($name);

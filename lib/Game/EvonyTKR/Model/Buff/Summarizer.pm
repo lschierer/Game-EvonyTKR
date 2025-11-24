@@ -278,8 +278,7 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
         $btt =~ s/(Ranged|Ground|Mounted)/$1 Troop/;
         $btt =~ s/Siege Machines/Siege Machine/;
         my $book =
-          first { $_->name =~ /Level 4 $btt $attribute$/ }
-        values $books->%*;
+          first { $_->name =~ /Level 4 $btt $attribute$/ } values $books->%*;
 
         if (
           $book
@@ -303,10 +302,9 @@ class Game::EvonyTKR::Model::Buff::Summarizer :
         if ($troopType ne 'Overall') {
           my $btt = $tt =~ s/(Ranged|Ground|Mounted)/$1 Troop/r;
           $btt = $tt =~ s/Siege Machines/Siege Machine/r;
-          my $book = first {
-            $_->name =~ /Level 4 $btt $attribute  Against Monsters/
-          }
-          values $books->%*;
+          my $book =
+            first { $_->name =~ /Level 4 $btt $attribute  Against Monsters/ }
+            values $books->%*;
 
           if (
             $book
