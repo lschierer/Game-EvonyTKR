@@ -17,7 +17,7 @@ use Sereal::Decoder;
 
 $ENV{'MOJO_MODE'} = 'development';
 
-my $logger = Game::EvonyTKR::Log::Config->logger('Test::Package');
+my $logger = Game::EvonyTKR::Log::Config->get_logger('Test::Package');
 say 'log level is ' . Log::Log4perl::Level::to_level($logger->level());
 
 my $home = Mojo::Home->new->detect('Game::EvonyTKR');
@@ -28,6 +28,7 @@ our $decoder = Sereal::Decoder->new();
 our $encoder = Sereal::Encoder->new({
   canonical          => 1,
   no_shared_hashkeys => 1,
+  freeze_callbacks   => 1,
   refuse_objects     => 1
 });
 

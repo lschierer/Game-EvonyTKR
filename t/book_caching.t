@@ -8,7 +8,7 @@ use lib 'lib';
 require Game::EvonyTKR;
 require Game::EvonyTKR::Log::Config;
 
-my $logger = Game::EvonyTKR::Log::Config->logger('Test');
+my $logger = Game::EvonyTKR::Log::Config->get_logger('Test::Package');
 $logger->info('Test script logging configured');
 
 require Game::EvonyTKR::Role::Logger;

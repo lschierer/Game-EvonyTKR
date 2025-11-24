@@ -27,7 +27,7 @@ require Game::EvonyTKR::Shared::Constants;
 require Game::EvonyTKR::External::Common;
 
 # Setup logger
-my $logger        = Game::EvonyTKR::Log::Config->logger();
+my $logger        = Game::EvonyTKR::Log::Config->get_logger('Test::Package');
 my $memcachClient = Cache::Memcached->new({
   debug     => 0,
   namespace => 'generals__',

@@ -51,7 +51,7 @@ package Game::EvonyTKR::Model::Specialty {
 
   # --- YAML -> object (input shape: levels = [ {level, text, buffs}, ... ]) ---
   sub from_hash ($class, $h) {
-    my $logger = $log;
+    my $logger = Game::EvonyTKR::Log::Config->get_logger(__PACKAGE__);
     croak "from_hash expects hashref" unless ref($h) eq 'HASH';
     my $name = $h->{name} // '';
     $logger->debug(sprintf(
@@ -114,17 +114,25 @@ package Game::EvonyTKR::Model::Specialty {
   }
 
   sub to_wire_hash ($self) {
+    my $levels_data = {};
+    foreach my $lv (keys $self->levels->%*) {
+      my $l = $self->levels->{$lv};
+      $levels_data->{$lv} = {
+        text  => $l->{text} // '',
+        buffs => [ map { $_->to_wire_hash() } $l->{buffs}->@* ],
+      };
+    }
     my $hash = {
       _v     => 1,
       id     => $self->id,
       name   => $self->name,
-      levels => $self->levels,
+      levels => $levels_data,
     };
     return $hash;
   }
 
   sub from_wire_hash ($class, $w) {
-    my $logger = $log;
+    my $logger = Game::EvonyTKR::Log::Config->get_logger(__PACKAGE__);
     unless (($w->{_v} // 1) == 1){
       $logger->error("unknown wire version");
       croak("unknown wire version");

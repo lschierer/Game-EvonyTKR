@@ -237,12 +237,12 @@ components:
         name:
           type: string
           maxLength: 1000
-        activeBuffs:
+        activebuffs:
           type: array
           items:
             $ref: "#/components/schemas/Buff"
           maxItems: 10
-        passiveBuffs:
+        passivebuffs:
           type: array
           items:
             $ref: "#/components/schemas/Buff"
@@ -550,7 +550,7 @@ components:
         - Buffs
         - level
       properties:
-        Buffs:
+        buffs:
           type: array
           items:
             $ref: "#/components/schemas/Buff"

@@ -37,7 +37,7 @@ package Game::EvonyTKR::External::JobBase {
       say 'job not defined in run for ' . __PACKAGE__;
       return;
     }
-    Game::EvonyTKR::Log::Config->logger();
+    Game::EvonyTKR::Log::Config->get_logger();
     $job->logger->debug("JobBase configured Logging in run.");
     unless (defined($job->app)) {
       my $errmessage = sprintf('app undefined in job for %s', __PACKAGE__);

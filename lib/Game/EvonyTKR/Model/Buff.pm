@@ -11,7 +11,6 @@ package Game::EvonyTKR::Model::Buff {
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants', -role;
   use List::AllUtils qw( any none );
   use Carp;
-  use Log::Any       qw($log);
   use File::FindLib 'lib';
   use overload
     '""'       => \&as_string,
@@ -386,7 +385,7 @@ package Game::EvonyTKR::Model::Buff {
   }
 
   sub from_hash ($class, $hashref) {
-    my $logger = $log;
+    my $logger = Game::EvonyTKR::Log::Config->get_logger();
     my $v      = Game::EvonyTKR::Model::Buff::Value->new(
       number => abs($hashref->{value}->{number}),
       unit   => ($hashref->{value}->{unit} // 'percentage'),
@@ -469,7 +468,7 @@ package Game::EvonyTKR::Model::Buff {
   }
 
   sub from_wire_hash ($class, $w) {
-    my $logger = $log;
+    my $logger = Game::EvonyTKR::Log::Config->get_logger();
     my $buff = $class->new(
       attribute    => $w->{attribute},
       passive      => $w->{passive} // 0,

@@ -6,6 +6,7 @@ require JSON::PP;
 require Scalar::Util;
 require Game::EvonyTKR::Model::Buff::Matcher;
 require Game::EvonyTKR::Model::Buff;
+require Game::EvonyTKR::Log::Config;
 use namespace::autoclean;
 
 package Game::EvonyTKR::Model::Role::Book {
@@ -148,9 +149,10 @@ package Game::EvonyTKR::Model::Role::Book {
   }
 
   sub from_hash($class, $object) {
+    my $logger = Game::EvonyTKR::Log::Config->get_logger(__PACKAGE__);
     my $b;
     if ($object->{name} =~ m/Level [1-4]/i) {
-      $class->logger->debug(
+      $logger->debug(
         sprintf('detected that %s is a Generic book', $object->{name}));
       my $name = $object->{name} =~ s/Level [1-4]\s+//ir;
       my $level;
@@ -163,7 +165,7 @@ package Game::EvonyTKR::Model::Role::Book {
       $b->level($level);
     }
     else {
-      $class->logger->debug(
+      $logger->debug(
         sprintf('detected that %s is a builtin book', $object->{name}));
       $b = Game::EvonyTKR::Model::Book->new(name => $object->{name},)
         ->with_roles('Game::EvonyTKR::Model::Role::Book::Builtin');

@@ -33,7 +33,7 @@ sub get_effective_caller {
 
     # Return first valid class found
     if($caller->can('logger')){
-      return $caller unless($caller eq 'Game::EvonyTKR::Role::Logger');
+      return $caller unless($caller eq 'Game::EvonyTKR::Log::Config');
     }
   }
   # Fallback to a default strategy
@@ -160,7 +160,7 @@ sub appender_setup {
       'Game::EvonyTKR::Role::Constants::GeneralConstants'          => 'WARN',
       'Game::EvonyTKR::Role::Constants::Specialties'               => 'WARN',
       'Game::EvonyTKR::Role::General'                              => 'WARN',
-      'Game::EvonyTKR::Role::Logger'                               => 'WARN',
+      'Game::EvonyTKR::Log::Config'                               => 'WARN',
       'Game::EvonyTKR::Role::MarkdownRenderer'                     => 'WARN',
       'Game::EvonyTKR::Service::Cache'                             => 'WARN',
       'Game::EvonyTKR::Shared::Constants'                          => 'WARN',

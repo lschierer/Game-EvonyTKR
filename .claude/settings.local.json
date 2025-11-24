@@ -1,7 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(perl -c:*)"
+      "Bash(perl -c:*)",
+      "Bash(prove -v:*)",
+      "Bash(perl -Ilib t/encoding.t:*)"
     ],
     "deny": [],
     "ask": []

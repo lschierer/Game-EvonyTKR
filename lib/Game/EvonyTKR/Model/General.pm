@@ -96,7 +96,7 @@ package Game::EvonyTKR::Model::General {
     state $ascending_helper //= do {
       my $helper = eval {
         Mojo::Base->new->with_roles(
-          'Game::EvonyTKR::Role::Logger',
+          'Game::EvonyTKR::Log::Config',
           'Game::EvonyTKR::Role::Common',
           'Game::EvonyTKR::Controller::Role::AscendingAttributes'
         );
@@ -135,7 +135,7 @@ package Game::EvonyTKR::Model::General {
     state $books_helper //= do {
       my $helper = eval {
         Mojo::Base->new->with_roles(
-          'Game::EvonyTKR::Role::Logger',
+          'Game::EvonyTKR::Log::Config',
           'Game::EvonyTKR::Role::Common',
           'Game::EvonyTKR::Controller::Role::Books'
         );
@@ -187,7 +187,7 @@ package Game::EvonyTKR::Model::General {
     state $specialty_helper //= do {
       my $helper = eval {
         Mojo::Base->new->with_roles(
-          'Game::EvonyTKR::Role::Logger',
+          'Game::EvonyTKR::Log::Config',
           'Game::EvonyTKR::Role::Common',
           'Game::EvonyTKR::Controller::Role::Specialties'
         );
@@ -227,11 +227,11 @@ package Game::EvonyTKR::Model::General {
     }
   }
 
-  sub from_hash ($self, $hashObject) {
-    my $logger = Game::EvonyTKR::Log::Config->logger();
+  sub from_hash ($class, $hashObject) {
+    my $logger = Game::EvonyTKR::Log::Config->get_logger(__PACKAGE__);
 
     if (!exists $hashObject->{name}) {
-      $self->logger->error('hash object must contain a name attribute.');
+      $logger->error('hash object must contain a name attribute.');
       return undef;
     }
 
@@ -244,7 +244,7 @@ package Game::EvonyTKR::Model::General {
       specialtyNames  => $hashObject->{specialties},
     );
     unless ($g->validate()) {
-      $self->logger->error('Invalid Hash Object.');
+      $logger->error('Invalid Hash Object.');
       return;
     }
 
@@ -295,7 +295,7 @@ package Game::EvonyTKR::Model::General {
   }
 
   sub from_wire_hash ($class, $w, $opts = {}) {
-    my $logger = Game::EvonyTKR::Log::Config->logger();
+    my $logger = Game::EvonyTKR::Log::Config->get_logger(__PACKAGE__);
     unless (($w->{_v} // 1) == 1 ) {
       $logger->error('unknown wire version');
       die "unknown wire version";

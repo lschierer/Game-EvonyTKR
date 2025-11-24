@@ -15,7 +15,6 @@ package Game::EvonyTKR::Model::AscendingAttributes {
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants',       -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants',    -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::AscendingAttributes', -role;
-  use Log::Any qw($log);
   use Carp;
   use Data::Printer;
   use List::AllUtils qw (none);
@@ -215,9 +214,20 @@ package Game::EvonyTKR::Model::AscendingAttributes {
   }
 
   sub to_wire_hash ($self) {
-    my $h = $self->to_hash();
-    $h->{id} = $self->id;
-    return $h;
+    my $ascending_data = {};
+    foreach my $lv (keys $self->attributes->%*) {
+      my $l = $self->attributes->{$lv};
+      $ascending_data->{$lv} = {
+        text  => $l->{text} // '',
+        buffs => [ map { $_->to_wire_hash() } $l->{buffs}->@* ],
+      };
+    }
+    return {
+      _v        => 1,
+      id        => $self->id,
+      general   => $self->general,
+      ascending => $ascending_data,
+    };
   }
 
   sub to_hash {
@@ -255,7 +265,7 @@ package Game::EvonyTKR::Model::AscendingAttributes {
   }
 
   sub from_wire_hash($class, $h) {
-    my $logger = $log;
+    my $logger = Game::EvonyTKR::Log::Config->get_logger();
 
     # Convert wire format (hash-based ascending) back to array format
     my $converted_h = {%$h};    # shallow copy
@@ -290,7 +300,7 @@ package Game::EvonyTKR::Model::AscendingAttributes {
   }
 
   sub from_hash($class, $object) {
-    my $logger = $log;
+    my $logger = Game::EvonyTKR::Log::Config->get_logger();
     unless (exists $object->{ascending}
       && ref($object->{ascending}) eq 'ARRAY') {
       $logger->error(sprintf(

@@ -5,7 +5,7 @@ use File::FindLib 'lib';
 # lib/Game/EvonyTKR/Repo/Books.pm
 package Game::EvonyTKR::Repo::Books::Builtin {
   use Mojo::Base -base;
-  use Mojo::Base 'Game::EvonyTKR::Role::Logger', -role;
+  use Mojo::Base 'Game::EvonyTKR::Log::Config', -role;
   use Sereal::Encoder;
   use Sereal::Decoder;
   use Game::EvonyTKR::Model::Factory ();
@@ -15,7 +15,7 @@ package Game::EvonyTKR::Repo::Books::Builtin {
     my ($class) = @_;
     my $self = bless {
       cache => Game::EvonyTKR::Service::Cache::instance(),
-      enc   => Sereal::Encoder->new({ refuse_objects => 1 }),
+      enc   => Sereal::Encoder->new({ freeze_callbacks => 1, refuse_objects => 1 }),
       dec   => Sereal::Decoder->new,
     }, $class;
     return $self;

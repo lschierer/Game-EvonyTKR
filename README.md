@@ -138,3 +138,10 @@ just tidy             # Format all Perl code with perltidy
 1. conflict groups to book mappings are woefully incomplete
 1. standard book names are inconsistent and partially wrong
 1. Look up debuff book values. EvAns source material doesn't have these.
+
+## Testing Infrastructure TODOs
+
+1. **Replace `Game::EvonyTKR::External::Common`** - This module is still used for books but not for generals. It needs to be replaced with better patterns matching how other collection types work.
+1. **Fix `t/generals.t` and `t/books_caching.t`** - These tests are broken; they rely on the deprecated `External::Common` pattern and don't work with current Minion job architecture.
+1. **Unify book loading patterns** - Books have two kinds (builtin/generic) vs single kind for other collections. While this difference is necessary, the code divergence should be minimized.
+1. **Memcache test lifecycle** - Tests need memcache running but `just quickdev` manages its own for data consistency. Consider a test harness that manages memcache lifecycle, or document the manual process clearly.

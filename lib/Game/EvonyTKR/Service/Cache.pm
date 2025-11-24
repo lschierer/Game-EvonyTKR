@@ -16,6 +16,7 @@ package Game::EvonyTKR::Service::Cache {
   our $encoder = Sereal::Encoder->new({
     canonical          => 1,
     no_shared_hashkeys => 1,
+    freeze_callbacks   => 1,
     refuse_objects     => 1
   });
 
@@ -27,10 +28,10 @@ package Game::EvonyTKR::Service::Cache {
       $instances->{$ns_key} = Cache::Memcached::Fast->new({
         servers           => [{ address => '127.0.0.1:11211' }],
         namespace         => 'evonytkr:' . $self->namespace,
-        utf8              => 1,
+        utf8              => 1,    # Encode keys as UTF-8 for unicode support
         serialize_methods => [
-          sub { $encoder->encode(@_) },    # Custom serialization sub
-          sub { $decoder->decode(@_) }     # Custom deserialization sub
+          sub { $encoder->encode($_[0]) },
+          sub { $decoder->decode($_[0]) }
         ]
       });
     }
@@ -38,36 +39,23 @@ package Game::EvonyTKR::Service::Cache {
   }
 
   sub add ($self, $key, $data) {
-    my $encoded = $encoder->encode($data);
-    return $self->instance->add($key, $encoded);
+    return $self->instance->add($key, $data);
   }
 
   sub set ($self, $key, $data) {
-    my $encoded = $encoder->encode($data);
-    return $self->instance->set($key, $encoded);
+    return $self->instance->set($key, $data);
   }
 
   sub get ($self, $key) {
-    my $encoded = $self->instance->get($key);
-    return unless defined($encoded) && length($encoded);
-
-    $decoder->decode($encoded, my $data);
-    return $data;
+    return $self->instance->get($key);
   }
 
   sub gets ($self, $key) {
-    my $cas_val = $self->instance->gets($key);
-    if (defined $cas_val) {
-      my $encoded = $$cas_val[1];
-      $decoder->decode($encoded, my $data);
-      $$cas_val[1] = $data;
-    }
-    return $cas_val;
+    return $self->instance->gets($key);
   }
 
   sub cas ($self, $key, $cas, $value) {
-    my $encoded = $encoder->encode($value);
-    return $self->instance->cas($key, $cas, $encoded);
+    return $self->instance->cas($key, $cas, $value);
   }
 
   sub delete ($self, $key) {

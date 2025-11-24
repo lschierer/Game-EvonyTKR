@@ -234,9 +234,26 @@ package Game::EvonyTKR::Model::BasicAttribute {
     };
   }
 
+  sub to_wire_hash ($self) {
+    return {
+      _v             => 1,
+      attribute_name => $self->attribute_name,
+      base           => $self->base,
+      increment      => $self->increment,
+    };
+  }
+
+  sub from_wire_hash ($class, $w) {
+    return $class->new(
+      attribute_name => $w->{attribute_name},
+      base           => $w->{base}      // 0,
+      increment      => $w->{increment} // 0,
+    );
+  }
+
   # Method for JSON serialization
   sub TO_JSON ($self) {
-    return $self->to_hash();
+    return $self->to_wire_hash();
   }
 
   # Stringification method using JSON

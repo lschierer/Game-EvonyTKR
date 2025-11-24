@@ -21,7 +21,6 @@ package Game::EvonyTKR::Model::Covenant {
   use File::FindLib 'lib';
   use List::AllUtils qw(first any all none uniq);
   use Hash::Util     qw(lock_keys);
-  use Log::Any       qw($log);
   use Carp;
   use overload
     '""'       => \&as_string,
@@ -167,7 +166,7 @@ package Game::EvonyTKR::Model::Covenant {
   };
 
   sub from_hash($class, $object) {
-    my $logger = $log;
+    my $logger = Game::EvonyTKR::Log::Config->get_logger(__PACKAGE__);
     if (!exists $object->{name}) {
       $logger->error('object must have name attribute.');
       return;
@@ -176,9 +175,7 @@ package Game::EvonyTKR::Model::Covenant {
     my $name = $object->{name};
     state $general_helper //= do {
       my $helper = eval {
-        Mojo::Base->new->with_roles(
-          'Game::EvonyTKR::Role::Logger',
-          'Game::EvonyTKR::Role::Common',
+        Game::EvonyTKR::Model::Base->new->with_roles(
           'Game::EvonyTKR::Controller::Role::Generals'
         );
       };
@@ -236,7 +233,7 @@ package Game::EvonyTKR::Model::Covenant {
   }
 
   sub from_wire_hash ($class, $h) {
-    my $logger = $log;
+    my $logger = Game::EvonyTKR::Log::Config->get_logger(__PACKAGE__);
     unless (ref($h) && ref($h) eq 'HASH') {
       my $errmessage = 'from_wire_hash requires a valid hashref';
       $logger->error($errmessage);
@@ -253,9 +250,7 @@ package Game::EvonyTKR::Model::Covenant {
 
     state $general_helper //= do {
       my $helper = eval {
-        Mojo::Base->new->with_roles(
-          'Game::EvonyTKR::Role::Logger',
-          'Game::EvonyTKR::Role::Common',
+        Game::EvonyTKR::Model::Base->new->with_roles(
           'Game::EvonyTKR::Controller::Role::Generals'
         );
       };

@@ -64,15 +64,15 @@ package Game::EvonyTKR::Model::General::Pair {
   }
 
   sub from_wire_hash ($class, $h) {
-    my $logger = Game::EvonyTKR::Log::Config->logger();
-    
-    my $primary_name = ref($h->{primary}) eq 'HASH' 
-      ? $h->{primary}->{name} 
+    my $logger = Game::EvonyTKR::Log::Config->get_logger();
+
+    my $primary_name = ref($h->{primary}) eq 'HASH'
+      ? $h->{primary}->{name}
       : $h->{primary};
     my $secondary_name = ref($h->{secondary}) eq 'HASH'
       ? $h->{secondary}->{name}
       : $h->{secondary};
-    
+
     unless (defined($primary_name) && length($primary_name)) {
       $logger->error('hash object must contain a primary with a name in it.');
       return;
@@ -82,7 +82,7 @@ package Game::EvonyTKR::Model::General::Pair {
     unless ($general_helper) {
       eval {
         $general_helper = Mojo::Base->new->with_roles(
-          'Game::EvonyTKR::Role::Logger',
+          'Game::EvonyTKR::Log::Config',
           'Game::EvonyTKR::Role::Common',
           'Game::EvonyTKR::Controller::Role::Generals'
         );
