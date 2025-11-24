@@ -1,12 +1,69 @@
 name: Age of Discovery
 levels:
   - level: Green
-    text: When General brings any dragon Attacking Siege Machine Attack +3%. When General brings any dragon March Size Capacity +1%.
+    text: >-
+      When General brings any dragon Attacking Siege Machine Attack +3%.
+      When General brings any dragon March Size Capacity +1%.
+    buffs:
+      - attribute: Attack
+        troop: Siege Machines
+        conditions:
+          - Attacking
+          - brings a dragon
+        value:
+          number: 3
+      - attribute: March Size
+        value:
+          number: 1
   - level: Blue
     text: When General brings any dragon Attacking Siege Machine Attack +3%. When General brings any dragon March Size Capacity +1%.
+    buffs:
+      - attribute: Attack
+        troop: Siege Machines
+        conditions:
+          - Attacking
+          - brings a dragon
+        value:
+          number: 3
+      - attribute: March Size
+        value:
+          number: 1
   - level: Purple
     text: When General brings any dragon Attacking Siege Machine Attack +6%. When General brings any dragon March Size Capacity +2%.
+    buffs:
+      - attribute: Attack
+        troop: Siege Machines
+        conditions:
+          - Attacking
+          - brings a dragon
+        value:
+          number: 6
+      - attribute: March Size
+        value:
+          number: 2
   - level: Orange
     text: When General brings any dragon Attacking Siege Machine Attack +6%. When General brings any dragon March Size Capacity +2%.
+    buffs:
+      - attribute: Attack
+        troop: Siege Machines
+        conditions:
+          - Attacking
+          - brings a dragon
+        value:
+          number: 6
+      - attribute: March Size
+        value:
+          number: 2
   - level: Gold
     text: When General brings any dragon Attacking Siege Machine Attack +12%. When General brings any dragon March Size Capacity +4%.
+    buffs:
+      - attribute: Attack
+        troop: Siege Machines
+        conditions:
+          - Attacking
+          - brings a dragon
+        value:
+          number: 12
+      - attribute: March Size
+        value:
+          number: 4
