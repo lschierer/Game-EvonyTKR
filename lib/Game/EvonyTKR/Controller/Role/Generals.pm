@@ -95,6 +95,48 @@ package Game::EvonyTKR::Controller::Role::Generals {
 
     return \%generals;
   }
+
+  sub get_generals_by_type ($self, $type) {
+    $logger->debug("get_generals_by_type called for: $type");
+
+    # Fetch the pre-built index for this type
+    my $type_key  = "by_type:$type";
+    my $keys_list = $self->general_cache->get($type_key);
+
+    unless ($keys_list && @$keys_list) {
+      $logger->warn("No generals found for type: $type");
+      return [];
+    }
+
+    $logger->debug(sprintf(
+      'Found %d general keys for type "%s"',
+      scalar(@$keys_list), $type
+    ));
+
+    # Hydrate each general from the keys list
+    my @generals;
+    for my $key (@$keys_list) {
+      my $general = $self->get_general($key);
+      if ($general) {
+        push @generals, $general;
+      }
+      else {
+        $logger->warn("Could not hydrate general for key: $key");
+      }
+    }
+
+    $logger->debug(sprintf(
+      'Returning %d hydrated generals for type "%s"',
+      scalar(@generals), $type
+    ));
+
+    return \@generals;
+  }
+
+  sub get_available_types ($self) {
+    my $types = $self->general_cache->get('available_types');
+    return $types // [];
+  }
 }
 
 1;

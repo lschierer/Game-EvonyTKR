@@ -5,6 +5,7 @@ use File::FindLib 'lib';
 package Game::EvonyTKR::External::General::LoadAll {
   use Mojo::Base 'Game::EvonyTKR::External::JobBase', -signatures;
   use Mojo::Base 'Game::EvonyTKR::Role::Common',      -role;
+  require Game::EvonyTKR::External::General::BuildIndexes;
   use Mojo::File;
 
   sub register ($taskClass, $app, $conf = {}) {
@@ -58,7 +59,7 @@ package Game::EvonyTKR::External::General::LoadAll {
         'load_general' => [$job->normalize($file->to_string)] => {
           attempts => 3,
           delay    => rand(10),
-          expire   => 300,
+          expire   => 500,
           priority => 20,
         }
       );
@@ -67,6 +68,12 @@ package Game::EvonyTKR::External::General::LoadAll {
         $job_id, $file->basename
       ));
     }
+    $job->minion->enqueue(
+      build_general_indexes => [] => {
+        attempts => 3,
+        priority => 30,
+      }
+    );
     $job->note(generalCount => scalar(@files));
     my $message = 'LoadAll generals job completed';
     $job->logger->info($message);

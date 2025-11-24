@@ -665,7 +665,7 @@ package Game::EvonyTKR::Controller::Generals {
     $self->logger->debug("uidseed is '$uidseed'");
 
     my $session_id =
-      UUID::uuid5($self->app->get_root_manager()->UUID5_base, $uidseed);
+      UUID::uuid5($self->UUID5_base, $uidseed);
     $self->logger->debug("final session_id is '$session_id'");
 
     # Lookup route metadata
@@ -692,22 +692,7 @@ package Game::EvonyTKR::Controller::Generals {
     my $buffActivation = $route_meta->{buffActivation};
     my $uiTarget       = $route_meta->{uiTarget};
 
-    my @selected;
-    while (my ($key, $general) =
-      each(%{ $self->SUPER::get_shared_data('generals') })) {
-      $self->logger->debug(
-        "inspecting '$key', first need to see if it is a $generalType."
-          . Data::Printer::np($general, multiline => 0));
-      if (none { lc($_) eq $generalType } @{ $general->type }) {
-        $self->logger->debug("none of "
-            . $general->name
-            . "'s types: "
-            . Data::Printer::np($general->type, multiline => 0)
-            . "match as a $generalType.");
-        next;
-      }
-      push @selected, $general;
-    }
+    my @selected = $self->get_generals_by_type($generalType)->@*;
 
     $self->logger->debug(
       sprintf('There are %s generals to return.', scalar(@selected)));
@@ -819,18 +804,35 @@ package Game::EvonyTKR::Controller::Generals {
     $validated_params->{route_meta}     = $route_meta;
 
     my @generals;
-    my $valid = {};
-    map { $valid->{ $_->{primary} } = 1 } @$selected;
 
-    foreach my $general (sort { $a->name cmp $b->name }
-      values $c->get_generals()->%*) {
-      if (scalar(@$selected) && exists $valid->{ $general->name }) {
-        push @generals, $general;
-      }
-      elsif (any { $_ eq $generalType } $general->type->@*) {
+    if (@$selected) {
+      # Client provided a specific list - fetch just those generals
+      for my $entry (@$selected) {
+        my $name = $entry->{primary};
+        next unless defined($name) && length($name);
+
+        my $general = $c->get_general($name);
+        unless ($general) {
+          $c->logger->warn("Could not find general '$name' from selection, skipping");
+          next;
+        }
+
+        # Validate the general matches the requested type
+        unless (any { $_ eq $generalType } $general->type->@*) {
+          $c->logger->warn("General '$name' is not of type '$generalType', skipping");
+          next;
+        }
+
         push @generals, $general;
       }
     }
+    else {
+      # No selection - get all generals of this type
+      @generals = $c->get_generals_by_type($generalType)->@*;
+    }
+
+    # Sort by name
+    @generals = sort { $a->name cmp $b->name } @generals;
 
     my @job_ids;
     for my $index (0 .. $#generals) {
@@ -851,6 +853,8 @@ package Game::EvonyTKR::Controller::Generals {
           undef,  # books - will be computed
         ] => {
           delay    => ($index * 0.001) + rand(0.5),
+          priority => 80,
+          expire   => 2700,
           attempts => 2,
         }
       );
@@ -863,10 +867,17 @@ package Game::EvonyTKR::Controller::Generals {
     foreach my $jid (@job_ids) {
       my $promise = $c->app->minion->result_p($jid)->then(sub {
         return if !$c->tx || $c->tx->is_finished;
-        my $result = shift;
+        my $info = shift;
+        my $result = $info->{result};
 
         if (defined($result) && ref($result) eq 'HASH') {
           my $general = $c->get_general($result->{general});
+          unless($general){
+            $c->logger->error(sprintf(
+              'unable to get general from result: %s',
+              Data::Printer::np($result)));
+            next;
+          }
           my $buffKey = $generalType =~ s/_/ /r;
           $buffKey =~ s/(\w)(\w+) specialist/\U$1\L$2 \UT\Lroops/;
           $buffKey =~ s/Siege Troops/Siege Machines/;
