@@ -12,8 +12,8 @@ require Game::EvonyTKR::External::JobBase;
 require Game::EvonyTKR::Role::Logging;
 
 package Game::EvonyTKR {
-  use Mojo::Base 'Mojolicious', -strict, -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Role::Logging', -role, -signatures;
+  use Mojo::Base 'Mojolicious',                   -strict, -signatures;
+  use Mojo::Base 'Game::EvonyTKR::Role::Logging', -role,   -signatures;
   use Log::Any::Adapter;
   use Log::Log4perl;
   use Mojo::File::Share qw(dist_dir );

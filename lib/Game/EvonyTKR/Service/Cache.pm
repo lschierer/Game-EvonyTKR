@@ -3,7 +3,7 @@ use utf8::all;
 use File::FindLib 'lib';
 
 package Game::EvonyTKR::Service::Cache {
-  use Mojo::Base -base,                         -signatures;
+  use Mojo::Base -base,                           -signatures;
   use Mojo::Base 'Game::EvonyTKR::Role::Logging', -role;
   use Cache::Memcached::Fast;
   use Sereal::Encoder;

@@ -312,12 +312,14 @@ package Game::EvonyTKR::Model::AscendingAttributes {
       $logger->error('object must have a "general" attribute');
       return;
     }
-    $logger->debug(sprintf('starting import for ascending attribute "%s"', $an));
+    $logger->debug(
+      sprintf('starting import for ascending attribute "%s"', $an));
     my $aa = Game::EvonyTKR::Model::AscendingAttributes->new(general => $an);
     foreach my $oa (@{ $object->{ascending} }) {
       my $level = $oa->{level};
-      unless(defined($level) && length($level)){
-        $logger->error('undefined or zero length level in ascending object %s', Data::Printer::np($oa, multiline => 0));
+      unless (defined($level) && length($level)) {
+        $logger->error('undefined or zero length level in ascending object %s',
+          Data::Printer::np($oa, multiline => 0));
         next;
       }
       foreach my $ob (@{ $oa->{buffs} }) {

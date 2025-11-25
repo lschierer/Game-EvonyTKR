@@ -5,7 +5,7 @@ use utf8::all;
 use Mojo::Base -role, -signatures;
 use Log::Log4perl;
 use Log::Log4perl::Level;
-use Mojo::Loader      qw(find_modules);
+use Mojo::Loader        qw(find_modules);
 use File::HomeDir::Tiny ();
 require Data::Printer;
 use List::AllUtils qw( uniq );
@@ -27,18 +27,17 @@ sub get_logger ($package) {
   # Strip __WITH__ role composition from package name
   $pn =~ s/__WITH__.+$//;
 
-
   my $l4p = Log::Log4perl->get_logger($pn);
-  if(exists $logLevelOverrides->{$pn}){
-    unless(Log::Log4perl::Level::to_level($l4p->level()) eq $logLevelOverrides->{$pn}) {
+  if (exists $logLevelOverrides->{$pn}) {
+    unless (Log::Log4perl::Level::to_level($l4p->level()) eq
+      $logLevelOverrides->{$pn}) {
       $l4p->level($logLevelOverrides->{$pn});
     }
   }
   if ($Game::EvonyTKR::Role::Logging::DEBUG_LOGGING) {
     warn sprintf(
       'package "%s" is requesting a logger. Returning one with level %s',
-      $pn, Log::Log4perl::Level::to_level($l4p->level())
-    );
+      $pn, Log::Log4perl::Level::to_level($l4p->level()));
   }
   return $l4p;
 }
@@ -116,22 +115,23 @@ BEGIN {
 
   my $config = __PACKAGE__->appender_setup();
 
-  my @packages = find_modules('Game::EvonyTKR', {recursive => 1});
+  my @packages = find_modules('Game::EvonyTKR', { recursive => 1 });
   push @packages, keys %$logLevelOverrides;
 
-  my @upn = sort {$a cmp $b} uniq @packages;
+  my @upn = sort { $a cmp $b } uniq @packages;
 
   foreach my $package (@upn) {
     $package = ref($package) ? blessed($package) : $package;
-    if (exists $logLevelOverrides->{$package}){
+    if (exists $logLevelOverrides->{$package}) {
       my $level = $logLevelOverrides->{$package};
       $config .= "log4perl.logger.$package = ${level}\n";
-    }else {
+    }
+    else {
       $config .= "log4perl.logger.$package = ${defaultMode}\n";
     }
   }
 
-  unless(Log::Log4perl->initialized()){
+  unless (Log::Log4perl->initialized()) {
     if ($Game::EvonyTKR::Role::Logging::DEBUG_LOGGING) {
       warn "=== INITIALIZING LOG4PERL ===\n";
       warn "Mode: $mode, Default: $defaultMode\n";
@@ -142,9 +142,10 @@ BEGIN {
   }
 
   state $wrapperRegistered = 0;
-  unless($wrapperRegistered){
+  unless ($wrapperRegistered) {
     if ($Game::EvonyTKR::Role::Logging::DEBUG_LOGGING) {
-      warn sprintf('registering "%s" as a log4perl wrapper', __PACKAGE__) . "\n";
+      warn sprintf('registering "%s" as a log4perl wrapper', __PACKAGE__)
+        . "\n";
     }
     Log::Log4perl->wrapper_register(__PACKAGE__);
     $wrapperRegistered = 1;

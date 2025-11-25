@@ -21,7 +21,7 @@ class Game::EvonyTKR::Model::Logger {
   our $wrapperRegistered = 0;
 
   ADJUST {
-    unless($Game::EvonyTKR::Model::Logger::wrapperRegistered){
+    unless ($Game::EvonyTKR::Model::Logger::wrapperRegistered) {
       Log::Log4perl->wrapper_register(__CLASS__);
       $Game::EvonyTKR::Model::Logger::wrapperRegistered = 1;
     }

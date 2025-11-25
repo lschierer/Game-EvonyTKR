@@ -6,7 +6,7 @@ use namespace::autoclean;
 
 package Game::EvonyTKR::Model::Book {
   use Mojo::Base "Game::EvonyTKR::Model::Base";
-  use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants', -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants',    -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants', -role;
   use List::AllUtils qw( any none );
   use Carp;

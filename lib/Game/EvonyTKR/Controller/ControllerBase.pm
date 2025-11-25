@@ -11,7 +11,7 @@ use namespace::clean;
 package Game::EvonyTKR::Controller::ControllerBase {
   use Mojo::Base 'Mojolicious::Controller';
   use Mojo::Base 'Mojolicious::Plugin',                    -role, -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Role::Logging',            -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Logging',          -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Common',           -role;
   use Mojo::Base 'Game::EvonyTKR::Role::MarkdownRenderer', -role;
   require Mojo::File;
