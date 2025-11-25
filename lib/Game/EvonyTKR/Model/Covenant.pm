@@ -120,7 +120,7 @@ package Game::EvonyTKR::Model::Covenant {
       }
       $self->logger->debug(sprintf(
         '%s has Total %s for level "%s" and attribute "%s"',
-        $self->primary->name, $level, $attribute
+        $self->primary->name, $total, $level, $attribute
       ));
       return $total;
     }

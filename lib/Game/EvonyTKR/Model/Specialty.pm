@@ -66,7 +66,7 @@ package Game::EvonyTKR::Model::Specialty {
       croak "level must have a level attribute"
         unless (defined($lv->{level}) && length($lv->{level}));
 
-      unless ($s->is_valid_level(lc($lv->{level}))) {
+      unless ($s->is_valid_specialty_level(lc($lv->{level}))) {
         my $errmessg = sprintf('invalid level %s, level must be one of %s',
           $lv->{level}, join ', ', $s->SpecialtyLevelValues->@*);
         $logger->error($errmessg);

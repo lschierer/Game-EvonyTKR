@@ -17,7 +17,7 @@ package Game::EvonyTKR::Role::Constants::Specialties {
     gold   => 'Gold',
   );
 
-  has 'is_valid_level' => sub ($self, $level) {
+  has 'is_valid_specialty_level' => sub ($self, $level) {
     if (exists $SpecialtyLevels{$level}) {
       return 1;
     }

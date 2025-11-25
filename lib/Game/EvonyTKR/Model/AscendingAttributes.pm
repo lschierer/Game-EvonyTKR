@@ -116,10 +116,10 @@ package Game::EvonyTKR::Model::AscendingAttributes {
             'Testing buff: attr=%s, targetType=%s, '
               . 'buffConds=%s, debuffConds=%s, matching_type=%s',
             $buff->attribute,
-            $buff->targetedType,
+            $buff->targetedType // 'no targetted type',
             join(',', @{ $buff->buffConditions   // [] }),
             join(',', @{ $buff->debuffConditions // [] }),
-            $matching_type
+            $matching_type // 'no matching type'
             )
         );
 

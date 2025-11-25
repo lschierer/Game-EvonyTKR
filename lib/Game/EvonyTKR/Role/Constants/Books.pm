@@ -10,9 +10,11 @@ use Carp;
 
 # a *best* book will always be a level 4 book,
 # as level 4 is the highest.
-our $bestLevel = 4;
+has bestLevel => 4;
 
 has 'BestSkillBooks' => sub {
+  my $self = shift;
+  my $bestLevel = $self->bestLevel;
   const my $tmp => {
     ground_specialist => {
       default => {

@@ -750,7 +750,7 @@ package Game::EvonyTKR::Controller::Generals {
     my $session_id = $c->param('sessionId');
     unless (defined($session_id) && length($session_id)) {
       $c->logger->error('Session ID must be present!');
-      my $payload = encode_json({ runId => 0+ $run_id });
+      my $payload = encode_base64(encode_json({ runId => 0+ $run_id }), '');
       $c->write_sse({ type => 'complete', text => $payload });
       return;
     }
@@ -786,7 +786,7 @@ package Game::EvonyTKR::Controller::Generals {
           }
         );
       }
-      my $payload = encode_json({ runId => 0+ $run_id });
+      my $payload = encode_base64(encode_json({ runId => 0+ $run_id }), '');
       $c->write_sse({ type => 'complete', text => $payload });
       return;
     }
@@ -857,7 +857,7 @@ package Game::EvonyTKR::Controller::Generals {
           delay    => ($index * 0.001) + rand(0.5),
           priority => 80,
           expire   => 2700,
-          attempts => 2,
+          attempts => 1,
         }
       );
 
@@ -911,7 +911,7 @@ package Game::EvonyTKR::Controller::Generals {
             siegehpdebuff => $result->{debuffs}->{'Siege Machines'}{'HP'},
           };
 
-          my $payload = encode_json({ runId => $run_id, data => $row });
+          my $payload = encode_base64(encode_json({ runId => $run_id, data => $row }), '');
           $c->write_sse({ type => 'row', text => $payload });
         }
         return $result;
@@ -930,7 +930,7 @@ package Game::EvonyTKR::Controller::Generals {
 
       Mojo::IOLoop->timer(
         10 => sub {
-          my $payload = encode_json({ runId => $run_id });
+          my $payload = encode_base64(encode_json({ runId => $run_id }), '');
           $c->write_sse({ type => 'complete', text => $payload });
         }
       );
