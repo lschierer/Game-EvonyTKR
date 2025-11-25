@@ -262,7 +262,7 @@ package Game::EvonyTKR::Model::AscendingAttributes {
   }
 
   sub from_wire_hash($class, $h) {
-    my $logger = Game::EvonyTKR::Log::Config->get_logger();
+    my $logger = Game::EvonyTKR::Role::Logging::get_logger(__PACKAGE__);
 
     # Convert wire format (hash-based ascending) back to array format
     my $converted_h = {%$h};    # shallow copy
@@ -297,7 +297,7 @@ package Game::EvonyTKR::Model::AscendingAttributes {
   }
 
   sub from_hash($class, $object) {
-    my $logger = Game::EvonyTKR::Log::Config->get_logger();
+    my $logger = Game::EvonyTKR::Role::Logging::get_logger(__PACKAGE__);
     unless (exists $object->{ascending}
       && ref($object->{ascending}) eq 'ARRAY') {
       $logger->error(sprintf(
@@ -308,14 +308,18 @@ package Game::EvonyTKR::Model::AscendingAttributes {
       return;
     }
     my $an = $object->{general};
-    unless (length($an)) {
+    unless (defined($an) && length($an)) {
       $logger->error('object must have a "general" attribute');
       return;
     }
-    $logger->debug("starting import for ascending attribute $an");
+    $logger->debug(sprintf('starting import for ascending attribute "%s"', $an));
     my $aa = Game::EvonyTKR::Model::AscendingAttributes->new(general => $an);
     foreach my $oa (@{ $object->{ascending} }) {
       my $level = $oa->{level};
+      unless(defined($level) && length($level)){
+        $logger->error('undefined or zero length level in ascending object %s', Data::Printer::np($oa, multiline => 0));
+        next;
+      }
       foreach my $ob (@{ $oa->{buffs} }) {
         my $b = Game::EvonyTKR::Model::Buff->from_hash($ob);
         $aa->addBuff($level, $b);

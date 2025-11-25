@@ -9,13 +9,13 @@ require Mojolicious::Plugin::Minion;
 #require Game::EvonyTKR::Controller::Root;
 require Game::EvonyTKR::Controller::ControllerBase;
 require Game::EvonyTKR::External::JobBase;
-require Game::EvonyTKR::Log::Config;
+require Game::EvonyTKR::Role::Logging;
 
 package Game::EvonyTKR {
   use Mojo::Base 'Mojolicious', -strict, -signatures;
+  use Mojo::Base 'Game::EvonyTKR::Role::Logging', -role, -signatures;
   use Log::Any::Adapter;
   use Log::Log4perl;
-  use Mojo::Base 'Game::EvonyTKR::Log::Config', -role, -signatures;
   use Mojo::File::Share qw(dist_dir );
   use Mojo::Loader      qw(find_modules load_class);
   use Fcntl             qw(:flock);
@@ -26,6 +26,10 @@ package Game::EvonyTKR {
   use diagnostics;
   use Env qw(DEPLOYMENT_TIME HOSTNAME IMAGE_TAG IMAGE_URI);
   our $VERSION = 'v0.50.0';
+
+  BEGIN {
+    Game::EvonyTKR::Role::Logging::get_logger(__PACKAGE__);
+  }
 
   sub startup ($app) {
     $app->logger->debug('setting up logging');

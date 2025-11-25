@@ -9,7 +9,7 @@ package Game::EvonyTKR::Role::MarkdownRenderer {
   use Mojo::Base -role, -signatures;
   use Carp;
 
-  # NOTE: This role has an interdependency on Game::EvonyTKR::Log::Config
+  # NOTE: This role has an interdependency on Game::EvonyTKR::Role::Logging
   # The consuming class must also compose Role::Logger (or otherwise provide
   # a logger() method). ControllerBase composes both roles.
 

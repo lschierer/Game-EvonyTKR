@@ -4,7 +4,7 @@ use File::FindLib 'lib';
 
 package Game::EvonyTKR::Plugins::Sqlite {
   use Mojo::Base 'Mojolicious::Plugin', -strict, -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Log::Config', -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Logging', -role;
   use POSIX 'strftime';
   use Time::HiRes 'time';
   use Carp;

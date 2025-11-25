@@ -64,7 +64,7 @@ package Game::EvonyTKR::Model::General::Pair {
   }
 
   sub from_wire_hash ($class, $h) {
-    my $logger = Game::EvonyTKR::Log::Config->get_logger();
+    my $logger = Game::EvonyTKR::Role::Logging::get_logger(__PACKAGE__);
 
     my $primary_name =
       ref($h->{primary}) eq 'HASH'
@@ -84,7 +84,7 @@ package Game::EvonyTKR::Model::General::Pair {
     unless ($general_helper) {
       eval {
         $general_helper = Mojo::Base->new->with_roles(
-          'Game::EvonyTKR::Log::Config',
+          'Game::EvonyTKR::Role::Logging',
           'Game::EvonyTKR::Role::Common',
           'Game::EvonyTKR::Controller::Role::Generals'
         );

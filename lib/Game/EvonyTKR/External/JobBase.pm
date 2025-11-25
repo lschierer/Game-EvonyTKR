@@ -6,7 +6,7 @@ package Game::EvonyTKR::External::JobBase {
   use Mojo::Base 'Minion::Job',                  -signatures;
   use Mojo::Base 'Mojolicious::Plugin',          -role, -signatures;
   use Mojo::Base 'Game::EvonyTKR::Role::Common', -role, -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Log::Config',  -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Logging',  -role;
   use diagnostics;
   use Carp;
 
@@ -37,7 +37,7 @@ package Game::EvonyTKR::External::JobBase {
       say 'job not defined in run for ' . __PACKAGE__;
       return;
     }
-    Game::EvonyTKR::Log::Config->get_logger();
+    Game::EvonyTKR::Role::Logging::get_logger(__PACKAGE__);
     $job->logger->debug("JobBase configured Logging in run.");
     unless (defined($job->app)) {
       my $errmessage = sprintf('app undefined in job for %s', __PACKAGE__);

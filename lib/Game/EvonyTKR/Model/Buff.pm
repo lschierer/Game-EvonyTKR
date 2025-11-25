@@ -242,7 +242,6 @@ package Game::EvonyTKR::Model::Buff {
     $test_buffConditions   = [],
     $test_debuffConditions = [],
   ) {
-    print STDERR "DEBUG: match_buff called for attribute: $test_attribute\n";
     my $no_op_Conditions = [
       "brings a dragon",
       'brings a sacred dragon',
@@ -385,7 +384,7 @@ package Game::EvonyTKR::Model::Buff {
   }
 
   sub from_hash ($class, $hashref) {
-    my $logger = Game::EvonyTKR::Log::Config->get_logger();
+    my $logger = Game::EvonyTKR::Role::Logging::get_logger(__PACKAGE__);
     my $v      = Game::EvonyTKR::Model::Buff::Value->new(
       number => abs($hashref->{value}->{number}),
       unit   => ($hashref->{value}->{unit} // 'percentage'),
@@ -396,18 +395,18 @@ package Game::EvonyTKR::Model::Buff {
       value     => $v,
     );
     if (exists $hashref->{targetedType}) {
-      $logger->debug(
-          'found targetedType in hashref: ' . defined($hashref->{targetedType})
+      $logger->debug(sprintf('found targetedType in hashref: "%s"',
+            defined($hashref->{targetedType})
         ? ref($hashref->{targetedType})
             ? join ', ',
             map { sprintf('"%s"', $_) } $hashref->{targetedType}->@*
             : $hashref->{targetedType}
         : 'undef'
-      );
+      ));
       $r->set_target($hashref->{targetedType});
     }
     if (exists $hashref->{troop}) {
-      $logger->debug('found troop in hashref: ' . $hashref->{troop});
+      $logger->debug(sprintf('found troop in hashref: "%s"', $hashref->{troop}));
       $r->set_target($hashref->{troop});
     }
     if (exists $hashref->{condition}) {
@@ -475,7 +474,7 @@ package Game::EvonyTKR::Model::Buff {
   }
 
   sub from_wire_hash ($class, $w) {
-    my $logger = Game::EvonyTKR::Log::Config->get_logger();
+    my $logger = Game::EvonyTKR::Role::Logging::get_logger(__PACKAGE__);
     my $buff   = $class->new(
       attribute    => $w->{attribute},
       passive      => $w->{passive} // 0,

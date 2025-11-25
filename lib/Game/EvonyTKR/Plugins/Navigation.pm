@@ -7,7 +7,7 @@ use namespace::autoclean;
 
 package Game::EvonyTKR::Plugins::Navigation {
   use Mojo::Base 'Mojolicious::Plugin';
-  use Mojo::Base 'Game::EvonyTKR::Log::Config', -role, -signatures;
+  use Mojo::Base 'Game::EvonyTKR::Role::Logging', -role;
   use Carp;
 
   my %nav_items_by_path;

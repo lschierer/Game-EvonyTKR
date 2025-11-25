@@ -28,6 +28,7 @@ package Game::EvonyTKR::Controller::Generals {
   use Mojo::JSON     qw(to_json encode_json);
   use MIME::Base64   qw(encode_base64);
   use List::AllUtils qw( all any none );
+  require Game::EvonyTKR::External::General::Summarizer;
 
   use Carp;
 

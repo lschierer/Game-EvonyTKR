@@ -5,7 +5,7 @@ use File::FindLib 'lib';
 # lib/Game/EvonyTKR/Repo/Books.pm
 package Game::EvonyTKR::Repo::Books::Builtin {
   use Mojo::Base -base;
-  use Mojo::Base 'Game::EvonyTKR::Log::Config', -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Logging', -role;
   use Sereal::Encoder;
   use Sereal::Decoder;
   use Game::EvonyTKR::Model::Factory ();

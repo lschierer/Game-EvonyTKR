@@ -163,7 +163,7 @@ package Game::EvonyTKR::Model::Covenant {
   }
 
   sub from_hash($class, $object) {
-    my $logger = Game::EvonyTKR::Log::Config->get_logger(__PACKAGE__);
+    my $logger = Game::EvonyTKR::Role::Logging::get_logger(__PACKAGE__);
     if (!exists $object->{name}) {
       $logger->error('object must have name attribute.');
       return;
@@ -236,7 +236,7 @@ package Game::EvonyTKR::Model::Covenant {
   }
 
   sub from_wire_hash ($class, $h) {
-    my $logger = Game::EvonyTKR::Log::Config->get_logger(__PACKAGE__);
+    my $logger = Game::EvonyTKR::Role::Logging::get_logger(__PACKAGE__);
     unless (ref($h) && ref($h) eq 'HASH') {
       my $errmessage = 'from_wire_hash requires a valid hashref';
       $logger->error($errmessage);

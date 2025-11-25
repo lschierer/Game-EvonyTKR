@@ -59,7 +59,7 @@ package Game::EvonyTKR::External::General::LoadAll {
         'load_general' => [$job->normalize($file->to_string)] => {
           attempts => 3,
           delay    => rand(10),
-          expire   => 500,
+          expire   => 1000,
           priority => 20,
         }
       );

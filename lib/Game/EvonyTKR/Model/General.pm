@@ -96,7 +96,7 @@ package Game::EvonyTKR::Model::General {
     state $ascending_helper //= do {
       my $helper = eval {
         Mojo::Base->new->with_roles(
-          'Game::EvonyTKR::Log::Config',
+          'Game::EvonyTKR::Role::Logging',
           'Game::EvonyTKR::Role::Common',
           'Game::EvonyTKR::Controller::Role::AscendingAttributes'
         );
@@ -135,7 +135,7 @@ package Game::EvonyTKR::Model::General {
     state $books_helper //= do {
       my $helper = eval {
         Mojo::Base->new->with_roles(
-          'Game::EvonyTKR::Log::Config',
+          'Game::EvonyTKR::Role::Logging',
           'Game::EvonyTKR::Role::Common',
           'Game::EvonyTKR::Controller::Role::Books'
         );
@@ -187,7 +187,7 @@ package Game::EvonyTKR::Model::General {
     state $specialty_helper //= do {
       my $helper = eval {
         Mojo::Base->new->with_roles(
-          'Game::EvonyTKR::Log::Config',
+          'Game::EvonyTKR::Role::Logging',
           'Game::EvonyTKR::Role::Common',
           'Game::EvonyTKR::Controller::Role::Specialties'
         );
@@ -228,7 +228,7 @@ package Game::EvonyTKR::Model::General {
   }
 
   sub from_hash ($class, $hashObject) {
-    my $logger = Game::EvonyTKR::Log::Config->get_logger(__PACKAGE__);
+    my $logger = Game::EvonyTKR::Role::Logging::get_logger(__PACKAGE__);
 
     if (!exists $hashObject->{name}) {
       $logger->error('hash object must contain a name attribute.');
@@ -295,7 +295,7 @@ package Game::EvonyTKR::Model::General {
   }
 
   sub from_wire_hash ($class, $w, $opts = {}) {
-    my $logger = Game::EvonyTKR::Log::Config->get_logger(__PACKAGE__);
+    my $logger = Game::EvonyTKR::Role::Logging::get_logger(__PACKAGE__);
     unless (($w->{_v} // 1) == 1) {
       $logger->error('unknown wire version');
       die "unknown wire version";
