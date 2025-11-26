@@ -49,7 +49,7 @@ package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
     $job->logger->info('Starting LoadAllPairBuilders job');
 
     # Get all generals from cache
-    my $generals = $job->get_generals($job->app);
+    my $generals = $job->get_generals();
 
     $job->logger->info(
       sprintf('Found %d generals to process', scalar keys %$generals));

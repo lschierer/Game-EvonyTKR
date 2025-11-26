@@ -109,6 +109,25 @@ has 'BestSkillBooks' => sub {
         "Level $bestLevel Siege Machine Defense"     => 5,
         "Level $bestLevel Luck"                      => 6,
       }
+    },
+    #mayor => {
+    #  default => {
+    #
+    #  }
+    #},
+    wall => {
+      default => {
+        "Level $bestLevel Siege Machine Attack"      => 1,
+        "Level $bestLevel Mounted Troop Attack"      => 2,
+        "Level $bestLevel Ranged Troop Attack"       => 3,
+        "Level $bestLevel Siege Machine Range Bonus" => 4,
+        "Level $bestLevel Ground Troop Attack"       => 5,
+        "Level $bestLevel Ranged Troop Range Bonus"  => 6,
+        "Level $bestLevel Siege Machine HP"          => 7,
+        "Level $bestLevel Mounted Troop HP"          => 8,
+        "Level $bestLevel Ranged Troop HP"           => 9,
+        "Level $bestLevel Ground Troop HP"           => 10,
+      }
     }
   };
   return $tmp;

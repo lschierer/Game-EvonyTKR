@@ -122,15 +122,21 @@ package Game::EvonyTKR::Controller::Role::Books {
     return $returnlist;
   }
 
-  sub load_best_skill_books ($self, $general, $targetType, $activationType) {
+  sub load_best_skill_books ($self, $general, $targetType, $activationType, $desiredCount = 3) {
     $self->logger->info(sprintf(
       'finding best %s skill books for %s',
       $activationType, $general->name
     ));
     my $key = $activationType eq 'PvM' ? 'PvM' : 'default';
 
-# TODO: currently hard coded for a single general (3 books)
-#       allow for a pair of generals (6 books)
+    $key = 'default' if($targetType eq 'wall');
+
+    if($desiredCount <= 3 && $desiredCount != 6) {
+      $desiredCount = 3;
+    }
+
+# TODO: partially implemented support for pairs using $desiredCount variable
+#       This would work except for the todo items below.
 # TODO: Implement book conflict detection
 #       (requires an instance of Game::EvonyTKR::Model::General::Conflict::Book )
 # TODO: Handle partial conflicts
@@ -158,7 +164,7 @@ package Game::EvonyTKR::Controller::Role::Books {
       $self->logger->info(
         sprintf('Picked book "%s" for "%s"', $book_name, $general->name));
       push @books, $book;
-      last if (scalar @books >= 3);    # Single general gets 3 books
+      last if (scalar @books >= $desiredCount);    # Single general gets 3 books
     }
 
     return \@books;
@@ -168,10 +174,16 @@ package Game::EvonyTKR::Controller::Role::Books {
     my @books;
     my $level = $self->bestLevel;
     # Ensure required books are present for buff summarizer
-    foreach my $attr ('Attack', 'Defense', 'HP') {
+    foreach my $attr ('Attack', 'Defense', 'HP', 'March Size') {
       foreach my $tt ('Mounted Troop', 'Ranged Troop', 'Ground Troop',
         'Siege Machine') {
-        my $book_name = sprintf('Level %s %s %s', $level, $tt, $attr);
+
+        my $book_name;
+        if($attr ne 'March Size') {
+          $book_name = sprintf('Level %s %s %s', $level, $tt, $attr);
+        } else {
+          $book_name = sprintf('Level %s %s', $level, $attr);
+        }
         unless (any { $_->name eq $book_name } @books) {
           my $book = $self->get_generic_book($book_name, $level);
           unless ($book) {
@@ -182,6 +194,7 @@ package Game::EvonyTKR::Controller::Role::Books {
         }
       }
     }
+
     return \@books;
   }
 }

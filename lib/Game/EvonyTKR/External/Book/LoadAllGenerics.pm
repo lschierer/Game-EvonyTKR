@@ -51,10 +51,7 @@ package Game::EvonyTKR::External::Book::LoadAllGenerics {
       $job->logger->error($errmessage);
       return $job->fail($errmessage);
     }
-    $job->logger->debug(sprintf(
-      '%s log level is %s',
-      __PACKAGE__, Log::Log4perl::Level::to_level($job->logger->level())
-    ));
+
     my @list = $job->list_generic_books()->@*;
     $job->logger->info('list of generic books is ' . Data::Printer::np(@list));
     my $maxIndex = scalar(@list) - 1;

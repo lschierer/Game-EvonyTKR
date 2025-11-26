@@ -50,6 +50,33 @@ package Game::EvonyTKR::Controller::ControllerBase {
       }
     );
 
+    $app->helper(
+      check_prereqs_or_wait => sub($self, $prereqs, $retry_delay = 30) {
+        unless (ref($prereqs) && ref($prereqs) eq 'ARRAY') {
+          $c->logger->error('check_prereqs_or_wait requires an arrayref.');
+          return 0;
+        }
+
+        my $outstanding = $self->outstanding_prereqs($prereqs);
+        if ($outstanding) {
+          $c->logger->info(sprintf(
+            'Prerequisites outstanding for route %s, rendering wait page',
+            $self->req->url->path->to_string
+          ));
+
+          my $current_url = $self->req->url->to_abs;
+          $self->stash(
+            retry_url   => $current_url,
+            retry_delay => $retry_delay,
+            prereqs     => $prereqs,
+          );
+          $self->render(template => 'prereqs_wait', status => 503);
+          return 1;    # Rendered wait page, caller should return
+        }
+        return 0;      # Prerequisites met, caller should continue
+      }
+    );
+
     $routes->get('/health')->to(
       cb => sub($self) {
         my $APP_START_TIME = $app->config->{'APP_START_TIME'};

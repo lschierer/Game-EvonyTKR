@@ -437,9 +437,6 @@ subtest "Marco Polo with all values set to 'none'" => sub {
     first { $_->primary->name eq $marco_polo->name } $covenants->@*;
   my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
     general             => $marco_polo,
-    books               => [$generic_books->@*, $builtin_books->@*],
-    covenant            => $covenant,
-    ascendingAttributes => $marco_polo->ascendingAttributes,
     isPrimary           => 1,
     targetType          => 'mounted_specialist',
     activationType      => 'Attacking',
@@ -520,9 +517,6 @@ subtest "Aethelflaed with all values set to 'none'" => sub {
     first { $_->primary->name eq $aethelflaed->name } $covenants->@*;
   my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
     general             => $aethelflaed,
-    books               => [$generic_books->@*, $builtin_books->@*],
-    covenant            => $covenant,
-    ascendingAttributes => $aethelflaed->ascendingAttributes,
     isPrimary           => 1,
     targetType          => 'mounted_specialist',
     activationType      => 'PvM',
@@ -608,9 +602,6 @@ subtest "Marco Polo with Red1 ascending, all else none" => sub {
   my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
 
     general             => $marco_polo,
-    books               => [$generic_books->@*, $builtin_books->@*],
-    covenant            => $covenant,
-    ascendingAttributes => $marco_polo->ascendingAttributes,
     isPrimary           => 1,
     targetType          => 'mounted_specialist',
     activationType      => 'Attacking',
@@ -693,9 +684,6 @@ subtest "Marco Polo with Red2 ascending, all else none" => sub {
   my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
 
     general             => $marco_polo,
-    books               => [$generic_books->@*, $builtin_books->@*],
-    covenant            => $covenant,
-    ascendingAttributes => $marco_polo->ascendingAttributes,
     isPrimary           => 1,
     targetType          => 'mounted_specialist',
     activationType      => 'Attacking',
@@ -778,9 +766,6 @@ subtest "Marco Polo with Red3 ascending, all else none" => sub {
   my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
 
     general             => $marco_polo,
-    books               => [$generic_books->@*, $builtin_books->@*],
-    covenant            => $covenant,
-    ascendingAttributes => $marco_polo->ascendingAttributes,
     isPrimary           => 1,
     targetType          => 'mounted_specialist',
     activationType      => 'Attacking',
@@ -863,9 +848,6 @@ subtest "Marco Polo with Red4 ascending, all else none" => sub {
   my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
 
     general             => $marco_polo,
-    books               => [$generic_books->@*, $builtin_books->@*],
-    covenant            => $covenant,
-    ascendingAttributes => $marco_polo->ascendingAttributes,
     isPrimary           => 1,
     targetType          => 'mounted_specialist',
     activationType      => 'Attacking',
@@ -947,9 +929,6 @@ subtest "Marco Polo with Red5 ascending, all else none" => sub {
   my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
 
     general             => $marco_polo,
-    books               => [$generic_books->@*, $builtin_books->@*],
-    covenant            => $covenant,
-    ascendingAttributes => $marco_polo->ascendingAttributes,
     isPrimary           => 1,
     targetType          => 'mounted_specialist',
     activationType      => 'Attacking',
@@ -1112,9 +1091,6 @@ subtest "Marco Polo with Blue 1st specialty, all else none" => sub {
   my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
 
     general             => $marco_polo,
-    books               => [$generic_books->@*, $builtin_books->@*],
-    covenant            => $covenant,
-    ascendingAttributes => $marco_polo->ascendingAttributes,
     isPrimary           => 1,
     targetType          => 'mounted_specialist',
     activationType      => 'Attacking',
@@ -1196,9 +1172,6 @@ subtest "Marco Polo with Purple 1st specialty, all else none" => sub {
   my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
 
     general             => $marco_polo,
-    books               => [$generic_books->@*, $builtin_books->@*],
-    covenant            => $covenant,
-    ascendingAttributes => $marco_polo->ascendingAttributes,
     isPrimary           => 1,
     targetType          => 'mounted_specialist',
     activationType      => 'Attacking',
@@ -1280,9 +1253,6 @@ subtest "Marco Polo with Orange 1st specialty, all else none" => sub {
   my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
 
     general             => $marco_polo,
-    books               => [$generic_books->@*, $builtin_books->@*],
-    covenant            => $covenant,
-    ascendingAttributes => $marco_polo->ascendingAttributes,
     isPrimary           => 1,
     targetType          => 'mounted_specialist',
     activationType      => 'Attacking',
@@ -1364,9 +1334,6 @@ subtest "Marco Polo with Gold 1st specialty, all else none" => sub {
   my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
 
     general             => $marco_polo,
-    books               => [$generic_books->@*, $builtin_books->@*],
-    covenant            => $covenant,
-    ascendingAttributes => $marco_polo->ascendingAttributes,
     isPrimary           => 1,
     targetType          => 'mounted_specialist',
     activationType      => 'Attacking',
@@ -1449,9 +1416,6 @@ subtest "Marco Polo with Civilization covenant, all else none" => sub {
   my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
 
     general             => $marco_polo,
-    books               => [$generic_books->@*, $builtin_books->@*],
-    covenant            => $covenant,
-    ascendingAttributes => $marco_polo->ascendingAttributes,
     isPrimary           => 1,
     targetType          => 'mounted_specialist',
     activationType      => 'Attacking',
@@ -1478,9 +1442,6 @@ subtest "Marco Polo with all maxed out" => sub {
   my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
 
     general             => $marco_polo,
-    books               => [$generic_books->@*, $builtin_books->@*],
-    covenant            => $covenant,
-    ascendingAttributes => $marco_polo->ascendingAttributes,
     isPrimary           => 1,
     targetType          => 'mounted_specialist',
     activationType      => 'Attacking',
@@ -1588,9 +1549,6 @@ subtest "Aethelflaed with all maxed out" => sub {
   my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
 
     general             => $aethelflaed,
-    books               => [$generic_books->@*, $builtin_books->@*],
-    covenant            => $covenant,
-    ascendingAttributes => $aethelflaed->ascendingAttributes,
     isPrimary           => 1,
     targetType          => 'mounted_specialist',
     activationType      => 'PvM',
@@ -1670,9 +1628,6 @@ subtest "Harald with all maxed out" => sub {
   my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
 
     general             => $Harald,
-    books               => [$generic_books->@*, $builtin_books->@*],
-    covenant            => $covenant,
-    ascendingAttributes => $Harald->ascendingAttributes,
     isPrimary           => 1,
     targetType          => 'mayor',
     activationType      => 'Mayor',

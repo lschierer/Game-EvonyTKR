@@ -159,14 +159,12 @@ package Game::EvonyTKR::Model::Book {
   sub from_hash($class, $object) {
     my $logger = Game::EvonyTKR::Role::Logging::get_logger(__PACKAGE__);
     my $b;
-    if ($object->{name} =~ m/Level [1-4]/i) {
+    my $name = $object->{name};
+    if (exists $object->{level}) {
       $logger->debug(
         sprintf('detected that %s is a Generic book', $object->{name}));
-      my $name = $object->{name} =~ s/Level [1-4]\s+//ir;
-      my $level;
-      if ($object->{name} =~ m/Level ([1-4])/i) {
-        $level = $1;
-      }
+
+      my $level = $object->{level};
 
       $b = Game::EvonyTKR::Model::Book->new(name => $name,)
         ->with_roles('Game::EvonyTKR::Model::Role::Book::SkillBook');

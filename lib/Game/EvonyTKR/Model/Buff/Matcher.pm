@@ -116,12 +116,12 @@ class Game::EvonyTKR::Model::Buff::Matcher :
         $logID, scalar @{ $toTest->buffConditions }
       ));
       foreach my $condition (@{ $toTest->buffConditions }) {
-        if (none { exists $allowed_conditions{$_} } @{$testBuffs}) {
+        if (!exists $allowed_conditions{$condition}) {
           $self->logger->debug(
             $logID
               . sprintf(
-              '%s  ✗ Rejected: This buff has %s, which is not one of %s.',
-              $logID, $condition, join(', ', sort keys %allowed_conditions),
+              '  ✗ Rejected: buff condition "%s" not in allowed list (%s).',
+              $condition, join(', ', sort keys %allowed_conditions),
               )
           );
           return 0;

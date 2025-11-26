@@ -98,6 +98,7 @@ package Game::EvonyTKR {
 
     my $config = $app->plugin('NotYAMLConfig' => { module => 'YAML::PP' });
     $app->config(distDir        => $distDir);
+    $app->config(mode           => $app->mode);
     $app->config(APP_START_TIME => time());
     $app->config(
       'EvonyTKR-Environment' => {

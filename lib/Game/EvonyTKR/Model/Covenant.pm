@@ -122,8 +122,8 @@ package Game::EvonyTKR::Model::Covenant {
         '%s has Total %s for level "%s" and attribute "%s"',
         $self->primary->name, $total, $level, $attribute
       ));
-      return $total;
     }
+    return $total;
   }
 
   sub addBuff ($self, $level, $nb) {

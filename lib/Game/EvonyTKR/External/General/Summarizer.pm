@@ -109,9 +109,6 @@ package Game::EvonyTKR::External::General::Summarizer {
 
     my $params = {
       general             => $general,
-      books               => $books,
-      covenant            => $covenant,
-      ascendingAttributes => $general->ascendingAttributes,
       isPrimary           => $isPrimary // 1,
       targetType          => $targetType,
       activationType      => $activationType,
@@ -173,25 +170,6 @@ package Game::EvonyTKR::External::General::Summarizer {
       return $job->fail($em);
     }
 
-    unless (ref($params->{books}) eq 'ARRAY') {
-      my $em =
-        sprintf('job id "%s" requires an array of books.', $job->info->{id});
-      $job->logger->error($em);
-      return $job->fail($em);
-    }
-
-    foreach my $book ($params->{books}->@*) {
-      unless ($book
-        && ref($book)
-        && blessed($book)
-        && $book->isa('Game::EvonyTKR::Model::Book')) {
-        my $em =
-          sprintf('job id "%s" requires that all books be valid books, not %s',
-          $job->info->{id}, ref($book) ? blessed($book) : 'scalar');
-        $job->logger->error($em);
-        return $job->fail($em);
-      }
-    }
 
     #covenants only exist for a fraction of generals.
 

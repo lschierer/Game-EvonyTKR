@@ -95,7 +95,24 @@ package Game::EvonyTKR::Controller::Generals {
       }
     );
 
-    say "general_routing_available emitting";
+    # the pair building jobs are necessary
+    # because they also collect conflict data
+    $app->helper(
+      generals_prereqs => sub {
+        return [qw(
+          build_general_indexes
+          create_pairs
+          load_ascending_attributes
+          load_book
+          load_covenant
+          load_general
+          load_specialty
+          monitor_loaders
+          reduce_coordinator
+        )];
+      }
+    );
+
     $app->plugins->emit(
       general_routing_available => { routing => $app->general_routing });
   }
@@ -115,7 +132,7 @@ package Game::EvonyTKR::Controller::Generals {
       ->to(controller => $controller_name, action => 'index');
 
     eval {
-      foreach my $general ($c->list_generals($app)->@*) {
+      foreach my $general ($c->list_generals()->@*) {
         $c->_build_general_routes($general, $app);
       }
     };
@@ -294,6 +311,7 @@ package Game::EvonyTKR::Controller::Generals {
   }
 
   sub index($c) {
+
     my $collection = collection_name();
     $c->logger->debug("Rendering index for $collection");
 
@@ -314,7 +332,7 @@ package Game::EvonyTKR::Controller::Generals {
     my $base      = $c->getBase();
     $c->logger->debug("Generals index method has base $base");
 
-    my $items = $c->get_generals($c->app) // {};
+    my $items = $c->get_generals() // {};
     $c->logger->debug(
       sprintf('Items: %s with %s keys.', ref($items), scalar(keys %$items)));
     $c->stash(
@@ -341,6 +359,7 @@ package Game::EvonyTKR::Controller::Generals {
   }
 
   sub uiTarget_index($self) {
+
     my $uiTarget = $self->param('uiTarget');
 
     my $rp = $self->req->url->path->to_string;
@@ -433,6 +452,8 @@ package Game::EvonyTKR::Controller::Generals {
   }
 
   sub show ($c) {
+    return if $c->check_prereqs_or_wait($c->generals_prereqs);
+
     $c->logger->debug("start of show method");
     my $name = $c->param('name');
 
@@ -442,7 +463,7 @@ package Game::EvonyTKR::Controller::Generals {
       return $c->redirect_to($canonical, 301);
     }
 
-    my $expected_list  = $c->list_generals($c->app) // [];
+    my $expected_list  = $c->list_generals() // [];
     my %expected       = map { $_ => 1 } $expected_list->@*;
     my $expected_total = scalar keys %expected;
 
@@ -553,38 +574,9 @@ package Game::EvonyTKR::Controller::Generals {
           $helper;
         };
 
-        state $books_helper //= do {
-          my $helper = eval {
-            Game::EvonyTKR::Model::Base->new->with_roles(
-              'Game::EvonyTKR::Controller::Role::Books',
-              'Game::EvonyTKR::Role::Constants::BuffConstants',
-              'Game::EvonyTKR::Role::Constants::GeneralConstants',
-              'Game::EvonyTKR::Role::Constants::Books',
-            );
-          };
-          if ($@) {
-            $c->logger->error("Cannot create books helper: $@");
-            return;
-          }
-          $helper;
-        };
-        my $ctt = lc($targetType);
-        $ctt =~ s/ /_/g;
-        $ctt =~ s/(?:machines|troops)/specialist/;
-        my $books = [
-          $books_helper->load_best_skill_books($general, $ctt, 'Attacking')->@*,
-          $books_helper->load_mandatory_skill_books()->@*,
-        ];
-
-        $c->logger->debug(sprintf('books are %s',
-          join ', ', map { sprintf('"%s"', $_->name) } $books->@*));
-
         $c->logger->debug("Using $targetType as targetType for $name");
         my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
           general             => $general,
-          books               => $books,
-          covenant            => $covenant_helper->get_covenant($general->name),
-          ascendingAttributes => $general->ascendingAttributes,
           isPrimary           => 1,
           targetType          => $targetType,
           activationType      => 'Attacking',
@@ -629,6 +621,8 @@ package Game::EvonyTKR::Controller::Generals {
   }
 
   sub singleTable ($c) {
+    return if $c->check_prereqs_or_wait($c->generals_prereqs);
+
     my $distDir = Mojo::File::Share::dist_dir('Game::EvonyTKR');
 
     my $slug_ui   = $c->stash('uiTarget');          # from captured route

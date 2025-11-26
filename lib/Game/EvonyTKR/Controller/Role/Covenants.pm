@@ -106,19 +106,9 @@ package Game::EvonyTKR::Controller::Role::Covenants {
   }
 
   sub list_covenants ($self, $app //= undef) {
-    my $collectionDir;
-    unless (defined($app)) {
-      use Cwd;
-      $collectionDir = Mojo::File->new(cwd())->child('share/collections/data/');
-      $self->logger->warn(sprintf(
-        'collectionDir "%s" infered from cwd "%s"',
-        $collectionDir, cwd()
-      ));
-    }
-    else {
-      $collectionDir =
-        Mojo::File->new($app->config('distDir'))->child('collections/data/');
-    }
+    my $mh =
+      Mojo::File->new(Mojo::Home->new->detect('Game::EvonyTKR')->to_string());
+    my $collectionDir = $mh->child('share/collections/data');
 
     my $covenantsDir = $collectionDir->child('covenants');
     my @suffixlist   = ('.yaml', '.yml');

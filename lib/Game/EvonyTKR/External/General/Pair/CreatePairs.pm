@@ -44,7 +44,7 @@ package Game::EvonyTKR::External::General::Pair::CreatePairs {
     }
 
     # Get all generals from cache
-    my $generals = $job->get_generals($job->app);
+    my $generals = $job->get_generals();
 
     # Find the primary general
     my $primary = $generals->{ $job->normalize($general_name) };

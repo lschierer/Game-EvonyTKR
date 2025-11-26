@@ -47,7 +47,7 @@ package Game::EvonyTKR::External::General::BuildIndexes {
     $job->logger->info('Starting build_general_indexes job');
 
     my $app           = $job->app;
-    my $general_names = $job->list_generals($app);
+    my $general_names = $job->list_generals();
 
     unless ($general_names && @$general_names) {
       my $errmessage = 'No generals found to index';
