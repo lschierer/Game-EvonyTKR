@@ -170,27 +170,6 @@ package Game::EvonyTKR::External::General::Summarizer {
       return $job->fail($em);
     }
 
-    #covenants only exist for a fraction of generals.
-
-    if ($params->{isPrimary} && $params->{general}->ascending) {
-      unless (exists $params->{ascendingAttributes}
-        && ref($params->{ascendingAttributes})
-        && blessed($params->{ascendingAttributes})
-        && $params->{ascendingAttributes}
-        ->isa('Game::EvonyTKR::Model::AscendingAttributes')) {
-        my $em = sprintf(
-'job id "%s" requiers that ascending attributes be valid ascending attributes, not %s',
-          $job->info->{id},
-          ref($params->{ascendingAttributes})
-          ? blessed($params->{ascendingAttributes})
-          : 'scalar'
-        );
-
-        $job->logger->error($em);
-        return $job->fail($em);
-      }
-    }
-
     if ($params->{isPrimary}) {
       if ($params->{ascendingLevel} =~ /red/) {
         unless (any { $_ eq $params->{ascendingLevel} }
