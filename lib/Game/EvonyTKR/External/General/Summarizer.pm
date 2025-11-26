@@ -108,16 +108,16 @@ package Game::EvonyTKR::External::General::Summarizer {
       $general->specialties->@*);
 
     my $params = {
-      general             => $general,
-      isPrimary           => $isPrimary // 1,
-      targetType          => $targetType,
-      activationType      => $activationType,
-      ascendingLevel      => $ascendingLevel // 'red5',
-      covenantLevel       => $covenantLevel  // 'civilization',
-      specialty1          => $specialty1     // 'gold',
-      specialty2          => $specialty2     // 'gold',
-      specialty3          => $specialty3     // 'gold',
-      specialty4          => $specialty4     // 'gold',
+      general        => $general,
+      isPrimary      => $isPrimary // 1,
+      targetType     => $targetType,
+      activationType => $activationType,
+      ascendingLevel => $ascendingLevel // 'red5',
+      covenantLevel  => $covenantLevel  // 'civilization',
+      specialty1     => $specialty1     // 'gold',
+      specialty2     => $specialty2     // 'gold',
+      specialty3     => $specialty3     // 'gold',
+      specialty4     => $specialty4     // 'gold',
     };
 
     $job->validateParams($params);
@@ -169,7 +169,6 @@ package Game::EvonyTKR::External::General::Summarizer {
       $job->logger->error($em);
       return $job->fail($em);
     }
-
 
     #covenants only exist for a fraction of generals.
 

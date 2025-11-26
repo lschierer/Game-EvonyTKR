@@ -49,12 +49,10 @@ package Test::Package {
       }
 
       if ($buff->value->number != $args{value}) {
-        diag(
-          sprintf(
-            'value test failed: %s ne %s.',
-            $buff->value->number, $args{value}
-          )
-        );
+        diag(sprintf(
+          'value test failed: %s ne %s.',
+          $buff->value->number, $args{value}
+        ));
         $ok = 0;
       }
 

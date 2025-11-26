@@ -576,16 +576,16 @@ package Game::EvonyTKR::Controller::Generals {
 
         $c->logger->debug("Using $targetType as targetType for $name");
         my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
-          general             => $general,
-          isPrimary           => 1,
-          targetType          => $targetType,
-          activationType      => 'Attacking',
-          ascendingLevel      => $ascendingLevel,
-          covenantLevel       => $covenantLevel,
-          specialty1          => $specialties[0],
-          specialty2          => $specialties[1],
-          specialty3          => $specialties[2],
-          specialty4          => $specialties[3],
+          general        => $general,
+          isPrimary      => 1,
+          targetType     => $targetType,
+          activationType => 'Attacking',
+          ascendingLevel => $ascendingLevel,
+          covenantLevel  => $covenantLevel,
+          specialty1     => $specialties[0],
+          specialty2     => $specialties[1],
+          specialty3     => $specialties[2],
+          specialty4     => $specialties[3],
         );
 
         $summarizer->updateBuffs();

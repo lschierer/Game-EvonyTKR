@@ -122,16 +122,17 @@ package Game::EvonyTKR::Controller::Role::Books {
     return $returnlist;
   }
 
-  sub load_best_skill_books ($self, $general, $targetType, $activationType, $desiredCount = 3) {
+  sub load_best_skill_books ($self, $general, $targetType, $activationType,
+    $desiredCount = 3) {
     $self->logger->info(sprintf(
       'finding best %s skill books for %s',
       $activationType, $general->name
     ));
     my $key = $activationType eq 'PvM' ? 'PvM' : 'default';
 
-    $key = 'default' if($targetType eq 'wall');
+    $key = 'default' if ($targetType eq 'wall');
 
-    if($desiredCount <= 3 && $desiredCount != 6) {
+    if ($desiredCount <= 3 && $desiredCount != 6) {
       $desiredCount = 3;
     }
 
@@ -179,9 +180,10 @@ package Game::EvonyTKR::Controller::Role::Books {
         'Siege Machine') {
 
         my $book_name;
-        if($attr ne 'March Size') {
+        if ($attr ne 'March Size') {
           $book_name = sprintf('Level %s %s %s', $level, $tt, $attr);
-        } else {
+        }
+        else {
           $book_name = sprintf('Level %s %s', $level, $attr);
         }
         unless (any { $_->name eq $book_name } @books) {

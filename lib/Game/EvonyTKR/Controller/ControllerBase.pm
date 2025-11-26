@@ -61,8 +61,7 @@ package Game::EvonyTKR::Controller::ControllerBase {
         if ($outstanding) {
           $c->logger->info(sprintf(
             'Prerequisites outstanding for route %s, rendering wait page',
-            $self->req->url->path->to_string
-          ));
+            $self->req->url->path->to_string));
 
           my $current_url = $self->req->url->to_abs;
           $self->stash(

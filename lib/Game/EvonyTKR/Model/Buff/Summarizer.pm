@@ -10,7 +10,7 @@ package Game::EvonyTKR::Model::Buff::Summarizer {
   use Mojo::Base 'Game::EvonyTKR::Model::Base',                    -signatures;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants', -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants', -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::Constants::Books', -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Constants::Books',            -role;
   use List::AllUtils qw(first any all none uniq);
   use Carp;
   use diagnostics;
@@ -35,7 +35,7 @@ package Game::EvonyTKR::Model::Buff::Summarizer {
 
   # Input parameters
   has 'general';
-  has 'isPrimary'    => 1;
+  has 'isPrimary'      => 1;
   has 'targetType'     => '';
   has 'activationType' => 'Overall';
   has 'ascendingLevel' => 'red5';
@@ -78,44 +78,65 @@ package Game::EvonyTKR::Model::Buff::Summarizer {
     # Return early if already inflated (per-instance guard)
     return 1 if $self->_private->{is_inflated};
 
-    unless(defined($self->general) && ref($self->general) && blessed($self->general) && $self->general->isa('Game::EvonyTKR::Model::General')) {
+    unless (defined($self->general)
+      && ref($self->general)
+      && blessed($self->general)
+      && $self->general->isa('Game::EvonyTKR::Model::General')) {
       $self->logger->error(sprintf('%s requires a general', __PACKAGE__));
       return 0;
     }
 
-    if($self->general->ascending){
+    if ($self->general->ascending) {
       $self->general->populateAscendingAttributes();
-      unless($self->general->ascendingAttributes &&
-        ref($self->general->ascendingAttributes) &&
-        blessed($self->general->ascendingAttributes) &&
-        $self->general->ascendingAttributes->isa('Game::EvonyTKR::Model::AscendingAttributes')
+      unless (
+           $self->general->ascendingAttributes
+        && ref($self->general->ascendingAttributes)
+        && blessed($self->general->ascendingAttributes)
+        && $self->general->ascendingAttributes->isa(
+          'Game::EvonyTKR::Model::AscendingAttributes')
       ) {
-        $self->logger->error(sprintf('failed to populate general "%s" in %s',
-        $self->general->name, __PACKAGE__));
+        $self->logger->error(sprintf(
+          'failed to populate general "%s" in %s',
+          $self->general->name, __PACKAGE__
+        ));
         return 0;
       }
     }
 
     $self->general->populateBuiltinBook();
-    unless($self->general->builtInBook &&
-      ref($self->general->builtInBook) &&
-      blessed($self->general->builtInBook) &&
-      $self->general->builtInBook->isa('Game::EvonyTKR::Model::Book')
-    ){
-      $self->logger->error(sprintf('failed to populate general "%s" in %s',
-      $self->general->name, __PACKAGE__));
+    unless ($self->general->builtInBook
+      && ref($self->general->builtInBook)
+      && blessed($self->general->builtInBook)
+      && $self->general->builtInBook->isa('Game::EvonyTKR::Model::Book')) {
+      $self->logger->error(sprintf(
+        'failed to populate general "%s" in %s',
+        $self->general->name, __PACKAGE__
+      ));
       return 0;
     }
 
     $self->general->populateSpecialties();
-    unless(scalar($self->general->specialties->@*) == scalar($self->general->specialtyNames->@*)) {
-      $self->logger->error(sprintf('failed to populate general "%s" in %s',
-      $self->general->name, __PACKAGE__));
+    unless (
+      scalar($self->general->specialties->@*) ==
+      scalar($self->general->specialtyNames->@*)) {
+      $self->logger->error(sprintf(
+        'failed to populate general "%s" in %s',
+        $self->general->name, __PACKAGE__
+      ));
       return 0;
     }
-    unless(all { defined($_) && ref($_) && blessed($_) && $_->isa('Game::EvonyTKR::Model::Specialty') } $self->general->specialties->@* ){
-      $self->logger->error(sprintf('failed to populate general "%s" in %s',
-      $self->general->name, __PACKAGE__));
+    unless (
+      all {
+             defined($_)
+          && ref($_)
+          && blessed($_)
+          && $_->isa('Game::EvonyTKR::Model::Specialty')
+      } $self->general->specialties->@*
+    ) {
+      $self->logger->error(sprintf(
+        'failed to populate general "%s" in %s',
+        $self->general->name, __PACKAGE__
+      ));
       return 0;
     }
 
@@ -136,11 +157,14 @@ package Game::EvonyTKR::Model::Buff::Summarizer {
     };
 
     my $nn = lc($self->normalize($self->general->name));
-    if(any { $nn eq lc($self->normalize($_)) } $covenant_helper->list_covenants->@* ){
+    if (any { $nn eq lc($self->normalize($_)) }
+      $covenant_helper->list_covenants->@*) {
       $self->_private->{covenant} = $covenant_helper->get_covenant($nn);
-      unless($self->_private->{covenant}){
-        $self->logger->error(sprintf('failed to populate general "%s" in %s',
-        $self->general->name, __PACKAGE__));
+      unless ($self->_private->{covenant}) {
+        $self->logger->error(sprintf(
+          'failed to populate general "%s" in %s',
+          $self->general->name, __PACKAGE__
+        ));
         return 0;
       }
     }
@@ -162,8 +186,9 @@ package Game::EvonyTKR::Model::Buff::Summarizer {
       $helper;
     };
 
-    unless($self->targetType){
-      $self->logger->error(sprintf('targetType is required for %s', __PACKAGE__));
+    unless ($self->targetType) {
+      $self->logger->error(
+        sprintf('targetType is required for %s', __PACKAGE__));
       return 0;
     }
 
@@ -171,30 +196,33 @@ package Game::EvonyTKR::Model::Buff::Summarizer {
     $ctt =~ s/ /_/g;
     $ctt =~ s/(?:machines|troops)/specialist/;
 
-    if($ctt eq 'mayor') {
+    if ($ctt eq 'mayor') {
+      $self->_private->{books} =
+        [$books_helper->load_mandatory_skill_books()->@*,];
+    }
+    else {
       $self->_private->{books} = [
-        $books_helper->load_mandatory_skill_books()->@*,
-      ];
-    } else {
-      $self->_private->{books} = [
-        $books_helper->load_best_skill_books($self->general, $ctt, $self->activationType )->@*,
+        $books_helper->load_best_skill_books($self->general, $ctt,
+          $self->activationType)->@*,
         $books_helper->load_mandatory_skill_books()->@*,
       ];
     }
 
-
     $self->logger->debug(sprintf(
       'found total book set %s for general "%s" ctt "%s" activationType "%s"',
-      join(', ', map { sprintf('"%s"', $_->name) } @{ $self->_private->{books} } ),
-      $self->general->name, $ctt, $self->activationType,
-      ));
+      join(', ',
+        map { sprintf('"%s"', $_->name) } @{ $self->_private->{books} }),
+      $self->general->name,
+      $ctt,
+      $self->activationType,
+    ));
 
     $self->_private->{is_inflated} = 1;
     return 1;
   }
 
   sub updateBuffs ($self) {
-    unless($self->inflate()) {
+    unless ($self->inflate()) {
       $self->logger->logcroak(sprintf('failed to inflate %s', __PACKAGE__));
       return;
     }
@@ -227,7 +255,7 @@ package Game::EvonyTKR::Model::Buff::Summarizer {
   }
 
   sub updateDebuffs ($self) {
-    unless($self->inflate()) {
+    unless ($self->inflate()) {
       $self->logger->logcroak(sprintf('failed to inflate %s', __PACKAGE__));
       return;
     }
@@ -374,8 +402,7 @@ package Game::EvonyTKR::Model::Buff::Summarizer {
       my $genericBooks = $self->getGenericBookValue($attribute, $buffType);
       $total += $genericBooks;
       $self->logger->debug(sprintf(
-        'adding generic book value %s '.
-        'for attribute %s  and buff type %s',
+        'adding generic book value %s ' . 'for attribute %s  and buff type %s',
         $genericBooks, $attribute, $buffType
       ));
     }
@@ -411,8 +438,9 @@ package Game::EvonyTKR::Model::Buff::Summarizer {
         $btt =~ s/(Ranged|Ground|Mounted)/$1 Troop/;
         $btt =~ s/Siege Machines/Siege Machine/;
         my $level = $self->bestLevel;
-        my $book = first { $_->name =~ /^Level $level $btt $attribute$/ && $_->level == $level }
-          $books->@*;
+        my $book  = first {
+          $_->name =~ /^Level $level $btt $attribute$/ && $_->level == $level
+        } $books->@*;
 
         if (
           $book
@@ -426,7 +454,8 @@ package Game::EvonyTKR::Model::Buff::Summarizer {
           $self->logger->error(sprintf(
             'no book found for "%s" from %s',
             "Level 4 $btt $attribute",
-            join ', ', map { sprintf('"%s"', $_->name) } $books->@*
+            join ', ',
+            map { sprintf('"%s"', $_->name) } $books->@*
           ));
         }
       }
@@ -440,7 +469,8 @@ package Game::EvonyTKR::Model::Buff::Summarizer {
           my $level = $self->bestLevel;
           my $book =
             first {
-            $_->name =~ /^Level $level $btt $attribute Against Monster/ && $_->level == $level
+                 $_->name =~ /^Level $level $btt $attribute Against Monster/
+              && $_->level == $level
             } $books->@*;
 
           if (
@@ -499,8 +529,9 @@ package Game::EvonyTKR::Model::Buff::Summarizer {
     );
 
     $self->logger->info(sprintf(
-    'summarize_from_sources has %s after '.'summarize_covenant for %s/%s',
-    $total, $attribute, $summaryType));
+      'summarize_from_sources has %s after ' . 'summarize_covenant for %s/%s',
+      $total, $attribute, $summaryType
+    ));
 
     $total += $self->summarize_specialties_for_attribute(
       $attribute,        $summaryType, $buffConditions,
@@ -508,8 +539,10 @@ package Game::EvonyTKR::Model::Buff::Summarizer {
     );
 
     $self->logger->info(sprintf(
-    'summarize_from_sources has %s after '.'summarize_specialties for %s/%s',
-    $total, $attribute, $summaryType));
+      'summarize_from_sources has %s after '
+        . 'summarize_specialties for %s/%s',
+      $total, $attribute, $summaryType
+    ));
 
     if ($self->isPrimary && $self->general->ascending) {
       $total += $self->summarize_ascendingAttributes_for_attribute(
@@ -518,8 +551,10 @@ package Game::EvonyTKR::Model::Buff::Summarizer {
       );
 
       $self->logger->info(sprintf(
-      'summarize_from_sources has %s after '.'summarize_ascendingAttributes for %s/%s',
-      $total, $attribute, $summaryType));
+        'summarize_from_sources has %s after '
+          . 'summarize_ascendingAttributes for %s/%s',
+        $total, $attribute, $summaryType
+      ));
     }
 
     return $total;
@@ -581,7 +616,8 @@ package Game::EvonyTKR::Model::Buff::Summarizer {
     my $total = 0;
 
     my $covenant = $self->_private->{covenant};
-    if (defined($covenant) && $covenant->isa('Game::EvonyTKR::Model::Covenant')) {
+    if (defined($covenant) && $covenant->isa('Game::EvonyTKR::Model::Covenant'))
+    {
       $self->logger->debug("Found covenant for "
           . $self->general->name
           . " now processing at level "
@@ -621,14 +657,15 @@ package Game::EvonyTKR::Model::Buff::Summarizer {
       $self->specialty3, $self->specialty4
     );
     $self->logger->debug(sprintf(
-      '%s summarize_specialties_for_attribute called for "%s" looking for levels '
+'%s summarize_specialties_for_attribute called for "%s" looking for levels '
         . 'sp1: "%s"; sp2: "%s"; sp3: "%s"; sp4: "%s";',
-      $matching_type, $self->general->name, $self->specialty1, $self->specialty2,
-      $self->specialty3,    $self->specialty4
+      $matching_type,    $self->general->name, $self->specialty1,
+      $self->specialty2, $self->specialty3,    $self->specialty4
     ));
     $self->logger->debug(sprintf(
-      '%s summarize_specialties_for_attribute for "%s" attribute: "%s"; summaryType: "%s"',
-      $matching_type, $self->general->name, $attribute, $summaryType));
+'%s summarize_specialties_for_attribute for "%s" attribute: "%s"; summaryType: "%s"',
+      $matching_type, $self->general->name, $attribute, $summaryType
+    ));
 
     foreach my $sn_index (0 .. $#specialtyNames) {
       my $sn = $specialtyNames[$sn_index];
