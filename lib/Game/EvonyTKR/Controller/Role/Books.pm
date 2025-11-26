@@ -13,6 +13,9 @@ package Game::EvonyTKR::Controller::Role::Books {
   use Log::Any;
   use Carp;
 
+  # TODO: Handle 'Overall' troop type properly in book selection
+  # 'Overall' means "I don't care what troop type" and should use the general's primary type
+
   my $logger = Log::Any->get_logger(category => __PACKAGE__);
   our $namespace = 'books__';
 
