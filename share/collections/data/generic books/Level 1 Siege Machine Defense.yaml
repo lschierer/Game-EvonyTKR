@@ -1,4 +1,5 @@
-name: Level 1 Siege Machine Defense
+name: Siege Machine Defense
+level: 1
 text: Increases Siege Machine by 10% when General is leading the army.
 buffs:
   - attribute: Defense

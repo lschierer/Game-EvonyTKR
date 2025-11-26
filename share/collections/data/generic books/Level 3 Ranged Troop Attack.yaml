@@ -1,4 +1,5 @@
-name: Level 3 Ranged Troop Attack
+name: Ranged Troop Attack
+level: 3
 text: Increases Ranged Troop by 20% when General is leading the army.
 buffs:
   - attribute: Attack

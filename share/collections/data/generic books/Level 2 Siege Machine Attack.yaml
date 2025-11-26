@@ -1,4 +1,5 @@
-name: Level 2 Siege Machine Attack
+name: Siege Machine Attack
+level: 2
 text: Increases Siege Machine by 15% when General is leading the army.
 buffs:
   - attribute: Attack

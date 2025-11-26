@@ -1,4 +1,5 @@
-name: Level 2 Mounted Troop HP
+name: Mounted Troop HP
+level: 2
 text: Increases Mounted Troop by 15% when General is leading the army.
 buffs:
   - attribute: HP

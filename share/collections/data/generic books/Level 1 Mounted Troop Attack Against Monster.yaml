@@ -1,4 +1,5 @@
-name: Level 1 Mounted Troop Attack Against Monster
+name: Mounted Troop Attack Against Monster
+level: 1
 text: Increases Mounted Troop by 15% when General is leading the army.
 buffs:
   - attribute: Attack

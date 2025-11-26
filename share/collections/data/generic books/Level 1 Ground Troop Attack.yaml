@@ -1,4 +1,5 @@
-name: Level 1 Ground Troop Attack
+name: Ground Troop Attack
+level: 1
 text: Increases Ground Troop by 10% when General is leading the army.
 buffs:
   - attribute: Attack

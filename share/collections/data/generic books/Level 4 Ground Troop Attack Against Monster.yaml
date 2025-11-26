@@ -1,4 +1,5 @@
-name: Level 4 Ground Troop Attack Against Monster
+name: Ground Troop Attack Against Monster
+level: 4
 text: Increases Ground Troop by 45% when General is leading the army.
 buffs:
   - attribute: Attack
