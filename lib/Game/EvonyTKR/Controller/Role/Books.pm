@@ -95,66 +95,94 @@ package Game::EvonyTKR::Controller::Role::Books {
   }
 
   sub list_generic_books ($self, $app = undef) {
-    my $returnlist;
-    my $collectionDir;
-    unless (defined($app)) {
-      use Cwd;
-      $collectionDir = Mojo::File->new(cwd())->child('share/collections/data/');
-      $self->logger->warn(sprintf(
-        'collectionDir "%s" infered from cwd "%s"',
-        $collectionDir, cwd()
-      ));
-    }
-    else {
-      $collectionDir =
-        Mojo::File->new($app->config('distDir'))->child('collections/data/');
-    }
-
-    my $gbDir      = $collectionDir->child('generic books');
-    my @suffixlist = ('.yaml', '.yml');
-    $gbDir->list->grep(sub { $_ =~ /\.ya?ml$/ && -f -r $_ })->sort->map(sub {
-      my $ib = $_->basename(@suffixlist);
-      $ib = lc($self->normalize($ib));
-      if (none { $_ eq $ib } $returnlist->@*) {
-        push @$returnlist, $ib;
-      }
-    });
-
+    state $returnlist;
+    $returnlist //= do {
+      my $mh            = Mojo::Home->new->detect('Game::EvonyTKR');
+      my $collectionDir = $mh->child('share/collections/data');
+      my $gbdir         = $collectionDir->child('generic books');
+      my @suffixlist    = ('.yaml', '.yml');
+      my @files = $gbdir->list->grep(sub { $_ =~ /\.ya?ml$/ && -f -r $_ })
+        ->sort->map(sub { return $_->basename(@suffixlist) })->each;
+      [List::UtilsBy::uniq_by { lc($self->normalize($_)) } @files];
+    };
     return $returnlist;
   }
 
-  sub list_builtin_books ($self, $app = undef) {
-    my $returnlist;
-    my $collectionDir;
-    unless (defined($app)) {
-      use Cwd;
-      $collectionDir = Mojo::File->new(cwd())->child('share/collections/data/');
-      $self->logger->warn(sprintf(
-        'collectionDir "%s" infered from cwd "%s"',
-        $collectionDir, cwd()
-      ));
-    }
-    else {
-      $collectionDir =
-        Mojo::File->new($app->config('distDir'))->child('collections/data/');
-    }
-
-    my $gbDir      = $collectionDir->child('skill books');
-    my @suffixlist = ('.yaml', '.yml');
-    $gbDir->list->grep(sub { $_ =~ /\.ya?ml$/ && -f -r $_ })->sort->map(sub {
-      my $ib = $_->basename(@suffixlist);
-      $ib = lc($self->normalize($ib));
-      if (none { $_ eq $ib } $returnlist->@*) {
-        $logger->debug(sprintf('adding "%s" to the list of builtins', $ib));
-        push @$returnlist, $ib;
-      }
-      else {
-        $logger->debug(
-          sprintf('excluding "%s" from the list of builtins', $ib));
-      }
-    });
-
+  sub list_builtin_books ($self,) {
+    state $returnlist;
+    $returnlist //= do {
+      my $mh            = Mojo::Home->new->detect('Game::EvonyTKR');
+      my $collectionDir = $mh->child('share/collections/data');
+      my $bbdir         = $collectionDir->child('skill books');
+      my @suffixlist    = ('.yaml', '.yml');
+      my @files = $bbdir->list->grep(sub { $_ =~ /\.ya?ml$/ && -f -r $_ })
+        ->sort->map(sub { return $_->basename(@suffixlist) })->each;
+      [List::UtilsBy::uniq_by { lc($self->normalize($_)) } @files];
+    };
     return $returnlist;
+  }
+
+  sub load_best_skill_books ($self, $general, $targetType, $activationType) {
+    $self->logger->info(sprintf(
+      'finding best %s skill books for %s',
+      $activationType, $general->name
+    ));
+    my $key = $activationType eq 'PvM' ? 'PvM' : 'default';
+
+# TODO: currently hard coded for a single general (3 books)
+#       allow for a pair of generals (6 books)
+# TODO: Implement book conflict detection
+#       (requires an instance of Game::EvonyTKR::Model::General::Conflict::Book )
+# TODO: Handle partial conflicts
+#       A) book works for single general but conflicts as a pair
+#       B) ability to display the potential for this even in the single general UI.
+#          This one (B) may require a separate method from this for the UI to call.
+
+    my @books;
+    my $generic_dir       = $self->collection_dir->child('generic books');
+    my @sorted_book_names = sort {
+      $self->BestSkillBooks->{$targetType}->{$key}->{$a}
+        <=> $self->BestSkillBooks->{$targetType}->{$key}->{$b}
+    } keys %{ $self->BestSkillBooks->{$targetType}->{$key} };
+
+    my $level = $self->bestLevel;
+
+    foreach my $book_name (@sorted_book_names) {
+      my $base_name = $book_name =~ s/^Level \d+ //r;
+      my $book      = $self->get_generic_book($base_name, $level);
+      unless ($book && ref($book) && $book->isa('Game::EvonyTKR::Model::Book'))
+      {
+        $self->logger->error("Cannot find $book_name");
+        next;
+      }
+      $self->logger->info(
+        sprintf('Picked book "%s" for "%s"', $book_name, $general->name));
+      push @books, $book;
+      last if (scalar @books >= 3);    # Single general gets 3 books
+    }
+
+    return \@books;
+  }
+
+  sub load_mandatory_skill_books ($self) {
+    my @books;
+    my $level = $self->bestLevel;
+    # Ensure required books are present for buff summarizer
+    foreach my $attr ('Attack', 'Defense', 'HP') {
+      foreach my $tt ('Mounted Troop', 'Ranged Troop', 'Ground Troop',
+        'Siege Machine') {
+        my $book_name = sprintf('Level %s %s %s', $level, $tt, $attr);
+        unless (any { $_->name eq $book_name } @books) {
+          my $book = $self->get_generic_book($book_name, $level);
+          unless ($book) {
+            $self->logger->error("Cannot find $book_name");
+            next;
+          }
+          push @books, $book;
+        }
+      }
+    }
+    return \@books;
   }
 }
 1;

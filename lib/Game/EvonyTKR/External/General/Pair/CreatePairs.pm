@@ -10,9 +10,11 @@ package Game::EvonyTKR::External::General::Pair::CreatePairs {
   require Game::EvonyTKR::Service::Cache;
   require Game::EvonyTKR::Model::General::Conflict::Book;
 
+  sub task_name {'create_pairs'}
+
   sub register ($taskClass, $app, $conf = {}) {
     $taskClass->SUPER::register($app, $conf);
-    $app->minion->add_task(create_pairs => __PACKAGE__);
+    $app->minion->add_task($taskClass->task_name => __PACKAGE__);
     my $signal = __PACKAGE__ =~ s/::/_/gr;
     $app->plugins->emit($signal => 1);
   }

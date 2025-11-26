@@ -7,9 +7,11 @@ package Game::EvonyTKR::External::General::BuildIndexes {
   use Mojo::Base 'Game::EvonyTKR::Role::Common',               -role;
   use Mojo::Base 'Game::EvonyTKR::Controller::Role::Generals', -role;
 
+  sub task_name {'build_general_indexes'}
+
   sub register ($taskClass, $app, $conf = {}) {
     $taskClass->SUPER::register($app, $conf);
-    $app->minion->add_task(build_general_indexes => __PACKAGE__);
+    $app->minion->add_task($taskClass->task_name => __PACKAGE__);
     my $signal = __PACKAGE__ =~ s/::/_/gr;
     $app->plugins->emit($signal => 1);
   }

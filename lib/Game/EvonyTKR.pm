@@ -9,7 +9,6 @@ require Mojolicious::Plugin::Minion;
 #require Game::EvonyTKR::Controller::Root;
 require Game::EvonyTKR::Controller::ControllerBase;
 require Game::EvonyTKR::External::JobBase;
-require Game::EvonyTKR::Role::Logging;
 
 package Game::EvonyTKR {
   use Mojo::Base 'Mojolicious',                   -strict, -signatures;

@@ -17,6 +17,11 @@ package Game::EvonyTKR::Role::Common {
   use Unicode::Normalize qw(NFKD);
   use List::AllUtils     qw(min uniq );
 
+  has 'collection_dir' => sub {
+    my $home = Mojo::Home->new->detect('Game::EvonyTKR');
+    return $home->child('share/collections/data');
+  };
+
   sub normalize ($self, $name) {
     my $dn = Encode::is_utf8($name) ? $name : Encode::decode_utf8($name);
     my $nn = fc(NFKD($dn));
@@ -125,15 +130,15 @@ package Game::EvonyTKR::Role::Common {
         if ($is_minion_job) {
           $self->note("${prereq}PendingCount" => $prereqPendingCount);
 
-          if($is_minion_job && $prereqPendingCount < 10){
+          if ($is_minion_job && $prereqPendingCount < 10) {
             $minion->jobs({
               tasks  => [$prereq],
               states => ['active', 'inactive'],
-            })->each(sub{
-              my $info = $_;
+            })->each(sub {
+              my $info    = $_;
               my $pending = $self->info->{notes}->{pending};
-              push @{ $pending }, $info->{id};
-              $pending = [ uniq @{$pending} ];
+              push @{$pending}, $info->{id};
+              $pending = [uniq @{$pending}];
               $self->note(pending => $pending);
             });
           }

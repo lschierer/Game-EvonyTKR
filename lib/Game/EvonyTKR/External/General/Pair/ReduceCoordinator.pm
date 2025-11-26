@@ -8,9 +8,11 @@ package Game::EvonyTKR::External::General::Pair::ReduceCoordinator {
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants', -role;
   use List::AllUtils qw(uniq none all any);
 
+  sub task_name {'reduce_coordinator'}
+
   sub register ($taskClass, $app, $conf = {}) {
     $taskClass->SUPER::register($app, $conf);
-    $app->minion->add_task(reduce_coordinator => __PACKAGE__);
+    $app->minion->add_task($taskClass->task_name => __PACKAGE__);
     my $signal = __PACKAGE__ =~ s/::/_/gr;
     $app->plugins->emit($signal => 1);
   }

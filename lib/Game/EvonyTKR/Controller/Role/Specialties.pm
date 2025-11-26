@@ -52,14 +52,12 @@ package Game::EvonyTKR::Controller::Role::Specialties {
     return $specialty;
   }
 
-  sub list_specialties ($self, $app) {
-    unless (defined($app)) {
-      $self->logger->logcroak('$app must be defined');
-    }
-    my $collectionDir =
-      Mojo::File->new($app->config('distDir'))->child('collections/data/');
-    my $specialtyDir = $collectionDir->child('specialties');
-    my @suffixlist   = ('.yaml', '.yml');
+  sub list_specialties ($self,) {
+    my $mh =
+      Mojo::File->new(Mojo::Home->new->detect('Game::EvonyTKR')->to_string());
+    my $collectionDir = $mh->child('share/collections/data');
+    my $specialtyDir  = $collectionDir->child('specialties');
+    my @suffixlist    = ('.yaml', '.yml');
     my @files = $specialtyDir->list->grep(sub { $_ =~ /\.ya?ml$/ && -f -r $_ })
       ->sort->map(sub { return $_->basename(@suffixlist) })->each;
     my @returnlist = List::UtilsBy::uniq_by { lc($self->normalize($_)) } @files;

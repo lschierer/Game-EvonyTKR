@@ -1,7 +1,6 @@
 package Game::EvonyTKR::Role::Constants::Books;
 use v5.42.0;
 use utf8::all;
-use File::FindLib 'lib';
 require Data::Printer;
 require Hash::Util;
 use Mojo::Base -role, -signatures;
@@ -13,7 +12,7 @@ use Carp;
 has bestLevel => 4;
 
 has 'BestSkillBooks' => sub {
-  my $self = shift;
+  my $self      = shift;
   my $bestLevel = $self->bestLevel;
   const my $tmp => {
     ground_specialist => {

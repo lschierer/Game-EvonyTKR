@@ -30,13 +30,9 @@ package Game::EvonyTKR::Controller::Role::Generals {
     $logger->debug("get_general called for: $name");
 
     my $normalized_name = lc($self->normalize($name)) // '';
+    $normalized_name =~ s/ /_/g;
     return unless (length($normalized_name));
     $logger->debug(sprintf('key "%s" for name "%s"', $normalized_name, $name));
-    $normalized_name =~ s/ /_/g;
-    $logger->debug(sprintf(
-      'key after spaces removed: "%s", for name "%s"',
-      $normalized_name, $name
-    ));
 
     if (exists $generals->{$normalized_name}) {
       $logger->debug("Returning general $name from local cache");
@@ -65,12 +61,11 @@ package Game::EvonyTKR::Controller::Role::Generals {
     return $general;
   }
 
-  sub list_generals ($self, $app) {
-    unless (defined($app)) {
-      $logger->logcroak('$app must be defined');
-    }
-    my $collectionDir =
-      Mojo::File->new($app->config('distDir'))->child('collections/data/');
+  sub list_generals ($self,) {
+    my $mh =
+      Mojo::File->new(Mojo::Home->new->detect('Game::EvonyTKR')->to_string());
+    my $collectionDir = $mh->child('share/collections/data');
+
     my $generalDir = $collectionDir->child('generals');
     my @suffixlist = ('.yaml', '.yml');
     my @files = $generalDir->list->grep(sub { $_ =~ /\.ya?ml$/ && -f -r $_ })

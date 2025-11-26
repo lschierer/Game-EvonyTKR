@@ -10,26 +10,15 @@ require Path::Tiny;
 require Game::EvonyTKR;
 require Game::EvonyTKR::Shared::Constants;
 require Game::EvonyTKR::Model::General;
-require Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders;
-require Game::EvonyTKR::External::General::Pair::CreatePairs;
-require Game::EvonyTKR::External::General::Pair::ReduceCoordinator;
-require Game::EvonyTKR::External::General::Pair::ReduceBatch;
-require Game::EvonyTKR::External::MonitorLoaders;
-require Game::EvonyTKR::External::General::Loader;
-require Game::EvonyTKR::External::General::LoadAll;
-require Game::EvonyTKR::External::Book::Loader;
-require Game::EvonyTKR::External::Book::LoadAllBuiltins;
-require Game::EvonyTKR::External::Book::LoadAllGenerics;
-require Game::EvonyTKR::External::AscendingAttributes::Loader;
-require Game::EvonyTKR::External::AscendingAttributes::LoadAll;
-require Game::EvonyTKR::External::Specialty::Loader;
-require Game::EvonyTKR::External::Specialty::LoadAllSpecialties;
+require Mojo::Loader;
 
 package Game::EvonyTKR::External::Prebuild {
   use Mojo::Base 'Game::EvonyTKR::External::JobBase',          -signatures;
   use Mojo::Base 'Game::EvonyTKR::Controller::Role::Generals', -role;
   use Mojo::Home;
   use Mojo::File;
+  use Mojo::Loader;
+
   use POSIX 'strftime';
   use Time::HiRes 'time';
   use experimental   qw(class);
@@ -41,6 +30,28 @@ package Game::EvonyTKR::External::Prebuild {
   state $generalCache;
   state $prereqs  = {};
   state $monitors = {};
+
+  my $prereq_plugins = [
+    'Game::EvonyTKR::External::AscendingAttributes::Loader',
+    'Game::EvonyTKR::External::AscendingAttributes::LoadAll',
+    'Game::EvonyTKR::External::Book::LoadAllBuiltins',
+    'Game::EvonyTKR::External::Book::LoadAllGenerics',
+    'Game::EvonyTKR::External::Book::Loader',
+    'Game::EvonyTKR::External::General::LoadAll',
+    'Game::EvonyTKR::External::General::Loader',
+    'Game::EvonyTKR::External::General::BuildIndexes',
+    'Game::EvonyTKR::External::General::Pair::CreatePairs',
+    'Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders',
+    'Game::EvonyTKR::External::General::Pair::ReduceCoordinator',
+    'Game::EvonyTKR::External::General::Pair::ReduceBatch',
+    'Game::EvonyTKR::External::MonitorLoaders',
+    'Game::EvonyTKR::External::Specialty::LoadAllSpecialties',
+    'Game::EvonyTKR::External::Specialty::Loader',
+    'Game::EvonyTKR::External::Covenant::LoadAll',
+    'Game::EvonyTKR::External::Covenant::Loader',
+  ];
+
+  sub task_name {'external_prebuild'}
 
   sub register ($plugin, $app, $conf = {}) {
     if (not defined $plugin) {
@@ -64,25 +75,7 @@ package Game::EvonyTKR::External::Prebuild {
       sprintf('register function for "%s" %s', __PACKAGE__, $$));
 
     # Register main prebuild orchestration task
-    $app->minion->add_task(external_prebuild => __PACKAGE__);
-    my $plugins = [
-      'Game::EvonyTKR::External::AscendingAttributes::Loader',
-      'Game::EvonyTKR::External::AscendingAttributes::LoadAll',
-      'Game::EvonyTKR::External::Book::LoadAllBuiltins',
-      'Game::EvonyTKR::External::Book::LoadAllGenerics',
-      'Game::EvonyTKR::External::Book::Loader',
-      'Game::EvonyTKR::External::General::LoadAll',
-      'Game::EvonyTKR::External::General::Loader',
-      'Game::EvonyTKR::External::General::Pair::CreatePairs',
-      'Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders',
-      'Game::EvonyTKR::External::General::Pair::ReduceCoordinator',
-      'Game::EvonyTKR::External::General::Pair::ReduceBatch',
-      'Game::EvonyTKR::External::MonitorLoaders',
-      'Game::EvonyTKR::External::Specialty::LoadAllSpecialties',
-      'Game::EvonyTKR::External::Specialty::Loader',
-      'Game::EvonyTKR::External::Covenant::LoadAll',
-      'Game::EvonyTKR::External::Covenant::Loader',
-    ];
+    $app->minion->add_task($plugin->task_name => __PACKAGE__);
 
     my @tasks = values $app->minion->tasks->%*;
     foreach my $task (@tasks) {
@@ -90,8 +83,13 @@ package Game::EvonyTKR::External::Prebuild {
         ref($task) // 'undef ref',
         blessed($task) // 'undef blessed'));
     }
-    foreach my $prereq ($plugins->@*) {
+    foreach my $prereq ($prereq_plugins->@*) {
       $prereqs->{$prereq} = 0;
+      if (my $e = Mojo::Loader::load_class($prereq)) {
+        $plugin->logger->logcroak(sprintf(
+          'exception loading %s: ', ref($e) ? $e : 'Not Found!'));
+        next;
+      }
       my $signal = $prereq =~ s/::/_/gr;
       $app->plugins->on(
         $signal => sub {
@@ -134,7 +132,6 @@ package Game::EvonyTKR::External::Prebuild {
           'external_prebuild' => [{}] => {
             priority => 100,
             attempts => 3,
-            expire   => 7200,
             notes    => { uniq => 'external_prebuild' },
           }
         );
@@ -208,49 +205,42 @@ package Game::EvonyTKR::External::Prebuild {
         args     => [],
         attempts => 3,
         delay    => 1,
-        expire   => 300,
         priority => 50,
       },
       load_all_generic_books => {
         args     => [],
         attempts => 3,
         delay    => 1,
-        expire   => 300,
         priority => 50,
       },
       load_all_builtin_books => {
         args     => [],
         attempts => 3,
         delay    => 1,
-        expire   => 300,
         priority => 60,
       },
       load_all_specialties => {
         args     => [],
         attempts => 3,
         delay    => 1,
-        expire   => 300,
         priority => 60,
       },
       load_all_generals => {
         args     => ['prebuild load_all_generals'],
         attempts => 3,
         delay    => 5,
-        expire   => 300,
         priority => 10,
       },
       load_all_covenants => {
         args     => [],
         attempts => 3,
         delay    => 5,
-        expire   => 300,
         priority => 10,
       },
       load_all_pair_builders => {
         args     => [],
         attempts => 5,
         delay    => 6,
-        expire   => 300,
         priority => 50,
       },
     };
@@ -306,7 +296,6 @@ package Game::EvonyTKR::External::Prebuild {
           $mn => [] => {
             attempts => 5,
             delay    => 10,
-            expire   => 3700,
             priority => 90,
             parents  => $loaderJids
           }
@@ -317,6 +306,35 @@ package Game::EvonyTKR::External::Prebuild {
 
     Mojo::IOLoop->remove($timer_id) if ($timer_id);
     $job->finish('Prebuild spawning complete');
+  }
+
+  sub cleanup ($job) {
+    my $prebuild_start = time;
+
+    my @tasks;
+    foreach my $prereq ($prereq_plugins->@*) {
+      unless ($prereq->can('task_name')) {
+        $job->logger->error(
+          sprintf('prereq plugin "%s" is missing the task_name method.',
+            $prereq)
+        );
+        next;
+      }
+      push @tasks, $prereq->task_name();
+    }
+
+    $job->minion->jobs({
+      tasks  => \@tasks,
+      states => ['finished', 'failed'],
+    })->each(sub {
+      my $j = $_;
+      if ($j->info->{finished} && $j->info->{finished} < $prebuild_start) {
+        $j->remove;
+      }
+      elsif ($j->info->{failed}) {
+        $j->remove;
+      }
+    });
   }
 
   sub prebuild_db_lock($job, $db, $job_key, $owner, $ttl, $timer_id,

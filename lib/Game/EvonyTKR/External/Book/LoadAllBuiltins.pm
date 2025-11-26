@@ -17,6 +17,8 @@ package Game::EvonyTKR::External::Book::LoadAllBuiltins {
 
   state $bookCache;
 
+  sub task_name {'load_all_builtin_books'}
+
   sub register ($taskClass, $app, $conf = {}) {
     $taskClass->SUPER::register($app, $conf);
     if (not defined($app)) {
@@ -32,7 +34,7 @@ package Game::EvonyTKR::External::Book::LoadAllBuiltins {
       return;
     }
     $taskClass->logger->debug('Registering Book Loader workflow tasks');
-    $app->minion->add_task(load_all_builtin_books => __PACKAGE__);
+    $app->minion->add_task($taskClass->task_name => __PACKAGE__);
 
     $taskClass->logger->info(sprintf('emitting signal for %s', __PACKAGE__));
     my $signal = __PACKAGE__ =~ s/::/_/gr;
@@ -55,7 +57,7 @@ package Game::EvonyTKR::External::Book::LoadAllBuiltins {
       __PACKAGE__, Log::Log4perl::Level::to_level($job->logger->level())
     ));
     my @list;
-    push @list, $job->list_builtin_books($job->app)->@*;
+    push @list, $job->list_builtin_books()->@*;
     $job->logger->info('list of builtin books is ' . Data::Printer::np(@list));
     my $maxIndex = scalar(@list) - 1;
     foreach my $index (0 .. $maxIndex) {
@@ -73,7 +75,6 @@ package Game::EvonyTKR::External::Book::LoadAllBuiltins {
         ] => {
           attempts => 3,
           delay    => rand(10),
-          expire   => 300,
           priority => 20,
         }
       );

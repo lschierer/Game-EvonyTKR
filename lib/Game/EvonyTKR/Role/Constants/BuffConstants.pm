@@ -7,6 +7,7 @@ require Hash::Util;
 package Game::EvonyTKR::Role::Constants::BuffConstants {
   use Mojo::Base -role, -signatures;
   use Const::Fast;
+  use List::AllUtils qw( first );
   use Carp;
 
   has 'TroopTypeValues' => sub {

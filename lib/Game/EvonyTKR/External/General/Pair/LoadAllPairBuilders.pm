@@ -8,10 +8,12 @@ package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
   use Mojo::Base 'Game::EvonyTKR::Controller::Role::Pairs',    -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants', -role;
 
+  sub task_name {'load_all_pair_builders'}
+
   sub register ($taskClass, $app, $conf = {}) {
     $taskClass->SUPER::register($app, $conf);
     $taskClass->setup_pairs_by_type();
-    $app->minion->add_task(load_all_pair_builders => __PACKAGE__);
+    $app->minion->add_task($taskClass->task_name => __PACKAGE__);
     my $signal = __PACKAGE__ =~ s/::/_/gr;
     $app->plugins->emit($signal => 1);
   }
@@ -83,7 +85,6 @@ package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
         my $job_id = $job->minion->enqueue(
           'create_pairs' => [$general_name, $type] => {
             priority => $priority,
-            expire   => 2700,
           }
         );
         $job->logger->debug(sprintf(
@@ -115,7 +116,6 @@ package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
               'reduce_batch' => [] => {
                 parents  => [@current_batch],
                 priority => 50,
-                expire   => 2700,
               }
             );
             $job->logger->debug(sprintf(
@@ -146,8 +146,8 @@ package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
 
       my $reduce_jid = $job->minion->enqueue(
         'reduce_batch' => [] => {
-          parents => [@current_batch],
-          expire  => 2700,
+          parents  => [@current_batch],
+          priority => 50,
         }
       );
       $job->logger->debug(sprintf(

@@ -8,9 +8,11 @@ package Game::EvonyTKR::External::General::LoadAll {
   require Game::EvonyTKR::External::General::BuildIndexes;
   use Mojo::File;
 
+  sub task_name {'load_all_generals'}
+
   sub register ($taskClass, $app, $conf = {}) {
     $taskClass->SUPER::register($app, $conf);
-    $app->minion->add_task(load_all_generals => __PACKAGE__);
+    $app->minion->add_task($taskClass->task_name => __PACKAGE__);
     my $signal = __PACKAGE__ =~ s/::/_/gr;
     $app->plugins->emit($signal => 1);
   }
@@ -59,7 +61,6 @@ package Game::EvonyTKR::External::General::LoadAll {
         'load_general' => [$job->normalize($file->to_string)] => {
           attempts => 3,
           delay    => rand(10),
-          expire   => 1000,
           priority => 20,
         }
       );

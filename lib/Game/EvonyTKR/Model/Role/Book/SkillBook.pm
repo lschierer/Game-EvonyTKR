@@ -22,10 +22,5 @@ package Game::EvonyTKR::Model::Role::Book::SkillBook {
     return 1;
   }
 
-  sub from_hash ($class, $object) {
-    require Game::EvonyTKR::Model::Book::SkillBook;
-    return Game::EvonyTKR::Model::Book::SkillBook->new(level => $object->{level}
-        // 1);
-  }
 }
 1;

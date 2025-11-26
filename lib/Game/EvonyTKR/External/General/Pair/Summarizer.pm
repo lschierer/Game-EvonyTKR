@@ -33,13 +33,15 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
     return $home->child('share/collections/data');
   };
 
+  sub task_name {'summarize_pair'}
+
   # call the first parameter a taskClass here
   # to emphasize that this is acting on the task as a meta-entity
   # and not on a single instance of it
   # register is the entry point when *creating a task*
   sub register ($taskClass, $app, $conf = {}) {
     $taskClass->SUPER::register($app, $conf);
-    $app->minion->add_task(summarize_pair => __PACKAGE__);
+    $app->minion->add_task($taskClass->task_name => __PACKAGE__);
 
     $app->plugins->emit(summarize_pair_job_ready => 1);
   }

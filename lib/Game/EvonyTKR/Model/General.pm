@@ -14,7 +14,7 @@ package Game::EvonyTKR::Model::General {
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::AscendingAttributes', -role;
   use JSON::PP;
   use UUID           qw(uuid5);
-  use List::AllUtils qw( any none );
+  use List::AllUtils qw( any none all );
   use File::FindLib 'lib';
   use Carp;
   use overload
@@ -180,7 +180,7 @@ package Game::EvonyTKR::Model::General {
       );
     }
     $self->builtInBook($book);
-    return $self;
+    return 1;
   }
 
   sub populateSpecialties ($self,) {
@@ -225,6 +225,21 @@ package Game::EvonyTKR::Model::General {
         ));
       }
     }
+    unless (
+      scalar(@{ $self->specialtyNames }) eq scalar(@{ $self->specialties })) {
+      return 0;
+    }
+    unless (
+      all {
+             $_
+          && ref($_)
+          && blessed($_)
+          && $_->isa('Game::EvonyTKR::Model::Specialty')
+      } $self->specialties->@*
+    ) {
+      return 0;
+    }
+    return 1;
   }
 
   sub from_hash ($class, $hashObject) {

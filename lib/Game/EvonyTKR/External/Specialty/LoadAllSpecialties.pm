@@ -7,9 +7,11 @@ package Game::EvonyTKR::External::Specialty::LoadAllSpecialties {
   use Mojo::Base 'Game::EvonyTKR::Role::Common',      -role;
   use Mojo::File;
 
+  sub task_name {'load_all_specialties'}
+
   sub register ($taskClass, $app, $conf = {}) {
     $taskClass->SUPER::register($app, $conf);
-    $app->minion->add_task(load_all_specialties => __PACKAGE__);
+    $app->minion->add_task($taskClass->task_name => __PACKAGE__);
     my $signal = __PACKAGE__ =~ s/::/_/gr;
     $app->plugins->emit($signal => 1);
   }
@@ -47,7 +49,6 @@ package Game::EvonyTKR::External::Specialty::LoadAllSpecialties {
         'load_specialty' => [$file->to_string] => {
           attempts => 3,
           delay    => rand(10),
-          expire   => 300,
           priority => 20,
         }
       );

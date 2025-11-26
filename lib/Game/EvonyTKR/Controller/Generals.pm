@@ -14,6 +14,7 @@ require Game::EvonyTKR::Model::Buff::Summarizer;
 require Game::EvonyTKR::Control::Generals::Routing;
 require Game::EvonyTKR::Model::Data;
 require Game::EvonyTKR::Service::Cache;
+require Game::EvonyTKR::Model::Base;
 
 require UUID;
 require Data::Printer;
@@ -537,12 +538,53 @@ package Game::EvonyTKR::Controller::Generals {
         $targetType =~ s/(\w)(\w+) specialist/\U$1\L$2 \UT\Lroops/;
         $targetType =~ s/Siege Troops/Siege Machines/;
 
+        state $covenant_helper //= do {
+          my $helper = eval {
+            Mojo::Base->new->with_roles(
+              'Game::EvonyTKR::Role::Logging',
+              'Game::EvonyTKR::Role::Common',
+              'Game::EvonyTKR::Controller::Role::Covenants'
+            );
+          };
+          if ($@) {
+            $c->logger->error("Cannot create covenant helper: $@");
+            return;
+          }
+          $helper;
+        };
+
+        state $books_helper //= do {
+          my $helper = eval {
+            Game::EvonyTKR::Model::Base->new->with_roles(
+              'Game::EvonyTKR::Controller::Role::Books',
+              'Game::EvonyTKR::Role::Constants::BuffConstants',
+              'Game::EvonyTKR::Role::Constants::GeneralConstants',
+              'Game::EvonyTKR::Role::Constants::Books',
+            );
+          };
+          if ($@) {
+            $c->logger->error("Cannot create books helper: $@");
+            return;
+          }
+          $helper;
+        };
+        my $ctt = lc($targetType);
+        $ctt =~ s/ /_/g;
+        $ctt =~ s/(?:machines|troops)/specialist/;
+        my $books = [
+          $books_helper->load_best_skill_books($general, $ctt, 'Attacking')->@*,
+          $books_helper->load_mandatory_skill_books()->@*,
+        ];
+
+        $c->logger->debug(sprintf('books are %s',
+          join ', ', map { sprintf('"%s"', $_->name) } $books->@*));
+
         $c->logger->debug("Using $targetType as targetType for $name");
         my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
           general             => $general,
-          books               => $c->app->get_generic_books(),
-          covenant            => $c->app->getCovenant($general->name),
-          ascendingAttributes => $general->ascendingAttribute,
+          books               => $books,
+          covenant            => $covenant_helper->get_covenant($general->name),
+          ascendingAttributes => $general->ascendingAttributes,
           isPrimary           => 1,
           targetType          => $targetType,
           activationType      => 'Attacking',
@@ -856,7 +898,6 @@ package Game::EvonyTKR::Controller::Generals {
         ] => {
           delay    => ($index * 0.001) + rand(0.5),
           priority => 80,
-          expire   => 2700,
           attempts => 1,
         }
       );
@@ -911,7 +952,8 @@ package Game::EvonyTKR::Controller::Generals {
             siegehpdebuff => $result->{debuffs}->{'Siege Machines'}{'HP'},
           };
 
-          my $payload = encode_base64(encode_json({ runId => $run_id, data => $row }), '');
+          my $payload =
+            encode_base64(encode_json({ runId => $run_id, data => $row }), '');
           $c->write_sse({ type => 'row', text => $payload });
         }
         return $result;

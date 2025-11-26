@@ -8,9 +8,11 @@ package Game::EvonyTKR::External::Covenant::LoadAll {
   use Mojo::Base 'Game::EvonyTKR::Controller::Role::Covenants', -role;
   use Mojo::File;
 
+  sub task_name {'load_all_covenants'}
+
   sub register ($taskClass, $app, $conf = {}) {
     $taskClass->SUPER::register($app, $conf);
-    $app->minion->add_task(load_all_covenants => __PACKAGE__);
+    $app->minion->add_task($taskClass->task_name => __PACKAGE__);
     my $signal = __PACKAGE__ =~ s/::/_/gr;
     $app->plugins->emit($signal => 1);
   }
@@ -60,7 +62,6 @@ package Game::EvonyTKR::External::Covenant::LoadAll {
         'load_covenant' => [$file->to_string] => {
           attempts => 3,
           delay    => rand(10),
-          expire   => 300,
           priority => 20,
         }
       );

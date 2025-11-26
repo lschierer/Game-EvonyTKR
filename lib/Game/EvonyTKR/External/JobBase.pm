@@ -10,6 +10,12 @@ package Game::EvonyTKR::External::JobBase {
   use diagnostics;
   use Carp;
 
+  sub task_name {
+    my $class = shift;
+    $class->logger->logcroak(
+      sprintf('%s must implement task_name()', ref($class) || $class));
+  }
+
   # Initialize Log4perl for all job-based classes
   sub register ($plugin, $app, $conf = {}) {
 
@@ -26,6 +32,9 @@ package Game::EvonyTKR::External::JobBase {
       return;
     }
     $app->minion->backend->sqlite->db->ping;
+
+    #force the subclass to implement task_name
+    $plugin->task_name();
 
     my $signal = __PACKAGE__ =~ s/::/_/gr;
     $app->plugins->emit($signal => 1);

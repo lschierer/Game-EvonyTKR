@@ -11,10 +11,10 @@ package Game::EvonyTKR::External::General::Summarizer {
   use Mojo::Base 'Game::EvonyTKR::Controller::Role::Books',        -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::Books',         -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants', -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants', -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants',    -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::AscendingAttributes', -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::Constants::Covenants', -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::Constants::Specialties', -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Constants::Covenants',           -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Constants::Specialties',         -role;
   use Const::Fast;
   use List::AllUtils qw(any all none uniq);
   use Carp;
@@ -27,14 +27,11 @@ package Game::EvonyTKR::External::General::Summarizer {
     return $yp;
   };
 
-  has 'collection_dir' => sub {
-    my $home = Mojo::Home->new->detect('Game::EvonyTKR');
-    return $home->child('share/collections/data');
-  };
+  sub task_name {'summarize_general'}
 
   sub register ($taskClass, $app, $conf = {}) {
     $taskClass->SUPER::register($app, $conf);
-    $app->minion->add_task(summarize_general => __PACKAGE__);
+    $app->minion->add_task($taskClass->task_name => __PACKAGE__);
     $app->plugins->emit(summarize_general_job_ready => 1);
   }
 
@@ -68,7 +65,8 @@ package Game::EvonyTKR::External::General::Summarizer {
     # Get general
     my $general = $job->get_general($generalName);
     unless ($general) {
-      my $err = sprintf('Cannot retrieve general: %s', ref($generalName) ? Data::Printer::np($generalName) : $generalName);
+      my $err = sprintf('Cannot retrieve general: %s',
+        ref($generalName) ? Data::Printer::np($generalName) : $generalName);
       $job->logger->error($err);
       return $job->fail($err);
     }
@@ -95,7 +93,8 @@ package Game::EvonyTKR::External::General::Summarizer {
 # TODO: Handle partial conflicts (when other general has conflicting book)
 # It may be worth displaying in the UI even though it doesn't affect a single general
 # TODO: Verify book compatibility with general
-    unless ($books && ref($books) eq 'ARRAY' && @$books) {
+    unless ($books && ref($books) eq 'ARRAY' && @$books && scalar(@$books) >= 3)
+    {
       $books = [
         $job->load_best_skill_books($general, $targetType, $activationType)->@*,
         $job->load_mandatory_skill_books()->@*,
@@ -139,7 +138,7 @@ package Game::EvonyTKR::External::General::Summarizer {
         specialty2     => $specialty2     // 'gold',
         specialty3     => $specialty3     // 'gold',
         specialty4     => $specialty4     // 'gold',
-        has_covenant   => defined($covenant) ? 1 : 0,
+        has_covenant   => defined($covenant)                     ? 1 : 0,
         has_ascending  => defined($general->ascendingAttributes) ? 1 : 0,
         book_count     => scalar(@$books),
         book_names     => [map { $_->name } @$books],
@@ -147,9 +146,7 @@ package Game::EvonyTKR::External::General::Summarizer {
     );
 
     # Create summarizer
-    my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
-      $params->%*
-    );
+    my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new($params->%*);
 
     # Compute buffs and debuffs
     $summarizer->updateBuffs();
@@ -164,80 +161,33 @@ package Game::EvonyTKR::External::General::Summarizer {
     });
   }
 
-  sub load_best_skill_books ($job, $general, $targetType, $activationType) {
-    my $key = $activationType eq 'PvM' ? 'PvM' : 'default';
-
-    # TODO: Implement book conflict detection
-    # TODO: For pairs, need to check conflicts with other general's books
-    # TODO: Handle partial conflicts (book works for self but conflicts with pair)
-
-    my @books;
-    my $generic_dir       = $job->collection_dir->child('generic books');
-    my @sorted_book_names = sort {
-      $job->BestSkillBooks->{$targetType}->{$key}->{$a}
-        <=> $job->BestSkillBooks->{$targetType}->{$key}->{$b}
-    } keys %{ $job->BestSkillBooks->{$targetType}->{$key} };
-
-    my $level = $job->bestLevel;
-
-    foreach my $book_name (@sorted_book_names) {
-      my $book = $job->get_generic_book($book_name, $level);
-      unless ($book && ref($book) && $book->isa('Game::EvonyTKR::Model::Book'))
-      {
-        $job->logger->error("Cannot find $book_name");
-        next;
-      }
-      $job->logger->info(
-        sprintf('Picked book "%s" for "%s"', $book_name, $general->name));
-      push @books, $book;
-      last if (scalar @books >= 3);    # Single general gets 3 books
-    }
-
-    return \@books;
-  }
-
-  sub load_mandatory_skill_books ($job) {
-    my @books;
-    my $level = $job->bestLevel;
-    # Ensure required books are present for buff summarizer
-    foreach my $attr ('Attack', 'Defense', 'HP') {
-      foreach my $tt ('Mounted Troop', 'Ranged Troop', 'Ground Troop',
-        'Siege Machine') {
-        my $book_name = sprintf('Level %s %s %s', $level, $tt, $attr);
-        unless (any { $_->name eq $book_name } @books) {
-          my $book = $job->get_generic_book($book_name, $level);
-          unless ($book) {
-            $job->logger->error("Cannot find $book_name");
-            next;
-          }
-          push @books, $book;
-        }
-      }
-    }
-    return \@books;
-  }
-
-  sub validateParams($job, $params ) {
-    unless(ref($params->{general}) &&
-      blessed($params->{general}) &&
-      $params->{general}->isa('Game::EvonyTKR::Model::General')){
+  sub validateParams($job, $params) {
+    unless (ref($params->{general})
+      && blessed($params->{general})
+      && $params->{general}->isa('Game::EvonyTKR::Model::General')) {
       my $em = sprintf('job id "%s" requires a General, not "%s"',
-       $job->info->{id}, ref($params->{general}) ? blessed($params->{general}) : 'scalar');
+        $job->info->{id},
+        ref($params->{general}) ? blessed($params->{general}) : 'scalar');
 
       $job->logger->error($em);
       return $job->fail($em);
     }
 
-    unless(ref($params->{books}) eq 'ARRAY'){
-      my $em = sprintf('job id "%s" requires an array of books.', $job->info->{id});
+    unless (ref($params->{books}) eq 'ARRAY') {
+      my $em =
+        sprintf('job id "%s" requires an array of books.', $job->info->{id});
       $job->logger->error($em);
       return $job->fail($em);
     }
 
-    foreach my $book ($params->{books}->@*){
-      unless($book && ref($book) && blessed($book) && $book->isa('Game::EvonyTKR::Model::Book')){
-        my $em = sprintf('job id "%s" requires that all books be valid books, not %s',
-        $job->info->{id}, ref($book) ? blessed($book) : 'scalar');
+    foreach my $book ($params->{books}->@*) {
+      unless ($book
+        && ref($book)
+        && blessed($book)
+        && $book->isa('Game::EvonyTKR::Model::Book')) {
+        my $em =
+          sprintf('job id "%s" requires that all books be valid books, not %s',
+          $job->info->{id}, ref($book) ? blessed($book) : 'scalar');
         $job->logger->error($em);
         return $job->fail($em);
       }
@@ -245,14 +195,19 @@ package Game::EvonyTKR::External::General::Summarizer {
 
     #covenants only exist for a fraction of generals.
 
-    if($params->{isPrimary} && $params->{general}->ascending){
-      unless(exists $params->{ascendingAttributes} &&
-        ref($params->{ascendingAttributes}) &&
-        blessed($params->{ascendingAttributes}) &&
-        $params->{ascendingAttributes}->isa('Game::EvonyTKR::Model::AscendingAttributes')
-      ) {
-        my $em = sprintf('job id "%s" requiers that ascending attributes be valid ascending attributes, not %s',
-        $job->info->{id}, ref($params->{ascendingAttributes}) ? blessed($params->{ascendingAttributes}) : 'scalar');
+    if ($params->{isPrimary} && $params->{general}->ascending) {
+      unless (exists $params->{ascendingAttributes}
+        && ref($params->{ascendingAttributes})
+        && blessed($params->{ascendingAttributes})
+        && $params->{ascendingAttributes}
+        ->isa('Game::EvonyTKR::Model::AscendingAttributes')) {
+        my $em = sprintf(
+'job id "%s" requiers that ascending attributes be valid ascending attributes, not %s',
+          $job->info->{id},
+          ref($params->{ascendingAttributes})
+          ? blessed($params->{ascendingAttributes})
+          : 'scalar'
+        );
 
         $job->logger->error($em);
         return $job->fail($em);
@@ -260,18 +215,27 @@ package Game::EvonyTKR::External::General::Summarizer {
     }
 
     if ($params->{isPrimary}) {
-      if($params->{ascendingLevel} =~ /red/){
-        unless (any { $_ eq $params->{ascendingLevel} } $job->AscendingAttributeLevelValues(1) ) {
-          my $em = sprintf('red ascending level "%s" is invalid, must be one of %s',
-          $params->{ascendingLevel}, join ', ', map { sprintf('"%s"', $_) } $job->AscendingAttributeLevelValues(1),
+      if ($params->{ascendingLevel} =~ /red/) {
+        unless (any { $_ eq $params->{ascendingLevel} }
+          $job->AscendingAttributeLevelValues(1)) {
+          my $em = sprintf(
+            'red ascending level "%s" is invalid, must be one of %s',
+            $params->{ascendingLevel},
+            join ', ',
+            map { sprintf('"%s"', $_) } $job->AscendingAttributeLevelValues(1),
           );
           $job->logger->error($em);
           return $job->fail($em);
         }
-      } else {
-        unless (any { $_ eq $params->{ascendingLevel} } $job->AscendingAttributeLevelValues(0) ) {
-          my $em = sprintf('ascending level "%s" is invalid, must be one of %s',
-          $params->{ascendingLevel}, join ', ', map { sprintf('"%s"', $_) } $job->AscendingAttributeLevelValues(0),
+      }
+      else {
+        unless (any { $_ eq $params->{ascendingLevel} }
+          $job->AscendingAttributeLevelValues(0)) {
+          my $em = sprintf(
+            'ascending level "%s" is invalid, must be one of %s',
+            $params->{ascendingLevel},
+            join ', ',
+            map { sprintf('"%s"', $_) } $job->AscendingAttributeLevelValues(0),
           );
           $job->logger->error($em);
           return $job->fail($em);
@@ -280,20 +244,23 @@ package Game::EvonyTKR::External::General::Summarizer {
 
     }
 
-    unless(any { $_ eq $params->{covenantLevel} } $job->CovenantCategoryValues->@* ){
-      my $em = sprintf('covenant level "%s" is invalid, must be one of %s',
-      $params->{covenantLevel}, join ', ', map { sprintf('"%s"', $_) } $job->CovenantCategoryValues->@*
+    unless (any { $_ eq $params->{covenantLevel} }
+      $job->CovenantCategoryValues->@*) {
+      my $em = sprintf(
+        'covenant level "%s" is invalid, must be one of %s',
+        $params->{covenantLevel},
+        join ', ', map { sprintf('"%s"', $_) } $job->CovenantCategoryValues->@*
       );
       $job->logger->error($em);
       return $job->fail($em);
     }
 
-    foreach my $index (1 .. 4){
+    foreach my $index (1 .. 4) {
       my $specialtyLevel = $params->{"specialty${index}"};
-      unless($job->is_valid_specialty_level($specialtyLevel) ){
+      unless ($job->is_valid_specialty_level($specialtyLevel)) {
         my $em = sprintf('specialty level "%s" is invalid, must be one of %s',
-        $specialtyLevel, join ', ', map { sprintf('"%s"', $_) } $job->SpecialtyLevelValues->@*
-        );
+          $specialtyLevel, join ', ',
+          map { sprintf('"%s"', $_) } $job->SpecialtyLevelValues->@*);
         $job->logger->error($em);
         return $job->fail($em);
       }

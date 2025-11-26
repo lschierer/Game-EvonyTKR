@@ -14,6 +14,8 @@ package Game::EvonyTKR::External::Book::Loader {
   use experimental qw(class);
   use Carp;
 
+  sub task_name {'load_book'}
+
   sub register ($taskClass, $app, $conf = {}) {
     $taskClass->SUPER::register($app, $conf);
     if (not defined($app)) {
@@ -29,7 +31,7 @@ package Game::EvonyTKR::External::Book::Loader {
       return;
     }
     $taskClass->logger->debug('Registering Book Loader workflow tasks');
-    $app->minion->add_task(load_book => __PACKAGE__);
+    $app->minion->add_task($taskClass->task_name => __PACKAGE__);
 
     my $signal = __PACKAGE__ =~ s/::/_/gr;
     $app->plugins->emit($signal => 1);

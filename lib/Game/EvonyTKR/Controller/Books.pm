@@ -33,7 +33,7 @@ package Game::EvonyTKR::Controller::Books {
 
   sub getBuiltInBooks ($c, $app) {
     state %builtinBooks;
-    my $bblist = $c->list_builtin_books($app);
+    my $bblist = $c->list_builtin_books();
     $c->logger->debug(sprintf(
       'got a list of %s builtin books: %s',
       scalar @$bblist,
@@ -62,7 +62,7 @@ package Game::EvonyTKR::Controller::Books {
 
   sub getGenericBooks ($c, $app) {
     state %genericBooks;
-    my @gglist = $c->list_generic_books($app);
+    my @gglist = $c->list_generic_books();
     foreach my $ggname (@gglist) {
       my @parts = split ' ', $ggname;
       my $level = $parts[1] unless ($#parts < 1);
@@ -228,7 +228,7 @@ package Game::EvonyTKR::Controller::Books {
 
     # Count expected books
     my $expected =
-      @{ $c->list_builtin_books($app) } + @{ $c->list_generic_books($app) };
+      @{ $c->list_builtin_books() } + @{ $c->list_generic_books() };
 
     return $spawned_jobs == $expected;
   }
@@ -286,7 +286,7 @@ package Game::EvonyTKR::Controller::Books {
       }
     }
 
-    my $expectedCount = scalar(@{ $c->list_builtin_books($app) });
+    my $expectedCount = scalar(@{ $c->list_builtin_books });
     my @allBooks;
     push @allBooks,
       sort { lc($a->name) cmp lc($b->name) }

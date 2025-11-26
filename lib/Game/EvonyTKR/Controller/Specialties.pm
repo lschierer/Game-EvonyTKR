@@ -33,8 +33,8 @@ package Game::EvonyTKR::Controller::Specialties {
 
     return $c->_hydrate_from_list(
       $app,
-      sub ($app2) { $c->list_specialties($app2) },    # list provider
-      sub ($name) { $c->get_specialty($name) },       # fetch one
+      sub ($app2) { $c->list_specialties() },      # list provider
+      sub ($name) { $c->get_specialty($name) },    # fetch one
       \%specialties,
       \$sig,
     );

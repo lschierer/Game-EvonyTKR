@@ -16,6 +16,8 @@ package Game::EvonyTKR::External::Book::LoadAllGenerics {
 
   state $bookCache;
 
+  sub task_name {'load_all_generic_books'}
+
   sub register ($taskClass, $app, $conf = {}) {
     $taskClass->SUPER::register($app, $conf);
     if (not defined($app)) {
@@ -31,7 +33,7 @@ package Game::EvonyTKR::External::Book::LoadAllGenerics {
       return;
     }
     $taskClass->logger->debug('Registering Book Loader workflow tasks');
-    $app->minion->add_task(load_all_generic_books => __PACKAGE__);
+    $app->minion->add_task($taskClass->task_name => __PACKAGE__);
 
     $taskClass->logger->info(sprintf('emitting signal for %s', __PACKAGE__));
     my $signal = __PACKAGE__ =~ s/::/_/gr;
@@ -53,7 +55,7 @@ package Game::EvonyTKR::External::Book::LoadAllGenerics {
       '%s log level is %s',
       __PACKAGE__, Log::Log4perl::Level::to_level($job->logger->level())
     ));
-    my @list = $job->list_generic_books($job->app)->@*;
+    my @list = $job->list_generic_books()->@*;
     $job->logger->info('list of generic books is ' . Data::Printer::np(@list));
     my $maxIndex = scalar(@list) - 1;
     foreach my $index (0 .. $maxIndex) {
@@ -71,7 +73,6 @@ package Game::EvonyTKR::External::Book::LoadAllGenerics {
         ] => {
           attempts => 3,
           delay    => rand(10),
-          expire   => 300,
           priority => 10,
         }
       );

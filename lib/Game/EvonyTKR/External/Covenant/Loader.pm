@@ -12,9 +12,11 @@ package Game::EvonyTKR::External::Covenant::Loader {
   use Encode;
   require Game::EvonyTKR::Model::Covenant;
 
+  sub task_name {'load_covenant'}
+
   sub register ($taskClass, $app, $conf = {}) {
     $taskClass->SUPER::register($app, $conf);
-    $app->minion->add_task(load_covenant => __PACKAGE__);
+    $app->minion->add_task($taskClass->task_name => __PACKAGE__);
     my $signal = __PACKAGE__ =~ s/::/_/gr;
     $app->plugins->emit($signal => 1);
   }
