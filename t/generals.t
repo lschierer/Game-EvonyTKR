@@ -61,11 +61,8 @@ foreach my $index (0 .. $#yaml_files) {
   my $general = $importTool->load_single_general($yf, $index);
   if ($general) {
     $generals->{ $general->normalize($general->name) } = $general;
-    $logger->info(
-      sprintf(
-        'successfully imported "%s"', $general->normalize($general->name)
-      )
-    );
+    $logger->info(sprintf('successfully imported "%s"',
+      $general->normalize($general->name)));
     eval {
       my $frozen = freeze($general);
       my $thawed = thaw($frozen);

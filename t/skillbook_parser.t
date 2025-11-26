@@ -6,7 +6,6 @@ use List::AllUtils qw( all any none uniq);
 use Devel::Local;
 use File::FindLib 'lib';
 
-
 require Game::EvonyTKR;
 require Game::EvonyTKR::Log::Config;
 require Game::EvonyTKR::Service::Cache;
@@ -16,21 +15,18 @@ require Data::Printer;
 
 use Log::Log4perl qw(:levels);
 my $logger = Game::EvonyTKR::Log::Config->logger('Test::Package');
-$logger->info(sprintf(
-  'Test script logging configured with log level %s',
-  Log::Log4perl::Level::to_level($logger->level()), ));
+$logger->info(sprintf('Test script logging configured with log level %s',
+  Log::Log4perl::Level::to_level($logger->level()),));
 
 require Game::EvonyTKR::Role::Logger;
 require Game::EvonyTKR::Model::General;
 require Game::EvonyTKR::Model::Covenant;
 require Game::EvonyTKR::Shared::Parser;
 
-
 my $parser = Game::EvonyTKR::Shared::Parser->new();
 #override what's in Game::EvonyTKR::Log::Config
 $parser->logger->level($DEBUG);
 $parser->generate_grammar();
-
 
 package Test::Package {
   use Mojo::Base -base,                          -signatures;
@@ -45,19 +41,26 @@ package Test::Package {
       my $ok = 1;
 
       if ($buff->attribute ne $args{attribute}) {
-        diag( sprintf('attribute test failed: %s ne %s.',
-          $buff->attribute, $args{attribute}));
+        diag(sprintf(
+          'attribute test failed: %s ne %s.',
+          $buff->attribute, $args{attribute}
+        ));
         $ok = 0;
       }
 
       if ($buff->value->number != $args{value}) {
-        diag(sprintf('value test failed: %s ne %s.',$buff->value->number, $args{value}));
+        diag(
+          sprintf(
+            'value test failed: %s ne %s.',
+            $buff->value->number, $args{value}
+          )
+        );
         $ok = 0;
       }
 
       if (defined $args{class}) {
         if (($buff->targetedType // '') ne $args{class}) {
-          diag( sprintf(
+          diag(sprintf(
             'class test failed: %s ne %s.',
             $buff->targetedType // 'undef',
             $args{class}
@@ -73,8 +76,10 @@ package Test::Package {
           my @union    = List::MoreUtils::uniq(@actual, @expected);
           if ( scalar(@union) != scalar(@actual)
             || scalar(@actual) != scalar(@expected)) {
-            diag( sprintf('conditions mismatch: actual=%s expected=%s union=%s',
-              scalar(@actual), scalar(@expected), scalar(@union)));
+            diag(sprintf(
+              'conditions mismatch: actual=%s expected=%s union=%s',
+              scalar(@actual), scalar(@expected), scalar(@union)
+            ));
             diag('actual: ' . join(', ', @actual));
             diag('expected: ' . join(', ', @expected));
             $ok = 0;
@@ -92,14 +97,13 @@ package Test::Package {
   }
 }
 
-
 subtest 'fake singlebuff book' => sub {
   my $text =
     "Increases mounted troops’ attack by 45% when General is leading the army.";
   my @fragments = $parser->tokenize_buffs($text);
   my @hashedBuffs;
   foreach my $frag (@fragments) {
-    diag ("frag is " . Data::Printer::np($frag));
+    diag("frag is " . Data::Printer::np($frag));
     my @nb = $parser->normalize_buff($frag);
     push(@hashedBuffs, @nb);
   }

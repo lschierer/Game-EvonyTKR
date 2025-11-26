@@ -17,9 +17,8 @@ BEGIN {
 
 require Game::EvonyTKR::Role::Logging;
 
-
 package Test::Package {
-  use Mojo::Base -base, -signatures;
+  use Mojo::Base -base,                           -signatures;
   use Mojo::Base 'Game::EvonyTKR::Role::Logging', -role;
 
   sub testMethod ($self) {
@@ -33,8 +32,10 @@ package Test::Package {
 
 my $test = Test::Package->new();
 ok($test->testMethod(), 'test method successful');
-ok($test->debug_log_level() =~ /(?:DEBUG|TRACE)/,
-  'Correct log level for package based logger');
+ok(
+  $test->debug_log_level() =~ /(?:DEBUG|TRACE)/,
+  'Correct log level for package based logger'
+);
 
 my $logger = Game::EvonyTKR::Role::Logging::get_logger('Test::Package');
 ok(defined($logger), 'got logger from get_logger');
@@ -46,7 +47,7 @@ $logFile = sprintf('%s/app-%s.log', $logFile, $$);
 $logFile = Path::Tiny::path($logFile);
 my $logData = $logFile->slurp_utf8;
 
-say sprintf('log file is at "%s"',  $logFile);
+say sprintf('log file is at "%s"', $logFile);
 
 like($logData, qr/Test::Package line \d+/, 'Correct caller in log');
 

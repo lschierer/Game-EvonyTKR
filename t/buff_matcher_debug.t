@@ -13,10 +13,8 @@ require Data::Printer;
 
 use Log::Log4perl qw(:levels);
 my $logger = Game::EvonyTKR::Log::Config->logger('Test::Package');
-$logger->info(sprintf(
-  'Test script logging configured with log level %s',
-  Log::Log4perl::Level::to_level($logger->level()), ));
-
+$logger->info(sprintf('Test script logging configured with log level %s',
+  Log::Log4perl::Level::to_level($logger->level()),));
 
 require Game::EvonyTKR::Model::Buff;
 require Game::EvonyTKR::Model::Buff::Matcher;

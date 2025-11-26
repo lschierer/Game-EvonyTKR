@@ -12,17 +12,18 @@ my $books = $obj->BestSkillBooks;
 
 # Test that interpolation worked
 like($books->{ground_specialist}->{default}->{'Level 4 Ground Troop Attack'},
-     qr/^\d+$/,
-     'Level 4 book exists with numeric priority');
-
+  qr/^\d+$/, 'Level 4 book exists with numeric priority');
 
 # Test that $bestLevel was interpolated correctly
-my @keys = keys %{$books->{ground_specialist}->{default}};
-ok((grep { /^Level 4 / } @keys), 'Keys contain "Level 4"');
+my @keys = keys %{ $books->{ground_specialist}->{default} };
+ok((grep {/^Level 4 /} @keys), 'Keys contain "Level 4"');
 
 # Test immutability
 like(
-  dies { $books->{ground_specialist}->{default}->{'Level 4 Ground Troop Attack'} = 999; },
+  dies {
+    $books->{ground_specialist}->{default}->{'Level 4 Ground Troop Attack'} =
+      999;
+  },
   qr/Modification of a read-only value/,
   'Cannot modify const hash'
 );

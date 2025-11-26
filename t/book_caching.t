@@ -28,7 +28,7 @@ package Test::Package {
     my $entry = 'Supreme Power';
     my $book;
 
-    $book      = $self->get_builtin_book($entry);
+    $book = $self->get_builtin_book($entry);
     my @suffixlist = ('.yaml', '.yml');
 
     if ( defined($book)
@@ -41,8 +41,7 @@ package Test::Package {
 
     my $distDir = Mojo::Home->new->detect('Game::EvonyTKR')->to_string;
     my $collectionDir =
-      Mojo::File->new($distDir)
-      ->child('share/collections/data/');
+      Mojo::File->new($distDir)->child('share/collections/data/');
     my $bookDir    = $collectionDir->child('skill books');
     my $ne         = lc($self->normalize($entry));
     my ($bookFile) = $bookDir->list->sort->grep(sub {
@@ -59,8 +58,8 @@ package Test::Package {
       $self->logger->error($errmessage);
       return 0;
     }
-    $self->logger->debug(sprintf('found file "%s" for "%s"',
-    $bookFile, $entry));
+    $self->logger->debug(sprintf(
+      'found file "%s" for "%s"', $bookFile, $entry));
 
     my $bd  = $bookFile->slurp('UTF-8');
     my $bho = YAML::PP->new(
@@ -76,8 +75,9 @@ package Test::Package {
       $self->logger->error($errmessage);
       return 0;
     }
-    $self->logger->debug(sprintf('got a book "%s" back from Game::EvonyTKR::Model::Book->from_hash',
-    $book->name));
+    $self->logger->debug(sprintf(
+      'got a book "%s" back from Game::EvonyTKR::Model::Book->from_hash',
+      $book->name));
 
     my $add_result = $self->add_builtin_book($book);
     if (defined($add_result) && $add_result == 1) {
@@ -94,7 +94,7 @@ package Test::Package {
     }
   }
 
-  sub retrieve_Supreme_Power ($self){
+  sub retrieve_Supreme_Power ($self) {
     my $testBookName = 'Supreme Power';
 
     my $key = $testBookName =~ s/ /_/gr;
@@ -103,12 +103,15 @@ package Test::Package {
     my $book = $self->get_builtin_book($testBookName);
     warn "Retrieved book: " . (defined($book) ? ref($book) : 'undef');
 
-    unless(defined($book) && blessed($book) && $book->DOES('Game::EvonyTKR::Model::Book')){
+    unless (defined($book)
+      && blessed($book)
+      && $book->DOES('Game::EvonyTKR::Model::Book')) {
       my $all_items = $self->get_all_items();
       warn "Cache keys: " . join(', ', keys %$all_items);
       warn "Looking for key: '$key'";
       my $raw_value = $self->store->get($key);
-      warn "Raw cache value: " . (defined($raw_value) ? length($raw_value) . " bytes" : 'undef');
+      warn "Raw cache value: "
+        . (defined($raw_value) ? length($raw_value) . " bytes" : 'undef');
 
       return 0;
     }
@@ -131,10 +134,9 @@ package Test::Package {
       return;
     };
 
-    eval {
-      $book = $books_helper->get_builtin_book($testBookName);
-    } or do {
-      $self->logger->error(sprintf('eval failed; cannot get book from helper: %s', $@));
+    eval { $book = $books_helper->get_builtin_book($testBookName); } or do {
+      $self->logger->error(
+        sprintf('eval failed; cannot get book from helper: %s', $@));
       return;
     };
 
@@ -158,7 +160,10 @@ package Test::Package {
 
 my $test = Test::Package->new();
 DOES_ok($test, ['Test::Package'], 'Test Class instantiated successfully');
-ok($test->load_Supreme_Power(), 'Supreme Power Loaded');
+ok($test->load_Supreme_Power(),     'Supreme Power Loaded');
 ok($test->retrieve_Supreme_Power(), 'Supreme Power Retrieved');
-ok($test->retrieve_Supreme_Power_with_helper(), 'Supreme Power Retrieved With Helper');
+ok(
+  $test->retrieve_Supreme_Power_with_helper(),
+  'Supreme Power Retrieved With Helper'
+);
 done_testing();

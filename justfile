@@ -2,7 +2,8 @@ find-perl-deps:
   ./scripts/finddeps.sh
 
 tidy:
-  find lib t -name '*.pm' -exec perltidy -b -pro=.perltidyrc {} \;
+  find lib -name '*.pm' -exec perltidy -b -pro=.perltidyrc {} \;
+  find t -name '*.t' -exec perltidy -b -pro=.perltidyrc {} \;
   perltidy -b -pro=.perltidyrc Build.PL
   perltidy -b -pro=.perltidyrc scripts/check_broken_links scripts/create-general bin/game-evonytkr scripts/update_git_meta.pl
   find . -name '*.bak' -delete
