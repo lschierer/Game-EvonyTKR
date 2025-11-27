@@ -20,7 +20,7 @@ BEGIN {
 
 # Load required modules
 require Data::Printer;
-require Game::EvonyTKR::Model::Buff::Summarizer;
+require Game::EvonyTKR::Model::Buff::Summarizer::Single;
 require Game::EvonyTKR::Service::Cache;
 require Game::EvonyTKR::Shared::Constants;
 require Game::EvonyTKR;
@@ -131,7 +131,7 @@ subtest "Marco Polo with all values set to 'none'" => sub {
 
   my $covenant =
     first { $_->primary->name eq $marco_polo->name } $covenants->@*;
-  my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
+  my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer::Single->new(
     general        => $marco_polo,
     isPrimary      => 1,
     targetType     => 'mounted_specialist',
@@ -212,7 +212,7 @@ subtest "Aethelflaed with all values set to 'none'" => sub {
 
   my $covenant =
     first { $_->primary->name eq $aethelflaed->name } $covenants->@*;
-  my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
+  my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer::Single->new(
     general        => $aethelflaed,
     isPrimary      => 1,
     targetType     => 'mounted_specialist',
@@ -297,7 +297,7 @@ subtest "Marco Polo with Red1 ascending, all else none" => sub {
   my $covenant =
     first { $_->primary->name eq $marco_polo->name } $covenants->@*;
 
-  my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
+  my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer::Single->new(
 
     general        => $marco_polo,
     isPrimary      => 1,
@@ -379,7 +379,7 @@ subtest "Marco Polo with Red2 ascending, all else none" => sub {
   my $covenant =
     first { $_->primary->name eq $marco_polo->name } $covenants->@*;
 
-  my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
+  my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer::Single->new(
 
     general        => $marco_polo,
     isPrimary      => 1,
@@ -461,7 +461,7 @@ subtest "Marco Polo with Red3 ascending, all else none" => sub {
   my $covenant =
     first { $_->primary->name eq $marco_polo->name } $covenants->@*;
 
-  my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
+  my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer::Single->new(
 
     general        => $marco_polo,
     isPrimary      => 1,
@@ -543,7 +543,7 @@ subtest "Marco Polo with Red4 ascending, all else none" => sub {
   my $covenant =
     first { $_->primary->name eq $marco_polo->name } $covenants->@*;
 
-  my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
+  my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer::Single->new(
 
     general        => $marco_polo,
     isPrimary      => 1,
@@ -624,7 +624,7 @@ subtest "Marco Polo with Red5 ascending, all else none" => sub {
 
   my $covenant =
     first { $_->primary->name eq $marco_polo->name } $covenants->@*;
-  my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
+  my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer::Single->new(
 
     general        => $marco_polo,
     isPrimary      => 1,
@@ -705,7 +705,7 @@ subtest "Marco Polo with Green 1st specialty, all else none" => sub {
 
   my $covenant =
     first { $_->primary->name eq $marco_polo->name } $covenants->@*;
-  my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
+  my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer::Single->new(
 
     general        => $marco_polo,
     isPrimary      => 1,
@@ -786,7 +786,7 @@ subtest "Marco Polo with Blue 1st specialty, all else none" => sub {
 
   my $covenant =
     first { $_->primary->name eq $marco_polo->name } $covenants->@*;
-  my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
+  my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer::Single->new(
 
     general        => $marco_polo,
     isPrimary      => 1,
@@ -867,7 +867,7 @@ subtest "Marco Polo with Purple 1st specialty, all else none" => sub {
 
   my $covenant =
     first { $_->primary->name eq $marco_polo->name } $covenants->@*;
-  my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
+  my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer::Single->new(
 
     general        => $marco_polo,
     isPrimary      => 1,
@@ -948,7 +948,7 @@ subtest "Marco Polo with Orange 1st specialty, all else none" => sub {
 
   my $covenant =
     first { $_->primary->name eq $marco_polo->name } $covenants->@*;
-  my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
+  my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer::Single->new(
 
     general        => $marco_polo,
     isPrimary      => 1,
@@ -1029,7 +1029,7 @@ subtest "Marco Polo with Gold 1st specialty, all else none" => sub {
 
   my $covenant =
     first { $_->primary->name eq $marco_polo->name } $covenants->@*;
-  my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
+  my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer::Single->new(
 
     general        => $marco_polo,
     isPrimary      => 1,
@@ -1111,7 +1111,7 @@ subtest "Marco Polo with Civilization covenant, all else none" => sub {
   my $covenant =
     first { $_->primary->name eq $marco_polo->name } $covenants->@*;
 
-  my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
+  my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer::Single->new(
 
     general        => $marco_polo,
     isPrimary      => 1,
@@ -1137,7 +1137,7 @@ subtest "Marco Polo with Civilization covenant, all else none" => sub {
 subtest "Marco Polo with all maxed out" => sub {
   my $covenant =
     first { $_->primary->name eq $marco_polo->name } $covenants->@*;
-  my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
+  my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer::Single->new(
 
     general        => $marco_polo,
     isPrimary      => 1,
@@ -1244,7 +1244,7 @@ subtest "Aethelflaed with all maxed out" => sub {
 
   my $covenant =
     first { $_->primary->name eq $aethelflaed->name } $covenants->@*;
-  my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
+  my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer::Single->new(
 
     general        => $aethelflaed,
     isPrimary      => 1,
@@ -1323,7 +1323,7 @@ subtest "Aethelflaed with all maxed out" => sub {
 subtest "Harald with all maxed out" => sub {
 
   my $covenant   = first { $_->primary->name eq $Harald->name } $covenants->@*;
-  my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
+  my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer::Single->new(
 
     general        => $Harald,
     isPrimary      => 1,

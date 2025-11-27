@@ -2,7 +2,7 @@ use v5.42.0;
 use utf8::all;
 use File::FindLib 'lib';
 require Data::Printer;
-require Game::EvonyTKR::Model::Buff::Summarizer;
+require Game::EvonyTKR::Model::Buff::Summarizer::Single;
 
 package Game::EvonyTKR::External::General::Summarizer {
   use Mojo::Base 'Game::EvonyTKR::External::JobBase',              -signatures;
@@ -143,7 +143,7 @@ package Game::EvonyTKR::External::General::Summarizer {
     );
 
     # Create summarizer
-    my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new($params->%*);
+    my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer::Single->new($params->%*);
 
     # Compute buffs and debuffs
     $summarizer->updateBuffs();

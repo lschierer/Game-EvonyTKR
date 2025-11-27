@@ -10,7 +10,7 @@ require List::Util;
 
 require Game::EvonyTKR::Model::General;
 require Game::EvonyTKR::Model::General::Pair;
-require Game::EvonyTKR::Model::Buff::Summarizer;
+require Game::EvonyTKR::Model::Buff::Summarizer::Single;
 require Game::EvonyTKR::Control::Generals::Routing;
 require Game::EvonyTKR::Model::Data;
 require Game::EvonyTKR::Service::Cache;
@@ -575,7 +575,7 @@ package Game::EvonyTKR::Controller::Generals {
         };
 
         $c->logger->debug("Using $targetType as targetType for $name");
-        my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
+        my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer::Single->new(
           general        => $general,
           isPrimary      => 1,
           targetType     => $targetType,
