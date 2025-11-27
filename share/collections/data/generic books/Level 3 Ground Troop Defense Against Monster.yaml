@@ -1,9 +1,12 @@
-name: Ground Troop Defense Against Monster
-level: 3
-text: Increases Ground Troop by 35% when General is leading the army.
+---
 buffs:
-  - attribute: Defense
-    targetedType: Ground Troops
-    value:
-      number: 35
-      unit: percentage
+- attribute: Defense
+  conditions:
+  - Against Monsters
+  targetedType: Ground Troops
+  value:
+    number: 35
+    unit: percentage
+level: 3
+name: Ground Troop Defense Against Monster
+text: Increases Ground Troop by 35% when General is leading the army.

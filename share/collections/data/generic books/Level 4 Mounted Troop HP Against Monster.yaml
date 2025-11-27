@@ -1,9 +1,12 @@
-name: Mounted Troop HP Against Monster
-level: 4
-text: Increases Mounted Troop by 45% when General is leading the army.
+---
 buffs:
-  - attribute: HP
-    targetedType: Mounted Troops
-    value:
-      number: 45
-      unit: percentage
+- attribute: HP
+  conditions:
+  - Against Monsters
+  targetedType: Mounted Troops
+  value:
+    number: 45
+    unit: percentage
+level: 4
+name: Mounted Troop HP Against Monster
+text: Increases Mounted Troop by 45% when General is leading the army.
