@@ -465,7 +465,7 @@ package Game::EvonyTKR::Model::Buff {
 
   sub as_string ($self, @args) {
     my $json =
-      JSON::PP->new->utf8->pretty->allow_blessed(1)
+      JSON::PP->new->utf8->allow_blessed(1)
       ->convert_blessed(1)
       ->encode($self->to_hash());
     return $json;

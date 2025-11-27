@@ -462,7 +462,7 @@ subtest 'Louis XIV Stackable Buffs Test' => sub {
 my $bc = $conflicts;
 
 # Get books for testing
-my $l4ra = (grep { $_->name =~ /Ranged.*Attack/i && $_->level == 4 } @$generic_books)[0];
+my $l4ra = (grep { $_->name =~ /Ranged.*Attack/i && $_->name !~ /Monster/i && $_->level == 4 } @$generic_books)[0];
 my $l4ms = (grep { $_->name =~ /March Size/i && $_->level == 4 } @$generic_books)[0];
 my $l4maam = (grep { $_->name =~ /Mounted.*Attack.*Against.*Monster/i && $_->level == 4 } @$generic_books)[0];
 
