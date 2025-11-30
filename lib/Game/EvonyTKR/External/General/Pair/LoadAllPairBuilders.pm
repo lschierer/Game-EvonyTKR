@@ -3,8 +3,8 @@ use utf8::all;
 use File::FindLib 'lib';
 
 package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
-  use Mojo::Base 'Game::EvonyTKR::External::JobBase',          -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Pairs',    -role;
+  use Mojo::Base 'Game::EvonyTKR::External::JobBase',       -signatures;
+  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Pairs', -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants', -role;
 
   sub task_name {'load_all_pair_builders'}
@@ -59,8 +59,7 @@ package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
     my $batch_count   = 0;
     my %type_counters = ();    # Track how many jobs per type
 
-    foreach my $general (sort { $a->name cmp $b->name} @$generals)
-    {
+    foreach my $general (sort { $a->name cmp $b->name } @$generals) {
 
       # Handle scalar vs array types for this general
       my $general_types = $general->type // [];
@@ -117,8 +116,8 @@ package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
               }
             );
             $job->logger->debug(sprintf(
-              'Spawned type-balanced reduce_batch job %s '.
-              'for batch %d (%d jobs)',
+              'Spawned type-balanced reduce_batch job %s '
+                . 'for batch %d (%d jobs)',
               $reduce_jid, ++$batch_count, scalar(@current_batch)
             ));
           }

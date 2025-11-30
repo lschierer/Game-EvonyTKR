@@ -4,9 +4,9 @@ use utf8::all;
 require Data::Printer;
 require Game::EvonyTKR::Model::Buff::Value;
 require Game::EvonyTKR::Service::Conflicts;
-use Mojo::Base 'Game::EvonyTKR::Model::Buff::Summarizer',                    -signatures;
+use Mojo::Base 'Game::EvonyTKR::Model::Buff::Summarizer', -signatures;
 use List::AllUtils qw(first any all none uniq);
-use Scalar::Util qw(blessed);
+use Scalar::Util   qw(blessed);
 use Carp;
 use diagnostics;
 
@@ -38,12 +38,15 @@ has pairDebuffValues => sub {
 };
 
 sub updateBuffs ($self) {
-  unless($self->pair &&
-    ref($self->pair) &&
-    blessed($self->pair) &&
-    $self->pair->isa('Game::EvonyTKR::Model::General::Pair')
-  ){
-    $self->logger->error(sprintf('%s requires a Game::EvonyTKR::Model::General::Pair', __PACKAGE__));
+  unless ($self->pair
+    && ref($self->pair)
+    && blessed($self->pair)
+    && $self->pair->isa('Game::EvonyTKR::Model::General::Pair')) {
+    $self->logger->error(
+      sprintf(
+        '%s requires a Game::EvonyTKR::Model::General::Pair', __PACKAGE__
+      )
+    );
     return;
   }
 
@@ -70,12 +73,15 @@ sub updateBuffs ($self) {
 }
 
 sub updateDebuffs ($self) {
-  unless($self->pair &&
-    ref($self->pair) &&
-    blessed($self->pair) &&
-    $self->pair->isa('Game::EvonyTKR::Model::General::Pair')
-  ){
-    $self->logger->error(sprintf('%s requires a Game::EvonyTKR::Model::General::Pair', __PACKAGE__));
+  unless ($self->pair
+    && ref($self->pair)
+    && blessed($self->pair)
+    && $self->pair->isa('Game::EvonyTKR::Model::General::Pair')) {
+    $self->logger->error(
+      sprintf(
+        '%s requires a Game::EvonyTKR::Model::General::Pair', __PACKAGE__
+      )
+    );
     return;
   }
 
@@ -107,7 +113,8 @@ sub _getGenericBookValue_impl ($self, $attribute, $troopType) {
 
   # Determine which general is current and which is other
   my $current_general = $self->general;
-  my $other_general = $self->isPrimary ? $self->pair->secondary : $self->pair->primary;
+  my $other_general =
+    $self->isPrimary ? $self->pair->secondary : $self->pair->primary;
 
   # Special case for March Size - it's universal, not troop-specific
   if ($attribute eq 'March Size') {
@@ -115,8 +122,7 @@ sub _getGenericBookValue_impl ($self, $attribute, $troopType) {
     $books_helper //= do {
       my $helper = eval {
         Game::EvonyTKR::Model::Base->new->with_roles(
-          'Game::EvonyTKR::Role::Persistence',
-        );
+          'Game::EvonyTKR::Role::Persistence',);
       };
       if ($@) {
         $self->logger->error("Cannot create books helper: $@");
@@ -126,9 +132,14 @@ sub _getGenericBookValue_impl ($self, $attribute, $troopType) {
     };
 
     my $MS = $books_helper->get_generic_book('March Size', $self->bestLevel);
-    if ($MS &&
-        $self->bc->is_general_and_book_compatible($current_general, $MS, { same_side => 1 }) &&
-        $self->bc->is_general_and_book_compatible($other_general, $MS, { same_side => 0 })) {
+    if (
+      $MS
+      && $self->bc->is_general_and_book_compatible($current_general, $MS,
+        { same_side => 1 })
+      && $self->bc->is_general_and_book_compatible(
+        $other_general, $MS, { same_side => 0 }
+      )
+    ) {
       $total += $MS->buffs->[0]->value->number;
     }
     return $total;
@@ -136,7 +147,10 @@ sub _getGenericBookValue_impl ($self, $attribute, $troopType) {
 
   # Overall isn't a real troop type - use general's primary type
   if ($troopType eq 'Overall') {
-    $troopType = ref($current_general->type) ? $current_general->type->[0] : $current_general->type;
+    $troopType =
+      ref($current_general->type)
+      ? $current_general->type->[0]
+      : $current_general->type;
     $troopType =~ s/_specialist$//;
     $troopType =~ s/_/ /g;
     $troopType = ucfirst($troopType) . ' Troops';
@@ -159,7 +173,7 @@ sub _getGenericBookValue_impl ($self, $attribute, $troopType) {
   };
 
   # Convert troop type to target type key
-  my $tt = $troopType =~ s/ Troops$//r;
+  my $tt         = $troopType =~ s/ Troops$//r;
   my $targetType = lc($tt) . '_specialist';
   $targetType =~ s/siege machines/siege/;
   $targetType =~ s/ /_/g;
@@ -168,20 +182,22 @@ sub _getGenericBookValue_impl ($self, $attribute, $troopType) {
   my $key = $self->activationType eq 'PvM' ? 'PvM' : 'default';
 
   # Get the best books for this troop type
-  my $book_priorities = $books_helper->BestSkillBooks->{$targetType}->{$key} // {};
+  my $book_priorities = $books_helper->BestSkillBooks->{$targetType}->{$key}
+    // {};
 
   $self->logger->debug(sprintf(
-    'Pair getGenericBookValue: attr=%s, troopType=%s, targetType=%s, key=%s, found %d books',
-    $attribute, $troopType, $targetType, $key, scalar keys %$book_priorities
+'Pair getGenericBookValue: attr=%s, troopType=%s, targetType=%s, key=%s, found %d books',
+    $attribute, $troopType, $targetType,
+    $key,       scalar keys %$book_priorities
   ));
 
   # Sort books by priority and check until we find 3 compatible ones
   my @sorted_books = sort { $book_priorities->{$a} <=> $book_priorities->{$b} }
-                     keys %$book_priorities;
+    keys %$book_priorities;
 
   my $found = 0;
   for my $book_name (@sorted_books) {
-    last if $found >= 3;  # Pairs get 6 total but 3 per general
+    last if $found >= 3;    # Pairs get 6 total but 3 per general
 
     # Extract base name (remove "Level X" prefix)
     my $base_name = $book_name =~ s/^Level \d+ //r;
@@ -191,9 +207,9 @@ sub _getGenericBookValue_impl ($self, $attribute, $troopType) {
 
     # Check if this book provides the attribute we're looking for
     my $provides_attr = 0;
-    for my $buff (@{$book->buffs}) {
-      if ($buff->attribute eq $attribute &&
-          ($buff->targetedType // '') eq $troopType) {
+    for my $buff (@{ $book->buffs }) {
+      if ($buff->attribute eq $attribute
+        && ($buff->targetedType // '') eq $troopType) {
         $provides_attr = 1;
         last;
       }
@@ -202,27 +218,31 @@ sub _getGenericBookValue_impl ($self, $attribute, $troopType) {
     next unless $provides_attr;
 
     # Check compatibility with current general (same side)
-    my $compat_current = $self->bc->is_general_and_book_compatible(
-          $current_general, $book, { same_side => 1 });
+    my $compat_current =
+      $self->bc->is_general_and_book_compatible($current_general, $book,
+      { same_side => 1 });
 
-    # Check compatibility with other general (different side - no partial conflicts)
-    my $compat_other = $self->bc->is_general_and_book_compatible(
-          $other_general, $book, { same_side => 0 });
+# Check compatibility with other general (different side - no partial conflicts)
+    my $compat_other =
+      $self->bc->is_general_and_book_compatible($other_general, $book,
+      { same_side => 0 });
 
     $self->logger->debug(sprintf(
-      'Book %s for %s (%s): provides_attr=%d, compat_current=%d, compat_other=%d',
-      $book->name, $attribute, $current_general->name, $provides_attr, $compat_current, $compat_other
+'Book %s for %s (%s): provides_attr=%d, compat_current=%d, compat_other=%d',
+      $book->name,    $attribute,      $current_general->name,
+      $provides_attr, $compat_current, $compat_other
     ));
 
-    # Book must be compatible with current general AND not conflict with other general
+# Book must be compatible with current general AND not conflict with other general
     if ($compat_current && $compat_other) {
-      for my $buff (@{$book->buffs}) {
-        if ($buff->attribute eq $attribute &&
-            ($buff->targetedType // '') eq $troopType) {
+      for my $buff (@{ $book->buffs }) {
+        if ($buff->attribute eq $attribute
+          && ($buff->targetedType // '') eq $troopType) {
           $total += $buff->value->number;
           $self->logger->debug(sprintf(
             'Adding %d from %s for %s, total now %d',
-            $buff->value->number, $book->name, $current_general->name, $total
+            $buff->value->number,   $book->name,
+            $current_general->name, $total
           ));
         }
       }
@@ -232,7 +252,6 @@ sub _getGenericBookValue_impl ($self, $attribute, $troopType) {
 
   return $total;
 }
-
 
 1;
 __END__

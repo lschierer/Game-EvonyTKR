@@ -30,7 +30,7 @@ package Game::EvonyTKR::Model::Buff::Summarizer {
   has '_private' => sub { {} };
 
   # Optional books parameter for testing
-  has 'books' => sub { undef };
+  has 'books' => sub {undef};
 
   # Input parameters
   has 'general';

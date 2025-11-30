@@ -16,10 +16,10 @@ require Game::EvonyTKR::Model::Book;
 require Game::EvonyTKR::Service::Cache;
 
 package Test::Package {
-  use Mojo::Base -base,                                     -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Role::Logger',            -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::Common',            -role;
-  use Mojo::Base 'Game::EvonyTKR::Model::Role::Book',       -role;
+  use Mojo::Base -base,                               -signatures;
+  use Mojo::Base 'Game::EvonyTKR::Role::Logger',      -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Common',      -role;
+  use Mojo::Base 'Game::EvonyTKR::Model::Role::Book', -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Persistence', -role;
 
   state $bookCache;
@@ -123,10 +123,8 @@ package Test::Package {
     my $testBookName = 'Supreme Power';
     eval {
       $books_helper = Mojo::Base->new->with_roles(
-        'Game::EvonyTKR::Role::Logger',
-        'Game::EvonyTKR::Role::Cache',
-        'Game::EvonyTKR::Role::Common',
-        'Game::EvonyTKR::Role::Persistence'
+        'Game::EvonyTKR::Role::Logger', 'Game::EvonyTKR::Role::Cache',
+        'Game::EvonyTKR::Role::Common', 'Game::EvonyTKR::Role::Persistence'
       );
     } or do {
       $self->logger->error(

@@ -7,8 +7,8 @@ require Data::Printer;
 require Game::EvonyTKR::External::Common;
 
 package Game::EvonyTKR::External::Book::LoadAllGenerics {
-  use Mojo::Base 'Game::EvonyTKR::External::JobBase',       -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Role::Common',            -role;
+  use Mojo::Base 'Game::EvonyTKR::External::JobBase', -signatures;
+  use Mojo::Base 'Game::EvonyTKR::Role::Common',      -role;
   use Mojo::File;
   use experimental qw(class);
   use Carp;
@@ -52,11 +52,12 @@ package Game::EvonyTKR::External::Book::LoadAllGenerics {
     }
 
     my @list = $job->list_generic_books()->@*;
-    $job->logger->info(sprintf('Found %d generic books to process', scalar @list));
+    $job->logger->info(
+      sprintf('Found %d generic books to process', scalar @list));
 
     my $enqueued_count = 0;
-    my $skipped_count = 0;
-    my @job_ids = ();
+    my $skipped_count  = 0;
+    my @job_ids        = ();
 
     my $maxIndex = scalar(@list) - 1;
     foreach my $index (0 .. $maxIndex) {
@@ -104,15 +105,16 @@ package Game::EvonyTKR::External::Book::LoadAllGenerics {
 
     # Wait for all child jobs to complete
     if (@job_ids) {
-      $job->logger->info(sprintf('Waiting for %d child jobs to complete', scalar @job_ids));
+      $job->logger->info(
+        sprintf('Waiting for %d child jobs to complete', scalar @job_ids));
 
       my $finished = 0;
-      my $failed = 0;
+      my $failed   = 0;
 
       while (1) {
         my $all_done = 1;
         $finished = 0;
-        $failed = 0;
+        $failed   = 0;
 
         for my $jid (@job_ids) {
           my $info = $job->minion->job($jid);
@@ -120,9 +122,11 @@ package Game::EvonyTKR::External::Book::LoadAllGenerics {
 
           if ($info->{state} eq 'finished') {
             $finished++;
-          } elsif ($info->{state} eq 'failed') {
+          }
+          elsif ($info->{state} eq 'failed') {
             $failed++;
-          } else {
+          }
+          else {
             $all_done = 0;
           }
         }

@@ -140,7 +140,8 @@ package Game::EvonyTKR::External::General::Summarizer {
     );
 
     # Create summarizer
-    my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer::Single->new($params->%*);
+    my $summarizer =
+      Game::EvonyTKR::Model::Buff::Summarizer::Single->new($params->%*);
 
     # Compute buffs and debuffs
     $summarizer->updateBuffs();

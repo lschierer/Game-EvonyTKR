@@ -44,8 +44,8 @@ package Game::EvonyTKR::External::Specialty::LoadAllSpecialties {
       sprintf('Found %d specialty files to process', scalar @files));
 
     my $enqueued_count = 0;
-    my $skipped_count = 0;
-    my @job_ids = ();
+    my $skipped_count  = 0;
+    my @job_ids        = ();
 
     foreach my $file (@files) {
       # Extract specialty name from filename
@@ -54,9 +54,7 @@ package Game::EvonyTKR::External::Specialty::LoadAllSpecialties {
       # Check if already in persistence
       if ($job->persistence->get_specialty($specialty_name)) {
         $job->logger->debug(sprintf(
-          'Skipping %s - already in persistence',
-          $specialty_name
-        ));
+          'Skipping %s - already in persistence', $specialty_name));
         $skipped_count++;
         next;
       }
@@ -83,15 +81,16 @@ package Game::EvonyTKR::External::Specialty::LoadAllSpecialties {
 
     # Wait for all child jobs to complete
     if (@job_ids) {
-      $job->logger->info(sprintf('Waiting for %d child jobs to complete', scalar @job_ids));
+      $job->logger->info(
+        sprintf('Waiting for %d child jobs to complete', scalar @job_ids));
 
       my $finished = 0;
-      my $failed = 0;
+      my $failed   = 0;
 
       while (1) {
         my $all_done = 1;
         $finished = 0;
-        $failed = 0;
+        $failed   = 0;
 
         for my $jid (@job_ids) {
           my $info = $job->minion->job($jid);
@@ -99,9 +98,11 @@ package Game::EvonyTKR::External::Specialty::LoadAllSpecialties {
 
           if ($info->{state} eq 'finished') {
             $finished++;
-          } elsif ($info->{state} eq 'failed') {
+          }
+          elsif ($info->{state} eq 'failed') {
             $failed++;
-          } else {
+          }
+          else {
             $all_done = 0;
           }
         }

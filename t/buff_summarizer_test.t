@@ -36,8 +36,6 @@ require Test::Package;
 
 use Log::Log4perl qw(:levels);
 
-
-
 my $testManager = Test::Package->new();
 $testManager->logger->info('starting testing.');
 isa_ok($testManager, ['Test::Package'], 'Test Package instantiated');

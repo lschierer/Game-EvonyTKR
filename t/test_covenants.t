@@ -37,10 +37,10 @@ unless ($cc->set($test_key, 'test')) {
 }
 
 package Test::Package {
-  use Mojo::Base -base,                                         -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Role::Logger',                -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::Common',                -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::Persistence',  -role;
+  use Mojo::Base -base,                               -signatures;
+  use Mojo::Base 'Game::EvonyTKR::Role::Logger',      -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Common',      -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Persistence', -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Persistence', -role;
 
   sub loadAllGenerals($self) {

@@ -3,7 +3,7 @@ use utf8::all;
 use File::FindLib 'lib';
 
 package Game::EvonyTKR::External::Specialty::Loader {
-  use Mojo::Base 'Game::EvonyTKR::External::JobBase',             -signatures;
+  use Mojo::Base 'Game::EvonyTKR::External::JobBase', -signatures;
   use Mojo::File;
   use YAML::PP;
   use Encode;

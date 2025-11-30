@@ -4,7 +4,7 @@ use utf8::all;
 use Mojo::Base -base, -signatures;
 use List::AllUtils qw( any );
 
-has 'service';  # parent service for constants
+has 'service';    # parent service for constants
 
 sub conflicts ($self, $b1, $b2, $g1, $g2) {
   return 0 if $b1->passive || $b2->passive;
@@ -20,13 +20,13 @@ sub conflicts ($self, $b1, $b2, $g1, $g2) {
   my $attr = $b1->attribute;
 
   # Check if buffs have activation scoping (dragon/spirit conditions)
-  my $c1 = $b1->conditions // [];
-  my $c2 = $b2->conditions // [];
-  my $scoped1 = any { /dragon|spiritual beast/i } @$c1;
-  my $scoped2 = any { /dragon|spiritual beast/i } @$c2;
+  my $c1      = $b1->conditions // [];
+  my $c2      = $b2->conditions // [];
+  my $scoped1 = any {/dragon|spiritual beast/i} @$c1;
+  my $scoped2 = any {/dragon|spiritual beast/i} @$c2;
 
-  # If either has activation scoping, they don't conflict
-  # (scoped buff only exists if condition met, so can't conflict with always-on buff)
+# If either has activation scoping, they don't conflict
+# (scoped buff only exists if condition met, so can't conflict with always-on buff)
   return 0 if $scoped1 || $scoped2;
 
   # Conditionless attributes
@@ -42,15 +42,14 @@ sub conflicts ($self, $b1, $b2, $g1, $g2) {
 sub _troops_overlap ($self, $b1, $b2) {
   my $t1 = $b1->targetedType // '';
   my $t2 = $b2->targetedType // '';
-  return 1 if !$t1 || !$t2;  # global buffs overlap everything
+  return 1 if !$t1 || !$t2;    # global buffs overlap everything
   return $t1 eq $t2;
 }
 
 sub _normalize_conditions ($self, $buff) {
   # Strip non-operative conditions
-  my @conds = grep {
-    $_ ne 'leading the army' && $_ ne 'you own the General'
-  } @{$buff->conditions // []};
+  my @conds = grep { $_ ne 'leading the army' && $_ ne 'you own the General' }
+    @{ $buff->conditions // [] };
 
   return join('|', sort @conds);
 }

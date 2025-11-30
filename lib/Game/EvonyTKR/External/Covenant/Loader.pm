@@ -4,7 +4,7 @@ use File::FindLib 'lib';
 require Game::EvonyTKR::Model::Covenant;
 
 package Game::EvonyTKR::External::Covenant::Loader {
-  use Mojo::Base 'Game::EvonyTKR::External::JobBase',           -signatures;
+  use Mojo::Base 'Game::EvonyTKR::External::JobBase', -signatures;
   use Mojo::File;
   use YAML::PP;
   use Encode;

@@ -22,7 +22,6 @@ BEGIN {
 
 require Test::Package;
 
-
 # Setup logger
 my $logger;
 
@@ -40,9 +39,9 @@ require Game::EvonyTKR::Model::General;
 require Game::EvonyTKR::Model::Specialty;
 
 my $conflicts = Game::EvonyTKR::Service::Conflicts->new(
-  build_index      => 1,
-  asst_has_dragon  => 1,
-  asst_has_spirit  => 1,
+  build_index     => 1,
+  asst_has_dragon => 1,
+  asst_has_spirit => 1,
 );
 
 sub are_generals_compatible_either_role ($g1, $g2) {
@@ -61,10 +60,10 @@ sub are_generals_compatible_either_role ($g1, $g2) {
 {
 
   package TestBase::WithRoles;
-  use Mojo::Base -base,                          -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Role::Logging', -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::Common', -role;
-  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Pairs',  -role;
+  use Mojo::Base -base,                                     -signatures;
+  use Mojo::Base 'Game::EvonyTKR::Role::Logging',           -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Common',            -role;
+  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Pairs', -role;
   use Carp;
 
   # Add minimal required attributes
@@ -87,12 +86,9 @@ $logger = $testPackage->get_logger;
 
 ########################## Start Test Stuff
 
-
 # Locate data
 
-
 my $TestGenerals = TestClass::Generals->new();
-
 
 my $memcachClient = $TestGenerals->general_cache();
 if (not defined($memcachClient)) {
@@ -126,8 +122,10 @@ subtest 'Data Setup' => sub {
   );
 
   $covenants = $testManager->import_covenants();
-  ok(ref($covenants) && scalar(@$covenants),
-    sprintf('imported %s covenants', ref($covenants) ? scalar(@$covenants) : 0));
+  ok(
+    ref($covenants) && scalar(@$covenants),
+    sprintf('imported %s covenants', ref($covenants) ? scalar(@$covenants) : 0)
+  );
 
   $generic_books = $testManager->import_generic_books();
   ok(
@@ -162,7 +160,7 @@ subtest 'Data Setup' => sub {
         ok(
           !$pa || $pa == 0,
           sprintf(
-            'attempt to populate ascending attributes for "%s" correctly failed',
+'attempt to populate ascending attributes for "%s" correctly failed',
             $general->name)
         );
       }
@@ -234,28 +232,28 @@ subtest 'All Generals have types to test against' => sub {
   }
 };
 
-my $WASH   = $TestGenerals->get_general('Washington Prime',  );
-my $MARCO  = $TestGenerals->get_general('Marco Polo',        );
-my $AETHEL = $TestGenerals->get_general('Aethelflaed',       );
-my $CAESAR = $TestGenerals->get_general('Caesar',            );
-my $DF     = $TestGenerals->get_general('David Farragut',    );
-my $SC     = $TestGenerals->get_general('Sun Ce',            );
-my $GO     = $TestGenerals->get_general('Gaius Octavius',    );
-my $Hermes = $TestGenerals->get_general('Hermes',            );
-my $Haakon = $TestGenerals->get_general('Haakon Haraldsson', );
-my $Barbarossa = $TestGenerals->get_general('Barbarossa',      );
-my $Custer     = $TestGenerals->get_general('George A Custer', );
-my $KA         = $TestGenerals->get_general('King Arthur',     );
-my $Jayavarman = $TestGenerals->get_general('Jayavarman II',   );
-my $Cheng      = $TestGenerals->get_general('Cheng Yaojin',    );
-my $Laudon     = $TestGenerals->get_general('Laudon',          );
-my $Elektra    = $TestGenerals->get_general('Elektra',         );
-my $Franz      = $TestGenerals->get_general('Franz Joseph I',  );
-my $Douglas    = $TestGenerals->get_general('Douglas',         );
-my $Marcus     = $TestGenerals->get_general('Marcus Agrippa',  );
-my $Louis      = $TestGenerals->get_general('Louis IX',        );
-my $LouisXIV   = $TestGenerals->get_general('Louis XIV',       );
-my $OlavII     = $TestGenerals->get_general('Olav II',         );
+my $WASH       = $TestGenerals->get_general('Washington Prime',);
+my $MARCO      = $TestGenerals->get_general('Marco Polo',);
+my $AETHEL     = $TestGenerals->get_general('Aethelflaed',);
+my $CAESAR     = $TestGenerals->get_general('Caesar',);
+my $DF         = $TestGenerals->get_general('David Farragut',);
+my $SC         = $TestGenerals->get_general('Sun Ce',);
+my $GO         = $TestGenerals->get_general('Gaius Octavius',);
+my $Hermes     = $TestGenerals->get_general('Hermes',);
+my $Haakon     = $TestGenerals->get_general('Haakon Haraldsson',);
+my $Barbarossa = $TestGenerals->get_general('Barbarossa',);
+my $Custer     = $TestGenerals->get_general('George A Custer',);
+my $KA         = $TestGenerals->get_general('King Arthur',);
+my $Jayavarman = $TestGenerals->get_general('Jayavarman II',);
+my $Cheng      = $TestGenerals->get_general('Cheng Yaojin',);
+my $Laudon     = $TestGenerals->get_general('Laudon',);
+my $Elektra    = $TestGenerals->get_general('Elektra',);
+my $Franz      = $TestGenerals->get_general('Franz Joseph I',);
+my $Douglas    = $TestGenerals->get_general('Douglas',);
+my $Marcus     = $TestGenerals->get_general('Marcus Agrippa',);
+my $Louis      = $TestGenerals->get_general('Louis IX',);
+my $LouisXIV   = $TestGenerals->get_general('Louis XIV',);
+my $OlavII     = $TestGenerals->get_general('Olav II',);
 
 subtest 'Ensure Generals are Pressent for further tests' => sub {
 
@@ -462,35 +460,75 @@ subtest 'Louis XIV Stackable Buffs Test' => sub {
 my $bc = $conflicts;
 
 # Get books for testing
-my $l4ra = (grep { $_->name =~ /Ranged.*Attack/i && $_->name !~ /Monster/i && $_->level == 4 } @$generic_books)[0];
-my $l4ms = (grep { $_->name =~ /March Size/i && $_->level == 4 } @$generic_books)[0];
-my $l4maam = (grep { $_->name =~ /Mounted.*Attack.*Against.*Monster/i && $_->level == 4 } @$generic_books)[0];
+my $l4ra = (
+  grep {
+    $_->name =~ /Ranged.*Attack/i && $_->name !~ /Monster/i && $_->level == 4
+  } @$generic_books
+)[0];
+my $l4ms =
+  (grep { $_->name =~ /March Size/i && $_->level == 4 } @$generic_books)[0];
+my $l4maam =
+  (grep { $_->name =~ /Mounted.*Attack.*Against.*Monster/i && $_->level == 4 }
+    @$generic_books)[0];
 
 subtest 'Books ready for testing' => sub {
-  isa_ok($l4ra, ['Game::EvonyTKR::Model::Book'], 'Level 4 Ranged Troop Attack is a ::Model::Book') if $l4ra;
-  isa_ok($l4ms, ['Game::EvonyTKR::Model::Book'], 'Level 4 March Size is a ::Model::Book') if $l4ms;
+  isa_ok(
+    $l4ra,
+    ['Game::EvonyTKR::Model::Book'],
+    'Level 4 Ranged Troop Attack is a ::Model::Book'
+  ) if $l4ra;
+  isa_ok(
+    $l4ms,
+    ['Game::EvonyTKR::Model::Book'],
+    'Level 4 March Size is a ::Model::Book'
+  ) if $l4ms;
 
   done_testing();
 };
 
 subtest 'Partial Conflicts with Books' => sub {
-  SKIP: {
+SKIP: {
     skip "Books not available", 4 unless $l4ra && $l4ms;
 
-    ok($bc->is_general_and_book_compatible($Elektra, $l4ra, { same_side => 1,}), 'Elektra and L4 Ranged Troop Attack work (same side)');
-    ok(!$bc->is_general_and_book_compatible($Elektra, $l4ra, { same_side => 0,}), 'Elektra and L4 Ranged Troop Attack conflict (other side)');
-    ok($bc->is_general_and_book_compatible($Custer, $l4ms, { same_side => 1,}), 'George A. Custer and L4 March Size work (same side)');
-    ok(!$bc->is_general_and_book_compatible($Custer, $l4ms, { same_side => 0,}), 'George A. Custer and L4 March Size conflict (other side)');
+    ok(
+      $bc->is_general_and_book_compatible($Elektra, $l4ra, { same_side => 1, }),
+      'Elektra and L4 Ranged Troop Attack work (same side)'
+    );
+    ok(
+      !$bc->is_general_and_book_compatible(
+        $Elektra, $l4ra, { same_side => 0, }
+      ),
+      'Elektra and L4 Ranged Troop Attack conflict (other side)'
+    );
+    ok(
+      $bc->is_general_and_book_compatible($Custer, $l4ms, { same_side => 1, }),
+      'George A. Custer and L4 March Size work (same side)'
+    );
+    ok(
+      !$bc->is_general_and_book_compatible($Custer, $l4ms, { same_side => 0, }),
+      'George A. Custer and L4 March Size conflict (other side)'
+    );
   }
   done_testing();
 };
 
 subtest 'Full Conflicts with Books' => sub {
-  SKIP: {
+SKIP: {
     skip "Books not available", 2 unless $l4ms;
-    ok(!$bc->is_general_and_book_compatible($AETHEL, $l4maam, { same_side => 1,}), 'Aethelflaed and Level 4 Mounted Troop Attack Against Monster (same side)');
-    ok(!$bc->is_general_and_book_compatible($KA, $l4ms, { same_side => 1,}), 'King Arthur and Level 4 March Size conflict (same side)');
-    ok(!$bc->is_general_and_book_compatible($KA, $l4ms, { same_side => 0,}), 'King Arthur and Level 4 March Size conflict (other side)');
+    ok(
+      !$bc->is_general_and_book_compatible(
+        $AETHEL, $l4maam, { same_side => 1, }
+      ),
+      'Aethelflaed and Level 4 Mounted Troop Attack Against Monster (same side)'
+    );
+    ok(
+      !$bc->is_general_and_book_compatible($KA, $l4ms, { same_side => 1, }),
+      'King Arthur and Level 4 March Size conflict (same side)'
+    );
+    ok(
+      !$bc->is_general_and_book_compatible($KA, $l4ms, { same_side => 0, }),
+      'King Arthur and Level 4 March Size conflict (other side)'
+    );
   }
   done_testing();
 };

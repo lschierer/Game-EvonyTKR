@@ -23,7 +23,7 @@ use namespace::autoclean;
 package Game::EvonyTKR::Controller::Generals {
   use Mojo::Base 'Game::EvonyTKR::Controller::ControllerBase';
   use Mojo::Base 'Game::EvonyTKR::Role::Persistence', -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::StaticPages',          -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::StaticPages', -role;
   use Mojo::IOLoop;
   use Mojo::Promise;
   use Mojo::JSON     qw(to_json encode_json);
@@ -50,7 +50,7 @@ package Game::EvonyTKR::Controller::Generals {
   sub get_general_routing ($self) {
     state $routing = Game::EvonyTKR::Control::Generals::Routing->new();
     return $routing;
-  };
+  }
 
   # Specify which collection this controller handles
   has collection_name => 'generals';
@@ -73,7 +73,7 @@ package Game::EvonyTKR::Controller::Generals {
     $c->logger->info("Registering routes for " . ref($c));
     $c->SUPER::register($app, $config);
 
-    if($app->mode eq 'development'){
+    if ($app->mode eq 'development') {
       $c->get_general_routing->set_debug(1);
     }
 
@@ -108,12 +108,15 @@ package Game::EvonyTKR::Controller::Generals {
 
   sub setup_helpers($c, $app) {
 
-    $app->helper(general_routing => sub{
-      return $c->get_general_routing();
-    });
+    $app->helper(
+      general_routing => sub {
+        return $c->get_general_routing();
+      }
+    );
 
     $app->plugins->emit(
-      get_general_routing_available => { routing => $c->get_general_routing() });
+      get_general_routing_available => { routing => $c->get_general_routing() }
+    );
   }
 
   sub setup_routes($c, $app) {
@@ -731,10 +734,11 @@ package Game::EvonyTKR::Controller::Generals {
     my $uiTarget       = $route_meta->{uiTarget};
 
     my @all_generals = $self->get_generals()->@*;
-    $self->logger->debug(sprintf('get_generals returned %s generals', scalar(@all_generals)));
+    $self->logger->debug(
+      sprintf('get_generals returned %s generals', scalar(@all_generals)));
 
     my @selected = grep {
-      my $gen = $_;
+      my $gen    = $_;
       my $result = 0;
 
       eval {
@@ -754,8 +758,7 @@ package Game::EvonyTKR::Controller::Generals {
       } or do {
         $self->logger->error(sprintf(
           'Error filtering general %s: %s',
-          $gen->name // 'unknown',
-          $@
+          $gen->name // 'unknown', $@
         ));
         $result = 0;
       };
@@ -764,7 +767,11 @@ package Game::EvonyTKR::Controller::Generals {
     } @all_generals;
 
     $self->logger->debug(
-      sprintf('grep filtered the list from %s to %s', scalar(@all_generals), scalar(@selected)));
+      sprintf(
+        'grep filtered the list from %s to %s',
+        scalar(@all_generals), scalar(@selected)
+      )
+    );
 
     # Return just the basic name information without computing buffs
     my @names = map { { primary => $_->name } } @selected;

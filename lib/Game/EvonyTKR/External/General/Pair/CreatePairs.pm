@@ -3,8 +3,8 @@ use utf8::all;
 use File::FindLib 'lib';
 
 package Game::EvonyTKR::External::General::Pair::CreatePairs {
-  use Mojo::Base 'Game::EvonyTKR::External::JobBase',          -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Pairs',    -role;
+  use Mojo::Base 'Game::EvonyTKR::External::JobBase',       -signatures;
+  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Pairs', -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants', -role;
   require Game::EvonyTKR::Service::Cache;
   require Game::EvonyTKR::Model::General::Conflict::Book;
@@ -46,7 +46,9 @@ package Game::EvonyTKR::External::General::Pair::CreatePairs {
     my $generals = $job->get_generals();
 
     # Find the primary general
-    my ($primary) = grep { $job->normalize($general_name) eq $job->normalize($_->name) } $generals->@*;
+    my ($primary) =
+      grep { $job->normalize($general_name) eq $job->normalize($_->name) }
+      $generals->@*;
     unless ($primary) {
       $job->logger->error("General '$general_name' not found");
       return $job->fail("General '$general_name' not found");
@@ -169,22 +171,20 @@ package Game::EvonyTKR::External::General::Pair::CreatePairs {
     }
 
     # Store new conflicts to persistence
-    my $final_by_general = $conflict_detector->by_general;
+    my $final_by_general     = $conflict_detector->by_general;
     my $new_conflicts_stored = 0;
 
     foreach my $g1 (keys %$final_by_general) {
       foreach my $g2 (keys %{ $final_by_general->{$g1} }) {
-        # Store to persistence (uses INSERT OR IGNORE so duplicates are harmless)
+       # Store to persistence (uses INSERT OR IGNORE so duplicates are harmless)
         $job->persistence->store_conflict($g1, $g2);
         $new_conflicts_stored++;
       }
     }
 
     # Note: stored count includes duplicates, actual new conflicts will be less
-    $job->logger->debug(sprintf(
-      'Stored %d conflict records to persistence',
-      $new_conflicts_stored
-    ));
+    $job->logger->debug(sprintf('Stored %d conflict records to persistence',
+      $new_conflicts_stored));
 
     # Return conflict data in notes for monitor job to merge
     my $conflict_data = {

@@ -1,9 +1,9 @@
 package Game::EvonyTKR::Service::Conflicts;
 use v5.42.0;
 use utf8::all;
-use Mojo::Base -base, -signatures;
-use Mojo::Base 'Game::EvonyTKR::Role::Logging', -role;
-use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants', -role;
+use Mojo::Base -base,                                               -signatures;
+use Mojo::Base 'Game::EvonyTKR::Role::Logging',                     -role;
+use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants',    -role;
 use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants', -role;
 
 require Data::Printer;
@@ -22,7 +22,7 @@ has main_has_spirit   => 1;
 has asst_has_dragon   => 0;
 has asst_has_spirit   => 0;
 #TODO -- toggle on WALL buffs.
-has allow_wall_buffs  => 1;
+has allow_wall_buffs => 1;
 
 # Output caches
 has ProcessedGenerals       => sub { {} };
@@ -31,25 +31,25 @@ has by_general              => sub { {} };
 has cache_hits              => 0;
 
 # Constants
-has TROOP_BIT => sub {{
+has TROOP_BIT => sub { {
   'Ground Troops'  => 1,
   'Ranged Troops'  => 2,
   'Mounted Troops' => 4,
   'Siege Machines' => 8,
-}};
+} };
 
-has CONDLESS => sub {{
+has CONDLESS => sub { {
   'March Size'             => 1,
   'Marching Speed'         => 1,
   'Stamina cost'           => 1,
   'Double Items Drop Rate' => 1,
-}};
+} };
 
-has TRIADS => sub {{
+has TRIADS => sub { {
   'Attack'  => 1,
   'Defense' => 1,
   'HP'      => 1,
-}};
+} };
 
 # Main conflict detection
 sub are_generals_compatible ($self, $g1, $g2) {
@@ -59,7 +59,8 @@ sub are_generals_compatible ($self, $g1, $g2) {
   return 1 unless $self->_troop_overlap($g1, $g2);
 
   # Try grouped buff detection first (handles complex cases like Haakon/Cheng)
-  my $grouped = Game::EvonyTKR::Service::Conflicts::GroupedBuffComparator->new(service => $self);
+  my $grouped = Game::EvonyTKR::Service::Conflicts::GroupedBuffComparator->new(
+    service => $self);
   my $grouped_result = $grouped->conflicts($g1, $g2);
   if (defined $grouped_result) {
     $self->_record_conflict($g1, $g2) if $grouped_result;
@@ -67,17 +68,17 @@ sub are_generals_compatible ($self, $g1, $g2) {
   }
 
   # Fall back to individual buff comparison
-  my $comparator = Game::EvonyTKR::Service::Conflicts::BuffComparator->new(service => $self);
+  my $comparator =
+    Game::EvonyTKR::Service::Conflicts::BuffComparator->new(service => $self);
 
-  for my $b1 (@{$g1->builtInBook->buffs}) {
-    for my $b2 (@{$g2->builtInBook->buffs}) {
+  for my $b1 (@{ $g1->builtInBook->buffs }) {
+    for my $b2 (@{ $g2->builtInBook->buffs }) {
       if ($comparator->conflicts($b1, $b2, $g1, $g2)) {
         $self->logger->debug(sprintf(
           '%s/%s conflict: %s vs %s (conds: [%s] vs [%s])',
-          $g1->name, $g2->name,
-          $b1->attribute, $b2->attribute,
-          join(',', @{$b1->conditions // []}),
-          join(',', @{$b2->conditions // []})
+          $g1->name, $g2->name, $b1->attribute, $b2->attribute,
+          join(',', @{ $b1->conditions // [] }),
+          join(',', @{ $b2->conditions // [] })
         ));
         $self->_record_conflict($g1, $g2);
         return 0;
@@ -91,7 +92,8 @@ sub are_generals_compatible ($self, $g1, $g2) {
 # Check if generic book conflicts with general's builtin book
 # Returns: true if compatible, false if conflicts
 sub is_general_and_book_compatible ($self, $general, $book, $opts = {}) {
-  my $comparator = Game::EvonyTKR::Service::Conflicts::BookComparator->new(service => $self);
+  my $comparator =
+    Game::EvonyTKR::Service::Conflicts::BookComparator->new(service => $self);
   my $result = $comparator->conflicts($general, $book, $opts);
 
   # 0 = compatible, 1+ = some kind of conflict
@@ -105,7 +107,8 @@ sub load_from_persistence ($self, $persistence) {
   if ($conflicts && ref($conflicts) eq 'HASH') {
     $self->by_general($conflicts);
     my $count = scalar(keys %$conflicts);
-    $self->logger->debug("Loaded conflicts for $count generals from persistence");
+    $self->logger->debug(
+      "Loaded conflicts for $count generals from persistence");
   }
 
   return $self;
@@ -129,22 +132,22 @@ sub _check_cache ($self, $g1, $g2) {
 }
 
 sub _record_conflict ($self, $g1, $g2) {
-  $self->by_general->{$g1->name}{$g2->name} = 1;
-  $self->by_general->{$g2->name}{$g1->name} = 1;
+  $self->by_general->{ $g1->name }{ $g2->name } = 1;
+  $self->by_general->{ $g2->name }{ $g1->name } = 1;
 }
 
 sub _troop_overlap ($self, $g1, $g2) {
   my $mask1 = 0;
   my $mask2 = 0;
 
-  for my $buff (@{$g1->builtInBook->buffs}) {
+  for my $buff (@{ $g1->builtInBook->buffs }) {
     next if $buff->passive;
-    $mask1 |= $self->TROOP_BIT->{$buff->targetedType // ''} // 0;
+    $mask1 |= $self->TROOP_BIT->{ $buff->targetedType // '' } // 0;
   }
 
-  for my $buff (@{$g2->builtInBook->buffs}) {
+  for my $buff (@{ $g2->builtInBook->buffs }) {
     next if $buff->passive;
-    $mask2 |= $self->TROOP_BIT->{$buff->targetedType // ''} // 0;
+    $mask2 |= $self->TROOP_BIT->{ $buff->targetedType // '' } // 0;
   }
 
   return $mask1 & $mask2;
@@ -154,7 +157,6 @@ sub preseed ($self, $new_by_general, $new_groups_by_conflict_type) {
   $self->by_general($new_by_general);
   $self->groups_by_conflict_type($new_groups_by_conflict_type);
 }
-
 
 1;
 __END__

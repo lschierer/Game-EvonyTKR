@@ -10,7 +10,8 @@ has persistence => sub {
 };
 
 has 'ascending_attribute_cache' => sub ($self) {
-  return Game::EvonyTKR::Service::Cache->new(namespace => 'ascending_attributes__');
+  return Game::EvonyTKR::Service::Cache->new(
+    namespace => 'ascending_attributes__');
 };
 
 has 'general_cache' => sub ($self) {
@@ -101,7 +102,8 @@ sub get_general ($self, $name) {
     return;
   }
 
-  my $general = Game::EvonyTKR::Model::Factory->build_from_wire('General', $wire_data);
+  my $general =
+    Game::EvonyTKR::Model::Factory->build_from_wire('General', $wire_data);
 
   unless (defined($general)) {
     $self->logger->error("Factory failed to build general from wire_data");
@@ -117,13 +119,16 @@ sub get_generals ($self) {
   my $result = [];
   foreach my $name ($self->list_generals->@*) {
     my $g = $self->get_general($name);
-    if($g && ref($g) && blessed($g) && $g->isa('Game::EvonyTKR::Model::General')){
-      push @{ $result }, $g;
+    if ( $g
+      && ref($g)
+      && blessed($g)
+      && $g->isa('Game::EvonyTKR::Model::General')) {
+      push @{$result}, $g;
     }
   }
 
-  if(scalar(@{$result}) != $self->persistence->count_generals()){
-    $self->logger->error('unable to fetch all generals.')
+  if (scalar(@{$result}) != $self->persistence->count_generals()) {
+    $self->logger->error('unable to fetch all generals.');
   }
   return $result;
 }
@@ -133,10 +138,11 @@ sub list_generals ($self) {
   require Mojo::Home;
   require List::UtilsBy;
 
-  my $mh = Mojo::File->new(Mojo::Home->new->detect('Game::EvonyTKR')->to_string());
+  my $mh =
+    Mojo::File->new(Mojo::Home->new->detect('Game::EvonyTKR')->to_string());
   my $collectionDir = $mh->child('share/collections/data');
-  my $generalDir = $collectionDir->child('generals');
-  my @suffixlist = ('.yaml', '.yml');
+  my $generalDir    = $collectionDir->child('generals');
+  my @suffixlist    = ('.yaml', '.yml');
   my @files = $generalDir->list->grep(sub { $_ =~ /\.ya?ml$/ && -f -r $_ })
     ->sort->map(sub { return $_->basename(@suffixlist) })->each;
   my @returnlist = List::UtilsBy::uniq_by { lc($self->normalize($_)) } @files;
@@ -195,7 +201,8 @@ sub get_builtin_book ($self, $name) {
     return;
   }
 
-  my $book = Game::EvonyTKR::Model::Factory->build_from_wire('Book', $wire_data);
+  my $book =
+    Game::EvonyTKR::Model::Factory->build_from_wire('Book', $wire_data);
 
   unless (defined($book)) {
     $self->logger->error("Factory failed to build book from wire_data");
@@ -212,11 +219,12 @@ sub list_builtin_books ($self) {
   require Mojo::Home;
   require List::UtilsBy;
 
-  my $mh = Mojo::File->new(Mojo::Home->new->detect('Game::EvonyTKR')->to_string());
+  my $mh =
+    Mojo::File->new(Mojo::Home->new->detect('Game::EvonyTKR')->to_string());
   my $collectionDir = $mh->child('share/collections/data');
-  my $bbdir = $collectionDir->child('skill books');
-  my @suffixlist = ('.yaml', '.yml');
-  my @files = $bbdir->list->grep(sub { $_ =~ /\.ya?ml$/ && -f -r $_ })
+  my $bbdir         = $collectionDir->child('skill books');
+  my @suffixlist    = ('.yaml', '.yml');
+  my @files         = $bbdir->list->grep(sub { $_ =~ /\.ya?ml$/ && -f -r $_ })
     ->sort->map(sub { return $_->basename(@suffixlist) })->each;
   return [List::UtilsBy::uniq_by { lc($self->normalize($_)) } @files];
 }
@@ -226,7 +234,7 @@ sub list_builtin_books ($self) {
 ##############################################################################
 
 sub add_generic_book ($self, $book) {
-  my $name = $book->name;
+  my $name  = $book->name;
   my $level = $book->level;
 
   # Write to persistence layer
@@ -271,7 +279,8 @@ sub get_generic_book ($self, $name, $level) {
 
   return unless defined($wire_data);
 
-  my $book = Game::EvonyTKR::Model::Factory->build_from_wire('Book', $wire_data);
+  my $book =
+    Game::EvonyTKR::Model::Factory->build_from_wire('Book', $wire_data);
   $generic_books->{$key} = $book if defined($book);
   return $book;
 }
@@ -281,11 +290,12 @@ sub list_generic_books ($self) {
   require Mojo::Home;
   require List::UtilsBy;
 
-  my $mh = Mojo::File->new(Mojo::Home->new->detect('Game::EvonyTKR')->to_string());
+  my $mh =
+    Mojo::File->new(Mojo::Home->new->detect('Game::EvonyTKR')->to_string());
   my $collectionDir = $mh->child('share/collections/data');
-  my $gbdir = $collectionDir->child('generic books');
-  my @suffixlist = ('.yaml', '.yml');
-  my @files = $gbdir->list->grep(sub { $_ =~ /\.ya?ml$/ && -f -r $_ })
+  my $gbdir         = $collectionDir->child('generic books');
+  my @suffixlist    = ('.yaml', '.yml');
+  my @files         = $gbdir->list->grep(sub { $_ =~ /\.ya?ml$/ && -f -r $_ })
     ->sort->map(sub { return $_->basename(@suffixlist) })->each;
   return [List::UtilsBy::uniq_by { lc($self->normalize($_)) } @files];
 }
@@ -337,7 +347,8 @@ sub get_covenant ($self, $name) {
 
   return unless defined($wire_data);
 
-  my $covenant = Game::EvonyTKR::Model::Factory->build_from_wire('Covenant', $wire_data);
+  my $covenant =
+    Game::EvonyTKR::Model::Factory->build_from_wire('Covenant', $wire_data);
   $covenants->{$normalized_name} = $covenant if defined($covenant);
   return $covenant;
 }
@@ -347,11 +358,12 @@ sub list_covenants ($self) {
   require Mojo::Home;
   require List::UtilsBy;
 
-  my $mh = Mojo::File->new(Mojo::Home->new->detect('Game::EvonyTKR')->to_string());
+  my $mh =
+    Mojo::File->new(Mojo::Home->new->detect('Game::EvonyTKR')->to_string());
   my $collectionDir = $mh->child('share/collections/data');
-  my $cdir = $collectionDir->child('covenants');
-  my @suffixlist = ('.yaml', '.yml');
-  my @files = $cdir->list->grep(sub { $_ =~ /\.ya?ml$/ && -f -r $_ })
+  my $cdir          = $collectionDir->child('covenants');
+  my @suffixlist    = ('.yaml', '.yml');
+  my @files         = $cdir->list->grep(sub { $_ =~ /\.ya?ml$/ && -f -r $_ })
     ->sort->map(sub { return $_->basename(@suffixlist) })->each;
   return [List::UtilsBy::uniq_by { lc($self->normalize($_)) } @files];
 }
@@ -403,7 +415,8 @@ sub get_specialty ($self, $name) {
 
   return unless defined($wire_data);
 
-  my $specialty = Game::EvonyTKR::Model::Factory->build_from_wire('Specialty', $wire_data);
+  my $specialty =
+    Game::EvonyTKR::Model::Factory->build_from_wire('Specialty', $wire_data);
   $specialties->{$normalized_name} = $specialty if defined($specialty);
   return $specialty;
 }
@@ -413,11 +426,12 @@ sub list_specialties ($self) {
   require Mojo::Home;
   require List::UtilsBy;
 
-  my $mh = Mojo::File->new(Mojo::Home->new->detect('Game::EvonyTKR')->to_string());
+  my $mh =
+    Mojo::File->new(Mojo::Home->new->detect('Game::EvonyTKR')->to_string());
   my $collectionDir = $mh->child('share/collections/data');
-  my $sdir = $collectionDir->child('specialties');
-  my @suffixlist = ('.yaml', '.yml');
-  my @files = $sdir->list->grep(sub { $_ =~ /\.ya?ml$/ && -f -r $_ })
+  my $sdir          = $collectionDir->child('specialties');
+  my @suffixlist    = ('.yaml', '.yml');
+  my @files         = $sdir->list->grep(sub { $_ =~ /\.ya?ml$/ && -f -r $_ })
     ->sort->map(sub { return $_->basename(@suffixlist) })->each;
   return [List::UtilsBy::uniq_by { lc($self->normalize($_)) } @files];
 }
@@ -430,12 +444,14 @@ sub add_ascending_attribute ($self, $ascendingAttribute) {
   my $name = $self->normalize($ascendingAttribute->general);
 
   # Write to persistence layer
-  $self->persistence->store_ascending_attribute($name, $ascendingAttribute->to_wire_hash());
+  $self->persistence->store_ascending_attribute($name,
+    $ascendingAttribute->to_wire_hash());
 
   # Update memcached
   my $key = lc($self->normalize($ascendingAttribute->general));
   $key =~ s/ /_/g;
-  $self->ascending_attribute_cache->set($key, $ascendingAttribute->to_wire_hash());
+  $self->ascending_attribute_cache->set($key,
+    $ascendingAttribute->to_wire_hash());
 
   return 1;
 }
@@ -452,7 +468,8 @@ sub get_ascending_attributes ($self, $name) {
 
   # Check state cache
   if (exists $AscendingAttributes->{$normalized_name}) {
-    $self->logger->debug("Returning Ascending Attributes $name from state cache");
+    $self->logger->debug(
+      "Returning Ascending Attributes $name from state cache");
     return $AscendingAttributes->{$normalized_name};
   }
 
@@ -471,15 +488,20 @@ sub get_ascending_attributes ($self, $name) {
 
   return unless defined($wire_data);
 
-  $self->logger->debug("Found wire_data, attempting to build AscendingAttributes");
-  my $ascendingAttribute = Game::EvonyTKR::Model::Factory->build_from_wire('AscendingAttributes', $wire_data);
+  $self->logger->debug(
+    "Found wire_data, attempting to build AscendingAttributes");
+  my $ascendingAttribute =
+    Game::EvonyTKR::Model::Factory->build_from_wire('AscendingAttributes',
+    $wire_data);
 
   unless (defined($ascendingAttribute)) {
-    $self->logger->error("Factory failed to build AscendingAttributes from wire_data");
+    $self->logger->error(
+      "Factory failed to build AscendingAttributes from wire_data");
     return;
   }
 
-  $self->logger->debug("Successfully built ascendingAttributes: " . $ascendingAttribute->general);
+  $self->logger->debug(
+    "Successfully built ascendingAttributes: " . $ascendingAttribute->general);
   $AscendingAttributes->{$normalized_name} = $ascendingAttribute;
   return $ascendingAttribute;
 }
@@ -489,11 +511,13 @@ sub list_ascending_attributes ($self) {
   require Mojo::Home;
   require List::UtilsBy;
 
-  my $mh = Mojo::File->new(Mojo::Home->new->detect('Game::EvonyTKR')->to_string());
-  my $collectionDir = $mh->child('share/collections/data');
+  my $mh =
+    Mojo::File->new(Mojo::Home->new->detect('Game::EvonyTKR')->to_string());
+  my $collectionDir          = $mh->child('share/collections/data');
   my $AscendingAttributesDir = $collectionDir->child('ascending attributes');
-  my @suffixlist = ('.yaml', '.yml');
-  my @files = $AscendingAttributesDir->list->grep(sub { $_ =~ /\.ya?ml$/ && -f -r $_ })
+  my @suffixlist             = ('.yaml', '.yml');
+  my @files =
+    $AscendingAttributesDir->list->grep(sub { $_ =~ /\.ya?ml$/ && -f -r $_ })
     ->sort->map(sub { return $_->basename(@suffixlist) })->each;
   return [List::UtilsBy::uniq_by { lc($self->normalize($_)) } @files];
 }

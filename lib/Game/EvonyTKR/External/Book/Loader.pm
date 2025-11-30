@@ -7,8 +7,8 @@ require Mojo::Home;
 require Game::EvonyTKR::Model::Book;
 
 package Game::EvonyTKR::External::Book::Loader {
-  use Mojo::Base 'Game::EvonyTKR::External::JobBase',       -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Role::Common',            -role;
+  use Mojo::Base 'Game::EvonyTKR::External::JobBase', -signatures;
+  use Mojo::Base 'Game::EvonyTKR::Role::Common',      -role;
   use Mojo::File;
   use experimental qw(class);
   use Carp;

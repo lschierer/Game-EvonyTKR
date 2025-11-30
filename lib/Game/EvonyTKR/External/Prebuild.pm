@@ -13,7 +13,7 @@ require Game::EvonyTKR::Model::General;
 require Mojo::Loader;
 
 package Game::EvonyTKR::External::Prebuild {
-  use Mojo::Base 'Game::EvonyTKR::External::JobBase',          -signatures;
+  use Mojo::Base 'Game::EvonyTKR::External::JobBase', -signatures;
   use Mojo::Home;
   use Mojo::File;
   use Mojo::Loader;

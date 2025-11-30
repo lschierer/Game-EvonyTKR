@@ -1,9 +1,9 @@
 package Game::EvonyTKR::Service::Persistence;
 use v5.42.0;
 use utf8::all;
-use Mojo::Base -base, -signatures;
+use Mojo::Base -base,                           -signatures;
 use Mojo::Base 'Game::EvonyTKR::Role::Logging', -role;
-use Mojo::Base 'Game::EvonyTKR::Role::Common',           -role;
+use Mojo::Base 'Game::EvonyTKR::Role::Common',  -role;
 use Mojo::File;
 use Mojo::SQLite;
 use Mojo::JSON qw(encode_json decode_json);
@@ -43,10 +43,9 @@ sub _initialize_schema ($self, $sqlite) {
 
   my $current_version = 0;
   if ($tables) {
-    my $version_row = $db->query(
-      'SELECT value FROM metadata WHERE key = ?',
-      'schema_version'
-    )->hash;
+    my $version_row =
+      $db->query('SELECT value FROM metadata WHERE key = ?', 'schema_version')
+      ->hash;
     $current_version = $version_row ? $version_row->{value} : 0;
   }
 
@@ -54,7 +53,7 @@ sub _initialize_schema ($self, $sqlite) {
     $self->logger->info('Initializing persistence database schema');
     $self->_create_schema_v1($db);
     $self->_set_metadata_direct($db, 'schema_version', $SCHEMA_VERSION);
-    $self->_set_metadata_direct($db, 'lifecycle_id', $self->lifecycle_id);
+    $self->_set_metadata_direct($db, 'lifecycle_id',   $self->lifecycle_id);
   }
   elsif ($current_version < $SCHEMA_VERSION) {
     $self->logger->info(sprintf(
@@ -155,10 +154,17 @@ sub _create_schema_v1 ($self, $db) {
   });
 
   # Indices for common queries
-  $db->query('CREATE INDEX IF NOT EXISTS idx_job_completions_lifecycle ON job_completions(lifecycle_id)');
-  $db->query('CREATE INDEX IF NOT EXISTS idx_generals_loaded_at ON generals(loaded_at)');
-  $db->query('CREATE INDEX IF NOT EXISTS idx_conflicts_general1 ON general_conflicts(general1_name)');
-  $db->query('CREATE INDEX IF NOT EXISTS idx_conflicts_general2 ON general_conflicts(general2_name)');
+  $db->query(
+'CREATE INDEX IF NOT EXISTS idx_job_completions_lifecycle ON job_completions(lifecycle_id)'
+  );
+  $db->query(
+    'CREATE INDEX IF NOT EXISTS idx_generals_loaded_at ON generals(loaded_at)');
+  $db->query(
+'CREATE INDEX IF NOT EXISTS idx_conflicts_general1 ON general_conflicts(general1_name)'
+  );
+  $db->query(
+'CREATE INDEX IF NOT EXISTS idx_conflicts_general2 ON general_conflicts(general2_name)'
+  );
 
   $self->logger->info('Schema v1 created successfully');
 }
@@ -181,7 +187,7 @@ sub _migrate_schema ($self, $db, $from_version, $to_version) {
 # Internal helper to avoid recursion during initialization
 sub _set_metadata_direct ($self, $db, $key, $value) {
   $db->query(
-    q{INSERT OR REPLACE INTO metadata (key, value, updated_at) VALUES (?, ?, strftime('%s', 'now'))},
+q{INSERT OR REPLACE INTO metadata (key, value, updated_at) VALUES (?, ?, strftime('%s', 'now'))},
     $key, $value
   );
   return 1;
@@ -189,10 +195,8 @@ sub _set_metadata_direct ($self, $db, $key, $value) {
 
 sub get_metadata ($self, $key) {
   my $db = $self->sqlite->db;
-  my $result = $db->query(
-    'SELECT value FROM metadata WHERE key = ?',
-    $key
-  )->hash;
+  my $result =
+    $db->query('SELECT value FROM metadata WHERE key = ?', $key)->hash;
 
   return $result ? $result->{value} : undef;
 }
@@ -214,7 +218,8 @@ sub needs_rebuild ($self) {
 
   # Check if we have any data
   my $db = $self->sqlite->db;
-  my $general_count = $db->query('SELECT COUNT(*) as count FROM generals')->hash->{count};
+  my $general_count =
+    $db->query('SELECT COUNT(*) as count FROM generals')->hash->{count};
   return 1 if $general_count == 0;
 
   return 0;
@@ -227,10 +232,12 @@ sub needs_rebuild ($self) {
 sub mark_job_completed ($self, $task_name, $notes = undef) {
   my $db = $self->sqlite->db;
 
-  $db->query(q{
+  $db->query(
+    q{
     INSERT OR REPLACE INTO job_completions (task_name, completed_at, lifecycle_id, notes)
     VALUES (?, strftime('%s', 'now'), ?, ?)
-  }, $task_name, $self->lifecycle_id, $notes);
+  }, $task_name, $self->lifecycle_id, $notes
+  );
 
   $self->logger->debug("Marked job as completed: $task_name");
   return 1;
@@ -239,10 +246,12 @@ sub mark_job_completed ($self, $task_name, $notes = undef) {
 sub is_job_completed ($self, $task_name) {
   my $db = $self->sqlite->db;
 
-  my $result = $db->query(q{
+  my $result = $db->query(
+    q{
     SELECT completed_at FROM job_completions
     WHERE task_name = ? AND lifecycle_id = ?
-  }, $task_name, $self->lifecycle_id)->hash;
+  }, $task_name, $self->lifecycle_id
+  )->hash;
 
   return defined($result);
 }
@@ -250,10 +259,12 @@ sub is_job_completed ($self, $task_name) {
 sub get_job_completion_time ($self, $task_name) {
   my $db = $self->sqlite->db;
 
-  my $result = $db->query(q{
+  my $result = $db->query(
+    q{
     SELECT completed_at FROM job_completions
     WHERE task_name = ? AND lifecycle_id = ?
-  }, $task_name, $self->lifecycle_id)->hash;
+  }, $task_name, $self->lifecycle_id
+  )->hash;
 
   return $result ? $result->{completed_at} : undef;
 }
@@ -262,9 +273,11 @@ sub clear_lifecycle_jobs ($self) {
   my $db = $self->sqlite->db;
 
   # Clear jobs from previous lifecycles
-  $db->query(q{
+  $db->query(
+    q{
     DELETE FROM job_completions WHERE lifecycle_id != ?
-  }, $self->lifecycle_id);
+  }, $self->lifecycle_id
+  );
 
   $self->logger->info('Cleared job completions from previous lifecycles');
   return 1;
@@ -278,10 +291,12 @@ sub store_general ($self, $name, $data_hash) {
   my $db = $self->sqlite->db;
 
   my $json = encode_json($data_hash);
-  $db->query(q{
+  $db->query(
+    q{
     INSERT OR REPLACE INTO generals (name, data_json, loaded_at)
     VALUES (?, ?, strftime('%s', 'now'))
-  }, $name, $json);
+  }, $name, $json
+  );
 
   return 1;
 }
@@ -289,10 +304,8 @@ sub store_general ($self, $name, $data_hash) {
 sub get_general ($self, $name) {
   my $db = $self->sqlite->db;
 
-  my $result = $db->query(
-    'SELECT data_json FROM generals WHERE name = ?',
-    $name
-  )->hash;
+  my $result =
+    $db->query('SELECT data_json FROM generals WHERE name = ?', $name)->hash;
 
   return $result ? decode_json($result->{data_json}) : undef;
 }
@@ -301,7 +314,8 @@ sub list_generals ($self) {
   my $db = $self->sqlite->db;
 
   my @generals;
-  my $results = $db->query('SELECT name, data_json FROM generals ORDER BY name');
+  my $results =
+    $db->query('SELECT name, data_json FROM generals ORDER BY name');
 
   while (my $row = $results->hash) {
     push @generals, decode_json($row->{data_json});
@@ -323,10 +337,12 @@ sub store_builtin_book ($self, $name, $data_hash) {
   my $db = $self->sqlite->db;
 
   my $json = encode_json($data_hash);
-  $db->query(q{
+  $db->query(
+    q{
     INSERT OR REPLACE INTO builtin_books (name, data_json, loaded_at)
     VALUES (?, ?, strftime('%s', 'now'))
-  }, $name, $json);
+  }, $name, $json
+  );
 
   return 1;
 }
@@ -334,10 +350,9 @@ sub store_builtin_book ($self, $name, $data_hash) {
 sub get_builtin_book ($self, $name) {
   my $db = $self->sqlite->db;
 
-  my $result = $db->query(
-    'SELECT data_json FROM builtin_books WHERE name = ?',
-    $name
-  )->hash;
+  my $result =
+    $db->query('SELECT data_json FROM builtin_books WHERE name = ?', $name)
+    ->hash;
 
   return $result ? decode_json($result->{data_json}) : undef;
 }
@@ -346,7 +361,8 @@ sub list_builtin_books ($self) {
   my $db = $self->sqlite->db;
 
   my @books;
-  my $results = $db->query('SELECT name, data_json FROM builtin_books ORDER BY name');
+  my $results =
+    $db->query('SELECT name, data_json FROM builtin_books ORDER BY name');
 
   while (my $row = $results->hash) {
     push @books, decode_json($row->{data_json});
@@ -363,10 +379,12 @@ sub store_generic_book ($self, $name, $level, $data_hash) {
   my $db = $self->sqlite->db;
 
   my $json = encode_json($data_hash);
-  $db->query(q{
+  $db->query(
+    q{
     INSERT OR REPLACE INTO generic_books (name, level, data_json, loaded_at)
     VALUES (?, ?, ?, strftime('%s', 'now'))
-  }, $name, $level, $json);
+  }, $name, $level, $json
+  );
 
   return 1;
 }
@@ -376,8 +394,7 @@ sub get_generic_book ($self, $name, $level) {
 
   my $result = $db->query(
     'SELECT data_json FROM generic_books WHERE name = ? AND level = ?',
-    $name, $level
-  )->hash;
+    $name, $level)->hash;
 
   return $result ? decode_json($result->{data_json}) : undef;
 }
@@ -386,7 +403,8 @@ sub list_generic_books ($self) {
   my $db = $self->sqlite->db;
 
   my @books;
-  my $results = $db->query('SELECT name, level, data_json FROM generic_books ORDER BY name, level');
+  my $results = $db->query(
+    'SELECT name, level, data_json FROM generic_books ORDER BY name, level');
 
   while (my $row = $results->hash) {
     push @books, decode_json($row->{data_json});
@@ -403,10 +421,12 @@ sub store_covenant ($self, $name, $data_hash) {
   my $db = $self->sqlite->db;
 
   my $json = encode_json($data_hash);
-  $db->query(q{
+  $db->query(
+    q{
     INSERT OR REPLACE INTO covenants (name, data_json, loaded_at)
     VALUES (?, ?, strftime('%s', 'now'))
-  }, $name, $json);
+  }, $name, $json
+  );
 
   return 1;
 }
@@ -414,10 +434,8 @@ sub store_covenant ($self, $name, $data_hash) {
 sub get_covenant ($self, $name) {
   my $db = $self->sqlite->db;
 
-  my $result = $db->query(
-    'SELECT data_json FROM covenants WHERE name = ?',
-    $name
-  )->hash;
+  my $result =
+    $db->query('SELECT data_json FROM covenants WHERE name = ?', $name)->hash;
 
   return $result ? decode_json($result->{data_json}) : undef;
 }
@@ -426,7 +444,8 @@ sub list_covenants ($self) {
   my $db = $self->sqlite->db;
 
   my @covenants;
-  my $results = $db->query('SELECT name, data_json FROM covenants ORDER BY name');
+  my $results =
+    $db->query('SELECT name, data_json FROM covenants ORDER BY name');
 
   while (my $row = $results->hash) {
     push @covenants, decode_json($row->{data_json});
@@ -443,10 +462,12 @@ sub store_specialty ($self, $name, $data_hash) {
   my $db = $self->sqlite->db;
 
   my $json = encode_json($data_hash);
-  $db->query(q{
+  $db->query(
+    q{
     INSERT OR REPLACE INTO specialties (name, data_json, loaded_at)
     VALUES (?, ?, strftime('%s', 'now'))
-  }, $name, $json);
+  }, $name, $json
+  );
 
   return 1;
 }
@@ -454,10 +475,8 @@ sub store_specialty ($self, $name, $data_hash) {
 sub get_specialty ($self, $name) {
   my $db = $self->sqlite->db;
 
-  my $result = $db->query(
-    'SELECT data_json FROM specialties WHERE name = ?',
-    $name
-  )->hash;
+  my $result =
+    $db->query('SELECT data_json FROM specialties WHERE name = ?', $name)->hash;
 
   return $result ? decode_json($result->{data_json}) : undef;
 }
@@ -466,7 +485,8 @@ sub list_specialties ($self) {
   my $db = $self->sqlite->db;
 
   my @specialties;
-  my $results = $db->query('SELECT name, data_json FROM specialties ORDER BY name');
+  my $results =
+    $db->query('SELECT name, data_json FROM specialties ORDER BY name');
 
   while (my $row = $results->hash) {
     push @specialties, decode_json($row->{data_json});
@@ -483,10 +503,12 @@ sub store_ascending_attribute ($self, $name, $data_hash) {
   my $db = $self->sqlite->db;
 
   my $json = encode_json($data_hash);
-  $db->query(q{
+  $db->query(
+    q{
     INSERT OR REPLACE INTO ascending_attributes (name, data_json, loaded_at)
     VALUES (?, ?, strftime('%s', 'now'))
-  }, $name, $json);
+  }, $name, $json
+  );
 
   return 1;
 }
@@ -494,10 +516,9 @@ sub store_ascending_attribute ($self, $name, $data_hash) {
 sub get_ascending_attribute ($self, $name) {
   my $db = $self->sqlite->db;
 
-  my $result = $db->query(
-    'SELECT data_json FROM ascending_attributes WHERE name = ?',
-    $name
-  )->hash;
+  my $result =
+    $db->query('SELECT data_json FROM ascending_attributes WHERE name = ?',
+    $name)->hash;
 
   return $result ? decode_json($result->{data_json}) : undef;
 }
@@ -506,7 +527,8 @@ sub list_ascending_attributes ($self) {
   my $db = $self->sqlite->db;
 
   my @attrs;
-  my $results = $db->query('SELECT name, data_json FROM ascending_attributes ORDER BY name');
+  my $results = $db->query(
+    'SELECT name, data_json FROM ascending_attributes ORDER BY name');
 
   while (my $row = $results->hash) {
     push @attrs, decode_json($row->{data_json});
@@ -525,10 +547,12 @@ sub store_conflict ($self, $general1_name, $general2_name) {
   # Always store in alphabetical order to avoid duplicates
   my ($name1, $name2) = sort ($general1_name, $general2_name);
 
-  $db->query(q{
+  $db->query(
+    q{
     INSERT OR IGNORE INTO general_conflicts (general1_name, general2_name, detected_at)
     VALUES (?, ?, strftime('%s', 'now'))
-  }, $name1, $name2);
+  }, $name1, $name2
+  );
 
   return 1;
 }
@@ -541,8 +565,7 @@ sub get_conflicts_for_general ($self, $general_name) {
   # Find conflicts where this general is first
   my $results1 = $db->query(
     'SELECT general2_name FROM general_conflicts WHERE general1_name = ?',
-    $general_name
-  );
+    $general_name);
   while (my $row = $results1->hash) {
     push @conflicts, $row->{general2_name};
   }
@@ -550,8 +573,7 @@ sub get_conflicts_for_general ($self, $general_name) {
   # Find conflicts where this general is second
   my $results2 = $db->query(
     'SELECT general1_name FROM general_conflicts WHERE general2_name = ?',
-    $general_name
-  );
+    $general_name);
   while (my $row = $results2->hash) {
     push @conflicts, $row->{general1_name};
   }
@@ -563,7 +585,8 @@ sub load_all_conflicts ($self) {
   my $db = $self->sqlite->db;
 
   my %by_general;
-  my $results = $db->query('SELECT general1_name, general2_name FROM general_conflicts');
+  my $results =
+    $db->query('SELECT general1_name, general2_name FROM general_conflicts');
 
   while (my $row = $results->hash) {
     my $g1 = $row->{general1_name};
@@ -579,7 +602,8 @@ sub load_all_conflicts ($self) {
 
 sub count_conflicts ($self) {
   my $db = $self->sqlite->db;
-  return $db->query('SELECT COUNT(*) as count FROM general_conflicts')->hash->{count};
+  return $db->query('SELECT COUNT(*) as count FROM general_conflicts')
+    ->hash->{count};
 }
 
 1;
