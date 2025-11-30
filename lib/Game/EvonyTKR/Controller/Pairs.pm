@@ -17,7 +17,7 @@ use namespace::autoclean;
 
 package Game::EvonyTKR::Controller::Pairs {
   use Mojo::Base 'Game::EvonyTKR::Controller::ControllerBase';
-  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Generals',        -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Persistence',        -role;
   use Mojo::Base 'Game::EvonyTKR::Controller::Role::Pairs',           -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants', -role;
   use Mojo::IOLoop;

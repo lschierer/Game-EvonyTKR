@@ -9,11 +9,11 @@ use List::AllUtils qw( first any none all );
 
   use Mojo::Base 'Game::EvonyTKR::Model::Base';
   use Mojo::Base 'Game::EvonyTKR::Role::Logging',                         -role;
-  use Mojo::Base 'Game::EvonyTKR::Controller::Role::AscendingAttributes', -role;
-  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Books',               -role;
-  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Covenants',           -role;
-  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Generals',            -role;
-  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Specialties',         -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Persistence', -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Persistence',               -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Persistence',           -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Persistence',            -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Persistence',         -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants',        -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants',     -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::Books',                -role;

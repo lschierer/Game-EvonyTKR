@@ -5,8 +5,6 @@ require Game::EvonyTKR::Model::Covenant;
 
 package Game::EvonyTKR::External::Covenant::Loader {
   use Mojo::Base 'Game::EvonyTKR::External::JobBase',           -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Generals',  -role;
-  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Covenants', -role;
   use Mojo::File;
   use YAML::PP;
   use Encode;

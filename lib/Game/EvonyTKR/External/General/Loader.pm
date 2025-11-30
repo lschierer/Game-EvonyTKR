@@ -4,7 +4,6 @@ use File::FindLib 'lib';
 
 package Game::EvonyTKR::External::General::Loader {
   use Mojo::Base 'Game::EvonyTKR::External::JobBase',          -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Generals', -role;
   use Mojo::File;
   use YAML::PP;
   use Scalar::Util;

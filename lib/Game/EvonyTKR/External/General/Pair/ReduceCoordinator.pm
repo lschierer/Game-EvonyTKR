@@ -134,6 +134,11 @@ package Game::EvonyTKR::External::General::Pair::ReduceCoordinator {
           %{ $merged_by_general->{$general} },
           %{ $batch_results->{by_general}->{$general} }
         );
+
+        # Store conflicts to persistence
+        foreach my $other_general (keys %{ $batch_results->{by_general}->{$general} }) {
+          $job->persistence->store_conflict($general, $other_general);
+        }
       }
     }
 

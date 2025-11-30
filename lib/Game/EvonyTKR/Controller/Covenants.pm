@@ -21,8 +21,7 @@ use namespace::autoclean;
 
 package Game::EvonyTKR::Controller::Covenants {
   use Mojo::Base 'Game::EvonyTKR::Controller::ControllerBase';
-  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Generals',  -role;
-  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Covenants', -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Persistence', -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::Covenants',  -role;
   use Mojo::IOLoop;
   use Mojo::Promise;

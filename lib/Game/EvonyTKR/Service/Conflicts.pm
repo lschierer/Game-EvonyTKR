@@ -98,6 +98,25 @@ sub is_general_and_book_compatible ($self, $general, $book, $opts = {}) {
   return $result == 0 ? 1 : 0;
 }
 
+# Load conflict data from persistence layer
+sub load_from_persistence ($self, $persistence) {
+  my $conflicts = $persistence->load_all_conflicts();
+
+  if ($conflicts && ref($conflicts) eq 'HASH') {
+    $self->by_general($conflicts);
+    my $count = scalar(keys %$conflicts);
+    $self->logger->debug("Loaded conflicts for $count generals from persistence");
+  }
+
+  return $self;
+}
+
+# Store new conflict to persistence
+sub store_to_persistence ($self, $persistence, $g1_name, $g2_name) {
+  $persistence->store_conflict($g1_name, $g2_name);
+  return $self;
+}
+
 sub _check_cache ($self, $g1, $g2) {
   my $name1 = $self->assume_g1_is_main ? $g1->name : $g2->name;
   my $name2 = $self->assume_g1_is_main ? $g2->name : $g1->name;
@@ -131,6 +150,10 @@ sub _troop_overlap ($self, $g1, $g2) {
   return $mask1 & $mask2;
 }
 
+sub preseed ($self, $new_by_general, $new_groups_by_conflict_type) {
+  $self->by_general($new_by_general);
+  $self->groups_by_conflict_type($new_groups_by_conflict_type);
+}
 
 
 1;

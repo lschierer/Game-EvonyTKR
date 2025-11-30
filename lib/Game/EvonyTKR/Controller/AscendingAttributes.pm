@@ -9,7 +9,7 @@ use namespace::clean;
 package Game::EvonyTKR::Controller::AscendingAttributes {
   use Mojo::Base 'Game::EvonyTKR::Controller::ControllerBase', -strict,
     -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Controller::Role::AscendingAttributes', -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Persistence', -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::AscendingAttributes',  -role;
   use List::AllUtils qw(uniq first);
   use Carp;
@@ -33,7 +33,7 @@ package Game::EvonyTKR::Controller::AscendingAttributes {
 
     return $c->_hydrate_from_list(
       $app,
-      sub ($app2) { $c->list_ascending_attributes($app2) },    # expected AAs
+      sub ($app2) { $c->list_ascending_attributes() },    # expected AAs
       sub ($aa_name) { $c->get_ascending_attributes($aa_name) },
       \%aa_by_general,
       \$sig,

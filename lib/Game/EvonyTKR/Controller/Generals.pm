@@ -22,7 +22,7 @@ use namespace::autoclean;
 
 package Game::EvonyTKR::Controller::Generals {
   use Mojo::Base 'Game::EvonyTKR::Controller::ControllerBase';
-  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Generals', -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Persistence', -role;
   use Mojo::Base 'Game::EvonyTKR::Role::StaticPages',          -role;
   use Mojo::IOLoop;
   use Mojo::Promise;
@@ -33,12 +33,29 @@ package Game::EvonyTKR::Controller::Generals {
 
   use Carp;
 
-  # Specify which collection this controller handles
-  sub collection_name {'generals'}
+  has generals_prereqs => sub {
+    return [qw(
+      build_general_indexes
+      create_pairs
+      load_ascending_attributes
+      load_book
+      load_covenant
+      load_general
+      load_specialty
+      monitor_loaders
+      reduce_coordinator
+    )];
+  };
 
-  sub controller_name ($self) {
-    return "Generals";
-  }
+  sub get_general_routing ($self) {
+    state $routing = Game::EvonyTKR::Control::Generals::Routing->new();
+    return $routing;
+  };
+
+  # Specify which collection this controller handles
+  has collection_name => 'generals';
+
+  has controller_name => 'Generals';
 
   my $base = '/Generals';
 
@@ -48,13 +65,17 @@ package Game::EvonyTKR::Controller::Generals {
 
   my $max_concurrency = 15;
 
-  sub getBase($self) {
+  has getBase => sub ($self) {
     return $base;
-  }
+  };
 
   sub register($c, $app, $config = {}) {
     $c->logger->info("Registering routes for " . ref($c));
     $c->SUPER::register($app, $config);
+
+    if($app->mode eq 'development'){
+      $c->get_general_routing->set_debug(1);
+    }
 
     eval {
       $c->logger->debug(
@@ -87,34 +108,12 @@ package Game::EvonyTKR::Controller::Generals {
 
   sub setup_helpers($c, $app) {
 
-    $app->helper(
-      general_routing => sub {
-        state $routing = Game::EvonyTKR::Control::Generals::Routing->new(
-          debug => $app->mode eq 'development',);
-        return $routing;
-      }
-    );
-
-    # the pair building jobs are necessary
-    # because they also collect conflict data
-    $app->helper(
-      generals_prereqs => sub {
-        return [qw(
-          build_general_indexes
-          create_pairs
-          load_ascending_attributes
-          load_book
-          load_covenant
-          load_general
-          load_specialty
-          monitor_loaders
-          reduce_coordinator
-        )];
-      }
-    );
+    $app->helper(general_routing => sub{
+      return $c->get_general_routing();
+    });
 
     $app->plugins->emit(
-      general_routing_available => { routing => $app->general_routing });
+      get_general_routing_available => { routing => $c->get_general_routing() });
   }
 
   sub setup_routes($c, $app) {
@@ -161,9 +160,9 @@ package Game::EvonyTKR::Controller::Generals {
         is_valid_uiTarget => sub ($route, $controller, $captures, $arg) {
           my $ui = $captures->{uiTarget};
           # make this deterministic: compare exact left side of key
-          my $slug = $app->general_routing->_slugify($ui);
+          my $slug = $c->get_general_routing()->_slugify($ui);
           my $ok   = 0;
-          for my $key (keys $app->general_routing->validRoutes->%*) {
+          for my $key (keys $c->get_general_routing()->validRoutes->%*) {
             my ($left) = split /\|/, $key, 2;
             if ($left eq $slug) { $ok = 1; last }
           }
@@ -175,7 +174,7 @@ package Game::EvonyTKR::Controller::Generals {
       $app->routes->add_condition(
         is_valid_buffActivation => sub ($route, $controller, $captures, $arg) {
           my ($ui, $buff) = @$captures{qw(uiTarget buffActivation)};
-          my $ok = $app->general_routing->has_route($ui, $buff) ? 1 : 0;
+          my $ok = $c->get_general_routing()->has_route($ui, $buff) ? 1 : 0;
           $c->logger->debug("check ui='$ui' buff='$buff' -> $ok");
           return $ok;    # never die here
         }
@@ -231,7 +230,7 @@ package Game::EvonyTKR::Controller::Generals {
     });
 
     # nav items for the dynamic routes
-    foreach my $route ($app->general_routing->all_valid_routes()) {
+    foreach my $route ($c->get_general_routing()->all_valid_routes()) {
       $c->logger->debug("building nav items for "
           . $route->{uiTarget} . "|"
           . $route->{buffActivation});
@@ -281,6 +280,9 @@ package Game::EvonyTKR::Controller::Generals {
       # Check if the word (converted to lowercase) is in the articles list
       if (grep { lc($word) eq $_ } @articles) {
         push @capitalized_words, lc($word);    # Keep articles lowercase
+      }
+      elsif ($word =~ /^[xiv]+$/i) {
+        push @capitalized_words, uc($word);    # Uppercase Roman numerals
       }
       else {
         push @capitalized_words, ucfirst(lc($word));   # Capitalize first letter
@@ -332,9 +334,9 @@ package Game::EvonyTKR::Controller::Generals {
     my $base      = $c->getBase();
     $c->logger->debug("Generals index method has base $base");
 
-    my $items = $c->get_generals() // {};
+    my $items = $c->get_generals() // [];
     $c->logger->debug(
-      sprintf('Items: %s with %s keys.', ref($items), scalar(keys %$items)));
+      sprintf('Items: %s with %s generals.', ref($items), scalar(@$items)));
     $c->stash(
       linkBase        => $base,
       items           => $items,
@@ -371,7 +373,7 @@ package Game::EvonyTKR::Controller::Generals {
     }
 
     my @valid_routes =
-      $self->general_routing->get_routes_for_uiTarget($uiTarget);
+      $self->get_general_routing->get_routes_for_uiTarget($uiTarget);
     $self->logger->debug("found valid_routes "
         . Data::Printer::np(@valid_routes)
         . "for $uiTarget");
@@ -417,7 +419,7 @@ package Game::EvonyTKR::Controller::Generals {
     }
 
     my $route =
-      $self->general_routing->lookup_route($uiTarget, $buffActivation);
+      $self->get_general_routing->lookup_route($uiTarget, $buffActivation);
 
     # Validate the parameters
     unless ($route) {
@@ -564,7 +566,7 @@ package Game::EvonyTKR::Controller::Generals {
             Mojo::Base->new->with_roles(
               'Game::EvonyTKR::Role::Logging',
               'Game::EvonyTKR::Role::Common',
-              'Game::EvonyTKR::Controller::Role::Covenants'
+              'Game::EvonyTKR::Role::Persistence'
             );
           };
           if ($@) {
@@ -629,7 +631,7 @@ package Game::EvonyTKR::Controller::Generals {
     my $slug_buff = $c->stash('buffActivation');    # from captured route
 
     # Lookup full route metadata
-    my $routing    = $c->general_routing;
+    my $routing    = $c->get_general_routing();
     my $route_meta = $routing->lookup_route($slug_ui, $slug_buff);
 
     unless ($route_meta) {
@@ -705,7 +707,7 @@ package Game::EvonyTKR::Controller::Generals {
     $self->logger->debug("final session_id is '$session_id'");
 
     # Lookup route metadata
-    my $routing    = $self->general_routing;
+    my $routing    = $self->get_general_routing();
     my $route_meta = $routing->lookup_route($slug_ui, $slug_buff);
 
     unless ($route_meta) {
@@ -728,10 +730,41 @@ package Game::EvonyTKR::Controller::Generals {
     my $buffActivation = $route_meta->{buffActivation};
     my $uiTarget       = $route_meta->{uiTarget};
 
-    my @selected = $self->get_generals_by_type($generalType)->@*;
+    my @all_generals = $self->get_generals()->@*;
+    $self->logger->debug(sprintf('get_generals returned %s generals', scalar(@all_generals)));
+
+    my @selected = grep {
+      my $gen = $_;
+      my $result = 0;
+
+      eval {
+        my $type = $gen->type;
+
+        if (!defined $type) {
+          # Skip generals with no type
+          $result = 0;
+        }
+        elsif (ref($type) eq 'ARRAY') {
+          $result = any { $_ eq $generalType } @$type;
+        }
+        else {
+          $result = ($type eq $generalType);
+        }
+        1;
+      } or do {
+        $self->logger->error(sprintf(
+          'Error filtering general %s: %s',
+          $gen->name // 'unknown',
+          $@
+        ));
+        $result = 0;
+      };
+
+      $result;
+    } @all_generals;
 
     $self->logger->debug(
-      sprintf('There are %s generals to return.', scalar(@selected)));
+      sprintf('grep filtered the list from %s to %s', scalar(@all_generals), scalar(@selected)));
 
     # Return just the basic name information without computing buffs
     my @names = map { { primary => $_->name } } @selected;

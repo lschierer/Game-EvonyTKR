@@ -4,7 +4,6 @@ use File::FindLib 'lib';
 
 package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
   use Mojo::Base 'Game::EvonyTKR::External::JobBase',          -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Generals', -role;
   use Mojo::Base 'Game::EvonyTKR::Controller::Role::Pairs',    -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants', -role;
 
@@ -52,7 +51,7 @@ package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
     my $generals = $job->get_generals();
 
     $job->logger->info(
-      sprintf('Found %d generals to process', scalar keys %$generals));
+      sprintf('Found %d generals to process', scalar @$generals));
 
     # Spawn CreatePairs jobs for each general/type combination
     my $job_count     = 0;
@@ -60,9 +59,8 @@ package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
     my $batch_count   = 0;
     my %type_counters = ();    # Track how many jobs per type
 
-    foreach my $general_name (sort keys %$generals)
-    {                          # Sort for deterministic order
-      my $general = $generals->{$general_name};
+    foreach my $general (sort { $a->name cmp $b->name} @$generals)
+    {
 
       # Handle scalar vs array types for this general
       my $general_types = $general->type // [];
@@ -83,13 +81,13 @@ package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
         $priority = ($type_counters{$type} <= 3) ? 10 : $priority;
 
         my $job_id = $job->minion->enqueue(
-          'create_pairs' => [$general_name, $type] => {
+          'create_pairs' => [$general->name, $type] => {
             priority => $priority,
           }
         );
         $job->logger->debug(sprintf(
           'Enqueued create_pairs job %s for general %s, type %s (priority %d)',
-          $job_id, $general_name, $type, $priority
+          $job_id, $general->name, $type, $priority
         ));
 
         # Add to type-specific batch
@@ -119,7 +117,8 @@ package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
               }
             );
             $job->logger->debug(sprintf(
-'Spawned type-balanced reduce_batch job %s for batch %d (%d jobs)',
+              'Spawned type-balanced reduce_batch job %s '.
+              'for batch %d (%d jobs)',
               $reduce_jid, ++$batch_count, scalar(@current_batch)
             ));
           }

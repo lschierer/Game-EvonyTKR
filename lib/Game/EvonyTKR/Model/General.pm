@@ -98,7 +98,7 @@ package Game::EvonyTKR::Model::General {
         Mojo::Base->new->with_roles(
           'Game::EvonyTKR::Role::Logging',
           'Game::EvonyTKR::Role::Common',
-          'Game::EvonyTKR::Controller::Role::AscendingAttributes'
+          'Game::EvonyTKR::Role::Persistence'
         );
       };
       if ($@) {
@@ -137,7 +137,7 @@ package Game::EvonyTKR::Model::General {
         Mojo::Base->new->with_roles(
           'Game::EvonyTKR::Role::Logging',
           'Game::EvonyTKR::Role::Common',
-          'Game::EvonyTKR::Controller::Role::Books'
+          'Game::EvonyTKR::Role::Persistence'
         );
       };
       if ($@) {
@@ -189,7 +189,7 @@ package Game::EvonyTKR::Model::General {
         Mojo::Base->new->with_roles(
           'Game::EvonyTKR::Role::Logging',
           'Game::EvonyTKR::Role::Common',
-          'Game::EvonyTKR::Controller::Role::Specialties'
+          'Game::EvonyTKR::Role::Persistence'
         );
       };
       if ($@) {

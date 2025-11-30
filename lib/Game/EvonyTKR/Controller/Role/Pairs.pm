@@ -305,22 +305,31 @@ package Game::EvonyTKR::Controller::Role::Pairs {
   }
 
   sub initialize_conflict_detector($self, $conflict_detector = undef) {
+    require Game::EvonyTKR::Service::Conflicts;
+
     # Create or use provided conflict detector
-    $conflict_detector //= Game::EvonyTKR::Model::General::Conflict::Book->new(
+    $conflict_detector //= Game::EvonyTKR::Service::Conflicts->new(
       build_index      => 1,
       asst_has_dragon  => 1,
       asst_has_spirit  => 1,
       allow_wall_buffs => 1,
     );
 
-    # Load existing conflict data from cache
+    # Load existing conflict data from persistence
+    $conflict_detector->load_from_persistence($self->persistence);
+
+    # Also try to load from memcached for backwards compatibility
     my $cached_conflicts = $self->conflict_cache->get('merged_conflicts');
-
-    if ($cached_conflicts) {
-      $self->logger->debug('Loading existing conflict data from cache');
-
-      $conflict_detector->preseed($cached_conflicts->{by_general},
-        $cached_conflicts->{groups_by_conflict_type});
+    if ($cached_conflicts && $cached_conflicts->{by_general}) {
+      # Merge cached conflicts with persisted ones
+      my $by_gen = $conflict_detector->by_general;
+      foreach my $g1 (keys %{ $cached_conflicts->{by_general} }) {
+        foreach my $g2 (keys %{ $cached_conflicts->{by_general}{$g1} }) {
+          $by_gen->{$g1}{$g2} = 1;
+        }
+      }
+      $conflict_detector->by_general($by_gen);
+      $self->logger->debug('Merged memcached conflicts with persistence');
     }
 
     return $conflict_detector;

@@ -14,6 +14,7 @@ package Game::EvonyTKR::Controller::ControllerBase {
   use Mojo::Base 'Game::EvonyTKR::Role::Logging',          -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Common',           -role;
   use Mojo::Base 'Game::EvonyTKR::Role::MarkdownRenderer', -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Persistence',      -role;
   require Mojo::File;
   require YAML::PP;
   require Data::Printer;

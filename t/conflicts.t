@@ -77,7 +77,7 @@ $logger = $testPackage->get_logger;
 
   package TestClass::Generals;
   use Mojo::Base 'TestBase::WithRoles';
-  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Generals', -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Persistence', -role;
   use Carp;
 
   # Mock only what's needed

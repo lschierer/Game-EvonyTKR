@@ -40,8 +40,8 @@ package Test::Package {
   use Mojo::Base -base,                                         -signatures;
   use Mojo::Base 'Game::EvonyTKR::Role::Logger',                -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Common',                -role;
-  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Generals',  -role;
-  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Covenants', -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Persistence',  -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Persistence', -role;
 
   sub loadAllGenerals($self) {
     my @yaml_files = $GeneralsDir->list->grep(sub {

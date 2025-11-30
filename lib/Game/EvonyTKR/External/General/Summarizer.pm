@@ -6,9 +6,6 @@ require Game::EvonyTKR::Model::Buff::Summarizer::Single;
 
 package Game::EvonyTKR::External::General::Summarizer {
   use Mojo::Base 'Game::EvonyTKR::External::JobBase',              -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Generals',     -role;
-  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Covenants',    -role;
-  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Books',        -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::Books',         -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants', -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants',    -role;

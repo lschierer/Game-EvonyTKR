@@ -20,7 +20,7 @@ package Test::Package {
   use Mojo::Base 'Game::EvonyTKR::Role::Logger',            -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Common',            -role;
   use Mojo::Base 'Game::EvonyTKR::Model::Role::Book',       -role;
-  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Books', -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Persistence', -role;
 
   state $bookCache;
 
@@ -126,7 +126,7 @@ package Test::Package {
         'Game::EvonyTKR::Role::Logger',
         'Game::EvonyTKR::Role::Cache',
         'Game::EvonyTKR::Role::Common',
-        'Game::EvonyTKR::Controller::Role::Books'
+        'Game::EvonyTKR::Role::Persistence'
       );
     } or do {
       $self->logger->error(

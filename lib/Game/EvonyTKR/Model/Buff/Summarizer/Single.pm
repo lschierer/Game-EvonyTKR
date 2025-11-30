@@ -20,7 +20,7 @@ sub _getGenericBookValue_impl ($self, $attribute, $troopType) {
     $books_helper //= do {
       my $helper = eval {
         Game::EvonyTKR::Model::Base->new->with_roles(
-          'Game::EvonyTKR::Controller::Role::Books',
+          'Game::EvonyTKR::Role::Persistence',
         );
       };
       if ($@) {
@@ -52,7 +52,7 @@ sub _getGenericBookValue_impl ($self, $attribute, $troopType) {
   $books_helper //= do {
     my $helper = eval {
       Game::EvonyTKR::Model::Base->new->with_roles(
-        'Game::EvonyTKR::Controller::Role::Books',
+        'Game::EvonyTKR::Role::Persistence',
         'Game::EvonyTKR::Role::Constants::Books',
       );
     };

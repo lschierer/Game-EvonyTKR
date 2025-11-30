@@ -14,7 +14,6 @@ require Mojo::Loader;
 
 package Game::EvonyTKR::External::Prebuild {
   use Mojo::Base 'Game::EvonyTKR::External::JobBase',          -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Generals', -role;
   use Mojo::Home;
   use Mojo::File;
   use Mojo::Loader;

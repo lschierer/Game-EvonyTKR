@@ -4,11 +4,11 @@
 </article>
 <div class="collection-list">
   <ul class="collection-grid">
-    <% if ($items && ref $items eq 'HASH') { %>
-      <% foreach my $key (sort(keys(%$items))) { %>
+    <% if ($items && ref $items eq 'ARRAY') { %>
+      <% foreach my $item (sort { $a->name cmp $b->name } @$items) { %>
         <li class="collection-item">
-          <a href="/Reference/Generals/<%= $items->{$key}->name %>/">
-            <%= $items->{$key}->name %>
+          <a href="/Reference/Generals/<%= $item->name %>/">
+            <%= $item->name %>
           </a>
         </li>
       <% } %>

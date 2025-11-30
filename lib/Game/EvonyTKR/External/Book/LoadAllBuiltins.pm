@@ -8,7 +8,6 @@ require Game::EvonyTKR::External::Common;
 
 package Game::EvonyTKR::External::Book::LoadAllBuiltins {
   use Mojo::Base 'Game::EvonyTKR::External::JobBase',       -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Books', -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Common',            -role;
   use List::AllUtils qw( any none uniq all );
   use Mojo::File;
@@ -58,11 +57,27 @@ package Game::EvonyTKR::External::Book::LoadAllBuiltins {
     ));
     my @list;
     push @list, $job->list_builtin_books()->@*;
-    $job->logger->info('list of builtin books is ' . Data::Printer::np(@list));
+    $job->logger->info(sprintf('Found %d builtin books to process', scalar @list));
+
+    my $enqueued_count = 0;
+    my $skipped_count = 0;
+    my @job_ids = ();
+
     my $maxIndex = scalar(@list) - 1;
     foreach my $index (0 .. $maxIndex) {
       my $entry = $list[$index];
-      $job->minion->enqueue(
+
+      # Check if already in persistence
+      if ($job->persistence->get_builtin_book($entry)) {
+        $job->logger->debug(sprintf(
+          'Skipping %s - already in persistence',
+          $entry
+        ));
+        $skipped_count++;
+        next;
+      }
+
+      my $job_id = $job->minion->enqueue(
         load_book => [
           $entry,
           {
@@ -78,7 +93,52 @@ package Game::EvonyTKR::External::Book::LoadAllBuiltins {
           priority => 20,
         }
       );
+      push @job_ids, $job_id;
+      $enqueued_count++;
     }
+
+    $job->logger->info(sprintf(
+      'Enqueued %d load_book jobs, skipped %d already in persistence',
+      $enqueued_count, $skipped_count
+    ));
+
+    # Wait for all child jobs to complete
+    if (@job_ids) {
+      $job->logger->info(sprintf('Waiting for %d child jobs to complete', scalar @job_ids));
+
+      my $finished = 0;
+      my $failed = 0;
+
+      while (1) {
+        my $all_done = 1;
+        $finished = 0;
+        $failed = 0;
+
+        for my $jid (@job_ids) {
+          my $info = $job->minion->job($jid);
+          next unless ($info && $info->{state});
+
+          if ($info->{state} eq 'finished') {
+            $finished++;
+          } elsif ($info->{state} eq 'failed') {
+            $failed++;
+          } else {
+            $all_done = 0;
+          }
+        }
+
+        last if $all_done;
+        sleep 2;
+      }
+
+      $job->logger->info(sprintf(
+        'Child jobs completed: %d finished, %d failed',
+        $finished, $failed
+      ));
+    }
+
+    # Mark this job as completed in persistence
+    $job->persistence->mark_job_completed($job->task_name);
   }
 }
 1;

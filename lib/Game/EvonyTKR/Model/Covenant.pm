@@ -13,10 +13,6 @@ package Game::EvonyTKR::Model::Covenant {
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants',    -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants', -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::Covenants',        -role;
-  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Generals', -role,
-    -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Covenants', -role,
-    -signatures;
   use builtin qw(indexed);
   use File::FindLib 'lib';
   use List::AllUtils qw(first any all none uniq);
@@ -174,7 +170,7 @@ package Game::EvonyTKR::Model::Covenant {
     state $general_helper //= do {
       my $helper = eval {
         Game::EvonyTKR::Model::Base->new->with_roles(
-          'Game::EvonyTKR::Controller::Role::Generals');
+          'Game::EvonyTKR::Role::Persistence');
       };
       if ($@) {
         $logger->error("Cannot create general helper: $@");
@@ -254,7 +250,7 @@ package Game::EvonyTKR::Model::Covenant {
     state $general_helper //= do {
       my $helper = eval {
         Game::EvonyTKR::Model::Base->new->with_roles(
-          'Game::EvonyTKR::Controller::Role::Generals');
+          'Game::EvonyTKR::Role::Persistence');
       };
       if ($@) {
         $logger->error("Cannot create general helper: $@");

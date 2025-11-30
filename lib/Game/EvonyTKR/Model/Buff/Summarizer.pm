@@ -145,7 +145,7 @@ package Game::EvonyTKR::Model::Buff::Summarizer {
         Mojo::Base->new->with_roles(
           'Game::EvonyTKR::Role::Logging',
           'Game::EvonyTKR::Role::Common',
-          'Game::EvonyTKR::Controller::Role::Covenants'
+          'Game::EvonyTKR::Role::Persistence'
         );
       };
       if ($@) {
@@ -172,7 +172,7 @@ package Game::EvonyTKR::Model::Buff::Summarizer {
     $books_helper //= do {
       my $helper = eval {
         Game::EvonyTKR::Model::Base->new->with_roles(
-          'Game::EvonyTKR::Controller::Role::Books',
+          'Game::EvonyTKR::Role::Persistence',
           'Game::EvonyTKR::Role::Constants::BuffConstants',
           'Game::EvonyTKR::Role::Constants::GeneralConstants',
           'Game::EvonyTKR::Role::Constants::Books',

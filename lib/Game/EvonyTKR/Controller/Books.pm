@@ -7,7 +7,7 @@ use namespace::clean;
 
 package Game::EvonyTKR::Controller::Books {
   use Mojo::Base 'Game::EvonyTKR::Controller::ControllerBase';
-  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Books', -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Persistence', -role;
   use Carp;
 
   # Specify which collection this controller handles

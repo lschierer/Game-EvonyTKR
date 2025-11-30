@@ -4,7 +4,6 @@ use File::FindLib 'lib';
 
 package Game::EvonyTKR::External::Specialty::LoadAllSpecialties {
   use Mojo::Base 'Game::EvonyTKR::External::JobBase', -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Role::Common',      -role;
   use Mojo::File;
 
   sub task_name {'load_all_specialties'}
@@ -42,9 +41,26 @@ package Game::EvonyTKR::External::Specialty::LoadAllSpecialties {
       $specialtyDir->list->grep(sub { $_ =~ /\.ya?ml$/ && -f -r $_ })->each;
 
     $job->logger->info(
-      sprintf('Found %d specialty files to load', scalar @files));
+      sprintf('Found %d specialty files to process', scalar @files));
+
+    my $enqueued_count = 0;
+    my $skipped_count = 0;
+    my @job_ids = ();
 
     foreach my $file (@files) {
+      # Extract specialty name from filename
+      my $specialty_name = $file->basename('.yaml', '.yml');
+
+      # Check if already in persistence
+      if ($job->persistence->get_specialty($specialty_name)) {
+        $job->logger->debug(sprintf(
+          'Skipping %s - already in persistence',
+          $specialty_name
+        ));
+        $skipped_count++;
+        next;
+      }
+
       my $job_id = $job->minion->enqueue(
         'load_specialty' => [$file->to_string] => {
           attempts => 3,
@@ -56,7 +72,52 @@ package Game::EvonyTKR::External::Specialty::LoadAllSpecialties {
         'Enqueued load_specialty job %s for file %s',
         $job_id, $file->basename
       ));
+      push @job_ids, $job_id;
+      $enqueued_count++;
     }
+
+    $job->logger->info(sprintf(
+      'Enqueued %d load_specialty jobs, skipped %d already in persistence',
+      $enqueued_count, $skipped_count
+    ));
+
+    # Wait for all child jobs to complete
+    if (@job_ids) {
+      $job->logger->info(sprintf('Waiting for %d child jobs to complete', scalar @job_ids));
+
+      my $finished = 0;
+      my $failed = 0;
+
+      while (1) {
+        my $all_done = 1;
+        $finished = 0;
+        $failed = 0;
+
+        for my $jid (@job_ids) {
+          my $info = $job->minion->job($jid);
+          next unless ($info && $info->{state});
+
+          if ($info->{state} eq 'finished') {
+            $finished++;
+          } elsif ($info->{state} eq 'failed') {
+            $failed++;
+          } else {
+            $all_done = 0;
+          }
+        }
+
+        last if $all_done;
+        sleep 2;
+      }
+
+      $job->logger->info(sprintf(
+        'Child jobs completed: %d finished, %d failed',
+        $finished, $failed
+      ));
+    }
+
+    # Mark this job as completed in persistence
+    $job->persistence->mark_job_completed($job->task_name);
 
     $job->logger->info('LoadAllSpecialties job completed');
   }

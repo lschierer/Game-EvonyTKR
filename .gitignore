@@ -29,3 +29,5 @@ share/tmp
 minion.db
 minion.db-wal
 minion.db-shm
+*.lock
+var/

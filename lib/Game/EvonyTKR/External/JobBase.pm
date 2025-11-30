@@ -3,10 +3,11 @@ use utf8::all;
 use File::FindLib 'lib';
 
 package Game::EvonyTKR::External::JobBase {
-  use Mojo::Base 'Minion::Job',                   -signatures;
-  use Mojo::Base 'Mojolicious::Plugin',           -role, -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Role::Common',  -role, -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Role::Logging', -role;
+  use Mojo::Base 'Minion::Job',                      -signatures;
+  use Mojo::Base 'Mojolicious::Plugin',              -role, -signatures;
+  use Mojo::Base 'Game::EvonyTKR::Role::Common',     -role, -signatures;
+  use Mojo::Base 'Game::EvonyTKR::Role::Logging',    -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Persistence', -role;
   use diagnostics;
   use Carp;
 

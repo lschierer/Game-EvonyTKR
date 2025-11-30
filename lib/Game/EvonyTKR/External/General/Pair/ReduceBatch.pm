@@ -110,6 +110,9 @@ package Game::EvonyTKR::External::General::Pair::ReduceBatch {
         $merged_by_general->{$general} //= {};
         foreach my $other_general (keys %{ $notes->{by_general}->{$general} }) {
           $merged_by_general->{$general}->{$other_general} = 1;
+
+          # Store conflict to persistence (INSERT OR IGNORE handles duplicates)
+          $job->persistence->store_conflict($general, $other_general);
         }
       }
     }

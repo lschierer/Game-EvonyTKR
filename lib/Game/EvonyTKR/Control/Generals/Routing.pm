@@ -13,7 +13,7 @@ class Game::EvonyTKR::Control::Generals::Routing :
   use Carp;
 
   field $validRoutes : reader;
-  field $debug : param //= 0;
+  field $debug :writer : param //= 0;
 
   ADJUST {
     $validRoutes = {};

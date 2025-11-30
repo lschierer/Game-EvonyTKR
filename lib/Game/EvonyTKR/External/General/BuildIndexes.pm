@@ -4,8 +4,6 @@ use File::FindLib 'lib';
 
 package Game::EvonyTKR::External::General::BuildIndexes {
   use Mojo::Base 'Game::EvonyTKR::External::JobBase',          -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Role::Common',               -role;
-  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Generals', -role;
 
   sub task_name {'build_general_indexes'}
 

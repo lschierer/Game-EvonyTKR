@@ -86,7 +86,7 @@ package Game::EvonyTKR::Model::General::Pair {
         $general_helper = Mojo::Base->new->with_roles(
           'Game::EvonyTKR::Role::Logging',
           'Game::EvonyTKR::Role::Common',
-          'Game::EvonyTKR::Controller::Role::Generals'
+          'Game::EvonyTKR::Role::Persistence'
         );
       } or do {
         $logger->error(
