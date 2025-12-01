@@ -24,5 +24,6 @@ specialties:
 stars: red5
 type:
   - ranged_specialist
+  - mounted_specialist
 general: Elektra
 name: Elektra
