@@ -35,10 +35,10 @@ package Game::EvonyTKR::External::General::BuildIndexes {
       if ($job->are_prereqs_outstanding(
       $job->minion,
       [
-        'load_all_ascending_attributes', 'load_all_builtin_books',
-        'load_all_specialties',          'load_ascending_attributes',
-        'load_book',                     'load_specialty',
-        'load_all_generals',             'load_general',
+        'load_all_generals',
+        'load_all_builtin_books',
+        'load_all_specialties',
+        'load_all_ascending_attributes',
       ]
       ));
 
@@ -122,6 +122,10 @@ package Game::EvonyTKR::External::General::BuildIndexes {
       types            => \@type_list,
       generals_by_type => \%by_type,
     );
+
+    # Mark job as completed in persistence
+    $job->persistence->mark_job_completed($job->task_name);
+
     return $job->finish($msg);
   }
 }

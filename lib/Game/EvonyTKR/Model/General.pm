@@ -110,8 +110,8 @@ package Game::EvonyTKR::Model::General {
 
     return unless $ascending_helper;
 
-    my $key = lc($self->normalize($self->name));
-    $key =~ s/ /_/g;
+    # Don't convert spaces to underscores - persistence stores with spaces
+    my $key = $self->normalize($self->name);
 
     my $aa = $ascending_helper->get_ascending_attributes($key);
     if ($aa) {

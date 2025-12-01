@@ -12,6 +12,13 @@ use diagnostics;
 
 has pair => undef;
 
+# Secondary general has its own covenant and specialty levels
+has 'secondaryCovenantLevel' => 'Civilization';
+has 'secondarySpecialty1'    => 'gold';
+has 'secondarySpecialty2'    => 'gold';
+has 'secondarySpecialty3'    => 'gold';
+has 'secondarySpecialty4'    => 'gold';
+
 has pairBuffValues => sub {
   {
     'Ground Troops' =>
@@ -50,8 +57,16 @@ sub updateBuffs ($self) {
     return;
   }
 
+  # Store primary levels
+  my $primaryCovenantLevel = $self->covenantLevel;
+  my $primarySpecialty1    = $self->specialty1;
+  my $primarySpecialty2    = $self->specialty2;
+  my $primarySpecialty3    = $self->specialty3;
+  my $primarySpecialty4    = $self->specialty4;
+
   # Calculate primary buffs
   $self->general($self->pair->primary);
+  $self->isPrimary(1);
   $self->SUPER::updateBuffs();
   foreach my $troopType (keys %{ $self->buffValues }) {
     foreach my $attribute (keys %{ $self->buffValues->{$troopType} }) {
@@ -59,6 +74,13 @@ sub updateBuffs ($self) {
         $self->buffValues->{$troopType}->{$attribute};
     }
   }
+
+  # Switch to secondary levels
+  $self->covenantLevel($self->secondaryCovenantLevel);
+  $self->specialty1($self->secondarySpecialty1);
+  $self->specialty2($self->secondarySpecialty2);
+  $self->specialty3($self->secondarySpecialty3);
+  $self->specialty4($self->secondarySpecialty4);
 
   # Calculate secondary buffs
   $self->general($self->pair->secondary);
@@ -70,6 +92,13 @@ sub updateBuffs ($self) {
         $self->buffValues->{$troopType}->{$attribute};
     }
   }
+
+  # Restore primary levels
+  $self->covenantLevel($primaryCovenantLevel);
+  $self->specialty1($primarySpecialty1);
+  $self->specialty2($primarySpecialty2);
+  $self->specialty3($primarySpecialty3);
+  $self->specialty4($primarySpecialty4);
 }
 
 sub updateDebuffs ($self) {
@@ -85,8 +114,16 @@ sub updateDebuffs ($self) {
     return;
   }
 
+  # Store primary levels
+  my $primaryCovenantLevel = $self->covenantLevel;
+  my $primarySpecialty1    = $self->specialty1;
+  my $primarySpecialty2    = $self->specialty2;
+  my $primarySpecialty3    = $self->specialty3;
+  my $primarySpecialty4    = $self->specialty4;
+
   # Calculate primary debuffs
   $self->general($self->pair->primary);
+  $self->isPrimary(1);
   $self->SUPER::updateDebuffs();
   foreach my $troopType (keys %{ $self->debuffValues }) {
     foreach my $attribute (keys %{ $self->debuffValues->{$troopType} }) {
@@ -94,6 +131,13 @@ sub updateDebuffs ($self) {
         $self->debuffValues->{$troopType}->{$attribute};
     }
   }
+
+  # Switch to secondary levels
+  $self->covenantLevel($self->secondaryCovenantLevel);
+  $self->specialty1($self->secondarySpecialty1);
+  $self->specialty2($self->secondarySpecialty2);
+  $self->specialty3($self->secondarySpecialty3);
+  $self->specialty4($self->secondarySpecialty4);
 
   # Calculate secondary debuffs
   $self->general($self->pair->secondary);
@@ -105,6 +149,13 @@ sub updateDebuffs ($self) {
         $self->debuffValues->{$troopType}->{$attribute};
     }
   }
+
+  # Restore primary levels
+  $self->covenantLevel($primaryCovenantLevel);
+  $self->specialty1($primarySpecialty1);
+  $self->specialty2($primarySpecialty2);
+  $self->specialty3($primarySpecialty3);
+  $self->specialty4($primarySpecialty4);
 }
 
 # Override getGenericBookValue to check compatibility with both generals in pair
@@ -122,7 +173,11 @@ sub _getGenericBookValue_impl ($self, $attribute, $troopType) {
     $books_helper //= do {
       my $helper = eval {
         Game::EvonyTKR::Model::Base->new->with_roles(
-          'Game::EvonyTKR::Role::Persistence',);
+        'Game::EvonyTKR::Role::Persistence',
+        'Game::EvonyTKR::Role::Constants::BuffConstants',
+        'Game::EvonyTKR::Role::Constants::GeneralConstants',
+        'Game::EvonyTKR::Role::Constants::Books',
+        'Game::EvonyTKR::Role::Books',);
       };
       if ($@) {
         $self->logger->error("Cannot create books helper: $@");

@@ -37,11 +37,11 @@ package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
       if $job->are_prereqs_outstanding(
       $job->minion,
       [
-        'load_all_ascending_attributes', 'load_all_builtin_books',
-        'load_all_generals',             'load_all_specialties',
-        'load_ascending_attributes',     'load_book',
-        'load_general',                  'load_specialty',
-        'load_all_covenants',            'load_covenant',
+        'load_all_generals',
+        'load_all_builtin_books',
+        'load_all_specialties',
+        'load_all_ascending_attributes',
+        'load_all_covenants',
       ]
       );
 
@@ -156,6 +156,14 @@ package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
 
     $job->logger->info(sprintf(
 'LoadAllPairBuilders completed: spawned %d create_pairs jobs in %d batches',
+      $job_count, $batch_count
+    ));
+
+    # Mark job as completed in persistence
+    $job->persistence->mark_job_completed($job->task_name);
+
+    return $job->finish(sprintf(
+      'Spawned %d create_pairs jobs in %d batches',
       $job_count, $batch_count
     ));
   }

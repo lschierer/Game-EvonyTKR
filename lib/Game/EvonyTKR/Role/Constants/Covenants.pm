@@ -35,6 +35,18 @@ package Game::EvonyTKR::Role::Constants::Covenants {
     my @ordered = sort { $cats->{$a} <=> $cats->{$b} } keys %$cats;
     return \@ordered;
   };
+
+  sub checkCovenantLevel ($self, $proposedLevel) {
+    unless (defined($proposedLevel) && length($proposedLevel)) {
+      $self->logger->error("Invalid proposed level!!! $proposedLevel");
+      return 0;
+    }
+    my $check = {};
+    foreach my $key ($self->CovenantCategoryValues->@*) {
+      $check->{$key} = 1;
+    }
+    return exists $check->{$proposedLevel};
+  }
 }
 1;
 __END__

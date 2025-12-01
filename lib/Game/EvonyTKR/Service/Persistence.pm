@@ -10,7 +10,7 @@ use Mojo::JSON qw(encode_json decode_json);
 use Carp;
 
 # Schema version - increment when schema changes
-our $SCHEMA_VERSION = 1;
+our $SCHEMA_VERSION = 2;
 
 has 'db_path' => sub {
   my $home = Mojo::Home->new->detect('Game::EvonyTKR');
@@ -28,9 +28,20 @@ has 'sqlite' => sub ($self) {
   return $sqlite;
 };
 
-has 'lifecycle_id' => sub {
-  # Generate unique ID for this app lifecycle
-  return time . '_' . $$;
+has 'lifecycle_id' => sub ($self) {
+  # Ensure database is initialized first (this triggers _initialize_schema)
+  my $db = $self->sqlite;
+
+  # Now read lifecycle_id from metadata to ensure consistency across worker processes
+  my $stored = $self->get_metadata('lifecycle_id');
+
+  # If not in metadata (shouldn't happen after initialization), generate and store one
+  unless ($stored) {
+    $stored = time . '_' . $$;
+    $self->set_metadata('lifecycle_id', $stored);
+  }
+
+  return $stored;
 };
 
 sub _initialize_schema ($self, $sqlite) {
@@ -53,7 +64,10 @@ sub _initialize_schema ($self, $sqlite) {
     $self->logger->info('Initializing persistence database schema');
     $self->_create_schema_v1($db);
     $self->_set_metadata_direct($db, 'schema_version', $SCHEMA_VERSION);
-    $self->_set_metadata_direct($db, 'lifecycle_id',   $self->lifecycle_id);
+
+    # Generate and store lifecycle_id for this app instance
+    my $new_lifecycle_id = time . '_' . $$;
+    $self->_set_metadata_direct($db, 'lifecycle_id', $new_lifecycle_id);
   }
   elsif ($current_version < $SCHEMA_VERSION) {
     $self->logger->info(sprintf(
@@ -153,6 +167,19 @@ sub _create_schema_v1 ($self, $db) {
     )
   });
 
+  # Pairs (general pairings by type)
+  $db->query(q{
+    CREATE TABLE IF NOT EXISTS pairs (
+      pair_key TEXT PRIMARY KEY,
+      type TEXT NOT NULL,
+      primary_name TEXT NOT NULL,
+      secondary_name TEXT NOT NULL,
+      data_json TEXT NOT NULL,
+      lifecycle_id TEXT NOT NULL,
+      created_at INTEGER DEFAULT (strftime('%s', 'now'))
+    )
+  });
+
   # Indices for common queries
   $db->query(
 'CREATE INDEX IF NOT EXISTS idx_job_completions_lifecycle ON job_completions(lifecycle_id)'
@@ -165,19 +192,45 @@ sub _create_schema_v1 ($self, $db) {
   $db->query(
 'CREATE INDEX IF NOT EXISTS idx_conflicts_general2 ON general_conflicts(general2_name)'
   );
+  $db->query(
+    'CREATE INDEX IF NOT EXISTS idx_pairs_type ON pairs(type)');
+  $db->query(
+    'CREATE INDEX IF NOT EXISTS idx_pairs_lifecycle ON pairs(lifecycle_id)');
 
   $self->logger->info('Schema v1 created successfully');
 }
 
 sub _migrate_schema ($self, $db, $from_version, $to_version) {
-  # Future migrations go here
-  # for my $version ($from_version + 1 .. $to_version) {
-  #   if ($version == 2) {
-  #     $self->_migrate_to_v2($db);
-  #   }
-  # }
+  for my $version ($from_version + 1 .. $to_version) {
+    if ($version == 2) {
+      $self->_migrate_to_v2($db);
+    }
+  }
+}
 
-  $self->logger->warn('No migration path implemented yet');
+sub _migrate_to_v2 ($self, $db) {
+  $self->logger->info('Migrating to schema v2: adding pairs table');
+
+  # Add pairs table
+  $db->query(q{
+    CREATE TABLE IF NOT EXISTS pairs (
+      pair_key TEXT PRIMARY KEY,
+      type TEXT NOT NULL,
+      primary_name TEXT NOT NULL,
+      secondary_name TEXT NOT NULL,
+      data_json TEXT NOT NULL,
+      lifecycle_id TEXT NOT NULL,
+      created_at INTEGER DEFAULT (strftime('%s', 'now'))
+    )
+  });
+
+  # Add indices
+  $db->query(
+    'CREATE INDEX IF NOT EXISTS idx_pairs_type ON pairs(type)');
+  $db->query(
+    'CREATE INDEX IF NOT EXISTS idx_pairs_lifecycle ON pairs(lifecycle_id)');
+
+  $self->logger->info('Schema v2 migration completed');
 }
 
 ##############################################################################
@@ -289,13 +342,14 @@ sub clear_lifecycle_jobs ($self) {
 
 sub store_general ($self, $name, $data_hash) {
   my $db = $self->sqlite->db;
+  my $normalized_name = $self->normalize($name);
 
   my $json = encode_json($data_hash);
   $db->query(
     q{
     INSERT OR REPLACE INTO generals (name, data_json, loaded_at)
     VALUES (?, ?, strftime('%s', 'now'))
-  }, $name, $json
+  }, $normalized_name, $json
   );
 
   return 1;
@@ -303,9 +357,10 @@ sub store_general ($self, $name, $data_hash) {
 
 sub get_general ($self, $name) {
   my $db = $self->sqlite->db;
+  my $normalized_name = $self->normalize($name);
 
   my $result =
-    $db->query('SELECT data_json FROM generals WHERE name = ?', $name)->hash;
+    $db->query('SELECT data_json FROM generals WHERE name = ?', $normalized_name)->hash;
 
   return $result ? decode_json($result->{data_json}) : undef;
 }
@@ -335,13 +390,14 @@ sub count_generals ($self) {
 
 sub store_builtin_book ($self, $name, $data_hash) {
   my $db = $self->sqlite->db;
+  my $normalized_name = $self->normalize($name);
 
   my $json = encode_json($data_hash);
   $db->query(
     q{
     INSERT OR REPLACE INTO builtin_books (name, data_json, loaded_at)
     VALUES (?, ?, strftime('%s', 'now'))
-  }, $name, $json
+  }, $normalized_name, $json
   );
 
   return 1;
@@ -349,9 +405,10 @@ sub store_builtin_book ($self, $name, $data_hash) {
 
 sub get_builtin_book ($self, $name) {
   my $db = $self->sqlite->db;
+  my $normalized_name = $self->normalize($name);
 
   my $result =
-    $db->query('SELECT data_json FROM builtin_books WHERE name = ?', $name)
+    $db->query('SELECT data_json FROM builtin_books WHERE name = ?', $normalized_name)
     ->hash;
 
   return $result ? decode_json($result->{data_json}) : undef;
@@ -377,13 +434,14 @@ sub list_builtin_books ($self) {
 
 sub store_generic_book ($self, $name, $level, $data_hash) {
   my $db = $self->sqlite->db;
+  my $normalized_name = $self->normalize($name);
 
   my $json = encode_json($data_hash);
   $db->query(
     q{
     INSERT OR REPLACE INTO generic_books (name, level, data_json, loaded_at)
     VALUES (?, ?, ?, strftime('%s', 'now'))
-  }, $name, $level, $json
+  }, $normalized_name, $level, $json
   );
 
   return 1;
@@ -391,10 +449,11 @@ sub store_generic_book ($self, $name, $level, $data_hash) {
 
 sub get_generic_book ($self, $name, $level) {
   my $db = $self->sqlite->db;
+  my $normalized_name = $self->normalize($name);
 
   my $result = $db->query(
     'SELECT data_json FROM generic_books WHERE name = ? AND level = ?',
-    $name, $level)->hash;
+    $normalized_name, $level)->hash;
 
   return $result ? decode_json($result->{data_json}) : undef;
 }
@@ -419,13 +478,14 @@ sub list_generic_books ($self) {
 
 sub store_covenant ($self, $name, $data_hash) {
   my $db = $self->sqlite->db;
+  my $normalized_name = $self->normalize($name);
 
   my $json = encode_json($data_hash);
   $db->query(
     q{
     INSERT OR REPLACE INTO covenants (name, data_json, loaded_at)
     VALUES (?, ?, strftime('%s', 'now'))
-  }, $name, $json
+  }, $normalized_name, $json
   );
 
   return 1;
@@ -433,9 +493,10 @@ sub store_covenant ($self, $name, $data_hash) {
 
 sub get_covenant ($self, $name) {
   my $db = $self->sqlite->db;
+  my $normalized_name = $self->normalize($name);
 
   my $result =
-    $db->query('SELECT data_json FROM covenants WHERE name = ?', $name)->hash;
+    $db->query('SELECT data_json FROM covenants WHERE name = ?', $normalized_name)->hash;
 
   return $result ? decode_json($result->{data_json}) : undef;
 }
@@ -460,13 +521,14 @@ sub list_covenants ($self) {
 
 sub store_specialty ($self, $name, $data_hash) {
   my $db = $self->sqlite->db;
+  my $normalized_name = $self->normalize($name);
 
   my $json = encode_json($data_hash);
   $db->query(
     q{
     INSERT OR REPLACE INTO specialties (name, data_json, loaded_at)
     VALUES (?, ?, strftime('%s', 'now'))
-  }, $name, $json
+  }, $normalized_name, $json
   );
 
   return 1;
@@ -474,9 +536,10 @@ sub store_specialty ($self, $name, $data_hash) {
 
 sub get_specialty ($self, $name) {
   my $db = $self->sqlite->db;
+  my $normalized_name = $self->normalize($name);
 
   my $result =
-    $db->query('SELECT data_json FROM specialties WHERE name = ?', $name)->hash;
+    $db->query('SELECT data_json FROM specialties WHERE name = ?', $normalized_name)->hash;
 
   return $result ? decode_json($result->{data_json}) : undef;
 }
@@ -501,13 +564,14 @@ sub list_specialties ($self) {
 
 sub store_ascending_attribute ($self, $name, $data_hash) {
   my $db = $self->sqlite->db;
+  my $normalized_name = $self->normalize($name);
 
   my $json = encode_json($data_hash);
   $db->query(
     q{
     INSERT OR REPLACE INTO ascending_attributes (name, data_json, loaded_at)
     VALUES (?, ?, strftime('%s', 'now'))
-  }, $name, $json
+  }, $normalized_name, $json
   );
 
   return 1;
@@ -515,10 +579,11 @@ sub store_ascending_attribute ($self, $name, $data_hash) {
 
 sub get_ascending_attribute ($self, $name) {
   my $db = $self->sqlite->db;
+  my $normalized_name = $self->normalize($name);
 
   my $result =
     $db->query('SELECT data_json FROM ascending_attributes WHERE name = ?',
-    $name)->hash;
+    $normalized_name)->hash;
 
   return $result ? decode_json($result->{data_json}) : undef;
 }
@@ -544,8 +609,12 @@ sub list_ascending_attributes ($self) {
 sub store_conflict ($self, $general1_name, $general2_name) {
   my $db = $self->sqlite->db;
 
+  # Normalize names for consistent storage
+  my $norm1 = $self->normalize($general1_name);
+  my $norm2 = $self->normalize($general2_name);
+
   # Always store in alphabetical order to avoid duplicates
-  my ($name1, $name2) = sort ($general1_name, $general2_name);
+  my ($name1, $name2) = sort ($norm1, $norm2);
 
   $db->query(
     q{
@@ -559,13 +628,14 @@ sub store_conflict ($self, $general1_name, $general2_name) {
 
 sub get_conflicts_for_general ($self, $general_name) {
   my $db = $self->sqlite->db;
+  my $normalized_name = $self->normalize($general_name);
 
   my @conflicts;
 
   # Find conflicts where this general is first
   my $results1 = $db->query(
     'SELECT general2_name FROM general_conflicts WHERE general1_name = ?',
-    $general_name);
+    $normalized_name);
   while (my $row = $results1->hash) {
     push @conflicts, $row->{general2_name};
   }
@@ -573,7 +643,7 @@ sub get_conflicts_for_general ($self, $general_name) {
   # Find conflicts where this general is second
   my $results2 = $db->query(
     'SELECT general1_name FROM general_conflicts WHERE general2_name = ?',
-    $general_name);
+    $normalized_name);
   while (my $row = $results2->hash) {
     push @conflicts, $row->{general1_name};
   }
@@ -604,6 +674,101 @@ sub count_conflicts ($self) {
   my $db = $self->sqlite->db;
   return $db->query('SELECT COUNT(*) as count FROM general_conflicts')
     ->hash->{count};
+}
+
+##############################################################################
+# Pairs methods
+##############################################################################
+
+sub store_pair ($self, $key, $wire_pair) {
+  my $db = $self->sqlite->db;
+
+  # Normalize the key (already normalized in caller, but be safe)
+  my $normalized_key = $self->normalize($key);
+  $normalized_key =~ s/ /_/g;
+
+  my $json = encode_json($wire_pair);
+
+  $db->query(
+    q{
+    INSERT OR REPLACE INTO pairs (pair_key, type, primary_name, secondary_name, data_json, lifecycle_id, created_at)
+    VALUES (?, ?, ?, ?, ?, ?, strftime('%s', 'now'))
+  },
+    $normalized_key,
+    $wire_pair->{type},
+    $self->normalize($wire_pair->{primary}),
+    $self->normalize($wire_pair->{secondary}),
+    $json,
+    $self->lifecycle_id
+  );
+
+  return 1;
+}
+
+sub get_pair ($self, $key) {
+  my $db = $self->sqlite->db;
+
+  # Normalize the key to match storage format
+  my $normalized_key = $self->normalize($key);
+  $normalized_key =~ s/ /_/g;
+
+  my $result =
+    $db->query('SELECT data_json FROM pairs WHERE pair_key = ?', $normalized_key)
+    ->hash;
+
+  return $result ? decode_json($result->{data_json}) : undef;
+}
+
+sub list_pairs_by_type ($self, $type) {
+  my $db = $self->sqlite->db;
+  my $lifecycle_id = $self->lifecycle_id;
+
+  my $results = $db->query(
+    'SELECT data_json FROM pairs WHERE type = ? AND lifecycle_id = ?',
+    $type, $lifecycle_id
+  );
+
+  my @pairs;
+  while (my $row = $results->hash) {
+    push @pairs, decode_json($row->{data_json});
+  }
+
+  return \@pairs;
+}
+
+sub get_all_pair_types ($self) {
+  my $db = $self->sqlite->db;
+  my $lifecycle_id = $self->lifecycle_id;
+
+  my $results = $db->query(
+    'SELECT DISTINCT type FROM pairs WHERE lifecycle_id = ?',
+    $lifecycle_id
+  );
+
+  my @types;
+  while (my $row = $results->hash) {
+    push @types, $row->{type};
+  }
+
+  return \@types;
+}
+
+sub count_pairs_by_type ($self, $type = undef) {
+  my $db = $self->sqlite->db;
+  my $lifecycle_id = $self->lifecycle_id;
+
+  if (defined $type) {
+    return $db->query(
+      'SELECT COUNT(*) as count FROM pairs WHERE type = ? AND lifecycle_id = ?',
+      $type, $lifecycle_id
+    )->hash->{count};
+  }
+  else {
+    return $db->query(
+      'SELECT COUNT(*) as count FROM pairs WHERE lifecycle_id = ?',
+      $lifecycle_id
+    )->hash->{count};
+  }
 }
 
 1;

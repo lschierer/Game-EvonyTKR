@@ -77,7 +77,7 @@ sub appender_setup {
   my $config = qq(
     log4perl.rootLogger = WARN, LOGFILE
     log4perl.appender.LOGFILE = Log::Log4perl::Appender::File
-    log4perl.appender.LOGFILE.filename = $logDir/app-$$.log
+    log4perl.appender.LOGFILE.filename = $logDir/system.log
     log4perl.appender.LOGFILE.mode = append
     log4perl.appender.LOGFILE.utf8 = 1
     log4perl.appender.LOGFILE.layout = Log::Log4perl::Layout::PatternLayout

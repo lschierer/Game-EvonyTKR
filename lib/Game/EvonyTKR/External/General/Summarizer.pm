@@ -12,6 +12,7 @@ package Game::EvonyTKR::External::General::Summarizer {
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::AscendingAttributes', -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::Covenants',           -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::Specialties',         -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Books', -role;
   use Const::Fast;
   use List::AllUtils qw(any all none uniq);
   use Carp;

@@ -86,6 +86,7 @@ package Game::EvonyTKR::Role::Common {
   };
 
   # Generic prerequisite checker for Minion jobs and controllers
+  # Uses persistence layer to check job completion across hypnotoad restarts
   # $prereq_tasks: arrayref of task names that must be finished
   # Returns: 0 if all prereqs met, 1 if outstanding (controllers)
   #          calls retry/fail for Minion jobs
@@ -104,71 +105,91 @@ package Game::EvonyTKR::Role::Common {
       return 1;
     }
 
-    my $prereqs = {};
+    # Get persistence service (assuming we have it via Role::Persistence)
+    my $persistence;
+    if ($self->can('persistence')) {
+      $persistence = $self->persistence;
+    }
+    else {
+      # Fallback: create a new instance
+      require Game::EvonyTKR::Service::Persistence;
+      $persistence = Game::EvonyTKR::Service::Persistence->new;
+    }
+
+    my $prereqs         = {};
+    my @outstanding     = ();
+    my @failed_tasks    = ();
 
     foreach my $prereq (@$prereq_tasks) {
-      my $prereqFinishedCount = $minion->jobs({
-        tasks  => [$prereq],
-        states => ['finished'],
-      })->total // 0;
+      # Check persistence layer for completion
+      my $is_completed = $persistence->is_job_completed($prereq);
+
+      if ($is_completed) {
+        $prereqs->{$prereq} = 'completed';
+        next;
+      }
+
+      # Not completed in persistence - check Minion for active/failed jobs
       my $prereqPendingCount = $minion->jobs({
         tasks  => [$prereq],
         states => ['active', 'inactive'],
       })->total // 0;
+
       my $prereqFailedCount = $minion->jobs({
         tasks  => [$prereq],
         states => ['failed'],
       })->total // 0;
 
       if ($prereqFailedCount > 0) {
-        my $errmessage = sprintf('Cannot proceed: %s job failed', $prereq);
-        $self->logger->error($errmessage);
-        return $is_minion_job ? $self->fail($errmessage) : 1;
+        push @failed_tasks, $prereq;
+        $prereqs->{$prereq} = 'failed';
       }
-
-      if ($prereqPendingCount > 0) {
-        if ($is_minion_job) {
-          $self->note("${prereq}PendingCount" => $prereqPendingCount);
-
-          if ($is_minion_job && $prereqPendingCount < 10) {
-            $minion->jobs({
-              tasks  => [$prereq],
-              states => ['active', 'inactive'],
-            })->each(sub {
-              my $info    = $_;
-              my $pending = $self->info->{notes}->{pending};
-              push @{$pending}, $info->{id};
-              $pending = [uniq @{$pending}];
-              $self->note(pending => $pending);
-            });
-          }
-
-          my $delay = min(2 * $prereqPendingCount, 30);
-          $self->logger->debug(sprintf(
-            'Retrying with delay %s due to pending %s: %s',
-            $delay, $prereq, $prereqPendingCount
-          ));
-          return $self->retry({ delay => $delay });
-        }
-        else {
-          return 1;    # Outstanding prereqs for controller
-        }
+      elsif ($prereqPendingCount > 0) {
+        push @outstanding, $prereq;
+        $prereqs->{$prereq} = 'pending';
       }
-      $prereqs->{$prereq} = $prereqFinishedCount;
+      else {
+        # Not completed, not pending, not failed - not started yet
+        push @outstanding, $prereq;
+        $prereqs->{$prereq} = 'not_started';
+      }
     }
 
-    if (not defined($prereqs) || !ref($prereqs) || ref($prereqs) ne 'HASH') {
-      $self->logger->logcroak('prereqs is in an odd state.');
-      return 1;
-    }
-
-    $self->logger->info(
+    # Log prereq states
+    $self->logger->debug(
       sprintf('prereqs are in states %s',
         Data::Printer::np($prereqs, multiline => 0))
     );
 
-    my @outstanding = grep { $_ == "0" } values %{$prereqs};
-    return scalar(@outstanding);
+    # Handle failed prereqs
+    if (@failed_tasks) {
+      my $errmessage = sprintf('Cannot proceed: prerequisite job(s) failed: %s',
+        join(', ', @failed_tasks));
+      $self->logger->error($errmessage);
+      return $is_minion_job ? $self->fail($errmessage) : 1;
+    }
+
+    # Handle outstanding prereqs
+    if (@outstanding) {
+      if ($is_minion_job) {
+        # Note which prereqs are outstanding
+        $self->note(outstanding_prereqs => \@outstanding);
+
+        # Calculate retry delay based on number of outstanding prereqs
+        my $delay = min(2 * scalar(@outstanding), 30);
+        $self->logger->debug(sprintf(
+          'Retrying with delay %s due to outstanding prereqs: %s',
+          $delay, join(', ', @outstanding)
+        ));
+        return $self->retry({ delay => $delay });
+      }
+      else {
+        return 1;    # Outstanding prereqs for controller
+      }
+    }
+
+    # All prereqs met
+    return 0;
   }
 }
 1;

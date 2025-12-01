@@ -160,10 +160,20 @@ package Game::EvonyTKR::Controller::Role::Pairs {
       $$pbt_cas_val[1] = $npbt;
       my $pbt_result = $self->pair_cache->cas('pairs_by_type', @$pbt_cas_val);
       if ($pbt_result) {
+        # Use 'set' instead of 'add' to ensure the pair is stored even if key exists
+        # This handles race conditions where multiple workers create the same pair
         my $wp_result =
-          $self->pair_cache->add($self->wire_pair_to_key($wire_pair),
+          $self->pair_cache->set($self->wire_pair_to_key($wire_pair),
           $wire_pair);
         if ($wp_result) {
+          # Also write to persistence for durability
+          eval {
+            $self->persistence->store_pair($key, $wire_pair);
+          };
+          if ($@) {
+            $self->logger->error("Failed to store pair to persistence: $@");
+          }
+
           $self->pairs_by_type($npbt);
           $add_result = 1;
         }
@@ -174,11 +184,34 @@ package Game::EvonyTKR::Controller::Role::Pairs {
   }
 
   sub get_pair ($self, $key) {
+    $key = $self->normalize($key);
+    $key =~ s/ /_/g;
+
+    # Try memcached first
     my $wire_pair = $self->pair_cache->get($key);
+
+    # Fall back to persistence if not in cache
+    unless ($wire_pair) {
+      $self->logger->debug(
+        sprintf('Pair not in memcached, checking persistence for key %s', $key));
+      eval {
+        $wire_pair = $self->persistence->get_pair($key);
+        if ($wire_pair) {
+          # Populate memcached for next time
+          $self->pair_cache->set($key, $wire_pair);
+          $self->logger->debug("Populated memcached with pair from persistence");
+        }
+      };
+      if ($@) {
+        $self->logger->error("Failed to get pair from persistence: $@");
+      }
+    }
+
     unless ($wire_pair) {
       $self->logger->warn(sprintf('cannot find pair for key %s', $key));
       return;
     }
+
     my $pair = Game::EvonyTKR::Model::General::Pair->from_wire_hash($wire_pair);
     unless ($pair) {
       $self->logger->error(sprintf(
@@ -194,6 +227,33 @@ package Game::EvonyTKR::Controller::Role::Pairs {
   sub get_pairs_by_type ($self) {
     # Get pairs from cache and inflate them into objects
     my $pairs_by_type = $self->pair_cache->get('pairs_by_type') // {};
+
+    # If cache is empty or has no types, rebuild from persistence
+    if (!keys %$pairs_by_type) {
+      $self->logger->info(
+        'pairs_by_type not in memcached, rebuilding from persistence');
+      eval {
+        my $all_types = $self->persistence->get_all_pair_types();
+        foreach my $type (@$all_types) {
+          my $type_pairs = $self->persistence->list_pairs_by_type($type);
+          $pairs_by_type->{$type} = $type_pairs;
+          $self->logger->debug(sprintf(
+            'Loaded %d pairs of type %s from persistence',
+            scalar(@$type_pairs), $type
+          ));
+        }
+
+        # Store rebuilt structure to memcached
+        if (keys %$pairs_by_type) {
+          $self->pair_cache->set('pairs_by_type', $pairs_by_type);
+          $self->logger->info('Rebuilt pairs_by_type in memcached from persistence');
+        }
+      };
+      if ($@) {
+        $self->logger->error("Failed to rebuild pairs_by_type from persistence: $@");
+      }
+    }
+
     state $all_pairs_built;
     state $inflated_pairs = {};
     unless ($all_pairs_built) {
@@ -270,26 +330,26 @@ package Game::EvonyTKR::Controller::Role::Pairs {
     if (!$data_model->checkAscendingLevel($ascendingLevel)) {
       $self->logger->warn(
         "Invalid ascendingLevel: $ascendingLevel, using default 'red5'");
-      $ascendingLevel = 'red5';
+      $ascendingLevel = 'none';
     }
 
-    if (!$data_model->checkCovenantLevel($primaryCovenantLevel)) {
+    if (!$self->checkCovenantLevel($primaryCovenantLevel)) {
       $self->logger->warn(
         sprintf('Invalid covenantLevel: %s, using default "civilization"',
           $primaryCovenantLevel)
       );
-      $primaryCovenantLevel = 'civilization';
+      $primaryCovenantLevel = 'none';
     }
 
     @$primarySpecialties =
       $data_model->normalizeSpecialtyLevels(@$primarySpecialties);
 
-    if (!$data_model->checkCovenantLevel($secondaryCovenantLevel)) {
+    if (!$self->checkCovenantLevel($secondaryCovenantLevel)) {
       $self->logger->warn(
         sprintf('Invalid covenantLevel: %s, using default "civilization"',
           $secondaryCovenantLevel)
       );
-      $secondaryCovenantLevel = 'civilization';
+      $secondaryCovenantLevel = 'none';
     }
 
     @$secondarySpecialties =

@@ -1,85 +1,57 @@
-use v5.40;
-use experimental qw(class);
+use v5.42.0;
 use utf8::all;
 use File::FindLib 'lib';
 require Data::Printer;
-
-require Game::EvonyTKR::Model::Buff::Summarizer;
+require Game::EvonyTKR::Model::Buff::Summarizer::Pair;
 
 package Game::EvonyTKR::External::General::Pair::Summarizer {
-  use Mojo::Base 'Game::EvonyTKR::External::JobBase',              -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Pairs',        -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::Constants::Books',         -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants', -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants', -role;
-  use experimental   qw(class);
+  use Mojo::Base 'Game::EvonyTKR::External::JobBase',                    -signatures;
+  use Mojo::Base 'Game::EvonyTKR::Role::Constants::Books',               -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants',       -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants',    -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Constants::AscendingAttributes', -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Constants::Covenants',           -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Constants::Specialties',         -role;
+  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Pairs', -role;
   use List::AllUtils qw(any all none uniq);
+  use Mojo::JSON     qw(encode_json);
+  use Scalar::Util   qw(blessed);
   use Const::Fast;
   use Carp;
 
-  state $generalCache;
-  state $pair;
-
-  has 'ypp' => sub {
-    state $yp //= YAML::PP->new(
-      schema       => [qw/ + Perl /],
-      yaml_version => ['1.2', '1.1']
-    );
-    return $yp;
-  };
-
-  has 'collection_dir' => sub {
-    my $home = Mojo::Home->new->detect('Game::EvonyTKR');
-    return $home->child('share/collections/data');
-  };
-
   sub task_name {'summarize_pair'}
 
-  # call the first parameter a taskClass here
-  # to emphasize that this is acting on the task as a meta-entity
-  # and not on a single instance of it
-  # register is the entry point when *creating a task*
   sub register ($taskClass, $app, $conf = {}) {
     $taskClass->SUPER::register($app, $conf);
     $app->minion->add_task($taskClass->task_name => __PACKAGE__);
-
     $app->plugins->emit(summarize_pair_job_ready => 1);
   }
 
-  # here the first parameter indicates that this is prepresenting
-  # a single instance. this conforms with the fact that
-  # run is the entry point when *executing a job*
-  has 'run' => sub ($job, @args) {
+  sub run ($job, @args) {
     $job->SUPER::run(@args);
 
-    $generalCache = $job->create_general_cache()
-      unless (defined($generalCache));
+    my $params = shift @args;
+    my $runId = $params->{runId};
+    my $primaryName             = $params->{primaryName    };
+    my $secondaryName           = $params->{secondaryName  };
+    my $targetType              = $params->{targetType     };
+    my $activationType          = $params->{activationType };
+    $params->{ascendingLevel        }  //= 'none';
+    $params->{primaryCovenantLevel  }  //= 'none';
+    $params->{primarySpecialty1     }  //= 'none';
+    $params->{primarySpecialty2     }  //= 'none';
+    $params->{primarySpecialty3     }  //= 'none';
+    $params->{primarySpecialty4     }  //= 'none';
+    $params->{secondaryCovenantLevel}  //= 'none';
+    $params->{secondarySpecialty1   }  //= 'none';
+    $params->{secondarySpecialty2   }  //= 'none';
+    $params->{secondarySpecialty3   }  //= 'none';
+    $params->{secondarySpecialty4   }  //= 'none';
 
-    my (
-      $runId,                $primaryName,         $secondaryName,
-      $tt,                   $activationType,      $ascendingLevel,
-      $primaryCovenantLevel, $primarySpecialty1,   $primarySpecialty2,
-      $primarySpecialty3,    $primarySpecialty4,   $secondaryCovenantLevel,
-      $secondarySpecialty1,  $secondarySpecialty2, $secondarySpecialty3,
-      $secondarySpecialty4,
-    ) = shift @args;
-
-    my $primarySpecialties = [
-      $primarySpecialty1, $primarySpecialty2,
-      $primarySpecialty3, $primarySpecialty4
-    ];
-    my $secondarySpecialties = [
-      $secondarySpecialty1, $secondarySpecialty2,
-      $secondarySpecialty3, $secondarySpecialty4
-    ];
-    my $validatedparams = $job->validatePairParams(
-      $ascendingLevel,         $primaryCovenantLevel, $primarySpecialties,
-      $secondaryCovenantLevel, $secondarySpecialties,
-    );
-
+    # Validate required parameters
     my @errmessage;
     unless (defined($runId) && length($runId)) {
-      push @errmessage, sprintf('runId must be defined');
+      push @errmessage, 'runId must be defined';
     }
     unless (defined($primaryName) && length($primaryName)) {
       push @errmessage, 'primaryName must be defined';
@@ -87,40 +59,11 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
     unless (defined($secondaryName) && length($secondaryName)) {
       push @errmessage, 'secondaryName must be defined';
     }
-    unless (defined($tt) && length($tt) && $job->ValidateGeneralType($tt)) {
-      push @errmessage,
-        sprintf(
-        'must provide a valid general type from %s, not "%s"',
-        join(',',
-          map { sprintf('"%s"', $_) } $job->GeneralKeys->@*,
-          defined($tt) ? $tt : 'undefined')
-        );
+    unless (defined($targetType) && length($targetType)) {
+      push @errmessage, 'targetType must be defined';
     }
-    unless (defined(
-           $activationType
-        && length($activationType)
-        && any { $activationType eq $_ } $job->AllowedBuffActivationValues->@*
-    )) {
-      push @errmessage,
-        sprintf(
-        'must provide a valid activation type from %s, not "%s"',
-        join(',',
-          map { sprintf('"%s"', $_) } $job->AllowedBuffActivationValues->@*),
-        defined($activationType) ? $activationType : 'undef'
-        );
-    }
-
-    my $pair = $job->get_pair($job->wire_pair_to_key({
-      primary   => $primaryName,
-      secondary => $secondaryName,
-      type      => $tt,
-    }));
-
-    unless ($pair) {
-      push @errmessage,
-        sprintf(
-        'cannot retrieve pair for primary "%s", secondary "%s", type "%s"',
-        $primaryName, $secondaryName, $tt);
+    unless (defined($activationType) && length($activationType)) {
+      push @errmessage, 'activationType must be defined';
     }
 
     if (scalar(@errmessage)) {
@@ -129,91 +72,197 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
       return;
     }
 
-    #TODO get covenants;
-    #TODO get specialties
-    #TODO get ascending attributes
-  };
+    # Get both generals
+    my $primary = $job->get_general($primaryName);
+    unless ($primary) {
+      my $err = sprintf('Cannot retrieve primary general: %s', $primaryName);
+      $job->logger->error($err);
+      return $job->fail($err);
+    }
 
-  has 'load_best_skill_books' =>
-    sub ($job, $general, $ascendingLevel, $targetType, $activationType) {
-    my $key = $activationType eq 'PvM' ? 'PvM' : 'default';
+    my $secondary = $job->get_general($secondaryName);
+    unless ($secondary) {
+      my $err = sprintf('Cannot retrieve secondary general: %s', $secondaryName);
+      $job->logger->error($err);
+      return $job->fail($err);
+    }
 
-    my @books;
-    my $generic_dir       = $job->collection_dir->child('generic books');
-    my @sorted_book_names = sort {
-      $job->BestSkillBooks->{$targetType}->{$key}->{$a}
-        <=> $job->BestSkillBooks->{$targetType}->{$key}->{$b}
-    } keys %{ $job->BestSkillBooks->{$targetType}->{$key} };
+    # Get the pair object
+    my $pair = $job->get_pair($job->wire_pair_to_key({
+      primary   => $primaryName,
+      secondary => $secondaryName,
+      type      => $targetType,
+    }));
 
-    foreach my $book_name (@sorted_book_names) {
-      my ($book_file) = $generic_dir->children(qr/\Q$book_name\E\.yaml/i);
-      if (defined($book_file) && $book_file->is_file()) {
-        my $data   = $book_file->slurp_utf8;
-        my $object = $job->ypp->load_string($data);
-        my $book = Game::EvonyTKR::Model::Book::SkillBook->from_hash($object,);
+    unless ($pair) {
+      my $err = sprintf(
+        'Cannot retrieve pair for primary "%s", secondary "%s", type "%s"',
+        $primaryName, $secondaryName, $targetType
+      );
+      $job->logger->error($err);
+      return $job->fail($err);
+    }
 
-        $job->logger->info(sprintf(
-          'picked book %s for general %s', $book->name, $general->name
-        ));
-        push @books, $book;
-        last if (scalar @books >= 10);
+    # Get covenants
+    my $primaryCovenant = $job->get_covenant($primaryName);
+    unless ($primaryCovenant) {
+      $job->logger->warn("No covenant found for primary $primaryName");
+    }
 
-      }
-      else {
-        $job->logger->warn("cannot find file for $book_name");
-        next;
+    my $secondaryCovenant = $job->get_covenant($secondaryName);
+    unless ($secondaryCovenant) {
+      $job->logger->warn("No covenant found for secondary $secondaryName");
+    }
+
+    # Get ascending attributes (primary only)
+    if ($primary->ascending) {
+      $primary->populateAscendingAttributes();
+      unless ($primary->ascendingAttributes) {
+        my $errmessage = sprintf(
+          'Failed to get ascending attributes for primary "%s"',
+          $primary->name
+        );
+        $job->logger->error($errmessage);
+        $job->fail($errmessage);
       }
     }
-    # certain books need to be there or the buff summarizer will
-    # spew errors.
-    foreach my $attr ('Attack', 'Defense', 'HP') {
-      foreach my $tt ('Mounted Troop', 'Ranged Troop', 'Ground Troop',
-        'Siege Machine') {
-        unless (any { $_->name =~ /$tt $attr/ } @books) {
-          my ($book_file) =
-            $generic_dir->children(qr/\QLevel 4 $tt $attr\E\.yaml$/i);
-          if ($book_file && $book_file->is_file()) {
-            my $data   = $book_file->slurp_utf8;
-            my $object = $job->ypp->load_string($data);
-            my $book =
-              Game::EvonyTKR::Model::Book::SkillBook->from_hash($object);
 
-            $job->logger->debug(sprintf(
-              'picked book %s for general %s',
-              $book->name, $general->name
-            ));
-            push @books, $book;
-          }
-        }
+    # Populate builtin books for both generals
+    $primary->populateBuiltinBook()     unless ($primary->builtInBook);
+    $secondary->populateBuiltinBook()   unless ($secondary->builtInBook);
+
+    # Populate specialties for both generals
+    $primary->populateSpecialties()
+      unless (scalar($primary->specialties)
+      && all { ref($_) && $_->isa('Game::EvonyTKR::Model::Specialty') }
+      $primary->specialties->@*);
+
+    $secondary->populateSpecialties()
+      unless (scalar($secondary->specialties)
+      && all { ref($_) && $_->isa('Game::EvonyTKR::Model::Specialty') }
+      $secondary->specialties->@*);
+
+
+    $job->validateParams($params);
+
+    # Note serializable params for debugging
+    $job->note(
+      PairSummarizer_params => {
+        $params->%*,
+        has_primary_covenant   => defined($primaryCovenant)   ? 1 : 0,
+        has_secondary_covenant => defined($secondaryCovenant) ? 1 : 0,
+        has_ascending          => defined($primary->ascendingAttributes) ? 1 : 0,
+      }
+    );
+
+    # Create summarizer
+    my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer::Pair->new($params->%*);
+
+    # Compute buffs and debuffs
+    $summarizer->updateBuffs();
+    $summarizer->updateDebuffs();
+
+    # Return results
+    $job->finish({
+      status => 'complete',
+      result => encode_json({
+        runId     => $runId,
+        primary   => $primaryName,
+        secondary => $secondaryName,
+        buffs     => $summarizer->pairBuffValues,
+        debuffs   => $summarizer->pairDebuffValues,
+      })
+    });
+  }
+
+  sub validateParams($job, $params) {
+
+    my $key = $job->wire_pair_to_key({
+      type      => $params->{targetType},
+      primary   => $params->{primaryName},
+      secondary => $params->{secondaryName},
+    });
+    $params->{pair} = $job->get_pair($key);
+    unless(ref($params->{pair}) &&
+      blessed($params->{pair}) &&
+      $params->{pair}->isa('Game::EvonyTKR::Model::General::Pair')
+    ) {
+      my $em = sprintf('job id %s cannot find a valid Pair for params %s',
+      $job->info->{id}, Data::Printer::np($params, multiline => 0));
+
+      $job->logger->error($em);
+      return $job->fail($em);
+    }
+
+    # Validate ascending level
+    if ($params->{ascendingLevel} =~ /red/) {
+      unless (any { $_ eq $params->{ascendingLevel} }
+        $job->AscendingAttributeLevelValues(1)) {
+        my $em = sprintf(
+          'red ascending level "%s" is invalid, must be one of %s',
+          $params->{ascendingLevel},
+          join ', ',
+          map { sprintf('"%s"', $_) } $job->AscendingAttributeLevelValues(1),
+        );
+        $job->logger->error($em);
+        return $job->fail($em);
       }
     }
-    return \@books;
-    };
+    else {
+      unless (any { $_ eq $params->{ascendingLevel} }
+        $job->AscendingAttributeLevelValues(0)) {
+        my $em = sprintf(
+          'ascending level "%s" is invalid, must be one of %s',
+          $params->{ascendingLevel},
+          join ', ',
+          map { sprintf('"%s"', $_) } $job->AscendingAttributeLevelValues(0),
+        );
+        $job->logger->error($em);
+        return $job->fail($em);
+      }
+    }
+
+    # Validate covenant levels
+    foreach my $level_param (qw(primaryCovenantLevel secondaryCovenantLevel)) {
+      unless (any { $_ eq $params->{$level_param} }
+        $job->CovenantCategoryValues->@*) {
+        my $em = sprintf(
+          '%s "%s" is invalid, must be one of %s',
+          $level_param, $params->{$level_param},
+          join ', ', map { sprintf('"%s"', $_) } $job->CovenantCategoryValues->@*
+        );
+        $job->logger->error($em);
+        return $job->fail($em);
+      }
+    }
+
+    # Validate primary specialty levels (1-4)
+    foreach my $index (1 .. 4) {
+      my $specialtyLevel = $params->{"specialty${index}"};
+      unless ($job->is_valid_specialty_level($specialtyLevel)) {
+        my $em = sprintf('primary specialty%d level "%s" is invalid, must be one of %s',
+          $index, $specialtyLevel, join ', ',
+          map { sprintf('"%s"', $_) } $job->SpecialtyLevelValues->@*);
+        $job->logger->error($em);
+        return $job->fail($em);
+      }
+    }
+
+    # Validate secondary specialty levels (1-4)
+    foreach my $index (1 .. 4) {
+      my $specialtyLevel = $params->{"secondarySpecialty${index}"};
+      unless ($job->is_valid_specialty_level($specialtyLevel)) {
+        my $em = sprintf('secondary specialty%d level "%s" is invalid, must be one of %s',
+          $index, $specialtyLevel, join ', ',
+          map { sprintf('"%s"', $_) } $job->SpecialtyLevelValues->@*);
+        $job->logger->error($em);
+        return $job->fail($em);
+      }
+    }
+
+    return 1;
+  }
 }
 
 1;
 __END__
-has 'summarize_primary' => sub ($job, $activationType, $targetType) {
-  my $general = $pair->primary;
-  my $bestBooks =
-    $job->load_best_skill_books($general, $targetType, $activationType);
-
-  my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer->new(
-    general             => $general,
-    books               => $bestBooks,
-    covenant            => undef,
-    ascendingAttributes => undef,
-    isPrimary           => 1,
-    targetType          => $targetType,
-    activationType      => $activationType,
-    ascendingLevel      => $ascendingLevel,
-    covenantLevel       => undef,
-    specialty1          => undef,
-    specialty2          => undef,
-    specialty3          => undef,
-    specialty4          => undef,
-  );
-  # Do all the heavy computation here
-  $bsum1->updateBuffs();
-  $bsum1->updateDebuffs();
-};

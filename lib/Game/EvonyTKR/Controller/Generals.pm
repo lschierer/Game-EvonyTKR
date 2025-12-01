@@ -33,17 +33,18 @@ package Game::EvonyTKR::Controller::Generals {
 
   use Carp;
 
-  has generals_prereqs => sub {
+  has prereqs => sub {
     return [qw(
+      load_all_generals
+      load_all_builtin_books
+      load_all_generic_books
+      load_all_covenants
+      load_all_specialties
+      load_all_ascending_attributes
       build_general_indexes
-      create_pairs
-      load_ascending_attributes
-      load_book
-      load_covenant
-      load_general
-      load_specialty
-      monitor_loaders
+      load_all_pair_builders
       reduce_coordinator
+      monitor_loaders
     )];
   };
 
@@ -315,6 +316,49 @@ package Game::EvonyTKR::Controller::Generals {
     });
   }
 
+  sub get_generals_by_type ($self, $generalType) {
+    my @all_generals = $self->get_generals()->@*;
+    $self->logger->debug(
+      sprintf('get_generals returned %s generals', scalar(@all_generals)));
+
+    my @selected = grep {
+      my $gen    = $_;
+      my $result = 0;
+
+      eval {
+        my $type = $gen->type;
+
+        if (!defined $type) {
+          # Skip generals with no type
+          $result = 0;
+        }
+        elsif (ref($type) eq 'ARRAY') {
+          $result = any { $_ eq $generalType } @$type;
+        }
+        else {
+          $result = ($type eq $generalType);
+        }
+        1;
+      } or do {
+        $self->logger->error(sprintf(
+          'Error filtering general %s: %s',
+          $gen->name // 'unknown', $@
+        ));
+        $result = 0;
+      };
+
+      $result;
+    } @all_generals;
+
+    $self->logger->debug(
+      sprintf(
+        'grep filtered the list from %s to %s',
+        scalar(@all_generals), scalar(@selected)
+      )
+    );
+    return \@selected;
+  }
+
   sub index($c) {
 
     my $collection = collection_name();
@@ -457,7 +501,7 @@ package Game::EvonyTKR::Controller::Generals {
   }
 
   sub show ($c) {
-    return if $c->check_prereqs_or_wait($c->generals_prereqs);
+    return if $c->check_prereqs_or_wait($c->prereqs);
 
     $c->logger->debug("start of show method");
     my $name = $c->param('name');
@@ -626,7 +670,7 @@ package Game::EvonyTKR::Controller::Generals {
   }
 
   sub singleTable ($c) {
-    return if $c->check_prereqs_or_wait($c->generals_prereqs);
+    return if $c->check_prereqs_or_wait($c->prereqs);
 
     my $distDir = Mojo::File::Share::dist_dir('Game::EvonyTKR');
 
@@ -733,45 +777,8 @@ package Game::EvonyTKR::Controller::Generals {
     my $buffActivation = $route_meta->{buffActivation};
     my $uiTarget       = $route_meta->{uiTarget};
 
-    my @all_generals = $self->get_generals()->@*;
-    $self->logger->debug(
-      sprintf('get_generals returned %s generals', scalar(@all_generals)));
 
-    my @selected = grep {
-      my $gen    = $_;
-      my $result = 0;
-
-      eval {
-        my $type = $gen->type;
-
-        if (!defined $type) {
-          # Skip generals with no type
-          $result = 0;
-        }
-        elsif (ref($type) eq 'ARRAY') {
-          $result = any { $_ eq $generalType } @$type;
-        }
-        else {
-          $result = ($type eq $generalType);
-        }
-        1;
-      } or do {
-        $self->logger->error(sprintf(
-          'Error filtering general %s: %s',
-          $gen->name // 'unknown', $@
-        ));
-        $result = 0;
-      };
-
-      $result;
-    } @all_generals;
-
-    $self->logger->debug(
-      sprintf(
-        'grep filtered the list from %s to %s',
-        scalar(@all_generals), scalar(@selected)
-      )
-    );
+    my @selected = $self->get_generals_by_type($generalType)->@*;
 
     # Return just the basic name information without computing buffs
     my @names = map { { primary => $_->name } } @selected;

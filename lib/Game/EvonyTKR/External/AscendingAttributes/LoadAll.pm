@@ -117,6 +117,41 @@ package Game::EvonyTKR::External::AscendingAttributes::LoadAll {
         'Child jobs completed: %d finished, %d failed',
         $finished, $failed
       ));
+
+      # Verify all data is actually in persistence before marking complete
+      my $verified = 0;
+      my $max_verify_attempts = 10;
+
+      for my $attempt (1 .. $max_verify_attempts) {
+        my $all_in_persistence = 1;
+        my $missing_count = 0;
+
+        foreach my $file (@files) {
+          my $attr_name = $file->basename('.yaml', '.yml');
+          unless ($job->persistence->get_ascending_attribute($attr_name)) {
+            $all_in_persistence = 0;
+            $missing_count++;
+          }
+        }
+
+        if ($all_in_persistence) {
+          $job->logger->info('All ascending attributes verified in persistence');
+          $verified = 1;
+          last;
+        }
+
+        $job->logger->debug(sprintf(
+          'Persistence verification attempt %d/%d: %d ascending attributes still missing',
+          $attempt, $max_verify_attempts, $missing_count
+        ));
+        sleep 1;
+      }
+
+      unless ($verified) {
+        my $errmsg = 'Failed to verify all ascending attributes in persistence after child jobs finished';
+        $job->logger->error($errmsg);
+        return $job->fail($errmsg);
+      }
     }
 
     $job->ascending_attribute_cache->set(

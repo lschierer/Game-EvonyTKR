@@ -308,14 +308,14 @@ sub add_covenant ($self, $covenant) {
   my $name = $covenant->primary->name;
 
   # Write to persistence layer
-  $self->persistence->store_covenant($name, $covenant->to_wire_hash());
+  my $r1 = $self->persistence->store_covenant($name, $covenant->to_wire_hash());
 
   # Update memcached
   my $key = lc($self->normalize($name));
   $key =~ s/ /_/g;
-  $self->covenant_cache->set($key, $covenant->to_wire_hash());
+  my $r2 = $self->covenant_cache->set($key, $covenant->to_wire_hash());
 
-  return 1;
+  return $r1 && $r2;
 }
 
 sub get_covenant ($self, $name) {
@@ -463,8 +463,8 @@ sub get_ascending_attributes ($self, $name) {
 
   $self->logger->debug("get_ascending_attribute called for: $name");
 
-  my $normalized_name = lc($self->normalize($name));
-  $normalized_name =~ s/ /_/g;
+  # Don't convert spaces to underscores - persistence stores with spaces
+  my $normalized_name = $self->normalize($name);
 
   # Check state cache
   if (exists $AscendingAttributes->{$normalized_name}) {

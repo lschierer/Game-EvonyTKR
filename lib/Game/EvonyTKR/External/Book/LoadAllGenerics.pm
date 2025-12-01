@@ -139,6 +139,45 @@ package Game::EvonyTKR::External::Book::LoadAllGenerics {
         'Child jobs completed: %d finished, %d failed',
         $finished, $failed
       ));
+
+      # Verify all data is actually in persistence before marking complete
+      # This ensures database transactions have committed
+      my $verified = 0;
+      my $max_verify_attempts = 10;
+
+      for my $attempt (1 .. $max_verify_attempts) {
+        my $all_in_persistence = 1;
+        my $missing_count = 0;
+
+        foreach my $entry (@list) {
+          # Parse "Level X BookName" format
+          if ($entry =~ /^Level (\d+) (.+)$/) {
+            my ($level, $book_name) = ($1, $2);
+            unless ($job->persistence->get_generic_book($book_name, $level)) {
+              $all_in_persistence = 0;
+              $missing_count++;
+            }
+          }
+        }
+
+        if ($all_in_persistence) {
+          $job->logger->info('All generic books verified in persistence');
+          $verified = 1;
+          last;
+        }
+
+        $job->logger->debug(sprintf(
+          'Persistence verification attempt %d/%d: %d generic books still missing',
+          $attempt, $max_verify_attempts, $missing_count
+        ));
+        sleep 1;
+      }
+
+      unless ($verified) {
+        my $errmsg = 'Failed to verify all generic books in persistence after child jobs finished';
+        $job->logger->error($errmsg);
+        return $job->fail($errmsg);
+      }
     }
 
     # Mark this job as completed in persistence

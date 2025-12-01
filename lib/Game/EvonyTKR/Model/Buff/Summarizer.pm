@@ -176,6 +176,7 @@ package Game::EvonyTKR::Model::Buff::Summarizer {
           'Game::EvonyTKR::Role::Constants::BuffConstants',
           'Game::EvonyTKR::Role::Constants::GeneralConstants',
           'Game::EvonyTKR::Role::Constants::Books',
+          'Game::EvonyTKR::Role::Books',
         );
       };
       if ($@) {

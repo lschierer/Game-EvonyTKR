@@ -37,9 +37,9 @@ package Game::EvonyTKR::External::General::LoadAll {
       if ($job->are_prereqs_outstanding(
       $job->minion,
       [
-        'load_all_ascending_attributes', 'load_all_builtin_books',
-        'load_all_specialties',          'load_ascending_attributes',
-        'load_book',                     'load_specialty',
+        'load_all_builtin_books',
+        'load_all_specialties',
+        'load_all_ascending_attributes',
       ]
       ));
 
@@ -128,6 +128,42 @@ package Game::EvonyTKR::External::General::LoadAll {
         'Child jobs completed: %d finished, %d failed',
         $finished, $failed
       ));
+
+      # Verify all data is actually in persistence before marking complete
+      # This ensures database transactions have committed
+      my $verified = 0;
+      my $max_verify_attempts = 10;
+
+      for my $attempt (1 .. $max_verify_attempts) {
+        my $all_in_persistence = 1;
+        my $missing_count = 0;
+
+        foreach my $file (@files) {
+          my $general_name = $file->basename('.yaml', '.yml');
+          unless ($job->persistence->get_general($general_name)) {
+            $all_in_persistence = 0;
+            $missing_count++;
+          }
+        }
+
+        if ($all_in_persistence) {
+          $job->logger->info('All generals verified in persistence');
+          $verified = 1;
+          last;
+        }
+
+        $job->logger->debug(sprintf(
+          'Persistence verification attempt %d/%d: %d generals still missing',
+          $attempt, $max_verify_attempts, $missing_count
+        ));
+        sleep 1;
+      }
+
+      unless ($verified) {
+        my $errmsg = 'Failed to verify all generals in persistence after child jobs finished';
+        $job->logger->error($errmsg);
+        return $job->fail($errmsg);
+      }
     }
 
     # Mark this job as completed in persistence

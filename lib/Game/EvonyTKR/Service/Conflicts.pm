@@ -3,6 +3,7 @@ use v5.42.0;
 use utf8::all;
 use Mojo::Base -base,                                               -signatures;
 use Mojo::Base 'Game::EvonyTKR::Role::Logging',                     -role;
+use Mojo::Base 'Game::EvonyTKR::Role::Common',                      -role;
 use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants',    -role;
 use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants', -role;
 
@@ -124,7 +125,11 @@ sub _check_cache ($self, $g1, $g2) {
   my $name1 = $self->assume_g1_is_main ? $g1->name : $g2->name;
   my $name2 = $self->assume_g1_is_main ? $g2->name : $g1->name;
 
-  if (exists $self->by_general->{$name1}{$name2}) {
+  # Normalize names to match how they're stored in persistence
+  my $norm1 = $self->normalize($name1);
+  my $norm2 = $self->normalize($name2);
+
+  if (exists $self->by_general->{$norm1}{$norm2}) {
     $self->cache_hits($self->cache_hits + 1);
     return 1;
   }
@@ -132,8 +137,12 @@ sub _check_cache ($self, $g1, $g2) {
 }
 
 sub _record_conflict ($self, $g1, $g2) {
-  $self->by_general->{ $g1->name }{ $g2->name } = 1;
-  $self->by_general->{ $g2->name }{ $g1->name } = 1;
+  # Normalize names to match how they're stored in persistence
+  my $norm1 = $self->normalize($g1->name);
+  my $norm2 = $self->normalize($g2->name);
+
+  $self->by_general->{$norm1}{$norm2} = 1;
+  $self->by_general->{$norm2}{$norm1} = 1;
 }
 
 sub _troop_overlap ($self, $g1, $g2) {
