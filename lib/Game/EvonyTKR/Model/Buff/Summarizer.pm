@@ -142,11 +142,7 @@ package Game::EvonyTKR::Model::Buff::Summarizer {
     state $covenant_helper;
     $covenant_helper //= do {
       my $helper = eval {
-        Mojo::Base->new->with_roles(
-          'Game::EvonyTKR::Role::Logging',
-          'Game::EvonyTKR::Role::Common',
-          'Game::EvonyTKR::Role::Persistence'
-        );
+        Game::EvonyTKR::Model::Base->new();
       };
       if ($@) {
         $self->logger->error("Cannot create covenant helper: $@");

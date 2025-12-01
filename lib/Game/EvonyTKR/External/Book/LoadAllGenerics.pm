@@ -68,7 +68,7 @@ package Game::EvonyTKR::External::Book::LoadAllGenerics {
         my ($level, $book_name) = ($1, $2);
 
         # Check if already in persistence
-        if ($job->persistence->get_generic_book($book_name, $level)) {
+        if ($job->get_generic_book($book_name, $level)) {
           $job->logger->debug(sprintf(
             'Skipping %s level %d - already in persistence',
             $book_name, $level
@@ -153,7 +153,7 @@ package Game::EvonyTKR::External::Book::LoadAllGenerics {
           # Parse "Level X BookName" format
           if ($entry =~ /^Level (\d+) (.+)$/) {
             my ($level, $book_name) = ($1, $2);
-            unless ($job->persistence->get_generic_book($book_name, $level)) {
+            unless ($job->get_generic_book($book_name, $level)) {
               $all_in_persistence = 0;
               $missing_count++;
             }

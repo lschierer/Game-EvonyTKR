@@ -1364,5 +1364,106 @@ subtest "Harald with all maxed out" => sub {
 
 };
 
+# Pair tests
+require Game::EvonyTKR::Model::Buff::Summarizer::Pair;
+require Game::EvonyTKR::Model::General::Pair;
+
+subtest "Aethelflaed + Marco Polo pair with all values set to 'none'" => sub {
+  
+  # Create a pair object
+  my $pair = Game::EvonyTKR::Model::General::Pair->new(
+    primary   => $aethelflaed,
+    secondary => $marco_polo,
+    type      => 'mounted_specialist',
+  );
+  
+  my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer::Pair->new(
+    pair                    => $pair,
+    targetType              => 'mounted_specialist',
+    activationType          => 'PvM',
+    ascendingLevel          => 'none',
+    covenantLevel           => 'none',
+    specialty1              => 'none',
+    specialty2              => 'none',
+    specialty3              => 'none',
+    specialty4              => 'none',
+    secondaryCovenantLevel  => 'none',
+    secondarySpecialty1     => 'none',
+    secondarySpecialty2     => 'none',
+    secondarySpecialty3     => 'none',
+    secondarySpecialty4     => 'none',
+  );
+  
+  $summarizer->updateBuffs();
+  $summarizer->updateDebuffs();
+  
+  # Pair uses 6 generic books compatible with BOTH generals
+  # Not simple addition of individual books
+  is(
+    $summarizer->pairBuffValues->{'Mounted Troops'},
+    {
+      'March Size' => 12,
+      'Attack'     => 125,
+      'Defense'    => 165,
+      'HP'         => 110
+    },
+    "Pair mounted buffs from shared generic books"
+  );
+  
+  # Debuffs should be 0 with no ascending/covenant/specialties
+  is(
+    $summarizer->pairDebuffValues,
+    {
+      'Ground Troops'  => { 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
+      'Mounted Troops' => { 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
+      'Ranged Troops'  => { 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
+      'Siege Machines' => { 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
+      'Overall'        => { 'Attack' => 0, 'Defense' => 0, 'HP' => 0 },
+    },
+    "No debuffs should be present for pair"
+  );
+};
+
+subtest "Aethelflaed + Marco Polo pair with gold specialties" => sub {
+  
+  my $pair = Game::EvonyTKR::Model::General::Pair->new(
+    primary   => $aethelflaed,
+    secondary => $marco_polo,
+    type      => 'mounted_specialist',
+  );
+  
+  my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer::Pair->new(
+    pair                    => $pair,
+    targetType              => 'mounted_specialist',
+    activationType          => 'PvM',
+    ascendingLevel          => 'none',
+    covenantLevel           => 'none',
+    specialty1              => 'gold',
+    specialty2              => 'gold',
+    specialty3              => 'gold',
+    specialty4              => 'gold',
+    secondaryCovenantLevel  => 'none',
+    secondarySpecialty1     => 'gold',
+    secondarySpecialty2     => 'gold',
+    secondarySpecialty3     => 'gold',
+    secondarySpecialty4     => 'gold',
+  );
+  
+  $summarizer->updateBuffs();
+  $summarizer->updateDebuffs();
+  
+  # With gold specialties on both generals plus shared books
+  is(
+    $summarizer->pairBuffValues->{'Mounted Troops'},
+    {
+      'March Size' => 33,
+      'Attack'     => 245,
+      'Defense'    => 225,
+      'HP'         => 160
+    },
+    "Pair with gold specialties has combined specialty buffs plus shared books"
+  );
+};
+
 #
 done_testing();

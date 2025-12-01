@@ -21,6 +21,7 @@ package Game::EvonyTKR::Role::Constants::BuffConstants {
   };
 
   sub string_to_trooptype ($self, $string) {
+    $string =~ s/_/ /g;
     $string =~ s/(\w+)(?: .*)/\L$1/x;
     my $key = first { $_ =~ /^$string/x } keys %{ $self->TroopTypeValues };
     if (exists $self->TroopTypeValues->{$key}) {

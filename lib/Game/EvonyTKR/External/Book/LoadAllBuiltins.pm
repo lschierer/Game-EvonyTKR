@@ -69,7 +69,7 @@ package Game::EvonyTKR::External::Book::LoadAllBuiltins {
       my $entry = $list[$index];
 
       # Check if already in persistence
-      if ($job->persistence->get_builtin_book($entry)) {
+      if ($job->get_builtin_book($entry)) {
         $job->logger->debug(sprintf(
           'Skipping %s - already in persistence', $entry));
         $skipped_count++;
@@ -148,7 +148,7 @@ package Game::EvonyTKR::External::Book::LoadAllBuiltins {
         my $missing_count = 0;
 
         foreach my $entry (@list) {
-          unless ($job->persistence->get_builtin_book($entry)) {
+          unless ($job->get_builtin_book($entry)) {
             $all_in_persistence = 0;
             $missing_count++;
           }

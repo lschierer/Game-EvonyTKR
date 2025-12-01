@@ -4,7 +4,7 @@ use File::FindLib 'lib';
 
 package Game::EvonyTKR::External::General::Pair::CreatePairs {
   use Mojo::Base 'Game::EvonyTKR::External::JobBase',       -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Pairs', -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Persistence::Pairs', -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants', -role;
   require Game::EvonyTKR::Service::Cache;
   require Game::EvonyTKR::Model::General::Conflict::Book;

@@ -65,7 +65,7 @@ package Game::EvonyTKR::External::General::LoadAll {
       my $general_name = $file->basename('.yaml', '.yml');
 
       # Check if already in persistence
-      if ($job->persistence->get_general($general_name)) {
+      if ($job->get_general($general_name)) {
         $job->logger->debug(sprintf(
           'Skipping %s - already in persistence', $general_name));
         $skipped_count++;
@@ -140,7 +140,7 @@ package Game::EvonyTKR::External::General::LoadAll {
 
         foreach my $file (@files) {
           my $general_name = $file->basename('.yaml', '.yml');
-          unless ($job->persistence->get_general($general_name)) {
+          unless ($job->get_general($general_name)) {
             $all_in_persistence = 0;
             $missing_count++;
           }

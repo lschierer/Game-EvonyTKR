@@ -6,7 +6,6 @@ use namespace::autoclean;
 
 package Game::EvonyTKR::Controller::Specialties {
   use Mojo::Base 'Game::EvonyTKR::Controller::ControllerBase';
-  use Mojo::Base 'Game::EvonyTKR::Role::Persistence', -role;
   use List::AllUtils qw( all any none first);
   use Carp;
 

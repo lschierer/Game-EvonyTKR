@@ -54,7 +54,7 @@ package Game::EvonyTKR::External::AscendingAttributes::LoadAll {
       my $attr_name = $file->basename('.yaml', '.yml');
 
       # Check if already in persistence
-      if ($job->persistence->get_ascending_attribute($attr_name)) {
+      if ($job->get_ascending_attributes($attr_name)) {
         $job->logger->debug(sprintf(
           'Skipping %s - already in persistence', $attr_name));
         $skipped_count++;
@@ -128,7 +128,7 @@ package Game::EvonyTKR::External::AscendingAttributes::LoadAll {
 
         foreach my $file (@files) {
           my $attr_name = $file->basename('.yaml', '.yml');
-          unless ($job->persistence->get_ascending_attribute($attr_name)) {
+          unless ($job->get_ascending_attributes($attr_name)) {
             $all_in_persistence = 0;
             $missing_count++;
           }

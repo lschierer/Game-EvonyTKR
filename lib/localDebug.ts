@@ -6,21 +6,21 @@ if (DEBUG) {
 
 const fileDebug: Record<string, boolean> = {
   'lib/Game/EvonyTKR/Shared/Constants.ts': false,
-  'lib/Generals/GeneralRowSchemas.ts': false,
+  'lib/Generals/GeneralRowSchemas.ts': true,
   'lib/Generals/Pair/PairPicker.ts': false,
-  'lib/Generals/Pair/PairTable.ts': false,
-  'lib/Generals/Pair/data.ts': false,
+  'lib/Generals/Pair/PairTable.ts': true,
+  'lib/Generals/Pair/data.ts': true,
   'lib/Generals/Pair/filter.ts': false,
-  'lib/Generals/Pair/pairStore.ts': false,
-  'lib/Generals/UrlBinder.ts': false,
+  'lib/Generals/Pair/pairStore.ts': true,
+  'lib/Generals/UrlBinder.ts': true,
   'lib/Generals/specialtyStore.ts': false,
-  'lib/Generals/Single/buffFilter.ts': true,
-  'lib/Generals/Single/data.ts': true,
-  'lib/Generals/Single/generalFilterStore.ts': true,
-  'lib/Generals/Single/singleStore.ts': true,
-  'lib/Generals/Single/SinglePicker.ts': true,
-  'lib/Generals/Single/SingleTable.ts': true,
-  'lib/Generals/Single/StateManager.ts': true,
+  'lib/Generals/Single/buffFilter.ts': false,
+  'lib/Generals/Single/data.ts': false,
+  'lib/Generals/Single/generalFilterStore.ts': false,
+  'lib/Generals/Single/singleStore.ts': false,
+  'lib/Generals/Single/SinglePicker.ts': false,
+  'lib/Generals/Single/SingleTable.ts': false,
+  'lib/Generals/Single/StateManager.ts': false,
 };
 
 function isAbsolutePath(path: string): boolean {

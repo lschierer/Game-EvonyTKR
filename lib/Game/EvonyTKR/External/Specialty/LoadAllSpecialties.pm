@@ -52,7 +52,7 @@ package Game::EvonyTKR::External::Specialty::LoadAllSpecialties {
       my $specialty_name = $file->basename('.yaml', '.yml');
 
       # Check if already in persistence
-      if ($job->persistence->get_specialty($specialty_name)) {
+      if ($job->get_specialty($specialty_name)) {
         $job->logger->debug(sprintf(
           'Skipping %s - already in persistence', $specialty_name));
         $skipped_count++;
@@ -126,7 +126,7 @@ package Game::EvonyTKR::External::Specialty::LoadAllSpecialties {
 
         foreach my $file (@files) {
           my $specialty_name = $file->basename('.yaml', '.yml');
-          unless ($job->persistence->get_specialty($specialty_name)) {
+          unless ($job->get_specialty($specialty_name)) {
             $all_in_persistence = 0;
             $missing_count++;
           }

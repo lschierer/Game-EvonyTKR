@@ -4,7 +4,7 @@ use File::FindLib 'lib';
 
 package Game::EvonyTKR::External::General::Pair::ReduceBatch {
   use Mojo::Base 'Game::EvonyTKR::External::JobBase',       -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Pairs', -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Persistence::Pairs', -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants', -role;
 
   sub task_name {'reduce_batch'}
@@ -32,6 +32,36 @@ package Game::EvonyTKR::External::General::Pair::ReduceBatch {
       sprintf('ReduceBatch processing %d parent jobs', scalar(@$job_ids)));
 
     my $batch_id = $job->id;
+
+    # Check if all parent jobs had 100% cache hits (nothing new to reduce)
+    my $all_cache_hits = 1;
+    my $total_pairs_created = 0;
+    
+    foreach my $job_id (@$job_ids) {
+      my $job_info = $job->minion->job($job_id);
+      next unless $job_info;
+      
+      my $notes = $job_info->info->{notes} // {};
+      my $pairs_created = $notes->{pairs_created} // 0;
+      $total_pairs_created += $pairs_created;
+      
+      if ($pairs_created > 0) {
+        $all_cache_hits = 0;
+        last;
+      }
+    }
+    
+    if ($all_cache_hits && $total_pairs_created == 0) {
+      $job->logger->info('All parent jobs had 100% cache hits, nothing to reduce');
+      $job->note(
+        total_conflicts  => 0,
+        total_cache_hits => $total_cache_hits,
+        total_pairs      => 0,
+        processed_jobs   => scalar(@$job_ids),
+        skipped_reason   => 'all_cache_hits',
+      );
+      return $job->finish('Skipped - all cache hits');
+    }
 
     foreach my $job_id (@$job_ids) {
       my $job_info = $job->minion->job($job_id);

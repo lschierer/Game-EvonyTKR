@@ -68,6 +68,12 @@ sub updateBuffs ($self) {
   $self->general($self->pair->primary);
   $self->isPrimary(1);
   $self->SUPER::updateBuffs();
+  
+  $self->logger->debug(sprintf(
+    'After primary updateBuffs: %s',
+    Data::Printer::np($self->buffValues, max_depth => 2)
+  ));
+  
   foreach my $troopType (keys %{ $self->buffValues }) {
     foreach my $attribute (keys %{ $self->buffValues->{$troopType} }) {
       $self->pairBuffValues->{$troopType}->{$attribute} +=

@@ -17,8 +17,6 @@ use namespace::autoclean;
 
 package Game::EvonyTKR::Controller::Pairs {
   use Mojo::Base 'Game::EvonyTKR::Controller::ControllerBase';
-  use Mojo::Base 'Game::EvonyTKR::Role::Persistence',                 -role;
-  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Pairs',           -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants', -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::Covenants', -role;
   use Mojo::IOLoop;
@@ -540,21 +538,19 @@ package Game::EvonyTKR::Controller::Pairs {
       scalar(@sorted_pairs), $session_id
     ));
 
-    my $ascendingLevel       = $c->param('ascendingLevel') // 'red5';
-    my $primaryCovenantLevel = $c->param('primaryCovenantLevel')
-      // 'civilization';
+    my $ascendingLevel       = $c->param('ascendingLevel') // 'none';
+    my $primaryCovenantLevel = $c->param('primaryCovenantLevel') // 'none';
     my @primarySpecialties;
     push @primarySpecialties, $c->param('primarySpecialty1') // 'gold';
     push @primarySpecialties, $c->param('primarySpecialty2') // 'gold';
     push @primarySpecialties, $c->param('primarySpecialty3') // 'gold';
-    push @primarySpecialties, $c->param('primarySpecialty4') // 'gold';
-    my $secondaryCovenantLevel = $c->param('secondaryCovenantLevel')
-      // 'civilization';
+    push @primarySpecialties, $c->param('primarySpecialty4') // 'green';
+    my $secondaryCovenantLevel = $c->param('secondaryCovenantLevel') // 'none';
     my @secondarySpecialties;
     push @secondarySpecialties, $c->param('secondarySpecialty1') // 'gold';
     push @secondarySpecialties, $c->param('secondarySpecialty2') // 'gold';
     push @secondarySpecialties, $c->param('secondarySpecialty3') // 'gold';
-    push @secondarySpecialties, $c->param('secondarySpecialty4') // 'gold';
+    push @secondarySpecialties, $c->param('secondarySpecialty4') // 'green';
 
     my $validated_params = $c->validatePairParams(
       $ascendingLevel,      $primaryCovenantLevel,
@@ -617,8 +613,7 @@ package Game::EvonyTKR::Controller::Pairs {
 
       $c->logger->debug(sprintf('Enqueueing job for pair index: %s with params %s',
         $index, Data::Printer::np($args, multiline => 0)));
-      my $jid = 0;
-      $c->app->minion->enqueue(
+      my $jid = $c->app->minion->enqueue(
         summarize_pair => [ $args ] => {
           delay    => ($index * 0.001) + rand(0.5),
           attempts => 2,
@@ -642,8 +637,9 @@ package Game::EvonyTKR::Controller::Pairs {
           $c->logger->debug(
             "job $jid result is " . Data::Printer::np($result, multiline => 0));
           if ($result->{result}->{status} eq 'complete') {
+            my $encoded = encode_base64($result->{result}->{result}, '');
             $c->write_sse(
-              { type => 'pair', text => $result->{result}->{result} });
+              { type => 'pair', text => $encoded });
           }
         }
         return $result;

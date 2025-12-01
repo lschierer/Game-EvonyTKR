@@ -90,30 +90,30 @@ package Game::EvonyTKR::Model::General {
     return 1;
   }
 
-  sub populateAscendingAttributes ($self,) {
-    return unless $self->ascending;
-
-    state $ascending_helper //= do {
+  sub persistenceHelper ($self) {
+    state $persistence_helper //= do {
       my $helper = eval {
-        Mojo::Base->new->with_roles(
-          'Game::EvonyTKR::Role::Logging',
-          'Game::EvonyTKR::Role::Common',
-          'Game::EvonyTKR::Role::Persistence'
-        );
+        Game::EvonyTKR::Model::Base->new();
       };
-      if ($@) {
-        $self->logger->error("Cannot create ascending attributes helper: $@");
+      if($@) {
+        $self->logger->error(sprintf('Cannot create Persistence Helper: %s', $@));
         return;
       }
       $helper;
     };
+    return $persistence_helper;
+  };
 
-    return unless $ascending_helper;
+  sub populateAscendingAttributes ($self,) {
+    return unless $self->ascending;
+
+
+    return unless $self->persistenceHelper();
 
     # Don't convert spaces to underscores - persistence stores with spaces
     my $key = $self->normalize($self->name);
 
-    my $aa = $ascending_helper->get_ascending_attributes($key);
+    my $aa = $self->persistenceHelper->get_ascending_attributes($key);
     if ($aa) {
       $self->ascendingAttributes($aa);
     }
@@ -124,7 +124,7 @@ package Game::EvonyTKR::Model::General {
         $self->name,
         join ', ',
         map { sprintf('"%s"', %_ // 'undef file') }
-          sort $ascending_helper->list_ascending_attributes
+          sort $self->persistenceHelper->list_ascending_attributes
       ));
       return;
     }
@@ -132,30 +132,16 @@ package Game::EvonyTKR::Model::General {
   }
 
   sub populateBuiltinBook ($self) {
-    state $books_helper //= do {
-      my $helper = eval {
-        Mojo::Base->new->with_roles(
-          'Game::EvonyTKR::Role::Logging',
-          'Game::EvonyTKR::Role::Common',
-          'Game::EvonyTKR::Role::Persistence'
-        );
-      };
-      if ($@) {
-        $self->logger->error("Cannot create books helper: $@");
-        return;
-      }
-      $helper;
-    };
 
-    return unless $books_helper;
+    return unless $self->persistenceHelper;
 
     my $book;
 
-    eval { $book = $books_helper->get_builtin_book($self->builtInBookName); }
+    eval { $book = $self->persistenceHelper->get_builtin_book($self->builtInBookName); }
       or do {
       $self->logger->error(
         sprintf('eval failed; cannot get book from helper: %s', $@));
-      my $ab = $books_helper->list_builtin_books;
+      my $ab = $self->persistenceHelper->list_builtin_books;
       $self->logger->debug(sprintf(
         'available books: %s',
         scalar(@{$ab})
@@ -184,22 +170,8 @@ package Game::EvonyTKR::Model::General {
   }
 
   sub populateSpecialties ($self,) {
-    state $specialty_helper //= do {
-      my $helper = eval {
-        Mojo::Base->new->with_roles(
-          'Game::EvonyTKR::Role::Logging',
-          'Game::EvonyTKR::Role::Common',
-          'Game::EvonyTKR::Role::Persistence'
-        );
-      };
-      if ($@) {
-        $self->logger->error("Cannot create specialty helper: $@");
-        return;
-      }
-      $helper;
-    };
 
-    return unless $specialty_helper;
+    return unless $self->persistenceHelper;
 
     foreach my $sn_index (0 .. scalar($#{ $self->specialtyNames })) {
       my $sn = $self->specialtyNames->[$sn_index];
@@ -214,7 +186,7 @@ package Game::EvonyTKR::Model::General {
         'populating speciality at index %s, name %s',
         $sn_index, defined($sn) && length($sn) ? $sn : 'undefined'
       ));
-      my $specialty = $specialty_helper->get_specialty($sn);
+      my $specialty = $self->persistenceHelper->get_specialty($sn);
       if ($specialty) {
         $self->specialties->[$sn_index] = $specialty;
       }

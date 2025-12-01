@@ -65,7 +65,7 @@ package Game::EvonyTKR::External::Covenant::LoadAll {
       my $covenant_name = $file->basename('.yaml', '.yml');
 
       # Check if already in persistence
-      if ($job->persistence->get_covenant($covenant_name)) {
+      if ($job->get_covenant($covenant_name)) {
         $job->logger->debug(sprintf(
           'Skipping %s - already in persistence', $covenant_name));
         $skipped_count++;
@@ -140,7 +140,7 @@ package Game::EvonyTKR::External::Covenant::LoadAll {
 
         foreach my $file (@files) {
           my $covenant_name = $file->basename('.yaml', '.yml');
-          unless ($job->persistence->get_covenant($covenant_name)) {
+          unless ($job->get_covenant($covenant_name)) {
             $all_in_persistence = 0;
             $missing_count++;
           }
