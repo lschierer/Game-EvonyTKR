@@ -1,46 +1,47 @@
 use v5.42.0;
-use experimental qw(class);
 use utf8::all;
 use File::FindLib 'lib';
 require Data::Printer;
 require Game::EvonyTKR::Model::Buff::Value;
 require JSON::PP;
 
-class Game::EvonyTKR::Model::Buff::Matcher :
-  isa(Game::EvonyTKR::Shared::Constants) {
+package Game::EvonyTKR::Model::Buff::Matcher {
+  use Mojo::Base 'Game::EvonyTKR::Model::Base', -signatures;
   use List::AllUtils qw( any all none );
-  use namespace::autoclean;
   use Carp;
-  use File::FindLib 'lib';
   our $VERSION = 'v0.1.0';
 
-  field $toTest : param;
+  has 'toTest';
 
-  field %general_to_targeted = (
-    mounted => 'Mounted Troops',
-    ground  => 'Ground Troops',
-    ranged  => 'Ranged Troops',
-    siege   => 'Siege Machines',
-  );
+  has general_to_targeted => sub {
+    {
+      mounted => 'Mounted Troops',
+      ground  => 'Ground Troops',
+      ranged  => 'Ranged Troops',
+      siege   => 'Siege Machines',
+    }
+  };
 
   # Conditions that are equivalent to having no condition
-  field $no_op_Conditions = [
-    "brings a dragon",
-    'brings a sacred dragon',
-    'brings a spiritual beast',
-    'During SvS',
-    'leading the army',
-    'you own the General',
-  ];
+  has no_op_Conditions => sub {
+    [
+      "brings a dragon",
+      'brings a sacred dragon',
+      'brings a spiritual beast',
+      'During SvS',
+      'leading the army',
+      'you own the General',
+    ]
+  };
 
-  method matchTargetedType($test_tt, $logID) {
-    if (length $toTest->targetedType) {
+  sub matchTargetedType ($self, $test_tt, $logID) {
+    if (length $self->toTest->targetedType) {
       # test_tt often comes from generals, convert it for use here.
       if ($test_tt =~ /^(\w+)_specialist$/) {
         my $short = $1;
 
-        if (exists $general_to_targeted{$short}) {
-          $test_tt = $general_to_targeted{$short};
+        if (exists $self->general_to_targeted->{$short}) {
+          $test_tt = $self->general_to_targeted->{$short};
           $self->logger->debug(
             "$logID. Normalized test_targetedType to '$test_tt'");
         }
@@ -51,12 +52,12 @@ class Game::EvonyTKR::Model::Buff::Matcher :
         }
       }
 
-      if ($toTest->targetedType !~ /$test_tt/i) {
+      if ($self->toTest->targetedType !~ /$test_tt/i) {
         $self->logger->debug(
           $logID
             . sprintf(
             '  ✗ Rejected: targetedType "%s" not matched by %s',
-            $test_tt, $toTest->targetedType
+            $test_tt, $self->toTest->targetedType
             )
         );
         return 0;
@@ -70,8 +71,8 @@ class Game::EvonyTKR::Model::Buff::Matcher :
     return 1;
   }
 
-  method matchDebuffConditions ($testDebuffs, $logID) {
-    my $has_debuff_conditions = scalar @{ $toTest->debuffConditions } > 0;
+  sub matchDebuffConditions ($self, $testDebuffs, $logID) {
+    my $has_debuff_conditions = scalar @{ $self->toTest->debuffConditions } > 0;
     $self->logger->debug(
       "$logID has_debuff_conditions is $has_debuff_conditions");
     if ($has_debuff_conditions) {
@@ -83,7 +84,7 @@ class Game::EvonyTKR::Model::Buff::Matcher :
       $self->logger->debug(
         "past check for no debuff conditions. " . scalar @$testDebuffs);
       # we have debuff condition values to test against
-      foreach my $condition (@{ $toTest->debuffConditions }) {
+      foreach my $condition (@{ $self->toTest->debuffConditions }) {
         if (none { $_ eq $condition } @$testDebuffs) {
           $self->logger->debug(
             "  ✗ Rejected: debuff condition '$condition' not in allowed list");
@@ -101,21 +102,21 @@ class Game::EvonyTKR::Model::Buff::Matcher :
     return 1;
   }
 
-  method matchBuffConditions ($testBuffs, $logID) {
-    if (scalar @{ $toTest->buffConditions }) {
+  sub matchBuffConditions ($self, $testBuffs, $logID) {
+    if (scalar @{ $self->toTest->buffConditions }) {
       my %allowed_conditions;
       if (scalar @$testBuffs > 0) {
         %allowed_conditions =
-          map { $_ => 1 } ($testBuffs->@*, $no_op_Conditions->@*);
+          map { $_ => 1 } ($testBuffs->@*, $self->no_op_Conditions->@*);
       }
       else {
-        %allowed_conditions = map { $_ => 1 } $no_op_Conditions->@*;
+        %allowed_conditions = map { $_ => 1 } $self->no_op_Conditions->@*;
       }
       $self->logger->debug(sprintf(
         '%s  Processing: This buff has %s conditions.',
-        $logID, scalar @{ $toTest->buffConditions }
+        $logID, scalar @{ $self->toTest->buffConditions }
       ));
-      foreach my $condition (@{ $toTest->buffConditions }) {
+      foreach my $condition (@{ $self->toTest->buffConditions }) {
         if (!exists $allowed_conditions{$condition}) {
           $self->logger->debug(
             $logID
@@ -134,7 +135,7 @@ class Game::EvonyTKR::Model::Buff::Matcher :
     return 1;
   }
 
-  method match ($test_attribute, $test_tt, $testBuffs, $testDebuffs, $logID) {
+  sub match ($self, $test_attribute, $test_tt, $testBuffs, $testDebuffs, $logID) {
     $self->logger->debug("$logID === BUFF MATCHER CALLED ===");
     $self->logger->debug(sprintf(
       "$logID Matcher called with: attr=%s, tt=%s, buffs=%s, debuffs=%s",
@@ -142,7 +143,7 @@ class Game::EvonyTKR::Model::Buff::Matcher :
       join(',', @$testBuffs), join(',', @$testDebuffs)
     ));
 
-    if ($toTest->attribute ne $test_attribute) {
+    if ($self->toTest->attribute ne $test_attribute) {
       $self->logger->debug("$logID Rejecting based on $test_attribute");
       return 0;
     }

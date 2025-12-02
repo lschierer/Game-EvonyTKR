@@ -24,7 +24,7 @@ sub load_best_skill_books ($self, $general, $targetType, $activationType,
 # TODO: partially implemented support for pairs using $desiredCount variable
 #       This would work except for the todo items below.
 # TODO: Implement book conflict detection
-#       (requires an instance of Game::EvonyTKR::Model::General::Conflict::Book )
+#       (requires an instance of Game::EvonyTKR::Service::Conflicts )
 # TODO: Handle partial conflicts
 #       A) book works for single general but conflicts as a pair
 #       B) ability to display the potential for this even in the single general UI.

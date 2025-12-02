@@ -63,7 +63,7 @@ sub are_generals_compatible_either_role ($g1, $g2) {
   use Mojo::Base -base,                                     -signatures;
   use Mojo::Base 'Game::EvonyTKR::Role::Logging',           -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Common',            -role;
-  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Pairs', -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Persistence', -role;
   use Carp;
 
   # Add minimal required attributes
@@ -248,6 +248,7 @@ my $Jayavarman = $TestGenerals->get_general('Jayavarman II',);
 my $Cheng      = $TestGenerals->get_general('Cheng Yaojin',);
 my $Laudon     = $TestGenerals->get_general('Laudon',);
 my $Elektra    = $TestGenerals->get_general('Elektra',);
+my $Champlain  = $TestGenerals->get_general('Champlain',);
 my $Franz      = $TestGenerals->get_general('Franz Joseph I',);
 my $Douglas    = $TestGenerals->get_general('Douglas',);
 my $Marcus     = $TestGenerals->get_general('Marcus Agrippa',);
@@ -470,6 +471,31 @@ my $l4ms =
 my $l4maam =
   (grep { $_->name =~ /Mounted.*Attack.*Against.*Monster/i && $_->level == 4 }
     @$generic_books)[0];
+my $l4sma = (
+  grep {
+    $_->name =~ /Siege.*Attack/i && $_->name !~ /Monster/i && $_->level == 4
+  } @$generic_books
+)[0];
+my $l4smd = (
+  grep {
+    $_->name =~ /Siege.*Defense/i && $_->name !~ /Monster/i && $_->level == 4
+  } @$generic_books
+)[0];
+my $l4mdm = (
+  grep {
+    $_->name =~ /Mounted.*Defense.*Against.*Monster/i && $_->level == 4
+  } @$generic_books
+)[0];
+my $l4ma = (
+  grep {
+    $_->name =~ /^Mounted.*Attack$/i && $_->name !~ /Monster/i && $_->level == 4
+  } @$generic_books
+)[0];
+my $l4md = (
+  grep {
+    $_->name =~ /^Mounted.*Defense$/i && $_->name !~ /Monster/i && $_->level == 4
+  } @$generic_books
+)[0];
 
 subtest 'Books ready for testing' => sub {
   isa_ok(
@@ -528,6 +554,33 @@ SKIP: {
     ok(
       !$bc->is_general_and_book_compatible($KA, $l4ms, { same_side => 0, }),
       'King Arthur and Level 4 March Size conflict (other side)'
+    );
+  }
+  done_testing();
+};
+
+subtest 'Generals that should NOT conflict with books' => sub {
+SKIP: {
+    skip "Books not available", 5 unless $l4sma && $l4smd && $l4mdm && $l4ma && $l4md;
+    ok(
+      $bc->is_general_and_book_compatible($Champlain, $l4sma, { same_side => 1, }),
+      'Champlain and Level 4 Siege Machine Attack work (same side)'
+    );
+    ok(
+      $bc->is_general_and_book_compatible($Champlain, $l4smd, { same_side => 1, }),
+      'Champlain and Level 4 Siege Machine Defense work (same side)'
+    );
+    ok(
+      $bc->is_general_and_book_compatible($AETHEL, $l4mdm, { same_side => 1, }),
+      'Aethelflaed and Level 4 Mounted Defense Against Monster work (same side)'
+    );
+    ok(
+      !$bc->is_general_and_book_compatible($Laudon, $l4ma, { same_side => 1, }),
+      'Laudon and Level 4 Mounted Attack conflict (same side)'
+    );
+    ok(
+      $bc->is_general_and_book_compatible($Laudon, $l4md, { same_side => 1, }),
+      'Laudon and Level 4 Mounted Defense work (same side)'
     );
   }
   done_testing();

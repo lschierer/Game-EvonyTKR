@@ -34,7 +34,7 @@ class Game::EvonyTKR::External::Common : isa(Game::EvonyTKR::Shared::Constants)
   field $generals : reader = {};
   #there needs to be a reader so child classes can see it.
   field $conflictDetector : reader =
-    Game::EvonyTKR::Model::General::Conflict::Book->new(
+    Game::EvonyTKR::Service::Conflicts->new(
     build_index      => 1,
     asst_has_dragon  => 1,
     asst_has_spirit  => 1,

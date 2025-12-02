@@ -1465,5 +1465,71 @@ subtest "Aethelflaed + Marco Polo pair with gold specialties" => sub {
   );
 };
 
+subtest "Casimir Pulaski + Champlain pair with green 4th specialty" => sub {
+  
+  my $casimir = first { $_->name eq 'Casimir Pulaski' } $generals->@*;
+  ok(defined $casimir, "Casimir Pulaski general loaded");
+  
+  my $champlain = first { $_->name eq 'Champlain' } $generals->@*;
+  ok(defined $champlain, "Champlain general loaded");
+  
+  my $pair = Game::EvonyTKR::Model::General::Pair->new(
+    primary   => $casimir,
+    secondary => $champlain,
+    type      => 'siege_specialist',
+  );
+  
+  my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer::Pair->new(
+    pair                    => $pair,
+    targetType              => 'Siege Machines',
+    activationType          => 'Attacking',
+    ascendingLevel          => 'none',
+    covenantLevel           => 'none',
+    specialty1              => 'gold',
+    specialty2              => 'gold',
+    specialty3              => 'gold',
+    specialty4              => 'green',
+    secondaryCovenantLevel  => 'none',
+    secondarySpecialty1     => 'gold',
+    secondarySpecialty2     => 'gold',
+    secondarySpecialty3     => 'gold',
+    secondarySpecialty4     => 'green',
+    books                   => $generic_books,
+  );
+  
+  $summarizer->updateBuffs();
+  $summarizer->updateDebuffs();
+  
+  # Expected values calculated manually:
+  # March: 12% (books) + 1% (Casimir sp4) + 6% (Champlain sp2) = 19%
+  # Attack: 25% (books) + 10% (Casimir sp1) + 6% (Casimir sp3) + 50% (Champlain book) + 10% (Champlain sp1) + 10% (Champlain sp2 Attacking) + 10% (Champlain sp3) = 121%
+  # Defense: 25% (books) + 10% (Casimir sp1) + 40% (Champlain book) + 10% (Champlain sp1) + 10% (Champlain sp3) = 95%
+  # HP: 25% (books) + 50% (Champlain book) + 10% (Champlain sp3) = 85%
+  
+  is(
+    $summarizer->pairBuffValues->{'Siege Machines'},
+    {
+      'March Size' => 19,
+      'Attack'     => 121,
+      'Defense'    => 95,
+      'HP'         => 85
+    },
+    "Casimir + Champlain siege pair buffs match manual calculation"
+  );
+  
+  # Debuffs: Casimir specialty 2 (Snipe) provides 10% Attack Debuff to all troop types
+  is(
+    $summarizer->pairDebuffValues,
+    {
+      'Ground Troops'  => { 'Attack' => 10, 'Defense' => 0, 'HP' => 0 },
+      'Mounted Troops' => { 'Attack' => 10, 'Defense' => 0, 'HP' => 0 },
+      'Ranged Troops'  => { 'Attack' => 10, 'Defense' => 0, 'HP' => 0 },
+      'Siege Machines' => { 'Attack' => 10, 'Defense' => 0, 'HP' => 0 },
+      'Overall'        => { 'Attack' => 10, 'Defense' => 0, 'HP' => 0 },
+    },
+    "Casimir Snipe specialty provides 10% attack debuff to all troops"
+  );
+};
+
 #
 done_testing();

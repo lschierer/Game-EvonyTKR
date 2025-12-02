@@ -2,7 +2,6 @@ use v5.42.0;
 use experimental qw(class);
 use utf8::all;
 use File::FindLib 'lib';
-require Game::EvonyTKR::Model::General::Conflict;
 require Game::EvonyTKR::Service::Cache;
 use namespace::autoclean;
 

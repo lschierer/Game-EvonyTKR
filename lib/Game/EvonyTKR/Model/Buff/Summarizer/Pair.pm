@@ -68,12 +68,12 @@ sub updateBuffs ($self) {
   $self->general($self->pair->primary);
   $self->isPrimary(1);
   $self->SUPER::updateBuffs();
-  
+
   $self->logger->debug(sprintf(
     'After primary updateBuffs: %s',
     Data::Printer::np($self->buffValues, max_depth => 2)
   ));
-  
+
   foreach my $troopType (keys %{ $self->buffValues }) {
     foreach my $attribute (keys %{ $self->buffValues->{$troopType} }) {
       $self->pairBuffValues->{$troopType}->{$attribute} +=
@@ -167,6 +167,22 @@ sub updateDebuffs ($self) {
 # Override getGenericBookValue to check compatibility with both generals in pair
 sub _getGenericBookValue_impl ($self, $attribute, $troopType) {
   my $total = 0;
+  state $books_helper;
+  $books_helper //= do {
+    my $helper = eval {
+      Game::EvonyTKR::Model::Base->new->with_roles(
+      'Game::EvonyTKR::Role::Constants::BuffConstants',
+      'Game::EvonyTKR::Role::Constants::GeneralConstants',
+      'Game::EvonyTKR::Role::Constants::Books',
+      'Game::EvonyTKR::Role::Books',);
+    };
+    if ($@) {
+      $self->logger->error("Cannot create books helper: $@");
+      return $total;
+    }
+    $helper;
+  };
+
 
   # Determine which general is current and which is other
   my $current_general = $self->general;
@@ -175,22 +191,6 @@ sub _getGenericBookValue_impl ($self, $attribute, $troopType) {
 
   # Special case for March Size - it's universal, not troop-specific
   if ($attribute eq 'March Size') {
-    state $books_helper;
-    $books_helper //= do {
-      my $helper = eval {
-        Game::EvonyTKR::Model::Base->new->with_roles(
-        'Game::EvonyTKR::Role::Persistence',
-        'Game::EvonyTKR::Role::Constants::BuffConstants',
-        'Game::EvonyTKR::Role::Constants::GeneralConstants',
-        'Game::EvonyTKR::Role::Constants::Books',
-        'Game::EvonyTKR::Role::Books',);
-      };
-      if ($@) {
-        $self->logger->error("Cannot create books helper: $@");
-        return $total;
-      }
-      $helper;
-    };
 
     my $MS = $books_helper->get_generic_book('March Size', $self->bestLevel);
     if (
@@ -216,22 +216,6 @@ sub _getGenericBookValue_impl ($self, $attribute, $troopType) {
     $troopType =~ s/_/ /g;
     $troopType = ucfirst($troopType) . ' Troops';
   }
-
-  # Get books_helper with BestSkillBooks constants
-  state $books_helper;
-  $books_helper //= do {
-    my $helper = eval {
-      Game::EvonyTKR::Model::Base->new->with_roles(
-        'Game::EvonyTKR::Role::Persistence',
-        'Game::EvonyTKR::Role::Constants::Books',
-      );
-    };
-    if ($@) {
-      $self->logger->error("Cannot create books helper: $@");
-      return $total;
-    }
-    $helper;
-  };
 
   # Convert troop type to target type key
   my $tt         = $troopType =~ s/ Troops$//r;
