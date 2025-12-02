@@ -193,6 +193,7 @@ subtest 'Data Setup' => sub {
 my $test_key = 'memcached_test_' . time();
 unless ($memcachClient->set($test_key, 'test')) {
   $logger->info('Memcached not available, skipping memcached tests');
+  done_testing();
   exit 1;
 }
 
@@ -230,6 +231,7 @@ subtest 'All Generals have types to test against' => sub {
       sprintf('able to test passive on first buff in book for %s', $g->name)
     );
   }
+  done_testing();
 };
 
 my $WASH       = $TestGenerals->get_general('Washington Prime',);
@@ -402,6 +404,8 @@ subtest 'Conflicting Generals' => sub {
     !are_generals_compatible_either_role($WASH, $Custer),
     'Washington Prime/George A. Custer conflict'
   );
+  ok(!are_generals_compatible_either_role($WASH, $Haakon),
+    'Washington Prime/Haakon conflict');
   ok(
     !are_generals_compatible_either_role($WASH, $KA),
     'Washington Prime/King Arthur conflict'
@@ -418,6 +422,10 @@ subtest 'Conflicting Generals' => sub {
 subtest 'Working Pairs' => sub {
   ok(are_generals_compatible_either_role($Cheng, $Haakon),
     'Cheng Yaojin/Haakon work');
+  ok(are_generals_compatible_either_role($Haakon, $Jayavarman), 'Haakon/Jayavarman II work');
+  ok(are_generals_compatible_either_role($Haakon, $MARCO), 'Haakon/Marco Polo work');
+  ok(are_generals_compatible_either_role($Haakon, $SC), 'Haakon/Sun Ce work');
+  ok(are_generals_compatible_either_role($Haakon, $SC), 'Haakon/Sun Ce work');
   ok(are_generals_compatible_either_role($Douglas, $Franz),
     'Douglas/Franz Joseph I work');
   ok(are_generals_compatible_either_role($Elektra, $Douglas),
@@ -426,6 +434,12 @@ subtest 'Working Pairs' => sub {
     'Elektra/Marcus Agrippa work');
   ok(are_generals_compatible_either_role($Laudon, $Haakon),
     'Laudon/Haakon work');
+  ok(are_generals_compatible_either_role($Laudon, $SC),
+    'Laudon/Sun Ce work');
+  ok(are_generals_compatible_either_role($Laudon, $LouisXIV),
+    'Laudon/Louis XIV work');
+  ok(are_generals_compatible_either_role($Laudon, $MARCO),
+    'Laudon/Marco Polo work');
   ok(are_generals_compatible_either_role($MARCO, $WASH,),
     'Marco Polo/Washington Prime work');
   ok(
@@ -443,10 +457,6 @@ subtest 'Working Pairs' => sub {
     'Louis IX/King Arthur work');
   ok(are_generals_compatible_either_role($Louis, $Douglas),
     'Louis IX/Douglas work');
-  done_testing();
-};
-
-subtest 'Louis XIV Stackable Buffs Test' => sub {
   ok(are_generals_compatible_either_role($LouisXIV, $OlavII),
     'Louis XIV/Olav II should work (stackable)');
   ok(
@@ -456,7 +466,7 @@ subtest 'Louis XIV Stackable Buffs Test' => sub {
   done_testing();
 };
 
-# TODO: Implement Book conflict detection
+
 # Use same conflicts object for book tests
 my $bc = $conflicts;
 
