@@ -92,21 +92,19 @@ package Game::EvonyTKR::Model::General {
 
   sub persistenceHelper ($self) {
     state $persistence_helper //= do {
-      my $helper = eval {
-        Game::EvonyTKR::Model::Base->new();
-      };
-      if($@) {
-        $self->logger->error(sprintf('Cannot create Persistence Helper: %s', $@));
+      my $helper = eval { Game::EvonyTKR::Model::Base->new(); };
+      if ($@) {
+        $self->logger->error(
+          sprintf('Cannot create Persistence Helper: %s', $@));
         return;
       }
       $helper;
     };
     return $persistence_helper;
-  };
+  }
 
   sub populateAscendingAttributes ($self,) {
     return unless $self->ascending;
-
 
     return unless $self->persistenceHelper();
 
@@ -137,8 +135,10 @@ package Game::EvonyTKR::Model::General {
 
     my $book;
 
-    eval { $book = $self->persistenceHelper->get_builtin_book($self->builtInBookName); }
-      or do {
+    eval {
+      $book =
+        $self->persistenceHelper->get_builtin_book($self->builtInBookName);
+    } or do {
       $self->logger->error(
         sprintf('eval failed; cannot get book from helper: %s', $@));
       my $ab = $self->persistenceHelper->list_builtin_books;
@@ -150,7 +150,7 @@ package Game::EvonyTKR::Model::General {
         : 'no books available'
       ));
       return;
-      };
+    };
 
     if (defined($book)) {
       $self->logger->debug(sprintf(

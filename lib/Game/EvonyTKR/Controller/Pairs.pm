@@ -18,7 +18,7 @@ use namespace::autoclean;
 package Game::EvonyTKR::Controller::Pairs {
   use Mojo::Base 'Game::EvonyTKR::Controller::ControllerBase';
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants', -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::Constants::Covenants', -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Constants::Covenants',        -role;
   use Mojo::IOLoop;
   use Mojo::JSON     qw(to_json encode_json);
   use MIME::Base64   qw(encode_base64);
@@ -213,8 +213,7 @@ package Game::EvonyTKR::Controller::Pairs {
     unless (defined $pairs_for_type) {
       $self->logger->debug(sprintf(
         'No pairs found for type "%s". Available types: %s',
-        $generalType,
-        join(', ', sort keys %$all_pairs)
+        $generalType, join(', ', sort keys %$all_pairs)
       ));
       return [];
     }
@@ -222,16 +221,14 @@ package Game::EvonyTKR::Controller::Pairs {
     unless (ref($pairs_for_type) eq 'ARRAY') {
       $self->logger->error(sprintf(
         'Pairs for type "%s" is not an array: %s',
-        $generalType,
-        ref($pairs_for_type)
+        $generalType, ref($pairs_for_type)
       ));
       return [];
     }
 
     $self->logger->debug(sprintf(
       'Found %d pairs for type "%s"',
-      scalar(@$pairs_for_type),
-      $generalType
+      scalar(@$pairs_for_type), $generalType
     ));
 
     return $pairs_for_type;
@@ -538,7 +535,7 @@ package Game::EvonyTKR::Controller::Pairs {
       scalar(@sorted_pairs), $session_id
     ));
 
-    my $ascendingLevel       = $c->param('ascendingLevel') // 'none';
+    my $ascendingLevel       = $c->param('ascendingLevel')       // 'none';
     my $primaryCovenantLevel = $c->param('primaryCovenantLevel') // 'none';
     my @primarySpecialties;
     push @primarySpecialties, $c->param('primarySpecialty1') // 'gold';
@@ -585,36 +582,40 @@ package Game::EvonyTKR::Controller::Pairs {
 
     for my $index (0 .. $max_index) {
       my $pair = $sorted_pairs[$index];
-      unless($pair && $pair->primary->name && $pair->secondary->name){
-        $c->logger->error(sprintf('invalid pair at index %s : %s', $index,
-        $pair ? Data::Printer::np($pair) : 'undefined'));
+      unless ($pair && $pair->primary->name && $pair->secondary->name) {
+        $c->logger->error(sprintf(
+          'invalid pair at index %s : %s',
+          $index, $pair ? Data::Printer::np($pair) : 'undefined'
+        ));
         next;
       }
 
       # Build args hash for the Worker class
       my $args = {
-        runId                   => $run_id,
-        primaryName             => $pair->primary->name,
-        secondaryName           => $pair->secondary->name,
-        targetType              => $validated_params->{route_meta}->{generalType},
-        activationType          => $validated_params->{buffActivation},
-        ascendingLevel          => $validated_params->{ascendingLevel},
-        primaryCovenantLevel    => $validated_params->{primaryCovenantLevel},
-        primarySpecialty1       => $validated_params->{primarySpecialties}->[0],
-        primarySpecialty2       => $validated_params->{primarySpecialties}->[1],
-        primarySpecialty3       => $validated_params->{primarySpecialties}->[2],
-        primarySpecialty4       => $validated_params->{primarySpecialties}->[3],
-        secondaryCovenantLevel  => $validated_params->{secondaryCovenantLevel},
-        secondarySpecialty1     => $validated_params->{secondarySpecialties}->[0],
-        secondarySpecialty2     => $validated_params->{secondarySpecialties}->[1],
-        secondarySpecialty3     => $validated_params->{secondarySpecialties}->[2],
-        secondarySpecialty4     => $validated_params->{secondarySpecialties}->[3],
+        runId                => $run_id,
+        primaryName          => $pair->primary->name,
+        secondaryName        => $pair->secondary->name,
+        targetType           => $validated_params->{route_meta}->{generalType},
+        activationType       => $validated_params->{buffActivation},
+        ascendingLevel       => $validated_params->{ascendingLevel},
+        primaryCovenantLevel => $validated_params->{primaryCovenantLevel},
+        primarySpecialty1    => $validated_params->{primarySpecialties}->[0],
+        primarySpecialty2    => $validated_params->{primarySpecialties}->[1],
+        primarySpecialty3    => $validated_params->{primarySpecialties}->[2],
+        primarySpecialty4    => $validated_params->{primarySpecialties}->[3],
+        secondaryCovenantLevel => $validated_params->{secondaryCovenantLevel},
+        secondarySpecialty1 => $validated_params->{secondarySpecialties}->[0],
+        secondarySpecialty2 => $validated_params->{secondarySpecialties}->[1],
+        secondarySpecialty3 => $validated_params->{secondarySpecialties}->[2],
+        secondarySpecialty4 => $validated_params->{secondarySpecialties}->[3],
       };
 
-      $c->logger->debug(sprintf('Enqueueing job for pair index: %s with params %s',
-        $index, Data::Printer::np($args, multiline => 0)));
+      $c->logger->debug(sprintf(
+        'Enqueueing job for pair index: %s with params %s',
+        $index, Data::Printer::np($args, multiline => 0)
+      ));
       my $jid = $c->app->minion->enqueue(
-        summarize_pair => [ $args ] => {
+        summarize_pair => [$args] => {
           delay    => ($index * 0.001) + rand(0.5),
           attempts => 2,
         }
@@ -638,8 +639,7 @@ package Game::EvonyTKR::Controller::Pairs {
             "job $jid result is " . Data::Printer::np($result, multiline => 0));
           if ($result->{result}->{status} eq 'complete') {
             my $encoded = encode_base64($result->{result}->{result}, '');
-            $c->write_sse(
-              { type => 'pair', text => $encoded });
+            $c->write_sse({ type => 'pair', text => $encoded });
           }
         }
         return $result;

@@ -141,9 +141,7 @@ package Game::EvonyTKR::Model::Buff::Summarizer {
 
     state $covenant_helper;
     $covenant_helper //= do {
-      my $helper = eval {
-        Game::EvonyTKR::Model::Base->new();
-      };
+      my $helper = eval { Game::EvonyTKR::Model::Base->new(); };
       if ($@) {
         $self->logger->error("Cannot create covenant helper: $@");
         return;

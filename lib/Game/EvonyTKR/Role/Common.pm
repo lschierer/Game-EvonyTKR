@@ -116,9 +116,9 @@ package Game::EvonyTKR::Role::Common {
       $persistence = Game::EvonyTKR::Service::Persistence->new;
     }
 
-    my $prereqs         = {};
-    my @outstanding     = ();
-    my @failed_tasks    = ();
+    my $prereqs      = {};
+    my @outstanding  = ();
+    my @failed_tasks = ();
 
     foreach my $prereq (@$prereq_tasks) {
       # Check persistence layer for completion

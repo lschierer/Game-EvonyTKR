@@ -8,7 +8,6 @@ use Mojo::Base -role, -signatures;
 use Const::Fast;
 use Carp;
 
-
 # a *best* book will always be a level 4 book,
 # as level 4 is the highest.
 has bestLevel => 4;

@@ -5,14 +5,14 @@ require Data::Printer;
 require Game::EvonyTKR::Model::Buff::Summarizer::Pair;
 
 package Game::EvonyTKR::External::General::Pair::Summarizer {
-  use Mojo::Base 'Game::EvonyTKR::External::JobBase',                    -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Role::Constants::Books',               -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants',       -role;
+  use Mojo::Base 'Game::EvonyTKR::External::JobBase',              -signatures;
+  use Mojo::Base 'Game::EvonyTKR::Role::Constants::Books',         -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants', -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants',    -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::AscendingAttributes', -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::Covenants',           -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::Specialties',         -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::Persistence::Pairs', -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Persistence::Pairs',             -role;
   use List::AllUtils qw(any all none uniq);
   use Mojo::JSON     qw(encode_json);
   use Scalar::Util   qw(blessed);
@@ -30,23 +30,23 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
   sub run ($job, @args) {
     $job->SUPER::run(@args);
 
-    my $params = shift @args;
-    my $runId = $params->{runId};
-    my $primaryName             = $params->{primaryName    };
-    my $secondaryName           = $params->{secondaryName  };
+    my $params        = shift @args;
+    my $runId         = $params->{runId};
+    my $primaryName   = $params->{primaryName};
+    my $secondaryName = $params->{secondaryName};
 
-    my $activationType          = $params->{activationType };
-    $params->{ascendingLevel        }  //= 'none';
-    $params->{primaryCovenantLevel  }  //= 'none';
-    $params->{primarySpecialty1     }  //= 'none';
-    $params->{primarySpecialty2     }  //= 'none';
-    $params->{primarySpecialty3     }  //= 'none';
-    $params->{primarySpecialty4     }  //= 'none';
-    $params->{secondaryCovenantLevel}  //= 'none';
-    $params->{secondarySpecialty1   }  //= 'none';
-    $params->{secondarySpecialty2   }  //= 'none';
-    $params->{secondarySpecialty3   }  //= 'none';
-    $params->{secondarySpecialty4   }  //= 'none';
+    my $activationType = $params->{activationType};
+    $params->{ascendingLevel}         //= 'none';
+    $params->{primaryCovenantLevel}   //= 'none';
+    $params->{primarySpecialty1}      //= 'none';
+    $params->{primarySpecialty2}      //= 'none';
+    $params->{primarySpecialty3}      //= 'none';
+    $params->{primarySpecialty4}      //= 'none';
+    $params->{secondaryCovenantLevel} //= 'none';
+    $params->{secondarySpecialty1}    //= 'none';
+    $params->{secondarySpecialty2}    //= 'none';
+    $params->{secondarySpecialty3}    //= 'none';
+    $params->{secondarySpecialty4}    //= 'none';
 
     # Validate required parameters
     my @errmessage;
@@ -82,7 +82,8 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
 
     my $secondary = $job->get_general($secondaryName);
     unless ($secondary) {
-      my $err = sprintf('Cannot retrieve secondary general: %s', $secondaryName);
+      my $err =
+        sprintf('Cannot retrieve secondary general: %s', $secondaryName);
       $job->logger->error($err);
       return $job->fail($err);
     }
@@ -97,8 +98,7 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
     unless ($pair) {
       my $err = sprintf(
         'Cannot retrieve pair for primary "%s", secondary "%s", type "%s"',
-        $primaryName, $secondaryName, $params->{targetType}
-      );
+        $primaryName, $secondaryName, $params->{targetType});
       $job->logger->error($err);
       return $job->fail($err);
     }
@@ -118,18 +118,18 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
     if ($pair->primary->ascending) {
       $pair->primary->populateAscendingAttributes();
       unless ($pair->primary->ascendingAttributes) {
-        my $errmessage = sprintf(
-          'Failed to get ascending attributes for primary "%s"',
-          $pair->primary->name
-        );
+        my $errmessage =
+          sprintf('Failed to get ascending attributes for primary "%s"',
+          $pair->primary->name);
         $job->logger->error($errmessage);
         $job->fail($errmessage);
       }
     }
 
     # Populate builtin books for both generals in the pair
-    $pair->primary->populateBuiltinBook()     unless ($pair->primary->builtInBook);
-    $pair->secondary->populateBuiltinBook()   unless ($pair->secondary->builtInBook);
+    $pair->primary->populateBuiltinBook() unless ($pair->primary->builtInBook);
+    $pair->secondary->populateBuiltinBook()
+      unless ($pair->secondary->builtInBook);
 
     # Populate specialties for both generals in the pair
     $pair->primary->populateSpecialties()
@@ -145,12 +145,9 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
     # Debug: verify specialties are loaded
     $job->logger->debug(sprintf(
       'Primary %s has %d specialties, Secondary %s has %d specialties',
-      $pair->primary->name,
-      scalar($pair->primary->specialties->@*),
-      $pair->secondary->name,
-      scalar($pair->secondary->specialties->@*)
+      $pair->primary->name,   scalar($pair->primary->specialties->@*),
+      $pair->secondary->name, scalar($pair->secondary->specialties->@*)
     ));
-
 
     $job->validateParams($params);
 
@@ -158,29 +155,38 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
     $params->{pair} = $pair;
     # Convert targetType to proper troop type key
     $params->{targetType} = $job->string_to_trooptype($params->{targetType});
-    $job->logger->debug(sprintf('%s using tt %s to retrieve results', __PACKAGE__, $params->{targetType}));
-
+    $job->logger->debug(
+      sprintf(
+        '%s using tt %s to retrieve results',
+        __PACKAGE__, $params->{targetType}
+      )
+    );
 
     # Map primary covenant/specialty params to base Summarizer attributes
     $params->{covenantLevel} = $params->{primaryCovenantLevel};
-    $params->{specialty1} = $params->{primarySpecialty1};
-    $params->{specialty2} = $params->{primarySpecialty2};
-    $params->{specialty3} = $params->{primarySpecialty3};
-    $params->{specialty4} = $params->{primarySpecialty4};
+    $params->{specialty1}    = $params->{primarySpecialty1};
+    $params->{specialty2}    = $params->{primarySpecialty2};
+    $params->{specialty3}    = $params->{primarySpecialty3};
+    $params->{specialty4}    = $params->{primarySpecialty4};
 
     # Note serializable params for debugging
     $job->note(
       PairSummarizer_params => {
         $params->%*,
-        pair                   => { primary => $pair->primary->to_hash(), secondary => $pair->secondary->to_hash(), type => $pair->type },
-        has_primary_covenant   => defined($primaryCovenant)   ? 1 : 0,
-        has_secondary_covenant => defined($secondaryCovenant) ? 1 : 0,
-        has_ascending          => defined($primary->ascendingAttributes) ? 1 : 0,
+        pair => {
+          primary   => $pair->primary->to_hash(),
+          secondary => $pair->secondary->to_hash(),
+          type      => $pair->type
+        },
+        has_primary_covenant   => defined($primaryCovenant)     ? 1 : 0,
+        has_secondary_covenant => defined($secondaryCovenant)   ? 1 : 0,
+        has_ascending => defined($primary->ascendingAttributes) ? 1 : 0,
       }
     );
 
     # Create summarizer
-    my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer::Pair->new($params->%*);
+    my $summarizer =
+      Game::EvonyTKR::Model::Buff::Summarizer::Pair->new($params->%*);
 
     # Compute buffs and debuffs
     $summarizer->updateBuffs();
@@ -191,13 +197,13 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
     my $secondary_general = $job->get_general($secondaryName);
 
     unless ($primary_general && $secondary_general) {
-      return $job->fail("Failed to load generals: $primaryName, $secondaryName");
+      return $job->fail(
+        "Failed to load generals: $primaryName, $secondaryName");
     }
 
     # Flatten buffs/debuffs to match client schema
     my $buffs   = $summarizer->pairBuffValues;
     my $debuffs = $summarizer->pairDebuffValues;
-
 
     # Return results
     $job->finish({
@@ -205,24 +211,25 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
       result => encode_json({
         runId => $runId,
         data  => {
-          primary             => $primary_general->to_hash(),
-          secondary           => $secondary_general->to_hash(),
-          marchbuff           => $buffs->{$params->{targetType}}->{'March Size'} // 0,
-          attackbuff          => $buffs->{$params->{targetType}}->{'Attack'} // 0,
-          defensebuff         => $buffs->{$params->{targetType}}->{'Defense'} // 0,
-          hpbuff              => $buffs->{$params->{targetType}}->{'HP'} // 0,
-          groundattackdebuff  => $debuffs->{'Ground Troops'}->{'Attack'} // 0,
-          grounddefensedebuff => $debuffs->{'Ground Troops'}->{'Defense'} // 0,
-          groundhpdebuff      => $debuffs->{'Ground Troops'}->{'HP'} // 0,
-          mountedattackdebuff => $debuffs->{'Mounted Troops'}->{'Attack'} // 0,
-          mounteddefensedebuff => $debuffs->{'Mounted Troops'}->{'Defense'} // 0,
-          mountedhpdebuff     => $debuffs->{'Mounted Troops'}->{'HP'} // 0,
-          rangedattackdebuff  => $debuffs->{'Ranged Troops'}->{'Attack'} // 0,
-          rangeddefensedebuff => $debuffs->{'Ranged Troops'}->{'Defense'} // 0,
-          rangedhpdebuff      => $debuffs->{'Ranged Troops'}->{'HP'} // 0,
-          siegeattackdebuff   => $debuffs->{'Siege Machines'}->{'Attack'} // 0,
+          primary     => $primary_general->to_hash(),
+          secondary   => $secondary_general->to_hash(),
+          marchbuff   => $buffs->{ $params->{targetType} }->{'March Size'} // 0,
+          attackbuff  => $buffs->{ $params->{targetType} }->{'Attack'}     // 0,
+          defensebuff => $buffs->{ $params->{targetType} }->{'Defense'}    // 0,
+          hpbuff      => $buffs->{ $params->{targetType} }->{'HP'}         // 0,
+          groundattackdebuff   => $debuffs->{'Ground Troops'}->{'Attack'}  // 0,
+          grounddefensedebuff  => $debuffs->{'Ground Troops'}->{'Defense'} // 0,
+          groundhpdebuff       => $debuffs->{'Ground Troops'}->{'HP'}      // 0,
+          mountedattackdebuff  => $debuffs->{'Mounted Troops'}->{'Attack'} // 0,
+          mounteddefensedebuff => $debuffs->{'Mounted Troops'}->{'Defense'}
+            // 0,
+          mountedhpdebuff     => $debuffs->{'Mounted Troops'}->{'HP'}      // 0,
+          rangedattackdebuff  => $debuffs->{'Ranged Troops'}->{'Attack'}   // 0,
+          rangeddefensedebuff => $debuffs->{'Ranged Troops'}->{'Defense'}  // 0,
+          rangedhpdebuff      => $debuffs->{'Ranged Troops'}->{'HP'}       // 0,
+          siegeattackdebuff   => $debuffs->{'Siege Machines'}->{'Attack'}  // 0,
           siegedefensedebuff  => $debuffs->{'Siege Machines'}->{'Defense'} // 0,
-          siegehpdebuff       => $debuffs->{'Siege Machines'}->{'HP'} // 0,
+          siegehpdebuff       => $debuffs->{'Siege Machines'}->{'HP'}      // 0,
         }
       })
     });
@@ -236,12 +243,11 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
       secondary => $params->{secondaryName},
     });
     $params->{pair} = $job->get_pair($key);
-    unless(ref($params->{pair}) &&
-      blessed($params->{pair}) &&
-      $params->{pair}->isa('Game::EvonyTKR::Model::General::Pair')
-    ) {
+    unless (ref($params->{pair})
+      && blessed($params->{pair})
+      && $params->{pair}->isa('Game::EvonyTKR::Model::General::Pair')) {
       my $em = sprintf('job id %s cannot find a valid Pair for params %s',
-      $job->info->{id}, Data::Printer::np($params, multiline => 0));
+        $job->info->{id}, Data::Printer::np($params, multiline => 0));
 
       $job->logger->error($em);
       return $job->fail($em);
@@ -282,7 +288,8 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
         my $em = sprintf(
           '%s "%s" is invalid, must be one of %s',
           $level_param, $params->{$level_param},
-          join ', ', map { sprintf('"%s"', $_) } $job->CovenantCategoryValues->@*
+          join ', ',
+          map { sprintf('"%s"', $_) } $job->CovenantCategoryValues->@*
         );
         $job->logger->error($em);
         return $job->fail($em);
@@ -293,7 +300,8 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
     foreach my $index (1 .. 4) {
       my $specialtyLevel = $params->{"specialty${index}"};
       unless ($job->is_valid_specialty_level($specialtyLevel)) {
-        my $em = sprintf('primary specialty%d level "%s" is invalid, must be one of %s',
+        my $em = sprintf(
+          'primary specialty%d level "%s" is invalid, must be one of %s',
           $index, $specialtyLevel, join ', ',
           map { sprintf('"%s"', $_) } $job->SpecialtyLevelValues->@*);
         $job->logger->error($em);
@@ -305,7 +313,8 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
     foreach my $index (1 .. 4) {
       my $specialtyLevel = $params->{"secondarySpecialty${index}"};
       unless ($job->is_valid_specialty_level($specialtyLevel)) {
-        my $em = sprintf('secondary specialty%d level "%s" is invalid, must be one of %s',
+        my $em = sprintf(
+          'secondary specialty%d level "%s" is invalid, must be one of %s',
           $index, $specialtyLevel, join ', ',
           map { sprintf('"%s"', $_) } $job->SpecialtyLevelValues->@*);
         $job->logger->error($em);

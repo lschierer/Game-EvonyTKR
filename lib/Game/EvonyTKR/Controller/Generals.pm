@@ -349,12 +349,10 @@ package Game::EvonyTKR::Controller::Generals {
       $result;
     } @all_generals;
 
-    $self->logger->debug(
-      sprintf(
-        'grep filtered the list from %s to %s',
-        scalar(@all_generals), scalar(@selected)
-      )
-    );
+    $self->logger->debug(sprintf(
+      'grep filtered the list from %s to %s',
+      scalar(@all_generals), scalar(@selected)
+    ));
     return \@selected;
   }
 
@@ -775,7 +773,6 @@ package Game::EvonyTKR::Controller::Generals {
     my $generalType    = $route_meta->{generalType};
     my $buffActivation = $route_meta->{buffActivation};
     my $uiTarget       = $route_meta->{uiTarget};
-
 
     my @selected = $self->get_generals_by_type($generalType)->@*;
 

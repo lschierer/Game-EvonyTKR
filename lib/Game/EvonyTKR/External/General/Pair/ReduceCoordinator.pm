@@ -3,7 +3,7 @@ use utf8::all;
 use File::FindLib 'lib';
 
 package Game::EvonyTKR::External::General::Pair::ReduceCoordinator {
-  use Mojo::Base 'Game::EvonyTKR::External::JobBase',       -signatures;
+  use Mojo::Base 'Game::EvonyTKR::External::JobBase',        -signatures;
   use Mojo::Base 'Game::EvonyTKR::Role::Persistence::Pairs', -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants', -role;
   use List::AllUtils qw(uniq none all any);
@@ -127,8 +127,10 @@ package Game::EvonyTKR::External::General::Pair::ReduceCoordinator {
     return unless $batch_results;
 
     # Check if batch was skipped due to all cache hits
-    if ($batch_results->{skipped_reason} && $batch_results->{skipped_reason} eq 'all_cache_hits') {
-      $job->logger->debug("Batch $batch_id was skipped (all cache hits), nothing to merge");
+    if ( $batch_results->{skipped_reason}
+      && $batch_results->{skipped_reason} eq 'all_cache_hits') {
+      $job->logger->debug(
+        "Batch $batch_id was skipped (all cache hits), nothing to merge");
       $total_cache_hits += $batch_results->{total_cache_hits} // 0;
       return;
     }
@@ -181,13 +183,15 @@ package Game::EvonyTKR::External::General::Pair::ReduceCoordinator {
   sub cache_pair_results ($job, $batch_id) {
     my $batch_results = $job->pair_cache->get("batch_results:$batch_id");
     return unless $batch_results;
-    
+
     # Check if batch was skipped - no pairs to process
-    if ($batch_results->{skipped_reason} && $batch_results->{skipped_reason} eq 'all_cache_hits') {
-      $job->logger->debug("Batch $batch_id was skipped (all cache hits), no pairs to merge");
+    if ( $batch_results->{skipped_reason}
+      && $batch_results->{skipped_reason} eq 'all_cache_hits') {
+      $job->logger->debug(
+        "Batch $batch_id was skipped (all cache hits), no pairs to merge");
       return;
     }
-    
+
     if ($batch_results->{pairs}) {
       $total_pairs = [
         List::UtilsBy::uniq_by { $job->wire_pair_to_key($_) }

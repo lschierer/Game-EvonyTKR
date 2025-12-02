@@ -72,14 +72,15 @@ sub load_mandatory_skill_books ($self) {
         $book_name = sprintf('Level %s %s', $level, $attr);
       }
 
-      if(!scalar(@books)){
+      if (!scalar(@books)) {
         my $book = $self->get_generic_book($book_name, $level);
         unless ($book) {
           $self->logger->error("Cannot find $book_name");
           next;
         }
         push @books, $book;
-      } elsif (none { $_->name eq $book_name } @books) {
+      }
+      elsif (none { $_->name eq $book_name } @books) {
         my $book = $self->get_generic_book($book_name, $level);
         unless ($book) {
           $self->logger->error("Cannot find $book_name");

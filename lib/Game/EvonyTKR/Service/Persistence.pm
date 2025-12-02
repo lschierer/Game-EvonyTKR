@@ -32,10 +32,10 @@ has 'lifecycle_id' => sub ($self) {
   # Ensure database is initialized first (this triggers _initialize_schema)
   my $db = $self->sqlite;
 
-  # Now read lifecycle_id from metadata to ensure consistency across worker processes
+# Now read lifecycle_id from metadata to ensure consistency across worker processes
   my $stored = $self->get_metadata('lifecycle_id');
 
-  # If not in metadata (shouldn't happen after initialization), generate and store one
+# If not in metadata (shouldn't happen after initialization), generate and store one
   unless ($stored) {
     $stored = time . '_' . $$;
     $self->set_metadata('lifecycle_id', $stored);
@@ -192,8 +192,7 @@ sub _create_schema_v1 ($self, $db) {
   $db->query(
 'CREATE INDEX IF NOT EXISTS idx_conflicts_general2 ON general_conflicts(general2_name)'
   );
-  $db->query(
-    'CREATE INDEX IF NOT EXISTS idx_pairs_type ON pairs(type)');
+  $db->query('CREATE INDEX IF NOT EXISTS idx_pairs_type ON pairs(type)');
   $db->query(
     'CREATE INDEX IF NOT EXISTS idx_pairs_lifecycle ON pairs(lifecycle_id)');
 
@@ -225,8 +224,7 @@ sub _migrate_to_v2 ($self, $db) {
   });
 
   # Add indices
-  $db->query(
-    'CREATE INDEX IF NOT EXISTS idx_pairs_type ON pairs(type)');
+  $db->query('CREATE INDEX IF NOT EXISTS idx_pairs_type ON pairs(type)');
   $db->query(
     'CREATE INDEX IF NOT EXISTS idx_pairs_lifecycle ON pairs(lifecycle_id)');
 
@@ -341,7 +339,7 @@ sub clear_lifecycle_jobs ($self) {
 ##############################################################################
 
 sub store_general ($self, $name, $data_hash) {
-  my $db = $self->sqlite->db;
+  my $db              = $self->sqlite->db;
   my $normalized_name = $self->normalize($name);
 
   my $json = encode_json($data_hash);
@@ -356,11 +354,11 @@ sub store_general ($self, $name, $data_hash) {
 }
 
 sub get_general ($self, $name) {
-  my $db = $self->sqlite->db;
+  my $db              = $self->sqlite->db;
   my $normalized_name = $self->normalize($name);
 
-  my $result =
-    $db->query('SELECT data_json FROM generals WHERE name = ?', $normalized_name)->hash;
+  my $result = $db->query('SELECT data_json FROM generals WHERE name = ?',
+    $normalized_name)->hash;
 
   return $result ? decode_json($result->{data_json}) : undef;
 }
@@ -389,7 +387,7 @@ sub count_generals ($self) {
 ##############################################################################
 
 sub store_builtin_book ($self, $name, $data_hash) {
-  my $db = $self->sqlite->db;
+  my $db              = $self->sqlite->db;
   my $normalized_name = $self->normalize($name);
 
   my $json = encode_json($data_hash);
@@ -404,12 +402,11 @@ sub store_builtin_book ($self, $name, $data_hash) {
 }
 
 sub get_builtin_book ($self, $name) {
-  my $db = $self->sqlite->db;
+  my $db              = $self->sqlite->db;
   my $normalized_name = $self->normalize($name);
 
-  my $result =
-    $db->query('SELECT data_json FROM builtin_books WHERE name = ?', $normalized_name)
-    ->hash;
+  my $result = $db->query('SELECT data_json FROM builtin_books WHERE name = ?',
+    $normalized_name)->hash;
 
   return $result ? decode_json($result->{data_json}) : undef;
 }
@@ -433,7 +430,7 @@ sub list_builtin_books ($self) {
 ##############################################################################
 
 sub store_generic_book ($self, $name, $level, $data_hash) {
-  my $db = $self->sqlite->db;
+  my $db              = $self->sqlite->db;
   my $normalized_name = $self->normalize($name);
 
   my $json = encode_json($data_hash);
@@ -448,7 +445,7 @@ sub store_generic_book ($self, $name, $level, $data_hash) {
 }
 
 sub get_generic_book ($self, $name, $level) {
-  my $db = $self->sqlite->db;
+  my $db              = $self->sqlite->db;
   my $normalized_name = $self->normalize($name);
 
   my $result = $db->query(
@@ -477,7 +474,7 @@ sub list_generic_books ($self) {
 ##############################################################################
 
 sub store_covenant ($self, $name, $data_hash) {
-  my $db = $self->sqlite->db;
+  my $db              = $self->sqlite->db;
   my $normalized_name = $self->normalize($name);
 
   my $json = encode_json($data_hash);
@@ -492,11 +489,11 @@ sub store_covenant ($self, $name, $data_hash) {
 }
 
 sub get_covenant ($self, $name) {
-  my $db = $self->sqlite->db;
+  my $db              = $self->sqlite->db;
   my $normalized_name = $self->normalize($name);
 
-  my $result =
-    $db->query('SELECT data_json FROM covenants WHERE name = ?', $normalized_name)->hash;
+  my $result = $db->query('SELECT data_json FROM covenants WHERE name = ?',
+    $normalized_name)->hash;
 
   return $result ? decode_json($result->{data_json}) : undef;
 }
@@ -520,7 +517,7 @@ sub list_covenants ($self) {
 ##############################################################################
 
 sub store_specialty ($self, $name, $data_hash) {
-  my $db = $self->sqlite->db;
+  my $db              = $self->sqlite->db;
   my $normalized_name = $self->normalize($name);
 
   my $json = encode_json($data_hash);
@@ -535,11 +532,11 @@ sub store_specialty ($self, $name, $data_hash) {
 }
 
 sub get_specialty ($self, $name) {
-  my $db = $self->sqlite->db;
+  my $db              = $self->sqlite->db;
   my $normalized_name = $self->normalize($name);
 
-  my $result =
-    $db->query('SELECT data_json FROM specialties WHERE name = ?', $normalized_name)->hash;
+  my $result = $db->query('SELECT data_json FROM specialties WHERE name = ?',
+    $normalized_name)->hash;
 
   return $result ? decode_json($result->{data_json}) : undef;
 }
@@ -563,7 +560,7 @@ sub list_specialties ($self) {
 ##############################################################################
 
 sub store_ascending_attribute ($self, $name, $data_hash) {
-  my $db = $self->sqlite->db;
+  my $db              = $self->sqlite->db;
   my $normalized_name = $self->normalize($name);
 
   my $json = encode_json($data_hash);
@@ -578,7 +575,7 @@ sub store_ascending_attribute ($self, $name, $data_hash) {
 }
 
 sub get_ascending_attribute ($self, $name) {
-  my $db = $self->sqlite->db;
+  my $db              = $self->sqlite->db;
   my $normalized_name = $self->normalize($name);
 
   my $result =
@@ -627,7 +624,7 @@ sub store_conflict ($self, $general1_name, $general2_name) {
 }
 
 sub get_conflicts_for_general ($self, $general_name) {
-  my $db = $self->sqlite->db;
+  my $db              = $self->sqlite->db;
   my $normalized_name = $self->normalize($general_name);
 
   my @conflicts;
@@ -712,21 +709,19 @@ sub get_pair ($self, $key) {
   my $normalized_key = $self->normalize($key);
   $normalized_key =~ s/ /_/g;
 
-  my $result =
-    $db->query('SELECT data_json FROM pairs WHERE pair_key = ?', $normalized_key)
-    ->hash;
+  my $result = $db->query('SELECT data_json FROM pairs WHERE pair_key = ?',
+    $normalized_key)->hash;
 
   return $result ? decode_json($result->{data_json}) : undef;
 }
 
 sub list_pairs_by_type ($self, $type) {
-  my $db = $self->sqlite->db;
+  my $db           = $self->sqlite->db;
   my $lifecycle_id = $self->lifecycle_id;
 
   my $results = $db->query(
     'SELECT data_json FROM pairs WHERE type = ? AND lifecycle_id = ?',
-    $type, $lifecycle_id
-  );
+    $type, $lifecycle_id);
 
   my @pairs;
   while (my $row = $results->hash) {
@@ -737,13 +732,12 @@ sub list_pairs_by_type ($self, $type) {
 }
 
 sub get_all_pair_types ($self) {
-  my $db = $self->sqlite->db;
+  my $db           = $self->sqlite->db;
   my $lifecycle_id = $self->lifecycle_id;
 
-  my $results = $db->query(
-    'SELECT DISTINCT type FROM pairs WHERE lifecycle_id = ?',
-    $lifecycle_id
-  );
+  my $results =
+    $db->query('SELECT DISTINCT type FROM pairs WHERE lifecycle_id = ?',
+    $lifecycle_id);
 
   my @types;
   while (my $row = $results->hash) {
@@ -754,7 +748,7 @@ sub get_all_pair_types ($self) {
 }
 
 sub count_pairs_by_type ($self, $type = undef) {
-  my $db = $self->sqlite->db;
+  my $db           = $self->sqlite->db;
   my $lifecycle_id = $self->lifecycle_id;
 
   if (defined $type) {
@@ -766,8 +760,7 @@ sub count_pairs_by_type ($self, $type = undef) {
   else {
     return $db->query(
       'SELECT COUNT(*) as count FROM pairs WHERE lifecycle_id = ?',
-      $lifecycle_id
-    )->hash->{count};
+      $lifecycle_id)->hash->{count};
   }
 }
 

@@ -1,7 +1,7 @@
 package Game::EvonyTKR::Role::Persistence::Pairs;
 use v5.42.0;
 use utf8::all;
-use Mojo::Base -role, -signatures;
+use Mojo::Base -role,                                     -signatures;
 use Mojo::Base 'Game::EvonyTKR::Role::Persistence::Core', -role;
 use List::AllUtils qw(uniq none all any);
 use List::UtilsBy;
@@ -50,8 +50,8 @@ sub add_conflict_data ($self, $by_general, $groups_by_conflict_type) {
 
     foreach my $type (keys %$groups_by_conflict_type) {
       $current_data->{groups_by_conflict_type}->{$type} //= [];
-      my %seen = map { $_ => 1 }
-        @{ $current_data->{groups_by_conflict_type}->{$type} };
+      my %seen =
+        map { $_ => 1 } @{ $current_data->{groups_by_conflict_type}->{$type} };
       push @{ $current_data->{groups_by_conflict_type}->{$type} },
         grep { !$seen{$_}++ } @{ $groups_by_conflict_type->{$type} };
     }
@@ -154,12 +154,9 @@ sub add_wire_pair ($self, $wire_pair) {
     my $pbt_result = $self->pair_cache->cas('pairs_by_type', @$pbt_cas_val);
     if ($pbt_result) {
       my $wp_result =
-        $self->pair_cache->set($self->wire_pair_to_key($wire_pair),
-        $wire_pair);
+        $self->pair_cache->set($self->wire_pair_to_key($wire_pair), $wire_pair);
       if ($wp_result) {
-        eval {
-          $self->persistence->store_pair($key, $wire_pair);
-        };
+        eval { $self->persistence->store_pair($key, $wire_pair); };
         if ($@) {
           $self->logger->error("Failed to store pair to persistence: $@");
         }
@@ -230,11 +227,13 @@ sub get_pairs_by_type ($self) {
 
       if (keys %$pairs_by_type) {
         $self->pair_cache->set('pairs_by_type', $pairs_by_type);
-        $self->logger->info('Rebuilt pairs_by_type in memcached from persistence');
+        $self->logger->info(
+          'Rebuilt pairs_by_type in memcached from persistence');
       }
     };
     if ($@) {
-      $self->logger->error("Failed to rebuild pairs_by_type from persistence: $@");
+      $self->logger->error(
+        "Failed to rebuild pairs_by_type from persistence: $@");
     }
   }
 

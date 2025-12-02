@@ -49,11 +49,9 @@ sub updateBuffs ($self) {
     && ref($self->pair)
     && blessed($self->pair)
     && $self->pair->isa('Game::EvonyTKR::Model::General::Pair')) {
-    $self->logger->error(
-      sprintf(
-        '%s requires a Game::EvonyTKR::Model::General::Pair', __PACKAGE__
-      )
-    );
+    $self->logger->error(sprintf(
+      '%s requires a Game::EvonyTKR::Model::General::Pair',
+      __PACKAGE__));
     return;
   }
 
@@ -69,10 +67,8 @@ sub updateBuffs ($self) {
   $self->isPrimary(1);
   $self->SUPER::updateBuffs();
 
-  $self->logger->debug(sprintf(
-    'After primary updateBuffs: %s',
-    Data::Printer::np($self->buffValues, max_depth => 2)
-  ));
+  $self->logger->debug(sprintf('After primary updateBuffs: %s',
+    Data::Printer::np($self->buffValues, max_depth => 2)));
 
   foreach my $troopType (keys %{ $self->buffValues }) {
     foreach my $attribute (keys %{ $self->buffValues->{$troopType} }) {
@@ -112,11 +108,9 @@ sub updateDebuffs ($self) {
     && ref($self->pair)
     && blessed($self->pair)
     && $self->pair->isa('Game::EvonyTKR::Model::General::Pair')) {
-    $self->logger->error(
-      sprintf(
-        '%s requires a Game::EvonyTKR::Model::General::Pair', __PACKAGE__
-      )
-    );
+    $self->logger->error(sprintf(
+      '%s requires a Game::EvonyTKR::Model::General::Pair',
+      __PACKAGE__));
     return;
   }
 
@@ -171,10 +165,11 @@ sub _getGenericBookValue_impl ($self, $attribute, $troopType) {
   $books_helper //= do {
     my $helper = eval {
       Game::EvonyTKR::Model::Base->new->with_roles(
-      'Game::EvonyTKR::Role::Constants::BuffConstants',
-      'Game::EvonyTKR::Role::Constants::GeneralConstants',
-      'Game::EvonyTKR::Role::Constants::Books',
-      'Game::EvonyTKR::Role::Books',);
+        'Game::EvonyTKR::Role::Constants::BuffConstants',
+        'Game::EvonyTKR::Role::Constants::GeneralConstants',
+        'Game::EvonyTKR::Role::Constants::Books',
+        'Game::EvonyTKR::Role::Books',
+      );
     };
     if ($@) {
       $self->logger->error("Cannot create books helper: $@");
@@ -182,7 +177,6 @@ sub _getGenericBookValue_impl ($self, $attribute, $troopType) {
     }
     $helper;
   };
-
 
   # Determine which general is current and which is other
   my $current_general = $self->general;

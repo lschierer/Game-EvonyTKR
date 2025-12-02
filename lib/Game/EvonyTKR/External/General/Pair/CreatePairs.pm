@@ -3,7 +3,7 @@ use utf8::all;
 use File::FindLib 'lib';
 
 package Game::EvonyTKR::External::General::Pair::CreatePairs {
-  use Mojo::Base 'Game::EvonyTKR::External::JobBase',       -signatures;
+  use Mojo::Base 'Game::EvonyTKR::External::JobBase',        -signatures;
   use Mojo::Base 'Game::EvonyTKR::Role::Persistence::Pairs', -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants', -role;
   require Game::EvonyTKR::Service::Cache;

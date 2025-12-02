@@ -82,9 +82,7 @@ package Game::EvonyTKR::Model::General::Pair {
 
     state $general_helper;
     unless ($general_helper) {
-      eval {
-        $general_helper = Game::EvonyTKR::Model::Base->new();
-      } or do {
+      eval { $general_helper = Game::EvonyTKR::Model::Base->new(); } or do {
         $logger->error(
           sprintf('eval failed; cannot define general helper: "%s"', $@));
         return;

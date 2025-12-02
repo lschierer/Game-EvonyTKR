@@ -140,12 +140,12 @@ package Game::EvonyTKR::External::Book::LoadAllBuiltins {
 
       # Verify all data is actually in persistence before marking complete
       # This ensures database transactions have committed
-      my $verified = 0;
+      my $verified            = 0;
       my $max_verify_attempts = 10;
 
       for my $attempt (1 .. $max_verify_attempts) {
         my $all_in_persistence = 1;
-        my $missing_count = 0;
+        my $missing_count      = 0;
 
         foreach my $entry (@list) {
           unless ($job->get_builtin_book($entry)) {
@@ -161,14 +161,15 @@ package Game::EvonyTKR::External::Book::LoadAllBuiltins {
         }
 
         $job->logger->debug(sprintf(
-          'Persistence verification attempt %d/%d: %d builtin books still missing',
+'Persistence verification attempt %d/%d: %d builtin books still missing',
           $attempt, $max_verify_attempts, $missing_count
         ));
         sleep 1;
       }
 
       unless ($verified) {
-        my $errmsg = 'Failed to verify all builtin books in persistence after child jobs finished';
+        my $errmsg =
+'Failed to verify all builtin books in persistence after child jobs finished';
         $job->logger->error($errmsg);
         return $job->fail($errmsg);
       }

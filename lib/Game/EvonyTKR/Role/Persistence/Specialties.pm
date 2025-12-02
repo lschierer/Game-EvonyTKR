@@ -1,7 +1,7 @@
 package Game::EvonyTKR::Role::Persistence::Specialties;
 use v5.42.0;
 use utf8::all;
-use Mojo::Base -role, -signatures;
+use Mojo::Base -role,                                     -signatures;
 use Mojo::Base 'Game::EvonyTKR::Role::Persistence::Core', -role;
 
 has 'specialty_cache' => sub ($self) {

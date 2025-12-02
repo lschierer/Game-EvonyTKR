@@ -16,27 +16,27 @@ sub conflicts ($self, $general, $generic_book, $opts = {}) {
 
   # Find grouped buffs in builtin book
   my $groups = $self->_find_groups($builtin);
-  
-  # Check if any grouped builtin buff has 25+ delta vs a generic book of same troop type
-  # If so, ALL generic books for that troop type stack (not just matching attribute)
-  # Example: Champlain 50% Siege Attack (grouped) vs L4 25% = 25pt delta
-  #          So ALL L4 Siege books (Attack, Defense, HP) stack
+
+# Check if any grouped builtin buff has 25+ delta vs a generic book of same troop type
+# If so, ALL generic books for that troop type stack (not just matching attribute)
+# Example: Champlain 50% Siege Attack (grouped) vs L4 25% = 25pt delta
+#          So ALL L4 Siege books (Attack, Defense, HP) stack
   my %stack_troop_types;
   for my $group (@$groups) {
-    for my $bi_buff (@{$group->{buffs}}) {
-      my $bi_val = $bi_buff->value->number // 0;
-      my $bi_type = $bi_buff->targetedType // '';
-      
+    for my $bi_buff (@{ $group->{buffs} }) {
+      my $bi_val  = $bi_buff->value->number // 0;
+      my $bi_type = $bi_buff->targetedType  // '';
+
       # Check against ALL generic buffs of same troop type
       for my $gen_buff (@{ $generic_book->buffs }) {
         next if $gen_buff->passive || $bi_buff->passive;
         my $gen_type = $gen_buff->targetedType // '';
         next unless $bi_type eq $gen_type;
-        
+
         # For this troop type, find the typical generic book value (usually 25%)
         my $gen_val = $gen_buff->value->number // 0;
-        my $delta = $bi_val - $gen_val;
-        
+        my $delta   = $bi_val - $gen_val;
+
         if ($delta >= 25) {
           $stack_troop_types{$bi_type} = 1;
           last;
@@ -44,7 +44,7 @@ sub conflicts ($self, $general, $generic_book, $opts = {}) {
       }
     }
   }
-  
+
   # If any generic buff matches a stacking troop type, no conflict
   for my $gen_buff (@{ $generic_book->buffs }) {
     my $gen_type = $gen_buff->targetedType // '';
@@ -52,12 +52,12 @@ sub conflicts ($self, $general, $generic_book, $opts = {}) {
       return 0;
     }
   }
-  
+
   # Build set of grouped buff addresses
   my %grouped_buffs;
   for my $group (@$groups) {
-    for my $buff (@{$group->{buffs}}) {
-      $grouped_buffs{refaddr($buff)} = 1;
+    for my $buff (@{ $group->{buffs} }) {
+      $grouped_buffs{ refaddr($buff) } = 1;
     }
   }
 
@@ -136,9 +136,10 @@ sub conflicts ($self, $general, $generic_book, $opts = {}) {
         ));
       }
 
-      my $conflict = $self->_buff_conflict($gen_buff, $bi_buff, \%grouped_buffs);
+      my $conflict =
+        $self->_buff_conflict($gen_buff, $bi_buff, \%grouped_buffs);
       $worst = $conflict if $conflict > $worst;
-      return 2 if $worst == 2;    # short-circuit on full conflict
+      return 2           if $worst == 2;        # short-circuit on full conflict
     }
   }
 
@@ -188,9 +189,9 @@ sub _buff_conflict ($self, $generic_buff, $builtin_buff, $grouped_buffs = {}) {
     ));
   }
 
-  # Empirically: grouped buffs with 25+ percentage point delta stack
-  # Example: Champlain 50% Siege Attack (grouped) vs L4 25% = 25pt delta = stack
-  # But: Aethelflaed 55% Mounted vs Monster (grouped) vs L4 45% = 10pt delta = conflict
+# Empirically: grouped buffs with 25+ percentage point delta stack
+# Example: Champlain 50% Siege Attack (grouped) vs L4 25% = 25pt delta = stack
+# But: Aethelflaed 55% Mounted vs Monster (grouped) vs L4 45% = 10pt delta = conflict
   my $bi_addr = refaddr($builtin_buff);
   if (exists $grouped_buffs->{$bi_addr} && $bi_val >= $gen_val) {
     my $delta = $bi_val - $gen_val;

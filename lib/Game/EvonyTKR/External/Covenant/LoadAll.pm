@@ -36,10 +36,8 @@ package Game::EvonyTKR::External::Covenant::LoadAll {
       if ($job->are_prereqs_outstanding(
       $job->minion,
       [
-        'load_all_generals',
-        'load_all_builtin_books',
-        'load_all_specialties',
-        'load_all_ascending_attributes',
+        'load_all_generals',    'load_all_builtin_books',
+        'load_all_specialties', 'load_all_ascending_attributes',
       ]
       ));
 
@@ -131,12 +129,12 @@ package Game::EvonyTKR::External::Covenant::LoadAll {
 
       # Verify all data is actually in persistence before marking complete
       # This ensures database transactions have committed
-      my $verified = 0;
+      my $verified            = 0;
       my $max_verify_attempts = 10;
 
       for my $attempt (1 .. $max_verify_attempts) {
         my $all_in_persistence = 1;
-        my $missing_count = 0;
+        my $missing_count      = 0;
 
         foreach my $file (@files) {
           my $covenant_name = $file->basename('.yaml', '.yml');
@@ -160,7 +158,8 @@ package Game::EvonyTKR::External::Covenant::LoadAll {
       }
 
       unless ($verified) {
-        my $errmsg = 'Failed to verify all covenants in persistence after child jobs finished';
+        my $errmsg =
+'Failed to verify all covenants in persistence after child jobs finished';
         $job->logger->error($errmsg);
         return $job->fail($errmsg);
       }

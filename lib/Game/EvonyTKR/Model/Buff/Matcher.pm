@@ -13,26 +13,22 @@ package Game::EvonyTKR::Model::Buff::Matcher {
 
   has 'toTest';
 
-  has general_to_targeted => sub {
-    {
-      mounted => 'Mounted Troops',
-      ground  => 'Ground Troops',
-      ranged  => 'Ranged Troops',
-      siege   => 'Siege Machines',
-    }
-  };
+  has general_to_targeted => sub { {
+    mounted => 'Mounted Troops',
+    ground  => 'Ground Troops',
+    ranged  => 'Ranged Troops',
+    siege   => 'Siege Machines',
+  } };
 
   # Conditions that are equivalent to having no condition
-  has no_op_Conditions => sub {
-    [
-      "brings a dragon",
-      'brings a sacred dragon',
-      'brings a spiritual beast',
-      'During SvS',
-      'leading the army',
-      'you own the General',
-    ]
-  };
+  has no_op_Conditions => sub { [
+    "brings a dragon",
+    'brings a sacred dragon',
+    'brings a spiritual beast',
+    'During SvS',
+    'leading the army',
+    'you own the General',
+  ] };
 
   sub matchTargetedType ($self, $test_tt, $logID) {
     if (length $self->toTest->targetedType) {
@@ -135,7 +131,8 @@ package Game::EvonyTKR::Model::Buff::Matcher {
     return 1;
   }
 
-  sub match ($self, $test_attribute, $test_tt, $testBuffs, $testDebuffs, $logID) {
+  sub match ($self, $test_attribute, $test_tt, $testBuffs, $testDebuffs, $logID)
+  {
     $self->logger->debug("$logID === BUFF MATCHER CALLED ===");
     $self->logger->debug(sprintf(
       "$logID Matcher called with: attr=%s, tt=%s, buffs=%s, debuffs=%s",

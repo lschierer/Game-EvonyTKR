@@ -3,7 +3,7 @@ use utf8::all;
 use File::FindLib 'lib';
 
 package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
-  use Mojo::Base 'Game::EvonyTKR::External::JobBase',       -signatures;
+  use Mojo::Base 'Game::EvonyTKR::External::JobBase',        -signatures;
   use Mojo::Base 'Game::EvonyTKR::Role::Persistence::Pairs', -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants', -role;
 
@@ -37,10 +37,8 @@ package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
       if $job->are_prereqs_outstanding(
       $job->minion,
       [
-        'load_all_generals',
-        'load_all_builtin_books',
-        'load_all_specialties',
-        'load_all_ascending_attributes',
+        'load_all_generals',    'load_all_builtin_books',
+        'load_all_specialties', 'load_all_ascending_attributes',
         'load_all_covenants',
       ]
       );

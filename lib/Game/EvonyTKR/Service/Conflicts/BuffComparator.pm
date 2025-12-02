@@ -43,7 +43,8 @@ sub conflicts ($self, $b1, $b2, $g1, $g2) {
   return 1 if $self->service->CONDLESS->{$attr};
 
   # Triad attributes have special rules
-  return $self->_triad_conflicts($b1, $b2, $g1, $g2) if $self->service->TRIADS->{$attr};
+  return $self->_triad_conflicts($b1, $b2, $g1, $g2)
+    if $self->service->TRIADS->{$attr};
 
   # Standard attributes
   return $self->_standard_conflicts($b1, $b2, $g1, $g2);
@@ -59,19 +60,23 @@ sub _troops_overlap ($self, $b1, $b2) {
 sub _normalize_conditions ($self, $buff) {
   # Strip non-operative and activation scoping conditions
   my @conds = grep {
-       $_ ne 'leading the army'
-    && $_ ne 'you own the General'
-    && !/dragon|spiritual beast/i    # activation scoping
+         $_ ne 'leading the army'
+      && $_ ne 'you own the General'
+      && !/dragon|spiritual beast/i    # activation scoping
   } @{ $buff->conditions // [] };
 
   return join('|', sort @conds);
 }
 
-sub _conditions_conflict ($self, $c1_str, $c2_str, $b1_is_multi = 0, $b2_is_multi = 0) {
+sub _conditions_conflict (
+  $self, $c1_str, $c2_str,
+  $b1_is_multi = 0,
+  $b2_is_multi = 0
+) {
   # Same conditions (including both empty)
   if ($c1_str eq $c2_str) {
-    # Both have same conditions - but if BOTH are first in multi-attribute groups,
-    # they can coexist in different structural roles (primary/secondary)
+  # Both have same conditions - but if BOTH are first in multi-attribute groups,
+  # they can coexist in different structural roles (primary/secondary)
     return 0 if $b1_is_multi && $b2_is_multi;
 
     # Otherwise they conflict
@@ -129,17 +134,15 @@ sub _build_non_conflicting_set ($self, $g1, $g2) {
 sub _find_groups ($self, $book) {
   my @buffs = grep { !$_->passive } @{ $book->buffs };
 
-  # Group by value+unit+conditions (NOT targetedType - grouped buffs like "15% to Mounted and Ranged")
+# Group by value+unit+conditions (NOT targetedType - grouped buffs like "15% to Mounted and Ranged")
   my %by_key;
   for my $buff (@buffs) {
     my $conds = join('|',
       sort grep { $_ ne 'leading the army' && $_ ne 'you own the General' }
         @{ $buff->conditions // [] });
 
-    my $key = join('|',
-      $buff->value->number // 0,
-      $buff->value->unit   // '',
-      $conds);
+    my $key =
+      join('|', $buff->value->number // 0, $buff->value->unit // '', $conds);
 
     push @{ $by_key{$key} }, $buff;
   }
@@ -162,7 +165,7 @@ sub _find_groups ($self, $book) {
 }
 
 sub _is_first_in_multi_attr_group ($self, $buff, $general) {
-  my $groups = $self->_find_groups($general->builtInBook);
+  my $groups    = $self->_find_groups($general->builtInBook);
   my $buff_addr = refaddr($buff);
 
   for my $group (@$groups) {

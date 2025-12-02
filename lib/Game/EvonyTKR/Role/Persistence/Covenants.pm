@@ -1,7 +1,7 @@
 package Game::EvonyTKR::Role::Persistence::Covenants;
 use v5.42.0;
 use utf8::all;
-use Mojo::Base -role, -signatures;
+use Mojo::Base -role,                                     -signatures;
 use Mojo::Base 'Game::EvonyTKR::Role::Persistence::Core', -role;
 
 has 'covenant_cache' => sub ($self) {

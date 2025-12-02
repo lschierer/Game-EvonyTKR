@@ -35,10 +35,8 @@ package Game::EvonyTKR::External::General::BuildIndexes {
       if ($job->are_prereqs_outstanding(
       $job->minion,
       [
-        'load_all_generals',
-        'load_all_builtin_books',
-        'load_all_specialties',
-        'load_all_ascending_attributes',
+        'load_all_generals',    'load_all_builtin_books',
+        'load_all_specialties', 'load_all_ascending_attributes',
       ]
       ));
 
