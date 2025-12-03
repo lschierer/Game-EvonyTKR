@@ -31,3 +31,7 @@ minion.db-wal
 minion.db-shm
 *.lock
 var/
+
+*.csv
+*.pkl
+conflicts.json

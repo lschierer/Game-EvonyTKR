@@ -236,6 +236,12 @@ package Game::EvonyTKR::External::Prebuild {
         delay    => 5,
         priority => 10,
       },
+      load_ml_conflicts => {
+        args     => [],
+        attempts => 3,
+        delay    => 5,
+        priority => 15,
+      },
       load_all_pair_builders => {
         args     => [],
         attempts => 5,

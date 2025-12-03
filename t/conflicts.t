@@ -634,7 +634,12 @@ subtest 'All mounted_pairs should work' => sub {
   my @pairs;
   while (my $line = <$fh>) {
     chomp $line;
-    my ($g1_name, $g2_name) = split /\t/, $line;
+    next if $line =~ /^\s*$/;  # skip empty lines
+    my ($g1_name, $g2_name) = split /;/, $line, 2;
+    next unless defined $g1_name && defined $g2_name;
+    # Trim whitespace
+    $g1_name =~ s/^\s+|\s+$//g;
+    $g2_name =~ s/^\s+|\s+$//g;
     push @pairs, [$g1_name, $g2_name];
   }
   close $fh;
@@ -669,7 +674,6 @@ subtest 'All conflicting_pairs should conflict' => sub {
 
   # Build general lookup hash
   my %general_by_name = map { $_->name => $_ } @$generals;
-  my @known_names = sort { length($b) <=> length($a) } keys %general_by_name;  # longest first
 
   my @pairs;
   my $skipped = 0;
@@ -678,29 +682,25 @@ subtest 'All conflicting_pairs should conflict' => sub {
     chomp $line;
     next if $line =~ /^\s*$/;  # skip empty lines
 
-    # Try to match two general names from the line
-    my ($g1_name, $g2_name);
-    for my $name (@known_names) {
-      if ($line =~ /^\Q$name\E\s+(.+)$/) {
-        $g1_name = $name;
-        my $rest = $1;
-        # Try to match second name
-        for my $name2 (@known_names) {
-          if ($rest eq $name2) {
-            $g2_name = $name2;
-            last;
-          }
-        }
-        last if $g2_name;
-      }
-    }
-
-    unless ($g1_name && $g2_name) {
+    my ($g1_name, $g2_name) = split /;/, $line, 2;
+    unless (defined $g1_name && defined $g2_name) {
       $skipped++;
       next;
     }
 
-    push @pairs, [$g1_name, $g2_name, $general_by_name{$g1_name}, $general_by_name{$g2_name}];
+    # Trim whitespace
+    $g1_name =~ s/^\s+|\s+$//g;
+    $g2_name =~ s/^\s+|\s+$//g;
+
+    my $g1 = $general_by_name{$g1_name};
+    my $g2 = $general_by_name{$g2_name};
+
+    unless ($g1 && $g2) {
+      $skipped++;
+      next;
+    }
+
+    push @pairs, [$g1_name, $g2_name, $g1, $g2];
   }
   close $fh;
 

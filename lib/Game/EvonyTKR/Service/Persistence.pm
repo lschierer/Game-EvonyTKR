@@ -764,6 +764,19 @@ sub count_pairs_by_type ($self, $type = undef) {
   }
 }
 
+sub set_ml_conflicts ($self, $conflicts) {
+  require Mojo::JSON;
+  my $json = Mojo::JSON::encode_json($conflicts);
+  return $self->set_metadata('ml_conflicts', $json);
+}
+
+sub get_ml_conflicts ($self) {
+  require Mojo::JSON;
+  my $json = $self->get_metadata('ml_conflicts');
+  return undef unless $json;
+  return Mojo::JSON::decode_json($json);
+}
+
 1;
 __END__
 

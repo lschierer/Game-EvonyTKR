@@ -24,6 +24,7 @@ has asst_has_dragon   => 0;
 has asst_has_spirit   => 0;
 #TODO -- toggle on WALL buffs.
 has allow_wall_buffs => 1;
+has persistence       => undef;    # Set via load_from_persistence()
 
 # Output caches
 has ProcessedGenerals       => sub { {} };
@@ -58,6 +59,21 @@ sub are_generals_compatible ($self, $g1, $g2) {
 
   return 0 if $self->_check_cache($g1, $g2);
   return 1 unless $self->_troop_overlap($g1, $g2);
+
+  # Check ML predictions first if available
+  if (my $ml_result = $self->_check_ml_prediction($g1, $g2)) {
+    $self->logger->debug(sprintf(
+      '%s/%s ML prediction: %s (confidence: %.2f)',
+      $g1->name, $g2->name,
+      $ml_result->{conflict} ? 'CONFLICT' : 'COMPATIBLE',
+      $ml_result->{confidence}
+    ));
+    if ($ml_result->{conflict}) {
+      $self->_record_conflict($g1, $g2);
+      return 0;
+    }
+    return 1;
+  }
 
   # Try grouped buff detection first (handles complex cases like Haakon/Cheng)
   my $grouped = Game::EvonyTKR::Service::Conflicts::GroupedBuffComparator->new(
@@ -103,6 +119,8 @@ sub is_general_and_book_compatible ($self, $general, $book, $opts = {}) {
 
 # Load conflict data from persistence layer
 sub load_from_persistence ($self, $persistence) {
+  $self->persistence($persistence);  # Store reference for ML lookups
+
   my $conflicts = $persistence->load_all_conflicts();
 
   if ($conflicts && ref($conflicts) eq 'HASH') {
@@ -134,6 +152,29 @@ sub _check_cache ($self, $g1, $g2) {
     return 1;
   }
   return 0;
+}
+
+sub _check_ml_prediction ($self, $g1, $g2) {
+  # Lazy load ML conflicts on first use
+  unless (exists $self->{_ml_conflicts_loaded}) {
+    $self->{_ml_conflicts} = $self->persistence->get_ml_conflicts() // {};
+    $self->{_ml_conflicts_loaded} = 1;
+  }
+
+  my $ml_conflicts = $self->{_ml_conflicts};
+  return undef unless %$ml_conflicts;
+
+  # Check both orderings
+  my $g1_name = $g1->name;
+  my $g2_name = $g2->name;
+
+  return $ml_conflicts->{$g1_name}{$g2_name}
+    if exists $ml_conflicts->{$g1_name}{$g2_name};
+
+  return $ml_conflicts->{$g2_name}{$g1_name}
+    if exists $ml_conflicts->{$g2_name}{$g1_name};
+
+  return undef;
 }
 
 sub _record_conflict ($self, $g1, $g2) {

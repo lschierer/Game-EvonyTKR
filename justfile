@@ -19,7 +19,7 @@ npmdeps:
 
 deps: prepare npmdeps
   ./Build installdeps --cpan_client 'cpanm -n'
-  perl ./scripts/update_git_meta.pl
+  #perl ./scripts/update_git_meta.pl
 
 [working-directory: 'share']
 images:
@@ -39,7 +39,7 @@ ts: npmdeps css
   mkdir -p share/public/types
   pnpm build:ts
 
-build: prepare deps css images ts
+build: prepare deps css images ts mlModel
   ./Build manifest
   ./Build
 
@@ -60,3 +60,9 @@ deploy-prod: build
 [working-directory: 'share/infrastructure']
 dev-image: build
   ./bin/build-image.sh -d
+
+mlModel:
+  perl bin/extract_conflict_features.pl --mode=training --output=training_data.csv
+  python bin/train_conflict_model.py     --training=training_data.csv     --model=conflict_model.pkl     --importance=feature_importance.csv
+  perl bin/extract_conflict_features.pl --mode=predict --output=all_pairs.csv
+  python bin/predict_conflicts.py     --model=conflict_model.pkl     --pairs=all_pairs.csv     --output=conflicts.json
