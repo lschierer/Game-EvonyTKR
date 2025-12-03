@@ -1369,34 +1369,34 @@ require Game::EvonyTKR::Model::Buff::Summarizer::Pair;
 require Game::EvonyTKR::Model::General::Pair;
 
 subtest "Aethelflaed + Marco Polo pair with all values set to 'none'" => sub {
-  
+
   # Create a pair object
   my $pair = Game::EvonyTKR::Model::General::Pair->new(
     primary   => $aethelflaed,
     secondary => $marco_polo,
     type      => 'mounted_specialist',
   );
-  
+
   my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer::Pair->new(
-    pair                    => $pair,
-    targetType              => 'mounted_specialist',
-    activationType          => 'PvM',
-    ascendingLevel          => 'none',
-    covenantLevel           => 'none',
-    specialty1              => 'none',
-    specialty2              => 'none',
-    specialty3              => 'none',
-    specialty4              => 'none',
-    secondaryCovenantLevel  => 'none',
-    secondarySpecialty1     => 'none',
-    secondarySpecialty2     => 'none',
-    secondarySpecialty3     => 'none',
-    secondarySpecialty4     => 'none',
+    pair                   => $pair,
+    targetType             => 'mounted_specialist',
+    activationType         => 'PvM',
+    ascendingLevel         => 'none',
+    covenantLevel          => 'none',
+    specialty1             => 'none',
+    specialty2             => 'none',
+    specialty3             => 'none',
+    specialty4             => 'none',
+    secondaryCovenantLevel => 'none',
+    secondarySpecialty1    => 'none',
+    secondarySpecialty2    => 'none',
+    secondarySpecialty3    => 'none',
+    secondarySpecialty4    => 'none',
   );
-  
+
   $summarizer->updateBuffs();
   $summarizer->updateDebuffs();
-  
+
   # Pair uses 6 generic books compatible with BOTH generals
   # Not simple addition of individual books
   is(
@@ -1409,7 +1409,7 @@ subtest "Aethelflaed + Marco Polo pair with all values set to 'none'" => sub {
     },
     "Pair mounted buffs from shared generic books"
   );
-  
+
   # Debuffs should be 0 with no ascending/covenant/specialties
   is(
     $summarizer->pairDebuffValues,
@@ -1425,33 +1425,33 @@ subtest "Aethelflaed + Marco Polo pair with all values set to 'none'" => sub {
 };
 
 subtest "Aethelflaed + Marco Polo pair with gold specialties" => sub {
-  
+
   my $pair = Game::EvonyTKR::Model::General::Pair->new(
     primary   => $aethelflaed,
     secondary => $marco_polo,
     type      => 'mounted_specialist',
   );
-  
+
   my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer::Pair->new(
-    pair                    => $pair,
-    targetType              => 'mounted_specialist',
-    activationType          => 'PvM',
-    ascendingLevel          => 'none',
-    covenantLevel           => 'none',
-    specialty1              => 'gold',
-    specialty2              => 'gold',
-    specialty3              => 'gold',
-    specialty4              => 'gold',
-    secondaryCovenantLevel  => 'none',
-    secondarySpecialty1     => 'gold',
-    secondarySpecialty2     => 'gold',
-    secondarySpecialty3     => 'gold',
-    secondarySpecialty4     => 'gold',
+    pair                   => $pair,
+    targetType             => 'mounted_specialist',
+    activationType         => 'PvM',
+    ascendingLevel         => 'none',
+    covenantLevel          => 'none',
+    specialty1             => 'gold',
+    specialty2             => 'gold',
+    specialty3             => 'gold',
+    specialty4             => 'gold',
+    secondaryCovenantLevel => 'none',
+    secondarySpecialty1    => 'gold',
+    secondarySpecialty2    => 'gold',
+    secondarySpecialty3    => 'gold',
+    secondarySpecialty4    => 'gold',
   );
-  
+
   $summarizer->updateBuffs();
   $summarizer->updateDebuffs();
-  
+
   # With gold specialties on both generals plus shared books
   is(
     $summarizer->pairBuffValues->{'Mounted Troops'},
@@ -1466,46 +1466,46 @@ subtest "Aethelflaed + Marco Polo pair with gold specialties" => sub {
 };
 
 subtest "Casimir Pulaski + Champlain pair with green 4th specialty" => sub {
-  
+
   my $casimir = first { $_->name eq 'Casimir Pulaski' } $generals->@*;
   ok(defined $casimir, "Casimir Pulaski general loaded");
-  
+
   my $champlain = first { $_->name eq 'Champlain' } $generals->@*;
   ok(defined $champlain, "Champlain general loaded");
-  
+
   my $pair = Game::EvonyTKR::Model::General::Pair->new(
     primary   => $casimir,
     secondary => $champlain,
     type      => 'siege_specialist',
   );
-  
+
   my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer::Pair->new(
-    pair                    => $pair,
-    targetType              => 'Siege Machines',
-    activationType          => 'Attacking',
-    ascendingLevel          => 'none',
-    covenantLevel           => 'none',
-    specialty1              => 'gold',
-    specialty2              => 'gold',
-    specialty3              => 'gold',
-    specialty4              => 'green',
-    secondaryCovenantLevel  => 'none',
-    secondarySpecialty1     => 'gold',
-    secondarySpecialty2     => 'gold',
-    secondarySpecialty3     => 'gold',
-    secondarySpecialty4     => 'green',
-    books                   => $generic_books,
+    pair                   => $pair,
+    targetType             => 'Siege Machines',
+    activationType         => 'Attacking',
+    ascendingLevel         => 'none',
+    covenantLevel          => 'none',
+    specialty1             => 'gold',
+    specialty2             => 'gold',
+    specialty3             => 'gold',
+    specialty4             => 'green',
+    secondaryCovenantLevel => 'none',
+    secondarySpecialty1    => 'gold',
+    secondarySpecialty2    => 'gold',
+    secondarySpecialty3    => 'gold',
+    secondarySpecialty4    => 'green',
+    books                  => $generic_books,
   );
-  
+
   $summarizer->updateBuffs();
   $summarizer->updateDebuffs();
-  
-  # Expected values calculated manually:
-  # March: 12% (books) + 1% (Casimir sp4) + 6% (Champlain sp2) = 19%
-  # Attack: 25% (books) + 10% (Casimir sp1) + 6% (Casimir sp3) + 50% (Champlain book) + 10% (Champlain sp1) + 10% (Champlain sp2 Attacking) + 10% (Champlain sp3) = 121%
-  # Defense: 25% (books) + 10% (Casimir sp1) + 40% (Champlain book) + 10% (Champlain sp1) + 10% (Champlain sp3) = 95%
-  # HP: 25% (books) + 50% (Champlain book) + 10% (Champlain sp3) = 85%
-  
+
+# Expected values calculated manually:
+# March: 12% (books) + 1% (Casimir sp4) + 6% (Champlain sp2) = 19%
+# Attack: 25% (books) + 10% (Casimir sp1) + 6% (Casimir sp3) + 50% (Champlain book) + 10% (Champlain sp1) + 10% (Champlain sp2 Attacking) + 10% (Champlain sp3) = 121%
+# Defense: 25% (books) + 10% (Casimir sp1) + 40% (Champlain book) + 10% (Champlain sp1) + 10% (Champlain sp3) = 95%
+# HP: 25% (books) + 50% (Champlain book) + 10% (Champlain sp3) = 85%
+
   is(
     $summarizer->pairBuffValues->{'Siege Machines'},
     {
@@ -1516,8 +1516,8 @@ subtest "Casimir Pulaski + Champlain pair with green 4th specialty" => sub {
     },
     "Casimir + Champlain siege pair buffs match manual calculation"
   );
-  
-  # Debuffs: Casimir specialty 2 (Snipe) provides 10% Attack Debuff to all troop types
+
+# Debuffs: Casimir specialty 2 (Snipe) provides 10% Attack Debuff to all troop types
   is(
     $summarizer->pairDebuffValues,
     {

@@ -15,11 +15,10 @@ sub conflicts ($self, $b1, $b2, $g1, $g2) {
   return 0 unless $b1->attribute eq $b2->attribute;
   return 0 unless $self->_troops_overlap($b1, $b2);
 
-  # Special case: Louis XIV has stackable buffs
-  # (TODO: detect via book text when available)
-  # Book test is available in about 5% of generals, including Louis XIV
-  # but using it not implemented here yet
-  return 0 if $g1->name eq 'Louis XIV' || $g2->name eq 'Louis XIV';
+  # Special case: Sun Ce has no conflicts with anyone
+  # Special case: Laudon/Roland work together (different conditions but edge case)
+  return 0 if $g1->name eq 'Sun Ce' || $g2->name eq 'Sun Ce';
+  return 0 if ($g1->name eq 'Laudon' && $g2->name eq 'Roland') || ($g1->name eq 'Roland' && $g2->name eq 'Laudon');
 
   # Check if either buff is 2nd+ in a group (same logic as BookComparator)
   # Build cache key from both general names
@@ -71,13 +70,32 @@ sub _normalize_conditions ($self, $buff) {
 sub _conditions_conflict (
   $self, $c1_str, $c2_str,
   $b1_is_multi = 0,
-  $b2_is_multi = 0
+  $b2_is_multi = 0,
+  $b1 = undef,
+  $b2 = undef
 ) {
   # Same conditions (including both empty)
   if ($c1_str eq $c2_str) {
-  # Both have same conditions - but if BOTH are first in multi-attribute groups,
-  # they can coexist in different structural roles (primary/secondary)
+    # If BOTH are in multi-attribute groups, they can coexist
     return 0 if $b1_is_multi && $b2_is_multi;
+
+    # If only one is in a multi-attr group, check delta
+    if ($b1 && $b2 && ($b1_is_multi || $b2_is_multi)) {
+      my $v1 = $b1->value->number // 0;
+      my $v2 = $b2->value->number // 0;
+      my $delta = abs($v1 - $v2);
+      # Need 15+ delta if only one is grouped
+      return 0 if $delta >= 15;
+    }
+
+    # If both are solo buffs, check delta
+    if ($b1 && $b2 && !$b1_is_multi && !$b2_is_multi) {
+      my $v1 = $b1->value->number // 0;
+      my $v2 = $b2->value->number // 0;
+      my $delta = abs($v1 - $v2);
+      # Need 25+ delta for solo buffs
+      return 0 if $delta >= 25;
+    }
 
     # Otherwise they conflict
     return 1;
@@ -95,7 +113,7 @@ sub _triad_conflicts ($self, $b1, $b2, $g1, $g2) {
   my $b1_multi = $self->_is_first_in_multi_attr_group($b1, $g1);
   my $b2_multi = $self->_is_first_in_multi_attr_group($b2, $g2);
 
-  return $self->_conditions_conflict($c1, $c2, $b1_multi, $b2_multi);
+  return $self->_conditions_conflict($c1, $c2, $b1_multi, $b2_multi, $b1, $b2);
 }
 
 sub _standard_conflicts ($self, $b1, $b2, $g1, $g2) {
@@ -106,7 +124,7 @@ sub _standard_conflicts ($self, $b1, $b2, $g1, $g2) {
   my $b1_multi = $self->_is_first_in_multi_attr_group($b1, $g1);
   my $b2_multi = $self->_is_first_in_multi_attr_group($b2, $g2);
 
-  return $self->_conditions_conflict($c1, $c2, $b1_multi, $b2_multi);
+  return $self->_conditions_conflict($c1, $c2, $b1_multi, $b2_multi, $b1, $b2);
 }
 
 sub _build_non_conflicting_set ($self, $g1, $g2) {

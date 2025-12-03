@@ -8,8 +8,8 @@ has 'service';    # parent service for constants
 
 # Detect conflicts between generals with grouped buffs
 sub conflicts ($self, $g1, $g2) {
-  # Special case: Louis XIV has stackable buffs
-  return undef if $g1->name eq 'Louis XIV' || $g2->name eq 'Louis XIV';
+  # Special case: Sun Ce has no conflicts with anyone
+  return undef if $g1->name eq 'Sun Ce' || $g2->name eq 'Sun Ce';
 
   my $groups1 = $self->_find_groups($g1);
   my $groups2 = $self->_find_groups($g2);
@@ -18,9 +18,26 @@ sub conflicts ($self, $g1, $g2) {
   return undef unless @$groups1 && @$groups2;
 
   # Check if any groups conflict
-  for my $g1 (@$groups1) {
-    for my $g2 (@$groups2) {
-      return 1 if $self->_groups_conflict($g1, $g2);
+  for my $gr1 (@$groups1) {
+    for my $gr2 (@$groups2) {
+      # Groups conflict if same value, same troop type, AND same attribute set
+      next unless $gr1->{value} == $gr2->{value};
+      next unless $gr1->{type} eq $gr2->{type};
+
+      # Check if attribute sets are identical
+      my @attrs1 = sort @{$gr1->{attrs}};
+      my @attrs2 = sort @{$gr2->{attrs}};
+      next unless @attrs1 == @attrs2;
+
+      my $attrs_match = 1;
+      for my $i (0 .. $#attrs1) {
+        if ($attrs1[$i] ne $attrs2[$i]) {
+          $attrs_match = 0;
+          last;
+        }
+      }
+
+      return 1 if $attrs_match;
     }
   }
 
@@ -31,15 +48,17 @@ sub conflicts ($self, $g1, $g2) {
 sub _find_groups ($self, $general) {
   my @buffs = grep { !$_->passive } @{ $general->builtInBook->buffs };
 
-  # Group by value+unit+conditions
+  # Group by value+unit+targetedType+conditions (match BookComparator logic)
   my %by_key;
   for my $buff (@buffs) {
     my $conds = join('|',
       sort grep { $_ ne 'leading the army' && $_ ne 'you own the General' }
         @{ $buff->conditions // [] });
 
-    my $key =
-      join('|', $buff->value->number // 0, $buff->value->unit // '', $conds);
+    my $key = join('|',
+      $buff->value->number // 0,
+      $buff->value->unit   // '',
+      $buff->targetedType  // '', $conds);
 
     push @{ $by_key{$key} }, $buff;
   }
@@ -55,15 +74,12 @@ sub _find_groups ($self, $general) {
       key   => $key,
       buffs => $buffs,
       attrs => [uniq map { $_->attribute } @$buffs],
+      value => $buffs->[0]->value->number // 0,
+      type  => $buffs->[0]->targetedType // '',
       };
   }
 
   return \@groups;
-}
-
-sub _groups_conflict ($self, $g1, $g2) {
-  # Same key = same value/unit/conditions
-  return $g1->{key} eq $g2->{key};
 }
 
 1;

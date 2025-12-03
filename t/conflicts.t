@@ -10,7 +10,7 @@ require Game::EvonyTKR;
 require Game::EvonyTKR::Role::Logging;
 require Game::EvonyTKR::Shared::Constants;
 use Test2::V0;
-use List::AllUtils qw( any none uniq );
+use List::AllUtils qw( any none uniq first );
 use Sereal::Encoder;
 use Sereal::Decoder;
 use Carp;
@@ -60,9 +60,9 @@ sub are_generals_compatible_either_role ($g1, $g2) {
 {
 
   package TestBase::WithRoles;
-  use Mojo::Base -base,                                     -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Role::Logging',           -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::Common',            -role;
+  use Mojo::Base -base,                               -signatures;
+  use Mojo::Base 'Game::EvonyTKR::Role::Logging',     -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Common',      -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Persistence', -role;
   use Carp;
 
@@ -204,8 +204,7 @@ isa_ok(
 );
 
 subtest 'All Generals have types to test against' => sub {
-  for my $g (sort { $a->name cmp $b->name }
-    values %{ $TestGenerals->get_generals() }) {
+  for my $g (sort { $a->name cmp $b->name } $generals->@* ) {
     isa_ok(
       $g,
       ['Game::EvonyTKR::Model::General'],
@@ -234,145 +233,48 @@ subtest 'All Generals have types to test against' => sub {
   done_testing();
 };
 
-my $WASH       = $TestGenerals->get_general('Washington Prime',);
-my $MARCO      = $TestGenerals->get_general('Marco Polo',);
-my $AETHEL     = $TestGenerals->get_general('Aethelflaed',);
-my $CAESAR     = $TestGenerals->get_general('Caesar',);
-my $DF         = $TestGenerals->get_general('David Farragut',);
-my $SC         = $TestGenerals->get_general('Sun Ce',);
-my $GO         = $TestGenerals->get_general('Gaius Octavius',);
-my $Hermes     = $TestGenerals->get_general('Hermes',);
-my $Haakon     = $TestGenerals->get_general('Haakon Haraldsson',);
-my $Barbarossa = $TestGenerals->get_general('Barbarossa',);
-my $Custer     = $TestGenerals->get_general('George A Custer',);
-my $KA         = $TestGenerals->get_general('King Arthur',);
-my $Jayavarman = $TestGenerals->get_general('Jayavarman II',);
-my $Cheng      = $TestGenerals->get_general('Cheng Yaojin',);
-my $Laudon     = $TestGenerals->get_general('Laudon',);
-my $Elektra    = $TestGenerals->get_general('Elektra',);
-my $Champlain  = $TestGenerals->get_general('Champlain',);
-my $Franz      = $TestGenerals->get_general('Franz Joseph I',);
-my $Douglas    = $TestGenerals->get_general('Douglas',);
-my $Marcus     = $TestGenerals->get_general('Marcus Agrippa',);
-my $Louis      = $TestGenerals->get_general('Louis IX',);
-my $LouisXIV   = $TestGenerals->get_general('Louis XIV',);
-my $OlavII     = $TestGenerals->get_general('Olav II',);
-
-subtest 'Ensure Generals are Pressent for further tests' => sub {
-
-  isa_ok(
-    $WASH,
-    ['Game::EvonyTKR::Model::General'],
-    sprintf('%s is a ::Model::General', 'Washington Prime')
-  );
-  isa_ok(
-    $MARCO,
-    ['Game::EvonyTKR::Model::General'],
-    sprintf('%s is a ::Model::General', 'Marco Polo')
-  );
-  isa_ok(
-    $AETHEL,
-    ['Game::EvonyTKR::Model::General'],
-    sprintf('%s is a ::Model::General', 'Aethelflaed')
-  );
-  isa_ok(
-    $CAESAR,
-    ['Game::EvonyTKR::Model::General'],
-    sprintf('%s is a ::Model::General', 'Caesar')
-  );
-  isa_ok(
-    $DF,
-    ['Game::EvonyTKR::Model::General'],
-    sprintf('%s is a ::Model::General', 'David Farragut')
-  );
-  isa_ok(
-    $SC,
-    ['Game::EvonyTKR::Model::General'],
-    sprintf('%s is a ::Model::General', 'Sun Ce')
-  );
-  isa_ok(
-    $GO,
-    ['Game::EvonyTKR::Model::General'],
-    sprintf('%s is a ::Model::General', 'Gaius Octavius')
-  );
-  isa_ok(
-    $Hermes,
-    ['Game::EvonyTKR::Model::General'],
-    sprintf('%s is a ::Model::General', 'Hermes')
-  );
-  isa_ok(
-    $Haakon,
-    ['Game::EvonyTKR::Model::General'],
-    sprintf('%s is a ::Model::General', 'Haakon Haraldsson')
-  );
-  isa_ok(
-    $Barbarossa,
-    ['Game::EvonyTKR::Model::General'],
-    sprintf('%s is a ::Model::General', 'Barbarossa')
-  );
-  isa_ok(
-    $Custer,
-    ['Game::EvonyTKR::Model::General'],
-    sprintf('%s is a ::Model::General', 'George A. Custer')
-  );
-  isa_ok(
-    $KA,
-    ['Game::EvonyTKR::Model::General'],
-    sprintf('%s is a ::Model::General', 'King Arthur')
-  );
-  isa_ok(
-    $Jayavarman,
-    ['Game::EvonyTKR::Model::General'],
-    sprintf('%s is a ::Model::General', 'Jayavarman II')
-  );
-  isa_ok(
-    $Cheng,
-    ['Game::EvonyTKR::Model::General'],
-    sprintf('%s is a ::Model::General', 'Cheng Yaojin')
-  );
-  isa_ok(
-    $Laudon,
-    ['Game::EvonyTKR::Model::General'],
-    sprintf('%s is a ::Model::General', 'Laudon')
-  );
-  isa_ok(
-    $Elektra,
-    ['Game::EvonyTKR::Model::General'],
-    sprintf('%s is a ::Model::General', 'Elektra')
-  );
-  isa_ok(
-    $Franz,
-    ['Game::EvonyTKR::Model::General'],
-    sprintf('%s is a ::Model::General', 'Franz Joseph I')
-  );
-  isa_ok(
-    $Douglas,
-    ['Game::EvonyTKR::Model::General'],
-    sprintf('%s is a ::Model::General', 'Douglas')
-  );
-  isa_ok(
-    $Marcus,
-    ['Game::EvonyTKR::Model::General'],
-    sprintf('%s is a ::Model::General', 'Marcus Agrippa')
-  );
-  isa_ok(
-    $Louis,
-    ['Game::EvonyTKR::Model::General'],
-    sprintf('%s is a ::Model::General', 'Louis IX')
-  );
-  isa_ok(
-    $LouisXIV,
-    ['Game::EvonyTKR::Model::General'],
-    sprintf('%s is a ::Model::General', 'Louis XIV')
-  );
-  isa_ok(
-    $OlavII,
-    ['Game::EvonyTKR::Model::General'],
-    sprintf('%s is a ::Model::General', 'Olav II')
-  );
-
-  done_testing();
-};
+my $AETHEL       = first { $_->name eq 'Aethelflaed' } $generals->@*;
+my $Artemis      = first { $_->name eq 'Artemis' } $generals->@*;
+my $Baibars      = first { $_->name eq 'Baibars' } $generals->@*;
+my $Barbarossa   = first { $_->name eq 'Barbarossa' } $generals->@*;
+my $Beowulf      = first { $_->name eq 'Beowulf' } $generals->@*;
+my $Bertrand     = first { $_->name eq 'Bertrand du Guesclin' } $generals->@*;
+my $CAESAR       = first { $_->name eq 'Caesar' } $generals->@*;
+my $Casimir      = first { $_->name eq 'Casimir Pulaski' } $generals->@*;
+my $Champlain    = first { $_->name eq 'Champlain' } $generals->@*;
+my $Cheng        = first { $_->name eq 'Cheng Yaojin' } $generals->@*;
+my $Custer       = first { $_->name eq 'George A Custer' } $generals->@*;
+my $DF           = first { $_->name eq 'David Farragut' } $generals->@*;
+my $Douglas      = first { $_->name eq 'Douglas' } $generals->@*;
+my $Elektra      = first { $_->name eq 'Elektra' } $generals->@*;
+my $Franz        = first { $_->name eq 'Franz Joseph I' } $generals->@*;
+my $Gaius        = first { $_->name eq 'Gaius Octavius' } $generals->@*;
+my $Genghis      = first { $_->name eq 'Genghis Khan' } $generals->@*;
+my $GeorgeMonck  = first { $_->name eq 'George Monck' } $generals->@*;
+my $Haakon       = first { $_->name eq 'Haakon Haraldsson' } $generals->@*;
+my $Hannibal     = first { $_->name eq 'Hannibal' } $generals->@*;
+my $Hermes       = first { $_->name eq 'Hermes' } $generals->@*;
+my $Hestia       = first { $_->name eq 'Hestia' } $generals->@*;
+my $IiNaomasa    = first { $_->name eq 'Ii Naomasa' } $generals->@*;
+my $Jayavarman   = first { $_->name eq 'Jayavarman II' } $generals->@*;
+my $KA           = first { $_->name eq 'King Arthur' } $generals->@*;
+my $Laudon       = first { $_->name eq 'Laudon' } $generals->@*;
+my $LiJing       = first { $_->name eq 'Li Jing' } $generals->@*;
+my $Louis        = first { $_->name eq 'Louis IX' } $generals->@*;
+my $LouisXIV     = first { $_->name eq 'Louis XIV' } $generals->@*;
+my $MARCO        = first { $_->name eq 'Marco Polo' } $generals->@*;
+my $MariaTheresa = first { $_->name eq 'Maria Theresa' } $generals->@*;
+my $Marcus       = first { $_->name eq 'Marcus Agrippa' } $generals->@*;
+my $Martinus     = first { $_->name eq 'Martinus' } $generals->@*;
+my $Mordred      = first { $_->name eq 'Mordred' } $generals->@*;
+my $Napoleon     = first { $_->name eq 'Napoleon Prime' } $generals->@*;
+my $Nathanael    = first { $_->name eq 'Nathanael Greene' } $generals->@*;
+my $OlavII       = first { $_->name eq 'Olav II' } $generals->@*;
+my $Poligenus    = first { $_->name eq 'Poligenus' } $generals->@*;
+my $PrinceEugene = first { $_->name eq 'Prince Eugene' } $generals->@*;
+my $Roland       = first { $_->name eq 'Roland' } $generals->@*;
+my $SunCe        = first { $_->name eq 'Sun Ce' } $generals->@*;
+my $WASH         = first { $_->name eq 'Washington Prime' } $generals->@*;
 
 $conflicts->asst_has_dragon(1);
 $conflicts->asst_has_spirit(1);
@@ -394,7 +296,7 @@ subtest 'Conflicting Generals' => sub {
     'Hermes/King Arthur conflict');
   ok(!are_generals_compatible_either_role($Laudon, $Cheng),
     'Laudon/Cheng Yaojin conflict');
-  ok(!are_generals_compatible_either_role($MARCO, $GO),
+  ok(!are_generals_compatible_either_role($MARCO, $Gaius),
     'Marco/Gaius Octavius confict');
   ok(!are_generals_compatible_either_role($MARCO, $Jayavarman),
     'Marco Polo/Jayavarman II conflict');
@@ -414,58 +316,179 @@ subtest 'Conflicting Generals' => sub {
     'Louis IX/Franz Joseph I conflict');
   ok(!are_generals_compatible_either_role($Louis, $Elektra),
     'Louis IX/Elektra conflict');
-  ok(!are_generals_compatible_either_role($Jayavarman, $GO),
+  ok(!are_generals_compatible_either_role($Jayavarman, $Gaius),
     'Jayavarman II/Gaius Octavius conflict');
+  ok(!are_generals_compatible_either_role($Artemis, $Barbarossa), 'Artemis/Barbarossa conflict');
+  ok(!are_generals_compatible_either_role($Artemis, $Beowulf), 'Artemis/Beowulf conflict');
+  ok(!are_generals_compatible_either_role($Artemis, $Gaius), 'Artemis/Gaius conflict');
+  ok(!are_generals_compatible_either_role($Artemis, $Custer), 'Artemis/Custer conflict');
+
   done_testing();
 };
 
 subtest 'Working Pairs' => sub {
-  ok(are_generals_compatible_either_role($Cheng, $Haakon),
-    'Cheng Yaojin/Haakon work');
+  ok(are_generals_compatible_either_role($AETHEL, $Artemis), 'Aethelflaed/Artemis work');
+  ok(are_generals_compatible_either_role($AETHEL, $Baibars), 'Aethelflaed/Baibars work');
+  ok(are_generals_compatible_either_role($AETHEL, $Barbarossa), 'Aethelflaed/Barbarossa work');
+  ok(are_generals_compatible_either_role($AETHEL, $Beowulf), 'Aethelflaed/Beowulf work');
+  ok(are_generals_compatible_either_role($AETHEL, $Bertrand), 'Aethelflaed/Bertrand work');
+  ok(are_generals_compatible_either_role($AETHEL, $Casimir), 'Aethelflaed/Casimir work');
+  ok(are_generals_compatible_either_role($AETHEL, $Cheng), 'Aethelflaed/Cheng work');
+  ok(are_generals_compatible_either_role($AETHEL, $Gaius), 'Aethelflaed/Gaius work');
+  ok(are_generals_compatible_either_role($AETHEL, $Genghis), 'Aethelflaed/Genghis work');
+  ok(are_generals_compatible_either_role($AETHEL, $Custer), 'Aethelflaed/George A Custer work');
+  ok(are_generals_compatible_either_role($AETHEL, $GeorgeMonck), 'Aethelflaed/George Monck work');
+  ok(are_generals_compatible_either_role($AETHEL, $Haakon), 'Aethelflaed/Haakon work');
+  ok(are_generals_compatible_either_role($AETHEL, $Hannibal), 'Aethelflaed/Hannibal work');
+  ok(are_generals_compatible_either_role($AETHEL, $Hermes), 'Aethelflaed/Hermes work');
+  ok(are_generals_compatible_either_role($AETHEL, $Hestia), 'Aethelflaed/Hestia work');
+  ok(are_generals_compatible_either_role($AETHEL, $IiNaomasa), 'Aethelflaed/Ii Naomasa work');
+  ok(are_generals_compatible_either_role($AETHEL, $Jayavarman), 'Aethelflaed/Jayavarman work');
+  ok(are_generals_compatible_either_role($AETHEL, $KA), 'Aethelflaed/King Arthur work');
+  ok(are_generals_compatible_either_role($AETHEL, $Laudon), 'Aethelflaed/Laudon work');
+  ok(are_generals_compatible_either_role($AETHEL, $MARCO), 'Aethelflaed/Marco Polo work');
+  ok(are_generals_compatible_either_role($AETHEL, $MariaTheresa), 'Aethelflaed/Maria Theresa work');
+  ok(are_generals_compatible_either_role($AETHEL, $OlavII), 'Aethelflaed/Olav II work');
+  ok(are_generals_compatible_either_role($AETHEL, $Poligenus), 'Aethelflaed/Poligenus work');
+  ok(are_generals_compatible_either_role($AETHEL, $PrinceEugene), 'Aethelflaed/Prince Eugene work');
+  ok(are_generals_compatible_either_role($AETHEL, $SunCe), 'Aethelflaed/Sun Ce work');
+  ok(are_generals_compatible_either_role($AETHEL, $WASH), 'Aethelflaed/Washington Prime work');
+  ok(are_generals_compatible_either_role($Artemis, $Baibars), 'Artemis/Baibars work');
+  ok(are_generals_compatible_either_role($Artemis, $Bertrand), 'Artemis/Bertrand work');
+  ok(are_generals_compatible_either_role($Artemis, $Casimir), 'Artemis/Casimir work');
+  ok(are_generals_compatible_either_role($Artemis, $Cheng), 'Artemis/Cheng work');
+  ok(are_generals_compatible_either_role($Artemis, $Genghis), 'Artemis/Genghis work');
+  ok(are_generals_compatible_either_role($Artemis, $GeorgeMonck), 'Artemis/George Monck work');
+  ok(are_generals_compatible_either_role($Artemis, $Haakon), 'Artemis/Haakon work');
+  ok(are_generals_compatible_either_role($Artemis, $Hermes), 'Artemis/Hermes work');
+  ok(are_generals_compatible_either_role($Artemis, $IiNaomasa), 'Artemis/Ii Naomasa work');
+  ok(are_generals_compatible_either_role($Artemis, $Jayavarman), 'Artemis/Jayavarman work');
+  ok(are_generals_compatible_either_role($Artemis, $Laudon), 'Artemis/Laudon work');
+  ok(are_generals_compatible_either_role($Artemis, $LiJing), 'Artemis/Li Jing work');
+  ok(are_generals_compatible_either_role($Artemis, $LouisXIV), 'Artemis/Louis XIV work');
+  ok(are_generals_compatible_either_role($Artemis, $MARCO), 'Artemis/Marco Polo work');
+  ok(are_generals_compatible_either_role($Artemis, $MariaTheresa), 'Artemis/Maria Theresa work');
+  ok(are_generals_compatible_either_role($Artemis, $Mordred), 'Artemis/Mordred work');
+  ok(are_generals_compatible_either_role($Artemis, $Napoleon), 'Artemis/Napoleon Prime work');
+  ok(are_generals_compatible_either_role($Artemis, $Nathanael), 'Artemis/Nathanael Greene work');
+  ok(are_generals_compatible_either_role($Artemis, $OlavII), 'Artemis/Olav II work');
+  ok(are_generals_compatible_either_role($Artemis, $Poligenus), 'Artemis/Poligenus work');
+  ok(are_generals_compatible_either_role($Artemis, $PrinceEugene), 'Artemis/Prince Eugene work');
+  ok(are_generals_compatible_either_role($Artemis, $Roland), 'Artemis/Roland work');
+  ok(are_generals_compatible_either_role($Artemis, $SunCe), 'Artemis/Sun Ce work');
+  ok(are_generals_compatible_either_role($Artemis, $WASH), 'Artemis/Washington Prime work');
+
+  ok(are_generals_compatible_either_role($Baibars, $Barbarossa), 'Baibars/Barbarossa work');
+  ok(are_generals_compatible_either_role($Baibars, $Beowulf), 'Baibars/Beowulf work');
+  ok(are_generals_compatible_either_role($Baibars, $Bertrand), 'Baibars/Bertrand work');
+  ok(are_generals_compatible_either_role($Baibars, $Casimir), 'Baibars/Casimir work');
+  ok(are_generals_compatible_either_role($Baibars, $Cheng), 'Baibars/Cheng work');
+  ok(are_generals_compatible_either_role($Baibars, $Gaius), 'Baibars/Gaius work');
+  ok(are_generals_compatible_either_role($Baibars, $Genghis), 'Baibars/Genghis work');
+  ok(are_generals_compatible_either_role($Baibars, $Custer), 'Baibars/George A Custer work');
+  ok(are_generals_compatible_either_role($Baibars, $GeorgeMonck), 'Baibars/George Monck work');
+  ok(are_generals_compatible_either_role($Baibars, $Haakon), 'Baibars/Haakon work');
+  ok(are_generals_compatible_either_role($Baibars, $Hannibal), 'Baibars/Hannibal work');
+  ok(are_generals_compatible_either_role($Baibars, $Hermes), 'Baibars/Hermes work');
+  ok(are_generals_compatible_either_role($Baibars, $Hestia), 'Baibars/Hestia work');
+  ok(are_generals_compatible_either_role($Baibars, $IiNaomasa), 'Baibars/Ii Naomasa work');
+  ok(are_generals_compatible_either_role($Baibars, $Jayavarman), 'Baibars/Jayavarman work');
+  ok(are_generals_compatible_either_role($Baibars, $KA), 'Baibars/King Arthur work');
+  ok(are_generals_compatible_either_role($Baibars, $Laudon), 'Baibars/Laudon work');
+  ok(are_generals_compatible_either_role($Baibars, $LiJing), 'Baibars/Li Jing work');
+  ok(are_generals_compatible_either_role($Baibars, $LouisXIV), 'Baibars/Louis XIV work');
+  ok(are_generals_compatible_either_role($Baibars, $MARCO), 'Baibars/Marco Polo work');
+  ok(are_generals_compatible_either_role($Baibars, $MariaTheresa), 'Baibars/Maria Theresa work');
+  ok(are_generals_compatible_either_role($Baibars, $Martinus), 'Baibars/Martinus work');
+  ok(are_generals_compatible_either_role($Baibars, $Mordred), 'Baibars/Mordred work');
+  ok(are_generals_compatible_either_role($Baibars, $Napoleon), 'Baibars/Napoleon Prime work');
+  ok(are_generals_compatible_either_role($Baibars, $Nathanael), 'Baibars/Nathanael Greene work');
+  ok(are_generals_compatible_either_role($Baibars, $OlavII), 'Baibars/Olav II work');
+  ok(are_generals_compatible_either_role($Baibars, $Poligenus), 'Baibars/Poligenus work');
+  ok(are_generals_compatible_either_role($Baibars, $PrinceEugene), 'Baibars/Prince Eugene work');
+  ok(are_generals_compatible_either_role($Baibars, $Roland), 'Baibars/Roland work');
+  ok(are_generals_compatible_either_role($Baibars, $SunCe), 'Baibars/Sun Ce work');
+  ok(are_generals_compatible_either_role($Baibars, $WASH), 'Baibars/Washington Prime work');
+
+  ok(are_generals_compatible_either_role($Cheng, $Haakon), 'Cheng Yaojin/Haakon work');
+  ok(are_generals_compatible_either_role($Cheng, $Hermes), 'Cheng Yaojin/Hermes work');
+  ok(are_generals_compatible_either_role($Cheng, $Hestia), 'Cheng Yaojin/Hestia work');
+  ok(are_generals_compatible_either_role($Cheng, $Jayavarman), 'Cheng Yaojin/Jayavarman work');
+  ok(are_generals_compatible_either_role($Cheng, $KA), 'Cheng Yaojin/King Arthur work');
+  ok(are_generals_compatible_either_role($Cheng, $LouisXIV), 'Cheng Yaojin/Louis XIV work');
+  ok(are_generals_compatible_either_role($Cheng, $MARCO), 'Cheng Yaojin/Marco Polo work');
+  ok(are_generals_compatible_either_role($Cheng, $MariaTheresa), 'Cheng Yaojin/Maria Theresa work');
+  ok(are_generals_compatible_either_role($Cheng, $Mordred), 'Cheng Yaojin/Mordred work');
+  ok(are_generals_compatible_either_role($Cheng, $Napoleon), 'Cheng Yaojin/Napoleon Prime work');
+  ok(are_generals_compatible_either_role($Cheng, $Nathanael), 'Cheng Yaojin/Nathanael Greene work');
+  ok(are_generals_compatible_either_role($Cheng, $OlavII), 'Cheng Yaojin/Olav II work');
+  ok(are_generals_compatible_either_role($Cheng, $Poligenus), 'Cheng Yaojin/Poligenus work');
+  ok(are_generals_compatible_either_role($Cheng, $Roland), 'Cheng Yaojin/Roland work');
+  ok(are_generals_compatible_either_role($Cheng, $SunCe), 'Cheng Yaojin/Sun Ce work');
+  ok(are_generals_compatible_either_role($Cheng, $WASH), 'Cheng Yaojin/Washington Prime work');
+
+  ok(are_generals_compatible_either_role($Genghis, $Custer), 'Genghis Khan/George A Custer work');
+  ok(are_generals_compatible_either_role($Genghis, $GeorgeMonck), 'Genghis Khan/George Monck work');
+  ok(are_generals_compatible_either_role($Genghis, $Haakon), 'Genghis Khan/Haakon work');
+  ok(are_generals_compatible_either_role($Genghis, $Hannibal), 'Genghis Khan/Hannibal work');
+  ok(are_generals_compatible_either_role($Genghis, $Hermes), 'Genghis Khan/Hermes work');
+  ok(are_generals_compatible_either_role($Genghis, $Hestia), 'Genghis Khan/Hestia work');
+  ok(are_generals_compatible_either_role($Genghis, $IiNaomasa), 'Genghis Khan/Ii Naomasa work');
+  ok(are_generals_compatible_either_role($Genghis, $Jayavarman), 'Genghis Khan/Jayavarman work');
+  ok(are_generals_compatible_either_role($Genghis, $KA), 'Genghis Khan/King Arthur work');
+  ok(are_generals_compatible_either_role($Genghis, $Laudon), 'Genghis Khan/Laudon work');
+  ok(are_generals_compatible_either_role($Genghis, $LiJing), 'Genghis Khan/Li Jing work');
+  ok(are_generals_compatible_either_role($Genghis, $LouisXIV), 'Genghis Khan/Louis XIV work');
+  ok(are_generals_compatible_either_role($Genghis, $MARCO), 'Genghis Khan/Marco Polo work');
+  ok(are_generals_compatible_either_role($Genghis, $MariaTheresa), 'Genghis Khan/Maria Theresa work');
+  ok(are_generals_compatible_either_role($Genghis, $Martinus), 'Genghis Khan/Martinus work');
+  ok(are_generals_compatible_either_role($Genghis, $Mordred), 'Genghis Khan/Mordred work');
+  ok(are_generals_compatible_either_role($Genghis, $Napoleon), 'Genghis Khan/Napoleon Prime work');
+  ok(are_generals_compatible_either_role($Genghis, $Nathanael), 'Genghis Khan/Nathanael Greene work');
+  ok(are_generals_compatible_either_role($Genghis, $OlavII), 'Genghis Khan/Olav II work');
+  ok(are_generals_compatible_either_role($Genghis, $Poligenus), 'Genghis Khan/Poligenus work');
+  ok(are_generals_compatible_either_role($Genghis, $PrinceEugene), 'Genghis Khan/Prince Eugene work');
+  ok(are_generals_compatible_either_role($Genghis, $Roland), 'Genghis Khan/Roland work');
+  ok(are_generals_compatible_either_role($Genghis, $SunCe), 'Genghis Khan/Sun Ce work');
+  ok(are_generals_compatible_either_role($Genghis, $WASH), 'Genghis Khan/Washington Prime work');
+
+  ok(are_generals_compatible_either_role($Haakon, $Hannibal), 'Haakon/Hannibal work');
+  ok(are_generals_compatible_either_role($Haakon, $Hestia), 'Haakon/Hestia work');
+  ok(are_generals_compatible_either_role($Haakon, $KA), 'Haakon/King Arthur work');
+  ok(are_generals_compatible_either_role($Haakon, $Laudon), 'Haakon/Laudon work');
+  ok(are_generals_compatible_either_role($Haakon, $LouisXIV), 'Haakon/Louis XIV work');
+  ok(are_generals_compatible_either_role($Haakon, $MariaTheresa), 'Haakon/Maria Theresa work');
+  ok(are_generals_compatible_either_role($Haakon, $Mordred), 'Haakon/Mordred work');
+  ok(are_generals_compatible_either_role($Haakon, $Napoleon), 'Haakon/Napoleon Prime work');
+  ok(are_generals_compatible_either_role($Haakon, $Nathanael), 'Haakon/Nathanael Greene work');
+  ok(are_generals_compatible_either_role($Haakon, $OlavII), 'Haakon/Olav II work');
+  ok(are_generals_compatible_either_role($Haakon, $Poligenus), 'Haakon/Poligenus work');
+  ok(are_generals_compatible_either_role($Haakon, $PrinceEugene), 'Haakon/Prince Eugene work');
+  ok(are_generals_compatible_either_role($Haakon, $Roland), 'Haakon/Roland work');
+
+  ok(are_generals_compatible_either_role($Douglas, $Franz), 'Douglas/Franz Joseph I work');
+  ok(are_generals_compatible_either_role($Elektra, $Douglas), 'Elektra/Douglas work');
+  ok(are_generals_compatible_either_role($Elektra, $Marcus), 'Elektra/Marcus Agrippa work');
   ok(are_generals_compatible_either_role($Haakon, $Jayavarman), 'Haakon/Jayavarman II work');
   ok(are_generals_compatible_either_role($Haakon, $MARCO), 'Haakon/Marco Polo work');
-  ok(are_generals_compatible_either_role($Haakon, $SC), 'Haakon/Sun Ce work');
-  ok(are_generals_compatible_either_role($Haakon, $SC), 'Haakon/Sun Ce work');
-  ok(are_generals_compatible_either_role($Douglas, $Franz),
-    'Douglas/Franz Joseph I work');
-  ok(are_generals_compatible_either_role($Elektra, $Douglas),
-    'Elektra/Douglas work');
-  ok(are_generals_compatible_either_role($Elektra, $Marcus),
-    'Elektra/Marcus Agrippa work');
-  ok(are_generals_compatible_either_role($Laudon, $Haakon),
-    'Laudon/Haakon work');
-  ok(are_generals_compatible_either_role($Laudon, $SC),
-    'Laudon/Sun Ce work');
-  ok(are_generals_compatible_either_role($Laudon, $LouisXIV),
-    'Laudon/Louis XIV work');
-  ok(are_generals_compatible_either_role($Laudon, $MARCO),
-    'Laudon/Marco Polo work');
-  ok(are_generals_compatible_either_role($MARCO, $WASH,),
-    'Marco Polo/Washington Prime work');
-  ok(
-    are_generals_compatible_either_role($MARCO, $DF),
-    'Marco Polo/David Farragut work (no overlaping types)'
-  );
-  ok(are_generals_compatible_either_role($MARCO, $Haakon),
-    'Marco Polo/Haakon work');
-  ok(are_generals_compatible_either_role($MARCO,  $SC), 'Marco/Sun Ce works');
-  ok(are_generals_compatible_either_role($Marcus, $Franz),
-    'Marcus Agrippa/Franz Joseph I work');
-  ok(are_generals_compatible_either_role($Louis, $Marcus),
-    'Louis IX/Marcus Agrippa work');
-  ok(are_generals_compatible_either_role($Louis, $KA),
-    'Louis IX/King Arthur work');
-  ok(are_generals_compatible_either_role($Louis, $Douglas),
-    'Louis IX/Douglas work');
-  ok(are_generals_compatible_either_role($LouisXIV, $OlavII),
-    'Louis XIV/Olav II should work (stackable)');
-  ok(
-    are_generals_compatible_either_role($LouisXIV, $MARCO),
-    'Louis XIV/Marco Polo should work (stackable)'
-  );
+  ok(are_generals_compatible_either_role($Haakon, $SunCe), 'Haakon/Sun Ce work');
+  ok(are_generals_compatible_either_role($Haakon, $SunCe), 'Haakon/Sun Ce work');
+  ok(are_generals_compatible_either_role($Laudon, $Haakon), 'Laudon/Haakon work');
+  ok(are_generals_compatible_either_role($Laudon, $LouisXIV), 'Laudon/Louis XIV work');
+  ok(are_generals_compatible_either_role($Laudon, $MARCO), 'Laudon/Marco Polo work');
+  ok(are_generals_compatible_either_role($Laudon, $SunCe), 'Laudon/Sun Ce work');
+  ok(are_generals_compatible_either_role($Louis, $Douglas), 'Louis IX/Douglas work');
+  ok(are_generals_compatible_either_role($Louis, $KA), 'Louis IX/King Arthur work');
+  ok(are_generals_compatible_either_role($Louis, $Marcus), 'Louis IX/Marcus Agrippa work');
+  ok(are_generals_compatible_either_role($LouisXIV, $MARCO), 'Louis XIV/Marco Polo should work (stackable)');
+  ok(are_generals_compatible_either_role($LouisXIV, $OlavII), 'Louis XIV/Olav II should work (stackable)');
+  ok(are_generals_compatible_either_role($MARCO, $DF), 'Marco Polo/David Farragut work (no overlaping types)');
+  ok(are_generals_compatible_either_role($MARCO, $Haakon), 'Marco Polo/Haakon work');
+  ok(are_generals_compatible_either_role($MARCO, $SunCe), 'Marco/Sun Ce works');
+  ok(are_generals_compatible_either_role($MARCO, $WASH,), 'Marco Polo/Washington Prime work');
+  ok(are_generals_compatible_either_role($Marcus, $Franz), 'Marcus Agrippa/Franz Joseph I work');
   done_testing();
 };
-
 
 # Use same conflicts object for book tests
 my $bc = $conflicts;
@@ -491,11 +514,9 @@ my $l4smd = (
     $_->name =~ /Siege.*Defense/i && $_->name !~ /Monster/i && $_->level == 4
   } @$generic_books
 )[0];
-my $l4mdm = (
-  grep {
-    $_->name =~ /Mounted.*Defense.*Against.*Monster/i && $_->level == 4
-  } @$generic_books
-)[0];
+my $l4mdm =
+  (grep { $_->name =~ /Mounted.*Defense.*Against.*Monster/i && $_->level == 4 }
+    @$generic_books)[0];
 my $l4ma = (
   grep {
     $_->name =~ /^Mounted.*Attack$/i && $_->name !~ /Monster/i && $_->level == 4
@@ -503,7 +524,9 @@ my $l4ma = (
 )[0];
 my $l4md = (
   grep {
-    $_->name =~ /^Mounted.*Defense$/i && $_->name !~ /Monster/i && $_->level == 4
+         $_->name =~ /^Mounted.*Defense$/i
+      && $_->name !~ /Monster/i
+      && $_->level == 4
   } @$generic_books
 )[0];
 
@@ -571,13 +594,18 @@ SKIP: {
 
 subtest 'Generals that should NOT conflict with books' => sub {
 SKIP: {
-    skip "Books not available", 5 unless $l4sma && $l4smd && $l4mdm && $l4ma && $l4md;
+    skip "Books not available", 5
+      unless $l4sma && $l4smd && $l4mdm && $l4ma && $l4md;
     ok(
-      $bc->is_general_and_book_compatible($Champlain, $l4sma, { same_side => 1, }),
+      $bc->is_general_and_book_compatible(
+        $Champlain, $l4sma, { same_side => 1, }
+      ),
       'Champlain and Level 4 Siege Machine Attack work (same side)'
     );
     ok(
-      $bc->is_general_and_book_compatible($Champlain, $l4smd, { same_side => 1, }),
+      $bc->is_general_and_book_compatible(
+        $Champlain, $l4smd, { same_side => 1, }
+      ),
       'Champlain and Level 4 Siege Machine Defense work (same side)'
     );
     ok(
@@ -593,6 +621,96 @@ SKIP: {
       'Laudon and Level 4 Mounted Defense work (same side)'
     );
   }
+  done_testing();
+};
+
+subtest 'All mounted_pairs should work' => sub {
+  # Read all pairs from mounted_pairs file
+  open my $fh, '<', 't/mounted_pairs' or do {
+    plan skip_all => 'mounted_pairs file not found';
+    return;
+  };
+
+  my @pairs;
+  while (my $line = <$fh>) {
+    chomp $line;
+    my ($g1_name, $g2_name) = split /\t/, $line;
+    push @pairs, [$g1_name, $g2_name];
+  }
+  close $fh;
+
+  # Build general lookup hash
+  my %general_by_name = map { $_->name => $_ } @$generals;
+
+  my $skipped = 0;
+  for my $pair (@pairs) {
+    my ($g1_name, $g2_name) = @$pair;
+    my $g1 = $general_by_name{$g1_name};
+    my $g2 = $general_by_name{$g2_name};
+
+    unless ($g1 && $g2) {
+      $skipped++;
+      next;
+    }
+
+    ok(are_generals_compatible_either_role($g1, $g2), "$g1_name/$g2_name work");
+  }
+
+  note("Skipped $skipped pairs due to missing generals") if $skipped;
+  done_testing();
+};
+
+subtest 'All conflicting_pairs should conflict' => sub {
+  # Read all pairs from conflicting_pairs file
+  open my $fh, '<', 't/conflicting_pairs' or do {
+    plan skip_all => 'conflicting_pairs file not found';
+    return;
+  };
+
+  # Build general lookup hash
+  my %general_by_name = map { $_->name => $_ } @$generals;
+  my @known_names = sort { length($b) <=> length($a) } keys %general_by_name;  # longest first
+
+  my @pairs;
+  my $skipped = 0;
+
+  while (my $line = <$fh>) {
+    chomp $line;
+    next if $line =~ /^\s*$/;  # skip empty lines
+
+    # Try to match two general names from the line
+    my ($g1_name, $g2_name);
+    for my $name (@known_names) {
+      if ($line =~ /^\Q$name\E\s+(.+)$/) {
+        $g1_name = $name;
+        my $rest = $1;
+        # Try to match second name
+        for my $name2 (@known_names) {
+          if ($rest eq $name2) {
+            $g2_name = $name2;
+            last;
+          }
+        }
+        last if $g2_name;
+      }
+    }
+
+    unless ($g1_name && $g2_name) {
+      $skipped++;
+      next;
+    }
+
+    push @pairs, [$g1_name, $g2_name, $general_by_name{$g1_name}, $general_by_name{$g2_name}];
+  }
+  close $fh;
+
+  for my $pair (@pairs) {
+    my ($g1_name, $g2_name, $g1, $g2) = @$pair;
+    ok(!are_generals_compatible_either_role($g1, $g2), "$g1_name/$g2_name conflict");
+  }
+
+  note("Skipped $skipped pairs due to missing generals") if $skipped;
+  note("Testing " . scalar(@pairs) . " conflict pairs");
   done_testing();
 };
 
