@@ -15,10 +15,12 @@ sub conflicts ($self, $b1, $b2, $g1, $g2) {
   return 0 unless $b1->attribute eq $b2->attribute;
   return 0 unless $self->_troops_overlap($b1, $b2);
 
-  # Special case: Sun Ce has no conflicts with anyone
-  # Special case: Laudon/Roland work together (different conditions but edge case)
+# Special case: Sun Ce has no conflicts with anyone
+# Special case: Laudon/Roland work together (different conditions but edge case)
   return 0 if $g1->name eq 'Sun Ce' || $g2->name eq 'Sun Ce';
-  return 0 if ($g1->name eq 'Laudon' && $g2->name eq 'Roland') || ($g1->name eq 'Roland' && $g2->name eq 'Laudon');
+  return 0
+    if ($g1->name eq 'Laudon' && $g2->name eq 'Roland')
+    || ($g1->name eq 'Roland' && $g2->name eq 'Laudon');
 
   # Check if either buff is 2nd+ in a group (same logic as BookComparator)
   # Build cache key from both general names
@@ -71,8 +73,8 @@ sub _conditions_conflict (
   $self, $c1_str, $c2_str,
   $b1_is_multi = 0,
   $b2_is_multi = 0,
-  $b1 = undef,
-  $b2 = undef
+  $b1          = undef,
+  $b2          = undef
 ) {
   # Same conditions (including both empty)
   if ($c1_str eq $c2_str) {
@@ -81,8 +83,8 @@ sub _conditions_conflict (
 
     # If only one is in a multi-attr group, check delta
     if ($b1 && $b2 && ($b1_is_multi || $b2_is_multi)) {
-      my $v1 = $b1->value->number // 0;
-      my $v2 = $b2->value->number // 0;
+      my $v1    = $b1->value->number // 0;
+      my $v2    = $b2->value->number // 0;
       my $delta = abs($v1 - $v2);
       # Need 15+ delta if only one is grouped
       return 0 if $delta >= 15;
@@ -90,8 +92,8 @@ sub _conditions_conflict (
 
     # If both are solo buffs, check delta
     if ($b1 && $b2 && !$b1_is_multi && !$b2_is_multi) {
-      my $v1 = $b1->value->number // 0;
-      my $v2 = $b2->value->number // 0;
+      my $v1    = $b1->value->number // 0;
+      my $v2    = $b2->value->number // 0;
       my $delta = abs($v1 - $v2);
       # Need 25+ delta for solo buffs
       return 0 if $delta >= 25;

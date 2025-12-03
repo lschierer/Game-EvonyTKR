@@ -25,8 +25,8 @@ sub conflicts ($self, $g1, $g2) {
       next unless $gr1->{type} eq $gr2->{type};
 
       # Check if attribute sets are identical
-      my @attrs1 = sort @{$gr1->{attrs}};
-      my @attrs2 = sort @{$gr2->{attrs}};
+      my @attrs1 = sort @{ $gr1->{attrs} };
+      my @attrs2 = sort @{ $gr2->{attrs} };
       next unless @attrs1 == @attrs2;
 
       my $attrs_match = 1;
@@ -75,7 +75,7 @@ sub _find_groups ($self, $general) {
       buffs => $buffs,
       attrs => [uniq map { $_->attribute } @$buffs],
       value => $buffs->[0]->value->number // 0,
-      type  => $buffs->[0]->targetedType // '',
+      type  => $buffs->[0]->targetedType  // '',
       };
   }
 

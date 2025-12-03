@@ -155,12 +155,10 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
     $params->{pair} = $pair;
     # Convert targetType to proper troop type key
     $params->{targetType} = $job->string_to_trooptype($params->{targetType});
-    $job->logger->debug(
-      sprintf(
-        '%s using tt %s to retrieve results',
-        __PACKAGE__, $params->{targetType}
-      )
-    );
+    $job->logger->debug(sprintf(
+      '%s using tt %s to retrieve results',
+      __PACKAGE__, $params->{targetType}
+    ));
 
     # Map primary covenant/specialty params to base Summarizer attributes
     $params->{covenantLevel} = $params->{primaryCovenantLevel};

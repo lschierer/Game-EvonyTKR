@@ -58,22 +58,22 @@ package Game::EvonyTKR::External::Conflicts::LoadML {
 
     # Load JSON
     my $json_text = $json_path->slurp;
-    my $raw_data = decode_json($json_text);
+    my $raw_data  = decode_json($json_text);
 
     # Get all generals for type checking
     my %generals = map { $_->name => $_ } values %{ $job->get_generals() };
 
     # Filter out cross-type pairs
     my %filtered_conflicts;
-    my $total_pairs = 0;
+    my $total_pairs    = 0;
     my $filtered_pairs = 0;
-    my $kept_pairs = 0;
+    my $kept_pairs     = 0;
 
     for my $g1_name (keys %$raw_data) {
       my $g1 = $generals{$g1_name};
       next unless $g1;
 
-      for my $g2_name (keys %{$raw_data->{$g1_name}}) {
+      for my $g2_name (keys %{ $raw_data->{$g1_name} }) {
         my $g2 = $generals{$g2_name};
         next unless $g2;
 
@@ -86,7 +86,8 @@ package Game::EvonyTKR::External::Conflicts::LoadML {
         }
 
         # Keep this entry
-        $filtered_conflicts{$g1_name}{$g2_name} = $raw_data->{$g1_name}{$g2_name};
+        $filtered_conflicts{$g1_name}{$g2_name} =
+          $raw_data->{$g1_name}{$g2_name};
         $kept_pairs++;
       }
     }
@@ -106,8 +107,8 @@ package Game::EvonyTKR::External::Conflicts::LoadML {
   }
 
   sub _has_troop_overlap ($self, $g1, $g2) {
-    my @g1_types = @{$g1->type // []};
-    my @g2_types = @{$g2->type // []};
+    my @g1_types = @{ $g1->type // [] };
+    my @g2_types = @{ $g2->type // [] };
 
     for my $t1 (@g1_types) {
       return 1 if any { $_ eq $t1 } @g2_types;

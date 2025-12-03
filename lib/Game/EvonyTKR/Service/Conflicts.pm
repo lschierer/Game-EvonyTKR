@@ -24,7 +24,7 @@ has asst_has_dragon   => 0;
 has asst_has_spirit   => 0;
 #TODO -- toggle on WALL buffs.
 has allow_wall_buffs => 1;
-has persistence       => undef;    # Set via load_from_persistence()
+has persistence      => undef;    # Set via load_from_persistence()
 
 # Output caches
 has ProcessedGenerals       => sub { {} };
@@ -119,7 +119,7 @@ sub is_general_and_book_compatible ($self, $general, $book, $opts = {}) {
 
 # Load conflict data from persistence layer
 sub load_from_persistence ($self, $persistence) {
-  $self->persistence($persistence);  # Store reference for ML lookups
+  $self->persistence($persistence);    # Store reference for ML lookups
 
   my $conflicts = $persistence->load_all_conflicts();
 
