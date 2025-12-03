@@ -106,6 +106,11 @@ my $builder = Module::Build->new(
     'namespace::autoclean'                => '0',
     'namespace::clean'                    => '0',
     'overload'                            => '0',
+    'AI::XGBoost'                         => '0',
+    'AI::DecisionTree'                    => '0',
+    'Algorithm::NaiveBayes'               => '0',
+    'PDL::Stats'                          => '0',
+
   },
   recommends => {
     'Mojolicious::Plugin::Minion::Admin' => '0',
