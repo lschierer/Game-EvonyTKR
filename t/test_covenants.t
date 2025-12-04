@@ -29,12 +29,6 @@ ok(-r -d $CovenantsDir, "using CovenantsDir $CovenantsDir");
 
 my $cc = Game::EvonyTKR::Service::Cache->new();
 
-my $test_key = 'memcached_test_' . time();
-
-unless ($cc->set($test_key, 'test')) {
-  $logger->info('Memcached not available, skipping memcached tests');
-  exit 1;
-}
 
 package Test::Package {
   use Mojo::Base -base,                               -signatures;

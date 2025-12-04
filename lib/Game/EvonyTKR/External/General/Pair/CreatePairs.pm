@@ -6,7 +6,6 @@ package Game::EvonyTKR::External::General::Pair::CreatePairs {
   use Mojo::Base 'Game::EvonyTKR::External::JobBase',        -signatures;
   use Mojo::Base 'Game::EvonyTKR::Role::Persistence::Pairs', -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants', -role;
-  require Game::EvonyTKR::Service::Cache;
 
   sub task_name {'create_pairs'}
 
@@ -175,8 +174,9 @@ package Game::EvonyTKR::External::General::Pair::CreatePairs {
 
     foreach my $g1 (keys %$final_by_general) {
       foreach my $g2 (keys %{ $final_by_general->{$g1} }) {
-       # Store to persistence (uses INSERT OR IGNORE so duplicates are harmless)
-        $job->persistence->store_conflict($g1, $g2);
+       # Store to persistence with actual conflict status (0 or 1)
+        my $conflicts = $final_by_general->{$g1}{$g2};
+        $job->persistence->store_conflict($g1, $g2, $conflicts);
         $new_conflicts_stored++;
       }
     }

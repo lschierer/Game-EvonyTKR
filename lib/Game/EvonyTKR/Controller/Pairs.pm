@@ -58,50 +58,10 @@ package Game::EvonyTKR::Controller::Pairs {
       $c->logger->error("route setup failed in Pairs controller");
     };
 
-    Mojo::IOLoop->timer(
-      0.01 => sub {
-        $c->schedule_merge_pairs_from_cache($app);
-      }
-    );
+
   }
 
-  sub schedule_merge_pairs_from_cache ($c, $app, $delay = 0) {
 
-    # Check if pair building is complete
-    my $is_complete = $c->pair_cache()->get('pair_building_complete');
-    my $npbt;
-
-    my $repeat = 0;
-    $delay++;
-    my $maxdelay = defined($app->config('mode'))
-      && $app->config('mode') eq 'development' ? 15 : 60;
-    $maxdelay = defined($maxdelay) ? $maxdelay : 60;
-    $delay    = $delay % $maxdelay;
-    $delay    = $delay == 0 ? 0.001 : $delay;
-
-    if (!$is_complete) {
-      $c->logger->debug(
-        sprintf('Pair building not complete yet, will retry in %s', $delay));
-      $repeat = 1;
-    }
-    else {
-      $npbt = $c->get_pairs_by_type();
-      if (!$npbt) {
-        $c->logger->debug(sprintf(
-          'Pair Building Complete but no pairs by type yet. retry in %s',
-          $delay));
-        $repeat = 1;
-      }
-    }
-
-    if ($repeat) {
-      Mojo::IOLoop->timer(
-        $delay => sub {
-          $c->schedule_merge_pairs_from_cache($app, $delay);
-        }
-      );
-    }
-  }
 
   sub setup_routes ($c, $app,) {
     say 'starting setup routes for Pairs';

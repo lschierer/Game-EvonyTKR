@@ -4,18 +4,9 @@ use utf8::all;
 use Mojo::Base -role,                                     -signatures;
 use Mojo::Base 'Game::EvonyTKR::Role::Persistence::Core', -role;
 
-has 'ascending_attribute_cache' => sub ($self) {
-  return Game::EvonyTKR::Service::Cache->new(
-    namespace => 'ascending_attributes__');
-};
-
 sub add_ascending_attribute ($self, $ascendingAttribute) {
   my $name = $self->normalize($ascendingAttribute->general);
   $self->persistence->store_ascending_attribute($name,
-    $ascendingAttribute->to_wire_hash());
-  my $key = lc($self->normalize($ascendingAttribute->general));
-  $key =~ s/ /_/g;
-  $self->ascending_attribute_cache->set($key,
     $ascendingAttribute->to_wire_hash());
   return 1;
 }
@@ -35,16 +26,8 @@ sub get_ascending_attributes ($self, $name) {
     return $AscendingAttributes->{$normalized_name};
   }
 
-  my $wire_data = $self->ascending_attribute_cache->get($normalized_name);
-
-  unless (defined($wire_data)) {
-    $self->logger->debug("Not in memcached, checking persistence");
-    $wire_data = $self->persistence->get_ascending_attribute($name);
-
-    if (defined($wire_data)) {
-      $self->ascending_attribute_cache->set($normalized_name, $wire_data);
-    }
-  }
+  # Load directly from SQLite
+  my $wire_data = $self->persistence->get_ascending_attribute($name);
 
   return unless defined($wire_data);
 

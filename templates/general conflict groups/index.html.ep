@@ -17,13 +17,21 @@
     <p>No conflict groups found.</p>
   <% } %>
 
-  <h2>Individual Conflicts</h2>
+  <h2>Individual Conflicts By General</h2>
   <% if ($pairs && ref $pairs eq 'HASH') { %>
     <ul class="conflict-pairs">
       <% foreach my $general1 (sort keys %{ $pairs }) { %>
-        <% foreach my $general2 (sort keys %{ $pairs->{$general1} }) { %>
-          <li><%= $general1 %> ↔ <%= $general2 %></li>
+        <% my @conflicts = grep { $pairs->{$general1}->{$_} == 1 } keys $pairs->{$general1}->%*; %>
+        <li><%= $general1 %>
+        <% if(scalar(@conflicts)) { %>
+          <%= sprintf(' (%s Conflicts)', scalar(@conflicts)); %>
+          <ul>
+            <% foreach my $general2 (sort @conflicts) { %>
+              <li><%= $general1 %> ↔ <%= $general2 %></li>
+            <% } %>
+          </ul>
         <% } %>
+        </li>
       <% } %>
     </ul>
   <% } else { %>

@@ -13,7 +13,6 @@ require Game::EvonyTKR::Model::General::Pair;
 require Game::EvonyTKR::Model::Buff::Summarizer::Single;
 require Game::EvonyTKR::Control::Generals::Routing;
 require Game::EvonyTKR::Model::Data;
-require Game::EvonyTKR::Service::Cache;
 require Game::EvonyTKR::Model::Base;
 
 require UUID;

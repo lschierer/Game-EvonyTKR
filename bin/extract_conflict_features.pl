@@ -24,7 +24,7 @@ if ($help || !$output) {
 Usage: extract_conflict_features.pl --mode=MODE --output=FILE
 
 Modes:
-  training  Extract features from known pairs in t/conflicting_pairs and t/mounted_pairs
+  training  Extract features from known pairs in share/training_data/
   predict   Extract features for all possible general pairs
 
 Options:
@@ -48,7 +48,11 @@ die "Invalid mode: $mode (must be 'training' or 'predict')\n"
 # Initialize data loader
 my $common = Game::EvonyTKR::Model::Base->new();
 my @generals =  $common->get_generals()->@*;
-my %general_by_name = map { $_->name => $_ } @generals;
+my %general_by_name = ();
+foreach my $general (@generals){
+  my $nn = lc($common->normalize($general->name));
+  $general_by_name{$nn} = $general;
+}
 
 say STDERR "Loaded " . scalar(@generals) . " generals";
 
@@ -60,6 +64,10 @@ my @feature_names = (
   'general1', 'general2',
   # Troop type features
   'shared_troop_types', 'g1_troop_count', 'g2_troop_count',
+  # Specialist type features
+  'g1_mounted_specialist', 'g1_ranged_specialist', 'g1_ground_specialist', 'g1_siege_specialist',
+  'g2_mounted_specialist', 'g2_ranged_specialist', 'g2_ground_specialist', 'g2_siege_specialist',
+  'same_specialist_type',
   # Group structure features
   'g1_multi_attr_groups', 'g2_multi_attr_groups',
   'g1_solo_buffs', 'g2_solo_buffs',
@@ -73,7 +81,7 @@ my @feature_names = (
   'g1_has_dragon', 'g2_has_dragon',
   'condition_overlap_count',
   # Special cases
-  'is_louis_xiv_pair', 'is_sun_ce_pair',
+  'is_sun_ce_pair',
   # Book text complexity
   'g1_book_text_length', 'g2_book_text_length',
 );
@@ -97,8 +105,8 @@ sub extract_training_data ($fh, $general_by_name) {
   my @pairs;
 
   # Read conflicting pairs (label = 1)
-  if (-f 't/conflicting_pairs') {
-    open my $conflict_fh, '<', 't/conflicting_pairs' or die "Cannot open t/conflicting_pairs: $!\n";
+  if (-f 'share/training_data/conflicting_pairs') {
+    open my $conflict_fh, '<', 'share/training_data/conflicting_pairs' or die "Cannot open share/training_data/conflicting_pairs: $!\n";
     while (my $line = <$conflict_fh>) {
       chomp $line;
       next if $line =~ /^\s*$/;
@@ -107,8 +115,8 @@ sub extract_training_data ($fh, $general_by_name) {
       $g1_name =~ s/^\s+|\s+$//g;
       $g2_name =~ s/^\s+|\s+$//g;
 
-      my $g1 = $general_by_name->{$g1_name};
-      my $g2 = $general_by_name->{$g2_name};
+      my $g1 = $general_by_name->{lc($common->normalize($g1_name))};
+      my $g2 = $general_by_name->{lc($common->normalize($g2_name))};
       next unless $g1 && $g2;
 
       push @pairs, [$g1, $g2, 1];
@@ -117,10 +125,14 @@ sub extract_training_data ($fh, $general_by_name) {
     say STDERR "Loaded " . scalar(@pairs) . " conflicting pairs";
   }
 
-  # Read working pairs (label = 0)
+  # Read working pairs (label = 0) from all *_pairs files (except conflicting_pairs)
   my $working_count = 0;
-  if (-f 't/mounted_pairs') {
-    open my $work_fh, '<', 't/mounted_pairs' or die "Cannot open t/mounted_pairs: $!\n";
+  my @pair_files = grep { $_ !~ /conflicting_pairs$/ } glob('share/training_data/*_pairs');
+  for my $pair_file (@pair_files) {
+    next unless -f $pair_file;
+
+    open my $work_fh, '<', $pair_file or die "Cannot open $pair_file: $!\n";
+    my $file_count = 0;
     while (my $line = <$work_fh>) {
       chomp $line;
       next if $line =~ /^\s*$/;
@@ -129,16 +141,18 @@ sub extract_training_data ($fh, $general_by_name) {
       $g1_name =~ s/^\s+|\s+$//g;
       $g2_name =~ s/^\s+|\s+$//g;
 
-      my $g1 = $general_by_name->{$g1_name};
-      my $g2 = $general_by_name->{$g2_name};
+      my $g1 = $general_by_name->{lc($common->normalize($g1_name))};
+      my $g2 = $general_by_name->{lc($common->normalize($g2_name))};
       next unless $g1 && $g2;
 
       push @pairs, [$g1, $g2, 0];
-      $working_count++;
+      $file_count++;
     }
     close $work_fh;
-    say STDERR "Loaded $working_count working pairs";
+    say STDERR "Loaded $file_count working pairs from $pair_file";
+    $working_count += $file_count;
   }
+  say STDERR "Loaded $working_count working pairs total";
 
   # Extract features for each pair
   for my $pair (@pairs) {
@@ -168,7 +182,7 @@ sub extract_features ($g1, $g2) {
   my @features;
 
   # General names
-  push @features, $g1->name, $g2->name;
+  push @features, lc($common->normalize($g1->name)), lc($common->normalize($g2->name));
 
   # Troop type overlap
   my @g1_types = @{ $g1->type // [] };
@@ -179,6 +193,28 @@ sub extract_features ($g1, $g2) {
     $shared++ if any { $_ eq $t } @g2_types;
   }
   push @features, $shared, scalar(@g1_types), scalar(@g2_types);
+
+  # Specialist type features
+  my $g1_mounted = (any { $_ eq 'mounted_specialist' } @g1_types) ? 1 : 0;
+  my $g1_ranged = (any { $_ eq 'ranged_specialist' } @g1_types) ? 1 : 0;
+  my $g1_ground = (any { $_ eq 'ground_specialist' } @g1_types) ? 1 : 0;
+  my $g1_siege = (any { $_ eq 'siege_specialist' } @g1_types) ? 1 : 0;
+
+  my $g2_mounted = (any { $_ eq 'mounted_specialist' } @g2_types) ? 1 : 0;
+  my $g2_ranged = (any { $_ eq 'ranged_specialist' } @g2_types) ? 1 : 0;
+  my $g2_ground = (any { $_ eq 'ground_specialist' } @g2_types) ? 1 : 0;
+  my $g2_siege = (any { $_ eq 'siege_specialist' } @g2_types) ? 1 : 0;
+
+  my $same_specialist = (
+    ($g1_mounted && $g2_mounted) ||
+    ($g1_ranged && $g2_ranged) ||
+    ($g1_ground && $g2_ground) ||
+    ($g1_siege && $g2_siege)
+  ) ? 1 : 0;
+
+  push @features, $g1_mounted, $g1_ranged, $g1_ground, $g1_siege;
+  push @features, $g2_mounted, $g2_ranged, $g2_ground, $g2_siege;
+  push @features, $same_specialist;
 
   # Group structure
   $g1->populateBuiltinBook();
@@ -218,9 +254,8 @@ sub extract_features ($g1, $g2) {
   push @features, $cond_overlap;
 
   # Special cases
-  my $is_louis = ($g1->name eq 'Louis XIV' || $g2->name eq 'Louis XIV') ? 1 : 0;
   my $is_sunce = ($g1->name eq 'Sun Ce' || $g2->name eq 'Sun Ce') ? 1 : 0;
-  push @features, $is_louis, $is_sunce;
+  push @features,  $is_sunce;
 
   # Book text complexity
   my $g1_text_len = length($g1->builtInBook->text // '');

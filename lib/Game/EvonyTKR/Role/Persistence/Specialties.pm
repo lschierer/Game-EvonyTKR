@@ -4,16 +4,9 @@ use utf8::all;
 use Mojo::Base -role,                                     -signatures;
 use Mojo::Base 'Game::EvonyTKR::Role::Persistence::Core', -role;
 
-has 'specialty_cache' => sub ($self) {
-  return Game::EvonyTKR::Service::Cache->new(namespace => 'specialties:');
-};
-
 sub add_specialty ($self, $specialty) {
   my $name = $specialty->name;
   $self->persistence->store_specialty($name, $specialty->to_wire_hash());
-  my $key = lc($self->normalize($name));
-  $key =~ s/ /_/g;
-  $self->specialty_cache->set($key, $specialty->to_wire_hash());
   return 1;
 }
 
@@ -30,16 +23,8 @@ sub get_specialty ($self, $name) {
     return $specialties->{$normalized_name};
   }
 
-  my $wire_data = $self->specialty_cache->get($normalized_name);
-
-  unless (defined($wire_data)) {
-    $self->logger->debug("Not in memcached, checking persistence");
-    $wire_data = $self->persistence->get_specialty($name);
-
-    if (defined($wire_data)) {
-      $self->specialty_cache->set($normalized_name, $wire_data);
-    }
-  }
+  # Load directly from SQLite
+  my $wire_data = $self->persistence->get_specialty($name);
 
   return unless defined($wire_data);
 

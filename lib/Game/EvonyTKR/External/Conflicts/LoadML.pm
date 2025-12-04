@@ -5,7 +5,6 @@ use File::FindLib 'lib';
 
 package Game::EvonyTKR::External::Conflicts::LoadML {
   use Mojo::Base 'Game::EvonyTKR::External::JobBase', -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Role::Common',      -role;
   use Mojo::JSON qw(decode_json);
   use Mojo::File;
   use List::AllUtils qw(any);
@@ -46,6 +45,15 @@ package Game::EvonyTKR::External::Conflicts::LoadML {
       return $job->fail($errmessage);
     }
 
+    return
+      if ($job->are_prereqs_outstanding(
+      $job->minion,
+      [
+        'load_all_generals',    'load_all_builtin_books',
+        'load_all_specialties', 'load_all_ascending_attributes',
+      ]
+      ));
+
     # Find conflicts.json file
     my $json_path = Mojo::File->new('conflicts.json');
     unless (-f $json_path) {
@@ -60,8 +68,8 @@ package Game::EvonyTKR::External::Conflicts::LoadML {
     my $json_text = $json_path->slurp;
     my $raw_data  = decode_json($json_text);
 
-    # Get all generals for type checking
-    my %generals = map { $_->name => $_ } values %{ $job->get_generals() };
+    # Get all generals for type checking (normalize names to match JSON keys)
+    my %generals = map { $job->normalize($_->name) => $_ } $job->get_generals()->@* ;
 
     # Filter out cross-type pairs
     my %filtered_conflicts;
@@ -96,10 +104,27 @@ package Game::EvonyTKR::External::Conflicts::LoadML {
       'Loaded ML conflicts: %d total, %d filtered (no troop overlap), %d kept',
       $total_pairs, $filtered_pairs, $kept_pairs
     ));
+    $job->note(
+      total_pairs     => $total_pairs,
+      filtered_pairs  => $filtered_pairs,
+      kept_pairs      => $kept_pairs,
+    );
 
-    # Store in persistence
+    # Store in memcache for fast lookup
     $job->persistence->set_ml_conflicts(\%filtered_conflicts);
 
+    # Also store in SQLite for persistence across restarts
+    my $stored_count = 0;
+    for my $g1_name (keys %filtered_conflicts) {
+      for my $g2_name (keys %{ $filtered_conflicts{$g1_name} }) {
+        my $prediction = $filtered_conflicts{$g1_name}{$g2_name};
+        my $conflicts = $prediction->{conflict} ? 1 : 0;
+        $job->persistence->store_conflict($g1_name, $g2_name, $conflicts);
+        $stored_count++;
+      }
+    }
+
+    $job->logger->info("Stored $stored_count ML predictions in SQLite persistence");
     $job->logger->info('ML conflicts stored in persistence');
 
     # Mark this job as completed in persistence

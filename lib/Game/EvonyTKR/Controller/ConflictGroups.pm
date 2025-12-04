@@ -2,7 +2,6 @@ use v5.42.0;
 use experimental qw(class);
 use utf8::all;
 use File::FindLib 'lib';
-require Game::EvonyTKR::Service::Cache;
 use namespace::autoclean;
 
 package Game::EvonyTKR::Controller::ConflictGroups {
@@ -38,50 +37,35 @@ package Game::EvonyTKR::Controller::ConflictGroups {
       order  => 60,
     });
 
-    Mojo::IOLoop->timer(
-      0.01 => sub {
-        $c->logger->debug(
-          __PACKAGE__ . ' calling schedule_cached_conflicts_merge');
-        $c->schedule_cached_conflicts_merge($app);
-      }
-    );
   }
 
-  sub schedule_cached_conflicts_merge($c, $app, $delay = 0) {
-    my $is_complete = $c->conflict_cache->get('conflict_building_complete');
-
-    $delay++;
-    $delay = $delay % 60;
-    $delay = $delay ? $delay : 0.01;
-
-    if ($is_complete) {
-      $c->logger->info('Conflict building complete, loading final data');
-      # calling get_conflict_detector will trigger a refresh
-      Mojo::IOLoop->timer(
-        0.001 => sub {
-          $c->get_conflict_detector();
-        }
-      );
-      return;
-    }
-
-    # Not complete yet, retry in 30 seconds
-    $c->logger->debug(
-      sprintf('Conflict building not complete yet, will retry in %s seconds',
-        $delay)
-    );
-    Mojo::IOLoop->timer(
-      $delay => sub { $c->schedule_cached_conflicts_merge($app, $delay) });
-  }
+  has prereqs => sub {
+    return [qw(
+      load_all_generals
+      load_all_builtin_books
+      load_all_generic_books
+      load_all_covenants
+      load_all_specialties
+      load_all_ascending_attributes
+      build_general_indexes
+      load_all_pair_builders
+      load_ml_conflicts
+      reduce_coordinator
+      monitor_loaders
+    )];
+  };
 
   sub index ($c) {
+    return if $c->check_prereqs_or_wait($c->prereqs);
     $c->logger->debug("Rendering conflict groups index");
 
     my $detector = $c->get_conflict_detector();
+
     $c->logger->debug(sprintf('there are %s generals in the by_general index',
       scalar keys $detector->by_general->%*));
     my $groups = $detector->groups_by_conflict_type;
     my $pairs  = $detector->by_general;
+    $c->logger->debug('conflict groups controller index handler sees ' . Data::Printer::np($pairs));
 
     $c->stash(
       groups   => $groups,

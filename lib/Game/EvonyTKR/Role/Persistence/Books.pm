@@ -4,14 +4,6 @@ use utf8::all;
 use Mojo::Base -role,                                     -signatures;
 use Mojo::Base 'Game::EvonyTKR::Role::Persistence::Core', -role;
 
-has 'builtin_book_cache' => sub ($self) {
-  return Game::EvonyTKR::Service::Cache->new(namespace => 'builtin_books:');
-};
-
-has 'generic_book_cache' => sub ($self) {
-  return Game::EvonyTKR::Service::Cache->new(namespace => 'generic_books:');
-};
-
 ##############################################################################
 # Builtin Books
 ##############################################################################
@@ -19,9 +11,6 @@ has 'generic_book_cache' => sub ($self) {
 sub add_builtin_book ($self, $book) {
   my $name = $book->name;
   $self->persistence->store_builtin_book($name, $book->to_wire_hash());
-  my $key = $name =~ s/ /_/gr;
-  $key = $self->normalize($key);
-  $self->builtin_book_cache->set($key, $book->to_wire_hash());
   return 1;
 }
 
@@ -40,16 +29,8 @@ sub get_builtin_book ($self, $name) {
     return $builtin_books->{$key};
   }
 
-  my $wire_data = $self->builtin_book_cache->get($key);
-
-  unless (defined($wire_data)) {
-    $self->logger->debug("Not in memcached, checking persistence");
-    $wire_data = $self->persistence->get_builtin_book($name);
-
-    if (defined($wire_data)) {
-      $self->builtin_book_cache->set($key, $wire_data);
-    }
-  }
+  # Load directly from SQLite
+  my $wire_data = $self->persistence->get_builtin_book($name);
 
   unless (defined($wire_data)) {
     $self->logger->warn("No wire_data found for key: $key");
@@ -87,15 +68,13 @@ sub list_builtin_books ($self) {
 ##############################################################################
 # Generic Books
 ##############################################################################
+# Generic Books
+##############################################################################
 
 sub add_generic_book ($self, $book) {
   my $name  = $book->name;
   my $level = $book->level;
   $self->persistence->store_generic_book($name, $level, $book->to_wire_hash());
-  my $nn = $name =~ s/ /_/gr;
-  $nn = $self->normalize($nn);
-  my $key = sprintf('%s_level_%s', $nn, $level);
-  $self->generic_book_cache->set($key, $book->to_wire_hash());
   return 1;
 }
 
@@ -113,16 +92,8 @@ sub get_generic_book ($self, $name, $level) {
     return $generic_books->{$key};
   }
 
-  my $wire_data = $self->generic_book_cache->get($key);
-
-  unless (defined($wire_data)) {
-    $self->logger->debug("Not in memcached, checking persistence");
-    $wire_data = $self->persistence->get_generic_book($name, $level);
-
-    if (defined($wire_data)) {
-      $self->generic_book_cache->set($key, $wire_data);
-    }
-  }
+  # Load directly from SQLite
+  my $wire_data = $self->persistence->get_generic_book($name, $level);
 
   return unless defined($wire_data);
 

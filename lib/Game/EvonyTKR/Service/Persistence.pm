@@ -10,7 +10,7 @@ use Mojo::JSON qw(encode_json decode_json);
 use Carp;
 
 # Schema version - increment when schema changes
-our $SCHEMA_VERSION = 2;
+our $SCHEMA_VERSION = 3;
 
 has 'db_path' => sub {
   my $home = Mojo::Home->new->detect('Game::EvonyTKR');
@@ -162,6 +162,7 @@ sub _create_schema_v1 ($self, $db) {
     CREATE TABLE IF NOT EXISTS general_conflicts (
       general1_name TEXT NOT NULL,
       general2_name TEXT NOT NULL,
+      conflicts INTEGER NOT NULL DEFAULT 1,
       detected_at INTEGER DEFAULT (strftime('%s', 'now')),
       PRIMARY KEY (general1_name, general2_name)
     )
@@ -204,6 +205,9 @@ sub _migrate_schema ($self, $db, $from_version, $to_version) {
     if ($version == 2) {
       $self->_migrate_to_v2($db);
     }
+    elsif ($version == 3) {
+      $self->_migrate_to_v3($db);
+    }
   }
 }
 
@@ -229,6 +233,17 @@ sub _migrate_to_v2 ($self, $db) {
     'CREATE INDEX IF NOT EXISTS idx_pairs_lifecycle ON pairs(lifecycle_id)');
 
   $self->logger->info('Schema v2 migration completed');
+}
+
+sub _migrate_to_v3 ($self, $db) {
+  $self->logger->info('Migrating to schema v3: adding conflicts column to general_conflicts');
+
+  # Add conflicts column (default 1 for existing rows which are all conflicts)
+  $db->query(q{
+    ALTER TABLE general_conflicts ADD COLUMN conflicts INTEGER NOT NULL DEFAULT 1
+  });
+
+  $self->logger->info('Schema v3 migration completed');
 }
 
 ##############################################################################
@@ -603,7 +618,7 @@ sub list_ascending_attributes ($self) {
 # Data storage methods - General Conflicts
 ##############################################################################
 
-sub store_conflict ($self, $general1_name, $general2_name) {
+sub store_conflict ($self, $general1_name, $general2_name, $conflicts ) {
   my $db = $self->sqlite->db;
 
   # Normalize names for consistent storage
@@ -615,9 +630,9 @@ sub store_conflict ($self, $general1_name, $general2_name) {
 
   $db->query(
     q{
-    INSERT OR IGNORE INTO general_conflicts (general1_name, general2_name, detected_at)
-    VALUES (?, ?, strftime('%s', 'now'))
-  }, $name1, $name2
+    INSERT OR IGNORE INTO general_conflicts (general1_name, general2_name, conflicts, detected_at)
+    VALUES (?, ?, ?, strftime('%s', 'now'))
+  }, $name1, $name2, $conflicts
   );
 
   return 1;
@@ -653,15 +668,16 @@ sub load_all_conflicts ($self) {
 
   my %by_general;
   my $results =
-    $db->query('SELECT general1_name, general2_name FROM general_conflicts');
+    $db->query('SELECT general1_name, general2_name, conflicts FROM general_conflicts');
 
   while (my $row = $results->hash) {
     my $g1 = $row->{general1_name};
     my $g2 = $row->{general2_name};
+    my $conflicts = $row->{conflicts};
 
-    # Store bidirectional mapping
-    $by_general{$g1}{$g2} = 1;
-    $by_general{$g2}{$g1} = 1;
+    # Store bidirectional mapping with conflict status
+    $by_general{$g1}{$g2} = $conflicts;
+    $by_general{$g2}{$g1} = $conflicts;
   }
 
   return \%by_general;
@@ -771,10 +787,9 @@ sub set_ml_conflicts ($self, $conflicts) {
 }
 
 sub get_ml_conflicts ($self) {
-  require Mojo::JSON;
-  my $json = $self->get_metadata('ml_conflicts');
-  return undef unless $json;
-  return Mojo::JSON::decode_json($json);
+  # Read ML predictions from general_conflicts table
+  # This is the same as load_all_conflicts but returns the full structure
+  return $self->load_all_conflicts();
 }
 
 1;

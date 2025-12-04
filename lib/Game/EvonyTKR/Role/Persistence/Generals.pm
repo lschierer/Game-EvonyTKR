@@ -4,16 +4,9 @@ use utf8::all;
 use Mojo::Base -role,                                     -signatures;
 use Mojo::Base 'Game::EvonyTKR::Role::Persistence::Core', -role;
 
-has 'general_cache' => sub ($self) {
-  return Game::EvonyTKR::Service::Cache->new(namespace => 'generals:');
-};
-
 sub add_general ($self, $general) {
   my $name = $general->name;
   $self->persistence->store_general($name, $general->to_wire_hash());
-  my $key = lc($self->normalize($name));
-  $key =~ s/ /_/g;
-  $self->general_cache->set($key, $general->to_wire_hash());
   return 1;
 }
 
@@ -35,16 +28,8 @@ sub get_general ($self, $name) {
     return $generals->{$normalized_name};
   }
 
-  my $wire_data = $self->general_cache->get($normalized_name);
-
-  unless (defined($wire_data)) {
-    $self->logger->debug("Not in memcached, checking persistence");
-    $wire_data = $self->persistence->get_general($name);
-
-    if (defined($wire_data)) {
-      $self->general_cache->set($normalized_name, $wire_data);
-    }
-  }
+  # Load directly from SQLite
+  my $wire_data = $self->persistence->get_general($name);
 
   unless (defined($wire_data)) {
     $self->logger->warn("No data found for: $name");

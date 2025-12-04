@@ -27,7 +27,6 @@ my $logger;
 
 require Game::EvonyTKR::Service::Conflicts;
 require Game::EvonyTKR::Model::Buff::Summarizer;
-require Game::EvonyTKR::Service::Cache;
 require Game::EvonyTKR::Shared::Constants;
 require Game::EvonyTKR;
 require Game::EvonyTKR::Model::Base;
@@ -90,10 +89,6 @@ $logger = $testPackage->get_logger;
 
 my $TestGenerals = TestClass::Generals->new();
 
-my $memcachClient = $TestGenerals->general_cache();
-if (not defined($memcachClient)) {
-  croak('failed to define memcachClient');
-}
 
 # Manager setup
 
@@ -189,13 +184,7 @@ subtest 'Data Setup' => sub {
   done_testing();
 };
 
-# Check if memcached is available
-my $test_key = 'memcached_test_' . time();
-unless ($memcachClient->set($test_key, 'test')) {
-  $logger->info('Memcached not available, skipping memcached tests');
-  done_testing();
-  exit 1;
-}
+
 
 isa_ok(
   $conflicts,
@@ -788,7 +777,7 @@ SKIP: {
 
 subtest 'All mounted_pairs should work' => sub {
   # Read all pairs from mounted_pairs file
-  open my $fh, '<', 't/mounted_pairs' or do {
+  open my $fh, '<', 'share/training_data/mounted_pairs' or do {
     plan skip_all => 'mounted_pairs file not found';
     return;
   };
@@ -829,7 +818,7 @@ subtest 'All mounted_pairs should work' => sub {
 
 subtest 'All conflicting_pairs should conflict' => sub {
   # Read all pairs from conflicting_pairs file
-  open my $fh, '<', 't/conflicting_pairs' or do {
+  open my $fh, '<', 'share/training_data/conflicting_pairs' or do {
     plan skip_all => 'conflicting_pairs file not found';
     return;
   };

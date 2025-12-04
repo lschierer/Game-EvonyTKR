@@ -12,7 +12,6 @@ require Game::EvonyTKR::Model::General;
 require Game::EvonyTKR::Model::General::Pair;
 require Game::EvonyTKR::Control::Generals::Routing;
 require Game::EvonyTKR::Model::Data;
-require Game::EvonyTKR::Service::Cache;
 require Game::EvonyTKR::Model::Covenant;
 
 require UUID;

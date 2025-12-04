@@ -4,17 +4,9 @@ use utf8::all;
 use Mojo::Base -role,                                     -signatures;
 use Mojo::Base 'Game::EvonyTKR::Role::Persistence::Core', -role;
 
-has 'covenant_cache' => sub ($self) {
-  return Game::EvonyTKR::Service::Cache->new(namespace => 'covenants:');
-};
-
 sub add_covenant ($self, $covenant) {
   my $name = $covenant->primary->name;
-  my $r1 = $self->persistence->store_covenant($name, $covenant->to_wire_hash());
-  my $key = lc($self->normalize($name));
-  $key =~ s/ /_/g;
-  my $r2 = $self->covenant_cache->set($key, $covenant->to_wire_hash());
-  return $r1 && $r2;
+  return $self->persistence->store_covenant($name, $covenant->to_wire_hash());
 }
 
 sub get_covenant ($self, $name) {
@@ -30,16 +22,8 @@ sub get_covenant ($self, $name) {
     return $covenants->{$normalized_name};
   }
 
-  my $wire_data = $self->covenant_cache->get($normalized_name);
-
-  unless (defined($wire_data)) {
-    $self->logger->debug("Not in memcached, checking persistence");
-    $wire_data = $self->persistence->get_covenant($name);
-
-    if (defined($wire_data)) {
-      $self->covenant_cache->set($normalized_name, $wire_data);
-    }
-  }
+  # Load directly from SQLite
+  my $wire_data = $self->persistence->get_covenant($name);
 
   return unless defined($wire_data);
 

@@ -19,6 +19,7 @@ npmdeps:
 
 deps: prepare npmdeps
   ./Build installdeps --cpan_client 'cpanm -n'
+  pip install numpy pandas scikit-learn
   #perl ./scripts/update_git_meta.pl
 
 [working-directory: 'share']
@@ -63,6 +64,6 @@ dev-image: build
 
 mlModel:
   perl bin/extract_conflict_features.pl --mode=training --output=training_data.csv
-  python bin/train_conflict_model.py     --training=training_data.csv     --model=conflict_model.pkl     --importance=feature_importance.csv
+  PYTHON_GIL=0 python bin/train_conflict_model.py     --training=training_data.csv     --model=conflict_model.pkl     --importance=feature_importance.csv
   perl bin/extract_conflict_features.pl --mode=predict --output=all_pairs.csv
-  python bin/predict_conflicts.py     --model=conflict_model.pkl     --pairs=all_pairs.csv     --output=conflicts.json
+  PYTHON_GIL=0 python bin/predict_conflicts.py     --model=conflict_model.pkl     --pairs=all_pairs.csv     --output=conflicts.json

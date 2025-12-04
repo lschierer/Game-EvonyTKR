@@ -91,8 +91,12 @@ package Game::EvonyTKR::External::General::Pair::ReduceCoordinator {
     my $pc_verify = 0;
     my $cc_verify = 0;
     do {
-      my $pc = $job->pair_cache->set('pair_building_complete', 1);
-      my $cc = $job->conflict_cache->set('conflict_building_complete', 1);
+      # Use SQLite metadata for completion tracking
+      $job->persistence->set_metadata('pair_building_complete', '1');
+      my $pc = 1; # Always succeeds with SQLite
+      # Use SQLite metadata instead of memcache for conflict completion
+      $job->persistence->set_metadata('conflict_building_complete', '1');
+      my $cc = 1; # Always succeeds with SQLite
 
       $job->logger->info(sprintf(
 "Cache set results: pair_building_complete=%s, conflict_building_complete=%s",
@@ -101,8 +105,8 @@ package Game::EvonyTKR::External::General::Pair::ReduceCoordinator {
       ));
 
       # Verify the values were actually set
-      $pc_verify = $job->pair_cache->get('pair_building_complete');
-      $cc_verify = $job->conflict_cache->get('conflict_building_complete');
+      $pc_verify = $job->persistence->get_metadata('pair_building_complete');
+      $cc_verify = $job->persistence->get_metadata('conflict_building_complete');
 
       $job->logger->info(sprintf(
 "Cache verification: pair_building_complete=%s, conflict_building_complete=%s",
@@ -151,7 +155,8 @@ package Game::EvonyTKR::External::General::Pair::ReduceCoordinator {
         foreach
           my $other_general (keys %{ $batch_results->{by_general}->{$general} })
         {
-          $job->persistence->store_conflict($general, $other_general);
+          my $conflicts = $merged_by_general->{$general}{$other_general};
+          $job->persistence->store_conflict($general, $other_general, $conflicts);
         }
       }
     }
@@ -168,20 +173,15 @@ package Game::EvonyTKR::External::General::Pair::ReduceCoordinator {
       }
     }
 
-    # store incremental results
-    $job->conflict_cache->set(
-      'merged_conflicts',
-      {
-        timestamp               => time(),
-        total_conflicts         => $total_conflicts,
-        by_general              => $merged_by_general,
-        groups_by_conflict_type => $merged_groups_by_conflict_type,
-      }
-    );
+    # Conflicts are already stored in SQLite above - no need for memcache
   }
 
   sub cache_pair_results ($job, $batch_id) {
-    my $batch_results = $job->pair_cache->get("batch_results:$batch_id");
+    # Get batch results from job notes (stored by ReduceBatch)
+    my $batch_job = $job->minion->job($batch_id);
+    return unless $batch_job;
+    
+    my $batch_results = $batch_job->info->{notes};
     return unless $batch_results;
 
     # Check if batch was skipped - no pairs to process

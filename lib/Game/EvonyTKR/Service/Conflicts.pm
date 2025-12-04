@@ -57,30 +57,27 @@ has TRIADS => sub { {
 sub are_generals_compatible ($self, $g1, $g2) {
   $self->logger->debug(sprintf('testing %s and %s', $g1->name, $g2->name));
 
-  return 0 if $self->_check_cache($g1, $g2);
+  # Check cache first (includes ML predictions loaded from persistence)
+  my $cached = $self->_check_cache($g1, $g2);
+  if (defined $cached) {
+    return $cached == 0 ? 1 : 0;  # 0 = compatible (return 1), 1 = conflict (return 0)
+  }
+  
   return 1 unless $self->_troop_overlap($g1, $g2);
 
-  # Check ML predictions first if available
-  if (my $ml_result = $self->_check_ml_prediction($g1, $g2)) {
-    $self->logger->debug(sprintf(
-      '%s/%s ML prediction: %s (confidence: %.2f)',
-      $g1->name, $g2->name,
-      $ml_result->{conflict} ? 'CONFLICT' : 'COMPATIBLE',
-      $ml_result->{confidence}
-    ));
-    if ($ml_result->{conflict}) {
-      $self->_record_conflict($g1, $g2);
-      return 0;
-    }
-    return 1;
-  }
+  $self->logger->debug(sprintf('No cached result, using rule-based detection for %s ↔ %s',
+    $g1->name, $g2->name));
 
   # Try grouped buff detection first (handles complex cases like Haakon/Cheng)
   my $grouped = Game::EvonyTKR::Service::Conflicts::GroupedBuffComparator->new(
     service => $self);
   my $grouped_result = $grouped->conflicts($g1, $g2);
   if (defined $grouped_result) {
-    $self->_record_conflict($g1, $g2) if $grouped_result;
+    if ($grouped_result) {
+      $self->_record_conflict($g1, $g2);
+    } else {
+      $self->_record_compatible($g1, $g2);
+    }
     return $grouped_result ? 0 : 1;
   }
 
@@ -103,6 +100,8 @@ sub are_generals_compatible ($self, $g1, $g2) {
     }
   }
 
+  # No conflicts found - record as compatible
+  $self->_record_compatible($g1, $g2);
   return 1;
 }
 
@@ -134,8 +133,8 @@ sub load_from_persistence ($self, $persistence) {
 }
 
 # Store new conflict to persistence
-sub store_to_persistence ($self, $persistence, $g1_name, $g2_name) {
-  $persistence->store_conflict($g1_name, $g2_name);
+sub store_to_persistence ($self, $persistence, $g1_name, $g2_name, $conflicts) {
+  $persistence->store_conflict($g1_name, $g2_name, $conflicts);
   return $self;
 }
 
@@ -149,31 +148,24 @@ sub _check_cache ($self, $g1, $g2) {
 
   if (exists $self->by_general->{$norm1}{$norm2}) {
     $self->cache_hits($self->cache_hits + 1);
-    return 1;
+    return $self->by_general->{$norm1}{$norm2};  # Return the conflict status (0 or 1)
   }
-  return 0;
+  return undef;
 }
 
 sub _check_ml_prediction ($self, $g1, $g2) {
-  # Lazy load ML conflicts on first use
-  unless (exists $self->{_ml_conflicts_loaded}) {
-    $self->{_ml_conflicts} = $self->persistence->get_ml_conflicts() // {};
-    $self->{_ml_conflicts_loaded} = 1;
+  # ML predictions are already loaded into by_general via load_from_persistence()
+  # Just check the cache - if it exists, it's an ML prediction
+  my $cached = $self->_check_cache($g1, $g2);
+  
+  # If found in cache, return it in the expected format
+  if (defined $cached) {
+    return {
+      conflict => $cached,
+      confidence => 1.0  # No confidence info stored in SQLite
+    };
   }
-
-  my $ml_conflicts = $self->{_ml_conflicts};
-  return undef unless %$ml_conflicts;
-
-  # Check both orderings
-  my $g1_name = $g1->name;
-  my $g2_name = $g2->name;
-
-  return $ml_conflicts->{$g1_name}{$g2_name}
-    if exists $ml_conflicts->{$g1_name}{$g2_name};
-
-  return $ml_conflicts->{$g2_name}{$g1_name}
-    if exists $ml_conflicts->{$g2_name}{$g1_name};
-
+  
   return undef;
 }
 
@@ -184,6 +176,27 @@ sub _record_conflict ($self, $g1, $g2) {
 
   $self->by_general->{$norm1}{$norm2} = 1;
   $self->by_general->{$norm2}{$norm1} = 1;
+
+  # Also store to persistence if available
+  if ($self->persistence) {
+    $self->persistence->store_conflict($norm1, $norm2, 1);
+  }
+}
+
+sub _record_compatible ($self, $g1, $g2) {
+  # Normalize names to match how they're stored in persistence
+  my $norm1 = $self->normalize($g1->name);
+  my $norm2 = $self->normalize($g2->name);
+
+  $self->logger->debug(sprintf('Recording compatible: %s ↔ %s', $norm1, $norm2));
+
+  $self->by_general->{$norm1}{$norm2} = 0;
+  $self->by_general->{$norm2}{$norm1} = 0;
+
+  # Also store to persistence if available
+  if ($self->persistence) {
+    $self->persistence->store_conflict($norm1, $norm2, 0);
+  }
 }
 
 sub _troop_overlap ($self, $g1, $g2) {

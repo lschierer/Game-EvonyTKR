@@ -49,12 +49,6 @@ my @yaml_files = ($collection_dir->child('generals'))->list->grep(sub {
   return 0;
 })->each;
 
-# Check if memcached is available
-my $test_key = 'memcached_test_' . time();
-unless ($memcachClient->set($test_key, 'test')) {
-  $logger->info('Memcached not available, skipping memcached tests');
-  exit 1;
-}
 
 foreach my $index (0 .. $#yaml_files) {
   my $yf      = $yaml_files[$index];

@@ -73,26 +73,7 @@ package Game::EvonyTKR::External::General::Pair::ReduceBatch {
       $job->merge_conflict_results($job_info->info,);
     }
 
-    # Store batch results in cache
-    $job->pair_cache->set(
-      "batch_results:$batch_id",
-      {
-        total_pairs    => scalar(@$total_pairs),
-        pairs          => $total_pairs,
-        processed_jobs => scalar(@$job_ids),
-      }
-    );
-
-    $job->conflict_cache->set(
-      "batch_results:$batch_id",
-      {
-        total_conflicts         => $total_conflicts,
-        total_cache_hits        => $total_cache_hits,
-        by_general              => $merged_by_general,
-        groups_by_conflict_type => $merged_groups_by_conflict_type,
-        processed_jobs          => scalar(@$job_ids),
-      }
-    );
+    # Batch results are stored in job notes below - no need for memcache
 
     $job->note(
       total_conflicts         => $total_conflicts,
@@ -143,7 +124,8 @@ package Game::EvonyTKR::External::General::Pair::ReduceBatch {
           $merged_by_general->{$general}->{$other_general} = 1;
 
           # Store conflict to persistence (INSERT OR IGNORE handles duplicates)
-          $job->persistence->store_conflict($general, $other_general);
+          my $conflicts = $merged_by_general->{$general}{$other_general};
+          $job->persistence->store_conflict($general, $other_general, $conflicts);
         }
       }
     }
