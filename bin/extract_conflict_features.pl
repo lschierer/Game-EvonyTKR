@@ -4,7 +4,6 @@ use utf8::all;
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 use Getopt::Long qw( GetOptions );
-require Game::EvonyTKR::Service::Cache;
 use Game::EvonyTKR::Model::Base;
 use List::AllUtils qw( any uniq max min sum );
 use Scalar::Util qw( refaddr );
