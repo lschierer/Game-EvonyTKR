@@ -121,8 +121,8 @@ package Game::EvonyTKR::External::General::Pair::CreatePairs {
       my $pair_key_ba = $job->wire_pair_to_key($pair_ba);
 
       # Skip if either direction already processed
-      if ( $job->pair_cache->get($pair_key_ab)
-        || $job->pair_cache->get($pair_key_ba)) {
+      if ( $job->persistence->get_pair($pair_key_ab)
+        || $job->persistence->get_pair($pair_key_ba)) {
         $skipped_existing++;
         $job->logger->debug(sprintf(
           'Pair relationship already exists: %s <-> %s (type: %s)',

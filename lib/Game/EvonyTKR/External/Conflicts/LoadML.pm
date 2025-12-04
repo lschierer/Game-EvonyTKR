@@ -110,10 +110,7 @@ package Game::EvonyTKR::External::Conflicts::LoadML {
       kept_pairs      => $kept_pairs,
     );
 
-    # Store in memcache for fast lookup
-    $job->persistence->set_ml_conflicts(\%filtered_conflicts);
-
-    # Also store in SQLite for persistence across restarts
+    # Store in SQLite for persistence across restarts
     my $stored_count = 0;
     for my $g1_name (keys %filtered_conflicts) {
       for my $g2_name (keys %{ $filtered_conflicts{$g1_name} }) {
@@ -125,7 +122,6 @@ package Game::EvonyTKR::External::Conflicts::LoadML {
     }
 
     $job->logger->info("Stored $stored_count ML predictions in SQLite persistence");
-    $job->logger->info('ML conflicts stored in persistence');
 
     # Mark this job as completed in persistence
     $job->persistence->mark_job_completed($job->task_name);

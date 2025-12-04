@@ -156,8 +156,8 @@ package Game::EvonyTKR::External::AscendingAttributes::LoadAll {
       }
     }
 
-    $job->ascending_attribute_cache->set(
-      total_ascending_attributes => scalar(@files));
+    # Store count in metadata
+    $job->persistence->set_metadata('total_ascending_attributes', scalar(@files));
 
     # Mark this job as completed in persistence
     $job->persistence->mark_job_completed($job->task_name);

@@ -126,8 +126,11 @@ package Game::EvonyTKR::External::General::Pair::ReduceCoordinator {
   }
 
   sub cache_conflict_results($job, $batch_id) {
-    # Get batch results from cache
-    my $batch_results = $job->conflict_cache->get("batch_results:$batch_id");
+    # Get batch results from job notes (stored by ReduceBatch)
+    my $batch_job = $job->minion->job($batch_id);
+    return unless $batch_job;
+
+    my $batch_results = $batch_job->info->{notes};
     return unless $batch_results;
 
     # Check if batch was skipped due to all cache hits

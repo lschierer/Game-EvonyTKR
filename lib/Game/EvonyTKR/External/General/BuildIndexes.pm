@@ -88,28 +88,38 @@ package Game::EvonyTKR::External::General::BuildIndexes {
       $indexed_count, scalar(keys %by_type)
     ));
 
-    # Store each type's list in cache
+    # Store each type's list in metadata
     for my $type (keys %by_type) {
-      my $type_key  = "by_type:$type";
+      my $type_key  = "general_index:by_type:$type";
       my $keys_list = $by_type{$type};
 
-      unless ($job->general_cache->set($type_key, $keys_list)) {
-        $job->logger->error(sprintf(
-          'Failed to store index for type "%s" with %d generals',
-          $type, scalar(@$keys_list)
-        ));
-      }
-      else {
+      eval {
+        require Mojo::JSON;
+        my $json = Mojo::JSON::encode_json($keys_list);
+        $job->persistence->set_metadata($type_key, $json);
         $job->logger->debug(sprintf(
           'Stored index for type "%s" with %d generals',
           $type, scalar(@$keys_list)
+        ));
+      };
+      if ($@) {
+        $job->logger->error(sprintf(
+          'Failed to store index for type "%s": %s',
+          $type, $@
         ));
       }
     }
 
     # Also store the list of available types
     my @type_list = sort keys %by_type;
-    $job->general_cache->set('available_types', \@type_list);
+    eval {
+      require Mojo::JSON;
+      my $json = Mojo::JSON::encode_json(\@type_list);
+      $job->persistence->set_metadata('general_index:available_types', $json);
+    };
+    if ($@) {
+      $job->logger->error("Failed to store available_types: $@");
+    }
 
     my $msg = sprintf(
       'build_general_indexes completed: %d generals indexed into %d types (%s)',

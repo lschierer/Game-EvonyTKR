@@ -165,7 +165,8 @@ package Game::EvonyTKR::External::Covenant::LoadAll {
       }
     }
 
-    $job->covenant_cache->set(total_covenants => scalar(@files));
+    # Store count in metadata
+    $job->persistence->set_metadata('total_covenants', scalar(@files));
 
     # Mark this job as completed in persistence
     $job->persistence->mark_job_completed($job->task_name);
