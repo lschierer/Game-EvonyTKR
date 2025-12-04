@@ -37,14 +37,14 @@ sub add_wire_pair ($self, $wire_pair) {
 
   # Get current pairs_by_type from state
   my $npbt = $self->pairs_by_type();
-  
+
   # Add wire_pair to the appropriate type array
   my %hash = map { $self->wire_pair_to_key($_) => $_ }
     ($wire_pair, ($npbt->{ $wire_pair->{type} } // [])->@*);
   $npbt->{ $wire_pair->{type} } =
     [sort { $self->wire_pair_to_key($a) cmp $self->wire_pair_to_key($b) }
       values %hash];
-  
+
   # Store to SQLite
   eval { $self->persistence->store_pair($key, $wire_pair); };
   if ($@) {
@@ -63,9 +63,7 @@ sub get_pair ($self, $key) {
 
   # Load directly from SQLite
   my $wire_pair;
-  eval {
-    $wire_pair = $self->persistence->get_pair($key);
-  };
+  eval { $wire_pair = $self->persistence->get_pair($key); };
   if ($@) {
     $self->logger->error("Failed to get pair from persistence: $@");
   }
@@ -90,7 +88,7 @@ sub get_pair ($self, $key) {
 sub get_pairs_by_type ($self) {
   # Load from SQLite
   my $pairs_by_type = {};
-  
+
   eval {
     my $all_types = $self->persistence->get_all_pair_types();
     foreach my $type (@$all_types) {
@@ -103,8 +101,7 @@ sub get_pairs_by_type ($self) {
     }
   };
   if ($@) {
-    $self->logger->error(
-      "Failed to load pairs_by_type from persistence: $@");
+    $self->logger->error("Failed to load pairs_by_type from persistence: $@");
   }
 
   state $all_pairs_built;
@@ -135,14 +132,15 @@ sub get_pairs_by_type ($self) {
       }
     }
     # Check completion via SQLite metadata
-    $all_pairs_built = $self->persistence->get_metadata('pair_building_complete');
+    $all_pairs_built =
+      $self->persistence->get_metadata('pair_building_complete');
   }
   return $inflated_pairs;
 }
 
 sub get_pair_list ($self, $requested_type = undef) {
-  my $list          = [];
-  
+  my $list = [];
+
   # Load from SQLite
   my $pairs_by_type = {};
   eval {

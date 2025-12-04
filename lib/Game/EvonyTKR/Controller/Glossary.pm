@@ -18,7 +18,7 @@ sub register ($c, $app, $config = {}) {
   $c->logger->info("Registering routes for " . ref($c));
   $c->SUPER::register($app, $config);
 
-  my @parts = split(/::/, ref($c));
+  my @parts     = split(/::/, ref($c));
   my $baseClass = pop(@parts);
 
   my $controller_name =
@@ -55,17 +55,24 @@ sub index ($c) {
   # Convert wire format to objects
   require Game::EvonyTKR::Model::Glossary;
   my @terms;
-  foreach my $td ($terms_data->@*){
+  foreach my $td ($terms_data->@*) {
     my $tdo = Game::EvonyTKR::Model::Glossary->from_wire_hash($td);
-    unless($tdo){
-      $c->logger->error(sprintf('failed to create object from term %s', exists($td->{term}) ? $td->{term} : Data::Printer::np($td)));
+    unless ($tdo) {
+      $c->logger->error(
+        sprintf('failed to create object from term %s',
+          exists($td->{term}) ? $td->{term} : Data::Printer::np($td))
+      );
       next;
     }
     $tdo->rendered_def($c->render_markdown_snippet($tdo->definition));
-    $c->logger->debug(sprintf('glossary definition for term "%s" before markdown rendering:: %s',
-    $tdo->term, $tdo->definition));
-    $c->logger->debug(sprintf('glossary definition for term "%s" after markdown rendering:: %s',
-    $tdo->term, $tdo->rendered_def));
+    $c->logger->debug(sprintf(
+      'glossary definition for term "%s" before markdown rendering:: %s',
+      $tdo->term, $tdo->definition
+    ));
+    $c->logger->debug(sprintf(
+      'glossary definition for term "%s" after markdown rendering:: %s',
+      $tdo->term, $tdo->rendered_def
+    ));
     push @terms, $tdo;
   }
 
@@ -81,9 +88,9 @@ sub index ($c) {
   my @letters = sort keys %letters_with_terms;
 
   $c->stash(
-    terms              => \@terms,
-    available_letters  => \@letters,
-    linkBase           => $base,
+    terms             => \@terms,
+    available_letters => \@letters,
+    linkBase          => $base,
   );
 
   return $c->render(template => 'glossary/index');

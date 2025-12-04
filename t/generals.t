@@ -49,7 +49,6 @@ my @yaml_files = ($collection_dir->child('generals'))->list->grep(sub {
   return 0;
 })->each;
 
-
 foreach my $index (0 .. $#yaml_files) {
   my $yf      = $yaml_files[$index];
   my $general = $importTool->load_single_general($yf, $index);

@@ -104,9 +104,7 @@ package Game::EvonyTKR::External::General::BuildIndexes {
       };
       if ($@) {
         $job->logger->error(sprintf(
-          'Failed to store index for type "%s": %s',
-          $type, $@
-        ));
+          'Failed to store index for type "%s": %s', $type, $@));
       }
     }
 

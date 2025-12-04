@@ -48,7 +48,8 @@ package Game::EvonyTKR::External::Glossary::LoadAll {
     $job->logger->info('Starting load_all_glossary_terms job');
 
     # Find glossary YAML files
-    my $mh = Mojo::File->new(Mojo::Home->new->detect('Game::EvonyTKR')->to_string());
+    my $mh =
+      Mojo::File->new(Mojo::Home->new->detect('Game::EvonyTKR')->to_string());
     my $glossary_dir = $mh->child('share/collections/Glossary');
 
     unless (-d $glossary_dir) {
@@ -57,18 +58,19 @@ package Game::EvonyTKR::External::Glossary::LoadAll {
       return $job->fail($errmsg);
     }
 
-    my @yaml_files = $glossary_dir->list->grep(sub { 
-      $_ =~ /\.ya?ml$/ && -f -r $_ && $_ !~ /schema/ 
+    my @yaml_files = $glossary_dir->list->grep(sub {
+      $_ =~ /\.ya?ml$/ && -f -r $_ && $_ !~ /schema/;
     })->each;
 
-    $job->logger->info(sprintf('Found %d glossary YAML files', scalar(@yaml_files)));
+    $job->logger->info(
+      sprintf('Found %d glossary YAML files', scalar(@yaml_files)));
 
-    my $yp = YAML::PP->new();
+    my $yp          = YAML::PP->new();
     my $total_terms = 0;
 
     foreach my $file (@yaml_files) {
       $job->logger->debug("Processing $file");
-      
+
       my $data = eval { $yp->load_file($file->to_string) };
       if ($@) {
         $job->logger->error("Failed to parse $file: $@");
@@ -79,15 +81,15 @@ package Game::EvonyTKR::External::Glossary::LoadAll {
 
       foreach my $term_data (@{ $data->{glossary} }) {
         require Game::EvonyTKR::Model::Glossary;
-        
+
         my $term = Game::EvonyTKR::Model::Glossary->new(
           term          => $term_data->{term},
-          definition    => $term_data->{definition} // '',
-          synonyms      => $term_data->{synonyms} // [],
+          definition    => $term_data->{definition}    // '',
+          synonyms      => $term_data->{synonyms}      // [],
           related_terms => $term_data->{related_terms} // [],
-          examples      => $term_data->{examples} // [],
-          owner         => $term_data->{owner} // '',
-          status        => $term_data->{status} // 'approved',
+          examples      => $term_data->{examples}      // [],
+          owner         => $term_data->{owner}         // '',
+          status        => $term_data->{status}        // 'approved',
         );
 
         $job->add_glossary_term($term);

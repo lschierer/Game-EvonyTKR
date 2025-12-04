@@ -107,9 +107,9 @@ my $builder = Module::Build->new(
     'namespace::clean'                    => '0',
     'overload'                            => '0',
     #'AI::XGBoost'                         => '0',
-    'AI::DecisionTree'                    => '0',
-    'Algorithm::NaiveBayes'               => '0',
-    'PDL::Stats'                          => '0',
+    'AI::DecisionTree'      => '0',
+    'Algorithm::NaiveBayes' => '0',
+    'PDL::Stats'            => '0',
 
   },
   recommends => {

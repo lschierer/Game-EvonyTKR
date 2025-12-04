@@ -29,7 +29,6 @@ ok(-r -d $CovenantsDir, "using CovenantsDir $CovenantsDir");
 
 my $cc = Game::EvonyTKR::Service::Cache->new();
 
-
 package Test::Package {
   use Mojo::Base -base,                               -signatures;
   use Mojo::Base 'Game::EvonyTKR::Role::Logger',      -role;

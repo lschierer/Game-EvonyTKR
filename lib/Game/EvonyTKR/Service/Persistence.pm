@@ -249,7 +249,8 @@ sub _migrate_to_v2 ($self, $db) {
 }
 
 sub _migrate_to_v3 ($self, $db) {
-  $self->logger->info('Migrating to schema v3: adding conflicts column to general_conflicts');
+  $self->logger->info(
+    'Migrating to schema v3: adding conflicts column to general_conflicts');
 
   # Add conflicts column (default 1 for existing rows which are all conflicts)
   $db->query(q{
@@ -369,7 +370,6 @@ sub clear_lifecycle_jobs ($self) {
 sub store_general ($self, $name, $data_hash) {
   my $db              = $self->sqlite->db;
   my $normalized_name = $self->normalize($name);
-
 
   my $json = $self->encoder->encode($data_hash);
   $db->query(
@@ -633,7 +633,7 @@ sub list_ascending_attributes ($self) {
 ##############################################################################
 
 sub store_glossary_term ($self, $term, $data_hash) {
-  my $db = $self->sqlite->db;
+  my $db              = $self->sqlite->db;
   my $normalized_term = lc($self->normalize($term));
   $normalized_term =~ s/ /_/g;
 
@@ -649,12 +649,11 @@ sub store_glossary_term ($self, $term, $data_hash) {
 }
 
 sub get_glossary_term ($self, $term) {
-  my $db = $self->sqlite->db;
+  my $db              = $self->sqlite->db;
   my $normalized_term = lc($self->normalize($term));
   $normalized_term =~ s/ /_/g;
 
-  my $result =
-    $db->query('SELECT data_json FROM glossary_terms WHERE term = ?',
+  my $result = $db->query('SELECT data_json FROM glossary_terms WHERE term = ?',
     $normalized_term)->hash;
 
   return $result ? decode_json($result->{data_json}) : undef;
@@ -664,8 +663,8 @@ sub list_glossary_terms ($self) {
   my $db = $self->sqlite->db;
 
   my @terms;
-  my $results = $db->query(
-    'SELECT term, data_json FROM glossary_terms ORDER BY term');
+  my $results =
+    $db->query('SELECT term, data_json FROM glossary_terms ORDER BY term');
 
   while (my $row = $results->hash) {
     push @terms, decode_json($row->{data_json});
@@ -678,7 +677,7 @@ sub list_glossary_terms ($self) {
 # Data storage methods - General Conflicts
 ##############################################################################
 
-sub store_conflict ($self, $general1_name, $general2_name, $conflicts ) {
+sub store_conflict ($self, $general1_name, $general2_name, $conflicts) {
   my $db = $self->sqlite->db;
 
   # Normalize names for consistent storage
@@ -728,11 +727,12 @@ sub load_all_conflicts ($self) {
 
   my %by_general;
   my $results =
-    $db->query('SELECT general1_name, general2_name, conflicts FROM general_conflicts');
+    $db->query(
+    'SELECT general1_name, general2_name, conflicts FROM general_conflicts');
 
   while (my $row = $results->hash) {
-    my $g1 = $row->{general1_name};
-    my $g2 = $row->{general2_name};
+    my $g1        = $row->{general1_name};
+    my $g2        = $row->{general2_name};
     my $conflicts = $row->{conflicts};
 
     # Store bidirectional mapping with conflict status

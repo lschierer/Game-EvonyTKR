@@ -60,13 +60,17 @@ sub are_generals_compatible ($self, $g1, $g2) {
   # Check cache first (includes ML predictions loaded from persistence)
   my $cached = $self->_check_cache($g1, $g2);
   if (defined $cached) {
-    return $cached == 0 ? 1 : 0;  # 0 = compatible (return 1), 1 = conflict (return 0)
+    return $cached == 0
+      ? 1
+      : 0;    # 0 = compatible (return 1), 1 = conflict (return 0)
   }
-  
+
   return 1 unless $self->_troop_overlap($g1, $g2);
 
-  $self->logger->debug(sprintf('No cached result, using rule-based detection for %s ↔ %s',
-    $g1->name, $g2->name));
+  $self->logger->debug(sprintf(
+    'No cached result, using rule-based detection for %s ↔ %s',
+    $g1->name, $g2->name
+  ));
 
   # Try grouped buff detection first (handles complex cases like Haakon/Cheng)
   my $grouped = Game::EvonyTKR::Service::Conflicts::GroupedBuffComparator->new(
@@ -75,7 +79,8 @@ sub are_generals_compatible ($self, $g1, $g2) {
   if (defined $grouped_result) {
     if ($grouped_result) {
       $self->_record_conflict($g1, $g2);
-    } else {
+    }
+    else {
       $self->_record_compatible($g1, $g2);
     }
     return $grouped_result ? 0 : 1;
@@ -148,24 +153,25 @@ sub _check_cache ($self, $g1, $g2) {
 
   if (exists $self->by_general->{$norm1}{$norm2}) {
     $self->cache_hits($self->cache_hits + 1);
-    return $self->by_general->{$norm1}{$norm2};  # Return the conflict status (0 or 1)
+    return $self->by_general->{$norm1}{$norm2}
+      ;    # Return the conflict status (0 or 1)
   }
   return undef;
 }
 
 sub _check_ml_prediction ($self, $g1, $g2) {
-  # ML predictions are already loaded into by_general via load_from_persistence()
-  # Just check the cache - if it exists, it's an ML prediction
+ # ML predictions are already loaded into by_general via load_from_persistence()
+ # Just check the cache - if it exists, it's an ML prediction
   my $cached = $self->_check_cache($g1, $g2);
-  
+
   # If found in cache, return it in the expected format
   if (defined $cached) {
     return {
-      conflict => $cached,
-      confidence => 1.0  # No confidence info stored in SQLite
+      conflict   => $cached,
+      confidence => 1.0        # No confidence info stored in SQLite
     };
   }
-  
+
   return undef;
 }
 
@@ -188,7 +194,8 @@ sub _record_compatible ($self, $g1, $g2) {
   my $norm1 = $self->normalize($g1->name);
   my $norm2 = $self->normalize($g2->name);
 
-  $self->logger->debug(sprintf('Recording compatible: %s ↔ %s', $norm1, $norm2));
+  $self->logger->debug(
+    sprintf('Recording compatible: %s ↔ %s', $norm1, $norm2));
 
   $self->by_general->{$norm1}{$norm2} = 0;
   $self->by_general->{$norm2}{$norm1} = 0;

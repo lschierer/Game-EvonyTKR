@@ -58,10 +58,7 @@ package Game::EvonyTKR::Controller::Pairs {
       $c->logger->error("route setup failed in Pairs controller");
     };
 
-
   }
-
-
 
   sub setup_routes ($c, $app,) {
     say 'starting setup routes for Pairs';

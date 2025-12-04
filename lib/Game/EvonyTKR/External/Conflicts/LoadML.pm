@@ -69,7 +69,8 @@ package Game::EvonyTKR::External::Conflicts::LoadML {
     my $raw_data  = decode_json($json_text);
 
     # Get all generals for type checking (normalize names to match JSON keys)
-    my %generals = map { $job->normalize($_->name) => $_ } $job->get_generals()->@* ;
+    my %generals =
+      map { $job->normalize($_->name) => $_ } $job->get_generals()->@*;
 
     # Filter out cross-type pairs
     my %filtered_conflicts;
@@ -105,9 +106,9 @@ package Game::EvonyTKR::External::Conflicts::LoadML {
       $total_pairs, $filtered_pairs, $kept_pairs
     ));
     $job->note(
-      total_pairs     => $total_pairs,
-      filtered_pairs  => $filtered_pairs,
-      kept_pairs      => $kept_pairs,
+      total_pairs    => $total_pairs,
+      filtered_pairs => $filtered_pairs,
+      kept_pairs     => $kept_pairs,
     );
 
     # Store in SQLite for persistence across restarts
@@ -115,13 +116,14 @@ package Game::EvonyTKR::External::Conflicts::LoadML {
     for my $g1_name (keys %filtered_conflicts) {
       for my $g2_name (keys %{ $filtered_conflicts{$g1_name} }) {
         my $prediction = $filtered_conflicts{$g1_name}{$g2_name};
-        my $conflicts = $prediction->{conflict} ? 1 : 0;
+        my $conflicts  = $prediction->{conflict} ? 1 : 0;
         $job->persistence->store_conflict($g1_name, $g2_name, $conflicts);
         $stored_count++;
       }
     }
 
-    $job->logger->info("Stored $stored_count ML predictions in SQLite persistence");
+    $job->logger->info(
+      "Stored $stored_count ML predictions in SQLite persistence");
 
     # Mark this job as completed in persistence
     $job->persistence->mark_job_completed($job->task_name);

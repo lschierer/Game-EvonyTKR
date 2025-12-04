@@ -65,7 +65,8 @@ package Game::EvonyTKR::Controller::ConflictGroups {
       scalar keys $detector->by_general->%*));
     my $groups = $detector->groups_by_conflict_type;
     my $pairs  = $detector->by_general;
-    $c->logger->debug('conflict groups controller index handler sees ' . Data::Printer::np($pairs));
+    $c->logger->debug('conflict groups controller index handler sees '
+        . Data::Printer::np($pairs));
 
     $c->stash(
       groups   => $groups,

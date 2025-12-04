@@ -9,7 +9,6 @@ use overload
   'bool'     => sub { my $self = shift; $self->_isTrue },
   "fallback" => 1;
 
-
 has 'term';
 has 'definition';
 has 'rendered_def';
@@ -53,11 +52,11 @@ sub from_wire_hash ($class, $wire) {
   return $class->new(
     term          => $wire->{term},
     definition    => $wire->{definition},
-    synonyms      => $wire->{synonyms} // [],
+    synonyms      => $wire->{synonyms}      // [],
     related_terms => $wire->{related_terms} // [],
-    examples      => $wire->{examples} // [],
-    owner         => $wire->{owner} // '',
-    status        => $wire->{status} // 'approved',
+    examples      => $wire->{examples}      // [],
+    owner         => $wire->{owner}         // '',
+    status        => $wire->{status}        // 'approved',
   );
 }
 

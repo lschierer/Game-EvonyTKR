@@ -174,7 +174,7 @@ package Game::EvonyTKR::External::General::Pair::CreatePairs {
 
     foreach my $g1 (keys %$final_by_general) {
       foreach my $g2 (keys %{ $final_by_general->{$g1} }) {
-       # Store to persistence with actual conflict status (0 or 1)
+        # Store to persistence with actual conflict status (0 or 1)
         my $conflicts = $final_by_general->{$g1}{$g2};
         $job->persistence->store_conflict($g1, $g2, $conflicts);
         $new_conflicts_stored++;

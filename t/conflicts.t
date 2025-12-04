@@ -89,7 +89,6 @@ $logger = $testPackage->get_logger;
 
 my $TestGenerals = TestClass::Generals->new();
 
-
 # Manager setup
 
 my $testManager;
@@ -183,8 +182,6 @@ subtest 'Data Setup' => sub {
 
   done_testing();
 };
-
-
 
 isa_ok(
   $conflicts,

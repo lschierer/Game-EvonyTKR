@@ -125,7 +125,8 @@ package Game::EvonyTKR::External::General::Pair::ReduceBatch {
 
           # Store conflict to persistence (INSERT OR IGNORE handles duplicates)
           my $conflicts = $merged_by_general->{$general}{$other_general};
-          $job->persistence->store_conflict($general, $other_general, $conflicts);
+          $job->persistence->store_conflict($general, $other_general,
+            $conflicts);
         }
       }
     }

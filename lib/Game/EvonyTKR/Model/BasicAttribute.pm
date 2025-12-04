@@ -251,13 +251,13 @@ package Game::EvonyTKR::Model::BasicAttribute {
   }
 
   # Method for JSON serialization
-  sub TO_JSON  {
-  my $self = shift;
+  sub TO_JSON {
+    my $self = shift;
     return $self->to_wire_hash();
   }
 
   # Stringification method using JSON
-  sub as_string  {
+  sub as_string {
     my $self = shift;
     my $json =
       JSON::PP->new->utf8->pretty->canonical(1)

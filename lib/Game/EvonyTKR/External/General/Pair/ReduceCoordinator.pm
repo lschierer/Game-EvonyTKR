@@ -93,10 +93,10 @@ package Game::EvonyTKR::External::General::Pair::ReduceCoordinator {
     do {
       # Use SQLite metadata for completion tracking
       $job->persistence->set_metadata('pair_building_complete', '1');
-      my $pc = 1; # Always succeeds with SQLite
-      # Use SQLite metadata instead of memcache for conflict completion
+      my $pc = 1;    # Always succeeds with SQLite
+          # Use SQLite metadata instead of memcache for conflict completion
       $job->persistence->set_metadata('conflict_building_complete', '1');
-      my $cc = 1; # Always succeeds with SQLite
+      my $cc = 1;    # Always succeeds with SQLite
 
       $job->logger->info(sprintf(
 "Cache set results: pair_building_complete=%s, conflict_building_complete=%s",
@@ -106,7 +106,8 @@ package Game::EvonyTKR::External::General::Pair::ReduceCoordinator {
 
       # Verify the values were actually set
       $pc_verify = $job->persistence->get_metadata('pair_building_complete');
-      $cc_verify = $job->persistence->get_metadata('conflict_building_complete');
+      $cc_verify =
+        $job->persistence->get_metadata('conflict_building_complete');
 
       $job->logger->info(sprintf(
 "Cache verification: pair_building_complete=%s, conflict_building_complete=%s",
@@ -159,7 +160,8 @@ package Game::EvonyTKR::External::General::Pair::ReduceCoordinator {
           my $other_general (keys %{ $batch_results->{by_general}->{$general} })
         {
           my $conflicts = $merged_by_general->{$general}{$other_general};
-          $job->persistence->store_conflict($general, $other_general, $conflicts);
+          $job->persistence->store_conflict($general, $other_general,
+            $conflicts);
         }
       }
     }
@@ -183,7 +185,7 @@ package Game::EvonyTKR::External::General::Pair::ReduceCoordinator {
     # Get batch results from job notes (stored by ReduceBatch)
     my $batch_job = $job->minion->job($batch_id);
     return unless $batch_job;
-    
+
     my $batch_results = $batch_job->info->{notes};
     return unless $batch_results;
 
