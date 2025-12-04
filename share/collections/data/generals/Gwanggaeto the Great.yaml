@@ -22,5 +22,6 @@ specialties:
 stars: red5
 type:
   - ranged_specialist
+  - siege_specialist
 general: Gwanggaeto the Great
 name: Gwanggaeto the Great
