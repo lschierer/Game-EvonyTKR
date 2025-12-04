@@ -48,6 +48,7 @@ package Game::EvonyTKR::External::Prebuild {
     'Game::EvonyTKR::External::Specialty::Loader',
     'Game::EvonyTKR::External::Covenant::LoadAll',
     'Game::EvonyTKR::External::Covenant::Loader',
+    'Game::EvonyTKR::External::Glossary::LoadAll',
   ];
 
   sub task_name {'external_prebuild'}
@@ -235,6 +236,12 @@ package Game::EvonyTKR::External::Prebuild {
         attempts => 3,
         delay    => 5,
         priority => 10,
+      },
+      load_all_glossary_terms => {
+        args     => [],
+        attempts => 3,
+        delay    => 1,
+        priority => 60,
       },
       load_ml_conflicts => {
         args     => [],

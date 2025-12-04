@@ -318,7 +318,8 @@ package Game::EvonyTKR::Model::General {
     return $general;
   }
 
-  sub TO_JSON ($self) {
+  sub TO_JSON  {
+    my $self = shift;
     return $self->to_wire_hash();
   }
 

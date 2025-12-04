@@ -12,7 +12,8 @@
           </a>
         </span>
         <dl>
-          <% foreach my $term_obj (@{ getTermsByLetter($letter) }) { %>
+          <% foreach my $term_obj (sort $terms->@*) { %>
+            <% next if $term_obj->term !~ /^$letter/i; %>
             <% my $term = $term_obj->term; %>
             <% my $term_target = $term =~ s/ /_/gr; %>
             <dt class="spectrum-Heading spectrum-Heading--sizeS">
@@ -21,7 +22,7 @@
               </a>
             </dt>
             <dd>
-              <%== $c->render_markdown_snippet($term_obj->definition); %>
+              <%== $term_obj->rendered_def %>
             </dd>
             <% my @syn = $term_obj->synonyms->@*; %>
             <% if(scalar @syn) { %>

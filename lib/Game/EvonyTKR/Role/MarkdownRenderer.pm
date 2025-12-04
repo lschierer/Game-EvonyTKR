@@ -87,7 +87,14 @@ package Game::EvonyTKR::Role::MarkdownRenderer {
   # Pure function: Convert markdown content to HTML via Pandoc
   sub convert_markdown ($self, $content) {
     return '' unless defined $content && length($content);
-    return $self->_pandoc->convert($customCommonMark => 'html', $content);
+    
+    # Pandoc expects UTF-8 bytes, not Perl strings
+    use Encode qw(encode decode);
+    my $bytes = encode('UTF-8', $content, Encode::FB_CROAK);
+    my $html_bytes = $self->_pandoc->convert($customCommonMark => 'html', $bytes);
+    
+    # Decode back to Perl strings
+    return decode('UTF-8', $html_bytes, Encode::FB_CROAK);
   }
 
   # Pure function: Convert a markdown snippet to HTML with Spectrum formatting

@@ -10,6 +10,7 @@ use Mojo::Base 'Game::EvonyTKR::Role::Persistence::Covenants',           -role;
 use Mojo::Base 'Game::EvonyTKR::Role::Persistence::Specialties',         -role;
 use Mojo::Base 'Game::EvonyTKR::Role::Persistence::AscendingAttributes', -role;
 use Mojo::Base 'Game::EvonyTKR::Role::Persistence::Pairs',               -role;
+use Mojo::Base 'Game::EvonyTKR::Role::Persistence::Glossary',            -role;
 
 1;
 __END__

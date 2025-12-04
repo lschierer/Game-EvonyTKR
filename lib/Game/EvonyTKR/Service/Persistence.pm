@@ -6,7 +6,7 @@ use Mojo::Base 'Game::EvonyTKR::Role::Logging', -role;
 use Mojo::Base 'Game::EvonyTKR::Role::Common',  -role;
 use Mojo::File;
 use Mojo::SQLite;
-use Mojo::JSON qw(encode_json decode_json);
+use JSON::PP qw( decode_json);
 use Carp;
 
 # Schema version - increment when schema changes
@@ -26,6 +26,10 @@ has 'sqlite' => sub ($self) {
   my $sqlite = Mojo::SQLite->new('file:' . $db_path);
   $self->_initialize_schema($sqlite);
   return $sqlite;
+};
+
+has encoder => sub {
+  return JSON::PP->new->utf8->allow_blessed->convert_blessed;
 };
 
 has 'lifecycle_id' => sub ($self) {
@@ -152,6 +156,15 @@ sub _create_schema_v1 ($self, $db) {
   $db->query(q{
     CREATE TABLE IF NOT EXISTS ascending_attributes (
       name TEXT PRIMARY KEY,
+      data_json TEXT NOT NULL,
+      loaded_at INTEGER DEFAULT (strftime('%s', 'now'))
+    )
+  });
+
+  # Glossary Terms
+  $db->query(q{
+    CREATE TABLE IF NOT EXISTS glossary_terms (
+      term TEXT PRIMARY KEY,
       data_json TEXT NOT NULL,
       loaded_at INTEGER DEFAULT (strftime('%s', 'now'))
     )
@@ -357,7 +370,8 @@ sub store_general ($self, $name, $data_hash) {
   my $db              = $self->sqlite->db;
   my $normalized_name = $self->normalize($name);
 
-  my $json = encode_json($data_hash);
+
+  my $json = $self->encoder->encode($data_hash);
   $db->query(
     q{
     INSERT OR REPLACE INTO generals (name, data_json, loaded_at)
@@ -405,7 +419,7 @@ sub store_builtin_book ($self, $name, $data_hash) {
   my $db              = $self->sqlite->db;
   my $normalized_name = $self->normalize($name);
 
-  my $json = encode_json($data_hash);
+  my $json = $self->encoder->encode($data_hash);
   $db->query(
     q{
     INSERT OR REPLACE INTO builtin_books (name, data_json, loaded_at)
@@ -448,7 +462,7 @@ sub store_generic_book ($self, $name, $level, $data_hash) {
   my $db              = $self->sqlite->db;
   my $normalized_name = $self->normalize($name);
 
-  my $json = encode_json($data_hash);
+  my $json = $self->encoder->encode($data_hash);
   $db->query(
     q{
     INSERT OR REPLACE INTO generic_books (name, level, data_json, loaded_at)
@@ -492,7 +506,7 @@ sub store_covenant ($self, $name, $data_hash) {
   my $db              = $self->sqlite->db;
   my $normalized_name = $self->normalize($name);
 
-  my $json = encode_json($data_hash);
+  my $json = $self->encoder->encode($data_hash);
   $db->query(
     q{
     INSERT OR REPLACE INTO covenants (name, data_json, loaded_at)
@@ -535,7 +549,7 @@ sub store_specialty ($self, $name, $data_hash) {
   my $db              = $self->sqlite->db;
   my $normalized_name = $self->normalize($name);
 
-  my $json = encode_json($data_hash);
+  my $json = $self->encoder->encode($data_hash);
   $db->query(
     q{
     INSERT OR REPLACE INTO specialties (name, data_json, loaded_at)
@@ -578,7 +592,7 @@ sub store_ascending_attribute ($self, $name, $data_hash) {
   my $db              = $self->sqlite->db;
   my $normalized_name = $self->normalize($name);
 
-  my $json = encode_json($data_hash);
+  my $json = $self->encoder->encode($data_hash);
   $db->query(
     q{
     INSERT OR REPLACE INTO ascending_attributes (name, data_json, loaded_at)
@@ -612,6 +626,52 @@ sub list_ascending_attributes ($self) {
   }
 
   return \@attrs;
+}
+
+##############################################################################
+# Glossary Terms methods
+##############################################################################
+
+sub store_glossary_term ($self, $term, $data_hash) {
+  my $db = $self->sqlite->db;
+  my $normalized_term = lc($self->normalize($term));
+  $normalized_term =~ s/ /_/g;
+
+  my $json = $self->encoder->encode($data_hash);
+  $db->query(
+    q{
+    INSERT OR REPLACE INTO glossary_terms (term, data_json, loaded_at)
+    VALUES (?, ?, strftime('%s', 'now'))
+  }, $normalized_term, $json
+  );
+
+  return 1;
+}
+
+sub get_glossary_term ($self, $term) {
+  my $db = $self->sqlite->db;
+  my $normalized_term = lc($self->normalize($term));
+  $normalized_term =~ s/ /_/g;
+
+  my $result =
+    $db->query('SELECT data_json FROM glossary_terms WHERE term = ?',
+    $normalized_term)->hash;
+
+  return $result ? decode_json($result->{data_json}) : undef;
+}
+
+sub list_glossary_terms ($self) {
+  my $db = $self->sqlite->db;
+
+  my @terms;
+  my $results = $db->query(
+    'SELECT term, data_json FROM glossary_terms ORDER BY term');
+
+  while (my $row = $results->hash) {
+    push @terms, decode_json($row->{data_json});
+  }
+
+  return \@terms;
 }
 
 ##############################################################################
@@ -700,7 +760,7 @@ sub store_pair ($self, $key, $wire_pair) {
   my $normalized_key = $self->normalize($key);
   $normalized_key =~ s/ /_/g;
 
-  my $json = encode_json($wire_pair);
+  my $json = $self->encoder->encode($wire_pair);
 
   $db->query(
     q{
@@ -781,8 +841,7 @@ sub count_pairs_by_type ($self, $type = undef) {
 }
 
 sub set_ml_conflicts ($self, $conflicts) {
-  require Mojo::JSON;
-  my $json = Mojo::JSON::encode_json($conflicts);
+  my $json = $self->encoder->encode($conflicts);
   return $self->set_metadata('ml_conflicts', $json);
 }
 

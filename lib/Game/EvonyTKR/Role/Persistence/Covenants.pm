@@ -14,8 +14,7 @@ sub get_covenant ($self, $name) {
 
   state $covenants = {};
 
-  my $normalized_name = lc($self->normalize($name));
-  $normalized_name =~ s/ /_/g;
+  my $normalized_name = $self->normalize($name);
 
   if (exists $covenants->{$normalized_name}) {
     $self->logger->debug("Returning covenant $name from state cache");
@@ -23,7 +22,7 @@ sub get_covenant ($self, $name) {
   }
 
   # Load directly from SQLite
-  my $wire_data = $self->persistence->get_covenant($name);
+  my $wire_data = $self->persistence->get_covenant($normalized_name);
 
   return unless defined($wire_data);
 
