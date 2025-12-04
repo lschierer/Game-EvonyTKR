@@ -1,3 +1,6 @@
+Aethelflaed;Baibars
+Aethelflaed;Theodora
+Aethelflaed;George A Custer
 Artemis;Aethelflaed
 Artemis;Baibars
 Artemis;Bertrand du Guesclin
@@ -114,6 +117,9 @@ Bertrand du Guesclin;Nathanael Greene
 Bertrand du Guesclin;Prince Eugene
 Bertrand du Guesclin;Sun Ce
 Bertrand du Guesclin;Washington Prime
+Caesar;Baibars
+Caesar;Sanada Yukimura
+Caesar;Theodora
 Casimir Pulaski;Aethelflaed
 Casimir Pulaski;Artemis
 Casimir Pulaski;Baibars
@@ -742,6 +748,13 @@ Sun Ce;Olav II
 Sun Ce;Prince Eugene
 Sun Ce;Roland
 Sun Ce;Washington Prime
+Theodora;Aethelflaed
+Theodora;Hernando Cortes
+Theodora;Huo Qubing
+Theodora;Nathanael Greene
+Theodora;Sanada Yukimura
+Theodora;Seleucus I
+Theodora;Spartacus
 Washington Prime;Aethelflaed
 Washington Prime;Artemis
 Washington Prime;Baibars

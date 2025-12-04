@@ -51,6 +51,8 @@ Aurelian;Maeda Toshiie
 Aurelian;Scipio Africanus
 Aurelian;Totila
 Aurelian;Yue Fei
+Baibars;Cleopatra
+Baibars;Theodora
 Barbarossa;André Masséna
 Barbarossa;Bertrand du Guesclin
 Barbarossa;Cyrus the Great
@@ -86,6 +88,7 @@ Bertrand du Guesclin;Roland
 Brian Boru;Merlin
 Brian Boru;Mihai
 Brian Boru;Sigurd
+Caesar;Aethelflaed
 Carus;Alexander the Great
 Carus;Aurelian
 Carus;El Cid
@@ -619,13 +622,6 @@ Mu Guiying;Septimius Serverus
 Mu Guiying;Stephen II
 Mu Guiying;Surena
 Mu Guiying;William Wallace
-Napoleon;Alfred the Great
-Napoleon;John Churchill
-Napoleon;Petronas
-Napoleon;Philip II
-Napoleon;Prince Rhaeger
-Napoleon;Raged King
-Napoleon;Zucca
 Napoleon Prime;Barbarossa
 Napoleon Prime;Bertrand du Guesclin
 Napoleon Prime;Cyrus the Great
@@ -638,6 +634,13 @@ Napoleon Prime;Lysander
 Napoleon Prime;Marco Polo
 Napoleon Prime;Mordred
 Napoleon Prime;Roland
+Napoleon;Alfred the Great
+Napoleon;John Churchill
+Napoleon;Petronas
+Napoleon;Philip II
+Napoleon;Prince Rhaeger
+Napoleon;Raged King
+Napoleon;Zucca
 Narcissus;Alessandra
 Narcissus;Basil II
 Narcissus;Suchet
@@ -820,6 +823,8 @@ Takenaka Shigeharu;Jadwiga
 Takenaka Shigeharu;Leo III
 Takenaka Shigeharu;Tran Hung Dao
 Theobald I;Kleos
+Theodora;Baibars
+Theodora;Cleopatra
 Theodosius I;Christina
 Theodosius I;Genghis Khan
 Theodosius I;Gunther
