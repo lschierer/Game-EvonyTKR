@@ -64,6 +64,7 @@ dev-image: build
 
 mlModel:
   perl bin/extract_conflict_features.pl --mode=training --output=training_data.csv
-  PYTHON_GIL=0 python bin/train_conflict_model.py     --training=training_data.csv     --model=conflict_model.pkl     --importance=feature_importance.csv
+  python bin/train_conflict_model.py     --training=training_data.csv     --model=conflict_model.pkl     --importance=feature_importance.csv
   perl bin/extract_conflict_features.pl --mode=predict --output=all_pairs.csv
-  PYTHON_GIL=0 python bin/predict_conflicts.py     --model=conflict_model.pkl     --pairs=all_pairs.csv     --output=conflicts.json
+  python bin/predict_conflicts.py     --model=conflict_model.pkl     --pairs=all_pairs.csv     --output=conflicts.json
+

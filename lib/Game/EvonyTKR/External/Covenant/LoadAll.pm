@@ -138,7 +138,8 @@ package Game::EvonyTKR::External::Covenant::LoadAll {
 
         foreach my $file (@files) {
           my $covenant_name = $file->basename('.yaml', '.yml');
-          unless ($job->get_covenant($covenant_name)) {
+          # Query SQLite directly to bypass state cache
+          unless ($job->persistence->get_covenant($covenant_name)) {
             $all_in_persistence = 0;
             $missing_count++;
           }
@@ -164,9 +165,6 @@ package Game::EvonyTKR::External::Covenant::LoadAll {
         return $job->fail($errmsg);
       }
     }
-
-    # Store count in metadata
-    $job->persistence->set_metadata('total_covenants', scalar(@files));
 
     # Mark this job as completed in persistence
     $job->persistence->mark_job_completed($job->task_name);

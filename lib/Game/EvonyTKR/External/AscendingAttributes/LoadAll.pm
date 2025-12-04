@@ -128,7 +128,8 @@ package Game::EvonyTKR::External::AscendingAttributes::LoadAll {
 
         foreach my $file (@files) {
           my $attr_name = $file->basename('.yaml', '.yml');
-          unless ($job->get_ascending_attributes($attr_name)) {
+          # Query SQLite directly to bypass state cache
+          unless ($job->persistence->get_ascending_attribute($attr_name)) {
             $all_in_persistence = 0;
             $missing_count++;
           }
@@ -155,9 +156,6 @@ package Game::EvonyTKR::External::AscendingAttributes::LoadAll {
         return $job->fail($errmsg);
       }
     }
-
-    # Store count in metadata
-    $job->persistence->set_metadata('total_ascending_attributes', scalar(@files));
 
     # Mark this job as completed in persistence
     $job->persistence->mark_job_completed($job->task_name);
