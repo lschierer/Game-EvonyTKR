@@ -111,27 +111,51 @@ package Game::EvonyTKR::Controller::Covenants {
       ->to(controller => $controller_name, action => 'index')
       ->name("${base}_index");
 
-    foreach my $cn ($c->list_covenants()->@*) {
-      $cn = join(' ', map {ucfirst} split / /, $cn);
-      my $path = sprintf('/%s', $cn);
-      my $key  = $cn =~ s/ /_/gr;
+    # Dynamic catch-all route for individual covenants
+    $mainRoutes->get('/:name')
+      ->to(controller => $controller_name, action => 'show')
+      ->name('covenant_details');
+  }
 
-      $mainRoutes->get($path => { name => $cn })->to(
-        controller => $controller_name,
-        action     => 'show'
-      )->name("covenant-${key}");
+  sub _build_covenant_nav($c, $covenant_name, $app) {
+    use Encode qw(is_utf8 decode_utf8);
 
-      $app->add_navigation_item({
-        title  => "Details for ${cn}",
-        path   => sprintf('%s%s', $c->getBase(), $path),
-        parent => $c->getBase(),
-        order  => 40,
-      });
+    my $display_name = is_utf8($covenant_name) ? $covenant_name : decode_utf8($covenant_name);
+    my $path = sprintf('%s/%s', $c->getBase(), $display_name);
+
+    $app->add_navigation_item({
+      title  => "Details for ${display_name}",
+      path   => $path,
+      parent => $c->getBase(),
+      order  => 40,
+    });
+  }
+
+  sub _ensure_navigation_built($c) {
+    state $nav_built = 0;
+    return if $nav_built;
+
+    my @covenant_names = eval { $c->list_covenants()->@* };
+    return unless @covenant_names;
+
+    my $test_covenant = eval { $c->get_covenant($covenant_names[0]) };
+    return unless $test_covenant;
+
+    foreach my $covenant_name (@covenant_names) {
+      my $covenant = eval { $c->get_covenant($covenant_name) };
+      next unless $covenant;
+      $c->_build_covenant_nav($covenant->primary->name, $c->app);
     }
+
+    $nav_built = 1;
+    $c->logger->info("Built navigation items for " . scalar(@covenant_names) . " covenants");
   }
 
   sub index($c) {
     $c->logger->debug(sprintf('Rendering index for %s', __PACKAGE__));
+
+    # Build navigation items if not already done
+    $c->_ensure_navigation_built();
 
     # Check if markdown exists for this collection
     my $distDir       = Mojo::Home->new->detect('Game::EvonyTKR');
@@ -174,8 +198,14 @@ package Game::EvonyTKR::Controller::Covenants {
 
   sub show ($c) {
     $c->logger->debug("start of show method");
-    my $name;
-    $name = $c->param('name') // '';
+
+    # Build navigation items if not already done
+    $c->_ensure_navigation_built();
+
+    use Encode qw(decode is_utf8);
+    my $name = $c->param('name') // '';
+    $name = decode('UTF-8', $name) unless is_utf8($name);
+
     $c->logger->debug("show detects name $name, showing details.");
 
     my $outstanding = $c->outstanding_prereqs([
@@ -197,10 +227,12 @@ package Game::EvonyTKR::Controller::Covenants {
       );
     }
 
-    my $covenant = $c->get_covenant($name);
+    # Normalize name for lookup
+    my $normalized_name = $c->normalize($name);
+    my $covenant = $c->get_covenant($normalized_name);
 
     unless ($covenant) {
-      $c->logger->error("covenant for '$name' was not found.");
+      $c->logger->error("covenant for '$name' (normalized: '$normalized_name') was not found.");
       $c->reply->not_found;
     }
     $c->logger->debug(sprintf(

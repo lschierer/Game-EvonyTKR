@@ -132,20 +132,11 @@ package Game::EvonyTKR::Controller::Generals {
     $referenceRoutes->get('/')
       ->to(controller => $controller_name, action => 'index');
 
-    eval {
-      foreach my $general ($c->list_generals()->@*) {
-        $c->_build_general_routes($general, $app);
-      }
-    };
-    if ($@) {
-      my $error =
-        sprintf('error building dynamic routes for Generals Controller: %s',
-        $@);
-      $c->logger->error($error);
-      if ($app->mode eq 'development') {
-        croak($error);
-      }
-    }
+    # Dynamic catch-all route for individual generals
+    $referenceRoutes->get('/:name')
+      ->to(controller => $controller_name, action => 'show')
+      ->name('general_details');
+
     # a routes for single general tables
     # and the index routes for troop type categories that go under /Generals
     # and thus are managed by this controller
@@ -269,49 +260,46 @@ package Game::EvonyTKR::Controller::Generals {
     }
   }
 
-  sub _build_general_routes($c, $general_name, $app,) {
-    my $name = $c->normalize($general_name);
-    # words that do not get capitalized
-    my @articles = qw(a an the);
-    my @capitalized_words;
+  sub _build_general_routes($c, $general_name, $app) {
+    # Build navigation item for this general
+    use Encode qw(decode_utf8 is_utf8);
 
-    my @words = split /(\s+)/,
-      $name;    # Split by whitespace, keeping the whitespace
+    # Ensure the name is properly decoded as UTF-8
+    my $display_name = is_utf8($general_name) ? $general_name : decode_utf8($general_name);
+    my $gr  = "/Reference/Generals/$display_name";
 
-    foreach my $word (@words) {
-      # Check if the word (converted to lowercase) is in the articles list
-      if (grep { lc($word) eq $_ } @articles) {
-        push @capitalized_words, lc($word);    # Keep articles lowercase
-      }
-      elsif ($word =~ /^[xiv]+$/i) {
-        push @capitalized_words, uc($word);    # Uppercase Roman numerals
-      }
-      else {
-        push @capitalized_words, ucfirst(lc($word));   # Capitalize first letter
-      }
-    }
+    $c->logger->debug(sprintf("Building nav for: %s (is_utf8: %s, path: %s)",
+      $display_name, is_utf8($display_name) ? 'yes' : 'no', $gr));
 
-    $name = join '', @capitalized_words;
-
-    $c->logger->debug("building Reference Routes for $name");
-    my $referenceRoutes = $app->routes->any($reference_base);
-
-    my $gr  = "/Reference/Generals/$name";
-    my $grn = "${name}ReferenceRoute";
-    $grn =~ s/ /_/g;
-
-    $referenceRoutes->get("/$name" => { name => $name })
-      ->to(controller => 'Generals', action => 'show')
-      ->name($grn);
-
-    $c->logger->debug(
-      sprintf('building general routes, gr: "%s" for name "%s"', $gr, $name));
     $app->add_navigation_item({
-      title  => "Details for $name",
+      title  => $display_name,
       path   => $gr,
       parent => '/Reference/Generals',
       order  => 20,
     });
+  }
+
+  sub _ensure_navigation_built($c) {
+    state $nav_built = 0;
+    return if $nav_built;
+
+    # Check if generals are loaded
+    my @general_names = eval { $c->list_generals()->@* };
+    return unless @general_names;
+
+    # Try to load one general to verify they're actually available
+    my $test_general = eval { $c->get_general($general_names[0]) };
+    return unless $test_general;
+
+    # Build navigation for all generals
+    foreach my $general_name (@general_names) {
+      my $general = eval { $c->get_general($general_name) };
+      next unless $general;
+      $c->_build_general_routes($general->name, $c->app);
+    }
+
+    $nav_built = 1;
+    $c->logger->info("Built navigation items for " . scalar(@general_names) . " generals");
   }
 
   sub get_generals_by_type ($self, $generalType) {
@@ -356,6 +344,9 @@ package Game::EvonyTKR::Controller::Generals {
   }
 
   sub index($c) {
+
+    # Build navigation items if not already done
+    $c->_ensure_navigation_built();
 
     my $collection = collection_name();
     $c->logger->debug("Rendering index for $collection");
@@ -499,8 +490,24 @@ package Game::EvonyTKR::Controller::Generals {
   sub show ($c) {
     return if $c->check_prereqs_or_wait($c->prereqs);
 
+    # Build navigation items if not already done
+    $c->_ensure_navigation_built();
+
     $c->logger->debug("start of show method");
+
+    # Get name from URL - Mojolicious should already decode it
+    use Encode qw(decode is_utf8);
     my $name = $c->param('name');
+
+    $c->logger->debug(sprintf("Raw param: %s (is_utf8: %s, bytes: %s)",
+      $name, is_utf8($name) ? 'yes' : 'no',
+      join(' ', map { sprintf('%02x', ord($_)) } split //, $name)));
+
+    # Mojolicious should handle UTF-8, but double-check
+    $name = decode('UTF-8', $name) unless is_utf8($name);
+
+    $c->logger->debug(sprintf("After decode: %s (is_utf8: %s)",
+      $name, is_utf8($name) ? 'yes' : 'no'));
 
     # Canonicalize trailing slash
     if ((my $rp = $c->req->url->path->to_string) =~ m{/$}) {
@@ -508,7 +515,7 @@ package Game::EvonyTKR::Controller::Generals {
       return $c->redirect_to($canonical, 301);
     }
 
-    my $expected_list  = $c->list_generals() // [];
+    my $expected_list  = [map { $c->normalize($_) } $c->list_generals()->@*];
     my %expected       = map { $_ => 1 } $expected_list->@*;
     my $expected_total = scalar keys %expected;
 
@@ -553,15 +560,18 @@ package Game::EvonyTKR::Controller::Generals {
 
     # 2) If a name is provided, validate it against the expected list
     if (defined $name && length $name) {
-      unless ($expected{$name}) {
+      # Normalize the name to match filesystem-based list
+      my $normalized_name = $c->normalize($name);
+
+      unless ($expected{$normalized_name}) {
         # invalid string: not a known/expected general name → proper 404
-        $c->logger->warn(
-          "Unknown general name '$name' (not in expected list).");
-        return $c->reply->not_found;
+        $c->logger->warn(sprintf('Unknown general name "%s" (normalized "%s", should be one of %s)',
+        $name, $normalized_name, join(',', map { sprintf('"%s"', $_)} $expected_list->@* )));
+        return $c->continue;  # Let other routes (like static pages) try to match
       }
 
-      # Name is valid/expected; check if it's loaded
-      my $general = $c->get_general($name);
+      # Name is valid/expected; check if it's loaded (use normalized name for lookup)
+      my $general = $c->get_general($normalized_name);
       unless ($general) {
         $c->logger->info(
           "General '$name' expected but not loaded yet; pending.");

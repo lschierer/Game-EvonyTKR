@@ -36,5 +36,5 @@ my $checker = LinkChecker::Command->new(
   debug    => $debug,
   startUrl => $startUrl,
 );
-
+$checker->init();
 $checker->execute();
