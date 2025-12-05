@@ -46,12 +46,28 @@ def load_training_data(csv_path):
 
 def train_model(X, y, feature_names):
     """Train gradient boosting classifier."""
+    # Calculate class weights to handle imbalance
+    n_samples = len(y)
+    n_conflicts = sum(y == 1)
+    n_compatible = sum(y == 0)
+    
+    # Weight inversely proportional to class frequency
+    conflict_weight = n_samples / (2 * n_conflicts)
+    compatible_weight = n_samples / (2 * n_compatible)
+    
+    print(f"\nClass weights:")
+    print(f"  Conflict (1): {conflict_weight:.2f}")
+    print(f"  Compatible (0): {compatible_weight:.2f}")
+    
     # Split data for validation
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.2, random_state=42, stratify=y
     )
 
     print("\nTraining gradient boosting classifier...")
+
+    # Create sample weights for training
+    sample_weights = np.where(y_train == 1, conflict_weight, compatible_weight)
 
     # Train model with reasonable hyperparameters
     model = GradientBoostingClassifier(
@@ -65,7 +81,7 @@ def train_model(X, y, feature_names):
         verbose=1
     )
 
-    model.fit(X_train, y_train)
+    model.fit(X_train, y_train, sample_weight=sample_weights)
 
     # Evaluate on test set
     y_pred = model.predict(X_test)
@@ -85,7 +101,8 @@ def train_model(X, y, feature_names):
 
     # Retrain on full dataset for final model
     print("\nRetraining on full dataset...")
-    model.fit(X, y)
+    full_sample_weights = np.where(y == 1, conflict_weight, compatible_weight)
+    model.fit(X, y, sample_weight=full_sample_weights)
 
     # Show feature importance
     print("\nTop 10 Most Important Features:")

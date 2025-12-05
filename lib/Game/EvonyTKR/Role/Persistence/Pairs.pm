@@ -86,9 +86,19 @@ sub get_pair ($self, $key) {
 }
 
 sub get_pairs_by_type ($self) {
+  state $inflated_pairs = {};
+  state $all_pairs_built = 0;
+
+  # If pair building is complete and we've already cached, return cache
+  if ($all_pairs_built && %$inflated_pairs) {
+    return $inflated_pairs;
+  }
+
+  # Check if pair building is complete
+  my $building_complete = $self->persistence->get_metadata('pair_building_complete');
+
   # Load from SQLite
   my $pairs_by_type = {};
-
   eval {
     my $all_types = $self->persistence->get_all_pair_types();
     foreach my $type (@$all_types) {
@@ -104,37 +114,25 @@ sub get_pairs_by_type ($self) {
     $self->logger->error("Failed to load pairs_by_type from persistence: $@");
   }
 
-  state $all_pairs_built;
-  state $inflated_pairs = {};
-  unless ($all_pairs_built) {
-    foreach my $type (sort keys %$pairs_by_type) {
-      $self->logger->debug(sprintf(
-        'merging %s pairs for type %s',
-        scalar(@{ $pairs_by_type->{$type} }), $type
-      ));
-      $inflated_pairs->{$type} = [];
-      my $type_starts_at_zero = scalar(@{ $inflated_pairs->{$type} });
-      foreach my $wire_pair (@{ $pairs_by_type->{$type} }) {
-        my $wpk = $self->wire_pair_to_key($wire_pair);
-        if (!$type_starts_at_zero
-          && any { $wpk eq $self->wire_pair_to_key($_->to_wire_hash()) }
-          $inflated_pairs->{$type}->@*) {
-          $self->logger->debug(sprintf('pair %s is already present', $wpk));
-          next;
-        }
-        else {
-          $self->logger->debug("merging pair $wpk for type $type");
-        }
-        if (my $pair_obj =
-          Game::EvonyTKR::Model::General::Pair->from_wire_hash($wire_pair)) {
-          push @{ $inflated_pairs->{$type} }, $pair_obj;
-        }
+  # Inflate pairs
+  $inflated_pairs = {};
+  foreach my $type (sort keys %$pairs_by_type) {
+    $self->logger->debug(sprintf(
+      'Inflating %s pairs for type %s',
+      scalar(@{ $pairs_by_type->{$type} }), $type
+    ));
+    $inflated_pairs->{$type} = [];
+    foreach my $wire_pair (@{ $pairs_by_type->{$type} }) {
+      if (my $pair_obj =
+        Game::EvonyTKR::Model::General::Pair->from_wire_hash($wire_pair)) {
+        push @{ $inflated_pairs->{$type} }, $pair_obj;
       }
     }
-    # Check completion via SQLite metadata
-    $all_pairs_built =
-      $self->persistence->get_metadata('pair_building_complete');
   }
+
+  # Only mark as built if building is actually complete
+  $all_pairs_built = $building_complete ? 1 : 0;
+
   return $inflated_pairs;
 }
 

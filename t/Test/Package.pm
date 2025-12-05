@@ -6,18 +6,23 @@ use Test2::V0;
 use Path::Tiny;
 require YAML::PP;
 use List::AllUtils qw( first any none all );
+require Game::EvonyTKR::Model::General;
+require Game::EvonyTKR::Model::AscendingAttributes;
+require Game::EvonyTKR::Model::Book;
+require Game::EvonyTKR::Model::Specialty;
+require Game::EvonyTKR::Model::Covenant;
 
-  use Mojo::Base 'Game::EvonyTKR::Model::Base';
-  use Mojo::Base 'Game::EvonyTKR::Role::Logging',                         -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::Persistence', -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::Persistence',               -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::Persistence',           -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::Persistence',            -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::Persistence',         -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants',        -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants',     -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::Constants::Books',                -role;
-  use List::AllUtils qw( first );
+use Mojo::Base 'Game::EvonyTKR::Model::Base';
+use Mojo::Base 'Game::EvonyTKR::Role::Logging',                         -role;
+use Mojo::Base 'Game::EvonyTKR::Role::Persistence', -role;
+use Mojo::Base 'Game::EvonyTKR::Role::Persistence',               -role;
+use Mojo::Base 'Game::EvonyTKR::Role::Persistence',           -role;
+use Mojo::Base 'Game::EvonyTKR::Role::Persistence',            -role;
+use Mojo::Base 'Game::EvonyTKR::Role::Persistence',         -role;
+use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants',        -role;
+use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants',     -role;
+use Mojo::Base 'Game::EvonyTKR::Role::Constants::Books',                -role;
+use List::AllUtils qw( first );
 
   sub import_generic_books ($self) {
     my $suffixlist = ['.yaml', '.yml'];

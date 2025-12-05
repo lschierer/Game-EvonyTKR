@@ -697,6 +697,23 @@ sub store_conflict ($self, $general1_name, $general2_name, $conflicts) {
   return 1;
 }
 
+sub get_conflict ($self, $general1_name, $general2_name) {
+  my $db = $self->sqlite->db;
+
+  my $norm1 = $self->normalize($general1_name);
+  my $norm2 = $self->normalize($general2_name);
+
+  # Always query in alphabetical order since that's how we store
+  my ($name1, $name2) = sort ($norm1, $norm2);
+
+  my $result = $db->query(
+    'SELECT conflicts FROM general_conflicts WHERE general1_name = ? AND general2_name = ?',
+    $name1, $name2
+  )->hash;
+
+  return $result ? $result->{conflicts} : undef;
+}
+
 sub get_conflicts_for_general ($self, $general_name) {
   my $db              = $self->sqlite->db;
   my $normalized_name = $self->normalize($general_name);
