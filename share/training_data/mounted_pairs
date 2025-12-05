@@ -1,6 +1,6 @@
 Aethelflaed;Baibars
-Aethelflaed;Theodora
 Aethelflaed;George A Custer
+Aethelflaed;Theodora
 Artemis;Aethelflaed
 Artemis;Baibars
 Artemis;Bertrand du Guesclin
@@ -63,7 +63,6 @@ Barbarossa;Aethelflaed
 Barbarossa;Baibars
 Barbarossa;Casimir Pulaski
 Barbarossa;Cheng Yaojin
-Barbarossa;Genghis Khan
 Barbarossa;Haakon Haraldsson
 Barbarossa;Ii Naomasa
 Barbarossa;Laudon
@@ -196,44 +195,10 @@ Gaius Octavius;Nathanael Greene
 Gaius Octavius;Prince Eugene
 Gaius Octavius;Sun Ce
 Gaius Octavius;Washington Prime
-Genghis Khan;Aethelflaed
-Genghis Khan;Artemis
-Genghis Khan;Baibars
-Genghis Khan;Barbarossa
-Genghis Khan;Beowulf
-Genghis Khan;Bertrand du Guesclin
-Genghis Khan;Casimir Pulaski
-Genghis Khan;Cheng Yaojin
-Genghis Khan;Gaius Octavius
-Genghis Khan;George A Custer
-Genghis Khan;George Monck
-Genghis Khan;Haakon Haraldsson
-Genghis Khan;Hannibal
-Genghis Khan;Hermes
-Genghis Khan;Hestia
-Genghis Khan;Ii Naomasa
-Genghis Khan;Jayavarman II
-Genghis Khan;King Arthur
-Genghis Khan;Laudon
-Genghis Khan;Li Jing
-Genghis Khan;Louis XIV
-Genghis Khan;Marco Polo
-Genghis Khan;Maria Theresa
-Genghis Khan;Martinus
-Genghis Khan;Mordred
-Genghis Khan;Napoleon Prime
-Genghis Khan;Nathanael Greene
-Genghis Khan;Olav II
-Genghis Khan;Poligenus
-Genghis Khan;Prince Eugene
-Genghis Khan;Roland
-Genghis Khan;Sun Ce
-Genghis Khan;Washington Prime
 George A Custer;Aethelflaed
 George A Custer;Baibars
 George A Custer;Casimir Pulaski
 George A Custer;Cheng Yaojin
-George A Custer;Genghis Khan
 George A Custer;Haakon Haraldsson
 George A Custer;Ii Naomasa
 George A Custer;Laudon
@@ -312,7 +277,6 @@ Hermes;Bertrand du Guesclin
 Hermes;Casimir Pulaski
 Hermes;Cheng Yaojin
 Hermes;Gaius Octavius
-Hermes;Genghis Khan
 Hermes;George Monck
 Hermes;Hannibal
 Hermes;Hestia
@@ -402,19 +366,11 @@ King Arthur;Aethelflaed
 King Arthur;Baibars
 King Arthur;Bertrand du Guesclin
 King Arthur;Casimir Pulaski
-King Arthur;Cheng Yaojin
-King Arthur;Genghis Khan
-King Arthur;George Monck
-King Arthur;Haakon Haraldsson
 King Arthur;Ii Naomasa
-King Arthur;Jayavarman II
 King Arthur;Laudon
 King Arthur;Li Jing
-King Arthur;Louis XIV
-King Arthur;Marco Polo
 King Arthur;Maria Theresa
 King Arthur;Mordred
-King Arthur;Napoleon Prime
 King Arthur;Nathanael Greene
 King Arthur;Olav II
 King Arthur;Poligenus
@@ -480,7 +436,6 @@ Louis XIV;Beowulf
 Louis XIV;Bertrand du Guesclin
 Louis XIV;Casimir Pulaski
 Louis XIV;Cheng Yaojin
-Louis XIV;Genghis Khan
 Louis XIV;George Monck
 Louis XIV;Haakon Haraldsson
 Louis XIV;Hermes
@@ -507,7 +462,6 @@ Marco Polo;Baibars
 Marco Polo;Beowulf
 Marco Polo;Casimir Pulaski
 Marco Polo;Cheng Yaojin
-Marco Polo;Genghis Khan
 Marco Polo;Haakon Haraldsson
 Marco Polo;Hermes
 Marco Polo;Hestia
@@ -530,7 +484,6 @@ Maria Theresa;Bertrand du Guesclin
 Maria Theresa;Casimir Pulaski
 Maria Theresa;Cheng Yaojin
 Maria Theresa;Gaius Octavius
-Maria Theresa;Genghis Khan
 Maria Theresa;George A Custer
 Maria Theresa;George Monck
 Maria Theresa;Haakon Haraldsson
@@ -586,7 +539,6 @@ Napoleon Prime;Baibars
 Napoleon Prime;Beowulf
 Napoleon Prime;Casimir Pulaski
 Napoleon Prime;Cheng Yaojin
-Napoleon Prime;Genghis Khan
 Napoleon Prime;Haakon Haraldsson
 Napoleon Prime;Hermes
 Napoleon Prime;Hestia
@@ -639,7 +591,6 @@ Olav II;Baibars
 Olav II;Beowulf
 Olav II;Casimir Pulaski
 Olav II;Cheng Yaojin
-Olav II;Genghis Khan
 Olav II;Haakon Haraldsson
 Olav II;Hermes
 Olav II;Hestia
@@ -763,7 +714,6 @@ Washington Prime;Bertrand du Guesclin
 Washington Prime;Casimir Pulaski
 Washington Prime;Cheng Yaojin
 Washington Prime;Gaius Octavius
-Washington Prime;Genghis Khan
 Washington Prime;George Monck
 Washington Prime;Hannibal
 Washington Prime;Hestia
