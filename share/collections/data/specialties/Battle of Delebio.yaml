@@ -1,0 +1,87 @@
+name: Battle of Delebio
+levels:
+  - level: gold
+    text: >-
+      Ground Troop Attack +50%.
+      Ground Troop HP +35%.
+      March Size Capacity +8%.
+    buffs:
+      - attribute: Attack
+        troop: Ground Troops
+        value:
+          number: 22
+      - attribute: HP
+        troop: Ground Troops
+        value:
+          number: 14
+      - attribute: March Size
+        value:
+          number: 3
+  - level: green
+    text: >-
+      Ground Troop Attack +5%.
+      Ground Troop HP +3%.
+      March Size Capacity +1%.
+    buffs:
+      - attribute: Attack
+        troop: Ground Troops
+        value:
+          number: 5
+      - attribute: HP
+        troop: Ground Troops
+        value:
+          number: 3
+      - attribute: March Size
+        value:
+          number: 1
+  - level: blue
+    text: >-
+      Ground Troop Attack +5%.
+      Ground Troop HP +4%.
+      March Size Capacity +1%.
+    buffs:
+      - attribute: Attack
+        troop: Ground Troops
+        value:
+          number: 5
+      - attribute: HP
+        troop: Ground Troops
+        value:
+          number: 4
+      - attribute: March Size
+        value:
+          number: 1
+  - level: purple
+    text: >-
+      Ground Troop Attack +10%.
+      Ground Troop HP +7%.
+      March Size Capacity +2%.
+    buffs:
+      - attribute: Attack
+        troop: Ground Troops
+        value:
+          number: 10
+      - attribute: HP
+        troop: Ground Troops
+        value:
+          number: 7
+      - attribute: March Size
+        value:
+          number: 2
+  - level: orange
+    text: >-
+      Ground Troop Attack +10%.
+      Ground Troop HP +7%.
+      March Size Capacity +2%.
+    buffs:
+      - attribute: Attack
+        troop: Ground Troops
+        value:
+          number: 10
+      - attribute: HP
+        troop: Ground Troops
+        value:
+          number: 7
+      - attribute: March Size
+        value:
+          number: 2
