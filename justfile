@@ -20,7 +20,7 @@ npmdeps:
 deps: prepare npmdeps
   ./Build installdeps --cpan_client 'cpanm -n'
   pip install numpy pandas scikit-learn
-  #perl ./scripts/update_git_meta.pl
+  perl ./scripts/update_git_meta.pl
 
 [working-directory: 'share']
 images:

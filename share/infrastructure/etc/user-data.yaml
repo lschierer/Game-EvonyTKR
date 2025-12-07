@@ -118,33 +118,34 @@ runcmd:
   # on the auto retry systemctl does
   - sync && echo 3 > /proc/sys/vm/drop_caches
   - systemctl enable unattended-upgrades
-  - |
-    cat > /etc/systemd/system/mojolicious-worker.service << 'EOF'
-    [Unit]
-    Description=Game Evony TKR Minion Worker
-    After=network.target
+  #- |
+  #  cat > /etc/systemd/system/mojolicious-worker.service << 'EOF'
+  #  [Unit]
+  #  Description=Game Evony TKR Minion Worker
+  #  After=network.target
 
-    [Service]
-    Type=simple
-    User=mojo
-    WorkingDirectory=/opt/mojo/app
-    ExecStart=/opt/mojo/bin/mojo-worker.sh
-    Nice=10
-    IOSchedulingClass=2
-    IOSchedulingPriority=4
-    Restart=always
-    RestartSec=5
+  #  [Service]
+  #  Type=simple
+  #  User=mojo
+  #  WorkingDirectory=/opt/mojo/app
+  #  ExecStart=/opt/mojo/bin/mojo-worker.sh
+  #  Nice=10
+  #  IOSchedulingClass=2
+  #  IOSchedulingPriority=4
+  #  Restart=always
+  #  RestartSec=5
 
-    [Install]
-    WantedBy=multi-user.target
-    EOF
+  #  [Install]
+  #  WantedBy=multi-user.target
+  #  EOF
   - |
     cat > /etc/systemd/system/mojolicious.service << 'EOF'
     [Unit]
     Description=Game Evony TKR Mojolicious Server
-    After=network.target mojolicious-worker.service
-    Requires=mojolicious-worker.service
-    Wants=mojolicious-worker.service
+    After=network.target
+    #After=network.target mojolicious-worker.service
+    #Requires=mojolicious-worker.service
+    #Wants=mojolicious-worker.service
 
     [Service]
     Type=forking
