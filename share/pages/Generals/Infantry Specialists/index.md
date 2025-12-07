@@ -52,5 +52,5 @@ should be avoided for the same reason.  At the time of writing, both Elise and L
 [Mounted]: </Generals/Cavalry Specialists>
 [Ranged]: </Generals/Archer Specialists>
 [Wall]: </Generals/Wall Specialists>
-[buffs]: /Reference/Glossary#buffs
+[buffs]: /Reference/Glossary#buff
 [covenants]: /Reference/Glossary#covenant
