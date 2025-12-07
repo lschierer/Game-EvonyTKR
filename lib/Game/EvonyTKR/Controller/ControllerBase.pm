@@ -45,7 +45,7 @@ package Game::EvonyTKR::Controller::ControllerBase {
           return $c->are_prereqs_outstanding($app->minion, $prereqs);
         }
         else {
-          $c->logger->error('outstanding_prereqs requires an arrayref.');
+          $c->log_error('outstanding_prereqs requires an arrayref.');
           return 1;
         }
       }
@@ -54,13 +54,13 @@ package Game::EvonyTKR::Controller::ControllerBase {
     $app->helper(
       check_prereqs_or_wait => sub($self, $prereqs, $retry_delay = 30) {
         unless (ref($prereqs) && ref($prereqs) eq 'ARRAY') {
-          $c->logger->error('check_prereqs_or_wait requires an arrayref.');
+          $c->log_error('check_prereqs_or_wait requires an arrayref.');
           return 0;
         }
 
         my $outstanding = $self->outstanding_prereqs($prereqs);
         if ($outstanding) {
-          $c->logger->info(sprintf(
+          $c->log_info(sprintf(
             'Prerequisites outstanding for route %s, rendering wait page',
             $self->req->url->path->to_string));
 
@@ -112,7 +112,7 @@ package Game::EvonyTKR::Controller::ControllerBase {
   }
 
   sub index($self) {
-    $self->logger->warn('using index from controller base');
+    $self->log_warn('using index from controller base');
     $self->stash(
       base     => $self->getBase(),
       layout   => 'default',

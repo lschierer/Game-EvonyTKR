@@ -67,11 +67,11 @@ package Game::EvonyTKR::External::Prebuild {
 
     unless (defined($app->minion)) {
       my $errmessage = sprintf('minion undefined in job for %s', __PACKAGE__);
-      $plugin->logger->error($errmessage);
+      $plugin->log_error($errmessage);
       say $errmessage;
       return;
     }
-    $plugin->logger->debug(
+    $plugin->log_debug(
       sprintf('register function for "%s" %s', __PACKAGE__, $$));
 
     # Register main prebuild orchestration task
@@ -79,33 +79,33 @@ package Game::EvonyTKR::External::Prebuild {
 
     my @tasks = values $app->minion->tasks->%*;
     foreach my $task (@tasks) {
-      $plugin->logger->debug(sprintf('task is %s, %s',
+      $plugin->log_debug(sprintf('task is %s, %s',
         ref($task) // 'undef ref',
         blessed($task) // 'undef blessed'));
     }
     foreach my $prereq ($prereq_plugins->@*) {
       $prereqs->{$prereq} = 0;
       if (my $e = Mojo::Loader::load_class($prereq)) {
-        $plugin->logger->logcroak(sprintf(
+        $plugin->log_logcroak(sprintf(
           'exception loading %s: ', ref($e) ? $e : 'Not Found!'));
         next;
       }
       my $signal = $prereq =~ s/::/_/gr;
       $app->plugins->on(
         $signal => sub {
-          $plugin->logger->info(sprintf('detected %s ready', $prereq));
+          $plugin->log_info(sprintf('detected %s ready', $prereq));
           return $plugin->prebuildPrerequisites({ $prereq => 1 });
         }
       );
       eval { $app->plugin($prereq); } or do {
-        $plugin->logger->error("Error loading task plugin $prereq: $@");
+        $plugin->log_error("Error loading task plugin $prereq: $@");
       };
 
     }
 
     $plugin->prebuild_init($app);
 
-    $plugin->logger->info(
+    $plugin->log_info(
       sprintf('%s register function complete for %s', __PACKAGE__, $$));
   }
 
@@ -135,7 +135,7 @@ package Game::EvonyTKR::External::Prebuild {
             notes    => { uniq => 'external_prebuild' },
           }
         );
-        $plugin->logger->info("Queued external_prebuild $jid");
+        $plugin->log_info("Queued external_prebuild $jid");
       }
     }
   }
@@ -148,7 +148,7 @@ package Game::EvonyTKR::External::Prebuild {
     if (none { $_ == 0 } values $prereqs->%*) {
       return 1;
     }
-    $plugin->logger->debug(
+    $plugin->log_debug(
       sprintf('failed prebuildPrerequisites: %s',
         Data::Printer::np($prereqs, multiline => 0))
     );
@@ -164,16 +164,16 @@ package Game::EvonyTKR::External::Prebuild {
     $job->SUPER::run(@args);
     unless (defined($job->minion)) {
       my $errmessage = sprintf('minion undefined in job for %s', __PACKAGE__);
-      $job->logger->error($errmessage);
+      $job->log_error($errmessage);
       return $job->fail($errmessage);
     }
     else {
-      $job->logger->debug(sprintf(
+      $job->log_debug(sprintf(
         'minion in %s is a %s;%s',
         __PACKAGE__, ref($job->minion), blessed($job->minion)
       ));
     }
-    $job->logger->debug('Prebuild orchestration starting');
+    $job->log_debug('Prebuild orchestration starting');
 
     my $owner         = $$ . '@' . ($ENV{HOSTNAME} // 'localhost');
     my $job_key       = 'prebuild_run';
@@ -188,14 +188,14 @@ package Game::EvonyTKR::External::Prebuild {
     }
 
     unless ($job->prebuildPrerequisites) {
-      $job->logger->debug(sprintf('cannot start prebuild; prereqs: %s',
+      $job->log_debug(sprintf('cannot start prebuild; prereqs: %s',
         Data::Printer::np($prereqs, multiline => 0)));
       return $job->retry({ delay => $refresh_every });
     }
     my $timer_id;
     Mojo::IOLoop->timer(
       0.01 => sub {
-        $job->logger->debug("prebuild obtaining db lock");
+        $job->log_debug("prebuild obtaining db lock");
         $job->prebuild_db_lock($timer_id);
       }
     );
@@ -257,7 +257,7 @@ package Game::EvonyTKR::External::Prebuild {
       },
     };
 
-    $job->logger->info('launching jobs to spawn loaders.');
+    $job->log_info('launching jobs to spawn loaders.');
 
     my $loaderJids = [];
     foreach my $jobname (sort keys $loaderJobDefs->%*) {
@@ -269,24 +269,24 @@ package Game::EvonyTKR::External::Prebuild {
         $job->minion->enqueue($jobname => [$args->@*] => { $params->%* });
       if (defined($jid)) {
         $job->note($jobname => $jid);
-        $job->logger->debug(sprintf('launched %s with jid %s', $jobname, $jid));
+        $job->log_debug(sprintf('launched %s with jid %s', $jobname, $jid));
         push @{$loaderJids}, $jid;
       }
       else {
         my $errmessage = sprintf('failed to launch %s', $jobname);
-        $job->logger->error($errmessage);
+        $job->log_error($errmessage);
         Mojo::IOLoop->remove($timer_id) if ($timer_id);
         return $job->fail($errmessage);
       }
     }
 
     if (scalar(@$loaderJids) == keys($loaderJobDefs->%*)) {
-      $job->logger->info('all job spawners launched');
+      $job->log_info('all job spawners launched');
     }
     else {
       my $errmessage = sprintf('launched %s spawners, expected %s. ',
         scalar(@$loaderJids), keys($loaderJobDefs->%*));
-      $job->logger->error($errmessage);
+      $job->log_error($errmessage);
       Mojo::IOLoop->remove($timer_id) if ($timer_id);
       return $job->fail($errmessage);
     }
@@ -326,7 +326,7 @@ package Game::EvonyTKR::External::Prebuild {
     my @tasks;
     foreach my $prereq ($prereq_plugins->@*) {
       unless ($prereq->can('task_name')) {
-        $job->logger->error(
+        $job->log_error(
           sprintf('prereq plugin "%s" is missing the task_name method.',
             $prereq)
         );
@@ -353,9 +353,9 @@ package Game::EvonyTKR::External::Prebuild {
     $refresh_every) {
     $timer_id = Mojo::IOLoop->recurring(
       $refresh_every => sub {
-        $job->logger->info('prebuild db lock loop');
+        $job->log_info('prebuild db lock loop');
         $job->app->refresh_lock_sqlite($db, $job_key, $owner, $ttl) or do {
-          $job->logger->error('Lost runtime lock; stopping prebuild.');
+          $job->log_error('Lost runtime lock; stopping prebuild.');
           Mojo::IOLoop->remove($timer_id) if $timer_id;
           # safe even if we don’t own it
           $job->app->release_lock_sqlite($db, $job_key, $owner);

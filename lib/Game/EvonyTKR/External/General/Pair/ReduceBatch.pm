@@ -28,7 +28,7 @@ package Game::EvonyTKR::External::General::Pair::ReduceBatch {
       unless $job_ids && ref($job_ids) eq 'ARRAY';
 
     $job->SUPER::run([]);
-    $job->logger->info(
+    $job->log_info(
       sprintf('ReduceBatch processing %d parent jobs', scalar(@$job_ids)));
 
     my $batch_id = $job->id;
@@ -52,7 +52,7 @@ package Game::EvonyTKR::External::General::Pair::ReduceBatch {
     }
 
     if ($all_cache_hits && $total_pairs_created == 0) {
-      $job->logger->info(
+      $job->log_info(
         'All parent jobs had 100% cache hits, nothing to reduce');
       $job->note(
         total_conflicts  => 0,
@@ -68,7 +68,7 @@ package Game::EvonyTKR::External::General::Pair::ReduceBatch {
       my $job_info = $job->minion->job($job_id);
       next unless $job_info;    # Parent jobs are guaranteed finished
 
-      $job->logger->debug("Processing parent job $job_id");
+      $job->log_debug("Processing parent job $job_id");
       $job->merge_pair_results($job_info->info);
       $job->merge_conflict_results($job_info->info,);
     }
@@ -95,7 +95,7 @@ package Game::EvonyTKR::External::General::Pair::ReduceBatch {
         List::UtilsBy::uniq_by { $job->wire_pair_to_key($_) }
         ($total_pairs->@*, $notes->{pairs}->@*)
       ];
-      $job->logger->debug(sprintf(
+      $job->log_debug(sprintf(
         'after merging pair results for %s, ReduceBatch shows %s',
         $job_info->{id}, Data::Printer::np($total_pairs)
       ));
@@ -104,7 +104,7 @@ package Game::EvonyTKR::External::General::Pair::ReduceBatch {
       }
     }
     else {
-      $job->logger->warn(
+      $job->log_warn(
         'ReduceBatch found a CreatePair job %s that ccreated no pairs.',
         $job_info->{id});
     }

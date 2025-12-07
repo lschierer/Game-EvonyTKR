@@ -21,6 +21,90 @@ has logger => sub ($package) {
   return get_logger($package);
 };
 
+##############################################################################
+# Logging wrapper methods that use caller() to get the actual logging package
+# This allows both roles and classes to have their own log level control
+##############################################################################
+
+sub log_trace ($self, @msg) {
+  my $caller_package = caller(0);
+  my $logger = get_logger($caller_package);
+  $logger->trace(@msg);
+}
+
+sub log_debug ($self, @msg) {
+  my $caller_package = caller(0);
+  my $logger = get_logger($caller_package);
+  $logger->debug(@msg);
+}
+
+sub log_info ($self, @msg) {
+  my $caller_package = caller(0);
+  my $logger = get_logger($caller_package);
+  $logger->info(@msg);
+}
+
+sub log_warn ($self, @msg) {
+  my $caller_package = caller(0);
+  my $logger = get_logger($caller_package);
+  $logger->warn(@msg);
+}
+
+sub log_error ($self, @msg) {
+  my $caller_package = caller(0);
+  my $logger = get_logger($caller_package);
+  $logger->error(@msg);
+}
+
+sub log_fatal ($self, @msg) {
+  my $caller_package = caller(0);
+  my $logger = get_logger($caller_package);
+  $logger->fatal(@msg);
+}
+
+sub log_logcroak ($self, @msg) {
+  my $caller_package = caller(0);
+  my $logger = get_logger($caller_package);
+  $logger->logcroak(@msg);
+}
+
+# Check if log levels are enabled
+sub is_trace ($self) {
+  my $caller_package = caller(0);
+  my $logger = get_logger($caller_package);
+  return $logger->is_trace();
+}
+
+sub is_debug ($self) {
+  my $caller_package = caller(0);
+  my $logger = get_logger($caller_package);
+  return $logger->is_debug();
+}
+
+sub is_info ($self) {
+  my $caller_package = caller(0);
+  my $logger = get_logger($caller_package);
+  return $logger->is_info();
+}
+
+sub is_warn ($self) {
+  my $caller_package = caller(0);
+  my $logger = get_logger($caller_package);
+  return $logger->is_warn();
+}
+
+sub is_error ($self) {
+  my $caller_package = caller(0);
+  my $logger = get_logger($caller_package);
+  return $logger->is_error();
+}
+
+sub is_fatal ($self) {
+  my $caller_package = caller(0);
+  my $logger = get_logger($caller_package);
+  return $logger->is_fatal();
+}
+
 sub get_logger ($package) {
   my $pn = ref($package) ? blessed($package) : $package;
 
@@ -94,19 +178,27 @@ BEGIN {
   $logLevelOverrides = {
     'Game::EvonyTKR'                                => 'DEBUG',
     'Game::EvonyTKR::Controller::Generals'          => 'DEBUG',
+    'Game::EvonyTKR::External::Book::LoadAllBuiltins' => 'INFO',
+    'Game::EvonyTKR::External::Book::LoadAllGenerics' => 'INFO',
+    'Game::EvonyTKR::External::Book::Loader'        => 'INFO',
     'Game::EvonyTKR::External::General::Summarizer' => 'DEBUG',
     'Game::EvonyTKR::Model::AscendingAttributes'    => 'INFO',
     'Game::EvonyTKR::Model::BasicAttribute'         => 'INFO',
     'Game::EvonyTKR::Model::BasicAttributes'        => 'INFO',
     'Game::EvonyTKR::Model::Book'                   => 'INFO',
     'Game::EvonyTKR::Model::Buff'                   => 'WARN',
-    'Game::EvonyTKR::Model::Buff::Matcher'          => 'DEBUG',
+    'Game::EvonyTKR::Model::Buff::Matcher'          => 'INFO',
     'Game::EvonyTKR::Model::Buff::Summarizer'       => 'DEBUG',
     'Game::EvonyTKR::Model::Buff::Value'            => 'WARN',
     'Game::EvonyTKR::Model::Covenant'               => 'INFO',
     'Game::EvonyTKR::Model::General'                => 'INFO',
     'Game::EvonyTKR::Model::Specialty'              => 'INFO',
     'Game::EvonyTKR::Plugins::Navigation'           => 'WARN',
+    'Game::EvonyTKR::Role::Persistence::AscendingAttributes' => 'INFO',
+    'Game::EvonyTKR::Role::Persistence::Books'      => 'INFO',
+    'Game::EvonyTKR::Role::Persistence::Covenants'  => 'INFO',
+    'Game::EvonyTKR::Role::Persistence::Generals'   => 'DEBUG',
+    'Game::EvonyTKR::Role::Persistence::Specialties' => 'INFO',
     'Game::EvonyTKR::Shared::Logger'                => 'INFO',
     'Test::Package'                                 => 'TRACE',
     'Test'                                          => 'TRACE',
@@ -125,12 +217,15 @@ BEGIN {
 
   foreach my $package (@upn) {
     $package = ref($package) ? blessed($package) : $package;
+    # Convert :: to . for Log4perl category naming
+    my $category = $package;
+    $category =~ s/::/./g;
     if (exists $logLevelOverrides->{$package}) {
       my $level = $logLevelOverrides->{$package};
-      $config .= "log4perl.logger.$package = ${level}\n";
+      $config .= "log4perl.logger.$category = ${level}\n";
     }
     else {
-      $config .= "log4perl.logger.$package = ${defaultMode}\n";
+      $config .= "log4perl.logger.$category = ${defaultMode}\n";
     }
   }
 

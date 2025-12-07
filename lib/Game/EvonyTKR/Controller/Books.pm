@@ -33,7 +33,7 @@ package Game::EvonyTKR::Controller::Books {
   sub getBuiltInBooks ($c, $app) {
     state %builtinBooks;
     my $bblist = $c->list_builtin_books();
-    $c->logger->debug(sprintf(
+    $c->log_debug(sprintf(
       'got a list of %s builtin books: %s',
       scalar @$bblist,
       Data::Printer::np(@$bblist)
@@ -45,7 +45,7 @@ package Game::EvonyTKR::Controller::Books {
         unless (defined($bb)
           && ref($bb)
           && $bb->isa('Game::EvonyTKR::Model::Book')) {
-          $c->logger->error(sprintf(
+          $c->log_error(sprintf(
             'invalid book retrieved for list entry "%s" : ref %s; blessed %s',
             $bbname,
             ref($bb) // 'scalar variable',
@@ -67,13 +67,13 @@ package Game::EvonyTKR::Controller::Books {
       my $level = $parts[1] unless ($#parts < 1);
       my $name  = join ' ', @parts[2 .. $#parts] unless ($#parts < 2);
       if (not defined($level)) {
-        $c->logger->error(sprintf(
+        $c->log_error(sprintf(
           'invalid entry found in list of generic books: "%s"',
           $ggname));
         next;
       }
       if (not defined($name)) {
-        $c->logger->error(sprintf(
+        $c->log_error(sprintf(
           'invalid entry found in list of generic books: "%s"',
           $ggname));
         next;
@@ -83,7 +83,7 @@ package Game::EvonyTKR::Controller::Books {
         unless (defined($gg)
           && ref($gg)
           && $gg->isa('Game::EvonyTKR::Model::Book')) {
-          $c->logger->error('invalid book retrieved for list entry "%s" '
+          $c->log_error('invalid book retrieved for list entry "%s" '
               . 'split into name "%s" and level %s',
             $ggname, $name, $level);
           next;
@@ -96,7 +96,7 @@ package Game::EvonyTKR::Controller::Books {
 
   # Register this when the application starts
   sub register($c, $app, $config = {}) {
-    $c->logger->info("Registering routes for " . ref($c));
+    $c->log_info("Registering routes for " . ref($c));
     $c->SUPER::register($app, $config);
 
     $app->add_navigation_item({
@@ -113,7 +113,7 @@ package Game::EvonyTKR::Controller::Books {
       ? $c->controller_name()
       : $baseClass;
 
-    $c->logger->debug("got controller_name $controller_name.");
+    $c->log_debug("got controller_name $controller_name.");
 
     my $mainRoutes = $app->routes->any($base);
     $mainRoutes->get('/')
@@ -135,7 +135,7 @@ package Game::EvonyTKR::Controller::Books {
 
     $app->helper(
       get_builtin_book_text => sub ($self, $book_name) {
-        $c->logger->debug("get_builtin_book_text for book '$book_name'");
+        $c->log_debug("get_builtin_book_text for book '$book_name'");
 
         $book_name = $c->SUPER::getConstants->normalize($book_name);
         my $book = $c->getBuiltInBooks($app)->{$book_name};
@@ -144,7 +144,7 @@ package Game::EvonyTKR::Controller::Books {
           return $book->text();
         }
         else {
-          $c->logger->warn("No book found for '$book_name'");
+          $c->log_warn("No book found for '$book_name'");
         }
         return "";
       }
@@ -180,11 +180,11 @@ package Game::EvonyTKR::Controller::Books {
         }
       });
       if ($retries >= $max_retries) {
-        $c->logger->error('cannot find a generic book loader!');
+        $c->log_error('cannot find a generic book loader!');
       }
       else {
         $retries++;
-        $c->logger->debug('cannot find a generic book loader!');
+        $c->log_debug('cannot find a generic book loader!');
         Mojo::IOLoop->timer(
           $delayTime => sub {
             return $c->check_book_loading_readiness();
@@ -201,11 +201,11 @@ package Game::EvonyTKR::Controller::Books {
         }
       });
       if ($retries >= $max_retries) {
-        $c->logger->error('cannot find a builtin book loader!');
+        $c->log_error('cannot find a builtin book loader!');
       }
       else {
         $retries++;
-        $c->logger->debug('cannot find a builtin book loader!');
+        $c->log_debug('cannot find a builtin book loader!');
         Mojo::IOLoop->timer(
           $delayTime => sub {
             return $c->check_book_loading_readiness();
@@ -250,11 +250,11 @@ package Game::EvonyTKR::Controller::Books {
         }
       });
       if ($retries >= $max_retries) {
-        $c->logger->error('cannot find a generic book loader!');
+        $c->log_error('cannot find a generic book loader!');
       }
       else {
         $retries++;
-        $c->logger->debug('cannot find a generic book loader!');
+        $c->log_debug('cannot find a generic book loader!');
         Mojo::IOLoop->timer(
           $delayTime => sub {
             return $c->book_route_builder($app, $mainRoutes, $controller_name);
@@ -272,11 +272,11 @@ package Game::EvonyTKR::Controller::Books {
         }
       });
       if ($retries >= $max_retries) {
-        $c->logger->error('cannot find a builtin book loader!');
+        $c->log_error('cannot find a builtin book loader!');
       }
       else {
         $retries++;
-        $c->logger->debug('cannot find a builtin book loader!');
+        $c->log_debug('cannot find a builtin book loader!');
         Mojo::IOLoop->timer(
           $delayTime => sub {
             return $c->book_route_builder($app, $mainRoutes, $controller_name);
@@ -291,13 +291,13 @@ package Game::EvonyTKR::Controller::Books {
       sort { lc($a->name) cmp lc($b->name) }
       values $c->getBuiltInBooks($app)->%*;
 
-    $c->logger->info(sprintf(
+    $c->log_info(sprintf(
       '%s book_route_builder expected %s, found %s',
       __PACKAGE__, $expectedCount, scalar(@allBooks)
     ));
 
     foreach my $book (@allBooks) {
-      $c->logger->debug(sprintf('building routes for "%s"', $book->name));
+      $c->log_debug(sprintf('building routes for "%s"', $book->name));
       my $name = $book->name;
 
       my $clean_name = $name;
@@ -320,7 +320,7 @@ package Game::EvonyTKR::Controller::Books {
     # allowing more retries. Do not delay longer so that
     # I get incremental progress.
     if ($expectedCount > scalar(@allBooks) && $retries <= ($max_retries * 10)) {
-      $c->logger->debug(sprintf(
+      $c->log_debug(sprintf(
         'on retry %s, expected %s, found %s',
         $retries, $expectedCount, scalar(@allBooks)
       ));
@@ -335,7 +335,7 @@ package Game::EvonyTKR::Controller::Books {
 
   sub index($self) {
     my $collection = collection_name();
-    $self->logger->debug("Rendering index for $collection");
+    $self->log_debug("Rendering index for $collection");
 
     # Check if markdown exists for this collection
     my $distDir       = Mojo::File::Share::dist_dir('Game::EvonyTKR');
@@ -344,11 +344,11 @@ package Game::EvonyTKR::Controller::Books {
     my @parts     = split(/::/, ref($self));
     my $baseClass = pop(@parts);
     my $base      = $self->getBase();
-    $self->logger->debug("Books index method has base $base");
+    $self->log_debug("Books index method has base $base");
 
     my $items;
     @$items = values $self->getBuiltInBooks($self->app)->%*;
-    $self->logger->debug(
+    $self->log_debug(
       sprintf('Items: %s with %s items.', ref($items), scalar(@$items)));
     $self->stash(
       linkBase        => $base,
@@ -371,18 +371,18 @@ package Game::EvonyTKR::Controller::Books {
   }
 
   sub show ($self) {
-    $self->logger->debug("start of show method");
+    $self->log_debug("start of show method");
     my $name;
     $name = $self->param('name');
-    $self->logger->debug("show detects name $name, showing details.");
+    $self->log_debug("show detects name $name, showing details.");
 
     my $book = $self->get_builtin_book($name);
 
     unless ($book) {
-      $self->logger->error("skill book '$name' was not found.");
+      $self->log_error("skill book '$name' was not found.");
       $self->reply->not_found;
     }
-    $self->logger->debug("retrieved skill book $book");
+    $self->log_debug("retrieved skill book $book");
 
     $self->stash(
       item     => $book,

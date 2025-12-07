@@ -27,34 +27,57 @@ package Game::EvonyTKR::External::General::Loader {
     $job->SUPER::run([$filename]);
     unless (defined($job->minion)) {
       my $errmessage = sprintf('minion undefined in job for %s', __PACKAGE__);
-      $job->logger->error($errmessage);
+      $job->log_error($errmessage);
       return $job->fail($errmessage);
     }
-    $job->logger->debug(sprintf(
+    $job->log_debug(sprintf(
       '%s log level is %s',
       __PACKAGE__, Log::Log4perl::Level::to_level($job->logger->level())
     ));
-    $job->logger->debug("Loading general from file: $filename");
+    $job->log_debug("Loading general from file: $filename");
 
     my $app = $job->app;
     my $collectionDir =
       Mojo::File->new($app->config('distDir'))->child('collections/data/');
     my $generalDir    = $collectionDir->child('generals');
     my @suffixList    = ('.yaml', '.yml');
+
+    $job->log_debug(sprintf(
+      'Searching for file matching "%s" in %s',
+      $filename, $generalDir
+    ));
+
     my ($generalFile) = $generalDir->list->grep(sub {
       my $nn = $job->normalize($filename);
       $nn = Mojo::File->new($nn)->basename(@suffixList);
       my $cf = $job->normalize($_->basename(@suffixList));
       if ($nn eq $cf) {
+        $job->log_debug(sprintf(
+          'Matched file: %s (normalized: "%s" == "%s")',
+          $_->to_string, $nn, $cf
+        ));
         return 1;
       }
       return 0;
     })->head(1)->each;
 
+    unless (defined $generalFile) {
+      my $available = join(', ',
+        map { $_->basename } $generalDir->list->grep(sub { $_ =~ /\.ya?ml$/ })->each
+      );
+      $job->log_error(sprintf(
+        'No file found matching "%s". Available files: %s',
+        $filename, $available
+      ));
+      return $job->fail("No general file found for: $filename");
+    }
+
     unless (-f $generalFile && -r $generalFile) {
-      $job->logger->error("Cannot read general file: $generalFile");
+      $job->log_error("Cannot read general file: $generalFile");
       return $job->fail("Cannot read general file: $generalFile");
     }
+
+    $job->log_info(sprintf('Loading general from: %s', $generalFile->to_string));
 
     my $data       = $generalFile->slurp('UTF-8');
     my $hashObject = YAML::PP->new(
@@ -64,7 +87,7 @@ package Game::EvonyTKR::External::General::Loader {
 
     my $general = Game::EvonyTKR::Model::General->from_hash($hashObject);
     unless ($general) {
-      $job->logger->error("Failed to import General from $generalFile");
+      $job->log_error("Failed to import General from $generalFile");
       return $job->fail("Failed to import General from $generalFile");
     }
 
@@ -83,7 +106,7 @@ package Game::EvonyTKR::External::General::Loader {
         $job->note(error => $errmessage);
         return $job->retry({ delay => 15 });
       }
-      $job->logger->error($errmessage);
+      $job->log_error($errmessage);
       return $job->fail($errmessage);
     }
 
@@ -97,7 +120,7 @@ package Game::EvonyTKR::External::General::Loader {
           $job->note(error => $errmessage);
           return $job->retry({ delay => 15 });
         }
-        $job->logger->error($errmessage);
+        $job->log_error($errmessage);
         return $job->fail($errmessage);
       }
     }
@@ -106,7 +129,7 @@ package Game::EvonyTKR::External::General::Loader {
     $job->add_general($general);
 
     my $message = sprintf('Successfully loaded general: %s', $general->name);
-    $job->logger->info($message);
+    $job->log_info($message);
     $job->note(general => $general);
     $job->finish($message);
   }

@@ -40,14 +40,14 @@ package Game::EvonyTKR::Controller::AscendingAttributes {
   }
 
   sub register($c, $app, $config = {}) {
-    $c->logger->info("Registering routes for " . __PACKAGE__);
+    $c->log_info("Registering routes for " . __PACKAGE__);
     $c->SUPER::register($app, $config);
 
     my $distDir    = Mojo::File::Share::dist_dir('Game::EvonyTKR');
     my $collection = $c->collection_name;
     my $SourceDir  = $distDir->child("collections/$collection");
 
-    $c->logger->info("Successfully loaded Ascending Attributes "
+    $c->log_info("Successfully loaded Ascending Attributes "
         . "manager with collection from $SourceDir");
 
     $app->helper(
@@ -76,7 +76,7 @@ package Game::EvonyTKR::Controller::AscendingAttributes {
 
     $app->helper(
       ascending_level_names => sub($self, $level = '', $printable = 0) {
-        $c->logger->debug(sprintf(
+        $c->log_debug(sprintf(
           'ascending_level_names helper started, level is %s, printable is %s',
           defined $level     ? $level     : '',
           defined $printable ? $printable : 0,
@@ -97,7 +97,7 @@ package Game::EvonyTKR::Controller::AscendingAttributes {
               $combined{$ln}++;
             }
             my @unique = sort keys(%combined);
-            $c->logger->debug("derived unique keys " . join(', ', @unique));
+            $c->log_debug("derived unique keys " . join(', ', @unique));
             return \@unique;
           }
           else {
@@ -113,7 +113,7 @@ package Game::EvonyTKR::Controller::AscendingAttributes {
               $combined{$ln}++;
             }
             my @unique = sort keys(%combined);
-            $c->logger->debug("derived unique keys " . join(', ', @unique));
+            $c->log_debug("derived unique keys " . join(', ', @unique));
             return \@unique;
           }
         }
@@ -140,11 +140,11 @@ package Game::EvonyTKR::Controller::AscendingAttributes {
 
     $app->helper(
       get_ascending_section => sub ($self, $name = '') {
-        $c->logger->debug(
+        $c->log_debug(
           sprintf('in get_ascending_section helper, self is %s ',
             blessed($self))
         );
-        $c->logger->debug(sprintf(
+        $c->log_debug(sprintf(
           'in get_ascending_section helper, c is %s, c->app is %s',
           blessed($c), defined($c->app) ? blessed($c->app) : 'undefined'
         ));
@@ -159,7 +159,7 @@ package Game::EvonyTKR::Controller::AscendingAttributes {
       if ( Scalar::Util::reftype($item)
         && Scalar::Util::reftype($item) eq 'HASH'
         && blessed($item) eq 'Game::EvonyTKR::Model::AscendingAttributes') {
-        $c->logger->debug("rendering get_ascending_section for $name");
+        $c->log_debug("rendering get_ascending_section for $name");
         return $caller->render_to_string(
           item     => $item,
           template => '/ascending attributes/details',
@@ -167,9 +167,9 @@ package Game::EvonyTKR::Controller::AscendingAttributes {
         );
       }
       else {
-        $c->logger->warn(
+        $c->log_warn(
           "get_ascending_section cannot find Ascending Attributes for $name");
-        $c->logger->debug(sprintf(
+        $c->log_debug(sprintf(
           "searching for $name, instead got %s %s",
           Scalar::Util::reftype($item) // '',
           blessed($item)               // ''
@@ -177,7 +177,7 @@ package Game::EvonyTKR::Controller::AscendingAttributes {
       }
     }
     else {
-      $c->logger->warn("cannot get_ascending_section without a name");
+      $c->log_warn("cannot get_ascending_section without a name");
     }
     return "";
   }
@@ -196,29 +196,29 @@ package Game::EvonyTKR::Controller::AscendingAttributes {
       $nn = lc($c->normalize($g));
     }
     $nn =~ s/ /_/g;
-    $c->logger->debug("looking for attributes for $nn");
+    $c->log_debug("looking for attributes for $nn");
 
     my $all = $c->get_all_ascending_attributes($app);
     my $aa  = $all->{$nn};
     unless (defined $aa) {
-      $c->logger->error(sprintf(
+      $c->log_error(sprintf(
         'no ascending attributes found for '
           . 'general named "%s" normalized to "%s"',
         $gn, $nn
       ));
-      $c->logger->debug(sprintf(
+      $c->log_debug(sprintf(
         'available ascending attributes are %s',
         join ', ', map { sprintf('"%s"', $_) } sort keys $all->%*
       ));
     }
-    $c->logger->debug(
+    $c->log_debug(
       sprintf('found %s for requested key %s', Data::Printer::np($aa), $nn));
     return $aa;
   }
 
   sub import_single_aa_file ($c, $app, $fileName, $delay) {
     my $all = $c->get_all_ascending_attributes();
-    $c->logger->debug("processing $fileName");
+    $c->log_debug("processing $fileName");
 
     my $data       = $fileName->slurp('UTF-8');
     my $hashObject = YAML::PP->new(
@@ -228,12 +228,12 @@ package Game::EvonyTKR::Controller::AscendingAttributes {
 
     my $aa = Game::EvonyTKR::Model::AscendingAttributes->from_hash($hashObject);
     unless ($aa) {
-      $c->logger->error(
+      $c->log_error(
         sprintf('failed to build ascending attribute from %s', $fileName));
       next;
     }
     $all->{ $c->SUPER::getConstants->normalize($aa->general) } = $aa;
-    $c->logger->debug(sprintf(
+    $c->log_debug(sprintf(
       'after delay of %s, imported "%s" as "%s" from "%s"',
       $delay, $aa->general, $c->normalize($aa->general), $fileName
     ));
@@ -244,7 +244,7 @@ package Game::EvonyTKR::Controller::AscendingAttributes {
     else {
       if ($c) {
         # the problem si that I'm getting to this error log line.
-        $c->logger->error(
+        $c->log_error(
           '$app was undefined.  $c is: ' . Scalar::Util::blessed($c));
       }
     }

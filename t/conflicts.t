@@ -26,8 +26,8 @@ my $builtin_books;
 my $logger = $testManager->get_logger;
 
 # Initialize persistence with SQLite connection
-my $db_path = 'var/persistence.db';
-my $sqlite = Mojo::SQLite->new("sqlite:$db_path");
+my $db_path     = 'var/persistence.db';
+my $sqlite      = Mojo::SQLite->new("sqlite:$db_path");
 my $persistence = Game::EvonyTKR::Service::Persistence->new(
   logger => $logger,
   sqlite => $sqlite,
@@ -43,12 +43,13 @@ sub are_generals_conflicting ($g1_name, $g2_name) {
 }
 
 subtest 'Data Setup' => sub {
-  ok($persistence, 'Persistence initialized');
+  ok($persistence,         'Persistence initialized');
   ok($persistence->sqlite, 'SQLite connection available');
 
   # Verify we have conflict data loaded
   my $db = $persistence->sqlite->db;
-  my $count = $db->query('SELECT COUNT(*) as cnt FROM general_conflicts')->hash->{cnt};
+  my $count =
+    $db->query('SELECT COUNT(*) as cnt FROM general_conflicts')->hash->{cnt};
   ok($count > 0, "Conflict data loaded ($count pairs)");
   isa_ok($testManager, ['Test::Package'], 'Test Package instantiated');
 
@@ -64,8 +65,10 @@ subtest 'Data Setup' => sub {
   );
 
   $covenants = $testManager->import_covenants();
-  ok(ref($covenants) && scalar(@$covenants),
-    sprintf('imported %s covenants', ref($covenants) ? scalar(@$covenants) : 0));
+  ok(
+    ref($covenants) && scalar(@$covenants),
+    sprintf('imported %s covenants', ref($covenants) ? scalar(@$covenants) : 0)
+  );
 
   $generic_books = $testManager->import_generic_books();
   ok(
@@ -85,29 +88,29 @@ subtest 'Data Setup' => sub {
 subtest 'Known Conflicts' => sub {
   # These pairs should conflict based on ML predictions
   my @known_conflicts = (
-    ['Aethelflaed', 'Caesar'],
-    ['Artemis','Barbarossa'],
-    ['Artemis','Beowulf'],
-    ['Artemis','Gaius Octavius'],
-    ['Artemis','George A Custer'],
-    ['Douglas', 'Marcus Agrippa'],
-    ['Elektra', 'Franz Joseph I'],
-    ['Hermes', 'Barbarossa'],
-    ['Hermes', 'King Arthur'],
-    ['Hermes', 'Washington Prime'],
-    ['Jayavarman II','Gaius Octavius'],
-    ['Laudon', 'Cheng Yaojin'],
-    ['Leonidas I', 'Jadwiga'],
-    ['Leonidas I', 'Lautaro'],
-    ['Leonidas I', 'Queen Boudica'],
-    ['Louis IX','Elektra'],
-    ['Louis IX','Franz Joseph I'],
-    ['Marco Polo', 'Gaius Octavius'],
-    ['Marco Polo','Jayavarman II'],
-    ['Washington Prime','Barbarossa'],
-    ['Washington Prime','George A Custer'],
-    ['Washington Prime','Haakon Haraldsson'],
-    ['Washington Prime','King Arthur'],
+    ['Aethelflaed',      'Caesar'],
+    ['Artemis',          'Barbarossa'],
+    ['Artemis',          'Beowulf'],
+    ['Artemis',          'Gaius Octavius'],
+    ['Artemis',          'George A Custer'],
+    ['Douglas',          'Marcus Agrippa'],
+    ['Elektra',          'Franz Joseph I'],
+    ['Hermes',           'Barbarossa'],
+    ['Hermes',           'King Arthur'],
+    ['Hermes',           'Washington Prime'],
+    ['Jayavarman II',    'Gaius Octavius'],
+    ['Laudon',           'Cheng Yaojin'],
+    ['Leonidas I',       'Jadwiga'],
+    ['Leonidas I',       'Lautaro'],
+    ['Leonidas I',       'Queen Boudica'],
+    ['Louis IX',         'Elektra'],
+    ['Louis IX',         'Franz Joseph I'],
+    ['Marco Polo',       'Gaius Octavius'],
+    ['Marco Polo',       'Jayavarman II'],
+    ['Washington Prime', 'Barbarossa'],
+    ['Washington Prime', 'George A Custer'],
+    ['Washington Prime', 'Haakon Haraldsson'],
+    ['Washington Prime', 'King Arthur'],
   );
 
   foreach my $pair (@known_conflicts) {
@@ -120,13 +123,13 @@ subtest 'Known Conflicts' => sub {
 subtest 'Known Compatible Pairs' => sub {
   # These pairs should be compatible based on ML predictions
   my @known_compatible = (
-    ['Aethelflaed', 'Artemis'],
-    ['Aethelflaed', 'Baibars'],
-    ['Artemis', 'Genghis Khan'],
-    ['Artemis', 'George Monck'],
-    ['Baibars', 'George Monck'],
+    ['Aethelflaed',  'Artemis'],
+    ['Aethelflaed',  'Baibars'],
+    ['Artemis',      'Genghis Khan'],
+    ['Artemis',      'George Monck'],
+    ['Baibars',      'George Monck'],
     ['Genghis Khan', 'George Monck'],
-    ['Hermes', 'Haakon Haraldsson'],
+    ['Hermes',       'Haakon Haraldsson'],
   );
 
   foreach my $pair (@known_compatible) {
@@ -137,7 +140,8 @@ subtest 'Known Compatible Pairs' => sub {
 };
 
 subtest 'CSV Passing Pairs' => sub {
-  my $mh = Mojo::File->new(Mojo::Home->new->detect('Game::EvonyTKR')->to_string());
+  my $mh =
+    Mojo::File->new(Mojo::Home->new->detect('Game::EvonyTKR')->to_string());
   my $training_data = $mh->child('share/training_data/');
 
   foreach my $file ($training_data->list->grep(qr/pairs$/)->each) {
@@ -150,16 +154,30 @@ subtest 'CSV Passing Pairs' => sub {
     };
 
     my @pairs;
-    while(my $line = <$fh>){
+    while (my $line = <$fh>) {
       chomp $line;
       my ($g1_name, $g2_name) = split /;/, $line;
       next unless $g1_name && $g2_name;
-      unless(any {lc($testManager->normalize($g1_name)) eq lc($testManager->normalize($_->name)) } $generals->@* ){
-        note(sprintf('skipping pair with primary general "%s", which was not loaded by the testManager', $g1_name));
+      unless (
+        any {
+          lc($testManager->normalize($g1_name)) eq
+            lc($testManager->normalize($_->name))
+        } $generals->@*
+      ) {
+        note(sprintf(
+'skipping pair with primary general "%s", which was not loaded by the testManager',
+          $g1_name));
         next;
       }
-      unless(any {lc($testManager->normalize($g2_name)) eq lc($testManager->normalize($_->name)) } $generals->@* ){
-        note(sprintf('skipping pair with secondary general "%s", which was not loaded by the testManager', $g2_name));
+      unless (
+        any {
+          lc($testManager->normalize($g2_name)) eq
+            lc($testManager->normalize($_->name))
+        } $generals->@*
+      ) {
+        note(sprintf(
+'skipping pair with secondary general "%s", which was not loaded by the testManager',
+          $g2_name));
         next;
       }
 
@@ -172,14 +190,15 @@ subtest 'CSV Passing Pairs' => sub {
       my $conflicts = are_generals_conflicting($g1_name, $g2_name);
       ok(!$conflicts, "$g1_name/$g2_name pair successfully");
     }
-    note(sprintf('Testing %s working pairs from %s.', scalar(@pairs), $file ));
+    note(sprintf('Testing %s working pairs from %s.', scalar(@pairs), $file));
   }
 
   done_testing();
 };
 
 subtest 'CSV Conflict Pairs' => sub {
-  my $mh = Mojo::File->new(Mojo::Home->new->detect('Game::EvonyTKR')->to_string());
+  my $mh =
+    Mojo::File->new(Mojo::Home->new->detect('Game::EvonyTKR')->to_string());
   my $csv_file = $mh->child('share/training_data/conflicting_pairs');
 
   unless (-f $csv_file) {
@@ -196,12 +215,26 @@ subtest 'CSV Conflict Pairs' => sub {
     chomp $line;
     my ($g1_name, $g2_name) = split /;/, $line;
     next unless $g1_name && $g2_name;
-    unless(any {lc($testManager->normalize($g1_name)) eq lc($testManager->normalize($_->name)) } $generals->@* ){
-      note(sprintf('skipping pair with primary general "%s", which was not loaded by the testManager', $g1_name));
+    unless (
+      any {
+        lc($testManager->normalize($g1_name)) eq
+          lc($testManager->normalize($_->name))
+      } $generals->@*
+    ) {
+      note(sprintf(
+'skipping pair with primary general "%s", which was not loaded by the testManager',
+        $g1_name));
       next;
     }
-    unless(any {lc($testManager->normalize($g2_name)) eq lc($testManager->normalize($_->name)) } $generals->@* ){
-      note(sprintf('skipping pair with secondary general "%s", which was not loaded by the testManager', $g2_name));
+    unless (
+      any {
+        lc($testManager->normalize($g2_name)) eq
+          lc($testManager->normalize($_->name))
+      } $generals->@*
+    ) {
+      note(sprintf(
+'skipping pair with secondary general "%s", which was not loaded by the testManager',
+        $g2_name));
       next;
     }
 

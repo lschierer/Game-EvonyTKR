@@ -201,13 +201,13 @@ __END__
     $secondarySummarizer->updateBuffs();
     my $primary   = $primarySummarizer->buffValues;
     my $secondary = $secondarySummarizer->buffValues;
-    $self->logger->debug("primary is " . Data::Printer::np($primary));
-    $self->logger->debug("secondary is " . Data::Printer::np($secondary));
+    $self->log_debug("primary is " . Data::Printer::np($primary));
+    $self->log_debug("secondary is " . Data::Printer::np($secondary));
 
     foreach my $category (keys %$primary) {
-      $self->logger->debug("computing buff total for category $category");
+      $self->log_debug("computing buff total for category $category");
       foreach my $type (keys %{ $primary->{$category} }) {
-        $self->logger->debug(
+        $self->log_debug(
           "computing buff total for category $category type $type");
         $total_computed_buffs_cache{$current_cache_key}->{buffValues}
           ->{$category}->{$type} =
@@ -224,9 +224,9 @@ __END__
     my $secondary = $secondarySummarizer->debuffValues;
 
     foreach my $category (keys %$primary) {
-      $self->logger->debug("calc debuffs for $category");
+      $self->log_debug("calc debuffs for $category");
       foreach my $type (keys %{ $primary->{$category} }) {
-        $self->logger->debug("calc debuffs for $type");
+        $self->log_debug("calc debuffs for $type");
         $total_computed_buffs_cache{$current_cache_key}->{debuffValues}
           ->{$category}->{$type} =
           $primary->{$category}->{$type} + $secondary->{$category}->{$type};
@@ -247,7 +247,7 @@ __END__
       if ($tt eq 'Wall Troops') {
         $tt = 'Overall';
       }
-      $self->logger->debug("looking for type $tt");
+      $self->log_debug("looking for type $tt");
     }
     return {
       primary             => $primary,

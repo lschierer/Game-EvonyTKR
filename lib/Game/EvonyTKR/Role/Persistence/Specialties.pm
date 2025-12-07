@@ -19,7 +19,7 @@ sub get_specialty ($self, $name) {
   $normalized_name =~ s/ /_/g;
 
   if (exists $specialties->{$normalized_name}) {
-    $self->logger->debug("Returning specialty $name from state cache");
+    $self->log_debug("Returning specialty $name from state cache");
     return $specialties->{$normalized_name};
   }
 

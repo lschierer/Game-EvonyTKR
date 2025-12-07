@@ -24,10 +24,10 @@ package Game::EvonyTKR::External::Covenant::LoadAll {
     $job->SUPER::run(@args);
     unless (defined($job->minion)) {
       my $errmessage = sprintf('minion undefined in job for %s', __PACKAGE__);
-      $job->logger->error($errmessage);
+      $job->log_error($errmessage);
       return $job->fail($errmessage);
     }
-    $job->logger->debug(sprintf(
+    $job->log_debug(sprintf(
       '%s log level is %s',
       __PACKAGE__, Log::Log4perl::Level::to_level($job->logger->level())
     ));
@@ -41,7 +41,7 @@ package Game::EvonyTKR::External::Covenant::LoadAll {
       ]
       ));
 
-    $job->logger->info('Starting load_all_covenants job');
+    $job->log_info('Starting load_all_covenants job');
 
     my $app = $job->app;
     my $collectionDir =
@@ -51,7 +51,7 @@ package Game::EvonyTKR::External::Covenant::LoadAll {
     my @files =
       $CovenantsDir->list->grep(sub { $_ =~ /\.ya?ml$/ && -f -r $_ })->each;
 
-    $job->logger->info(
+    $job->log_info(
       sprintf('Found %d Covenant files to process', scalar @files));
 
     my $enqueued_count = 0;
@@ -64,7 +64,7 @@ package Game::EvonyTKR::External::Covenant::LoadAll {
 
       # Check if already in persistence
       if ($job->get_covenant($covenant_name)) {
-        $job->logger->debug(sprintf(
+        $job->log_debug(sprintf(
           'Skipping %s - already in persistence', $covenant_name));
         $skipped_count++;
         next;
@@ -77,7 +77,7 @@ package Game::EvonyTKR::External::Covenant::LoadAll {
           priority => 20,
         }
       );
-      $job->logger->debug(sprintf(
+      $job->log_debug(sprintf(
         'Enqueued load_covenant job %s for file %s',
         $job_id, $file->basename
       ));
@@ -85,14 +85,14 @@ package Game::EvonyTKR::External::Covenant::LoadAll {
       $enqueued_count++;
     }
 
-    $job->logger->info(sprintf(
+    $job->log_info(sprintf(
       'Enqueued %d load_covenant jobs, skipped %d already in persistence',
       $enqueued_count, $skipped_count
     ));
 
     # Wait for all child jobs to complete
     if (@job_ids) {
-      $job->logger->info(
+      $job->log_info(
         sprintf('Waiting for %d child jobs to complete', scalar @job_ids));
 
       my $finished = 0;
@@ -122,7 +122,7 @@ package Game::EvonyTKR::External::Covenant::LoadAll {
         sleep 2;
       }
 
-      $job->logger->info(sprintf(
+      $job->log_info(sprintf(
         'Child jobs completed: %d finished, %d failed',
         $finished, $failed
       ));
@@ -146,12 +146,12 @@ package Game::EvonyTKR::External::Covenant::LoadAll {
         }
 
         if ($all_in_persistence) {
-          $job->logger->info('All covenants verified in persistence');
+          $job->log_info('All covenants verified in persistence');
           $verified = 1;
           last;
         }
 
-        $job->logger->debug(sprintf(
+        $job->log_debug(sprintf(
           'Persistence verification attempt %d/%d: %d covenants still missing',
           $attempt, $max_verify_attempts, $missing_count
         ));
@@ -161,7 +161,7 @@ package Game::EvonyTKR::External::Covenant::LoadAll {
       unless ($verified) {
         my $errmsg =
 'Failed to verify all covenants in persistence after child jobs finished';
-        $job->logger->error($errmsg);
+        $job->log_error($errmsg);
         return $job->fail($errmsg);
       }
     }
@@ -170,7 +170,7 @@ package Game::EvonyTKR::External::Covenant::LoadAll {
     $job->persistence->mark_job_completed($job->task_name);
 
     my $msg = 'load_all_covenants job completed';
-    $job->logger->info($msg);
+    $job->log_info($msg);
     $job->finish($msg);
   }
 }

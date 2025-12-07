@@ -36,7 +36,7 @@ package Game::EvonyTKR::Repo::Books::Generic {
     my $bytes = $self->{enc}->encode($wire);
     my $pr    = $self->{cache}
       ->set($self->cache_key_for($book->name, $book->level) => $bytes, $ttl);
-    $self->logger->debug(sprintf(
+    $self->log_debug(sprintf(
       'put result for %s was %s',
       sprintf('Level %s %s', $book->level, $book->name),
       defined($pr) ? $pr : 'undefined'

@@ -46,14 +46,14 @@ build: prepare deps css images ts mlModel
 
 dev: deps css images build
   rm -f "${HOME}/var/log/Perl/dist/Game-Evony/*.log"
-  watchexec --exts css,pm,ep,js,yaml -w lib/ -w bin/ -w share/templates/ -w share/public/ -w share/collections/data/ --restart morbo ./bin/game-evonytkr
+  MOJO_MODE=development MOJO_RENDERER_DEBUG=1  morbo -w templates -w share -w public ./bin/game-evonytkr
 
 quickdev:
   rm -vf "${HOME}/var/log/Perl/dist/Game-EvonyTKR/*.log"
   ./scripts/dev.sh
 
 deploy-dev: build
-  pnpm cdk --profile personal deploy --context env=dev
+  pnpm cdk --profile personal deploy --context env=dev evonytkrtips-dev-stack2
 
 deploy-prod: build
   pnpm cdk --profile personal deploy --context env=prod
@@ -67,4 +67,3 @@ mlModel:
   python bin/train_conflict_model.py     --training=training_data.csv     --model=conflict_model.pkl     --importance=feature_importance.csv
   perl bin/extract_conflict_features.pl --mode=predict --output=all_pairs.csv
   python bin/predict_conflicts.py     --model=conflict_model.pkl     --pairs=all_pairs.csv     --output=conflicts.json
-

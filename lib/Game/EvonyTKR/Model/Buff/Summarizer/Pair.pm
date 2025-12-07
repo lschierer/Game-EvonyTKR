@@ -49,7 +49,7 @@ sub updateBuffs ($self) {
     && ref($self->pair)
     && blessed($self->pair)
     && $self->pair->isa('Game::EvonyTKR::Model::General::Pair')) {
-    $self->logger->error(sprintf(
+    $self->log_error(sprintf(
       '%s requires a Game::EvonyTKR::Model::General::Pair',
       __PACKAGE__));
     return;
@@ -67,7 +67,7 @@ sub updateBuffs ($self) {
   $self->isPrimary(1);
   $self->SUPER::updateBuffs();
 
-  $self->logger->debug(sprintf('After primary updateBuffs: %s',
+  $self->log_debug(sprintf('After primary updateBuffs: %s',
     Data::Printer::np($self->buffValues, max_depth => 2)));
 
   foreach my $troopType (keys %{ $self->buffValues }) {
@@ -108,7 +108,7 @@ sub updateDebuffs ($self) {
     && ref($self->pair)
     && blessed($self->pair)
     && $self->pair->isa('Game::EvonyTKR::Model::General::Pair')) {
-    $self->logger->error(sprintf(
+    $self->log_error(sprintf(
       '%s requires a Game::EvonyTKR::Model::General::Pair',
       __PACKAGE__));
     return;
@@ -172,7 +172,7 @@ sub _getGenericBookValue_impl ($self, $attribute, $troopType) {
       );
     };
     if ($@) {
-      $self->logger->error("Cannot create books helper: $@");
+      $self->log_error("Cannot create books helper: $@");
       return $total;
     }
     $helper;
@@ -224,7 +224,7 @@ sub _getGenericBookValue_impl ($self, $attribute, $troopType) {
   my $book_priorities = $books_helper->BestSkillBooks->{$targetType}->{$key}
     // {};
 
-  $self->logger->debug(sprintf(
+  $self->log_debug(sprintf(
 'Pair getGenericBookValue: attr=%s, troopType=%s, targetType=%s, key=%s, found %d books',
     $attribute, $troopType, $targetType,
     $key,       scalar keys %$book_priorities
@@ -266,7 +266,7 @@ sub _getGenericBookValue_impl ($self, $attribute, $troopType) {
       $self->bc->is_general_and_book_compatible($other_general, $book,
       { same_side => 0 });
 
-    $self->logger->debug(sprintf(
+    $self->log_debug(sprintf(
 'Book %s for %s (%s): provides_attr=%d, compat_current=%d, compat_other=%d',
       $book->name,    $attribute,      $current_general->name,
       $provides_attr, $compat_current, $compat_other
@@ -278,7 +278,7 @@ sub _getGenericBookValue_impl ($self, $attribute, $troopType) {
         if ($buff->attribute eq $attribute
           && ($buff->targetedType // '') eq $troopType) {
           $total += $buff->value->number;
-          $self->logger->debug(sprintf(
+          $self->log_debug(sprintf(
             'Adding %d from %s for %s, total now %d',
             $buff->value->number,   $book->name,
             $current_general->name, $total

@@ -27,19 +27,19 @@ package Game::EvonyTKR::External::Covenant::Loader {
     $job->SUPER::run([$filename]);
     unless (defined($job->minion)) {
       my $errmessage = sprintf('minion undefined in job for %s', __PACKAGE__);
-      $job->logger->error($errmessage);
+      $job->log_error($errmessage);
       return $job->fail($errmessage);
     }
-    $job->logger->debug(sprintf(
+    $job->log_debug(sprintf(
       '%s log level is %s',
       __PACKAGE__, Log::Log4perl::Level::to_level($job->logger->level())
     ));
-    $job->logger->debug("Loading Covenant from file: $filename");
+    $job->log_debug("Loading Covenant from file: $filename");
 
     my $CovenantFile = Mojo::File->new(Encode::decode_utf8($filename));
 
     unless (-f $CovenantFile && -r $CovenantFile) {
-      $job->logger->error("Cannot read Covenant file: $CovenantFile");
+      $job->log_error("Cannot read Covenant file: $CovenantFile");
       return $job->fail("Cannot read Covenant file: $CovenantFile");
     }
 
@@ -86,12 +86,12 @@ package Game::EvonyTKR::External::Covenant::Loader {
     $job->note(Covenant => $covenant);
     my $complete =
       sprintf('finished loading covenant %s', $covenant->primary->name);
-    $job->logger->info($complete);
+    $job->log_info($complete);
     return $job->finish($complete);
   }
 
   sub run_fail ($job, @errors) {
-    $job->logger->error(join('; ', @errors));
+    $job->log_error(join('; ', @errors));
     $job->fail(join('; ', @errors));
   }
 }

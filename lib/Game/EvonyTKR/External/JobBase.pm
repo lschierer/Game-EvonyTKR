@@ -13,7 +13,7 @@ package Game::EvonyTKR::External::JobBase {
 
   sub task_name {
     my $class = shift;
-    $class->logger->logcroak(
+    $class->log_logcroak(
       sprintf('%s must implement task_name()', ref($class) || $class));
   }
 
@@ -23,12 +23,12 @@ package Game::EvonyTKR::External::JobBase {
     if (not defined($app)) {
       my $errmessage = 'app not defined in register for ' . __PACKAGE__;
       say $errmessage;
-      $plugin->logger->error($errmessage);
+      $plugin->log_error($errmessage);
       return;
     }
     unless (defined($app->minion)) {
       my $errmessage = sprintf('minion undefined in job for %s', __PACKAGE__);
-      $plugin->logger->error($errmessage);
+      $plugin->log_error($errmessage);
       say $errmessage;
       return;
     }
@@ -48,15 +48,15 @@ package Game::EvonyTKR::External::JobBase {
       return;
     }
     Game::EvonyTKR::Role::Logging::get_logger(__PACKAGE__);
-    $job->logger->debug("JobBase configured Logging in run.");
+    $job->log_debug("JobBase configured Logging in run.");
     unless (defined($job->app)) {
       my $errmessage = sprintf('app undefined in job for %s', __PACKAGE__);
-      $job->logger->error($errmessage);
+      $job->log_error($errmessage);
       return $job->fail($errmessage);
     }
     unless (defined($job->minion)) {
       my $errmessage = sprintf('minion undefined in job for %s', __PACKAGE__);
-      $job->logger->error($errmessage);
+      $job->log_error($errmessage);
       return $job->fail($errmessage);
     }
   }

@@ -22,10 +22,10 @@ package Game::EvonyTKR::External::General::BuildIndexes {
     $job->SUPER::run(@args);
     unless (defined($job->minion)) {
       my $errmessage = sprintf('minion undefined in job for %s', __PACKAGE__);
-      $job->logger->error($errmessage);
+      $job->log_error($errmessage);
       return $job->fail($errmessage);
     }
-    $job->logger->debug(sprintf(
+    $job->log_debug(sprintf(
       '%s log level is %s',
       __PACKAGE__, Log::Log4perl::Level::to_level($job->logger->level())
     ));
@@ -40,18 +40,18 @@ package Game::EvonyTKR::External::General::BuildIndexes {
       ]
       ));
 
-    $job->logger->info('Starting build_general_indexes job');
+    $job->log_info('Starting build_general_indexes job');
 
     my $app           = $job->app;
     my $general_names = $job->list_generals();
 
     unless ($general_names && @$general_names) {
       my $errmessage = 'No generals found to index';
-      $job->logger->error($errmessage);
+      $job->log_error($errmessage);
       return $job->fail($errmessage);
     }
 
-    $job->logger->info(
+    $job->log_info(
       sprintf('Building indexes for %d generals', scalar @$general_names));
 
     # Build type -> [keys] mapping
@@ -61,7 +61,7 @@ package Game::EvonyTKR::External::General::BuildIndexes {
     for my $name (@$general_names) {
       my $general = $job->get_general($name);
       unless ($general) {
-        $job->logger->warn(
+        $job->log_warn(
           sprintf('Could not fetch general "%s" from cache', $name));
         next;
       }
@@ -83,7 +83,7 @@ package Game::EvonyTKR::External::General::BuildIndexes {
       $indexed_count++;
     }
 
-    $job->logger->info(sprintf(
+    $job->log_info(sprintf(
       'Indexed %d generals into %d type categories',
       $indexed_count, scalar(keys %by_type)
     ));
@@ -97,13 +97,13 @@ package Game::EvonyTKR::External::General::BuildIndexes {
         require Mojo::JSON;
         my $json = Mojo::JSON::encode_json($keys_list);
         $job->persistence->set_metadata($type_key, $json);
-        $job->logger->debug(sprintf(
+        $job->log_debug(sprintf(
           'Stored index for type "%s" with %d generals',
           $type, scalar(@$keys_list)
         ));
       };
       if ($@) {
-        $job->logger->error(sprintf(
+        $job->log_error(sprintf(
           'Failed to store index for type "%s": %s', $type, $@));
       }
     }
@@ -116,13 +116,13 @@ package Game::EvonyTKR::External::General::BuildIndexes {
       $job->persistence->set_metadata('general_index:available_types', $json);
     };
     if ($@) {
-      $job->logger->error("Failed to store available_types: $@");
+      $job->log_error("Failed to store available_types: $@");
     }
 
     my $msg = sprintf(
       'build_general_indexes completed: %d generals indexed into %d types (%s)',
       $indexed_count, scalar(@type_list), join(', ', @type_list));
-    $job->logger->info($msg);
+    $job->log_info($msg);
     $job->note(
       indexed_count    => $indexed_count,
       types            => \@type_list,

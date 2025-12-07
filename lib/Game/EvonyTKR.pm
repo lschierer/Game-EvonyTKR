@@ -31,9 +31,10 @@ package Game::EvonyTKR {
   }
 
   sub startup ($app) {
-    $app->logger->debug('setting up logging');
+    # Set up Log::Any adapter BEFORE accessing $app->logger
     Log::Any::Adapter->set('Log4perl');
     $app->plugin('Log::Any' => { logger => 'Log::Log4perl' });
+    $app->log_debug('setting up logging');
     $app->log->info(sprintf('Mojolicious Logging initialized'));
 
     _init_core($app);    # runs in web *and* worker
@@ -51,7 +52,6 @@ package Game::EvonyTKR {
             return unless _this_proc_is_a_web_server($server); # has acceptors?
             return unless _i_am_the_one_spawner($app);         # spawn once only
             return if _this_is_a_minion_process(); # don't spawn from minion cmd
-
             _spawn_minion_workers($app);
           }
         );
@@ -205,7 +205,7 @@ package Game::EvonyTKR {
     };
 
     my @controllerplugins = find_modules 'Game::EvonyTKR::Controller';
-    $app->logger->info(
+    $app->log_info(
       sprintf('found %s controller plugins', scalar(@controllerplugins)));
     foreach my $module (@controllerplugins) {
       if (my $e = load_class($module)) {
@@ -218,9 +218,9 @@ package Game::EvonyTKR {
         next if ($module eq 'Game::EvonyTKR::Controller::ControllerBase');
         eval {
           $app->plugin($module);
-          $app->logger->debug("loaded $module");
+          $app->log_debug("loaded $module");
         } or do {
-          $app->logger->error(
+          $app->log_error(
             sprintf('failed to load module %s: %s', $module, $@));
         }
       }

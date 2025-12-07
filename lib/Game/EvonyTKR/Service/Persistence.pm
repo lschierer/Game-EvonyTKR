@@ -65,7 +65,7 @@ sub _initialize_schema ($self, $sqlite) {
   }
 
   if ($current_version == 0) {
-    $self->logger->info('Initializing persistence database schema');
+    $self->log_info('Initializing persistence database schema');
     $self->_create_schema_v1($db);
     $self->_set_metadata_direct($db, 'schema_version', $SCHEMA_VERSION);
 
@@ -74,7 +74,7 @@ sub _initialize_schema ($self, $sqlite) {
     $self->_set_metadata_direct($db, 'lifecycle_id', $new_lifecycle_id);
   }
   elsif ($current_version < $SCHEMA_VERSION) {
-    $self->logger->info(sprintf(
+    $self->log_info(sprintf(
       'Migrating persistence schema from v%d to v%d',
       $current_version, $SCHEMA_VERSION
     ));
@@ -210,7 +210,7 @@ sub _create_schema_v1 ($self, $db) {
   $db->query(
     'CREATE INDEX IF NOT EXISTS idx_pairs_lifecycle ON pairs(lifecycle_id)');
 
-  $self->logger->info('Schema v1 created successfully');
+  $self->log_info('Schema v1 created successfully');
 }
 
 sub _migrate_schema ($self, $db, $from_version, $to_version) {
@@ -225,7 +225,7 @@ sub _migrate_schema ($self, $db, $from_version, $to_version) {
 }
 
 sub _migrate_to_v2 ($self, $db) {
-  $self->logger->info('Migrating to schema v2: adding pairs table');
+  $self->log_info('Migrating to schema v2: adding pairs table');
 
   # Add pairs table
   $db->query(q{
@@ -245,11 +245,11 @@ sub _migrate_to_v2 ($self, $db) {
   $db->query(
     'CREATE INDEX IF NOT EXISTS idx_pairs_lifecycle ON pairs(lifecycle_id)');
 
-  $self->logger->info('Schema v2 migration completed');
+  $self->log_info('Schema v2 migration completed');
 }
 
 sub _migrate_to_v3 ($self, $db) {
-  $self->logger->info(
+  $self->log_info(
     'Migrating to schema v3: adding conflicts column to general_conflicts');
 
   # Add conflicts column (default 1 for existing rows which are all conflicts)
@@ -257,7 +257,7 @@ sub _migrate_to_v3 ($self, $db) {
     ALTER TABLE general_conflicts ADD COLUMN conflicts INTEGER NOT NULL DEFAULT 1
   });
 
-  $self->logger->info('Schema v3 migration completed');
+  $self->log_info('Schema v3 migration completed');
 }
 
 ##############################################################################
@@ -319,7 +319,7 @@ sub mark_job_completed ($self, $task_name, $notes = undef) {
   }, $task_name, $self->lifecycle_id, $notes
   );
 
-  $self->logger->debug("Marked job as completed: $task_name");
+  $self->log_debug("Marked job as completed: $task_name");
   return 1;
 }
 
@@ -359,7 +359,7 @@ sub clear_lifecycle_jobs ($self) {
   }, $self->lifecycle_id
   );
 
-  $self->logger->info('Cleared job completions from previous lifecycles');
+  $self->log_info('Cleared job completions from previous lifecycles');
   return 1;
 }
 
@@ -707,7 +707,7 @@ sub get_conflict ($self, $general1_name, $general2_name) {
   my ($name1, $name2) = sort ($norm1, $norm2);
 
   my $result = $db->query(
-    'SELECT conflicts FROM general_conflicts WHERE general1_name = ? AND general2_name = ?',
+'SELECT conflicts FROM general_conflicts WHERE general1_name = ? AND general2_name = ?',
     $name1, $name2
   )->hash;
 

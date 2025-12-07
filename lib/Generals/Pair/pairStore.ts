@@ -10,9 +10,11 @@ import { GeneralPair, GeneralPairStub } from '../GeneralRowSchemas';
 const GPSA = GeneralPairStub.array();
 type GPSA = z.infer<typeof GPSA>;
 
-// Stable row key: "Primary ␟ Secondary" (use a char you're sure won’t appear in names)
+// Stable row key: "Primary ␟ Secondary" (use a char you're sure won't appear in names)
 const SEP = '\u241F'; // SYMBOL FOR UNIT SEPARATOR
-export const pairKey = (p: string, s: string) => `${p}${SEP}${s}`;
+// Normalize to NFC to handle Unicode variants (e.g., Niccolò)
+export const pairKey = (p: string, s: string) =>
+  `${p.normalize('NFC')}${SEP}${s.normalize('NFC')}`;
 
 export type Key = string;
 
@@ -330,7 +332,10 @@ export class PairStore {
     };
 
     es.addEventListener('pair', (e: MessageEvent) => {
-      const jsonString = atob(e.data);
+      // Decode base64 properly handling UTF-8
+      const binaryString = atob(e.data);
+      const bytes = Uint8Array.from(binaryString, (c) => c.charCodeAt(0));
+      const jsonString = new TextDecoder('utf-8').decode(bytes);
       const msg = JSON.parse(jsonString);
       if (DEBUG) {
         console.log('parsed pair message:', msg);

@@ -11,7 +11,7 @@ package Game::EvonyTKR::Controller::Root {
   use Carp;
 
   sub register ($c, $app, $config = {}) {
-    $c->logger->info("Registering root landing page route");
+    $c->log_info("Registering root landing page route");
     $c->SUPER::register($app, $config);
 
     # Register the root route
@@ -57,10 +57,10 @@ package Game::EvonyTKR::Controller::Root {
     my $home       = Mojo::Home->new->detect;
     my $index_path = $home->child('share/pages/index.md');
 
-    $c->logger->debug("Rendering root index from $index_path");
+    $c->log_debug("Rendering root index from $index_path");
 
     unless (-f $index_path) {
-      $c->logger->error("Root index.md not found at $index_path");
+      $c->log_error("Root index.md not found at $index_path");
       return $c->render(
         template => 'markdown',
         layout   => 'default',
@@ -71,13 +71,12 @@ package Game::EvonyTKR::Controller::Root {
     unless ($index_path && ref($index_path) && $index_path->isa('Mojo::File')) {
       $index_path = Mojo::File->new($index_path);
     }
-    $c->logger->debug(sprintf('root index is a "%s"',
+    $c->log_debug(sprintf('root index is a "%s"',
         $index_path->isa('Mojo::File') ? 'Mojo::File'
       : ref($index_path)               ? ref($index_path)
       :                                  'scalar'));
 
-    return $c->render_markdown_page($c->app, $index_path,
-      { template => 'root/index' });
+    return $c->render_markdown_page($index_path, { template => 'root/index' });
   }
 }
 

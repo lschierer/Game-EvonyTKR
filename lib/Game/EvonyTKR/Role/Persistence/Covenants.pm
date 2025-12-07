@@ -17,7 +17,7 @@ sub get_covenant ($self, $name) {
   my $normalized_name = $self->normalize($name);
 
   if (exists $covenants->{$normalized_name}) {
-    $self->logger->debug("Returning covenant $name from state cache");
+    $self->log_debug("Returning covenant $name from state cache");
     return $covenants->{$normalized_name};
   }
 

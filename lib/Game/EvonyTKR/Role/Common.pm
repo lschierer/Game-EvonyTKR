@@ -95,13 +95,13 @@ package Game::EvonyTKR::Role::Common {
       $self->can('retry') && $self->can('fail') && $self->can('note');
 
     unless ($minion) {
-      $self->logger->error(
+      $self->log_error(
         'must provide a minion process in which to search for jobs.');
       return 1;
     }
 
     if (scalar(@{$prereq_tasks}) == 0) {
-      $self->logger->error('prereq tasks must be defined.');
+      $self->log_error('prereq tasks must be defined.');
       return 1;
     }
 
@@ -156,7 +156,7 @@ package Game::EvonyTKR::Role::Common {
     }
 
     # Log prereq states
-    $self->logger->debug(
+    $self->log_debug(
       sprintf('prereqs are in states %s',
         Data::Printer::np($prereqs, multiline => 0))
     );
@@ -165,7 +165,7 @@ package Game::EvonyTKR::Role::Common {
     if (@failed_tasks) {
       my $errmessage = sprintf('Cannot proceed: prerequisite job(s) failed: %s',
         join(', ', @failed_tasks));
-      $self->logger->error($errmessage);
+      $self->log_error($errmessage);
       return $is_minion_job ? $self->fail($errmessage) : 1;
     }
 
@@ -177,7 +177,7 @@ package Game::EvonyTKR::Role::Common {
 
         # Calculate retry delay based on number of outstanding prereqs
         my $delay = min(2 * scalar(@outstanding), 30);
-        $self->logger->debug(sprintf(
+        $self->log_debug(sprintf(
           'Retrying with delay %s due to outstanding prereqs: %s',
           $delay, join(', ', @outstanding)
         ));

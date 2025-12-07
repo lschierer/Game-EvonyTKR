@@ -435,7 +435,7 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
 
     # Debug logging
     foreach my $error_line (@err) {
-      $self->logger->error("STDERR: $error_line");
+      $self->log_error("STDERR: $error_line");
     }
     # Note, we will output STDOUT after parsing it below.
 

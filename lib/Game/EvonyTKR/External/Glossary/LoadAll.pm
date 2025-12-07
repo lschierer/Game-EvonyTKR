@@ -16,19 +16,19 @@ package Game::EvonyTKR::External::Glossary::LoadAll {
     if (not defined($app)) {
       my $errmessage = 'app not defined in register for ' . __PACKAGE__;
       say $errmessage;
-      $taskClass->logger->error($errmessage);
+      $taskClass->log_error($errmessage);
       return;
     }
     unless (defined($app->minion)) {
       my $errmessage = sprintf('minion undefined in job for %s', __PACKAGE__);
-      $taskClass->logger->error($errmessage);
+      $taskClass->log_error($errmessage);
       say $errmessage;
       return;
     }
-    $taskClass->logger->debug('Registering Glossary LoadAll task');
+    $taskClass->log_debug('Registering Glossary LoadAll task');
     $app->minion->add_task($taskClass->task_name => __PACKAGE__);
 
-    $taskClass->logger->info(sprintf('emitting signal for %s', __PACKAGE__));
+    $taskClass->log_info(sprintf('emitting signal for %s', __PACKAGE__));
     my $signal = __PACKAGE__ =~ s/::/_/gr;
     $app->plugins->emit($signal => 1);
   }
@@ -41,11 +41,11 @@ package Game::EvonyTKR::External::Glossary::LoadAll {
     $job->SUPER::run(@args);
     unless (defined($job->minion)) {
       my $errmessage = sprintf('minion undefined in job for %s', __PACKAGE__);
-      $job->logger->error($errmessage);
+      $job->log_error($errmessage);
       return $job->fail($errmessage);
     }
 
-    $job->logger->info('Starting load_all_glossary_terms job');
+    $job->log_info('Starting load_all_glossary_terms job');
 
     # Find glossary YAML files
     my $mh =
@@ -54,7 +54,7 @@ package Game::EvonyTKR::External::Glossary::LoadAll {
 
     unless (-d $glossary_dir) {
       my $errmsg = "Glossary directory not found: $glossary_dir";
-      $job->logger->error($errmsg);
+      $job->log_error($errmsg);
       return $job->fail($errmsg);
     }
 
@@ -62,18 +62,18 @@ package Game::EvonyTKR::External::Glossary::LoadAll {
       $_ =~ /\.ya?ml$/ && -f -r $_ && $_ !~ /schema/;
     })->each;
 
-    $job->logger->info(
+    $job->log_info(
       sprintf('Found %d glossary YAML files', scalar(@yaml_files)));
 
     my $yp          = YAML::PP->new();
     my $total_terms = 0;
 
     foreach my $file (@yaml_files) {
-      $job->logger->debug("Processing $file");
+      $job->log_debug("Processing $file");
 
       my $data = eval { $yp->load_file($file->to_string) };
       if ($@) {
-        $job->logger->error("Failed to parse $file: $@");
+        $job->log_error("Failed to parse $file: $@");
         next;
       }
 
@@ -97,7 +97,7 @@ package Game::EvonyTKR::External::Glossary::LoadAll {
       }
     }
 
-    $job->logger->info("Loaded $total_terms glossary terms");
+    $job->log_info("Loaded $total_terms glossary terms");
     $job->note(total_terms => $total_terms);
 
     # Mark this job as completed in persistence

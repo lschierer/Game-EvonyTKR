@@ -68,7 +68,7 @@ package Game::EvonyTKR::Model::BasicAttribute {
     }
 
     if (scalar @errors >= 1) {
-      $self->logger->logcroak(join ', ', @errors);
+      $self->log_logcroak(join ', ', @errors);
     }
   }
 
@@ -97,7 +97,7 @@ package Game::EvonyTKR::Model::BasicAttribute {
       push @errors, "increment must be positive, not $newIncrement";
     }
     if (scalar @errors >= 1) {
-      $self->logger->error(join(', ', @errors));
+      $self->log_error(join(', ', @errors));
       return;
     }
     else {
@@ -128,7 +128,7 @@ package Game::EvonyTKR::Model::BasicAttribute {
       ) / 100,
       3
     );
-    $self->logger->debug(sprintf(
+    $self->log_debug(sprintf(
       'found total basic %s attribute value of "%s" for "%s"',
       $self->attribute_name, $result, $name
     ));
@@ -140,7 +140,7 @@ package Game::EvonyTKR::Model::BasicAttribute {
     my @classList  = split(/::/, $otherClass);
     if ($classList[2] ne 'BasicAttribute') {
       my $od = Data::Printer::p $other;
-      $self->logger->error(sprintf(
+      $self->log_error(sprintf(
         'Game::EvonyTKR::Model::BasicAttribute '
           . 'comparison operator cannot take a %s',
         $od
@@ -156,7 +156,7 @@ package Game::EvonyTKR::Model::BasicAttribute {
       my $mt = $self->total();
       my $ot = $other->total();
       if ($self->attribute_name() cmp $other->attribute_name()) {
-        $self->logger->warn(sprintf(
+        $self->log_warn(sprintf(
           'you probably did not intend to compare '
             . 'to different attributes: %s %s',
           $self->attribute_name(),
@@ -174,7 +174,7 @@ package Game::EvonyTKR::Model::BasicAttribute {
       my @classList = split(/::/, $otherClass);
       if ($classList[2] ne 'BasicAttribute') {
         my $od = Data::Printer::p $other;
-        $self->logger->error(sprintf(
+        $self->log_error(sprintf(
           'Game::EvonyTKR::Model::BasicAttribute '
             . 'equality operator cannot take a %s',
           $od
@@ -204,7 +204,7 @@ package Game::EvonyTKR::Model::BasicAttribute {
     my @classList  = split(/::/, $otherClass);
     if ($classList[2] ne 'BasicAttribute') {
       my $od = Data::Printer::p $other;
-      $self->logger->error(sprintf(
+      $self->log_error(sprintf(
         'Game::EvonyTKR::Model::BasicAttribute '
           . 'inequality operator cannot take a %s',
         $od

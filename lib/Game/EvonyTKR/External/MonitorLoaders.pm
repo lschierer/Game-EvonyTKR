@@ -22,10 +22,10 @@ package Game::EvonyTKR::External::MonitorLoaders {
     $job->SUPER::run([]);
     unless (defined($job->minion)) {
       my $errmessage = sprintf('minion undefined in job for %s', __PACKAGE__);
-      $job->logger->error($errmessage);
+      $job->log_error($errmessage);
       return $job->fail($errmessage);
     }
-    $job->logger->debug(sprintf(
+    $job->log_debug(sprintf(
       '%s log level is %s',
       __PACKAGE__, Log::Log4perl::Level::to_level($job->logger->level())
     ));
@@ -41,7 +41,7 @@ package Game::EvonyTKR::External::MonitorLoaders {
       ]
       );
 
-    $job->logger->info('All loader jobs completed');
+    $job->log_info('All loader jobs completed');
 
     # Mark job as completed in persistence
     $job->persistence->mark_job_completed($job->task_name);

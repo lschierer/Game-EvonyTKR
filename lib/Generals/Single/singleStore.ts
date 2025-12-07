@@ -308,7 +308,10 @@ export class GeneralStore {
     };
 
     es.addEventListener('row', (e: MessageEvent) => {
-      const jsonString = atob(e.data);
+      // Decode base64 properly handling UTF-8
+      const binaryString = atob(e.data);
+      const bytes = Uint8Array.from(binaryString, (c) => c.charCodeAt(0));
+      const jsonString = new TextDecoder('utf-8').decode(bytes);
       const msg = JSON.parse(jsonString);
       if (DEBUG) {
         console.log('parsed row message:', msg);

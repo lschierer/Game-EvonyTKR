@@ -20,7 +20,7 @@ package Game::EvonyTKR::Controller::ConflictGroups {
   }
 
   sub register($c, $app, $config = {}) {
-    $c->logger->info("Registering routes for " . __PACKAGE__);
+    $c->log_info("Registering routes for " . __PACKAGE__);
     $c->SUPER::register($app, $config);
 
     my $routes          = $app->routes->any($base);
@@ -57,15 +57,15 @@ package Game::EvonyTKR::Controller::ConflictGroups {
 
   sub index ($c) {
     return if $c->check_prereqs_or_wait($c->prereqs);
-    $c->logger->debug("Rendering conflict groups index");
+    $c->log_debug("Rendering conflict groups index");
 
     my $detector = $c->get_conflict_detector();
 
-    $c->logger->debug(sprintf('there are %s generals in the by_general index',
+    $c->log_debug(sprintf('there are %s generals in the by_general index',
       scalar keys $detector->by_general->%*));
     my $groups = $detector->groups_by_conflict_type;
     my $pairs  = $detector->by_general;
-    $c->logger->debug('conflict groups controller index handler sees '
+    $c->log_debug('conflict groups controller index handler sees '
         . Data::Printer::np($pairs));
 
     $c->stash(

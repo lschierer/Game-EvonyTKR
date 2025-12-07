@@ -24,19 +24,19 @@ package Game::EvonyTKR::External::General::Pair::CreatePairs {
     $job->SUPER::run([$general_name, $type]);
     unless (defined($job->minion)) {
       my $errmessage = sprintf('minion undefined in job for %s', __PACKAGE__);
-      $job->logger->error($errmessage);
+      $job->log_error($errmessage);
       return $job->fail($errmessage);
     }
-    $job->logger->debug(sprintf(
+    $job->log_debug(sprintf(
       '%s log level is %s',
       __PACKAGE__, Log::Log4perl::Level::to_level($job->logger->level())
     ));
-    $job->logger->debug(
+    $job->log_debug(
       "Creating pairs for general: $general_name, type: $type");
 
     # Validate the type
     unless ($job->ValidateGeneralType($type)) {
-      $job->logger->error("Invalid general type: $type");
+      $job->log_error("Invalid general type: $type");
       return $job->fail("Invalid general type: $type");
     }
 
@@ -48,7 +48,7 @@ package Game::EvonyTKR::External::General::Pair::CreatePairs {
       grep { $job->normalize($general_name) eq $job->normalize($_->name) }
       $generals->@*;
     unless ($primary) {
-      $job->logger->error("General '$general_name' not found");
+      $job->log_error("General '$general_name' not found");
       return $job->fail("General '$general_name' not found");
     }
     $primary->populateBuiltinBook();
@@ -56,7 +56,7 @@ package Game::EvonyTKR::External::General::Pair::CreatePairs {
     unless ($primary->builtInBook) {
       my $errmessage = sprintf('failed to populate builtInBook %s for %s',
         $primary->builtInBookName, $primary->name);
-      $job->logger->error($errmessage);
+      $job->log_error($errmessage);
       return $job->fail($errmessage);
     }
 
@@ -68,7 +68,7 @@ package Game::EvonyTKR::External::General::Pair::CreatePairs {
       unless ($general->builtInBook) {
         my $errmessage = sprintf('failed to populate builtInBook %s for %s',
           $general->builtInBookName, $general->name);
-        $job->logger->error($errmessage);
+        $job->log_error($errmessage);
         next;
       }
 
@@ -81,7 +81,7 @@ package Game::EvonyTKR::External::General::Pair::CreatePairs {
       }
     }
 
-    $job->logger->info(sprintf(
+    $job->log_info(sprintf(
       'Found %d generals of type %s to pair with %s',
       scalar @matching_generals,
       $type, $general_name
@@ -90,7 +90,7 @@ package Game::EvonyTKR::External::General::Pair::CreatePairs {
     # Initialize conflict detector
     my $conflict_detector = $job->initialize_conflict_detector();
     my $initial_conflicts = scalar(keys %{ $conflict_detector->by_general });
-    $job->logger->info(
+    $job->log_info(
       sprintf('Initialized conflict detector with %d existing conflicts',
         $initial_conflicts)
     );
@@ -124,7 +124,7 @@ package Game::EvonyTKR::External::General::Pair::CreatePairs {
       if ( $job->persistence->get_pair($pair_key_ab)
         || $job->persistence->get_pair($pair_key_ba)) {
         $skipped_existing++;
-        $job->logger->debug(sprintf(
+        $job->log_debug(sprintf(
           'Pair relationship already exists: %s <-> %s (type: %s)',
           $primary->name, $secondary->name, $type
         ));
@@ -135,7 +135,7 @@ package Game::EvonyTKR::External::General::Pair::CreatePairs {
       $compatibility_checks++;
       my $pre_cache_hits = $conflict_detector->cache_hits;
 
-      $job->logger->debug(sprintf(
+      $job->log_debug(sprintf(
         'Testing compatibility: %s <-> %s',
         $primary->name, $secondary->name
       ));
@@ -147,7 +147,7 @@ package Game::EvonyTKR::External::General::Pair::CreatePairs {
           $conflict_cache_hits++;
         }
 
-        $job->logger->debug(sprintf(
+        $job->log_debug(sprintf(
           'Conflict detected: %s <-> %s',
           $primary->name, $secondary->name
         ));
@@ -162,7 +162,7 @@ package Game::EvonyTKR::External::General::Pair::CreatePairs {
       $job->add_wire_pair($pair_ab);
       $job->add_wire_pair($pair_ba);
 
-      $job->logger->info(sprintf(
+      $job->log_info(sprintf(
         'Created bidirectional pairs: %s <-> %s (type: %s)',
         $pair_ab->{primary}, $pair_ab->{secondary}, $type
       ));
@@ -182,7 +182,7 @@ package Game::EvonyTKR::External::General::Pair::CreatePairs {
     }
 
     # Note: stored count includes duplicates, actual new conflicts will be less
-    $job->logger->debug(sprintf('Stored %d conflict records to persistence',
+    $job->log_debug(sprintf('Stored %d conflict records to persistence',
       $new_conflicts_stored));
 
     # Return conflict data in notes for monitor job to merge
@@ -202,7 +202,7 @@ package Game::EvonyTKR::External::General::Pair::CreatePairs {
       type                    => $type,
     );
 
-    $job->logger->info(sprintf(
+    $job->log_info(sprintf(
 'CreatePairs completed for %s/%s: %d pairs, %d conflicts (%d cache hits), %d skipped, %d compatibility checks of %d candidates',
       $general_name,         $type,
       scalar @pairs,         $conflicts_found,

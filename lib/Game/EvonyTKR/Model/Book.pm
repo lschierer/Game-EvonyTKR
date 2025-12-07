@@ -30,7 +30,7 @@ package Game::EvonyTKR::Model::Book {
     $conditions       = [],
     $debuffConditions = [],
   ) {
-    $self->logger->debug(sprintf(
+    $self->log_debug(sprintf(
       'Calculating buffs for "%s", attribute: "%s"',
       $self->name, $attribute
     ));
@@ -58,15 +58,15 @@ package Game::EvonyTKR::Model::Book {
         $logID
       )) {
         my $val = $b->value->number;
-        $self->logger->debug("  ➤ Match found. Adding $val to total.");
+        $self->log_debug("  ➤ Match found. Adding $val to total.");
         $total += $val;
       }
       else {
-        $self->logger->debug("  ✗ No match found.");
+        $self->log_debug("  ✗ No match found.");
       }
     }
 
-    $self->logger->debug(sprintf(
+    $self->log_debug(sprintf(
       '"%s": total for attribute "%s": "%s"',
       $self->name, $attribute, $total
     ));
@@ -74,22 +74,22 @@ package Game::EvonyTKR::Model::Book {
   }
 
   sub addBuff ($self, $newBuff) {
-    $self->logger->debug(sprintf('addBuff called for book "%s"', $self->name));
+    $self->log_debug(sprintf('addBuff called for book "%s"', $self->name));
 
     if (!defined $newBuff) {
-      $self->logger->warn("addBuff: newBuff is undefined");
+      $self->log_warn("addBuff: newBuff is undefined");
       return;
     }
 
     my $reftype = Scalar::Util::reftype($newBuff);
     my $blessed = Scalar::Util::blessed($newBuff);
 
-    $self->logger->debug(sprintf(
+    $self->log_debug(sprintf(
       'addBuff: newBuff reftype="%s", blessed="%s"',
       $reftype, ($blessed // 'undef')
     ));
     unless ($blessed && $newBuff->isa('Game::EvonyTKR::Model::Buff')) {
-      $self->logger->logcroak(sprintf(
+      $self->log_logcroak(sprintf(
         'not adding totally bogus buff: reftype="%s", blessed="%s"',
         $reftype, ($blessed // 'undef')
       ));
@@ -97,32 +97,32 @@ package Game::EvonyTKR::Model::Book {
     }
 
     my $classList = $blessed;
-    $self->logger->debug(sprintf(
+    $self->log_debug(sprintf(
       'Adding buff of class "%s" to book "%s"',
       $classList, $self->name
     ));
 
     my @classStack = split(/::/, $classList);
-    $self->logger->debug("Class stack: " . join(", ", @classStack));
+    $self->log_debug("Class stack: " . join(", ", @classStack));
 
     if (scalar @classStack > 3) {
       if ($classStack[3] eq 'Buff') {
-        $self->logger->debug(sprintf('adding %s to %s', $newBuff, $self->name));
+        $self->log_debug(sprintf('adding %s to %s', $newBuff, $self->name));
 
         push @{ $self->buffs }, $newBuff;
-        $self->logger->debug(sprintf(
+        $self->log_debug(sprintf(
           'Book "%s" now has "%s" buffs',
           $self->name, scalar @{ $self->buffs }
         ));
       }
       else {
-        $self->logger->warn(sprintf(
+        $self->log_warn(sprintf(
           'Not adding buff: class stack position 2 is "%s" not "Buff"',
           $classStack[2]));
       }
     }
     else {
-      $self->logger->warn(
+      $self->log_warn(
         "Not adding buff: class stack has fewer than 3 elements");
     }
 
@@ -151,7 +151,7 @@ package Game::EvonyTKR::Model::Book {
         sprintf('$text must contain a string, not %s', $self->text);
     }
     if (@errors) {
-      $self->logger->logcroak(join ', ', @errors);
+      $self->log_logcroak(join ', ', @errors);
       return;
     }
   }

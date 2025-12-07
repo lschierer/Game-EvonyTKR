@@ -26,25 +26,13 @@ package Game::EvonyTKR::Controller::Specialties {
     return "Specialties";
   }
 
-  sub get_all_specialties ($c, $app) {
-    state %specialties;    # normalized_name -> object
-    state $sig;            # signature of expected set we’ve fully hydrated
-
-    return $c->_hydrate_from_list(
-      $app,
-      sub ($app2) { $c->list_specialties() },      # list provider
-      sub ($name) { $c->get_specialty($name) },    # fetch one
-      \%specialties,
-      \$sig,
-    );
-  }
 
   sub register($c, $app, $config = {}) {
-    $c->logger->info("Registering routes for " . __PACKAGE__);
+    $c->log_info("Registering routes for " . __PACKAGE__);
     $c->SUPER::register($app, $config);
 
     unless (defined($app)) {
-      $c->logger->logcroak('$app is not defined in ' . __PACKAGE__);
+      $c->log_logcroak('$app is not defined in ' . __PACKAGE__);
     }
 
     $app->add_navigation_item({
@@ -62,7 +50,7 @@ package Game::EvonyTKR::Controller::Specialties {
       ? $c->controller_name()
       : $baseClass;
 
-    $c->logger->debug("got controller_name $controller_name.");
+    $c->log_debug("got controller_name $controller_name.");
 
     my $mainRoutes = $app->routes->any($base);
 
@@ -70,17 +58,8 @@ package Game::EvonyTKR::Controller::Specialties {
       ->to(controller => $controller_name, action => 'index')
       ->name("${base}_index");
 
-    Mojo::IOLoop->timer(
-      60 => sub {
-        $c->build_routes($app, $mainRoutes, $controller_name);
-      }
-    );
-
-    $app->helper(
-      get_all_specialties => sub {
-        return values $c->get_all_specialties($app)->%*;
-      }
-    );
+    # Build routes synchronously during app startup
+    $c->build_routes($app, $mainRoutes, $controller_name);
 
     $app->helper(
       specialty_level_names => sub ($self, $level = '', $printable = 0) {
@@ -89,7 +68,7 @@ package Game::EvonyTKR::Controller::Specialties {
           my $nameList = [];
           foreach
             my $orig_name ($c->SUPER::getConstants->SpecialtyLevelValues->@*) {
-            $c->logger->debug(
+            $c->log_debug(
               "specialty_level_names evaluating specialty level name $orig_name"
             );
             my $name;
@@ -104,7 +83,7 @@ package Game::EvonyTKR::Controller::Specialties {
           return $nameList;
         }
         else {
-          $c->logger->debug(
+          $c->log_debug(
             "specialty_level_names sees levels"
               . Data::Printer::np(
               $c->SUPER::getConstants->SpecialtyLevelValues->@*
@@ -121,8 +100,16 @@ package Game::EvonyTKR::Controller::Specialties {
   }
 
   sub build_routes ($c, $app, $mainRoutes, $controller_name) {
-    my $specialties = $c->get_all_specialties($app);
-    foreach my $specialty (values $specialties->%*) {
+    my $specialties = [];
+    foreach my $sn ($c->list_specialties->@*) {
+      my $specialty = $c->get_specialty($sn);
+      unless($specialty){
+        $c->log_error(sprintf('failed to get listed specialty "%s"', $sn));
+        next;
+      }
+      push @{ $specialties }, $specialty;
+    }
+    foreach my $specialty (@$specialties) {
       my $name = $specialty->name;
 
       my $clean_name = $name;
@@ -139,7 +126,7 @@ package Game::EvonyTKR::Controller::Specialties {
         order  => 40,
       });
 
-      $c->logger->debug(
+      $c->log_debug(
         sprintf('added route and nav item for name "%s" ', $name)
           . sprintf(
           'cleaned to "%s" with path "%s/%s"',
@@ -173,7 +160,7 @@ package Game::EvonyTKR::Controller::Specialties {
 
   sub index($c) {
     my $collection = collection_name();
-    $c->logger->debug("Rendering index for $collection");
+    $c->log_debug("Rendering index for $collection");
 
     # Check if markdown exists for this collection
     my $distDir       = Mojo::File::Share::dist_dir('Game::EvonyTKR');
@@ -182,11 +169,19 @@ package Game::EvonyTKR::Controller::Specialties {
     my @parts     = split(/::/, ref($c));
     my $baseClass = pop(@parts);
     my $base      = $c->getBase();
-    $c->logger->debug("Specialties index method has base $base");
+    $c->log_debug("Specialties index method has base $base");
 
     my $items;
-    @{$items} = values $c->get_all_specialties($c->app)->%*;
-    $c->logger->debug(
+    my $specialties = [];
+    foreach my $sn ($c->list_specialties->@*) {
+      my $specialty = $c->get_specialty($sn);
+      unless($specialty){
+        $c->log_error(sprintf('failed to get listed specialty "%s"', $sn));
+        next;
+      }
+      push @{ $items }, $specialty;
+    }
+    $c->log_debug(
       sprintf('Items: %s with %s items.', ref($items), scalar(@$items)));
     $c->stash(
       linkBase        => $base,
@@ -209,17 +204,17 @@ package Game::EvonyTKR::Controller::Specialties {
   }
 
   sub show ($c) {
-    $c->logger->debug("start of show method");
+    $c->log_debug("start of show method");
     my $name = $c->param('name');
-    $c->logger->debug("show detects name $name, showing details.");
+    $c->log_debug("show detects name $name, showing details.");
 
     my $specialty = $c->get_specialty($name);
 
     unless ($specialty) {
-      $c->logger->error("specialty '$name' was not found.");
+      $c->log_error("specialty '$name' was not found.");
       return $c->reply->not_found;
     }
-    $c->logger->debug("retrieved specialty $specialty");
+    $c->log_debug("retrieved specialty $specialty");
 
     $c->stash(
       item     => $specialty,

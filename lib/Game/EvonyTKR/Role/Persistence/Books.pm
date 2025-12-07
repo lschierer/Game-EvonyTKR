@@ -19,13 +19,13 @@ sub get_builtin_book ($self, $name) {
 
   state $builtin_books = {};
 
-  $self->logger->debug("get_builtin_book called for: $name");
+  $self->log_debug("get_builtin_book called for: $name");
 
   my $key = $name =~ s/ /_/gr;
   $key = $self->normalize($key);
 
   if (exists $builtin_books->{$key}) {
-    $self->logger->debug("Returning builtin book $name from state cache");
+    $self->log_debug("Returning builtin book $name from state cache");
     return $builtin_books->{$key};
   }
 
@@ -33,7 +33,7 @@ sub get_builtin_book ($self, $name) {
   my $wire_data = $self->persistence->get_builtin_book($name);
 
   unless (defined($wire_data)) {
-    $self->logger->warn("No wire_data found for key: $key");
+    $self->log_warn("No wire_data found for key: $key");
     return;
   }
 
@@ -41,11 +41,11 @@ sub get_builtin_book ($self, $name) {
     Game::EvonyTKR::Model::Factory->build_from_wire('Book', $wire_data);
 
   unless (defined($book)) {
-    $self->logger->error("Factory failed to build book from wire_data");
+    $self->log_error("Factory failed to build book from wire_data");
     return;
   }
 
-  $self->logger->debug("Successfully built book: " . $book->name);
+  $self->log_debug("Successfully built book: " . $book->name);
   $builtin_books->{$key} = $book;
   return $book;
 }
@@ -88,7 +88,7 @@ sub get_generic_book ($self, $name, $level) {
   $key = sprintf('%s_level_%s', $key, $level);
 
   if (exists $generic_books->{$key}) {
-    $self->logger->debug("Returning generic book $name from state cache");
+    $self->log_debug("Returning generic book $name from state cache");
     return $generic_books->{$key};
   }
 

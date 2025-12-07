@@ -50,7 +50,7 @@ package Game::EvonyTKR::Model::AscendingAttributes {
       $self->AscendingAttributeLevelValues(1)
     );
     lock_keys(%h);
-    $self->logger->debug('h with empty levels is ' . Data::Printer::np(%h));
+    $self->log_debug('h with empty levels is ' . Data::Printer::np(%h));
     return \%h;
   }
 
@@ -88,7 +88,7 @@ package Game::EvonyTKR::Model::AscendingAttributes {
     return 0 unless exists $level_index{$level};
 
     my $target_index = $level_index{$level};
-    $self->logger->debug(
+    $self->log_debug(
       "my ascending hash looks like " . Data::Printer::np($self->attributes));
     my $total = 0;
     for my $i (1 .. $target_index) {    # skip index 0 ('None')
@@ -166,14 +166,14 @@ package Game::EvonyTKR::Model::AscendingAttributes {
   sub addBuff ($self, $level, $nb) {
     my $red = 1;
     if (!blessed($nb) || blessed($nb) ne "Game::EvonyTKR::Model::Buff") {
-      $self->logger->error(sprintf(
+      $self->log_error(sprintf(
         'attempting to add buff of type %s not "Game::EvonyTKR::Model::Buff"',
         !blessed($nb) ? Scalar::Util::reftype($nb) : blessed($nb)));
       exit 0;
     }
 
     if ($level !~ /(purple|red)[0-9]{1}/i) {
-      $self->logger->error(sprintf(
+      $self->log_error(sprintf(
         'level should be one of %s, not %s',
         join(
           ', ',
@@ -190,7 +190,7 @@ package Game::EvonyTKR::Model::AscendingAttributes {
       $red = 0;
     }
     if (none { $_ eq $level } $self->AscendingAttributeLevelValues($red)) {
-      $self->logger->debug(
+      $self->log_debug(
         "$level must be one of "
           . join(
           ', ',
@@ -204,7 +204,7 @@ package Game::EvonyTKR::Model::AscendingAttributes {
     }
 
     push @{ $self->attributes->{$level}->{buffs} }, $nb;
-    $self->logger->debug("$level now has "
+    $self->log_debug("$level now has "
         . scalar @{ $self->attributes->{$level}->{buffs} }
         . " buffs");
     return scalar @{ $self->attributes->{$level}->{buffs} };

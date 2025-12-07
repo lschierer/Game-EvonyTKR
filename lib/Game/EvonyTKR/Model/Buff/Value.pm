@@ -37,7 +37,7 @@ package Game::EvonyTKR::Model::Buff::Value {
     }
 
     if (scalar @errors >= 1) {
-      $self->logger->error(join ', ', @errors);
+      $self->log_error(join ', ', @errors);
       croak(join ', ', @errors);
       return;
     }

@@ -9,7 +9,7 @@ use Mojo::Base -role, -signatures;
 
 sub load_best_skill_books ($self, $general, $targetType, $activationType,
   $desiredCount = 3) {
-  $self->logger->info(sprintf(
+  $self->log_info(sprintf(
     'finding best %s skill books for %s',
     $activationType, $general->name
   ));
@@ -43,10 +43,10 @@ sub load_best_skill_books ($self, $general, $targetType, $activationType,
     my $base_name = $book_name =~ s/^Level \d+ //r;
     my $book      = $self->get_generic_book($base_name, $level);
     unless ($book && ref($book) && $book->isa('Game::EvonyTKR::Model::Book')) {
-      $self->logger->error("Cannot find $book_name");
+      $self->log_error("Cannot find $book_name");
       next;
     }
-    $self->logger->info(
+    $self->log_info(
       sprintf('Picked book "%s" for "%s"', $book_name, $general->name));
     push @books, $book;
     last if (scalar @books >= $desiredCount);    # Single general gets 3 books
@@ -75,7 +75,7 @@ sub load_mandatory_skill_books ($self) {
       if (!scalar(@books)) {
         my $book = $self->get_generic_book($book_name, $level);
         unless ($book) {
-          $self->logger->error("Cannot find $book_name");
+          $self->log_error("Cannot find $book_name");
           next;
         }
         push @books, $book;
@@ -83,7 +83,7 @@ sub load_mandatory_skill_books ($self) {
       elsif (none { $_->name eq $book_name } @books) {
         my $book = $self->get_generic_book($book_name, $level);
         unless ($book) {
-          $self->logger->error("Cannot find $book_name");
+          $self->log_error("Cannot find $book_name");
           next;
         }
         push @books, $book;

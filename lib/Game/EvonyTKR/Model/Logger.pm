@@ -32,12 +32,12 @@ class Game::EvonyTKR::Model::Logger {
     return $log;
   }
 
-  method trace { $self->logger->debug(@_) }
-  method debug { $self->logger->debug(@_) }
-  method info  { $self->logger->info(@_) }
-  method warn  { $self->logger->warn(@_) }
-  method error { $self->logger->error(@_) }
-  method fatal { $self->logger->error(@_) }
+  method trace { $self->log_debug(@_) }
+  method debug { $self->log_debug(@_) }
+  method info  { $self->log_info(@_) }
+  method warn  { $self->log_warn(@_) }
+  method error { $self->log_error(@_) }
+  method fatal { $self->log_error(@_) }
 
   # Normalize $level to a constant if a string is given
   method _norm_level ($level) {

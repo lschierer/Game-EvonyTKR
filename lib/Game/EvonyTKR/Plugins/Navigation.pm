@@ -26,14 +26,14 @@ package Game::EvonyTKR::Plugins::Navigation {
       $self->debug_log_level(),
       $self->debug_log_category()
     );
-    $self->logger->info($register_message);
+    $self->log_info($register_message);
 
     $app->helper(
       add_navigation_item => sub {
         my ($c, $item) = @_;
 
         unless (ref $item eq 'HASH' && $item->{path}) {
-          $self->logger->error(
+          $self->log_error(
             "Invalid item (missing path): " . Data::Printer::np($item));
           return;
         }
@@ -41,16 +41,16 @@ package Game::EvonyTKR::Plugins::Navigation {
         my $path = $item->{path};
 
         # DEBUG: Log all paths being registered
-        $self->logger->debug(
+        $self->log_debug(
           "NAVIGATION: Registering path '$path' with title '$item->{title}'");
 
         if ($rejected_items_by_path->{$path}) {
-          $self->logger->debug("Skipping rejected path $path");
+          $self->log_debug("Skipping rejected path $path");
           return;
         }
 
         unless (exists $item->{title}) {
-          $self->logger->error("Item rejected: missing title for $path");
+          $self->log_error("Item rejected: missing title for $path");
           return;
         }
 
@@ -67,7 +67,7 @@ package Game::EvonyTKR::Plugins::Navigation {
             $nav_items_by_path{$path} = $item;
           }
           elsif (!exists $existing->{order}) {
-            $self->logger->error(
+            $self->log_error(
               "Duplicate navigation item at $path without order");
           }
         }
@@ -171,7 +171,7 @@ package Game::EvonyTKR::Plugins::Navigation {
       $a->{order} <=> $b->{order}
         || lc($a->{title}) cmp lc($b->{title})
     } @result;
-    $self->logger->debug(
+    $self->log_debug(
       "_prune_and_sort returning result " . Data::Printer::np(@result));
     return \@result;
   }

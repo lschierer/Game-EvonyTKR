@@ -92,7 +92,7 @@ package Game::EvonyTKR::Role::Constants::BuffConstants {
   has 'AttributeValues' => sub ($self) {
     my @av;
     push @av, sort keys $self->attributeValues->%*;
-    $self->logger->debug(sprintf('there are %s attribute values', scalar @av));
+    $self->log_debug(sprintf('there are %s attribute values', scalar @av));
     return \@av;
   };
 

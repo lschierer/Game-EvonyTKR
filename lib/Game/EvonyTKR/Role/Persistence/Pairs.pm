@@ -48,7 +48,7 @@ sub add_wire_pair ($self, $wire_pair) {
   # Store to SQLite
   eval { $self->persistence->store_pair($key, $wire_pair); };
   if ($@) {
-    $self->logger->error("Failed to store pair to persistence: $@");
+    $self->log_error("Failed to store pair to persistence: $@");
     return 0;
   }
 
@@ -65,17 +65,17 @@ sub get_pair ($self, $key) {
   my $wire_pair;
   eval { $wire_pair = $self->persistence->get_pair($key); };
   if ($@) {
-    $self->logger->error("Failed to get pair from persistence: $@");
+    $self->log_error("Failed to get pair from persistence: $@");
   }
 
   unless ($wire_pair) {
-    $self->logger->warn(sprintf('cannot find pair for key %s', $key));
+    $self->log_warn(sprintf('cannot find pair for key %s', $key));
     return;
   }
 
   my $pair = Game::EvonyTKR::Model::General::Pair->from_wire_hash($wire_pair);
   unless ($pair) {
-    $self->logger->error(sprintf(
+    $self->log_error(sprintf(
       'cannot create pair from wire_pair %s/%s/%s; key %s',
       $wire_pair->{type},      $wire_pair->{primary},
       $wire_pair->{secondary}, $key
@@ -86,7 +86,7 @@ sub get_pair ($self, $key) {
 }
 
 sub get_pairs_by_type ($self) {
-  state $inflated_pairs = {};
+  state $inflated_pairs  = {};
   state $all_pairs_built = 0;
 
   # If pair building is complete and we've already cached, return cache
@@ -95,7 +95,8 @@ sub get_pairs_by_type ($self) {
   }
 
   # Check if pair building is complete
-  my $building_complete = $self->persistence->get_metadata('pair_building_complete');
+  my $building_complete =
+    $self->persistence->get_metadata('pair_building_complete');
 
   # Load from SQLite
   my $pairs_by_type = {};
@@ -104,20 +105,20 @@ sub get_pairs_by_type ($self) {
     foreach my $type (@$all_types) {
       my $type_pairs = $self->persistence->list_pairs_by_type($type);
       $pairs_by_type->{$type} = $type_pairs;
-      $self->logger->debug(sprintf(
+      $self->log_debug(sprintf(
         'Loaded %d pairs of type %s from persistence',
         scalar(@$type_pairs), $type
       ));
     }
   };
   if ($@) {
-    $self->logger->error("Failed to load pairs_by_type from persistence: $@");
+    $self->log_error("Failed to load pairs_by_type from persistence: $@");
   }
 
   # Inflate pairs
   $inflated_pairs = {};
   foreach my $type (sort keys %$pairs_by_type) {
-    $self->logger->debug(sprintf(
+    $self->log_debug(sprintf(
       'Inflating %s pairs for type %s',
       scalar(@{ $pairs_by_type->{$type} }), $type
     ));
@@ -151,7 +152,7 @@ sub get_pair_list ($self, $requested_type = undef) {
 
   foreach my $type (keys($pairs_by_type->%*)) {
     if (defined $requested_type && $type ne $requested_type) {
-      $self->logger->debug(sprintf(
+      $self->log_debug(sprintf(
         'skipping type %s as it does not match requested type %s',
         $type, $requested_type
       ));
@@ -184,13 +185,13 @@ sub validatePairParams($self, $ascendingLevel, $primaryCovenantLevel,
   my $data_model = Game::EvonyTKR::Model::Data->new();
 
   if (!$data_model->checkAscendingLevel($ascendingLevel)) {
-    $self->logger->warn(
+    $self->log_warn(
       "Invalid ascendingLevel: $ascendingLevel, using default 'red5'");
     $ascendingLevel = 'none';
   }
 
   if (!$self->checkCovenantLevel($primaryCovenantLevel)) {
-    $self->logger->warn(
+    $self->log_warn(
       sprintf('Invalid covenantLevel: %s, using default "civilization"',
         $primaryCovenantLevel)
     );
@@ -201,7 +202,7 @@ sub validatePairParams($self, $ascendingLevel, $primaryCovenantLevel,
     $data_model->normalizeSpecialtyLevels(@$primarySpecialties);
 
   if (!$self->checkCovenantLevel($secondaryCovenantLevel)) {
-    $self->logger->warn(
+    $self->log_warn(
       sprintf('Invalid covenantLevel: %s, using default "civilization"',
         $secondaryCovenantLevel)
     );

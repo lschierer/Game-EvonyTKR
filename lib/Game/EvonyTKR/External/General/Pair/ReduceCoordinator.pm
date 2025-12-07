@@ -50,7 +50,7 @@ package Game::EvonyTKR::External::General::Pair::ReduceCoordinator {
       $processed->{$batch_id}++;
       $new_batches++;
 
-      $job->logger->debug("Processing batch results for job $batch_id");
+      $job->log_debug("Processing batch results for job $batch_id");
       $job->cache_conflict_results($batch_id);
       $job->cache_pair_results($batch_id);
     });
@@ -82,7 +82,7 @@ package Game::EvonyTKR::External::General::Pair::ReduceCoordinator {
       ? sprintf("%.1f%%", ($total_cache_hits / $total_conflicts) * 100)
       : "N/A";
 
-    $job->logger->info(sprintf(
+    $job->log_info(sprintf(
       "Cache effectiveness: %d cache hits out of %d total conflicts (%s)",
       $total_cache_hits, $total_conflicts, $cache_effectiveness
     ));
@@ -98,7 +98,7 @@ package Game::EvonyTKR::External::General::Pair::ReduceCoordinator {
       $job->persistence->set_metadata('conflict_building_complete', '1');
       my $cc = 1;    # Always succeeds with SQLite
 
-      $job->logger->info(sprintf(
+      $job->log_info(sprintf(
 "Cache set results: pair_building_complete=%s, conflict_building_complete=%s",
         defined($pc) ? ($pc ? 'success' : 'failed') : 'undef',
         defined($cc) ? ($cc ? 'success' : 'failed') : 'undef'
@@ -109,7 +109,7 @@ package Game::EvonyTKR::External::General::Pair::ReduceCoordinator {
       $cc_verify =
         $job->persistence->get_metadata('conflict_building_complete');
 
-      $job->logger->info(sprintf(
+      $job->log_info(sprintf(
 "Cache verification: pair_building_complete=%s, conflict_building_complete=%s",
         defined($pc_verify) ? $pc_verify : 'undef',
         defined($cc_verify) ? $cc_verify : 'undef'
@@ -137,7 +137,7 @@ package Game::EvonyTKR::External::General::Pair::ReduceCoordinator {
     # Check if batch was skipped due to all cache hits
     if ( $batch_results->{skipped_reason}
       && $batch_results->{skipped_reason} eq 'all_cache_hits') {
-      $job->logger->debug(
+      $job->log_debug(
         "Batch $batch_id was skipped (all cache hits), nothing to merge");
       $total_cache_hits += $batch_results->{total_cache_hits} // 0;
       return;
@@ -192,7 +192,7 @@ package Game::EvonyTKR::External::General::Pair::ReduceCoordinator {
     # Check if batch was skipped - no pairs to process
     if ( $batch_results->{skipped_reason}
       && $batch_results->{skipped_reason} eq 'all_cache_hits') {
-      $job->logger->debug(
+      $job->log_debug(
         "Batch $batch_id was skipped (all cache hits), no pairs to merge");
       return;
     }

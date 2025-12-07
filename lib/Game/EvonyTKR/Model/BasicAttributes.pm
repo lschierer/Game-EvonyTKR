@@ -48,7 +48,7 @@ package Game::EvonyTKR::Model::BasicAttributes {
 
   sub setAttribute($self, $attributeName, $newAttribute) {
     if (none { $_ =~ $attributeName } $self->BasicAttributeTypes) {
-      $self->logger->error(sprintf(
+      $self->log_error(sprintf(
         'attributeName must be one of %s, not %s',
         Data::Printer::np($self->BasicAttributeTypes),
         $attributeName,
@@ -58,7 +58,7 @@ package Game::EvonyTKR::Model::BasicAttributes {
 
     unless (ref($newAttribute)
       && $newAttribute->isa('Game::EvonyTKR::Model::BasicAttribute')) {
-      $self->logger->error(sprintf(
+      $self->log_error(sprintf(
         'newAttribute must be a %s not a %s',
         'Game::EvonyTKR::Model::BasicAttribute',
         blessed $newAttribute
@@ -69,7 +69,7 @@ package Game::EvonyTKR::Model::BasicAttributes {
       $self->$attributeName($newAttribute);
     }
     else {
-      $self->logger->error(sprintf(
+      $self->log_error(sprintf(
         'cannot find method "%s" in "%s"',
         $attributeName, blessed($self)
       ));

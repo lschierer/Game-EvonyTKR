@@ -67,26 +67,36 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
     }
 
     if (scalar(@errmessage)) {
-      $job->logger->error(join ' ', @errmessage);
+      $job->log_error(join ' ', @errmessage);
       $job->fail(join ' ', @errmessage);
       return;
     }
 
     # Get both generals
-    my $primary = $job->get_general($primaryName);
+    $job->log_debug(sprintf(
+      'Getting primary general "%s" (normalized: "%s")',
+      $primaryName, $job->normalize($primaryName)
+    ));
+    my $primary = $job->get_general(lc($job->normalize($primaryName)));
     unless ($primary) {
       my $err = sprintf('Cannot retrieve primary general: %s', $primaryName);
-      $job->logger->error($err);
+      $job->log_error($err);
       return $job->fail($err);
     }
+    $job->log_debug(sprintf('Got primary general: %s', $primary->name));
 
-    my $secondary = $job->get_general($secondaryName);
+    $job->log_debug(sprintf(
+      'Getting secondary general "%s" (normalized: "%s")',
+      $secondaryName, $job->normalize($secondaryName)
+    ));
+    my $secondary = $job->get_general(lc($job->normalize($secondaryName)));
     unless ($secondary) {
       my $err =
         sprintf('Cannot retrieve secondary general: %s', $secondaryName);
-      $job->logger->error($err);
+      $job->log_error($err);
       return $job->fail($err);
     }
+    $job->log_debug(sprintf('Got secondary general: %s', $secondary->name));
 
     # Get the pair object
     my $pair = $job->get_pair($job->wire_pair_to_key({
@@ -99,19 +109,27 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
       my $err = sprintf(
         'Cannot retrieve pair for primary "%s", secondary "%s", type "%s"',
         $primaryName, $secondaryName, $params->{targetType});
-      $job->logger->error($err);
+      $job->log_error($err);
       return $job->fail($err);
     }
 
     # Get covenants
+    $job->log_debug(sprintf('Getting covenant for primary: %s', $primaryName));
     my $primaryCovenant = $job->get_covenant($primaryName);
     unless ($primaryCovenant) {
-      $job->logger->warn("No covenant found for primary $primaryName");
+      $job->log_warn("No covenant found for primary $primaryName");
+    }
+    else {
+      $job->log_debug(sprintf('Got covenant for primary: %s', $primaryName));
     }
 
+    $job->log_debug(sprintf('Getting covenant for secondary: %s', $secondaryName));
     my $secondaryCovenant = $job->get_covenant($secondaryName);
     unless ($secondaryCovenant) {
-      $job->logger->warn("No covenant found for secondary $secondaryName");
+      $job->log_warn("No covenant found for secondary $secondaryName");
+    }
+    else {
+      $job->log_debug(sprintf('Got covenant for secondary: %s', $secondaryName));
     }
 
     # Get ascending attributes (primary only)
@@ -121,7 +139,7 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
         my $errmessage =
           sprintf('Failed to get ascending attributes for primary "%s"',
           $pair->primary->name);
-        $job->logger->error($errmessage);
+        $job->log_error($errmessage);
         $job->fail($errmessage);
       }
     }
@@ -143,7 +161,7 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
       $pair->secondary->specialties->@*);
 
     # Debug: verify specialties are loaded
-    $job->logger->debug(sprintf(
+    $job->log_debug(sprintf(
       'Primary %s has %d specialties, Secondary %s has %d specialties',
       $pair->primary->name,   scalar($pair->primary->specialties->@*),
       $pair->secondary->name, scalar($pair->secondary->specialties->@*)
@@ -155,7 +173,7 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
     $params->{pair} = $pair;
     # Convert targetType to proper troop type key
     $params->{targetType} = $job->string_to_trooptype($params->{targetType});
-    $job->logger->debug(sprintf(
+    $job->log_debug(sprintf(
       '%s using tt %s to retrieve results',
       __PACKAGE__, $params->{targetType}
     ));
@@ -183,11 +201,14 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
     );
 
     # Create summarizer
+    $job->log_debug('Creating pair summarizer');
     my $summarizer =
       Game::EvonyTKR::Model::Buff::Summarizer::Pair->new($params->%*);
 
     # Compute buffs and debuffs
+    $job->log_debug('Computing buffs');
     $summarizer->updateBuffs();
+    $job->log_debug('Computing debuffs');
     $summarizer->updateDebuffs();
 
     # Load full general objects for serialization
@@ -202,6 +223,12 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
     # Flatten buffs/debuffs to match client schema
     my $buffs   = $summarizer->pairBuffValues;
     my $debuffs = $summarizer->pairDebuffValues;
+
+    $job->log_debug(sprintf(
+      'Buff values for %s/%s: %s',
+      $primaryName, $secondaryName,
+      Data::Printer::np($buffs, multiline => 0)
+    ));
 
     # Return results
     $job->finish({
@@ -247,7 +274,7 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
       my $em = sprintf('job id %s cannot find a valid Pair for params %s',
         $job->info->{id}, Data::Printer::np($params, multiline => 0));
 
-      $job->logger->error($em);
+      $job->log_error($em);
       return $job->fail($em);
     }
 
@@ -261,7 +288,7 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
           join ', ',
           map { sprintf('"%s"', $_) } $job->AscendingAttributeLevelValues(1),
         );
-        $job->logger->error($em);
+        $job->log_error($em);
         return $job->fail($em);
       }
     }
@@ -274,7 +301,7 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
           join ', ',
           map { sprintf('"%s"', $_) } $job->AscendingAttributeLevelValues(0),
         );
-        $job->logger->error($em);
+        $job->log_error($em);
         return $job->fail($em);
       }
     }
@@ -289,7 +316,7 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
           join ', ',
           map { sprintf('"%s"', $_) } $job->CovenantCategoryValues->@*
         );
-        $job->logger->error($em);
+        $job->log_error($em);
         return $job->fail($em);
       }
     }
@@ -302,7 +329,7 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
           'primary specialty%d level "%s" is invalid, must be one of %s',
           $index, $specialtyLevel, join ', ',
           map { sprintf('"%s"', $_) } $job->SpecialtyLevelValues->@*);
-        $job->logger->error($em);
+        $job->log_error($em);
         return $job->fail($em);
       }
     }
@@ -315,7 +342,7 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
           'secondary specialty%d level "%s" is invalid, must be one of %s',
           $index, $specialtyLevel, join ', ',
           map { sprintf('"%s"', $_) } $job->SpecialtyLevelValues->@*);
-        $job->logger->error($em);
+        $job->log_error($em);
         return $job->fail($em);
       }
     }

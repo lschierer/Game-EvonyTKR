@@ -25,10 +25,10 @@ package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
     $job->SUPER::run(@args);
     unless (defined($job->minion)) {
       my $errmessage = sprintf('minion undefined in job for %s', __PACKAGE__);
-      $job->logger->error($errmessage);
+      $job->log_error($errmessage);
       return $job->fail($errmessage);
     }
-    $job->logger->debug(sprintf(
+    $job->log_debug(sprintf(
       '%s log level is %s',
       __PACKAGE__, Log::Log4perl::Level::to_level($job->logger->level())
     ));
@@ -43,12 +43,12 @@ package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
       ]
       );
 
-    $job->logger->info('Starting LoadAllPairBuilders job');
+    $job->log_info('Starting LoadAllPairBuilders job');
 
     # Get all generals from cache
     my $generals = $job->get_generals();
 
-    $job->logger->info(
+    $job->log_info(
       sprintf('Found %d generals to process', scalar @$generals));
 
     # Spawn CreatePairs jobs for each general/type combination
@@ -82,7 +82,7 @@ package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
             priority => $priority,
           }
         );
-        $job->logger->debug(sprintf(
+        $job->log_debug(sprintf(
           'Enqueued create_pairs job %s for general %s, type %s (priority %d)',
           $job_id, $general->name, $type, $priority
         ));
@@ -113,7 +113,7 @@ package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
                 priority => 50,
               }
             );
-            $job->logger->debug(sprintf(
+            $job->log_debug(sprintf(
               'Spawned type-balanced reduce_batch job %s '
                 . 'for batch %d (%d jobs)',
               $reduce_jid, ++$batch_count, scalar(@current_batch)
@@ -146,13 +146,13 @@ package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
           priority => 50,
         }
       );
-      $job->logger->debug(sprintf(
+      $job->log_debug(sprintf(
 'Spawned final type-balanced reduce_batch job %s for batch %d (%d jobs)',
         $reduce_jid, ++$batch_count, scalar(@current_batch)
       ));
     }
 
-    $job->logger->info(sprintf(
+    $job->log_info(sprintf(
 'LoadAllPairBuilders completed: spawned %d create_pairs jobs in %d batches',
       $job_count, $batch_count
     ));

@@ -55,7 +55,7 @@ has TRIADS => sub { {
 
 # Main conflict detection
 sub are_generals_compatible ($self, $g1, $g2) {
-  $self->logger->debug(sprintf('testing %s and %s', $g1->name, $g2->name));
+  $self->log_debug(sprintf('testing %s and %s', $g1->name, $g2->name));
 
   # Check cache first (includes ML predictions loaded from persistence)
   my $cached = $self->_check_cache($g1, $g2);
@@ -67,7 +67,7 @@ sub are_generals_compatible ($self, $g1, $g2) {
 
   return 1 unless $self->_troop_overlap($g1, $g2);
 
-  $self->logger->debug(sprintf(
+  $self->log_debug(sprintf(
     'No cached result, using rule-based detection for %s ↔ %s',
     $g1->name, $g2->name
   ));
@@ -93,7 +93,7 @@ sub are_generals_compatible ($self, $g1, $g2) {
   for my $b1 (@{ $g1->builtInBook->buffs }) {
     for my $b2 (@{ $g2->builtInBook->buffs }) {
       if ($comparator->conflicts($b1, $b2, $g1, $g2)) {
-        $self->logger->debug(sprintf(
+        $self->log_debug(sprintf(
           '%s/%s conflict: %s vs %s (conds: [%s] vs [%s])',
           $g1->name, $g2->name, $b1->attribute, $b2->attribute,
           join(',', @{ $b1->conditions // [] }),
@@ -130,7 +130,7 @@ sub load_from_persistence ($self, $persistence) {
   if ($conflicts && ref($conflicts) eq 'HASH') {
     $self->by_general($conflicts);
     my $count = scalar(keys %$conflicts);
-    $self->logger->debug(
+    $self->log_debug(
       "Loaded conflicts for $count generals from persistence");
   }
 
@@ -194,7 +194,7 @@ sub _record_compatible ($self, $g1, $g2) {
   my $norm1 = $self->normalize($g1->name);
   my $norm2 = $self->normalize($g2->name);
 
-  $self->logger->debug(
+  $self->log_debug(
     sprintf('Recording compatible: %s ↔ %s', $norm1, $norm2));
 
   $self->by_general->{$norm1}{$norm2} = 0;

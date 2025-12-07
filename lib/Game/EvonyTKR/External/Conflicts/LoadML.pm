@@ -16,19 +16,19 @@ package Game::EvonyTKR::External::Conflicts::LoadML {
     if (not defined($app)) {
       my $errmessage = 'app not defined in register for ' . __PACKAGE__;
       say $errmessage;
-      $taskClass->logger->error($errmessage);
+      $taskClass->log_error($errmessage);
       return;
     }
     unless (defined($app->minion)) {
       my $errmessage = sprintf('minion undefined in job for %s', __PACKAGE__);
-      $taskClass->logger->error($errmessage);
+      $taskClass->log_error($errmessage);
       say $errmessage;
       return;
     }
-    $taskClass->logger->debug('Registering ML Conflicts Loader task');
+    $taskClass->log_debug('Registering ML Conflicts Loader task');
     $app->minion->add_task($taskClass->task_name => __PACKAGE__);
 
-    $taskClass->logger->info(sprintf('emitting signal for %s', __PACKAGE__));
+    $taskClass->log_info(sprintf('emitting signal for %s', __PACKAGE__));
     my $signal = __PACKAGE__ =~ s/::/_/gr;
     $app->plugins->emit($signal => 1);
   }
@@ -41,7 +41,7 @@ package Game::EvonyTKR::External::Conflicts::LoadML {
     $job->SUPER::run(@args);
     unless (defined($job->minion)) {
       my $errmessage = sprintf('minion undefined in job for %s', __PACKAGE__);
-      $job->logger->error($errmessage);
+      $job->log_error($errmessage);
       return $job->fail($errmessage);
     }
 
@@ -58,11 +58,11 @@ package Game::EvonyTKR::External::Conflicts::LoadML {
     my $json_path = Mojo::File->new('conflicts.json');
     unless (-f $json_path) {
       my $errmsg = "conflicts.json not found in current directory";
-      $job->logger->error($errmsg);
+      $job->log_error($errmsg);
       return $job->fail($errmsg);
     }
 
-    $job->logger->info('Loading ML conflict predictions from conflicts.json');
+    $job->log_info('Loading ML conflict predictions from conflicts.json');
 
     # Load JSON
     my $json_text = $json_path->slurp;
@@ -101,7 +101,7 @@ package Game::EvonyTKR::External::Conflicts::LoadML {
       }
     }
 
-    $job->logger->info(sprintf(
+    $job->log_info(sprintf(
       'Loaded ML conflicts: %d total, %d filtered (no troop overlap), %d kept',
       $total_pairs, $filtered_pairs, $kept_pairs
     ));
@@ -122,7 +122,7 @@ package Game::EvonyTKR::External::Conflicts::LoadML {
       }
     }
 
-    $job->logger->info(
+    $job->log_info(
       "Stored $stored_count ML predictions in SQLite persistence");
 
     # Mark this job as completed in persistence

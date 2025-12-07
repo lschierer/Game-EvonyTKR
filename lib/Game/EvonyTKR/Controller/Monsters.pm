@@ -11,7 +11,7 @@ package Game::EvonyTKR::Controller::Monsters {
   use Carp;
 
   sub register ($c, $app, $config = {}) {
-    $c->logger->info("Registering root landing page route");
+    $c->log_info("Registering root landing page route");
     $c->SUPER::register($app, $config);
 
     my $base = '/Monsters';

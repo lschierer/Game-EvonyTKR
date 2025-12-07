@@ -35,7 +35,7 @@ package Game::EvonyTKR::Repo::Books::Builtin {
     my $bytes = $self->{enc}->encode($wire);
     my $pr =
       $self->{cache}->set($self->cache_key_for($book->name) => $bytes, $ttl);
-    $self->logger->debug(sprintf(
+    $self->log_debug(sprintf(
       'put result for %s was %s',
       $book->name, defined($pr) ? $pr : 'undefined'
     ));

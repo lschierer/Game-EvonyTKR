@@ -32,15 +32,15 @@ package Game::EvonyTKR::Model::Covenant {
   has 'categories' => sub ($self) {
     my $h  = {};
     my $cv = $self->CovenantCategoryValues;
-    $self->logger->debug(sprintf('cv is %s', Data::Printer::np($cv)));
+    $self->log_debug(sprintf('cv is %s', Data::Printer::np($cv)));
     foreach my $index (0 .. scalar($self->CovenantCategoryValues->@*) - 1) {
       my $key = $self->CovenantCategoryValues->[$index];
-      $self->logger->debug(sprintf('key at index %s is %s', $index, $key));
+      $self->log_debug(sprintf('key at index %s is %s', $index, $key));
       if ($key eq 'none') {
         next;
       }
       my $al = 10000 + $index * 2 * 1000;
-      $self->logger->debug("setting activationLevel for $key to $al");
+      $self->log_debug("setting activationLevel for $key to $al");
       $h->{$key} = {
         activationLevel => $al,
         buffs           => [],
@@ -58,7 +58,7 @@ package Game::EvonyTKR::Model::Covenant {
     $debuffConditions = [],
     $includePassive   = 0,
   ) {
-    $self->logger->debug(sprintf(
+    $self->log_debug(sprintf(
       'Calculating ascending buffs for level: %s, attribute: %s',
       $level, $attribute
     ));
@@ -79,7 +79,7 @@ package Game::EvonyTKR::Model::Covenant {
     my %level_index  = map { $valid_levels->[$_] => $_ } 0 .. $#$valid_levels;
 
     unless (exists $level_index{$level}) {
-      $self->logger->debug("Invalid level: $level");
+      $self->log_debug("Invalid level: $level");
       return 0;
     }
 
@@ -90,7 +90,7 @@ package Game::EvonyTKR::Model::Covenant {
     for my $i (1 .. $target_index) {    # skip index 0 for 'None'
       my $level_name = $valid_levels->[$i];
       my $buffs      = $self->categories->{$level_name}->{buffs};
-      $self->logger->debug(sprintf(
+      $self->log_debug(sprintf(
         'Checking level "%s" with %s buffs.',
         $level_name, scalar(@$buffs)
       ));
@@ -107,14 +107,14 @@ package Game::EvonyTKR::Model::Covenant {
           $logID
         )) {
           my $val = $buff->value->number;
-          $self->logger->debug("  ➤ Match found. Adding $val to total.");
+          $self->log_debug("  ➤ Match found. Adding $val to total.");
           $total += $val;
         }
         else {
-          $self->logger->debug("  ✗ No match found.");
+          $self->log_debug("  ✗ No match found.");
         }
       }
-      $self->logger->debug(sprintf(
+      $self->log_debug(sprintf(
         '%s has Total %s for level "%s" and attribute "%s"',
         $self->primary->name, $total, $level, $attribute
       ));
@@ -125,14 +125,14 @@ package Game::EvonyTKR::Model::Covenant {
   sub addBuff ($self, $level, $nb) {
     my $red = 1;
     if (!blessed($nb) || blessed($nb) ne "Game::EvonyTKR::Model::Buff") {
-      $self->logger->error(sprintf(
+      $self->log_error(sprintf(
         'attempting to add buff of type %s not "Game::EvonyTKR::Model::Buff"',
         !blessed($nb) ? Scalar::Util::reftype($nb) : blessed($nb)));
       exit 0;
     }
 
     if (none { $level =~ /$_/i } $self->CovenantCategoryValues->@*) {
-      $self->logger->error(sprintf(
+      $self->log_error(sprintf(
         'level should be one of %s, not %s',
         join(', ', @{ $self->CovenantCategoryValues }), $level
       ));
@@ -144,13 +144,13 @@ package Game::EvonyTKR::Model::Covenant {
     my $count = -1;
     $level = lc($level);
     if (!exists $self->categories->{$level}) {
-      $self->logger->error(
+      $self->log_error(
         "category $level is not a valid key for covenantlevels!!");
     }
     else {
       push @{ $self->categories->{$level}->{buffs} }, $nb;
       $count = scalar @{ $self->categories->{$level}->{buffs} };
-      $self->logger->debug("Added buff for attribute '"
+      $self->log_debug("Added buff for attribute '"
           . $nb->attribute
           . "' to covenant level '$level', now has $count buffs");
     }

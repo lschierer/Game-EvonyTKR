@@ -18,7 +18,7 @@ package Game::EvonyTKR::Role::MarkdownRenderer {
   );
 
   # Lazily initialized Pandoc instance
-  sub _pandoc ($self) {
+  sub _pandoc ($c) {
     state $pandoc = Pandoc->new();
     return $pandoc;
   }
@@ -26,8 +26,8 @@ package Game::EvonyTKR::Role::MarkdownRenderer {
   # Pure function: Parse YAML frontmatter from a markdown file
   # Returns hashref with title, order, front_matter, yaml_data, content
   # Returns 0 on error
-  sub parse_markdown_frontmatter ($self, $file_path) {
-    my $logger = $self->logger;
+  sub parse_markdown_frontmatter ($c, $file_path) {
+    my $logger = $c->logger;
 
     unless ($file_path && $file_path->isa('Mojo::File')) {
       $logger->error("file_path must be a 'Mojo::File' not "
@@ -85,36 +85,35 @@ package Game::EvonyTKR::Role::MarkdownRenderer {
   }
 
   # Pure function: Convert markdown content to HTML via Pandoc
-  sub convert_markdown ($self, $content) {
+  sub convert_markdown ($c, $content) {
     return '' unless defined $content && length($content);
 
     # Pandoc expects UTF-8 bytes, not Perl strings
     use Encode qw(encode decode);
-    my $bytes = encode('UTF-8', $content, Encode::FB_CROAK);
-    my $html_bytes =
-      $self->_pandoc->convert($customCommonMark => 'html', $bytes);
+    my $bytes      = encode('UTF-8', $content, Encode::FB_CROAK);
+    my $html_bytes = $c->_pandoc->convert($customCommonMark => 'html', $bytes);
 
     # Decode back to Perl strings
     return decode('UTF-8', $html_bytes, Encode::FB_CROAK);
   }
 
   # Pure function: Convert a markdown snippet to HTML with Spectrum formatting
-  sub render_markdown_snippet ($self, $snippet) {
-    my $logger = $self->logger;
+  sub render_markdown_snippet ($c, $snippet) {
+    my $logger = $c->logger;
 
     if (not defined $snippet or length($snippet) == 0) {
       $logger->warn('snippet must be present!!');
       return '';
     }
 
-    my $html_content = $self->convert_markdown($snippet);
-    $html_content = $self->spectrum_formatting($html_content);
+    my $html_content = $c->convert_markdown($snippet);
+    $html_content = $c->spectrum_formatting($html_content);
     $logger->debug("html_content for snippet is $html_content");
     return $html_content;
   }
 
   # Pure function: Apply Spectrum CSS classes to HTML
-  sub spectrum_formatting ($self, $html_content) {
+  sub spectrum_formatting ($c, $html_content) {
     my $dom = Mojo::DOM58->new($html_content);
 
     my %spectrum_h = (
@@ -192,70 +191,70 @@ package Game::EvonyTKR::Role::MarkdownRenderer {
   }
 
   # Controller method: Render a markdown file as a page
-  # This method expects $self to be a Mojolicious::Controller
-  sub render_markdown_page ($self, $app, $file_path, $opts = {}) {
+  # This method expects $c to be a Mojolicious::Controller
+  sub render_markdown_page ($c, $file_path, $opts = {}) {
 
-    unless (defined($self->app)) {
-      $self->logger->error('app is not defined in render_markdown_page');
+    unless (defined($c->app)) {
+      $c->log_error('app is not defined in render_markdown_page');
       return;
     }
 
-    my $startstash = $self->stash();
+    my $startstash = $c->stash();
     my @stashkeys  = keys %$startstash;
-    $self->logger->debug("stash at start of render_markdown_page has keys "
+    $c->log_debug("stash at start of render_markdown_page has keys "
         . join(", ", @stashkeys));
 
     unless ($file_path && ref($file_path) && blessed($file_path)) {
-      $self->logger->error("file_path must be a 'Mojo::File' not "
+      $c->log_error("file_path must be a 'Mojo::File' not "
           . (ref($file_path) || 'undefined'));
       if (ref($file_path) eq 'HASH') {
-        $self->logger->debug('file path is ' . Data::Printer::np($file_path));
+        $c->log_debug('file path is ' . Data::Printer::np($file_path));
       }
-      return $self->reply->not_found;
+      return $c->reply->not_found;
     }
     unless ($file_path->isa('Mojo::File')) {
-      $self->logger->error("file_path must be a 'Mojo::File' not "
+      $c->log_error("file_path must be a 'Mojo::File' not "
           . (ref($file_path) || 'undefined'));
-      return $self->reply->not_found;
+      return $c->reply->not_found;
     }
 
-    my $parsedFile = $self->parse_markdown_frontmatter($file_path);
+    my $parsedFile = $c->parse_markdown_frontmatter($file_path);
     unless ($parsedFile) {
-      $self->logger->error("error parsing front matter for $file_path");
-      return $self->reply->not_found;
+      $c->log_error("error parsing front matter for $file_path");
+      return $c->reply->not_found;
     }
 
     # Only set stash values that aren't already set
     foreach my $key (keys %{ $parsedFile->{front_matter} }) {
-      $self->stash($key => $parsedFile->{front_matter}->{$key})
-        unless exists $self->stash->{$key};
+      $c->stash($key => $parsedFile->{front_matter}->{$key})
+        unless exists $c->stash->{$key};
     }
 
     # Only set title if not already set
-    $self->stash(title => $parsedFile->{title})
-      unless exists $self->stash->{title};
+    $c->stash(title => $parsedFile->{title})
+      unless exists $c->stash->{title};
 
     # Only set layout if not already set
     my $layout = $parsedFile->{front_matter}->{layout} // 'default';
     $layout =~ s/standard/default/;
-    $self->stash(layout => $layout) unless exists $self->stash->{layout};
+    $c->stash(layout => $layout) unless exists $c->stash->{layout};
 
-    $self->logger->debug("layout is " . $self->stash('layout'));
+    $c->log_debug("layout is " . $c->stash('layout'));
 
     # Use template from options, then stash, then default to 'markdown'
-    my $template = $opts->{template} // $self->stash('template') // 'markdown';
-    $self->logger->debug("Using template: $template");
+    my $template = $opts->{template} // $c->stash('template') // 'markdown';
+    $c->log_debug("Using template: $template");
 
-    $self->logger->debug("Looking for template: $template.html.ep");
+    $c->log_debug("Looking for template: $template.html.ep");
 
-    my $html_content = $self->convert_markdown($parsedFile->{content});
+    my $html_content = $c->convert_markdown($parsedFile->{content});
 
     # Temporary debug logging for images
     if ($html_content =~ /<img/) {
-      $self->logger->debug("Found img tags in HTML output");
+      $c->log_debug("Found img tags in HTML output");
     }
     else {
-      $self->logger->debug(
+      $c->log_debug(
         "No img tags found in HTML output. Raw content contains: "
           . (
           $parsedFile->{content} =~ /!\[.*?\]\(.*?\)/
@@ -265,27 +264,27 @@ package Game::EvonyTKR::Role::MarkdownRenderer {
       );
     }
 
-    $html_content = $self->spectrum_formatting($html_content);
+    $html_content = $c->spectrum_formatting($html_content);
 
-    $self->logger->debug("html is now $html_content");
+    $c->log_debug("html is now $html_content");
     # Add markdown content to stash but don't override existing content
-    if (!exists $self->stash->{markdown_content}) {
-      $self->stash(markdown_content => $html_content);
+    if (!exists $c->stash->{markdown_content}) {
+      $c->stash(markdown_content => $html_content);
     }
 
     # Use existing content if available, otherwise use markdown content
-    my $content  = $self->stash('content') // $html_content;
-    my $endstash = $self->stash();
-    $self->logger->debug("items type before render: "
+    my $content  = $c->stash('content') // $html_content;
+    my $endstash = $c->stash();
+    $c->log_debug("items type before render: "
         . (ref($endstash->{items}) || 'not a reference'));
     if (ref($endstash->{items}) eq 'HASH') {
-      $self->logger->debug(
+      $c->log_debug(
         "items has " . scalar(keys %{ $endstash->{items} }) . " keys");
     }
-    $self->logger->debug("finally decided on template $template");
-    return $self->render(
+    $c->log_debug("finally decided on template $template");
+    return $c->render(
       template => $template,
-      layout   => $self->stash('layout'),
+      layout   => $c->stash('layout'),
       content  => $content
     );
   }
@@ -305,9 +304,9 @@ Game::EvonyTKR::Role::MarkdownRenderer - Role for rendering markdown content in 
     use Mojo::Base 'Mojolicious::Controller';
     use Mojo::Base 'Game::EvonyTKR::Role::MarkdownRenderer', -role;
 
-    sub some_page ($self) {
+    sub some_page ($c) {
       my $md_path = Mojo::File->new('/path/to/page.md');
-      return $self->render_markdown_page($md_path, { template => 'custom' });
+      return $c->render_markdown_page( $md_path, { template => 'custom' });
     }
   }
 

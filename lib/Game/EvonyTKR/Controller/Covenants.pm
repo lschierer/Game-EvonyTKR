@@ -49,29 +49,29 @@ package Game::EvonyTKR::Controller::Covenants {
   # Register this when the application starts
   sub register($c, $app, $config = {}) {
     $c->SUPER::register($app, $config);
-    $c->logger->info(sprintf('Registering routes for %s', __PACKAGE__));
+    $c->log_info(sprintf('Registering routes for %s', __PACKAGE__));
 
     eval {
-      $c->logger->debug(sprintf('setup_helpers for %s', __PACKAGE__));
+      $c->log_debug(sprintf('setup_helpers for %s', __PACKAGE__));
       $c->setup_helpers($app);
       1;
     } or do {
       my $em = sprintf('setup_helpers failed in %s', __PACKAGE__);
-      $c->logger->error($em);
+      $c->log_error($em);
       say $em;
     };
 
     eval {
-      $c->logger->debug(sprintf('setup_routes for %s', __PACKAGE__));
+      $c->log_debug(sprintf('setup_routes for %s', __PACKAGE__));
       $c->setup_routes($app);
       1;
     } or do {
       my $em = sprintf('setup_routes failed in %s', __PACKAGE__);
-      $c->logger->error($em);
+      $c->log_error($em);
       say $em;
     };
 
-    $c->logger->debug("end of register method");
+    $c->log_debug("end of register method");
   }
 
   sub setup_helpers ($c, $app) {
@@ -104,7 +104,7 @@ package Game::EvonyTKR::Controller::Covenants {
         $c->can('controller_name')
       ? $c->controller_name()
       : $baseClass;
-    $c->logger->debug("got controller_name $controller_name.");
+    $c->log_debug("got controller_name $controller_name.");
 
     my $mainRoutes = $app->routes->any($base);
     $mainRoutes->get('/')
@@ -120,7 +120,8 @@ package Game::EvonyTKR::Controller::Covenants {
   sub _build_covenant_nav($c, $covenant_name, $app) {
     use Encode qw(is_utf8 decode_utf8);
 
-    my $display_name = is_utf8($covenant_name) ? $covenant_name : decode_utf8($covenant_name);
+    my $display_name =
+      is_utf8($covenant_name) ? $covenant_name : decode_utf8($covenant_name);
     my $path = sprintf('%s/%s', $c->getBase(), $display_name);
 
     $app->add_navigation_item({
@@ -148,11 +149,12 @@ package Game::EvonyTKR::Controller::Covenants {
     }
 
     $nav_built = 1;
-    $c->logger->info("Built navigation items for " . scalar(@covenant_names) . " covenants");
+    $c->log_info(
+      "Built navigation items for " . scalar(@covenant_names) . " covenants");
   }
 
   sub index($c) {
-    $c->logger->debug(sprintf('Rendering index for %s', __PACKAGE__));
+    $c->log_debug(sprintf('Rendering index for %s', __PACKAGE__));
 
     # Build navigation items if not already done
     $c->_ensure_navigation_built();
@@ -160,22 +162,22 @@ package Game::EvonyTKR::Controller::Covenants {
     # Check if markdown exists for this collection
     my $distDir       = Mojo::Home->new->detect('Game::EvonyTKR');
     my $markdown_path = $distDir->child("share/pages/Covenants/index.md");
-    $c->logger->debug("markdown_path is $markdown_path");
+    $c->log_debug("markdown_path is $markdown_path");
 
     my @parts     = split(/::/, ref($c));
     my $baseClass = pop(@parts);
     my $base      = $c->getBase();
-    $c->logger->debug("Covenants index method has base $base");
+    $c->log_debug("Covenants index method has base $base");
 
     my @items;
     foreach my $cn ($c->list_covenants()->@*) {
       $cn = join(' ', map {ucfirst} split / /, $cn);
       my $path     = sprintf('%s/%s', $c->getBase(), $cn);
       my $covenant = $c->get_covenant($cn);
-      push @items, $cn;
+      push @items, $covenant->primary->name;
     }
 
-    $c->logger->debug(sprintf('Items: %s items.', scalar(@items)));
+    $c->log_debug(sprintf('Items: %s items.', scalar(@items)));
     $c->stash(
       linkBase        => $base,
       items           => \@items,
@@ -190,14 +192,14 @@ package Game::EvonyTKR::Controller::Covenants {
         { template => 'covenants/index' });
     }
     else {
-      $c->logger->debug("no markdown index content found at $markdown_path");
+      $c->log_debug("no markdown index content found at $markdown_path");
       # Render just the items
       return $c->render(template => 'covenants/index');
     }
   }
 
   sub show ($c) {
-    $c->logger->debug("start of show method");
+    $c->log_debug("start of show method");
 
     # Build navigation items if not already done
     $c->_ensure_navigation_built();
@@ -206,7 +208,7 @@ package Game::EvonyTKR::Controller::Covenants {
     my $name = $c->param('name') // '';
     $name = decode('UTF-8', $name) unless is_utf8($name);
 
-    $c->logger->debug("show detects name $name, showing details.");
+    $c->log_debug("show detects name $name, showing details.");
 
     my $outstanding = $c->outstanding_prereqs([
       'load_all_generals',    'load_all_builtin_books',
@@ -215,7 +217,7 @@ package Game::EvonyTKR::Controller::Covenants {
     ]);
 
     if ($outstanding) {
-      $c->logger->debug(
+      $c->log_debug(
         sprintf('%s prereq check detected outstanding prereqs.', __PACKAGE__));
       my $delay = $outstanding * 5;
       return $c->render(
@@ -229,13 +231,14 @@ package Game::EvonyTKR::Controller::Covenants {
 
     # Normalize name for lookup
     my $normalized_name = $c->normalize($name);
-    my $covenant = $c->get_covenant($normalized_name);
+    my $covenant        = $c->get_covenant($normalized_name);
 
     unless ($covenant) {
-      $c->logger->error("covenant for '$name' (normalized: '$normalized_name') was not found.");
+      $c->log_error(
+        "covenant for '$name' (normalized: '$normalized_name') was not found.");
       $c->reply->not_found;
     }
-    $c->logger->debug(sprintf(
+    $c->log_debug(sprintf(
       'retrieved covenant for "%s": %s',
       $name, Data::Printer::np($covenant)
     ));
@@ -313,7 +316,7 @@ __END__
   sub _build_covenant_routes($c, $covenant, $name, $app, $controller_name,
     $mainRoutes) {
 
-  #  $c->logger->debug("building route for " . $covenant->primary->name);
+  #  $c->log_debug("building route for " . $covenant->primary->name);
 
   #  my $clean_name = $name;
   #  $clean_name =~ s{^/}{};
