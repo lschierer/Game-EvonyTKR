@@ -94,16 +94,6 @@ export class UbuntuInstance extends NestedStack {
       'systemctl reload nginx',
     );
 
-    // Signal CloudFormation based on bootstrap exit code
-    shellCommands.addCommands(
-      'if [ $BOOTSTRAP_EXIT_CODE -eq 0 ]; then',
-      `  /usr/local/bin/cfn-signal -e 0 --stack ${this.stackName} --resource Instance --region ${this.region}`,
-      'else',
-      `  /usr/local/bin/cfn-signal -e 1 --stack ${this.stackName} --resource Instance --region ${this.region}`,
-      '  exit $BOOTSTRAP_EXIT_CODE',
-      'fi',
-    );
-
     (cloud_user_data.runcmd as Array<string>).push(shellCommands.render());
 
     // Combine them with MultiPart
@@ -134,6 +124,22 @@ export class UbuntuInstance extends NestedStack {
       vpcSubnets: { subnetType: ec2.SubnetType.PUBLIC },
       resourceSignalTimeout: cdk.Duration.minutes(35),
     });
+
+    // Update cfn-signal commands with correct resource logical ID
+    const instanceLogicalId = this.instance.node.defaultChild
+      ? (this.instance.node.defaultChild as cdk.CfnResource).logicalId
+      : 'Instance';
+    
+    shellCommands.addCommands(
+      'if [ $BOOTSTRAP_EXIT_CODE -eq 0 ]; then',
+      `  /usr/local/bin/cfn-signal -e 0 --stack ${this.stackName} --resource ${instanceLogicalId} --region ${this.region}`,
+      'else',
+      `  /usr/local/bin/cfn-signal -e 1 --stack ${this.stackName} --resource ${instanceLogicalId} --region ${this.region}`,
+      '  exit $BOOTSTRAP_EXIT_CODE',
+      'fi',
+    );
+
+    (cloud_user_data.runcmd as Array<string>).push(shellCommands.render());
 
     ec2SecGroup.addIngressRule(
       ec2.Peer.anyIpv4(),
