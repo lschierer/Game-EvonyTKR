@@ -1,0 +1,14 @@
+[project]
+name = "evony-tkr-ml"
+version = "0.1.0"
+description = "ML conflict detection for Evony TKR"
+requires-python = ">=3.8"
+dependencies = [
+    "scikit-learn>=1.3.0",
+    "pandas>=2.0.0",
+    "numpy>=1.24.0",
+]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
