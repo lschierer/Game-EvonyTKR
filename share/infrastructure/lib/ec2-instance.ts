@@ -64,6 +64,9 @@ export class UbuntuInstance extends NestedStack {
       'curl "https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip" -o "awscliv2.zip"',
       'unzip awscliv2.zip',
       'sudo ./aws/install',
+      // Install CloudFormation helper scripts
+      'apt-get update && apt-get install -y python3-pip',
+      'pip3 install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-py3-latest.tar.gz',
     );
     const localPath = shellCommands.addS3DownloadCommand({
       bucket: mojoBinAsset.bucket,
@@ -78,13 +81,32 @@ export class UbuntuInstance extends NestedStack {
       'mv .bash* /opt/mojo/',
       'cp /opt/mojo/bin/deploy-mojo.sh /usr/local/bin',
       'chmod 0755 /opt/mojo/bin/deploy-mojo.sh',
-      'sudo -u mojo -s /bin/bash -l -c /opt/mojo/bin/bootstrap.sh',
     );
+
+    // Run bootstrap and signal success/failure to CloudFormation
+    shellCommands.addCommands(
+      'set +e', // Don't exit on error so we can signal failure
+      'sudo -u mojo -s /bin/bash -l -c /opt/mojo/bin/bootstrap.sh',
+      'BOOTSTRAP_EXIT_CODE=$?',
+      'set -e',
+    );
+
     shellCommands.addCommands(
       'systemctl enable mojolicious-worker',
       'systemctl start mojolicious-worker',
       'systemctl reload nginx',
     );
+
+    // Signal CloudFormation based on bootstrap exit code
+    shellCommands.addCommands(
+      'if [ $BOOTSTRAP_EXIT_CODE -eq 0 ]; then',
+      `  /usr/local/bin/cfn-signal -e 0 --stack ${this.stackName} --resource Instance --region ${this.region}`,
+      'else',
+      `  /usr/local/bin/cfn-signal -e 1 --stack ${this.stackName} --resource Instance --region ${this.region}`,
+      '  exit $BOOTSTRAP_EXIT_CODE',
+      'fi',
+    );
+
     (cloud_user_data.runcmd as Array<string>).push(shellCommands.render());
 
     // Combine them with MultiPart
@@ -113,6 +135,7 @@ export class UbuntuInstance extends NestedStack {
       securityGroup: ec2SecGroup,
       machineImage: this.genericLinuxImage(),
       vpcSubnets: { subnetType: ec2.SubnetType.PUBLIC },
+      resourceSignalTimeout: cdk.Duration.minutes(35),
     });
 
     ec2SecGroup.addIngressRule(

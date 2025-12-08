@@ -1,7 +1,34 @@
 #! /bin/bash -x
 set -e
 
-curl https://mise.run | sh
+# Helper function to retry commands with exponential backoff
+retry_with_backoff() {
+  local max_attempts=5
+  local timeout=1
+  local attempt=1
+  local exitCode=0
+
+  while (( attempt <= max_attempts ))
+  do
+    if "$@"
+    then
+      return 0
+    else
+      exitCode=$?
+    fi
+
+    echo "Command failed (attempt $attempt/$max_attempts). Retrying in $timeout seconds..."
+    sleep $timeout
+    timeout=$(( timeout * 2 ))
+    attempt=$(( attempt + 1 ))
+  done
+
+  echo "Command failed after $max_attempts attempts: $*"
+  return $exitCode
+}
+
+# Install mise with retry
+retry_with_backoff curl -fsSL https://mise.run | sh
 
 eval "$(/opt/mojo/.local/bin/mise activate bash)"
 
@@ -15,12 +42,14 @@ echo 'export PATH="/opt/mojo/.local/bin/:$HOME/bin:$PATH"' >> /opt/mojo/.bash_pr
 
 export PATH="/opt/mojo/.local/bin/:$HOME/bin:$PATH"
 
-git clone -b streaming https://github.com/lschierer/Game-EvonyTKR.git /opt/mojo/app
+# Clone repository with retry
+retry_with_backoff git clone -b streaming https://github.com/lschierer/Game-EvonyTKR.git /opt/mojo/app
 
 cd /opt/mojo/app
 
 mise trust
-mise install
+# Install tools (including Python) with retry for transient failures
+retry_with_backoff mise install
 mise reshim
 
 cd /opt/mojo/app
@@ -50,8 +79,9 @@ pnpm config set childConcurrency 1
 export NODE_OPTIONS=--max_old_space_size=2560; pnpm tsx ./scripts/build-ts.ts
 
 ./Build manifest
-perl ./scripts/update_git_meta.pl
+#perl ./scripts/update_git_meta.pl
 ./Build
 
 pnpm config set childConcurrency 2
-echo 'bootstrap complete'
+echo 'bootstrap complete - SUCCESS'
+exit 0
