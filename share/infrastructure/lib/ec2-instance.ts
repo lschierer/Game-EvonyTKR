@@ -64,9 +64,6 @@ export class UbuntuInstance extends NestedStack {
       'curl "https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip" -o "awscliv2.zip"',
       'unzip awscliv2.zip',
       'sudo ./aws/install',
-      // Install CloudFormation helper scripts
-      'apt-get update && apt-get install -y python3-pip',
-      'pip3 install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-py3-latest.tar.gz',
     );
     const localPath = shellCommands.addS3DownloadCommand({
       bucket: mojoBinAsset.bucket,

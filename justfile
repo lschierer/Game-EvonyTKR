@@ -20,6 +20,7 @@ npmdeps:
 deps: prepare npmdeps
   ./Build installdeps --cpan_client 'cpanm -n'
   pip install -e scripts
+  #./scripts/AIBoost_install.sh
   perl ./scripts/update_git_meta.pl
 
 [working-directory: 'share']
