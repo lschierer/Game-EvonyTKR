@@ -8,7 +8,6 @@ require Mojo::Promise;
 require List::Util;
 require Game::EvonyTKR::Model::General;
 require Game::EvonyTKR::Model::General::Pair;
-require Game::EvonyTKR::Control::Generals::Routing;
 require Game::EvonyTKR::Model::Data;
 require Mojo::Util;
 require UUID;
@@ -19,6 +18,8 @@ package Game::EvonyTKR::Controller::Pairs {
   use Mojo::Base 'Game::EvonyTKR::Controller::ControllerBase';
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants', -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::Covenants',        -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants', -role;
+  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Generals::Routing', -role;
   use Mojo::IOLoop;
   use Mojo::JSON     qw(to_json encode_json);
   use MIME::Base64   qw(encode_base64);

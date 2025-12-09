@@ -1,83 +1,76 @@
+package Game::EvonyTKR::Controller::Role::Generals::Routing ;
 use v5.42.0;
 use experimental qw(class);
 use utf8::all;
-use File::FindLib 'lib';
+use Mojo::Base -role, -strict, -signatures;
+use Carp;
 require Data::Printer;
 require Path::Tiny;
 require Game::EvonyTKR::Model::General;
 require Game::EvonyTKR::Model::General::Pair;
-use namespace::clean;
 
-class Game::EvonyTKR::Control::Generals::Routing :
-  isa(Game::EvonyTKR::Shared::Constants) {
-  use Carp;
 
-  field $validRoutes : reader;
-  field $debug : writer : param //= 0;
+  has validRoutes => sub { my $c = shift; return $c->get_valid_routes(); };
+  has debug => 0;
 
-  ADJUST {
-    $validRoutes = {};
-    $self->get_valid_routes;
+  sub all_valid_routes($c) {
+    return values $c->validRoutes->%*;
   }
 
-  method all_valid_routes() {
-    return values %$validRoutes;
-  }
-
-  method get_routes_for_uiTarget ($uiTarget) {
-    $self->log_debug("looking for routes for $uiTarget");
+  sub get_routes_for_uiTarget ($c, $uiTarget) {
+    $c->log_debug("looking for routes for $uiTarget");
     my @results;
-    my $slug = $self->_slugify($uiTarget);
-    $self->log_debug("slug for $uiTarget is $slug");
-    foreach my $key (keys %$validRoutes) {
+    my $slug = $c->_slugify($uiTarget);
+    $c->log_debug("slug for $uiTarget is $slug");
+    foreach my $key (keys $c->validRoutes->%*) {
       if ($key =~ /^$slug/) {
-        push @results, $validRoutes->{$key};
+        push @results, $c->validRoutes->{$key};
       }
     }
     return @results;
   }
 
   # In Game::EvonyTKR::Control::Generals::Routing
-  method has_route ($uiTarget, $buffActivation) {
-    my $slug_ui   = $self->_slugify($uiTarget);
-    my $slug_buff = $self->_slugify($buffActivation);
+  sub has_route ($c, $uiTarget, $buffActivation) {
+    my $slug_ui   = $c->_slugify($uiTarget);
+    my $slug_buff = $c->_slugify($buffActivation);
     my $key       = "$slug_ui|$slug_buff";
-    return exists $validRoutes->{$key};
+    return exists $c->validRoutes->{$key};
   }
 
-  method try_lookup_route ($uiTarget, $buffActivation) {
-    my $slug_ui   = $self->_slugify($uiTarget);
-    my $slug_buff = $self->_slugify($buffActivation);
+  sub try_lookup_route ($c, $uiTarget, $buffActivation) {
+    my $slug_ui   = $c->_slugify($uiTarget);
+    my $slug_buff = $c->_slugify($buffActivation);
     my $key       = "$slug_ui|$slug_buff";
-    return $validRoutes->{$key};    # undef if missing; NO croak
+    return $c->validRoutes->{$key};    # undef if missing; NO croak
   }
 
-  method lookup_route ($slug_ui, $slug_buff,) {
-    $slug_ui   = $self->_slugify($slug_ui);
-    $slug_buff = $self->_slugify($slug_buff);
+  sub lookup_route ($c, $slug_ui, $slug_buff,) {
+    $slug_ui   = $c->_slugify($slug_ui);
+    $slug_buff = $c->_slugify($slug_buff);
     my $key = lc("$slug_ui|$slug_buff");
-    if (exists $validRoutes->{$key}) {
-      return $validRoutes->{$key};
+    if (exists $c->validRoutes->{$key}) {
+      return $c->validRoutes->{$key};
     }
-    if ($debug) {
-      my @r = $self->all_valid_routes();
-      $self->log_error("$key is not a valid route. Valid routes are "
-          . Data::Printer::np($validRoutes));
+    if ($c->debug) {
+      my @r = $c->all_valid_routes();
+      $c->log_error("$key is not a valid route. Valid routes are "
+          . Data::Printer::np($c->validRoutes));
     }
     else {
-      $self->log_error("$key is not a valid route.");
+      $c->log_error("$key is not a valid route.");
       croak("$key is not a valid route.");
     }
     return 0;
   }
 
-  method _slugify ($str) {
+  sub _slugify ($c, $str) {
     $str =~ s/\s+/-/g;
     $str =~ s/[^a-zA-Z0-9\-]//g;
     return lc $str;
   }
 
-  method _ui_target_name ($tt) {
+  sub _ui_target_name ($c, $tt) {
     my $name = $tt =~ s/_/ /gr;
     $name =~ s/(\w)(\w+)( specialist)?/\U$1\L$2 \US\Lpecialists/;
     $name =~ s/Mounted/Cavalry/g;
@@ -87,7 +80,7 @@ class Game::EvonyTKR::Control::Generals::Routing :
     return $name;
   }
 
-  method general_type_from_ui_target ($uiTarget) {
+  sub general_type_from_ui_target ($c, $uiTarget) {
     my $str = $uiTarget;
 
     # Undo display substitutions
@@ -107,9 +100,9 @@ class Game::EvonyTKR::Control::Generals::Routing :
 # the main routes will be dependant on GeneralKeys and AllowedBuffActivationValues
 # specialties, skill books, and so on, while important, are essentially ancillary
 # information to support generals.
-  method get_valid_routes() {
-    foreach my $buffActivation ($self->AllowedBuffActivationValues->@*) {
-      foreach my $tt ($self->GeneralKeys->@*) {
+  sub get_valid_routes($c) {
+    foreach my $buffActivation ($c->AllowedBuffActivationValues->@*) {
+      foreach my $tt ($c->GeneralKeys->@*) {
         next if $buffActivation eq 'Officer' && $tt ne 'officer';
         next if $buffActivation eq 'Mayor'   && $tt ne 'mayor';
         next
@@ -120,12 +113,12 @@ class Game::EvonyTKR::Control::Generals::Routing :
           && $tt =~ /(?:mayor|officer)/;
 
         # Generate slugs
-        my $uiTarget  = $self->_ui_target_name($tt);
-        my $slug_ui   = $self->_slugify($uiTarget);
-        my $slug_buff = $self->_slugify($buffActivation);
+        my $uiTarget  = $c->_ui_target_name($tt);
+        my $slug_ui   = $c->_slugify($uiTarget);
+        my $slug_buff = $c->_slugify($buffActivation);
 
         # Save valid combo using pipe as a dsv separator
-        $validRoutes->{"$slug_ui|$slug_buff"} = {
+        $c->validRoutes->{"$slug_ui|$slug_buff"} = {
           generalType    => $tt,
           uiTarget       => $uiTarget,
           buffActivation => $buffActivation,
@@ -133,4 +126,5 @@ class Game::EvonyTKR::Control::Generals::Routing :
       }
     }
   }
-}
+1;
+__END__

@@ -11,7 +11,6 @@ require List::Util;
 require Game::EvonyTKR::Model::General;
 require Game::EvonyTKR::Model::General::Pair;
 require Game::EvonyTKR::Model::Buff::Summarizer::Single;
-require Game::EvonyTKR::Control::Generals::Routing;
 require Game::EvonyTKR::Model::Data;
 require Game::EvonyTKR::Model::Base;
 
@@ -22,6 +21,8 @@ use namespace::autoclean;
 package Game::EvonyTKR::Controller::Generals {
   use Mojo::Base 'Game::EvonyTKR::Controller::ControllerBase';
   use Mojo::Base 'Game::EvonyTKR::Role::StaticPages', -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants', -role;
+  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Generals::Routing', -role;
   use Mojo::IOLoop;
   use Mojo::Promise;
   use Mojo::JSON     qw(to_json encode_json);
