@@ -61,6 +61,7 @@ cpanm -n IO::Socket::SSL
 
 perl Build.PL
 ./Build installdeps --cpan_client 'cpanm -n'
+pip install -e scripts
 
 pnpm config set childConcurrency 2
 export NODE_OPTIONS=--max_old_space_size=1536; pnpm install
@@ -81,6 +82,12 @@ export NODE_OPTIONS=--max_old_space_size=2560; pnpm tsx ./scripts/build-ts.ts
 ./Build manifest
 #perl ./scripts/update_git_meta.pl
 ./Build
+
+perl bin/extract_conflict_features.pl --mode=training --output=training_data.csv
+python bin/train_conflict_model.py     --training=training_data.csv     --model=conflict_model.pkl     --importance=feature_importance.csv
+perl bin/extract_conflict_features.pl --mode=predict --output=all_pairs.csv
+python bin/predict_conflicts.py     --model=conflict_model.pkl     --pairs=all_pairs.csv     --output=conflicts.json
+
 
 pnpm config set childConcurrency 2
 echo 'bootstrap complete - SUCCESS'
