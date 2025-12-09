@@ -24,6 +24,12 @@ has 'sqlite' => sub ($self) {
   Mojo::File->new($db_path)->dirname->make_path;
 
   my $sqlite = Mojo::SQLite->new('file:' . $db_path);
+  
+  # Enable WAL mode for better concurrent access
+  $sqlite->db->query('PRAGMA journal_mode = WAL');
+  $sqlite->db->query('PRAGMA synchronous = NORMAL');
+  $sqlite->db->query('PRAGMA busy_timeout = 5000');
+  
   $self->_initialize_schema($sqlite);
   return $sqlite;
 };
