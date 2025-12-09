@@ -14,7 +14,9 @@ packages:
   - gettext
   - git
   - gnu-standards
+  - graphviz
   - libgd-dev
+  - libgraphviz-dev
   - libssl-dev
   - libtool
   - libzip-dev

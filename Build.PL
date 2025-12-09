@@ -127,6 +127,7 @@ my $builder = Module::Build->new(
     'File::Find::Rule::Perl'                             => '0',
     'File::Find::Rule::VCS'                              => '0',
     'File::Slurp'                                        => '0',
+    'Graphviz'                                           => '0',
     'Log::Any::Adapter::Dispatch'                        => '0',
     'Software::License::Perl_5'                          => '0',
     'Test::Command'                                      => '0',

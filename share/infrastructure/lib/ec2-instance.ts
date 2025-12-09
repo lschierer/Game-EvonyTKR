@@ -1,6 +1,10 @@
 import { NestedStack, Stack } from 'aws-cdk-lib';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as s3Assets from 'aws-cdk-lib/aws-s3-assets';
+import * as cloudwatch from 'aws-cdk-lib/aws-cloudwatch';
+import * as cloudwatch_actions from 'aws-cdk-lib/aws-cloudwatch-actions';
+import * as sns from 'aws-cdk-lib/aws-sns';
+import * as route53 from 'aws-cdk-lib/aws-route53';
 import * as fs from 'fs';
 import * as cdk from 'aws-cdk-lib';
 import * as yaml from 'js-yaml';
@@ -91,6 +95,7 @@ export class UbuntuInstance extends NestedStack {
     shellCommands.addCommands(
       //'systemctl enable mojolicious-worker',
       //'systemctl start mojolicious-worker',
+      'systemctl start mojolicious',
       'systemctl reload nginx',
     );
 
@@ -122,22 +127,9 @@ export class UbuntuInstance extends NestedStack {
       securityGroup: ec2SecGroup,
       machineImage: this.genericLinuxImage(),
       vpcSubnets: { subnetType: ec2.SubnetType.PUBLIC },
-      resourceSignalTimeout: cdk.Duration.minutes(35),
+      // Remove resourceSignalTimeout - let instance succeed when it comes up
+      // Bootstrap continues in background via systemd service
     });
-
-    // Update cfn-signal commands with correct resource logical ID
-    const instanceLogicalId = this.instance.node.defaultChild
-      ? (this.instance.node.defaultChild as cdk.CfnResource).logicalId
-      : 'Instance';
-    
-    shellCommands.addCommands(
-      'if [ $BOOTSTRAP_EXIT_CODE -eq 0 ]; then',
-      `  /usr/local/bin/cfn-signal -e 0 --stack ${this.stackName} --resource ${instanceLogicalId} --region ${this.region}`,
-      'else',
-      `  /usr/local/bin/cfn-signal -e 1 --stack ${this.stackName} --resource ${instanceLogicalId} --region ${this.region}`,
-      '  exit $BOOTSTRAP_EXIT_CODE',
-      'fi',
-    );
 
     (cloud_user_data.runcmd as Array<string>).push(shellCommands.render());
 
@@ -163,6 +155,60 @@ export class UbuntuInstance extends NestedStack {
     );
     ec2SecGroup.addIngressRule(ec2.Peer.anyIpv4(), ec2.Port.tcp(22), 'ssh');
     ec2SecGroup.addIngressRule(ec2.Peer.anyIpv6(), ec2.Port.tcp(22), 'ssh');
+
+    // Production health monitoring
+    if (props.environment === 'prod') {
+      const topic = new sns.Topic(this, 'HealthAlertTopic', {
+        displayName: 'Production Instance Health Alerts',
+      });
+
+      // EC2 status check alarm
+      const statusAlarm = new cloudwatch.Alarm(this, 'InstanceHealthAlarm', {
+        metric: new cloudwatch.Metric({
+          namespace: 'AWS/EC2',
+          metricName: 'StatusCheckFailed',
+          dimensionsMap: {
+            InstanceId: this.instance.instanceId,
+          },
+          statistic: 'Maximum',
+          period: cdk.Duration.minutes(1),
+        }),
+        threshold: 1,
+        evaluationPeriods: 2,
+        datapointsToAlarm: 2,
+        treatMissingData: cloudwatch.TreatMissingData.BREACHING,
+      });
+      statusAlarm.addAlarmAction(new cloudwatch_actions.SnsAction(topic));
+
+      // Application health check
+      const healthCheck = new route53.CfnHealthCheck(this, 'AppHealthCheck', {
+        healthCheckConfig: {
+          type: 'HTTPS',
+          resourcePath: '/health',
+          fullyQualifiedDomainName: `${props.appSubdomain}.${props.domainName}`,
+          port: 443,
+          requestInterval: 30,
+          failureThreshold: 3,
+        },
+      });
+
+      const healthAlarm = new cloudwatch.Alarm(this, 'AppHealthAlarm', {
+        metric: new cloudwatch.Metric({
+          namespace: 'AWS/Route53',
+          metricName: 'HealthCheckStatus',
+          dimensionsMap: {
+            HealthCheckId: healthCheck.attrHealthCheckId,
+          },
+          statistic: 'Minimum',
+          period: cdk.Duration.minutes(1),
+        }),
+        threshold: 1,
+        evaluationPeriods: 2,
+        comparisonOperator: cloudwatch.ComparisonOperator.LESS_THAN_THRESHOLD,
+        treatMissingData: cloudwatch.TreatMissingData.BREACHING,
+      });
+      healthAlarm.addAlarmAction(new cloudwatch_actions.SnsAction(topic));
+    }
   }
 
   genericLinuxImage() {
