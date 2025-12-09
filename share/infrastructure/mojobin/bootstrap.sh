@@ -84,10 +84,8 @@ export NODE_OPTIONS=--max_old_space_size=2560; pnpm tsx ./scripts/build-ts.ts
 #perl ./scripts/update_git_meta.pl
 ./Build
 
-/opt/mojo/bin/mojoperl bin/extract_conflict_features.pl --mode=training --output=training_data.csv
-/opt/mojo/bin/mojopython bin/train_conflict_model.py     --training=training_data.csv     --model=conflict_model.pkl     --importance=feature_importance.csv
-/opt/mojo/bin/mojoperl bin/extract_conflict_features.pl --mode=predict --output=all_pairs.csv
-/opt/mojo/bin/mojopython bin/predict_conflicts.py     --model=conflict_model.pkl     --pairs=all_pairs.csv     --output=conflicts.json
+# ML training moved to post-startup script - needs app running and data loaded first
+# See /opt/mojo/bin/train-ml.sh
 
 pnpm config set childConcurrency 2
 echo 'bootstrap complete - SUCCESS'

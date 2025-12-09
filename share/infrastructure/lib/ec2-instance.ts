@@ -97,6 +97,8 @@ export class UbuntuInstance extends NestedStack {
       //'systemctl enable mojolicious-worker',
       //'systemctl start mojolicious-worker',
       'systemctl start mojolicious',
+      'sleep 5',  // Give mojolicious a moment to start
+      'systemctl start ml-training.service',
       'systemctl reload nginx',
     );
 
