@@ -57,9 +57,51 @@ package Game::EvonyTKR::External::Conflicts::LoadML {
     # Find conflicts.json file
     my $json_path = Mojo::File->new('conflicts.json');
     unless (-f $json_path) {
-      my $errmsg = "conflicts.json not found in current directory";
-      $job->log_error($errmsg);
-      return $job->fail($errmsg);
+      $job->log_info('conflicts.json not found - generating ML model and predictions');
+
+      # Run training pipeline
+      my $rc = system('perl', 'bin/extract_conflict_features.pl',
+                      '--mode=training', '--output=training_data.csv');
+      if ($rc != 0) {
+        my $errmsg = "Failed to extract training features: exit code $rc";
+        $job->log_error($errmsg);
+        return $job->fail($errmsg);
+      }
+
+      $rc = system('python', 'bin/train_conflict_model.py',
+                   '--training=training_data.csv', '--model=conflict_model.pkl',
+                   '--importance=feature_importance.csv');
+      if ($rc != 0) {
+        my $errmsg = "Failed to train ML model: exit code $rc";
+        $job->log_error($errmsg);
+        return $job->fail($errmsg);
+      }
+
+      $rc = system('perl', 'bin/extract_conflict_features.pl',
+                   '--mode=predict', '--output=all_pairs.csv');
+      if ($rc != 0) {
+        my $errmsg = "Failed to extract prediction features: exit code $rc";
+        $job->log_error($errmsg);
+        return $job->fail($errmsg);
+      }
+
+      $rc = system('python', 'bin/predict_conflicts.py',
+                   '--model=conflict_model.pkl', '--pairs=all_pairs.csv',
+                   '--output=conflicts.json');
+      if ($rc != 0) {
+        my $errmsg = "Failed to generate predictions: exit code $rc";
+        $job->log_error($errmsg);
+        return $job->fail($errmsg);
+      }
+
+      $job->log_info('ML model training and prediction complete');
+
+      # Verify the file was created
+      unless (-f $json_path) {
+        my $errmsg = "conflicts.json still not found after training";
+        $job->log_error($errmsg);
+        return $job->fail($errmsg);
+      }
     }
 
     $job->log_info('Loading ML conflict predictions from conflicts.json');
