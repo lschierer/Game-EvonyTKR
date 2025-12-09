@@ -1,7 +1,14 @@
+
+
+package Game::EvonyTKR::Controller::Generals;
 use v5.42.0;
 use experimental qw(class);
 use utf8::all;
-use File::FindLib 'lib';
+use Mojo::Base 'Game::EvonyTKR::Controller::ControllerBase';
+use Mojo::Base 'Game::EvonyTKR::Role::StaticPages', -role;
+use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants', -role;
+use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants', -role;
+use Mojo::Base 'Game::EvonyTKR::Controller::Role::Generals::Routing', -role;
 require JSON::PP;
 require YAML::PP;
 require Mojo::Promise;
@@ -16,20 +23,15 @@ require Game::EvonyTKR::Model::Base;
 
 require UUID;
 require Data::Printer;
-use namespace::autoclean;
 
-package Game::EvonyTKR::Controller::Generals {
-  use Mojo::Base 'Game::EvonyTKR::Controller::ControllerBase';
-  use Mojo::Base 'Game::EvonyTKR::Role::StaticPages', -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants', -role;
-  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Generals::Routing', -role;
+
   use Mojo::IOLoop;
   use Mojo::Promise;
   use Mojo::JSON     qw(to_json encode_json);
   use MIME::Base64   qw(encode_base64);
   use List::AllUtils qw( all any none );
   require Game::EvonyTKR::External::General::Summarizer;
-
+  use diagnostics;
   use Carp;
 
   has prereqs => sub {
@@ -47,10 +49,7 @@ package Game::EvonyTKR::Controller::Generals {
     )];
   };
 
-  sub get_general_routing ($self) {
-    state $routing = Game::EvonyTKR::Control::Generals::Routing->new();
-    return $routing;
-  }
+
 
   # Specify which collection this controller handles
   has collection_name => 'generals';
@@ -74,7 +73,7 @@ package Game::EvonyTKR::Controller::Generals {
     $c->SUPER::register($app, $config);
 
     if ($app->mode eq 'development') {
-      $c->get_general_routing->set_debug(1);
+      $c->routing_debug(1);
     }
 
     eval {
@@ -108,14 +107,9 @@ package Game::EvonyTKR::Controller::Generals {
 
   sub setup_helpers($c, $app) {
 
-    $app->helper(
-      general_routing => sub {
-        return $c->get_general_routing();
-      }
-    );
-
+    # left for backwards compatibility
     $app->plugins->emit(
-      get_general_routing_available => { routing => $c->get_general_routing() }
+      get_general_routing_available => { routing => 1 }
     );
   }
 
@@ -154,9 +148,9 @@ package Game::EvonyTKR::Controller::Generals {
         is_valid_uiTarget => sub ($route, $controller, $captures, $arg) {
           my $ui = $captures->{uiTarget};
           # make this deterministic: compare exact left side of key
-          my $slug = $c->get_general_routing()->_slugify($ui);
+          my $slug = $c->_slugify($ui);
           my $ok   = 0;
-          for my $key (keys $c->get_general_routing()->validRoutes->%*) {
+          for my $key (keys $c->validRoutes->%*) {
             my ($left) = split /\|/, $key, 2;
             if ($left eq $slug) { $ok = 1; last }
           }
@@ -168,7 +162,7 @@ package Game::EvonyTKR::Controller::Generals {
       $app->routes->add_condition(
         is_valid_buffActivation => sub ($route, $controller, $captures, $arg) {
           my ($ui, $buff) = @$captures{qw(uiTarget buffActivation)};
-          my $ok = $c->get_general_routing()->has_route($ui, $buff) ? 1 : 0;
+          my $ok = $c->has_route($ui, $buff) ? 1 : 0;
           $c->log_debug("check ui='$ui' buff='$buff' -> $ok");
           return $ok;    # never die here
         }
@@ -224,7 +218,7 @@ package Game::EvonyTKR::Controller::Generals {
     });
 
     # nav items for the dynamic routes
-    foreach my $route ($c->get_general_routing()->all_valid_routes()) {
+    foreach my $route ($c->all_valid_routes()) {
       $c->log_debug("building nav items for "
           . $route->{uiTarget} . "|"
           . $route->{buffActivation});
@@ -412,7 +406,7 @@ package Game::EvonyTKR::Controller::Generals {
     }
 
     my @valid_routes =
-      $self->get_general_routing->get_routes_for_uiTarget($uiTarget);
+      $self->get_routes_for_uiTarget($uiTarget);
     $self->log_debug("found valid_routes "
         . Data::Printer::np(@valid_routes)
         . "for $uiTarget");
@@ -458,7 +452,7 @@ package Game::EvonyTKR::Controller::Generals {
     }
 
     my $route =
-      $self->get_general_routing->lookup_route($uiTarget, $buffActivation);
+      $self->lookup_route($uiTarget, $buffActivation);
 
     # Validate the parameters
     unless ($route) {
@@ -697,8 +691,7 @@ package Game::EvonyTKR::Controller::Generals {
     my $slug_buff = $c->stash('buffActivation');    # from captured route
 
     # Lookup full route metadata
-    my $routing    = $c->get_general_routing();
-    my $route_meta = $routing->lookup_route($slug_ui, $slug_buff);
+    my $route_meta = $c->lookup_route($slug_ui, $slug_buff);
 
     unless ($route_meta) {
       $c->log_error("Invalid route combo: $slug_ui / $slug_buff");
@@ -755,40 +748,39 @@ package Game::EvonyTKR::Controller::Generals {
     }
   }
 
-  sub singleCatalog ($self) {
+  sub singleCatalog ($c) {
     my $distDir            = Mojo::File::Share::dist_dir('Game::EvonyTKR');
-    my $slug_ui            = $self->stash('uiTarget');
-    my $slug_buff          = $self->stash('buffActivation');
+    my $slug_ui            = $c->stash('uiTarget');
+    my $slug_buff          = $c->stash('buffActivation');
     my $requested_generals = [];
 
-    if ($self->req->method eq 'POST') {
-      my $json_data = $self->req->json;
+    if ($c->req->method eq 'POST') {
+      my $json_data = $c->req->json;
       $requested_generals = $json_data->{generals} // [];
     }
 
     my $uidseed = join(', ', @$requested_generals) . ' ' . UUID::uuid7();
-    $self->log_debug("uidseed is '$uidseed'");
+    $c->log_debug("uidseed is '$uidseed'");
 
-    my $session_id = UUID::uuid5($self->UUID5_base, $uidseed);
-    $self->log_debug("final session_id is '$session_id'");
+    my $session_id = UUID::uuid5($c->UUID5_base, $uidseed);
+    $c->log_debug("final session_id is '$session_id'");
 
     # Lookup route metadata
-    my $routing    = $self->get_general_routing();
-    my $route_meta = $routing->lookup_route($slug_ui, $slug_buff);
+    my $route_meta = $c->lookup_route($slug_ui, $slug_buff);
 
     unless ($route_meta) {
-      $self->log_error("Invalid route combo: $slug_ui / $slug_buff");
-      if ($self->app->mode eq 'development') {
-        $self->log_debug("Known valid routes:");
-        $routing->each_valid_route(
+      $c->log_error("Invalid route combo: $slug_ui / $slug_buff");
+      if ($c->app->mode eq 'development') {
+        $c->log_debug("Known valid routes:");
+        $c->each_valid_route(
           sub ($key, $meta) {
-            $self->log_debug("  $key => " . Data::Printer::np($meta),
+            $c->log_debug("  $key => " . Data::Printer::np($meta),
               multiline => 0);
           }
         );
       }
 
-      return $self->reply->not_found;
+      return $c->reply->not_found;
     }
 
     # Extract metadata
@@ -796,7 +788,7 @@ package Game::EvonyTKR::Controller::Generals {
     my $buffActivation = $route_meta->{buffActivation};
     my $uiTarget       = $route_meta->{uiTarget};
 
-    my @selected = $self->get_generals_by_type($generalType)->@*;
+    my @selected = $c->get_generals_by_type($generalType)->@*;
 
     # Return just the basic name information without computing buffs
     my @names = map { { primary => $_->name } } @selected;
@@ -810,7 +802,7 @@ package Game::EvonyTKR::Controller::Generals {
       my @filtered;
       foreach my $entry (@names) {
         if (exists $requested{$entry}) {
-          $self->log_debug(sprintf(
+          $c->log_debug(sprintf(
             '%s was requsted for session %s', $entry, $session_id));
           push @filtered, $entry;
         }
@@ -818,7 +810,7 @@ package Game::EvonyTKR::Controller::Generals {
 
       $session_store->{$session_id} = \@filtered;
 
-      return $self->render(
+      return $c->render(
         json => {
           sessionId => $session_id,
           selected  => \@filtered,
@@ -826,12 +818,12 @@ package Game::EvonyTKR::Controller::Generals {
       );
     }
     else {
-      $self->log_debug(
+      $c->log_debug(
         "no requested primaries for session '$session_id' returning full list: "
           . Data::Printer::np(@names));
       $session_store->{$session_id} = \@names;
 
-      return $self->render(
+      return $c->render(
         json => {
           sessionId => $session_id,
           selected  => \@names,
@@ -1113,8 +1105,9 @@ package Game::EvonyTKR::Controller::Generals {
     };
   }
 
-}
+
 
 1;
 
+__END__
 # Add these helper methods to the Generals controller:

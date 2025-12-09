@@ -50,7 +50,7 @@ dev: deps css images build
   MOJO_MODE=development MOJO_RENDERER_DEBUG=1  morbo -w templates -w share -w public ./bin/game-evonytkr
 
 quickdev:
-  rm -vf "${HOME}/var/log/Perl/dist/Game-EvonyTKR/*.log"
+  truncate -s 0 "${HOME}/var/log/Perl/dist/Game-EvonyTKR/system.log"
   ./scripts/dev.sh
 
 deploy-dev: build

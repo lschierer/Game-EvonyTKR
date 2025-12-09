@@ -16,9 +16,9 @@ use namespace::autoclean;
 
 package Game::EvonyTKR::Controller::Pairs {
   use Mojo::Base 'Game::EvonyTKR::Controller::ControllerBase';
+  use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants', -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants', -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::Covenants',        -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants', -role;
   use Mojo::Base 'Game::EvonyTKR::Controller::Role::Generals::Routing', -role;
   use Mojo::IOLoop;
   use Mojo::JSON     qw(to_json encode_json);
@@ -64,35 +64,11 @@ package Game::EvonyTKR::Controller::Pairs {
   sub setup_routes ($c, $app,) {
     say 'starting setup routes for Pairs';
     my @parts = split '::', __PACKAGE__;
-    my $general_routing;
 
     my $controller_name = $parts[$#parts] // 'unknown_controller';
 
     $c->log_debug("got controller_name $controller_name.");
     my $mainRoutes = $app->routes->any($base);
-
-    if (defined($app->renderer->helpers->{general_routing})) {
-      $general_routing = $app->general_routing;
-    }
-    else {
-      $c->log_debug('general_routing not available yet');
-    }
-    state $retryCount = 0;
-    unless (defined($general_routing)) {
-      my $grerror =
-        'General Routing Object not available in Pairs setup_routes';
-      say $grerror;
-      $c->log_error($grerror);
-      my $delay = 1 + rand($retryCount);
-      if ($retryCount++ < 100) {
-        Mojo::IOLoop->delay(
-          $delay => sub {
-            $c->setup_routes($app);
-          }
-        );
-      }
-      return 0;
-    }
 
     eval {
       # Diagnostic route for pairs by type
@@ -131,7 +107,7 @@ package Game::EvonyTKR::Controller::Pairs {
       $c->log_error('failed to set up Generals_dynamic_pairDetails');
     };
 
-    foreach my $route ($general_routing->all_valid_routes()) {
+    foreach my $route ($c->all_valid_routes()) {
       $c->log_debug("building nav items for "
           . $route->{uiTarget} . "|"
           . $route->{buffActivation});

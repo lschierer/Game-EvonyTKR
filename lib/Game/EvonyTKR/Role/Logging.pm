@@ -197,7 +197,7 @@ BEGIN {
     'Game::EvonyTKR::Role::Persistence::AscendingAttributes' => 'INFO',
     'Game::EvonyTKR::Role::Persistence::Books'      => 'INFO',
     'Game::EvonyTKR::Role::Persistence::Covenants'  => 'INFO',
-    'Game::EvonyTKR::Role::Persistence::Generals'   => 'DEBUG',
+    'Game::EvonyTKR::Role::Persistence::Generals'   => 'INFO',
     'Game::EvonyTKR::Role::Persistence::Specialties' => 'INFO',
     'Game::EvonyTKR::Shared::Logger'                => 'INFO',
     'Test::Package'                                 => 'TRACE',

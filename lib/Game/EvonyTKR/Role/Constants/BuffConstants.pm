@@ -35,7 +35,7 @@ package Game::EvonyTKR::Role::Constants::BuffConstants {
   }
 
   has 'BuffActivationValues' => sub {
-    const my $hash = {
+    const my $hash => {
       'Overall'     => 1,
       'PvM'         => 1,
       'Attacking'   => 1,

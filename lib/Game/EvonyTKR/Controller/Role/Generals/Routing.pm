@@ -8,10 +8,21 @@ require Data::Printer;
 require Path::Tiny;
 require Game::EvonyTKR::Model::General;
 require Game::EvonyTKR::Model::General::Pair;
+use diagnostics;
 
+  our $vr;
 
-  has validRoutes => sub { my $c = shift; return $c->get_valid_routes(); };
-  has debug => 0;
+  has validRoutes => sub {
+    my $c = shift;
+    unless($vr){
+      # assign an initial value so that this does not recurse
+      $vr = {};
+      $vr = $c->get_valid_routes();
+    }
+    return $vr;
+  };
+
+  has routing_debug => 0;
 
   sub all_valid_routes($c) {
     return values $c->validRoutes->%*;
@@ -52,7 +63,7 @@ require Game::EvonyTKR::Model::General::Pair;
     if (exists $c->validRoutes->{$key}) {
       return $c->validRoutes->{$key};
     }
-    if ($c->debug) {
+    if ($c->routing_debug) {
       my @r = $c->all_valid_routes();
       $c->log_error("$key is not a valid route. Valid routes are "
           . Data::Printer::np($c->validRoutes));
@@ -102,6 +113,7 @@ require Game::EvonyTKR::Model::General::Pair;
 # information to support generals.
   sub get_valid_routes($c) {
     foreach my $buffActivation ($c->AllowedBuffActivationValues->@*) {
+      $c->logger->debug(sprintf('generating valid routes for buffActivation "%s"', $buffActivation));
       foreach my $tt ($c->GeneralKeys->@*) {
         next if $buffActivation eq 'Officer' && $tt ne 'officer';
         next if $buffActivation eq 'Mayor'   && $tt ne 'mayor';
@@ -125,6 +137,7 @@ require Game::EvonyTKR::Model::General::Pair;
         };
       }
     }
+    return $c->validRoutes;
   }
 1;
 __END__
