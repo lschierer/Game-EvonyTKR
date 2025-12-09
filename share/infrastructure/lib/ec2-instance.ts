@@ -79,6 +79,7 @@ export class UbuntuInstance extends NestedStack {
       `unzip ${localPath}`,
       'chown -R mojo:mojo /opt/mojo',
       'chmod +x /opt/mojo/bin/*.sh',
+      'chmod +x /opt/mojo/bin/mojo*',
       'mv .bash* /opt/mojo/',
       'cp /opt/mojo/bin/deploy-mojo.sh /usr/local/bin',
       'chmod 0755 /opt/mojo/bin/deploy-mojo.sh',
@@ -127,6 +128,15 @@ export class UbuntuInstance extends NestedStack {
       securityGroup: ec2SecGroup,
       machineImage: this.genericLinuxImage(),
       vpcSubnets: { subnetType: ec2.SubnetType.PUBLIC },
+      blockDevices: [
+        {
+          deviceName: '/dev/sda1',
+          volume: ec2.BlockDeviceVolume.ebs(30, {
+            volumeType: ec2.EbsDeviceVolumeType.GP3,
+            deleteOnTermination: true,
+          }),
+        },
+      ],
       // Remove resourceSignalTimeout - let instance succeed when it comes up
       // Bootstrap continues in background via systemd service
     });
