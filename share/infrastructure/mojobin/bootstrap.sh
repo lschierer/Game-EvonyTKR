@@ -55,6 +55,7 @@ mise reshim
 cd /opt/mojo/app
 
 which cpanm
+pnpm config set childConcurrency 1
 
 cpanm -n utf8::all Module::Build
 cpanm -n IO::Socket::SSL
@@ -76,18 +77,17 @@ export NODE_OPTIONS=--max_old_space_size=2560; pnpm tsx ./scripts/build-css.ts .
 
 mkdir -p share/public/js
 mkdir -p share/public/types
-pnpm config set childConcurrency 1
+
 export NODE_OPTIONS=--max_old_space_size=2560; pnpm tsx ./scripts/build-ts.ts
 
 ./Build manifest
 #perl ./scripts/update_git_meta.pl
 ./Build
 
-perl bin/extract_conflict_features.pl --mode=training --output=training_data.csv
-python bin/train_conflict_model.py     --training=training_data.csv     --model=conflict_model.pkl     --importance=feature_importance.csv
-perl bin/extract_conflict_features.pl --mode=predict --output=all_pairs.csv
-python bin/predict_conflicts.py     --model=conflict_model.pkl     --pairs=all_pairs.csv     --output=conflicts.json
-
+/opt/mojo/bin/mojoperl bin/extract_conflict_features.pl --mode=training --output=training_data.csv
+/opt/mojo/bin/mojopython bin/train_conflict_model.py     --training=training_data.csv     --model=conflict_model.pkl     --importance=feature_importance.csv
+/opt/mojo/bin/mojoperl bin/extract_conflict_features.pl --mode=predict --output=all_pairs.csv
+/opt/mojo/bin/mojopython bin/predict_conflicts.py     --model=conflict_model.pkl     --pairs=all_pairs.csv     --output=conflicts.json
 
 pnpm config set childConcurrency 2
 echo 'bootstrap complete - SUCCESS'
