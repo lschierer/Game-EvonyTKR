@@ -19,7 +19,7 @@ ascending:
         value:
           number: 8
         conditions:
-          - attacking
+          - Attacking
   - level: red3
     text: Mounted Troop and Ground Troop Attack +20% and Defense +15%
     buffs:
