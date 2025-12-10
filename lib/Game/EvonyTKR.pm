@@ -120,8 +120,8 @@ package Game::EvonyTKR {
     $app->config(APP_START_TIME => time());
     $app->config(
       'EvonyTKR-Environment' => {
-        DEPLOYMENT_TIME => $DEPLOYMENT_TIME,
-        HOSTNAME        => $HOSTNAME,
+        DEPLOYMENT_TIME => $DEPLOYMENT_TIME // 'unknown',
+        HOSTNAME        => $HOSTNAME  // `hostname`,
       }
     );
 
