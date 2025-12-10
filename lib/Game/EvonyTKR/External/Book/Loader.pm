@@ -16,7 +16,7 @@ package Game::EvonyTKR::External::Book::Loader {
   sub task_name {'load_book'}
 
   sub register ($taskClass, $app, $conf = {}) {
-    $taskClass->SUPER::register($app, $conf);
+    return unless $taskClass->SUPER::register($app, $conf);
     if (not defined($app)) {
       my $errmessage = 'app not defined in register for ' . __PACKAGE__;
       say $errmessage;

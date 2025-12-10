@@ -8,7 +8,7 @@ package Game::EvonyTKR::External::MonitorLoaders {
   sub task_name {'monitor_loaders'}
 
   sub register ($taskClass, $app, $conf = {}) {
-    $taskClass->SUPER::register($app, $conf);
+    return unless $taskClass->SUPER::register($app, $conf);
     $app->minion->add_task($taskClass->task_name => __PACKAGE__);
     my $signal = __PACKAGE__ =~ s/::/_/gr;
     $app->plugins->emit($signal => 1);

@@ -28,7 +28,7 @@ package Game::EvonyTKR::External::General::Summarizer {
   sub task_name {'summarize_general'}
 
   sub register ($taskClass, $app, $conf = {}) {
-    $taskClass->SUPER::register($app, $conf);
+    return unless $taskClass->SUPER::register($app, $conf);
     $app->minion->add_task($taskClass->task_name => __PACKAGE__);
     $app->plugins->emit(summarize_general_job_ready => 1);
   }

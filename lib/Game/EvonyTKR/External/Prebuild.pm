@@ -63,7 +63,7 @@ package Game::EvonyTKR::External::Prebuild {
       say $errmessage;
       return;
     }
-    $plugin->SUPER::register($app, $conf);
+    return unless $plugin->SUPER::register($app, $conf);
 
     unless (defined($app->minion)) {
       my $errmessage = sprintf('minion undefined in job for %s', __PACKAGE__);

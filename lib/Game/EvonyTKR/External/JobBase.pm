@@ -22,10 +22,11 @@ package Game::EvonyTKR::External::JobBase {
   state %registered_classes;
 
   # Initialize Log4perl for all job-based classes
+  # Returns 1 if registration happened, 0 if already registered
   sub register ($plugin, $app, $conf = {}) {
     # Prevent multiple registrations of the same class
     my $class = ref($plugin) || $plugin;
-    return if $registered_classes{$class}++;
+    return 0 if $registered_classes{$class}++;
 
     if (not defined($app)) {
       my $errmessage = 'app not defined in register for ' . __PACKAGE__;
@@ -46,6 +47,8 @@ package Game::EvonyTKR::External::JobBase {
 
     my $signal = __PACKAGE__ =~ s/::/_/gr;
     $app->plugins->emit($signal => 1);
+
+    return 1;  # Registration completed successfully
   }
 
   sub run {

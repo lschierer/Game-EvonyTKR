@@ -49,17 +49,9 @@ package Game::EvonyTKR {
         # optional: only if you want web proc to fork workers
         Mojo::IOLoop->timer(
           1 => sub {
-            my $is_web_server = _this_proc_is_a_web_server($server);
-            my $is_spawner = _i_am_the_one_spawner($app);
-            my $is_minion = _this_is_a_minion_process();
-
-            say "DEBUG spawn decision: is_web_server=$is_web_server, is_spawner=$is_spawner, is_minion=$is_minion, pid=$$";
-
-            return unless $is_web_server; # has acceptors?
-            return unless $is_spawner;         # spawn once only
-            return if $is_minion; # don't spawn from minion cmd
-
-            say "DEBUG: About to spawn minion workers from pid $$";
+            return unless _this_proc_is_a_web_server($server); # has acceptors?
+            return unless _i_am_the_one_spawner($app);         # spawn once only
+            return if _this_is_a_minion_process(); # don't spawn from minion cmd
             _spawn_minion_workers($app);
           }
         );
@@ -77,11 +69,6 @@ package Game::EvonyTKR {
     my $acceptors =
       eval { $server->can('acceptors') ? scalar @{ $server->acceptors } : 0 }
       // 0;
-
-    # Debug logging
-    my $server_class = ref($server) || 'UNDEF';
-    say "DEBUG _this_proc_is_a_web_server: server=$server_class, acceptors=$acceptors, pid=$$";
-
     return $acceptors > 0;
   }
 
@@ -254,31 +241,21 @@ package Game::EvonyTKR {
   my %WORKER_PIDS;
 
   sub _spawn_minion_workers ($app) {
-    say "DEBUG _spawn_minion_workers called from pid $$";
     return if $ENV{MINION_WORKER_CHILD};
     my $start_workers = $ENV{START_MINION_WORKERS} // 1;
     my $worker_count  = $ENV{MINION_WORKERS}       // 4;
     my $job_count     = $ENV{MINION_JOB_COUNT}     // $app->mode eq 'development' ? 5 : 3;
-
-    say "DEBUG _spawn_minion_workers: start_workers=$start_workers, worker_count=$worker_count, job_count=$job_count";
     return unless $start_workers;
 
     for (1 .. $worker_count) {
       my $pid = fork // die "fork failed: $!";
-      if ($pid) {
-        say "DEBUG: Forked minion worker with PID $pid";
-        $WORKER_PIDS{$pid} = 1;
-        next;
-      }
+      if ($pid) { $WORKER_PIDS{$pid} = 1; next }
 
       # --- child path ---
-      say "DEBUG: In child process $$, about to exec minion worker";
       $ENV{MINION_WORKER_CHILD} = 1;    # prevents recursion on load
       POSIX::nice(10);
       exec($^X, $0, 'minion', 'worker', '-j', $job_count) or die "exec failed: $!";
     }
-
-    say "DEBUG: Spawned $worker_count minion workers: ", join(', ', keys %WORKER_PIDS);
 
     # Reap *our* children periodically (doesn't interfere with Mojo/Hypnotoad)
     Mojo::IOLoop->recurring(

@@ -22,7 +22,7 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
   sub task_name {'summarize_pair'}
 
   sub register ($taskClass, $app, $conf = {}) {
-    $taskClass->SUPER::register($app, $conf);
+    return unless $taskClass->SUPER::register($app, $conf);
     $app->minion->add_task($taskClass->task_name => __PACKAGE__);
     $app->plugins->emit(summarize_pair_job_ready => 1);
   }
