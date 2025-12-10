@@ -202,15 +202,14 @@ package Game::EvonyTKR::Controller::Pairs {
     my $slug_buff = $c->stash('buffActivation');
 
     # Lookup route metadata
-    my $routing    = Game::EvonyTKR::Control::Generals::Routing->new;
-    my $route_meta = $routing->lookup_route($slug_ui, $slug_buff);
+    my $route_meta = $c->lookup_route($slug_ui, $slug_buff);
 
     unless ($route_meta) {
       $c->log_error("Invalid pair route: $slug_ui | $slug_buff");
 
       if ($c->app->mode eq 'development') {
         $c->log_debug("Known valid routes:");
-        $routing->each_valid_route(
+        $c->each_valid_route(
           sub ($key, $meta) {
             $c->log_debug(
               "  $key => " . Data::Printer::np($meta, multiline => 0));
@@ -329,15 +328,14 @@ package Game::EvonyTKR::Controller::Pairs {
     $c->log_debug("final session_id is '$session_id'");
 
     # Lookup route metadata
-    my $routing    = Game::EvonyTKR::Control::Generals::Routing->new;
-    my $route_meta = $routing->lookup_route($slug_ui, $slug_buff);
+    my $route_meta = $c->lookup_route($slug_ui, $slug_buff);
 
     unless ($route_meta) {
       $c->log_error("Invalid pair route: $slug_ui | $slug_buff");
 
       if ($c->app->mode eq 'development') {
         $c->log_debug("Known valid routes:");
-        $routing->each_valid_route(
+        $c->each_valid_route(
           sub ($key, $meta) {
             $c->log_debug(
               "  $key => " . Data::Printer::np($meta, multiline => 0));
@@ -431,15 +429,14 @@ package Game::EvonyTKR::Controller::Pairs {
     ));
 
     # Lookup route metadata
-    my $routing    = Game::EvonyTKR::Control::Generals::Routing->new;
-    my $route_meta = $routing->lookup_route($slug_ui, $slug_buff);
+    my $route_meta = $c->lookup_route($slug_ui, $slug_buff);
 
     unless ($route_meta) {
       $c->log_error("Invalid pair route: $slug_ui | $slug_buff");
 
       if ($c->app->mode eq 'development') {
         $c->log_debug("Known valid routes:");
-        $routing->each_valid_route(
+        $c->each_valid_route(
           sub ($key, $meta) {
             $c->log_debug(
               "  $key => " . Data::Printer::np($meta, multiline => 0));
