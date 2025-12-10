@@ -30,6 +30,11 @@ sudo -u ${APP_USER} -s /bin/bash -l -c "cd ${APP_PATH} && ./Build manifest"
 sudo -u ${APP_USER} -s /bin/bash -l -c "cd ${APP_PATH} && perl ./scripts/update_git_meta.pl"
 sudo -u ${APP_USER} -s /bin/bash -l -c "cd ${APP_PATH} && ./Build"
 
+# remove the old state
+# to prevent stale cache problems with new data
+rm -rf /opt/mojo/app/var
+
+# workers now launched from the main package
 #echo "Restarting workers"
 #sudo systemctl restart "${SERVICE_NAME}-worker"
 #sudo systemctl status "${SERVICE_NAME}-worker"

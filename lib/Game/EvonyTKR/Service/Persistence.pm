@@ -23,13 +23,67 @@ has 'sqlite' => sub ($self) {
   # Ensure directory exists
   Mojo::File->new($db_path)->dirname->make_path;
 
+  # Check database integrity and recover if corrupted
+  my $db_ok = 0;
+  if (-f $db_path) {
+    $db_ok = eval {
+      my $test_sqlite = Mojo::SQLite->new('file:' . $db_path);
+      my $test_db = $test_sqlite->db;
+      my $integrity = $test_db->query('PRAGMA integrity_check')->hash;
+      return $integrity->{integrity_check} eq 'ok';
+    };
+
+    unless ($db_ok) {
+      $self->log_error("Persistence database integrity check failed: $@");
+      $self->log_warn("Attempting to recover by recreating database...");
+
+      # Backup corrupted database
+      my $backup_dir = Mojo::File->new($db_path)->dirname->child('backup');
+      $backup_dir->make_path;
+      my $timestamp = time();
+      my $backup_path = $backup_dir->child("persistence.db.corrupt.$timestamp");
+
+      eval {
+        require File::Copy;
+        File::Copy::copy($db_path, $backup_path);
+        $self->log_info("Backed up corrupted database to $backup_path");
+      };
+
+      # Remove corrupted database files
+      for my $suffix ('', '-shm', '-wal') {
+        my $file = $db_path . $suffix;
+        unlink $file if -f $file;
+      }
+
+      $self->log_info("Recreated persistence database at $db_path");
+    }
+  }
+
   my $sqlite = Mojo::SQLite->new('file:' . $db_path);
-  
-  # Enable WAL mode for better concurrent access
+
+  # Enable WAL mode and EBS-compatible settings
   $sqlite->db->query('PRAGMA journal_mode = WAL');
   $sqlite->db->query('PRAGMA synchronous = NORMAL');
   $sqlite->db->query('PRAGMA busy_timeout = 5000');
-  
+  # Disable memory-mapped I/O for compatibility with EBS volumes
+  $sqlite->db->query('PRAGMA mmap_size = 0');
+  # Ensure normal locking mode (not exclusive)
+  $sqlite->db->query('PRAGMA locking_mode = NORMAL');
+  # Increase cache size for better performance
+  $sqlite->db->query('PRAGMA cache_size = -32000');  # 32MB cache
+
+  # Set pragmas for all future connections
+  $sqlite->on(
+    connection => sub ($sqlite, $dbh) {
+      $dbh->do('PRAGMA journal_mode = WAL');
+      $dbh->do('PRAGMA synchronous = NORMAL');
+      $dbh->do('PRAGMA busy_timeout = 5000');
+      $dbh->do('PRAGMA mmap_size = 0');
+      $dbh->do('PRAGMA locking_mode = NORMAL');
+      $dbh->do('PRAGMA cache_size = -32000');
+    }
+  );
+
   $self->_initialize_schema($sqlite);
   return $sqlite;
 };

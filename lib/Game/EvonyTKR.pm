@@ -139,6 +139,12 @@ package Game::EvonyTKR {
         $dbh->do('PRAGMA temp_store=MEMORY');
         $dbh->do('PRAGMA foreign_keys=ON');
         $dbh->do('PRAGMA busy_timeout=8000');
+        # Disable memory-mapped I/O for compatibility with EBS volumes
+        $dbh->do('PRAGMA mmap_size=0');
+        # Ensure normal locking mode (not exclusive)
+        $dbh->do('PRAGMA locking_mode=NORMAL');
+        # Increase cache size for better performance
+        $dbh->do('PRAGMA cache_size=-64000');  # 64MB cache
       }
     );
 
@@ -238,6 +244,7 @@ package Game::EvonyTKR {
     return if $ENV{MINION_WORKER_CHILD};
     my $start_workers = $ENV{START_MINION_WORKERS} // 1;
     my $worker_count  = $ENV{MINION_WORKERS}       // 4;
+    my $job_count     = $ENV{MINION_JOB_COUNT}     // $app->mode eq 'development' ? 5 : 3;
     return unless $start_workers;
 
     for (1 .. $worker_count) {
@@ -247,7 +254,7 @@ package Game::EvonyTKR {
       # --- child path ---
       $ENV{MINION_WORKER_CHILD} = 1;    # prevents recursion on load
       POSIX::nice(10);
-      exec($^X, $0, 'minion', 'worker', '-j', '5') or die "exec failed: $!";
+      exec($^X, $0, 'minion', 'worker', '-j', $job_count) or die "exec failed: $!";
     }
 
     # Reap *our* children periodically (doesn't interfere with Mojo/Hypnotoad)

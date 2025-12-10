@@ -15,13 +15,55 @@ package Game::EvonyTKR::Plugins::Sqlite {
       Mojo::File->new(Mojo::Home->new->detect('Game::EvonyTKR')->to_string());
     my $dbPath = $mh->child('var/minion.db');
 
+    # Ensure var directory exists
+    $mh->child('var')->make_path unless -d $mh->child('var');
+
     $app->plugin(
       Minion => {
         SQLite =>
 "sqlite:$dbPath?sqlite_use_immediate_transaction=1&busy_timeout=30000",
       }
     );
-    my $db = $app->minion->backend->sqlite->db;
+
+    # Set WAL mode immediately on the backend's sqlite object
+    # This ensures WAL is enabled BEFORE the connection event handler runs
+    my $sqlite = $app->minion->backend->sqlite;
+
+    # Check database integrity and recover if corrupted
+    my $db_ok = eval {
+      my $test_db = $sqlite->db;
+      my $integrity = $test_db->query('PRAGMA integrity_check')->hash;
+      return $integrity->{integrity_check} eq 'ok';
+    };
+
+    unless ($db_ok) {
+      $app->log->error("Minion database integrity check failed: $@");
+      $app->log->warn("Attempting to recover by recreating database...");
+
+      # Close all connections
+      eval { $sqlite->db->dbh->disconnect };
+
+      # Remove corrupted database files
+      for my $suffix ('', '-shm', '-wal') {
+        my $file = "$dbPath$suffix";
+        unlink $file if -f $file;
+      }
+
+      $app->log->info("Recreated minion database at $dbPath");
+    }
+
+    # Now set WAL mode and other pragmas for EBS compatibility
+    $sqlite->db->query('PRAGMA journal_mode=WAL');
+    $sqlite->db->query('PRAGMA synchronous=NORMAL');
+    $sqlite->db->query('PRAGMA busy_timeout=30000');
+    # Disable memory-mapped I/O for compatibility with EBS volumes
+    $sqlite->db->query('PRAGMA mmap_size=0');
+    # Ensure normal locking mode (not exclusive)
+    $sqlite->db->query('PRAGMA locking_mode=NORMAL');
+    # Increase cache size for better performance
+    $sqlite->db->query('PRAGMA cache_size=-64000');  # 64MB cache
+
+    my $db = $sqlite->db;
     ensure_lock_table_sqlite($db);
 
     $app->helper(
