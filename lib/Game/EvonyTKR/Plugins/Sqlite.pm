@@ -11,7 +11,9 @@ package Game::EvonyTKR::Plugins::Sqlite {
 
   sub register ($self, $app, $config) {
 
-    my $dbPath = Mojo::File->new('minion.db');
+    my $mh =
+      Mojo::File->new(Mojo::Home->new->detect('Game::EvonyTKR')->to_string());
+    my $dbPath = $mh->child('var/minion.db');
 
     $app->plugin(
       Minion => {
