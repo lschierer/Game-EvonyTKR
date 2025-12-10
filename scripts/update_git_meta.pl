@@ -22,22 +22,14 @@ my $distDir = Path::Tiny::path(dist_dir('Game::EvonyTKR'));
 $logger->info("distDir is $distDir");
 my $reader = GitRepo::Reader->new(source_dir => $distDir->parent());
 
-my $oldest_dt = $reader->find_copyright_range();
-my $year_range;
-if ($oldest_dt) {
-  my $this_year  = DateTime->now->year;
-  my $start_year = $oldest_dt->year;
-  $year_range =
-    ($start_year == $this_year)
-    ? "$this_year"
-    : "$start_year-$this_year";
-}
-else {
-  $year_range = DateTime->now->year;
-}
+# Get current commit and branch info (fast operations)
+my $git_commit = $reader->get_current_commit();
+my $git_branch = $reader->get_current_branch();
+my $build_time = DateTime->now->iso8601();
 
-my $authors = $reader->find_authors();
-$logger->info("Found authors " . Data::Printer::np($authors));
+$logger->info("Git commit: $git_commit");
+$logger->info("Git branch: $git_branch");
+$logger->info("Build time: $build_time");
 
 # 2. Load config file
 my $yaml        = YAML::PP->new;
@@ -52,14 +44,18 @@ else {
   $logger->error("config file $config_path is not found.");
 }
 
-# 3. Inject metadata
-$config_data->{git_meta} = {
-  copyright => $year_range,
-  authors   => $authors,
+# 3. Inject version metadata (preserve git_meta if it exists)
+# Note: git_meta (copyright/authors) should be manually maintained in the config file
+#       This script only updates the version info (commit, branch, build time)
+
+$config_data->{version} = {
+  'git-commit' => $git_commit,
+  'git-branch' => $git_branch,
+  'build-time' => $build_time,
 };
 
 # 4. Write back
-$logger->info("Updating git_meta section with year '$year_range' and authors");
+$logger->info("Updating version section with commit $git_commit on branch $git_branch");
 $config_path->spew_utf8($yaml->dump_string($config_data));
 
-$logger->info("Config updated.");
+$logger->info("Config updated successfully.");

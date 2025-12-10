@@ -125,6 +125,26 @@ class GitRepo::Reader {
     return '';
   }
 
+  method get_current_commit {
+    # Get the current commit hash (short version)
+    my $commit = $git_repo->run('rev-parse', '--short', 'HEAD');
+    chomp $commit if $commit;
+    return $commit // 'unknown';
+  }
+
+  method get_current_branch {
+    # Get the current branch name
+    my $branch = eval {
+      $git_repo->run('rev-parse', '--abbrev-ref', 'HEAD');
+    };
+    if ($@) {
+      $logger->warn("Could not get current branch: $@");
+      return 'unknown';
+    }
+    chomp $branch if $branch;
+    return $branch // 'unknown';
+  }
+
 }
 1;
 

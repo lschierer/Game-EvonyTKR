@@ -80,26 +80,46 @@ package Game::EvonyTKR::Controller::ControllerBase {
     $routes->get('/health')->to(
       cb => sub($self) {
         my $APP_START_TIME = $app->config->{'APP_START_TIME'};
+
+        # Get deployment environment info
+        my $deployment_env = $app->config->{'EvonyTKR-Environment'} // {};
+
+        # Determine if we're in EC2 or container environment
+        my $is_ec2 = !$deployment_env->{'IMAGE_TAG'};
+
+        # Build environment-specific info
+        my $env_info = {};
+        if ($is_ec2) {
+          # EC2 deployment info
+          $env_info = {
+            deployment_type => 'ec2',
+            hostname        => $deployment_env->{'HOSTNAME'} // `hostname`,
+            git_commit      => $app->config->{'version'}->{'git-commit'} // 'unknown',
+            git_branch      => $app->config->{'version'}->{'git-branch'} // 'unknown',
+            build_time      => $app->config->{'version'}->{'build-time'} // 'unknown',
+          };
+          chomp $env_info->{hostname} if $env_info->{hostname};
+        }
+        else {
+          # Container deployment info (legacy)
+          $env_info = {
+            deployment_type     => 'container',
+            cdk_deployment_time => $deployment_env->{'DEPLOYMENT_TIME'} // 'unknown',
+            container_id        => $deployment_env->{'HOSTNAME'} // 'unknown',
+            image_tag           => $deployment_env->{'IMAGE_TAG'} // 'unknown',
+            image_uri           => $deployment_env->{'IMAGE_URI'} // 'unknown',
+          };
+        }
+
         $self->render(
           json => {
-            status              => 'ok',
-            mode                => $app->mode // 'unknown',
-            version             => $app->VERSION,
-            time                => scalar localtime,
-            app_started_at      => scalar(localtime($APP_START_TIME)),
-            app_uptime_seconds  => time() - $APP_START_TIME,
-            build_time          => $app->config->{'version'}->{'build-time'},
-            cdk_deployment_time =>
-              $app->config->{'EvonyTKR-Environment'}->{'DEPLOYMENT_TIME'}
-              // 'unknown',
-            container_id => $app->config->{'EvonyTKR-Environment'}->{'HOSTNAME'}
-              // 'unknown',    # ECS sets this automatically
-            image_tag => $app->config->{'EvonyTKR-Environment'}->{'IMAGE_TAG'}
-              // 'unknown',
-            image_uri => $app->config->{'EvonyTKR-Environment'}->{'IMAGE_URI'}
-              // 'unknown',
-            version    => $app->VERSION,
-            git_commit => $app->config->{'version'}->{'git-commit'},
+            status             => 'ok',
+            mode               => $app->mode // 'unknown',
+            version            => $app->VERSION,
+            time               => scalar localtime,
+            app_started_at     => scalar(localtime($APP_START_TIME)),
+            app_uptime_seconds => time() - $APP_START_TIME,
+            %$env_info,
           },
           status => 200
         );

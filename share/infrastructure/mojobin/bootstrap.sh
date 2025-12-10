@@ -81,7 +81,7 @@ mkdir -p share/public/types
 export NODE_OPTIONS=--max_old_space_size=2560; pnpm tsx ./scripts/build-ts.ts
 
 ./Build manifest
-#perl ./scripts/update_git_meta.pl
+perl ./scripts/update_git_meta.pl
 ./Build
 
 # ML training moved to post-startup script - needs app running and data loaded first
