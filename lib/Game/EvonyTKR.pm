@@ -127,7 +127,7 @@ package Game::EvonyTKR {
 
     $app->secrets($config->{secrets});
 
-    if(_this_is_a_minion_process()){
+    if(!_this_is_a_minion_process()){
       foreach my $envkey (keys %{ $app->config->{'EvonyTKR-Environment'} }) {
         if (defined $envkey) {
           my $envValue = $app->config->{'EvonyTKR-Environment'}->{$envkey}
