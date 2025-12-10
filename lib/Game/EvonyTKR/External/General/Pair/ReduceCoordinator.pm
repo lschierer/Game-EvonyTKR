@@ -11,10 +11,11 @@ package Game::EvonyTKR::External::General::Pair::ReduceCoordinator {
   sub task_name {'reduce_coordinator'}
 
   sub register ($taskClass, $app, $conf = {}) {
-    return unless $taskClass->SUPER::register($app, $conf);
+    return 1 unless $taskClass->SUPER::register($app, $conf);
     $app->minion->add_task($taskClass->task_name => __PACKAGE__);
-    my $signal = __PACKAGE__ =~ s/::/_/gr;
-    $app->plugins->emit($signal => 1);
+
+
+    return 1;
   }
 
   state $total_conflicts                = 0;

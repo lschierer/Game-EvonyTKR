@@ -11,10 +11,9 @@ package Game::EvonyTKR::External::General::LoadAll {
   sub task_name {'load_all_generals'}
 
   sub register ($taskClass, $app, $conf = {}) {
-    return unless $taskClass->SUPER::register($app, $conf);
+    return 1 unless $taskClass->SUPER::register($app, $conf);
     $app->minion->add_task($taskClass->task_name => __PACKAGE__);
-    my $signal = __PACKAGE__ =~ s/::/_/gr;
-    $app->plugins->emit($signal => 1);
+    return 1;
   }
 
   sub run ($job, @args) {
@@ -52,8 +51,7 @@ package Game::EvonyTKR::External::General::LoadAll {
     my @files =
       $generalDir->list->grep(sub { $_ =~ /\.ya?ml$/ && -f -r $_ })->each;
 
-    $job->log_info(
-      sprintf('Found %d general files to process', scalar @files));
+    $job->log_info(sprintf('Found %d general files to process', scalar @files));
 
     my $enqueued_count = 0;
     my $skipped_count  = 0;
@@ -157,8 +155,8 @@ package Game::EvonyTKR::External::General::LoadAll {
         if ($attempt == $max_verify_attempts || $job->is_debug()) {
           $job->log_warn(sprintf(
             'Persistence verification attempt %d/%d: %d generals missing: %s',
-            $attempt, $max_verify_attempts, $missing_count,
-            join(', ', @missing_generals)
+            $attempt,       $max_verify_attempts,
+            $missing_count, join(', ', @missing_generals)
           ));
         }
         else {

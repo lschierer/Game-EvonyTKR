@@ -94,8 +94,7 @@ package Game::EvonyTKR::Model::General {
     state $persistence_helper //= do {
       my $helper = eval { Game::EvonyTKR::Model::Base->new(); };
       if ($@) {
-        $self->log_error(
-          sprintf('Cannot create Persistence Helper: %s', $@));
+        $self->log_error(sprintf('Cannot create Persistence Helper: %s', $@));
         return;
       }
       $helper;

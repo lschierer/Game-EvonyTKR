@@ -130,8 +130,7 @@ sub load_from_persistence ($self, $persistence) {
   if ($conflicts && ref($conflicts) eq 'HASH') {
     $self->by_general($conflicts);
     my $count = scalar(keys %$conflicts);
-    $self->log_debug(
-      "Loaded conflicts for $count generals from persistence");
+    $self->log_debug("Loaded conflicts for $count generals from persistence");
   }
 
   return $self;
@@ -194,8 +193,7 @@ sub _record_compatible ($self, $g1, $g2) {
   my $norm1 = $self->normalize($g1->name);
   my $norm2 = $self->normalize($g2->name);
 
-  $self->log_debug(
-    sprintf('Recording compatible: %s ↔ %s', $norm1, $norm2));
+  $self->log_debug(sprintf('Recording compatible: %s ↔ %s', $norm1, $norm2));
 
   $self->by_general->{$norm1}{$norm2} = 0;
   $self->by_general->{$norm2}{$norm1} = 0;

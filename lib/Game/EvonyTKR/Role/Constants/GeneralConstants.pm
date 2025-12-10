@@ -25,8 +25,7 @@ package Game::EvonyTKR::Role::Constants::GeneralConstants {
   has 'GeneralKeys' => sub ($self) {
     my @gk;
     push @gk, sort keys %generalKeys;
-    $self->log_debug(sprintf(
-      'there are %s keys from generalKeys', scalar @gk));
+    $self->log_debug(sprintf('there are %s keys from generalKeys', scalar @gk));
     return \@gk;
   };
 

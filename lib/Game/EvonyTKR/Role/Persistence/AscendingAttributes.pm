@@ -21,8 +21,7 @@ sub get_ascending_attributes ($self, $name) {
   my $normalized_name = $self->normalize($name);
 
   if (exists $AscendingAttributes->{$normalized_name}) {
-    $self->log_debug(
-      "Returning Ascending Attributes $name from state cache");
+    $self->log_debug("Returning Ascending Attributes $name from state cache");
     return $AscendingAttributes->{$normalized_name};
   }
 
@@ -31,8 +30,7 @@ sub get_ascending_attributes ($self, $name) {
 
   return unless defined($wire_data);
 
-  $self->log_debug(
-    "Found wire_data, attempting to build AscendingAttributes");
+  $self->log_debug("Found wire_data, attempting to build AscendingAttributes");
   my $ascendingAttribute =
     Game::EvonyTKR::Model::Factory->build_from_wire('AscendingAttributes',
     $wire_data);

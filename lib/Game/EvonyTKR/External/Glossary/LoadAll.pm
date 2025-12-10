@@ -12,7 +12,7 @@ package Game::EvonyTKR::External::Glossary::LoadAll {
   sub task_name {'load_all_glossary_terms'}
 
   sub register ($taskClass, $app, $conf = {}) {
-    return unless $taskClass->SUPER::register($app, $conf);
+    return 1 unless $taskClass->SUPER::register($app, $conf);
     if (not defined($app)) {
       my $errmessage = 'app not defined in register for ' . __PACKAGE__;
       say $errmessage;
@@ -28,9 +28,8 @@ package Game::EvonyTKR::External::Glossary::LoadAll {
     $taskClass->log_debug('Registering Glossary LoadAll task');
     $app->minion->add_task($taskClass->task_name => __PACKAGE__);
 
-    $taskClass->log_info(sprintf('emitting signal for %s', __PACKAGE__));
-    my $signal = __PACKAGE__ =~ s/::/_/gr;
-    $app->plugins->emit($signal => 1);
+
+    return 1;
   }
 
   sub run ($job, @args) {

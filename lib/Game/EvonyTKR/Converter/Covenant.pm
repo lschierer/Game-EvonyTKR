@@ -94,8 +94,7 @@ class Game::EvonyTKR::Converter::Covenant :
 
           @fragments = $parser->tokenize_buffs($sentence);
         }
-        $self->log_debug(
-          sprintf('there are %s fragments', scalar(@fragments)));
+        $self->log_debug(sprintf('there are %s fragments', scalar(@fragments)));
         foreach my $frag (@fragments) {
           my $b = $parser->normalize_buff($frag);
           $self->log_debug(sprintf(
@@ -172,8 +171,7 @@ class Game::EvonyTKR::Converter::Covenant :
     my $filename = lc($primary);
     $filename = "${filename}.yaml";
     if (!$outputDir->is_dir()) {
-      $self->log_error(
-        "$outputDir is not a directory!!!" . $outputDir->stat());
+      $self->log_error("$outputDir is not a directory!!!" . $outputDir->stat());
     }
     $outputDir->child($filename)->touch();
     if ($debug) {

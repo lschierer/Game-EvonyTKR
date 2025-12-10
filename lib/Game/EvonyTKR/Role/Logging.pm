@@ -28,80 +28,80 @@ has logger => sub ($package) {
 
 sub log_trace ($self, @msg) {
   my $caller_package = caller(0);
-  my $logger = get_logger($caller_package);
+  my $logger         = get_logger($caller_package);
   $logger->trace(@msg);
 }
 
 sub log_debug ($self, @msg) {
   my $caller_package = caller(0);
-  my $logger = get_logger($caller_package);
+  my $logger         = get_logger($caller_package);
   $logger->debug(@msg);
 }
 
 sub log_info ($self, @msg) {
   my $caller_package = caller(0);
-  my $logger = get_logger($caller_package);
+  my $logger         = get_logger($caller_package);
   $logger->info(@msg);
 }
 
 sub log_warn ($self, @msg) {
   my $caller_package = caller(0);
-  my $logger = get_logger($caller_package);
+  my $logger         = get_logger($caller_package);
   $logger->warn(@msg);
 }
 
 sub log_error ($self, @msg) {
   my $caller_package = caller(0);
-  my $logger = get_logger($caller_package);
+  my $logger         = get_logger($caller_package);
   $logger->error(@msg);
 }
 
 sub log_fatal ($self, @msg) {
   my $caller_package = caller(0);
-  my $logger = get_logger($caller_package);
+  my $logger         = get_logger($caller_package);
   $logger->fatal(@msg);
 }
 
 sub log_logcroak ($self, @msg) {
   my $caller_package = caller(0);
-  my $logger = get_logger($caller_package);
+  my $logger         = get_logger($caller_package);
   $logger->logcroak(@msg);
 }
 
 # Check if log levels are enabled
 sub is_trace ($self) {
   my $caller_package = caller(0);
-  my $logger = get_logger($caller_package);
+  my $logger         = get_logger($caller_package);
   return $logger->is_trace();
 }
 
 sub is_debug ($self) {
   my $caller_package = caller(0);
-  my $logger = get_logger($caller_package);
+  my $logger         = get_logger($caller_package);
   return $logger->is_debug();
 }
 
 sub is_info ($self) {
   my $caller_package = caller(0);
-  my $logger = get_logger($caller_package);
+  my $logger         = get_logger($caller_package);
   return $logger->is_info();
 }
 
 sub is_warn ($self) {
   my $caller_package = caller(0);
-  my $logger = get_logger($caller_package);
+  my $logger         = get_logger($caller_package);
   return $logger->is_warn();
 }
 
 sub is_error ($self) {
   my $caller_package = caller(0);
-  my $logger = get_logger($caller_package);
+  my $logger         = get_logger($caller_package);
   return $logger->is_error();
 }
 
 sub is_fatal ($self) {
   my $caller_package = caller(0);
-  my $logger = get_logger($caller_package);
+  my $logger         = get_logger($caller_package);
   return $logger->is_fatal();
 }
 
@@ -176,32 +176,32 @@ BEGIN {
 
   #(ALL|FATAL|TRACE|DEBUG|INFO|WARN|ERROR|FATAL|OFF)
   $logLevelOverrides = {
-    'Game::EvonyTKR'                                => 'DEBUG',
-    'Game::EvonyTKR::Controller::Generals'          => 'DEBUG',
-    'Game::EvonyTKR::External::Book::LoadAllBuiltins' => 'INFO',
-    'Game::EvonyTKR::External::Book::LoadAllGenerics' => 'INFO',
-    'Game::EvonyTKR::External::Book::Loader'        => 'INFO',
-    'Game::EvonyTKR::External::General::Summarizer' => 'DEBUG',
-    'Game::EvonyTKR::Model::AscendingAttributes'    => 'INFO',
-    'Game::EvonyTKR::Model::BasicAttribute'         => 'INFO',
-    'Game::EvonyTKR::Model::BasicAttributes'        => 'INFO',
-    'Game::EvonyTKR::Model::Book'                   => 'INFO',
-    'Game::EvonyTKR::Model::Buff'                   => 'WARN',
-    'Game::EvonyTKR::Model::Buff::Matcher'          => 'INFO',
-    'Game::EvonyTKR::Model::Buff::Summarizer'       => 'DEBUG',
-    'Game::EvonyTKR::Model::Buff::Value'            => 'WARN',
-    'Game::EvonyTKR::Model::Covenant'               => 'INFO',
-    'Game::EvonyTKR::Model::General'                => 'INFO',
-    'Game::EvonyTKR::Model::Specialty'              => 'INFO',
-    'Game::EvonyTKR::Plugins::Navigation'           => 'WARN',
+    'Game::EvonyTKR'                                         => 'DEBUG',
+    'Game::EvonyTKR::Controller::Generals'                   => 'DEBUG',
+    'Game::EvonyTKR::External::Book::LoadAllBuiltins'        => 'INFO',
+    'Game::EvonyTKR::External::Book::LoadAllGenerics'        => 'INFO',
+    'Game::EvonyTKR::External::Book::Loader'                 => 'INFO',
+    'Game::EvonyTKR::External::General::Summarizer'          => 'DEBUG',
+    'Game::EvonyTKR::Model::AscendingAttributes'             => 'INFO',
+    'Game::EvonyTKR::Model::BasicAttribute'                  => 'INFO',
+    'Game::EvonyTKR::Model::BasicAttributes'                 => 'INFO',
+    'Game::EvonyTKR::Model::Book'                            => 'INFO',
+    'Game::EvonyTKR::Model::Buff'                            => 'WARN',
+    'Game::EvonyTKR::Model::Buff::Matcher'                   => 'INFO',
+    'Game::EvonyTKR::Model::Buff::Summarizer'                => 'DEBUG',
+    'Game::EvonyTKR::Model::Buff::Value'                     => 'WARN',
+    'Game::EvonyTKR::Model::Covenant'                        => 'INFO',
+    'Game::EvonyTKR::Model::General'                         => 'INFO',
+    'Game::EvonyTKR::Model::Specialty'                       => 'INFO',
+    'Game::EvonyTKR::Plugins::Navigation'                    => 'WARN',
     'Game::EvonyTKR::Role::Persistence::AscendingAttributes' => 'INFO',
-    'Game::EvonyTKR::Role::Persistence::Books'      => 'INFO',
-    'Game::EvonyTKR::Role::Persistence::Covenants'  => 'INFO',
-    'Game::EvonyTKR::Role::Persistence::Generals'   => 'INFO',
-    'Game::EvonyTKR::Role::Persistence::Specialties' => 'INFO',
-    'Game::EvonyTKR::Shared::Logger'                => 'INFO',
-    'Test::Package'                                 => 'TRACE',
-    'Test'                                          => 'TRACE',
+    'Game::EvonyTKR::Role::Persistence::Books'               => 'INFO',
+    'Game::EvonyTKR::Role::Persistence::Covenants'           => 'INFO',
+    'Game::EvonyTKR::Role::Persistence::Generals'            => 'INFO',
+    'Game::EvonyTKR::Role::Persistence::Specialties'         => 'INFO',
+    'Game::EvonyTKR::Shared::Logger'                         => 'INFO',
+    'Test::Package'                                          => 'TRACE',
+    'Test'                                                   => 'TRACE',
   };
 
   if ($Game::EvonyTKR::Role::Logging::DEBUG_LOGGING) {

@@ -55,7 +55,8 @@ $config_data->{version} = {
 };
 
 # 4. Write back
-$logger->info("Updating version section with commit $git_commit on branch $git_branch");
+$logger->info(
+  "Updating version section with commit $git_commit on branch $git_branch");
 $config_path->spew_utf8($yaml->dump_string($config_data));
 
 $logger->info("Config updated successfully.");

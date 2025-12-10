@@ -10,10 +10,11 @@ package Game::EvonyTKR::External::General::Pair::ReduceBatch {
   sub task_name {'reduce_batch'}
 
   sub register ($taskClass, $app, $conf = {}) {
-    return unless $taskClass->SUPER::register($app, $conf);
+    return 1 unless $taskClass->SUPER::register($app, $conf);
     $app->minion->add_task($taskClass->task_name => __PACKAGE__);
-    my $signal = __PACKAGE__ =~ s/::/_/gr;
-    $app->plugins->emit($signal => 1);
+
+
+    return 1;
   }
 
   state $total_conflicts                = 0;
@@ -52,8 +53,7 @@ package Game::EvonyTKR::External::General::Pair::ReduceBatch {
     }
 
     if ($all_cache_hits && $total_pairs_created == 0) {
-      $job->log_info(
-        'All parent jobs had 100% cache hits, nothing to reduce');
+      $job->log_info('All parent jobs had 100% cache hits, nothing to reduce');
       $job->note(
         total_conflicts  => 0,
         total_cache_hits => $total_cache_hits,

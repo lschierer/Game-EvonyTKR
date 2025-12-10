@@ -26,7 +26,6 @@ package Game::EvonyTKR::Controller::Specialties {
     return "Specialties";
   }
 
-
   sub register($c, $app, $config = {}) {
     $c->log_info("Registering routes for " . __PACKAGE__);
     $c->SUPER::register($app, $config);
@@ -103,11 +102,11 @@ package Game::EvonyTKR::Controller::Specialties {
     my $specialties = [];
     foreach my $sn ($c->list_specialties->@*) {
       my $specialty = $c->get_specialty($sn);
-      unless($specialty){
+      unless ($specialty) {
         $c->log_error(sprintf('failed to get listed specialty "%s"', $sn));
         next;
       }
-      push @{ $specialties }, $specialty;
+      push @{$specialties}, $specialty;
     }
     foreach my $specialty (@$specialties) {
       my $name = $specialty->name;
@@ -175,11 +174,11 @@ package Game::EvonyTKR::Controller::Specialties {
     my $specialties = [];
     foreach my $sn ($c->list_specialties->@*) {
       my $specialty = $c->get_specialty($sn);
-      unless($specialty){
+      unless ($specialty) {
         $c->log_error(sprintf('failed to get listed specialty "%s"', $sn));
         next;
       }
-      push @{ $items }, $specialty;
+      push @{$items}, $specialty;
     }
     $c->log_debug(
       sprintf('Items: %s with %s items.', ref($items), scalar(@$items)));

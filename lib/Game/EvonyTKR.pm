@@ -35,7 +35,8 @@ package Game::EvonyTKR {
     Log::Any::Adapter->set('Log4perl');
     $app->plugin('Log::Any' => { logger => 'Log::Log4perl' });
     $app->log_debug('setting up logging');
-    $app->log->info(sprintf('Mojolicious Logging initialized for process "%s"', $$));
+    $app->log->info(
+      sprintf('Mojolicious Logging initialized for process "%s"', $$));
 
     _init_core($app);    # runs in web *and* worker
     _init_minion($app);
@@ -144,7 +145,7 @@ package Game::EvonyTKR {
         # Ensure normal locking mode (not exclusive)
         $dbh->do('PRAGMA locking_mode=NORMAL');
         # Increase cache size for better performance
-        $dbh->do('PRAGMA cache_size=-64000');  # 64MB cache
+        $dbh->do('PRAGMA cache_size=-64000');    # 64MB cache
       }
     );
 
@@ -173,7 +174,9 @@ package Game::EvonyTKR {
 
     my @task_plugins = find_modules 'Game::EvonyTKR::External',
       { recursive => 1 };
-    foreach my $module (@task_plugins) {
+    foreach my $module (sort @task_plugins) {
+      # make sure Prebuild loads last.
+      next if ($module eq 'Game::EvonyTKR::External::Prebuild');
       if (my $e = load_class($module)) {
         my $errmessage = sprintf('loading module "%s" failed: %s', $module, $e);
         print STDERR $errmessage;
@@ -184,6 +187,14 @@ package Game::EvonyTKR {
       next if ($module eq 'Game::EvonyTKR::External::JobBase');
       $app->plugin($module);
     }
+    my $module = 'Game::EvonyTKR::External::Prebuild';
+    if (my $e = load_class($module)) {
+      my $errmessage = sprintf('loading module "%s" failed: %s', $module, $e);
+      print STDERR $errmessage;
+      $app->log->error($errmessage);
+      croak($errmessage);
+    }
+    $app->plugin($module);
   }
 
   sub _init_web ($app) {
@@ -226,8 +237,7 @@ package Game::EvonyTKR {
           $app->plugin($module);
           $app->log_debug("loaded $module");
         } or do {
-          $app->log_error(
-            sprintf('failed to load module %s: %s', $module, $@));
+          $app->log_error(sprintf('failed to load module %s: %s', $module, $@));
         }
       }
     }
@@ -244,7 +254,8 @@ package Game::EvonyTKR {
     return if $ENV{MINION_WORKER_CHILD};
     my $start_workers = $ENV{START_MINION_WORKERS} // 1;
     my $worker_count  = $ENV{MINION_WORKERS}       // 4;
-    my $job_count     = $ENV{MINION_JOB_COUNT}     // $app->mode eq 'development' ? 5 : 3;
+    my $job_count     = $ENV{MINION_JOB_COUNT}
+      // $app->mode eq 'development' ? 5 : 3;
     return unless $start_workers;
 
     for (1 .. $worker_count) {
@@ -254,7 +265,8 @@ package Game::EvonyTKR {
       # --- child path ---
       $ENV{MINION_WORKER_CHILD} = 1;    # prevents recursion on load
       POSIX::nice(10);
-      exec($^X, $0, 'minion', 'worker', '-j', $job_count) or die "exec failed: $!";
+      exec($^X, $0, 'minion', 'worker', '-j', $job_count)
+        or die "exec failed: $!";
     }
 
     # Reap *our* children periodically (doesn't interfere with Mojo/Hypnotoad)

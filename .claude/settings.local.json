@@ -6,7 +6,9 @@
       "Bash(perl -Ilib t/encoding.t:*)",
       "Bash(perl:*)",
       "Bash(cat:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(grep:*)",
+      "Bash(find:*)"
     ],
     "deny": [],
     "ask": []

@@ -16,7 +16,7 @@ use Carp;
 our $VERSION = 'v0.30.0';
 
 has debug => 0;
-has delay => 0.1;  # Delay between requests in seconds (100ms default)
+has delay => 0.1;    # Delay between requests in seconds (100ms default)
 
 has 'startUrl'       => '';
 has checked_urls     => sub { {} };
@@ -94,14 +94,17 @@ sub check_url ($self, $url, $recurse = 1) {
     $response = $http->get($url);
 
     # Success or permanent failure (4xx) - don't retry
-    if ($response->{success} || ($response->{status} >= 400 && $response->{status} < 500)) {
+    if ($response->{success}
+      || ($response->{status} >= 400 && $response->{status} < 500)) {
       last;
     }
 
     # Transient failure (5xx, timeout, etc) - retry with backoff
     if ($attempt < $max_retries) {
-      my $backoff = 0.5 * $attempt;  # 0.5s, 1s, 1.5s
-      $self->log_debug("Attempt $attempt failed with $response->{status}, retrying after ${backoff}s");
+      my $backoff = 0.5 * $attempt;    # 0.5s, 1s, 1.5s
+      $self->log_debug(
+"Attempt $attempt failed with $response->{status}, retrying after ${backoff}s"
+      );
       select(undef, undef, undef, $backoff);
     }
   }
@@ -216,14 +219,17 @@ sub check_single_url ($self, $url) {
     $response = $http->get($url);
 
     # Success or permanent failure (4xx) - don't retry
-    if ($response->{success} || ($response->{status} >= 400 && $response->{status} < 500)) {
+    if ($response->{success}
+      || ($response->{status} >= 400 && $response->{status} < 500)) {
       last;
     }
 
     # Transient failure (5xx, timeout, etc) - retry with backoff
     if ($attempt < $max_retries) {
-      my $backoff = 0.5 * $attempt;  # 0.5s, 1s, 1.5s
-      $self->log_debug("Attempt $attempt failed with $response->{status}, retrying after ${backoff}s");
+      my $backoff = 0.5 * $attempt;    # 0.5s, 1s, 1.5s
+      $self->log_debug(
+"Attempt $attempt failed with $response->{status}, retrying after ${backoff}s"
+      );
       select(undef, undef, undef, $backoff);
     }
   }
@@ -266,8 +272,7 @@ sub update_children_statuses ($self) {
           $self->checked_urls->{$abs_url_str}->{status};
       }
       else {
-        $self->log_warn(
-          "Could not find status for child URL: $abs_url_str");
+        $self->log_warn("Could not find status for child URL: $abs_url_str");
         $self->checked_urls->{$parent_url}->{children}->{$child_href} =
           'unknown';
       }

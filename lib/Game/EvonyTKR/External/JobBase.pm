@@ -45,10 +45,7 @@ package Game::EvonyTKR::External::JobBase {
     #force the subclass to implement task_name
     $plugin->task_name();
 
-    my $signal = __PACKAGE__ =~ s/::/_/gr;
-    $app->plugins->emit($signal => 1);
-
-    return 1;  # Registration completed successfully
+    return 1;    # Registration completed successfully
   }
 
   sub run {

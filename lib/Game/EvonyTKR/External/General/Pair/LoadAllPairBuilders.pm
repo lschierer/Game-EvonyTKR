@@ -10,11 +10,12 @@ package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
   sub task_name {'load_all_pair_builders'}
 
   sub register ($taskClass, $app, $conf = {}) {
-    return unless $taskClass->SUPER::register($app, $conf);
+    return 1 unless $taskClass->SUPER::register($app, $conf);
     $taskClass->setup_pairs_by_type();
     $app->minion->add_task($taskClass->task_name => __PACKAGE__);
-    my $signal = __PACKAGE__ =~ s/::/_/gr;
-    $app->plugins->emit($signal => 1);
+
+
+    return 1;
   }
 
   sub run ($job, @args) {
@@ -48,8 +49,7 @@ package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
     # Get all generals from cache
     my $generals = $job->get_generals();
 
-    $job->log_info(
-      sprintf('Found %d generals to process', scalar @$generals));
+    $job->log_info(sprintf('Found %d generals to process', scalar @$generals));
 
     # Spawn CreatePairs jobs for each general/type combination
     my $job_count     = 0;

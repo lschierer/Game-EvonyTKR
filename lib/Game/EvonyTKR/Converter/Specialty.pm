@@ -95,8 +95,7 @@ class Game::EvonyTKR::Converter::Specialty :
           $self->log_debug(sprintf(
             'after normalize_buff, size of frag is %s', scalar(@{$nb})
           ));
-          $self->log_debug(sprintf(
-            'this fragment was normalized to -- %s -- ',
+          $self->log_debug(sprintf('this fragment was normalized to -- %s -- ',
             Data::Printer::np($nb)));
           push(@hashedBuffs, @{$nb});
         }
@@ -203,8 +202,7 @@ class Game::EvonyTKR::Converter::Specialty :
     my $filename = lc($name);
     $filename = "${filename}.yaml";
     if (!$outputDir->is_dir()) {
-      $self->log_error(
-        "$outputDir is not a directory!!!" . $outputDir->stat());
+      $self->log_error("$outputDir is not a directory!!!" . $outputDir->stat());
     }
     $outputDir->child($filename)->touch();
     if ($debug) {

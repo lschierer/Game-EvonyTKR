@@ -13,10 +13,9 @@ package Game::EvonyTKR::External::General::Loader {
   sub task_name {'load_general'}
 
   sub register ($taskClass, $app, $conf = {}) {
-    return unless $taskClass->SUPER::register($app, $conf);
+    return 1 unless $taskClass->SUPER::register($app, $conf);
     $app->minion->add_task($taskClass->task_name => __PACKAGE__);
-    my $signal = __PACKAGE__ =~ s/::/_/gr;
-    $app->plugins->emit($signal => 1);
+    return 1;
   }
 
   sub run ($job, $filename) {
@@ -39,12 +38,11 @@ package Game::EvonyTKR::External::General::Loader {
     my $app = $job->app;
     my $collectionDir =
       Mojo::File->new($app->config('distDir'))->child('collections/data/');
-    my $generalDir    = $collectionDir->child('generals');
-    my @suffixList    = ('.yaml', '.yml');
+    my $generalDir = $collectionDir->child('generals');
+    my @suffixList = ('.yaml', '.yml');
 
     $job->log_debug(sprintf(
-      'Searching for file matching "%s" in %s',
-      $filename, $generalDir
+      'Searching for file matching "%s" in %s', $filename, $generalDir
     ));
 
     my ($generalFile) = $generalDir->list->grep(sub {
@@ -63,8 +61,8 @@ package Game::EvonyTKR::External::General::Loader {
 
     unless (defined $generalFile) {
       my $available = join(', ',
-        map { $_->basename } $generalDir->list->grep(sub { $_ =~ /\.ya?ml$/ })->each
-      );
+        map { $_->basename }
+          $generalDir->list->grep(sub { $_ =~ /\.ya?ml$/ })->each);
       $job->log_error(sprintf(
         'No file found matching "%s". Available files: %s',
         $filename, $available
@@ -77,7 +75,8 @@ package Game::EvonyTKR::External::General::Loader {
       return $job->fail("Cannot read general file: $generalFile");
     }
 
-    $job->log_info(sprintf('Loading general from: %s', $generalFile->to_string));
+    $job->log_info(
+      sprintf('Loading general from: %s', $generalFile->to_string));
 
     my $data       = $generalFile->slurp('UTF-8');
     my $hashObject = YAML::PP->new(

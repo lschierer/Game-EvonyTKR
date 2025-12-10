@@ -122,8 +122,7 @@ package Game::EvonyTKR::Model::Book {
       }
     }
     else {
-      $self->log_warn(
-        "Not adding buff: class stack has fewer than 3 elements");
+      $self->log_warn("Not adding buff: class stack has fewer than 3 elements");
     }
 
   }

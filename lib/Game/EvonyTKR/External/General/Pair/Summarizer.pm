@@ -22,7 +22,7 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
   sub task_name {'summarize_pair'}
 
   sub register ($taskClass, $app, $conf = {}) {
-    return unless $taskClass->SUPER::register($app, $conf);
+    return 1 unless $taskClass->SUPER::register($app, $conf);
     $app->minion->add_task($taskClass->task_name => __PACKAGE__);
     $app->plugins->emit(summarize_pair_job_ready => 1);
   }
@@ -123,13 +123,15 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
       $job->log_debug(sprintf('Got covenant for primary: %s', $primaryName));
     }
 
-    $job->log_debug(sprintf('Getting covenant for secondary: %s', $secondaryName));
+    $job->log_debug(
+      sprintf('Getting covenant for secondary: %s', $secondaryName));
     my $secondaryCovenant = $job->get_covenant($secondaryName);
     unless ($secondaryCovenant) {
       $job->log_warn("No covenant found for secondary $secondaryName");
     }
     else {
-      $job->log_debug(sprintf('Got covenant for secondary: %s', $secondaryName));
+      $job->log_debug(
+        sprintf('Got covenant for secondary: %s', $secondaryName));
     }
 
     # Get ascending attributes (primary only)

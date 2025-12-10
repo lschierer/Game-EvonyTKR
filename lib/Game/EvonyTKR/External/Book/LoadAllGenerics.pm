@@ -18,7 +18,7 @@ package Game::EvonyTKR::External::Book::LoadAllGenerics {
   sub task_name {'load_all_generic_books'}
 
   sub register ($taskClass, $app, $conf = {}) {
-    return unless $taskClass->SUPER::register($app, $conf);
+    return 1 unless $taskClass->SUPER::register($app, $conf);
     if (not defined($app)) {
       my $errmessage = 'app not defined in register for ' . __PACKAGE__;
       say $errmessage;
@@ -34,9 +34,8 @@ package Game::EvonyTKR::External::Book::LoadAllGenerics {
     $taskClass->log_debug('Registering Book Loader workflow tasks');
     $app->minion->add_task($taskClass->task_name => __PACKAGE__);
 
-    $taskClass->log_info(sprintf('emitting signal for %s', __PACKAGE__));
-    my $signal = __PACKAGE__ =~ s/::/_/gr;
-    $app->plugins->emit($signal => 1);
+
+    return 1;
   }
 
   sub run ($job, @args) {
@@ -52,8 +51,7 @@ package Game::EvonyTKR::External::Book::LoadAllGenerics {
     }
 
     my @list = $job->list_generic_books()->@*;
-    $job->log_info(
-      sprintf('Found %d generic books to process', scalar @list));
+    $job->log_info(sprintf('Found %d generic books to process', scalar @list));
 
     my $enqueued_count = 0;
     my $skipped_count  = 0;

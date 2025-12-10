@@ -181,8 +181,7 @@ package Game::EvonyTKR::Model::Buff::Summarizer {
     };
 
     unless ($self->targetType) {
-      $self->log_error(
-        sprintf('targetType is required for %s', __PACKAGE__));
+      $self->log_error(sprintf('targetType is required for %s', __PACKAGE__));
       return 0;
     }
 

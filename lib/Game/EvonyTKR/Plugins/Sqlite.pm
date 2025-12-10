@@ -31,7 +31,7 @@ package Game::EvonyTKR::Plugins::Sqlite {
 
     # Check database integrity and recover if corrupted
     my $db_ok = eval {
-      my $test_db = $sqlite->db;
+      my $test_db   = $sqlite->db;
       my $integrity = $test_db->query('PRAGMA integrity_check')->hash;
       return $integrity->{integrity_check} eq 'ok';
     };
@@ -61,7 +61,7 @@ package Game::EvonyTKR::Plugins::Sqlite {
     # Ensure normal locking mode (not exclusive)
     $sqlite->db->query('PRAGMA locking_mode=NORMAL');
     # Increase cache size for better performance
-    $sqlite->db->query('PRAGMA cache_size=-64000');  # 64MB cache
+    $sqlite->db->query('PRAGMA cache_size=-64000');    # 64MB cache
 
     my $db = $sqlite->db;
     ensure_lock_table_sqlite($db);

@@ -228,8 +228,7 @@ qr/elementor-element-(?:\w){1,9}.elementor-widget.elementor-widget-theme-post-co
     my $filename = lc($name);
     $filename = "${filename}.yaml";
     if (!$outputDir->is_dir()) {
-      $self->log_error(
-        "$outputDir is not a directory!!!" . $outputDir->stat());
+      $self->log_error("$outputDir is not a directory!!!" . $outputDir->stat());
     }
     $outputDir->child($filename)->touch();
     if ($debug) {

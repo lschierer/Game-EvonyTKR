@@ -10,10 +10,11 @@ package Game::EvonyTKR::External::General::Pair::CreatePairs {
   sub task_name {'create_pairs'}
 
   sub register ($taskClass, $app, $conf = {}) {
-    return unless $taskClass->SUPER::register($app, $conf);
+    return 1 unless $taskClass->SUPER::register($app, $conf);
     $app->minion->add_task($taskClass->task_name => __PACKAGE__);
-    my $signal = __PACKAGE__ =~ s/::/_/gr;
-    $app->plugins->emit($signal => 1);
+
+
+    return 1;
   }
 
   sub run ($job, $general_name, $type) {
@@ -31,8 +32,7 @@ package Game::EvonyTKR::External::General::Pair::CreatePairs {
       '%s log level is %s',
       __PACKAGE__, Log::Log4perl::Level::to_level($job->logger->level())
     ));
-    $job->log_debug(
-      "Creating pairs for general: $general_name, type: $type");
+    $job->log_debug("Creating pairs for general: $general_name, type: $type");
 
     # Validate the type
     unless ($job->ValidateGeneralType($type)) {

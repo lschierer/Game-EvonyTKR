@@ -63,7 +63,7 @@ package Game::EvonyTKR::External::Prebuild {
       say $errmessage;
       return;
     }
-    return unless $plugin->SUPER::register($app, $conf);
+    return 1 unless $plugin->SUPER::register($app, $conf);
 
     unless (defined($app->minion)) {
       my $errmessage = sprintf('minion undefined in job for %s', __PACKAGE__);
@@ -84,22 +84,33 @@ package Game::EvonyTKR::External::Prebuild {
         blessed($task) // 'undef blessed'));
     }
     foreach my $prereq ($prereq_plugins->@*) {
-      $prereqs->{$prereq} = 0;
-      if (my $e = Mojo::Loader::load_class($prereq)) {
-        $plugin->log_logcroak(sprintf(
-          'exception loading %s: ', ref($e) ? $e : 'Not Found!'));
+      # By this point, parent _init_minion() has already loaded all External modules
+      # So we're just checking if their tasks were successfully registered
+
+      # Get the task name from the prerequisite class
+      my $task_name = eval { $prereq->task_name };
+      if ($@) {
+        my $errmsg = sprintf(
+          'Failed to get task_name from %s: %s', $prereq, $@);
+        $plugin->log_error($errmsg);
+        $prereqs->{$prereq} = 0;
         next;
       }
-      my $signal = $prereq =~ s/::/_/gr;
-      $app->plugins->on(
-        $signal => sub {
-          $plugin->log_info(sprintf('detected %s ready', $prereq));
-          return $plugin->prebuildPrerequisites({ $prereq => 1 });
-        }
-      );
-      eval { $app->plugin($prereq); } or do {
-        $plugin->log_error("Error loading task plugin $prereq: $@");
-      };
+
+      # Check if the task is registered in Minion
+      # If not, the prerequisite's register() failed
+      if ($app->minion->tasks->{$task_name}) {
+        $plugin->log_debug(sprintf(
+          'prereq %s has task "%s" registered', $prereq, $task_name));
+        $prereqs->{$prereq} = 1;
+      } else {
+        my $errmsg = sprintf(
+          'PREREQUISITE FAILED: %s task "%s" was not registered in Minion. ' .
+          'This means its register() method failed or did not call add_task()',
+          $prereq, $task_name);
+        $plugin->log_error($errmsg);
+        $prereqs->{$prereq} = 0;
+      }
 
     }
 
@@ -107,6 +118,7 @@ package Game::EvonyTKR::External::Prebuild {
 
     $plugin->log_info(
       sprintf('%s register function complete for %s', __PACKAGE__, $$));
+    return 1;
   }
 
   sub prebuild_init ($plugin, $app) {

@@ -38,18 +38,13 @@ package Game::EvonyTKR::Controller::Books {
 
     # Load builtin books
     my $builtin_list = $c->list_builtin_books();
-    $c->log_debug(sprintf(
-      'Loading %d builtin books',
-      scalar @$builtin_list
-    ));
+    $c->log_debug(sprintf('Loading %d builtin books', scalar @$builtin_list));
 
     foreach my $book_name ($builtin_list->@*) {
       my $book = $c->get_builtin_book($book_name);
-      unless ($book && ref($book) && $book->isa('Game::EvonyTKR::Model::Book')) {
-        $c->log_error(sprintf(
-          'Failed to load builtin book: %s',
-          $book_name
-        ));
+      unless ($book && ref($book) && $book->isa('Game::EvonyTKR::Model::Book'))
+      {
+        $c->log_error(sprintf('Failed to load builtin book: %s', $book_name));
         next;
       }
       push @all_books, $book;
@@ -138,9 +133,7 @@ package Game::EvonyTKR::Controller::Books {
     my $books = $c->get_all_books($app);
 
     $c->log_info(sprintf(
-      'Building routes for %d skill books',
-      scalar(@$books)
-    ));
+      'Building routes for %d skill books', scalar(@$books)));
 
     foreach my $book (@$books) {
       my $name = $book->name;
@@ -159,9 +152,7 @@ package Game::EvonyTKR::Controller::Books {
         order  => 30,
       });
 
-      $c->log_debug(
-        sprintf('Added route and nav item for "%s"', $name)
-      );
+      $c->log_debug(sprintf('Added route and nav item for "%s"', $name));
     }
   }
 

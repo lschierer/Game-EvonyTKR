@@ -28,8 +28,8 @@ has 'sqlite' => sub ($self) {
   if (-f $db_path) {
     $db_ok = eval {
       my $test_sqlite = Mojo::SQLite->new('file:' . $db_path);
-      my $test_db = $test_sqlite->db;
-      my $integrity = $test_db->query('PRAGMA integrity_check')->hash;
+      my $test_db     = $test_sqlite->db;
+      my $integrity   = $test_db->query('PRAGMA integrity_check')->hash;
       return $integrity->{integrity_check} eq 'ok';
     };
 
@@ -40,7 +40,7 @@ has 'sqlite' => sub ($self) {
       # Backup corrupted database
       my $backup_dir = Mojo::File->new($db_path)->dirname->child('backup');
       $backup_dir->make_path;
-      my $timestamp = time();
+      my $timestamp   = time();
       my $backup_path = $backup_dir->child("persistence.db.corrupt.$timestamp");
 
       eval {
@@ -70,7 +70,7 @@ has 'sqlite' => sub ($self) {
   # Ensure normal locking mode (not exclusive)
   $sqlite->db->query('PRAGMA locking_mode = NORMAL');
   # Increase cache size for better performance
-  $sqlite->db->query('PRAGMA cache_size = -32000');  # 32MB cache
+  $sqlite->db->query('PRAGMA cache_size = -32000');    # 32MB cache
 
   # Set pragmas for all future connections
   $sqlite->on(

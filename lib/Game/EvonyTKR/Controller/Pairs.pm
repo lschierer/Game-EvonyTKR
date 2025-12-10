@@ -16,9 +16,9 @@ use namespace::autoclean;
 
 package Game::EvonyTKR::Controller::Pairs {
   use Mojo::Base 'Game::EvonyTKR::Controller::ControllerBase';
-  use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants', -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants', -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::Constants::Covenants',        -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants',      -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants',   -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Constants::Covenants',          -role;
   use Mojo::Base 'Game::EvonyTKR::Controller::Role::Generals::Routing', -role;
   use Mojo::IOLoop;
   use Mojo::JSON     qw(to_json encode_json);
@@ -253,8 +253,7 @@ package Game::EvonyTKR::Controller::Pairs {
     my $data_model = Game::EvonyTKR::Model::Data->new;
 
     unless ($data_model->validateBuffActivation($buffActivation)) {
-      $c->log_warn(
-        "Invalid Buff Activation: $buffActivation, using 'Overall'");
+      $c->log_warn("Invalid Buff Activation: $buffActivation, using 'Overall'");
       $buffActivation = 'Overall';
     }
 

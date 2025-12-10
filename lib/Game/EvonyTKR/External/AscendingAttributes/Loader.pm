@@ -12,10 +12,9 @@ package Game::EvonyTKR::External::AscendingAttributes::Loader {
   sub task_name {'load_ascending_attributes'}
 
   sub register ($taskClass, $app, $conf = {}) {
-    return unless $taskClass->SUPER::register($app, $conf);
+    return 1 unless $taskClass->SUPER::register($app, $conf);
     $app->minion->add_task($taskClass->task_name => __PACKAGE__);
-    my $signal = __PACKAGE__ =~ s/::/_/gr;
-    $app->plugins->emit($signal => 1);
+    return 1;
   }
 
   sub run ($job, $filename) {

@@ -134,9 +134,7 @@ class GitRepo::Reader {
 
   method get_current_branch {
     # Get the current branch name
-    my $branch = eval {
-      $git_repo->run('rev-parse', '--abbrev-ref', 'HEAD');
-    };
+    my $branch = eval { $git_repo->run('rev-parse', '--abbrev-ref', 'HEAD'); };
     if ($@) {
       $logger->warn("Could not get current branch: $@");
       return 'unknown';

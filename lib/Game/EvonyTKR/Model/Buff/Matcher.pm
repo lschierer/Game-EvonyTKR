@@ -60,8 +60,7 @@ package Game::EvonyTKR::Model::Buff::Matcher {
       }
     }
     else {
-      $self->log_debug(
-        "$logID the buff to be tested had no targeted types.");
+      $self->log_debug("$logID the buff to be tested had no targeted types.");
     }
     $self->log_debug($logID . ' matchTargetedType found no issue');
     return 1;
@@ -69,8 +68,7 @@ package Game::EvonyTKR::Model::Buff::Matcher {
 
   sub matchDebuffConditions ($self, $testDebuffs, $logID) {
     my $has_debuff_conditions = scalar @{ $self->toTest->debuffConditions } > 0;
-    $self->log_debug(
-      "$logID has_debuff_conditions is $has_debuff_conditions");
+    $self->log_debug("$logID has_debuff_conditions is $has_debuff_conditions");
     if ($has_debuff_conditions) {
       if (scalar @$testDebuffs == 0) {
         $self->log_debug(

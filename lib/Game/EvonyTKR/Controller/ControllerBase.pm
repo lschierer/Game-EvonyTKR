@@ -94,9 +94,12 @@ package Game::EvonyTKR::Controller::ControllerBase {
           $env_info = {
             deployment_type => 'ec2',
             hostname        => $deployment_env->{'HOSTNAME'} // `hostname`,
-            git_commit      => $app->config->{'version'}->{'git-commit'} // 'unknown',
-            git_branch      => $app->config->{'version'}->{'git-branch'} // 'unknown',
-            build_time      => $app->config->{'version'}->{'build-time'} // 'unknown',
+            git_commit      => $app->config->{'version'}->{'git-commit'}
+              // 'unknown',
+            git_branch => $app->config->{'version'}->{'git-branch'}
+              // 'unknown',
+            build_time => $app->config->{'version'}->{'build-time'}
+              // 'unknown',
           };
           chomp $env_info->{hostname} if $env_info->{hostname};
         }
@@ -104,10 +107,11 @@ package Game::EvonyTKR::Controller::ControllerBase {
           # Container deployment info (legacy)
           $env_info = {
             deployment_type     => 'container',
-            cdk_deployment_time => $deployment_env->{'DEPLOYMENT_TIME'} // 'unknown',
-            container_id        => $deployment_env->{'HOSTNAME'} // 'unknown',
-            image_tag           => $deployment_env->{'IMAGE_TAG'} // 'unknown',
-            image_uri           => $deployment_env->{'IMAGE_URI'} // 'unknown',
+            cdk_deployment_time => $deployment_env->{'DEPLOYMENT_TIME'}
+              // 'unknown',
+            container_id => $deployment_env->{'HOSTNAME'}  // 'unknown',
+            image_tag    => $deployment_env->{'IMAGE_TAG'} // 'unknown',
+            image_uri    => $deployment_env->{'IMAGE_URI'} // 'unknown',
           };
         }
 
