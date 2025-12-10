@@ -7,14 +7,14 @@ buffs:
     value:
       number: 60
     conditions:
-      - leading_the_army
+      - leading the army
       - Attacking
   - attribute: Defense
     troop: Ground Troops
     value:
       number: 60
     conditions:
-      - leading_the_army
+      - leading the army
       - Attacking
   - attribute: HP
     troop: Ground Troops
