@@ -17,8 +17,15 @@ package Game::EvonyTKR::External::JobBase {
       sprintf('%s must implement task_name()', ref($class) || $class));
   }
 
+  # Track which classes have been registered to prevent multiple registrations
+  # This prevents Hypnotoad worker forks from re-registering tasks
+  state %registered_classes;
+
   # Initialize Log4perl for all job-based classes
   sub register ($plugin, $app, $conf = {}) {
+    # Prevent multiple registrations of the same class
+    my $class = ref($plugin) || $plugin;
+    return if $registered_classes{$class}++;
 
     if (not defined($app)) {
       my $errmessage = 'app not defined in register for ' . __PACKAGE__;

@@ -5,7 +5,8 @@
       "Bash(prove -v:*)",
       "Bash(perl -Ilib t/encoding.t:*)",
       "Bash(perl:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(ls:*)"
     ],
     "deny": [],
     "ask": []
