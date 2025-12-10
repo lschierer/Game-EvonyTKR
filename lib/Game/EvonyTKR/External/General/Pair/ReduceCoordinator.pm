@@ -26,6 +26,13 @@ package Game::EvonyTKR::External::General::Pair::ReduceCoordinator {
 
   sub run ($job) {
     $job->SUPER::run([]);
+    
+    # Check if prerequisites are loaded - fail fast if not
+    return if ($job->are_prereqs_outstanding(
+      $job->minion,
+      ['load_all_pair_builders']
+    ));
+    
     my $processed = $job->info->{notes}{processed} // {};
 
     # Initialize merged results from job notes
