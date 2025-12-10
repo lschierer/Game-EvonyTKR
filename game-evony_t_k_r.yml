@@ -1,6 +1,6 @@
 ---
 git_meta:
-  authors: Luke Schierer, Luke Stephen Schierer, Wags-SMITE
+  authors: Luke Stephen Schierer, Wags-SMITE
   copyright: 2023-2025
 hypnotoad:
   accepts: 10000
@@ -13,3 +13,7 @@ hypnotoad:
   workers: 2
 secrets:
 - e0deeacd35ce3e6c4b07a33ae421a4704636f001
+version:
+  build-time: 2025-12-10T03:08:56
+  git-branch: streaming
+  git-commit: a4c73a93
