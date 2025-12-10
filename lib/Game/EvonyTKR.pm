@@ -35,7 +35,7 @@ package Game::EvonyTKR {
     Log::Any::Adapter->set('Log4perl');
     $app->plugin('Log::Any' => { logger => 'Log::Log4perl' });
     $app->log_debug('setting up logging');
-    $app->log->info(sprintf('Mojolicious Logging initialized'));
+    $app->log->info(sprintf('Mojolicious Logging initialized for process "%s"', $$));
 
     _init_core($app);    # runs in web *and* worker
     _init_minion($app);
