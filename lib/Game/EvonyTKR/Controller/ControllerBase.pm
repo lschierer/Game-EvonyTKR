@@ -100,6 +100,8 @@ package Game::EvonyTKR::Controller::ControllerBase {
               // 'unknown',
             build_time => $app->config->{'version'}->{'build-time'}
               // 'unknown',
+            cdk_deployment_time => $deployment_env->{'DEPLOYMENT_TIME'}
+              // 'unknown',
           };
           chomp $env_info->{hostname} if $env_info->{hostname};
         }
@@ -109,9 +111,6 @@ package Game::EvonyTKR::Controller::ControllerBase {
             deployment_type     => 'container',
             cdk_deployment_time => $deployment_env->{'DEPLOYMENT_TIME'}
               // 'unknown',
-            container_id => $deployment_env->{'HOSTNAME'}  // 'unknown',
-            image_tag    => $deployment_env->{'IMAGE_TAG'} // 'unknown',
-            image_uri    => $deployment_env->{'IMAGE_URI'} // 'unknown',
           };
         }
 

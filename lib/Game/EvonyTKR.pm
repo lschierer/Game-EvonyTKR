@@ -23,7 +23,7 @@ package Game::EvonyTKR {
   use Scalar::Util 'weaken';
   use Carp;
   use diagnostics;
-  use Env qw(DEPLOYMENT_TIME HOSTNAME IMAGE_TAG IMAGE_URI);
+  use Env qw(DEPLOYMENT_TIME HOSTNAME );
   our $VERSION = 'v0.50.0';
 
   BEGIN {
@@ -122,8 +122,6 @@ package Game::EvonyTKR {
       'EvonyTKR-Environment' => {
         DEPLOYMENT_TIME => $DEPLOYMENT_TIME,
         HOSTNAME        => $HOSTNAME,
-        IMAGE_TAG       => $IMAGE_TAG,
-        IMAGE_URI       => $IMAGE_URI,
       }
     );
 
