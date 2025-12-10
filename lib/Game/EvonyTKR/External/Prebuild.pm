@@ -189,10 +189,14 @@ package Game::EvonyTKR::External::Prebuild {
 
     my $owner         = $$ . '@' . ($ENV{HOSTNAME} // 'localhost');
     my $job_key       = 'prebuild_run';
-    my $ttl           = 60;                                 # lock TTL (seconds)
-    my $refresh_every = 20;                                 # heartbeat interval
+    my $ttl           = 30;                                 # reduced TTL (seconds)
+    my $refresh_every = 10;                                 # heartbeat interval
     my $db            = $job->minion->backend->sqlite->db;
     my $pair_monitor_jid;
+
+    # On fresh boot, clear any stale locks older than 5 minutes
+    my $stale_cutoff = time() - 300;
+    $db->query('DELETE FROM app_locks WHERE updated_at < ?', $stale_cutoff);
 
     unless ($job->app->try_acquire_lock_sqlite($db, $job_key, $owner, $ttl)) {
       $job->note(skipped => 'another prebuild is running');
