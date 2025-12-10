@@ -270,9 +270,12 @@ package Game::EvonyTKR {
   sub _spawn_minion_workers ($app) {
     return if $ENV{MINION_WORKER_CHILD};
     my $start_workers = $ENV{START_MINION_WORKERS} // 1;
-    my $worker_count  = $ENV{MINION_WORKERS}       // 4;
+    # Production defaults for T4G Large (2 vCPUs):
+    # 2 workers × 1 job = 2 concurrent processes (matches CPU count)
+    # Development: More aggressive for local multi-core machines
+    my $worker_count  = $ENV{MINION_WORKERS}       // ($app->mode eq 'development' ? 4 : 2);
     my $job_count     = $ENV{MINION_JOB_COUNT}
-      // $app->mode eq 'development' ? 5 : 3;
+      // $app->mode eq 'development' ? 5 : 1;
     return unless $start_workers;
 
     for (1 .. $worker_count) {

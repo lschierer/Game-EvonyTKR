@@ -32,7 +32,7 @@ sudo -u ${APP_USER} -s /bin/bash -l -c "cd ${APP_PATH} && ./Build"
 
 # remove the old state
 # to prevent stale cache problems with new data
-rm -rf /opt/mojo/app/var
+sudo -u ${APP_USER} rm -rf /opt/mojo/app/var
 
 # workers now launched from the main package
 #echo "Restarting workers"
