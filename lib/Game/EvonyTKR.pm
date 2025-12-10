@@ -35,8 +35,14 @@ package Game::EvonyTKR {
     Log::Any::Adapter->set('Log4perl');
     $app->plugin('Log::Any' => { logger => 'Log::Log4perl' });
     $app->log_debug('setting up logging');
-    $app->log->info(
-      sprintf('Mojolicious Logging initialized for process "%s"', $$));
+
+    # Debug: Why is startup() being called?
+    my $is_minion = _this_is_a_minion_process();
+    my $parent_pid = getppid();
+    $app->log->info(sprintf(
+      'Mojolicious Logging initialized for process "%s" (parent: %s, is_minion: %s, MINION_WORKER_CHILD: %s)',
+      $$, $parent_pid, $is_minion ? 'YES' : 'NO', $ENV{MINION_WORKER_CHILD} // 'unset'
+    ));
 
     _init_core($app);    # runs in web *and* worker
     _init_minion($app);
@@ -50,9 +56,20 @@ package Game::EvonyTKR {
         # optional: only if you want web proc to fork workers
         Mojo::IOLoop->timer(
           1 => sub {
-            return unless _this_proc_is_a_web_server($server); # has acceptors?
-            return unless _i_am_the_one_spawner($app);         # spawn once only
-            return if _this_is_a_minion_process(); # don't spawn from minion cmd
+            my $is_web = _this_proc_is_a_web_server($server);
+            my $is_spawner = _i_am_the_one_spawner($app);
+            my $is_minion = _this_is_a_minion_process();
+
+            $app->log->debug(sprintf(
+              'Worker spawn check in PID %s: is_web=%s, is_spawner=%s, is_minion=%s',
+              $$, $is_web ? 'YES' : 'NO', $is_spawner ? 'YES' : 'NO', $is_minion ? 'YES' : 'NO'
+            ));
+
+            return unless $is_web; # has acceptors?
+            return unless $is_spawner;         # spawn once only
+            return if $is_minion; # don't spawn from minion cmd
+
+            $app->log->info("SPAWNING MINION WORKERS from PID $$");
             _spawn_minion_workers($app);
           }
         );
