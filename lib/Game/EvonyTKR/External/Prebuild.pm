@@ -103,7 +103,7 @@ package Game::EvonyTKR::External::Prebuild {
 
     }
 
-    #$plugin->prebuild_init($app);
+    $plugin->prebuild_init($app);
 
     $plugin->log_info(
       sprintf('%s register function complete for %s', __PACKAGE__, $$));
