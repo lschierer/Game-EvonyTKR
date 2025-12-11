@@ -89,6 +89,7 @@ my $builder = Module::Build->new(
     'Params::ValidationCompiler'          => '0',
     'Path::Iterator::Rule'                => '0',
     'Path::Tiny'                          => '0',
+    'Paws'                                => '0',
     'Readonly'                            => '0',
     'Scalar::Util'                        => '0',
     'Sereal::Encoder'                     => '0',

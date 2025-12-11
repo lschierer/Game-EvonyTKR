@@ -49,6 +49,10 @@ cd /opt/mojo/app
 
 mise trust
 # Install tools (including Python) with retry for transient failures
+export MISE_AQUA_MINISIGN=false
+export MISE_PYTHON_VERIFY_SIGNATURE=false
+export MISE_NODE_VERIFY_SIGNATURE=false
+export MISE_NODE_VERIFY=false
 retry_with_backoff mise install
 mise reshim
 
