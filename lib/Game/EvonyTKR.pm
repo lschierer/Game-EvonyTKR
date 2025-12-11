@@ -3,8 +3,6 @@ use experimental qw(class);
 use utf8::all;
 use File::FindLib 'lib';
 require YAML::PP;
-require Minion::Backend::SQLite;
-require Mojolicious::Plugin::Minion;
 
 #require Game::EvonyTKR::Controller::Root;
 require Game::EvonyTKR::Controller::ControllerBase;
@@ -13,6 +11,8 @@ require Game::EvonyTKR::External::JobBase;
 package Game::EvonyTKR {
   use Mojo::Base 'Mojolicious',                   -strict, -signatures;
   use Mojo::Base 'Game::EvonyTKR::Role::Logging', -role,   -signatures;
+  use Mojo::Base 'Game::EvonyTKR::Role::Persistence', -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Common', -role;
   use Log::Any::Adapter;
   use Log::Log4perl;
   use Mojo::File::Share qw(dist_dir );
@@ -43,6 +43,8 @@ package Game::EvonyTKR {
       'Mojolicious Logging initialized for process "%s" (parent: %s, is_minion: %s, MINION_WORKER_CHILD: %s)',
       $$, $parent_pid, $is_minion ? 'YES' : 'NO', $ENV{MINION_WORKER_CHILD} // 'unset'
     ));
+
+    $app->config(start_time => time());
 
     _init_core($app);    # runs in web *and* worker
     _init_minion($app);
@@ -144,45 +146,27 @@ package Game::EvonyTKR {
   }
 
   sub _init_minion($app) {
-    # this defines helpers needed by both the web and worker processes.
-    #
-    $app->plugin('Game::EvonyTKR::Plugins::Sqlite');
 
-    # Apply PRAGMAs for ALL future connections first
+    require Minion::Backend::SQLite;
+    require Mojolicious::Plugin::Minion;
+    # Use SQLite for Minion (reliable), mode-gated persistence for application data
+    my $minion_db = $app->home->child('minion.db');
+    $app->plugin(Minion => { SQLite => $minion_db });
+
+    # Apply SQLite optimizations for Minion
     my $sqlite = $app->minion->backend->sqlite;
     $sqlite->on(
       connection => sub ($sqlite, $dbh) {
         $dbh->do('PRAGMA journal_mode=WAL');
         $dbh->do('PRAGMA synchronous=NORMAL');
-        $dbh->do('PRAGMA temp_store=MEMORY');
-        $dbh->do('PRAGMA foreign_keys=ON');
-        $dbh->do('PRAGMA busy_timeout=8000');
-        # Disable memory-mapped I/O for compatibility with EBS volumes
-        $dbh->do('PRAGMA mmap_size=0');
-        # Ensure normal locking mode (not exclusive)
-        $dbh->do('PRAGMA locking_mode=NORMAL');
-        # Increase cache size for better performance
-        $dbh->do('PRAGMA cache_size=-64000');    # 64MB cache
+        $dbh->do('PRAGMA busy_timeout=30000');
       }
     );
 
-    # Now it's safe to open a handle
-    my $db = $sqlite->db;
-    $db->ping;
-
-    # Run migrations/repair ONLY in the
-    # web parent (not in forked or exec'd workers)
-    my $is_worker_child = $ENV{MINION_WORKER_CHILD};
-    my $is_minion_cmd   = ($0 =~ /minion(?:\.pl)?$/i)
-      || ($ENV{MOJO_COMMAND} && $ENV{MOJO_COMMAND} eq 'minion');
-
-    unless ($is_worker_child || $is_minion_cmd) {
-      $sqlite->migrations->name('evonytkr')
-        ->from_data('Game::EvonyTKR', 'migrations')
-        ->migrate;
-
-      $app->minion->repair;
-      $app->ensure_lock_table_sqlite($db);
+    # Clear Minion jobs on startup
+    unless ($ENV{MINION_WORKER_CHILD}) {
+      $app->minion->reset;
+      $app->log->info("Cleared Minion jobs on startup");
     }
 
     if ($app->mode eq 'development') {
@@ -204,6 +188,7 @@ package Game::EvonyTKR {
       next if ($module eq 'Game::EvonyTKR::External::JobBase');
       $app->plugin($module);
     }
+
     my $module = 'Game::EvonyTKR::External::Prebuild';
     if (my $e = load_class($module)) {
       my $errmessage = sprintf('loading module "%s" failed: %s', $module, $e);

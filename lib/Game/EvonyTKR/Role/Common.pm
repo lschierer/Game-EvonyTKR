@@ -188,7 +188,11 @@ package Game::EvonyTKR::Role::Common {
       }
     }
 
-    # All prereqs met
+    # All prereqs met - clear any previous outstanding_prereqs note
+    if ($is_minion_job) {
+      $self->note(outstanding_prereqs => undef);
+    }
+    
     return 0;
   }
 }

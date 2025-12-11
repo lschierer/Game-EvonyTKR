@@ -5,7 +5,7 @@ use Mojo::Base -role,                                     -signatures;
 use Mojo::Base 'Game::EvonyTKR::Role::Persistence::Core', -role;
 
 sub add_general ($self, $general) {
-  my $name = $general->name;
+  my $name = lc($self->normalize($general->name));
   # Normalize the name before storing to ensure consistent lookups
   my $normalized_name = $self->normalize($name);
   $self->persistence->store_general($normalized_name, $general->to_wire_hash());
@@ -22,7 +22,6 @@ sub get_general ($self, $name) {
   $self->log_debug("get_general called for: $name");
 
   my $normalized_name = lc($self->normalize($name)) // '';
-  $normalized_name =~ s/ /_/g;
   return unless (length($normalized_name));
 
   if (exists $generals->{$normalized_name}) {
@@ -31,7 +30,7 @@ sub get_general ($self, $name) {
   }
 
   # Load directly from SQLite - use normalized name for lookup
-  my $wire_data = $self->persistence->get_general($self->normalize($name));
+  my $wire_data = $self->persistence->get_general($normalized_name);
 
   unless (defined($wire_data)) {
     $self->log_warn("No data found for: $name");

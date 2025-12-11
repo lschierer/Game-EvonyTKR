@@ -177,11 +177,12 @@ BEGIN {
   #(ALL|FATAL|TRACE|DEBUG|INFO|WARN|ERROR|FATAL|OFF)
   $logLevelOverrides = {
     'Game::EvonyTKR'                                         => 'DEBUG',
-    'Game::EvonyTKR::Controller::Generals'                   => 'DEBUG',
+    'Game::EvonyTKR::Controller::Generals'                   => 'INFO',
     'Game::EvonyTKR::External::Book::LoadAllBuiltins'        => 'INFO',
     'Game::EvonyTKR::External::Book::LoadAllGenerics'        => 'INFO',
     'Game::EvonyTKR::External::Book::Loader'                 => 'INFO',
     'Game::EvonyTKR::External::General::Summarizer'          => 'DEBUG',
+    'Game::EvonyTKR::External::Prebuild'                     => 'DEBUG',
     'Game::EvonyTKR::Model::AscendingAttributes'             => 'INFO',
     'Game::EvonyTKR::Model::BasicAttribute'                  => 'INFO',
     'Game::EvonyTKR::Model::BasicAttributes'                 => 'INFO',

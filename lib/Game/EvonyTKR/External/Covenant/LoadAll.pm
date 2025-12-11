@@ -138,7 +138,7 @@ package Game::EvonyTKR::External::Covenant::LoadAll {
         foreach my $file (@files) {
           my $covenant_name = $file->basename('.yaml', '.yml');
           # Query SQLite directly to bypass state cache
-          unless ($job->persistence->get_covenant($covenant_name)) {
+          unless ($job->get_covenant($covenant_name)) {
             $all_in_persistence = 0;
             $missing_count++;
           }

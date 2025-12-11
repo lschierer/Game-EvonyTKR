@@ -1,0 +1,344 @@
+package Game::EvonyTKR::Service::SQLitePersistence;
+use v5.42.0;
+use utf8::all;
+use Mojo::Base -base, -signatures;
+use Mojo::SQLite;
+use Mojo::JSON qw(encode_json decode_json);
+use Carp;
+use Time::HiRes 'time';
+
+has 'db_path' => sub {
+  $ENV{SQLITE_DB_PATH} || './evonytkr.db'
+};
+
+has 'sqlite' => sub ($self) {
+  my $sqlite = Mojo::SQLite->new('sqlite:' . $self->db_path);
+
+  # Apply optimizations
+  $sqlite->on(connection => sub ($sqlite, $dbh) {
+    $dbh->do('PRAGMA journal_mode=WAL');
+    $dbh->do('PRAGMA synchronous=NORMAL');
+    $dbh->do('PRAGMA busy_timeout=30000');
+  });
+
+  # Create tables - run migrations immediately
+  $sqlite->migrations->name('evonytkr')->from_data->migrate;
+
+  return $sqlite;
+};
+
+has 'db' => sub ($self) { $self->sqlite->db };
+
+has 'lifecycle_id' => sub ($self) {
+  my $stored = $self->get_metadata('lifecycle_id');
+  unless ($stored) {
+    $stored = time . '_' . $$;
+    $self->set_metadata('lifecycle_id', $stored);
+  }
+  return $stored;
+};
+
+# Metadata operations
+sub get_metadata ($self, $key) {
+  my $result = $self->db->select('metadata', ['value'], { key => $key })->hash;
+  return $result ? decode_json($result->{value}) : undef;
+}
+
+sub set_metadata ($self, $key, $value) {
+  $self->db->insert('metadata', {
+    key => $key,
+    value => encode_json($value),
+    updated_at => time()
+  }, { on_conflict => \['(key) do update set value = ?, updated_at = ?', encode_json($value), time()] });
+}
+
+# Job completion tracking
+sub mark_job_completed ($self, $job_name) {
+  $self->db->insert('job_completed', {
+    job_name => $job_name,
+    completed_at => time()
+  }, { on_conflict => \['(job_name) do update set completed_at = ?', time()] });
+}
+
+sub is_job_completed ($self, $job_name) {
+  return $self->db->select('job_completed', ['job_name'], { job_name => $job_name })->hash ? 1 : 0;
+}
+
+# Generic storage operations
+sub store_data ($self, $table, $key, $data) {
+  eval {
+    $self->db->insert($table, {
+      name => $key,
+      data => encode_json($data),
+      updated_at => time()
+    }, { on_conflict => \['(name) do update set data = ?, updated_at = ?', encode_json($data), time()] });
+  };
+  if ($@) {
+    warn "Failed to store data in $table for key $key: $@";
+    die $@;
+  }
+}
+
+sub get_data ($self, $table, $key) {
+  my $result = eval { $self->db->select($table, ['data'], { name => $key })->hash };
+  if ($@) {
+    warn "Failed to get data from $table for key $key: $@";
+    return undef;
+  }
+  return $result ? decode_json($result->{data}) : undef;
+}
+
+sub get_all_data ($self, $table) {
+  my $results = $self->db->select($table, ['name', 'data'])->hashes;
+  my $data = {};
+  for my $row (@$results) {
+    $data->{$row->{name}} = decode_json($row->{data});
+  }
+  return $data;
+}
+
+# Specific data type methods (delegate to generic methods)
+sub store_general ($self, $key, $general_data) {
+  return $self->store_data('generals', $key, $general_data);
+}
+
+sub get_general ($self, $name) {
+  return $self->get_data('generals', $name);
+}
+
+sub get_all_generals ($self) {
+  return $self->get_all_data('generals');
+}
+
+sub count_generals ($self) {
+  return $self->db->query('SELECT COUNT(*) FROM generals')->array->[0];
+}
+
+# Ascending Attributes
+sub store_ascending_attribute ($self, $key, $data) {
+  return $self->store_data('ascending_attributes', $key, $data);
+}
+
+sub get_ascending_attribute ($self, $name) {
+  return $self->get_data('ascending_attributes', $name);
+}
+
+sub get_all_ascending_attributes ($self) {
+  return $self->get_all_data('ascending_attributes');
+}
+
+sub count_ascending_attributes ($self) {
+  return $self->db->query('SELECT COUNT(*) FROM ascending_attributes')->array->[0];
+}
+
+# Books
+sub store_book ($self, $key, $book_data) {
+  my $name = $book_data->{name} or croak "Book must have name";
+  my $type = $book_data->{type} || 'generic';
+  my $table = $type eq 'builtin' ? 'builtin_books' : 'generic_books';
+  return $self->store_data($table, $key, $book_data);
+}
+
+sub get_book ($self, $name, $type = 'generic') {
+  my $table = $type eq 'builtin' ? 'builtin_books' : 'generic_books';
+  return $self->get_data($table, $name);
+}
+
+sub get_all_books ($self, $type = 'generic') {
+  my $table = $type eq 'builtin' ? 'builtin_books' : 'generic_books';
+  return $self->get_all_data($table);
+}
+
+# Legacy book methods
+sub get_generic_book ($self, $name, $level = undef) { $self->get_book($name, 'generic') }
+sub get_builtin_book ($self, $name, $level = undef) { $self->get_book($name, 'builtin') }
+sub get_all_generic_books ($self) { $self->get_all_books('generic') }
+sub get_all_builtin_books ($self) { $self->get_all_books('builtin') }
+
+sub store_generic_book ($self, $key, $data) {
+  $data->{type} = 'generic';
+  return $self->store_book($key, $data);
+}
+
+sub store_builtin_book ($self, $name, $data) {
+  $data->{type} = 'builtin';
+  return $self->store_book($name, $data);
+}
+
+sub count_generic_books ($self) {
+  return $self->db->query('SELECT COUNT(*) FROM generic_books')->array->[0];
+}
+
+sub count_builtin_books ($self) {
+  return $self->db->query('SELECT COUNT(*) FROM builtin_books')->array->[0];
+}
+
+# Specialties
+sub store_specialty ($self, $key, $data) {
+  return $self->store_data('specialties', $key, $data);
+}
+
+sub get_specialty ($self, $name) {
+  my $result = $self->get_data('specialties', $name);
+  return $result;
+}
+sub get_all_specialties ($self) { $self->get_all_data('specialties') }
+sub count_specialties ($self) { $self->db->query('SELECT COUNT(*) FROM specialties')->array->[0] }
+
+# Covenants
+sub store_covenant ($self, $key, $covenant_data) {
+  return $self->store_data('covenants', $key, $covenant_data);
+}
+
+sub get_covenant ($self, $name) { $self->get_data('covenants', $name) }
+sub get_all_covenants ($self) { $self->get_all_data('covenants') }
+sub count_covenants ($self) { $self->db->query('SELECT COUNT(*) FROM covenants')->array->[0] }
+
+# Glossary terms
+sub store_glossary_term ($self, $name, $data) { $self->store_data('glossary_terms', $name, $data) }
+sub get_glossary_term ($self, $name) { $self->get_data('glossary_terms', $name) }
+sub get_all_glossary_terms ($self) { $self->get_all_data('glossary_terms') }
+sub count_glossary_terms ($self) { $self->db->query('SELECT COUNT(*) FROM glossary_terms')->array->[0] }
+
+# Conflicts
+sub store_conflict ($self, $g1, $g2, $conflicts) {
+  ($g1, $g2) = sort ($g1, $g2);
+  my $key = "$g1:$g2";
+  $self->db->insert('general_conflicts', {
+    pair_key => $key,
+    conflicts => $conflicts ? 1 : 0,
+    updated_at => time()
+  }, { on_conflict => \['(pair_key) do update set conflicts = ?, updated_at = ?', $conflicts ? 1 : 0, time()] });
+}
+
+sub get_conflict ($self, $g1, $g2) {
+  ($g1, $g2) = sort ($g1, $g2);
+  my $key = "$g1:$g2";
+  my $result = $self->db->select('general_conflicts', ['conflicts'], { pair_key => $key })->hash;
+  return unless $result;
+  return $result->{conflicts} ? 1 : 0;
+}
+
+# Pairs (simplified)
+sub store_pairs ($self, $type, $pairs) {
+  $self->store_data('pairs', $type, { pairs => $pairs });
+}
+
+sub get_pairs_by_type ($self, $type) {
+  my $result = $self->get_data('pairs', $type);
+  return $result ? $result->{pairs} : [];
+}
+
+sub store_pair ($self, $key, $data) { $self->store_data('pairs_individual', $key, $data) }
+sub get_pair ($self, $key) { $self->get_data('pairs_individual', $key) }
+
+sub get_all_pair_types ($self) {
+  my $results = $self->db->select('pairs', ['name'])->arrays;
+  return [map { $_->[0] } @$results];
+}
+
+sub list_pairs_by_type ($self, $type) { $self->get_pairs_by_type($type) }
+
+# Clear all data
+sub clear_all_data ($self) {
+  my @tables = qw(
+    metadata generals ascending_attributes builtin_books generic_books
+    specialties covenants general_conflicts glossary_terms pairs pairs_individual
+    job_completed
+  );
+
+  for my $table (@tables) {
+    eval { $self->db->delete($table) };
+  }
+  return 1;
+}
+
+1;
+
+__DATA__
+
+@@ evonytkr
+-- 1 up
+CREATE TABLE IF NOT EXISTS metadata (
+  key TEXT PRIMARY KEY,
+  value TEXT NOT NULL,
+  updated_at REAL NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS job_completed (
+  job_name TEXT PRIMARY KEY,
+  completed_at REAL NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS generals (
+  name TEXT PRIMARY KEY,
+  data TEXT NOT NULL,
+  updated_at REAL NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS ascending_attributes (
+  name TEXT PRIMARY KEY,
+  data TEXT NOT NULL,
+  updated_at REAL NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS builtin_books (
+  name TEXT PRIMARY KEY,
+  data TEXT NOT NULL,
+  updated_at REAL NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS generic_books (
+  name TEXT PRIMARY KEY,
+  data TEXT NOT NULL,
+  updated_at REAL NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS specialties (
+  name TEXT PRIMARY KEY,
+  data TEXT NOT NULL,
+  updated_at REAL NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS covenants (
+  name TEXT PRIMARY KEY,
+  data TEXT NOT NULL,
+  updated_at REAL NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS glossary_terms (
+  name TEXT PRIMARY KEY,
+  data TEXT NOT NULL,
+  updated_at REAL NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS general_conflicts (
+  pair_key TEXT PRIMARY KEY,
+  conflicts INTEGER NOT NULL,
+  updated_at REAL NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS pairs (
+  name TEXT PRIMARY KEY,
+  data TEXT NOT NULL,
+  updated_at REAL NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS pairs_individual (
+  name TEXT PRIMARY KEY,
+  data TEXT NOT NULL,
+  updated_at REAL NOT NULL
+);
+
+__END__
+
+=head1 NAME
+
+Game::EvonyTKR::Service::SQLitePersistence - SQLite persistence backend
+
+=head1 DESCRIPTION
+
+SQLite implementation for development use. Provides the same interface
+as DynamoDBPersistence but uses local SQLite database.
+
+=cut

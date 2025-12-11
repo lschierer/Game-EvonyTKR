@@ -115,6 +115,8 @@ package Game::EvonyTKR::External::Specialty::LoadAllSpecialties {
         $finished, $failed
       ));
 
+      sleep 2;
+
       # Verify all data is actually in persistence before marking complete
       my $verified            = 0;
       my $max_verify_attempts = 10;
@@ -125,7 +127,9 @@ package Game::EvonyTKR::External::Specialty::LoadAllSpecialties {
 
         foreach my $file (@files) {
           my $specialty_name = $file->basename('.yaml', '.yml');
+          # Use direct persistence check to avoid model building during verification
           unless ($job->get_specialty($specialty_name)) {
+            $job->log_warn(sprintf('cannot retrieve "%s"', $specialty_name));
             $all_in_persistence = 0;
             $missing_count++;
           }

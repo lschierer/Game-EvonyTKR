@@ -5,7 +5,7 @@ use Mojo::Base -role,                                     -signatures;
 use Mojo::Base 'Game::EvonyTKR::Role::Persistence::Core', -role;
 
 sub add_ascending_attribute ($self, $ascendingAttribute) {
-  my $name = $self->normalize($ascendingAttribute->general);
+  my $name = lc($self->normalize($ascendingAttribute->general));
   $self->persistence->store_ascending_attribute($name,
     $ascendingAttribute->to_wire_hash());
   return 1;
@@ -18,15 +18,15 @@ sub get_ascending_attributes ($self, $name) {
 
   $self->log_debug("get_ascending_attribute called for: $name");
 
-  my $normalized_name = $self->normalize($name);
+  my $normalized_name = lc($self->normalize($name));
 
   if (exists $AscendingAttributes->{$normalized_name}) {
     $self->log_debug("Returning Ascending Attributes $name from state cache");
     return $AscendingAttributes->{$normalized_name};
   }
 
-  # Load directly from SQLite
-  my $wire_data = $self->persistence->get_ascending_attribute($name);
+  # Load directly from Redis
+  my $wire_data = $self->persistence->get_ascending_attribute($normalized_name);
 
   return unless defined($wire_data);
 
@@ -45,6 +45,11 @@ sub get_ascending_attributes ($self, $name) {
     "Successfully built ascendingAttributes: " . $ascendingAttribute->general);
   $AscendingAttributes->{$normalized_name} = $ascendingAttribute;
   return $ascendingAttribute;
+}
+
+# Alias for singular form
+sub get_ascending_attribute ($self, $name) {
+  return $self->get_ascending_attributes($name);
 }
 
 sub list_ascending_attributes ($self) {

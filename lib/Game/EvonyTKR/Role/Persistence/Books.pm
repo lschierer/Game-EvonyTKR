@@ -9,8 +9,8 @@ use Mojo::Base 'Game::EvonyTKR::Role::Persistence::Core', -role;
 ##############################################################################
 
 sub add_builtin_book ($self, $book) {
-  my $name = $book->name;
-  $self->persistence->store_builtin_book($name, $book->to_wire_hash());
+  my $key = lc($self->normalize($book->name));
+  $self->persistence->store_builtin_book($key, $book->to_wire_hash());
   return 1;
 }
 
@@ -21,8 +21,7 @@ sub get_builtin_book ($self, $name) {
 
   $self->log_debug("get_builtin_book called for: $name");
 
-  my $key = $name =~ s/ /_/gr;
-  $key = $self->normalize($key);
+  my $key = lc($self->normalize($name));
 
   if (exists $builtin_books->{$key}) {
     $self->log_debug("Returning builtin book $name from state cache");
@@ -30,7 +29,7 @@ sub get_builtin_book ($self, $name) {
   }
 
   # Load directly from SQLite
-  my $wire_data = $self->persistence->get_builtin_book($name);
+  my $wire_data = $self->persistence->get_builtin_book($key);
 
   unless (defined($wire_data)) {
     $self->log_warn("No wire_data found for key: $key");
@@ -72,9 +71,9 @@ sub list_builtin_books ($self) {
 ##############################################################################
 
 sub add_generic_book ($self, $book) {
-  my $name  = $book->name;
-  my $level = $book->level;
-  $self->persistence->store_generic_book($name, $level, $book->to_wire_hash());
+  my $key = lc($self->normalize($book->name));
+  $key = sprintf('%s_level_%s', $key, $book->level);
+  $self->persistence->store_generic_book($key, $book->to_wire_hash());
   return 1;
 }
 
@@ -83,8 +82,7 @@ sub get_generic_book ($self, $name, $level) {
 
   state $generic_books = {};
 
-  my $key = $name =~ s/ /_/gr;
-  $key = $self->normalize($key);
+  my $key = lc($self->normalize($name));
   $key = sprintf('%s_level_%s', $key, $level);
 
   if (exists $generic_books->{$key}) {
@@ -93,7 +91,7 @@ sub get_generic_book ($self, $name, $level) {
   }
 
   # Load directly from SQLite
-  my $wire_data = $self->persistence->get_generic_book($name, $level);
+  my $wire_data = $self->persistence->get_generic_book($key, $level);
 
   return unless defined($wire_data);
 

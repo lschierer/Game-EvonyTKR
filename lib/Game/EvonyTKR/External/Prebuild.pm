@@ -23,6 +23,7 @@ package Game::EvonyTKR::External::Prebuild {
   use experimental   qw(class);
   use List::AllUtils qw(any all none uniq);
   use Carp;
+  use diagnostics;
 
   state $OnlyOnePrebuild = 0;
 
@@ -53,9 +54,9 @@ package Game::EvonyTKR::External::Prebuild {
 
   sub task_name {'external_prebuild'}
 
-  sub register ($plugin, $app, $conf = {}) {
-    if (not defined $plugin) {
-      say '$plugin ont defined in register for ' . __PACKAGE__ . $$;
+  sub register ($taskClass, $app, $conf = {}) {
+    if (not defined $taskClass) {
+      say '$taskClass ont defined in register for ' . __PACKAGE__ . $$;
       return;
     }
     if (not defined($app)) {
@@ -63,96 +64,73 @@ package Game::EvonyTKR::External::Prebuild {
       say $errmessage;
       return;
     }
-    return 1 unless $plugin->SUPER::register($app, $conf);
+    return 1 unless $taskClass->SUPER::register($app, $conf);
 
     unless (defined($app->minion)) {
       my $errmessage = sprintf('minion undefined in job for %s', __PACKAGE__);
-      $plugin->log_error($errmessage);
+      $taskClass->log_error($errmessage);
       say $errmessage;
       return;
     }
-    $plugin->log_debug(
+    $taskClass->log_debug(
       sprintf('register function for "%s" %s', __PACKAGE__, $$));
 
     # Register main prebuild orchestration task
-    $app->minion->add_task($plugin->task_name => __PACKAGE__);
+    $app->minion->add_task($taskClass->task_name => __PACKAGE__);
 
-    my @tasks = values $app->minion->tasks->%*;
-    foreach my $task (@tasks) {
-      $plugin->log_debug(sprintf('task is %s, %s',
-        ref($task) // 'undef ref',
-        blessed($task) // 'undef blessed'));
-    }
-    foreach my $prereq ($prereq_plugins->@*) {
-      # By this point, parent _init_minion() has already loaded all External modules
-      # So we're just checking if their tasks were successfully registered
+    $taskClass->prebuild_init($app);
 
-      # Get the task name from the prerequisite class
-      my $task_name = eval { $prereq->task_name };
-      if ($@) {
-        my $errmsg = sprintf(
-          'Failed to get task_name from %s: %s', $prereq, $@);
-        $plugin->log_error($errmsg);
-        $prereqs->{$prereq} = 0;
-        next;
-      }
-
-      # Check if the task is registered in Minion
-      # If not, the prerequisite's register() failed
-      if ($app->minion->tasks->{$task_name}) {
-        $plugin->log_debug(sprintf(
-          'prereq %s has task "%s" registered', $prereq, $task_name));
-        $prereqs->{$prereq} = 1;
-      } else {
-        my $errmsg = sprintf(
-          'PREREQUISITE FAILED: %s task "%s" was not registered in Minion. ' .
-          'This means its register() method failed or did not call add_task()',
-          $prereq, $task_name);
-        $plugin->log_error($errmsg);
-        $prereqs->{$prereq} = 0;
-      }
-
-    }
-
-    $plugin->prebuild_init($app);
-
-    $plugin->log_info(
+    $taskClass->log_info(
       sprintf('%s register function complete for %s', __PACKAGE__, $$));
     return 1;
   }
 
-  sub prebuild_init ($plugin, $app) {
-    # wait for prerequisites...
-    if (!$plugin->prebuildPrerequisites) {
-      Mojo::IOLoop->timer(
-        5 => sub {
-          $plugin->prebuild_init($app);
-        }
-      );
-    }
+  sub prebuild_init ($taskClass, $app) {
+    # Only run in web process, not in worker processes
+    return if $ENV{MINION_WORKER_CHILD};
 
-    if (my $g =
-      $app->minion->guard('external_prebuild:bootstrap', 15, { limit => 1 })) {
-      # only the guard holder gets here
-      my $existing = $app->minion->jobs({
-        tasks  => ['external_prebuild'],
-        states => [qw(inactive delayed active finished)]
-      })->total;
+    # Use a guard to ensure only one process can enqueue prebuild
+    my $guard = $app->minion->guard('prebuild_enqueue_lock', 30, { limit => 1 });
+    return unless $guard;
 
-      unless ($existing) {
-        my $jid = $app->minion->enqueue(
-          'external_prebuild' => [{}] => {
-            priority => 100,
-            attempts => 3,
-            notes    => { uniq => 'external_prebuild' },
-          }
-        );
-        $plugin->log_info("Queued external_prebuild $jid");
-      }
+    # Check for existing prebuild jobs
+    my $existing = $app->minion->jobs({
+      tasks  => ['external_prebuild'],
+      states => [qw(active inactive)]
+    })->total;
+
+    if ($existing == 0) {
+      my $jid = $app->minion->enqueue('external_prebuild' => [{}] => {
+        priority => 100,
+        attempts => 3,
+      });
+      $taskClass->log_info("Queued external_prebuild $jid");
+    } else {
+      $taskClass->log_info("Prebuild job already exists ($existing), skipping");
     }
   }
 
-  sub prebuildPrerequisites ($plugin, $args = {}) {
+  sub prebuildPrerequisites ($job, $args = {}) {
+
+    my @loaded_plugins = sort values $job->minion->tasks->%*;
+    $job->log_debug(sprintf('there are %s tasks in minion', scalar(@loaded_plugins)));
+    if(scalar(keys($args->%*)) == 0) {
+      foreach my $prereq_plugin ($prereq_plugins->@*){
+        if (any {$_ eq $prereq_plugin } @loaded_plugins ) {
+          $job->log_debug(sprintf(
+            'prereq %s is registered', $prereq_plugin,));
+          $prereqs->{$prereq_plugin} = 1;
+        } else {
+          my $errmessage = sprintf('module "%s" unavailable', $prereq_plugin,);
+          print STDERR $errmessage;
+          $job->log_error($errmessage);
+          $prereqs->{$prereq_plugin} = 0;
+          return $job->fail($errmessage);
+        }
+      }
+    }
+
+
     foreach my $key (keys $args->%*) {
       $prereqs->{$key} = $args->{$key};
     }
@@ -160,7 +138,7 @@ package Game::EvonyTKR::External::Prebuild {
     if (none { $_ == 0 } values $prereqs->%*) {
       return 1;
     }
-    $plugin->log_debug(
+    $job->log_debug(
       sprintf('failed prebuildPrerequisites: %s',
         Data::Printer::np($prereqs, multiline => 0))
     );
@@ -187,34 +165,47 @@ package Game::EvonyTKR::External::Prebuild {
     }
     $job->log_debug('Prebuild orchestration starting');
 
+    # Check prerequisites before proceeding
+    unless ($job->prebuildPrerequisites) {
+      $job->log_debug(sprintf('Cannot start prebuild; prereqs: %s',
+        Data::Printer::np($prereqs, multiline => 0)));
+      return $job->retry({ delay => 10 });
+    }
+
+    # Check if data is already loaded - if so, we can finish immediately
+    my $data_loaded = 1;
+    eval {
+      my $generals_count = $job->persistence->count_generals // 0;
+      my $specialties_count = $job->persistence->count_specialties // 0;
+      my $books_count = $job->persistence->count_builtin_books // 0;
+
+      if ($generals_count == 0 || $specialties_count == 0 || $books_count == 0) {
+        $data_loaded = 0;
+      }
+
+      $job->log_info("Data check: generals=$generals_count, specialties=$specialties_count, books=$books_count");
+    };
+
+    if ($@) {
+      $job->log_debug("Error checking data: $@");
+      $data_loaded = 0;
+    }
+
+    if ($data_loaded) {
+      $job->log_info("Data already loaded, prebuild complete");
+      return $job->finish('Data already loaded');
+    }
+
     my $owner         = $$ . '@' . ($ENV{HOSTNAME} // 'localhost');
     my $job_key       = 'prebuild_run';
     my $ttl           = 30;                                 # reduced TTL (seconds)
     my $refresh_every = 10;                                 # heartbeat interval
-    my $db            = $job->minion->backend->sqlite->db;
     my $pair_monitor_jid;
 
-    # On fresh boot, clear any stale locks older than 5 minutes
-    my $stale_cutoff = time() - 300;
-    $db->query('DELETE FROM app_locks WHERE updated_at < ?', $stale_cutoff);
+    # Use Minion's built-in job uniqueness instead of custom SQLite locking
 
-    unless ($job->app->try_acquire_lock_sqlite($db, $job_key, $owner, $ttl)) {
-      $job->note(skipped => 'another prebuild is running');
-      return $job->finish('skipped');
-    }
-
-    unless ($job->prebuildPrerequisites) {
-      $job->log_debug(sprintf('cannot start prebuild; prereqs: %s',
-        Data::Printer::np($prereqs, multiline => 0)));
-      return $job->retry({ delay => $refresh_every });
-    }
     my $timer_id;
-    Mojo::IOLoop->timer(
-      0.01 => sub {
-        $job->log_debug("prebuild obtaining db lock");
-        $job->prebuild_db_lock($timer_id);
-      }
-    );
+    # Remove custom locking - Minion handles job uniqueness
 
     my $loaderJobDefs = {
       load_all_ascending_attributes => {
@@ -277,6 +268,18 @@ package Game::EvonyTKR::External::Prebuild {
 
     my $loaderJids = [];
     foreach my $jobname (sort keys $loaderJobDefs->%*) {
+      # Simple check: if any active/inactive jobs exist for this task, skip it
+      my $existing = $job->minion->jobs({
+        tasks  => [$jobname],
+        states => [qw(inactive active)]
+      })->total;
+
+      if ($existing > 0) {
+        $job->log_info("Skipping $jobname - $existing jobs already exist");
+        next;
+      }
+      $job->log_debug("Prebuild needs to launch $jobname");
+
       my $args   = $loaderJobDefs->{$jobname}->{args} // [];
       my $params = $loaderJobDefs->{$jobname}         // {};
       delete($params->{args}) if (exists $params->{args});
@@ -291,7 +294,6 @@ package Game::EvonyTKR::External::Prebuild {
       else {
         my $errmessage = sprintf('failed to launch %s', $jobname);
         $job->log_error($errmessage);
-        Mojo::IOLoop->remove($timer_id) if ($timer_id);
         return $job->fail($errmessage);
       }
     }
@@ -301,9 +303,8 @@ package Game::EvonyTKR::External::Prebuild {
     }
     else {
       my $errmessage = sprintf('launched %s spawners, expected %s. ',
-        scalar(@$loaderJids), keys($loaderJobDefs->%*));
+        scalar(@$loaderJids), scalar(keys($loaderJobDefs->%*)));
       $job->log_error($errmessage);
-      Mojo::IOLoop->remove($timer_id) if ($timer_id);
       return $job->fail($errmessage);
     }
 
@@ -332,7 +333,6 @@ package Game::EvonyTKR::External::Prebuild {
       }
     }
 
-    Mojo::IOLoop->remove($timer_id) if ($timer_id);
     $job->finish('Prebuild spawning complete');
   }
 
@@ -363,23 +363,6 @@ package Game::EvonyTKR::External::Prebuild {
         $j->remove;
       }
     });
-  }
-
-  sub prebuild_db_lock($job, $db, $job_key, $owner, $ttl, $timer_id,
-    $refresh_every) {
-    $timer_id = Mojo::IOLoop->recurring(
-      $refresh_every => sub {
-        $job->log_info('prebuild db lock loop');
-        $job->app->refresh_lock_sqlite($db, $job_key, $owner, $ttl) or do {
-          $job->log_error('Lost runtime lock; stopping prebuild.');
-          Mojo::IOLoop->remove($timer_id) if $timer_id;
-          # safe even if we don’t own it
-          $job->app->release_lock_sqlite($db, $job_key, $owner);
-          $job->fail('lost lock');
-        };
-      }
-    );
-    Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
   }
 
 }

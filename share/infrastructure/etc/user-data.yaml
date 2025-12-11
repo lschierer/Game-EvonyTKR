@@ -194,7 +194,8 @@ runcmd:
     cat > /etc/systemd/system/mojolicious.service << 'EOF'
     [Unit]
     Description=Game Evony TKR Mojolicious Server
-    After=network.target
+    After=network.target redis-mojo.service
+    Requires=redis-mojo.service
 
     [Service]
     Type=forking
@@ -211,3 +212,5 @@ runcmd:
 
     EOF
   - systemctl enable mojolicious
+  - mkdir -p /opt/mojo/var
+  - chown mojo:mojo /opt/mojo/var

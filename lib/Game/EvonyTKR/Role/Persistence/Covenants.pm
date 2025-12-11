@@ -5,7 +5,7 @@ use Mojo::Base -role,                                     -signatures;
 use Mojo::Base 'Game::EvonyTKR::Role::Persistence::Core', -role;
 
 sub add_covenant ($self, $covenant) {
-  my $name = $covenant->primary->name;
+  my $name = lc($self->normalize($covenant->primary->name));
   return $self->persistence->store_covenant($name, $covenant->to_wire_hash());
 }
 
@@ -14,7 +14,7 @@ sub get_covenant ($self, $name) {
 
   state $covenants = {};
 
-  my $normalized_name = $self->normalize($name);
+  my $normalized_name = lc($self->normalize($name));
 
   if (exists $covenants->{$normalized_name}) {
     $self->log_debug("Returning covenant $name from state cache");

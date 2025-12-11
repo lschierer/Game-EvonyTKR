@@ -53,7 +53,7 @@ package Game::EvonyTKR::External::AscendingAttributes::LoadAll {
       my $attr_name = $file->basename('.yaml', '.yml');
 
       # Check if already in persistence
-      if ($job->get_ascending_attributes($attr_name)) {
+      if ($job->get_ascending_attribute($attr_name)) {
         $job->log_debug(sprintf(
           'Skipping %s - already in persistence', $attr_name));
         $skipped_count++;
@@ -127,8 +127,8 @@ package Game::EvonyTKR::External::AscendingAttributes::LoadAll {
 
         foreach my $file (@files) {
           my $attr_name = $file->basename('.yaml', '.yml');
-          # Query SQLite directly to bypass state cache
-          unless ($job->persistence->get_ascending_attribute($attr_name)) {
+          # Query Redis directly to bypass state cache
+          unless ($job->get_ascending_attribute($attr_name)) {
             $all_in_persistence = 0;
             $missing_count++;
           }

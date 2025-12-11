@@ -1,0 +1,339 @@
+package Game::EvonyTKR::Service::DynamoDBPersistence;
+use v5.42.0;
+use utf8::all;
+use Mojo::Base -base, -signatures;
+use Mojo::JSON qw(encode_json decode_json);
+use Carp;
+use Time::HiRes 'time';
+
+has 'table_name' => sub { $ENV{DYNAMODB_TABLE} || 'evonytkr-data' };
+has 'region' => sub { $ENV{AWS_REGION} || 'us-east-1' };
+
+has 'dynamodb' => sub ($self) {
+  require Paws;
+  return Paws->service('DynamoDB', region => $self->region);
+};
+
+has 'lifecycle_id' => sub ($self) {
+  my $stored = $self->get_metadata('lifecycle_id');
+  unless ($stored) {
+    $stored = time . '_' . $$;
+    $self->set_metadata('lifecycle_id', $stored);
+  }
+  return $stored;
+};
+
+# Core DynamoDB operations
+sub _put_item ($self, $pk, $sk, $data, $entity_type = undef) {
+  $entity_type //= $pk;
+  my $item = {
+    pk => { S => $pk },
+    sk => { S => $sk },
+    entity_type => { S => $entity_type },
+    data => { S => encode_json($data) },
+    updated_at => { N => time() }
+  };
+
+  $self->dynamodb->PutItem(
+    TableName => $self->table_name,
+    Item => $item
+  );
+}
+
+sub _get_item ($self, $pk, $sk) {
+  my $result = $self->dynamodb->GetItem(
+    TableName => $self->table_name,
+    Key => {
+      pk => { S => $pk },
+      sk => { S => $sk }
+    }
+  );
+
+  return unless $result->Item;
+  return decode_json($result->Item->{data}->{S});
+}
+
+sub _query_items ($self, $pk, $sk_prefix = undef) {
+  my $params = {
+    TableName => $self->table_name,
+    KeyConditionExpression => 'pk = :pk',
+    ExpressionAttributeValues => {
+      ':pk' => { S => $pk }
+    }
+  };
+
+  if ($sk_prefix) {
+    $params->{KeyConditionExpression} .= ' AND begins_with(sk, :sk_prefix)';
+    $params->{ExpressionAttributeValues}->{':sk_prefix'} = { S => $sk_prefix };
+  }
+
+  my $result = $self->dynamodb->Query($params);
+  my @items;
+
+  for my $item (@{$result->Items || []}) {
+    push @items, decode_json($item->{data}->{S});
+  }
+
+  return \@items;
+}
+
+# Metadata operations
+sub get_metadata ($self, $key) {
+  return $self->_get_item('metadata', $key);
+}
+
+sub set_metadata ($self, $key, $value) {
+  return $self->_put_item('metadata', $key, $value);
+}
+
+# Job completion tracking
+sub mark_job_completed ($self, $job_name) {
+  return $self->_put_item('job_completed', $job_name, { completed_at => time() });
+}
+
+sub is_job_completed ($self, $job_name) {
+  return defined $self->_get_item('job_completed', $job_name);
+}
+
+# Generic storage operations
+sub store_data ($self, $table, $key, $data) {
+  return $self->_put_item($table, $key, $data);
+}
+
+sub get_data ($self, $table, $key) {
+  return $self->_get_item($table, $key);
+}
+
+sub get_all_data ($self, $table) {
+  my $items = $self->_query_items($table);
+  my $result = {};
+  for my $item (@$items) {
+    # Assume the key is stored in the data or derive from sk
+    my $key = $item->{name} || $item->{id} || 'unknown';
+    $result->{$key} = $item;
+  }
+  return $result;
+}
+
+# Specific data type methods
+sub store_general ($self, $general_data) {
+  my $name = $general_data->{name} or croak "General must have name";
+  return $self->_put_item('generals', $name, $general_data);
+}
+
+sub get_general ($self, $name) {
+  return $self->_get_item('generals', $name);
+}
+
+sub get_all_generals ($self) {
+  return $self->get_all_data('generals');
+}
+
+sub count_generals ($self) {
+  my $items = $self->_query_items('generals');
+  return scalar @$items;
+}
+
+# Ascending Attributes
+sub store_ascending_attribute ($self, $key, $data ) {
+  return $self->_put_item('ascending_attributes', $key, $data);
+}
+
+sub get_ascending_attribute ($self, $name) {
+  return $self->_get_item('ascending_attributes', $name);
+}
+
+sub get_all_ascending_attributes ($self) {
+  return $self->get_all_data('ascending_attributes');
+}
+
+sub count_ascending_attributes ($self) {
+  my $items = $self->_query_items('ascending_attributes');
+  return scalar @$items;
+}
+
+# Books
+sub store_book ($self, $key, $book_data) {
+  my $name = $book_data->{name} or croak "Book must have name";
+  my $type = $book_data->{type} || 'generic';
+  my $table = $type eq 'builtin' ? 'builtin_books' : 'generic_books';
+  return $self->_put_item($table, $key, $book_data);
+}
+
+sub get_book ($self, $name, $type = 'generic') {
+  my $table = $type eq 'builtin' ? 'builtin_books' : 'generic_books';
+  return $self->_get_item($table, $name);
+}
+
+sub get_all_books ($self, $type = 'generic') {
+  my $table = $type eq 'builtin' ? 'builtin_books' : 'generic_books';
+  return $self->get_all_data($table);
+}
+
+# Legacy book methods
+sub get_generic_book ($self, $name, $level = undef) {
+  return $self->get_book($name, 'generic');
+}
+
+sub get_builtin_book ($self, $name, $level = undef) {
+  return $self->get_book($name, 'builtin');
+}
+
+sub get_all_generic_books ($self) {
+  return $self->get_all_books('generic');
+}
+
+sub get_all_builtin_books ($self) {
+  return $self->get_all_books('builtin');
+}
+
+sub store_generic_book ($self, $key, $data) {
+  $data->{type} = 'generic';
+  return $self->store_book($data);
+}
+
+sub store_builtin_book ($self, $key, $data) {
+  $data->{type} = 'builtin';
+  return $self->store_book($key, $data);
+}
+
+sub count_generic_books ($self) {
+  my $items = $self->_query_items('generic_books');
+  return scalar @$items;
+}
+
+sub count_builtin_books ($self) {
+  my $items = $self->_query_items('builtin_books');
+  return scalar @$items;
+}
+
+# Specialties
+sub store_specialty ($self, $key, $data) {
+  return $self->_put_item('specialties', $key, $data);
+}
+
+sub get_specialty ($self, $name) {
+  return $self->_get_item('specialties', $name);
+}
+
+sub get_all_specialties ($self) {
+  return $self->get_all_data('specialties');
+}
+
+sub count_specialties ($self) {
+  my $items = $self->_query_items('specialties');
+  return scalar @$items;
+}
+
+# Covenants
+sub store_covenant ($self, $key, $covenant_data) {
+  return $self->_put_item('covenants', $key, $covenant_data);
+}
+
+sub get_covenant ($self, $name) {
+  return $self->_get_item('covenants', $name);
+}
+
+sub get_all_covenants ($self) {
+  return $self->get_all_data('covenants');
+}
+
+sub count_covenants ($self) {
+  my $items = $self->_query_items('covenants');
+  return scalar @$items;
+}
+
+# Glossary terms
+sub store_glossary_term ($self, $name, $data) {
+  return $self->_put_item('glossary_terms', $name, $data);
+}
+
+sub get_glossary_term ($self, $name) {
+  return $self->_get_item('glossary_terms', $name);
+}
+
+sub get_all_glossary_terms ($self) {
+  return $self->get_all_data('glossary_terms');
+}
+
+sub count_glossary_terms ($self) {
+  my $items = $self->_query_items('glossary_terms');
+  return scalar @$items;
+}
+
+# Conflicts (simplified for DynamoDB)
+sub store_conflict ($self, $g1, $g2, $conflicts) {
+  ($g1, $g2) = sort ($g1, $g2);
+  my $key = "$g1:$g2";
+  return $self->_put_item('general_conflicts', $key, { conflicts => $conflicts ? 1 : 0 });
+}
+
+sub get_conflict ($self, $g1, $g2) {
+  ($g1, $g2) = sort ($g1, $g2);
+  my $key = "$g1:$g2";
+  my $result = $self->_get_item('general_conflicts', $key);
+  return unless $result;
+  return $result->{conflicts} ? 1 : 0;
+}
+
+# Pairs (simplified - store as JSON)
+sub store_pairs ($self, $type, $pairs) {
+  return $self->_put_item('pairs', $type, { pairs => $pairs });
+}
+
+sub get_pairs_by_type ($self, $type) {
+  my $result = $self->_get_item('pairs', $type);
+  return $result ? $result->{pairs} : [];
+}
+
+sub store_pair ($self, $key, $data) {
+  return $self->_put_item('pairs_individual', $key, $data);
+}
+
+sub get_pair ($self, $key) {
+  return $self->_get_item('pairs_individual', $key);
+}
+
+sub get_all_pair_types ($self) {
+  my $items = $self->_query_items('pairs');
+  return [map { $_->{name} || 'unknown' } @$items];
+}
+
+sub list_pairs_by_type ($self, $type) {
+  return $self->get_pairs_by_type($type);
+}
+
+# Clear all data (for rebuilds) - WARNING: This will be expensive in DynamoDB
+sub clear_all_data ($self) {
+  # In production, you might want to recreate the table instead
+  # This is a simplified version that would need pagination for large datasets
+  warn "clear_all_data is expensive in DynamoDB - consider table recreation";
+
+  # For now, just clear metadata to indicate a rebuild is needed
+  $self->set_metadata('cleared_at', time());
+  return 1;
+}
+
+1;
+__END__
+
+=head1 NAME
+
+Game::EvonyTKR::Service::DynamoDBPersistence - DynamoDB persistence backend
+
+=head1 DESCRIPTION
+
+Single-table DynamoDB implementation optimized for cost-effectiveness.
+Uses partition key (pk) for entity type and sort key (sk) for entity name.
+
+=head1 ENVIRONMENT VARIABLES
+
+=over 4
+
+=item * DYNAMODB_TABLE - Table name (default: evonytkr-data)
+
+=item * AWS_REGION - AWS region (default: us-east-1)
+
+=back
+
+=cut

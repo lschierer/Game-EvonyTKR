@@ -12,11 +12,15 @@ cleanup() {
 trap cleanup EXIT INT TERM
 
 # Start Minion worker in background
+
 echo "Starting Minion workers..."
 
 if [ -f minion.db ]; then
   rm -fv minion.db*
 fi
+
+# Clean up Redis persistence data for fresh start
+rm -f ./var/redis.rdb ./var/persistence.db*
 
 touch minion.db
 

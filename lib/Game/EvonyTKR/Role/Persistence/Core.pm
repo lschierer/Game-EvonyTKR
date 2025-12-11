@@ -4,9 +4,10 @@ use utf8::all;
 use Mojo::Base -role, -signatures;
 use Game::EvonyTKR::Service::Persistence;
 
-# Lazy-load persistence service
-has persistence => sub {
-  Game::EvonyTKR::Service::Persistence->new;
+# Lazy-load mode-gated persistence service
+has persistence => sub ($self) {
+  my $mode = ref($self) && $self->can('mode') ? $self->mode : ($ENV{MOJO_MODE} || 'development');
+  return Game::EvonyTKR::Service::Persistence->new(mode => $mode);
 };
 
 ##############################################################################

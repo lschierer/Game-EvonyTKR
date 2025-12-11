@@ -40,7 +40,14 @@ package Game::EvonyTKR::External::JobBase {
       say $errmessage;
       return;
     }
-    $app->minion->backend->sqlite->db->ping;
+    # Test backend connectivity (works for both SQLite and Redis)
+    eval { $app->minion->backend->list_jobs(0, 1) };
+    if ($@) {
+      my $errmessage = sprintf('Minion backend connectivity test failed for %s: %s', __PACKAGE__, $@);
+      $plugin->log_error($errmessage);
+      say $errmessage;
+      return;
+    }
 
     #force the subclass to implement task_name
     $plugin->task_name();
