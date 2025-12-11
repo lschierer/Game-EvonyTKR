@@ -1,5 +1,6 @@
 import { NestedStack, Stack } from 'aws-cdk-lib';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
+import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import * as s3Assets from 'aws-cdk-lib/aws-s3-assets';
 import * as cloudwatch from 'aws-cdk-lib/aws-cloudwatch';
 import * as cloudwatch_actions from 'aws-cdk-lib/aws-cloudwatch-actions';
@@ -18,6 +19,7 @@ import { type MojoliciousStackProps } from './main-stack';
 
 interface UbuntuInstanceProps extends MojoliciousStackProps {
   vpc: ec2.IVpc | ec2.Vpc;
+  persistenceTable: dynamodb.Table;
 }
 
 export class UbuntuInstance extends NestedStack {
@@ -37,6 +39,9 @@ export class UbuntuInstance extends NestedStack {
     const instanceRole = new cdk.aws_iam.Role(this, 'InstanceRole', {
       assumedBy: new cdk.aws_iam.ServicePrincipal('ec2.amazonaws.com'),
     });
+
+    // Grant DynamoDB read/write permissions to the instance
+    props.persistenceTable.grantReadWriteData(instanceRole);
 
     // slightly randomize the hostname so that if I need to iterate
     // on the way the ec2 instance is built, letsencrypt sees different account names
@@ -83,6 +88,14 @@ export class UbuntuInstance extends NestedStack {
       'mv .bash* /opt/mojo/',
       'cp /opt/mojo/bin/deploy-mojo.sh /usr/local/bin',
       'chmod 0755 /opt/mojo/bin/deploy-mojo.sh',
+    );
+
+    // Generate production config file from template before bootstrap
+    shellCommands.addCommands(
+      'cd /opt/mojo/app',
+      `sed 's/{{AWS_REGION}}/${this.region}/g; s/{{DYNAMODB_TABLE}}/${props.persistenceTable.tableName}/g' game-evony_t_k_r.production.yml.template > game-evony_t_k_r.production.yml`,
+      'chown mojo:mojo game-evony_t_k_r.production.yml',
+      'chmod 644 game-evony_t_k_r.production.yml',
     );
 
     // Run bootstrap and signal success/failure to CloudFormation

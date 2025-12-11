@@ -7,7 +7,8 @@ use Game::EvonyTKR::Service::Persistence;
 # Lazy-load mode-gated persistence service
 has persistence => sub ($self) {
   my $mode = ref($self) && $self->can('mode') ? $self->mode : ($ENV{MOJO_MODE} || 'development');
-  return Game::EvonyTKR::Service::Persistence->new(mode => $mode);
+  my $config = ref($self) && $self->can('config') ? $self->config : {};
+  return Game::EvonyTKR::Service::Persistence->new(mode => $mode, config => $config);
 };
 
 ##############################################################################

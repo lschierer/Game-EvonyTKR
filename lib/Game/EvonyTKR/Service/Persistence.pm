@@ -5,14 +5,22 @@ use Mojo::Base -base, -signatures;
 
 # Mode-gated persistence factory
 has 'mode' => sub { $ENV{MOJO_MODE} || 'development' };
+has 'config';  # Optional config hash from NotYAMLConfig
 
 has 'backend' => sub ($self) {
+  my $config = $self->config || {};
+  my $persistence_config = $config->{persistence} || {};
+
   if ($self->mode eq 'development') {
     require Game::EvonyTKR::Service::SQLitePersistence;
-    return Game::EvonyTKR::Service::SQLitePersistence->new;
+    return Game::EvonyTKR::Service::SQLitePersistence->new(config => $persistence_config);
   } else {
     require Game::EvonyTKR::Service::DynamoDBPersistence;
-    return Game::EvonyTKR::Service::DynamoDBPersistence->new;
+    my $aws_config = $config->{aws} || {};
+    return Game::EvonyTKR::Service::DynamoDBPersistence->new(
+      config => $persistence_config,
+      aws_config => $aws_config,
+    );
   }
 };
 

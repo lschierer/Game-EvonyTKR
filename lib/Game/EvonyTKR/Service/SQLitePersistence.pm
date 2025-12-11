@@ -7,8 +7,11 @@ use Mojo::JSON qw(encode_json decode_json);
 use Carp;
 use Time::HiRes 'time';
 
-has 'db_path' => sub {
-  $ENV{SQLITE_DB_PATH} || './evonytkr.db'
+has 'config';  # Config hash from NotYAMLConfig
+
+has 'db_path' => sub ($self) {
+  my $config = $self->config || {};
+  return $config->{sqlite_db_path} || $ENV{SQLITE_DB_PATH} || './evonytkr.db';
 };
 
 has 'sqlite' => sub ($self) {
@@ -62,6 +65,15 @@ sub mark_job_completed ($self, $job_name) {
 
 sub is_job_completed ($self, $job_name) {
   return $self->db->select('job_completed', ['job_name'], { job_name => $job_name })->hash ? 1 : 0;
+}
+
+# Data versioning - track which git-commit the data was built from
+sub get_data_version ($self) {
+  return $self->get_metadata('data_version');
+}
+
+sub set_data_version ($self, $version) {
+  return $self->set_metadata('data_version', $version);
 }
 
 # Generic storage operations
@@ -160,9 +172,9 @@ sub store_generic_book ($self, $key, $data) {
   return $self->store_book($key, $data);
 }
 
-sub store_builtin_book ($self, $name, $data) {
+sub store_builtin_book ($self, $key, $data) {
   $data->{type} = 'builtin';
-  return $self->store_book($name, $data);
+  return $self->store_book($key, $data);
 }
 
 sub count_generic_books ($self) {

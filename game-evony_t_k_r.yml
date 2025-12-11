@@ -14,6 +14,6 @@ hypnotoad:
 secrets:
 - e0deeacd35ce3e6c4b07a33ae421a4704636f001
 version:
-  build-time: 2025-12-10T03:08:56
+  build-time: 2025-12-11T04:33:59
   git-branch: streaming
-  git-commit: a4c73a93
+  git-commit: a81b322a

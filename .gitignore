@@ -35,3 +35,6 @@ var/
 *.csv
 *.pkl
 conflicts.json
+
+# Generated config files
+game-evony_t_k_r.production.yml

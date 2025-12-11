@@ -41,7 +41,7 @@ ts: npmdeps css
   mkdir -p share/public/types
   pnpm build:ts
 
-build: prepare deps css images ts mlModel
+build: prepare deps css images ts
   ./Build manifest
   ./Build
 

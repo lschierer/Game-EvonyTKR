@@ -172,28 +172,55 @@ package Game::EvonyTKR::External::Prebuild {
       return $job->retry({ delay => 10 });
     }
 
-    # Check if data is already loaded - if so, we can finish immediately
-    my $data_loaded = 1;
-    eval {
-      my $generals_count = $job->persistence->count_generals // 0;
-      my $specialties_count = $job->persistence->count_specialties // 0;
-      my $books_count = $job->persistence->count_builtin_books // 0;
-
-      if ($generals_count == 0 || $specialties_count == 0 || $books_count == 0) {
-        $data_loaded = 0;
-      }
-
-      $job->log_info("Data check: generals=$generals_count, specialties=$specialties_count, books=$books_count");
-    };
-
-    if ($@) {
-      $job->log_debug("Error checking data: $@");
-      $data_loaded = 0;
+    # Check if we should force a rebuild regardless of data state
+    my $force_reload = $ENV{FORCE_DATA_RELOAD} || 0;
+    if ($force_reload) {
+      $job->log_info("FORCE_DATA_RELOAD set - rebuilding data regardless of current state");
     }
 
-    if ($data_loaded) {
-      $job->log_info("Data already loaded, prebuild complete");
-      return $job->finish('Data already loaded');
+    # Get current version from config (git-commit)
+    my $current_version = eval { $job->app->config->{version}{'git-commit'} } // 'unknown';
+    $job->log_info("Current git-commit: $current_version");
+
+    # Check if data is current for this version
+    unless ($force_reload) {
+      my $data_current = 0;
+      eval {
+        my $stored_version = $job->persistence->get_data_version;
+
+        if ($stored_version && $stored_version eq $current_version) {
+          # Version matches - verify data actually exists
+          my $generals_count = $job->persistence->count_generals // 0;
+          my $specialties_count = $job->persistence->count_specialties // 0;
+          my $books_count = $job->persistence->count_builtin_books // 0;
+
+          if ($generals_count > 0 && $specialties_count > 0 && $books_count > 0) {
+            $data_current = 1;
+            $job->log_info(sprintf(
+              "Data current for version %s (generals=%d, specialties=%d, books=%d)",
+              $current_version, $generals_count, $specialties_count, $books_count
+            ));
+          } else {
+            $job->log_warn(sprintf(
+              "Version matches but data incomplete: generals=%d, specialties=%d, books=%d",
+              $generals_count, $specialties_count, $books_count
+            ));
+          }
+        } elsif ($stored_version) {
+          $job->log_info("Data version mismatch: stored=$stored_version, current=$current_version - will reload");
+        } else {
+          $job->log_info("No stored data version - first run or data cleared");
+        }
+      };
+
+      if ($@) {
+        $job->log_debug("Error checking data version: $@");
+        $data_current = 0;
+      }
+
+      if ($data_current) {
+        return $job->finish("Data current for version $current_version");
+      }
     }
 
     my $owner         = $$ . '@' . ($ENV{HOSTNAME} // 'localhost');
@@ -331,6 +358,16 @@ package Game::EvonyTKR::External::Prebuild {
         );
         $monitors->{$mn} = $mj;
       }
+    }
+
+    # Store current version to persistence after successful load
+    eval {
+      my $current_version = $job->app->config->{version}{'git-commit'} // 'unknown';
+      $job->persistence->set_data_version($current_version);
+      $job->log_info("Stored data version: $current_version");
+    };
+    if ($@) {
+      $job->log_warn("Failed to store data version: $@");
     }
 
     $job->finish('Prebuild spawning complete');

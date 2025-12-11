@@ -6,8 +6,18 @@ use Mojo::JSON qw(encode_json decode_json);
 use Carp;
 use Time::HiRes 'time';
 
-has 'table_name' => sub { $ENV{DYNAMODB_TABLE} || 'evonytkr-data' };
-has 'region' => sub { $ENV{AWS_REGION} || 'us-east-1' };
+has 'config';      # Persistence config from NotYAMLConfig
+has 'aws_config';  # AWS config from NotYAMLConfig
+
+has 'table_name' => sub ($self) {
+  my $config = $self->config || {};
+  return $config->{dynamodb_table} || $ENV{DYNAMODB_TABLE} || 'evonytkr-data';
+};
+
+has 'region' => sub ($self) {
+  my $aws_config = $self->aws_config || {};
+  return $aws_config->{region} || $ENV{AWS_REGION} || 'us-east-1';
+};
 
 has 'dynamodb' => sub ($self) {
   require Paws;
@@ -92,7 +102,16 @@ sub mark_job_completed ($self, $job_name) {
 }
 
 sub is_job_completed ($self, $job_name) {
-  return defined $self->_get_item('job_completed', $job_name);
+  return defined $self->_get_item('job_completed', $job_name) ? 1 : 0;
+}
+
+# Data versioning - track which git-commit the data was built from
+sub get_data_version ($self) {
+  return $self->get_metadata('data_version');
+}
+
+sub set_data_version ($self, $version) {
+  return $self->set_metadata('data_version', $version);
 }
 
 # Generic storage operations
@@ -116,9 +135,8 @@ sub get_all_data ($self, $table) {
 }
 
 # Specific data type methods
-sub store_general ($self, $general_data) {
-  my $name = $general_data->{name} or croak "General must have name";
-  return $self->_put_item('generals', $name, $general_data);
+sub store_general ($self, $key, $general_data) {
+  return $self->_put_item('generals', $key, $general_data);
 }
 
 sub get_general ($self, $name) {
@@ -189,7 +207,7 @@ sub get_all_builtin_books ($self) {
 
 sub store_generic_book ($self, $key, $data) {
   $data->{type} = 'generic';
-  return $self->store_book($data);
+  return $self->store_book($key, $data);
 }
 
 sub store_builtin_book ($self, $key, $data) {
