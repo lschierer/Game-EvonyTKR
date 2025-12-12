@@ -2,7 +2,7 @@ package Game::EvonyTKR::Service::DynamoDBPersistence;
 use v5.42.0;
 use utf8::all;
 use Mojo::Base -base, -signatures;
-use Mojo::JSON qw(encode_json decode_json);
+use JSON::PP qw(encode_json decode_json);
 use Carp;
 use Time::HiRes 'time';
 
@@ -62,16 +62,37 @@ sub _put_item ($self, $pk, $sk, $data, $entity_type = undef) {
 }
 
 sub _get_item ($self, $pk, $sk) {
-  my $result = $self->dynamodb->GetItem(
-    TableName => $self->table_name,
-    Key => {
-      pk => { S => $pk },
-      sk => { S => $sk }
-    }
-  );
+  my $result = eval {
+    $self->dynamodb->GetItem(
+      TableName => $self->table_name,
+      Key => {
+        pk => { S => $pk },
+        sk => { S => $sk }
+      }
+    );
+  };
 
-  return unless $result->Item;
-  return decode_json($result->Item->{data}->{S});
+  if ($@) {
+    warn sprintf("[DynamoDB] GetItem failed for pk=%s, sk=%s: %s\n", $pk, $sk, $@);
+    return;
+  }
+
+  return unless $result && $result->Item;
+
+  my $data_str = $result->Item->{data}->{S};
+  unless (defined $data_str && length($data_str) > 0) {
+    warn sprintf("[DynamoDB] Empty/undef data for pk=%s, sk=%s\n", $pk, $sk);
+    return;
+  }
+
+  my $decoded = eval { decode_json($data_str) };
+  if ($@) {
+    warn sprintf("[DynamoDB] JSON decode failed for pk=%s, sk=%s: %s\n", $pk, $sk, $@);
+    warn sprintf("[DynamoDB] Raw data (first 200 chars): %s\n", substr($data_str, 0, 200));
+    return;
+  }
+
+  return $decoded;
 }
 
 sub _query_items ($self, $pk, $sk_prefix = undef) {

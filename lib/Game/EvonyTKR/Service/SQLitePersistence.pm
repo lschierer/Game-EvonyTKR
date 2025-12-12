@@ -3,7 +3,7 @@ use v5.42.0;
 use utf8::all;
 use Mojo::Base -base, -signatures;
 use Mojo::SQLite;
-use Mojo::JSON qw(encode_json decode_json);
+use JSON::PP qw(encode_json decode_json);
 use Carp;
 use Time::HiRes 'time';
 
@@ -97,7 +97,16 @@ sub get_data ($self, $table, $key) {
     warn "Failed to get data from $table for key $key: $@";
     return undef;
   }
-  return $result ? decode_json($result->{data}) : undef;
+  return unless $result && defined($result->{data});
+
+  my $decoded = eval { decode_json($result->{data}) };
+  if ($@) {
+    warn sprintf("[SQLite] JSON decode failed for table=%s, key=%s: %s\n", $table, $key, $@);
+    warn sprintf("[SQLite] Raw data (first 200 chars): %s\n", substr($result->{data}, 0, 200));
+    return;
+  }
+
+  return $decoded;
 }
 
 sub get_all_data ($self, $table) {
