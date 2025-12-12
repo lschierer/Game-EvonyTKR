@@ -6,8 +6,8 @@ use JSON::PP qw(encode_json decode_json);
 use Carp;
 use Time::HiRes 'time';
 
-has 'config';      # Persistence config from NotYAMLConfig
-has 'aws_config';  # AWS config from NotYAMLConfig
+has 'config';        # Persistence config from NotYAMLConfig
+has 'aws_config';    # AWS config from NotYAMLConfig
 
 has 'table_name' => sub ($self) {
   my $config = $self->config || {};
@@ -15,16 +15,19 @@ has 'table_name' => sub ($self) {
 };
 
 has 'region' => sub ($self) {
-  my $aws_config = $self->aws_config || {};
-  my $region = $aws_config->{region} || $ENV{AWS_REGION} || 'us-east-1';
+  my $aws_config = $self->aws_config     || {};
+  my $region     = $aws_config->{region} || $ENV{AWS_REGION} || 'us-east-1';
 
   # Debug: Log which source provided the region
   if ($aws_config->{region}) {
     warn sprintf("[DynamoDB] Using region from config: %s\n", $region);
-  } elsif ($ENV{AWS_REGION}) {
+  }
+  elsif ($ENV{AWS_REGION}) {
     warn sprintf("[DynamoDB] Using region from ENV: %s\n", $region);
-  } else {
-    warn sprintf("[DynamoDB] Using fallback region: %s (check config!)\n", $region);
+  }
+  else {
+    warn sprintf("[DynamoDB] Using fallback region: %s (check config!)\n",
+      $region);
   }
 
   return $region;
@@ -52,23 +55,24 @@ sub _put_item ($self, $pk, $sk, $data, $entity_type = undef) {
     $pk, $sk, $self->table_name);
 
   my $item = {
-    pk => { S => $pk },
-    sk => { S => $sk },
+    pk          => { S => $pk },
+    sk          => { S => $sk },
     entity_type => { S => $entity_type },
-    data => { S => encode_json($data) },
-    updated_at => { N => sprintf("%.6f", time()) }
+    data        => { S => encode_json($data) },
+    updated_at  => { N => sprintf("%.6f", time()) }
   };
 
   eval {
     my $result = $self->dynamodb->PutItem(
       TableName => $self->table_name,
-      Item => $item
+      Item      => $item
     );
     warn sprintf("[DynamoDB] PutItem SUCCESS for pk=%s, sk=%s\n", $pk, $sk);
   };
 
   if ($@) {
-    warn sprintf("[DynamoDB] PutItem FAILED for pk=%s, sk=%s: %s\n", $pk, $sk, $@);
+    warn
+      sprintf("[DynamoDB] PutItem FAILED for pk=%s, sk=%s: %s\n", $pk, $sk, $@);
     die $@;
   }
 
@@ -79,7 +83,7 @@ sub _get_item ($self, $pk, $sk) {
   my $result = eval {
     $self->dynamodb->GetItem(
       TableName => $self->table_name,
-      Key => {
+      Key       => {
         pk => { S => $pk },
         sk => { S => $sk }
       }
@@ -87,7 +91,8 @@ sub _get_item ($self, $pk, $sk) {
   };
 
   if ($@) {
-    warn sprintf("[DynamoDB] GetItem failed for pk=%s, sk=%s: %s\n", $pk, $sk, $@);
+    warn
+      sprintf("[DynamoDB] GetItem failed for pk=%s, sk=%s: %s\n", $pk, $sk, $@);
     return;
   }
 
@@ -101,8 +106,10 @@ sub _get_item ($self, $pk, $sk) {
 
   my $decoded = eval { decode_json($data_str) };
   if ($@) {
-    warn sprintf("[DynamoDB] JSON decode failed for pk=%s, sk=%s: %s\n", $pk, $sk, $@);
-    warn sprintf("[DynamoDB] Raw data (first 200 chars): %s\n", substr($data_str, 0, 200));
+    warn sprintf("[DynamoDB] JSON decode failed for pk=%s, sk=%s: %s\n",
+      $pk, $sk, $@);
+    warn sprintf("[DynamoDB] Raw data (first 200 chars): %s\n",
+      substr($data_str, 0, 200));
     return;
   }
 
@@ -111,7 +118,7 @@ sub _get_item ($self, $pk, $sk) {
 
 sub _query_items ($self, $pk, $sk_prefix = undef) {
   my $key_condition = 'pk = :pk';
-  my $attr_values = { ':pk' => { S => $pk } };
+  my $attr_values   = { ':pk' => { S => $pk } };
 
   if ($sk_prefix) {
     $key_condition .= ' AND begins_with(sk, :sk_prefix)';
@@ -120,8 +127,8 @@ sub _query_items ($self, $pk, $sk_prefix = undef) {
 
   my $result = eval {
     $self->dynamodb->Query(
-      TableName => $self->table_name,
-      KeyConditionExpression => $key_condition,
+      TableName                 => $self->table_name,
+      KeyConditionExpression    => $key_condition,
       ExpressionAttributeValues => $attr_values
     );
   };
@@ -134,7 +141,7 @@ sub _query_items ($self, $pk, $sk_prefix = undef) {
   return [] unless $result && $result->Items;
 
   my @items;
-  for my $item (@{$result->Items}) {
+  for my $item (@{ $result->Items }) {
     push @items, decode_json($item->{data}->{S});
   }
 
@@ -152,7 +159,8 @@ sub set_metadata ($self, $key, $value) {
 
 # Job completion tracking
 sub mark_job_completed ($self, $job_name) {
-  return $self->_put_item('job_completed', $job_name, { completed_at => time() });
+  return $self->_put_item('job_completed', $job_name,
+    { completed_at => time() });
 }
 
 sub is_job_completed ($self, $job_name) {
@@ -178,7 +186,7 @@ sub get_data ($self, $table, $key) {
 }
 
 sub get_all_data ($self, $table) {
-  my $items = $self->_query_items($table);
+  my $items  = $self->_query_items($table);
   my $result = {};
   for my $item (@$items) {
     # Assume the key is stored in the data or derive from sk
@@ -207,7 +215,7 @@ sub count_generals ($self) {
 }
 
 # Ascending Attributes
-sub store_ascending_attribute ($self, $key, $data ) {
+sub store_ascending_attribute ($self, $key, $data) {
   return $self->_put_item('ascending_attributes', $key, $data);
 }
 
@@ -226,8 +234,8 @@ sub count_ascending_attributes ($self) {
 
 # Books
 sub store_book ($self, $key, $book_data) {
-  my $name = $book_data->{name} or croak "Book must have name";
-  my $type = $book_data->{type} || 'generic';
+  my $name  = $book_data->{name} or croak "Book must have name";
+  my $type  = $book_data->{type} || 'generic';
   my $table = $type eq 'builtin' ? 'builtin_books' : 'generic_books';
   return $self->_put_item($table, $key, $book_data);
 }
@@ -337,12 +345,13 @@ sub count_glossary_terms ($self) {
 sub store_conflict ($self, $g1, $g2, $conflicts) {
   ($g1, $g2) = sort ($g1, $g2);
   my $key = "$g1:$g2";
-  return $self->_put_item('general_conflicts', $key, { conflicts => $conflicts ? 1 : 0 });
+  return $self->_put_item('general_conflicts', $key,
+    { conflicts => $conflicts ? 1 : 0 });
 }
 
 sub get_conflict ($self, $g1, $g2) {
   ($g1, $g2) = sort ($g1, $g2);
-  my $key = "$g1:$g2";
+  my $key    = "$g1:$g2";
   my $result = $self->_get_item('general_conflicts', $key);
   return unless $result;
   return $result->{conflicts} ? 1 : 0;

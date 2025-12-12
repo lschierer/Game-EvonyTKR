@@ -9,10 +9,10 @@ require Game::EvonyTKR::Controller::ControllerBase;
 require Game::EvonyTKR::External::JobBase;
 
 package Game::EvonyTKR {
-  use Mojo::Base 'Mojolicious',                   -strict, -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Role::Logging', -role,   -signatures;
+  use Mojo::Base 'Mojolicious',                       -strict, -signatures;
+  use Mojo::Base 'Game::EvonyTKR::Role::Logging',     -role,   -signatures;
   use Mojo::Base 'Game::EvonyTKR::Role::Persistence', -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::Common', -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Common',      -role;
   use Log::Any::Adapter;
   use Log::Log4perl;
   use Mojo::File::Share qw(dist_dir );
@@ -37,11 +37,12 @@ package Game::EvonyTKR {
     $app->log_debug('setting up logging');
 
     # Debug: Why is startup() being called?
-    my $is_minion = _this_is_a_minion_process();
+    my $is_minion  = _this_is_a_minion_process();
     my $parent_pid = getppid();
     $app->log->info(sprintf(
-      'Mojolicious Logging initialized for process "%s" (parent: %s, is_minion: %s, MINION_WORKER_CHILD: %s)',
-      $$, $parent_pid, $is_minion ? 'YES' : 'NO', $ENV{MINION_WORKER_CHILD} // 'unset'
+'Mojolicious Logging initialized for process "%s" (parent: %s, is_minion: %s, MINION_WORKER_CHILD: %s)',
+      $$,                        $parent_pid,
+      $is_minion ? 'YES' : 'NO', $ENV{MINION_WORKER_CHILD} // 'unset'
     ));
 
     $app->config(start_time => time());
@@ -58,18 +59,21 @@ package Game::EvonyTKR {
         # optional: only if you want web proc to fork workers
         Mojo::IOLoop->timer(
           1 => sub {
-            my $is_web = _this_proc_is_a_web_server($server);
+            my $is_web     = _this_proc_is_a_web_server($server);
             my $is_spawner = _i_am_the_one_spawner($app);
-            my $is_minion = _this_is_a_minion_process();
+            my $is_minion  = _this_is_a_minion_process();
 
             $app->log->debug(sprintf(
-              'Worker spawn check in PID %s: is_web=%s, is_spawner=%s, is_minion=%s',
-              $$, $is_web ? 'YES' : 'NO', $is_spawner ? 'YES' : 'NO', $is_minion ? 'YES' : 'NO'
+'Worker spawn check in PID %s: is_web=%s, is_spawner=%s, is_minion=%s',
+              $$,
+              $is_web     ? 'YES' : 'NO',
+              $is_spawner ? 'YES' : 'NO',
+              $is_minion  ? 'YES' : 'NO'
             ));
 
-            return unless $is_web; # has acceptors?
-            return unless $is_spawner;         # spawn once only
-            return if $is_minion; # don't spawn from minion cmd
+            return unless $is_web;        # has acceptors?
+            return unless $is_spawner;    # spawn once only
+            return if $is_minion;         # don't spawn from minion cmd
 
             $app->log->info("SPAWNING MINION WORKERS from PID $$");
             _spawn_minion_workers($app);
@@ -123,18 +127,19 @@ package Game::EvonyTKR {
     $app->config(
       'EvonyTKR-Environment' => {
         DEPLOYMENT_TIME => $DEPLOYMENT_TIME // 'unknown',
-        HOSTNAME        => $HOSTNAME  // `hostname`,
+        HOSTNAME        => $HOSTNAME        // `hostname`,
       }
     );
 
     $app->secrets($config->{secrets});
 
-    if(!_this_is_a_minion_process()){
+    if (!_this_is_a_minion_process()) {
       foreach my $envkey (keys %{ $app->config->{'EvonyTKR-Environment'} }) {
         if (defined $envkey) {
           my $envValue = $app->config->{'EvonyTKR-Environment'}->{$envkey}
             // 'Undefined';
-          $app->log->info("EvonyTKR-Environnment variable $envkey is $envValue");
+          $app->log->info(
+            "EvonyTKR-Environnment variable $envkey is $envValue");
         }
         else {
           $app->log->warn('undefined envkey in EvonyTKR-Environment!');
@@ -158,14 +163,15 @@ package Game::EvonyTKR {
 
     warn "[Game::EvonyTKR] _init_persistence() called\n";
     warn sprintf("[Game::EvonyTKR] Config keys available: %s\n",
-      join(', ', sort keys %{$app->config || {}}));
-    warn sprintf("[Game::EvonyTKR] Mode: %s\n", $ENV{MOJO_MODE} || 'development');
+      join(', ', sort keys %{ $app->config || {} }));
+    warn
+      sprintf("[Game::EvonyTKR] Mode: %s\n", $ENV{MOJO_MODE} || 'development');
 
     # Directly initialize the singleton in Core.pm's package variable
     $Game::EvonyTKR::Role::Persistence::Core::persistence =
       Game::EvonyTKR::Service::Persistence->new(
-        mode   => $ENV{MOJO_MODE} || 'development',
-        config => $app->config || {}
+      mode   => $ENV{MOJO_MODE} || 'development',
+      config => $app->config    || {}
       );
 
     $app->log->info(sprintf(
@@ -180,7 +186,7 @@ package Game::EvonyTKR {
 
     require Minion::Backend::SQLite;
     require Mojolicious::Plugin::Minion;
-    # Use SQLite for Minion (reliable), mode-gated persistence for application data
+ # Use SQLite for Minion (reliable), mode-gated persistence for application data
     my $minion_db = $app->home->child('minion.db');
     $app->plugin(Minion => { SQLite => $minion_db });
 
@@ -289,8 +295,9 @@ package Game::EvonyTKR {
     # Production defaults for T4G Large (2 vCPUs):
     # 2 workers × 1 job = 2 concurrent processes (matches CPU count)
     # Development: More aggressive for local multi-core machines
-    my $worker_count  = $ENV{MINION_WORKERS}       // ($app->mode eq 'development' ? 4 : 2);
-    my $job_count     = $ENV{MINION_JOB_COUNT}
+    my $worker_count = $ENV{MINION_WORKERS}
+      // ($app->mode eq 'development' ? 4 : 2);
+    my $job_count = $ENV{MINION_JOB_COUNT}
       // $app->mode eq 'development' ? 5 : 1;
     return unless $start_workers;
 

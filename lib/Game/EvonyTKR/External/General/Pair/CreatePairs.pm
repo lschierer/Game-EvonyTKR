@@ -13,7 +13,6 @@ package Game::EvonyTKR::External::General::Pair::CreatePairs {
     return 1 unless $taskClass->SUPER::register($app, $conf);
     $app->minion->add_task($taskClass->task_name => __PACKAGE__);
 
-
     return 1;
   }
 
@@ -30,13 +29,14 @@ package Game::EvonyTKR::External::General::Pair::CreatePairs {
     }
 
     # Check if prerequisites are loaded - fail fast if not
-    return if ($job->are_prereqs_outstanding(
+    return
+      if ($job->are_prereqs_outstanding(
       $job->minion,
       [
-        'load_all_generals', 'load_all_builtin_books',
+        'load_all_generals',    'load_all_builtin_books',
         'load_all_specialties', 'load_all_ascending_attributes',
       ]
-    ));
+      ));
 
     $job->log_debug(sprintf(
       '%s log level is %s',

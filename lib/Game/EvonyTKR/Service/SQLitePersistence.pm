@@ -7,7 +7,7 @@ use JSON::PP qw(encode_json decode_json);
 use Carp;
 use Time::HiRes 'time';
 
-has 'config';  # Config hash from NotYAMLConfig
+has 'config';    # Config hash from NotYAMLConfig
 
 has 'db_path' => sub ($self) {
   my $config = $self->config || {};
@@ -18,11 +18,13 @@ has 'sqlite' => sub ($self) {
   my $sqlite = Mojo::SQLite->new('sqlite:' . $self->db_path);
 
   # Apply optimizations
-  $sqlite->on(connection => sub ($sqlite, $dbh) {
-    $dbh->do('PRAGMA journal_mode=WAL');
-    $dbh->do('PRAGMA synchronous=NORMAL');
-    $dbh->do('PRAGMA busy_timeout=30000');
-  });
+  $sqlite->on(
+    connection => sub ($sqlite, $dbh) {
+      $dbh->do('PRAGMA journal_mode=WAL');
+      $dbh->do('PRAGMA synchronous=NORMAL');
+      $dbh->do('PRAGMA busy_timeout=30000');
+    }
+  );
 
   # Create tables - run migrations immediately
   $sqlite->migrations->name('evonytkr')->from_data->migrate;
@@ -48,23 +50,37 @@ sub get_metadata ($self, $key) {
 }
 
 sub set_metadata ($self, $key, $value) {
-  $self->db->insert('metadata', {
-    key => $key,
-    value => encode_json($value),
-    updated_at => time()
-  }, { on_conflict => \['(key) do update set value = ?, updated_at = ?', encode_json($value), time()] });
+  $self->db->insert(
+    'metadata',
+    {
+      key        => $key,
+      value      => encode_json($value),
+      updated_at => time()
+    },
+    {
+      on_conflict => \[
+        '(key) do update set value = ?, updated_at = ?', encode_json($value),
+        time()
+      ]
+    }
+  );
 }
 
 # Job completion tracking
 sub mark_job_completed ($self, $job_name) {
-  $self->db->insert('job_completed', {
-    job_name => $job_name,
-    completed_at => time()
-  }, { on_conflict => \['(job_name) do update set completed_at = ?', time()] });
+  $self->db->insert(
+    'job_completed',
+    {
+      job_name     => $job_name,
+      completed_at => time()
+    },
+    { on_conflict => \['(job_name) do update set completed_at = ?', time()] }
+  );
 }
 
 sub is_job_completed ($self, $job_name) {
-  return $self->db->select('job_completed', ['job_name'], { job_name => $job_name })->hash ? 1 : 0;
+  return $self->db->select('job_completed', ['job_name'],
+    { job_name => $job_name })->hash ? 1 : 0;
 }
 
 # Data versioning - track which git-commit the data was built from
@@ -79,11 +95,20 @@ sub set_data_version ($self, $version) {
 # Generic storage operations
 sub store_data ($self, $table, $key, $data) {
   eval {
-    $self->db->insert($table, {
-      name => $key,
-      data => encode_json($data),
-      updated_at => time()
-    }, { on_conflict => \['(name) do update set data = ?, updated_at = ?', encode_json($data), time()] });
+    $self->db->insert(
+      $table,
+      {
+        name       => $key,
+        data       => encode_json($data),
+        updated_at => time()
+      },
+      {
+        on_conflict => \[
+          '(name) do update set data = ?, updated_at = ?', encode_json($data),
+          time()
+        ]
+      }
+    );
   };
   if ($@) {
     warn "Failed to store data in $table for key $key: $@";
@@ -92,7 +117,8 @@ sub store_data ($self, $table, $key, $data) {
 }
 
 sub get_data ($self, $table, $key) {
-  my $result = eval { $self->db->select($table, ['data'], { name => $key })->hash };
+  my $result =
+    eval { $self->db->select($table, ['data'], { name => $key })->hash };
   if ($@) {
     warn "Failed to get data from $table for key $key: $@";
     return undef;
@@ -101,8 +127,10 @@ sub get_data ($self, $table, $key) {
 
   my $decoded = eval { decode_json($result->{data}) };
   if ($@) {
-    warn sprintf("[SQLite] JSON decode failed for table=%s, key=%s: %s\n", $table, $key, $@);
-    warn sprintf("[SQLite] Raw data (first 200 chars): %s\n", substr($result->{data}, 0, 200));
+    warn sprintf("[SQLite] JSON decode failed for table=%s, key=%s: %s\n",
+      $table, $key, $@);
+    warn sprintf("[SQLite] Raw data (first 200 chars): %s\n",
+      substr($result->{data}, 0, 200));
     return;
   }
 
@@ -111,9 +139,9 @@ sub get_data ($self, $table, $key) {
 
 sub get_all_data ($self, $table) {
   my $results = $self->db->select($table, ['name', 'data'])->hashes;
-  my $data = {};
+  my $data    = {};
   for my $row (@$results) {
-    $data->{$row->{name}} = decode_json($row->{data});
+    $data->{ $row->{name} } = decode_json($row->{data});
   }
   return $data;
 }
@@ -149,13 +177,14 @@ sub get_all_ascending_attributes ($self) {
 }
 
 sub count_ascending_attributes ($self) {
-  return $self->db->query('SELECT COUNT(*) FROM ascending_attributes')->array->[0];
+  return $self->db->query('SELECT COUNT(*) FROM ascending_attributes')
+    ->array->[0];
 }
 
 # Books
 sub store_book ($self, $key, $book_data) {
-  my $name = $book_data->{name} or croak "Book must have name";
-  my $type = $book_data->{type} || 'generic';
+  my $name  = $book_data->{name} or croak "Book must have name";
+  my $type  = $book_data->{type} || 'generic';
   my $table = $type eq 'builtin' ? 'builtin_books' : 'generic_books';
   return $self->store_data($table, $key, $book_data);
 }
@@ -171,8 +200,13 @@ sub get_all_books ($self, $type = 'generic') {
 }
 
 # Legacy book methods
-sub get_generic_book ($self, $name, $level = undef) { $self->get_book($name, 'generic') }
-sub get_builtin_book ($self, $name, $level = undef) { $self->get_book($name, 'builtin') }
+sub get_generic_book ($self, $name, $level = undef) {
+  $self->get_book($name, 'generic');
+}
+
+sub get_builtin_book ($self, $name, $level = undef) {
+  $self->get_book($name, 'builtin');
+}
 sub get_all_generic_books ($self) { $self->get_all_books('generic') }
 sub get_all_builtin_books ($self) { $self->get_all_books('builtin') }
 
@@ -204,38 +238,63 @@ sub get_specialty ($self, $name) {
   return $result;
 }
 sub get_all_specialties ($self) { $self->get_all_data('specialties') }
-sub count_specialties ($self) { $self->db->query('SELECT COUNT(*) FROM specialties')->array->[0] }
+
+sub count_specialties ($self) {
+  $self->db->query('SELECT COUNT(*) FROM specialties')->array->[0];
+}
 
 # Covenants
 sub store_covenant ($self, $key, $covenant_data) {
   return $self->store_data('covenants', $key, $covenant_data);
 }
 
-sub get_covenant ($self, $name) { $self->get_data('covenants', $name) }
-sub get_all_covenants ($self) { $self->get_all_data('covenants') }
-sub count_covenants ($self) { $self->db->query('SELECT COUNT(*) FROM covenants')->array->[0] }
+sub get_covenant      ($self, $name) { $self->get_data('covenants', $name) }
+sub get_all_covenants ($self)        { $self->get_all_data('covenants') }
+
+sub count_covenants ($self) {
+  $self->db->query('SELECT COUNT(*) FROM covenants')->array->[0];
+}
 
 # Glossary terms
-sub store_glossary_term ($self, $name, $data) { $self->store_data('glossary_terms', $name, $data) }
-sub get_glossary_term ($self, $name) { $self->get_data('glossary_terms', $name) }
+sub store_glossary_term ($self, $name, $data) {
+  $self->store_data('glossary_terms', $name, $data);
+}
+
+sub get_glossary_term ($self, $name) {
+  $self->get_data('glossary_terms', $name);
+}
 sub get_all_glossary_terms ($self) { $self->get_all_data('glossary_terms') }
-sub count_glossary_terms ($self) { $self->db->query('SELECT COUNT(*) FROM glossary_terms')->array->[0] }
+
+sub count_glossary_terms ($self) {
+  $self->db->query('SELECT COUNT(*) FROM glossary_terms')->array->[0];
+}
 
 # Conflicts
 sub store_conflict ($self, $g1, $g2, $conflicts) {
   ($g1, $g2) = sort ($g1, $g2);
   my $key = "$g1:$g2";
-  $self->db->insert('general_conflicts', {
-    pair_key => $key,
-    conflicts => $conflicts ? 1 : 0,
-    updated_at => time()
-  }, { on_conflict => \['(pair_key) do update set conflicts = ?, updated_at = ?', $conflicts ? 1 : 0, time()] });
+  $self->db->insert(
+    'general_conflicts',
+    {
+      pair_key   => $key,
+      conflicts  => $conflicts ? 1 : 0,
+      updated_at => time()
+    },
+    {
+      on_conflict => \[
+        '(pair_key) do update set conflicts = ?, updated_at = ?',
+        $conflicts ? 1 : 0, time()
+      ]
+    }
+  );
 }
 
 sub get_conflict ($self, $g1, $g2) {
   ($g1, $g2) = sort ($g1, $g2);
   my $key = "$g1:$g2";
-  my $result = $self->db->select('general_conflicts', ['conflicts'], { pair_key => $key })->hash;
+  my $result =
+    $self->db->select('general_conflicts', ['conflicts'], { pair_key => $key })
+    ->hash;
   return unless $result;
   return $result->{conflicts} ? 1 : 0;
 }
@@ -250,7 +309,9 @@ sub get_pairs_by_type ($self, $type) {
   return $result ? $result->{pairs} : [];
 }
 
-sub store_pair ($self, $key, $data) { $self->store_data('pairs_individual', $key, $data) }
+sub store_pair ($self, $key, $data) {
+  $self->store_data('pairs_individual', $key, $data);
+}
 sub get_pair ($self, $key) { $self->get_data('pairs_individual', $key) }
 
 sub get_all_pair_types ($self) {

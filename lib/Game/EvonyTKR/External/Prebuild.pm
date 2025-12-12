@@ -90,7 +90,8 @@ package Game::EvonyTKR::External::Prebuild {
     return if $ENV{MINION_WORKER_CHILD};
 
     # Use a guard to ensure only one process can enqueue prebuild
-    my $guard = $app->minion->guard('prebuild_enqueue_lock', 30, { limit => 1 });
+    my $guard =
+      $app->minion->guard('prebuild_enqueue_lock', 30, { limit => 1 });
     return unless $guard;
 
     # Check for existing prebuild jobs
@@ -100,12 +101,15 @@ package Game::EvonyTKR::External::Prebuild {
     })->total;
 
     if ($existing == 0) {
-      my $jid = $app->minion->enqueue('external_prebuild' => [{}] => {
-        priority => 100,
-        attempts => 3,
-      });
+      my $jid = $app->minion->enqueue(
+        'external_prebuild' => [{}] => {
+          priority => 100,
+          attempts => 3,
+        }
+      );
       $taskClass->log_info("Queued external_prebuild $jid");
-    } else {
+    }
+    else {
       $taskClass->log_info("Prebuild job already exists ($existing), skipping");
     }
   }
@@ -113,14 +117,15 @@ package Game::EvonyTKR::External::Prebuild {
   sub prebuildPrerequisites ($job, $args = {}) {
 
     my @loaded_plugins = sort values $job->minion->tasks->%*;
-    $job->log_debug(sprintf('there are %s tasks in minion', scalar(@loaded_plugins)));
-    if(scalar(keys($args->%*)) == 0) {
-      foreach my $prereq_plugin ($prereq_plugins->@*){
-        if (any {$_ eq $prereq_plugin } @loaded_plugins ) {
-          $job->log_debug(sprintf(
-            'prereq %s is registered', $prereq_plugin,));
+    $job->log_debug(
+      sprintf('there are %s tasks in minion', scalar(@loaded_plugins)));
+    if (scalar(keys($args->%*)) == 0) {
+      foreach my $prereq_plugin ($prereq_plugins->@*) {
+        if (any { $_ eq $prereq_plugin } @loaded_plugins) {
+          $job->log_debug(sprintf('prereq %s is registered', $prereq_plugin,));
           $prereqs->{$prereq_plugin} = 1;
-        } else {
+        }
+        else {
           my $errmessage = sprintf('module "%s" unavailable', $prereq_plugin,);
           print STDERR $errmessage;
           $job->log_error($errmessage);
@@ -129,7 +134,6 @@ package Game::EvonyTKR::External::Prebuild {
         }
       }
     }
-
 
     foreach my $key (keys $args->%*) {
       $prereqs->{$key} = $args->{$key};
@@ -175,11 +179,13 @@ package Game::EvonyTKR::External::Prebuild {
     # Check if we should force a rebuild regardless of data state
     my $force_reload = $ENV{FORCE_DATA_RELOAD} || 0;
     if ($force_reload) {
-      $job->log_info("FORCE_DATA_RELOAD set - rebuilding data regardless of current state");
+      $job->log_info(
+        "FORCE_DATA_RELOAD set - rebuilding data regardless of current state");
     }
 
     # Get current version from config (git-commit)
-    my $current_version = eval { $job->app->config->{version}{'git-commit'} } // 'unknown';
+    my $current_version =
+      eval { $job->app->config->{version}{'git-commit'} } // 'unknown';
     $job->log_info("Current git-commit: $current_version");
 
     # Check if data is current for this version
@@ -190,25 +196,32 @@ package Game::EvonyTKR::External::Prebuild {
 
         if ($stored_version && $stored_version eq $current_version) {
           # Version matches - verify data actually exists
-          my $generals_count = $job->persistence->count_generals // 0;
-          my $specialties_count = $job->persistence->count_specialties // 0;
-          my $books_count = $job->persistence->count_builtin_books // 0;
+          my $generals_count    = $job->persistence->count_generals      // 0;
+          my $specialties_count = $job->persistence->count_specialties   // 0;
+          my $books_count       = $job->persistence->count_builtin_books // 0;
 
-          if ($generals_count > 0 && $specialties_count > 0 && $books_count > 0) {
+          if ($generals_count > 0 && $specialties_count > 0 && $books_count > 0)
+          {
             $data_current = 1;
             $job->log_info(sprintf(
-              "Data current for version %s (generals=%d, specialties=%d, books=%d)",
-              $current_version, $generals_count, $specialties_count, $books_count
+"Data current for version %s (generals=%d, specialties=%d, books=%d)",
+              $current_version,   $generals_count,
+              $specialties_count, $books_count
             ));
-          } else {
+          }
+          else {
             $job->log_warn(sprintf(
-              "Version matches but data incomplete: generals=%d, specialties=%d, books=%d",
+"Version matches but data incomplete: generals=%d, specialties=%d, books=%d",
               $generals_count, $specialties_count, $books_count
             ));
           }
-        } elsif ($stored_version) {
-          $job->log_info("Data version mismatch: stored=$stored_version, current=$current_version - will reload");
-        } else {
+        }
+        elsif ($stored_version) {
+          $job->log_info(
+"Data version mismatch: stored=$stored_version, current=$current_version - will reload"
+          );
+        }
+        else {
           $job->log_info("No stored data version - first run or data cleared");
         }
       };
@@ -225,8 +238,8 @@ package Game::EvonyTKR::External::Prebuild {
 
     my $owner         = $$ . '@' . ($ENV{HOSTNAME} // 'localhost');
     my $job_key       = 'prebuild_run';
-    my $ttl           = 30;                                 # reduced TTL (seconds)
-    my $refresh_every = 10;                                 # heartbeat interval
+    my $ttl           = 30;    # reduced TTL (seconds)
+    my $refresh_every = 10;    # heartbeat interval
     my $pair_monitor_jid;
 
     # Use Minion's built-in job uniqueness instead of custom SQLite locking
@@ -362,7 +375,8 @@ package Game::EvonyTKR::External::Prebuild {
 
     # Store current version to persistence after successful load
     eval {
-      my $current_version = $job->app->config->{version}{'git-commit'} // 'unknown';
+      my $current_version = $job->app->config->{version}{'git-commit'}
+        // 'unknown';
       $job->persistence->set_data_version($current_version);
       $job->log_info("Stored data version: $current_version");
     };

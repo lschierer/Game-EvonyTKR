@@ -5,18 +5,25 @@ use Mojo::Base -base, -signatures;
 
 # Mode-gated persistence factory
 has 'mode' => sub { $ENV{MOJO_MODE} || 'development' };
-has 'config';  # Optional config hash from NotYAMLConfig
+has 'config';    # Optional config hash from NotYAMLConfig
 
 has 'backend' => sub ($self) {
-  my $config = $self->config || {};
+  my $config             = $self->config          || {};
   my $persistence_config = $config->{persistence} || {};
 
   # Debug logging
   require Data::Dumper;
-  warn sprintf("[Persistence] MOJO_MODE=%s, mode attribute=%s\n", $ENV{MOJO_MODE} // 'unset', $self->mode);
+  warn sprintf(
+    "[Persistence] MOJO_MODE=%s, mode attribute=%s\n",
+    $ENV{MOJO_MODE} // 'unset',
+    $self->mode
+  );
   warn sprintf("[Persistence] Config keys: %s\n", join(', ', keys %$config));
-  warn sprintf("[Persistence] Persistence config: %s\n", Data::Dumper::Dumper($persistence_config));
-  warn sprintf("[Persistence] AWS config: %s\n", Data::Dumper::Dumper($config->{aws})) if $config->{aws};
+  warn sprintf("[Persistence] Persistence config: %s\n",
+    Data::Dumper::Dumper($persistence_config));
+  warn sprintf("[Persistence] AWS config: %s\n",
+    Data::Dumper::Dumper($config->{aws}))
+    if $config->{aws};
 
   # Determine backend: explicit config > mode-based fallback
   my $backend_type = $persistence_config->{backend};
@@ -24,23 +31,32 @@ has 'backend' => sub ($self) {
   # Fall back to mode-based selection if no explicit backend configured
   unless ($backend_type) {
     $backend_type = ($self->mode eq 'development') ? 'sqlite' : 'dynamodb';
-    warn sprintf("[Persistence] No explicit backend configured, using mode-based default: %s\n", $backend_type);
-  } else {
-    warn sprintf("[Persistence] Using explicitly configured backend: %s\n", $backend_type);
+    warn sprintf(
+"[Persistence] No explicit backend configured, using mode-based default: %s\n",
+      $backend_type);
+  }
+  else {
+    warn sprintf("[Persistence] Using explicitly configured backend: %s\n",
+      $backend_type);
   }
 
   if ($backend_type eq 'sqlite') {
     require Game::EvonyTKR::Service::SQLitePersistence;
-    return Game::EvonyTKR::Service::SQLitePersistence->new(config => $persistence_config);
-  } elsif ($backend_type eq 'dynamodb') {
+    return Game::EvonyTKR::Service::SQLitePersistence->new(
+      config => $persistence_config);
+  }
+  elsif ($backend_type eq 'dynamodb') {
     require Game::EvonyTKR::Service::DynamoDBPersistence;
     my $aws_config = $config->{aws} || {};
     return Game::EvonyTKR::Service::DynamoDBPersistence->new(
-      config => $persistence_config,
+      config     => $persistence_config,
       aws_config => $aws_config,
     );
-  } else {
-    die sprintf("Unknown persistence backend type: %s (expected 'sqlite' or 'dynamodb')\n", $backend_type);
+  }
+  else {
+    die sprintf(
+"Unknown persistence backend type: %s (expected 'sqlite' or 'dynamodb')\n",
+      $backend_type);
   }
 };
 
@@ -50,7 +66,7 @@ sub AUTOLOAD ($self, @args) {
   my $method = $AUTOLOAD;
   $method =~ s/.*:://;
   return if $method eq 'DESTROY';
-  
+
   return $self->backend->$method(@args);
 }
 

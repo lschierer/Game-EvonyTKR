@@ -34,7 +34,6 @@ package Game::EvonyTKR::External::Book::LoadAllGenerics {
     $taskClass->log_debug('Registering Book Loader workflow tasks');
     $app->minion->add_task($taskClass->task_name => __PACKAGE__);
 
-
     return 1;
   }
 

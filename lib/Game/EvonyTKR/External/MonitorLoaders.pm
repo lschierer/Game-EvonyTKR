@@ -11,7 +11,6 @@ package Game::EvonyTKR::External::MonitorLoaders {
     return 1 unless $taskClass->SUPER::register($app, $conf);
     $app->minion->add_task($taskClass->task_name => __PACKAGE__);
 
-
     return 1;
   }
 

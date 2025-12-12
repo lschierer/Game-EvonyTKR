@@ -14,7 +14,6 @@ package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
     $taskClass->setup_pairs_by_type();
     $app->minion->add_task($taskClass->task_name => __PACKAGE__);
 
-
     return 1;
   }
 

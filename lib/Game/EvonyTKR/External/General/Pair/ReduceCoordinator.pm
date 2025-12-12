@@ -14,7 +14,6 @@ package Game::EvonyTKR::External::General::Pair::ReduceCoordinator {
     return 1 unless $taskClass->SUPER::register($app, $conf);
     $app->minion->add_task($taskClass->task_name => __PACKAGE__);
 
-
     return 1;
   }
 
@@ -26,13 +25,12 @@ package Game::EvonyTKR::External::General::Pair::ReduceCoordinator {
 
   sub run ($job) {
     $job->SUPER::run([]);
-    
+
     # Check if prerequisites are loaded - fail fast if not
-    return if ($job->are_prereqs_outstanding(
-      $job->minion,
-      ['load_all_pair_builders']
-    ));
-    
+    return
+      if ($job->are_prereqs_outstanding(
+      $job->minion, ['load_all_pair_builders']));
+
     my $processed = $job->info->{notes}{processed} // {};
 
     # Initialize merged results from job notes

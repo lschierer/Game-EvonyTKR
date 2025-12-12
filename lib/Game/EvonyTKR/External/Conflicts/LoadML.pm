@@ -28,7 +28,6 @@ package Game::EvonyTKR::External::Conflicts::LoadML {
     $taskClass->log_debug('Registering ML Conflicts Loader task');
     $app->minion->add_task($taskClass->task_name => __PACKAGE__);
 
-
     return 1;
   }
 

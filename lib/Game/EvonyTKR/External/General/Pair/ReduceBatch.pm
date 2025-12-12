@@ -13,7 +13,6 @@ package Game::EvonyTKR::External::General::Pair::ReduceBatch {
     return 1 unless $taskClass->SUPER::register($app, $conf);
     $app->minion->add_task($taskClass->task_name => __PACKAGE__);
 
-
     return 1;
   }
 
@@ -29,13 +28,12 @@ package Game::EvonyTKR::External::General::Pair::ReduceBatch {
       unless $job_ids && ref($job_ids) eq 'ARRAY';
 
     $job->SUPER::run([]);
-    
-    # Check if prerequisites are loaded - fail fast if not  
-    return if ($job->are_prereqs_outstanding(
-      $job->minion,
-      ['load_all_pair_builders']
-    ));
-    
+
+    # Check if prerequisites are loaded - fail fast if not
+    return
+      if ($job->are_prereqs_outstanding(
+      $job->minion, ['load_all_pair_builders']));
+
     $job->log_info(
       sprintf('ReduceBatch processing %d parent jobs', scalar(@$job_ids)));
 

@@ -48,7 +48,7 @@ package Game::EvonyTKR::Service::RedisPersistence {
   # Job completion tracking
   sub mark_job_completed ($self, $job_name) {
     my $key = "job_completed:$job_name";
-    return $self->db->setex($key, 86400, time); # Expire after 24 hours
+    return $self->db->setex($key, 86400, time);    # Expire after 24 hours
   }
 
   sub is_job_completed ($self, $job_name) {
@@ -69,7 +69,7 @@ package Game::EvonyTKR::Service::RedisPersistence {
   }
 
   sub get_all_data ($self, $table) {
-    my $hash = $self->db->hgetall($table);
+    my $hash   = $self->db->hgetall($table);
     my $result = {};
     for my $key (keys %$hash) {
       $result->{$key} = decode_json($hash->{$key});
@@ -87,7 +87,7 @@ package Game::EvonyTKR::Service::RedisPersistence {
 
   # List operations
   sub store_list ($self, $key, $items) {
-    $self->db->del($key); # Clear existing
+    $self->db->del($key);    # Clear existing
     return unless @$items;
     my @json_items = map { encode_json($_) } @$items;
     return $self->db->lpush($key, @json_items);
@@ -120,10 +120,11 @@ package Game::EvonyTKR::Service::RedisPersistence {
       # Old signature: store_ascending_attribute($name, $data)
       $data->{name} = $name_or_data unless exists $data->{name};
       return $self->store_data('ascending_attributes', $name_or_data, $data);
-    } else {
+    }
+    else {
       # New signature: store_ascending_attribute($data)
       my $attr_data = $name_or_data;
-      my $name = $attr_data->{name} or croak "Attribute must have name";
+      my $name      = $attr_data->{name} or croak "Attribute must have name";
       return $self->store_data('ascending_attributes', $name, $attr_data);
     }
   }
@@ -139,7 +140,8 @@ package Game::EvonyTKR::Service::RedisPersistence {
   # Books
   sub store_book ($self, $book_data) {
     my $name = $book_data->{name} or croak "Book must have name";
-    my $table = $book_data->{type} eq 'builtin' ? 'builtin_books' : 'generic_books';
+    my $table =
+      $book_data->{type} eq 'builtin' ? 'builtin_books' : 'generic_books';
     return $self->store_data($table, $name, $book_data);
   }
 
@@ -203,7 +205,7 @@ package Game::EvonyTKR::Service::RedisPersistence {
   }
 
   sub get_all_pair_types ($self) {
-    my @keys = $self->db->keys('pairs:*');
+    my @keys  = $self->db->keys('pairs:*');
     my @types = map { s/^pairs://; $_ } @keys;
     return \@types;
   }
@@ -248,7 +250,8 @@ package Game::EvonyTKR::Service::RedisPersistence {
       # Old signature: store_specialty($name, $data)
       $data->{name} = $name_or_data unless exists $data->{name};
       return $self->store_data('specialties', $name_or_data, $data);
-    } else {
+    }
+    else {
       # New signature: store_specialty($data)
       my $specialty_data = $name_or_data;
       my $name = $specialty_data->{name} or croak "Specialty must have name";
@@ -288,7 +291,7 @@ package Game::EvonyTKR::Service::RedisPersistence {
 
   sub get_conflict ($self, $g1, $g2) {
     ($g1, $g2) = sort ($g1, $g2);
-    my $key = "$g1:$g2";
+    my $key    = "$g1:$g2";
     my $result = $self->db->hget('general_conflicts', $key);
     return unless defined $result;
     return $result ? 1 : 0;

@@ -28,7 +28,6 @@ package Game::EvonyTKR::External::Glossary::LoadAll {
     $taskClass->log_debug('Registering Glossary LoadAll task');
     $app->minion->add_task($taskClass->task_name => __PACKAGE__);
 
-
     return 1;
   }
 

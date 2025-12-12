@@ -192,7 +192,7 @@ package Game::EvonyTKR::Role::Common {
     if ($is_minion_job) {
       $self->note(outstanding_prereqs => undef);
     }
-    
+
     return 0;
   }
 }

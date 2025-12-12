@@ -7,9 +7,10 @@ use Game::EvonyTKR::Service::Persistence;
 # Lazy-load mode-gated persistence service
 # Use package-level singleton to share backend across all instances
 our $persistence;
+
 sub persistence ($self) {
   $persistence //= do {
-    my $mode = $ENV{MOJO_MODE} || 'development';
+    my $mode   = $ENV{MOJO_MODE} || 'development';
     my $config = {};
 
     # Get config from app (controllers/jobs have $self->app)
@@ -19,7 +20,8 @@ sub persistence ($self) {
 
     # Debug: Log when singleton is lazily initialized (should be rare!)
     my ($package, $filename, $line) = caller(1);
-    warn sprintf("[Persistence::Core] LAZY initialization from %s:%d (should be initialized by Game::EvonyTKR::_init_persistence instead!)\n",
+    warn sprintf(
+"[Persistence::Core] LAZY initialization from %s:%d (should be initialized by Game::EvonyTKR::_init_persistence instead!)\n",
       $package, $line);
     warn sprintf("[Persistence::Core] Config keys at lazy init: %s\n",
       join(', ', sort keys %$config));
