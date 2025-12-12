@@ -2,7 +2,8 @@ package Game::EvonyTKR::Service::DynamoDBPersistence;
 use v5.42.0;
 use utf8::all;
 use Mojo::Base -base, -signatures;
-use JSON::PP qw(encode_json decode_json);
+use Mojo::Base 'Game::EvonyTKR::Role::JSON', -role;
+
 use Carp;
 use Time::HiRes 'time';
 
@@ -58,7 +59,7 @@ sub _put_item ($self, $pk, $sk, $data, $entity_type = undef) {
     pk          => { S => $pk },
     sk          => { S => $sk },
     entity_type => { S => $entity_type },
-    data        => { S => encode_json($data) },
+    data        => { S => $self->encode($data) },
     updated_at  => { N => sprintf("%.6f", time()) }
   };
 
@@ -73,7 +74,7 @@ sub _put_item ($self, $pk, $sk, $data, $entity_type = undef) {
   if ($@) {
     warn
       sprintf("[DynamoDB] PutItem FAILED for pk=%s, sk=%s: %s\n", $pk, $sk, $@);
-    die $@;
+    return 0;
   }
 
   return 1;
@@ -104,7 +105,7 @@ sub _get_item ($self, $pk, $sk) {
     return;
   }
 
-  my $decoded = eval { decode_json($data_str) };
+  my $decoded = eval { $self->decode($data_str) };
   if ($@) {
     warn sprintf("[DynamoDB] JSON decode failed for pk=%s, sk=%s: %s\n",
       $pk, $sk, $@);
@@ -142,7 +143,7 @@ sub _query_items ($self, $pk, $sk_prefix = undef) {
 
   my @items;
   for my $item (@{ $result->Items }) {
-    push @items, decode_json($item->{data}->{S});
+    push @items, $self->decode($item->{data}->{S});
   }
 
   return \@items;
@@ -355,6 +356,29 @@ sub get_conflict ($self, $g1, $g2) {
   my $result = $self->_get_item('general_conflicts', $key);
   return unless $result;
   return $result->{conflicts} ? 1 : 0;
+}
+
+sub load_all_conflicts ($self) {
+  my $result = $self->paws->Scan(
+    TableName => $self->table_name,
+    FilterExpression => 'entity_type = :entity_type',
+    ExpressionAttributeValues => {
+      ':entity_type' => { S => 'general_conflicts' }
+    }
+  );
+
+  my $conflicts = {};
+  for my $item (@{ $result->Items }) {
+    my $sk = $item->{sk}->{S};
+    my ($g1, $g2) = split ':', $sk;
+    my $data = $self->decode($item->{data}->{S});
+    my $has_conflict = $data->{conflicts} ? 1 : 0;
+    
+    $conflicts->{$g1}{$g2} = $has_conflict;
+    $conflicts->{$g2}{$g1} = $has_conflict;
+  }
+  
+  return $conflicts;
 }
 
 # Pairs (simplified - store as JSON)

@@ -2,7 +2,7 @@ use v5.42.0;
 use utf8::all;
 use File::FindLib 'lib';
 require Data::Printer;
-require JSON::PP;
+
 require Game::EvonyTKR::Model::Buff::Value;
 use namespace::autoclean;
 
@@ -452,10 +452,7 @@ package Game::EvonyTKR::Model::Buff {
     my $r = {
       __CLASS__ => __PACKAGE__,
       attribute => $self->attribute,
-      value     => {
-        number => $self->value->number(),
-        unit   => $self->value->unit(),
-      },
+      value     => $self->value,  # Let JSON role handle the blessed object
       passive      => $self->passive,
       targetedType => $self->targetedType,
       conditions   => $rc,

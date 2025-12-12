@@ -2,7 +2,7 @@ use v5.42.0;
 use experimental qw(class);
 use utf8::all;
 use File::FindLib 'lib';
-require JSON::PP;
+
 require YAML::PP;
 require Mojo::Promise;
 require List::Util;
@@ -20,8 +20,8 @@ package Game::EvonyTKR::Controller::Pairs {
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants',   -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::Covenants',          -role;
   use Mojo::Base 'Game::EvonyTKR::Controller::Role::Generals::Routing', -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::JSON',                          -role;
   use Mojo::IOLoop;
-  use Mojo::JSON     qw(to_json encode_json);
   use MIME::Base64   qw(encode_base64);
   use List::AllUtils qw( all any none );
   use Carp;
@@ -134,18 +134,18 @@ package Game::EvonyTKR::Controller::Pairs {
     return 1;
   }
 
-  sub get_pairs_for_type ($self, $generalType) {
-    my $all_pairs = $self->get_pairs_by_type();
+  sub get_pairs_for_type ($c, $generalType) {
+    my $all_pairs = $c->get_pairs_by_type();
 
     unless ($all_pairs && ref($all_pairs) eq 'HASH') {
-      $self->log_error('get_pairs_by_type returned invalid data');
+      $c->log_error('get_pairs_by_type returned invalid data');
       return [];
     }
 
     my $pairs_for_type = $all_pairs->{$generalType};
 
     unless (defined $pairs_for_type) {
-      $self->log_debug(sprintf(
+      $c->log_debug(sprintf(
         'No pairs found for type "%s". Available types: %s',
         $generalType, join(', ', sort keys %$all_pairs)
       ));
@@ -153,14 +153,14 @@ package Game::EvonyTKR::Controller::Pairs {
     }
 
     unless (ref($pairs_for_type) eq 'ARRAY') {
-      $self->log_error(sprintf(
+      $c->log_error(sprintf(
         'Pairs for type "%s" is not an array: %s',
         $generalType, ref($pairs_for_type)
       ));
       return [];
     }
 
-    $self->log_debug(sprintf(
+    $c->log_debug(sprintf(
       'Found %d pairs for type "%s"',
       scalar(@$pairs_for_type), $generalType
     ));
@@ -405,7 +405,7 @@ package Game::EvonyTKR::Controller::Pairs {
     my $session_id = $c->param('sessionId');
     unless (defined($session_id) && length($session_id)) {
       $c->log_error('Session ID must be present!');
-      my $payload = encode_json({ runId => 0+ $run_id });
+      my $payload = $c->encode({ runId => 0+ $run_id });
       $c->write_sse({ type => 'complete', text => $payload });
       return;
     }
@@ -442,7 +442,7 @@ package Game::EvonyTKR::Controller::Pairs {
           }
         );
       }
-      my $payload = encode_json({ runId => 0+ $run_id });
+      my $payload = $c->encode({ runId => 0+ $run_id });
       $c->write_sse({ type => 'complete', text => $payload });
       return;
     }
@@ -594,7 +594,7 @@ package Game::EvonyTKR::Controller::Pairs {
         10 => sub ($loop) {
           $c->log_debug(
             'all jobs complete promise handler sending complete event');
-          my $payload = encode_json({ runId => $run_id });
+          my $payload = $c->encode({ runId => $run_id });
           $c->write_sse({ type => 'complete', text => $payload });
         }
       );

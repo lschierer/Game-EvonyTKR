@@ -8,7 +8,6 @@ use Mojo::Base 'Game::EvonyTKR::Role::StaticPages',                   -role;
 use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants',      -role;
 use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants',   -role;
 use Mojo::Base 'Game::EvonyTKR::Controller::Role::Generals::Routing', -role;
-require JSON::PP;
 require YAML::PP;
 require Mojo::Promise;
 require Mojo::Util;
@@ -25,7 +24,7 @@ require Data::Printer;
 
 use Mojo::IOLoop;
 use Mojo::Promise;
-use Mojo::JSON     qw(to_json encode_json);
+
 use MIME::Base64   qw(encode_base64);
 use List::AllUtils qw( all any none );
 require Game::EvonyTKR::External::General::Summarizer;
@@ -826,7 +825,7 @@ sub single_details_stream ($c) {
   my $session_id = $c->param('sessionId');
   unless (defined($session_id) && length($session_id)) {
     $c->log_error('Session ID must be present!');
-    my $payload = encode_base64(encode_json({ runId => 0+ $run_id }), '');
+    my $payload = encode_base64($c->encode({ runId => 0+ $run_id }), '');
     $c->write_sse({ type => 'complete', text => $payload });
     return;
   }
@@ -862,7 +861,7 @@ sub single_details_stream ($c) {
         }
       );
     }
-    my $payload = encode_base64(encode_json({ runId => 0+ $run_id }), '');
+    my $payload = encode_base64($c->encode({ runId => 0+ $run_id }), '');
     $c->write_sse({ type => 'complete', text => $payload });
     return;
   }
@@ -982,7 +981,7 @@ sub single_details_stream ($c) {
         };
 
         my $payload =
-          encode_base64(encode_json({ runId => $run_id, data => $row }), '');
+          encode_base64($c->encode({ runId => $run_id, data => $row }), '');
         $c->write_sse({ type => 'row', text => $payload });
       }
       return $result;
@@ -1001,7 +1000,7 @@ sub single_details_stream ($c) {
 
     Mojo::IOLoop->timer(
       10 => sub {
-        my $payload = encode_base64(encode_json({ runId => $run_id }), '');
+        my $payload = encode_base64($c->encode({ runId => $run_id }), '');
         $c->write_sse({ type => 'complete', text => $payload });
       }
     );

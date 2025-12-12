@@ -5,7 +5,6 @@ use File::FindLib 'lib';
 
 package Game::EvonyTKR::External::Conflicts::LoadML {
   use Mojo::Base 'Game::EvonyTKR::External::JobBase', -signatures;
-  use Mojo::JSON qw(decode_json);
   use Mojo::File;
   use List::AllUtils qw(any);
 
@@ -115,7 +114,7 @@ package Game::EvonyTKR::External::Conflicts::LoadML {
 
     # Load JSON
     my $json_text = $json_path->slurp;
-    my $raw_data  = decode_json($json_text);
+    my $raw_data  = $job->decode($json_text);
 
     # Get all generals for type checking (normalize names to match JSON keys)
     my %generals =

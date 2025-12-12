@@ -237,6 +237,10 @@ sub initialize_conflict_detector($self, $conflict_detector = undef) {
   return $conflict_detector;
 }
 
+sub load_all_conflicts ($self) {
+  return $self->persistence->load_all_conflicts();
+}
+
 sub wire_pair_to_key($self, $wire_pair) {
   my $key = sprintf('%s/%s/%s',
     $wire_pair->{type},

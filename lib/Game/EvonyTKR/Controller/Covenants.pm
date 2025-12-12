@@ -2,7 +2,7 @@ use v5.42.0;
 use experimental qw(class);
 use utf8::all;
 use File::FindLib 'lib';
-require JSON::PP;
+
 require YAML::PP;
 require Mojo::Promise;
 require Mojo::Util;
@@ -22,7 +22,6 @@ package Game::EvonyTKR::Controller::Covenants {
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::Covenants', -role;
   use Mojo::IOLoop;
   use Mojo::Promise;
-  use Mojo::JSON     qw(to_json encode_json);
   use MIME::Base64   qw(encode_base64);
   use List::AllUtils qw( all any none );
   use Carp;

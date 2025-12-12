@@ -2,7 +2,7 @@ use v5.42.0;
 use utf8::all;
 
 use File::FindLib 'lib';
-require JSON::PP;
+
 require Data::Printer;
 
 require Game::EvonyTKR::Model::Buff;

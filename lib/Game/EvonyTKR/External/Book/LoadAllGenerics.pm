@@ -4,7 +4,6 @@ use utf8::all;
 use File::FindLib 'lib';
 require Data::Printer;
 
-require Game::EvonyTKR::External::Common;
 
 package Game::EvonyTKR::External::Book::LoadAllGenerics {
   use Mojo::Base 'Game::EvonyTKR::External::JobBase', -signatures;

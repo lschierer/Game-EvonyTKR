@@ -1,7 +1,7 @@
 use v5.42.0;
 use experimental qw(class);
 use utf8::all;
-require JSON::PP;
+
 require Scalar::Util;
 
 require Game::EvonyTKR::Model::General;

@@ -1,7 +1,7 @@
 use v5.42.0;
 use utf8::all;
 use File::FindLib 'lib';
-require JSON::PP;
+
 use namespace::autoclean;
 
 package Game::EvonyTKR::Model::Buff::Value {

@@ -2,10 +2,11 @@ use v5.42.0;
 use experimental qw(class);
 use utf8::all;
 use File::FindLib 'lib';
+with 'Game::EvonyTKR::Role::JSON';
 require Data::Printer;
 require Path::Tiny;
 require Readonly;
-require JSON::PP;
+
 require YAML::PP;
 require Game::EvonyTKR::Model::Buff;
 require Game::EvonyTKR::Model::Buff::Value;

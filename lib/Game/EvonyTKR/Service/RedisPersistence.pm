@@ -4,8 +4,8 @@ use utf8::all;
 
 package Game::EvonyTKR::Service::RedisPersistence {
   use Mojo::Base -base, -signatures;
+  with 'Game::EvonyTKR::Role::JSON';
   use Mojo::Redis;
-  use Mojo::JSON qw(encode_json decode_json);
   use Carp;
   use Time::HiRes 'time';
 
@@ -22,8 +22,8 @@ package Game::EvonyTKR::Service::RedisPersistence {
     return $self->redis->db;
   };
 
-  has encoder => sub {
-    return Mojo::JSON->new;
+  has encoder => sub ($self) {
+    return $self->JSON;
   };
 
   has 'lifecycle_id' => sub ($self) {
@@ -58,21 +58,21 @@ package Game::EvonyTKR::Service::RedisPersistence {
 
   # Generic storage operations
   sub store_data ($self, $table, $key, $data) {
-    my $json = encode_json($data);
+    my $json = $self->encode($data);
     return $self->db->hset($table, $key, $json);
   }
 
   sub get_data ($self, $table, $key) {
     my $json = $self->db->hget($table, $key);
     return unless $json;
-    return decode_json($json);
+    return $self->decode($json);
   }
 
   sub get_all_data ($self, $table) {
     my $hash   = $self->db->hgetall($table);
     my $result = {};
     for my $key (keys %$hash) {
-      $result->{$key} = decode_json($hash->{$key});
+      $result->{$key} = $self->decode($hash->{$key});
     }
     return $result;
   }
@@ -89,13 +89,13 @@ package Game::EvonyTKR::Service::RedisPersistence {
   sub store_list ($self, $key, $items) {
     $self->db->del($key);    # Clear existing
     return unless @$items;
-    my @json_items = map { encode_json($_) } @$items;
+    my @json_items = map { $self->encode($_) } @$items;
     return $self->db->lpush($key, @json_items);
   }
 
   sub get_list ($self, $key) {
     my @json_items = $self->db->lrange($key, 0, -1);
-    return [map { decode_json($_) } @json_items];
+    return [map { $self->decode($_) } @json_items];
   }
 
   # Specific data type methods (matching SQLite interface)

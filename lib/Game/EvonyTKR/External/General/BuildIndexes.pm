@@ -93,8 +93,7 @@ package Game::EvonyTKR::External::General::BuildIndexes {
       my $keys_list = $by_type{$type};
 
       eval {
-        require Mojo::JSON;
-        my $json = Mojo::JSON::encode_json($keys_list);
+        my $json = $job->encode($keys_list);
         $job->persistence->set_metadata($type_key, $json);
         $job->log_debug(sprintf(
           'Stored index for type "%s" with %d generals',
@@ -110,8 +109,7 @@ package Game::EvonyTKR::External::General::BuildIndexes {
     # Also store the list of available types
     my @type_list = sort keys %by_type;
     eval {
-      require Mojo::JSON;
-      my $json = Mojo::JSON::encode_json(\@type_list);
+      my $json = $job->encode(\@type_list);
       $job->persistence->set_metadata('general_index:available_types', $json);
     };
     if ($@) {

@@ -3,8 +3,6 @@ use experimental qw(class);
 use utf8::all;
 use File::FindLib 'lib';
 require Data::Printer;
-require JSON::PP;
-require Mojo::JSON;
 require X500::DN;
 require X500::RDN;
 require Unicode::CaseFold;

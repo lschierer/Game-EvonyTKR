@@ -4,7 +4,7 @@ use utf8::all;
 use File::FindLib 'lib';
 require Data::Printer;
 require File::Share;
-require JSON::PP;
+
 require MIME::Base64;
 require Path::Tiny;
 require Game::EvonyTKR;

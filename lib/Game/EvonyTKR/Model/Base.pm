@@ -1,9 +1,10 @@
 package Game::EvonyTKR::Model::Base;
 use v5.42.0;
 use utf8::all;
-require JSON::PP;
+
 use File::FindLib 'lib';
 use Mojo::Base -base,                               -signatures;
+use Mojo::Base 'Game::EvonyTKR::Role::JSON', -role;
 use Mojo::Base 'Game::EvonyTKR::Role::Common',      -role;
 use Mojo::Base 'Game::EvonyTKR::Role::Logging',     -role;
 use Mojo::Base 'Game::EvonyTKR::Role::Persistence', -role;

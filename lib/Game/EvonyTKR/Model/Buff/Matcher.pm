@@ -3,7 +3,6 @@ use utf8::all;
 use File::FindLib 'lib';
 require Data::Printer;
 require Game::EvonyTKR::Model::Buff::Value;
-require JSON::PP;
 
 package Game::EvonyTKR::Model::Buff::Matcher {
   use Mojo::Base 'Game::EvonyTKR::Model::Base', -signatures;

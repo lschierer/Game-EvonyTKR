@@ -4,7 +4,6 @@ use File::FindLib 'lib';
 require Data::Printer;
 require Game::EvonyTKR::Model::Buff::Value;
 require Game::EvonyTKR::Service::Conflicts;
-require JSON::PP;
 
 package Game::EvonyTKR::Model::Buff::Summarizer {
   use Mojo::Base 'Game::EvonyTKR::Model::Base',                    -signatures;

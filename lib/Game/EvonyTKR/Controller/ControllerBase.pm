@@ -13,6 +13,7 @@ package Game::EvonyTKR::Controller::ControllerBase {
   use Mojo::Base 'Mojolicious::Plugin',                    -role, -signatures;
   use Mojo::Base 'Game::EvonyTKR::Role::Logging',          -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Common',           -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::JSON',           -role;
   use Mojo::Base 'Game::EvonyTKR::Role::MarkdownRenderer', -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Persistence',      -role;
   require Mojo::File;

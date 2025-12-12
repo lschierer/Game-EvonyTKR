@@ -3,7 +3,7 @@ use experimental qw(class);
 use utf8::all;
 use File::FindLib 'lib';
 require Data::Printer;
-require JSON::PP;
+
 require X500::DN;
 require X500::RDN;
 

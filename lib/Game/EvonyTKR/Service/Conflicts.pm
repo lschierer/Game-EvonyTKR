@@ -4,6 +4,7 @@ use utf8::all;
 use Mojo::Base -base,                                               -signatures;
 use Mojo::Base 'Game::EvonyTKR::Role::Logging',                     -role;
 use Mojo::Base 'Game::EvonyTKR::Role::Common',                      -role;
+use Mojo::Base 'Game::EvonyTKR::Role::Persistence::Pairs',          -role;
 use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants',    -role;
 use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants', -role;
 
@@ -125,7 +126,7 @@ sub is_general_and_book_compatible ($self, $general, $book, $opts = {}) {
 sub load_from_persistence ($self, $persistence) {
   $self->persistence($persistence);    # Store reference for ML lookups
 
-  my $conflicts = $persistence->load_all_conflicts();
+  my $conflicts = $self->load_all_conflicts();
 
   if ($conflicts && ref($conflicts) eq 'HASH') {
     $self->by_general($conflicts);

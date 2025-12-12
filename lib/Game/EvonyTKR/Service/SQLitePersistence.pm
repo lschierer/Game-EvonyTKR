@@ -2,8 +2,9 @@ package Game::EvonyTKR::Service::SQLitePersistence;
 use v5.42.0;
 use utf8::all;
 use Mojo::Base -base, -signatures;
+use Mojo::Base 'Game::EvonyTKR::Role::JSON', -role;
 use Mojo::SQLite;
-use JSON::PP qw(encode_json decode_json);
+
 use Carp;
 use Time::HiRes 'time';
 
@@ -46,7 +47,7 @@ has 'lifecycle_id' => sub ($self) {
 # Metadata operations
 sub get_metadata ($self, $key) {
   my $result = $self->db->select('metadata', ['value'], { key => $key })->hash;
-  return $result ? decode_json($result->{value}) : undef;
+  return $result ? $self->decode($result->{value}) : undef;
 }
 
 sub set_metadata ($self, $key, $value) {
@@ -54,12 +55,12 @@ sub set_metadata ($self, $key, $value) {
     'metadata',
     {
       key        => $key,
-      value      => encode_json($value),
+      value      => $self->encode($value),
       updated_at => time()
     },
     {
       on_conflict => \[
-        '(key) do update set value = ?, updated_at = ?', encode_json($value),
+        '(key) do update set value = ?, updated_at = ?', $self->encode($value),
         time()
       ]
     }
@@ -99,12 +100,12 @@ sub store_data ($self, $table, $key, $data) {
       $table,
       {
         name       => $key,
-        data       => encode_json($data),
+        data       => $self->encode($data),
         updated_at => time()
       },
       {
         on_conflict => \[
-          '(name) do update set data = ?, updated_at = ?', encode_json($data),
+          '(name) do update set data = ?, updated_at = ?', $self->encode($data),
           time()
         ]
       }
@@ -112,8 +113,9 @@ sub store_data ($self, $table, $key, $data) {
   };
   if ($@) {
     warn "Failed to store data in $table for key $key: $@";
-    die $@;
+    return 0;
   }
+  return 1;
 }
 
 sub get_data ($self, $table, $key) {
@@ -125,7 +127,7 @@ sub get_data ($self, $table, $key) {
   }
   return unless $result && defined($result->{data});
 
-  my $decoded = eval { decode_json($result->{data}) };
+  my $decoded = eval { $self->decode($result->{data}) };
   if ($@) {
     warn sprintf("[SQLite] JSON decode failed for table=%s, key=%s: %s\n",
       $table, $key, $@);
@@ -141,7 +143,7 @@ sub get_all_data ($self, $table) {
   my $results = $self->db->select($table, ['name', 'data'])->hashes;
   my $data    = {};
   for my $row (@$results) {
-    $data->{ $row->{name} } = decode_json($row->{data});
+    $data->{ $row->{name} } = $self->decode($row->{data});
   }
   return $data;
 }
@@ -297,6 +299,19 @@ sub get_conflict ($self, $g1, $g2) {
     ->hash;
   return unless $result;
   return $result->{conflicts} ? 1 : 0;
+}
+
+sub load_all_conflicts ($self) {
+  my $results = $self->db->select('general_conflicts', ['pair_key', 'conflicts'])->hashes;
+  my $conflicts = {};
+  
+  for my $row (@$results) {
+    my ($g1, $g2) = split ':', $row->{pair_key};
+    $conflicts->{$g1}{$g2} = $row->{conflicts} ? 1 : 0;
+    $conflicts->{$g2}{$g1} = $row->{conflicts} ? 1 : 0;
+  }
+  
+  return $conflicts;
 }
 
 # Pairs (simplified)

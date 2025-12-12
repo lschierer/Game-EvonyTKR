@@ -13,8 +13,8 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::Covenants',           -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::Specialties',         -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Persistence::Pairs',             -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::JSON',                          -role;
   use List::AllUtils qw(any all none uniq);
-  use Mojo::JSON     qw(encode_json);
   use Scalar::Util   qw(blessed);
   use Const::Fast;
   use Carp;
@@ -235,7 +235,7 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
     # Return results
     $job->finish({
       status => 'complete',
-      result => encode_json({
+      result => $job->encode({
         runId => $runId,
         data  => {
           primary     => $primary_general->to_hash(),
