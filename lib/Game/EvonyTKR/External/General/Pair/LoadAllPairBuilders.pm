@@ -79,6 +79,7 @@ package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
         my $job_id = $job->minion->enqueue(
           'create_pairs' => [$general->name, $type] => {
             priority => $priority,
+            notes    => { prebuild_run_id => $job->prebuild_run_id },
           }
         );
         $job->log_debug(sprintf(
@@ -110,6 +111,7 @@ package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
               'reduce_batch' => [] => {
                 parents  => [@current_batch],
                 priority => 50,
+                notes    => { prebuild_run_id => $job->prebuild_run_id },
               }
             );
             $job->log_debug(sprintf(
@@ -143,6 +145,7 @@ package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
         'reduce_batch' => [] => {
           parents  => [@current_batch],
           priority => 50,
+          notes    => { prebuild_run_id => $job->prebuild_run_id },
         }
       );
       $job->log_debug(sprintf(

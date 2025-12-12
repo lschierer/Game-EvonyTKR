@@ -62,7 +62,8 @@ package Game::EvonyTKR::External::Specialty::LoadAllSpecialties {
         'load_specialty' => [$file->to_string] => {
           attempts => 3,
           delay    => rand(10),
-          priority => 20,
+          notes    => { prebuild_run_id => $job->prebuild_run_id },
+          priority => 21,
         }
       );
       $job->log_debug(sprintf(

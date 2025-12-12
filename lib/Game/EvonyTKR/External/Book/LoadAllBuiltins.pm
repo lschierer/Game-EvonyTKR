@@ -41,6 +41,8 @@ package Game::EvonyTKR::External::Book::LoadAllBuiltins {
       say 'job not defined in run for ' . __PACKAGE__;
       return;
     }
+    my $parent_notes = $job->info->{notes} || {};
+    $job->prebuild_run_id($parent_notes->{prebuild_run_id} || '');
     $job->SUPER::run(@args);
     unless (defined($job->minion)) {
       my $errmessage = sprintf('minion undefined in job for %s', __PACKAGE__);
@@ -84,7 +86,8 @@ package Game::EvonyTKR::External::Book::LoadAllBuiltins {
         ] => {
           attempts => 3,
           delay    => rand(10),
-          priority => 20,
+          notes    => { prebuild_run_id => $job->prebuild_run_id },
+          priority => 22,
         }
       );
       push @job_ids, $job_id;

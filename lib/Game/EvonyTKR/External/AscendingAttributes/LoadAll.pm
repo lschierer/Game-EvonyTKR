@@ -20,6 +20,7 @@ package Game::EvonyTKR::External::AscendingAttributes::LoadAll {
       say 'job not defined in run for ' . __PACKAGE__;
       return;
     }
+
     $job->SUPER::run(@args);
     unless (defined($job->minion)) {
       my $errmessage = sprintf('minion undefined in job for %s', __PACKAGE__);
@@ -64,6 +65,7 @@ package Game::EvonyTKR::External::AscendingAttributes::LoadAll {
         'load_ascending_attributes' => [$file->to_string] => {
           attempts => 3,
           delay    => rand(10),
+          notes    => { prebuild_run_id => $job->info->{notes}->{prebuild_run_id} },
           priority => 20,
         }
       );

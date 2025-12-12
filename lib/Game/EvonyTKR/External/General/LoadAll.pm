@@ -74,6 +74,7 @@ package Game::EvonyTKR::External::General::LoadAll {
           attempts => 3,
           delay    => rand(10),
           priority => 20,
+          notes    => { prebuild_run_id => $job->info->{notes}->{prebuild_run_id} }
         }
       );
       $job->log_debug(sprintf(
@@ -190,6 +191,7 @@ package Game::EvonyTKR::External::General::LoadAll {
       build_general_indexes => [] => {
         attempts => 3,
         priority => 30,
+        notes    => { prebuild_run_id => $job->info->{notes}->{prebuild_run_id} }
       }
     );
     $job->note(generalCount => scalar(@files));

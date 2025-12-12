@@ -277,6 +277,15 @@ package Game::EvonyTKR::External::Prebuild {
 
     $job->log_info('launching jobs to spawn loaders.');
 
+    # Create unique run identifier for this prebuild
+    my $run_id = sprintf('%s-%s', $$, $job->id);
+    $job->prebuild_run_id($run_id);
+    $job->log_info("Prebuild run ID: $run_id");
+
+    # Harvest ALL jobs from previous prebuild runs (assume previous prebuild crashed)
+    my $harvested = $job->harvest_tagged_jobs();
+    $job->log_info("Harvested $harvested jobs from previous runs");
+
     my $loaderJids = [];
     my $totalJobs = 0;  # Count both launched and existing jobs
     foreach my $jobname (sort keys $loaderJobDefs->%*) {
@@ -298,7 +307,10 @@ package Game::EvonyTKR::External::Prebuild {
       delete($params->{args}) if (exists $params->{args});
 
       my $jid =
-        $job->minion->enqueue($jobname => [$args->@*] => { $params->%* });
+        $job->minion->enqueue($jobname => [$args->@*] => {
+          $params->%*,
+          notes => { prebuild_run_id => $run_id }
+        });
       if (defined($jid)) {
         $job->note($jobname => $jid);
         $job->log_debug(sprintf('launched %s with jid %s', $jobname, $jid));
@@ -340,7 +352,10 @@ package Game::EvonyTKR::External::Prebuild {
             attempts => 5,
             delay    => 10,
             priority => 90,
-            parents  => $loaderJids
+            notes    => {
+              prebuild_jid => $job->id,
+              prebuild_run_id => $job->prebuild_run_id,
+            }  # Reference instead of parent
           }
         );
         if (defined $mj) {

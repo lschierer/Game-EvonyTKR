@@ -26,6 +26,7 @@ package Game::EvonyTKR::External::Covenant::LoadAll {
       $job->log_error($errmessage);
       return $job->fail($errmessage);
     }
+
     $job->log_debug(sprintf(
       '%s log level is %s',
       __PACKAGE__, Log::Log4perl::Level::to_level($job->logger->level())
@@ -73,6 +74,7 @@ package Game::EvonyTKR::External::Covenant::LoadAll {
         'load_covenant' => [$file->to_string] => {
           attempts => 3,
           delay    => rand(10),
+          notes    => { prebuild_run_id => $job->prebuild_run_id },
           priority => 20,
         }
       );

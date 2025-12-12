@@ -12,6 +12,8 @@ package Game::EvonyTKR::External::JobBase {
   use diagnostics;
   use Carp;
 
+  has prebuild_run_id => '';
+
   sub task_name {
     my $class = shift;
     $class->log_logcroak(
@@ -64,8 +66,11 @@ package Game::EvonyTKR::External::JobBase {
       say 'job not defined in run for ' . __PACKAGE__;
       return;
     }
+    my $parent_notes = $job->info->{notes} || {};
+    $job->prebuild_run_id($parent_notes->{prebuild_run_id} || '');
     Game::EvonyTKR::Role::Logging::get_logger(__PACKAGE__);
-    $job->log_debug("JobBase configured Logging in run.");
+
+    $job->log_debug(sprintf('JobBase configured Logging in run "%s"', $job->prebuild_run_id));
     unless (defined($job->app)) {
       my $errmessage = sprintf('app undefined in job for %s', __PACKAGE__);
       $job->log_error($errmessage);
@@ -76,6 +81,36 @@ package Game::EvonyTKR::External::JobBase {
       $job->log_error($errmessage);
       return $job->fail($errmessage);
     }
+
+    $job->note(prebuild_run_id => $job->prebuild_run_id) if (length($job->prebuild_run_id));
+  }
+
+  sub harvest_tagged_jobs ($job) {
+    my $harvested = 0;
+    return if(!length($job->prebuild_run_id));
+
+    # Get all jobs that have the specified tag (from previous runs)
+    my $jobs = $job->minion->jobs({
+      states => [qw(inactive active finished failed)],
+      limit  => 50000  # Large limit to catch all jobs
+    });
+
+    while (my $j = $jobs->next) {
+      my $notes = $j->{notes} || {};
+      unless (exists $notes->{prebuild_run_id}) {
+        # This job was from a previous run, remove it
+        eval { $job->minion->job($j->{id})->remove };
+        $harvested++ unless $@;
+        next;
+      }
+      unless($notes->{prebuild_run_id} eq $job->prebuild_run_id){
+        # This job was from a previous run, remove it
+        eval { $job->minion->job($j->{id})->remove };
+        $harvested++ unless $@;
+      }
+    }
+
+    return $harvested;
   }
 }
 
