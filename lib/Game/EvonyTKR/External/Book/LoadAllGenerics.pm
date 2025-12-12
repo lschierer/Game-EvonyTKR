@@ -114,7 +114,8 @@ package Game::EvonyTKR::External::Book::LoadAllGenerics {
         $failed   = 0;
 
         for my $jid (@job_ids) {
-          my $info = $job->minion->job($jid);
+          my $job_obj = $job->minion->job($jid);
+          my $info = $job_obj ? $job_obj->info : undef;
           next unless ($info && $info->{state});
 
           if ($info->{state} eq 'finished') {

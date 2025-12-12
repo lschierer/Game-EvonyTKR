@@ -102,13 +102,15 @@ package Game::EvonyTKR::External::AscendingAttributes::LoadAll {
         my $skipped = 0;
 
         for my $jid (@job_ids) {
-          my $info = $job->minion->job($jid);
+          my $job_obj = $job->minion->job($jid);
+          my $info = $job_obj ? $job_obj->info : undef;
 
           unless ($info && $info->{state}) {
             $skipped++;
             $job->log_debug(sprintf(
-              'Job %s: no info or state (info=%s)',
+              'Job %s: no info or state (job_obj=%s, info=%s)',
               $jid,
+              defined($job_obj) ? 'defined' : 'undef',
               defined($info) ? 'defined but no state' : 'undef'
             ));
             next;
