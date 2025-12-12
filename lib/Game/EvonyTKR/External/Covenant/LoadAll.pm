@@ -89,46 +89,48 @@ package Game::EvonyTKR::External::Covenant::LoadAll {
       $enqueued_count, $skipped_count
     ));
 
-    # Wait for all child jobs to complete
+    # Check if child jobs are still running
     if (@job_ids) {
-      $job->log_info(
-        sprintf('Waiting for %d child jobs to complete', scalar @job_ids));
-
+      my $active = 0;
       my $finished = 0;
       my $failed   = 0;
 
-      my $loop;
-      $loop = Mojo::IOLoop->recurring(2 => sub {
-        my $all_done = 1;
-        $finished = 0;
-        $failed   = 0;
+      for my $jid (@job_ids) {
+        my $job_obj = $job->minion->job($jid);
+        my $info = $job_obj ? $job_obj->info : undef;
 
-        for my $jid (@job_ids) {
-          my $job_obj = $job->minion->job($jid);
-          my $info = $job_obj ? $job_obj->info : undef;
-          next unless ($info && $info->{state});
-
-          if ($info->{state} eq 'finished') {
-            $finished++;
-          }
-          elsif ($info->{state} eq 'failed') {
-            $failed++;
-          }
-          else {
-            $all_done = 0;
-          }
+        unless ($info && $info->{state}) {
+          $job->log_debug("Job $jid: no info or state");
+          next;
         }
 
-        if ($all_done) {
-          Mojo::IOLoop->remove($loop);
-          Mojo::IOLoop->stop;
+        if ($info->{state} eq 'finished') {
+          $finished++;
         }
+        elsif ($info->{state} eq 'failed') {
+          $failed++;
+        }
+        else {
+          $active++;
+        }
+      }
 
-      });
+      $job->log_debug(sprintf(
+        'Job status: active=%d, finished=%d, failed=%d',
+        $active, $finished, $failed
+      ));
 
-      Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
+      # If jobs still running, retry this coordinator job to check again later
+      if ($active > 0) {
+        $job->log_info(sprintf(
+          'Still waiting for %d child jobs - retrying in 5 seconds',
+          $active
+        ));
+        return $job->retry({ delay => 5 });
+      }
+
       $job->log_info(sprintf(
-        'Child jobs completed: %d finished, %d failed',
+        'All child jobs completed: %d finished, %d failed',
         $finished, $failed
       ));
 
