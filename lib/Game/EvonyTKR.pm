@@ -188,6 +188,8 @@ package Game::EvonyTKR {
     require Mojolicious::Plugin::Minion;
  # Use SQLite for Minion (reliable), mode-gated persistence for application data
     my $minion_db = $app->home->child('minion.db');
+    warn sprintf("[Game::EvonyTKR] Minion SQLite database: %s (app->home=%s)\n",
+      $minion_db, $app->home);
     $app->plugin(Minion => { SQLite => $minion_db });
 
     # Apply SQLite optimizations for Minion

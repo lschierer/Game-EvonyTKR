@@ -85,6 +85,13 @@ package Game::EvonyTKR::External::AscendingAttributes::LoadAll {
       $job->log_info(
         sprintf('Waiting for %d child jobs to complete', scalar @job_ids));
 
+      # Debug: Log Minion backend info
+      $job->log_debug(sprintf(
+        'Minion backend: %s, SQLite DB: %s',
+        ref($job->minion->backend),
+        eval { $job->minion->backend->sqlite->db->dbh->sqlite_db_filename } // 'N/A'
+      ));
+
       my $finished = 0;
       my $failed   = 0;
 
@@ -92,10 +99,22 @@ package Game::EvonyTKR::External::AscendingAttributes::LoadAll {
         my $all_done = 1;
         $finished = 0;
         $failed   = 0;
+        my $skipped = 0;
 
         for my $jid (@job_ids) {
           my $info = $job->minion->job($jid);
-          next unless ($info && $info->{state});
+
+          unless ($info && $info->{state}) {
+            $skipped++;
+            $job->log_debug(sprintf(
+              'Job %s: no info or state (info=%s)',
+              $jid,
+              defined($info) ? 'defined but no state' : 'undef'
+            ));
+            next;
+          }
+
+          $job->log_debug(sprintf('Job %s: state=%s', $jid, $info->{state}));
 
           if ($info->{state} eq 'finished') {
             $finished++;
@@ -107,6 +126,11 @@ package Game::EvonyTKR::External::AscendingAttributes::LoadAll {
             $all_done = 0;
           }
         }
+
+        $job->log_debug(sprintf(
+          'Job status check: finished=%d, failed=%d, skipped=%d, all_done=%s',
+          $finished, $failed, $skipped, $all_done ? 'YES' : 'NO'
+        ));
 
         last if $all_done;
         sleep 2;
