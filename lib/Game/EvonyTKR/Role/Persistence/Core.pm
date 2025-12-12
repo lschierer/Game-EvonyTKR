@@ -5,11 +5,14 @@ use Mojo::Base -role, -signatures;
 use Game::EvonyTKR::Service::Persistence;
 
 # Lazy-load mode-gated persistence service
-has persistence => sub ($self) {
-  my $mode = ref($self) && $self->can('mode') ? $self->mode : ($ENV{MOJO_MODE} || 'development');
-  my $config = ref($self) && $self->can('config') ? $self->config : {};
-  return Game::EvonyTKR::Service::Persistence->new(mode => $mode, config => $config);
-};
+our $persistence;
+sub persistence ($self) {
+  $persistence //= do {
+    my $mode = $ENV{MOJO_MODE} || 'development';
+    my $config = $self->can('config') ? $self->config : {};
+    Game::EvonyTKR::Service::Persistence->new(mode => $mode, config => $config);
+  };
+}
 
 ##############################################################################
 # Convenience methods for job tracking

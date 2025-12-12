@@ -46,6 +46,7 @@ export PATH="/opt/mojo/.local/bin/:$HOME/bin:$PATH"
 retry_with_backoff git clone -b streaming https://github.com/lschierer/Game-EvonyTKR.git /opt/mojo/app
 
 cd /opt/mojo/app
+cp /opt/mojo/etc/game-evony_t_k_r.production.yml .
 
 mise trust
 # Install tools (including Python) with retry for transient failures
