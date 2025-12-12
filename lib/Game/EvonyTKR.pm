@@ -156,6 +156,11 @@ package Game::EvonyTKR {
     require Game::EvonyTKR::Role::Persistence::Core;
     require Game::EvonyTKR::Service::Persistence;
 
+    warn "[Game::EvonyTKR] _init_persistence() called\n";
+    warn sprintf("[Game::EvonyTKR] Config keys available: %s\n",
+      join(', ', sort keys %{$app->config || {}}));
+    warn sprintf("[Game::EvonyTKR] Mode: %s\n", $ENV{MOJO_MODE} || 'development');
+
     # Directly initialize the singleton in Core.pm's package variable
     $Game::EvonyTKR::Role::Persistence::Core::persistence =
       Game::EvonyTKR::Service::Persistence->new(
@@ -168,6 +173,7 @@ package Game::EvonyTKR {
       $Game::EvonyTKR::Role::Persistence::Core::persistence->mode,
       ref($Game::EvonyTKR::Role::Persistence::Core::persistence->backend)
     ));
+    warn "[Game::EvonyTKR] _init_persistence() completed successfully\n";
   }
 
   sub _init_minion($app) {

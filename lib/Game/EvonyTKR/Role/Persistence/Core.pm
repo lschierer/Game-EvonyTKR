@@ -17,6 +17,13 @@ sub persistence ($self) {
       $config = $self->app->config || {};
     }
 
+    # Debug: Log when singleton is lazily initialized (should be rare!)
+    my ($package, $filename, $line) = caller(1);
+    warn sprintf("[Persistence::Core] LAZY initialization from %s:%d (should be initialized by Game::EvonyTKR::_init_persistence instead!)\n",
+      $package, $line);
+    warn sprintf("[Persistence::Core] Config keys at lazy init: %s\n",
+      join(', ', sort keys %$config));
+
     Game::EvonyTKR::Service::Persistence->new(mode => $mode, config => $config);
   };
 }
