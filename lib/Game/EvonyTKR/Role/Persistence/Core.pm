@@ -5,11 +5,18 @@ use Mojo::Base -role, -signatures;
 use Game::EvonyTKR::Service::Persistence;
 
 # Lazy-load mode-gated persistence service
+# Use package-level singleton to share backend across all instances
 our $persistence;
 sub persistence ($self) {
   $persistence //= do {
     my $mode = $ENV{MOJO_MODE} || 'development';
-    my $config = $self->can('config') ? $self->config : {};
+    my $config = {};
+
+    # Get config from app (controllers/jobs have $self->app)
+    if ($self->can('app') && defined($self->app)) {
+      $config = $self->app->config || {};
+    }
+
     Game::EvonyTKR::Service::Persistence->new(mode => $mode, config => $config);
   };
 }

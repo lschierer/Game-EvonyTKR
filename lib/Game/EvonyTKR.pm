@@ -142,7 +142,32 @@ package Game::EvonyTKR {
       }
     }
 
+    # Eagerly initialize persistence singleton with full config
+    # This ensures the singleton is created AFTER NotYAMLConfig loads
+    # and has access to the complete config including aws.region
+    $app->_init_persistence();
+
     push @{ $app->plugins->namespaces }, 'Game::EvonyTKR::Plugins';
+  }
+
+  sub _init_persistence ($app) {
+    # Force early initialization of the persistence singleton with full config
+    # This prevents lazy initialization happening before config is loaded
+    require Game::EvonyTKR::Role::Persistence::Core;
+    require Game::EvonyTKR::Service::Persistence;
+
+    # Directly initialize the singleton in Core.pm's package variable
+    $Game::EvonyTKR::Role::Persistence::Core::persistence =
+      Game::EvonyTKR::Service::Persistence->new(
+        mode   => $ENV{MOJO_MODE} || 'development',
+        config => $app->config || {}
+      );
+
+    $app->log->info(sprintf(
+      "Persistence initialized: mode=%s, backend=%s",
+      $Game::EvonyTKR::Role::Persistence::Core::persistence->mode,
+      ref($Game::EvonyTKR::Role::Persistence::Core::persistence->backend)
+    ));
   }
 
   sub _init_minion($app) {

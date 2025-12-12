@@ -11,6 +11,12 @@ has 'backend' => sub ($self) {
   my $config = $self->config || {};
   my $persistence_config = $config->{persistence} || {};
 
+  # Debug logging
+  require Data::Dumper;
+  warn sprintf("[Persistence] Mode: %s\n", $self->mode);
+  warn sprintf("[Persistence] Config keys: %s\n", join(', ', keys %$config));
+  warn sprintf("[Persistence] AWS config: %s\n", Data::Dumper::Dumper($config->{aws})) if $config->{aws};
+
   if ($self->mode eq 'development') {
     require Game::EvonyTKR::Service::SQLitePersistence;
     return Game::EvonyTKR::Service::SQLitePersistence->new(config => $persistence_config);

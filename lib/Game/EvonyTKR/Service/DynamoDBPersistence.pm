@@ -16,7 +16,18 @@ has 'table_name' => sub ($self) {
 
 has 'region' => sub ($self) {
   my $aws_config = $self->aws_config || {};
-  return $aws_config->{region} || $ENV{AWS_REGION} || 'us-east-1';
+  my $region = $aws_config->{region} || $ENV{AWS_REGION} || 'us-east-1';
+
+  # Debug: Log which source provided the region
+  if ($aws_config->{region}) {
+    warn sprintf("[DynamoDB] Using region from config: %s\n", $region);
+  } elsif ($ENV{AWS_REGION}) {
+    warn sprintf("[DynamoDB] Using region from ENV: %s\n", $region);
+  } else {
+    warn sprintf("[DynamoDB] Using fallback region: %s (check config!)\n", $region);
+  }
+
+  return $region;
 };
 
 has 'dynamodb' => sub ($self) {
