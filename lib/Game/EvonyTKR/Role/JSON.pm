@@ -8,10 +8,8 @@ require JSON::PP;
 our $json_instance;
 
 has JSON => sub {
-  $json_instance //= JSON::PP->new()
-    ->utf8(1)
-    ->allow_blessed(1)
-    ->convert_blessed(1);
+  $json_instance //=
+    JSON::PP->new()->utf8(1)->allow_blessed(1)->convert_blessed(1);
   return $json_instance;
 };
 

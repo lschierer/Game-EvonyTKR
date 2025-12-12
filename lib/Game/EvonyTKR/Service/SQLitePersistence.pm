@@ -1,7 +1,7 @@
 package Game::EvonyTKR::Service::SQLitePersistence;
 use v5.42.0;
 use utf8::all;
-use Mojo::Base -base, -signatures;
+use Mojo::Base -base,                        -signatures;
 use Mojo::Base 'Game::EvonyTKR::Role::JSON', -role;
 use Mojo::SQLite;
 
@@ -60,8 +60,8 @@ sub set_metadata ($self, $key, $value) {
     },
     {
       on_conflict => \[
-        '(key) do update set value = ?, updated_at = ?', $self->encode($value),
-        time()
+        '(key) do update set value = ?, updated_at = ?',
+        $self->encode($value), time()
       ]
     }
   );
@@ -105,8 +105,8 @@ sub store_data ($self, $table, $key, $data) {
       },
       {
         on_conflict => \[
-          '(name) do update set data = ?, updated_at = ?', $self->encode($data),
-          time()
+          '(name) do update set data = ?, updated_at = ?',
+          $self->encode($data), time()
         ]
       }
     );
@@ -302,15 +302,16 @@ sub get_conflict ($self, $g1, $g2) {
 }
 
 sub load_all_conflicts ($self) {
-  my $results = $self->db->select('general_conflicts', ['pair_key', 'conflicts'])->hashes;
+  my $results =
+    $self->db->select('general_conflicts', ['pair_key', 'conflicts'])->hashes;
   my $conflicts = {};
-  
+
   for my $row (@$results) {
     my ($g1, $g2) = split ':', $row->{pair_key};
     $conflicts->{$g1}{$g2} = $row->{conflicts} ? 1 : 0;
     $conflicts->{$g2}{$g1} = $row->{conflicts} ? 1 : 0;
   }
-  
+
   return $conflicts;
 }
 

@@ -82,13 +82,13 @@ package Game::EvonyTKR::External::AscendingAttributes::LoadAll {
 
     # Check if child jobs are still running
     if (@job_ids) {
-      my $active = 0;
+      my $active   = 0;
       my $finished = 0;
       my $failed   = 0;
 
       for my $jid (@job_ids) {
         my $job_obj = $job->minion->job($jid);
-        my $info = $job_obj ? $job_obj->info : undef;
+        my $info    = $job_obj ? $job_obj->info : undef;
 
         unless ($info && $info->{state}) {
           $job->log_debug("Job $jid: no info or state");
@@ -115,8 +115,7 @@ package Game::EvonyTKR::External::AscendingAttributes::LoadAll {
       if ($active > 0) {
         $job->log_info(sprintf(
           'Still waiting for %d child jobs - retrying in 5 seconds',
-          $active
-        ));
+          $active));
         return $job->retry({ delay => 5 });
       }
 

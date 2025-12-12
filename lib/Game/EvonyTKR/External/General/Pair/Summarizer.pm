@@ -13,7 +13,7 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::Covenants',           -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::Specialties',         -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Persistence::Pairs',             -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::JSON',                          -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::JSON',                           -role;
   use List::AllUtils qw(any all none uniq);
   use Scalar::Util   qw(blessed);
   use Const::Fast;

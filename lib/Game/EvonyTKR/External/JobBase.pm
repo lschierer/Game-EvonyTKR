@@ -7,7 +7,7 @@ package Game::EvonyTKR::External::JobBase {
   use Mojo::Base 'Mojolicious::Plugin',               -role, -signatures;
   use Mojo::Base 'Game::EvonyTKR::Role::Common',      -role, -signatures;
   use Mojo::Base 'Game::EvonyTKR::Role::Logging',     -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::JSON',     -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::JSON',        -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Persistence', -role;
   use diagnostics;
   use Carp;

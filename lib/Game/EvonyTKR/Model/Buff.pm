@@ -450,9 +450,9 @@ package Game::EvonyTKR::Model::Buff {
       $c = [];
     }
     my $r = {
-      __CLASS__ => __PACKAGE__,
-      attribute => $self->attribute,
-      value     => $self->value,  # Let JSON role handle the blessed object
+      __CLASS__    => __PACKAGE__,
+      attribute    => $self->attribute,
+      value        => $self->value,    # Let JSON role handle the blessed object
       passive      => $self->passive,
       targetedType => $self->targetedType,
       conditions   => $rc,

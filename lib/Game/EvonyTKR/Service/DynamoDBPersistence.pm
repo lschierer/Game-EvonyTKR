@@ -1,7 +1,7 @@
 package Game::EvonyTKR::Service::DynamoDBPersistence;
 use v5.42.0;
 use utf8::all;
-use Mojo::Base -base, -signatures;
+use Mojo::Base -base,                        -signatures;
 use Mojo::Base 'Game::EvonyTKR::Role::JSON', -role;
 
 use Carp;
@@ -360,8 +360,8 @@ sub get_conflict ($self, $g1, $g2) {
 
 sub load_all_conflicts ($self) {
   my $result = $self->paws->Scan(
-    TableName => $self->table_name,
-    FilterExpression => 'entity_type = :entity_type',
+    TableName                 => $self->table_name,
+    FilterExpression          => 'entity_type = :entity_type',
     ExpressionAttributeValues => {
       ':entity_type' => { S => 'general_conflicts' }
     }
@@ -371,13 +371,13 @@ sub load_all_conflicts ($self) {
   for my $item (@{ $result->Items }) {
     my $sk = $item->{sk}->{S};
     my ($g1, $g2) = split ':', $sk;
-    my $data = $self->decode($item->{data}->{S});
+    my $data         = $self->decode($item->{data}->{S});
     my $has_conflict = $data->{conflicts} ? 1 : 0;
-    
+
     $conflicts->{$g1}{$g2} = $has_conflict;
     $conflicts->{$g2}{$g1} = $has_conflict;
   }
-  
+
   return $conflicts;
 }
 

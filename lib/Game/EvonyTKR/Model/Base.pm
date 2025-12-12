@@ -4,7 +4,7 @@ use utf8::all;
 
 use File::FindLib 'lib';
 use Mojo::Base -base,                               -signatures;
-use Mojo::Base 'Game::EvonyTKR::Role::JSON', -role;
+use Mojo::Base 'Game::EvonyTKR::Role::JSON',        -role;
 use Mojo::Base 'Game::EvonyTKR::Role::Common',      -role;
 use Mojo::Base 'Game::EvonyTKR::Role::Logging',     -role;
 use Mojo::Base 'Game::EvonyTKR::Role::Persistence', -role;
