@@ -47,25 +47,32 @@ has 'lifecycle_id' => sub ($self) {
 # Core DynamoDB operations
 sub _put_item ($self, $pk, $sk, $data, $entity_type = undef) {
   $entity_type //= $pk;
+
+  warn sprintf("[DynamoDB] _put_item called: pk=%s, sk=%s, table=%s\n",
+    $pk, $sk, $self->table_name);
+
   my $item = {
     pk => { S => $pk },
     sk => { S => $sk },
     entity_type => { S => $entity_type },
     data => { S => encode_json($data) },
-    updated_at => { N => time() }
+    updated_at => { N => sprintf("%.6f", time()) }
   };
 
   eval {
-    $self->dynamodb->PutItem(
+    my $result = $self->dynamodb->PutItem(
       TableName => $self->table_name,
       Item => $item
     );
+    warn sprintf("[DynamoDB] PutItem SUCCESS for pk=%s, sk=%s\n", $pk, $sk);
   };
 
   if ($@) {
-    warn sprintf("[DynamoDB] PutItem failed for pk=%s, sk=%s: %s\n", $pk, $sk, $@);
+    warn sprintf("[DynamoDB] PutItem FAILED for pk=%s, sk=%s: %s\n", $pk, $sk, $@);
     die $@;
   }
+
+  return 1;
 }
 
 sub _get_item ($self, $pk, $sk) {
