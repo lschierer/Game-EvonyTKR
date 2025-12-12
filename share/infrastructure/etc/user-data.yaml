@@ -200,6 +200,7 @@ runcmd:
     Type=forking
     User=mojo
     PIDFile=/opt/mojo/app/bin/hypnotoad.pid
+    Environment="MOJO_MODE=REPLACEMODE"
     ExecStart=/opt/mojo/bin/mojo.sh
     ExecReload=/bin/kill -USR2 $MAINPID
     TimeoutStartSec=900
