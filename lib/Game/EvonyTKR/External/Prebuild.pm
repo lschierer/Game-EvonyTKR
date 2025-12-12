@@ -105,6 +105,7 @@ package Game::EvonyTKR::External::Prebuild {
         'external_prebuild' => [{}] => {
           priority => 100,
           attempts => 3,
+          expire   => 300,  # 5 minutes should be plenty for spawning jobs
         }
       );
       $taskClass->log_info("Queued external_prebuild $jid");
@@ -307,6 +308,7 @@ package Game::EvonyTKR::External::Prebuild {
     $job->log_info('launching jobs to spawn loaders.');
 
     my $loaderJids = [];
+    my $totalJobs = 0;  # Count both launched and existing jobs
     foreach my $jobname (sort keys $loaderJobDefs->%*) {
       # Simple check: if any active/inactive jobs exist for this task, skip it
       my $existing = $job->minion->jobs({
@@ -316,6 +318,7 @@ package Game::EvonyTKR::External::Prebuild {
 
       if ($existing > 0) {
         $job->log_info("Skipping $jobname - $existing jobs already exist");
+        $totalJobs++;  # Count existing jobs
         next;
       }
       $job->log_debug("Prebuild needs to launch $jobname");
@@ -330,6 +333,7 @@ package Game::EvonyTKR::External::Prebuild {
         $job->note($jobname => $jid);
         $job->log_debug(sprintf('launched %s with jid %s', $jobname, $jid));
         push @{$loaderJids}, $jid;
+        $totalJobs++;  # Count newly launched jobs
       }
       else {
         my $errmessage = sprintf('failed to launch %s', $jobname);
@@ -338,12 +342,12 @@ package Game::EvonyTKR::External::Prebuild {
       }
     }
 
-    if (scalar(@$loaderJids) == keys($loaderJobDefs->%*)) {
-      $job->log_info('all job spawners launched');
+    if ($totalJobs == keys($loaderJobDefs->%*)) {
+      $job->log_info('all job spawners launched or already exist');
     }
     else {
       my $errmessage = sprintf('launched %s spawners, expected %s. ',
-        scalar(@$loaderJids), scalar(keys($loaderJobDefs->%*)));
+        $totalJobs, scalar(keys($loaderJobDefs->%*)));
       $job->log_error($errmessage);
       return $job->fail($errmessage);
     }
@@ -369,7 +373,12 @@ package Game::EvonyTKR::External::Prebuild {
             parents  => $loaderJids
           }
         );
-        $monitors->{$mn} = $mj;
+        if (defined $mj) {
+          $monitors->{$mn} = $mj;
+          $job->log_debug("Launched monitor job $mn with jid $mj");
+        } else {
+          $job->log_warn("Failed to launch monitor job $mn");
+        }
       }
     }
 
