@@ -11,20 +11,6 @@ has 'backend' => sub ($self) {
   my $config             = $self->config          || {};
   my $persistence_config = $config->{persistence} || {};
 
-  # Debug logging
-  require Data::Dumper;
-  warn sprintf(
-    "[Persistence] MOJO_MODE=%s, mode attribute=%s\n",
-    $ENV{MOJO_MODE} // 'unset',
-    $self->mode
-  );
-  warn sprintf("[Persistence] Config keys: %s\n", join(', ', keys %$config));
-  warn sprintf("[Persistence] Persistence config: %s\n",
-    Data::Dumper::Dumper($persistence_config));
-  warn sprintf("[Persistence] AWS config: %s\n",
-    Data::Dumper::Dumper($config->{aws}))
-    if $config->{aws};
-
   # Determine backend: explicit config > mode-based fallback
   my $backend_type = $persistence_config->{backend};
 
@@ -35,10 +21,7 @@ has 'backend' => sub ($self) {
 "[Persistence] No explicit backend configured, using mode-based default: %s\n",
       $backend_type);
   }
-  else {
-    warn sprintf("[Persistence] Using explicitly configured backend: %s\n",
-      $backend_type);
-  }
+
 
   if ($backend_type eq 'sqlite') {
     require Game::EvonyTKR::Service::SQLitePersistence;
@@ -54,9 +37,9 @@ has 'backend' => sub ($self) {
     );
   }
   else {
-    die sprintf(
+    croak( sprintf(
 "Unknown persistence backend type: %s (expected 'sqlite' or 'dynamodb')\n",
-      $backend_type);
+      $backend_type));
   }
 };
 

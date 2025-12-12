@@ -13,7 +13,7 @@ package Game::EvonyTKR::Role::Common {
   use UUID               qw(uuid5);
   use Unicode::CaseFold  qw(fc);
   use Unicode::Normalize qw(NFKD);
-  use List::AllUtils     qw(min uniq );
+  use List::AllUtils     qw(min uniq none all );
 
   has 'collection_dir' => sub {
     my $home = Mojo::Home->new->detect('Game::EvonyTKR');
@@ -193,6 +193,50 @@ package Game::EvonyTKR::Role::Common {
 
     return 0;
   }
+  sub normalizeSpecialtyLevels ($self, @specialties) {
+    my @normalized = @specialties;
+
+    # Ensure we have exactly 4 specialties
+    if (scalar @normalized != 4) {
+      $self->logger->warn("Expected 4 specialties, got "
+          . scalar @normalized
+          . ". Padding with defaults.");
+      while (scalar @normalized < 4) {
+        push @normalized, 'gold';
+      }
+      @normalized = @normalized[0 .. 3] if scalar @normalized > 4;
+    }
+
+    # Validate and normalize each specialty level
+    foreach my $index (0 .. 3) {
+      if (none { $_ eq $normalized[$index] } $self->SpecialtyLevelValues->@*) {
+        $self->logger->warn(
+"Invalid specialty level at index $index: $normalized[$index], using default"
+        );
+        $normalized[$index] = 'gold';
+      }
+    }
+
+    # Apply the specialty 4 rule
+    my $all_gold = all { $_ eq 'gold' } @normalized[0 .. 2];
+
+    if ($all_gold && $normalized[3] eq 'none') {
+      $self->logger->warn(
+"When specialties 1-3 are all gold, specialty 4 cannot be 'none'. Setting to gold."
+      );
+      $normalized[3] = 'gold';
+    }
+
+    if (!$all_gold && $normalized[3] ne 'none') {
+      $self->logger->warn(
+"When specialties 1-3 are not all gold, specialty 4 must be 'none'. Setting to none."
+      );
+      $normalized[3] = 'none';
+    }
+
+    return @normalized;
+  }
+
 }
 1;
 __END__

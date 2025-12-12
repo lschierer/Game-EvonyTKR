@@ -7,11 +7,13 @@ use Mojo::Base 'Game::EvonyTKR::Controller::ControllerBase';
 use Mojo::Base 'Game::EvonyTKR::Role::StaticPages',                   -role;
 use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants',      -role;
 use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants',   -role;
+use Mojo::Base 'Game::EvonyTKR::Role::Constants::Covenants',   -role;
+use Mojo::Base 'Game::EvonyTKR::Role::Constants::AscendingAttributes',   -role;
+use Mojo::Base 'Game::EvonyTKR::Role::Constants::Specialties',   -role;
 use Mojo::Base 'Game::EvonyTKR::Controller::Role::Generals::Routing', -role;
 require YAML::PP;
 require Mojo::Promise;
 require Mojo::Util;
-require List::Util;
 
 require Game::EvonyTKR::Model::General;
 require Game::EvonyTKR::Model::General::Pair;
@@ -691,22 +693,21 @@ sub singleTable ($c) {
   my $ascendingLevel = $c->param('ascendingLevel') // 'red5';
   my @specialties    = map { $c->param("specialty$_") // 'gold' } (1 .. 4);
 
-  # Validate parameters
-  my $data_model = Game::EvonyTKR::Model::Data->new;
 
-  if (!$data_model->checkCovenantLevel($covenantLevel)) {
+
+  if (!$c->checkCovenantLevel($covenantLevel)) {
     $c->log_warn(
       "Invalid covenantLevel: $covenantLevel, using default 'civilization'");
     $covenantLevel = 'civilization';
   }
 
-  if (!$data_model->checkAscendingLevel($ascendingLevel)) {
+  if (!$c->is_valid_ascending_level_value($ascendingLevel)) {
     $c->log_warn(
       "Invalid ascendingLevel: $ascendingLevel, using default 'red5'");
     $ascendingLevel = 'red5';
   }
 
-  @specialties = $data_model->normalizeSpecialtyLevels(@specialties);
+  @specialties = $c->normalizeSpecialtyLevels(@specialties);
 
   # Stash data for template rendering
   $c->stash(
