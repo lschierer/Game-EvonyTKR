@@ -95,7 +95,8 @@ package Game::EvonyTKR::External::AscendingAttributes::LoadAll {
       my $finished = 0;
       my $failed   = 0;
 
-      while (1) {
+      my $loop;
+      $loop = Mojo::IOLoop->timer( 5 => sub{
         my $all_done = 1;
         $finished = 0;
         $failed   = 0;
@@ -134,10 +135,12 @@ package Game::EvonyTKR::External::AscendingAttributes::LoadAll {
           $finished, $failed, $skipped, $all_done ? 'YES' : 'NO'
         ));
 
-        last if $all_done;
-        sleep 2;
-      }
+        if $all_done{
+          Mojo::IOLoop->remove($loop);
+        }
 
+      });
+      Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
       $job->log_info(sprintf(
         'Child jobs completed: %d finished, %d failed',
         $finished, $failed
