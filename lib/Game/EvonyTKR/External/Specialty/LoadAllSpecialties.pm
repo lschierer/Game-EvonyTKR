@@ -86,7 +86,8 @@ package Game::EvonyTKR::External::Specialty::LoadAllSpecialties {
       my $finished = 0;
       my $failed   = 0;
 
-      while (1) {
+      my $loop;
+      $loop = Mojo::IOLoop->recurring(2 => sub {
         my $all_done = 1;
         $finished = 0;
         $failed   = 0;
@@ -107,16 +108,18 @@ package Game::EvonyTKR::External::Specialty::LoadAllSpecialties {
           }
         }
 
-        last if $all_done;
-        sleep 2;
-      }
+        if ($all_done) {
+          Mojo::IOLoop->remove($loop);
+          Mojo::IOLoop->stop;
+        }
 
+      });
+
+      Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
       $job->log_info(sprintf(
         'Child jobs completed: %d finished, %d failed',
         $finished, $failed
       ));
-
-      sleep 2;
 
       # Verify all data is actually in persistence before marking complete
       my $verified            = 0;

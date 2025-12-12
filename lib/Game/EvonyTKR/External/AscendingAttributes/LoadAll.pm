@@ -96,7 +96,7 @@ package Game::EvonyTKR::External::AscendingAttributes::LoadAll {
       my $failed   = 0;
 
       my $loop;
-      $loop = Mojo::IOLoop->timer( 5 => sub{
+      $loop = Mojo::IOLoop->recurring(2 => sub {  # RECURRING: fires every 2 seconds
         my $all_done = 1;
         $finished = 0;
         $failed   = 0;
@@ -135,8 +135,9 @@ package Game::EvonyTKR::External::AscendingAttributes::LoadAll {
           $finished, $failed, $skipped, $all_done ? 'YES' : 'NO'
         ));
 
-        if $all_done{
-          Mojo::IOLoop->remove($loop);
+        if ($all_done) {
+          Mojo::IOLoop->remove($loop);  # Remove the recurring timer
+          Mojo::IOLoop->stop;           # Stop the event loop
         }
 
       });
