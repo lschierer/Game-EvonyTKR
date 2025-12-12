@@ -55,10 +55,17 @@ sub _put_item ($self, $pk, $sk, $data, $entity_type = undef) {
     updated_at => { N => time() }
   };
 
-  $self->dynamodb->PutItem(
-    TableName => $self->table_name,
-    Item => $item
-  );
+  eval {
+    $self->dynamodb->PutItem(
+      TableName => $self->table_name,
+      Item => $item
+    );
+  };
+
+  if ($@) {
+    warn sprintf("[DynamoDB] PutItem failed for pk=%s, sk=%s: %s\n", $pk, $sk, $@);
+    die $@;
+  }
 }
 
 sub _get_item ($self, $pk, $sk) {
@@ -96,23 +103,31 @@ sub _get_item ($self, $pk, $sk) {
 }
 
 sub _query_items ($self, $pk, $sk_prefix = undef) {
-  my $params = {
-    TableName => $self->table_name,
-    KeyConditionExpression => 'pk = :pk',
-    ExpressionAttributeValues => {
-      ':pk' => { S => $pk }
-    }
-  };
+  my $key_condition = 'pk = :pk';
+  my $attr_values = { ':pk' => { S => $pk } };
 
   if ($sk_prefix) {
-    $params->{KeyConditionExpression} .= ' AND begins_with(sk, :sk_prefix)';
-    $params->{ExpressionAttributeValues}->{':sk_prefix'} = { S => $sk_prefix };
+    $key_condition .= ' AND begins_with(sk, :sk_prefix)';
+    $attr_values->{':sk_prefix'} = { S => $sk_prefix };
   }
 
-  my $result = $self->dynamodb->Query($params);
-  my @items;
+  my $result = eval {
+    $self->dynamodb->Query(
+      TableName => $self->table_name,
+      KeyConditionExpression => $key_condition,
+      ExpressionAttributeValues => $attr_values
+    );
+  };
 
-  for my $item (@{$result->Items || []}) {
+  if ($@) {
+    warn sprintf("[DynamoDB] Query failed for pk=%s: %s\n", $pk, $@);
+    return [];
+  }
+
+  return [] unless $result && $result->Items;
+
+  my @items;
+  for my $item (@{$result->Items}) {
     push @items, decode_json($item->{data}->{S});
   }
 
