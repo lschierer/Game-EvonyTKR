@@ -142,7 +142,7 @@ package Game::EvonyTKR::External::Specialty::LoadAllSpecialties {
         }
 
         $job->log_debug(sprintf(
-'Persistence verification attempt %d/%d: %d specialties still missing',
+        'Persistence verification attempt %d/%d: '.'%d specialties still missing',
           $attempt, $max_verify_attempts, $missing_count
         ));
         sleep 1;
