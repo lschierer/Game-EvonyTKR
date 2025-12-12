@@ -78,42 +78,12 @@ package Game::EvonyTKR::External::Prebuild {
     # Register main prebuild orchestration task
     $app->minion->add_task($taskClass->task_name => __PACKAGE__);
 
-    $taskClass->prebuild_init($app);
-
     $taskClass->log_info(
       sprintf('%s register function complete for %s', __PACKAGE__, $$));
     return 1;
   }
 
-  sub prebuild_init ($taskClass, $app) {
-    # Only run in web process, not in worker processes
-    return if $ENV{MINION_WORKER_CHILD};
 
-    # Use a guard to ensure only one process can enqueue prebuild
-    my $guard =
-      $app->minion->guard('prebuild_enqueue_lock', 30, { limit => 1 });
-    return unless $guard;
-
-    # Check for existing prebuild jobs
-    my $existing = $app->minion->jobs({
-      tasks  => ['external_prebuild'],
-      states => [qw(active inactive)]
-    })->total;
-
-    if ($existing == 0) {
-      my $jid = $app->minion->enqueue(
-        'external_prebuild' => [{}] => {
-          priority => 100,
-          attempts => 3,
-          expire   => 300,  # 5 minutes should be plenty for spawning jobs
-        }
-      );
-      $taskClass->log_info("Queued external_prebuild $jid");
-    }
-    else {
-      $taskClass->log_info("Prebuild job already exists ($existing), skipping");
-    }
-  }
 
   sub prebuildPrerequisites ($job, $args = {}) {
 

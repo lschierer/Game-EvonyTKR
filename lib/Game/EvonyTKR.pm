@@ -77,6 +77,10 @@ package Game::EvonyTKR {
 
             $app->log->info("SPAWNING MINION WORKERS from PID $$");
             _spawn_minion_workers($app);
+            $app->minion->enqueue(external_prebuild => [{}] => {
+              priority => 100,
+              attempts => 3,
+            });
           }
         );
       }
