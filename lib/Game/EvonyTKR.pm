@@ -165,12 +165,6 @@ package Game::EvonyTKR {
     require Game::EvonyTKR::Role::Persistence::Core;
     require Game::EvonyTKR::Service::Persistence;
 
-    warn "[Game::EvonyTKR] _init_persistence() called\n";
-    warn sprintf("[Game::EvonyTKR] Config keys available: %s\n",
-      join(', ', sort keys %{ $app->config || {} }));
-    warn
-      sprintf("[Game::EvonyTKR] Mode: %s\n", $ENV{MOJO_MODE} || 'development');
-
     # Directly initialize the singleton in Core.pm's package variable
     $Game::EvonyTKR::Role::Persistence::Core::persistence =
       Game::EvonyTKR::Service::Persistence->new(
@@ -183,7 +177,6 @@ package Game::EvonyTKR {
       $Game::EvonyTKR::Role::Persistence::Core::persistence->mode,
       ref($Game::EvonyTKR::Role::Persistence::Core::persistence->backend)
     ));
-    warn "[Game::EvonyTKR] _init_persistence() completed successfully\n";
   }
 
   sub _init_minion($app) {
@@ -192,8 +185,8 @@ package Game::EvonyTKR {
     require Mojolicious::Plugin::Minion;
  # Use SQLite for Minion (reliable), mode-gated persistence for application data
     my $minion_db = $app->home->child('minion.db');
-    warn sprintf("[Game::EvonyTKR] Minion SQLite database: %s (app->home=%s)\n",
-      $minion_db, $app->home);
+     $app->log->info(sprintf("[Game::EvonyTKR] Minion SQLite database: %s (app->home=%s)\n",
+      $minion_db, $app->home));
     $app->plugin(Minion => { SQLite => $minion_db });
 
     # Apply SQLite optimizations for Minion
