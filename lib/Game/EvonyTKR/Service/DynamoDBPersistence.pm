@@ -96,11 +96,31 @@ sub _get_item ($self, $pk, $sk) {
     return;
   }
 
-  return unless $result && $result->Item;
+  unless ($result && $result->Item) {
+    $self->log_debug(sprintf("[DynamoDB] No Item returned for pk=%s, sk=%s\n", $pk, $sk));
+    return;
+  }
 
-  my $data_str = $result->Item->{data}->{S};
+  # DEBUG: Log what we actually got from DynamoDB
+  $self->log_debug(sprintf("[DynamoDB] GetItem returned for pk=%s, sk=%s, Item type: %s\n",
+    $pk, $sk, ref($result->Item)));
+
+  # Try multiple ways to access the data field (Paws API can be tricky)
+  my $data_str;
+  if (ref($result->Item) eq 'HASH') {
+    $data_str = $result->Item->{data}->{S};
+  } elsif ($result->Item->can('data')) {
+    # Paws object accessor
+    my $data_attr = $result->Item->data;
+    $data_str = ref($data_attr) eq 'HASH' ? $data_attr->{S} : $data_attr->S;
+  }
+
   unless (defined $data_str && length($data_str) > 0) {
-    $self->log_error(sprintf("[DynamoDB] Empty/undef data for pk=%s, sk=%s\n", $pk, $sk));
+    $self->log_error(sprintf("[DynamoDB] Empty/undef data for pk=%s, sk=%s (tried hash and accessor)\n", $pk, $sk));
+    # DEBUG: Show what fields ARE available
+    if (ref($result->Item) eq 'HASH') {
+      $self->log_error(sprintf("[DynamoDB] Available fields: %s\n", join(', ', keys %{$result->Item})));
+    }
     return;
   }
 
