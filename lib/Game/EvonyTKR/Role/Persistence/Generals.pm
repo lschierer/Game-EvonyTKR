@@ -10,7 +10,6 @@ sub add_general ($self, $general) {
   my $normalized_name = $self->normalize($name);
   return $self->persistence->store_general($normalized_name, $general->to_wire_hash());
 }
-}
 
 sub get_general ($self, $name) {
   require Game::EvonyTKR::Model::Factory;
