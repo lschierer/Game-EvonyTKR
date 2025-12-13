@@ -200,6 +200,7 @@ BEGIN {
     'Game::EvonyTKR::Role::Persistence::Core'                => 'INFO',
     'Game::EvonyTKR::Role::Persistence'                      => 'WARN',
     'Game::EvonyTKR::Service::DynamoDBPersistence'           => 'DEBUG',
+    'Game::EvonyTKR::Service::Persistence'                   => 'DEBUG',
     'Game::EvonyTKR::Shared::Logger'                         => 'INFO',
     'Test::Package'                                          => 'TRACE',
     'Test'                                                   => 'TRACE',

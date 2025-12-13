@@ -199,13 +199,15 @@ package Game::EvonyTKR {
       }
     );
 
-    # Clear Minion jobs on startup
-    unless ($ENV{MINION_WORKER_CHILD}) {
+    # Clear Minion jobs ONLY in development mode
+    # In production/staging, jobs MUST persist across restarts
+    # CRITICAL: Don't call reset() in production - it deletes ALL jobs including running ones!
+    # With Hypnotoad spawning multiple workers, reset() was being called repeatedly, wiping the queue
+    if ($app->mode eq 'development' && !$ENV{MINION_WORKER_CHILD}) {
       $app->minion->reset;
-      $app->log->info("Cleared Minion jobs on startup");
-    }
-
-    if ($app->mode eq 'development') {
+      $app->log->info("Cleared Minion jobs on startup (development mode only)");
+      $app->minion->remove_after(7200);
+    } elsif ($app->mode eq 'development') {
       $app->minion->remove_after(7200);
     }
 
