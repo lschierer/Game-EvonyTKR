@@ -78,17 +78,17 @@ package Game::EvonyTKR::External::Book::LoadAllBuiltins {
         tasks => ['load_book'],
         states => ['active', 'inactive']
       });
-      
+
       my $job_exists = 0;
       while (my $existing = $existing_jobs->next) {
         if ($existing->{args} && $existing->{args}[0] && $existing->{args}[0] eq $entry &&
-            $existing->{notes} && $existing->{notes}->{prebuild_run_id} && 
+            $existing->{notes} && $existing->{notes}->{prebuild_run_id} &&
             $existing->{notes}->{prebuild_run_id} eq $job->prebuild_run_id) {
           $job_exists = 1;
           last;
         }
       }
-      
+
       if ($job_exists) {
         $job->log_debug(sprintf(
           'Skipping %s - job already exists for current run', $entry));
@@ -158,7 +158,7 @@ package Game::EvonyTKR::External::Book::LoadAllBuiltins {
         $job->log_info(sprintf(
           'Still waiting for %d child jobs - retrying in 5 seconds',
           $active));
-        return $job->retry({ delay => 5 });
+        return $job->retry({ delay => $job->standard_delay });
       }
 
       $job->log_info(sprintf(

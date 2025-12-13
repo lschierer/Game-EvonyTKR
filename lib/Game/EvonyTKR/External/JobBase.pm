@@ -14,6 +14,8 @@ package Game::EvonyTKR::External::JobBase {
 
   has prebuild_run_id => '';
 
+  has standard_delay => 10;
+
   sub task_name {
     my $class = shift;
     $class->log_logcroak(

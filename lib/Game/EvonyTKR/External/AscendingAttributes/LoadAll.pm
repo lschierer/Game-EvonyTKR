@@ -66,17 +66,17 @@ package Game::EvonyTKR::External::AscendingAttributes::LoadAll {
         tasks => ['load_ascending_attributes'],
         states => ['active', 'inactive']
       });
-      
+
       my $job_exists = 0;
       while (my $existing = $existing_jobs->next) {
         if ($existing->{args} && $existing->{args}[0] && $existing->{args}[0] eq $file->to_string &&
-            $existing->{notes} && $existing->{notes}->{prebuild_run_id} && 
+            $existing->{notes} && $existing->{notes}->{prebuild_run_id} &&
             $existing->{notes}->{prebuild_run_id} eq $job->info->{notes}->{prebuild_run_id}) {
           $job_exists = 1;
           last;
         }
       }
-      
+
       if ($job_exists) {
         $job->log_debug(sprintf(
           'Skipping %s - job already exists for current run', $attr_name));
@@ -141,7 +141,7 @@ package Game::EvonyTKR::External::AscendingAttributes::LoadAll {
         $job->log_info(sprintf(
           'Still waiting for %d child jobs - retrying in 5 seconds',
           $active));
-        return $job->retry({ delay => 5 });
+        return $job->retry({ delay => $job->standard_delay });
       }
 
       $job->log_info(sprintf(

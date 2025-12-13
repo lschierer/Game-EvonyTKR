@@ -146,7 +146,7 @@ package Game::EvonyTKR::External::Prebuild {
     unless ($job->prebuildPrerequisites) {
       $job->log_debug(sprintf('Cannot start prebuild; prereqs: %s',
         Data::Printer::np($prereqs, multiline => 0)));
-      return $job->retry({ delay => 10 });
+      return $job->retry({ delay => $job->standard_delay });
     }
 
     # Get current version from config (git-commit)
