@@ -91,7 +91,7 @@ package Game::EvonyTKR::External::JobBase {
 
     # Get all jobs that have the specified tag (from previous runs)
     my $jobs = $job->minion->jobs({
-      states => [qw(inactive active finished failed)],
+      states => [qw(inactive active failed)],
       limit  => 50000  # Large limit to catch all jobs
     });
 
@@ -109,7 +109,7 @@ package Game::EvonyTKR::External::JobBase {
         $harvested++ unless $@;
       }
     }
-
+    $job->log_info(sprintf('harvested %s jobs', $harvested));
     return $harvested;
   }
 }
