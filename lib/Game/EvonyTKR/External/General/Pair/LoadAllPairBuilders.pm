@@ -76,6 +76,30 @@ package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
         $priority = ($type_counters{$type} <= 4) ? 9  : $priority;
         $priority = ($type_counters{$type} <= 3) ? 10 : $priority;
 
+        # Check if job already exists for this general/type in current run
+        my $existing_jobs = $job->minion->jobs({
+          tasks => ['create_pairs'],
+          states => ['active', 'inactive'],
+          notes => { prebuild_run_id => $job->prebuild_run_id }
+        });
+        
+        my $job_exists = 0;
+        while (my $existing = $existing_jobs->next) {
+          if ($existing->{args} && 
+              $existing->{args}[0] && $existing->{args}[0] eq $general->name &&
+              $existing->{args}[1] && $existing->{args}[1] eq $type) {
+            $job_exists = 1;
+            last;
+          }
+        }
+        
+        if ($job_exists) {
+          $job->log_debug(sprintf(
+            'Skipping %s/%s - job already exists for current run', 
+            $general->name, $type));
+          next;
+        }
+
         my $job_id = $job->minion->enqueue(
           'create_pairs' => [$general->name, $type] => {
             priority => $priority,

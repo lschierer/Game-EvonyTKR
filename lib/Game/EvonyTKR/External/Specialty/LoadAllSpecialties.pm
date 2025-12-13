@@ -58,6 +58,28 @@ package Game::EvonyTKR::External::Specialty::LoadAllSpecialties {
         next;
       }
 
+      # Check if job already exists for this file in current run
+      my $existing_jobs = $job->minion->jobs({
+        tasks => ['load_specialty'],
+        states => ['active', 'inactive'],
+        notes => { prebuild_run_id => $job->prebuild_run_id }
+      });
+      
+      my $job_exists = 0;
+      while (my $existing = $existing_jobs->next) {
+        if ($existing->{args} && $existing->{args}[0] && $existing->{args}[0] eq $file->to_string) {
+          $job_exists = 1;
+          last;
+        }
+      }
+      
+      if ($job_exists) {
+        $job->log_debug(sprintf(
+          'Skipping %s - job already exists for current run', $specialty_name));
+        $skipped_count++;
+        next;
+      }
+
       my $job_id = $job->minion->enqueue(
         'load_specialty' => [$file->to_string] => {
           attempts => 3,
