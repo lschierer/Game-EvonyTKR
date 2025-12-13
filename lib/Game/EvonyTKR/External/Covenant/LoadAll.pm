@@ -153,6 +153,16 @@ package Game::EvonyTKR::External::Covenant::LoadAll {
         return $job->retry({ delay => $job->standard_delay });
       }
 
+      # Fail if any child jobs failed
+      if ($failed > 0) {
+        my $errmsg = sprintf(
+          'LoadAll failed: %d child jobs failed, %d finished',
+          $failed, $finished
+        );
+        $job->log_error($errmsg);
+        return $job->fail($errmsg);
+      }
+
       $job->log_info(sprintf(
         'All child jobs completed: %d finished, %d failed',
         $finished, $failed

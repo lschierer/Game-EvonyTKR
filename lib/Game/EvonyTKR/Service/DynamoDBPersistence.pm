@@ -52,8 +52,8 @@ has 'lifecycle_id' => sub ($self) {
 sub _put_item ($self, $pk, $sk, $data, $entity_type = undef) {
   $entity_type //= $pk;
 
-  warn sprintf("[DynamoDB] _put_item called: pk=%s, sk=%s, table=%s\n",
-    $pk, $sk, $self->table_name);
+  $self->log_info( sprintf("[DynamoDB] _put_item called: pk=%s, sk=%s, table=%s\n",
+    $pk, $sk, $self->table_name));
 
   my $item = {
     pk          => { S => $pk },
@@ -68,15 +68,13 @@ sub _put_item ($self, $pk, $sk, $data, $entity_type = undef) {
       TableName => $self->table_name,
       Item      => $item
     );
-    warn sprintf("[DynamoDB] PutItem SUCCESS for pk=%s, sk=%s\n", $pk, $sk);
   };
 
   if ($@) {
-    warn
-      sprintf("[DynamoDB] PutItem FAILED for pk=%s, sk=%s: %s\n", $pk, $sk, $@);
+    $self->log_error(sprintf("[DynamoDB] PutItem FAILED for pk=%s, sk=%s: %s\n", $pk, $sk, $@));
     return 0;
   }
-
+  $self->log_info(sprintf("[DynamoDB] PutItem SUCCESS for pk=%s, sk=%s\n", $pk, $sk));
   return 1;
 }
 
@@ -92,8 +90,7 @@ sub _get_item ($self, $pk, $sk) {
   };
 
   if ($@) {
-    warn
-      sprintf("[DynamoDB] GetItem failed for pk=%s, sk=%s: %s\n", $pk, $sk, $@);
+    $self->log_error(sprintf("[DynamoDB] GetItem failed for pk=%s, sk=%s: %s\n", $pk, $sk, $@));
     return;
   }
 
@@ -101,16 +98,16 @@ sub _get_item ($self, $pk, $sk) {
 
   my $data_str = $result->Item->{data}->{S};
   unless (defined $data_str && length($data_str) > 0) {
-    warn sprintf("[DynamoDB] Empty/undef data for pk=%s, sk=%s\n", $pk, $sk);
+    $self->log_error(sprintf("[DynamoDB] Empty/undef data for pk=%s, sk=%s\n", $pk, $sk));
     return;
   }
 
   my $decoded = eval { $self->decode($data_str) };
   if ($@) {
-    warn sprintf("[DynamoDB] JSON decode failed for pk=%s, sk=%s: %s\n",
-      $pk, $sk, $@);
-    warn sprintf("[DynamoDB] Raw data (first 200 chars): %s\n",
-      substr($data_str, 0, 200));
+    $self->log_error(sprintf("[DynamoDB] JSON decode failed for pk=%s, sk=%s: %s\n",
+      $pk, $sk, $@));
+    $self->log_error(sprintf("[DynamoDB] Raw data (first 200 chars): %s\n",
+      substr($data_str, 0, 200)));
     return;
   }
 
@@ -135,7 +132,7 @@ sub _query_items ($self, $pk, $sk_prefix = undef) {
   };
 
   if ($@) {
-    warn sprintf("[DynamoDB] Query failed for pk=%s: %s\n", $pk, $@);
+    $self->log_error( sprintf("[DynamoDB] Query failed for pk=%s: %s\n", $pk, $@));
     return [];
   }
 
