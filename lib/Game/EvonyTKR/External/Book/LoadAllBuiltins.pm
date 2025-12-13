@@ -76,13 +76,14 @@ package Game::EvonyTKR::External::Book::LoadAllBuiltins {
       # Check if job already exists for this book in current run
       my $existing_jobs = $job->minion->jobs({
         tasks => ['load_book'],
-        states => ['active', 'inactive'],
-        notes => { prebuild_run_id => $job->prebuild_run_id }
+        states => ['active', 'inactive']
       });
       
       my $job_exists = 0;
       while (my $existing = $existing_jobs->next) {
-        if ($existing->{args} && $existing->{args}[0] && $existing->{args}[0] eq $entry) {
+        if ($existing->{args} && $existing->{args}[0] && $existing->{args}[0] eq $entry &&
+            $existing->{notes} && $existing->{notes}->{prebuild_run_id} && 
+            $existing->{notes}->{prebuild_run_id} eq $job->prebuild_run_id) {
           $job_exists = 1;
           last;
         }

@@ -64,13 +64,14 @@ package Game::EvonyTKR::External::AscendingAttributes::LoadAll {
       # Check if job already exists for this file in current run
       my $existing_jobs = $job->minion->jobs({
         tasks => ['load_ascending_attributes'],
-        states => ['active', 'inactive'],
-        notes => { prebuild_run_id => $job->info->{notes}->{prebuild_run_id} }
+        states => ['active', 'inactive']
       });
       
       my $job_exists = 0;
       while (my $existing = $existing_jobs->next) {
-        if ($existing->{args} && $existing->{args}[0] && $existing->{args}[0] eq $file->to_string) {
+        if ($existing->{args} && $existing->{args}[0] && $existing->{args}[0] eq $file->to_string &&
+            $existing->{notes} && $existing->{notes}->{prebuild_run_id} && 
+            $existing->{notes}->{prebuild_run_id} eq $job->info->{notes}->{prebuild_run_id}) {
           $job_exists = 1;
           last;
         }

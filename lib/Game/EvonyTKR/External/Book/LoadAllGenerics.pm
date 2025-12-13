@@ -75,13 +75,14 @@ package Game::EvonyTKR::External::Book::LoadAllGenerics {
         my $book_name = sprintf('Level %s %s', $level, $entry);
         my $existing_jobs = $job->minion->jobs({
           tasks => ['load_book'],
-          states => ['active', 'inactive'],
-          notes => { prebuild_run_id => $job->prebuild_run_id }
+          states => ['active', 'inactive']
         });
         
         my $job_exists = 0;
         while (my $existing = $existing_jobs->next) {
-          if ($existing->{args} && $existing->{args}[0] && $existing->{args}[0] eq $book_name) {
+          if ($existing->{args} && $existing->{args}[0] && $existing->{args}[0] eq $book_name &&
+              $existing->{notes} && $existing->{notes}->{prebuild_run_id} && 
+              $existing->{notes}->{prebuild_run_id} eq $job->prebuild_run_id) {
             $job_exists = 1;
             last;
           }
