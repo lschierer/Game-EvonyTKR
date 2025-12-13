@@ -6,9 +6,8 @@ use Mojo::Base 'Game::EvonyTKR::Role::Persistence::Core', -role;
 
 sub add_ascending_attribute ($self, $ascendingAttribute) {
   my $name = lc($self->normalize($ascendingAttribute->general));
-  $self->persistence->store_ascending_attribute($name,
+  return $self->persistence->store_ascending_attribute($name,
     $ascendingAttribute->to_wire_hash());
-  return 1;
 }
 
 sub get_ascending_attributes ($self, $name) {

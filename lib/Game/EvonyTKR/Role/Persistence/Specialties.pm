@@ -8,9 +8,8 @@ our $roleLogger = Game::EvonyTKR::Role::Logging::get_logger(__PACKAGE__);
 
 sub add_specialty ($self, $specialty) {
   my $normalized_name = lc($self->normalize($specialty->name));
-  $self->persistence->store_specialty($normalized_name,
+  return $self->persistence->store_specialty($normalized_name,
     $specialty->to_wire_hash());
-  return 1;
 }
 
 sub get_specialty ($self, $name) {

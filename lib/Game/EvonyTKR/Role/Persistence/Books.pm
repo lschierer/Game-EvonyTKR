@@ -10,8 +10,7 @@ use Mojo::Base 'Game::EvonyTKR::Role::Persistence::Core', -role;
 
 sub add_builtin_book ($self, $book) {
   my $key = lc($self->normalize($book->name));
-  $self->persistence->store_builtin_book($key, $book->to_wire_hash());
-  return 1;
+  return $self->persistence->store_builtin_book($key, $book->to_wire_hash());
 }
 
 sub get_builtin_book ($self, $name) {
@@ -73,8 +72,7 @@ sub list_builtin_books ($self) {
 sub add_generic_book ($self, $book) {
   my $key = lc($self->normalize($book->name));
   $key = sprintf('%s level %s', $key, $book->level);
-  $self->persistence->store_generic_book($key, $book->to_wire_hash());
-  return 1;
+  return $self->persistence->store_generic_book($key, $book->to_wire_hash());
 }
 
 sub get_generic_book ($self, $name, $level) {

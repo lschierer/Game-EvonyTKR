@@ -6,8 +6,7 @@ use Mojo::Base 'Game::EvonyTKR::Role::Persistence::Core', -role;
 
 sub add_glossary_term ($self, $term) {
   my $name = $term->term;
-  $self->persistence->store_glossary_term($name, $term->to_wire_hash());
-  return 1;
+  return $self->persistence->store_glossary_term($name, $term->to_wire_hash());
 }
 
 sub get_glossary_term ($self, $term_name) {
