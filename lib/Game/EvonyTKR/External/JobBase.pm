@@ -88,7 +88,10 @@ package Game::EvonyTKR::External::JobBase {
 
   sub harvest_tagged_jobs ($job) {
     my $harvested = 0;
-    return if(!length($job->prebuild_run_id));
+    if(!length($job->prebuild_run_id)){
+      $job->log_warn('cannot harvest without a prebuild_run_id');
+      return;
+    }
 
     # Get all jobs that have the specified tag (from previous runs)
     my $jobs = $job->minion->jobs({
