@@ -95,7 +95,7 @@ package Game::EvonyTKR::External::JobBase {
       return;
     }
 
-    # Get all jobs that have the specified tag (from previous runs)
+    # Harvest stale Minion jobs
     my $jobs = $job->minion->jobs({
       states => [qw(inactive active failed)],
       limit  => 50000  # Large limit to catch all jobs
@@ -115,8 +115,17 @@ package Game::EvonyTKR::External::JobBase {
         $harvested++ unless $@;
       }
     }
-    $job->log_info(sprintf('harvested %s jobs', $harvested));
-    return $harvested;
+    $job->log_info(sprintf('harvested %s Minion jobs', $harvested));
+
+    # Also harvest stale persistence job_completed records
+    my $persistence_harvested = eval {
+      $job->harvest_job_completions($job->prebuild_run_id);
+    };
+    if ($@) {
+      $job->log_warn("Failed to harvest persistence records: $@");
+    }
+
+    return $harvested + ($persistence_harvested || 0);
   }
 }
 

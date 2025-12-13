@@ -198,7 +198,8 @@ package Game::EvonyTKR::External::AscendingAttributes::LoadAll {
     }
 
     # Mark this job as completed in persistence
-    $job->persistence->mark_job_completed($job->task_name);
+    my $run_id = $job->info->{notes}->{prebuild_run_id};
+    $job->mark_task_completed($job->task_name, $run_id);
 
     my $msg = 'load_all_ascending_attributes job completed';
     $job->log_info($msg);

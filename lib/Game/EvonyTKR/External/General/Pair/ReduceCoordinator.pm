@@ -123,7 +123,8 @@ package Game::EvonyTKR::External::General::Pair::ReduceCoordinator {
     } while (!$pc_verify || !$cc_verify);
 
     # Mark job as completed in persistence
-    $job->persistence->mark_job_completed($job->task_name);
+    my $run_id = $job->info->{notes}->{prebuild_run_id};
+    $job->mark_task_completed($job->task_name, $run_id);
 
     $job->finish(sprintf(
 "Merged results from %d batches - %d conflicts (%d cache hits, %s effectiveness)",

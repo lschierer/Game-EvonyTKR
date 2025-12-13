@@ -218,8 +218,9 @@ package Game::EvonyTKR::External::General::LoadAll {
       }
     }
 
-    # Mark this job as completed in persistence
-    $job->persistence->mark_job_completed($job->task_name);
+    # Mark this job as completed in persistence (with run_id for isolation)
+    my $run_id = $job->info->{notes}->{prebuild_run_id};
+    $job->mark_task_completed($job->task_name, $run_id);
 
     $job->minion->enqueue(
       build_general_indexes => [] => {

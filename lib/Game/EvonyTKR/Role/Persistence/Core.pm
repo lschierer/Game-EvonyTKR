@@ -34,12 +34,16 @@ sub persistence ($self) {
 # Convenience methods for job tracking
 ##############################################################################
 
-sub mark_task_completed ($self, $task_name, $notes = undef) {
-  return $self->persistence->mark_job_completed($task_name, $notes);
+sub mark_task_completed ($self, $task_name, $run_id = undef) {
+  return $self->persistence->mark_job_completed($task_name, $run_id);
 }
 
-sub is_task_completed ($self, $task_name) {
-  return $self->persistence->is_job_completed($task_name);
+sub is_task_completed ($self, $task_name, $run_id = undef) {
+  return $self->persistence->is_job_completed($task_name, $run_id);
+}
+
+sub harvest_job_completions ($self, $run_id) {
+  return $self->persistence->harvest_job_completions($run_id);
 }
 
 1;

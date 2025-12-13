@@ -197,7 +197,8 @@ package Game::EvonyTKR::External::Specialty::LoadAllSpecialties {
     }
 
     # Mark this job as completed in persistence
-    $job->persistence->mark_job_completed($job->task_name);
+    my $run_id = $job->info->{notes}->{prebuild_run_id};
+    $job->mark_task_completed($job->task_name, $run_id);
 
     $job->log_info('LoadAllSpecialties job completed');
   }

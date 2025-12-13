@@ -118,9 +118,17 @@ package Game::EvonyTKR::Role::Common {
     my @outstanding  = ();
     my @failed_tasks = ();
 
+    # Get prebuild_run_id from job if available (for run-scoped completion tracking)
+    my $run_id;
+    if ($self->can('prebuild_run_id')) {
+      $run_id = $self->prebuild_run_id;
+    } elsif ($self->can('info') && $self->info && $self->info->{notes}) {
+      $run_id = $self->info->{notes}->{prebuild_run_id};
+    }
+
     foreach my $prereq (@$prereq_tasks) {
-      # Check persistence layer for completion
-      my $is_completed = $persistence->is_job_completed($prereq);
+      # Check persistence layer for completion (with run_id for isolation)
+      my $is_completed = $persistence->is_job_completed($prereq, $run_id);
 
       if ($is_completed) {
         $prereqs->{$prereq} = 'completed';

@@ -158,13 +158,66 @@ sub set_metadata ($self, $key, $value) {
 }
 
 # Job completion tracking
-sub mark_job_completed ($self, $job_name) {
-  return $self->_put_item('job_completed', $job_name,
-    { completed_at => time() });
+sub mark_job_completed ($self, $job_name, $run_id = undef) {
+  my $sk = $run_id ? "${run_id}:${job_name}" : $job_name;
+  return $self->_put_item('job_completed', $sk,
+    { completed_at => time(), run_id => $run_id // 'legacy' });
 }
 
-sub is_job_completed ($self, $job_name) {
-  return defined $self->_get_item('job_completed', $job_name) ? 1 : 0;
+sub is_job_completed ($self, $job_name, $run_id = undef) {
+  my $sk = $run_id ? "${run_id}:${job_name}" : $job_name;
+  my $result = $self->_get_item('job_completed', $sk);
+
+  # If run-scoped lookup failed, try legacy key for backward compatibility
+  if (!defined $result && $run_id) {
+    $result = $self->_get_item('job_completed', $job_name);
+  }
+
+  return defined $result ? 1 : 0;
+}
+
+# Harvest (clean up) job completion records from previous runs
+sub harvest_job_completions ($self, $current_run_id) {
+  unless ($current_run_id) {
+    $self->log_warn("[DynamoDB] Cannot harvest without current_run_id");
+    return 0;
+  }
+
+  my $harvested = 0;
+
+  # Query all job_completed items
+  my $items = $self->_query_items('job_completed');
+
+  foreach my $item (@$items) {
+    my $sk = $item->{sk}->{S};
+    my $data = eval { $self->decode($item->{data}->{S}) } // {};
+
+    # Skip items from current run
+    next if $sk =~ /^\Q${current_run_id}\E:/;
+
+    # Skip if this is current run_id in data
+    next if $data->{run_id} && $data->{run_id} eq $current_run_id;
+
+    # Delete stale record
+    eval {
+      $self->dynamodb->DeleteItem(
+        TableName => $self->table_name,
+        Key => {
+          pk => { S => 'job_completed' },
+          sk => { S => $sk }
+        }
+      );
+      $harvested++;
+      $self->log_debug("[DynamoDB] Harvested stale job_completed: $sk");
+    };
+
+    if ($@) {
+      $self->log_warn("[DynamoDB] Failed to harvest $sk: $@");
+    }
+  }
+
+  $self->log_info("[DynamoDB] Harvested $harvested stale job_completed records");
+  return $harvested;
 }
 
 # Data versioning - track which git-commit the data was built from

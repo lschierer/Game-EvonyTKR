@@ -68,20 +68,46 @@ sub set_metadata ($self, $key, $value) {
 }
 
 # Job completion tracking
-sub mark_job_completed ($self, $job_name) {
+sub mark_job_completed ($self, $job_name, $run_id = undef) {
+  my $key = $run_id ? "${run_id}:${job_name}" : $job_name;
   $self->db->insert(
     'job_completed',
     {
-      job_name     => $job_name,
+      job_name     => $key,
       completed_at => time()
     },
     { on_conflict => \['(job_name) do update set completed_at = ?', time()] }
   );
 }
 
-sub is_job_completed ($self, $job_name) {
-  return $self->db->select('job_completed', ['job_name'],
-    { job_name => $job_name })->hash ? 1 : 0;
+sub is_job_completed ($self, $job_name, $run_id = undef) {
+  my $key = $run_id ? "${run_id}:${job_name}" : $job_name;
+  my $result = $self->db->select('job_completed', ['job_name'],
+    { job_name => $key })->hash;
+
+  # If run-scoped lookup failed, try legacy key for backward compatibility
+  if (!$result && $run_id) {
+    $result = $self->db->select('job_completed', ['job_name'],
+      { job_name => $job_name })->hash;
+  }
+
+  return $result ? 1 : 0;
+}
+
+# Harvest (clean up) job completion records from previous runs
+sub harvest_job_completions ($self, $current_run_id) {
+  unless ($current_run_id) {
+    warn "[SQLite] Cannot harvest without current_run_id";
+    return 0;
+  }
+
+  # Delete all records that don't start with current_run_id
+  # This includes legacy records (no run_id prefix) and old run_ids
+  my $deleted = $self->db->delete('job_completed',
+    \["job_name NOT LIKE ?", "${current_run_id}:%"]);
+
+  warn sprintf("[SQLite] Harvested %d stale job_completed records\n", $deleted);
+  return $deleted;
 }
 
 # Data versioning - track which git-commit the data was built from

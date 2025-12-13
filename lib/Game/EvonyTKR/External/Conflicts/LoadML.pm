@@ -173,7 +173,8 @@ package Game::EvonyTKR::External::Conflicts::LoadML {
     $job->log_info("Stored $stored_count ML predictions in SQLite persistence");
 
     # Mark this job as completed in persistence
-    $job->persistence->mark_job_completed($job->task_name);
+    my $run_id = $job->info->{notes}->{prebuild_run_id};
+    $job->mark_task_completed($job->task_name, $run_id);
   }
 
   sub _has_troop_overlap ($self, $g1, $g2) {
