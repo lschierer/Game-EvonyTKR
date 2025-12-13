@@ -135,6 +135,12 @@ package Game::EvonyTKR::Role::Common {
         next;
       }
 
+      # DEBUG: Log why we think it's not complete
+      $self->log_debug(sprintf(
+        'Prereq %s not marked complete in persistence (run_id=%s)',
+        $prereq, $run_id // 'none'
+      ));
+
       # Not completed in persistence - check Minion for active/failed jobs
       my $prereqPendingCount = $minion->jobs({
         tasks  => [$prereq],

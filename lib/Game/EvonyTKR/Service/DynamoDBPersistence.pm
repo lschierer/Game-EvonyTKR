@@ -189,14 +189,19 @@ sub mark_job_completed ($self, $job_name, $run_id = undef) {
 
 sub is_job_completed ($self, $job_name, $run_id = undef) {
   my $sk = $run_id ? "${run_id}:${job_name}" : $job_name;
+
+  $self->log_debug(sprintf("[DynamoDB] Checking job_completed: pk=job_completed, sk=%s", $sk));
   my $result = $self->_get_item('job_completed', $sk);
 
   # If run-scoped lookup failed, try legacy key for backward compatibility
   if (!defined $result && $run_id) {
+    $self->log_debug(sprintf("[DynamoDB] Run-scoped key not found, trying legacy: sk=%s", $job_name));
     $result = $self->_get_item('job_completed', $job_name);
   }
 
-  return defined $result ? 1 : 0;
+  my $found = defined $result ? 1 : 0;
+  $self->log_debug(sprintf("[DynamoDB] Job %s completion check: %s", $job_name, $found ? 'FOUND' : 'NOT FOUND'));
+  return $found;
 }
 
 # Harvest (clean up) job completion records from previous runs
