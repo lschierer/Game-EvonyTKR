@@ -83,6 +83,42 @@ package Game::EvonyTKR::Role::Common {
     return uuid5($ns_base, $self->globalDN->getX500String());
   };
 
+  # Helper to retry operations that may encounter transient SQLite locking
+  sub _minion_retry ($self, $operation, $max_attempts = 3) {
+    my $attempt = 0;
+    while ($attempt < $max_attempts) {
+      $attempt++;
+      my $result = eval { $operation->() };
+
+      if ($@) {
+        my $error = $@;
+        # Check if it's a transient database error
+        if ($error =~ /database is locked|database disk image is malformed|SQLITE_BUSY/i) {
+          if ($attempt < $max_attempts) {
+            $self->log_debug(sprintf(
+              'Minion operation failed with transient error (attempt %d/%d): %s',
+              $attempt, $max_attempts, $error
+            ));
+            # Exponential backoff: 100ms, 200ms, 400ms
+            select(undef, undef, undef, 0.1 * (2 ** ($attempt - 1)));
+            next;
+          }
+          # Max attempts reached
+          $self->log_error(sprintf(
+            'Minion operation failed after %d attempts: %s',
+            $max_attempts, $error
+          ));
+          die $error;
+        }
+        # Not a transient error, rethrow immediately
+        die $error;
+      }
+
+      # Success
+      return $result;
+    }
+  }
+
   # Generic prerequisite checker for Minion jobs and controllers
   # Uses persistence layer to check job completion across hypnotoad restarts
   # $prereq_tasks: arrayref of task names that must be finished
@@ -141,30 +177,28 @@ package Game::EvonyTKR::Role::Common {
         $prereq, $run_id // 'none'
       ));
 
-      # Not completed in persistence - check Minion for active/failed jobs
-      my $prereqPendingCount = $minion->jobs({
-        tasks  => [$prereq],
-        states => ['active', 'inactive'],
-      })->total // 0;
+      # For controllers, we don't need to distinguish between pending/failed/not-started
+      # They just show a wait page regardless
+      # Only check Minion for failed jobs if caller is a Minion job (to fail fast)
+      if ($is_minion_job) {
+        # Check if prereq failed - wrap in retry logic for transient SQLite locking
+        my $prereqFailedCount = $self->_minion_retry(sub {
+          $minion->jobs({
+            tasks  => [$prereq],
+            states => ['failed'],
+          })->total // 0;
+        });
 
-      my $prereqFailedCount = $minion->jobs({
-        tasks  => [$prereq],
-        states => ['failed'],
-      })->total // 0;
+        if ($prereqFailedCount > 0) {
+          push @failed_tasks, $prereq;
+          $prereqs->{$prereq} = 'failed';
+          next;
+        }
+      }
 
-      if ($prereqFailedCount > 0) {
-        push @failed_tasks, $prereq;
-        $prereqs->{$prereq} = 'failed';
-      }
-      elsif ($prereqPendingCount > 0) {
-        push @outstanding, $prereq;
-        $prereqs->{$prereq} = 'pending';
-      }
-      else {
-        # Not completed, not pending, not failed - not started yet
-        push @outstanding, $prereq;
-        $prereqs->{$prereq} = 'not_started';
-      }
+      # Not completed and (for controllers) not checking Minion, or (for jobs) not failed
+      push @outstanding, $prereq;
+      $prereqs->{$prereq} = 'pending';
     }
 
     # Log prereq states

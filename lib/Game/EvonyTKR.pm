@@ -195,7 +195,8 @@ package Game::EvonyTKR {
       connection => sub ($sqlite, $dbh) {
         $dbh->do('PRAGMA journal_mode=WAL');
         $dbh->do('PRAGMA synchronous=NORMAL');
-        $dbh->do('PRAGMA busy_timeout=30000');
+        # Increased timeout for heavy concurrent job load (2 minutes)
+        $dbh->do('PRAGMA busy_timeout=120000');
       }
     );
 
