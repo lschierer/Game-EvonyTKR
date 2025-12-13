@@ -101,26 +101,13 @@ sub _get_item ($self, $pk, $sk) {
     return;
   }
 
-  # DEBUG: Log what we actually got from DynamoDB
-  $self->log_debug(sprintf("[DynamoDB] GetItem returned for pk=%s, sk=%s, Item type: %s\n",
-    $pk, $sk, ref($result->Item)));
+  # Paws returns a Paws::DynamoDB::AttributeMap object
+  # Access the underlying hash via ->Map
+  my $item_hash = ref($result->Item) eq 'HASH' ? $result->Item : $result->Item->Map;
 
-  # Try multiple ways to access the data field (Paws API can be tricky)
-  my $data_str;
-  if (ref($result->Item) eq 'HASH') {
-    $data_str = $result->Item->{data}->{S};
-  } elsif ($result->Item->can('data')) {
-    # Paws object accessor
-    my $data_attr = $result->Item->data;
-    $data_str = ref($data_attr) eq 'HASH' ? $data_attr->{S} : $data_attr->S;
-  }
-
+  my $data_str = $item_hash->{data}->{S};
   unless (defined $data_str && length($data_str) > 0) {
-    $self->log_error(sprintf("[DynamoDB] Empty/undef data for pk=%s, sk=%s (tried hash and accessor)\n", $pk, $sk));
-    # DEBUG: Show what fields ARE available
-    if (ref($result->Item) eq 'HASH') {
-      $self->log_error(sprintf("[DynamoDB] Available fields: %s\n", join(', ', keys %{$result->Item})));
-    }
+    $self->log_error(sprintf("[DynamoDB] Empty/undef data for pk=%s, sk=%s\n", $pk, $sk));
     return;
   }
 
@@ -136,7 +123,7 @@ sub _get_item ($self, $pk, $sk) {
   return $decoded;
 }
 
-sub _query_items ($self, $pk, $sk_prefix = undef) {
+sub _query_raw_items ($self, $pk, $sk_prefix = undef) {
   my $key_condition = 'pk = :pk';
   my $attr_values   = { ':pk' => { S => $pk } };
 
@@ -160,12 +147,28 @@ sub _query_items ($self, $pk, $sk_prefix = undef) {
 
   return [] unless $result && $result->Items;
 
+  # Return raw items (as hashes) with Paws::DynamoDB::AttributeMap converted
   my @items;
   for my $item (@{ $result->Items }) {
-    push @items, $self->decode($item->{data}->{S});
+    my $item_hash = ref($item) eq 'HASH' ? $item : $item->Map;
+    push @items, $item_hash;
   }
 
   return \@items;
+}
+
+sub _query_items ($self, $pk, $sk_prefix = undef) {
+  my $raw_items = $self->_query_raw_items($pk, $sk_prefix);
+
+  my @decoded_items;
+  for my $item_hash (@$raw_items) {
+    my $data_str = $item_hash->{data}->{S};
+    if (defined $data_str && length($data_str) > 0) {
+      push @decoded_items, $self->decode($data_str);
+    }
+  }
+
+  return \@decoded_items;
 }
 
 # Metadata operations
@@ -205,12 +208,13 @@ sub harvest_job_completions ($self, $current_run_id) {
 
   my $harvested = 0;
 
-  # Query all job_completed items
-  my $items = $self->_query_items('job_completed');
+  # Query all job_completed items (raw format with sk, pk, data fields)
+  my $items = $self->_query_raw_items('job_completed');
 
   foreach my $item (@$items) {
     my $sk = $item->{sk}->{S};
-    my $data = eval { $self->decode($item->{data}->{S}) } // {};
+    my $data_str = $item->{data}->{S} // '';
+    my $data = eval { $self->decode($data_str) } // {};
 
     # Skip items from current run
     next if $sk =~ /^\Q${current_run_id}\E:/;
