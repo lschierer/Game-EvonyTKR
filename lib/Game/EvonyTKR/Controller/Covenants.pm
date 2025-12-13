@@ -44,6 +44,15 @@ package Game::EvonyTKR::Controller::Covenants {
     return $base;
   }
 
+  has prereqs => sub {
+    return [qw(
+      load_all_generals
+      load_all_covenants
+      build_general_indexes
+    )];
+  };
+
+
   # Register this when the application starts
   sub register($c, $app, $config = {}) {
     $c->SUPER::register($app, $config);
@@ -89,6 +98,12 @@ package Game::EvonyTKR::Controller::Covenants {
   }
 
   sub setup_routes ($c, $app) {
+    if($c->are_prereqs_outstanding($app->minion, $c->prereqs)){
+      Mojo::IOLoop->timer($c->standard_delay => sub{
+        $c->setup_routes($app);
+      });
+      return;
+    }
 
     $app->add_navigation_item({
       title => 'Details of General Covenants',
@@ -113,6 +128,8 @@ package Game::EvonyTKR::Controller::Covenants {
     $mainRoutes->get('/:name')
       ->to(controller => $controller_name, action => 'show')
       ->name('covenant_details');
+
+    $c->_ensure_navigation_built();
   }
 
   sub _build_covenant_nav($c, $covenant_name, $app) {
@@ -152,6 +169,7 @@ package Game::EvonyTKR::Controller::Covenants {
   }
 
   sub index($c) {
+    return if $c->check_prereqs_or_wait($c->prereqs);
     $c->log_debug(sprintf('Rendering index for %s', __PACKAGE__));
 
     # Build navigation items if not already done
@@ -197,6 +215,7 @@ package Game::EvonyTKR::Controller::Covenants {
   }
 
   sub show ($c) {
+    return if $c->check_prereqs_or_wait($c->prereqs);
     $c->log_debug("start of show method");
 
     # Build navigation items if not already done

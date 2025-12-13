@@ -26,19 +26,6 @@ package Game::EvonyTKR::Controller::AscendingAttributes {
     return 'AscendingAttributes';    # Explicitly return the controller name
   }
 
-  sub get_all_ascending_attributes ($c, $app) {
-    state %aa_by_general;            # normalized general name -> AA object
-    state $sig;
-
-    return $c->_hydrate_from_list(
-      $app,
-      sub ($app2) { $c->list_ascending_attributes() },    # expected AAs
-      sub ($aa_name) { $c->get_ascending_attributes($aa_name) },
-      \%aa_by_general,
-      \$sig,
-    );
-  }
-
   sub register($c, $app, $config = {}) {
     $c->log_info("Registering routes for " . __PACKAGE__);
     $c->SUPER::register($app, $config);
@@ -49,12 +36,6 @@ package Game::EvonyTKR::Controller::AscendingAttributes {
 
     $c->log_info("Successfully loaded Ascending Attributes "
         . "manager with collection from $SourceDir");
-
-    $app->helper(
-      get_all_ascending_attributes => sub {
-        return $c->get_all_ascending_attributes($app);
-      }
-    );
 
     $app->helper(
       get_ascendingattributes_for_general => sub ($self, $g) {
@@ -198,7 +179,7 @@ package Game::EvonyTKR::Controller::AscendingAttributes {
     $nn =~ s/ /_/g;
     $c->log_debug("looking for attributes for $nn");
 
-    my $all = $c->get_all_ascending_attributes($app);
+    my $all = $c->($app);
     my $aa  = $all->{$nn};
     unless (defined $aa) {
       $c->log_error(sprintf(
@@ -214,41 +195,6 @@ package Game::EvonyTKR::Controller::AscendingAttributes {
     $c->log_debug(
       sprintf('found %s for requested key %s', Data::Printer::np($aa), $nn));
     return $aa;
-  }
-
-  sub import_single_aa_file ($c, $app, $fileName, $delay) {
-    my $all = $c->get_all_ascending_attributes();
-    $c->log_debug("processing $fileName");
-
-    my $data       = $fileName->slurp('UTF-8');
-    my $hashObject = YAML::PP->new(
-      schema       => [qw/ + Perl /],
-      yaml_version => ['1.2', '1.1'],
-    )->load_string($data);
-
-    my $aa = Game::EvonyTKR::Model::AscendingAttributes->from_hash($hashObject);
-    unless ($aa) {
-      $c->log_error(
-        sprintf('failed to build ascending attribute from %s', $fileName));
-      next;
-    }
-    $all->{ $c->SUPER::getConstants->normalize($aa->general) } = $aa;
-    $c->log_debug(sprintf(
-      'after delay of %s, imported "%s" as "%s" from "%s"',
-      $delay, $aa->general, $c->normalize($aa->general), $fileName
-    ));
-    if ($app) {
-      $app->plugins->emit(
-        single_ascending_attributes_imported => { attribute => $aa });
-    }
-    else {
-      if ($c) {
-        # the problem si that I'm getting to this error log line.
-        $c->log_error(
-          '$app was undefined.  $c is: ' . Scalar::Util::blessed($c));
-      }
-    }
-
   }
 
   sub show ($self) {

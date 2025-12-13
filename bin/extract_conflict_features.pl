@@ -7,6 +7,8 @@ use Getopt::Long qw( GetOptions );
 use Game::EvonyTKR::Model::Base;
 use List::AllUtils qw( any uniq max min sum );
 use Scalar::Util qw( refaddr );
+use YAML::PP;
+use Mojo::File;
 
 my $mode   = 'training';  # training or predict
 my $output = undef;
@@ -43,6 +45,41 @@ USAGE
 
 die "Invalid mode: $mode (must be 'training' or 'predict')\n"
   unless $mode =~ /^(training|predict)$/;
+
+# Initialize persistence singleton (similar to Game::EvonyTKR->_init_persistence)
+sub init_persistence {
+  my $mojo_mode = $ENV{MOJO_MODE} || 'development';
+
+  # Load config file (mimics NotYAMLConfig plugin)
+  my $config_file = Mojo::File->new("$FindBin::Bin/..")->child("game-evony_t_k_r.${mojo_mode}.yml");
+  my $config = {};
+
+  if (-e $config_file) {
+    $config = YAML::PP->new->load_file($config_file);
+    warn sprintf("[extract_conflict_features] Loaded config from %s\n", $config_file);
+  } else {
+    warn sprintf("[extract_conflict_features] No config file found: %s, using defaults\n", $config_file);
+  }
+
+  # Initialize persistence singleton (same as in Game::EvonyTKR.pm)
+  require Game::EvonyTKR::Role::Persistence::Core;
+  require Game::EvonyTKR::Service::Persistence;
+
+  $Game::EvonyTKR::Role::Persistence::Core::persistence =
+    Game::EvonyTKR::Service::Persistence->new(
+      mode   => $mojo_mode,
+      config => $config
+    );
+
+  warn sprintf(
+    "[extract_conflict_features] Persistence initialized: mode=%s, backend=%s\n",
+    $mojo_mode,
+    ref($Game::EvonyTKR::Role::Persistence::Core::persistence->backend)
+  );
+}
+
+# Initialize persistence before using Model::Base
+init_persistence();
 
 # Initialize data loader
 my $common = Game::EvonyTKR::Model::Base->new();

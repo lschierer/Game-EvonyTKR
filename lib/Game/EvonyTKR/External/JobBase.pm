@@ -14,7 +14,7 @@ package Game::EvonyTKR::External::JobBase {
 
   has prebuild_run_id => '';
 
-  has standard_delay => 10;
+  has standard_delay => 30;
 
   sub task_name {
     my $class = shift;
@@ -95,6 +95,16 @@ package Game::EvonyTKR::External::JobBase {
       return;
     }
 
+    # Only harvest once per prebuild run - use a metadata flag
+    my $harvest_key = "harvested_" . $job->prebuild_run_id;
+    if ($job->persistence->get_metadata($harvest_key)) {
+      $job->log_debug("Harvesting already done for run " . $job->prebuild_run_id);
+      return 0;
+    }
+
+    # Mark as harvesting to prevent concurrent harvests
+    $job->persistence->set_metadata($harvest_key, { started_at => time() });
+
     # Harvest stale Minion jobs
     my $jobs = $job->minion->jobs({
       states => [qw(inactive active failed)],
@@ -123,7 +133,11 @@ package Game::EvonyTKR::External::JobBase {
     };
     if ($@) {
       $job->log_warn("Failed to harvest persistence records: $@");
+      $persistence_harvested = 0;
     }
+
+    $job->log_info(sprintf('Total harvested: %d Minion jobs, %d persistence records',
+      $harvested, $persistence_harvested || 0));
 
     return $harvested + ($persistence_harvested || 0);
   }

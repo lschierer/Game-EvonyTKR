@@ -25,6 +25,8 @@ package Game::EvonyTKR::Controller::ControllerBase {
   my $base = '';
   my $routes;
 
+  has standard_delay => 30;
+
   sub getBase($self) {
     return $base;
   }
@@ -53,7 +55,7 @@ package Game::EvonyTKR::Controller::ControllerBase {
     );
 
     $app->helper(
-      check_prereqs_or_wait => sub($self, $prereqs, $retry_delay = 30) {
+      check_prereqs_or_wait => sub($self, $prereqs, $retry_delay = $self->standard_delay) {
         unless (ref($prereqs) && ref($prereqs) eq 'ARRAY') {
           $c->log_error('check_prereqs_or_wait requires an arrayref.');
           return 0;

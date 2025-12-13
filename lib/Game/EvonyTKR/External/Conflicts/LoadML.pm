@@ -57,6 +57,10 @@ package Game::EvonyTKR::External::Conflicts::LoadML {
       $job->log_info(
         'conflicts.json not found - generating ML model and predictions');
 
+      # Ensure MOJO_MODE is set for subprocesses
+      $ENV{MOJO_MODE} ||= $job->app->mode;
+      $job->log_debug(sprintf('Running ML pipeline with MOJO_MODE=%s', $ENV{MOJO_MODE}));
+
       # Run training pipeline
       my $rc = system(
         'perl',            'bin/extract_conflict_features.pl',

@@ -26,6 +26,13 @@ package Game::EvonyTKR::Controller::Books {
     return $base;
   }
 
+  has prereqs => sub {
+    return [qw(
+      load_all_builtin_books
+      load_all_generic_books
+    )];
+  };
+
 
   # Register this when the application starts
   sub register($c, $app, $config = {}) {
@@ -140,6 +147,7 @@ package Game::EvonyTKR::Controller::Books {
   }
 
   sub index($c) {
+    return if $c->check_prereqs_or_wait($c->prereqs);
     my $collection = collection_name();
     $c->log_debug("Rendering index for $collection");
 
@@ -200,6 +208,7 @@ package Game::EvonyTKR::Controller::Books {
   }
 
   sub show ($self) {
+    return if $self->check_prereqs_or_wait($self->prereqs);
     $self->log_debug("start of show method");
     my $name = $self->param('book_name');
     $self->log_debug("show detects name $name, showing details.");

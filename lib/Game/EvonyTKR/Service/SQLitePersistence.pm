@@ -101,13 +101,25 @@ sub harvest_job_completions ($self, $current_run_id) {
     return 0;
   }
 
+  # First count what we're about to delete
+  my $count = $self->db->select('job_completed',
+    [\'COUNT(*)'],
+    \["job_name NOT LIKE ?", "${current_run_id}:%"])->array->[0];
+
   # Delete all records that don't start with current_run_id
   # This includes legacy records (no run_id prefix) and old run_ids
-  my $deleted = $self->db->delete('job_completed',
-    \["job_name NOT LIKE ?", "${current_run_id}:%"]);
+  eval {
+    $self->db->delete('job_completed',
+      \["job_name NOT LIKE ?", "${current_run_id}:%"]);
+  };
 
-  warn sprintf("[SQLite] Harvested %d stale job_completed records\n", $deleted);
-  return $deleted;
+  if ($@) {
+    warn "[SQLite] Failed to harvest job_completed records: $@\n";
+    return 0;
+  }
+
+  warn sprintf("[SQLite] Harvested %d stale job_completed records\n", $count || 0);
+  return $count || 0;
 }
 
 # Data versioning - track which git-commit the data was built from
