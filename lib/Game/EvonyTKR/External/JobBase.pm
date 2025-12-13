@@ -83,6 +83,7 @@ package Game::EvonyTKR::External::JobBase {
     }
 
     $job->note(prebuild_run_id => $job->prebuild_run_id) if (length($job->prebuild_run_id));
+    $job->harvest_tagged_jobs();
   }
 
   sub harvest_tagged_jobs ($job) {
