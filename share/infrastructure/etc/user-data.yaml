@@ -197,7 +197,7 @@ runcmd:
     After=network.target
 
     [Service]
-    Type=forking
+    Type=simple
     User=mojo
     PIDFile=/opt/mojo/app/bin/hypnotoad.pid
     Environment="MOJO_MODE=REPLACEMODE"

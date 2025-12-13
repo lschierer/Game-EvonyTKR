@@ -108,6 +108,7 @@ package Game::EvonyTKR::Controller::Specialties {
       Mojo::IOLoop->timer(30 => sub{
         $c->build_nav_items($app, $mainRoutes, $controller_name);
       });
+      return;
     }
 
     my $specialties = [];

@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 set -e
 
 eval "$(/opt/mojo/.local/bin/mise activate bash)"
@@ -21,3 +21,7 @@ echo "Starting Minion workers..."
 
 
 hypnotoad ./bin/game-evonytkr
+HYPNOTOADPID=$!
+
+echo "The PID of the main Hypnotoad process is ${HYPNOTOADPID}."
+set +e
