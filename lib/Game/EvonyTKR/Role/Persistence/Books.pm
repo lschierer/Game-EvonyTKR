@@ -72,36 +72,31 @@ sub list_builtin_books ($self) {
 
 sub add_generic_book ($self, $book) {
   my $key = lc($self->normalize($book->name));
-  $key = sprintf('%s_level_%s', $key, $book->level);
+  $key = sprintf('%s level %s', $key, $book->level);
   $self->persistence->store_generic_book($key, $book->to_wire_hash());
   return 1;
 }
 
 sub get_generic_book ($self, $name, $level) {
   require Game::EvonyTKR::Model::Factory;
-
-  state $generic_books = {};
+  $self->logger->debug(sprintf('persistence role get_generic_book called for %s level %s',
+  $name, $level));
 
   my $key = lc($self->normalize($name));
-  $key = sprintf('%s_level_%s', $key, $level);
-
-  if (exists $generic_books->{$key}) {
-    $self->log_debug("Returning generic book $name from state cache");
-    return $generic_books->{$key};
-  }
+  $key = sprintf('%s level %s', $key, $level);
 
   # Load directly from SQLite
-  my $wire_data = $self->persistence->get_generic_book($key, $level);
+  my $wire_data = $self->persistence->get_generic_book($key);
 
   return unless defined($wire_data);
 
   my $book =
     Game::EvonyTKR::Model::Factory->build_from_wire('Book', $wire_data);
-  $generic_books->{$key} = $book if defined($book);
+
   return $book;
 }
 
-sub list_generic_books ($self) {
+sub list_generic_books ($self, $level) {
   require Mojo::File;
   require Mojo::Home;
   require List::UtilsBy;
@@ -111,9 +106,15 @@ sub list_generic_books ($self) {
   my $collectionDir = $mh->child('share/collections/data');
   my $gbdir         = $collectionDir->child('generic books');
   my @suffixlist    = ('.yaml', '.yml');
-  my @files         = $gbdir->list->grep(sub { $_ =~ /\.ya?ml$/ && -f -r $_ })
+  my @files         = $gbdir->list->grep(sub { $_->basename =~ /^Level\s+${level}\s+.+\.ya?ml$/ && -f -r $_ })
     ->sort->map(sub { return $_->basename(@suffixlist) })->each;
-  return [List::UtilsBy::uniq_by { lc($self->normalize($_)) } @files];
+  my @intermediate = List::UtilsBy::uniq_by { lc($self->normalize($_)) } @files;
+  my @final;
+  foreach my $ib (@intermediate){
+    $ib =~ s/^Level\s+\d+\s+//;
+    push @final, $ib;
+  }
+  return \@final;
 }
 
 1;

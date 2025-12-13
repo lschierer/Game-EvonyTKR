@@ -49,51 +49,47 @@ package Game::EvonyTKR::External::Book::LoadAllGenerics {
       return $job->fail($errmessage);
     }
 
-    my @list = $job->list_generic_books()->@*;
-    $job->log_info(sprintf('Found %d generic books to process', scalar @list));
-
     my $enqueued_count = 0;
     my $skipped_count  = 0;
     my @job_ids        = ();
 
-    my $maxIndex = scalar(@list) - 1;
-    foreach my $index (0 .. $maxIndex) {
-      my $entry = $list[$index];
+    foreach my $level (1..4) {
+      my $ll = $job->list_generic_books($level);
+      $job->log_info(sprintf('Found %d generic books to process at level %s',
+      scalar @$ll, $level));
 
-      # Parse "Level X BookName" format
-      if ($entry =~ /^Level (\d+) (.+)$/) {
-        my ($level, $book_name) = ($1, $2);
+      my $maxIndex = scalar(@$ll) - 1;
+      foreach my $index (0 .. $maxIndex){
+        my $entry = $ll->[$index];
 
-        # Check if already in persistence
-        if ($job->get_generic_book($book_name, $level)) {
+        if ($job->get_generic_book($entry, $level)) {
           $job->log_debug(sprintf(
             'Skipping %s level %d - already in persistence',
-            $book_name, $level
+            $entry, $level
           ));
           $skipped_count++;
           next;
         }
-      }
-
-      my $job_id = $job->minion->enqueue(
-        load_book => [
-          $entry,
-          {
-            index      => $index,
-            is_generic => 1,
-            is_builtin => 0,
-            filebase   => $entry,
-            suffixlist => ['.yaml', '.yml'],
+        my $job_id = $job->minion->enqueue(
+          load_book => [
+            sprintf('Level %s %s', $level, $entry),
+            {
+              index      => $index,
+              is_generic => 1,
+              is_builtin => 0,
+              filebase   => $entry,
+              suffixlist => ['.yaml', '.yml'],
+            }
+          ] => {
+            attempts => 3,
+            delay    => rand(10),
+            priority => 10,
+            notes    => { prebuild_run_id => $job->prebuild_run_id },
           }
-        ] => {
-          attempts => 3,
-          delay    => rand(10),
-          priority => 10,
-          notes    => { prebuild_run_id => $job->prebuild_run_id },
-        }
-      );
-      push @job_ids, $job_id;
-      $enqueued_count++;
+        );
+        push @job_ids, $job_id;
+        $enqueued_count++;
+      }
     }
 
     $job->log_info(sprintf(
@@ -154,13 +150,16 @@ package Game::EvonyTKR::External::Book::LoadAllGenerics {
         my $all_in_persistence = 1;
         my $missing_count      = 0;
 
-        foreach my $entry (@list) {
-          # Parse "Level X BookName" format
-          if ($entry =~ /^Level (\d+) (.+)$/) {
-            my ($level, $book_name) = ($1, $2);
-            unless ($job->get_generic_book($book_name, $level)) {
-              $all_in_persistence = 0;
-              $missing_count++;
+        foreach my $level (1..4) {
+          my @list = $job->list_generic_books($level)->@*;
+          foreach my $entry (@list) {
+            # Parse "Level X BookName" format
+            if ($entry =~ /^Level (\d+) (.+)$/) {
+              my ($level, $book_name) = ($1, $2);
+              unless ($job->get_generic_book($book_name, $level)) {
+                $all_in_persistence = 0;
+                $missing_count++;
+              }
             }
           }
         }

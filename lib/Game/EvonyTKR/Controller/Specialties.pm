@@ -57,8 +57,12 @@ package Game::EvonyTKR::Controller::Specialties {
       ->to(controller => $controller_name, action => 'index')
       ->name("${base}_index");
 
+    $mainRoutes->get('/:specialty_name')
+      ->to(controller => $controller_name, action => 'show')
+      ->name("${base}_show");
+
     # Build routes synchronously during app startup
-    $c->build_routes($app, $mainRoutes, $controller_name);
+    $c->build_nav_items($app, $mainRoutes, $controller_name);
 
     $app->helper(
       specialty_level_names => sub ($self, $level = '', $printable = 0) {
@@ -98,7 +102,14 @@ package Game::EvonyTKR::Controller::Specialties {
 
   }
 
-  sub build_routes ($c, $app, $mainRoutes, $controller_name) {
+  sub build_nav_items ($c, $app, $mainRoutes, $controller_name) {
+
+    if($c->are_prereqs_outstanding($app->minion, ['load_all_specialties', ])){
+      Mojo::IOLoop->timer(30 => sub{
+        $c->build_nav_items($app, $mainRoutes, $controller_name);
+      });
+    }
+
     my $specialties = [];
     foreach my $sn ($c->list_specialties->@*) {
       my $specialty = $c->get_specialty($sn);
@@ -111,26 +122,16 @@ package Game::EvonyTKR::Controller::Specialties {
     foreach my $specialty (@$specialties) {
       my $name = $specialty->name;
 
-      my $clean_name = $name;
-      $clean_name =~ s{^/}{};
-
-      $mainRoutes->get($clean_name => { name => $clean_name })
-        ->to(controller => $controller_name, action => 'show')
-        ->name("${base}_show");
-
       $app->add_navigation_item({
-        title  => "Details for $name",
+        title  => "Details for the $name Specialty",
         path   => "$base/$name",
         parent => "$base",
         order  => 40,
       });
 
       $c->log_debug(
-        sprintf('added route and nav item for name "%s" ', $name)
-          . sprintf(
-          'cleaned to "%s" with path "%s/%s"',
-          $clean_name, $base, $name
-          )
+        sprintf('added nav item for name "%s" with path "%s/%s"',
+          $name, $base, $name)
       );
     }
   }
@@ -204,14 +205,14 @@ package Game::EvonyTKR::Controller::Specialties {
 
   sub show ($c) {
     $c->log_debug("start of show method");
-    my $name = $c->param('name');
+    my $name = $c->param('specialty_name');
     $c->log_debug("show detects name $name, showing details.");
 
     my $specialty = $c->get_specialty($name);
 
     unless ($specialty) {
-      $c->log_error("specialty '$name' was not found.");
-      return $c->reply->not_found;
+      $c->log_debug("specialty '$name' was not found, passing through to other routes.");
+      return $c->continue;  # Pass through to allow other routes to match
     }
     $c->log_debug("retrieved specialty $specialty");
 

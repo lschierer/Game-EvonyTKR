@@ -147,23 +147,15 @@ package Game::EvonyTKR::External::Prebuild {
       return $job->retry({ delay => 10 });
     }
 
-    # Check if we should force a rebuild regardless of data state
-    my $force_reload = $ENV{FORCE_DATA_RELOAD} || 0;
-    if ($force_reload) {
-      $job->log_info(
-        "FORCE_DATA_RELOAD set - rebuilding data regardless of current state");
-    }
-
     # Get current version from config (git-commit)
     my $current_version =
       eval { $job->app->config->{version}{'git-commit'} } // 'unknown';
     $job->log_info("Current git-commit: $current_version");
-
+    my $stored_version = 0;
     # Check if data is current for this version
-    unless ($force_reload) {
       my $data_current = 0;
       eval {
-        my $stored_version = $job->persistence->get_data_version;
+        $stored_version = $job->persistence->get_data_version;
 
         if ($stored_version && $stored_version eq $current_version) {
           # Version matches - verify data actually exists
@@ -202,10 +194,7 @@ package Game::EvonyTKR::External::Prebuild {
         $data_current = 0;
       }
 
-      if ($data_current) {
-        return $job->finish("Data current for version $current_version");
-      }
-    }
+
 
     my $owner         = $$ . '@' . ($ENV{HOSTNAME} // 'localhost');
     my $job_key       = 'prebuild_run';
@@ -220,55 +209,55 @@ package Game::EvonyTKR::External::Prebuild {
 
     my $loaderJobDefs = {
       load_all_ascending_attributes => {
-        args     => [],
+        args     => [$stored_version, $current_version],
         attempts => 3,
         delay    => 1,
         priority => 50,
       },
       load_all_generic_books => {
-        args     => [],
+        args     => [$stored_version, $current_version],
         attempts => 3,
         delay    => 1,
         priority => 50,
       },
       load_all_builtin_books => {
-        args     => [],
+        args     => [$stored_version, $current_version],
         attempts => 3,
         delay    => 1,
         priority => 60,
       },
       load_all_specialties => {
-        args     => [],
+        args     => [$stored_version, $current_version],
         attempts => 3,
         delay    => 1,
         priority => 60,
       },
       load_all_generals => {
-        args     => ['prebuild load_all_generals'],
+        args     => ['prebuild load_all_generals', $stored_version, $current_version],
         attempts => 3,
         delay    => 5,
         priority => 10,
       },
       load_all_covenants => {
-        args     => [],
+        args     => [$stored_version, $current_version],
         attempts => 3,
         delay    => 5,
         priority => 10,
       },
       load_all_glossary_terms => {
-        args     => [],
+        args     => [$stored_version, $current_version],
         attempts => 3,
         delay    => 1,
         priority => 60,
       },
       load_ml_conflicts => {
-        args     => [],
+        args     => [$stored_version, $current_version],
         attempts => 3,
         delay    => 5,
         priority => 15,
       },
       load_all_pair_builders => {
-        args     => [],
+        args     => [$stored_version, $current_version],
         attempts => 5,
         delay    => 6,
         priority => 50,

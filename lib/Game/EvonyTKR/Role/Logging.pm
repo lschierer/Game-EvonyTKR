@@ -177,6 +177,7 @@ BEGIN {
   #(ALL|FATAL|TRACE|DEBUG|INFO|WARN|ERROR|FATAL|OFF)
   $logLevelOverrides = {
     'Game::EvonyTKR'                                         => 'DEBUG',
+    'Game::EvonyTKR::Controller::Books'                      => 'DEBUG',
     'Game::EvonyTKR::Controller::Generals'                   => 'INFO',
     'Game::EvonyTKR::External::AscendingAttributes::LoadAll' => 'DEBUG',
     'Game::EvonyTKR::External::AscendingAttributes::Loader'  => 'DEBUG',
@@ -195,7 +196,7 @@ BEGIN {
     'Game::EvonyTKR::Model::General'                         => 'INFO',
     'Game::EvonyTKR::Model::Specialty'                       => 'INFO',
     'Game::EvonyTKR::Plugins::Navigation'                    => 'WARN',
-    'Game::EvonyTKR::Role::Persistence::AscendingAttributes' => 'DEBUG',
+    'Game::EvonyTKR::Role::Persistence::Books'               => 'DEBUG',
     'Game::EvonyTKR::Role::Persistence'                      => 'WARN',
     'Game::EvonyTKR::Shared::Logger'                         => 'INFO',
     'Test::Package'                                          => 'TRACE',
@@ -223,7 +224,19 @@ BEGIN {
       $config .= "log4perl.logger.$category = ${level}\n";
     }
     else {
-      $config .= "log4perl.logger.$category = ${defaultMode}\n";
+      my @parts = split '::', $package;
+      my $overrideSet = 0;
+      while(scalar(@parts)){
+        pop(@parts);
+        my $p = join('::', @parts);
+        if(exists $logLevelOverrides->{$p}){
+          my $level = $logLevelOverrides->{$p};
+          $config .= "log4perl.logger.$category = ${level}\n";
+          $overrideSet = 1;
+          last;
+        }
+      }
+      $config .= "log4perl.logger.$category = ${defaultMode}\n" unless($overrideSet);
     }
   }
 

@@ -202,12 +202,12 @@ sub get_all_books ($self, $type = 'generic') {
 }
 
 # Legacy book methods
-sub get_generic_book ($self, $name, $level = undef) {
-  $self->get_book($name, 'generic');
+sub get_generic_book ($self, $key) {
+  $self->get_book($key, 'generic');
 }
 
-sub get_builtin_book ($self, $name, $level = undef) {
-  $self->get_book($name, 'builtin');
+sub get_builtin_book ($self, $key) {
+  $self->get_book($key, 'builtin');
 }
 sub get_all_generic_books ($self) { $self->get_all_books('generic') }
 sub get_all_builtin_books ($self) { $self->get_all_books('builtin') }
