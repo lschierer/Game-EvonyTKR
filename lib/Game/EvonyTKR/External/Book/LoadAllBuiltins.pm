@@ -212,11 +212,20 @@ package Game::EvonyTKR::External::Book::LoadAllBuiltins {
         return $job->fail($errmsg);
       }
     }
+    # If no jobs were enqueued (data already in persistence), we still succeeded
+    elsif ($skipped_count > 0) {
+      $job->log_info(sprintf(
+        'All data already in persistence - no jobs needed (skipped %d)',
+        $skipped_count
+      ));
+    }
 
-    # Mark this job as completed in persistence
+    # Mark this job as completed in persistence (with run_id for isolation)
+    # IMPORTANT: This must be OUTSIDE the if (@job_ids) block so jobs that
+    # skip all work (because data exists) still mark themselves complete
     my $run_id = $job->info->{notes}->{prebuild_run_id};
     $job->mark_task_completed($job->task_name, $run_id);
-  }
+    }
 }
 1;
 __END__
