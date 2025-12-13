@@ -126,6 +126,8 @@ package Game::EvonyTKR::External::Prebuild {
       say '$job not defined in run for ' . __PACKAGE__;
       return;
     }
+    return $job->finish(sprintf('pid %s job id %s is not the only prebuild',
+    $$, $job->info->{id})) unless $job->minion->lock('prebuild_guard', 300);
     $job->SUPER::run(@args);
     unless (defined($job->minion)) {
       my $errmessage = sprintf('minion undefined in job for %s', __PACKAGE__);
