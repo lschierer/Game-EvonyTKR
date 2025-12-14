@@ -129,7 +129,7 @@ package Game::EvonyTKR::Controller::Covenants {
       ->to(controller => $controller_name, action => 'show')
       ->name('covenant_details');
 
-    $c->_ensure_navigation_built();
+    $c->_ensure_navigation_built($app);
   }
 
   sub _build_covenant_nav($c, $covenant_name, $app) {
@@ -167,7 +167,7 @@ package Game::EvonyTKR::Controller::Covenants {
     }
   }
 
-  sub _ensure_navigation_built($c) {
+  sub _ensure_navigation_built($c, $app) {
     state $nav_built = 0;
     return if $nav_built;
 
@@ -196,7 +196,7 @@ package Game::EvonyTKR::Controller::Covenants {
       }
 
       # Always build nav, even with degraded data
-      $c->_build_covenant_nav($display_name, $c->app);
+      $c->_build_covenant_nav($display_name, $app);
     }
 
     $nav_built = 1;
@@ -209,7 +209,7 @@ package Game::EvonyTKR::Controller::Covenants {
     $c->log_debug(sprintf('Rendering index for %s', __PACKAGE__));
 
     # Build navigation items if not already done
-    $c->_ensure_navigation_built();
+    $c->_ensure_navigation_built($c->app);
 
     # Check if markdown exists for this collection
     my $distDir       = Mojo::Home->new->detect('Game::EvonyTKR');
@@ -255,7 +255,7 @@ package Game::EvonyTKR::Controller::Covenants {
     $c->log_debug("start of show method");
 
     # Build navigation items if not already done
-    $c->_ensure_navigation_built();
+    $c->_ensure_navigation_built($c->app);
 
     use Encode qw(decode is_utf8);
     my $name = $c->param('name') // '';

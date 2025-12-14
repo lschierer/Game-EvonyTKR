@@ -447,25 +447,56 @@ sub get_conflict ($self, $g1, $g2) {
 }
 
 sub load_all_conflicts ($self) {
-  my $result = $self->dynamodb->Scan(
-    TableName                 => $self->table_name,
-    FilterExpression          => 'entity_type = :entity_type',
-    ExpressionAttributeValues => {
-      ':entity_type' => { S => 'general_conflicts' }
-    }
-  );
+  my $result = eval {
+    $self->dynamodb->Scan(
+      TableName                 => $self->table_name,
+      FilterExpression          => 'entity_type = :entity_type',
+      ExpressionAttributeValues => {
+        ':entity_type' => { S => 'general_conflicts' }
+      }
+    );
+  };
+
+  if ($@) {
+    $self->log_error(sprintf("[DynamoDB] Scan failed for conflicts: %s", $@));
+    return {};
+  }
+
+  unless ($result && $result->Items) {
+    $self->log_debug("[DynamoDB] No conflict items found in scan");
+    return {};
+  }
 
   my $conflicts = {};
   for my $item (@{ $result->Items }) {
-    my $sk = $item->{sk}->{S};
+    # Convert AttributeMap to hash if needed
+    my $item_hash = ref($item) eq 'HASH' ? $item : $item->Map;
+
+    # Extract sk and validate
+    my $sk = $item_hash->{sk}->{S} or next;
     my ($g1, $g2) = split ':', $sk;
-    my $data         = $self->decode($item->{data}->{S});
+    next unless ($g1 && $g2);
+
+    # Extract and decode data
+    my $data_str = $item_hash->{data}->{S};
+    unless (defined $data_str && length($data_str) > 0) {
+      $self->log_warn(sprintf("[DynamoDB] Empty data for conflict %s", $sk));
+      next;
+    }
+
+    my $data = eval { $self->decode($data_str) };
+    if ($@) {
+      $self->log_error(sprintf("[DynamoDB] Failed to decode conflict data for %s: %s", $sk, $@));
+      next;
+    }
+
     my $has_conflict = $data->{conflicts} ? 1 : 0;
 
     $conflicts->{$g1}{$g2} = $has_conflict;
     $conflicts->{$g2}{$g1} = $has_conflict;
   }
 
+  $self->log_info(sprintf("[DynamoDB] Loaded %d conflict relationships", scalar(keys %$conflicts)));
   return $conflicts;
 }
 
