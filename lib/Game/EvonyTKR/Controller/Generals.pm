@@ -253,22 +253,36 @@ sub _build_general_routes($c, $general_name, $app) {
   # Build navigation item for this general
   use Encode qw(decode_utf8 is_utf8);
 
+  # Guard against undefined values
+  unless (defined $general_name && length($general_name)) {
+    $c->log_error('_build_general_routes called with empty general_name, skipping');
+    return;
+  }
+
+  unless (defined $app) {
+    $c->log_error('_build_general_routes called with undefined app, skipping');
+    return;
+  }
+
   # Ensure the name is properly decoded as UTF-8
   my $display_name =
     is_utf8($general_name) ? $general_name : decode_utf8($general_name);
   my $gr = "/Reference/Generals/$display_name";
 
-  $c->log_debug(sprintf(
-    "Building nav for: %s (is_utf8: %s, path: %s)",
-    $display_name, is_utf8($display_name) ? 'yes' : 'no', $gr
-  ));
-
-  $app->add_navigation_item({
-    title  => $display_name,
-    path   => $gr,
-    parent => '/Reference/Generals',
-    order  => 20,
-  });
+  eval {
+    $app->add_navigation_item({
+      title  => $display_name,
+      path   => $gr,
+      parent => '/Reference/Generals',
+      order  => 20,
+    });
+  };
+  if ($@) {
+    $c->log_error(sprintf(
+      'Failed to add nav item for general %s: %s',
+      $general_name, $@
+    ));
+  }
 }
 
 sub _ensure_navigation_built($c) {
@@ -286,8 +300,24 @@ sub _ensure_navigation_built($c) {
   # Build navigation for all generals
   foreach my $general_name (@general_names) {
     my $general = eval { $c->get_general($general_name) };
-    next unless $general;
-    $c->_build_general_routes($general->name, $c->app);
+
+    # Determine display name with fallbacks
+    my $display_name;
+    if ($general) {
+      $display_name = eval { $general->name };
+    }
+
+    # Fallback to general filename if object name unavailable
+    if (!defined($display_name) || !length($display_name)) {
+      $c->log_warn(sprintf(
+        'General %s has no valid name, using list name as fallback',
+        $general_name // 'undef'
+      ));
+      $display_name = $general_name;
+    }
+
+    # Always build nav, even with degraded data
+    $c->_build_general_routes($display_name, $c->app);
   }
 
   $nav_built = 1;

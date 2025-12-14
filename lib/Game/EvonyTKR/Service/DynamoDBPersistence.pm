@@ -180,6 +180,11 @@ sub set_metadata ($self, $key, $value) {
   return $self->_put_item('metadata', $key, $value);
 }
 
+sub get_current_prebuild_run_id ($self) {
+  my $metadata = $self->get_metadata('current_prebuild_run_id');
+  return $metadata ? $metadata->{run_id} : undef;
+}
+
 # Job completion tracking
 sub mark_job_completed ($self, $job_name, $run_id = undef) {
   my $sk = $run_id ? "${run_id}:${job_name}" : $job_name;

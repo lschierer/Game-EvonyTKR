@@ -154,12 +154,25 @@ package Game::EvonyTKR::Role::Common {
     my @outstanding  = ();
     my @failed_tasks = ();
 
-    # Get prebuild_run_id from job if available (for run-scoped completion tracking)
+    # Get prebuild_run_id for run-scoped completion tracking
+    # Try multiple sources in order of preference:
+    # 1. Job's own prebuild_run_id attribute (for Minion jobs)
+    # 2. Job's notes (for child jobs)
+    # 3. Current prebuild_run_id from persistence (for controllers)
     my $run_id;
     if ($self->can('prebuild_run_id')) {
       $run_id = $self->prebuild_run_id;
     } elsif ($self->can('info') && $self->info && $self->info->{notes}) {
       $run_id = $self->info->{notes}->{prebuild_run_id};
+    }
+
+    # If no run_id yet (e.g., controller), fetch current run from persistence
+    unless ($run_id) {
+      $run_id = $persistence->get_current_prebuild_run_id();
+      $self->log_debug(sprintf(
+        'No local run_id, fetched current from persistence: %s',
+        $run_id // 'none'
+      ));
     }
 
     foreach my $prereq (@$prereq_tasks) {

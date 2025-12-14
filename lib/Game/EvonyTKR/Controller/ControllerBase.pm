@@ -131,6 +131,50 @@ package Game::EvonyTKR::Controller::ControllerBase {
         );
       }
     );
+
+    # API endpoint to get all routes with metadata
+    $routes->get('/api/routes')->to(
+      cb => sub($self) {
+        my @all_routes;
+
+        my $walk_routes;
+        $walk_routes = sub {
+          my ($route, $parent_path) = @_;
+          $parent_path //= "";
+
+          my $pattern = $route->pattern->unparsed // "";
+          my $full_path = $parent_path . $pattern;
+          my $name = $route->name // undef;
+          my $to = $route->to // {};
+
+          # Only include non-empty paths
+          if ($full_path && $full_path ne "/" && $full_path ne "") {
+            my $route_methods = $route->methods;
+            push @all_routes, {
+              path       => $full_path,
+              name       => $name,
+              controller => $to->{controller} // undef,
+              action     => $to->{action} // undef,
+              methods    => $route_methods ? [sort @{$route_methods}] : undef,
+            };
+          }
+
+          # Recursively walk children
+          foreach my $child (@{$route->children}) {
+            $walk_routes->($child, $full_path);
+          }
+        };
+
+        $walk_routes->($app->routes);
+
+        $self->render(
+          json => {
+            routes => \@all_routes,
+            count  => scalar(@all_routes),
+          }
+        );
+      }
+    );
   }
 
   sub getRoutes($self) {

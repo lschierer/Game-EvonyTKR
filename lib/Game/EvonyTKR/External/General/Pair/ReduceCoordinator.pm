@@ -80,7 +80,7 @@ package Game::EvonyTKR::External::General::Pair::ReduceCoordinator {
     })->total;
 
     if ($active_batches > 0 || $new_batches > 0) {
-      return $job->retry({ delay => 5 });
+      return $job->retry({ delay => $job->standard_delay });
     }
 
     my $cache_effectiveness =
@@ -92,6 +92,17 @@ package Game::EvonyTKR::External::General::Pair::ReduceCoordinator {
       "Cache effectiveness: %d cache hits out of %d total conflicts (%s)",
       $total_cache_hits, $total_conflicts, $cache_effectiveness
     ));
+
+    # Flush pairs_by_type to persistence before marking complete
+    my $pairs_by_type = $job->pairs_by_type();
+    foreach my $type (keys %$pairs_by_type) {
+      my $pairs = $pairs_by_type->{$type};
+      $job->log_info(sprintf(
+        'Storing %d pairs for type %s to persistence',
+        scalar(@$pairs), $type
+      ));
+      $job->persistence->store_pairs($type, $pairs);
+    }
 
     # Set completion flags for both Pairs and ConflictGroups controllers
     my $pc_verify = 0;

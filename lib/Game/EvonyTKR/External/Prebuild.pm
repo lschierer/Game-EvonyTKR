@@ -273,6 +273,12 @@ package Game::EvonyTKR::External::Prebuild {
     $job->prebuild_run_id($run_id);
     $job->log_info("Prebuild run ID: $run_id");
 
+    # Store current run_id in persistence so controllers can find it
+    $job->set_metadata('current_prebuild_run_id', {
+      run_id     => $run_id,
+      started_at => time(),
+    });
+
     # Harvest ALL jobs from previous prebuild runs (assume previous prebuild crashed)
     my $harvested = $job->harvest_tagged_jobs();
     $job->log_info("Harvested $harvested jobs from previous runs");

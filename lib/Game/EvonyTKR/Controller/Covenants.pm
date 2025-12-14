@@ -135,16 +135,36 @@ package Game::EvonyTKR::Controller::Covenants {
   sub _build_covenant_nav($c, $covenant_name, $app) {
     use Encode qw(is_utf8 decode_utf8);
 
+    # Guard against undefined values - use fallbacks instead of failing
+    unless (defined $covenant_name && length($covenant_name)) {
+      $c->log_error('_build_covenant_nav called with empty covenant_name, skipping');
+      return;
+    }
+
+    unless (defined $app) {
+      $c->log_error('_build_covenant_nav called with undefined app, skipping');
+      return;
+    }
+
     my $display_name =
       is_utf8($covenant_name) ? $covenant_name : decode_utf8($covenant_name);
-    my $path = sprintf('%s/%s', $c->getBase(), $display_name);
+    my $base = $c->getBase();
+    my $path = sprintf('%s/%s', $base, $display_name);
 
-    $app->add_navigation_item({
-      title  => "Details for ${display_name}",
-      path   => $path,
-      parent => $c->getBase(),
-      order  => 40,
-    });
+    eval {
+      $app->add_navigation_item({
+        title  => "Details for ${display_name}",
+        path   => $path,
+        parent => $base,
+        order  => 40,
+      });
+    };
+    if ($@) {
+      $c->log_error(sprintf(
+        'Failed to add nav item for covenant %s: %s',
+        $covenant_name, $@
+      ));
+    }
   }
 
   sub _ensure_navigation_built($c) {
@@ -159,8 +179,24 @@ package Game::EvonyTKR::Controller::Covenants {
 
     foreach my $covenant_name (@covenant_names) {
       my $covenant = eval { $c->get_covenant($covenant_name) };
-      next unless $covenant;
-      $c->_build_covenant_nav($covenant->primary->name, $c->app);
+
+      # Determine display name with fallbacks
+      my $display_name;
+      if ($covenant && defined($covenant->primary)) {
+        $display_name = eval { $covenant->primary->name };
+      }
+
+      # Fallback to covenant filename if primary name unavailable
+      if (!defined($display_name) || !length($display_name)) {
+        $c->log_warn(sprintf(
+          'Covenant %s has no valid primary name, using covenant name as fallback',
+          $covenant_name // 'undef'
+        ));
+        $display_name = $covenant_name;
+      }
+
+      # Always build nav, even with degraded data
+      $c->_build_covenant_nav($display_name, $c->app);
     }
 
     $nav_built = 1;

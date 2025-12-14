@@ -104,39 +104,87 @@ package Game::EvonyTKR::Controller::Books {
 
     my $books = [];
     foreach my $bn ($c->list_builtin_books->@*) {
-      my $book = $c->get_builtin_book($bn);
-      unless($book){
-        $c->log_error(sprintf('failed to retrieve built in book "%s" after prereq check passed', $bn));
-        next;
+      my $book = eval { $c->get_builtin_book($bn) };
+
+      # Determine display name with fallbacks
+      my $display_name;
+      if ($book) {
+        $display_name = eval { $book->name };
       }
-      push @{ $books }, $book;
-    }
-    foreach my $book (@$books) {
-      my $name = $book->name;
 
-      $app->add_navigation_item({
-        title  => "Details for the $name Book",
-        path   => "$base/$name",
-        parent => $base,
-        order  => 30,
-      });
+      # Fallback to book filename if object name unavailable
+      if (!defined($display_name) || !length($display_name)) {
+        $c->log_warn(sprintf(
+          'Builtin book %s has no valid name, using list name as fallback',
+          $bn // 'undef'
+        ));
+        $display_name = $bn;
+      }
 
-      $c->log_debug(sprintf('Added nav item for "%s"', $name));
+      # Always build nav, even with degraded data
+      eval {
+        $app->add_navigation_item({
+          title  => "Details for the $display_name Book",
+          path   => "$base/$display_name",
+          parent => $base,
+          order  => 30,
+        });
+      };
+      if ($@) {
+        $c->log_error(sprintf(
+          'Failed to add nav item for builtin book %s: %s',
+          $bn, $@
+        ));
+      } else {
+        $c->log_debug(sprintf(
+          'added nav item for builtin book name "%s" with path "%s/%s"',
+          $display_name, $base, $display_name
+        ));
+      }
+
+      # Only add to books list if we have a valid object
+      push @{ $books }, $book if $book;
     }
 
     foreach my $level (1..4){
       foreach my $bn ($c->list_generic_books($level)->@*) {
-        my $book = $c->get_generic_book($bn, $level);
-        unless($book){
-          $c->log_error(sprintf('failed to retrieve generic in book "%s" after prereq check passed', $bn));
-          next;
+        my $book = eval { $c->get_generic_book($bn, $level) };
+
+        # Determine display name with fallbacks
+        my $display_name;
+        if ($book) {
+          $display_name = eval { $book->name };
         }
-        $app->add_navigation_item({
-          title  => sprintf('Details for the Level %s %s Book', $level, $book->name),
-          path   => sprintf('%s/Level %s %s', $base, $level, $book->name),
-          parent => $base,
-          order  => 30,
-        });
+
+        # Fallback to book filename if object name unavailable
+        if (!defined($display_name) || !length($display_name)) {
+          $c->log_warn(sprintf(
+            'Generic book %s (level %s) has no valid name, using list name as fallback',
+            $bn // 'undef', $level
+          ));
+          $display_name = $bn;
+        }
+
+        # Always build nav, even with degraded data
+        eval {
+          $app->add_navigation_item({
+            title  => sprintf('Details for the Level %s %s Book', $level, $display_name),
+            path   => sprintf('%s/Level %s %s', $base, $level, $display_name),
+            parent => $base,
+            order  => 30,
+          });
+        };
+        if ($@) {
+          $c->log_error(sprintf(
+            'Failed to add nav item for generic book %s (level %s): %s',
+            $bn, $level, $@
+          ));
+        } else {
+          $c->log_debug(sprintf(
+            'added nav item for generic book name "%s" (level %s) with path "%s/Level %s %s"',
+            $display_name, $level, $base, $level, $display_name
+          ));
+        }
       }
     }
 

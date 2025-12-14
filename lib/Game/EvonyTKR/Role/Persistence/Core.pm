@@ -46,6 +46,19 @@ sub harvest_job_completions ($self, $run_id) {
   return $self->persistence->harvest_job_completions($run_id);
 }
 
+sub get_current_prebuild_run_id ($self) {
+  my $metadata = $self->persistence->get_metadata('current_prebuild_run_id');
+  return $metadata ? $metadata->{run_id} : undef;
+}
+
+sub set_metadata ($self, $key, $value) {
+  return $self->persistence->set_metadata($key, $value);
+}
+
+sub get_metadata ($self, $key) {
+  return $self->persistence->get_metadata($key);
+}
+
 1;
 __END__
 
