@@ -445,7 +445,7 @@ sub get_conflict ($self, $g1, $g2) {
 }
 
 sub load_all_conflicts ($self) {
-  my $result = $self->DynamoDB->Scan(
+  my $result = $self->dynamodb->Scan(
     TableName                 => $self->table_name,
     FilterExpression          => 'entity_type = :entity_type',
     ExpressionAttributeValues => {
