@@ -54,7 +54,7 @@ has 'lifecycle_id' => sub ($self) {
 sub _put_item ($self, $pk, $sk, $data, $entity_type = undef) {
   $entity_type //= $pk;
 
-  $self->log_info( sprintf("[DynamoDB] _put_item called: pk=%s, sk=%s, table=%s\n",
+  $self->log_info(sprintf("[DynamoDB] _put_item called: pk=%s, sk=%s, table=%s",
     $pk, $sk, $self->table_name));
 
   my $item = {
@@ -70,13 +70,15 @@ sub _put_item ($self, $pk, $sk, $data, $entity_type = undef) {
       TableName => $self->table_name,
       Item      => $item
     );
+    1;
+  } or do {
+    my $error = $@ || 'unknown error';
+    $self->log_error(sprintf("[DynamoDB] PutItem FAILED for pk=%s, sk=%s: %s", $pk, $sk, $error));
+    warn sprintf("[DynamoDB] PutItem FAILED for pk=%s, sk=%s: %s\n", $pk, $sk, $error);
+    return 0;
   };
 
-  if ($@) {
-    $self->log_error(sprintf("[DynamoDB] PutItem FAILED for pk=%s, sk=%s: %s\n", $pk, $sk, $@));
-    return 0;
-  }
-  $self->log_info(sprintf("[DynamoDB] PutItem SUCCESS for pk=%s, sk=%s\n", $pk, $sk));
+  $self->log_info(sprintf("[DynamoDB] PutItem SUCCESS for pk=%s, sk=%s", $pk, $sk));
   return 1;
 }
 

@@ -35,7 +35,16 @@ sub persistence ($self) {
 ##############################################################################
 
 sub mark_task_completed ($self, $task_name, $run_id = undef) {
-  return $self->persistence->mark_job_completed($task_name, $run_id);
+  $self->log_info(sprintf(
+    "[Persistence::Core] mark_task_completed called: task=%s, run_id=%s, backend=%s",
+    $task_name, $run_id // 'none', ref($self->persistence->backend)
+  ));
+  my $result = $self->persistence->mark_job_completed($task_name, $run_id);
+  $self->log_info(sprintf(
+    "[Persistence::Core] mark_job_completed returned: %s",
+    $result ? 'success' : 'failure'
+  ));
+  return $result;
 }
 
 sub is_task_completed ($self, $task_name, $run_id = undef) {
@@ -52,7 +61,16 @@ sub get_current_prebuild_run_id ($self) {
 }
 
 sub set_metadata ($self, $key, $value) {
-  return $self->persistence->set_metadata($key, $value);
+  $self->log_info(sprintf(
+    "[Persistence::Core] set_metadata called: key=%s, backend=%s",
+    $key, ref($self->persistence->backend)
+  ));
+  my $result = $self->persistence->set_metadata($key, $value);
+  $self->log_info(sprintf(
+    "[Persistence::Core] set_metadata returned: %s",
+    $result ? 'success' : 'failure'
+  ));
+  return $result;
 }
 
 sub get_metadata ($self, $key) {
