@@ -39,7 +39,7 @@ package Game::EvonyTKR::Controller::AscendingAttributes {
 
     $app->helper(
       get_ascendingattributes_for_general => sub ($self, $g) {
-        return $c->get_ascendingattributes_for_general($app, $g);
+        return $c->get_ascendingattributes_for_general( $g);
       }
     );
 
@@ -133,7 +133,7 @@ package Game::EvonyTKR::Controller::AscendingAttributes {
 
   sub get_ascending_section ($c, $caller, $app, $name = '') {
     if (length($name)) {
-      my $item = $c->get_ascendingattributes_for_general($app, $name);
+      my $item = $c->get_ascendingattributes_for_general( $name);
       if ( Scalar::Util::reftype($item)
         && Scalar::Util::reftype($item) eq 'HASH'
         && blessed($item) eq 'Game::EvonyTKR::Model::AscendingAttributes') {
@@ -160,7 +160,7 @@ package Game::EvonyTKR::Controller::AscendingAttributes {
     return "";
   }
 
-  sub get_ascendingattributes_for_general ($c, $app, $g) {
+  sub get_ascendingattributes_for_general ($c, $g) {
 
     my $nn;
     my $gn;
@@ -171,22 +171,17 @@ package Game::EvonyTKR::Controller::AscendingAttributes {
     }
     else {
       $gn = "$g";
-      $nn = lc($c->normalize($g));
+      $nn = lc($c->normalize($gn));
     }
-    $nn =~ s/ /_/g;
+
     $c->log_debug("looking for attributes for $nn");
 
-    my $all = $c->($app);
-    my $aa  = $all->{$nn};
+    my $aa  = $c->get_ascending_attributes($nn);
     unless (defined $aa) {
       $c->log_error(sprintf(
         'no ascending attributes found for '
           . 'general named "%s" normalized to "%s"',
         $gn, $nn
-      ));
-      $c->log_debug(sprintf(
-        'available ascending attributes are %s',
-        join ', ', map { sprintf('"%s"', $_) } sort keys $all->%*
       ));
     }
     $c->log_debug(
