@@ -425,6 +425,10 @@ sub get_all_glossary_terms ($self) {
   return $self->get_all_data('glossary_terms');
 }
 
+sub list_glossary_terms ($self) {
+  return $self->get_all_glossary_terms();
+}
+
 sub count_glossary_terms ($self) {
   my $items = $self->_query_items('glossary_terms');
   return scalar @$items;

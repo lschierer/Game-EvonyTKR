@@ -120,8 +120,8 @@ package Game::EvonyTKR::Role::Common {
   }
 
   # Generic prerequisite checker for Minion jobs and controllers
-  # Uses persistence layer to check job completion across hypnotoad restarts
-  # $prereq_tasks: arrayref of task names that must be finished
+  # Uses DynamoDB work unit tracker to check completion
+  # $prereq_tasks: arrayref of work unit names that must be complete
   # Returns: 0 if all prereqs met, 1 if outstanding (controllers)
   #          calls retry/fail for Minion jobs
   sub are_prereqs_outstanding ($self, $minion, $prereq_tasks) {
@@ -139,56 +139,24 @@ package Game::EvonyTKR::Role::Common {
       return 1;
     }
 
-    # Get persistence service (assuming we have it via Role::Persistence)
-    my $persistence;
-    if ($self->can('persistence')) {
-      $persistence = $self->persistence;
-    }
-    else {
-      # Fallback: create a new instance
-      require Game::EvonyTKR::Service::Persistence;
-      $persistence = Game::EvonyTKR::Service::Persistence->new;
-    }
+    # Get work unit tracker
+    require Game::EvonyTKR::WorkUnit::Tracker;
+    my $tracker = Game::EvonyTKR::WorkUnit::Tracker->new(
+      ddb => $self->app->ddb  # Assuming app has ddb helper
+    );
 
     my $prereqs      = {};
     my @outstanding  = ();
     my @failed_tasks = ();
 
-    # Get prebuild_run_id for run-scoped completion tracking
-    # Try multiple sources in order of preference:
-    # 1. Job's own prebuild_run_id attribute (for Minion jobs)
-    # 2. Job's notes (for child jobs)
-    # 3. Current prebuild_run_id from persistence (for controllers)
-    my $run_id;
-    if ($self->can('prebuild_run_id')) {
-      $run_id = $self->prebuild_run_id;
-    } elsif ($self->can('info') && $self->info && $self->info->{notes}) {
-      $run_id = $self->info->{notes}->{prebuild_run_id};
-    }
-
-    # If no run_id yet (e.g., controller), fetch current run from persistence
-    unless ($run_id) {
-      $run_id = $persistence->get_current_prebuild_run_id();
-      $self->log_debug(sprintf(
-        'No local run_id, fetched current from persistence: %s',
-        $run_id // 'none'
-      ));
-    }
-
     foreach my $prereq (@$prereq_tasks) {
-      # Check persistence layer for completion (with run_id for isolation)
-      my $is_completed = $persistence->is_job_completed($prereq, $run_id);
+      # Check DDB for work unit completion
+      my $is_completed = $tracker->is_complete($prereq);
 
       if ($is_completed) {
         $prereqs->{$prereq} = 'completed';
         next;
       }
-
-      # DEBUG: Log why we think it's not complete
-      $self->log_debug(sprintf(
-        'Prereq %s not marked complete in persistence (run_id=%s)',
-        $prereq, $run_id // 'none'
-      ));
 
       # For controllers, we don't need to distinguish between pending/failed/not-started
       # They just show a wait page regardless

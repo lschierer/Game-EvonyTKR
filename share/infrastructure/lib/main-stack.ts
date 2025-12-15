@@ -70,6 +70,15 @@ export class MojoliciousStack extends Stack {
       encryption: dynamodb.TableEncryption.AWS_MANAGED, // Use AWS-managed encryption
     });
 
+    // Create DynamoDB table for work unit completion tracking
+    const workUnitsTable = new dynamodb.Table(this, 'WorkUnitsTable', {
+      tableName: `evony-work-units`,
+      partitionKey: { name: 'work_unit_id', type: dynamodb.AttributeType.STRING },
+      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+      removalPolicy: RemovalPolicy.DESTROY, // Always clean up work units
+      encryption: dynamodb.TableEncryption.AWS_MANAGED,
+    });
+
     const InstanceStack = new UbuntuInstance(
       this,
       `Mojo-${props.environment}-instance`,
@@ -77,6 +86,7 @@ export class MojoliciousStack extends Stack {
         ...props,
         vpc,
         persistenceTable,
+        workUnitsTable,
       },
     );
 

@@ -180,9 +180,12 @@ package Game::EvonyTKR::External::Conflicts::LoadML {
       $stored_count
     ));
 
-    # Mark this job as completed in persistence
-    my $run_id = $job->info->{notes}->{prebuild_run_id};
-    $job->mark_task_completed($job->task_name, $run_id);
+    # Mark work unit as complete
+    require Game::EvonyTKR::WorkUnit::Tracker;
+    my $tracker = Game::EvonyTKR::WorkUnit::Tracker->new(ddb => $job->app->ddb);
+    $tracker->mark_complete('ml_conflicts');
+    
+    $job->app->log->info("Marked work unit 'ml_conflicts' as complete");
   }
 
   sub _has_troop_overlap ($self, $g1, $g2) {

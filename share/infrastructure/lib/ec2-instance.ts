@@ -21,6 +21,7 @@ import { type MojoliciousStackProps } from './main-stack';
 interface UbuntuInstanceProps extends MojoliciousStackProps {
   vpc: ec2.IVpc | ec2.Vpc;
   persistenceTable: dynamodb.Table;
+  workUnitsTable: dynamodb.Table;
 }
 
 export class UbuntuInstance extends NestedStack {
@@ -43,6 +44,7 @@ export class UbuntuInstance extends NestedStack {
 
     // Grant DynamoDB read/write permissions to the instance
     props.persistenceTable.grantReadWriteData(instanceRole);
+    props.workUnitsTable.grantReadWriteData(instanceRole);
 
     instanceRole.addToPolicy(
       new iam.PolicyStatement({
@@ -57,6 +59,7 @@ export class UbuntuInstance extends NestedStack {
         ],
         resources: [
           `arn:aws:dynamodb:${this.region}:${this.account}:table/${props.persistenceTable.tableName}`,
+          `arn:aws:dynamodb:${this.region}:${this.account}:table/${props.workUnitsTable.tableName}`,
         ],
       }),
     );

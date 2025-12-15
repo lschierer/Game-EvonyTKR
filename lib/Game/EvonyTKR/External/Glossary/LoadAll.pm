@@ -98,9 +98,12 @@ package Game::EvonyTKR::External::Glossary::LoadAll {
     $job->log_info("Loaded $total_terms glossary terms");
     $job->note(total_terms => $total_terms);
 
-    # Mark this job as completed in persistence
-    my $run_id = $job->info->{notes}->{prebuild_run_id};
-    $job->mark_task_completed($job->task_name, $run_id);
+    # Mark work unit as complete
+    require Game::EvonyTKR::WorkUnit::Tracker;
+    my $tracker = Game::EvonyTKR::WorkUnit::Tracker->new(ddb => $job->app->ddb);
+    $tracker->mark_complete('glossary_terms');
+    
+    $job->app->log->info("Marked work unit 'glossary_terms' as complete");
   }
 }
 
