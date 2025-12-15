@@ -36,14 +36,14 @@ sub persistence ($self) {
 
 sub mark_task_completed ($self, $task_name, $run_id = undef) {
   $self->log_info(sprintf(
-    "[Persistence::Core] mark_task_completed called: task=%s, run_id=%s, backend=%s",
-    $task_name, $run_id // 'none', ref($self->persistence->backend)
+"[Persistence::Core] mark_task_completed called: task=%s, run_id=%s, backend=%s",
+    $task_name,
+    $run_id // 'none',
+    ref($self->persistence->backend)
   ));
   my $result = $self->persistence->mark_job_completed($task_name, $run_id);
-  $self->log_info(sprintf(
-    "[Persistence::Core] mark_job_completed returned: %s",
-    $result ? 'success' : 'failure'
-  ));
+  $self->log_info(sprintf("[Persistence::Core] mark_job_completed returned: %s",
+    $result ? 'success' : 'failure'));
   return $result;
 }
 
@@ -66,10 +66,8 @@ sub set_metadata ($self, $key, $value) {
     $key, ref($self->persistence->backend)
   ));
   my $result = $self->persistence->set_metadata($key, $value);
-  $self->log_info(sprintf(
-    "[Persistence::Core] set_metadata returned: %s",
-    $result ? 'success' : 'failure'
-  ));
+  $self->log_info(sprintf("[Persistence::Core] set_metadata returned: %s",
+    $result ? 'success' : 'failure'));
   return $result;
 }
 

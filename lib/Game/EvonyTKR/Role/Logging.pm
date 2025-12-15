@@ -176,34 +176,34 @@ BEGIN {
 
   #(ALL|FATAL|TRACE|DEBUG|INFO|WARN|ERROR|FATAL|OFF)
   $logLevelOverrides = {
-    'Game::EvonyTKR'                                         => 'DEBUG',
-    'Game::EvonyTKR::Controller::Books'                      => 'DEBUG',
-    'Game::EvonyTKR::Controller::Generals'                   => 'INFO',
-    'Game::EvonyTKR::External::AscendingAttributes'          => 'WARN',
-    'Game::EvonyTKR::External::Book'                         => 'DEBUG',
-    'Game::EvonyTKR::External::General::Summarizer'          => 'DEBUG',
-    'Game::EvonyTKR::External::Prebuild'                     => 'DEBUG',
-    'Game::EvonyTKR::External'                               => 'WARN',
-    'Game::EvonyTKR::Model::AscendingAttributes'             => 'INFO',
-    'Game::EvonyTKR::Model::BasicAttribute'                  => 'INFO',
-    'Game::EvonyTKR::Model::BasicAttributes'                 => 'INFO',
-    'Game::EvonyTKR::Model::Book'                            => 'INFO',
-    'Game::EvonyTKR::Model::Buff'                            => 'WARN',
-    'Game::EvonyTKR::Model::Buff::Matcher'                   => 'INFO',
-    'Game::EvonyTKR::Model::Buff::Summarizer'                => 'DEBUG',
-    'Game::EvonyTKR::Model::Buff::Value'                     => 'WARN',
-    'Game::EvonyTKR::Model::Covenant'                        => 'INFO',
-    'Game::EvonyTKR::Model::General'                         => 'INFO',
-    'Game::EvonyTKR::Model::Specialty'                       => 'INFO',
-    'Game::EvonyTKR::Plugins::Navigation'                    => 'WARN',
-    'Game::EvonyTKR::Role::Persistence::Books'               => 'DEBUG',
-    'Game::EvonyTKR::Role::Persistence::Core'                => 'INFO',
-    'Game::EvonyTKR::Role::Persistence'                      => 'WARN',
-    'Game::EvonyTKR::Service::DynamoDBPersistence'           => 'DEBUG',
-    'Game::EvonyTKR::Service::Persistence'                   => 'DEBUG',
-    'Game::EvonyTKR::Shared::Logger'                         => 'INFO',
-    'Test::Package'                                          => 'TRACE',
-    'Test'                                                   => 'TRACE',
+    'Game::EvonyTKR'                                => 'DEBUG',
+    'Game::EvonyTKR::Controller::Books'             => 'DEBUG',
+    'Game::EvonyTKR::Controller::Generals'          => 'INFO',
+    'Game::EvonyTKR::External::AscendingAttributes' => 'WARN',
+    'Game::EvonyTKR::External::Book'                => 'DEBUG',
+    'Game::EvonyTKR::External::General::Summarizer' => 'DEBUG',
+    'Game::EvonyTKR::External::Prebuild'            => 'DEBUG',
+    'Game::EvonyTKR::External'                      => 'WARN',
+    'Game::EvonyTKR::Model::AscendingAttributes'    => 'INFO',
+    'Game::EvonyTKR::Model::BasicAttribute'         => 'INFO',
+    'Game::EvonyTKR::Model::BasicAttributes'        => 'INFO',
+    'Game::EvonyTKR::Model::Book'                   => 'INFO',
+    'Game::EvonyTKR::Model::Buff'                   => 'WARN',
+    'Game::EvonyTKR::Model::Buff::Matcher'          => 'INFO',
+    'Game::EvonyTKR::Model::Buff::Summarizer'       => 'DEBUG',
+    'Game::EvonyTKR::Model::Buff::Value'            => 'WARN',
+    'Game::EvonyTKR::Model::Covenant'               => 'INFO',
+    'Game::EvonyTKR::Model::General'                => 'INFO',
+    'Game::EvonyTKR::Model::Specialty'              => 'INFO',
+    'Game::EvonyTKR::Plugins::Navigation'           => 'WARN',
+    'Game::EvonyTKR::Role::Persistence::Books'      => 'DEBUG',
+    'Game::EvonyTKR::Role::Persistence::Core'       => 'INFO',
+    'Game::EvonyTKR::Role::Persistence'             => 'WARN',
+    'Game::EvonyTKR::Service::DynamoDBPersistence'  => 'DEBUG',
+    'Game::EvonyTKR::Service::Persistence'          => 'DEBUG',
+    'Game::EvonyTKR::Shared::Logger'                => 'INFO',
+    'Test::Package'                                 => 'TRACE',
+    'Test'                                          => 'TRACE',
   };
 
   if ($Game::EvonyTKR::Role::Logging::DEBUG_LOGGING) {
@@ -227,19 +227,20 @@ BEGIN {
       $config .= "log4perl.logger.$category = ${level}\n";
     }
     else {
-      my @parts = split '::', $package;
+      my @parts       = split '::', $package;
       my $overrideSet = 0;
-      while(scalar(@parts)){
+      while (scalar(@parts)) {
         pop(@parts);
         my $p = join('::', @parts);
-        if(exists $logLevelOverrides->{$p}){
+        if (exists $logLevelOverrides->{$p}) {
           my $level = $logLevelOverrides->{$p};
           $config .= "log4perl.logger.$category = ${level}\n";
           $overrideSet = 1;
           last;
         }
       }
-      $config .= "log4perl.logger.$category = ${defaultMode}\n" unless($overrideSet);
+      $config .= "log4perl.logger.$category = ${defaultMode}\n"
+        unless ($overrideSet);
     }
   }
 

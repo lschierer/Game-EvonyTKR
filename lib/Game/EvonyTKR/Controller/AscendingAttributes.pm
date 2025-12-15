@@ -39,7 +39,7 @@ package Game::EvonyTKR::Controller::AscendingAttributes {
 
     $app->helper(
       get_ascendingattributes_for_general => sub ($self, $g) {
-        return $c->get_ascendingattributes_for_general( $g);
+        return $c->get_ascendingattributes_for_general($g);
       }
     );
 
@@ -133,7 +133,7 @@ package Game::EvonyTKR::Controller::AscendingAttributes {
 
   sub get_ascending_section ($c, $caller, $app, $name = '') {
     if (length($name)) {
-      my $item = $c->get_ascendingattributes_for_general( $name);
+      my $item = $c->get_ascendingattributes_for_general($name);
       if ( Scalar::Util::reftype($item)
         && Scalar::Util::reftype($item) eq 'HASH'
         && blessed($item) eq 'Game::EvonyTKR::Model::AscendingAttributes') {
@@ -176,7 +176,7 @@ package Game::EvonyTKR::Controller::AscendingAttributes {
 
     $c->log_debug("looking for attributes for $nn");
 
-    my $aa  = $c->get_ascending_attributes($nn);
+    my $aa = $c->get_ascending_attributes($nn);
     unless (defined $aa) {
       $c->log_error(sprintf(
         'no ascending attributes found for '

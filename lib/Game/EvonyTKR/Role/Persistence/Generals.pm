@@ -8,7 +8,8 @@ sub add_general ($self, $general) {
   my $name = lc($self->normalize($general->name));
   # Normalize the name before storing to ensure consistent lookups
   my $normalized_name = $self->normalize($name);
-  return $self->persistence->store_general($normalized_name, $general->to_wire_hash());
+  return $self->persistence->store_general($normalized_name,
+    $general->to_wire_hash());
 }
 
 sub get_general ($self, $name) {

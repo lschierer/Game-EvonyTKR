@@ -87,8 +87,9 @@ sub mark_job_completed ($self, $job_name, $run_id = undef) {
 
 sub is_job_completed ($self, $job_name, $run_id = undef) {
   my $key = $run_id ? "${run_id}:${job_name}" : $job_name;
-  my $result = $self->db->select('job_completed', ['job_name'],
-    { job_name => $key })->hash;
+  my $result =
+    $self->db->select('job_completed', ['job_name'], { job_name => $key })
+    ->hash;
 
   # If run-scoped lookup failed, try legacy key for backward compatibility
   if (!$result && $run_id) {
@@ -108,8 +109,7 @@ sub harvest_job_completions ($self, $current_run_id) {
 
   # First count what we're about to delete
   my $count = $self->db->select('job_completed',
-    [\'COUNT(*)'],
-    \["job_name NOT LIKE ?", "${current_run_id}:%"])->array->[0];
+    [\'COUNT(*)'], \["job_name NOT LIKE ?", "${current_run_id}:%"])->array->[0];
 
   # Delete all records that don't start with current_run_id
   # This includes legacy records (no run_id prefix) and old run_ids
@@ -123,7 +123,8 @@ sub harvest_job_completions ($self, $current_run_id) {
     return 0;
   }
 
-  warn sprintf("[SQLite] Harvested %d stale job_completed records\n", $count || 0);
+  warn
+    sprintf("[SQLite] Harvested %d stale job_completed records\n", $count || 0);
   return $count || 0;
 }
 
@@ -337,14 +338,14 @@ sub store_conflict ($self, $g1, $g2, $conflicts) {
 
 # Batch write conflicts - much more efficient for bulk updates
 sub store_conflicts_batch ($self, $conflicts_hash) {
-  my $tx = $self->db->begin;
+  my $tx    = $self->db->begin;
   my $count = 0;
 
   eval {
     foreach my $g1 (keys %$conflicts_hash) {
       foreach my $g2 (keys %{ $conflicts_hash->{$g1} }) {
         my ($sorted_g1, $sorted_g2) = sort ($g1, $g2);
-        my $key = "$sorted_g1:$sorted_g2";
+        my $key       = "$sorted_g1:$sorted_g2";
         my $conflicts = $conflicts_hash->{$g1}{$g2} ? 1 : 0;
 
         $self->db->insert(
@@ -368,7 +369,8 @@ sub store_conflicts_batch ($self, $conflicts_hash) {
     1;
   } or do {
     my $error = $@ || 'unknown error';
-    $self->log_error(sprintf("[SQLite] Batch conflict write failed: %s", $error));
+    $self->log_error(
+      sprintf("[SQLite] Batch conflict write failed: %s", $error));
     $tx->rollback;
     return 0;
   };

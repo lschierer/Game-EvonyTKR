@@ -22,7 +22,6 @@ has 'backend' => sub ($self) {
       $backend_type);
   }
 
-
   if ($backend_type eq 'sqlite') {
     require Game::EvonyTKR::Service::SQLitePersistence;
     return Game::EvonyTKR::Service::SQLitePersistence->new(
@@ -37,7 +36,7 @@ has 'backend' => sub ($self) {
     );
   }
   else {
-    croak( sprintf(
+    croak(sprintf(
 "Unknown persistence backend type: %s (expected 'sqlite' or 'dynamodb')\n",
       $backend_type));
   }

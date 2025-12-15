@@ -4,13 +4,13 @@ use v5.42.0;
 use experimental qw(class);
 use utf8::all;
 use Mojo::Base 'Game::EvonyTKR::Controller::ControllerBase';
-use Mojo::Base 'Game::EvonyTKR::Role::StaticPages',                   -role;
-use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants',      -role;
-use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants',   -role;
-use Mojo::Base 'Game::EvonyTKR::Role::Constants::Covenants',   -role;
-use Mojo::Base 'Game::EvonyTKR::Role::Constants::AscendingAttributes',   -role;
-use Mojo::Base 'Game::EvonyTKR::Role::Constants::Specialties',   -role;
-use Mojo::Base 'Game::EvonyTKR::Controller::Role::Generals::Routing', -role;
+use Mojo::Base 'Game::EvonyTKR::Role::StaticPages',                    -role;
+use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants',       -role;
+use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants',    -role;
+use Mojo::Base 'Game::EvonyTKR::Role::Constants::Covenants',           -role;
+use Mojo::Base 'Game::EvonyTKR::Role::Constants::AscendingAttributes', -role;
+use Mojo::Base 'Game::EvonyTKR::Role::Constants::Specialties',         -role;
+use Mojo::Base 'Game::EvonyTKR::Controller::Role::Generals::Routing',  -role;
 require YAML::PP;
 require Mojo::Promise;
 require Mojo::Util;
@@ -255,7 +255,8 @@ sub _build_general_routes($c, $general_name, $app) {
 
   # Guard against undefined values
   unless (defined $general_name && length($general_name)) {
-    $c->log_error('_build_general_routes called with empty general_name, skipping');
+    $c->log_error(
+      '_build_general_routes called with empty general_name, skipping');
     return;
   }
 
@@ -279,9 +280,7 @@ sub _build_general_routes($c, $general_name, $app) {
   };
   if ($@) {
     $c->log_error(sprintf(
-      'Failed to add nav item for general %s: %s',
-      $general_name, $@
-    ));
+      'Failed to add nav item for general %s: %s', $general_name, $@));
   }
 }
 
@@ -311,8 +310,7 @@ sub _ensure_navigation_built($c) {
     if (!defined($display_name) || !length($display_name)) {
       $c->log_warn(sprintf(
         'General %s has no valid name, using list name as fallback',
-        $general_name // 'undef'
-      ));
+        $general_name // 'undef'));
       $display_name = $general_name;
     }
 
@@ -722,8 +720,6 @@ sub singleTable ($c) {
   my $covenantLevel  = $c->param('covenantLevel')  // 'civilization';
   my $ascendingLevel = $c->param('ascendingLevel') // 'red5';
   my @specialties    = map { $c->param("specialty$_") // 'gold' } (1 .. 4);
-
-
 
   if (!$c->checkCovenantLevel($covenantLevel)) {
     $c->log_warn(

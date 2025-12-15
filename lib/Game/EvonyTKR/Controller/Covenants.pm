@@ -52,7 +52,6 @@ package Game::EvonyTKR::Controller::Covenants {
     )];
   };
 
-
   # Register this when the application starts
   sub register($c, $app, $config = {}) {
     $c->SUPER::register($app, $config);
@@ -98,10 +97,12 @@ package Game::EvonyTKR::Controller::Covenants {
   }
 
   sub setup_routes ($c, $app) {
-    if($c->are_prereqs_outstanding($app->minion, $c->prereqs)){
-      Mojo::IOLoop->timer($c->standard_delay => sub{
-        $c->setup_routes($app);
-      });
+    if ($c->are_prereqs_outstanding($app->minion, $c->prereqs)) {
+      Mojo::IOLoop->timer(
+        $c->standard_delay => sub {
+          $c->setup_routes($app);
+        }
+      );
       return;
     }
 
@@ -137,7 +138,8 @@ package Game::EvonyTKR::Controller::Covenants {
 
     # Guard against undefined values - use fallbacks instead of failing
     unless (defined $covenant_name && length($covenant_name)) {
-      $c->log_error('_build_covenant_nav called with empty covenant_name, skipping');
+      $c->log_error(
+        '_build_covenant_nav called with empty covenant_name, skipping');
       return;
     }
 
@@ -189,9 +191,8 @@ package Game::EvonyTKR::Controller::Covenants {
       # Fallback to covenant filename if primary name unavailable
       if (!defined($display_name) || !length($display_name)) {
         $c->log_warn(sprintf(
-          'Covenant %s has no valid primary name, using covenant name as fallback',
-          $covenant_name // 'undef'
-        ));
+'Covenant %s has no valid primary name, using covenant name as fallback',
+          $covenant_name // 'undef'));
         $display_name = $covenant_name;
       }
 

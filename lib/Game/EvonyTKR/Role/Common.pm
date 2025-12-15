@@ -93,14 +93,15 @@ package Game::EvonyTKR::Role::Common {
       if ($@) {
         my $error = $@;
         # Check if it's a transient database error
-        if ($error =~ /database is locked|database disk image is malformed|SQLITE_BUSY/i) {
+        if ($error =~
+          /database is locked|database disk image is malformed|SQLITE_BUSY/i) {
           if ($attempt < $max_attempts) {
             $self->log_debug(sprintf(
-              'Minion operation failed with transient error (attempt %d/%d): %s',
+'Minion operation failed with transient error (attempt %d/%d): %s',
               $attempt, $max_attempts, $error
             ));
             # Exponential backoff: 100ms, 200ms, 400ms
-            select(undef, undef, undef, 0.1 * (2 ** ($attempt - 1)));
+            select(undef, undef, undef, 0.1 * (2**($attempt - 1)));
             next;
           }
           # Max attempts reached
@@ -142,7 +143,7 @@ package Game::EvonyTKR::Role::Common {
     # Get work unit tracker
     require Game::EvonyTKR::WorkUnit::Tracker;
     my $tracker = Game::EvonyTKR::WorkUnit::Tracker->new(
-      ddb => $self->app->ddb  # Assuming app has ddb helper
+      ddb => $self->app->ddb    # Assuming app has ddb helper
     );
 
     my $prereqs      = {};
@@ -158,11 +159,11 @@ package Game::EvonyTKR::Role::Common {
         next;
       }
 
-      # For controllers, we don't need to distinguish between pending/failed/not-started
-      # They just show a wait page regardless
-      # Only check Minion for failed jobs if caller is a Minion job (to fail fast)
+# For controllers, we don't need to distinguish between pending/failed/not-started
+# They just show a wait page regardless
+# Only check Minion for failed jobs if caller is a Minion job (to fail fast)
       if ($is_minion_job) {
-        # Check if prereq failed - wrap in retry logic for transient SQLite locking
+     # Check if prereq failed - wrap in retry logic for transient SQLite locking
         my $prereqFailedCount = $self->_minion_retry(sub {
           $minion->jobs({
             tasks  => [$prereq],
@@ -177,7 +178,7 @@ package Game::EvonyTKR::Role::Common {
         }
       }
 
-      # Not completed and (for controllers) not checking Minion, or (for jobs) not failed
+# Not completed and (for controllers) not checking Minion, or (for jobs) not failed
       push @outstanding, $prereq;
       $prereqs->{$prereq} = 'pending';
     }
@@ -222,6 +223,7 @@ package Game::EvonyTKR::Role::Common {
 
     return 0;
   }
+
   sub normalizeSpecialtyLevels ($self, @specialties) {
     my @normalized = @specialties;
 

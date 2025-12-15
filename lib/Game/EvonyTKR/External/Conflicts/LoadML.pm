@@ -59,7 +59,8 @@ package Game::EvonyTKR::External::Conflicts::LoadML {
 
       # Ensure MOJO_MODE is set for subprocesses
       $ENV{MOJO_MODE} ||= $job->app->mode;
-      $job->log_debug(sprintf('Running ML pipeline with MOJO_MODE=%s', $ENV{MOJO_MODE}));
+      $job->log_debug(
+        sprintf('Running ML pipeline with MOJO_MODE=%s', $ENV{MOJO_MODE}));
 
       # Run training pipeline
       my $rc = system(
@@ -174,17 +175,17 @@ package Game::EvonyTKR::External::Conflicts::LoadML {
     }
 
     # Use batch write for efficiency (25x faster than individual writes)
-    my $stored_count = $job->persistence->store_conflicts_batch(\%conflicts_for_batch);
+    my $stored_count =
+      $job->persistence->store_conflicts_batch(\%conflicts_for_batch);
     $job->log_info(sprintf(
       "Batch stored %d ML conflict predictions to persistence",
-      $stored_count
-    ));
+      $stored_count));
 
     # Mark work unit as complete
     require Game::EvonyTKR::WorkUnit::Tracker;
     my $tracker = Game::EvonyTKR::WorkUnit::Tracker->new(ddb => $job->app->ddb);
     $tracker->mark_complete('ml_conflicts');
-    
+
     $job->app->log->info("Marked work unit 'ml_conflicts' as complete");
   }
 

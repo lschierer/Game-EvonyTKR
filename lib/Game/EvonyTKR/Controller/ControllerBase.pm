@@ -55,7 +55,8 @@ package Game::EvonyTKR::Controller::ControllerBase {
     );
 
     $app->helper(
-      check_prereqs_or_wait => sub($self, $prereqs, $retry_delay = $self->standard_delay) {
+      check_prereqs_or_wait =>
+        sub($self, $prereqs, $retry_delay = $self->standard_delay) {
         unless (ref($prereqs) && ref($prereqs) eq 'ARRAY') {
           $c->log_error('check_prereqs_or_wait requires an arrayref.');
           return 0;
@@ -77,7 +78,7 @@ package Game::EvonyTKR::Controller::ControllerBase {
           return 1;    # Rendered wait page, caller should return
         }
         return 0;      # Prerequisites met, caller should continue
-      }
+        }
     );
 
     $routes->get('/health')->to(
@@ -142,25 +143,26 @@ package Game::EvonyTKR::Controller::ControllerBase {
           my ($route, $parent_path) = @_;
           $parent_path //= "";
 
-          my $pattern = $route->pattern->unparsed // "";
+          my $pattern   = $route->pattern->unparsed // "";
           my $full_path = $parent_path . $pattern;
-          my $name = $route->name // undef;
-          my $to = $route->to // {};
+          my $name      = $route->name // undef;
+          my $to        = $route->to   // {};
 
           # Only include non-empty paths
           if ($full_path && $full_path ne "/" && $full_path ne "") {
             my $route_methods = $route->methods;
-            push @all_routes, {
+            push @all_routes,
+              {
               path       => $full_path,
               name       => $name,
               controller => $to->{controller} // undef,
-              action     => $to->{action} // undef,
+              action     => $to->{action}     // undef,
               methods    => $route_methods ? [sort @{$route_methods}] : undef,
-            };
+              };
           }
 
           # Recursively walk children
-          foreach my $child (@{$route->children}) {
+          foreach my $child (@{ $route->children }) {
             $walk_routes->($child, $full_path);
           }
         };

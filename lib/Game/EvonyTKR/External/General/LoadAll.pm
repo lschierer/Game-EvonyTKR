@@ -71,16 +71,20 @@ package Game::EvonyTKR::External::General::LoadAll {
 
       # Check if job already exists for this file in current run
       my $normalized_path = $job->normalize($file->to_string);
-      my $existing_jobs = $job->minion->jobs({
-        tasks => ['load_general'],
+      my $existing_jobs   = $job->minion->jobs({
+        tasks  => ['load_general'],
         states => ['active', 'inactive']
       });
 
       my $job_exists = 0;
       while (my $existing = $existing_jobs->next) {
-        if ($existing->{args} && $existing->{args}[0] && $existing->{args}[0] eq $normalized_path &&
-            $existing->{notes} && $existing->{notes}->{prebuild_run_id} &&
-            $existing->{notes}->{prebuild_run_id} eq $job->info->{notes}->{prebuild_run_id}) {
+        if ( $existing->{args}
+          && $existing->{args}[0]
+          && $existing->{args}[0] eq $normalized_path
+          && $existing->{notes}
+          && $existing->{notes}->{prebuild_run_id}
+          && $existing->{notes}->{prebuild_run_id} eq
+          $job->info->{notes}->{prebuild_run_id}) {
           $job_exists = 1;
           last;
         }
@@ -88,7 +92,8 @@ package Game::EvonyTKR::External::General::LoadAll {
 
       if ($job_exists) {
         $job->log_debug(sprintf(
-          'Skipping %s - job already exists for current run', $general_name));
+          'Skipping %s - job already exists for current run',
+          $general_name));
         $skipped_count++;
         next;
       }
@@ -98,7 +103,7 @@ package Game::EvonyTKR::External::General::LoadAll {
           attempts => 3,
           delay    => rand(10),
           priority => 20,
-          notes    => { prebuild_run_id => $job->info->{notes}->{prebuild_run_id} }
+          notes => { prebuild_run_id => $job->info->{notes}->{prebuild_run_id} }
         }
       );
       $job->log_debug(sprintf(
@@ -155,10 +160,9 @@ package Game::EvonyTKR::External::General::LoadAll {
 
       # Fail if any child jobs failed
       if ($failed > 0) {
-        my $errmsg = sprintf(
-          'LoadAll failed: %d child jobs failed, %d finished',
-          $failed, $finished
-        );
+        my $errmsg =
+          sprintf('LoadAll failed: %d child jobs failed, %d finished',
+          $failed, $finished);
         $job->log_error($errmsg);
         return $job->fail($errmsg);
       }
@@ -221,8 +225,7 @@ package Game::EvonyTKR::External::General::LoadAll {
     elsif ($skipped_count > 0) {
       $job->log_info(sprintf(
         'All %d generals already in persistence - no jobs needed',
-        $skipped_count
-      ));
+        $skipped_count));
     }
 
     # Mark this job as completed in persistence (with run_id for isolation)
@@ -235,7 +238,7 @@ package Game::EvonyTKR::External::General::LoadAll {
       build_general_indexes => [] => {
         attempts => 3,
         priority => 30,
-        notes    => { prebuild_run_id => $job->info->{notes}->{prebuild_run_id} }
+        notes => { prebuild_run_id => $job->info->{notes}->{prebuild_run_id} }
       }
     );
     $job->note(generalCount => scalar(@files));

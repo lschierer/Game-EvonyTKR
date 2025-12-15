@@ -77,8 +77,10 @@ sub add_generic_book ($self, $book) {
 
 sub get_generic_book ($self, $name, $level) {
   require Game::EvonyTKR::Model::Factory;
-  $self->logger->debug(sprintf('persistence role get_generic_book called for %s level %s',
-  $name, $level));
+  $self->logger->debug(sprintf(
+    'persistence role get_generic_book called for %s level %s',
+    $name, $level
+  ));
 
   my $key = lc($self->normalize($name));
   $key = sprintf('%s level %s', $key, $level);
@@ -104,11 +106,13 @@ sub list_generic_books ($self, $level) {
   my $collectionDir = $mh->child('share/collections/data');
   my $gbdir         = $collectionDir->child('generic books');
   my @suffixlist    = ('.yaml', '.yml');
-  my @files         = $gbdir->list->grep(sub { $_->basename =~ /^Level\s+${level}\s+.+\.ya?ml$/ && -f -r $_ })
+  my @files         = $gbdir->list->grep(
+    sub { $_->basename =~ /^Level\s+${level}\s+.+\.ya?ml$/ && -f -r $_ })
     ->sort->map(sub { return $_->basename(@suffixlist) })->each;
   my @intermediate = List::UtilsBy::uniq_by { lc($self->normalize($_)) } @files;
   my @final;
-  foreach my $ib (@intermediate){
+
+  foreach my $ib (@intermediate) {
     $ib =~ s/^Level\s+\d+\s+//;
     push @final, $ib;
   }

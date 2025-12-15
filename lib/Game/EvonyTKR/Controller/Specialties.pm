@@ -104,10 +104,12 @@ package Game::EvonyTKR::Controller::Specialties {
 
   sub build_nav_items ($c, $app, $mainRoutes, $controller_name) {
 
-    if($c->are_prereqs_outstanding($app->minion, ['load_all_specialties', ])){
-      Mojo::IOLoop->timer(30 => sub{
-        $c->build_nav_items($app, $mainRoutes, $controller_name);
-      });
+    if ($c->are_prereqs_outstanding($app->minion, ['load_all_specialties',])) {
+      Mojo::IOLoop->timer(
+        30 => sub {
+          $c->build_nav_items($app, $mainRoutes, $controller_name);
+        }
+      );
       return;
     }
 
@@ -124,8 +126,7 @@ package Game::EvonyTKR::Controller::Specialties {
       if (!defined($display_name) || !length($display_name)) {
         $c->log_warn(sprintf(
           'Specialty %s has no valid name, using list name as fallback',
-          $specialty_name // 'undef'
-        ));
+          $specialty_name // 'undef'));
         $display_name = $specialty_name;
       }
 
@@ -143,10 +144,13 @@ package Game::EvonyTKR::Controller::Specialties {
           'Failed to add nav item for specialty %s: %s',
           $specialty_name, $@
         ));
-      } else {
+      }
+      else {
         $c->log_debug(
-          sprintf('added nav item for name "%s" with path "%s/%s"',
-            $display_name, $base, $display_name)
+          sprintf(
+            'added nav item for name "%s" with path "%s/%s"',
+            $display_name, $base, $display_name
+          )
         );
       }
     }
@@ -227,8 +231,9 @@ package Game::EvonyTKR::Controller::Specialties {
     my $specialty = $c->get_specialty($name);
 
     unless ($specialty) {
-      $c->log_debug("specialty '$name' was not found, passing through to other routes.");
-      return $c->continue;  # Pass through to allow other routes to match
+      $c->log_debug(
+        "specialty '$name' was not found, passing through to other routes.");
+      return $c->continue;    # Pass through to allow other routes to match
     }
     $c->log_debug("retrieved specialty $specialty");
 

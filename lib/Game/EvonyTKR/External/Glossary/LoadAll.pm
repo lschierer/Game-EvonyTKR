@@ -102,7 +102,7 @@ package Game::EvonyTKR::External::Glossary::LoadAll {
     require Game::EvonyTKR::WorkUnit::Tracker;
     my $tracker = Game::EvonyTKR::WorkUnit::Tracker->new(ddb => $job->app->ddb);
     $tracker->mark_complete('glossary_terms');
-    
+
     $job->app->log->info("Marked work unit 'glossary_terms' as complete");
   }
 }

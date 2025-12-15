@@ -52,64 +52,67 @@ package Game::EvonyTKR::External::Prebuild {
     'Game::EvonyTKR::External::Glossary::LoadAll',
   ];
 
-  my $loaderJobDefs = {
-    load_all_ascending_attributes => {
-      args     => [$stored_version, $current_version],
-      attempts => 3,
-      delay    => 1,
-      priority => 50,
-    },
-    load_all_generic_books => {
-      args     => [$stored_version, $current_version],
-      attempts => 3,
-      delay    => 1,
-      priority => 50,
-    },
-    load_all_builtin_books => {
-      args     => [$stored_version, $current_version],
-      attempts => 3,
-      delay    => 1,
-      priority => 60,
-    },
-    load_all_specialties => {
-      args     => [$stored_version, $current_version],
-      attempts => 3,
-      delay    => 1,
-      priority => 60,
-    },
-    load_all_generals => {
-      args     => ['prebuild load_all_generals', $stored_version, $current_version],
-      attempts => 3,
-      delay    => 5,
-      priority => 10,
-    },
-    load_all_covenants => {
-      args     => [$stored_version, $current_version],
-      attempts => 3,
-      delay    => 5,
-      priority => 10,
-    },
-    load_all_glossary_terms => {
-      args     => [$stored_version, $current_version],
-      attempts => 3,
-      delay    => 1,
-      priority => 60,
-    },
-    load_ml_conflicts => {
-      args     => [$stored_version, $current_version],
-      attempts => 3,
-      delay    => 5,
-      priority => 15,
-    },
-    load_all_pair_builders => {
-      args     => [$stored_version, $current_version],
-      attempts => 5,
-      delay    => 6,
-      priority => 50,
-    },
-  };
-
   sub task_name {'external_prebuild'}
+
+  sub _build_loader_job_defs ($self, $stored_version, $current_version) {
+    return {
+      load_all_ascending_attributes => {
+        args     => [$stored_version, $current_version],
+        attempts => 3,
+        delay    => 1,
+        priority => 50,
+      },
+      load_all_generic_books => {
+        args     => [$stored_version, $current_version],
+        attempts => 3,
+        delay    => 1,
+        priority => 50,
+      },
+      load_all_builtin_books => {
+        args     => [$stored_version, $current_version],
+        attempts => 3,
+        delay    => 1,
+        priority => 60,
+      },
+      load_all_specialties => {
+        args     => [$stored_version, $current_version],
+        attempts => 3,
+        delay    => 1,
+        priority => 60,
+      },
+      load_all_generals => {
+        args =>
+          ['prebuild load_all_generals', $stored_version, $current_version],
+        attempts => 3,
+        delay    => 5,
+        priority => 10,
+      },
+      load_all_covenants => {
+        args     => [$stored_version, $current_version],
+        attempts => 3,
+        delay    => 5,
+        priority => 10,
+      },
+      load_all_glossary_terms => {
+        args     => [$stored_version, $current_version],
+        attempts => 3,
+        delay    => 1,
+        priority => 60,
+      },
+      load_ml_conflicts => {
+        args     => [$stored_version, $current_version],
+        attempts => 3,
+        delay    => 5,
+        priority => 15,
+      },
+      load_all_pair_builders => {
+        args     => [$stored_version, $current_version],
+        attempts => 5,
+        delay    => 6,
+        priority => 50,
+      },
+    };
+  }
 
   sub register ($taskClass, $app, $conf = {}) {
     if (not defined $taskClass) {
@@ -139,8 +142,6 @@ package Game::EvonyTKR::External::Prebuild {
       sprintf('%s register function complete for %s', __PACKAGE__, $$));
     return 1;
   }
-
-
 
   sub prebuildPrerequisites ($job, $args = {}) {
 
@@ -183,8 +184,11 @@ package Game::EvonyTKR::External::Prebuild {
       say '$job not defined in run for ' . __PACKAGE__;
       return;
     }
-    return $job->finish(sprintf('pid %s job id %s is not the only prebuild',
-    $$, $job->info->{id})) unless $job->minion->lock('prebuild_guard', 300);
+    return $job->finish(sprintf(
+      'pid %s job id %s is not the only prebuild',
+      $$, $job->info->{id}
+    ))
+      unless $job->minion->lock('prebuild_guard', 300);
     $job->SUPER::run(@args);
     unless (defined($job->minion)) {
       my $errmessage = sprintf('minion undefined in job for %s', __PACKAGE__);
@@ -211,49 +215,50 @@ package Game::EvonyTKR::External::Prebuild {
       eval { $job->app->config->{version}{'git-commit'} } // 'unknown';
     $job->log_info("Current git-commit: $current_version");
     my $stored_version = 0;
+
+    # Get loader job configurations
+    my $loaderJobDefs =
+      $job->_build_loader_job_defs($stored_version, $current_version);
     # Check if data is current for this version
-      my $data_current = 0;
-      eval {
-        $stored_version = $job->persistence->get_data_version;
+    my $data_current = 0;
+    eval {
+      $stored_version = $job->persistence->get_data_version;
 
-        if ($stored_version && $stored_version eq $current_version) {
-          # Version matches - verify data actually exists
-          my $generals_count    = $job->persistence->count_generals      // 0;
-          my $specialties_count = $job->persistence->count_specialties   // 0;
-          my $books_count       = $job->persistence->count_builtin_books // 0;
+      if ($stored_version && $stored_version eq $current_version) {
+        # Version matches - verify data actually exists
+        my $generals_count    = $job->persistence->count_generals      // 0;
+        my $specialties_count = $job->persistence->count_specialties   // 0;
+        my $books_count       = $job->persistence->count_builtin_books // 0;
 
-          if ($generals_count > 0 && $specialties_count > 0 && $books_count > 0)
-          {
-            $data_current = 1;
-            $job->log_info(sprintf(
+        if ($generals_count > 0 && $specialties_count > 0 && $books_count > 0) {
+          $data_current = 1;
+          $job->log_info(sprintf(
 "Data current for version %s (generals=%d, specialties=%d, books=%d)",
-              $current_version,   $generals_count,
-              $specialties_count, $books_count
-            ));
-          }
-          else {
-            $job->log_warn(sprintf(
-"Version matches but data incomplete: generals=%d, specialties=%d, books=%d",
-              $generals_count, $specialties_count, $books_count
-            ));
-          }
-        }
-        elsif ($stored_version) {
-          $job->log_info(
-"Data version mismatch: stored=$stored_version, current=$current_version - will reload"
-          );
+            $current_version,   $generals_count,
+            $specialties_count, $books_count
+          ));
         }
         else {
-          $job->log_info("No stored data version - first run or data cleared");
+          $job->log_warn(sprintf(
+"Version matches but data incomplete: generals=%d, specialties=%d, books=%d",
+            $generals_count, $specialties_count, $books_count
+          ));
         }
-      };
-
-      if ($@) {
-        $job->log_debug("Error checking data version: $@");
-        $data_current = 0;
       }
+      elsif ($stored_version) {
+        $job->log_info(
+"Data version mismatch: stored=$stored_version, current=$current_version - will reload"
+        );
+      }
+      else {
+        $job->log_info("No stored data version - first run or data cleared");
+      }
+    };
 
-
+    if ($@) {
+      $job->log_debug("Error checking data version: $@");
+      $data_current = 0;
+    }
 
     my $owner         = $$ . '@' . ($ENV{HOSTNAME} // 'localhost');
     my $job_key       = 'prebuild_run';
@@ -266,7 +271,6 @@ package Game::EvonyTKR::External::Prebuild {
     my $timer_id;
     # Remove custom locking - Minion handles job uniqueness
 
-
     $job->log_info('launching jobs to spawn loaders.');
 
     # Create unique run identifier for this prebuild
@@ -277,30 +281,33 @@ package Game::EvonyTKR::External::Prebuild {
     # Mark all work units as incomplete at start
     require Game::EvonyTKR::WorkUnit::Tracker;
     my $tracker = Game::EvonyTKR::WorkUnit::Tracker->new(ddb => $job->app->ddb);
-    
+
     my @work_units = qw(
-      ascending_attributes generic_books builtin_books specialties 
+      ascending_attributes generic_books builtin_books specialties
       generals covenants glossary_terms ml_conflicts pairs
     );
-    
+
     for my $unit (@work_units) {
       $tracker->mark_incomplete($unit);
     }
     $job->log_info("Marked all work units as incomplete");
 
     # Store current run_id in persistence so controllers can find it
-    $job->set_metadata('current_prebuild_run_id', {
-      run_id     => $run_id,
-      started_at => time(),
-    });
+    $job->set_metadata(
+      'current_prebuild_run_id',
+      {
+        run_id     => $run_id,
+        started_at => time(),
+      }
+    );
 
-    # Harvest ALL jobs from previous prebuild runs (assume previous prebuild crashed)
+# Harvest ALL jobs from previous prebuild runs (assume previous prebuild crashed)
     my $harvested = $job->harvest_tagged_jobs();
     $job->log_info("Harvested $harvested jobs from previous runs");
 
     my $loaderJids = [];
-    my $totalJobs = 0;  # Count both launched and existing jobs
-    foreach my $jobname (sort keys $self->loaderJobDefs->%*) {
+    my $totalJobs  = 0;    # Count both launched and existing jobs
+    foreach my $jobname (sort keys $loaderJobDefs->%*) {
       # Simple check: if any active/inactive jobs exist for this task, skip it
       my $existing = $job->minion->jobs({
         tasks  => [$jobname],
@@ -309,25 +316,25 @@ package Game::EvonyTKR::External::Prebuild {
 
       if ($existing > 0) {
         $job->log_info("Skipping $jobname - $existing jobs already exist");
-        $totalJobs++;  # Count existing jobs
+        $totalJobs++;    # Count existing jobs
         next;
       }
       $job->log_debug("Prebuild needs to launch $jobname");
 
-      my $args   = $self->loaderJobDefs->{$jobname}->{args} // [];
-      my $params = $self->loaderJobDefs->{$jobname}         // {};
+      my $args   = $loaderJobDefs->{$jobname}->{args} // [];
+      my $params = $loaderJobDefs->{$jobname}         // {};
       delete($params->{args}) if (exists $params->{args});
 
-      my $jid =
-        $job->minion->enqueue($jobname => [$args->@*] => {
-          $params->%*,
-          notes => { prebuild_run_id => $run_id }
-        });
+      my $jid = $job->minion->enqueue(
+        $jobname => [$args->@*] => {
+          $params->%*, notes => { prebuild_run_id => $run_id }
+        }
+      );
       if (defined($jid)) {
         $job->note($jobname => $jid);
         $job->log_debug(sprintf('launched %s with jid %s', $jobname, $jid));
         push @{$loaderJids}, $jid;
-        $totalJobs++;  # Count newly launched jobs
+        $totalJobs++;    # Count newly launched jobs
       }
       else {
         my $errmessage = sprintf('failed to launch %s', $jobname);
@@ -336,12 +343,12 @@ package Game::EvonyTKR::External::Prebuild {
       }
     }
 
-    if ($totalJobs == keys($self->loaderJobDefs->%*)) {
+    if ($totalJobs == keys($loaderJobDefs->%*)) {
       $job->log_info('all job spawners launched or already exist');
     }
     else {
       my $errmessage = sprintf('launched %s spawners, expected %s. ',
-        $totalJobs, scalar(keys($self->loaderJobDefs->%*)));
+        $totalJobs, scalar(keys($loaderJobDefs->%*)));
       $job->log_error($errmessage);
       return $job->fail($errmessage);
     }
@@ -349,28 +356,30 @@ package Game::EvonyTKR::External::Prebuild {
     # Spawn completion jobs for collection types
     my %collection_completions = (
       'ascending_attributes' => ['loader_ascending_attributes'],
-      'generic_books'       => ['loader_generic_book'],
-      'builtin_books'       => ['loader_builtin_book'],
-      'specialties'         => ['loader_specialty'],
-      'generals'            => ['loader_general'],
-      'covenants'           => ['loader_covenant'],
+      'generic_books'        => ['loader_generic_book'],
+      'builtin_books'        => ['loader_builtin_book'],
+      'specialties'          => ['loader_specialty'],
+      'generals'             => ['loader_general'],
+      'covenants'            => ['loader_covenant'],
     );
-    
+
     for my $collection (keys %collection_completions) {
       my $completion_jid = $job->minion->enqueue(
-        'mark_collection_complete' => [$collection, $collection_completions{$collection}] => {
+        'mark_collection_complete' =>
+          [$collection, $collection_completions{$collection}] => {
           attempts => 10,
           delay    => 30,
           priority => 5,
           notes    => { prebuild_run_id => $run_id }
-        }
+          }
       );
-      $job->log_debug("Spawned completion job for $collection: $completion_jid");
+      $job->log_debug(
+        "Spawned completion job for $collection: $completion_jid");
     }
-    
+
     # Simple completions (single job marks complete)
     # ml_conflicts and glossary_terms will mark themselves complete
-    
+
     # Pairs completion (waits for reduce_coordinator)
     my $pairs_completion_jid = $job->minion->enqueue(
       'mark_pairs_complete' => [] => {
@@ -401,15 +410,16 @@ package Game::EvonyTKR::External::Prebuild {
             delay    => 10,
             priority => 90,
             notes    => {
-              prebuild_jid => $job->id,
+              prebuild_jid    => $job->id,
               prebuild_run_id => $job->prebuild_run_id,
-            }  # Reference instead of parent
+            }    # Reference instead of parent
           }
         );
         if (defined $mj) {
           $monitors->{$mn} = $mj;
           $job->log_debug("Launched monitor job $mn with jid $mj");
-        } else {
+        }
+        else {
           $job->log_warn("Failed to launch monitor job $mn");
         }
       }

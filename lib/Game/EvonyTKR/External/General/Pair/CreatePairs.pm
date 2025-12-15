@@ -104,15 +104,15 @@ package Game::EvonyTKR::External::General::Pair::CreatePairs {
     my $initial_by_general = {};
     foreach my $g1 (keys %{ $conflict_detector->by_general }) {
       foreach my $g2 (keys %{ $conflict_detector->by_general->{$g1} }) {
-        $initial_by_general->{$g1}{$g2} = $conflict_detector->by_general->{$g1}{$g2};
+        $initial_by_general->{$g1}{$g2} =
+          $conflict_detector->by_general->{$g1}{$g2};
       }
     }
 
     my $initial_conflict_count = scalar(keys %$initial_by_general);
     $job->log_info(sprintf(
       'Initialized conflict detector with %d existing conflict relationships',
-      $initial_conflict_count
-    ));
+      $initial_conflict_count));
 
     my @pairs;
     my $conflicts_found      = 0;
@@ -201,18 +201,18 @@ package Game::EvonyTKR::External::General::Pair::CreatePairs {
       }
     }
 
-    my $new_conflict_count = scalar(
-      map { keys %{ $new_conflicts_only{$_} } } keys %new_conflicts_only
-    );
+    my $new_conflict_count = scalar(map { keys %{ $new_conflicts_only{$_} } }
+        keys %new_conflicts_only);
 
     if ($new_conflict_count > 0) {
       # Use batch write for efficiency
-      my $stored = $job->persistence->store_conflicts_batch(\%new_conflicts_only);
+      my $stored =
+        $job->persistence->store_conflicts_batch(\%new_conflicts_only);
       $job->log_info(sprintf(
         'Batch stored %d NEW conflict relationships to persistence',
-        $stored
-      ));
-    } else {
+        $stored));
+    }
+    else {
       $job->log_debug('No new conflicts to store (all were already known)');
     }
 

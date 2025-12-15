@@ -77,10 +77,12 @@ package Game::EvonyTKR {
 
             $app->log->info("SPAWNING MINION WORKERS from PID $$");
             _spawn_minion_workers($app);
-            $app->minion->enqueue(external_prebuild => [{}] => {
-              priority => 100,
-              attempts => 3,
-            });
+            $app->minion->enqueue(
+              external_prebuild => [{}] => {
+                priority => 100,
+                attempts => 3,
+              }
+            );
           }
         );
       }
@@ -185,8 +187,10 @@ package Game::EvonyTKR {
     require Mojolicious::Plugin::Minion;
  # Use SQLite for Minion (reliable), mode-gated persistence for application data
     my $minion_db = $app->home->child('minion.db');
-     $app->log->info(sprintf("[Game::EvonyTKR] Minion SQLite database: %s (app->home=%s)\n",
-      $minion_db, $app->home));
+    $app->log->info(sprintf(
+      "[Game::EvonyTKR] Minion SQLite database: %s (app->home=%s)\n",
+      $minion_db, $app->home
+    ));
     $app->plugin(Minion => { SQLite => $minion_db });
 
     # Apply SQLite optimizations for Minion
@@ -200,15 +204,16 @@ package Game::EvonyTKR {
       }
     );
 
-    # Clear Minion jobs ONLY in development mode
-    # In production/staging, jobs MUST persist across restarts
-    # CRITICAL: Don't call reset() in production - it deletes ALL jobs including running ones!
-    # With Hypnotoad spawning multiple workers, reset() was being called repeatedly, wiping the queue
+# Clear Minion jobs ONLY in development mode
+# In production/staging, jobs MUST persist across restarts
+# CRITICAL: Don't call reset() in production - it deletes ALL jobs including running ones!
+# With Hypnotoad spawning multiple workers, reset() was being called repeatedly, wiping the queue
     if ($app->mode eq 'development' && !$ENV{MINION_WORKER_CHILD}) {
       $app->minion->reset;
       $app->log->info("Cleared Minion jobs on startup (development mode only)");
       $app->minion->remove_after(7200);
-    } elsif ($app->mode eq 'development') {
+    }
+    elsif ($app->mode eq 'development') {
       $app->minion->remove_after(7200);
     }
 

@@ -72,7 +72,8 @@ package Game::EvonyTKR::External::JobBase {
     $job->prebuild_run_id($parent_notes->{prebuild_run_id} || '');
     Game::EvonyTKR::Role::Logging::get_logger(__PACKAGE__);
 
-    $job->log_debug(sprintf('JobBase configured Logging in run "%s"', $job->prebuild_run_id));
+    $job->log_debug(
+      sprintf('JobBase configured Logging in run "%s"', $job->prebuild_run_id));
     unless (defined($job->app)) {
       my $errmessage = sprintf('app undefined in job for %s', __PACKAGE__);
       $job->log_error($errmessage);
@@ -84,13 +85,14 @@ package Game::EvonyTKR::External::JobBase {
       return $job->fail($errmessage);
     }
 
-    $job->note(prebuild_run_id => $job->prebuild_run_id) if (length($job->prebuild_run_id));
+    $job->note(prebuild_run_id => $job->prebuild_run_id)
+      if (length($job->prebuild_run_id));
     $job->harvest_tagged_jobs();
   }
 
   sub harvest_tagged_jobs ($job) {
     my $harvested = 0;
-    if(!length($job->prebuild_run_id)){
+    if (!length($job->prebuild_run_id)) {
       $job->log_warn('cannot harvest without a prebuild_run_id');
       return;
     }
@@ -98,7 +100,8 @@ package Game::EvonyTKR::External::JobBase {
     # Only harvest once per prebuild run - use a metadata flag
     my $harvest_key = "harvested_" . $job->prebuild_run_id;
     if ($job->persistence->get_metadata($harvest_key)) {
-      $job->log_debug("Harvesting already done for run " . $job->prebuild_run_id);
+      $job->log_debug(
+        "Harvesting already done for run " . $job->prebuild_run_id);
       return 0;
     }
 
@@ -108,7 +111,7 @@ package Game::EvonyTKR::External::JobBase {
     # Harvest stale Minion jobs
     my $jobs = $job->minion->jobs({
       states => [qw(inactive active failed)],
-      limit  => 50000  # Large limit to catch all jobs
+      limit  => 50000                           # Large limit to catch all jobs
     });
 
     while (my $j = $jobs->next) {
@@ -119,7 +122,7 @@ package Game::EvonyTKR::External::JobBase {
         $harvested++ unless $@;
         next;
       }
-      unless($notes->{prebuild_run_id} eq $job->prebuild_run_id){
+      unless ($notes->{prebuild_run_id} eq $job->prebuild_run_id) {
         # This job was from a previous run, remove it
         eval { $job->minion->job($j->{id})->remove };
         $harvested++ unless $@;
@@ -128,16 +131,17 @@ package Game::EvonyTKR::External::JobBase {
     $job->log_info(sprintf('harvested %s Minion jobs', $harvested));
 
     # Also harvest stale persistence job_completed records
-    my $persistence_harvested = eval {
-      $job->harvest_job_completions($job->prebuild_run_id);
-    };
+    my $persistence_harvested =
+      eval { $job->harvest_job_completions($job->prebuild_run_id); };
     if ($@) {
       $job->log_warn("Failed to harvest persistence records: $@");
       $persistence_harvested = 0;
     }
 
-    $job->log_info(sprintf('Total harvested: %d Minion jobs, %d persistence records',
-      $harvested, $persistence_harvested || 0));
+    $job->log_info(sprintf(
+      'Total harvested: %d Minion jobs, %d persistence records',
+      $harvested, $persistence_harvested || 0
+    ));
 
     return $harvested + ($persistence_harvested || 0);
   }

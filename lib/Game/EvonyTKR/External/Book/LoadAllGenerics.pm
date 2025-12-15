@@ -53,13 +53,15 @@ package Game::EvonyTKR::External::Book::LoadAllGenerics {
     my $skipped_count  = 0;
     my @job_ids        = ();
 
-    foreach my $level (1..4) {
+    foreach my $level (1 .. 4) {
       my $ll = $job->list_generic_books($level);
-      $job->log_info(sprintf('Found %d generic books to process at level %s',
-      scalar @$ll, $level));
+      $job->log_info(sprintf(
+        'Found %d generic books to process at level %s',
+        scalar @$ll, $level
+      ));
 
       my $maxIndex = scalar(@$ll) - 1;
-      foreach my $index (0 .. $maxIndex){
+      foreach my $index (0 .. $maxIndex) {
         my $entry = $ll->[$index];
 
         if ($job->get_generic_book($entry, $level)) {
@@ -72,17 +74,20 @@ package Game::EvonyTKR::External::Book::LoadAllGenerics {
         }
 
         # Check if job already exists for this book in current run
-        my $book_name = sprintf('Level %s %s', $level, $entry);
+        my $book_name     = sprintf('Level %s %s', $level, $entry);
         my $existing_jobs = $job->minion->jobs({
-          tasks => ['load_book'],
+          tasks  => ['load_book'],
           states => ['active', 'inactive']
         });
 
         my $job_exists = 0;
         while (my $existing = $existing_jobs->next) {
-          if ($existing->{args} && $existing->{args}[0] && $existing->{args}[0] eq $book_name &&
-              $existing->{notes} && $existing->{notes}->{prebuild_run_id} &&
-              $existing->{notes}->{prebuild_run_id} eq $job->prebuild_run_id) {
+          if ( $existing->{args}
+            && $existing->{args}[0]
+            && $existing->{args}[0] eq $book_name
+            && $existing->{notes}
+            && $existing->{notes}->{prebuild_run_id}
+            && $existing->{notes}->{prebuild_run_id} eq $job->prebuild_run_id) {
             $job_exists = 1;
             last;
           }
@@ -164,10 +169,9 @@ package Game::EvonyTKR::External::Book::LoadAllGenerics {
 
       # Fail if any child jobs failed
       if ($failed > 0) {
-        my $errmsg = sprintf(
-          'LoadAll failed: %d child jobs failed, %d finished',
-          $failed, $finished
-        );
+        my $errmsg =
+          sprintf('LoadAll failed: %d child jobs failed, %d finished',
+          $failed, $finished);
         $job->log_error($errmsg);
         return $job->fail($errmsg);
       }
@@ -186,7 +190,7 @@ package Game::EvonyTKR::External::Book::LoadAllGenerics {
         my $all_in_persistence = 1;
         my $missing_count      = 0;
 
-        foreach my $level (1..4) {
+        foreach my $level (1 .. 4) {
           my @list = $job->list_generic_books($level)->@*;
           foreach my $entry (@list) {
             # Parse "Level X BookName" format
@@ -224,8 +228,7 @@ package Game::EvonyTKR::External::Book::LoadAllGenerics {
     elsif ($skipped_count > 0) {
       $job->log_info(sprintf(
         'All data already in persistence - no jobs needed (skipped %d)',
-        $skipped_count
-      ));
+        $skipped_count));
     }
 
     # Mark this job as completed in persistence (with run_id for isolation)
@@ -233,7 +236,7 @@ package Game::EvonyTKR::External::Book::LoadAllGenerics {
     # skip all work (because data exists) still mark themselves complete
     my $run_id = $job->info->{notes}->{prebuild_run_id};
     $job->mark_task_completed($job->task_name, $run_id);
-    }
+  }
 }
 1;
 __END__

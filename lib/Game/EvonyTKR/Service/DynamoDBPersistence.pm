@@ -1,10 +1,10 @@
 package Game::EvonyTKR::Service::DynamoDBPersistence;
 use v5.42.0;
 use utf8::all;
-use Mojo::Base -base,                        -signatures;
-use Mojo::Base 'Game::EvonyTKR::Role::JSON',        -role;
-use Mojo::Base 'Game::EvonyTKR::Role::Common',      -role;
-use Mojo::Base 'Game::EvonyTKR::Role::Logging',     -role;
+use Mojo::Base -base,                           -signatures;
+use Mojo::Base 'Game::EvonyTKR::Role::JSON',    -role;
+use Mojo::Base 'Game::EvonyTKR::Role::Common',  -role;
+use Mojo::Base 'Game::EvonyTKR::Role::Logging', -role;
 
 use Carp;
 use Time::HiRes 'time';
@@ -54,8 +54,10 @@ has 'lifecycle_id' => sub ($self) {
 sub _put_item ($self, $pk, $sk, $data, $entity_type = undef) {
   $entity_type //= $pk;
 
-  $self->log_info(sprintf("[DynamoDB] _put_item called: pk=%s, sk=%s, table=%s",
-    $pk, $sk, $self->table_name));
+  $self->log_info(sprintf(
+    "[DynamoDB] _put_item called: pk=%s, sk=%s, table=%s",
+    $pk, $sk, $self->table_name
+  ));
 
   my $item = {
     pk          => { S => $pk },
@@ -73,12 +75,19 @@ sub _put_item ($self, $pk, $sk, $data, $entity_type = undef) {
     1;
   } or do {
     my $error = $@ || 'unknown error';
-    $self->log_error(sprintf("[DynamoDB] PutItem FAILED for pk=%s, sk=%s: %s", $pk, $sk, $error));
-    warn sprintf("[DynamoDB] PutItem FAILED for pk=%s, sk=%s: %s\n", $pk, $sk, $error);
+    $self->log_error(
+      sprintf(
+        "[DynamoDB] PutItem FAILED for pk=%s, sk=%s: %s",
+        $pk, $sk, $error
+      )
+    );
+    warn sprintf("[DynamoDB] PutItem FAILED for pk=%s, sk=%s: %s\n",
+      $pk, $sk, $error);
     return 0;
   };
 
-  $self->log_info(sprintf("[DynamoDB] PutItem SUCCESS for pk=%s, sk=%s", $pk, $sk));
+  $self->log_info(
+    sprintf("[DynamoDB] PutItem SUCCESS for pk=%s, sk=%s", $pk, $sk));
   return 1;
 }
 
@@ -94,29 +103,36 @@ sub _get_item ($self, $pk, $sk) {
   };
 
   if ($@) {
-    $self->log_error(sprintf("[DynamoDB] GetItem failed for pk=%s, sk=%s: %s\n", $pk, $sk, $@));
+    $self->log_error(
+      sprintf("[DynamoDB] GetItem failed for pk=%s, sk=%s: %s\n", $pk, $sk, $@)
+    );
     return;
   }
 
   unless ($result && $result->Item) {
-    $self->log_debug(sprintf("[DynamoDB] No Item returned for pk=%s, sk=%s\n", $pk, $sk));
+    $self->log_debug(
+      sprintf("[DynamoDB] No Item returned for pk=%s, sk=%s\n", $pk, $sk));
     return;
   }
 
   # Paws returns a Paws::DynamoDB::AttributeMap object
   # Access the underlying hash via ->Map
-  my $item_hash = ref($result->Item) eq 'HASH' ? $result->Item : $result->Item->Map;
+  my $item_hash =
+    ref($result->Item) eq 'HASH' ? $result->Item : $result->Item->Map;
 
   my $data_str = $item_hash->{data}->{S};
   unless (defined $data_str && length($data_str) > 0) {
-    $self->log_error(sprintf("[DynamoDB] Empty/undef data for pk=%s, sk=%s\n", $pk, $sk));
+    $self->log_error(
+      sprintf("[DynamoDB] Empty/undef data for pk=%s, sk=%s\n", $pk, $sk));
     return;
   }
 
   my $decoded = eval { $self->decode($data_str) };
   if ($@) {
-    $self->log_error(sprintf("[DynamoDB] JSON decode failed for pk=%s, sk=%s: %s\n",
-      $pk, $sk, $@));
+    $self->log_error(sprintf(
+      "[DynamoDB] JSON decode failed for pk=%s, sk=%s: %s\n",
+      $pk, $sk, $@
+    ));
     $self->log_error(sprintf("[DynamoDB] Raw data (first 200 chars): %s\n",
       substr($data_str, 0, 200)));
     return;
@@ -143,7 +159,8 @@ sub _query_raw_items ($self, $pk, $sk_prefix = undef) {
   };
 
   if ($@) {
-    $self->log_error( sprintf("[DynamoDB] Query failed for pk=%s: %s\n", $pk, $@));
+    $self->log_error(
+      sprintf("[DynamoDB] Query failed for pk=%s: %s\n", $pk, $@));
     return [];
   }
 
@@ -197,17 +214,26 @@ sub mark_job_completed ($self, $job_name, $run_id = undef) {
 sub is_job_completed ($self, $job_name, $run_id = undef) {
   my $sk = $run_id ? "${run_id}:${job_name}" : $job_name;
 
-  $self->log_debug(sprintf("[DynamoDB] Checking job_completed: pk=job_completed, sk=%s", $sk));
+  $self->log_debug(
+    sprintf("[DynamoDB] Checking job_completed: pk=job_completed, sk=%s", $sk));
   my $result = $self->_get_item('job_completed', $sk);
 
   # If run-scoped lookup failed, try legacy key for backward compatibility
   if (!defined $result && $run_id) {
-    $self->log_debug(sprintf("[DynamoDB] Run-scoped key not found, trying legacy: sk=%s", $job_name));
+    $self->log_debug(
+      sprintf("[DynamoDB] Run-scoped key not found, trying legacy: sk=%s",
+        $job_name)
+    );
     $result = $self->_get_item('job_completed', $job_name);
   }
 
   my $found = defined $result ? 1 : 0;
-  $self->log_debug(sprintf("[DynamoDB] Job %s completion check: %s", $job_name, $found ? 'FOUND' : 'NOT FOUND'));
+  $self->log_debug(
+    sprintf(
+      "[DynamoDB] Job %s completion check: %s",
+      $job_name, $found ? 'FOUND' : 'NOT FOUND'
+    )
+  );
   return $found;
 }
 
@@ -224,9 +250,9 @@ sub harvest_job_completions ($self, $current_run_id) {
   my $items = $self->_query_raw_items('job_completed');
 
   foreach my $item (@$items) {
-    my $sk = $item->{sk}->{S};
-    my $data_str = $item->{data}->{S} // '';
-    my $data = eval { $self->decode($data_str) } // {};
+    my $sk       = $item->{sk}->{S};
+    my $data_str = $item->{data}->{S}                // '';
+    my $data     = eval { $self->decode($data_str) } // {};
 
     # Skip items from current run
     next if $sk =~ /^\Q${current_run_id}\E:/;
@@ -238,7 +264,7 @@ sub harvest_job_completions ($self, $current_run_id) {
     eval {
       $self->dynamodb->DeleteItem(
         TableName => $self->table_name,
-        Key => {
+        Key       => {
           pk => { S => 'job_completed' },
           sk => { S => $sk }
         }
@@ -252,7 +278,8 @@ sub harvest_job_completions ($self, $current_run_id) {
     }
   }
 
-  $self->log_info("[DynamoDB] Harvested $harvested stale job_completed records");
+  $self->log_info(
+    "[DynamoDB] Harvested $harvested stale job_completed records");
   return $harvested;
 }
 
@@ -450,50 +477,49 @@ sub store_conflicts_batch ($self, $conflicts_hash) {
   foreach my $g1 (keys %$conflicts_hash) {
     foreach my $g2 (keys %{ $conflicts_hash->{$g1} }) {
       my ($sorted_g1, $sorted_g2) = sort ($g1, $g2);
-      my $sk = "$sorted_g1:$sorted_g2";
+      my $sk        = "$sorted_g1:$sorted_g2";
       my $conflicts = $conflicts_hash->{$g1}{$g2} ? 1 : 0;
 
-      push @items, {
+      push @items,
+        {
         pk          => { S => 'general_conflicts' },
         sk          => { S => $sk },
         entity_type => { S => 'general_conflicts' },
         data        => { S => $self->encode({ conflicts => $conflicts }) },
         updated_at  => { N => sprintf("%.6f", time()) }
-      };
+        };
     }
   }
 
   my $total_items = scalar(@items);
   return 0 unless $total_items;
 
-  $self->log_info(sprintf("[DynamoDB] Batch writing %d conflict items", $total_items));
+  $self->log_info(
+    sprintf("[DynamoDB] Batch writing %d conflict items", $total_items));
 
   my $written = 0;
-  my $failed = 0;
+  my $failed  = 0;
 
   # DynamoDB BatchWriteItem limit is 25 items per request
   while (@items) {
     my @batch = splice(@items, 0, 25);
 
-    my $request_items = {
-      $self->table_name => [
-        map { { PutRequest => { Item => $_ } } } @batch
-      ]
-    };
+    my $request_items =
+      { $self->table_name => [map { { PutRequest => { Item => $_ } } } @batch]
+      };
 
     eval {
-      my $result = $self->dynamodb->BatchWriteItem(
-        RequestItems => $request_items
-      );
+      my $result =
+        $self->dynamodb->BatchWriteItem(RequestItems => $request_items);
 
       # Handle unprocessed items (throttling)
-      if ($result->UnprocessedItems && %{$result->UnprocessedItems}) {
-        my $unprocessed = $result->UnprocessedItems->{$self->table_name} || [];
+      if ($result->UnprocessedItems && %{ $result->UnprocessedItems }) {
+        my $unprocessed =
+          $result->UnprocessedItems->{ $self->table_name } || [];
         my $unprocessed_count = scalar(@$unprocessed);
         $self->log_warn(sprintf(
           "[DynamoDB] %d items unprocessed due to throttling, retrying...",
-          $unprocessed_count
-        ));
+          $unprocessed_count));
 
         # Re-add unprocessed items to the queue
         push @items, map { $_->{PutRequest}->{Item} } @$unprocessed;
@@ -529,20 +555,24 @@ sub get_conflict ($self, $g1, $g2) {
 }
 
 sub load_all_conflicts ($self) {
-  $self->log_debug(sprintf("[DynamoDB] Loading conflicts using Query on pk=general_conflicts"));
+  $self->log_debug(
+    sprintf("[DynamoDB] Loading conflicts using Query on pk=general_conflicts")
+  );
 
   # Use _query_raw_items which efficiently queries by pk
   my $items = $self->_query_raw_items('general_conflicts');
 
   my $item_count = ref($items) eq 'ARRAY' ? scalar(@$items) : 0;
-  $self->log_info(sprintf("[DynamoDB] Query returned %d conflict items", $item_count));
+  $self->log_info(
+    sprintf("[DynamoDB] Query returned %d conflict items", $item_count));
 
   if ($item_count == 0) {
-    $self->log_warn("[DynamoDB] No conflict items found - may not be written yet");
+    $self->log_warn(
+      "[DynamoDB] No conflict items found - may not be written yet");
     return {};
   }
 
-  my $conflicts = {};
+  my $conflicts     = {};
   my $decode_errors = 0;
 
   for my $item_hash (@$items) {
@@ -560,7 +590,11 @@ sub load_all_conflicts ($self) {
 
     my $data = eval { $self->decode($data_str) };
     if ($@) {
-      $self->log_error(sprintf("[DynamoDB] Failed to decode conflict data for %s: %s", $sk, $@));
+      $self->log_error(
+        sprintf(
+          "[DynamoDB] Failed to decode conflict data for %s: %s", $sk, $@
+        )
+      );
       $decode_errors++;
       next;
     }
@@ -573,7 +607,7 @@ sub load_all_conflicts ($self) {
 
   my $general_count = scalar(keys %$conflicts);
   $self->log_info(sprintf(
-    "[DynamoDB] Loaded %d conflict items covering %d generals (%d decode errors)",
+"[DynamoDB] Loaded %d conflict items covering %d generals (%d decode errors)",
     $item_count, $general_count, $decode_errors
   ));
 

@@ -78,26 +78,30 @@ package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
 
         # Check if job already exists for this general/type in current run
         my $existing_jobs = $job->minion->jobs({
-          tasks => ['create_pairs'],
+          tasks  => ['create_pairs'],
           states => ['active', 'inactive']
         });
-        
+
         my $job_exists = 0;
         while (my $existing = $existing_jobs->next) {
-          if ($existing->{args} && 
-              $existing->{args}[0] && $existing->{args}[0] eq $general->name &&
-              $existing->{args}[1] && $existing->{args}[1] eq $type &&
-              $existing->{notes} && $existing->{notes}->{prebuild_run_id} && 
-              $existing->{notes}->{prebuild_run_id} eq $job->prebuild_run_id) {
+          if ( $existing->{args}
+            && $existing->{args}[0]
+            && $existing->{args}[0] eq $general->name
+            && $existing->{args}[1]
+            && $existing->{args}[1] eq $type
+            && $existing->{notes}
+            && $existing->{notes}->{prebuild_run_id}
+            && $existing->{notes}->{prebuild_run_id} eq $job->prebuild_run_id) {
             $job_exists = 1;
             last;
           }
         }
-        
+
         if ($job_exists) {
           $job->log_debug(sprintf(
-            'Skipping %s/%s - job already exists for current run', 
-            $general->name, $type));
+            'Skipping %s/%s - job already exists for current run',
+            $general->name, $type
+          ));
           next;
         }
 

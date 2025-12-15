@@ -63,15 +63,19 @@ package Game::EvonyTKR::External::AscendingAttributes::LoadAll {
 
       # Check if job already exists for this file in current run
       my $existing_jobs = $job->minion->jobs({
-        tasks => ['load_ascending_attributes'],
+        tasks  => ['load_ascending_attributes'],
         states => ['active', 'inactive']
       });
 
       my $job_exists = 0;
       while (my $existing = $existing_jobs->next) {
-        if ($existing->{args} && $existing->{args}[0] && $existing->{args}[0] eq $file->to_string &&
-            $existing->{notes} && $existing->{notes}->{prebuild_run_id} &&
-            $existing->{notes}->{prebuild_run_id} eq $job->info->{notes}->{prebuild_run_id}) {
+        if ( $existing->{args}
+          && $existing->{args}[0]
+          && $existing->{args}[0] eq $file->to_string
+          && $existing->{notes}
+          && $existing->{notes}->{prebuild_run_id}
+          && $existing->{notes}->{prebuild_run_id} eq
+          $job->info->{notes}->{prebuild_run_id}) {
           $job_exists = 1;
           last;
         }
@@ -79,7 +83,8 @@ package Game::EvonyTKR::External::AscendingAttributes::LoadAll {
 
       if ($job_exists) {
         $job->log_debug(sprintf(
-          'Skipping %s - job already exists for current run', $attr_name));
+          'Skipping %s - job already exists for current run',
+          $attr_name));
         $skipped_count++;
         next;
       }
@@ -88,7 +93,8 @@ package Game::EvonyTKR::External::AscendingAttributes::LoadAll {
         'load_ascending_attributes' => [$file->to_string] => {
           attempts => 3,
           delay    => rand(10),
-          notes    => { prebuild_run_id => $job->info->{notes}->{prebuild_run_id} },
+          notes    =>
+            { prebuild_run_id => $job->info->{notes}->{prebuild_run_id} },
           priority => 20,
         }
       );
@@ -146,10 +152,9 @@ package Game::EvonyTKR::External::AscendingAttributes::LoadAll {
 
       # Fail if any child jobs failed
       if ($failed > 0) {
-        my $errmsg = sprintf(
-          'LoadAll failed: %d child jobs failed, %d finished',
-          $failed, $finished
-        );
+        my $errmsg =
+          sprintf('LoadAll failed: %d child jobs failed, %d finished',
+          $failed, $finished);
         $job->log_error($errmsg);
         return $job->fail($errmsg);
       }
@@ -200,8 +205,7 @@ package Game::EvonyTKR::External::AscendingAttributes::LoadAll {
     elsif ($skipped_count > 0) {
       $job->log_info(sprintf(
         'All data already in persistence - no jobs needed (skipped %d)',
-        $skipped_count
-      ));
+        $skipped_count));
     }
 
     # Mark this job as completed in persistence (with run_id for isolation)
@@ -209,7 +213,7 @@ package Game::EvonyTKR::External::AscendingAttributes::LoadAll {
     # skip all work (because data exists) still mark themselves complete
     my $run_id = $job->info->{notes}->{prebuild_run_id};
     $job->mark_task_completed($job->task_name, $run_id);
-  
+
     my $msg = 'load_all_ascending_attributes job completed';
     $job->log_info($msg);
     $job->finish($msg);

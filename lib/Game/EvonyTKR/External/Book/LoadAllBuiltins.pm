@@ -75,15 +75,18 @@ package Game::EvonyTKR::External::Book::LoadAllBuiltins {
 
       # Check if job already exists for this book in current run
       my $existing_jobs = $job->minion->jobs({
-        tasks => ['load_book'],
+        tasks  => ['load_book'],
         states => ['active', 'inactive']
       });
 
       my $job_exists = 0;
       while (my $existing = $existing_jobs->next) {
-        if ($existing->{args} && $existing->{args}[0] && $existing->{args}[0] eq $entry &&
-            $existing->{notes} && $existing->{notes}->{prebuild_run_id} &&
-            $existing->{notes}->{prebuild_run_id} eq $job->prebuild_run_id) {
+        if ( $existing->{args}
+          && $existing->{args}[0]
+          && $existing->{args}[0] eq $entry
+          && $existing->{notes}
+          && $existing->{notes}->{prebuild_run_id}
+          && $existing->{notes}->{prebuild_run_id} eq $job->prebuild_run_id) {
           $job_exists = 1;
           last;
         }
@@ -163,10 +166,9 @@ package Game::EvonyTKR::External::Book::LoadAllBuiltins {
 
       # Fail if any child jobs failed
       if ($failed > 0) {
-        my $errmsg = sprintf(
-          'LoadAll failed: %d child jobs failed, %d finished',
-          $failed, $finished
-        );
+        my $errmsg =
+          sprintf('LoadAll failed: %d child jobs failed, %d finished',
+          $failed, $finished);
         $job->log_error($errmsg);
         return $job->fail($errmsg);
       }
@@ -216,8 +218,7 @@ package Game::EvonyTKR::External::Book::LoadAllBuiltins {
     elsif ($skipped_count > 0) {
       $job->log_info(sprintf(
         'All data already in persistence - no jobs needed (skipped %d)',
-        $skipped_count
-      ));
+        $skipped_count));
     }
 
     # Mark this job as completed in persistence (with run_id for isolation)
@@ -225,7 +226,7 @@ package Game::EvonyTKR::External::Book::LoadAllBuiltins {
     # skip all work (because data exists) still mark themselves complete
     my $run_id = $job->info->{notes}->{prebuild_run_id};
     $job->mark_task_completed($job->task_name, $run_id);
-    }
+  }
 }
 1;
 __END__
