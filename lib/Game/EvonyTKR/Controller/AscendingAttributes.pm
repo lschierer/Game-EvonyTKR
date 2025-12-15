@@ -125,10 +125,7 @@ package Game::EvonyTKR::Controller::AscendingAttributes {
           sprintf('in get_ascending_section helper, self is %s ',
             blessed($self))
         );
-        $c->log_debug(sprintf(
-          'in get_ascending_section helper, c is %s, c->app is %s',
-          blessed($c), defined($c->app) ? blessed($c->app) : 'undefined'
-        ));
+
         return $c->get_ascending_section($self, $app, $name);
       }
     );
