@@ -447,31 +447,23 @@ sub get_conflict ($self, $g1, $g2) {
 }
 
 sub load_all_conflicts ($self) {
-  my $result = eval {
-    $self->dynamodb->Scan(
-      TableName                 => $self->table_name,
-      FilterExpression          => 'entity_type = :entity_type',
-      ExpressionAttributeValues => {
-        ':entity_type' => { S => 'general_conflicts' }
-      }
-    );
-  };
+  $self->log_debug(sprintf("[DynamoDB] Loading conflicts using Query on pk=general_conflicts"));
 
-  if ($@) {
-    $self->log_error(sprintf("[DynamoDB] Scan failed for conflicts: %s", $@));
-    return {};
-  }
+  # Use _query_raw_items which efficiently queries by pk
+  my $items = $self->_query_raw_items('general_conflicts');
 
-  unless ($result && $result->Items) {
-    $self->log_debug("[DynamoDB] No conflict items found in scan");
+  my $item_count = ref($items) eq 'ARRAY' ? scalar(@$items) : 0;
+  $self->log_info(sprintf("[DynamoDB] Query returned %d conflict items", $item_count));
+
+  if ($item_count == 0) {
+    $self->log_warn("[DynamoDB] No conflict items found - may not be written yet");
     return {};
   }
 
   my $conflicts = {};
-  for my $item (@{ $result->Items }) {
-    # Convert AttributeMap to hash if needed
-    my $item_hash = ref($item) eq 'HASH' ? $item : $item->Map;
+  my $decode_errors = 0;
 
+  for my $item_hash (@$items) {
     # Extract sk and validate
     my $sk = $item_hash->{sk}->{S} or next;
     my ($g1, $g2) = split ':', $sk;
@@ -487,6 +479,7 @@ sub load_all_conflicts ($self) {
     my $data = eval { $self->decode($data_str) };
     if ($@) {
       $self->log_error(sprintf("[DynamoDB] Failed to decode conflict data for %s: %s", $sk, $@));
+      $decode_errors++;
       next;
     }
 
@@ -496,7 +489,12 @@ sub load_all_conflicts ($self) {
     $conflicts->{$g2}{$g1} = $has_conflict;
   }
 
-  $self->log_info(sprintf("[DynamoDB] Loaded %d conflict relationships", scalar(keys %$conflicts)));
+  my $general_count = scalar(keys %$conflicts);
+  $self->log_info(sprintf(
+    "[DynamoDB] Loaded %d conflict items covering %d generals (%d decode errors)",
+    $item_count, $general_count, $decode_errors
+  ));
+
   return $conflicts;
 }
 
