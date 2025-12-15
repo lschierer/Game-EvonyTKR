@@ -332,6 +332,49 @@ sub store_conflict ($self, $g1, $g2, $conflicts) {
       ]
     }
   );
+  return 1;
+}
+
+# Batch write conflicts - much more efficient for bulk updates
+sub store_conflicts_batch ($self, $conflicts_hash) {
+  my $tx = $self->db->begin;
+  my $count = 0;
+
+  eval {
+    foreach my $g1 (keys %$conflicts_hash) {
+      foreach my $g2 (keys %{ $conflicts_hash->{$g1} }) {
+        my ($sorted_g1, $sorted_g2) = sort ($g1, $g2);
+        my $key = "$sorted_g1:$sorted_g2";
+        my $conflicts = $conflicts_hash->{$g1}{$g2} ? 1 : 0;
+
+        $self->db->insert(
+          'general_conflicts',
+          {
+            pair_key   => $key,
+            conflicts  => $conflicts,
+            updated_at => time()
+          },
+          {
+            on_conflict => \[
+              '(pair_key) do update set conflicts = ?, updated_at = ?',
+              $conflicts, time()
+            ]
+          }
+        );
+        $count++;
+      }
+    }
+    $tx->commit;
+    1;
+  } or do {
+    my $error = $@ || 'unknown error';
+    $self->log_error(sprintf("[SQLite] Batch conflict write failed: %s", $error));
+    $tx->rollback;
+    return 0;
+  };
+
+  $self->log_info(sprintf("[SQLite] Batch wrote %d conflict items", $count));
+  return $count;
 }
 
 sub get_conflict ($self, $g1, $g2) {

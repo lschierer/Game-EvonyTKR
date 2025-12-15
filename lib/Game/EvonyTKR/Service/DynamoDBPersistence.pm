@@ -438,6 +438,84 @@ sub store_conflict ($self, $g1, $g2, $conflicts) {
     { conflicts => $conflicts ? 1 : 0 });
 }
 
+# Batch write conflicts - much more efficient for bulk updates
+sub store_conflicts_batch ($self, $conflicts_hash) {
+  my @items;
+
+  # Convert hash structure to list of items
+  foreach my $g1 (keys %$conflicts_hash) {
+    foreach my $g2 (keys %{ $conflicts_hash->{$g1} }) {
+      my ($sorted_g1, $sorted_g2) = sort ($g1, $g2);
+      my $sk = "$sorted_g1:$sorted_g2";
+      my $conflicts = $conflicts_hash->{$g1}{$g2} ? 1 : 0;
+
+      push @items, {
+        pk          => { S => 'general_conflicts' },
+        sk          => { S => $sk },
+        entity_type => { S => 'general_conflicts' },
+        data        => { S => $self->encode({ conflicts => $conflicts }) },
+        updated_at  => { N => sprintf("%.6f", time()) }
+      };
+    }
+  }
+
+  my $total_items = scalar(@items);
+  return 0 unless $total_items;
+
+  $self->log_info(sprintf("[DynamoDB] Batch writing %d conflict items", $total_items));
+
+  my $written = 0;
+  my $failed = 0;
+
+  # DynamoDB BatchWriteItem limit is 25 items per request
+  while (@items) {
+    my @batch = splice(@items, 0, 25);
+
+    my $request_items = {
+      $self->table_name => [
+        map { { PutRequest => { Item => $_ } } } @batch
+      ]
+    };
+
+    eval {
+      my $result = $self->dynamodb->BatchWriteItem(
+        RequestItems => $request_items
+      );
+
+      # Handle unprocessed items (throttling)
+      if ($result->UnprocessedItems && %{$result->UnprocessedItems}) {
+        my $unprocessed = $result->UnprocessedItems->{$self->table_name} || [];
+        my $unprocessed_count = scalar(@$unprocessed);
+        $self->log_warn(sprintf(
+          "[DynamoDB] %d items unprocessed due to throttling, retrying...",
+          $unprocessed_count
+        ));
+
+        # Re-add unprocessed items to the queue
+        push @items, map { $_->{PutRequest}->{Item} } @$unprocessed;
+        $failed += $unprocessed_count;
+      }
+
+      $written += scalar(@batch);
+      1;
+    } or do {
+      my $error = $@ || 'unknown error';
+      $self->log_error(sprintf("[DynamoDB] BatchWriteItem failed: %s", $error));
+      $failed += scalar(@batch);
+    };
+
+    # Small delay between batches to avoid throttling
+    select(undef, undef, undef, 0.1) if @items;
+  }
+
+  $self->log_info(sprintf(
+    "[DynamoDB] Batch write complete: %d/%d items written (%d failed)",
+    $written, $total_items, $failed
+  ));
+
+  return $written;
+}
+
 sub get_conflict ($self, $g1, $g2) {
   ($g1, $g2) = sort ($g1, $g2);
   my $key    = "$g1:$g2";

@@ -163,18 +163,22 @@ package Game::EvonyTKR::External::Conflicts::LoadML {
       kept_pairs     => $kept_pairs,
     );
 
-    # Store in SQLite for persistence across restarts
-    my $stored_count = 0;
+    # Convert predictions to conflict hash for batch storage
+    my %conflicts_for_batch;
     for my $g1_name (keys %filtered_conflicts) {
       for my $g2_name (keys %{ $filtered_conflicts{$g1_name} }) {
         my $prediction = $filtered_conflicts{$g1_name}{$g2_name};
         my $conflicts  = $prediction->{conflict} ? 1 : 0;
-        $job->persistence->store_conflict($g1_name, $g2_name, $conflicts);
-        $stored_count++;
+        $conflicts_for_batch{$g1_name}{$g2_name} = $conflicts;
       }
     }
 
-    $job->log_info("Stored $stored_count ML predictions in SQLite persistence");
+    # Use batch write for efficiency (25x faster than individual writes)
+    my $stored_count = $job->persistence->store_conflicts_batch(\%conflicts_for_batch);
+    $job->log_info(sprintf(
+      "Batch stored %d ML conflict predictions to persistence",
+      $stored_count
+    ));
 
     # Mark this job as completed in persistence
     my $run_id = $job->info->{notes}->{prebuild_run_id};

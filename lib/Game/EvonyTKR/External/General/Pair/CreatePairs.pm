@@ -97,13 +97,22 @@ package Game::EvonyTKR::External::General::Pair::CreatePairs {
       $type, $general_name
     ));
 
-    # Initialize conflict detector
+    # Initialize conflict detector and track initial state
     my $conflict_detector = $job->initialize_conflict_detector();
-    my $initial_conflicts = scalar(keys %{ $conflict_detector->by_general });
-    $job->log_info(
-      sprintf('Initialized conflict detector with %d existing conflicts',
-        $initial_conflicts)
-    );
+
+    # Deep copy initial state to detect NEW conflicts only
+    my $initial_by_general = {};
+    foreach my $g1 (keys %{ $conflict_detector->by_general }) {
+      foreach my $g2 (keys %{ $conflict_detector->by_general->{$g1} }) {
+        $initial_by_general->{$g1}{$g2} = $conflict_detector->by_general->{$g1}{$g2};
+      }
+    }
+
+    my $initial_conflict_count = scalar(keys %$initial_by_general);
+    $job->log_info(sprintf(
+      'Initialized conflict detector with %d existing conflict relationships',
+      $initial_conflict_count
+    ));
 
     my @pairs;
     my $conflicts_found      = 0;
@@ -178,22 +187,34 @@ package Game::EvonyTKR::External::General::Pair::CreatePairs {
       ));
     }
 
-    # Store new conflicts to persistence
-    my $final_by_general     = $conflict_detector->by_general;
-    my $new_conflicts_stored = 0;
+    # Store ONLY new conflicts to persistence (not already in initial state)
+    my $final_by_general = $conflict_detector->by_general;
+    my %new_conflicts_only;
 
     foreach my $g1 (keys %$final_by_general) {
       foreach my $g2 (keys %{ $final_by_general->{$g1} }) {
-        # Store to persistence with actual conflict status (0 or 1)
-        my $conflicts = $final_by_general->{$g1}{$g2};
-        $job->persistence->store_conflict($g1, $g2, $conflicts);
-        $new_conflicts_stored++;
+        # Skip if this conflict was in the initial state
+        next if exists $initial_by_general->{$g1}{$g2};
+
+        # This is a NEW conflict discovered by this job
+        $new_conflicts_only{$g1}{$g2} = $final_by_general->{$g1}{$g2};
       }
     }
 
-    # Note: stored count includes duplicates, actual new conflicts will be less
-    $job->log_debug(sprintf('Stored %d conflict records to persistence',
-      $new_conflicts_stored));
+    my $new_conflict_count = scalar(
+      map { keys %{ $new_conflicts_only{$_} } } keys %new_conflicts_only
+    );
+
+    if ($new_conflict_count > 0) {
+      # Use batch write for efficiency
+      my $stored = $job->persistence->store_conflicts_batch(\%new_conflicts_only);
+      $job->log_info(sprintf(
+        'Batch stored %d NEW conflict relationships to persistence',
+        $stored
+      ));
+    } else {
+      $job->log_debug('No new conflicts to store (all were already known)');
+    }
 
     # Return conflict data in notes for monitor job to merge
     my $conflict_data = {
