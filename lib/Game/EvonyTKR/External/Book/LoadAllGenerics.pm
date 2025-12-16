@@ -11,8 +11,6 @@ package Game::EvonyTKR::External::Book::LoadAllGenerics {
   use experimental qw(class);
   use Carp;
 
-  state $bookCache;
-
   sub task_name {'load_all_generic_books'}
 
   sub register ($taskClass, $app, $conf = {}) {
@@ -51,7 +49,7 @@ package Game::EvonyTKR::External::Book::LoadAllGenerics {
 
     my $enqueued_count = 0;
     my $skipped_count  = 0;
-    my @job_ids        = ();
+    my $in_progress = $job->info->{notes}->{in_progress} // {};
 
     foreach my $level (1 .. 4) {
       my $ll = $job->list_generic_books($level);
@@ -72,35 +70,50 @@ package Game::EvonyTKR::External::Book::LoadAllGenerics {
           $skipped_count++;
           next;
         }
+        if(exists $in_progress->{$entry}->{$level}){
+          my $bj = $job->minion->job($in_progress->{$entry}->{$level});
+          if($bj) {
+            if($bj->info->{notes}->{prebuild_run_id} eq $job->prebuild_run_id){
+              if($bj->info->{state} eq 'finished'){
+                $job->log_debug(sprintf(
+                  'Skipping %s level %d - already in progress',
+                  $entry, $level
+                ));
+                $skipped_count++;
+                next;
+              }elsif($bj->info->{state} eq 'failed'){
+                $job->log_debug(sprintf(
+                  'Skipping %s level %d - already in progress',
+                  $entry, $level
+                ));
+                $skipped_count++;
+                next;
+              }elsif($bj->info->{state} eq 'active'){
+                $job->log_debug(sprintf(
+                  'Skipping %s level %d - already in progress',
+                  $entry, $level
+                ));
+                $skipped_count++;
+                next;
+              }elsif($bj->info->{state} eq 'inactive'){
+                $job->log_debug(sprintf(
+                  'Skipping %s level %d - already in progress',
+                  $entry, $level
+                ));
+                $skipped_count++;
+                next;
+              }
+              # else it is a ghost job and we should ignore it.
+            } else {
+              $bj->remove();
+            }
+          }
+          # else it is a ghost job and we should ignore it.
+        }
 
         # Check if job already exists for this book in current run
         my $book_name     = sprintf('Level %s %s', $level, $entry);
-        my $existing_jobs = $job->minion->jobs({
-          tasks  => ['load_book'],
-          states => ['active', 'inactive']
-        });
 
-        my $job_exists = 0;
-        while (my $existing = $existing_jobs->next) {
-          if ( $existing->{args}
-            && $existing->{args}[0]
-            && $existing->{args}[0] eq $book_name
-            && $existing->{notes}
-            && $existing->{notes}->{prebuild_run_id}
-            && $existing->{notes}->{prebuild_run_id} eq $job->prebuild_run_id) {
-            $job_exists = 1;
-            last;
-          }
-        }
-
-        if ($job_exists) {
-          $job->log_debug(sprintf(
-            'Skipping %s level %d - job already exists for current run',
-            $entry, $level
-          ));
-          $skipped_count++;
-          next;
-        }
         my $job_id = $job->minion->enqueue(
           load_book => [
             sprintf('Level %s %s', $level, $entry),
@@ -118,68 +131,17 @@ package Game::EvonyTKR::External::Book::LoadAllGenerics {
             notes    => { prebuild_run_id => $job->prebuild_run_id },
           }
         );
-        push @job_ids, $job_id;
+        $in_progress->{$entry}->{$level} = $job_id;
         $enqueued_count++;
       }
     }
+    $job->note(in_progress => $in_progress);
 
     $job->log_info(sprintf(
-      'Enqueued %d load_book jobs, skipped %d already in persistence',
+      'Enqueued %d generic load_book jobs, skipped %d already in persistence',
       $enqueued_count, $skipped_count
     ));
 
-    # Check if child jobs are still running
-    if (@job_ids) {
-      my $active   = 0;
-      my $finished = 0;
-      my $failed   = 0;
-
-      for my $jid (@job_ids) {
-        my $job_obj = $job->minion->job($jid);
-        my $info    = $job_obj ? $job_obj->info : undef;
-
-        unless ($info && $info->{state}) {
-          $job->log_debug("Job $jid: no info or state");
-          next;
-        }
-
-        if ($info->{state} eq 'finished') {
-          $finished++;
-        }
-        elsif ($info->{state} eq 'failed') {
-          $failed++;
-        }
-        else {
-          $active++;
-        }
-      }
-
-      $job->log_debug(sprintf(
-        'Job status: active=%d, finished=%d, failed=%d',
-        $active, $finished, $failed
-      ));
-
-      # If jobs still running, retry this coordinator job to check again later
-      if ($active > 0) {
-        $job->log_info(sprintf(
-          'Still waiting for %d child jobs - retrying in 5 seconds',
-          $active));
-        return $job->retry({ delay => $job->standard_delay });
-      }
-
-      # Fail if any child jobs failed
-      if ($failed > 0) {
-        my $errmsg =
-          sprintf('LoadAll failed: %d child jobs failed, %d finished',
-          $failed, $finished);
-        $job->log_error($errmsg);
-        return $job->fail($errmsg);
-      }
-
-      $job->log_info(sprintf(
-        'All child jobs completed: %d finished, %d failed',
-        $finished, $failed
-      ));
 
       # Verify all data is actually in persistence before marking complete
       # This ensures database transactions have committed
@@ -193,13 +155,11 @@ package Game::EvonyTKR::External::Book::LoadAllGenerics {
         foreach my $level (1 .. 4) {
           my @list = $job->list_generic_books($level)->@*;
           foreach my $entry (@list) {
-            # Parse "Level X BookName" format
-            if ($entry =~ /^Level (\d+) (.+)$/) {
-              my ($level, $book_name) = ($1, $2);
-              unless ($job->get_generic_book($book_name, $level)) {
-                $all_in_persistence = 0;
-                $missing_count++;
-              }
+            unless ($job->get_generic_book($entry, $level)) {
+              $job->log_warn(sprintf('attempt %s failed to find "Level %s %s" in persistence.',
+                $attempt, $level, $entry));
+              $all_in_persistence = 0;
+              $missing_count++;
             }
           }
         }
@@ -218,25 +178,25 @@ package Game::EvonyTKR::External::Book::LoadAllGenerics {
       }
 
       unless ($verified) {
-        my $errmsg =
-'Failed to verify all generic books in persistence after child jobs finished';
+        my $errmsg = 'Failed to verify all generic books '.
+          'in persistence after child jobs finished';
         $job->log_error($errmsg);
         return $job->fail($errmsg);
       }
-    }
-    # If no jobs were enqueued (data already in persistence), we still succeeded
-    elsif ($skipped_count > 0) {
-      $job->log_info(sprintf(
-        'All data already in persistence - no jobs needed (skipped %d)',
-        $skipped_count));
+      # If no jobs were enqueued (data already in persistence), we still succeeded
+      if ($skipped_count > 0) {
+        $job->log_info(sprintf(
+          'All data already in persistence - no jobs needed (skipped %d)',
+          $skipped_count));
+      }
+
+      # Mark this job as completed in persistence (with run_id for isolation)
+      # IMPORTANT: This must be OUTSIDE the if (@job_ids) block so jobs that
+      # skip all work (because data exists) still mark themselves complete
+      my $run_id = $job->info->{notes}->{prebuild_run_id};
+      $job->mark_task_completed($job->task_name, $run_id);
     }
 
-    # Mark this job as completed in persistence (with run_id for isolation)
-    # IMPORTANT: This must be OUTSIDE the if (@job_ids) block so jobs that
-    # skip all work (because data exists) still mark themselves complete
-    my $run_id = $job->info->{notes}->{prebuild_run_id};
-    $job->mark_task_completed($job->task_name, $run_id);
-  }
 }
 1;
 __END__

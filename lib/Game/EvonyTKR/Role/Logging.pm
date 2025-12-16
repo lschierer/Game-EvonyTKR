@@ -183,6 +183,8 @@ BEGIN {
     'Game::EvonyTKR::External::AscendingAttributes'       => 'WARN',
     'Game::EvonyTKR::External::General::Summarizer'       => 'DEBUG',
     'Game::EvonyTKR::External::General::Pair::Summarizer' => 'DEBUG',
+    'Game::EvonyTKR::External::Book::LoadAllGenerics' => 'DEBUG',
+    'Game::EvonyTKR::External::Book::Loader' => 'DEBUG',
     'Game::EvonyTKR::External::Prebuild'                  => 'DEBUG',
     'Game::EvonyTKR::External'                            => 'WARN',
     'Game::EvonyTKR::Model::AscendingAttributes'          => 'INFO',

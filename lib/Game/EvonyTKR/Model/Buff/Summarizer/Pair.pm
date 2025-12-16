@@ -222,6 +222,7 @@ sub _getGenericBookValue_impl ($self, $attribute, $troopType) {
 
   # Get the best books for this troop type
   my $book_priorities = $books_helper->BestSkillBooks->{$targetType}->{$key}
+    // $books_helper->BestSkillBooks->{$troopType}->{$key}
     // {};
 
   $self->log_debug(sprintf(

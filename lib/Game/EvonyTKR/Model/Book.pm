@@ -162,6 +162,7 @@ package Game::EvonyTKR::Model::Book {
     if (exists $object->{level}) {
       $logger->debug(
         sprintf('detected that %s is a Generic book', $object->{name}));
+      $name =~ s/Level [1-4] //;
 
       my $level = $object->{level};
 

@@ -111,11 +111,13 @@ has 'BestSkillBooks' => sub {
         "Level $bestLevel Luck"                      => 6,
       }
     },
-    #mayor => {
-    #  default => {
-    #
-    #  }
-    #},
+    mayor => {
+      default => {
+        "Level $bestLevel Rebirth"                   => 1,
+        "Level $bestLevel Training Speed"            => 2,
+        "Level $bestLevel Training Capacity"         => 3,
+      }
+    },
     wall => {
       default => {
         "Level $bestLevel Siege Machine Attack"      => 1,
