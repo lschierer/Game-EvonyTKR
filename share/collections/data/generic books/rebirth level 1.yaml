@@ -4,5 +4,7 @@ level: 1
 text: "Increase subordinate city troops' death to survival rate by 1% when General is the Mayor."
 buffs:
   - attribute: "SubCity Death to Survival"
-    value: 1
-    condition: "mayor"
+    value:
+      number: 1
+    condition:
+      - When City Mayor for this SubCity
