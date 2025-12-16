@@ -1,9 +1,9 @@
 ---
-name: "Rebirth Level 1"
+name: Level 1 Rebirth
 level: 1
 text: "Increase subordinate city troops' death to survival rate by 1% when General is the Mayor."
 buffs:
-  - attribute: "SubCity Death to Survival"
+  - attribute: 'SubCity Death to Survival'
     value:
       number: 1
     condition:

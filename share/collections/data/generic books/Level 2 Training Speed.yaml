@@ -1,0 +1,10 @@
+---
+name: Level 2 Training Speed
+level: 2
+text: 'Increases Troop Training Speed in Subordinate City by 15% when General is the Mayor.'
+buffs:
+  - attribute: 'SubCity Training Speed'
+    value:
+      number: 15
+    condition:
+      - When City Mayor for this SubCity
