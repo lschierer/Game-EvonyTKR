@@ -871,19 +871,17 @@ sub single_details_stream ($c) {
   ));
 
   # Lookup route metadata
-  my $routing    = Game::EvonyTKR::Control::Generals::Routing->new;
-  my $route_meta = $routing->lookup_route($slug_ui, $slug_buff);
+  my $route_meta = $c->lookup_route($slug_ui, $slug_buff);
 
   unless ($route_meta) {
     $c->log_error("Invalid single route: $slug_ui | $slug_buff");
 
     if ($c->app->mode eq 'development') {
       $c->log_debug("Known valid routes:");
-      $routing->each_valid_route(
-        sub ($key, $meta) {
-          $c->log_debug("  $key => " . Data::Printer::np($meta));
-        }
-      );
+      foreach my $route (sort keys $c->all_valid_routes->%*){
+        my $meta = $c->all_valid_routes->{$route};
+        $c->log_debug(sprintf('  "%s" => %s', $route, Data::Printer::np($meta)));
+      }
     }
     my $payload = encode_base64($c->encode({ runId => 0+ $run_id }), '');
     $c->write_sse({ type => 'complete', text => $payload });

@@ -86,12 +86,6 @@ package Game::EvonyTKR::Controller::Specialties {
           return $nameList;
         }
         else {
-          $c->log_debug(
-            "specialty_level_names sees levels"
-              . Data::Printer::np(
-              $c->SUPER::getConstants->SpecialtyLevelValues->@*
-              )
-          );
           my $match = first { $level =~ /$_/i }
             $c->SUPER::getConstants->SpecialtyLevelValues->@*;
           $match =~ s/(\w)(\w*)/\U$1\L$2/;
