@@ -1,0 +1,8 @@
+---
+name: "Gold Production Level 3"
+level: 3
+text: "Boosts the Gold Production Speed in Subordinate City by 35% when General is the Mayor."
+buffs:
+  - attribute: "SubCity Gold Production"
+    value: 35
+    condition: "mayor"

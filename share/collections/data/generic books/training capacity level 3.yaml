@@ -1,0 +1,8 @@
+---
+name: "Training Capacity Level 3"
+level: 3
+text: "Increases Troop Training Capacity in Subordinate City by 35% when General is the Mayor."
+buffs:
+  - attribute: "SubCity Training Capacity"
+    value: 35
+    condition: "mayor"

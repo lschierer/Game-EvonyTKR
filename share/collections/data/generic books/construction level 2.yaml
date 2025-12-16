@@ -1,0 +1,8 @@
+---
+name: "Construction Level 2"
+level: 2
+text: "Increases the Constrution Speed in Subordinate City by 25% when General is the Mayor."
+buffs:
+  - attribute: "SubCity Construction Speed"
+    value: 25
+    condition: "mayor"
