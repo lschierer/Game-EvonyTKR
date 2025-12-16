@@ -196,7 +196,6 @@ BEGIN {
     'Game::EvonyTKR::Model::General'                => 'INFO',
     'Game::EvonyTKR::Model::Specialty'              => 'INFO',
     'Game::EvonyTKR::Plugins::Navigation'           => 'WARN',
-    'Game::EvonyTKR::Role::Persistence::Books'      => 'DEBUG',
     'Game::EvonyTKR::Role::Persistence::Core'       => 'INFO',
     'Game::EvonyTKR::Role::Persistence'             => 'WARN',
     'Game::EvonyTKR::Service::DynamoDBPersistence'  => 'DEBUG',
