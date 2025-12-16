@@ -177,7 +177,7 @@ package Game::EvonyTKR::Controller::Books {
             title => sprintf(
               'Details for the Level %s %s Book', $level, $display_name
             ),
-            path   => sprintf('%s/Level %s %s', $base, $level, $display_name),
+            path   => sprintf('%s/%s Level %s', $base, $level, $display_name),
             parent => $base,
             order  => 30,
           });
@@ -278,12 +278,11 @@ package Game::EvonyTKR::Controller::Books {
     my $name = $self->param('book_name');
     $self->log_debug("show detects name $name, showing details.");
 
-    my $book = $self->get_builtin_book($name);
+    my $book = $self->get_builtin_book($name) || $self->get_generic_book($name);
 
     unless ($book) {
-      $self->log_debug(
-        "skill book '$name' was not found, passing through to other routes.");
-      return $self->continue;    # Pass through to allow other routes to match
+      $self->log_debug("skill book '$name' was not found in builtin or generic books.");
+      return $self->render(text => "Book not found: $name", status => 404);
     }
 
     $self->log_debug("retrieved skill book $book");

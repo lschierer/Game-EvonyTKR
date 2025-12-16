@@ -30,6 +30,7 @@ packages:
   - python3-certbot-nginx
   - python3-pip
   - rsync
+  - sqlite3
   - sysstat
   - unattended-upgrades
   - unzip
@@ -87,6 +88,7 @@ runcmd:
       server_name           ${H}.evonytkrtips.net REPLACE2.evonytkrtips.net www.REPLACE2.evonytkrtips.net;
       return                301 https://$host$request_uri;
     }
+    limit_req_zone $binary_remote_addr zone=anti_hammer:10m rate=1r/s;
     server {
       listen 443 ssl;
       server_name           ${H}.evonytkrtips.net REPLACE2.evonytkrtips.net www.REPLACE2.evonytkrtips.net;
@@ -95,8 +97,13 @@ runcmd:
       ssl_protocols         TLSv1 TLSv1.1 TLSv1.2 TLSv1.3;
       ssl_ciphers           HIGH:!aNULL:!MD5;
       ssl_session_timeout   15m;
+      if ($http_referer ~* (openai\.com)) {
+        return 444;
+      }
       location / {
-        proxy_pass http://myapp;
+        limit_req zone=anti_hammer burst=5 nodelay;
+        limit_req_status 429;
+        proxy_pass http://localhost:3000;
         proxy_http_version 1.1;
         proxy_set_header Upgrade \$http_upgrade;
         proxy_set_header Connection "upgrade";
