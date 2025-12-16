@@ -224,13 +224,14 @@ package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
       $job_count, $batch_count, $skipped_count
     ));
 
-    # Mark job as completed in persistence
-    my $run_id = $job->info->{notes}->{prebuild_run_id};
-    $job->mark_task_completed($job->task_name, $run_id);
+    # Mark work unit as complete using WorkUnit::Tracker
+    require Game::EvonyTKR::WorkUnit::Tracker;
+    my $tracker = Game::EvonyTKR::WorkUnit::Tracker->new(persistence => $job->persistence);
+    $tracker->mark_complete('load_all_pair_builders');
 
     return $job->finish(sprintf(
-      'Spawned %d create_pairs jobs in %d batches',
-      $job_count, $batch_count
+      'Spawned %d create_pairs jobs in %d batches, skipped %d',
+      $job_count, $batch_count, $skipped_count
     ));
   }
 }
