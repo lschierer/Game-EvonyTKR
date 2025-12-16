@@ -97,7 +97,7 @@ runcmd:
       server_name           ${H}.evonytkrtips.net REPLACE2.evonytkrtips.net www.REPLACE2.evonytkrtips.net;
       return                301 https://$host$request_uri;
     }
-    limit_req_zone $binary_remote_addr zone=anti_hammer:10m rate=1r/s;
+    limit_req_zone \$binary_remote_addr zone=anti_hammer:10m rate=1r/s;
     server {
       listen 443 ssl;
       server_name           ${H}.evonytkrtips.net REPLACE2.evonytkrtips.net www.REPLACE2.evonytkrtips.net;
@@ -106,7 +106,7 @@ runcmd:
       ssl_protocols         TLSv1 TLSv1.1 TLSv1.2 TLSv1.3;
       ssl_ciphers           HIGH:!aNULL:!MD5;
       ssl_session_timeout   15m;
-      if ($http_referer ~* (openai\.com)) {
+      if (\$http_referer ~* (openai\.com)) {
         return 444;
       }
       location / {
@@ -229,5 +229,6 @@ runcmd:
 
     EOF
   - systemctl enable mojolicious
-  - mkdir -p /opt/mojo/var
-  - chown mojo:mojo /opt/mojo/var
+  - mkdir -p var/log/Perl/dist/Game-EvonyTKR/
+  - chown -R mojo:mojo /opt/mojo/var
+  - find /opt/mojo/var -type d -exec chmod g+rx {} \;

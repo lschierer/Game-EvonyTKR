@@ -71,6 +71,7 @@ my $builder = Module::Build->new(
     'Mojo::DOM58'                         => '0',
     'Mojo::File'                          => '0',
     'Mojo::File::Share'                   => '0',
+    'Mojo::Pg'                            => '0',
     'Mojo::Redis'                         => '0',
     'Mojo::Server::Hypnotoad'             => '0',
     'Mojo::UserAgent'                     => '0',
