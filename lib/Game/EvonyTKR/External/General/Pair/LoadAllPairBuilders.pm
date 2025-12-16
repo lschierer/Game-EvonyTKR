@@ -51,10 +51,33 @@ package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
     $job->log_info(sprintf('Found %d generals to process', scalar @$generals));
 
     # Spawn CreatePairs jobs for each general/type combination
-    my $job_count     = 0;
-    my %type_batches  = ();    # Track jobs by type for balanced batching
-    my $batch_count   = 0;
-    my %type_counters = ();    # Track how many jobs per type
+    my $job_count      = 0;
+    my $skipped_count  = 0;
+    my %type_batches   = ();    # Track jobs by type for balanced batching
+    my $batch_count    = 0;
+    my %type_counters  = ();    # Track how many jobs per type
+    my %pairs_in_persistence = ();    # Cache of which general/types have pairs
+
+    # Pre-load pairs from persistence to check what already exists
+    my $all_types = eval { $job->persistence->get_all_pair_types() } // [];
+    foreach my $type (@$all_types) {
+      my $type_pairs = eval { $job->persistence->list_pairs_by_type($type) } // [];
+      foreach my $wire_pair (@$type_pairs) {
+        if ($wire_pair && ref($wire_pair) eq 'HASH' && $wire_pair->{primary}) {
+          my $normalized_primary = $job->normalize($wire_pair->{primary});
+          $pairs_in_persistence{$type}{$normalized_primary} = 1;
+        }
+      }
+    }
+
+    my $total_existing_pairs = 0;
+    foreach my $type (keys %pairs_in_persistence) {
+      $total_existing_pairs += scalar(keys %{ $pairs_in_persistence{$type} });
+    }
+    $job->log_info(sprintf(
+      'Found %d existing general/type combinations with pairs in persistence',
+      $total_existing_pairs
+    ));
 
     foreach my $general (sort { $a->name cmp $b->name } @$generals) {
 
@@ -65,6 +88,18 @@ package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
       # Create jobs for each type this general supports
       foreach my $type (@$general_types) {
         $type_counters{$type}++;
+
+        my $normalized_name = $job->normalize($general->name);
+
+        # Check if pairs already exist in persistence for this general/type
+        if ($pairs_in_persistence{$type}{$normalized_name}) {
+          $job->log_debug(sprintf(
+            'Skipping %s/%s - pairs already in persistence',
+            $general->name, $type
+          ));
+          $skipped_count++;
+          next;
+        }
 
         # High priority for first 3 generals of each type
         my $priority = ($type_counters{$type} <= 10) ? 3 : 1;
@@ -102,6 +137,7 @@ package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
             'Skipping %s/%s - job already exists for current run',
             $general->name, $type
           ));
+          $skipped_count++;
           next;
         }
 
@@ -184,8 +220,8 @@ package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
     }
 
     $job->log_info(sprintf(
-'LoadAllPairBuilders completed: spawned %d create_pairs jobs in %d batches',
-      $job_count, $batch_count
+'LoadAllPairBuilders completed: spawned %d create_pairs jobs in %d batches, skipped %d already in persistence',
+      $job_count, $batch_count, $skipped_count
     ));
 
     # Mark job as completed in persistence
