@@ -528,7 +528,8 @@ package Game::EvonyTKR::Controller::Pairs {
     my $batch_size          = 100;  # Enqueue 100 jobs per tick
     my $current_idx         = 0;
 
-    my $recurring_id = Mojo::IOLoop->recurring(0.05 => sub {
+    my $recurring_id;
+    $recurring_id = Mojo::IOLoop->recurring(0.05 => sub {
       my $loop = shift;
 
       # Calculate batch range
