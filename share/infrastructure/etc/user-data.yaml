@@ -98,7 +98,7 @@ runcmd:
       server_name           ${H}.evonytkrtips.net REPLACE2.evonytkrtips.net www.REPLACE2.evonytkrtips.net;
       return                301 https://$host$request_uri;
     }
-    limit_req_zone \$binary_remote_addr zone=anti_hammer:10m rate=1r/s;
+    limit_req_zone \$binary_remote_addr zone=anti_hammer:10m rate=5r/s;
     server {
       listen 443 ssl;
       server_name           ${H}.evonytkrtips.net REPLACE2.evonytkrtips.net www.REPLACE2.evonytkrtips.net;
