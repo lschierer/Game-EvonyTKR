@@ -50,7 +50,7 @@ sub index ($c) {
   $c->log_debug("Rendering glossary index");
 
   # Load all terms from persistence
-  my $terms_data = $c->persistence->list_glossary_terms();
+  my $terms_data = $c->list_glossary_terms();
 
   # Convert wire format to objects
   require Game::EvonyTKR::Model::Glossary;

@@ -32,6 +32,10 @@ sub get_glossary_term ($self, $term_name) {
   return $term;
 }
 
+sub list_glossary_terms ($self) {
+  return [ sort keys $self->persistence->list_glossary_terms()->%* ];
+}
+
 1;
 __END__
 
