@@ -525,11 +525,11 @@ package Game::EvonyTKR::Controller::Pairs {
     my $max_index           = scalar(@sorted_pairs) - 1;
     my $active_processes    = 0;
     my $pair_index          = 0;
-    my $batch_size          = 100;  # Enqueue 100 jobs per tick
+    my $batch_size          = 50;  # Enqueue 100 jobs per tick
     my $current_idx         = 0;
 
     my $recurring_id;
-    $recurring_id = Mojo::IOLoop->recurring(0.05 => sub {
+    $recurring_id = Mojo::IOLoop->recurring(1 => sub {
       my $loop = shift;
 
       # Calculate batch range
