@@ -639,7 +639,7 @@ package Game::EvonyTKR::Controller::Pairs {
           "Client disconnected, canceling " . scalar(@subs) . " jobs");
         foreach my $jid (@subs) {
           my $job = $c->app->minion->job($jid);
-          Mojo::IOLoop->timer(rand(5.00) -> {
+          Mojo::IOLoop->timer(rand(5.00) => {
             if ($job) {
               my $info = $job->info;
               next unless $info;    # Job might be gone
