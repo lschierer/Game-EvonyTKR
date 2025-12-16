@@ -657,12 +657,7 @@ sub list_pairs_by_type ($self, $type) {
   # Query pairs_individual table for all pairs of this type
   # Format: pk='pairs_individual', sk starts with 'type/'
   my $items = eval {
-    $self->_query_raw_items(
-      'pairs_individual',
-      undef,    # no specific sk (get all)
-      undef,    # no filter expression
-      {}, # no expression attribute values
-    );
+    $self->_query_raw_items('pairs_individual', "$type/");
   };
 
   if ($@) {
@@ -672,16 +667,12 @@ sub list_pairs_by_type ($self, $type) {
 
   my @type_pairs;
   foreach my $item_hash (@$items) {
-    my $sk = $item_hash->{sk}->{S} or next;
-
-    # sk format is "type/primary/secondary"
-    next unless $sk =~ /^\Q$type\E\//;
-
     my $data_str = $item_hash->{data}->{S};
     next unless $data_str;
 
     my $wire_pair = eval { $self->decode($data_str) };
     if ($@) {
+      my $sk = $item_hash->{sk}->{S} || 'unknown';
       $self->log_warn("Failed to decode pair $sk: $@");
       next;
     }
