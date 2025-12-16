@@ -280,7 +280,7 @@ package Game::EvonyTKR::External::Prebuild {
 
     # Mark all work units as incomplete at start
     require Game::EvonyTKR::WorkUnit::Tracker;
-    my $tracker = Game::EvonyTKR::WorkUnit::Tracker->new(ddb => $job->app->ddb);
+    my $tracker = Game::EvonyTKR::WorkUnit::Tracker->new(persistence => $job->persistence);
 
     my @work_units = qw(
       ascending_attributes generic_books builtin_books specialties

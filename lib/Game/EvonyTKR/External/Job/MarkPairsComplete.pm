@@ -25,7 +25,7 @@ sub run ($self) {
   }
 
   # Coordinator complete - mark pairs work unit as complete
-  my $tracker = Game::EvonyTKR::WorkUnit::Tracker->new(ddb => $app->ddb);
+  my $tracker = Game::EvonyTKR::WorkUnit::Tracker->new(persistence => $self->persistence);
   $tracker->mark_complete('pairs');
 
   $self->app->log->info("Marked work unit 'pairs' as complete");

@@ -100,7 +100,7 @@ package Game::EvonyTKR::External::Glossary::LoadAll {
 
     # Mark work unit as complete
     require Game::EvonyTKR::WorkUnit::Tracker;
-    my $tracker = Game::EvonyTKR::WorkUnit::Tracker->new(ddb => $job->app->ddb);
+    my $tracker = Game::EvonyTKR::WorkUnit::Tracker->new(persistence => $job->persistence);
     $tracker->mark_complete('glossary_terms');
 
     $job->app->log->info("Marked work unit 'glossary_terms' as complete");

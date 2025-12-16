@@ -516,6 +516,12 @@ CREATE TABLE IF NOT EXISTS pairs_individual (
   updated_at REAL NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS work_units (
+  name TEXT PRIMARY KEY,
+  data TEXT NOT NULL,
+  updated_at REAL NOT NULL
+);
+
 __END__
 
 =head1 NAME

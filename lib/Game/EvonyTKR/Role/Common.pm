@@ -143,7 +143,9 @@ package Game::EvonyTKR::Role::Common {
     # Get work unit tracker
     require Game::EvonyTKR::WorkUnit::Tracker;
     my $tracker = Game::EvonyTKR::WorkUnit::Tracker->new(
-      ddb => $self->app->ddb    # Assuming app has ddb helper
+      persistence => $self->can('persistence') ? $self->persistence : 
+                     do { require Game::EvonyTKR::Service::Persistence; 
+                          Game::EvonyTKR::Service::Persistence->new }
     );
 
     my $prereqs      = {};

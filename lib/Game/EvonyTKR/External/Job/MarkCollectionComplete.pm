@@ -32,7 +32,7 @@ sub run ($self, $collection_type, $loader_task_names) {
   }
 
   # All loaders complete - mark work unit as complete
-  my $tracker = Game::EvonyTKR::WorkUnit::Tracker->new(ddb => $app->ddb);
+  my $tracker = Game::EvonyTKR::WorkUnit::Tracker->new(persistence => $self->persistence);
   $tracker->mark_complete($collection_type);
 
   $self->app->log->info("Marked work unit '$collection_type' as complete");

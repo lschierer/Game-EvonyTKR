@@ -183,7 +183,7 @@ package Game::EvonyTKR::External::Conflicts::LoadML {
 
     # Mark work unit as complete
     require Game::EvonyTKR::WorkUnit::Tracker;
-    my $tracker = Game::EvonyTKR::WorkUnit::Tracker->new(ddb => $job->app->ddb);
+    my $tracker = Game::EvonyTKR::WorkUnit::Tracker->new(persistence => $job->persistence);
     $tracker->mark_complete('ml_conflicts');
 
     $job->app->log->info("Marked work unit 'ml_conflicts' as complete");
