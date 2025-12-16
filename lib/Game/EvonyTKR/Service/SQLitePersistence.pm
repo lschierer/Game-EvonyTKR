@@ -345,32 +345,44 @@ sub store_conflict ($self, $g1, $g2, $conflicts) {
 
 # Batch write conflicts - much more efficient for bulk updates
 sub store_conflicts_batch ($self, $conflicts_hash) {
+  # Deduplicate first - conflicts are bidirectional so we might have
+  # both conflicts{A}{B} and conflicts{B}{A} which map to same key
+  my %unique_conflicts;
+
+  foreach my $g1 (keys %$conflicts_hash) {
+    foreach my $g2 (keys %{ $conflicts_hash->{$g1} }) {
+      my ($sorted_g1, $sorted_g2) = sort ($g1, $g2);
+      my $key = "$sorted_g1:$sorted_g2";
+
+      # Skip if we've already processed this conflict pair
+      next if exists $unique_conflicts{$key};
+
+      $unique_conflicts{$key} = $conflicts_hash->{$g1}{$g2} ? 1 : 0;
+    }
+  }
+
   my $tx    = $self->db->begin;
   my $count = 0;
 
   eval {
-    foreach my $g1 (keys %$conflicts_hash) {
-      foreach my $g2 (keys %{ $conflicts_hash->{$g1} }) {
-        my ($sorted_g1, $sorted_g2) = sort ($g1, $g2);
-        my $key       = "$sorted_g1:$sorted_g2";
-        my $conflicts = $conflicts_hash->{$g1}{$g2} ? 1 : 0;
+    foreach my $key (keys %unique_conflicts) {
+      my $conflicts = $unique_conflicts{$key};
 
-        $self->db->insert(
-          'general_conflicts',
-          {
-            pair_key   => $key,
-            conflicts  => $conflicts,
-            updated_at => time()
-          },
-          {
-            on_conflict => \[
-              '(pair_key) do update set conflicts = ?, updated_at = ?',
-              $conflicts, time()
-            ]
-          }
-        );
-        $count++;
-      }
+      $self->db->insert(
+        'general_conflicts',
+        {
+          pair_key   => $key,
+          conflicts  => $conflicts,
+          updated_at => time()
+        },
+        {
+          on_conflict => \[
+            '(pair_key) do update set conflicts = ?, updated_at = ?',
+            $conflicts, time()
+          ]
+        }
+      );
+      $count++;
     }
     $tx->commit;
     1;

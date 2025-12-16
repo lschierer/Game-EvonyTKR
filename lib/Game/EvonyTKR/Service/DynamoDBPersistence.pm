@@ -471,27 +471,33 @@ sub store_conflict ($self, $g1, $g2, $conflicts) {
 
 # Batch write conflicts - much more efficient for bulk updates
 sub store_conflicts_batch ($self, $conflicts_hash) {
-  my @items;
+  # Use hash to deduplicate - conflicts are bidirectional so we might have
+  # both conflicts{A}{B} and conflicts{B}{A} which map to same DynamoDB key
+  my %unique_items;
 
-  # Convert hash structure to list of items
+  # Convert hash structure to list of items, deduplicating by sk
   foreach my $g1 (keys %$conflicts_hash) {
     foreach my $g2 (keys %{ $conflicts_hash->{$g1} }) {
       my ($sorted_g1, $sorted_g2) = sort ($g1, $g2);
-      my $sk        = "$sorted_g1:$sorted_g2";
+      my $sk = "$sorted_g1:$sorted_g2";
+
+      # Skip if we've already processed this conflict pair
+      next if exists $unique_items{$sk};
+
       my $conflicts = $conflicts_hash->{$g1}{$g2} ? 1 : 0;
 
-      push @items,
-        {
+      $unique_items{$sk} = {
         pk          => { S => 'general_conflicts' },
         sk          => { S => $sk },
         entity_type => { S => 'general_conflicts' },
         data        => { S => $self->encode({ conflicts => $conflicts }) },
         updated_at  => { N => sprintf("%.6f", time()) }
-        };
+      };
     }
   }
 
-  my $total_items = scalar(@items);
+  my @items        = values %unique_items;
+  my $total_items  = scalar(@items);
   return 0 unless $total_items;
 
   $self->log_info(
