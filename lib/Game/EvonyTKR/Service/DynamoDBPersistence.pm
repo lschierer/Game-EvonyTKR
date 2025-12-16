@@ -306,7 +306,7 @@ sub get_all_data ($self, $table) {
   my $result = {};
   for my $item (@$items) {
     # Assume the key is stored in the data or derive from sk
-    my $key = $item->{name} || $item->{id} || 'unknown';
+    my $key = $item->{name} || $item->{id} || $item->{term} || 'unknown';
     $result->{$key} = $item;
   }
   return $result;
