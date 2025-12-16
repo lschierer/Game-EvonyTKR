@@ -48,7 +48,6 @@ package Game::EvonyTKR::Controller::Covenants {
     return [qw(
       load_all_generals
       load_all_covenants
-      build_general_indexes
     )];
   };
 
