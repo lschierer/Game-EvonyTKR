@@ -177,7 +177,7 @@ package Game::EvonyTKR::Controller::Books {
             title => sprintf(
               'Details for the Level %s %s Book', $level, $display_name
             ),
-            path   => sprintf('%s/%s Level %s', $base,  $display_name, $level,),
+            path   => sprintf('%s/%s Level %s', $base,  $display_name, $level),
             parent => $base,
             order  => 30,
           });
@@ -278,7 +278,13 @@ package Game::EvonyTKR::Controller::Books {
     my $name = $self->param('book_name');
     $self->log_debug("show detects name $name, showing details.");
 
-    my $book = $self->get_builtin_book($name) || $self->get_generic_book($name);
+    my $book;
+    if ($name =~ /^(.+?)\s+Level\s+([1-4])$/i) {
+      my ($base_name, $level) = ($1, $2);
+      $book = $self->get_builtin_book($name) || $self->get_generic_book($base_name, $level);
+    } else {
+      $book = $self->get_builtin_book($name);
+    }
 
     unless ($book) {
       $self->log_debug("skill book '$name' was not found in builtin or generic books.");
