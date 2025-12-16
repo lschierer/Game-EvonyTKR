@@ -42,6 +42,19 @@ package Game::EvonyTKR::Controller::Pairs {
     return $base;
   }
 
+  has prereqs => sub {
+    return [qw(
+      load_all_ascending_attributes
+      load_all_builtin_books
+      load_all_covenants
+      load_all_generals
+      load_all_generic_books
+      load_all_pair_builders
+      load_all_specialties
+    )];
+  };
+
+
   sub register($c, $app, $config = {}) {
     $c->SUPER::register($app, $config);
     $c->log_info("Registering routes for " . ref($c));
