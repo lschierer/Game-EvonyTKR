@@ -517,105 +517,119 @@ package Game::EvonyTKR::Controller::Pairs {
     $c->inactivity_timeout(1200);
 
     my @subs;
-    # Simple process-by-process approach instead of batching
+    my @promises;
+
+    # Enqueue jobs in batches using recurring timer to avoid SQLite lock contention
     my $completed_processes = {};
     my $total_processes     = scalar(@sorted_pairs);
     my $max_index           = scalar(@sorted_pairs) - 1;
     my $active_processes    = 0;
     my $pair_index          = 0;
+    my $batch_size          = 100;  # Enqueue 100 jobs per tick
+    my $current_idx         = 0;
 
-    for my $index (0 .. $max_index) {
-      my $pair = $sorted_pairs[$index];
-      unless ($pair && $pair->primary->name && $pair->secondary->name) {
-        $c->log_error(sprintf(
-          'invalid pair at index %s : %s',
-          $index, $pair ? Data::Printer::np($pair) : 'undefined'
-        ));
-        next;
+    my $recurring_id = Mojo::IOLoop->recurring(0.05 => sub {
+      my $loop = shift;
+
+      # Calculate batch range
+      my $end_idx = $current_idx + $batch_size - 1;
+      $end_idx = $max_index if $end_idx > $max_index;
+
+      # Enqueue this batch
+      for my $index ($current_idx .. $end_idx) {
+        my $pair = $sorted_pairs[$index];
+        unless ($pair && $pair->primary->name && $pair->secondary->name) {
+          $c->log_error(sprintf(
+            'invalid pair at index %s : %s',
+            $index, $pair ? Data::Printer::np($pair) : 'undefined'
+          ));
+          next;
+        }
+
+        # Build args hash for the Worker class
+        my $args = {
+          runId                => $run_id,
+          primaryName          => $pair->primary->name,
+          secondaryName        => $pair->secondary->name,
+          targetType           => $validated_params->{route_meta}->{generalType},
+          activationType       => $validated_params->{buffActivation},
+          ascendingLevel       => $validated_params->{ascendingLevel},
+          primaryCovenantLevel => $validated_params->{primaryCovenantLevel},
+          primarySpecialty1    => $validated_params->{primarySpecialties}->[0],
+          primarySpecialty2    => $validated_params->{primarySpecialties}->[1],
+          primarySpecialty3    => $validated_params->{primarySpecialties}->[2],
+          primarySpecialty4    => $validated_params->{primarySpecialties}->[3],
+          secondaryCovenantLevel => $validated_params->{secondaryCovenantLevel},
+          secondarySpecialty1 => $validated_params->{secondarySpecialties}->[0],
+          secondarySpecialty2 => $validated_params->{secondarySpecialties}->[1],
+          secondarySpecialty3 => $validated_params->{secondarySpecialties}->[2],
+          secondarySpecialty4 => $validated_params->{secondarySpecialties}->[3],
+        };
+
+        my $jid = $c->app->minion->enqueue(
+          summarize_pair => [$args] => {
+            delay    => ($index * 0.001) + rand(0.5),
+            attempts => 2,
+          }
+        );
+
+        push @subs, $jid;
+
+        # Set up promise for this job immediately
+        my $promise = $c->app->minion->result_p($jid)->then(sub {
+          return if !$c->tx || $c->tx->is_finished;
+          my $result = shift;
+          if (defined($result) && ref($result) eq 'HASH') {
+            $c->log_debug(
+              "job $jid result is " . Data::Printer::np($result, multiline => 0));
+            if ($result->{result}->{status} eq 'complete') {
+              my $encoded = encode_base64($result->{result}->{result}, '');
+              $c->write_sse({ type => 'pair', text => $encoded });
+            }
+          }
+          return $result;
+        })->catch(sub {
+          my $err = shift;
+          $c->log_error(
+            "Job $jid failed: " . Data::Printer::np($err, multiline => 0));
+          return undef;    # Return something for Promise->all
+        });
+
+        push @promises, $promise;
       }
 
-      # Build args hash for the Worker class
-      my $args = {
-        runId                => $run_id,
-        primaryName          => $pair->primary->name,
-        secondaryName        => $pair->secondary->name,
-        targetType           => $validated_params->{route_meta}->{generalType},
-        activationType       => $validated_params->{buffActivation},
-        ascendingLevel       => $validated_params->{ascendingLevel},
-        primaryCovenantLevel => $validated_params->{primaryCovenantLevel},
-        primarySpecialty1    => $validated_params->{primarySpecialties}->[0],
-        primarySpecialty2    => $validated_params->{primarySpecialties}->[1],
-        primarySpecialty3    => $validated_params->{primarySpecialties}->[2],
-        primarySpecialty4    => $validated_params->{primarySpecialties}->[3],
-        secondaryCovenantLevel => $validated_params->{secondaryCovenantLevel},
-        secondarySpecialty1 => $validated_params->{secondarySpecialties}->[0],
-        secondarySpecialty2 => $validated_params->{secondarySpecialties}->[1],
-        secondarySpecialty3 => $validated_params->{secondarySpecialties}->[2],
-        secondarySpecialty4 => $validated_params->{secondarySpecialties}->[3],
-      };
-
       $c->log_debug(sprintf(
-        'Enqueueing job for pair index: %s with params %s',
-        $index, Data::Printer::np($args, multiline => 0)
+        'Enqueued batch: jobs %d-%d (%d total)',
+        $current_idx, $end_idx, scalar(@subs)
       ));
-      my $jid = $c->app->minion->enqueue(
-        summarize_pair => [$args] => {
-          delay    => ($index * 0.001) + rand(0.5),
-          attempts => 2,
-        }
-      );
 
-      $c->log_debug("Enqueued job with ID: $jid");
-      push @subs, $jid;
+      # Stop recurring when all jobs are enqueued
+      if ($end_idx >= $max_index) {
+        $loop->remove($recurring_id);
+        $c->log_info(sprintf('Finished enqueueing all %d jobs', scalar(@subs)));
 
-    }
+        # Now that all jobs are enqueued, set up completion handler
+        Mojo::Promise->all(@promises)->then(sub {
+          $c->log_debug("all jobs complete promise handler starting timer");
+          return if !$c->tx || $c->tx->is_finished;
+          # I cannot know which order the promise handlers will
+          # run in, I *need* this one to be *after* all the individual
+          # job handlers have run.
+          Mojo::IOLoop->timer(
+            10 => sub ($loop) {
+              $c->log_debug(
+                'all jobs complete promise handler sending complete event');
+              my $payload = $c->encode({ runId => $run_id });
+              $c->write_sse({ type => 'complete', text => $payload });
+            }
+          );
+        })->catch(sub {
+          $c->log_error("Some jobs failed in batch");
+          return undef;
+        });
+      }
 
-    my @promises;
-
-    foreach my $jid (@subs) {
-      my $job = $c->app->minion->job($jid);
-
-      my $promise = $c->app->minion->result_p($jid)->then(sub {
-        return if !$c->tx || $c->tx->is_finished;
-        my $result = shift;
-        if (defined($result) && ref($result) eq 'HASH') {
-          $c->log_debug(
-            "job $jid result is " . Data::Printer::np($result, multiline => 0));
-          if ($result->{result}->{status} eq 'complete') {
-            my $encoded = encode_base64($result->{result}->{result}, '');
-            $c->write_sse({ type => 'pair', text => $encoded });
-          }
-        }
-        return $result;
-      })->catch(sub {
-        my $err = shift;
-        $c->log_error(
-          "Job $jid failed: " . Data::Printer::np($err, multiline => 0));
-        return undef;    # Return something for Promise->all
-      });
-
-      push @promises, $promise;
-    }
-
-    # Send completion when ALL jobs are done
-    Mojo::Promise->all(@promises)->then(sub {
-      $c->log_debug("all jobs complete promise handler starting timer");
-      return if !$c->tx || $c->tx->is_finished;
-      # I cannot know which order the promise handlers will
-      # run in, I *need* this one to be *after* all the individual
-      # job handlers have run.
-      Mojo::IOLoop->timer(
-        10 => sub ($loop) {
-          $c->log_debug(
-            'all jobs complete promise handler sending complete event');
-          my $payload = $c->encode({ runId => $run_id });
-          $c->write_sse({ type => 'complete', text => $payload });
-        }
-      );
-
-    })->catch(sub {
-      $c->log_error("Some jobs failed in batch");
-      return undef;
+      $current_idx = $end_idx + 1;
     });
 
     $c->on(
