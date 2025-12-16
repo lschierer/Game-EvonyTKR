@@ -314,7 +314,7 @@ sub store_glossary_term ($self, $name, $data) {
 }
 
 sub get_glossary_term ($self, $name) {
-  $self->get_data('glossary_terms', $name);
+  return $self->get_data('glossary_terms', $name);
 }
 sub get_all_glossary_terms ($self) { $self->get_all_data('glossary_terms') }
 

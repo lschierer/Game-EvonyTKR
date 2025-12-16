@@ -75,6 +75,7 @@ runcmd:
   # set up the mojo user and environment
   - mkdir -p /opt/mojo/var/run
   - mkdir -p /opt/mojo/bin
+  - /usr/sbin/groupmod -a mojo -U luke
   - chown -R mojo:www-data /opt/mojo
   - |
     export H=$( grep 127.0.1.1 /etc/hosts | cut -d ' ' -f 3 | cut -d '.' -f 1); cat > /etc/nginx/sites-available/mojoproxy << EOF
