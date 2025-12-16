@@ -503,8 +503,11 @@ sub store_conflicts_batch ($self, $conflicts_hash) {
   $self->log_info(
     sprintf("[DynamoDB] Batch writing %d conflict items", $total_items));
 
-  my $written = 0;
-  my $failed  = 0;
+  my $written           = 0;
+  my $failed            = 0;
+  my $throttle_delay    = 0.1;  # Start with 100ms
+  my $consecutive_throttles = 0;
+  my $total_throttled   = 0;
 
   # DynamoDB BatchWriteItem limit is 25 items per request
   while (@items) {
@@ -514,6 +517,7 @@ sub store_conflicts_batch ($self, $conflicts_hash) {
       { $self->table_name => [map { { PutRequest => { Item => $_ } } } @batch]
       };
 
+    my $was_throttled = 0;
     eval {
       my $result =
         $self->dynamodb->BatchWriteItem(RequestItems => $request_items);
@@ -523,16 +527,29 @@ sub store_conflicts_batch ($self, $conflicts_hash) {
         my $unprocessed =
           $result->UnprocessedItems->{ $self->table_name } || [];
         my $unprocessed_count = scalar(@$unprocessed);
-        $self->log_warn(sprintf(
-          "[DynamoDB] %d items unprocessed due to throttling, retrying...",
-          $unprocessed_count));
+
+        $was_throttled = 1;
+        $consecutive_throttles++;
+        $total_throttled += $unprocessed_count;
 
         # Re-add unprocessed items to the queue
         push @items, map { $_->{PutRequest}->{Item} } @$unprocessed;
-        $failed += $unprocessed_count;
+
+        # Exponential backoff: double delay on each consecutive throttle
+        $throttle_delay = $throttle_delay * 2;
+        $throttle_delay = 2.0 if $throttle_delay > 2.0;  # Cap at 2 seconds
+
+        $self->log_debug(sprintf(
+          "[DynamoDB] Throttled: %d unprocessed, %d consecutive throttles, next delay: %.1fs",
+          $unprocessed_count, $consecutive_throttles, $throttle_delay
+        ));
+      } else {
+        # Batch succeeded without throttling - reset backoff
+        $consecutive_throttles = 0;
+        $throttle_delay = 0.1;
       }
 
-      $written += scalar(@batch);
+      $written += scalar(@batch) - ($was_throttled ? scalar(@{ $result->UnprocessedItems->{ $self->table_name } || [] }) : 0);
       1;
     } or do {
       my $error = $@ || 'unknown error';
@@ -540,14 +557,23 @@ sub store_conflicts_batch ($self, $conflicts_hash) {
       $failed += scalar(@batch);
     };
 
-    # Small delay between batches to avoid throttling
-    select(undef, undef, undef, 0.1) if @items;
+    # Delay between batches - longer if we're being throttled
+    select(undef, undef, undef, $throttle_delay) if @items;
   }
 
-  $self->log_info(sprintf(
-    "[DynamoDB] Batch write complete: %d/%d items written (%d failed)",
-    $written, $total_items, $failed
-  ));
+  my $summary = sprintf(
+    "[DynamoDB] Batch write complete: %d/%d items written",
+    $written, $total_items
+  );
+
+  if ($total_throttled > 0) {
+    $summary .= sprintf(" (%d items throttled and retried)", $total_throttled);
+  }
+  if ($failed > 0) {
+    $summary .= sprintf(" (%d failed)", $failed);
+  }
+
+  $self->log_info($summary);
 
   return $written;
 }
