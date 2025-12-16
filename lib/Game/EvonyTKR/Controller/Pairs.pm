@@ -529,8 +529,9 @@ package Game::EvonyTKR::Controller::Pairs {
     my $current_idx         = 0;
 
     my $recurring_id;
-    $recurring_id = Mojo::IOLoop->recurring(5 => sub {
-      my $loop = shift;
+    #$recurring_id = Mojo::IOLoop->recurring(5 => sub {
+    #  my $loop = shift;
+    while($current_idx <= $max_index) {
 
       # Calculate batch range
       my $end_idx = $current_idx + $batch_size - 1;
@@ -605,7 +606,7 @@ package Game::EvonyTKR::Controller::Pairs {
 
       # Stop recurring when all jobs are enqueued
       if ($end_idx >= $max_index) {
-        $loop->remove($recurring_id);
+      #  $loop->remove($recurring_id);
         $c->log_info(sprintf('Finished enqueueing all %d jobs', scalar(@subs)));
 
         # Now that all jobs are enqueued, set up completion handler
@@ -630,7 +631,8 @@ package Game::EvonyTKR::Controller::Pairs {
       }
 
       $current_idx = $end_idx + 1;
-    });
+    #});
+    }
 
     $c->on(
       finish => sub {
