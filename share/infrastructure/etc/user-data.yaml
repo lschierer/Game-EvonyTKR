@@ -26,6 +26,8 @@ packages:
   - pipx
   - pkg-config
   - plocate
+  - postgresql
+  - postgresql-contrib
   - python3
   - python3-certbot-nginx
   - python3-pip
@@ -74,6 +76,13 @@ runcmd:
   - systemctl enable amazon-ssm-agent
   - systemctl start amazon-ssm-agent
   # set up the mojo user and environment
+  - sudo systemctl enable postgresql
+  - sudo systemctl start postgresql
+  - sudo -u postgres createdb minion_db
+  - sudo -u postgres psql -c "CREATE USER mojo;"
+  - sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE minion_db TO mojo;"
+  - echo "local   minion_db   mojo                    peer" | sudo tee -a /etc/postgresql/16/main/pg_hba.conf
+  - systemctl reload postgresql
   - mkdir -p /opt/mojo/var/run
   - mkdir -p /opt/mojo/bin
   - /usr/sbin/groupmod -a mojo -U luke

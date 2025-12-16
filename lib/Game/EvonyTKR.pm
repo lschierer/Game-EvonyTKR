@@ -183,28 +183,15 @@ package Game::EvonyTKR {
 
   sub _init_minion($app) {
 
-    require Minion::Backend::SQLite;
+    require Minion::Backend::Pg;
     require Mojolicious::Plugin::Minion;
- # Use SQLite for Minion (reliable), mode-gated persistence for application data
-    my $minion_db = $app->home->child('minion.db');
+ # Use PostgreSQL for Minion (better concurrency than SQLite)
+    my $minion_dsn = 'postgresql:///minion_db';
     $app->log->info(sprintf(
-      "[Game::EvonyTKR] Minion SQLite database: %s (app->home=%s)\n",
-      $minion_db, $app->home
+      "[Game::EvonyTKR] Minion PostgreSQL DSN: %s\n",
+      $minion_dsn
     ));
-    $app->plugin(Minion => { SQLite => $minion_db });
-
-    # Apply SQLite optimizations for Minion
-    my $sqlite = $app->minion->backend->sqlite;
-    $sqlite->on(
-      connection => sub ($sqlite, $dbh) {
-        $dbh->do('PRAGMA journal_mode=WAL');
-        $dbh->do('PRAGMA synchronous=OFF');
-        $dbh->do('PRAGMA auto_vacuum=INCREMENTAL');
-        $dbh->do('PRAGMA temp_store=MEMORY');
-        # Increased timeout for heavy concurrent job load (2 minutes)
-        $dbh->do('PRAGMA busy_timeout=120000');
-      }
-    );
+    $app->plugin(Minion => { Pg => $minion_dsn });
 
 # Clear Minion jobs ONLY in development mode
 # In production/staging, jobs MUST persist across restarts

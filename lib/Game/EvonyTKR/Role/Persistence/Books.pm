@@ -31,7 +31,7 @@ sub get_builtin_book ($self, $name) {
   my $wire_data = $self->persistence->get_builtin_book($key);
 
   unless (defined($wire_data)) {
-    $self->log_warn("No wire_data found for key: $key");
+    $self->log_warn("No built in book wire_data found for key: $key");
     return;
   }
 
