@@ -529,7 +529,7 @@ package Game::EvonyTKR::Controller::Pairs {
     my $current_idx         = 0;
 
     my $recurring_id;
-    $recurring_id = Mojo::IOLoop->recurring(2 => sub {
+    $recurring_id = Mojo::IOLoop->recurring($current_idx % 10 + 1 => sub {
       my $loop = shift;
 
       # Calculate batch range
@@ -639,24 +639,26 @@ package Game::EvonyTKR::Controller::Pairs {
           "Client disconnected, canceling " . scalar(@subs) . " jobs");
         foreach my $jid (@subs) {
           my $job = $c->app->minion->job($jid);
-          if ($job) {
-            my $info = $job->info;
-            next unless $info;    # Job might be gone
-            my $state = $info->{state};
-            if ($state eq 'inactive') {
-              $job->remove;
-              $c->log_debug("Removed inactive job $jid");
-            }
-            elsif ($state eq 'active' && $info->{pid}) {
-              eval { $job->kill(); };
-              if ($@) {
-                $c->log_debug("Failed to kill job $jid: $@");
+          Mojo::IOLoop->timer(rand(5.00) -> {
+            if ($job) {
+              my $info = $job->info;
+              next unless $info;    # Job might be gone
+              my $state = $info->{state};
+              if ($state eq 'inactive') {
+                $job->remove;
+                $c->log_debug("Removed inactive job $jid");
               }
-              else {
-                $c->log_debug("Killed active job $jid");
+              elsif ($state eq 'active' && $info->{pid}) {
+                eval { $job->kill(); };
+                if ($@) {
+                  $c->log_debug("Failed to kill job $jid: $@");
+                }
+                else {
+                  $c->log_debug("Killed active job $jid");
+                }
               }
             }
-          }
+          });
         }
 
         if (exists $session_store->{$session_id}) {
