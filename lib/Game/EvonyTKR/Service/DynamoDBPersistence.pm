@@ -633,12 +633,63 @@ sub get_pair ($self, $key) {
 }
 
 sub get_all_pair_types ($self) {
-  my $items = $self->_query_items('pairs');
-  return [map { $_->{name} || 'unknown' } @$items];
+  # Query pairs_individual to find all unique types
+  my $items = eval { $self->_query_raw_items('pairs_individual') };
+
+  if ($@) {
+    $self->log_error("Failed to query pairs_individual for types: $@");
+    return [];
+  }
+
+  my %types_seen;
+  foreach my $item_hash (@$items) {
+    my $sk = $item_hash->{sk}->{S} or next;
+    # sk format is "type/primary/secondary"
+    if ($sk =~ /^([^\/]+)\//) {
+      $types_seen{$1} = 1;
+    }
+  }
+
+  return [sort keys %types_seen];
 }
 
 sub list_pairs_by_type ($self, $type) {
-  return $self->get_pairs_by_type($type);
+  # Query pairs_individual table for all pairs of this type
+  # Format: pk='pairs_individual', sk starts with 'type/'
+  my $items = eval {
+    $self->_query_raw_items(
+      'pairs_individual',
+      undef,    # no specific sk (get all)
+      undef,    # no filter expression
+      {}, # no expression attribute values
+    );
+  };
+
+  if ($@) {
+    $self->log_error("Failed to query pairs_individual: $@");
+    return [];
+  }
+
+  my @type_pairs;
+  foreach my $item_hash (@$items) {
+    my $sk = $item_hash->{sk}->{S} or next;
+
+    # sk format is "type/primary/secondary"
+    next unless $sk =~ /^\Q$type\E\//;
+
+    my $data_str = $item_hash->{data}->{S};
+    next unless $data_str;
+
+    my $wire_pair = eval { $self->decode($data_str) };
+    if ($@) {
+      $self->log_warn("Failed to decode pair $sk: $@");
+      next;
+    }
+
+    push @type_pairs, $wire_pair;
+  }
+
+  return \@type_pairs;
 }
 
 # Clear all data (for rebuilds) - WARNING: This will be expensive in DynamoDB

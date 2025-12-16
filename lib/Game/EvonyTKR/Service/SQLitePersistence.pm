@@ -426,11 +426,39 @@ sub store_pair ($self, $key, $data) {
 sub get_pair ($self, $key) { $self->get_data('pairs_individual', $key) }
 
 sub get_all_pair_types ($self) {
-  my $results = $self->db->select('pairs', ['name'])->arrays;
-  return [map { $_->[0] } @$results];
+  # Query pairs_individual to find all unique types
+  # Name format is "type/primary/secondary"
+  my $results = $self->db->select('pairs_individual', ['name'])->arrays;
+
+  my %types_seen;
+  for my $row (@$results) {
+    my $name = $row->[0];
+    if ($name =~ /^([^\/]+)\//) {
+      $types_seen{$1} = 1;
+    }
+  }
+
+  return [sort keys %types_seen];
 }
 
-sub list_pairs_by_type ($self, $type) { $self->get_pairs_by_type($type) }
+sub list_pairs_by_type ($self, $type) {
+  # Query pairs_individual table for all pairs of this type
+  # The name field has format "type/primary/secondary"
+  my $results = $self->db->select('pairs_individual', ['name', 'data'],
+    \["name LIKE ?", "$type/%"])->hashes;
+
+  my @type_pairs;
+  for my $row (@$results) {
+    my $wire_pair = eval { $self->decode($row->{data}) };
+    if ($@) {
+      warn sprintf("[SQLite] Failed to decode pair %s: %s\n", $row->{name}, $@);
+      next;
+    }
+    push @type_pairs, $wire_pair;
+  }
+
+  return \@type_pairs;
+}
 
 # Clear all data
 sub clear_all_data ($self) {
