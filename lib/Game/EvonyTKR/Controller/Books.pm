@@ -177,7 +177,7 @@ package Game::EvonyTKR::Controller::Books {
             title => sprintf(
               'Details for the Level %s %s Book', $level, $display_name
             ),
-            path   => sprintf('%s/%s Level %s', $base, $level, $display_name),
+            path   => sprintf('%s/%s Level %s', $base,  $display_name, $level,),
             parent => $base,
             order  => 30,
           });
