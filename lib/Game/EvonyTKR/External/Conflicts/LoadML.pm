@@ -184,9 +184,9 @@ package Game::EvonyTKR::External::Conflicts::LoadML {
     # Mark work unit as complete
     require Game::EvonyTKR::WorkUnit::Tracker;
     my $tracker = Game::EvonyTKR::WorkUnit::Tracker->new(persistence => $job->persistence);
-    $tracker->mark_complete('ml_conflicts');
+    $tracker->mark_complete('load_ml_conflicts');
 
-    $job->app->log->info("Marked work unit 'ml_conflicts' as complete");
+    $job->app->log->info("Marked work unit 'load_ml_conflicts' as complete");
   }
 
   sub _has_troop_overlap ($self, $g1, $g2) {

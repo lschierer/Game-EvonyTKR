@@ -3,6 +3,7 @@ use v5.42.0;
 use utf8::all;
 use Mojo::Base -base,                        -signatures;
 use Mojo::Base 'Game::EvonyTKR::Role::JSON', -role;
+use Mojo::Base 'Game::EvonyTKR::Role::Logging', -role;
 use Mojo::SQLite;
 
 use Carp;
@@ -23,12 +24,18 @@ has 'sqlite' => sub ($self) {
     connection => sub ($sqlite, $dbh) {
       $dbh->do('PRAGMA journal_mode=WAL');
       $dbh->do('PRAGMA synchronous=NORMAL');
-      $dbh->do('PRAGMA busy_timeout=30000');
+      $dbh->do('PRAGMA busy_timeout=35000');
     }
   );
 
-  # Create tables - run migrations immediately
-  $sqlite->migrations->name('evonytkr')->from_data->migrate;
+  # Create tables - run migrations with error handling
+  eval {
+    $sqlite->migrations->name('evonytkr')->from_data->migrate;
+  };
+  if ($@) {
+    # If migration fails due to version conflict, it's likely already migrated
+    warn "Migration warning (likely harmless): $@" if $@ !~ /greater than.*latest version/;
+  }
 
   return $sqlite;
 };

@@ -29,7 +29,7 @@ package Game::EvonyTKR::External::General::Pair::ReduceCoordinator {
     # Check if prerequisites are loaded - fail fast if not
     return
       if ($job->are_prereqs_outstanding(
-      $job->minion, ['load_all_pair_builders']));
+      $job->minion, ['load_all_generals']));
 
     my $processed = $job->info->{notes}{processed} // {};
 

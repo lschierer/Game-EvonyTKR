@@ -47,11 +47,7 @@ package Game::EvonyTKR::Controller::ConflictGroups {
       load_all_covenants
       load_all_specialties
       load_all_ascending_attributes
-      build_general_indexes
-      load_all_pair_builders
       load_ml_conflicts
-      reduce_coordinator
-      monitor_loaders
     )];
   };
 

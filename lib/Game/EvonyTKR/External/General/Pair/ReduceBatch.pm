@@ -32,7 +32,7 @@ package Game::EvonyTKR::External::General::Pair::ReduceBatch {
     # Check if prerequisites are loaded - fail fast if not
     return
       if ($job->are_prereqs_outstanding(
-      $job->minion, ['load_all_pair_builders']));
+      $job->minion, ['load_all_generals']));
 
     $job->log_info(
       sprintf('ReduceBatch processing %d parent jobs', scalar(@$job_ids)));

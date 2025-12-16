@@ -355,12 +355,12 @@ package Game::EvonyTKR::External::Prebuild {
 
     # Spawn completion jobs for collection types
     my %collection_completions = (
-      'ascending_attributes' => ['loader_ascending_attributes'],
-      'generic_books'        => ['loader_generic_book'],
-      'builtin_books'        => ['loader_builtin_book'],
-      'specialties'          => ['loader_specialty'],
-      'generals'             => ['loader_general'],
-      'covenants'            => ['loader_covenant'],
+      'load_all_ascending_attributes' => ['loader_ascending_attributes'],
+      'load_all_generic_books'        => ['loader_generic_book'],
+      'load_all_builtin_books'        => ['loader_builtin_book'],
+      'load_all_specialties'          => ['loader_specialty'],
+      'load_all_generals'             => ['loader_general'],
+      'load_all_covenants'            => ['loader_covenant'],
     );
 
     for my $collection (keys %collection_completions) {
