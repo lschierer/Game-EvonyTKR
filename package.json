@@ -49,7 +49,7 @@
     "signal-polyfill": "^0.2.2",
     "signal-utils": "^0.21.1",
     "sprintf-js": "^1.1.3",
-    "zod": "^4.2.0"
+    "zod": "^4.2.1"
   },
   "devDependencies": {
     "@commitlint/cli": "^20.2.0",
