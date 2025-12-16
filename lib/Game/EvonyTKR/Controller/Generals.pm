@@ -41,10 +41,7 @@ has prereqs => sub {
     load_all_covenants
     load_all_specialties
     load_all_ascending_attributes
-    build_general_indexes
     load_all_pair_builders
-    reduce_coordinator
-    monitor_loaders
   )];
 };
 

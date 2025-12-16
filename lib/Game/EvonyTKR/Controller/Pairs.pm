@@ -196,6 +196,7 @@ package Game::EvonyTKR::Controller::Pairs {
   }
 
   sub pairTable ($c) {
+    return if $c->check_prereqs_or_wait($c->prereqs);
     my $distDir = Mojo::File::Share::dist_dir('Game::EvonyTKR');
 
     my $slug_ui   = $c->stash('uiTarget');
