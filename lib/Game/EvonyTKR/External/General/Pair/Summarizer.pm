@@ -202,14 +202,9 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
     $summarizer->updateDebuffs();
     $t{update_debuffs} = time() - $t_debuffs_start;
 
-    # Load full general objects for serialization
-    my $primary_general   = $job->get_general($primaryName);
-    my $secondary_general = $job->get_general($secondaryName);
-
-    unless ($primary_general && $secondary_general) {
-      return $job->fail(
-        "Failed to load generals: $primaryName, $secondaryName");
-    }
+    # Reuse already-loaded generals for serialization (no need to reload)
+    my $primary_general   = $primary;
+    my $secondary_general = $secondary;
 
     # Flatten buffs/debuffs to match client schema
     my $buffs   = $summarizer->pairBuffValues;
