@@ -73,6 +73,21 @@ package Game::EvonyTKR::Model::Buff::Summarizer {
     };
   };
 
+  # Helper to generate cache key for buff/debuff results
+  sub _make_cache_key ($self, $type) {
+    return join('||',
+      $self->general->name,
+      $type,                 # 'buffs' or 'debuffs'
+      $self->targetType // '',
+      $self->activationType,
+      $self->covenantLevel,
+      $self->specialty1, $self->specialty2,
+      $self->specialty3, $self->specialty4,
+      $self->ascendingLevel,
+      $self->isPrimary ? 1 : 0
+    );
+  }
+
   sub inflate ($self) {
     # Return early if already inflated (per-instance guard)
     return 1 if $self->_private->{is_inflated};
@@ -236,6 +251,29 @@ package Game::EvonyTKR::Model::Buff::Summarizer {
       $self->ascendingLevel('none');
     }
 
+    # Check cache first (class-level state cache shared across instances in this process)
+    state $buffs_cache = {};
+    state $buffs_cache_hits = 0;
+    state $buffs_cache_misses = 0;
+    my $cache_key = $self->_make_cache_key('buffs');
+
+    if (exists $buffs_cache->{$cache_key}) {
+      $buffs_cache_hits++;
+      $self->log_info(sprintf(
+        "Cache HIT for buffs: %s (hits=%d, misses=%d, hit_rate=%.1f%%)",
+        $self->general->name, $buffs_cache_hits, $buffs_cache_misses,
+        100 * $buffs_cache_hits / ($buffs_cache_hits + $buffs_cache_misses)
+      ));
+      $self->buffValues($buffs_cache->{$cache_key});
+      return;
+    }
+
+    $buffs_cache_misses++;
+    $self->log_info(sprintf(
+      "Cache MISS for buffs: %s (hits=%d, misses=%d)",
+      $self->general->name, $buffs_cache_hits, $buffs_cache_misses
+    ));
+
     # Only compute buffs for the target troop type, not all types
     my @troopTypes = $self->targetType
       ? ($self->targetType)
@@ -247,6 +285,13 @@ package Game::EvonyTKR::Model::Buff::Summarizer {
           $self->updateBuff($attribute, $troopType);
       }
     }
+
+    # Cache the result (deep copy to avoid mutation issues)
+    require Sereal::Decoder;
+    require Sereal::Encoder;
+    state $encoder = Sereal::Encoder->new();
+    state $decoder = Sereal::Decoder->new();
+    $buffs_cache->{$cache_key} = $decoder->decode($encoder->encode($self->buffValues));
 
     # Report timing breakdown if available
     if ($self->_private->{timing}) {
@@ -288,6 +333,29 @@ package Game::EvonyTKR::Model::Buff::Summarizer {
       $self->ascendingLevel('none');
     }
 
+    # Check cache first (class-level state cache shared across instances in this process)
+    state $debuffs_cache = {};
+    state $debuffs_cache_hits = 0;
+    state $debuffs_cache_misses = 0;
+    my $cache_key = $self->_make_cache_key('debuffs');
+
+    if (exists $debuffs_cache->{$cache_key}) {
+      $debuffs_cache_hits++;
+      $self->log_info(sprintf(
+        "Cache HIT for debuffs: %s (hits=%d, misses=%d, hit_rate=%.1f%%)",
+        $self->general->name, $debuffs_cache_hits, $debuffs_cache_misses,
+        100 * $debuffs_cache_hits / ($debuffs_cache_hits + $debuffs_cache_misses)
+      ));
+      $self->debuffValues($debuffs_cache->{$cache_key});
+      return;
+    }
+
+    $debuffs_cache_misses++;
+    $self->log_info(sprintf(
+      "Cache MISS for debuffs: %s (hits=%d, misses=%d)",
+      $self->general->name, $debuffs_cache_hits, $debuffs_cache_misses
+    ));
+
     # Compute debuffs for all enemy troop types except Overall
     # (we need all 4 because you might fight any enemy type)
     foreach my $troopType (keys %{ $self->debuffValues }) {
@@ -297,6 +365,13 @@ package Game::EvonyTKR::Model::Buff::Summarizer {
           $self->updateDebuff($attribute, $troopType);
       }
     }
+
+    # Cache the result (deep copy to avoid mutation issues)
+    require Sereal::Decoder;
+    require Sereal::Encoder;
+    state $encoder = Sereal::Encoder->new();
+    state $decoder = Sereal::Decoder->new();
+    $debuffs_cache->{$cache_key} = $decoder->decode($encoder->encode($self->debuffValues));
 
     # Report timing breakdown if available
     if ($self->_private->{timing}) {
