@@ -18,8 +18,7 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
   use Scalar::Util   qw(blessed);
   use Const::Fast;
   use Carp;
-  use Devel::NYTProf;
-  DB::enable_profile();
+  use Time::HiRes qw(time);
 
   sub task_name {'summarize_pair'}
 
@@ -30,12 +29,15 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
   }
 
   sub run ($job, @args) {
+    my $t_start = time();
     $job->SUPER::run(@args);
 
     my $params        = shift @args;
     my $runId         = $params->{runId};
     my $primaryName   = $params->{primaryName};
     my $secondaryName = $params->{secondaryName};
+
+    my %t;
 
     my $activationType = $params->{activationType};
     $params->{ascendingLevel}         //= 'none';
@@ -75,22 +77,13 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
     }
 
     # Get both generals
-    $job->log_debug(sprintf(
-      'Getting primary general "%s" (normalized: "%s")',
-      $primaryName, $job->normalize($primaryName)
-    ));
     my $primary = $job->get_general(lc($job->normalize($primaryName)));
     unless ($primary) {
       my $err = sprintf('Cannot retrieve primary general: %s', $primaryName);
       $job->log_error($err);
       return $job->fail($err);
     }
-    $job->log_debug(sprintf('Got primary general: %s', $primary->name));
 
-    $job->log_debug(sprintf(
-      'Getting secondary general "%s" (normalized: "%s")',
-      $secondaryName, $job->normalize($secondaryName)
-    ));
     my $secondary = $job->get_general(lc($job->normalize($secondaryName)));
     unless ($secondary) {
       my $err =
@@ -98,7 +91,7 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
       $job->log_error($err);
       return $job->fail($err);
     }
-    $job->log_debug(sprintf('Got secondary general: %s', $secondary->name));
+    $t{get_generals} = time() - $t_start;
 
     # Get the pair object
     my $pair = $job->get_pair($job->wire_pair_to_key({
@@ -106,6 +99,7 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
       secondary => $secondaryName,
       type      => $params->{targetType},
     }));
+    $t{get_pair} = time() - $t_start - $t{get_generals};
 
     unless ($pair) {
       my $err = sprintf(
@@ -116,27 +110,13 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
     }
 
     # Get covenants
-    $job->log_debug(sprintf('Getting covenant for primary: %s', $primaryName));
+    my $t_cov_start = time();
     my $primaryCovenant = $job->get_covenant($primaryName);
-    unless ($primaryCovenant) {
-      $job->log_warn("No covenant found for primary $primaryName");
-    }
-    else {
-      $job->log_debug(sprintf('Got covenant for primary: %s', $primaryName));
-    }
-
-    $job->log_debug(
-      sprintf('Getting covenant for secondary: %s', $secondaryName));
     my $secondaryCovenant = $job->get_covenant($secondaryName);
-    unless ($secondaryCovenant) {
-      $job->log_warn("No covenant found for secondary $secondaryName");
-    }
-    else {
-      $job->log_debug(
-        sprintf('Got covenant for secondary: %s', $secondaryName));
-    }
+    $t{get_covenants} = time() - $t_cov_start;
 
     # Get ascending attributes (primary only)
+    my $t_asc_start = time();
     if ($pair->primary->ascending) {
       $pair->primary->populateAscendingAttributes();
       unless ($pair->primary->ascendingAttributes) {
@@ -147,13 +127,17 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
         $job->fail($errmessage);
       }
     }
+    $t{populate_ascending} = time() - $t_asc_start;
 
     # Populate builtin books for both generals in the pair
+    my $t_books_start = time();
     $pair->primary->populateBuiltinBook() unless ($pair->primary->builtInBook);
     $pair->secondary->populateBuiltinBook()
       unless ($pair->secondary->builtInBook);
+    $t{populate_books} = time() - $t_books_start;
 
     # Populate specialties for both generals in the pair
+    my $t_spec_start = time();
     $pair->primary->populateSpecialties()
       unless (scalar($pair->primary->specialties->@*)
       && all { ref($_) && $_->isa('Game::EvonyTKR::Model::Specialty') }
@@ -163,15 +147,11 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
       unless (scalar($pair->secondary->specialties->@*)
       && all { ref($_) && $_->isa('Game::EvonyTKR::Model::Specialty') }
       $pair->secondary->specialties->@*);
+    $t{populate_specialties} = time() - $t_spec_start;
 
-    # Debug: verify specialties are loaded
-    $job->log_debug(sprintf(
-      'Primary %s has %d specialties, Secondary %s has %d specialties',
-      $pair->primary->name,   scalar($pair->primary->specialties->@*),
-      $pair->secondary->name, scalar($pair->secondary->specialties->@*)
-    ));
-
+    my $t_validate_start = time();
     $job->validateParams($params);
+    $t{validate_params} = time() - $t_validate_start;
 
     # Add the pair object to params for the summarizer
     $params->{pair} = $pair;
@@ -206,14 +186,21 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
 
     # Create summarizer
     $job->log_debug('Creating pair summarizer');
+    my $t_create_start = time();
     my $summarizer =
       Game::EvonyTKR::Model::Buff::Summarizer::Pair->new($params->%*);
+    $t{create_summarizer} = time() - $t_create_start;
 
     # Compute buffs and debuffs
     $job->log_debug('Computing buffs');
+    my $t_buffs_start = time();
     $summarizer->updateBuffs();
+    $t{update_buffs} = time() - $t_buffs_start;
+
     $job->log_debug('Computing debuffs');
+    my $t_debuffs_start = time();
     $summarizer->updateDebuffs();
+    $t{update_debuffs} = time() - $t_debuffs_start;
 
     # Load full general objects for serialization
     my $primary_general   = $job->get_general($primaryName);
@@ -232,6 +219,25 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
       'Buff values for %s/%s: %s',
       $primaryName, $secondaryName,
       Data::Printer::np($buffs, multiline => 0)
+    ));
+
+    # Log timing breakdown
+    my $t_total = time() - $t_start;
+    $job->log_info(sprintf(
+      'TIMING: total=%.3fs get_generals=%.3fs get_pair=%.3fs get_cov=%.3fs ' .
+      'pop_asc=%.3fs pop_books=%.3fs pop_spec=%.3fs validate=%.3fs ' .
+      'create_sum=%.3fs buffs=%.3fs debuffs=%.3fs',
+      $t_total,
+      $t{get_generals} // 0,
+      $t{get_pair} // 0,
+      $t{get_covenants} // 0,
+      $t{populate_ascending} // 0,
+      $t{populate_books} // 0,
+      $t{populate_specialties} // 0,
+      $t{validate_params} // 0,
+      $t{create_summarizer} // 0,
+      $t{update_buffs} // 0,
+      $t{update_debuffs} // 0
     ));
 
     # Return results
