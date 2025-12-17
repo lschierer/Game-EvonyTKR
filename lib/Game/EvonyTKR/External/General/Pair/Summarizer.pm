@@ -18,6 +18,8 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
   use Scalar::Util   qw(blessed);
   use Const::Fast;
   use Carp;
+  use Devel::NYTProf;
+  DB::enable_profile();
 
   sub task_name {'summarize_pair'}
 

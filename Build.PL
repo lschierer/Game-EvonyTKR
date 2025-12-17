@@ -30,6 +30,7 @@ my $builder = Module::Build->new(
     'Date::Manip'                         => '0',
     'DateTime'                            => '0',
     'Devel::Local'                        => '0',
+    'Devel::NYTProf'                      => '0',
     'Encode'                              => '0',
     'File::FindLib'                       => '0',
     'File::HomeDir'                       => '0',
