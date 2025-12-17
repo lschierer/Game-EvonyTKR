@@ -1,6 +1,7 @@
 use v5.42.0;
 use utf8::all;
 use File::FindLib 'lib';
+use Time::HiRes qw(time);
 require Data::Printer;
 require Game::EvonyTKR::Model::Buff::Value;
 require Game::EvonyTKR::Service::Conflicts;
@@ -235,12 +236,31 @@ package Game::EvonyTKR::Model::Buff::Summarizer {
       $self->ascendingLevel('none');
     }
 
-    foreach my $troopType (keys %{ $self->buffValues }) {
+    # Only compute buffs for the target troop type, not all types
+    my @troopTypes = $self->targetType
+      ? ($self->targetType)
+      : (keys %{ $self->buffValues });
+
+    foreach my $troopType (@troopTypes) {
       foreach my $attribute (keys %{ $self->buffValues->{$troopType} }) {
         $self->buffValues->{$troopType}->{$attribute} =
           $self->updateBuff($attribute, $troopType);
       }
     }
+
+    # Report timing breakdown if available
+    if ($self->_private->{timing}) {
+      my $t = $self->_private->{timing};
+      $self->log_info(sprintf(
+        'updateBuffs timing: book=%.3fs (%d calls), covenant=%.3fs (%d calls), '
+        . 'specialties=%.3fs (%d calls), ascending=%.3fs (%d calls)',
+        $t->{book_total} // 0, $t->{book_calls} // 0,
+        $t->{covenant_total} // 0, $t->{covenant_calls} // 0,
+        $t->{specialties_total} // 0, $t->{specialties_calls} // 0,
+        $t->{ascending_total} // 0, $t->{ascending_calls} // 0
+      ));
+    }
+
     $self->log_info("returning buffs for "
         . $self->general->name
         . Data::Printer::np($self->buffValues));
@@ -268,12 +288,29 @@ package Game::EvonyTKR::Model::Buff::Summarizer {
       $self->ascendingLevel('none');
     }
 
+    # Compute debuffs for all enemy troop types except Overall
+    # (we need all 4 because you might fight any enemy type)
     foreach my $troopType (keys %{ $self->debuffValues }) {
+      next if $troopType eq 'Overall';  # Overall debuffs not used
       foreach my $attribute (keys %{ $self->debuffValues->{$troopType} }) {
         $self->debuffValues->{$troopType}->{$attribute} =
           $self->updateDebuff($attribute, $troopType);
       }
     }
+
+    # Report timing breakdown if available
+    if ($self->_private->{timing}) {
+      my $t = $self->_private->{timing};
+      $self->log_info(sprintf(
+        'updateDebuffs timing: book=%.3fs (%d calls), covenant=%.3fs (%d calls), '
+        . 'specialties=%.3fs (%d calls), ascending=%.3fs (%d calls)',
+        $t->{book_total} // 0, $t->{book_calls} // 0,
+        $t->{covenant_total} // 0, $t->{covenant_calls} // 0,
+        $t->{specialties_total} // 0, $t->{specialties_calls} // 0,
+        $t->{ascending_total} // 0, $t->{ascending_calls} // 0
+      ));
+    }
+
     $self->log_info("returning debuffs for"
         . $self->general->name
         . Data::Printer::np($self->debuffValues));
@@ -446,29 +483,42 @@ package Game::EvonyTKR::Model::Buff::Summarizer {
     my $total         = 0;
     my $matching_type = (scalar @$debuffConditions > 0) ? 'debuff' : 'buff';
 
+    # Initialize timing hash if not exists
+    $self->_private->{timing} //= {};
+    my $t = $self->_private->{timing};
+
+    my $t_book_start = time();
     $total += $self->summarize_book_for_attribute(
       $attribute,        $summaryType, $buffConditions,
       $debuffConditions, $matching_type
     );
+    $t->{book_total} += time() - $t_book_start;
+    $t->{book_calls}++;
 
     $self->log_info(
           "summarize_from_sources has $total after summarize_book "
         . "for $attribute/$summaryType");
 
+    my $t_cov_start = time();
     $total += $self->summarize_covenant_for_attribute(
       $attribute,        $summaryType, $buffConditions,
       $debuffConditions, $matching_type
     );
+    $t->{covenant_total} += time() - $t_cov_start;
+    $t->{covenant_calls}++;
 
     $self->log_info(sprintf(
       'summarize_from_sources has %s after ' . 'summarize_covenant for %s/%s',
       $total, $attribute, $summaryType
     ));
 
+    my $t_spec_start = time();
     $total += $self->summarize_specialties_for_attribute(
       $attribute,        $summaryType, $buffConditions,
       $debuffConditions, $matching_type
     );
+    $t->{specialties_total} += time() - $t_spec_start;
+    $t->{specialties_calls}++;
 
     $self->log_info(sprintf(
       'summarize_from_sources has %s after '
@@ -477,10 +527,13 @@ package Game::EvonyTKR::Model::Buff::Summarizer {
     ));
 
     if ($self->isPrimary && $self->general->ascending) {
+      my $t_asc_start = time();
       $total += $self->summarize_ascendingAttributes_for_attribute(
         $attribute,        $summaryType, $buffConditions,
         $debuffConditions, $matching_type
       );
+      $t->{ascending_total} += time() - $t_asc_start;
+      $t->{ascending_calls}++;
 
       $self->log_info(sprintf(
         'summarize_from_sources has %s after '
