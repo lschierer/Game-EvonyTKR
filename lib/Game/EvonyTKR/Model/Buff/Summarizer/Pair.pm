@@ -183,17 +183,25 @@ sub _getGenericBookValue_impl ($self, $attribute, $troopType) {
   my $other_general =
     $self->isPrimary ? $self->pair->secondary : $self->pair->primary;
 
+  # Cache key for book compatibility (instance-level cache)
+  my $compat_cache = $self->_private->{book_compat_cache} //= {};
+
+  # Helper to check compatibility with caching
+  my $check_compat = sub {
+    my ($general, $book, $same_side) = @_;
+    my $cache_key = join(':', $general->name, $book->name, $same_side);
+    return $compat_cache->{$cache_key} //=
+      $self->bc->is_general_and_book_compatible($general, $book, { same_side => $same_side });
+  };
+
   # Special case for March Size - it's universal, not troop-specific
   if ($attribute eq 'March Size') {
 
     my $MS = $books_helper->get_generic_book('March Size', $self->bestLevel);
     if (
       $MS
-      && $self->bc->is_general_and_book_compatible($current_general, $MS,
-        { same_side => 1 })
-      && $self->bc->is_general_and_book_compatible(
-        $other_general, $MS, { same_side => 0 }
-      )
+      && $check_compat->($current_general, $MS, 1)
+      && $check_compat->($other_general, $MS, 0)
     ) {
       $total += $MS->buffs->[0]->value->number;
     }
@@ -257,15 +265,11 @@ sub _getGenericBookValue_impl ($self, $attribute, $troopType) {
 
     next unless $provides_attr;
 
-    # Check compatibility with current general (same side)
-    my $compat_current =
-      $self->bc->is_general_and_book_compatible($current_general, $book,
-      { same_side => 1 });
+    # Check compatibility with current general (same side) - cached
+    my $compat_current = $check_compat->($current_general, $book, 1);
 
-# Check compatibility with other general (different side - no partial conflicts)
-    my $compat_other =
-      $self->bc->is_general_and_book_compatible($other_general, $book,
-      { same_side => 0 });
+    # Check compatibility with other general (different side - no partial conflicts) - cached
+    my $compat_other = $check_compat->($other_general, $book, 0);
 
     $self->log_debug(sprintf(
 'Book %s for %s (%s): provides_attr=%d, compat_current=%d, compat_other=%d',

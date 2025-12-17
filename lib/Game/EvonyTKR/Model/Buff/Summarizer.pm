@@ -280,6 +280,10 @@ package Game::EvonyTKR::Model::Buff::Summarizer {
   }
 
   sub filterBuffConditions ($self) {
+    # Return cached result if available
+    my $cache_key = 'filterBuffConditions_' . $self->activationType;
+    return $self->_private->{$cache_key} if exists $self->_private->{$cache_key};
+
     my @buffConditions = keys %{ $self->BuffConditionValues };
 
     my %activationFilters = (
@@ -360,6 +364,8 @@ package Game::EvonyTKR::Model::Buff::Summarizer {
           . join(', ', @filtered)
           . "]");
 
+      # Cache and return
+      $self->_private->{$cache_key} = \@filtered;
       return \@filtered;
     }
     else {
@@ -373,6 +379,10 @@ package Game::EvonyTKR::Model::Buff::Summarizer {
   }
 
   sub filterDebuffConditions ($self) {
+    # Return cached result if available
+    my $cache_key = 'filterDebuffConditions_' . $self->activationType;
+    return $self->_private->{$cache_key} if exists $self->_private->{$cache_key};
+
     my @debuffConditions = @{ $self->DebuffConditionValues };
 
     if ($self->activationType ne 'PvM') {
@@ -383,6 +393,8 @@ package Game::EvonyTKR::Model::Buff::Summarizer {
       @debuffConditions = ("Monsters");
     }
 
+    # Cache and return
+    $self->_private->{$cache_key} = \@debuffConditions;
     return \@debuffConditions;
   }
 
