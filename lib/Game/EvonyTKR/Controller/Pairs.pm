@@ -617,7 +617,7 @@ package Game::EvonyTKR::Controller::Pairs {
           # run in, I *need* this one to be *after* all the individual
           # job handlers have run.
           Mojo::IOLoop->timer(
-            0.1 => sub ($loop) {
+            10 => sub ($loop) {
               $c->log_debug(
                 'all jobs complete promise handler sending complete event');
               my $payload = $c->encode({ runId => $run_id });
