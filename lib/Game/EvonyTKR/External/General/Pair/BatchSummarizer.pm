@@ -40,37 +40,23 @@ package Game::EvonyTKR::External::General::Pair::BatchSummarizer {
       sprintf("Batch contains %d unique generals", scalar @general_names));
 
     # Build cache keys for all generals with current params
-    my %cache_keys;
+    my $cached_buffs = {};
     foreach my $general_name (@general_names) {
-      my $cache_key = join(
-        ':',
-        $general_name,
-        $params->{targetType}           // 'ground_troops',
-        $params->{activationType}       // 'Attacking',
-        $params->{ascendingLevel}       // 'none',
-        $params->{primaryCovenantLevel} // 'none',    # Use primary for both
-        $params->{primarySpecialty1}    // 'none'
+      my $primary_key = $job->generate_buff_cache_key(
+        $general_name, 1, $params->{targetType}, $params->{activationType},
+        $params->{ascendingLevel}, $params->{primaryCovenantLevel},
+        $params->{primarySpecialty1}, $params->{primarySpecialty2},
+        $params->{primarySpecialty3}, $params->{primarySpecialty4}
       );
-      $cache_keys{$general_name} = $cache_key;
-    }
+      $cached_buffs->{$general_name}->{primary} = $job->get_buff_cache($primary_key);
 
-    # Bulk read cached buffs
-    my @cache_key_list = values %cache_keys;
-    my $cached_buffs   = {};
-
-    # Try to get cached results for all generals
-    foreach my $general_name (@general_names) {
-      my $cache_key = $cache_keys{$general_name};
-      my $cached_result =
-        $job->persistence->get_data('general_buff_cache', $cache_key);
-      if ($cached_result) {
-        $cached_buffs->{$general_name} = $cached_result;
-        $job->log_debug("Found cached buffs for $general_name");
-      }
-      else {
-        $job->log_debug(
-          "No cached buffs found for $general_name (key: $cache_key)");
-      }
+      my $secondary_key = $job->generate_buff_cache_key(
+        $general_name, 0, $params->{targetType}, $params->{activationType},
+        'none', $params->{secondaryCovenantLevel},
+        $params->{secondarySpecialty1}, $params->{secondarySpecialty2},
+        $params->{secondarySpecialty3}, $params->{secondarySpecialty4}
+      );
+      $cached_buffs->{$general_name}->{secondary} = $job->get_buff_cache($secondary_key);
     }
 
     # Enqueue individual pair jobs with or without cached buffs
@@ -82,12 +68,13 @@ package Game::EvonyTKR::External::General::Pair::BatchSummarizer {
 
       $params->{primaryName}   = $primary_name;
       $params->{secondaryName} = $secondary_name;
+
       # Prepare arguments for pair summarizer
       my @args = ($params);
 
       # Add cached buffs if available
-      my $primary_buffs   = $cached_buffs->{$primary_name};
-      my $secondary_buffs = $cached_buffs->{$secondary_name};
+      my $primary_buffs   = $cached_buffs->{$primary_name}->{primary};
+      my $secondary_buffs = $cached_buffs->{$secondary_name}->{secondary};
 
       if ($primary_buffs || $secondary_buffs) {
         # Add cached buffs as second argument

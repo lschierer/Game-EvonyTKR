@@ -36,6 +36,7 @@ my $prereq_plugins = [
   'Game::EvonyTKR::External::General::BuildIndexes',
   'Game::EvonyTKR::External::General::ComputeBuffCache',
   'Game::EvonyTKR::External::General::MonitorBuffCache',
+  'Game::EvonyTKR::External::General::LoadAllComputeBuffCache',
   'Game::EvonyTKR::External::General::Pair::BatchSummarizer',
   'Game::EvonyTKR::External::General::Pair::CreatePairs',
   'Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders',
@@ -106,6 +107,12 @@ sub _build_loader_job_defs ($self, $stored_version, $current_version) {
       attempts => 5,
       delay    => 6,
       priority => 50,
+    },
+    load_all_compute_buff_cache => {
+      args     => [$stored_version, $current_version],
+      attempts => 5,
+      delay    => 7,
+      priority => -1,
     },
   };
 }
@@ -210,6 +217,11 @@ sub run ($job, @args) {
   $job->log_info("Current git-commit: $current_version");
   my $stored_version = 0;
 
+  # Create unique run identifier for this prebuild
+  my $run_id = sprintf('%s-%s', $$, $job->id);
+  $job->prebuild_run_id($run_id);
+  $job->log_info("Prebuild run ID: $run_id");
+
   # harvest old stuff
   $job->cleanup();
 
@@ -268,10 +280,6 @@ sub run ($job, @args) {
 
   $job->log_info('launching jobs to spawn loaders.');
 
-  # Create unique run identifier for this prebuild
-  my $run_id = sprintf('%s-%s', $$, $job->id);
-  $job->prebuild_run_id($run_id);
-  $job->log_info("Prebuild run ID: $run_id");
 
   # Mark all work units as incomplete at start
   require Game::EvonyTKR::WorkUnit::Tracker;
@@ -290,9 +298,6 @@ sub run ($job, @args) {
       $tracker->mark_incomplete($prereq->task_name);
     }
   }
-
-  # Special case: mark general buff cache as incomplete work unit
-  $tracker->mark_incomplete('general_buff_cache');
 
   # Store current run_id in persistence so controllers can find it
   $job->set_metadata(

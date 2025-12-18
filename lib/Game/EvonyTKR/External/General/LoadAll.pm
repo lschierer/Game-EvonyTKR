@@ -56,7 +56,6 @@ package Game::EvonyTKR::External::General::LoadAll {
     my $enqueued_count      = 0;
     my $skipped_count       = 0;
     my @job_ids             = ();
-    my $cache_jobs_enqueued = 0;
     my $run_id              = $job->info->{notes}->{prebuild_run_id};
 
     foreach my $file (@files) {
@@ -115,23 +114,7 @@ package Game::EvonyTKR::External::General::LoadAll {
           $enqueued_count++;
         }
       }
-
-      my $cache_job_id = $job->minion->enqueue(
-        'compute_general_buff_cache' => [$job->normalize($general_name)] => {
-          attempts =>  3,
-          priority => -1,
-          notes    => { prebuild_run_id => $run_id }
-        }
-      );
-      $cache_jobs_enqueued++;
-      $job->log_debug(
-        "Enqueued buff cache job $cache_job_id for $general_name");
     }
-
-    $job->log_info(sprintf(
-      'Enqueued %d load_general jobs, skipped %d already in persistence',
-      $enqueued_count, $skipped_count
-    ));
 
     # Check if child jobs are still running
     if (@job_ids) {
@@ -242,24 +225,6 @@ package Game::EvonyTKR::External::General::LoadAll {
         $skipped_count));
     }
 
-    # Mark this job as completed in persistence (with run_id for isolation)
-    # IMPORTANT: This must be OUTSIDE the if (@job_ids) block so jobs that
-    # skip all work (because data exists) still mark themselves complete
-
-    $job->mark_task_completed($job->task_name, $run_id);
-
-    $job->log_info("Enqueued $cache_jobs_enqueued buff cache computation jobs");
-
-    # Enqueue monitor job to track buff cache completion
-    $job->minion->enqueue(
-      'monitor_general_buff_cache' => [] => {
-        attempts => 10,
-        priority => 5,     # Low priority, runs after other jobs
-        delay    => 30,    # Give cache jobs time to start
-        notes => { prebuild_run_id => $job->info->{notes}->{prebuild_run_id} }
-      }
-    );
-
     $job->minion->enqueue(
       build_general_indexes => [] => {
         attempts => 3,
@@ -267,6 +232,13 @@ package Game::EvonyTKR::External::General::LoadAll {
         notes => { prebuild_run_id => $job->info->{notes}->{prebuild_run_id} }
       }
     );
+
+    # Mark this job as completed in persistence (with run_id for isolation)
+    # IMPORTANT: This must be OUTSIDE the if (@job_ids) block so jobs that
+    # skip all work (because data exists) still mark themselves complete
+
+    $job->mark_task_completed($job->task_name, $run_id);
+
     $job->note(generalCount => scalar(@files));
     my $message = 'LoadAll generals job completed';
     $job->log_info($message);
