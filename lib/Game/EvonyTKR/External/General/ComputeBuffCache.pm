@@ -59,7 +59,7 @@ sub run ($job, @args) {
   # Wait for covenants to be loaded before computing buffs
   return if $job->are_prereqs_outstanding($job->minion, ['load_all_covenants']);
   return $job->retry({delay => $job->standard_delay * 2 })
-      unless my $guard = $job->minion->guard($job->task_name, 1500, {limit => 1});
+      unless my $guard = $job->minion->guard($job->task_name, 600, {limit => 1});
 
   $job->SUPER::run(@args);
 
@@ -90,8 +90,8 @@ sub run ($job, @args) {
       'computing buffs for "%s" target_type "%s"',
       $job->general->name, $target_type
     ));
-    $job->targetType($target_type);
-    $job->params->{targetType} = $target_type;
+    $job->targetType($job->string_to_trooptype($target_type));
+    $job->params->{targetType} = $job->string_to_trooptype($target_type);
 
     foreach my $activation_type ($job->common_activation_types->@*) {
       $job->log_debug(sprintf(
