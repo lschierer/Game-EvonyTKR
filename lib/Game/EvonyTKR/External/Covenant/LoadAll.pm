@@ -10,7 +10,7 @@ package Game::EvonyTKR::External::Covenant::LoadAll {
   sub task_name {'load_all_covenants'}
 
   sub register ($taskClass, $app, $conf = {}) {
-    return 1 unless $taskClass->SUPER::register($app, $conf);
+    $taskClass->SUPER::register($app, $conf);
     $app->minion->add_task($taskClass->task_name => __PACKAGE__);
     return 1;
   }
@@ -34,10 +34,7 @@ package Game::EvonyTKR::External::Covenant::LoadAll {
 
     return
       if ($job->are_prereqs_outstanding(
-      $job->minion,
-      [
-        'load_all_generals',    'load_all_builtin_books',
-      ]
+      $job->minion, ['load_all_generals', 'load_all_builtin_books',]
       ));
 
     $job->log_info('Starting load_all_covenants job');

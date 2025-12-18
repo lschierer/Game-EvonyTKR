@@ -12,7 +12,7 @@ package Game::EvonyTKR::External::Glossary::LoadAll {
   sub task_name {'load_all_glossary_terms'}
 
   sub register ($taskClass, $app, $conf = {}) {
-    return 1 unless $taskClass->SUPER::register($app, $conf);
+    $taskClass->SUPER::register($app, $conf);
     if (not defined($app)) {
       my $errmessage = 'app not defined in register for ' . __PACKAGE__;
       say $errmessage;
@@ -100,10 +100,12 @@ package Game::EvonyTKR::External::Glossary::LoadAll {
 
     # Mark work unit as complete
     require Game::EvonyTKR::WorkUnit::Tracker;
-    my $tracker = Game::EvonyTKR::WorkUnit::Tracker->new(persistence => $job->persistence);
+    my $tracker =
+      Game::EvonyTKR::WorkUnit::Tracker->new(persistence => $job->persistence);
     $tracker->mark_complete('load_all_glossary_terms');
 
-    $job->app->log->info("Marked work unit 'load_all_glossary_terms' as complete");
+    $job->app->log->info(
+      "Marked work unit 'load_all_glossary_terms' as complete");
   }
 }
 

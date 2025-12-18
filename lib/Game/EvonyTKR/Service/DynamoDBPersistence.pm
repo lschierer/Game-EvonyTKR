@@ -75,12 +75,10 @@ sub _put_item ($self, $pk, $sk, $data, $entity_type = undef) {
     1;
   } or do {
     my $error = $@ || 'unknown error';
-    $self->log_error(
-      sprintf(
-        "[DynamoDB] PutItem FAILED for pk=%s, sk=%s: %s",
-        $pk, $sk, $error
-      )
-    );
+    $self->log_error(sprintf(
+      "[DynamoDB] PutItem FAILED for pk=%s, sk=%s: %s",
+      $pk, $sk, $error
+    ));
     warn sprintf("[DynamoDB] PutItem FAILED for pk=%s, sk=%s: %s\n",
       $pk, $sk, $error);
     return 0;
@@ -228,12 +226,10 @@ sub is_job_completed ($self, $job_name, $run_id = undef) {
   }
 
   my $found = defined $result ? 1 : 0;
-  $self->log_debug(
-    sprintf(
-      "[DynamoDB] Job %s completion check: %s",
-      $job_name, $found ? 'FOUND' : 'NOT FOUND'
-    )
-  );
+  $self->log_debug(sprintf(
+    "[DynamoDB] Job %s completion check: %s",
+    $job_name, $found ? 'FOUND' : 'NOT FOUND'
+  ));
   return $found;
 }
 
@@ -496,18 +492,18 @@ sub store_conflicts_batch ($self, $conflicts_hash) {
     }
   }
 
-  my @items        = values %unique_items;
-  my $total_items  = scalar(@items);
+  my @items       = values %unique_items;
+  my $total_items = scalar(@items);
   return 0 unless $total_items;
 
   $self->log_info(
     sprintf("[DynamoDB] Batch writing %d conflict items", $total_items));
 
-  my $written           = 0;
-  my $failed            = 0;
-  my $throttle_delay    = 0.1;  # Start with 100ms
+  my $written               = 0;
+  my $failed                = 0;
+  my $throttle_delay        = 0.1;    # Start with 100ms
   my $consecutive_throttles = 0;
-  my $total_throttled   = 0;
+  my $total_throttled       = 0;
 
   # DynamoDB BatchWriteItem limit is 25 items per request
   while (@items) {
@@ -537,19 +533,24 @@ sub store_conflicts_batch ($self, $conflicts_hash) {
 
         # Exponential backoff: double delay on each consecutive throttle
         $throttle_delay = $throttle_delay * 2;
-        $throttle_delay = 2.0 if $throttle_delay > 2.0;  # Cap at 2 seconds
+        $throttle_delay = 2.0 if $throttle_delay > 2.0;    # Cap at 2 seconds
 
         $self->log_debug(sprintf(
-          "[DynamoDB] Throttled: %d unprocessed, %d consecutive throttles, next delay: %.1fs",
+"[DynamoDB] Throttled: %d unprocessed, %d consecutive throttles, next delay: %.1fs",
           $unprocessed_count, $consecutive_throttles, $throttle_delay
         ));
-      } else {
+      }
+      else {
         # Batch succeeded without throttling - reset backoff
         $consecutive_throttles = 0;
-        $throttle_delay = 0.1;
+        $throttle_delay        = 0.1;
       }
 
-      $written += scalar(@batch) - ($was_throttled ? scalar(@{ $result->UnprocessedItems->{ $self->table_name } || [] }) : 0);
+      $written += scalar(@batch) - (
+        $was_throttled
+        ? scalar(@{ $result->UnprocessedItems->{ $self->table_name } || [] })
+        : 0
+      );
       1;
     } or do {
       my $error = $@ || 'unknown error';
@@ -561,10 +562,8 @@ sub store_conflicts_batch ($self, $conflicts_hash) {
     select(undef, undef, undef, $throttle_delay) if @items;
   }
 
-  my $summary = sprintf(
-    "[DynamoDB] Batch write complete: %d/%d items written",
-    $written, $total_items
-  );
+  my $summary = sprintf("[DynamoDB] Batch write complete: %d/%d items written",
+    $written, $total_items);
 
   if ($total_throttled > 0) {
     $summary .= sprintf(" (%d items throttled and retried)", $total_throttled);
@@ -622,11 +621,10 @@ sub load_all_conflicts ($self) {
 
     my $data = eval { $self->decode($data_str) };
     if ($@) {
-      $self->log_error(
-        sprintf(
-          "[DynamoDB] Failed to decode conflict data for %s: %s", $sk, $@
-        )
-      );
+      $self->log_error(sprintf(
+        "[DynamoDB] Failed to decode conflict data for %s: %s",
+        $sk, $@
+      ));
       $decode_errors++;
       next;
     }
@@ -688,9 +686,7 @@ sub get_all_pair_types ($self) {
 sub list_pairs_by_type ($self, $type) {
   # Query pairs_individual table for all pairs of this type
   # Format: pk='pairs_individual', sk starts with 'type/'
-  my $items = eval {
-    $self->_query_raw_items('pairs_individual', "$type/");
-  };
+  my $items = eval { $self->_query_raw_items('pairs_individual', "$type/"); };
 
   if ($@) {
     $self->log_error("Failed to query pairs_individual: $@");

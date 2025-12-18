@@ -878,9 +878,10 @@ sub single_details_stream ($c) {
 
     if ($c->app->mode eq 'development') {
       $c->log_debug("Known valid routes:");
-      foreach my $route (sort keys $c->all_valid_routes->%*){
+      foreach my $route (sort keys $c->all_valid_routes->%*) {
         my $meta = $c->all_valid_routes->{$route};
-        $c->log_debug(sprintf('  "%s" => %s', $route, Data::Printer::np($meta)));
+        $c->log_debug(
+          sprintf('  "%s" => %s', $route, Data::Printer::np($meta)));
       }
     }
     my $payload = encode_base64($c->encode({ runId => 0+ $run_id }), '');

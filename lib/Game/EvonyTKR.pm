@@ -185,12 +185,10 @@ package Game::EvonyTKR {
 
     require Minion::Backend::Pg;
     require Mojolicious::Plugin::Minion;
- # Use PostgreSQL for Minion (better concurrency than SQLite)
+    # Use PostgreSQL for Minion (better concurrency than SQLite)
     my $minion_dsn = 'postgresql:///minion_db';
     $app->log->info(sprintf(
-      "[Game::EvonyTKR] Minion PostgreSQL DSN: %s\n",
-      $minion_dsn
-    ));
+      "[Game::EvonyTKR] Minion PostgreSQL DSN: %s\n", $minion_dsn));
     $app->plugin(Minion => { Pg => $minion_dsn });
 
 # Clear Minion jobs ONLY in development mode

@@ -140,12 +140,10 @@ package Game::EvonyTKR::Controller::Specialties {
         ));
       }
       else {
-        $c->log_debug(
-          sprintf(
-            'added nav item for name "%s" with path "%s/%s"',
-            $display_name, $base, $display_name
-          )
-        );
+        $c->log_debug(sprintf(
+          'added nav item for name "%s" with path "%s/%s"',
+          $display_name, $base, $display_name
+        ));
       }
     }
   }

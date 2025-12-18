@@ -75,9 +75,10 @@ package Game::EvonyTKR::Model::Buff::Summarizer {
 
   # Helper to generate cache key for buff/debuff results
   sub _make_cache_key ($self, $type) {
-    return join('||',
+    return join(
+      '||',
       $self->general->name,
-      $type,                 # 'buffs' or 'debuffs'
+      $type,    # 'buffs' or 'debuffs'
       $self->targetType // '',
       $self->activationType,
       $self->covenantLevel,
@@ -251,9 +252,9 @@ package Game::EvonyTKR::Model::Buff::Summarizer {
       $self->ascendingLevel('none');
     }
 
-    # Check cache first (class-level state cache shared across instances in this process)
-    state $buffs_cache = {};
-    state $buffs_cache_hits = 0;
+# Check cache first (class-level state cache shared across instances in this process)
+    state $buffs_cache        = {};
+    state $buffs_cache_hits   = 0;
     state $buffs_cache_misses = 0;
     my $cache_key = $self->_make_cache_key('buffs');
 
@@ -275,7 +276,8 @@ package Game::EvonyTKR::Model::Buff::Summarizer {
     ));
 
     # Only compute buffs for the target troop type, not all types
-    my @troopTypes = $self->targetType
+    my @troopTypes =
+      $self->targetType
       ? ($self->targetType)
       : (keys %{ $self->buffValues });
 
@@ -291,18 +293,23 @@ package Game::EvonyTKR::Model::Buff::Summarizer {
     require Sereal::Encoder;
     state $encoder = Sereal::Encoder->new();
     state $decoder = Sereal::Decoder->new();
-    $buffs_cache->{$cache_key} = $decoder->decode($encoder->encode($self->buffValues));
+    $buffs_cache->{$cache_key} =
+      $decoder->decode($encoder->encode($self->buffValues));
 
     # Report timing breakdown if available
     if ($self->_private->{timing}) {
       my $t = $self->_private->{timing};
       $self->log_info(sprintf(
         'updateBuffs timing: book=%.3fs (%d calls), covenant=%.3fs (%d calls), '
-        . 'specialties=%.3fs (%d calls), ascending=%.3fs (%d calls)',
-        $t->{book_total} // 0, $t->{book_calls} // 0,
-        $t->{covenant_total} // 0, $t->{covenant_calls} // 0,
-        $t->{specialties_total} // 0, $t->{specialties_calls} // 0,
-        $t->{ascending_total} // 0, $t->{ascending_calls} // 0
+          . 'specialties=%.3fs (%d calls), ascending=%.3fs (%d calls)',
+        $t->{book_total}        // 0,
+        $t->{book_calls}        // 0,
+        $t->{covenant_total}    // 0,
+        $t->{covenant_calls}    // 0,
+        $t->{specialties_total} // 0,
+        $t->{specialties_calls} // 0,
+        $t->{ascending_total}   // 0,
+        $t->{ascending_calls}   // 0
       ));
     }
 
@@ -333,9 +340,9 @@ package Game::EvonyTKR::Model::Buff::Summarizer {
       $self->ascendingLevel('none');
     }
 
-    # Check cache first (class-level state cache shared across instances in this process)
-    state $debuffs_cache = {};
-    state $debuffs_cache_hits = 0;
+# Check cache first (class-level state cache shared across instances in this process)
+    state $debuffs_cache        = {};
+    state $debuffs_cache_hits   = 0;
     state $debuffs_cache_misses = 0;
     my $cache_key = $self->_make_cache_key('debuffs');
 
@@ -343,8 +350,11 @@ package Game::EvonyTKR::Model::Buff::Summarizer {
       $debuffs_cache_hits++;
       $self->log_info(sprintf(
         "Cache HIT for debuffs: %s (hits=%d, misses=%d, hit_rate=%.1f%%)",
-        $self->general->name, $debuffs_cache_hits, $debuffs_cache_misses,
-        100 * $debuffs_cache_hits / ($debuffs_cache_hits + $debuffs_cache_misses)
+        $self->general->name,
+        $debuffs_cache_hits,
+        $debuffs_cache_misses,
+        100 * $debuffs_cache_hits /
+          ($debuffs_cache_hits + $debuffs_cache_misses)
       ));
       $self->debuffValues($debuffs_cache->{$cache_key});
       return;
@@ -359,7 +369,7 @@ package Game::EvonyTKR::Model::Buff::Summarizer {
     # Compute debuffs for all enemy troop types except Overall
     # (we need all 4 because you might fight any enemy type)
     foreach my $troopType (keys %{ $self->debuffValues }) {
-      next if $troopType eq 'Overall';  # Overall debuffs not used
+      next if $troopType eq 'Overall';    # Overall debuffs not used
       foreach my $attribute (keys %{ $self->debuffValues->{$troopType} }) {
         $self->debuffValues->{$troopType}->{$attribute} =
           $self->updateDebuff($attribute, $troopType);
@@ -371,18 +381,23 @@ package Game::EvonyTKR::Model::Buff::Summarizer {
     require Sereal::Encoder;
     state $encoder = Sereal::Encoder->new();
     state $decoder = Sereal::Decoder->new();
-    $debuffs_cache->{$cache_key} = $decoder->decode($encoder->encode($self->debuffValues));
+    $debuffs_cache->{$cache_key} =
+      $decoder->decode($encoder->encode($self->debuffValues));
 
     # Report timing breakdown if available
     if ($self->_private->{timing}) {
       my $t = $self->_private->{timing};
       $self->log_info(sprintf(
-        'updateDebuffs timing: book=%.3fs (%d calls), covenant=%.3fs (%d calls), '
-        . 'specialties=%.3fs (%d calls), ascending=%.3fs (%d calls)',
-        $t->{book_total} // 0, $t->{book_calls} // 0,
-        $t->{covenant_total} // 0, $t->{covenant_calls} // 0,
-        $t->{specialties_total} // 0, $t->{specialties_calls} // 0,
-        $t->{ascending_total} // 0, $t->{ascending_calls} // 0
+'updateDebuffs timing: book=%.3fs (%d calls), covenant=%.3fs (%d calls), '
+          . 'specialties=%.3fs (%d calls), ascending=%.3fs (%d calls)',
+        $t->{book_total}        // 0,
+        $t->{book_calls}        // 0,
+        $t->{covenant_total}    // 0,
+        $t->{covenant_calls}    // 0,
+        $t->{specialties_total} // 0,
+        $t->{specialties_calls} // 0,
+        $t->{ascending_total}   // 0,
+        $t->{ascending_calls}   // 0
       ));
     }
 
@@ -394,7 +409,8 @@ package Game::EvonyTKR::Model::Buff::Summarizer {
   sub filterBuffConditions ($self) {
     # Return cached result if available
     my $cache_key = 'filterBuffConditions_' . $self->activationType;
-    return $self->_private->{$cache_key} if exists $self->_private->{$cache_key};
+    return $self->_private->{$cache_key}
+      if exists $self->_private->{$cache_key};
 
     my @buffConditions = keys %{ $self->BuffConditionValues };
 
@@ -493,7 +509,8 @@ package Game::EvonyTKR::Model::Buff::Summarizer {
   sub filterDebuffConditions ($self) {
     # Return cached result if available
     my $cache_key = 'filterDebuffConditions_' . $self->activationType;
-    return $self->_private->{$cache_key} if exists $self->_private->{$cache_key};
+    return $self->_private->{$cache_key}
+      if exists $self->_private->{$cache_key};
 
     my @debuffConditions = @{ $self->DebuffConditionValues };
 

@@ -2,6 +2,7 @@ package Game::EvonyTKR::Role::Books;
 use v5.42.0;
 use utf8::all;
 use Mojo::Base -role, -signatures;
+use List::AllUtils qw(any all none uniq);
 
 # requires that Game::EvonyTKR::Role::Constants::BuffConstants be composed in.
 # requires that Game::EvonyTKR::Role::Constants::Books be composed in.
@@ -66,23 +67,29 @@ sub load_mandatory_skill_books ($self) {
 
       my $book_name;
       if ($attr ne 'March Size') {
-        $book_name = sprintf('Level %s %s %s', $level, $tt, $attr);
+        $book_name = sprintf('%s %s', $tt, $attr);
       }
       else {
-        $book_name = sprintf('Level %s %s', $level, $attr);
+        $book_name = sprintf('%s', $attr);
       }
 
-      if (!scalar(@books)) {
+      if (scalar(@books) == 0) {
         my $book = $self->get_generic_book($book_name, $level);
-        unless ($book) {
+        unless ($book
+          && ref($book)
+          && $book->isa('Game::EvonyTKR::Model::Book')) {
           $self->log_error("Cannot find $book_name");
           next;
         }
         push @books, $book;
       }
-      elsif (none { $_->name eq $book_name } @books) {
+      elsif (scalar(@books)
+        && List::AllUtils::none { defined($_) && $_->name eq $book_name }
+        @books) {
         my $book = $self->get_generic_book($book_name, $level);
-        unless ($book) {
+        unless ($book
+          && ref($book)
+          && $book->isa('Game::EvonyTKR::Model::Book')) {
           $self->log_error("Cannot find $book_name");
           next;
         }

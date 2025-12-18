@@ -8,7 +8,7 @@ package Game::EvonyTKR::External::MonitorLoaders {
   sub task_name {'monitor_loaders'}
 
   sub register ($taskClass, $app, $conf = {}) {
-    return 1 unless $taskClass->SUPER::register($app, $conf);
+    $taskClass->SUPER::register($app, $conf);
     $app->minion->add_task($taskClass->task_name => __PACKAGE__);
 
     return 1;

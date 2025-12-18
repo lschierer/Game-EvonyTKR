@@ -5,7 +5,7 @@ use Game::EvonyTKR::WorkUnit::Tracker;
 sub task_name {'mark_pairs_complete'}
 
 sub register ($taskClass, $app, $conf = {}) {
-  return 1 unless $taskClass->SUPER::register($app, $conf);
+  $taskClass->SUPER::register($app, $conf);
   $app->minion->add_task($taskClass->task_name => __PACKAGE__);
   return 1;
 }
@@ -25,8 +25,9 @@ sub run ($self) {
   }
 
   # Coordinator complete - mark pairs work unit as complete
-  my $tracker = Game::EvonyTKR::WorkUnit::Tracker->new(persistence => $self->persistence);
-  $tracker->mark_complete('pairs');
+  my $tracker =
+    Game::EvonyTKR::WorkUnit::Tracker->new(persistence => $self->persistence);
+  $tracker->mark_complete('load_all_pair_builders');
 
   $self->app->log->info("Marked work unit 'pairs' as complete");
 }

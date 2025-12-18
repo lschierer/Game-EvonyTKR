@@ -9,7 +9,7 @@ package Game::EvonyTKR::External::Specialty::LoadAllSpecialties {
   sub task_name {'load_all_specialties'}
 
   sub register ($taskClass, $app, $conf = {}) {
-    return 1 unless $taskClass->SUPER::register($app, $conf);
+    $taskClass->SUPER::register($app, $conf);
     $app->minion->add_task($taskClass->task_name => __PACKAGE__);
     return 1;
   }

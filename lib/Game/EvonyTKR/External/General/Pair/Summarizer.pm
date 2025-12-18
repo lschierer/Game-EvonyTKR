@@ -23,7 +23,7 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
   sub task_name {'summarize_pair'}
 
   sub register ($taskClass, $app, $conf = {}) {
-    return 1 unless $taskClass->SUPER::register($app, $conf);
+    $taskClass->SUPER::register($app, $conf);
     $app->minion->add_task($taskClass->task_name => __PACKAGE__);
     $app->plugins->emit(summarize_pair_job_ready => 1);
   }
@@ -33,6 +33,7 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
     $job->SUPER::run(@args);
 
     my $params        = shift @args;
+    my $cached_buffs  = shift @args;                # Optional precomputed buffs
     my $runId         = $params->{runId};
     my $primaryName   = $params->{primaryName};
     my $secondaryName = $params->{secondaryName};
@@ -51,6 +52,20 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
     $params->{secondarySpecialty2}    //= 'none';
     $params->{secondarySpecialty3}    //= 'none';
     $params->{secondarySpecialty4}    //= 'none';
+
+    # Extract precomputed buffs if provided
+    my $primary_buffs = $cached_buffs ? $cached_buffs->{primary_buffs} : undef;
+    my $secondary_buffs =
+      $cached_buffs ? $cached_buffs->{secondary_buffs} : undef;
+
+    if ($primary_buffs) {
+      $job->log_debug(
+        "Using precomputed buffs for primary general: $primaryName");
+    }
+    if ($secondary_buffs) {
+      $job->log_debug(
+        "Using precomputed buffs for secondary general: $secondaryName");
+    }
 
     # Validate required parameters
     my @errmessage;
@@ -110,8 +125,8 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
     }
 
     # Get covenants
-    my $t_cov_start = time();
-    my $primaryCovenant = $job->get_covenant($primaryName);
+    my $t_cov_start       = time();
+    my $primaryCovenant   = $job->get_covenant($primaryName);
     my $secondaryCovenant = $job->get_covenant($secondaryName);
     $t{get_covenants} = time() - $t_cov_start;
 
@@ -194,7 +209,8 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
     # Compute buffs and debuffs
     $job->log_debug('Computing buffs');
     my $t_buffs_start = time();
-    $summarizer->updateBuffs();
+    $summarizer->updatePrimaryBuffs($primary_buffs);
+    $summarizer->updateSecondaryBuffs($secondary_buffs);
     $t{update_buffs} = time() - $t_buffs_start;
 
     $job->log_debug('Computing debuffs');
@@ -219,20 +235,20 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
     # Log timing breakdown
     my $t_total = time() - $t_start;
     $job->log_info(sprintf(
-      'TIMING: total=%.3fs get_generals=%.3fs get_pair=%.3fs get_cov=%.3fs ' .
-      'pop_asc=%.3fs pop_books=%.3fs pop_spec=%.3fs validate=%.3fs ' .
-      'create_sum=%.3fs buffs=%.3fs debuffs=%.3fs',
+      'TIMING: total=%.3fs get_generals=%.3fs get_pair=%.3fs get_cov=%.3fs '
+        . 'pop_asc=%.3fs pop_books=%.3fs pop_spec=%.3fs validate=%.3fs '
+        . 'create_sum=%.3fs buffs=%.3fs debuffs=%.3fs',
       $t_total,
-      $t{get_generals} // 0,
-      $t{get_pair} // 0,
-      $t{get_covenants} // 0,
-      $t{populate_ascending} // 0,
-      $t{populate_books} // 0,
+      $t{get_generals}         // 0,
+      $t{get_pair}             // 0,
+      $t{get_covenants}        // 0,
+      $t{populate_ascending}   // 0,
+      $t{populate_books}       // 0,
       $t{populate_specialties} // 0,
-      $t{validate_params} // 0,
-      $t{create_summarizer} // 0,
-      $t{update_buffs} // 0,
-      $t{update_debuffs} // 0
+      $t{validate_params}      // 0,
+      $t{create_summarizer}    // 0,
+      $t{update_buffs}         // 0,
+      $t{update_debuffs}       // 0
     ));
 
     # Return results

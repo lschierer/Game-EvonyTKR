@@ -96,11 +96,9 @@ package Game::EvonyTKR::Controller::Books {
     $c->log_debug(
       "attempting to build nav items for books, retry # $retry_number")
       if $retry_number;
-    if (
-      $c->are_prereqs_outstanding(
-        $app->minion, ['load_all_builtin_books', 'load_all_generic_books',]
-      )
-    ) {
+    if ($c->are_prereqs_outstanding(
+      $app->minion, ['load_all_builtin_books', 'load_all_generic_books',]
+    )) {
       Mojo::IOLoop->timer(
         30 => sub {
           $c->build_nav_items($app, $mainRoutes, $controller_name,
@@ -165,7 +163,8 @@ package Game::EvonyTKR::Controller::Books {
         # Fallback to book filename if object name unavailable
         if (!defined($display_name) || !length($display_name)) {
           $c->log_warn(sprintf(
-'Generic book %s (level %s) has no valid name, using list name as fallback',
+            'Generic book %s (level %s) has no valid name, '
+              . 'using list name as fallback',
             $bn // 'undef', $level
           ));
           $display_name = $bn;
@@ -177,7 +176,7 @@ package Game::EvonyTKR::Controller::Books {
             title => sprintf(
               'Details for the Level %s %s Book', $level, $display_name
             ),
-            path   => sprintf('%s/%s Level %s', $base,  $display_name, $level),
+            path   => sprintf('%s/Level %s %s', $base, $level, $display_name),
             parent => $base,
             order  => 30,
           });
@@ -220,11 +219,9 @@ package Game::EvonyTKR::Controller::Books {
     foreach my $bn ($c->list_builtin_books->@*) {
       my $book = $c->get_builtin_book($bn);
       unless ($book) {
-        $c->log_error(
-          sprintf(
-            'failed to retrieve built in book "%s" after prereq check passed',
-            $bn)
-        );
+        $c->log_error(sprintf(
+          'failed to retrieve built in book "%s" after prereq check passed',
+          $bn));
         next;
       }
       push @{$items}, $book;
@@ -239,11 +236,9 @@ package Game::EvonyTKR::Controller::Books {
       foreach my $bn (@$ll) {
         my $book = $c->get_generic_book($bn, $level);
         unless ($book) {
-          $c->log_error(
-            sprintf(
-'failed to retrieve generic in book "%s" after prereq check passed',
-              $bn)
-          );
+          $c->log_error(sprintf(
+            'failed to retrieve generic in book "%s" after prereq check passed',
+            $bn));
           next;
         }
         push @{$generics}, $book;
@@ -281,13 +276,16 @@ package Game::EvonyTKR::Controller::Books {
     my $book;
     if ($name =~ /^(.+?)\s+Level\s+([1-4])$/i) {
       my ($base_name, $level) = ($1, $2);
-      $book = $self->get_builtin_book($name) || $self->get_generic_book($base_name, $level);
-    } else {
+      $book = $self->get_builtin_book($name)
+        || $self->get_generic_book($base_name, $level);
+    }
+    else {
       $book = $self->get_builtin_book($name);
     }
 
     unless ($book) {
-      $self->log_debug("skill book '$name' was not found in builtin or generic books.");
+      $self->log_debug(
+        "skill book '$name' was not found in builtin or generic books.");
       return $self->render(text => "Book not found: $name", status => 404);
     }
 

@@ -5,25 +5,33 @@ use Game::EvonyTKR::WorkUnit::Tracker;
 sub task_name {'mark_collection_complete'}
 
 sub register ($taskClass, $app, $conf = {}) {
-  return 1 unless $taskClass->SUPER::register($app, $conf);
+  $taskClass->SUPER::register($app, $conf);
   $app->minion->add_task($taskClass->task_name => __PACKAGE__);
   return 1;
 }
 
-sub run ($self, $collection_type, $loader_task_names) {
+sub run ($self, $unit_name) {
   my $app = $self->app;
 
   # Wait for all loader jobs to complete
   my @outstanding = ();
-  for my $task_name (@$loader_task_names) {
-    my $pending_count = $app->minion->jobs({
-      tasks  => [$task_name],
-      states => ['inactive', 'active']
-    })->total;
+  my $collection  = $unit_name;
+  $collection =~ s/load_all_//;
 
-    if ($pending_count > 0) {
-      push @outstanding, $task_name;
-    }
+  # special cases
+  $collection = 'book' if ($collection =~ /book/i);
+  $collection =~ s/s$// unless ($collection eq 'ascending_attributes');
+
+  # build the individual task name from the collection
+  my $task_name = "load_${collection}";
+
+  my $pending_count = $app->minion->jobs({
+    tasks  => [$unit_name, $task_name],
+    states => ['inactive', 'active']
+  })->total;
+
+  if ($pending_count > 0) {
+    push @outstanding, $task_name;
   }
 
   if (@outstanding) {
@@ -32,10 +40,11 @@ sub run ($self, $collection_type, $loader_task_names) {
   }
 
   # All loaders complete - mark work unit as complete
-  my $tracker = Game::EvonyTKR::WorkUnit::Tracker->new(persistence => $self->persistence);
-  $tracker->mark_complete($collection_type);
+  my $tracker =
+    Game::EvonyTKR::WorkUnit::Tracker->new(persistence => $self->persistence);
+  $tracker->mark_complete($unit_name);
 
-  $self->app->log->info("Marked work unit '$collection_type' as complete");
+  $self->app->log->info("Marked work unit '$unit_name' as complete");
 }
 
 1;

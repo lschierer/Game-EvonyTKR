@@ -11,7 +11,7 @@ package Game::EvonyTKR::External::General::Pair::ReduceCoordinator {
   sub task_name {'reduce_coordinator'}
 
   sub register ($taskClass, $app, $conf = {}) {
-    return 1 unless $taskClass->SUPER::register($app, $conf);
+    $taskClass->SUPER::register($app, $conf);
     $app->minion->add_task($taskClass->task_name => __PACKAGE__);
 
     return 1;
@@ -28,8 +28,7 @@ package Game::EvonyTKR::External::General::Pair::ReduceCoordinator {
 
     # Check if prerequisites are loaded - fail fast if not
     return
-      if ($job->are_prereqs_outstanding(
-      $job->minion, ['load_all_generals']));
+      if ($job->are_prereqs_outstanding($job->minion, ['load_all_generals']));
 
     my $processed = $job->info->{notes}{processed} // {};
 

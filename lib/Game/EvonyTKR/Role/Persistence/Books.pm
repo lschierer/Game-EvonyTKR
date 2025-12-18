@@ -66,24 +66,26 @@ sub list_builtin_books ($self) {
 ##############################################################################
 # Generic Books
 ##############################################################################
-# Generic Books
-##############################################################################
 
 sub add_generic_book ($self, $book) {
   my $key = lc($self->normalize($book->name));
-  $key = sprintf('%s level %s', $key, $book->level);
+  $key = sprintf('level %s %s', $book->level, $key);
+  $self->logger->debug(sprintf(
+    'persistence role add_generic_book called for name "%s" level "%s"',
+    $book->name, $book->level,
+  ));
   return $self->persistence->store_generic_book($key, $book->to_wire_hash());
 }
 
 sub get_generic_book ($self, $name, $level) {
   require Game::EvonyTKR::Model::Factory;
   $self->logger->debug(sprintf(
-    'persistence role get_generic_book called for %s level %s',
+    'persistence role get_generic_book called for name "%s" level "%s"',
     $name, $level
   ));
 
   my $key = lc($self->normalize($name));
-  $key = sprintf('%s level %s', $key, $level);
+  $key = sprintf('level %s %s', $level, $key);
 
   # Load directly from SQLite
   my $wire_data = $self->persistence->get_generic_book($key);
@@ -107,13 +109,14 @@ sub list_generic_books ($self, $level) {
   my $gbdir         = $collectionDir->child('generic books');
   my @suffixlist    = ('.yaml', '.yml');
   my @files         = $gbdir->list->grep(
-    sub { $_->basename =~ /^Level\s+${level}\s+.+\.ya?ml$/ && -f -r $_ })
+    sub { $_->basename =~ /^Level\s+${level}\s+.+\.ya?ml$/i && -f -r $_ })
     ->sort->map(sub { return $_->basename(@suffixlist) })->each;
   my @intermediate = List::UtilsBy::uniq_by { lc($self->normalize($_)) } @files;
-  my @final;
 
+  my @final;
   foreach my $ib (@intermediate) {
-    $ib =~ s/^Level\s+\d+\s+//;
+    $ib =~ s/^Level\s+\d+\s+//i;
+    $self->log_debug(sprintf('list_generic_books adding "%s"', $ib));
     push @final, $ib;
   }
   return \@final;

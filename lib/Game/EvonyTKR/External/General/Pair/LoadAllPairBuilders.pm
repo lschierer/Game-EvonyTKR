@@ -10,7 +10,7 @@ package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
   sub task_name {'load_all_pair_builders'}
 
   sub register ($taskClass, $app, $conf = {}) {
-    return 1 unless $taskClass->SUPER::register($app, $conf);
+    $taskClass->SUPER::register($app, $conf);
     $taskClass->setup_pairs_by_type();
     $app->minion->add_task($taskClass->task_name => __PACKAGE__);
 
@@ -51,17 +51,18 @@ package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
     $job->log_info(sprintf('Found %d generals to process', scalar @$generals));
 
     # Spawn CreatePairs jobs for each general/type combination
-    my $job_count      = 0;
-    my $skipped_count  = 0;
-    my %type_batches   = ();    # Track jobs by type for balanced batching
-    my $batch_count    = 0;
-    my %type_counters  = ();    # Track how many jobs per type
+    my $job_count            = 0;
+    my $skipped_count        = 0;
+    my %type_batches         = ();    # Track jobs by type for balanced batching
+    my $batch_count          = 0;
+    my %type_counters        = ();    # Track how many jobs per type
     my %pairs_in_persistence = ();    # Cache of which general/types have pairs
 
     # Pre-load pairs from persistence to check what already exists
     my $all_types = eval { $job->persistence->get_all_pair_types() } // [];
     foreach my $type (@$all_types) {
-      my $type_pairs = eval { $job->persistence->list_pairs_by_type($type) } // [];
+      my $type_pairs =
+        eval { $job->persistence->list_pairs_by_type($type) } // [];
       foreach my $wire_pair (@$type_pairs) {
         if ($wire_pair && ref($wire_pair) eq 'HASH' && $wire_pair->{primary}) {
           my $normalized_primary = $job->normalize($wire_pair->{primary});
@@ -76,8 +77,7 @@ package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
     }
     $job->log_info(sprintf(
       'Found %d existing general/type combinations with pairs in persistence',
-      $total_existing_pairs
-    ));
+      $total_existing_pairs));
 
     foreach my $general (sort { $a->name cmp $b->name } @$generals) {
 
@@ -226,7 +226,8 @@ package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
 
     # Mark work unit as complete using WorkUnit::Tracker
     require Game::EvonyTKR::WorkUnit::Tracker;
-    my $tracker = Game::EvonyTKR::WorkUnit::Tracker->new(persistence => $job->persistence);
+    my $tracker =
+      Game::EvonyTKR::WorkUnit::Tracker->new(persistence => $job->persistence);
     $tracker->mark_complete('load_all_pair_builders');
 
     return $job->finish(sprintf(

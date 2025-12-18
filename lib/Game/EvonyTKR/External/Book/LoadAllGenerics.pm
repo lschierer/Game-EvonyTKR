@@ -14,7 +14,7 @@ package Game::EvonyTKR::External::Book::LoadAllGenerics {
   sub task_name {'load_all_generic_books'}
 
   sub register ($taskClass, $app, $conf = {}) {
-    return 1 unless $taskClass->SUPER::register($app, $conf);
+    $taskClass->SUPER::register($app, $conf);
     if (not defined($app)) {
       my $errmessage = 'app not defined in register for ' . __PACKAGE__;
       say $errmessage;
@@ -49,7 +49,7 @@ package Game::EvonyTKR::External::Book::LoadAllGenerics {
 
     my $enqueued_count = 0;
     my $skipped_count  = 0;
-    my $in_progress = $job->info->{notes}->{in_progress} // {};
+    my $in_progress    = $job->info->{notes}->{in_progress} // {};
 
     foreach my $level (1 .. 4) {
       my $ll = $job->list_generic_books($level);
@@ -70,32 +70,36 @@ package Game::EvonyTKR::External::Book::LoadAllGenerics {
           $skipped_count++;
           next;
         }
-        if(exists $in_progress->{$entry}->{$level}){
+        if (exists $in_progress->{$entry}->{$level}) {
           my $bj = $job->minion->job($in_progress->{$entry}->{$level});
-          if($bj) {
-            if($bj->info->{notes}->{prebuild_run_id} eq $job->prebuild_run_id){
-              if($bj->info->{state} eq 'finished'){
+          if ($bj) {
+            if ($bj->info->{notes}->{prebuild_run_id} eq $job->prebuild_run_id)
+            {
+              if ($bj->info->{state} eq 'finished') {
                 $job->log_debug(sprintf(
                   'Skipping %s level %d - already in progress',
                   $entry, $level
                 ));
                 $skipped_count++;
                 next;
-              }elsif($bj->info->{state} eq 'failed'){
+              }
+              elsif ($bj->info->{state} eq 'failed') {
                 $job->log_debug(sprintf(
                   'Skipping %s level %d - already in progress',
                   $entry, $level
                 ));
                 $skipped_count++;
                 next;
-              }elsif($bj->info->{state} eq 'active'){
+              }
+              elsif ($bj->info->{state} eq 'active') {
                 $job->log_debug(sprintf(
                   'Skipping %s level %d - already in progress',
                   $entry, $level
                 ));
                 $skipped_count++;
                 next;
-              }elsif($bj->info->{state} eq 'inactive'){
+              }
+              elsif ($bj->info->{state} eq 'inactive') {
                 $job->log_debug(sprintf(
                   'Skipping %s level %d - already in progress',
                   $entry, $level
@@ -104,7 +108,8 @@ package Game::EvonyTKR::External::Book::LoadAllGenerics {
                 next;
               }
               # else it is a ghost job and we should ignore it.
-            } else {
+            }
+            else {
               $bj->remove();
             }
           }
@@ -112,7 +117,7 @@ package Game::EvonyTKR::External::Book::LoadAllGenerics {
         }
 
         # Check if job already exists for this book in current run
-        my $book_name     = sprintf('Level %s %s', $level, $entry);
+        my $book_name = sprintf('Level %s %s', $level, $entry);
 
         my $job_id = $job->minion->enqueue(
           load_book => [
@@ -142,60 +147,62 @@ package Game::EvonyTKR::External::Book::LoadAllGenerics {
       $enqueued_count, $skipped_count
     ));
 
+    # Verify all data is actually in persistence before marking complete
+    # This ensures database transactions have committed
+    my $verified            = 0;
+    my $max_verify_attempts = 10;
 
-      # Verify all data is actually in persistence before marking complete
-      # This ensures database transactions have committed
-      my $verified            = 0;
-      my $max_verify_attempts = 10;
+    for my $attempt (1 .. $max_verify_attempts) {
+      my $all_in_persistence = 1;
+      my $missing_count      = 0;
 
-      for my $attempt (1 .. $max_verify_attempts) {
-        my $all_in_persistence = 1;
-        my $missing_count      = 0;
-
-        foreach my $level (1 .. 4) {
-          my @list = $job->list_generic_books($level)->@*;
-          foreach my $entry (@list) {
-            unless ($job->get_generic_book($entry, $level)) {
-              $job->log_warn(sprintf('attempt %s failed to find "Level %s %s" in persistence.',
-                $attempt, $level, $entry));
-              $all_in_persistence = 0;
-              $missing_count++;
-            }
+      foreach my $level (1 .. 4) {
+        my @list = $job->list_generic_books($level)->@*;
+        foreach my $entry (@list) {
+          unless ($job->get_generic_book($entry, $level)) {
+            $job->log_warn(sprintf(
+              'attempt %s failed to find "Level %s %s" in persistence.',
+              $attempt, $level, $entry
+            ));
+            $all_in_persistence = 0;
+            $missing_count++;
           }
         }
-
-        if ($all_in_persistence) {
-          $job->log_info('All generic books verified in persistence');
-          $verified = 1;
-          last;
-        }
-
-        $job->log_debug(sprintf(
-'Persistence verification attempt %d/%d: %d generic books still missing',
-          $attempt, $max_verify_attempts, $missing_count
-        ));
-        sleep 1;
       }
 
-      unless ($verified) {
-        my $errmsg = 'Failed to verify all generic books '.
-          'in persistence after child jobs finished';
-        $job->log_error($errmsg);
-        return $job->fail($errmsg);
-      }
-      # If no jobs were enqueued (data already in persistence), we still succeeded
-      if ($skipped_count > 0) {
-        $job->log_info(sprintf(
-          'All data already in persistence - no jobs needed (skipped %d)',
-          $skipped_count));
+      if ($all_in_persistence) {
+        $job->log_info('All generic books verified in persistence');
+        $verified = 1;
+        last;
       }
 
-      # Mark this job as completed in persistence (with run_id for isolation)
-      # IMPORTANT: This must be OUTSIDE the if (@job_ids) block so jobs that
-      # skip all work (because data exists) still mark themselves complete
-      my $run_id = $job->info->{notes}->{prebuild_run_id};
-      $job->mark_task_completed($job->task_name, $run_id);
+      $job->log_debug(sprintf(
+        'Persistence verification attempt %d/%d: '
+          . '%d generic books still missing',
+        $attempt, $max_verify_attempts, $missing_count
+      ));
+      sleep 1;
     }
+
+    unless ($verified) {
+      my $errmsg = 'Failed to verify all generic books '
+        . 'in persistence after child jobs finished';
+      $job->log_error($errmsg);
+      return $job->fail($errmsg);
+    }
+    # If no jobs were enqueued (data already in persistence), we still succeeded
+    if ($skipped_count > 0) {
+      $job->log_info(sprintf(
+        'All data already in persistence - no jobs needed (skipped %d)',
+        $skipped_count));
+    }
+
+    # Mark this job as completed in persistence (with run_id for isolation)
+    # IMPORTANT: This must be OUTSIDE the if (@job_ids) block so jobs that
+    # skip all work (because data exists) still mark themselves complete
+    my $run_id = $job->info->{notes}->{prebuild_run_id};
+    $job->mark_task_completed($job->task_name, $run_id);
+  }
 
 }
 1;

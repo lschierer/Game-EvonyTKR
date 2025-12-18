@@ -13,7 +13,7 @@ package Game::EvonyTKR::External::Covenant::Loader {
   sub task_name {'load_covenant'}
 
   sub register ($taskClass, $app, $conf = {}) {
-    return 1 unless $taskClass->SUPER::register($app, $conf);
+    $taskClass->SUPER::register($app, $conf);
     $app->minion->add_task($taskClass->task_name => __PACKAGE__);
     return 1;
   }
@@ -38,7 +38,6 @@ package Game::EvonyTKR::External::Covenant::Loader {
         'load_all_specialties', 'load_all_ascending_attributes',
       ]
       ));
-
 
     $job->log_debug(sprintf(
       '%s log level is %s',

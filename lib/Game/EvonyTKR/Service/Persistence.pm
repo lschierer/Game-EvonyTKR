@@ -37,8 +37,10 @@ has 'backend' => sub ($self) {
   }
   else {
     croak(sprintf(
-"Unknown persistence backend type: %s (expected 'sqlite' or 'dynamodb')\n",
-      $backend_type));
+      "Unknown persistence backend type: %s "
+        . "(expected 'sqlite' or 'dynamodb')\n",
+      $backend_type
+    ));
   }
 };
 

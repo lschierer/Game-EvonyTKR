@@ -17,6 +17,13 @@ package Game::EvonyTKR::External::General::Summarizer {
   use List::AllUtils qw(any all none uniq);
   use Carp;
 
+  my $isStub = 0;
+
+  # when this package is extended, call this.
+  sub parentIsStub {
+    $isStub = 1;
+  }
+
   has 'ypp' => sub {
     state $yp //= YAML::PP->new(
       schema       => [qw/ + Perl /],
@@ -25,32 +32,60 @@ package Game::EvonyTKR::External::General::Summarizer {
     return $yp;
   };
 
+  has [
+    'generalName',   'targetType', 'activationType', 'ascendingLevel',
+    'covenantLevel', 'books',      'specialty1',     'specialty2',
+    'specialty3',    'specialty4'
+  ] => '';
+  has isPrimary => 0;
+
+  has ['general', 'covenant'] => undef;
+
+  has params => sub { {} };
+
+  has summarizer => undef;
+
   sub task_name {'summarize_general'}
 
   sub register ($taskClass, $app, $conf = {}) {
-    return 1 unless $taskClass->SUPER::register($app, $conf);
+    $taskClass->SUPER::register($app, $conf);
     $app->minion->add_task($taskClass->task_name => __PACKAGE__);
     $app->plugins->emit(summarize_general_job_ready => 1);
   }
 
-  sub run ($job, @args) {
-    $job->SUPER::run(@args);
-
-    my (
-      $generalName,    $isPrimary,     $targetType, $activationType,
-      $ascendingLevel, $covenantLevel, $specialty1, $specialty2,
-      $specialty3,     $specialty4,    $books,
-    ) = @args;
+  sub populateFromArgs($job, @args) {
+    $job->note(isStub => $isStub);
+    if (($isStub == 0) && (scalar(@args) < 11)) {
+      my $errmessage =
+          'Missing required args, each of '
+        . 'generalName isPrimary targetType activationType'
+        . 'ascendingLevel covenantLevel '
+        . 'specialty1 specialty2 specialty3 specialty4 books'
+        . ' must be sent in that order.';
+      $job->log_error($errmessage);
+      return $job->fail($errmessage);
+    }
+    $job->generalName($args[0])    if (scalar(@args) >= 1);
+    $job->isPrimary($args[1])      if (scalar(@args) >= 2);
+    $job->targetType($args[2])     if (scalar(@args) >= 3);
+    $job->activationType($args[3]) if (scalar(@args) >= 4);
+    $job->ascendingLevel($args[4]) if (scalar(@args) >= 5);
+    $job->covenantLevel($args[5])  if (scalar(@args) >= 6);
+    $job->specialty1($args[6])     if (scalar(@args) >= 7);
+    $job->specialty2($args[7])     if (scalar(@args) >= 8);
+    $job->specialty3($args[8])     if (scalar(@args) >= 9);
+    $job->specialty4($args[9])     if (scalar(@args) >= 10);
+    $job->books($args[10])         if (scalar(@args) >= 11);
 
     # Validate required parameters
     my @errmessage;
-    unless (defined($generalName) && length($generalName)) {
+    unless (length($job->generalName)) {
       push @errmessage, 'generalName must be defined';
     }
-    unless (defined($targetType) && length($targetType)) {
+    if (($isStub == 0) && (length($job->targetType) < 1)) {
       push @errmessage, 'targetType must be defined';
     }
-    unless (defined($activationType) && length($activationType)) {
+    if (($isStub == 0) && (length($job->activationType) < 1)) {
       push @errmessage, 'activationType must be defined';
     }
 
@@ -61,100 +96,122 @@ package Game::EvonyTKR::External::General::Summarizer {
     }
 
     # Get general
-    my $general = $job->get_general($generalName);
-    unless ($general) {
+    $job->general($job->get_general($job->generalName));
+    unless ($job->general) {
       my $err = sprintf('Cannot retrieve general: %s',
-        ref($generalName) ? Data::Printer::np($generalName) : $generalName);
+        ref($job->generalName)
+        ? Data::Printer::np($job->generalName)
+        : $job->generalName);
       $job->log_error($err);
       return $job->fail($err);
     }
 
+    $job->params({
+      general        => $job->general,
+      isPrimary      => $job->isPrimary // 1,
+      targetType     => $job->targetType,
+      activationType => $job->activationType,
+      ascendingLevel => $job->ascendingLevel // 'red5',
+      covenantLevel  => $job->covenantLevel  // 'civilization',
+      specialty1     => $job->specialty1     // 'gold',
+      specialty2     => $job->specialty2     // 'gold',
+      specialty3     => $job->specialty3     // 'gold',
+      specialty4     => $job->specialty4     // 'gold',
+    });
+
+    my $validation = $job->validateParams($job->params);
+    unless ($validation == 1) {
+      return $validation;
+    }
+
     # Get covenant
-    my $covenant = $job->get_covenant($generalName);
-    unless ($covenant) {
-      $job->log_warn("No covenant found for $generalName");
+    $job->covenant($job->get_covenant($job->generalName));
+    unless ($job->covenant) {
+      $job->log_warn(sprintf('No covenant found for "%s"', $job->generalName));
     }
 
     # Get ascending attributes (primary only)
-    if ($isPrimary && $general->ascending) {
-      $general->populateAscendingAttributes();
-      unless ($general->ascendingAttributes) {
+    if ($job->isPrimary && $job->general->ascending) {
+      $job->general->populateAscendingAttributes();
+      unless ($job->general->ascendingAttributes) {
         my $errmessage = sprintf('failed to get ascending attributes for "%s"',
-          $general->name);
+          $job->general->name);
         $job->log_error($errmessage);
         $job->fail($errmessage);
       }
     }
 
     # Load books if not provided
-    $general->populateBuiltinBook() unless ($general->builtInBook);
+    $job->general->populateBuiltinBook() unless ($job->general->builtInBook);
+
 # TODO: Handle partial conflicts (when other general has conflicting book)
 # It may be worth displaying in the UI even though it doesn't affect a single general
 # TODO: Verify book compatibility with general
-    unless ($books && ref($books) eq 'ARRAY' && @$books && scalar(@$books) >= 3)
-    {
-      $books = [
-        $job->load_best_skill_books($general, $targetType, $activationType)->@*,
+    unless ($job->books
+      && ref($job->books)
+      && ref($job->books) eq 'ARRAY'
+      && scalar(@{ $job->books }) >= 3) {
+      my $tt =
+        length($job->targetType) ? $job->targetType : $job->general->type->[0];
+      my $at = length($job->activationType) ? $job->activationType : 'default';
+      $job->books([
+        $job->load_best_skill_books($job->general, $tt, $at)->@*,
         $job->load_mandatory_skill_books()->@*,
-      ];
+      ]);
     }
 
     # ensure specialities are loaded
-    $general->populateSpecialties()
-      unless (scalar($general->specialties)
+    $job->general->populateSpecialties()
+      unless (scalar($job->general->specialties)
       && all { ref($_) && $_->isa('Game::EvonyTKR::Model::Specialty') }
-      $general->specialties->@*);
+      $job->general->specialties->@*);
+    return 1;
+  }
 
-    my $params = {
-      general        => $general,
-      isPrimary      => $isPrimary // 1,
-      targetType     => $targetType,
-      activationType => $activationType,
-      ascendingLevel => $ascendingLevel // 'red5',
-      covenantLevel  => $covenantLevel  // 'civilization',
-      specialty1     => $specialty1     // 'gold',
-      specialty2     => $specialty2     // 'gold',
-      specialty3     => $specialty3     // 'gold',
-      specialty4     => $specialty4     // 'gold',
-    };
+  sub run ($job, @args) {
+    $job->SUPER::run(@args);
 
-    $job->validateParams($params);
+    my $populateSuccess = $job->populateFromArgs(@args);
+    unless ($populateSuccess && $populateSuccess == 1) {
+      return $populateSuccess;
+    }
 
+    # if this is a stub, then the parent extending this package
+    # is responsible to run the summary and finish the task.
+    # return early from this run method so that we do not
+    # accidentally end the whole task.
+    return if ($isStub);
+
+    $job->summarize();
+
+    # Return results
+    return $job->finish({
+      general   => $job->generalName,
+      isPrimary => $job->isPrimary,
+      buffs     => $job->summarizer->buffValues,
+      debuffs   => $job->summarizer->debuffValues,
+    });
+  }
+
+  sub summarize ($job) {
     # Note serializable params for debugging
     $job->note(
       Summarizer_params => {
-        generalName    => $generalName,
-        isPrimary      => $isPrimary // 1,
-        targetType     => $targetType,
-        activationType => $activationType,
-        ascendingLevel => $ascendingLevel // 'red5',
-        covenantLevel  => $covenantLevel  // 'civilization',
-        specialty1     => $specialty1     // 'gold',
-        specialty2     => $specialty2     // 'gold',
-        specialty3     => $specialty3     // 'gold',
-        specialty4     => $specialty4     // 'gold',
-        has_covenant   => defined($covenant)                     ? 1 : 0,
-        has_ascending  => defined($general->ascendingAttributes) ? 1 : 0,
-        book_count     => scalar(@$books),
-        book_names     => [map { $_->name } @$books],
+        $job->params->%*,
+        has_covenant  => defined($job->covenant)                     ? 1 : 0,
+        has_ascending => defined($job->general->ascendingAttributes) ? 1 : 0,
+        book_count    => scalar(@{ $job->books }),
+        book_names    => [map { $_->name } @{ $job->books }],
       }
     );
 
     # Create summarizer
-    my $summarizer =
-      Game::EvonyTKR::Model::Buff::Summarizer::Single->new($params->%*);
+    $job->summarizer(
+      Game::EvonyTKR::Model::Buff::Summarizer::Single->new($job->params->%*));
 
     # Compute buffs and debuffs
-    $summarizer->updateBuffs();
-    $summarizer->updateDebuffs();
-
-    # Return results
-    $job->finish({
-      general   => $generalName,
-      isPrimary => $isPrimary,
-      buffs     => $summarizer->buffValues,
-      debuffs   => $summarizer->debuffValues,
-    });
+    $job->summarizer->updateBuffs();
+    $job->summarizer->updateDebuffs();
   }
 
   sub validateParams($job, $params) {
@@ -196,7 +253,11 @@ package Game::EvonyTKR::External::General::Summarizer {
           return $job->fail($em);
         }
       }
+    }
 
+    if ($job->covenantLevel eq '') {
+      $job->covenantLevel('none');
+      $job->params->{covenantLevel} = 'none';
     }
 
     unless (any { $_ eq $params->{covenantLevel} }

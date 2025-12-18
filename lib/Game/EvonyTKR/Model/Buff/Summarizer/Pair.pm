@@ -44,6 +44,86 @@ has pairDebuffValues => sub {
   };
 };
 
+sub updatePrimaryBuffs ($self, $precomputed = undef) {
+  unless ($self->pair
+    && ref($self->pair)
+    && blessed($self->pair)
+    && $self->pair->isa('Game::EvonyTKR::Model::General::Pair')) {
+    $self->log_error(sprintf(
+      '%s requires a Game::EvonyTKR::Model::General::Pair',
+      __PACKAGE__));
+    return;
+  }
+
+  if ($precomputed && ref($precomputed) && ref($precomputed) eq 'HASH') {
+    $self->buffValues($precomputed);
+  }
+  else {
+    $self->general($self->pair->primary);
+    $self->isPrimary(1);
+    $self->SUPER::updateBuffs();
+  }
+
+  $self->log_debug(sprintf('After primary updateBuffs: %s',
+    Data::Printer::np($self->buffValues, max_depth => 2)));
+
+  foreach my $troopType (keys %{ $self->buffValues }) {
+    foreach my $attribute (keys %{ $self->buffValues->{$troopType} }) {
+      $self->pairBuffValues->{$troopType}->{$attribute} +=
+        $self->buffValues->{$troopType}->{$attribute};
+    }
+  }
+}
+
+sub updateSecondaryBuffs ($self, $precomputed = undef) {
+  unless ($self->pair
+    && ref($self->pair)
+    && blessed($self->pair)
+    && $self->pair->isa('Game::EvonyTKR::Model::General::Pair')) {
+    $self->log_error(sprintf(
+      '%s requires a Game::EvonyTKR::Model::General::Pair',
+      __PACKAGE__));
+    return;
+  }
+  # Store primary levels
+  my $primaryCovenantLevel = $self->covenantLevel;
+  my $primarySpecialty1    = $self->specialty1;
+  my $primarySpecialty2    = $self->specialty2;
+  my $primarySpecialty3    = $self->specialty3;
+  my $primarySpecialty4    = $self->specialty4;
+
+  # Switch to secondary levels
+  $self->covenantLevel($self->secondaryCovenantLevel);
+  $self->specialty1($self->secondarySpecialty1);
+  $self->specialty2($self->secondarySpecialty2);
+  $self->specialty3($self->secondarySpecialty3);
+  $self->specialty4($self->secondarySpecialty4);
+
+  # Calculate secondary buffs
+  if ($precomputed && ref($precomputed) && ref($precomputed) eq 'HASH') {
+    $self->buffValues($precomputed);
+  }
+  else {
+    $self->general($self->pair->secondary);
+    $self->isPrimary(0);
+    $self->SUPER::updateBuffs();
+  }
+
+  foreach my $troopType (keys %{ $self->buffValues }) {
+    foreach my $attribute (keys %{ $self->buffValues->{$troopType} }) {
+      $self->pairBuffValues->{$troopType}->{$attribute} +=
+        $self->buffValues->{$troopType}->{$attribute};
+    }
+  }
+
+  # Restore primary levels
+  $self->covenantLevel($primaryCovenantLevel);
+  $self->specialty1($primarySpecialty1);
+  $self->specialty2($primarySpecialty2);
+  $self->specialty3($primarySpecialty3);
+  $self->specialty4($primarySpecialty4);
+}
+
 sub updateBuffs ($self) {
   unless ($self->pair
     && ref($self->pair)
@@ -92,6 +172,83 @@ sub updateBuffs ($self) {
     foreach my $attribute (keys %{ $self->buffValues->{$troopType} }) {
       $self->pairBuffValues->{$troopType}->{$attribute} +=
         $self->buffValues->{$troopType}->{$attribute};
+    }
+  }
+
+  # Restore primary levels
+  $self->covenantLevel($primaryCovenantLevel);
+  $self->specialty1($primarySpecialty1);
+  $self->specialty2($primarySpecialty2);
+  $self->specialty3($primarySpecialty3);
+  $self->specialty4($primarySpecialty4);
+}
+
+sub updatePrimaryDebuffs ($self, $precomputed = undef) {
+  unless ($self->pair
+    && ref($self->pair)
+    && blessed($self->pair)
+    && $self->pair->isa('Game::EvonyTKR::Model::General::Pair')) {
+    $self->log_error(sprintf(
+      '%s requires a Game::EvonyTKR::Model::General::Pair',
+      __PACKAGE__));
+    return;
+  }
+  if ($precomputed && ref($precomputed) && ref($precomputed) eq 'HASH') {
+    $self->debuffValues($precomputed);
+  }
+  else {
+    $self->general($self->pair->primary);
+    $self->isPrimary(1);
+    $self->SUPER::updateDebuffs();
+  }
+  $self->log_debug(sprintf('After primary updateDebuffs: %s',
+    Data::Printer::np($self->debuffValues, max_depth => 2)));
+
+  foreach my $troopType (keys %{ $self->debuffValues }) {
+    foreach my $attribute (keys %{ $self->debuffValues->{$troopType} }) {
+      $self->pairDebuffValues->{$troopType}->{$attribute} +=
+        $self->debuffValues->{$troopType}->{$attribute};
+    }
+  }
+}
+
+sub updateSecondaryDebuffs ($self, $precomputed = undef) {
+  unless ($self->pair
+    && ref($self->pair)
+    && blessed($self->pair)
+    && $self->pair->isa('Game::EvonyTKR::Model::General::Pair')) {
+    $self->log_error(sprintf(
+      '%s requires a Game::EvonyTKR::Model::General::Pair',
+      __PACKAGE__));
+    return;
+  }
+  # Store primary levels
+  my $primaryCovenantLevel = $self->covenantLevel;
+  my $primarySpecialty1    = $self->specialty1;
+  my $primarySpecialty2    = $self->specialty2;
+  my $primarySpecialty3    = $self->specialty3;
+  my $primarySpecialty4    = $self->specialty4;
+
+  # Switch to secondary levels
+  $self->covenantLevel($self->secondaryCovenantLevel);
+  $self->specialty1($self->secondarySpecialty1);
+  $self->specialty2($self->secondarySpecialty2);
+  $self->specialty3($self->secondarySpecialty3);
+  $self->specialty4($self->secondarySpecialty4);
+
+  # Calculate secondary buffs
+  if ($precomputed && ref($precomputed) && ref($precomputed) eq 'HASH') {
+    $self->debuffValues($precomputed);
+  }
+  else {
+    $self->general($self->pair->secondary);
+    $self->isPrimary(0);
+    $self->SUPER::updateDebuffs();
+  }
+  foreach my $troopType (keys %{ $self->debuffValues }) {
+    foreach my $attribute (keys %{ $self->debuffValues->{$troopType} }) {
+      $self->pairDebuffValues->{$troopType}->{$attribute} +=
+        $self->debuffValues->{$troopType}->{$attribute};
     }
   }
 
@@ -191,18 +348,17 @@ sub _getGenericBookValue_impl ($self, $attribute, $troopType) {
     my ($general, $book, $same_side) = @_;
     my $cache_key = join(':', $general->name, $book->name, $same_side);
     return $compat_cache->{$cache_key} //=
-      $self->bc->is_general_and_book_compatible($general, $book, { same_side => $same_side });
+      $self->bc->is_general_and_book_compatible($general, $book,
+      { same_side => $same_side });
   };
 
   # Special case for March Size - it's universal, not troop-specific
   if ($attribute eq 'March Size') {
 
     my $MS = $books_helper->get_generic_book('March Size', $self->bestLevel);
-    if (
-      $MS
+    if ( $MS
       && $check_compat->($current_general, $MS, 1)
-      && $check_compat->($other_general, $MS, 0)
-    ) {
+      && $check_compat->($other_general,   $MS, 0)) {
       $total += $MS->buffs->[0]->value->number;
     }
     return $total;
@@ -230,8 +386,7 @@ sub _getGenericBookValue_impl ($self, $attribute, $troopType) {
 
   # Get the best books for this troop type
   my $book_priorities = $books_helper->BestSkillBooks->{$targetType}->{$key}
-    // $books_helper->BestSkillBooks->{$troopType}->{$key}
-    // {};
+    // $books_helper->BestSkillBooks->{$troopType}->{$key} // {};
 
   $self->log_debug(sprintf(
 'Pair getGenericBookValue: attr=%s, troopType=%s, targetType=%s, key=%s, found %d books',
@@ -268,7 +423,7 @@ sub _getGenericBookValue_impl ($self, $attribute, $troopType) {
     # Check compatibility with current general (same side) - cached
     my $compat_current = $check_compat->($current_general, $book, 1);
 
-    # Check compatibility with other general (different side - no partial conflicts) - cached
+# Check compatibility with other general (different side - no partial conflicts) - cached
     my $compat_other = $check_compat->($other_general, $book, 0);
 
     $self->log_debug(sprintf(

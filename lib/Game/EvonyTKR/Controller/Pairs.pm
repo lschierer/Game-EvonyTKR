@@ -54,7 +54,6 @@ package Game::EvonyTKR::Controller::Pairs {
     )];
   };
 
-
   sub register($c, $app, $config = {}) {
     $c->SUPER::register($app, $config);
     $c->log_info("Registering routes for " . ref($c));
@@ -519,120 +518,122 @@ package Game::EvonyTKR::Controller::Pairs {
     my @subs;
     my @promises;
 
-    # Enqueue jobs in batches using recurring timer to avoid SQLite lock contention
+    my $args = {
+      runId => $run_id,
+
+      targetType             => $validated_params->{route_meta}->{generalType},
+      activationType         => $validated_params->{buffActivation},
+      ascendingLevel         => $validated_params->{ascendingLevel},
+      primaryCovenantLevel   => $validated_params->{primaryCovenantLevel},
+      primarySpecialty1      => $validated_params->{primarySpecialties}->[0],
+      primarySpecialty2      => $validated_params->{primarySpecialties}->[1],
+      primarySpecialty3      => $validated_params->{primarySpecialties}->[2],
+      primarySpecialty4      => $validated_params->{primarySpecialties}->[3],
+      secondaryCovenantLevel => $validated_params->{secondaryCovenantLevel},
+      secondarySpecialty1    => $validated_params->{secondarySpecialties}->[0],
+      secondarySpecialty2    => $validated_params->{secondarySpecialties}->[1],
+      secondarySpecialty3    => $validated_params->{secondarySpecialties}->[2],
+      secondarySpecialty4    => $validated_params->{secondarySpecialties}->[3],
+    };
+
+    my $batchJid = $c->app->minion->enqueue(
+      batch_summarize_pairs => [\@sorted_pairs, $args] => {
+        attempts => 2,
+      }
+    );
+
+ # Enqueue jobs in batches using recurring timer to avoid SQLite lock contention
     my $completed_processes = {};
+    my $pending_processes   = {};
     my $total_processes     = scalar(@sorted_pairs);
     my $max_index           = scalar(@sorted_pairs) - 1;
     my $active_processes    = 0;
     my $pair_index          = 0;
-    my $batch_size          = 5;  # Enqueue 100 jobs per tick
+    my $batch_size          = 5;    # Enqueue 100 jobs per tick
     my $current_idx         = 0;
 
     my $recurring_id;
-    #$recurring_id = Mojo::IOLoop->recurring(5 => sub {
-    #  my $loop = shift;
-    while($current_idx <= $max_index) {
-
-      # Calculate batch range
-      my $end_idx = $current_idx + $batch_size - 1;
-      $end_idx = $max_index if $end_idx > $max_index;
-
-      # Enqueue this batch
-      for my $index ($current_idx .. $end_idx) {
-        my $pair = $sorted_pairs[$index];
-        unless ($pair && $pair->primary->name && $pair->secondary->name) {
-          $c->log_error(sprintf(
-            'invalid pair at index %s : %s',
-            $index, $pair ? Data::Printer::np($pair) : 'undefined'
-          ));
-          next;
-        }
-
-        # Build args hash for the Worker class
-        my $args = {
-          runId                => $run_id,
-          primaryName          => $pair->primary->name,
-          secondaryName        => $pair->secondary->name,
-          targetType           => $validated_params->{route_meta}->{generalType},
-          activationType       => $validated_params->{buffActivation},
-          ascendingLevel       => $validated_params->{ascendingLevel},
-          primaryCovenantLevel => $validated_params->{primaryCovenantLevel},
-          primarySpecialty1    => $validated_params->{primarySpecialties}->[0],
-          primarySpecialty2    => $validated_params->{primarySpecialties}->[1],
-          primarySpecialty3    => $validated_params->{primarySpecialties}->[2],
-          primarySpecialty4    => $validated_params->{primarySpecialties}->[3],
-          secondaryCovenantLevel => $validated_params->{secondaryCovenantLevel},
-          secondarySpecialty1 => $validated_params->{secondarySpecialties}->[0],
-          secondarySpecialty2 => $validated_params->{secondarySpecialties}->[1],
-          secondarySpecialty3 => $validated_params->{secondarySpecialties}->[2],
-          secondarySpecialty4 => $validated_params->{secondarySpecialties}->[3],
-        };
-
-        my $jid = $c->app->minion->enqueue(
-          summarize_pair => [$args] => {
-            attempts => 2,
-          }
-        );
-
-        push @subs, $jid;
-
-        # Set up promise for this job immediately
-        my $promise = $c->app->minion->result_p($jid)->then(sub {
-          return if !$c->tx || $c->tx->is_finished;
-          my $result = shift;
-          if (defined($result) && ref($result) eq 'HASH') {
-            $c->log_debug(
-              "job $jid result is " . Data::Printer::np($result, multiline => 0));
-            if ($result->{result}->{status} eq 'complete') {
-              my $encoded = encode_base64($result->{result}->{result}, '');
-              $c->write_sse({ type => 'pair', text => $encoded });
-            }
-          }
-          return $result;
-        })->catch(sub {
-          my $err = shift;
-          $c->log_error(
-            "Job $jid failed: " . Data::Printer::np($err, multiline => 0));
-          return undef;    # Return something for Promise->all
-        });
-
-        push @promises, $promise;
-      }
-
-      $c->log_debug(sprintf(
-        'Enqueued batch: jobs %d-%d (%d total)',
-        $current_idx, $end_idx, scalar(@subs)
-      ));
-
-      # Stop recurring when all jobs are enqueued
-      if ($end_idx >= $max_index) {
-      #  $loop->remove($recurring_id);
-        $c->log_info(sprintf('Finished enqueueing all %d jobs', scalar(@subs)));
-
-        # Now that all jobs are enqueued, set up completion handler
-        Mojo::Promise->all(@promises)->then(sub {
-          $c->log_debug("all jobs complete promise handler starting timer");
-          return if !$c->tx || $c->tx->is_finished;
-          # I cannot know which order the promise handlers will
-          # run in, I *need* this one to be *after* all the individual
+    my $timer_logic = sub {
+      my $loop = shift;
+      if (scalar keys $completed_processes->%*) {
+        unless (scalar(keys $pending_processes->%*)) {
+          # I *need* this one to be *after* all the individual
           # job handlers have run.
           Mojo::IOLoop->timer(
-            10 => sub ($loop) {
-              $c->log_debug(
-                'all jobs complete promise handler sending complete event');
+            $c->standard_delay * 2 => sub ($loop) {
+              $c->log_debug('all jobs complete, sending complete event');
               my $payload = $c->encode({ runId => $run_id });
               $c->write_sse({ type => 'complete', text => $payload });
             }
           );
-        })->catch(sub {
-          $c->log_error("Some jobs failed in batch");
-          return undef;
-        });
+          Mojo::IOLoop->remove($recurring_id);
+          return;
+        }
+      }
+      my $batchJob = $c->minion->job($batchJid);
+      unless ($batchJob) {
+        $c->log_warn(sprintf('cannot find job for batch jid %s', $batchJid));
+        unless (scalar keys $pending_processes->%*) {
+          Mojo::IOLoop->remove($recurring_id);
+        }
+        return;
       }
 
-      $current_idx = $end_idx + 1;
-    #});
-    }
+      # Add newly spawned jobs to pending list
+      my $batch_info = $batchJob->info;
+      if ($batch_info && $batch_info->{spawned_jobs}) {
+        foreach my $spawned_jid ($batch_info->{spawned_jobs}->@*) {
+          unless (exists $pending_processes->{$spawned_jid}
+            || exists $completed_processes->{$spawned_jid}) {
+            $pending_processes->{$spawned_jid} = 1;
+          }
+        }
+      }
+
+      my @spawned_processes = keys $pending_processes->%*;
+      foreach my $sp (@spawned_processes) {
+        if (exists $completed_processes->{$sp}) {
+          delete $pending_processes->{$sp};
+          next;
+        }
+        my $spj = $c->minion->job($sp);
+        unless ($spj) {
+          $c->log_warn(sprintf('no job for spawned job %s', $sp));
+          $completed_processes->{$sp} = 0;
+          next;
+        }
+        if ($spj->info->{state} eq 'failed') {
+          $completed_processes->{$sp} = 0;
+          next;
+        }
+        elsif ($spj->info->{state} eq 'finished') {
+          my $result = $spj->result;
+          unless (defined($result) && ref($result) && ref($result) eq 'HASH') {
+            $c->log_error(sprintf('odd result for job %s: %s', $sp, $result));
+          }
+          $c->log_debug(sprintf(
+            'job %s result is %s',
+            $sp, Data::Printer::np($result, multiline => 0)
+          ));
+
+          if ($result->{result}->{status} eq 'complete') {
+            my $encoded = encode_base64($result->{result}->{result}, '');
+            $c->write_sse({ type => 'pair', text => $encoded });
+          }
+          $completed_processes->{$sp} = $result;
+        }
+        else {
+         # in case I need information to debug, lets go ahead and cache it here.
+          $pending_processes->{$sp} = $c->minion->job($sp)->info // 0;
+        }
+      }
+    };
+
+    # Execute immediately to start processing
+    $timer_logic->();
+
+    # Then set up recurring timer
+    $recurring_id = Mojo::IOLoop->recurring($c->standard_delay => $timer_logic);
 
     $c->on(
       finish => sub {
@@ -640,26 +641,28 @@ package Game::EvonyTKR::Controller::Pairs {
           "Client disconnected, canceling " . scalar(@subs) . " jobs");
         foreach my $jid (@subs) {
           my $job = $c->app->minion->job($jid);
-          Mojo::IOLoop->timer(rand(5.00) => sub {
-            if ($job) {
-              my $info = $job->info;
-              next unless $info;    # Job might be gone
-              my $state = $info->{state};
-              if ($state eq 'inactive') {
-                $job->remove;
-                $c->log_debug("Removed inactive job $jid");
-              }
-              elsif ($state eq 'active' && $info->{pid}) {
-                eval { $job->kill(); };
-                if ($@) {
-                  $c->log_debug("Failed to kill job $jid: $@");
+          Mojo::IOLoop->timer(
+            rand(5.00) => sub {
+              if ($job) {
+                my $info = $job->info;
+                next unless $info;    # Job might be gone
+                my $state = $info->{state};
+                if ($state eq 'inactive') {
+                  $job->remove;
+                  $c->log_debug("Removed inactive job $jid");
                 }
-                else {
-                  $c->log_debug("Killed active job $jid");
+                elsif ($state eq 'active' && $info->{pid}) {
+                  eval { $job->kill(); };
+                  if ($@) {
+                    $c->log_debug("Failed to kill job $jid: $@");
+                  }
+                  else {
+                    $c->log_debug("Killed active job $jid");
+                  }
                 }
               }
             }
-          });
+          );
         }
 
         if (exists $session_store->{$session_id}) {

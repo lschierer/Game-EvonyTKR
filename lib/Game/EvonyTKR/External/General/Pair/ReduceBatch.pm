@@ -10,7 +10,7 @@ package Game::EvonyTKR::External::General::Pair::ReduceBatch {
   sub task_name {'reduce_batch'}
 
   sub register ($taskClass, $app, $conf = {}) {
-    return 1 unless $taskClass->SUPER::register($app, $conf);
+    $taskClass->SUPER::register($app, $conf);
     $app->minion->add_task($taskClass->task_name => __PACKAGE__);
 
     return 1;
@@ -31,8 +31,7 @@ package Game::EvonyTKR::External::General::Pair::ReduceBatch {
 
     # Check if prerequisites are loaded - fail fast if not
     return
-      if ($job->are_prereqs_outstanding(
-      $job->minion, ['load_all_generals']));
+      if ($job->are_prereqs_outstanding($job->minion, ['load_all_generals']));
 
     $job->log_info(
       sprintf('ReduceBatch processing %d parent jobs', scalar(@$job_ids)));

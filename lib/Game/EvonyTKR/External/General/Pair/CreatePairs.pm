@@ -10,7 +10,7 @@ package Game::EvonyTKR::External::General::Pair::CreatePairs {
   sub task_name {'create_pairs'}
 
   sub register ($taskClass, $app, $conf = {}) {
-    return 1 unless $taskClass->SUPER::register($app, $conf);
+    $taskClass->SUPER::register($app, $conf);
     $app->minion->add_task($taskClass->task_name => __PACKAGE__);
 
     return 1;
@@ -201,8 +201,10 @@ package Game::EvonyTKR::External::General::Pair::CreatePairs {
       }
     }
 
-    my $new_conflict_count = scalar(map { keys %{ $new_conflicts_only{$_} } }
-        keys %new_conflicts_only);
+    my $new_conflict_count = scalar(
+      map { keys %{ $new_conflicts_only{$_} } }
+        keys %new_conflicts_only
+    );
 
     if ($new_conflict_count > 0) {
       # Use batch write for efficiency

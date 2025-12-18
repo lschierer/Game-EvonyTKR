@@ -113,9 +113,9 @@ has 'BestSkillBooks' => sub {
     },
     mayor => {
       default => {
-        "Level $bestLevel Rebirth"                   => 1,
-        "Level $bestLevel Training Speed"            => 2,
-        "Level $bestLevel Training Capacity"         => 3,
+        "Level $bestLevel Rebirth"           => 1,
+        "Level $bestLevel Training Speed"    => 2,
+        "Level $bestLevel Training Capacity" => 3,
       }
     },
     wall => {

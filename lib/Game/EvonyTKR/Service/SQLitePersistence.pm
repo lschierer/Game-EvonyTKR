@@ -1,8 +1,8 @@
 package Game::EvonyTKR::Service::SQLitePersistence;
 use v5.42.0;
 use utf8::all;
-use Mojo::Base -base,                        -signatures;
-use Mojo::Base 'Game::EvonyTKR::Role::JSON', -role;
+use Mojo::Base -base,                           -signatures;
+use Mojo::Base 'Game::EvonyTKR::Role::JSON',    -role;
 use Mojo::Base 'Game::EvonyTKR::Role::Logging', -role;
 use Mojo::SQLite;
 
@@ -29,12 +29,11 @@ has 'sqlite' => sub ($self) {
   );
 
   # Create tables - run migrations with error handling
-  eval {
-    $sqlite->migrations->name('evonytkr')->from_data->migrate;
-  };
+  eval { $sqlite->migrations->name('evonytkr')->from_data->migrate; };
   if ($@) {
     # If migration fails due to version conflict, it's likely already migrated
-    warn "Migration warning (likely harmless): $@" if $@ !~ /greater than.*latest version/;
+    warn "Migration warning (likely harmless): $@"
+      if $@ !~ /greater than.*latest version/;
   }
 
   return $sqlite;
@@ -456,8 +455,11 @@ sub get_all_pair_types ($self) {
 sub list_pairs_by_type ($self, $type) {
   # Query pairs_individual table for all pairs of this type
   # The name field has format "type/primary/secondary"
-  my $results = $self->db->select('pairs_individual', ['name', 'data'],
-    \["name LIKE ?", "$type/%"])->hashes;
+  my $results = $self->db->select(
+    'pairs_individual',
+    ['name', 'data'],
+    \["name LIKE ?", "$type/%"]
+  )->hashes;
 
   my @type_pairs;
   for my $row (@$results) {
@@ -565,6 +567,12 @@ CREATE TABLE IF NOT EXISTS pairs_individual (
 
 CREATE TABLE IF NOT EXISTS work_units (
   name TEXT PRIMARY KEY,
+  data TEXT NOT NULL,
+  updated_at REAL NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS general_buff_cache (
+  key TEXT PRIMARY KEY,
   data TEXT NOT NULL,
   updated_at REAL NOT NULL
 );

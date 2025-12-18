@@ -33,7 +33,7 @@ sub get_glossary_term ($self, $term_name) {
 }
 
 sub list_glossary_terms ($self) {
-  return [ values $self->persistence->get_all_glossary_terms()->%* ];
+  return [values $self->persistence->get_all_glossary_terms()->%*];
 }
 
 1;

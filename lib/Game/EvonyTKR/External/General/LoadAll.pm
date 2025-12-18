@@ -11,7 +11,7 @@ package Game::EvonyTKR::External::General::LoadAll {
   sub task_name {'load_all_generals'}
 
   sub register ($taskClass, $app, $conf = {}) {
-    return 1 unless $taskClass->SUPER::register($app, $conf);
+    $taskClass->SUPER::register($app, $conf);
     $app->minion->add_task($taskClass->task_name => __PACKAGE__);
     return 1;
   }
@@ -53,9 +53,11 @@ package Game::EvonyTKR::External::General::LoadAll {
 
     $job->log_info(sprintf('Found %d general files to process', scalar @files));
 
-    my $enqueued_count = 0;
-    my $skipped_count  = 0;
-    my @job_ids        = ();
+    my $enqueued_count      = 0;
+    my $skipped_count       = 0;
+    my @job_ids             = ();
+    my $cache_jobs_enqueued = 0;
+    my $run_id              = $job->info->{notes}->{prebuild_run_id};
 
     foreach my $file (@files) {
       # Extract general name from filename
@@ -66,52 +68,64 @@ package Game::EvonyTKR::External::General::LoadAll {
         $job->log_debug(sprintf(
           'Skipping %s - already in persistence', $general_name));
         $skipped_count++;
-        next;
       }
+      else {
+        # Check if job already exists for this file in current run
+        my $normalized_path = $job->normalize($file->to_string);
+        my $existing_jobs   = $job->minion->jobs({
+          tasks  => ['load_general'],
+          states => ['active', 'inactive']
+        });
 
-      # Check if job already exists for this file in current run
-      my $normalized_path = $job->normalize($file->to_string);
-      my $existing_jobs   = $job->minion->jobs({
-        tasks  => ['load_general'],
-        states => ['active', 'inactive']
-      });
+        my $job_exists = 0;
+        while (my $existing = $existing_jobs->next) {
+          if ( $existing->{args}
+            && $existing->{args}[0]
+            && $existing->{args}[0] eq $normalized_path
+            && $existing->{notes}
+            && $existing->{notes}->{prebuild_run_id}
+            && $existing->{notes}->{prebuild_run_id} eq
+            $job->info->{notes}->{prebuild_run_id}) {
+            $job_exists = 1;
+            last;
+          }
+        }
 
-      my $job_exists = 0;
-      while (my $existing = $existing_jobs->next) {
-        if ( $existing->{args}
-          && $existing->{args}[0]
-          && $existing->{args}[0] eq $normalized_path
-          && $existing->{notes}
-          && $existing->{notes}->{prebuild_run_id}
-          && $existing->{notes}->{prebuild_run_id} eq
-          $job->info->{notes}->{prebuild_run_id}) {
-          $job_exists = 1;
-          last;
+        if ($job_exists) {
+          $job->log_debug(sprintf(
+            'Skipping %s - job already exists for current run',
+            $general_name));
+          $skipped_count++;
+        }
+        else {
+          my $job_id = $job->minion->enqueue(
+            'load_general' => [$job->normalize($file->to_string)] => {
+              attempts => 3,
+              delay    => rand(10),
+              priority => 20,
+              notes    =>
+                { prebuild_run_id => $job->info->{notes}->{prebuild_run_id} }
+            }
+          );
+          $job->log_debug(sprintf(
+            'Enqueued load_general job %s for file %s',
+            $job_id, $file->basename
+          ));
+          push @job_ids, $job_id;
+          $enqueued_count++;
         }
       }
 
-      if ($job_exists) {
-        $job->log_debug(sprintf(
-          'Skipping %s - job already exists for current run',
-          $general_name));
-        $skipped_count++;
-        next;
-      }
-
-      my $job_id = $job->minion->enqueue(
-        'load_general' => [$job->normalize($file->to_string)] => {
+      my $cache_job_id = $job->minion->enqueue(
+        'compute_general_buff_cache' => [$job->normalize($general_name)] => {
           attempts => 3,
-          delay    => rand(10),
-          priority => 20,
-          notes => { prebuild_run_id => $job->info->{notes}->{prebuild_run_id} }
+          priority => 15,    # Lower than data loading, higher than pairs
+          notes    => { prebuild_run_id => $run_id }
         }
       );
-      $job->log_debug(sprintf(
-        'Enqueued load_general job %s for file %s',
-        $job_id, $file->basename
-      ));
-      push @job_ids, $job_id;
-      $enqueued_count++;
+      $cache_jobs_enqueued++;
+      $job->log_debug(
+        "Enqueued buff cache job $cache_job_id for $general_name");
     }
 
     $job->log_info(sprintf(
@@ -215,8 +229,8 @@ package Game::EvonyTKR::External::General::LoadAll {
       }
 
       unless ($verified) {
-        my $errmsg =
-'Failed to verify all generals in persistence after child jobs finished';
+        my $errmsg = 'Failed to verify all generals in '
+          . 'persistence after child jobs finished';
         $job->log_error($errmsg);
         return $job->fail($errmsg);
       }
@@ -231,8 +245,20 @@ package Game::EvonyTKR::External::General::LoadAll {
     # Mark this job as completed in persistence (with run_id for isolation)
     # IMPORTANT: This must be OUTSIDE the if (@job_ids) block so jobs that
     # skip all work (because data exists) still mark themselves complete
-    my $run_id = $job->info->{notes}->{prebuild_run_id};
+
     $job->mark_task_completed($job->task_name, $run_id);
+
+    $job->log_info("Enqueued $cache_jobs_enqueued buff cache computation jobs");
+
+    # Enqueue monitor job to track buff cache completion
+    $job->minion->enqueue(
+      'monitor_general_buff_cache' => [] => {
+        attempts => 10,
+        priority => 5,     # Low priority, runs after other jobs
+        delay    => 30,    # Give cache jobs time to start
+        notes => { prebuild_run_id => $job->info->{notes}->{prebuild_run_id} }
+      }
+    );
 
     $job->minion->enqueue(
       build_general_indexes => [] => {
