@@ -12,7 +12,7 @@ sub task_name {'compute_general_buff_cache'}
 
 sub register ($taskClass, $app, $conf = {}) {
   $taskClass->SUPER::register($app, $conf);
-  $app->minion->add_task($taskClass->task_name => __PACKAGE__, {limit => 1});
+  $app->minion->add_task($taskClass->task_name => __PACKAGE__, { limit => 1 });
   return 1;
 }
 
@@ -21,9 +21,10 @@ sub common_activation_types ($job) {
   my $general_types = $job->general->type;
 
   # Wall generals use Wall and Defense
-  if (grep { /wall/i } @$general_types) {
+  if (grep {/wall/i} @$general_types) {
     return ['Defense', 'Wall'];
-  } elsif(grep { /mayor/i } @$general_types ){
+  }
+  elsif (grep {/mayor/i} @$general_types) {
     return ['Defense', 'Mayor'];
   }
 
@@ -42,12 +43,13 @@ sub common_specialty_configs ($job) {
 }
 
 sub common_ascending_levels ($job, $isRed) {
-  if($isRed){
+  if ($isRed) {
     return ['none', 'red3', 'red4', 'red5'];
-  }else {
+  }
+  else {
     return ['none', 'purple3', 'purple4', 'purple5'];
   }
-  return
+  return;
 }
 
 sub common_covenant_levels ($job) {
@@ -58,8 +60,9 @@ sub common_covenant_levels ($job) {
 sub run ($job, @args) {
   # Wait for covenants to be loaded before computing buffs
   return if $job->are_prereqs_outstanding($job->minion, ['load_all_covenants']);
-  return $job->retry({delay => $job->standard_delay * 2 })
-      unless my $guard = $job->minion->guard($job->task_name, 600, {limit => 1});
+  return $job->retry({ delay => $job->standard_delay * 2 })
+    unless my $guard =
+    $job->minion->guard($job->task_name, 600, { limit => 1 });
 
   $job->SUPER::run(@args);
 
@@ -79,7 +82,8 @@ sub run ($job, @args) {
   $job->general->populateSpecialties;
 
   my $isRed = $job->general->stars =~ /red/i;
-  my $ascending_levels = $job->general->ascending
+  my $ascending_levels =
+      $job->general->ascending
     ? $job->common_ascending_levels($isRed)
     : ['none'];
 
@@ -121,86 +125,86 @@ sub run ($job, @args) {
         ));
 
         foreach my $covenant_level ($job->common_covenant_levels->@*) {
+          $job->log_debug(sprintf(
+            'computing buffs for "%s" covenant_level "%s"',
+            $job->general->name, $covenant_level
+          ));
+          $job->covenantLevel($covenant_level);
+          $job->params->{covenantLevel} = $covenant_level;
+
+          foreach my $ascending_level (@$ascending_levels) {
             $job->log_debug(sprintf(
-              'computing buffs for "%s" covenant_level "%s"',
-              $job->general->name, $covenant_level
+              'computing buffs for "%s" ascending_level "%s"',
+              $job->general->name, $ascending_level
             ));
-            $job->covenantLevel($covenant_level);
-            $job->params->{covenantLevel} = $covenant_level;
+            if ($job->general->ascending) {
+              $job->ascendingLevel($ascending_level);
+              $job->params->{ascendingLevel} = $ascending_level;
+            }
+            else {
+              $job->ascendingLevel('none');
+              $job->params->{ascendingLevel} = 'none';
+            }
+            my $tt = $job->targetType     // $job->general->type->[0];
+            my $at = $job->activationType // 'default';
+            $job->books([
+              $job->load_best_skill_books($job->general, $tt, $at)->@*,
+              $job->load_mandatory_skill_books()->@*,
+            ]);
 
-            foreach my $ascending_level (@$ascending_levels) {
-              $job->log_debug(sprintf(
-                'computing buffs for "%s" ascending_level "%s"',
-                $job->general->name, $ascending_level
-              ));
-              if ($job->general->ascending) {
-                $job->ascendingLevel($ascending_level);
-                $job->params->{ascendingLevel} = $ascending_level;
-              }
-              else {
-                $job->ascendingLevel('none');
-                $job->params->{ascendingLevel} = 'none';
-              }
-              my $tt = $job->targetType     // $job->general->type->[0];
-              my $at = $job->activationType // 'default';
-              $job->books([
-                $job->load_best_skill_books($job->general, $tt, $at)->@*,
-                $job->load_mandatory_skill_books()->@*,
-              ]);
+            $job->log_debug(sprintf(
+              'computing buffs for "%s" with params %s',
+              $job->general->name,
+              Data::Printer::np($job->params, multiline => 0)
+            ));
 
-              $job->log_debug(
-                sprintf(
-                  'computing buffs for "%s" with params %s',
-                  $job->general->name,
-                  Data::Printer::np($job->params, multiline => 0)
-                )
-              );
+            # as primary
+            $job->isPrimary(1);
+            $job->summarize();
+            # Store in persistence with predictable key
+            my $cache_key = $job->generate_buff_cache_key(
+              $job->generalName,    $job->isPrimary,
+              $job->targetType,     $job->activationType,
+              $job->ascendingLevel, $job->covenantLevel,
+              $job->specialty1,     $job->specialty2,
+              $job->specialty3,     $job->specialty4
+            );
+            my $buff_values = $job->summarizer->buffValues;
+            $job->log_debug(sprintf(
+              'found buffs for "%s" with cache key "%s": %s',
+              $job->general->name, $cache_key,
+              Data::Printer::np($buff_values)
+            ));
+            $job->store_buff_cache($cache_key, $buff_values);
+            $cached_count++;
+            $job->note(cached_count             => $cached_count);
+            $job->note(last_primary_buff_values => $buff_values);
 
-              # as primary
-              $job->isPrimary(1);
-              $job->summarize();
-              # Store in persistence with predictable key
-              my $cache_key   = $job->generate_buff_cache_key(
-              $job->generalName,    $job->isPrimary,      $job->targetType,
-              $job->activationType, $job->ascendingLevel, $job->covenantLevel,
-              $job->specialty1,     $job->specialty2,     $job->specialty3,
-              $job->specialty4
-              );
-              my $buff_values = $job->summarizer->buffValues;
-              $job->log_debug(sprintf(
-                'found buffs for "%s" with cache key "%s": %s',
-                $job->general->name, $cache_key,
-                Data::Printer::np($buff_values)
-              ));
-              $job->store_buff_cache( $cache_key, $buff_values);
-              $cached_count++;
-              $job->note(cached_count => $cached_count);
-              $job->note(last_primary_buff_values => $buff_values);
-
-              # as secondary
-              $job->isPrimary(0);
-              $job->summarize();
-              # Store in persistence with predictable key
-              $cache_key   = $job->generate_buff_cache_key(
-              $job->generalName,    $job->isPrimary,      $job->targetType,
-              $job->activationType, $job->ascendingLevel, $job->covenantLevel,
-              $job->specialty1,     $job->specialty2,     $job->specialty3,
-              $job->specialty4
-              );
-              $buff_values = $job->summarizer->buffValues;
-              $job->log_debug(sprintf(
-                'found buffs for "%s" with cache key "%s": %s',
-                $job->general->name, $cache_key,
-                Data::Printer::np($buff_values)
-              ));
-              $job->store_buff_cache( $cache_key, $buff_values);
-              $cached_count++;
-              $job->note(cached_count => $cached_count);
-            }  # end ascending_level loop
-          }  # end covenant_level loop
-        }  # end specialty_config loop
-      }  # end activation_type loop
-    }  # end target_type loop
+            # as secondary
+            $job->isPrimary(0);
+            $job->summarize();
+            # Store in persistence with predictable key
+            $cache_key = $job->generate_buff_cache_key(
+              $job->generalName,    $job->isPrimary,
+              $job->targetType,     $job->activationType,
+              $job->ascendingLevel, $job->covenantLevel,
+              $job->specialty1,     $job->specialty2,
+              $job->specialty3,     $job->specialty4
+            );
+            $buff_values = $job->summarizer->buffValues;
+            $job->log_debug(sprintf(
+              'found buffs for "%s" with cache key "%s": %s',
+              $job->general->name, $cache_key,
+              Data::Printer::np($buff_values)
+            ));
+            $job->store_buff_cache($cache_key, $buff_values);
+            $cached_count++;
+            $job->note(cached_count => $cached_count);
+          }    # end ascending_level loop
+        }    # end covenant_level loop
+      }    # end specialty_config loop
+    }    # end activation_type loop
+  }    # end target_type loop
 
   my $message = sprintf('Cached %s buff configurations for "%s"',
     $cached_count, $job->generalName);
@@ -209,7 +213,6 @@ sub run ($job, @args) {
 }
 
 sub _generate_cache_key($job) {
-
 
 }
 

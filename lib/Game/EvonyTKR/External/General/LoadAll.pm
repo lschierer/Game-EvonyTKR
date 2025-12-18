@@ -118,7 +118,7 @@ package Game::EvonyTKR::External::General::LoadAll {
 
       my $cache_job_id = $job->minion->enqueue(
         'compute_general_buff_cache' => [$job->normalize($general_name)] => {
-          attempts => 3,
+          attempts =>  3,
           priority => -1,
           notes    => { prebuild_run_id => $run_id }
         }

@@ -6,7 +6,8 @@ use Mojo::Base 'Game::EvonyTKR::Role::Persistence::Core', -role;
 
 sub store_buff_cache ($self, $key, $buffValues) {
   $key = lc($self->normalize($key));
-  return $self->persistence->store_data('general_buff_cache', $key, $buffValues);
+  return $self->persistence->store_data('general_buff_cache', $key,
+    $buffValues);
 }
 
 sub get_buff_cache ($self, $key) {
@@ -94,24 +95,28 @@ sub list_generals ($self) {
   return \@returnlist;
 }
 
-
-sub generate_buff_cache_key($self, $general, $isPrimary, $targetType, $activationType, $ascendingLevel, $covenantLevel, $specialty1, $specialty2, $specialty3, $specialty4) {
+sub generate_buff_cache_key(
+  $self,           $general,        $isPrimary,     $targetType,
+  $activationType, $ascendingLevel, $covenantLevel, $specialty1,
+  $specialty2,     $specialty3,     $specialty4
+) {
   my $gn;
-  if(defined($general) && ref($general) && $general->can('name')){
+  if (defined($general) && ref($general) && $general->can('name')) {
     $gn = $general->name;
-  } elsif(defined($general) && !ref($general) && length($general)){
+  }
+  elsif (defined($general) && !ref($general) && length($general)) {
     $gn = $general;
-  } else{
+  }
+  else {
     $self->log_error('general name is required to generate a buff cache key');
     return '';
   }
 
   return sprintf(
     '%s:%s:%s:%s:%s:%s:%s:%s:%s:%s',
-    $gn,     $isPrimary,      $targetType,
-    $activationType,    $ascendingLevel, $covenantLevel,
-    $specialty1,        $specialty2,     $specialty3,
-    $specialty4
+    $gn,             $isPrimary,     $targetType, $activationType,
+    $ascendingLevel, $covenantLevel, $specialty1, $specialty2,
+    $specialty3,     $specialty4
   );
 }
 

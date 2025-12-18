@@ -39,8 +39,9 @@ sub run ($job) {
 
   my $pending_count = 0;
   while (my $j = $all_pending->next) {
-    if ($j->{notes} && $j->{notes}->{prebuild_run_id} &&
-        $j->{notes}->{prebuild_run_id} eq $run_id) {
+    if ( $j->{notes}
+      && $j->{notes}->{prebuild_run_id}
+      && $j->{notes}->{prebuild_run_id} eq $run_id) {
       $pending_count++;
     }
   }
@@ -59,8 +60,9 @@ sub run ($job) {
 
   my $failed_count = 0;
   while (my $j = $all_failed->next) {
-    if ($j->{notes} && $j->{notes}->{prebuild_run_id} &&
-        $j->{notes}->{prebuild_run_id} eq $run_id) {
+    if ( $j->{notes}
+      && $j->{notes}->{prebuild_run_id}
+      && $j->{notes}->{prebuild_run_id} eq $run_id) {
       $failed_count++;
     }
   }

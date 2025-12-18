@@ -32,24 +32,29 @@ sub load_best_skill_books ($self, $general, $targetType, $activationType,
 #          This one (B) may require a separate method from this for the UI to call.
 
   my @books;
-  my $generic_dir       = $self->collection_dir->child('generic books');
+  my $generic_dir = $self->collection_dir->child('generic books');
   my @sorted_book_names;
-  if(exists $self->BestSkillBooks->{$targetType} &&
-    exists $self->BestSkillBooks->{$targetType}->{$key}){
+  if ( exists $self->BestSkillBooks->{$targetType}
+    && exists $self->BestSkillBooks->{$targetType}->{$key}) {
     @sorted_book_names = sort {
       $self->BestSkillBooks->{$targetType}->{$key}->{$a}
         <=> $self->BestSkillBooks->{$targetType}->{$key}->{$b}
     } keys %{ $self->BestSkillBooks->{$targetType}->{$key} };
-  } elsif(exists $self->BestSkillBooks->{$targetType}) {
+  }
+  elsif (exists $self->BestSkillBooks->{$targetType}) {
     @sorted_book_names = sort {
       $self->BestSkillBooks->{$targetType}->{'default'}->{$a}
         <=> $self->BestSkillBooks->{$targetType}->{'default'}->{$b}
     } keys %{ $self->BestSkillBooks->{$targetType}->{'default'} };
-  }else{
-    $self->log_error(sprintf('targetType "%s" is not supported by BestSkillBooks', $targetType));
+  }
+  else {
+    $self->log_error(
+      sprintf(
+        'targetType "%s" is not supported by BestSkillBooks', $targetType
+      )
+    );
     return [];
   }
-
 
   my $level = $self->bestLevel;
 
@@ -96,9 +101,11 @@ sub load_mandatory_skill_books ($self) {
         }
         push @books, $book;
       }
-      elsif (scalar(@books)
+      elsif (
+        scalar(@books)
         && List::AllUtils::none { defined($_) && $_->name eq $book_name }
-        @books) {
+        @books
+      ) {
         my $book = $self->get_generic_book($book_name, $level);
         unless ($book
           && ref($book)
