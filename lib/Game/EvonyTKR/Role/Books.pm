@@ -33,10 +33,23 @@ sub load_best_skill_books ($self, $general, $targetType, $activationType,
 
   my @books;
   my $generic_dir       = $self->collection_dir->child('generic books');
-  my @sorted_book_names = sort {
-    $self->BestSkillBooks->{$targetType}->{$key}->{$a}
-      <=> $self->BestSkillBooks->{$targetType}->{$key}->{$b}
-  } keys %{ $self->BestSkillBooks->{$targetType}->{$key} };
+  my @sorted_book_names;
+  if(exists $self->BestSkillBooks->{$targetType} &&
+    exists $self->BestSkillBooks->{$targetType}->{$key}){
+    @sorted_book_names = sort {
+      $self->BestSkillBooks->{$targetType}->{$key}->{$a}
+        <=> $self->BestSkillBooks->{$targetType}->{$key}->{$b}
+    } keys %{ $self->BestSkillBooks->{$targetType}->{$key} };
+  } elsif(exists $self->BestSkillBooks->{$targetType}) {
+    @sorted_book_names = sort {
+      $self->BestSkillBooks->{$targetType}->{'default'}->{$a}
+        <=> $self->BestSkillBooks->{$targetType}->{'default'}->{$b}
+    } keys %{ $self->BestSkillBooks->{$targetType}->{'default'} };
+  }else{
+    $self->log_error(sprintf('targetType "%s" is not supported by BestSkillBooks', $targetType));
+    return [];
+  }
+
 
   my $level = $self->bestLevel;
 

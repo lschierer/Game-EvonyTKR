@@ -7,6 +7,7 @@ use Mojo::Base 'Game::EvonyTKR::Role::Persistence::Core', -role;
 ##############################################################################
 # Builtin Books
 ##############################################################################
+my $logger;
 
 sub add_builtin_book ($self, $book) {
   my $key = lc($self->normalize($book->name));
@@ -15,15 +16,16 @@ sub add_builtin_book ($self, $book) {
 
 sub get_builtin_book ($self, $name) {
   require Game::EvonyTKR::Model::Factory;
+  $logger //= Game::EvonyTKR::Role::Logging::get_logger(__PACKAGE__);
 
   state $builtin_books = {};
 
-  $self->log_debug("get_builtin_book called for: $name");
+  $logger->debug("get_builtin_book called for: $name");
 
   my $key = lc($self->normalize($name));
 
   if (exists $builtin_books->{$key}) {
-    $self->log_debug("Returning builtin book $name from state cache");
+    $logger->debug("Returning builtin book $name from state cache");
     return $builtin_books->{$key};
   }
 
@@ -31,7 +33,7 @@ sub get_builtin_book ($self, $name) {
   my $wire_data = $self->persistence->get_builtin_book($key);
 
   unless (defined($wire_data)) {
-    $self->log_warn("No built in book wire_data found for key: $key");
+    $logger->warn("No built in book wire_data found for key: $key");
     return;
   }
 
@@ -39,11 +41,11 @@ sub get_builtin_book ($self, $name) {
     Game::EvonyTKR::Model::Factory->build_from_wire('Book', $wire_data);
 
   unless (defined($book)) {
-    $self->log_error("Factory failed to build book from wire_data");
+    $logger->error("Factory failed to build book from wire_data");
     return;
   }
 
-  $self->log_debug("Successfully built book: " . $book->name);
+  $logger->debug("Successfully built book: " . $book->name);
   $builtin_books->{$key} = $book;
   return $book;
 }
@@ -68,9 +70,10 @@ sub list_builtin_books ($self) {
 ##############################################################################
 
 sub add_generic_book ($self, $book) {
+  $logger //= Game::EvonyTKR::Role::Logging::get_logger(__PACKAGE__);
   my $key = lc($self->normalize($book->name));
   $key = sprintf('level %s %s', $book->level, $key);
-  $self->logger->debug(sprintf(
+  $logger->debug(sprintf(
     'persistence role add_generic_book called for name "%s" level "%s"',
     $book->name, $book->level,
   ));
@@ -78,8 +81,9 @@ sub add_generic_book ($self, $book) {
 }
 
 sub get_generic_book ($self, $name, $level) {
+  $logger //= Game::EvonyTKR::Role::Logging::get_logger(__PACKAGE__);
   require Game::EvonyTKR::Model::Factory;
-  $self->logger->debug(sprintf(
+  $logger->debug(sprintf(
     'persistence role get_generic_book called for name "%s" level "%s"',
     $name, $level
   ));
@@ -116,7 +120,6 @@ sub list_generic_books ($self, $level) {
   my @final;
   foreach my $ib (@intermediate) {
     $ib =~ s/^Level\s+\d+\s+//i;
-    $self->log_debug(sprintf('list_generic_books adding "%s"', $ib));
     push @final, $ib;
   }
   return \@final;

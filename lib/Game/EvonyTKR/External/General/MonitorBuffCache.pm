@@ -30,13 +30,20 @@ sub run ($job) {
   }
 
   # Check for any active or inactive buff cache jobs from this run
-  my $pending_jobs = $job->minion->jobs({
+  # Note: SQLite backend doesn't support filtering by notes in query,
+  # so we query all jobs and filter in Perl
+  my $all_pending = $job->minion->jobs({
     tasks  => ['compute_general_buff_cache'],
-    states => ['inactive', 'active'],
-    notes  => { prebuild_run_id => $run_id }
+    states => ['inactive', 'active']
   });
 
-  my $pending_count = $pending_jobs->total;
+  my $pending_count = 0;
+  while (my $j = $all_pending->next) {
+    if ($j->{notes} && $j->{notes}->{prebuild_run_id} &&
+        $j->{notes}->{prebuild_run_id} eq $run_id) {
+      $pending_count++;
+    }
+  }
 
   if ($pending_count > 0) {
     $job->log_debug(
@@ -45,13 +52,19 @@ sub run ($job) {
   }
 
   # Check for any failed jobs
-  my $failed_jobs = $job->minion->jobs({
+  my $all_failed = $job->minion->jobs({
     tasks  => ['compute_general_buff_cache'],
-    states => ['failed'],
-    notes  => { prebuild_run_id => $run_id }
+    states => ['failed']
   });
 
-  my $failed_count = $failed_jobs->total;
+  my $failed_count = 0;
+  while (my $j = $all_failed->next) {
+    if ($j->{notes} && $j->{notes}->{prebuild_run_id} &&
+        $j->{notes}->{prebuild_run_id} eq $run_id) {
+      $failed_count++;
+    }
+  }
+
   if ($failed_count > 0) {
     my $errmsg = "Buff cache completion failed: $failed_count jobs failed";
     $job->log_error($errmsg);

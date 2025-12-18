@@ -4,6 +4,16 @@ use utf8::all;
 use Mojo::Base -role,                                     -signatures;
 use Mojo::Base 'Game::EvonyTKR::Role::Persistence::Core', -role;
 
+sub store_buff_cache ($self, $key, $buffValues) {
+  $key = lc($self->normalize($key));
+  return $self->persistence->store_data('general_buff_cache', $key, $buffValues);
+}
+
+sub get_buff_cache ($self, $key) {
+  $key = lc($self->normalize($key));
+  return $self->persistence->get_data('general_buff_cache', $key);
+}
+
 sub add_general ($self, $general) {
   my $name = lc($self->normalize($general->name));
   # Normalize the name before storing to ensure consistent lookups
@@ -82,6 +92,27 @@ sub list_generals ($self) {
     ->sort->map(sub { return $_->basename(@suffixlist) })->each;
   my @returnlist = List::UtilsBy::uniq_by { lc($self->normalize($_)) } @files;
   return \@returnlist;
+}
+
+
+sub generate_buff_cache_key($self, $general, $isPrimary, $targetType, $activationType, $ascendingLevel, $covenantLevel, $specialty1, $specialty2, $specialty3, $specialty4) {
+  my $gn;
+  if(defined($general) && ref($general) && $general->can('name')){
+    $gn = $general->name;
+  } elsif(defined($general) && !ref($general) && length($general)){
+    $gn = $general;
+  } else{
+    $self->log_error('general name is required to generate a buff cache key');
+    return '';
+  }
+
+  return sprintf(
+    '%s:%s:%s:%s:%s:%s:%s:%s:%s:%s',
+    $gn,     $isPrimary,      $targetType,
+    $activationType,    $ascendingLevel, $covenantLevel,
+    $specialty1,        $specialty2,     $specialty3,
+    $specialty4
+  );
 }
 
 1;

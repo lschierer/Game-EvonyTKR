@@ -462,19 +462,32 @@ sub cleanup ($job) {
     }
     push @tasks, $prereq->task_name();
   }
+  push @tasks, 'compute_general_buff_cache';
+  push @tasks, 'monitor_general_buff_cache';
 
+  my $cleaned = 0;
   $job->minion->jobs({
     tasks  => \@tasks,
-    states => ['finished', 'failed'],
+    states => ['finished', 'failed','inactive'],
   })->each(sub {
     my $ji = $_;
     if ($ji->{finished} && $ji->{finished} < $prebuild_start) {
       $job->minion->job($ji->{id})->remove;
+      $cleaned++;
     }
     elsif ($ji->{failed}) {
       $job->minion->job($ji->{id})->remove;
+      $cleaned++;
+    }elsif($ji->{notes}->{prebuild_run_id} ne $job->prebuild_run_id){
+      my $id = $ji->{id};
+      if($id =~ /\d+/){
+        $job->minion->job($id)->remove;
+        $cleaned++;
+      }
+
     }
   });
+  $job->log_debug(sprintf('cleaned %s jobs after harvest ran', $cleaned));
 }
 
 1;

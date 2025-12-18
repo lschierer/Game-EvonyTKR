@@ -577,6 +577,23 @@ CREATE TABLE IF NOT EXISTS general_buff_cache (
   updated_at REAL NOT NULL
 );
 
+-- 2 up
+-- Fix general_buff_cache to use 'name' instead of 'key' for consistency
+DROP TABLE IF EXISTS general_buff_cache;
+CREATE TABLE general_buff_cache (
+  name TEXT PRIMARY KEY,
+  data TEXT NOT NULL,
+  updated_at REAL NOT NULL
+);
+
+-- 2 down
+DROP TABLE IF EXISTS general_buff_cache;
+CREATE TABLE general_buff_cache (
+  key TEXT PRIMARY KEY,
+  data TEXT NOT NULL,
+  updated_at REAL NOT NULL
+);
+
 __END__
 
 =head1 NAME
