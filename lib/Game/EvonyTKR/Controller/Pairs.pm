@@ -51,6 +51,7 @@ package Game::EvonyTKR::Controller::Pairs {
       load_all_generic_books
       load_all_pair_builders
       load_all_specialties
+      load_ml_conflicts
     )];
   };
 
