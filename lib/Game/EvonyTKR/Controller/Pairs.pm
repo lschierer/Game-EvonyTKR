@@ -670,15 +670,23 @@ package Game::EvonyTKR::Controller::Pairs {
                 $c->log_debug("Removed inactive job $jid") unless $@;
               }
               elsif ($state eq 'active') {
-                eval { $job->kill(); };
+                eval { $job->kill(); $job->remove; };
                 $c->log_debug("Killed active job $jid") unless $@;
               }
             }
           }
         }
 
-        #finally, remove the batch itself.
-        $c->app->minion->job($batchJid)->remove;
+        my $batch_job = $c->app->minion->job($batchJid);
+        if ($batch_job) {
+          my $info = $batch_job->info;
+          if ($info && $info->{state} eq 'active') {
+            eval { $batch_job->kill(); };
+            $c->log_debug("Killed active batch job $batchJid") unless $@;
+          }
+          eval { $batch_job->remove; };
+          $c->log_debug("Removed batch job $batchJid") unless $@;
+        }
 
         # Clean up session store
         if (exists $session_store->{$session_id}) {
