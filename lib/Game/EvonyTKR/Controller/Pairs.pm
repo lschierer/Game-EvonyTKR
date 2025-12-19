@@ -637,34 +637,48 @@ package Game::EvonyTKR::Controller::Pairs {
 
     $c->on(
       finish => sub {
-        $c->log_debug(
-          "Client disconnected, canceling " . scalar(@subs) . " jobs");
-        foreach my $jid (@subs) {
-          my $job = $c->app->minion->job($jid);
-          Mojo::IOLoop->timer(
-            rand(5.00) => sub {
-              if ($job) {
-                my $info = $job->info;
-                next unless $info;    # Job might be gone
-                my $state = $info->{state};
-                if ($state eq 'inactive') {
-                  $job->remove;
-                  $c->log_debug("Removed inactive job $jid");
-                }
-                elsif ($state eq 'active' && $info->{pid}) {
-                  eval { $job->kill(); };
-                  if ($@) {
-                    $c->log_debug("Failed to kill job $jid: $@");
-                  }
-                  else {
-                    $c->log_debug("Killed active job $jid");
-                  }
-                }
-              }
+        # Stop the recurring timer
+        Mojo::IOLoop->remove($recurring_id) if $recurring_id;
+
+        # Kill the batch job (which will cascade to spawned jobs via BatchSummarizer->kill)
+        my $batch_job = $c->app->minion->job($batchJid);
+        if ($batch_job) {
+          my $batch_info = $batch_job->info;
+          my $batch_state = $batch_info->{state} if $batch_info;
+
+          if ($batch_state && $batch_state =~ /^(inactive|active)$/) {
+            $c->log_debug("Client disconnected, killing batch job $batchJid");
+            eval { $batch_job->kill(); };
+            if ($@) {
+              $c->log_warn("Failed to kill batch job $batchJid: $@");
             }
-          );
+          }
         }
 
+        # Also kill any pending spawned jobs as backup (in case batch kill didn't cascade)
+        my @pending_jids = keys %$pending_processes;
+        if (@pending_jids) {
+          $c->log_debug("Killing " . scalar(@pending_jids) . " pending spawned jobs");
+          foreach my $jid (@pending_jids) {
+            my $job = $c->app->minion->job($jid);
+            if ($job) {
+              my $info = $job->info;
+              next unless $info;
+              my $state = $info->{state};
+
+              if ($state eq 'inactive') {
+                eval { $job->remove; };
+                $c->log_debug("Removed inactive job $jid") unless $@;
+              }
+              elsif ($state eq 'active') {
+                eval { $job->kill(); };
+                $c->log_debug("Killed active job $jid") unless $@;
+              }
+            }
+          }
+        }
+
+        # Clean up session store
         if (exists $session_store->{$session_id}) {
           delete $session_store->{$session_id};
         }
