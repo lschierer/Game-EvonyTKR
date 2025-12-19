@@ -686,7 +686,7 @@ package Game::EvonyTKR::Controller::Pairs {
             $c->log_debug("Killed active batch job $batchJid") unless $@;
           }
           eval { $batch_job->remove; };
-          $c->log_debug("Removed batch job $batchJid") unless $@;
+          $c->log_debug("Removed batch job $batchJid for run id $run_id and session $session_id") unless $@;
         }
 
         # Clean up session store
