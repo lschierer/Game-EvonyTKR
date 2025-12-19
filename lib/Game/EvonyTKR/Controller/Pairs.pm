@@ -570,7 +570,7 @@ package Game::EvonyTKR::Controller::Pairs {
           return;
         }
       }
-      $c->log_debug(sprintf('timer_logic fired for run_id "%s" session', $run_id, $session_id));
+      $c->log_debug(sprintf('timer_logic fired for run_id "%s" session "%s"', $run_id, $session_id));
       my $batchJob = $c->app->minion->job($batchJid);
       unless ($batchJob) {
         $c->log_warn(sprintf('cannot find job for batch jid %s', $batchJid));
