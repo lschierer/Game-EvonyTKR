@@ -49,7 +49,7 @@ use utf8::all;
 
     my $cache_jobs = [];
 
-    foreach my $general_name ($job->list_generals->@*) {
+    foreach my $general_name (sort { $a->type->[0] cmp $b->type->[0] } $job->list_generals->@*) {
       my $general = $job->get_general($general_name);
       unless($general){
         $job->log_error(sprintf('failed to get general "%s" from persistence.',
@@ -57,22 +57,46 @@ use utf8::all;
         next;
       }
 
-      # prioritize the generals with only one type.
-      my $priority = 0 - scalar(@{ $general->type });
+      my $queue;
+      my $priority;
+
+      # Base priority by primary type (10-point spread)
       if($general->type->[0] =~ /siege/i){
-        $priority--;
-      }elsif($general->type->[0] =~ /ground/i){
-        $priority = $priority - 2;
-      }elsif($general->type->[0] =~ /ranged/i){
-        $priority = $priority - 3;
-      }elsif($general->type->[0] =~ /mounted/i){
-        $priority = $priority - 4;
+        $priority = -10;
+        $queue = 'siege';
+      } elsif($general->type->[0] =~ /ground/i){
+        $priority = -20;
+        $queue = 'ground';
+      } elsif($general->type->[0] =~ /ranged/i){
+        $priority = -30;
+        $queue = 'ranged';
+      } elsif($general->type->[0] =~ /mounted/i){
+        $priority = -40;
+        $queue = 'mounted';
+      } elsif($general->type->[0] =~ /mayor/i ){
+        $priority = -50;
+        $queue = 'mayor';
+      } elsif($general->type->[0] =~ /wall/i ) {
+        $priority = -60;
+        $queue = 'wall';
+      } else {
+        $priority = -50;
+        $queue = 'default';
       }
+
+      # Dual/triple-type penalty (they take longer, push to end)
+      my $type_count = scalar(@{ $general->type });
+      if ($type_count > 1) {
+        $priority -= 15 * $type_count;
+      }
+      $priority = -99 if($priority < -99);
+
       my $cache_job_id = $job->minion->enqueue(
         'compute_general_buff_cache' => [ $general_name ] => {
-          attempts =>  3,
-          priority => $priority,
-          notes    => { prebuild_run_id => $job->prebuild_run_id }
+          attempts  => 3,
+          queue     => $queue,
+          priority  => $priority,
+          notes     => { prebuild_run_id => $job->prebuild_run_id }
         }
       );
       push @$cache_jobs, $cache_job_id;

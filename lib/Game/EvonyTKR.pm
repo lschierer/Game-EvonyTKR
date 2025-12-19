@@ -302,7 +302,10 @@ package Game::EvonyTKR {
       # --- child path ---
       $ENV{MINION_WORKER_CHILD} = 1;    # prevents recursion on load
       POSIX::nice(10);
-      exec($^X, $0, 'minion', 'worker', '-j', $job_count)
+      exec($^X, $0, 'minion', 'worker', '-j', $job_count,
+      '-q', 'default', '-q', 'siege', '-q', 'ground',
+      '-q', 'ranged', '-q', 'mounted', '-q', 'mayor', '-q', 'wall',
+      )
         or die "exec failed: $!";
     }
 
