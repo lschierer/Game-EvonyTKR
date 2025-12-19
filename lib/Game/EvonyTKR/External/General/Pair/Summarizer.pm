@@ -210,9 +210,6 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
     $job->log_debug('Computing buffs');
     my $t_buffs_start = time();
     $summarizer->updatePrimaryBuffs($primary_buffs);
-    $summarizer->updateSecondaryBuffs($secondary_buffs);
-    $t{update_buffs} = time() - $t_buffs_start;
-
     # Opportunistic cache warming: if we had to compute, store for next time
     if (!$primary_buffs) {
       my $primary_key = $job->generate_buff_cache_key(
@@ -221,26 +218,15 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
         $params->{primarySpecialty1}, $params->{primarySpecialty2},
         $params->{primarySpecialty3}, $params->{primarySpecialty4}
       );
-      my $computed_primary = $summarizer->primaryBuffValues;
+      my $computed_primary = $summarizer->pairBuffValues;
       if ($computed_primary) {
         $job->store_buff_cache($primary_key, $computed_primary);
         $job->log_debug("Opportunistically cached primary buffs for $primaryName");
       }
     }
 
-    if (!$secondary_buffs) {
-      my $secondary_key = $job->generate_buff_cache_key(
-        $secondaryName, 0, $params->{targetType}, $params->{activationType},
-        'none', $params->{secondaryCovenantLevel},
-        $params->{secondarySpecialty1}, $params->{secondarySpecialty2},
-        $params->{secondarySpecialty3}, $params->{secondarySpecialty4}
-      );
-      my $computed_secondary = $summarizer->secondaryBuffValues;
-      if ($computed_secondary) {
-        $job->store_buff_cache($secondary_key, $computed_secondary);
-        $job->log_debug("Opportunistically cached secondary buffs for $secondaryName");
-      }
-    }
+    $summarizer->updateSecondaryBuffs($secondary_buffs);
+    $t{update_buffs} = time() - $t_buffs_start;
 
     $job->log_debug('Computing debuffs');
     my $t_debuffs_start = time();
