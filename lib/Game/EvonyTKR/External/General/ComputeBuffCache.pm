@@ -66,7 +66,7 @@ sub common_covenant_levels ($job) {
 sub run ($job, @args) {
   # Wait for covenants to be loaded before computing buffs
   return if $job->are_prereqs_outstanding($job->minion, ['load_all_covenants']);
-  return $job->retry({ delay => $job->standard_delay * 2 })
+  return $job->retry({ delay => $job->standard_delay + $job->info->{notes}->{delay} })
     unless my $guard =
     $job->minion->guard($job->task_name, 600, { limit => 1 });
 

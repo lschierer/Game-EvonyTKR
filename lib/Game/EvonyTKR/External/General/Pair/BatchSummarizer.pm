@@ -17,12 +17,14 @@ package Game::EvonyTKR::External::General::Pair::BatchSummarizer {
     $job->SUPER::run();
 
     # Wait for buff cache to be available
+    # pairs needed for residual conflicts
+    #
     return
       if $job->are_prereqs_outstanding(
       $job->minion,
       [
-        'load_all_general_buff_cache', 'load_all_covenants',
-        'load_all_generals',
+        'load_all_covenants','load_all_pair_builders',
+        'load_all_generals', 'load_ml_conflicts',
       ]
       );
 
@@ -31,8 +33,17 @@ package Game::EvonyTKR::External::General::Pair::BatchSummarizer {
     # Extract unique generals from pairs
     my %unique_generals;
     foreach my $pair (@$pairs) {
-      $unique_generals{ $pair->{primaryName} }   = 1;
-      $unique_generals{ $pair->{secondaryName} } = 1;
+      $job->log_debug(sprintf('pair is a "%s".  It is "%s", and dumps as %s',
+      ref($pair) ? ref($pair) : 'scalar',
+      blessed($pair) ? 'blessed' : 'not blessed',
+      Data::Printer::np($pair)));
+      $pair = Game::EvonyTKR::Model::General::Pair->from_wire_hash($pair);
+      $job->log_debug(sprintf('after constructor, is a "%s".  It is "%s", and dumps as %s',
+      ref($pair) ? ref($pair) : 'scalar',
+      blessed($pair) ? 'blessed' : 'not blessed',
+      Data::Printer::np($pair)));
+      $unique_generals{ $pair->primary->name    }   = 1;
+      $unique_generals{ $pair->secondary->name  } = 1;
     }
 
     my @general_names = keys %unique_generals;
@@ -63,8 +74,8 @@ package Game::EvonyTKR::External::General::Pair::BatchSummarizer {
     my $jobs_enqueued = 0;
     my @spawned_job_ids;
     foreach my $pair (@$pairs) {
-      my $primary_name   = $pair->{primaryName};
-      my $secondary_name = $pair->{secondaryName};
+      my $primary_name   = $pair->primary->name  ;
+      my $secondary_name = $pair->secondary->name;
 
       $params->{primaryName}   = $primary_name;
       $params->{secondaryName} = $secondary_name;

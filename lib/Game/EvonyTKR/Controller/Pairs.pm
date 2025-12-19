@@ -570,7 +570,7 @@ package Game::EvonyTKR::Controller::Pairs {
           return;
         }
       }
-      my $batchJob = $c->minion->job($batchJid);
+      my $batchJob = $c->app->minion->job($batchJid);
       unless ($batchJob) {
         $c->log_warn(sprintf('cannot find job for batch jid %s', $batchJid));
         unless (scalar keys $pending_processes->%*) {
@@ -581,8 +581,8 @@ package Game::EvonyTKR::Controller::Pairs {
 
       # Add newly spawned jobs to pending list
       my $batch_info = $batchJob->info;
-      if ($batch_info && $batch_info->{spawned_jobs}) {
-        foreach my $spawned_jid ($batch_info->{spawned_jobs}->@*) {
+      if ($batch_info && $batch_info->{notes} && $batch_info->{notes}->{spawned_jobs}) {
+        foreach my $spawned_jid ($batch_info->{notes}->{spawned_jobs}->@*) {
           unless (exists $pending_processes->{$spawned_jid}
             || exists $completed_processes->{$spawned_jid}) {
             $pending_processes->{$spawned_jid} = 1;
@@ -596,7 +596,7 @@ package Game::EvonyTKR::Controller::Pairs {
           delete $pending_processes->{$sp};
           next;
         }
-        my $spj = $c->minion->job($sp);
+        my $spj = $c->app->minion->job($sp);
         unless ($spj) {
           $c->log_warn(sprintf('no job for spawned job %s', $sp));
           $completed_processes->{$sp} = 0;
@@ -607,7 +607,7 @@ package Game::EvonyTKR::Controller::Pairs {
           next;
         }
         elsif ($spj->info->{state} eq 'finished') {
-          my $result = $spj->result;
+          my $result = $spj->info->{result};
           unless (defined($result) && ref($result) && ref($result) eq 'HASH') {
             $c->log_error(sprintf('odd result for job %s: %s', $sp, $result));
           }
@@ -616,15 +616,15 @@ package Game::EvonyTKR::Controller::Pairs {
             $sp, Data::Printer::np($result, multiline => 0)
           ));
 
-          if ($result->{result}->{status} eq 'complete') {
-            my $encoded = encode_base64($result->{result}->{result}, '');
+          if ($result->{status} eq 'complete') {
+            my $encoded = encode_base64($result->{result}, '');
             $c->write_sse({ type => 'pair', text => $encoded });
           }
           $completed_processes->{$sp} = $result;
         }
         else {
          # in case I need information to debug, lets go ahead and cache it here.
-          $pending_processes->{$sp} = $c->minion->job($sp)->info // 0;
+          $pending_processes->{$sp} = $c->app->minion->job($sp)->info // 0;
         }
       }
     };

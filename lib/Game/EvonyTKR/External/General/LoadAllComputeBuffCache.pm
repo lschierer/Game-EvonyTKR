@@ -49,61 +49,79 @@ use utf8::all;
 
     my $cache_jobs = [];
 
-    foreach my $general_name (sort { $a->type->[0] cmp $b->type->[0] } $job->list_generals->@*) {
+    my $generals = {};
+    foreach my $general_name ( $job->list_generals->@*) {
       my $general = $job->get_general($general_name);
       unless($general){
         $job->log_error(sprintf('failed to get general "%s" from persistence.',
         $general_name));
         next;
       }
-
-      my $queue;
-      my $priority;
-
-      # Base priority by primary type (10-point spread)
-      if($general->type->[0] =~ /siege/i){
-        $priority = -10;
-        $queue = 'siege';
-      } elsif($general->type->[0] =~ /ground/i){
-        $priority = -20;
-        $queue = 'ground';
-      } elsif($general->type->[0] =~ /ranged/i){
-        $priority = -30;
-        $queue = 'ranged';
-      } elsif($general->type->[0] =~ /mounted/i){
-        $priority = -40;
-        $queue = 'mounted';
-      } elsif($general->type->[0] =~ /mayor/i ){
-        $priority = -50;
-        $queue = 'mayor';
-      } elsif($general->type->[0] =~ /wall/i ) {
-        $priority = -60;
-        $queue = 'wall';
-      } else {
-        $priority = -50;
-        $queue = 'default';
-      }
-
-      # Dual/triple-type penalty (they take longer, push to end)
-      my $type_count = scalar(@{ $general->type });
-      if ($type_count > 1) {
-        $priority -= 15 * $type_count;
-      }
-      $priority = -99 if($priority < -99);
-
-      my $cache_job_id = $job->minion->enqueue(
-        'compute_general_buff_cache' => [ $general_name ] => {
-          attempts  => 3,
-          queue     => $queue,
-          priority  => $priority,
-          notes     => { prebuild_run_id => $job->prebuild_run_id }
-        }
-      );
-      push @$cache_jobs, $cache_job_id;
-      $job->log_debug(
-        "Enqueued buff cache job $cache_job_id for $general_name");
+      $general->type->[0] =~ /^(\S+)/;
+      my $type = $1;
+      push @{ $generals->{$type} }, $general;
     }
 
+    foreach my $type (sort keys $generals->%*){
+      foreach my $general ($generals->{$type}->@*){
+        my $queue;
+        my $priority;
+        my $delay;
+
+        # Base priority by primary type (10-point spread)
+        if($general->type->[0] =~ /siege/i){
+          $priority = -10;
+          $delay = 0;
+          $queue = 'siege';
+        } elsif($general->type->[0] =~ /ground/i){
+          $priority = -20;
+          $delay = 10;
+          $queue = 'ground';
+        } elsif($general->type->[0] =~ /ranged/i){
+          $priority = -30;
+          $delay = 20;
+          $queue = 'ranged';
+        } elsif($general->type->[0] =~ /mounted/i){
+          $priority = -40;
+          $delay = 30;
+          $queue = 'mounted';
+        } elsif($general->type->[0] =~ /mayor/i ){
+          $priority = -50;
+          $delay = 40;
+          $queue = 'mayor';
+        } elsif($general->type->[0] =~ /wall/i ) {
+          $priority = -60;
+          $delay = 50;
+          $queue = 'wall';
+        } else {
+          $priority = -50;
+          $delay = 60;
+          $queue = 'default';
+        }
+
+        # Dual/triple-type penalty (they take longer, push to end)
+        my $type_count = scalar(@{ $general->type });
+        if ($type_count > 1) {
+          $priority -= 15 * $type_count;
+        }
+        $priority = -99 if($priority < -99);
+
+        my $cache_job_id = $job->minion->enqueue(
+          'compute_general_buff_cache' => [ $general->name ] => {
+            attempts  => 3,
+            queue     => $queue,
+            delay     => $delay,
+            priority  => $priority,
+            notes     => {
+              prebuild_run_id => $job->prebuild_run_id,
+              delay           => $delay,
+            }
+          }
+        );
+        push @$cache_jobs, $cache_job_id;
+        $job->log_debug(sprintf('Enqueued buff cache job %s for "%s"', $cache_job_id, $general->name));
+      }
+    }
 
     # Mark this job as completed in persistence (with run_id for isolation)
     # IMPORTANT: This must be OUTSIDE the if (@job_ids) block so jobs that
