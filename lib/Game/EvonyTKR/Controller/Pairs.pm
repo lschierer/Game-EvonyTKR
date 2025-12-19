@@ -656,10 +656,11 @@ package Game::EvonyTKR::Controller::Pairs {
 
           if ($batch_state && $batch_state =~ /^(inactive|active)$/) {
             $c->log_debug("Client disconnected, killing batch job $batchJid");
-            eval { $batch_job->kill($batchJid); };
+            eval { $batch_job->kill('INT'); };
             if ($@) {
               $c->log_warn("Failed to kill batch job $batchJid: $@");
             }
+            $batch_job->remove;
           }
         }
 

@@ -86,7 +86,7 @@ sub run {
 
   $job->note(prebuild_run_id => $job->prebuild_run_id)
     if (length($job->prebuild_run_id));
-  $job->harvest_tagged_jobs();
+  $job->harvest_tagged_jobs() if (length($job->prebuild_run_id));
 }
 
 sub harvest_tagged_jobs ($job) {
