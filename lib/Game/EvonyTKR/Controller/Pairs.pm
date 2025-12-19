@@ -583,13 +583,19 @@ package Game::EvonyTKR::Controller::Pairs {
 
       # Add newly spawned jobs to pending list
       my $batch_info = $batchJob->info;
+      $c->log_debug(sprintf('batch job %s state: %s', $batchJid, $batch_info ? $batch_info->{state} : 'no info'));
+
       if ($batch_info && $batch_info->{notes} && $batch_info->{notes}->{spawned_jobs}) {
+        $c->log_debug(sprintf('found %d spawned jobs in batch notes', scalar($batch_info->{notes}->{spawned_jobs}->@*)));
         foreach my $spawned_jid ($batch_info->{notes}->{spawned_jobs}->@*) {
           unless (exists $pending_processes->{$spawned_jid}
             || exists $completed_processes->{$spawned_jid}) {
             $pending_processes->{$spawned_jid} = 1;
+            $c->log_debug(sprintf('added spawned job %s to pending', $spawned_jid));
           }
         }
+      } else {
+        $c->log_debug('no spawned jobs found in batch notes');
       }
 
       my @spawned_processes = keys $pending_processes->%*;
@@ -648,23 +654,7 @@ package Game::EvonyTKR::Controller::Pairs {
         # Stop the recurring timer
         Mojo::IOLoop->remove($recurring_id) if $recurring_id;
 
-        # Kill the batch job (which will cascade to spawned jobs via BatchSummarizer->kill)
-        my $batch_job = $c->app->minion->job($batchJid);
-        if ($batch_job) {
-          my $batch_info = $batch_job->info;
-          my $batch_state = $batch_info->{state} if $batch_info;
-
-          if ($batch_state && $batch_state =~ /^(inactive|active)$/) {
-            $c->log_debug("Client disconnected, killing batch job $batchJid");
-            eval { $batch_job->kill('INT'); };
-            if ($@) {
-              $c->log_warn("Failed to kill batch job $batchJid: $@");
-            }
-            $batch_job->remove;
-          }
-        }
-
-        # Also kill any pending spawned jobs as backup (in case batch kill didn't cascade)
+        # remove pending spawned jobs as backup (in case batch kill didn't cascade)
         my @pending_jids = keys %$pending_processes;
         if (@pending_jids) {
           $c->log_debug("Killing " . scalar(@pending_jids) . " pending spawned jobs");
@@ -686,6 +676,9 @@ package Game::EvonyTKR::Controller::Pairs {
             }
           }
         }
+
+        #finally, remove the batch itself.
+        $c->app->minion->job($batchJid)->remove;
 
         # Clean up session store
         if (exists $session_store->{$session_id}) {

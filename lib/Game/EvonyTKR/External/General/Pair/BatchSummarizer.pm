@@ -123,28 +123,6 @@ package Game::EvonyTKR::External::General::Pair::BatchSummarizer {
     $job->log_info("Enqueued $jobs_enqueued pair summarizer jobs");
     return $job->finish("Batch pair processing initiated");
   }
-
-  # Override kill to cascade to spawned jobs
-  sub kill ($self, @args) {
-    my $info         = $self->info;
-    my $spawned_jobs = $info->{notes}->{spawned_jobs} // [];
-
-    $self->app->log->info(sprintf(
-      "BatchSummarizer job %d killed, canceling %d spawned jobs",
-      $self->id, scalar @$spawned_jobs
-    ));
-
-    # Cancel all spawned jobs
-    foreach my $job_id (@$spawned_jobs) {
-      my $spawned_job = $self->minion->job($job_id);
-      if ($spawned_job && $spawned_job->info->{state} =~ /^(inactive|active)$/)
-      {
-        $spawned_job->kill;
-      }
-    }
-
-    return $self->SUPER::kill(@args);
-  }
 }
 
 1;
