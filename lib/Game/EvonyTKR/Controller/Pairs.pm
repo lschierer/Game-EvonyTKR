@@ -570,6 +570,7 @@ package Game::EvonyTKR::Controller::Pairs {
           return;
         }
       }
+      $c->log_debug(sprintf('timer_logic fired for run_id "%s"', $run_id));
       my $batchJob = $c->app->minion->job($batchJid);
       unless ($batchJob) {
         $c->log_warn(sprintf('cannot find job for batch jid %s', $batchJid));
@@ -578,6 +579,7 @@ package Game::EvonyTKR::Controller::Pairs {
         }
         return;
       }
+      $c->log_debug(sprintf('batch job for jid "%s" found', $batchJid));
 
       # Add newly spawned jobs to pending list
       my $batch_info = $batchJob->info;
@@ -591,6 +593,8 @@ package Game::EvonyTKR::Controller::Pairs {
       }
 
       my @spawned_processes = keys $pending_processes->%*;
+      $c->log_debug(sprintf('there are %s spawned_processes and %s completed_processes',
+      scalar(@spawned_processes), scalar(keys $completed_processes->%* ), ));
       foreach my $sp (@spawned_processes) {
         if (exists $completed_processes->{$sp}) {
           delete $pending_processes->{$sp};
@@ -619,12 +623,16 @@ package Game::EvonyTKR::Controller::Pairs {
           if ($result->{status} eq 'complete') {
             my $encoded = encode_base64($result->{result}, '');
             $c->write_sse({ type => 'pair', text => $encoded });
+          }else{
+            $c->log_warn(sprintf('finished process %s has status "%s"',
+            $sp, $result->{status}));
           }
           $completed_processes->{$sp} = $result;
         }
         else {
          # in case I need information to debug, lets go ahead and cache it here.
           $pending_processes->{$sp} = $c->app->minion->job($sp)->info // 0;
+          $c->log_debug(sprintf('process %s was in state %s', $sp, $spj->info->{state}));
         }
       }
     };
@@ -648,7 +656,7 @@ package Game::EvonyTKR::Controller::Pairs {
 
           if ($batch_state && $batch_state =~ /^(inactive|active)$/) {
             $c->log_debug("Client disconnected, killing batch job $batchJid");
-            eval { $batch_job->kill(); };
+            eval { $batch_job->kill($batchJid); };
             if ($@) {
               $c->log_warn("Failed to kill batch job $batchJid: $@");
             }
