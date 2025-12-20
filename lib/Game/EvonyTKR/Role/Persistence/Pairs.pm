@@ -7,53 +7,22 @@ use List::AllUtils qw(uniq none all any);
 use List::UtilsBy;
 use Carp;
 
-sub pairs_by_type ($self, $new_pbt = undef) {
-  state $pairs_by_type = {};
-  if (defined($new_pbt) && ref($new_pbt) eq 'HASH') {
-    $pairs_by_type = $new_pbt;
-  }
-  return $pairs_by_type;
-}
-
 sub get_conflict_detector ($self) {
   # Always reload from SQLite - it's fast and avoids stale cache issues
   my $cd = $self->initialize_conflict_detector();
   return $cd;
 }
 
-sub setup_pairs_by_type ($self) {
-  my $pairs = $self->pairs_by_type();
-  foreach my $key ($self->GeneralKeys->@*) {
-    $pairs->{$key} = []
-      unless (ref($pairs) eq 'HASH' && exists $pairs->{$key});
-  }
-  # Store in state variable only - no memcache
-  $self->pairs_by_type($pairs);
-  return 1;
-}
-
 sub add_wire_pair ($self, $wire_pair) {
   my $key = $self->wire_pair_to_key($wire_pair);
 
-  # Get current pairs_by_type from state
-  my $npbt = $self->pairs_by_type();
-
-  # Add wire_pair to the appropriate type array
-  my %hash = map { $self->wire_pair_to_key($_) => $_ }
-    ($wire_pair, ($npbt->{ $wire_pair->{type} } // [])->@*);
-  $npbt->{ $wire_pair->{type} } =
-    [sort { $self->wire_pair_to_key($a) cmp $self->wire_pair_to_key($b) }
-      values %hash];
-
-  # Store to SQLite
+  # Store to SQLite (single source of truth)
   eval { $self->persistence->store_pair($key, $wire_pair); };
   if ($@) {
     $self->log_error("Failed to store pair to persistence: $@");
     return 0;
   }
 
-  # Update state
-  $self->pairs_by_type($npbt);
   return 1;
 }
 
@@ -70,7 +39,7 @@ sub get_pair ($self, $key) {
 
   unless ($wire_pair) {
     my @caller_info = caller(1);
-    $self->log_warn(sprintf('cannot find pair for key %s (called from %s line %d)', 
+    $self->log_warn(sprintf('cannot find pair for key %s (called from %s line %d)',
       $key, $caller_info[3] // 'unknown', $caller_info[2] // 0));
     return;
   }

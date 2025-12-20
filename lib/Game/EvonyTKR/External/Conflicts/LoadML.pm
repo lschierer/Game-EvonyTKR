@@ -123,7 +123,7 @@ package Game::EvonyTKR::External::Conflicts::LoadML {
 
     # Get all generals for type checking (normalize names to match JSON keys)
     my %generals =
-      map { $job->normalize($_->name) => $_ } $job->get_generals()->@*;
+      map { lc($job->normalize($_->name)) => $_ } $job->get_generals()->@*;
 
     # Filter out cross-type pairs
     my %filtered_conflicts;
@@ -141,15 +141,20 @@ package Game::EvonyTKR::External::Conflicts::LoadML {
 
         $total_pairs++;
 
+        # CRITICAL: Only process actual conflicts (conflict: true)
+        my $conflict_data = $raw_data->{$g1_name}{$g2_name};
+        unless ($conflict_data->{conflict}) {
+          next;  # Skip non-conflicts
+        }
+
         # Check for troop type overlap
         unless ($job->_has_troop_overlap($g1, $g2)) {
           $filtered_pairs++;
           next;
         }
 
-        # Keep this entry
-        $filtered_conflicts{$g1_name}{$g2_name} =
-          $raw_data->{$g1_name}{$g2_name};
+        # Keep this conflict entry
+        $filtered_conflicts{$g1_name}{$g2_name} = $conflict_data;
         $kept_pairs++;
       }
     }

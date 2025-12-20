@@ -79,7 +79,18 @@ package Game::EvonyTKR::External::General::Pair::ReduceCoordinator {
       states => ['active', 'inactive']
     })->total;
 
-    if ($active_batches > 0 || $new_batches > 0) {
+    # CRITICAL: Also check if create_pairs jobs are still running
+    # We can't mark completion until ALL pairs are created
+    my $active_create_pairs = $job->minion->jobs({
+      tasks  => ['create_pairs'],
+      states => ['active', 'inactive']
+    })->total;
+
+    if ($active_batches > 0 || $active_create_pairs > 0 || $new_batches > 0) {
+      $job->log_debug(sprintf(
+        "Still waiting: %d reduce_batch jobs, %d create_pairs jobs, %d new batches",
+        $active_batches, $active_create_pairs, $new_batches
+      ));
       return $job->retry({ delay => $job->standard_delay });
     }
 
@@ -93,16 +104,8 @@ package Game::EvonyTKR::External::General::Pair::ReduceCoordinator {
       $total_cache_hits, $total_conflicts, $cache_effectiveness
     ));
 
-    # Flush pairs_by_type to persistence before marking complete
-    my $pairs_by_type = $job->pairs_by_type();
-    foreach my $type (keys %$pairs_by_type) {
-      my $pairs = $pairs_by_type->{$type};
-      $job->log_info(sprintf(
-        'Storing %d pairs for type %s to persistence',
-        scalar(@$pairs), $type
-      ));
-      $job->persistence->store_pairs($type, $pairs);
-    }
+    # Pairs are already stored to persistence via add_wire_pair() in ReduceBatch
+    # No flush needed - SQLite is the single source of truth
 
     # Set completion flags for both Pairs and ConflictGroups controllers
     my $pc_verify = 0;

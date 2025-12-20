@@ -4,6 +4,7 @@ use File::FindLib 'lib';
 
 package Game::EvonyTKR::External::General::Pair::BatchSummarizer {
   use Mojo::Base 'Game::EvonyTKR::External::JobBase', -signatures;
+  use List::Util qw(min);
 
   sub task_name {'batch_summarize_pairs'}
 
@@ -103,10 +104,16 @@ package Game::EvonyTKR::External::General::Pair::BatchSummarizer {
       }
 
       # Enqueue individual pair job
+      # Use timestamp-based priority to ensure newer sessions process first
+      # Priority range is -100 to 100; higher = processes sooner
+      # Increment by 1 every 10 seconds from base time, capped at 99
+      my $base_time = $job->app->config('APP_START_TIME') // 1734000000;  # Dec 12, 2024 reference
+      my $priority = min(99, int((time() - $base_time) / 10));
+
       my $pair_job_id = $job->minion->enqueue(
         'summarize_pair' => \@args => {
           attempts => 3,
-          priority => 10,
+          priority => $priority,
           notes    => {
             prebuild_run_id => $job->info->{notes}->{prebuild_run_id},
             batch_job_id    => $job->id
