@@ -1,0 +1,87 @@
+general: Stephen I of Hungary
+id: Stephen I of Hungary
+ascending:
+  - level: red1
+    text: Attacking Mounted Troop Defense and HP +15%
+    buffs:
+      - attribute: Defense
+        troop: Mounted Troops
+        value:
+          number: 15
+        conditions:
+          - Attacking
+      - attribute: HP
+        troop: Mounted Troops
+        value:
+          number: 15
+        conditions:
+          - Attacking
+  - level: red2
+    text: Attacking Troop Death into Wounded Rate +8%
+    buffs:
+      - attribute: Death to Wounded
+        conditions:
+          - Attacking
+        value:
+          number: 8
+          unit: percentage
+  - level: red3
+    text: Attacking Mounted Troop Attack +25%, Attacking Ground Troop and Mounted Troop Defense +25%
+    buffs:
+      - attribute: Attack
+        troop: Mounted Troops
+        value:
+          number: 25
+        conditions:
+          - attacking
+      - attribute: Defense
+        troop: Ground Troops
+        conditions:
+          - attacking
+        value:
+          number: 25
+      - attribute: Defense
+        troop: Mounted Troops
+        conditions:
+          - attacking
+        value:
+          number: 25
+  - level: red4
+    text: Attacking Ground Troop and Mounted Troop Attack +20%, March Size Capacity +10%
+    buffs:
+      - attribute: Attack
+        troop: Ground Troops
+        value:
+          number: 20
+        conditions:
+          - Attacking
+      - attribute: Attack
+        troop: Mounted Troops
+        value:
+          number: 20
+        conditions:
+          - Attacking
+      - attribute: March Size
+        value:
+          number: 10
+  - level: red5
+    text: Attacking Mounted Troop Attack, Defense, and HP +40%
+    buffs:
+      - attribute: Attack
+        troop: Mounted Troops
+        conditions:
+          - Attacking
+        value:
+          number: 40
+      - attribute: Defense
+        troop: Mounted Troops
+        conditions:
+          - Attacking
+        value:
+          number: 40
+      - attribute: HP
+        troop: Mounted Troops
+        conditions:
+          - Attacking
+        value:
+          number: 40

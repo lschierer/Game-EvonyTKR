@@ -1,0 +1,25 @@
+name: Stephen I of Hungary
+basic_attributes:
+  leadership:
+    base: 128
+    increment: 8.96
+  attack:
+    base: 133
+    increment: 9.41
+  defense:
+    base: 123
+    increment: 8.66
+  politics:
+    base: 118
+    increment: 8.11
+ascending: true
+book: Saint Stephen
+specialties:
+  - Mounted Troop Formation
+  - Formation
+  - Mounted Troop Ares
+  - Battle of Veszprém
+stars: red5
+type:
+  - mounted_specialist
+general: Stephen I of Hungary

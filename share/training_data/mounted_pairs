@@ -24,6 +24,7 @@ Artemis;Olav II
 Artemis;Poligenus
 Artemis;Prince Eugene
 Artemis;Roland
+Artemis;Stephen I of Hungary
 Artemis;Sun Ce
 Artemis;Washington Prime
 Baibars;Aethelflaed
@@ -94,6 +95,7 @@ Beowulf;Olav II
 Beowulf;Poligenus
 Beowulf;Prince Eugene
 Beowulf;Roland
+Beowulf;Stephen I of Hungary
 Beowulf;Sun Ce
 Beowulf;Washington Prime
 Bertrand du Guesclin;Aethelflaed
@@ -178,6 +180,7 @@ Cheng Yaojin;Nathanael Greene
 Cheng Yaojin;Olav II
 Cheng Yaojin;Poligenus
 Cheng Yaojin;Roland
+Cheng Yaojin;Stephen I of Hungary
 Cheng Yaojin;Sun Ce
 Cheng Yaojin;Washington Prime
 Gaius Octavius;Aethelflaed
@@ -255,6 +258,7 @@ Haakon Haraldsson;Poligenus
 Haakon Haraldsson;Prince Eugene
 Haakon Haraldsson;Roland
 Haakon Haraldsson;Sun Ce
+Haakon Harldsson;Stephen I of Hungary
 Hannibal;Aethelflaed
 Hannibal;Baibars
 Hannibal;Casimir Pulaski
@@ -292,6 +296,7 @@ Hermes;Olav II
 Hermes;Poligenus
 Hermes;Prince Eugene
 Hermes;Roland
+Hermes;Stephen I of Hungary
 Hermes;Sun Ce
 Hestia;Aethelflaed
 Hestia;Baibars
@@ -454,6 +459,7 @@ Louis XIV;Olav II
 Louis XIV;Poligenus
 Louis XIV;Prince Eugene
 Louis XIV;Roland
+Louis XIV;Stephen I of Hungary
 Louis XIV;Sun Ce
 Louis XIV;Washington Prime
 Marco Polo;Aethelflaed
@@ -513,6 +519,7 @@ Martinus;Casimir Pulaski
 Martinus;Genghis Khan
 Martinus;Maria Theresa
 Martinus;Nathanael Greene
+Maximilian I;Stephen I of Hungary
 Mordred;Aethelflaed
 Mordred;Artemis
 Mordred;Baibars
@@ -600,8 +607,11 @@ Olav II;Laudon
 Olav II;Li Jing
 Olav II;Louis XIV
 Olav II;Maria Theresa
+Olav II;Martinus
+Olav II;Maximilian I
 Olav II;Nathanael Greene
 Olav II;Prince Eugene
+Olav II;Stephen I of Hungary
 Olav II;Sun Ce
 Olav II;Washington Prime
 Poligenus;Aethelflaed
@@ -729,4 +739,5 @@ Washington Prime;Olav II
 Washington Prime;Poligenus
 Washington Prime;Prince Eugene
 Washington Prime;Roland
+Washington Prime;Stephen I of Hungary
 Washington Prime;Sun Ce
