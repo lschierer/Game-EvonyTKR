@@ -50,6 +50,7 @@ package Game::EvonyTKR::External::General::Pair::ReduceCoordinator {
     $finished_batches->each(sub {
       my $batch_info = $_;
       my $batch_id   = $batch_info->{id};
+      return if($batch_info->{notes}->{prebuild_run_id} ne $job->prebuild_run_id);
 
       return if exists $processed->{$batch_id};
       $processed->{$batch_id}++;

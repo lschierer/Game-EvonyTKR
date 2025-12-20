@@ -56,25 +56,18 @@ package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
     my %type_batches         = ();    # Track jobs by type for balanced batching
     my $batch_count          = 0;
     my %type_counters        = ();    # Track how many jobs per type
-    my %pairs_in_persistence = ();    # Cache of which general/types have pairs
+    my $pairs_in_persistence = {};    # Cache of which general/types have pairs
+    my $total_existing_pairs = 0;
 
     # Pre-load pairs from persistence to check what already exists
-    my $all_types = eval { $job->persistence->get_all_pair_types() } // [];
-    foreach my $type (@$all_types) {
-      my $type_pairs =
-        eval { $job->persistence->list_pairs_by_type($type) } // [];
-      foreach my $wire_pair (@$type_pairs) {
-        if ($wire_pair && ref($wire_pair) eq 'HASH' && $wire_pair->{primary}) {
-          my $normalized_primary = $job->normalize($wire_pair->{primary});
-          $pairs_in_persistence{$type}{$normalized_primary} = 1;
-        }
+    my $pairs_by_type = $job->get_pairs_by_type();
+    foreach my $type (sort keys $pairs_by_type->%*){
+      foreach my $pair ($pairs_by_type->{$type}->@*){
+        $pairs_in_persistence->{$type}->{lc($job->normalize($pair->primary->name))}++;
+        $total_existing_pairs++;
       }
     }
 
-    my $total_existing_pairs = 0;
-    foreach my $type (keys %pairs_in_persistence) {
-      $total_existing_pairs += scalar(keys %{ $pairs_in_persistence{$type} });
-    }
     $job->log_info(sprintf(
       'Found %d existing general/type combinations with pairs in persistence',
       $total_existing_pairs));
@@ -89,10 +82,10 @@ package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
       foreach my $type (@$general_types) {
         $type_counters{$type}++;
 
-        my $normalized_name = $job->normalize($general->name);
+        my $normalized_name = lc($job->normalize($general->name));
 
         # Check if pairs already exist in persistence for this general/type
-        if ($pairs_in_persistence{$type}{$normalized_name}) {
+        if (exists $pairs_in_persistence->{$type}->{$normalized_name} && $pairs_in_persistence->{$type}->{$normalized_name} > 1) {
           $job->log_debug(sprintf(
             'Skipping %s/%s - pairs already in persistence',
             $general->name, $type

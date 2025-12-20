@@ -385,6 +385,69 @@ package Game::EvonyTKR::Role::Constants::BuffConstants {
     const my $array => ['Enemy', 'Monsters'];
     return $array;
   };
+
+  has MappedAttributeNames => sub {
+    const my $hash => {
+    'Attack Range'                   => 'Range',
+    'death into wounded rate'        => 'Death to Wounded',
+    'death-turning-wounded rate'     => 'Death to Wounded',
+    'death into survival rate'       => 'Death to Survival',
+    'march size increase'            => 'March Size',
+    'march size capacity'            => 'March Size',
+    'marching size capacity'         => 'March Size',
+    'march size'                     => 'March Size',
+    'the march size'                 => 'March Size',
+    'march speed'                    => 'Marching Speed',
+    'march time reduction'           => 'Marching Speed',
+    'training'                       => 'Training Speed',
+    'wounded into death rate'        => 'Wounded to Death',
+    'wounded into death'             => 'Wounded to Death',
+    'mayor training speed'           => 'SubCity Training Speed',
+    'mayor death into survival rate' => 'SubCity Death to Survival',
+    'the gold production speed'      => 'SubCity Gold Production',
+    "traps’ triggering rate"         => 'Trap Triggering Rate',
+    'Trap Triggering Chance'         => 'Trap Triggering Rate',
+    'subordinate city troops’ death to survival rate' =>
+      'SubCity Death to Survival',
+    'subordinate city troops’ death to survival' =>
+      'SubCity Death to Survival',
+    'subordinate city troops’ death into survival rate' =>
+      'SubCity Death to Survival',
+    'subordinate city troops’ death into survival' =>
+      'SubCity Death to Survival',
+
+    };
+    return $hash;
+  };
+
+  has MappedConditionNames => sub {
+    const my $hash => {
+    'In-Rally'                   => "When Rallying",
+    'in rally'                   => 'When Rallying',
+    'Reduces Monster'            => "Monsters",               # debuff version
+    'brings any dragon'          => 'brings a dragon',
+    'brings any sacred dragon'   => 'brings a sacred dragon',
+    'brings dragon'              => 'brings a dragon',
+    'with dragon'                => 'brings a dragon',
+    'with any dragon'            => 'brings a dragon',
+    'with any sacred dragon'     => 'brings a sacred dragon',
+    'brings any spiritual beast' => 'brings a spiritual beast',
+    'brings spiritual beast'     => 'brings a spiritual beast',
+    'to attack Monsters'         => 'Against Monsters',         # buff version
+    'to attack'                  => 'Attacking',
+    'to reinforce'               => 'Reinforcing',
+    'the Mayor'                     => "When City Mayor for this SubCity",
+    'in this subordinate city'      => "When City Mayor for this SubCity",
+    'in subordinate city'           => "When City Mayor for this SubCity",
+    'launching Alliance War'        => 'When Rallying',
+    'attacking Monsters'            => 'Against Monsters',
+    'in-city'                       => 'In City',
+    'from Monsters'                 => 'Against Monsters',
+    'the main city defense general' => 'When The Main Defense General',
+
+    };
+    return $hash;
+  };
 }
 1;
 __END__

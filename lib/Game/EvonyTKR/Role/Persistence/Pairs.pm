@@ -69,7 +69,9 @@ sub get_pair ($self, $key) {
   }
 
   unless ($wire_pair) {
-    $self->log_warn(sprintf('cannot find pair for key %s', $key));
+    my @caller_info = caller(1);
+    $self->log_warn(sprintf('cannot find pair for key %s (called from %s line %d)', 
+      $key, $caller_info[3] // 'unknown', $caller_info[2] // 0));
     return;
   }
 

@@ -6,7 +6,7 @@
 :- style_check(-singleton).
 :- discontiguous troop/3.
 :- discontiguous condition/3.
-:- include('EvonyBuffDictionary').
+:- include('EvonyBuffDictionary.pl').
 :- include('buff_patterns').
 :- include('condition_processing').
 :- include('parsing_helpers').

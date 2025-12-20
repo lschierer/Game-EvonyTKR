@@ -1,17 +1,27 @@
+
+package Game::EvonyTKR::Shared::Parser;
 use v5.42.0;
 use experimental qw(class);
 use utf8::all;
-use File::FindLib 'lib';
-with 'Game::EvonyTKR::Role::JSON';
+
+use Mojo::Base -base,                               -signatures;
+use Mojo::Base 'Game::EvonyTKR::Role::JSON',        -role;
+use Mojo::Base 'Game::EvonyTKR::Role::Common',      -role;
+use Mojo::Base 'Game::EvonyTKR::Role::Logging',     -role;
+use Mojo::Base 'Game::EvonyTKR::Role::Persistence', -role;
+use Mojo::Base 'Game::EvonyTKR::Role::Constants::AscendingAttributes', -role;
+use Mojo::Base 'Game::EvonyTKR::Role::Constants::Books', -role;
+use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants', -role;
+use Mojo::Base 'Game::EvonyTKR::Role::Constants::Covenants', -role;
+use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants', -role;
+use Mojo::Base 'Game::EvonyTKR::Role::Constants::Specialties', -role;
 require Data::Printer;
 require Path::Tiny;
 require Readonly;
-
 require YAML::PP;
 require Game::EvonyTKR::Model::Buff;
 require Game::EvonyTKR::Model::Buff::Value;
 
-class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
   use List::AllUtils qw( first all any none uniq );
   use IPC::Open3;
   use open qw(:std :utf8);
@@ -20,15 +30,15 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
   use namespace::autoclean;
 
   # Simplified normalize_buff - parses Prolog output format
-  method normalize_buff ($buff_hash) {
-    $self->debug(
+  sub normalize_buff ($self, $buff_hash) {
+    $self->log_debug(
       "Processing Prolog fragment: " . Data::Printer::np($buff_hash));
 
     my @result;
     my $is_debuff = 0;
 
     unless (ref $buff_hash eq 'HASH') {
-      $self->warn("Expected buff as hash, got: $buff_hash");
+      $self->log_warn("Expected buff as hash, got: $buff_hash");
       return;
     }
 
@@ -40,7 +50,7 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
 # Prolog cannot parse the negative out of the numbers, we must do so here.
 # that also means that it sometimes does not set the debuff conditions correctly.
     if ($value < 0) {
-      $self->info("detected a debuff to convert");
+      $self->log_info("detected a debuff to convert");
       $is_debuff = 1;
       $value     = abs($value);
       @{$conditions_list} = grep { length($_) > 0 } @{$conditions_list};
@@ -101,7 +111,7 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
       $troop_atom = $troop_atom->[0];
     }
     if (length($troop_atom)) {
-      $self->debug("troop_atom is '$troop_atom'");
+      $self->log_debug("troop_atom is '$troop_atom'");
       my $troop_type = $self->atom_to_troop($troop_atom);
       $buff->set_target($troop_type);
     }
@@ -115,33 +125,33 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
       if ($cond eq 'enemy') {
         $is_debuff = 1;
         $r         = $buff->set_condition('Enemy');
-        $self->debug(
+        $self->log_debug(
           "Added debuff condition: 'Enemy' ; set_condition result: $r");
       }
       elsif ($cond eq 'monsters') {
         $is_debuff = 1;
         $r         = $buff->set_condition('Monsters');
-        $self->debug(
+        $self->log_debug(
           "Added debuff condition: 'Monsters' ; set_condition result: $r");
       }
       elsif ($cond =~ /against[_ ]monsters/i && $is_debuff) {
         $cond = 'Monsters';
         $r    = $buff->set_condition($cond);
-        $self->debug("Added buff condition: $cond ; set_condition result: $r");
+        $self->log_debug("Added buff condition: $cond ; set_condition result: $r");
       }
       else {
-        $self->debug("Processing condition: '$cond'");
+        $self->log_debug("Processing condition: '$cond'");
         if (length($cond) == 0) {
           next;
         }
         my $normalized = $self->normalize_condition_case($cond);
         if (defined $normalized) {
           $r = $buff->set_condition($normalized);
-          $self->debug(
+          $self->log_debug(
             "Added buff condition: $normalized ; set_condition result: $r");
         }
         else {
-          $self->warn("Could not normalize condition: '$cond'");
+          $self->log_warn("Could not normalize condition: '$cond'");
         }
       }
     }
@@ -149,9 +159,9 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
     return $buff;
   }
 
-  method normalize_condition_case($prolog_condition) {
+  sub normalize_condition_case($self, $prolog_condition) {
 
-    $self->debug(sprintf(
+    $self->log_debug(sprintf(
       'normalize_condition_case called with: "%s"', $prolog_condition));
 
     # Handle the new underscore-based condition format
@@ -161,14 +171,14 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
       my $display_condition = $prolog_condition;
       $display_condition =~ s/_/ /g;    # Convert underscores to spaces
 
-      $self->debug(
+      $self->log_debug(
         "Converted underscore atom: '$prolog_condition' -> '$display_condition'"
       );
 
       # Try to map to proper case using existing constants
       my $mapped = $self->string_to_condition($display_condition);
       if ($mapped) {
-        $self->debug(
+        $self->log_debug(
           "string_to_condition mapped: '$display_condition' -> '$mapped'");
         return $mapped;
       }
@@ -176,7 +186,7 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
       # Fallback: capitalize each word
       my $capitalized =
         join(' ', map { ucfirst($_) } split(/ /, $display_condition));
-      $self->debug(
+      $self->log_debug(
         "Using capitalized fallback: '$display_condition' -> '$capitalized'");
       return $capitalized;
     }
@@ -193,49 +203,49 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
       $condition_map{ lc($const) } = $const;
     }
 
-    $self->debug(
+    $self->log_debug(
       "Built condition map with " . scalar(keys %condition_map) . " entries");
 
     # Handle multi-word conditions that might have different formatting
     my $lower_condition = lc($prolog_condition);
-    $self->debug("Lowercase condition: '$lower_condition'");
+    $self->log_debug("Lowercase condition: '$lower_condition'");
 
     # Direct lookup first
     if (exists $condition_map{$lower_condition}) {
       my $result = $condition_map{$lower_condition};
-      $self->debug("Direct lookup found: '$lower_condition' -> '$result'");
+      $self->log_debug("Direct lookup found: '$lower_condition' -> '$result'");
       return $result;
     }
 
     # Fallback: try string_to_condition for mapping
     my $mapped = $self->string_to_condition($prolog_condition);
     if ($mapped) {
-      $self->debug(
+      $self->log_debug(
         "string_to_condition mapped: '$prolog_condition' -> '$mapped'");
       return $mapped;
     }
 
     # Last resort: return original with first letter capitalized
     my $capitalized = ucfirst($prolog_condition);
-    $self->debug(
+    $self->log_debug(
       "Using capitalized fallback: '$prolog_condition' -> '$capitalized'");
     return $capitalized;
   }
 
   # Helper methods to convert atoms back to display format
-  method atom_to_attribute($atom) {
+  sub atom_to_attribute($self, $atom) {
     my $attr = $atom;
     $attr =~ s/_/ /g;    # Convert underscores to spaces
     return $self->string_to_attribute($attr) || ucfirst($attr);
   }
 
-  method atom_to_troop($atom) {
+  sub atom_to_troop($self, $atom) {
     my $troop = $atom;
     $troop =~ s/_/ /g;    # Convert underscores to spaces
     return $self->string_to_trooptype($troop) || ucfirst($troop);
   }
 
-  method generate_grammar {
+  sub generate_grammar ($self) {
     my $grammar = Path::Tiny::path(
       'share/prolog/Game/EvonyTKR/Shared/EvonyBuffDictionary.pl');
     my @rules;
@@ -290,9 +300,9 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
 
     push @rules, map {
       my $key = $_;
-      $self->debug("attribute alias key is '$key'");
+      $self->log_debug("attribute alias key is '$key'");
       my $attr = $self->MappedAttributeNames->{$key};
-      $self->debug("attribute for alias '$key' is '$attr'");
+      $self->log_debug("attribute for alias '$key' is '$attr'");
 
       $attr = lc($attr);
       my @term      = split(/ /, $attr);
@@ -353,9 +363,9 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
 
     push @rules, map {
       my $key = $_;
-      $self->debug("condition alias key is '$key'");
-      my $attr = $self->mapped_conditions->{$key};
-      $self->debug("condition for alias '$key' is '$attr'");
+      $self->log_debug("condition alias key is '$key'");
+      my $attr = $self->MappedConditionNames->{$key};
+      $self->log_debug("condition for alias '$key' is '$attr'");
 
       $attr = lc($attr);
       my @term      = split(/ /, $attr);
@@ -368,7 +378,7 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
       }
 
       sprintf('condition(%s) --> %s.', join('_', @term), join(', ', @synonym));
-    } keys %{ $self->mapped_conditions };
+    } keys %{ $self->MappedConditionNames };
 
     foreach my $r (@rules) {
       $r = lc($r);
@@ -392,7 +402,7 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
 
   }
 
-  method tokenize_buffs ($text) {
+  sub tokenize_buffs ($self, $text) {
 
     # remove the following for prolog:
     #\x{0022}    # ASCII double quote "
@@ -412,7 +422,7 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
     # none of my constants are built around in-word hyphens.
     $text =~ s/\bin-([a-zA-Z]+)\b/in $1/g;
 
-    $self->debug("cleaned text is '$text'");
+    $self->log_debug("cleaned text is '$text'");
 
     # Send the raw string instead of tokenizing
     my $quoted_text = "'" . $text . "'";    # single-quote to create an atom
@@ -442,7 +452,7 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
 
     my $parsed = join('', @out);
     $parsed =~ s/^\s+|\s+$//g;
-    $self->info(sprintf('parsed text is -- %s --', $parsed));
+    $self->log_info(sprintf('parsed text is -- %s --', $parsed));
 
     # Extract just the buff list (last non-debug line)
     my @buff_fragments;
@@ -459,7 +469,7 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
     foreach my $line (@out) {
       chomp $line;
       if ($line =~ /^debug:/) {
-        $self->debug("STDOUT: $line");
+        $self->log_debug("STDOUT: $line");
       }
       elsif ($line =~ /^buff\(/) {
         push @buff_fragments, $line;    # optional: keep legacy Prolog format
@@ -476,25 +486,25 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
       $json_text =~ s/\}\s+{/},{/g;
       eval {
         $json_text = "[$json_text]";
-        $self->debug("json text is -- $json_text -- ");
+        $self->log_debug("json text is -- $json_text -- ");
         my $decoded = JSON::PP->new(utf8 => 1)->decode($json_text);
         push @json_lines, @$decoded;
       };
       if ($@) {
-        $self->warn("Failed to parse JSON block: $@");
+        $self->log_warn("Failed to parse JSON block: $@");
       }
     }
     else {
-      $self->warn("No buff(...) line found; skipping JSON extraction");
+      $self->log_warn("No buff(...) line found; skipping JSON extraction");
     }
 
-    $self->debug(sprintf(
+    $self->log_debug(sprintf(
       'found %d buffs: %s',
       scalar @buff_fragments,
       join(', ', @buff_fragments)
     ));
     if (scalar @json_lines != scalar @buff_fragments) {
-      $self->warn(sprintf(
+      $self->log_warn(sprintf(
         'uneven output detected: %s versus %s, are there missing output lines?',
         scalar @json_lines,
         scalar @buff_fragments
@@ -502,5 +512,4 @@ class Game::EvonyTKR::Shared::Parser : isa(Game::EvonyTKR::Shared::Constants) {
     }
     return @json_lines;
   }
-}
 1;
