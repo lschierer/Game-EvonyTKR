@@ -1,0 +1,25 @@
+name: Simeon the Great
+basic_attributes:
+  leadership:
+    base: 115
+    increment: 9.12
+  attack:
+    base: 110
+    increment: 8.65
+  defense:
+    base: 115
+    increment: 9.18
+  politics:
+    base: 112
+    increment: 8.37
+ascending: true
+book: Empire Offensive
+specialties:
+  - Ranged Troop Formation
+  - Siege
+  - War God
+  - Battle of Achelous
+stars: red5
+type:
+  - ranged_specialist
+general: Simeon the Great

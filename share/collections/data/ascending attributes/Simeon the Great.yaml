@@ -1,0 +1,81 @@
+general: Simeon the Great
+id: Simeon the Great
+ascending:
+  - level: red1
+    text: Attacking Siege Machine and Ranged Troop Attack +5%, Attacking Ranged Troop HP +20%
+    buffs:
+      - attribute: Attack
+        troop: Siege Machines
+        value:
+          number: 5
+        conditions:
+          - Attacking
+      - attribute: Attack
+        troop: Ranged Troops
+        value:
+          number: 5
+        conditions:
+          - Attacking
+      - attribute: HP
+        troop: Ranged Troops
+        value:
+          number: 20
+  - level: red2
+    text: Enemy In-cy Troop Wounded into Death rate +10%
+    buffs:
+      - attribute: Wounded to Death
+        conditions:
+          - Enemy
+          - In City
+        value:
+          number: 10
+          unit: percentage
+  - level: red3
+    text: When General is launching Alliance War, Rally Capacity +8%
+    buffs:
+      - attribute: Rally Capacity
+        value:
+          number: 8
+        conditions:
+          - When Rallying
+  - level: red4
+    text: Attacking Siege Machine and Ranged Troop Attack +10%, Attacking Ranged Troop HP +30%
+    buffs:
+      - attribute: Attack
+        troop: Siege Machines
+        value:
+          number: 10
+        conditions:
+          - Attacking
+      - attribute: Attack
+        troop: Ranged Troops
+        value:
+          number: 10
+        conditions:
+          - Attacking
+      - attribute: HP
+        troop: Ranged Troops
+        value:
+          number: 30
+  - level: red5
+    text: Attacking Siege Machine and Ranged Troop Attack +5%; with Dragon, extra Attacking Ranged Troop Attack +20%
+    buffs:
+      - attribute: Attack
+        troop: Siege Machine
+        conditions:
+          - Attacking
+        value:
+          number: 5
+      - attribute: Attack
+        troop: Ranged Troop
+        conditions:
+          - Attacking
+        value:
+          number: 5
+      - attribute: Attack
+        troop: Ranged Troop
+        condition:
+          - brings a dragon
+          - Attacking
+        value:
+          number: 20
