@@ -61,11 +61,8 @@ package Game::EvonyTKR::Controller::Pairs {
 
     my $mainRoutes = $app->routes->any($base);
 
-    Mojo::IOLoop->timer(
-      0.001 => sub {
-        $c->setup_pairs_by_type();
-      }
-    );
+    # Pairs are now loaded from SQLite on-demand via get_pairs_by_type()
+    # No initialization needed
 
     eval { $c->setup_routes($app); } or do {
       say "route setup failed in Pairs controller";
@@ -465,17 +462,11 @@ package Game::EvonyTKR::Controller::Pairs {
     my $buffActivation = $route_meta->{buffActivation};
     my $uiTarget       = $route_meta->{uiTarget};
 
-    my $pairs_for_type = $c->get_pairs_for_type($generalType);
-    my @sorted_pairs   = sort {
-      my $pc = $a->primary->name cmp $b->primary->name;
-      if ($pc == 0) {
-        return $a->secondary->name cmp $b->secondary->name;
-      }
-      return $pc;
-    } @$pairs_for_type;
+    # Use the filtered pairs from session store (already as wire hashes)
+    my @sorted_pairs = @$selected;
 
     $c->log_debug(sprintf(
-      'There are %s pairs to compute details for %s.',
+      'There are %s pairs to compute details for session %s.',
       scalar(@sorted_pairs), $session_id
     ));
 
@@ -655,39 +646,59 @@ package Game::EvonyTKR::Controller::Pairs {
         # Stop the recurring timer
         Mojo::IOLoop->remove($recurring_id) if $recurring_id;
 
-        # remove pending spawned jobs as backup (in case batch kill didn't cascade)
-        my @pending_jids = keys %$pending_processes;
-        if (@pending_jids) {
-          $c->log_debug("Killing " . scalar(@pending_jids) . " pending spawned jobs");
-          foreach my $jid (@pending_jids) {
-            my $job = $c->app->minion->job($jid);
-            if ($job) {
-              my $info = $job->info;
-              next unless $info;
-              my $state = $info->{state};
+        # Clean up batch job and spawned jobs
+        # Note: Can only remove() inactive jobs. Active jobs can't be killed,
+        # but we stop processing their results by clearing pending_processes.
 
-              if ($state eq 'inactive') {
-                eval { $job->remove; };
-                $c->log_debug("Removed inactive job $jid") unless $@;
-              }
-              elsif ($state eq 'active') {
-                eval { $job->kill(); $job->remove; };
-                $c->log_debug("Killed active job $jid") unless $@;
-              }
+        # First, try to remove the batch job
+        my $batch_job = $c->app->minion->job($batchJid);
+        if ($batch_job) {
+          my $info = $batch_job->info;
+          if ($info) {
+            if ($info->{state} eq 'inactive') {
+              eval { $batch_job->remove; };
+              $c->log_debug("Removed inactive batch job $batchJid") unless $@;
+            }
+            elsif ($info->{state} eq 'finished') {
+              eval { $batch_job->remove; };
+              $c->log_debug("Removed finished batch job $batchJid") unless $@;
+            }
+            else {
+              $c->log_debug("Batch job $batchJid is $info->{state}, cannot remove (will finish on its own)");
             }
           }
         }
 
-        my $batch_job = $c->app->minion->job($batchJid);
-        if ($batch_job) {
-          my $info = $batch_job->info;
-          if ($info && $info->{state} eq 'active') {
-            eval { $batch_job->kill(); };
-            $c->log_debug("Killed active batch job $batchJid") unless $@;
+        # Remove spawned jobs (only inactive ones can be removed)
+        my @pending_jids = keys %$pending_processes;
+        my $removed_count = 0;
+        my $active_count = 0;
+
+        foreach my $jid (@pending_jids) {
+          my $job = $c->app->minion->job($jid);
+          if ($job) {
+            my $info = $job->info;
+            next unless $info;
+
+            if ($info->{state} eq 'inactive') {
+              eval { $job->remove; };
+              unless ($@) {
+                $removed_count++;
+                $c->log_debug("Removed inactive job $jid");
+              }
+            }
+            elsif ($info->{state} eq 'active') {
+              # Can't remove active jobs - they'll finish on their own
+              # Results won't be processed since we stopped the timer
+              $active_count++;
+            }
           }
-          eval { $batch_job->remove; };
-          $c->log_debug("Removed batch job $batchJid for run id $run_id and session $session_id") unless $@;
         }
+
+        $c->log_debug(sprintf(
+          "Client disconnected: removed %d inactive jobs, %d active jobs will finish (ignored)",
+          $removed_count, $active_count
+        ));
 
         # Clean up session store
         if (exists $session_store->{$session_id}) {
