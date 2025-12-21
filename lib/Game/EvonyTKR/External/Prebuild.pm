@@ -111,7 +111,7 @@ sub _build_loader_job_defs ($self, $stored_version, $current_version) {
     load_all_compute_buff_cache => {
       args     => [$stored_version, $current_version],
       attempts => 5,
-      delay    => 7,
+      delay    => 60,
       priority => -1,
     },
   };
