@@ -55,6 +55,16 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
 
     # Extract precomputed buffs if provided
     my $primary_buffs = $cached_buffs ? $cached_buffs->{primary_buffs} : undef;
+
+    my $primaryBuffKey = $job->generate_buff_cache_key(
+      $primaryName, 1, $params->{targetType}, $params->{activationType},
+      $params->{ascendingLevel}, $params->{primaryCovenantLevel},
+      $params->{primarySpecialty1}, $params->{primarySpecialty2},
+      $params->{primarySpecialty3}, $params->{primarySpecialty4}
+    );
+    $primary_buffs = $job->get_buff_cache($primaryBuffKey) unless($primary_buffs);
+
+    $primary_buffs = $job->
     my $secondary_buffs =
       $cached_buffs ? $cached_buffs->{secondary_buffs} : undef;
 
