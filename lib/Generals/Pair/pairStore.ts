@@ -382,6 +382,18 @@ export class PairStore {
     sp = sp.replace('-comparison', '-details-stream');
     const streamUrl = new URL(sp, window.location.toString());
 
+    // Add selected primaries to params so server can filter
+    const primaries = new Set<string>();
+    for (const entry of this.store.state.catalog) {
+      primaries.add(entry.primary);
+    }
+    if (primaries.size > 0) {
+      params.set('primaries', JSON.stringify([...primaries]));
+      if (DEBUG) {
+        console.log(`Added ${primaries.size} primaries to stream params`);
+      }
+    }
+
     if (!!this._currentES) {
       if (DEBUG) {
         console.log(

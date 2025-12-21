@@ -26,8 +26,6 @@ package Game::EvonyTKR::Controller::Pairs {
   use List::AllUtils qw( all any none );
   use Carp;
 
-  my $session_store = {};
-
   my $max_concurrency = 15;
 
   my $reference_base = '/Reference/Generals';
@@ -403,7 +401,6 @@ package Game::EvonyTKR::Controller::Pairs {
         scalar(@filtered), scalar(@pairs), $session_id
       ));
 
-      $session_store->{$session_id} = \@filtered;
       return $c->render(
         json => {
           sessionId => $session_id,
@@ -416,7 +413,6 @@ package Game::EvonyTKR::Controller::Pairs {
       $c->log_debug(
         "no requested primaries for session '$session_id' returning full list: "
           . Data::Printer::np(@json_data, multiline => 0));
-      $session_store->{$session_id} = \@json_data;
 
       return $c->render(
         json => {
@@ -436,28 +432,30 @@ package Game::EvonyTKR::Controller::Pairs {
     my $slug_buff  = $c->stash('buffActivation');
     my $run_id     = 0+ $c->param('runId');
     my $session_id = $c->param('sessionId');
+
+    # Get primaries filter from query param (JSON array)
+    my $primaries_json = $c->param('primaries');
+    my $requested_primaries = [];
+    if ($primaries_json) {
+      eval { $requested_primaries = $c->decode($primaries_json); };
+      if ($@) {
+        $c->log_warn("Failed to decode primaries param: $@");
+        $requested_primaries = [];
+      }
+    }
+
     unless (defined($session_id) && length($session_id)) {
       $c->log_error('Session ID must be present!');
       my $payload = $c->encode({ runId => 0+ $run_id });
       $c->write_sse({ type => 'complete', text => $payload });
       return;
     }
-    my $selected =
-      exists $session_store->{$session_id} ? $session_store->{$session_id} : [];
 
     $c->log_debug(sprintf(
       'stream_pair_details called url: %s,'
-        . ' uiTarget: %s; buffActivation: %s; run_id: %s',
+        . ' uiTarget: %s; buffActivation: %s; run_id: %s; primaries: %d',
       $c->req->url->path->to_string,
-      $slug_ui, $slug_buff, 0+ $run_id
-    ));
-
-    $c->log_debug(sprintf(
-      'session info: sessionId: "%s"; selected: %s',
-      $session_id // 'Not Present',
-      join ', ',
-      map { sprintf('%s/%s', $_->{primary}->{name}, $_->{secondary}->{name}) }
-        @$selected
+      $slug_ui, $slug_buff, 0+ $run_id, scalar(@$requested_primaries)
     ));
 
     # Lookup route metadata
@@ -484,8 +482,31 @@ package Game::EvonyTKR::Controller::Pairs {
     my $buffActivation = $route_meta->{buffActivation};
     my $uiTarget       = $route_meta->{uiTarget};
 
-    # Use the filtered pairs from session store (already as wire hashes)
-    my @sorted_pairs = @$selected;
+    # Get all pairs for this type
+    my $pairs_for_type = $c->get_pairs_for_type($generalType);
+    my @all_pairs = @$pairs_for_type;
+
+    # Filter to requested primaries if specified
+    my @sorted_pairs;
+    if (scalar(@$requested_primaries) > 0) {
+      my %requested = map { $_ => 1 } @$requested_primaries;
+      foreach my $pair (@all_pairs) {
+        if (exists $requested{ $pair->primary->name }) {
+          push @sorted_pairs, $pair->to_wire_hash();
+        }
+      }
+      $c->log_debug(sprintf(
+        'Filtered to %d pairs from %d total for %d primaries',
+        scalar(@sorted_pairs), scalar(@all_pairs), scalar(@$requested_primaries)
+      ));
+    } else {
+      # No filter - use all pairs
+      @sorted_pairs = map { $_->to_wire_hash() } @all_pairs;
+      $c->log_debug(sprintf(
+        'No filter specified, using all %d pairs',
+        scalar(@sorted_pairs)
+      ));
+    }
 
     $c->log_debug(sprintf(
       'There are %s pairs to compute details for session %s.',
@@ -721,11 +742,6 @@ package Game::EvonyTKR::Controller::Pairs {
           "Client disconnected: removed %d inactive jobs, %d active jobs will finish (ignored)",
           $removed_count, $active_count
         ));
-
-        # Clean up session store
-        if (exists $session_store->{$session_id}) {
-          delete $session_store->{$session_id};
-        }
       }
     );
   }
