@@ -366,8 +366,25 @@ package Game::EvonyTKR::Controller::Pairs {
 
     $c->log_debug(sprintf('There are %s pairs to return.', scalar(@pairs)));
 
+    # Safety check: if no pairs loaded yet, return error
+    if (scalar(@pairs) == 0) {
+      $c->log_warn("pairCatalog called but no pairs loaded yet for $generalType");
+      return $c->render(
+        json => {
+          error => 'Pairs not loaded yet, please try again',
+          sessionId => '',
+          selected => []
+        },
+        status => 503  # Service Unavailable
+      );
+    }
+
     # if there were requested primaries, filter to only include those
     if (scalar @$requested_primaries) {
+      $c->log_debug(sprintf(
+        'pairCatalog filtering to %d requested primaries for session %s',
+        scalar(@$requested_primaries), $session_id
+      ));
 
       my %requested = map { $_ => 1 } @$requested_primaries;
       my @filtered;
@@ -380,6 +397,11 @@ package Game::EvonyTKR::Controller::Pairs {
           push @filtered, $entry->to_wire_hash();
         }
       }
+
+      $c->log_debug(sprintf(
+        'pairCatalog filtered to %d pairs (from %d total) for session %s',
+        scalar(@filtered), scalar(@pairs), $session_id
+      ));
 
       $session_store->{$session_id} = \@filtered;
       return $c->render(
