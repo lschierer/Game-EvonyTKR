@@ -64,7 +64,6 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
     );
     $primary_buffs = $job->get_buff_cache($primaryBuffKey) unless($primary_buffs);
 
-    $primary_buffs = $job->
     my $secondary_buffs =
       $cached_buffs ? $cached_buffs->{secondary_buffs} : undef;
 
