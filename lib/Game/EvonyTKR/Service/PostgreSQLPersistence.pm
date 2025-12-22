@@ -19,7 +19,29 @@ has 'dsn' => sub ($self) {
 };
 
 has 'pg' => sub ($self) {
-  my $pg = Mojo::Pg->new($self->dsn);
+  my $dsn = $self->dsn;
+  $self->log_info("[PostgreSQL] Connecting with DSN: $dsn") if $self->can('log_info');
+
+  my $pg = Mojo::Pg->new($dsn);
+
+  # Configure connection pool - important for Minion job concurrency
+  $pg->max_connections(10);  # Allow up to 10 concurrent connections
+
+  # Test connection before proceeding
+  eval {
+    my $test_db = $pg->db;
+    my $result = $test_db->query('SELECT current_database(), current_user')->hash;
+    if ($self->can('log_info')) {
+      $self->log_info(sprintf(
+        "[PostgreSQL] Connected to database '%s' as user '%s'",
+        $result->{current_database}, $result->{current_user}
+      ));
+    }
+  };
+  if ($@) {
+    warn "[PostgreSQL] Connection test failed: $@";
+    die "Failed to connect to PostgreSQL: $@";
+  }
 
   # Create tables - run migrations with error handling
   eval { $pg->migrations->name('evonytkr')->from_data->migrate; };
@@ -29,10 +51,15 @@ has 'pg' => sub ($self) {
       if $@ !~ /greater than.*latest version/;
   }
 
+  $self->log_info("[PostgreSQL] Initialization complete") if $self->can('log_info');
   return $pg;
 };
 
-has 'db' => sub ($self) { $self->pg->db };
+# Get a database handle from the connection pool
+# DO NOT cache - always get fresh connection from pool to avoid stale connections
+sub db ($self) {
+  return $self->pg->db;
+}
 
 has 'lifecycle_id' => sub ($self) {
   my $stored = $self->get_metadata('lifecycle_id');
