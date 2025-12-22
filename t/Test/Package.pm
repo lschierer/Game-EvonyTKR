@@ -35,42 +35,49 @@ use List::AllUtils qw( first );
     $self->logger->debug(
       sprintf('found %s generic book files', $gbdir->list->size));
 
-    foreach my $book_name ($self->list_generic_books->@*) {
-      $self->logger->debug("importing $book_name");
-      my $bn = lc($self->normalize($book_name));
+    foreach my $level (1 .. 4){
+      foreach my $book_name ($self->list_generic_books($level)->@*) {
+        $book_name = "Level ${level} ${book_name}";
+        $self->logger->debug("importing $book_name");
+        my $bn = lc($self->normalize($book_name));
 
-      my ($file) = $gbdir->list->sort->grep(sub {
-        my $b = lc($self->normalize($_->basename(@$suffixlist)));
-        if ($_ =~ m/\.ya?ml$/ && $b eq $bn) {
-          return 1;
+        my ($file) = $gbdir->list->sort->grep(sub {
+          my $b = lc($self->normalize($_->basename(@$suffixlist)));
+          #$self->logger->debug("testing $b for match with $bn");
+          if ($_ =~ m/\.ya?ml$/ && $b eq $bn) {
+            return 1;
+          }
+          return 0;
+        })->head(1)->each;
+
+        unless ($file && -f $file) {
+          $self->logger->error(
+            sprintf('failed to find file for "%s", "%s" did not exist',
+              $book_name, defined($file) ? length($file) ? $file : 'undef' : 'undef'
+            ));
+          return 0;
         }
-        return 0;
-      })->head(1)->each;
 
-      unless ($file && -f $file) {
-        $self->logger->error(
-          sprintf('failed to find file for "%s"', $book_name));
-        return 0;
+        my $data       = Mojo::File->new($file)->slurp('UTF-8');
+        my $hashObject = YAML::PP->new(
+          schema       => [qw/ + Perl /],
+          yaml_version => ['1.2', '1.1'],
+        )->load_string($data);
+        my $book = Game::EvonyTKR::Model::Book->from_hash($hashObject);
+        unless ($book
+          && ref($book)
+          && blessed($book)
+          && $book->isa('Game::EvonyTKR::Model::Book')) {
+          $self->logger->error(sprintf(
+            'failed to create a book with from_hash for "%s"',
+            $book_name));
+          return 0;
+        }
+        $self->add_generic_book($book);
+        push @books, $book;
       }
-
-      my $data       = Mojo::File->new($file)->slurp('UTF-8');
-      my $hashObject = YAML::PP->new(
-        schema       => [qw/ + Perl /],
-        yaml_version => ['1.2', '1.1'],
-      )->load_string($data);
-      my $book = Game::EvonyTKR::Model::Book->from_hash($hashObject);
-      unless ($book
-        && ref($book)
-        && blessed($book)
-        && $book->isa('Game::EvonyTKR::Model::Book')) {
-        $self->logger->error(sprintf(
-          'failed to create a book with from_hash for "%s"',
-          $book_name));
-        return 0;
-      }
-      $self->add_generic_book($book);
-      push @books, $book;
     }
+
     return \@books;
   }
 

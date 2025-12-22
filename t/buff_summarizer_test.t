@@ -21,7 +21,6 @@ BEGIN {
 # Load required modules
 require Data::Printer;
 require Game::EvonyTKR::Model::Buff::Summarizer::Single;
-require Game::EvonyTKR::Service::Cache;
 require Game::EvonyTKR::Shared::Constants;
 require Game::EvonyTKR;
 require Game::EvonyTKR::Model::Base;
@@ -40,21 +39,6 @@ my $testManager = Test::Package->new();
 $testManager->logger->info('starting testing.');
 isa_ok($testManager, ['Test::Package'], 'Test Package instantiated');
 
-my $generals = $testManager->import_generals();
-ok(ref($generals) && scalar(@$generals),
-  sprintf('imported %s generals', ref($generals) ? scalar(@$generals) : 0));
-
-my $ascending_attributes = $testManager->import_ascendingAttributes();
-ok(
-  ref($ascending_attributes) && scalar(@$ascending_attributes),
-  sprintf('imported %s ascending_attributes',
-    ref($ascending_attributes) ? scalar(@$ascending_attributes) : 0)
-);
-
-my $covenants = $testManager->import_covenants();
-ok(ref($covenants) && scalar(@$covenants),
-  sprintf('imported %s covenants', ref($covenants) ? scalar(@$covenants) : 0));
-
 my $generic_books = $testManager->import_generic_books();
 ok(
   ref($generic_books) && scalar(@$generic_books),
@@ -69,12 +53,29 @@ ok(
     ref($builtin_books) ? scalar(@$builtin_books) : 0)
 );
 
+my $ascending_attributes = $testManager->import_ascendingAttributes();
+ok(
+  ref($ascending_attributes) && scalar(@$ascending_attributes),
+  sprintf('imported %s ascending_attributes',
+    ref($ascending_attributes) ? scalar(@$ascending_attributes) : 0)
+);
+
+
 my $specialties = $testManager->import_specialties();
 ok(
   ref($specialties) && scalar(@$specialties),
   sprintf('imported %s specialties',
     ref($specialties) ? scalar(@$specialties) : 0)
 );
+
+my $generals = $testManager->import_generals();
+ok(ref($generals) && scalar(@$generals),
+  sprintf('imported %s generals', ref($generals) ? scalar(@$generals) : 0));
+
+my $covenants = $testManager->import_covenants();
+ok(ref($covenants) && scalar(@$covenants),
+  sprintf('imported %s covenants', ref($covenants) ? scalar(@$covenants) : 0));
+
 
 subtest 'Populate Ascending Attributes' => sub {
   foreach my $general (@$generals) {

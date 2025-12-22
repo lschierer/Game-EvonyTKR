@@ -1,0 +1,6 @@
+pyproject.toml
+evony_tkr_ml.egg-info/PKG-INFO
+evony_tkr_ml.egg-info/SOURCES.txt
+evony_tkr_ml.egg-info/dependency_links.txt
+evony_tkr_ml.egg-info/requires.txt
+evony_tkr_ml.egg-info/top_level.txt

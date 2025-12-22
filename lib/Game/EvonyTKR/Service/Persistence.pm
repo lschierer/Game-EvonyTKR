@@ -27,19 +27,6 @@ has 'backend' => sub ($self) {
     return Game::EvonyTKR::Service::PostgreSQLPersistence->new(
       config => $persistence_config);
   }
-  elsif ($backend_type eq 'sqlite') {
-    require Game::EvonyTKR::Service::SQLitePersistence;
-    return Game::EvonyTKR::Service::SQLitePersistence->new(
-      config => $persistence_config);
-  }
-  elsif ($backend_type eq 'dynamodb') {
-    require Game::EvonyTKR::Service::DynamoDBPersistence;
-    my $aws_config = $config->{aws} || {};
-    return Game::EvonyTKR::Service::DynamoDBPersistence->new(
-      config     => $persistence_config,
-      aws_config => $aws_config,
-    );
-  }
   else {
     croak(sprintf(
       "Unknown persistence backend type: %s "
