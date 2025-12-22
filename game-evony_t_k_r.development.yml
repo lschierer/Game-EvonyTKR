@@ -1,8 +1,6 @@
 ---
 # Development mode configuration
-# Uses SQLite for all persistence (including non-Minion data)
-aws:
-  region: us-east-2  # Not actually used in dev, but defined for consistency
+# Uses PostgreSQL for all persistence (Minion + application data)
 persistence:
-  backend: sqlite
-  sqlite_db_path: ./var/evonytkr.db
+  backend: postgresql
+  postgresql_dsn: 'postgresql:///evonytkr_app_data'
