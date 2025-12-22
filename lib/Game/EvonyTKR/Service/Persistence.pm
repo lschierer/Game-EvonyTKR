@@ -16,13 +16,18 @@ has 'backend' => sub ($self) {
 
   # Fall back to mode-based selection if no explicit backend configured
   unless ($backend_type) {
-    $backend_type = ($self->mode eq 'development') ? 'sqlite' : 'dynamodb';
+    $backend_type = 'postgresql';    # Default to PostgreSQL for all modes
     warn sprintf(
-"[Persistence] No explicit backend configured, using mode-based default: %s\n",
+"[Persistence] No explicit backend configured, using default: %s\n",
       $backend_type);
   }
 
-  if ($backend_type eq 'sqlite') {
+  if ($backend_type eq 'postgresql') {
+    require Game::EvonyTKR::Service::PostgreSQLPersistence;
+    return Game::EvonyTKR::Service::PostgreSQLPersistence->new(
+      config => $persistence_config);
+  }
+  elsif ($backend_type eq 'sqlite') {
     require Game::EvonyTKR::Service::SQLitePersistence;
     return Game::EvonyTKR::Service::SQLitePersistence->new(
       config => $persistence_config);
@@ -38,7 +43,7 @@ has 'backend' => sub ($self) {
   else {
     croak(sprintf(
       "Unknown persistence backend type: %s "
-        . "(expected 'sqlite' or 'dynamodb')\n",
+        . "(expected 'postgresql', 'sqlite', or 'dynamodb')\n",
       $backend_type
     ));
   }
@@ -66,19 +71,35 @@ Game::EvonyTKR::Service::Persistence - Configurable persistence factory
 Provides different persistence backends based on configuration:
 
 B<Backend Selection Priority:>
-1. Explicit config: persistence.backend = 'sqlite' | 'dynamodb' (CDK-generated)
-2. Mode fallback: development → sqlite, production → dynamodb
+1. Explicit config: persistence.backend = 'postgresql' | 'sqlite' | 'dynamodb'
+2. Default fallback: postgresql (for all modes)
+
+B<Supported Backends:>
+- postgresql: PostgreSQL database (recommended, default)
+- sqlite: SQLite file database (legacy, development only)
+- dynamodb: AWS DynamoDB (legacy, being phased out)
 
 B<Configuration Example:>
+  persistence:
+    backend: postgresql
+    postgresql_dsn: 'postgresql:///evonytkr_app_data'
+
+This allows:
+- Local development: No config → PostgreSQL (local instance)
+- Dev stack (EC2): No config → PostgreSQL (local instance)
+- Prod stack (EC2): No config → PostgreSQL (local instance)
+
+B<Legacy Configuration:>
+  # SQLite (development only)
+  persistence:
+    backend: sqlite
+    sqlite_db_path: './evonytkr.db'
+
+  # DynamoDB (being phased out)
   persistence:
     backend: dynamodb
     dynamodb_table: evonytkr-dev-data
   aws:
     region: us-east-2
-
-This allows:
-- Local development: No config, mode=development → SQLite
-- Dev stack (EC2): Config backend=dynamodb, mode=development → DynamoDB
-- Prod stack (EC2): Config backend=dynamodb, mode=production → DynamoDB
 
 =cut

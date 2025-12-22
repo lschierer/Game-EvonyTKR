@@ -34,7 +34,7 @@ package Game::EvonyTKR::Controller::Root {
     $app->add_navigation_item({
       title => 'Reference',
       path  => '/Reference',
-      order => 0,
+      order => 104,
     });
 
     $app->routes->get('/policy/privacy')->to(

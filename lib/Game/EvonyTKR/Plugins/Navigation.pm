@@ -90,7 +90,7 @@ package Game::EvonyTKR::Plugins::Navigation {
         my $c         = shift;
         my $structure = {};
 
-        foreach my $path (keys %nav_items_by_path) {
+        foreach my $path (sort keys %nav_items_by_path) {
           $self->_add_path_to_structure($structure, $path,
             $nav_items_by_path{$path});
         }
