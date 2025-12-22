@@ -33,17 +33,17 @@ ascending:
         value:
           number: 25
         conditions:
-          - attacking
+          - Attacking
       - attribute: Defense
         troop: Ground Troops
         conditions:
-          - attacking
+          - Attacking
         value:
           number: 25
       - attribute: Defense
         troop: Mounted Troops
         conditions:
-          - attacking
+          - Attacking
         value:
           number: 25
   - level: red4
