@@ -80,10 +80,11 @@ runcmd:
   # set up the mojo user and environment
   - sudo systemctl enable postgresql
   - sudo systemctl start postgresql
-  - sudo -u postgres createdb minion_db
   - sudo -u postgres createuser --createdb mojo
   - sudo -u postgres createdb -O mojo minion_db
-  - echo "local   minion_db   mojo                    peer" | sudo tee -a /etc/postgresql/16/main/pg_hba.conf
+  - sudo -u postgres createdb -O mojo evonytkr_app_data
+  - echo "local   minion_db           mojo                    peer" | sudo tee -a /etc/postgresql/16/main/pg_hba.conf
+  - echo "local   evonytkr_app_data   mojo                    peer" | sudo tee -a /etc/postgresql/16/main/pg_hba.conf
   - systemctl reload postgresql
   - mkdir -p /opt/mojo/var/run
   - mkdir -p /opt/mojo/bin

@@ -1,7 +1,6 @@
-import { Stack, type StackProps, Duration, RemovalPolicy } from 'aws-cdk-lib';
+import { Stack, type StackProps, Duration } from 'aws-cdk-lib';
 import { type Construct } from 'constructs';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
-import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import * as route53 from 'aws-cdk-lib/aws-route53';
 
 import * as iam from 'aws-cdk-lib/aws-iam';
@@ -56,28 +55,10 @@ export class MojoliciousStack extends Stack {
       ],
     });
 
-    // Create DynamoDB table for persistence (production only)
-    // Development uses SQLite for everything
-    const persistenceTable = new dynamodb.Table(this, 'PersistenceTable', {
-      tableName: `evonytkr-${props.environment}-data`,
-      partitionKey: { name: 'pk', type: dynamodb.AttributeType.STRING },
-      sortKey: { name: 'sk', type: dynamodb.AttributeType.STRING },
-      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST, // On-demand pricing for cost efficiency
-      pointInTimeRecovery: props.environment === 'prod', // Enable PITR for production only
-      removalPolicy: props.environment === 'prod'
-        ? RemovalPolicy.SNAPSHOT  // Snapshot prod data on stack deletion
-        : RemovalPolicy.DESTROY,   // Clean up dev data automatically
-      encryption: dynamodb.TableEncryption.AWS_MANAGED, // Use AWS-managed encryption
-    });
-
-    // Create DynamoDB table for work unit completion tracking
-    const workUnitsTable = new dynamodb.Table(this, 'WorkUnitsTable', {
-      tableName: `evony-work-units`,
-      partitionKey: { name: 'work_unit_id', type: dynamodb.AttributeType.STRING },
-      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
-      removalPolicy: RemovalPolicy.DESTROY, // Always clean up work units
-      encryption: dynamodb.TableEncryption.AWS_MANAGED,
-    });
+    // PostgreSQL is now used for all persistence (both Minion and application data)
+    // Databases are created in user-data.yaml:
+    // - minion_db: Minion job queue state
+    // - evonytkr_app_data: Application data (generals, books, pairs, etc.)
 
     const InstanceStack = new UbuntuInstance(
       this,
@@ -85,8 +66,6 @@ export class MojoliciousStack extends Stack {
       {
         ...props,
         vpc,
-        persistenceTable,
-        workUnitsTable,
       },
     );
 
