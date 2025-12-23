@@ -605,14 +605,14 @@ package Game::EvonyTKR::Controller::Pairs {
       my $loop = shift;
 
       # Check if all pairs have been processed
-      if ($current_idx >= $total_pairs) {
+      if ($current_idx > $total_pairs) {
         # this delay *must* be larger than the overall loop delay down below.
         Mojo::IOLoop->timer(0.05 => sub {
           $c->log_debug('All pairs computed, sending complete event');
           my $payload = $c->encode({ runId => $run_id });
           $c->write_sse({ type => 'complete', text => $payload });
-          Mojo::IOLoop->remove($recurring_id);
         });
+        Mojo::IOLoop->remove($recurring_id);
         return;
       }
 
