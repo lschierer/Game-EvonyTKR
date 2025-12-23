@@ -612,9 +612,19 @@ package Game::EvonyTKR::Controller::Pairs {
 
       # Compute next batch of pairs using PDL
       my $batch_end = List::Util::min($current_idx + $batch_size, $total_pairs);
+
+      # Use smaller batch for last few to reduce buffering issues
+      my $is_last_batch = ($batch_end >= $total_pairs);
+      if ($is_last_batch && ($total_pairs - $current_idx) > 5) {
+        # If this is the last batch and it's > 5 pairs, split it
+        $batch_end = $current_idx + 5;
+        $is_last_batch = 0;  # Not actually the last, we'll do another iteration
+      }
+
       $c->log_debug(sprintf(
-        'Computing pairs %d-%d of %d',
-        $current_idx + 1, $batch_end, $total_pairs
+        'Computing pairs %d-%d of %d%s',
+        $current_idx + 1, $batch_end, $total_pairs,
+        $is_last_batch ? ' (FINAL BATCH)' : ''
       ));
 
       for my $i ($current_idx .. $batch_end - 1) {
@@ -692,11 +702,14 @@ package Game::EvonyTKR::Controller::Pairs {
           # Encode and stream via SSE
           my $json_result = $c->encode($result);
           my $encoded = encode_base64($json_result, '');
-          $c->log_debug(sprintf('json_result result is "%s"', $json_result));
           $c->write_sse({
             type => 'pair',
             text => $encoded
           });
+          $c->log_debug(sprintf(
+            'Sent pair %d/%d: %s / %s',
+            $i + 1, $total_pairs, $primary_name, $secondary_name
+          ));
         };
         if ($@) {
           $c->log_error(sprintf(
@@ -710,9 +723,17 @@ package Game::EvonyTKR::Controller::Pairs {
       # Check if all pairs have been processed
       if ($current_idx >= $total_pairs && !$complete_sent) {
         $complete_sent = 1;  # Mark that we're sending complete
-        # this delay *must* be larger than the overall loop delay down below.
-        Mojo::IOLoop->timer(2 * $loopDelay => sub {
-          $c->log_debug('All pairs computed, sending complete event');
+
+        # CRITICAL: Give multiple event loop cycles for buffered writes to flush
+        # The timer delay alone isn't enough - we need to let the event loop
+        # process all queued writes before sending the complete event
+        my $flush_delay = 0.5;  # 500ms should ensure all writes are transmitted
+
+        Mojo::IOLoop->timer($flush_delay => sub {
+          $c->log_debug(sprintf(
+            'All %d pairs computed and flushed, sending complete event',
+            $total_pairs
+          ));
           my $payload = $c->encode({ runId => $run_id });
           $c->write_sse({ type => 'complete', text => $payload });
 
