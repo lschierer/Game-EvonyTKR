@@ -596,12 +596,12 @@ package Game::EvonyTKR::Controller::Pairs {
     my $targetType = $typeMap->{$validated_params->{route_meta}->{generalType}} || 'mounted_specialist';
 
     # Process pairs in batches to avoid blocking
-    my $batch_size = 2;  # Process 20 pairs at a time
+    my $batch_size = 15;
     my $current_idx = 0;
     my $total_pairs = scalar(@sorted_pairs);
 
     my $recurring_id;
-    my $loopDelay = 0.2;
+    my $loopDelay = 0.02;
     my $process_batch = sub {
       my $loop = shift;
 

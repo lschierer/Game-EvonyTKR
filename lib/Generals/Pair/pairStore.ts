@@ -49,6 +49,9 @@ export class PairStore {
   readonly sessionId: Store<string> = new Store<string>('');
   protected _currentES?: EventSource;
 
+  private rowBuffer: Map<string, GeneralPair> = new Map();
+  private flushTimer?: number;
+
   readonly store: Store<PairsState> = new Store<PairsState>(
     {
       catalog: [],
@@ -223,6 +226,30 @@ export class PairStore {
     const gp = parsed.data;
     const key = pairKey(gp.primary.name, gp.secondary.name);
 
+    // BATCHING: Instead of updating state immediately, add to buffer
+    this.rowBuffer.set(key, gp);
+
+    // DEBOUNCE: Schedule a flush, but cancel/reschedule if more rows arrive quickly
+    // This means we'll only update state once per 100ms, batching many rows together
+    if (this.flushTimer) {
+      clearTimeout(this.flushTimer);
+    }
+    this.flushTimer = window.setTimeout(() => this.flushBuffer(runId), 100);
+  }
+
+  private flushBuffer(runId: number) {
+    // If buffer is empty, nothing to do
+    if (this.rowBuffer.size === 0) return;
+
+    // Copy buffer and clear it (in case new rows arrive during state update)
+    const bufferedRows = new Map(this.rowBuffer);
+    this.rowBuffer.clear();
+
+    if (DEBUG) {
+      console.log(`Flushing ${bufferedRows.size} buffered rows`);
+    }
+
+    // NOW update state once with ALL buffered rows
     this.store.setState((prev: PairsState) => {
       // Ignore old runs
       if (runId !== prev.runId) {
@@ -234,31 +261,28 @@ export class PairStore {
         return prev;
       }
 
-      let rows;
-      const old = prev.rows[key];
-      if (old) {
-        if (old.state !== 'ignore') {
-          old.state = 'current';
-        }
+      // Start with existing rows
+      const rows = { ...prev.rows };
 
-        old.data = gp;
-        rows = {
-          ...prev.rows,
-          [key]: old,
-        };
-      } else {
-        const baseRow: RowEntry = {
-          key,
-          primary: gp.primary.name,
-          secondary: gp.secondary.name,
-          state: 'current',
-          data: gp,
-        };
-        rows = {
-          ...prev.rows,
-          [key]: baseRow,
-        };
-      }
+      // Add/update all buffered rows
+      bufferedRows.forEach((gp, key) => {
+        const old = rows[key];
+        if (old) {
+          rows[key] = {
+            ...old,
+            state: old.state !== 'ignore' ? 'current' : 'ignore',
+            data: gp,
+          };
+        } else {
+          rows[key] = {
+            key,
+            primary: gp.primary.name,
+            secondary: gp.secondary.name,
+            state: 'current',
+            data: gp,
+          };
+        }
+      });
 
       return { ...prev, rows } as PairsState;
     });
@@ -354,6 +378,12 @@ export class PairStore {
     });
 
     es.addEventListener('complete', () => {
+      // Flush any remaining buffered rows before closing
+      if (this.flushTimer) {
+        clearTimeout(this.flushTimer);
+      }
+      this.flushBuffer(runId);
+
       es.close();
       this.endRun(runId);
     });
