@@ -34,10 +34,6 @@ my $prereq_plugins = [
   'Game::EvonyTKR::External::General::LoadAll',
   'Game::EvonyTKR::External::General::Loader',
   'Game::EvonyTKR::External::General::BuildIndexes',
-  'Game::EvonyTKR::External::General::ComputeBuffCache',
-  'Game::EvonyTKR::External::General::MonitorBuffCache',
-  'Game::EvonyTKR::External::General::LoadAllComputeBuffCache',
-  'Game::EvonyTKR::External::General::Pair::BatchSummarizer',
   'Game::EvonyTKR::External::General::Pair::CreatePairs',
   'Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders',
   'Game::EvonyTKR::External::General::Pair::ReduceCoordinator',
@@ -108,12 +104,7 @@ sub _build_loader_job_defs ($self, $stored_version, $current_version) {
       delay    => 6,
       priority => 50,
     },
-    load_all_compute_buff_cache => {
-      args     => [$stored_version, $current_version],
-      attempts => 5,
-      delay    => 60,
-      priority => -1,
-    },
+
   };
 }
 

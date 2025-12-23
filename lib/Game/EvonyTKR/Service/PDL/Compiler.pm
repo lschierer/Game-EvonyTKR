@@ -2,12 +2,16 @@ package Game::EvonyTKR::Service::PDL::Compiler;
 use v5.42.0;
 use utf8;
 use Mojo::Base -base, -signatures;
+use Mojo::Base 'Game::EvonyTKR::Role::Logging', -role;
+use Mojo::Base 'Game::EvonyTKR::Role::Common', -role;
 use PDL;
 use PDL::NiceSlice;
 use YAML::XS qw(LoadFile);
 use Mojo::File qw(path);
 use Mojo::Util qw(dumper);
-use Mojo::Log;
+use File::Basename qw(fileparse);
+use Unicode::Normalize qw(NFKD);
+use Encode;
 
 =head1 NAME
 
@@ -83,6 +87,21 @@ our @BUFF_COLUMNS = qw(
   hp_all
   death_to_wounded
   marching_speed
+  enemy_attack_ground
+  enemy_defense_ground
+  enemy_hp_ground
+  enemy_attack_mounted
+  enemy_defense_mounted
+  enemy_hp_mounted
+  enemy_attack_ranged
+  enemy_defense_ranged
+  enemy_hp_ranged
+  enemy_attack_siege
+  enemy_defense_siege
+  enemy_hp_siege
+  enemy_attack_all
+  enemy_defense_all
+  enemy_hp_all
 );
 
 our %BUFF_INDEX;
@@ -91,7 +110,7 @@ for my $i (0 .. $#BUFF_COLUMNS) {
 }
 
 has 'data_dir' => sub { 'share/collections/data' };
-has 'log' => sub { Mojo::Log->new };
+has 'log' => sub { Game::EvonyTKR::Role::Logging::get_logger(__PACKAGE__); };
 
 =head2 compile_general
 
@@ -167,6 +186,16 @@ sub compile_general ($self, $general_name, $activation_type) {
     }
   }
 
+  # Additional rows: Generic books (only from slot 1 - they're universal, not per-slot)
+  # Generic books provide universal buffs that apply once, not per slot
+  my @generic_levels = qw(none level1 level2 level3 level4);
+
+  for my $level (@generic_levels) {
+    my $generic_row = $self->_compile_generic_book_buffs($level, $activation_type, $troop_type);
+    push @rows, $generic_row;
+    push @row_labels, "generic_$level";
+  }
+
   # Convert to PDL matrix
   # Stack rows as a 2D matrix: each row becomes a row in the matrix
   my $matrix = pdl(\@rows)->transpose;  # Transpose so rows become rows (not columns)
@@ -189,36 +218,56 @@ sub compile_general ($self, $general_name, $activation_type) {
 
 =cut
 
+sub _find_file_case_insensitive ($self, $dir, $entry) {
+  my @suffixes = qw(.yaml .yml);
+  my $normalized_entry = lc($self->normalize($entry));
+
+  my ($file) = $dir->list->sort->grep(sub {
+    my ($basename) = fileparse($_, @suffixes);
+    my $normalized_basename = lc($self->normalize($basename));
+    return 1 if $_ =~ m/\.ya?ml$/ && $normalized_basename eq $normalized_entry;
+    return 0;
+  })->head(1)->each;
+
+  return $file;
+}
+
 sub _load_general ($self, $name) {
-  my $path = path($self->data_dir, 'generals', "$name.yaml");
-  die "General file not found: $path" unless -e $path;
-  return LoadFile($path->to_string);
+  my $dir = path($self->data_dir, 'generals');
+  my $file = $self->_find_file_case_insensitive($dir, $name);
+  die "General file not found for '$name' in $dir" unless $file;
+  return LoadFile($file->to_string);
 }
 
 sub _load_book ($self, $name) {
-  my $path = path($self->data_dir, 'skill books', "$name.yaml");
-  die "Book file not found: $path" unless -e $path;
-  return LoadFile($path->to_string);
+  my $dir = path($self->data_dir, 'skill books');
+  my $file = $self->_find_file_case_insensitive($dir, $name);
+  die "Book file not found for '$name' in $dir" unless $file;
+  return LoadFile($file->to_string);
 }
 
 sub _load_ascending ($self, $name) {
-  my $path = path($self->data_dir, 'ascending attributes', "$name.yaml");
-  return { ascending => [] } unless -e $path;  # Some generals may not have ascending
-  return LoadFile($path->to_string);
+  my $dir = path($self->data_dir, 'ascending attributes');
+  my $file = $self->_find_file_case_insensitive($dir, $name);
+  return { ascending => [] } unless $file;  # Some generals may not have ascending
+  return LoadFile($file->to_string);
 }
 
 sub _load_covenant ($self, $name) {
-  my $path = path($self->data_dir, 'covenants', "$name.yaml");
-  return { levels => [] } unless -e $path;  # Some generals may not have covenants
-  return LoadFile($path->to_string);
+  my $dir = path($self->data_dir, 'covenants');
+  my $file = $self->_find_file_case_insensitive($dir, $name);
+  return { levels => [] } unless $file;  # Some generals may not have covenants
+  return LoadFile($file->to_string);
 }
 
 sub _load_specialties ($self, $spec_names) {
   my %specs;
+  my $dir = path($self->data_dir, 'specialties');
+
   for my $name (@$spec_names) {
-    my $path = path($self->data_dir, 'specialties', "$name.yaml");
-    next unless -e $path;
-    $specs{$name} = LoadFile($path->to_string);
+    my $file = $self->_find_file_case_insensitive($dir, $name);
+    next unless $file;
+    $specs{$name} = LoadFile($file->to_string);
   }
   return \%specs;
 }
@@ -236,8 +285,11 @@ sub _compile_book_buffs ($self, $book_data, $activation_type, $troop_type) {
   for my $buff (@{$book_data->{buffs} || []}) {
     next unless $self->_buff_applies($buff, $activation_type, $troop_type);
 
-    my $column_key = $self->_get_buff_column_key($buff);
-    next unless exists $BUFF_INDEX{$column_key};
+    # Check if this is a debuff (Enemy condition)
+    my $is_debuff = grep { $_ eq 'Enemy' } @{$buff->{conditions} || []};
+
+    my $column_key = $self->_get_buff_column_key($buff, $is_debuff);
+    next unless defined $column_key && exists $BUFF_INDEX{$column_key};
 
     my $value = $buff->{value}{number} || 0;
     $row->set($BUFF_INDEX{$column_key}, $value);
@@ -265,15 +317,14 @@ sub _compile_ascending_buffs ($self, $asc_data, $level, $activation_type, $troop
   for my $buff (@{$level_data->{buffs} || []}) {
     next unless $self->_buff_applies($buff, $activation_type, $troop_type);
 
-    my $column_key = $self->_get_buff_column_key($buff);
-    next unless exists $BUFF_INDEX{$column_key};
+    # Check if this is a debuff (Enemy or Monsters condition without other targeting)
+    # "Monsters" condition with Defense/Attack/HP typically means enemy debuff
+    my $is_debuff = grep { $_ eq 'Enemy' || $_ eq 'Monsters' } @{$buff->{conditions} || []};
+
+    my $column_key = $self->_get_buff_column_key($buff, $is_debuff);
+    next unless defined $column_key && exists $BUFF_INDEX{$column_key};
 
     my $value = $buff->{value}{number} || 0;
-
-    # Check if this is a debuff (Enemy condition)
-    my $is_debuff = grep { $_ eq 'Enemy' } @{$buff->{conditions} || []};
-    $value = -$value if $is_debuff;
-
     $row->set($BUFF_INDEX{$column_key}, $value);
   }
 
@@ -285,28 +336,37 @@ sub _compile_covenant_buffs ($self, $cov_data, $level, $activation_type, $troop_
 
   return $row if $level eq 'none';
 
-  # Find the covenant level data
-  my $level_data;
+  # Covenant levels are cumulative: war < cooperation < civilization < faith < honor < peace
+  my @levels = qw(war cooperation civilization faith honor peace);
+  my %level_rank = map { $levels[$_] => $_ } 0 .. $#levels;
+
+  my $selected_rank = $level_rank{lc($level)};
+  return $row unless defined $selected_rank;
+
+  # Accumulate buffs from all levels up to and including selected level
   for my $cov (@{$cov_data->{levels} || []}) {
-    if (lc($cov->{category} || '') eq lc($level)) {
-      $level_data = $cov;
-      last;
+    my $cov_level_name = lc($cov->{category} || '');
+    my $cov_rank = $level_rank{$cov_level_name};
+
+    # Skip levels higher than selected
+    next unless defined $cov_rank && $cov_rank <= $selected_rank;
+
+    for my $buff (@{$cov->{buffs} || []}) {
+      # Skip passive buffs for now (they apply differently)
+      next if $buff->{passive};
+
+      next unless $self->_buff_applies($buff, $activation_type, $troop_type);
+
+      # Check if this is a debuff (Enemy condition)
+      my $is_debuff = grep { $_ eq 'Enemy' } @{$buff->{conditions} || []};
+
+      my $column_key = $self->_get_buff_column_key($buff, $is_debuff);
+      next unless defined $column_key && exists $BUFF_INDEX{$column_key};
+
+      my $value = $buff->{value}{number} || 0;
+      my $current = $row->at($BUFF_INDEX{$column_key});
+      $row->set($BUFF_INDEX{$column_key}, $current + $value);
     }
-  }
-
-  return $row unless $level_data;
-
-  for my $buff (@{$level_data->{buffs} || []}) {
-    # Skip passive buffs for now (they apply differently)
-    next if $buff->{passive};
-
-    next unless $self->_buff_applies($buff, $activation_type, $troop_type);
-
-    my $column_key = $self->_get_buff_column_key($buff);
-    next unless exists $BUFF_INDEX{$column_key};
-
-    my $value = $buff->{value}{number} || 0;
-    $row->set($BUFF_INDEX{$column_key}, $value);
   }
 
   return $row;
@@ -317,25 +377,94 @@ sub _compile_specialty_buffs ($self, $spec_data, $level, $activation_type, $troo
 
   return $row if $level eq 'none' || !$spec_data;
 
-  # Find the specialty level data
-  my $level_data;
+  # Specialty levels are cumulative: green < blue < purple < orange < gold
+  my @levels = qw(green blue purple orange gold);
+  my %level_rank = map { $levels[$_] => $_ } 0 .. $#levels;
+
+  my $selected_rank = $level_rank{lc($level)};
+  return $row unless defined $selected_rank;
+
+  # Accumulate buffs from all levels up to and including selected level
   for my $spec_level (@{$spec_data->{levels} || []}) {
-    if (lc($spec_level->{level} || '') eq lc($level)) {
-      $level_data = $spec_level;
-      last;
+    my $spec_level_name = lc($spec_level->{level} || '');
+    my $spec_rank = $level_rank{$spec_level_name};
+
+    # Skip levels higher than selected
+    next unless defined $spec_rank && $spec_rank <= $selected_rank;
+
+    for my $buff (@{$spec_level->{buffs} || []}) {
+      next unless $self->_buff_applies($buff, $activation_type, $troop_type);
+
+      # Check if this is a debuff (Enemy condition)
+      my $is_debuff = grep { $_ eq 'Enemy' } @{$buff->{conditions} || []};
+
+      my $column_key = $self->_get_buff_column_key($buff, $is_debuff);
+      next unless defined $column_key && exists $BUFF_INDEX{$column_key};
+
+      my $value = $buff->{value}{number} || 0;
+      my $current = $row->at($BUFF_INDEX{$column_key});
+      $row->set($BUFF_INDEX{$column_key}, $current + $value);
     }
   }
 
-  return $row unless $level_data;
+  return $row;
+}
 
-  for my $buff (@{$level_data->{buffs} || []}) {
-    next unless $self->_buff_applies($buff, $activation_type, $troop_type);
+sub _compile_generic_book_buffs ($self, $level, $activation_type, $troop_type) {
+  my $row = zeros(scalar @BUFF_COLUMNS);
 
-    my $column_key = $self->_get_buff_column_key($buff);
-    next unless exists $BUFF_INDEX{$column_key};
+  return $row if $level eq 'none';
 
-    my $value = $buff->{value}{number} || 0;
-    $row->set($BUFF_INDEX{$column_key}, $value);
+  # Generic books provide buffs for the primary troop type
+  # Based on BestSkillBooks constants, typically:
+  # - March Size (universal)
+  # - Primary troop type Attack
+  # - Primary troop type Defense or HP
+
+  my %march_values = (level1 => 3, level2 => 6, level3 => 9, level4 => 12);
+  my %combat_values = (level1 => 10, level2 => 15, level3 => 20, level4 => 25);
+
+  my $march_value = $march_values{$level} || 0;
+  my $combat_value = $combat_values{$level} || 0;
+
+  # March Size (universal - applies to all)
+  $row->set($BUFF_INDEX{march_size}, $march_value);
+
+  # Combat stats - apply only to primary troop type when leading
+  my $applies = ($activation_type eq 'Attacking' || $activation_type eq 'PvM');
+
+  if ($applies) {
+    # Determine primary troop type and apply combat buffs
+    my ($attack_col, $defense_col, $hp_col);
+
+    if ($troop_type =~ /mounted/i) {
+      $attack_col = 'attack_mounted';
+      $defense_col = 'defense_mounted';
+      $hp_col = 'hp_mounted';
+    }
+    elsif ($troop_type =~ /ground/i) {
+      $attack_col = 'attack_ground';
+      $defense_col = 'defense_ground';
+      $hp_col = 'hp_ground';
+    }
+    elsif ($troop_type =~ /ranged/i) {
+      $attack_col = 'attack_ranged';
+      $defense_col = 'defense_ranged';
+      $hp_col = 'hp_ranged';
+    }
+    elsif ($troop_type =~ /siege/i) {
+      $attack_col = 'attack_siege';
+      $defense_col = 'defense_siege';
+      $hp_col = 'hp_siege';
+    }
+
+    if ($attack_col) {
+      # Apply best 3 generic books for primary troop type:
+      # Attack, Defense, HP
+      $row->set($BUFF_INDEX{$attack_col}, $combat_value);
+      $row->set($BUFF_INDEX{$defense_col}, $combat_value);
+      $row->set($BUFF_INDEX{$hp_col}, $combat_value);
+    }
   }
 
   return $row;
@@ -348,25 +477,33 @@ sub _buff_applies ($self, $buff, $activation_type, $troop_type) {
   # If no conditions, it always applies
   return 1 unless @$conditions;
 
+  # Filter out 'Enemy' and 'Monsters' from conditions for activation matching
+  # These indicate debuffs and apply based on other conditions, or always if they're the only condition
+  my @non_debuff_conditions = grep { $_ ne 'Enemy' && $_ ne 'Monsters' } @$conditions;
+
+  # If only debuff conditions exist, the buff applies (it's an unconditional enemy debuff)
+  return 1 if @$conditions && !@non_debuff_conditions;
+
   # Map activation types to condition keywords
   my %activation_map = (
     'Attacking' => ['Attacking', 'Marching', 'Attack'],
-    'PvM' => ['monsters', 'PvM'],
+    'PvM' => ['monsters', 'PvM', 'Against Monsters'],
     'Mayor' => ['Mayor', 'Wall'],
     'Defending' => ['Defending', 'Defense'],
   );
 
   my $keywords = $activation_map{$activation_type} || [];
 
+  # Check if any non-debuff conditions match the activation type
   for my $keyword (@$keywords) {
-    for my $condition (@$conditions) {
+    for my $condition (@non_debuff_conditions) {
       return 1 if lc($condition) =~ /\Q\L$keyword\E/;
     }
   }
 
   # Special case: if activation is 'Attacking', also check for 'leading' condition
   if ($activation_type eq 'Attacking') {
-    for my $condition (@$conditions) {
+    for my $condition (@non_debuff_conditions) {
       return 1 if lc($condition) eq 'leading';
     }
   }
@@ -375,7 +512,7 @@ sub _buff_applies ($self, $buff, $activation_type, $troop_type) {
   return 0;
 }
 
-sub _get_buff_column_key ($self, $buff) {
+sub _get_buff_column_key ($self, $buff, $is_debuff = 0) {
   my $attribute = lc($buff->{attribute} || '');
   my $targeted_type = $buff->{targetedType} || '';
 
@@ -383,14 +520,16 @@ sub _get_buff_column_key ($self, $buff) {
   $attribute =~ s/\s+/_/g;
 
   # Map to column keys
+  my $column_key;
+
   if ($attribute eq 'march_size') {
-    return 'march_size';
+    $column_key = 'march_size';
   }
   elsif ($attribute eq 'death_to_wounded') {
-    return 'death_to_wounded';
+    $column_key = 'death_to_wounded';
   }
   elsif ($attribute eq 'marching_speed') {
-    return 'marching_speed';
+    $column_key = 'marching_speed';
   }
   elsif ($attribute =~ /^(attack|defense|hp)$/) {
     my $buff_type = $attribute;
@@ -411,12 +550,20 @@ sub _get_buff_column_key ($self, $buff) {
       $suffix = 'siege';
     }
 
-    return "${buff_type}_${suffix}";
+    $column_key = "${buff_type}_${suffix}";
+  }
+  else {
+    # Unknown attribute, log warning
+    $self->log->warn("Unknown buff attribute: $attribute (targeted: $targeted_type)");
+    return undef;
   }
 
-  # Unknown attribute, log warning
-  $self->log->warn("Unknown buff attribute: $attribute (targeted: $targeted_type)");
-  return undef;
+  # If this is a debuff (Enemy condition), prepend 'enemy_' to the column key
+  if ($is_debuff) {
+    $column_key = "enemy_${column_key}";
+  }
+
+  return $column_key;
 }
 
 1;

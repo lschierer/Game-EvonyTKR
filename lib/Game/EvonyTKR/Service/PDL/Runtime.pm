@@ -2,6 +2,7 @@ package Game::EvonyTKR::Service::PDL::Runtime;
 use v5.42.0;
 use utf8;
 use Mojo::Base -base, -signatures;
+use Mojo::Base 'Game::EvonyTKR::Role::Logging', -role;
 use PDL;
 use PDL::NiceSlice;
 use Game::EvonyTKR::Service::PDL::Compiler;
@@ -60,7 +61,7 @@ has 'compiler' => sub ($self) {
 };
 
 has 'data_dir' => sub { 'share/collections/data' };
-has 'log' => sub { Mojo::Log->new };
+has 'log' => sub { Game::EvonyTKR::Role::Logging::get_logger(__PACKAGE__); };
 
 # Cache of compiled matrices: { "general_name:activation" => compiled_data }
 has 'matrix_cache' => sub { {} };
@@ -82,6 +83,7 @@ Arguments:
   - ascendingLevel: 'none', 'red1'-'red5', 'orange1'-'orange5'
   - covenantLevel: 'none', 'war', 'cooperation', 'civilization', 'faith', 'honor', 'peace'
   - specialty1-4: 'none', 'green', 'blue', 'purple', 'orange', 'gold'
+  - generic1-4: 'none', 'level1', 'level2', 'level3', 'level4'
 
 Returns hashref of buff values (column_name => value).
 
@@ -154,17 +156,23 @@ sub build_filter_mask ($self, $compiled, $filters) {
       my $selected = $filters->{ascendingLevel} || 'none';
       $active = $self->is_ascending_active($level, $selected);
     }
-    # Covenant levels (only selected level is active)
+    # Covenant levels (select only the chosen level - it already contains cumulative buffs)
     elsif ($label =~ /^cov_(.+)$/) {
       my $level = $1;
       my $selected = lc($filters->{covenantLevel} || 'none');
       $active = (lc($level) eq $selected) ? 1 : 0;
     }
-    # Specialty levels
+    # Specialty levels (select only the chosen level - it already contains cumulative buffs)
     elsif ($label =~ /^spec(\d+)_(.+)$/) {
       my $slot = $1;
       my $level = $2;
       my $selected = lc($filters->{"specialty$slot"} || 'none');
+      $active = (lc($level) eq $selected) ? 1 : 0;
+    }
+    # Generic book level (single row, activated by generic1 filter)
+    elsif ($label =~ /^generic_(.+)$/) {
+      my $level = $1;
+      my $selected = lc($filters->{generic1} || 'none');  # Use generic1 as the selector
       $active = (lc($level) eq $selected) ? 1 : 0;
     }
 
@@ -182,6 +190,28 @@ sub is_ascending_active ($self, $level, $selected) {
   my $selected_idx = $level_num{$selected} // 0;
 
   # Ascending is cumulative: if selected=red3, then red1, red2, red3 are all active
+  return $level_idx > 0 && $level_idx <= $selected_idx ? 1 : 0;
+}
+
+sub is_covenant_active ($self, $level, $selected) {
+  my @levels = qw(none war cooperation civilization faith honor peace);
+  my %level_num = map { $levels[$_] => $_ } 0 .. $#levels;
+
+  my $level_idx = $level_num{lc($level)} // 0;
+  my $selected_idx = $level_num{lc($selected)} // 0;
+
+  # Covenant is cumulative: if selected=civilization, then war, cooperation, civilization are all active
+  return $level_idx > 0 && $level_idx <= $selected_idx ? 1 : 0;
+}
+
+sub is_specialty_active ($self, $level, $selected) {
+  my @levels = qw(none green blue purple orange gold);
+  my %level_num = map { $levels[$_] => $_ } 0 .. $#levels;
+
+  my $level_idx = $level_num{lc($level)} // 0;
+  my $selected_idx = $level_num{lc($selected)} // 0;
+
+  # Specialty is cumulative: if selected=gold, then green, blue, purple, orange, gold are all active
   return $level_idx > 0 && $level_idx <= $selected_idx ? 1 : 0;
 }
 
@@ -237,13 +267,17 @@ sub vector_to_hash ($self, $compiled, $buff_vector) {
 Convenience method that returns buffs organized by troop type,
 matching the structure expected by the UI.
 
+Returns hashref with two keys:
+- buffValues: Buffs organized by troop type
+- debuffValues: Enemy debuffs organized by troop type
+
 =cut
 
 sub get_buff_summary ($self, %args) {
   my $buffs = $self->compute_buffs(%args);
 
-  # Organize by troop type
-  my $summary = {
+  # Organize buffs by troop type
+  my $buff_values = {
     'Ground Troops' => {
       'March Size' => $buffs->{march_size},
       'Attack' => $buffs->{attack_ground} + $buffs->{attack_all},
@@ -271,12 +305,39 @@ sub get_buff_summary ($self, %args) {
   };
 
   # Add other buffs
-  $summary->{Other} = {
+  $buff_values->{Other} = {
     'Death to Wounded' => $buffs->{death_to_wounded},
     'Marching Speed' => $buffs->{marching_speed},
   };
 
-  return $summary;
+  # Organize debuffs by troop type
+  my $debuff_values = {
+    'Ground Troops' => {
+      'Attack' => $buffs->{enemy_attack_ground} + $buffs->{enemy_attack_all},
+      'Defense' => $buffs->{enemy_defense_ground} + $buffs->{enemy_defense_all},
+      'HP' => $buffs->{enemy_hp_ground} + $buffs->{enemy_hp_all},
+    },
+    'Mounted Troops' => {
+      'Attack' => $buffs->{enemy_attack_mounted} + $buffs->{enemy_attack_all},
+      'Defense' => $buffs->{enemy_defense_mounted} + $buffs->{enemy_defense_all},
+      'HP' => $buffs->{enemy_hp_mounted} + $buffs->{enemy_hp_all},
+    },
+    'Ranged Troops' => {
+      'Attack' => $buffs->{enemy_attack_ranged} + $buffs->{enemy_attack_all},
+      'Defense' => $buffs->{enemy_defense_ranged} + $buffs->{enemy_defense_all},
+      'HP' => $buffs->{enemy_hp_ranged} + $buffs->{enemy_hp_all},
+    },
+    'Siege Machines' => {
+      'Attack' => $buffs->{enemy_attack_siege} + $buffs->{enemy_attack_all},
+      'Defense' => $buffs->{enemy_defense_siege} + $buffs->{enemy_defense_all},
+      'HP' => $buffs->{enemy_hp_siege} + $buffs->{enemy_hp_all},
+    },
+  };
+
+  return {
+    buffValues   => $buff_values,
+    debuffValues => $debuff_values,
+  };
 }
 
 =head2 compute_pair_buffs

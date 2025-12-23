@@ -18,6 +18,7 @@ require Mojo::Util;
 require Game::EvonyTKR::Model::General;
 require Game::EvonyTKR::Model::General::Pair;
 require Game::EvonyTKR::Model::Buff::Summarizer::Single;
+require Game::EvonyTKR::Service::PDL::Runtime;
 require Game::EvonyTKR::Model::Data;
 require Game::EvonyTKR::Model::Base;
 
@@ -43,6 +44,13 @@ has prereqs => sub {
     load_all_specialties
     load_ml_conflicts
   )];
+};
+
+# PDL Runtime service for fast buff computation
+has 'pdl_runtime' => sub ($self) {
+  Game::EvonyTKR::Service::PDL::Runtime->new(
+    data_dir => $self->app->home->child('share/collections/data')->to_string
+  );
 };
 
 # Specify which collection this controller handles
@@ -500,7 +508,7 @@ sub buffActivation_index($self) {
 }
 
 sub show ($c) {
-  return if $c->check_prereqs_or_wait($c->prereqs);
+  #return if $c->check_prereqs_or_wait($c->prereqs);
 
   # Build navigation items if not already done
   $c->_ensure_navigation_built();
@@ -647,33 +655,30 @@ sub show ($c) {
       };
 
       $c->log_debug("Using $targetType as targetType for $name");
-      my $summarizer = Game::EvonyTKR::Model::Buff::Summarizer::Single->new(
-        general        => $general,
-        isPrimary      => 1,
-        targetType     => $targetType,
-        activationType => 'Attacking',
-        ascendingLevel => $ascendingLevel,
-        covenantLevel  => $covenantLevel,
-        specialty1     => $specialties[0],
-        specialty2     => $specialties[1],
-        specialty3     => $specialties[2],
-        specialty4     => $specialties[3],
-      );
 
-      $summarizer->updateBuffs();
-      $summarizer->updateDebuffs();
+      # Use PDL runtime for fast buff computation
+      my $summary = $c->pdl_runtime->get_buff_summary(
+        general    => $name,
+        activation => 'Attacking',
+        filters    => {
+          ascendingLevel => $ascendingLevel,
+          covenantLevel  => $covenantLevel,
+          specialty1     => $specialties[0],
+          specialty2     => $specialties[1],
+          specialty3     => $specialties[2],
+          specialty4     => $specialties[3],
+          generic1       => 'level4',  # TODO: Make configurable
+        },
+      );
 
       $c->stash(
         'buff-summaries' => {
-          marchIncrease =>
-            $summarizer->buffValues->{$targetType}->{'March Size'} // 0,
-          attackIncrease => $summarizer->buffValues->{$targetType}->{'Attack'}
-            // 0,
-          defenseIncrease => $summarizer->buffValues->{$targetType}->{'Defense'}
-            // 0,
-          hpIncrease   => $summarizer->buffValues->{$targetType}->{'HP'} // 0,
-          buffValues   => $summarizer->buffValues,
-          debuffValues => $summarizer->debuffValues,
+          marchIncrease   => $summary->{buffValues}->{$targetType}->{'March Size'} // 0,
+          attackIncrease  => $summary->{buffValues}->{$targetType}->{'Attack'} // 0,
+          defenseIncrease => $summary->{buffValues}->{$targetType}->{'Defense'} // 0,
+          hpIncrease      => $summary->{buffValues}->{$targetType}->{'HP'} // 0,
+          buffValues      => $summary->{buffValues},
+          debuffValues    => $summary->{debuffValues},
         },
       );
     }
@@ -932,131 +937,87 @@ sub single_details_stream ($c) {
   # Sort by name
   @generals = sort { $a->name cmp $b->name } @generals;
 
-  my @job_ids;
-  for my $index (0 .. $#generals) {
-    my $general = $generals[$index];
+  # Compute buff key for this type
+  my $buffKey = $generalType =~ s/_/ /r;
+  $buffKey =~ s/(\w)(\w+) specialist/\U$1\L$2 \UT\Lroops/;
+  $buffKey =~ s/Siege Troops/Siege Machines/;
 
-    my $jid = $c->app->minion->enqueue(
-      summarize_general => [
-        $general->name,
-        1,    # isPrimary
-        $generalType,
-        $validated_params->{buffActivation},
-        $validated_params->{ascendingLevel},
-        $validated_params->{covenantLevel},
-        $validated_params->{specialties}->[0],
-        $validated_params->{specialties}->[1],
-        $validated_params->{specialties}->[2],
-        $validated_params->{specialties}->[3],
-        undef,    # books - will be computed
-      ] => {
-        delay    => ($index * 0.001) + rand(0.5),
-        priority => 80,
-        attempts => 1,
-      }
-    );
+  # Prepare filters for PDL
+  my $filters = {
+    ascendingLevel => $validated_params->{ascendingLevel},
+    covenantLevel  => $validated_params->{covenantLevel},
+    specialty1     => $validated_params->{specialties}->[0],
+    specialty2     => $validated_params->{specialties}->[1],
+    specialty3     => $validated_params->{specialties}->[2],
+    specialty4     => $validated_params->{specialties}->[3],
+    generic1       => 'level4',  # TODO: Make configurable
+  };
 
-    $c->log_debug("Enqueued job $jid for $general->name");
-    push @job_ids, $jid;
-  }
+  # Stream computation in batches
+  my $batch_size = 20;
+  my $current_idx = 0;
+  my $total_generals = scalar(@generals);
+  my $recurring_id;
 
-  my @promises;
-  foreach my $jid (@job_ids) {
-    my $promise = $c->app->minion->result_p($jid)->then(sub {
-      return if !$c->tx || $c->tx->is_finished;
-      my $info   = shift;
-      my $result = $info->{result};
-
-      if (defined($result) && ref($result) eq 'HASH') {
-        my $general = $c->get_general($result->{general});
-        unless ($general) {
-          $c->log_error(sprintf('unable to get general from result: %s',
-            Data::Printer::np($result)));
-          next;
-        }
-        my $buffKey = $generalType =~ s/_/ /r;
-        $buffKey =~ s/(\w)(\w+) specialist/\U$1\L$2 \UT\Lroops/;
-        $buffKey =~ s/Siege Troops/Siege Machines/;
-
-        my $row = {
-          primary            => $general->to_hash,
-          attackbuff         => $result->{buffs}->{$buffKey}{'Attack'},
-          defensebuff        => $result->{buffs}->{$buffKey}{'Defense'},
-          hpbuff             => $result->{buffs}->{$buffKey}{'HP'},
-          marchbuff          => $result->{buffs}->{$buffKey}{'March Size'},
-          groundattackdebuff => $result->{debuffs}->{'Ground Troops'}{'Attack'},
-          grounddefensedebuff =>
-            $result->{debuffs}->{'Ground Troops'}{'Defense'},
-          groundhpdebuff      => $result->{debuffs}->{'Ground Troops'}{'HP'},
-          mountedattackdebuff =>
-            $result->{debuffs}->{'Mounted Troops'}{'Attack'},
-          mounteddefensedebuff =>
-            $result->{debuffs}->{'Mounted Troops'}{'Defense'},
-          mountedhpdebuff    => $result->{debuffs}->{'Mounted Troops'}{'HP'},
-          rangedattackdebuff => $result->{debuffs}->{'Ranged Troops'}{'Attack'},
-          rangeddefensedebuff =>
-            $result->{debuffs}->{'Ranged Troops'}{'Defense'},
-          rangedhpdebuff    => $result->{debuffs}->{'Ranged Troops'}{'HP'},
-          siegeattackdebuff => $result->{debuffs}->{'Siege Machines'}{'Attack'},
-          siegedefensedebuff =>
-            $result->{debuffs}->{'Siege Machines'}{'Defense'},
-          siegehpdebuff => $result->{debuffs}->{'Siege Machines'}{'HP'},
-        };
-
-        my $payload =
-          encode_base64($c->encode({ runId => $run_id, data => $row }), '');
-        $c->write_sse({ type => 'row', text => $payload });
-      }
-      return $result;
-    })->catch(sub {
-      my $err = shift;
-      $c->log_error("Job $jid failed: " . Data::Printer::np($err));
-      return undef;
-    });
-
-    push @promises, $promise;
-  }
-
-  Mojo::Promise->all(@promises)->then(sub {
-    $c->log_debug("All jobs complete, sending complete event");
+  my $process_batch = sub {
     return if !$c->tx || $c->tx->is_finished;
 
-    Mojo::IOLoop->timer(
-      10 => sub {
-        my $payload = encode_base64($c->encode({ runId => $run_id }), '');
-        $c->write_sse({ type => 'complete', text => $payload });
-      }
-    );
-  })->catch(sub {
-    $c->log_error("Some jobs failed in batch");
-    return undef;
-  });
+    if ($current_idx >= $total_generals) {
+      my $payload = encode_base64($c->encode({ runId => $run_id }), '');
+      $c->write_sse({ type => 'complete', text => $payload });
+      Mojo::IOLoop->remove($recurring_id) if $recurring_id;
+      return;
+    }
+
+    my $batch_end = List::Util::min($current_idx + $batch_size, $total_generals);
+
+    for my $i ($current_idx .. $batch_end - 1) {
+      my $general = $generals[$i];
+      my $general_name = $general->name;
+
+      # Compute using PDL
+      my $summary = $c->pdl_runtime->get_buff_summary(
+        general    => $general_name,
+        activation => $validated_params->{buffActivation},
+        filters    => $filters,
+      );
+
+      my $row = {
+        primary            => $general->to_hash,
+        attackbuff         => $summary->{buffValues}->{$buffKey}{'Attack'} // 0,
+        defensebuff        => $summary->{buffValues}->{$buffKey}{'Defense'} // 0,
+        hpbuff             => $summary->{buffValues}->{$buffKey}{'HP'} // 0,
+        marchbuff          => $summary->{buffValues}->{$buffKey}{'March Size'} // 0,
+        groundattackdebuff => $summary->{debuffValues}->{'Ground Troops'}{'Attack'} // 0,
+        grounddefensedebuff => $summary->{debuffValues}->{'Ground Troops'}{'Defense'} // 0,
+        groundhpdebuff     => $summary->{debuffValues}->{'Ground Troops'}{'HP'} // 0,
+        mountedattackdebuff => $summary->{debuffValues}->{'Mounted Troops'}{'Attack'} // 0,
+        mounteddefensedebuff => $summary->{debuffValues}->{'Mounted Troops'}{'Defense'} // 0,
+        mountedhpdebuff    => $summary->{debuffValues}->{'Mounted Troops'}{'HP'} // 0,
+        rangedattackdebuff => $summary->{debuffValues}->{'Ranged Troops'}{'Attack'} // 0,
+        rangeddefensedebuff => $summary->{debuffValues}->{'Ranged Troops'}{'Defense'} // 0,
+        rangedhpdebuff     => $summary->{debuffValues}->{'Ranged Troops'}{'HP'} // 0,
+        siegeattackdebuff  => $summary->{debuffValues}->{'Siege Machines'}{'Attack'} // 0,
+        siegedefensedebuff => $summary->{debuffValues}->{'Siege Machines'}{'Defense'} // 0,
+        siegehpdebuff      => $summary->{debuffValues}->{'Siege Machines'}{'HP'} // 0,
+      };
+
+      my $payload = encode_base64($c->encode({ runId => $run_id, data => $row }), '');
+      $c->write_sse({ type => 'row', text => $payload });
+    }
+
+    $current_idx = $batch_end;
+  };
+
+  # Start processing
+  $process_batch->();
+  $recurring_id = Mojo::IOLoop->recurring($c->standard_delay => $process_batch);
 
   $c->on(
     finish => sub {
-      $c->log_debug(
-        "Client disconnected, canceling " . scalar(@job_ids) . " jobs");
-      foreach my $jid (@job_ids) {
-        my $job = $c->app->minion->job($jid);
-        if ($job) {
-          my $info = $job->info;
-          next unless $info;
-          my $state = $info->{state};
-          if ($state eq 'inactive') {
-            $job->remove;
-            $c->log_debug("Removed inactive job $jid");
-          }
-          elsif ($state eq 'active' && $info->{pid}) {
-            eval { $job->kill(); };
-            if ($@) {
-              $c->log_debug("Failed to kill job $jid: $@");
-            }
-            else {
-              $c->log_debug("Killed active job $jid");
-            }
-          }
-        }
-      }
+      # No Minion jobs to clean up with PDL!
+      Mojo::IOLoop->remove($recurring_id) if $recurring_id;
+      $c->log_debug("Client disconnected: stopped general computation");
       if (exists $session_store->{$session_id}) {
         delete $session_store->{$session_id};
       }

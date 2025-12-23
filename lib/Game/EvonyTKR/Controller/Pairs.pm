@@ -8,6 +8,7 @@ require Mojo::Promise;
 require List::Util;
 require Game::EvonyTKR::Model::General;
 require Game::EvonyTKR::Model::General::Pair;
+require Game::EvonyTKR::Service::PDL::Runtime;
 require Game::EvonyTKR::Model::Data;
 require Mojo::Util;
 require UUID;
@@ -51,6 +52,13 @@ package Game::EvonyTKR::Controller::Pairs {
       load_all_specialties
       load_ml_conflicts
     )];
+  };
+
+  # PDL Runtime service for fast buff computation
+  has 'pdl_runtime' => sub ($self) {
+    Game::EvonyTKR::Service::PDL::Runtime->new(
+      data_dir => $self->app->home->child('share/collections/data')->to_string
+    );
   };
 
   sub register($c, $app, $config = {}) {
@@ -488,26 +496,31 @@ package Game::EvonyTKR::Controller::Pairs {
 
     # Filter to requested primaries if specified
     my @sorted_pairs;
+    my @unsorted_pairs;
     if (scalar(@$requested_primaries) > 0) {
       my %requested = map { $_ => 1 } @$requested_primaries;
       foreach my $pair (@all_pairs) {
         if (exists $requested{ $pair->primary->name }) {
-          push @sorted_pairs, $pair->to_wire_hash();
+          push @unsorted_pairs, $pair->to_wire_hash();
         }
       }
       $c->log_debug(sprintf(
         'Filtered to %d pairs from %d total for %d primaries',
-        scalar(@sorted_pairs), scalar(@all_pairs), scalar(@$requested_primaries)
+        scalar(@unsorted_pairs), scalar(@all_pairs), scalar(@$requested_primaries)
       ));
     } else {
       # No filter - use all pairs
-      @sorted_pairs = map { $_->to_wire_hash() } @all_pairs;
+      @unsorted_pairs = map { $_->to_wire_hash() } @all_pairs;
       $c->log_debug(sprintf(
         'No filter specified, using all %d pairs',
-        scalar(@sorted_pairs)
+        scalar(@unsorted_pairs)
       ));
     }
-
+    @sorted_pairs = sort {
+      my $pc = $a->{primary}->{name} cmp $b->{primary}->{name};
+      my $sc = $a->{secondary}->{name} cmp $b->{secondary}->{name};
+      return $pc ? $pc : $sc;
+      } @unsorted_pairs;
     $c->log_debug(sprintf(
       'There are %s pairs to compute details for session %s.',
       scalar(@sorted_pairs), $session_id
@@ -553,195 +566,163 @@ package Game::EvonyTKR::Controller::Pairs {
     my @subs;
     my @promises;
 
-    my $args = {
-      runId => $run_id,
+    # Use PDL runtime for fast pair computation (replaces Minion jobs)
+    $c->log_info(sprintf(
+      'Computing %d pairs using PDL runtime (activation: %s)',
+      scalar(@sorted_pairs), $buffActivation
+    ));
 
-      targetType             => $validated_params->{route_meta}->{generalType},
-      activationType         => $validated_params->{buffActivation},
-      ascendingLevel         => $validated_params->{ascendingLevel},
-      primaryCovenantLevel   => $validated_params->{primaryCovenantLevel},
-      primarySpecialty1      => $validated_params->{primarySpecialties}->[0],
-      primarySpecialty2      => $validated_params->{primarySpecialties}->[1],
-      primarySpecialty3      => $validated_params->{primarySpecialties}->[2],
-      primarySpecialty4      => $validated_params->{primarySpecialties}->[3],
-      secondaryCovenantLevel => $validated_params->{secondaryCovenantLevel},
-      secondarySpecialty1    => $validated_params->{secondarySpecialties}->[0],
-      secondarySpecialty2    => $validated_params->{secondarySpecialties}->[1],
-      secondarySpecialty3    => $validated_params->{secondarySpecialties}->[2],
-      secondarySpecialty4    => $validated_params->{secondarySpecialties}->[3],
+    my $primary_filters = {
+      ascendingLevel => $validated_params->{ascendingLevel},
+      covenantLevel  => $validated_params->{primaryCovenantLevel},
+      specialty1     => $validated_params->{primarySpecialties}->[0],
+      specialty2     => $validated_params->{primarySpecialties}->[1],
+      specialty3     => $validated_params->{primarySpecialties}->[2],
+      specialty4     => $validated_params->{primarySpecialties}->[3],
+      generic1       => 'level4',  # TODO: Make configurable
     };
 
-    my $batchJid = $c->app->minion->enqueue(
-      batch_summarize_pairs => [\@sorted_pairs, $args] => {
-        attempts => 2,
-      }
-    );
+    my $secondary_filters = {
+      ascendingLevel => $validated_params->{ascendingLevel},
+      covenantLevel  => $validated_params->{secondaryCovenantLevel},
+      specialty1     => $validated_params->{secondarySpecialties}->[0],
+      specialty2     => $validated_params->{secondarySpecialties}->[1],
+      specialty3     => $validated_params->{secondarySpecialties}->[2],
+      specialty4     => $validated_params->{secondarySpecialties}->[3],
+      generic1       => 'level4',  # TODO: Make configurable
+    };
 
- # Enqueue jobs in batches using recurring timer to avoid SQLite lock contention
-    my $completed_processes = {};
-    my $pending_processes   = {};
-    my $total_processes     = scalar(@sorted_pairs);
-    my $max_index           = scalar(@sorted_pairs) - 1;
-    my $active_processes    = 0;
-    my $pair_index          = 0;
-    my $batch_size          = 5;    # Enqueue 100 jobs per tick
-    my $current_idx         = 0;
+    # Compute all pairs using PDL (no Minion jobs needed!)
+    my $targetType = $typeMap->{$validated_params->{route_meta}->{generalType}} || 'mounted_specialist';
+
+    # Process pairs in batches to avoid blocking
+    my $batch_size = 20;  # Process 20 pairs at a time
+    my $current_idx = 0;
+    my $total_pairs = scalar(@sorted_pairs);
 
     my $recurring_id;
-    my $timer_logic = sub {
+    my $process_batch = sub {
       my $loop = shift;
-      if (scalar keys $completed_processes->%*) {
-        unless (scalar(keys $pending_processes->%*)) {
-          # I *need* this one to be *after* all the individual
-          # job handlers have run.
-          Mojo::IOLoop->timer(
-            $c->standard_delay * 2 => sub ($loop) {
-              $c->log_debug('all jobs complete, sending complete event');
-              my $payload = $c->encode({ runId => $run_id });
-              $c->write_sse({ type => 'complete', text => $payload });
-            }
-          );
-          Mojo::IOLoop->remove($recurring_id);
-          return;
-        }
-      }
-      $c->log_debug(sprintf('timer_logic fired for run_id "%s" session "%s"', $run_id, $session_id));
-      my $batchJob = $c->app->minion->job($batchJid);
-      unless ($batchJob) {
-        $c->log_warn(sprintf('cannot find job for batch jid %s', $batchJid));
-        unless (scalar keys $pending_processes->%*) {
-          Mojo::IOLoop->remove($recurring_id);
-        }
+
+      # Check if all pairs have been processed
+      if ($current_idx >= $total_pairs) {
+        $c->log_debug('All pairs computed, sending complete event');
+        my $payload = $c->encode({ runId => $run_id });
+        $c->write_sse({ type => 'complete', text => $payload });
+        Mojo::IOLoop->remove($recurring_id);
         return;
       }
-      $c->log_debug(sprintf('batch job for jid "%s" found', $batchJid));
 
-      # Add newly spawned jobs to pending list
-      my $batch_info = $batchJob->info;
-      $c->log_debug(sprintf('batch job %s state: %s', $batchJid, $batch_info ? $batch_info->{state} : 'no info'));
+      # Compute next batch of pairs using PDL
+      my $batch_end = List::Util::min($current_idx + $batch_size, $total_pairs);
+      $c->log_debug(sprintf(
+        'Computing pairs %d-%d of %d',
+        $current_idx + 1, $batch_end, $total_pairs
+      ));
 
-      if ($batch_info && $batch_info->{notes} && $batch_info->{notes}->{spawned_jobs}) {
-        $c->log_debug(sprintf('found %d spawned jobs in batch notes', scalar($batch_info->{notes}->{spawned_jobs}->@*)));
-        foreach my $spawned_jid ($batch_info->{notes}->{spawned_jobs}->@*) {
-          unless (exists $pending_processes->{$spawned_jid}
-            || exists $completed_processes->{$spawned_jid}) {
-            $pending_processes->{$spawned_jid} = 1;
-            $c->log_debug(sprintf('added spawned job %s to pending', $spawned_jid));
+      for my $i ($current_idx .. $batch_end - 1) {
+        my $pair_hash = $sorted_pairs[$i];
+
+        # Extract names from wire hash format: { primary => { name => '...' }, secondary => { name => '...' } }
+        my $primary_name = ref($pair_hash->{primary}) eq 'HASH'
+          ? $pair_hash->{primary}{name}
+          : $pair_hash->{primary};
+        my $secondary_name = ref($pair_hash->{secondary}) eq 'HASH'
+          ? $pair_hash->{secondary}{name}
+          : $pair_hash->{secondary};
+
+        eval {
+          # Get full general objects to send their hash representations
+          my $primary_general = $c->get_general(lc($c->normalize($primary_name)));
+          my $secondary_general = $c->get_general(lc($c->normalize($secondary_name)));
+
+          unless ($primary_general && $secondary_general) {
+            $c->log_error(sprintf(
+              'Cannot load generals: %s, %s',
+              $primary_name, $secondary_name
+            ));
+            return;
           }
-        }
-      } else {
-        $c->log_debug('no spawned jobs found in batch notes');
-      }
 
-      my @spawned_processes = keys $pending_processes->%*;
-      $c->log_debug(sprintf('there are %s spawned_processes and %s completed_processes',
-      scalar(@spawned_processes), scalar(keys $completed_processes->%* ), ));
-      foreach my $sp (@spawned_processes) {
-        if (exists $completed_processes->{$sp}) {
-          delete $pending_processes->{$sp};
-          next;
-        }
-        my $spj = $c->app->minion->job($sp);
-        unless ($spj) {
-          $c->log_warn(sprintf('no job for spawned job %s', $sp));
-          $completed_processes->{$sp} = 0;
-          next;
-        }
-        if ($spj->info->{state} eq 'failed') {
-          $completed_processes->{$sp} = 0;
-          next;
-        }
-        elsif ($spj->info->{state} eq 'finished') {
-          my $result = $spj->info->{result};
-          unless (defined($result) && ref($result) && ref($result) eq 'HASH') {
-            $c->log_error(sprintf('odd result for job %s: %s', $sp, $result));
+          # Compute combined buffs for this pair using PDL
+          my $combined_buffs = $c->pdl_runtime->compute_pair_buffs(
+            primary            => $primary_name,
+            secondary          => $secondary_name,
+            activation         => $buffActivation,
+            primary_filters    => $primary_filters,
+            secondary_filters  => $secondary_filters,
+          );
+
+          # Map general type to troop column suffix (ground, mounted, ranged, siege)
+          my $troop_suffix;
+          if ($generalType =~ /ground/i) {
+            $troop_suffix = 'ground';
+          } elsif ($generalType =~ /mounted/i) {
+            $troop_suffix = 'mounted';
+          } elsif ($generalType =~ /ranged/i) {
+            $troop_suffix = 'ranged';
+          } elsif ($generalType =~ /siege/i) {
+            $troop_suffix = 'siege';
+          } else {
+            $troop_suffix = 'ground';  # Default fallback
           }
-          $c->log_debug(sprintf(
-            'job %s result is %s',
-            $sp, Data::Printer::np($result, multiline => 0)
+
+          # Format buffs into the structure the frontend expects
+          my $result = {
+            runId              => 0+ $run_id,
+            data  => {
+            primary            => $primary_general->to_hash(),
+            secondary          => $secondary_general->to_hash(),
+            attackbuff         => ($combined_buffs->{"attack_$troop_suffix"} // 0) + ($combined_buffs->{attack_all} // 0),
+            defensebuff        => ($combined_buffs->{"defense_$troop_suffix"} // 0) + ($combined_buffs->{defense_all} // 0),
+            hpbuff             => ($combined_buffs->{"hp_$troop_suffix"} // 0) + ($combined_buffs->{hp_all} // 0),
+            marchbuff          => $combined_buffs->{march_size} // 0,
+            groundattackdebuff => ($combined_buffs->{enemy_attack_ground} // 0) + ($combined_buffs->{enemy_attack_all} // 0),
+            grounddefensedebuff => ($combined_buffs->{enemy_defense_ground} // 0) + ($combined_buffs->{enemy_defense_all} // 0),
+            groundhpdebuff     => ($combined_buffs->{enemy_hp_ground} // 0) + ($combined_buffs->{enemy_hp_all} // 0),
+            mountedattackdebuff => ($combined_buffs->{enemy_attack_mounted} // 0) + ($combined_buffs->{enemy_attack_all} // 0),
+            mounteddefensedebuff => ($combined_buffs->{enemy_defense_mounted} // 0) + ($combined_buffs->{enemy_defense_all} // 0),
+            mountedhpdebuff    => ($combined_buffs->{enemy_hp_mounted} // 0) + ($combined_buffs->{enemy_hp_all} // 0),
+            rangedattackdebuff => ($combined_buffs->{enemy_attack_ranged} // 0) + ($combined_buffs->{enemy_attack_all} // 0),
+            rangeddefensedebuff => ($combined_buffs->{enemy_defense_ranged} // 0) + ($combined_buffs->{enemy_defense_all} // 0),
+            rangedhpdebuff     => ($combined_buffs->{enemy_hp_ranged} // 0) + ($combined_buffs->{enemy_hp_all} // 0),
+            siegeattackdebuff  => ($combined_buffs->{enemy_attack_siege} // 0) + ($combined_buffs->{enemy_attack_all} // 0),
+            siegedefensedebuff => ($combined_buffs->{enemy_defense_siege} // 0) + ($combined_buffs->{enemy_defense_all} // 0),
+            siegehpdebuff      => ($combined_buffs->{enemy_hp_siege} // 0) + ($combined_buffs->{enemy_hp_all} // 0),
+            }
+          };
+
+          # Encode and stream via SSE
+          my $json_result = $c->encode($result);
+          my $encoded = encode_base64($json_result, '');
+          $c->log_debug(sprintf('json_result result is "%s"', $json_result));
+          $c->write_sse({
+            type => 'pair',
+            text => $encoded
+          });
+        };
+        if ($@) {
+          $c->log_error(sprintf(
+            'Error computing pair %s/%s: %s',
+            $primary_name, $secondary_name, $@
           ));
-
-          if ($result->{status} eq 'complete') {
-            my $encoded = encode_base64($result->{result}, '');
-            $c->write_sse({ type => 'pair', text => $encoded });
-          }else{
-            $c->log_warn(sprintf('finished process %s has status "%s"',
-            $sp, $result->{status}));
-          }
-          $completed_processes->{$sp} = $result;
-        }
-        else {
-         # in case I need information to debug, lets go ahead and cache it here.
-          $pending_processes->{$sp} = $c->app->minion->job($sp)->info // 0;
-          $c->log_debug(sprintf('process %s was in state %s', $sp, $spj->info->{state}));
         }
       }
+
+      $current_idx = $batch_end;
     };
 
     # Execute immediately to start processing
-    $timer_logic->();
+    $process_batch->();
 
-    # Then set up recurring timer
-    $recurring_id = Mojo::IOLoop->recurring($c->standard_delay => $timer_logic);
+    # Then set up recurring timer to process remaining batches
+    $recurring_id = Mojo::IOLoop->recurring(0.01 => $process_batch);
 
     $c->on(
       finish => sub {
-        # Stop the recurring timer
+        # Stop the recurring timer (no Minion jobs to clean up with PDL!)
         Mojo::IOLoop->remove($recurring_id) if $recurring_id;
-
-        # Clean up batch job and spawned jobs
-        # Note: Can only remove() inactive jobs. Active jobs can't be killed,
-        # but we stop processing their results by clearing pending_processes.
-
-        # First, try to remove the batch job
-        my $batch_job = $c->app->minion->job($batchJid);
-        if ($batch_job) {
-          my $info = $batch_job->info;
-          if ($info) {
-            if ($info->{state} eq 'inactive') {
-              eval { $batch_job->remove; };
-              $c->log_debug("Removed inactive batch job $batchJid") unless $@;
-            }
-            elsif ($info->{state} eq 'finished') {
-              eval { $batch_job->remove; };
-              $c->log_debug("Removed finished batch job $batchJid") unless $@;
-            }
-            else {
-              $c->log_debug("Batch job $batchJid is $info->{state}, cannot remove (will finish on its own)");
-            }
-          }
-        }
-
-        # Remove spawned jobs (only inactive ones can be removed)
-        my @pending_jids = keys %$pending_processes;
-        my $removed_count = 0;
-        my $active_count = 0;
-
-        foreach my $jid (@pending_jids) {
-          my $job = $c->app->minion->job($jid);
-          if ($job) {
-            my $info = $job->info;
-            next unless $info;
-
-            if ($info->{state} eq 'inactive') {
-              eval { $job->remove; };
-              unless ($@) {
-                $removed_count++;
-                $c->log_debug("Removed inactive job $jid");
-              }
-            }
-            elsif ($info->{state} eq 'active') {
-              # Can't remove active jobs - they'll finish on their own
-              # Results won't be processed since we stopped the timer
-              $active_count++;
-            }
-          }
-        }
-
-        $c->log_debug(sprintf(
-          "Client disconnected: removed %d inactive jobs, %d active jobs will finish (ignored)",
-          $removed_count, $active_count
-        ));
+        $c->log_debug("Client disconnected: stopped pair computation");
       }
     );
   }

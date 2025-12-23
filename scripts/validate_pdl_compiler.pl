@@ -164,6 +164,12 @@ sub build_filter_mask ($compiled, $filters) {
       my $selected = lc($filters->{"specialty$slot"} || 'none');
       $active = (lc($level) eq $selected) ? 1 : 0;
     }
+    # Generic book level (single row, activated by generic1 filter)
+    elsif ($label =~ /^generic_(.+)$/) {
+      my $level = $1;
+      my $selected = lc($filters->{generic1} || 'none');  # Use generic1 as the selector
+      $active = (lc($level) eq $selected) ? 1 : 0;
+    }
 
     push @mask, $active;
   }
@@ -231,41 +237,70 @@ sub compare_results ($compiled, $buff_vector, $expected_buffs, $expected_debuffs
 
     for my $buff_name (keys %$buffs) {
       my $expected = $buffs->{$buff_name};
+
+      # Skip march size - it's universal, no _all column
+      if (lc($buff_name) eq 'march size') {
+        my $column_key = 'march_size';
+        next unless exists $col_map{$column_key};
+        my $actual = $buff_vector->at($col_map{$column_key});
+        if ($actual != $expected) {
+          push @errors, sprintf(
+            "%s %s: expected %d, got %d",
+            $troop_type, $buff_name, $expected, $actual
+          );
+          $passed = 0;
+        }
+        next;
+      }
+
+      # For Attack/Defense/HP, combine specific column + _all column
       my $column_key = get_column_key($buff_name, $troop_suffix);
+      my $all_column_key = get_column_key($buff_name, 'all');
 
-      next unless exists $col_map{$column_key};
+      my $specific_value = exists $col_map{$column_key} ?
+        $buff_vector->at($col_map{$column_key}) : 0;
+      my $all_value = exists $col_map{$all_column_key} ?
+        $buff_vector->at($col_map{$all_column_key}) : 0;
 
-      my $actual = $buff_vector->at($col_map{$column_key});
+      my $actual = $specific_value + $all_value;
 
       if ($actual != $expected) {
         push @errors, sprintf(
-          "%s %s: expected %d, got %d",
-          $troop_type, $buff_name, $expected, $actual
+          "%s %s: expected %d, got %d (specific=%d, all=%d)",
+          $troop_type, $buff_name, $expected, $actual, $specific_value, $all_value
         );
         $passed = 0;
       }
     }
   }
 
-  # Check expected debuffs (negative values)
+  # Check expected debuffs (stored in enemy_* columns as positive values)
   for my $troop_type (keys %$expected_debuffs) {
     my $troop_suffix = get_troop_suffix($troop_type);
     my $debuffs = $expected_debuffs->{$troop_type};
 
     for my $buff_name (keys %$debuffs) {
-      my $expected = -$debuffs->{$buff_name};  # Debuffs are stored as negative
+      my $expected = $debuffs->{$buff_name};  # Expected debuff value (positive)
       next if $expected == 0;  # Skip zero debuffs
 
+      # For debuffs, also combine specific + _all columns
       my $column_key = get_column_key($buff_name, $troop_suffix);
+      my $all_column_key = get_column_key($buff_name, 'all');
 
-      next unless exists $col_map{$column_key};
+      my $enemy_specific_key = "enemy_${column_key}";
+      my $enemy_all_key = "enemy_${all_column_key}";
 
-      my $actual = $buff_vector->at($col_map{$column_key});
+      my $specific_value = exists $col_map{$enemy_specific_key} ?
+        $buff_vector->at($col_map{$enemy_specific_key}) : 0;
+      my $all_value = exists $col_map{$enemy_all_key} ?
+        $buff_vector->at($col_map{$enemy_all_key}) : 0;
+
+      my $actual = $specific_value + $all_value;
 
       if ($actual != $expected) {
         push @errors, sprintf(
-          "%s %s debuff: expected %d, got %d",
-          $troop_type, $buff_name, $expected, $actual
+          "%s %s debuff: expected %d, got %d (specific=%d, all=%d)",
+          $troop_type, $buff_name, $expected, $actual, $specific_value, $all_value
         );
         $passed = 0;
       }
