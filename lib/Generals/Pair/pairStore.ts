@@ -345,8 +345,8 @@ export class PairStore {
       if (DEBUG) {
         console.error('EventSource error:', event);
       }
-      //es.close();
-      //this.endRun(runId);
+      es.close();
+      this.endRun(runId);
     };
 
     es.onmessage = (event) => {
@@ -378,14 +378,32 @@ export class PairStore {
     });
 
     es.addEventListener('complete', () => {
+      if (DEBUG) {
+        console.log('Complete event received, flushing buffer and closing');
+      }
+
       // Flush any remaining buffered rows before closing
       if (this.flushTimer) {
         clearTimeout(this.flushTimer);
       }
       this.flushBuffer(runId);
 
-      es.close();
-      this.endRun(runId);
+      // CRITICAL: Delay closing the connection to let any in-flight pair events
+      // be processed by the browser's EventSource. Without this delay, the last
+      // batch of events may not be delivered before the connection closes.
+      window.setTimeout(() => {
+        // Final flush in case any stragglers arrived during the delay
+        if (this.flushTimer) {
+          clearTimeout(this.flushTimer);
+        }
+        this.flushBuffer(runId);
+
+        if (DEBUG) {
+          console.log('Closing EventSource after delay');
+        }
+        es.close();
+        this.endRun(runId);
+      }, 250); // 250ms should be plenty for browser to process buffered events
     });
 
     if (DEBUG) {
