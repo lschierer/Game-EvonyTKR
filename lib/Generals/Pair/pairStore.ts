@@ -321,8 +321,8 @@ export class PairStore {
       if (DEBUG) {
         console.error('EventSource error:', event);
       }
-      es.close();
-      this.endRun(runId);
+      //es.close();
+      //this.endRun(runId);
     };
 
     es.onmessage = (event) => {
