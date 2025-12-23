@@ -4,6 +4,7 @@ use utf8;
 use Mojo::Base -base, -signatures;
 use Mojo::Base 'Game::EvonyTKR::Role::Logging', -role;
 use Mojo::Base 'Game::EvonyTKR::Role::Common', -role;
+use Mojo::Base 'Game::EvonyTKR::Role::Constants::Books', -role;
 use PDL;
 use PDL::NiceSlice;
 use YAML::XS qw(LoadFile);
@@ -12,6 +13,7 @@ use Mojo::Util qw(dumper);
 use File::Basename qw(fileparse);
 use Unicode::Normalize qw(NFKD);
 use Encode;
+use List::Util qw(min);
 
 =head1 NAME
 
@@ -188,7 +190,8 @@ sub compile_general ($self, $general_name, $activation_type) {
 
   # Additional rows: Generic books (only from slot 1 - they're universal, not per-slot)
   # Generic books provide universal buffs that apply once, not per slot
-  my @generic_levels = qw(none level1 level2 level3 level4);
+  # Support up to level6 for pair computation (3 books per general = 6 total)
+  my @generic_levels = qw(none level1 level2 level3 level4 level5 level6);
 
   for my $level (@generic_levels) {
     my $generic_row = $self->_compile_generic_book_buffs($level, $activation_type, $troop_type);
@@ -415,55 +418,59 @@ sub _compile_generic_book_buffs ($self, $level, $activation_type, $troop_type) {
 
   return $row if $level eq 'none';
 
-  # Generic books provide buffs for the primary troop type
-  # Based on BestSkillBooks constants, typically:
-  # - March Size (universal)
-  # - Primary troop type Attack
-  # - Primary troop type Defense or HP
+  # Map level to book count: level4 = 3 books (single), level6 = 6 books (pair)
+  my %level_to_count = (
+    level1 => 1, level2 => 2, level3 => 3, level4 => 3,
+    level5 => 5, level6 => 6
+  );
+  my $book_count = $level_to_count{$level} || 3;
 
-  my %march_values = (level1 => 3, level2 => 6, level3 => 9, level4 => 12);
-  my %combat_values = (level1 => 10, level2 => 15, level3 => 20, level4 => 25);
+  # Get the best books for this troop type and activation from BestSkillBooks hash
+  my $key = $activation_type eq 'PvM' ? 'PvM' : 'default';
+  my $best_books = $self->BestSkillBooks->{$troop_type};
 
-  my $march_value = $march_values{$level} || 0;
-  my $combat_value = $combat_values{$level} || 0;
+  unless ($best_books) {
+    $self->log_warn("No BestSkillBooks defined for troop type: $troop_type");
+    return $row;
+  }
 
-  # March Size (universal - applies to all)
-  $row->set($BUFF_INDEX{march_size}, $march_value);
+  my $books_for_key = $best_books->{$key} || $best_books->{'default'};
+  unless ($books_for_key) {
+    $self->log_warn("No best books found for $troop_type/$key");
+    return $row;
+  }
 
-  # Combat stats - apply only to primary troop type when leading
-  my $applies = ($activation_type eq 'Attacking' || $activation_type eq 'PvM');
+  # Sort books by priority (lower number = higher priority)
+  my @sorted_book_names = sort { $books_for_key->{$a} <=> $books_for_key->{$b} }
+    keys %$books_for_key;
 
-  if ($applies) {
-    # Determine primary troop type and apply combat buffs
-    my ($attack_col, $defense_col, $hp_col);
+  # Take the top N books
+  my @top_books = @sorted_book_names[0 .. min($book_count - 1, $#sorted_book_names)];
 
-    if ($troop_type =~ /mounted/i) {
-      $attack_col = 'attack_mounted';
-      $defense_col = 'defense_mounted';
-      $hp_col = 'hp_mounted';
-    }
-    elsif ($troop_type =~ /ground/i) {
-      $attack_col = 'attack_ground';
-      $defense_col = 'defense_ground';
-      $hp_col = 'hp_ground';
-    }
-    elsif ($troop_type =~ /ranged/i) {
-      $attack_col = 'attack_ranged';
-      $defense_col = 'defense_ranged';
-      $hp_col = 'hp_ranged';
-    }
-    elsif ($troop_type =~ /siege/i) {
-      $attack_col = 'attack_siege';
-      $defense_col = 'defense_siege';
-      $hp_col = 'hp_siege';
+  # Load and sum buffs from these books
+  my $generic_dir = path($self->data_dir, 'generic books');
+
+  for my $book_name (@top_books) {
+    my $book_file = $self->_find_file_case_insensitive($generic_dir, $book_name);
+    unless ($book_file) {
+      $self->log_warn("Could not find generic book file: $book_name");
+      next;
     }
 
-    if ($attack_col) {
-      # Apply best 3 generic books for primary troop type:
-      # Attack, Defense, HP
-      $row->set($BUFF_INDEX{$attack_col}, $combat_value);
-      $row->set($BUFF_INDEX{$defense_col}, $combat_value);
-      $row->set($BUFF_INDEX{$hp_col}, $combat_value);
+    my $book_data = LoadFile($book_file->to_string);
+    next unless $book_data && $book_data->{buffs};
+
+    # Sum buffs from this book
+    for my $buff (@{$book_data->{buffs}}) {
+      next unless $self->_buff_applies($buff, $activation_type, $troop_type);
+
+      my $is_debuff = grep { $_ eq 'Enemy' } @{$buff->{conditions} || []};
+      my $column_key = $self->_get_buff_column_key($buff, $is_debuff);
+      next unless defined $column_key && exists $BUFF_INDEX{$column_key};
+
+      my $value = $buff->{value}{number} || 0;
+      my $current = $row->at($BUFF_INDEX{$column_key});
+      $row->set($BUFF_INDEX{$column_key}, $current + $value);
     }
   }
 

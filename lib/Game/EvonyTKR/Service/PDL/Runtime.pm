@@ -353,17 +353,28 @@ sub compute_pair_buffs ($self, %args) {
   my $primary_filters = $args{primary_filters} || {};
   my $secondary_filters = $args{secondary_filters} || {};
 
+  # CRITICAL: For pairs, we select 6 best generic books total (not 3 for each)
+  # Apply all 6 to primary, none to secondary, to avoid duplicate book selection
+  my $pair_primary_filters = { %$primary_filters };
+  my $pair_secondary_filters = { %$secondary_filters };
+
+  # Use 6 books for primary (best 6 for the pair)
+  $pair_primary_filters->{generic1} = 'level6';
+
+  # No generic books for secondary (they're already counted in primary's 6)
+  $pair_secondary_filters->{generic1} = 'none';
+
   # Compute buffs for each general
   my $primary_buffs = $self->compute_buffs(
     general => $primary,
     activation => $activation,
-    filters => $primary_filters,
+    filters => $pair_primary_filters,
   );
 
   my $secondary_buffs = $self->compute_buffs(
     general => $secondary,
     activation => $activation,
-    filters => $secondary_filters,
+    filters => $pair_secondary_filters,
   );
 
   # Add buff vectors (element-wise addition)

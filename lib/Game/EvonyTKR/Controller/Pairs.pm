@@ -596,14 +596,14 @@ package Game::EvonyTKR::Controller::Pairs {
     my $targetType = $typeMap->{$validated_params->{route_meta}->{generalType}} || 'mounted_specialist';
 
     # Process pairs in batches to avoid blocking
-    my $batch_size = 15;
+    my $batch_size = 50;  # Increased from 15 - client batching handles this now
     my $current_idx = 0;
     my $total_pairs = scalar(@sorted_pairs);
     my $complete_sent = 0;  # Flag to track if we've sent the complete event
 
     ### START OF LOOP ###
     my $recurring_id;
-    my $loopDelay = 0.02;
+    my $loopDelay = 0.01;  # Back to fast - callback ensures reliable delivery
     my $process_batch = sub {
       my $loop = shift;
 
@@ -613,18 +613,9 @@ package Game::EvonyTKR::Controller::Pairs {
       # Compute next batch of pairs using PDL
       my $batch_end = List::Util::min($current_idx + $batch_size, $total_pairs);
 
-      # Use smaller batch for last few to reduce buffering issues
-      my $is_last_batch = ($batch_end >= $total_pairs);
-      if ($is_last_batch && ($total_pairs - $current_idx) > 5) {
-        # If this is the last batch and it's > 5 pairs, split it
-        $batch_end = $current_idx + 5;
-        $is_last_batch = 0;  # Not actually the last, we'll do another iteration
-      }
-
       $c->log_debug(sprintf(
-        'Computing pairs %d-%d of %d%s',
-        $current_idx + 1, $batch_end, $total_pairs,
-        $is_last_batch ? ' (FINAL BATCH)' : ''
+        'Computing pairs %d-%d of %d',
+        $current_idx + 1, $batch_end, $total_pairs
       ));
 
       for my $i ($current_idx .. $batch_end - 1) {
@@ -724,10 +715,8 @@ package Game::EvonyTKR::Controller::Pairs {
       if ($current_idx >= $total_pairs && !$complete_sent) {
         $complete_sent = 1;  # Mark that we're sending complete
 
-        # CRITICAL: Give multiple event loop cycles for buffered writes to flush
-        # The timer delay alone isn't enough - we need to let the event loop
-        # process all queued writes before sending the complete event
-        my $flush_delay = 1;  # 500ms should ensure all writes are transmitted
+        # Small delay to ensure last batch is written before complete event
+        my $flush_delay = 0.1;  # 100ms is enough with callback pattern
 
         Mojo::IOLoop->timer($flush_delay => sub {
           $c->log_debug(sprintf(
@@ -735,12 +724,10 @@ package Game::EvonyTKR::Controller::Pairs {
             $total_pairs
           ));
           my $payload = $c->encode({ runId => $run_id });
-          $c->write_sse({ type => 'complete', text => $payload } => sub  { $c->finish });
+          # Use write_sse callback to ensure complete event is written before closing
+          $c->write_sse({ type => 'complete', text => $payload } => sub { $c->finish });
 
-          # DON'T remove the recurring_id here! Let it keep running.
-          # The connection will stay open until the client closes it,
-          # ensuring all buffered SSE writes are flushed.
-          $c->log_debug('Complete event sent and flushed, keeping connection open for client to close');
+          $c->log_debug('Complete event queued with finish callback');
         });
         # Stop processing more batches, but keep the connection alive
         return;
