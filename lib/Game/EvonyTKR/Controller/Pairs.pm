@@ -600,22 +600,11 @@ package Game::EvonyTKR::Controller::Pairs {
     my $current_idx = 0;
     my $total_pairs = scalar(@sorted_pairs);
 
+    ### START OF LOOP ###
     my $recurring_id;
     my $loopDelay = 0.02;
     my $process_batch = sub {
       my $loop = shift;
-
-      # Check if all pairs have been processed
-      if ($current_idx > $total_pairs) {
-        # this delay *must* be larger than the overall loop delay down below.
-        Mojo::IOLoop->timer(2 * $loopDelay => sub {
-          $c->log_debug('All pairs computed, sending complete event');
-          my $payload = $c->encode({ runId => $run_id });
-          $c->write_sse({ type => 'complete', text => $payload });
-        });
-        Mojo::IOLoop->remove($recurring_id);
-        return;
-      }
 
       # Compute next batch of pairs using PDL
       my $batch_end = List::Util::min($current_idx + $batch_size, $total_pairs);
@@ -714,6 +703,17 @@ package Game::EvonyTKR::Controller::Pairs {
       }
 
       $current_idx = $batch_end;
+      # Check if all pairs have been processed
+      if ($current_idx >= $total_pairs) {
+        # this delay *must* be larger than the overall loop delay down below.
+        Mojo::IOLoop->timer(2 * $loopDelay => sub {
+          $c->log_debug('All pairs computed, sending complete event');
+          my $payload = $c->encode({ runId => $run_id });
+          $c->write_sse({ type => 'complete', text => $payload });
+        });
+        Mojo::IOLoop->remove($recurring_id);
+        return;
+      }
     };
 
     # Execute immediately to start processing
