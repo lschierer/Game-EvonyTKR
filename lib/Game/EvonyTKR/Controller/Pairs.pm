@@ -599,12 +599,16 @@ package Game::EvonyTKR::Controller::Pairs {
     my $batch_size = 15;
     my $current_idx = 0;
     my $total_pairs = scalar(@sorted_pairs);
+    my $complete_sent = 0;  # Flag to track if we've sent the complete event
 
     ### START OF LOOP ###
     my $recurring_id;
     my $loopDelay = 0.02;
     my $process_batch = sub {
       my $loop = shift;
+
+      # If we've already completed, just keep connection alive (don't process more)
+      return if $complete_sent;
 
       # Compute next batch of pairs using PDL
       my $batch_end = List::Util::min($current_idx + $batch_size, $total_pairs);
@@ -704,14 +708,20 @@ package Game::EvonyTKR::Controller::Pairs {
 
       $current_idx = $batch_end;
       # Check if all pairs have been processed
-      if ($current_idx >= $total_pairs) {
+      if ($current_idx >= $total_pairs && !$complete_sent) {
+        $complete_sent = 1;  # Mark that we're sending complete
         # this delay *must* be larger than the overall loop delay down below.
         Mojo::IOLoop->timer(2 * $loopDelay => sub {
           $c->log_debug('All pairs computed, sending complete event');
           my $payload = $c->encode({ runId => $run_id });
           $c->write_sse({ type => 'complete', text => $payload });
+
+          # DON'T remove the recurring_id here! Let it keep running.
+          # The connection will stay open until the client closes it,
+          # ensuring all buffered SSE writes are flushed.
+          $c->log_debug('Complete event sent, keeping connection open for client to close');
         });
-        Mojo::IOLoop->remove($recurring_id);
+        # Stop processing more batches, but keep the connection alive
         return;
       }
     };
