@@ -596,18 +596,19 @@ package Game::EvonyTKR::Controller::Pairs {
     my $targetType = $typeMap->{$validated_params->{route_meta}->{generalType}} || 'mounted_specialist';
 
     # Process pairs in batches to avoid blocking
-    my $batch_size = 20;  # Process 20 pairs at a time
+    my $batch_size = 2;  # Process 20 pairs at a time
     my $current_idx = 0;
     my $total_pairs = scalar(@sorted_pairs);
 
     my $recurring_id;
+    my $loopDelay = 0.2;
     my $process_batch = sub {
       my $loop = shift;
 
       # Check if all pairs have been processed
       if ($current_idx > $total_pairs) {
         # this delay *must* be larger than the overall loop delay down below.
-        Mojo::IOLoop->timer(0.05 => sub {
+        Mojo::IOLoop->timer(2 * $loopDelay => sub {
           $c->log_debug('All pairs computed, sending complete event');
           my $payload = $c->encode({ runId => $run_id });
           $c->write_sse({ type => 'complete', text => $payload });
@@ -719,7 +720,7 @@ package Game::EvonyTKR::Controller::Pairs {
     $process_batch->();
 
     # Then set up recurring timer to process remaining batches
-    $recurring_id = Mojo::IOLoop->recurring(0.01 => $process_batch);
+    $recurring_id = Mojo::IOLoop->recurring($loopDelay => $process_batch);
 
     $c->on(
       finish => sub {
