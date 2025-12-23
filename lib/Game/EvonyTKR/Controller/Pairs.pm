@@ -727,7 +727,7 @@ package Game::EvonyTKR::Controller::Pairs {
         # CRITICAL: Give multiple event loop cycles for buffered writes to flush
         # The timer delay alone isn't enough - we need to let the event loop
         # process all queued writes before sending the complete event
-        my $flush_delay = 0.5;  # 500ms should ensure all writes are transmitted
+        my $flush_delay = 1;  # 500ms should ensure all writes are transmitted
 
         Mojo::IOLoop->timer($flush_delay => sub {
           $c->log_debug(sprintf(
@@ -735,12 +735,12 @@ package Game::EvonyTKR::Controller::Pairs {
             $total_pairs
           ));
           my $payload = $c->encode({ runId => $run_id });
-          $c->write_sse({ type => 'complete', text => $payload });
+          $c->write_sse({ type => 'complete', text => $payload } => sub  { $c->finish });
 
           # DON'T remove the recurring_id here! Let it keep running.
           # The connection will stay open until the client closes it,
           # ensuring all buffered SSE writes are flushed.
-          $c->log_debug('Complete event sent, keeping connection open for client to close');
+          $c->log_debug('Complete event sent and flushed, keeping connection open for client to close');
         });
         # Stop processing more batches, but keep the connection alive
         return;
