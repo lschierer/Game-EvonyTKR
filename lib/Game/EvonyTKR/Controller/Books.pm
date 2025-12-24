@@ -274,8 +274,8 @@ package Game::EvonyTKR::Controller::Books {
     $self->log_debug("show detects name $name, showing details.");
 
     my $book;
-    if ($name =~ /^(.+?)\s+Level\s+([1-4])$/i) {
-      my ($base_name, $level) = ($1, $2);
+    if ($name =~ /^Level\s+([1-4])\s+(.+?)$/i) {
+      my ($base_name, $level) = ($2, $1);
       $book = $self->get_builtin_book($name)
         || $self->get_generic_book($base_name, $level);
     }
