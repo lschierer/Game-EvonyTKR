@@ -14,6 +14,17 @@
         <pair-filter is_primary form_title="<%= $PrimaryFormTitle %>">
           <pair-filter form_title="<%= $SecondaryFormTitle %>">
             <pair-picker>
+              <div class="note">
+                <div class="title">
+                  <p class="spectrum-Body spectrum-Body--serif spectrum-Body--sizeM">
+                    Note:
+                  </p>
+                </div>
+                <p class="spectrum-Body spectrum-Body--serif spectrum-Body--sizeM">
+                  Please be aware that this table does not properly account for generals that have conflicts with generic skill books.
+                  It will over estimate the buffs for pairs in such cases, by the value of the conflicting skill book.
+                </p>
+              </div>
               <pair-table>
                 <pair-data></pair-data>
               </pair-table>

@@ -13,7 +13,7 @@ use Mojo::Util qw(dumper);
 use File::Basename qw(fileparse);
 use Unicode::Normalize qw(NFKD);
 use Encode;
-use List::Util qw(min);
+# Note: Not importing min from List::Util to avoid conflict with PDL::min
 
 =head1 NAME
 
@@ -430,13 +430,13 @@ sub _compile_generic_book_buffs ($self, $level, $activation_type, $troop_type) {
   my $best_books = $self->BestSkillBooks->{$troop_type};
 
   unless ($best_books) {
-    $self->log_warn("No BestSkillBooks defined for troop type: $troop_type");
+    $self->log->warn("No BestSkillBooks defined for troop type: $troop_type");
     return $row;
   }
 
   my $books_for_key = $best_books->{$key} || $best_books->{'default'};
   unless ($books_for_key) {
-    $self->log_warn("No best books found for $troop_type/$key");
+    $self->log->warn("No best books found for $troop_type/$key");
     return $row;
   }
 
@@ -445,7 +445,8 @@ sub _compile_generic_book_buffs ($self, $level, $activation_type, $troop_type) {
     keys %$books_for_key;
 
   # Take the top N books
-  my @top_books = @sorted_book_names[0 .. min($book_count - 1, $#sorted_book_names)];
+  my $last_idx = $book_count - 1 < $#sorted_book_names ? $book_count - 1 : $#sorted_book_names;
+  my @top_books = @sorted_book_names[0 .. $last_idx];
 
   # Load and sum buffs from these books
   my $generic_dir = path($self->data_dir, 'generic books');
@@ -453,20 +454,27 @@ sub _compile_generic_book_buffs ($self, $level, $activation_type, $troop_type) {
   for my $book_name (@top_books) {
     my $book_file = $self->_find_file_case_insensitive($generic_dir, $book_name);
     unless ($book_file) {
-      $self->log_warn("Could not find generic book file: $book_name");
+      $self->log->warn("Could not find generic book file: $book_name");
       next;
     }
 
     my $book_data = LoadFile($book_file->to_string);
-    next unless $book_data && $book_data->{buffs};
+    unless ($book_data && $book_data->{buffs}) {
+      $self->log->warn("Book $book_name has no buffs data");
+      next;
+    }
 
     # Sum buffs from this book
     for my $buff (@{$book_data->{buffs}}) {
-      next unless $self->_buff_applies($buff, $activation_type, $troop_type);
+      unless ($self->_buff_applies($buff, $activation_type, $troop_type)) {
+        next;
+      }
 
       my $is_debuff = grep { $_ eq 'Enemy' } @{$buff->{conditions} || []};
       my $column_key = $self->_get_buff_column_key($buff, $is_debuff);
-      next unless defined $column_key && exists $BUFF_INDEX{$column_key};
+      unless (defined $column_key && exists $BUFF_INDEX{$column_key}) {
+        next;
+      }
 
       my $value = $buff->{value}{number} || 0;
       my $current = $row->at($BUFF_INDEX{$column_key});
@@ -511,7 +519,7 @@ sub _buff_applies ($self, $buff, $activation_type, $troop_type) {
   # Special case: if activation is 'Attacking', also check for 'leading' condition
   if ($activation_type eq 'Attacking') {
     for my $condition (@non_debuff_conditions) {
-      return 1 if lc($condition) eq 'leading';
+      return 1 if lc($condition) =~ /leading/;
     }
   }
 
