@@ -371,19 +371,21 @@ export class PairFilter extends LitElement {
 
   protected render(): TemplateResult {
     return html`
-      <div class="settings-form">
-        <h3 class="spectrum-Heading spectrum-Heading--sizeS">
-          ${this.form_title}
-        </h3>
-        <form
-          id="settings-form"
-          class="spectrum-Form spectrum-Form--labelsAbove spectrum-Form--sizeM"
-        >
-          ${this.renderAscendingCombo()} ${this.renderCovenantCombo()}
-          ${this.renderSpecialtyCombos()}
-        </form>
+      <div class="filter-container">
+        <div class="settings-form">
+          <h3 class="spectrum-Heading spectrum-Heading--sizeS">
+            ${this.form_title}
+          </h3>
+          <form
+            id="settings-form"
+            class="spectrum-Form spectrum-Form--labelsAbove spectrum-Form--sizeM"
+          >
+            ${this.renderAscendingCombo()} ${this.renderCovenantCombo()}
+            ${this.renderSpecialtyCombos()}
+          </form>
+        </div>
+        <slot></slot>
       </div>
-      <slot></slot>
     `;
   }
 }
