@@ -232,6 +232,43 @@ runcmd:
 
     EOF
   - systemctl enable mojolicious
-  - mkdir -p var/log/Perl/dist/Game-EvonyTKR/
+  - mkdir -p /opt/mojo/var/log/Perl/dist/Game-EvonyTKR/
+  - mkdir -p /home/luke/var/log/Perl/dist/Game-EvonyTKR/
   - chown -R mojo:mojo /opt/mojo/var
+  - chown -R luke:luke /home/luke/var
   - find /opt/mojo/var -type d -exec chmod g+rx {} \;
+  - |
+    cat > /etc/logrotate.d/evonytkr << 'EOF'
+    # Logrotate configuration for Game-EvonyTKR application logs
+    # Uses copytruncate to avoid issues with processes holding open file handles
+
+    /opt/mojo/var/log/Perl/dist/Game-EvonyTKR/*.log {
+        daily
+        rotate 14
+        missingok
+        notifempty
+        copytruncate
+        compress
+        delaycompress
+        dateext
+        dateformat -%Y%m%d
+        create 0644 mojo mojo
+        sharedscripts
+    }
+
+    # System log file (if it exists in home directory)
+    /home/luke/var/log/Perl/dist/Game-EvonyTKR/*.log {
+        daily
+        rotate 7
+        missingok
+        notifempty
+        copytruncate
+        compress
+        delaycompress
+        dateext
+        dateformat -%Y%m%d
+        create 0644 luke luke
+        sharedscripts
+    }
+    EOF
+  - chmod 644 /etc/logrotate.d/evonytkr
