@@ -4,10 +4,13 @@ use utf8::all;
 
 use File::FindLib 'lib';
 use Mojo::Base -base,                               -signatures;
-use Mojo::Base 'Game::EvonyTKR::Role::JSON',        -role;
-use Mojo::Base 'Game::EvonyTKR::Role::Common',      -role;
-use Mojo::Base 'Game::EvonyTKR::Role::Logging',     -role;
-use Mojo::Base 'Game::EvonyTKR::Role::Persistence', -role;
+use Mojo::Base 'Game::EvonyTKR::Role::JSON',                   -role;
+use Mojo::Base 'Game::EvonyTKR::Role::Common',                 -role;
+use Mojo::Base 'Game::EvonyTKR::Role::Logging',                -role;
+use Mojo::Base 'Game::EvonyTKR::Role::Persistence',            -role;
+use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants', -role;
+use Mojo::Base 'Game::EvonyTKR::Role::Constants::Books',       -role;
+use Mojo::Base 'Game::EvonyTKR::Role::Books',                  -role;
 use overload
   '""'       => \&as_string,
   '.'        => \&concat,

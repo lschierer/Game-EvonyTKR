@@ -114,6 +114,12 @@ for my $i (0 .. $#BUFF_COLUMNS) {
 has 'data_dir' => sub { 'share/collections/data' };
 has 'log' => sub { Game::EvonyTKR::Role::Logging::get_logger(__PACKAGE__); };
 
+# Cache helper to access General objects
+has 'cache_helper' => sub {
+  require Game::EvonyTKR::Model::Base;
+  return Game::EvonyTKR::Model::Base->new();
+};
+
 =head2 compile_general
 
   my $compiled = $compiler->compile_general($general_name, $activation_type);
@@ -136,6 +142,9 @@ Returns hashref:
 
 sub compile_general ($self, $general_name, $activation_type) {
   $self->log->debug("Compiling $general_name for $activation_type");
+
+  # Try to get General object from cache
+  my $general_obj = eval { $self->cache_helper->get_general($general_name) };
 
   # Load all data for this general
   my $general_data = $self->_load_general($general_name);
@@ -194,7 +203,7 @@ sub compile_general ($self, $general_name, $activation_type) {
   my @generic_levels = qw(none level1 level2 level3 level4 level5 level6);
 
   for my $level (@generic_levels) {
-    my $generic_row = $self->_compile_generic_book_buffs($level, $activation_type, $troop_type);
+    my $generic_row = $self->_compile_generic_book_buffs($level, $activation_type, $general_obj);
     push @rows, $generic_row;
     push @row_labels, "generic_$level";
   }
@@ -413,73 +422,74 @@ sub _compile_specialty_buffs ($self, $spec_data, $level, $activation_type, $troo
   return $row;
 }
 
-sub _compile_generic_book_buffs ($self, $level, $activation_type, $troop_type) {
+sub _compile_generic_book_buffs ($self, $level, $activation_type, $general) {
   my $row = zeros(scalar @BUFF_COLUMNS);
 
   return $row if $level eq 'none';
 
-  # Map level to book count: level4 = 3 books (single), level6 = 6 books (pair)
-  my %level_to_count = (
-    level1 => 1, level2 => 2, level3 => 3, level4 => 3,
-    level5 => 5, level6 => 6
-  );
-  my $book_count = $level_to_count{$level} || 3;
-
-  # Get the best books for this troop type and activation from BestSkillBooks hash
-  my $key = $activation_type eq 'PvM' ? 'PvM' : 'default';
-  my $best_books = $self->BestSkillBooks->{$troop_type};
-
-  unless ($best_books) {
-    $self->log->warn("No BestSkillBooks defined for troop type: $troop_type");
+  # Look up pre-computed values from the general's genericBookBuffs cache
+  unless ($general && $general->can('genericBookBuffs')) {
+    $self->log->warn(sprintf(
+      "_compile_generic_book_buffs: General object missing or no genericBookBuffs method (level=%s, activation=%s)",
+      $level, $activation_type
+    ));
     return $row;
   }
 
-  my $books_for_key = $best_books->{$key} || $best_books->{'default'};
-  unless ($books_for_key) {
-    $self->log->warn("No best books found for $troop_type/$key");
+  my $general_name = $general->can('name') ? $general->name : 'unknown';
+  $self->log->debug(sprintf(
+    "_compile_generic_book_buffs: Looking up %s/%s for %s",
+    $activation_type, $level, $general_name
+  ));
+
+  my $generic_buffs = $general->genericBookBuffs;
+  unless ($generic_buffs && ref($generic_buffs) eq 'HASH') {
+    $self->log->warn(sprintf(
+      "No generic book buffs found for general %s",
+      $general_name
+    ));
     return $row;
   }
 
-  # Sort books by priority (lower number = higher priority)
-  my @sorted_book_names = sort { $books_for_key->{$a} <=> $books_for_key->{$b} }
-    keys %$books_for_key;
+  $self->log->debug(sprintf(
+    "genericBookBuffs has activations: %s",
+    join(', ', keys %$generic_buffs)
+  ));
 
-  # Take the top N books
-  my $last_idx = $book_count - 1 < $#sorted_book_names ? $book_count - 1 : $#sorted_book_names;
-  my @top_books = @sorted_book_names[0 .. $last_idx];
+  # Get the buffs for this activation and level
+  my $activation_buffs = $generic_buffs->{$activation_type};
+  unless ($activation_buffs && ref($activation_buffs) eq 'HASH') {
+    $self->log->debug(sprintf(
+      "No generic book buffs for %s/%s",
+      $activation_type, $level
+    ));
+    return $row;
+  }
 
-  # Load and sum buffs from these books
-  my $generic_dir = path($self->data_dir, 'generic books');
+  $self->log->debug(sprintf(
+    "%s has levels: %s",
+    $activation_type, join(', ', keys %$activation_buffs)
+  ));
 
-  for my $book_name (@top_books) {
-    my $book_file = $self->_find_file_case_insensitive($generic_dir, $book_name);
-    unless ($book_file) {
-      $self->log->warn("Could not find generic book file: $book_name");
-      next;
-    }
+  my $level_buffs = $activation_buffs->{$level};
+  unless ($level_buffs && ref($level_buffs) eq 'HASH') {
+    $self->log->debug(sprintf(
+      "No generic book buffs for %s/%s (available: %s)",
+      $activation_type, $level, join(', ', keys %$activation_buffs)
+    ));
+    return $row;
+  }
 
-    my $book_data = LoadFile($book_file->to_string);
-    unless ($book_data && $book_data->{buffs}) {
-      $self->log->warn("Book $book_name has no buffs data");
-      next;
-    }
+  $self->log->debug(sprintf(
+    "%s/%s has buffs: %s",
+    $activation_type, $level, join(', ', map { "$_=$level_buffs->{$_}" } keys %$level_buffs)
+  ));
 
-    # Sum buffs from this book
-    for my $buff (@{$book_data->{buffs}}) {
-      unless ($self->_buff_applies($buff, $activation_type, $troop_type)) {
-        next;
-      }
-
-      my $is_debuff = grep { $_ eq 'Enemy' } @{$buff->{conditions} || []};
-      my $column_key = $self->_get_buff_column_key($buff, $is_debuff);
-      unless (defined $column_key && exists $BUFF_INDEX{$column_key}) {
-        next;
-      }
-
-      my $value = $buff->{value}{number} || 0;
-      my $current = $row->at($BUFF_INDEX{$column_key});
-      $row->set($BUFF_INDEX{$column_key}, $current + $value);
-    }
+  # Convert hash to PDL row
+  foreach my $buff_key (keys %$level_buffs) {
+    next unless exists $BUFF_INDEX{$buff_key};
+    my $value = $level_buffs->{$buff_key} || 0;
+    $row->set($BUFF_INDEX{$buff_key}, $value);
   }
 
   return $row;

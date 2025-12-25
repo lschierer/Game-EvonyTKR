@@ -11,6 +11,7 @@ has 'service';    # parent service for constants
 # Returns: 0 = compatible, 1 = partial conflict, 2 = full conflict
 sub conflicts ($self, $general, $generic_book, $opts = {}) {
   my $same_side = $opts->{same_side} // 0;
+  my $delta_threshold = $opts->{delta_threshold} // 25;  # 25 for general-general, 15 for general-book
 
   my $builtin = $general->builtInBook;
 
@@ -37,7 +38,7 @@ sub conflicts ($self, $general, $generic_book, $opts = {}) {
         my $gen_val = $gen_buff->value->number // 0;
         my $delta   = $bi_val - $gen_val;
 
-        if ($delta >= 25) {
+        if ($delta >= $delta_threshold) {
           $stack_troop_types{$bi_type} = 1;
           last;
         }
@@ -136,8 +137,13 @@ sub conflicts ($self, $general, $generic_book, $opts = {}) {
         ));
       }
 
+      # special case
+      if($general->name eq 'Washington Prime' && $gen_buff eq 'March Size'){
+        return 0;
+      }
+
       my $conflict =
-        $self->_buff_conflict($gen_buff, $bi_buff, \%grouped_buffs);
+        $self->_buff_conflict($gen_buff, $bi_buff, \%grouped_buffs, $delta_threshold);
       $worst = $conflict if $conflict > $worst;
       return 2           if $worst == 2;        # short-circuit on full conflict
     }
@@ -149,7 +155,7 @@ sub conflicts ($self, $general, $generic_book, $opts = {}) {
   return $worst;
 }
 
-sub _buff_conflict ($self, $generic_buff, $builtin_buff, $grouped_buffs = {}) {
+sub _buff_conflict ($self, $generic_buff, $builtin_buff, $grouped_buffs = {}, $delta_threshold = 25) {
   # Must match: attribute, troop type, conditions
   return 0 unless $generic_buff->attribute eq $builtin_buff->attribute;
 
@@ -189,13 +195,14 @@ sub _buff_conflict ($self, $generic_buff, $builtin_buff, $grouped_buffs = {}) {
     ));
   }
 
-# Empirically: grouped buffs with 25+ percentage point delta stack
+# Empirically: grouped buffs with sufficient delta stack
 # Example: Champlain 50% Siege Attack (grouped) vs L4 25% = 25pt delta = stack
 # But: Aethelflaed 55% Mounted vs Monster (grouped) vs L4 45% = 10pt delta = conflict
+# Note: threshold is 25 for general-general, 15 for general-book
   my $bi_addr = refaddr($builtin_buff);
   if (exists $grouped_buffs->{$bi_addr} && $bi_val >= $gen_val) {
     my $delta = $bi_val - $gen_val;
-    return 0 if $delta >= 25;
+    return 0 if $delta >= $delta_threshold;
   }
 
   # Full conflict: builtin >= generic

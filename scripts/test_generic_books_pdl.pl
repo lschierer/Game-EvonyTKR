@@ -18,6 +18,35 @@ my $runtime = Game::EvonyTKR::Service::PDL::Runtime->new(
   data_dir => 'share/collections/data'
 );
 
+# Manually populate generic books for testing (since cache may not have been reloaded)
+say "Manually populating generic books for Marco Polo and Washington Prime...";
+if ($compiler->cache_helper) {
+  for my $gen_name ('Marco Polo', 'Washington Prime') {
+    my $gen = eval { $compiler->cache_helper->get_general($gen_name) };
+    if ($gen && $gen->can('populateGenericBooks')) {
+      say "Populating generic books for $gen_name...";
+      $gen->populateGenericBooks();
+
+      # Debug: Show what was populated
+      my $gbuffs = $gen->genericBookBuffs;
+      if ($gbuffs && ref($gbuffs) eq 'HASH') {
+        say "  Activations populated: " . join(', ', keys %$gbuffs);
+        if (exists $gbuffs->{Attacking}) {
+          say "  Attacking levels: " . join(', ', keys %{$gbuffs->{Attacking}});
+          if (exists $gbuffs->{Attacking}{level3}) {
+            my $l3 = $gbuffs->{Attacking}{level3};
+            say "  level3 buffs: " . join(', ', map { "$_=$l3->{$_}" } keys %$l3);
+          }
+        }
+      } else {
+        say "  WARNING: genericBookBuffs is empty or not a hash!";
+      }
+    } else {
+      say "Warning: Could not populate generic books for $gen_name";
+    }
+  }
+}
+
 # Test: Marco Polo + Washington Prime (mounted specialists, no conflicts)
 # Expected values from built-in books + 6 best generic books:
 # - March: 27%
