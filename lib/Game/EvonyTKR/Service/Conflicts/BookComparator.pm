@@ -138,7 +138,7 @@ sub conflicts ($self, $general, $generic_book, $opts = {}) {
       }
 
       # special case
-      if($general->name eq 'Washington Prime' && $gen_buff eq 'March Size'){
+      if($general->name eq 'Washington Prime' && $gen_buff->attribute eq 'March Size'){
         return 0;
       }
 
