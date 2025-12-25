@@ -137,13 +137,18 @@ sub conflicts ($self, $general, $generic_book, $opts = {}) {
         ));
       }
 
+      my $conflict;
       # special case
       if($general->name eq 'Washington Prime' && $gen_buff->attribute eq 'March Size'){
-        return 0;
+        $conflict = 1;
+      } elsif($general->name =~ /Naomasa/i && $gen_buff->attribute eq 'HP'){
+        $conflict = 1;
+      }
+      else {
+        $conflict =
+          $self->_buff_conflict($gen_buff, $bi_buff, \%grouped_buffs, $delta_threshold);
       }
 
-      my $conflict =
-        $self->_buff_conflict($gen_buff, $bi_buff, \%grouped_buffs, $delta_threshold);
       $worst = $conflict if $conflict > $worst;
       return 2           if $worst == 2;        # short-circuit on full conflict
     }
