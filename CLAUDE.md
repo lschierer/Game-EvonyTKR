@@ -16,8 +16,9 @@ This is an information resource for players of **Evony: The King's Return (Evony
 
 **Backend:**
 - Perl 5.42+ with Mojolicious web framework
-- Minion job queue (SQLite backend) for async processing
-- Memcached for IPC and caching (no long-term SQLite usage)
+- Minion job queue (Postgres backend) for async processing
+- Postgres for persistence
+- Perl Data Language for massive performance gains
 
 **Frontend:**
 - **Keep TypeScript MINIMAL** - performance degrades rapidly with large TS bundles
@@ -30,7 +31,7 @@ This is an information resource for players of **Evony: The King's Return (Evony
 
 **Data:**
 - YAML files for static game data (generals, books, covenants, etc.)
-- No long-term database storage (SQLite only for Minion internals)
+- Database content a mix of cached YAML data and content derived by combining information across multiple YAML files to generate new content.
 
 ## Common Commands
 
@@ -94,7 +95,7 @@ Parallel Minion Jobs:
 ├── Build Pairs (all valid general combinations)
 └── Reduce/Summarize (batch process with conflict detection)
     ↓
-Memcached Cache (precomputed data)
+Postgres Cache (precomputed data)
     ↓
 Controllers → Models → Templates/TypeScript → HTTP Response
 ```
@@ -115,7 +116,7 @@ Controllers → Models → Templates/TypeScript → HTTP Response
 - **Role/** - Shared Moose roles and constants
   - **Common.pm** - normalize(), logging utilities
   - **Constants/** - BuffConstants, GeneralConstants, etc.
-- **Service/Cache.pm** - Memcached wrapper
+- **Service/** - Postgres perstence, PDL computation service, custom log4perl adapter, other subsystems called by both Controllers and Minion Jobs.  
 - **Converter/** - Tools to convert external data to YAML
 
 **Frontend (lib/):**
@@ -184,7 +185,7 @@ Most computation should happen in Perl on the server.
 
 ### Caching Strategy
 
-1. **Memcached** - Primary cache for IPC and hot data
+1. **Postgres** - Primary cache for IPC and hot data
 2. **Model-level memoization** - Function-level caching
 3. **HTTP caching headers** - For static resources
 
