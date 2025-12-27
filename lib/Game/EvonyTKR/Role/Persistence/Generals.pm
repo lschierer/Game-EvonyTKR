@@ -23,7 +23,7 @@ sub add_general ($self, $general) {
     $general->to_wire_hash());
 }
 
-sub get_general ($self, $name) {
+sub get_general ($self, $name, $opts = {}) {
   require Game::EvonyTKR::Model::Factory;
 
   state $generals = {};
@@ -35,7 +35,10 @@ sub get_general ($self, $name) {
   my $normalized_name = lc($self->normalize($name)) // '';
   return unless (length($normalized_name));
 
-  if (exists $generals->{$normalized_name}) {
+  # Only use cache if using default options (full population)
+  my $use_cache = !%$opts;
+
+  if ($use_cache && exists $generals->{$normalized_name}) {
     $self->log_debug("Returning general $name from state cache");
     return $generals->{$normalized_name};
   }
@@ -49,7 +52,7 @@ sub get_general ($self, $name) {
   }
 
   my $general =
-    Game::EvonyTKR::Model::Factory->build_from_wire('General', $wire_data);
+    Game::EvonyTKR::Model::Factory->build_from_wire('General', $wire_data, $opts);
 
   unless (defined($general)) {
     $self->log_error("Factory failed to build general from wire_data");
@@ -57,7 +60,12 @@ sub get_general ($self, $name) {
   }
 
   $self->log_debug("Successfully built general: " . $general->name);
-  $generals->{$normalized_name} = $general;
+
+  # Only cache if using default options
+  if ($use_cache) {
+    $generals->{$normalized_name} = $general;
+  }
+
   return $general;
 }
 

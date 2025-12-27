@@ -80,7 +80,7 @@ package Game::EvonyTKR::Model::General::Pair {
     return $h;
   }
 
-  sub from_wire_hash ($class, $h) {
+  sub from_wire_hash ($class, $h, %opts) {
     my $logger = Game::EvonyTKR::Role::Logging::get_logger(__PACKAGE__);
 
     my $primary_name =
@@ -105,7 +105,9 @@ package Game::EvonyTKR::Model::General::Pair {
         return;
       };
     }
-    my $primary = $general_helper->get_general($primary_name);
+
+    # Pass options down to get_general (e.g., populateGenericBooks => 0)
+    my $primary = $general_helper->get_general($primary_name, \%opts);
     unless ($primary) {
       $logger->error(
         sprintf('cannot retrieve general for %s when creating a pair.',
@@ -113,7 +115,7 @@ package Game::EvonyTKR::Model::General::Pair {
       );
       return;
     }
-    my $secondary = $general_helper->get_general($secondary_name);
+    my $secondary = $general_helper->get_general($secondary_name, \%opts);
     unless ($secondary) {
       $logger->error(
         sprintf('cannot retrieve general for %s when creating a pair.',
