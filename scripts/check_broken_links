@@ -6,17 +6,18 @@ use File::FindLib 'lib';
 use Getopt::Long;
 use Carp;
 
-require LinkChecker::Command;
-
-my $startUrl =
-  'http://localhost:3000';    # default to assuming a local Mojolicious instance
+my $startUrl = 'http://localhost:3000';
 my $debug = 0;
-my $help  = 0;
+my $help = 0;
+my $distributed = 0;
+my $workers = 4;
 
 GetOptions(
   'url=s' => \$startUrl,
   'debug' => \$debug,
-  'help'  => \$help,
+  'help' => \$help,
+  'distributed' => \$distributed,
+  'workers=i' => \$workers,
 ) or die "Error in command line arguments\n";
 
 if ($help) {
@@ -24,17 +25,31 @@ if ($help) {
 Usage: $0 [options]
 
 Options:
-  --url=StartUrl  Url to start checking at
-  --debug         enable debugging
-  --help          Display this help message
+  --url=StartUrl    Url to start checking at
+  --debug           Enable debugging
+  --distributed     Use distributed workers (faster)
+  --workers=N       Number of workers for distributed mode (default: 4)
+  --help            Display this help message
 
 HELP
   exit 0;
 }
 
-my $checker = LinkChecker::Command->new(
-  debug    => $debug,
-  startUrl => $startUrl,
-);
-$checker->init();
-$checker->execute();
+if ($distributed) {
+  require LinkChecker::DistributedCommand;
+  my $checker = LinkChecker::DistributedCommand->new(
+    start_url => $startUrl,
+    debug => $debug,
+    worker_count => $workers,
+  );
+  $checker->init();
+  $checker->execute();
+} else {
+  require LinkChecker::Command;
+  my $checker = LinkChecker::Command->new(
+    debug => $debug,
+    startUrl => $startUrl,
+  );
+  $checker->init();
+  $checker->execute();
+}
