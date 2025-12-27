@@ -123,8 +123,18 @@ runcmd:
       server_name           ${H}.evonytkrtips.net REPLACE2.evonytkrtips.net www.REPLACE2.evonytkrtips.net;
       return                301 https://$host$request_uri;
     }
-    limit_req_zone \$binary_remote_addr zone=anti_hammer:10m rate=5r/s;
-    limit_req_zone \$binary_remote_addr zone=generals_heavy:10m rate=1r/s;
+    # Rate limit zones - apply based on whether request is from trusted source
+    map \$http_user_agent \$limit_key {
+      default                           \$binary_remote_addr;
+      ~*LinkChecker                     "";                      # Your link checker bypasses limits
+      ~*Googlebot                       "";                      # Google gets a pass
+      ~*bingbot                         "";                      # Bing gets a pass
+    }
+
+    limit_req_zone \$limit_key zone=anti_hammer:10m rate=10r/s;        # Raised from 5r/s
+    limit_req_zone \$limit_key zone=generals_heavy:10m rate=3r/s;      # Raised from 1r/s
+    limit_req_zone \$binary_remote_addr zone=security_scan:10m rate=1r/m;  # New: block scanners
+
     server {
       listen 443 ssl;
       server_name           ${H}.evonytkrtips.net REPLACE2.evonytkrtips.net www.REPLACE2.evonytkrtips.net;
@@ -133,11 +143,25 @@ runcmd:
       ssl_protocols         TLSv1 TLSv1.1 TLSv1.2 TLSv1.3;
       ssl_ciphers           HIGH:!aNULL:!MD5;
       ssl_session_timeout   15m;
+      # Block OpenAI crawlers
       if (\$http_referer ~* (openai\.com)) {
         return 444;
       }
+
+      # Block common security scanning patterns
+      location ~* /(\.env|\.git|wp-admin|phpMyAdmin|admin|\.php\$|\.asp\$) {
+        limit_req zone=security_scan burst=1 nodelay;
+        limit_req_status 444;  # Close connection without response
+        return 404;
+      }
+
+      # Block requests with suspicious query strings (SQL injection, XSS attempts)
+      if (\$args ~* (union.*select|concat.*\(|base64_|javascript:|<script)) {
+        return 444;
+      }
+
       location /Generals {
-        limit_req zone=generals_heavy burst=2 nodelay;
+        limit_req zone=generals_heavy burst=5 nodelay;  # Raised from 2
         limit_req_status 429;
         proxy_pass http://localhost:3000;
         proxy_http_version 1.1;
@@ -147,8 +171,9 @@ runcmd:
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto \$scheme;
       }
+
       location / {
-        limit_req zone=anti_hammer burst=5 nodelay;
+        limit_req zone=anti_hammer burst=10 nodelay;  # Raised from 5
         limit_req_status 429;
         proxy_pass http://localhost:3000;
         proxy_http_version 1.1;

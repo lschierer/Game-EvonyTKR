@@ -462,6 +462,12 @@ sub get_pairs_by_type ($self, $type) {
 }
 
 sub store_pair ($self, $key, $data) {
+  # Validate that data is a hash ref (wire_pair format)
+  unless (ref($data) eq 'HASH') {
+    warn sprintf("[PostgreSQL] Refusing to store invalid pair data for %s: expected HASH, got %s\n",
+      $key, ref($data) || 'scalar');
+    return 0;
+  }
   $self->store_data('pairs_individual', $key, $data);
 }
 sub get_pair ($self, $key) { $self->get_data('pairs_individual', $key) }
@@ -498,6 +504,14 @@ sub list_pairs_by_type ($self, $type) {
         $row->{name}, $@);
       next;
     }
+
+    # Skip invalid data (must be a hash ref, not array ref or other types)
+    unless (ref($wire_pair) eq 'HASH') {
+      warn sprintf("[PostgreSQL] Invalid pair data for %s: expected HASH, got %s\n",
+        $row->{name}, ref($wire_pair) || 'scalar');
+      next;
+    }
+
     push @type_pairs, $wire_pair;
   }
 

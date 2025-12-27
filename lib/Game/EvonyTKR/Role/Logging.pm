@@ -198,6 +198,7 @@ BEGIN {
     'Game::EvonyTKR::Model'                               => 'WARN',
     'Game::EvonyTKR::Plugins::Navigation'                 => 'WARN',
     'Game::EvonyTKR::Role::Persistence::Core'             => 'WARN',
+    'Game::EvonyTKR::Role::Persistence::Pairs'            => 'DEBUG',
     'Game::EvonyTKR::Role::Persistence'                   => 'WARN',
     'Game::EvonyTKR::Role'                                => 'WARN',
     'Game::EvonyTKR::Service::DynamoDBPersistence'        => 'WARN',

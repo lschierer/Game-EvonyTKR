@@ -226,7 +226,7 @@ sub _check_url ($self, $url) {
 }
 
 sub _extract_links ($self, $url) {
-  my $http = HTTP::Tiny->new(timeout => 30);
+  my $http = HTTP::Tiny->new(timeout => 30, agent => 'LinkChecker-Distributed/1.0');
   my $response = $http->get($url);
   return [] unless $response->{success} && $response->{content};
 

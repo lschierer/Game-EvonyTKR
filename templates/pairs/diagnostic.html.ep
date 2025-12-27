@@ -23,7 +23,7 @@
     </tr>
   </thead>
   <tbody>
-    % for my $pair (sort @$pairs) {
+    % for my $pair (@$pairs) {
     <tr>
       <td><%== $pair->primary->name %></td>
       <td><%== $pair->secondary->name %></td>

@@ -150,40 +150,6 @@ package Game::EvonyTKR::Controller::Pairs {
     return 1;
   }
 
-  sub get_pairs_for_type ($c, $generalType) {
-    my $all_pairs = $c->get_pairs_by_type();
-
-    unless ($all_pairs && ref($all_pairs) eq 'HASH') {
-      $c->log_error('get_pairs_by_type returned invalid data');
-      return [];
-    }
-
-    my $pairs_for_type = $all_pairs->{$generalType};
-
-    unless (defined $pairs_for_type) {
-      $c->log_debug(sprintf(
-        'No pairs found for type "%s". Available types: %s',
-        $generalType, join(', ', sort keys %$all_pairs)
-      ));
-      return [];
-    }
-
-    unless (ref($pairs_for_type) eq 'ARRAY') {
-      $c->log_error(sprintf(
-        'Pairs for type "%s" is not an array: %s',
-        $generalType, ref($pairs_for_type)
-      ));
-      return [];
-    }
-
-    $c->log_debug(sprintf(
-      'Found %d pairs for type "%s"',
-      scalar(@$pairs_for_type), $generalType
-    ));
-
-    return $pairs_for_type;
-  }
-
   sub diagnostic_pairs_by_type ($c) {
     my $type = $c->param('type');
 
@@ -195,12 +161,8 @@ package Game::EvonyTKR::Controller::Pairs {
         status => 400
       );
     }
-    $c->log_debug('diagnostic_pairs_by_type calling get_pairs_for_type');
-    my $pairs_for_type = $c->get_pairs_for_type($type);
-    $c->log_debug(sprintf(
-      'diagnostic_pairs_by_type has %s pairs of type %s',
-      scalar(@{$pairs_for_type}), $type
-    ));
+    $c->log_debug('diagnostic_pairs_by_type calling get_pairs_for_type_batch');
+    my $pairs_for_type = $c->get_pairs_for_type_batch($type);
 
     $c->render(
       template   => 'pairs/diagnostic',
@@ -242,7 +204,16 @@ package Game::EvonyTKR::Controller::Pairs {
     my $buffActivation = $route_meta->{buffActivation};
     my $uiTarget       = $route_meta->{uiTarget};
 
-    my $pairs_for_type = $c->get_pairs_for_type($generalType);
+    my $type = $generalType;
+    unless (grep { $_ eq $type } $c->GeneralKeys()->@*) {
+      return $c->render(
+        text => "Invalid type: $type. Valid types: "
+          . join(', ', $c->GeneralKeys()->@*),
+        status => 400
+      );
+    }
+    $c->log_debug('diagnostic_pairs_by_type calling get_pairs_for_type_batch');
+    my $pairs_for_type = $c->get_pairs_for_type_batch($type);
     my $pair_count     = scalar(@$pairs_for_type);
 
     if ($pair_count == 0) {
@@ -367,7 +338,16 @@ package Game::EvonyTKR::Controller::Pairs {
     my $buffActivation = $route_meta->{buffActivation};
     my $uiTarget       = $route_meta->{uiTarget};
 
-    my $pairs_for_type = $c->get_pairs_for_type($generalType);
+    my $type = $generalType;
+    unless (grep { $_ eq $type } $c->GeneralKeys()->@*) {
+      return $c->render(
+        text => "Invalid type: $type. Valid types: "
+          . join(', ', $c->GeneralKeys()->@*),
+        status => 400
+      );
+    }
+    $c->log_debug('diagnostic_pairs_by_type calling get_pairs_for_type_batch');
+    my $pairs_for_type = $c->get_pairs_for_type_batch($type);
     my @pairs          = sort { $a cmp $b } @$pairs_for_type;
 
     $c->log_debug(sprintf('There are %s pairs to return.', scalar(@pairs)));
@@ -487,11 +467,20 @@ package Game::EvonyTKR::Controller::Pairs {
     }
 
     my $generalType    = $route_meta->{generalType};
+    my $type = $generalType;
     my $buffActivation = $route_meta->{buffActivation};
     my $uiTarget       = $route_meta->{uiTarget};
 
     # Get all pairs for this type
-    my $pairs_for_type = $c->get_pairs_for_type($generalType);
+    unless (grep { $_ eq $type } $c->GeneralKeys()->@*) {
+      return $c->render(
+        text => "Invalid type: $type. Valid types: "
+          . join(', ', $c->GeneralKeys()->@*),
+        status => 400
+      );
+    }
+    $c->log_debug('diagnostic_pairs_by_type calling get_pairs_for_type_batch');
+    my $pairs_for_type = $c->get_pairs_for_type_batch($type);
     my @all_pairs = @$pairs_for_type;
 
     # Filter to requested primaries if specified

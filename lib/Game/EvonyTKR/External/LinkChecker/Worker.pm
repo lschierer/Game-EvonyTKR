@@ -72,7 +72,7 @@ sub _check_single_url ($job, $url) {
 }
 
 sub _extract_links ($job, $url, $base_host) {
-  my $http = HTTP::Tiny->new(timeout => 30);
+  my $http = HTTP::Tiny->new(timeout => 30, agent => 'EvonyTKR-LinkChecker/2.0');
   my $response = $http->get($url);
   
   return [] unless $response->{success} && $response->{content};
