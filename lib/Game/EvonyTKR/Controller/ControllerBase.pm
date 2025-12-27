@@ -52,11 +52,11 @@ package Game::EvonyTKR::Controller::ControllerBase {
     $routes->get('/robots.txt')->to(cb => sub ($c) {
       my $host = $c->req->headers->host // '';
       my $is_dev = $host =~ /dev|localhost|127\.0\.0\.1/i;
-      
-      my $robots = $is_dev 
+
+      my $robots = $is_dev
         ? "User-agent: *\nDisallow: /\n"
         : "User-agent: *\nDisallow:\nSitemap: " . $c->req->url->base . "sitemap.xml\n";
-      
+
       $c->render(data => $robots, format => 'txt');
     });
 
@@ -96,51 +96,6 @@ package Game::EvonyTKR::Controller::ControllerBase {
           return 1;    # Rendered wait page, caller should return
         }
         return 0;      # Prerequisites met, caller should continue
-        }
-    );
-
-    # Helper to load pairs asynchronously and show wait page until ready
-    # Returns: (1, undef) if wait page rendered, (0, $pairs) if data ready
-    $app->helper(
-      load_pairs_async_or_wait =>
-        sub($self, $type, $opts = {}, $retry_delay = 2) {
-        # Use app defaults as per-worker cache for loaded pairs
-        my $cache_key = "pairs_batch_$type";
-        my $loading_key = "${cache_key}_loading";
-
-        # Check if already loaded
-        if ($app->defaults->{$cache_key} && @{$app->defaults->{$cache_key}}) {
-          $self->log_debug("Pairs for $type already loaded, returning cached data");
-          return (0, $app->defaults->{$cache_key});
-        }
-
-        # Start loading if not already in progress
-        unless ($app->defaults->{$loading_key}) {
-          $app->defaults->{$loading_key} = 1;
-          $self->log_info("Starting async load for pairs type: $type");
-
-          Mojo::IOLoop->timer(0.01 => sub {
-            eval {
-              my $loaded = $self->get_pairs_for_type_batch($type, $opts);
-              $app->defaults->{$cache_key} = $loaded;
-              $self->log_info(sprintf("Loaded %d pairs for type %s", scalar(@$loaded), $type));
-            };
-            if ($@) {
-              $self->log_error("Failed to load pairs for $type: $@");
-            }
-            delete $app->defaults->{$loading_key};
-          });
-        }
-
-        # Show wait page with auto-refresh
-        my $current_url = $self->req->url->to_abs;
-        $self->stash(
-          retry_url   => $current_url,
-          retry_delay => $retry_delay,
-          type        => $type,
-        );
-        $self->render(template => 'pairs_loading', status => 503);
-        return (1, undef);
         }
     );
 

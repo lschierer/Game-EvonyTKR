@@ -162,20 +162,50 @@ package Game::EvonyTKR::Controller::Pairs {
       );
     }
 
-    # Load pairs asynchronously - shows wait page until ready
-    my ($waiting, $pairs_for_type) = $c->load_pairs_async_or_wait(
-      $type,
-      { skip_generic_books => 1 }
-    );
-    return if $waiting;  # Wait page rendered, exit
+    # Use session-aware state key
+    my $session_id = $c->session('session_id') // $c->session(session_id => rand());
+    my $state_key = "${type}_${session_id}";
 
-    $c->render(
-      template   => 'pairs/diagnostic',
-      type       => $type,
-      pairs      => $pairs_for_type,
-      pair_count => scalar @$pairs_for_type,
-      all_types  => [$c->GeneralKeys()->@*],
+    state %promises;
+
+    # Check if we already have results
+    if ($promises{$state_key} && $promises{$state_key}{result}) {
+      my $pairs_for_type = $promises{$state_key}{result};
+      delete $promises{$state_key}; # Clean up
+      return $c->render(
+        template   => 'pairs/diagnostic',
+        type       => $type,
+        pairs      => $pairs_for_type,
+        pair_count => scalar @$pairs_for_type,
+        all_types  => [$c->GeneralKeys()->@*],
+      );
+    }
+
+    # Start promise if not already running
+    if (!$promises{$state_key}) {
+      $promises{$state_key} = { promise => undef, result => undef };
+
+      $promises{$state_key}{promise} = Mojo::Promise->new->resolve->then(sub {
+        my $pairs_for_type = $c->get_pairs_for_type_batch($type, { skip_generic_books => 1 });
+        $c->log_info(sprintf("Loaded %d pairs for type %s", scalar(@$pairs_for_type), $type));
+        $promises{$state_key}{result} = $pairs_for_type;
+        return $pairs_for_type;
+      })->catch(sub {
+        my $error = shift;
+        $c->log_error("Failed to load pairs for $type: $error");
+        delete $promises{$state_key}; # Clean up on error
+        die $error;
+      });
+    }
+
+    # Return loading page
+    my $current_url = $c->req->url->to_abs;
+    $c->stash(
+      retry_url   => $current_url,
+      retry_delay => 3,
+      type        => $type,
     );
+    $c->render(template => 'pairs_loading', status => 503);
   }
 
   sub pairTable ($c) {
@@ -352,23 +382,9 @@ package Game::EvonyTKR::Controller::Pairs {
       );
     }
 
-    # Load pairs asynchronously - shows wait page until ready
-    my ($waiting, $pairs_for_type) = $c->load_pairs_async_or_wait(
-      $type,
-      { skip_generic_books => 1 }
-    );
-    if ($waiting) {
-      # Return JSON for catalog endpoint instead of HTML wait page
-      return $c->render(
-        json => {
-          loading => 1,
-          message => 'Pairs are being loaded, please retry in 2 seconds',
-          sessionId => '',
-          selected => []
-        },
-        status => 503
-      );
-    }
+    $c->log_debug('pairCatalog calling get_pairs_for_type_batch');
+    # Skip generic books - catalog only needs names and conflicts (builtin books)
+    my $pairs_for_type = $c->get_pairs_for_type_batch($type, { skip_generic_books => 1 });
 
     my @pairs = sort { $a cmp $b } @$pairs_for_type;
     $c->log_debug(sprintf('There are %s pairs to return.', scalar(@pairs)));
