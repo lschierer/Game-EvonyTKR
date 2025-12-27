@@ -99,6 +99,51 @@ package Game::EvonyTKR::Controller::ControllerBase {
         }
     );
 
+    # Helper to load pairs asynchronously and show wait page until ready
+    # Returns: (1, undef) if wait page rendered, (0, $pairs) if data ready
+    $app->helper(
+      load_pairs_async_or_wait =>
+        sub($self, $type, $opts = {}, $retry_delay = 2) {
+        # Use app defaults as per-worker cache for loaded pairs
+        my $cache_key = "pairs_batch_$type";
+        my $loading_key = "${cache_key}_loading";
+
+        # Check if already loaded
+        if ($app->defaults->{$cache_key} && @{$app->defaults->{$cache_key}}) {
+          $self->log_debug("Pairs for $type already loaded, returning cached data");
+          return (0, $app->defaults->{$cache_key});
+        }
+
+        # Start loading if not already in progress
+        unless ($app->defaults->{$loading_key}) {
+          $app->defaults->{$loading_key} = 1;
+          $self->log_info("Starting async load for pairs type: $type");
+
+          Mojo::IOLoop->timer(0.01 => sub {
+            eval {
+              my $loaded = $self->get_pairs_for_type_batch($type, $opts);
+              $app->defaults->{$cache_key} = $loaded;
+              $self->log_info(sprintf("Loaded %d pairs for type %s", scalar(@$loaded), $type));
+            };
+            if ($@) {
+              $self->log_error("Failed to load pairs for $type: $@");
+            }
+            delete $app->defaults->{$loading_key};
+          });
+        }
+
+        # Show wait page with auto-refresh
+        my $current_url = $self->req->url->to_abs;
+        $self->stash(
+          retry_url   => $current_url,
+          retry_delay => $retry_delay,
+          type        => $type,
+        );
+        $self->render(template => 'pairs_loading', status => 503);
+        return (1, undef);
+        }
+    );
+
     $routes->get('/health')->to(
       cb => sub($self) {
         my $APP_START_TIME = $app->config->{'APP_START_TIME'};

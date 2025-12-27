@@ -161,9 +161,13 @@ package Game::EvonyTKR::Controller::Pairs {
         status => 400
       );
     }
-    $c->log_debug('diagnostic_pairs_by_type calling get_pairs_for_type_batch');
-    # Skip expensive generic books precomputation - diagnostic only shows names/types
-    my $pairs_for_type = $c->get_pairs_for_type_batch($type, { skip_generic_books => 1 });
+
+    # Load pairs asynchronously - shows wait page until ready
+    my ($waiting, $pairs_for_type) = $c->load_pairs_async_or_wait(
+      $type,
+      { skip_generic_books => 1 }
+    );
+    return if $waiting;  # Wait page rendered, exit
 
     $c->render(
       template   => 'pairs/diagnostic',
@@ -347,11 +351,26 @@ package Game::EvonyTKR::Controller::Pairs {
         status => 400
       );
     }
-    $c->log_debug('pairCatalog calling get_pairs_for_type_batch');
-    # Skip generic books - catalog only needs names and conflicts (builtin books)
-    my $pairs_for_type = $c->get_pairs_for_type_batch($type, { skip_generic_books => 1 });
-    my @pairs          = sort { $a cmp $b } @$pairs_for_type;
 
+    # Load pairs asynchronously - shows wait page until ready
+    my ($waiting, $pairs_for_type) = $c->load_pairs_async_or_wait(
+      $type,
+      { skip_generic_books => 1 }
+    );
+    if ($waiting) {
+      # Return JSON for catalog endpoint instead of HTML wait page
+      return $c->render(
+        json => {
+          loading => 1,
+          message => 'Pairs are being loaded, please retry in 2 seconds',
+          sessionId => '',
+          selected => []
+        },
+        status => 503
+      );
+    }
+
+    my @pairs = sort { $a cmp $b } @$pairs_for_type;
     $c->log_debug(sprintf('There are %s pairs to return.', scalar(@pairs)));
 
     # Safety check: if no pairs loaded yet, return error
