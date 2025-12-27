@@ -63,8 +63,12 @@ runcmd:
   - |
     cat > /etc/sysctl.d/local.conf << 'EOF'
     vm.swappiness=0
-    vm.overcommit_memory=0
+    vm.overcommit_memory=2
     vm.vfs_cache_pressure=90
+    # PostgreSQL tuning
+    kernel.shmmax=17179869184
+    kernel.shmall=4194304
+    fs.file-max=65536
     EOF
   - service procps force-reload
   - systemctl is-active sysstat
@@ -79,6 +83,25 @@ runcmd:
   - systemctl start amazon-ssm-agent
   # set up the mojo user and environment
   - sudo systemctl enable postgresql
+  # Configure PostgreSQL for higher concurrency before starting
+  - |
+    cat >> /etc/postgresql/16/main/postgresql.conf << 'EOF'
+
+    # Performance tuning for Mojolicious app with high concurrency
+    # Added by cloud-init user-data
+    max_connections = 200                   # Support 50 conn/worker × 4 workers
+    shared_buffers = 512MB                  # ~25% of 2GB RAM (adjust for instance size)
+    effective_cache_size = 1536MB           # ~75% of 2GB RAM
+    maintenance_work_mem = 128MB            # For VACUUM, CREATE INDEX
+    checkpoint_completion_target = 0.9      # Spread out checkpoint I/O
+    wal_buffers = 16MB                      # Write-ahead log buffers
+    default_statistics_target = 100         # Query planner statistics
+    random_page_cost = 1.1                  # SSD storage (EBS)
+    effective_io_concurrency = 200          # SSD concurrent I/O
+    work_mem = 4MB                          # Per-operation memory (200 conn × 4MB = 800MB max)
+    min_wal_size = 1GB
+    max_wal_size = 4GB
+    EOF
   - sudo systemctl start postgresql
   - sudo -u postgres createuser --createdb mojo
   - sudo -u postgres createdb -O mojo minion_db

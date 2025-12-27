@@ -24,8 +24,14 @@ has 'pg' => sub ($self) {
 
   my $pg = Mojo::Pg->new($dsn);
 
-  # Configure connection pool - important for Minion job concurrency
-  $pg->max_connections(10);  # Allow up to 10 concurrent connections
+  # Configure connection pool - important for Minion job concurrency and web traffic
+  # Set to 40 per worker: 4 workers × 40 = 160 connections (under PostgreSQL's 200 limit)
+  # Leaves 40 connections for Minion workers and admin tools
+  # PostgreSQL configured via user-data.yaml for max_connections=200
+  $pg->max_connections(40);
+
+  # Set inactivity timeout to 30 seconds - prevents stale connections from holding pool slots
+  $pg->options->{inactivity_timeout} = 30;
 
   # Test connection before proceeding
   eval {
