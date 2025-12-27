@@ -59,12 +59,12 @@ package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
     my $total_existing_pairs = 0;
 
     # Pre-load pairs from persistence to check what already exists
-    my $pairs_by_type = $job->get_pairs_by_type();
-    foreach my $type (sort keys $pairs_by_type->%*){
-      foreach my $pair ($pairs_by_type->{$type}->@*){
-        $pairs_in_persistence->{$type}->{lc($job->normalize($pair->primary->name))}++;
-        $total_existing_pairs++;
-      }
+    # Use get_all_pairs which efficiently loads all pairs via batch method
+    my $all_pairs = $job->get_all_pairs();
+    foreach my $pair (@$all_pairs) {
+      my $type = $pair->type;
+      $pairs_in_persistence->{$type}->{lc($job->normalize($pair->primary->name))}++;
+      $total_existing_pairs++;
     }
 
     $job->log_info(sprintf(
