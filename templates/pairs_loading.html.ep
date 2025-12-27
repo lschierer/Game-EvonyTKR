@@ -1,0 +1,72 @@
+% layout 'default';
+% title 'Loading Pairs - Please Wait';
+
+<div class="pairs-loading-container">
+  <h1>Loading General Pairs</h1>
+
+  <p>Loading pairs for <strong><%= $type %></strong>. This page will automatically refresh in <span id="countdown"><%= $retry_delay %></span> seconds.</p>
+
+  <div class="loading-spinner">
+    <div class="spinner"></div>
+  </div>
+
+  <p class="manual-refresh">
+    If the page doesn't automatically refresh, <a href="<%= $retry_url %>">click here</a>.
+  </p>
+</div>
+
+<style>
+  .pairs-loading-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 2rem;
+    text-align: center;
+  }
+
+  .loading-spinner {
+    margin: 2rem 0;
+  }
+
+  .spinner {
+    width: 50px;
+    height: 50px;
+    margin: 0 auto;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #2563eb;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  #countdown {
+    font-weight: bold;
+    color: #2563eb;
+  }
+
+  .manual-refresh {
+    margin-top: 2rem;
+    font-size: 0.9rem;
+    color: #666;
+  }
+</style>
+
+<script>
+  (function() {
+    var countdown = <%= $retry_delay %>;
+    var countdownEl = document.getElementById('countdown');
+
+    var interval = setInterval(function() {
+      countdown--;
+      countdownEl.textContent = countdown;
+
+      if (countdown <= 0) {
+        clearInterval(interval);
+        window.location.href = '<%= $retry_url %>';
+      }
+    }, 1000);
+  })();
+</script>
