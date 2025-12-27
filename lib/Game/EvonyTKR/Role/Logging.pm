@@ -206,6 +206,7 @@ BEGIN {
     'Game::EvonyTKR::Shared::Logger'                      => 'WARN',
     'Test::Package'                                       => 'TRACE',
     'Test'                                                => 'TRACE',
+    'LinkChecker'                                         => 'DEBUG',
   };
 
   if ($Game::EvonyTKR::Role::Logging::DEBUG_LOGGING) {

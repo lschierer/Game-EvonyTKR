@@ -86,6 +86,81 @@ package Game::EvonyTKR::Plugins::Navigation {
     );
 
     $app->helper(
+      generate_sitemap_xml => sub {
+        my $c = shift;
+        my $base_url = $c->req->url->base->to_string;
+        $base_url =~ s{/$}{};  # Remove trailing slash
+        
+        my @urls;
+        for my $path (sort keys %raw_paths) {
+          push @urls, {
+            loc => "$base_url$path",
+            lastmod => $c->_get_lastmod_for_path($path),
+            changefreq => $c->_get_changefreq_for_path($path),
+            priority => $c->_get_priority_for_path($path)
+          };
+        }
+        
+        return $c->_render_sitemap_xml(\@urls);
+      }
+    );
+
+    $app->helper(
+      _get_lastmod_for_path => sub {
+        my ($c, $path) = @_;
+        # Default to current date, controllers can override
+        return $c->_format_sitemap_date(time());
+      }
+    );
+
+    $app->helper(
+      _get_changefreq_for_path => sub {
+        my ($c, $path) = @_;
+        return 'weekly' if $path =~ m{^/(generals|books|specialties|covenants)};
+        return 'monthly';
+      }
+    );
+
+    $app->helper(
+      _get_priority_for_path => sub {
+        my ($c, $path) = @_;
+        return '1.0' if $path eq '/';
+        return '0.8' if $path =~ m{^/(generals|books|specialties|covenants)$};
+        return '0.6' if $path =~ m{^/(generals|books|specialties|covenants)/};
+        return '0.4';
+      }
+    );
+
+    $app->helper(
+      _format_sitemap_date => sub {
+        my ($c, $timestamp) = @_;
+        my ($sec,$min,$hour,$mday,$mon,$year) = gmtime($timestamp);
+        return sprintf('%04d-%02d-%02d', $year+1900, $mon+1, $mday);
+      }
+    );
+
+    $app->helper(
+      _render_sitemap_xml => sub {
+        my ($c, $urls) = @_;
+        
+        my $xml = qq{<?xml version="1.0" encoding="UTF-8"?>\n};
+        $xml .= qq{<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n};
+        
+        for my $url (@$urls) {
+          $xml .= qq{  <url>\n};
+          $xml .= qq{    <loc>$url->{loc}</loc>\n};
+          $xml .= qq{    <lastmod>$url->{lastmod}</lastmod>\n};
+          $xml .= qq{    <changefreq>$url->{changefreq}</changefreq>\n};
+          $xml .= qq{    <priority>$url->{priority}</priority>\n};
+          $xml .= qq{  </url>\n};
+        }
+        
+        $xml .= qq{</urlset>\n};
+        return $xml;
+      }
+    );
+
+    $app->helper(
       generate_navigation => sub {
         my $c         = shift;
         my $structure = {};

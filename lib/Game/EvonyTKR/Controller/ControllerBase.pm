@@ -42,6 +42,24 @@ package Game::EvonyTKR::Controller::ControllerBase {
 
     my $routes = $app->routes;
 
+    # Add sitemap route
+    $routes->get('/sitemap.xml')->to(cb => sub ($c) {
+      my $xml = $c->generate_sitemap_xml;
+      $c->render(data => $xml, format => 'xml');
+    });
+
+    # Add robots.txt route
+    $routes->get('/robots.txt')->to(cb => sub ($c) {
+      my $host = $c->req->headers->host // '';
+      my $is_dev = $host =~ /dev|localhost|127\.0\.0\.1/i;
+      
+      my $robots = $is_dev 
+        ? "User-agent: *\nDisallow: /\n"
+        : "User-agent: *\nDisallow:\nSitemap: " . $c->req->url->base . "sitemap.xml\n";
+      
+      $c->render(data => $robots, format => 'txt');
+    });
+
     $app->helper(
       outstanding_prereqs => sub($self, $prereqs) {
         if (ref($prereqs) && ref($prereqs) eq 'ARRAY') {
