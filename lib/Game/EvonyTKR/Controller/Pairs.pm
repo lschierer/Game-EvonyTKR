@@ -185,16 +185,26 @@ package Game::EvonyTKR::Controller::Pairs {
     if (!$promises{$state_key}) {
       $promises{$state_key} = { promise => undef, result => undef };
 
-      $promises{$state_key}{promise} = Mojo::Promise->new->resolve->then(sub {
-        my $pairs_for_type = $c->get_pairs_for_type_batch($type, { skip_generic_books => 1 });
-        $c->log_info(sprintf("Loaded %d pairs for type %s", scalar(@$pairs_for_type), $type));
+      my $promise = Mojo::Promise->new(sub ($resolve, $reject) {
+        # Use next_tick to defer execution
+        Mojo::IOLoop->next_tick(sub {
+          eval {
+            my $pairs_for_type = $c->get_pairs_for_type_batch($type, { skip_generic_books => 1 });
+            $c->log_info(sprintf("Loaded %d pairs for type %s", scalar(@$pairs_for_type), $type));
+            $resolve->($pairs_for_type);
+          };
+          if ($@) {
+            $c->log_error("Failed to load pairs for $type: $@");
+            $reject->($@);
+          }
+        });
+      });
+      
+      $promises{$state_key}{promise} = $promise->then(sub ($pairs_for_type) {
         $promises{$state_key}{result} = $pairs_for_type;
         return $pairs_for_type;
-      })->catch(sub {
-        my $error = shift;
-        $c->log_error("Failed to load pairs for $type: $error");
+      })->catch(sub ($error) {
         delete $promises{$state_key}; # Clean up on error
-        die $error;
       });
     }
 
