@@ -45,7 +45,7 @@ interface GeneralOption {
 }
 
 @customElement('level-settings')
-export class LevelSettings extends SignalWatcher(LitElement) {
+export class LevelSettings extends (SignalWatcher(LitElement) as new () => LitElement) {
   static styles: CSSResultGroup = [
     SpectrumTokensCSS,
     SpectrumButton,
