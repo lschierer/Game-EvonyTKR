@@ -3,20 +3,14 @@ git_meta:
   authors: Luke Stephen Schierer, Wags-SMITE
   copyright: 2023-2025
 hypnotoad:
-  accepts: 10000              # Connections per worker before accepting more
-  clients: 100                # Max concurrent connections per worker (was 10 - too low)
-  graceful_timeout: 60        # Graceful shutdown timeout in seconds
-  heartbeat_interval: 10      # Heartbeat check interval
-  heartbeat_timeout: 180      # Heartbeat timeout
-  inactivity_timeout: 120     # WebSocket/long-poll/SSE timeout (default: 30)
-  keep_alive_timeout: 30      # Keep-alive timeout - matches nginx keepalive
+  accepts: 10000
+  clients: 10
+  heartbeat_interval: 10
+  heartbeat_timeout: 180
   listen:
   - http://*:3000
-  pid_file: /opt/mojo/var/run/hypnotoad.pid
-  proxy: 1                    # Trust X-Forwarded-* headers from nginx
-  requests: 100               # Keep-alive requests per connection (default: 100)
-  upgrade_timeout: 180        # Timeout for zero-downtime restarts
-  workers: 4                  # Number of worker processes (was 2)
+  proxy: 1
+  workers: 2
 secrets:
 - e0deeacd35ce3e6c4b07a33ae421a4704636f001
 version:
