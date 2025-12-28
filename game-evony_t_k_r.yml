@@ -6,11 +6,13 @@ hypnotoad:
   accepts: 10000
   clients: 40
   heartbeat_interval: 10
-  heartbeat_timeout: 180
+  heartbeat_timeout: 240
+  keep_alive_timeout: 3600
   listen:
     - http://*:3000
   proxy: 1
   workers: 10
+  spare: 2
 secrets:
   - e0deeacd35ce3e6c4b07a33ae421a4704636f001
 version:

@@ -292,7 +292,7 @@ package Game::EvonyTKR {
     my $worker_count = $ENV{MINION_WORKERS}
       // ($app->mode eq 'development' ? 4 : 2);
     my $job_count = $ENV{MINION_JOB_COUNT}
-      // $app->mode eq 'development' ? 5 : 1;
+      // ($app->mode eq 'development' ? 5 : 1);
     return unless $start_workers;
 
     for (1 .. $worker_count) {
@@ -300,6 +300,8 @@ package Game::EvonyTKR {
       if ($pid) { $WORKER_PIDS{$pid} = 1; next }
 
       # --- child path ---
+      # Detach from parent session so Minion workers survive Hypnotoad worker restarts
+      setsid() or die "setsid failed: $!";
       $ENV{MINION_WORKER_CHILD} = 1;    # prevents recursion on load
       POSIX::nice(10);
       exec($^X, $0, 'minion', 'worker', '-j', $job_count,
