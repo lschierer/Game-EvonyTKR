@@ -50,34 +50,34 @@ package Game::EvonyTKR {
     _init_core($app);    # runs in web *and* worker
     _init_minion($app);
 
-    # Spawn Minion workers from the manager process (runs before worker fork)
-    # The manager is the only process with PPID=1 at this point
-    Mojo::IOLoop->next_tick(sub {
-      my $is_minion  = _this_is_a_minion_process();
-      my $is_manager = _this_is_hypnotoad_manager();
-      my $is_spawner = _i_am_the_one_spawner($app);
+    # Spawn Minion workers synchronously from the manager process (before worker fork)
+    # This must run BEFORE Hypnotoad forks workers, so we can't use next_tick/timers
+    my $is_minion  = _this_is_a_minion_process();
+    my $is_manager = _this_is_hypnotoad_manager();
+    my $is_spawner = _i_am_the_one_spawner($app);
 
-      $app->log->debug(sprintf(
-        'Minion spawn check in PID %s (PPID %s): is_manager=%s, is_spawner=%s, is_minion=%s',
-        $$, getppid(),
-        $is_manager ? 'YES' : 'NO',
-        $is_spawner ? 'YES' : 'NO',
-        $is_minion  ? 'YES' : 'NO'
-      ));
+    $app->log->debug(sprintf(
+      'Minion spawn check in PID %s (PPID %s): is_manager=%s, is_spawner=%s, is_minion=%s',
+      $$, getppid(),
+      $is_manager ? 'YES' : 'NO',
+      $is_spawner ? 'YES' : 'NO',
+      $is_minion  ? 'YES' : 'NO'
+    ));
 
-      return if $is_minion;         # Don't spawn from minion cmd
-      return unless $is_manager;    # Only manager spawns, not workers
-      return unless $is_spawner;    # Spawn once only (file lock)
-
+    if (!$is_minion && $is_manager && $is_spawner) {
       $app->log->info("SPAWNING MINION WORKERS from PID $$ (MANAGER)");
       _spawn_minion_workers($app);
-      $app->minion->enqueue(
-        external_prebuild => [{}] => {
-          priority => 100,
-          attempts => 3,
-        }
-      );
-    });
+
+      # Queue prebuild job after workers are spawned
+      Mojo::IOLoop->next_tick(sub {
+        $app->minion->enqueue(
+          external_prebuild => [{}] => {
+            priority => 100,
+            attempts => 3,
+          }
+        );
+      });
+    }
 
     # web-only: routes/UI initialization
     $app->hook(
