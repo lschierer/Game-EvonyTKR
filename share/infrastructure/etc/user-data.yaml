@@ -115,8 +115,11 @@ runcmd:
   - chown -R mojo:www-data /opt/mojo
   - |
     export H=$( grep 127.0.1.1 /etc/hosts | cut -d ' ' -f 3 | cut -d '.' -f 1); cat > /etc/nginx/sites-available/mojoproxy << EOF
-    upstream myapp {
-      server 127.0.1.1:3000;
+    upstream mojolicious {
+      server 127.0.1.1:3000  max_fails=0 ;
+      # Maintain pool of idle keepalive connections to reduce connection overhead
+      keepalive 32;
+      keepalive_timeout 30s;
     }
     server {
       listen                80;
@@ -160,11 +163,31 @@ runcmd:
         return 444;
       }
 
+      # Serve static files directly from nginx (much faster than proxying to Mojolicious)
+      # These are compiled assets in the shared data directory
+      location ~* ^/(css|js|images|assets|types)/ {
+        root /opt/mojo/app/share/public;
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+
+        # Enable gzip compression for text-based files
+        gzip on;
+        gzip_types text/css application/javascript application/json image/svg+xml;
+        gzip_vary on;
+      }
+
+      # Serve ads.txt directly
+      location = /ads.txt {
+        root /opt/mojo/app/share/public;
+        expires 1d;
+      }
+
       location /Generals {
         limit_req zone=generals_heavy burst=5 nodelay;  # Raised from 2
         limit_req_status 429;
         proxy_pass http://localhost:3000;
         proxy_http_version 1.1;
+        proxy_read_timeout 3600;
         proxy_set_header Upgrade \$http_upgrade;
         proxy_set_header Connection "upgrade";
         proxy_set_header Host \$host;
@@ -177,6 +200,7 @@ runcmd:
         limit_req_status 429;
         proxy_pass http://localhost:3000;
         proxy_http_version 1.1;
+        proxy_read_timeout 3600;
         proxy_set_header Upgrade \$http_upgrade;
         proxy_set_header Connection "upgrade";
         proxy_set_header Host \$host;
