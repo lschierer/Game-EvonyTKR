@@ -1,10 +1,7 @@
+
+package Game::EvonyTKR::Model::Book;
 use v5.42.0;
 use utf8::all;
-use File::FindLib 'lib';
-
-use namespace::autoclean;
-
-package Game::EvonyTKR::Model::Book {
   use Mojo::Base "Game::EvonyTKR::Model::Base";
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants',    -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants', -role;
@@ -15,6 +12,7 @@ package Game::EvonyTKR::Model::Book {
     '.'        => \&concat,
     'bool'     => \&_isTrue,
     'fallback' => 0;
+    require Game::EvonyTKR::Model::Buff;
 
   has ['name', 'text'] => '';
   has 'buffs'          => sub { [] };
@@ -296,6 +294,5 @@ package Game::EvonyTKR::Model::Book {
       && blessed($self)
       && $self->isa(__PACKAGE__);
   }
-}
 1;
 __END__
