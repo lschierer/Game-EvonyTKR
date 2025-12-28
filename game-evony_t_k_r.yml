@@ -4,15 +4,15 @@ git_meta:
   copyright: 2023-2025
 hypnotoad:
   accepts: 10000
-  clients: 10
+  clients: 40
   heartbeat_interval: 10
   heartbeat_timeout: 180
   listen:
-  - http://*:3000
+    - http://*:3000
   proxy: 1
-  workers: 2
+  workers: 10
 secrets:
-- e0deeacd35ce3e6c4b07a33ae421a4704636f001
+  - e0deeacd35ce3e6c4b07a33ae421a4704636f001
 version:
   build-time: 2025-12-28T03:42:00
   git-branch: streaming
