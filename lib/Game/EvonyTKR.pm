@@ -50,43 +50,45 @@ package Game::EvonyTKR {
     _init_core($app);    # runs in web *and* worker
     _init_minion($app);
 
-    # Spawn Minion workers synchronously from the initial Hypnotoad process (before it forks)
-    # This runs in the pre-fork process (PID 82243 in your case), which then becomes the manager
-    # The file lock in _i_am_the_one_spawner ensures only one process spawns, even if
-    # startup() is called multiple times (manager + workers)
-    my $should_spawn = _should_spawn_minion_workers();
-    my $is_spawner   = _i_am_the_one_spawner($app);
-
-    $app->log->debug(sprintf(
-      'Minion spawn check in PID %s (PPID %s): should_spawn=%s, is_spawner=%s',
-      $$, getppid(),
-      $should_spawn ? 'YES' : 'NO',
-      $is_spawner   ? 'YES' : 'NO'
-    ));
-
-    if ($should_spawn && $is_spawner) {
-      $app->log->info("SPAWNING MINION WORKERS from PID $$ (PPID $${\(getppid())})");
-      _spawn_minion_workers($app);
-
-      # Queue prebuild job in before_server_start hook when event loop is running
-      $app->hook(after_dispatch => sub {
-        state $enqueued = 0;
-        return if $enqueued++;
-        $app->minion->enqueue(
-          external_prebuild => [{}] => {
-            priority => 100,
-            attempts => 3,
-          }
-        );
-        $app->log->info("Enqueued external_prebuild job");
-      });
-    }
-
-    # web-only: routes/UI initialization
+    # web-only: routes/UI and Minion worker spawning
     $app->hook(
       before_server_start => sub ($server, $app) {
         # routes, UIs, helpers that need HTTP server
         _init_web($app);
+
+        # Spawn Minion workers from the manager process AFTER Hypnotoad has forked
+        # This hook runs in worker processes, so we need to detect the manager
+        Mojo::IOLoop->timer(
+          1 => sub {
+            my $should_spawn = _should_spawn_minion_workers();
+            my $is_spawner   = _i_am_the_one_spawner($app);
+            my $has_acceptors = eval { scalar @{ $server->acceptors } } // 0;
+
+            $app->log->debug(sprintf(
+              'Minion spawn check in PID %s (PPID %s): should_spawn=%s, is_spawner=%s, acceptors=%d',
+              $$, getppid(),
+              $should_spawn ? 'YES' : 'NO',
+              $is_spawner   ? 'YES' : 'NO',
+              $has_acceptors
+            ));
+
+            return unless $should_spawn;
+            return unless $is_spawner;
+            return unless $has_acceptors > 0;  # Only in web server processes
+
+            $app->log->info(sprintf("SPAWNING MINION WORKERS from PID %s (PPID %s)", $$, getppid()));
+            _spawn_minion_workers($app);
+
+            # Queue prebuild job after workers are spawned
+            $app->minion->enqueue(
+              external_prebuild => [{}] => {
+                priority => 100,
+                attempts => 3,
+              }
+            );
+            $app->log->info("Enqueued external_prebuild job");
+          }
+        );
       }
     );
 
