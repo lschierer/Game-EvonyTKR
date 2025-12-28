@@ -315,6 +315,7 @@ sub run ($job, @args) {
         $existing_count++;
       } else {
         $job->minion->job($j)->remove;
+        $job->minion->repair();
       }
     }
 
