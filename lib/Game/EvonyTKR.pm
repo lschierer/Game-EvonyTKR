@@ -50,44 +50,40 @@ package Game::EvonyTKR {
     _init_core($app);    # runs in web *and* worker
     _init_minion($app);
 
-    # web-only: routes/UI and optional worker spawning
+    # Spawn Minion workers from the manager process (runs before worker fork)
+    # The manager is the only process with PPID=1 at this point
+    Mojo::IOLoop->next_tick(sub {
+      my $is_minion  = _this_is_a_minion_process();
+      my $is_manager = _this_is_hypnotoad_manager();
+      my $is_spawner = _i_am_the_one_spawner($app);
+
+      $app->log->debug(sprintf(
+        'Minion spawn check in PID %s (PPID %s): is_manager=%s, is_spawner=%s, is_minion=%s',
+        $$, getppid(),
+        $is_manager ? 'YES' : 'NO',
+        $is_spawner ? 'YES' : 'NO',
+        $is_minion  ? 'YES' : 'NO'
+      ));
+
+      return if $is_minion;         # Don't spawn from minion cmd
+      return unless $is_manager;    # Only manager spawns, not workers
+      return unless $is_spawner;    # Spawn once only (file lock)
+
+      $app->log->info("SPAWNING MINION WORKERS from PID $$ (MANAGER)");
+      _spawn_minion_workers($app);
+      $app->minion->enqueue(
+        external_prebuild => [{}] => {
+          priority => 100,
+          attempts => 3,
+        }
+      );
+    });
+
+    # web-only: routes/UI initialization
     $app->hook(
       before_server_start => sub ($server, $app) {
-
         # routes, UIs, helpers that need HTTP server
         _init_web($app);
-        # optional: only if you want web proc to fork workers
-        Mojo::IOLoop->timer(
-          1 => sub {
-            my $is_web     = _this_proc_is_a_web_server($server);
-            my $is_manager = _this_is_hypnotoad_manager();
-            my $is_spawner = _i_am_the_one_spawner($app);
-            my $is_minion  = _this_is_a_minion_process();
-
-            $app->log->debug(sprintf(
-'Worker spawn check in PID %s (PPID %s): is_web=%s, is_manager=%s, is_spawner=%s, is_minion=%s',
-              $$, getppid(),
-              $is_web     ? 'YES' : 'NO',
-              $is_manager ? 'YES' : 'NO',
-              $is_spawner ? 'YES' : 'NO',
-              $is_minion  ? 'YES' : 'NO'
-            ));
-
-            return unless $is_web;        # has acceptors?
-            return unless $is_manager;    # CRITICAL: only manager spawns, not workers
-            return unless $is_spawner;    # spawn once only
-            return if $is_minion;         # don't spawn from minion cmd
-
-            $app->log->info("SPAWNING MINION WORKERS from PID $$ (MANAGER)");
-            _spawn_minion_workers($app);
-            $app->minion->enqueue(
-              external_prebuild => [{}] => {
-                priority => 100,
-                attempts => 3,
-              }
-            );
-          }
-        );
       }
     );
 
