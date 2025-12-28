@@ -68,14 +68,17 @@ package Game::EvonyTKR {
       $app->log->info("SPAWNING MINION WORKERS from PID $$ (PPID $${\(getppid())})");
       _spawn_minion_workers($app);
 
-      # Queue prebuild job after workers are spawned (needs event loop, so defer)
-      Mojo::IOLoop->next_tick(sub {
+      # Queue prebuild job in before_server_start hook when event loop is running
+      $app->hook(after_dispatch => sub {
+        state $enqueued = 0;
+        return if $enqueued++;
         $app->minion->enqueue(
           external_prebuild => [{}] => {
             priority => 100,
             attempts => 3,
           }
         );
+        $app->log->info("Enqueued external_prebuild job");
       });
     }
 
@@ -303,12 +306,19 @@ package Game::EvonyTKR {
       // ($app->mode eq 'development' ? 5 : 1);
     return unless $start_workers;
 
+    $app->log->info("Spawning $worker_count Minion workers with $job_count jobs each");
+
     for (1 .. $worker_count) {
       my $pid = fork // die "fork failed: $!";
-      if ($pid) { $WORKER_PIDS{$pid} = 1; next }
+      if ($pid) {
+        $WORKER_PIDS{$pid} = 1;
+        $app->log->debug("Forked Minion worker with PID $pid");
+        next;
+      }
 
       # --- child path ---
-      # Detach from parent session so Minion workers survive Hypnotoad worker restarts
+      # Detach from parent session so Minion workers survive Hypnotoad restarts
+      # After setsid(), this process is reparented to init (PID 1) and doesn't need explicit reaping
       setsid() or die "setsid failed: $!";
       $ENV{MINION_WORKER_CHILD} = 1;    # prevents recursion on load
       POSIX::nice(10);
@@ -319,14 +329,10 @@ package Game::EvonyTKR {
         or die "exec failed: $!";
     }
 
-    # Reap *our* children periodically (doesn't interfere with Mojo/Hypnotoad)
-    Mojo::IOLoop->recurring(
-      1 => sub {
-        while ((my $kid = waitpid(-1, POSIX::WNOHANG)) > 0) {
-          delete $WORKER_PIDS{$kid};
-        }
-      }
-    );
+    # Note: We don't set up recurring() reaper here because:
+    # 1. Event loop isn't running yet (called from startup() before Hypnotoad starts loop)
+    # 2. setsid() reparents children to init, so we don't need to reap them
+    # 3. END block handles cleanup on shutdown
   }
 
   # Optional: graceful stop on normal shutdown (no signal handlers needed)
