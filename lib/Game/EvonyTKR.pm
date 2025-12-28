@@ -60,22 +60,25 @@ package Game::EvonyTKR {
         Mojo::IOLoop->timer(
           1 => sub {
             my $is_web     = _this_proc_is_a_web_server($server);
+            my $is_manager = _this_is_hypnotoad_manager();
             my $is_spawner = _i_am_the_one_spawner($app);
             my $is_minion  = _this_is_a_minion_process();
 
             $app->log->debug(sprintf(
-'Worker spawn check in PID %s: is_web=%s, is_spawner=%s, is_minion=%s',
-              $$,
+'Worker spawn check in PID %s (PPID %s): is_web=%s, is_manager=%s, is_spawner=%s, is_minion=%s',
+              $$, getppid(),
               $is_web     ? 'YES' : 'NO',
+              $is_manager ? 'YES' : 'NO',
               $is_spawner ? 'YES' : 'NO',
               $is_minion  ? 'YES' : 'NO'
             ));
 
             return unless $is_web;        # has acceptors?
+            return unless $is_manager;    # CRITICAL: only manager spawns, not workers
             return unless $is_spawner;    # spawn once only
             return if $is_minion;         # don't spawn from minion cmd
 
-            $app->log->info("SPAWNING MINION WORKERS from PID $$");
+            $app->log->info("SPAWNING MINION WORKERS from PID $$ (MANAGER)");
             _spawn_minion_workers($app);
             $app->minion->enqueue(
               external_prebuild => [{}] => {
@@ -100,6 +103,13 @@ package Game::EvonyTKR {
       eval { $server->can('acceptors') ? scalar @{ $server->acceptors } : 0 }
       // 0;
     return $acceptors > 0;
+  }
+
+  sub _this_is_hypnotoad_manager () {
+    # Hypnotoad manager has PPID=1 (or low PID like init/systemd)
+    # Workers have PPID=manager_pid
+    my $ppid = getppid();
+    return $ppid == 1 || $ppid < 100;  # Manager is adopted by init, or very low PPID
   }
 
   sub _this_is_a_minion_process {
