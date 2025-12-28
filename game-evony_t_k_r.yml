@@ -14,7 +14,7 @@ hypnotoad:
   - http://*:3000
   pid_file: /opt/mojo/var/run/hypnotoad.pid
   proxy: 1                    # Trust X-Forwarded-* headers from nginx
-  requests: 0                 # CRITICAL: 0 = unlimited, prevents worker recycling causing connection resets
+  requests: 100               # Keep-alive requests per connection (default: 100)
   upgrade_timeout: 180        # Timeout for zero-downtime restarts
   workers: 4                  # Number of worker processes (was 2)
 secrets:
