@@ -50,25 +50,25 @@ package Game::EvonyTKR {
     _init_core($app);    # runs in web *and* worker
     _init_minion($app);
 
-    # Spawn Minion workers synchronously from the manager process (before worker fork)
-    # This must run BEFORE Hypnotoad forks workers, so we can't use next_tick/timers
-    my $is_minion  = _this_is_a_minion_process();
-    my $is_manager = _this_is_hypnotoad_manager();
-    my $is_spawner = _i_am_the_one_spawner($app);
+    # Spawn Minion workers synchronously from the initial Hypnotoad process (before it forks)
+    # This runs in the pre-fork process (PID 82243 in your case), which then becomes the manager
+    # The file lock in _i_am_the_one_spawner ensures only one process spawns, even if
+    # startup() is called multiple times (manager + workers)
+    my $should_spawn = _should_spawn_minion_workers();
+    my $is_spawner   = _i_am_the_one_spawner($app);
 
     $app->log->debug(sprintf(
-      'Minion spawn check in PID %s (PPID %s): is_manager=%s, is_spawner=%s, is_minion=%s',
+      'Minion spawn check in PID %s (PPID %s): should_spawn=%s, is_spawner=%s',
       $$, getppid(),
-      $is_manager ? 'YES' : 'NO',
-      $is_spawner ? 'YES' : 'NO',
-      $is_minion  ? 'YES' : 'NO'
+      $should_spawn ? 'YES' : 'NO',
+      $is_spawner   ? 'YES' : 'NO'
     ));
 
-    if (!$is_minion && $is_manager && $is_spawner) {
-      $app->log->info("SPAWNING MINION WORKERS from PID $$ (MANAGER)");
+    if ($should_spawn && $is_spawner) {
+      $app->log->info("SPAWNING MINION WORKERS from PID $$ (PPID $${\(getppid())})");
       _spawn_minion_workers($app);
 
-      # Queue prebuild job after workers are spawned
+      # Queue prebuild job after workers are spawned (needs event loop, so defer)
       Mojo::IOLoop->next_tick(sub {
         $app->minion->enqueue(
           external_prebuild => [{}] => {
@@ -101,11 +101,13 @@ package Game::EvonyTKR {
     return $acceptors > 0;
   }
 
-  sub _this_is_hypnotoad_manager () {
-    # Hypnotoad manager has PPID=1 (or low PID like init/systemd)
-    # Workers have PPID=manager_pid
-    my $ppid = getppid();
-    return $ppid == 1 || $ppid < 100;  # Manager is adopted by init, or very low PPID
+  sub _should_spawn_minion_workers () {
+    # Spawn from the initial Hypnotoad process (before it forks manager/workers)
+    # Don't rely on PPID - the wrapper script makes that unreliable
+    # Instead, rely on:
+    #   1. Not a Minion process (check env/args)
+    #   2. File lock ensures only one process spawns (even if startup() runs multiple times)
+    return !_this_is_a_minion_process();
   }
 
   sub _this_is_a_minion_process {
