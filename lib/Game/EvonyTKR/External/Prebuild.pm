@@ -302,14 +302,24 @@ sub run ($job, @args) {
   my $loaderJids = [];
   my $totalJobs  = 0;    # Count both launched and existing jobs
   foreach my $jobname (sort keys $loaderJobDefs->%*) {
-    # Simple check: if any active/inactive jobs exist for this task, skip it
-    my $existing = $job->minion->jobs({
+    # Check if any active/inactive jobs exist for this task WITH the current run_id
+    my $existing_jobs = $job->minion->jobs({
       tasks  => [$jobname],
       states => [qw(inactive active)]
-    })->total;
+    });
 
-    if ($existing > 0) {
-      $job->log_info("Skipping $jobname - $existing jobs already exist");
+    my $existing_count = 0;
+    while (my $j = $existing_jobs->next) {
+      my $notes = $j->{notes} // {};
+      if ($notes->{prebuild_run_id} && $notes->{prebuild_run_id} eq $run_id) {
+        $existing_count++;
+      } else {
+        $job->minion->job($j)->remove;
+      }
+    }
+
+    if ($existing_count > 0) {
+      $job->log_info("Skipping $jobname - $existing_count jobs with run_id $run_id already exist");
       $totalJobs++;    # Count existing jobs
       next;
     }
