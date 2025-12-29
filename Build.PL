@@ -64,7 +64,6 @@ my $builder = Module::Build->new(
     'Memoize'                             => '0',
     'Memoize::Memcached'                  => '0',
     'Minion::Backend::Pg'                 => '0',
-    'Minion::Backend::SQLite'             => '0',
     'Module::Find'                        => '0',
     'Module::Load'                        => '0',
     'Module::Runtime'                     => '0',
