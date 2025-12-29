@@ -116,10 +116,11 @@ runcmd:
   - |
     export H=$( grep 127.0.1.1 /etc/hosts | cut -d ' ' -f 3 | cut -d '.' -f 1); cat > /etc/nginx/sites-available/mojoproxy << EOF
     upstream mojolicious {
-      server 127.0.1.1:3000  max_fails=0 ;
+      server 127.0.1.1:3000  ;
       # Maintain pool of idle keepalive connections to reduce connection overhead
       keepalive 32;
-      keepalive_timeout 30s;
+      keepalive_requests: 10000;
+      keepalive_timeout 1h;
     }
     server {
       listen                80;

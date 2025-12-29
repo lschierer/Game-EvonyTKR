@@ -6,11 +6,15 @@ hypnotoad:
   accepts: 10000
   clients: 40
   heartbeat_interval: 10
-  heartbeat_timeout: 240
-  keep_alive_timeout: 3600
+  heartbeat_timeout: 300
+  inactivity_timeout: 3600
+  graceful_timeout: 30
   listen:
-    - http://*:3000
+    - http://127.0.1.1:3000
   proxy: 1
+  trusted_proxies:
+    - 127.0.1.1
+    - 127.0.0.1
   workers: 10
   spare: 2
 secrets:
