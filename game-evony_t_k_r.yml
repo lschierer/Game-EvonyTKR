@@ -5,21 +5,21 @@ git_meta:
 hypnotoad:
   accepts: 10000
   clients: 40
+  graceful_timeout: 30
   heartbeat_interval: 10
   heartbeat_timeout: 300
   inactivity_timeout: 3600
-  graceful_timeout: 30
   listen:
-    - http://127.0.1.1:3000
+  - http://127.0.1.1:3000
   proxy: 1
-  trusted_proxies:
-    - 127.0.1.1
-    - 127.0.0.1
-  workers: 10
   spare: 2
+  trusted_proxies:
+  - 127.0.1.1
+  - 127.0.0.1
+  workers: 10
 secrets:
-  - e0deeacd35ce3e6c4b07a33ae421a4704636f001
+- e0deeacd35ce3e6c4b07a33ae421a4704636f001
 version:
-  build-time: 2025-12-28T03:42:00
+  build-time: 2025-12-29T01:12:42
   git-branch: streaming
-  git-commit: c4f1bfed
+  git-commit: 4aab717f
