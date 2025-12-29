@@ -66,7 +66,6 @@ package Game::EvonyTKR::External::General::BuildIndexes {
       }
 
       my $key = lc($job->normalize($name));
-      $key =~ s/ /_/g;
 
       # general->type can be arrayref or scalar
       my @types =

@@ -41,16 +41,7 @@ package Game::EvonyTKR::Model::General::Pair {
     return $persistence_helper;
   }
 
-  sub to_key ($self) {
-    my $key = sprintf('%s/%s/%s',
-      $self->type,
-      $self->normalize($self->primary->name),
-      $self->normalize($self->secondary->name),
-    );
-    $key = lc($key);
-    $key =~ s/ /_/g;
-    return $key;
-  }
+
 
   sub to_hash ($self) {
     my $h = {

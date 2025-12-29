@@ -29,7 +29,6 @@ sub add_wire_pair ($self, $wire_pair) {
 
 sub get_pair ($self, $key) {
   $key = $self->normalize($key);
-  $key =~ s/ /_/g;
 
   # Load directly from SQLite
   my $wire_pair;
@@ -204,7 +203,6 @@ sub wire_pair_to_key($self, $wire_pair) {
     $self->normalize($wire_pair->{secondary}),
   );
   $key = lc($key);
-  $key =~ s/ /_/g;
   return $key;
 }
 

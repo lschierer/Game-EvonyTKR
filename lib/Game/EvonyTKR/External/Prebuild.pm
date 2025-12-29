@@ -219,6 +219,8 @@ sub run ($job, @args) {
   # Get loader job configurations
   my $loaderJobDefs =
     $job->_build_loader_job_defs($stored_version, $current_version);
+
+  $job->log_debug(sprintf('this prebuild includes jobs: %s', join(', ', keys %{ $loaderJobDefs }), ));
   # Check if data is current for this version
   my $data_current = 0;
   eval {

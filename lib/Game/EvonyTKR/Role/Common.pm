@@ -38,7 +38,6 @@ package Game::EvonyTKR::Role::Common {
 
     my $_norm = sub ($c, $name) {
       my $k = lc($c->normalize($name) // '');
-      $k =~ s/ /_/g;
       return $k;
     };
 
