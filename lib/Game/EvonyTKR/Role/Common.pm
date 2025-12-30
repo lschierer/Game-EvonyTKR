@@ -13,7 +13,7 @@ package Game::EvonyTKR::Role::Common {
   use UUID               qw(uuid5);
   use Unicode::CaseFold  qw(fc);
   use Unicode::Normalize qw(NFKD);
-  use List::AllUtils     qw(min uniq none all );
+  use List::AllUtils     qw(min max uniq none all );
 
   has 'collection_dir' => sub {
     my $home = Mojo::Home->new->detect('Game::EvonyTKR');
@@ -208,7 +208,7 @@ package Game::EvonyTKR::Role::Common {
         $self->note(outstanding_prereqs => \@outstanding);
 
         # Calculate retry delay based on number of outstanding prereqs
-        my $delay = min(2 * scalar(@outstanding), 30);
+        my $delay = max(min(5 * scalar(@outstanding), 30), $self->standard_delay);
         $self->log_debug(sprintf(
           'Retrying with delay %s due to outstanding prereqs: %s',
           $delay, join(', ', @outstanding)
