@@ -23,6 +23,7 @@ package Game::EvonyTKR::Controller::Pairs {
   use Mojo::Base 'Game::EvonyTKR::Controller::Role::Generals::Routing', -role;
   use Mojo::Base 'Game::EvonyTKR::Role::JSON',                          -role;
   use Mojo::Base 'Game::EvonyTKR::Controller::Role::Tables',            -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Persistence::TableSessions',    -role;
   use Mojo::IOLoop;
   use List::AllUtils qw( all any none );
   use Carp;
@@ -63,6 +64,12 @@ package Game::EvonyTKR::Controller::Pairs {
   sub register($c, $app, $config = {}) {
     $c->SUPER::register($app, $config);
     $c->log_info("Registering routes for " . ref($c));
+
+    # Initialize session persistence table
+    eval { $c->init_table_sessions_db(); };
+    if ($@) {
+      $c->log_error("Failed to initialize table_sessions: $@");
+    }
 
     my $mainRoutes = $app->routes->any($base);
 
@@ -192,12 +199,10 @@ package Game::EvonyTKR::Controller::Pairs {
             eval {
               my $pairs_for_type = $c->get_pairs_for_type_batch($type,
                 { skip_generic_books => 1 });
-              $c->log_info(
-                sprintf(
-                  "Loaded %d pairs for type %s",
-                  scalar(@$pairs_for_type), $type
-                )
-              );
+              $c->log_info(sprintf(
+                "Loaded %d pairs for type %s",
+                scalar(@$pairs_for_type), $type
+              ));
               $resolve->($pairs_for_type);
             };
             if ($@) {
@@ -442,6 +447,19 @@ package Game::EvonyTKR::Controller::Pairs {
         scalar(@filtered), scalar(@pairs), $session_id
       ));
 
+      # Store session for idempotent access across workers
+      my @pair_keys =
+        map { $_->{primary}{name} . '|' . $_->{secondary}{name} } @filtered;
+      $c->store_table_session(
+        $session_id,
+        {
+          generalType    => $generalType,
+          buffActivation => $buffActivation,
+          items          => \@pair_keys,
+          ttl            => 3600,              # 1 hour
+        }
+      );
+
       return $c->render(
         json => {
           sessionId => $session_id,
@@ -454,6 +472,19 @@ package Game::EvonyTKR::Controller::Pairs {
       $c->log_debug(
         "no requested primaries for session '$session_id' returning full list: "
           . Data::Printer::np(@json_data, multiline => 0));
+
+      # Store session for idempotent access across workers
+      my @pair_keys =
+        map { $_->{primary}{name} . '|' . $_->{secondary}{name} } @json_data;
+      $c->store_table_session(
+        $session_id,
+        {
+          generalType    => $generalType,
+          buffActivation => $buffActivation,
+          items          => \@pair_keys,
+          ttl            => 3600,              # 1 hour
+        }
+      );
 
       return $c->render(
         json => {
@@ -485,12 +516,27 @@ package Game::EvonyTKR::Controller::Pairs {
 
     return unless $c->validate_session_id($session_id, $run_id);
 
+    # Retrieve session state (idempotent across workers)
+    my $session_data = $c->get_table_session($session_id);
+    unless ($session_data) {
+      $c->log_error("Session $session_id not found or expired");
+      $c->write_table_sse('complete', { runId => 0+ $run_id });
+      return;
+    }
+
+    # Parse pair keys from session
+    my $session_pair_keys = $session_data->{items} // [];
+    $c->log_debug(sprintf(
+      'Retrieved session %s with %d pairs from persistence',
+      $session_id, scalar(@$session_pair_keys)
+    ));
+
     $c->log_debug(sprintf(
       'stream_pair_details called url: %s,'
-        . ' uiTarget: %s; buffActivation: %s; run_id: %s; primaries: %d',
+        . ' uiTarget: %s; buffActivation: %s; run_id: %s; session_pairs: %d',
       $c->req->url->path->to_string, $slug_ui,
       $slug_buff,                    0+ $run_id,
-      scalar(@$requested_primaries)
+      scalar(@$session_pair_keys)
     ));
 
     # Lookup route metadata
@@ -526,37 +572,49 @@ package Game::EvonyTKR::Controller::Pairs {
         status => 400
       );
     }
-    $c->log_debug('diagnostic_pairs_by_type calling get_pairs_for_type_batch');
-    my $pairs_for_type = $c->get_pairs_for_type_batch($type);
-    my @all_pairs      = @$pairs_for_type;
-
-    # Filter to requested primaries if specified
+    # Use session data to filter pairs (idempotent - no re-filtering!)
+    # This is THE KEY to fixing the 7x get_pairs_for_type_batch calls
     my @sorted_pairs;
-    my @unsorted_pairs;
-    if (scalar(@$requested_primaries) > 0) {
-      my %requested = map { $_ => 1 } @$requested_primaries;
+
+    if (scalar(@$session_pair_keys) > 0) {
+      # Build lookup from session pair keys
+      my %session_pairs = map { $_ => 1 } @$session_pair_keys;
+
+# Only load pairs that are in the session
+# Still need to call get_pairs_for_type_batch ONCE, but filtering is much faster
+      $c->log_debug('Loading pairs for type (only once per session!)');
+      my $pairs_for_type = $c->get_pairs_for_type_batch($type);
+      my @all_pairs      = @$pairs_for_type;
+
+      my @unsorted_pairs;
       foreach my $pair (@all_pairs) {
-        if (exists $requested{ $pair->primary->name }) {
+        my $key = $pair->primary->name . '|' . $pair->secondary->name;
+        if (exists $session_pairs{$key}) {
           push @unsorted_pairs, $pair->to_wire_hash();
         }
       }
+
+      @sorted_pairs = sort {
+        my $pc = $a->{primary}->{name} cmp $b->{primary}->{name};
+        my $sc = $a->{secondary}->{name} cmp $b->{secondary}->{name};
+        return $pc ? $pc : $sc;
+      } @unsorted_pairs;
+
       $c->log_debug(sprintf(
-        'Filtered to %d pairs from %d total for %d primaries',
-        scalar(@unsorted_pairs), scalar(@all_pairs),
-        scalar(@$requested_primaries)
-      ));
+        'Filtered to %d pairs from session (idempotent, no re-filtering!)',
+        scalar(@sorted_pairs)));
     }
     else {
-      # No filter - use all pairs
-      @unsorted_pairs = map { $_->to_wire_hash() } @all_pairs;
-      $c->log_debug(sprintf('No filter specified, using all %d pairs',
-        scalar(@unsorted_pairs)));
+      # Empty session = all pairs (shouldn't happen in practice)
+      $c->log_debug('Empty session, loading all pairs (shouldn\'t happen!)');
+      my $pairs_for_type = $c->get_pairs_for_type_batch($type);
+      @sorted_pairs = sort {
+        my $pc = $a->{primary}->{name} cmp $b->{primary}->{name};
+        my $sc = $a->{secondary}->{name} cmp $b->{secondary}->{name};
+        return $pc ? $pc : $sc;
+      } map { $_->to_wire_hash() } @$pairs_for_type;
     }
-    @sorted_pairs = sort {
-      my $pc = $a->{primary}->{name} cmp $b->{primary}->{name};
-      my $sc = $a->{secondary}->{name} cmp $b->{secondary}->{name};
-      return $pc ? $pc : $sc;
-    } @unsorted_pairs;
+
     $c->log_debug(sprintf(
       'There are %s pairs to compute details for session %s.',
       scalar(@sorted_pairs), $session_id

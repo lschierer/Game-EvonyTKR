@@ -12,6 +12,7 @@ use Mojo::Base 'Game::EvonyTKR::Role::Constants::AscendingAttributes', -role;
 use Mojo::Base 'Game::EvonyTKR::Role::Constants::Specialties',         -role;
 use Mojo::Base 'Game::EvonyTKR::Controller::Role::Generals::Routing',  -role;
 use Mojo::Base 'Game::EvonyTKR::Controller::Role::Tables',             -role;
+use Mojo::Base 'Game::EvonyTKR::Role::Persistence::TableSessions',     -role;
 require YAML::PP;
 require Mojo::Promise;
 require Mojo::Util;
@@ -61,7 +62,7 @@ my $base = '/Generals';
 
 my $reference_base = '/Reference/Generals';
 
-my $session_store = {};
+# Session storage now uses persistent SQLite via TableSessions role (not in-memory hash)
 
 my $max_concurrency = 15;
 
@@ -72,6 +73,12 @@ has getBase => sub ($self) {
 sub register($c, $app, $config = {}) {
   $c->log_info("Registering routes for " . ref($c));
   $c->SUPER::register($app, $config);
+
+  # Initialize session persistence table
+  eval { $c->init_table_sessions_db(); };
+  if ($@) {
+    $c->log_error("Failed to initialize table_sessions: $@");
+  }
 
   if ($app->mode eq 'development') {
     $c->routing_debug(1);
@@ -818,7 +825,17 @@ sub singleCatalog ($c) {
       }
     }
 
-    $session_store->{$session_id} = \@filtered;
+    # Store session for idempotent access across workers
+    my @general_names = map { $_->{primary} } @filtered;
+    $c->store_table_session(
+      $session_id,
+      {
+        generalType    => $generalType,
+        buffActivation => $buffActivation,
+        items          => \@general_names,
+        ttl            => 3600,              # 1 hour
+      }
+    );
 
     return $c->render(
       json => {
@@ -831,7 +848,18 @@ sub singleCatalog ($c) {
     $c->log_debug(
       "no requested primaries for session '$session_id' returning full list: "
         . Data::Printer::np(@names));
-    $session_store->{$session_id} = \@names;
+
+    # Store session for idempotent access across workers
+    my @general_names = map { $_->{primary} } @names;
+    $c->store_table_session(
+      $session_id,
+      {
+        generalType    => $generalType,
+        buffActivation => $buffActivation,
+        items          => \@general_names,
+        ttl            => 3600,              # 1 hour
+      }
+    );
 
     return $c->render(
       json => {
@@ -850,21 +878,28 @@ sub single_details_stream ($c) {
   my $run_id     = 0+ $c->param('runId');
   my $session_id = $c->param('sessionId');
   return unless $c->validate_session_id($session_id, $run_id);
-  my $selected =
-    exists $session_store->{$session_id} ? $session_store->{$session_id} : [];
 
+  # Retrieve session state (idempotent across workers)
+  my $session_data = $c->get_table_session($session_id);
+  unless ($session_data) {
+    $c->log_error("Session $session_id not found or expired");
+    $c->write_table_sse('complete', { runId => 0+ $run_id });
+    return;
+  }
+
+  # Get general names from session
+  my $session_general_names = $session_data->{items} // [];
   $c->log_debug(sprintf(
-    'single_details_stream called url: %s,'
-      . ' uiTarget: %s; buffActivation: %s; run_id: %s',
-    $c->req->url->path->to_string,
-    $slug_ui, $slug_buff, 0+ $run_id
+    'Retrieved session %s with %d generals from persistence',
+    $session_id, scalar(@$session_general_names)
   ));
 
   $c->log_debug(sprintf(
-    'session info: sessionId: "%s"; selected: %s',
-    $session_id // 'Not Present',
-    join ', ',
-    map { $_->{primary} } @$selected
+    'single_details_stream called url: %s,'
+      . ' uiTarget: %s; buffActivation: %s; run_id: %s; session_generals: %d',
+    $c->req->url->path->to_string, $slug_ui,
+    $slug_buff,                    0+ $run_id,
+    scalar(@$session_general_names)
   ));
 
   # Lookup route metadata
@@ -899,15 +934,15 @@ sub single_details_stream ($c) {
 
   my @generals;
 
-  if (@$selected) {
-    # Client provided a specific list - fetch just those generals
-    for my $entry (@$selected) {
-      my $name = $entry->{primary};
+  # Use session data (idempotent across workers)
+  if (@$session_general_names) {
+    # Client provided a specific list - fetch just those generals from session
+    for my $name (@$session_general_names) {
       next unless defined($name) && length($name);
 
       my $general = $c->get_general($name);
       unless ($general) {
-        $c->log_warn("Could not find general '$name' from selection, skipping");
+        $c->log_warn("Could not find general '$name' from session, skipping");
         next;
       }
 
@@ -919,9 +954,12 @@ sub single_details_stream ($c) {
 
       push @generals, $general;
     }
+
+    $c->log_debug(sprintf('Loaded %d generals from session (idempotent!)',
+      scalar(@generals)));
   }
   else {
-    # No selection - get all generals of this type
+    # No selection - get all generals of this type (shouldn't happen)
     @generals = $c->get_generals_by_type($generalType)->@*;
   }
 
@@ -1027,9 +1065,7 @@ sub single_details_stream ($c) {
       # No Minion jobs to clean up with PDL!
       Mojo::IOLoop->remove($recurring_id) if $recurring_id;
       $c->log_debug("Client disconnected: stopped general computation");
-      if (exists $session_store->{$session_id}) {
-        delete $session_store->{$session_id};
-      }
+      $c->delete_table_session($session_id);
     }
   );
 }

@@ -3,6 +3,7 @@ use v5.42.0;
 use utf8::all;
 use Mojo::Base -role, -signatures;
 use Game::EvonyTKR::Service::Persistence;
+use DBI;
 
 # Lazy-load mode-gated persistence service
 # Use package-level singleton to share backend across all instances

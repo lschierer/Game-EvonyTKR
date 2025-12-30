@@ -522,12 +522,106 @@ sub list_pairs_by_type ($self, $type) {
   return \@type_pairs;
 }
 
+# Table session management for idempotency across workers
+sub store_table_session ($self, $session_id, $data) {
+  my $general_type    = $data->{generalType} // die 'generalType required';
+  my $buff_activation = $data->{buffActivation}
+    // die 'buffActivation required';
+  my $items = $data->{items} // [];
+  my $ttl   = $data->{ttl}   // 3600;
+
+  my $now        = time();
+  my $expires_at = $now + $ttl;
+
+  # Encode items as JSON
+  my $item_list_json = $self->encode($items);
+
+  eval {
+    $self->db->insert(
+      'table_sessions',
+      {
+        session_id      => $session_id,
+        general_type    => $general_type,
+        buff_activation => $buff_activation,
+        item_list       => $item_list_json,
+        created_at      => $now,
+        expires_at      => $expires_at,
+      },
+      {
+        on_conflict => \[
+'(session_id) DO UPDATE SET general_type = ?, buff_activation = ?, item_list = ?, created_at = ?, expires_at = ?',
+          $general_type, $buff_activation, $item_list_json,
+          $now,          $expires_at
+        ]
+      }
+    );
+  };
+
+  if ($@) {
+    warn "Failed to store table session $session_id: $@";
+    return 0;
+  }
+
+  return 1;
+}
+
+sub get_table_session ($self, $session_id) {
+  my $result = eval {
+    $self->db->select(
+      'table_sessions',
+      [
+        'session_id', 'general_type', 'buff_activation', 'item_list',
+        'created_at', 'expires_at'
+      ],
+      { session_id => $session_id }
+    )->hash;
+  };
+
+  return undef unless $result;
+
+  # Check if expired
+  return undef if $result->{expires_at} <= time();
+
+  # Decode items from JSON
+  my $items = eval { $self->decode($result->{item_list}) };
+  if ($@) {
+    warn "Failed to decode item_list for session $session_id: $@";
+    return undef;
+  }
+
+  return {
+    session_id     => $result->{session_id},
+    generalType    => $result->{general_type},
+    buffActivation => $result->{buff_activation},
+    items          => $items,
+    created_at     => $result->{created_at},
+    expires_at     => $result->{expires_at},
+  };
+}
+
+sub delete_table_session ($self, $session_id) {
+  my $result =
+    eval { $self->db->delete('table_sessions', { session_id => $session_id }); };
+
+  return $result ? $result->rows : 0;
+}
+
+sub expire_table_sessions ($self, $max_age = undef) {
+  my $cutoff_time = defined($max_age) ? time() - $max_age : time();
+
+  my $result = eval {
+    $self->db->delete('table_sessions', \['expires_at <= ?', $cutoff_time]);
+  };
+
+  return $result ? $result->rows : 0;
+}
+
 # Clear all data
 sub clear_all_data ($self) {
   my @tables = qw(
     metadata generals ascending_attributes builtin_books generic_books
     specialties covenants general_conflicts glossary_terms pairs pairs_individual
-    job_completed work_units general_buff_cache
+    job_completed work_units general_buff_cache table_sessions
   );
 
   for my $table (@tables) {
@@ -625,7 +719,18 @@ CREATE TABLE IF NOT EXISTS general_buff_cache (
   updated_at DOUBLE PRECISION NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS table_sessions (
+  session_id TEXT PRIMARY KEY,
+  general_type TEXT NOT NULL,
+  buff_activation TEXT NOT NULL,
+  item_list TEXT NOT NULL,
+  created_at DOUBLE PRECISION NOT NULL,
+  expires_at DOUBLE PRECISION NOT NULL
+);
+
 -- Add indexes for common queries
+CREATE INDEX IF NOT EXISTS idx_table_sessions_expires
+  ON table_sessions (expires_at);
 CREATE INDEX IF NOT EXISTS idx_pairs_individual_type
   ON pairs_individual (name text_pattern_ops);
 
@@ -633,6 +738,7 @@ CREATE INDEX IF NOT EXISTS idx_conflicts_pair_key
   ON general_conflicts (pair_key);
 
 -- 1 down
+DROP TABLE IF EXISTS table_sessions;
 DROP TABLE IF EXISTS general_buff_cache;
 DROP TABLE IF EXISTS work_units;
 DROP TABLE IF EXISTS pairs_individual;
