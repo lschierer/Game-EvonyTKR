@@ -75,12 +75,10 @@ package Game::EvonyTKR {
             return unless $is_spawner;
             return unless $has_acceptors > 0;    # Only in web server processes
 
-            $app->log->info(
-              sprintf(
-                "SPAWNING MINION WORKERS from PID %s (PPID %s)",
-                $$, getppid()
-              )
-            );
+            $app->log->info(sprintf(
+              "SPAWNING MINION WORKERS from PID %s (PPID %s)",
+              $$, getppid()
+            ));
             _spawn_minion_workers($app);
 
             # Queue prebuild job after workers are spawned

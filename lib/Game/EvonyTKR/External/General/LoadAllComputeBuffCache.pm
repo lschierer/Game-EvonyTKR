@@ -122,12 +122,10 @@ sub run ($job, @args) {
         }
       );
       push @$cache_jobs, $cache_job_id;
-      $job->log_debug(
-        sprintf(
-          'Enqueued buff cache job %s for "%s"',
-          $cache_job_id, $general->name
-        )
-      );
+      $job->log_debug(sprintf(
+        'Enqueued buff cache job %s for "%s"',
+        $cache_job_id, $general->name
+      ));
     }
   }
 

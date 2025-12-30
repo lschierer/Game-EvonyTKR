@@ -10,26 +10,41 @@ sub register ($taskClass, $app, $conf = {}) {
   return 1;
 }
 
-sub run ($self) {
-  my $app = $self->app;
+sub run ($job) {
+  my $app = $job->app;
 
   # Wait for reduce_coordinator to complete
-  my $coordinator_pending = $app->minion->jobs({
-    tasks  => ['reduce_coordinator'],
+  my $jobs_needed =
+    ['reduce_coordinator', 'reduce_batch', 'load_all_pair_builders'];
+  my $job_pending = $app->minion->jobs({
+    tasks  => $jobs_needed,
     states => ['inactive', 'active']
   })->total;
 
-  if ($coordinator_pending > 0) {
-    $self->note(waiting_for => ['reduce_coordinator']);
-    return $self->retry({ delay => 10 });
+  if ($job_pending > 0) {
+    $job->note(waiting_for => $jobs_needed);
+    return $job->retry({ delay => 10 });
+  }
+  else {
+    $app->minion->jobs({
+      tasks  => ['reduce_coordinator', 'load_all_pair_builders'],
+      states => ['finished',           'failed']
+    })->each(sub {
+      my $info = $_;
+      next
+        unless ($info->{notes}->{prebuild_run_id} eq
+        $job->info->{notes}->{prebuild_run_id});
+      $job->note($info->{task} => $info->{id});
+      $job->note(waiting_for   => 'nothing');
+    });
   }
 
   # Coordinator complete - mark pairs work unit as complete
   my $tracker =
-    Game::EvonyTKR::WorkUnit::Tracker->new(persistence => $self->persistence);
+    Game::EvonyTKR::WorkUnit::Tracker->new(persistence => $job->persistence);
   $tracker->mark_complete('load_all_pair_builders');
 
-  $self->app->log->info("Marked work unit 'pairs' as complete");
+  $job->app->log->info("Marked work unit 'pairs' as complete");
 }
 
 1;

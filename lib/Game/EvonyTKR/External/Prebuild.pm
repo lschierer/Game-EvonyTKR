@@ -104,7 +104,12 @@ sub _build_loader_job_defs ($self, $stored_version, $current_version) {
       delay    => 6,
       priority => 50,
     },
-
+    reduce_coordinator => {
+      args     => [],
+      attempts => 5,
+      delay    => 16,
+      priority => 30,
+    },
   };
 }
 
@@ -306,40 +311,33 @@ sub run ($job, @args) {
   my $loaderJids = [];
   my $totalJobs  = 0;    # Count both launched and existing jobs
   foreach my $jobname (sort keys $loaderJobDefs->%*) {
- # Check if any active/inactive jobs exist for this task WITH the current run_id
-    my $existing_jobs = $job->minion->jobs({
-      tasks  => [$jobname],
-      states => [qw(inactive active)]
-    });
-
-    my $existing_count = 0;
-    while (my $j = $existing_jobs->next) {
-      my $notes = $j->{notes} // {};
-      if ($notes->{prebuild_run_id} && $notes->{prebuild_run_id} eq $run_id) {
-        $existing_count++;
-      }
-      else {
-        $job->minion->job($j)->remove;
-        $job->minion->repair();
-      }
-    }
-
-    if ($existing_count > 0) {
-      $job->log_info(
-"Skipping $jobname - $existing_count jobs with run_id $run_id already exist"
-      );
-      $totalJobs++;    # Count existing jobs
-      next;
-    }
     $job->log_debug("Prebuild needs to launch $jobname");
 
     my $args   = $loaderJobDefs->{$jobname}->{args} // [];
     my $params = $loaderJobDefs->{$jobname}         // {};
     delete($params->{args}) if (exists $params->{args});
 
+    my $parents = [];
+    if ($jobname eq 'reduce_coordinator') {
+      $job->minion->jobs({
+        tasks => ['load_all_pair_builders'],
+      })->each(sub {
+        my $info = $_;
+        if ($info->{notes}->{prebuild_run_id} eq $job->prebuild_run_id) {
+          push @{$parents}, $info->{id};
+        }
+      });
+      $params->{parents} = $parents;
+    }
+
     my $jid = $job->minion->enqueue(
       $jobname => [$args->@*] => {
-        $params->%*, notes => { prebuild_run_id => $run_id }
+        $params->%*,
+        notes => {
+          prebuild_run_id => $run_id,
+          prebuild_jid    => $job->id,
+          parents         => $parents,
+        },
       }
     );
     if (defined($jid)) {
@@ -399,7 +397,6 @@ sub run ($job, @args) {
   # Simple completions (single job marks complete)
   # ml_conflicts and glossary_terms will mark themselves complete
 
-  # Pairs completion (waits for reduce_coordinator)
   my $pairs_completion_jid = $job->minion->enqueue(
     'mark_pairs_complete' => [] => {
       attempts => 10,
@@ -411,36 +408,29 @@ sub run ($job, @args) {
   $job->log_debug("Spawned pairs completion job: $pairs_completion_jid");
 
   my $monitor_names = [
-    sort grep { $_ =~ /(?:monitor|coordinator)/i }
+    sort grep { $_ =~ /(?:monitor)/i }
       keys $job->minion->tasks->%*
   ];
 
   foreach my $mn ($monitor_names->@*) {
 
-    unless (
-      $job->minion->jobs({
-        tasks  => [$mn],
-        states => ['active', 'inactive', 'finished'],
-      })->total > 0
-    ) {
-      my $mj = $job->minion->enqueue(
-        $mn => [] => {
-          attempts => 5,
-          delay    => 10,
-          priority => 90,
-          notes    => {
-            prebuild_jid    => $job->id,
-            prebuild_run_id => $job->prebuild_run_id,
-          }    # Reference instead of parent
-        }
-      );
-      if (defined $mj) {
-        $monitors->{$mn} = $mj;
-        $job->log_debug("Launched monitor job $mn with jid $mj");
+    my $mj = $job->minion->enqueue(
+      $mn => [] => {
+        attempts => 5,
+        delay    => 10,
+        priority => 90,
+        notes    => {
+          prebuild_jid    => $job->id,
+          prebuild_run_id => $job->prebuild_run_id,
+        }    # Reference instead of parent
       }
-      else {
-        $job->log_warn("Failed to launch monitor job $mn");
-      }
+    );
+    if (defined $mj) {
+      $monitors->{$mn} = $mj;
+      $job->log_debug("Launched monitor job $mn with jid $mj");
+    }
+    else {
+      $job->log_warn("Failed to launch monitor job $mn");
     }
   }
 
