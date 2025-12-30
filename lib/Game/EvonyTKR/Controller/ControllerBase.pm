@@ -46,7 +46,7 @@ package Game::EvonyTKR::Controller::ControllerBase {
     $routes->get('/sitemap.xml')->to(
       cb => sub ($c) {
         my $xml = $c->generate_sitemap_xml;
-        $c->render(data => $xml, format => 'xml');
+        $c->render(data => $xml, format => 'xml', charset => 'utf-8');
       }
     );
 
