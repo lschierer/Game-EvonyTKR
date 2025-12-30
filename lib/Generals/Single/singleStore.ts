@@ -29,6 +29,12 @@ export class GeneralStore {
   readonly sessionId: Store<string> = new Store<string>('');
   protected _currentES?: EventSource;
 
+  private rowBuffer: Map<string, GeneralData> = new Map();
+  private flushTimer?: number;
+
+  private rowBuffer: Map<string, GeneralData> = new Map();
+  private flushTimer?: number;
+
   readonly store: Store<GeneralState> = new Store<GeneralState>(
     {
       catalog: [],
@@ -201,6 +207,30 @@ export class GeneralStore {
     const gp = parsed.data;
     const key = gp.primary.name;
 
+    // BATCHING: Instead of updating state immediately, add to buffer
+    this.rowBuffer.set(key, gp);
+
+    // DEBOUNCE: Schedule a flush, but cancel/reschedule if more rows arrive quickly
+    // This means we'll only update state once per 100ms, batching many rows together
+    if (this.flushTimer) {
+      clearTimeout(this.flushTimer);
+    }
+    this.flushTimer = window.setTimeout(() => this.flushBuffer(runId), 100);
+  }
+
+  private flushBuffer(runId: number) {
+    // If buffer is empty, nothing to do
+    if (this.rowBuffer.size === 0) return;
+
+    // Copy buffer and clear it (in case new rows arrive during state update)
+    const bufferedRows = new Map(this.rowBuffer);
+    this.rowBuffer.clear();
+
+    if (DEBUG) {
+      console.log(`Flushing ${bufferedRows.size} buffered rows`);
+    }
+
+    // NOW update state once with ALL buffered rows
     this.store.setState((prev: GeneralState) => {
       // Ignore old runs
       if (runId !== prev.runId) {
@@ -212,29 +242,26 @@ export class GeneralStore {
         return prev;
       }
 
-      let rows;
-      const old = prev.rows[key];
-      if (old) {
-        if (old.state !== 'ignore') {
-          old.state = 'current';
-        }
+      // Start with existing rows
+      const rows = { ...prev.rows };
 
-        old.data = gp;
-        rows = {
-          ...prev.rows,
-          [key]: old,
-        };
-      } else {
-        const baseRow: SingleGeneralState = {
-          primary: gp.primary.name,
-          state: 'current',
-          data: gp,
-        };
-        rows = {
-          ...prev.rows,
-          [key]: baseRow,
-        };
-      }
+      // Add/update all buffered rows
+      bufferedRows.forEach((gp, key) => {
+        const old = rows[key];
+        if (old) {
+          rows[key] = {
+            ...old,
+            state: old.state !== 'ignore' ? 'current' : 'ignore',
+            data: gp,
+          };
+        } else {
+          rows[key] = {
+            primary: gp.primary.name,
+            state: 'current',
+            data: gp,
+          };
+        }
+      });
 
       return { ...prev, rows } as GeneralState;
     });
@@ -329,8 +356,32 @@ export class GeneralStore {
     });
 
     es.addEventListener('complete', () => {
-      es.close();
-      this.endRun(runId);
+      if (DEBUG) {
+        console.log('Complete event received, flushing buffer and closing');
+      }
+
+      // Flush any remaining buffered rows before closing
+      if (this.flushTimer) {
+        clearTimeout(this.flushTimer);
+      }
+      this.flushBuffer(runId);
+
+      // CRITICAL: Delay closing the connection to let any in-flight row events
+      // be processed by the browser's EventSource. Without this delay, the last
+      // batch of events may not be delivered before the connection closes.
+      window.setTimeout(() => {
+        // Final flush in case any stragglers arrived during the delay
+        if (this.flushTimer) {
+          clearTimeout(this.flushTimer);
+        }
+        this.flushBuffer(runId);
+
+        if (DEBUG) {
+          console.log('Closing EventSource after delay');
+        }
+        es.close();
+        this.endRun(runId);
+      }, 250); // 250ms should be plenty for browser to process buffered events
     });
 
     if (DEBUG) {

@@ -22,8 +22,8 @@ package Game::EvonyTKR::Controller::Pairs {
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::Covenants',          -role;
   use Mojo::Base 'Game::EvonyTKR::Controller::Role::Generals::Routing', -role;
   use Mojo::Base 'Game::EvonyTKR::Role::JSON',                          -role;
+  use Mojo::Base 'Game::EvonyTKR::Controller::Role::Tables',            -role;
   use Mojo::IOLoop;
-  use MIME::Base64   qw(encode_base64);
   use List::AllUtils qw( all any none );
   use Carp;
 
@@ -57,8 +57,7 @@ package Game::EvonyTKR::Controller::Pairs {
   # PDL Runtime service for fast buff computation
   has 'pdl_runtime' => sub ($self) {
     Game::EvonyTKR::Service::PDL::Runtime->new(
-      data_dir => $self->app->home->child('share/collections/data')->to_string
-    );
+      data_dir => $self->app->home->child('share/collections/data')->to_string);
   };
 
   sub register($c, $app, $config = {}) {
@@ -163,7 +162,8 @@ package Game::EvonyTKR::Controller::Pairs {
     }
 
     # Use session-aware state key
-    my $session_id = $c->session('session_id') // $c->session(session_id => rand());
+    my $session_id = $c->session('session_id')
+      // $c->session(session_id => rand());
     my $state_key = "${type}_${session_id}";
 
     state %promises;
@@ -171,7 +171,7 @@ package Game::EvonyTKR::Controller::Pairs {
     # Check if we already have results
     if ($promises{$state_key} && $promises{$state_key}{result}) {
       my $pairs_for_type = $promises{$state_key}{result};
-      delete $promises{$state_key}; # Clean up
+      delete $promises{$state_key};    # Clean up
       return $c->render(
         template   => 'pairs/diagnostic',
         type       => $type,
@@ -185,26 +185,34 @@ package Game::EvonyTKR::Controller::Pairs {
     if (!$promises{$state_key}) {
       $promises{$state_key} = { promise => undef, result => undef };
 
-      my $promise = Mojo::Promise->new(sub ($resolve, $reject) {
-        # Use next_tick to defer execution
-        Mojo::IOLoop->next_tick(sub {
-          eval {
-            my $pairs_for_type = $c->get_pairs_for_type_batch($type, { skip_generic_books => 1 });
-            $c->log_info(sprintf("Loaded %d pairs for type %s", scalar(@$pairs_for_type), $type));
-            $resolve->($pairs_for_type);
-          };
-          if ($@) {
-            $c->log_error("Failed to load pairs for $type: $@");
-            $reject->($@);
-          }
-        });
-      });
-      
+      my $promise = Mojo::Promise->new(
+        sub ($resolve, $reject) {
+          # Use next_tick to defer execution
+          Mojo::IOLoop->next_tick(sub {
+            eval {
+              my $pairs_for_type = $c->get_pairs_for_type_batch($type,
+                { skip_generic_books => 1 });
+              $c->log_info(
+                sprintf(
+                  "Loaded %d pairs for type %s",
+                  scalar(@$pairs_for_type), $type
+                )
+              );
+              $resolve->($pairs_for_type);
+            };
+            if ($@) {
+              $c->log_error("Failed to load pairs for $type: $@");
+              $reject->($@);
+            }
+          });
+        }
+      );
+
       $promises{$state_key}{promise} = $promise->then(sub ($pairs_for_type) {
         $promises{$state_key}{result} = $pairs_for_type;
         return $pairs_for_type;
       })->catch(sub ($error) {
-        delete $promises{$state_key}; # Clean up on error
+        delete $promises{$state_key};    # Clean up on error
       });
     }
 
@@ -353,11 +361,7 @@ package Game::EvonyTKR::Controller::Pairs {
       $requested_primaries = $json_data->{primaries} // [];
     }
 
-    my $uidseed = join(', ', @$requested_primaries) . ' ' . UUID::uuid7();
-    $c->log_debug("uidseed is '$uidseed'");
-
-    my $session_id = UUID::uuid5($c->UUID5_base, $uidseed);
-    $c->log_debug("final session_id is '$session_id'");
+    my $session_id = $c->generate_table_session_id($requested_primaries);
 
     # Lookup route metadata
     my $route_meta = $c->lookup_route($slug_ui, $slug_buff);
@@ -393,22 +397,24 @@ package Game::EvonyTKR::Controller::Pairs {
     }
 
     $c->log_debug('pairCatalog calling get_pairs_for_type_batch');
-    # Skip generic books - catalog only needs names and conflicts (builtin books)
-    my $pairs_for_type = $c->get_pairs_for_type_batch($type, { skip_generic_books => 1 });
+   # Skip generic books - catalog only needs names and conflicts (builtin books)
+    my $pairs_for_type =
+      $c->get_pairs_for_type_batch($type, { skip_generic_books => 1 });
 
     my @pairs = sort { $a cmp $b } @$pairs_for_type;
     $c->log_debug(sprintf('There are %s pairs to return.', scalar(@pairs)));
 
     # Safety check: if no pairs loaded yet, return error
     if (scalar(@pairs) == 0) {
-      $c->log_warn("pairCatalog called but no pairs loaded yet for $generalType");
+      $c->log_warn(
+        "pairCatalog called but no pairs loaded yet for $generalType");
       return $c->render(
         json => {
-          error => 'Pairs not loaded yet, please try again',
+          error     => 'Pairs not loaded yet, please try again',
           sessionId => '',
-          selected => []
+          selected  => []
         },
-        status => 503  # Service Unavailable
+        status => 503    # Service Unavailable
       );
     }
 
@@ -459,9 +465,7 @@ package Game::EvonyTKR::Controller::Pairs {
   }
 
   sub stream_pair_details ($c) {
-    $c->res->headers->content_type('text/event-stream');
-    $c->res->headers->content_encoding('utf-8');
-    $c->res->headers->add('Cache-Control', 'no-cache');
+    $c->setup_sse_headers();
 
     my $slug_ui    = $c->stash('uiTarget');
     my $slug_buff  = $c->stash('buffActivation');
@@ -469,7 +473,7 @@ package Game::EvonyTKR::Controller::Pairs {
     my $session_id = $c->param('sessionId');
 
     # Get primaries filter from query param (JSON array)
-    my $primaries_json = $c->param('primaries');
+    my $primaries_json      = $c->param('primaries');
     my $requested_primaries = [];
     if ($primaries_json) {
       eval { $requested_primaries = $c->decode($primaries_json); };
@@ -479,18 +483,14 @@ package Game::EvonyTKR::Controller::Pairs {
       }
     }
 
-    unless (defined($session_id) && length($session_id)) {
-      $c->log_error('Session ID must be present!');
-      my $payload = $c->encode({ runId => 0+ $run_id });
-      $c->write_sse({ type => 'complete', text => $payload });
-      return;
-    }
+    return unless $c->validate_session_id($session_id, $run_id);
 
     $c->log_debug(sprintf(
       'stream_pair_details called url: %s,'
         . ' uiTarget: %s; buffActivation: %s; run_id: %s; primaries: %d',
-      $c->req->url->path->to_string,
-      $slug_ui, $slug_buff, 0+ $run_id, scalar(@$requested_primaries)
+      $c->req->url->path->to_string, $slug_ui,
+      $slug_buff,                    0+ $run_id,
+      scalar(@$requested_primaries)
     ));
 
     # Lookup route metadata
@@ -509,12 +509,12 @@ package Game::EvonyTKR::Controller::Pairs {
         );
       }
       my $payload = $c->encode({ runId => 0+ $run_id });
-      $c->write_sse({ type => 'complete', text => $payload });
+      $c->write_table_sse('complete', { runId => 0+ $run_id });
       return;
     }
 
     my $generalType    = $route_meta->{generalType};
-    my $type = $generalType;
+    my $type           = $generalType;
     my $buffActivation = $route_meta->{buffActivation};
     my $uiTarget       = $route_meta->{uiTarget};
 
@@ -528,7 +528,7 @@ package Game::EvonyTKR::Controller::Pairs {
     }
     $c->log_debug('diagnostic_pairs_by_type calling get_pairs_for_type_batch');
     my $pairs_for_type = $c->get_pairs_for_type_batch($type);
-    my @all_pairs = @$pairs_for_type;
+    my @all_pairs      = @$pairs_for_type;
 
     # Filter to requested primaries if specified
     my @sorted_pairs;
@@ -542,21 +542,21 @@ package Game::EvonyTKR::Controller::Pairs {
       }
       $c->log_debug(sprintf(
         'Filtered to %d pairs from %d total for %d primaries',
-        scalar(@unsorted_pairs), scalar(@all_pairs), scalar(@$requested_primaries)
+        scalar(@unsorted_pairs), scalar(@all_pairs),
+        scalar(@$requested_primaries)
       ));
-    } else {
+    }
+    else {
       # No filter - use all pairs
       @unsorted_pairs = map { $_->to_wire_hash() } @all_pairs;
-      $c->log_debug(sprintf(
-        'No filter specified, using all %d pairs',
-        scalar(@unsorted_pairs)
-      ));
+      $c->log_debug(sprintf('No filter specified, using all %d pairs',
+        scalar(@unsorted_pairs)));
     }
     @sorted_pairs = sort {
       my $pc = $a->{primary}->{name} cmp $b->{primary}->{name};
       my $sc = $a->{secondary}->{name} cmp $b->{secondary}->{name};
       return $pc ? $pc : $sc;
-      } @unsorted_pairs;
+    } @unsorted_pairs;
     $c->log_debug(sprintf(
       'There are %s pairs to compute details for session %s.',
       scalar(@sorted_pairs), $session_id
@@ -615,7 +615,7 @@ package Game::EvonyTKR::Controller::Pairs {
       specialty2     => $validated_params->{primarySpecialties}->[1],
       specialty3     => $validated_params->{primarySpecialties}->[2],
       specialty4     => $validated_params->{primarySpecialties}->[3],
-      generic1       => 'level4',  # TODO: Make configurable
+      generic1       => 'level4',    # TODO: Make configurable
     };
 
     my $secondary_filters = {
@@ -625,25 +625,27 @@ package Game::EvonyTKR::Controller::Pairs {
       specialty2     => $validated_params->{secondarySpecialties}->[1],
       specialty3     => $validated_params->{secondarySpecialties}->[2],
       specialty4     => $validated_params->{secondarySpecialties}->[3],
-      generic1       => 'level4',  # TODO: Make configurable
+      generic1       => 'level4',    # TODO: Make configurable
     };
 
     # Compute all pairs using PDL (no Minion jobs needed!)
-    my $targetType = $typeMap->{$validated_params->{route_meta}->{generalType}} || 'mounted_specialist';
+    my $targetType =
+      $typeMap->{ $validated_params->{route_meta}->{generalType} }
+      || 'mounted_specialist';
 
     # Process pairs in batches to avoid blocking
-    my $batch_size = 50;  # Increased from 15 - client batching handles this now
+    my $batch_size  = 50; # Increased from 15 - client batching handles this now
     my $current_idx = 0;
     my $total_pairs = scalar(@sorted_pairs);
-    my $complete_sent = 0;  # Flag to track if we've sent the complete event
+    my $complete_sent = 0;    # Flag to track if we've sent the complete event
 
     ### START OF LOOP ###
     my $recurring_id;
-    my $loopDelay = 0.01;  # Back to fast - callback ensures reliable delivery
+    my $loopDelay = 0.01;    # Back to fast - callback ensures reliable delivery
     my $process_batch = sub {
       my $loop = shift;
 
-      # If we've already completed, just keep connection alive (don't process more)
+   # If we've already completed, just keep connection alive (don't process more)
       return if $complete_sent;
 
       # Compute next batch of pairs using PDL
@@ -651,24 +653,29 @@ package Game::EvonyTKR::Controller::Pairs {
 
       $c->log_debug(sprintf(
         'Computing pairs %d-%d of %d',
-        $current_idx + 1, $batch_end, $total_pairs
+        $current_idx + 1,
+        $batch_end, $total_pairs
       ));
 
       for my $i ($current_idx .. $batch_end - 1) {
         my $pair_hash = $sorted_pairs[$i];
 
-        # Extract names from wire hash format: { primary => { name => '...' }, secondary => { name => '...' } }
-        my $primary_name = ref($pair_hash->{primary}) eq 'HASH'
+# Extract names from wire hash format: { primary => { name => '...' }, secondary => { name => '...' } }
+        my $primary_name =
+          ref($pair_hash->{primary}) eq 'HASH'
           ? $pair_hash->{primary}{name}
           : $pair_hash->{primary};
-        my $secondary_name = ref($pair_hash->{secondary}) eq 'HASH'
+        my $secondary_name =
+          ref($pair_hash->{secondary}) eq 'HASH'
           ? $pair_hash->{secondary}{name}
           : $pair_hash->{secondary};
 
         eval {
           # Get full general objects to send their hash representations
-          my $primary_general = $c->get_general(lc($c->normalize($primary_name)));
-          my $secondary_general = $c->get_general(lc($c->normalize($secondary_name)));
+          my $primary_general =
+            $c->get_general(lc($c->normalize($primary_name)));
+          my $secondary_general =
+            $c->get_general(lc($c->normalize($secondary_name)));
 
           unless ($primary_general && $secondary_general) {
             $c->log_error(sprintf(
@@ -680,59 +687,80 @@ package Game::EvonyTKR::Controller::Pairs {
 
           # Compute combined buffs for this pair using PDL
           my $combined_buffs = $c->pdl_runtime->compute_pair_buffs(
-            primary            => $primary_name,
-            secondary          => $secondary_name,
-            activation         => $buffActivation,
-            primary_filters    => $primary_filters,
-            secondary_filters  => $secondary_filters,
+            primary           => $primary_name,
+            secondary         => $secondary_name,
+            activation        => $buffActivation,
+            primary_filters   => $primary_filters,
+            secondary_filters => $secondary_filters,
           );
 
-          # Map general type to troop column suffix (ground, mounted, ranged, siege)
+      # Map general type to troop column suffix (ground, mounted, ranged, siege)
           my $troop_suffix;
           if ($generalType =~ /ground/i) {
             $troop_suffix = 'ground';
-          } elsif ($generalType =~ /mounted/i) {
+          }
+          elsif ($generalType =~ /mounted/i) {
             $troop_suffix = 'mounted';
-          } elsif ($generalType =~ /ranged/i) {
+          }
+          elsif ($generalType =~ /ranged/i) {
             $troop_suffix = 'ranged';
-          } elsif ($generalType =~ /siege/i) {
+          }
+          elsif ($generalType =~ /siege/i) {
             $troop_suffix = 'siege';
-          } else {
-            $troop_suffix = 'ground';  # Default fallback
+          }
+          else {
+            $troop_suffix = 'ground';    # Default fallback
           }
 
           # Format buffs into the structure the frontend expects
           my $result = {
-            runId              => 0+ $run_id,
+            runId => 0+ $run_id,
             data  => {
-            primary            => $primary_general->to_hash(),
-            secondary          => $secondary_general->to_hash(),
-            attackbuff         => ($combined_buffs->{"attack_$troop_suffix"} // 0) + ($combined_buffs->{attack_all} // 0),
-            defensebuff        => ($combined_buffs->{"defense_$troop_suffix"} // 0) + ($combined_buffs->{defense_all} // 0),
-            hpbuff             => ($combined_buffs->{"hp_$troop_suffix"} // 0) + ($combined_buffs->{hp_all} // 0),
-            marchbuff          => $combined_buffs->{march_size} // 0,
-            groundattackdebuff => ($combined_buffs->{enemy_attack_ground} // 0) + ($combined_buffs->{enemy_attack_all} // 0),
-            grounddefensedebuff => ($combined_buffs->{enemy_defense_ground} // 0) + ($combined_buffs->{enemy_defense_all} // 0),
-            groundhpdebuff     => ($combined_buffs->{enemy_hp_ground} // 0) + ($combined_buffs->{enemy_hp_all} // 0),
-            mountedattackdebuff => ($combined_buffs->{enemy_attack_mounted} // 0) + ($combined_buffs->{enemy_attack_all} // 0),
-            mounteddefensedebuff => ($combined_buffs->{enemy_defense_mounted} // 0) + ($combined_buffs->{enemy_defense_all} // 0),
-            mountedhpdebuff    => ($combined_buffs->{enemy_hp_mounted} // 0) + ($combined_buffs->{enemy_hp_all} // 0),
-            rangedattackdebuff => ($combined_buffs->{enemy_attack_ranged} // 0) + ($combined_buffs->{enemy_attack_all} // 0),
-            rangeddefensedebuff => ($combined_buffs->{enemy_defense_ranged} // 0) + ($combined_buffs->{enemy_defense_all} // 0),
-            rangedhpdebuff     => ($combined_buffs->{enemy_hp_ranged} // 0) + ($combined_buffs->{enemy_hp_all} // 0),
-            siegeattackdebuff  => ($combined_buffs->{enemy_attack_siege} // 0) + ($combined_buffs->{enemy_attack_all} // 0),
-            siegedefensedebuff => ($combined_buffs->{enemy_defense_siege} // 0) + ($combined_buffs->{enemy_defense_all} // 0),
-            siegehpdebuff      => ($combined_buffs->{enemy_hp_siege} // 0) + ($combined_buffs->{enemy_hp_all} // 0),
+              primary    => $primary_general->to_hash(),
+              secondary  => $secondary_general->to_hash(),
+              attackbuff => ($combined_buffs->{"attack_$troop_suffix"} // 0) +
+                ($combined_buffs->{attack_all} // 0),
+              defensebuff => ($combined_buffs->{"defense_$troop_suffix"} // 0)
+                + ($combined_buffs->{defense_all} // 0),
+              hpbuff => ($combined_buffs->{"hp_$troop_suffix"} // 0) +
+                ($combined_buffs->{hp_all} // 0),
+              marchbuff          => $combined_buffs->{march_size} // 0,
+              groundattackdebuff =>
+                ($combined_buffs->{enemy_attack_ground} // 0) +
+                ($combined_buffs->{enemy_attack_all}    // 0),
+              grounddefensedebuff =>
+                ($combined_buffs->{enemy_defense_ground} // 0) +
+                ($combined_buffs->{enemy_defense_all}    // 0),
+              groundhpdebuff => ($combined_buffs->{enemy_hp_ground} // 0) +
+                ($combined_buffs->{enemy_hp_all} // 0),
+              mountedattackdebuff =>
+                ($combined_buffs->{enemy_attack_mounted} // 0) +
+                ($combined_buffs->{enemy_attack_all}     // 0),
+              mounteddefensedebuff =>
+                ($combined_buffs->{enemy_defense_mounted} // 0) +
+                ($combined_buffs->{enemy_defense_all}     // 0),
+              mountedhpdebuff => ($combined_buffs->{enemy_hp_mounted} // 0) +
+                ($combined_buffs->{enemy_hp_all} // 0),
+              rangedattackdebuff =>
+                ($combined_buffs->{enemy_attack_ranged} // 0) +
+                ($combined_buffs->{enemy_attack_all}    // 0),
+              rangeddefensedebuff =>
+                ($combined_buffs->{enemy_defense_ranged} // 0) +
+                ($combined_buffs->{enemy_defense_all}    // 0),
+              rangedhpdebuff => ($combined_buffs->{enemy_hp_ranged} // 0) +
+                ($combined_buffs->{enemy_hp_all} // 0),
+              siegeattackdebuff => ($combined_buffs->{enemy_attack_siege} // 0)
+                + ($combined_buffs->{enemy_attack_all} // 0),
+              siegedefensedebuff =>
+                ($combined_buffs->{enemy_defense_siege} // 0) +
+                ($combined_buffs->{enemy_defense_all}   // 0),
+              siegehpdebuff => ($combined_buffs->{enemy_hp_siege} // 0) +
+                ($combined_buffs->{enemy_hp_all} // 0),
             }
           };
 
           # Encode and stream via SSE
-          my $json_result = $c->encode($result);
-          my $encoded = encode_base64($json_result, '');
-          $c->write_sse({
-            type => 'pair',
-            text => $encoded
-          });
+          $c->write_table_sse('pair', $result);
           $c->log_debug(sprintf(
             'Sent pair %d/%d: %s / %s',
             $i + 1, $total_pairs, $primary_name, $secondary_name
@@ -749,22 +777,16 @@ package Game::EvonyTKR::Controller::Pairs {
       $current_idx = $batch_end;
       # Check if all pairs have been processed
       if ($current_idx >= $total_pairs && !$complete_sent) {
-        $complete_sent = 1;  # Mark that we're sending complete
+        $complete_sent = 1;    # Mark that we're sending complete
 
         # Small delay to ensure last batch is written before complete event
-        my $flush_delay = 0.1;  # 100ms is enough with callback pattern
+        my $flush_delay = 0.1;    # 100ms is enough with callback pattern
 
-        Mojo::IOLoop->timer($flush_delay => sub {
-          $c->log_debug(sprintf(
-            'All %d pairs computed and flushed, sending complete event',
-            $total_pairs
-          ));
-          my $payload = $c->encode({ runId => $run_id });
-          # Use write_sse callback to ensure complete event is written before closing
-          $c->write_sse({ type => 'complete', text => $payload } => sub { $c->finish });
-
-          $c->log_debug('Complete event queued with finish callback');
-        });
+        Mojo::IOLoop->timer(
+          $flush_delay => sub {
+            $c->send_complete_event($run_id, $total_pairs, 'pairs');
+          }
+        );
         # Stop processing more batches, but keep the connection alive
         return;
       }

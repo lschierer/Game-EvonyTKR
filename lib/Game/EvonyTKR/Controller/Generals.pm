@@ -11,6 +11,7 @@ use Mojo::Base 'Game::EvonyTKR::Role::Constants::Covenants',           -role;
 use Mojo::Base 'Game::EvonyTKR::Role::Constants::AscendingAttributes', -role;
 use Mojo::Base 'Game::EvonyTKR::Role::Constants::Specialties',         -role;
 use Mojo::Base 'Game::EvonyTKR::Controller::Role::Generals::Routing',  -role;
+use Mojo::Base 'Game::EvonyTKR::Controller::Role::Tables',             -role;
 require YAML::PP;
 require Mojo::Promise;
 require Mojo::Util;
@@ -28,7 +29,6 @@ require Data::Printer;
 use Mojo::IOLoop;
 use Mojo::Promise;
 
-use MIME::Base64   qw(encode_base64);
 use List::AllUtils qw( all any none );
 require Game::EvonyTKR::External::General::Summarizer;
 use diagnostics;
@@ -49,8 +49,7 @@ has prereqs => sub {
 # PDL Runtime service for fast buff computation
 has 'pdl_runtime' => sub ($self) {
   Game::EvonyTKR::Service::PDL::Runtime->new(
-    data_dir => $self->app->home->child('share/collections/data')->to_string
-  );
+    data_dir => $self->app->home->child('share/collections/data')->to_string);
 };
 
 # Specify which collection this controller handles
@@ -667,18 +666,21 @@ sub show ($c) {
           specialty2     => $specialties[1],
           specialty3     => $specialties[2],
           specialty4     => $specialties[3],
-          generic1       => 'level4',  # TODO: Make configurable
+          generic1       => 'level4',          # TODO: Make configurable
         },
       );
 
       $c->stash(
         'buff-summaries' => {
-          marchIncrease   => $summary->{buffValues}->{$targetType}->{'March Size'} // 0,
-          attackIncrease  => $summary->{buffValues}->{$targetType}->{'Attack'} // 0,
-          defenseIncrease => $summary->{buffValues}->{$targetType}->{'Defense'} // 0,
-          hpIncrease      => $summary->{buffValues}->{$targetType}->{'HP'} // 0,
-          buffValues      => $summary->{buffValues},
-          debuffValues    => $summary->{debuffValues},
+          marchIncrease => $summary->{buffValues}->{$targetType}->{'March Size'}
+            // 0,
+          attackIncrease => $summary->{buffValues}->{$targetType}->{'Attack'}
+            // 0,
+          defenseIncrease => $summary->{buffValues}->{$targetType}->{'Defense'}
+            // 0,
+          hpIncrease   => $summary->{buffValues}->{$targetType}->{'HP'} // 0,
+          buffValues   => $summary->{buffValues},
+          debuffValues => $summary->{debuffValues},
         },
       );
     }
@@ -770,10 +772,7 @@ sub singleCatalog ($c) {
     $requested_generals = $json_data->{generals} // [];
   }
 
-  my $uidseed = join(', ', @$requested_generals) . ' ' . UUID::uuid7();
-  $c->log_debug("uidseed is '$uidseed'");
-
-  my $session_id = UUID::uuid5($c->UUID5_base, $uidseed);
+  my $session_id = $c->generate_table_session_id($requested_generals);
   $c->log_debug("final session_id is '$session_id'");
 
   # Lookup route metadata
@@ -844,20 +843,13 @@ sub singleCatalog ($c) {
 }
 
 sub single_details_stream ($c) {
-  $c->res->headers->content_type('text/event-stream');
-  $c->res->headers->content_encoding('utf-8');
-  $c->res->headers->add('Cache-Control', 'no-cache');
+  $c->setup_sse_headers();
 
   my $slug_ui    = $c->stash('uiTarget');
   my $slug_buff  = $c->stash('buffActivation');
   my $run_id     = 0+ $c->param('runId');
   my $session_id = $c->param('sessionId');
-  unless (defined($session_id) && length($session_id)) {
-    $c->log_error('Session ID must be present!');
-    my $payload = encode_base64($c->encode({ runId => 0+ $run_id }), '');
-    $c->write_sse({ type => 'complete', text => $payload });
-    return;
-  }
+  return unless $c->validate_session_id($session_id, $run_id);
   my $selected =
     exists $session_store->{$session_id} ? $session_store->{$session_id} : [];
 
@@ -889,8 +881,7 @@ sub single_details_stream ($c) {
           sprintf('  "%s" => %s', $route, Data::Printer::np($meta)));
       }
     }
-    my $payload = encode_base64($c->encode({ runId => 0+ $run_id }), '');
-    $c->write_sse({ type => 'complete', text => $payload });
+    $c->write_table_sse('complete', { runId => 0+ $run_id });
     return;
   }
 
@@ -950,12 +941,12 @@ sub single_details_stream ($c) {
     specialty2     => $validated_params->{specialties}->[1],
     specialty3     => $validated_params->{specialties}->[2],
     specialty4     => $validated_params->{specialties}->[3],
-    generic1       => 'level4',  # TODO: Make configurable
+    generic1       => 'level4',    # TODO: Make configurable
   };
 
   # Stream computation in batches
-  my $batch_size = 20;
-  my $current_idx = 0;
+  my $batch_size     = 50;   # Aligned with Pairs - client batching handles this
+  my $current_idx    = 0;
   my $total_generals = scalar(@generals);
   my $recurring_id;
 
@@ -963,16 +954,23 @@ sub single_details_stream ($c) {
     return if !$c->tx || $c->tx->is_finished;
 
     if ($current_idx >= $total_generals) {
-      my $payload = encode_base64($c->encode({ runId => $run_id }), '');
-      $c->write_sse({ type => 'complete', text => $payload });
-      Mojo::IOLoop->remove($recurring_id) if $recurring_id;
+      # Small delay to ensure last batch is written before complete event
+      my $flush_delay = $c->table_complete_flush_delay;   # 100ms to match Pairs
+
+      Mojo::IOLoop->timer(
+        $flush_delay => sub {
+          $c->send_complete_event($run_id, $total_generals, 'generals');
+          Mojo::IOLoop->remove($recurring_id) if $recurring_id;
+        }
+      );
       return;
     }
 
-    my $batch_end = List::Util::min($current_idx + $batch_size, $total_generals);
+    my $batch_end =
+      List::Util::min($current_idx + $batch_size, $total_generals);
 
     for my $i ($current_idx .. $batch_end - 1) {
-      my $general = $generals[$i];
+      my $general      = $generals[$i];
       my $general_name = $general->name;
 
       # Compute using PDL
@@ -983,27 +981,38 @@ sub single_details_stream ($c) {
       );
 
       my $row = {
-        primary            => $general->to_hash,
-        attackbuff         => $summary->{buffValues}->{$buffKey}{'Attack'} // 0,
-        defensebuff        => $summary->{buffValues}->{$buffKey}{'Defense'} // 0,
-        hpbuff             => $summary->{buffValues}->{$buffKey}{'HP'} // 0,
-        marchbuff          => $summary->{buffValues}->{$buffKey}{'March Size'} // 0,
-        groundattackdebuff => $summary->{debuffValues}->{'Ground Troops'}{'Attack'} // 0,
-        grounddefensedebuff => $summary->{debuffValues}->{'Ground Troops'}{'Defense'} // 0,
-        groundhpdebuff     => $summary->{debuffValues}->{'Ground Troops'}{'HP'} // 0,
-        mountedattackdebuff => $summary->{debuffValues}->{'Mounted Troops'}{'Attack'} // 0,
-        mounteddefensedebuff => $summary->{debuffValues}->{'Mounted Troops'}{'Defense'} // 0,
-        mountedhpdebuff    => $summary->{debuffValues}->{'Mounted Troops'}{'HP'} // 0,
-        rangedattackdebuff => $summary->{debuffValues}->{'Ranged Troops'}{'Attack'} // 0,
-        rangeddefensedebuff => $summary->{debuffValues}->{'Ranged Troops'}{'Defense'} // 0,
-        rangedhpdebuff     => $summary->{debuffValues}->{'Ranged Troops'}{'HP'} // 0,
-        siegeattackdebuff  => $summary->{debuffValues}->{'Siege Machines'}{'Attack'} // 0,
-        siegedefensedebuff => $summary->{debuffValues}->{'Siege Machines'}{'Defense'} // 0,
-        siegehpdebuff      => $summary->{debuffValues}->{'Siege Machines'}{'HP'} // 0,
+        primary     => $general->to_hash,
+        attackbuff  => $summary->{buffValues}->{$buffKey}{'Attack'}     // 0,
+        defensebuff => $summary->{buffValues}->{$buffKey}{'Defense'}    // 0,
+        hpbuff      => $summary->{buffValues}->{$buffKey}{'HP'}         // 0,
+        marchbuff   => $summary->{buffValues}->{$buffKey}{'March Size'} // 0,
+        groundattackdebuff =>
+          $summary->{debuffValues}->{'Ground Troops'}{'Attack'} // 0,
+        grounddefensedebuff =>
+          $summary->{debuffValues}->{'Ground Troops'}{'Defense'} // 0,
+        groundhpdebuff => $summary->{debuffValues}->{'Ground Troops'}{'HP'}
+          // 0,
+        mountedattackdebuff =>
+          $summary->{debuffValues}->{'Mounted Troops'}{'Attack'} // 0,
+        mounteddefensedebuff =>
+          $summary->{debuffValues}->{'Mounted Troops'}{'Defense'} // 0,
+        mountedhpdebuff => $summary->{debuffValues}->{'Mounted Troops'}{'HP'}
+          // 0,
+        rangedattackdebuff =>
+          $summary->{debuffValues}->{'Ranged Troops'}{'Attack'} // 0,
+        rangeddefensedebuff =>
+          $summary->{debuffValues}->{'Ranged Troops'}{'Defense'} // 0,
+        rangedhpdebuff => $summary->{debuffValues}->{'Ranged Troops'}{'HP'}
+          // 0,
+        siegeattackdebuff =>
+          $summary->{debuffValues}->{'Siege Machines'}{'Attack'} // 0,
+        siegedefensedebuff =>
+          $summary->{debuffValues}->{'Siege Machines'}{'Defense'} // 0,
+        siegehpdebuff => $summary->{debuffValues}->{'Siege Machines'}{'HP'}
+          // 0,
       };
 
-      my $payload = encode_base64($c->encode({ runId => $run_id, data => $row }), '');
-      $c->write_sse({ type => 'row', text => $payload });
+      $c->write_table_sse('row', { runId => $run_id, data => $row });
     }
 
     $current_idx = $batch_end;
