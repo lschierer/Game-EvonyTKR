@@ -50,7 +50,8 @@ package Game::EvonyTKR::External::General::Pair::ReduceCoordinator {
     $finished_batches->each(sub {
       my $batch_info = $_;
       my $batch_id   = $batch_info->{id};
-      return if($batch_info->{notes}->{prebuild_run_id} ne $job->prebuild_run_id);
+      return
+        if ($batch_info->{notes}->{prebuild_run_id} ne $job->prebuild_run_id);
 
       return if exists $processed->{$batch_id};
       $processed->{$batch_id}++;
@@ -88,7 +89,7 @@ package Game::EvonyTKR::External::General::Pair::ReduceCoordinator {
 
     if ($active_batches > 0 || $active_create_pairs > 0 || $new_batches > 0) {
       $job->log_debug(sprintf(
-        "Still waiting: %d reduce_batch jobs, %d create_pairs jobs, %d new batches",
+"Still waiting: %d reduce_batch jobs, %d create_pairs jobs, %d new batches",
         $active_batches, $active_create_pairs, $new_batches
       ));
       return $job->retry({ delay => $job->standard_delay });

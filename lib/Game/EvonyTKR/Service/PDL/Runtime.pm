@@ -1,7 +1,7 @@
 package Game::EvonyTKR::Service::PDL::Runtime;
 use v5.42.0;
 use utf8;
-use Mojo::Base -base, -signatures;
+use Mojo::Base -base,                           -signatures;
 use Mojo::Base 'Game::EvonyTKR::Role::Logging', -role;
 use PDL;
 use PDL::NiceSlice;
@@ -55,12 +55,10 @@ The workflow:
 =cut
 
 has 'compiler' => sub ($self) {
-  Game::EvonyTKR::Service::PDL::Compiler->new(
-    data_dir => $self->data_dir
-  );
+  Game::EvonyTKR::Service::PDL::Compiler->new(data_dir => $self->data_dir);
 };
 
-has 'data_dir' => sub { 'share/collections/data' };
+has 'data_dir' => sub {'share/collections/data'};
 has 'log' => sub { Game::EvonyTKR::Role::Logging::get_logger(__PACKAGE__); };
 
 # Cache of compiled matrices: { "general_name:activation" => compiled_data }
@@ -90,9 +88,9 @@ Returns hashref of buff values (column_name => value).
 =cut
 
 sub compute_buffs ($self, %args) {
-  my $general = $args{general} or die "general required";
+  my $general    = $args{general}    or die "general required";
   my $activation = $args{activation} or die "activation required";
-  my $filters = $args{filters} || {};
+  my $filters    = $args{filters} || {};
 
   # Get or compile matrix for this general+activation
   my $compiled = $self->get_compiled_matrix($general, $activation);
@@ -143,7 +141,7 @@ sub build_filter_mask ($self, $compiled, $filters) {
   my $row_labels = $compiled->{row_labels};
 
   for my $i (0 .. $#{$row_labels}) {
-    my $label = $row_labels->[$i];
+    my $label  = $row_labels->[$i];
     my $active = 0;
 
     # Book is always active
@@ -152,27 +150,28 @@ sub build_filter_mask ($self, $compiled, $filters) {
     }
     # Ascending levels (cumulative)
     elsif ($label =~ /^asc_(.+)$/) {
-      my $level = $1;
+      my $level    = $1;
       my $selected = $filters->{ascendingLevel} || 'none';
       $active = $self->is_ascending_active($level, $selected);
     }
-    # Covenant levels (select only the chosen level - it already contains cumulative buffs)
+# Covenant levels (select only the chosen level - it already contains cumulative buffs)
     elsif ($label =~ /^cov_(.+)$/) {
-      my $level = $1;
+      my $level    = $1;
       my $selected = lc($filters->{covenantLevel} || 'none');
       $active = (lc($level) eq $selected) ? 1 : 0;
     }
-    # Specialty levels (select only the chosen level - it already contains cumulative buffs)
+# Specialty levels (select only the chosen level - it already contains cumulative buffs)
     elsif ($label =~ /^spec(\d+)_(.+)$/) {
-      my $slot = $1;
-      my $level = $2;
+      my $slot     = $1;
+      my $level    = $2;
       my $selected = lc($filters->{"specialty$slot"} || 'none');
       $active = (lc($level) eq $selected) ? 1 : 0;
     }
     # Generic book level (single row, activated by generic1 filter)
     elsif ($label =~ /^generic_(.+)$/) {
       my $level = $1;
-      my $selected = lc($filters->{generic1} || 'none');  # Use generic1 as the selector
+      my $selected =
+        lc($filters->{generic1} || 'none');    # Use generic1 as the selector
       $active = (lc($level) eq $selected) ? 1 : 0;
     }
 
@@ -183,35 +182,36 @@ sub build_filter_mask ($self, $compiled, $filters) {
 }
 
 sub is_ascending_active ($self, $level, $selected) {
-  my @levels = qw(none red1 red2 red3 red4 red5 orange1 orange2 orange3 orange4 orange5);
+  my @levels =
+    qw(none red1 red2 red3 red4 red5 orange1 orange2 orange3 orange4 orange5);
   my %level_num = map { $levels[$_] => $_ } 0 .. $#levels;
 
-  my $level_idx = $level_num{$level} // 0;
+  my $level_idx    = $level_num{$level}    // 0;
   my $selected_idx = $level_num{$selected} // 0;
 
-  # Ascending is cumulative: if selected=red3, then red1, red2, red3 are all active
+# Ascending is cumulative: if selected=red3, then red1, red2, red3 are all active
   return $level_idx > 0 && $level_idx <= $selected_idx ? 1 : 0;
 }
 
 sub is_covenant_active ($self, $level, $selected) {
-  my @levels = qw(none war cooperation civilization faith honor peace);
+  my @levels    = qw(none war cooperation civilization faith honor peace);
   my %level_num = map { $levels[$_] => $_ } 0 .. $#levels;
 
-  my $level_idx = $level_num{lc($level)} // 0;
-  my $selected_idx = $level_num{lc($selected)} // 0;
+  my $level_idx    = $level_num{ lc($level) }    // 0;
+  my $selected_idx = $level_num{ lc($selected) } // 0;
 
-  # Covenant is cumulative: if selected=civilization, then war, cooperation, civilization are all active
+# Covenant is cumulative: if selected=civilization, then war, cooperation, civilization are all active
   return $level_idx > 0 && $level_idx <= $selected_idx ? 1 : 0;
 }
 
 sub is_specialty_active ($self, $level, $selected) {
-  my @levels = qw(none green blue purple orange gold);
+  my @levels    = qw(none green blue purple orange gold);
   my %level_num = map { $levels[$_] => $_ } 0 .. $#levels;
 
-  my $level_idx = $level_num{lc($level)} // 0;
-  my $selected_idx = $level_num{lc($selected)} // 0;
+  my $level_idx    = $level_num{ lc($level) }    // 0;
+  my $selected_idx = $level_num{ lc($selected) } // 0;
 
-  # Specialty is cumulative: if selected=gold, then green, blue, purple, orange, gold are all active
+# Specialty is cumulative: if selected=gold, then green, blue, purple, orange, gold are all active
   return $level_idx > 0 && $level_idx <= $selected_idx ? 1 : 0;
 }
 
@@ -255,7 +255,7 @@ sub vector_to_hash ($self, $compiled, $buff_vector) {
 
   for my $i (0 .. $#{$columns}) {
     my $column_name = $columns->[$i];
-    my $value = $buff_vector->at($i);
+    my $value       = $buff_vector->at($i);
     $buffs{$column_name} = $value;
   }
 
@@ -280,57 +280,58 @@ sub get_buff_summary ($self, %args) {
   my $buff_values = {
     'Ground Troops' => {
       'March Size' => $buffs->{march_size},
-      'Attack' => $buffs->{attack_ground} + $buffs->{attack_all},
-      'Defense' => $buffs->{defense_ground} + $buffs->{defense_all},
-      'HP' => $buffs->{hp_ground} + $buffs->{hp_all},
+      'Attack'     => $buffs->{attack_ground} + $buffs->{attack_all},
+      'Defense'    => $buffs->{defense_ground} + $buffs->{defense_all},
+      'HP'         => $buffs->{hp_ground} + $buffs->{hp_all},
     },
     'Mounted Troops' => {
       'March Size' => $buffs->{march_size},
-      'Attack' => $buffs->{attack_mounted} + $buffs->{attack_all},
-      'Defense' => $buffs->{defense_mounted} + $buffs->{defense_all},
-      'HP' => $buffs->{hp_mounted} + $buffs->{hp_all},
+      'Attack'     => $buffs->{attack_mounted} + $buffs->{attack_all},
+      'Defense'    => $buffs->{defense_mounted} + $buffs->{defense_all},
+      'HP'         => $buffs->{hp_mounted} + $buffs->{hp_all},
     },
     'Ranged Troops' => {
       'March Size' => $buffs->{march_size},
-      'Attack' => $buffs->{attack_ranged} + $buffs->{attack_all},
-      'Defense' => $buffs->{defense_ranged} + $buffs->{defense_all},
-      'HP' => $buffs->{hp_ranged} + $buffs->{hp_all},
+      'Attack'     => $buffs->{attack_ranged} + $buffs->{attack_all},
+      'Defense'    => $buffs->{defense_ranged} + $buffs->{defense_all},
+      'HP'         => $buffs->{hp_ranged} + $buffs->{hp_all},
     },
     'Siege Machines' => {
       'March Size' => $buffs->{march_size},
-      'Attack' => $buffs->{attack_siege} + $buffs->{attack_all},
-      'Defense' => $buffs->{defense_siege} + $buffs->{defense_all},
-      'HP' => $buffs->{hp_siege} + $buffs->{hp_all},
+      'Attack'     => $buffs->{attack_siege} + $buffs->{attack_all},
+      'Defense'    => $buffs->{defense_siege} + $buffs->{defense_all},
+      'HP'         => $buffs->{hp_siege} + $buffs->{hp_all},
     },
   };
 
   # Add other buffs
   $buff_values->{Other} = {
     'Death to Wounded' => $buffs->{death_to_wounded},
-    'Marching Speed' => $buffs->{marching_speed},
+    'Marching Speed'   => $buffs->{marching_speed},
   };
 
   # Organize debuffs by troop type
   my $debuff_values = {
     'Ground Troops' => {
-      'Attack' => $buffs->{enemy_attack_ground} + $buffs->{enemy_attack_all},
+      'Attack'  => $buffs->{enemy_attack_ground} + $buffs->{enemy_attack_all},
       'Defense' => $buffs->{enemy_defense_ground} + $buffs->{enemy_defense_all},
-      'HP' => $buffs->{enemy_hp_ground} + $buffs->{enemy_hp_all},
+      'HP'      => $buffs->{enemy_hp_ground} + $buffs->{enemy_hp_all},
     },
     'Mounted Troops' => {
-      'Attack' => $buffs->{enemy_attack_mounted} + $buffs->{enemy_attack_all},
-      'Defense' => $buffs->{enemy_defense_mounted} + $buffs->{enemy_defense_all},
+      'Attack'  => $buffs->{enemy_attack_mounted} + $buffs->{enemy_attack_all},
+      'Defense' => $buffs->{enemy_defense_mounted} +
+        $buffs->{enemy_defense_all},
       'HP' => $buffs->{enemy_hp_mounted} + $buffs->{enemy_hp_all},
     },
     'Ranged Troops' => {
-      'Attack' => $buffs->{enemy_attack_ranged} + $buffs->{enemy_attack_all},
+      'Attack'  => $buffs->{enemy_attack_ranged} + $buffs->{enemy_attack_all},
       'Defense' => $buffs->{enemy_defense_ranged} + $buffs->{enemy_defense_all},
-      'HP' => $buffs->{enemy_hp_ranged} + $buffs->{enemy_hp_all},
+      'HP'      => $buffs->{enemy_hp_ranged} + $buffs->{enemy_hp_all},
     },
     'Siege Machines' => {
-      'Attack' => $buffs->{enemy_attack_siege} + $buffs->{enemy_attack_all},
+      'Attack'  => $buffs->{enemy_attack_siege} + $buffs->{enemy_attack_all},
       'Defense' => $buffs->{enemy_defense_siege} + $buffs->{enemy_defense_all},
-      'HP' => $buffs->{enemy_hp_siege} + $buffs->{enemy_hp_all},
+      'HP'      => $buffs->{enemy_hp_siege} + $buffs->{enemy_hp_all},
     },
   };
 
@@ -347,16 +348,16 @@ Computes combined buffs for a general pair.
 =cut
 
 sub compute_pair_buffs ($self, %args) {
-  my $primary = $args{primary} or die "primary general required";
-  my $secondary = $args{secondary} or die "secondary general required";
-  my $activation = $args{activation} or die "activation required";
-  my $primary_filters = $args{primary_filters} || {};
+  my $primary           = $args{primary}    or die "primary general required";
+  my $secondary         = $args{secondary}  or die "secondary general required";
+  my $activation        = $args{activation} or die "activation required";
+  my $primary_filters   = $args{primary_filters}   || {};
   my $secondary_filters = $args{secondary_filters} || {};
 
   # CRITICAL: For pairs, we select 6 best generic books total (not 3 for each)
   # Apply all 6 to primary, none to secondary, to avoid duplicate book selection
-  my $pair_primary_filters = { %$primary_filters };
-  my $pair_secondary_filters = { %$secondary_filters };
+  my $pair_primary_filters   = {%$primary_filters};
+  my $pair_secondary_filters = {%$secondary_filters};
 
   # Use 6 books for primary (best 6 for the pair)
   $pair_primary_filters->{generic1} = 'level6';
@@ -366,15 +367,15 @@ sub compute_pair_buffs ($self, %args) {
 
   # Compute buffs for each general
   my $primary_buffs = $self->compute_buffs(
-    general => $primary,
+    general    => $primary,
     activation => $activation,
-    filters => $pair_primary_filters,
+    filters    => $pair_primary_filters,
   );
 
   my $secondary_buffs = $self->compute_buffs(
-    general => $secondary,
+    general    => $secondary,
     activation => $activation,
-    filters => $pair_secondary_filters,
+    filters    => $pair_secondary_filters,
   );
 
   # Add buff vectors (element-wise addition)

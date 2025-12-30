@@ -39,8 +39,12 @@ sub get_pair ($self, $key) {
 
   unless ($wire_pair) {
     my @caller_info = caller(1);
-    $self->log_warn(sprintf('cannot find pair for key %s (called from %s line %d)',
-      $key, $caller_info[3] // 'unknown', $caller_info[2] // 0));
+    $self->log_warn(sprintf(
+      'cannot find pair for key %s (called from %s line %d)',
+      $key,
+      $caller_info[3] // 'unknown',
+      $caller_info[2] // 0
+    ));
     return;
   }
 
@@ -96,15 +100,16 @@ sub get_pairs_for_type_batch ($self, $type, $opts = {}) {
 
   eval {
     my $type_pairs = $self->persistence->list_pairs_by_type($type);
-    foreach my $wp (sort {$self->wire_pair_to_key($a) cmp $self->wire_pair_to_key($b) } @$type_pairs) {
+    foreach my $wp (
+      sort { $self->wire_pair_to_key($a) cmp $self->wire_pair_to_key($b) }
+      @$type_pairs) {
       # Pass options down to from_wire_hash (e.g., populateGenericBooks => 0)
       my $pair_obj;
       if ($opts->{skip_generic_books}) {
-        $pair_obj = Game::EvonyTKR::Model::General::Pair->from_wire_hash(
-          $wp,
-          populateGenericBooks => 0
-        );
-      } else {
+        $pair_obj = Game::EvonyTKR::Model::General::Pair->from_wire_hash($wp,
+          populateGenericBooks => 0);
+      }
+      else {
         $pair_obj = Game::EvonyTKR::Model::General::Pair->from_wire_hash($wp);
       }
 

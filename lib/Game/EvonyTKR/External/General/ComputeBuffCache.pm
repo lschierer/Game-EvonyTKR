@@ -26,12 +26,15 @@ sub common_activation_types ($job) {
   }
   elsif (grep {/mayor/i} @$general_types) {
     return ['Defense', 'Mayor'];
-  }elsif(grep { /(?:mounted|ranged)/i }@$general_types ){
-    return ['Reinforcing','Attacking', 'PvM'];
-  }elsif(grep { /ground/i }@$general_types ){
-    return ['Reinforcing','Attacking', 'PvM'];
-  }elsif(grep { /siege/i }@$general_types ){
-    return ['Wall','Attacking','Defense'];
+  }
+  elsif (grep {/(?:mounted|ranged)/i} @$general_types) {
+    return ['Reinforcing', 'Attacking', 'PvM'];
+  }
+  elsif (grep {/ground/i} @$general_types) {
+    return ['Reinforcing', 'Attacking', 'PvM'];
+  }
+  elsif (grep {/siege/i} @$general_types) {
+    return ['Wall', 'Attacking', 'Defense'];
   }
 
   # Most generals use Attacking and PvM (Monster hunting)
@@ -97,8 +100,11 @@ sub run ($job, @args) {
   my $cached_count = 0;
 
   foreach my $target_type ($job->general->type->@*) {
-    unless(length($target_type)){
-      $job->log_error(sprintf('general "%s" has invalid target type with no length.', $job->general->name));
+    unless (length($target_type)) {
+      $job->log_error(
+        sprintf('general "%s" has invalid target type with no length.',
+          $job->general->name)
+      );
       next;
     }
     $job->log_debug(sprintf(
@@ -107,16 +113,18 @@ sub run ($job, @args) {
     ));
 
     my $tt;
-    if($target_type =~ /wall/i or $target_type =~ /mayor/i){
+    if ($target_type =~ /wall/i or $target_type =~ /mayor/i) {
       $tt = $target_type;
-    }else {
+    }
+    else {
       $tt = $job->string_to_trooptype($target_type);
     }
 
-    unless(length($tt)){
+    unless (length($tt)) {
       $job->log_error(sprintf(
-        'general type to troop type conversion failed for general "%s" with type "%s"',
-        $job->general->name, $target_type));
+'general type to troop type conversion failed for general "%s" with type "%s"',
+        $job->general->name, $target_type
+      ));
       next;
     }
     $job->targetType($tt);

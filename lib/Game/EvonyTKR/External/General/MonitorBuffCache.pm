@@ -78,7 +78,8 @@ sub run ($job) {
   require Game::EvonyTKR::External::General::LoadAllComputeBuffCache;
   my $tracker =
     Game::EvonyTKR::WorkUnit::Tracker->new(persistence => $job->persistence);
-  $tracker->mark_complete(Game::EvonyTKR::External::General::LoadAllComputeBuffCache::task_name());
+  $tracker->mark_complete(
+    Game::EvonyTKR::External::General::LoadAllComputeBuffCache::task_name());
 
   $job->log_info("All general buff cache jobs completed successfully");
   return $job->finish("General buff cache monitoring complete");

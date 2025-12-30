@@ -68,12 +68,12 @@ sub are_generals_compatible ($self, $g1, $g2) {
 
   return 1 unless $self->_troop_overlap($g1, $g2);
 
-  # TEMPORARY: Disable fallback to see if ML data is loading correctly
-  #$self->log_warn(sprintf(
-  #  'No cached ML result for %s ↔ %s - returning compatible (fallback disabled)',
-  #  $g1->name, $g2->name
-  #));
-  #return 1;  # Assume compatible if no ML data
+# TEMPORARY: Disable fallback to see if ML data is loading correctly
+#$self->log_warn(sprintf(
+#  'No cached ML result for %s ↔ %s - returning compatible (fallback disabled)',
+#  $g1->name, $g2->name
+#));
+#return 1;  # Assume compatible if no ML data
 
   # Try grouped buff detection first (handles complex cases like Haakon/Cheng)
   my $grouped = Game::EvonyTKR::Service::Conflicts::GroupedBuffComparator->new(

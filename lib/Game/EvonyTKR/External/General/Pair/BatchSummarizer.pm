@@ -24,8 +24,8 @@ package Game::EvonyTKR::External::General::Pair::BatchSummarizer {
       if $job->are_prereqs_outstanding(
       $job->minion,
       [
-        'load_all_covenants','load_all_pair_builders',
-        'load_all_generals', 'load_ml_conflicts',
+        'load_all_covenants', 'load_all_pair_builders',
+        'load_all_generals',  'load_ml_conflicts',
       ]
       );
 
@@ -34,17 +34,21 @@ package Game::EvonyTKR::External::General::Pair::BatchSummarizer {
     # Extract unique generals from pairs
     my %unique_generals;
     foreach my $pair (@$pairs) {
-      $job->log_debug(sprintf('pair is a "%s".  It is "%s", and dumps as %s',
-      ref($pair) ? ref($pair) : 'scalar',
-      blessed($pair) ? 'blessed' : 'not blessed',
-      Data::Printer::np($pair)));
+      $job->log_debug(sprintf(
+        'pair is a "%s".  It is "%s", and dumps as %s',
+        ref($pair)     ? ref($pair) : 'scalar',
+        blessed($pair) ? 'blessed'  : 'not blessed',
+        Data::Printer::np($pair)
+      ));
       $pair = Game::EvonyTKR::Model::General::Pair->from_wire_hash($pair);
-      $job->log_debug(sprintf('after constructor, is a "%s".  It is "%s", and dumps as %s',
-      ref($pair) ? ref($pair) : 'scalar',
-      blessed($pair) ? 'blessed' : 'not blessed',
-      Data::Printer::np($pair)));
-      $unique_generals{ $pair->primary->name    }   = 1;
-      $unique_generals{ $pair->secondary->name  } = 1;
+      $job->log_debug(sprintf(
+        'after constructor, is a "%s".  It is "%s", and dumps as %s',
+        ref($pair)     ? ref($pair) : 'scalar',
+        blessed($pair) ? 'blessed'  : 'not blessed',
+        Data::Printer::np($pair)
+      ));
+      $unique_generals{ $pair->primary->name }   = 1;
+      $unique_generals{ $pair->secondary->name } = 1;
     }
 
     my @general_names = keys %unique_generals;
@@ -55,27 +59,31 @@ package Game::EvonyTKR::External::General::Pair::BatchSummarizer {
     my $cached_buffs = {};
     foreach my $general_name (@general_names) {
       my $primary_key = $job->generate_buff_cache_key(
-        $general_name, 1, $params->{targetType}, $params->{activationType},
-        $params->{ascendingLevel}, $params->{primaryCovenantLevel},
+        $general_name,                1,
+        $params->{targetType},        $params->{activationType},
+        $params->{ascendingLevel},    $params->{primaryCovenantLevel},
         $params->{primarySpecialty1}, $params->{primarySpecialty2},
         $params->{primarySpecialty3}, $params->{primarySpecialty4}
       );
-      $cached_buffs->{$general_name}->{primary} = $job->get_buff_cache($primary_key);
+      $cached_buffs->{$general_name}->{primary} =
+        $job->get_buff_cache($primary_key);
 
       my $secondary_key = $job->generate_buff_cache_key(
-        $general_name, 0, $params->{targetType}, $params->{activationType},
-        'none', $params->{secondaryCovenantLevel},
+        $general_name,                  0,
+        $params->{targetType},          $params->{activationType},
+        'none',                         $params->{secondaryCovenantLevel},
         $params->{secondarySpecialty1}, $params->{secondarySpecialty2},
         $params->{secondarySpecialty3}, $params->{secondarySpecialty4}
       );
-      $cached_buffs->{$general_name}->{secondary} = $job->get_buff_cache($secondary_key);
+      $cached_buffs->{$general_name}->{secondary} =
+        $job->get_buff_cache($secondary_key);
     }
 
     # Enqueue individual pair jobs with or without cached buffs
     my $jobs_enqueued = 0;
     my @spawned_job_ids;
     foreach my $pair (@$pairs) {
-      my $primary_name   = $pair->primary->name  ;
+      my $primary_name   = $pair->primary->name;
       my $secondary_name = $pair->secondary->name;
 
       $params->{primaryName}   = $primary_name;
@@ -107,7 +115,8 @@ package Game::EvonyTKR::External::General::Pair::BatchSummarizer {
       # Use timestamp-based priority to ensure newer sessions process first
       # Priority range is -100 to 100; higher = processes sooner
       # Increment by 1 every 10 seconds from base time, capped at 99
-      my $base_time = $job->app->config('APP_START_TIME') // 1734000000;  # Dec 12, 2024 reference
+      my $base_time = $job->app->config('APP_START_TIME')
+        // 1734000000;    # Dec 12, 2024 reference
       my $priority = min(99, int((time() - $base_time) / 10));
 
       my $pair_job_id = $job->minion->enqueue(

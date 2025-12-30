@@ -53,10 +53,10 @@ package Game::EvonyTKR::External::General::LoadAll {
 
     $job->log_info(sprintf('Found %d general files to process', scalar @files));
 
-    my $enqueued_count      = 0;
-    my $skipped_count       = 0;
-    my @job_ids             = ();
-    my $run_id              = $job->info->{notes}->{prebuild_run_id};
+    my $enqueued_count = 0;
+    my $skipped_count  = 0;
+    my @job_ids        = ();
+    my $run_id         = $job->info->{notes}->{prebuild_run_id};
 
     foreach my $file (@files) {
       # Extract general name from filename

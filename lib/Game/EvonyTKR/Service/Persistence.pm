@@ -18,7 +18,7 @@ has 'backend' => sub ($self) {
   unless ($backend_type) {
     $backend_type = 'postgresql';    # Default to PostgreSQL for all modes
     warn sprintf(
-"[Persistence] No explicit backend configured, using default: %s\n",
+      "[Persistence] No explicit backend configured, using default: %s\n",
       $backend_type);
   }
 

@@ -43,8 +43,8 @@ package Game::EvonyTKR::Model::General {
   has 'basicAttributes' =>
     sub { return Game::EvonyTKR::Model::BasicAttributes->new() };
 
-  # Precomputed generic book buff values by activation type and level
-  # Structure: { Attacking => { level1 => {march_size => 3, ...}, level2 => {...}, ... }, ... }
+# Precomputed generic book buff values by activation type and level
+# Structure: { Attacking => { level1 => {march_size => 3, ...}, level2 => {...}, ... }, ... }
   has 'genericBookBuffs' => sub { {} };
 
   sub set_general_id($self) {
@@ -201,7 +201,8 @@ package Game::EvonyTKR::Model::General {
       }
     }
     unless (
-      scalar(@{ $self->specialtyNames }) eq scalar(@{ $self->specialtyNames })) {
+      scalar(@{ $self->specialtyNames }) eq scalar(@{ $self->specialtyNames }))
+    {
       return 0;
     }
     unless (
@@ -218,7 +219,8 @@ package Game::EvonyTKR::Model::General {
   }
 
   sub populateGenericBooks ($self) {
-    $self->log_debug(sprintf('populateGenericBooks called for %s', $self->name));
+    $self->log_debug(
+      sprintf('populateGenericBooks called for %s', $self->name));
 
     unless ($self->persistenceHelper) {
       $self->log_error('No persistenceHelper available');
@@ -228,7 +230,8 @@ package Game::EvonyTKR::Model::General {
 
     # Ensure builtin book is populated (needed for conflict detection)
     unless ($self->builtInBook) {
-      $self->log_debug('BuiltInBook not populated, calling populateBuiltinBook()');
+      $self->log_debug(
+        'BuiltInBook not populated, calling populateBuiltinBook()');
       $self->populateBuiltinBook();
       unless ($self->builtInBook) {
         $self->log_error(sprintf(
@@ -241,14 +244,18 @@ package Game::EvonyTKR::Model::General {
     }
 
     # Get troop type (type is stored as array)
-    my $troop_type = ref($self->type) eq 'ARRAY' ? $self->type->[0] : $self->type;
+    my $troop_type =
+      ref($self->type) eq 'ARRAY' ? $self->type->[0] : $self->type;
 
     unless ($troop_type) {
-      $self->log_warn(sprintf('No troop type defined for general %s', $self->name));
+      $self->log_warn(
+        sprintf('No troop type defined for general %s', $self->name));
       return 0;
     }
 
-    $self->log_debug(sprintf('Populating generic books for %s (%s)', $self->name, $troop_type));
+    $self->log_debug(
+      sprintf('Populating generic books for %s (%s)', $self->name, $troop_type)
+    );
 
     my @activations = qw(Attacking PvM Mayor Defending);
 
@@ -265,12 +272,12 @@ package Game::EvonyTKR::Model::General {
     foreach my $activation (@activations) {
       $self->log_debug(sprintf('Processing activation: %s', $activation));
 
-      foreach my $count (1..6) {  # Compute up to 6 levels (singles use 3, pairs use 6)
+      foreach my $count (1 .. 6)
+      {    # Compute up to 6 levels (singles use 3, pairs use 6)
         my $level = "level$count";
 
         $self->log_debug(sprintf(
-          'Computing %s for %s: %d books',
-          $level, $activation, $count
+          'Computing %s for %s: %d books', $level, $activation, $count
         ));
 
         # Replicate load_best_skill_books logic with conflict detection
@@ -278,7 +285,7 @@ package Game::EvonyTKR::Model::General {
         $key = 'default' if ($troop_type eq 'wall');
 
         my @sorted_book_names;
-        if (exists $self->BestSkillBooks->{$troop_type}
+        if ( exists $self->BestSkillBooks->{$troop_type}
           && exists $self->BestSkillBooks->{$troop_type}->{$key}) {
           @sorted_book_names = sort {
             $self->BestSkillBooks->{$troop_type}->{$key}->{$a}
@@ -293,8 +300,8 @@ package Game::EvonyTKR::Model::General {
         }
         else {
           $self->log_error(sprintf(
-            'targetType "%s" is not supported by BestSkillBooks', $troop_type
-          ));
+            'targetType "%s" is not supported by BestSkillBooks',
+            $troop_type));
           next;
         }
 
@@ -306,15 +313,18 @@ package Game::EvonyTKR::Model::General {
           my $base_name = $book_name =~ s/^Level \d+ //r;
           my $book = eval { $self->get_generic_book($base_name, $best_level) };
 
-          unless ($book && ref($book) && $book->isa('Game::EvonyTKR::Model::Book')) {
+          unless ($book
+            && ref($book)
+            && $book->isa('Game::EvonyTKR::Model::Book')) {
             $self->log_error("Cannot find $book_name");
             next;
           }
 
-          # Check for full conflicts (partial conflicts OK for singles via same_side)
-          # Use delta_threshold => 15 for general-to-book (vs 25 for general-to-general)
+  # Check for full conflicts (partial conflicts OK for singles via same_side)
+  # Use delta_threshold => 15 for general-to-book (vs 25 for general-to-general)
           my $conflict_level = eval {
-            $comparator->conflicts($self, $book, { same_side => 1, delta_threshold => 15 });
+            $comparator->conflicts($self, $book,
+              { same_side => 1, delta_threshold => 15 });
           };
 
           if ($@) {
@@ -352,7 +362,7 @@ package Game::EvonyTKR::Model::General {
         # Sum buff values from all books
         my %buffs = ();
         foreach my $book (@books) {
-          foreach my $buff (@{$book->buffs}) {
+          foreach my $buff (@{ $book->buffs }) {
             # Map buff to column name
             my $column_key = $self->_map_buff_to_column($buff);
             next unless $column_key;
@@ -366,25 +376,23 @@ package Game::EvonyTKR::Model::General {
 
         $self->log_debug(sprintf(
           'Computed %s/%s: %d buff types (%s)',
-          $activation, $level, scalar(keys %buffs),
-          join(', ', map { "$_=$buffs{$_}" } keys %buffs)
+          $activation,         $level,
+          scalar(keys %buffs), join(', ', map {"$_=$buffs{$_}"} keys %buffs)
         ));
       }
     }
 
-    $self->log_debug(sprintf(
-      'populateGenericBooks complete. Activations: %s',
-      join(', ', keys %{$self->genericBookBuffs})
-    ));
+    $self->log_debug(sprintf('populateGenericBooks complete. Activations: %s',
+      join(', ', keys %{ $self->genericBookBuffs })));
 
     return 1;
   }
 
   # Helper method to map a buff to a column name (same logic as PDL Compiler)
   sub _map_buff_to_column ($self, $buff) {
-    my $attribute = lc($buff->{attribute} || '');
+    my $attribute     = lc($buff->{attribute} || '');
     my $targeted_type = $buff->{targetedType} || '';
-    my $conditions = $buff->{conditions} || [];
+    my $conditions    = $buff->{conditions}   || [];
 
     # Normalize attribute names
     $attribute =~ s/\s+/_/g;
@@ -393,16 +401,16 @@ package Game::EvonyTKR::Model::General {
     my $is_debuff = grep { $_ eq 'Enemy' } @$conditions;
 
     # Simple attributes that don't need troop type
-    return 'march_size' if $attribute eq 'march_size';
+    return 'march_size'       if $attribute eq 'march_size';
     return 'death_to_wounded' if $attribute eq 'death_to_wounded';
-    return 'marching_speed' if $attribute eq 'marching_speed';
+    return 'marching_speed'   if $attribute eq 'marching_speed';
 
     # Combat attributes need troop type suffix
     if ($attribute =~ /^(attack|defense|hp)$/) {
       my $buff_type = $attribute;
 
       # Determine troop type suffix
-      my $suffix = 'all';  # Default to 'all' if no specific type
+      my $suffix = 'all';    # Default to 'all' if no specific type
 
       if ($targeted_type =~ /ground/i) {
         $suffix = 'ground';

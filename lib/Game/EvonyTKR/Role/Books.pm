@@ -48,11 +48,9 @@ sub load_best_skill_books ($self, $general, $targetType, $activationType,
     } keys %{ $self->BestSkillBooks->{$targetType}->{'default'} };
   }
   else {
-    $self->log_error(
-      sprintf(
-        'targetType "%s" is not supported by BestSkillBooks', $targetType
-      )
-    );
+    $self->log_error(sprintf(
+      'targetType "%s" is not supported by BestSkillBooks',
+      $targetType));
     return [];
   }
 

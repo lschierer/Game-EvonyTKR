@@ -52,7 +52,8 @@ sub get_general ($self, $name, $opts = {}) {
   }
 
   my $general =
-    Game::EvonyTKR::Model::Factory->build_from_wire('General', $wire_data, $opts);
+    Game::EvonyTKR::Model::Factory->build_from_wire('General', $wire_data,
+    $opts);
 
   unless (defined($general)) {
     $self->log_error("Factory failed to build general from wire_data");

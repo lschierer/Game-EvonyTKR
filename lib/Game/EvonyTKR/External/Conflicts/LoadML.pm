@@ -144,7 +144,7 @@ package Game::EvonyTKR::External::Conflicts::LoadML {
         # CRITICAL: Only process actual conflicts (conflict: true)
         my $conflict_data = $raw_data->{$g1_name}{$g2_name};
         unless ($conflict_data->{conflict}) {
-          next;  # Skip non-conflicts
+          next;    # Skip non-conflicts
         }
 
         # Check for troop type overlap

@@ -120,7 +120,9 @@ sub harvest_tagged_jobs ($job) {
       $harvested++ unless $@;
       next;
     }
-    unless (exists $notes->{prebuild_run_id} && defined($notes->{prebuild_run_id}) && $notes->{prebuild_run_id} eq $job->prebuild_run_id) {
+    unless (exists $notes->{prebuild_run_id}
+      && defined($notes->{prebuild_run_id})
+      && $notes->{prebuild_run_id} eq $job->prebuild_run_id) {
       # This job was from a previous run, remove it
       eval { $job->minion->job($j->{id})->remove };
       $harvested++ unless $@;

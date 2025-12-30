@@ -87,20 +87,21 @@ package Game::EvonyTKR::Plugins::Navigation {
 
     $app->helper(
       generate_sitemap_xml => sub {
-        my $c = shift;
+        my $c        = shift;
         my $base_url = $c->req->url->base->to_string;
-        $base_url =~ s{/$}{};  # Remove trailing slash
-        
+        $base_url =~ s{/$}{};    # Remove trailing slash
+
         my @urls;
         for my $path (sort keys %raw_paths) {
-          push @urls, {
-            loc => "$base_url$path",
-            lastmod => $c->_get_lastmod_for_path($path),
+          push @urls,
+            {
+            loc        => "$base_url$path",
+            lastmod    => $c->_get_lastmod_for_path($path),
             changefreq => $c->_get_changefreq_for_path($path),
-            priority => $c->_get_priority_for_path($path)
-          };
+            priority   => $c->_get_priority_for_path($path)
+            };
         }
-        
+
         return $c->_render_sitemap_xml(\@urls);
       }
     );
@@ -134,18 +135,19 @@ package Game::EvonyTKR::Plugins::Navigation {
     $app->helper(
       _format_sitemap_date => sub {
         my ($c, $timestamp) = @_;
-        my ($sec,$min,$hour,$mday,$mon,$year) = gmtime($timestamp);
-        return sprintf('%04d-%02d-%02d', $year+1900, $mon+1, $mday);
+        my ($sec, $min, $hour, $mday, $mon, $year) = gmtime($timestamp);
+        return sprintf('%04d-%02d-%02d', $year + 1900, $mon + 1, $mday);
       }
     );
 
     $app->helper(
       _render_sitemap_xml => sub {
         my ($c, $urls) = @_;
-        
+
         my $xml = qq{<?xml version="1.0" encoding="UTF-8"?>\n};
-        $xml .= qq{<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n};
-        
+        $xml .=
+          qq{<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n};
+
         for my $url (@$urls) {
           $xml .= qq{  <url>\n};
           $xml .= qq{    <loc>$url->{loc}</loc>\n};
@@ -154,7 +156,7 @@ package Game::EvonyTKR::Plugins::Navigation {
           $xml .= qq{    <priority>$url->{priority}</priority>\n};
           $xml .= qq{  </url>\n};
         }
-        
+
         $xml .= qq{</urlset>\n};
         return $xml;
       }

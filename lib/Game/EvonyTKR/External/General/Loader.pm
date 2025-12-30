@@ -126,10 +126,9 @@ package Game::EvonyTKR::External::General::Loader {
 
     # Populate generic book buffs
     unless ($general->populateGenericBooks()) {
-      my $errmessage = sprintf(
-        'failed to populate generic books for general "%s"',
-        $general->name,
-      );
+      my $errmessage =
+        sprintf('failed to populate generic books for general "%s"',
+        $general->name,);
       if ($job->retries < $max_retries) {
         $job->note(error => $errmessage);
         return $job->retry({ delay => 15 });

@@ -56,27 +56,31 @@ package Game::EvonyTKR {
         # routes, UIs, helpers that need HTTP server
         _init_web($app);
 
-        # Spawn Minion workers from the manager process AFTER Hypnotoad has forked
-        # This hook runs in worker processes, so we need to detect the manager
+      # Spawn Minion workers from the manager process AFTER Hypnotoad has forked
+      # This hook runs in worker processes, so we need to detect the manager
         Mojo::IOLoop->timer(
           1 => sub {
-            my $should_spawn = _should_spawn_minion_workers();
-            my $is_spawner   = _i_am_the_one_spawner($app);
+            my $should_spawn  = _should_spawn_minion_workers();
+            my $is_spawner    = _i_am_the_one_spawner($app);
             my $has_acceptors = eval { scalar @{ $server->acceptors } } // 0;
 
             $app->log->debug(sprintf(
-              'Minion spawn check in PID %s (PPID %s): should_spawn=%s, is_spawner=%s, acceptors=%d',
-              $$, getppid(),
-              $should_spawn ? 'YES' : 'NO',
-              $is_spawner   ? 'YES' : 'NO',
+'Minion spawn check in PID %s (PPID %s): should_spawn=%s, is_spawner=%s, acceptors=%d',
+              $$,                           getppid(),
+              $should_spawn ? 'YES' : 'NO', $is_spawner ? 'YES' : 'NO',
               $has_acceptors
             ));
 
             return unless $should_spawn;
             return unless $is_spawner;
-            return unless $has_acceptors > 0;  # Only in web server processes
+            return unless $has_acceptors > 0;    # Only in web server processes
 
-            $app->log->info(sprintf("SPAWNING MINION WORKERS from PID %s (PPID %s)", $$, getppid()));
+            $app->log->info(
+              sprintf(
+                "SPAWNING MINION WORKERS from PID %s (PPID %s)",
+                $$, getppid()
+              )
+            );
             _spawn_minion_workers($app);
 
             # Queue prebuild job after workers are spawned
@@ -107,11 +111,11 @@ package Game::EvonyTKR {
   }
 
   sub _should_spawn_minion_workers () {
-    # Spawn from the initial Hypnotoad process (before it forks manager/workers)
-    # Don't rely on PPID - the wrapper script makes that unreliable
-    # Instead, rely on:
-    #   1. Not a Minion process (check env/args)
-    #   2. File lock ensures only one process spawns (even if startup() runs multiple times)
+# Spawn from the initial Hypnotoad process (before it forks manager/workers)
+# Don't rely on PPID - the wrapper script makes that unreliable
+# Instead, rely on:
+#   1. Not a Minion process (check env/args)
+#   2. File lock ensures only one process spawns (even if startup() runs multiple times)
     return !_this_is_a_minion_process();
   }
 
@@ -308,7 +312,8 @@ package Game::EvonyTKR {
       // ($app->mode eq 'development' ? 5 : 1);
     return unless $start_workers;
 
-    $app->log->info("Spawning $worker_count Minion workers with $job_count jobs each");
+    $app->log->info(
+      "Spawning $worker_count Minion workers with $job_count jobs each");
 
     for (1 .. $worker_count) {
       my $pid = fork // die "fork failed: $!";
@@ -318,23 +323,24 @@ package Game::EvonyTKR {
         next;
       }
 
-      # --- child path ---
-      # Detach from parent session so Minion workers survive Hypnotoad restarts
-      # After setsid(), this process is reparented to init (PID 1) and doesn't need explicit reaping
+# --- child path ---
+# Detach from parent session so Minion workers survive Hypnotoad restarts
+# After setsid(), this process is reparented to init (PID 1) and doesn't need explicit reaping
       setsid() or die "setsid failed: $!";
       $ENV{MINION_WORKER_CHILD} = 1;    # prevents recursion on load
       POSIX::nice(10);
-      exec($^X, $0, 'minion', 'worker', '-j', $job_count,
-      '-q', 'default', '-q', 'siege', '-q', 'ground',
-      '-q', 'ranged', '-q', 'mounted', '-q', 'mayor', '-q', 'wall',
-      )
-        or die "exec failed: $!";
+      exec(
+        $^X,        $0,       'minion',  'worker', '-j',
+        $job_count, '-q',     'default', '-q',     'siege',
+        '-q',       'ground', '-q',      'ranged', '-q',
+        'mounted',  '-q',     'mayor',   '-q',     'wall',
+      ) or die "exec failed: $!";
     }
 
-    # Note: We don't set up recurring() reaper here because:
-    # 1. Event loop isn't running yet (called from startup() before Hypnotoad starts loop)
-    # 2. setsid() reparents children to init, so we don't need to reap them
-    # 3. END block handles cleanup on shutdown
+# Note: We don't set up recurring() reaper here because:
+# 1. Event loop isn't running yet (called from startup() before Hypnotoad starts loop)
+# 2. setsid() reparents children to init, so we don't need to reap them
+# 3. END block handles cleanup on shutdown
   }
 
   # Optional: graceful stop on normal shutdown (no signal handlers needed)

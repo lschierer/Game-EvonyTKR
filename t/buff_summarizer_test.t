@@ -60,7 +60,6 @@ ok(
     ref($ascending_attributes) ? scalar(@$ascending_attributes) : 0)
 );
 
-
 my $specialties = $testManager->import_specialties();
 ok(
   ref($specialties) && scalar(@$specialties),
@@ -75,7 +74,6 @@ ok(ref($generals) && scalar(@$generals),
 my $covenants = $testManager->import_covenants();
 ok(ref($covenants) && scalar(@$covenants),
   sprintf('imported %s covenants', ref($covenants) ? scalar(@$covenants) : 0));
-
 
 subtest 'Populate Ascending Attributes' => sub {
   foreach my $general (@$generals) {

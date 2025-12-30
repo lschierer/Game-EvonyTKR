@@ -10,8 +10,9 @@ has 'service';    # parent service for constants
 # Compare generic book against general's builtin book
 # Returns: 0 = compatible, 1 = partial conflict, 2 = full conflict
 sub conflicts ($self, $general, $generic_book, $opts = {}) {
-  my $same_side = $opts->{same_side} // 0;
-  my $delta_threshold = $opts->{delta_threshold} // 25;  # 25 for general-general, 15 for general-book
+  my $same_side       = $opts->{same_side} // 0;
+  my $delta_threshold = $opts->{delta_threshold}
+    // 25;    # 25 for general-general, 15 for general-book
 
   my $builtin = $general->builtInBook;
 
@@ -139,14 +140,17 @@ sub conflicts ($self, $general, $generic_book, $opts = {}) {
 
       my $conflict;
       # special case
-      if($general->name eq 'Washington Prime' && $gen_buff->attribute eq 'March Size'){
+      if ( $general->name eq 'Washington Prime'
+        && $gen_buff->attribute eq 'March Size') {
         $conflict = 1;
-      } elsif($general->name =~ /Naomasa/i && $gen_buff->attribute eq 'HP'){
+      }
+      elsif ($general->name =~ /Naomasa/i && $gen_buff->attribute eq 'HP') {
         $conflict = 1;
       }
       else {
         $conflict =
-          $self->_buff_conflict($gen_buff, $bi_buff, \%grouped_buffs, $delta_threshold);
+          $self->_buff_conflict($gen_buff, $bi_buff, \%grouped_buffs,
+          $delta_threshold);
       }
 
       $worst = $conflict if $conflict > $worst;
@@ -160,7 +164,11 @@ sub conflicts ($self, $general, $generic_book, $opts = {}) {
   return $worst;
 }
 
-sub _buff_conflict ($self, $generic_buff, $builtin_buff, $grouped_buffs = {}, $delta_threshold = 25) {
+sub _buff_conflict (
+  $self, $generic_buff, $builtin_buff,
+  $grouped_buffs = {},
+  $delta_threshold = 25
+) {
   # Must match: attribute, troop type, conditions
   return 0 unless $generic_buff->attribute eq $builtin_buff->attribute;
 

@@ -63,7 +63,8 @@ package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
     my $all_pairs = $job->get_all_pairs();
     foreach my $pair (@$all_pairs) {
       my $type = $pair->type;
-      $pairs_in_persistence->{$type}->{lc($job->normalize($pair->primary->name))}++;
+      $pairs_in_persistence->{$type}
+        ->{ lc($job->normalize($pair->primary->name)) }++;
       $total_existing_pairs++;
     }
 
@@ -83,17 +84,20 @@ package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
 
         my $normalized_name = lc($job->normalize($general->name));
 
-        # Check if pairs already exist in persistence for this general/type
-        # Only skip if we have ALL expected pairs (general count - 1)
-        # This prevents skipping partially-completed generals from a previous interrupted run
-        my $total_generals_of_type = scalar(grep {
-          my $g_types = $_->type;
-          $g_types = [$g_types] unless ref($g_types) eq 'ARRAY';
-          grep { $_ eq $type } @$g_types;
-        } @$generals);
+# Check if pairs already exist in persistence for this general/type
+# Only skip if we have ALL expected pairs (general count - 1)
+# This prevents skipping partially-completed generals from a previous interrupted run
+        my $total_generals_of_type = scalar(
+          grep {
+            my $g_types = $_->type;
+            $g_types = [$g_types] unless ref($g_types) eq 'ARRAY';
+            grep { $_ eq $type } @$g_types;
+          } @$generals
+        );
 
         my $expected_pairs = $total_generals_of_type - 1; # Can't pair with self
-        my $existing_pairs = $pairs_in_persistence->{$type}->{$normalized_name} // 0;
+        my $existing_pairs = $pairs_in_persistence->{$type}->{$normalized_name}
+          // 0;
 
         if ($existing_pairs >= $expected_pairs) {
           $job->log_debug(sprintf(

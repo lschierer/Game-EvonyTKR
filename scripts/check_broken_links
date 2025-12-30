@@ -6,18 +6,18 @@ use File::FindLib 'lib';
 use Getopt::Long;
 use Carp;
 
-my $startUrl = 'http://localhost:3000';
-my $debug = 0;
-my $help = 0;
+my $startUrl    = 'http://localhost:3000';
+my $debug       = 0;
+my $help        = 0;
 my $distributed = 0;
-my $workers = 4;
+my $workers     = 4;
 
 GetOptions(
-  'url=s' => \$startUrl,
-  'debug' => \$debug,
-  'help' => \$help,
+  'url=s'       => \$startUrl,
+  'debug'       => \$debug,
+  'help'        => \$help,
   'distributed' => \$distributed,
-  'workers=i' => \$workers,
+  'workers=i'   => \$workers,
 ) or die "Error in command line arguments\n";
 
 if ($help) {
@@ -38,16 +38,17 @@ HELP
 if ($distributed) {
   require LinkChecker::DistributedCommand;
   my $checker = LinkChecker::DistributedCommand->new(
-    start_url => $startUrl,
-    debug => $debug,
+    start_url    => $startUrl,
+    debug        => $debug,
     worker_count => $workers,
   );
   $checker->init();
   $checker->execute();
-} else {
+}
+else {
   require LinkChecker::Command;
   my $checker = LinkChecker::Command->new(
-    debug => $debug,
+    debug    => $debug,
     startUrl => $startUrl,
   );
   $checker->init();

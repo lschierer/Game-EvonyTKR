@@ -13,34 +13,38 @@ has 'config';    # Config hash from NotYAMLConfig
 
 has 'dsn' => sub ($self) {
   my $config = $self->config || {};
-  return $config->{postgresql_dsn}
+  return
+       $config->{postgresql_dsn}
     || $ENV{POSTGRESQL_DSN}
     || 'postgresql:///evonytkr_app_data';
 };
 
 has 'pg' => sub ($self) {
   my $dsn = $self->dsn;
-  $self->log_info("[PostgreSQL] Connecting with DSN: $dsn") if $self->can('log_info');
+  $self->log_info("[PostgreSQL] Connecting with DSN: $dsn")
+    if $self->can('log_info');
 
   my $pg = Mojo::Pg->new($dsn);
 
-  # Configure connection pool - important for Minion job concurrency and web traffic
-  # Set to 40 per worker: 4 workers × 40 = 160 connections (under PostgreSQL's 200 limit)
-  # Leaves 40 connections for Minion workers and admin tools
-  # PostgreSQL configured via user-data.yaml for max_connections=200
+# Configure connection pool - important for Minion job concurrency and web traffic
+# Set to 40 per worker: 4 workers × 40 = 160 connections (under PostgreSQL's 200 limit)
+# Leaves 40 connections for Minion workers and admin tools
+# PostgreSQL configured via user-data.yaml for max_connections=200
   $pg->max_connections(40);
 
-  # Set inactivity timeout to 30 seconds - prevents stale connections from holding pool slots
+# Set inactivity timeout to 30 seconds - prevents stale connections from holding pool slots
   $pg->options->{inactivity_timeout} = 30;
 
   # Test connection before proceeding
   eval {
     my $test_db = $pg->db;
-    my $result = $test_db->query('SELECT current_database(), current_user')->hash;
+    my $result =
+      $test_db->query('SELECT current_database(), current_user')->hash;
     if ($self->can('log_info')) {
       $self->log_info(sprintf(
         "[PostgreSQL] Connected to database '%s' as user '%s'",
-        $result->{current_database}, $result->{current_user}
+        $result->{current_database},
+        $result->{current_user}
       ));
     }
   };
@@ -57,7 +61,8 @@ has 'pg' => sub ($self) {
       if $@ !~ /greater than.*latest version/;
   }
 
-  $self->log_info("[PostgreSQL] Initialization complete") if $self->can('log_info');
+  $self->log_info("[PostgreSQL] Initialization complete")
+    if $self->can('log_info');
   return $pg;
 };
 
@@ -142,16 +147,13 @@ sub harvest_job_completions ($self, $current_run_id) {
   # First count what we're about to delete
   my $count = $self->db->query(
     'SELECT COUNT(*) FROM job_completed WHERE job_name NOT LIKE $1',
-    "${current_run_id}:%"
-  )->array->[0];
+    "${current_run_id}:%")->array->[0];
 
   # Delete all records that don't start with current_run_id
   # This includes legacy records (no run_id prefix) and old run_ids
   eval {
-    $self->db->query(
-      'DELETE FROM job_completed WHERE job_name NOT LIKE $1',
-      "${current_run_id}:%"
-    );
+    $self->db->query('DELETE FROM job_completed WHERE job_name NOT LIKE $1',
+      "${current_run_id}:%");
   };
 
   if ($@) {
@@ -423,7 +425,8 @@ sub store_conflicts_batch ($self, $conflicts_hash) {
     return 0;
   };
 
-  $self->log_info(sprintf("[PostgreSQL] Batch wrote %d conflict items", $count));
+  $self->log_info(
+    sprintf("[PostgreSQL] Batch wrote %d conflict items", $count));
   return $count;
 }
 
@@ -464,7 +467,8 @@ sub get_pairs_by_type ($self, $type) {
 sub store_pair ($self, $key, $data) {
   # Validate that data is a hash ref (wire_pair format)
   unless (ref($data) eq 'HASH') {
-    warn sprintf("[PostgreSQL] Refusing to store invalid pair data for %s: expected HASH, got %s\n",
+    warn sprintf(
+"[PostgreSQL] Refusing to store invalid pair data for %s: expected HASH, got %s\n",
       $key, ref($data) || 'scalar');
     return 0;
   }
@@ -492,9 +496,8 @@ sub list_pairs_by_type ($self, $type) {
   # Query pairs_individual table for all pairs of this type
   # The name field has format "type/primary/secondary"
   my $results = $self->db->query(
-    'SELECT name, data FROM pairs_individual WHERE name LIKE $1',
-    "$type/%"
-  )->hashes;
+    'SELECT name, data FROM pairs_individual WHERE name LIKE $1', "$type/%")
+    ->hashes;
 
   my @type_pairs;
   for my $row (@$results) {
@@ -507,7 +510,8 @@ sub list_pairs_by_type ($self, $type) {
 
     # Skip invalid data (must be a hash ref, not array ref or other types)
     unless (ref($wire_pair) eq 'HASH') {
-      warn sprintf("[PostgreSQL] Invalid pair data for %s: expected HASH, got %s\n",
+      warn sprintf(
+        "[PostgreSQL] Invalid pair data for %s: expected HASH, got %s\n",
         $row->{name}, ref($wire_pair) || 'scalar');
       next;
     }

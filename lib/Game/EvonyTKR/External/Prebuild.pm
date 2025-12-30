@@ -220,7 +220,10 @@ sub run ($job, @args) {
   my $loaderJobDefs =
     $job->_build_loader_job_defs($stored_version, $current_version);
 
-  $job->log_debug(sprintf('this prebuild includes jobs: %s', join(', ', keys %{ $loaderJobDefs }), ));
+  $job->log_debug(
+    sprintf('this prebuild includes jobs: %s',
+      join(', ', keys %{$loaderJobDefs}),)
+  );
   # Check if data is current for this version
   my $data_current = 0;
   eval {
@@ -273,7 +276,6 @@ sub run ($job, @args) {
 
   $job->log_info('launching jobs to spawn loaders.');
 
-
   # Mark all work units as incomplete at start
   require Game::EvonyTKR::WorkUnit::Tracker;
   my $tracker =
@@ -304,7 +306,7 @@ sub run ($job, @args) {
   my $loaderJids = [];
   my $totalJobs  = 0;    # Count both launched and existing jobs
   foreach my $jobname (sort keys $loaderJobDefs->%*) {
-    # Check if any active/inactive jobs exist for this task WITH the current run_id
+ # Check if any active/inactive jobs exist for this task WITH the current run_id
     my $existing_jobs = $job->minion->jobs({
       tasks  => [$jobname],
       states => [qw(inactive active)]
@@ -315,14 +317,17 @@ sub run ($job, @args) {
       my $notes = $j->{notes} // {};
       if ($notes->{prebuild_run_id} && $notes->{prebuild_run_id} eq $run_id) {
         $existing_count++;
-      } else {
+      }
+      else {
         $job->minion->job($j)->remove;
         $job->minion->repair();
       }
     }
 
     if ($existing_count > 0) {
-      $job->log_info("Skipping $jobname - $existing_count jobs with run_id $run_id already exist");
+      $job->log_info(
+"Skipping $jobname - $existing_count jobs with run_id $run_id already exist"
+      );
       $totalJobs++;    # Count existing jobs
       next;
     }
