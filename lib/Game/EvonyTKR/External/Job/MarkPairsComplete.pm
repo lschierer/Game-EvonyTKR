@@ -44,7 +44,8 @@ sub run ($job) {
     Game::EvonyTKR::WorkUnit::Tracker->new(persistence => $job->persistence);
   $tracker->mark_complete('load_all_pair_builders');
 
-  $job->app->log->info("Marked work unit 'pairs' as complete");
+  $job->app->log->info("Marked work unit 'load_all_pair_builders' as complete");
 }
 
 1;
+__END__

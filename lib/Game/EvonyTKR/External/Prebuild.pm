@@ -298,6 +298,9 @@ sub run ($job, @args) {
       $tracker->mark_incomplete($prereq->task_name);
     }
   }
+  
+  # Clear other work units that don't match the load_all pattern
+  $tracker->mark_incomplete('load_ml_conflicts');
 
   # Store current run_id in persistence so controllers can find it
   $job->set_metadata(
