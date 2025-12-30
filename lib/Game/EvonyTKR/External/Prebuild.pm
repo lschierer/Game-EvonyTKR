@@ -375,7 +375,7 @@ sub run ($job, @args) {
     }
     if ($prereq->task_name =~ /load_all/) {
       # skip special cases.
-      next if ($prereq->task_name =~ /(?:pair_builders|glossary_terms)/);
+      next if ($prereq->task_name =~ /(?:pair_builders|glossary_terms|reduce)/);
       my $completion_jid = $job->minion->enqueue(
         'mark_collection_complete' => [$prereq->task_name] => {
           attempts => 10,

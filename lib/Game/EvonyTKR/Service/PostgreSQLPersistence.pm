@@ -522,6 +522,49 @@ sub list_pairs_by_type ($self, $type) {
   return \@type_pairs;
 }
 
+# Batch version: returns inflated Pair objects directly (avoids N+1 queries)
+# Options:
+#   skip_generic_books => 1  # Skip expensive generic book precomputation (for diagnostics)
+sub get_pairs_for_type_batch ($self, $type, $opts = {}) {
+  require Game::EvonyTKR::Model::General::Pair;
+
+  my $pairs = [];
+
+  eval {
+    my $type_pairs = $self->list_pairs_by_type($type);
+    foreach my $wp (
+      sort {
+        my $key_a = sprintf('%s/%s/%s',
+          $a->{type},
+          lc($a->{primary}),
+          lc($a->{secondary}));
+        my $key_b = sprintf('%s/%s/%s',
+          $b->{type},
+          lc($b->{primary}),
+          lc($b->{secondary}));
+        $key_a cmp $key_b;
+      } @$type_pairs
+    ) {
+      # Pass options down to from_wire_hash (e.g., populateGenericBooks => 0)
+      my $pair_obj;
+      if ($opts->{skip_generic_books}) {
+        $pair_obj = Game::EvonyTKR::Model::General::Pair->from_wire_hash($wp,
+          populateGenericBooks => 0);
+      }
+      else {
+        $pair_obj = Game::EvonyTKR::Model::General::Pair->from_wire_hash($wp);
+      }
+
+      push @$pairs, $pair_obj if $pair_obj;
+    }
+  };
+  if ($@) {
+    warn "Failed to load pairs for type $type: $@";
+  }
+
+  return $pairs;
+}
+
 # Table session management for idempotency across workers
 sub store_table_session ($self, $session_id, $data) {
   my $general_type    = $data->{generalType} // die 'generalType required';
@@ -719,18 +762,7 @@ CREATE TABLE IF NOT EXISTS general_buff_cache (
   updated_at DOUBLE PRECISION NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS table_sessions (
-  session_id TEXT PRIMARY KEY,
-  general_type TEXT NOT NULL,
-  buff_activation TEXT NOT NULL,
-  item_list TEXT NOT NULL,
-  created_at DOUBLE PRECISION NOT NULL,
-  expires_at DOUBLE PRECISION NOT NULL
-);
-
 -- Add indexes for common queries
-CREATE INDEX IF NOT EXISTS idx_table_sessions_expires
-  ON table_sessions (expires_at);
 CREATE INDEX IF NOT EXISTS idx_pairs_individual_type
   ON pairs_individual (name text_pattern_ops);
 
@@ -738,7 +770,6 @@ CREATE INDEX IF NOT EXISTS idx_conflicts_pair_key
   ON general_conflicts (pair_key);
 
 -- 1 down
-DROP TABLE IF EXISTS table_sessions;
 DROP TABLE IF EXISTS general_buff_cache;
 DROP TABLE IF EXISTS work_units;
 DROP TABLE IF EXISTS pairs_individual;
@@ -753,6 +784,22 @@ DROP TABLE IF EXISTS ascending_attributes;
 DROP TABLE IF EXISTS generals;
 DROP TABLE IF EXISTS job_completed;
 DROP TABLE IF EXISTS metadata;
+
+-- 2 up
+CREATE TABLE IF NOT EXISTS table_sessions (
+  session_id TEXT PRIMARY KEY,
+  general_type TEXT NOT NULL,
+  buff_activation TEXT NOT NULL,
+  item_list TEXT NOT NULL,
+  created_at DOUBLE PRECISION NOT NULL,
+  expires_at DOUBLE PRECISION NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_table_sessions_expires
+  ON table_sessions (expires_at);
+
+-- 2 down
+DROP TABLE IF EXISTS table_sessions;
 
 __END__
 
