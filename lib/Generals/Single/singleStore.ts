@@ -32,9 +32,6 @@ export class GeneralStore {
   private rowBuffer: Map<string, GeneralData> = new Map();
   private flushTimer?: number;
 
-  private rowBuffer: Map<string, GeneralData> = new Map();
-  private flushTimer?: number;
-
   readonly store: Store<GeneralState> = new Store<GeneralState>(
     {
       catalog: [],
