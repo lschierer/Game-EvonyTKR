@@ -1,0 +1,24 @@
+ascending: 1
+basic_attributes:
+  attack:
+    base: 131
+    increment: 8.48
+  defense:
+    base: 121
+    increment: 8.63
+  leadership:
+    base: 129
+    increment: 8.91
+  politics:
+    base: 117
+    increment: 8.48
+book: Pragmatic Sanction
+name: Charles VI
+specialties:
+  - Ranged Troop Defense
+  - Bash
+  - Ranged Troop Ares
+  - Inherited Order
+stars: red5
+type:
+  - ranged_specialist

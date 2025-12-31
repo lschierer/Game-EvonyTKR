@@ -1,0 +1,67 @@
+name: Henry IV
+generals:
+  - Napoleon
+  - Elizabeth I
+  - Champlain
+levels:
+  - category: war
+    text: Mounted Troop HP +10%.
+    buffs:
+      - attribute: HP
+        troop: Mounted Troops
+        value:
+          number: 10
+  - category: cooperation
+    text: Mounted Troop Training Speed +10% (passive).
+    buffs:
+      - attribute: Training Speed
+        troop: Mounted Troops
+        passive: 1
+        value:
+          number: 10
+  - category: peace
+    text: Mounted Troop Defense +10%.
+    buffs:
+      - attribute: Defense
+        troop: Mounted Troops
+        value:
+          number: 10
+  - category: faith
+    text: >-
+      Attacking Mounted Troop HP +10%.
+      In-Rally Mounted Troop HP +5% (passive).
+    buffs:
+      - attribute: HP
+        troop: Mounted Troops
+        conditions:
+          - Attacking
+        value:
+          number: 10
+      - attribute: HP
+        troop: Mounted Troops
+        passive: 1
+        conditions:
+          - When Rallying
+        value:
+          number: 5
+  - category: honor
+    text: Mounted Troop Attack +10%.
+    buffs:
+      - attribute: Attack
+        troop: Mounted Troops
+        value:
+          number: 10
+  - category: civilization
+    text: >-
+      Attacking Mounted Troop Attack +10%
+      March Size Capacity +10%
+    buffs:
+      - attribute: Attack
+        troop: Mounted Troops
+        conditions:
+          - Attacking
+        value:
+          number: 10
+      - attribute: March Size
+        value:
+          number: 10

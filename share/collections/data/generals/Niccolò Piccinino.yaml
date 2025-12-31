@@ -1,0 +1,25 @@
+name: Niccolò Piccinino
+ascending: true
+basic_attributes:
+  attack:
+    base: 134
+    increment: 9.36
+  defense:
+    base: 131
+    increment: 9.09
+  leadership:
+    base: 127
+    increment: 8.89
+  politics:
+    base: 112
+    increment: 7.93
+book: Alter Mars
+specialties:
+  - Ground Troop Formation
+  - Formation
+  - Ground Troop Ares
+  - Battle of Delebio
+stars: red5
+type:
+  - ground_specialist
+general: Niccolò Piccinino

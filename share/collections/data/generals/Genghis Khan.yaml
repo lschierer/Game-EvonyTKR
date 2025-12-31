@@ -22,3 +22,4 @@ specialties:
 stars: red5
 type:
   - mounted_specialist
+  - ranged_specialist

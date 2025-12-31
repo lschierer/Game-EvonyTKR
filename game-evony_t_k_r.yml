@@ -1,0 +1,25 @@
+---
+git_meta:
+  authors: Luke Stephen Schierer, Wags-SMITE
+  copyright: 2023-2025
+hypnotoad:
+  accepts: 1000
+  clients: 5
+  graceful_timeout: 30
+  heartbeat_interval: 10
+  heartbeat_timeout: 300
+  inactivity_timeout: 3600
+  listen:
+  - http://127.0.1.1:3000
+  proxy: 1
+  spare: 1
+  trusted_proxies:
+  - 127.0.1.1
+  - 127.0.0.1
+  workers: 4
+secrets:
+- e0deeacd35ce3e6c4b07a33ae421a4704636f001
+version:
+  build-time: 2025-12-29T01:12:42
+  git-branch: streaming
+  git-commit: 4aab717f

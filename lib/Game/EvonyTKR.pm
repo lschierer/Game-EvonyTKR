@@ -1,257 +1,371 @@
-package Game::EvonyTKR;
-# VERSION
-use v5.40.0;
-use utf8::all;
-
-use Carp;
+use v5.42.0;
 use experimental qw(class);
-use Data::Printer;
-use base qw(App::Cmd::Simple);
-use File::ShareDir ':ALL';
-use File::Spec;
-use File::HomeDir;
-use File::Path qw(make_path);
-use File::Touch;
-use YAML::XS qw{LoadFile Load};
-use Util::Any -all;
-use Devel::Peek;
+use utf8::all;
+use File::FindLib 'lib';
+require YAML::PP;
 
-use FindBin;
-use lib "$FindBin::Bin/../../lib";
-use Game::EvonyTKR::Ascending;
-use Game::EvonyTKR::Buff;
-use Game::EvonyTKR::Buff::Data;
-use Game::EvonyTKR::Buff::Value;
-use Game::EvonyTKR::General::Ground;
-use Game::EvonyTKR::General::Mounted;
-use Game::EvonyTKR::General::Pair;
-use Game::EvonyTKR::General::Pair::Creator;
-use Game::EvonyTKR::General::Ranged;
-use Game::EvonyTKR::General::Siege;
-use Game::EvonyTKR::Logger;
-use Game::EvonyTKR::SkillBook::Special;
-use Game::EvonyTKR::Speciality;
-use namespace::clean;
+#require Game::EvonyTKR::Controller::Root;
+require Game::EvonyTKR::Controller::ControllerBase;
+require Game::EvonyTKR::External::JobBase;
 
-sub opt_spec {
-  return (["option1|a", "do option 1"],);
-}
+package Game::EvonyTKR {
+  use Mojo::Base 'Mojolicious',                       -strict, -signatures;
+  use Mojo::Base 'Game::EvonyTKR::Role::Logging',     -role,   -signatures;
+  use Mojo::Base 'Game::EvonyTKR::Role::Persistence', -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Common',      -role;
+  use Log::Any::Adapter;
+  use Log::Log4perl;
+  use Mojo::File::Share qw(dist_dir );
+  use Mojo::Loader      qw(find_modules load_class);
+  use Fcntl             qw(:flock);
+  use Mojo::File;
+  use POSIX qw(setsid);
+  use Scalar::Util 'weaken';
+  use Carp;
+  use diagnostics;
+  use Env qw(DEPLOYMENT_TIME HOSTNAME );
+  our $VERSION = 'v0.50.0';
 
-sub getLogfileName() {
-  my $logger = Game::EvonyTKR::Logger->new();
-  return $logger->getLogfileName();
-}
-
-sub validate_args {
-  my ($self, $opt, $args) = @_;
-
-  # no args allowed but options
-  $self->usage_error("No args allowed") if @$args;
-}
-
-sub _logInit() {
-    my $home   = File::HomeDir->my_home;
-    my $logDir = File::Spec->catdir($home, 'var/log/Perl/dist/Game-Evony/');
-    if (!-r -w -x -o -d $logDir) {
-      make_path($logDir, "0770");
-    }
-    my $logFile = File::Spec->catfile($logDir, 'dancer2.log');
-    if (!-e $logFile) {
-      File::Touch::touch($logFile);
-      chmod(0600, $logFile);
-    }
-    my $SystemLogger = Game::EvonyTKR::Logger->new();
-    my $logFile2     = $SystemLogger->getLogfileName();
-
-    my %logLevel = (
-      development => 'ALL',
-      production  => 'INFO',
-    );
-
-    my $level = $logLevel{'production'};
-
-    my %conf = (
-      "log4perl.category.Game.EvonyTKR" => "$level, logFile2",
-      
-      "log4perl.appender.logFile"          => "Log::Log4perl::Appender::File",
-      "log4perl.appender.logFile.utf8"     => 1,
-      "log4perl.appender.logFile.filename" => $logFile,
-      "log4perl.appender.Logfile.DatePattern" => "yyyy-MM-dd",
-      "log4perl.appender.Logfile.TZ"          => "UTC",
-      "log4perl.appender.logFile.mode"        => "append",
-      "log4perl.appender.logFile.layout"      =>
-        "Log::Log4perl::Layout::PatternLayout",
-      "log4perl.appender.logFile.layout.ConversionPattern" =>
-        "[%p] %d (%C line %L) %m%n",
-
-      "log4perl.appender.logFile2"          => "Log::Log4perl::Appender::File",
-      "log4perl.appender.logFile2.utf8"     => 1,
-      "log4perl.appender.logFile2.filename" => $logFile2,
-      "log4perl.appender.logFile2.DatePattern" => "yyyy-MM-dd",
-      "log4perl.appender.logFile2.TZ"          => "UTC",
-      "log4perl.appender.logFile2.mode"        => "append",
-      "log4perl.appender.logFile2.layout"      =>
-        "Log::Log4perl::Layout::PatternLayout",
-      "log4perl.appender.logFile2.layout.ConversionPattern" =>
-        "[%p] %d (%C line %L) %m%n",
-    );
-    # ... passed as a reference to init()
-    Log::Log4perl::init(\%conf);
-    return np %conf;
+  BEGIN {
+    Game::EvonyTKR::Role::Logging::get_logger(__PACKAGE__);
   }
 
-sub execute {
-  my ($self, $opt, $args) = @_;
-  binmode(STDOUT, ":encoding(UTF-8)")
-    ;    # apparently not the same thing as "use utf8;"
-  binmode(STDIN, ":encoding(UTF-8)")
-    ;    # apparently not the same thing as "use utf8;"
-  _logInit();
-  my $logController = Game::EvonyTKR::Logger->new();
-  my $logger        = $logController->logger();
-  
-  if ($opt->{option1}) {
-    # do option 1 stuff
-  }
-  else {
-    $logger->info("$VERSION");
-    say "$VERSION";
-    $logger->info("done");
-  }
-}
+  sub startup ($app) {
+    # Set up Log::Any adapter BEFORE accessing $app->logger
+    Log::Any::Adapter->set('Log4perl');
+    $app->plugin('Log::Any' => { logger => 'Log::Log4perl' });
+    $app->log_debug('setting up logging');
 
-sub read_generals($logger) {
+    # Debug: Why is startup() being called?
+    my $is_minion  = _this_is_a_minion_process();
+    my $parent_pid = getppid();
+    $app->log->info(sprintf(
+'Mojolicious Logging initialized for process "%s" (parent: %s, is_minion: %s, MINION_WORKER_CHILD: %s)',
+      $$,                        $parent_pid,
+      $is_minion ? 'YES' : 'NO', $ENV{MINION_WORKER_CHILD} // 'unset'
+    ));
 
-  $logger->info("read_generals");
-  my $general_share =
-    File::Spec->catfile(dist_dir('Game-EvonyTKR'), 'generals');
+    $app->config(start_time => time());
 
-  my $special_share =
-    File::Spec->catfile(dist_dir('Game-EvonyTKR'), 'specialities');
-  my $ascending_share =
-    File::Spec->catfile(dist_dir('Game-EvonyTKR'), 'ascending');
-  my @found = grep { -T -s -r } glob("$general_share/*.yaml");
-  $logger->info("$general_share");
-  $logger->info(scalar @found);
+    _init_core($app);    # runs in web *and* worker
+    _init_minion($app);
 
-  my %generals;
-  foreach my $tg (@found) {
-    if (defined($tg)) {
-      open(my ($fh), '<', $tg) or croak "$!";
-      my $data = LoadFile($tg);
-      my $name = $data->{'general'}->{'name'};
-      $logger->info($name);
-      my @books           = @{ $data->{'general'}->{'books'} };
-      my @SpecialityNames = @{ $data->{'general'}->{'specialities'} };
+    # web-only: routes/UI and Minion worker spawning
+    $app->hook(
+      before_server_start => sub ($server, $app) {
+        # routes, UIs, helpers that need HTTP server
+        _init_web($app);
 
-      if (exists $data->{'general'}->{'extra'}) {
-        push @books, @{ $data->{'general'}->{'extra'} };
+      # Spawn Minion workers from the manager process AFTER Hypnotoad has forked
+      # This hook runs in worker processes, so we need to detect the manager
+        Mojo::IOLoop->timer(
+          1 => sub {
+            my $should_spawn  = _should_spawn_minion_workers();
+            my $is_spawner    = _i_am_the_one_spawner($app);
+            my $has_acceptors = eval { scalar @{ $server->acceptors } } // 0;
+
+            $app->log->debug(sprintf(
+'Minion spawn check in PID %s (PPID %s): should_spawn=%s, is_spawner=%s, acceptors=%d',
+              $$,                           getppid(),
+              $should_spawn ? 'YES' : 'NO', $is_spawner ? 'YES' : 'NO',
+              $has_acceptors
+            ));
+
+            return unless $should_spawn;
+            return unless $is_spawner;
+            return unless $has_acceptors > 0;    # Only in web server processes
+
+            $app->log->info(sprintf(
+              "SPAWNING MINION WORKERS from PID %s (PPID %s)",
+              $$, getppid()
+            ));
+            _spawn_minion_workers($app);
+
+            # Queue prebuild job after workers are spawned
+            $app->minion->enqueue(
+              external_prebuild => [{}] => {
+                priority => 100,
+                attempts => 3,
+              }
+            );
+            $app->log->info("Enqueued external_prebuild job");
+          }
+        );
       }
+    );
 
-      my $bookName = $books[0];
-      my $sb       = Game::EvonyTKR::SkillBook::Special->new(name => $bookName);
-      $sb->readFromFile();
+    # optional: worker lifecycle breadcrumbs
+    Mojo::IOLoop->next_tick(sub {
+      $app->plugins->emit(mojo_worker_started => { app => $app });
+    });
+  }
 
-      my %generalClass = (
-        'Ground'  => 'Game::EvonyTKR::General::Ground',
-        'Mounted' => 'Game::EvonyTKR::General::Mounted',
-        'Ranged'  => 'Game::EvonyTKR::General::Ranged',
-        'Siege'   => 'Game::EvonyTKR::General::Siege',
+  sub _this_proc_is_a_web_server ($server) {
+    # Minion commands and plain perl procs have no HTTP acceptors
+    my $acceptors =
+      eval { $server->can('acceptors') ? scalar @{ $server->acceptors } : 0 }
+      // 0;
+    return $acceptors > 0;
+  }
+
+  sub _should_spawn_minion_workers () {
+# Spawn from the initial Hypnotoad process (before it forks manager/workers)
+# Don't rely on PPID - the wrapper script makes that unreliable
+# Instead, rely on:
+#   1. Not a Minion process (check env/args)
+#   2. File lock ensures only one process spawns (even if startup() runs multiple times)
+    return !_this_is_a_minion_process();
+  }
+
+  sub _this_is_a_minion_process {
+    return 1 if $ENV{MINION_WORKER_CHILD};
+    return 1 if ($ENV{MOJO_COMMAND} && $ENV{MOJO_COMMAND} eq 'minion');
+    # belt-and-suspenders: if started like `script/app minion worker ...`
+    return 1 if grep { $_ eq 'minion' } @ARGV;
+    return 0;
+  }
+
+  sub _i_am_the_one_spawner ($app) {
+    # File lock so only one preforked web worker “wins”
+    state $fh;
+    $fh //= Mojo::File->new($app->home->child('spawn_minion.lock'))->open('>>');
+    return 0 unless $fh;
+    return
+      flock($fh, LOCK_EX | LOCK_NB)
+      ;    # true only in the first process that grabs it
+  }
+
+  sub _init_core ($app) {
+    my $distDir = dist_dir('Game::EvonyTKR');
+    my $mode    = $app->mode;
+    my $home    = Mojo::Home->new->detect;
+    Env::import();
+
+    my $config = $app->plugin('NotYAMLConfig' => { module => 'YAML::PP' });
+    $app->config(distDir        => $distDir);
+    $app->config(mode           => $app->mode);
+    $app->config(APP_START_TIME => time());
+    $app->config(
+      'EvonyTKR-Environment' => {
+        DEPLOYMENT_TIME => $DEPLOYMENT_TIME // 'unknown',
+        HOSTNAME        => $HOSTNAME        // `hostname`,
+      }
+    );
+
+    $app->secrets($config->{secrets});
+
+    if (!_this_is_a_minion_process()) {
+      foreach my $envkey (keys %{ $app->config->{'EvonyTKR-Environment'} }) {
+        if (defined $envkey) {
+          my $envValue = $app->config->{'EvonyTKR-Environment'}->{$envkey}
+            // 'Undefined';
+          $app->log->info(
+            "EvonyTKR-Environnment variable $envkey is $envValue");
+        }
+        else {
+          $app->log->warn('undefined envkey in EvonyTKR-Environment!');
+        }
+      }
+    }
+
+    # Eagerly initialize persistence singleton with full config
+    # This ensures the singleton is created AFTER NotYAMLConfig loads
+    # and has access to the complete config including aws.region
+    $app->_init_persistence();
+
+    push @{ $app->plugins->namespaces }, 'Game::EvonyTKR::Plugins';
+  }
+
+  sub _init_persistence ($app) {
+    # Force early initialization of the persistence singleton with full config
+    # This prevents lazy initialization happening before config is loaded
+    require Game::EvonyTKR::Role::Persistence::Core;
+    require Game::EvonyTKR::Service::Persistence;
+
+    # Directly initialize the singleton in Core.pm's package variable
+    $Game::EvonyTKR::Role::Persistence::Core::persistence =
+      Game::EvonyTKR::Service::Persistence->new(
+      mode   => $ENV{MOJO_MODE} || 'development',
+      config => $app->config    || {}
       );
 
-      my @generalClassKey;
+    $app->log->info(sprintf(
+      "Persistence initialized: mode=%s, backend=%s",
+      $Game::EvonyTKR::Role::Persistence::Core::persistence->mode,
+      ref($Game::EvonyTKR::Role::Persistence::Core::persistence->backend)
+    ));
+  }
 
-      my @scoreType = @{ $data->{'general'}->{'score_as'} };
-      if (any { $_ =~ /Ground/ } @scoreType) {
-        push @generalClassKey => 'Ground';
-      }
-      if (any { $_ =~ /Mounted/ } @scoreType) {
-        push @generalClassKey => 'Mounted';
-      }
-      if (any { $_ =~ /Ranged/ or $_ =~ /Archers/ } @scoreType) {
-        push @generalClassKey => 'Ranged';
-      }
-      if (any { $_ =~ /Siege/ } @scoreType) {
-        push @generalClassKey => 'Siege';
-      }
-      if (any { $_ =~ /Mayor/ } @scoreType) {
-        next;
-      }
-      if (scalar @generalClassKey != scalar @scoreType) {
-        croak $data->{'general'}->{'name'}
-          . " is of unknown general type "
-          . p @scoreType;
-      }
+  sub _init_minion($app) {
 
-      for (@generalClassKey) {
-        $generals{$name} = $generalClass{$_}->new(
-          name                 => $data->{'general'}->{'name'},
-          leadership           => $data->{'general'}->{'leadership'},
-          leadership_increment => $data->{'general'}->{'leadership_increment'},
-          attack               => $data->{'general'}->{'attack'},
-          attack_increment     => $data->{'general'}->{'attack_increment'},
-          defense              => $data->{'general'}->{'defense'},
-          defense_increment    => $data->{'general'}->{'defense_increment'},
-          politics             => $data->{'general'}->{'politics'},
-          politics_increment   => $data->{'general'}->{'politics_increment'},
-          builtInBook          => $sb,
-        );
-        for (@books) {
-          my $tbName = $_;
-          if ($tbName eq /$bookName/) {
-            next;
-          }
-          my $tb = Game::EvonyTKR::SkillBook::Special->new(name => $tbName);
-          $tb->readFromFile();
-          $generals{$name}->addAnotherBook($tb);
+    require Minion::Backend::Pg;
+    require Mojolicious::Plugin::Minion;
+    # Use PostgreSQL for Minion (better concurrency than SQLite)
+    my $minion_dsn = 'postgresql:///minion_db';
+    $app->log->info(sprintf(
+      "[Game::EvonyTKR] Minion PostgreSQL DSN: %s\n", $minion_dsn));
+    $app->plugin(Minion => { Pg => $minion_dsn });
+
+# Clear Minion jobs ONLY in development mode
+# In production/staging, jobs MUST persist across restarts
+# CRITICAL: Don't call reset() in production - it deletes ALL jobs including running ones!
+# With Hypnotoad spawning multiple workers, reset() was being called repeatedly, wiping the queue
+    if ($app->mode eq 'development' && !$ENV{MINION_WORKER_CHILD}) {
+      $app->minion->reset;
+      $app->log->info("Cleared Minion jobs on startup (development mode only)");
+      $app->minion->remove_after(7200);
+    }
+    elsif ($app->mode eq 'development') {
+      $app->minion->remove_after(7200);
+    }
+
+    my @task_plugins = find_modules 'Game::EvonyTKR::External',
+      { recursive => 1 };
+    foreach my $module (sort @task_plugins) {
+      # make sure Prebuild loads last.
+      next if ($module eq 'Game::EvonyTKR::External::Prebuild');
+      if (my $e = load_class($module)) {
+        my $errmessage = sprintf('loading module "%s" failed: %s', $module, $e);
+        print STDERR $errmessage;
+        $app->log->error($errmessage);
+        croak($errmessage);
+      }
+      next if ($module eq 'Game::EvonyTKR::External::Common');
+      next if ($module eq 'Game::EvonyTKR::External::JobBase');
+      $app->plugin($module);
+    }
+
+    my $module = 'Game::EvonyTKR::External::Prebuild';
+    if (my $e = load_class($module)) {
+      my $errmessage = sprintf('loading module "%s" failed: %s', $module, $e);
+      print STDERR $errmessage;
+      $app->log->error($errmessage);
+      croak($errmessage);
+    }
+    $app->plugin($module);
+  }
+
+  sub _init_web ($app) {
+    my $processmsg = "Detected non-minion process '$0' at pid $$";
+    $app->log->info($processmsg);
+    say $processmsg;
+
+    my $distDir = dist_dir('Game::EvonyTKR');
+
+    # Template and static paths
+    push @{ $app->renderer->paths }, $distDir->child('templates')->to_string;
+    push @{ $app->static->paths },   $distDir->child('public')->to_string;
+
+    $app->plugin('DefaultHelpers');
+    $app->defaults(layout => 'default');
+
+    push @{ $app->routes->namespaces },  'Game::EvonyTKR::Controller';
+    push @{ $app->plugins->namespaces }, 'Game::EvonyTKR::Controller';
+    push @{ $app->preload_namespaces },  'Game::EvonyTKR::Controller';
+
+    # Navigation
+    eval { $app->plugin('Game::EvonyTKR::Plugins::Navigation'); } or do {
+      $app->log->error('Failed to load Navigation Plugin');
+      croak('Failed to load Navigation Plugin');
+    };
+
+    my @controllerplugins = find_modules 'Game::EvonyTKR::Controller';
+    $app->log_info(
+      sprintf('found %s controller plugins', scalar(@controllerplugins)));
+    foreach my $module (@controllerplugins) {
+      if (my $e = load_class($module)) {
+        my $errmessage = sprintf('loading module "%s" failed: %s', $module, $e);
+        print STDERR $errmessage;
+        $app->log->error($errmessage);
+        croak($errmessage);
+      }
+      else {
+        next if ($module eq 'Game::EvonyTKR::Controller::ControllerBase');
+        eval {
+          $app->plugin($module);
+          $app->log_debug("loaded $module");
+        } or do {
+          $app->log_error(sprintf('failed to load module %s: %s', $module, $@));
         }
-        for (@SpecialityNames) {
-          my $sn  = $_;
-          my $tsi = Game::EvonyTKR::Speciality->new(name => $sn,);
-          $tsi->readFromFile();
-        }
-        $logger->debug("added " . np $generals{$name});
       }
+    }
 
+    if ($app->mode eq 'development') {
+      # start the web UI for debugging
+      $app->plugin('Minion::Admin');
     }
   }
-  return %generals;
-}
+
+  my %WORKER_PIDS;
+
+  sub _spawn_minion_workers ($app) {
+    return if $ENV{MINION_WORKER_CHILD};
+    my $start_workers = $ENV{START_MINION_WORKERS} // 1;
+    # Production defaults for T4G Large (2 vCPUs):
+    # 2 workers × 1 job = 2 concurrent processes (matches CPU count)
+    # Development: More aggressive for local multi-core machines
+    my $worker_count = $ENV{MINION_WORKERS}
+      // ($app->mode eq 'development' ? 4 : 2);
+    my $job_count = $ENV{MINION_JOB_COUNT}
+      // ($app->mode eq 'development' ? 5 : 1);
+    return unless $start_workers;
+
+    $app->log->info(
+      "Spawning $worker_count Minion workers with $job_count jobs each");
+
+    for (1 .. $worker_count) {
+      my $pid = fork // die "fork failed: $!";
+      if ($pid) {
+        $WORKER_PIDS{$pid} = 1;
+        $app->log->debug("Forked Minion worker with PID $pid");
+        next;
+      }
+
+# --- child path ---
+# Detach from parent session so Minion workers survive Hypnotoad restarts
+# After setsid(), this process is reparented to init (PID 1) and doesn't need explicit reaping
+      setsid() or die "setsid failed: $!";
+      $ENV{MINION_WORKER_CHILD} = 1;    # prevents recursion on load
+      POSIX::nice(10);
+      exec(
+        $^X,        $0,       'minion',  'worker', '-j',
+        $job_count, '-q',     'default', '-q',     'siege',
+        '-q',       'ground', '-q',      'ranged', '-q',
+        'mounted',  '-q',     'mayor',   '-q',     'wall',
+      ) or die "exec failed: $!";
+    }
+
+# Note: We don't set up recurring() reaper here because:
+# 1. Event loop isn't running yet (called from startup() before Hypnotoad starts loop)
+# 2. setsid() reparents children to init, so we don't need to reap them
+# 3. END block handles cleanup on shutdown
+  }
+
+  # Optional: graceful stop on normal shutdown (no signal handlers needed)
+  END {
+    return unless %WORKER_PIDS;
+    kill 'TERM', keys %WORKER_PIDS;
+    my $deadline = time + 10;
+    while (%WORKER_PIDS && time < $deadline) {
+      while ((my $kid = waitpid(-1, POSIX::WNOHANG)) > 0) {
+        delete $WORKER_PIDS{$kid};
+      }
+      select undef, undef, undef, 0.1;
+    }
+    kill 'KILL', keys %WORKER_PIDS if %WORKER_PIDS;
+  }
+};
 
 1;
+
 __END__
 
-# PODNAME: Game::EvonyTKR
+#ABSTRACT: The main Mojolicious configuration, command, and control module
 
-# ABSTRACT: Perl Modules providing utilities for players of Evony The King's Return
-
-=head1 SYNOPSIS
-
-  use Game::EvonyTKR;
-
-  Game::EvonyTKR->execute();
-=cut
+=pod
 
 =head1 DESCRIPTION
 
-This distribution aims to help players create and process the wealth of data that _Evony The King's Return_ dumps on users with next to no organization, documentation, or built-in tools to handle.
+this module contains the primary Mojolicious command, control and configuration.
 
-This module will (eventually) help players of the game needing to make reasonably complex analysis to make optimal choices about each of these:
-
-=for :list
-
-* Which generals to invest time and resources in
-
-* How to best pair generals for different senarios
-
-* The effects of Armor, Spiritual Beats, and Dragons on buffs and debuffs
-
-* Calculating your total buffs and debuffs in different senarios given the ever increasing number of sources for these buffs and debuffs
-
-
-
-=method getBookData($sb, $bookName)
-$sb is a Game::EvonyTKR::SkillBook
-$bookname is the YAML file containing its data. 
-This populates the skill book with the data. 
 =cut

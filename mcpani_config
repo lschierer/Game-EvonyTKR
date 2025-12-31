@@ -1,3 +1,0 @@
-local: ../../var/mirrors/minicpan/
-remote: http://cpan.org/
-repository: ../../var/repository

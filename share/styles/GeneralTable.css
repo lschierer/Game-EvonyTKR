@@ -1,0 +1,157 @@
+/* Styles for the General Pairs table */
+
+@import url('@spectrum-css/table/dist/index.css');
+@import url('@spectrum-css/overlay/index.css');
+
+div#table-loading {
+  width: calc(100% - 4rem);
+  padding: 1rem;
+  margin: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  /* @spectrum-css progress bar cannot be more than 768px */
+  --mod-progressbar-size-default: min(768px, 100%);
+}
+
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--spectrum-overlay-background-color); /* token */
+  pointer-events: none;
+}
+
+.spectrum-Overlay-content {
+  background-color: var(--spectrum-global-color-gray-50); /* surface overlay */
+  padding: var(--spectrum-global-dimension-size-200)
+    var(--spectrum-global-dimension-size-400);
+  border-radius: var(--spectrum-alias-border-radius-medium);
+  color: var(--spectrum-global-color-gray-900);
+  font-weight: var(--spectrum-global-font-weight-bold);
+  pointer-events: auto;
+}
+
+/* Add cursor pointer to sortable headers */
+.spectrum-Table-headCell.is-sortable {
+  cursor: pointer;
+}
+
+td.spectrum-Table-cell.stale,
+td.spectrum-Table-cell.pending,
+tr.spectrum-Table-row.stale,
+tr.spectrum-Table-row.pending {
+  /* stylelint-disable-next-line custom-property-pattern */
+  --mod-table-row-background-color--quiet: var(--surface-2);
+  --mod-table-row-background-color: var(--surface-2);
+
+  /* stylelint-disable-next-line custom-property-pattern */
+  background-color: var(--mod-table-row-background-color--quiet);
+}
+
+td.spectrum-Table-cell.error,
+tr.spectrum-Table-row.error {
+  /* stylelint-disable-next-line custom-property-pattern */
+  --mod-table-row-background-color--quiet: var(--spectrum-red-200);
+  --mod-table-row-background-color: var(--spectrum-red-200);
+  --mod-table-row-text-color: var(--spectrum-red-1000);
+
+  /* stylelint-disable-next-line custom-property-pattern */
+  background-color: var(--mod-table-row-background-color--quiet);
+}
+
+thead,
+tr {
+  width: 100%;
+}
+
+.general-pairs-table {
+  max-width: 75vw;
+  max-height: 65vh;
+  margin: 20px 0;
+}
+
+div.table-header-sort {
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+  cursor: pointer;
+}
+
+span.table-header-sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2em;
+}
+
+span.table-header-sort-index {
+  background: var(--surface-3);
+  color: var(--brand);
+  font-size: calc(calc(var(--size-2) + var(--size-3)) / 2);
+  padding: calc(calc(var(--size-2) + var(--size-1)) / 2);
+  border-radius: 50%;
+  line-height: var(--size-1);
+  display: inline-block;
+}
+
+table.spectrum-Table-main {
+  width: fit-content;
+  max-width: 100%;
+}
+
+tbody::before {
+  content: '';
+  display: table-row;
+  height: 0;
+}
+
+tbody::before > td {
+  padding: 0;
+  border: none;
+}
+
+tbody.spectrum-Table-body {
+  overflow: auto;
+  max-height: 60vh; /* or whatever height */
+  width: 100%;
+  min-width: 100%;
+}
+
+tbody.spectrum-Table-body > tr {
+  width: 100%;
+}
+
+/* Loading indicator styles */
+.loading-indicator {
+  top: 10px;
+  right: 10px;
+  padding: 8px 16px;
+  background-color: rgb(0 0 0 / 70%);
+  color: white;
+  border-radius: 4px;
+  z-index: 1000;
+}
+
+.loading-placeholder {
+  color: #888;
+  font-style: italic;
+}
+
+/* Responsive adjustments */
+@media (width <= 768px) {
+  .general-pairs-table {
+    overflow-x: auto;
+  }
+}
+
+div.hidden {
+  display: none;
+  visibility: hidden;
+}

@@ -1,0 +1,6 @@
+---
+# Development mode configuration
+# Uses PostgreSQL for all persistence (Minion + application data)
+persistence:
+  backend: postgresql
+  postgresql_dsn: 'postgresql:///evonytkr_app_data'

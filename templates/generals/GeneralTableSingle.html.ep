@@ -1,0 +1,20 @@
+% layout 'default';
+<link rel="stylesheet" href="/css/GeneralTable.css" />
+<script  type="module" >
+  import "/js/lib/Generals/Single/index.js";
+</script>
+
+<div class="general-comparison">
+
+  <div class="general-table-container">
+    <state-manager>
+      <buff-filter is_primary form_title="<%= $PrimaryFormTitle %>">
+        <general-picker>
+          <single-table>
+            <single-data></single-data>
+          </single-table>
+        </general-picker>
+      </buff-filter>
+    </state-manager>
+  </div>
+</div>

@@ -1,0 +1,22 @@
+name: Pragmatic Sanction
+text: >-
+  Increases ranged troops' attack and HP by 55% and defense by 40% when General is leading the army to attack.
+buffs:
+  - attribute: Attack
+    targetedType: Ranged Troops
+    value:
+      number: 55
+      unit: percentage
+  - attribute: Defense
+    targetedType: Ranged Troops
+    value:
+      number: 55
+      unit: percentage
+  - attribute: HP
+    conditions:
+      - Attacking
+      - leading the army
+    targetedType: Ranged Troops
+    value:
+      number: 40
+      unit: percentage

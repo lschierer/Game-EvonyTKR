@@ -1,8 +1,6 @@
-use strict;
 use Test::More;
-use Game::EvonyTKR;
 
-# replace with the actual test
-ok 1;
+use File::FindLib 'lib';
+require_ok('Game::EvonyTKR');
 
-done_testing;
+done_testing();

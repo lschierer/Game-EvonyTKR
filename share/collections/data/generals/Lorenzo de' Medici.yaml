@@ -1,0 +1,25 @@
+name: Lorenzo de' Medici
+ascending: true
+basic_attributes:
+  attack:
+    base: 133
+    increment: 9.51
+  defense:
+    base: 126
+    increment: 8.79
+  leadership:
+    base: 130
+    increment: 9.07
+  politics:
+    base: 115
+    increment: 7.96
+book: Magnifico
+specialties:
+  - Ground Troop Assault
+  - Annihilation
+  - Ground Troop Ares
+  - Needle of the Scale
+stars: red5
+type:
+  - ground_specialist
+general: Lorenzo de' Medici

@@ -1,0 +1,21 @@
+<div class="builtinbook-details">
+  <% if( $item ) { %>
+    <% require Scalar::Util; %>
+    <% if( Scalar::Util::reftype($item) eq 'HASH' && Scalar::Util::blessed($item) =~ /Game::EvonyTKR::Model::Book/) { %>
+      <h3><%= $item->name %></h3>
+      <p class="description">
+        <%= $item->text %>
+      </p>
+      <ul>
+        <% foreach my $buff  (@{ $item->buff }) { %>
+          <%= include 'buffs/single', buff => $buff %>
+        <% } %>
+      </ul>
+    <% } else { %>
+      <%= Scalar::Util::reftype($item) %>
+      <%= Scalar::Util::blessed($item) %>
+    <% } %>
+  <% } %>
+</div>
+<% require Data::Printer; %>
+<!-- <%== Data::Printer::np($item) %> -->

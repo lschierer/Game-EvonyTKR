@@ -1,8 +1,12 @@
-name: Level 3 Ranged Troop Attack Against Monster
-text: Increases Ranged Troop by 35% when General is leading the army.
+---
 buffs:
-  - attribute: Attack
-    targetedType: Ranged Troops
-    value:
-      number: 35
-      unit: percentage
+- attribute: Attack
+  conditions:
+  - Against Monsters
+  targetedType: Ranged Troops
+  value:
+    number: 35
+    unit: percentage
+level: 3
+name: Ranged Troop Attack Against Monster
+text: Increases Ranged Troop by 35% when General is leading the army.

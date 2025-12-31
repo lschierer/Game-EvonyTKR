@@ -1,0 +1,370 @@
+#cloud-config
+package_update: true
+package_upgrade: true
+packages:
+  - autoconf
+  - autoconf-archive
+  - automake
+  - bison
+  - build-essential
+  - certbot
+  - curl
+  - flex
+  - gcc
+  - gcc-13-locales
+  - gettext
+  - git
+  - gnu-standards
+  - graphviz
+  - libgd-dev
+  - libgraphviz-dev
+  - libssl-dev
+  - libtool
+  - libzip-dev
+  - make
+  - nginx
+  - openssh-server
+  - pipx
+  - pkg-config
+  - plocate
+  - postgresql
+  - postgresql-contrib
+  - postgresql-server-dev-16
+  - python3
+  - python3-certbot-nginx
+  - python3-pip
+  - rsync
+  - sqlite3
+  - sysstat
+  - unattended-upgrades
+  - unzip
+  - update-notifier-common
+users:
+  - default
+  - name: mojo
+    homedir: /opt/mojo
+    system: true
+    shell: /sbin/nologin
+    groups: www-data
+  - name: luke
+    shell: /bin/bash
+    sudo: 'ALL=(ALL) NOPASSWD:ALL'
+    groups: users, admin, adm, man, sudo, operator, src, staff, crontab
+    ssh_authorized_keys:
+      - ecdsa-sha2-nistp521 AAAAE2VjZHNhLXNoYTItbmlzdHA1MjEAAAAIbmlzdHA1MjEAAACFBABn9dVXygIvLoJrcSA71/PNcPRPxg0FBmU1QkVIPToc4cfBP9oiyGkiRJ33kz9zaL1lseB75XGoz01W0lex2/9zjAHGxDdo9byoemhtKlGXoWZ43rRfuZtXPQkLLFhONmVfG1eK5Bct4M314N4WrmbxyRg5froEvK10yqrPzeagleCywQ== lschiere@a07817adb134.ant.amazon.com
+      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDos5u8SSJXO8BcmKrjfUjxz8y9KwmfTXfhetEcPQ1bSCY/fIaebvKJG4YJ0OmFKBQLW63MTnKp9iScw9OQp0mE5q/EMQj30iXu/q6ufYoGG5U9NAr4D6wH9XEUvwS6TrDXGphseGDxZk1ZspfdMR+c/XAALgyNVnzhaqW7k1KNJjUzw9ZzVFTDWcYOKFPgOorQIjTmn3y1B6NhQ179N7yB/6NiOKLn3gwNB3/jm9WidnnGHXA940nFIBNv7Ml0jSRChXd/57+VahVzqAxo8NlpiKfLHQPj7VjwBA7s7/gB67X7vnr/sERda8EmEu0sWgCZ9V1i1eOn0B2SKojhXJIpI2kMLDrZIP0RR9hdgqatRE13wNTYzbGPlSUhOCDaiiHOuBYqNbFYhCfV0fPo0CuHPn/04pbFnRU5KDdsyhjk4oa90Df1oq/X3bfAtj1d0gfrt0SVBa9TUh4Hi6vYFBQ5YRmY3YPk2xUsJxnDTYmocizqYZLU6RCPwVMkZrxIOflS96LGVLoqVVLRXLm1UVAkGViWB9ezhT1fxoyjF2s9xT2oRY8bmro+cep/N8Dk9YfAGrJRjLGKu185+ssB+WfpB2ZjA3OMK+6NPwn573S4lO0ftatbqOZSUQ4U4zxZJE8gMtBs8tAhdRsBj6JRd30OB2bSWdwiaEErPzvAaW3uzQ== luke@schierer@opus001.schierer.org
+      - ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAgEAzzFE5saXFWaM8aJscVuqSk48EcrcOvZ1tdFSgyQkK7eH/oBnZGvAyouRtmpavwUDIUelpmfVyaMdDX606ml5ZAQkodn4Nhje5v1jJ/32Wi3gIs6kosjdsB8ew6v2LIWuVVJrz+ZsjaoALAqjYmetPbtKo42u6Ai95otWBt2NxEUZx2LrLG/6MtxrXspcrmatDZGDiDSz7KOHP2O4j7c48tLG5naaLeT5ZoPRFNhVUVujyedc1s02TtHbvQ3sICgwNxx9B4HkFLuegtWhYwFretZJzhDrEY2olFtwbQR2r4TGJLYIrudj6G06HN7zfVf7Csd+LFW7HF5aztGHwm3g907jjzmG1U3ptfAqmR5bffJXhlbemD/++0Hs+f4ta2eevTZZUwRnGpM1Y9lfFip2d3UiiNgdblhbnmPlEPZhkPgcxE5rwsHClnZ2rUsDgTaWyRoiegvxIGmArcTt5133/Y8eNkCS9/opxzqRsmZ0eNcovyjpCXoa/CXT37uOZgzjf9DcVZCtenIZyZPGLxYrqlwOJBKHLYua6k1+fQ+/v+Qq+/R0RtMW6Of3L8akx+2MQnvG4lwutVsih0Ohg49G1JkJn6/5h8NIDbE5zcBQIa4tTQOO9I3A32pjyg9XH2WnUl5PZDBOaj/TKM6t+qMlLQwePZCpZ62nQ4rL3vRCPjk= lukeschierer@minimus.local
+runcmd:
+  - export HOSTNAME='REPLACEHOSTNAME'; hostname ${HOSTNAME}
+  - export HOSTNAME='REPLACEHOSTNAME'; hostnamectl set-hostname ${HOSTNAME}
+  - export HOSTNAME='REPLACEHOSTNAME'; echo "127.0.1.1 ${HOSTNAME} ${HOSTNAME}.localdoamin" >> /etc/hosts
+  - PIPX_HOME=/usr/local/ PIPX_BIN_DIR=/usr/local/bin PIPX_MAN_DIR=/usr/local/ /usr/bin/pipx install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-py3-latest.tar.gz || echo 'cfn-bootstrap failed' >> /var/log/boostrap.log
+  - ln -sf /usr/local/bin/cfn-* /usr/bin/ || true
+  - |
+    cat > /etc/sysctl.d/local.conf << 'EOF'
+    vm.swappiness=0
+    vm.overcommit_memory=0
+    vm.overcommit_ratio=80
+    vm.vfs_cache_pressure=50
+    # PostgreSQL tuning
+    kernel.shmmax=17179869184
+    kernel.shmall=4194304
+    # Increased for many concurrent connections (10 workers × 40 clients + Minion)
+    fs.file-max=131072
+    # Network tuning for nginx → Hypnotoad keepalive
+    net.core.somaxconn=4096
+    net.ipv4.tcp_max_syn_backlog=8192
+    EOF
+  - service procps force-reload
+  - systemctl is-active sysstat
+  - add-apt-repository -y universe
+  - apt-get update
+  - apt-get dist-upgrade -y
+  # Steps to install amazon-ssm-agent manually
+  - apt-get remove --purge -y snapd
+  - curl "https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/debian_arm64/amazon-ssm-agent.deb" -o "/tmp/amazon-ssm-agent.deb"
+  - dpkg -i /tmp/amazon-ssm-agent.deb
+  - systemctl enable amazon-ssm-agent
+  - systemctl start amazon-ssm-agent
+  # set up the mojo user and environment
+  - sudo systemctl enable postgresql
+  # Configure PostgreSQL for higher concurrency before starting
+  - |
+    cat >> /etc/postgresql/16/main/postgresql.conf << 'EOF'
+
+    # Performance tuning for Mojolicious app with high concurrency
+    # Added by cloud-init user-data
+    max_connections = 275                   # Support 50 conn/worker × 4 workers
+    shared_buffers = 512MB                  # ~25% of 2GB RAM (adjust for instance size)
+    effective_cache_size = 1536MB           # ~75% of 2GB RAM
+    maintenance_work_mem = 128MB            # For VACUUM, CREATE INDEX
+    checkpoint_completion_target = 0.9      # Spread out checkpoint I/O
+    wal_buffers = 16MB                      # Write-ahead log buffers
+    default_statistics_target = 100         # Query planner statistics
+    random_page_cost = 1.1                  # SSD storage (EBS)
+    effective_io_concurrency = 200          # SSD concurrent I/O
+    work_mem = 4MB                          # Per-operation memory (200 conn × 4MB = 800MB max)
+    min_wal_size = 1GB
+    max_wal_size = 4GB
+    EOF
+  - sudo systemctl start postgresql
+  - sudo -u postgres createuser --createdb mojo
+  - sudo -u postgres createdb -O mojo minion_db
+  - sudo -u postgres createdb -O mojo evonytkr_app_data
+  - echo "local   minion_db           mojo                    peer" | sudo tee -a /etc/postgresql/16/main/pg_hba.conf
+  - echo "local   evonytkr_app_data   mojo                    peer" | sudo tee -a /etc/postgresql/16/main/pg_hba.conf
+  - systemctl reload postgresql
+  - mkdir -p /opt/mojo/var/run
+  - mkdir -p /opt/mojo/bin
+  - /usr/sbin/groupmod -a mojo -U luke
+  - chown -R mojo:www-data /opt/mojo
+  - |
+    export H=$( grep 127.0.1.1 /etc/hosts | cut -d ' ' -f 3 | cut -d '.' -f 1); cat > /etc/nginx/sites-available/mojoproxy << EOF
+    upstream mojolicious {
+      server 127.0.1.1:3000  ;
+      # Maintain pool of idle keepalive connections to reduce connection overhead
+      keepalive 32;
+      keepalive_requests 10000;
+      keepalive_timeout 1h;
+    }
+    server {
+      listen                80;
+      server_name           ${H}.evonytkrtips.net REPLACE2.evonytkrtips.net www.REPLACE2.evonytkrtips.net;
+      return                301 https://$host$request_uri;
+    }
+    # Rate limit zones - apply based on whether request is from trusted source
+    map \$http_user_agent \$limit_key {
+      default                           \$binary_remote_addr;
+      ~*LinkChecker                     "";                      # Your link checker bypasses limits
+      ~*Googlebot                       "";                      # Google gets a pass
+      ~*bingbot                         "";                      # Bing gets a pass
+    }
+
+    limit_req_zone \$limit_key zone=anti_hammer:10m rate=10r/s;        # Raised from 5r/s
+    limit_req_zone \$limit_key zone=generals_heavy:10m rate=3r/s;      # Raised from 1r/s
+    limit_req_zone \$binary_remote_addr zone=security_scan:10m rate=1r/m;  # New: block scanners
+
+    server {
+      listen 443 ssl;
+      server_name           ${H}.evonytkrtips.net REPLACE2.evonytkrtips.net www.REPLACE2.evonytkrtips.net;
+      ssl_certificate       /etc/nginx/ssl/evonytkrtips.net.crt;
+      ssl_certificate_key   /etc/nginx/ssl/evonytkrtips.net.key;
+      ssl_protocols         TLSv1 TLSv1.1 TLSv1.2 TLSv1.3;
+      ssl_ciphers           HIGH:!aNULL:!MD5;
+      ssl_session_timeout   15m;
+      # Block OpenAI crawlers
+      if (\$http_referer ~* (openai\.com)) {
+        return 444;
+      }
+
+      # Block common security scanning patterns
+      location ~* /(\.env|\.git|wp-admin|phpMyAdmin|admin|\.php\$|\.asp\$) {
+        limit_req zone=security_scan burst=1 nodelay;
+        limit_req_status 444;  # Close connection without response
+        return 404;
+      }
+
+      # Block requests with suspicious query strings (SQL injection, XSS attempts)
+      if (\$args ~* (union.*select|concat.*\(|base64_|javascript:|<script)) {
+        return 444;
+      }
+
+      # Serve static files directly from nginx (much faster than proxying to Mojolicious)
+      # These are compiled assets in the shared data directory
+      location ~* ^/(css|js|images|assets|types)/ {
+        root /opt/mojo/app/share/public;
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+
+        # Enable gzip compression for text-based files
+        gzip on;
+        gzip_types text/css application/javascript application/json image/svg+xml;
+        gzip_vary on;
+      }
+
+      # Serve ads.txt directly
+      location = /ads.txt {
+        root /opt/mojo/app/share/public;
+        expires 1d;
+      }
+
+      location /Generals {
+        limit_req zone=generals_heavy burst=5 nodelay;  # Raised from 2
+        limit_req_status 429;
+        proxy_pass http://mojolicious;
+        proxy_http_version 1.1;
+        proxy_read_timeout 3600;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host \$host;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+        proxy_read_timeout 300s;
+        proxy_connect_timeout 300s;
+        proxy_send_timeout 300s;
+      }
+
+      location / {
+        limit_req zone=anti_hammer burst=10 nodelay;  # Raised from 5
+        limit_req_status 429;
+        proxy_pass http://mojolicious;
+        proxy_http_version 1.1;
+        proxy_read_timeout 3600;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host \$host;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+        proxy_read_timeout 300s;
+        proxy_connect_timeout 300s;
+        proxy_send_timeout 300s;
+      }
+    }
+    EOF
+  - ln -s /etc/nginx/sites-available/mojoproxy /etc/nginx/sites-enabled/
+  - sudo -u mojo touch /opt/mojo/.bash_profile
+  - echo 'export PATH="/opt/mojo/.local/bin/:$HOME/bin:$PATH"' >> /opt/mojo/.bash_profile
+  - mkdir /etc/nginx/ssl
+  # if there is not a cert present where the nginx config states, then
+  # when certbot runs, it checks the nginx config syntax for correctness and it will fail
+  - openssl req -x509 -newkey rsa:2048 -keyout /etc/nginx/ssl/evonytkrtips.net.key -out /etc/nginx/ssl/evonytkrtips.net.crt -days 365 -nodes -subj "/C=US/ST=State/L=City/O=Org/OU=OrgUnit/CN=localhost"
+  - chown -R www-data:www-data /etc/nginx/ssl
+  - |
+    cat > /usr/local/bin/setup-cert.sh << 'CERTSCRIPT'
+    #!/bin/bash
+    set -e
+    H=$(hostname -s)
+
+    # Check if real cert already exists
+    if [ -L /etc/nginx/ssl/evonytkrtips.net.crt ] && [ -e /etc/nginx/ssl/evonytkrtips.net.crt ]; then
+      echo "Certificate already installed and valid"
+      exit 0
+    fi
+
+    # Check DNS is ready
+    if ! dig +short @8.8.8.8 ${H}.evonytkrtips.net A | grep -q .; then
+      echo "DNS not ready yet for ${H}.evonytkrtips.net"
+      exit 1
+    fi
+
+    # Run certbot
+    DOMAIN2=$(echo "REPLACE2.evonytkrtips.net")
+    if certbot certonly --nginx -m 'staff@schierer.org' --agree-tos -d "${H}.evonytkrtips.net" -d "${DOMAIN2}" -d "www.${DOMAIN2}" --non-interactive; then
+      # Only replace certs if certbot succeeded
+      rm -f /etc/nginx/ssl/evonytkrtips.net.key /etc/nginx/ssl/evonytkrtips.net.crt
+      ln -s /etc/letsencrypt/live/${H}.evonytkrtips.net/privkey.pem /etc/nginx/ssl/evonytkrtips.net.key
+      ln -s /etc/letsencrypt/live/${H}.evonytkrtips.net/fullchain.pem /etc/nginx/ssl/evonytkrtips.net.crt
+      systemctl reload nginx
+      echo "Certificate installed successfully"
+    else
+      echo "Certbot failed, will retry"
+      exit 1
+    fi
+    CERTSCRIPT
+  - chmod +x /usr/local/bin/setup-cert.sh
+  - |
+    cat > /etc/systemd/system/setup-cert.service << 'EOF'
+    [Unit]
+    Description=Setup Let's Encrypt Certificate
+    After=network-online.target nginx.service
+    Wants=network-online.target
+
+    [Service]
+    Type=oneshot
+    ExecStart=/usr/local/bin/setup-cert.sh
+    Restart=on-failure
+    RestartSec=30
+    StartLimitBurst=100
+
+    [Install]
+    WantedBy=multi-user.target
+    EOF
+  - systemctl enable setup-cert.service
+  - systemctl start setup-cert.service &
+  # several of the previous processes cache quite a bit, prevent OOM
+  # this is *probably* only needed in dev, as even without this it works fine
+  # on the auto retry systemctl does
+  - sync && echo 3 > /proc/sys/vm/drop_caches
+  - systemctl enable unattended-upgrades
+  #- |
+  #  cat > /etc/systemd/system/mojolicious-worker.service << 'EOF'
+  #  [Unit]
+  #  Description=Game Evony TKR Minion Worker
+  #  After=network.target
+
+  #  [Service]
+  #  Type=simple
+  #  User=mojo
+  #  WorkingDirectory=/opt/mojo/app
+  #  ExecStart=/opt/mojo/bin/mojo-worker.sh
+  #  Nice=10
+  #  IOSchedulingClass=2
+  #  IOSchedulingPriority=4
+  #  Restart=always
+  #  RestartSec=5
+
+  #  [Install]
+  #  WantedBy=multi-user.target
+  #  EOF
+  - |
+    cat > /etc/systemd/system/mojolicious.service << 'EOF'
+    [Unit]
+    Description=Game Evony TKR Mojolicious Server
+    After=network.target
+
+    [Service]
+    Type=simple
+    User=mojo
+    PIDFile=/opt/mojo/app/bin/hypnotoad.pid
+    Environment="MOJO_MODE=REPLACEMODE"
+    ExecStart=/opt/mojo/bin/mojo.sh
+    ExecReload=/bin/kill -USR2 $MAINPID
+    TimeoutStartSec=900
+    KillMode=mixed
+    Restart=always
+
+    [Install]
+    WantedBy=multi-user.target
+
+    EOF
+  - systemctl enable mojolicious
+  - mkdir -p /opt/mojo/var/log/Perl/dist/Game-EvonyTKR/
+  - mkdir -p /home/luke/var/log/Perl/dist/Game-EvonyTKR/
+  - chown -R mojo:mojo /opt/mojo/var
+  - chown -R luke:luke /home/luke/var
+  - find /opt/mojo/var -type d -exec chmod g+rx {} \;
+  - |
+    cat > /etc/logrotate.d/evonytkr << 'EOF'
+    # Logrotate configuration for Game-EvonyTKR application logs
+    # Uses copytruncate to avoid issues with processes holding open file handles
+
+    /opt/mojo/var/log/Perl/dist/Game-EvonyTKR/*.log {
+        daily
+        rotate 14
+        missingok
+        notifempty
+        copytruncate
+        compress
+        delaycompress
+        dateext
+        dateformat -%Y%m%d
+        create 0644 mojo mojo
+        sharedscripts
+    }
+
+    # System log file (if it exists in home directory)
+    /home/luke/var/log/Perl/dist/Game-EvonyTKR/*.log {
+        daily
+        rotate 7
+        missingok
+        notifempty
+        copytruncate
+        compress
+        delaycompress
+        dateext
+        dateformat -%Y%m%d
+        create 0644 luke luke
+        sharedscripts
+    }
+    EOF
+  - chmod 644 /etc/logrotate.d/evonytkr

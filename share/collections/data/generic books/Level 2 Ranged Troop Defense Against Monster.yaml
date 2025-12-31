@@ -1,8 +1,12 @@
-name: Level 2 Ranged Troop Defense Against Monster
-text: Increases Ranged Troop by 25% when General is leading the army.
+---
 buffs:
-  - attribute: Defense
-    targetedType: Ranged Troops
-    value:
-      number: 25
-      unit: percentage
+- attribute: Defense
+  conditions:
+  - Against Monsters
+  targetedType: Ranged Troops
+  value:
+    number: 25
+    unit: percentage
+level: 2
+name: Ranged Troop Defense Against Monster
+text: Increases Ranged Troop by 25% when General is leading the army.

@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(perl -c:*)",
+      "Bash(prove -v:*)",
+      "Bash(perl -Ilib t/encoding.t:*)",
+      "Bash(perl:*)",
+      "Bash(cat:*)",
+      "Bash(ls:*)",
+      "Bash(grep:*)",
+      "Bash(find:*)",
+      "Bash(sqlite3:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

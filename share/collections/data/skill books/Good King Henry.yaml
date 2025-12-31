@@ -1,0 +1,24 @@
+name: Good King Henry
+text: >-
+  Increases mounted troops' attack and HP by 55% and increases ground and mounted troops' defense by 40% when General is leading the army.
+buffs:
+  - attribute: Attack
+    targetedType: Mounted Troops
+    value:
+      number: 55
+      unit: percentage
+  - attribute: HP
+    targetedType: Mounted Troops
+    value:
+      number: 55
+      unit: percentage
+  - attribute: Defense
+    targetedType: Ground Troops
+    value:
+      number: 40
+      unit: percentage
+  - attribute: Defense
+    targetedType: Mounted Troops
+    value:
+      number: 40
+      unit: percentage

@@ -1,0 +1,84 @@
+general: Lorenzo de' Medici
+id: Lorenzo de' Medici
+ascending:
+  - level: red1
+    text: Attacking Ground Troop and Mounted Troop Defense and HP +10%
+    buffs:
+      - attribute: Defense
+        troop: Ground Troops
+        value:
+          number: 10
+        conditions:
+          - Attacking
+      - attribute: Defense
+        troop: Mounted Troops
+        value:
+          number: 10
+        conditions:
+          - Attacking
+      - attribute: HP
+        troop: Ground Troops
+        value:
+          number: 10
+        conditions:
+          - Attacking
+      - attribute: HP
+        troop: Mounted Troops
+        value:
+          number: 10
+        conditions:
+          - Attacking
+  - level: red2
+    text: Attacking Troop Death into Wounded Rate +8%
+    buffs:
+      - attribute: Death to Wounded
+        conditions:
+          - Attacking
+        value:
+          number: 8
+          unit: percentage
+  - level: red3
+    text: Attacking Ground Troop Attack +25%, March Size Capacity +5%
+    buffs:
+      - attribute: Attack
+        troop: Ground Troops
+        value:
+          number: 25
+        conditions:
+          - Attacking
+      - attribute: March Size
+        value:
+          number: 5
+  - level: red4
+    text: Attacking Ground Troop Attack +25% and HP +20%
+    buffs:
+      - attribute: Attack
+        troop: Ground Troops
+        value:
+          number: 25
+        conditions:
+          - Attacking
+      - attribute: HP
+        troop: Ground Troops
+        value:
+          number: 20
+        conditions:
+          - Attacking
+  - level: red5
+    text: When attacking, Ground Troop Attack and Defense +35%, March Size Capacity +8%
+    buffs:
+      - attribute: Attack
+        troop: Ground Troops
+        value:
+          number: 35
+        conditions:
+          - Attacking
+      - attribute: Defense
+        troop: Ground Troops
+        value:
+          number: 35
+        conditions:
+          - Attacking
+      - attribute: March Size
+        value:
+          number: 8

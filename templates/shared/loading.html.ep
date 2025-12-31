@@ -1,0 +1,2 @@
+<meta http-equiv="refresh" content="<%= $delay %>">
+<p>Data is still being prepared. Refreshing in <%= $delay %> seconds...</p>

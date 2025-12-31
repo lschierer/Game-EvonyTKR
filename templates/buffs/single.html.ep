@@ -1,0 +1,32 @@
+% my $buff = stash('buff') // die 'partials/_buff.html.ep requires buff';
+<li>
+  <dl>
+    <dt>Attribute:</dt>
+    <dd><%= $buff->attribute %></dd>
+
+    % my $tt = $buff->targetedType;
+    % if (defined $tt) {
+      <dt>Troop Type:</dt>
+      % if (ref($tt) eq 'ARRAY') {
+        % for my $t (@$tt) {
+          <dd><%== $t %></dd>
+        % }
+      % } elsif (length $tt) {
+        <dd><%= $tt %></dd>
+      % }
+    % }
+
+    % my $conds = $buff->conditions;
+    % if ($conds && @$conds) {
+      <dt>Condition(s):</dt>
+      % for my $c (@$conds) {
+        <dd><%= $c %></dd>
+      % }
+    % }
+
+    <dt>Value:</dt>
+    <dd>
+      <%= $buff->value->number %><%= ($buff->value->unit//'') eq 'percentage' ? '%' : '' %>
+    </dd>
+  </dl>
+</li>

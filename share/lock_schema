@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS app_locks (
+  name        TEXT PRIMARY KEY,
+  owner       TEXT NOT NULL,          -- pid/hostname or worker id
+  expires_at  INTEGER NOT NULL,       -- epoch seconds
+  updated_at  INTEGER NOT NULL
+);
+CREATE INDEX IF NOT EXISTS app_locks_expires_idx ON app_locks (expires_at);

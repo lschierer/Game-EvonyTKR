@@ -1,4 +1,6 @@
 Game-EvonyTKR.geany
+cdk.out
+cdk.context.json 
 /Game-EvonyTKR-*
 /.build
 /_build*
@@ -8,4 +10,31 @@ MYMETA.*
 /.prove
 *.tdy
 .vscode
+MANIFEST
+*.bak
+META.json
+META.yml
+blib
+.DS_Store
 
+# sst
+.sst
+
+node_modules
+share/infrastructure/cdk.out
+
+*.d.ts.map
+tsconfig.build.tsbuildinfo
+share/tmp
+minion.db
+minion.db-wal
+minion.db-shm
+*.lock
+var/
+
+*.csv
+*.pkl
+conflicts.json
+
+# Generated config files
+game-evony_t_k_r.production.yml

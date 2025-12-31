@@ -1,8 +1,11 @@
-name: Level 4 Mounted Troop HP
+name: Mounted Troop HP
+level: 4
 text: Increases Mounted Troop by 25% when General is leading the army.
 buffs:
   - attribute: HP
     targetedType: Mounted Troops
+    conditions:
+      - leading the army
     value:
       number: 25
       unit: percentage

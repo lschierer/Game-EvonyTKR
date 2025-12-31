@@ -1,0 +1,56 @@
+#!/usr/bin/env perl
+use v5.42;
+use experimental qw(class);
+use utf8::all;
+use File::FindLib 'lib';
+use Getopt::Long;
+use Carp;
+
+my $startUrl    = 'http://localhost:3000';
+my $debug       = 0;
+my $help        = 0;
+my $distributed = 0;
+my $workers     = 4;
+
+GetOptions(
+  'url=s'       => \$startUrl,
+  'debug'       => \$debug,
+  'help'        => \$help,
+  'distributed' => \$distributed,
+  'workers=i'   => \$workers,
+) or die "Error in command line arguments\n";
+
+if ($help) {
+  print <<HELP;
+Usage: $0 [options]
+
+Options:
+  --url=StartUrl    Url to start checking at
+  --debug           Enable debugging
+  --distributed     Use distributed workers (faster)
+  --workers=N       Number of workers for distributed mode (default: 4)
+  --help            Display this help message
+
+HELP
+  exit 0;
+}
+
+if ($distributed) {
+  require LinkChecker::DistributedCommand;
+  my $checker = LinkChecker::DistributedCommand->new(
+    start_url    => $startUrl,
+    debug        => $debug,
+    worker_count => $workers,
+  );
+  $checker->init();
+  $checker->execute();
+}
+else {
+  require LinkChecker::Command;
+  my $checker = LinkChecker::Command->new(
+    debug    => $debug,
+    startUrl => $startUrl,
+  );
+  $checker->init();
+  $checker->execute();
+}

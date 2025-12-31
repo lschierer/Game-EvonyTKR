@@ -1,8 +1,12 @@
-name: Level 3 Ground Troop Attack Against Monster
-text: Increases Ground Troop by 35% when General is leading the army.
+---
 buffs:
-  - attribute: Attack
-    targetedType: Ground Troops
-    value:
-      number: 35
-      unit: percentage
+- attribute: Attack
+  conditions:
+  - Against Monsters
+  targetedType: Ground Troops
+  value:
+    number: 35
+    unit: percentage
+level: 3
+name: Ground Troop Attack Against Monster
+text: Increases Ground Troop by 35% when General is leading the army.

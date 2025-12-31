@@ -1,0 +1,9 @@
+<!-- templates/generals/pairs/loading.html.ep -->
+<div class="loading-container">
+  <h2>Building General Pairs...</h2>
+  <p><%= $message %></p>
+  <div class="spinner"></div>
+  <script>
+    setTimeout(() => window.location.reload(), <%= $refresh_seconds * 1000 %>);
+  </script>
+</div>

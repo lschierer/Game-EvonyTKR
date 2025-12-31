@@ -1,0 +1,25 @@
+ascending: true
+basic_attributes:
+  attack:
+    base: 128
+    increment: 8.91
+  defense:
+    base: 127
+    increment: 8.62
+  leadership:
+    base: 129
+    increment: 9.02
+  politics:
+    base: 115
+    increment: 8.47
+book: Good King Henry
+specialties:
+  - Mounted Troop Defense
+  - Formation
+  - Mounted Troop Ares
+  - Edict of Nantes
+stars: red5
+type:
+  - mounted_specialist
+general: Henry IV
+name: Henry IV

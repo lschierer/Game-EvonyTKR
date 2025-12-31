@@ -1,0 +1,28 @@
+name: Alter Mars
+text: >-
+  Increases ground troops' attack and HP by 60% and ground troops and mounted troops' defense by 45% when General is leading the army.
+buffs:
+  - attribute: Attack
+    troop: Ground Troops
+    value:
+      number: 60
+    conditions:
+      - leading the army
+  - attribute: HP
+    troop: Ground Troops
+    value:
+      number: 60
+    conditions:
+      - leading the army
+  - attribute: Defense
+    troop: Ground Troops
+    value:
+      number: 45
+    conditions:
+      - leading the army
+  - attribute: Defense
+    troop: Mounted Troops
+    value:
+      number: 45
+    conditions:
+      - leading the army

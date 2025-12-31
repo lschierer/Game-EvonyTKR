@@ -1,0 +1,83 @@
+% layout 'default';
+% title 'Loading Data - Please Wait';
+
+<div class="prereqs-wait-container">
+  <h1>Data Loading in Progress</h1>
+
+  <p>The application is currently loading game data. This page will automatically refresh in <span id="countdown"><%= $retry_delay %></span> seconds.</p>
+
+  <% if(app->config->{mode} eq 'development') { %>
+    <div class="prereqs-status">
+      <h2>Waiting for:</h2>
+      <ul>
+        % for my $prereq (@$prereqs) {
+          <li><code><%= $prereq %></code></li>
+        % }
+      </ul>
+    </div>
+  <% } %>
+
+  <p class="manual-refresh">
+    If the page doesn't automatically refresh, <a href="<%= $retry_url %>">click here</a>.
+  </p>
+</div>
+
+<style>
+  .prereqs-wait-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 2rem;
+    text-align: center;
+  }
+
+  .prereqs-status {
+    margin: 2rem 0;
+    padding: 1rem;
+    background-color: #f5f5f5;
+    border-radius: 8px;
+  }
+
+  .prereqs-status ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .prereqs-status li {
+    margin: 0.5rem 0;
+  }
+
+  .prereqs-status code {
+    background-color: #e0e0e0;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-family: monospace;
+  }
+
+  #countdown {
+    font-weight: bold;
+    color: #2563eb;
+  }
+
+  .manual-refresh {
+    margin-top: 2rem;
+    font-size: 0.9rem;
+    color: #666;
+  }
+</style>
+
+<script>
+  (function() {
+    var countdown = <%= $retry_delay %>;
+    var countdownEl = document.getElementById('countdown');
+
+    var interval = setInterval(function() {
+      countdown--;
+      countdownEl.textContent = countdown;
+
+      if (countdown <= 0) {
+        clearInterval(interval);
+        window.location.href = '<%= $retry_url %>';
+      }
+    }, 1000);
+  })();
+</script>

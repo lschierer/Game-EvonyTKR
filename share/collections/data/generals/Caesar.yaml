@@ -2,16 +2,16 @@ ascending: true
 basic_attributes:
   leadership:
     base: 119
-    increment: 0
+    increment: 9.45
   attack:
     base: 112
-    increment: 0
+    increment: 8.42
   defense:
     base: 113
-    increment: 0
+    increment: 8.84
   politics:
     base: 111
-    increment: 0
+    increment: 8.61
 book: Dictator
 specialties:
   - Mounted Troop Assault

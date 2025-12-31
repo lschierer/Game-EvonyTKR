@@ -1,0 +1,11 @@
+indent: auto
+indent-spaces: 2
+wrap: 72
+markup: yes
+output-xml: no
+input-xml: no
+char-encoding: utf8
+show-warnings: yes
+uppercase-tags: no
+uppercase-attributes: no
+new-blocklevel-tags: pair-picker pair-filter pair-table pair-data state-manager

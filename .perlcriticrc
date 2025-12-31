@@ -1,0 +1,28 @@
+severity = 3
+theme = core + best-practices
+exclude   = Modules::RequireExplicitPackage Objects::RequireIsa
+
+# Disable legacy OO assumptions
+[-Objects::ProhibitIndirectSyntax]
+
+# Disable strict/warnings policies — Corinna classes don't need them
+[-TestingAndDebugging::RequireUseStrict]
+[-TestingAndDebugging::RequireUseWarnings]
+
+# Disable policies that assume sub-based OO or get confused by keywords like "field"
+[-Subroutines::ProhibitManyArgs]
+[-Subroutines::RequireFinalReturn]
+[-Subroutines::ProtectPrivateSubs]
+
+
+# Optional: if you use Readonly in ADJUST blocks, disable this to avoid warnings
+[-ValuesAndExpressions::ProhibitConstantPragma]
+
+# Style improvements
+[CodeLayout::RequireTidyCode]
+perltidyrc = ./.perltidyrc
+
+
+# Allow class-level method and field declarations to omit parens
+[-BuiltinFunctions::ProhibitVoidMap]
+[-BuiltinFunctions::ProhibitVoidGrep]

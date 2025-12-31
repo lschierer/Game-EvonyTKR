@@ -1,0 +1,40 @@
+<link rel="stylesheet" href="/css/collectionIndex.css" />
+
+<div class="collection-list">
+  <h2>Conflict Groups by Type</h2>
+  <% if ($groups && ref $groups eq 'HASH') { %>
+    <% foreach my $conflict_key (sort keys %{ $groups }) { %>
+      <div class="conflict-group">
+        <h3><%= $conflict_key %></h3>
+        <ul class="general-list">
+          <% foreach my $general_name (sort @{ $groups->{$conflict_key} }) { %>
+            <li><%= $general_name %></li>
+          <% } %>
+        </ul>
+      </div>
+    <% } %>
+  <% } else { %>
+    <p>No conflict groups found.</p>
+  <% } %>
+
+  <h2>Individual Conflicts By General</h2>
+  <% if ($pairs && ref $pairs eq 'HASH') { %>
+    <ul class="conflict-pairs">
+      <% foreach my $general1 (sort keys %{ $pairs }) { %>
+        <% my @conflicts = grep { $pairs->{$general1}->{$_} == 1 } keys $pairs->{$general1}->%*; %>
+        <li><%= $general1 %>
+        <% if(scalar(@conflicts)) { %>
+          <%= sprintf(' (%s Conflicts)', scalar(@conflicts)); %>
+          <ul>
+            <% foreach my $general2 (sort @conflicts) { %>
+              <li><%= $general1 %> ↔ <%= $general2 %></li>
+            <% } %>
+          </ul>
+        <% } %>
+        </li>
+      <% } %>
+    </ul>
+  <% } else { %>
+    <p>No individual conflicts found.</p>
+  <% } %>
+</div>

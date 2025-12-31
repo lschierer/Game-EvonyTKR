@@ -1,0 +1,1 @@
+source /opt/mojo/.bashrc

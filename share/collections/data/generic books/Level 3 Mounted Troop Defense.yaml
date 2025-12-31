@@ -1,8 +1,11 @@
-name: Level 3 Mounted Troop Defense
+name: Mounted Troop Defense
+level: 3
 text: Increases Mounted Troop by 20% when General is leading the army.
 buffs:
   - attribute: Defense
     targetedType: Mounted Troops
+    conditions:
+      - leading the army
     value:
       number: 20
       unit: percentage

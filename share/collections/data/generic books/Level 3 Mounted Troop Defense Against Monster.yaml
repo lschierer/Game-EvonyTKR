@@ -1,8 +1,12 @@
-name: Level 3 Mounted Troop Defense Against Monster
-text: Increases Mounted Troop by 35% when General is leading the army.
+---
 buffs:
-  - attribute: Defense
-    targetedType: Mounted Troops
-    value:
-      number: 35
-      unit: percentage
+- attribute: Defense
+  conditions:
+  - Against Monsters
+  targetedType: Mounted Troops
+  value:
+    number: 35
+    unit: percentage
+level: 3
+name: Mounted Troop Defense Against Monster
+text: Increases Mounted Troop by 35% when General is leading the army.

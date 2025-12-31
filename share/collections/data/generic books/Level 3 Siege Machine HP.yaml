@@ -1,8 +1,11 @@
-name: Level 3 Siege Machine HP
+name: Siege Machine HP
+level: 3
 text: Increases Siege Machine by 20% when General is leading the army.
 buffs:
   - attribute: HP
     targetedType: Siege Machines
+    conditions:
+      - leading the army
     value:
       number: 20
       unit: percentage
