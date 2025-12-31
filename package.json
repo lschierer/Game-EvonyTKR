@@ -39,17 +39,17 @@
     "@spectrum-css/typography": "^8.2.0",
     "@spectrum-css/ui-icons": "^1.1.2",
     "@tanstack/lit-table": "^8.21.3",
-    "@tanstack/lit-virtual": "^3.13.14",
+    "@tanstack/lit-virtual": "^3.13.15",
     "@tanstack/store": "^0.8.0",
     "@tanstack/table-core": "^8.21.3",
-    "@tanstack/virtual-core": "^3.13.13",
+    "@tanstack/virtual-core": "^3.13.14",
     "iconify-icon": "^3.0.2",
     "js-yaml": "^4.1.1",
     "lit": "^3.3.2",
     "signal-polyfill": "^0.2.2",
     "signal-utils": "^0.21.1",
     "sprintf-js": "^1.1.3",
-    "zod": "^4.2.1"
+    "zod": "^4.3.2"
   },
   "devDependencies": {
     "@commitlint/cli": "^20.2.0",
@@ -65,7 +65,7 @@
     "@types/postcss-import": "^14.0.3",
     "@types/postcss-sorting": "^8.0.2",
     "@types/sprintf-js": "^1.1.4",
-    "@typescript-eslint/parser": "^8.50.1",
+    "@typescript-eslint/parser": "^8.51.0",
     "autoprefixer": "^10.4.23",
     "aws-cdk": "^2.1100.1",
     "aws-cdk-lib": "^2.233.0",
@@ -89,7 +89,7 @@
     "postcss-import": "^16.1.1",
     "postcss-load-config": "^6.0.1",
     "postcss-nesting": "^13.0.2",
-    "postcss-preset-env": "^10.5.0",
+    "postcss-preset-env": "^10.6.0",
     "postcss-reporter": "^7.1.0",
     "postcss-sorting": "^9.1.0",
     "prettier": "^3.7.4",
@@ -102,7 +102,7 @@
     "ts-node": "^10.9.2",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.50.1"
+    "typescript-eslint": "^8.51.0"
   },
   "lint-staged": {
     "*.json": [
