@@ -150,7 +150,7 @@ package Game::EvonyTKR::Plugins::Navigation {
 
         for my $url (@$urls) {
           $xml .= qq{  <url>\n};
-          $xml .= qq{    <loc>$url->{loc}</loc>\n};
+          $xml .= qq{    <loc>} . $c->_xml_escape($url->{loc}) . qq{</loc>\n};
           $xml .= qq{    <lastmod>$url->{lastmod}</lastmod>\n};
           $xml .= qq{    <changefreq>$url->{changefreq}</changefreq>\n};
           $xml .= qq{    <priority>$url->{priority}</priority>\n};
@@ -159,6 +159,22 @@ package Game::EvonyTKR::Plugins::Navigation {
 
         $xml .= qq{</urlset>\n};
         return $xml;
+      }
+    );
+
+    $app->helper(
+      _xml_escape => sub {
+        my ($c, $text) = @_;
+        # Ensure UTF-8 encoding
+        utf8::decode($text) unless utf8::is_utf8($text);
+        
+        # XML escape
+        $text =~ s/&/&amp;/g;
+        $text =~ s/</&lt;/g;
+        $text =~ s/>/&gt;/g;
+        $text =~ s/"/&quot;/g;
+        $text =~ s/'/&apos;/g;
+        return $text;
       }
     );
 
