@@ -94,7 +94,7 @@ runcmd:
 
     # Performance tuning for Mojolicious app with high concurrency
     # Added by cloud-init user-data
-    max_connections = 200                   # Support 50 conn/worker × 4 workers
+    max_connections = 275                   # Support 50 conn/worker × 4 workers
     shared_buffers = 512MB                  # ~25% of 2GB RAM (adjust for instance size)
     effective_cache_size = 1536MB           # ~75% of 2GB RAM
     maintenance_work_mem = 128MB            # For VACUUM, CREATE INDEX

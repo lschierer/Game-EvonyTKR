@@ -30,7 +30,7 @@ has 'pg' => sub ($self) {
 # Set to 40 per worker: 4 workers × 40 = 160 connections (under PostgreSQL's 200 limit)
 # Leaves 40 connections for Minion workers and admin tools
 # PostgreSQL configured via user-data.yaml for max_connections=200
-  $pg->max_connections(40);
+  $pg->max_connections(50);
 
 # Set inactivity timeout to 30 seconds - prevents stale connections from holding pool slots
   $pg->options->{inactivity_timeout} = 30;
