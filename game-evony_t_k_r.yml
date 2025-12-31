@@ -4,7 +4,7 @@ git_meta:
   copyright: 2023-2025
 hypnotoad:
   accepts: 1000
-  clients: 10
+  clients: 5
   graceful_timeout: 30
   heartbeat_interval: 10
   heartbeat_timeout: 300
