@@ -19,6 +19,9 @@ class Game::EvonyTKR::Model::Data : isa(Game::EvonyTKR::Shared::Constants) {
   my $debug = 0;
   use Carp;
 
+  field $allowedValueUnits : reader =
+    Type::Tiny::Enum->new(values => [qw( flat percentage )]);
+
   method validateBuffActivation ($proposed) {
 
     my %valid;
@@ -35,9 +38,6 @@ class Game::EvonyTKR::Model::Data : isa(Game::EvonyTKR::Shared::Constants) {
 
     return 1;
   }
-
-  field $allowedValueUnits : reader =
-    Type::Tiny::Enum->new(values => [qw( flat percentage )]);
 
   method validateSpecialtyLevels (@specialties) {
     my $logger = $self->logger;

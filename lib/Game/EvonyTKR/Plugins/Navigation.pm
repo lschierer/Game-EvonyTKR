@@ -167,7 +167,7 @@ package Game::EvonyTKR::Plugins::Navigation {
         my ($c, $text) = @_;
         # Ensure UTF-8 encoding
         utf8::decode($text) unless utf8::is_utf8($text);
-        
+
         # XML escape
         $text =~ s/&/&amp;/g;
         $text =~ s/</&lt;/g;
