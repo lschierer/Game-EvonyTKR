@@ -7,9 +7,12 @@ use Mojo::Base -base, -signatures;
 use Minion;
 use HTTP::Tiny;
 use HTML::LinkExtor;
+use File::HomeDir::Tiny ();
 use URI;
 use List::AllUtils qw(uniq);
 use List::Util;
+use POSIX qw(strftime);
+use Fcntl qw(:flock);
 
 has 'start_url';
 has 'worker_count' => 4;
@@ -17,6 +20,7 @@ has 'delay'        => 0.1;
 has 'debug'        => 0;
 has 'minion';
 has 'shared_state' => sub { { checked => {}, broken => {}, metrics => {} } };
+has 'log_file'     => path(File::HomeDir::Tiny::home)->child('var/log/Perl/dist/')->child(__PACKAGE__)->child('linkchecker_access.log');
 
 sub init ($self) {
   # Create Minion instance with temporary SQLite file
@@ -24,6 +28,21 @@ sub init ($self) {
   $self->minion(Minion->new(SQLite => $temp_db));
 
   my $base_host = URI->new($self->start_url)->host;
+
+  # Ensure log directory exists
+  if ($self->log_file =~ m{^(.+)/[^/]+$}) {
+    my $log_dir = $1;
+    unless (-d $log_dir) {
+      mkdir $log_dir or warn "Could not create log directory $log_dir: $!";
+    }
+  }
+
+  # Clear or create log file
+  if (open my $fh, '>', $self->log_file) {
+    print $fh "# LinkChecker Access Log - " . localtime() . "\n";
+    print $fh "# Format: [timestamp] status duration url_with_fragment\n";
+    close $fh;
+  }
 
   # Register the task
   $self->minion->add_task(
@@ -33,11 +52,28 @@ sub init ($self) {
   );
 }
 
+sub _log_access ($self, $url, $status, $duration) {
+  return unless $self->log_file;
+
+  my $timestamp = strftime("%Y-%m-%d %H:%M:%S", localtime());
+  my $log_line = sprintf("[%s] %s %.3fs %s\n",
+    $timestamp, $status, $duration, $url);
+
+  # Thread-safe logging with file locking
+  if (open my $fh, '>>', $self->log_file) {
+    flock($fh, LOCK_EX);
+    print $fh $log_line;
+    flock($fh, LOCK_UN);
+    close $fh;
+  }
+}
+
 sub execute ($self) {
   say "Starting distributed link check with "
     . $self->worker_count
     . " workers";
   say "Starting URL: " . $self->start_url;
+  say "Access log: " . $self->log_file;
 
   # Start worker processes
   my @worker_pids;
@@ -177,17 +213,30 @@ sub _process_urls ($self, $job, $urls, $depth, $base_host) {
     new_external => []
   };
 
-  for my $url (@$urls) {
+  for my $url_with_fragment (@$urls) {
+    # Parse URL to separate fragment from the rest
+    my $uri = URI->new($url_with_fragment);
+    my $fragment = $uri->fragment;
+
+    # Create URL without fragment for HTTP request
+    my $url_no_fragment = $uri->clone;
+    $url_no_fragment->fragment(undef);
+    my $url_for_request = $url_no_fragment->as_string;
+
     my $start_time = time();
-    my ($status, $size) = $self->_check_url_with_metrics($url, $base_host);
+    my ($status, $size) = $self->_check_url_with_metrics($url_for_request, $base_host);
     my $duration = time() - $start_time;
 
-    $results->{checked}{$url} = $status;
+    # Log with full URL including fragment
+    $self->_log_access($url_with_fragment, $status, $duration);
+
+    # Store in results using URL without fragment (to avoid duplicates in state)
+    $results->{checked}{$url_with_fragment} = $status;
 
     # Only collect metrics for internal URLs
-    my $url_host = URI->new($url)->host // '';
+    my $url_host = $uri->host // '';
     if ($url_host eq $base_host) {
-      $results->{metrics}{$url} = {
+      $results->{metrics}{$url_with_fragment} = {
         duration => $duration,
         size     => $size,
         status   => $status
@@ -195,12 +244,13 @@ sub _process_urls ($self, $job, $urls, $depth, $base_host) {
     }
 
     if ($status !~ /^2/) {
-      $results->{broken}{$url} = $status;
+      $results->{broken}{$url_with_fragment} = $status;
       next;
     }
 
     if ($depth > 0) {
-      my $links = $self->_extract_links($url);
+      # Only extract links from the page once (use URL without fragment)
+      my $links = $self->_extract_links($url_for_request);
       for my $link (@$links) {
         my $link_host = URI->new($link)->host // '';
         if ($link_host eq $base_host) {
@@ -272,6 +322,7 @@ sub _print_results ($self) {
   say "Total URLs checked: $total";
   say "Internal URLs with metrics: $metrics_count";
   say "Broken links found: $broken_count";
+  say "Access log written to: " . $self->log_file;
 
   if ($broken_count) {
     say "\nBroken links:";
