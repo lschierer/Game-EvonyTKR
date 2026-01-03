@@ -8,6 +8,7 @@ use Minion;
 use HTTP::Tiny;
 use HTML::LinkExtor;
 use File::HomeDir::Tiny ();
+require Path::Tiny;
 use URI;
 use List::AllUtils qw(uniq);
 use List::Util;
@@ -20,7 +21,7 @@ has 'delay'        => 0.1;
 has 'debug'        => 0;
 has 'minion';
 has 'shared_state' => sub { { checked => {}, broken => {}, metrics => {} } };
-has 'log_file'     => path(File::HomeDir::Tiny::home)->child('var/log/Perl/dist/')->child(__PACKAGE__)->child('linkchecker_access.log');
+has 'log_file'     => sub { return Path::Tiny::path(File::HomeDir::Tiny::home)->child('var/log/Perl/dist/')->child(__PACKAGE__)->child('linkchecker_access.log'); };
 
 sub init ($self) {
   # Create Minion instance with temporary SQLite file
