@@ -208,7 +208,8 @@ package Game::EvonyTKR::Role::Common {
         $self->note(outstanding_prereqs => \@outstanding);
 
         # Calculate retry delay based on number of outstanding prereqs
-        my $delay = max(min(5 * scalar(@outstanding), 30), $self->standard_delay);
+        my $delay =
+          max(min(5 * scalar(@outstanding), 30), $self->standard_delay);
         $self->log_debug(sprintf(
           'Retrying with delay %s due to outstanding prereqs: %s',
           $delay, join(', ', @outstanding)

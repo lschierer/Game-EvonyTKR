@@ -72,7 +72,7 @@ class Game::EvonyTKR::Shared::Constants : isa(Game::EvonyTKR::Model::Logger) {
     $TroopTypeValues = $temp;
   }
 
-  field $AllowedBuffActivationValues :reader;
+  field $AllowedBuffActivationValues : reader;
 
   ADJUST {
     Readonly::Array my @temp => (
@@ -578,7 +578,6 @@ class Game::EvonyTKR::Shared::Constants : isa(Game::EvonyTKR::Model::Logger) {
       $UUID5_Generals->{$gk} = $specific_base;
     }
   }
-
 
   method string_to_trooptype ($string) {
     $string =~ s/(\w+)(?: .*)/\L$1/x;

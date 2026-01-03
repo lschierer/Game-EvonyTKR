@@ -22,22 +22,22 @@ class Game::EvonyTKR::Model::Data : isa(Game::EvonyTKR::Shared::Constants) {
   field $allowedValueUnits : reader =
     Type::Tiny::Enum->new(values => [qw( flat percentage )]);
 
-    method validateBuffActivation ($proposed) {
+  method validateBuffActivation ($proposed) {
 
-      my %valid;
-      foreach my $key ($self->AllowedBuffActivationValues->@*) {
-        $valid{$key} = 1;
-      }
-
-      if (none { $_ eq $proposed } $self->AllowedBuffActivationValues->@*) {
-        $self->log_warn(
-  "validateBuffActivation detected illegal Buff Activation Condition $proposed"
-        );
-        return 0;
-      }
-
-      return 1;
+    my %valid;
+    foreach my $key ($self->AllowedBuffActivationValues->@*) {
+      $valid{$key} = 1;
     }
+
+    if (none { $_ eq $proposed } $self->AllowedBuffActivationValues->@*) {
+      $self->log_warn(
+"validateBuffActivation detected illegal Buff Activation Condition $proposed"
+      );
+      return 0;
+    }
+
+    return 1;
+  }
 
   method validateSpecialtyLevels (@specialties) {
     my $logger = $self->logger;
