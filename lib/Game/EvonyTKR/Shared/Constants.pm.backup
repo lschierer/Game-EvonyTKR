@@ -3,7 +3,7 @@ use experimental qw(class);
 use utf8::all;
 use File::FindLib 'lib';
 require Data::Printer;
-require JSON::PP;
+
 require X500::DN;
 require X500::RDN;
 
@@ -72,7 +72,20 @@ class Game::EvonyTKR::Shared::Constants : isa(Game::EvonyTKR::Model::Logger) {
     $TroopTypeValues = $temp;
   }
 
-  field $AllowedBuffActivationValues :reader;
+  method string_to_trooptype ($string) {
+    $string =~ s/(\w+)(?: .*)/\L$1/x;
+    my $key = first { $_ =~ /^$string/x } keys %{$TroopTypeValues};
+    if (exists $TroopTypeValues->{$key}) {
+      return $TroopTypeValues->{$key};
+    }
+    else {
+      # return '' to indicate $string is not
+      # reflective of a troop type
+      return '';
+    }
+  }
+
+  field $AllowedBuffActivationValues : reader;
 
   ADJUST {
     Readonly::Array my @temp => (
@@ -154,6 +167,30 @@ class Game::EvonyTKR::Shared::Constants : isa(Game::EvonyTKR::Model::Logger) {
 
     };
     $MappedAttributeNames = $temp;
+  }
+
+  method string_to_attribute ($string) {
+    my $exact = first { lc($_) eq lc($string) } $AttributeValues->@*;
+    my $map   = $MappedAttributeNames;
+    if ($exact) {
+      return $exact;
+    }
+    elsif (exists $map->{ lc($string) }) {
+      my $a = $map->{ lc($string) };
+      if (none { lc($a) eq lc($_) } $AttributeValues->@*) {
+        $self->log_error(
+          sprintf('%s is not a valid attribute mapping for %s', $a, $string));
+        croak(
+          sprintf('%s is not a valid attribute mapping for %s', $a, $string));
+        return;
+      }
+      return $a;
+    }
+    else {
+      # return an empty string to indicate
+      # that $string does not reflect an Attribute
+      return '';
+    }
   }
 
   field $BuffConditionValues : reader;
@@ -477,6 +514,48 @@ class Game::EvonyTKR::Shared::Constants : isa(Game::EvonyTKR::Model::Logger) {
     $mapped_conditions = $temp;
   }
 
+  method string_to_condition ($string) {
+    my $exactBuff   = first { $string =~ /$_/i } keys %{$BuffConditionValues};
+    my $exactDebuff = first { $string =~ /$_/i } $DebuffConditionValues->@*;
+    my $map         = $mapped_conditions;
+
+    if ($exactBuff) {
+      $self->log_debug("Mapped Exact Buff $exactBuff");
+      return $exactBuff;
+    }
+    elsif ($exactDebuff) {
+      $self->log_debug("Mapped Exact DeBuff $exactDebuff");
+      return $exactDebuff;
+    }
+    elsif (exists $map->{$string}) {
+      my $v = $map->{$string};
+      unless (any { $_ eq $v }
+        (keys %{$BuffConditionValues}, $DebuffConditionValues->@*)) {
+        $self->log_error(
+          sprintf('%s is not a valid condition mapping for %s', $v, $string));
+        croak(
+          sprintf('%s is not a valid condition mapping for %s', $v, $string));
+        return;
+      }
+      return $v;
+    }
+    else {
+      # return an empty string to indicate
+      # that $string does not reflect a condition
+      return '';
+    }
+  }
+
+  method AllConditions() {
+    my %seen;
+    my @allowedConditions = grep { not $seen{$_}++ } (
+      keys %{$BuffConditionValues},
+      @{$DebuffConditionValues},
+      @{$BookConditionValues}
+    );
+    return @allowedConditions;
+  }
+
   field $SpecialtyLevelValues : reader;
 
   ADJUST {
@@ -557,108 +636,6 @@ class Game::EvonyTKR::Shared::Constants : isa(Game::EvonyTKR::Model::Logger) {
     purple5 => '5 Purple Stars',
   };
 
-  field $globalDN : reader = X500::DN->new(
-    X500::RDN->new('OU' => 'EvonyTKR'),
-    X500::RDN->new('OU' => 'Game'),
-    X500::RDN->new('OU' => 'module'),
-    X500::RDN->new('dc' => 'Perl'),
-    X500::RDN->new('dc' => 'org'),
-  );
-
-  field $UUID5_base : reader;
-
-  field $UUID5_Generals : reader = {};
-
-  ADJUST {
-    my $ns_base = uuid5(dns => 'perl.org');
-    $UUID5_base = uuid5($ns_base, $globalDN->getX500String());
-    my $UUID5_Generals_base = uuid5($UUID5_base, 'Generals');
-    foreach my $gk (@{$GeneralKeys}) {
-      my $specific_base = uuid5($UUID5_Generals_base, $gk);
-      $UUID5_Generals->{$gk} = $specific_base;
-    }
-  }
-
-
-  method string_to_trooptype ($string) {
-    $string =~ s/(\w+)(?: .*)/\L$1/x;
-    my $key = first { $_ =~ /^$string/x } keys %{$TroopTypeValues};
-    if (exists $TroopTypeValues->{$key}) {
-      return $TroopTypeValues->{$key};
-    }
-    else {
-      # return '' to indicate $string is not
-      # reflective of a troop type
-      return '';
-    }
-  }
-
-  method string_to_attribute ($string) {
-    my $exact = first { lc($_) eq lc($string) } $AttributeValues->@*;
-    my $map   = $MappedAttributeNames;
-    if ($exact) {
-      return $exact;
-    }
-    elsif (exists $map->{ lc($string) }) {
-      my $a = $map->{ lc($string) };
-      if (none { lc($a) eq lc($_) } $AttributeValues->@*) {
-        $self->log_error(
-          sprintf('%s is not a valid attribute mapping for %s', $a, $string));
-        croak(
-          sprintf('%s is not a valid attribute mapping for %s', $a, $string));
-        return;
-      }
-      return $a;
-    }
-    else {
-      # return an empty string to indicate
-      # that $string does not reflect an Attribute
-      return '';
-    }
-  }
-
-  method string_to_condition ($string) {
-    my $exactBuff   = first { $string =~ /$_/i } keys %{$BuffConditionValues};
-    my $exactDebuff = first { $string =~ /$_/i } $DebuffConditionValues->@*;
-    my $map         = $mapped_conditions;
-
-    if ($exactBuff) {
-      $self->log_debug("Mapped Exact Buff $exactBuff");
-      return $exactBuff;
-    }
-    elsif ($exactDebuff) {
-      $self->log_debug("Mapped Exact DeBuff $exactDebuff");
-      return $exactDebuff;
-    }
-    elsif (exists $map->{$string}) {
-      my $v = $map->{$string};
-      unless (any { $_ eq $v }
-        (keys %{$BuffConditionValues}, $DebuffConditionValues->@*)) {
-        $self->log_error(
-          sprintf('%s is not a valid condition mapping for %s', $v, $string));
-        croak(
-          sprintf('%s is not a valid condition mapping for %s', $v, $string));
-        return;
-      }
-      return $v;
-    }
-    else {
-      # return an empty string to indicate
-      # that $string does not reflect a condition
-      return '';
-    }
-  }
-
-  method AllConditions() {
-    my %seen;
-    my @allowedConditions = grep { not $seen{$_}++ } (
-      keys %{$BuffConditionValues},
-      @{$DebuffConditionValues},
-      @{$BookConditionValues}
-    );
-    return @allowedConditions;
-  }
-
   method AscendingAttributeLevelName ($level) {
     if ($level =~ /red/) {
       if (exists $redAscendingLevelNames->{$level}) {
@@ -702,6 +679,28 @@ class Game::EvonyTKR::Shared::Constants : isa(Game::EvonyTKR::Model::Logger) {
       }
     }
     return @result;
+  }
+
+  field $globalDN : reader = X500::DN->new(
+    X500::RDN->new('OU' => 'EvonyTKR'),
+    X500::RDN->new('OU' => 'Game'),
+    X500::RDN->new('OU' => 'module'),
+    X500::RDN->new('dc' => 'Perl'),
+    X500::RDN->new('dc' => 'org'),
+  );
+
+  field $UUID5_base : reader;
+
+  field $UUID5_Generals : reader = {};
+
+  ADJUST {
+    my $ns_base = uuid5(dns => 'perl.org');
+    $UUID5_base = uuid5($ns_base, $globalDN->getX500String());
+    my $UUID5_Generals_base = uuid5($UUID5_base, 'Generals');
+    foreach my $gk (@{$GeneralKeys}) {
+      my $specific_base = uuid5($UUID5_Generals_base, $gk);
+      $UUID5_Generals->{$gk} = $specific_base;
+    }
   }
 
   method _isTrue {
