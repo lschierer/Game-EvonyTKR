@@ -22,6 +22,8 @@ has 'debug'        => 0;
 has 'minion';
 has 'shared_state' => sub { { checked => {}, broken => {}, metrics => {} } };
 has 'log_file'     => sub { return Path::Tiny::path(File::HomeDir::Tiny::home)->child('var/log/Perl/dist/')->child(__PACKAGE__)->child('linkchecker_access.log'); };
+has 'max_retries'  => 3;
+has 'job_timeout'  => 300;    # 5 minutes max per job
 
 sub init ($self) {
   # Create Minion instance with temporary SQLite file
@@ -98,13 +100,17 @@ sub execute ($self) {
   my %pending_internal =
     ($self->start_url => 0);    # 0=pending, -1=in_progress, 1=done
   my %pending_external = ();
+  my %retry_count      = ();    # Track retry attempts per URL
   my @active_jobs;
+  my %job_start_times = ();     # Track when each job started
 
   while (%pending_internal || %pending_external || @active_jobs) {
     # Start jobs for internal URLs (with recursion)
     while (@active_jobs < $self->worker_count * 2) {
-      my @available =
-        grep { $pending_internal{$_} == 0 } keys %pending_internal;
+      my @available = grep {
+        $pending_internal{$_} == 0
+          && ($retry_count{$_} // 0) < $self->max_retries
+      } keys %pending_internal;
       last unless @available;
 
       my @batch = splice(@available, 0, 5);    # Random 5 due to hash key order
@@ -115,6 +121,7 @@ sub execute ($self) {
 
       my $job_id = $self->minion->enqueue(check_url_section => [\@batch, 1]);
       push @active_jobs, $job_id;
+      $job_start_times{$job_id} = time();
       my $remaining =
         scalar(grep { !$pending_internal{$_} } keys %pending_internal);
       my $msg = sprintf('Queued internal batch job %s: %s. %d jobs remaining.',
@@ -124,8 +131,10 @@ sub execute ($self) {
 
     # Start jobs for external URLs (no recursion)
     while (@active_jobs < $self->worker_count * 2) {
-      my @available =
-        grep { $pending_external{$_} == 0 } keys %pending_external;
+      my @available = grep {
+        $pending_external{$_} == 0
+          && ($retry_count{$_} // 0) < $self->max_retries
+      } keys %pending_external;
       last unless @available;
 
       my @batch = splice(@available, 0, 10);
@@ -136,14 +145,26 @@ sub execute ($self) {
 
       my $job_id = $self->minion->enqueue(check_url_section => [\@batch, 0]);
       push @active_jobs, $job_id;
+      $job_start_times{$job_id} = time();
       say "Queued external batch job $job_id: " . join(', ', @batch)
         if $self->debug;
     }
 
     # Check completed jobs
     @active_jobs = grep {
-      my $job  = $self->minion->job($_);
-      my $info = $job->info;
+      my $job_id = $_;
+      my $job    = $self->minion->job($job_id);
+      my $info   = $job->info;
+
+      # Check for timeout
+      if (exists $job_start_times{$job_id}) {
+        my $elapsed = time() - $job_start_times{$job_id};
+        if ($elapsed > $self->job_timeout && $info->{state} eq 'active') {
+          say "Job $job_id timed out after ${elapsed}s, failing it";
+          $job->fail("Job timed out after ${elapsed}s");
+          $info = $job->info;    # Refresh info after failing
+        }
+      }
 
       if ($info->{state} eq 'finished') {
         my $results = $info->{result};
@@ -177,13 +198,55 @@ sub execute ($self) {
           $pending_external{$url} = 1 if exists $pending_external{$url};
         }
 
-        say "Job $_ completed: " .
-          keys($results->{checked}->%*) . " URLs checked"
+        say "Job $job_id completed: "
+          . keys($results->{checked}->%*)
+          . " URLs checked"
           if $self->debug;
+        delete $job_start_times{$job_id};
         0;    # Remove from active
       }
       elsif ($info->{state} eq 'failed') {
-        say "Job $_ failed: " . ($info->{result} // 'Unknown error');
+        say "Job $job_id failed: " . ($info->{result} // 'Unknown error');
+
+        # Get the URLs that were in this job and requeue or mark as failed
+        my $args      = $info->{args};
+        my $urls      = $args->[0] // [];
+        my $is_intern = $args->[1] // 0;
+
+        for my $url (@$urls) {
+          $retry_count{$url} = ($retry_count{$url} // 0) + 1;
+
+          if ($retry_count{$url} < $self->max_retries) {
+            # Requeue for retry
+            if ($is_intern) {
+              $pending_internal{$url} = 0;
+              say "  Requeuing internal URL for retry: $url (attempt "
+                . $retry_count{$url} . ")"
+                if $self->debug;
+            }
+            else {
+              $pending_external{$url} = 0;
+              say "  Requeuing external URL for retry: $url (attempt "
+                . $retry_count{$url} . ")"
+                if $self->debug;
+            }
+          }
+          else {
+            # Max retries exceeded, mark as failed
+            say "  Max retries exceeded for $url, marking as failed (500)"
+              if $self->debug;
+            $self->shared_state->{checked}{$url} = 500;
+            $self->shared_state->{broken}{$url}  = 500;
+            if ($is_intern) {
+              $pending_internal{$url} = 1;
+            }
+            else {
+              $pending_external{$url} = 1;
+            }
+          }
+        }
+
+        delete $job_start_times{$job_id};
         0;    # Remove from active
       }
       else {
