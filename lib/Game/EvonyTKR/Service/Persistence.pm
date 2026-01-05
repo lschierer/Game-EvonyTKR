@@ -4,10 +4,20 @@ use utf8::all;
 use Moo;
 
 # Mode-gated persistence factory
-has 'mode' => sub { $ENV{MOJO_MODE} || 'development' };
-has 'config';    # Optional config hash from NotYAMLConfig
+has mode => (
+  is => 'ro',
+  lazy => 1,
+  default => sub { $ENV{MOJO_MODE} || 'development' }
+);
 
-has 'backend' => sub ($self) {
+has config => (
+  is => 'ro'
+);    # Optional config hash from NotYAMLConfig
+
+has backend => (
+  is => 'ro',
+  lazy => 1,
+  default => sub ($self) {
   my $config             = $self->config          || {};
   my $persistence_config = $config->{persistence} || {};
 
@@ -34,7 +44,8 @@ has 'backend' => sub ($self) {
       $backend_type
     ));
   }
-};
+  }
+);
 
 # Delegate all methods to the appropriate backend
 sub AUTOLOAD ($self, @args) {

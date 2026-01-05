@@ -3,14 +3,16 @@ use v5.42.0;
 use utf8::all;
 
 use File::FindLib 'lib';
-use Mojo::Base -base,                                            -signatures;
-use Mojo::Base 'Game::EvonyTKR::Role::JSON',                     -role;
-use Mojo::Base 'Game::EvonyTKR::Role::Common',                   -role;
-use Mojo::Base 'Game::EvonyTKR::Role::Logging',                  -role;
-use Mojo::Base 'Game::EvonyTKR::Role::Persistence',              -role;
+use Moo;
+use experimental qw(signatures);
+
+with 'Game::EvonyTKR::Role::JSON';
+with 'Game::EvonyTKR::Role::Common';
+with 'Game::EvonyTKR::Role::Logging';
+with 'Game::EvonyTKR::Role::Persistence';
 with 'Game::EvonyTKR::Role::Constants::BuffConstants';
-use Mojo::Base 'Game::EvonyTKR::Role::Constants::Books',         -role;
-use Mojo::Base 'Game::EvonyTKR::Role::Books',                    -role;
+with 'Game::EvonyTKR::Role::Constants::Books';
+with 'Game::EvonyTKR::Role::Books';
 use overload
   '""'       => \&as_string,
   '.'        => \&concat,

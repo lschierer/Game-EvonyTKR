@@ -1,0 +1,32 @@
+<link rel="stylesheet" href="/css/collectionDetails.css" />
+<div class="specialty-details">
+  [% IF item -%]
+    <h3 class="spectrum-Heading spectrum-Heading--sizeL">Buffs Provided at Each Level for [% item.name %]</h3>
+    <table class="spectrum-Table spectrum-Table--sizeM spectrum-Table--quiet" >
+      <thead class="spectrum-Table-head">
+        <tr>
+          [% FOREACH level IN ['green', 'blue', 'purple', 'orange', 'gold'] -%]
+            [% level_label = level.ucfirst -%]
+            <th class="spectrum-Table-headCell"> [% level_label %] </th>
+          [% END -%]
+        </tr>
+      </thead>
+      <tbody class="spectrum-Table-body">
+        <tr class="spectrum-Table-row">
+          [% FOREACH level IN ['green', 'blue', 'purple', 'orange', 'gold'] -%]
+            [% level_data = item.levels.$level -%]
+            <td class="spectrum-Table-cell [% level %]">
+              <ul>
+                [% FOREACH buff IN level_data.buffs -%]
+                  [% INCLUDE buffs/single.tt buff=buff %]
+                [% END -%]
+              </ul>
+            </td>
+          [% END -%]
+        </tr>
+      </tbody>
+    </table>
+  [% ELSE -%]
+    <span>Specialty Not Available</span>
+  [% END -%]
+</div>

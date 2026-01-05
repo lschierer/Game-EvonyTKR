@@ -16,6 +16,7 @@ use Future::AsyncAwait;
 use Path::Tiny;
 use IO::Async::Loop;
 use Log::Log4perl qw(:easy);
+use Game::EvonyTKR::Loader::Specialties;
 
 # Initialize logging
 Log::Log4perl->easy_init($DEBUG);
@@ -29,6 +30,14 @@ my $template = PAGI::WebServer::Template->new(
     include_path => ['templates', 'templates/partials']
 );
 my $pages_dir = path('share/pages');
+
+# Load specialty data
+my $specialty_loader = Game::EvonyTKR::Loader::Specialties->new(
+    data_dir => 'share/collections/data/specialties'
+);
+say "Loading specialties...";
+my $count = $specialty_loader->load_all();
+say "Loaded $count specialties";
 
 # Create navigation
 my $nav = PAGI::WebServer::Navigation->new;
@@ -338,6 +347,85 @@ $router->get('/images/*' => async sub {
     await $send->({
         type => 'http.response.body',
         body => 'Image Not Found',
+        more => 0,
+    });
+});
+
+# Add route for Specialties index
+$router->get('/Reference/Specialties' => async sub {
+    my ($scope, $receive, $send) = @_;
+
+    my $items = [map { $specialty_loader->get_specialty($_) }
+                 @{$specialty_loader->list_specialties}];
+
+    my $html = $template->render('specialties/index.tt', {
+        items => $items,
+        collection_name => 'Specialties',
+        title => 'Details of General Specialties',
+        current_year => (localtime)[5] + 1900,
+        sidebar => 1,
+        navigation => $nav->render('/Reference/Specialties'),
+    }, {
+        layout => 'layouts/default.tt'
+    });
+
+    my $bytes = encode_utf8($html);
+
+    await $send->({
+        type    => 'http.response.start',
+        status  => 200,
+        headers => [['content-type', 'text/html; charset=utf-8']],
+    });
+    await $send->({
+        type => 'http.response.body',
+        body => $bytes,
+        more => 0,
+    });
+});
+
+# Add route for Specialties details
+$router->get('/Reference/Specialties/*' => async sub {
+    my ($scope, $receive, $send) = @_;
+
+    my $path = $scope->{path};
+    my ($specialty_name) = $path =~ m{^/Reference/Specialties/(.+?)/?$};
+
+    my $item = $specialty_loader->get_specialty($specialty_name);
+
+    unless ($item) {
+        await $send->({
+            type    => 'http.response.start',
+            status  => 404,
+            headers => [['content-type', 'text/plain']],
+        });
+        await $send->({
+            type => 'http.response.body',
+            body => 'Specialty not found',
+            more => 0,
+        });
+        return;
+    }
+
+    my $html = $template->render('specialties/details.tt', {
+        item => $item,
+        title => "Details for the $specialty_name Specialty",
+        current_year => (localtime)[5] + 1900,
+        sidebar => 1,
+        navigation => $nav->render("/Reference/Specialties/$specialty_name"),
+    }, {
+        layout => 'layouts/default.tt'
+    });
+
+    my $bytes = encode_utf8($html);
+
+    await $send->({
+        type    => 'http.response.start',
+        status  => 200,
+        headers => [['content-type', 'text/html; charset=utf-8']],
+    });
+    await $send->({
+        type => 'http.response.body',
+        body => $bytes,
         more => 0,
     });
 });

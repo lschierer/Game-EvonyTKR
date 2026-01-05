@@ -1,0 +1,29 @@
+<li>
+  <dl>
+    <dt>Attribute:</dt>
+    <dd>[% buff.attribute %]</dd>
+
+    [% IF buff.targetedType -%]
+      <dt>Troop Type:</dt>
+      [% IF buff.targetedType.ref == 'ARRAY' -%]
+        [% FOREACH t IN buff.targetedType -%]
+          <dd>[% t %]</dd>
+        [% END -%]
+      [% ELSIF buff.targetedType.length -%]
+        <dd>[% buff.targetedType %]</dd>
+      [% END -%]
+    [% END -%]
+
+    [% IF buff.conditions && buff.conditions.size > 0 -%]
+      <dt>Condition(s):</dt>
+      [% FOREACH c IN buff.conditions -%]
+        <dd>[% c %]</dd>
+      [% END -%]
+    [% END -%]
+
+    <dt>Value:</dt>
+    <dd>
+      [% buff.value.number %][% IF buff.value.unit == 'percentage' %]%[% END %]
+    </dd>
+  </dl>
+</li>

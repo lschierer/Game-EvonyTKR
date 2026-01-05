@@ -15,10 +15,14 @@ package Game::EvonyTKR::Role::Common {
   use Unicode::Normalize qw(NFKD);
   use List::AllUtils     qw(min max uniq none all );
 
-  has 'collection_dir' => sub {
-    my $home = Mojo::Home->new->detect('Game::EvonyTKR');
-    return $home->child('share/collections/data');
-  };
+  has collection_dir => (
+    is => 'ro',
+    lazy => 1,
+    default => sub {
+      my $home = Mojo::Home->new->detect('Game::EvonyTKR');
+      return $home->child('share/collections/data');
+    }
+  );
 
   sub normalize ($self, $name) {
     my $dn = Encode::is_utf8($name) ? $name : Encode::decode_utf8($name);
@@ -67,20 +71,29 @@ package Game::EvonyTKR::Role::Common {
     return $state_ref;
   }
 
-  has 'globalDN' => sub {
-    return X500::DN->new(
-      X500::RDN->new('OU' => 'EvonyTKR'),
-      X500::RDN->new('OU' => 'Game'),
-      X500::RDN->new('OU' => 'module'),
-      X500::RDN->new('dc' => 'Perl'),
-      X500::RDN->new('dc' => 'org'),
-    );
-  };
+  has globalDN => (
+    is => 'ro',
+    lazy => 1,
+    default => sub {
+      return X500::DN->new(
+        X500::RDN->new('OU' => 'EvonyTKR'),
+        X500::RDN->new('OU' => 'Game'),
+        X500::RDN->new('OU' => 'module'),
+        X500::RDN->new('dc' => 'Perl'),
+        X500::RDN->new('dc' => 'org'),
+      );
+    }
+  );
 
-  has 'UUID5_base' => sub ($self) {
-    my $ns_base = uuid5(dns => 'perl.org');
-    return uuid5($ns_base, $self->globalDN->getX500String());
-  };
+  has UUID5_base => (
+    is => 'ro',
+    lazy => 1,
+    default => sub {
+      my ($self) = @_;
+      my $ns_base = uuid5(dns => 'perl.org');
+      return uuid5($ns_base, $self->globalDN->getX500String());
+    }
+  );
 
   # Helper to retry operations that may encounter transient SQLite locking
   sub _minion_retry ($self, $operation, $max_attempts = 3) {

@@ -11,6 +11,7 @@ package Game::EvonyTKR::Role::Constants::GeneralConstants {
   use Const::Fast;
   use Carp;
   use UUID qw(uuid5);
+  use List::AllUtils qw(none all any);
 
   const our %generalKeys => (
     ground_specialist  => 1,
@@ -22,14 +23,19 @@ package Game::EvonyTKR::Role::Constants::GeneralConstants {
     wall               => 1,
   );
 
-  has 'GeneralKeys' => sub ($self) {
-    my @gk;
-    push @gk, sort keys %generalKeys;
-    $self->log_debug(sprintf('there are %s keys from generalKeys', scalar @gk));
-    return \@gk;
-  };
+  has GeneralKeys => (
+    is => 'ro',
+    lazy => 1,
+    default => sub {
+      my ($self) = @_;
+      my @gk;
+      push @gk, sort keys %generalKeys;
+      $self->log_debug(sprintf('there are %s keys from generalKeys', scalar @gk));
+      return \@gk;
+    }
+  );
 
-  has 'ValidateGeneralType' => sub($self, $tt) {
+  sub ValidateGeneralType ($self, $tt) {
     if (ref($tt) eq 'ARRAY') {
       my $valid = 0;
       foreach my $stt ($tt->@*) {
@@ -44,16 +50,16 @@ package Game::EvonyTKR::Role::Constants::GeneralConstants {
       return 0;
     }
     else {
-      if (none { $_ eq $tt } $self->GeneralKeys()) {
+      if (none { $_ eq $tt } $self->GeneralKeys->@*) {
         $self->log_error(sprintf(
           'General Type must be one of %s, not %s',
-          join ', ', $self->GeneralKeys(), $tt
+          join(', ', $self->GeneralKeys->@*), $tt
         ));
         return 0;
       }
       return 1;
     }
-  };
+  }
 
   const our %GeneralTypes2TroopTypes => (
     ground_specialist  => 'Ground Troops',
@@ -65,18 +71,19 @@ package Game::EvonyTKR::Role::Constants::GeneralConstants {
     wall               => 'ALL',
   );
 
-  has 'UUID5_Generals' => sub ($self) {
-    state $uuids = {};
-
-    unless (scalar keys %$uuids > 0) {
+  has UUID5_Generals => (
+    is => 'ro',
+    lazy => 1,
+    default => sub {
+      my ($self) = @_;
+      my $uuids = {};
       my $UUID5_Generals_base = uuid5($self->UUID5_base, 'Generals');
       foreach my $gk (@{ $self->GeneralKeys }) {
         $uuids->{$gk} = uuid5($UUID5_Generals_base, $gk);
       }
+      return $uuids;
     }
-
-    return $uuids;
-  };
+  );
 
 }
 1;

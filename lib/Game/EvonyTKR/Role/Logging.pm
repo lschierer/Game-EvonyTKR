@@ -17,9 +17,14 @@ BEGIN {
   our $DEBUG_LOGGING = $ENV{LOG_DEBUG} // 0;
 }
 
-has logger => sub ($package) {
-  return get_logger($package);
-};
+has logger => (
+  is => 'ro',
+  lazy => 1,
+  default => sub {
+    my ($self) = @_;
+    return get_logger($self);
+  }
+);
 
 ##############################################################################
 # Logging wrapper methods that use caller() to get the actual logging package
