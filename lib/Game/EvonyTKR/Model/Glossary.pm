@@ -1,7 +1,8 @@
 package Game::EvonyTKR::Model::Glossary;
 use v5.42.0;
 use utf8::all;
-use Mojo::Base 'Game::EvonyTKR::Model::Base';
+use Moo;
+extends 'Game::EvonyTKR::Model::Base';
 use overload
   '""'       => \&as_string,
   '<=>'      => \&_comparison,

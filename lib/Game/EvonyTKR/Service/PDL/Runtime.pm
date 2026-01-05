@@ -2,7 +2,7 @@ package Game::EvonyTKR::Service::PDL::Runtime;
 use v5.42.0;
 use utf8;
 use Mojo::Base -base,                           -signatures;
-use Mojo::Base 'Game::EvonyTKR::Role::Logging', -role;
+with 'Game::EvonyTKR::Role::Logging';
 use PDL;
 use PDL::NiceSlice;
 use Game::EvonyTKR::Service::PDL::Compiler;

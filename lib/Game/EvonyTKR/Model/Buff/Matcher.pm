@@ -5,7 +5,8 @@ require Data::Printer;
 require Game::EvonyTKR::Model::Buff::Value;
 
 package Game::EvonyTKR::Model::Buff::Matcher {
-  use Mojo::Base 'Game::EvonyTKR::Model::Base', -signatures;
+  use Moo;
+  extends 'Game::EvonyTKR::Model::Base';
   use List::AllUtils qw( any all none );
   use Carp;
   our $VERSION = 'v0.1.0';

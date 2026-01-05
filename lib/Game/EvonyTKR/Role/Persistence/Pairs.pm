@@ -2,7 +2,7 @@ package Game::EvonyTKR::Role::Persistence::Pairs;
 use v5.42.0;
 use utf8::all;
 use Mojo::Base -role,                                     -signatures;
-use Mojo::Base 'Game::EvonyTKR::Role::Persistence::Core', -role;
+with 'Game::EvonyTKR::Role::Persistence::Core';
 use List::AllUtils qw(uniq none all any);
 use List::UtilsBy;
 use Hash::Util qw(lock_keys);

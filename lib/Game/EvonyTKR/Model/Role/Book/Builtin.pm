@@ -5,7 +5,7 @@ require Mojo::Base;
 use namespace::autoclean;
 
 package Game::EvonyTKR::Model::Role::Book::Builtin {
-  use Mojo::Base -role, -signatures;
+  use Moo::Role;
   use Carp;
 
   sub is_builtin {

@@ -11,7 +11,7 @@ require Data::Printer;
 package Game::EvonyTKR::Model::Covenant {
   use Mojo::Base "Game::EvonyTKR::Model::Base";
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants',    -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants', -role;
+  with 'Game::EvonyTKR::Role::Constants::GeneralConstants';
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::Covenants',        -role;
   use builtin qw(indexed);
   use File::FindLib 'lib';

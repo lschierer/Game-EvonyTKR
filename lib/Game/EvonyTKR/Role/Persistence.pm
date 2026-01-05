@@ -1,14 +1,14 @@
 package Game::EvonyTKR::Role::Persistence;
 use v5.42.0;
 use utf8::all;
-use Mojo::Base -role, -signatures;
+use Moo::Role;
 
 # Compose all granular persistence roles
 use Mojo::Base 'Game::EvonyTKR::Role::Persistence::Generals',            -role;
 use Mojo::Base 'Game::EvonyTKR::Role::Persistence::Books',               -role;
 use Mojo::Base 'Game::EvonyTKR::Role::Persistence::Covenants',           -role;
 use Mojo::Base 'Game::EvonyTKR::Role::Persistence::Specialties',         -role;
-use Mojo::Base 'Game::EvonyTKR::Role::Persistence::AscendingAttributes', -role;
+with 'Game::EvonyTKR::Role::Persistence::AscendingAttributes';
 use Mojo::Base 'Game::EvonyTKR::Role::Persistence::Pairs',               -role;
 use Mojo::Base 'Game::EvonyTKR::Role::Persistence::Glossary',            -role;
 
@@ -22,8 +22,9 @@ Game::EvonyTKR::Role::Persistence - Convenience role composing all persistence o
 =head1 SYNOPSIS
 
   package Game::EvonyTKR::Controller::Generals;
-  use Mojo::Base 'Mojolicious::Controller', -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Role::Persistence', -role;
+  use Moo;
+  extends 'Mojolicious::Controller';
+  with 'Game::EvonyTKR::Role::Persistence';
 
   sub list ($self) {
     my $generals = $self->list_generals();
@@ -39,7 +40,7 @@ persistence operations.
 For specialized use cases that only need specific collections, you can
 compose individual roles instead:
 
-  use Mojo::Base 'Game::EvonyTKR::Role::Persistence::Generals', -role;
+  with 'Game::EvonyTKR::Role::Persistence::Generals';
   use Mojo::Base 'Game::EvonyTKR::Role::Persistence::Books',    -role;
 
 =head1 COMPOSED ROLES

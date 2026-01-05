@@ -3,7 +3,7 @@ use utf8::all;
 use File::FindLib 'lib';
 
 package Game::EvonyTKR::Model::Role::Book::SkillBook {
-  use Mojo::Base -role, -signatures;
+  use Moo::Role;
   use Carp;
 
   has 'level' => 1;

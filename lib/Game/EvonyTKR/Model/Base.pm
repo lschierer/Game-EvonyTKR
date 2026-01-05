@@ -8,7 +8,7 @@ use Mojo::Base 'Game::EvonyTKR::Role::JSON',                     -role;
 use Mojo::Base 'Game::EvonyTKR::Role::Common',                   -role;
 use Mojo::Base 'Game::EvonyTKR::Role::Logging',                  -role;
 use Mojo::Base 'Game::EvonyTKR::Role::Persistence',              -role;
-use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants', -role;
+with 'Game::EvonyTKR::Role::Constants::BuffConstants';
 use Mojo::Base 'Game::EvonyTKR::Role::Constants::Books',         -role;
 use Mojo::Base 'Game::EvonyTKR::Role::Books',                    -role;
 use overload

@@ -1,5 +1,6 @@
     package Game::EvonyTKR::Service::LogAdapter;
-    use Mojo::Base 'Mojo::Log';
+    use Moo;
+    extends 'Mojo::Log';
     use Log::Log4perl;
 
     my $l4p;

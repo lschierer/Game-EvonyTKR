@@ -1,7 +1,7 @@
 package Game::EvonyTKR::Role::JSON;
 use v5.42.0;
 use utf8::all;
-use Mojo::Base -role, -signatures;
+use Moo::Role;
 use Carp;
 require JSON::PP;
 

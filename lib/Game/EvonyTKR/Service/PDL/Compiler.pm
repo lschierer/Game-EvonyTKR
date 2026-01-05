@@ -4,7 +4,7 @@ use utf8;
 use Mojo::Base -base,                                    -signatures;
 use Mojo::Base 'Game::EvonyTKR::Role::Logging',          -role;
 use Mojo::Base 'Game::EvonyTKR::Role::Common',           -role;
-use Mojo::Base 'Game::EvonyTKR::Role::Constants::Books', -role;
+with 'Game::EvonyTKR::Role::Constants::Books';
 use PDL;
 use PDL::NiceSlice;
 use YAML::XS           qw(LoadFile);

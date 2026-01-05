@@ -1,7 +1,7 @@
 package Game::EvonyTKR::Service::Conflicts::BookComparator;
 use v5.42.0;
 use utf8::all;
-use Mojo::Base -base, -signatures;
+use Moo;
 use List::AllUtils qw( any uniq );
 use Scalar::Util   qw( refaddr );
 

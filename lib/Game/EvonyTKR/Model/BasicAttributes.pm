@@ -6,9 +6,10 @@ use File::FindLib 'lib';
 use namespace::autoclean;
 
 package Game::EvonyTKR::Model::BasicAttributes {
-  use Mojo::Base 'Game::EvonyTKR::Model::Base';
+  use Moo;
+  extends 'Game::EvonyTKR::Model::Base';
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants',    -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants', -role;
+  with 'Game::EvonyTKR::Role::Constants::GeneralConstants';
 # VERSION
   use Carp;
   use List::AllUtils qw( any none first );

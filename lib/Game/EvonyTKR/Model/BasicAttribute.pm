@@ -6,8 +6,9 @@ require Math::Round;
 use namespace::autoclean;
 
 package Game::EvonyTKR::Model::BasicAttribute {
-  use Mojo::Base 'Game::EvonyTKR::Model::Base';
-  use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants', -role;
+  use Moo;
+  extends 'Game::EvonyTKR::Model::Base';
+  with 'Game::EvonyTKR::Role::Constants::BuffConstants';
   use List::AllUtils qw( any none );
   use Scalar::Util   qw(blessed);
   use Data::Printer;

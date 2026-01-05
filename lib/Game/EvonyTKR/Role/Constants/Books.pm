@@ -4,7 +4,7 @@ use utf8::all;
 require Data::Printer;
 require Hash::Util;
 use List::AllUtils qw( all any none );
-use Mojo::Base -role, -signatures;
+use Moo::Role;
 use Const::Fast;
 use Carp;
 

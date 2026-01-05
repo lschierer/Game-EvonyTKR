@@ -8,7 +8,7 @@ require X500::RDN;
 require Unicode::CaseFold;
 
 package Game::EvonyTKR::Role::Common {
-  use Mojo::Base -role, -signatures;
+  use Moo::Role;
   use Carp;
   use UUID               qw(uuid5);
   use Unicode::CaseFold  qw(fc);

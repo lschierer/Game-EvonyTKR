@@ -11,7 +11,7 @@ package Game::EvonyTKR::Model::General {
   use Mojo::Base "Game::EvonyTKR::Model::Base";
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants',       -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants',    -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::Constants::AscendingAttributes', -role;
+  with 'Game::EvonyTKR::Role::Constants::AscendingAttributes';
   use JSON::PP;
   use UUID           qw(uuid5);
   use List::AllUtils qw( any none all );

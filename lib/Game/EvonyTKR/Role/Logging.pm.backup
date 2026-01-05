@@ -2,7 +2,7 @@ package Game::EvonyTKR::Role::Logging;
 use v5.42.0;
 use experimental qw(class);
 use utf8::all;
-use Moo::Role;
+use Mojo::Base -role, -signatures;
 use Log::Log4perl;
 use Log::Log4perl::Level;
 use Mojo::Loader        qw(find_modules);

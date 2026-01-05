@@ -7,8 +7,9 @@ require Game::EvonyTKR::Model::Buff::Value;
 use namespace::autoclean;
 
 package Game::EvonyTKR::Model::Buff {
-  use Mojo::Base 'Game::EvonyTKR::Model::Base';
-  use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants', -role;
+  use Moo;
+  extends 'Game::EvonyTKR::Model::Base';
+  with 'Game::EvonyTKR::Role::Constants::BuffConstants';
   use List::AllUtils qw( any none );
   use Carp;
   use File::FindLib 'lib';

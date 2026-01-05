@@ -7,7 +7,7 @@ require X500::RDN;
 require Hash::Util;
 
 package Game::EvonyTKR::Role::Constants::GeneralConstants {
-  use Mojo::Base -role, -signatures;
+  use Moo::Role;
   use Const::Fast;
   use Carp;
   use UUID qw(uuid5);

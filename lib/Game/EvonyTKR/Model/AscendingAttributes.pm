@@ -14,7 +14,7 @@ package Game::EvonyTKR::Model::AscendingAttributes {
   use Mojo::Base "Game::EvonyTKR::Model::Base";
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants',       -role;
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants',    -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::Constants::AscendingAttributes', -role;
+  with 'Game::EvonyTKR::Role::Constants::AscendingAttributes';
   use Carp;
   use Data::Printer;
   use List::AllUtils qw (none);

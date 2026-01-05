@@ -11,9 +11,10 @@ require Game::EvonyTKR::Model::Buff::Matcher;
 use namespace::autoclean;
 
 package Game::EvonyTKR::Model::Specialty {
-  use Mojo::Base 'Game::EvonyTKR::Model::Base';
+  use Moo;
+  extends 'Game::EvonyTKR::Model::Base';
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants',    -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants', -role;
+  with 'Game::EvonyTKR::Role::Constants::GeneralConstants';
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::Specialties',      -role;
   use List::AllUtils qw( any none all );
   use UUID           qw(uuid5);

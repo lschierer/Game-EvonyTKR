@@ -2,7 +2,7 @@ package Game::EvonyTKR::Role::StaticPages;
 use v5.42.0;
 use experimental qw(class);
 use utf8::all;
-use Mojo::Base -role, -signatures;
+use Moo::Role;
 
 require YAML::PP;
 require Game::EvonyTKR::Role::MarkdownRenderer;

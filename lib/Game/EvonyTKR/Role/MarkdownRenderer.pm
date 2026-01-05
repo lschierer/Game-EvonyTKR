@@ -6,7 +6,7 @@ require YAML::PP;
 require Mojo::DOM58;
 
 package Game::EvonyTKR::Role::MarkdownRenderer {
-  use Mojo::Base -role, -signatures;
+  use Moo::Role;
   use Carp;
 
   # NOTE: This role has an interdependency on Game::EvonyTKR::Role::Logging
@@ -301,8 +301,9 @@ Game::EvonyTKR::Role::MarkdownRenderer - Role for rendering markdown content in 
 =head1 SYNOPSIS
 
   package MyController {
-    use Mojo::Base 'Mojolicious::Controller';
-    use Mojo::Base 'Game::EvonyTKR::Role::MarkdownRenderer', -role;
+    use Moo;
+    extends 'Mojolicious::Controller';
+    with 'Game::EvonyTKR::Role::MarkdownRenderer';
 
     sub some_page ($c) {
       my $md_path = Mojo::File->new('/path/to/page.md');

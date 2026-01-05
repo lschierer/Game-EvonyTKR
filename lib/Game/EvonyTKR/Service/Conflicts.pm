@@ -6,7 +6,7 @@ use Mojo::Base 'Game::EvonyTKR::Role::Logging',                     -role;
 use Mojo::Base 'Game::EvonyTKR::Role::Common',                      -role;
 use Mojo::Base 'Game::EvonyTKR::Role::Persistence::Pairs',          -role;
 use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants',    -role;
-use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants', -role;
+with 'Game::EvonyTKR::Role::Constants::GeneralConstants';
 
 require Data::Printer;
 use List::AllUtils qw( any none uniq );

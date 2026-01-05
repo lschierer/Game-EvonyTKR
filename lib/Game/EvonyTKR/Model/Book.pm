@@ -4,7 +4,7 @@ use v5.42.0;
 use utf8::all;
 use Mojo::Base "Game::EvonyTKR::Model::Base";
 use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants',    -role;
-use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants', -role;
+with 'Game::EvonyTKR::Role::Constants::GeneralConstants';
 use List::AllUtils qw( any none );
 use Carp;
 use overload

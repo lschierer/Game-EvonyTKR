@@ -1,7 +1,7 @@
 package Game::EvonyTKR::Role::Books;
 use v5.42.0;
 use utf8::all;
-use Mojo::Base -role, -signatures;
+use Moo::Role;
 use List::AllUtils qw(any all none uniq);
 
 # requires that Game::EvonyTKR::Role::Constants::BuffConstants be composed in.

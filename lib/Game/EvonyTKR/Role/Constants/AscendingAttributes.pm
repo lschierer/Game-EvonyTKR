@@ -5,7 +5,7 @@ require Data::Printer;
 require Hash::Util;
 
 package Game::EvonyTKR::Role::Constants::AscendingAttributes {
-  use Mojo::Base -role, -signatures;
+  use Moo::Role;
   use Const::Fast;
   use Carp;
   use List::AllUtils qw(any);

@@ -8,8 +8,8 @@ require Game::EvonyTKR::Service::Conflicts;
 
 package Game::EvonyTKR::Model::Buff::Summarizer {
   use Mojo::Base 'Game::EvonyTKR::Model::Base',                    -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants', -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants', -role;
+  with 'Game::EvonyTKR::Role::Constants::BuffConstants';
+  with 'Game::EvonyTKR::Role::Constants::GeneralConstants';
   use Mojo::Base 'Game::EvonyTKR::Role::Constants::Books',            -role;
   use List::AllUtils qw(first any all none uniq);
   use Carp;

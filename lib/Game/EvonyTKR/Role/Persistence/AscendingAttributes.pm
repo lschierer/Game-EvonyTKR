@@ -2,7 +2,7 @@ package Game::EvonyTKR::Role::Persistence::AscendingAttributes;
 use v5.42.0;
 use utf8::all;
 use Mojo::Base -role,                                     -signatures;
-use Mojo::Base 'Game::EvonyTKR::Role::Persistence::Core', -role;
+with 'Game::EvonyTKR::Role::Persistence::Core';
 
 sub add_ascending_attribute ($self, $ascendingAttribute) {
   my $name = lc($self->normalize($ascendingAttribute->general));

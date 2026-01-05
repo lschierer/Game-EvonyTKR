@@ -1,7 +1,7 @@
 package Game::EvonyTKR::Service::Persistence;
 use v5.42.0;
 use utf8::all;
-use Mojo::Base -base, -signatures;
+use Moo;
 
 # Mode-gated persistence factory
 has 'mode' => sub { $ENV{MOJO_MODE} || 'development' };

@@ -1,7 +1,7 @@
 package Game::EvonyTKR::Role::Persistence::Core;
 use v5.42.0;
 use utf8::all;
-use Mojo::Base -role, -signatures;
+use Moo::Role;
 use Game::EvonyTKR::Service::Persistence;
 use DBI;
 

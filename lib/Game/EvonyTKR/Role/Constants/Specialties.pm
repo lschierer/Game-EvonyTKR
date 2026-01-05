@@ -4,7 +4,7 @@ use File::FindLib 'lib';
 require Data::Printer;
 
 package Game::EvonyTKR::Role::Constants::Specialties {
-  use Mojo::Base -role, -signatures;
+  use Moo::Role;
   use Const::Fast;
   use Carp;
 
@@ -17,27 +17,38 @@ package Game::EvonyTKR::Role::Constants::Specialties {
     gold   => 'Gold',
   );
 
-  has 'is_valid_specialty_level' => sub ($self, $level) {
+  sub is_valid_specialty_level ($self, $level) {
     if (exists $SpecialtyLevels{$level}) {
       return 1;
     }
     return 0;
-  };
+  }
 
-  has 'SpecialtyLevelValues' => sub {
-    const my $tmp => ['none', 'green', 'blue', 'purple', 'orange', 'gold',];
-    return $tmp;
-  };
-
-  has 'SpecialtyLevelLabels' => sub ($self) {
-    my $labels = [];
-    foreach my $key ($self->SpecialtyLevelValues->@*) {
-      push @{$labels}, $SpecialtyLevels{$key};
+  has SpecialtyLevelValues => (
+    is => 'ro',
+    lazy => 1,
+    default => sub {
+      const my $tmp => ['none', 'green', 'blue', 'purple', 'orange', 'gold',];
+      return $tmp;
     }
-    return $labels;
-  };
+  );
 
-  has 'CommonSpecialtyNames' => sub {
+  has SpecialtyLevelLabels => (
+    is => 'ro',
+    lazy => 1,
+    default => sub ($self) {
+      my $labels = [];
+      foreach my $key ($self->SpecialtyLevelValues->@*) {
+        push @{$labels}, $SpecialtyLevels{$key};
+      }
+      return $labels;
+    }
+  );
+
+  has CommonSpecialtyNames => (
+    is => 'ro',
+    lazy => 1,
+    default => sub {
     const my $tmp => [
       'Ambush',
       'Annihilation',
@@ -75,7 +86,8 @@ package Game::EvonyTKR::Role::Constants::Specialties {
       'War God',
     ];
     return $tmp;
-  };
+    }
+  );
 }
 1;
 __END__
