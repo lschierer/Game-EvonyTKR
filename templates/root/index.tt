@@ -1,0 +1,2 @@
+[%# Root homepage template - content is pre-rendered from markdown %]
+[% content %]

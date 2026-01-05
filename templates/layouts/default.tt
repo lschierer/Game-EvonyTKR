@@ -1,0 +1,59 @@
+[% sidebar = sidebar.defined ? sidebar : 1 -%]
+<!DOCTYPE html>
+<html lang="en" class="spectrum spectrum--medium spectrum--light light-theme light">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>[% title || 'Evony TKR Tips' %]</title>
+
+    <link rel="stylesheet" href="/css/global.css" />
+    <link rel="stylesheet" href="/css/spectrum-overrides.css" />
+    [% IF css_files -%]
+      [% FOREACH css_file IN css_files -%]
+        <link rel="stylesheet" href="[% css_file %]">
+      [% END -%]
+    [% END -%]
+    <script src="https://cdn.jsdelivr.net/npm/iconify-icon@3.0.0/dist/iconify-icon.min.js"></script>
+  </head>
+  [% classes = sidebar ? 'spectrum spectrum--medium spectrum--light spectrum-Typography light-theme light with-sidebar' : 'spectrum spectrum--medium spectrum--light spectrum-Typography light-theme light' -%]
+  <body class="[% classes %]">
+    <header>
+      [% INCLUDE partials/global_header.tt %]
+    </header>
+    [% IF sidebar -%]
+      <div class=" spectrum-SplitView spectrum-SplitView--horizontal ">
+        <div id="nav" class="spectrum-SplitView-pane">
+          <div class="spectrum-Site-sideBar">
+            <nav class="">
+              [% IF navigation -%]
+                [% navigation %]
+              [% ELSE -%]
+                <!-- No navigation configured -->
+              [% END -%]
+            </nav>
+          </div>
+        </div>
+        <div tabindex="0" class=" spectrum-SplitView-splitter "></div>
+        <div id="main" class="spectrum-SplitView-pane">
+    [% END -%]
+
+    <main >
+      [% content %]
+    </main>
+
+    [% IF sidebar -%]
+        </div> <!-- close the Right spectrum-SplitView-pane -->
+      </div> <!-- close the spectrum-SplitView spectrum-SplitView--horizontal -->
+    [% END -%]
+
+    <footer>
+      [% INCLUDE partials/global_footer.tt %]
+    </footer>
+
+    [% IF js_files -%]
+      [% FOREACH js_file IN js_files -%]
+        <script src="[% js_file %]"></script>
+      [% END -%]
+    [% END -%]
+  </body>
+</html>

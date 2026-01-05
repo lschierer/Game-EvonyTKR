@@ -1,0 +1,2 @@
+[%# Generic markdown page template - content is pre-rendered from markdown %]
+[% content %]

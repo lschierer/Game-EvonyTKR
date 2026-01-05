@@ -1,0 +1,422 @@
+#!/usr/bin/env perl
+use v5.42.0;
+use experimental qw(class);
+use utf8::all;
+use Encode qw(encode_utf8);
+use lib '../PAGI-WebServer/lib';
+use lib 'lib';
+
+use PAGI::WebServer;
+use PAGI::WebServer::Router;
+use PAGI::WebServer::Markdown;
+use PAGI::WebServer::Navigation;
+use PAGI::WebServer::Template;
+use PAGI::Server;
+use Future::AsyncAwait;
+use Path::Tiny;
+use IO::Async::Loop;
+use Log::Log4perl qw(:easy);
+
+# Initialize logging
+Log::Log4perl->easy_init($DEBUG);
+
+my $framework = PAGI::WebServer->new;
+$framework->setup_logging;
+
+my $markdown = PAGI::WebServer::Markdown->new;
+my $template = PAGI::WebServer::Template->new(
+    template_dir => 'templates',
+    include_path => ['templates', 'templates/partials']
+);
+my $pages_dir = path('share/pages');
+
+# Create navigation
+my $nav = PAGI::WebServer::Navigation->new;
+
+# Create router
+my $router = PAGI::WebServer::Router->new;
+
+# Apply Spectrum CSS to HTML
+sub apply_spectrum_css {
+    my ($html) = @_;
+
+    require Mojo::DOM58;
+    my $dom = Mojo::DOM58->new($html);
+
+    my %spectrum_h = (
+        h1 => "spectrum-Heading spectrum-Heading--sizeXXL",
+        h2 => "spectrum-Heading spectrum-Heading--sizeXL",
+        h3 => "spectrum-Heading spectrum-Heading--sizeL",
+        h4 => "spectrum-Heading spectrum-Heading--sizeM",
+        h5 => "spectrum-Heading spectrum-Heading--sizeS",
+        h6 => "spectrum-Heading spectrum-Heading--sizeXS",
+    );
+
+    for my $tag (keys %spectrum_h) {
+        $dom->find($tag)->each(sub { $_->attr(class => $spectrum_h{$tag}) });
+    }
+
+    $dom->find('p')->each(sub {
+        $_->attr(class => "spectrum-Body spectrum-Body--serif spectrum-Body--sizeM");
+    });
+
+    $dom->find('li')->each(sub {
+        $_->attr(class => "spectrum-Body spectrum-Body--serif spectrum-Body--sizeM");
+    });
+
+    $dom->find('a')->each(sub {
+        $_->attr(class => "spectrum-Link spectrum-Link--primary spectrum-Link--quiet");
+    });
+
+    $dom->find('em')->each(sub {
+        $_->attr(class => "spectrum-Body-emphasized");
+    });
+
+    $dom->find('strong')->each(sub {
+        $_->attr(class => "spectrum-Body-strong");
+    });
+
+    $dom->find('hr')->each(sub {
+        $_->attr(class => 'spectrum-Divider spectrum-Divider--sizeM');
+    });
+
+    $dom->find('table')->each(sub {
+        $_->attr(class => 'spectrum-Table spectrum-Table--sizeM');
+    });
+
+    $dom->find('thead')->each(sub {
+        $_->attr(class => 'spectrum-Table-head');
+    });
+
+    $dom->find('tbody')->each(sub {
+        $_->attr(class => 'spectrum-Table-body');
+    });
+
+    $dom->find('th')->each(sub {
+        $_->attr(class => 'spectrum-Table-headCell');
+    });
+
+    $dom->find('td')->each(sub {
+        $_->attr(class => 'spectrum-Table-cell');
+    });
+
+    $dom->find('tr')->each(sub {
+        $_->attr(class => 'spectrum-Table-row');
+    });
+
+    return $dom->to_string;
+}
+
+# Auto-discover markdown pages for navigation
+$pages_dir->visit(
+    sub {
+        my ($path) = @_;
+        return if $path->is_dir;
+        return unless $path =~ /\.md$/;
+
+        # Convert file path to route path
+        my $rel_path = $path->relative($pages_dir);
+        my $route    = "/$rel_path";
+        $route =~ s/\.md$//;
+        $route =~ s|/index$||;    # Remove /index for index files
+
+        # Parse frontmatter to get title and order
+        my $content = $path->slurp_utf8;
+        my ($frontmatter, $markdown_content) = $markdown->parse_frontmatter($content);
+
+        # Use title from frontmatter, or generate from filename
+        my $title = $frontmatter->{title};
+        if (!$title) {
+            $title = $path->basename;
+            $title =~ s/\.md$//;
+            $title =~ s/[-_]/ /g;
+            $title =~ s/\b(\w)/\U$1/g;    # Capitalize words
+        }
+
+        # Get order from frontmatter - only if explicitly set
+        my $options = {};
+        if (defined $frontmatter->{order}) {
+            $options->{order} = $frontmatter->{order};
+        }
+
+        # Skip policy pages (hardcoded exclusion like Mojolicious)
+        return if $route =~ m{^/policy};
+
+        # Add route to navigation (will default to 999 if no order specified)
+        $nav->add_route($route, $title, $options);
+    },
+    { recurse => 1 }
+);
+
+# Add policy/privacy manually (not auto-discovered)
+$nav->add_route('/policy/privacy', 'Privacy Policy', { order => 200 });
+
+# Add route for homepage
+$router->get('/' => async sub {
+    my ($scope, $receive, $send) = @_;
+
+    my $index_file = $pages_dir->child('index.md');
+
+    unless ($index_file->exists) {
+        await $send->({
+            type    => 'http.response.start',
+            status  => 404,
+            headers => [['content-type', 'text/plain']],
+        });
+        await $send->({
+            type => 'http.response.body',
+            body => 'Homepage not found',
+            more => 0,
+        });
+        return;
+    }
+
+    # Parse frontmatter and render markdown
+    my ($frontmatter, $content_html) = $markdown->render_with_frontmatter($index_file->stringify);
+
+    # Apply Spectrum CSS
+    $content_html = apply_spectrum_css($content_html);
+
+    my $title = $frontmatter->{title} || 'EvonyTKR';
+    my $current_year = (localtime)[5] + 1900;
+    my $navigation_html = $nav->render('/');
+
+    my $vars = {
+        content      => $content_html,
+        title        => $title,
+        current_year => $current_year,
+        sidebar      => 0,  # Homepage doesn't have sidebar
+        navigation   => $navigation_html,
+    };
+
+    my $html = $template->render('root/index.tt', $vars,
+        { layout => 'layouts/default.tt' });
+
+    my $bytes = encode_utf8($html);
+
+    await $send->({
+        type    => 'http.response.start',
+        status  => 200,
+        headers => [['content-type', 'text/html; charset=utf-8']],
+    });
+    await $send->({
+        type => 'http.response.body',
+        body => $bytes,
+        more => 0,
+    });
+});
+
+# Add route for CSS files
+$router->get('/css/*' => async sub {
+    my ($scope, $receive, $send) = @_;
+
+    my $path = $scope->{path};
+    my ($filename) = $path =~ m{^/css/(.+)$};
+
+    if ($filename) {
+        my $css_file = path('share/public/css')->child($filename);
+
+        if ($css_file->exists && $css_file->is_file) {
+            my $content = $css_file->slurp_utf8;
+            my $bytes   = encode_utf8($content);
+
+            await $send->({
+                type    => 'http.response.start',
+                status  => 200,
+                headers => [['content-type', 'text/css; charset=utf-8']],
+            });
+            await $send->({
+                type => 'http.response.body',
+                body => $bytes,
+                more => 0,
+            });
+            return;
+        }
+    }
+
+    # CSS file not found
+    await $send->({
+        type    => 'http.response.start',
+        status  => 404,
+        headers => [['content-type', 'text/plain']],
+    });
+    await $send->({
+        type => 'http.response.body',
+        body => 'CSS Not Found',
+        more => 0,
+    });
+});
+
+# Add route for JS files
+$router->get('/js/*' => async sub {
+    my ($scope, $receive, $send) = @_;
+
+    my $path = $scope->{path};
+    my ($filename) = $path =~ m{^/js/(.+)$};
+
+    if ($filename) {
+        my $js_file = path('share/public/js')->child($filename);
+
+        if ($js_file->exists && $js_file->is_file) {
+            my $content = $js_file->slurp_utf8;
+            my $bytes   = encode_utf8($content);
+
+            # Determine content type based on file extension
+            my $content_type = $filename =~ /\.js$/ ? 'application/javascript; charset=utf-8'
+                             : $filename =~ /\.map$/ ? 'application/json; charset=utf-8'
+                             : 'text/plain; charset=utf-8';
+
+            await $send->({
+                type    => 'http.response.start',
+                status  => 200,
+                headers => [['content-type', $content_type]],
+            });
+            await $send->({
+                type => 'http.response.body',
+                body => $bytes,
+                more => 0,
+            });
+            return;
+        }
+    }
+
+    # JS file not found
+    await $send->({
+        type    => 'http.response.start',
+        status  => 404,
+        headers => [['content-type', 'text/plain']],
+    });
+    await $send->({
+        type => 'http.response.body',
+        body => 'JS Not Found',
+        more => 0,
+    });
+});
+
+# Add route for image files
+$router->get('/images/*' => async sub {
+    my ($scope, $receive, $send) = @_;
+
+    my $path = $scope->{path};
+    my ($filename) = $path =~ m{^/images/(.+)$};
+
+    if ($filename) {
+        my $img_file = path('share/public/images')->child($filename);
+
+        if ($img_file->exists && $img_file->is_file) {
+            my $content = $img_file->slurp_raw;  # Binary content for images
+
+            # Determine content type based on file extension
+            my $content_type = $filename =~ /\.jpe?g$/i ? 'image/jpeg'
+                             : $filename =~ /\.png$/i   ? 'image/png'
+                             : $filename =~ /\.gif$/i   ? 'image/gif'
+                             : $filename =~ /\.svg$/i   ? 'image/svg+xml'
+                             : $filename =~ /\.webp$/i  ? 'image/webp'
+                             : $filename =~ /\.ico$/i   ? 'image/x-icon'
+                             : 'application/octet-stream';
+
+            await $send->({
+                type    => 'http.response.start',
+                status  => 200,
+                headers => [['content-type', $content_type]],
+            });
+            await $send->({
+                type => 'http.response.body',
+                body => $content,
+                more => 0,
+            });
+            return;
+        }
+    }
+
+    # Image file not found
+    await $send->({
+        type    => 'http.response.start',
+        status  => 404,
+        headers => [['content-type', 'text/plain']],
+    });
+    await $send->({
+        type => 'http.response.body',
+        body => 'Image Not Found',
+        more => 0,
+    });
+});
+
+# Add wildcard route for markdown pages
+$router->get('*' => async sub {
+    my ($scope, $receive, $send) = @_;
+
+    my $path = $scope->{path};
+    $path =~ s|^/||;  # Remove leading slash
+
+    # Try exact path first
+    my $md_file = $pages_dir->child("$path.md");
+
+    # If not found, try as directory with index.md
+    unless ($md_file->exists) {
+        $md_file = $pages_dir->child($path, 'index.md');
+    }
+
+    unless ($md_file->exists) {
+        await $send->({
+            type    => 'http.response.start',
+            status  => 404,
+            headers => [['content-type', 'text/plain']],
+        });
+        await $send->({
+            type => 'http.response.body',
+            body => 'Page not found',
+            more => 0,
+        });
+        return;
+    }
+
+    # Parse and render
+    my ($frontmatter, $content_html) = $markdown->render_with_frontmatter($md_file->stringify);
+    $content_html = apply_spectrum_css($content_html);
+
+    my $title = $frontmatter->{title} || $path;
+    my $current_year = (localtime)[5] + 1900;
+    my $navigation_html = $nav->render($path);
+
+    my $vars = {
+        content      => $content_html,
+        title        => $title,
+        current_year => $current_year,
+        sidebar      => 1,
+        navigation   => $navigation_html,
+    };
+
+    my $html = $template->render('page/markdown.tt', $vars,
+        { layout => 'layouts/default.tt' });
+
+    my $bytes = encode_utf8($html);
+
+    await $send->({
+        type    => 'http.response.start',
+        status  => 200,
+        headers => [['content-type', 'text/html; charset=utf-8']],
+    });
+    await $send->({
+        type => 'http.response.body',
+        body => $bytes,
+        more => 0,
+    });
+});
+
+# Create event loop and server
+my $loop = IO::Async::Loop->new;
+
+my $server = PAGI::Server->new(
+    app  => $router->to_app,
+    host => '127.0.0.1',
+    port => 3000,
+);
+
+say "Starting EvonyTKR PAGI server on 127.0.0.1:3000";
+
+$loop->add($server);
+$server->listen->get;
+
+# Keep the event loop running
+$loop->run;

@@ -1,0 +1,30 @@
+[%# share/templates/partials/global_footer.tt %]
+<div class="footer">
+  <div class="copyright">
+    <p class="spectrum-Body spectrum-Body--sizeS">&copy; [% current_year || 2026 %] Luke Schierer</p>
+  </div>
+  <div class="privacy">
+    <span class="spectrum-Body spectrum-Body--sizeS">
+      <a href="/policy/privacy" class="spectrum-Link --spectrum-Link--primary --spectrum-Link--quiet">Privacy Policy</a>
+    </span>
+  </div>
+</div>
+<style>
+  div.footer {
+    height: 100%;
+    width: 100%;
+    padding: var(--size-1) var(--size-9);
+    box-sizing: border-box;
+    background: var(--text-1);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    align-content: space-around;
+    justify-content: space-between;
+
+    --spectrum-background-base-color: var(--text-1);
+    --spectrum-body-font-color: var(--text-2);
+    --spectrum-heading-font-color: var(--text-2);
+  }
+
+</style>
