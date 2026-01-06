@@ -1,0 +1,13 @@
+<div class="collection-list">
+  <ul class="collection-grid">
+    [% IF items && items.size > 0 -%]
+      [% FOREACH item IN items.sort('name') -%]
+        <li class="collection-item">
+          <a href="/Reference/Books/Skill/[% item.name %]">
+            [% item.name %]
+          </a>
+        </li>
+      [% END -%]
+    [% END -%]
+  </ul>
+</div>

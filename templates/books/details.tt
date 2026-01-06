@@ -1,0 +1,25 @@
+<div class="book-details">
+  [% IF item -%]
+    <h3 class="spectrum-Heading spectrum-Heading--sizeL">
+      [% item.name %]
+      [% IF item.can('level') && item.level -%]
+        (Level [% item.level %])
+      [% END -%]
+    </h3>
+
+    [% IF item.text -%]
+      <p class="book-description">[% item.text %]</p>
+    [% END -%]
+
+    [% IF item.buffs && item.buffs.size > 0 -%]
+      <h4 class="spectrum-Heading spectrum-Heading--sizeM">Buffs</h4>
+      <ul class="buff-list">
+        [% FOREACH buff IN item.buffs -%]
+          [% INCLUDE buffs/single.tt buff=buff %]
+        [% END -%]
+      </ul>
+    [% END -%]
+  [% ELSE -%]
+    <span>Book Not Available</span>
+  [% END -%]
+</div>

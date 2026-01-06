@@ -16,7 +16,9 @@ use Future::AsyncAwait;
 use Path::Tiny;
 use IO::Async::Loop;
 use Log::Log4perl qw(:easy);
+use URI::Escape qw(uri_unescape);
 use Game::EvonyTKR::Loader::Specialties;
+use Game::EvonyTKR::Loader::Books;
 
 # Initialize logging
 Log::Log4perl->easy_init($DEBUG);
@@ -36,8 +38,16 @@ my $specialty_loader = Game::EvonyTKR::Loader::Specialties->new(
     data_dir => 'share/collections/data/specialties'
 );
 say "Loading specialties...";
-my $count = $specialty_loader->load_all();
-say "Loaded $count specialties";
+my $specialty_count = $specialty_loader->load_all();
+say "Loaded $specialty_count specialties";
+
+# Load books data
+my $books_loader = Game::EvonyTKR::Loader::Books->new(
+    data_dir => 'share/collections/data'
+);
+say "Loading books...";
+my $books_count = $books_loader->load_all();
+say "Loaded $books_count books";
 
 # Create navigation
 my $nav = PAGI::WebServer::Navigation->new;
@@ -159,6 +169,39 @@ $pages_dir->visit(
 
 # Add policy/privacy manually (not auto-discovered)
 $nav->add_route('/policy/privacy', 'Privacy Policy', { order => 200 });
+$nav->add_route('/Reference/Specialties', 'Specialties', { order => 10, parent => '/Reference' });
+$nav->add_route('/Reference/Books', 'Books', { order => 20, parent => '/Reference' });
+$nav->add_route('/Reference/Books/Skill', 'Skill Books', { order => 10, parent => '/Reference/Books' });
+$nav->add_route('/Reference/Books/Generic', 'Generic Books', { order => 20, parent => '/Reference/Books' });
+
+# Add individual specialties to navigation
+my $specialty_order = 0;
+for my $specialty_name (sort @{$specialty_loader->list_specialties}) {
+    $nav->add_route("/Reference/Specialties/$specialty_name", $specialty_name, {
+        order => $specialty_order++,
+        parent => '/Reference/Specialties'
+    });
+}
+
+# Add individual skill books to navigation
+my $skill_order = 0;
+for my $book_name (sort @{$books_loader->list_skill_books}) {
+    $nav->add_route("/Reference/Books/Skill/$book_name", $book_name, {
+        order => $skill_order++,
+        parent => '/Reference/Books/Skill'
+    });
+}
+
+# Add individual generic books to navigation
+my $generic_order = 0;
+for my $book_key (sort @{$books_loader->list_generic_books}) {
+    my $book = $books_loader->get_generic_book($book_key);
+    my $display_name = $book_key;  # Already has "Name (Level X)" format
+    $nav->add_route("/Reference/Books/Generic/$book_key", $display_name, {
+        order => $generic_order++,
+        parent => '/Reference/Books/Generic'
+    });
+}
 
 # Add route for homepage
 $router->get('/' => async sub {
@@ -412,6 +455,192 @@ $router->get('/Reference/Specialties/*' => async sub {
         current_year => (localtime)[5] + 1900,
         sidebar => 1,
         navigation => $nav->render("/Reference/Specialties/$specialty_name"),
+    }, {
+        layout => 'layouts/default.tt'
+    });
+
+    my $bytes = encode_utf8($html);
+
+    await $send->({
+        type    => 'http.response.start',
+        status  => 200,
+        headers => [['content-type', 'text/html; charset=utf-8']],
+    });
+    await $send->({
+        type => 'http.response.body',
+        body => $bytes,
+        more => 0,
+    });
+});
+
+# Books routes
+# Main books index
+$router->get('/Reference/Books' => async sub {
+    my ($scope, $receive, $send) = @_;
+
+    my $html = $template->render('books/index.tt', {
+        title => 'Books',
+        current_year => (localtime)[5] + 1900,
+        sidebar => 1,
+        navigation => $nav->render('/Reference/Books'),
+    }, {
+        layout => 'layouts/default.tt'
+    });
+
+    my $bytes = encode_utf8($html);
+
+    await $send->({
+        type    => 'http.response.start',
+        status  => 200,
+        headers => [['content-type', 'text/html; charset=utf-8']],
+    });
+    await $send->({
+        type => 'http.response.body',
+        body => $bytes,
+        more => 0,
+    });
+});
+
+# Skill books index
+$router->get('/Reference/Books/Skill' => async sub {
+    my ($scope, $receive, $send) = @_;
+
+    my $items = [map { $books_loader->get_skill_book($_) }
+                 @{$books_loader->list_skill_books}];
+
+    my $html = $template->render('books/skill_books_index.tt', {
+        title => 'Skill Books',
+        items => $items,
+        current_year => (localtime)[5] + 1900,
+        sidebar => 1,
+        navigation => $nav->render('/Reference/Books/Skill'),
+    }, {
+        layout => 'layouts/default.tt'
+    });
+
+    my $bytes = encode_utf8($html);
+
+    await $send->({
+        type    => 'http.response.start',
+        status  => 200,
+        headers => [['content-type', 'text/html; charset=utf-8']],
+    });
+    await $send->({
+        type => 'http.response.body',
+        body => $bytes,
+        more => 0,
+    });
+});
+
+# Generic books index
+$router->get('/Reference/Books/Generic' => async sub {
+    my ($scope, $receive, $send) = @_;
+
+    my $items = [map { $books_loader->get_generic_book($_) }
+                 @{$books_loader->list_generic_books}];
+
+    my $html = $template->render('books/generic_books_index.tt', {
+        title => 'Generic Books',
+        items => $items,
+        current_year => (localtime)[5] + 1900,
+        sidebar => 1,
+        navigation => $nav->render('/Reference/Books/Generic'),
+    }, {
+        layout => 'layouts/default.tt'
+    });
+
+    my $bytes = encode_utf8($html);
+
+    await $send->({
+        type    => 'http.response.start',
+        status  => 200,
+        headers => [['content-type', 'text/html; charset=utf-8']],
+    });
+    await $send->({
+        type => 'http.response.body',
+        body => $bytes,
+        more => 0,
+    });
+});
+
+# Skill book detail
+$router->get('/Reference/Books/Skill/*' => async sub {
+    my ($scope, $receive, $send) = @_;
+
+    my $path = $scope->{path};
+    my ($name) = $path =~ m{^/Reference/Books/Skill/(.+?)/?$};
+    $name = uri_unescape($name) if defined $name;
+
+    my $item = $books_loader->get_skill_book($name);
+
+    unless ($item) {
+        await $send->({
+            type    => 'http.response.start',
+            status  => 404,
+            headers => [['content-type', 'text/html; charset=utf-8']],
+        });
+        await $send->({
+            type => 'http.response.body',
+            body => encode_utf8("<h1>Skill Book Not Found</h1>"),
+            more => 0,
+        });
+        return;
+    }
+
+    my $html = $template->render('books/details.tt', {
+        title => $item->name,
+        item => $item,
+        current_year => (localtime)[5] + 1900,
+        sidebar => 1,
+        navigation => $nav->render("/Reference/Books/Skill/$name"),
+    }, {
+        layout => 'layouts/default.tt'
+    });
+
+    my $bytes = encode_utf8($html);
+
+    await $send->({
+        type    => 'http.response.start',
+        status  => 200,
+        headers => [['content-type', 'text/html; charset=utf-8']],
+    });
+    await $send->({
+        type => 'http.response.body',
+        body => $bytes,
+        more => 0,
+    });
+});
+
+# Generic book detail
+$router->get('/Reference/Books/Generic/*' => async sub {
+    my ($scope, $receive, $send) = @_;
+
+    my $path = $scope->{path};
+    my ($name) = $path =~ m{^/Reference/Books/Generic/(.+?)/?$};
+    $name = uri_unescape($name) if defined $name;
+
+    my $item = $books_loader->get_generic_book($name);
+
+    unless ($item) {
+        await $send->({
+            type    => 'http.response.start',
+            status  => 404,
+            headers => [['content-type', 'text/html; charset=utf-8']],
+        });
+        await $send->({
+            type => 'http.response.body',
+            body => encode_utf8("<h1>Generic Book Not Found</h1>"),
+            more => 0,
+        });
+        return;
+    }
+
+    my $html = $template->render('books/details.tt', {
+        title => $item->name,
+        item => $item,
+        current_year => (localtime)[5] + 1900,
+        sidebar => 1,
+        navigation => $nav->render("/Reference/Books/Generic/$name"),
     }, {
         layout => 'layouts/default.tt'
     });

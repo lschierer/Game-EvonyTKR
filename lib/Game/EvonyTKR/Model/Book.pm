@@ -2,8 +2,9 @@
 package Game::EvonyTKR::Model::Book;
 use v5.42.0;
 use utf8::all;
-use Mojo::Base "Game::EvonyTKR::Model::Base";
-use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants',    -role;
+use Moo;
+extends 'Game::EvonyTKR::Model::Base';
+with 'Game::EvonyTKR::Role::Constants::BuffConstants';
 with 'Game::EvonyTKR::Role::Constants::GeneralConstants';
 use List::AllUtils qw( any none );
 use Carp;
@@ -14,8 +15,25 @@ use overload
   'fallback' => 0;
 require Game::EvonyTKR::Model::Buff;
 
-has ['name', 'text'] => '';
-has 'buffs'          => sub { [] };
+has name => (
+  is => 'rw',
+  default => sub { '' }
+);
+
+has text => (
+  is => 'rw',
+  default => sub { '' }
+);
+
+has buffs => (
+  is => 'rw',
+  lazy => 1,
+  default => sub { [] }
+);
+
+has level => (
+  is => 'rw'
+);
 
 # for backwards compatibility
 sub buff ($self) {
@@ -152,23 +170,23 @@ sub from_hash($class, $object) {
   my $logger = Game::EvonyTKR::Role::Logging::get_logger(__PACKAGE__);
   my $b;
   my $name = $object->{name};
+
+  # Create book with optional level attribute
+  my %params = (name => $name);
+
   if (exists $object->{level}) {
     $logger->debug(
       sprintf('detected that %s is a Generic book', $object->{name}));
     $name =~ s/Level [1-4] //;
-
-    my $level = $object->{level};
-
-    $b = Game::EvonyTKR::Model::Book->new(name => $name,)
-      ->with_roles('Game::EvonyTKR::Model::Role::Book::SkillBook');
-    $b->level($level);
+    $params{name} = $name;
+    $params{level} = $object->{level};
   }
   else {
     $logger->debug(
-      sprintf('detected that %s is a builtin book', $object->{name}));
-    $b = Game::EvonyTKR::Model::Book->new(name => $object->{name},)
-      ->with_roles('Game::EvonyTKR::Model::Role::Book::Builtin');
+      sprintf('detected that %s is a builtin/skill book', $object->{name}));
   }
+
+  $b = Game::EvonyTKR::Model::Book->new(%params);
   if (exists $object->{text}) {
     $b->text($object->{text});
   }

@@ -1,0 +1,15 @@
+<div class="collection-list">
+  <h2 class="spectrum-Heading spectrum-Heading--sizeM">Book Collections</h2>
+  <ul class="collection-grid">
+    <li class="collection-item">
+      <a href="/Reference/Books/Skill">
+        Skill Books
+      </a>
+    </li>
+    <li class="collection-item">
+      <a href="/Reference/Books/Generic">
+        Generic Books
+      </a>
+    </li>
+  </ul>
+</div>
