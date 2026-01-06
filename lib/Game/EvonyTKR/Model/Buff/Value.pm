@@ -7,7 +7,7 @@ use namespace::autoclean;
 package Game::EvonyTKR::Model::Buff::Value {
   use Moo;
   extends 'Game::EvonyTKR::Model::Base';
-  use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants',    -role;
+  with 'Game::EvonyTKR::Role::Constants::BuffConstants';
   with 'Game::EvonyTKR::Role::Constants::GeneralConstants';
   use Carp;
   use File::FindLib 'lib';
@@ -16,8 +16,15 @@ package Game::EvonyTKR::Model::Buff::Value {
     'bool'     => \&_isTrue,
     'fallback' => 0;
 
-  has 'number' => 0;
-  has 'unit'   => 'flat';
+  has number => (
+    is => 'rw',
+    default => sub { 0 }
+  );
+
+  has unit => (
+    is => 'rw',
+    default => sub { 'flat' }
+  );
 
   sub clone ($self) {
     return __PACKAGE__->new(

@@ -13,9 +13,9 @@ use namespace::autoclean;
 package Game::EvonyTKR::Model::Specialty {
   use Moo;
   extends 'Game::EvonyTKR::Model::Base';
-  use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants',    -role;
+  with 'Game::EvonyTKR::Role::Constants::BuffConstants';
   with 'Game::EvonyTKR::Role::Constants::GeneralConstants';
-  use Mojo::Base 'Game::EvonyTKR::Role::Constants::Specialties',      -role;
+  with 'Game::EvonyTKR::Role::Constants::Specialties';
   use List::AllUtils qw( any none all );
   use UUID           qw(uuid5);
   use Hash::Util     qw(lock_keys);
@@ -27,21 +27,34 @@ package Game::EvonyTKR::Model::Specialty {
     'bool'     => \&_isTrue,
     'fallback' => 0;
 
-  has ['name'] => '';
+  has name => (
+    is => 'rw',
+    default => sub { '' }
+  );
 
-  has 'id' => sub ($self) {
-    if (defined($self) && defined($self->UUID5_base)) {
-      my $specialtybase = uuid5($self->UUID5_base, 'Specialty');
-      if (defined($self->name)) {
-        return uuid5($specialtybase, $self->name);
+  has id => (
+    is => 'ro',
+    lazy => 1,
+    default => sub {
+      my ($self) = @_;
+      if (defined($self) && defined($self->UUID5_base)) {
+        my $specialtybase = uuid5($self->UUID5_base, 'Specialty');
+        if (defined($self->name)) {
+          return uuid5($specialtybase, $self->name);
+        }
       }
+      return '';
     }
-    return '';
-  };
+  );
 
-  has 'levels' => sub ($self) {
-    return $self->_init_empty_levels();
-  };
+  has levels => (
+    is => 'rw',
+    lazy => 1,
+    default => sub {
+      my ($self) = @_;
+      return $self->_init_empty_levels();
+    }
+  );
 
   sub _init_empty_levels ($self) {
     my %h =

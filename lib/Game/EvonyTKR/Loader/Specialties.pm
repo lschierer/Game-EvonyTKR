@@ -2,14 +2,16 @@ package Game::EvonyTKR::Loader::Specialties;
 use v5.42.0;
 use utf8::all;
 use Moo;
+use experimental qw(signatures);
 use Path::Tiny;
 use YAML::PP;
 use Log::Log4perl qw(get_logger);
-use Game::EvonyTKR::Model::Specialty;
+require Game::EvonyTKR::Model::Specialty;
 
 has logger => (
   is => 'ro',
-  default => sub { get_logger(__PACKAGE__) },
+  lazy => 1,
+  default => sub { get_logger(__PACKAGE__) }
 );
 
 has data_dir => (

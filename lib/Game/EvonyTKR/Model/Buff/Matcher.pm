@@ -11,24 +11,36 @@ package Game::EvonyTKR::Model::Buff::Matcher {
   use Carp;
   our $VERSION = 'v0.1.0';
 
-  has 'toTest';
+  has toTest => (is => 'rw');
 
-  has general_to_targeted => sub { {
-    mounted => 'Mounted Troops',
-    ground  => 'Ground Troops',
-    ranged  => 'Ranged Troops',
-    siege   => 'Siege Machines',
-  } };
+  has general_to_targeted => (
+    is => 'ro',
+    lazy => 1,
+    default => sub {
+      return {
+        mounted => 'Mounted Troops',
+        ground  => 'Ground Troops',
+        ranged  => 'Ranged Troops',
+        siege   => 'Siege Machines',
+      };
+    }
+  );
 
   # Conditions that are equivalent to having no condition
-  has no_op_Conditions => sub { [
-    "brings a dragon",
-    'brings a sacred dragon',
-    'brings a spiritual beast',
-    'During SvS',
-    'leading the army',
-    'you own the General',
-  ] };
+  has no_op_Conditions => (
+    is => 'ro',
+    lazy => 1,
+    default => sub {
+      return [
+        "brings a dragon",
+        'brings a sacred dragon',
+        'brings a spiritual beast',
+        'During SvS',
+        'leading the army',
+        'you own the General',
+      ];
+    }
+  );
 
   sub matchTargetedType ($self, $test_tt, $logID) {
     if (length $self->toTest->targetedType) {

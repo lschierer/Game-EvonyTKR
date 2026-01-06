@@ -433,6 +433,18 @@ package Game::EvonyTKR::Model::Buff {
       ));
       $r->set_target($hashref->{targetedType});
     }
+    if (exists $hashref->{targetedTroops}) {
+      $logger->debug(sprintf(
+        'found targetedTroops in hashref: "%s"',
+        defined($hashref->{targetedTroops})
+        ? ref($hashref->{targetedTroops})
+            ? join ', ',
+            map { sprintf('"%s"', $_) } $hashref->{targetedTroops}->@*
+            : $hashref->{targetedTroops}
+        : 'undef'
+      ));
+      $r->set_target($hashref->{targetedTroops});
+    }
     if (exists $hashref->{troop}) {
       $logger->debug(
         sprintf('found troop in hashref: "%s"', $hashref->{troop}));
