@@ -19,6 +19,7 @@ use Log::Log4perl qw(:easy);
 use URI::Escape qw(uri_unescape);
 use Game::EvonyTKR::Loader::Specialties;
 use Game::EvonyTKR::Loader::Books;
+use Game::EvonyTKR::Loader::AscendingAttributes;
 
 # Initialize logging
 Log::Log4perl->easy_init($DEBUG);
@@ -48,6 +49,14 @@ my $books_loader = Game::EvonyTKR::Loader::Books->new(
 say "Loading books...";
 my $books_count = $books_loader->load_all();
 say "Loaded $books_count books";
+
+# Load ascending attributes data (no routes, just data for general pages)
+my $ascending_loader = Game::EvonyTKR::Loader::AscendingAttributes->new(
+    data_dir => 'share/collections/data/ascending attributes'
+);
+say "Loading ascending attributes...";
+my $aa_count = $ascending_loader->load_all();
+say "Loaded $aa_count ascending attributes";
 
 # Create navigation
 my $nav = PAGI::WebServer::Navigation->new;

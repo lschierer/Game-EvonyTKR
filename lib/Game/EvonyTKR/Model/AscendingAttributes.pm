@@ -11,9 +11,10 @@ require Game::EvonyTKR::Model::Buff::Matcher;
 use namespace::autoclean;
 
 package Game::EvonyTKR::Model::AscendingAttributes {
-  use Mojo::Base "Game::EvonyTKR::Model::Base";
-  use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants',       -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants',    -role;
+  use Moo;
+  extends 'Game::EvonyTKR::Model::Base';
+  with 'Game::EvonyTKR::Role::Constants::BuffConstants';
+  with 'Game::EvonyTKR::Role::Constants::GeneralConstants';
   with 'Game::EvonyTKR::Role::Constants::AscendingAttributes';
   use Carp;
   use Data::Printer;
@@ -28,21 +29,34 @@ package Game::EvonyTKR::Model::AscendingAttributes {
     'bool'     => \&_isTrue,
     "fallback" => 0;
 
-  has 'id' => sub ($self) {
-    if (defined($self) && defined($self->UUID5_base)) {
-      my $aabase = uuid5($self->UUID5_base, 'Ascending Attributes');
-      if (defined($self->general)) {
-        return uuid5($aabase, $self->general);
+  has id => (
+    is => 'ro',
+    lazy => 1,
+    default => sub {
+      my ($self) = @_;
+      if (defined($self) && defined($self->UUID5_base)) {
+        my $aabase = uuid5($self->UUID5_base, 'Ascending Attributes');
+        if (defined($self->general)) {
+          return uuid5($aabase, $self->general);
+        }
       }
+      return '';
     }
-    return '';
-  };
+  );
 
-  has 'general' => '';
+  has general => (
+    is => 'rw',
+    default => sub { '' }
+  );
 
-  has 'attributes' => sub ($self) {
-    return $self->_init_empty_levels();
-  };
+  has attributes => (
+    is => 'rw',
+    lazy => 1,
+    default => sub {
+      my ($self) = @_;
+      return $self->_init_empty_levels();
+    }
+  );
 
   sub _init_empty_levels ($self) {
     my %h = map { $_ => { text => '', buffs => [], } } (
