@@ -20,6 +20,7 @@ use URI::Escape qw(uri_unescape);
 use Game::EvonyTKR::Loader::Specialties;
 use Game::EvonyTKR::Loader::Books;
 use Game::EvonyTKR::Loader::AscendingAttributes;
+use Game::EvonyTKR::Loader::Generals;
 
 # Initialize logging
 Log::Log4perl->easy_init($DEBUG);
@@ -57,6 +58,14 @@ my $ascending_loader = Game::EvonyTKR::Loader::AscendingAttributes->new(
 say "Loading ascending attributes...";
 my $aa_count = $ascending_loader->load_all();
 say "Loaded $aa_count ascending attributes";
+
+# Load generals data
+my $generals_loader = Game::EvonyTKR::Loader::Generals->new(
+    data_dir => 'share/collections/data/generals'
+);
+say "Loading generals...";
+my $generals_count = $generals_loader->load_all();
+say "Loaded $generals_count generals";
 
 # Create navigation
 my $nav = PAGI::WebServer::Navigation->new;

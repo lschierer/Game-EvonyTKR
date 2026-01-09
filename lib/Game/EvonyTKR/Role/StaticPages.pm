@@ -5,7 +5,7 @@ use utf8::all;
 use Moo::Role;
 
 require YAML::PP;
-require Game::EvonyTKR::Role::MarkdownRenderer;
+require WebFramework::Role::Markdown;
 
 use Mojo::Util;
 use Mojo::File;

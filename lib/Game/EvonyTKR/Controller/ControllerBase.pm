@@ -2,30 +2,38 @@ use v5.42.0;
 use experimental qw(class);
 use utf8::all;
 use File::FindLib 'lib';
-require Data::Printer;
-require Mojolicious::Controller;
-require Mojolicious::Plugin;
-require Game::EvonyTKR::Role::MarkdownRenderer;
-use namespace::clean;
 
 package Game::EvonyTKR::Controller::ControllerBase {
-  use Mojo::Base 'Mojolicious::Controller';
-  use Mojo::Base 'Mojolicious::Plugin',                    -role, -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Role::Logging',          -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::Common',           -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::JSON',             -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::MarkdownRenderer', -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::Persistence',      -role;
-  require Mojo::File;
+  use Mooish::Base -standard;
+  with 'WebFramework::Role::Markdown';
+  extends 'Thunderhorse::Controller';
+
+  # Compose EvonyTKR-specific roles
+  with 'Game::EvonyTKR::Role::Logging';
+  with 'Game::EvonyTKR::Role::Common';
+  with 'Game::EvonyTKR::Role::JSON';
+  with 'Game::EvonyTKR::Role::Persistence';
+  with 'WebFramework::Role::Logger';
+
   require YAML::PP;
   require Data::Printer;
   use Carp;
+  use Future::AsyncAwait;
 
-  my $logger;
+  has app_config => (
+    is => 'ro',
+    default => sub {
+      my $self = shift;
+      return $self->app->config;
+    },
+  );
+
+  has standard_delay => (
+    is => 'ro',
+    default => 30,
+  );
+
   my $base = '';
-  my $routes;
-
-  has standard_delay => 30;
 
   sub getBase($self) {
     return $base;
@@ -36,189 +44,165 @@ package Game::EvonyTKR::Controller::ControllerBase {
     return $constants;
   }
 
-  sub register($c, $app, $config = {}) {
-    $logger = Log::Log4perl->get_logger(__PACKAGE__);
-    $logger->debug("ControllerBase register function");
+  # Base build method - subclasses should call SUPER::build()
+  sub build ($self) {
+    $self->logger->debug("ControllerBase build");
 
-    my $routes = $app->routes;
+    # Register common routes that all controllers need
+    $self->_register_common_routes();
+  }
 
-    # Add sitemap route
-    $routes->get('/sitemap.xml')->to(
-      cb => sub ($c) {
-        my $xml = $c->generate_sitemap_xml;
-        $c->render(data => $xml, format => 'xml', charset => 'utf-8');
-      }
-    );
+  # Common routes for all controllers
+  sub _register_common_routes ($self) {
+    my $router = $self->router;
 
-    # Add robots.txt route
-    $routes->get('/robots.txt')->to(
-      cb => sub ($c) {
-        my $host   = $c->req->headers->host // '';
+    # Sitemap route
+    $router->add('/sitemap.xml', {
+      to => sub ($self, $ctx) {
+        my $xml = $self->generate_sitemap_xml();
+        $ctx->res->headers->content_type('application/xml; charset=utf-8');
+        return $xml;
+      },
+      action => 'http.get',
+    });
+
+    # Robots.txt route
+    $router->add('/robots.txt', {
+      to => sub ($self, $ctx) {
+        my $host = $ctx->req->headers->header('host') // '';
         my $is_dev = $host =~ /dev|localhost|127\.0\.0\.1/i;
 
-        my $robots =
-          $is_dev
+        my $robots = $is_dev
           ? "User-agent: *\nDisallow: /\n"
           : "User-agent: *\nDisallow:\nSitemap: "
-          . $c->req->url->base
-          . "sitemap.xml\n";
+          . $ctx->req->base . "sitemap.xml\n";
 
-        $c->render(data => $robots, format => 'txt');
-      }
-    );
+        $ctx->res->headers->content_type('text/plain');
+        return $robots;
+      },
+      action => 'http.get',
+    });
 
-    $app->helper(
-      outstanding_prereqs => sub($self, $prereqs) {
-        if (ref($prereqs) && ref($prereqs) eq 'ARRAY') {
-          return $c->are_prereqs_outstanding($app->minion, $prereqs);
-        }
-        else {
-          $c->log_error('outstanding_prereqs requires an arrayref.');
-          return 1;
-        }
-      }
-    );
-
-    $app->helper(
-      check_prereqs_or_wait =>
-        sub($self, $prereqs, $retry_delay = $self->standard_delay) {
-        unless (ref($prereqs) && ref($prereqs) eq 'ARRAY') {
-          $c->log_error('check_prereqs_or_wait requires an arrayref.');
-          return 0;
-        }
-
-        my $outstanding = $self->outstanding_prereqs($prereqs);
-        if ($outstanding) {
-          $c->log_info(sprintf(
-            'Prerequisites outstanding for route %s, rendering wait page',
-            $self->req->url->path->to_string));
-
-          my $current_url = $self->req->url->to_abs;
-          $self->stash(
-            retry_url   => $current_url,
-            retry_delay => $retry_delay,
-            prereqs     => $prereqs,
-          );
-          $self->render(template => 'prereqs_wait', status => 503);
-          return 1;    # Rendered wait page, caller should return
-        }
-        return 0;      # Prerequisites met, caller should continue
-        }
-    );
-
-    $routes->get('/health')->to(
-      cb => sub($self) {
-        my $APP_START_TIME = $app->config->{'APP_START_TIME'};
-
-        # Get deployment environment info
-        my $deployment_env = $app->config->{'EvonyTKR-Environment'} // {};
+    # Health check route
+    $router->add('/health', {
+      to => sub ($self, $ctx) {
+        my $APP_START_TIME = $self->app->config->{config}->{APP_START_TIME} // time();
+        my $deployment_env = $self->app->config->{config}->{'EvonyTKR-Environment'} // {};
 
         # Determine if we're in EC2 or container environment
         my $is_ec2 = !$deployment_env->{'IMAGE_TAG'};
 
-        # Build environment-specific info
         my $env_info = {};
         if ($is_ec2) {
           # EC2 deployment info
           $env_info = {
             deployment_type => 'ec2',
-            hostname        => $deployment_env->{'HOSTNAME'} // `hostname`,
-            git_commit      => $app->config->{'version'}->{'git-commit'}
-              // 'unknown',
-            git_branch => $app->config->{'version'}->{'git-branch'}
-              // 'unknown',
-            build_time => $app->config->{'version'}->{'build-time'}
-              // 'unknown',
-            cdk_deployment_time => $deployment_env->{'DEPLOYMENT_TIME'}
-              // 'unknown',
+            hostname => $deployment_env->{'HOSTNAME'} // `hostname`,
+            git_commit => $self->app->config->{config}->{version}->{'git-commit'} // 'unknown',
+            git_branch => $self->app->config->{config}->{version}->{'git-branch'} // 'unknown',
+            build_time => $self->app->config->{config}->{version}->{'build-time'} // 'unknown',
+            cdk_deployment_time => $deployment_env->{'DEPLOYMENT_TIME'} // 'unknown',
           };
           chomp $env_info->{hostname} if $env_info->{hostname};
         }
         else {
-          # Container deployment info (legacy)
+          # Container deployment info
           $env_info = {
-            deployment_type     => 'container',
-            cdk_deployment_time => $deployment_env->{'DEPLOYMENT_TIME'}
-              // 'unknown',
+            deployment_type => 'container',
+            cdk_deployment_time => $deployment_env->{'DEPLOYMENT_TIME'} // 'unknown',
           };
         }
 
-        $self->render(
-          json => {
-            status             => 'ok',
-            mode               => $app->mode // 'unknown',
-            version            => $app->VERSION,
-            time               => scalar localtime,
-            app_started_at     => scalar(localtime($APP_START_TIME)),
-            app_uptime_seconds => time() - $APP_START_TIME,
-            %$env_info,
-          },
-          status => 200
-        );
-      }
-    );
+        use JSON::MaybeXS;
+        my $json = JSON::MaybeXS->new(utf8 => 1, pretty => 1);
 
-    # API endpoint to get all routes with metadata
-    $routes->get('/api/routes')->to(
-      cb => sub($self) {
-        my @all_routes;
+        my $response = $json->encode({
+          status => 'ok',
+          mode => $self->app->env // 'unknown',
+          version => $Game::EvonyTKR::VERSION // 'unknown',
+          time => scalar localtime,
+          app_started_at => scalar(localtime($APP_START_TIME)),
+          app_uptime_seconds => time() - $APP_START_TIME,
+          %$env_info,
+        });
 
-        my $walk_routes;
-        $walk_routes = sub {
-          my ($route, $parent_path) = @_;
-          $parent_path //= "";
-
-          my $pattern   = $route->pattern->unparsed // "";
-          my $full_path = $parent_path . $pattern;
-          my $name      = $route->name // undef;
-          my $to        = $route->to   // {};
-
-          # Only include non-empty paths
-          if ($full_path && $full_path ne "/" && $full_path ne "") {
-            my $route_methods = $route->methods;
-            push @all_routes,
-              {
-              path       => $full_path,
-              name       => $name,
-              controller => $to->{controller} // undef,
-              action     => $to->{action}     // undef,
-              methods    => $route_methods ? [sort @{$route_methods}] : undef,
-              };
-          }
-
-          # Recursively walk children
-          foreach my $child (@{ $route->children }) {
-            $walk_routes->($child, $full_path);
-          }
-        };
-
-        $walk_routes->($app->routes);
-
-        $self->render(
-          json => {
-            routes => \@all_routes,
-            count  => scalar(@all_routes),
-          }
-        );
-      }
-    );
+        $ctx->res->headers->content_type('application/json; charset=utf-8');
+        return $response;
+      },
+      action => 'http.get',
+    });
   }
 
-  sub getRoutes($self) {
-    return $routes;
+  # Helper for checking if prereqs are outstanding
+  # This will need adaptation based on how we handle async data loading
+  sub are_prereqs_outstanding ($self, $prereqs) {
+    # TODO: Adapt this for Thunderhorse/async data loading
+    # For now, assume all data is loaded at startup
+    return 0;
   }
 
-  sub index($self) {
-    $self->log_warn('using index from controller base');
-    $self->stash(
-      base     => $self->getBase(),
-      layout   => 'default',
-      template => 'markdown',
-      content  => "Hello from the $base Controller",
-    );
-
-    $self->render();
+  # Subclasses override this to specify which collection they manage
+  sub collection_name ($self) {
+    return '';
   }
 
+  # Subclasses override to specify their base route
+  sub controller_name ($self) {
+    return ref($self) =~ s/.*:://r;
+  }
+
+  # Default index action - subclasses should override
+  async sub index ($self, $ctx) {
+    $self->logger->warn('using default index from ControllerBase');
+
+    my $content = "Hello from the " . $self->getBase() . " Controller";
+
+    return $self->render('markdown.tt', {
+      content => $content,
+      title => $self->collection_name(),
+      current_year => (localtime)[5] + 1900,
+    });
+  }
+
+  # Generate sitemap XML for SEO
+  sub generate_sitemap_xml ($self) {
+    # TODO: Implement sitemap generation based on navigation
+    my $base_url = $self->app->config->{config}->{base_url} // 'https://evonytkrguide.com';
+
+    my $xml = qq{<?xml version="1.0" encoding="UTF-8"?>\n};
+    $xml .= qq{<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n};
+
+    # Add homepage
+    $xml .= qq{  <url>\n};
+    $xml .= qq{    <loc>$base_url/</loc>\n};
+    $xml .= qq{    <priority>1.0</priority>\n};
+    $xml .= qq{  </url>\n};
+
+    # TODO: Iterate through navigation items and add to sitemap
+
+    $xml .= qq{</urlset>\n};
+
+    return $xml;
+  }
 }
+
 1;
+
+__END__
+
+=head1 NAME
+
+Game::EvonyTKR::Controller::ControllerBase - Base controller for EvonyTKR Thunderhorse controllers
+
+=head1 DESCRIPTION
+
+Provides common functionality for all EvonyTKR controllers:
+- Logging via Game::EvonyTKR::Role::Logging
+- Persistence via Game::EvonyTKR::Role::Persistence
+- Markdown rendering via WebFramework::Role::Markdown
+- Common routes (/health, /robots.txt, /sitemap.xml)
+- Helper methods for data loading and navigation
+
+All EvonyTKR controllers should extend this base class.
+
+=cut

@@ -1,4 +1,5 @@
-<link rel="stylesheet" href="/css/collectionDetails.css" />
+[% WRAPPER layouts/default.tt %]
+
 <div class="specialty-details">
   [% IF item -%]
     <h3 class="spectrum-Heading spectrum-Heading--sizeL">Buffs Provided at Each Level for [% item.name %]</h3>
@@ -30,3 +31,5 @@
     <span>Specialty Not Available</span>
   [% END -%]
 </div>
+
+[% END %]

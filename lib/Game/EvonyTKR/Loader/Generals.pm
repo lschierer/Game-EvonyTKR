@@ -1,0 +1,102 @@
+package Game::EvonyTKR::Loader::Generals;
+use v5.42.0;
+use utf8::all;
+use Moo;
+use experimental qw(signatures);
+use Path::Tiny;
+use YAML::PP;
+use Log::Log4perl qw(get_logger);
+require Game::EvonyTKR::Model::General;
+
+has logger => (
+  is => 'ro',
+  lazy => 1,
+  default => sub { get_logger(__PACKAGE__) }
+);
+
+has data_dir => (
+  is => 'ro',
+  required => 1,
+);
+
+has generals => (
+  is => 'rw',
+  default => sub { {} },
+);
+
+sub load_all {
+  my ($self) = @_;
+
+  my $dir = path($self->data_dir);
+  unless ($dir->exists && $dir->is_dir) {
+    $self->logger->error("Generals data directory not found: $dir");
+    return 0;
+  }
+
+  my @yaml_files = $dir->children(qr/\.ya?ml$/);
+  $self->logger->info(sprintf("Found %d general files to load", scalar @yaml_files));
+
+  my $loaded = 0;
+  for my $file (@yaml_files) {
+    eval {
+      my $data = YAML::PP->new(
+        schema => [qw/ + Perl /],
+        yaml_version => ['1.2', '1.1'],
+      )->load_string($file->slurp_utf8);
+
+      # The file name (without extension) is the general name
+      my $general_name = $file->basename(qr/\.ya?ml$/);
+
+      # Add name to data for from_hash
+      $data->{name} = $general_name;
+
+      my $general = Game::EvonyTKR::Model::General->from_hash($data);
+      if ($general) {
+        $self->generals->{$general_name} = $general;
+        $loaded++;
+        $self->logger->debug("Loaded general: $general_name");
+      } else {
+        $self->logger->error("Failed to create general from $file");
+      }
+    };
+    if ($@) {
+      $self->logger->error("Failed to load $file: $@");
+    }
+  }
+
+  $self->logger->info("Loaded $loaded generals");
+  return $loaded;
+}
+
+sub get_general {
+  my ($self, $general_name) = @_;
+  return $self->generals->{$general_name};
+}
+
+sub list_generals {
+  my ($self) = @_;
+  return [sort keys %{$self->generals}];
+}
+
+1;
+
+__END__
+
+=head1 NAME
+
+Game::EvonyTKR::Loader::Generals - Load generals data from YAML files
+
+=head1 SYNOPSIS
+
+    my $loader = Game::EvonyTKR::Loader::Generals->new(
+        data_dir => 'share/collections/data/generals'
+    );
+    $loader->load_all();
+    my $general = $loader->get_general('Aethelflaed');
+
+=head1 DESCRIPTION
+
+In-memory loader for general data. Loads all general YAML files from the
+data directory and makes them available via simple accessor methods.
+
+=cut

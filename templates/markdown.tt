@@ -1,0 +1,6 @@
+[% WRAPPER layouts/default.tt %]
+
+[%# Generic markdown page template - content is pre-rendered from markdown %]
+[% content %]
+
+[% END %]

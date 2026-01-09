@@ -1,96 +1,114 @@
 use v5.42.0;
 use utf8::all;
 use File::FindLib 'lib';
-use Mojo::File;
 use namespace::autoclean;
 
 package Game::EvonyTKR::Controller::Root {
-  use Mojo::Base 'Game::EvonyTKR::Controller::ControllerBase';
-  use Mojo::Base 'Game::EvonyTKR::Role::StaticPages', -role;
-  use Mojo::Home;
+  use Mooish::Base -standard;
+  extends 'Game::EvonyTKR::Controller::ControllerBase';
+
+  with 'Game::EvonyTKR::Role::StaticPages';
+
   use Carp;
+  use Future::AsyncAwait;
+  use Path::Tiny qw(path);
 
-  sub register ($c, $app, $config = {}) {
-    $c->log_info("Registering root landing page route");
-    $c->SUPER::register($app, $config);
+  sub build ($self) {
+    $self->logger->info("Building Root controller");
 
-    # Register the root route
-    $app->routes->get('/')->to(
-      controller => 'Root',
-      action     => 'index'
-    )->name('root_index');
+    # Call parent to register common routes
+    $self->SUPER::build();
 
-    $app->add_navigation_item({
-      title => 'Home',
-      path  => '/',
-      order => 0,
+    # Register root page
+    $self->add_navigation_route('/', 'Home', { order => 0 });
+
+    $self->router->add('/', {
+      to => async sub ($self, $ctx) {
+        return await $self->index($ctx);
+      },
+      action => 'http.get',
     });
 
-    $app->routes->get('/Reference')->to(
-      controller => 'Root',
-      action     => 'single_page'
-    )->name('root_index');
+    # Register Reference page
+    $self->add_navigation_route('/Reference', 'Reference', { order => 104 });
 
-    $app->add_navigation_item({
-      title => 'Reference',
-      path  => '/Reference',
-      order => 104,
+    $self->router->add('/Reference', {
+      to => async sub ($self, $ctx) {
+        return await $self->single_page($ctx, '/Reference');
+      },
+      action => 'http.get',
     });
 
-    $app->routes->get('/policy/privacy')->to(
-      controller => 'Root',
-      action     => 'single_page'
-    )->name('root_index');
+    # Register privacy policy
+    $self->add_navigation_route('/policy/privacy', 'Privacy Policy', { order => 200 });
 
-    $app->add_navigation_item({
-      title => 'Privacy Policy',
-      path  => '/policy/privacy',
-      order => 0,
+    $self->router->add('/policy/privacy', {
+      to => async sub ($self, $ctx) {
+        return await $self->single_page($ctx, '/policy/privacy');
+      },
+      action => 'http.get',
     });
   }
 
-  sub index ($c) {
-    unless ($c) {
-      croak('controller is undefined in root index method');
-      return;
-    }
-    my $home       = Mojo::Home->new->detect;
-    my $index_path = $home->child('share/pages/index.md');
+  async sub index ($self, $ctx) {
+    my $index_path = path('share/pages/index.md');
 
-    $c->log_debug("Rendering root index from $index_path");
+    $self->logger->debug("Rendering root index from $index_path");
 
-    unless (-f $index_path) {
-      $c->log_error("Root index.md not found at $index_path");
-      return $c->render(
-        template => 'markdown',
-        layout   => 'default',
-        content  => '<p>Welcome to EvonyTKR</p>',
-      );
+    unless ($index_path->exists) {
+      $self->logger->error("Root index.md not found at $index_path");
+      return $self->render('markdown.tt', {
+        content => '<p>Welcome to EvonyTKR</p>',
+        title => 'EvonyTKR Guide',
+        current_year => (localtime)[5] + 1900,
+        sidebar => 0,
+        navigation => $self->render_navigation($ctx->req->path),
+        site_logo => $self->site_logo(),
+      });
     }
 
-    unless ($index_path && ref($index_path) && $index_path->isa('Mojo::File')) {
-      $index_path = Mojo::File->new($index_path);
-    }
-    $c->log_debug(sprintf('root index is a "%s"',
-        $index_path->isa('Mojo::File') ? 'Mojo::File'
-      : ref($index_path)               ? ref($index_path)
-      :                                  'scalar'));
+    return $self->render_markdown_page($index_path->stringify, $ctx->req->path, {
+      template => 'root/index.tt',
+      title => 'EvonyTKR Guide',
+      sidebar => 0,
+    });
+  }
 
-    return $c->render_markdown_page($index_path, { template => 'root/index' });
+  async sub single_page ($self, $ctx, $route_path) {
+    $self->logger->debug("Rendering single page for route: $route_path");
+
+    # Convert route to file path
+    my $file_path = $route_path;
+    $file_path =~ s|^/||;  # Remove leading slash
+    my $md_path = path('share/pages')->child("$file_path.md");
+
+    unless ($md_path->exists) {
+      $self->logger->warn("Markdown file not found: $md_path");
+      return $self->render_error(404, "Page not found");
+    }
+
+    return $self->render_markdown_page($md_path->stringify, $ctx->req->path, {
+      template => 'markdown.tt',
+      sidebar => 1,
+    });
   }
 }
 
 1;
+
 __END__
 
 =pod
 
 =head1 NAME
 
-Game::EvonyTKR::Controller::Root - Controller for the root landing page
+Game::EvonyTKR::Controller::Root - Controller for root landing page and static pages
 
 =head1 DESCRIPTION
 
-Handles the root route (/) by rendering share/pages/index.md as the landing page.
+Handles:
+- / - Homepage (renders share/pages/index.md)
+- /Reference - Reference overview page
+- /policy/privacy - Privacy policy page
 
 =cut

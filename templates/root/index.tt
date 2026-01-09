@@ -1,2 +1,6 @@
-[%# Root homepage template - content is pre-rendered from markdown %]
+[% WRAPPER layouts/default.tt %]
+
+[%# Homepage template - content comes from share/pages/index.md %]
 [% content %]
+
+[% END %]

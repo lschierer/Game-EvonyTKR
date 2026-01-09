@@ -8,15 +8,17 @@ require Game::EvonyTKR::Model::BasicAttributes;
 require Game::EvonyTKR::Model::BasicAttribute;
 
 package Game::EvonyTKR::Model::General {
-  use Mojo::Base "Game::EvonyTKR::Model::Base";
-  use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants',       -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants',    -role;
+  use Moo;
+  extends 'Game::EvonyTKR::Model::Base';
+  with 'Game::EvonyTKR::Role::Constants::BuffConstants';
+  with 'Game::EvonyTKR::Role::Constants::GeneralConstants';
   with 'Game::EvonyTKR::Role::Constants::AscendingAttributes';
   use JSON::PP;
   use UUID           qw(uuid5);
   use List::AllUtils qw( any none all );
   use File::FindLib 'lib';
   use Carp;
+  use namespace::autoclean;
   use overload
     '""'       => \&as_string,
     'eq'       => \&equality,
@@ -25,27 +27,74 @@ package Game::EvonyTKR::Model::General {
 
   our $VERSION = 'v0.40.0';
 
-  has 'id' => sub ($self) {
-    my $general_type =
-      ref($self->type) eq 'ARRAY' ? $self->type->[0] : $self->type;
-    if (exists $self->UUID5_Generals->{$general_type}) {
-      return uuid5($self->UUID5_Generals->{$general_type}, $self->name);
+  has id => (
+    is => 'ro',
+    lazy => 1,
+    default => sub {
+      my ($self) = @_;
+      my $general_type =
+        ref($self->type) eq 'ARRAY' ? $self->type->[0] : $self->type;
+      if (exists $self->UUID5_Generals->{$general_type}) {
+        return uuid5($self->UUID5_Generals->{$general_type}, $self->name);
+      }
+      return $self->name;
     }
-    return $self->name;
-  };
+  );
 
-  has ['name', 'type', 'ascendingAttributes', 'builtInBookName',
-    'builtInBook'] => undef;
+  has name => (
+    is => 'rw'
+  );
 
-  has ['specialtyNames', 'specialties'] => sub { [] };
-  has 'ascending'                       => 0;
-  has 'stars'                           => 'none';
-  has 'basicAttributes' =>
-    sub { return Game::EvonyTKR::Model::BasicAttributes->new() };
+  has type => (
+    is => 'rw'
+  );
+
+  has ascendingAttributes => (
+    is => 'rw'
+  );
+
+  has builtInBookName => (
+    is => 'rw'
+  );
+
+  has builtInBook => (
+    is => 'rw'
+  );
+
+  has specialtyNames => (
+    is => 'rw',
+    default => sub { [] }
+  );
+
+  has specialties => (
+    is => 'rw',
+    default => sub { [] }
+  );
+
+  has ascending => (
+    is => 'rw',
+    default => sub { 0 }
+  );
+
+  has stars => (
+    is => 'rw',
+    default => sub { 'none' }
+  );
+
+  has basicAttributes => (
+    is => 'rw',
+    lazy => 1,
+    default => sub {
+      return Game::EvonyTKR::Model::BasicAttributes->new();
+    }
+  );
 
 # Precomputed generic book buff values by activation type and level
 # Structure: { Attacking => { level1 => {march_size => 3, ...}, level2 => {...}, ... }, ... }
-  has 'genericBookBuffs' => sub { {} };
+  has genericBookBuffs => (
+    is => 'rw',
+    default => sub { {} }
+  );
 
   sub set_general_id($self) {
     if (ref $self->type) {

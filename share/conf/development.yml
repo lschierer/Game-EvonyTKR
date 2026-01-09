@@ -1,0 +1,47 @@
+# Game-EvonyTKR Thunderhorse Configuration
+# Development Environment
+
+# Stage: development, staging, production
+stage: development
+
+# Server configuration
+server:
+  host: 127.0.0.1
+  port: 3000
+
+# Template configuration
+modules:
+  Template:
+    paths:
+      - templates
+      - templates/partials
+      - ../PAGI-WebServer/templates
+      - ../PAGI-WebServer/templates/partials
+    conf:
+      EVAL_PERL: 1
+
+# Directory paths
+css_dir: public/css
+js_dir: public/js
+images_dir: public/images
+markdown_dir: share/pages
+
+# Application configuration
+config:
+  APP_START_TIME: 0  # Set at runtime
+  base_url: http://localhost:3000
+
+  version:
+    git-commit: unknown
+    git-branch: unknown
+    build-time: unknown
+
+  EvonyTKR-Environment:
+    DEPLOYMENT_TIME: development
+    HOSTNAME: localhost
+
+# Module-specific log levels
+log_config:
+  default: INFO
+  'Game::EvonyTKR': DEBUG
+  'WebFramework': DEBUG
