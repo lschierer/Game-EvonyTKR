@@ -2,7 +2,6 @@ use v5.42.0;
 use experimental qw(class);
 use utf8::all;
 use namespace::autoclean;
-require Log::Log4perl;
 require Game::EvonyTKR::Role::Logging;
 
 class Game::EvonyTKR::Model::Logger {
@@ -11,6 +10,7 @@ class Game::EvonyTKR::Model::Logger {
   use Scalar::Util qw(blessed);
   use JSON::PP     ();
   use Env          qw(DEV_MODE PERL_ENV MOJO_MODE);
+  use Log::Handler;
   our $VERSION = 'v0.31.0';
 
   use overload
@@ -18,17 +18,10 @@ class Game::EvonyTKR::Model::Logger {
     'bool'     => sub { $_[0]->_isTrue },
     'fallback' => 0;                        # allow Perl defaults for the rest
 
-  our $wrapperRegistered = 0;
 
-  ADJUST {
-    unless ($Game::EvonyTKR::Model::Logger::wrapperRegistered) {
-      Log::Log4perl->wrapper_register(__CLASS__);
-      $Game::EvonyTKR::Model::Logger::wrapperRegistered = 1;
-    }
-  }
 
   method logger {
-    my $log = Log::Log4perl->get_logger(blessed($self));
+    my $log = Log::Handler->create_logger(blessed($self));
     return $log;
   }
 

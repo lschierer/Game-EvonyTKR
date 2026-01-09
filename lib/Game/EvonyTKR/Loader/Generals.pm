@@ -1,18 +1,12 @@
 package Game::EvonyTKR::Loader::Generals;
 use v5.42.0;
 use utf8::all;
-use Moo;
+use Mooish::Base -standard;
+with 'WebFramework::Role::Logger';
 use experimental qw(signatures);
 use Path::Tiny;
 use YAML::PP;
-use Log::Log4perl qw(get_logger);
 require Game::EvonyTKR::Model::General;
-
-has logger => (
-  is => 'ro',
-  lazy => 1,
-  default => sub { get_logger(__PACKAGE__) }
-);
 
 has data_dir => (
   is => 'ro',
