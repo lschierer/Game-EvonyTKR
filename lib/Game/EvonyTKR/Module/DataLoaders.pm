@@ -11,6 +11,7 @@ use Game::EvonyTKR::Loader::Specialties;
 use Game::EvonyTKR::Loader::Books;
 use Game::EvonyTKR::Loader::AscendingAttributes;
 use Game::EvonyTKR::Loader::Generals;
+use Game::EvonyTKR::Loader::Covenants;
 
 # Build method runs at app startup
 sub build ($self) {
@@ -95,6 +96,28 @@ sub build ($self) {
 
   # Store in app stash so it's accessible elsewhere
   $self->app->{generals_loader} = $generals_loader;
+
+  # Load covenants synchronously at startup
+  # Note: Covenants require generals to be loaded first
+  my $covenants_loader = Game::EvonyTKR::Loader::Covenants->new(
+    data_dir => 'share/collections/data/covenants',
+    generals_loader => $generals_loader,
+  );
+
+  $self->logger->info("Loading covenants...");
+  my $covenants_count = $covenants_loader->load_all();
+  $self->logger->info("Loaded $covenants_count covenants");
+
+  # Register as helper so controllers can access it
+  # Controllers can call $self->covenants_loader()
+  $self->register(
+    controller => covenants_loader => sub ($controller) {
+      return $covenants_loader;
+    }
+  );
+
+  # Store in app stash so it's accessible elsewhere
+  $self->app->{covenants_loader} = $covenants_loader;
 }
 
 1;

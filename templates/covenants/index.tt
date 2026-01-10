@@ -1,0 +1,24 @@
+[% WRAPPER layouts/default.tt %]
+
+<div class="collection-list">
+  <h2 class="spectrum-Heading spectrum-Heading--sizeL">Covenants</h2>
+  <ul class="collection-grid">
+    [% IF items && items.size > 0 -%]
+      [% FOREACH item IN items -%]
+        [% IF item && item.primary -%]
+          <li class="collection-item">
+            <a href="/Reference/Covenants/[% item.primary.name %]" class="spectrum-Link spectrum-Link--primary">
+              [% item.primary.name %]
+            </a>
+          </li>
+        [% END -%]
+      [% END -%]
+    [% ELSE -%]
+      <li class="collection-item">
+        <span class="spectrum-Body spectrum-Body--sizeM">No covenants available</span>
+      </li>
+    [% END -%]
+  </ul>
+</div>
+
+[% END %]

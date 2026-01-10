@@ -1,0 +1,53 @@
+[% WRAPPER layouts/default.tt %]
+
+<div class="covenant-details">
+  [% IF item && item.isa('Game::EvonyTKR::Model::Covenant') -%]
+    <h3 class="spectrum-Heading spectrum-Heading--sizeL">
+      Buffs Provided by each Category for [% item.primary.name %]
+    </h3>
+
+    [%# Get covenant category info from the constants role -%]
+    [% SET category_names = ['faith', 'cooperation', 'war', 'honor', 'peace', 'civilization'] -%]
+    [% SET category_labels = {
+      faith = 'Faith',
+      cooperation = 'Cooperation',
+      war = 'War',
+      honor = 'Honor',
+      peace = 'Peace',
+      civilization = 'Civilization'
+    } -%]
+
+    <table class="spectrum-Table spectrum-Table--sizeM spectrum-Table--quiet">
+      <thead class="spectrum-Table-head">
+        <tr>
+          [% FOREACH cat_name IN category_names -%]
+            <th class="spectrum-Table-headCell">[% category_labels.$cat_name %]</th>
+          [% END -%]
+        </tr>
+      </thead>
+      <tbody class="spectrum-Table-body">
+        <tr class="spectrum-Table-row">
+          [% FOREACH cat_name IN category_names -%]
+            [% category = item.categories.$cat_name -%]
+            <td class="spectrum-Table-cell [% cat_name %]">
+              [% IF category && category.buffs -%]
+                <ul>
+                  [% FOREACH buff IN category.buffs -%]
+                    [% INCLUDE 'buffs/single.tt' buff=buff -%]
+                  [% END -%]
+                </ul>
+              [% ELSE -%]
+                <span class="spectrum-Body spectrum-Body--sizeS">No buffs</span>
+              [% END -%]
+            </td>
+          [% END -%]
+        </tr>
+      </tbody>
+    </table>
+
+  [% ELSE -%]
+    <span class="spectrum-Body spectrum-Body--sizeM">Covenant details not available</span>
+  [% END -%]
+</div>
+
+[% END %]

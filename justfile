@@ -54,6 +54,8 @@ dev: deps css images build
 
 quickdev:
     truncate -s 0 "${HOME}/var/log/Perl/dist/Game-EvonyTKR/system.log"
+    truncate -s 0 "${HOME}/var/log/Perl/dist/WebFramework/system.log"
+    truncate -s 0 "${HOME}/var/log/Perl/dist/WebFramework/access.log"
     ./scripts/dev.sh
 
 deploy-dev: build

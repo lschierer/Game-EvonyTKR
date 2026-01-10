@@ -9,32 +9,43 @@ package Game::EvonyTKR::Role::Constants::Covenants {
   use Const::Fast;
   use Carp;
 
-  has 'CovenantCategories' => sub ($self) {
-    const my %tmp => (
-      None         => 0,
-      War          => 1,
-      Cooperation  => 2,
-      Peace        => 3,
-      Faith        => 4,
-      Honor        => 5,
-      Civilization => 6,
-    );
-    return \%tmp;
-  };
+  has 'CovenantCategories' => (
+    is => 'ro',
+    lazy => 1,
+    default => sub ($self) {
+      return {
+        None         => 0,
+        War          => 1,
+        Cooperation  => 2,
+        Peace        => 3,
+        Faith        => 4,
+        Honor        => 5,
+        Civilization => 6,
+      };
+    }
+  );
 
-  has 'CovenantCategoryValues' => sub ($self) {
-    my $cats = $self->CovenantCategories;
-    # Sort keys by their numeric value, return lowercase
-    my @ordered = sort { $cats->{$a} <=> $cats->{$b} } keys %$cats;
-    return [map { lc $_ } @ordered];
-  };
+  has 'CovenantCategoryValues' => (
+    is => 'ro',
+    lazy => 1,
+    default => sub ($self) {
+      my $cats = $self->CovenantCategories;
+      # Sort keys by their numeric value, return lowercase
+      my @ordered = sort { $cats->{$a} <=> $cats->{$b} } keys %$cats;
+      return [map { lc $_ } @ordered];
+    }
+  );
 
-  has 'CovenantCategoryLabels' => sub ($self) {
-    my $cats = $self->CovenantCategories;
-    # Same order, but keep original capitalization
-    my @ordered = sort { $cats->{$a} <=> $cats->{$b} } keys %$cats;
-    return \@ordered;
-  };
+  has 'CovenantCategoryLabels' => (
+    is => 'ro',
+    lazy => 1,
+    default => sub ($self) {
+      my $cats = $self->CovenantCategories;
+      # Same order, but keep original capitalization
+      my @ordered = sort { $cats->{$a} <=> $cats->{$b} } keys %$cats;
+      return \@ordered;
+    }
+  );
 
   sub checkCovenantLevel ($self, $proposedLevel) {
     unless (defined($proposedLevel) && length($proposedLevel)) {

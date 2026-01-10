@@ -1,19 +1,17 @@
+package Game::EvonyTKR::Model::Covenant;
 use v5.42.0;
 use utf8::all;
-
-use File::FindLib 'lib';
+use Mooish::Base -standard;
+with 'Game::EvonyTKR::Role::Constants::BuffConstants';
+with 'Game::EvonyTKR::Role::Constants::GeneralConstants';
+with 'Game::EvonyTKR::Role::Constants::Covenants';
+extends 'Game::EvonyTKR::Model::Base';
 
 require Game::EvonyTKR::Model::Buff;
 require Game::EvonyTKR::Model::Buff::Value;
 require Game::EvonyTKR::Model::Buff::Matcher;
 require Data::Printer;
 
-package Game::EvonyTKR::Model::Covenant {
-  use Mojo::Base "Game::EvonyTKR::Model::Base";
-  use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants',    -role;
-  with 'Game::EvonyTKR::Role::Constants::GeneralConstants';
-  use Mojo::Base 'Game::EvonyTKR::Role::Constants::Covenants',        -role;
-  use builtin qw(indexed);
   use File::FindLib 'lib';
   use List::AllUtils qw(first any all none uniq);
   use Hash::Util     qw(lock_keys);
@@ -25,11 +23,35 @@ package Game::EvonyTKR::Model::Covenant {
 
   my $debug = 1;
 
-  has ['primary', 'one', 'two', 'three'];
+  has primary => (
+    is    => 'rw',
+    isa   => InstanceOf['Game::EvonyTKR::Model::General'],
+    lazy  => 1,
+  );
 
-  has 'secondaryKeys' => sub {qw(one two three)};
+  has one => (
+    is    => 'rw',
+    lazy  => 1,
+  );
 
-  has 'categories' => sub ($self) {
+  has two => (
+    is    => 'rw',
+    lazy  => 1,
+  );
+
+  has three => (
+    is    => 'rw',
+    lazy  => 1,
+  );
+
+  has secondaryKeys => (
+    is      => 'ro',
+    default => sub {qw(one two three)},
+  );
+
+  has categories => (
+    is      => 'ro',
+    default => sub ($self) {
     my $h  = {};
     my $cv = $self->CovenantCategoryValues;
     $self->log_debug(sprintf('cv is %s', Data::Printer::np($cv)));
@@ -49,7 +71,7 @@ package Game::EvonyTKR::Model::Covenant {
     lock_keys(%{$h});
 
     return $h;
-  };
+  });
 
   sub get_buffs_at_level (
     $self, $level, $attribute, $matching_type,
@@ -158,7 +180,7 @@ package Game::EvonyTKR::Model::Covenant {
     return $count;
   }
 
-  sub from_hash($class, $object) {
+  sub from_hash($class, $object, $primary_general = undef) {
     my $logger = Game::EvonyTKR::Role::Logging::get_logger(__PACKAGE__);
     if (!exists $object->{name}) {
       $logger->error('object must have name attribute.');
@@ -167,21 +189,34 @@ package Game::EvonyTKR::Model::Covenant {
     $logger->info(
       sprintf('attempting import of covenant for "%s"', $object->{name}));
     my $name = $object->{name};
-    state $general_helper //= do {
-      my $helper = eval {
-        Game::EvonyTKR::Model::Base->new->with_roles(
-          'Game::EvonyTKR::Role::Persistence');
+
+    # If primary general was provided (e.g., from loader), use it
+    my $primary = $primary_general;
+    $logger->debug(sprintf(
+      "from_hash: primary_general param is %s",
+      $primary_general ? ref($primary_general) : 'NOT PROVIDED'
+    ));
+
+    # Otherwise, look it up using persistence (legacy behavior)
+    unless ($primary) {
+      state $general_helper //= do {
+        my $helper = eval {
+          Game::EvonyTKR::Model::Base->new->with_roles(
+            'Game::EvonyTKR::Role::Persistence');
+        };
+        if ($@) {
+          $logger->error("Cannot create general helper: $@");
+          return;
+        }
+        $helper;
       };
-      if ($@) {
-        $logger->error("Cannot create general helper: $@");
-        return;
-      }
-      $helper;
-    };
 
-    return unless $general_helper;
+      return unless $general_helper;
 
-    my $primary = $general_helper->get_general($name);
+      $primary = $general_helper->get_general($name);
+    }
+
+    # Validate primary general
     unless (defined($primary)
       && ref($primary)
       && $primary->isa('Game::EvonyTKR::Model::General')) {
@@ -201,6 +236,13 @@ package Game::EvonyTKR::Model::Covenant {
       two     => $object->{generals}->[1],
       three   => $object->{generals}->[2],
     );
+
+    # Debug: Check if primary was set
+    $logger->debug(sprintf(
+      "Created Covenant object, primary is %s (expected: %s)",
+      $o->primary ? ref($o->primary) : 'NOT DEFINED',
+      ref($primary)
+    ));
 
     foreach my $oc (@{ $object->{levels} }) {
       my $category = $oc->{category};
@@ -380,7 +422,6 @@ package Game::EvonyTKR::Model::Covenant {
       && $self->isa(__PACKAGE__);
   }
 
-};
 1;
 
 __END__
