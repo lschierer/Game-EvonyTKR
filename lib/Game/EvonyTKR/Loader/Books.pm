@@ -4,6 +4,7 @@ use utf8::all;
 
 use Mooish::Base -standard;
 with 'WebFramework::Role::Logger';
+with 'Game::EvonyTKR::Role::Common';
 
 use experimental qw(signatures);
 use Path::Tiny;
@@ -79,20 +80,23 @@ sub _load_directory {
 
       my $book = Game::EvonyTKR::Model::Book->from_hash($data);
 
-      # Store in appropriate hash
+      # Store in appropriate hash using normalized keys
       if ($type eq 'skill') {
-        $self->skill_books->{$book->name} = $book;
+        my $normalized_key = $self->normalize($book->name);
+        $self->skill_books->{$normalized_key} = $book;
+        $self->logger->debug("Loaded $type book: " . $book->name . " (key: $normalized_key)");
       } else {
         # For generic books, key by "name-level"
         my $key = $book->name;
         if ($book->can('level') && defined $book->level) {
           $key = sprintf("%s (Level %d)", $book->name, $book->level);
         }
-        $self->generic_books->{$key} = $book;
+        my $normalized_key = $self->normalize($key);
+        $self->generic_books->{$normalized_key} = $book;
+        $self->logger->debug("Loaded $type book: " . $book->name . " (key: $normalized_key)");
       }
 
       $loaded++;
-      $self->logger->debug("Loaded $type book: " . $book->name);
     };
     if ($@) {
       $self->logger->error("Failed to load $file: $@");
@@ -105,12 +109,26 @@ sub _load_directory {
 
 sub get_skill_book {
   my ($self, $name) = @_;
-  return $self->skill_books->{$name};
+  my $normalized_key = $self->normalize($name);
+  return $self->skill_books->{$normalized_key};
 }
 
 sub get_generic_book {
   my ($self, $name) = @_;
-  return $self->generic_books->{$name};
+  my $normalized_key = $self->normalize($name);
+  return $self->generic_books->{$normalized_key};
+}
+
+# Unified method - tries skill books first, then generic
+sub get_book {
+  my ($self, $name) = @_;
+
+  # Try skill books first (most built-in books are skill books)
+  my $book = $self->get_skill_book($name);
+  return $book if $book;
+
+  # Try generic books
+  return $self->get_generic_book($name);
 }
 
 sub list_skill_books {

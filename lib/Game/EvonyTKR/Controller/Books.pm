@@ -1,116 +1,119 @@
 use v5.42.0;
-use experimental qw(class);
 use utf8::all;
 use File::FindLib 'lib';
 require Game::EvonyTKR::Model::Book;
-use namespace::clean;
+use namespace::autoclean;
 
 package Game::EvonyTKR::Controller::Books {
-  use Mojo::Base 'Game::EvonyTKR::Controller::ControllerBase';
+  use Mooish::Base -standard;
+  extends 'Game::EvonyTKR::Controller::ControllerBase';
+
+  use List::AllUtils qw(all any none first);
   use Carp;
+  use Future::AsyncAwait;
+  use Path::Tiny qw(path);
+  use URI::Escape qw(uri_unescape);
 
   # Specify which collection this controller handles
-  sub collection_name {
-    return 'skill books';
+  sub collection_name { 'Books' }
+
+  my $base = '/Reference/Books';
+
+  sub getBase($self) {
+    return $base;
   }
 
   sub controller_name ($self) {
     return "Books";
   }
 
-  my $base = '/Reference/Skill Books';
+  # Build method - replaces register() from Mojolicious
+  sub build ($self) {
+    $self->logger->info("Building Books controller");
 
- # in part because parent classes use this to override different values of $base
-  sub getBase($self) {
-    $base =~ s{/$}{};
-    return $base;
-  }
+    # Call parent to register common routes
+    $self->SUPER::build();
 
-  has prereqs => sub {
-    return [qw(
-      load_all_builtin_books
-      load_all_generic_books
-    )];
-  };
+    # Add navigation for main books page
+    $self->add_navigation_route(
+      $base,
+      'Books',
+      { order => 30, parent => '/Reference' }
+    );
 
-  # Register this when the application starts
-  sub register($c, $app, $config = {}) {
-    $c->log_info("Registering routes for " . ref($c));
-    $c->SUPER::register($app, $config);
+    # Add navigation for Skill Books
+    $self->add_navigation_route(
+      "$base/Skill",
+      'Skill Books',
+      { order => 10, parent => $base }
+    );
 
-    $app->add_navigation_item({
-      title => 'Details of General Skill Books',
-      path  => $c->getBase(),
-      order => 30,
+    # Add navigation for Generic Books
+    $self->add_navigation_route(
+      "$base/Generic",
+      'Generic Books',
+      { order => 20, parent => $base }
+    );
+
+    # Register routes
+    # Main books landing page
+    $self->router->add($base, {
+      to => async sub ($self, $ctx) {
+        return await $self->index($ctx);
+      },
+      action => 'http.get',
     });
 
-    my @parts     = split(/::/, ref($c));
-    my $baseClass = pop(@parts);
+    # Skill books index
+    $self->router->add("$base/Skill", {
+      to => async sub ($self, $ctx) {
+        return await $self->skill_books_index($ctx);
+      },
+      action => 'http.get',
+    });
 
-    my $controller_name =
-        $c->can('controller_name')
-      ? $c->controller_name()
-      : $baseClass;
+    # Generic books index
+    $self->router->add("$base/Generic", {
+      to => async sub ($self, $ctx) {
+        return await $self->generic_books_index($ctx);
+      },
+      action => 'http.get',
+    });
 
-    $c->log_debug("got controller_name $controller_name.");
+    # Skill book detail
+    $self->router->add("$base/Skill/:book_name", {
+      to => async sub ($self, $ctx, @args) {
+        my $book_name = uri_unescape($args[0]);
+        return await $self->show_skill_book($ctx, $book_name);
+      },
+      action => 'http.get',
+    });
 
-    my $mainRoutes = $app->routes->any($base);
-    $mainRoutes->get('/')
-      ->to(controller => $controller_name, action => 'index')
-      ->name("${base}_index");
+    # Generic book detail
+    $self->router->add("$base/Generic/:book_name", {
+      to => async sub ($self, $ctx, @args) {
+        my $book_name = uri_unescape($args[0]);
+        return await $self->show_generic_book($ctx, $book_name);
+      },
+      action => 'http.get',
+    });
 
-    # for backwards compatibility
-    $mainRoutes->any('/details')->to(
-      cb => sub ($c) {
-        $c->redirect_to($c->getBase());
-      }
-    );
-
-    $app->helper(
-      get_builtin_book_text => sub ($self, $book_name) {
-        $c->log_debug("get_builtin_book_text for book '$book_name'");
-
-        my $book = $c->get_builtin_book($book_name);
-
-        if ($book) {
-          return $book->text();
-        }
-        else {
-          $c->log_warn("No book found for '$book_name'");
-        }
-        return "";
-      }
-    );
-
-    # Add generic route with placeholder for any book name
-    $mainRoutes->get('/:book_name')
-      ->to(controller => $controller_name, action => 'show')
-      ->name("${base}_show");
-
-    # Build navigation items asynchronously during app startup
-    $c->build_nav_items($app, $mainRoutes, $controller_name);
+    # Build navigation items for individual books
+    $self->build_nav_items();
   }
 
-  sub build_nav_items ($c, $app, $mainRoutes, $controller_name,
-    $retry_number = 0) {
-    $c->log_debug(
-      "attempting to build nav items for books, retry # $retry_number")
-      if $retry_number;
-    if ($c->are_prereqs_outstanding(
-      $app->minion, ['load_all_builtin_books', 'load_all_generic_books',]
-    )) {
-      Mojo::IOLoop->timer(
-        30 => sub {
-          $c->build_nav_items($app, $mainRoutes, $controller_name,
-            $retry_number++);
-        }
-      );
+  sub build_nav_items ($self) {
+    # Get books loader from app (registered by DataLoaders module)
+    my $books_loader = $self->books_loader();
+
+    unless ($books_loader) {
+      $self->logger->error("Books loader not available");
       return;
     }
 
-    my $books = [];
-    foreach my $bn ($c->list_builtin_books->@*) {
-      my $book = eval { $c->get_builtin_book($bn) };
+    # Add skill books to navigation
+    foreach my $book_name ($books_loader->list_skill_books->@*) {
+      my $book = eval { $books_loader->get_skill_book($book_name) };
 
       # Determine display name with fallbacks
       my $display_name;
@@ -120,185 +123,251 @@ package Game::EvonyTKR::Controller::Books {
 
       # Fallback to book filename if object name unavailable
       if (!defined($display_name) || !length($display_name)) {
-        $c->log_warn(sprintf(
-          'Builtin book %s has no valid name, using list name as fallback',
-          $bn // 'undef'));
-        $display_name = $bn;
+        $self->logger->warn(sprintf(
+          'Skill book %s has no valid name, using list name as fallback',
+          $book_name // 'undef'));
+        $display_name = $book_name;
       }
 
-      # Always build nav, even with degraded data
+      # Add to navigation
       eval {
-        $app->add_navigation_item({
-          title  => "Details for the $display_name Book",
-          path   => "$base/$display_name",
-          parent => $base,
-          order  => 30,
-        });
+        $self->add_navigation_route(
+          "$base/Skill/$display_name",
+          $display_name,
+          { order => 10, parent => "$base/Skill" }
+        );
       };
       if ($@) {
-        $c->log_error(sprintf(
-          'Failed to add nav item for builtin book %s: %s', $bn, $@));
+        $self->logger->error(sprintf(
+          'Failed to add nav item for skill book %s: %s',
+          $book_name, $@
+        ));
       }
       else {
-        $c->log_debug(sprintf(
-          'added nav item for builtin book name "%s" with path "%s/%s"',
+        $self->logger->debug(sprintf(
+          'Added nav item for skill book "%s" with path "%s/Skill/%s"',
           $display_name, $base, $display_name
         ));
       }
-
-      # Only add to books list if we have a valid object
-      push @{$books}, $book if $book;
     }
 
-    foreach my $level (1 .. 4) {
-      foreach my $bn ($c->list_generic_books($level)->@*) {
-        my $book = eval { $c->get_generic_book($bn, $level) };
+    # Add generic books to navigation
+    foreach my $book_key ($books_loader->list_generic_books->@*) {
+      my $book = eval { $books_loader->get_generic_book($book_key) };
 
-        # Determine display name with fallbacks
-        my $display_name;
-        if ($book) {
-          $display_name = eval { $book->name };
-        }
-
-        # Fallback to book filename if object name unavailable
-        if (!defined($display_name) || !length($display_name)) {
-          $c->log_warn(sprintf(
-            'Generic book %s (level %s) has no valid name, '
-              . 'using list name as fallback',
-            $bn // 'undef', $level
-          ));
-          $display_name = $bn;
-        }
-
-        # Always build nav, even with degraded data
-        eval {
-          $app->add_navigation_item({
-            title => sprintf(
-              'Details for the Level %s %s Book', $level, $display_name
-            ),
-            path   => sprintf('%s/Level %s %s', $base, $level, $display_name),
-            parent => $base,
-            order  => 30,
-          });
-        };
-        if ($@) {
-          $c->log_error(sprintf(
-            'Failed to add nav item for generic book %s (level %s): %s',
-            $bn, $level, $@
-          ));
-        }
-        else {
-          $c->log_debug(sprintf(
-'added nav item for generic book name "%s" (level %s) with path "%s/Level %s %s"',
-            $display_name, $level, $base, $level, $display_name
-          ));
+      # Determine display name with fallbacks
+      my $display_name;
+      if ($book) {
+        $display_name = eval { $book->name };
+        if ($book->can('level') && defined $book->level) {
+          $display_name = sprintf("%s (Level %d)", $display_name, $book->level);
         }
       }
+
+      # Fallback to book key if object name unavailable
+      if (!defined($display_name) || !length($display_name)) {
+        $self->logger->warn(sprintf(
+          'Generic book %s has no valid name, using list name as fallback',
+          $book_key // 'undef'));
+        $display_name = $book_key;
+      }
+
+      # Add to navigation
+      eval {
+        $self->add_navigation_route(
+          "$base/Generic/$display_name",
+          $display_name,
+          { order => 20, parent => "$base/Generic" }
+        );
+      };
+      if ($@) {
+        $self->logger->error(sprintf(
+          'Failed to add nav item for generic book %s: %s',
+          $book_key, $@
+        ));
+      }
+      else {
+        $self->logger->debug(sprintf(
+          'Added nav item for generic book "%s" with path "%s/Generic/%s"',
+          $display_name, $base, $display_name
+        ));
+      }
     }
-
-    $c->log_info(sprintf(
-      'Building navigation for %d skill books', scalar(@$books)));
-
   }
 
-  sub index($c) {
-    return if $c->check_prereqs_or_wait($c->prereqs);
-    my $collection = collection_name();
-    $c->log_debug("Rendering index for $collection");
+  # Main books landing page
+  async sub index($self, $ctx) {
+    $self->logger->debug("Rendering books landing page");
 
-    # Check if markdown exists for this collection
-    my $distDir       = Mojo::File::Share::dist_dir('Game::EvonyTKR');
-    my $markdown_path = $distDir->child("pages/$collection/index.md");
+    my $vars = {
+      title        => 'Books',
+      current_year => (localtime)[5] + 1900,
+      sidebar      => 1,
+      navigation   => $self->render_navigation($ctx->req->path),
+      site_logo    => $self->site_logo(),
+    };
 
-    my @parts     = split(/::/, __PACKAGE__);
-    my $baseClass = pop(@parts);
-    my $base      = $c->getBase();
-    $c->log_debug("Books index method has base $base");
+    return $self->render('books/index.tt', $vars);
+  }
 
+  # Skill books index
+  async sub skill_books_index($self, $ctx) {
+    $self->logger->debug("Rendering skill books index");
+
+    my $books_loader = $self->books_loader();
+
+    unless ($books_loader) {
+      return $self->render_error(500, "Books data not loaded");
+    }
+
+    # Gather all skill books
     my $items = [];
-    foreach my $bn ($c->list_builtin_books->@*) {
-      my $book = $c->get_builtin_book($bn);
+    foreach my $book_name ($books_loader->list_skill_books->@*) {
+      my $book = $books_loader->get_skill_book($book_name);
       unless ($book) {
-        $c->log_error(sprintf(
-          'failed to retrieve built in book "%s" after prereq check passed',
-          $bn));
+        $self->logger->error(sprintf('Failed to get listed skill book "%s"', $book_name));
         next;
       }
       push @{$items}, $book;
     }
 
-    my $generics = [];
-    foreach my $level (1 .. 4) {
-      my $ll = $c->list_generic_books($level);
-      $c->log_debug(sprintf(
-        'there are %s generic books at level %s', scalar(@$ll), $level
-      ));
-      foreach my $bn (@$ll) {
-        my $book = $c->get_generic_book($bn, $level);
-        unless ($book) {
-          $c->log_error(sprintf(
-            'failed to retrieve generic in book "%s" after prereq check passed',
-            $bn));
-          next;
-        }
-        push @{$generics}, $book;
-      }
-    }
-    $c->log_debug(
-      sprintf('Items: %s with %s items.', ref($items), scalar(@$items)));
-    $c->stash(
-      linkBase        => $base,
-      items           => $items,
-      generics        => $generics,
-      collection_name => $collection,
-      controller_name => $baseClass,
+    $self->logger->debug(
+      sprintf('Skill books: %s with %s items', ref($items), scalar(@$items))
     );
 
-    if (-f $markdown_path) {
-      # Render with markdown
-      $c->stash(template => 'skill books/index');
+    my $vars = {
+      items        => $items,
+      title        => 'Skill Books',
+      current_year => (localtime)[5] + 1900,
+      css_files    => ['/css/collectionIndex.css'],
+      sidebar      => 1,
+      navigation   => $self->render_navigation($ctx->req->path),
+      site_logo    => $self->site_logo(),
+    };
 
-      return $c->render_markdown_page($markdown_path,
-        { template => 'skill books/index' });
-    }
-    else {
-      # Render just the items
-      return $c->render(template => 'skill books/index');
-    }
+    return $self->render('books/skill_books_index.tt', $vars);
   }
 
-  sub show ($self) {
-    return if $self->check_prereqs_or_wait($self->prereqs);
-    $self->log_debug("start of show method");
-    my $name = $self->param('book_name');
-    $self->log_debug("show detects name $name, showing details.");
+  # Generic books index
+  async sub generic_books_index($self, $ctx) {
+    $self->logger->debug("Rendering generic books index");
 
-    my $book;
-    if ($name =~ /^Level\s+([1-4])\s+(.+?)$/i) {
-      my ($base_name, $level) = ($2, $1);
-      $book = $self->get_builtin_book($name)
-        || $self->get_generic_book($base_name, $level);
+    my $books_loader = $self->books_loader();
+
+    unless ($books_loader) {
+      return $self->render_error(500, "Books data not loaded");
     }
-    else {
-      $book = $self->get_builtin_book($name);
+
+    # Gather all generic books
+    my $items = [];
+    foreach my $book_key ($books_loader->list_generic_books->@*) {
+      my $book = $books_loader->get_generic_book($book_key);
+      unless ($book) {
+        $self->logger->error(sprintf('Failed to get listed generic book "%s"', $book_key));
+        next;
+      }
+      push @{$items}, $book;
     }
+
+    $self->logger->debug(
+      sprintf('Generic books: %s with %s items', ref($items), scalar(@$items))
+    );
+
+    my $vars = {
+      items        => $items,
+      title        => 'Generic Books',
+      current_year => (localtime)[5] + 1900,
+      css_files    => ['/css/collectionIndex.css'],
+      sidebar      => 1,
+      navigation   => $self->render_navigation($ctx->req->path),
+      site_logo    => $self->site_logo(),
+    };
+
+    return $self->render('books/generic_books_index.tt', $vars);
+  }
+
+  # Show skill book details
+  async sub show_skill_book ($self, $ctx, $book_name) {
+    $self->logger->debug("Show details for skill book: $book_name");
+
+    my $books_loader = $self->books_loader();
+
+    unless ($books_loader) {
+      return $self->render_error(500, "Books data not loaded");
+    }
+
+    my $book = $books_loader->get_skill_book($book_name);
 
     unless ($book) {
-      $self->log_debug(
-        "skill book '$name' was not found in builtin or generic books.");
-      return $self->render(text => "Book not found: $name", status => 404);
+      $self->logger->debug("Skill book '$book_name' not found");
+      return $self->render_error(404, "Skill book not found");
     }
 
-    $self->log_debug("retrieved skill book $book");
+    $self->logger->debug("Retrieved skill book: $book");
 
-    $self->stash(
-      item     => $book,
-      template => 'skill books/details',
-      layout   => 'default',
-    );
-    return $self->render();
+    my $vars = {
+      item         => $book,
+      title        => $book->name,
+      current_year => (localtime)[5] + 1900,
+      css_files    => ['/css/collectionDetails.css'],
+      sidebar      => 1,
+      navigation   => $self->render_navigation($ctx->req->path),
+      site_logo    => $self->site_logo(),
+    };
+
+    return $self->render('books/details.tt', $vars);
   }
 
+  # Show generic book details
+  async sub show_generic_book ($self, $ctx, $book_name) {
+    $self->logger->debug("Show details for generic book: $book_name");
+
+    my $books_loader = $self->books_loader();
+
+    unless ($books_loader) {
+      return $self->render_error(500, "Books data not loaded");
+    }
+
+    my $book = $books_loader->get_generic_book($book_name);
+
+    unless ($book) {
+      $self->logger->debug("Generic book '$book_name' not found");
+      return $self->render_error(404, "Generic book not found");
+    }
+
+    $self->logger->debug("Retrieved generic book: $book");
+
+    my $vars = {
+      item         => $book,
+      title        => $book->name,
+      current_year => (localtime)[5] + 1900,
+      css_files    => ['/css/collectionDetails.css'],
+      sidebar      => 1,
+      navigation   => $self->render_navigation($ctx->req->path),
+      site_logo    => $self->site_logo(),
+    };
+
+    return $self->render('books/details.tt', $vars);
+  }
 }
 
 1;
+
+__END__
+
+=head1 NAME
+
+Game::EvonyTKR::Controller::Books - Thunderhorse controller for Books
+
+=head1 DESCRIPTION
+
+Manages routes and views for Skill Books and Generic Books in EvonyTKR.
+
+Routes:
+- GET /Reference/Books - Main books landing page
+- GET /Reference/Books/Skill - Index of all skill books
+- GET /Reference/Books/Generic - Index of all generic books
+- GET /Reference/Books/Skill/:name - Details for specific skill book
+- GET /Reference/Books/Generic/:name - Details for specific generic book
+
+=cut

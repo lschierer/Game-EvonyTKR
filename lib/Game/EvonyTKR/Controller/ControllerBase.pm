@@ -6,7 +6,6 @@ use File::FindLib 'lib';
 package Game::EvonyTKR::Controller::ControllerBase {
   use Mooish::Base -standard;
   with 'WebFramework::Role::Markdown';
-  extends 'Thunderhorse::Controller';
 
   # Compose EvonyTKR-specific roles
   with 'Game::EvonyTKR::Role::Logging';
@@ -14,6 +13,7 @@ package Game::EvonyTKR::Controller::ControllerBase {
   with 'Game::EvonyTKR::Role::JSON';
   with 'Game::EvonyTKR::Role::Persistence';
   with 'WebFramework::Role::Logger';
+  extends 'Thunderhorse::Controller';
 
   require YAML::PP;
   require Data::Printer;
@@ -149,6 +149,15 @@ package Game::EvonyTKR::Controller::ControllerBase {
   # Subclasses override to specify their base route
   sub controller_name ($self) {
     return ref($self) =~ s/.*:://r;
+  }
+
+  # Render error responses
+  # Note: This is called from route handlers, so we need $ctx
+  sub render_error ($self, $ctx, $status, $message) {
+    $self->logger->error("Error $status: $message");
+
+    # Use Thunderhorse's render_error which knows how to format responses
+    return $self->SUPER::render_error($ctx, $status, $message);
   }
 
   # Default index action - subclasses should override

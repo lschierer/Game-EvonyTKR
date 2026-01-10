@@ -1,3 +1,4 @@
+
 <div class="builtinbook-details">
   <% if( $item ) { %>
     <% require Scalar::Util; %>

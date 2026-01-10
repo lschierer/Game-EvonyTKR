@@ -4,6 +4,7 @@ use utf8::all;
 
 use Mooish::Base -standard;
 with 'WebFramework::Role::Logger';
+with 'Game::EvonyTKR::Role::Common';
 
 use experimental qw(signatures);
 use Path::Tiny;
@@ -47,9 +48,12 @@ sub load_all {
       $data->{general} = $general_name;
 
       my $aa = Game::EvonyTKR::Model::AscendingAttributes->from_hash($data);
-      $self->ascending_attributes->{$general_name} = $aa;
+
+      # Store using normalized key for case-insensitive lookup
+      my $normalized_key = $self->normalize($general_name);
+      $self->ascending_attributes->{$normalized_key} = $aa;
       $loaded++;
-      $self->logger->debug("Loaded ascending attributes for: $general_name");
+      $self->logger->debug("Loaded ascending attributes for: $general_name (key: $normalized_key)");
     };
     if ($@) {
       $self->logger->error("Failed to load $file: $@");
@@ -62,7 +66,8 @@ sub load_all {
 
 sub get_for_general {
   my ($self, $general_name) = @_;
-  return $self->ascending_attributes->{$general_name};
+  my $normalized_key = $self->normalize($general_name);
+  return $self->ascending_attributes->{$normalized_key};
 }
 
 sub list_generals {

@@ -1,20 +1,29 @@
+[% WRAPPER layouts/default.tt %]
+
 <div class="collection-list">
+  <h2 class="spectrum-Heading spectrum-Heading--sizeL">Generic Books</h2>
   <ul class="collection-grid">
     [% IF items && items.size > 0 -%]
       [% FOREACH item IN items.sort('name') -%]
         <li class="collection-item">
           [% IF item.can('level') && item.level -%]
             [% display_name = item.name _ " (Level " _ item.level _ ")" -%]
-            <a href="/Reference/Books/Generic/[% display_name | uri %]">
+            <a href="/Reference/Books/Generic/[% display_name | uri %]" class="spectrum-Link spectrum-Link--primary">
               [% display_name %]
             </a>
           [% ELSE -%]
-            <a href="/Reference/Books/Generic/[% item.name | uri %]">
+            <a href="/Reference/Books/Generic/[% item.name | uri %]" class="spectrum-Link spectrum-Link--primary">
               [% item.name %]
             </a>
           [% END -%]
         </li>
       [% END -%]
+    [% ELSE -%]
+      <li class="collection-item">
+        <span class="spectrum-Body spectrum-Body--sizeM">No generic books available</span>
+      </li>
     [% END -%]
   </ul>
 </div>
+
+[% END %]

@@ -3,6 +3,7 @@ use v5.42.0;
 use utf8::all;
 use Mooish::Base -standard;
 with 'WebFramework::Role::Logger';
+with 'Game::EvonyTKR::Role::Common';
 use experimental qw(signatures);
 use Path::Tiny;
 use YAML::PP;
@@ -41,14 +42,16 @@ sub load_all {
       # The file name (without extension) is the general name
       my $general_name = $file->basename(qr/\.ya?ml$/);
 
-      # Add name to data for from_hash
-      $data->{name} = $general_name;
+      # Only set name if not already in YAML (prefer YAML name for correct encoding)
+      $data->{name} = $general_name unless exists $data->{name};
 
       my $general = Game::EvonyTKR::Model::General->from_hash($data);
       if ($general) {
-        $self->generals->{$general_name} = $general;
+        # Store using normalized key for case-insensitive lookup
+        my $normalized_key = $self->normalize($general_name);
+        $self->generals->{$normalized_key} = $general;
         $loaded++;
-        $self->logger->debug("Loaded general: $general_name");
+        $self->logger->debug("Loaded general: $general_name (key: $normalized_key)");
       } else {
         $self->logger->error("Failed to create general from $file");
       }
@@ -64,7 +67,8 @@ sub load_all {
 
 sub get_general {
   my ($self, $general_name) = @_;
-  return $self->generals->{$general_name};
+  my $normalized_key = $self->normalize($general_name);
+  return $self->generals->{$normalized_key};
 }
 
 sub list_generals {

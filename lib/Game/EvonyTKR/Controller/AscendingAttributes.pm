@@ -1,198 +1,78 @@
 use v5.42.0;
-use experimental qw(class);
 use utf8::all;
 use File::FindLib 'lib';
 require Game::EvonyTKR::Model::AscendingAttributes;
-require Data::Printer;
-use namespace::clean;
+use namespace::autoclean;
 
 package Game::EvonyTKR::Controller::AscendingAttributes {
-  use Mojo::Base 'Game::EvonyTKR::Controller::ControllerBase', -strict,
-    -signatures;
-  use Mojo::Base 'Game::EvonyTKR::Role::Constants::AscendingAttributes', -role;
-  use List::AllUtils qw(uniq first);
+  use Mooish::Base -standard;
+  extends 'Game::EvonyTKR::Controller::ControllerBase';
+
+  use List::AllUtils qw(all any none first uniq);
   use Carp;
+  use Scalar::Util qw(blessed reftype);
+  use Data::Printer;
 
   # Specify which collection this controller handles
-  sub collection_name {'ascending attributes'}
+  sub collection_name { 'Ascending Attributes' }
 
-  my $base = '/Ascending Attributes';
-
-  sub getBase($self) {
-    return $base;
+  sub controller_name ($self) {
+    return "AscendingAttributes";
   }
 
-  sub controller_name($self) {
-    return 'AscendingAttributes';    # Explicitly return the controller name
+  # Build method - this controller doesn't register routes, only helpers
+  sub build ($self) {
+    $self->logger->info("Building AscendingAttributes controller (helpers only)");
+
+    # Call parent to register common routes
+    $self->SUPER::build();
+
+    # This controller provides helpers for other controllers to use
+    # No routes are registered here - ascending attributes are displayed
+    # as part of General detail pages
+
+    # Note: Helper methods are called directly by other controllers
+    # (like Generals controller) via $self->get_ascendingattributes_for_general()
   }
 
-  sub register($c, $app, $config = {}) {
-    $c->log_info("Registering routes for " . __PACKAGE__);
-    $c->SUPER::register($app, $config);
-
-    my $distDir    = Mojo::File::Share::dist_dir('Game::EvonyTKR');
-    my $collection = $c->collection_name;
-    my $SourceDir  = $distDir->child("collections/$collection");
-
-    $c->log_info("Successfully loaded Ascending Attributes "
-        . "manager with collection from $SourceDir");
-
-    $app->helper(
-      get_ascendingattributes_for_general => sub ($self, $g) {
-        return $c->get_ascendingattributes_for_general($g);
-      }
-    );
-
-    $app->helper(
-      get_column_info => sub($self, $item) {
-        return $c->get_column_info($item);
-      }
-    );
-
-    $app->helper(
-      sort_ascending_levels => sub($self, $item) {
-        return $c->sort_ascending_levels($item);
-      }
-    );
-
-    $app->helper(
-      ascending_level_names => sub($self, $level = '', $printable = 0) {
-        $c->log_debug(sprintf(
-          'ascending_level_names helper started, level is %s, printable is %s',
-          defined $level     ? $level     : '',
-          defined $printable ? $printable : 0,
-        ));
-
-        # Case 1: Return all level values (for dropdown values)
-        if (length($level) == 0) {
-          if ($printable) {
-            # Return all printable names
-            my @purpleNames =
-              $c->SUPER::getConstants()->AscendingAttributeLevelNames(0);
-            my @redNames =
-              $c->SUPER::getConstants()->AscendingAttributeLevelNames(1);
-
-            # Combine and get unique values
-            my %combined;
-            foreach my $ln (@purpleNames, @redNames) {
-              $combined{$ln}++;
-            }
-            my @unique = sort keys(%combined);
-            $c->log_debug("derived unique keys " . join(', ', @unique));
-            return \@unique;
-          }
-          else {
-            # Return all internal values
-            my @purpleValues =
-              $c->SUPER::getConstants()->AscendingAttributeLevelValues(0);
-            my @redValues =
-              $c->SUPER::getConstants()->AscendingAttributeLevelValues(1);
-
-            # Combine and get unique values
-            my %combined;
-            foreach my $ln (@purpleValues, @redValues) {
-              $combined{$ln}++;
-            }
-            my @unique = sort keys(%combined);
-            $c->log_debug("derived unique keys " . join(', ', @unique));
-            return \@unique;
-          }
-        }
-
-        # Case 2: Return a specific level's name
-        if ($printable) {
-          return $c->SUPER::getConstants()->AscendingAttributeLevelName($level);
-        }
-        else {
-          if ($level =~ /red/) {
-            return
-              first { $_ =~ /level/ }
-              $c->SUPER::getConstants()->AscendingAttributeLevelValues(1);
-          }
-          else {
-            return
-              first { $_ =~ /level/ }
-              $c->SUPER::getConstants()->AscendingAttributeLevelValues(0);
-          }
-        }
-        return 'none';
-      }
-    );
-
-    $app->helper(
-      get_ascending_section => sub ($self, $name = '') {
-        $c->log_debug(
-          sprintf('in get_ascending_section helper, self is %s ',
-            blessed($self))
-        );
-
-        return $c->get_ascending_section($self, $app, $name);
-      }
-    );
-  }
-
-  sub get_ascending_section ($c, $caller, $app, $name = '') {
-    if (length($name)) {
-      my $item = $c->get_ascendingattributes_for_general($name);
-      if ( Scalar::Util::reftype($item)
-        && Scalar::Util::reftype($item) eq 'HASH'
-        && blessed($item) eq 'Game::EvonyTKR::Model::AscendingAttributes') {
-        $c->log_debug("rendering get_ascending_section for $name");
-        return $caller->render_to_string(
-          item     => $item,
-          template => '/ascending attributes/details',
-          layout   => undef
-        );
-      }
-      else {
-        $c->log_warn(
-          "get_ascending_section cannot find Ascending Attributes for $name");
-        $c->log_debug(sprintf(
-          "searching for $name, instead got %s %s",
-          Scalar::Util::reftype($item) // '',
-          blessed($item)               // ''
-        ));
-      }
-    }
-    else {
-      $c->log_warn("cannot get_ascending_section without a name");
-    }
-    return "";
-  }
-
-  sub get_ascendingattributes_for_general ($c, $g) {
-
+  # Get ascending attributes for a specific general
+  sub get_ascendingattributes_for_general ($self, $g) {
     my $nn;
     my $gn;
-    if (Scalar::Util::blessed($g) && $g->isa('Game::EvonyTKR::Model::General'))
-    {
+
+    if (blessed($g) && $g->isa('Game::EvonyTKR::Model::General')) {
       $gn = $g->name;
-      $nn = lc($g->normalize($g->name));
+      $nn = lc($self->normalize($g->name));
     }
     else {
       $gn = "$g";
-      $nn = lc($c->normalize($gn));
+      $nn = lc($self->normalize($gn));
     }
 
-    $c->log_debug("looking for attributes for $nn");
+    $self->logger->debug("Looking for ascending attributes for $nn");
 
-    my $aa = $c->get_ascending_attributes($nn);
+    my $loader = $self->ascending_attributes_loader();
+    unless ($loader) {
+      $self->logger->error("Ascending attributes loader not available");
+      return undef;
+    }
+
+    my $aa = $loader->get_for_general($nn);
     unless (defined $aa) {
-      $c->log_error(sprintf(
-        'no ascending attributes found for '
-          . 'general named "%s" normalized to "%s"',
+      $self->logger->error(sprintf(
+        'No ascending attributes found for general named "%s" normalized to "%s"',
         $gn, $nn
       ));
+      return undef;
     }
-    $c->log_debug(
-      sprintf('found %s for requested key %s', Data::Printer::np($aa), $nn));
+
+    $self->logger->debug(
+      sprintf('Found %s for requested key %s', np($aa), $nn)
+    );
     return $aa;
   }
 
-  sub show ($self) {
-    return $self->SUPER::show();
-  }
-
+  # Get column info for rendering ascending attributes table
   sub get_column_info($self, $item) {
     # Define the two possible sets of level names
     my %level_sets = (
@@ -210,7 +90,7 @@ package Game::EvonyTKR::Controller::AscendingAttributes {
       }
     );
 
-    # Default to regular if we can't determine
+    # Default to purple if we can't determine
     my $set_type = 'purple';
 
     # Check if item has ascending levels
@@ -222,7 +102,7 @@ package Game::EvonyTKR::Controller::AscendingAttributes {
       my $first_level = $item->{ascending}[0]{level};
 
       # Determine which set it belongs to
-      if (grep { $_ eq $first_level } @{ $level_sets{special}{levels} }) {
+      if (grep { $_ eq $first_level } @{ $level_sets{red}{levels} }) {
         $set_type = 'red';
       }
     }
@@ -230,6 +110,7 @@ package Game::EvonyTKR::Controller::AscendingAttributes {
     return $level_sets{$set_type};
   }
 
+  # Sort ascending levels according to their progression
   sub sort_ascending_levels($self, $item) {
     # Get column info to determine the level order
     my $column_info = $self->get_column_info($item);
@@ -255,7 +136,58 @@ package Game::EvonyTKR::Controller::AscendingAttributes {
     return [];
   }
 
+  # Get ascending section HTML for a general (to be embedded in general detail page)
+  sub get_ascending_section ($self, $name = '') {
+    unless (length($name)) {
+      $self->logger->warn("Cannot get_ascending_section without a name");
+      return "";
+    }
+
+    my $item = $self->get_ascendingattributes_for_general($name);
+
+    unless ($item && reftype($item) eq 'HASH'
+            && blessed($item) eq 'Game::EvonyTKR::Model::AscendingAttributes') {
+      $self->logger->warn(
+        "get_ascending_section cannot find Ascending Attributes for $name"
+      );
+      $self->logger->debug(sprintf(
+        "searching for $name, instead got %s %s",
+        reftype($item) // '',
+        blessed($item) // ''
+      ));
+      return "";
+    }
+
+    $self->logger->debug("Rendering get_ascending_section for $name");
+
+    # This would render the partial template
+    # For now, return a placeholder - will be properly implemented when Generals controller is created
+    my $vars = {
+      item => $item,
+    };
+
+    return $self->render_to_string('ascending attributes/details.tt', $vars);
+  }
 }
 
 1;
+
 __END__
+
+=head1 NAME
+
+Game::EvonyTKR::Controller::AscendingAttributes - Thunderhorse controller for Ascending Attributes
+
+=head1 DESCRIPTION
+
+This controller provides helper methods for working with Ascending Attributes.
+It does NOT register any routes - ascending attributes are displayed as part of
+General detail pages rather than as standalone pages.
+
+Helper methods:
+- get_ascendingattributes_for_general($general) - Get AA for a general
+- get_column_info($item) - Get column info for AA table
+- sort_ascending_levels($item) - Sort AA levels in proper order
+- get_ascending_section($name) - Render AA section HTML
+
+=cut

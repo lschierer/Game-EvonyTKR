@@ -1,0 +1,109 @@
+[% WRAPPER layouts/default.tt %]
+
+<div class="general-details">
+  [% IF item && item.isa('Game::EvonyTKR::Model::General') -%]
+    <h2 class="spectrum-Heading spectrum-Heading--sizeXL">Details for [% item.name %]</h2>
+
+    <div class="basicInfo">
+      <div class="baseStats">
+        <h3 class="spectrum-Heading spectrum-Heading--sizeL">Basic Attributes</h3>
+        <table class="spectrum-Table spectrum-Table--sizeM spectrum-Table--quiet">
+          <thead class="spectrum-Table-head">
+            <tr>
+              <th class="spectrum-Table-headCell">Attribute</th>
+              <th class="spectrum-Table-headCell">Base</th>
+              <th class="spectrum-Table-headCell">Increment</th>
+            </tr>
+          </thead>
+          <tbody class="spectrum-Table-body">
+            <tr class="spectrum-Table-row">
+              <td class="spectrum-Table-cell"><strong class="spectrum-Body-strong">Attack</strong></td>
+              <td class="spectrum-Table-cell">[% item.basicAttributes.attack.base %]</td>
+              <td class="spectrum-Table-cell">[% item.basicAttributes.attack.increment %]</td>
+            </tr>
+            <tr class="spectrum-Table-row">
+              <td class="spectrum-Table-cell"><strong class="spectrum-Body-strong">Defense</strong></td>
+              <td class="spectrum-Table-cell">[% item.basicAttributes.defense.base %]</td>
+              <td class="spectrum-Table-cell">[% item.basicAttributes.defense.increment %]</td>
+            </tr>
+            <tr class="spectrum-Table-row">
+              <td class="spectrum-Table-cell"><strong class="spectrum-Body-strong">Leadership</strong></td>
+              <td class="spectrum-Table-cell">[% item.basicAttributes.leadership.base %]</td>
+              <td class="spectrum-Table-cell">[% item.basicAttributes.leadership.increment %]</td>
+            </tr>
+            <tr class="spectrum-Table-row">
+              <td class="spectrum-Table-cell"><strong class="spectrum-Body-strong">Politics</strong></td>
+              <td class="spectrum-Table-cell">[% item.basicAttributes.politics.base %]</td>
+              <td class="spectrum-Table-cell">[% item.basicAttributes.politics.increment %]</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="ExtraBaseInfo">
+        <h3 class="spectrum-Heading spectrum-Heading--sizeL">Basic Information</h3>
+        <ul class="baseInfo">
+          <li class="spectrum-Body spectrum-Body--sizeS">
+            <strong class="spectrum-Body-strong">Type: </strong>
+            [% TRY -%]
+              [% FOREACH type IN item.type -%]
+                [% formatted_type = type.replace('_', ' ') -%]
+                [% formatted_type = formatted_type.replace('(\w)(\w+)( specialist)?', '$1$2 Specialist') -%]
+                [% formatted_type %][% UNLESS loop.last %], [% END -%]
+              [% END -%]
+            [% CATCH -%]
+              <em>Type not specified</em>
+            [% END -%]
+          </li>
+          <li class="spectrum-Body spectrum-Body--sizeS">
+            <strong class="spectrum-Body-strong">Ascendable: </strong>
+            <span class="ascending-value">[% item.ascending ? "True" : "False" %]</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="specialskill">
+      <h3 class="spectrum-Heading spectrum-Heading--sizeL">
+        [% item.name %]'s Special Skill
+      </h3>
+      <h4 class="spectrum-Heading spectrum-Heading--sizeM">
+        [% item.builtInBookName %]
+      </h4>
+      <p class="spectrum-Body spectrum-Body--sizeM">
+        [% IF builtInBook -%]
+          [% builtInBook.text %]
+        [% ELSE -%]
+          <em>Built-in book details not available</em>
+        [% END -%]
+      </p>
+
+      [% IF item.ascending && ascending -%]
+        <h4 class="spectrum-Heading spectrum-Heading--sizeM">
+          [% item.name %]'s Ascension Buffs
+        </h4>
+        [% INCLUDE 'ascending attributes/details.tt' item=ascending %]
+      [% END -%]
+    </div>
+
+    <div class="specialties">
+      <h3 class="spectrum-Heading spectrum-Heading--sizeL">
+        [% item.name %]'s Specialties
+      </h3>
+      <ol>
+        [% FOREACH specialtyName IN item.specialtyNames -%]
+          <li class="spectrum-Body spectrum-Body--sizeS">
+            <a href="/Reference/Specialties/[% specialtyName %]" class="spectrum-Link spectrum-Link--quiet spectrum-Link--primary">
+              [% specialtyName %]
+            </a>
+          </li>
+        [% END -%]
+      </ol>
+    </div>
+
+  [% ELSE -%]
+    <span class="spectrum-Body spectrum-Body--sizeM">General details not available</span>
+  [% END -%]
+</div>
+
+[% END %]

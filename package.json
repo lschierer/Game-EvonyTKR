@@ -35,6 +35,7 @@
     "@spectrum-css/tag": "^10.2.0",
     "@spectrum-css/taggroup": "^7.2.0",
     "@spectrum-css/textfield": "^8.2.0",
+    "@spectrum-css/treeview": "^12.2.0",
     "@spectrum-css/tokens": "^16.0.2",
     "@spectrum-css/typography": "^8.2.0",
     "@spectrum-css/ui-icons": "^1.1.2",

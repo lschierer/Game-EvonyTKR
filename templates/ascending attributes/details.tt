@@ -1,0 +1,88 @@
+[%# Check if item has the expected structure -%]
+[% IF item && item.attributes -%]
+  [%# Determine which level set (purple or red) to use -%]
+  [%# Get both purple and red level arrays -%]
+  [% purple_levels = item.AscendingAttributeLevelValues(0) -%]
+  [% red_levels = item.AscendingAttributeLevelValues(1) -%]
+
+  [%# Find which set has buffs - check purple first, then red -%]
+  [% SET firstWithBuff = '' -%]
+  [% SET is_red = 0 -%]
+  [% FOREACH l IN purple_levels -%]
+    [% IF item.attributes.$l && item.attributes.$l.buffs && item.attributes.$l.buffs.size > 0 -%]
+      [% firstWithBuff = l -%]
+      [% is_red = 0 -%]
+      [% LAST -%]
+    [% END -%]
+  [% END -%]
+  [% IF !firstWithBuff -%]
+    [% FOREACH l IN red_levels -%]
+      [% IF item.attributes.$l && item.attributes.$l.buffs && item.attributes.$l.buffs.size > 0 -%]
+        [% firstWithBuff = l -%]
+        [% is_red = 1 -%]
+        [% LAST -%]
+      [% END -%]
+    [% END -%]
+  [% END -%]
+
+  [% SET sorted_levels = item.AscendingAttributeLevelValues(is_red) -%]
+  [% SET sorted_labels = item.AscendingAttributeLevelNames(is_red) -%]
+
+  <div class="ascendingattribute-details">
+    <h4 class="spectrum-Heading spectrum-Heading--sizeM">Ascending Attributes</h4>
+    <table class="spectrum-Table spectrum-Table--sizeM spectrum-Table--quiet">
+      <thead class="spectrum-Table-head">
+        <tr>
+          [% FOREACH index IN [1..5] -%] [%# skip 0 for none -%]
+            [% SET label = sorted_labels.$index -%]
+            <th class="spectrum-Table-headCell">[% label %]</th>
+          [% END -%]
+        </tr>
+      </thead>
+      <tbody class="spectrum-Table-body">
+        <tr class="spectrum-Table-row">
+          [% FOREACH level IN sorted_levels -%]
+            [% NEXT IF level.match('none', 'i') -%]
+            <td class="spectrum-Table-cell [% level %]">
+              [% IF item.attributes.$level.buffs -%]
+                [% FOREACH buff IN item.attributes.$level.buffs -%]
+                  <dl>
+                    <dt>Attribute:</dt>
+                    <dd>[% buff.attribute %]</dd>
+
+                    [% IF buff.targetedType -%]
+                      [%# Try to iterate - if it's an array it will work, if scalar it will iterate once -%]
+                      [% TRY -%]
+                        <dt>Troop Type[% IF buff.targetedType.size > 1 %]s[% END %]:</dt>
+                        [% FOREACH tt IN buff.targetedType -%]
+                          <dd>[% tt %]</dd>
+                        [% END -%]
+                      [% CATCH -%]
+                        [%# If FOREACH fails, just output as scalar -%]
+                        <dt>Troop Type:</dt>
+                        <dd>[% buff.targetedType %]</dd>
+                      [% END -%]
+                    [% END -%]
+
+                    [% IF buff.conditions.size > 0 -%]
+                      <dt>Condition(s):</dt>
+                      [% FOREACH condition IN buff.conditions -%]
+                        <dd>[% condition %]</dd>
+                      [% END -%]
+                    [% END -%]
+
+                    <dt>Value:</dt>
+                    <dd>[% buff.value.number %][% IF buff.value.unit == 'percentage' %]%[% END %]</dd>
+                  </dl>
+                [% END -%]
+              [% END -%]
+            </td>
+          [% END -%]
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+[% ELSE -%]
+  <span class="spectrum-Body spectrum-Body--sizeM">Ascending Attributes Not Available</span>
+[% END -%]

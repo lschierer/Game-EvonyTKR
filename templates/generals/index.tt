@@ -1,19 +1,19 @@
 [% WRAPPER layouts/default.tt %]
 
 <div class="collection-list">
-  <h2 class="spectrum-Heading spectrum-Heading--sizeL">Skill Books</h2>
+  <h2 class="spectrum-Heading spectrum-Heading--sizeL">Generals</h2>
   <ul class="collection-grid">
     [% IF items && items.size > 0 -%]
       [% FOREACH item IN items.sort('name') -%]
         <li class="collection-item">
-          <a href="/Reference/Books/Skill/[% item.name %]" class="spectrum-Link spectrum-Link--primary">
+          <a href="/Reference/Generals/[% item.name %]" class="spectrum-Link spectrum-Link--primary">
             [% item.name %]
           </a>
         </li>
       [% END -%]
     [% ELSE -%]
       <li class="collection-item">
-        <span class="spectrum-Body spectrum-Body--sizeM">No skill books available</span>
+        <span class="spectrum-Body spectrum-Body--sizeM">No generals available</span>
       </li>
     [% END -%]
   </ul>

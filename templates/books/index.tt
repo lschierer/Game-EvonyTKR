@@ -1,15 +1,19 @@
+[% WRAPPER layouts/default.tt %]
+
 <div class="collection-list">
   <h2 class="spectrum-Heading spectrum-Heading--sizeM">Book Collections</h2>
   <ul class="collection-grid">
     <li class="collection-item">
-      <a href="/Reference/Books/Skill">
+      <a href="/Reference/Books/Skill" class="spectrum-Link spectrum-Link--primary">
         Skill Books
       </a>
     </li>
     <li class="collection-item">
-      <a href="/Reference/Books/Generic">
+      <a href="/Reference/Books/Generic" class="spectrum-Link spectrum-Link--primary">
         Generic Books
       </a>
     </li>
   </ul>
 </div>
+
+[% END %]

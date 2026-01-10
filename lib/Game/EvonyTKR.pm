@@ -24,6 +24,9 @@ package Game::EvonyTKR {
     # Load controllers
     $self->logger->info("Loading controllers...");
     $self->load_controller('Specialties');
+    $self->load_controller('Books');
+    $self->load_controller('AscendingAttributes');  # Helpers only, no routes
+    $self->load_controller('Generals');
     $self->load_controller('Root');  # Must be last for catch-all routes
 
     # Load middleware for static assets
@@ -57,6 +60,6 @@ designed for better async performance and lower resource usage.
 
 =head1 VERSION
 
-v0.50.0 - Thunderhorse migration MVP (Specialties only)
+v0.50.0 - Thunderhorse migration MVP (Specialties, Books, Ascending Attributes, and Single Generals)
 
 =cut

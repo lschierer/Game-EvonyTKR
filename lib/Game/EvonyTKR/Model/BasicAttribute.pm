@@ -12,7 +12,6 @@ package Game::EvonyTKR::Model::BasicAttribute {
   use List::AllUtils qw( any none );
   use Scalar::Util   qw(blessed);
   use Data::Printer;
-  use Const::Fast;
   use File::FindLib 'lib';
   use Carp;
   use overload
@@ -24,11 +23,12 @@ package Game::EvonyTKR::Model::BasicAttribute {
     '.'        => \&concat,
     "fallback" => 0;
 
-  has 'attribute_name'      => '';
-  has ['base', 'increment'] => 0;
-  has 'EvansAdjustment'     => 2.4867;
-  has 'BasicAESAdjustment'  => sub {
-    const my $hash = {
+  has 'attribute_name' => (is => 'ro', default => '');
+  has 'base'           => (is => 'rw', default => 0);
+  has 'increment'      => (is => 'rw', default => 0);
+  has 'EvansAdjustment'    => (is => 'ro', default => 2.4867);
+  has 'BasicAESAdjustment' => (is => 'ro', default => sub {
+    return {
       'none'    => 0,
       'purple1' => 0,
       'purple2' => 0,
@@ -41,8 +41,7 @@ package Game::EvonyTKR::Model::BasicAttribute {
       'red4'    => 40,
       'red5'    => 50,
     };
-    return $hash;
-  };
+  });
 
   sub validate ($self) {
     my @errors;

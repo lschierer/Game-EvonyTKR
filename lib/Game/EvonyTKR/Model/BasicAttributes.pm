@@ -8,7 +8,7 @@ use namespace::autoclean;
 package Game::EvonyTKR::Model::BasicAttributes {
   use Moo;
   extends 'Game::EvonyTKR::Model::Base';
-  use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants',    -role;
+  with 'Game::EvonyTKR::Role::Constants::BuffConstants';
   with 'Game::EvonyTKR::Role::Constants::GeneralConstants';
 # VERSION
   use Carp;
@@ -21,18 +21,18 @@ package Game::EvonyTKR::Model::BasicAttributes {
     '""'       => \&as_string,
     'fallback' => 1;
 
-  has 'attack' => sub {
+  has 'attack' => (is => 'rw', default => sub {
     Game::EvonyTKR::Model::BasicAttribute->new(attribute_name => 'attack');
-  };
-  has 'leadership' => sub {
+  });
+  has 'leadership' => (is => 'rw', default => sub {
     Game::EvonyTKR::Model::BasicAttribute->new(attribute_name => 'leadership');
-  };
-  has 'defense' => sub {
+  });
+  has 'defense' => (is => 'rw', default => sub {
     Game::EvonyTKR::Model::BasicAttribute->new(attribute_name => 'defense');
-  };
-  has 'politics' => sub {
+  });
+  has 'politics' => (is => 'rw', default => sub {
     Game::EvonyTKR::Model::BasicAttribute->new(attribute_name => 'politics');
-  };
+  });
 
   # Get specific attribute
   sub get_attribute ($self, $name) {
