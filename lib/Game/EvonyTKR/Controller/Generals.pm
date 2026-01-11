@@ -14,6 +14,18 @@ package Game::EvonyTKR::Controller::Generals {
   use URI::Escape qw(uri_unescape);
   use Encode qw(decode is_utf8);
   use Scalar::Util qw(blessed);
+  use Game::EvonyTKR::Service::PDL::Runtime;
+
+  # PDL Runtime service for fast buff computation
+  has 'pdl_runtime' => (
+    is => 'ro',
+    lazy => 1,
+    default => sub ($self) {
+      return Game::EvonyTKR::Service::PDL::Runtime->new(
+        data_dir => 'share/collections/data'
+      );
+    },
+  );
 
   # Specify which collection this controller handles
   sub collection_name { 'Generals' }
@@ -243,16 +255,62 @@ package Game::EvonyTKR::Controller::Generals {
       $self->logger->error("Error getting built-in book: $@");
     }
 
+    # Check if buff calculation is requested via query parameter
+    my $buff_summaries;
+    my $calculate_buffs = $ctx->req->query('calculate_buffs');
+
+    if ($calculate_buffs) {
+      $self->logger->debug("Buff calculation requested for $gen_name");
+
+      # Extract query parameters with defaults
+      my $ascending_level = $ctx->req->query('ascendingLevel') // 'red5';
+      my $covenant_level  = $ctx->req->query('covenantLevel') // 'civilization';
+      my $specialty1      = $ctx->req->query('specialty1') // 'gold';
+      my $specialty2      = $ctx->req->query('specialty2') // 'gold';
+      my $specialty3      = $ctx->req->query('specialty3') // 'gold';
+      my $specialty4      = $ctx->req->query('specialty4') // 'gold';
+      my $activation      = $ctx->req->query('activation') // 'Attacking';
+
+      $self->logger->debug(sprintf(
+        "Buff params: activation=%s, ascending=%s, covenant=%s, specialties=%s/%s/%s/%s",
+        $activation, $ascending_level, $covenant_level,
+        $specialty1, $specialty2, $specialty3, $specialty4
+      ));
+
+      # Compute buffs using PDL Runtime
+      eval {
+        $buff_summaries = $self->pdl_runtime->get_buff_summary(
+          general => $gen_name,
+          activation => $activation,
+          filters => {
+            ascendingLevel => $ascending_level,
+            covenantLevel  => $covenant_level,
+            specialty1     => $specialty1,
+            specialty2     => $specialty2,
+            specialty3     => $specialty3,
+            specialty4     => $specialty4,
+            generic1       => 'level4',  # Default to level 4 generic books
+          }
+        );
+
+        $self->logger->debug("Successfully computed buff summaries");
+      };
+      if ($@) {
+        $self->logger->error("Error computing buffs: $@");
+      }
+    }
+
     my $vars = {
-      item         => $general,
-      ascending    => $ascending_attrs,
-      builtInBook  => $built_in_book,
-      title        => "Details for $gen_name",
-      current_year => (localtime)[5] + 1900,
-      css_files    => ['/css/collectionDetails.css'],
-      sidebar      => 1,
-      navigation   => $self->render_navigation($ctx->req->path),
-      site_logo    => $self->site_logo(),
+      item          => $general,
+      ascending     => $ascending_attrs,
+      builtInBook   => $built_in_book,
+      buff_summaries => $buff_summaries,  # Add computed buffs if available
+      title         => "Details for $gen_name",
+      current_year  => (localtime)[5] + 1900,
+      css_files     => ['/css/collectionDetails.css'],
+      sidebar       => 1,
+      navigation    => $self->render_navigation($ctx->req->path),
+      site_logo     => $self->site_logo(),
     };
 
     $self->logger->debug("About to render generals/details.tt");

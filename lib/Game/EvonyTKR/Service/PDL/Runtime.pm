@@ -1,7 +1,8 @@
 package Game::EvonyTKR::Service::PDL::Runtime;
 use v5.42.0;
 use utf8;
-use Mojo::Base -base,                           -signatures;
+use Moo;
+use experimental 'signatures';
 with 'Game::EvonyTKR::Role::Logging';
 use PDL;
 use PDL::NiceSlice;
@@ -54,15 +55,30 @@ The workflow:
 
 =cut
 
-has 'compiler' => sub ($self) {
-  Game::EvonyTKR::Service::PDL::Compiler->new(data_dir => $self->data_dir);
-};
+has 'compiler' => (
+  is => 'ro',
+  lazy => 1,
+  default => sub ($self) {
+    Game::EvonyTKR::Service::PDL::Compiler->new(data_dir => $self->data_dir);
+  },
+);
 
-has 'data_dir' => sub {'share/collections/data'};
-has 'log' => sub { Game::EvonyTKR::Role::Logging::get_logger(__PACKAGE__); };
+has 'data_dir' => (
+  is => 'ro',
+  default => sub { 'share/collections/data' },
+);
+
+has 'log' => (
+  is => 'ro',
+  lazy => 1,
+  default => sub { Game::EvonyTKR::Role::Logging::get_logger(__PACKAGE__); },
+);
 
 # Cache of compiled matrices: { "general_name:activation" => compiled_data }
-has 'matrix_cache' => sub { {} };
+has 'matrix_cache' => (
+  is => 'ro',
+  default => sub { {} },
+);
 
 =head2 compute_buffs
 

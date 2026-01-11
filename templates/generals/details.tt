@@ -101,6 +101,71 @@
       </ol>
     </div>
 
+    [%# Buff Summaries Section (when calculate_buffs query param is present) -%]
+    [% IF buff_summaries -%]
+      <div class="buff_summaries">
+        <h2 class="spectrum-Heading spectrum-Heading--sizeL">Buff Summaries</h2>
+
+        <h3 class="spectrum-Heading spectrum-Heading--sizeM">Buff Values by Troop Type</h3>
+        [% SET buffValues = buff_summaries.buffValues -%]
+        [% IF buffValues -%]
+          [%# Get buff attributes from first troop type for table columns -%]
+          [% SET firstTroopType = buffValues.keys.sort.0 -%]
+          [% SET buffAttributes = buffValues.$firstTroopType.keys.sort -%]
+
+          <table class="spectrum-Table spectrum-Table--sizeM spectrum-Table--quiet">
+            <thead class="spectrum-Table-head">
+              <tr>
+                <th class="spectrum-Table-headCell">Troop Type</th>
+                [% FOREACH attr IN buffAttributes -%]
+                  <th class="spectrum-Table-headCell">[% attr %]</th>
+                [% END -%]
+              </tr>
+            </thead>
+            <tbody class="spectrum-Table-body">
+              [% FOREACH troopType IN buffValues.keys.sort -%]
+                <tr class="spectrum-Table-row">
+                  <td class="spectrum-Table-cell"><strong>[% troopType %]</strong></td>
+                  [% FOREACH attr IN buffAttributes -%]
+                    <td class="spectrum-Table-cell">[% buffValues.$troopType.$attr %]</td>
+                  [% END -%]
+                </tr>
+              [% END -%]
+            </tbody>
+          </table>
+        [% END -%]
+
+        <h3 class="spectrum-Heading spectrum-Heading--sizeM">Debuff Values by Troop Type</h3>
+        [% SET debuffValues = buff_summaries.debuffValues -%]
+        [% IF debuffValues -%]
+          [%# Get debuff attributes from first troop type for table columns -%]
+          [% SET firstTroopType = debuffValues.keys.sort.0 -%]
+          [% SET debuffAttributes = debuffValues.$firstTroopType.keys.sort -%]
+
+          <table class="spectrum-Table spectrum-Table--sizeM spectrum-Table--quiet">
+            <thead class="spectrum-Table-head">
+              <tr>
+                <th class="spectrum-Table-headCell">Troop Type</th>
+                [% FOREACH attr IN debuffAttributes -%]
+                  <th class="spectrum-Table-headCell">[% attr %]</th>
+                [% END -%]
+              </tr>
+            </thead>
+            <tbody class="spectrum-Table-body">
+              [% FOREACH troopType IN debuffValues.keys.sort -%]
+                <tr class="spectrum-Table-row">
+                  <td class="spectrum-Table-cell"><strong>[% troopType %]</strong></td>
+                  [% FOREACH attr IN debuffAttributes -%]
+                    <td class="spectrum-Table-cell">[% debuffValues.$troopType.$attr %]</td>
+                  [% END -%]
+                </tr>
+              [% END -%]
+            </tbody>
+          </table>
+        [% END -%]
+      </div>
+    [% END -%]
+
   [% ELSE -%]
     <span class="spectrum-Body spectrum-Body--sizeM">General details not available</span>
   [% END -%]

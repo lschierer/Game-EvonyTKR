@@ -3,9 +3,9 @@ package Game::EvonyTKR::Model::Book;
 use v5.42.0;
 use utf8::all;
 use Moo;
-extends 'Game::EvonyTKR::Model::Base';
 with 'Game::EvonyTKR::Role::Constants::BuffConstants';
 with 'Game::EvonyTKR::Role::Constants::GeneralConstants';
+extends 'Game::EvonyTKR::Model::Base';
 use List::AllUtils qw( any none );
 use Carp;
 use overload
