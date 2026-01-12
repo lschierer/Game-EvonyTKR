@@ -49,8 +49,10 @@ build: prepare deps css images ts
     ./Build
 
 dev: deps css images build
-    rm -f "${HOME}/var/log/Perl/dist/Game-Evony/*.log"
-    MOJO_MODE=development MOJO_RENDERER_DEBUG=1  morbo -w templates -w share -w public ./bin/game-evonytkr
+    truncate -s 0 "${HOME}/var/log/Perl/dist/Game-EvonyTKR/system.log"
+    truncate -s 0 "${HOME}/var/log/Perl/dist/WebFramework/system.log"
+    truncate -s 0 "${HOME}/var/log/Perl/dist/WebFramework/access.log"
+    ./bin/server2.pl --mode development
 
 quickdev:
     truncate -s 0 "${HOME}/var/log/Perl/dist/Game-EvonyTKR/system.log"

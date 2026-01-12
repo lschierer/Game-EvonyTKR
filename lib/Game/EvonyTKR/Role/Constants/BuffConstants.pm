@@ -5,25 +5,28 @@ require Data::Printer;
 require Hash::Util;
 
 package Game::EvonyTKR::Role::Constants::BuffConstants {
-  use Mojo::Base -role, -signatures;
+  use Moo::Role;
   use Const::Fast;
   use List::AllUtils qw( first );
   use Carp;
 
-  has 'TroopTypeValues' => sub {
-    const my $hash => {
-      ground  => "Ground Troops",
-      mounted => "Mounted Troops",
-      ranged  => "Ranged Troops",
-      siege   => "Siege Machines",
-    };
-    return $hash;
-  };
+  has TroopTypeValues => (
+    is      => 'ro',
+    default => sub {
+      const my $hash => {
+        ground  => "Ground Troops",
+        mounted => "Mounted Troops",
+        ranged  => "Ranged Troops",
+        siege   => "Siege Machines",
+      };
+      return $hash;
+    },
+  );
 
   sub string_to_trooptype ($self, $string) {
     $string =~ s/_/ /g;
     $string =~ s/(\w+)(?: .*)/\L$1/x;
-    my $key = first { $_ =~ /^$string/x } keys %{ $self->TroopTypeValues };
+    my $key = first { $_ =~ /^$string/ix } keys %{ $self->TroopTypeValues };
     if (exists $self->TroopTypeValues->{$key}) {
       return $self->TroopTypeValues->{$key};
     }
@@ -34,67 +37,81 @@ package Game::EvonyTKR::Role::Constants::BuffConstants {
     }
   }
 
-  has 'BuffActivationValues' => sub {
-    const my $hash => {
-      'Overall'     => 1,
-      'PvM'         => 1,
-      'Attacking'   => 1,
-      'Reinforcing' => 1,
-      'Defense'     => 1,
-      'In City'     => 1,
-      'Out City'    => 1,
-      'Wall'        => 1,
-      'Mayor'       => 1,
-      'Officer'     => 1,
-    };
-    return $hash;
-  };
+  has BuffActivationValues => (
+    is      => 'ro',
+    default => sub {
+      const my $hash => {
+        'Overall'     => 1,
+        'PvM'         => 1,
+        'Attacking'   => 1,
+        'Reinforcing' => 1,
+        'Defense'     => 1,
+        'In City'     => 1,
+        'Out City'    => 1,
+        'Wall'        => 1,
+        'Mayor'       => 1,
+        'Officer'     => 1,
+      };
+      return $hash;
+    },
+  );
 
-  has 'AllowedBuffActivationValues' => sub ($self) {
-    return [sort keys $self->BuffActivationValues->%*];
-  };
+  has AllowedBuffActivationValues => (
+    is      => 'ro',
+    lazy    => 1,
+    default => sub ($self) {
+      return [sort keys $self->BuffActivationValues->%*];
+    },
+  );
 
-  has 'attributeValues' => sub {
-    const my $tmp => {
-      'Attack'                     => 1,
-      'Construction Speed'         => 1,
-      'Death to Soul'              => 1,
-      'Death to Survival'          => 1,
-      'Death to Wounded'           => 1,
-      'Defense'                    => 1,
-      'Deserter Capacity'          => 1,
-      'Double Items Drop Rate'     => 1,
-      'Healing Speed'              => 1,
-      'Hospital Capacity'          => 1,
-      'HP'                         => 1,
-      'Leadership'                 => 1,
-      'March Size'                 => 1,
-      'Marching Speed'             => 1,
-      'Range'                      => 1,
-      'Politics'                   => 1,
-      'Rally Capacity'             => 1,
-      'Resources Production'       => 1,
-      'Stamina cost'               => 1,
-      'SubCity Construction Speed' => 1,
-      'SubCity Death to Survival'  => 1,
-      'SubCity Gold Production'    => 1,
-      'SubCity Training Capacity'  => 1,
-      'SubCity Training Speed'     => 1,
-      'SubCity Troop Capacity'     => 1,
-      'Training Capacity'          => 1,
-      'Trap Triggering Rate'       => 1,
-      'Training Speed'             => 1,
-      'Wounded to Death'           => 1,
-    };
-    return $tmp;
-  };
+  has attributeValues => (
+    is      => 'ro',
+    default => sub {
+      const my $tmp => {
+        'Attack'                     => 1,
+        'Construction Speed'         => 1,
+        'Death to Soul'              => 1,
+        'Death to Survival'          => 1,
+        'Death to Wounded'           => 1,
+        'Defense'                    => 1,
+        'Deserter Capacity'          => 1,
+        'Double Items Drop Rate'     => 1,
+        'Healing Speed'              => 1,
+        'Hospital Capacity'          => 1,
+        'HP'                         => 1,
+        'Leadership'                 => 1,
+        'March Size'                 => 1,
+        'Marching Speed'             => 1,
+        'Range'                      => 1,
+        'Politics'                   => 1,
+        'Rally Capacity'             => 1,
+        'Resources Production'       => 1,
+        'Stamina cost'               => 1,
+        'SubCity Construction Speed' => 1,
+        'SubCity Death to Survival'  => 1,
+        'SubCity Gold Production'    => 1,
+        'SubCity Training Capacity'  => 1,
+        'SubCity Training Speed'     => 1,
+        'SubCity Troop Capacity'     => 1,
+        'Training Capacity'          => 1,
+        'Trap Triggering Rate'       => 1,
+        'Training Speed'             => 1,
+        'Wounded to Death'           => 1,
+      };
+      return $tmp;
+    },
+  );
 
-  has 'AttributeValues' => sub ($self) {
-    my @av;
-    push @av, sort keys $self->attributeValues->%*;
-    $self->log_debug(sprintf('there are %s attribute values', scalar @av));
-    return \@av;
-  };
+  has AttributeValues => (
+    is      => 'ro',
+    lazy    => 1,
+    default => sub ($self) {
+      my @av;
+      push @av, sort keys $self->attributeValues->%*;
+      $self->log_debug(sprintf('there are %s attribute values', scalar @av));
+      return \@av;
+    },
+  );
 
   sub basicAttributeTypes {
     const my $tmp => {
@@ -110,8 +127,10 @@ package Game::EvonyTKR::Role::Constants::BuffConstants {
     return sort keys $self->basicAttributeTypes->%*;
   }
 
-  has 'BuffConditionValues' => sub {
-    const my $hash => {
+  has BuffConditionValues => (
+    is      => 'ro',
+    default => sub {
+      const my $hash => {
       'Against Monsters' => {
         "Overall"     => 0,
         "PvM"         => 1,
@@ -377,16 +396,22 @@ package Game::EvonyTKR::Role::Constants::BuffConstants {
         "Mayor"       => 0,
         "Officer"     => 1,
       },
-    };
-    return $hash;
-  };
+      };
+      return $hash;
+    },
+  );
 
-  has 'DebuffConditionValues' => sub {
-    const my $array => ['Enemy', 'Monsters'];
-    return $array;
-  };
+  has DebuffConditionValues => (
+    is      => 'ro',
+    default => sub {
+      const my $array => ['Enemy', 'Monsters'];
+      return $array;
+    },
+  );
 
-  has MappedAttributeNames => sub {
+  has MappedAttributeNames => (
+    is      => 'ro',
+    default => sub {
     const my $hash => {
       'Attack Range'                   => 'Range',
       'death into wounded rate'        => 'Death to Wounded',
@@ -416,11 +441,14 @@ package Game::EvonyTKR::Role::Constants::BuffConstants {
       'subordinate city troops’ death into survival' =>
         'SubCity Death to Survival',
 
-    };
-    return $hash;
-  };
+      };
+      return $hash;
+    },
+  );
 
-  has MappedConditionNames => sub {
+  has MappedConditionNames => (
+    is      => 'ro',
+    default => sub {
     const my $hash => {
       'In-Rally'                   => "When Rallying",
       'in rally'                   => 'When Rallying',
@@ -445,9 +473,10 @@ package Game::EvonyTKR::Role::Constants::BuffConstants {
       'from Monsters'                 => 'Against Monsters',
       'the main city defense general' => 'When The Main Defense General',
 
-    };
-    return $hash;
-  };
+      };
+      return $hash;
+    },
+  );
 }
 1;
 __END__

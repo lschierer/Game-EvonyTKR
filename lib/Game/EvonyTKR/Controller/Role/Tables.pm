@@ -1,10 +1,11 @@
 package Game::EvonyTKR::Controller::Role::Tables;
 use v5.42.0;
 use utf8::all;
-use Mojo::Base -role, -signatures;
+use Moo::Role;
 
 require UUID;
 require MIME::Base64;
+require Mojo::IOLoop;
 use List::Util qw(min);
 
 =head1 NAME
@@ -33,9 +34,20 @@ Delay in seconds before sending complete event to ensure last batch is flushed. 
 
 =cut
 
-has table_batch_size           => 50;
-has table_loop_delay           => 0.01;
-has table_complete_flush_delay => 0.1;
+has table_batch_size => (
+  is      => 'ro',
+  default => sub { 50 },
+);
+
+has table_loop_delay => (
+  is      => 'ro',
+  default => sub { 0.01 },
+);
+
+has table_complete_flush_delay => (
+  is      => 'ro',
+  default => sub { 0.1 },
+);
 
 =head1 METHODS
 

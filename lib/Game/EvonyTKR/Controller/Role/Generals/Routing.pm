@@ -2,7 +2,7 @@ package Game::EvonyTKR::Controller::Role::Generals::Routing;
 use v5.42.0;
 use experimental qw(class);
 use utf8::all;
-use Mojo::Base -role, -strict, -signatures;
+use Moo::Role;
 use Carp;
 require Data::Printer;
 require Path::Tiny;
@@ -12,17 +12,23 @@ use diagnostics;
 
 our $vr;
 
-has validRoutes => sub {
-  my $c = shift;
-  unless ($vr) {
-    # assign an initial value so that this does not recurse
-    $vr = {};
-    $vr = $c->get_valid_routes();
-  }
-  return $vr;
-};
+has validRoutes => (
+  is      => 'ro',
+  lazy    => 1,
+  default => sub ($self) {
+    unless ($vr) {
+      # assign an initial value so that this does not recurse
+      $vr = {};
+      $vr = $self->get_valid_routes();
+    }
+    return $vr;
+  },
+);
 
-has routing_debug => 0;
+has routing_debug => (
+  is      => 'ro',
+  default => sub { 0 },
+);
 
 sub all_valid_routes($c) {
   return values $c->validRoutes->%*;

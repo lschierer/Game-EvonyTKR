@@ -14,13 +14,13 @@ package Game::EvonyTKR::Role::Constants::GeneralConstants {
   use List::AllUtils qw(none all any);
 
   const our %generalKeys => (
-    ground_specialist  => 1,
-    mounted_specialist => 1,
-    ranged_specialist  => 1,
-    siege_specialist   => 1,
-    mayor              => 1,
-    officer            => 1,
-    wall               => 1,
+    ground_specialist  => 'Infantry Specialists',
+    mounted_specialist => 'Cavalry Specialists',
+    ranged_specialist  => 'Archer Specialists',
+    siege_specialist   => 'Siege Specialists',
+    mayor              => 'Mayor Specialists',
+    officer            => 'Officer Specialists',
+    wall               => 'Wall Specialists',
   );
 
   has GeneralKeys => (
