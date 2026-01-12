@@ -1,0 +1,26 @@
+[% WRAPPER layouts/default.tt %]
+
+<link rel="stylesheet" href="/css/collectionIndex.css" />
+
+<article>
+  <h1 class="spectrum-Heading spectrum-Heading--sizeXL">[% troopType %] General Tables</h1>
+
+  <p class="spectrum-Body spectrum-Body--sizeL">
+    Select a buff activation type to view general comparison tables:
+  </p>
+</article>
+
+<div class="link-grid">
+  [% FOREACH route IN routes -%]
+    <a
+      href="/Reference/Generals/[% route.uiTarget %]/[% route.buffActivation %]"
+      class="link-item spectrum-Button spectrum-Button--outline spectrum-Button--primary spectrum-Button--sizeM"
+    >
+      <span class="spectrum-Button-label">
+        [% route.buffActivation FILTER ucfirst %] Use
+      </span>
+    </a>
+  [% END -%]
+</div>
+
+[% END %]

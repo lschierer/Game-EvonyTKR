@@ -1,0 +1,33 @@
+[% WRAPPER layouts/default.tt %]
+
+<link rel="stylesheet" href="/css/collectionIndex.css" />
+
+<article>
+  <h1 class="spectrum-Heading spectrum-Heading--sizeXL">
+    [% uiTarget %] - [% buffActivation FILTER ucfirst %] Use
+  </h1>
+
+  <p class="spectrum-Body spectrum-Body--sizeL">
+    Choose how you want to compare generals:
+  </p>
+</article>
+
+<div class="link-grid">
+  <a
+    href="/Reference/Generals/[% uiTarget %]/[% buffActivation %]/comparison"
+    class="link-item spectrum-Button spectrum-Button--fill spectrum-Button--accent spectrum-Button--sizeL"
+  >
+    <span class="spectrum-Button-label">Single General Comparison</span>
+  </a>
+
+  [% IF has_pairs -%]
+    <a
+      href="/Generals/[% uiTarget %]/[% buffActivation %]/pair-comparison"
+      class="link-item spectrum-Button spectrum-Button--fill spectrum-Button--accent spectrum-Button--sizeL"
+    >
+      <span class="spectrum-Button-label">General Pair Comparison</span>
+    </a>
+  [% END -%]
+</div>
+
+[% END %]

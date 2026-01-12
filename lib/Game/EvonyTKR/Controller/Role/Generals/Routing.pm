@@ -35,10 +35,10 @@ sub all_valid_routes($c) {
 }
 
 sub get_routes_for_uiTarget ($c, $uiTarget) {
-  $c->log_debug("looking for routes for $uiTarget");
+  $c->logger->debug("looking for routes for $uiTarget");
   my @results;
   my $slug = $c->_slugify($uiTarget);
-  $c->log_debug("slug for $uiTarget is $slug");
+  $c->logger->debug("slug for $uiTarget is $slug");
   foreach my $key (keys $c->validRoutes->%*) {
     if ($key =~ /^$slug/) {
       push @results, $c->validRoutes->{$key};
@@ -71,14 +71,13 @@ sub lookup_route ($c, $slug_ui, $slug_buff,) {
   }
   if ($c->routing_debug) {
     my @r = $c->all_valid_routes();
-    $c->log_error("$key is not a valid route. Valid routes are "
+    $c->logger->error("$key is not a valid route. Valid routes are "
         . Data::Printer::np($c->validRoutes));
   }
   else {
-    $c->log_error("$key is not a valid route.");
-    croak("$key is not a valid route.");
+    $c->logger->error("$key is not a valid route.");
   }
-  return 0;
+  return undef;  # Return undef instead of croaking - let caller handle it
 }
 
 sub _slugify ($c, $str) {

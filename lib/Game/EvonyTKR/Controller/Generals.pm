@@ -73,7 +73,28 @@ package Game::EvonyTKR::Controller::Generals {
       action => 'http.get',
     });
 
-    # Single general detail page
+    # Register static troop type index routes FIRST (before /:name dynamic route)
+    # to avoid routing conflicts
+    use Game::EvonyTKR::Role::Constants::GeneralConstants;
+    my @general_types = keys %Game::EvonyTKR::Role::Constants::GeneralConstants::generalKeys;
+
+    $self->logger->info(sprintf("Registering %d troop type index routes", scalar(@general_types)));
+
+    foreach my $generalType (@general_types) {
+      my $ui_target = $self->_ui_target_name($generalType);
+      my $slug = $self->_slugify($ui_target);
+
+      $self->router->add("$base/$slug", {
+        to => sub ($self, $ctx) {
+          return $self->troopTypeIndex($ctx, $slug);
+        },
+        action => 'http.get',
+      });
+
+      $self->logger->info("Registered troop type index route: $base/$slug for type: $generalType");
+    }
+
+    # Single general detail page (dynamic route - registered after static routes)
     $self->router->add("$base/:name", {
       to => sub ($self, $ctx, @args) {
         my $name = uri_unescape($args[0]);
@@ -121,23 +142,7 @@ package Game::EvonyTKR::Controller::Generals {
       action => 'http.get',
     });
 
-    # Route 4: Troop type index routes (statically registered from GeneralKeys)
-    # Register explicit routes for each general type to avoid conflict with /:name
-    foreach my $generalType ($self->GeneralKeys->@*) {
-      my $ui_target = $self->_ui_target_name($generalType);
-      my $slug = $self->_slugify($ui_target);
-
-      $self->router->add("$base/$slug", {
-        to => sub ($self, $ctx) {
-          return $self->troopTypeIndex($ctx, $slug);
-        },
-        action => 'http.get',
-      });
-
-      $self->logger->debug("Registered troop type index route: $base/$slug");
-    }
-
-    # Route 5: Activation index (shows single/pair choice or redirects)
+    # Route 4: Activation index (shows single/pair choice or redirects)
     $self->router->add("$base/:uiTarget/:buffActivation", {
       to => sub ($self, $ctx, @args) {
         my $uiTarget = uri_unescape($args[0]);
@@ -398,8 +403,8 @@ package Game::EvonyTKR::Controller::Generals {
   sub singleTable ($self, $ctx, $uiTarget, $buffActivation) {
     $self->logger->debug("Rendering single general table for $uiTarget / $buffActivation");
 
-    # Validate route using Routing role
-    my $route_meta = $self->lookup_route($uiTarget, $buffActivation);
+    # Validate route using Routing role - use try_lookup_route which doesn't croak
+    my $route_meta = $self->try_lookup_route($uiTarget, $buffActivation);
     unless ($route_meta) {
       $self->logger->error("Invalid single route: $uiTarget | $buffActivation");
       return $self->render_error($ctx, 404, "Invalid general type or buff activation");
@@ -452,15 +457,15 @@ package Game::EvonyTKR::Controller::Generals {
       site_logo             => $self->site_logo(),
     };
 
-    return $self->render('generals/GeneralTableSingle.html.ep', $vars);
+    return $self->render('generals/GeneralTableSingle.tt', $vars);
   }
 
   # Single general catalog endpoint (returns list of generals)
   sub singleCatalog ($self, $ctx, $uiTarget, $buffActivation) {
     $self->logger->debug("Fetching single general catalog for $uiTarget / $buffActivation");
 
-    # Validate route
-    my $route_meta = $self->lookup_route($uiTarget, $buffActivation);
+    # Validate route - use try_lookup_route which returns undef without croaking
+    my $route_meta = $self->try_lookup_route($uiTarget, $buffActivation);
     unless ($route_meta) {
       $self->logger->error("Invalid single route: $uiTarget | $buffActivation");
       return $self->render_error($ctx, 404, "Invalid general type or buff activation");
@@ -566,8 +571,8 @@ package Game::EvonyTKR::Controller::Generals {
       $uiTarget, $buffActivation, $run_id, scalar(@{$session_data->{items}})
     ));
 
-    # Validate route
-    my $route_meta = $self->lookup_route($uiTarget, $buffActivation);
+    # Validate route - use try_lookup_route which doesn't croak
+    my $route_meta = $self->try_lookup_route($uiTarget, $buffActivation);
     unless ($route_meta) {
       $self->logger->error("Invalid single route: $uiTarget | $buffActivation");
       $self->write_table_sse('complete', { runId => 0+ $run_id });
@@ -804,15 +809,15 @@ package Game::EvonyTKR::Controller::Generals {
       site_logo     => $self->site_logo(),
     };
 
-    return $self->render('generals/troopTypeIndex.html.ep', $vars);
+    return $self->render('generals/troopTypeIndex.tt', $vars);
   }
 
   # Activation index - shows single/pair choice or redirects
   sub activationIndex ($self, $ctx, $uiTarget, $buffActivation) {
     $self->logger->debug("Rendering activation index for: $uiTarget / $buffActivation");
 
-    # Validate route
-    my $route_meta = $self->lookup_route($uiTarget, $buffActivation);
+    # Validate route - use try_lookup_route which returns undef without croaking
+    my $route_meta = $self->try_lookup_route($uiTarget, $buffActivation);
     unless ($route_meta) {
       $self->logger->error("Invalid route: $uiTarget | $buffActivation");
       return $self->render_error($ctx, 404, "Invalid general type or buff activation");
@@ -839,7 +844,7 @@ package Game::EvonyTKR::Controller::Generals {
       site_logo      => $self->site_logo(),
     };
 
-    return $self->render('generals/activationIndex.html.ep', $vars);
+    return $self->render('generals/activationIndex.tt', $vars);
   }
 }
 
