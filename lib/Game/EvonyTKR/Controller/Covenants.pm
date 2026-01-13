@@ -47,7 +47,7 @@ package Game::EvonyTKR::Controller::Covenants {
       to => sub ($self, $ctx) {
         return $self->index($ctx);
       },
-      action => 'http.get',
+      action => 'http.*',
     });
 
     # Single covenant detail page
@@ -58,7 +58,7 @@ package Game::EvonyTKR::Controller::Covenants {
         $name = decode('UTF-8', $name) unless is_utf8($name);
         return $self->show($ctx, $name);
       },
-      action => 'http.get',
+      action => 'http.*',
     });
 
     # Build navigation items for individual covenants

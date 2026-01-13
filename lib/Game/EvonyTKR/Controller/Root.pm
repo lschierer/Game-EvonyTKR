@@ -26,7 +26,7 @@ package Game::EvonyTKR::Controller::Root {
       to => async sub ($self, $ctx) {
         return await $self->index($ctx);
       },
-      action => 'http.get',
+      action => 'http.*',
     });
 
     # Register Reference page
@@ -36,7 +36,7 @@ package Game::EvonyTKR::Controller::Root {
       to => async sub ($self, $ctx) {
         return await $self->single_page($ctx, '/Reference');
       },
-      action => 'http.get',
+      action => 'http.*',
     });
 
     # Register privacy policy
@@ -46,7 +46,7 @@ package Game::EvonyTKR::Controller::Root {
       to => async sub ($self, $ctx) {
         return await $self->single_page($ctx, '/policy/privacy');
       },
-      action => 'http.get',
+      action => 'http.*',
     });
   }
 

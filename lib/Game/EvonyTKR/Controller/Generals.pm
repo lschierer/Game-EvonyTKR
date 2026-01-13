@@ -70,7 +70,7 @@ package Game::EvonyTKR::Controller::Generals {
       to => sub ($self, $ctx) {
         return $self->index($ctx);
       },
-      action => 'http.get',
+      action => 'http.*',
     });
 
     # Register static troop type index routes FIRST (before /:name dynamic route)
@@ -88,7 +88,7 @@ package Game::EvonyTKR::Controller::Generals {
         to => sub ($self, $ctx) {
           return $self->troopTypeIndex($ctx, $slug);
         },
-        action => 'http.get',
+        action => 'http.*',
       });
 
       $self->logger->info("Registered troop type index route: $base/$slug for type: $generalType");
@@ -102,7 +102,7 @@ package Game::EvonyTKR::Controller::Generals {
         $name = decode('UTF-8', $name) unless is_utf8($name);
         return $self->show($ctx, $name);
       },
-      action => 'http.get',
+      action => 'http.*',
     });
 
     # NEW: Table routes (Phase 2)
@@ -115,7 +115,7 @@ package Game::EvonyTKR::Controller::Generals {
         $buffActivation = decode('UTF-8', $buffActivation) unless is_utf8($buffActivation);
         return $self->singleTable($ctx, $uiTarget, $buffActivation);
       },
-      action => 'http.get',
+      action => 'http.*',
     });
 
     # Route 2: Catalog endpoint (POST for filter body)
@@ -139,7 +139,7 @@ package Game::EvonyTKR::Controller::Generals {
         $buffActivation = decode('UTF-8', $buffActivation) unless is_utf8($buffActivation);
         return $self->stream_single_details($ctx, $uiTarget, $buffActivation);
       },
-      action => 'http.get',
+      action => 'http.*',
     });
 
     # Route 4: Activation index (shows single/pair choice or redirects)
@@ -151,7 +151,7 @@ package Game::EvonyTKR::Controller::Generals {
         $buffActivation = decode('UTF-8', $buffActivation) unless is_utf8($buffActivation);
         return $self->activationIndex($ctx, $uiTarget, $buffActivation);
       },
-      action => 'http.get',
+      action => 'http.*',
     });
 
     # Build navigation items for individual generals

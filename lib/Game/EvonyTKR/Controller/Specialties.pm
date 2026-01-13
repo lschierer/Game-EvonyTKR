@@ -45,7 +45,7 @@ package Game::EvonyTKR::Controller::Specialties {
       to => async sub ($self, $ctx) {
         return await $self->index($ctx);
       },
-      action => 'http.get',
+      action => 'http.*',
     });
 
     $self->router->add("$base/:specialty_name", {
@@ -53,7 +53,7 @@ package Game::EvonyTKR::Controller::Specialties {
         my $specialty_name = $args[0];
         return await $self->show($ctx, $specialty_name);
       },
-      action => 'http.get',
+      action => 'http.*',
     });
 
     # Build navigation items for individual specialties

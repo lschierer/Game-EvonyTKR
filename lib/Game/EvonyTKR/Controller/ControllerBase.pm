@@ -63,7 +63,7 @@ package Game::EvonyTKR::Controller::ControllerBase {
         $ctx->res->headers->content_type('application/xml; charset=utf-8');
         return $xml;
       },
-      action => 'http.get',
+      action => 'http.*',
     });
 
     # Robots.txt route
@@ -80,7 +80,7 @@ package Game::EvonyTKR::Controller::ControllerBase {
         $ctx->res->headers->content_type('text/plain');
         return $robots;
       },
-      action => 'http.get',
+      action => 'http.*',
     });
 
     # Health check route
@@ -129,7 +129,7 @@ package Game::EvonyTKR::Controller::ControllerBase {
         $ctx->res->headers->content_type('application/json; charset=utf-8');
         return $response;
       },
-      action => 'http.get',
+      action => 'http.*',
     });
   }
 

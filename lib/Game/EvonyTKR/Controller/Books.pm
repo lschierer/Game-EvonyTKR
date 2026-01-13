@@ -61,7 +61,7 @@ package Game::EvonyTKR::Controller::Books {
       to => async sub ($self, $ctx) {
         return await $self->index($ctx);
       },
-      action => 'http.get',
+      action => 'http.*',
     });
 
     # Skill books index
@@ -69,7 +69,7 @@ package Game::EvonyTKR::Controller::Books {
       to => async sub ($self, $ctx) {
         return await $self->skill_books_index($ctx);
       },
-      action => 'http.get',
+      action => 'http.*',
     });
 
     # Generic books index
@@ -77,7 +77,7 @@ package Game::EvonyTKR::Controller::Books {
       to => async sub ($self, $ctx) {
         return await $self->generic_books_index($ctx);
       },
-      action => 'http.get',
+      action => 'http.*',
     });
 
     # Skill book detail
@@ -86,7 +86,7 @@ package Game::EvonyTKR::Controller::Books {
         my $book_name = uri_unescape($args[0]);
         return await $self->show_skill_book($ctx, $book_name);
       },
-      action => 'http.get',
+      action => 'http.*',
     });
 
     # Generic book detail
@@ -95,7 +95,7 @@ package Game::EvonyTKR::Controller::Books {
         my $book_name = uri_unescape($args[0]);
         return await $self->show_generic_book($ctx, $book_name);
       },
-      action => 'http.get',
+      action => 'http.*',
     });
 
     # Build navigation items for individual books
