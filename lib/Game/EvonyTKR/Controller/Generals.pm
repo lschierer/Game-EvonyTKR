@@ -7,7 +7,7 @@ use namespace::autoclean;
 
 package Game::EvonyTKR::Controller::Generals {
   use Mooish::Base -standard;
-
+  extends 'Game::EvonyTKR::Controller::ControllerBase';
   # Compose table-related roles
   with 'Game::EvonyTKR::Controller::Role::Tables';
   with 'Game::EvonyTKR::Role::Persistence::TableSessions';
@@ -15,7 +15,6 @@ package Game::EvonyTKR::Controller::Generals {
   with 'Game::EvonyTKR::Role::Constants::BuffConstants';
   with 'Game::EvonyTKR::Role::Constants::GeneralConstants';
 
-  extends 'Game::EvonyTKR::Controller::ControllerBase';
 
   use List::Util qw(min);
   use List::AllUtils qw(all any none first);
@@ -24,6 +23,7 @@ package Game::EvonyTKR::Controller::Generals {
   use URI::Escape qw(uri_unescape);
   use Encode qw(decode is_utf8);
   use Scalar::Util qw(blessed);
+  use Future::AsyncAwait;
   use Game::EvonyTKR::Service::PDL::Runtime;
 
   # PDL Runtime service for fast buff computation
@@ -40,7 +40,8 @@ package Game::EvonyTKR::Controller::Generals {
   # Specify which collection this controller handles
   sub collection_name { 'Generals' }
 
-  my $base = '/Reference/Generals';
+  my $base = '/Generals';
+  my $refBase = '/Reference/Generals';
 
   sub getBase($self) {
     return $base;
@@ -59,14 +60,14 @@ package Game::EvonyTKR::Controller::Generals {
 
     # Add navigation for main generals page
     $self->add_navigation_route(
-      $base,
+      $refBase,
       'Generals',
       { order => 20, parent => '/Reference' }
     );
 
     # Register routes
     # Main generals landing page
-    $self->router->add($base, {
+    $self->router->add($refBase, {
       to => sub ($self, $ctx) {
         return $self->index($ctx);
       },
@@ -84,18 +85,18 @@ package Game::EvonyTKR::Controller::Generals {
       my $ui_target = $self->_ui_target_name($generalType);
       my $slug = $self->_slugify($ui_target);
 
-      $self->router->add("$base/$slug", {
+      $self->router->add("$refBase/$slug", {
         to => sub ($self, $ctx) {
           return $self->troopTypeIndex($ctx, $slug);
         },
         action => 'http.*',
       });
 
-      $self->logger->info("Registered troop type index route: $base/$slug for type: $generalType");
+      $self->logger->info("Registered troop type index route: $refBase/$slug for type: $generalType");
     }
 
     # Single general detail page (dynamic route - registered after static routes)
-    $self->router->add("$base/:name", {
+    $self->router->add("$refBase/:name", {
       to => sub ($self, $ctx, @args) {
         my $name = uri_unescape($args[0]);
         # Ensure UTF-8 decoding
@@ -105,7 +106,7 @@ package Game::EvonyTKR::Controller::Generals {
       action => 'http.*',
     });
 
-    # NEW: Table routes (Phase 2)
+
     # Route 1: Table UI page
     $self->router->add("$base/:uiTarget/:buffActivation/comparison", {
       to => sub ($self, $ctx, @args) {
@@ -142,7 +143,7 @@ package Game::EvonyTKR::Controller::Generals {
       action => 'http.*',
     });
 
-    # Route 4: Activation index (shows single/pair choice or redirects)
+    # Activation index (shows single/pair choice or redirects)
     $self->router->add("$base/:uiTarget/:buffActivation", {
       to => sub ($self, $ctx, @args) {
         my $uiTarget = uri_unescape($args[0]);
@@ -461,7 +462,7 @@ package Game::EvonyTKR::Controller::Generals {
   }
 
   # Single general catalog endpoint (returns list of generals)
-  sub singleCatalog ($self, $ctx, $uiTarget, $buffActivation) {
+  async sub singleCatalog ($self, $ctx, $uiTarget, $buffActivation) {
     $self->logger->debug("Fetching single general catalog for $uiTarget / $buffActivation");
 
     # Validate route - use try_lookup_route which returns undef without croaking
@@ -476,7 +477,7 @@ package Game::EvonyTKR::Controller::Generals {
     # Check for POST body with primaries filter (optional)
     my $requested_primaries = [];
     if ($ctx->req->method eq 'POST') {
-      my $json_data = $ctx->req->json;
+      my $json_data = await $ctx->req->json;  # await the async json parse
       $requested_primaries = $json_data->{primaries} // [];
       $self->logger->debug(sprintf(
         "Catalog request with %d primaries filter",
@@ -487,23 +488,45 @@ package Game::EvonyTKR::Controller::Generals {
     # Generate unique session ID
     my $session_id = $self->generate_table_session_id($requested_primaries);
 
-    # Get all generals matching the generalType
+    # Get all generals matching the generalType via specialties
     my $generals_loader = $self->generals_loader();
     unless ($generals_loader) {
       return $self->render_error($ctx, 500, "Generals data not loaded");
     }
+
+    # Get troop type string to match in specialties
+    my $troop_type = $Game::EvonyTKR::Role::Constants::GeneralConstants::GeneralTypes2TroopTypes{$generalType} // '';
+    $self->logger->debug("Looking for generals with troop type: $troop_type (generalType: $generalType)");
 
     my @all_generals;
     foreach my $general_key ($generals_loader->list_generals->@*) {
       my $general = $generals_loader->get_general($general_key);
       next unless $general;
 
-      # Filter by generalType
-      my $gen_type = $general->type // '';
-      next unless $gen_type eq $generalType;
+      # For 'ALL' types (mayor, officer, wall), include all generals
+      if ($troop_type eq 'ALL') {
+        push @all_generals, $general;
+        next;
+      }
+
+      # Filter by matching specialty - check if any specialty contains the troop type
+      # e.g., "Mounted Troops" should match "Mounted Troop Attack", "Mounted Troop Ares", etc.
+      my $specialty_names = $general->specialtyNames // [];
+      my $matches = 0;
+      my $search_term = $troop_type;
+      $search_term =~ s/s$//;  # "Mounted Troops" -> "Mounted Troop" for matching
+      for my $specialty (@$specialty_names) {
+        if ($specialty =~ /$search_term/i) {
+          $matches = 1;
+          last;
+        }
+      }
+      next unless $matches;
 
       push @all_generals, $general;
     }
+
+    $self->logger->debug(sprintf("Found %d generals for %s", scalar(@all_generals), $generalType));
 
     # If primaries filter provided, filter to requested generals
     my @filtered_generals;
@@ -540,7 +563,7 @@ package Game::EvonyTKR::Controller::Generals {
     );
 
     # Return catalog response
-    return $self->render_json($ctx, {
+    return await $ctx->res->json({
       sessionId => $session_id,
       selected  => \@selected,
     });
@@ -829,7 +852,7 @@ package Game::EvonyTKR::Controller::Generals {
     if (!$has_pairs) {
       # No pairs exist, redirect directly to single table
       $self->logger->debug("No pairs for $uiTarget/$buffActivation, redirecting to single table");
-      return $ctx->redirect("/Reference/Generals/$uiTarget/$buffActivation/comparison");
+      return $ctx->res->redirect("/Reference/Generals/$uiTarget/$buffActivation/comparison");
     }
 
     # Pairs exist, show choice

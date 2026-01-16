@@ -5,9 +5,8 @@ use lib '../PAGI-WebServer/lib';
 
 package Game::EvonyTKR {
   use Mooish::Base -standard;
-
-  with 'WebFramework::Role::Logger';
   extends 'WebFramework::App';
+  with 'WebFramework::Role::Logger';
 
   our $VERSION = 'v0.50.0';
 
@@ -17,7 +16,9 @@ package Game::EvonyTKR {
     # Call parent build
     $self->SUPER::build();
 
-    # Load data loaders first (must run before controllers)
+    # note, a number of modules loaded from the config file.
+
+    # Load data loaders (must run before controllers)
     $self->logger->info("Loading DataLoaders module...");
     $self->load_module('^Game::EvonyTKR::Module::DataLoaders');
 

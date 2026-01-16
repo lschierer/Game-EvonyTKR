@@ -1,16 +1,19 @@
-# Game-EvonyTKR Thunderhorse Configuration
-# Development Environment
+# PAGI WebServer Framework Configuration
 
-# Stage: development, staging, production
-stage: development
+# Stage: localDev, staging, production
+stage: localDev
 
 # Server configuration
 server:
   host: 127.0.0.1
   port: 3000
+  worker_threads: 4
 
-# Template configuration
 modules:
+  '^WebFramework::Module::AutoIndex': {}
+  '^WebFramework::Module::Navigation': {}
+  '^WebFramework::Module::SiteLogo':
+    site_logo: share/public/images/TKRTipsLogo.svg
   Template:
     paths:
       - templates
@@ -24,22 +27,15 @@ modules:
 css_dir: public/css
 js_dir: public/js
 images_dir: public/images
+typescript_dir: src/ts
 markdown_dir: share/pages
+# relative to the public directory
 
-# Application configuration
-config:
-  APP_START_TIME: 0  # Set at runtime
-  base_url: http://localhost:3000
+# Pandoc modules to load
+pandoc_modules: []
 
-  version:
-    git-commit: unknown
-    git-branch: unknown
-    build-time: unknown
-
-  EvonyTKR-Environment:
-    DEPLOYMENT_TIME: development
-    HOSTNAME: localhost
-
+log_base: Game-EvonyTKR
+site_url: dev.hp-fan.schierer.org
 # Module-specific log levels
 log_config:
   default: INFO

@@ -1,19 +1,14 @@
+package Game::EvonyTKR::Controller::ControllerBase;
 use v5.42.0;
 use experimental qw(class);
 use utf8::all;
-use File::FindLib 'lib';
-
-package Game::EvonyTKR::Controller::ControllerBase {
-  use Mooish::Base -standard;
-  with 'WebFramework::Role::Markdown';
-
+use Mooish::Base -standard;
+  extends 'WebFramework::Controller::Base';
   # Compose EvonyTKR-specific roles
-  with 'Game::EvonyTKR::Role::Logging';
   with 'Game::EvonyTKR::Role::Common';
   with 'Game::EvonyTKR::Role::JSON';
   with 'Game::EvonyTKR::Role::Persistence';
   with 'WebFramework::Role::Logger';
-  extends 'Thunderhorse::Controller';
 
   require YAML::PP;
   require Data::Printer;
@@ -193,7 +188,7 @@ package Game::EvonyTKR::Controller::ControllerBase {
 
     return $xml;
   }
-}
+
 
 1;
 
