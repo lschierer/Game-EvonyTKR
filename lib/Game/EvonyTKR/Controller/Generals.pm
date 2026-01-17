@@ -16,32 +16,30 @@ package Game::EvonyTKR::Controller::Generals {
   with 'Game::EvonyTKR::Role::Constants::GeneralConstants';
   with 'WebFramework::Role::Markdown';
 
-
-  use List::Util qw(min);
+  use List::Util     qw(min);
   use List::AllUtils qw(all any none first);
   use Carp;
-  use Path::Tiny qw(path);
-  use URI::Escape qw(uri_unescape);
-  use Encode qw(decode is_utf8);
+  use Path::Tiny   qw(path);
+  use URI::Escape  qw(uri_unescape);
+  use Encode       qw(decode is_utf8);
   use Scalar::Util qw(blessed);
   use Future::AsyncAwait;
   use Game::EvonyTKR::Service::PDL::Runtime;
 
   # PDL Runtime service for fast buff computation
   has 'pdl_runtime' => (
-    is => 'ro',
-    lazy => 1,
+    is      => 'ro',
+    lazy    => 1,
     default => sub ($self) {
       return Game::EvonyTKR::Service::PDL::Runtime->new(
-        data_dir => 'share/collections/data'
-      );
+        data_dir => 'share/collections/data');
     },
   );
 
   # Specify which collection this controller handles
-  sub collection_name { 'Generals' }
+  sub collection_name {'Generals'}
 
-  my $base = '/Generals';
+  my $base    = '/Generals';
   my $refBase = '/Reference/Generals';
 
   sub getBase($self) {
@@ -61,115 +59,148 @@ package Game::EvonyTKR::Controller::Generals {
 
     # Force initialization of validRoutes
     my $routes = $self->validRoutes;
-    $self->logger->info(sprintf("Initialized %d valid routes", scalar(keys %$routes)));
+    $self->logger->info(
+      sprintf("Initialized %d valid routes", scalar(keys %$routes)));
 
     # Add navigation for main generals page (Reference section)
     $self->add_navigation_route(
       $refBase,
-      'Generals',
-      { order => 20, parent => '/Reference' }
+      'General Details',
+      { order => 21, parent => '/Reference' }
     );
+
+    $self->add_navigation_route($base, 'Generals',
+      { order => 5, parent => '/' });
 
     # ===== /Reference/Generals routes (detail pages) =====
 
     # Main generals landing page
-    $self->router->add($refBase, {
-      to => sub ($self, $ctx) {
-        return $self->index($ctx);
-      },
-      action => 'http.*',
-    });
+    $self->router->add(
+      $refBase,
+      {
+        to => sub ($self, $ctx) {
+          return $self->index($ctx);
+        },
+        action => 'http.*',
+      }
+    );
 
-    # Register static troop type index routes FIRST (before /:name dynamic route)
-    # to avoid routing conflicts
+   # Register static troop type index routes FIRST (before /:name dynamic route)
+   # to avoid routing conflicts
     use Game::EvonyTKR::Role::Constants::GeneralConstants;
-    my @general_types = keys %Game::EvonyTKR::Role::Constants::GeneralConstants::generalKeys;
+    my @general_types =
+      keys %Game::EvonyTKR::Role::Constants::GeneralConstants::generalKeys;
 
-    $self->logger->info(sprintf("Registering %d troop type index routes", scalar(@general_types)));
+    $self->logger->info(
+      sprintf("Registering %d troop type index routes", scalar(@general_types))
+    );
 
-
-
-    # Single general detail page (dynamic route - registered after static routes)
-    $self->router->add("$refBase/:name", {
-      to => sub ($self, $ctx, @args) {
-        my $name = uri_unescape($args[0]);
-        # Ensure UTF-8 decoding
-        $name = decode('UTF-8', $name) unless is_utf8($name);
-        return $self->show($ctx, $name);
-      },
-      action => 'http.*',
-    });
+   # Single general detail page (dynamic route - registered after static routes)
+    $self->router->add(
+      "$refBase/:name",
+      {
+        to => sub ($self, $ctx, @args) {
+          my $name = uri_unescape($args[0]);
+          # Ensure UTF-8 decoding
+          $name = decode('UTF-8', $name) unless is_utf8($name);
+          return $self->show($ctx, $name);
+        },
+        action => 'http.*',
+      }
+    );
 
     # ===== /Generals routes (table comparison pages) =====
 
     # Main tables landing page
-    $self->router->add($base, {
-      to => sub ($self, $ctx) {
-        return $self->tablesIndex($ctx);
-      },
-      action => 'http.*',
-    });
+    $self->router->add(
+      $base,
+      {
+        to => sub ($self, $ctx) {
+          return $self->tablesIndex($ctx);
+        },
+        action => 'http.*',
+      }
+    );
 
     foreach my $generalType (@general_types) {
       my $ui_target = $self->_ui_target_name($generalType);
 
-      $self->router->add("$base/$ui_target", {
-        to => sub ($self, $ctx) {
-          return $self->troopTypeTableIndex($ctx, $ui_target);
-        },
-        action => 'http.*',
-      });
-
-      $self->logger->info("Registered troop type index route: `$base/$ui_target` for type: $generalType");
-
-      # Activation index (shows single/pair choice or redirects)
-      foreach my $buffActivation ($self->AllowedBuffActivationValues->@*){
-        $self->router->add("$base/$ui_target/$buffActivation", {
-          to => sub ($self, $ctx, @args) {
-            return $self->activationIndex($ctx, $ui_target, $buffActivation);
+      $self->router->add(
+        "$base/$ui_target",
+        {
+          to => sub ($self, $ctx) {
+            return $self->troopTypeTableIndex($ctx, $ui_target);
           },
           action => 'http.*',
-        });
-      }
+        }
+      );
 
+      $self->logger->info(
+"Registered troop type index route: `$base/$ui_target` for type: $generalType"
+      );
+
+      # Activation index (shows single/pair choice or redirects)
+      foreach my $buffActivation ($self->AllowedBuffActivationValues->@*) {
+        $self->router->add(
+          "$base/$ui_target/$buffActivation",
+          {
+            to => sub ($self, $ctx, @args) {
+              return $self->activationIndex($ctx, $ui_target, $buffActivation);
+            },
+            action => 'http.*',
+          }
+        );
+      }
 
     }
 
     # Table UI page
-    $self->router->add("$base/:uiTarget/:buffActivation/comparison", {
-      to => sub ($self, $ctx, @args) {
-        my $uiTarget = uri_unescape($args[0]);
-        my $buffActivation = uri_unescape($args[1]);
-        $uiTarget = decode('UTF-8', $uiTarget) unless is_utf8($uiTarget);
-        $buffActivation = decode('UTF-8', $buffActivation) unless is_utf8($buffActivation);
-        return $self->singleTable($ctx, $uiTarget, $buffActivation);
-      },
-      action => 'http.*',
-    });
+    $self->router->add(
+      "$base/:uiTarget/:buffActivation/comparison",
+      {
+        to => sub ($self, $ctx, @args) {
+          my $uiTarget       = uri_unescape($args[0]);
+          my $buffActivation = uri_unescape($args[1]);
+          $uiTarget = decode('UTF-8', $uiTarget) unless is_utf8($uiTarget);
+          $buffActivation = decode('UTF-8', $buffActivation)
+            unless is_utf8($buffActivation);
+          return $self->singleTable($ctx, $uiTarget, $buffActivation);
+        },
+        action => 'http.*',
+      }
+    );
 
     # Catalog endpoint (POST for filter body)
-    $self->router->add("$base/:uiTarget/:buffActivation/data.json", {
-      to => sub ($self, $ctx, @args) {
-        my $uiTarget = uri_unescape($args[0]);
-        my $buffActivation = uri_unescape($args[1]);
-        $uiTarget = decode('UTF-8', $uiTarget) unless is_utf8($uiTarget);
-        $buffActivation = decode('UTF-8', $buffActivation) unless is_utf8($buffActivation);
-        return $self->singleCatalog($ctx, $uiTarget, $buffActivation);
-      },
-      action => 'http.post',
-    });
+    $self->router->add(
+      "$base/:uiTarget/:buffActivation/data.json",
+      {
+        to => sub ($self, $ctx, @args) {
+          my $uiTarget       = uri_unescape($args[0]);
+          my $buffActivation = uri_unescape($args[1]);
+          $uiTarget = decode('UTF-8', $uiTarget) unless is_utf8($uiTarget);
+          $buffActivation = decode('UTF-8', $buffActivation)
+            unless is_utf8($buffActivation);
+          return $self->singleCatalog($ctx, $uiTarget, $buffActivation);
+        },
+        action => 'http.post',
+      }
+    );
 
     # Details stream (SSE)
-    $self->router->add("$base/:uiTarget/:buffActivation/details-stream", {
-      to => sub ($self, $ctx, @args) {
-        my $uiTarget = uri_unescape($args[0]);
-        my $buffActivation = uri_unescape($args[1]);
-        $uiTarget = decode('UTF-8', $uiTarget) unless is_utf8($uiTarget);
-        $buffActivation = decode('UTF-8', $buffActivation) unless is_utf8($buffActivation);
-        return $self->stream_single_details($ctx, $uiTarget, $buffActivation);
-      },
-      action => 'http.*',
-    });
+    $self->router->add(
+      "$base/:uiTarget/:buffActivation/details-stream",
+      {
+        to => sub ($self, $ctx, @args) {
+          my $uiTarget       = uri_unescape($args[0]);
+          my $buffActivation = uri_unescape($args[1]);
+          $uiTarget = decode('UTF-8', $uiTarget) unless is_utf8($uiTarget);
+          $buffActivation = decode('UTF-8', $buffActivation)
+            unless is_utf8($buffActivation);
+          return $self->stream_single_details($ctx, $uiTarget, $buffActivation);
+        },
+        action => 'http.*',
+      }
+    );
 
     # Build navigation items for individual generals
     $self->build_nav_items();
@@ -191,9 +222,7 @@ package Game::EvonyTKR::Controller::Generals {
 
       unless ($general) {
         $self->logger->warn(sprintf(
-          'Failed to load general with key "%s"',
-          $normalized_key
-        ));
+          'Failed to load general with key "%s"', $normalized_key));
         next;
       }
 
@@ -202,18 +231,14 @@ package Game::EvonyTKR::Controller::Generals {
       unless (defined($display_name) && length($display_name)) {
         $self->logger->warn(sprintf(
           'General with key "%s" has no valid name, skipping',
-          $normalized_key
-        ));
+          $normalized_key));
         next;
       }
 
       # Add to navigation using the proper display name
       eval {
-        $self->add_navigation_route(
-          "$base/$display_name",
-          $display_name,
-          { order => 20, parent => $base }
-        );
+        $self->add_navigation_route("$refBase/$display_name", $display_name,
+          { order => 20, parent => $refBase });
       };
       if ($@) {
         $self->logger->error(sprintf(
@@ -224,7 +249,7 @@ package Game::EvonyTKR::Controller::Generals {
       else {
         $self->logger->debug(sprintf(
           'Added nav item for general "%s" with path "%s/%s" (key: %s)',
-          $display_name, $base, $display_name, $normalized_key
+          $display_name, $refBase, $display_name, $normalized_key
         ));
       }
     }
@@ -245,15 +270,15 @@ package Game::EvonyTKR::Controller::Generals {
     foreach my $general_name ($generals_loader->list_generals->@*) {
       my $general = $generals_loader->get_general($general_name);
       unless ($general) {
-        $self->logger->error(sprintf('Failed to get listed general "%s"', $general_name));
+        $self->logger->error(
+          sprintf('Failed to get listed general "%s"', $general_name));
         next;
       }
       push @{$items}, $general;
     }
 
     $self->logger->debug(
-      sprintf('Generals: %s with %s items', ref($items), scalar(@$items))
-    );
+      sprintf('Generals: %s with %s items', ref($items), scalar(@$items)));
 
     my $vars = {
       items        => $items,
@@ -274,16 +299,18 @@ package Game::EvonyTKR::Controller::Generals {
 
     # Get all troop types
     use Game::EvonyTKR::Role::Constants::GeneralConstants;
-    my @general_types = keys %Game::EvonyTKR::Role::Constants::GeneralConstants::generalKeys;
+    my @general_types =
+      keys %Game::EvonyTKR::Role::Constants::GeneralConstants::generalKeys;
 
     my @troop_types;
     foreach my $generalType (@general_types) {
       my $ui_target = $self->_ui_target_name($generalType);
-      push @troop_types, {
+      push @troop_types,
+        {
         name => $ui_target,
         slug => $ui_target,
         path => "/Generals/$ui_target",
-      };
+        };
     }
 
     my $vars = {
@@ -307,15 +334,17 @@ package Game::EvonyTKR::Controller::Generals {
     my @routes = $self->get_routes_for_uiTarget($uiTarget);
 
     unless (@routes) {
-      return $self->render_error($ctx, 404, "No routes found for troop type: $uiTarget");
+      return $self->render_error($ctx, 404,
+        "No routes found for troop type: $uiTarget");
     }
 
     # Sort by buff activation
-    my @sorted_routes = sort { $a->{buffActivation} cmp $b->{buffActivation} } @routes;
+    my @sorted_routes =
+      sort { $a->{buffActivation} cmp $b->{buffActivation} } @routes;
 
     # Check for markdown content
     my $static_content = '';
-    my $path = $ctx->req->path;
+    my $path           = $ctx->req->path;
     $path =~ s|^/||;
     my $md_file = $self->pages_dir->child("$path/index.md");
     if ($md_file->exists) {
@@ -354,8 +383,7 @@ package Game::EvonyTKR::Controller::Generals {
 
     unless ($general) {
       $self->logger->debug(
-        "General '$name' (normalized: '$normalized_name') not found"
-      );
+        "General '$name' (normalized: '$normalized_name') not found");
       return $self->render_error($ctx, 404, "General not found");
     }
 
@@ -365,9 +393,12 @@ package Game::EvonyTKR::Controller::Generals {
     $self->logger->debug(sprintf(
       "General data - name: %s, type: %s, ascending: %s, book: %s",
       $general->can('name') ? ($general->name // 'undef') : 'no name method',
-      $general->can('type') ? (ref($general->type) || $general->type // 'undef') : 'no type method',
-      $general->can('ascending') ? ($general->ascending // 'undef') : 'no ascending method',
-      $general->can('builtInBookName') ? ($general->builtInBookName // 'undef') : 'no book method'
+      $general->can('type') ? (ref($general->type) || $general->type // 'undef')
+      : 'no type method',
+      $general->can('ascending') ? ($general->ascending // 'undef')
+      : 'no ascending method',
+      $general->can('builtInBookName') ? ($general->builtInBookName // 'undef')
+      : 'no book method'
     ));
 
     # Get ascending attributes for this general if applicable
@@ -377,22 +408,25 @@ package Game::EvonyTKR::Controller::Generals {
         $self->logger->debug("General is ascending, looking up attributes");
         my $aa_loader = $self->ascending_attributes_loader();
         if ($aa_loader) {
-          my $gen_name = $general->can('name') ? $general->name : $normalized_name;
+          my $gen_name =
+            $general->can('name') ? $general->name : $normalized_name;
           my $normalized_general_name = $self->normalize($gen_name);
           $self->logger->debug(sprintf(
             "Looking up ascending attrs for '%s' (normalized: '%s')",
             $gen_name, $normalized_general_name
           ));
-          $ascending_attrs = $aa_loader->get_for_general($normalized_general_name);
-          $self->logger->debug(sprintf(
-            "Ascending attrs lookup result: %s",
-            $ascending_attrs ? 'found' : 'not found'
-          ));
-        } else {
+          $ascending_attrs =
+            $aa_loader->get_for_general($normalized_general_name);
+          $self->logger->debug(sprintf("Ascending attrs lookup result: %s",
+            $ascending_attrs ? 'found' : 'not found'));
+        }
+        else {
           $self->logger->warn("No ascending attributes loader available");
         }
-      } else {
-        $self->logger->debug("General is not ascending or ascending field not set");
+      }
+      else {
+        $self->logger->debug(
+          "General is not ascending or ascending field not set");
       }
     };
     if ($@) {
@@ -407,12 +441,13 @@ package Game::EvonyTKR::Controller::Generals {
       if ($general->can('builtInBookName') && $general->builtInBookName) {
         my $books_loader = $self->books_loader();
         if ($books_loader) {
-          my $book_name = $general->builtInBookName;
+          my $book_name            = $general->builtInBookName;
           my $normalized_book_name = $self->normalize($book_name);
           $built_in_book = $books_loader->get_book($normalized_book_name);
           $self->logger->debug(sprintf(
             "Looked up book '%s' (normalized: '%s'), found: %s",
-            $book_name, $normalized_book_name, $built_in_book ? 'yes' : 'no'
+            $book_name, $normalized_book_name,
+            $built_in_book ? 'yes' : 'no'
           ));
         }
       }
@@ -431,31 +466,31 @@ package Game::EvonyTKR::Controller::Generals {
       # Extract query parameters with defaults
       my $ascending_level = $ctx->req->query('ascendingLevel') // 'red5';
       my $covenant_level  = $ctx->req->query('covenantLevel') // 'civilization';
-      my $specialty1      = $ctx->req->query('specialty1') // 'gold';
-      my $specialty2      = $ctx->req->query('specialty2') // 'gold';
-      my $specialty3      = $ctx->req->query('specialty3') // 'gold';
-      my $specialty4      = $ctx->req->query('specialty4') // 'gold';
-      my $activation      = $ctx->req->query('activation') // 'Attacking';
+      my $specialty1      = $ctx->req->query('specialty1')    // 'gold';
+      my $specialty2      = $ctx->req->query('specialty2')    // 'gold';
+      my $specialty3      = $ctx->req->query('specialty3')    // 'gold';
+      my $specialty4      = $ctx->req->query('specialty4')    // 'gold';
+      my $activation      = $ctx->req->query('activation')    // 'Attacking';
 
       $self->logger->debug(sprintf(
-        "Buff params: activation=%s, ascending=%s, covenant=%s, specialties=%s/%s/%s/%s",
-        $activation, $ascending_level, $covenant_level,
-        $specialty1, $specialty2, $specialty3, $specialty4
+"Buff params: activation=%s, ascending=%s, covenant=%s, specialties=%s/%s/%s/%s",
+        $activation, $ascending_level, $covenant_level, $specialty1,
+        $specialty2, $specialty3,      $specialty4
       ));
 
       # Compute buffs using PDL Runtime
       eval {
         $buff_summaries = $self->pdl_runtime->get_buff_summary(
-          general => $gen_name,
+          general    => $gen_name,
           activation => $activation,
-          filters => {
+          filters    => {
             ascendingLevel => $ascending_level,
             covenantLevel  => $covenant_level,
             specialty1     => $specialty1,
             specialty2     => $specialty2,
             specialty3     => $specialty3,
             specialty4     => $specialty4,
-            generic1       => 'level4',  # Default to level 4 generic books
+            generic1       => 'level4',    # Default to level 4 generic books
           }
         );
 
@@ -467,16 +502,16 @@ package Game::EvonyTKR::Controller::Generals {
     }
 
     my $vars = {
-      item          => $general,
-      ascending     => $ascending_attrs,
-      builtInBook   => $built_in_book,
-      buff_summaries => $buff_summaries,  # Add computed buffs if available
-      title         => "Details for $gen_name",
-      current_year  => (localtime)[5] + 1900,
-      css_files     => ['/css/collectionDetails.css'],
-      sidebar       => 1,
-      navigation    => $self->render_navigation($ctx->req->path),
-      site_logo     => $self->site_logo(),
+      item           => $general,
+      ascending      => $ascending_attrs,
+      builtInBook    => $built_in_book,
+      buff_summaries => $buff_summaries,    # Add computed buffs if available
+      title          => "Details for $gen_name",
+      current_year   => (localtime)[5] + 1900,
+      css_files      => ['/css/collectionDetails.css'],
+      sidebar        => 1,
+      navigation     => $self->render_navigation($ctx->req->path),
+      site_logo      => $self->site_logo(),
     };
 
     $self->logger->debug("About to render generals/details.tt");
@@ -487,40 +522,46 @@ package Game::EvonyTKR::Controller::Generals {
 
   # Single general table UI page
   sub singleTable ($self, $ctx, $uiTarget, $buffActivation) {
-    $self->logger->debug("Rendering single general table for $uiTarget / $buffActivation");
+    $self->logger->debug(
+      "Rendering single general table for $uiTarget / $buffActivation");
 
-    # Validate route using Routing role - use try_lookup_route which doesn't croak
+  # Validate route using Routing role - use try_lookup_route which doesn't croak
     my $route_meta = $self->try_lookup_route($uiTarget, $buffActivation);
     unless ($route_meta) {
       $self->logger->error("Invalid single route: $uiTarget | $buffActivation");
-      return $self->render_error($ctx, 404, "Invalid general type or buff activation");
+      return $self->render_error($ctx, 404,
+        "Invalid general type or buff activation");
     }
 
     # Extract validated metadata
-    my $generalType = $route_meta->{generalType};
+    my $generalType     = $route_meta->{generalType};
     my $buff_activation = $route_meta->{buffActivation};
-    my $ui_target = $route_meta->{uiTarget};
+    my $ui_target       = $route_meta->{uiTarget};
 
     # Get filter parameters with defaults
     my $ascendingLevel = $ctx->req->query('ascendingLevel') // 'red5';
-    my $covenantLevel = $ctx->req->query('covenantLevel') // 'civilization';
-    my @specialties = map { $ctx->req->query("specialty$_") // 'gold' } (1..4);
+    my $covenantLevel  = $ctx->req->query('covenantLevel')  // 'civilization';
+    my @specialties =
+      map { $ctx->req->query("specialty$_") // 'gold' } (1 .. 4);
 
     # Validate using Data model
     my $data_model = Game::EvonyTKR::Model::Data->new;
 
     unless ($data_model->validateBuffActivation($buff_activation)) {
-      $self->logger->warn("Invalid Buff Activation: $buff_activation, using 'Overall'");
+      $self->logger->warn(
+        "Invalid Buff Activation: $buff_activation, using 'Overall'");
       $buff_activation = 'Overall';
     }
 
     unless ($data_model->checkAscendingLevel($ascendingLevel)) {
-      $self->logger->warn("Invalid ascendingLevel: $ascendingLevel, using 'red5'");
+      $self->logger->warn(
+        "Invalid ascendingLevel: $ascendingLevel, using 'red5'");
       $ascendingLevel = 'red5';
     }
 
     unless ($data_model->checkCovenantLevel($covenantLevel)) {
-      $self->logger->warn("Invalid covenantLevel: $covenantLevel, using 'civilization'");
+      $self->logger->warn(
+        "Invalid covenantLevel: $covenantLevel, using 'civilization'");
       $covenantLevel = 'civilization';
     }
 
@@ -528,19 +569,19 @@ package Game::EvonyTKR::Controller::Generals {
 
     # Prepare template variables
     my $vars = {
-      generalType           => $generalType,
-      buffActivation        => $buff_activation,
-      uiTarget              => $ui_target,
-      ascendingLevel        => $ascendingLevel,
-      covenantLevel         => $covenantLevel,
-      specialties           => \@specialties,
-      PrimaryFormTitle      => 'General Buff Selection',
-      title                 => "Single General Table - $ui_target / $buff_activation",
-      current_year          => (localtime)[5] + 1900,
-      css_files             => ['/css/GeneralTable.css'],
-      sidebar               => 1,
-      navigation            => $self->render_navigation($ctx->req->path),
-      site_logo             => $self->site_logo(),
+      generalType      => $generalType,
+      buffActivation   => $buff_activation,
+      uiTarget         => $ui_target,
+      ascendingLevel   => $ascendingLevel,
+      covenantLevel    => $covenantLevel,
+      specialties      => \@specialties,
+      PrimaryFormTitle => 'General Buff Selection',
+      title        => "Single General Table - $ui_target / $buff_activation",
+      current_year => (localtime)[5] + 1900,
+      css_files    => ['/css/GeneralTable.css'],
+      sidebar      => 1,
+      navigation   => $self->render_navigation($ctx->req->path),
+      site_logo    => $self->site_logo(),
     };
 
     return $self->render('generals/GeneralTableSingle.tt', $vars);
@@ -548,13 +589,15 @@ package Game::EvonyTKR::Controller::Generals {
 
   # Single general catalog endpoint (returns list of generals)
   async sub singleCatalog ($self, $ctx, $uiTarget, $buffActivation) {
-    $self->logger->debug("Fetching single general catalog for $uiTarget / $buffActivation");
+    $self->logger->debug(
+      "Fetching single general catalog for $uiTarget / $buffActivation");
 
     # Validate route - use try_lookup_route which returns undef without croaking
     my $route_meta = $self->try_lookup_route($uiTarget, $buffActivation);
     unless ($route_meta) {
       $self->logger->error("Invalid single route: $uiTarget | $buffActivation");
-      return $self->render_error($ctx, 404, "Invalid general type or buff activation");
+      return $self->render_error($ctx, 404,
+        "Invalid general type or buff activation");
     }
 
     my $generalType = $route_meta->{generalType};
@@ -562,12 +605,10 @@ package Game::EvonyTKR::Controller::Generals {
     # Check for POST body with primaries filter (optional)
     my $requested_primaries = [];
     if ($ctx->req->method eq 'POST') {
-      my $json_data = await $ctx->req->json;  # await the async json parse
+      my $json_data = await $ctx->req->json;    # await the async json parse
       $requested_primaries = $json_data->{primaries} // [];
-      $self->logger->debug(sprintf(
-        "Catalog request with %d primaries filter",
-        scalar(@$requested_primaries)
-      ));
+      $self->logger->debug(sprintf("Catalog request with %d primaries filter",
+        scalar(@$requested_primaries)));
     }
 
     # Generate unique session ID
@@ -580,8 +621,12 @@ package Game::EvonyTKR::Controller::Generals {
     }
 
     # Get troop type string to match in specialties
-    my $troop_type = $Game::EvonyTKR::Role::Constants::GeneralConstants::GeneralTypes2TroopTypes{$generalType} // '';
-    $self->logger->debug("Looking for generals with troop type: $troop_type (generalType: $generalType)");
+    my $troop_type =
+      $Game::EvonyTKR::Role::Constants::GeneralConstants::GeneralTypes2TroopTypes{
+      $generalType} // '';
+    $self->logger->debug(
+"Looking for generals with troop type: $troop_type (generalType: $generalType)"
+    );
 
     my @all_generals;
     foreach my $general_key ($generals_loader->list_generals->@*) {
@@ -594,12 +639,12 @@ package Game::EvonyTKR::Controller::Generals {
         next;
       }
 
-      # Filter by matching specialty - check if any specialty contains the troop type
-      # e.g., "Mounted Troops" should match "Mounted Troop Attack", "Mounted Troop Ares", etc.
+# Filter by matching specialty - check if any specialty contains the troop type
+# e.g., "Mounted Troops" should match "Mounted Troop Attack", "Mounted Troop Ares", etc.
       my $specialty_names = $general->specialtyNames // [];
-      my $matches = 0;
-      my $search_term = $troop_type;
-      $search_term =~ s/s$//;  # "Mounted Troops" -> "Mounted Troop" for matching
+      my $matches         = 0;
+      my $search_term     = $troop_type;
+      $search_term =~ s/s$//; # "Mounted Troops" -> "Mounted Troop" for matching
       for my $specialty (@$specialty_names) {
         if ($specialty =~ /$search_term/i) {
           $matches = 1;
@@ -611,29 +656,27 @@ package Game::EvonyTKR::Controller::Generals {
       push @all_generals, $general;
     }
 
-    $self->logger->debug(sprintf("Found %d generals for %s", scalar(@all_generals), $generalType));
+    $self->logger->debug(
+      sprintf("Found %d generals for %s", scalar(@all_generals), $generalType));
 
     # If primaries filter provided, filter to requested generals
     my @filtered_generals;
     if (scalar(@$requested_primaries) > 0) {
       my %requested = map { $_ => 1 } @$requested_primaries;
-      @filtered_generals = grep {
-        exists $requested{$_->name}
-      } @all_generals;
+      @filtered_generals = grep { exists $requested{ $_->name } } @all_generals;
 
       $self->logger->debug(sprintf(
         "Filtered to %d generals from %d total",
         scalar(@filtered_generals),
         scalar(@all_generals)
       ));
-    } else {
+    }
+    else {
       @filtered_generals = @all_generals;
     }
 
     # Convert to wire format (stubs for catalog)
-    my @selected = map {
-      { primary => $_->name }
-    } @filtered_generals;
+    my @selected = map { { primary => $_->name } } @filtered_generals;
 
     # Store session for streaming endpoint
     my @general_keys = map { $_->{primary} } @selected;
@@ -643,7 +686,7 @@ package Game::EvonyTKR::Controller::Generals {
         generalType    => $generalType,
         buffActivation => $buffActivation,
         items          => \@general_keys,
-        ttl            => 3600, # 1 hour
+        ttl            => 3600,              # 1 hour
       }
     );
 
@@ -660,7 +703,7 @@ package Game::EvonyTKR::Controller::Generals {
     $self->setup_sse_headers();
 
     # Extract parameters
-    my $run_id = 0+ $ctx->req->query('runId');
+    my $run_id     = 0+ $ctx->req->query('runId');
     my $session_id = $ctx->req->query('sessionId');
 
     # Validate session
@@ -675,8 +718,9 @@ package Game::EvonyTKR::Controller::Generals {
     }
 
     $self->logger->debug(sprintf(
-      'stream_single_details: uiTarget=%s, buffActivation=%s, runId=%s, session items=%d',
-      $uiTarget, $buffActivation, $run_id, scalar(@{$session_data->{items}})
+'stream_single_details: uiTarget=%s, buffActivation=%s, runId=%s, session items=%d',
+      $uiTarget, $buffActivation,
+      $run_id,   scalar(@{ $session_data->{items} })
     ));
 
     # Validate route - use try_lookup_route which doesn't croak
@@ -688,12 +732,13 @@ package Game::EvonyTKR::Controller::Generals {
     }
 
     my $generalType = $route_meta->{generalType};
-    my $activation = $route_meta->{buffActivation};
+    my $activation  = $route_meta->{buffActivation};
 
     # Extract filter parameters
     my $ascendingLevel = $ctx->req->query('ascendingLevel') // 'red5';
-    my $covenantLevel = $ctx->req->query('covenantLevel') // 'civilization';
-    my @specialties = map { $ctx->req->query("specialty$_") // 'gold' } (1..4);
+    my $covenantLevel  = $ctx->req->query('covenantLevel')  // 'civilization';
+    my @specialties =
+      map { $ctx->req->query("specialty$_") // 'gold' } (1 .. 4);
 
     # Validate filter parameters
     my $data_model = Game::EvonyTKR::Model::Data->new;
@@ -717,37 +762,35 @@ package Game::EvonyTKR::Controller::Generals {
     };
 
     # Get general names from session
-    my @general_names = @{$session_data->{items}};
+    my @general_names = @{ $session_data->{items} };
 
     $self->logger->debug(sprintf(
-      'Computing buffs for %d generals',
-      scalar(@general_names)
-    ));
+      'Computing buffs for %d generals', scalar(@general_names)));
 
     # Setup streaming
     $ctx->render_later;
     $self->write_sse($ctx);
-    $ctx->inactivity_timeout(1200); # 20 minutes
+    $ctx->inactivity_timeout(1200);    # 20 minutes
 
     # Process in batches (even though computation is fast, batch for UX)
-    my $batch_size = 50;
-    my $current_idx = 0;
+    my $batch_size     = 50;
+    my $current_idx    = 0;
     my $total_generals = scalar(@general_names);
-    my $complete_sent = 0;
+    my $complete_sent  = 0;
 
     my $recurring_id;
-    my $loop_delay = $self->table_loop_delay // 0.01; # 10ms
+    my $loop_delay = $self->table_loop_delay // 0.01;    # 10ms
 
     my $process_batch = sub {
       return if $complete_sent;
 
-      my $batch_end = List::Util::min($current_idx + $batch_size, $total_generals);
+      my $batch_end =
+        List::Util::min($current_idx + $batch_size, $total_generals);
 
       $self->logger->debug(sprintf(
         'Processing generals %d-%d of %d',
         $current_idx + 1,
-        $batch_end,
-        $total_generals
+        $batch_end, $total_generals
       ));
 
       for my $i ($current_idx .. $batch_end - 1) {
@@ -757,7 +800,7 @@ package Game::EvonyTKR::Controller::Generals {
           # Get general object
           my $generals_loader = $self->generals_loader();
           my $normalized_name = $self->normalize($general_name);
-          my $general = $generals_loader->get_general($normalized_name);
+          my $general         = $generals_loader->get_general($normalized_name);
 
           unless ($general) {
             $self->logger->error("Cannot load general: $general_name");
@@ -782,22 +825,69 @@ package Game::EvonyTKR::Controller::Generals {
                 name => $general->name,
                 type => $general->type,
               },
-              marchbuff => $buff_summary->{buffValues}->{'Ground Troops'}->{'March Size'} // 0,
-              attackbuff => $self->_extract_buff($buff_summary->{buffValues}, $troop_suffix, 'Attack'),
-              defensebuff => $self->_extract_buff($buff_summary->{buffValues}, $troop_suffix, 'Defense'),
-              hpbuff => $self->_extract_buff($buff_summary->{buffValues}, $troop_suffix, 'HP'),
-              groundattackdebuff => $self->_extract_debuff($buff_summary->{debuffValues}, 'Ground Troops', 'Attack'),
-              grounddefensedebuff => $self->_extract_debuff($buff_summary->{debuffValues}, 'Ground Troops', 'Defense'),
-              groundhpdebuff => $self->_extract_debuff($buff_summary->{debuffValues}, 'Ground Troops', 'HP'),
-              mountedattackdebuff => $self->_extract_debuff($buff_summary->{debuffValues}, 'Mounted Troops', 'Attack'),
-              mounteddefensedebuff => $self->_extract_debuff($buff_summary->{debuffValues}, 'Mounted Troops', 'Defense'),
-              mountedhpdebuff => $self->_extract_debuff($buff_summary->{debuffValues}, 'Mounted Troops', 'HP'),
-              rangedattackdebuff => $self->_extract_debuff($buff_summary->{debuffValues}, 'Ranged Troops', 'Attack'),
-              rangeddefensedebuff => $self->_extract_debuff($buff_summary->{debuffValues}, 'Ranged Troops', 'Defense'),
-              rangedhpdebuff => $self->_extract_debuff($buff_summary->{debuffValues}, 'Ranged Troops', 'HP'),
-              siegeattackdebuff => $self->_extract_debuff($buff_summary->{debuffValues}, 'Siege Machines', 'Attack'),
-              siegedefensedebuff => $self->_extract_debuff($buff_summary->{debuffValues}, 'Siege Machines', 'Defense'),
-              siegehpdebuff => $self->_extract_debuff($buff_summary->{debuffValues}, 'Siege Machines', 'HP'),
+              marchbuff =>
+                $buff_summary->{buffValues}->{'Ground Troops'}->{'March Size'}
+                // 0,
+              attackbuff => $self->_extract_buff(
+                $buff_summary->{buffValues},
+                $troop_suffix, 'Attack'
+              ),
+              defensebuff => $self->_extract_buff(
+                $buff_summary->{buffValues},
+                $troop_suffix, 'Defense'
+              ),
+              hpbuff => $self->_extract_buff(
+                $buff_summary->{buffValues},
+                $troop_suffix, 'HP'
+              ),
+              groundattackdebuff => $self->_extract_debuff(
+                $buff_summary->{debuffValues},
+                'Ground Troops', 'Attack'
+              ),
+              grounddefensedebuff => $self->_extract_debuff(
+                $buff_summary->{debuffValues},
+                'Ground Troops', 'Defense'
+              ),
+              groundhpdebuff => $self->_extract_debuff(
+                $buff_summary->{debuffValues},
+                'Ground Troops', 'HP'
+              ),
+              mountedattackdebuff => $self->_extract_debuff(
+                $buff_summary->{debuffValues},
+                'Mounted Troops', 'Attack'
+              ),
+              mounteddefensedebuff => $self->_extract_debuff(
+                $buff_summary->{debuffValues},
+                'Mounted Troops', 'Defense'
+              ),
+              mountedhpdebuff => $self->_extract_debuff(
+                $buff_summary->{debuffValues},
+                'Mounted Troops', 'HP'
+              ),
+              rangedattackdebuff => $self->_extract_debuff(
+                $buff_summary->{debuffValues},
+                'Ranged Troops', 'Attack'
+              ),
+              rangeddefensedebuff => $self->_extract_debuff(
+                $buff_summary->{debuffValues},
+                'Ranged Troops', 'Defense'
+              ),
+              rangedhpdebuff => $self->_extract_debuff(
+                $buff_summary->{debuffValues},
+                'Ranged Troops', 'HP'
+              ),
+              siegeattackdebuff => $self->_extract_debuff(
+                $buff_summary->{debuffValues},
+                'Siege Machines', 'Attack'
+              ),
+              siegedefensedebuff => $self->_extract_debuff(
+                $buff_summary->{debuffValues},
+                'Siege Machines', 'Defense'
+              ),
+              siegehpdebuff => $self->_extract_debuff(
+                $buff_summary->{debuffValues},
+                'Siege Machines', 'HP'
+              ),
             }
           };
 
@@ -806,9 +896,7 @@ package Game::EvonyTKR::Controller::Generals {
 
           $self->logger->debug(sprintf(
             'Sent general %d/%d: %s',
-            $i + 1,
-            $total_generals,
-            $general_name
+            $i + 1, $total_generals, $general_name
           ));
         };
         if ($@) {
@@ -843,7 +931,8 @@ package Game::EvonyTKR::Controller::Generals {
     $ctx->on(
       finish => sub {
         Mojo::IOLoop->remove($recurring_id) if $recurring_id;
-        $self->logger->debug("Client disconnected: stopped general computation");
+        $self->logger->debug(
+          "Client disconnected: stopped general computation");
       }
     );
   }
@@ -852,16 +941,20 @@ package Game::EvonyTKR::Controller::Generals {
   sub _get_troop_suffix ($self, $generalType) {
     if ($generalType =~ /ground/i) {
       return 'ground';
-    } elsif ($generalType =~ /mounted/i) {
+    }
+    elsif ($generalType =~ /mounted/i) {
       return 'mounted';
-    } elsif ($generalType =~ /ranged/i) {
+    }
+    elsif ($generalType =~ /ranged/i) {
       return 'ranged';
-    } elsif ($generalType =~ /siege/i) {
+    }
+    elsif ($generalType =~ /siege/i) {
       return 'siege';
-    } elsif ($generalType =~ /wall/i) {
+    }
+    elsif ($generalType =~ /wall/i) {
       return 'wall';
     }
-    return 'ground'; # Default
+    return 'ground';    # Default
   }
 
   # Helper: Extract buff value for specific troop type
@@ -889,13 +982,15 @@ package Game::EvonyTKR::Controller::Generals {
 
   # Activation index - shows single/pair choice or redirects
   sub activationIndex ($self, $ctx, $uiTarget, $buffActivation) {
-    $self->logger->debug("Rendering activation index for: $uiTarget / $buffActivation");
+    $self->logger->debug(
+      "Rendering activation index for: $uiTarget / $buffActivation");
 
     # Validate route - use try_lookup_route which returns undef without croaking
     my $route_meta = $self->try_lookup_route($uiTarget, $buffActivation);
     unless ($route_meta) {
       $self->logger->error("Invalid route: $uiTarget | $buffActivation");
-      return $self->render_error($ctx, 404, "Invalid general type or buff activation");
+      return $self->render_error($ctx, 404,
+        "Invalid general type or buff activation");
     }
 
     # Check if pairs exist for this combination
@@ -903,8 +998,10 @@ package Game::EvonyTKR::Controller::Generals {
 
     if (!$has_pairs) {
       # No pairs exist, redirect directly to single table
-      $self->logger->debug("No pairs for $uiTarget/$buffActivation, redirecting to single table");
-      return $ctx->res->redirect("/Reference/Generals/$uiTarget/$buffActivation/comparison");
+      $self->logger->debug(
+        "No pairs for $uiTarget/$buffActivation, redirecting to single table");
+      return $ctx->res->redirect(
+        "Generals/$uiTarget/$buffActivation/comparison");
     }
 
     # Pairs exist, show choice
@@ -940,11 +1037,11 @@ Part 1 - Single General Display:
 - GET /Reference/Generals/:name - Details for specific general
 
 Part 2 - Single General Tables (Interactive Comparison):
-- GET /Reference/Generals/:troopType - Navigation page for troop type
-- GET /Reference/Generals/:uiTarget/:buffActivation - Choice/redirect page
-- GET /Reference/Generals/:uiTarget/:buffActivation/comparison - Table UI
-- POST /Reference/Generals/:uiTarget/:buffActivation/data.json - Catalog endpoint
-- GET /Reference/Generals/:uiTarget/:buffActivation/details-stream - SSE buff streaming
+- GET /Generals/:troopType - Navigation page for troop type
+- GET /Generals/:uiTarget/:buffActivation - Choice/redirect page
+- GET /Generals/:uiTarget/:buffActivation/comparison - Table UI
+- POST /Generals/:uiTarget/:buffActivation/data.json - Catalog endpoint
+- GET /Generals/:uiTarget/:buffActivation/details-stream - SSE buff streaming
 
 =head1 METHODS
 
