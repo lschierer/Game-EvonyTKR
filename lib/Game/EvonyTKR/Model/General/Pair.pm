@@ -72,7 +72,7 @@ package Game::EvonyTKR::Model::General::Pair {
   }
 
   sub from_wire_hash ($class, $h, %opts) {
-    my $logger = WebFramework::Role::Logger::get_logger(__PACKAGE__);
+    my $logger = Log::Handler->get_logger(__PACKAGE__);
 
     my $primary_name =
       ref($h->{primary}) eq 'HASH'

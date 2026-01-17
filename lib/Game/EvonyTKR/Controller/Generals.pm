@@ -124,9 +124,12 @@ package Game::EvonyTKR::Controller::Generals {
 
     foreach my $generalType (@general_types) {
       my $ui_target = $self->_ui_target_name($generalType);
+      my $route = "$base/$ui_target";
+      $self->add_navigation_route($route, $ui_target,
+        { order => 5, parent => '/' });
 
       $self->router->add(
-        "$base/$ui_target",
+        $route,
         {
           to => sub ($self, $ctx) {
             return $self->troopTypeTableIndex($ctx, $ui_target);

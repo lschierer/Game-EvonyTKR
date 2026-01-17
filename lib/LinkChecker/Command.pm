@@ -24,7 +24,7 @@ has urls_to_check    => sub { [] };
 has 'start_hostname' => '';
 
 BEGIN {
-  WebFramework::Role::Logger::get_logger(__PACKAGE__);
+  Log::Handler->get_logger(__PACKAGE__);
 }
 
 sub init {

@@ -113,7 +113,7 @@ package Game::EvonyTKR::Model::BasicAttributes {
   }
 
   sub from_hash ($class, $hashObject) {
-    my $logger = WebFramework::Role::Logger::get_logger(__PACKAGE__);
+    my $logger = Log::Handler->get_logger(__PACKAGE__);
     unless (ref($hashObject) eq 'HASH') {
       $logger->error(sprintf(
         '%s from_hash requires a hash as a parameter, not %s',

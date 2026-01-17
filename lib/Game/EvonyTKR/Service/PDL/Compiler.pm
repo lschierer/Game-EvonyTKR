@@ -120,7 +120,7 @@ has 'data_dir' => (
 has 'log' => (
   is      => 'ro',
   lazy    => 1,
-  default => sub { WebFramework::Role::Logger::get_logger(__PACKAGE__); },
+  default => sub { Log::Handler->get_logger(__PACKAGE__); },
 );
 
 # Cache helper to access General objects

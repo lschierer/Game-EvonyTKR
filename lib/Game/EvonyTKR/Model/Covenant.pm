@@ -181,7 +181,7 @@ sub addBuff ($self, $level, $nb) {
 }
 
 sub from_hash($class, $object, $primary_general = undef) {
-  my $logger = WebFramework::Role::Logger::get_logger(__PACKAGE__);
+  my $logger = Log::Handler->get_logger(__PACKAGE__);
   if (!exists $object->{name}) {
     $logger->error('object must have name attribute.');
     return;
@@ -272,7 +272,7 @@ sub from_hash($class, $object, $primary_general = undef) {
 }
 
 sub from_wire_hash ($class, $h) {
-  my $logger = WebFramework::Role::Logger::get_logger(__PACKAGE__);
+  my $logger = Log::Handler->get_logger(__PACKAGE__);
   unless (ref($h) && ref($h) eq 'HASH') {
     my $errmessage = 'from_wire_hash requires a valid hashref';
     $logger->error($errmessage);

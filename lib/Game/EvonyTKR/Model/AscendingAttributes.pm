@@ -276,7 +276,7 @@ package Game::EvonyTKR::Model::AscendingAttributes {
   }
 
   sub from_wire_hash($class, $h) {
-    my $logger = WebFramework::Role::Logger::get_logger(__PACKAGE__);
+    my $logger = Log::Handler->get_logger(__PACKAGE__);
 
     # Convert wire format (hash-based ascending) back to array format
     my $converted_h = {%$h};    # shallow copy
@@ -311,7 +311,7 @@ package Game::EvonyTKR::Model::AscendingAttributes {
   }
 
   sub from_hash($class, $object) {
-    my $logger = WebFramework::Role::Logger::get_logger(__PACKAGE__);
+    my $logger = Log::Handler->get_logger(__PACKAGE__);
     unless (exists $object->{ascending}
       && ref($object->{ascending}) eq 'ARRAY') {
       $logger->error(sprintf(

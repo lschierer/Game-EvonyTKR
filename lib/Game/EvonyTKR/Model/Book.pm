@@ -166,7 +166,7 @@ sub validate($self) {
 }
 
 sub from_hash($class, $object) {
-  my $logger = WebFramework::Role::Logger::get_logger(__PACKAGE__);
+  my $logger = Log::Handler->get_logger(__PACKAGE__);
   my $b;
   my $name = $object->{name};
 

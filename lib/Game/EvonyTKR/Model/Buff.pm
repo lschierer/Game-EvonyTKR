@@ -411,7 +411,7 @@ package Game::EvonyTKR::Model::Buff {
   }
 
   sub from_hash ($class, $hashref) {
-    my $logger = WebFramework::Role::Logger::get_logger(__PACKAGE__);
+    my $logger = Log::Handler->get_logger(__PACKAGE__);
     my $v      = Game::EvonyTKR::Model::Buff::Value->new(
       number => abs($hashref->{value}->{number}),
       unit   => ($hashref->{value}->{unit} // 'percentage'),
@@ -512,7 +512,7 @@ package Game::EvonyTKR::Model::Buff {
   }
 
   sub from_wire_hash ($class, $w) {
-    my $logger = WebFramework::Role::Logger::get_logger(__PACKAGE__);
+    my $logger = Log::Handler->get_logger(__PACKAGE__);
     my $buff   = $class->new(
       attribute    => $w->{attribute},
       passive      => $w->{passive} // 0,

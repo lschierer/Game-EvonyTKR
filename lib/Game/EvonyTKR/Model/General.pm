@@ -476,7 +476,7 @@ package Game::EvonyTKR::Model::General {
   }
 
   sub from_hash ($class, $hashObject) {
-    my $logger = WebFramework::Role::Logger::get_logger(__PACKAGE__);
+    my $logger = Log::Handler->get_logger(__PACKAGE__);
 
     if (!exists $hashObject->{name}) {
       $logger->error('hash object must contain a name attribute.');
@@ -543,7 +543,7 @@ package Game::EvonyTKR::Model::General {
   }
 
   sub from_wire_hash ($class, $w, $opts = {}) {
-    my $logger = WebFramework::Role::Logger::get_logger(__PACKAGE__);
+    my $logger = Log::Handler->get_logger(__PACKAGE__);
     unless (($w->{_v} // 1) == 1) {
       $logger->error('unknown wire version');
       die "unknown wire version";

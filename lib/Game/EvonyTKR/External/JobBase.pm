@@ -69,7 +69,7 @@ sub run {
   }
   my $parent_notes = $job->info->{notes} || {};
   $job->prebuild_run_id($parent_notes->{prebuild_run_id} || '');
-  WebFramework::Role::Logger::get_logger(__PACKAGE__);
+  Log::Handler->get_logger(__PACKAGE__);
 
   $job->logger->debug(
     sprintf('JobBase configured Logging in run "%s"', $job->prebuild_run_id));
