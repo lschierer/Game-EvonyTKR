@@ -16,24 +16,22 @@ use overload
 require Game::EvonyTKR::Model::Buff;
 
 has name => (
-  is => 'rw',
-  default => sub { '' }
+  is      => 'rw',
+  default => sub {''}
 );
 
 has text => (
-  is => 'rw',
-  default => sub { '' }
+  is      => 'rw',
+  default => sub {''}
 );
 
 has buffs => (
-  is => 'rw',
-  lazy => 1,
+  is      => 'rw',
+  lazy    => 1,
   default => sub { [] }
 );
 
-has level => (
-  is => 'rw'
-);
+has level => (is => 'rw');
 
 # for backwards compatibility
 sub buff ($self) {
@@ -136,7 +134,8 @@ sub addBuff ($self, $newBuff) {
     }
   }
   else {
-    $self->logger->warn("Not adding buff: class stack has fewer than 3 elements");
+    $self->logger->warn(
+      "Not adding buff: class stack has fewer than 3 elements");
   }
 
 }
@@ -178,7 +177,7 @@ sub from_hash($class, $object) {
     $logger->debug(
       sprintf('detected that %s is a Generic book', $object->{name}));
     $name =~ s/Level [1-4] //;
-    $params{name} = $name;
+    $params{name}  = $name;
     $params{level} = $object->{level};
   }
   else {

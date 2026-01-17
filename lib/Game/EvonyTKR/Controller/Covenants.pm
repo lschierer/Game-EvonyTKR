@@ -9,13 +9,13 @@ package Game::EvonyTKR::Controller::Covenants {
 
   use List::AllUtils qw(all any none first);
   use Carp;
-  use Path::Tiny qw(path);
-  use URI::Escape qw(uri_unescape);
-  use Encode qw(decode is_utf8);
+  use Path::Tiny   qw(path);
+  use URI::Escape  qw(uri_unescape);
+  use Encode       qw(decode is_utf8);
   use Scalar::Util qw(blessed);
 
   # Specify which collection this controller handles
-  sub collection_name { 'Covenants' }
+  sub collection_name {'Covenants'}
 
   my $base = '/Reference/Covenants';
 
@@ -35,31 +35,34 @@ package Game::EvonyTKR::Controller::Covenants {
     $self->SUPER::build();
 
     # Add navigation for main covenants page
-    $self->add_navigation_route(
-      $base,
-      'Covenants',
-      { order => 30, parent => '/Reference' }
-    );
+    $self->add_navigation_route($base, 'Covenants',
+      { order => 30, parent => '/Reference' });
 
     # Register routes
     # Main covenants landing page
-    $self->router->add($base, {
-      to => sub ($self, $ctx) {
-        return $self->index($ctx);
-      },
-      action => 'http.*',
-    });
+    $self->router->add(
+      $base,
+      {
+        to => sub ($self, $ctx) {
+          return $self->index($ctx);
+        },
+        action => 'http.*',
+      }
+    );
 
     # Single covenant detail page
-    $self->router->add("$base/:name", {
-      to => sub ($self, $ctx, @args) {
-        my $name = uri_unescape($args[0]);
-        # Ensure UTF-8 decoding
-        $name = decode('UTF-8', $name) unless is_utf8($name);
-        return $self->show($ctx, $name);
-      },
-      action => 'http.*',
-    });
+    $self->router->add(
+      "$base/:name",
+      {
+        to => sub ($self, $ctx, @args) {
+          my $name = uri_unescape($args[0]);
+          # Ensure UTF-8 decoding
+          $name = decode('UTF-8', $name) unless is_utf8($name);
+          return $self->show($ctx, $name);
+        },
+        action => 'http.*',
+      }
+    );
 
     # Build navigation items for individual covenants
     $self->build_nav_items();
@@ -77,7 +80,8 @@ package Game::EvonyTKR::Controller::Covenants {
     # Note: list_covenants() returns normalized keys, not display names
     # We need to load each covenant to get the proper display name
     my $covenant_keys = $covenants_loader->list_covenants;
-    $self->logger->debug(sprintf("Building nav for %d covenants", scalar(@$covenant_keys)));
+    $self->logger->debug(
+      sprintf("Building nav for %d covenants", scalar(@$covenant_keys)));
 
     foreach my $normalized_key (@$covenant_keys) {
       $self->logger->debug("Processing covenant key: $normalized_key");
@@ -86,19 +90,18 @@ package Game::EvonyTKR::Controller::Covenants {
 
       unless ($covenant) {
         $self->logger->warn(sprintf(
-          'Failed to load covenant with key "%s"',
-          $normalized_key
-        ));
+          'Failed to load covenant with key "%s"', $normalized_key));
         next;
       }
 
-      $self->logger->debug(sprintf("Got covenant object: %s", ref($covenant) || 'not a ref'));
+      $self->logger->debug(
+        sprintf("Got covenant object: %s", ref($covenant) || 'not a ref'));
 
       # Debug: Check what we got
       $self->logger->debug(sprintf(
-        "Covenant object for key '%s': has primary method? %s, primary defined? %s",
+"Covenant object for key '%s': has primary method? %s, primary defined? %s",
         $normalized_key,
-        $covenant->can('primary') ? 'yes' : 'no',
+        $covenant->can('primary')                         ? 'yes' : 'no',
         ($covenant->can('primary') && $covenant->primary) ? 'yes' : 'no'
       ));
 
@@ -120,18 +123,14 @@ package Game::EvonyTKR::Controller::Covenants {
       unless (defined($display_name) && length($display_name)) {
         $self->logger->warn(sprintf(
           'Covenant with key "%s" has no valid primary name, skipping',
-          $normalized_key
-        ));
+          $normalized_key));
         next;
       }
 
       # Add to navigation using the proper display name
       eval {
-        $self->add_navigation_route(
-          "$base/$display_name",
-          $display_name,
-          { order => 30, parent => $base }
-        );
+        $self->add_navigation_route("$base/$display_name", $display_name,
+          { order => 30, parent => $base });
       };
       if ($@) {
         $self->logger->error(sprintf(
@@ -163,15 +162,15 @@ package Game::EvonyTKR::Controller::Covenants {
     foreach my $normalized_key ($covenants_loader->list_covenants->@*) {
       my $covenant = $covenants_loader->get_covenant($normalized_key);
       unless ($covenant) {
-        $self->logger->error(sprintf('Failed to get listed covenant "%s"', $normalized_key));
+        $self->logger->error(
+          sprintf('Failed to get listed covenant "%s"', $normalized_key));
         next;
       }
       push @{$items}, $covenant;
     }
 
     $self->logger->debug(
-      sprintf('Covenants: %s with %s items', ref($items), scalar(@$items))
-    );
+      sprintf('Covenants: %s with %s items', ref($items), scalar(@$items)));
 
     my $vars = {
       items        => $items,
@@ -203,8 +202,7 @@ package Game::EvonyTKR::Controller::Covenants {
 
     unless ($covenant) {
       $self->logger->debug(
-        "Covenant '$name' (normalized: '$normalized_name') not found"
-      );
+        "Covenant '$name' (normalized: '$normalized_name') not found");
       return $self->render_error($ctx, 404, "Covenant not found");
     }
 

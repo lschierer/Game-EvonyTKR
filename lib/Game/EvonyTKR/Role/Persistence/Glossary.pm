@@ -1,7 +1,7 @@
 package Game::EvonyTKR::Role::Persistence::Glossary;
 use v5.42.0;
 use utf8::all;
-use Mojo::Base -role,                                     -signatures;
+use Mojo::Base -role, -signatures;
 with 'Game::EvonyTKR::Role::Persistence::Core';
 
 sub add_glossary_term ($self, $term) {

@@ -1,7 +1,7 @@
 package Game::EvonyTKR::Role::Persistence::AscendingAttributes;
 use v5.42.0;
 use utf8::all;
-use Mojo::Base -role,                                     -signatures;
+use Mojo::Base -role, -signatures;
 with 'Game::EvonyTKR::Role::Persistence::Core';
 
 sub add_ascending_attribute ($self, $ascendingAttribute) {
@@ -20,7 +20,8 @@ sub get_ascending_attributes ($self, $name) {
   my $normalized_name = lc($self->normalize($name));
 
   if (exists $AscendingAttributes->{$normalized_name}) {
-    $self->logger->debug("Returning Ascending Attributes $name from state cache");
+    $self->logger->debug(
+      "Returning Ascending Attributes $name from state cache");
     return $AscendingAttributes->{$normalized_name};
   }
 
@@ -29,7 +30,8 @@ sub get_ascending_attributes ($self, $name) {
 
   return unless defined($wire_data);
 
-  $self->logger->debug("Found wire_data, attempting to build AscendingAttributes");
+  $self->logger->debug(
+    "Found wire_data, attempting to build AscendingAttributes");
   my $ascendingAttribute =
     Game::EvonyTKR::Model::Factory->build_from_wire('AscendingAttributes',
     $wire_data);

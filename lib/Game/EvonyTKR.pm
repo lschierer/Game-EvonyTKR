@@ -26,20 +26,22 @@ package Game::EvonyTKR {
     $self->logger->info("Loading controllers...");
     $self->load_controller('Specialties');
     $self->load_controller('Books');
-    $self->load_controller('AscendingAttributes');  # Helpers only, no routes
+    $self->load_controller('AscendingAttributes');    # Helpers only, no routes
     $self->load_controller('Generals');
     $self->load_controller('Covenants');
-    $self->load_controller('Root');  # Must be last for catch-all routes
+    $self->load_controller('Root');    # Must be last for catch-all routes
 
     # Load middleware for static assets
     $self->logger->info("Loading middleware...");
-    $self->load_module('Middleware' => {
-      Static => {
-        root => 'share/public',
-        pass_through => 1,
-        _order => 2
-      },
-    });
+    $self->load_module(
+      'Middleware' => {
+        Static => {
+          root         => 'share/public',
+          pass_through => 1,
+          _order       => 2
+        },
+      }
+    );
 
     $self->logger->info("Game::EvonyTKR application built successfully");
   }

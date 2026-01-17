@@ -150,7 +150,8 @@ sub prebuildPrerequisites ($job, $args = {}) {
   if (scalar(keys($args->%*)) == 0) {
     foreach my $prereq_plugin ($prereq_plugins->@*) {
       if (any { $_ eq $prereq_plugin } @loaded_plugins) {
-        $job->logger->debug(sprintf('prereq %s is registered', $prereq_plugin,));
+        $job->logger->debug(
+          sprintf('prereq %s is registered', $prereq_plugin,));
         $prereqs->{$prereq_plugin} = 1;
       }
       else {

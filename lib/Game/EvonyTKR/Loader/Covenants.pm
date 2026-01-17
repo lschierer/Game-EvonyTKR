@@ -12,17 +12,17 @@ use YAML::PP;
 require Game::EvonyTKR::Model::Covenant;
 
 has data_dir => (
-  is => 'ro',
+  is       => 'ro',
   required => 1,
 );
 
 has generals_loader => (
-  is => 'ro',
+  is       => 'ro',
   required => 1,
 );
 
 has covenants => (
-  is => 'rw',
+  is      => 'rw',
   default => sub { {} },
 );
 
@@ -36,13 +36,14 @@ sub load_all {
   }
 
   my @yaml_files = $dir->children(qr/\.ya?ml$/);
-  $self->logger->info(sprintf("Found %d covenant files to load", scalar @yaml_files));
+  $self->logger->info(
+    sprintf("Found %d covenant files to load", scalar @yaml_files));
 
   my $loaded = 0;
   for my $file (@yaml_files) {
     eval {
       my $data = YAML::PP->new(
-        schema => [qw/ + Perl /],
+        schema       => [qw/ + Perl /],
         yaml_version => ['1.2', '1.1'],
       )->load_string($file->slurp_utf8);
 
@@ -55,26 +56,29 @@ sub load_all {
       # Get the primary general object
       my $primary_general = $self->generals_loader->get_general($data->{name});
       unless ($primary_general) {
-        $self->logger->error("Cannot find primary general '$data->{name}' for covenant in $file");
+        $self->logger->error(
+          "Cannot find primary general '$data->{name}' for covenant in $file");
         return;
       }
 
       # Create covenant with the primary general object
-      my $covenant = Game::EvonyTKR::Model::Covenant->from_hash($data, $primary_general);
+      my $covenant =
+        Game::EvonyTKR::Model::Covenant->from_hash($data, $primary_general);
       if ($covenant) {
         # Debug: Check if primary is set
         $self->logger->debug(sprintf(
           "Created covenant for '%s', primary is %s",
-          $data->{name},
-          $covenant->primary ? 'defined' : 'NOT DEFINED'
+          $data->{name}, $covenant->primary ? 'defined' : 'NOT DEFINED'
         ));
 
         # Store using normalized key for case-insensitive lookup
         my $normalized_key = $self->normalize($data->{name});
         $self->covenants->{$normalized_key} = $covenant;
         $loaded++;
-        $self->logger->debug("Loaded covenant: $data->{name} (key: $normalized_key)");
-      } else {
+        $self->logger->debug(
+          "Loaded covenant: $data->{name} (key: $normalized_key)");
+      }
+      else {
         $self->logger->error("Failed to create covenant from $file");
       }
     };
@@ -95,7 +99,7 @@ sub get_covenant {
 
 sub list_covenants {
   my ($self) = @_;
-  return [sort keys %{$self->covenants}];
+  return [sort keys %{ $self->covenants }];
 }
 
 1;

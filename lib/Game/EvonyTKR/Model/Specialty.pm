@@ -28,13 +28,13 @@ package Game::EvonyTKR::Model::Specialty {
     'fallback' => 0;
 
   has name => (
-    is => 'rw',
-    default => sub { '' }
+    is      => 'rw',
+    default => sub {''}
   );
 
   has id => (
-    is => 'ro',
-    lazy => 1,
+    is      => 'ro',
+    lazy    => 1,
     default => sub {
       my ($self) = @_;
       if (defined($self) && defined($self->UUID5_base)) {
@@ -48,8 +48,8 @@ package Game::EvonyTKR::Model::Specialty {
   );
 
   has levels => (
-    is => 'rw',
-    lazy => 1,
+    is      => 'rw',
+    lazy    => 1,
     default => sub {
       my ($self) = @_;
       return $self->_init_empty_levels();

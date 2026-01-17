@@ -21,35 +21,35 @@ package Game::EvonyTKR::Model::Buff {
 
   our $VERSION = 'v0.30.0';
 
-  has attribute => (is => 'rw');
+  has attribute    => (is => 'rw');
   has targetedType => (is => 'rw');
 
   has value => (
-    is => 'rw',
-    lazy => 1,
+    is      => 'rw',
+    lazy    => 1,
     default => sub { Game::EvonyTKR::Model::Buff::Value->new() }
   );
 
   has debuffConditions => (
-    is => 'rw',
-    lazy => 1,
+    is      => 'rw',
+    lazy    => 1,
     default => sub { [] }
   );
 
   has buffConditions => (
-    is => 'rw',
-    lazy => 1,
+    is      => 'rw',
+    lazy    => 1,
     default => sub { [] }
   );
 
   has passive => (
-    is => 'rw',
-    default => sub { 0 }
+    is      => 'rw',
+    default => sub {0}
   );
 
   has DISABLED => (
-    is => 'rw',
-    default => sub { 0 }
+    is      => 'rw',
+    default => sub {0}
   );
 
   sub clone ($self) {

@@ -16,8 +16,8 @@ package Game::EvonyTKR::Role::Common {
   use List::AllUtils     qw(min max uniq none all );
 
   has collection_dir => (
-    is => 'ro',
-    lazy => 1,
+    is      => 'ro',
+    lazy    => 1,
     default => sub {
       my $home = Mojo::Home->new->detect('Game::EvonyTKR');
       return $home->child('share/collections/data');
@@ -72,8 +72,8 @@ package Game::EvonyTKR::Role::Common {
   }
 
   has globalDN => (
-    is => 'ro',
-    lazy => 1,
+    is      => 'ro',
+    lazy    => 1,
     default => sub {
       return X500::DN->new(
         X500::RDN->new('OU' => 'EvonyTKR'),
@@ -86,8 +86,8 @@ package Game::EvonyTKR::Role::Common {
   );
 
   has UUID5_base => (
-    is => 'ro',
-    lazy => 1,
+    is      => 'ro',
+    lazy    => 1,
     default => sub {
       my ($self) = @_;
       my $ns_base = uuid5(dns => 'perl.org');

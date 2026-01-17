@@ -18,8 +18,6 @@ class Game::EvonyTKR::Model::Logger {
     'bool'     => sub { $_[0]->_isTrue },
     'fallback' => 0;                        # allow Perl defaults for the rest
 
-
-
   method logger {
     my $log = Log::Handler->create_logger(blessed($self));
     return $log;

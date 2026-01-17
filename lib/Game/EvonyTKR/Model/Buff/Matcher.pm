@@ -14,8 +14,8 @@ package Game::EvonyTKR::Model::Buff::Matcher {
   has toTest => (is => 'rw');
 
   has general_to_targeted => (
-    is => 'ro',
-    lazy => 1,
+    is      => 'ro',
+    lazy    => 1,
     default => sub {
       return {
         mounted => 'Mounted Troops',
@@ -28,8 +28,8 @@ package Game::EvonyTKR::Model::Buff::Matcher {
 
   # Conditions that are equivalent to having no condition
   has no_op_Conditions => (
-    is => 'ro',
-    lazy => 1,
+    is      => 'ro',
+    lazy    => 1,
     default => sub {
       return [
         "brings a dragon",
@@ -72,7 +72,8 @@ package Game::EvonyTKR::Model::Buff::Matcher {
       }
     }
     else {
-      $self->logger->debug("$logID the buff to be tested had no targeted types.");
+      $self->logger->debug(
+        "$logID the buff to be tested had no targeted types.");
     }
     $self->logger->debug($logID . ' matchTargetedType found no issue');
     return 1;
@@ -80,7 +81,8 @@ package Game::EvonyTKR::Model::Buff::Matcher {
 
   sub matchDebuffConditions ($self, $testDebuffs, $logID) {
     my $has_debuff_conditions = scalar @{ $self->toTest->debuffConditions } > 0;
-    $self->logger->debug("$logID has_debuff_conditions is $has_debuff_conditions");
+    $self->logger->debug(
+      "$logID has_debuff_conditions is $has_debuff_conditions");
     if ($has_debuff_conditions) {
       if (scalar @$testDebuffs == 0) {
         $self->logger->debug(

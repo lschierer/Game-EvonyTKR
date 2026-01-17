@@ -56,27 +56,27 @@ The workflow:
 =cut
 
 has 'compiler' => (
-  is => 'ro',
-  lazy => 1,
+  is      => 'ro',
+  lazy    => 1,
   default => sub ($self) {
     Game::EvonyTKR::Service::PDL::Compiler->new(data_dir => $self->data_dir);
   },
 );
 
 has 'data_dir' => (
-  is => 'ro',
-  default => sub { 'share/collections/data' },
+  is      => 'ro',
+  default => sub {'share/collections/data'},
 );
 
 has 'log' => (
-  is => 'ro',
-  lazy => 1,
+  is      => 'ro',
+  lazy    => 1,
   default => sub { WebFramework::Role::Logger::get_logger(__PACKAGE__); },
 );
 
 # Cache of compiled matrices: { "general_name:activation" => compiled_data }
 has 'matrix_cache' => (
-  is => 'ro',
+  is      => 'ro',
   default => sub { {} },
 );
 

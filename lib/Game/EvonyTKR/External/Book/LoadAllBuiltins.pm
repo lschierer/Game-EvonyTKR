@@ -55,7 +55,8 @@ package Game::EvonyTKR::External::Book::LoadAllBuiltins {
     ));
     my @list;
     push @list, $job->list_builtin_books()->@*;
-    $job->logger->info(sprintf('Found %d builtin books to process', scalar @list));
+    $job->logger->info(
+      sprintf('Found %d builtin books to process', scalar @list));
 
     my $enqueued_count = 0;
     my $skipped_count  = 0;

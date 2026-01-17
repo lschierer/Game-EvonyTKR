@@ -270,7 +270,8 @@ package Game::EvonyTKR::Controller::Pairs {
         status => 400
       );
     }
-    $c->logger->debug('diagnostic_pairs_by_type calling get_pairs_for_type_batch');
+    $c->logger->debug(
+      'diagnostic_pairs_by_type calling get_pairs_for_type_batch');
     my $pairs_for_type = $c->get_pairs_for_type_batch($type);
     my $pair_count     = scalar(@$pairs_for_type);
 
@@ -299,7 +300,8 @@ package Game::EvonyTKR::Controller::Pairs {
     my $data_model = Game::EvonyTKR::Model::Data->new;
 
     unless ($data_model->validateBuffActivation($buffActivation)) {
-      $c->logger->warn("Invalid Buff Activation: $buffActivation, using 'Overall'");
+      $c->logger->warn(
+        "Invalid Buff Activation: $buffActivation, using 'Overall'");
       $buffActivation = 'Overall';
     }
 
@@ -606,7 +608,8 @@ package Game::EvonyTKR::Controller::Pairs {
     }
     else {
       # Empty session = all pairs (shouldn't happen in practice)
-      $c->logger->debug('Empty session, loading all pairs (shouldn\'t happen!)');
+      $c->logger->debug(
+        'Empty session, loading all pairs (shouldn\'t happen!)');
       my $pairs_for_type = $c->get_pairs_for_type_batch($type);
       @sorted_pairs = sort {
         my $pc = $a->{primary}->{name} cmp $b->{primary}->{name};

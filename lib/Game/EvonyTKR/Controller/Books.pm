@@ -11,11 +11,11 @@ package Game::EvonyTKR::Controller::Books {
   use List::AllUtils qw(all any none first);
   use Carp;
   use Future::AsyncAwait;
-  use Path::Tiny qw(path);
+  use Path::Tiny  qw(path);
   use URI::Escape qw(uri_unescape);
 
   # Specify which collection this controller handles
-  sub collection_name { 'Books' }
+  sub collection_name {'Books'}
 
   my $base = '/Reference/Books';
 
@@ -35,18 +35,12 @@ package Game::EvonyTKR::Controller::Books {
     $self->SUPER::build();
 
     # Add navigation for main books page
-    $self->add_navigation_route(
-      $base,
-      'Books',
-      { order => 30, parent => '/Reference' }
-    );
+    $self->add_navigation_route($base, 'Books',
+      { order => 30, parent => '/Reference' });
 
     # Add navigation for Skill Books
-    $self->add_navigation_route(
-      "$base/Skill",
-      'Skill Books',
-      { order => 10, parent => $base }
-    );
+    $self->add_navigation_route("$base/Skill", 'Skill Books',
+      { order => 10, parent => $base });
 
     # Add navigation for Generic Books
     $self->add_navigation_route(
@@ -57,46 +51,61 @@ package Game::EvonyTKR::Controller::Books {
 
     # Register routes
     # Main books landing page
-    $self->router->add($base, {
-      to => async sub ($self, $ctx) {
-        return await $self->index($ctx);
-      },
-      action => 'http.*',
-    });
+    $self->router->add(
+      $base,
+      {
+        to => async sub ($self, $ctx) {
+          return await $self->index($ctx);
+        },
+        action => 'http.*',
+      }
+    );
 
     # Skill books index
-    $self->router->add("$base/Skill", {
-      to => async sub ($self, $ctx) {
-        return await $self->skill_books_index($ctx);
-      },
-      action => 'http.*',
-    });
+    $self->router->add(
+      "$base/Skill",
+      {
+        to => async sub ($self, $ctx) {
+          return await $self->skill_books_index($ctx);
+        },
+        action => 'http.*',
+      }
+    );
 
     # Generic books index
-    $self->router->add("$base/Generic", {
-      to => async sub ($self, $ctx) {
-        return await $self->generic_books_index($ctx);
-      },
-      action => 'http.*',
-    });
+    $self->router->add(
+      "$base/Generic",
+      {
+        to => async sub ($self, $ctx) {
+          return await $self->generic_books_index($ctx);
+        },
+        action => 'http.*',
+      }
+    );
 
     # Skill book detail
-    $self->router->add("$base/Skill/:book_name", {
-      to => async sub ($self, $ctx, @args) {
-        my $book_name = uri_unescape($args[0]);
-        return await $self->show_skill_book($ctx, $book_name);
-      },
-      action => 'http.*',
-    });
+    $self->router->add(
+      "$base/Skill/:book_name",
+      {
+        to => async sub ($self, $ctx, @args) {
+          my $book_name = uri_unescape($args[0]);
+          return await $self->show_skill_book($ctx, $book_name);
+        },
+        action => 'http.*',
+      }
+    );
 
     # Generic book detail
-    $self->router->add("$base/Generic/:book_name", {
-      to => async sub ($self, $ctx, @args) {
-        my $book_name = uri_unescape($args[0]);
-        return await $self->show_generic_book($ctx, $book_name);
-      },
-      action => 'http.*',
-    });
+    $self->router->add(
+      "$base/Generic/:book_name",
+      {
+        to => async sub ($self, $ctx, @args) {
+          my $book_name = uri_unescape($args[0]);
+          return await $self->show_generic_book($ctx, $book_name);
+        },
+        action => 'http.*',
+      }
+    );
 
     # Build navigation items for individual books
     $self->build_nav_items();
@@ -131,11 +140,8 @@ package Game::EvonyTKR::Controller::Books {
 
       # Add to navigation
       eval {
-        $self->add_navigation_route(
-          "$base/Skill/$display_name",
-          $display_name,
-          { order => 10, parent => "$base/Skill" }
-        );
+        $self->add_navigation_route("$base/Skill/$display_name", $display_name,
+          { order => 10, parent => "$base/Skill" });
       };
       if ($@) {
         $self->logger->error(sprintf(
@@ -174,11 +180,8 @@ package Game::EvonyTKR::Controller::Books {
 
       # Add to navigation
       eval {
-        $self->add_navigation_route(
-          "$base/Generic/$display_name",
-          $display_name,
-          { order => 20, parent => "$base/Generic" }
-        );
+        $self->add_navigation_route("$base/Generic/$display_name",
+          $display_name, { order => 20, parent => "$base/Generic" });
       };
       if ($@) {
         $self->logger->error(sprintf(
@@ -225,15 +228,15 @@ package Game::EvonyTKR::Controller::Books {
     foreach my $book_name ($books_loader->list_skill_books->@*) {
       my $book = $books_loader->get_skill_book($book_name);
       unless ($book) {
-        $self->logger->error(sprintf('Failed to get listed skill book "%s"', $book_name));
+        $self->logger->error(
+          sprintf('Failed to get listed skill book "%s"', $book_name));
         next;
       }
       push @{$items}, $book;
     }
 
     $self->logger->debug(
-      sprintf('Skill books: %s with %s items', ref($items), scalar(@$items))
-    );
+      sprintf('Skill books: %s with %s items', ref($items), scalar(@$items)));
 
     my $vars = {
       items        => $items,
@@ -263,15 +266,15 @@ package Game::EvonyTKR::Controller::Books {
     foreach my $book_key ($books_loader->list_generic_books->@*) {
       my $book = $books_loader->get_generic_book($book_key);
       unless ($book) {
-        $self->logger->error(sprintf('Failed to get listed generic book "%s"', $book_key));
+        $self->logger->error(
+          sprintf('Failed to get listed generic book "%s"', $book_key));
         next;
       }
       push @{$items}, $book;
     }
 
     $self->logger->debug(
-      sprintf('Generic books: %s with %s items', ref($items), scalar(@$items))
-    );
+      sprintf('Generic books: %s with %s items', ref($items), scalar(@$items)));
 
     my $vars = {
       items        => $items,

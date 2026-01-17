@@ -10,12 +10,12 @@ use YAML::PP;
 require Game::EvonyTKR::Model::General;
 
 has data_dir => (
-  is => 'ro',
+  is       => 'ro',
   required => 1,
 );
 
 has generals => (
-  is => 'rw',
+  is      => 'rw',
   default => sub { {} },
 );
 
@@ -29,20 +29,21 @@ sub load_all {
   }
 
   my @yaml_files = $dir->children(qr/\.ya?ml$/);
-  $self->logger->info(sprintf("Found %d general files to load", scalar @yaml_files));
+  $self->logger->info(
+    sprintf("Found %d general files to load", scalar @yaml_files));
 
   my $loaded = 0;
   for my $file (@yaml_files) {
     eval {
       my $data = YAML::PP->new(
-        schema => [qw/ + Perl /],
+        schema       => [qw/ + Perl /],
         yaml_version => ['1.2', '1.1'],
       )->load_string($file->slurp_utf8);
 
       # The file name (without extension) is the general name
       my $general_name = $file->basename(qr/\.ya?ml$/);
 
-      # Only set name if not already in YAML (prefer YAML name for correct encoding)
+  # Only set name if not already in YAML (prefer YAML name for correct encoding)
       $data->{name} = $general_name unless exists $data->{name};
 
       my $general = Game::EvonyTKR::Model::General->from_hash($data);
@@ -51,8 +52,10 @@ sub load_all {
         my $normalized_key = $self->normalize($general_name);
         $self->generals->{$normalized_key} = $general;
         $loaded++;
-        $self->logger->debug("Loaded general: $general_name (key: $normalized_key)");
-      } else {
+        $self->logger->debug(
+          "Loaded general: $general_name (key: $normalized_key)");
+      }
+      else {
         $self->logger->error("Failed to create general from $file");
       }
     };
@@ -73,7 +76,7 @@ sub get_general {
 
 sub list_generals {
   my ($self) = @_;
-  return [sort keys %{$self->generals}];
+  return [sort keys %{ $self->generals }];
 }
 
 1;

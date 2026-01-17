@@ -36,17 +36,17 @@ Delay in seconds before sending complete event to ensure last batch is flushed. 
 
 has table_batch_size => (
   is      => 'ro',
-  default => sub { 50 },
+  default => sub {50},
 );
 
 has table_loop_delay => (
   is      => 'ro',
-  default => sub { 0.01 },
+  default => sub {0.01},
 );
 
 has table_complete_flush_delay => (
   is      => 'ro',
-  default => sub { 0.1 },
+  default => sub {0.1},
 );
 
 =head1 METHODS

@@ -17,13 +17,13 @@ package Game::EvonyTKR::Model::Buff::Value {
     'fallback' => 0;
 
   has number => (
-    is => 'rw',
-    default => sub { 0 }
+    is      => 'rw',
+    default => sub {0}
   );
 
   has unit => (
-    is => 'rw',
-    default => sub { 'flat' }
+    is      => 'rw',
+    default => sub {'flat'}
   );
 
   sub clone ($self) {

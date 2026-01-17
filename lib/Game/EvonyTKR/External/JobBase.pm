@@ -5,7 +5,7 @@ use utf8::all;
 use Mojo::Base 'Minion::Job',                       -signatures;
 use Mojo::Base 'Mojolicious::Plugin',               -role, -signatures;
 use Mojo::Base 'Game::EvonyTKR::Role::Common',      -role, -signatures;
-use Mojo::Base 'WebFramework::Role::Logger',     -role;
+use Mojo::Base 'WebFramework::Role::Logger',        -role;
 use Mojo::Base 'Game::EvonyTKR::Role::JSON',        -role;
 use Mojo::Base 'Game::EvonyTKR::Role::Persistence', -role;
 use diagnostics;
@@ -99,7 +99,8 @@ sub harvest_tagged_jobs ($job) {
   # Only harvest once per prebuild run - use a metadata flag
   my $harvest_key = "harvested_" . $job->prebuild_run_id;
   if ($job->persistence->get_metadata($harvest_key)) {
-    $job->logger->debug("Harvesting already done for run " . $job->prebuild_run_id);
+    $job->logger->debug(
+      "Harvesting already done for run " . $job->prebuild_run_id);
     return 0;
   }
 

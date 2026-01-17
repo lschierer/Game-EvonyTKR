@@ -1,0 +1,10 @@
+Perltidy version is 20250711
+
+lib/LinkChecker/DistributedCommand.pm: Begin Error Output Stream
+65: expecting ':' or ';' or '{' after definition or declaration of sub '_logger' but saw '-'
+
+82: sub execute ($self) {
+    ^
+found sub where operator expected
+
+Missing ';' or ',' above?

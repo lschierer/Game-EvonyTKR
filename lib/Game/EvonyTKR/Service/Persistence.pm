@@ -5,45 +5,43 @@ use Moo;
 
 # Mode-gated persistence factory
 has mode => (
-  is => 'ro',
-  lazy => 1,
+  is      => 'ro',
+  lazy    => 1,
   default => sub { $ENV{MOJO_MODE} || 'development' }
 );
 
-has config => (
-  is => 'ro'
-);    # Optional config hash from NotYAMLConfig
+has config => (is => 'ro');    # Optional config hash from NotYAMLConfig
 
 has backend => (
-  is => 'ro',
-  lazy => 1,
+  is      => 'ro',
+  lazy    => 1,
   default => sub ($self) {
-  my $config             = $self->config          || {};
-  my $persistence_config = $config->{persistence} || {};
+    my $config             = $self->config          || {};
+    my $persistence_config = $config->{persistence} || {};
 
-  # Determine backend: explicit config > mode-based fallback
-  my $backend_type = $persistence_config->{backend};
+    # Determine backend: explicit config > mode-based fallback
+    my $backend_type = $persistence_config->{backend};
 
-  # Fall back to mode-based selection if no explicit backend configured
-  unless ($backend_type) {
-    $backend_type = 'postgresql';    # Default to PostgreSQL for all modes
-    warn sprintf(
-      "[Persistence] No explicit backend configured, using default: %s\n",
-      $backend_type);
-  }
+    # Fall back to mode-based selection if no explicit backend configured
+    unless ($backend_type) {
+      $backend_type = 'postgresql';    # Default to PostgreSQL for all modes
+      warn sprintf(
+        "[Persistence] No explicit backend configured, using default: %s\n",
+        $backend_type);
+    }
 
-  if ($backend_type eq 'postgresql') {
-    require Game::EvonyTKR::Service::PostgreSQLPersistence;
-    return Game::EvonyTKR::Service::PostgreSQLPersistence->new(
-      config => $persistence_config);
-  }
-  else {
-    croak(sprintf(
-      "Unknown persistence backend type: %s "
-        . "(expected 'postgresql', 'sqlite', or 'dynamodb')\n",
-      $backend_type
-    ));
-  }
+    if ($backend_type eq 'postgresql') {
+      require Game::EvonyTKR::Service::PostgreSQLPersistence;
+      return Game::EvonyTKR::Service::PostgreSQLPersistence->new(
+        config => $persistence_config);
+    }
+    else {
+      croak(sprintf(
+        "Unknown persistence backend type: %s "
+          . "(expected 'postgresql', 'sqlite', or 'dynamodb')\n",
+        $backend_type
+      ));
+    }
   }
 );
 

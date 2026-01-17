@@ -21,10 +21,15 @@ has 'delay'        => 0.1;
 has 'debug'        => 0;
 has 'minion';
 has 'shared_state' => sub { { checked => {}, broken => {}, metrics => {} } };
-has 'logger->file'     => sub { return Path::Tiny::path(File::HomeDir::Tiny::home)->child('var/log/Perl/dist/')->child(__PACKAGE__)->child('linkchecker_access.log'); };
-has 'max_retries'  => 3;
-has 'job_timeout'  => 3600;    # 1 hour max per job execution
-has 'inactive_timeout' => 900; # 15 minutes max for job to stay queued
+has 'logger->file' => sub {
+  return Path::Tiny::path(File::HomeDir::Tiny::home)
+    ->child('var/log/Perl/dist/')
+    ->child(__PACKAGE__)
+    ->child('linkchecker_access.log');
+};
+has 'max_retries'      => 3;
+has 'job_timeout'      => 3600;    # 1 hour max per job execution
+has 'inactive_timeout' => 900;     # 15 minutes max for job to stay queued
 
 sub init ($self) {
   # Create Minion instance with temporary SQLite file
@@ -37,7 +42,8 @@ sub init ($self) {
   if ($self->logger->file =~ m{^(.+)/[^/]+$}) {
     my $logger->dir = $1;
     unless (-d $logger->dir) {
-      mkdir $logger->dir or warn "Could not create log directory $logger->dir: $!";
+      mkdir $logger->dir
+        or warn "Could not create log directory $logger->dir: $!";
     }
   }
 
@@ -56,12 +62,13 @@ sub init ($self) {
   );
 }
 
-sub _logger->access ($self, $url, $status, $duration) {
-  return unless $self->logger->file;
+sub _logger->access($self, $url, $status, $duration){
+  return
+    unless $self->logger->file;
 
   my $timestamp = strftime("%Y-%m-%d %H:%M:%S", localtime());
-  my $logger->line = sprintf("[%s] %s %.3fs %s\n",
-    $timestamp, $status, $duration, $url);
+  my $logger->line =
+    sprintf("[%s] %s %.3fs %s\n", $timestamp, $status, $duration, $url);
 
   # Thread-safe logging with file locking
   if (open my $fh, '>>', $self->logger->file) {
@@ -70,9 +77,9 @@ sub _logger->access ($self, $url, $status, $duration) {
     flock($fh, LOCK_UN);
     close $fh;
   }
-}
+  }
 
-sub execute ($self) {
+  sub execute ($self) {
   say "Starting distributed link check with "
     . $self->worker_count
     . " workers";
@@ -103,12 +110,12 @@ sub execute ($self) {
   my %pending_external = ();
   my %retry_count      = ();    # Track retry attempts per URL
   my @active_jobs;
-  my %job_enqueue_times = ();   # Track when each job was enqueued
-  my %job_start_times   = ();   # Track when each job started executing
+  my %job_enqueue_times = ();    # Track when each job was enqueued
+  my %job_start_times   = ();    # Track when each job started executing
 
-  my $last_status_time = time();
-  my $last_progress_count = 0;
-  my $stall_check_interval = 60;  # Check for stalls every minute
+  my $last_status_time     = time();
+  my $last_progress_count  = 0;
+  my $stall_check_interval = 60;       # Check for stalls every minute
 
   while (%pending_internal || %pending_external || @active_jobs) {
     # Start jobs for internal URLs (with recursion)
@@ -125,12 +132,14 @@ sub execute ($self) {
       # Mark as in progress
       $pending_internal{$_} = -1 for @batch;
 
-      my $job_id = $self->minion->enqueue(check_url_section => [\@batch, 1] => {
-        attempts  => $self->max_retries,
-        expire    => $self->job_timeout * 3,
-      });
+      my $job_id = $self->minion->enqueue(
+        check_url_section => [\@batch, 1] => {
+          attempts => $self->max_retries,
+          expire   => $self->job_timeout * 3,
+        }
+      );
       push @active_jobs, $job_id;
-      $job_enqueue_times{$job_id} = time();  # Track when enqueued
+      $job_enqueue_times{$job_id} = time();    # Track when enqueued
       my $remaining =
         scalar(grep { !$pending_internal{$_} } keys %pending_internal);
       my $msg = sprintf('Queued internal batch job %s: %s. %d jobs remaining.',
@@ -153,13 +162,15 @@ sub execute ($self) {
       $pending_external{$_} = -1 for @batch;
 
       # bias external jobs to run last.
-      my $job_id = $self->minion->enqueue(check_url_section => [\@batch, 0] => {
-        attempts  => $self->max_retries,
-        expire    => $self->job_timeout * 3,
-        priority  => -1,  # Lower priority than internal (default 0)
-      });
+      my $job_id = $self->minion->enqueue(
+        check_url_section => [\@batch, 0] => {
+          attempts => $self->max_retries,
+          expire   => $self->job_timeout * 3,
+          priority => -1,    # Lower priority than internal (default 0)
+        }
+      );
       push @active_jobs, $job_id;
-      $job_enqueue_times{$job_id} = time();  # Track when enqueued
+      $job_enqueue_times{$job_id} = time();    # Track when enqueued
       say "Queued external batch job $job_id: " . join(', ', @batch)
         if $self->debug;
     }
@@ -181,7 +192,8 @@ sub execute ($self) {
         my $queue_time = time() - $job_enqueue_times{$job_id};
         if ($queue_time > $self->inactive_timeout) {
           say "Job $job_id stuck in queue for ${queue_time}s, failing it";
-          $job->fail("Job stuck inactive for ${queue_time}s - workers may have died");
+          $job->fail(
+            "Job stuck inactive for ${queue_time}s - workers may have died");
           $info = $job->info;    # Refresh info after failing
         }
       }
@@ -190,7 +202,8 @@ sub execute ($self) {
       if (exists $job_start_times{$job_id} && $info->{state} eq 'active') {
         my $elapsed = time() - $job_start_times{$job_id};
         if ($elapsed > $self->job_timeout) {
-          say "Job $job_id timed out after ${elapsed}s of execution, failing it";
+          say
+            "Job $job_id timed out after ${elapsed}s of execution, failing it";
           $job->fail("Job timed out after ${elapsed}s of execution");
           $info = $job->info;    # Refresh info after failing
         }
@@ -228,9 +241,8 @@ sub execute ($self) {
           $pending_external{$url} = 1 if exists $pending_external{$url};
         }
 
-        say "Job $job_id completed: "
-          . keys($results->{checked}->%*)
-          . " URLs checked"
+        say "Job $job_id completed: " .
+          keys($results->{checked}->%*) . " URLs checked"
           if $self->debug;
         delete $job_start_times{$job_id};
         delete $job_enqueue_times{$job_id};
@@ -291,8 +303,10 @@ sub execute ($self) {
     } @active_jobs;
 
     # Quick exit check - if no pending work and no active jobs, we're done
-    my $has_pending_internal = grep { $_ == 0 || $_ == -1 } values %pending_internal;
-    my $has_pending_external = grep { $_ == 0 || $_ == -1 } values %pending_external;
+    my $has_pending_internal =
+      grep { $_ == 0 || $_ == -1 } values %pending_internal;
+    my $has_pending_external =
+      grep { $_ == 0 || $_ == -1 } values %pending_external;
     if (!$has_pending_internal && !$has_pending_external && !@active_jobs) {
       say "All work complete, exiting";
       last;
@@ -302,16 +316,21 @@ sub execute ($self) {
     my $now = time();
     if ($now - $last_status_time > $stall_check_interval) {
       my $current_checked = keys $self->shared_state->{checked}->%*;
-      my $pending_int_count = scalar(grep { $_ == 0 || $_ == -1 } values %pending_internal);
-      my $pending_ext_count = scalar(grep { $_ == 0 || $_ == -1 } values %pending_external);
+      my $pending_int_count =
+        scalar(grep { $_ == 0 || $_ == -1 } values %pending_internal);
+      my $pending_ext_count =
+        scalar(grep { $_ == 0 || $_ == -1 } values %pending_external);
 
       say sprintf(
-        "Status: %d checked, %d pending internal, %d pending external, %d active jobs",
-        $current_checked, $pending_int_count, $pending_ext_count, scalar(@active_jobs)
+"Status: %d checked, %d pending internal, %d pending external, %d active jobs",
+        $current_checked,   $pending_int_count,
+        $pending_ext_count, scalar(@active_jobs)
       );
 
       # Exit if no work remains and no active jobs
-      if ($pending_int_count == 0 && $pending_ext_count == 0 && @active_jobs == 0) {
+      if ( $pending_int_count == 0
+        && $pending_ext_count == 0
+        && @active_jobs == 0) {
         say "No pending work and no active jobs, exiting main loop";
         last;
       }
@@ -319,7 +338,8 @@ sub execute ($self) {
       # Check if we're making progress
       if ($current_checked == $last_progress_count && @active_jobs > 0) {
         say "WARNING: No progress in ${stall_check_interval}s with "
-          . scalar(@active_jobs) . " active jobs";
+          . scalar(@active_jobs)
+          . " active jobs";
 
         # Check if workers are still alive
         my $live_workers = 0;
@@ -330,7 +350,8 @@ sub execute ($self) {
 
         # If no workers alive, fail all remaining jobs so we can exit
         if ($live_workers == 0 && @active_jobs > 0) {
-          say "ERROR: All workers died, failing remaining jobs to exit gracefully";
+          say
+"ERROR: All workers died, failing remaining jobs to exit gracefully";
           for my $job_id (@active_jobs) {
             my $job = $self->minion->job($job_id);
             $job->fail("All workers died");
@@ -341,15 +362,17 @@ sub execute ($self) {
 
         # Show job states
         for my $job_id (@active_jobs) {
-          my $job = $self->minion->job($job_id);
+          my $job  = $self->minion->job($job_id);
           my $info = $job->info;
-          my $queue_time = exists $job_enqueue_times{$job_id}
-            ? time() - $job_enqueue_times{$job_id} : 'unknown';
+          my $queue_time =
+            exists $job_enqueue_times{$job_id}
+            ? time() - $job_enqueue_times{$job_id}
+            : 'unknown';
           say "  Job $job_id: state=$info->{state}, queued=${queue_time}s";
         }
       }
 
-      $last_status_time = $now;
+      $last_status_time    = $now;
       $last_progress_count = $current_checked;
     }
 
@@ -378,7 +401,7 @@ sub _process_urls ($self, $job, $urls, $depth, $base_host) {
 
   for my $url_with_fragment (@$urls) {
     # Parse URL to separate fragment from the rest
-    my $uri = URI->new($url_with_fragment);
+    my $uri      = URI->new($url_with_fragment);
     my $fragment = $uri->fragment;
 
     # Create URL without fragment for HTTP request
@@ -387,7 +410,8 @@ sub _process_urls ($self, $job, $urls, $depth, $base_host) {
     my $url_for_request = $url_no_fragment->as_string;
 
     my $start_time = time();
-    my ($status, $size) = $self->_check_url_with_metrics($url_for_request, $base_host);
+    my ($status, $size) =
+      $self->_check_url_with_metrics($url_for_request, $base_host);
     my $duration = time() - $start_time;
 
     # Log with full URL including fragment

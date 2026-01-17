@@ -113,20 +113,20 @@ for my $i (0 .. $#BUFF_COLUMNS) {
 }
 
 has 'data_dir' => (
-  is => 'ro',
-  default => sub { 'share/collections/data' },
+  is      => 'ro',
+  default => sub {'share/collections/data'},
 );
 
 has 'log' => (
-  is => 'ro',
-  lazy => 1,
+  is      => 'ro',
+  lazy    => 1,
   default => sub { WebFramework::Role::Logger::get_logger(__PACKAGE__); },
 );
 
 # Cache helper to access General objects
 has 'cache_helper' => (
-  is => 'ro',
-  lazy => 1,
+  is      => 'ro',
+  lazy    => 1,
   default => sub {
     require Game::EvonyTKR::Model::Base;
     return Game::EvonyTKR::Model::Base->new();
@@ -168,7 +168,8 @@ sub compile_general ($self, $general_name, $activation_type) {
   my $general_obj = bless {
     name => $general_name,
     type => $general_data->{type},
-  }, 'Game::EvonyTKR::Service::PDL::Compiler::SimpleGeneral';
+    },
+    'Game::EvonyTKR::Service::PDL::Compiler::SimpleGeneral';
 
   # Determine troop type from general type
   my $troop_type = $self->_get_troop_type($general_data->{type});
@@ -261,7 +262,7 @@ sub _find_file_case_insensitive ($self, $dir, $entry) {
   my @suffixes         = qw(.yaml .yml);
   my $normalized_entry = lc($self->normalize($entry));
 
-  my @files = sort { $a cmp $b } $dir->children;
+  my @files    = sort { $a cmp $b } $dir->children;
   my @matching = grep {
     my ($basename) = fileparse($_, @suffixes);
     my $normalized_basename = lc($self->normalize($basename));
@@ -467,8 +468,10 @@ sub _compile_generic_book_buffs ($self, $level, $activation_type, $general) {
 
   return $row if $level eq 'none';
 
-  # Compute generic books on-demand using simplified selection (no conflict detection)
-  my $generic_buffs = $self->_select_best_generic_books_simple($general, $activation_type, $level);
+# Compute generic books on-demand using simplified selection (no conflict detection)
+  my $generic_buffs =
+    $self->_select_best_generic_books_simple($general, $activation_type,
+    $level);
 
   # Convert hash to PDL row
   foreach my $buff_key (keys %$generic_buffs) {
@@ -483,7 +486,8 @@ sub _compile_generic_book_buffs ($self, $level, $activation_type, $general) {
 # Simplified generic book selection without conflict detection
 # This is sufficient for single generals (partial conflicts are OK)
 # For pairs, see TODO comment above
-sub _select_best_generic_books_simple ($self, $general, $activation_type, $book_level) {
+sub _select_best_generic_books_simple ($self, $general, $activation_type,
+  $book_level) {
   my %buffs = ();
 
   unless ($general) {
@@ -492,7 +496,8 @@ sub _select_best_generic_books_simple ($self, $general, $activation_type, $book_
   }
 
   # Determine troop type from general
-  my $general_name = ref($general) && $general->{name} ? $general->{name} : $general;
+  my $general_name =
+    ref($general) && $general->{name} ? $general->{name} : $general;
   my $troop_type = $self->_get_troop_type($general->{type});
 
   # Determine activation key
@@ -509,22 +514,24 @@ sub _select_best_generic_books_simple ($self, $general, $activation_type, $book_
   }
 
   # Sort by priority and take top 3
-  my @sorted_book_names = sort { $best_books->{$a} <=> $best_books->{$b} } keys %$best_books;
-  my @selected_books = @sorted_book_names[0..2];  # Top 3 books
+  my @sorted_book_names =
+    sort { $best_books->{$a} <=> $best_books->{$b} } keys %$best_books;
+  my @selected_books = @sorted_book_names[0 .. 2];    # Top 3 books
 
   my $book_level_num = $book_level =~ /(\d+)/ ? $1 : 4;
 
-  # Load and sum buffs from selected books
-  # Note: Generic book filenames include the level (e.g., "Level 4 Ground Troop Attack.yaml")
+# Load and sum buffs from selected books
+# Note: Generic book filenames include the level (e.g., "Level 4 Ground Troop Attack.yaml")
   my $books_dir = path($self->data_dir, 'generic books');
   foreach my $book_name (@selected_books) {
     # book_name already has "Level X" prefix (e.g., "Level 4 March Size")
     # But we need to use the correct level from book_level_num
-    my $base_name = $book_name =~ s/^Level \d+ //r;
+    my $base_name      = $book_name =~ s/^Level \d+ //r;
     my $full_book_name = "Level $book_level_num $base_name";
 
     # Load the book YAML
-    my $book_file = $self->_find_file_case_insensitive($books_dir, $full_book_name);
+    my $book_file =
+      $self->_find_file_case_insensitive($books_dir, $full_book_name);
     unless ($book_file) {
       $self->log->warn("Could not find generic book: $full_book_name");
       next;
@@ -536,7 +543,7 @@ sub _select_best_generic_books_simple ($self, $general, $activation_type, $book_
     foreach my $buff (@{ $book_data->{buffs} || [] }) {
       next unless $self->_buff_applies($buff, $activation_type, $troop_type);
 
-      my $is_debuff = grep { $_ eq 'Enemy' } @{ $buff->{conditions} || [] };
+      my $is_debuff  = grep { $_ eq 'Enemy' } @{ $buff->{conditions} || [] };
       my $column_key = $self->_get_buff_column_key($buff, $is_debuff);
       next unless defined $column_key && exists $BUFF_INDEX{$column_key};
 
@@ -547,8 +554,8 @@ sub _select_best_generic_books_simple ($self, $general, $activation_type, $book_
 
   $self->log->debug(sprintf(
     "Selected generic books for %s/%s/level%d: %s",
-    $general_name, $activation_type, $book_level_num,
-    join(', ', map {"$_=$buffs{$_}"} keys %buffs)
+    $general_name,   $activation_type,
+    $book_level_num, join(', ', map {"$_=$buffs{$_}"} keys %buffs)
   ));
 
   return \%buffs;

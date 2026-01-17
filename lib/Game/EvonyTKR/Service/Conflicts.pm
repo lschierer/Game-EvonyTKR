@@ -1,11 +1,11 @@
 package Game::EvonyTKR::Service::Conflicts;
 use v5.42.0;
 use utf8::all;
-use Mojo::Base -base,                                               -signatures;
+use Mojo::Base -base,                                            -signatures;
 use Mojo::Base 'WebFramework::Role::Logger',                     -role;
-use Mojo::Base 'Game::EvonyTKR::Role::Common',                      -role;
-use Mojo::Base 'Game::EvonyTKR::Role::Persistence::Pairs',          -role;
-use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants',    -role;
+use Mojo::Base 'Game::EvonyTKR::Role::Common',                   -role;
+use Mojo::Base 'Game::EvonyTKR::Role::Persistence::Pairs',       -role;
+use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants', -role;
 with 'Game::EvonyTKR::Role::Constants::GeneralConstants';
 
 require Data::Printer;
@@ -133,7 +133,8 @@ sub load_from_persistence ($self, $persistence) {
   if ($conflicts && ref($conflicts) eq 'HASH') {
     $self->by_general($conflicts);
     my $count = scalar(keys %$conflicts);
-    $self->logger->debug("Loaded conflicts for $count generals from persistence");
+    $self->logger->debug(
+      "Loaded conflicts for $count generals from persistence");
   }
 
   return $self;
@@ -196,7 +197,8 @@ sub _record_compatible ($self, $g1, $g2) {
   my $norm1 = $self->normalize($g1->name);
   my $norm2 = $self->normalize($g2->name);
 
-  $self->logger->debug(sprintf('Recording compatible: %s ↔ %s', $norm1, $norm2));
+  $self->logger->debug(
+    sprintf('Recording compatible: %s ↔ %s', $norm1, $norm2));
 
   $self->by_general->{$norm1}{$norm2} = 0;
   $self->by_general->{$norm2}{$norm1} = 0;

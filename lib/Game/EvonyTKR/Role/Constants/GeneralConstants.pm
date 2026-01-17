@@ -10,7 +10,7 @@ package Game::EvonyTKR::Role::Constants::GeneralConstants {
   use Moo::Role;
   use Const::Fast;
   use Carp;
-  use UUID qw(uuid5);
+  use UUID           qw(uuid5);
   use List::AllUtils qw(none all any);
 
   const our %generalKeys => (
@@ -24,13 +24,14 @@ package Game::EvonyTKR::Role::Constants::GeneralConstants {
   );
 
   has GeneralKeys => (
-    is => 'ro',
-    lazy => 1,
+    is      => 'ro',
+    lazy    => 1,
     default => sub {
       my ($self) = @_;
       my @gk;
       push @gk, sort keys %generalKeys;
-      $self->logger->debug(sprintf('there are %s keys from generalKeys', scalar @gk));
+      $self->logger->debug(
+        sprintf('there are %s keys from generalKeys', scalar @gk));
       return \@gk;
     }
   );
@@ -72,11 +73,11 @@ package Game::EvonyTKR::Role::Constants::GeneralConstants {
   );
 
   has UUID5_Generals => (
-    is => 'ro',
-    lazy => 1,
+    is      => 'ro',
+    lazy    => 1,
     default => sub {
-      my ($self) = @_;
-      my $uuids = {};
+      my ($self)              = @_;
+      my $uuids               = {};
       my $UUID5_Generals_base = uuid5($self->UUID5_base, 'Generals');
       foreach my $gk (@{ $self->GeneralKeys }) {
         $uuids->{$gk} = uuid5($UUID5_Generals_base, $gk);

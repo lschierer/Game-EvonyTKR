@@ -4,13 +4,13 @@ use utf8::all;
 use Moo::Role;
 
 # Compose all granular persistence roles
-use Mojo::Base 'Game::EvonyTKR::Role::Persistence::Generals',            -role;
-use Mojo::Base 'Game::EvonyTKR::Role::Persistence::Books',               -role;
-use Mojo::Base 'Game::EvonyTKR::Role::Persistence::Covenants',           -role;
-use Mojo::Base 'Game::EvonyTKR::Role::Persistence::Specialties',         -role;
+use Mojo::Base 'Game::EvonyTKR::Role::Persistence::Generals',    -role;
+use Mojo::Base 'Game::EvonyTKR::Role::Persistence::Books',       -role;
+use Mojo::Base 'Game::EvonyTKR::Role::Persistence::Covenants',   -role;
+use Mojo::Base 'Game::EvonyTKR::Role::Persistence::Specialties', -role;
 with 'Game::EvonyTKR::Role::Persistence::AscendingAttributes';
-use Mojo::Base 'Game::EvonyTKR::Role::Persistence::Pairs',               -role;
-use Mojo::Base 'Game::EvonyTKR::Role::Persistence::Glossary',            -role;
+use Mojo::Base 'Game::EvonyTKR::Role::Persistence::Pairs',    -role;
+use Mojo::Base 'Game::EvonyTKR::Role::Persistence::Glossary', -role;
 
 1;
 __END__

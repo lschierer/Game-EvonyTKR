@@ -27,7 +27,7 @@ has validRoutes => (
 
 has routing_debug => (
   is      => 'ro',
-  default => sub { 0 },
+  default => sub {0},
 );
 
 sub all_valid_routes($c) {
@@ -41,13 +41,19 @@ sub get_routes_for_uiTarget ($c, $uiTarget) {
   #$c->logger->debug("slug for $uiTarget is $slug");
   foreach my $key (keys $c->validRoutes->%*) {
     if ($key =~ /^$uiTarget/) {
-      $c->logger->debug("'$key' =~ '$uiTarget' -- good") if $c->app->env eq 'development';
+      $c->logger->debug("'$key' =~ '$uiTarget' -- good")
+        if $c->app->env eq 'development';
       push @results, $c->validRoutes->{$key};
-    }else {
-      $c->logger->debug("'$key' !~ '$uiTarget'") if $c->app->env eq 'development';
+    }
+    else {
+      $c->logger->debug("'$key' !~ '$uiTarget'")
+        if $c->app->env eq 'development';
     }
   }
-  $c->logger->debug(sprintf('there are %s routes for ui target "%s"', scalar(@results), $uiTarget));
+  $c->logger->debug(sprintf(
+    'there are %s routes for ui target "%s"',
+    scalar(@results), $uiTarget
+  ));
   return @results;
 }
 
@@ -63,7 +69,8 @@ sub try_lookup_route ($c, $uiTarget, $buffActivation) {
   #my $slug_ui   = $c->_slugify($uiTarget);
   #my $slug_buff = $c->_slugify($buffActivation);
   #my $key       = "$slug_ui|$slug_buff";
-  return $c->validRoutes->{"$uiTarget|$buffActivation"};    # undef if missing; NO croak
+  return $c->validRoutes->{"$uiTarget|$buffActivation"}
+    ;    # undef if missing; NO croak
 }
 
 sub lookup_route ($c, $uiTarget, $buffActivation) {
@@ -75,13 +82,14 @@ sub lookup_route ($c, $uiTarget, $buffActivation) {
   }
   if ($c->routing_debug) {
     my @r = $c->all_valid_routes();
-    $c->logger->error("'$uiTarget|$buffActivation' is not a valid route. Valid routes are "
+    $c->logger->error(
+      "'$uiTarget|$buffActivation' is not a valid route. Valid routes are "
         . Data::Printer::np($c->validRoutes));
   }
   else {
     $c->logger->error("'$uiTarget|$buffActivation' is not a valid route.");
   }
-  return undef;  # Return undef instead of croaking - let caller handle it
+  return undef;    # Return undef instead of croaking - let caller handle it
 }
 
 sub _ui_target_name ($c, $tt) {
@@ -131,7 +139,7 @@ sub get_valid_routes($c) {
         && $tt =~ /(?:mayor|officer)/;
 
       # Generate slugs
-      my $uiTarget  = $c->_ui_target_name($tt);
+      my $uiTarget = $c->_ui_target_name($tt);
       #my $slug_ui   = $c->_slugify($uiTarget);
       #my $slug_buff = $c->_slugify($buffActivation);
 

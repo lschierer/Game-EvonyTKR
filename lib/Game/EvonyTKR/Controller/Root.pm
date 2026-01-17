@@ -21,32 +21,45 @@ package Game::EvonyTKR::Controller::Root {
     # Register root page
     $self->add_navigation_route('/', 'Home', { order => 0 });
 
-    $self->router->add('/', {
-      to => async sub ($self, $ctx) {
-        return await $self->index($ctx);
-      },
-      action => 'http.*',
-    });
+    $self->router->add(
+      '/',
+      {
+        to => async sub ($self, $ctx) {
+          return await $self->index($ctx);
+        },
+        action => 'http.*',
+      }
+    );
 
     # Register Reference page
     $self->add_navigation_route('/Reference', 'Reference', { order => 104 });
 
-    $self->router->add('/Reference', {
-      to => async sub ($self, $ctx) {
-        return await $self->single_page($ctx, '/Reference');
-      },
-      action => 'http.*',
-    });
+    $self->router->add(
+      '/Reference',
+      {
+        to => async sub ($self, $ctx) {
+          return await $self->single_page($ctx, '/Reference');
+        },
+        action => 'http.*',
+      }
+    );
 
     # Register privacy policy
-    $self->add_navigation_route('/policy/privacy', 'Privacy Policy', { order => 200 });
+    $self->add_navigation_route(
+      '/policy/privacy',
+      'Privacy Policy',
+      { order => 200 }
+    );
 
-    $self->router->add('/policy/privacy', {
-      to => async sub ($self, $ctx) {
-        return await $self->single_page($ctx, '/policy/privacy');
-      },
-      action => 'http.*',
-    });
+    $self->router->add(
+      '/policy/privacy',
+      {
+        to => async sub ($self, $ctx) {
+          return await $self->single_page($ctx, '/policy/privacy');
+        },
+        action => 'http.*',
+      }
+    );
   }
 
   async sub index ($self, $ctx) {
@@ -56,27 +69,33 @@ package Game::EvonyTKR::Controller::Root {
 
     unless ($index_path->exists) {
       $self->logger->error("Root index.md not found at $index_path");
-      return $self->render('root/index.tt', {
-        content => '<p>Welcome to EvonyTKR</p>',
-        title => 'EvonyTKR Guide',
-        current_year => (localtime)[5] + 1900,
-        sidebar => 0,
-        navigation => $self->render_navigation($ctx->req->path),
-        site_logo => $self->site_logo(),
-      });
+      return $self->render(
+        'root/index.tt',
+        {
+          content      => '<p>Welcome to EvonyTKR</p>',
+          title        => 'EvonyTKR Guide',
+          current_year => (localtime)[5] + 1900,
+          sidebar      => 0,
+          navigation   => $self->render_navigation($ctx->req->path),
+          site_logo    => $self->site_logo(),
+        }
+      );
     }
 
     # Render markdown and get HTML content
     my $content_html = $self->retrieve_rendered_markdown($index_path);
 
-    return $self->render('root/index.tt', {
-      content => $content_html,
-      title => 'EvonyTKR Guide',
-      current_year => (localtime)[5] + 1900,
-      sidebar => 0,
-      navigation => $self->render_navigation($ctx->req->path),
-      site_logo => $self->site_logo(),
-    });
+    return $self->render(
+      'root/index.tt',
+      {
+        content      => $content_html,
+        title        => 'EvonyTKR Guide',
+        current_year => (localtime)[5] + 1900,
+        sidebar      => 0,
+        navigation   => $self->render_navigation($ctx->req->path),
+        site_logo    => $self->site_logo(),
+      }
+    );
   }
 
   async sub single_page ($self, $ctx, $route_path) {
@@ -84,7 +103,7 @@ package Game::EvonyTKR::Controller::Root {
 
     # Convert route to file path
     my $file_path = $route_path;
-    $file_path =~ s|^/||;  # Remove leading slash
+    $file_path =~ s|^/||;    # Remove leading slash
     my $md_path = path('share/pages')->child("$file_path.md");
 
     unless ($md_path->exists) {
@@ -92,10 +111,14 @@ package Game::EvonyTKR::Controller::Root {
       return $self->render_error(404, "Page not found");
     }
 
-    return $self->render_markdown_page($md_path->stringify, $ctx->req->path, {
-      template => 'markdown.tt',
-      sidebar => 1,
-    });
+    return $self->render_markdown_page(
+      $md_path->stringify,
+      $ctx->req->path,
+      {
+        template => 'markdown.tt',
+        sidebar  => 1,
+      }
+    );
   }
 }
 

@@ -7,10 +7,10 @@ require Game::EvonyTKR::Model::Buff::Value;
 require Game::EvonyTKR::Service::Conflicts;
 
 package Game::EvonyTKR::Model::Buff::Summarizer {
-  use Mojo::Base 'Game::EvonyTKR::Model::Base',                    -signatures;
+  use Mojo::Base 'Game::EvonyTKR::Model::Base', -signatures;
   with 'Game::EvonyTKR::Role::Constants::BuffConstants';
   with 'Game::EvonyTKR::Role::Constants::GeneralConstants';
-  use Mojo::Base 'Game::EvonyTKR::Role::Constants::Books',            -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Constants::Books', -role;
   use List::AllUtils qw(first any all none uniq);
   use Carp;
   use diagnostics;
@@ -197,7 +197,8 @@ package Game::EvonyTKR::Model::Buff::Summarizer {
     };
 
     unless ($self->targetType) {
-      $self->logger->error(sprintf('targetType is required for %s', __PACKAGE__));
+      $self->logger->error(
+        sprintf('targetType is required for %s', __PACKAGE__));
       return 0;
     }
 

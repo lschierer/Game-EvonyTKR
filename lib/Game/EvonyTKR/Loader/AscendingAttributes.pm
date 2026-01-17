@@ -12,12 +12,12 @@ use YAML::PP;
 require Game::EvonyTKR::Model::AscendingAttributes;
 
 has data_dir => (
-  is => 'ro',
+  is       => 'ro',
   required => 1,
 );
 
 has ascending_attributes => (
-  is => 'rw',
+  is      => 'rw',
   default => sub { {} },
 );
 
@@ -31,13 +31,14 @@ sub load_all {
   }
 
   my @yaml_files = $dir->children(qr/\.ya?ml$/);
-  $self->logger->info(sprintf("Found %d ascending attribute files to load", scalar @yaml_files));
+  $self->logger->info(
+    sprintf("Found %d ascending attribute files to load", scalar @yaml_files));
 
   my $loaded = 0;
   for my $file (@yaml_files) {
     eval {
       my $data = YAML::PP->new(
-        schema => [qw/ + Perl /],
+        schema       => [qw/ + Perl /],
         yaml_version => ['1.2', '1.1'],
       )->load_string($file->slurp_utf8);
 
@@ -53,7 +54,9 @@ sub load_all {
       my $normalized_key = $self->normalize($general_name);
       $self->ascending_attributes->{$normalized_key} = $aa;
       $loaded++;
-      $self->logger->debug("Loaded ascending attributes for: $general_name (key: $normalized_key)");
+      $self->logger->debug(
+        "Loaded ascending attributes for: $general_name (key: $normalized_key)"
+      );
     };
     if ($@) {
       $self->logger->error("Failed to load $file: $@");
@@ -72,7 +75,7 @@ sub get_for_general {
 
 sub list_generals {
   my ($self) = @_;
-  return [sort keys %{$self->ascending_attributes}];
+  return [sort keys %{ $self->ascending_attributes }];
 }
 
 1;

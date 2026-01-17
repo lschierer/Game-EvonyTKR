@@ -127,7 +127,8 @@ package Game::EvonyTKR::External::General::Summarizer {
     # Get covenant
     $job->covenant($job->get_covenant($job->generalName));
     unless ($job->covenant) {
-      $job->logger->warn(sprintf('No covenant found for "%s"', $job->generalName));
+      $job->logger->warn(
+        sprintf('No covenant found for "%s"', $job->generalName));
     }
 
     # Get ascending attributes (primary only)

@@ -28,8 +28,8 @@ package Game::EvonyTKR::Model::General {
   our $VERSION = 'v0.40.0';
 
   has id => (
-    is => 'ro',
-    lazy => 1,
+    is      => 'ro',
+    lazy    => 1,
     default => sub {
       my ($self) = @_;
       my $general_type =
@@ -41,49 +41,39 @@ package Game::EvonyTKR::Model::General {
     }
   );
 
-  has name => (
-    is => 'rw'
-  );
+  has name => (is => 'rw');
 
-  has type => (
-    is => 'rw'
-  );
+  has type => (is => 'rw');
 
-  has ascendingAttributes => (
-    is => 'rw'
-  );
+  has ascendingAttributes => (is => 'rw');
 
-  has builtInBookName => (
-    is => 'rw'
-  );
+  has builtInBookName => (is => 'rw');
 
-  has builtInBook => (
-    is => 'rw'
-  );
+  has builtInBook => (is => 'rw');
 
   has specialtyNames => (
-    is => 'rw',
+    is      => 'rw',
     default => sub { [] }
   );
 
   has specialties => (
-    is => 'rw',
+    is      => 'rw',
     default => sub { [] }
   );
 
   has ascending => (
-    is => 'rw',
-    default => sub { 0 }
+    is      => 'rw',
+    default => sub {0}
   );
 
   has stars => (
-    is => 'rw',
-    default => sub { 'none' }
+    is      => 'rw',
+    default => sub {'none'}
   );
 
   has basicAttributes => (
-    is => 'rw',
-    lazy => 1,
+    is      => 'rw',
+    lazy    => 1,
     default => sub {
       return Game::EvonyTKR::Model::BasicAttributes->new();
     }
@@ -92,7 +82,7 @@ package Game::EvonyTKR::Model::General {
 # Precomputed generic book buff values by activation type and level
 # Structure: { Attacking => { level1 => {march_size => 3, ...}, level2 => {...}, ... }, ... }
   has genericBookBuffs => (
-    is => 'rw',
+    is      => 'rw',
     default => sub { {} }
   );
 
@@ -147,7 +137,8 @@ package Game::EvonyTKR::Model::General {
     state $persistence_helper //= do {
       my $helper = eval { Game::EvonyTKR::Model::Base->new(); };
       if ($@) {
-        $self->logger->error(sprintf('Cannot create Persistence Helper: %s', $@));
+        $self->logger->error(
+          sprintf('Cannot create Persistence Helper: %s', $@));
         return;
       }
       $helper;
@@ -431,7 +422,8 @@ package Game::EvonyTKR::Model::General {
       }
     }
 
-    $self->logger->debug(sprintf('populateGenericBooks complete. Activations: %s',
+    $self->logger->debug(sprintf(
+      'populateGenericBooks complete. Activations: %s',
       join(', ', keys %{ $self->genericBookBuffs })));
 
     return 1;

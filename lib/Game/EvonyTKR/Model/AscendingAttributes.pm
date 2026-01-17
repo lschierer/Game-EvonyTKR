@@ -30,8 +30,8 @@ package Game::EvonyTKR::Model::AscendingAttributes {
     "fallback" => 0;
 
   has id => (
-    is => 'ro',
-    lazy => 1,
+    is      => 'ro',
+    lazy    => 1,
     default => sub {
       my ($self) = @_;
       if (defined($self) && defined($self->UUID5_base)) {
@@ -45,13 +45,13 @@ package Game::EvonyTKR::Model::AscendingAttributes {
   );
 
   has general => (
-    is => 'rw',
-    default => sub { '' }
+    is      => 'rw',
+    default => sub {''}
   );
 
   has attributes => (
-    is => 'rw',
-    lazy => 1,
+    is      => 'rw',
+    lazy    => 1,
     default => sub {
       my ($self) = @_;
       return $self->_init_empty_levels();

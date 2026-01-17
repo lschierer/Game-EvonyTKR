@@ -43,7 +43,8 @@ sub mark_task_completed ($self, $task_name, $run_id = undef) {
     ref($self->persistence->backend)
   ));
   my $result = $self->persistence->mark_job_completed($task_name, $run_id);
-  $self->logger->info(sprintf("[Persistence::Core] mark_job_completed returned: %s",
+  $self->logger->info(sprintf(
+    "[Persistence::Core] mark_job_completed returned: %s",
     $result ? 'success' : 'failure'));
   return $result;
 }

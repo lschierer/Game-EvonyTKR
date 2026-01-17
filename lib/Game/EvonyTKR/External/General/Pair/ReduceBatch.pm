@@ -57,7 +57,8 @@ package Game::EvonyTKR::External::General::Pair::ReduceBatch {
     }
 
     if ($all_cache_hits && $total_pairs_created == 0) {
-      $job->logger->info('All parent jobs had 100% cache hits, nothing to reduce');
+      $job->logger->info(
+        'All parent jobs had 100% cache hits, nothing to reduce');
       $job->note(
         total_conflicts  => 0,
         total_cache_hits => $total_cache_hits,

@@ -47,7 +47,8 @@ package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
     # Get all generals from cache
     my $generals = $job->get_generals();
 
-    $job->logger->info(sprintf('Found %d generals to process', scalar @$generals));
+    $job->logger->info(
+      sprintf('Found %d generals to process', scalar @$generals));
 
     # Spawn CreatePairs jobs for each general/type combination
     my $job_count            = 0;

@@ -19,8 +19,7 @@ sub build ($self) {
 
   # Load specialties synchronously at startup
   my $specialty_loader = Game::EvonyTKR::Loader::Specialties->new(
-    data_dir => 'share/collections/data/specialties'
-  );
+    data_dir => 'share/collections/data/specialties');
 
   $self->logger->info("Loading specialties...");
   my $specialty_count = $specialty_loader->load_all();
@@ -38,9 +37,8 @@ sub build ($self) {
   $self->app->{specialty_loader} = $specialty_loader;
 
   # Load books synchronously at startup
-  my $books_loader = Game::EvonyTKR::Loader::Books->new(
-    data_dir => 'share/collections/data'
-  );
+  my $books_loader =
+    Game::EvonyTKR::Loader::Books->new(data_dir => 'share/collections/data');
 
   $self->logger->info("Loading books...");
   my $books_count = $books_loader->load_all();
@@ -59,8 +57,7 @@ sub build ($self) {
 
   # Load ascending attributes synchronously at startup
   my $aa_loader = Game::EvonyTKR::Loader::AscendingAttributes->new(
-    data_dir => 'share/collections/data/ascending attributes'
-  );
+    data_dir => 'share/collections/data/ascending attributes');
 
   $self->logger->info("Loading ascending attributes...");
   my $aa_count = $aa_loader->load_all();
@@ -79,8 +76,7 @@ sub build ($self) {
 
   # Load generals synchronously at startup
   my $generals_loader = Game::EvonyTKR::Loader::Generals->new(
-    data_dir => 'share/collections/data/generals'
-  );
+    data_dir => 'share/collections/data/generals');
 
   $self->logger->info("Loading generals...");
   my $generals_count = $generals_loader->load_all();
@@ -100,7 +96,7 @@ sub build ($self) {
   # Load covenants synchronously at startup
   # Note: Covenants require generals to be loaded first
   my $covenants_loader = Game::EvonyTKR::Loader::Covenants->new(
-    data_dir => 'share/collections/data/covenants',
+    data_dir        => 'share/collections/data/covenants',
     generals_loader => $generals_loader,
   );
 

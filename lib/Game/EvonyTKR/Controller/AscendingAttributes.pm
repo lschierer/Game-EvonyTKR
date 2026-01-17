@@ -14,7 +14,7 @@ package Game::EvonyTKR::Controller::AscendingAttributes {
   use Data::Printer;
 
   # Specify which collection this controller handles
-  sub collection_name { 'Ascending Attributes' }
+  sub collection_name {'Ascending Attributes'}
 
   sub controller_name ($self) {
     return "AscendingAttributes";
@@ -22,7 +22,8 @@ package Game::EvonyTKR::Controller::AscendingAttributes {
 
   # Build method - this controller doesn't register routes, only helpers
   sub build ($self) {
-    $self->logger->info("Building AscendingAttributes controller (helpers only)");
+    $self->logger->info(
+      "Building AscendingAttributes controller (helpers only)");
 
     # Call parent to register common routes
     $self->SUPER::build();
@@ -31,8 +32,8 @@ package Game::EvonyTKR::Controller::AscendingAttributes {
     # No routes are registered here - ascending attributes are displayed
     # as part of General detail pages
 
-    # Note: Helper methods are called directly by other controllers
-    # (like Generals controller) via $self->get_ascendingattributes_for_general()
+   # Note: Helper methods are called directly by other controllers
+   # (like Generals controller) via $self->get_ascendingattributes_for_general()
   }
 
   # Get ascending attributes for a specific general
@@ -60,15 +61,14 @@ package Game::EvonyTKR::Controller::AscendingAttributes {
     my $aa = $loader->get_for_general($nn);
     unless (defined $aa) {
       $self->logger->error(sprintf(
-        'No ascending attributes found for general named "%s" normalized to "%s"',
+'No ascending attributes found for general named "%s" normalized to "%s"',
         $gn, $nn
       ));
       return undef;
     }
 
     $self->logger->debug(
-      sprintf('Found %s for requested key %s', np($aa), $nn)
-    );
+      sprintf('Found %s for requested key %s', np($aa), $nn));
     return $aa;
   }
 
@@ -136,7 +136,7 @@ package Game::EvonyTKR::Controller::AscendingAttributes {
     return [];
   }
 
-  # Get ascending section HTML for a general (to be embedded in general detail page)
+# Get ascending section HTML for a general (to be embedded in general detail page)
   sub get_ascending_section ($self, $name = '') {
     unless (length($name)) {
       $self->logger->warn("Cannot get_ascending_section without a name");
@@ -145,11 +145,11 @@ package Game::EvonyTKR::Controller::AscendingAttributes {
 
     my $item = $self->get_ascendingattributes_for_general($name);
 
-    unless ($item && reftype($item) eq 'HASH'
-            && blessed($item) eq 'Game::EvonyTKR::Model::AscendingAttributes') {
+    unless ($item
+      && reftype($item) eq 'HASH'
+      && blessed($item) eq 'Game::EvonyTKR::Model::AscendingAttributes') {
       $self->logger->warn(
-        "get_ascending_section cannot find Ascending Attributes for $name"
-      );
+        "get_ascending_section cannot find Ascending Attributes for $name");
       $self->logger->debug(sprintf(
         "searching for $name, instead got %s %s",
         reftype($item) // '',
@@ -160,11 +160,9 @@ package Game::EvonyTKR::Controller::AscendingAttributes {
 
     $self->logger->debug("Rendering get_ascending_section for $name");
 
-    # This would render the partial template
-    # For now, return a placeholder - will be properly implemented when Generals controller is created
-    my $vars = {
-      item => $item,
-    };
+# This would render the partial template
+# For now, return a placeholder - will be properly implemented when Generals controller is created
+    my $vars = { item => $item, };
 
     return $self->render_to_string('ascending attributes/details.tt', $vars);
   }

@@ -51,7 +51,8 @@ package Game::EvonyTKR::External::General::LoadAll {
     my @files =
       $generalDir->list->grep(sub { $_ =~ /\.ya?ml$/ && -f -r $_ })->each;
 
-    $job->logger->info(sprintf('Found %d general files to process', scalar @files));
+    $job->logger->info(
+      sprintf('Found %d general files to process', scalar @files));
 
     my $enqueued_count = 0;
     my $skipped_count  = 0;

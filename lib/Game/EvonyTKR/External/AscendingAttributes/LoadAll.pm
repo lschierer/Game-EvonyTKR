@@ -182,7 +182,8 @@ package Game::EvonyTKR::External::AscendingAttributes::LoadAll {
         }
 
         if ($all_in_persistence) {
-          $job->logger->info('All ascending attributes verified in persistence');
+          $job->logger->info(
+            'All ascending attributes verified in persistence');
           $verified = 1;
           last;
         }

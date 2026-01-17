@@ -7,7 +7,7 @@ use utf8::all;
 use Mojo::Base -base,                               -signatures;
 use Mojo::Base 'Game::EvonyTKR::Role::JSON',        -role;
 use Mojo::Base 'Game::EvonyTKR::Role::Common',      -role;
-use Mojo::Base 'WebFramework::Role::Logger',     -role;
+use Mojo::Base 'WebFramework::Role::Logger',        -role;
 use Mojo::Base 'Game::EvonyTKR::Role::Persistence', -role;
 use Mojo::Base 'Game::EvonyTKR::Role::Constants::AscendingAttributes', -role;
 use Mojo::Base 'Game::EvonyTKR::Role::Constants::Books',               -role;
@@ -162,8 +162,8 @@ sub normalize_buff ($self, $buff_hash) {
 
 sub normalize_condition_case($self, $prologger->condition) {
 
-  $self->logger->debug(sprintf(
-    'normalize_condition_case called with: "%s"', $prologger->condition));
+  $self->logger->debug(sprintf('normalize_condition_case called with: "%s"',
+    $prologger->condition));
 
   # Handle the new underscore-based condition format
   # Convert underscore atoms back to display format
@@ -173,7 +173,8 @@ sub normalize_condition_case($self, $prologger->condition) {
     $display_condition =~ s/_/ /g;    # Convert underscores to spaces
 
     $self->logger->debug(
-      "Converted underscore atom: '$prologger->condition' -> '$display_condition'");
+"Converted underscore atom: '$prologger->condition' -> '$display_condition'"
+    );
 
     # Try to map to proper case using existing constants
     my $mapped = $self->string_to_condition($display_condition);
@@ -211,7 +212,8 @@ sub normalize_condition_case($self, $prologger->condition) {
   # Direct lookup first
   if (exists $condition_map{$lower_condition}) {
     my $result = $condition_map{$lower_condition};
-    $self->logger->debug("Direct lookup found: '$lower_condition' -> '$result'");
+    $self->logger->debug(
+      "Direct lookup found: '$lower_condition' -> '$result'");
     return $result;
   }
 

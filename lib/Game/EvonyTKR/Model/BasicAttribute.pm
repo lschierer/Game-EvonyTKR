@@ -23,25 +23,28 @@ package Game::EvonyTKR::Model::BasicAttribute {
     '.'        => \&concat,
     "fallback" => 0;
 
-  has 'attribute_name' => (is => 'ro', default => '');
-  has 'base'           => (is => 'rw', default => 0);
-  has 'increment'      => (is => 'rw', default => 0);
-  has 'EvansAdjustment'    => (is => 'ro', default => 2.4867);
-  has 'BasicAESAdjustment' => (is => 'ro', default => sub {
-    return {
-      'none'    => 0,
-      'purple1' => 0,
-      'purple2' => 0,
-      'purple3' => 0,
-      'purple4' => 0,
-      'purple5' => 0,
-      'red1'    => 10,
-      'red2'    => 20,
-      'red3'    => 30,
-      'red4'    => 40,
-      'red5'    => 50,
-    };
-  });
+  has 'attribute_name'  => (is => 'ro', default => '');
+  has 'base'            => (is => 'rw', default => 0);
+  has 'increment'       => (is => 'rw', default => 0);
+  has 'EvansAdjustment' => (is => 'ro', default => 2.4867);
+  has 'BasicAESAdjustment' => (
+    is      => 'ro',
+    default => sub {
+      return {
+        'none'    => 0,
+        'purple1' => 0,
+        'purple2' => 0,
+        'purple3' => 0,
+        'purple4' => 0,
+        'purple5' => 0,
+        'red1'    => 10,
+        'red2'    => 20,
+        'red3'    => 30,
+        'red4'    => 40,
+        'red5'    => 50,
+      };
+    }
+  );
 
   sub validate ($self) {
     my @errors;

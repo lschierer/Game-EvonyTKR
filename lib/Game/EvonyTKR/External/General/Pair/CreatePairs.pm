@@ -42,7 +42,8 @@ package Game::EvonyTKR::External::General::Pair::CreatePairs {
       '%s log level is %s',
       __PACKAGE__, Log::Log4perl::Level::to_level($job->logger->level())
     ));
-    $job->logger->debug("Creating pairs for general: $general_name, type: $type");
+    $job->logger->debug(
+      "Creating pairs for general: $general_name, type: $type");
 
     # Validate the type
     unless ($job->ValidateGeneralType($type)) {

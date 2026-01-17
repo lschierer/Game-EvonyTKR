@@ -10,8 +10,8 @@ package Game::EvonyTKR::Role::Constants::Covenants {
   use Carp;
 
   has 'CovenantCategories' => (
-    is => 'ro',
-    lazy => 1,
+    is      => 'ro',
+    lazy    => 1,
     default => sub ($self) {
       return {
         None         => 0,
@@ -26,8 +26,8 @@ package Game::EvonyTKR::Role::Constants::Covenants {
   );
 
   has 'CovenantCategoryValues' => (
-    is => 'ro',
-    lazy => 1,
+    is      => 'ro',
+    lazy    => 1,
     default => sub ($self) {
       my $cats = $self->CovenantCategories;
       # Sort keys by their numeric value, return lowercase
@@ -37,8 +37,8 @@ package Game::EvonyTKR::Role::Constants::Covenants {
   );
 
   has 'CovenantCategoryLabels' => (
-    is => 'ro',
-    lazy => 1,
+    is      => 'ro',
+    lazy    => 1,
     default => sub ($self) {
       my $cats = $self->CovenantCategories;
       # Same order, but keep original capitalization

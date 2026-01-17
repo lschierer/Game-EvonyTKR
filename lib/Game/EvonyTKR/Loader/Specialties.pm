@@ -9,12 +9,12 @@ use YAML::PP;
 require Game::EvonyTKR::Model::Specialty;
 
 has data_dir => (
-  is => 'ro',
+  is       => 'ro',
   required => 1,
 );
 
 has specialties => (
-  is => 'rw',
+  is      => 'rw',
   default => sub { {} },
 );
 
@@ -28,13 +28,14 @@ sub load_all {
   }
 
   my @yaml_files = $dir->children(qr/\.ya?ml$/);
-  $self->logger->info(sprintf("Found %d specialty files to load", scalar @yaml_files));
+  $self->logger->info(
+    sprintf("Found %d specialty files to load", scalar @yaml_files));
 
   my $loaded = 0;
   for my $file (@yaml_files) {
     eval {
       my $data = YAML::PP->new(
-        schema => [qw/ + Perl /],
+        schema       => [qw/ + Perl /],
         yaml_version => ['1.2', '1.1'],
       )->load_string($file->slurp_utf8);
 
@@ -44,7 +45,7 @@ sub load_all {
       }
 
       my $specialty = Game::EvonyTKR::Model::Specialty->from_hash($data);
-      $self->specialties->{$specialty->name} = $specialty;
+      $self->specialties->{ $specialty->name } = $specialty;
       $loaded++;
       $self->logger->debug("Loaded specialty: " . $specialty->name);
     };
@@ -64,7 +65,7 @@ sub get_specialty {
 
 sub list_specialties {
   my ($self) = @_;
-  return [sort keys %{$self->specialties}];
+  return [sort keys %{ $self->specialties }];
 }
 
 1;

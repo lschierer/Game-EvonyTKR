@@ -1,13 +1,14 @@
 package Game::EvonyTKR::Role::Persistence::Books;
 use v5.42.0;
 use utf8::all;
-use Mojo::Base -role,                                     -signatures;
+use Mojo::Base -role, -signatures;
 with 'Game::EvonyTKR::Role::Persistence::Core';
 
 ##############################################################################
 # Builtin Books
 ##############################################################################
 my $logger;
+
 sub add_builtin_book ($self, $book) {
   my $key = lc($self->normalize($book->name));
   return $self->persistence->store_builtin_book($key, $book->to_wire_hash());

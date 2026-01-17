@@ -14,7 +14,7 @@ package Game::EvonyTKR::Controller::Specialties {
   use Path::Tiny qw(path);
 
   # Specify which collection this controller handles
-  sub collection_name { 'Specialties' }
+  sub collection_name {'Specialties'}
 
   my $base = '/Reference/Specialties';
 
@@ -41,20 +41,26 @@ package Game::EvonyTKR::Controller::Specialties {
     );
 
     # Register routes
-    $self->router->add($base, {
-      to => async sub ($self, $ctx) {
-        return await $self->index($ctx);
-      },
-      action => 'http.*',
-    });
+    $self->router->add(
+      $base,
+      {
+        to => async sub ($self, $ctx) {
+          return await $self->index($ctx);
+        },
+        action => 'http.*',
+      }
+    );
 
-    $self->router->add("$base/:specialty_name", {
-      to => async sub ($self, $ctx, @args) {
-        my $specialty_name = $args[0];
-        return await $self->show($ctx, $specialty_name);
-      },
-      action => 'http.*',
-    });
+    $self->router->add(
+      "$base/:specialty_name",
+      {
+        to => async sub ($self, $ctx, @args) {
+          my $specialty_name = $args[0];
+          return await $self->show($ctx, $specialty_name);
+        },
+        action => 'http.*',
+      }
+    );
 
     # Build navigation items for individual specialties
     $self->build_nav_items();
@@ -77,8 +83,8 @@ package Game::EvonyTKR::Controller::Specialties {
       return $nameList;
     }
     else {
-      my $match = first { $level =~ /$_/i }
-        $self->getConstants->SpecialtyLevelValues->@*;
+      my $match =
+        first { $level =~ /$_/i } $self->getConstants->SpecialtyLevelValues->@*;
       $match =~ s/(\w)(\w*)/\U$1\L$2/;
       return $match;
     }
@@ -94,7 +100,8 @@ package Game::EvonyTKR::Controller::Specialties {
     }
 
     foreach my $specialty_name ($specialty_loader->list_specialties->@*) {
-      my $specialty = eval { $specialty_loader->get_specialty($specialty_name) };
+      my $specialty =
+        eval { $specialty_loader->get_specialty($specialty_name) };
 
       # Determine display name with fallbacks
       my $display_name;
@@ -168,15 +175,15 @@ package Game::EvonyTKR::Controller::Specialties {
     foreach my $sn ($specialty_loader->list_specialties->@*) {
       my $specialty = $specialty_loader->get_specialty($sn);
       unless ($specialty) {
-        $self->logger->error(sprintf('Failed to get listed specialty "%s"', $sn));
+        $self->logger->error(
+          sprintf('Failed to get listed specialty "%s"', $sn));
         next;
       }
       push @{$items}, $specialty;
     }
 
     $self->logger->debug(
-      sprintf('Items: %s with %s items', ref($items), scalar(@$items))
-    );
+      sprintf('Items: %s with %s items', ref($items), scalar(@$items)));
 
     # Check if markdown exists for this collection
     my $markdown_path = path('share/pages')->child("$collection/index.md");
@@ -190,7 +197,7 @@ package Game::EvonyTKR::Controller::Specialties {
       current_year    => (localtime)[5] + 1900,
       css_files       => ['/css/collectionIndex.css'],
       sidebar         => 1,
-      navigation        => $self->render_navigation($ctx->req->path),
+      navigation      => $self->render_navigation($ctx->req->path),
       site_logo       => $self->site_logo(),
     };
 
@@ -200,7 +207,7 @@ package Game::EvonyTKR::Controller::Specialties {
         $self->markdown->render_with_frontmatter($markdown_path->stringify);
 
       $vars->{content} = $content_html;
-      $vars->{title} = $frontmatter->{title} // $vars->{title};
+      $vars->{title}   = $frontmatter->{title} // $vars->{title};
 
       return $self->render('specialties/index.tt', $vars);
     }
@@ -222,9 +229,7 @@ package Game::EvonyTKR::Controller::Specialties {
     my $specialty = $specialty_loader->get_specialty($specialty_name);
 
     unless ($specialty) {
-      $self->logger->debug(
-        "Specialty '$specialty_name' not found"
-      );
+      $self->logger->debug("Specialty '$specialty_name' not found");
       return $self->render_error(404, "Specialty not found");
     }
 
@@ -236,7 +241,7 @@ package Game::EvonyTKR::Controller::Specialties {
       current_year => (localtime)[5] + 1900,
       css_files    => ['/css/collectionDetails.css'],
       sidebar      => 1,
-      navigation     => $self->render_navigation($ctx->req->path),
+      navigation   => $self->render_navigation($ctx->req->path),
       site_logo    => $self->site_logo(),
     };
 

@@ -9,8 +9,8 @@ require Game::EvonyTKR::Model::General;
 package Game::EvonyTKR::Model::General::Pair {
   use Moo;
   extends 'Game::EvonyTKR::Model::Base';
-  use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants',       -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants',    -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants',    -role;
+  use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants', -role;
   with 'Game::EvonyTKR::Role::Constants::AscendingAttributes';
   use UUID           qw(uuid5);
   use List::AllUtils qw( any none );
@@ -34,7 +34,8 @@ package Game::EvonyTKR::Model::General::Pair {
     state $persistence_helper //= do {
       my $helper = eval { Game::EvonyTKR::Model::Base->new(); };
       if ($@) {
-        $self->logger->error(sprintf('Cannot create Persistence Helper: %s', $@));
+        $self->logger->error(
+          sprintf('Cannot create Persistence Helper: %s', $@));
         return;
       }
       $helper;

@@ -1,7 +1,7 @@
 package Game::EvonyTKR::Role::Persistence::Specialties;
 use v5.42.0;
 use utf8::all;
-use Mojo::Base -role,                                     -signatures;
+use Mojo::Base -role, -signatures;
 with 'Game::EvonyTKR::Role::Persistence::Core';
 require Log::Handler;
 

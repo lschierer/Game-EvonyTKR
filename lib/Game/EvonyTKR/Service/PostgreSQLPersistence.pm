@@ -1,8 +1,8 @@
 package Game::EvonyTKR::Service::PostgreSQLPersistence;
 use v5.42.0;
 use utf8::all;
-use Mojo::Base -base,                           -signatures;
-use Mojo::Base 'Game::EvonyTKR::Role::JSON',    -role;
+use Mojo::Base -base,                        -signatures;
+use Mojo::Base 'Game::EvonyTKR::Role::JSON', -role;
 with 'WebFramework::Role::Logger';
 use Mojo::Pg;
 

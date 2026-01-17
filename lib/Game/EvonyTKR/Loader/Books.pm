@@ -12,18 +12,18 @@ use YAML::PP;
 require Game::EvonyTKR::Model::Book;
 
 has data_dir => (
-  is => 'ro',
+  is       => 'ro',
   required => 1,
 );
 
 # Separate storage for skill books and generic books
 has skill_books => (
-  is => 'rw',
+  is      => 'rw',
   default => sub { {} },
 );
 
 has generic_books => (
-  is => 'rw',
+  is      => 'rw',
   default => sub { {} },
 );
 
@@ -36,7 +36,7 @@ sub load_all {
     return 0;
   }
 
-  my $skill_dir = $base_dir->child('skill books');
+  my $skill_dir   = $base_dir->child('skill books');
   my $generic_dir = $base_dir->child('generic books');
 
   my $loaded = 0;
@@ -44,14 +44,16 @@ sub load_all {
   # Load skill books
   if ($skill_dir->exists && $skill_dir->is_dir) {
     $loaded += $self->_load_directory($skill_dir, 'skill');
-  } else {
+  }
+  else {
     $self->logger->warn("Skill books directory not found: $skill_dir");
   }
 
   # Load generic books
   if ($generic_dir->exists && $generic_dir->is_dir) {
     $loaded += $self->_load_directory($generic_dir, 'generic');
-  } else {
+  }
+  else {
     $self->logger->warn("Generic books directory not found: $generic_dir");
   }
 
@@ -63,13 +65,14 @@ sub _load_directory {
   my ($self, $dir, $type) = @_;
 
   my @yaml_files = $dir->children(qr/\.ya?ml$/);
-  $self->logger->info(sprintf("Found %d $type book files to load", scalar @yaml_files));
+  $self->logger->info(
+    sprintf("Found %d $type book files to load", scalar @yaml_files));
 
   my $loaded = 0;
   for my $file (@yaml_files) {
     eval {
       my $data = YAML::PP->new(
-        schema => [qw/ + Perl /],
+        schema       => [qw/ + Perl /],
         yaml_version => ['1.2', '1.1'],
       )->load_string($file->slurp_utf8);
 
@@ -84,8 +87,10 @@ sub _load_directory {
       if ($type eq 'skill') {
         my $normalized_key = $self->normalize($book->name);
         $self->skill_books->{$normalized_key} = $book;
-        $self->logger->debug("Loaded $type book: " . $book->name . " (key: $normalized_key)");
-      } else {
+        $self->logger->debug(
+          "Loaded $type book: " . $book->name . " (key: $normalized_key)");
+      }
+      else {
         # For generic books, key by "name-level"
         my $key = $book->name;
         if ($book->can('level') && defined $book->level) {
@@ -93,7 +98,8 @@ sub _load_directory {
         }
         my $normalized_key = $self->normalize($key);
         $self->generic_books->{$normalized_key} = $book;
-        $self->logger->debug("Loaded $type book: " . $book->name . " (key: $normalized_key)");
+        $self->logger->debug(
+          "Loaded $type book: " . $book->name . " (key: $normalized_key)");
       }
 
       $loaded++;
@@ -133,12 +139,12 @@ sub get_book {
 
 sub list_skill_books {
   my ($self) = @_;
-  return [sort keys %{$self->skill_books}];
+  return [sort keys %{ $self->skill_books }];
 }
 
 sub list_generic_books {
   my ($self) = @_;
-  return [sort keys %{$self->generic_books}];
+  return [sort keys %{ $self->generic_books }];
 }
 
 1;

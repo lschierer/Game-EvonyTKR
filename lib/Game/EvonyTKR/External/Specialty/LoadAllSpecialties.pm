@@ -171,7 +171,8 @@ package Game::EvonyTKR::External::Specialty::LoadAllSpecialties {
           my $specialty_name = $file->basename('.yaml', '.yml');
       # Use direct persistence check to avoid model building during verification
           unless ($job->get_specialty($specialty_name)) {
-            $job->logger->warn(sprintf('cannot retrieve "%s"', $specialty_name));
+            $job->logger->warn(
+              sprintf('cannot retrieve "%s"', $specialty_name));
             $all_in_persistence = 0;
             $missing_count++;
           }

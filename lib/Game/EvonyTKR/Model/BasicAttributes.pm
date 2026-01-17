@@ -21,18 +21,31 @@ package Game::EvonyTKR::Model::BasicAttributes {
     '""'       => \&as_string,
     'fallback' => 1;
 
-  has 'attack' => (is => 'rw', default => sub {
-    Game::EvonyTKR::Model::BasicAttribute->new(attribute_name => 'attack');
-  });
-  has 'leadership' => (is => 'rw', default => sub {
-    Game::EvonyTKR::Model::BasicAttribute->new(attribute_name => 'leadership');
-  });
-  has 'defense' => (is => 'rw', default => sub {
-    Game::EvonyTKR::Model::BasicAttribute->new(attribute_name => 'defense');
-  });
-  has 'politics' => (is => 'rw', default => sub {
-    Game::EvonyTKR::Model::BasicAttribute->new(attribute_name => 'politics');
-  });
+  has 'attack' => (
+    is      => 'rw',
+    default => sub {
+      Game::EvonyTKR::Model::BasicAttribute->new(attribute_name => 'attack');
+    }
+  );
+  has 'leadership' => (
+    is      => 'rw',
+    default => sub {
+      Game::EvonyTKR::Model::BasicAttribute->new(
+        attribute_name => 'leadership');
+    }
+  );
+  has 'defense' => (
+    is      => 'rw',
+    default => sub {
+      Game::EvonyTKR::Model::BasicAttribute->new(attribute_name => 'defense');
+    }
+  );
+  has 'politics' => (
+    is      => 'rw',
+    default => sub {
+      Game::EvonyTKR::Model::BasicAttribute->new(attribute_name => 'politics');
+    }
+  );
 
   # Get specific attribute
   sub get_attribute ($self, $name) {

@@ -8,8 +8,8 @@ require JSON::PP;
 our $json_instance;
 
 has JSON => (
-  is => 'ro',
-  lazy => 1,
+  is      => 'ro',
+  lazy    => 1,
   default => sub {
     $json_instance //=
       JSON::PP->new()->utf8(1)->allow_blessed(1)->convert_blessed(1);

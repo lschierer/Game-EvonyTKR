@@ -8,7 +8,7 @@ require HTML::LinkExtor;
 require URI;
 
 package LinkChecker::Command;
-use Mojo::Base -base,                           -signatures;
+use Mojo::Base -base,                        -signatures;
 use Mojo::Base 'WebFramework::Role::Logger', -role;
 use List::AllUtils qw( any none );
 use namespace::autoclean;
@@ -272,7 +272,8 @@ sub update_children_statuses ($self) {
           $self->checked_urls->{$abs_url_str}->{status};
       }
       else {
-        $self->logger->warn("Could not find status for child URL: $abs_url_str");
+        $self->logger->warn(
+          "Could not find status for child URL: $abs_url_str");
         $self->checked_urls->{$parent_url}->{children}->{$child_href} =
           'unknown';
       }

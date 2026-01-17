@@ -1,7 +1,7 @@
 package Game::EvonyTKR::Role::Persistence::Generals;
 use v5.42.0;
 use utf8::all;
-use Mojo::Base -role,                                     -signatures;
+use Mojo::Base -role, -signatures;
 with 'Game::EvonyTKR::Role::Persistence::Core';
 
 sub store_buff_cache ($self, $key, $buffValues) {
@@ -117,7 +117,8 @@ sub generate_buff_cache_key(
     $gn = $general;
   }
   else {
-    $self->logger->error('general name is required to generate a buff cache key');
+    $self->logger->error(
+      'general name is required to generate a buff cache key');
     return '';
   }
 
