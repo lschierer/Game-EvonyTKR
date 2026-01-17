@@ -18,16 +18,16 @@ package Game::EvonyTKR::External::Book::LoadAllGenerics {
     if (not defined($app)) {
       my $errmessage = 'app not defined in register for ' . __PACKAGE__;
       say $errmessage;
-      $taskClass->log_error($errmessage);
+      $taskClass->logger->error($errmessage);
       return;
     }
     unless (defined($app->minion)) {
       my $errmessage = sprintf('minion undefined in job for %s', __PACKAGE__);
-      $taskClass->log_error($errmessage);
+      $taskClass->logger->error($errmessage);
       say $errmessage;
       return;
     }
-    $taskClass->log_debug('Registering Book Loader workflow tasks');
+    $taskClass->logger->debug('Registering Book Loader workflow tasks');
     $app->minion->add_task($taskClass->task_name => __PACKAGE__);
 
     return 1;
@@ -43,7 +43,7 @@ package Game::EvonyTKR::External::Book::LoadAllGenerics {
     $job->SUPER::run(@args);
     unless (defined($job->minion)) {
       my $errmessage = sprintf('minion undefined in job for %s', __PACKAGE__);
-      $job->log_error($errmessage);
+      $job->logger->error($errmessage);
       return $job->fail($errmessage);
     }
 
@@ -53,7 +53,7 @@ package Game::EvonyTKR::External::Book::LoadAllGenerics {
 
     foreach my $level (1 .. 4) {
       my $ll = $job->list_generic_books($level);
-      $job->log_info(sprintf(
+      $job->logger->info(sprintf(
         'Found %d generic books to process at level %s',
         scalar @$ll, $level
       ));
@@ -63,7 +63,7 @@ package Game::EvonyTKR::External::Book::LoadAllGenerics {
         my $entry = $ll->[$index];
 
         if ($job->get_generic_book($entry, $level)) {
-          $job->log_debug(sprintf(
+          $job->logger->debug(sprintf(
             'Skipping %s level %d - already in persistence',
             $entry, $level
           ));
@@ -76,7 +76,7 @@ package Game::EvonyTKR::External::Book::LoadAllGenerics {
             if ($bj->info->{notes}->{prebuild_run_id} eq $job->prebuild_run_id)
             {
               if ($bj->info->{state} eq 'finished') {
-                $job->log_debug(sprintf(
+                $job->logger->debug(sprintf(
                   'Skipping %s level %d - already in progress',
                   $entry, $level
                 ));
@@ -84,7 +84,7 @@ package Game::EvonyTKR::External::Book::LoadAllGenerics {
                 next;
               }
               elsif ($bj->info->{state} eq 'failed') {
-                $job->log_debug(sprintf(
+                $job->logger->debug(sprintf(
                   'Skipping %s level %d - already in progress',
                   $entry, $level
                 ));
@@ -92,7 +92,7 @@ package Game::EvonyTKR::External::Book::LoadAllGenerics {
                 next;
               }
               elsif ($bj->info->{state} eq 'active') {
-                $job->log_debug(sprintf(
+                $job->logger->debug(sprintf(
                   'Skipping %s level %d - already in progress',
                   $entry, $level
                 ));
@@ -100,7 +100,7 @@ package Game::EvonyTKR::External::Book::LoadAllGenerics {
                 next;
               }
               elsif ($bj->info->{state} eq 'inactive') {
-                $job->log_debug(sprintf(
+                $job->logger->debug(sprintf(
                   'Skipping %s level %d - already in progress',
                   $entry, $level
                 ));
@@ -142,7 +142,7 @@ package Game::EvonyTKR::External::Book::LoadAllGenerics {
     }
     $job->note(in_progress => $in_progress);
 
-    $job->log_info(sprintf(
+    $job->logger->info(sprintf(
       'Enqueued %d generic load_book jobs, skipped %d already in persistence',
       $enqueued_count, $skipped_count
     ));
@@ -160,7 +160,7 @@ package Game::EvonyTKR::External::Book::LoadAllGenerics {
         my @list = $job->list_generic_books($level)->@*;
         foreach my $entry (@list) {
           unless ($job->get_generic_book($entry, $level)) {
-            $job->log_warn(sprintf(
+            $job->logger->warn(sprintf(
               'attempt %s failed to find "Level %s %s" in persistence.',
               $attempt, $level, $entry
             ));
@@ -171,12 +171,12 @@ package Game::EvonyTKR::External::Book::LoadAllGenerics {
       }
 
       if ($all_in_persistence) {
-        $job->log_info('All generic books verified in persistence');
+        $job->logger->info('All generic books verified in persistence');
         $verified = 1;
         last;
       }
 
-      $job->log_debug(sprintf(
+      $job->logger->debug(sprintf(
         'Persistence verification attempt %d/%d: '
           . '%d generic books still missing',
         $attempt, $max_verify_attempts, $missing_count
@@ -187,12 +187,12 @@ package Game::EvonyTKR::External::Book::LoadAllGenerics {
     unless ($verified) {
       my $errmsg = 'Failed to verify all generic books '
         . 'in persistence after child jobs finished';
-      $job->log_error($errmsg);
+      $job->logger->error($errmsg);
       return $job->fail($errmsg);
     }
     # If no jobs were enqueued (data already in persistence), we still succeeded
     if ($skipped_count > 0) {
-      $job->log_info(sprintf(
+      $job->logger->info(sprintf(
         'All data already in persistence - no jobs needed (skipped %d)',
         $skipped_count));
     }

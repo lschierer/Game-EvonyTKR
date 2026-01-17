@@ -601,7 +601,7 @@ class Game::EvonyTKR::Shared::Constants : isa(Game::EvonyTKR::Model::Logger) {
     elsif (exists $map->{ lc($string) }) {
       my $a = $map->{ lc($string) };
       if (none { lc($a) eq lc($_) } $AttributeValues->@*) {
-        $self->log_error(
+        $self->logger->error(
           sprintf('%s is not a valid attribute mapping for %s', $a, $string));
         croak(
           sprintf('%s is not a valid attribute mapping for %s', $a, $string));
@@ -622,18 +622,18 @@ class Game::EvonyTKR::Shared::Constants : isa(Game::EvonyTKR::Model::Logger) {
     my $map         = $mapped_conditions;
 
     if ($exactBuff) {
-      $self->log_debug("Mapped Exact Buff $exactBuff");
+      $self->logger->debug("Mapped Exact Buff $exactBuff");
       return $exactBuff;
     }
     elsif ($exactDebuff) {
-      $self->log_debug("Mapped Exact DeBuff $exactDebuff");
+      $self->logger->debug("Mapped Exact DeBuff $exactDebuff");
       return $exactDebuff;
     }
     elsif (exists $map->{$string}) {
       my $v = $map->{$string};
       unless (any { $_ eq $v }
         (keys %{$BuffConditionValues}, $DebuffConditionValues->@*)) {
-        $self->log_error(
+        $self->logger->error(
           sprintf('%s is not a valid condition mapping for %s', $v, $string));
         croak(
           sprintf('%s is not a valid condition mapping for %s', $v, $string));

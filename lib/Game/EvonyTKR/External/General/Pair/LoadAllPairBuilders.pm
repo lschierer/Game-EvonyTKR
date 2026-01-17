@@ -24,10 +24,10 @@ package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
     $job->SUPER::run(@args);
     unless (defined($job->minion)) {
       my $errmessage = sprintf('minion undefined in job for %s', __PACKAGE__);
-      $job->log_error($errmessage);
+      $job->logger->error($errmessage);
       return $job->fail($errmessage);
     }
-    $job->log_debug(sprintf(
+    $job->logger->debug(sprintf(
       '%s log level is %s',
       __PACKAGE__, Log::Log4perl::Level::to_level($job->logger->level())
     ));
@@ -42,12 +42,12 @@ package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
       ]
       );
 
-    $job->log_info('Starting LoadAllPairBuilders job');
+    $job->logger->info('Starting LoadAllPairBuilders job');
 
     # Get all generals from cache
     my $generals = $job->get_generals();
 
-    $job->log_info(sprintf('Found %d generals to process', scalar @$generals));
+    $job->logger->info(sprintf('Found %d generals to process', scalar @$generals));
 
     # Spawn CreatePairs jobs for each general/type combination
     my $job_count            = 0;
@@ -68,7 +68,7 @@ package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
       $total_existing_pairs++;
     }
 
-    $job->log_info(sprintf(
+    $job->logger->info(sprintf(
       'Found %d existing general/type combinations with pairs in persistence',
       $total_existing_pairs));
 
@@ -100,7 +100,7 @@ package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
           // 0;
 
         if ($existing_pairs >= $expected_pairs) {
-          $job->log_debug(sprintf(
+          $job->logger->debug(sprintf(
             'Skipping %s/%s - has %d/%d pairs (complete)',
             $general->name, $type, $existing_pairs, $expected_pairs
           ));
@@ -108,7 +108,7 @@ package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
           next;
         }
         elsif ($existing_pairs > 0) {
-          $job->log_warn(sprintf(
+          $job->logger->warn(sprintf(
             'General %s/%s has incomplete pairs (%d/%d) - will rebuild',
             $general->name, $type, $existing_pairs, $expected_pairs
           ));
@@ -146,7 +146,7 @@ package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
         }
 
         if ($job_exists) {
-          $job->log_debug(sprintf(
+          $job->logger->debug(sprintf(
             'Skipping %s/%s - job already exists for current run',
             $general->name, $type
           ));
@@ -160,7 +160,7 @@ package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
             notes    => { prebuild_run_id => $job->prebuild_run_id },
           }
         );
-        $job->log_debug(sprintf(
+        $job->logger->debug(sprintf(
           'Enqueued create_pairs job %s for general %s, type %s (priority %d)',
           $job_id, $general->name, $type, $priority
         ));
@@ -192,7 +192,7 @@ package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
                 notes    => { prebuild_run_id => $job->prebuild_run_id },
               }
             );
-            $job->log_debug(sprintf(
+            $job->logger->debug(sprintf(
               'Spawned type-balanced reduce_batch job %s '
                 . 'for batch %d (%d jobs)',
               $reduce_jid, ++$batch_count, scalar(@current_batch)
@@ -226,13 +226,13 @@ package Game::EvonyTKR::External::General::Pair::LoadAllPairBuilders {
           notes    => { prebuild_run_id => $job->prebuild_run_id },
         }
       );
-      $job->log_debug(sprintf(
+      $job->logger->debug(sprintf(
 'Spawned final type-balanced reduce_batch job %s for batch %d (%d jobs)',
         $reduce_jid, ++$batch_count, scalar(@current_batch)
       ));
     }
 
-    $job->log_info(sprintf(
+    $job->logger->info(sprintf(
 'LoadAllPairBuilders completed: spawned %d create_pairs jobs in %d batches, skipped %d already in persistence',
       $job_count, $batch_count, $skipped_count
     ));

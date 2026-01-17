@@ -29,19 +29,19 @@ package Game::EvonyTKR::External::General::Pair::BatchSummarizer {
       ]
       );
 
-    $job->log_info(sprintf("Processing batch of %d pairs", scalar @$pairs));
+    $job->logger->info(sprintf("Processing batch of %d pairs", scalar @$pairs));
 
     # Extract unique generals from pairs
     my %unique_generals;
     foreach my $pair (@$pairs) {
-      $job->log_debug(sprintf(
+      $job->logger->debug(sprintf(
         'pair is a "%s".  It is "%s", and dumps as %s',
         ref($pair)     ? ref($pair) : 'scalar',
         blessed($pair) ? 'blessed'  : 'not blessed',
         Data::Printer::np($pair)
       ));
       $pair = Game::EvonyTKR::Model::General::Pair->from_wire_hash($pair);
-      $job->log_debug(sprintf(
+      $job->logger->debug(sprintf(
         'after constructor, is a "%s".  It is "%s", and dumps as %s',
         ref($pair)     ? ref($pair) : 'scalar',
         blessed($pair) ? 'blessed'  : 'not blessed',
@@ -52,7 +52,7 @@ package Game::EvonyTKR::External::General::Pair::BatchSummarizer {
     }
 
     my @general_names = keys %unique_generals;
-    $job->log_debug(
+    $job->logger->debug(
       sprintf("Batch contains %d unique generals", scalar @general_names));
 
     # Build cache keys for all generals with current params
@@ -103,11 +103,11 @@ package Game::EvonyTKR::External::General::Pair::BatchSummarizer {
           primary_buffs   => $primary_buffs,
           secondary_buffs => $secondary_buffs
           };
-        $job->log_debug(
+        $job->logger->debug(
           "Enqueueing pair $primary_name/$secondary_name with cached buffs");
       }
       else {
-        $job->log_debug(
+        $job->logger->debug(
           "Enqueueing pair $primary_name/$secondary_name without cached buffs");
       }
 
@@ -136,7 +136,7 @@ package Game::EvonyTKR::External::General::Pair::BatchSummarizer {
       $job->note(spawned_jobs => \@spawned_job_ids);
     }
 
-    $job->log_info("Enqueued $jobs_enqueued pair summarizer jobs");
+    $job->logger->info("Enqueued $jobs_enqueued pair summarizer jobs");
     return $job->finish("Batch pair processing initiated");
   }
 }

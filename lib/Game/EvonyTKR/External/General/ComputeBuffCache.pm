@@ -76,7 +76,7 @@ sub run ($job, @args) {
 
   $job->SUPER::run(@args);
 
-  $job->log_info(
+  $job->logger->info(
     sprintf('Computing buff cache for general: "%s"', $job->generalName));
 
   unless ($job->general) {
@@ -101,13 +101,13 @@ sub run ($job, @args) {
 
   foreach my $target_type ($job->general->type->@*) {
     unless (length($target_type)) {
-      $job->log_error(
+      $job->logger->error(
         sprintf('general "%s" has invalid target type with no length.',
           $job->general->name)
       );
       next;
     }
-    $job->log_debug(sprintf(
+    $job->logger->debug(sprintf(
       'computing buffs for "%s" target_type "%s"',
       $job->general->name, $target_type
     ));
@@ -121,7 +121,7 @@ sub run ($job, @args) {
     }
 
     unless (length($tt)) {
-      $job->log_error(sprintf(
+      $job->logger->error(sprintf(
 'general type to troop type conversion failed for general "%s" with type "%s"',
         $job->general->name, $target_type
       ));
@@ -131,7 +131,7 @@ sub run ($job, @args) {
     $job->params->{targetType} = $tt;
 
     foreach my $activation_type ($job->common_activation_types->@*) {
-      $job->log_debug(sprintf(
+      $job->logger->debug(sprintf(
         'computing buffs for "%s" activation_type "%s"',
         $job->general->name, $activation_type
       ));
@@ -152,13 +152,13 @@ sub run ($job, @args) {
         $job->params->{specialty3} = $s3;
         $job->params->{specialty4} = $s4;
 
-        $job->log_debug(sprintf(
+        $job->logger->debug(sprintf(
           'computing buffs for "%s" with specialties %s/%s/%s/%s',
           $job->general->name, $s1, $s2, $s3, $s4
         ));
 
         foreach my $covenant_level ($job->common_covenant_levels->@*) {
-          $job->log_debug(sprintf(
+          $job->logger->debug(sprintf(
             'computing buffs for "%s" covenant_level "%s"',
             $job->general->name, $covenant_level
           ));
@@ -166,7 +166,7 @@ sub run ($job, @args) {
           $job->params->{covenantLevel} = $covenant_level;
 
           foreach my $ascending_level (@$ascending_levels) {
-            $job->log_debug(sprintf(
+            $job->logger->debug(sprintf(
               'computing buffs for "%s" ascending_level "%s"',
               $job->general->name, $ascending_level
             ));
@@ -185,7 +185,7 @@ sub run ($job, @args) {
               $job->load_mandatory_skill_books()->@*,
             ]);
 
-            $job->log_debug(sprintf(
+            $job->logger->debug(sprintf(
               'computing buffs for "%s" with params %s',
               $job->general->name,
               Data::Printer::np($job->params, multiline => 0)
@@ -203,7 +203,7 @@ sub run ($job, @args) {
               $job->specialty3,     $job->specialty4
             );
             my $buff_values = $job->summarizer->buffValues;
-            $job->log_debug(sprintf(
+            $job->logger->debug(sprintf(
               'found buffs for "%s" with cache key "%s": %s',
               $job->general->name, $cache_key,
               Data::Printer::np($buff_values)
@@ -225,7 +225,7 @@ sub run ($job, @args) {
               $job->specialty3,     $job->specialty4
             );
             $buff_values = $job->summarizer->buffValues;
-            $job->log_debug(sprintf(
+            $job->logger->debug(sprintf(
               'found buffs for "%s" with cache key "%s": %s',
               $job->general->name, $cache_key,
               Data::Printer::np($buff_values)
@@ -241,7 +241,7 @@ sub run ($job, @args) {
 
   my $message = sprintf('Cached %s buff configurations for "%s"',
     $cached_count, $job->generalName);
-  $job->log_info($message);
+  $job->logger->info($message);
   return $job->finish($message);
 }
 

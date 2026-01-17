@@ -78,7 +78,7 @@ class Game::EvonyTKR::Converter::General :
       stars       => 'red5',
       type        => '',
     };
-    $self->log_debug(sprintf('general is %s', Data::Printer::np($data)));
+    $self->logger->debug(sprintf('general is %s', Data::Printer::np($data)));
     say YAML::PP->new(
       schema       => [qw/ + Perl /],
       yaml_version => ['1.2', '1.1'],
@@ -88,7 +88,7 @@ class Game::EvonyTKR::Converter::General :
 
   method execute {
     say "=== Basic Stats ===";
-    $self->log_info("=== Basic Stats ===");
+    $self->logger->info("=== Basic Stats ===");
     $self->getPrimaryFields();
     $self->printYAML();
   }
@@ -173,7 +173,7 @@ qr/elementor-element-(?:\w){1,9}.elementor-widget.elementor-widget-theme-post-co
       return [];
     }
     if ($debug) {
-      $self->log_debug("Found container: " . $container->starttag());
+      $self->logger->debug("Found container: " . $container->starttag());
     }
 
     # Get all h2 and h3 elements in reading order
@@ -205,7 +205,7 @@ qr/elementor-element-(?:\w){1,9}.elementor-widget.elementor-widget-theme-post-co
     }
 
     $name = $targetH2->as_trimmed_text =~ s/(.+?)\s*[-–—]\s*Stats:/$1/r;
-    $self->log_debug("name is $name");
+    $self->logger->debug("name is $name");
 
     my $statsH3 = $headers[$start_index + 1];
     # the attributes are in the next 4 paragraph elements.
@@ -223,7 +223,7 @@ qr/elementor-element-(?:\w){1,9}.elementor-widget.elementor-widget-theme-post-co
         my ($raw) = $text =~ /\Q$key\E\s*:\s*(\S+)/i;
         my $value = clean_number($raw, $key);
         if (defined $value) {
-          $self->log_debug("setting $key to $value");
+          $self->logger->debug("setting $key to $value");
           my $ba = Game::EvonyTKR::Model::BasicAttribute->new(
             base           => $value,
             increment      => 0,
@@ -232,7 +232,7 @@ qr/elementor-element-(?:\w){1,9}.elementor-widget.elementor-widget-theme-post-co
           $basic->setAttribute($key, $ba);
         }
         else {
-          $self->log_warn("Could not extract $key value from '$text'");
+          $self->logger->warn("Could not extract $key value from '$text'");
         }
       }
     }

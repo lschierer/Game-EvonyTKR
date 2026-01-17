@@ -3,7 +3,7 @@ use v5.42.0;
 use utf8::all;
 use Mojo::Base -base,                           -signatures;
 use Mojo::Base 'Game::EvonyTKR::Role::JSON',    -role;
-with 'Game::EvonyTKR::Role::Logging';
+with 'WebFramework::Role::Logger';
 use Mojo::Pg;
 
 use Carp;
@@ -21,8 +21,8 @@ has 'dsn' => sub ($self) {
 
 has 'pg' => sub ($self) {
   my $dsn = $self->dsn;
-  $self->log_info("[PostgreSQL] Connecting with DSN: $dsn")
-    if $self->can('log_info');
+  $self->logger->info("[PostgreSQL] Connecting with DSN: $dsn")
+    if $self->can('logger->info');
 
   my $pg = Mojo::Pg->new($dsn);
 
@@ -40,8 +40,8 @@ has 'pg' => sub ($self) {
     my $test_db = $pg->db;
     my $result =
       $test_db->query('SELECT current_database(), current_user')->hash;
-    if ($self->can('log_info')) {
-      $self->log_info(sprintf(
+    if ($self->can('logger->info')) {
+      $self->logger->info(sprintf(
         "[PostgreSQL] Connected to database '%s' as user '%s'",
         $result->{current_database},
         $result->{current_user}
@@ -61,8 +61,8 @@ has 'pg' => sub ($self) {
       if $@ !~ /greater than.*latest version/;
   }
 
-  $self->log_info("[PostgreSQL] Initialization complete")
-    if $self->can('log_info');
+  $self->logger->info("[PostgreSQL] Initialization complete")
+    if $self->can('logger->info');
   return $pg;
 };
 
@@ -419,13 +419,13 @@ sub store_conflicts_batch ($self, $conflicts_hash) {
     1;
   } or do {
     my $error = $@ || 'unknown error';
-    $self->log_error(
+    $self->logger->error(
       sprintf("[PostgreSQL] Batch conflict write failed: %s", $error));
     $tx->rollback;
     return 0;
   };
 
-  $self->log_info(
+  $self->logger->info(
     sprintf("[PostgreSQL] Batch wrote %d conflict items", $count));
   return $count;
 }

@@ -14,6 +14,7 @@ package Game::EvonyTKR::Controller::Generals {
   with 'Game::EvonyTKR::Controller::Role::Generals::Routing';
   with 'Game::EvonyTKR::Role::Constants::BuffConstants';
   with 'Game::EvonyTKR::Role::Constants::GeneralConstants';
+  with 'WebFramework::Role::Markdown';
 
 
   use List::Util qw(min);
@@ -58,14 +59,19 @@ package Game::EvonyTKR::Controller::Generals {
     # Call parent to register common routes
     $self->SUPER::build();
 
-    # Add navigation for main generals page
+    # Force initialization of validRoutes
+    my $routes = $self->validRoutes;
+    $self->logger->info(sprintf("Initialized %d valid routes", scalar(keys %$routes)));
+
+    # Add navigation for main generals page (Reference section)
     $self->add_navigation_route(
       $refBase,
       'Generals',
       { order => 20, parent => '/Reference' }
     );
 
-    # Register routes
+    # ===== /Reference/Generals routes (detail pages) =====
+
     # Main generals landing page
     $self->router->add($refBase, {
       to => sub ($self, $ctx) {
@@ -81,19 +87,7 @@ package Game::EvonyTKR::Controller::Generals {
 
     $self->logger->info(sprintf("Registering %d troop type index routes", scalar(@general_types)));
 
-    foreach my $generalType (@general_types) {
-      my $ui_target = $self->_ui_target_name($generalType);
-      my $slug = $self->_slugify($ui_target);
 
-      $self->router->add("$refBase/$slug", {
-        to => sub ($self, $ctx) {
-          return $self->troopTypeIndex($ctx, $slug);
-        },
-        action => 'http.*',
-      });
-
-      $self->logger->info("Registered troop type index route: $refBase/$slug for type: $generalType");
-    }
 
     # Single general detail page (dynamic route - registered after static routes)
     $self->router->add("$refBase/:name", {
@@ -106,8 +100,42 @@ package Game::EvonyTKR::Controller::Generals {
       action => 'http.*',
     });
 
+    # ===== /Generals routes (table comparison pages) =====
 
-    # Route 1: Table UI page
+    # Main tables landing page
+    $self->router->add($base, {
+      to => sub ($self, $ctx) {
+        return $self->tablesIndex($ctx);
+      },
+      action => 'http.*',
+    });
+
+    foreach my $generalType (@general_types) {
+      my $ui_target = $self->_ui_target_name($generalType);
+
+      $self->router->add("$base/$ui_target", {
+        to => sub ($self, $ctx) {
+          return $self->troopTypeTableIndex($ctx, $ui_target);
+        },
+        action => 'http.*',
+      });
+
+      $self->logger->info("Registered troop type index route: `$base/$ui_target` for type: $generalType");
+
+      # Activation index (shows single/pair choice or redirects)
+      foreach my $buffActivation ($self->AllowedBuffActivationValues->@*){
+        $self->router->add("$base/$ui_target/$buffActivation", {
+          to => sub ($self, $ctx, @args) {
+            return $self->activationIndex($ctx, $ui_target, $buffActivation);
+          },
+          action => 'http.*',
+        });
+      }
+
+
+    }
+
+    # Table UI page
     $self->router->add("$base/:uiTarget/:buffActivation/comparison", {
       to => sub ($self, $ctx, @args) {
         my $uiTarget = uri_unescape($args[0]);
@@ -119,7 +147,7 @@ package Game::EvonyTKR::Controller::Generals {
       action => 'http.*',
     });
 
-    # Route 2: Catalog endpoint (POST for filter body)
+    # Catalog endpoint (POST for filter body)
     $self->router->add("$base/:uiTarget/:buffActivation/data.json", {
       to => sub ($self, $ctx, @args) {
         my $uiTarget = uri_unescape($args[0]);
@@ -131,7 +159,7 @@ package Game::EvonyTKR::Controller::Generals {
       action => 'http.post',
     });
 
-    # Route 3: Details stream (SSE)
+    # Details stream (SSE)
     $self->router->add("$base/:uiTarget/:buffActivation/details-stream", {
       to => sub ($self, $ctx, @args) {
         my $uiTarget = uri_unescape($args[0]);
@@ -139,18 +167,6 @@ package Game::EvonyTKR::Controller::Generals {
         $uiTarget = decode('UTF-8', $uiTarget) unless is_utf8($uiTarget);
         $buffActivation = decode('UTF-8', $buffActivation) unless is_utf8($buffActivation);
         return $self->stream_single_details($ctx, $uiTarget, $buffActivation);
-      },
-      action => 'http.*',
-    });
-
-    # Activation index (shows single/pair choice or redirects)
-    $self->router->add("$base/:uiTarget/:buffActivation", {
-      to => sub ($self, $ctx, @args) {
-        my $uiTarget = uri_unescape($args[0]);
-        my $buffActivation = uri_unescape($args[1]);
-        $uiTarget = decode('UTF-8', $uiTarget) unless is_utf8($uiTarget);
-        $buffActivation = decode('UTF-8', $buffActivation) unless is_utf8($buffActivation);
-        return $self->activationIndex($ctx, $uiTarget, $buffActivation);
       },
       action => 'http.*',
     });
@@ -250,6 +266,75 @@ package Game::EvonyTKR::Controller::Generals {
     };
 
     return $self->render('generals/index.tt', $vars);
+  }
+
+  # Tables landing page at /Generals
+  sub tablesIndex($self, $ctx) {
+    $self->logger->debug("Rendering generals tables landing page");
+
+    # Get all troop types
+    use Game::EvonyTKR::Role::Constants::GeneralConstants;
+    my @general_types = keys %Game::EvonyTKR::Role::Constants::GeneralConstants::generalKeys;
+
+    my @troop_types;
+    foreach my $generalType (@general_types) {
+      my $ui_target = $self->_ui_target_name($generalType);
+      push @troop_types, {
+        name => $ui_target,
+        slug => $ui_target,
+        path => "/Generals/$ui_target",
+      };
+    }
+
+    my $vars = {
+      troop_types  => \@troop_types,
+      title        => 'General Comparison Tables',
+      current_year => (localtime)[5] + 1900,
+      css_files    => ['/css/generals.css'],
+      sidebar      => 1,
+      navigation   => $self->render_navigation($ctx->req->path),
+      site_logo    => $self->site_logo(),
+    };
+
+    return $self->render('generals/tablesIndex.tt', $vars);
+  }
+
+  # Troop type table index at /Generals/:uiTarget
+  sub troopTypeTableIndex($self, $ctx, $uiTarget) {
+    $self->logger->debug("Rendering table index for troop type: $uiTarget");
+
+    # Get all valid routes for this troop type
+    my @routes = $self->get_routes_for_uiTarget($uiTarget);
+
+    unless (@routes) {
+      return $self->render_error($ctx, 404, "No routes found for troop type: $uiTarget");
+    }
+
+    # Sort by buff activation
+    my @sorted_routes = sort { $a->{buffActivation} cmp $b->{buffActivation} } @routes;
+
+    # Check for markdown content
+    my $static_content = '';
+    my $path = $ctx->req->path;
+    $path =~ s|^/||;
+    my $md_file = $self->pages_dir->child("$path/index.md");
+    if ($md_file->exists) {
+      $static_content = $self->retrieve_rendered_markdown($md_file);
+    }
+
+    my $vars = {
+      uiTarget       => $uiTarget,
+      routes         => \@sorted_routes,
+      static_content => $static_content,
+      title          => "$uiTarget Tables",
+      current_year   => (localtime)[5] + 1900,
+      css_files      => ['/css/generals.css'],
+      sidebar        => 1,
+      navigation     => $self->render_navigation($ctx->req->path),
+      site_logo      => $self->site_logo(),
+    };
+
+    return $self->render('generals/troopTypeTableIndex.tt', $vars);
   }
 
   # Show general details
@@ -800,39 +885,6 @@ package Game::EvonyTKR::Controller::Generals {
       wall    => 'Wall',
     );
     return $map{$suffix} // 'Ground Troops';
-  }
-
-  # Troop type index - shows available buff activations
-  sub troopTypeIndex ($self, $ctx, $troopType) {
-    $self->logger->debug("Rendering troop type index for: $troopType");
-
-    # Get all valid routes for this troop type
-    my @routes = $self->get_routes_for_uiTarget($troopType);
-
-    unless (@routes) {
-      $self->logger->error("No valid routes found for troop type: $troopType");
-      return $self->render_error($ctx, 404, "Invalid troop type");
-    }
-
-    # Sort routes by uiTarget, then buffActivation
-    @routes = sort {
-      my $uitc = $a->{uiTarget} cmp $b->{uiTarget};
-      return $uitc if $uitc != 0;
-      return $a->{buffActivation} cmp $b->{buffActivation};
-    } @routes;
-
-    # Prepare template variables
-    my $vars = {
-      troopType     => $troopType,
-      routes        => \@routes,
-      title         => "General Tables - $troopType",
-      current_year  => (localtime)[5] + 1900,
-      sidebar       => 1,
-      navigation    => $self->render_navigation($ctx->req->path),
-      site_logo     => $self->site_logo(),
-    };
-
-    return $self->render('generals/troopTypeIndex.tt', $vars);
   }
 
   # Activation index - shows single/pair choice or redirects

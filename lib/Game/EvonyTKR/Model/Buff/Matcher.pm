@@ -50,18 +50,18 @@ package Game::EvonyTKR::Model::Buff::Matcher {
 
         if (exists $self->general_to_targeted->{$short}) {
           $test_tt = $self->general_to_targeted->{$short};
-          $self->log_debug(
+          $self->logger->debug(
             "$logID. Normalized test_targetedType to '$test_tt'");
         }
         else {
-          $self->log_warn(
+          $self->logger->warn(
             "$logID . Unrecognized general specialist key: $test_tt");
           return 0;
         }
       }
 
       if ($self->toTest->targetedType !~ /$test_tt/i) {
-        $self->log_debug(
+        $self->logger->debug(
           $logID
             . sprintf(
             '  ✗ Rejected: targetedType "%s" not matched by %s',
@@ -72,39 +72,39 @@ package Game::EvonyTKR::Model::Buff::Matcher {
       }
     }
     else {
-      $self->log_debug("$logID the buff to be tested had no targeted types.");
+      $self->logger->debug("$logID the buff to be tested had no targeted types.");
     }
-    $self->log_debug($logID . ' matchTargetedType found no issue');
+    $self->logger->debug($logID . ' matchTargetedType found no issue');
     return 1;
   }
 
   sub matchDebuffConditions ($self, $testDebuffs, $logID) {
     my $has_debuff_conditions = scalar @{ $self->toTest->debuffConditions } > 0;
-    $self->log_debug("$logID has_debuff_conditions is $has_debuff_conditions");
+    $self->logger->debug("$logID has_debuff_conditions is $has_debuff_conditions");
     if ($has_debuff_conditions) {
       if (scalar @$testDebuffs == 0) {
-        $self->log_debug(
+        $self->logger->debug(
           "  ✗ Rejected: buff has debuff conditions but none were requested");
         return 0;
       }
-      $self->log_debug(
+      $self->logger->debug(
         "past check for no debuff conditions. " . scalar @$testDebuffs);
       # we have debuff condition values to test against
       foreach my $condition (@{ $self->toTest->debuffConditions }) {
         if (none { $_ eq $condition } @$testDebuffs) {
-          $self->log_debug(
+          $self->logger->debug(
             "  ✗ Rejected: debuff condition '$condition' not in allowed list");
           return 0;
         }
       }
     }
     elsif (scalar @{$testDebuffs}) {
-      $self->log_debug($logID
+      $self->logger->debug($logID
           . "  ✗ Rejected: debuff conditions are not present in buff and are required."
       );
       return 0;
     }
-    $self->log_debug($logID . ' matchDebuffConditions found no issue');
+    $self->logger->debug($logID . ' matchDebuffConditions found no issue');
     return 1;
   }
 
@@ -118,13 +118,13 @@ package Game::EvonyTKR::Model::Buff::Matcher {
       else {
         %allowed_conditions = map { $_ => 1 } $self->no_op_Conditions->@*;
       }
-      $self->log_debug(sprintf(
+      $self->logger->debug(sprintf(
         '%s  Processing: This buff has %s conditions.',
         $logID, scalar @{ $self->toTest->buffConditions }
       ));
       foreach my $condition (@{ $self->toTest->buffConditions }) {
         if (!exists $allowed_conditions{$condition}) {
-          $self->log_debug(
+          $self->logger->debug(
             $logID
               . sprintf(
               '  ✗ Rejected: buff condition "%s" not in allowed list (%s).',
@@ -137,21 +137,21 @@ package Game::EvonyTKR::Model::Buff::Matcher {
     }
     # the buff has no conditions.
     # An unconnditional buff matches all conditions.
-    $self->log_debug('matchBuffConditions found no issue');
+    $self->logger->debug('matchBuffConditions found no issue');
     return 1;
   }
 
   sub match ($self, $test_attribute, $test_tt, $testBuffs, $testDebuffs, $logID)
   {
-    $self->log_debug("$logID === BUFF MATCHER CALLED ===");
-    $self->log_debug(sprintf(
+    $self->logger->debug("$logID === BUFF MATCHER CALLED ===");
+    $self->logger->debug(sprintf(
       "$logID Matcher called with: attr=%s, tt=%s, buffs=%s, debuffs=%s",
       $test_attribute,        $test_tt,
       join(',', @$testBuffs), join(',', @$testDebuffs)
     ));
 
     if ($self->toTest->attribute ne $test_attribute) {
-      $self->log_debug("$logID Rejecting based on $test_attribute");
+      $self->logger->debug("$logID Rejecting based on $test_attribute");
       return 0;
     }
 
@@ -165,27 +165,27 @@ package Game::EvonyTKR::Model::Buff::Matcher {
         # "Marching",
         # "When Rallying",
       ];
-      $self->log_warn(
+      $self->logger->warn(
         "$logID Empty buff conditions provided, using empty defaults instead");
     }
     if (length($test_tt)) {
       if (!$self->matchTargetedType($test_tt, $logID)) {
-        $self->log_debug("$logID Rejecting based on $test_tt");
+        $self->logger->debug("$logID Rejecting based on $test_tt");
         return 0;
       }
     }
     if (!$self->matchDebuffConditions($testDebuffs, $logID)) {
-      $self->log_debug(
+      $self->logger->debug(
         "$logID Rejecting based on " . join(', ', @{$testDebuffs}));
       return 0;
     }
     if (!$self->matchBuffConditions($testBuffs, $logID)) {
-      $self->log_debug(
+      $self->logger->debug(
         sprintf('%s Rjecting based on: %s.', $logID, join(', ', @{$testBuffs}))
       );
       return 0;
     }
-    $self->log_debug("accepted $logID");
+    $self->logger->debug("accepted $logID");
     return 1;
   }
 }

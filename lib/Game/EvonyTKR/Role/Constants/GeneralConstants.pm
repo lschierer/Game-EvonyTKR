@@ -30,7 +30,7 @@ package Game::EvonyTKR::Role::Constants::GeneralConstants {
       my ($self) = @_;
       my @gk;
       push @gk, sort keys %generalKeys;
-      $self->log_debug(sprintf('there are %s keys from generalKeys', scalar @gk));
+      $self->logger->debug(sprintf('there are %s keys from generalKeys', scalar @gk));
       return \@gk;
     }
   );
@@ -45,13 +45,13 @@ package Game::EvonyTKR::Role::Constants::GeneralConstants {
       return $valid;
     }
     elsif (ref($tt)) {
-      $self->log_error(sprintf(
+      $self->logger->error(sprintf(
         'General Type Must be an Array or a Scalar, not %s', ref($tt)));
       return 0;
     }
     else {
       if (none { $_ eq $tt } $self->GeneralKeys->@*) {
-        $self->log_error(sprintf(
+        $self->logger->error(sprintf(
           'General Type must be one of %s, not %s',
           join(', ', $self->GeneralKeys->@*), $tt
         ));

@@ -30,7 +30,7 @@ class Game::EvonyTKR::Model::Data : isa(Game::EvonyTKR::Shared::Constants) {
     }
 
     if (none { $_ eq $proposed } $self->AllowedBuffActivationValues->@*) {
-      $self->log_warn(
+      $self->logger->warn(
 "validateBuffActivation detected illegal Buff Activation Condition $proposed"
       );
       return 0;
@@ -122,7 +122,7 @@ class Game::EvonyTKR::Model::Data : isa(Game::EvonyTKR::Shared::Constants) {
 
   method checkCovenantLevel ($proposedLevel) {
     unless (defined($proposedLevel) && length($proposedLevel)) {
-      $self->log_error("Invalid proposed level!!! $proposedLevel");
+      $self->logger->error("Invalid proposed level!!! $proposedLevel");
       return 0;
     }
     my $check = {};

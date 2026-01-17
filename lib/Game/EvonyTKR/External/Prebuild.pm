@@ -127,17 +127,17 @@ sub register ($taskClass, $app, $conf = {}) {
 
   unless (defined($app->minion)) {
     my $errmessage = sprintf('minion undefined in job for %s', __PACKAGE__);
-    $taskClass->log_error($errmessage);
+    $taskClass->logger->error($errmessage);
     say $errmessage;
     return;
   }
-  $taskClass->log_debug(
+  $taskClass->logger->debug(
     sprintf('register function for "%s" %s', __PACKAGE__, $$));
 
   # Register main prebuild orchestration task
   $app->minion->add_task($taskClass->task_name => __PACKAGE__);
 
-  $taskClass->log_info(
+  $taskClass->logger->info(
     sprintf('%s register function complete for %s', __PACKAGE__, $$));
   return 1;
 }
@@ -145,18 +145,18 @@ sub register ($taskClass, $app, $conf = {}) {
 sub prebuildPrerequisites ($job, $args = {}) {
 
   my @loaded_plugins = sort values $job->minion->tasks->%*;
-  $job->log_debug(
+  $job->logger->debug(
     sprintf('there are %s tasks in minion', scalar(@loaded_plugins)));
   if (scalar(keys($args->%*)) == 0) {
     foreach my $prereq_plugin ($prereq_plugins->@*) {
       if (any { $_ eq $prereq_plugin } @loaded_plugins) {
-        $job->log_debug(sprintf('prereq %s is registered', $prereq_plugin,));
+        $job->logger->debug(sprintf('prereq %s is registered', $prereq_plugin,));
         $prereqs->{$prereq_plugin} = 1;
       }
       else {
         my $errmessage = sprintf('module "%s" unavailable', $prereq_plugin,);
         print STDERR $errmessage;
-        $job->log_error($errmessage);
+        $job->logger->error($errmessage);
         $prereqs->{$prereq_plugin} = 0;
         return $job->fail($errmessage);
       }
@@ -170,7 +170,7 @@ sub prebuildPrerequisites ($job, $args = {}) {
   if (none { $_ == 0 } values $prereqs->%*) {
     return 1;
   }
-  $job->log_debug(
+  $job->logger->debug(
     sprintf('failed prebuildPrerequisites: %s',
       Data::Printer::np($prereqs, multiline => 0))
   );
@@ -189,20 +189,20 @@ sub run ($job, @args) {
   $job->SUPER::run(@args);
   unless (defined($job->minion)) {
     my $errmessage = sprintf('minion undefined in job for %s', __PACKAGE__);
-    $job->log_error($errmessage);
+    $job->logger->error($errmessage);
     return $job->fail($errmessage);
   }
   else {
-    $job->log_debug(sprintf(
+    $job->logger->debug(sprintf(
       'minion in %s is a %s;%s',
       __PACKAGE__, ref($job->minion), blessed($job->minion)
     ));
   }
-  $job->log_debug('Prebuild orchestration starting');
+  $job->logger->debug('Prebuild orchestration starting');
 
   # Check prerequisites before proceeding
   unless ($job->prebuildPrerequisites) {
-    $job->log_debug(sprintf('Cannot start prebuild; prereqs: %s',
+    $job->logger->debug(sprintf('Cannot start prebuild; prereqs: %s',
       Data::Printer::np($prereqs, multiline => 0)));
     return $job->retry({ delay => $job->standard_delay });
   }
@@ -210,13 +210,13 @@ sub run ($job, @args) {
   # Get current version from config (git-commit)
   my $current_version =
     eval { $job->app->config->{version}{'git-commit'} } // 'unknown';
-  $job->log_info("Current git-commit: $current_version");
+  $job->logger->info("Current git-commit: $current_version");
   my $stored_version = 0;
 
   # Create unique run identifier for this prebuild
   my $run_id = sprintf('%s-%s', $$, $job->id);
   $job->prebuild_run_id($run_id);
-  $job->log_info("Prebuild run ID: $run_id");
+  $job->logger->info("Prebuild run ID: $run_id");
 
   # harvest old stuff
   $job->cleanup();
@@ -225,7 +225,7 @@ sub run ($job, @args) {
   my $loaderJobDefs =
     $job->_build_loader_job_defs($stored_version, $current_version);
 
-  $job->log_debug(
+  $job->logger->debug(
     sprintf('this prebuild includes jobs: %s',
       join(', ', keys %{$loaderJobDefs}),)
   );
@@ -242,7 +242,7 @@ sub run ($job, @args) {
 
       if ($generals_count > 0 && $specialties_count > 0 && $books_count > 0) {
         $data_current = 1;
-        $job->log_info(sprintf(
+        $job->logger->info(sprintf(
           'Data current for version %s '
             . '(generals=%d, specialties=%d, books=%d)',
           $current_version,   $generals_count,
@@ -250,7 +250,7 @@ sub run ($job, @args) {
         ));
       }
       else {
-        $job->log_warn(sprintf(
+        $job->logger->warn(sprintf(
           'Version matches but data incomplete: '
             . 'generals=%d, specialties=%d, books=%d',
           $generals_count, $specialties_count, $books_count
@@ -258,18 +258,18 @@ sub run ($job, @args) {
       }
     }
     elsif ($stored_version) {
-      $job->log_info(sprintf(
+      $job->logger->info(sprintf(
         'Data version mismatch: stored=,%s current=%s - will reload',
         $stored_version, $stored_version
       ));
     }
     else {
-      $job->log_info("No stored data version - first run or data cleared");
+      $job->logger->info("No stored data version - first run or data cleared");
     }
   };
 
   if ($@) {
-    $job->log_debug("Error checking data version: $@");
+    $job->logger->debug("Error checking data version: $@");
     $data_current = 0;
   }
 
@@ -279,7 +279,7 @@ sub run ($job, @args) {
   my $refresh_every = 10;    # heartbeat interval
   my $pair_monitor_jid;
 
-  $job->log_info('launching jobs to spawn loaders.');
+  $job->logger->info('launching jobs to spawn loaders.');
 
   # Mark all work units as incomplete at start
   require Game::EvonyTKR::WorkUnit::Tracker;
@@ -289,7 +289,7 @@ sub run ($job, @args) {
   my @work_units;
   foreach my $prereq ($prereq_plugins->@*) {
     unless ($prereq->can('task_name')) {
-      $job->log_error(
+      $job->logger->error(
         sprintf('prereq plugin "%s" is missing the task_name method.', $prereq)
       );
       next;
@@ -314,7 +314,7 @@ sub run ($job, @args) {
   my $loaderJids = [];
   my $totalJobs  = 0;    # Count both launched and existing jobs
   foreach my $jobname (sort keys $loaderJobDefs->%*) {
-    $job->log_debug("Prebuild needs to launch $jobname");
+    $job->logger->debug("Prebuild needs to launch $jobname");
 
     my $args   = $loaderJobDefs->{$jobname}->{args} // [];
     my $params = $loaderJobDefs->{$jobname}         // {};
@@ -345,24 +345,24 @@ sub run ($job, @args) {
     );
     if (defined($jid)) {
       $job->note($jobname => $jid);
-      $job->log_debug(sprintf('launched %s with jid %s', $jobname, $jid));
+      $job->logger->debug(sprintf('launched %s with jid %s', $jobname, $jid));
       push @{$loaderJids}, $jid;
       $totalJobs++;    # Count newly launched jobs
     }
     else {
       my $errmessage = sprintf('failed to launch %s', $jobname);
-      $job->log_error($errmessage);
+      $job->logger->error($errmessage);
       return $job->fail($errmessage);
     }
   }
 
   if ($totalJobs == keys($loaderJobDefs->%*)) {
-    $job->log_info('all job spawners launched or already exist');
+    $job->logger->info('all job spawners launched or already exist');
   }
   else {
     my $errmessage = sprintf('launched %s spawners, expected %s. ',
       $totalJobs, scalar(keys($loaderJobDefs->%*)));
-    $job->log_error($errmessage);
+    $job->logger->error($errmessage);
     return $job->fail($errmessage);
   }
 
@@ -371,7 +371,7 @@ sub run ($job, @args) {
   my $collection_completions;
   foreach my $prereq ($prereq_plugins->@*) {
     unless ($prereq->can('task_name')) {
-      $job->log_error(
+      $job->logger->error(
         sprintf('prereq plugin "%s" is missing the task_name method.', $prereq)
       );
       next;
@@ -388,7 +388,7 @@ sub run ($job, @args) {
           notes    => { prebuild_run_id => $run_id }
         }
       );
-      $job->log_debug(sprintf(
+      $job->logger->debug(sprintf(
         'Spawned completion job for %s: %s',
         $prereq->task_name, $completion_jid
       ));
@@ -408,7 +408,7 @@ sub run ($job, @args) {
       notes    => { prebuild_run_id => $run_id }
     }
   );
-  $job->log_debug("Spawned pairs completion job: $pairs_completion_jid");
+  $job->logger->debug("Spawned pairs completion job: $pairs_completion_jid");
 
   my $monitor_names = [
     sort grep { $_ =~ /(?:monitor)/i }
@@ -430,10 +430,10 @@ sub run ($job, @args) {
     );
     if (defined $mj) {
       $monitors->{$mn} = $mj;
-      $job->log_debug("Launched monitor job $mn with jid $mj");
+      $job->logger->debug("Launched monitor job $mn with jid $mj");
     }
     else {
-      $job->log_warn("Failed to launch monitor job $mn");
+      $job->logger->warn("Failed to launch monitor job $mn");
     }
   }
 
@@ -442,10 +442,10 @@ sub run ($job, @args) {
     my $current_version = $job->app->config->{version}{'git-commit'}
       // 'unknown';
     $job->persistence->set_data_version($current_version);
-    $job->log_info("Stored data version: $current_version");
+    $job->logger->info("Stored data version: $current_version");
   };
   if ($@) {
-    $job->log_warn("Failed to store data version: $@");
+    $job->logger->warn("Failed to store data version: $@");
   }
 
   $job->finish('Prebuild spawning complete');
@@ -457,12 +457,12 @@ sub cleanup ($job) {
   # Harvest ALL jobs from previous prebuild runs
   # (assume previous prebuild crashed)
   my $harvested = $job->harvest_tagged_jobs() // 0;
-  $job->log_info("Harvested $harvested jobs from previous runs");
+  $job->logger->info("Harvested $harvested jobs from previous runs");
 
   my @tasks;
   foreach my $prereq ($prereq_plugins->@*) {
     unless ($prereq->can('task_name')) {
-      $job->log_error(
+      $job->logger->error(
         sprintf('prereq plugin "%s" is missing the task_name method.', $prereq)
       );
       next;
@@ -495,7 +495,7 @@ sub cleanup ($job) {
 
     }
   });
-  $job->log_debug(sprintf('cleaned %s jobs after harvest ran', $cleaned));
+  $job->logger->debug(sprintf('cleaned %s jobs after harvest ran', $cleaned));
 }
 
 1;

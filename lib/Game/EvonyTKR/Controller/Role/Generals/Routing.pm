@@ -37,13 +37,17 @@ sub all_valid_routes($c) {
 sub get_routes_for_uiTarget ($c, $uiTarget) {
   $c->logger->debug("looking for routes for $uiTarget");
   my @results;
-  my $slug = $c->_slugify($uiTarget);
-  $c->logger->debug("slug for $uiTarget is $slug");
+  #my $slug = $c->_slugify($uiTarget);
+  #$c->logger->debug("slug for $uiTarget is $slug");
   foreach my $key (keys $c->validRoutes->%*) {
-    if ($key =~ /^$slug/) {
+    if ($key =~ /^$uiTarget/) {
+      $c->logger->debug("'$key' =~ '$uiTarget' -- good") if $c->app->env eq 'development';
       push @results, $c->validRoutes->{$key};
+    }else {
+      $c->logger->debug("'$key' !~ '$uiTarget'") if $c->app->env eq 'development';
     }
   }
+  $c->logger->debug(sprintf('there are %s routes for ui target "%s"', scalar(@results), $uiTarget));
   return @results;
 }
 
@@ -56,34 +60,28 @@ sub has_route ($c, $uiTarget, $buffActivation) {
 }
 
 sub try_lookup_route ($c, $uiTarget, $buffActivation) {
-  my $slug_ui   = $c->_slugify($uiTarget);
-  my $slug_buff = $c->_slugify($buffActivation);
-  my $key       = "$slug_ui|$slug_buff";
-  return $c->validRoutes->{$key};    # undef if missing; NO croak
+  #my $slug_ui   = $c->_slugify($uiTarget);
+  #my $slug_buff = $c->_slugify($buffActivation);
+  #my $key       = "$slug_ui|$slug_buff";
+  return $c->validRoutes->{"$uiTarget|$buffActivation"};    # undef if missing; NO croak
 }
 
-sub lookup_route ($c, $slug_ui, $slug_buff,) {
-  $slug_ui   = $c->_slugify($slug_ui);
-  $slug_buff = $c->_slugify($slug_buff);
-  my $key = lc("$slug_ui|$slug_buff");
-  if (exists $c->validRoutes->{$key}) {
-    return $c->validRoutes->{$key};
+sub lookup_route ($c, $uiTarget, $buffActivation) {
+  #$slug_ui   = $c->_slugify($slug_ui);
+  #$slug_buff = $c->_slugify($slug_buff);
+  #my $key = lc("$slug_ui|$slug_buff");
+  if (exists $c->validRoutes->{"$uiTarget|$buffActivation"}) {
+    return $c->validRoutes->{"$uiTarget|$buffActivation"};
   }
   if ($c->routing_debug) {
     my @r = $c->all_valid_routes();
-    $c->logger->error("$key is not a valid route. Valid routes are "
+    $c->logger->error("'$uiTarget|$buffActivation' is not a valid route. Valid routes are "
         . Data::Printer::np($c->validRoutes));
   }
   else {
-    $c->logger->error("$key is not a valid route.");
+    $c->logger->error("'$uiTarget|$buffActivation' is not a valid route.");
   }
   return undef;  # Return undef instead of croaking - let caller handle it
-}
-
-sub _slugify ($c, $str) {
-  $str =~ s/\s+/-/g;
-  $str =~ s/[^a-zA-Z0-9\-]//g;
-  return lc $str;
 }
 
 sub _ui_target_name ($c, $tt) {
@@ -134,11 +132,11 @@ sub get_valid_routes($c) {
 
       # Generate slugs
       my $uiTarget  = $c->_ui_target_name($tt);
-      my $slug_ui   = $c->_slugify($uiTarget);
-      my $slug_buff = $c->_slugify($buffActivation);
+      #my $slug_ui   = $c->_slugify($uiTarget);
+      #my $slug_buff = $c->_slugify($buffActivation);
 
       # Save valid combo using pipe as a dsv separator
-      $c->validRoutes->{"$slug_ui|$slug_buff"} = {
+      $c->validRoutes->{"$uiTarget|$buffActivation"} = {
         generalType    => $tt,
         uiTarget       => $uiTarget,
         buffActivation => $buffActivation,

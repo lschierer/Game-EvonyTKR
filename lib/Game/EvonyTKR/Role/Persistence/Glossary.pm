@@ -17,7 +17,7 @@ sub get_glossary_term ($self, $term_name) {
   my $normalized_name = lc($self->normalize($term_name));
 
   if (exists $glossary_terms->{$normalized_name}) {
-    $self->log_debug("Returning glossary term $term_name from state cache");
+    $self->logger->debug("Returning glossary term $term_name from state cache");
     return $glossary_terms->{$normalized_name};
   }
 

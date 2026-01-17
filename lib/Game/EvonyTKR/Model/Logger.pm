@@ -2,7 +2,7 @@ use v5.42.0;
 use experimental qw(class);
 use utf8::all;
 use namespace::autoclean;
-require Game::EvonyTKR::Role::Logging;
+require WebFramework::Role::Logger;
 
 class Game::EvonyTKR::Model::Logger {
   #PODNAME: Game::EvonyTKR::Model::Logger
@@ -25,12 +25,12 @@ class Game::EvonyTKR::Model::Logger {
     return $log;
   }
 
-  method trace { $self->log_debug(@_) }
-  method debug { $self->log_debug(@_) }
-  method info  { $self->log_info(@_) }
-  method warn  { $self->log_warn(@_) }
-  method error { $self->log_error(@_) }
-  method fatal { $self->log_error(@_) }
+  method trace { $self->logger->debug(@_) }
+  method debug { $self->logger->debug(@_) }
+  method info  { $self->logger->info(@_) }
+  method warn  { $self->logger->warn(@_) }
+  method error { $self->logger->error(@_) }
+  method fatal { $self->logger->error(@_) }
 
   # Normalize $level to a constant if a string is given
   method _norm_level ($level) {

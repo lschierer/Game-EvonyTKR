@@ -70,11 +70,11 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
       $cached_buffs ? $cached_buffs->{secondary_buffs} : undef;
 
     if ($primary_buffs) {
-      $job->log_debug(
+      $job->logger->debug(
         "Using precomputed buffs for primary general: $primaryName");
     }
     if ($secondary_buffs) {
-      $job->log_debug(
+      $job->logger->debug(
         "Using precomputed buffs for secondary general: $secondaryName");
     }
 
@@ -97,7 +97,7 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
     }
 
     if (scalar(@errmessage)) {
-      $job->log_error(join ' ', @errmessage);
+      $job->logger->error(join ' ', @errmessage);
       $job->fail(join ' ', @errmessage);
       return;
     }
@@ -106,7 +106,7 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
     my $primary = $job->get_general(lc($job->normalize($primaryName)));
     unless ($primary) {
       my $err = sprintf('Cannot retrieve primary general: %s', $primaryName);
-      $job->log_error($err);
+      $job->logger->error($err);
       return $job->fail($err);
     }
 
@@ -114,7 +114,7 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
     unless ($secondary) {
       my $err =
         sprintf('Cannot retrieve secondary general: %s', $secondaryName);
-      $job->log_error($err);
+      $job->logger->error($err);
       return $job->fail($err);
     }
     $t{get_generals} = time() - $t_start;
@@ -131,7 +131,7 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
       my $err = sprintf(
         'Cannot retrieve pair for primary "%s", secondary "%s", type "%s"',
         $primaryName, $secondaryName, $params->{targetType});
-      $job->log_error($err);
+      $job->logger->error($err);
       return $job->fail($err);
     }
 
@@ -149,7 +149,7 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
         my $errmessage =
           sprintf('Failed to get ascending attributes for primary "%s"',
           $pair->primary->name);
-        $job->log_error($errmessage);
+        $job->logger->error($errmessage);
         $job->fail($errmessage);
       }
     }
@@ -183,7 +183,7 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
     $params->{pair} = $pair;
     # Convert targetType to proper troop type key
     $params->{targetType} = $job->string_to_trooptype($params->{targetType});
-    $job->log_debug(sprintf(
+    $job->logger->debug(sprintf(
       '%s using tt %s to retrieve results',
       __PACKAGE__, $params->{targetType}
     ));
@@ -211,14 +211,14 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
     );
 
     # Create summarizer
-    $job->log_debug('Creating pair summarizer');
+    $job->logger->debug('Creating pair summarizer');
     my $t_create_start = time();
     my $summarizer =
       Game::EvonyTKR::Model::Buff::Summarizer::Pair->new($params->%*);
     $t{create_summarizer} = time() - $t_create_start;
 
     # Compute buffs and debuffs
-    $job->log_debug('Computing buffs');
+    $job->logger->debug('Computing buffs');
     my $t_buffs_start = time();
     $summarizer->updatePrimaryBuffs($primary_buffs);
     # Opportunistic cache warming: if we had to compute, store for next time
@@ -233,7 +233,7 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
       my $computed_primary = $summarizer->pairBuffValues;
       if ($computed_primary) {
         $job->store_buff_cache($primary_key, $computed_primary);
-        $job->log_debug(
+        $job->logger->debug(
           "Opportunistically cached primary buffs for $primaryName");
       }
     }
@@ -241,7 +241,7 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
     $summarizer->updateSecondaryBuffs($secondary_buffs);
     $t{update_buffs} = time() - $t_buffs_start;
 
-    $job->log_debug('Computing debuffs');
+    $job->logger->debug('Computing debuffs');
     my $t_debuffs_start = time();
     $summarizer->updateDebuffs();
     $t{update_debuffs} = time() - $t_debuffs_start;
@@ -254,7 +254,7 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
     my $buffs   = $summarizer->pairBuffValues;
     my $debuffs = $summarizer->pairDebuffValues;
 
-    $job->log_debug(sprintf(
+    $job->logger->debug(sprintf(
       'Buff values for %s/%s: %s',
       $primaryName, $secondaryName,
       Data::Printer::np($buffs, multiline => 0)
@@ -262,7 +262,7 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
 
     # Log timing breakdown
     my $t_total = time() - $t_start;
-    $job->log_info(sprintf(
+    $job->logger->info(sprintf(
       'TIMING: total=%.3fs get_generals=%.3fs get_pair=%.3fs get_cov=%.3fs '
         . 'pop_asc=%.3fs pop_books=%.3fs pop_spec=%.3fs validate=%.3fs '
         . 'create_sum=%.3fs buffs=%.3fs debuffs=%.3fs',
@@ -323,7 +323,7 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
       my $em = sprintf('job id %s cannot find a valid Pair for params %s',
         $job->info->{id}, Data::Printer::np($params, multiline => 0));
 
-      $job->log_error($em);
+      $job->logger->error($em);
       return $job->fail($em);
     }
 
@@ -337,7 +337,7 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
           join ', ',
           map { sprintf('"%s"', $_) } $job->AscendingAttributeLevelValues(1),
         );
-        $job->log_error($em);
+        $job->logger->error($em);
         return $job->fail($em);
       }
     }
@@ -350,7 +350,7 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
           join ', ',
           map { sprintf('"%s"', $_) } $job->AscendingAttributeLevelValues(0),
         );
-        $job->log_error($em);
+        $job->logger->error($em);
         return $job->fail($em);
       }
     }
@@ -365,7 +365,7 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
           join ', ',
           map { sprintf('"%s"', $_) } $job->CovenantCategoryValues->@*
         );
-        $job->log_error($em);
+        $job->logger->error($em);
         return $job->fail($em);
       }
     }
@@ -378,7 +378,7 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
           'primary specialty%d level "%s" is invalid, must be one of %s',
           $index, $specialtyLevel, join ', ',
           map { sprintf('"%s"', $_) } $job->SpecialtyLevelValues->@*);
-        $job->log_error($em);
+        $job->logger->error($em);
         return $job->fail($em);
       }
     }
@@ -391,7 +391,7 @@ package Game::EvonyTKR::External::General::Pair::Summarizer {
           'secondary specialty%d level "%s" is invalid, must be one of %s',
           $index, $specialtyLevel, join ', ',
           map { sprintf('"%s"', $_) } $job->SpecialtyLevelValues->@*);
-        $job->log_error($em);
+        $job->logger->error($em);
         return $job->fail($em);
       }
     }

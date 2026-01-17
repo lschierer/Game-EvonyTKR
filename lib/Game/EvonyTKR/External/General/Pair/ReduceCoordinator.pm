@@ -57,7 +57,7 @@ package Game::EvonyTKR::External::General::Pair::ReduceCoordinator {
       $processed->{$batch_id}++;
       $new_batches++;
 
-      $job->log_debug("Processing batch results for job $batch_id");
+      $job->logger->debug("Processing batch results for job $batch_id");
       $job->cache_conflict_results($batch_id);
       $job->cache_pair_results($batch_id);
     });
@@ -88,7 +88,7 @@ package Game::EvonyTKR::External::General::Pair::ReduceCoordinator {
     })->total;
 
     if ($active_batches > 0 || $active_create_pairs > 0 || $new_batches > 0) {
-      $job->log_debug(sprintf(
+      $job->logger->debug(sprintf(
 "Still waiting: %d reduce_batch jobs, %d create_pairs jobs, %d new batches",
         $active_batches, $active_create_pairs, $new_batches
       ));
@@ -100,7 +100,7 @@ package Game::EvonyTKR::External::General::Pair::ReduceCoordinator {
       ? sprintf("%.1f%%", ($total_cache_hits / $total_conflicts) * 100)
       : "N/A";
 
-    $job->log_info(sprintf(
+    $job->logger->info(sprintf(
       "Cache effectiveness: %d cache hits out of %d total conflicts (%s)",
       $total_cache_hits, $total_conflicts, $cache_effectiveness
     ));
@@ -119,7 +119,7 @@ package Game::EvonyTKR::External::General::Pair::ReduceCoordinator {
       $job->persistence->set_metadata('conflict_building_complete', '1');
       my $cc = 1;    # Always succeeds with SQLite
 
-      $job->log_info(sprintf(
+      $job->logger->info(sprintf(
 "Cache set results: pair_building_complete=%s, conflict_building_complete=%s",
         defined($pc) ? ($pc ? 'success' : 'failed') : 'undef',
         defined($cc) ? ($cc ? 'success' : 'failed') : 'undef'
@@ -130,7 +130,7 @@ package Game::EvonyTKR::External::General::Pair::ReduceCoordinator {
       $cc_verify =
         $job->persistence->get_metadata('conflict_building_complete');
 
-      $job->log_info(sprintf(
+      $job->logger->info(sprintf(
 "Cache verification: pair_building_complete=%s, conflict_building_complete=%s",
         defined($pc_verify) ? $pc_verify : 'undef',
         defined($cc_verify) ? $cc_verify : 'undef'
@@ -159,7 +159,7 @@ package Game::EvonyTKR::External::General::Pair::ReduceCoordinator {
     # Check if batch was skipped due to all cache hits
     if ( $batch_results->{skipped_reason}
       && $batch_results->{skipped_reason} eq 'all_cache_hits') {
-      $job->log_debug(
+      $job->logger->debug(
         "Batch $batch_id was skipped (all cache hits), nothing to merge");
       $total_cache_hits += $batch_results->{total_cache_hits} // 0;
       return;
@@ -214,7 +214,7 @@ package Game::EvonyTKR::External::General::Pair::ReduceCoordinator {
     # Check if batch was skipped - no pairs to process
     if ( $batch_results->{skipped_reason}
       && $batch_results->{skipped_reason} eq 'all_cache_hits') {
-      $job->log_debug(
+      $job->logger->debug(
         "Batch $batch_id was skipped (all cache hits), no pairs to merge");
       return;
     }

@@ -25,20 +25,20 @@ package Game::EvonyTKR::External::AscendingAttributes::Loader {
     $job->SUPER::run([$filename]);
     unless (defined($job->minion)) {
       my $errmessage = sprintf('minion undefined in job for %s', __PACKAGE__);
-      $job->log_error($errmessage);
+      $job->logger->error($errmessage);
       return $job->fail($errmessage);
     }
-    $job->log_debug(sprintf(
+    $job->logger->debug(sprintf(
       '%s log level is %s',
       __PACKAGE__, Log::Log4perl::Level::to_level($job->logger->level())
     ));
-    $job->log_debug("Loading AscendingAttribute from file: $filename");
+    $job->logger->debug("Loading AscendingAttribute from file: $filename");
 
     my $ascendingAttributeFile =
       Mojo::File->new(Encode::decode_utf8($filename));
 
     unless (-f $ascendingAttributeFile && -r $ascendingAttributeFile) {
-      $job->log_error(
+      $job->logger->error(
         "Cannot read AscendingAttribute file: $ascendingAttributeFile");
       return $job->fail(
         "Cannot read AscendingAttribute file: $ascendingAttributeFile");
@@ -51,7 +51,7 @@ package Game::EvonyTKR::External::AscendingAttributes::Loader {
     )->load_string($data);
 
     unless (exists $hashObject->{general} && length($hashObject->{general})) {
-      $job->log_error(sprintf(
+      $job->logger->error(sprintf(
         'general is required for a AscendingAttribute. Cannot import "%s"',
         $ascendingAttributeFile));
       return $job->fail("general is required for a AscendingAttribute");
@@ -60,7 +60,7 @@ package Game::EvonyTKR::External::AscendingAttributes::Loader {
     my $ascendingAttribute =
       Game::EvonyTKR::Model::AscendingAttributes->from_hash($hashObject);
     unless ($ascendingAttribute) {
-      $job->log_error(
+      $job->logger->error(
         "Failed to import AscendingAttribute from $ascendingAttributeFile");
       return $job->fail(
         "Failed to import AscendingAttribute from $ascendingAttributeFile");
@@ -69,7 +69,7 @@ package Game::EvonyTKR::External::AscendingAttributes::Loader {
     # Add to cache
     $job->add_ascending_attribute($ascendingAttribute);
     $job->note(ascending_attribute => $ascendingAttribute);
-    $job->log_info(
+    $job->logger->info(
       sprintf('Successfully loaded AscendingAttribute: %s',
         $ascendingAttribute->general)
     );

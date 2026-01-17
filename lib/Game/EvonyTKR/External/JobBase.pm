@@ -5,7 +5,7 @@ use utf8::all;
 use Mojo::Base 'Minion::Job',                       -signatures;
 use Mojo::Base 'Mojolicious::Plugin',               -role, -signatures;
 use Mojo::Base 'Game::EvonyTKR::Role::Common',      -role, -signatures;
-use Mojo::Base 'Game::EvonyTKR::Role::Logging',     -role;
+use Mojo::Base 'WebFramework::Role::Logger',     -role;
 use Mojo::Base 'Game::EvonyTKR::Role::JSON',        -role;
 use Mojo::Base 'Game::EvonyTKR::Role::Persistence', -role;
 use diagnostics;
@@ -17,7 +17,7 @@ has standard_delay => 30;
 
 sub task_name {
   my $class = shift;
-  $class->log_logcroak(
+  $class->logger->logcroak(
     sprintf('%s must implement task_name()', ref($class) || $class));
 }
 
@@ -35,12 +35,12 @@ sub register ($plugin, $app, $conf = {}) {
   if (not defined($app)) {
     my $errmessage = 'app not defined in register for ' . __PACKAGE__;
     say $errmessage;
-    $plugin->log_error($errmessage);
+    $plugin->logger->error($errmessage);
     return;
   }
   unless (defined($app->minion)) {
     my $errmessage = sprintf('minion undefined in job for %s', __PACKAGE__);
-    $plugin->log_error($errmessage);
+    $plugin->logger->error($errmessage);
     say $errmessage;
     return;
   }
@@ -50,7 +50,7 @@ sub register ($plugin, $app, $conf = {}) {
     my $errmessage =
       sprintf('Minion backend connectivity test failed for %s: %s',
       __PACKAGE__, $@);
-    $plugin->log_error($errmessage);
+    $plugin->logger->error($errmessage);
     say $errmessage;
     return;
   }
@@ -69,18 +69,18 @@ sub run {
   }
   my $parent_notes = $job->info->{notes} || {};
   $job->prebuild_run_id($parent_notes->{prebuild_run_id} || '');
-  Game::EvonyTKR::Role::Logging::get_logger(__PACKAGE__);
+  WebFramework::Role::Logger::get_logger(__PACKAGE__);
 
-  $job->log_debug(
+  $job->logger->debug(
     sprintf('JobBase configured Logging in run "%s"', $job->prebuild_run_id));
   unless (defined($job->app)) {
     my $errmessage = sprintf('app undefined in job for %s', __PACKAGE__);
-    $job->log_error($errmessage);
+    $job->logger->error($errmessage);
     return $job->fail($errmessage);
   }
   unless (defined($job->minion)) {
     my $errmessage = sprintf('minion undefined in job for %s', __PACKAGE__);
-    $job->log_error($errmessage);
+    $job->logger->error($errmessage);
     return $job->fail($errmessage);
   }
 
@@ -92,14 +92,14 @@ sub run {
 sub harvest_tagged_jobs ($job) {
   my $harvested = 0;
   if (!length($job->prebuild_run_id)) {
-    $job->log_warn('cannot harvest without a prebuild_run_id');
+    $job->logger->warn('cannot harvest without a prebuild_run_id');
     return;
   }
 
   # Only harvest once per prebuild run - use a metadata flag
   my $harvest_key = "harvested_" . $job->prebuild_run_id;
   if ($job->persistence->get_metadata($harvest_key)) {
-    $job->log_debug("Harvesting already done for run " . $job->prebuild_run_id);
+    $job->logger->debug("Harvesting already done for run " . $job->prebuild_run_id);
     return 0;
   }
 
@@ -128,17 +128,17 @@ sub harvest_tagged_jobs ($job) {
       $harvested++ unless $@;
     }
   }
-  $job->log_info(sprintf('harvested %s Minion jobs', $harvested));
+  $job->logger->info(sprintf('harvested %s Minion jobs', $harvested));
 
   # Also harvest stale persistence job_completed records
   my $persistence_harvested =
     eval { $job->harvest_job_completions($job->prebuild_run_id); };
   if ($@) {
-    $job->log_warn("Failed to harvest persistence records: $@");
+    $job->logger->warn("Failed to harvest persistence records: $@");
     $persistence_harvested = 0;
   }
 
-  $job->log_info(sprintf(
+  $job->logger->info(sprintf(
     'Total harvested: %d Minion jobs, %d persistence records',
     $harvested, $persistence_harvested || 0
   ));

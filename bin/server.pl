@@ -5,7 +5,9 @@ use utf8::all;
 use Encode qw(encode_utf8);
 use lib '../PAGI-WebServer/lib';
 use lib 'lib';
-
+say "this is deprecated";
+exit(0);
+__END__
 use PAGI::WebServer;
 use PAGI::WebServer::Router;
 use PAGI::WebServer::Markdown;
@@ -21,6 +23,7 @@ use Game::EvonyTKR::Loader::Specialties;
 use Game::EvonyTKR::Loader::Books;
 use Game::EvonyTKR::Loader::AscendingAttributes;
 use Game::EvonyTKR::Loader::Generals;
+
 
 # Initialize logging
 Log::Log4perl->easy_init($DEBUG);

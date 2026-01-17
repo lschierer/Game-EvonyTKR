@@ -23,10 +23,10 @@ sub run ($job, @args) {
   $job->SUPER::run(@args);
   unless (defined($job->minion)) {
     my $errmessage = sprintf('minion undefined in job for %s', $job->task_name);
-    $job->log_error($errmessage);
+    $job->logger->error($errmessage);
     return $job->fail($errmessage);
   }
-  $job->log_debug(sprintf(
+  $job->logger->debug(sprintf(
     '%s log level is %s',
     __PACKAGE__, Log::Log4perl::Level::to_level($job->logger->level())
   ));
@@ -42,7 +42,7 @@ sub run ($job, @args) {
     ]
     ));
 
-  $job->log_info(sprintf('Starting %s job', $job->task_name));
+  $job->logger->info(sprintf('Starting %s job', $job->task_name));
 
   my $cache_jobs = [];
 
@@ -50,7 +50,7 @@ sub run ($job, @args) {
   foreach my $general_name ($job->list_generals->@*) {
     my $general = $job->get_general($general_name);
     unless ($general) {
-      $job->log_error(sprintf(
+      $job->logger->error(sprintf(
         'failed to get general "%s" from persistence.', $general_name));
       next;
     }
@@ -122,7 +122,7 @@ sub run ($job, @args) {
         }
       );
       push @$cache_jobs, $cache_job_id;
-      $job->log_debug(sprintf(
+      $job->logger->debug(sprintf(
         'Enqueued buff cache job %s for "%s"',
         $cache_job_id, $general->name
       ));
@@ -135,7 +135,7 @@ sub run ($job, @args) {
 
   $job->mark_task_completed($job->task_name, $job->prebuild_run_id);
 
-  $job->log_info(
+  $job->logger->info(
     sprintf("Enqueued %s buff cache computation jobs", scalar(@$cache_jobs)));
 
   # Enqueue monitor job to track buff cache completion
@@ -151,7 +151,7 @@ sub run ($job, @args) {
 
   $job->note(generalCount => scalar(@{ $job->list_generals }));
   my $message = sprintf('%s job completed', $job->task_name);
-  $job->log_info($message);
+  $job->logger->info($message);
   return $job->finish($message);
 }
 

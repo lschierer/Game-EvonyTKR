@@ -6,11 +6,11 @@ use List::AllUtils qw(any all none uniq);
 
 # requires that Game::EvonyTKR::Role::Constants::BuffConstants be composed in.
 # requires that Game::EvonyTKR::Role::Constants::Books be composed in.
-# requires that Game::EvonyTKR::Role::Logging be composed in.
+# requires that WebFramework::Role::Logger be composed in.
 
 sub load_best_skill_books ($self, $general, $targetType, $activationType,
   $desiredCount = 3) {
-  $self->log_info(sprintf(
+  $self->logger->info(sprintf(
     'finding best %s skill books for %s',
     $activationType, $general->name
   ));
@@ -48,7 +48,7 @@ sub load_best_skill_books ($self, $general, $targetType, $activationType,
     } keys %{ $self->BestSkillBooks->{$targetType}->{'default'} };
   }
   else {
-    $self->log_error(sprintf(
+    $self->logger->error(sprintf(
       'targetType "%s" is not supported by BestSkillBooks',
       $targetType));
     return [];
@@ -60,10 +60,10 @@ sub load_best_skill_books ($self, $general, $targetType, $activationType,
     my $base_name = $book_name =~ s/^Level \d+ //r;
     my $book      = $self->get_generic_book($base_name, $level);
     unless ($book && ref($book) && $book->isa('Game::EvonyTKR::Model::Book')) {
-      $self->log_error("Cannot find $book_name");
+      $self->logger->error("Cannot find $book_name");
       next;
     }
-    $self->log_info(
+    $self->logger->info(
       sprintf('Picked book "%s" for "%s"', $book_name, $general->name));
     push @books, $book;
     last if (scalar @books >= $desiredCount);    # Single general gets 3 books
@@ -94,7 +94,7 @@ sub load_mandatory_skill_books ($self) {
         unless ($book
           && ref($book)
           && $book->isa('Game::EvonyTKR::Model::Book')) {
-          $self->log_error("Cannot find $book_name");
+          $self->logger->error("Cannot find $book_name");
           next;
         }
         push @books, $book;
@@ -108,7 +108,7 @@ sub load_mandatory_skill_books ($self) {
         unless ($book
           && ref($book)
           && $book->isa('Game::EvonyTKR::Model::Book')) {
-          $self->log_error("Cannot find $book_name");
+          $self->logger->error("Cannot find $book_name");
           next;
         }
         push @books, $book;

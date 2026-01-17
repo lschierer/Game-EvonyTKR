@@ -21,13 +21,13 @@ sub static_route_name_for ($c, $path) {
 }
 
 sub static_pages ($c, $app, $path) {
-  $c->log_info(sprintf(
+  $c->logger->info(sprintf(
     'static_pages function for %s with path "%s"',
     ref($c) ? ref($c) : $c, $path
   ));
 
   unless ($app) {
-    $c->log_error(sprintf('app undefined for static_pages called by %s',
+    $c->logger->error(sprintf('app undefined for static_pages called by %s',
       ref($c) ? ref($c) : $c));
     return;
   }
@@ -35,7 +35,7 @@ sub static_pages ($c, $app, $path) {
   my @parts           = split '::', ref($c) ? ref($c) : $c;
   my $controller_name = $parts[$#parts];
   foreach my $static_entry ($c->build_routes($app, $path)) {
-    $c->log_info(sprintf(
+    $c->logger->info(sprintf(
       'Adding route "%s" for file "%s"',
       $static_entry->{route},
       $static_entry->{path}
@@ -53,7 +53,7 @@ sub static_pages ($c, $app, $path) {
 sub single_page ($c) {
   my $home = Mojo::Home->new->detect;
   my $path = Mojo::Util::url_unescape($c->req->url->path->to_string);
-  $c->log_debug(sprintf('observed request for "%s"', $path));
+  $c->logger->debug(sprintf('observed request for "%s"', $path));
 
   my $page_path = $home->child(sprintf('share/pages/%s', $path));
   $page_path =~ s/\/\/+/\//g;
@@ -64,10 +64,10 @@ sub single_page ($c) {
   else {
     $page_path = "${page_path}.md";
   }
-  $c->log_debug(sprintf('single_page looking for "%s"', $page_path));
+  $c->logger->debug(sprintf('single_page looking for "%s"', $page_path));
 
   unless (-f $page_path) {
-    $c->log_debug(sprintf('cannot find "%s"', $page_path));
+    $c->logger->debug(sprintf('cannot find "%s"', $page_path));
     return $c->helpers->reply->not_found;
   }
 
@@ -80,7 +80,7 @@ sub build_routes ($c, $app, $path) {
     Mojo::File::Share::dist_dir('Game::EvonyTKR')->child("pages/$path");
 
   unless (-d $pages_dir) {
-    $c->log_error(sprintf(
+    $c->logger->error(sprintf(
       'static route building requested for "%s" which does not exist',
       $pages_dir));
     return ();
@@ -95,7 +95,7 @@ sub build_routes ($c, $app, $path) {
     my $file_path     = Mojo::File->new($file);
     my $relative_path = $file_path->to_rel($pages_dir);
     my $route_path    = $c->file_path_to_route($relative_path);
-    $c->log_debug(
+    $c->logger->debug(
       "Considering static route: $route_path for file: $relative_path");
 
     my $parsedFile = $c->parse_markdown_frontmatter($file_path);
@@ -104,12 +104,12 @@ sub build_routes ($c, $app, $path) {
       my $has_conflict     = 0;
 
       my $existing_nav = $app->get_existing_navigation_items() || {};
-      $c->log_debug(sprintf('comparing against %s existing nav entries.',
+      $c->logger->debug(sprintf('comparing against %s existing nav entries.',
         scalar keys %$existing_nav));
       foreach my $existing_path (keys %$existing_nav) {
         if (fc($existing_path) eq fc($normalized_route)) {
           $has_conflict = 1;
-          $c->log_debug(sprintf(
+          $c->logger->debug(sprintf(
             'Skipping static page navigation for "%s"'
               . ' - conflicts with existing "%s"',
             $route_path, $existing_path,
@@ -121,7 +121,7 @@ sub build_routes ($c, $app, $path) {
       unless ($has_conflict) {
         # Prefix with base path - handle index.md case where route_path is '/'
         my $full_route = $route_path eq '/' ? $path : "$path$route_path";
-        $c->log_debug(
+        $c->logger->debug(
           sprintf('Registering "%s" as static route, no conflicts present',
             $full_route)
         );

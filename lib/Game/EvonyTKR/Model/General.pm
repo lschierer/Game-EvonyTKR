@@ -101,7 +101,7 @@ package Game::EvonyTKR::Model::General {
       my @ts;
       push @ts, $self->type->@*;
       my $ut = $ts[0];
-      $self->log_debug("using type $ut");
+      $self->logger->debug("using type $ut");
       my $uuid5base = $self->UUID5_Generals->{$ut};
       $self->id = uuid5($uuid5base, $self->name);
     }
@@ -114,7 +114,7 @@ package Game::EvonyTKR::Model::General {
   sub validate($self) {
     my @errors;
     if (not defined $self->GeneralKeys) {
-      $self->log_logcroak('GeneralKeys is not defined in a General');
+      $self->logger->logcroak('GeneralKeys is not defined in a General');
     }
     if (not defined $self->type) {
       push @errors,
@@ -137,7 +137,7 @@ package Game::EvonyTKR::Model::General {
     }
 
     if (@errors) {
-      $self->log_logcroak(join ', ', @errors);
+      $self->logger->logcroak(join ', ', @errors);
       return;
     }
     return 1;
@@ -147,7 +147,7 @@ package Game::EvonyTKR::Model::General {
     state $persistence_helper //= do {
       my $helper = eval { Game::EvonyTKR::Model::Base->new(); };
       if ($@) {
-        $self->log_error(sprintf('Cannot create Persistence Helper: %s', $@));
+        $self->logger->error(sprintf('Cannot create Persistence Helper: %s', $@));
         return;
       }
       $helper;
@@ -168,7 +168,7 @@ package Game::EvonyTKR::Model::General {
       $self->ascendingAttributes($aa);
     }
     else {
-      $self->log_warn(sprintf(
+      $self->logger->warn(sprintf(
         'failed to find expected ascending attributes '
           . 'for %s. expected keys are %s',
         $self->name,
@@ -191,10 +191,10 @@ package Game::EvonyTKR::Model::General {
       $book =
         $self->persistenceHelper->get_builtin_book($self->builtInBookName);
     } or do {
-      $self->log_error(
+      $self->logger->error(
         sprintf('eval failed; cannot get book from helper: %s', $@));
       my $ab = $self->persistenceHelper->list_builtin_books;
-      $self->log_debug(sprintf(
+      $self->logger->debug(sprintf(
         'available books: %s',
         scalar(@{$ab})
         ? join ', ',
@@ -205,14 +205,14 @@ package Game::EvonyTKR::Model::General {
     };
 
     if (defined($book)) {
-      $self->log_debug(sprintf(
+      $self->logger->debug(sprintf(
         'fetch returned book "%s" with name "%s" for builtInBookName "%s"',
         blessed($book), $book->can('name') ? $book->name : 'no name method',
         $self->builtInBookName
       ));
     }
     else {
-      $self->log_error(
+      $self->logger->error(
         sprintf('failed to fetch book for builtin book "%s" from cache',
           $self->builtInBookName)
       );
@@ -228,13 +228,13 @@ package Game::EvonyTKR::Model::General {
     foreach my $sn_index (0 .. scalar($#{ $self->specialtyNames })) {
       my $sn = $self->specialtyNames->[$sn_index];
       if (!defined($sn) || !length($sn)) {
-        $self->log_error(sprintf(
+        $self->logger->error(sprintf(
           'invalid undef specialty in general %s at index %s',
           $self->name, $sn_index
         ));
         next;
       }
-      $self->log_debug(sprintf(
+      $self->logger->debug(sprintf(
         'populating speciality at index %s, name %s',
         $sn_index, defined($sn) && length($sn) ? $sn : 'undefined'
       ));
@@ -243,7 +243,7 @@ package Game::EvonyTKR::Model::General {
         $self->specialties->[$sn_index] = $specialty;
       }
       else {
-        $self->log_error(sprintf(
+        $self->logger->error(sprintf(
           'Missing specialty at index %s for general "%s": "%s" ',
           $sn_index, $self->name, $sn
         ));
@@ -268,22 +268,22 @@ package Game::EvonyTKR::Model::General {
   }
 
   sub populateGenericBooks ($self) {
-    $self->log_debug(
+    $self->logger->debug(
       sprintf('populateGenericBooks called for %s', $self->name));
 
     unless ($self->persistenceHelper) {
-      $self->log_error('No persistenceHelper available');
+      $self->logger->error('No persistenceHelper available');
       return 0;
     }
-    $self->log_debug('persistenceHelper is available');
+    $self->logger->debug('persistenceHelper is available');
 
     # Ensure builtin book is populated (needed for conflict detection)
     unless ($self->builtInBook) {
-      $self->log_debug(
+      $self->logger->debug(
         'BuiltInBook not populated, calling populateBuiltinBook()');
       $self->populateBuiltinBook();
       unless ($self->builtInBook) {
-        $self->log_error(sprintf(
+        $self->logger->error(sprintf(
           'Failed to populate builtInBook "%s" for %s',
           $self->builtInBookName // 'undef',
           $self->name
@@ -297,12 +297,12 @@ package Game::EvonyTKR::Model::General {
       ref($self->type) eq 'ARRAY' ? $self->type->[0] : $self->type;
 
     unless ($troop_type) {
-      $self->log_warn(
+      $self->logger->warn(
         sprintf('No troop type defined for general %s', $self->name));
       return 0;
     }
 
-    $self->log_debug(
+    $self->logger->debug(
       sprintf('Populating generic books for %s (%s)', $self->name, $troop_type)
     );
 
@@ -314,18 +314,18 @@ package Game::EvonyTKR::Model::General {
       Game::EvonyTKR::Service::Conflicts::BookComparator->new(service => $self);
     };
     if ($@) {
-      $self->log_error(sprintf('Failed to load BookComparator: %s', $@));
+      $self->logger->error(sprintf('Failed to load BookComparator: %s', $@));
       return 0;
     }
 
     foreach my $activation (@activations) {
-      $self->log_debug(sprintf('Processing activation: %s', $activation));
+      $self->logger->debug(sprintf('Processing activation: %s', $activation));
 
       foreach my $count (1 .. 6)
       {    # Compute up to 6 levels (singles use 3, pairs use 6)
         my $level = "level$count";
 
-        $self->log_debug(sprintf(
+        $self->logger->debug(sprintf(
           'Computing %s for %s: %d books', $level, $activation, $count
         ));
 
@@ -348,7 +348,7 @@ package Game::EvonyTKR::Model::General {
           } keys %{ $self->BestSkillBooks->{$troop_type}->{'default'} };
         }
         else {
-          $self->log_error(sprintf(
+          $self->logger->error(sprintf(
             'targetType "%s" is not supported by BestSkillBooks',
             $troop_type));
           next;
@@ -365,7 +365,7 @@ package Game::EvonyTKR::Model::General {
           unless ($book
             && ref($book)
             && $book->isa('Game::EvonyTKR::Model::Book')) {
-            $self->log_error("Cannot find $book_name");
+            $self->logger->error("Cannot find $book_name");
             next;
           }
 
@@ -377,7 +377,7 @@ package Game::EvonyTKR::Model::General {
           };
 
           if ($@) {
-            $self->log_error(sprintf(
+            $self->logger->error(sprintf(
               'Error checking conflict for %s with %s: %s',
               $self->name, $book_name, $@
             ));
@@ -386,7 +386,7 @@ package Game::EvonyTKR::Model::General {
 
           if ($conflict_level == 2) {
             # Full conflict - skip this book
-            $self->log_debug(sprintf(
+            $self->logger->debug(sprintf(
               'Skipping %s due to full conflict with %s',
               $book_name, $self->name
             ));
@@ -394,7 +394,7 @@ package Game::EvonyTKR::Model::General {
             next;
           }
 
-          $self->log_debug(sprintf(
+          $self->logger->debug(sprintf(
             'Picked book "%s" for "%s" (conflict_level=%d)',
             $book_name, $self->name, $conflict_level
           ));
@@ -403,7 +403,7 @@ package Game::EvonyTKR::Model::General {
           last if (scalar @books >= $count);
         }
 
-        $self->log_debug(sprintf(
+        $self->logger->debug(sprintf(
           'Selected %d books for %s/%s (skipped %d conflicts)',
           scalar(@books), $activation, $level, $skipped_conflicts
         ));
@@ -423,7 +423,7 @@ package Game::EvonyTKR::Model::General {
 
         $self->genericBookBuffs->{$activation}{$level} = \%buffs;
 
-        $self->log_debug(sprintf(
+        $self->logger->debug(sprintf(
           'Computed %s/%s: %d buff types (%s)',
           $activation,         $level,
           scalar(keys %buffs), join(', ', map {"$_=$buffs{$_}"} keys %buffs)
@@ -431,7 +431,7 @@ package Game::EvonyTKR::Model::General {
       }
     }
 
-    $self->log_debug(sprintf('populateGenericBooks complete. Activations: %s',
+    $self->logger->debug(sprintf('populateGenericBooks complete. Activations: %s',
       join(', ', keys %{ $self->genericBookBuffs })));
 
     return 1;
@@ -484,7 +484,7 @@ package Game::EvonyTKR::Model::General {
   }
 
   sub from_hash ($class, $hashObject) {
-    my $logger = Game::EvonyTKR::Role::Logging::get_logger(__PACKAGE__);
+    my $logger = WebFramework::Role::Logger::get_logger(__PACKAGE__);
 
     if (!exists $hashObject->{name}) {
       $logger->error('hash object must contain a name attribute.');
@@ -551,7 +551,7 @@ package Game::EvonyTKR::Model::General {
   }
 
   sub from_wire_hash ($class, $w, $opts = {}) {
-    my $logger = Game::EvonyTKR::Role::Logging::get_logger(__PACKAGE__);
+    my $logger = WebFramework::Role::Logger::get_logger(__PACKAGE__);
     unless (($w->{_v} // 1) == 1) {
       $logger->error('unknown wire version');
       die "unknown wire version";

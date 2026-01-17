@@ -6,7 +6,6 @@ use namespace::autoclean;
 package Game::EvonyTKR::Controller::Root {
   use Mooish::Base -standard;
   extends 'Game::EvonyTKR::Controller::ControllerBase';
-
   with 'Game::EvonyTKR::Role::StaticPages';
 
   use Carp;
@@ -57,7 +56,7 @@ package Game::EvonyTKR::Controller::Root {
 
     unless ($index_path->exists) {
       $self->logger->error("Root index.md not found at $index_path");
-      return $self->render('markdown.tt', {
+      return $self->render('root/index.tt', {
         content => '<p>Welcome to EvonyTKR</p>',
         title => 'EvonyTKR Guide',
         current_year => (localtime)[5] + 1900,
@@ -67,10 +66,16 @@ package Game::EvonyTKR::Controller::Root {
       });
     }
 
-    return $self->render_markdown_page($index_path->stringify, $ctx->req->path, {
-      template => 'root/index.tt',
+    # Render markdown and get HTML content
+    my $content_html = $self->retrieve_rendered_markdown($index_path);
+
+    return $self->render('root/index.tt', {
+      content => $content_html,
       title => 'EvonyTKR Guide',
+      current_year => (localtime)[5] + 1900,
       sidebar => 0,
+      navigation => $self->render_navigation($ctx->req->path),
+      site_logo => $self->site_logo(),
     });
   }
 

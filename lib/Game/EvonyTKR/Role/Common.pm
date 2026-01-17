@@ -108,7 +108,7 @@ package Game::EvonyTKR::Role::Common {
         if ($error =~
           /database is locked|database disk image is malformed|SQLITE_BUSY/i) {
           if ($attempt < $max_attempts) {
-            $self->log_debug(sprintf(
+            $self->logger->debug(sprintf(
 'Minion operation failed with transient error (attempt %d/%d): %s',
               $attempt, $max_attempts, $error
             ));
@@ -117,7 +117,7 @@ package Game::EvonyTKR::Role::Common {
             next;
           }
           # Max attempts reached
-          $self->log_error(sprintf(
+          $self->logger->error(sprintf(
             'Minion operation failed after %d attempts: %s',
             $max_attempts, $error
           ));
@@ -142,13 +142,13 @@ package Game::EvonyTKR::Role::Common {
       $self->can('retry') && $self->can('fail') && $self->can('note');
 
     unless ($minion) {
-      $self->log_error(
+      $self->logger->error(
         'must provide a minion process in which to search for jobs.');
       return 1;
     }
 
     if (scalar(@{$prereq_tasks}) == 0) {
-      $self->log_error('prereq tasks must be defined.');
+      $self->logger->error('prereq tasks must be defined.');
       return 1;
     }
 
@@ -201,7 +201,7 @@ package Game::EvonyTKR::Role::Common {
     }
 
     # Log prereq states
-    $self->log_debug(
+    $self->logger->debug(
       sprintf('prereqs are in states %s',
         Data::Printer::np($prereqs, multiline => 0))
     );
@@ -210,7 +210,7 @@ package Game::EvonyTKR::Role::Common {
     if (@failed_tasks) {
       my $errmessage = sprintf('Cannot proceed: prerequisite job(s) failed: %s',
         join(', ', @failed_tasks));
-      $self->log_error($errmessage);
+      $self->logger->error($errmessage);
       return $is_minion_job ? $self->fail($errmessage) : 1;
     }
 
@@ -223,7 +223,7 @@ package Game::EvonyTKR::Role::Common {
         # Calculate retry delay based on number of outstanding prereqs
         my $delay =
           max(min(5 * scalar(@outstanding), 30), $self->standard_delay);
-        $self->log_debug(sprintf(
+        $self->logger->debug(sprintf(
           'Retrying with delay %s due to outstanding prereqs: %s',
           $delay, join(', ', @outstanding)
         ));

@@ -3,7 +3,7 @@ use v5.42.0;
 use utf8;
 use Moo;
 use experimental 'signatures';
-with 'Game::EvonyTKR::Role::Logging';
+with 'WebFramework::Role::Logger';
 with 'Game::EvonyTKR::Role::Common';
 with 'Game::EvonyTKR::Role::Constants::Books';
 use PDL;
@@ -120,7 +120,7 @@ has 'data_dir' => (
 has 'log' => (
   is => 'ro',
   lazy => 1,
-  default => sub { Game::EvonyTKR::Role::Logging::get_logger(__PACKAGE__); },
+  default => sub { WebFramework::Role::Logger::get_logger(__PACKAGE__); },
 );
 
 # Cache helper to access General objects

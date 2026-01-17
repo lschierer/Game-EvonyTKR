@@ -9,7 +9,7 @@ require URI;
 
 package LinkChecker::Command;
 use Mojo::Base -base,                           -signatures;
-use Mojo::Base 'Game::EvonyTKR::Role::Logging', -role;
+use Mojo::Base 'WebFramework::Role::Logger', -role;
 use List::AllUtils qw( any none );
 use namespace::autoclean;
 use Carp;
@@ -24,7 +24,7 @@ has urls_to_check    => sub { [] };
 has 'start_hostname' => '';
 
 BEGIN {
-  Game::EvonyTKR::Role::Logging::get_logger(__PACKAGE__);
+  WebFramework::Role::Logger::get_logger(__PACKAGE__);
 }
 
 sub init {
@@ -38,7 +38,7 @@ sub init {
 
 sub execute {
   my $self = shift;
-  $self->log_info(sprintf('Starting checking at "%s"', $self->startUrl));
+  $self->logger->info(sprintf('Starting checking at "%s"', $self->startUrl));
 
   # Process queue until empty
   while (@{ $self->urls_to_check }) {
@@ -51,7 +51,7 @@ sub execute {
     }
   }
 
-  $self->log_info("Url Checking complete");
+  $self->logger->info("Url Checking complete");
 
   # Update children statuses now that all URLs are processed
   $self->update_children_statuses();
@@ -76,11 +76,11 @@ sub check_url ($self, $url, $recurse = 1) {
   my $uri = URI->new($url);
 
   if (exists $self->checked_urls->{$url}) {
-    $self->log_debug("$url has already been checked. Skipping.");
+    $self->logger->debug("$url has already been checked. Skipping.");
     return $self->checked_urls->{$url}->{status};
   }
 
-  $self->log_info("Checking $url");
+  $self->logger->info("Checking $url");
 
   my $http = HTTP::Tiny->new(
     timeout => 30,
@@ -102,7 +102,7 @@ sub check_url ($self, $url, $recurse = 1) {
     # Transient failure (5xx, timeout, etc) - retry with backoff
     if ($attempt < $max_retries) {
       my $backoff = 0.5 * $attempt;    # 0.5s, 1s, 1.5s
-      $self->log_debug(
+      $self->logger->debug(
 "Attempt $attempt failed with $response->{status}, retrying after ${backoff}s"
       );
       select(undef, undef, undef, $backoff);
@@ -112,14 +112,14 @@ sub check_url ($self, $url, $recurse = 1) {
   $self->checked_urls->{$url}->{status} = $response->{status};
 
   unless ($response->{success}) {
-    $self->log_warn(sprintf(
+    $self->logger->warn(sprintf(
       'Detected Broken page %s via status %s - %s.',
       $url, $response->{status}, $response->{reason}
     ));
     return $response->{status};
   }
 
-  $self->log_debug(
+  $self->logger->debug(
     sprintf('Page %s returned status %s.', $url, $response->{status}));
 
   if ($response->{content} && length($response->{content}) && $recurse) {
@@ -138,7 +138,7 @@ sub check_url ($self, $url, $recurse = 1) {
       }
 
       unless ($fragment_found) {
-        $self->log_warn("Fragment #$frag NOT found on page $url");
+        $self->logger->warn("Fragment #$frag NOT found on page $url");
         $self->checked_urls->{$url}->{status} =
           404;    # Override the successful page status
         return 404;
@@ -151,7 +151,7 @@ sub check_url ($self, $url, $recurse = 1) {
       my @links = $extractor->links;
 
       my $hostname = $uri->host;
-      $self->log_info("extracted hostname $hostname");
+      $self->logger->info("extracted hostname $hostname");
 
       foreach my $link_array (sort @links) {
         my ($tag, %attrs) = @$link_array;
@@ -159,7 +159,7 @@ sub check_url ($self, $url, $recurse = 1) {
 
         if ($href) {
           my $abs_uri = URI->new($href)->abs($url);
-          $self->log_debug("found url to check: $abs_uri");
+          $self->logger->debug("found url to check: $abs_uri");
 
           unless ($abs_uri->scheme eq 'mailto') {    # Avoid email links
             my $abs_url_str = $abs_uri->as_string;
@@ -172,14 +172,14 @@ sub check_url ($self, $url, $recurse = 1) {
                 if ($self->start_hostname eq $abs_uri->host) {
                   push @{ $self->urls_to_check },
                     $abs_url_str;   # Add to end of queue for recursive checking
-                  $self->log_debug(sprintf(
+                  $self->logger->debug(sprintf(
                     'Added internal URL "%s" to queue for recursive checking',
                     $abs_url_str));
                 }
                 else {
                   # External URL - check it directly but don't recurse
                   $self->check_single_url($abs_url_str);
-                  $self->log_debug(sprintf(
+                  $self->logger->debug(sprintf(
                     'Checked external URL "%s" directly (no recursion).',
                     $abs_url_str));
                 }
@@ -201,11 +201,11 @@ sub check_url ($self, $url, $recurse = 1) {
 sub check_single_url ($self, $url) {
   # This method checks a single URL without recursion (for external links)
   if (exists $self->checked_urls->{$url}) {
-    $self->log_debug("$url has already been checked. Skipping.");
+    $self->logger->debug("$url has already been checked. Skipping.");
     return $self->checked_urls->{$url}->{status};
   }
 
-  $self->log_info("Checking external URL $url (no recursion)");
+  $self->logger->info("Checking external URL $url (no recursion)");
 
   my $http = HTTP::Tiny->new(
     timeout => 30,
@@ -227,7 +227,7 @@ sub check_single_url ($self, $url) {
     # Transient failure (5xx, timeout, etc) - retry with backoff
     if ($attempt < $max_retries) {
       my $backoff = 0.5 * $attempt;    # 0.5s, 1s, 1.5s
-      $self->log_debug(
+      $self->logger->debug(
 "Attempt $attempt failed with $response->{status}, retrying after ${backoff}s"
       );
       select(undef, undef, undef, $backoff);
@@ -237,13 +237,13 @@ sub check_single_url ($self, $url) {
   $self->checked_urls->{$url}->{status} = $response->{status};
 
   unless ($response->{success}) {
-    $self->log_warn(sprintf(
+    $self->logger->warn(sprintf(
       'Detected Broken external page %s via status %s - %s.',
       $url, $response->{status}, $response->{reason}
     ));
   }
   else {
-    $self->log_debug(sprintf(
+    $self->logger->debug(sprintf(
       'External page %s returned status %s.',
       $url, $response->{status}
     ));
@@ -272,7 +272,7 @@ sub update_children_statuses ($self) {
           $self->checked_urls->{$abs_url_str}->{status};
       }
       else {
-        $self->log_warn("Could not find status for child URL: $abs_url_str");
+        $self->logger->warn("Could not find status for child URL: $abs_url_str");
         $self->checked_urls->{$parent_url}->{children}->{$child_href} =
           'unknown';
       }

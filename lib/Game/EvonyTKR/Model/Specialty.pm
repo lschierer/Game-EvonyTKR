@@ -65,7 +65,7 @@ package Game::EvonyTKR::Model::Specialty {
 
   # --- YAML -> object (input shape: levels = [ {level, text, buffs}, ... ]) ---
   sub from_hash ($class, $h) {
-    my $logger = Game::EvonyTKR::Role::Logging::get_logger(__PACKAGE__);
+    my $logger = WebFramework::Role::Logger::get_logger(__PACKAGE__);
     croak "from_hash expects hashref" unless ref($h) eq 'HASH';
     my $name = $h->{name} // '';
     $logger->debug(sprintf(
@@ -146,7 +146,7 @@ package Game::EvonyTKR::Model::Specialty {
   }
 
   sub from_wire_hash ($class, $w) {
-    my $logger = Game::EvonyTKR::Role::Logging::get_logger(__PACKAGE__);
+    my $logger = WebFramework::Role::Logger::get_logger(__PACKAGE__);
     unless (($w->{_v} // 1) == 1) {
       $logger->error("unknown wire version");
       croak("unknown wire version");
@@ -179,7 +179,7 @@ package Game::EvonyTKR::Model::Specialty {
   sub addBuff ($self, $level, $nb) {
 
     if (!blessed($nb) || blessed($nb) ne "Game::EvonyTKR::Model::Buff") {
-      $self->log_error(sprintf(
+      $self->logger->error(sprintf(
         'attempting to add buff of type %s not "Game::EvonyTKR::Model::Buff"',
         !blessed($nb) ? Scalar::Util::reftype($nb) : blessed($nb)));
       exit 0;
@@ -187,7 +187,7 @@ package Game::EvonyTKR::Model::Specialty {
 
     # the data files apparently have bad cases in them for level names.
     if (none { $_ =~ /$level/i } $self->SpecialtyLevelValues->@*) {
-      $self->log_error(sprintf(
+      $self->logger->error(sprintf(
         'level should be one of %s, not %s',
         join(', ', $self->SpecialtyLevelValues->@*), $level
       ));
@@ -195,7 +195,7 @@ package Game::EvonyTKR::Model::Specialty {
     }
     $level = lc($level);
     push @{ $self->levels->{$level}->{buffs} }, $nb;
-    $self->log_debug(sprintf(
+    $self->logger->debug(sprintf(
       'specialty %s at %s now has buffs %s.',
       $self->name, $level,
       Data::Printer::np($self->levels->{$level}->{buffs})
@@ -211,7 +211,7 @@ package Game::EvonyTKR::Model::Specialty {
   ) {
     $level = lc($level)
       ;    # sanitize the data from the user - level names must be lower case
-    $self->log_debug(
+    $self->logger->debug(
       "Calculating buffs for $self->name level: $level, attribute: $attribute");
 
     return 0 if not defined $level or $level =~ /none/i;
@@ -252,7 +252,7 @@ package Game::EvonyTKR::Model::Specialty {
       my $current_level = $level_hierarchy[$i];
       my $buffs         = $levels_by_name->{$current_level}->{buffs} // [];
 
-      $self->log_debug("Checking $self->name level $current_level with "
+      $self->logger->debug("Checking $self->name level $current_level with "
           . scalar(@{$buffs})
           . " buffs");
 
@@ -266,19 +266,19 @@ package Game::EvonyTKR::Model::Specialty {
           $logID
         )) {
           my $val = $buff->value->number;
-          $self->log_debug(sprintf(
+          $self->logger->debug(sprintf(
             '%s  ➤ Match found at %s level %s. Adding %s to total.',
             $logID, $self->name, $current_level, $val
           ));
           $total += $val;
         }
         else {
-          $self->log_debug("$logID  ✗ No match found.");
+          $self->logger->debug("$logID  ✗ No match found.");
         }
       }
     }
 
-    $self->log_debug(
+    $self->logger->debug(
 "Total for $self->name $level/$attribute/$targetedType/$matching_type: $total"
     );
     return $total;

@@ -39,11 +39,11 @@ class Game::EvonyTKR::Converter::Specialty :
   field $specialties : reader;
 
   ADJUST {
-    $self->log_debug(sprintf(
+    $self->logger->debug(sprintf(
 '%s assumes that the class or module calling it has generated the required grammar for %s',
       __CLASS__, 'Game::EvonyTKR::Shared::Parser'
     ));
-    $self->log_debug(sprintf(
+    $self->logger->debug(sprintf(
 '%s assumes that the class or module calling it has also correctly set up the $tree field.',
       __CLASS__));
     # do not assume we were properly passed
@@ -54,8 +54,8 @@ class Game::EvonyTKR::Converter::Specialty :
 
   method execute {
     say "=== Specialty Text to YAML Converter ===";
-    $self->log_info("=== Specialty Text to YAML Converter ===");
-    $self->log_debug(
+    $self->logger->info("=== Specialty Text to YAML Converter ===");
+    $self->logger->debug(
       sprintf('specialty sees tree sized -- %s --', length($tree->as_XML())));
     $self->getMainText();
     $self->parseText();
@@ -69,16 +69,16 @@ class Game::EvonyTKR::Converter::Specialty :
       if (any { $_ =~ /$sn/i } @{ $self->CommonSpecialtyNames }) {
         if ( $outputDir->child($fileName)->is_file()
           || $outputDir->child($lcFileName)->is_file()) {
-          $self->log_debug(
+          $self->logger->debug(
             "Common Specialty $fileName has already been converted.");
           next;
         }
       }
       else {
-        $self->log_debug("$sn is not a common specialty");
+        $self->logger->debug("$sn is not a common specialty");
       }
       # this is based off what we do in the test harness
-      $self->log_debug(
+      $self->logger->debug(
         sprintf('"%s" needs to be converted.', $specialty->{name}));
       my @hashedBuffs;
       my @textString;
@@ -86,16 +86,16 @@ class Game::EvonyTKR::Converter::Specialty :
         push @textString, $detail;
         my @fragments = $parser->tokenize_buffs($detail);
         foreach my $frag (@fragments) {
-          $self->log_debug(sprintf(
+          $self->logger->debug(sprintf(
             'frag for "%s" is %s',
             $specialty->{name}, Data::Printer::np($frag)
           ));
           my $nb;
           @{$nb} = $parser->normalize_buff($frag);
-          $self->log_debug(sprintf(
+          $self->logger->debug(sprintf(
             'after normalize_buff, size of frag is %s', scalar(@{$nb})
           ));
-          $self->log_debug(sprintf('this fragment was normalized to -- %s -- ',
+          $self->logger->debug(sprintf('this fragment was normalized to -- %s -- ',
             Data::Printer::np($nb)));
           push(@hashedBuffs, @{$nb});
         }
@@ -202,7 +202,7 @@ class Game::EvonyTKR::Converter::Specialty :
     my $filename = lc($name);
     $filename = "${filename}.yaml";
     if (!$outputDir->is_dir()) {
-      $self->log_error("$outputDir is not a directory!!!" . $outputDir->stat());
+      $self->logger->error("$outputDir is not a directory!!!" . $outputDir->stat());
     }
     $outputDir->child($filename)->touch();
     if ($debug) {
@@ -230,10 +230,10 @@ class Game::EvonyTKR::Converter::Specialty :
     }
 
     for my $specialty (@$specialties) {
-      $self->log_debug(
+      $self->logger->debug(
         sprintf('Specialty: "%s" Details: ', $specialty->{name}));
       for my $detail (@{ $specialty->{details} }) {
-        $self->log_debug("  - $detail");
+        $self->logger->debug("  - $detail");
       }
     }
 
@@ -250,7 +250,7 @@ class Game::EvonyTKR::Converter::Specialty :
       return [];
     }
     if ($debug) {
-      $self->log_debug("Found container: " . $container->starttag());
+      $self->logger->debug("Found container: " . $container->starttag());
     }
 
     my @specialtyDivs = $container->look_down(
@@ -289,7 +289,7 @@ qr/elementor-element-(?:\w){1,9}.elementor-widget.elementor-widget-theme-post-co
       return [];
     }
     if ($debug) {
-      $self->log_debug("Found container: " . $container->starttag());
+      $self->logger->debug("Found container: " . $container->starttag());
     }
 
     # Get all h2 and h3 elements in reading order

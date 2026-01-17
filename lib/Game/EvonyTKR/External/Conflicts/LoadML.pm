@@ -15,16 +15,16 @@ package Game::EvonyTKR::External::Conflicts::LoadML {
     if (not defined($app)) {
       my $errmessage = 'app not defined in register for ' . __PACKAGE__;
       say $errmessage;
-      $taskClass->log_error($errmessage);
+      $taskClass->logger->error($errmessage);
       return;
     }
     unless (defined($app->minion)) {
       my $errmessage = sprintf('minion undefined in job for %s', __PACKAGE__);
-      $taskClass->log_error($errmessage);
+      $taskClass->logger->error($errmessage);
       say $errmessage;
       return;
     }
-    $taskClass->log_debug('Registering ML Conflicts Loader task');
+    $taskClass->logger->debug('Registering ML Conflicts Loader task');
     $app->minion->add_task($taskClass->task_name => __PACKAGE__);
 
     return 1;
@@ -38,7 +38,7 @@ package Game::EvonyTKR::External::Conflicts::LoadML {
     $job->SUPER::run(@args);
     unless (defined($job->minion)) {
       my $errmessage = sprintf('minion undefined in job for %s', __PACKAGE__);
-      $job->log_error($errmessage);
+      $job->logger->error($errmessage);
       return $job->fail($errmessage);
     }
 
@@ -54,12 +54,12 @@ package Game::EvonyTKR::External::Conflicts::LoadML {
     # Find conflicts.json file
     my $json_path = Mojo::File->new('conflicts.json');
     unless (-f $json_path) {
-      $job->log_info(
+      $job->logger->info(
         'conflicts.json not found - generating ML model and predictions');
 
       # Ensure MOJO_MODE is set for subprocesses
       $ENV{MOJO_MODE} ||= $job->app->mode;
-      $job->log_debug(
+      $job->logger->debug(
         sprintf('Running ML pipeline with MOJO_MODE=%s', $ENV{MOJO_MODE}));
 
       # Run training pipeline
@@ -69,7 +69,7 @@ package Game::EvonyTKR::External::Conflicts::LoadML {
       );
       if ($rc != 0) {
         my $errmsg = "Failed to extract training features: exit code $rc";
-        $job->log_error($errmsg);
+        $job->logger->error($errmsg);
         return $job->fail($errmsg);
       }
 
@@ -80,7 +80,7 @@ package Game::EvonyTKR::External::Conflicts::LoadML {
       );
       if ($rc != 0) {
         my $errmsg = "Failed to train ML model: exit code $rc";
-        $job->log_error($errmsg);
+        $job->logger->error($errmsg);
         return $job->fail($errmsg);
       }
 
@@ -90,7 +90,7 @@ package Game::EvonyTKR::External::Conflicts::LoadML {
       );
       if ($rc != 0) {
         my $errmsg = "Failed to extract prediction features: exit code $rc";
-        $job->log_error($errmsg);
+        $job->logger->error($errmsg);
         return $job->fail($errmsg);
       }
 
@@ -101,21 +101,21 @@ package Game::EvonyTKR::External::Conflicts::LoadML {
       );
       if ($rc != 0) {
         my $errmsg = "Failed to generate predictions: exit code $rc";
-        $job->log_error($errmsg);
+        $job->logger->error($errmsg);
         return $job->fail($errmsg);
       }
 
-      $job->log_info('ML model training and prediction complete');
+      $job->logger->info('ML model training and prediction complete');
 
       # Verify the file was created
       unless (-f $json_path) {
         my $errmsg = "conflicts.json still not found after training";
-        $job->log_error($errmsg);
+        $job->logger->error($errmsg);
         return $job->fail($errmsg);
       }
     }
 
-    $job->log_info('Loading ML conflict predictions from conflicts.json');
+    $job->logger->info('Loading ML conflict predictions from conflicts.json');
 
     # Load JSON
     my $json_text = $json_path->slurp;
@@ -159,7 +159,7 @@ package Game::EvonyTKR::External::Conflicts::LoadML {
       }
     }
 
-    $job->log_info(sprintf(
+    $job->logger->info(sprintf(
       'Loaded ML conflicts: %d total, %d filtered (no troop overlap), %d kept',
       $total_pairs, $filtered_pairs, $kept_pairs
     ));
@@ -182,7 +182,7 @@ package Game::EvonyTKR::External::Conflicts::LoadML {
     # Use batch write for efficiency (25x faster than individual writes)
     my $stored_count =
       $job->persistence->store_conflicts_batch(\%conflicts_for_batch);
-    $job->log_info(sprintf(
+    $job->logger->info(sprintf(
       "Batch stored %d ML conflict predictions to persistence",
       $stored_count));
 

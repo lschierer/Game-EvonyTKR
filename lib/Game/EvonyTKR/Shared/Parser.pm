@@ -7,7 +7,7 @@ use utf8::all;
 use Mojo::Base -base,                               -signatures;
 use Mojo::Base 'Game::EvonyTKR::Role::JSON',        -role;
 use Mojo::Base 'Game::EvonyTKR::Role::Common',      -role;
-use Mojo::Base 'Game::EvonyTKR::Role::Logging',     -role;
+use Mojo::Base 'WebFramework::Role::Logger',     -role;
 use Mojo::Base 'Game::EvonyTKR::Role::Persistence', -role;
 use Mojo::Base 'Game::EvonyTKR::Role::Constants::AscendingAttributes', -role;
 use Mojo::Base 'Game::EvonyTKR::Role::Constants::Books',               -role;
@@ -31,14 +31,14 @@ use namespace::autoclean;
 
 # Simplified normalize_buff - parses Prolog output format
 sub normalize_buff ($self, $buff_hash) {
-  $self->log_debug(
+  $self->logger->debug(
     "Processing Prolog fragment: " . Data::Printer::np($buff_hash));
 
   my @result;
   my $is_debuff = 0;
 
   unless (ref $buff_hash eq 'HASH') {
-    $self->log_warn("Expected buff as hash, got: $buff_hash");
+    $self->logger->warn("Expected buff as hash, got: $buff_hash");
     return;
   }
 
@@ -50,7 +50,7 @@ sub normalize_buff ($self, $buff_hash) {
 # Prolog cannot parse the negative out of the numbers, we must do so here.
 # that also means that it sometimes does not set the debuff conditions correctly.
   if ($value < 0) {
-    $self->log_info("detected a debuff to convert");
+    $self->logger->info("detected a debuff to convert");
     $is_debuff = 1;
     $value     = abs($value);
     @{$conditions_list} = grep { length($_) > 0 } @{$conditions_list};
@@ -111,7 +111,7 @@ sub normalize_buff ($self, $buff_hash) {
     $troop_atom = $troop_atom->[0];
   }
   if (length($troop_atom)) {
-    $self->log_debug("troop_atom is '$troop_atom'");
+    $self->logger->debug("troop_atom is '$troop_atom'");
     my $troop_type = $self->atom_to_troop($troop_atom);
     $buff->set_target($troop_type);
   }
@@ -125,34 +125,34 @@ sub normalize_buff ($self, $buff_hash) {
     if ($cond eq 'enemy') {
       $is_debuff = 1;
       $r         = $buff->set_condition('Enemy');
-      $self->log_debug(
+      $self->logger->debug(
         "Added debuff condition: 'Enemy' ; set_condition result: $r");
     }
     elsif ($cond eq 'monsters') {
       $is_debuff = 1;
       $r         = $buff->set_condition('Monsters');
-      $self->log_debug(
+      $self->logger->debug(
         "Added debuff condition: 'Monsters' ; set_condition result: $r");
     }
     elsif ($cond =~ /against[_ ]monsters/i && $is_debuff) {
       $cond = 'Monsters';
       $r    = $buff->set_condition($cond);
-      $self->log_debug(
+      $self->logger->debug(
         "Added buff condition: $cond ; set_condition result: $r");
     }
     else {
-      $self->log_debug("Processing condition: '$cond'");
+      $self->logger->debug("Processing condition: '$cond'");
       if (length($cond) == 0) {
         next;
       }
       my $normalized = $self->normalize_condition_case($cond);
       if (defined $normalized) {
         $r = $buff->set_condition($normalized);
-        $self->log_debug(
+        $self->logger->debug(
           "Added buff condition: $normalized ; set_condition result: $r");
       }
       else {
-        $self->log_warn("Could not normalize condition: '$cond'");
+        $self->logger->warn("Could not normalize condition: '$cond'");
       }
     }
   }
@@ -160,25 +160,25 @@ sub normalize_buff ($self, $buff_hash) {
   return $buff;
 }
 
-sub normalize_condition_case($self, $prolog_condition) {
+sub normalize_condition_case($self, $prologger->condition) {
 
-  $self->log_debug(sprintf(
-    'normalize_condition_case called with: "%s"', $prolog_condition));
+  $self->logger->debug(sprintf(
+    'normalize_condition_case called with: "%s"', $prologger->condition));
 
   # Handle the new underscore-based condition format
   # Convert underscore atoms back to display format
-  if ($prolog_condition =~ /^[a-z_]+$/ && $prolog_condition =~ /_/) {
+  if ($prologger->condition =~ /^[a-z_]+$/ && $prologger->condition =~ /_/) {
     # This looks like an underscore-based atom from Prolog
-    my $display_condition = $prolog_condition;
+    my $display_condition = $prologger->condition;
     $display_condition =~ s/_/ /g;    # Convert underscores to spaces
 
-    $self->log_debug(
-      "Converted underscore atom: '$prolog_condition' -> '$display_condition'");
+    $self->logger->debug(
+      "Converted underscore atom: '$prologger->condition' -> '$display_condition'");
 
     # Try to map to proper case using existing constants
     my $mapped = $self->string_to_condition($display_condition);
     if ($mapped) {
-      $self->log_debug(
+      $self->logger->debug(
         "string_to_condition mapped: '$display_condition' -> '$mapped'");
       return $mapped;
     }
@@ -186,7 +186,7 @@ sub normalize_condition_case($self, $prolog_condition) {
     # Fallback: capitalize each word
     my $capitalized =
       join(' ', map { ucfirst($_) } split(/ /, $display_condition));
-    $self->log_debug(
+    $self->logger->debug(
       "Using capitalized fallback: '$display_condition' -> '$capitalized'");
     return $capitalized;
   }
@@ -201,32 +201,32 @@ sub normalize_condition_case($self, $prolog_condition) {
     $condition_map{ lc($const) } = $const;
   }
 
-  $self->log_debug(
+  $self->logger->debug(
     "Built condition map with " . scalar(keys %condition_map) . " entries");
 
   # Handle multi-word conditions that might have different formatting
-  my $lower_condition = lc($prolog_condition);
-  $self->log_debug("Lowercase condition: '$lower_condition'");
+  my $lower_condition = lc($prologger->condition);
+  $self->logger->debug("Lowercase condition: '$lower_condition'");
 
   # Direct lookup first
   if (exists $condition_map{$lower_condition}) {
     my $result = $condition_map{$lower_condition};
-    $self->log_debug("Direct lookup found: '$lower_condition' -> '$result'");
+    $self->logger->debug("Direct lookup found: '$lower_condition' -> '$result'");
     return $result;
   }
 
   # Fallback: try string_to_condition for mapping
-  my $mapped = $self->string_to_condition($prolog_condition);
+  my $mapped = $self->string_to_condition($prologger->condition);
   if ($mapped) {
-    $self->log_debug(
-      "string_to_condition mapped: '$prolog_condition' -> '$mapped'");
+    $self->logger->debug(
+      "string_to_condition mapped: '$prologger->condition' -> '$mapped'");
     return $mapped;
   }
 
   # Last resort: return original with first letter capitalized
-  my $capitalized = ucfirst($prolog_condition);
-  $self->log_debug(
-    "Using capitalized fallback: '$prolog_condition' -> '$capitalized'");
+  my $capitalized = ucfirst($prologger->condition);
+  $self->logger->debug(
+    "Using capitalized fallback: '$prologger->condition' -> '$capitalized'");
   return $capitalized;
 }
 
@@ -298,9 +298,9 @@ sub generate_grammar ($self) {
 
   push @rules, map {
     my $key = $_;
-    $self->log_debug("attribute alias key is '$key'");
+    $self->logger->debug("attribute alias key is '$key'");
     my $attr = $self->MappedAttributeNames->{$key};
-    $self->log_debug("attribute for alias '$key' is '$attr'");
+    $self->logger->debug("attribute for alias '$key' is '$attr'");
 
     $attr = lc($attr);
     my @term      = split(/ /, $attr);
@@ -360,9 +360,9 @@ sub generate_grammar ($self) {
 
   push @rules, map {
     my $key = $_;
-    $self->log_debug("condition alias key is '$key'");
+    $self->logger->debug("condition alias key is '$key'");
     my $attr = $self->MappedConditionNames->{$key};
-    $self->log_debug("condition for alias '$key' is '$attr'");
+    $self->logger->debug("condition for alias '$key' is '$attr'");
 
     $attr = lc($attr);
     my @term      = split(/ /, $attr);
@@ -419,7 +419,7 @@ sub tokenize_buffs ($self, $text) {
   # none of my constants are built around in-word hyphens.
   $text =~ s/\bin-([a-zA-Z]+)\b/in $1/g;
 
-  $self->log_debug("cleaned text is '$text'");
+  $self->logger->debug("cleaned text is '$text'");
 
   # Send the raw string instead of tokenizing
   my $quoted_text = "'" . $text . "'";    # single-quote to create an atom
@@ -443,13 +443,13 @@ sub tokenize_buffs ($self, $text) {
 
   # Debug logging
   foreach my $error_line (@err) {
-    $self->log_error("STDERR: $error_line");
+    $self->logger->error("STDERR: $error_line");
   }
   # Note, we will output STDOUT after parsing it below.
 
   my $parsed = join('', @out);
   $parsed =~ s/^\s+|\s+$//g;
-  $self->log_info(sprintf('parsed text is -- %s --', $parsed));
+  $self->logger->info(sprintf('parsed text is -- %s --', $parsed));
 
   # Extract just the buff list (last non-debug line)
   my @buff_fragments;
@@ -466,7 +466,7 @@ sub tokenize_buffs ($self, $text) {
   foreach my $line (@out) {
     chomp $line;
     if ($line =~ /^debug:/) {
-      $self->log_debug("STDOUT: $line");
+      $self->logger->debug("STDOUT: $line");
     }
     elsif ($line =~ /^buff\(/) {
       push @buff_fragments, $line;    # optional: keep legacy Prolog format
@@ -483,25 +483,25 @@ sub tokenize_buffs ($self, $text) {
     $json_text =~ s/\}\s+{/},{/g;
     eval {
       $json_text = "[$json_text]";
-      $self->log_debug("json text is -- $json_text -- ");
+      $self->logger->debug("json text is -- $json_text -- ");
       my $decoded = JSON::PP->new(utf8 => 1)->decode($json_text);
       push @json_lines, @$decoded;
     };
     if ($@) {
-      $self->log_warn("Failed to parse JSON block: $@");
+      $self->logger->warn("Failed to parse JSON block: $@");
     }
   }
   else {
-    $self->log_warn("No buff(...) line found; skipping JSON extraction");
+    $self->logger->warn("No buff(...) line found; skipping JSON extraction");
   }
 
-  $self->log_debug(sprintf(
+  $self->logger->debug(sprintf(
     'found %d buffs: %s',
     scalar @buff_fragments,
     join(', ', @buff_fragments)
   ));
   if (scalar @json_lines != scalar @buff_fragments) {
-    $self->log_warn(sprintf(
+    $self->logger->warn(sprintf(
       'uneven output detected: %s versus %s, are there missing output lines?',
       scalar @json_lines,
       scalar @buff_fragments

@@ -3,8 +3,9 @@ use v5.42.0;
 use utf8::all;
 use Mojo::Base -role,                                     -signatures;
 with 'Game::EvonyTKR::Role::Persistence::Core';
+require Log::Handler;
 
-our $roleLogger = Game::EvonyTKR::Role::Logging::get_logger(__PACKAGE__);
+our $roleLogger = Log::Handler->get_logger(__PACKAGE__);
 
 sub add_specialty ($self, $specialty) {
   my $normalized_name = lc($self->normalize($specialty->name));

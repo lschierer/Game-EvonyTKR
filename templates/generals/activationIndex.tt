@@ -14,7 +14,7 @@
 
 <div class="link-grid">
   <a
-    href="/Reference/Generals/[% uiTarget %]/[% buffActivation %]/comparison"
+    href="/Generals/[% uiTarget %]/[% buffActivation %]/comparison"
     class="link-item spectrum-Button spectrum-Button--fill spectrum-Button--accent spectrum-Button--sizeL"
   >
     <span class="spectrum-Button-label">Single General Comparison</span>

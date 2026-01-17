@@ -62,7 +62,7 @@ package Game::EvonyTKR::External::General::Summarizer {
         . 'ascendingLevel covenantLevel '
         . 'specialty1 specialty2 specialty3 specialty4 books'
         . ' must be sent in that order.';
-      $job->log_error($errmessage);
+      $job->logger->error($errmessage);
       return $job->fail($errmessage);
     }
     $job->generalName($args[0])    if (scalar(@args) >= 1);
@@ -90,7 +90,7 @@ package Game::EvonyTKR::External::General::Summarizer {
     }
 
     if (scalar(@errmessage)) {
-      $job->log_error(join ' ', @errmessage);
+      $job->logger->error(join ' ', @errmessage);
       $job->fail(join ' ', @errmessage);
       return;
     }
@@ -102,7 +102,7 @@ package Game::EvonyTKR::External::General::Summarizer {
         ref($job->generalName)
         ? Data::Printer::np($job->generalName)
         : $job->generalName);
-      $job->log_error($err);
+      $job->logger->error($err);
       return $job->fail($err);
     }
 
@@ -127,7 +127,7 @@ package Game::EvonyTKR::External::General::Summarizer {
     # Get covenant
     $job->covenant($job->get_covenant($job->generalName));
     unless ($job->covenant) {
-      $job->log_warn(sprintf('No covenant found for "%s"', $job->generalName));
+      $job->logger->warn(sprintf('No covenant found for "%s"', $job->generalName));
     }
 
     # Get ascending attributes (primary only)
@@ -136,7 +136,7 @@ package Game::EvonyTKR::External::General::Summarizer {
       unless ($job->general->ascendingAttributes) {
         my $errmessage = sprintf('failed to get ascending attributes for "%s"',
           $job->general->name);
-        $job->log_error($errmessage);
+        $job->logger->error($errmessage);
         $job->fail($errmessage);
       }
     }
@@ -222,7 +222,7 @@ package Game::EvonyTKR::External::General::Summarizer {
         $job->info->{id},
         ref($params->{general}) ? blessed($params->{general}) : 'scalar');
 
-      $job->log_error($em);
+      $job->logger->error($em);
       return $job->fail($em);
     }
 
@@ -236,7 +236,7 @@ package Game::EvonyTKR::External::General::Summarizer {
             join ', ',
             map { sprintf('"%s"', $_) } $job->AscendingAttributeLevelValues(1),
           );
-          $job->log_error($em);
+          $job->logger->error($em);
           return $job->fail($em);
         }
       }
@@ -249,7 +249,7 @@ package Game::EvonyTKR::External::General::Summarizer {
             join ', ',
             map { sprintf('"%s"', $_) } $job->AscendingAttributeLevelValues(0),
           );
-          $job->log_error($em);
+          $job->logger->error($em);
           return $job->fail($em);
         }
       }
@@ -267,7 +267,7 @@ package Game::EvonyTKR::External::General::Summarizer {
         $params->{covenantLevel},
         join ', ', map { sprintf('"%s"', $_) } $job->CovenantCategoryValues->@*
       );
-      $job->log_error($em);
+      $job->logger->error($em);
       return $job->fail($em);
     }
 
@@ -277,7 +277,7 @@ package Game::EvonyTKR::External::General::Summarizer {
         my $em = sprintf('specialty level "%s" is invalid, must be one of %s',
           $specialtyLevel, join ', ',
           map { sprintf('"%s"', $_) } $job->SpecialtyLevelValues->@*);
-        $job->log_error($em);
+        $job->logger->error($em);
         return $job->fail($em);
       }
     }

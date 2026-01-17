@@ -25,19 +25,19 @@ package Game::EvonyTKR::External::Specialty::Loader {
     $job->SUPER::run([$filename]);
     unless (defined($job->minion)) {
       my $errmessage = sprintf('minion undefined in job for %s', __PACKAGE__);
-      $job->log_error($errmessage);
+      $job->logger->error($errmessage);
       return $job->fail($errmessage);
     }
-    $job->log_debug(sprintf(
+    $job->logger->debug(sprintf(
       '%s log level is %s',
       __PACKAGE__, Log::Log4perl::Level::to_level($job->logger->level())
     ));
-    $job->log_debug("Loading specialty from file: $filename");
+    $job->logger->debug("Loading specialty from file: $filename");
 
     my $specialtyFile = Mojo::File->new(Encode::decode_utf8($filename));
 
     unless (-f $specialtyFile && -r $specialtyFile) {
-      $job->log_error("Cannot read specialty file: $specialtyFile");
+      $job->logger->error("Cannot read specialty file: $specialtyFile");
       return $job->fail("Cannot read specialty file: $specialtyFile");
     }
 
@@ -48,21 +48,21 @@ package Game::EvonyTKR::External::Specialty::Loader {
     )->load_string($data);
 
     unless (exists $hashObject->{name} && length($hashObject->{name})) {
-      $job->log_error(
+      $job->logger->error(
         "Name is required for a Specialty. Cannot import $specialtyFile");
       return $job->fail("Name is required for a Specialty");
     }
 
     my $specialty = Game::EvonyTKR::Model::Specialty->from_hash($hashObject);
     unless ($specialty) {
-      $job->log_error("Failed to import Specialty from $specialtyFile");
+      $job->logger->error("Failed to import Specialty from $specialtyFile");
       return $job->fail("Failed to import Specialty from $specialtyFile");
     }
 
     # Add to cache
     $job->add_specialty($specialty);
     $job->note(specialty => $specialty);
-    $job->log_info(
+    $job->logger->info(
       sprintf('Successfully loaded specialty: %s', $specialty->name));
   }
 }

@@ -84,10 +84,10 @@ Returns:
 
 sub generate_table_session_id ($self, $requested_items = []) {
   my $uidseed = join(', ', @$requested_items) . ' ' . UUID::uuid7();
-  $self->log_debug("uidseed is '$uidseed'");
+  $self->logger->debug("uidseed is '$uidseed'");
 
   my $session_id = UUID::uuid5($self->UUID5_base, $uidseed);
-  $self->log_debug("final session_id is '$session_id'");
+  $self->logger->debug("final session_id is '$session_id'");
 
   return $session_id;
 }
@@ -154,7 +154,7 @@ Arguments:
 =cut
 
 sub send_complete_event ($self, $run_id, $total_items, $item_type = 'items') {
-  $self->log_debug(sprintf(
+  $self->logger->debug(sprintf(
     'All %d %s computed and flushed, sending complete event',
     $total_items, $item_type
   ));
@@ -168,7 +168,7 @@ sub send_complete_event ($self, $run_id, $total_items, $item_type = 'items') {
     }
   );
 
-  $self->log_debug('Complete event queued with finish callback');
+  $self->logger->debug('Complete event queued with finish callback');
 }
 
 =head2 validate_session_id
@@ -189,7 +189,7 @@ Returns:
 
 sub validate_session_id ($self, $session_id, $run_id) {
   unless (defined($session_id) && length($session_id)) {
-    $self->log_error('Session ID must be present!');
+    $self->logger->error('Session ID must be present!');
     my $payload = $self->encode({ runId => 0+ $run_id });
     $self->write_table_sse('complete', $payload);
     return 0;
@@ -255,7 +255,7 @@ sub create_batch_processor ($self, $opts = {}) {
     # Process next batch
     my $batch_end = min($current_idx + $batch_size, $total_items);
 
-    $self->log_debug(sprintf(
+    $self->logger->debug(sprintf(
       'Processing %s %d-%d of %d',
       $item_type, $current_idx + 1,
       $batch_end, $total_items
@@ -264,7 +264,7 @@ sub create_batch_processor ($self, $opts = {}) {
     for my $i ($current_idx .. $batch_end - 1) {
       eval { $process_item->($items->[$i], $i); };
       if ($@) {
-        $self->log_error(
+        $self->logger->error(
           sprintf('Error processing %s %d: %s', $item_type, $i, $@));
       }
     }

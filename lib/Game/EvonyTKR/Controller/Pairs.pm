@@ -63,12 +63,12 @@ package Game::EvonyTKR::Controller::Pairs {
 
   sub register($c, $app, $config = {}) {
     $c->SUPER::register($app, $config);
-    $c->log_info("Registering routes for " . ref($c));
+    $c->logger->info("Registering routes for " . ref($c));
 
     # Initialize session persistence table
     eval { $c->init_table_sessions_db(); };
     if ($@) {
-      $c->log_error("Failed to initialize table_sessions: $@");
+      $c->logger->error("Failed to initialize table_sessions: $@");
     }
 
     my $mainRoutes = $app->routes->any($base);
@@ -78,7 +78,7 @@ package Game::EvonyTKR::Controller::Pairs {
 
     eval { $c->setup_routes($app); } or do {
       say "route setup failed in Pairs controller";
-      $c->log_error("route setup failed in Pairs controller");
+      $c->logger->error("route setup failed in Pairs controller");
     };
 
   }
@@ -89,7 +89,7 @@ package Game::EvonyTKR::Controller::Pairs {
 
     my $controller_name = $parts[$#parts] // 'unknown_controller';
 
-    $c->log_debug("got controller_name $controller_name.");
+    $c->logger->debug("got controller_name $controller_name.");
     my $mainRoutes = $app->routes->any($base);
 
     eval {
@@ -105,7 +105,7 @@ package Game::EvonyTKR::Controller::Pairs {
       )->name('General_dynamic_pairTable');
       1;
     } or do {
-      $c->log_error('failed to set up General_dynamic_pairTable');
+      $c->logger->error('failed to set up General_dynamic_pairTable');
     };
 
     eval {
@@ -116,7 +116,7 @@ package Game::EvonyTKR::Controller::Pairs {
         )->name('Generals_dynamic_pairCatalog');
       1;
     } or do {
-      $c->log_error('failed to set up Generals_dynamic_pairCatalog');
+      $c->logger->error('failed to set up Generals_dynamic_pairCatalog');
     };
 
     eval {
@@ -126,11 +126,11 @@ package Game::EvonyTKR::Controller::Pairs {
       )->name('Generals_dynamic_pairDetails');
       1;
     } or do {
-      $c->log_error('failed to set up Generals_dynamic_pairDetails');
+      $c->logger->error('failed to set up Generals_dynamic_pairDetails');
     };
 
     foreach my $route ($c->all_valid_routes()) {
-      $c->log_debug("building nav items for "
+      $c->logger->debug("building nav items for "
           . $route->{uiTarget} . "|"
           . $route->{buffActivation});
       my $printableUI = $route->{uiTarget} =~ s/-/ /rg;
@@ -150,7 +150,7 @@ package Game::EvonyTKR::Controller::Pairs {
             $route->{uiTarget}, $route->{buffActivation}),
           order => 50 + ($route->{order} || 0),
         });
-        $c->log_debug(sprintf('built route %s',));
+        $c->logger->debug(sprintf('built route %s',));
       }
     }
     return 1;
@@ -199,14 +199,14 @@ package Game::EvonyTKR::Controller::Pairs {
             eval {
               my $pairs_for_type = $c->get_pairs_for_type_batch($type,
                 { skip_generic_books => 1 });
-              $c->log_info(sprintf(
+              $c->logger->info(sprintf(
                 "Loaded %d pairs for type %s",
                 scalar(@$pairs_for_type), $type
               ));
               $resolve->($pairs_for_type);
             };
             if ($@) {
-              $c->log_error("Failed to load pairs for $type: $@");
+              $c->logger->error("Failed to load pairs for $type: $@");
               $reject->($@);
             }
           });
@@ -242,13 +242,13 @@ package Game::EvonyTKR::Controller::Pairs {
     my $route_meta = $c->lookup_route($slug_ui, $slug_buff);
 
     unless ($route_meta) {
-      $c->log_error("Invalid pair route: $slug_ui | $slug_buff");
+      $c->logger->error("Invalid pair route: $slug_ui | $slug_buff");
 
       if ($c->app->mode eq 'development') {
-        $c->log_debug("Known valid routes:");
+        $c->logger->debug("Known valid routes:");
         $c->each_valid_route(
           sub ($key, $meta) {
-            $c->log_debug(
+            $c->logger->debug(
               "  $key => " . Data::Printer::np($meta, multiline => 0));
           }
         );
@@ -270,7 +270,7 @@ package Game::EvonyTKR::Controller::Pairs {
         status => 400
       );
     }
-    $c->log_debug('diagnostic_pairs_by_type calling get_pairs_for_type_batch');
+    $c->logger->debug('diagnostic_pairs_by_type calling get_pairs_for_type_batch');
     my $pairs_for_type = $c->get_pairs_for_type_batch($type);
     my $pair_count     = scalar(@$pairs_for_type);
 
@@ -299,17 +299,17 @@ package Game::EvonyTKR::Controller::Pairs {
     my $data_model = Game::EvonyTKR::Model::Data->new;
 
     unless ($data_model->validateBuffActivation($buffActivation)) {
-      $c->log_warn("Invalid Buff Activation: $buffActivation, using 'Overall'");
+      $c->logger->warn("Invalid Buff Activation: $buffActivation, using 'Overall'");
       $buffActivation = 'Overall';
     }
 
     unless ($data_model->checkAscendingLevel($ascendingLevel)) {
-      $c->log_warn("Invalid ascendingLevel: $ascendingLevel, using 'red5'");
+      $c->logger->warn("Invalid ascendingLevel: $ascendingLevel, using 'red5'");
       $ascendingLevel = 'red5';
     }
 
     unless ($data_model->checkCovenantLevel($primaryCovenantLevel)) {
-      $c->log_warn(
+      $c->logger->warn(
         sprintf('Invalid primaryCovenantLevel: %s, using "civilization"',
           $primaryCovenantLevel)
       );
@@ -317,7 +317,7 @@ package Game::EvonyTKR::Controller::Pairs {
     }
 
     unless ($data_model->checkCovenantLevel($secondaryCovenantLevel)) {
-      $c->log_warn(
+      $c->logger->warn(
         sprintf('Invalid secondaryCovenantLevel: %s, using "civilization"',
           $secondaryCovenantLevel)
       );
@@ -348,11 +348,11 @@ package Game::EvonyTKR::Controller::Pairs {
       "pages/Generals/$uiTarget/$buffActivation/pair comparison.md");
 
     if (-f $markdown_path) {
-      $c->log_debug("Rendering from markdown index file");
+      $c->logger->debug("Rendering from markdown index file");
       return $c->render_markdown_page($markdown_path);
     }
 
-    $c->log_debug("Rendering without markdown file");
+    $c->logger->debug("Rendering without markdown file");
     return $c->render;
   }
 
@@ -372,13 +372,13 @@ package Game::EvonyTKR::Controller::Pairs {
     my $route_meta = $c->lookup_route($slug_ui, $slug_buff);
 
     unless ($route_meta) {
-      $c->log_error("Invalid pair route: $slug_ui | $slug_buff");
+      $c->logger->error("Invalid pair route: $slug_ui | $slug_buff");
 
       if ($c->app->mode eq 'development') {
-        $c->log_debug("Known valid routes:");
+        $c->logger->debug("Known valid routes:");
         $c->each_valid_route(
           sub ($key, $meta) {
-            $c->log_debug(
+            $c->logger->debug(
               "  $key => " . Data::Printer::np($meta, multiline => 0));
           }
         );
@@ -401,17 +401,17 @@ package Game::EvonyTKR::Controller::Pairs {
       );
     }
 
-    $c->log_debug('pairCatalog calling get_pairs_for_type_batch');
+    $c->logger->debug('pairCatalog calling get_pairs_for_type_batch');
    # Skip generic books - catalog only needs names and conflicts (builtin books)
     my $pairs_for_type =
       $c->get_pairs_for_type_batch($type, { skip_generic_books => 1 });
 
     my @pairs = sort { $a cmp $b } @$pairs_for_type;
-    $c->log_debug(sprintf('There are %s pairs to return.', scalar(@pairs)));
+    $c->logger->debug(sprintf('There are %s pairs to return.', scalar(@pairs)));
 
     # Safety check: if no pairs loaded yet, return error
     if (scalar(@pairs) == 0) {
-      $c->log_warn(
+      $c->logger->warn(
         "pairCatalog called but no pairs loaded yet for $generalType");
       return $c->render(
         json => {
@@ -425,7 +425,7 @@ package Game::EvonyTKR::Controller::Pairs {
 
     # if there were requested primaries, filter to only include those
     if (scalar @$requested_primaries) {
-      $c->log_debug(sprintf(
+      $c->logger->debug(sprintf(
         'pairCatalog filtering to %d requested primaries for session %s',
         scalar(@$requested_primaries), $session_id
       ));
@@ -434,7 +434,7 @@ package Game::EvonyTKR::Controller::Pairs {
       my @filtered;
       foreach my $entry (@pairs) {
         if (exists $requested{ $entry->primary->name }) {
-          $c->log_debug(sprintf(
+          $c->logger->debug(sprintf(
             '%s was requsted for session %s',
             $entry->primary->name, $session_id
           ));
@@ -442,7 +442,7 @@ package Game::EvonyTKR::Controller::Pairs {
         }
       }
 
-      $c->log_debug(sprintf(
+      $c->logger->debug(sprintf(
         'pairCatalog filtered to %d pairs (from %d total) for session %s',
         scalar(@filtered), scalar(@pairs), $session_id
       ));
@@ -469,7 +469,7 @@ package Game::EvonyTKR::Controller::Pairs {
     }
     else {
       my @json_data = map { $_->to_wire_hash() } @pairs;
-      $c->log_debug(
+      $c->logger->debug(
         "no requested primaries for session '$session_id' returning full list: "
           . Data::Printer::np(@json_data, multiline => 0));
 
@@ -509,7 +509,7 @@ package Game::EvonyTKR::Controller::Pairs {
     if ($primaries_json) {
       eval { $requested_primaries = $c->decode($primaries_json); };
       if ($@) {
-        $c->log_warn("Failed to decode primaries param: $@");
+        $c->logger->warn("Failed to decode primaries param: $@");
         $requested_primaries = [];
       }
     }
@@ -519,19 +519,19 @@ package Game::EvonyTKR::Controller::Pairs {
     # Retrieve session state (idempotent across workers)
     my $session_data = $c->get_table_session($session_id);
     unless ($session_data) {
-      $c->log_error("Session $session_id not found or expired");
+      $c->logger->error("Session $session_id not found or expired");
       $c->write_table_sse('complete', { runId => 0+ $run_id });
       return;
     }
 
     # Parse pair keys from session
     my $session_pair_keys = $session_data->{items} // [];
-    $c->log_debug(sprintf(
+    $c->logger->debug(sprintf(
       'Retrieved session %s with %d pairs from persistence',
       $session_id, scalar(@$session_pair_keys)
     ));
 
-    $c->log_debug(sprintf(
+    $c->logger->debug(sprintf(
       'stream_pair_details called url: %s,'
         . ' uiTarget: %s; buffActivation: %s; run_id: %s; session_pairs: %d',
       $c->req->url->path->to_string, $slug_ui,
@@ -543,13 +543,13 @@ package Game::EvonyTKR::Controller::Pairs {
     my $route_meta = $c->lookup_route($slug_ui, $slug_buff);
 
     unless ($route_meta) {
-      $c->log_error("Invalid pair route: $slug_ui | $slug_buff");
+      $c->logger->error("Invalid pair route: $slug_ui | $slug_buff");
 
       if ($c->app->mode eq 'development') {
-        $c->log_debug("Known valid routes:");
+        $c->logger->debug("Known valid routes:");
         $c->each_valid_route(
           sub ($key, $meta) {
-            $c->log_debug(
+            $c->logger->debug(
               "  $key => " . Data::Printer::np($meta, multiline => 0));
           }
         );
@@ -582,7 +582,7 @@ package Game::EvonyTKR::Controller::Pairs {
 
 # Only load pairs that are in the session
 # Still need to call get_pairs_for_type_batch ONCE, but filtering is much faster
-      $c->log_debug('Loading pairs for type (only once per session!)');
+      $c->logger->debug('Loading pairs for type (only once per session!)');
       my $pairs_for_type = $c->get_pairs_for_type_batch($type);
       my @all_pairs      = @$pairs_for_type;
 
@@ -600,13 +600,13 @@ package Game::EvonyTKR::Controller::Pairs {
         return $pc ? $pc : $sc;
       } @unsorted_pairs;
 
-      $c->log_debug(sprintf(
+      $c->logger->debug(sprintf(
         'Filtered to %d pairs from session (idempotent, no re-filtering!)',
         scalar(@sorted_pairs)));
     }
     else {
       # Empty session = all pairs (shouldn't happen in practice)
-      $c->log_debug('Empty session, loading all pairs (shouldn\'t happen!)');
+      $c->logger->debug('Empty session, loading all pairs (shouldn\'t happen!)');
       my $pairs_for_type = $c->get_pairs_for_type_batch($type);
       @sorted_pairs = sort {
         my $pc = $a->{primary}->{name} cmp $b->{primary}->{name};
@@ -615,7 +615,7 @@ package Game::EvonyTKR::Controller::Pairs {
       } map { $_->to_wire_hash() } @$pairs_for_type;
     }
 
-    $c->log_debug(sprintf(
+    $c->logger->debug(sprintf(
       'There are %s pairs to compute details for session %s.',
       scalar(@sorted_pairs), $session_id
     ));
@@ -661,7 +661,7 @@ package Game::EvonyTKR::Controller::Pairs {
     my @promises;
 
     # Use PDL runtime for fast pair computation (replaces Minion jobs)
-    $c->log_info(sprintf(
+    $c->logger->info(sprintf(
       'Computing %d pairs using PDL runtime (activation: %s)',
       scalar(@sorted_pairs), $buffActivation
     ));
@@ -709,7 +709,7 @@ package Game::EvonyTKR::Controller::Pairs {
       # Compute next batch of pairs using PDL
       my $batch_end = List::Util::min($current_idx + $batch_size, $total_pairs);
 
-      $c->log_debug(sprintf(
+      $c->logger->debug(sprintf(
         'Computing pairs %d-%d of %d',
         $current_idx + 1,
         $batch_end, $total_pairs
@@ -736,7 +736,7 @@ package Game::EvonyTKR::Controller::Pairs {
             $c->get_general(lc($c->normalize($secondary_name)));
 
           unless ($primary_general && $secondary_general) {
-            $c->log_error(sprintf(
+            $c->logger->error(sprintf(
               'Cannot load generals: %s, %s',
               $primary_name, $secondary_name
             ));
@@ -819,13 +819,13 @@ package Game::EvonyTKR::Controller::Pairs {
 
           # Encode and stream via SSE
           $c->write_table_sse('pair', $result);
-          $c->log_debug(sprintf(
+          $c->logger->debug(sprintf(
             'Sent pair %d/%d: %s / %s',
             $i + 1, $total_pairs, $primary_name, $secondary_name
           ));
         };
         if ($@) {
-          $c->log_error(sprintf(
+          $c->logger->error(sprintf(
             'Error computing pair %s/%s: %s',
             $primary_name, $secondary_name, $@
           ));
@@ -860,7 +860,7 @@ package Game::EvonyTKR::Controller::Pairs {
       finish => sub {
         # Stop the recurring timer (no Minion jobs to clean up with PDL!)
         Mojo::IOLoop->remove($recurring_id) if $recurring_id;
-        $c->log_debug("Client disconnected: stopped pair computation");
+        $c->logger->debug("Client disconnected: stopped pair computation");
       }
     );
   }

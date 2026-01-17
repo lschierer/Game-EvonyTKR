@@ -41,11 +41,11 @@ class Game::EvonyTKR::Converter::Covenant :
   field $covenantHash : reader;
 
   ADJUST {
-    $self->log_debug(sprintf(
+    $self->logger->debug(sprintf(
 '%s assumes that the class or module calling it has generated the required grammar for %s',
       __CLASS__, 'Game::EvonyTKR::Shared::Parser'
     ));
-    $self->log_debug(sprintf(
+    $self->logger->debug(sprintf(
 '%s assumes that the class or module calling it has also correctly set up the $tree field.',
       __CLASS__));
     # do not assume we were properly passed
@@ -56,10 +56,10 @@ class Game::EvonyTKR::Converter::Covenant :
 
   method execute {
     say "=== Covenant Text to YAML Converter ===";
-    $self->log_info("=== Covenant Text to YAML Converter ===");
+    $self->logger->info("=== Covenant Text to YAML Converter ===");
     $self->getMainText();
     if (scalar(keys %$covenantHash)) {
-      $self->log_debug(sprintf('there are %s keys in covenantHash',
+      $self->logger->debug(sprintf('there are %s keys in covenantHash',
         scalar(keys %$covenantHash),));
       $self->parseText();
       $self->printYAML();
@@ -67,10 +67,10 @@ class Game::EvonyTKR::Converter::Covenant :
   }
 
   method parseText {
-    $self->log_debug("at start of parseText, covenantHash currently has "
+    $self->logger->debug("at start of parseText, covenantHash currently has "
         . Data::Printer::np($covenantHash));
     foreach my $key (keys %$covenantHash) {
-      $self->log_debug("parseText for key $key");
+      $self->logger->debug("parseText for key $key");
       my $covenant  = $covenantHash->{$key};
       my @sentences = split(/;;/, $covenant->{text});
       my $passive   = 0;
@@ -79,7 +79,7 @@ class Game::EvonyTKR::Converter::Covenant :
         if ($sentence =~ /(.+)(\((?:Local|Global|General Only)\))/i) {
           my $text = $1;
           $passive = $2 eq '(Global)' ? 1 : 0;
-          $self->log_debug(sprintf(
+          $self->logger->debug(sprintf(
             'using text "%s" as a %s buff',
             $text, $passive ? 'passive' : 'personal'
           ));
@@ -87,17 +87,17 @@ class Game::EvonyTKR::Converter::Covenant :
           @fragments = $parser->tokenize_buffs($text);
         }
         else {
-          $self->log_debug(sprintf(
+          $self->logger->debug(sprintf(
             'using text "%s" as a %s buff',
             $sentence, $passive ? 'passive' : 'personal'
           ));
 
           @fragments = $parser->tokenize_buffs($sentence);
         }
-        $self->log_debug(sprintf('there are %s fragments', scalar(@fragments)));
+        $self->logger->debug(sprintf('there are %s fragments', scalar(@fragments)));
         foreach my $frag (@fragments) {
           my $b = $parser->normalize_buff($frag);
-          $self->log_debug(sprintf(
+          $self->logger->debug(sprintf(
             'recieved %s from normalize_buff for "%s"',
             ref($b), Data::Printer::np($frag)
           ));
@@ -108,7 +108,7 @@ class Game::EvonyTKR::Converter::Covenant :
         }
       }
 
-      $self->log_debug(sprintf(
+      $self->logger->debug(sprintf(
         'found %s buffs for key %s: %s',
         scalar(@{ $covenantHash->{$key}->{buffs} }), $key,
         Data::Printer::np($covenantHash->{$key}->{buffs})
@@ -171,7 +171,7 @@ class Game::EvonyTKR::Converter::Covenant :
     my $filename = lc($primary);
     $filename = "${filename}.yaml";
     if (!$outputDir->is_dir()) {
-      $self->log_error("$outputDir is not a directory!!!" . $outputDir->stat());
+      $self->logger->error("$outputDir is not a directory!!!" . $outputDir->stat());
     }
     $outputDir->child($filename)->touch();
     if ($debug) {
@@ -211,13 +211,13 @@ class Game::EvonyTKR::Converter::Covenant :
       return [];
     }
     if ($debug) {
-      $self->log_debug("Found container: " . $container->starttag());
+      $self->logger->debug("Found container: " . $container->starttag());
     }
 
     # Get all h2 and h3 elements in reading order
     my @headers = $container->look_down('_tag' => qr/^h[23]$/);
     unless (scalar(@headers) > 0) {
-      $self->log_error("No headers found");
+      $self->logger->error("No headers found");
     }
 
     # Find the first h3 (start of the pertinent info)
@@ -241,41 +241,41 @@ class Game::EvonyTKR::Converter::Covenant :
       warn "Could not find required h2 tag";
       return [];
     }
-    $self->log_debug("found start_index $start_index");
+    $self->logger->debug("found start_index $start_index");
 
     $primary = $targetH3->as_trimmed_text =~ s/Evony\s+(.+?)\s+Covenant:?/$1/r;
     $primary =~
       s/[\x{0022}\x{0027}\x{2018}\x{2019}\x{201C}\x{201D}\x{0060}\x{00B4}]s//g;
     $primary =~ s/Evony\s+(.+?)\s+Covenant:/$1/;
     $primary =~ s/[-–—]*//;
-    $self->log_debug("found primary '$primary'");
+    $self->logger->debug("found primary '$primary'");
     my $supporting_para = $helpers->find_next_p_after_element($targetH3);
     if ($supporting_para) {
       my @links = $supporting_para->look_down('_tag' => 'a');
       if (scalar @links) {
         foreach my $link (@links) {
-          $self->log_debug(
+          $self->logger->debug(
             sprintf('supporting general "%s"', $link->as_trimmed_text));
           push @{$supporting}, $link->as_trimmed_text;
         }
       }
       else {
-        $self->log_error("Could not find links in supporting_para");
+        $self->logger->error("Could not find links in supporting_para");
       }
     }
     else {
-      $self->log_error("Cound not find supporting_para");
+      $self->logger->error("Cound not find supporting_para");
     }
 
     $covenantHash = $self->setupLevelsHash();
     my $detailsTable = $helpers->find_next_table_after_element($targetH3);
     unless ($detailsTable) {
-      $self->log_error("cound not find detailsTable");
+      $self->logger->error("cound not find detailsTable");
     }
 
     my @rows = $detailsTable->look_down('_tag' => 'tr');
     unless (scalar(@rows)) {
-      $self->log_error("no rows in table");
+      $self->logger->error("no rows in table");
     }
 
     foreach my $ri (0 .. $#rows) {
@@ -286,7 +286,7 @@ class Game::EvonyTKR::Converter::Covenant :
       # the source site occasionally accidentically has extra text
       # in the cell being used as the key.
       $key = first { $key =~ /$_/i } @{ $self->CovenantCategoryValues };
-      $self->log_debug("getting text for key $key");
+      $self->logger->debug("getting text for key $key");
 
       my $fragment = $cells[1]->as_HTML;
       $fragment =~ s/<td>(.+)<\/td>/$1/;
@@ -294,12 +294,12 @@ class Game::EvonyTKR::Converter::Covenant :
       # those divs may have one or more attributes.
       $fragment =~ s/<div.*?>(.+)<\/div>/$1/;
       $fragment =~ s/<br\s*\/?>/;;/g;
-      $self->log_debug("fragment for $key is $fragment");
+      $self->logger->debug("fragment for $key is $fragment");
       if (exists $covenantHash->{$key}) {
         $covenantHash->{$key}->{text} = $fragment;
       }
       else {
-        $self->log_error("key $key is invalid, valid keys are "
+        $self->logger->error("key $key is invalid, valid keys are "
             . join(', ', keys %$covenantHash));
       }
     }
@@ -317,13 +317,13 @@ qr/elementor-element-(?:\w){1,9}.elementor-widget.elementor-widget-theme-post-co
       return [];
     }
     if ($debug) {
-      $self->log_debug("Found container: " . $container->starttag());
+      $self->logger->debug("Found container: " . $container->starttag());
     }
 
     # Get all h2 and h3 elements in reading order
     my @headers = $container->look_down('_tag' => qr/^h[23]$/);
     unless (scalar(@headers) > 0) {
-      $self->log_error("No headers found");
+      $self->logger->error("No headers found");
     }
 
     # Find the Third h2 (start of the pertinent info)
@@ -347,7 +347,7 @@ qr/elementor-element-(?:\w){1,9}.elementor-widget.elementor-widget-theme-post-co
       warn "Could not find required h2 tag";
       return;
     }
-    $self->log_debug("found start_index $start_index");
+    $self->logger->debug("found start_index $start_index");
 
     $primary = $targetH2->as_trimmed_text;
     $primary =~
@@ -367,18 +367,18 @@ qr/elementor-element-(?:\w){1,9}.elementor-widget.elementor-widget-theme-post-co
       my @links = $supporting_para->look_down('_tag' => 'a');
       if (scalar @links) {
         foreach my $link (@links) {
-          $self->log_debug(
+          $self->logger->debug(
             sprintf('supporting general "%s"', $link->as_trimmed_text));
           push @{$supporting}, $link->as_trimmed_text;
         }
       }
       else {
-        $self->log_error("Could not find links in supporting_para");
+        $self->logger->error("Could not find links in supporting_para");
         return;
       }
     }
     else {
-      $self->log_error("Cound not find supporting_para");
+      $self->logger->error("Cound not find supporting_para");
       return;
     }
 
@@ -386,14 +386,14 @@ qr/elementor-element-(?:\w){1,9}.elementor-widget.elementor-widget-theme-post-co
     my $detailsTable = $helpers->find_next_table_after_element($targetH2);
 
     unless (defined $detailsTable) {
-      $self->log_error("cound not find detailsTable");
+      $self->logger->error("cound not find detailsTable");
       return;
     }
-    $self->log_debug("$detailsTable is " . builtin::blessed $detailsTable);
+    $self->logger->debug("$detailsTable is " . builtin::blessed $detailsTable);
 
     my @rows = $detailsTable->look_down('_tag' => 'tr');
     unless (scalar(@rows)) {
-      $self->log_error("no rows in table");
+      $self->logger->error("no rows in table");
       return;
     }
 
@@ -405,17 +405,17 @@ qr/elementor-element-(?:\w){1,9}.elementor-widget.elementor-widget-theme-post-co
       # the source site occasionally accidentically has extra text
       # in the cell being used as the key.
       $key = first { $key =~ /$_/i } @{ $self->CovenantCategoryValues };
-      $self->log_debug("getting text for key $key");
+      $self->logger->debug("getting text for key $key");
 
       my $fragment = $cells[1]->as_HTML;
       $fragment =~ s/<td>(.+)<\/td>/$1/;
       $fragment =~ s/<br\s*\/?>/;;/g;
-      $self->log_debug("fragment for $key is $fragment");
+      $self->logger->debug("fragment for $key is $fragment");
       if (exists $covenantHash->{$key}) {
         $covenantHash->{$key}->{text} = $fragment;
       }
       else {
-        $self->log_error("key $key is invalid, valid keys are "
+        $self->logger->error("key $key is invalid, valid keys are "
             . join(', ', keys %$covenantHash));
       }
     }

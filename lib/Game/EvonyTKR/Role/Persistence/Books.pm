@@ -8,7 +8,6 @@ with 'Game::EvonyTKR::Role::Persistence::Core';
 # Builtin Books
 ##############################################################################
 my $logger;
-
 sub add_builtin_book ($self, $book) {
   my $key = lc($self->normalize($book->name));
   return $self->persistence->store_builtin_book($key, $book->to_wire_hash());
@@ -16,7 +15,7 @@ sub add_builtin_book ($self, $book) {
 
 sub get_builtin_book ($self, $name) {
   require Game::EvonyTKR::Model::Factory;
-  $logger //= Game::EvonyTKR::Role::Logging::get_logger(__PACKAGE__);
+  $logger //= WebFramework::Role::Logger::get_logger(__PACKAGE__);
 
   state $builtin_books = {};
 
@@ -70,7 +69,7 @@ sub list_builtin_books ($self) {
 ##############################################################################
 
 sub add_generic_book ($self, $book) {
-  $logger //= Game::EvonyTKR::Role::Logging::get_logger(__PACKAGE__);
+  $logger //= WebFramework::Role::Logger::get_logger(__PACKAGE__);
   my $key = lc($self->normalize($book->name));
   $key = sprintf('level %s %s', $book->level, $key);
   $logger->debug(sprintf(
@@ -81,7 +80,7 @@ sub add_generic_book ($self, $book) {
 }
 
 sub get_generic_book ($self, $name, $level) {
-  $logger //= Game::EvonyTKR::Role::Logging::get_logger(__PACKAGE__);
+  $logger //= WebFramework::Role::Logger::get_logger(__PACKAGE__);
   require Game::EvonyTKR::Model::Factory;
   $logger->debug(sprintf(
     'persistence role get_generic_book called for name "%s" level "%s"',

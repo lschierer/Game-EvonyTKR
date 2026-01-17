@@ -49,7 +49,7 @@ package Game::EvonyTKR::Model::BasicAttributes {
 
   sub setAttribute($self, $attributeName, $newAttribute) {
     if (none { $_ =~ $attributeName } $self->BasicAttributeTypes) {
-      $self->log_error(sprintf(
+      $self->logger->error(sprintf(
         'attributeName must be one of %s, not %s',
         Data::Printer::np($self->BasicAttributeTypes),
         $attributeName,
@@ -59,7 +59,7 @@ package Game::EvonyTKR::Model::BasicAttributes {
 
     unless (ref($newAttribute)
       && $newAttribute->isa('Game::EvonyTKR::Model::BasicAttribute')) {
-      $self->log_error(sprintf(
+      $self->logger->error(sprintf(
         'newAttribute must be a %s not a %s',
         'Game::EvonyTKR::Model::BasicAttribute',
         blessed $newAttribute
@@ -70,7 +70,7 @@ package Game::EvonyTKR::Model::BasicAttributes {
       $self->$attributeName($newAttribute);
     }
     else {
-      $self->log_error(sprintf(
+      $self->logger->error(sprintf(
         'cannot find method "%s" in "%s"',
         $attributeName, blessed($self)
       ));
@@ -100,7 +100,7 @@ package Game::EvonyTKR::Model::BasicAttributes {
   }
 
   sub from_hash ($class, $hashObject) {
-    my $logger = Game::EvonyTKR::Role::Logging::get_logger(__PACKAGE__);
+    my $logger = WebFramework::Role::Logger::get_logger(__PACKAGE__);
     unless (ref($hashObject) eq 'HASH') {
       $logger->error(sprintf(
         '%s from_hash requires a hash as a parameter, not %s',

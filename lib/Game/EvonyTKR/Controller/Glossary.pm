@@ -15,7 +15,7 @@ sub getBase ($c) {
 }
 
 sub register ($c, $app, $config = {}) {
-  $c->log_info("Registering routes for " . ref($c));
+  $c->logger->info("Registering routes for " . ref($c));
   $c->SUPER::register($app, $config);
 
   my @parts     = split(/::/, ref($c));
@@ -26,7 +26,7 @@ sub register ($c, $app, $config = {}) {
     ? $c->controller_name()
     : $baseClass;
 
-  $c->log_debug("got controller_name $controller_name.");
+  $c->logger->debug("got controller_name $controller_name.");
 
   my $mainRoutes = $app->routes->any($base);
   $mainRoutes->get('/')
@@ -47,7 +47,7 @@ sub prereqs ($c) {
 sub index ($c) {
   return if $c->check_prereqs_or_wait($c->prereqs);
 
-  $c->log_debug("Rendering glossary index");
+  $c->logger->debug("Rendering glossary index");
 
   # Load all terms from persistence
   my $terms_data = $c->list_glossary_terms();
@@ -58,18 +58,18 @@ sub index ($c) {
   foreach my $td ($terms_data->@*) {
     my $tdo = Game::EvonyTKR::Model::Glossary->from_wire_hash($td);
     unless ($tdo) {
-      $c->log_error(
+      $c->logger->error(
         sprintf('failed to create object from term %s',
           exists($td->{term}) ? $td->{term} : Data::Printer::np($td))
       );
       next;
     }
     $tdo->rendered_def($c->render_markdown_snippet($tdo->definition));
-    $c->log_debug(sprintf(
+    $c->logger->debug(sprintf(
       'glossary definition for term "%s" before markdown rendering:: %s',
       $tdo->term, $tdo->definition
     ));
-    $c->log_debug(sprintf(
+    $c->logger->debug(sprintf(
       'glossary definition for term "%s" after markdown rendering:: %s',
       $tdo->term, $tdo->rendered_def
     ));

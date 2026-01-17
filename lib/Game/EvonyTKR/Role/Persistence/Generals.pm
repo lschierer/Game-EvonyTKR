@@ -30,7 +30,7 @@ sub get_general ($self, $name, $opts = {}) {
 
   return if (not length($name));
 
-  $self->log_debug("get_general called for: $name");
+  $self->logger->debug("get_general called for: $name");
 
   my $normalized_name = lc($self->normalize($name)) // '';
   return unless (length($normalized_name));
@@ -39,7 +39,7 @@ sub get_general ($self, $name, $opts = {}) {
   my $use_cache = !%$opts;
 
   if ($use_cache && exists $generals->{$normalized_name}) {
-    $self->log_debug("Returning general $name from state cache");
+    $self->logger->debug("Returning general $name from state cache");
     return $generals->{$normalized_name};
   }
 
@@ -47,7 +47,7 @@ sub get_general ($self, $name, $opts = {}) {
   my $wire_data = $self->persistence->get_general($normalized_name);
 
   unless (defined($wire_data)) {
-    $self->log_warn("No data found for: $name");
+    $self->logger->warn("No data found for: $name");
     return;
   }
 
@@ -56,11 +56,11 @@ sub get_general ($self, $name, $opts = {}) {
     $opts);
 
   unless (defined($general)) {
-    $self->log_error("Factory failed to build general from wire_data");
+    $self->logger->error("Factory failed to build general from wire_data");
     return;
   }
 
-  $self->log_debug("Successfully built general: " . $general->name);
+  $self->logger->debug("Successfully built general: " . $general->name);
 
   # Only cache if using default options
   if ($use_cache) {
@@ -83,7 +83,7 @@ sub get_generals ($self) {
   }
 
   if (scalar(@{$result}) != $self->persistence->count_generals()) {
-    $self->log_error('unable to fetch all generals.');
+    $self->logger->error('unable to fetch all generals.');
   }
   return $result;
 }
@@ -117,7 +117,7 @@ sub generate_buff_cache_key(
     $gn = $general;
   }
   else {
-    $self->log_error('general name is required to generate a buff cache key');
+    $self->logger->error('general name is required to generate a buff cache key');
     return '';
   }
 

@@ -201,7 +201,7 @@ Game::EvonyTKR::Controller::ControllerBase - Base controller for EvonyTKR Thunde
 =head1 DESCRIPTION
 
 Provides common functionality for all EvonyTKR controllers:
-- Logging via Game::EvonyTKR::Role::Logging
+- Logging via WebFramework::Role::Logger
 - Persistence via Game::EvonyTKR::Role::Persistence
 - Markdown rendering via WebFramework::Role::Markdown
 - Common routes (/health, /robots.txt, /sitemap.xml)

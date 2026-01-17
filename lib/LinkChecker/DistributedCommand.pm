@@ -21,7 +21,7 @@ has 'delay'        => 0.1;
 has 'debug'        => 0;
 has 'minion';
 has 'shared_state' => sub { { checked => {}, broken => {}, metrics => {} } };
-has 'log_file'     => sub { return Path::Tiny::path(File::HomeDir::Tiny::home)->child('var/log/Perl/dist/')->child(__PACKAGE__)->child('linkchecker_access.log'); };
+has 'logger->file'     => sub { return Path::Tiny::path(File::HomeDir::Tiny::home)->child('var/log/Perl/dist/')->child(__PACKAGE__)->child('linkchecker_access.log'); };
 has 'max_retries'  => 3;
 has 'job_timeout'  => 3600;    # 1 hour max per job execution
 has 'inactive_timeout' => 900; # 15 minutes max for job to stay queued
@@ -34,15 +34,15 @@ sub init ($self) {
   my $base_host = URI->new($self->start_url)->host;
 
   # Ensure log directory exists
-  if ($self->log_file =~ m{^(.+)/[^/]+$}) {
-    my $log_dir = $1;
-    unless (-d $log_dir) {
-      mkdir $log_dir or warn "Could not create log directory $log_dir: $!";
+  if ($self->logger->file =~ m{^(.+)/[^/]+$}) {
+    my $logger->dir = $1;
+    unless (-d $logger->dir) {
+      mkdir $logger->dir or warn "Could not create log directory $logger->dir: $!";
     }
   }
 
   # Clear or create log file
-  if (open my $fh, '>', $self->log_file) {
+  if (open my $fh, '>', $self->logger->file) {
     print $fh "# LinkChecker Access Log - " . localtime() . "\n";
     print $fh "# Format: [timestamp] status duration url_with_fragment\n";
     close $fh;
@@ -56,17 +56,17 @@ sub init ($self) {
   );
 }
 
-sub _log_access ($self, $url, $status, $duration) {
-  return unless $self->log_file;
+sub _logger->access ($self, $url, $status, $duration) {
+  return unless $self->logger->file;
 
   my $timestamp = strftime("%Y-%m-%d %H:%M:%S", localtime());
-  my $log_line = sprintf("[%s] %s %.3fs %s\n",
+  my $logger->line = sprintf("[%s] %s %.3fs %s\n",
     $timestamp, $status, $duration, $url);
 
   # Thread-safe logging with file locking
-  if (open my $fh, '>>', $self->log_file) {
+  if (open my $fh, '>>', $self->logger->file) {
     flock($fh, LOCK_EX);
-    print $fh $log_line;
+    print $fh $logger->line;
     flock($fh, LOCK_UN);
     close $fh;
   }
@@ -77,7 +77,7 @@ sub execute ($self) {
     . $self->worker_count
     . " workers";
   say "Starting URL: " . $self->start_url;
-  say "Access log: " . $self->log_file;
+  say "Access log: " . $self->logger->file;
 
   # Start worker processes
   my @worker_pids;
@@ -391,7 +391,7 @@ sub _process_urls ($self, $job, $urls, $depth, $base_host) {
     my $duration = time() - $start_time;
 
     # Log with full URL including fragment
-    $self->_log_access($url_with_fragment, $status, $duration);
+    $self->_logger->access($url_with_fragment, $status, $duration);
 
     # Store in results using URL without fragment (to avoid duplicates in state)
     $results->{checked}{$url_with_fragment} = $status;
@@ -485,7 +485,7 @@ sub _print_results ($self) {
   say "Total URLs checked: $total";
   say "Internal URLs with metrics: $metrics_count";
   say "Broken links found: $broken_count";
-  say "Access log written to: " . $self->log_file;
+  say "Access log written to: " . $self->logger->file;
 
   if ($broken_count) {
     say "\nBroken links:";

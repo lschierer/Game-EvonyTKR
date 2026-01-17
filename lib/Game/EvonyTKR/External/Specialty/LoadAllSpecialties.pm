@@ -22,14 +22,14 @@ package Game::EvonyTKR::External::Specialty::LoadAllSpecialties {
     $job->SUPER::run(@args);
     unless (defined($job->minion)) {
       my $errmessage = sprintf('minion undefined in job for %s', __PACKAGE__);
-      $job->log_error($errmessage);
+      $job->logger->error($errmessage);
       return $job->fail($errmessage);
     }
-    $job->log_debug(sprintf(
+    $job->logger->debug(sprintf(
       '%s log level is %s',
       __PACKAGE__, Log::Log4perl::Level::to_level($job->logger->level())
     ));
-    $job->log_info('Starting LoadAllSpecialties job');
+    $job->logger->info('Starting LoadAllSpecialties job');
 
     my $app = $job->app;
     my $collectionDir =
@@ -39,7 +39,7 @@ package Game::EvonyTKR::External::Specialty::LoadAllSpecialties {
     my @files =
       $specialtyDir->list->grep(sub { $_ =~ /\.ya?ml$/ && -f -r $_ })->each;
 
-    $job->log_info(
+    $job->logger->info(
       sprintf('Found %d specialty files to process', scalar @files));
 
     my $enqueued_count = 0;
@@ -52,7 +52,7 @@ package Game::EvonyTKR::External::Specialty::LoadAllSpecialties {
 
       # Check if already in persistence
       if ($job->get_specialty($specialty_name)) {
-        $job->log_debug(sprintf(
+        $job->logger->debug(sprintf(
           'Skipping %s - already in persistence', $specialty_name));
         $skipped_count++;
         next;
@@ -78,7 +78,7 @@ package Game::EvonyTKR::External::Specialty::LoadAllSpecialties {
       }
 
       if ($job_exists) {
-        $job->log_debug(sprintf(
+        $job->logger->debug(sprintf(
           'Skipping %s - job already exists for current run',
           $specialty_name));
         $skipped_count++;
@@ -93,7 +93,7 @@ package Game::EvonyTKR::External::Specialty::LoadAllSpecialties {
           priority => 21,
         }
       );
-      $job->log_debug(sprintf(
+      $job->logger->debug(sprintf(
         'Enqueued load_specialty job %s for file %s',
         $job_id, $file->basename
       ));
@@ -101,7 +101,7 @@ package Game::EvonyTKR::External::Specialty::LoadAllSpecialties {
       $enqueued_count++;
     }
 
-    $job->log_info(sprintf(
+    $job->logger->info(sprintf(
       'Enqueued %d load_specialty jobs, skipped %d already in persistence',
       $enqueued_count, $skipped_count
     ));
@@ -117,7 +117,7 @@ package Game::EvonyTKR::External::Specialty::LoadAllSpecialties {
         my $info    = $job_obj ? $job_obj->info : undef;
 
         unless ($info && $info->{state}) {
-          $job->log_debug("Job $jid: no info or state");
+          $job->logger->debug("Job $jid: no info or state");
           next;
         }
 
@@ -132,14 +132,14 @@ package Game::EvonyTKR::External::Specialty::LoadAllSpecialties {
         }
       }
 
-      $job->log_debug(sprintf(
+      $job->logger->debug(sprintf(
         'Job status: active=%d, finished=%d, failed=%d',
         $active, $finished, $failed
       ));
 
       # If jobs still running, retry this coordinator job to check again later
       if ($active > 0) {
-        $job->log_info(sprintf(
+        $job->logger->info(sprintf(
           'Still waiting for %d child jobs - retrying in 5 seconds',
           $active));
         return $job->retry({ delay => $job->standard_delay });
@@ -150,11 +150,11 @@ package Game::EvonyTKR::External::Specialty::LoadAllSpecialties {
         my $errmsg =
           sprintf('LoadAll failed: %d child jobs failed, %d finished',
           $failed, $finished);
-        $job->log_error($errmsg);
+        $job->logger->error($errmsg);
         return $job->fail($errmsg);
       }
 
-      $job->log_info(sprintf(
+      $job->logger->info(sprintf(
         'All child jobs completed: %d finished, %d failed',
         $finished, $failed
       ));
@@ -171,19 +171,19 @@ package Game::EvonyTKR::External::Specialty::LoadAllSpecialties {
           my $specialty_name = $file->basename('.yaml', '.yml');
       # Use direct persistence check to avoid model building during verification
           unless ($job->get_specialty($specialty_name)) {
-            $job->log_warn(sprintf('cannot retrieve "%s"', $specialty_name));
+            $job->logger->warn(sprintf('cannot retrieve "%s"', $specialty_name));
             $all_in_persistence = 0;
             $missing_count++;
           }
         }
 
         if ($all_in_persistence) {
-          $job->log_info('All specialties verified in persistence');
+          $job->logger->info('All specialties verified in persistence');
           $verified = 1;
           last;
         }
 
-        $job->log_debug(sprintf(
+        $job->logger->debug(sprintf(
           'Persistence verification attempt %d/%d: '
             . '%d specialties still missing',
           $attempt, $max_verify_attempts, $missing_count
@@ -194,13 +194,13 @@ package Game::EvonyTKR::External::Specialty::LoadAllSpecialties {
       unless ($verified) {
         my $errmsg =
 'Failed to verify all specialties in persistence after child jobs finished';
-        $job->log_error($errmsg);
+        $job->logger->error($errmsg);
         return $job->fail($errmsg);
       }
     }
     # If no jobs were enqueued (data already in persistence), we still succeeded
     elsif ($skipped_count > 0) {
-      $job->log_info(sprintf(
+      $job->logger->info(sprintf(
         'All data already in persistence - no jobs needed (skipped %d)',
         $skipped_count));
     }
@@ -211,7 +211,7 @@ package Game::EvonyTKR::External::Specialty::LoadAllSpecialties {
     my $run_id = $job->info->{notes}->{prebuild_run_id};
     $job->mark_task_completed($job->task_name, $run_id);
 
-    $job->log_info('LoadAllSpecialties job completed');
+    $job->logger->info('LoadAllSpecialties job completed');
   }
 }
 

@@ -20,16 +20,16 @@ package Game::EvonyTKR::External::Book::Loader {
     if (not defined($app)) {
       my $errmessage = 'app not defined in register for ' . __PACKAGE__;
       say $errmessage;
-      $taskClass->log_error($errmessage);
+      $taskClass->logger->error($errmessage);
       return;
     }
     unless (defined($app->minion)) {
       my $errmessage = sprintf('minion undefined in job for %s', __PACKAGE__);
-      $taskClass->log_error($errmessage);
+      $taskClass->logger->error($errmessage);
       say $errmessage;
       return;
     }
-    $taskClass->log_debug('Registering Book Loader workflow tasks');
+    $taskClass->logger->debug('Registering Book Loader workflow tasks');
     $app->minion->add_task($taskClass->task_name => __PACKAGE__);
 
     return 1;
@@ -43,10 +43,10 @@ package Game::EvonyTKR::External::Book::Loader {
     $job->SUPER::run(@args);
     unless (defined($job->minion)) {
       my $errmessage = sprintf('minion undefined in job for %s', __PACKAGE__);
-      $job->log_error($errmessage);
+      $job->logger->error($errmessage);
       return $job->fail($errmessage);
     }
-    $job->log_debug(sprintf(
+    $job->logger->debug(sprintf(
       '%s log level is %s',
       __PACKAGE__, Log::Log4perl::Level::to_level($job->logger->level())
     ));
@@ -55,7 +55,7 @@ package Game::EvonyTKR::External::Book::Loader {
     my $index  = $params->{index}, my $suffixlist = $params->{suffixlist};
     my $bookType;
     if ($params->{is_generic} && (not $params->{is_builtin})) {
-      $job->log_debug(sprintf(
+      $job->logger->debug(sprintf(
         'detected generic job %s via %s and %s',
         $entry,
         $params->{is_generic} ? 'is_generic true' : 'is_generic false',
@@ -65,7 +65,7 @@ package Game::EvonyTKR::External::Book::Loader {
       return $job->load_generic($entry, $index, $suffixlist);
     }
     elsif ((not $params->{is_generic}) && $params->{is_builtin}) {
-      $job->log_debug(sprintf(
+      $job->logger->debug(sprintf(
         'detected builtin job %s via %s and %s',
         $entry,
         $params->{is_generic} ? 'is_generic true' : 'is_generic false',
@@ -77,7 +77,7 @@ package Game::EvonyTKR::External::Book::Loader {
     else {
       my $errmessage = sprintf('inconsistent params for load_book job: %s',
         Data::Printer::np($params, multiline => 0));
-      $job->log_error($errmessage);
+      $job->logger->error($errmessage);
       $job->fail($errmessage);
       return;
     }
@@ -98,13 +98,13 @@ package Game::EvonyTKR::External::Book::Loader {
     unless (defined($level)) {
       my $errmessage =
         sprintf('failed to parse "%s" as a generic book filename', $entry);
-      $job->log_error($errmessage);
+      $job->logger->error($errmessage);
       return $job->fail($errmessage);
     }
     unless (defined($name)) {
       my $errmessage =
         sprintf('failed to parse "%s" as a generic book filename', $entry);
-      $job->log_error($errmessage);
+      $job->logger->error($errmessage);
       $job->fail($errmessage);
       return;
     }
@@ -115,11 +115,11 @@ package Game::EvonyTKR::External::Book::Loader {
       && $book->isa('Game::EvonyTKR::Model::Book')) {
       my $result = sprintf('returning already loaded book "%s"',
         sprintf('Level %s %s', $book->level, $book->name));
-      $job->log_info($result);
+      $job->logger->info($result);
       return $job->finish($result);
     }
     else {
-      $job->log_debug(sprintf('proceeding to import %s from file', $entry));
+      $job->logger->debug(sprintf('proceeding to import %s from file', $entry));
     }
 
     my $collectionDir =
@@ -138,7 +138,7 @@ package Game::EvonyTKR::External::Book::Loader {
     unless (defined($bookFile) && length($bookFile)) {
       my $errmessage =
         sprintf('failed to find file for entry "%s" in %s', $entry, $bookDir);
-      $job->log_error($errmessage);
+      $job->logger->error($errmessage);
       return $job->fail($errmessage);
     }
 
@@ -153,7 +153,7 @@ package Game::EvonyTKR::External::Book::Loader {
       && Scalar::Util::blessed($book)
       && $book->isa('Game::EvonyTKR::Model::Book')) {
       my $errmessage = sprintf('failed to load book for file "%s"', $bookFile);
-      $job->log_error($errmessage);
+      $job->logger->error($errmessage);
       return $job->fail($errmessage);
     }
 
@@ -161,14 +161,14 @@ package Game::EvonyTKR::External::Book::Loader {
     if (defined($add_result) && $add_result == 1) {
       my $result = sprintf('imported %s',
         sprintf('Level %s %s', $book->level, $book->name));
-      $job->log_info($result);
+      $job->logger->info($result);
       $job->note(book_imported => $book);
       return $job->finish($result);
     }
     else {
       my $errmessage = sprintf('add to cache for %s failed: %s',
         $entry, $add_result // 'undef add result');
-      $job->log_error($errmessage);
+      $job->logger->error($errmessage);
       return $job->fail($errmessage);
     }
 
@@ -189,7 +189,7 @@ package Game::EvonyTKR::External::Book::Loader {
       && ref($book)
       && $book->isa('Game::EvonyTKR::Model::Book')) {
       my $result = sprintf('returning already loaded book "%s"', $book->name);
-      $job->log_info($result);
+      $job->logger->info($result);
       return $job->finish($result);
     }
 
@@ -209,7 +209,7 @@ package Game::EvonyTKR::External::Book::Loader {
     unless (defined($bookFile) && length($bookFile)) {
       my $errmessage =
         sprintf('failed to find file for entry "%s" in %s', $entry, $bookDir);
-      $job->log_error($errmessage);
+      $job->logger->error($errmessage);
       return $job->fail($errmessage);
     }
 
@@ -224,20 +224,20 @@ package Game::EvonyTKR::External::Book::Loader {
       && Scalar::Util::blessed($book)
       && $book->isa('Game::EvonyTKR::Model::Book')) {
       my $errmessage = sprintf('failed to load book for file "%s"', $bookFile);
-      $job->log_error($errmessage);
+      $job->logger->error($errmessage);
       return $job->fail($errmessage);
     }
     my $add_result = $job->add_builtin_book($book);
     if (defined($add_result) && $add_result == 1) {
       my $result = sprintf('imported %s', $book->name);
-      $job->log_info($result);
+      $job->logger->info($result);
       $job->note(book_imported => $book);
       return $job->finish($result);
     }
     else {
       my $errmessage = sprintf('add to cache for %s failed: %s',
         $entry, $add_result // 'undef add result');
-      $job->log_error($errmessage);
+      $job->logger->error($errmessage);
       return $job->fail($errmessage);
     }
 

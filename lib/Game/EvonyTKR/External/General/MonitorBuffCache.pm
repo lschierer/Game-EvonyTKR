@@ -20,12 +20,12 @@ sub run ($job) {
     if $job->are_prereqs_outstanding($job->minion,
     ['load_all_generals', 'load_all_covenants']);
 
-  $job->log_info("Monitoring buff cache job completion");
+  $job->logger->info("Monitoring buff cache job completion");
 
   my $run_id = $job->info->{notes}->{prebuild_run_id};
 
   unless (defined $run_id) {
-    $job->log_error("No prebuild_run_id found in job notes");
+    $job->logger->error("No prebuild_run_id found in job notes");
     return $job->fail("Missing prebuild_run_id");
   }
 
@@ -47,7 +47,7 @@ sub run ($job) {
   }
 
   if ($pending_count > 0) {
-    $job->log_debug(
+    $job->logger->debug(
       "Still waiting for $pending_count buff cache jobs to complete");
     return $job->retry({ delay => 10 });
   }
@@ -69,7 +69,7 @@ sub run ($job) {
 
   if ($failed_count > 0) {
     my $errmsg = "Buff cache completion failed: $failed_count jobs failed";
-    $job->log_error($errmsg);
+    $job->logger->error($errmsg);
     return $job->fail($errmsg);
   }
 
@@ -81,7 +81,7 @@ sub run ($job) {
   $tracker->mark_complete(
     Game::EvonyTKR::External::General::LoadAllComputeBuffCache::task_name());
 
-  $job->log_info("All general buff cache jobs completed successfully");
+  $job->logger->info("All general buff cache jobs completed successfully");
   return $job->finish("General buff cache monitoring complete");
 }
 

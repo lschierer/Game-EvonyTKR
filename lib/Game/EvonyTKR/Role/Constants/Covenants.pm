@@ -49,7 +49,7 @@ package Game::EvonyTKR::Role::Constants::Covenants {
 
   sub checkCovenantLevel ($self, $proposedLevel) {
     unless (defined($proposedLevel) && length($proposedLevel)) {
-      $self->log_error("Invalid proposed level!!! $proposedLevel");
+      $self->logger->error("Invalid proposed level!!! $proposedLevel");
       return 0;
     }
     my $check = {};

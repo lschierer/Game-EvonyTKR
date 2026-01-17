@@ -23,7 +23,7 @@ sub _getGenericBookValue_impl ($self, $attribute, $troopType) {
           'Game::EvonyTKR::Role::Persistence',);
       };
       if ($@) {
-        $self->log_error("Cannot create books helper: $@");
+        $self->logger->error("Cannot create books helper: $@");
         return $total;
       }
       $helper;
@@ -63,7 +63,7 @@ sub _getGenericBookValue_impl ($self, $attribute, $troopType) {
       );
     };
     if ($@) {
-      $self->log_error("Cannot create books helper: $@");
+      $self->logger->error("Cannot create books helper: $@");
       return $total;
     }
     $helper;
@@ -82,7 +82,7 @@ sub _getGenericBookValue_impl ($self, $attribute, $troopType) {
   my $book_priorities = $books_helper->BestSkillBooks->{$targetType}->{$key}
     // {};
 
-  $self->log_debug(sprintf(
+  $self->logger->debug(sprintf(
 'getGenericBookValue: attr=%s, troopType=%s, targetType=%s, key=%s, found %d books',
     $attribute, $troopType, $targetType,
     $key,       scalar keys %$book_priorities
@@ -119,7 +119,7 @@ sub _getGenericBookValue_impl ($self, $attribute, $troopType) {
       $self->bc->is_general_and_book_compatible($self->general, $book,
       { same_side => 1 });
 
-    $self->log_debug(sprintf(
+    $self->logger->debug(sprintf(
       'Book %s for %s: provides_attr=%d, compat=%d',
       $book->name, $attribute, $provides_attr, $compat
     ));
@@ -129,7 +129,7 @@ sub _getGenericBookValue_impl ($self, $attribute, $troopType) {
         if ($buff->attribute eq $attribute
           && ($buff->targetedType // '') eq $troopType) {
           $total += $buff->value->number;
-          $self->log_debug(sprintf(
+          $self->logger->debug(sprintf(
             'Adding %d from %s, total now %d',
             $buff->value->number, $book->name, $total
           ));

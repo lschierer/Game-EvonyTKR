@@ -75,7 +75,7 @@ sub store_table_session ($self, $session_id, $data) {
   if ($result) {
     my $items = $data->{items} // [];
     my $ttl   = $data->{ttl}   // 3600;
-    $self->log_debug(sprintf(
+    $self->logger->debug(sprintf(
       'Stored table session %s (%s/%s) with %d items, expires in %d seconds',
       $session_id,     $data->{generalType}, $data->{buffActivation},
       scalar(@$items), $ttl
@@ -130,7 +130,7 @@ Returns:
 
 sub expire_table_sessions ($self, $max_age = undef) {
   my $deleted = $self->persistence->expire_table_sessions($max_age);
-  $self->log_debug("Expired $deleted table sessions") if $deleted > 0;
+  $self->logger->debug("Expired $deleted table sessions") if $deleted > 0;
   return $deleted;
 }
 

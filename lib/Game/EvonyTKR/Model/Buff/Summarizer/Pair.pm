@@ -50,7 +50,7 @@ sub updatePrimaryBuffs ($self, $precomputed = undef) {
     && ref($self->pair)
     && blessed($self->pair)
     && $self->pair->isa('Game::EvonyTKR::Model::General::Pair')) {
-    $self->log_error(sprintf(
+    $self->logger->error(sprintf(
       '%s requires a Game::EvonyTKR::Model::General::Pair',
       __PACKAGE__));
     return;
@@ -65,7 +65,7 @@ sub updatePrimaryBuffs ($self, $precomputed = undef) {
     $self->SUPER::updateBuffs();
   }
 
-  $self->log_debug(sprintf('After primary updateBuffs: %s',
+  $self->logger->debug(sprintf('After primary updateBuffs: %s',
     Data::Printer::np($self->buffValues, max_depth => 2)));
 
   foreach my $troopType (keys %{ $self->buffValues }) {
@@ -81,7 +81,7 @@ sub updateSecondaryBuffs ($self, $precomputed = undef) {
     && ref($self->pair)
     && blessed($self->pair)
     && $self->pair->isa('Game::EvonyTKR::Model::General::Pair')) {
-    $self->log_error(sprintf(
+    $self->logger->error(sprintf(
       '%s requires a Game::EvonyTKR::Model::General::Pair',
       __PACKAGE__));
     return;
@@ -130,7 +130,7 @@ sub updateBuffs ($self) {
     && ref($self->pair)
     && blessed($self->pair)
     && $self->pair->isa('Game::EvonyTKR::Model::General::Pair')) {
-    $self->log_error(sprintf(
+    $self->logger->error(sprintf(
       '%s requires a Game::EvonyTKR::Model::General::Pair',
       __PACKAGE__));
     return;
@@ -148,7 +148,7 @@ sub updateBuffs ($self) {
   $self->isPrimary(1);
   $self->SUPER::updateBuffs();
 
-  $self->log_debug(sprintf('After primary updateBuffs: %s',
+  $self->logger->debug(sprintf('After primary updateBuffs: %s',
     Data::Printer::np($self->buffValues, max_depth => 2)));
 
   foreach my $troopType (keys %{ $self->buffValues }) {
@@ -189,7 +189,7 @@ sub updatePrimaryDebuffs ($self, $precomputed = undef) {
     && ref($self->pair)
     && blessed($self->pair)
     && $self->pair->isa('Game::EvonyTKR::Model::General::Pair')) {
-    $self->log_error(sprintf(
+    $self->logger->error(sprintf(
       '%s requires a Game::EvonyTKR::Model::General::Pair',
       __PACKAGE__));
     return;
@@ -202,7 +202,7 @@ sub updatePrimaryDebuffs ($self, $precomputed = undef) {
     $self->isPrimary(1);
     $self->SUPER::updateDebuffs();
   }
-  $self->log_debug(sprintf('After primary updateDebuffs: %s',
+  $self->logger->debug(sprintf('After primary updateDebuffs: %s',
     Data::Printer::np($self->debuffValues, max_depth => 2)));
 
   foreach my $troopType (keys %{ $self->debuffValues }) {
@@ -218,7 +218,7 @@ sub updateSecondaryDebuffs ($self, $precomputed = undef) {
     && ref($self->pair)
     && blessed($self->pair)
     && $self->pair->isa('Game::EvonyTKR::Model::General::Pair')) {
-    $self->log_error(sprintf(
+    $self->logger->error(sprintf(
       '%s requires a Game::EvonyTKR::Model::General::Pair',
       __PACKAGE__));
     return;
@@ -266,7 +266,7 @@ sub updateDebuffs ($self) {
     && ref($self->pair)
     && blessed($self->pair)
     && $self->pair->isa('Game::EvonyTKR::Model::General::Pair')) {
-    $self->log_error(sprintf(
+    $self->logger->error(sprintf(
       '%s requires a Game::EvonyTKR::Model::General::Pair',
       __PACKAGE__));
     return;
@@ -330,7 +330,7 @@ sub _getGenericBookValue_impl ($self, $attribute, $troopType) {
       );
     };
     if ($@) {
-      $self->log_error("Cannot create books helper: $@");
+      $self->logger->error("Cannot create books helper: $@");
       return $total;
     }
     $helper;
@@ -389,7 +389,7 @@ sub _getGenericBookValue_impl ($self, $attribute, $troopType) {
   my $book_priorities = $books_helper->BestSkillBooks->{$targetType}->{$key}
     // $books_helper->BestSkillBooks->{$troopType}->{$key} // {};
 
-  $self->log_debug(sprintf(
+  $self->logger->debug(sprintf(
 'Pair getGenericBookValue: attr=%s, troopType=%s, targetType=%s, key=%s, found %d books',
     $attribute, $troopType, $targetType,
     $key,       scalar keys %$book_priorities
@@ -427,7 +427,7 @@ sub _getGenericBookValue_impl ($self, $attribute, $troopType) {
 # Check compatibility with other general (different side - no partial conflicts) - cached
     my $compat_other = $check_compat->($other_general, $book, 0);
 
-    $self->log_debug(sprintf(
+    $self->logger->debug(sprintf(
 'Book %s for %s (%s): provides_attr=%d, compat_current=%d, compat_other=%d',
       $book->name,    $attribute,      $current_general->name,
       $provides_attr, $compat_current, $compat_other
@@ -439,7 +439,7 @@ sub _getGenericBookValue_impl ($self, $attribute, $troopType) {
         if ($buff->attribute eq $attribute
           && ($buff->targetedType // '') eq $troopType) {
           $total += $buff->value->number;
-          $self->log_debug(sprintf(
+          $self->logger->debug(sprintf(
             'Adding %d from %s for %s, total now %d',
             $buff->value->number,   $book->name,
             $current_general->name, $total

@@ -64,7 +64,7 @@ package Game::EvonyTKR::Model::AscendingAttributes {
       $self->AscendingAttributeLevelValues(1)
     );
     lock_keys(%h);
-    $self->log_debug('h with empty levels is ' . Data::Printer::np(%h));
+    $self->logger->debug('h with empty levels is ' . Data::Printer::np(%h));
     return \%h;
   }
 
@@ -102,7 +102,7 @@ package Game::EvonyTKR::Model::AscendingAttributes {
     return 0 unless exists $level_index{$level};
 
     my $target_index = $level_index{$level};
-    $self->log_debug(
+    $self->logger->debug(
       "my ascending hash looks like " . Data::Printer::np($self->attributes));
     my $total = 0;
     for my $i (1 .. $target_index) {    # skip index 0 ('None')
@@ -180,14 +180,14 @@ package Game::EvonyTKR::Model::AscendingAttributes {
   sub addBuff ($self, $level, $nb) {
     my $red = 1;
     if (!blessed($nb) || blessed($nb) ne "Game::EvonyTKR::Model::Buff") {
-      $self->log_error(sprintf(
+      $self->logger->error(sprintf(
         'attempting to add buff of type %s not "Game::EvonyTKR::Model::Buff"',
         !blessed($nb) ? Scalar::Util::reftype($nb) : blessed($nb)));
       exit 0;
     }
 
     if ($level !~ /(purple|red)[0-9]{1}/i) {
-      $self->log_error(sprintf(
+      $self->logger->error(sprintf(
         'level should be one of %s, not %s',
         join(
           ', ',
@@ -204,7 +204,7 @@ package Game::EvonyTKR::Model::AscendingAttributes {
       $red = 0;
     }
     if (none { $_ eq $level } $self->AscendingAttributeLevelValues($red)) {
-      $self->log_debug(
+      $self->logger->debug(
         "$level must be one of "
           . join(
           ', ',
@@ -218,7 +218,7 @@ package Game::EvonyTKR::Model::AscendingAttributes {
     }
 
     push @{ $self->attributes->{$level}->{buffs} }, $nb;
-    $self->log_debug("$level now has "
+    $self->logger->debug("$level now has "
         . scalar @{ $self->attributes->{$level}->{buffs} }
         . " buffs");
     return scalar @{ $self->attributes->{$level}->{buffs} };
@@ -276,7 +276,7 @@ package Game::EvonyTKR::Model::AscendingAttributes {
   }
 
   sub from_wire_hash($class, $h) {
-    my $logger = Game::EvonyTKR::Role::Logging::get_logger(__PACKAGE__);
+    my $logger = WebFramework::Role::Logger::get_logger(__PACKAGE__);
 
     # Convert wire format (hash-based ascending) back to array format
     my $converted_h = {%$h};    # shallow copy
@@ -311,7 +311,7 @@ package Game::EvonyTKR::Model::AscendingAttributes {
   }
 
   sub from_hash($class, $object) {
-    my $logger = Game::EvonyTKR::Role::Logging::get_logger(__PACKAGE__);
+    my $logger = WebFramework::Role::Logger::get_logger(__PACKAGE__);
     unless (exists $object->{ascending}
       && ref($object->{ascending}) eq 'ARRAY') {
       $logger->error(sprintf(

@@ -34,7 +34,7 @@ package Game::EvonyTKR::Model::General::Pair {
     state $persistence_helper //= do {
       my $helper = eval { Game::EvonyTKR::Model::Base->new(); };
       if ($@) {
-        $self->log_error(sprintf('Cannot create Persistence Helper: %s', $@));
+        $self->logger->error(sprintf('Cannot create Persistence Helper: %s', $@));
         return;
       }
       $helper;
@@ -71,7 +71,7 @@ package Game::EvonyTKR::Model::General::Pair {
   }
 
   sub from_wire_hash ($class, $h, %opts) {
-    my $logger = Game::EvonyTKR::Role::Logging::get_logger(__PACKAGE__);
+    my $logger = WebFramework::Role::Logger::get_logger(__PACKAGE__);
 
     my $primary_name =
       ref($h->{primary}) eq 'HASH'
@@ -136,22 +136,22 @@ package Game::EvonyTKR::Model::General::Pair {
   }
 
   sub populateGenericBooks ($self) {
-    $self->log_debug(sprintf(
+    $self->logger->debug(sprintf(
       'populateGenericBooks called for pair: %s + %s',
       $self->primary->name, $self->secondary->name
     ));
 
     unless ($self->persistenceHelper) {
-      $self->log_error('No persistenceHelper available');
+      $self->logger->error('No persistenceHelper available');
       return 0;
     }
 
 # Ensure both generals have builtin books populated (needed for conflict detection)
     unless ($self->primary->builtInBook) {
-      $self->log_debug('Primary builtInBook not populated');
+      $self->logger->debug('Primary builtInBook not populated');
       $self->primary->populateBuiltinBook();
       unless ($self->primary->builtInBook) {
-        $self->log_error(sprintf(
+        $self->logger->error(sprintf(
           'Failed to populate builtInBook for primary %s',
           $self->primary->name));
         return 0;
@@ -159,10 +159,10 @@ package Game::EvonyTKR::Model::General::Pair {
     }
 
     unless ($self->secondary->builtInBook) {
-      $self->log_debug('Secondary builtInBook not populated');
+      $self->logger->debug('Secondary builtInBook not populated');
       $self->secondary->populateBuiltinBook();
       unless ($self->secondary->builtInBook) {
-        $self->log_error(sprintf(
+        $self->logger->error(sprintf(
           'Failed to populate builtInBook for secondary %s',
           $self->secondary->name));
         return 0;
@@ -177,14 +177,14 @@ package Game::EvonyTKR::Model::General::Pair {
       : $self->primary->type;
 
     unless ($troop_type) {
-      $self->log_warn(sprintf(
+      $self->logger->warn(sprintf(
         'No troop type defined for pair %s + %s',
         $self->primary->name, $self->secondary->name
       ));
       return 0;
     }
 
-    $self->log_debug(sprintf(
+    $self->logger->debug(sprintf(
       'Populating generic books for pair %s + %s (%s)',
       $self->primary->name, $self->secondary->name, $troop_type
     ));
@@ -197,18 +197,18 @@ package Game::EvonyTKR::Model::General::Pair {
       Game::EvonyTKR::Service::Conflicts::BookComparator->new(service => $self);
     };
     if ($@) {
-      $self->log_error(sprintf('Failed to load BookComparator: %s', $@));
+      $self->logger->error(sprintf('Failed to load BookComparator: %s', $@));
       return 0;
     }
 
     foreach my $activation (@activations) {
-      $self->log_debug(sprintf('Processing activation: %s', $activation));
+      $self->logger->debug(sprintf('Processing activation: %s', $activation));
 
       # For pairs, compute level3 (single general) and level6 (both generals)
       foreach my $count (3, 6) {
         my $level = "level$count";
 
-        $self->log_debug(sprintf(
+        $self->logger->debug(sprintf(
           'Computing %s for %s: %d books', $level, $activation, $count
         ));
 
@@ -231,7 +231,7 @@ package Game::EvonyTKR::Model::General::Pair {
           } keys %{ $self->BestSkillBooks->{$troop_type}->{'default'} };
         }
         else {
-          $self->log_error(sprintf(
+          $self->logger->error(sprintf(
             'targetType "%s" is not supported by BestSkillBooks',
             $troop_type));
           next;
@@ -249,7 +249,7 @@ package Game::EvonyTKR::Model::General::Pair {
           unless ($book
             && ref($book)
             && $book->isa('Game::EvonyTKR::Model::Book')) {
-            $self->log_error("Cannot find $book_name");
+            $self->logger->error("Cannot find $book_name");
             next;
           }
 
@@ -268,14 +268,14 @@ package Game::EvonyTKR::Model::General::Pair {
           if ( $@
             || !defined($primary_conflict)
             || !defined($secondary_conflict)) {
-            $self->log_error(sprintf(
+            $self->logger->error(sprintf(
               'Error checking conflicts for %s: %s', $book_name, $@));
             next;
           }
 
           # Full conflict with either general - skip
           if ($primary_conflict == 2 || $secondary_conflict == 2) {
-            $self->log_debug(sprintf(
+            $self->logger->debug(sprintf(
               'Skipping %s due to full conflict (primary=%d, secondary=%d)',
               $book_name, $primary_conflict, $secondary_conflict
             ));
@@ -285,14 +285,14 @@ package Game::EvonyTKR::Model::General::Pair {
 
           # Both have partial conflicts - skip (acts as full for pairs)
           if ($primary_conflict == 1 && $secondary_conflict == 1) {
-            $self->log_debug(sprintf(
+            $self->logger->debug(sprintf(
 'Skipping %s due to dual partial conflict (both generals conflict)',
               $book_name));
             $skipped_dual_partial++;
             next;
           }
 
-          $self->log_debug(sprintf(
+          $self->logger->debug(sprintf(
 'Picked book "%s" for pair (primary_conflict=%d, secondary_conflict=%d)',
             $book_name, $primary_conflict, $secondary_conflict
           ));
@@ -301,7 +301,7 @@ package Game::EvonyTKR::Model::General::Pair {
           last if (scalar @books >= $count);
         }
 
-        $self->log_debug(sprintf(
+        $self->logger->debug(sprintf(
           'Selected %d books for %s/%s (skipped %d full, %d dual-partial)',
           scalar(@books), $activation,
           $level,         $skipped_full_conflicts,
@@ -323,7 +323,7 @@ package Game::EvonyTKR::Model::General::Pair {
 
         $self->genericBookBuffs->{$activation}{$level} = \%buffs;
 
-        $self->log_debug(sprintf(
+        $self->logger->debug(sprintf(
           'Computed %s/%s: %d buff types (%s)',
           $activation,         $level,
           scalar(keys %buffs), join(', ', map {"$_=$buffs{$_}"} keys %buffs)
@@ -331,7 +331,7 @@ package Game::EvonyTKR::Model::General::Pair {
       }
     }
 
-    $self->log_debug(sprintf(
+    $self->logger->debug(sprintf(
       'populateGenericBooks complete for pair. Activations: %s',
       join(', ', keys %{ $self->genericBookBuffs })));
 

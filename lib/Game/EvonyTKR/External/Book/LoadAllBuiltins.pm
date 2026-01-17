@@ -21,16 +21,16 @@ package Game::EvonyTKR::External::Book::LoadAllBuiltins {
     if (not defined($app)) {
       my $errmessage = 'app not defined in register for ' . __PACKAGE__;
       say $errmessage;
-      $taskClass->log_error($errmessage);
+      $taskClass->logger->error($errmessage);
       return;
     }
     unless (defined($app->minion)) {
       my $errmessage = sprintf('minion undefined in job for %s', __PACKAGE__);
-      $taskClass->log_error($errmessage);
+      $taskClass->logger->error($errmessage);
       say $errmessage;
       return;
     }
-    $taskClass->log_debug('Registering Book Loader workflow tasks');
+    $taskClass->logger->debug('Registering Book Loader workflow tasks');
     $app->minion->add_task($taskClass->task_name => __PACKAGE__);
 
     return 1;
@@ -46,16 +46,16 @@ package Game::EvonyTKR::External::Book::LoadAllBuiltins {
     $job->SUPER::run(@args);
     unless (defined($job->minion)) {
       my $errmessage = sprintf('minion undefined in job for %s', __PACKAGE__);
-      $job->log_error($errmessage);
+      $job->logger->error($errmessage);
       return $job->fail($errmessage);
     }
-    $job->log_debug(sprintf(
+    $job->logger->debug(sprintf(
       '%s log level is %s',
       __PACKAGE__, Log::Log4perl::Level::to_level($job->logger->level())
     ));
     my @list;
     push @list, $job->list_builtin_books()->@*;
-    $job->log_info(sprintf('Found %d builtin books to process', scalar @list));
+    $job->logger->info(sprintf('Found %d builtin books to process', scalar @list));
 
     my $enqueued_count = 0;
     my $skipped_count  = 0;
@@ -67,7 +67,7 @@ package Game::EvonyTKR::External::Book::LoadAllBuiltins {
 
       # Check if already in persistence
       if ($job->get_builtin_book($entry)) {
-        $job->log_debug(sprintf(
+        $job->logger->debug(sprintf(
           'Skipping %s - already in persistence', $entry));
         $skipped_count++;
         next;
@@ -93,7 +93,7 @@ package Game::EvonyTKR::External::Book::LoadAllBuiltins {
       }
 
       if ($job_exists) {
-        $job->log_debug(sprintf(
+        $job->logger->debug(sprintf(
           'Skipping %s - job already exists for current run', $entry));
         $skipped_count++;
         next;
@@ -120,7 +120,7 @@ package Game::EvonyTKR::External::Book::LoadAllBuiltins {
       $enqueued_count++;
     }
 
-    $job->log_info(sprintf(
+    $job->logger->info(sprintf(
       'Enqueued %d load_book jobs, skipped %d already in persistence',
       $enqueued_count, $skipped_count
     ));
@@ -136,7 +136,7 @@ package Game::EvonyTKR::External::Book::LoadAllBuiltins {
         my $info    = $job_obj ? $job_obj->info : undef;
 
         unless ($info && $info->{state}) {
-          $job->log_debug("Job $jid: no info or state");
+          $job->logger->debug("Job $jid: no info or state");
           next;
         }
 
@@ -151,14 +151,14 @@ package Game::EvonyTKR::External::Book::LoadAllBuiltins {
         }
       }
 
-      $job->log_debug(sprintf(
+      $job->logger->debug(sprintf(
         'Job status: active=%d, finished=%d, failed=%d',
         $active, $finished, $failed
       ));
 
       # If jobs still running, retry this coordinator job to check again later
       if ($active > 0) {
-        $job->log_info(sprintf(
+        $job->logger->info(sprintf(
           'Still waiting for %d child jobs - retrying in 5 seconds',
           $active));
         return $job->retry({ delay => $job->standard_delay });
@@ -169,11 +169,11 @@ package Game::EvonyTKR::External::Book::LoadAllBuiltins {
         my $errmsg =
           sprintf('LoadAll failed: %d child jobs failed, %d finished',
           $failed, $finished);
-        $job->log_error($errmsg);
+        $job->logger->error($errmsg);
         return $job->fail($errmsg);
       }
 
-      $job->log_info(sprintf(
+      $job->logger->info(sprintf(
         'All child jobs completed: %d finished, %d failed',
         $finished, $failed
       ));
@@ -195,12 +195,12 @@ package Game::EvonyTKR::External::Book::LoadAllBuiltins {
         }
 
         if ($all_in_persistence) {
-          $job->log_info('All builtin books verified in persistence');
+          $job->logger->info('All builtin books verified in persistence');
           $verified = 1;
           last;
         }
 
-        $job->log_debug(sprintf(
+        $job->logger->debug(sprintf(
 'Persistence verification attempt %d/%d: %d builtin books still missing',
           $attempt, $max_verify_attempts, $missing_count
         ));
@@ -210,13 +210,13 @@ package Game::EvonyTKR::External::Book::LoadAllBuiltins {
       unless ($verified) {
         my $errmsg =
 'Failed to verify all builtin books in persistence after child jobs finished';
-        $job->log_error($errmsg);
+        $job->logger->error($errmsg);
         return $job->fail($errmsg);
       }
     }
     # If no jobs were enqueued (data already in persistence), we still succeeded
     elsif ($skipped_count > 0) {
-      $job->log_info(sprintf(
+      $job->logger->info(sprintf(
         'All data already in persistence - no jobs needed (skipped %d)',
         $skipped_count));
     }

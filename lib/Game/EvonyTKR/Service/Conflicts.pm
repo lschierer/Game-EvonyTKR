@@ -2,7 +2,7 @@ package Game::EvonyTKR::Service::Conflicts;
 use v5.42.0;
 use utf8::all;
 use Mojo::Base -base,                                               -signatures;
-use Mojo::Base 'Game::EvonyTKR::Role::Logging',                     -role;
+use Mojo::Base 'WebFramework::Role::Logger',                     -role;
 use Mojo::Base 'Game::EvonyTKR::Role::Common',                      -role;
 use Mojo::Base 'Game::EvonyTKR::Role::Persistence::Pairs',          -role;
 use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants',    -role;
@@ -56,7 +56,7 @@ has TRIADS => sub { {
 
 # Main conflict detection
 sub are_generals_compatible ($self, $g1, $g2) {
-  $self->log_debug(sprintf('testing %s and %s', $g1->name, $g2->name));
+  $self->logger->debug(sprintf('testing %s and %s', $g1->name, $g2->name));
 
   # Check cache first (includes ML predictions loaded from persistence)
   my $cached = $self->_check_cache($g1, $g2);
@@ -69,7 +69,7 @@ sub are_generals_compatible ($self, $g1, $g2) {
   return 1 unless $self->_troop_overlap($g1, $g2);
 
 # TEMPORARY: Disable fallback to see if ML data is loading correctly
-#$self->log_warn(sprintf(
+#$self->logger->warn(sprintf(
 #  'No cached ML result for %s ↔ %s - returning compatible (fallback disabled)',
 #  $g1->name, $g2->name
 #));
@@ -96,7 +96,7 @@ sub are_generals_compatible ($self, $g1, $g2) {
   for my $b1 (@{ $g1->builtInBook->buffs }) {
     for my $b2 (@{ $g2->builtInBook->buffs }) {
       if ($comparator->conflicts($b1, $b2, $g1, $g2)) {
-        $self->log_debug(sprintf(
+        $self->logger->debug(sprintf(
           '%s/%s conflict: %s vs %s (conds: [%s] vs [%s])',
           $g1->name, $g2->name, $b1->attribute, $b2->attribute,
           join(',', @{ $b1->conditions // [] }),
@@ -133,7 +133,7 @@ sub load_from_persistence ($self, $persistence) {
   if ($conflicts && ref($conflicts) eq 'HASH') {
     $self->by_general($conflicts);
     my $count = scalar(keys %$conflicts);
-    $self->log_debug("Loaded conflicts for $count generals from persistence");
+    $self->logger->debug("Loaded conflicts for $count generals from persistence");
   }
 
   return $self;
@@ -196,7 +196,7 @@ sub _record_compatible ($self, $g1, $g2) {
   my $norm1 = $self->normalize($g1->name);
   my $norm2 = $self->normalize($g2->name);
 
-  $self->log_debug(sprintf('Recording compatible: %s ↔ %s', $norm1, $norm2));
+  $self->logger->debug(sprintf('Recording compatible: %s ↔ %s', $norm1, $norm2));
 
   $self->by_general->{$norm1}{$norm2} = 0;
   $self->by_general->{$norm2}{$norm1} = 0;

@@ -26,11 +26,11 @@ class Game::EvonyTKR::Converter::SkillBook :
   field $tree      : param;
 
   ADJUST {
-    $self->log_debug(sprintf(
+    $self->logger->debug(sprintf(
 '%s assumes that the class or module calling it has generated the required grammar for %s',
       __CLASS__, 'Game::EvonyTKR::Shared::Parser'
     ));
-    $self->log_debug(sprintf(
+    $self->logger->debug(sprintf(
 '%s assumes that the class or module calling it has also correctly set up the $tree field.',
       __CLASS__));
     # do not assume we were properly passed
@@ -70,7 +70,7 @@ qr/elementor-element-(?:\w){1,9}.elementor-widget.elementor-widget-theme-post-co
       return [];
     }
     if ($debug) {
-      $self->log_debug("Found container: " . $container->starttag());
+      $self->logger->debug("Found container: " . $container->starttag());
     }
 
     # Get all h2 and h3 elements in reading order
@@ -113,7 +113,7 @@ qr/elementor-element-(?:\w){1,9}.elementor-widget.elementor-widget-theme-post-co
           $text = $para->as_trimmed_text;
         }
         else {
-          $self->log_error("Could not find the required paragraph");
+          $self->logger->error("Could not find the required paragraph");
         }
         last;
       }
@@ -122,7 +122,7 @@ qr/elementor-element-(?:\w){1,9}.elementor-widget.elementor-widget-theme-post-co
       }
     }
     unless (length($name) && length($text)) {
-      $self->log_error("Cannot find and parse the required H3 tag!!");
+      $self->logger->error("Cannot find and parse the required H3 tag!!");
     }
 
   }
@@ -140,7 +140,7 @@ qr/elementor-element-(?:\w){1,9}.elementor-widget.elementor-widget-theme-post-co
       return [];
     }
     if ($debug) {
-      $self->log_debug("Found container: " . $container->starttag());
+      $self->logger->debug("Found container: " . $container->starttag());
     }
 
     # Get all h2 and h3 elements in reading order
@@ -183,7 +183,7 @@ qr/elementor-element-(?:\w){1,9}.elementor-widget.elementor-widget-theme-post-co
           $text = $para->as_trimmed_text;
         }
         else {
-          $self->log_error("Could not find the required paragraph");
+          $self->logger->error("Could not find the required paragraph");
         }
         last;
       }
@@ -192,7 +192,7 @@ qr/elementor-element-(?:\w){1,9}.elementor-widget.elementor-widget-theme-post-co
       }
     }
     unless (length($name)) {
-      $self->log_error("Cannot find the required H3 tag!!");
+      $self->logger->error("Cannot find the required H3 tag!!");
     }
   }
 
@@ -201,17 +201,17 @@ qr/elementor-element-(?:\w){1,9}.elementor-widget.elementor-widget-theme-post-co
     my $parser = Game::EvonyTKR::Shared::Parser->new();
 
     my @fragments = $parser->tokenize_buffs($text);
-    $self->log_debug(sprintf('thee are %s fragments', scalar(@fragments)));
+    $self->logger->debug(sprintf('thee are %s fragments', scalar(@fragments)));
     foreach my $frag (@fragments) {
       my $b = $parser->normalize_buff($frag);
-      $self->log_debug(sprintf(
+      $self->logger->debug(sprintf(
         'recieved %s from normalize_buff for "%s"',
         ref($b), Data::Printer::np($frag)
       ));
       push @{$buffs}, $b;
     }
 
-    $self->log_debug(Data::Printer::np($buffs));
+    $self->logger->debug(Data::Printer::np($buffs));
 
   }
 
@@ -228,7 +228,7 @@ qr/elementor-element-(?:\w){1,9}.elementor-widget.elementor-widget-theme-post-co
     my $filename = lc($name);
     $filename = "${filename}.yaml";
     if (!$outputDir->is_dir()) {
-      $self->log_error("$outputDir is not a directory!!!" . $outputDir->stat());
+      $self->logger->error("$outputDir is not a directory!!!" . $outputDir->stat());
     }
     $outputDir->child($filename)->touch();
     if ($debug) {
@@ -243,7 +243,7 @@ qr/elementor-element-(?:\w){1,9}.elementor-widget.elementor-widget-theme-post-co
 
   method execute {
     say "=== Skill Book Text to YAML Converter ===";
-    $self->log_info('=== Skill Book Text to YAML Converter ===');
+    $self->logger->info('=== Skill Book Text to YAML Converter ===');
     $self->getMainText();
     if (length($name)) {
       $self->parseSkillbookText();

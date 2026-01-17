@@ -54,15 +54,15 @@ require Data::Printer;
     default => sub ($self) {
     my $h  = {};
     my $cv = $self->CovenantCategoryValues;
-    $self->log_debug(sprintf('cv is %s', Data::Printer::np($cv)));
+    $self->logger->debug(sprintf('cv is %s', Data::Printer::np($cv)));
     foreach my $index (0 .. scalar($self->CovenantCategoryValues->@*) - 1) {
       my $key = $self->CovenantCategoryValues->[$index];
-      $self->log_debug(sprintf('key at index %s is %s', $index, $key));
+      $self->logger->debug(sprintf('key at index %s is %s', $index, $key));
       if ($key eq 'none') {
         next;
       }
       my $al = 10000 + $index * 2 * 1000;
-      $self->log_debug("setting activationLevel for $key to $al");
+      $self->logger->debug("setting activationLevel for $key to $al");
       $h->{$key} = {
         activationLevel => $al,
         buffs           => [],
@@ -80,7 +80,7 @@ require Data::Printer;
     $debuffConditions = [],
     $includePassive   = 0,
   ) {
-    $self->log_debug(sprintf(
+    $self->logger->debug(sprintf(
       'Calculating ascending buffs for level: %s, attribute: %s',
       $level, $attribute
     ));
@@ -101,7 +101,7 @@ require Data::Printer;
     my %level_index  = map { $valid_levels->[$_] => $_ } 0 .. $#$valid_levels;
 
     unless (exists $level_index{$level}) {
-      $self->log_debug("Invalid level: $level");
+      $self->logger->debug("Invalid level: $level");
       return 0;
     }
 
@@ -112,7 +112,7 @@ require Data::Printer;
     for my $i (1 .. $target_index) {    # skip index 0 for 'None'
       my $level_name = $valid_levels->[$i];
       my $buffs      = $self->categories->{$level_name}->{buffs};
-      $self->log_debug(sprintf(
+      $self->logger->debug(sprintf(
         'Checking level "%s" with %s buffs.',
         $level_name, scalar(@$buffs)
       ));
@@ -129,14 +129,14 @@ require Data::Printer;
           $logID
         )) {
           my $val = $buff->value->number;
-          $self->log_debug("  ➤ Match found. Adding $val to total.");
+          $self->logger->debug("  ➤ Match found. Adding $val to total.");
           $total += $val;
         }
         else {
-          $self->log_debug("  ✗ No match found.");
+          $self->logger->debug("  ✗ No match found.");
         }
       }
-      $self->log_debug(sprintf(
+      $self->logger->debug(sprintf(
         '%s has Total %s for level "%s" and attribute "%s"',
         $self->primary->name, $total, $level, $attribute
       ));
@@ -147,14 +147,14 @@ require Data::Printer;
   sub addBuff ($self, $level, $nb) {
     my $red = 1;
     if (!blessed($nb) || blessed($nb) ne "Game::EvonyTKR::Model::Buff") {
-      $self->log_error(sprintf(
+      $self->logger->error(sprintf(
         'attempting to add buff of type %s not "Game::EvonyTKR::Model::Buff"',
         !blessed($nb) ? Scalar::Util::reftype($nb) : blessed($nb)));
       exit 0;
     }
 
     if (none { $level =~ /$_/i } $self->CovenantCategoryValues->@*) {
-      $self->log_error(sprintf(
+      $self->logger->error(sprintf(
         'level should be one of %s, not %s',
         join(', ', @{ $self->CovenantCategoryValues }), $level
       ));
@@ -166,13 +166,13 @@ require Data::Printer;
     my $count = -1;
     $level = lc($level);
     if (!exists $self->categories->{$level}) {
-      $self->log_error(
+      $self->logger->error(
         "category $level is not a valid key for covenantlevels!!");
     }
     else {
       push @{ $self->categories->{$level}->{buffs} }, $nb;
       $count = scalar @{ $self->categories->{$level}->{buffs} };
-      $self->log_debug("Added buff for attribute '"
+      $self->logger->debug("Added buff for attribute '"
           . $nb->attribute
           . "' to covenant level '$level', now has $count buffs");
     }
@@ -181,7 +181,7 @@ require Data::Printer;
   }
 
   sub from_hash($class, $object, $primary_general = undef) {
-    my $logger = Game::EvonyTKR::Role::Logging::get_logger(__PACKAGE__);
+    my $logger = WebFramework::Role::Logger::get_logger(__PACKAGE__);
     if (!exists $object->{name}) {
       $logger->error('object must have name attribute.');
       return;
@@ -274,7 +274,7 @@ require Data::Printer;
   }
 
   sub from_wire_hash ($class, $h) {
-    my $logger = Game::EvonyTKR::Role::Logging::get_logger(__PACKAGE__);
+    my $logger = WebFramework::Role::Logger::get_logger(__PACKAGE__);
     unless (ref($h) && ref($h) eq 'HASH') {
       my $errmessage = 'from_wire_hash requires a valid hashref';
       $logger->error($errmessage);

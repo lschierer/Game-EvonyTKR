@@ -20,7 +20,7 @@ sub add_wire_pair ($self, $wire_pair) {
   # Store to SQLite (single source of truth)
   eval { $self->persistence->store_pair($key, $wire_pair); };
   if ($@) {
-    $self->log_error("Failed to store pair to persistence: $@");
+    $self->logger->error("Failed to store pair to persistence: $@");
     return 0;
   }
 
@@ -34,12 +34,12 @@ sub get_pair ($self, $key) {
   my $wire_pair;
   eval { $wire_pair = $self->persistence->get_pair($key); };
   if ($@) {
-    $self->log_error("Failed to get pair from persistence: $@");
+    $self->logger->error("Failed to get pair from persistence: $@");
   }
 
   unless ($wire_pair) {
     my @caller_info = caller(1);
-    $self->log_warn(sprintf(
+    $self->logger->warn(sprintf(
       'cannot find pair for key %s (called from %s line %d)',
       $key,
       $caller_info[3] // 'unknown',
@@ -50,7 +50,7 @@ sub get_pair ($self, $key) {
 
   my $pair = Game::EvonyTKR::Model::General::Pair->from_wire_hash($wire_pair);
   unless ($pair) {
-    $self->log_error(sprintf(
+    $self->logger->error(sprintf(
       'cannot create pair from wire_pair %s/%s/%s; key %s',
       $wire_pair->{type},      $wire_pair->{primary},
       $wire_pair->{secondary}, $key
@@ -75,7 +75,7 @@ sub get_pair_list ($self, $requested_type = undef) {
 
   foreach my $type (keys($pairs_by_type->%*)) {
     if (defined $requested_type && $type ne $requested_type) {
-      $self->log_debug(sprintf(
+      $self->logger->debug(sprintf(
         'skipping type %s as it does not match requested type %s',
         $type, $requested_type
       ));
@@ -111,7 +111,7 @@ sub get_all_pairs ($self) {
     }
   };
   if ($@) {
-    $self->log_error("Failed to load all pairs: $@");
+    $self->logger->error("Failed to load all pairs: $@");
   }
 
   return $pairs;
@@ -122,13 +122,13 @@ sub validatePairParams($self, $ascendingLevel, $primaryCovenantLevel,
   my $data_model = Game::EvonyTKR::Model::Data->new();
 
   if (!$data_model->checkAscendingLevel($ascendingLevel)) {
-    $self->log_warn(
+    $self->logger->warn(
       "Invalid ascendingLevel: $ascendingLevel, using default 'red5'");
     $ascendingLevel = 'none';
   }
 
   if (!$self->checkCovenantLevel($primaryCovenantLevel)) {
-    $self->log_warn(
+    $self->logger->warn(
       sprintf('Invalid covenantLevel: %s, using default "civilization"',
         $primaryCovenantLevel)
     );
@@ -139,7 +139,7 @@ sub validatePairParams($self, $ascendingLevel, $primaryCovenantLevel,
     $data_model->normalizeSpecialtyLevels(@$primarySpecialties);
 
   if (!$self->checkCovenantLevel($secondaryCovenantLevel)) {
-    $self->log_warn(
+    $self->logger->warn(
       sprintf('Invalid covenantLevel: %s, using default "civilization"',
         $secondaryCovenantLevel)
     );

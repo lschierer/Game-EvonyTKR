@@ -24,10 +24,10 @@ package Game::EvonyTKR::External::General::LoadAll {
     $job->SUPER::run(@args);
     unless (defined($job->minion)) {
       my $errmessage = sprintf('minion undefined in job for %s', __PACKAGE__);
-      $job->log_error($errmessage);
+      $job->logger->error($errmessage);
       return $job->fail($errmessage);
     }
-    $job->log_debug(sprintf(
+    $job->logger->debug(sprintf(
       '%s log level is %s',
       __PACKAGE__, Log::Log4perl::Level::to_level($job->logger->level())
     ));
@@ -41,7 +41,7 @@ package Game::EvonyTKR::External::General::LoadAll {
       ]
       ));
 
-    $job->log_info('Starting LoadAll generals job');
+    $job->logger->info('Starting LoadAll generals job');
 
     my $app = $job->app;
     my $collectionDir =
@@ -51,7 +51,7 @@ package Game::EvonyTKR::External::General::LoadAll {
     my @files =
       $generalDir->list->grep(sub { $_ =~ /\.ya?ml$/ && -f -r $_ })->each;
 
-    $job->log_info(sprintf('Found %d general files to process', scalar @files));
+    $job->logger->info(sprintf('Found %d general files to process', scalar @files));
 
     my $enqueued_count = 0;
     my $skipped_count  = 0;
@@ -64,7 +64,7 @@ package Game::EvonyTKR::External::General::LoadAll {
 
       # Check if already in persistence
       if ($job->get_general($general_name)) {
-        $job->log_debug(sprintf(
+        $job->logger->debug(sprintf(
           'Skipping %s - already in persistence', $general_name));
         $skipped_count++;
       }
@@ -91,7 +91,7 @@ package Game::EvonyTKR::External::General::LoadAll {
         }
 
         if ($job_exists) {
-          $job->log_debug(sprintf(
+          $job->logger->debug(sprintf(
             'Skipping %s - job already exists for current run',
             $general_name));
           $skipped_count++;
@@ -106,7 +106,7 @@ package Game::EvonyTKR::External::General::LoadAll {
                 { prebuild_run_id => $job->info->{notes}->{prebuild_run_id} }
             }
           );
-          $job->log_debug(sprintf(
+          $job->logger->debug(sprintf(
             'Enqueued load_general job %s for file %s',
             $job_id, $file->basename
           ));
@@ -127,7 +127,7 @@ package Game::EvonyTKR::External::General::LoadAll {
         my $info    = $job_obj ? $job_obj->info : undef;
 
         unless ($info && $info->{state}) {
-          $job->log_debug("Job $jid: no info or state");
+          $job->logger->debug("Job $jid: no info or state");
           next;
         }
 
@@ -142,14 +142,14 @@ package Game::EvonyTKR::External::General::LoadAll {
         }
       }
 
-      $job->log_debug(sprintf(
+      $job->logger->debug(sprintf(
         'Job status: active=%d, finished=%d, failed=%d',
         $active, $finished, $failed
       ));
 
       # If jobs still running, retry this coordinator job to check again later
       if ($active > 0) {
-        $job->log_info(sprintf(
+        $job->logger->info(sprintf(
           'Still waiting for %d child jobs - retrying in 5 seconds',
           $active));
         return $job->retry({ delay => $job->standard_delay });
@@ -160,11 +160,11 @@ package Game::EvonyTKR::External::General::LoadAll {
         my $errmsg =
           sprintf('LoadAll failed: %d child jobs failed, %d finished',
           $failed, $finished);
-        $job->log_error($errmsg);
+        $job->logger->error($errmsg);
         return $job->fail($errmsg);
       }
 
-      $job->log_info(sprintf(
+      $job->logger->info(sprintf(
         'All child jobs completed: %d finished, %d failed',
         $finished, $failed
       ));
@@ -189,21 +189,21 @@ package Game::EvonyTKR::External::General::LoadAll {
         }
 
         if ($all_in_persistence) {
-          $job->log_info('All generals verified in persistence');
+          $job->logger->info('All generals verified in persistence');
           $verified = 1;
           last;
         }
 
         # On final attempt or if DEBUG, show which generals are missing
         if ($attempt == $max_verify_attempts || $job->is_debug()) {
-          $job->log_warn(sprintf(
+          $job->logger->warn(sprintf(
             'Persistence verification attempt %d/%d: %d generals missing: %s',
             $attempt,       $max_verify_attempts,
             $missing_count, join(', ', @missing_generals)
           ));
         }
         else {
-          $job->log_debug(sprintf(
+          $job->logger->debug(sprintf(
             'Persistence verification attempt %d/%d: %d generals still missing',
             $attempt, $max_verify_attempts, $missing_count
           ));
@@ -214,13 +214,13 @@ package Game::EvonyTKR::External::General::LoadAll {
       unless ($verified) {
         my $errmsg = 'Failed to verify all generals in '
           . 'persistence after child jobs finished';
-        $job->log_error($errmsg);
+        $job->logger->error($errmsg);
         return $job->fail($errmsg);
       }
     }
     # If no jobs were enqueued (data already in persistence), we still succeeded
     elsif ($skipped_count > 0) {
-      $job->log_info(sprintf(
+      $job->logger->info(sprintf(
         'All %d generals already in persistence - no jobs needed',
         $skipped_count));
     }
@@ -241,7 +241,7 @@ package Game::EvonyTKR::External::General::LoadAll {
 
     $job->note(generalCount => scalar(@files));
     my $message = 'LoadAll generals job completed';
-    $job->log_info($message);
+    $job->logger->info($message);
     return $job->finish($message);
   }
 }
