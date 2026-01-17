@@ -18,6 +18,7 @@ use overload
   '.'        => \&concat,
   'bool'     => \&_isTrue,
   'fallback' => 0;
+#use Log::Handler;
 
 sub FREEZE ($self, $serializer) {
   return $self->to_wire_hash();

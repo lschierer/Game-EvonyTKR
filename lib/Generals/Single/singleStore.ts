@@ -332,11 +332,8 @@ export class GeneralStore {
     };
 
     es.addEventListener('row', (e: MessageEvent) => {
-      // Decode base64 properly handling UTF-8
-      const binaryString = atob(e.data);
-      const bytes = Uint8Array.from(binaryString, (c) => c.charCodeAt(0));
-      const jsonString = new TextDecoder('utf-8').decode(bytes);
-      const msg = JSON.parse(jsonString);
+      // Parse JSON data directly (PAGI::SSE sends plain JSON)
+      const msg = JSON.parse(e.data);
       if (DEBUG) {
         console.log('parsed row message:', msg);
       }
@@ -402,7 +399,7 @@ export class GeneralStore {
     }
 
     let sp = window.location.pathname;
-    sp = sp.replace('comparison', '1/details-stream');
+    sp = sp.replace('comparison', 'details-stream');
     const streamUrl = new URL(sp, window.location.toString());
 
     if (!!this._currentES) {

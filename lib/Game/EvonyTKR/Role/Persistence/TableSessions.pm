@@ -3,17 +3,15 @@ use v5.42.0;
 use utf8::all;
 use Moo::Role;
 
-require Game::EvonyTKR::Role::Persistence::Core;
-
 =head1 NAME
 
-Game::EvonyTKR::Role::Persistence::TableSessions - Persist table session state for idempotency across workers
+Game::EvonyTKR::Role::Persistence::TableSessions - In-memory table session state for Thunderhorse
 
 =head1 DESCRIPTION
 
-This role provides session state persistence for table routes. Since hypnotoad workers don't
-share memory, session state must be persisted in SQLite to ensure idempotent behavior when
-different workers handle different requests in the same client session.
+This role provides session state storage for table routes using in-memory hash storage.
+Thunderhorse runs as a single process, so in-memory storage is sufficient for session
+state that doesn't need to survive restarts.
 
 =head1 SYNOPSIS
 
@@ -21,11 +19,11 @@ different workers handle different requests in the same client session.
   $c->store_table_session($session_id, {
     generalType    => 'Ground Specialists',
     buffActivation => 'PvP',
-    primaries      => ['Leonidas', 'Trajan'],  # or pairs list
+    items          => ['Leonidas', 'Trajan'],  # generals or pair keys
     timestamp      => time(),
   });
 
-  # Retrieve session state (idempotent across workers)
+  # Retrieve session state
   my $session_data = $c->get_table_session($session_id);
 
   # Clean up old sessions
@@ -33,25 +31,25 @@ different workers handle different requests in the same client session.
 
 =cut
 
-with 'Game::EvonyTKR::Role::Persistence::Core';
+# In-memory session storage (package-level singleton)
+our %SESSION_STORE;
 
 =head1 METHODS
 
 =head2 init_table_sessions_db
 
-No-op method for backwards compatibility. Table creation is handled by PostgreSQL migrations.
+No-op method for backwards compatibility. In-memory storage needs no initialization.
 
 =cut
 
 sub init_table_sessions_db ($self) {
-  # Table is created automatically by PostgreSQL migrations
-  # This method exists for backwards compatibility with code that calls it
+  # In-memory storage needs no initialization
   return 1;
 }
 
 =head2 store_table_session
 
-Stores session state in PostgreSQL for idempotent access across workers.
+Stores session state in memory.
 
   $c->store_table_session($session_id, {
     generalType    => 'Ground Specialists',
@@ -70,24 +68,32 @@ Returns:
 =cut
 
 sub store_table_session ($self, $session_id, $data) {
-  my $result = $self->persistence->store_table_session($session_id, $data);
+  my $items      = $data->{items} // [];
+  my $ttl        = $data->{ttl}   // 3600;
+  my $now        = time();
+  my $expires_at = $now + $ttl;
 
-  if ($result) {
-    my $items = $data->{items} // [];
-    my $ttl   = $data->{ttl}   // 3600;
-    $self->logger->debug(sprintf(
-      'Stored table session %s (%s/%s) with %d items, expires in %d seconds',
-      $session_id,     $data->{generalType}, $data->{buffActivation},
-      scalar(@$items), $ttl
-    ));
-  }
+  $SESSION_STORE{$session_id} = {
+    session_id     => $session_id,
+    generalType    => $data->{generalType},
+    buffActivation => $data->{buffActivation},
+    items          => $items,
+    created_at     => $now,
+    expires_at     => $expires_at,
+  };
 
-  return $result;
+  $self->logger->debug(sprintf(
+    'Stored table session %s (%s/%s) with %d items, expires in %d seconds',
+    $session_id, $data->{generalType} // 'unknown', $data->{buffActivation} // 'unknown',
+    scalar(@$items), $ttl
+  ));
+
+  return 1;
 }
 
 =head2 get_table_session
 
-Retrieves session state from PostgreSQL. Works across all hypnotoad workers.
+Retrieves session state from memory.
 
   my $session_data = $c->get_table_session($session_id);
 
@@ -110,12 +116,36 @@ Returns:
 =cut
 
 sub get_table_session ($self, $session_id) {
-  return $self->persistence->get_table_session($session_id);
+  $self->logger->debug(sprintf(
+    'get_table_session: looking for session %s (store has %d sessions)',
+    $session_id, scalar(keys %SESSION_STORE)
+  ));
+
+  # Log all session IDs in store for debugging
+  if (scalar(keys %SESSION_STORE) > 0) {
+    $self->logger->debug('Sessions in store: ' . join(', ', keys %SESSION_STORE));
+  }
+
+  my $session = $SESSION_STORE{$session_id};
+  unless ($session) {
+    $self->logger->debug("Session $session_id NOT found in store");
+    return undef;
+  }
+
+  # Check if expired
+  if ($session->{expires_at} < time()) {
+    $self->logger->debug("Session $session_id expired");
+    delete $SESSION_STORE{$session_id};
+    return undef;
+  }
+
+  $self->logger->debug("Session $session_id found and valid");
+  return $session;
 }
 
 =head2 expire_table_sessions
 
-Removes expired sessions from the database.
+Removes expired sessions from memory.
 
   $c->expire_table_sessions();         # Remove all expired
   $c->expire_table_sessions($max_age); # Remove sessions older than max_age seconds
@@ -129,14 +159,28 @@ Returns:
 =cut
 
 sub expire_table_sessions ($self, $max_age = undef) {
-  my $deleted = $self->persistence->expire_table_sessions($max_age);
+  my $now     = time();
+  my $deleted = 0;
+
+  for my $session_id (keys %SESSION_STORE) {
+    my $session    = $SESSION_STORE{$session_id};
+    my $is_expired = $session->{expires_at} < $now;
+    my $is_old     = defined($max_age)
+      && ($now - $session->{created_at}) > $max_age;
+
+    if ($is_expired || $is_old) {
+      delete $SESSION_STORE{$session_id};
+      $deleted++;
+    }
+  }
+
   $self->logger->debug("Expired $deleted table sessions") if $deleted > 0;
   return $deleted;
 }
 
 =head2 delete_table_session
 
-Removes a specific session from the database.
+Removes a specific session from memory.
 
   $c->delete_table_session($session_id);
 
@@ -149,7 +193,7 @@ Returns:
 =cut
 
 sub delete_table_session ($self, $session_id) {
-  return $self->persistence->delete_table_session($session_id) > 0;
+  return delete $SESSION_STORE{$session_id} ? 1 : 0;
 }
 
 1;
@@ -158,8 +202,9 @@ sub delete_table_session ($self, $session_id) {
 
 Game::EvonyTKR Development Team
 
-=head1 SEE ALSO
+=head1 NOTE
 
-L<Game::EvonyTKR::Role::Persistence::Core>
+This is a Thunderhorse-specific implementation using in-memory storage.
+Sessions do not persist across server restarts.
 
 =cut

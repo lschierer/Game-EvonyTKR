@@ -15,12 +15,12 @@ const fileDebug: Record<string, boolean> = {
   'lib/Generals/UrlBinder.ts': false,
   'lib/Generals/specialtyStore.ts': false,
   'lib/Generals/Single/buffFilter.ts': false,
-  'lib/Generals/Single/data.ts': false,
+  'lib/Generals/Single/data.ts': true,
   'lib/Generals/Single/generalFilterStore.ts': false,
-  'lib/Generals/Single/singleStore.ts': false,
+  'lib/Generals/Single/singleStore.ts': true,
   'lib/Generals/Single/SinglePicker.ts': false,
-  'lib/Generals/Single/SingleTable.ts': false,
-  'lib/Generals/Single/StateManager.ts': false,
+  'lib/Generals/Single/SingleTable.ts': true,
+  'lib/Generals/Single/StateManager.ts': true,
 };
 
 function isAbsolutePath(path: string): boolean {

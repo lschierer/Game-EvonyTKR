@@ -138,14 +138,19 @@ package Game::EvonyTKR::Controller::Generals {
         }
       );
 
-      $self->logger->info(
-"Registered troop type index route: `$base/$ui_target` for type: $generalType"
-      );
+      $self->logger->info(sprintf(
+      'Registered troop type index route: "%s" for type: "%s"',
+      $route, $generalType));
 
       # Activation index (shows single/pair choice or redirects)
       foreach my $buffActivation ($self->AllowedBuffActivationValues->@*) {
+        my $br = "$route/$buffActivation";
+
+        $self->add_navigation_route($br, "$buffActivation Comparison Tables",
+          { order => 5, parent => '/' });
+
         $self->router->add(
-          "$base/$ui_target/$buffActivation",
+          $br,
           {
             to => sub ($self, $ctx, @args) {
               return $self->activationIndex($ctx, $ui_target, $buffActivation);
@@ -153,6 +158,10 @@ package Game::EvonyTKR::Controller::Generals {
             action => 'http.*',
           }
         );
+
+        $self->logger->info(sprintf(
+        'Registered troop type index route: "%s" for type: "%s" activation: "%s"',
+        $br, $generalType, $buffActivation));
       }
 
     }
@@ -189,7 +198,7 @@ package Game::EvonyTKR::Controller::Generals {
       }
     );
 
-    # Details stream (SSE)
+    # Details stream (SSE) - must use 'sse.get' action for PAGI SSE protocol
     $self->router->add(
       "$base/:uiTarget/:buffActivation/details-stream",
       {
@@ -201,7 +210,7 @@ package Game::EvonyTKR::Controller::Generals {
             unless is_utf8($buffActivation);
           return $self->stream_single_details($ctx, $uiTarget, $buffActivation);
         },
-        action => 'http.*',
+        action => 'sse.get',
       }
     );
 
@@ -700,42 +709,108 @@ package Game::EvonyTKR::Controller::Generals {
     });
   }
 
-  # Stream single general buff details via SSE
-  sub stream_single_details ($self, $ctx, $uiTarget, $buffActivation) {
-    # Setup SSE
-    $self->setup_sse_headers();
+  # Stream single general buff details via SSE (PAGI::SSE version)
+  # Uses flat async pattern - directly handles SSE without wrapper
+  async sub stream_single_details ($self, $ctx, $uiTarget, $buffActivation) {
+    # Get SSE object directly from context and consume immediately
+    my $sse = $ctx->sse;
+    $ctx->consume;
+
+    # Start SSE stream
+    await $sse->start;
+
+    # Enable keepalive for proxy compatibility
+    await $sse->keepalive($self->table_keepalive_interval);
+
+    # Register cleanup callback
+    $sse->on_close(sub {
+      my ($sse_obj, $reason) = @_;
+      $self->logger->debug("SSE connection closed: $reason");
+    });
 
     # Extract parameters
     my $run_id     = 0+ $ctx->req->query('runId');
     my $session_id = $ctx->req->query('sessionId');
 
-    # Validate session
-    return unless $self->validate_session_id($session_id, $run_id);
-
-    # Retrieve session data
-    my $session_data = $self->get_table_session($session_id);
-    unless ($session_data) {
-      $self->logger->error("Session $session_id not found or expired");
-      $self->write_table_sse('complete', { runId => 0+ $run_id });
+    # Validate session ID
+    unless (defined($session_id) && length($session_id)) {
+      $self->logger->error('Session ID must be present!');
+      await $self->send_complete_event($sse, $run_id, 0);
+      await $sse->run unless $sse->is_closed;
       return;
     }
 
-    $self->logger->debug(sprintf(
-'stream_single_details: uiTarget=%s, buffActivation=%s, runId=%s, session items=%d',
-      $uiTarget, $buffActivation,
-      $run_id,   scalar(@{ $session_data->{items} })
-    ));
-
-    # Validate route - use try_lookup_route which doesn't croak
+    # Validate route first - use try_lookup_route which doesn't croak
     my $route_meta = $self->try_lookup_route($uiTarget, $buffActivation);
     unless ($route_meta) {
       $self->logger->error("Invalid single route: $uiTarget | $buffActivation");
-      $self->write_table_sse('complete', { runId => 0+ $run_id });
+      await $self->send_complete_event($sse, $run_id, 0);
+      await $sse->run unless $sse->is_closed;
       return;
     }
 
     my $generalType = $route_meta->{generalType};
     my $activation  = $route_meta->{buffActivation};
+
+    # Try to retrieve session data, but fallback to fetching all generals if not found
+    my $session_data = $self->get_table_session($session_id);
+    my @general_names;
+
+    if ($session_data) {
+      @general_names = @{ $session_data->{items} };
+      $self->logger->debug(sprintf(
+        'stream_single_details: uiTarget=%s, buffActivation=%s, runId=%s, session items=%d',
+        $uiTarget, $buffActivation,
+        $run_id,   scalar(@general_names)
+      ));
+    } else {
+      # Session not found - fetch generals directly (fallback for robustness)
+      $self->logger->warn(
+        "Session $session_id not found, fetching generals directly for $generalType");
+
+      my $generals_loader = $self->generals_loader();
+      unless ($generals_loader) {
+        $self->logger->error("Generals data not loaded");
+        await $self->send_complete_event($sse, $run_id, 0);
+        await $sse->run unless $sse->is_closed;
+        return;
+      }
+
+      # Get troop type string to match in specialties
+      my $troop_type =
+        $Game::EvonyTKR::Role::Constants::GeneralConstants::GeneralTypes2TroopTypes{
+        $generalType} // '';
+
+      foreach my $general_key ($generals_loader->list_generals->@*) {
+        my $general = $generals_loader->get_general($general_key);
+        next unless $general;
+
+        # For 'ALL' types (mayor, officer, wall), include all generals
+        if ($troop_type eq 'ALL') {
+          push @general_names, $general->name;
+          next;
+        }
+
+        # Filter by matching specialty
+        my $specialty_names = $general->specialtyNames // [];
+        my $matches         = 0;
+        my $search_term     = $troop_type;
+        $search_term =~ s/s$//;    # "Mounted Troops" -> "Mounted Troop"
+        for my $specialty (@$specialty_names) {
+          if ($specialty =~ /$search_term/i) {
+            $matches = 1;
+            last;
+          }
+        }
+        next unless $matches;
+        push @general_names, $general->name;
+      }
+
+      $self->logger->debug(sprintf(
+        'stream_single_details (fallback): found %d generals for %s',
+        scalar(@general_names), $generalType
+      ));
+    }
 
     # Extract filter parameters
     my $ascendingLevel = $ctx->req->query('ascendingLevel') // 'red5';
@@ -764,180 +839,134 @@ package Game::EvonyTKR::Controller::Generals {
       generic1       => 'level4',
     };
 
-    # Get general names from session
-    my @general_names = @{ $session_data->{items} };
-
     $self->logger->debug(sprintf(
       'Computing buffs for %d generals', scalar(@general_names)));
 
-    # Setup streaming
-    $ctx->render_later;
-    $self->write_sse($ctx);
-    $ctx->inactivity_timeout(1200);    # 20 minutes
+    # Process generals using the streaming helper
+    await $self->process_items_streaming($sse, {
+      items     => \@general_names,
+      run_id    => $run_id,
+      item_type => 'generals',
+      process_item => async sub ($general_name, $idx) {
+        # Get general object
+        my $generals_loader = $self->generals_loader();
+        my $normalized_name = $self->normalize($general_name);
+        my $general         = $generals_loader->get_general($normalized_name);
 
-    # Process in batches (even though computation is fast, batch for UX)
-    my $batch_size     = 50;
-    my $current_idx    = 0;
-    my $total_generals = scalar(@general_names);
-    my $complete_sent  = 0;
-
-    my $recurring_id;
-    my $loop_delay = $self->table_loop_delay // 0.01;    # 10ms
-
-    my $process_batch = sub {
-      return if $complete_sent;
-
-      my $batch_end =
-        List::Util::min($current_idx + $batch_size, $total_generals);
-
-      $self->logger->debug(sprintf(
-        'Processing generals %d-%d of %d',
-        $current_idx + 1,
-        $batch_end, $total_generals
-      ));
-
-      for my $i ($current_idx .. $batch_end - 1) {
-        my $general_name = $general_names[$i];
-
-        eval {
-          # Get general object
-          my $generals_loader = $self->generals_loader();
-          my $normalized_name = $self->normalize($general_name);
-          my $general         = $generals_loader->get_general($normalized_name);
-
-          unless ($general) {
-            $self->logger->error("Cannot load general: $general_name");
-            return;
-          }
-
-          # Compute buffs using PDL Runtime
-          my $buff_summary = $self->pdl_runtime->get_buff_summary(
-            general    => $general_name,
-            activation => $activation,
-            filters    => $filters,
-          );
-
-          # Map to troop type for column extraction
-          my $troop_suffix = $self->_get_troop_suffix($generalType);
-
-          # Build result matching GeneralData schema
-          my $result = {
-            runId => 0+ $run_id,
-            data  => {
-              primary => {
-                name => $general->name,
-                type => $general->type,
-              },
-              marchbuff =>
-                $buff_summary->{buffValues}->{'Ground Troops'}->{'March Size'}
-                // 0,
-              attackbuff => $self->_extract_buff(
-                $buff_summary->{buffValues},
-                $troop_suffix, 'Attack'
-              ),
-              defensebuff => $self->_extract_buff(
-                $buff_summary->{buffValues},
-                $troop_suffix, 'Defense'
-              ),
-              hpbuff => $self->_extract_buff(
-                $buff_summary->{buffValues},
-                $troop_suffix, 'HP'
-              ),
-              groundattackdebuff => $self->_extract_debuff(
-                $buff_summary->{debuffValues},
-                'Ground Troops', 'Attack'
-              ),
-              grounddefensedebuff => $self->_extract_debuff(
-                $buff_summary->{debuffValues},
-                'Ground Troops', 'Defense'
-              ),
-              groundhpdebuff => $self->_extract_debuff(
-                $buff_summary->{debuffValues},
-                'Ground Troops', 'HP'
-              ),
-              mountedattackdebuff => $self->_extract_debuff(
-                $buff_summary->{debuffValues},
-                'Mounted Troops', 'Attack'
-              ),
-              mounteddefensedebuff => $self->_extract_debuff(
-                $buff_summary->{debuffValues},
-                'Mounted Troops', 'Defense'
-              ),
-              mountedhpdebuff => $self->_extract_debuff(
-                $buff_summary->{debuffValues},
-                'Mounted Troops', 'HP'
-              ),
-              rangedattackdebuff => $self->_extract_debuff(
-                $buff_summary->{debuffValues},
-                'Ranged Troops', 'Attack'
-              ),
-              rangeddefensedebuff => $self->_extract_debuff(
-                $buff_summary->{debuffValues},
-                'Ranged Troops', 'Defense'
-              ),
-              rangedhpdebuff => $self->_extract_debuff(
-                $buff_summary->{debuffValues},
-                'Ranged Troops', 'HP'
-              ),
-              siegeattackdebuff => $self->_extract_debuff(
-                $buff_summary->{debuffValues},
-                'Siege Machines', 'Attack'
-              ),
-              siegedefensedebuff => $self->_extract_debuff(
-                $buff_summary->{debuffValues},
-                'Siege Machines', 'Defense'
-              ),
-              siegehpdebuff => $self->_extract_debuff(
-                $buff_summary->{debuffValues},
-                'Siege Machines', 'HP'
-              ),
-            }
-          };
-
-          # Stream result
-          $self->write_table_sse('row', $result);
-
-          $self->logger->debug(sprintf(
-            'Sent general %d/%d: %s',
-            $i + 1, $total_generals, $general_name
-          ));
-        };
-        if ($@) {
-          $self->logger->error("Error computing general $general_name: $@");
+        unless ($general) {
+          $self->logger->error("Cannot load general: $general_name");
+          return undef;
         }
-      }
 
-      $current_idx = $batch_end;
-
-      # Check if complete
-      if ($current_idx >= $total_generals && !$complete_sent) {
-        $complete_sent = 1;
-
-        # Small delay to flush last batch
-        my $flush_delay = $self->table_complete_flush_delay // 0.1;
-        Mojo::IOLoop->timer(
-          $flush_delay => sub {
-            $self->send_complete_event($run_id, $total_generals, 'generals');
-          }
+        # Compute buffs using PDL Runtime
+        my $buff_summary = $self->pdl_runtime->get_buff_summary(
+          general    => $general_name,
+          activation => $activation,
+          filters    => $filters,
         );
-        return;
-      }
-    };
 
-    # Execute first batch immediately
-    $process_batch->();
+        # Map to troop type for column extraction
+        my $troop_suffix = $self->_get_troop_suffix($generalType);
 
-    # Schedule remaining batches
-    $recurring_id = Mojo::IOLoop->recurring($loop_delay => $process_batch);
+        # Build result matching GeneralData schema
+        # primary must match the General Zod schema with all required fields
+        my $ba = $general->basicAttributes;
+        my $result = {
+          runId => 0+ $run_id,
+          data  => {
+            primary => {
+              id              => $general->id,
+              name            => $general->name,
+              type            => $general->type,
+              ascending       => $general->ascending ? \1 : \0,
+              builtInBookName => $general->builtInBookName // '',
+              specialtyNames  => $general->specialtyNames // [],
+              basicAttributes => {
+                attack     => { base => $ba->attack->base,     increment => $ba->attack->increment },
+                defense    => { base => $ba->defense->base,    increment => $ba->defense->increment },
+                leadership => { base => $ba->leadership->base, increment => $ba->leadership->increment },
+                politics   => { base => $ba->politics->base,   increment => $ba->politics->increment },
+              },
+            },
+            marchbuff =>
+              $buff_summary->{buffValues}->{'Ground Troops'}->{'March Size'}
+              // 0,
+            attackbuff => $self->_extract_buff(
+              $buff_summary->{buffValues},
+              $troop_suffix, 'Attack'
+            ),
+            defensebuff => $self->_extract_buff(
+              $buff_summary->{buffValues},
+              $troop_suffix, 'Defense'
+            ),
+            hpbuff => $self->_extract_buff(
+              $buff_summary->{buffValues},
+              $troop_suffix, 'HP'
+            ),
+            groundattackdebuff => $self->_extract_debuff(
+              $buff_summary->{debuffValues},
+              'Ground Troops', 'Attack'
+            ),
+            grounddefensedebuff => $self->_extract_debuff(
+              $buff_summary->{debuffValues},
+              'Ground Troops', 'Defense'
+            ),
+            groundhpdebuff => $self->_extract_debuff(
+              $buff_summary->{debuffValues},
+              'Ground Troops', 'HP'
+            ),
+            mountedattackdebuff => $self->_extract_debuff(
+              $buff_summary->{debuffValues},
+              'Mounted Troops', 'Attack'
+            ),
+            mounteddefensedebuff => $self->_extract_debuff(
+              $buff_summary->{debuffValues},
+              'Mounted Troops', 'Defense'
+            ),
+            mountedhpdebuff => $self->_extract_debuff(
+              $buff_summary->{debuffValues},
+              'Mounted Troops', 'HP'
+            ),
+            rangedattackdebuff => $self->_extract_debuff(
+              $buff_summary->{debuffValues},
+              'Ranged Troops', 'Attack'
+            ),
+            rangeddefensedebuff => $self->_extract_debuff(
+              $buff_summary->{debuffValues},
+              'Ranged Troops', 'Defense'
+            ),
+            rangedhpdebuff => $self->_extract_debuff(
+              $buff_summary->{debuffValues},
+              'Ranged Troops', 'HP'
+            ),
+            siegeattackdebuff => $self->_extract_debuff(
+              $buff_summary->{debuffValues},
+              'Siege Machines', 'Attack'
+            ),
+            siegedefensedebuff => $self->_extract_debuff(
+              $buff_summary->{debuffValues},
+              'Siege Machines', 'Defense'
+            ),
+            siegehpdebuff => $self->_extract_debuff(
+              $buff_summary->{debuffValues},
+              'Siege Machines', 'HP'
+            ),
+          }
+        };
 
-    # Cleanup on disconnect
-    $ctx->on(
-      finish => sub {
-        Mojo::IOLoop->remove($recurring_id) if $recurring_id;
-        $self->logger->debug(
-          "Client disconnected: stopped general computation");
-      }
-    );
+        $self->logger->debug(sprintf(
+          'Computed general %d/%d: %s',
+          $idx + 1, scalar(@general_names), $general_name
+        ));
+
+        return $result;
+      },
+    });
+
+    # Wait for client disconnect (if not already closed)
+    await $sse->run unless $sse->is_closed;
+
+    return;
   }
 
   # Helper: Map generalType to troop suffix for buff extraction
@@ -1004,7 +1033,7 @@ package Game::EvonyTKR::Controller::Generals {
       $self->logger->debug(
         "No pairs for $uiTarget/$buffActivation, redirecting to single table");
       return $ctx->res->redirect(
-        "Generals/$uiTarget/$buffActivation/comparison");
+        "/Generals/$uiTarget/$buffActivation/comparison");
     }
 
     # Pairs exist, show choice

@@ -2,21 +2,20 @@ package Game::EvonyTKR::Controller::Role::Tables;
 use v5.42.0;
 use utf8::all;
 use Moo::Role;
+use Future::AsyncAwait;
 
 require UUID;
 require MIME::Base64;
-require Mojo::IOLoop;
-use List::Util qw(min);
 
 =head1 NAME
 
-Game::EvonyTKR::Controller::Role::Tables - Shared SSE streaming infrastructure for table controllers
+Game::EvonyTKR::Controller::Role::Tables - Shared SSE streaming infrastructure for table controllers (Thunderhorse/PAGI version)
 
 =head1 DESCRIPTION
 
 This role provides common Server-Sent Events (SSE) streaming functionality used by both
-the Pairs and Single Generals table controllers. It centralizes session management,
-batch processing, and event streaming patterns.
+the Pairs and Single Generals table controllers. It uses Thunderhorse::SSE (via $ctx->sse)
+for async streaming. Routes using this role must be registered with action => 'sse.get'.
 
 =head1 ATTRIBUTES
 
@@ -24,13 +23,9 @@ batch processing, and event streaming patterns.
 
 Standard batch size for processing items. Default: 50
 
-=head2 table_loop_delay
+=head2 table_keepalive_interval
 
-Delay in seconds between batch processing loops. Default: 0.01 (10ms)
-
-=head2 table_complete_flush_delay
-
-Delay in seconds before sending complete event to ensure last batch is flushed. Default: 0.1 (100ms)
+Keepalive interval in seconds for proxy compatibility. Default: 25
 
 =cut
 
@@ -39,33 +34,32 @@ has table_batch_size => (
   default => sub {50},
 );
 
-has table_loop_delay => (
+has table_keepalive_interval => (
   is      => 'ro',
-  default => sub {0.01},
-);
-
-has table_complete_flush_delay => (
-  is      => 'ro',
-  default => sub {0.1},
+  default => sub {25},
 );
 
 =head1 METHODS
 
-=head2 setup_sse_headers
+=head2 create_sse
 
-Sets up the HTTP headers required for Server-Sent Events streaming:
-- content-type: text/event-stream
-- content-encoding: utf-8
-- Cache-Control: no-cache
+Gets the Thunderhorse::SSE object from the context.
+The context must have been created with an SSE scope (action => 'sse.get').
 
-  $c->setup_sse_headers();
+  my $sse = $self->create_sse($ctx);
+
+Arguments:
+  $ctx - The request context (Thunderhorse::Context with SSE scope)
+
+Returns:
+  Thunderhorse::SSE object (extends PAGI::SSE)
 
 =cut
 
-sub setup_sse_headers ($self) {
-  $self->res->headers->content_type('text/event-stream');
-  $self->res->headers->content_encoding('utf-8');
-  $self->res->headers->add('Cache-Control', 'no-cache');
+sub create_sse ($self, $ctx) {
+  # Thunderhorse::Context provides a lazy 'sse' field that creates
+  # Thunderhorse::SSE automatically when the scope type is 'sse'
+  return $ctx->sse;
 }
 
 =head2 generate_table_session_id
@@ -92,83 +86,53 @@ sub generate_table_session_id ($self, $requested_items = []) {
   return $session_id;
 }
 
-=head2 encode_sse_payload
+=head2 send_row_event
 
-Encodes a data structure as Base64-encoded JSON for SSE transmission.
-This ensures UTF-8 characters are preserved correctly in SSE events.
+Sends a 'row' SSE event with the given data.
 
-  my $encoded = $c->encode_sse_payload($data);
+  await $self->send_row_event($sse, $data);
 
 Arguments:
-  $data - Data structure to encode (HashRef, ArrayRef, etc.)
-
-Returns:
-  $encoded - Base64-encoded JSON string
+  $sse  - PAGI::SSE object
+  $data - Data to send (will be JSON-encoded)
 
 =cut
 
-sub encode_sse_payload ($self, $data) {
-  my $json_result = $self->encode($data);
-  return MIME::Base64::encode_base64($json_result, '');
-}
-
-=head2 write_table_sse
-
-Writes an SSE event, optionally with a callback.
-Handles encoding of payload if it's a reference.
-
-  $c->write_table_sse($event_type, $payload);
-  $c->write_table_sse($event_type, $payload, sub { $c->finish });
-
-Arguments:
-  $event_type - String event type (e.g., 'row', 'pair', 'complete')
-  $payload    - Data to send (will be encoded if it's a reference)
-  $callback   - Optional callback to execute after write (CodeRef)
-
-=cut
-
-sub write_table_sse ($self, $event_type, $payload, $callback = undef) {
-  my $encoded = ref($payload) ? $self->encode_sse_payload($payload) : $payload;
-
-  if ($callback) {
-    $self->write_sse({ type => $event_type, text => $encoded } => $callback);
-  }
-  else {
-    $self->write_sse({ type => $event_type, text => $encoded });
-  }
+async sub send_row_event ($self, $sse, $data) {
+  $self->logger->debug('send_row_event: sending event');
+  await $sse->send_event(
+    event => 'row',
+    data  => $data,
+  );
+  $self->logger->debug('send_row_event: event sent successfully');
 }
 
 =head2 send_complete_event
 
-Sends a 'complete' SSE event with a finish callback to close the connection.
-Ensures the complete event is written before the connection closes.
+Sends a 'complete' SSE event to signal end of stream.
 
-  $c->send_complete_event($run_id, $total_items);
-  $c->send_complete_event($run_id, $total_items, 'pairs');
+  await $self->send_complete_event($sse, $run_id, $total_items, $item_type);
 
 Arguments:
+  $sse         - PAGI::SSE object
   $run_id      - Run ID for this streaming session
   $total_items - Total number of items that were processed
   $item_type   - Optional descriptive name for items (default: 'items')
 
 =cut
 
-sub send_complete_event ($self, $run_id, $total_items, $item_type = 'items') {
+async sub send_complete_event ($self, $sse, $run_id, $total_items, $item_type = 'items') {
   $self->logger->debug(sprintf(
-    'All %d %s computed and flushed, sending complete event',
+    'All %d %s computed, sending complete event',
     $total_items, $item_type
   ));
 
-  my $payload = $self->encode({ runId => $run_id });
-
-  # Use callback to ensure complete event is written before closing
-  $self->write_sse(
-    { type => 'complete', text => $payload } => sub {
-      $self->finish;
-    }
+  await $sse->send_event(
+    event => 'complete',
+    data  => { runId => 0+ $run_id },
   );
 
-  $self->logger->debug('Complete event queued with finish callback');
+  $self->logger->debug('Complete event sent');
 }
 
 =head2 validate_session_id
@@ -176,9 +140,10 @@ sub send_complete_event ($self, $run_id, $total_items, $item_type = 'items') {
 Validates that a session ID is present and non-empty.
 If validation fails, sends a complete event and returns false.
 
-  return unless $c->validate_session_id($session_id, $run_id);
+  return unless await $c->validate_session_id($sse, $session_id, $run_id);
 
 Arguments:
+  $sse        - PAGI::SSE object
   $session_id - Session ID to validate
   $run_id     - Run ID for error response
 
@@ -187,103 +152,135 @@ Returns:
 
 =cut
 
-sub validate_session_id ($self, $session_id, $run_id) {
+async sub validate_session_id ($self, $sse, $session_id, $run_id) {
   unless (defined($session_id) && length($session_id)) {
     $self->logger->error('Session ID must be present!');
-    my $payload = $self->encode({ runId => 0+ $run_id });
-    $self->write_table_sse('complete', $payload);
+    await $self->send_complete_event($sse, $run_id, 0);
     return 0;
   }
   return 1;
 }
 
-=head2 create_batch_processor
+=head2 process_items_streaming
 
-Creates a batch processor subroutine for processing items in chunks.
-This is a high-level abstraction over the recurring batch pattern.
+Processes items in batches and streams results via SSE.
 
-  my $process_batch = $c->create_batch_processor({
+  await $self->process_items_streaming($sse, {
     items        => \@items,
     run_id       => $run_id,
-    process_item => sub ($item, $index) {
-      # Process one item
-      my $result = compute($item);
-      $c->write_table_sse('row', $result);
+    process_item => async sub ($item, $index) {
+      # Process one item, return result hashref
+      return { ... };
     },
-    on_complete  => sub {
-      # Optional cleanup before complete event
-    },
-    batch_size   => 50,        # Optional, uses $c->table_batch_size if not set
-    item_type    => 'pairs',   # Optional, for logging
+    item_type    => 'generals',  # Optional, for logging
   });
-
-  # Execute immediately and set up recurring
-  $process_batch->();
-  my $recurring_id = Mojo::IOLoop->recurring($c->table_loop_delay => $process_batch);
 
 Arguments (hashref):
   items        - ArrayRef of items to process (required)
   run_id       - Run ID for this session (required)
-  process_item - CodeRef($item, $index) to process each item (required)
-  on_complete  - Optional CodeRef to call before complete event
-  batch_size   - Optional batch size (defaults to $self->table_batch_size)
+  process_item - Async CodeRef($item, $index) returning result hashref (required)
   item_type    - Optional string for logging (defaults to 'items')
-
-Returns:
-  CodeRef - Subroutine to call for processing next batch
 
 =cut
 
-sub create_batch_processor ($self, $opts = {}) {
-  my $items        = $opts->{items}      // [];
-  my $batch_size   = $opts->{batch_size} // $self->table_batch_size;
+async sub process_items_streaming ($self, $sse, $opts = {}) {
+  my $items        = $opts->{items}        // [];
   my $run_id       = $opts->{run_id};
-  my $process_item = $opts->{process_item};    # Callback: sub($item, $index)
-  my $on_complete  = $opts->{on_complete};     # Callback: sub()
-  my $item_type    = $opts->{item_type} // 'items';
+  my $process_item = $opts->{process_item};
+  my $item_type    = $opts->{item_type}    // 'items';
+  my $batch_size   = $opts->{batch_size}   // $self->table_batch_size;
 
-  my $current_idx   = 0;
-  my $total_items   = scalar(@$items);
-  my $complete_sent = 0;
+  my $total_items = scalar(@$items);
+  my $processed   = 0;
 
-  return sub {
-    my $loop = shift;
+  $self->logger->debug(sprintf(
+    'Starting to process %d %s in batches of %d',
+    $total_items, $item_type, $batch_size
+  ));
 
-    # Already completed
-    return if $complete_sent;
+  # Process items - PAGI::SSE handles connection state
+  for my $i (0 .. $#$items) {
+    last if $sse->is_closed;
 
-    # Process next batch
-    my $batch_end = min($current_idx + $batch_size, $total_items);
+    my $item = $items->[$i];
 
-    $self->logger->debug(sprintf(
-      'Processing %s %d-%d of %d',
-      $item_type, $current_idx + 1,
-      $batch_end, $total_items
-    ));
+    eval {
+      my $result = await $process_item->($item, $i);
 
-    for my $i ($current_idx .. $batch_end - 1) {
-      eval { $process_item->($items->[$i], $i); };
-      if ($@) {
-        $self->logger->error(
-          sprintf('Error processing %s %d: %s', $item_type, $i, $@));
+      if ($result) {
+        await $self->send_row_event($sse, $result);
+        $processed++;
       }
+    };
+    if ($@) {
+      $self->logger->error(sprintf(
+        'Error processing %s %d: %s', $item_type, $i, $@
+      ));
     }
 
-    $current_idx = $batch_end;
-
-    # Check if complete
-    if ($current_idx >= $total_items && !$complete_sent) {
-      $complete_sent = 1;
-
-      # Small delay to ensure last batch is written before complete event
-      Mojo::IOLoop->timer(
-        $self->table_complete_flush_delay => sub {
-          $on_complete->() if $on_complete;
-          $self->send_complete_event($run_id, $total_items, $item_type);
-        }
-      );
+    # Log batch progress
+    if (($i + 1) % $batch_size == 0) {
+      $self->logger->debug(sprintf(
+        'Processed %s %d-%d of %d',
+        $item_type, $i - $batch_size + 2, $i + 1, $total_items
+      ));
     }
-  };
+  }
+
+  # Send complete event unless connection closed
+  unless ($sse->is_closed) {
+    await $self->send_complete_event($sse, $run_id, $processed, $item_type);
+  }
+
+  return $processed;
+}
+
+=head2 run_sse_stream
+
+High-level method to run an SSE stream with standard setup.
+
+  await $self->run_sse_stream($ctx, async sub ($sse) {
+    # Your streaming logic here
+    await $sse->send_event(event => 'row', data => { ... });
+  });
+
+This handles:
+- Creating the SSE object from context
+- Starting the stream
+- Enabling keepalive
+- Running the provided callback
+- Waiting for disconnect
+- Marking context as consumed (critical for Thunderhorse)
+
+=cut
+
+async sub run_sse_stream ($self, $ctx, $callback) {
+  my $sse = $self->create_sse($ctx);
+
+  # Mark context as consumed IMMEDIATELY to prevent Thunderhorse from trying
+  # to send HTTP response if ANY error occurs during SSE handling.
+  # This is critical for SSE endpoints.
+  $ctx->consume;
+
+  # Start SSE stream
+  await $sse->start;
+
+  # Enable keepalive for proxy compatibility
+  await $sse->keepalive($self->table_keepalive_interval);
+
+  # Register cleanup callback
+  $sse->on_close(sub {
+    my ($sse, $reason) = @_;
+    $self->logger->debug("SSE connection closed: $reason");
+  });
+
+  # Run the user's streaming logic
+  await $callback->($sse);
+
+  # Wait for client disconnect (if not already closed)
+  await $sse->run unless $sse->is_closed;
+
+  return;
 }
 
 1;
@@ -294,6 +291,6 @@ Game::EvonyTKR Development Team
 
 =head1 LICENSE
 
-This software is copyright (c) 2024.
+This software is copyright (c) 2024-2026.
 
 =cut

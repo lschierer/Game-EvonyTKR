@@ -19,7 +19,6 @@ package Game::EvonyTKR::Model::Specialty {
   use List::AllUtils qw( any none all );
   use UUID           qw(uuid5);
   use Hash::Util     qw(lock_keys);
-  use Log::Any       qw($log);
   use Carp;
   use overload
     '""'       => \&as_string,
