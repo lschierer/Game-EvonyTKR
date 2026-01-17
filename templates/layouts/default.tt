@@ -55,5 +55,8 @@
         <script src="[% js_file %]"></script>
       [% END -%]
     [% END -%]
+    [% IF sidebar -%]
+      <script type="module" src="/js/lib/navigation.js"></script>
+    [% END -%]
   </body>
 </html>
