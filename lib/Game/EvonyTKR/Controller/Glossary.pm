@@ -93,7 +93,7 @@ sub index ($c) {
     linkBase          => $base,
   );
 
-  return $c->render(template => 'glossary/index');
+  return $c->template(template => 'glossary/index');
 }
 
 1;

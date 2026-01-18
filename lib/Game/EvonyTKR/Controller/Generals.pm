@@ -292,9 +292,19 @@ package Game::EvonyTKR::Controller::Generals {
     $self->logger->debug(
       sprintf('Generals: %s with %s items', ref($items), scalar(@$items)));
 
+    my $static_content = '';
+    my $path           = $ctx->req->path;
+    $path =~ s|^/||;
+    my $md_file = $self->pages_dir->child("$path/index.md");
+    if ($md_file->exists) {
+      $static_content = $self->retrieve_rendered_markdown($md_file);
+    }
+
+
     my $vars = {
       items        => $items,
       title        => 'Generals',
+      static_content => $static_content,
       current_year => (localtime)[5] + 1900,
       css_files    => ['/css/collectionIndex.css'],
       sidebar      => 1,
@@ -302,7 +312,7 @@ package Game::EvonyTKR::Controller::Generals {
       site_logo    => $self->site_logo(),
     };
 
-    return $self->render('generals/index.tt', $vars);
+    return $self->template('generals/index.tt', $vars);
   }
 
   # Tables landing page at /Generals
@@ -325,9 +335,18 @@ package Game::EvonyTKR::Controller::Generals {
         };
     }
 
+    my $static_content = '';
+    my $path           = $ctx->req->path;
+    $path =~ s|^/||;
+    my $md_file = $self->pages_dir->child("$path/index.md");
+    if ($md_file->exists) {
+      $static_content = $self->retrieve_rendered_markdown($md_file);
+    }
+
     my $vars = {
       troop_types  => \@troop_types,
       title        => 'General Comparison Tables',
+      static_content  => $static_content,
       current_year => (localtime)[5] + 1900,
       css_files    => ['/css/generals.css'],
       sidebar      => 1,
@@ -335,7 +354,7 @@ package Game::EvonyTKR::Controller::Generals {
       site_logo    => $self->site_logo(),
     };
 
-    return $self->render('generals/tablesIndex.tt', $vars);
+    return $self->template('generals/tablesIndex.tt', $vars);
   }
 
   # Troop type table index at /Generals/:uiTarget
@@ -375,7 +394,7 @@ package Game::EvonyTKR::Controller::Generals {
       site_logo      => $self->site_logo(),
     };
 
-    return $self->render('generals/troopTypeTableIndex.tt', $vars);
+    return $self->template('generals/troopTypeTableIndex.tt', $vars);
   }
 
   # Show general details
@@ -527,7 +546,7 @@ package Game::EvonyTKR::Controller::Generals {
     };
 
     $self->logger->debug("About to render generals/details.tt");
-    my $result = $self->render('generals/details.tt', $vars);
+    my $result = $self->template('generals/details.tt', $vars);
     $self->logger->debug("Render returned: " . ref($result));
     return $result;
   }
@@ -596,7 +615,7 @@ package Game::EvonyTKR::Controller::Generals {
       site_logo    => $self->site_logo(),
     };
 
-    return $self->render('generals/GeneralTableSingle.tt', $vars);
+    return $self->template('generals/GeneralTableSingle.tt', $vars);
   }
 
   # Single general catalog endpoint (returns list of generals)
@@ -1048,7 +1067,7 @@ package Game::EvonyTKR::Controller::Generals {
       site_logo      => $self->site_logo(),
     };
 
-    return $self->render('generals/activationIndex.tt', $vars);
+    return $self->template('generals/activationIndex.tt', $vars);
   }
 }
 

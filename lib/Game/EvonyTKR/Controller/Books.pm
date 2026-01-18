@@ -210,7 +210,7 @@ package Game::EvonyTKR::Controller::Books {
       site_logo    => $self->site_logo(),
     };
 
-    return $self->render('books/index.tt', $vars);
+    return $self->template('books/index.tt', $vars);
   }
 
   # Skill books index
@@ -248,7 +248,7 @@ package Game::EvonyTKR::Controller::Books {
       site_logo    => $self->site_logo(),
     };
 
-    return $self->render('books/skill_books_index.tt', $vars);
+    return $self->template('books/skill_books_index.tt', $vars);
   }
 
   # Generic books index
@@ -286,7 +286,7 @@ package Game::EvonyTKR::Controller::Books {
       site_logo    => $self->site_logo(),
     };
 
-    return $self->render('books/generic_books_index.tt', $vars);
+    return $self->template('books/generic_books_index.tt', $vars);
   }
 
   # Show skill book details
@@ -318,7 +318,7 @@ package Game::EvonyTKR::Controller::Books {
       site_logo    => $self->site_logo(),
     };
 
-    return $self->render('books/details.tt', $vars);
+    return $self->template('books/details.tt', $vars);
   }
 
   # Show generic book details
@@ -350,7 +350,7 @@ package Game::EvonyTKR::Controller::Books {
       site_logo    => $self->site_logo(),
     };
 
-    return $self->render('books/details.tt', $vars);
+    return $self->template('books/details.tt', $vars);
   }
 }
 

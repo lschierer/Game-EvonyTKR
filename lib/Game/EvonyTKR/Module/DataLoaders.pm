@@ -27,7 +27,7 @@ sub build ($self) {
 
   # Register as helper so controllers can access it
   # Controllers can call $self->specialty_loader()
-  $self->register(
+  $self->add_method(
     controller => specialty_loader => sub ($controller) {
       return $specialty_loader;
     }
@@ -46,7 +46,7 @@ sub build ($self) {
 
   # Register as helper so controllers can access it
   # Controllers can call $self->books_loader()
-  $self->register(
+  $self->add_method(
     controller => books_loader => sub ($controller) {
       return $books_loader;
     }
@@ -65,7 +65,7 @@ sub build ($self) {
 
   # Register as helper so controllers can access it
   # Controllers can call $self->ascending_attributes_loader()
-  $self->register(
+  $self->add_method(
     controller => ascending_attributes_loader => sub ($controller) {
       return $aa_loader;
     }
@@ -84,7 +84,7 @@ sub build ($self) {
 
   # Register as helper so controllers can access it
   # Controllers can call $self->generals_loader()
-  $self->register(
+  $self->add_method(
     controller => generals_loader => sub ($controller) {
       return $generals_loader;
     }
@@ -106,7 +106,7 @@ sub build ($self) {
 
   # Register as helper so controllers can access it
   # Controllers can call $self->covenants_loader()
-  $self->register(
+  $self->add_method(
     controller => covenants_loader => sub ($controller) {
       return $covenants_loader;
     }

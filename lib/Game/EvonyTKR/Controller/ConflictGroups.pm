@@ -70,7 +70,7 @@ package Game::EvonyTKR::Controller::ConflictGroups {
       linkBase => $base,
     );
 
-    return $c->render(template => '/general conflict groups/index');
+    return $c->template(template => '/general conflict groups/index');
   }
 }
 1;

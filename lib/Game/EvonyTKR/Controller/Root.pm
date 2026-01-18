@@ -69,7 +69,7 @@ package Game::EvonyTKR::Controller::Root {
 
     unless ($index_path->exists) {
       $self->logger->error("Root index.md not found at $index_path");
-      return $self->render(
+      return $self->template(
         'root/index.tt',
         {
           content      => '<p>Welcome to EvonyTKR</p>',
@@ -85,7 +85,7 @@ package Game::EvonyTKR::Controller::Root {
     # Render markdown and get HTML content
     my $content_html = $self->retrieve_rendered_markdown($index_path);
 
-    return $self->render(
+    return $self->template(
       'root/index.tt',
       {
         content      => $content_html,

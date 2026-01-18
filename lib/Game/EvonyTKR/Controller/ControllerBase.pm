@@ -182,7 +182,7 @@ async sub index ($self, $ctx) {
 
   my $content = "Hello from the " . $self->getBase() . " Controller";
 
-  return $self->render(
+  return $self->template(
     'markdown.tt',
     {
       content      => $content,

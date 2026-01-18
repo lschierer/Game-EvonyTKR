@@ -182,7 +182,7 @@ package Game::EvonyTKR::Controller::Covenants {
       site_logo    => $self->site_logo(),
     };
 
-    return $self->render('covenants/index.tt', $vars);
+    return $self->template('covenants/index.tt', $vars);
   }
 
   # Show covenant details
@@ -221,7 +221,7 @@ package Game::EvonyTKR::Controller::Covenants {
     };
 
     $self->logger->debug("About to render covenants/details.tt");
-    my $result = $self->render('covenants/details.tt', $vars);
+    my $result = $self->template('covenants/details.tt', $vars);
     $self->logger->debug("Render returned: " . ref($result));
     return $result;
   }

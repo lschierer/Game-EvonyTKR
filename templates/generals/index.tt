@@ -19,4 +19,11 @@
   </ul>
 </div>
 
+[% IF static_content -%]
+  <hr role="separator" class="spectrum-Divider spectrum-Divider--sizeM" />
+  <article>
+    [% static_content %]
+  </article>
+[% END -%]
+
 [% END %]

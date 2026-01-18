@@ -209,11 +209,11 @@ package Game::EvonyTKR::Controller::Specialties {
       $vars->{content} = $content_html;
       $vars->{title}   = $frontmatter->{title} // $vars->{title};
 
-      return $self->render('specialties/index.tt', $vars);
+      return $self->template('specialties/index.tt', $vars);
     }
     else {
       # Render just the items list
-      return $self->render('specialties/index.tt', $vars);
+      return $self->template('specialties/index.tt', $vars);
     }
   }
 
@@ -245,7 +245,7 @@ package Game::EvonyTKR::Controller::Specialties {
       site_logo    => $self->site_logo(),
     };
 
-    return $self->render('specialties/details.tt', $vars);
+    return $self->template('specialties/details.tt', $vars);
   }
 }
 
