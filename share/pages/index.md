@@ -1,7 +1,6 @@
 ---
 author: Luke Schierer
-layout: standard
-sidebar: false
+layout: splash
 title: Evony TKR Tips
 ---
 

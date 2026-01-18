@@ -2,7 +2,8 @@
 layout: standard
 title: Evaluating Generals
 author: Luke Schierer
-order: 100
+sidebar:
+  order: 100
 ---
 
 I've been watching John Wick's videos and while a general with a specialized buff will theoretically be stronger, they
