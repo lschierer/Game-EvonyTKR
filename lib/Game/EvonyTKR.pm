@@ -24,6 +24,8 @@ package Game::EvonyTKR {
 
     # Load controllers
     $self->logger->info("Loading controllers...");
+    $self->load_controller('Pairs');
+    $self->load_controller('ConflictGroups');
     $self->load_controller('Specialties');
     $self->load_controller('Books');
     $self->load_controller('AscendingAttributes');    # Helpers only, no routes

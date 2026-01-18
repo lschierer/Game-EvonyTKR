@@ -1,0 +1,22 @@
+[% WRAPPER layouts/default.tt %]
+
+<link rel="stylesheet" href="/css/GeneralTable.css" />
+<script type="module">
+  import "/js/lib/Generals/Pair/index.js";
+</script>
+
+<div class="general-comparison">
+  <div class="general-table-container">
+    <state-manager>
+      <pair-filter>
+        <pair-picker>
+          <pair-table>
+            <pair-data></pair-data>
+          </pair-table>
+        </pair-picker>
+      </pair-filter>
+    </state-manager>
+  </div>
+</div>
+
+[% END %]

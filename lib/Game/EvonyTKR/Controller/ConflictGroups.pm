@@ -1,77 +1,109 @@
 use v5.42.0;
-use experimental qw(class);
 use utf8::all;
 use File::FindLib 'lib';
 use namespace::autoclean;
 
 package Game::EvonyTKR::Controller::ConflictGroups {
-  use Mojo::Base 'Game::EvonyTKR::Controller::ControllerBase';
-  use List::AllUtils qw( all any none );
+  use Mooish::Base -standard;
+  extends 'Game::EvonyTKR::Controller::ControllerBase';
+
+  use List::AllUtils qw(all any none);
   use Carp;
+
+  # Specify which collection this controller handles
+  sub collection_name {'Conflict Groups'}
+
+  my $base = '/Reference/Conflict Groups';
+
+  sub getBase ($self) {
+    return $base;
+  }
 
   sub controller_name ($self) {
     return "ConflictGroups";
   }
 
-  my $base = '/Reference/Conflict Groups';
+  # Build method - replaces register() from Mojolicious
+  sub build ($self) {
+    $self->logger->info("Building ConflictGroups controller");
 
-  sub getBase($self) {
-    return $base;
-  }
+    # Call parent to register common routes
+    $self->SUPER::build();
 
-  sub register($c, $app, $config = {}) {
-    $c->logger->info("Registering routes for " . __PACKAGE__);
-    $c->SUPER::register($app, $config);
+    # Add navigation for conflict groups page
+    $self->add_navigation_route($base, 'General Conflict Groups',
+      { order => 60, parent => '/Reference' });
 
-    my $routes          = $app->routes->any($base);
-    my $controller_name = $c->controller_name();
-
-    $routes->get('/')
-      ->to(controller => $controller_name, action => 'index')
-      ->name("${base}_index");
-
-    $app->add_navigation_item({
-      title  => 'General Conflict Groups',
-      path   => $base,
-      parent => '/Reference/',
-      order  => 60,
-    });
-
-  }
-
-  has prereqs => sub {
-    return [qw(
-      load_all_generals
-      load_all_builtin_books
-      load_all_generic_books
-      load_all_covenants
-      load_all_specialties
-      load_all_ascending_attributes
-      load_ml_conflicts
-    )];
-  };
-
-  sub index ($c) {
-    return if $c->check_prereqs_or_wait($c->prereqs);
-    $c->logger->debug("Rendering conflict groups index");
-
-    my $detector = $c->get_conflict_detector();
-
-    $c->logger->debug(sprintf('there are %s generals in the by_general index',
-      scalar keys $detector->by_general->%*));
-    my $groups = $detector->groups_by_conflict_type;
-    my $pairs  = $detector->by_general;
-    $c->logger->debug('conflict groups controller index handler sees '
-        . Data::Printer::np($pairs));
-
-    $c->stash(
-      groups   => $groups,
-      pairs    => $pairs,
-      linkBase => $base,
+    # Register routes
+    # Main conflict groups landing page
+    $self->router->add(
+      $base,
+      {
+        to => sub ($self, $ctx) {
+          return $self->index($ctx);
+        },
+        action => 'http.*',
+      }
     );
+  }
 
-    return $c->template(template => '/general conflict groups/index');
+  # Main conflict groups page
+  sub index ($self, $ctx) {
+    $self->logger->debug("Rendering conflict groups index");
+
+    my $conflicts_loader = $self->conflicts_loader();
+
+    unless ($conflicts_loader) {
+      $self->logger->warn("Conflicts loader not available");
+      # Render with empty data - template handles this gracefully
+      return $self->_render_index($ctx, {}, {});
+    }
+
+    # Get conflict pairs indexed by general
+    my $pairs = $conflicts_loader->by_general;
+    $self->logger->debug(sprintf('Found %d generals in conflict index',
+      scalar keys %$pairs));
+
+    # groups_by_conflict_type is not available from ML predictions
+    # (ML doesn't categorize conflicts by type)
+    my $groups = {};
+
+    return $self->_render_index($ctx, $groups, $pairs);
+  }
+
+  sub _render_index ($self, $ctx, $groups, $pairs) {
+    my $vars = {
+      groups       => $groups,
+      pairs        => $pairs,
+      linkBase     => $base,
+      title        => 'General Conflict Groups',
+      current_year => (localtime)[5] + 1900,
+      css_files    => ['/css/collectionIndex.css'],
+      sidebar      => 1,
+      navigation   => $self->render_navigation($ctx->req->path),
+      site_logo    => $self->site_logo(),
+    };
+
+    return $self->template('conflict_groups/index.tt', $vars);
   }
 }
+
 1;
+
 __END__
+
+=head1 NAME
+
+Game::EvonyTKR::Controller::ConflictGroups - Thunderhorse controller for General Conflict Groups
+
+=head1 DESCRIPTION
+
+Displays general conflicts loaded from ML predictions (conflicts.json).
+
+Routes:
+- GET /Reference/Conflict Groups - Index showing conflict pairs
+
+The controller uses Game::EvonyTKR::Loader::Conflicts which loads ML-predicted
+conflict data at application startup.
+
+=cut

@@ -12,6 +12,8 @@ use Game::EvonyTKR::Loader::Books;
 use Game::EvonyTKR::Loader::AscendingAttributes;
 use Game::EvonyTKR::Loader::Generals;
 use Game::EvonyTKR::Loader::Covenants;
+use Game::EvonyTKR::Loader::Conflicts;
+use Game::EvonyTKR::Loader::Pairs;
 
 # Build method runs at app startup
 sub build ($self) {
@@ -114,6 +116,65 @@ sub build ($self) {
 
   # Store in app stash so it's accessible elsewhere
   $self->app->{covenants_loader} = $covenants_loader;
+
+  # Load conflicts (ML predictions) if available
+  # Note: Conflicts loader uses generals_loader for validation
+  my $conflicts_loader = Game::EvonyTKR::Loader::Conflicts->new(
+    data_file       => 'conflicts.json',
+    generals_loader => $generals_loader,
+  );
+
+  $self->logger->info("Loading conflicts...");
+  my $conflicts_count = $conflicts_loader->load();
+  if ($conflicts_count > 0) {
+    $self->logger->info(sprintf(
+      "Loaded %d conflict pairs (%d conflicts, %d compatible)",
+      $conflicts_loader->total_pairs,
+      $conflicts_loader->conflict_count,
+      $conflicts_loader->stats->{compatible}
+    ));
+  }
+  else {
+    $self->logger->warn(
+      "No conflicts loaded - pairs will use heuristic conflict detection");
+  }
+
+  # Register as helper so controllers can access it
+  # Controllers can call $self->conflicts_loader()
+  $self->add_method(
+    controller => conflicts_loader => sub ($controller) {
+      return $conflicts_loader;
+    }
+  );
+
+  # Store in app stash so it's accessible elsewhere
+  $self->app->{conflicts_loader} = $conflicts_loader;
+
+  # Load pairs (requires generals and conflicts loaders)
+  # Pairs are generated at startup by combining generals and filtering conflicts
+  my $pairs_loader = Game::EvonyTKR::Loader::Pairs->new(
+    generals_loader  => $generals_loader,
+    conflicts_loader => $conflicts_loader,
+  );
+
+  $self->logger->info("Generating pairs...");
+  my $pairs_count = $pairs_loader->load_all();
+  $self->logger->info(sprintf(
+    "Generated %d pairs (%d conflicts filtered)",
+    $pairs_count,
+    $pairs_loader->stats->{conflicts_found}
+  ));
+
+  # Register as helper so controllers can access it
+  # Controllers can call $self->pairs_loader()
+  $self->add_method(
+    controller => pairs_loader => sub ($controller) {
+      return $pairs_loader;
+    }
+  );
+
+  # Store in app stash so it's accessible elsewhere
+  $self->app->{pairs_loader} = $pairs_loader;
 }
 
 1;
@@ -133,9 +194,17 @@ Currently loaded:
 - Books (Skill and Generic)
 - Ascending Attributes
 - Generals
-
-Future iterations will add:
 - Covenants
-- etc.
+- Conflicts (ML predictions from conflicts.json)
+- Pairs (generated from generals, filtered by conflicts)
+
+Controllers can access loaders via helper methods:
+- $self->specialty_loader()
+- $self->books_loader()
+- $self->ascending_attributes_loader()
+- $self->generals_loader()
+- $self->covenants_loader()
+- $self->conflicts_loader()
+- $self->pairs_loader()
 
 =cut

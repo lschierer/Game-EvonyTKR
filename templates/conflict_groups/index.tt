@@ -1,0 +1,50 @@
+[% WRAPPER 'layouts/default.tt' %]
+
+<link rel="stylesheet" href="/css/collectionIndex.css" />
+
+<div class="collection-list">
+  <h2>Conflict Groups by Type</h2>
+  [% IF groups.keys.size %]
+    [% FOREACH conflict_key IN groups.keys.sort %]
+      <div class="conflict-group">
+        <h3>[% conflict_key %]</h3>
+        <ul class="general-list">
+          [% FOREACH general_name IN groups.$conflict_key.sort %]
+            <li>[% general_name %]</li>
+          [% END %]
+        </ul>
+      </div>
+    [% END %]
+  [% ELSE %]
+    <p>No conflict groups found. Run the ML pipeline to generate conflict predictions.</p>
+  [% END %]
+
+  <h2>Individual Conflicts By General</h2>
+  [% IF pairs.keys.size %]
+    <ul class="conflict-pairs">
+      [% FOREACH general1 IN pairs.keys.sort %]
+        [%# Build list of conflicts (where value == 1) %]
+        [% conflicts = [] %]
+        [% FOREACH general2 IN pairs.$general1.keys %]
+          [% IF pairs.$general1.$general2 == 1 %]
+            [% conflicts.push(general2) %]
+          [% END %]
+        [% END %]
+        <li>[% general1 %]
+        [% IF conflicts.size %]
+          ([% conflicts.size %] Conflicts)
+          <ul>
+            [% FOREACH general2 IN conflicts.sort %]
+              <li>[% general1 %] ↔ [% general2 %]</li>
+            [% END %]
+          </ul>
+        [% END %]
+        </li>
+      [% END %]
+    </ul>
+  [% ELSE %]
+    <p>No individual conflicts found. Ensure conflicts.json exists and is properly formatted.</p>
+  [% END %]
+</div>
+
+[% END %]
