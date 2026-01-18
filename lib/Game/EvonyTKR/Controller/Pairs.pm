@@ -127,7 +127,8 @@ package Game::EvonyTKR::Controller::Pairs {
         },
         action => 'http.*',
         checks => {
-          type => qr/(?:ground_specialist|mounted_specialist|ranged_specialist|siege_specialist|mayor|officer|wall)/,
+          type =>
+qr/(?:ground_specialist|mounted_specialist|ranged_specialist|siege_specialist|mayor|officer|wall)/,
         },
       }
     );
@@ -147,7 +148,10 @@ package Game::EvonyTKR::Controller::Pairs {
       eval {
         $self->add_navigation_route(
           $pair_path,
-          sprintf('%s %s Pair Comparison', $printableUI, $route->{buffActivation}),
+          sprintf(
+            '%s %s Pair Comparison',
+            $printableUI, $route->{buffActivation}
+          ),
           {
             order  => 50 + ($route->{order} || 0),
             parent => sprintf('/Generals/%s/%s',
@@ -185,7 +189,7 @@ package Game::EvonyTKR::Controller::Pairs {
       return $self->render_error($ctx, 500, "Pairs data not loaded");
     }
 
-    my $type = $self->_general_type_to_loader_type($generalType);
+    my $type           = $self->_general_type_to_loader_type($generalType);
     my $pairs_for_type = $pairs_loader->get_pairs_for_type($type);
     my $pair_count     = scalar(@$pairs_for_type);
 
@@ -194,9 +198,11 @@ package Game::EvonyTKR::Controller::Pairs {
     }
 
     # Get filter parameters with defaults
-    my $ascendingLevel         = $ctx->req->query('ascendingLevel') // 'red5';
-    my $primaryCovenantLevel   = $ctx->req->query('primaryCovenantLevel') // 'civilization';
-    my $secondaryCovenantLevel = $ctx->req->query('secondaryCovenantLevel') // 'civilization';
+    my $ascendingLevel       = $ctx->req->query('ascendingLevel') // 'red5';
+    my $primaryCovenantLevel = $ctx->req->query('primaryCovenantLevel')
+      // 'civilization';
+    my $secondaryCovenantLevel = $ctx->req->query('secondaryCovenantLevel')
+      // 'civilization';
     my @primarySpecialties =
       map { $ctx->req->query("primarySpecialty$_") // 'gold' } (1 .. 4);
     my @secondarySpecialties =
@@ -223,12 +229,15 @@ package Game::EvonyTKR::Controller::Pairs {
     }
 
     unless ($data_model->checkCovenantLevel($secondaryCovenantLevel)) {
-      $self->logger->warn("Invalid secondaryCovenantLevel, using 'civilization'");
+      $self->logger->warn(
+        "Invalid secondaryCovenantLevel, using 'civilization'");
       $secondaryCovenantLevel = 'civilization';
     }
 
-    @primarySpecialties   = $data_model->normalizeSpecialtyLevels(@primarySpecialties);
-    @secondarySpecialties = $data_model->normalizeSpecialtyLevels(@secondarySpecialties);
+    @primarySpecialties =
+      $data_model->normalizeSpecialtyLevels(@primarySpecialties);
+    @secondarySpecialties =
+      $data_model->normalizeSpecialtyLevels(@secondarySpecialties);
 
     my $vars = {
       mode                   => 'pair',
@@ -243,7 +252,7 @@ package Game::EvonyTKR::Controller::Pairs {
       primarySpecialties     => \@primarySpecialties,
       secondarySpecialties   => \@secondarySpecialties,
       pair_count             => $pair_count,
-      title => "Pair Comparison - $ui_target / $buff_activation",
+      title        => "Pair Comparison - $ui_target / $buff_activation",
       current_year => (localtime)[5] + 1900,
       css_files    => ['/css/GeneralTable.css'],
       sidebar      => 1,
@@ -264,7 +273,7 @@ package Game::EvonyTKR::Controller::Pairs {
     }
 
     # Get pairs for the requested type
-    my $pairs = $pairs_loader->get_pairs_for_type($type);
+    my $pairs      = $pairs_loader->get_pairs_for_type($type);
     my $pair_count = scalar(@$pairs);
 
     # Get stats
@@ -272,15 +281,20 @@ package Game::EvonyTKR::Controller::Pairs {
 
     # Build diagnostic info
     my $diagnostic = {
-      type           => $type,
-      pair_count     => $pair_count,
-      total_pairs    => $stats->{total_pairs},
+      type               => $type,
+      pair_count         => $pair_count,
+      total_pairs        => $stats->{total_pairs},
       conflicts_filtered => $stats->{conflicts_found},
-      pairs_by_type  => $stats->{pairs_by_type},
-      available_types => $pairs_loader->list_types,
-      sample_pairs   => [map {
-        { primary => $_->{primary}{name}, secondary => $_->{secondary}{name} }
-      } @$pairs[0 .. min(9, $#$pairs)]],
+      pairs_by_type      => $stats->{pairs_by_type},
+      available_types    => $pairs_loader->list_types,
+      sample_pairs       => [
+        map {
+          {
+            primary   => $_->{primary}{name},
+            secondary => $_->{secondary}{name}
+          }
+        } @$pairs[0 .. min(9, $#$pairs)]
+      ],
     };
 
     my $vars = {
@@ -332,7 +346,7 @@ package Game::EvonyTKR::Controller::Pairs {
       });
     }
 
-    my $type = $self->_general_type_to_loader_type($generalType);
+    my $type      = $self->_general_type_to_loader_type($generalType);
     my $all_pairs = $pairs_loader->get_pairs_for_type($type);
 
     if (scalar(@$all_pairs) == 0) {
@@ -348,9 +362,8 @@ package Game::EvonyTKR::Controller::Pairs {
     my @filtered_pairs;
     if (scalar(@$requested_primaries) > 0) {
       my %requested = map { $_ => 1 } @$requested_primaries;
-      @filtered_pairs = grep {
-        exists $requested{ $_->{primary}{name} }
-      } @$all_pairs;
+      @filtered_pairs =
+        grep { exists $requested{ $_->{primary}{name} } } @$all_pairs;
 
       $self->logger->debug(sprintf(
         "Filtered to %d pairs from %d total",
@@ -362,9 +375,8 @@ package Game::EvonyTKR::Controller::Pairs {
     }
 
     # Store session for streaming endpoint
-    my @pair_keys = map {
-      $_->{primary}{name} . '|' . $_->{secondary}{name}
-    } @filtered_pairs;
+    my @pair_keys =
+      map { $_->{primary}{name} . '|' . $_->{secondary}{name} } @filtered_pairs;
 
     $self->store_table_session(
       $session_id,
@@ -372,7 +384,7 @@ package Game::EvonyTKR::Controller::Pairs {
         generalType    => $generalType,
         buffActivation => $buffActivation,
         items          => \@pair_keys,
-        ttl            => 3600,    # 1 hour
+        ttl            => 3600,              # 1 hour
       }
     );
 
@@ -432,14 +444,15 @@ package Game::EvonyTKR::Controller::Pairs {
     if ($session_data) {
       @pair_keys = @{ $session_data->{items} };
       $self->logger->debug(sprintf(
-        'stream_pair_details: uiTarget=%s, buffActivation=%s, runId=%s, session items=%d',
+'stream_pair_details: uiTarget=%s, buffActivation=%s, runId=%s, session items=%d',
         $uiTarget, $buffActivation, $run_id, scalar(@pair_keys)
       ));
     }
     else {
       # Session not found - fallback to loading all pairs for type
       $self->logger->warn(
-        "Session $session_id not found, fetching pairs directly for $generalType");
+"Session $session_id not found, fetching pairs directly for $generalType"
+      );
 
       my $pairs_loader = $self->pairs_loader();
       unless ($pairs_loader) {
@@ -449,18 +462,19 @@ package Game::EvonyTKR::Controller::Pairs {
         return;
       }
 
-      my $type = $self->_general_type_to_loader_type($generalType);
+      my $type      = $self->_general_type_to_loader_type($generalType);
       my $all_pairs = $pairs_loader->get_pairs_for_type($type);
 
-      @pair_keys = map {
-        $_->{primary}{name} . '|' . $_->{secondary}{name}
-      } @$all_pairs;
+      @pair_keys =
+        map { $_->{primary}{name} . '|' . $_->{secondary}{name} } @$all_pairs;
     }
 
     # Extract filter parameters
-    my $ascendingLevel         = $ctx->req->query('ascendingLevel') // 'red5';
-    my $primaryCovenantLevel   = $ctx->req->query('primaryCovenantLevel') // 'civilization';
-    my $secondaryCovenantLevel = $ctx->req->query('secondaryCovenantLevel') // 'civilization';
+    my $ascendingLevel       = $ctx->req->query('ascendingLevel') // 'red5';
+    my $primaryCovenantLevel = $ctx->req->query('primaryCovenantLevel')
+      // 'civilization';
+    my $secondaryCovenantLevel = $ctx->req->query('secondaryCovenantLevel')
+      // 'civilization';
     my @primarySpecialties =
       map { $ctx->req->query("primarySpecialty$_") // 'gold' } (1 .. 4);
     my @secondarySpecialties =
@@ -477,8 +491,10 @@ package Game::EvonyTKR::Controller::Pairs {
     unless ($data_model->checkCovenantLevel($secondaryCovenantLevel)) {
       $secondaryCovenantLevel = 'civilization';
     }
-    @primarySpecialties   = $data_model->normalizeSpecialtyLevels(@primarySpecialties);
-    @secondarySpecialties = $data_model->normalizeSpecialtyLevels(@secondarySpecialties);
+    @primarySpecialties =
+      $data_model->normalizeSpecialtyLevels(@primarySpecialties);
+    @secondarySpecialties =
+      $data_model->normalizeSpecialtyLevels(@secondarySpecialties);
 
     # Build filter objects for PDL Runtime
     my $primary_filters = {
@@ -506,130 +522,153 @@ package Game::EvonyTKR::Controller::Pairs {
 
     # Process pairs using the streaming helper
     # Use event_type => 'pair' to match what pairStore.ts expects
-    await $self->process_items_streaming($sse, {
-      items      => \@pair_keys,
-      run_id     => $run_id,
-      item_type  => 'pairs',
-      event_type => 'pair',
-      process_item => async sub ($pair_key, $idx) {
-        my ($primary_name, $secondary_name) = split /\|/, $pair_key;
+    await $self->process_items_streaming(
+      $sse,
+      {
+        items        => \@pair_keys,
+        run_id       => $run_id,
+        item_type    => 'pairs',
+        event_type   => 'pair',
+        process_item => async sub ($pair_key, $idx) {
+          my ($primary_name, $secondary_name) = split /\|/, $pair_key;
 
-        # Get general objects
-        my $generals_loader = $self->generals_loader();
-        my $primary_general =
-          $generals_loader->get_general(lc($self->normalize($primary_name)));
-        my $secondary_general =
-          $generals_loader->get_general(lc($self->normalize($secondary_name)));
+          # Get general objects
+          my $generals_loader = $self->generals_loader();
+          my $primary_general =
+            $generals_loader->get_general(lc($self->normalize($primary_name)));
+          my $secondary_general =
+            $generals_loader->get_general(
+            lc($self->normalize($secondary_name)));
 
-        unless ($primary_general && $secondary_general) {
-          $self->logger->error(sprintf(
-            'Cannot load generals: %s, %s',
-            $primary_name, $secondary_name
-          ));
-          return undef;
-        }
-
-        # Compute combined buffs using PDL Runtime
-        my $combined_buffs = $self->pdl_runtime->compute_pair_buffs(
-          primary           => $primary_name,
-          secondary         => $secondary_name,
-          activation        => $activation,
-          primary_filters   => $primary_filters,
-          secondary_filters => $secondary_filters,
-        );
-
-        # Map general type to troop suffix
-        my $troop_suffix = $self->_get_troop_suffix($generalType);
-
-        # Build result
-        my $primary_ba   = $primary_general->basicAttributes;
-        my $secondary_ba = $secondary_general->basicAttributes;
-
-        my $result = {
-          runId => 0+ $run_id,
-          data  => {
-            primary => {
-              id              => $primary_general->id,
-              name            => $primary_general->name,
-              type            => $primary_general->type,
-              ascending       => $primary_general->ascending ? \1 : \0,
-              builtInBookName => $primary_general->builtInBookName // '',
-              specialtyNames  => $primary_general->specialtyNames // [],
-              basicAttributes => {
-                attack     => { base => $primary_ba->attack->base,     increment => $primary_ba->attack->increment },
-                defense    => { base => $primary_ba->defense->base,    increment => $primary_ba->defense->increment },
-                leadership => { base => $primary_ba->leadership->base, increment => $primary_ba->leadership->increment },
-                politics   => { base => $primary_ba->politics->base,   increment => $primary_ba->politics->increment },
-              },
-            },
-            secondary => {
-              id              => $secondary_general->id,
-              name            => $secondary_general->name,
-              type            => $secondary_general->type,
-              ascending       => $secondary_general->ascending ? \1 : \0,
-              builtInBookName => $secondary_general->builtInBookName // '',
-              specialtyNames  => $secondary_general->specialtyNames // [],
-              basicAttributes => {
-                attack     => { base => $secondary_ba->attack->base,     increment => $secondary_ba->attack->increment },
-                defense    => { base => $secondary_ba->defense->base,    increment => $secondary_ba->defense->increment },
-                leadership => { base => $secondary_ba->leadership->base, increment => $secondary_ba->leadership->increment },
-                politics   => { base => $secondary_ba->politics->base,   increment => $secondary_ba->politics->increment },
-              },
-            },
-            attackbuff => ($combined_buffs->{"attack_$troop_suffix"} // 0) +
-              ($combined_buffs->{attack_all} // 0),
-            defensebuff => ($combined_buffs->{"defense_$troop_suffix"} // 0) +
-              ($combined_buffs->{defense_all} // 0),
-            hpbuff => ($combined_buffs->{"hp_$troop_suffix"} // 0) +
-              ($combined_buffs->{hp_all} // 0),
-            marchbuff => $combined_buffs->{march_size} // 0,
-            groundattackdebuff =>
-              ($combined_buffs->{enemy_attack_ground} // 0) +
-              ($combined_buffs->{enemy_attack_all}    // 0),
-            grounddefensedebuff =>
-              ($combined_buffs->{enemy_defense_ground} // 0) +
-              ($combined_buffs->{enemy_defense_all}    // 0),
-            groundhpdebuff =>
-              ($combined_buffs->{enemy_hp_ground} // 0) +
-              ($combined_buffs->{enemy_hp_all}    // 0),
-            mountedattackdebuff =>
-              ($combined_buffs->{enemy_attack_mounted} // 0) +
-              ($combined_buffs->{enemy_attack_all}     // 0),
-            mounteddefensedebuff =>
-              ($combined_buffs->{enemy_defense_mounted} // 0) +
-              ($combined_buffs->{enemy_defense_all}     // 0),
-            mountedhpdebuff =>
-              ($combined_buffs->{enemy_hp_mounted} // 0) +
-              ($combined_buffs->{enemy_hp_all}     // 0),
-            rangedattackdebuff =>
-              ($combined_buffs->{enemy_attack_ranged} // 0) +
-              ($combined_buffs->{enemy_attack_all}    // 0),
-            rangeddefensedebuff =>
-              ($combined_buffs->{enemy_defense_ranged} // 0) +
-              ($combined_buffs->{enemy_defense_all}    // 0),
-            rangedhpdebuff =>
-              ($combined_buffs->{enemy_hp_ranged} // 0) +
-              ($combined_buffs->{enemy_hp_all}    // 0),
-            siegeattackdebuff =>
-              ($combined_buffs->{enemy_attack_siege} // 0) +
-              ($combined_buffs->{enemy_attack_all}   // 0),
-            siegedefensedebuff =>
-              ($combined_buffs->{enemy_defense_siege} // 0) +
-              ($combined_buffs->{enemy_defense_all}   // 0),
-            siegehpdebuff =>
-              ($combined_buffs->{enemy_hp_siege} // 0) +
-              ($combined_buffs->{enemy_hp_all}   // 0),
+          unless ($primary_general && $secondary_general) {
+            $self->logger->error(sprintf(
+              'Cannot load generals: %s, %s',
+              $primary_name, $secondary_name
+            ));
+            return undef;
           }
-        };
 
-        $self->logger->debug(sprintf(
-          'Computed pair %d/%d: %s / %s',
-          $idx + 1, scalar(@pair_keys), $primary_name, $secondary_name
-        ));
+          # Compute combined buffs using PDL Runtime
+          my $combined_buffs = $self->pdl_runtime->compute_pair_buffs(
+            primary           => $primary_name,
+            secondary         => $secondary_name,
+            activation        => $activation,
+            primary_filters   => $primary_filters,
+            secondary_filters => $secondary_filters,
+          );
 
-        return $result;
-      },
-    });
+          # Map general type to troop suffix
+          my $troop_suffix = $self->_get_troop_suffix($generalType);
+
+          # Build result
+          my $primary_ba   = $primary_general->basicAttributes;
+          my $secondary_ba = $secondary_general->basicAttributes;
+
+          my $result = {
+            runId => 0+ $run_id,
+            data  => {
+              primary => {
+                id              => $primary_general->id,
+                name            => $primary_general->name,
+                type            => $primary_general->type,
+                ascending       => $primary_general->ascending ? \1 : \0,
+                builtInBookName => $primary_general->builtInBookName // '',
+                specialtyNames  => $primary_general->specialtyNames  // [],
+                basicAttributes => {
+                  attack => {
+                    base      => $primary_ba->attack->base,
+                    increment => $primary_ba->attack->increment
+                  },
+                  defense => {
+                    base      => $primary_ba->defense->base,
+                    increment => $primary_ba->defense->increment
+                  },
+                  leadership => {
+                    base      => $primary_ba->leadership->base,
+                    increment => $primary_ba->leadership->increment
+                  },
+                  politics => {
+                    base      => $primary_ba->politics->base,
+                    increment => $primary_ba->politics->increment
+                  },
+                },
+              },
+              secondary => {
+                id              => $secondary_general->id,
+                name            => $secondary_general->name,
+                type            => $secondary_general->type,
+                ascending       => $secondary_general->ascending ? \1 : \0,
+                builtInBookName => $secondary_general->builtInBookName // '',
+                specialtyNames  => $secondary_general->specialtyNames  // [],
+                basicAttributes => {
+                  attack => {
+                    base      => $secondary_ba->attack->base,
+                    increment => $secondary_ba->attack->increment
+                  },
+                  defense => {
+                    base      => $secondary_ba->defense->base,
+                    increment => $secondary_ba->defense->increment
+                  },
+                  leadership => {
+                    base      => $secondary_ba->leadership->base,
+                    increment => $secondary_ba->leadership->increment
+                  },
+                  politics => {
+                    base      => $secondary_ba->politics->base,
+                    increment => $secondary_ba->politics->increment
+                  },
+                },
+              },
+              attackbuff => ($combined_buffs->{"attack_$troop_suffix"} // 0) +
+                ($combined_buffs->{attack_all} // 0),
+              defensebuff => ($combined_buffs->{"defense_$troop_suffix"} // 0)
+                + ($combined_buffs->{defense_all} // 0),
+              hpbuff => ($combined_buffs->{"hp_$troop_suffix"} // 0) +
+                ($combined_buffs->{hp_all} // 0),
+              marchbuff          => $combined_buffs->{march_size} // 0,
+              groundattackdebuff =>
+                ($combined_buffs->{enemy_attack_ground} // 0) +
+                ($combined_buffs->{enemy_attack_all}    // 0),
+              grounddefensedebuff =>
+                ($combined_buffs->{enemy_defense_ground} // 0) +
+                ($combined_buffs->{enemy_defense_all}    // 0),
+              groundhpdebuff => ($combined_buffs->{enemy_hp_ground} // 0) +
+                ($combined_buffs->{enemy_hp_all} // 0),
+              mountedattackdebuff =>
+                ($combined_buffs->{enemy_attack_mounted} // 0) +
+                ($combined_buffs->{enemy_attack_all}     // 0),
+              mounteddefensedebuff =>
+                ($combined_buffs->{enemy_defense_mounted} // 0) +
+                ($combined_buffs->{enemy_defense_all}     // 0),
+              mountedhpdebuff => ($combined_buffs->{enemy_hp_mounted} // 0) +
+                ($combined_buffs->{enemy_hp_all} // 0),
+              rangedattackdebuff =>
+                ($combined_buffs->{enemy_attack_ranged} // 0) +
+                ($combined_buffs->{enemy_attack_all}    // 0),
+              rangeddefensedebuff =>
+                ($combined_buffs->{enemy_defense_ranged} // 0) +
+                ($combined_buffs->{enemy_defense_all}    // 0),
+              rangedhpdebuff => ($combined_buffs->{enemy_hp_ranged} // 0) +
+                ($combined_buffs->{enemy_hp_all} // 0),
+              siegeattackdebuff => ($combined_buffs->{enemy_attack_siege} // 0)
+                + ($combined_buffs->{enemy_attack_all} // 0),
+              siegedefensedebuff =>
+                ($combined_buffs->{enemy_defense_siege} // 0) +
+                ($combined_buffs->{enemy_defense_all}   // 0),
+              siegehpdebuff => ($combined_buffs->{enemy_hp_siege} // 0) +
+                ($combined_buffs->{enemy_hp_all} // 0),
+            }
+          };
+
+          $self->logger->debug(sprintf(
+            'Computed pair %d/%d: %s / %s',
+            $idx + 1, scalar(@pair_keys), $primary_name, $secondary_name
+          ));
+
+          return $result;
+        },
+      }
+    );
 
     # Wait for client disconnect
     await $sse->run unless $sse->is_closed;

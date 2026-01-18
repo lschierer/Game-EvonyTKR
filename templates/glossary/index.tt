@@ -1,0 +1,69 @@
+[% WRAPPER layouts/default.tt %]
+
+[% IF available_letters && available_letters.size %]
+<article>
+  <ul class="alphabetlist">
+    [% FOREACH letter IN available_letters %]
+      <li>
+        <span class="spectrum-Heading spectrum-Heading--sizeM">
+          <a id="[% letter %]" href="#[% letter %]" class="spectrum-Link spectrum-Link--quiet spectrum-Link--secondary">
+            [% letter %]
+          </a>
+        </span>
+        <dl>
+          [% FOREACH term_obj IN terms %]
+            [% NEXT UNLESS term_obj.term.substr(0, 1).upper == letter %]
+            [% term = term_obj.term %]
+            [% term_target = term.replace(' ', '_') %]
+            <dt class="spectrum-Heading spectrum-Heading--sizeS">
+              <a id="[% term_target.lower %]" href="#[% term_target.lower %]" class="spectrum-Link spectrum-Link--quiet spectrum-Link--secondary">
+                [% term %]
+              </a>
+            </dt>
+            <dd>
+              [% term_obj.rendered_def %]
+            </dd>
+            [% synonyms = term_obj.synonyms %]
+            [% IF synonyms && synonyms.size %]
+              <dd>
+                Synonyms: <ul>
+                  [% FOREACH s IN synonyms.sort %]
+                    [% st = s.replace(' ', '_').lower %]
+                    <li>
+                      <a
+                        id="[% st %]"
+                        href="#[% st %]"
+                        class="spectrum-Link spectrum-Link--secondary"
+                      >
+                        [% s %]
+                      </a>
+                    </li>
+                  [% END %]
+                </ul>
+              </dd>
+            [% END %]
+            [% related = term_obj.related_terms %]
+            [% IF related && related.size %]
+              <dd>
+                See also: <ul>
+                  [% FOREACH r IN related.sort %]
+                    [% rt = r.replace(' ', '_').lower %]
+                    <li><a href="#[% rt %]" class="spectrum-Link spectrum-Link--secondary">[% r %]</a></li>
+                  [% END %]
+                </ul>
+              </dd>
+            [% END %]
+          [% END %]
+        </dl>
+      </li>
+    [% END %]
+  </ul>
+</article>
+
+[% ELSE %]
+<article>
+  <p class="spectrum-Body spectrum-Body--sizeM">No glossary terms available.</p>
+</article>
+[% END %]
+
+[% END %]

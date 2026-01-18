@@ -1,2 +1,5 @@
-[%# Generic markdown page template - content is pre-rendered from markdown %]
-[% content %]
+[% WRAPPER layouts/default.tt %]
+<div class="markdown-content">
+    [% content %]
+</div>
+[% END %]

@@ -32,7 +32,17 @@ markdown_dir: share/pages
 # relative to the public directory
 
 # Pandoc modules to load
-pandoc_modules: []
+pandoc_modules:
+  - commonmark
+  - alerts
+  - attributes
+  - autolink_bare_uris
+  - footnotes
+  - implicit_header_references
+  - pipe_tables raw_html
+  - rebase_relative_paths
+  - smart
+  - gfm_auto_identifiers
 
 log_base: Game-EvonyTKR
 site_url: dev.hp-fan.schierer.org

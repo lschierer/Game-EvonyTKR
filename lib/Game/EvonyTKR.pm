@@ -31,6 +31,7 @@ package Game::EvonyTKR {
     $self->load_controller('AscendingAttributes');    # Helpers only, no routes
     $self->load_controller('Generals');
     $self->load_controller('Covenants');
+    $self->load_controller('Glossary');
     $self->load_controller('Root');    # Must be last for catch-all routes
 
     # Load middleware for static assets

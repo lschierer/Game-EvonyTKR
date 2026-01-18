@@ -123,7 +123,8 @@ Arguments:
 
 =cut
 
-async sub send_complete_event ($self, $sse, $run_id, $total_items, $item_type = 'items') {
+async sub send_complete_event ($self, $sse, $run_id, $total_items,
+  $item_type = 'items') {
   $self->logger->debug(sprintf(
     'All %d %s computed, sending complete event',
     $total_items, $item_type
@@ -188,12 +189,12 @@ Arguments (hashref):
 =cut
 
 async sub process_items_streaming ($self, $sse, $opts = {}) {
-  my $items        = $opts->{items}        // [];
+  my $items        = $opts->{items} // [];
   my $run_id       = $opts->{run_id};
   my $process_item = $opts->{process_item};
-  my $item_type    = $opts->{item_type}    // 'items';
-  my $event_type   = $opts->{event_type}   // 'row';
-  my $batch_size   = $opts->{batch_size}   // $self->table_batch_size;
+  my $item_type    = $opts->{item_type}  // 'items';
+  my $event_type   = $opts->{event_type} // 'row';
+  my $batch_size   = $opts->{batch_size} // $self->table_batch_size;
 
   my $total_items = scalar(@$items);
   my $processed   = 0;
@@ -219,15 +220,15 @@ async sub process_items_streaming ($self, $sse, $opts = {}) {
     };
     if ($@) {
       $self->logger->error(sprintf(
-        'Error processing %s %d: %s', $item_type, $i, $@
-      ));
+        'Error processing %s %d: %s', $item_type, $i, $@));
     }
 
     # Log batch progress
     if (($i + 1) % $batch_size == 0) {
       $self->logger->debug(sprintf(
         'Processed %s %d-%d of %d',
-        $item_type, $i - $batch_size + 2, $i + 1, $total_items
+        $item_type, $i - $batch_size + 2,
+        $i + 1,     $total_items
       ));
     }
   }

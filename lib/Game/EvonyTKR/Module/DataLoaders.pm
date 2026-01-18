@@ -14,6 +14,7 @@ use Game::EvonyTKR::Loader::Generals;
 use Game::EvonyTKR::Loader::Covenants;
 use Game::EvonyTKR::Loader::Conflicts;
 use Game::EvonyTKR::Loader::Pairs;
+use Game::EvonyTKR::Loader::Glossary;
 
 # Build method runs at app startup
 sub build ($self) {
@@ -161,8 +162,7 @@ sub build ($self) {
   my $pairs_count = $pairs_loader->load_all();
   $self->logger->info(sprintf(
     "Generated %d pairs (%d conflicts filtered)",
-    $pairs_count,
-    $pairs_loader->stats->{conflicts_found}
+    $pairs_count, $pairs_loader->stats->{conflicts_found}
   ));
 
   # Register as helper so controllers can access it
@@ -175,6 +175,26 @@ sub build ($self) {
 
   # Store in app stash so it's accessible elsewhere
   $self->app->{pairs_loader} = $pairs_loader;
+
+  # Load glossary terms synchronously at startup
+  my $glossary_loader = Game::EvonyTKR::Loader::Glossary->new(
+    data_dir => 'share/collections/Glossary',
+  );
+
+  $self->logger->info("Loading glossary terms...");
+  my $glossary_count = $glossary_loader->load_all();
+  $self->logger->info("Loaded $glossary_count glossary terms");
+
+  # Register as helper so controllers can access it
+  # Controllers can call $self->glossary_loader()
+  $self->add_method(
+    controller => glossary_loader => sub ($controller) {
+      return $glossary_loader;
+    }
+  );
+
+  # Store in app stash so it's accessible elsewhere
+  $self->app->{glossary_loader} = $glossary_loader;
 }
 
 1;
@@ -197,6 +217,7 @@ Currently loaded:
 - Covenants
 - Conflicts (ML predictions from conflicts.json)
 - Pairs (generated from generals, filtered by conflicts)
+- Glossary terms
 
 Controllers can access loaders via helper methods:
 - $self->specialty_loader()
@@ -206,5 +227,6 @@ Controllers can access loaders via helper methods:
 - $self->covenants_loader()
 - $self->conflicts_loader()
 - $self->pairs_loader()
+- $self->glossary_loader()
 
 =cut

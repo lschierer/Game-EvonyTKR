@@ -109,7 +109,9 @@ export class PairPicker extends LitElement {
     this.menuOpen.subscribe(() => this.requestUpdate());
     this.filterText.subscribe(() => this.requestUpdate());
 
-    const qr = this.querySelector('pair-data');
+    // Look for pair-data as descendant first, then via state-manager ancestor
+    const qr = this.querySelector('pair-data') ??
+      this.closest('state-manager')?.querySelector('pair-data');
     if (qr) {
       if (DEBUG) {
         console.log('found data');

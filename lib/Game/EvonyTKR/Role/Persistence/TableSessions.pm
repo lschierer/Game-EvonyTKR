@@ -84,7 +84,9 @@ sub store_table_session ($self, $session_id, $data) {
 
   $self->logger->debug(sprintf(
     'Stored table session %s (%s/%s) with %d items, expires in %d seconds',
-    $session_id, $data->{generalType} // 'unknown', $data->{buffActivation} // 'unknown',
+    $session_id,
+    $data->{generalType}    // 'unknown',
+    $data->{buffActivation} // 'unknown',
     scalar(@$items), $ttl
   ));
 
@@ -123,7 +125,8 @@ sub get_table_session ($self, $session_id) {
 
   # Log all session IDs in store for debugging
   if (scalar(keys %SESSION_STORE) > 0) {
-    $self->logger->debug('Sessions in store: ' . join(', ', keys %SESSION_STORE));
+    $self->logger->debug(
+      'Sessions in store: ' . join(', ', keys %SESSION_STORE));
   }
 
   my $session = $SESSION_STORE{$session_id};

@@ -77,7 +77,10 @@ export class PairTable extends LitElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
-    const qr = this.querySelector('pair-data');
+    // Look for pair-data as descendant first, then via state-manager ancestor
+    const qr =
+      this.querySelector('pair-data') ??
+      this.closest('state-manager')?.querySelector('pair-data');
     if (qr) {
       if (DEBUG) {
         console.log('found data');
@@ -234,7 +237,7 @@ export class PairTable extends LitElement {
     });
 
     return html`
-      ${DEBUG ? html` table is ${typeof this.table} ` : ''}
+      ${DEBUG ? html`<div>table is ${typeof this.table}</div>` : ''}
       <div
         class="general-pairs-table spectrum-Table spectrum-Table-scroller spectrum-Table--quiet spectrum-Table--sizeM spectrum-Table--compact"
       >

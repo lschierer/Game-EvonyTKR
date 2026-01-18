@@ -16,6 +16,8 @@ export class StateManager extends LitElement {
   }
 
   connectedCallback(): void {
+    super.connectedCallback();
+    // pair-data should be a direct child of state-manager
     const qr = this.querySelector('pair-data');
     if (qr) {
       if (DEBUG) {

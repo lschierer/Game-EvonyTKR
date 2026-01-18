@@ -73,7 +73,9 @@ export class PairFilter extends LitElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
-    const qr = this.querySelector('pair-data');
+    // Look for pair-data as descendant first, then via state-manager ancestor
+    const qr = this.querySelector('pair-data') ??
+      this.closest('state-manager')?.querySelector('pair-data');
     if (qr) {
       if (DEBUG) {
         console.log('found data');

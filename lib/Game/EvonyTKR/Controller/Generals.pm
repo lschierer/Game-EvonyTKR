@@ -124,7 +124,7 @@ package Game::EvonyTKR::Controller::Generals {
 
     foreach my $generalType (@general_types) {
       my $ui_target = $self->_ui_target_name($generalType);
-      my $route = "$base/$ui_target";
+      my $route     = "$base/$ui_target";
       $self->add_navigation_route($route, $ui_target,
         { order => 5, parent => '/' });
 
@@ -139,15 +139,20 @@ package Game::EvonyTKR::Controller::Generals {
       );
 
       $self->logger->info(sprintf(
-      'Registered troop type index route: "%s" for type: "%s"',
-      $route, $generalType));
+        'Registered troop type index route: "%s" for type: "%s"',
+        $route, $generalType
+      ));
 
       # Activation index (shows single/pair choice or redirects)
       foreach my $buffActivation ($self->AllowedBuffActivationValues->@*) {
         my $br = "$route/$buffActivation";
+        next if ($ui_target =~ /mayor/i && $buffActivation !~ /mayor/i);
 
-        $self->add_navigation_route($br, "$buffActivation Comparison Tables",
-          { order => 5, parent => '/' });
+        $self->add_navigation_route(
+          $br,
+          "$buffActivation Comparison Tables",
+          { order => 5, parent => '/' }
+        );
 
         $self->router->add(
           $br,
@@ -160,8 +165,9 @@ package Game::EvonyTKR::Controller::Generals {
         );
 
         $self->logger->info(sprintf(
-        'Registered troop type index route: "%s" for type: "%s" activation: "%s"',
-        $br, $generalType, $buffActivation));
+'Registered troop type index route: "%s" for type: "%s" activation: "%s"',
+          $br, $generalType, $buffActivation
+        ));
       }
 
     }
@@ -300,16 +306,15 @@ package Game::EvonyTKR::Controller::Generals {
       $static_content = $self->retrieve_rendered_markdown($md_file);
     }
 
-
     my $vars = {
-      items        => $items,
-      title        => 'Generals',
+      items          => $items,
+      title          => 'Generals',
       static_content => $static_content,
-      current_year => (localtime)[5] + 1900,
-      css_files    => ['/css/collectionIndex.css'],
-      sidebar      => 1,
-      navigation   => $self->render_navigation($ctx->req->path),
-      site_logo    => $self->site_logo(),
+      current_year   => (localtime)[5] + 1900,
+      css_files      => ['/css/collectionIndex.css'],
+      sidebar        => 1,
+      navigation     => $self->render_navigation($ctx->req->path),
+      site_logo      => $self->site_logo(),
     };
 
     return $self->template('generals/index.tt', $vars);
@@ -344,14 +349,14 @@ package Game::EvonyTKR::Controller::Generals {
     }
 
     my $vars = {
-      troop_types  => \@troop_types,
-      title        => 'General Comparison Tables',
-      static_content  => $static_content,
-      current_year => (localtime)[5] + 1900,
-      css_files    => ['/css/generals.css'],
-      sidebar      => 1,
-      navigation   => $self->render_navigation($ctx->req->path),
-      site_logo    => $self->site_logo(),
+      troop_types    => \@troop_types,
+      title          => 'General Comparison Tables',
+      static_content => $static_content,
+      current_year   => (localtime)[5] + 1900,
+      css_files      => ['/css/generals.css'],
+      sidebar        => 1,
+      navigation     => $self->render_navigation($ctx->req->path),
+      site_logo      => $self->site_logo(),
     };
 
     return $self->template('generals/tablesIndex.tt', $vars);
@@ -771,21 +776,22 @@ package Game::EvonyTKR::Controller::Generals {
     my $generalType = $route_meta->{generalType};
     my $activation  = $route_meta->{buffActivation};
 
-    # Try to retrieve session data, but fallback to fetching all generals if not found
+# Try to retrieve session data, but fallback to fetching all generals if not found
     my $session_data = $self->get_table_session($session_id);
     my @general_names;
 
     if ($session_data) {
       @general_names = @{ $session_data->{items} };
       $self->logger->debug(sprintf(
-        'stream_single_details: uiTarget=%s, buffActivation=%s, runId=%s, session items=%d',
-        $uiTarget, $buffActivation,
-        $run_id,   scalar(@general_names)
+'stream_single_details: uiTarget=%s, buffActivation=%s, runId=%s, session items=%d',
+        $uiTarget, $buffActivation, $run_id, scalar(@general_names)
       ));
-    } else {
+    }
+    else {
       # Session not found - fetch generals directly (fallback for robustness)
       $self->logger->warn(
-        "Session $session_id not found, fetching generals directly for $generalType");
+"Session $session_id not found, fetching generals directly for $generalType"
+      );
 
       my $generals_loader = $self->generals_loader();
       unless ($generals_loader) {
@@ -862,125 +868,140 @@ package Game::EvonyTKR::Controller::Generals {
       'Computing buffs for %d generals', scalar(@general_names)));
 
     # Process generals using the streaming helper
-    await $self->process_items_streaming($sse, {
-      items     => \@general_names,
-      run_id    => $run_id,
-      item_type => 'generals',
-      process_item => async sub ($general_name, $idx) {
-        # Get general object
-        my $generals_loader = $self->generals_loader();
-        my $normalized_name = $self->normalize($general_name);
-        my $general         = $generals_loader->get_general($normalized_name);
+    await $self->process_items_streaming(
+      $sse,
+      {
+        items        => \@general_names,
+        run_id       => $run_id,
+        item_type    => 'generals',
+        process_item => async sub ($general_name, $idx) {
+          # Get general object
+          my $generals_loader = $self->generals_loader();
+          my $normalized_name = $self->normalize($general_name);
+          my $general         = $generals_loader->get_general($normalized_name);
 
-        unless ($general) {
-          $self->logger->error("Cannot load general: $general_name");
-          return undef;
-        }
-
-        # Compute buffs using PDL Runtime
-        my $buff_summary = $self->pdl_runtime->get_buff_summary(
-          general    => $general_name,
-          activation => $activation,
-          filters    => $filters,
-        );
-
-        # Map to troop type for column extraction
-        my $troop_suffix = $self->_get_troop_suffix($generalType);
-
-        # Build result matching GeneralData schema
-        # primary must match the General Zod schema with all required fields
-        my $ba = $general->basicAttributes;
-        my $result = {
-          runId => 0+ $run_id,
-          data  => {
-            primary => {
-              id              => $general->id,
-              name            => $general->name,
-              type            => $general->type,
-              ascending       => $general->ascending ? \1 : \0,
-              builtInBookName => $general->builtInBookName // '',
-              specialtyNames  => $general->specialtyNames // [],
-              basicAttributes => {
-                attack     => { base => $ba->attack->base,     increment => $ba->attack->increment },
-                defense    => { base => $ba->defense->base,    increment => $ba->defense->increment },
-                leadership => { base => $ba->leadership->base, increment => $ba->leadership->increment },
-                politics   => { base => $ba->politics->base,   increment => $ba->politics->increment },
-              },
-            },
-            marchbuff =>
-              $buff_summary->{buffValues}->{'Ground Troops'}->{'March Size'}
-              // 0,
-            attackbuff => $self->_extract_buff(
-              $buff_summary->{buffValues},
-              $troop_suffix, 'Attack'
-            ),
-            defensebuff => $self->_extract_buff(
-              $buff_summary->{buffValues},
-              $troop_suffix, 'Defense'
-            ),
-            hpbuff => $self->_extract_buff(
-              $buff_summary->{buffValues},
-              $troop_suffix, 'HP'
-            ),
-            groundattackdebuff => $self->_extract_debuff(
-              $buff_summary->{debuffValues},
-              'Ground Troops', 'Attack'
-            ),
-            grounddefensedebuff => $self->_extract_debuff(
-              $buff_summary->{debuffValues},
-              'Ground Troops', 'Defense'
-            ),
-            groundhpdebuff => $self->_extract_debuff(
-              $buff_summary->{debuffValues},
-              'Ground Troops', 'HP'
-            ),
-            mountedattackdebuff => $self->_extract_debuff(
-              $buff_summary->{debuffValues},
-              'Mounted Troops', 'Attack'
-            ),
-            mounteddefensedebuff => $self->_extract_debuff(
-              $buff_summary->{debuffValues},
-              'Mounted Troops', 'Defense'
-            ),
-            mountedhpdebuff => $self->_extract_debuff(
-              $buff_summary->{debuffValues},
-              'Mounted Troops', 'HP'
-            ),
-            rangedattackdebuff => $self->_extract_debuff(
-              $buff_summary->{debuffValues},
-              'Ranged Troops', 'Attack'
-            ),
-            rangeddefensedebuff => $self->_extract_debuff(
-              $buff_summary->{debuffValues},
-              'Ranged Troops', 'Defense'
-            ),
-            rangedhpdebuff => $self->_extract_debuff(
-              $buff_summary->{debuffValues},
-              'Ranged Troops', 'HP'
-            ),
-            siegeattackdebuff => $self->_extract_debuff(
-              $buff_summary->{debuffValues},
-              'Siege Machines', 'Attack'
-            ),
-            siegedefensedebuff => $self->_extract_debuff(
-              $buff_summary->{debuffValues},
-              'Siege Machines', 'Defense'
-            ),
-            siegehpdebuff => $self->_extract_debuff(
-              $buff_summary->{debuffValues},
-              'Siege Machines', 'HP'
-            ),
+          unless ($general) {
+            $self->logger->error("Cannot load general: $general_name");
+            return undef;
           }
-        };
 
-        $self->logger->debug(sprintf(
-          'Computed general %d/%d: %s',
-          $idx + 1, scalar(@general_names), $general_name
-        ));
+          # Compute buffs using PDL Runtime
+          my $buff_summary = $self->pdl_runtime->get_buff_summary(
+            general    => $general_name,
+            activation => $activation,
+            filters    => $filters,
+          );
 
-        return $result;
-      },
-    });
+          # Map to troop type for column extraction
+          my $troop_suffix = $self->_get_troop_suffix($generalType);
+
+          # Build result matching GeneralData schema
+          # primary must match the General Zod schema with all required fields
+          my $ba     = $general->basicAttributes;
+          my $result = {
+            runId => 0+ $run_id,
+            data  => {
+              primary => {
+                id              => $general->id,
+                name            => $general->name,
+                type            => $general->type,
+                ascending       => $general->ascending ? \1 : \0,
+                builtInBookName => $general->builtInBookName // '',
+                specialtyNames  => $general->specialtyNames  // [],
+                basicAttributes => {
+                  attack => {
+                    base      => $ba->attack->base,
+                    increment => $ba->attack->increment
+                  },
+                  defense => {
+                    base      => $ba->defense->base,
+                    increment => $ba->defense->increment
+                  },
+                  leadership => {
+                    base      => $ba->leadership->base,
+                    increment => $ba->leadership->increment
+                  },
+                  politics => {
+                    base      => $ba->politics->base,
+                    increment => $ba->politics->increment
+                  },
+                },
+              },
+              marchbuff =>
+                $buff_summary->{buffValues}->{'Ground Troops'}->{'March Size'}
+                // 0,
+              attackbuff => $self->_extract_buff(
+                $buff_summary->{buffValues},
+                $troop_suffix, 'Attack'
+              ),
+              defensebuff => $self->_extract_buff(
+                $buff_summary->{buffValues},
+                $troop_suffix, 'Defense'
+              ),
+              hpbuff => $self->_extract_buff(
+                $buff_summary->{buffValues},
+                $troop_suffix, 'HP'
+              ),
+              groundattackdebuff => $self->_extract_debuff(
+                $buff_summary->{debuffValues},
+                'Ground Troops', 'Attack'
+              ),
+              grounddefensedebuff => $self->_extract_debuff(
+                $buff_summary->{debuffValues},
+                'Ground Troops', 'Defense'
+              ),
+              groundhpdebuff => $self->_extract_debuff(
+                $buff_summary->{debuffValues},
+                'Ground Troops', 'HP'
+              ),
+              mountedattackdebuff => $self->_extract_debuff(
+                $buff_summary->{debuffValues},
+                'Mounted Troops', 'Attack'
+              ),
+              mounteddefensedebuff => $self->_extract_debuff(
+                $buff_summary->{debuffValues},
+                'Mounted Troops', 'Defense'
+              ),
+              mountedhpdebuff => $self->_extract_debuff(
+                $buff_summary->{debuffValues},
+                'Mounted Troops', 'HP'
+              ),
+              rangedattackdebuff => $self->_extract_debuff(
+                $buff_summary->{debuffValues},
+                'Ranged Troops', 'Attack'
+              ),
+              rangeddefensedebuff => $self->_extract_debuff(
+                $buff_summary->{debuffValues},
+                'Ranged Troops', 'Defense'
+              ),
+              rangedhpdebuff => $self->_extract_debuff(
+                $buff_summary->{debuffValues},
+                'Ranged Troops', 'HP'
+              ),
+              siegeattackdebuff => $self->_extract_debuff(
+                $buff_summary->{debuffValues},
+                'Siege Machines', 'Attack'
+              ),
+              siegedefensedebuff => $self->_extract_debuff(
+                $buff_summary->{debuffValues},
+                'Siege Machines', 'Defense'
+              ),
+              siegehpdebuff => $self->_extract_debuff(
+                $buff_summary->{debuffValues},
+                'Siege Machines', 'HP'
+              ),
+            }
+          };
+
+          $self->logger->debug(sprintf(
+            'Computed general %d/%d: %s',
+            $idx + 1, scalar(@general_names), $general_name
+          ));
+
+          return $result;
+        },
+      }
+    );
 
     # Wait for client disconnect (if not already closed)
     await $sse->run unless $sse->is_closed;
@@ -1045,12 +1066,12 @@ package Game::EvonyTKR::Controller::Generals {
     }
 
     # Check if pairs exist for this combination by querying the pairs_loader
-    my $has_pairs = 0;
+    my $has_pairs    = 0;
     my $pairs_loader = $self->pairs_loader();
     if ($pairs_loader) {
       # Map generalType (e.g., 'ground_specialist') to loader type key
       my $generalType = $route_meta->{generalType};
-      my $pair_count = $pairs_loader->pair_count_for_type($generalType);
+      my $pair_count  = $pairs_loader->pair_count_for_type($generalType);
       $has_pairs = $pair_count > 0 ? 1 : 0;
       $self->logger->debug(sprintf(
         "Pairs check for %s: %d pairs found",

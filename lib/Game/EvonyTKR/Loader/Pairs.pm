@@ -96,15 +96,17 @@ sub load_all ($self) {
     push @all_generals, $general;
   }
 
-  $self->logger->info(sprintf("Found %d generals to pair", scalar(@all_generals)));
+  $self->logger->info(
+    sprintf("Found %d generals to pair", scalar(@all_generals)));
 
   # Process each general type
   foreach my $type (@general_types) {
     my $troop_type = $type_to_troop{$type};
 
-    # Get generals matching this type
-    # Pass both the type key (e.g., 'mayor') and troop_type mapping (e.g., 'ALL')
-    my @matching_generals = $self->_get_generals_for_type(\@all_generals, $type, $troop_type);
+   # Get generals matching this type
+   # Pass both the type key (e.g., 'mayor') and troop_type mapping (e.g., 'ALL')
+    my @matching_generals =
+      $self->_get_generals_for_type(\@all_generals, $type, $troop_type);
 
     $self->logger->debug(sprintf(
       "Found %d generals for type %s",
@@ -122,9 +124,9 @@ sub load_all ($self) {
         my $secondary = $matching_generals[$j];
 
         # Check for conflicts using ML predictions
-        my $conflicts = $self->conflicts_loader->do_generals_conflict(
-          $primary->name, $secondary->name
-        );
+        my $conflicts =
+          $self->conflicts_loader->do_generals_conflict($primary->name,
+          $secondary->name);
 
         if ($conflicts) {
           $type_conflicts++;
@@ -136,8 +138,8 @@ sub load_all ($self) {
         }
 
         # Create bidirectional pairs (A->B and B->A)
-        my $pair_ab = $self->_create_pair_hash($primary, $secondary, $type);
-        my $pair_ba = $self->_create_pair_hash($secondary, $primary, $type);
+        my $pair_ab = $self->_create_pair_hash($primary,   $secondary, $type);
+        my $pair_ba = $self->_create_pair_hash($secondary, $primary,   $type);
 
         push @type_pairs, $pair_ab, $pair_ba;
 
@@ -151,7 +153,7 @@ sub load_all ($self) {
 
     $pairs_by_type{$type} = \@type_pairs;
     $type_counts{$type}   = scalar(@type_pairs);
-    $total_pairs += scalar(@type_pairs);
+    $total_pairs     += scalar(@type_pairs);
     $conflicts_found += $type_conflicts;
 
     $self->logger->info(sprintf(
@@ -186,7 +188,7 @@ sub _get_generals_for_type ($self, $all_generals, $type_key, $troop_type) {
       my $general_types = $general->type // [];
       $general_types = [$general_types] unless ref($general_types) eq 'ARRAY';
 
-      # Check if the general's type array contains this type (e.g., 'mayor', 'wall')
+  # Check if the general's type array contains this type (e.g., 'mayor', 'wall')
       if (grep { lc($_) eq lc($type_key) } @$general_types) {
         push @matching, $general;
       }

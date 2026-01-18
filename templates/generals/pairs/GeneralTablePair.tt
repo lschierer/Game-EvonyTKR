@@ -8,12 +8,25 @@
 <div class="general-comparison">
   <div class="general-table-container">
     <state-manager>
-      <pair-filter>
-        <pair-picker>
-          <pair-table>
-            <pair-data></pair-data>
-          </pair-table>
-        </pair-picker>
+      <pair-filter is_primary form_title="Primary General">
+        <pair-filter form_title="Secondary General">
+          <pair-picker>
+            <div class="note">
+              <div class="title">
+                <p class="spectrum-Body spectrum-Body--serif spectrum-Body--sizeM">
+                  Note:
+                </p>
+              </div>
+              <p class="spectrum-Body spectrum-Body--serif spectrum-Body--sizeM">
+                Please be aware that this table does not properly account for generals that have conflicts with generic skill books.
+                It will over estimate the buffs for pairs in such cases, by the value of the conflicting skill book.
+              </p>
+            </div>
+            <pair-table>
+              <pair-data></pair-data>
+            </pair-table>
+          </pair-picker>
+        </pair-filter>
       </pair-filter>
     </state-manager>
   </div>

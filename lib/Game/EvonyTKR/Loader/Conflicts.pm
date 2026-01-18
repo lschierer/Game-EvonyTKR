@@ -43,7 +43,7 @@ The conflict data structure in JSON is:
 
 has data_file => (
   is      => 'ro',
-  default => sub { 'conflicts.json' },
+  default => sub {'conflicts.json'},
 );
 
 has generals_loader => (
@@ -74,10 +74,10 @@ has stats => (
   is      => 'rw',
   default => sub {
     {
-      total_pairs    => 0,
-      conflicts      => 0,
-      compatible     => 0,
-      filtered       => 0,
+      total_pairs => 0,
+      conflicts   => 0,
+      compatible  => 0,
+      filtered    => 0,
     };
   },
 );
@@ -88,7 +88,7 @@ sub load ($self) {
   unless ($file->exists) {
     $self->logger->warn("Conflicts file not found: $file");
     $self->logger->warn(
-      "Run the ML pipeline to generate it, or conflicts will use heuristic detection"
+"Run the ML pipeline to generate it, or conflicts will use heuristic detection"
     );
     return 0;
   }
@@ -104,11 +104,9 @@ sub load ($self) {
   my $processed = $self->_process_conflicts($raw_data);
 
   $self->logger->info(sprintf(
-    "Loaded conflicts: %d total pairs, %d conflicts, %d compatible, %d filtered",
-    $self->stats->{total_pairs},
-    $self->stats->{conflicts},
-    $self->stats->{compatible},
-    $self->stats->{filtered}
+"Loaded conflicts: %d total pairs, %d conflicts, %d compatible, %d filtered",
+    $self->stats->{total_pairs}, $self->stats->{conflicts},
+    $self->stats->{compatible},  $self->stats->{filtered}
   ));
 
   return $processed;
@@ -117,10 +115,10 @@ sub load ($self) {
 sub _process_conflicts ($self, $raw_data) {
   my %lookup;
   my %by_general;
-  my $total    = 0;
-  my $conflicts = 0;
+  my $total      = 0;
+  my $conflicts  = 0;
   my $compatible = 0;
-  my $filtered = 0;
+  my $filtered   = 0;
 
   for my $g1_name (keys %$raw_data) {
     my $g1_norm = lc($self->normalize($g1_name));
@@ -145,7 +143,7 @@ sub _process_conflicts ($self, $raw_data) {
       }
 
       my $conflict_data = $raw_data->{$g1_name}{$g2_name};
-      my $is_conflict = $conflict_data->{conflict} ? 1 : 0;
+      my $is_conflict   = $conflict_data->{conflict} ? 1 : 0;
 
       $total++;
 

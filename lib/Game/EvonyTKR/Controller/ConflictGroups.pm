@@ -31,8 +31,11 @@ package Game::EvonyTKR::Controller::ConflictGroups {
     $self->SUPER::build();
 
     # Add navigation for conflict groups page
-    $self->add_navigation_route($base, 'General Conflict Groups',
-      { order => 60, parent => '/Reference' });
+    $self->add_navigation_route(
+      $base,
+      'General Conflict Groups',
+      { order => 60, parent => '/Reference' }
+    );
 
     # Register routes
     # Main conflict groups landing page
@@ -61,8 +64,8 @@ package Game::EvonyTKR::Controller::ConflictGroups {
 
     # Get conflict pairs indexed by general
     my $pairs = $conflicts_loader->by_general;
-    $self->logger->debug(sprintf('Found %d generals in conflict index',
-      scalar keys %$pairs));
+    $self->logger->debug(sprintf(
+      'Found %d generals in conflict index', scalar keys %$pairs));
 
     # groups_by_conflict_type is not available from ML predictions
     # (ML doesn't categorize conflicts by type)
