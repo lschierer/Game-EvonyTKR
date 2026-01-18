@@ -505,10 +505,12 @@ package Game::EvonyTKR::Controller::Pairs {
       'Computing buffs for %d pairs', scalar(@pair_keys)));
 
     # Process pairs using the streaming helper
+    # Use event_type => 'pair' to match what pairStore.ts expects
     await $self->process_items_streaming($sse, {
-      items     => \@pair_keys,
-      run_id    => $run_id,
-      item_type => 'pairs',
+      items      => \@pair_keys,
+      run_id     => $run_id,
+      item_type  => 'pairs',
+      event_type => 'pair',
       process_item => async sub ($pair_key, $idx) {
         my ($primary_name, $secondary_name) = split /\|/, $pair_key;
 

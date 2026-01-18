@@ -1044,8 +1044,19 @@ package Game::EvonyTKR::Controller::Generals {
         "Invalid general type or buff activation");
     }
 
-    # Check if pairs exist for this combination
-    my $has_pairs = $route_meta->{has_pairs} // 0;
+    # Check if pairs exist for this combination by querying the pairs_loader
+    my $has_pairs = 0;
+    my $pairs_loader = $self->pairs_loader();
+    if ($pairs_loader) {
+      # Map generalType (e.g., 'ground_specialist') to loader type key
+      my $generalType = $route_meta->{generalType};
+      my $pair_count = $pairs_loader->pair_count_for_type($generalType);
+      $has_pairs = $pair_count > 0 ? 1 : 0;
+      $self->logger->debug(sprintf(
+        "Pairs check for %s: %d pairs found",
+        $generalType, $pair_count
+      ));
+    }
 
     if (!$has_pairs) {
       # No pairs exist, redirect directly to single table

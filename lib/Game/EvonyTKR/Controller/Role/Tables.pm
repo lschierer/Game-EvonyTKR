@@ -88,20 +88,22 @@ sub generate_table_session_id ($self, $requested_items = []) {
 
 =head2 send_row_event
 
-Sends a 'row' SSE event with the given data.
+Sends an SSE event with the given data.
 
   await $self->send_row_event($sse, $data);
+  await $self->send_row_event($sse, $data, 'pair');  # custom event type
 
 Arguments:
-  $sse  - PAGI::SSE object
-  $data - Data to send (will be JSON-encoded)
+  $sse        - PAGI::SSE object
+  $data       - Data to send (will be JSON-encoded)
+  $event_type - Optional event type (default: 'row')
 
 =cut
 
-async sub send_row_event ($self, $sse, $data) {
-  $self->logger->debug('send_row_event: sending event');
+async sub send_row_event ($self, $sse, $data, $event_type = 'row') {
+  $self->logger->debug("send_row_event: sending '$event_type' event");
   await $sse->send_event(
-    event => 'row',
+    event => $event_type,
     data  => $data,
   );
   $self->logger->debug('send_row_event: event sent successfully');
@@ -173,6 +175,7 @@ Processes items in batches and streams results via SSE.
       return { ... };
     },
     item_type    => 'generals',  # Optional, for logging
+    event_type   => 'pair',      # Optional, SSE event type (default: 'row')
   });
 
 Arguments (hashref):
@@ -180,6 +183,7 @@ Arguments (hashref):
   run_id       - Run ID for this session (required)
   process_item - Async CodeRef($item, $index) returning result hashref (required)
   item_type    - Optional string for logging (defaults to 'items')
+  event_type   - Optional SSE event type (defaults to 'row')
 
 =cut
 
@@ -188,14 +192,15 @@ async sub process_items_streaming ($self, $sse, $opts = {}) {
   my $run_id       = $opts->{run_id};
   my $process_item = $opts->{process_item};
   my $item_type    = $opts->{item_type}    // 'items';
+  my $event_type   = $opts->{event_type}   // 'row';
   my $batch_size   = $opts->{batch_size}   // $self->table_batch_size;
 
   my $total_items = scalar(@$items);
   my $processed   = 0;
 
   $self->logger->debug(sprintf(
-    'Starting to process %d %s in batches of %d',
-    $total_items, $item_type, $batch_size
+    'Starting to process %d %s in batches of %d (event_type: %s)',
+    $total_items, $item_type, $batch_size, $event_type
   ));
 
   # Process items - PAGI::SSE handles connection state
@@ -208,7 +213,7 @@ async sub process_items_streaming ($self, $sse, $opts = {}) {
       my $result = await $process_item->($item, $i);
 
       if ($result) {
-        await $self->send_row_event($sse, $result);
+        await $self->send_row_event($sse, $result, $event_type);
         $processed++;
       }
     };

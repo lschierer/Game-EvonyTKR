@@ -356,11 +356,8 @@ export class PairStore {
     };
 
     es.addEventListener('pair', (e: MessageEvent) => {
-      // Decode base64 properly handling UTF-8
-      const binaryString = atob(e.data);
-      const bytes = Uint8Array.from(binaryString, (c) => c.charCodeAt(0));
-      const jsonString = new TextDecoder('utf-8').decode(bytes);
-      const msg = JSON.parse(jsonString);
+      // Parse JSON directly (PAGI::SSE sends plain JSON, not base64)
+      const msg = JSON.parse(e.data);
       if (DEBUG) {
         console.log('parsed pair message:', msg);
       }
