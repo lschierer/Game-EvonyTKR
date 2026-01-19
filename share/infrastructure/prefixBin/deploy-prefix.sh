@@ -6,7 +6,7 @@ SERVICE_NAME="evonytkr"
 APP_HOME="/opt/prefix"
 APP_PATH="${APP_HOME}/app"
 PAGI_PATH="${APP_HOME}/PAGI_WebServer"
-APP_USER="mojo"
+APP_USER="appuser"
 
 echo "Pulling latest code..."
 sudo -u ${APP_USER} -s /bin/bash -l -c "cd ${PAGI_PATH} && git reset --hard"
