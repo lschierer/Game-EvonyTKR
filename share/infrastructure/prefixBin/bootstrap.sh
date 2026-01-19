@@ -30,30 +30,30 @@ retry_with_backoff() {
 # Install mise with retry
 retry_with_backoff curl -fsSL https://mise.run | sh
 
-eval "$(/opt/mojo/.local/bin/mise activate bash)"
+eval "$(/opt/prefix/.local/bin/mise activate bash)"
 
 mise reshim
 
 #diagnostic, not actually part of the install
 mise doctor
 
-echo 'eval "$(/opt/mojo/.local/bin/mise activate bash)"' >> ~/.bash_profile
-echo 'export PATH="/opt/mojo/.local/bin/:$HOME/bin:$PATH"' >> /opt/mojo/.bash_profile
+echo 'eval "$(/opt/prefix/.local/bin/mise activate bash)"' >> ~/.bash_profile
+echo 'export PATH="/opt/prefix/.local/bin/:$HOME/bin:$PATH"' >> /opt/prefix/.bash_profile
 
-export PATH="/opt/mojo/.local/bin/:$HOME/bin:$PATH"
+export PATH="/opt/prefix/.local/bin/:$HOME/bin:$PATH"
 
 # Clone repository with retry
-retry_with_backoff git clone -b main https://git@github.com:lschierer/PAGI-WebServer.git /opt/mojo/PAGI-WebServer
-retry_with_backoff git clone -b PAGI https://github.com/lschierer/Game-EvonyTKR.git /opt/mojo/app
+retry_with_backoff git clone -b main https://github.com/lschierer/PAGI-WebServer.git /opt/prefix/PAGI-WebServer
+retry_with_backoff git clone -b PAGI https://github.com/lschierer/Game-EvonyTKR.git /opt/prefix/app
 
-cd /opt/mojo/app
+cd /opt/prefix/app
 # Copy mode-specific config (production.yml or staging.yml)
-if [ -f /opt/mojo/etc/game-evony_t_k_r.production.yml ]; then
-  cp /opt/mojo/etc/game-evony_t_k_r.production.yml .
-elif [ -f /opt/mojo/etc/game-evony_t_k_r.staging.yml ]; then
-  cp /opt/mojo/etc/game-evony_t_k_r.staging.yml .
+if [ -f /opt/prefix/etc/game-evony_t_k_r.production.yml ]; then
+  cp /opt/prefix/etc/game-evony_t_k_r.production.yml .
+elif [ -f /opt/prefix/etc/game-evony_t_k_r.staging.yml ]; then
+  cp /opt/prefix/etc/game-evony_t_k_r.staging.yml .
 else
-  echo "WARNING: No mode-specific config found in /opt/mojo/etc/"
+  echo "WARNING: No mode-specific config found in /opt/prefix/etc/"
   echo "Expected either game-evony_t_k_r.production.yml or game-evony_t_k_r.staging.yml"
 fi
 
@@ -66,7 +66,7 @@ export MISE_NODE_VERIFY=false
 retry_with_backoff mise install
 mise reshim
 
-cd /opt/mojo/app
+cd /opt/prefix/app
 
 which cpanm
 pnpm config set childConcurrency 1
@@ -99,7 +99,7 @@ perl ./scripts/update_git_meta.pl
 ./Build
 
 # ML training moved to post-startup script - needs app running and data loaded first
-# See /opt/mojo/bin/train-ml.sh
+# See /opt/prefix/bin/train-ml.sh
 
 pnpm config set childConcurrency 2
 echo 'bootstrap complete - SUCCESS'
