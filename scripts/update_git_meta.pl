@@ -11,11 +11,11 @@ require Path::Tiny;
 use GitRepo::Reader;
 require YAML::PP;
 use DateTime;
-require Game::EvonyTKR::Role::Logging;
+require Log::Handler;
 require Data::Printer;
 
 # Setup logging
-my $logger = Game::EvonyTKR::Role::Logging::get_logger(__PACKAGE__);
+my $logger = Log::Handler->get_logger(__PACKAGE__);
 
 # 1. Read git metadata
 my $distDir = Path::Tiny::path(dist_dir('Game::EvonyTKR'));
