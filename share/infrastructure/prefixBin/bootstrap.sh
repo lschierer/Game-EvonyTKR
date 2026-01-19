@@ -57,7 +57,7 @@ else
   echo "Expected either game-evony_t_k_r.production.yml or game-evony_t_k_r.staging.yml"
 fi
 
-retry_with_backoff /usr/local/bin/deploy-refix.sh
+retry_with_backoff /usr/local/bin/deploy-prefix.sh
 
 cd /opt/prefix/app
 
