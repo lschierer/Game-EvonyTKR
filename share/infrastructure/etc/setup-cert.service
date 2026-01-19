@@ -1,0 +1,12 @@
+[Unit]
+Description=Setup Let's Encrypt Certificate
+After=network-online.target nginx.service
+Wants=network-online.target
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/setup-cert.sh
+Restart=on-failure
+RestartSec=30
+StartLimitBurst=100
+[Install]
+WantedBy=multi-user.target

@@ -64,40 +64,64 @@ export class UbuntuInstance extends NestedStack {
     ) as Record<string, unknown>;
     cloud_user_data.runcmd =
       cloud_user_data['runcmd' as keyof typeof cloud_user_data] || [];
-    const mojoBinAsset = new s3Assets.Asset(this, 'MyScriptAsset', {
-      path: path.join(__dirname, '../mojobin'),
+
+    const prefixBinAsset = new s3Assets.Asset(this, 'prefixBinAsset', {
+      path: path.join(__dirname, '../prefixBin'),
     });
-    mojoBinAsset.grantRead(instanceRole);
+    prefixBinAsset.grantRead(instanceRole);
+
+    const prefix_etc_asset = new s3Assets.Asset(this, 'prefix_etc_asset', {
+      path: path.join(__dirname, '../etc'),
+    });
+
     const shellCommands = ec2.UserData.forLinux();
     shellCommands.addCommands(
       'curl "https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip" -o "awscliv2.zip"',
       'unzip awscliv2.zip',
       'sudo ./aws/install',
     );
-    const localPath = shellCommands.addS3DownloadCommand({
-      bucket: mojoBinAsset.bucket,
-      bucketKey: mojoBinAsset.s3ObjectKey,
+
+    const local_bin_path = shellCommands.addS3DownloadCommand({
+      bucket: prefixBinAsset.bucket,
+      bucketKey: prefixBinAsset.s3ObjectKey,
     });
+
+    const local_etc_path = shellCommands.addS3DownloadCommand({
+      bucket: prefixBinAsset.bucket,
+      bucketKey: prefixBinAsset.s3ObjectKey,
+    });
+
     shellCommands.addCommands(
-      'mkdir -p /opt/mojo/bin',
-      'cd /opt/mojo/bin',
-      `unzip ${localPath}`,
-      'chown -R mojo:mojo /opt/mojo',
-      'chmod +x /opt/mojo/bin/*.sh',
-      'chmod +x /opt/mojo/bin/mojo*',
-      'mv .bash* /opt/mojo/',
-      'cp /opt/mojo/bin/deploy-mojo.sh /usr/local/bin',
-      'chmod 0755 /opt/mojo/bin/deploy-mojo.sh',
+      'mkdir -p /opt/prefix/bin',
+      'cd /opt/prefix/bin',
+      `unzip ${local_bin_path}`,
+      'chown -R appuser:www-data /opt/prefix',
+      'chmod +x /opt/prefix/bin/*.sh',
+      'mv .bash* /opt/prefix/',
+      'cp /opt/prefix/bin/deploy-prefix.sh /usr/local/bin',
+      'chmod 0755 /opt/prefix/bin/deploy-prefix.sh',
+      'cp /opt/prefix/bin/setup-cert.sh /usr/local/bin',
+      'chmod 0755 /usr/local/bin/setup-cert.sh',
+      'cd /tmp',
+      `unzip ${local_etc_path}`,
+      'sudo cp /tmp/etc/setup-cert.service /etc/systemd/system/',
+      'sudo systemctl enable setup-cert.service',
+      'sudo systemctl start setup-cert.service',
+      'sudo cp /tmp/etc/evonytkr.service /etc/systemd/system/',
+      'sudo systemctl enable evonytkr.service',
+      'sudo cp /tmp/etc/sysctl.conf /etc/sysctl.d/evonytkr.conf',
+      'sudo service procps force-reload',
+      'sudo /opt/prefix/bin/setup-nginx.sh',
     );
 
     // Generate mode-specific config BEFORE bootstrap (git clone happens in bootstrap)
-    // Created in /opt/mojo/etc, then bootstrap.sh copies it to /opt/mojo/app after clone
+    // Created in /opt/prefix/etc, then bootstrap.sh copies it to /opt/prefix/app after clone
     const mojoMode = props.environment === 'prod' ? 'production' : 'staging';
     const configFileName = `game-evony_t_k_r.${mojoMode}.yml`;
     shellCommands.addCommands(
-      'mkdir -p /opt/mojo/etc',
-      'chown mojo:mojo /opt/mojo/etc',
-      'cd /opt/mojo/etc',
+      'mkdir -p /opt/prefix/etc',
+      'chown appuser:www-data /opt/prefix/etc',
+      'cd /opt/prefix/etc',
       `cat > ${configFileName} << 'EOF'
 ---
 # ${mojoMode.charAt(0).toUpperCase() + mojoMode.slice(1)} mode configuration
@@ -106,21 +130,21 @@ persistence:
   backend: postgresql
   postgresql_dsn: 'postgresql:///evonytkr_app_data'
 EOF`,
-      `chown mojo:mojo ${configFileName}`,
+      `chown appuser:www-data ${configFileName}`,
       `chmod 644 ${configFileName}`,
     );
 
     // Run bootstrap and signal success/failure to CloudFormation
-    // bootstrap.sh will: 1) git clone, 2) copy config from /opt/mojo/etc to /opt/mojo/app
+    // bootstrap.sh will: 1) git clone, 2) copy config from /opt/prefix/etc to /opt/prefix/app
     shellCommands.addCommands(
       'set +e', // Don't exit on error so we can signal failure
-      'sudo -u mojo -s /bin/bash -l -c /opt/mojo/bin/bootstrap.sh',
+      'sudo -u appuser -s /bin/bash -l -c /opt/prefix/bin/bootstrap.sh',
       'BOOTSTRAP_EXIT_CODE=$?',
       'set -e',
     );
 
     shellCommands.addCommands(
-      'systemctl start mojolicious',
+      'systemctl start evonytkr',
       'systemctl reload nginx',
     );
 

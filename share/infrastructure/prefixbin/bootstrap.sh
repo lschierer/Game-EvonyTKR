@@ -43,7 +43,8 @@ echo 'export PATH="/opt/mojo/.local/bin/:$HOME/bin:$PATH"' >> /opt/mojo/.bash_pr
 export PATH="/opt/mojo/.local/bin/:$HOME/bin:$PATH"
 
 # Clone repository with retry
-retry_with_backoff git clone -b streaming https://github.com/lschierer/Game-EvonyTKR.git /opt/mojo/app
+retry_with_backoff git clone -b main https://git@github.com:lschierer/PAGI-WebServer.git /opt/mojo/PAGI-WebServer
+retry_with_backoff git clone -b PAGI https://github.com/lschierer/Game-EvonyTKR.git /opt/mojo/app
 
 cd /opt/mojo/app
 # Copy mode-specific config (production.yml or staging.yml)

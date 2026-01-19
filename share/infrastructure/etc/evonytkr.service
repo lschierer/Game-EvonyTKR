@@ -1,0 +1,17 @@
+[Unit]
+    Description=Evony TKR Tips Website
+    After=network.target
+
+    [Service]
+    Type=simple
+    User=appuser
+    PIDFile=/opt/prefix/app/bin/hypnotoad.pid
+    Environment="MOJO_MODE=REPLACEMODE"
+    ExecStart=/opt/prefix/app/bin/server.pl
+    ExecReload=/bin/kill -HUP $MAINPID
+    TimeoutStartSec=900
+    KillMode=mixed
+    Restart=always
+
+    [Install]
+    WantedBy=multi-user.target
