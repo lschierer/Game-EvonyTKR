@@ -1,6 +1,10 @@
 #! /bin/bash -x
 set -e
 
+APP_HOME="/opt/prefix"
+APP_PATH="${APP_HOME}/app"
+PAGI_PATH="${APP_HOME}/PAGI_WebServer"
+
 # Helper function to retry commands with exponential backoff
 retry_with_backoff() {
   local max_attempts=5
@@ -57,9 +61,19 @@ else
   echo "Expected either game-evony_t_k_r.production.yml or game-evony_t_k_r.staging.yml"
 fi
 
-retry_with_backoff /usr/local/bin/deploy-prefix.sh
+cd $PAGI_PATH
+mise install
+mise reshim
 
-cd /opt/prefix/app
+perl Build.PL
+./Build installdeps --cpan_client 'cpanm -n'
+./Build manifest
+./Build
+
+cd $APP_PATH
+
+mise install
+mise reshim
 
 pip install -e scripts
 
@@ -80,5 +94,12 @@ mkdir -p share/public/types
 export NODE_OPTIONS=--max_old_space_size=2560; pnpm tsx ./scripts/build-ts.ts
 
 pnpm config set childConcurrency 2
+
+perl Build.PL
+./Build installdeps --cpan_client 'cpanm -n'
+./Build manifest
+perl ./scripts/update_git_meta.pl
+./Build
+
 echo 'bootstrap complete - SUCCESS'
 exit 0
