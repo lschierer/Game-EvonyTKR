@@ -27,9 +27,6 @@ retry_with_backoff() {
   return $exitCode
 }
 
-# Install mise with retry
-retry_with_backoff curl -fsSL https://mise.run | sh
-
 eval "$(/opt/prefix/.local/bin/mise activate bash)"
 
 mise reshim
@@ -37,14 +34,25 @@ mise reshim
 #diagnostic, not actually part of the install
 mise doctor
 
-echo 'eval "$(/opt/prefix/.local/bin/mise activate bash)"' >> ~/.bash_profile
-echo 'export PATH="/opt/prefix/.local/bin/:$HOME/bin:$PATH"' >> /opt/prefix/.bash_profile
-
 export PATH="/opt/prefix/.local/bin/:$HOME/bin:$PATH"
 
-# Clone repository with retry
-retry_with_backoff git clone -b main https://github.com/lschierer/PAGI-WebServer.git /opt/prefix/PAGI-WebServer
-retry_with_backoff git clone -b PAGI https://github.com/lschierer/Game-EvonyTKR.git /opt/prefix/app
+cd /opt/prefix/PAGI-WebServer
+
+mise trust
+# Install tools (including Python) with retry for transient failures
+export MISE_AQUA_MINISIGN=false
+export MISE_PYTHON_VERIFY_SIGNATURE=false
+export MISE_NODE_VERIFY_SIGNATURE=false
+export MISE_NODE_VERIFY=false
+retry_with_backoff mise install
+mise reshim
+
+which cpanm
+cpanm -n utf8::all Module::Build
+cpanm -n IO::Socket::SSL
+
+perl Build.PL
+./Build installdeps --cpan_client 'cpanm -n'
 
 cd /opt/prefix/app
 # Copy mode-specific config (production.yml or staging.yml)
@@ -57,10 +65,22 @@ else
   echo "Expected either game-evony_t_k_r.production.yml or game-evony_t_k_r.staging.yml"
 fi
 
-retry_with_backoff /usr/local/bin/deploy-refix.sh
+mise trust
+# Install tools (including Python) with retry for transient failures
+export MISE_AQUA_MINISIGN=false
+export MISE_PYTHON_VERIFY_SIGNATURE=false
+export MISE_NODE_VERIFY_SIGNATURE=false
+export MISE_NODE_VERIFY=false
+retry_with_backoff mise install
+mise reshim
 
 cd /opt/prefix/app
 
+which cpanm
+pnpm config set childConcurrency 1
+
+perl Build.PL
+./Build installdeps --cpan_client 'cpanm -n'
 pip install -e scripts
 
 pnpm config set childConcurrency 2
@@ -78,6 +98,13 @@ mkdir -p share/public/js
 mkdir -p share/public/types
 
 export NODE_OPTIONS=--max_old_space_size=2560; pnpm tsx ./scripts/build-ts.ts
+
+./Build manifest
+perl ./scripts/update_git_meta.pl
+./Build
+
+# ML training moved to post-startup script - needs app running and data loaded first
+# See /opt/prefix/bin/train-ml.sh
 
 pnpm config set childConcurrency 2
 echo 'bootstrap complete - SUCCESS'

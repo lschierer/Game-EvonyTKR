@@ -2,11 +2,16 @@
 set -e
 
 # Define variables for service and app paths for clarity
-SERVICE_NAME="mojolicious"
-APP_PATH="/opt/mojo/app"
+SERVICE_NAME="evonytkr"
+APP_HOME="/opt/prefix"
+APP_PATH="${APP_HOME}/app"
+PAGI_PATH="${APP_HOME}/PAGI_WebServer"
 APP_USER="mojo"
 
 echo "Pulling latest code..."
+sudo -u ${APP_USER} -s /bin/bash -l -c "cd ${PAGI_PATH} && git reset --hard"
+sudo -u ${APP_USER} -s /bin/bash -l -c "cd ${PAGI_PATH} && git pull"
+
 sudo -u ${APP_USER} -s /bin/bash -l -c "cd ${APP_PATH} && git reset --hard"
 sudo -u ${APP_USER} -s /bin/bash -l -c "cd ${APP_PATH} && git pull"
 
@@ -15,6 +20,13 @@ echo "Stopping service..."
 sudo systemctl stop ${SERVICE_NAME}
 
 echo "Building application..."
+sudo -u ${APP_USER} -s /bin/bash -l -c "cd ${PAGI_PATH} && mise install"
+sudo -u ${APP_USER} -s /bin/bash -l -c "cd ${PAGI_PATH} && mise reshim"
+sudo -u ${APP_USER} -s /bin/bash -l -c "cd ${PAGI_PATH} && perl Build.PL"
+sudo -u ${APP_USER} -s /bin/bash -l -c "cd ${PAGI_PATH} && ./Build installdeps --cpan_client 'cpanm -n'"
+sudo -u ${APP_USER} -s /bin/bash -l -c "cd ${PAGI_PATH} && ./Build manifest"
+sudo -u ${APP_USER} -s /bin/bash -l -c "cd ${PAGI_PATH} && ./Build"
+
 sudo -u ${APP_USER} -s /bin/bash -l -c "cd ${APP_PATH} && mise install"
 sudo -u ${APP_USER} -s /bin/bash -l -c "cd ${APP_PATH} && mise reshim"
 sudo -u ${APP_USER} -s /bin/bash -l -c "cd ${APP_PATH} && perl Build.PL"
