@@ -34,34 +34,21 @@ retry_with_backoff() {
 # Install mise with retry
 retry_with_backoff curl -fsSL https://mise.run | sh
 
+# Set up PATH and mise activation
+export PATH="/opt/prefix/.local/bin:$HOME/bin:$PATH"
 eval "$(/opt/prefix/.local/bin/mise activate bash)"
 
-mise reshim
-
-#diagnostic, not actually part of the install
-mise doctor
-
+# Add to bash_profile for future sessions
+echo 'export PATH="/opt/prefix/.local/bin:$HOME/bin:$PATH"' >> ~/.bash_profile
 echo 'eval "$(/opt/prefix/.local/bin/mise activate bash)"' >> ~/.bash_profile
-echo 'export PATH="/opt/prefix/.local/bin/:$HOME/bin:$PATH"' >> /opt/prefix/.bash_profile
 
-export PATH="/opt/prefix/.local/bin/:$HOME/bin:$PATH"
-
-# Clone repository with retry
+# Clone repositories with retry
 retry_with_backoff git clone -b main https://github.com/lschierer/PAGI-WebServer.git /opt/prefix/PAGI-WebServer
 retry_with_backoff git clone -b PAGI https://github.com/lschierer/Game-EvonyTKR.git /opt/prefix/app
 
-#cd /opt/prefix/app
-# Copy mode-specific config (production.yml or staging.yml)
-#if [ -f /opt/prefix/etc/game-evony_t_k_r.production.yml ]; then
-#  cp /opt/prefix/etc/game-evony_t_k_r.production.yml .
-#elif [ -f /opt/prefix/etc/game-evony_t_k_r.staging.yml ]; then
-#  cp /opt/prefix/etc/game-evony_t_k_r.staging.yml .
-#else
-#  echo "WARNING: No mode-specific config found in /opt/prefix/etc/"
-#  echo "Expected either game-evony_t_k_r.production.yml or game-evony_t_k_r.staging.yml"
-#fi
-
+# Build PAGI-WebServer first
 cd $PAGI_PATH
+mise trust
 mise install
 mise reshim
 
@@ -70,8 +57,9 @@ perl Build.PL
 ./Build manifest
 ./Build
 
+# Build Game-EvonyTKR
 cd $APP_PATH
-
+mise trust
 mise install
 mise reshim
 

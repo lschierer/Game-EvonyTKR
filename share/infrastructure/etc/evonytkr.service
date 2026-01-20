@@ -1,16 +1,20 @@
 [Unit]
-    Description=Evony TKR Tips Website
-    After=network.target
+Description=Evony TKR Tips Website
+After=network.target
 
-    [Service]
-    Type=simple
-    User=appuser
-    PIDFile=/opt/prefix/var/run/Game-EvonyTKR.pid
-    ExecStart=/opt/prefix/app/bin/server.pl
-    ExecReload=/bin/kill -HUP $MAINPID
-    TimeoutStartSec=900
-    KillMode=mixed
-    Restart=always
+[Service]
+Type=simple
+User=appuser
+Group=www-data
+WorkingDirectory=/opt/prefix/app
+Environment="PATH=/opt/prefix/.local/bin:/opt/prefix/.local/share/mise/shims:/usr/local/bin:/usr/bin:/bin"
+PIDFile=/opt/prefix/var/run/Game-EvonyTKR.pid
+ExecStart=/opt/prefix/app/bin/server.pl
+ExecReload=/bin/kill -HUP $MAINPID
+TimeoutStartSec=900
+KillMode=mixed
+Restart=always
+RestartSec=10
 
-    [Install]
-    WantedBy=multi-user.target
+[Install]
+WantedBy=multi-user.target

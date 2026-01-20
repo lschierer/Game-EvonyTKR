@@ -198,15 +198,15 @@ qr/(?:ground_specialist|mounted_specialist|ranged_specialist|siege_specialist|ma
     }
 
     # Get filter parameters with defaults
-    my $ascendingLevel       = $ctx->req->query('ascendingLevel') // 'red5';
-    my $primaryCovenantLevel = $ctx->req->query('primaryCovenantLevel')
+    my $ascendingLevel       = $ctx->req->query_param('ascendingLevel') // 'red5';
+    my $primaryCovenantLevel = $ctx->req->query_param('primaryCovenantLevel')
       // 'civilization';
-    my $secondaryCovenantLevel = $ctx->req->query('secondaryCovenantLevel')
+    my $secondaryCovenantLevel = $ctx->req->query_param('secondaryCovenantLevel')
       // 'civilization';
     my @primarySpecialties =
-      map { $ctx->req->query("primarySpecialty$_") // 'gold' } (1 .. 4);
+      map { $ctx->req->query_param("primarySpecialty$_") // 'gold' } (1 .. 4);
     my @secondarySpecialties =
-      map { $ctx->req->query("secondarySpecialty$_") // 'gold' } (1 .. 4);
+      map { $ctx->req->query_param("secondarySpecialty$_") // 'gold' } (1 .. 4);
 
     # Validate using Data model
     my $data_model = Game::EvonyTKR::Model::Data->new;
@@ -414,8 +414,8 @@ qr/(?:ground_specialist|mounted_specialist|ranged_specialist|siege_specialist|ma
     });
 
     # Extract parameters
-    my $run_id     = 0+ $ctx->req->query('runId');
-    my $session_id = $ctx->req->query('sessionId');
+    my $run_id     = 0+ $ctx->req->query_param('runId');
+    my $session_id = $ctx->req->query_param('sessionId');
 
     # Validate session ID
     unless (defined($session_id) && length($session_id)) {
@@ -470,15 +470,15 @@ qr/(?:ground_specialist|mounted_specialist|ranged_specialist|siege_specialist|ma
     }
 
     # Extract filter parameters
-    my $ascendingLevel       = $ctx->req->query('ascendingLevel') // 'red5';
-    my $primaryCovenantLevel = $ctx->req->query('primaryCovenantLevel')
+    my $ascendingLevel       = $ctx->req->query_param('ascendingLevel') // 'red5';
+    my $primaryCovenantLevel = $ctx->req->query_param('primaryCovenantLevel')
       // 'civilization';
-    my $secondaryCovenantLevel = $ctx->req->query('secondaryCovenantLevel')
+    my $secondaryCovenantLevel = $ctx->req->query_param('secondaryCovenantLevel')
       // 'civilization';
     my @primarySpecialties =
-      map { $ctx->req->query("primarySpecialty$_") // 'gold' } (1 .. 4);
+      map { $ctx->req->query_param("primarySpecialty$_") // 'gold' } (1 .. 4);
     my @secondarySpecialties =
-      map { $ctx->req->query("secondarySpecialty$_") // 'gold' } (1 .. 4);
+      map { $ctx->req->query_param("secondarySpecialty$_") // 'gold' } (1 .. 4);
 
     # Validate filter parameters
     my $data_model = Game::EvonyTKR::Model::Data->new;

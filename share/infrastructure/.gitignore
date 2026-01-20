@@ -6,3 +6,6 @@ node_modules
 # CDK asset staging directory
 .cdk.staging
 cdk.out
+
+# SSH keys - keep template, ignore actual keys
+ssh_keys/authorized_keys

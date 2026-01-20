@@ -21,6 +21,8 @@ export class CustomUbuntuUserData {
 
   public prefix_etc_asset: s3Assets.Asset;
 
+  public ssh_keys_asset: s3Assets.Asset;
+
   public constructor(stack: Stack, props: UbuntuInstanceProps) {
     const hostname =
       props.environment === 'prod'
@@ -33,6 +35,10 @@ export class CustomUbuntuUserData {
 
     this.prefix_etc_asset = new s3Assets.Asset(stack, 'prefix_etc_asset', {
       path: path.join(__dirname, '../etc'),
+    });
+
+    this.ssh_keys_asset = new s3Assets.Asset(stack, 'sshKeysAsset', {
+      path: path.join(__dirname, '../ssh_keys/authorized_keys'),
     });
 
     const shellCommands = ec2.UserData.forLinux();
@@ -50,6 +56,11 @@ export class CustomUbuntuUserData {
     const local_etc_path = shellCommands.addS3DownloadCommand({
       bucket: this.prefix_etc_asset.bucket,
       bucketKey: this.prefix_etc_asset.s3ObjectKey,
+    });
+
+    const local_ssh_keys_path = shellCommands.addS3DownloadCommand({
+      bucket: this.ssh_keys_asset.bucket,
+      bucketKey: this.ssh_keys_asset.s3ObjectKey,
     });
 
     const hostprefix =
@@ -139,9 +150,19 @@ export class CustomUbuntuUserData {
             ],
           }),
           // TODO: set up sudo for 'luke' user.
-          // TODO: set up ssh_authorized_keys for 'luke' user.
           ec2.InitCommand.shellCommand(
             ' /usr/sbin/groupmod -a appuser -U luke',
+          ),
+          ec2.InitCommand.shellCommand('mkdir -p /home/luke/.ssh'),
+          ec2.InitCommand.shellCommand('chmod 700 /home/luke/.ssh'),
+          ec2.InitCommand.shellCommand(
+            `cp ${local_ssh_keys_path} /home/luke/.ssh/authorized_keys`,
+          ),
+          ec2.InitCommand.shellCommand(
+            'chmod 600 /home/luke/.ssh/authorized_keys',
+          ),
+          ec2.InitCommand.shellCommand(
+            'chown -R luke:luke /home/luke/.ssh',
           ),
         ]),
         configureSSM: new ec2.InitConfig([
@@ -211,15 +232,6 @@ export class CustomUbuntuUserData {
           ec2.InitCommand.shellCommand('chown -R appuser:www-data /opt/prefix'),
           ec2.InitCommand.shellCommand('chmod +x /opt/prefix/bin/*.sh'),
           ec2.InitCommand.shellCommand('mv .bash* /opt/prefix/'),
-          ec2.InitCommand.shellCommand(
-            'mkdir -p /opt/prefix/.local/share/mise/',
-          ),
-          ec2.InitCommand.shellCommand(
-            'sudo cp /tmp/prefix_etc/trusted.toml /opt/prefix/.local/share/mise/trusted.toml',
-          ),
-          ec2.InitCommand.shellCommand(
-            'sudo chown -R appuser:appuser /opt/prefix/.local',
-          ),
 
           ec2.InitCommand.shellCommand(
             'sudo -u appuser -s /bin/bash -l -c /opt/prefix/bin/bootstrap.sh',
@@ -236,7 +248,7 @@ export class CustomUbuntuUserData {
           ),
 
           ec2.InitCommand.shellCommand(
-            `sed -i -E 's/replace/${hostprefix}/' /opt/prefix/bin/setup-cert.sh`,
+            `sed -i -E 's/REPLACE2/${hostprefix}/' /opt/prefix/bin/setup-cert.sh`,
           ),
           ec2.InitCommand.shellCommand(
             'cp /opt/prefix/bin/setup-cert.sh /usr/local/bin',
@@ -264,6 +276,8 @@ export class CustomUbuntuUserData {
             'cp /tmp/prefix_etc/logrotate-evonytkr.conf /etc/logrotate.d/evonytkr',
           ),
           ec2.InitCommand.shellCommand('chmod 644 /etc/logrotate.d/evonytkr'),
+
+          ec2.InitCommand.shellCommand('sudo systemctl daemon-reload'),
 
           ec2.InitCommand.shellCommand(
             'sudo systemctl enable setup-cert.service',

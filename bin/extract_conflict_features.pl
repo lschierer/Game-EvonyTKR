@@ -18,6 +18,9 @@ my $mode   = 'training';    # training or predict
 my $output = undef;
 my $help   = 0;
 
+# Track general frequency in training data for bias detection
+my %general_frequency;
+
 Getopt::Long::GetOptions(
   'mode=s'   => \$mode,
   'output=s' => \$output,
@@ -111,6 +114,7 @@ my @feature_names = (
   'shared_troop_types',
   'g1_troop_count',
   'g2_troop_count',
+  'disjoint_types',
   # Specialist type features
   'g1_mounted_specialist',
   'g1_ranged_specialist',
@@ -264,7 +268,11 @@ sub extract_features ($g1, $g2) {
   for my $t (@g1_types) {
     $shared++ if any { $_ eq $t } @g2_types;
   }
-  push @features, $shared, scalar(@g1_types), scalar(@g2_types);
+  
+  # Calculate if types are completely disjoint (no overlap)
+  my $disjoint_types = ($shared == 0 && @g1_types > 0 && @g2_types > 0) ? 1 : 0;
+  
+  push @features, $shared, scalar(@g1_types), scalar(@g2_types), $disjoint_types;
 
   # Specialist type features
   my $g1_mounted = (any { $_ eq 'mounted_specialist' } @g1_types) ? 1 : 0;

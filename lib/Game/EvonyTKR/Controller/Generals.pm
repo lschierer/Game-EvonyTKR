@@ -494,19 +494,19 @@ package Game::EvonyTKR::Controller::Generals {
 
     # Check if buff calculation is requested via query parameter
     my $buff_summaries;
-    my $calculate_buffs = $ctx->req->query('calculate_buffs');
+    my $calculate_buffs = $ctx->req->query_param('calculate_buffs');
 
     if ($calculate_buffs) {
       $self->logger->debug("Buff calculation requested for $gen_name");
 
       # Extract query parameters with defaults
-      my $ascending_level = $ctx->req->query('ascendingLevel') // 'red5';
-      my $covenant_level  = $ctx->req->query('covenantLevel') // 'civilization';
-      my $specialty1      = $ctx->req->query('specialty1')    // 'gold';
-      my $specialty2      = $ctx->req->query('specialty2')    // 'gold';
-      my $specialty3      = $ctx->req->query('specialty3')    // 'gold';
-      my $specialty4      = $ctx->req->query('specialty4')    // 'gold';
-      my $activation      = $ctx->req->query('activation')    // 'Attacking';
+      my $ascending_level = $ctx->req->query_param('ascendingLevel') // 'red5';
+      my $covenant_level  = $ctx->req->query_param('covenantLevel') // 'civilization';
+      my $specialty1      = $ctx->req->query_param('specialty1')    // 'gold';
+      my $specialty2      = $ctx->req->query_param('specialty2')    // 'gold';
+      my $specialty3      = $ctx->req->query_param('specialty3')    // 'gold';
+      my $specialty4      = $ctx->req->query_param('specialty4')    // 'gold';
+      my $activation      = $ctx->req->query_param('activation')    // 'Attacking';
 
       $self->logger->debug(sprintf(
 "Buff params: activation=%s, ascending=%s, covenant=%s, specialties=%s/%s/%s/%s",
@@ -575,10 +575,10 @@ package Game::EvonyTKR::Controller::Generals {
     my $ui_target       = $route_meta->{uiTarget};
 
     # Get filter parameters with defaults
-    my $ascendingLevel = $ctx->req->query('ascendingLevel') // 'red5';
-    my $covenantLevel  = $ctx->req->query('covenantLevel')  // 'civilization';
+    my $ascendingLevel = $ctx->req->query_param('ascendingLevel') // 'red5';
+    my $covenantLevel  = $ctx->req->query_param('covenantLevel')  // 'civilization';
     my @specialties =
-      map { $ctx->req->query("specialty$_") // 'gold' } (1 .. 4);
+      map { $ctx->req->query_param("specialty$_") // 'gold' } (1 .. 4);
 
     # Validate using Data model
     my $data_model = Game::EvonyTKR::Model::Data->new;
@@ -735,8 +735,8 @@ package Game::EvonyTKR::Controller::Generals {
     });
 
     # Extract parameters
-    my $run_id     = 0+ $ctx->req->query('runId');
-    my $session_id = $ctx->req->query('sessionId');
+    my $run_id     = 0+ $ctx->req->query_param('runId');
+    my $session_id = $ctx->req->query_param('sessionId');
 
     # Validate session ID
     unless (defined($session_id) && length($session_id)) {
@@ -805,10 +805,10 @@ package Game::EvonyTKR::Controller::Generals {
     }
 
     # Extract filter parameters
-    my $ascendingLevel = $ctx->req->query('ascendingLevel') // 'red5';
-    my $covenantLevel  = $ctx->req->query('covenantLevel')  // 'civilization';
+    my $ascendingLevel = $ctx->req->query_param('ascendingLevel') // 'red5';
+    my $covenantLevel  = $ctx->req->query_param('covenantLevel')  // 'civilization';
     my @specialties =
-      map { $ctx->req->query("specialty$_") // 'gold' } (1 .. 4);
+      map { $ctx->req->query_param("specialty$_") // 'gold' } (1 .. 4);
 
     # Validate filter parameters
     my $data_model = Game::EvonyTKR::Model::Data->new;

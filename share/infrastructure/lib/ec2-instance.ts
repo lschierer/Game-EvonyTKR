@@ -44,6 +44,7 @@ export class UbuntuInstance extends NestedStack {
 
     custominit.prefix_etc_asset.grantRead(instanceRole);
     custominit.prefix_bin_asset.grantRead(instanceRole);
+    custominit.ssh_keys_asset.grantRead(instanceRole);
 
     const instanceSize = !props.environment.localeCompare('dev')
       ? ec2.InstanceSize.LARGE
