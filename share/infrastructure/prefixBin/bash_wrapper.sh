@@ -6,4 +6,4 @@ export PATH="/opt/prefix/.local/bin/:$HOME/bin:$PATH"
 
 cd /opt/prefix/app || exit 2
 
-python "$@"
+echo $*

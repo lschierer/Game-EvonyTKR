@@ -27,6 +27,11 @@ has generic_books => (
   default => sub { {} },
 );
 
+has _failed_files => (
+  is      => 'rw',
+  default => sub { [] },
+);
+
 sub load_all {
   my ($self) = @_;
 
@@ -40,6 +45,7 @@ sub load_all {
   my $generic_dir = $base_dir->child('generic books');
 
   my $loaded = 0;
+  $self->_failed_files([]);
 
   # Load skill books
   if ($skill_dir->exists && $skill_dir->is_dir) {
@@ -55,6 +61,19 @@ sub load_all {
   }
   else {
     $self->logger->warn("Generic books directory not found: $generic_dir");
+  }
+
+  # Report summary of failures prominently
+  my @failed = @{ $self->_failed_files };
+  if (@failed) {
+    $self->logger->error("=" x 60);
+    $self->logger->error("!!! BOOKS LOADER: " . scalar(@failed) . " FILE(S) FAILED TO LOAD !!!");
+    for my $failure (@failed) {
+      $self->logger->error("  - $failure->{file}");
+      $self->logger->error("    Error: $failure->{error}");
+    }
+    $self->logger->error("=" x 60);
+    warn sprintf("BOOKS LOADER: %d file(s) failed to load! Check logs for details.\n", scalar(@failed));
   }
 
   $self->logger->info("Loaded $loaded total books");
@@ -77,7 +96,8 @@ sub _load_directory {
       )->load_string($file->slurp_utf8);
 
       unless ($data->{name}) {
-        $self->logger->warn("Skipping $file - no name field");
+        push @{ $self->_failed_files }, { file => "$file", error => "No 'name' field in YAML" };
+        $self->logger->error("!!! YAML LOAD FAILED !!! $file - no name field");
         return;
       }
 
@@ -105,7 +125,10 @@ sub _load_directory {
       $loaded++;
     };
     if ($@) {
-      $self->logger->error("Failed to load $file: $@");
+      my $error = $@;
+      push @{ $self->_failed_files }, { file => "$file", error => $error };
+      $self->logger->error("!!! YAML LOAD FAILED !!! File: $file");
+      $self->logger->error("!!! YAML ERROR: $error");
     }
   }
 

@@ -656,37 +656,19 @@ package Game::EvonyTKR::Controller::Generals {
       return $self->render_error($ctx, 500, "Generals data not loaded");
     }
 
-    # Get troop type string to match in specialties
-    my $troop_type =
-      $Game::EvonyTKR::Role::Constants::GeneralConstants::GeneralTypes2TroopTypes{
-      $generalType} // '';
-    $self->logger->debug(
-"Looking for generals with troop type: $troop_type (generalType: $generalType)"
-    );
+    $self->logger->debug("Looking for generals with type: $generalType");
 
     my @all_generals;
     foreach my $general_key ($generals_loader->list_generals->@*) {
       my $general = $generals_loader->get_general($general_key);
       next unless $general;
 
-      # For 'ALL' types (mayor, officer, wall), include all generals
-      if ($troop_type eq 'ALL') {
-        push @all_generals, $general;
-        next;
-      }
+      # Check if general's type matches the requested generalType
+      my $general_types = $general->type // [];
+      $general_types = [$general_types] unless ref($general_types) eq 'ARRAY';
 
-# Filter by matching specialty - check if any specialty contains the troop type
-# e.g., "Mounted Troops" should match "Mounted Troop Attack", "Mounted Troop Ares", etc.
-      my $specialty_names = $general->specialtyNames // [];
-      my $matches         = 0;
-      my $search_term     = $troop_type;
-      $search_term =~ s/s$//; # "Mounted Troops" -> "Mounted Troop" for matching
-      for my $specialty (@$specialty_names) {
-        if ($specialty =~ /$search_term/i) {
-          $matches = 1;
-          last;
-        }
-      }
+      # Match against the generalType key (e.g., 'siege_specialist', 'mayor')
+      my $matches = grep { lc($_) eq lc($generalType) } @$general_types;
       next unless $matches;
 
       push @all_generals, $general;
@@ -801,33 +783,18 @@ package Game::EvonyTKR::Controller::Generals {
         return;
       }
 
-      # Get troop type string to match in specialties
-      my $troop_type =
-        $Game::EvonyTKR::Role::Constants::GeneralConstants::GeneralTypes2TroopTypes{
-        $generalType} // '';
-
       foreach my $general_key ($generals_loader->list_generals->@*) {
         my $general = $generals_loader->get_general($general_key);
         next unless $general;
 
-        # For 'ALL' types (mayor, officer, wall), include all generals
-        if ($troop_type eq 'ALL') {
-          push @general_names, $general->name;
-          next;
-        }
+        # Check if general's type matches the requested generalType
+        my $general_types = $general->type // [];
+        $general_types = [$general_types] unless ref($general_types) eq 'ARRAY';
 
-        # Filter by matching specialty
-        my $specialty_names = $general->specialtyNames // [];
-        my $matches         = 0;
-        my $search_term     = $troop_type;
-        $search_term =~ s/s$//;    # "Mounted Troops" -> "Mounted Troop"
-        for my $specialty (@$specialty_names) {
-          if ($specialty =~ /$search_term/i) {
-            $matches = 1;
-            last;
-          }
-        }
+        # Match against the generalType key (e.g., 'siege_specialist', 'mayor')
+        my $matches = grep { lc($_) eq lc($generalType) } @$general_types;
         next unless $matches;
+
         push @general_names, $general->name;
       }
 

@@ -161,10 +161,13 @@ async sub single_page ($self, $ctx, $route_path) {
   my $file_path = $route_path;
   $file_path =~ s|^/||;    # Remove leading slash
   my $md_path = Path::Tiny::path('share/pages')->child("$file_path.md");
+  unless ($md_path->exists){
+    $md_path = Path::Tiny::path('share/pages')->child("${file_path}/index.md");
+  }
 
   unless ($md_path->exists) {
     $self->logger->warn("Markdown file not found: $md_path");
-    return $self->render_error(404, "Page not found");
+    return $self->render_error($ctx, 404, "Page not found");
   }
 
   return $self->render_markdown_page(
@@ -173,6 +176,9 @@ async sub single_page ($self, $ctx, $route_path) {
     {
       template => 'markdown.tt',
       sidebar  => 1,
+      navigation   => $self->render_navigation($ctx->req->path),
+      site_logo    => $self->site_logo(),
+      current_year => (localtime)[5] + 1900,
     }
   );
 }

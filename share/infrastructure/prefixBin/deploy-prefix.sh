@@ -5,7 +5,7 @@ set -e
 SERVICE_NAME="evonytkr"
 APP_HOME="/opt/prefix"
 APP_PATH="${APP_HOME}/app"
-PAGI_PATH="${APP_HOME}/PAGI_WebServer"
+PAGI_PATH="${APP_HOME}/PAGI-WebServer"
 APP_USER="appuser"
 
 echo "Pulling latest code..."
@@ -44,7 +44,7 @@ sudo -u ${APP_USER} -s /bin/bash -l -c "cd ${APP_PATH} && ./Build"
 
 # remove the old state
 # to prevent stale cache problems with new data
-sudo -u ${APP_USER} rm -rf /opt/mojo/app/var
+sudo -u ${APP_USER} rm -rf /opt/prefix/app/var
 
 # workers now launched from the main package
 #echo "Restarting workers"

@@ -95,8 +95,27 @@ sub load ($self) {
 
   $self->logger->info("Loading conflicts from $file");
 
-  my $json_text = $file->slurp_utf8;
-  my $raw_data  = JSON::PP->new->utf8->decode($json_text);
+  my $json_text = eval { $file->slurp_utf8 };
+  if ($@) {
+    $self->logger->error("=" x 60);
+    $self->logger->error("!!! CONFLICTS LOADER: FAILED TO READ FILE !!!");
+    $self->logger->error("  File: $file");
+    $self->logger->error("  Error: $@");
+    $self->logger->error("=" x 60);
+    warn "CONFLICTS LOADER: Failed to read $file! Check logs for details.\n";
+    return 0;
+  }
+
+  my $raw_data = eval { JSON::PP->new->utf8->decode($json_text) };
+  if ($@) {
+    $self->logger->error("=" x 60);
+    $self->logger->error("!!! CONFLICTS LOADER: FAILED TO PARSE JSON !!!");
+    $self->logger->error("  File: $file");
+    $self->logger->error("  Error: $@");
+    $self->logger->error("=" x 60);
+    warn "CONFLICTS LOADER: Failed to parse $file as JSON! Check logs for details.\n";
+    return 0;
+  }
 
   $self->raw_conflicts($raw_data);
 

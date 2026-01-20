@@ -93,13 +93,17 @@ sub load_all ($self) {
   my %by_letter;
   my %letters_seen;
   my $files_loaded = 0;
+  my @failed_files;
 
   foreach my $file (sort @yaml_files) {
     $self->logger->debug("Processing $file");
 
     my $data = eval { $yp->load_file($file->stringify) };
     if ($@) {
-      $self->logger->error("Failed to parse $file: $@");
+      my $error = $@;
+      push @failed_files, { file => "$file", error => $error };
+      $self->logger->error("!!! YAML LOAD FAILED !!! File: $file");
+      $self->logger->error("!!! YAML ERROR: $error");
       next;
     }
 
@@ -150,6 +154,18 @@ sub load_all ($self) {
     total_terms  => scalar(@all_terms),
     files_loaded => $files_loaded,
   });
+
+  # Report summary of failures prominently
+  if (@failed_files) {
+    $self->logger->error("=" x 60);
+    $self->logger->error("!!! GLOSSARY LOADER: " . scalar(@failed_files) . " FILE(S) FAILED TO LOAD !!!");
+    for my $failure (@failed_files) {
+      $self->logger->error("  - $failure->{file}");
+      $self->logger->error("    Error: $failure->{error}");
+    }
+    $self->logger->error("=" x 60);
+    warn sprintf("GLOSSARY LOADER: %d file(s) failed to load! Check logs for details.\n", scalar(@failed_files));
+  }
 
   $self->logger->info(sprintf(
     "Loaded %d glossary terms from %d files",

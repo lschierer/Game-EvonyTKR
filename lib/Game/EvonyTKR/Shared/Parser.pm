@@ -1,20 +1,18 @@
-
 package Game::EvonyTKR::Shared::Parser;
 use v5.42.0;
-use experimental qw(class);
 use utf8::all;
+use Mooish::Base -standard;
 
-use Mojo::Base -base,                               -signatures;
-use Mojo::Base 'Game::EvonyTKR::Role::JSON',        -role;
-use Mojo::Base 'Game::EvonyTKR::Role::Common',      -role;
-use Mojo::Base 'WebFramework::Role::Logger',        -role;
-use Mojo::Base 'Game::EvonyTKR::Role::Persistence', -role;
-use Mojo::Base 'Game::EvonyTKR::Role::Constants::AscendingAttributes', -role;
-use Mojo::Base 'Game::EvonyTKR::Role::Constants::Books',               -role;
-use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants',       -role;
-use Mojo::Base 'Game::EvonyTKR::Role::Constants::Covenants',           -role;
-use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants',    -role;
-use Mojo::Base 'Game::EvonyTKR::Role::Constants::Specialties',         -role;
+with 'Game::EvonyTKR::Role::JSON';
+with 'Game::EvonyTKR::Role::Common';
+with 'WebFramework::Role::Logger';
+with 'Game::EvonyTKR::Role::Constants::AscendingAttributes';
+with 'Game::EvonyTKR::Role::Constants::Books';
+with 'Game::EvonyTKR::Role::Constants::BuffConstants';
+with 'Game::EvonyTKR::Role::Constants::Covenants';
+with 'Game::EvonyTKR::Role::Constants::GeneralConstants';
+with 'Game::EvonyTKR::Role::Constants::Specialties';
+
 require Data::Printer;
 require Path::Tiny;
 require Readonly;
@@ -160,20 +158,20 @@ sub normalize_buff ($self, $buff_hash) {
   return $buff;
 }
 
-sub normalize_condition_case($self, $prologger->condition) {
+sub normalize_condition_case($self, $prolog_condition) {
 
   $self->logger->debug(sprintf('normalize_condition_case called with: "%s"',
-    $prologger->condition));
+    $prolog_condition));
 
   # Handle the new underscore-based condition format
   # Convert underscore atoms back to display format
-  if ($prologger->condition =~ /^[a-z_]+$/ && $prologger->condition =~ /_/) {
+  if ($prolog_condition =~ /^[a-z_]+$/ && $prolog_condition =~ /_/) {
     # This looks like an underscore-based atom from Prolog
-    my $display_condition = $prologger->condition;
+    my $display_condition = $prolog_condition;
     $display_condition =~ s/_/ /g;    # Convert underscores to spaces
 
     $self->logger->debug(
-"Converted underscore atom: '$prologger->condition' -> '$display_condition'"
+"Converted underscore atom: '$prolog_condition' -> '$display_condition'"
     );
 
     # Try to map to proper case using existing constants
@@ -206,7 +204,7 @@ sub normalize_condition_case($self, $prologger->condition) {
     "Built condition map with " . scalar(keys %condition_map) . " entries");
 
   # Handle multi-word conditions that might have different formatting
-  my $lower_condition = lc($prologger->condition);
+  my $lower_condition = lc($prolog_condition);
   $self->logger->debug("Lowercase condition: '$lower_condition'");
 
   # Direct lookup first
@@ -218,17 +216,17 @@ sub normalize_condition_case($self, $prologger->condition) {
   }
 
   # Fallback: try string_to_condition for mapping
-  my $mapped = $self->string_to_condition($prologger->condition);
+  my $mapped = $self->string_to_condition($prolog_condition);
   if ($mapped) {
     $self->logger->debug(
-      "string_to_condition mapped: '$prologger->condition' -> '$mapped'");
+      "string_to_condition mapped: '$prolog_condition' -> '$mapped'");
     return $mapped;
   }
 
   # Last resort: return original with first letter capitalized
-  my $capitalized = ucfirst($prologger->condition);
+  my $capitalized = ucfirst($prolog_condition);
   $self->logger->debug(
-    "Using capitalized fallback: '$prologger->condition' -> '$capitalized'");
+    "Using capitalized fallback: '$prolog_condition' -> '$capitalized'");
   return $capitalized;
 }
 

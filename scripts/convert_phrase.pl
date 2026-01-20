@@ -4,11 +4,12 @@ use experimental qw(class);
 use utf8::all;
 
 use File::FindLib 'lib';
+use lib '../PAGI-WebServer/lib';
 
 require Game::EvonyTKR::Shared::Parser;
-require Game::EvonyTKR::Role::Logging;
+use Log::Handler;
 
-my $logger = Game::EvonyTKR::Role::Logging::get_logger(__PACKAGE__);
+my $logger = Log::Handler->get_logger(__PACKAGE__);
 
 my $parser = Game::EvonyTKR::Shared::Parser->new();
 $parser->generate_grammar();

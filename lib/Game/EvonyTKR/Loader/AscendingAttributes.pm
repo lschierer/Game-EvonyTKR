@@ -35,6 +35,8 @@ sub load_all {
     sprintf("Found %d ascending attribute files to load", scalar @yaml_files));
 
   my $loaded = 0;
+  my @failed_files;
+
   for my $file (@yaml_files) {
     eval {
       my $data = YAML::PP->new(
@@ -59,8 +61,23 @@ sub load_all {
       );
     };
     if ($@) {
-      $self->logger->error("Failed to load $file: $@");
+      my $error = $@;
+      push @failed_files, { file => "$file", error => $error };
+      $self->logger->error("!!! YAML LOAD FAILED !!! File: $file");
+      $self->logger->error("!!! YAML ERROR: $error");
     }
+  }
+
+  # Report summary of failures prominently
+  if (@failed_files) {
+    $self->logger->error("=" x 60);
+    $self->logger->error("!!! ASCENDING ATTRIBUTES LOADER: " . scalar(@failed_files) . " FILE(S) FAILED TO LOAD !!!");
+    for my $failure (@failed_files) {
+      $self->logger->error("  - $failure->{file}");
+      $self->logger->error("    Error: $failure->{error}");
+    }
+    $self->logger->error("=" x 60);
+    warn sprintf("ASCENDING ATTRIBUTES LOADER: %d file(s) failed to load! Check logs for details.\n", scalar(@failed_files));
   }
 
   $self->logger->info("Loaded $loaded ascending attributes");

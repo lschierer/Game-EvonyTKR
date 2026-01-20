@@ -91,6 +91,8 @@ export class UbuntuInstance extends NestedStack {
       bucketKey: prefix_etc_asset.s3ObjectKey,
     });
 
+    const hostprefix =
+      props.environment === 'prod' ? 'production' : props.environment;
     shellCommands.addCommands(
       'mkdir -p /opt/prefix/bin',
       'cd /opt/prefix/bin',
@@ -100,6 +102,7 @@ export class UbuntuInstance extends NestedStack {
       'mv .bash* /opt/prefix/',
       'cp /opt/prefix/bin/deploy-prefix.sh /usr/local/bin',
       'chmod 0755 /opt/prefix/bin/deploy-prefix.sh',
+      `sed -i -E 's/replace/${hostprefix}/' /opt/prefix/bin/setup-cert.sh`,
       'cp /opt/prefix/bin/setup-cert.sh /usr/local/bin',
       'chmod 0755 /usr/local/bin/setup-cert.sh',
       'mkdir -p /tmp/prefix_etc',
@@ -108,6 +111,9 @@ export class UbuntuInstance extends NestedStack {
       'sudo cp /tmp/prefix_etc/setup-cert.service /etc/systemd/system/',
       'sudo cp /tmp/prefix_etc/evonytkr.service /etc/systemd/system/',
       'sudo cp /tmp/prefix_etc/sysctl.conf /etc/sysctl.d/evonytkr.conf',
+      'mkdir -p /opt/prefix/.local/share/mise/',
+      'sudo cp /tmp/prefix_etc/trusted.toml /opt/prefix/.local/share/mise/trusted.toml',
+      'sudo chown -R appuser:appuser /opt/prefix/.local',
       'sudo service procps force-reload',
     );
 

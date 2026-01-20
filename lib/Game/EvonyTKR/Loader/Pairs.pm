@@ -183,28 +183,13 @@ sub _get_generals_for_type ($self, $all_generals, $type_key, $troop_type) {
   my @matching;
 
   foreach my $general (@$all_generals) {
-    # For 'ALL' types (mayor, officer, wall), check the general's type field
-    if ($troop_type eq 'ALL') {
-      my $general_types = $general->type // [];
-      $general_types = [$general_types] unless ref($general_types) eq 'ARRAY';
+    my $general_types = $general->type // [];
+    $general_types = [$general_types] unless ref($general_types) eq 'ARRAY';
 
-  # Check if the general's type array contains this type (e.g., 'mayor', 'wall')
-      if (grep { lc($_) eq lc($type_key) } @$general_types) {
-        push @matching, $general;
-      }
-      next;
-    }
-
-    # Filter by matching specialty for troop types
-    my $specialty_names = $general->specialtyNames // [];
-    my $search_term     = $troop_type;
-    $search_term =~ s/s$//;    # "Mounted Troops" -> "Mounted Troop"
-
-    for my $specialty (@$specialty_names) {
-      if ($specialty =~ /$search_term/i) {
-        push @matching, $general;
-        last;
-      }
+    # Check if the general's type array contains this type_key
+    # This is the authoritative check - a general's type field determines their category
+    if (grep { lc($_) eq lc($type_key) } @$general_types) {
+      push @matching, $general;
     }
   }
 

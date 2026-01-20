@@ -24,7 +24,7 @@ sub load_all {
   my $dir = path($self->data_dir);
   unless ($dir->exists && $dir->is_dir) {
     $self->logger->error("Specialty data directory not found: $dir");
-    return;
+    return 0;
   }
 
   my @yaml_files = $dir->children(qr/\.ya?ml$/);
@@ -32,6 +32,8 @@ sub load_all {
     sprintf("Found %d specialty files to load", scalar @yaml_files));
 
   my $loaded = 0;
+  my @failed_files;
+
   for my $file (@yaml_files) {
     eval {
       my $data = YAML::PP->new(
@@ -40,7 +42,8 @@ sub load_all {
       )->load_string($file->slurp_utf8);
 
       unless ($data->{name}) {
-        $self->logger->warn("Skipping $file - no name field");
+        push @failed_files, { file => "$file", error => "No 'name' field in YAML" };
+        $self->logger->error("!!! YAML LOAD FAILED !!! $file - no name field");
         return;
       }
 
@@ -50,8 +53,23 @@ sub load_all {
       $self->logger->debug("Loaded specialty: " . $specialty->name);
     };
     if ($@) {
-      $self->logger->error("Failed to load $file: $@");
+      my $error = $@;
+      push @failed_files, { file => "$file", error => $error };
+      $self->logger->error("!!! YAML LOAD FAILED !!! File: $file");
+      $self->logger->error("!!! YAML ERROR: $error");
     }
+  }
+
+  # Report summary of failures prominently
+  if (@failed_files) {
+    $self->logger->error("=" x 60);
+    $self->logger->error("!!! SPECIALTIES LOADER: " . scalar(@failed_files) . " FILE(S) FAILED TO LOAD !!!");
+    for my $failure (@failed_files) {
+      $self->logger->error("  - $failure->{file}");
+      $self->logger->error("    Error: $failure->{error}");
+    }
+    $self->logger->error("=" x 60);
+    warn sprintf("SPECIALTIES LOADER: %d file(s) failed to load! Check logs for details.\n", scalar(@failed_files));
   }
 
   $self->logger->info("Loaded $loaded specialties");

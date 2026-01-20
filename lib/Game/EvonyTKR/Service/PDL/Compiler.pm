@@ -346,9 +346,18 @@ sub _compile_ascending_buffs ($self, $asc_data, $level, $activation_type,
 
   return $row if $level eq 'none';
 
+  # Handle both YAML formats:
+  # Format 1: ascending: [ {level: red1, ...}, ... ]
+  # Format 2: ascending: { levels: [ {level: red1, ...}, ... ] }
+  my $ascending_list = $asc_data->{ascending} || [];
+  if (ref($ascending_list) eq 'HASH' && exists $ascending_list->{levels}) {
+    $ascending_list = $ascending_list->{levels} || [];
+  }
+  $ascending_list = [] unless ref($ascending_list) eq 'ARRAY';
+
   # Find the ascending level data
   my $level_data;
-  for my $asc (@{ $asc_data->{ascending} || [] }) {
+  for my $asc (@$ascending_list) {
     if ($asc->{level} eq $level) {
       $level_data = $asc;
       last;

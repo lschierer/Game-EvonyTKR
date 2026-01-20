@@ -1,0 +1,8 @@
+["/opt/prefix/app"]
+trusted = true
+
+["/opt/prefix/Game-EvonyTKR"]
+trusted = true
+
+["/opt/prefix/PAGI-WebServer"]
+trusted = true

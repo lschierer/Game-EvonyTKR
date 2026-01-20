@@ -677,15 +677,17 @@ qr/(?:ground_specialist|mounted_specialist|ranged_specialist|siege_specialist|ma
   }
 
   # Helper: Map generalType to loader type key
+  # Note: $generalType comes from $route_meta->{generalType} which is already
+  # in the format used by GeneralKeys (e.g., 'siege_specialist')
   sub _general_type_to_loader_type ($self, $generalType) {
     my %map = (
-      'Ground Specialists'  => 'ground_specialist',
-      'Mounted Specialists' => 'mounted_specialist',
-      'Ranged Specialists'  => 'ranged_specialist',
-      'Siege Specialists'   => 'siege_specialist',
-      'Mayor Specialists'   => 'mayor',
-      'Officer Specialists' => 'officer',
-      'Wall Specialists'    => 'wall',
+      'ground_specialist'  => 'ground_specialist',
+      'mounted_specialist' => 'mounted_specialist',
+      'ranged_specialist'  => 'ranged_specialist',
+      'siege_specialist'   => 'siege_specialist',
+      'mayor'              => 'mayor',
+      'officer'            => 'officer',
+      'wall'               => 'wall',
     );
     return $map{$generalType} // 'ground_specialist';
   }

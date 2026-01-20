@@ -3,7 +3,7 @@ set -e
 
 APP_HOME="/opt/prefix"
 APP_PATH="${APP_HOME}/app"
-PAGI_PATH="${APP_HOME}/PAGI_WebServer"
+PAGI_PATH="${APP_HOME}/PAGI-WebServer"
 
 # Helper function to retry commands with exponential backoff
 retry_with_backoff() {
@@ -50,16 +50,16 @@ export PATH="/opt/prefix/.local/bin/:$HOME/bin:$PATH"
 retry_with_backoff git clone -b main https://github.com/lschierer/PAGI-WebServer.git /opt/prefix/PAGI-WebServer
 retry_with_backoff git clone -b PAGI https://github.com/lschierer/Game-EvonyTKR.git /opt/prefix/app
 
-cd /opt/prefix/app
+#cd /opt/prefix/app
 # Copy mode-specific config (production.yml or staging.yml)
-if [ -f /opt/prefix/etc/game-evony_t_k_r.production.yml ]; then
-  cp /opt/prefix/etc/game-evony_t_k_r.production.yml .
-elif [ -f /opt/prefix/etc/game-evony_t_k_r.staging.yml ]; then
-  cp /opt/prefix/etc/game-evony_t_k_r.staging.yml .
-else
-  echo "WARNING: No mode-specific config found in /opt/prefix/etc/"
-  echo "Expected either game-evony_t_k_r.production.yml or game-evony_t_k_r.staging.yml"
-fi
+#if [ -f /opt/prefix/etc/game-evony_t_k_r.production.yml ]; then
+#  cp /opt/prefix/etc/game-evony_t_k_r.production.yml .
+#elif [ -f /opt/prefix/etc/game-evony_t_k_r.staging.yml ]; then
+#  cp /opt/prefix/etc/game-evony_t_k_r.staging.yml .
+#else
+#  echo "WARNING: No mode-specific config found in /opt/prefix/etc/"
+#  echo "Expected either game-evony_t_k_r.production.yml or game-evony_t_k_r.staging.yml"
+#fi
 
 cd $PAGI_PATH
 mise install

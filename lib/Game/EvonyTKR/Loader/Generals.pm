@@ -33,6 +33,8 @@ sub load_all {
     sprintf("Found %d general files to load", scalar @yaml_files));
 
   my $loaded = 0;
+  my @failed_files;
+
   for my $file (@yaml_files) {
     eval {
       my $data = YAML::PP->new(
@@ -56,12 +58,28 @@ sub load_all {
           "Loaded general: $general_name (key: $normalized_key)");
       }
       else {
-        $self->logger->error("Failed to create general from $file");
+        push @failed_files, { file => "$file", error => "Failed to create model from hash" };
+        $self->logger->error("!!! YAML LOAD FAILED !!! Could not create general from $file");
       }
     };
     if ($@) {
-      $self->logger->error("Failed to load $file: $@");
+      my $error = $@;
+      push @failed_files, { file => "$file", error => $error };
+      $self->logger->error("!!! YAML LOAD FAILED !!! File: $file");
+      $self->logger->error("!!! YAML ERROR: $error");
     }
+  }
+
+  # Report summary of failures prominently
+  if (@failed_files) {
+    $self->logger->error("=" x 60);
+    $self->logger->error("!!! GENERALS LOADER: " . scalar(@failed_files) . " FILE(S) FAILED TO LOAD !!!");
+    for my $failure (@failed_files) {
+      $self->logger->error("  - $failure->{file}");
+      $self->logger->error("    Error: $failure->{error}");
+    }
+    $self->logger->error("=" x 60);
+    warn sprintf("GENERALS LOADER: %d file(s) failed to load! Check logs for details.\n", scalar(@failed_files));
   }
 
   $self->logger->info("Loaded $loaded generals");

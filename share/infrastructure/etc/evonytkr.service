@@ -5,7 +5,7 @@
     [Service]
     Type=simple
     User=appuser
-    PIDFile=/opt/prefix/app/bin/hypnotoad.pid
+    PIDFile=/opt/prefix/var/evonytkr.pid
     Environment="MOJO_MODE=REPLACEMODE"
     ExecStart=/opt/prefix/app/bin/server.pl
     ExecReload=/bin/kill -HUP $MAINPID
