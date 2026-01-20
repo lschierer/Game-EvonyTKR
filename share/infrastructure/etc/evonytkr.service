@@ -5,8 +5,7 @@
     [Service]
     Type=simple
     User=appuser
-    PIDFile=/opt/prefix/var/evonytkr.pid
-    Environment="MOJO_MODE=REPLACEMODE"
+    PIDFile=/opt/prefix/var/run/Game-EvonyTKR.pid
     ExecStart=/opt/prefix/app/bin/server.pl
     ExecReload=/bin/kill -HUP $MAINPID
     TimeoutStartSec=900

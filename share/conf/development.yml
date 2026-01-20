@@ -45,7 +45,7 @@ pandoc_modules:
   - gfm_auto_identifiers
 
 log_base: Game-EvonyTKR
-site_url: dev.hp-fan.schierer.org
+site_url: dev.evonytkrtips.net
 # Module-specific log levels
 log_config:
   default: INFO
