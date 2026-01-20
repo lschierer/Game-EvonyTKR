@@ -12,7 +12,6 @@ my $builder = Module::Build->new(
   create_makefile_pl => 0,    #'traditional',
   script_files       => [
     'bin/game-evonytkr', 'scripts/create-general',
-    'scripts/check_broken_links'
   ],
   share_dir => {
     dist => ['share'], # This tells Module::Build to install the share directory
