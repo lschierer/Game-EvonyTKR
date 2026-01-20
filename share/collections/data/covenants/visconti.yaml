@@ -1,0 +1,65 @@
+name: Visconti
+generals:
+  - Edward III
+  - Marco Polo
+  - Niccolò Piccinino
+levels:
+  - category: war
+    text: Ranged Troop Attack +5%.
+    buffs:
+      - attribute: Attack
+        troop: Ranged Troops
+        value:
+          number: 5
+  - category: cooperation
+    text: Ranged Troop Training Speed +10% (global)
+    buffs:
+      - attribute: Training Capacity
+        passive: 1
+        troop: Rannged Troops
+        value:
+          number: 10
+  - category: peace
+    text: Ranged Troop HP +10%.
+    buffs:
+      - attribute: HP
+        troop: Ranged Troops
+        value:
+          number: 10
+  - category: faith
+    text: >-
+      Ranged Troop Defense +15%.
+      In-Rally Ranged Troop Attack +5% (global).
+    buffs:
+      - attribute: Defense
+        troop: Ranged Troops
+        value:
+          number: 15
+      - attribute: Attack
+        troop: Ranged Troops
+        conditions:
+          - When Rallying
+        passive: 1
+        value:
+          number: 1
+  - category: honor
+    text: Attacking Ranged Troop Attack +15%.
+    buffs:
+      - attribute: Attack
+        troop: Ranged Troops
+        value:
+          number: 15
+  - category: civilization
+    text: >-
+      Attacking Ranged Troop HP +10%.
+      March Size Capacity +10%.
+    buffs:
+      - attribute: HP
+        troop: Ranged Troops
+        conditions:
+          - Attacking
+        value:
+          number: 10
+      - attribute: March Size
+        value:
+          number: 10

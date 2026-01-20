@@ -133,6 +133,8 @@ Cheng Yaojin;Prince Eugene
 Cheng Yaojin;Robert Guiscard
 Cheng Yaojin;Washington
 Christina;Gunther
+Christina;Kiso Yoshinaka
+Christina;Olaf Skötkonung
 Christina;Pallas
 Christina;Theodosius I
 Cyrus the Great;Barbarossa
@@ -288,6 +290,7 @@ George Monck;Mordred
 George Monck;Napoleon Prime
 George Monck;Roland
 Godfrey of Bouillon;Sigurd
+Godfrey of Bouillon;Gonzalo
 Guan Yu;Alexander the Great
 Guan Yu;Aurelian
 Guan Yu;Carus
@@ -316,8 +319,8 @@ Gwanggaeto the Great;Mason Weaver
 Gwanggaeto the Great;Ramesses II
 Gwanggaeto the Great;Suleiman the Magnificent
 Gwanggaeto the Great;Toyotomi Hideyori
-Haakon Haroldsson;Hermes
-Haakon Haroldsson;Washington Prime
+Haakon Haraldsson;Hermes
+Haakon Haraldsson;Washington Prime
 Hannibal;Barbarossa
 Hannibal;Basil II
 Hannibal;Bertrand du Guesclin
@@ -419,6 +422,8 @@ Khalid;Septimius Serverus
 Khalid;Stephen II
 Khalid;Surena
 Khalid;William Wallace
+Kiso Yoshinaka;Gunther
+Kiso Yoshinaka;Theodosius I
 Kleos;Genghis Khan
 Kleos;Isabella I
 Kleos;King Arthur
@@ -508,6 +513,19 @@ Lysander;Marco Polo
 Lysander;Mordred
 Lysander;Napoleon Prime
 Lysander;Roland
+Maarten Tromp ;Alfred the Great
+Maarten Tromp ;Charles XII
+Maarten Tromp ;Douglas
+Maarten Tromp ;Gnarr
+Maarten Tromp ;James Conrad
+Maarten Tromp ;Marcus Agrippa
+Maarten Tromp ;Mehmed II
+Maarten Tromp ;Mihai
+Maarten Tromp ;Princess Kaguya
+Maarten Tromp ;Simeon the Great
+Maarten Tromp ;Thutmose III
+Maarten Tromp ;Tomyris
+Maarten Tromp ;Wallenstein
 Maarten Tromp;Alfred the Great
 Maarten Tromp;Charles XII
 Maarten Tromp;Douglas
@@ -653,6 +671,9 @@ Narcissus;Basil II
 Narcissus;Suchet
 Oda Oichi;Leo III
 Oda Oichi;Yi Sun-sin
+Olaf Skötkonung;Gunther
+Olaf Skötkonung;Kiso Yoshinaka
+Olaf Skötkonung;Theodosius I
 Pallas;Christina
 Pallas;Gunther
 Pallas;Theodosius I
@@ -870,6 +891,7 @@ Tomyris;Wallenstein
 Totila;Aurelian
 Totila;Elise
 Totila;Guan Yu
+Totila;Lorenzo de' Medici
 Totila;Maeda Toshiie
 Totila;Yue Fei
 Trajan;Peter the Great
@@ -915,7 +937,7 @@ Washington Prime;André Masséna
 Washington Prime;Barbarossa
 Washington Prime;Genghis Khan
 Washington Prime;George A Custer
-Washington Prime;Haakon Haroldsson
+Washington Prime;Haakon Haraldsson
 Washington Prime;Hermes
 Washington Prime;Isabella I
 Washington Prime;King Arthur
@@ -974,11 +996,3 @@ Zucca;John Churchill
 Zucca;Napoleon
 Zucca;Petronas
 Zucca;Philip II
-Totila;Lorenzo de' Medici
-Olaf Skötkonung;Kiso Yoshinaka
-Christina;Olaf Skötkonung
-Olaf Skötkonung;Theodosius I
-Olaf Skötkonung;Gunther
-Christina;Kiso Yoshinaka
-Kiso Yoshinaka;Gunther
-Kiso Yoshinaka;Theodosius I

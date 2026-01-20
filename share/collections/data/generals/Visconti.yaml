@@ -1,0 +1,25 @@
+name: Visconti
+general: Visconti
+ascending: true
+basic_attributes:
+  attack:
+    base: 133
+    increment: 9.36
+  defense:
+    base: 123
+    increment: 8.54
+  leadership:
+    base: 129
+    increment: 9.01
+  politics:
+    base: 117
+    increment: 8.22
+book: Serpent of Milan
+specialties:
+  - Ranged Troop Assault
+  - Bash
+  - Ranged Troop Ares
+  - Battle of Casalecchio
+stars: red5
+type:
+  - ranged_specialist
