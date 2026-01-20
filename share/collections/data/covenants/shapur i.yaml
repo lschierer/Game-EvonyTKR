@@ -1,0 +1,64 @@
+name: Shapur I
+generals:
+  - Trajan
+  - Carus
+  - Septimius Severus
+levels:
+  - category: war
+    text: Siege Machine Defense +5%.
+    buffs:
+      - attribute: Defense
+        troop: Siege Machines
+        value:
+          number: 5
+  - category: cooperation
+    text: Siege Machine Training Capacity +10% (global).
+    buffs:
+      - attribute: Training Capacity
+        passive: 1
+        troop: Siege Machines
+        value:
+          number: 10
+  - category: peace
+    text: Reinforcing Siege Machine Defense +10%.
+    buffs:
+      - attribute: Defense
+        troop: Siege Machines
+        conditions:
+          - Reinforcing
+        value:
+          number: 10
+  - category: faith
+    text: >-
+      Attacking Siege Machine Attack +10%.
+      In-Rally Siege Machine HP +5% (global).
+    buffs:
+      - attribute: Attack
+        troop: Siege Machines
+        conditions:
+          - Attacking
+        value:
+          number: 10
+      - attribute: HP
+        troop: Siege Machines
+        passive: 1
+        conditions:
+          - When Rallying
+        value:
+          number: 5
+  - category: honor
+    text: Siege Machine Attack +10%
+    buffs:
+      - attribute: Attack
+        troop: Siege Machines
+        value:
+          number: 10
+  - category: civilization
+    text: >-
+      Siege Machine Attack +10%.
+      March Size Capacity +10%.
+    buffs:
+      - attribute: Attack
+        troop: Siege Machines
+        value:
+          number: 10

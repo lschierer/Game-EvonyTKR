@@ -1,0 +1,68 @@
+name: Olaf Skötkonung
+generals:
+  - Vladimir the Great
+  - Sweyn Forkbeard
+  - Olav II
+levels:
+  - category: war
+    text: Attacking Siege Machine HP +5%
+    buffs:
+      - attribute: HP
+        troop: Siege Machines
+        conditions:
+          - Attacking
+        value:
+          number: 5
+  - category: cooperation
+    text: Siege Machine Training Speed +10% (global)
+    buffs:
+      - attribute: Training Speed
+        troop: Siege Machines
+        passive: 1
+        value:
+          number: 10
+  - category: peace
+    text: Siege Machine HP +10%
+    buffs:
+      - attribute: HP
+        troop: Siege Machines
+        value:
+          number: 10
+  - category: faith
+    text: >-
+      Attacking Siege Machine Defense +10%.
+      In-Rally Siege Machine Attack +5% (global).
+    buffs:
+      - attribute: Defense
+        troop: Siege Machines
+        conditions:
+          - Attacking
+        value:
+          number: 10
+      - attribute: Attack
+        troop: Siege Machines
+        conditions:
+          - When Rallying
+        value:
+          number: 5
+  - category: honor
+    text: March Size Capacity +8%
+    buffs:
+      - attribute: March Size
+        value:
+          number: 8
+  - category: civilization
+    text: >-
+      Attacking Siege Machine Attack +15%.
+      Siege Machine Defense +10%.
+    buffs:
+      - attribute: Attack
+        troop: Siege Machines
+        conditions:
+          - Attacking
+        value:
+          number: 15
+      - attribute: Defense
+        troop: Siege Machines
+        value:
+          number: 10

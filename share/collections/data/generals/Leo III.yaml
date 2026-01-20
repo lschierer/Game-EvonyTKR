@@ -1,17 +1,17 @@
-ascending: 'true'
+ascending: 1
 basic_attributes:
   attack:
-    base: 118
-    increment: 0
+    base: 111
+    increment: 8.82
   defense:
-    base: 116
-    increment: 0
+    base: 113
+    increment: 8.98
   leadership:
     base: 115
-    increment: 0
+    increment: 8.98
   politics:
-    base: 112
-    increment: 0
+    base: 111
+    increment: 8.66
 book: Fire on the Sea
 name: Leo III
 specialties:

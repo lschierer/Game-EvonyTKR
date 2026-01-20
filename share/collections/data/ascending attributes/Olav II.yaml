@@ -32,6 +32,7 @@ ascending:
           number: 10
           unit: percentage
   - level: red2
+    text: Attacking Troop Death into Wounded Rate +8%
     buffs:
       - attribute: Death to Wounded
         conditions:

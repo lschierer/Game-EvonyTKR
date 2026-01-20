@@ -1,0 +1,25 @@
+name: Shapur I
+general: Shapur I
+ascending: true
+basic_attributes:
+  attack:
+    base: 132
+    increment: 8.93
+  defense:
+    base: 123
+    increment: 8.83
+  leadership:
+    base: 127
+    increment: 8.67
+  politics:
+    base: 117
+    increment: 8.59
+book: Mazda Worshiper
+specialties:
+  - Siege Machine Assault
+  - Bash
+  - Siege Machine Ares
+  - Battle of Antioch
+stars: red5
+type:
+  - siege_specialist

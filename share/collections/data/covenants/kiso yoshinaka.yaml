@@ -1,0 +1,71 @@
+name: Kiso Yoshinaka
+generals:
+  - Hōjō Ujiyasu
+  - Tachibana Ginchiyo
+  - Mouri Motonari
+levels:
+  - category: war
+    text: Siege Machine Attack +5%.
+    buffs:
+      - attribute: Attack
+        troop: Siege Machines
+        value:
+          number: 5
+  - category: cooperation
+    text: Siege Machine Training Capacity +10% (global).
+    buffs:
+      - attribute: Training Capacity
+        passive: 1
+        troop: Siege Machines
+        value:
+          number: 10
+  - category: peace
+    text: In-Rally Siege Machine Defense +10%.
+    buffs:
+      - attribute: Defense
+        troop: Siege Machines
+        conditions:
+          - When Rallying
+        value:
+          number: 10
+  - category: faith
+    text: >-
+      Attacking Siege Machine Attack +10%.
+      Attacking Siege Machine HP +10% (global).
+    buffs:
+      - attribute: Attack
+        troop: Siege Machines
+        conditions:
+          - Attacking
+        value:
+          number: 10
+      - attribute: HP
+        passive: 1
+        troop: Siege Machines
+        conditions:
+          - Attacking
+        value:
+          number: 10
+  - category: honor
+    text: In-Rally Siege Machine Attack +10%
+    buffs:
+      - attribute: Attack
+        troop: Siege Machines
+        conditions:
+          - When Rallying
+        value:
+          number: 10
+  - category: civilization
+    text: >-
+      Attacking Siege Machine Defense +10%.
+      March Size Capacity +8%.
+    buffs:
+      - attribute: Defense
+        troop: Siege Machines
+        conditions:
+          - Attacking
+        value:
+          number: 10
+      - attribute: March Size
+        value:
+          number: 8

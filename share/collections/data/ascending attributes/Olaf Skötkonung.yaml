@@ -1,0 +1,83 @@
+general: Olof Skötkonung
+id: Olof Skötkonung
+ascending:
+  - level: red1
+    text: Attacking Siege Machine Attack, Defense and HP +10%
+    buffs:
+      - attribute: Attack
+        troop: Siege Machines
+        conditions:
+          - Attacking
+        value:
+          number: 10
+      - attribute: Defense
+        troop: Siege Machines
+        conditions:
+          - Attacking
+        value:
+          number: 10
+      - attribute: HP
+        troop: Siege Machines
+        conditions:
+          - Attacking
+        value:
+          number: 10
+  - level: red2
+    text: Attacking Troop Death into Wounded Rate +8%
+    buffs:
+      - attribute: Death to Wounded
+        conditions:
+          - Attacking
+        value:
+          number: 8
+          unit: percentage
+  - level: red3
+    text: Attacking Siege Machine Attack and Defense +30%.
+    buffs:
+      - attribute: Attack
+        troop: Siege Machines
+        conditions:
+          - Attacking
+        value:
+          number: 30
+      - attribute: Defense
+        troop: Siege Machines
+        conditions:
+          - Attacking
+        value:
+          number: 30
+  - level: red4
+    text: Attacking Siege Machine HP +30%, March Size Capacity +10%.
+    buffs:
+      - attribute: HP
+        troop: Siege Machines
+        conditions:
+          - Attacking
+        value:
+          number: 30
+      - attribute: March Size
+        value:
+          number: 10
+  - level: red5
+    text: Attacking Ranged Troop and Siege Machine Attack +45%; Siege Machine Defense and HP +30%.
+    buffs:
+      - attribute: Attack
+        troop: Ranged Troops
+        conditions:
+          - Attacking
+        value:
+          number: 45
+      - attribute: Attack
+        troop: Siege Machines
+        conditions:
+          - Attacking
+        value:
+          number: 45
+      - attribute: Defense
+        troop: Siege Machines
+        value:
+          number: 30
+      - attribute: HP
+        troop: Siege Machines
+        value:
+          number: 30

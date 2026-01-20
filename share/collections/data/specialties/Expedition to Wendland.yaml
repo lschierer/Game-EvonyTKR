@@ -1,0 +1,122 @@
+name: Expedition to Wendland
+levels:
+  - level: green
+    text: >-
+      Attacking Siege Machine Attack +5%.
+      Attacking Siege Machine Defense +5%.
+      Attacking Siege Machine HP +4%.
+    buffs:
+      - attribute: Attack
+        conditions:
+          - Attacking
+        troop: Siege Machines
+        value:
+          number: 5
+      - attribute: Defense
+        conditions:
+          - Attacking
+        troop: Siege Machines
+        value:
+          number: 5
+      - attribute: HP
+        conditions:
+          - Attacking
+        troop: Siege Machines
+        value:
+          number: 4
+  - level: blue
+    text: >-
+      Attacking Siege Machine Attack +6%.
+      Attacking Siege Machine Defense +5%.
+      Attacking Siege Machine HP +5%.
+    buffs:
+      - attribute: Attack
+        conditions:
+          - Attacking
+        troop: Siege Machines
+        value:
+          number: 6
+      - attribute: Defense
+        conditions:
+          - Attacking
+        troop: Siege Machines
+        value:
+          number: 5
+      - attribute: HP
+        conditions:
+          - Attacking
+        troop: Siege Machines
+        value:
+          number: 5
+  - level: purple
+    text: >-
+      Attacking Siege Machine Attack +11%.
+      Attacking Siege Machine Defense +9%.
+      Attacking Siege Machine HP +9%.
+    buffs:
+      - attribute: Attack
+        conditions:
+          - Attacking
+        troop: Siege Machines
+        value:
+          number: 11
+      - attribute: Defense
+        conditions:
+          - Attacking
+        troop: Siege Machines
+        value:
+          number: 9
+      - attribute: HP
+        conditions:
+          - Attacking
+        troop: Siege Machines
+        value:
+          number: 9
+  - level: orange
+    text: >-
+      Attacking Siege Machine Attack +11%.
+      Attacking Siege Machine Defense +9%.
+      Attacking Siege Machine HP +9%.
+    buffs:
+      - attribute: Attack
+        conditions:
+          - Attacking
+        troop: Siege Machines
+        value:
+          number: 11
+      - attribute: Defense
+        conditions:
+          - Attacking
+        troop: Siege Machines
+        value:
+          number: 9
+      - attribute: HP
+        conditions:
+          - Attacking
+        troop: Siege Machines
+        value:
+          number: 9
+  - level: gold
+    text: >-
+      Attacking Siege Machine Attack +22%.
+      Attacking Siege Machine Defense +18%.
+      Attacking Siege Machine HP +18%.
+    buffs:
+      - attribute: Attack
+        conditions:
+          - Attacking
+        troop: Siege Machines
+        value:
+          number: 2
+      - attribute: Defense
+        conditions:
+          - Attacking
+        troop: Siege Machines
+        value:
+          number: 18
+      - attribute: HP
+        conditions:
+          - Attacking
+        troop: Siege Machines
+        value:
+          number: 18

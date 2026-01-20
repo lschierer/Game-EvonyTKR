@@ -1,0 +1,25 @@
+name: Kiso Yoshinaka
+general: Kiso Yoshinaka
+ascending: true
+basic_attributes:
+  attack:
+    base: 132
+    increment: 8.83
+  defense:
+    base: 121
+    increment: 8.68
+  leadership:
+    base: 124
+    increment: 8.78
+  politics:
+    base: 120
+    increment: 8.57
+book: Asahi Shogun
+specialties:
+  - Siege Machine Formation
+  - Bash
+  - Siege Machine Ares
+  - Battle of Kurikara Pass
+stars: red5
+type:
+  - siege_specialist

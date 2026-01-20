@@ -1,0 +1,25 @@
+name: Asahi Shogun
+text: >-
+  Increases siege machines' attack and defense by 55% and siege machines' HP by 40% when General is leading the army to attack.
+buffs:
+  - attribute: Attack
+    troop: Siege Machines
+    value:
+      number: 55
+    conditions:
+      - leading the army
+      - Attacking
+  - attribute: Defense
+    troop: Siege Machines
+    value:
+      number: 55
+    conditions:
+      - leading the army
+      - Attacking
+  - attribute: HP
+    troop: Siege Machines
+    value:
+      number: 40
+    conditions:
+      - leading the army
+      - Attacking

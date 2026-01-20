@@ -1,0 +1,25 @@
+name: Olaf Skötkonung
+general: Olaf Skötkonung
+ascending: true
+basic_attributes:
+  attack:
+    base: 132
+    increment: 9.22
+  defense:
+    base: 125
+    increment: 8.73
+  leadership:
+    base: 127
+    increment: 8.99
+  politics:
+    base: 118
+    increment: 8.19
+book: Ode to Olaf
+specialties:
+  - Siege Machine Defense
+  - Bash
+  - Siege Machine Ares
+  - Expedition to Wendland
+stars: red5
+type:
+  - siege_specialist
