@@ -118,8 +118,6 @@ my $builder = Module::Build->new(
     'Pod::Weaver::Role::SectionReplacer'                 => '0',
     'Pod::Weaver::PluginBundle::ReplaceBoilerplate'      => '0',
     'Pod::Weaver::Section::Leftovers'                    => '0',
-    'Log::Any::Adapter'                                  => '0',
-    'Mojolicious::Command::Author::generate::dockerfile' => '0',
   },
   test_requires => {
     'Devel::Local'                        => '0',
