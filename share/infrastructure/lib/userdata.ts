@@ -56,20 +56,11 @@ export class CustomUbuntuUserData {
       './aws/install',
     );
 
-    const local_bin_path = this.shellCommands.addS3DownloadCommand({
-      bucket: this.prefix_bin_asset.bucket,
-      bucketKey: this.prefix_bin_asset.s3ObjectKey,
-    });
-
-    const local_etc_path = this.shellCommands.addS3DownloadCommand({
-      bucket: this.prefix_etc_asset.bucket,
-      bucketKey: this.prefix_etc_asset.s3ObjectKey,
-    });
-
-    const local_ssh_keys_path = this.shellCommands.addS3DownloadCommand({
-      bucket: this.ssh_keys_asset.bucket,
-      bucketKey: this.ssh_keys_asset.s3ObjectKey,
-    });
+    // S3 downloads moved to cfn-init (downloadAssets config) to avoid credential timing issues
+    // These paths are where cfn-init will download the assets
+    const local_bin_path = '/tmp/prefix_bin.zip';
+    const local_etc_path = '/tmp/prefix_etc.zip';
+    const local_ssh_keys_path = '/tmp/authorized_keys';
 
     const hostprefix =
       props.environment === 'prod' ? 'production' : props.environment;
@@ -77,6 +68,7 @@ export class CustomUbuntuUserData {
     this.init = ec2.CloudFormationInit.fromConfigSets({
       configSets: {
         default: [
+          'downloadAssets',
           'installPackages',
           'createUsers',
           'configureSSM',
@@ -84,6 +76,24 @@ export class CustomUbuntuUserData {
         ],
       },
       configs: {
+        downloadAssets: new ec2.InitConfig([
+          // Download assets from S3 using cfn-init (handles IAM auth properly)
+          ec2.InitFile.fromS3Object(
+            local_bin_path,
+            this.prefix_bin_asset.bucket,
+            this.prefix_bin_asset.s3ObjectKey,
+          ),
+          ec2.InitFile.fromS3Object(
+            local_etc_path,
+            this.prefix_etc_asset.bucket,
+            this.prefix_etc_asset.s3ObjectKey,
+          ),
+          ec2.InitFile.fromS3Object(
+            local_ssh_keys_path,
+            this.ssh_keys_asset.bucket,
+            this.ssh_keys_asset.s3ObjectKey,
+          ),
+        ]),
         installPackages: new ec2.InitConfig([
           ec2.InitCommand.shellCommand('add-apt-repository -y universe'),
           ec2.InitCommand.shellCommand('apt-get update'),
@@ -129,6 +139,24 @@ export class CustomUbuntuUserData {
           ec2.InitCommand.shellCommand('systemctl enable unattended-upgrades'),
         ]),
         createUsers: new ec2.InitConfig([
+          ec2.InitFile.fromString(
+            `/etc/sudoers.d/90-nopasswd-adm`,
+            `%adm ALL=(ALL) NOPASSWD:ALL`,
+            {
+              mode: '000440', // Sudoers files MUST be read-only (440) for security
+              owner: 'root',
+              group: 'root',
+            },
+          ),
+          ec2.InitFile.fromString(
+            `/etc/sudoers.d/91-appuser-evonytkr`,
+            `appuser ALL=(ALL) NOPASSWD: /usr/bin/systemctl start evonytkr, /usr/bin/systemctl stop evonytkr, /usr/bin/systemctl restart evonytkr`,
+            {
+              mode: '000440',
+              owner: 'root',
+              group: 'root',
+            },
+          ),
           ec2.InitUser.fromName('appuser', {
             homeDir: '/opt/prefix',
             groups: ['www-data'],
@@ -150,6 +178,9 @@ export class CustomUbuntuUserData {
               'www-data',
             ],
           }),
+          ec2.InitCommand.shellCommand('cp -a /etc/skel /home/luke'),
+          ec2.InitCommand.shellCommand('chown -R luke:luke /home/luke'),
+          ec2.InitCommand.shellCommand('/usr/bin/chsh -s /bin/bash luke'),
           // TODO: set up sudo for 'luke' user.
           ec2.InitCommand.shellCommand(
             ' /usr/sbin/groupmod -a appuser -U luke',
@@ -186,6 +217,7 @@ export class CustomUbuntuUserData {
           ),
           ec2.InitCommand.shellCommand('mkdir -p /opt/prefix/var/run'),
           ec2.InitCommand.shellCommand('mkdir -p /opt/prefix/var/log'),
+          ec2.InitCommand.shellCommand('mkdir -p /opt/prefix/.config/mise'),
           ec2.InitCommand.shellCommand('mkdir -p /opt/prefix/bin'),
           ec2.InitCommand.shellCommand('mkdir -p /opt/prefix/etc'),
           ec2.InitCommand.shellCommand('chown -R appuser:www-data /opt/prefix'),
@@ -230,13 +262,6 @@ export class CustomUbuntuUserData {
           ),
 
           ec2.InitCommand.shellCommand(
-            'sudo -u appuser -s /bin/bash -l -c /opt/prefix/bin/bootstrap.sh',
-          ),
-          ec2.InitCommand.shellCommand(
-            'echo "BOOTSTRAP_EXIT_CODE=$?" | sudo tee /var/log/cloud-output-init.log',
-          ),
-
-          ec2.InitCommand.shellCommand(
             'cp /opt/prefix/bin/deploy-prefix.sh /usr/local/bin',
           ),
           ec2.InitCommand.shellCommand(
@@ -252,9 +277,28 @@ export class CustomUbuntuUserData {
           ec2.InitCommand.shellCommand(
             'chmod 0755 /usr/local/bin/setup-cert.sh',
           ),
+          ec2.InitCommand.shellCommand(
+            'cp /opt/prefix/bin/setup-cert-sbin.sh /usr/local/sbin/setup-cert.sh',
+          ),
+          ec2.InitCommand.shellCommand(
+            'chmod 0755 /usr/local/sbin/setup-cert.sh',
+          ),
           ec2.InitCommand.shellCommand('mkdir -p /tmp/prefix_etc'),
-          ec2.InitCommand.shellCommand('cd /tmp/prefix_etc'),
-          ec2.InitCommand.shellCommand(`unzip ${local_etc_path}`),
+          ec2.InitCommand.shellCommand(
+            `cd /tmp/prefix_etc && unzip ${local_etc_path}`,
+          ),
+          ec2.InitCommand.shellCommand(
+            'sudo cp /tmp/prefix_etc/trusted.toml /opt/prefix/.config/mise',
+          ),
+          ec2.InitCommand.shellCommand(
+            'sudo chown appuser:appuser /opt/prefix/.config/mise/trusted.toml',
+          ),
+
+          // Run bootstrap in background - it will start evonytkr.service when done
+          ec2.InitCommand.shellCommand(
+            'nohup sudo -u appuser /bin/bash /opt/prefix/bin/bootstrap.sh > /var/log/bootstrap.log 2>&1 &',
+          ),
+
           ec2.InitCommand.shellCommand(
             'sudo cp /tmp/prefix_etc/setup-cert.service /etc/systemd/system/',
           ),
@@ -275,25 +319,25 @@ export class CustomUbuntuUserData {
 
           ec2.InitCommand.shellCommand('sudo systemctl daemon-reload'),
 
-          ec2.InitCommand.shellCommand(
-            'sudo systemctl enable setup-cert.service',
-          ),
-          ec2.InitCommand.shellCommand('systemctl start setup-cert.service'),
+          ec2.InitService.enable('setup-cert', {
+            ensureRunning: true,
+            serviceManager: ec2.ServiceManager.SYSTEMD,
+          }),
           ec2.InitCommand.shellCommand('sudo /opt/prefix/bin/setup-nginx.sh'),
-          ec2.InitCommand.shellCommand(
-            'sudo systemctl enable evonytkr.service',
-          ),
-          ec2.InitCommand.shellCommand('systemctl start evonytkr'),
-          ec2.InitCommand.shellCommand('systemctl reload nginx'),
+          ec2.InitService.enable('evonytkr', {
+            ensureRunning: true,
+            serviceManager: ec2.ServiceManager.SYSTEMD,
+          }),
         ]),
       },
     });
 
     this.initOptions = {
       configSets: ['default'],
-      timeout: cdk.Duration.minutes(30),
-      ignoreFailures: true, // Don't rollback on failure during debugging
+      timeout: cdk.Duration.minutes(15),
+      ignoreFailures: false, // Don't rollback on failure during debugging
     };
+    // Note: CDK automatically appends cfn-init call when Instance has init + userData
   }
 
   getRandomInteger(min: number, max: number): number {

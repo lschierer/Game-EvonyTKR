@@ -97,9 +97,6 @@ my $builder = Module::Build->new(
     'PDL::Stats'            => '0',
 
   },
-  recommends => {
-    'Mojolicious::Plugin::Minion::Admin' => '0',
-  },
   configure_requires => {
     'Module::Build' => '0.42'
   },

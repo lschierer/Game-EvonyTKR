@@ -4,6 +4,8 @@ set -e
 APP_HOME="/opt/prefix"
 APP_PATH="${APP_HOME}/app"
 PAGI_PATH="${APP_HOME}/PAGI-WebServer"
+export PATH="/opt/prefix/.local/bin/:$HOME/bin:$PATH"
+
 
 # Helper function to retry commands with exponential backoff
 retry_with_backoff() {
@@ -34,15 +36,10 @@ retry_with_backoff() {
 # Install mise with retry
 retry_with_backoff curl -fsSL https://mise.run | sh
 
-# Set up PATH and mise activation
+# Add mise binary to PATH
 export PATH="/opt/prefix/.local/bin:$HOME/bin:$PATH"
-eval "$(/opt/prefix/.local/bin/mise activate bash)"
 
-# Add to bash_profile for future sessions
-echo 'export PATH="/opt/prefix/.local/bin:$HOME/bin:$PATH"' >> ~/.bash_profile
-echo 'eval "$(/opt/prefix/.local/bin/mise activate bash)"' >> ~/.bash_profile
-
-# Clone repositories with retry
+# Clone repositories with retry (need repos before mise install can read .mise.toml)
 retry_with_backoff git clone -b main https://github.com/lschierer/PAGI-WebServer.git /opt/prefix/PAGI-WebServer
 retry_with_backoff git clone -b PAGI https://github.com/lschierer/Game-EvonyTKR.git /opt/prefix/app
 
@@ -52,9 +49,23 @@ mise trust
 mise install
 mise reshim
 
+# Add mise shims to PATH (more reliable than mise activate in scripts)
+export PATH="/opt/prefix/.local/share/mise/shims:$PATH"
+
+# Set up bash_profile for future interactive sessions
+cat > ~/.bash_profile << 'EOF'
+export PATH="/opt/prefix/.local/share/mise/shims:/opt/prefix/.local/bin:$HOME/bin:$PATH"
+eval "$(/opt/prefix/.local/bin/mise activate bash)"
+EOF
+
+# Install cpanm (not included with mise's perl by default)
+curl -L https://cpanmin.us | perl - App::cpanminus
+mise reshim
+cpanm --self-upgrade -q
+
 cpanm Module::Build utf8::all
 perl Build.PL
-./Build installdeps --cpan_client 'cpanm -n'
+./Build installdeps --cpan_client 'cpanm -nq --with-recommends'
 ./Build manifest
 ./Build
 
@@ -85,10 +96,13 @@ export NODE_OPTIONS=--max_old_space_size=2560; pnpm tsx ./scripts/build-ts.ts
 pnpm config set childConcurrency 2
 
 perl Build.PL
-./Build installdeps --cpan_client 'cpanm -n'
+./Build installdeps --cpan_client 'cpanm -nq --with-recommends'
 ./Build manifest
 perl ./scripts/update_git_meta.pl
 ./Build
 
-echo 'bootstrap complete - SUCCESS'
+# Start the application service now that build is complete
+sudo systemctl start evonytkr
+
+echo 'bootstrap complete - SUCCESS' | tee -a ${HOME}/var/log/bootstrap.log
 exit 0

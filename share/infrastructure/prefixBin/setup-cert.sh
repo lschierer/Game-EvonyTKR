@@ -1,5 +1,8 @@
 #!/bin/bash
 set -e
+
+sleep 300
+
 H=$(hostname -s)
 
 # Check if real cert already exists
