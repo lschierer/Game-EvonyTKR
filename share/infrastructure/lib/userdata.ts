@@ -23,6 +23,8 @@ export class CustomUbuntuUserData {
 
   public ssh_keys_asset: s3Assets.Asset;
 
+  public shellCommands: ec2.UserData;
+
   public constructor(stack: Stack, props: UbuntuInstanceProps) {
     const hostname =
       props.environment === 'prod'
@@ -41,37 +43,36 @@ export class CustomUbuntuUserData {
       path: path.join(__dirname, '../ssh_keys/authorized_keys'),
     });
 
-    const shellCommands = ec2.UserData.forLinux();
-    shellCommands.addCommands(
+    this.shellCommands = ec2.UserData.forLinux();
+    this.shellCommands.addCommands(
+      'set -ex',
+      'apt-get update',
+      'apt-get install -y python3-pip unzip curl',
+      'pip3 install --break-system-packages https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-py3-latest.tar.gz',
+      'mkdir -p /opt/aws/bin',
+      'ln -sf /usr/local/bin/cfn-* /opt/aws/bin/',
       'curl "https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip" -o "awscliv2.zip"',
       'unzip awscliv2.zip',
-      'sudo ./aws/install',
+      './aws/install',
     );
 
-    const local_bin_path = shellCommands.addS3DownloadCommand({
+    const local_bin_path = this.shellCommands.addS3DownloadCommand({
       bucket: this.prefix_bin_asset.bucket,
       bucketKey: this.prefix_bin_asset.s3ObjectKey,
     });
 
-    const local_etc_path = shellCommands.addS3DownloadCommand({
+    const local_etc_path = this.shellCommands.addS3DownloadCommand({
       bucket: this.prefix_etc_asset.bucket,
       bucketKey: this.prefix_etc_asset.s3ObjectKey,
     });
 
-    const local_ssh_keys_path = shellCommands.addS3DownloadCommand({
+    const local_ssh_keys_path = this.shellCommands.addS3DownloadCommand({
       bucket: this.ssh_keys_asset.bucket,
       bucketKey: this.ssh_keys_asset.s3ObjectKey,
     });
 
     const hostprefix =
       props.environment === 'prod' ? 'production' : props.environment;
-
-    // Generate mode-specific config BEFORE bootstrap (git clone happens in bootstrap)
-    // Created in /opt/prefix/etc, then bootstrap.sh copies it to /opt/prefix/app after clone
-    const appMode = props.environment === 'prod' ? 'production' : 'staging';
-    const configFileName = `game-evony_t_k_r.${appMode}.yml`;
-    console.log(`config file is ${configFileName}`);
-    shellCommands.addCommands();
 
     this.init = ec2.CloudFormationInit.fromConfigSets({
       configSets: {
@@ -161,9 +162,7 @@ export class CustomUbuntuUserData {
           ec2.InitCommand.shellCommand(
             'chmod 600 /home/luke/.ssh/authorized_keys',
           ),
-          ec2.InitCommand.shellCommand(
-            'chown -R luke:luke /home/luke/.ssh',
-          ),
+          ec2.InitCommand.shellCommand('chown -R luke:luke /home/luke/.ssh'),
         ]),
         configureSSM: new ec2.InitConfig([
           ec2.InitCommand.shellCommand('apt-get remove --purge -y snapd'),
@@ -184,12 +183,6 @@ export class CustomUbuntuUserData {
           ec2.InitCommand.shellCommand(`hostnamectl set-hostname ${hostname}`),
           ec2.InitCommand.shellCommand(
             `echo "127.0.1.1 ${hostname} ${hostname}.localdoamin" >> /etc/hosts`,
-          ),
-          ec2.InitCommand.shellCommand(
-            `PIPX_HOME=/usr/local/ PIPX_BIN_DIR=/usr/local/bin PIPX_MAN_DIR=/usr/local/ /usr/bin/pipx install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-py3-latest.tar.gz || echo 'cfn-bootstrap failed' >> /var/log/boostrap.log`,
-          ),
-          ec2.InitCommand.shellCommand(
-            'ln -sf /usr/local/bin/cfn-* /usr/bin/ || true',
           ),
           ec2.InitCommand.shellCommand('mkdir -p /opt/prefix/var/run'),
           ec2.InitCommand.shellCommand('mkdir -p /opt/prefix/var/log'),
@@ -225,13 +218,16 @@ export class CustomUbuntuUserData {
           ),
           ec2.InitCommand.shellCommand('chown -R luke:luke /home/luke/var'),
           ec2.InitCommand.shellCommand(
-            'find /opt/prefix/var -type d -exec chmod g+rx {} \;',
+            'find /opt/prefix/var -type d -exec chmod g+rx {} \\;',
           ),
-          ec2.InitCommand.shellCommand('cd /opt/prefix/bin'),
-          ec2.InitCommand.shellCommand(`unzip ${local_bin_path}`),
+          ec2.InitCommand.shellCommand(
+            `cd /opt/prefix/bin && unzip ${local_bin_path}`,
+          ),
           ec2.InitCommand.shellCommand('chown -R appuser:www-data /opt/prefix'),
           ec2.InitCommand.shellCommand('chmod +x /opt/prefix/bin/*.sh'),
-          ec2.InitCommand.shellCommand('mv .bash* /opt/prefix/'),
+          ec2.InitCommand.shellCommand(
+            'mv /opt/prefix/bin/.bash* /opt/prefix/',
+          ),
 
           ec2.InitCommand.shellCommand(
             'sudo -u appuser -s /bin/bash -l -c /opt/prefix/bin/bootstrap.sh',
@@ -296,6 +292,7 @@ export class CustomUbuntuUserData {
     this.initOptions = {
       configSets: ['default'],
       timeout: cdk.Duration.minutes(30),
+      ignoreFailures: true, // Don't rollback on failure during debugging
     };
   }
 

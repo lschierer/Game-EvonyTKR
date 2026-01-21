@@ -18,7 +18,7 @@ import {
   aws_lambda as lambda,
 } from 'aws-cdk-lib';
 
-interface MojoliciousStackProps extends StackProps {
+interface ApplicatonStackProps extends StackProps {
   environment: string;
   CidrRange: string;
   domainName: string;
@@ -33,8 +33,8 @@ interface MojoliciousStackProps extends StackProps {
   imageTag: string;
 }
 
-export class MojoliciousStack extends Stack {
-  constructor(scope: Construct, id: string, props: MojoliciousStackProps) {
+export class ApplicatonStack extends Stack {
+  constructor(scope: Construct, id: string, props: ApplicatonStackProps) {
     super(scope, id, props);
 
     const logbucket = new s3.Bucket(this, 'EvonyTKRTipsLogBucket', {

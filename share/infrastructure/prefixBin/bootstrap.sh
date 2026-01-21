@@ -52,6 +52,7 @@ mise trust
 mise install
 mise reshim
 
+cpanm Module::Build utf8::all
 perl Build.PL
 ./Build installdeps --cpan_client 'cpanm -n'
 ./Build manifest

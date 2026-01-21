@@ -1,7 +1,7 @@
 import { App } from 'aws-cdk-lib';
 
-import { MojoliciousStack } from '../share/infrastructure/lib/infra-stack.ts';
-import { MojoliciousStack as Mojo2 } from 'share/infrastructure/lib/main-stack.ts';
+import { ApplicatonStack } from '../share/infrastructure/lib/infra-stack.ts';
+import { ApplicatonStack as Mojo2 } from 'share/infrastructure/lib/main-stack.ts';
 
 const app = new App();
 
@@ -38,7 +38,7 @@ const config = envConfigs[environment];
 const hostedZoneId = 'Z02705452UES0AYN9485J'; // Your Route53 hosted zone ID
 const zoneName = 'evonytkrtips.net';
 
-new MojoliciousStack(app, `evonytkrtips-${environment}-stack`, {
+new ApplicatonStack(app, `evonytkrtips-${environment}-stack`, {
   environment: environment,
   CidrRange: config.CidrRange,
   domainName: 'evonytkrtips.net', // Your Route53 domain

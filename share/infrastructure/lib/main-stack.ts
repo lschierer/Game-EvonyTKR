@@ -12,7 +12,7 @@ import {
 
 import { UbuntuInstance } from './ec2-instance';
 
-export interface MojoliciousStackProps extends StackProps {
+export interface ApplicatonStackProps extends StackProps {
   environment: string;
   CidrRange: string;
   domainName: string;
@@ -25,9 +25,10 @@ export interface MojoliciousStackProps extends StackProps {
   desiredCount: number;
 }
 
-export class MojoliciousStack extends Stack {
+export class ApplicatonStack extends Stack {
   readonly applicationURL;
-  constructor(scope: Construct, id: string, props: MojoliciousStackProps) {
+
+  constructor(scope: Construct, id: string, props: ApplicatonStackProps) {
     super(scope, id, props);
 
     this.applicationURL = `${props.appSubdomain}.${props.domainName}`;

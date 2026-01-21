@@ -9,9 +9,9 @@ import * as cdk from 'aws-cdk-lib';
 
 import { CustomUbuntuUserData } from './userdata';
 
-import { type MojoliciousStackProps } from './main-stack';
+import { type ApplicatonStackProps } from './main-stack';
 
-export interface UbuntuInstanceProps extends MojoliciousStackProps {
+export interface UbuntuInstanceProps extends ApplicatonStackProps {
   vpc: ec2.IVpc | ec2.Vpc;
 }
 
@@ -42,6 +42,28 @@ export class UbuntuInstance extends NestedStack {
 
     const custominit = new CustomUbuntuUserData(this, props);
 
+    // Create custom user data that installs cfn-bootstrap FIRST
+    const userData = ec2.UserData.forLinux();
+    userData.addCommands(
+      'set -ex',
+      'apt-get update',
+      'apt-get install -y python3-pip',
+      'pip3 install --break-system-packages https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-py3-latest.tar.gz',
+      'mkdir -p /opt/aws/bin',
+      'ln -sf /usr/local/bin/cfn-* /opt/aws/bin/',
+    );
+    
+    // Add the CloudFormation Init commands
+    const initCommand = ec2.InitCommand.argvCommand([
+      '/opt/aws/bin/cfn-init',
+      '-v',
+      '--region', this.region,
+      '--stack', this.stackName,
+      '--resource', 'InstanceC1063A87',
+      '-c', 'default',
+    ]);
+    userData.addCommands(initCommand.toString());
+
     custominit.prefix_etc_asset.grantRead(instanceRole);
     custominit.prefix_bin_asset.grantRead(instanceRole);
     custominit.ssh_keys_asset.grantRead(instanceRole);
@@ -61,6 +83,7 @@ export class UbuntuInstance extends NestedStack {
     this.instance = new ec2.Instance(this, 'Instance', {
       role: instanceRole,
       userDataCausesReplacement: true,
+      userData: custominit.shellCommands,
       init: custominit.init,
       initOptions: custominit.initOptions,
       vpc: props.vpc,
@@ -80,6 +103,7 @@ export class UbuntuInstance extends NestedStack {
       // Remove resourceSignalTimeout - let instance succeed when it comes up
       // Bootstrap continues in background via systemd service
     });
+    console.log(`instance is at ${this.instance.instancePublicDnsName}`);
 
     //(cloud_user_data.runcmd as Array<string>).push(shellCommands.render());
 
