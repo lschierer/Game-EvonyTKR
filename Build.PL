@@ -95,7 +95,8 @@ my $builder = Module::Build->new(
 
   },
   configure_requires => {
-    'Module::Build' => '0.42'
+    'Module::Build' => '0.42',
+    'utf8::all'     => '0',
   },
   build_requires => {
     'utf8::all'                                          => '0',
