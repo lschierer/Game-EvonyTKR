@@ -25,12 +25,11 @@ export class CustomUbuntuUserData {
 
   public shellCommands: ec2.UserData;
 
-  public constructor(stack: Stack, props: UbuntuInstanceProps) {
-    const hostname =
-      props.environment === 'prod'
-        ? `www${this.getRandomInteger(10, 99)}`
-        : `${props.appSubdomain}${this.getRandomInteger(10, 99)}`;
-
+  public constructor(
+    stack: Stack,
+    props: UbuntuInstanceProps,
+    hostname: string,
+  ) {
     this.prefix_bin_asset = new s3Assets.Asset(stack, 'prefixBinAsset', {
       path: path.join(__dirname, '../prefixBin'),
     });
@@ -98,6 +97,7 @@ export class CustomUbuntuUserData {
           ec2.InitCommand.shellCommand('add-apt-repository -y universe'),
           ec2.InitCommand.shellCommand('apt-get update'),
           ec2.InitCommand.shellCommand('apt-get dist-upgrade -y'),
+          ec2.InitPackage.apt('at'),
           ec2.InitPackage.apt('autoconf'),
           ec2.InitPackage.apt('autoconf-archive'),
           ec2.InitPackage.apt('automake'),
@@ -113,9 +113,12 @@ export class CustomUbuntuUserData {
           ec2.InitPackage.apt('gnu-standards'),
           ec2.InitPackage.apt('graphviz'),
           ec2.InitPackage.apt('libgd-dev'),
+          ec2.InitPackage.apt('libgsl-dev'),
           ec2.InitPackage.apt('libgraphviz-dev'),
+          ec2.InitPackage.apt('libcurl4-openssl-dev'),
           ec2.InitPackage.apt('libssl-dev'),
           ec2.InitPackage.apt('libtool'),
+          ec2.InitPackage.apt('libxml2-dev'),
           ec2.InitPackage.apt('libzip-dev'),
           ec2.InitPackage.apt('make'),
           ec2.InitPackage.apt('nginx'),
@@ -135,6 +138,7 @@ export class CustomUbuntuUserData {
           ec2.InitPackage.apt('unattended-upgrades'),
           ec2.InitPackage.apt('unzip'),
           ec2.InitPackage.apt('update-notifier-common'),
+          ec2.InitPackage.apt('uuid-dev'),
           ec2.InitCommand.shellCommand('systemctl is-active sysstat'),
           ec2.InitCommand.shellCommand('systemctl enable unattended-upgrades'),
         ]),
@@ -150,7 +154,7 @@ export class CustomUbuntuUserData {
           ),
           ec2.InitFile.fromString(
             `/etc/sudoers.d/91-appuser-evonytkr`,
-            `appuser ALL=(ALL) NOPASSWD: /usr/bin/systemctl start evonytkr, /usr/bin/systemctl stop evonytkr, /usr/bin/systemctl restart evonytkr`,
+            `appuser ALL=(ALL) NOPASSWD:/usr/bin/systemctl start evonytkr, NOPASSWD:/usr/bin/systemctl stop evonytkr, NOPASSWD:/usr/bin/systemctl restart evonytkr`,
             {
               mode: '000440',
               owner: 'root',
@@ -210,6 +214,10 @@ export class CustomUbuntuUserData {
             stackName: Stack.of(stack).stackName,
             region: Stack.of(stack).region,
           }),
+          ec2.InitService.enable('atd', {
+            ensureRunning: true,
+            serviceManager: ec2.ServiceManager.SYSTEMD,
+          }),
           ec2.InitCommand.shellCommand(`hostname ${hostname}`),
           ec2.InitCommand.shellCommand(`hostnamectl set-hostname ${hostname}`),
           ec2.InitCommand.shellCommand(
@@ -257,6 +265,7 @@ export class CustomUbuntuUserData {
           ),
           ec2.InitCommand.shellCommand('chown -R appuser:www-data /opt/prefix'),
           ec2.InitCommand.shellCommand('chmod +x /opt/prefix/bin/*.sh'),
+          ec2.InitCommand.shellCommand('chmod +x /opt/prefix/bin/appperl'),
           ec2.InitCommand.shellCommand(
             'mv /opt/prefix/bin/.bash* /opt/prefix/',
           ),
@@ -296,7 +305,7 @@ export class CustomUbuntuUserData {
 
           // Run bootstrap in background - it will start evonytkr.service when done
           ec2.InitCommand.shellCommand(
-            'nohup sudo -u appuser /bin/bash /opt/prefix/bin/bootstrap.sh > /var/log/bootstrap.log 2>&1 &',
+            'echo "bash /opt/prefix/bin/bootstrap.sh > /opt/prefix/var/log/bootstrap.log 2>&1" | sudo -u appuser  at now',
           ),
 
           ec2.InitCommand.shellCommand(
@@ -319,15 +328,20 @@ export class CustomUbuntuUserData {
 
           ec2.InitCommand.shellCommand('sudo systemctl daemon-reload'),
 
-          ec2.InitService.enable('setup-cert', {
-            ensureRunning: true,
-            serviceManager: ec2.ServiceManager.SYSTEMD,
-          }),
+          // Schedule cert setup to run 2 minutes after boot (DNS needs time to propagate)
+          // Script has its own retry logic, no systemd service needed
+
+          ec2.InitCommand.shellCommand(
+            'echo "/usr/local/bin/setup-cert.sh >> /var/log/setup-cert.log 2>&1" | at now + 2 minutes',
+          ),
           ec2.InitCommand.shellCommand('sudo /opt/prefix/bin/setup-nginx.sh'),
-          ec2.InitService.enable('evonytkr', {
-            ensureRunning: true,
-            serviceManager: ec2.ServiceManager.SYSTEMD,
-          }),
+          // The PDL perl package compile takes *forever*, so give this a generous amount of time.
+          ec2.InitCommand.shellCommand(
+            'echo "/usr/bin/systemctl enable evonytkrtips" | at now + 30 minutes',
+          ),
+          ec2.InitCommand.shellCommand(
+            'echo "/usr/bin/systemctl start evonytkrtips" | at now + 60 minutes',
+          ),
         ]),
       },
     });
@@ -338,11 +352,5 @@ export class CustomUbuntuUserData {
       ignoreFailures: false, // Don't rollback on failure during debugging
     };
     // Note: CDK automatically appends cfn-init call when Instance has init + userData
-  }
-
-  getRandomInteger(min: number, max: number): number {
-    min = Math.ceil(min);
-    max = Math.floor(max);
-    return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 }

@@ -5,7 +5,7 @@ Wants=network-online.target
 
 [Service]
 Type=oneshot
-ExecStart=/usr/local/sbin/setup-cert.sh
+ExecStart=/usr/local/bin/setup-cert.sh
 Restart=on-failure
 RestartSec=30
 StartLimitBurst=100

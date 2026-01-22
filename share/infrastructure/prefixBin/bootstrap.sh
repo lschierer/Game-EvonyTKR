@@ -63,6 +63,9 @@ curl -L https://cpanmin.us | perl - App::cpanminus
 mise reshim
 cpanm --self-upgrade -q
 
+# Pre-install HTML::Tree family to avoid circular dependency issues
+cpanm -nq HTML::Tagset HTML::Parser HTML::Tree
+
 cpanm Module::Build utf8::all
 perl Build.PL
 ./Build installdeps --cpan_client 'cpanm -nq --with-recommends'

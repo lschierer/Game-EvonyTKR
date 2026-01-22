@@ -1,7 +1,7 @@
 import { App } from 'aws-cdk-lib';
 
 import { ApplicatonStack } from '../share/infrastructure/lib/infra-stack.ts';
-import { ApplicatonStack as Mojo2 } from 'share/infrastructure/lib/main-stack.ts';
+import { ApplicationStack as Replacement } from 'share/infrastructure/lib/main-stack.ts';
 
 const app = new App();
 
@@ -62,7 +62,7 @@ new ApplicatonStack(app, `evonytkrtips-${environment}-stack`, {
   },
 });
 
-new Mojo2(app, `evonytkrtips-${environment}-stack2`, {
+new Replacement(app, `evonytkrtips-${environment}-stack2`, {
   environment: environment,
   CidrRange: config.CidrRange,
   domainName: 'evonytkrtips.net', // Your Route53 domain

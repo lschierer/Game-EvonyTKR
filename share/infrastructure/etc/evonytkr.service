@@ -9,7 +9,7 @@ Group=www-data
 WorkingDirectory=/opt/prefix/app
 Environment="PATH=/opt/prefix/.local/bin:/opt/prefix/.local/share/mise/shims:/usr/local/bin:/usr/bin:/bin"
 PIDFile=/opt/prefix/var/run/Game-EvonyTKR.pid
-ExecStart=/opt/prefix/app/bin/server.pl
+ExecStart=/opt/prefix/bin/appperl bin/server2.pl --mode test
 ExecReload=/bin/kill -HUP $MAINPID
 TimeoutStartSec=900
 KillMode=mixed

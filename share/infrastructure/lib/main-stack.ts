@@ -2,6 +2,7 @@ import { Stack, type StackProps, Duration } from 'aws-cdk-lib';
 import { type Construct } from 'constructs';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as route53 from 'aws-cdk-lib/aws-route53';
+import * as cdk from 'aws-cdk-lib';
 
 import * as iam from 'aws-cdk-lib/aws-iam';
 import {
@@ -12,7 +13,7 @@ import {
 
 import { UbuntuInstance } from './ec2-instance';
 
-export interface ApplicatonStackProps extends StackProps {
+export interface ApplicationStackProps extends StackProps {
   environment: string;
   CidrRange: string;
   domainName: string;
@@ -25,10 +26,10 @@ export interface ApplicatonStackProps extends StackProps {
   desiredCount: number;
 }
 
-export class ApplicatonStack extends Stack {
+export class ApplicationStack extends Stack {
   readonly applicationURL;
 
-  constructor(scope: Construct, id: string, props: ApplicatonStackProps) {
+  constructor(scope: Construct, id: string, props: ApplicationStackProps) {
     super(scope, id, props);
 
     this.applicationURL = `${props.appSubdomain}.${props.domainName}`;
@@ -61,9 +62,9 @@ export class ApplicatonStack extends Stack {
     // - minion_db: Minion job queue state
     // - evonytkr_app_data: Application data (generals, books, pairs, etc.)
 
-    const InstanceStack = new UbuntuInstance(
+    const Instance = new UbuntuInstance(
       this,
-      `Mojo-${props.environment}-instance`,
+      `EvonyTKR-${props.environment}-instance`,
       {
         ...props,
         vpc,
@@ -75,37 +76,35 @@ export class ApplicatonStack extends Stack {
       new route53.ARecord(this, 'RootDomainRecord', {
         zone: hostedZone,
         recordName: '', // root domain
-        target: route53.RecordTarget.fromIpAddresses(
-          InstanceStack.instance.instancePublicIp,
-        ),
+        target: route53.RecordTarget.fromIpAddresses(Instance.instancePublicIp),
       });
     }
 
     new route53.ARecord(this, 'EvonyTKRTipsDNSRecord', {
       zone: hostedZone,
-      recordName: `${props.appSubdomain}2`,
-      target: route53.RecordTarget.fromIpAddresses(
-        InstanceStack.instance.instancePublicIp,
-      ),
+      recordName: `${props.appSubdomain}`,
+      target: route53.RecordTarget.fromIpAddresses(Instance.instancePublicIp),
       ttl: Duration.minutes(5),
     });
 
     new route53.ARecord(this, 'EvonyTKRTipsWWWDNSRecord', {
       zone: hostedZone,
-      recordName: `www.${props.appSubdomain}2`,
-      target: route53.RecordTarget.fromIpAddresses(
-        InstanceStack.instance.instancePublicIp,
-      ),
+      recordName: `www.${props.appSubdomain}`,
+      target: route53.RecordTarget.fromIpAddresses(Instance.instancePublicIp),
       ttl: Duration.minutes(5),
     });
 
-    new route53.ARecord(this, 'InstanceDNSRecord', {
+    const instanceDNS = new route53.ARecord(this, 'InstanceDNSRecord', {
       zone: hostedZone,
-      recordName: `${InstanceStack.hostname}`,
-      target: route53.RecordTarget.fromIpAddresses(
-        InstanceStack.instance.instancePublicIp,
-      ),
+      recordName: `${Instance.hostname}`,
+      target: route53.RecordTarget.fromIpAddresses(Instance.instancePublicIp),
       ttl: Duration.minutes(5),
+    });
+    instanceDNS.node.addDependency(Instance);
+
+    new cdk.CfnOutput(this, 'InstanceDNSRecordOutput', {
+      value: `domainName: ${instanceDNS.domainName}; ip: ${Instance.instancePublicIp}`,
+      description: 'The individual dns entry for the Ubuntu instance',
     });
 
     if (props.environment == 'dev') {

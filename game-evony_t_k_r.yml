@@ -20,6 +20,6 @@ hypnotoad:
 secrets:
 - e0deeacd35ce3e6c4b07a33ae421a4704636f001
 version:
-  build-time: 2026-01-20T07:16:17
+  build-time: 2026-01-22T00:01:41
   git-branch: PAGI
-  git-commit: f8aa272e
+  git-commit: 87cf84ca
