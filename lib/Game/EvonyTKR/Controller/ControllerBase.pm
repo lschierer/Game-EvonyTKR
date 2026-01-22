@@ -176,6 +176,13 @@ sub render_error ($self, $ctx, $status, $message) {
   return $self->SUPER::render_error($ctx, $status, $message);
 }
 
+# Override template to automatically include is_production
+sub template ($self, $template_name, $vars = {}) {
+  # Add is_production to all template renders
+  $vars->{is_production} //= ($self->app->env // '') eq 'production';
+  return $self->SUPER::template($template_name, $vars);
+}
+
 # Default index action - subclasses should override
 async sub index ($self, $ctx) {
   $self->logger->warn('using default index from ControllerBase');

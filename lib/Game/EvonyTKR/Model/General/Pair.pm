@@ -9,8 +9,8 @@ require Game::EvonyTKR::Model::General;
 package Game::EvonyTKR::Model::General::Pair {
   use Moo;
   extends 'Game::EvonyTKR::Model::Base';
-  use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants',    -role;
-  use Mojo::Base 'Game::EvonyTKR::Role::Constants::GeneralConstants', -role;
+  with 'Game::EvonyTKR::Role::Constants::BuffConstants';
+  with 'Game::EvonyTKR::Role::Constants::GeneralConstants';
   with 'Game::EvonyTKR::Role::Constants::AscendingAttributes';
   use UUID           qw(uuid5);
   use List::AllUtils qw( any none );
@@ -23,12 +23,12 @@ package Game::EvonyTKR::Model::General::Pair {
     'bool'     => \&_isTrue,
     "fallback" => 1;
 
-  has ['primary', 'secondary', 'type'] => undef;
+  has [qw(primary secondary type)] => (is => 'rw');
 
 # Precomputed generic book buff values by activation type and level
 # Structure: { Attacking => { level3 => {march_size => 12, ...}, level6 => {...}, ... }, ... }
 # For pairs, level3 = single general's 3 books, level6 = both generals' 6 books combined
-  has 'genericBookBuffs' => sub { {} };
+  has 'genericBookBuffs' => (is => 'rw', default => sub { {} });
 
   sub persistenceHelper ($self) {
     state $persistence_helper //= do {
