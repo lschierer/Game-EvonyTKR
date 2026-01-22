@@ -1,0 +1,25 @@
+name: Qin Qiong
+general: Qin Qiong
+ascending: true
+basic_attributes:
+  attack:
+    base: 118
+    increment: 9.05
+  defense:
+    base: 117
+    increment: 9.03
+  leadership:
+    base: 119
+    increment: 9.14
+  politics:
+    base: 111
+    increment: 8.28
+book: Golden Twin Maces
+specialties:
+  - Ground Troop Defense
+  - Annihilation
+  - Ground Troop Ares
+  - Battle of Hulao
+stars: red5
+type:
+  - ground_specialist

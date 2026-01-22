@@ -1,0 +1,28 @@
+name: Golden Twin Maces
+text: >-
+  Increases ground troops' attack and defense by 40% and ground troops and mounted troops' HP by 40% when General is leading the army.
+buffs:
+  - attribute: Attack
+    troop: Ground Troops
+    conditions:
+      - leading the army
+    value:
+      number: 40
+  - attribute: Defense
+    troop: Ground Troops
+    conditions:
+      - leading the army
+    value:
+      number: 40
+  - attribute: HP
+    troop: Ground Troops
+    conditions:
+      - leading the army
+    value:
+      number: 40
+  - attribute: HP
+    troop: Mounted Troops
+    conditions:
+      - leading the army
+    value:
+      number: 40

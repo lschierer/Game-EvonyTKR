@@ -1,6 +1,6 @@
 ---
 ascending:
-  - level: "red1"
+  - level: red1
     buffs:
       - attribute: Attack
         targetedType: Mounted Troops
@@ -9,7 +9,7 @@ ascending:
         value:
           number: 20
           unit: percentage
-  - level: "red2"
+  - level: 'red2'
     buffs:
       - attribute: Wounded to Death
         conditions:
@@ -17,7 +17,7 @@ ascending:
         value:
           number: 8
           unit: percentage
-  - level: "red3"
+  - level: 'red3'
     buffs:
       - attribute: Rally Capacity
         conditions:
@@ -25,7 +25,7 @@ ascending:
         value:
           number: 8
           unit: percentage
-  - level: "red4"
+  - level: 'red4'
     buffs:
       - attribute: Defense
         targetedType: Mounted Troops
@@ -41,7 +41,7 @@ ascending:
         value:
           number: 20
           unit: percentage
-  - level: "red5"
+  - level: 'red5'
     buffs:
       - attribute: Attack
         targetedType: Mounted Troops
