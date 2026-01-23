@@ -20,7 +20,6 @@ div#nav ul.spectrum-TreeView {
 
   /* Remove any gap property from the list itself */
   gap: 0;
-  row-gap: 0;
 }
 
 span.spectrum-TreeView-itemLabel iconify-icon {
