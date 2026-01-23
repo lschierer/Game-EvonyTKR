@@ -1,0 +1,54 @@
+/* Navigation Tree Visibility Rules */
+
+.spectrum-TreeView iconify-icon {
+  font-size: inherit;
+}
+
+/* Hide items that shouldn't be visible in current context */
+.spectrum-TreeView-item.nav-hidden {
+  display: none;
+}
+
+/* Hide collapsed child groups */
+.spectrum-TreeView.nav-collapsed {
+  display: none !important;
+}
+
+div#nav ul.spectrum-TreeView {
+  /* should match div#nav in global.css */
+  max-inline-size: max(250px, 20vw);
+
+  /* Remove any gap property from the list itself */
+  gap: 0;
+  row-gap: 0;
+}
+
+span.spectrum-TreeView-itemLabel iconify-icon {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.25em;
+}
+
+/* Constrain the chevron icon height to prevent it from expanding the list item */
+.spectrum-TreeView-itemIndicator {
+  height: 0.75em !important;
+  display: inline-block;
+}
+
+/* Reduce spacing between tree items using Spectrum CSS custom properties */
+.spectrum-TreeView--sizeM {
+  --mod-treeview-item-min-block-size: 24px;
+}
+
+/* Ensure line-height doesn't add extra space */
+.spectrum-TreeView-itemLink {
+  line-height: 1.2;
+}
+
+/* Remove any extra spacing from list items - this eliminates the gap between items */
+.spectrum-TreeView-item {
+  line-height: 1;
+  margin: 0 !important;
+  padding: 0 !important;
+}
