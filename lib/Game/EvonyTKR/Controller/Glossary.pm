@@ -70,7 +70,6 @@ sub index ($self, $ctx) {
     linkBase          => $base,
     title             => 'Glossary of Terms',
     current_year      => (localtime)[5] + 1900,
-    css_files         => ['/css/glossary.css'],
     sidebar           => 1,
     navigation        => $self->render_navigation($ctx->req->path),
     site_logo         => $self->site_logo(),

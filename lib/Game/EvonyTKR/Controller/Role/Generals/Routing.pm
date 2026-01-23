@@ -39,6 +39,9 @@ sub get_routes_for_uiTarget ($c, $uiTarget) {
   my @results;
   #my $slug = $c->_slugify($uiTarget);
   #$c->logger->debug("slug for $uiTarget is $slug");
+  if($uiTarget =~ /(?:wall|mayor)/i ){
+    push @results, $c->validRoutes->{$uiTarget};
+  } else {
   foreach my $key (keys $c->validRoutes->%*) {
     if ($key =~ /^$uiTarget/) {
       $c->logger->debug("'$key' =~ '$uiTarget' -- good")
@@ -50,6 +53,8 @@ sub get_routes_for_uiTarget ($c, $uiTarget) {
         if $c->app->env eq 'development';
     }
   }
+  }
+
   $c->logger->debug(sprintf(
     'there are %s routes for ui target "%s"',
     scalar(@results), $uiTarget
