@@ -25,9 +25,20 @@ map \$http_user_agent \$limit_key {
   ~*bingbot                         "";                      # Bing gets a pass
 }
 
-limit_req_zone \$limit_key zone=anti_hammer:10m rate=10r/s;        # Raised from 5r/s
-limit_req_zone \$limit_key zone=generals_heavy:10m rate=3r/s;      # Raised from 1r/s
+limit_req_zone \$limit_key zone=anti_hammer:10m rate=100r/s;        # Increased for link checker
+limit_req_zone \$limit_key zone=generals_heavy:10m rate=50r/s;      # Increased for link checker
 limit_req_zone \$binary_remote_addr zone=security_scan:10m rate=1r/m;  # New: block scanners
+
+# Bypass rate limits for trusted bots
+geo \$bypass_rate_limit {
+  default 0;
+}
+map \$http_user_agent \$bypass_rate_limit {
+  default 0;
+  ~*LinkChecker 1;
+  ~*Googlebot 1;
+  ~*bingbot 1;
+}
 
 server {
   listen 443 ssl;
