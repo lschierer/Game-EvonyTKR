@@ -123,6 +123,9 @@ package Game::EvonyTKR::Controller::Generals {
     );
 
     foreach my $generalType (@general_types) {
+      # Skip officer (Duty Specialists) until tables are implemented
+      next if $generalType eq 'officer';
+
       my $ui_target = $self->_ui_target_name($generalType);
       my $route     = "$base/$ui_target";
       $self->add_navigation_route($route, $ui_target,
@@ -144,9 +147,25 @@ package Game::EvonyTKR::Controller::Generals {
       ));
 
       # Activation index (shows single/pair choice or redirects)
+      # Apply same validation rules as get_valid_routes in Role::Generals::Routing
       foreach my $buffActivation ($self->AllowedBuffActivationValues->@*) {
         my $br = "$route/$buffActivation";
-        next if ($ui_target =~ /mayor/i && $buffActivation !~ /mayor/i);
+
+        # Officer buffActivation only valid for officer general type
+        next if $buffActivation eq 'Officer' && $generalType ne 'officer';
+
+        # Mayor buffActivation only valid for mayor general type
+        next if $buffActivation eq 'Mayor' && $generalType ne 'mayor';
+
+        # Overall/PvM/Attacking/Out City only valid for troop specialists
+        next
+          if $buffActivation =~ /(?:Overall|PvM|Attacking|Out City)/
+          && $generalType !~ /(?:ground|mounted|ranged|siege)/;
+
+        # Reinforcing/Defense/In City/Wall not valid for mayor/officer
+        next
+          if $buffActivation =~ /(?:Reinforcing|Defense|In City|Wall)/
+          && $generalType =~ /(?:mayor|officer)/;
 
         $self->add_navigation_route(
           $br,
