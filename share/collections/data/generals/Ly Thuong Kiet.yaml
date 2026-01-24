@@ -1,17 +1,17 @@
-ascending: 'true'
+ascending: 1
 basic_attributes:
   attack:
     base: 107
-    increment: 0
+    increment: 8.29
   defense:
     base: 115
-    increment: 0
+    increment: 8.63
   leadership:
     base: 103
-    increment: 0
+    increment: 8.83
   politics:
     base: 105
-    increment: 0
+    increment: 7.83
 book: Vietnamese Warrior
 name: Ly Thuong Kiet
 specialties:

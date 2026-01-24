@@ -2,16 +2,16 @@ ascending: 1
 basic_attributes:
   attack:
     base: 105
-    increment: 0
+    increment: 8.57
   defense:
     base: 118
-    increment: 0
+    increment: 8.56
   leadership:
     base: 111
-    increment: 0
+    increment: 8.92
   politics:
     base: 101
-    increment: 0
+    increment: 8.48
 book: Ocean Squadrons
 name: George Dewey
 specialties:

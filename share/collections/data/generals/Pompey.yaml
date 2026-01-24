@@ -2,16 +2,16 @@ ascending: 'true'
 basic_attributes:
   attack:
     base: 102
-    increment: 0
+    increment: 7.77
   defense:
     base: 101
-    increment: 0
+    increment: 8.33
   leadership:
     base: 119
-    increment: 0
+    increment: 9.41
   politics:
     base: 111
-    increment: 0
+    increment: 8.74
 book: Roman Consul
 name: Pompey
 specialties:

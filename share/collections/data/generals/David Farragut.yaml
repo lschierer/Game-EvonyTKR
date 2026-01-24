@@ -2,16 +2,16 @@ ascending: 1
 basic_attributes:
   attack:
     base: 114
-    increment: 0
+    increment: 8.79
   defense:
     base: 117
-    increment: 0
+    increment: 8.89
   leadership:
     base: 119
-    increment: 0
+    increment: 9.25
   politics:
     base: 110
-    increment: 0
+    increment: 8.35
 book: Hero of the Union Navy
 name: David Farragut
 specialties:

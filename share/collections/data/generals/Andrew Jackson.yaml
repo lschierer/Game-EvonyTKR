@@ -2,16 +2,16 @@ ascending: true
 basic_attributes:
   leadership:
     base: 116
-    increment: 0
+    increment: 8.74
   attack:
     base: 102
-    increment: 0
+    increment: 8.13
   defense:
-    base: 102
-    increment: 0
+    base: 103
+    increment: 8.42
   politics:
     base: 116
-    increment: 0
+    increment: 8.55
 book: Old Hickory
 specialties:
   - Ranged Troop Assault

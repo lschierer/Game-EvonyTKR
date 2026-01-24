@@ -2,16 +2,16 @@ ascending: 'true'
 basic_attributes:
   attack:
     base: 117
-    increment: 0
+    increment: 8.99
   defense:
     base: 114
-    increment: 0
+    increment: 8.79
   leadership:
     base: 117
-    increment: 0
+    increment: 8.88
   politics:
     base: 109
-    increment: 0
+    increment: 8.65
 book: Mapuche Leader
 name: Lautaro
 specialties:

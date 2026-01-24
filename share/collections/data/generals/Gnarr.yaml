@@ -3,16 +3,16 @@ ascending: 'true'
 basic_attributes:
   attack:
     base: 113
-    increment: 0
+    increment: 8.69
   defense:
     base: 112
-    increment: 0
+    increment: 8.84
   leadership:
     base: 112
-    increment: 0
+    increment: 9.21
   politics:
     base: 108
-    increment: 0
+    increment: 8.48
 book: Nordic Hammer
 name: Gnarr
 specialties:

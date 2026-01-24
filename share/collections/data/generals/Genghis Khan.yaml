@@ -2,16 +2,16 @@ ascending: 'true'
 basic_attributes:
   attack:
     base: 105
-    increment: 0
+    increment: 7.91
   defense:
     base: 110
-    increment: 0
+    increment: 8.66
   leadership:
     base: 118
-    increment: 0
+    increment: 9.03
   politics:
     base: 113
-    increment: 0
+    increment: 8.91
 book: The Great Khan
 name: Genghis Khan
 specialties:

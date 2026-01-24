@@ -2,16 +2,16 @@ ascending: true
 basic_attributes:
   leadership:
     base: 113
-    increment: 0
+    increment: 8.75
   attack:
     base: 126
-    increment: 0
+    increment: 9.01
   defense:
     base: 119
-    increment: 0
+    increment: 8.88
   politics:
     base: 113
-    increment: 0
+    increment: 8.75
 book: Queen of Gimle
 specialties:
   - Siege Machine Formation

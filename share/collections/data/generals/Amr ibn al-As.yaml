@@ -2,16 +2,16 @@ ascending: true
 basic_attributes:
   leadership:
     base: 113
-    increment: 0
+    increment: 9.12
   attack:
     base: 106
-    increment: 0
+    increment: 8.45
   defense:
     base: 107
-    increment: 0
+    increment: 8.48
   politics:
     base: 118
-    increment: 0
+    increment: 9.23
 book: Military-political Genius
 specialties:
   - Ground Troop Assault

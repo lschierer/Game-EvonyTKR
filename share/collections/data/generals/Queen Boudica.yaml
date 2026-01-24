@@ -2,16 +2,16 @@ ascending: 'true'
 basic_attributes:
   attack:
     base: 109
-    increment: 0
+    increment: 8.65
   defense:
     base: 109
-    increment: 0
+    increment: 8.45
   leadership:
     base: 108
-    increment: 0
+    increment: 8.84
   politics:
     base: 115
-    increment: 0
+    increment: 8.65
 book: Rebel Leader
 name: Queen Boudica
 specialties:
