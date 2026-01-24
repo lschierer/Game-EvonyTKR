@@ -96,6 +96,8 @@ mkdir -p share/public/types
 
 export NODE_OPTIONS=--max_old_space_size=2560; pnpm tsx ./scripts/build-ts.ts
 
+pip install -e scripts
+
 pnpm config set childConcurrency 2
 
 perl Build.PL
@@ -103,6 +105,12 @@ perl Build.PL
 ./Build manifest
 perl ./scripts/update_git_meta.pl
 ./Build
+
+perl bin/extract_conflict_features.pl --mode=training --output=training_data.csv
+python bin/train_conflict_model.py   --training=training_data.csv   --model=conflict_model.pkl   --importance=feature_importance.csv
+perl bin/extract_conflict_features.pl --mode=predict --output=all_pairs.csv
+python bin/predict_conflicts.py   --model=conflict_model.pkl   --pairs=all_pairs.csv   --output=conflicts.json
+
 
 # Start the application service now that build is complete
 sudo systemctl start evonytkr
