@@ -61,7 +61,11 @@ export class CustomUbuntuUserData {
     const local_etc_path = '/tmp/prefix_etc.zip';
     const local_ssh_keys_path = '/tmp/authorized_keys';
 
-    const hostprefix = props.environment === 'prod' ? 'www' : props.environment;
+    // Full domain for cert (no prefix for prod, prefix.domain for others)
+    const certDomain =
+      props.environment === 'prod'
+        ? 'evonytkrtips.net'
+        : `${props.environment}.evonytkrtips.net`;
 
     this.init = ec2.CloudFormationInit.fromConfigSets({
       configSets: {
@@ -277,7 +281,7 @@ export class CustomUbuntuUserData {
           ),
 
           ec2.InitCommand.shellCommand(
-            `sed -i -E 's/REPLACE2/${hostprefix}/' /opt/prefix/bin/setup-cert.sh`,
+            `sed -i -E 's/REPLACE_DOMAIN/${certDomain}/' /opt/prefix/bin/setup-cert.sh`,
           ),
           ec2.InitCommand.shellCommand(
             'cp /opt/prefix/bin/setup-cert.sh /usr/local/bin',

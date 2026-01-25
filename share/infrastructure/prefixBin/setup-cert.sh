@@ -43,7 +43,7 @@ ATTEMPT=1
 while [ $ATTEMPT -le 5 ]; do
   echo "Attempt $ATTEMPT/5: Running certbot"
   
-  DOMAIN2=$(echo "REPLACE2.evonytkrtips.net")
+  DOMAIN2="REPLACE_DOMAIN"
   if certbot certonly --nginx -m 'staff@schierer.org' --agree-tos -d "${H}.evonytkrtips.net" -d "${DOMAIN2}" -d "www.${DOMAIN2}" --non-interactive; then
     # Only replace certs if certbot succeeded
     rm -f /etc/nginx/ssl/evonytkrtips.net.key /etc/nginx/ssl/evonytkrtips.net.crt
