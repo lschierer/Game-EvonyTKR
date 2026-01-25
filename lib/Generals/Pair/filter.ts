@@ -74,7 +74,8 @@ export class PairFilter extends LitElement {
   override connectedCallback(): void {
     super.connectedCallback();
     // Look for pair-data as descendant first, then via state-manager ancestor
-    const qr = this.querySelector('pair-data') ??
+    const qr =
+      this.querySelector('pair-data') ??
       this.closest('state-manager')?.querySelector('pair-data');
     if (qr) {
       if (DEBUG) {
@@ -89,6 +90,8 @@ export class PairFilter extends LitElement {
               this.data.ascendingLevel,
               this.data.primaryCovenantLevel,
               this.data.primarySpecialties.store,
+              this.data.generalLevel,
+              this.data.victoryColumnLevel,
             ]
           : [
               this.data.secondaryCovenantLevel,
@@ -102,6 +105,8 @@ export class PairFilter extends LitElement {
         this.data.ascendingLevel.subscribe(() => this.requestUpdate());
         this.data.primaryCovenantLevel.subscribe(() => this.requestUpdate());
         this.data.primarySpecialties.subscribe(() => this.requestUpdate());
+        this.data.generalLevel.subscribe(() => this.requestUpdate());
+        this.data.victoryColumnLevel.subscribe(() => this.requestUpdate());
       } else {
         this.data.secondaryCovenantLevel.subscribe(() => this.requestUpdate());
         this.data.secondarySpecialties.subscribe(() => this.requestUpdate());
@@ -304,6 +309,94 @@ export class PairFilter extends LitElement {
     `;
   };
 
+  protected generalLevelUpdate = (e: Event) => {
+    const target = e.target as HTMLSelectElement;
+    if (!this.data) {
+      if (DEBUG) {
+        console.log('data undefined');
+      }
+      return;
+    }
+    this.data.generalLevel.setState(parseInt(target.value, 10));
+  };
+
+  protected renderGeneralLevelCombo = () => {
+    if (!this.is_primary || !this.data) return html``;
+
+    const options = [];
+    for (let i = 25; i <= 50; i++) {
+      const selected = this.data.generalLevel.state === i;
+      options.push(html`
+        <option value="${i}" ?selected=${selected}>${i}</option>
+      `);
+    }
+
+    return html`
+      <div class="spectrum-Form-item">
+        <label
+          for="generalLevel"
+          class="spectrum-FieldLabel spectrum-FieldLabel--sizeM"
+        >
+          General Level:
+        </label>
+        <div class="spectrum-Form-itemField">
+          <select
+            id="generalLevel"
+            name="generalLevel"
+            class="spectrum-Picker spectrum-Picker--sizeM"
+            @change="${this.generalLevelUpdate}"
+          >
+            ${options}
+          </select>
+        </div>
+      </div>
+    `;
+  };
+
+  protected victoryColumnLevelUpdate = (e: Event) => {
+    const target = e.target as HTMLSelectElement;
+    if (!this.data) {
+      if (DEBUG) {
+        console.log('data undefined');
+      }
+      return;
+    }
+    this.data.victoryColumnLevel.setState(parseInt(target.value, 10));
+  };
+
+  protected renderVictoryColumnCombo = () => {
+    if (!this.is_primary || !this.data) return html``;
+
+    const options = [];
+    for (let i = 0; i <= 11; i++) {
+      const selected = this.data.victoryColumnLevel.state === i;
+      options.push(html`
+        <option value="${i}" ?selected=${selected}>${i}</option>
+      `);
+    }
+
+    return html`
+      <div class="spectrum-Form-item">
+        <label
+          for="victoryColumnLevel"
+          class="spectrum-FieldLabel spectrum-FieldLabel--sizeM"
+        >
+          Victory Column:
+        </label>
+        <div class="spectrum-Form-itemField">
+          <select
+            id="victoryColumnLevel"
+            name="victoryColumnLevel"
+            class="spectrum-Picker spectrum-Picker--sizeM"
+            @change="${this.victoryColumnLevelUpdate}"
+          >
+            ${options}
+          </select>
+        </div>
+      </div>
+    `;
+  };
+
   private UrlParamHandler = () => {
     if (!this.data) return;
     const S = this.is_primary
@@ -320,6 +413,18 @@ export class PairFilter extends LitElement {
             key: 'primaryCovenantLevel',
             get: () => this.data!.primaryCovenantLevel.state,
             set: (v: string) => this.data!.primaryCovenantLevel.setState(v),
+          },
+          {
+            key: 'generalLevel',
+            get: () => String(this.data!.generalLevel.state),
+            set: (v: string) =>
+              this.data!.generalLevel.setState(parseInt(v, 10) || 40),
+          },
+          {
+            key: 'victoryColumnLevel',
+            get: () => String(this.data!.victoryColumnLevel.state),
+            set: (v: string) =>
+              this.data!.victoryColumnLevel.setState(parseInt(v, 10) || 0),
           },
           {
             key: 'primarySpecialty1',
@@ -382,6 +487,7 @@ export class PairFilter extends LitElement {
             id="settings-form"
             class="spectrum-Form spectrum-Form--labelsAbove spectrum-Form--sizeM"
           >
+            ${this.renderGeneralLevelCombo()} ${this.renderVictoryColumnCombo()}
             ${this.renderAscendingCombo()} ${this.renderCovenantCombo()}
             ${this.renderSpecialtyCombos()}
           </form>

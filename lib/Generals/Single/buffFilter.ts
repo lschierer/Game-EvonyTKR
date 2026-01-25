@@ -86,6 +86,8 @@ export class BuffFilter extends LitElement {
           this.data.ascendingLevel,
           this.data.covenantLevel,
           this.data.specialties.store,
+          this.data.generalLevel,
+          this.data.victoryColumnLevel,
         ];
 
         this.binder.attach(watch);
@@ -93,6 +95,8 @@ export class BuffFilter extends LitElement {
 
       if (this.is_primary) {
         this.data.ascendingLevel.subscribe(() => this.requestUpdate());
+        this.data.generalLevel.subscribe(() => this.requestUpdate());
+        this.data.victoryColumnLevel.subscribe(() => this.requestUpdate());
       }
       this.data.covenantLevel.subscribe(() => this.requestUpdate());
       this.data.specialties.subscribe(() => this.requestUpdate());
@@ -283,6 +287,94 @@ export class BuffFilter extends LitElement {
     `;
   };
 
+  protected generalLevelUpdate = (e: Event) => {
+    const target = e.target as HTMLSelectElement;
+    if (!this.data) {
+      if (DEBUG) {
+        console.log('data undefined');
+      }
+      return;
+    }
+    this.data.generalLevel.setState(parseInt(target.value, 10));
+  };
+
+  protected renderGeneralLevelCombo = () => {
+    if (!this.is_primary || !this.data) return html``;
+
+    const options = [];
+    for (let i = 25; i <= 50; i++) {
+      const selected = this.data.generalLevel.state === i;
+      options.push(html`
+        <option value="${i}" ?selected=${selected}>${i}</option>
+      `);
+    }
+
+    return html`
+      <div class="spectrum-Form-item">
+        <label
+          for="generalLevel"
+          class="spectrum-FieldLabel spectrum-FieldLabel--sizeM"
+        >
+          General Level:
+        </label>
+        <div class="spectrum-Form-itemField">
+          <select
+            id="generalLevel"
+            name="generalLevel"
+            class="spectrum-Picker spectrum-Picker--sizeM"
+            @change="${this.generalLevelUpdate}"
+          >
+            ${options}
+          </select>
+        </div>
+      </div>
+    `;
+  };
+
+  protected victoryColumnLevelUpdate = (e: Event) => {
+    const target = e.target as HTMLSelectElement;
+    if (!this.data) {
+      if (DEBUG) {
+        console.log('data undefined');
+      }
+      return;
+    }
+    this.data.victoryColumnLevel.setState(parseInt(target.value, 10));
+  };
+
+  protected renderVictoryColumnCombo = () => {
+    if (!this.is_primary || !this.data) return html``;
+
+    const options = [];
+    for (let i = 0; i <= 11; i++) {
+      const selected = this.data.victoryColumnLevel.state === i;
+      options.push(html`
+        <option value="${i}" ?selected=${selected}>${i}</option>
+      `);
+    }
+
+    return html`
+      <div class="spectrum-Form-item">
+        <label
+          for="victoryColumnLevel"
+          class="spectrum-FieldLabel spectrum-FieldLabel--sizeM"
+        >
+          Victory Column:
+        </label>
+        <div class="spectrum-Form-itemField">
+          <select
+            id="victoryColumnLevel"
+            name="victoryColumnLevel"
+            class="spectrum-Picker spectrum-Picker--sizeM"
+            @change="${this.victoryColumnLevelUpdate}"
+          >
+            ${options}
+          </select>
+        </div>
+      </div>
+    `;
+  };
+
   private UrlParamHandler = () => {
     if (!this.data) return;
     const S = this.data.specialties;
@@ -296,6 +388,16 @@ export class BuffFilter extends LitElement {
         key: 'covenantLevel',
         get: () => this.data!.covenantLevel.state,
         set: (v: string) => this.data!.covenantLevel.setState(v),
+      },
+      {
+        key: 'generalLevel',
+        get: () => String(this.data!.generalLevel.state),
+        set: (v: string) => this.data!.generalLevel.setState(parseInt(v, 10) || 40),
+      },
+      {
+        key: 'victoryColumnLevel',
+        get: () => String(this.data!.victoryColumnLevel.state),
+        set: (v: string) => this.data!.victoryColumnLevel.setState(parseInt(v, 10) || 0),
       },
       {
         key: 'specialty1',
@@ -331,7 +433,9 @@ export class BuffFilter extends LitElement {
           class="spectrum-Form spectrum-Form--labelsAbove spectrum-Form--sizeM"
         >
           ${this.is_primary ? this.renderAscendingCombo() : ''}
-          ${this.renderCovenantCombo()} ${this.renderSpecialtyCombos()}
+          ${this.renderCovenantCombo()}
+          ${this.renderGeneralLevelCombo()} ${this.renderVictoryColumnCombo()}
+          ${this.renderSpecialtyCombos()}
         </form>
       </div>
       <slot></slot>

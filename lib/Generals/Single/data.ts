@@ -76,6 +76,36 @@ export class SingleData extends LitElement {
   buffFilter: PrimaryFilterStore = new PrimaryFilterStore();
 
   @property({ attribute: false })
+  public generalLevel = new Store(40, {
+    onUpdate: () => {
+      const level = this.generalLevel.state;
+      if (level < 25 || level > 50) {
+        if (DEBUG) {
+          console.error('invalid general level', level);
+        }
+        this.generalLevel.setState(this.generalLevel.prevState);
+      } else if (DEBUG) {
+        console.log(`general level validated at ${level}`);
+      }
+    },
+  });
+
+  @property({ attribute: false })
+  public victoryColumnLevel = new Store(0, {
+    onUpdate: () => {
+      const level = this.victoryColumnLevel.state;
+      if (level < 0 || level > 11) {
+        if (DEBUG) {
+          console.error('invalid victory column level', level);
+        }
+        this.victoryColumnLevel.setState(this.victoryColumnLevel.prevState);
+      } else if (DEBUG) {
+        console.log(`victory column level validated at ${level}`);
+      }
+    },
+  });
+
+  @property({ attribute: false })
   public queryParams = new Store<URLSearchParams>(new URLSearchParams());
 
   connectedCallback(): void {
@@ -96,6 +126,14 @@ export class SingleData extends LitElement {
       this.updateFilterParams();
       this.requestUpdate();
     });
+    this.generalLevel.subscribe(() => {
+      this.updateFilterParams();
+      this.requestUpdate();
+    });
+    this.victoryColumnLevel.subscribe(() => {
+      this.updateFilterParams();
+      this.requestUpdate();
+    });
 
     this.generalStore.subscribe(() => this.requestUpdate());
     this.buffFilter.subscribe(() => this.requestUpdate());
@@ -105,6 +143,8 @@ export class SingleData extends LitElement {
     const params = this.queryParams.state;
     params.set('ascendingLevel', this.ascendingLevel.state);
     params.set('covenantLevel', this.covenantLevel.state);
+    params.set('generalLevel', String(this.generalLevel.state));
+    params.set('victoryColumnLevel', String(this.victoryColumnLevel.state));
     params.set('specialty1', this.specialties.store.state.s1);
     params.set('specialty2', this.specialties.store.state.s2);
     params.set('specialty3', this.specialties.store.state.s3);

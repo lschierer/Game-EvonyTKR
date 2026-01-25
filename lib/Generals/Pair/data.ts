@@ -100,6 +100,36 @@ export class PairData extends LitElement {
   primaryFilter: PrimaryFilterStore = new PrimaryFilterStore();
 
   @property({ attribute: false })
+  public generalLevel = new Store(40, {
+    onUpdate: () => {
+      const level = this.generalLevel.state;
+      if (level < 25 || level > 50) {
+        if (DEBUG) {
+          console.error('invalid general level', level);
+        }
+        this.generalLevel.setState(this.generalLevel.prevState);
+      } else if (DEBUG) {
+        console.log(`general level validated at ${level}`);
+      }
+    },
+  });
+
+  @property({ attribute: false })
+  public victoryColumnLevel = new Store(0, {
+    onUpdate: () => {
+      const level = this.victoryColumnLevel.state;
+      if (level < 0 || level > 11) {
+        if (DEBUG) {
+          console.error('invalid victory column level', level);
+        }
+        this.victoryColumnLevel.setState(this.victoryColumnLevel.prevState);
+      } else if (DEBUG) {
+        console.log(`victory column level validated at ${level}`);
+      }
+    },
+  });
+
+  @property({ attribute: false })
   public queryParams = new Store<URLSearchParams>(new URLSearchParams());
 
   connectedCallback(): void {
@@ -127,6 +157,14 @@ export class PairData extends LitElement {
       this.updateFilterParams();
       this.requestUpdate();
     });
+    this.generalLevel.subscribe(() => {
+      this.updateFilterParams();
+      this.requestUpdate();
+    });
+    this.victoryColumnLevel.subscribe(() => {
+      this.updateFilterParams();
+      this.requestUpdate();
+    });
     this.pairStore.subscribe(() => this.requestUpdate());
     this.primaryFilter.subscribe(() => this.requestUpdate());
   }
@@ -136,6 +174,8 @@ export class PairData extends LitElement {
     params.set('ascendingLevel', this.ascendingLevel.state);
     params.set('primaryCovenantLevel', this.primaryCovenantLevel.state);
     params.set('secondaryCovenantLevel', this.primaryCovenantLevel.state);
+    params.set('generalLevel', String(this.generalLevel.state));
+    params.set('victoryColumnLevel', String(this.victoryColumnLevel.state));
     params.set('primarySpecialty1', this.primarySpecialties.store.state.s1);
     params.set('primarySpecialty2', this.primarySpecialties.store.state.s2);
     params.set('primarySpecialty3', this.primarySpecialties.store.state.s3);

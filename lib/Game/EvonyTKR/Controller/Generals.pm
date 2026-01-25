@@ -31,8 +31,11 @@ package Game::EvonyTKR::Controller::Generals {
     is      => 'ro',
     lazy    => 1,
     default => sub ($self) {
-      return Game::EvonyTKR::Service::PDL::Runtime->new(
+      my $runtime = Game::EvonyTKR::Service::PDL::Runtime->new(
         data_dir => 'share/collections/data');
+      # Inject generals_loader for basic attribute calculations
+      $runtime->generals_loader($self->generals_loader);
+      return $runtime;
     },
   );
 
@@ -829,6 +832,14 @@ package Game::EvonyTKR::Controller::Generals {
     my @specialties =
       map { $ctx->req->query_param("specialty$_") // 'gold' } (1 .. 4);
 
+    # Extract basic attribute filter parameters
+    my $generalLevel = $ctx->req->query_param('generalLevel') // 40;
+    my $victoryColumnLevel = $ctx->req->query_param('victoryColumnLevel') // 0;
+
+    # Validate ranges
+    $generalLevel = 40 unless ($generalLevel >= 25 && $generalLevel <= 50);
+    $victoryColumnLevel = 0 unless ($victoryColumnLevel >= 0 && $victoryColumnLevel <= 11);
+
     # Validate filter parameters
     my $data_model = Game::EvonyTKR::Model::Data->new;
     unless ($data_model->checkAscendingLevel($ascendingLevel)) {
@@ -841,13 +852,15 @@ package Game::EvonyTKR::Controller::Generals {
 
     # Build filter object for PDL Runtime
     my $filters = {
-      ascendingLevel => $ascendingLevel,
-      covenantLevel  => $covenantLevel,
-      specialty1     => $specialties[0],
-      specialty2     => $specialties[1],
-      specialty3     => $specialties[2],
-      specialty4     => $specialties[3],
-      generic1       => 'level4',
+      ascendingLevel     => $ascendingLevel,
+      covenantLevel      => $covenantLevel,
+      generalLevel       => $generalLevel,
+      victoryColumnLevel => $victoryColumnLevel,
+      specialty1         => $specialties[0],
+      specialty2         => $specialties[1],
+      specialty3         => $specialties[2],
+      specialty4         => $specialties[3],
+      generic1           => 'level4',
     };
 
     $self->logger->debug(sprintf(

@@ -33,8 +33,11 @@ package Game::EvonyTKR::Controller::Pairs {
     is      => 'ro',
     lazy    => 1,
     default => sub ($self) {
-      return Game::EvonyTKR::Service::PDL::Runtime->new(
+      my $runtime = Game::EvonyTKR::Service::PDL::Runtime->new(
         data_dir => 'share/collections/data');
+      # Inject generals_loader for basic attribute calculations
+      $runtime->generals_loader($self->generals_loader);
+      return $runtime;
     },
   );
 
@@ -481,6 +484,14 @@ qr/(?:ground_specialist|mounted_specialist|ranged_specialist|siege_specialist|ma
     my @secondarySpecialties =
       map { $ctx->req->query_param("secondarySpecialty$_") // 'gold' } (1 .. 4);
 
+    # Extract basic attribute filter parameters
+    my $generalLevel = $ctx->req->query_param('generalLevel') // 40;
+    my $victoryColumnLevel = $ctx->req->query_param('victoryColumnLevel') // 0;
+
+    # Validate ranges
+    $generalLevel = 40 unless ($generalLevel >= 25 && $generalLevel <= 50);
+    $victoryColumnLevel = 0 unless ($victoryColumnLevel >= 0 && $victoryColumnLevel <= 11);
+
     # Validate filter parameters
     my $data_model = Game::EvonyTKR::Model::Data->new;
     unless ($data_model->checkAscendingLevel($ascendingLevel)) {
@@ -499,23 +510,27 @@ qr/(?:ground_specialist|mounted_specialist|ranged_specialist|siege_specialist|ma
 
     # Build filter objects for PDL Runtime
     my $primary_filters = {
-      ascendingLevel => $ascendingLevel,
-      covenantLevel  => $primaryCovenantLevel,
-      specialty1     => $primarySpecialties[0],
-      specialty2     => $primarySpecialties[1],
-      specialty3     => $primarySpecialties[2],
-      specialty4     => $primarySpecialties[3],
-      generic1       => 'level4',
+      ascendingLevel     => $ascendingLevel,
+      covenantLevel      => $primaryCovenantLevel,
+      generalLevel       => $generalLevel,
+      victoryColumnLevel => $victoryColumnLevel,
+      specialty1         => $primarySpecialties[0],
+      specialty2         => $primarySpecialties[1],
+      specialty3         => $primarySpecialties[2],
+      specialty4         => $primarySpecialties[3],
+      generic1           => 'level4',
     };
 
     my $secondary_filters = {
-      ascendingLevel => $ascendingLevel,
-      covenantLevel  => $secondaryCovenantLevel,
-      specialty1     => $secondarySpecialties[0],
-      specialty2     => $secondarySpecialties[1],
-      specialty3     => $secondarySpecialties[2],
-      specialty4     => $secondarySpecialties[3],
-      generic1       => 'level4',
+      ascendingLevel     => $ascendingLevel,
+      covenantLevel      => $secondaryCovenantLevel,
+      generalLevel       => $generalLevel,
+      victoryColumnLevel => $victoryColumnLevel,
+      specialty1         => $secondarySpecialties[0],
+      specialty2         => $secondarySpecialties[1],
+      specialty3         => $secondarySpecialties[2],
+      specialty4         => $secondarySpecialties[3],
+      generic1           => 'level4',
     };
 
     $self->logger->debug(sprintf(
