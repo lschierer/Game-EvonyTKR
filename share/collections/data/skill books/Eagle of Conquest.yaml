@@ -1,0 +1,28 @@
+name: Eagle of Conquest
+text: >-
+  Increases ground troops' attack, defense and HP by 5% and ground troops' training speed by 20% when General is the Barracks Officer.
+buffs:
+  - attribute: Attack
+    troop: Ground Troops
+    conditions:
+      - When Appointed as Barracks Officer
+    value:
+      number: 5
+  - attribute: Defense
+    troop: Ground Troops
+    conditions:
+      - When Appointed as Barracks Officer
+    value:
+      number: 5
+  - attribute: HP
+    troop: Ground Troops
+    conditions:
+      - When Appointed as Barracks Officer
+    value:
+      number: 5
+  - attribute: Training Speed
+    troop: Ground Troops
+    condition:
+      - When Appointed as Barracks Officer
+    value:
+      number: 20
