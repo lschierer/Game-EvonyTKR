@@ -61,8 +61,7 @@ export class CustomUbuntuUserData {
     const local_etc_path = '/tmp/prefix_etc.zip';
     const local_ssh_keys_path = '/tmp/authorized_keys';
 
-    const hostprefix =
-      props.environment === 'prod' ? 'production' : props.environment;
+    const hostprefix = props.environment === 'prod' ? 'www' : props.environment;
 
     this.init = ec2.CloudFormationInit.fromConfigSets({
       configSets: {

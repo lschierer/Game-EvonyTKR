@@ -64,7 +64,7 @@ deploy-dev: build
     pnpm cdk --profile personal deploy --context env=dev evonytkrtips-dev-stack2
 
 deploy-prod: build
-    pnpm cdk --profile personal deploy --context env=prod
+    pnpm cdk --profile personal deploy --context env=prod evonytkrtips-prod-stack2
 
 [working-directory('share/infrastructure')]
 dev-image: build
