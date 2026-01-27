@@ -18,10 +18,7 @@ sub _getGenericBookValue_impl ($self, $attribute, $troopType) {
   if ($attribute eq 'March Size') {
     state $books_helper;
     $books_helper //= do {
-      my $helper = eval {
-        Game::EvonyTKR::Model::Base->new->with_roles(
-          'Game::EvonyTKR::Role::Persistence',);
-      };
+      my $helper = eval { Game::EvonyTKR::Model::Base->new; };
       if ($@) {
         $self->logger->error("Cannot create books helper: $@");
         return $total;
@@ -58,9 +55,7 @@ sub _getGenericBookValue_impl ($self, $attribute, $troopType) {
   $books_helper //= do {
     my $helper = eval {
       Game::EvonyTKR::Model::Base->new->with_roles(
-        'Game::EvonyTKR::Role::Persistence',
-        'Game::EvonyTKR::Role::Constants::Books',
-      );
+        'Game::EvonyTKR::Role::Constants::Books',);
     };
     if ($@) {
       $self->logger->error("Cannot create books helper: $@");

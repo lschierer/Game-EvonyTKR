@@ -4,7 +4,6 @@ use utf8::all;
 use Mojo::Base -base,                                            -signatures;
 use Mojo::Base 'WebFramework::Role::Logger',                     -role;
 use Mojo::Base 'Game::EvonyTKR::Role::Common',                   -role;
-use Mojo::Base 'Game::EvonyTKR::Role::Persistence::Pairs',       -role;
 use Mojo::Base 'Game::EvonyTKR::Role::Constants::BuffConstants', -role;
 with 'Game::EvonyTKR::Role::Constants::GeneralConstants';
 
@@ -25,7 +24,6 @@ has asst_has_dragon   => 0;
 has asst_has_spirit   => 0;
 #TODO -- toggle on WALL buffs.
 has allow_wall_buffs => 1;
-has persistence      => undef;    # Set via load_from_persistence()
 
 # Output caches
 has ProcessedGenerals       => sub { {} };
@@ -58,7 +56,7 @@ has TRIADS => sub { {
 sub are_generals_compatible ($self, $g1, $g2) {
   $self->logger->debug(sprintf('testing %s and %s', $g1->name, $g2->name));
 
-  # Check cache first (includes ML predictions loaded from persistence)
+  # Check cache first (includes ML predictions)
   my $cached = $self->_check_cache($g1, $g2);
   if (defined $cached) {
     return $cached == 0
@@ -124,54 +122,28 @@ sub is_general_and_book_compatible ($self, $general, $book, $opts = {}) {
   return $result == 0 ? 1 : 0;
 }
 
-# Load conflict data from persistence layer
-sub load_from_persistence ($self, $persistence) {
-  $self->persistence($persistence);    # Store reference for ML lookups
-
-  my $conflicts = $self->load_all_conflicts();
-
-  if ($conflicts && ref($conflicts) eq 'HASH') {
-    $self->by_general($conflicts);
-    my $count = scalar(keys %$conflicts);
-    $self->logger->debug(
-      "Loaded conflicts for $count generals from persistence");
-  }
-
-  return $self;
-}
-
-# Store new conflict to persistence
-sub store_to_persistence ($self, $persistence, $g1_name, $g2_name, $conflicts) {
-  $persistence->store_conflict($g1_name, $g2_name, $conflicts);
-  return $self;
-}
-
 sub _check_cache ($self, $g1, $g2) {
   my $name1 = $self->assume_g1_is_main ? $g1->name : $g2->name;
   my $name2 = $self->assume_g1_is_main ? $g2->name : $g1->name;
 
-  # Normalize names to match how they're stored in persistence
   my $norm1 = $self->normalize($name1);
   my $norm2 = $self->normalize($name2);
 
   if (exists $self->by_general->{$norm1}{$norm2}) {
     $self->cache_hits($self->cache_hits + 1);
-    return $self->by_general->{$norm1}{$norm2}
-      ;    # Return the conflict status (0 or 1)
+    return $self->by_general->{$norm1}{$norm2};
   }
   return undef;
 }
 
 sub _check_ml_prediction ($self, $g1, $g2) {
- # ML predictions are already loaded into by_general via load_from_persistence()
- # Just check the cache - if it exists, it's an ML prediction
+  # ML predictions are already loaded into by_general
   my $cached = $self->_check_cache($g1, $g2);
 
-  # If found in cache, return it in the expected format
   if (defined $cached) {
     return {
       conflict   => $cached,
-      confidence => 1.0        # No confidence info stored in SQLite
+      confidence => 1.0
     };
   }
 
@@ -179,21 +151,14 @@ sub _check_ml_prediction ($self, $g1, $g2) {
 }
 
 sub _record_conflict ($self, $g1, $g2) {
-  # Normalize names to match how they're stored in persistence
   my $norm1 = $self->normalize($g1->name);
   my $norm2 = $self->normalize($g2->name);
 
   $self->by_general->{$norm1}{$norm2} = 1;
   $self->by_general->{$norm2}{$norm1} = 1;
-
-  # Also store to persistence if available
-  if ($self->persistence) {
-    $self->persistence->store_conflict($norm1, $norm2, 1);
-  }
 }
 
 sub _record_compatible ($self, $g1, $g2) {
-  # Normalize names to match how they're stored in persistence
   my $norm1 = $self->normalize($g1->name);
   my $norm2 = $self->normalize($g2->name);
 
@@ -202,11 +167,6 @@ sub _record_compatible ($self, $g1, $g2) {
 
   $self->by_general->{$norm1}{$norm2} = 0;
   $self->by_general->{$norm2}{$norm1} = 0;
-
-  # Also store to persistence if available
-  if ($self->persistence) {
-    $self->persistence->store_conflict($norm1, $norm2, 0);
-  }
 }
 
 sub _troop_overlap ($self, $g1, $g2) {

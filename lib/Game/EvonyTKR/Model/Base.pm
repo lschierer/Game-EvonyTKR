@@ -9,7 +9,6 @@ use experimental qw(signatures);
 with 'Game::EvonyTKR::Role::JSON';
 with 'Game::EvonyTKR::Role::Common';
 with 'WebFramework::Role::Logger';
-with 'Game::EvonyTKR::Role::Persistence';
 with 'Game::EvonyTKR::Role::Constants::BuffConstants';
 with 'Game::EvonyTKR::Role::Constants::Books';
 with 'Game::EvonyTKR::Role::Books';

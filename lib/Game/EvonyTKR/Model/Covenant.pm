@@ -198,10 +198,7 @@ sub from_hash($class, $object, $primary_general = undef) {
   # Otherwise, look it up using persistence (legacy behavior)
   unless ($primary) {
     state $general_helper //= do {
-      my $helper = eval {
-        Game::EvonyTKR::Model::Base->new->with_roles(
-          'Game::EvonyTKR::Role::Persistence');
-      };
+      my $helper = eval { Game::EvonyTKR::Model::Base->new; };
       if ($@) {
         $logger->error("Cannot create general helper: $@");
         return;
@@ -288,10 +285,7 @@ sub from_wire_hash ($class, $h) {
   }
 
   state $general_helper //= do {
-    my $helper = eval {
-      Game::EvonyTKR::Model::Base->new->with_roles(
-        'Game::EvonyTKR::Role::Persistence');
-    };
+    my $helper = eval { Game::EvonyTKR::Model::Base->new; };
     if ($@) {
       $logger->error("Cannot create general helper: $@");
       return;

@@ -15,10 +15,13 @@ This is an information resource for players of **Evony: The King's Return (Evony
 ## Tech Stack
 
 **Backend:**
-- Perl 5.42+ with Mojolicious web framework
-- Minion job queue (Postgres backend) for async processing
-- Postgres for persistence
+- Perl 5.42+ with Thunderhorse/PAGI::Server web framework
+  - Built on top of my custom extended version in ../PAGI-WebServer 
+  - Uses mostly core Thunderhorse (https://metacpan.org/pod/Thunderhorse)
+  - Falls back to PAGI::* methods where Thunderhorse does not provide functionality
 - Perl Data Language for massive performance gains
+- MCE (Many-Core Engine for Perl) for offline processing where parallel work is required.
+- very minimal python for XGBoost during the build phase because perl XGBoost support busted on OSX
 
 **Frontend:**
 - **Keep TypeScript MINIMAL** - performance degrades rapidly with large TS bundles
@@ -31,8 +34,8 @@ This is an information resource for players of **Evony: The King's Return (Evony
 
 **Data:**
 - YAML files for static game data (generals, books, covenants, etc.)
-- Database content a mix of cached YAML data and content derived by combining information across multiple YAML files to generate new content.
-
+- Data cached in memory 
+ 
 ## Common Commands
 
 ### Setup and Dependencies
@@ -44,7 +47,7 @@ just deps             # Complete dependency setup (Perl + npm)
 
 ### Development
 ```bash
-just dev              # Full rebuild + watch mode with morbo
+just dev              # deprecated full rebuild command that previously also started a dev server
 just quickdev         # Fast dev server without full rebuild
 ```
 
@@ -54,11 +57,12 @@ just build            # Full production build (Perl + CSS + TypeScript)
 just css              # Build CSS only (PostCSS + Spectrum CSS)
 just ts               # Build TypeScript only (esbuild compilation)
 just images           # Sync images to public directory
+just mlModel          # build the mlModel using XGBoost
 ```
 
 ### Testing
 ```bash
-./Build test          # Run all Perl tests (Test2::V0 framework)
+./Build test          # Run all Perl tests (Test2::V0 framework) -- not currently working, run each test script manually. 
 ```
 
 ### Deployment
@@ -79,8 +83,7 @@ just tidy             # Format all Perl code with perltidy
 This project uses **modular auto-discovery** wherever possible:
 
 1. **Controllers** auto-discovered and loaded as Mojolicious plugins
-2. **Minion External tasks** auto-discovered and registered
-3. Modules use `register()` pattern for lifecycle hooks
+3. Extends Thunderhorse base packages to wire directly into the Thunderhorse lifecycle where possible. 
 4. Separate namespaces when load order matters
 
 ### Data Flow Pipeline
@@ -88,14 +91,7 @@ This project uses **modular auto-discovery** wherever possible:
 ```
 YAML Static Files (share/collections/data/)
     ↓
-External/Prebuild.pm (orchestrator job)
-    ↓
-Parallel Minion Jobs:
-├── Load Generals, Books, Covenants, Specialties, Ascending Attributes
-├── Build Pairs (all valid general combinations)
-└── Reduce/Summarize (batch process with conflict detection)
-    ↓
-Postgres Cache (precomputed data)
+::Loader::* packages
     ↓
 Controllers → Models → Templates/TypeScript → HTTP Response
 ```
@@ -110,13 +106,10 @@ Controllers → Models → Templates/TypeScript → HTTP Response
 - **Controller/** - Route handlers (Generals, Pairs, Covenants, Books, etc.)
   - Use ControllerBase.pm for shared functionality
   - Roles in Controller/Role/ for mixins
-- **External/** - Minion async jobs (all inherit from External/JobBase.pm)
-  - **Prebuild.pm** - Main orchestrator
-  - **General/Pair/** - Pair building and reduction jobs
 - **Role/** - Shared Moose roles and constants
   - **Common.pm** - normalize(), logging utilities
   - **Constants/** - BuffConstants, GeneralConstants, etc.
-- **Service/** - Postgres perstence, PDL computation service, custom log4perl adapter, other subsystems called by both Controllers and Minion Jobs.  
+- **Service/** - PDL computation service, other subsystems that do not fit in the Thunderhorse model.  
 - **Converter/** - Tools to convert external data to YAML
 
 **Frontend (lib/):**
@@ -126,53 +119,11 @@ Controllers → Models → Templates/TypeScript → HTTP Response
 
 ## Critical Design Patterns
 
-### Adding a New Buff Type
-
-When adding a buff type to the summarizer, update ALL of these files:
-
-1. **Game/EvonyTKR/Model/Buff/Summarizer.pm**
-   - New summarizer function
-   - New output field
-   - Update `updateBuffs()` with new field
-
-2. **Game/EvonyTKR/Model/General/Pair.pm**
-   - New computed field
-   - Update `updateBuffs()` to include new field
-
-3. **Game/EvonyTKR/Controller/Generals.pm**
-   - Add to buff-summaries stash setting
-
-4. **Game/EvonyTKR/Controller/Generals/Pairs.pm**
-   - Add `$*_param` for sorting
-   - Add `$*_dir_param` for direction
-   - Add comparison in sort function loop
-
-5. **templates/generals/details.html.ep**
-   - Add table row for new buff type
-
-6. **templates/generals/pairs/typeIndex.html.ep**
-   - Add `my $*_index` declaration
-   - Add `my $*_dir` declaration
-   - Add `my $*_sort_order` declaration
-   - Add column to table header (update all variable references)
-   - Add column to table body (update all variable references)
-
-### Plugin Architecture
-
-All controllers follow this pattern:
-```perl
-sub register ($c, $app, $conf) {
-    my $routes = $app->routes;
-    # Define routes here
-}
-```
-
-Minion jobs extend `External/JobBase.pm`:
-```perl
-sub register ($taskClassf, $minion, $app) {
-    $minion->add_task(task_name => sub { ... });
-}
-```
+- Extend existing base classes PAGI::WebServer where possible. 
+- Extend packages from Thunderhorse where PAGI::WebServer does not offer the necessary functionality.
+- Build fully custom packages only where neither of the above two patterns fit. 
+- update legacy code to this pattern any time it requires substantial changes or stops working with the overall project.
+- CSS should be written in small, route/component specific files in ../share/styles/ then compiled into place with the ```just css``` command. 
 
 ### Minimal Frontend Rule
 
@@ -182,12 +133,6 @@ sub register ($taskClassf, $minion, $app) {
 - URL state management
 
 Most computation should happen in Perl on the server.
-
-### Caching Strategy
-
-1. **Postgres** - Primary cache for IPC and hot data
-2. **Model-level memoization** - Function-level caching
-3. **HTTP caching headers** - For static resources
 
 ## Testing Guidelines
 
@@ -201,7 +146,7 @@ Most computation should happen in Perl on the server.
 See README.md for current TODO list. Key areas:
 - Buff summarizer condition handling is limited
 - Conflict group-to-book mappings incomplete
-- Monster books not yet implemented
+- Monster books not partly implemented
 - Passive buff support needs enhancement
 - Logging configuration inconsistencies
 
@@ -213,4 +158,7 @@ See README.md for current TODO list. Key areas:
 
 ## Current Development Branch
 
-**streaming** - Working on pairs, conflicts, and covenants integration
+**PAGI** 
+- Working adding a Monster Hunting Simulator
+- Trying to get logging to be more consistent
+- Removing unused cruft where possible.

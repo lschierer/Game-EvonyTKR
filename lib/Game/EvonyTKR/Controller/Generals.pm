@@ -10,7 +10,7 @@ package Game::EvonyTKR::Controller::Generals {
   extends 'Game::EvonyTKR::Controller::ControllerBase';
   # Compose table-related roles
   with 'Game::EvonyTKR::Controller::Role::Tables';
-  with 'Game::EvonyTKR::Role::Persistence::TableSessions';
+  with 'Game::EvonyTKR::Role::TableSessions';
   with 'Game::EvonyTKR::Controller::Role::Generals::Routing';
   with 'Game::EvonyTKR::Role::Constants::BuffConstants';
   with 'Game::EvonyTKR::Role::Constants::GeneralConstants';
