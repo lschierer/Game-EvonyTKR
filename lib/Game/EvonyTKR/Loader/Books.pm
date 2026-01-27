@@ -67,13 +67,16 @@ sub load_all {
   my @failed = @{ $self->_failed_files };
   if (@failed) {
     $self->logger->error("=" x 60);
-    $self->logger->error("!!! BOOKS LOADER: " . scalar(@failed) . " FILE(S) FAILED TO LOAD !!!");
+    $self->logger->error(
+      "!!! BOOKS LOADER: " . scalar(@failed) . " FILE(S) FAILED TO LOAD !!!");
     for my $failure (@failed) {
       $self->logger->error("  - $failure->{file}");
       $self->logger->error("    Error: $failure->{error}");
     }
     $self->logger->error("=" x 60);
-    warn sprintf("BOOKS LOADER: %d file(s) failed to load! Check logs for details.\n", scalar(@failed));
+    warn sprintf(
+      "BOOKS LOADER: %d file(s) failed to load! Check logs for details.\n",
+      scalar(@failed));
   }
 
   $self->logger->info("Loaded $loaded total books");
@@ -96,7 +99,8 @@ sub _load_directory {
       )->load_string($file->slurp_utf8);
 
       unless ($data->{name}) {
-        push @{ $self->_failed_files }, { file => "$file", error => "No 'name' field in YAML" };
+        push @{ $self->_failed_files },
+          { file => "$file", error => "No 'name' field in YAML" };
         $self->logger->error("!!! YAML LOAD FAILED !!! $file - no name field");
         return;
       }

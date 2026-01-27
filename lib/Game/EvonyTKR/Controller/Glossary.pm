@@ -31,7 +31,8 @@ sub build ($self) {
   $self->SUPER::build();
 
   # Add navigation
-  $self->add_navigation_route($base, 'Glossary', { order => 80, parent => '/Reference' });
+  $self->add_navigation_route($base, 'Glossary',
+    { order => 80, parent => '/Reference' });
 
   # Main glossary page
   $self->router->add(
@@ -56,7 +57,7 @@ sub index ($self, $ctx) {
     return $self->render_error($ctx, 500, "Glossary data not loaded");
   }
 
-  my $terms = $glossary_loader->get_all_terms();
+  my $terms             = $glossary_loader->get_all_terms();
   my $available_letters = $glossary_loader->get_available_letters();
 
   $self->logger->debug(sprintf(

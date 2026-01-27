@@ -160,8 +160,8 @@ sub normalize_buff ($self, $buff_hash) {
 
 sub normalize_condition_case($self, $prolog_condition) {
 
-  $self->logger->debug(sprintf('normalize_condition_case called with: "%s"',
-    $prolog_condition));
+  $self->logger->debug(sprintf(
+    'normalize_condition_case called with: "%s"', $prolog_condition));
 
   # Handle the new underscore-based condition format
   # Convert underscore atoms back to display format
@@ -171,8 +171,7 @@ sub normalize_condition_case($self, $prolog_condition) {
     $display_condition =~ s/_/ /g;    # Convert underscores to spaces
 
     $self->logger->debug(
-"Converted underscore atom: '$prolog_condition' -> '$display_condition'"
-    );
+      "Converted underscore atom: '$prolog_condition' -> '$display_condition'");
 
     # Try to map to proper case using existing constants
     my $mapped = $self->string_to_condition($display_condition);

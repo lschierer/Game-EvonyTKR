@@ -201,11 +201,11 @@ qr/(?:ground_specialist|mounted_specialist|ranged_specialist|siege_specialist|ma
     }
 
     # Get filter parameters with defaults
-    my $ascendingLevel       = $ctx->req->query_param('ascendingLevel') // 'red5';
+    my $ascendingLevel = $ctx->req->query_param('ascendingLevel') // 'red5';
     my $primaryCovenantLevel = $ctx->req->query_param('primaryCovenantLevel')
       // 'civilization';
-    my $secondaryCovenantLevel = $ctx->req->query_param('secondaryCovenantLevel')
-      // 'civilization';
+    my $secondaryCovenantLevel =
+      $ctx->req->query_param('secondaryCovenantLevel') // 'civilization';
     my @primarySpecialties =
       map { $ctx->req->query_param("primarySpecialty$_") // 'gold' } (1 .. 4);
     my @secondarySpecialties =
@@ -257,10 +257,10 @@ qr/(?:ground_specialist|mounted_specialist|ranged_specialist|siege_specialist|ma
       pair_count             => $pair_count,
       title        => "Pair Comparison - $ui_target / $buff_activation",
       current_year => (localtime)[5] + 1900,
-      css_files    => ['/css/GeneralTable.css', '/css/GenericSpectrumTable.css'],
-      sidebar      => 1,
-      navigation   => $self->render_navigation($ctx->req->path),
-      site_logo    => $self->site_logo(),
+      css_files  => ['/css/GeneralTable.css', '/css/GenericSpectrumTable.css'],
+      sidebar    => 1,
+      navigation => $self->render_navigation($ctx->req->path),
+      site_logo  => $self->site_logo(),
     };
 
     return $self->template('generals/pairs/GeneralTablePair.tt', $vars);
@@ -291,12 +291,10 @@ qr/(?:ground_specialist|mounted_specialist|ranged_specialist|siege_specialist|ma
       pairs_by_type      => $stats->{pairs_by_type},
       available_types    => $pairs_loader->list_types,
       sample_pairs       => [
-        map {
-          {
-            primary   => $_->{primary}{name},
-            secondary => $_->{secondary}{name}
-          }
-        } @$pairs[0 .. min(9, $#$pairs)]
+        map { {
+          primary   => $_->{primary}{name},
+          secondary => $_->{secondary}{name}
+        } } @$pairs[0 .. min(9, $#$pairs)]
       ],
     };
 
@@ -474,23 +472,24 @@ qr/(?:ground_specialist|mounted_specialist|ranged_specialist|siege_specialist|ma
     }
 
     # Extract filter parameters
-    my $ascendingLevel       = $ctx->req->query_param('ascendingLevel') // 'red5';
+    my $ascendingLevel = $ctx->req->query_param('ascendingLevel') // 'red5';
     my $primaryCovenantLevel = $ctx->req->query_param('primaryCovenantLevel')
       // 'civilization';
-    my $secondaryCovenantLevel = $ctx->req->query_param('secondaryCovenantLevel')
-      // 'civilization';
+    my $secondaryCovenantLevel =
+      $ctx->req->query_param('secondaryCovenantLevel') // 'civilization';
     my @primarySpecialties =
       map { $ctx->req->query_param("primarySpecialty$_") // 'gold' } (1 .. 4);
     my @secondarySpecialties =
       map { $ctx->req->query_param("secondarySpecialty$_") // 'gold' } (1 .. 4);
 
     # Extract basic attribute filter parameters
-    my $generalLevel = $ctx->req->query_param('generalLevel') // 40;
+    my $generalLevel       = $ctx->req->query_param('generalLevel')       // 40;
     my $victoryColumnLevel = $ctx->req->query_param('victoryColumnLevel') // 0;
 
     # Validate ranges
     $generalLevel = 40 unless ($generalLevel >= 25 && $generalLevel <= 50);
-    $victoryColumnLevel = 0 unless ($victoryColumnLevel >= 0 && $victoryColumnLevel <= 11);
+    $victoryColumnLevel = 0
+      unless ($victoryColumnLevel >= 0 && $victoryColumnLevel <= 11);
 
     # Validate filter parameters
     my $data_model = Game::EvonyTKR::Model::Data->new;

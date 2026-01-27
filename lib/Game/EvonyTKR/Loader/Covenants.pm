@@ -51,7 +51,8 @@ sub load_all {
 
       # The covenant name should be in the YAML
       unless ($data->{name}) {
-        push @failed_files, { file => "$file", error => "No 'name' field in YAML" };
+        push @failed_files,
+          { file => "$file", error => "No 'name' field in YAML" };
         $self->logger->error("!!! YAML LOAD FAILED !!! $file - no name field");
         return;
       }
@@ -59,9 +60,14 @@ sub load_all {
       # Get the primary general object
       my $primary_general = $self->generals_loader->get_general($data->{name});
       unless ($primary_general) {
-        push @failed_files, { file => "$file", error => "Primary general '$data->{name}' not found" };
+        push @failed_files,
+          {
+          file  => "$file",
+          error => "Primary general '$data->{name}' not found"
+          };
         $self->logger->error(
-          "!!! YAML LOAD FAILED !!! Cannot find primary general '$data->{name}' for covenant in $file");
+"!!! YAML LOAD FAILED !!! Cannot find primary general '$data->{name}' for covenant in $file"
+        );
         return;
       }
 
@@ -83,8 +89,10 @@ sub load_all {
           "Loaded covenant: $data->{name} (key: $normalized_key)");
       }
       else {
-        push @failed_files, { file => "$file", error => "Failed to create model from hash" };
-        $self->logger->error("!!! YAML LOAD FAILED !!! Could not create covenant from $file");
+        push @failed_files,
+          { file => "$file", error => "Failed to create model from hash" };
+        $self->logger->error(
+          "!!! YAML LOAD FAILED !!! Could not create covenant from $file");
       }
     };
     if ($@) {
@@ -98,13 +106,17 @@ sub load_all {
   # Report summary of failures prominently
   if (@failed_files) {
     $self->logger->error("=" x 60);
-    $self->logger->error("!!! COVENANTS LOADER: " . scalar(@failed_files) . " FILE(S) FAILED TO LOAD !!!");
+    $self->logger->error("!!! COVENANTS LOADER: "
+        . scalar(@failed_files)
+        . " FILE(S) FAILED TO LOAD !!!");
     for my $failure (@failed_files) {
       $self->logger->error("  - $failure->{file}");
       $self->logger->error("    Error: $failure->{error}");
     }
     $self->logger->error("=" x 60);
-    warn sprintf("COVENANTS LOADER: %d file(s) failed to load! Check logs for details.\n", scalar(@failed_files));
+    warn sprintf(
+      "COVENANTS LOADER: %d file(s) failed to load! Check logs for details.\n",
+      scalar(@failed_files));
   }
 
   $self->logger->info("Loaded $loaded covenants");

@@ -149,14 +149,6 @@ sub _register_common_routes ($self) {
   );
 }
 
-# Helper for checking if prereqs are outstanding
-# This will need adaptation based on how we handle async data loading
-sub are_prereqs_outstanding ($self, $prereqs) {
-  # TODO: Adapt this for Thunderhorse/async data loading
-  # For now, assume all data is loaded at startup
-  return 0;
-}
-
 # Subclasses override this to specify which collection they manage
 sub collection_name ($self) {
   return '';

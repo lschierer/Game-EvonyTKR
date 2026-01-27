@@ -12,10 +12,10 @@ use Game::EvonyTKR::Loader::Covenants;
 
 # First load generals (required dependency)
 my $generals_loader = Game::EvonyTKR::Loader::Generals->new(
-  data_dir => 'share/collections/data/generals',
-);
+  data_dir => 'share/collections/data/generals',);
 my $generals_count = $generals_loader->load_all();
-ok($generals_count > 0, "Loaded $generals_count generals (dependency for covenants)");
+ok($generals_count > 0,
+  "Loaded $generals_count generals (dependency for covenants)");
 
 # Now load covenants
 my $loader = Game::EvonyTKR::Loader::Covenants->new(
@@ -45,7 +45,7 @@ for my $key (@$covenant_keys) {
   # Validate structure
   my @problems;
 
-  push @problems, 'not blessed' unless blessed($covenant);
+  push @problems, 'not blessed'  unless blessed($covenant);
   push @problems, 'missing name' unless defined $covenant->name;
 
   # Check members array
@@ -66,11 +66,12 @@ for my $key (@$covenant_keys) {
   }
 
   if (@problems) {
-    push @structure_errors, {
+    push @structure_errors,
+      {
       key      => $key,
       name     => $covenant->name // '(unnamed)',
       problems => \@problems,
-    };
+      };
   }
 }
 
@@ -79,10 +80,10 @@ is(scalar(@failed_loads), 0, "All covenants loaded successfully")
 
 is(scalar(@structure_errors), 0, "All covenants passed structure validation")
   or do {
-    for my $err (@structure_errors) {
-      diag(sprintf("  %s (%s): %s",
-        $err->{name}, $err->{key}, join(', ', @{$err->{problems}})));
-    }
+  for my $err (@structure_errors) {
+    diag(sprintf("  %s (%s): %s",
+      $err->{name}, $err->{key}, join(', ', @{ $err->{problems} })));
+  }
   };
 
 # Test covenant_count
@@ -94,25 +95,28 @@ for my $key (@$covenant_keys) {
   my $covenant = $loader->get_covenant($key);
   next unless $covenant;
 
-  for my $member (@{$covenant->members}) {
+  for my $member (@{ $covenant->members }) {
     my $general_name = ref($member) ? $member->name : $member;
-    my $normalized = $generals_loader->normalize($general_name);
-    my $general = $generals_loader->get_general($normalized);
+    my $normalized   = $generals_loader->normalize($general_name);
+    my $general      = $generals_loader->get_general($normalized);
     unless ($general) {
-      push @invalid_members, {
+      push @invalid_members,
+        {
         covenant => $covenant->name,
         member   => $general_name,
-      };
+        };
     }
   }
 }
 
 is(scalar(@invalid_members), 0, "All covenant members reference valid generals")
   or do {
-    for my $err (@invalid_members) {
-      diag(sprintf("  Covenant '%s' has invalid member: %s",
-        $err->{covenant}, $err->{member}));
-    }
+  for my $err (@invalid_members) {
+    diag(sprintf(
+      "  Covenant '%s' has invalid member: %s",
+      $err->{covenant}, $err->{member}
+    ));
+  }
   };
 
 done_testing;

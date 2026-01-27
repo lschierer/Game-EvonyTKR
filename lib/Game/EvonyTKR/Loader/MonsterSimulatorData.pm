@@ -60,17 +60,18 @@ sub load_all ($self) {
 
   my $data = YAML::PP->new(
     schema       => [qw/ + Perl /],
-    yaml_version => [ '1.2', '1.1' ],
+    yaml_version => ['1.2', '1.1'],
   )->load_string($file->slurp_utf8);
 
-  $self->world_boss_modifiers($data->{world_boss_modifiers}     // {});
-  $self->tier_modifiers_vs_boss($data->{tier_modifiers_vs_boss} // {});
+  $self->world_boss_modifiers($data->{world_boss_modifiers}       // {});
+  $self->tier_modifiers_vs_boss($data->{tier_modifiers_vs_boss}   // {});
   $self->alliance_boss_modifiers($data->{alliance_boss_modifiers} // {});
-  $self->troop_base_attack($data->{troop_base_attack}           // {});
-  $self->troop_base_defense($data->{troop_base_defense}         // {});
-  $self->troop_base_hp($data->{troop_base_hp}                   // {});
+  $self->troop_base_attack($data->{troop_base_attack}             // {});
+  $self->troop_base_defense($data->{troop_base_defense}           // {});
+  $self->troop_base_hp($data->{troop_base_hp}                     // {});
 
-  $self->_log('info',
+  $self->_log(
+    'info',
     sprintf(
       'Loaded reference tables: %d tiers, %d world bosses',
       scalar(keys $self->troop_base_attack->%*),
@@ -83,32 +84,32 @@ sub load_all ($self) {
 
 # Get base attack for a tier and troop type
 sub get_base_attack ($self, $tier, $troop_type) {
-  return $self->troop_base_attack->{$tier}{lc $troop_type} // 0;
+  return $self->troop_base_attack->{$tier}{ lc $troop_type } // 0;
 }
 
 # Get base defense for a tier and troop type
 sub get_base_defense ($self, $tier, $troop_type) {
-  return $self->troop_base_defense->{$tier}{lc $troop_type} // 0;
+  return $self->troop_base_defense->{$tier}{ lc $troop_type } // 0;
 }
 
 # Get base HP for a tier and troop type
 sub get_base_hp ($self, $tier, $troop_type) {
-  return $self->troop_base_hp->{$tier}{lc $troop_type} // 0;
+  return $self->troop_base_hp->{$tier}{ lc $troop_type } // 0;
 }
 
 # Get tier modifier vs boss monsters
 sub get_tier_modifier_vs_boss ($self, $tier, $troop_type) {
-  return $self->tier_modifiers_vs_boss->{$tier}{lc $troop_type} // 1.0;
+  return $self->tier_modifiers_vs_boss->{$tier}{ lc $troop_type } // 1.0;
 }
 
 # Get alliance boss modifier
 sub get_alliance_boss_modifier ($self, $tier, $troop_type) {
-  return $self->alliance_boss_modifiers->{$tier}{lc $troop_type} // 1.0;
+  return $self->alliance_boss_modifiers->{$tier}{ lc $troop_type } // 1.0;
 }
 
 # Get world boss modifier by boss name
 sub get_world_boss_modifier ($self, $boss_name, $troop_type) {
-  return $self->world_boss_modifiers->{$boss_name}{lc $troop_type} // 1.0;
+  return $self->world_boss_modifiers->{$boss_name}{ lc $troop_type } // 1.0;
 }
 
 # Get world boss modifier by order number

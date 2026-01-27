@@ -149,8 +149,8 @@ package Game::EvonyTKR::Controller::Generals {
         $route, $generalType
       ));
 
-      # Activation index (shows single/pair choice or redirects)
-      # Apply same validation rules as get_valid_routes in Role::Generals::Routing
+    # Activation index (shows single/pair choice or redirects)
+    # Apply same validation rules as get_valid_routes in Role::Generals::Routing
       foreach my $buffActivation ($self->AllowedBuffActivationValues->@*) {
         my $br = "$route/$buffActivation";
 
@@ -375,10 +375,10 @@ package Game::EvonyTKR::Controller::Generals {
       title          => 'General Comparison Tables',
       static_content => $static_content,
       current_year   => (localtime)[5] + 1900,
-      css_files      => ['/css/GeneralTable.css', '/css/GenericSpectrumTable.css'],
-      sidebar        => 1,
-      navigation     => $self->render_navigation($ctx->req->path),
-      site_logo      => $self->site_logo(),
+      css_files  => ['/css/GeneralTable.css', '/css/GenericSpectrumTable.css'],
+      sidebar    => 1,
+      navigation => $self->render_navigation($ctx->req->path),
+      site_logo  => $self->site_logo(),
     };
 
     return $self->template('generals/tablesIndex.tt', $vars);
@@ -415,10 +415,10 @@ package Game::EvonyTKR::Controller::Generals {
       static_content => $static_content,
       title          => "$uiTarget Tables",
       current_year   => (localtime)[5] + 1900,
-      css_files      => ['/css/GeneralTable.css', '/css/GenericSpectrumTable.css'],
-      sidebar        => 1,
-      navigation     => $self->render_navigation($ctx->req->path),
-      site_logo      => $self->site_logo(),
+      css_files  => ['/css/GeneralTable.css', '/css/GenericSpectrumTable.css'],
+      sidebar    => 1,
+      navigation => $self->render_navigation($ctx->req->path),
+      site_logo  => $self->site_logo(),
     };
 
     return $self->template('generals/troopTypeTableIndex.tt', $vars);
@@ -523,12 +523,13 @@ package Game::EvonyTKR::Controller::Generals {
 
       # Extract query parameters with defaults
       my $ascending_level = $ctx->req->query_param('ascendingLevel') // 'red5';
-      my $covenant_level  = $ctx->req->query_param('covenantLevel') // 'civilization';
-      my $specialty1      = $ctx->req->query_param('specialty1')    // 'gold';
-      my $specialty2      = $ctx->req->query_param('specialty2')    // 'gold';
-      my $specialty3      = $ctx->req->query_param('specialty3')    // 'gold';
-      my $specialty4      = $ctx->req->query_param('specialty4')    // 'gold';
-      my $activation      = $ctx->req->query_param('activation')    // 'Attacking';
+      my $covenant_level  = $ctx->req->query_param('covenantLevel')
+        // 'civilization';
+      my $specialty1 = $ctx->req->query_param('specialty1') // 'gold';
+      my $specialty2 = $ctx->req->query_param('specialty2') // 'gold';
+      my $specialty3 = $ctx->req->query_param('specialty3') // 'gold';
+      my $specialty4 = $ctx->req->query_param('specialty4') // 'gold';
+      my $activation = $ctx->req->query_param('activation') // 'Attacking';
 
       $self->logger->debug(sprintf(
 "Buff params: activation=%s, ascending=%s, covenant=%s, specialties=%s/%s/%s/%s",
@@ -598,7 +599,8 @@ package Game::EvonyTKR::Controller::Generals {
 
     # Get filter parameters with defaults
     my $ascendingLevel = $ctx->req->query_param('ascendingLevel') // 'red5';
-    my $covenantLevel  = $ctx->req->query_param('covenantLevel')  // 'civilization';
+    my $covenantLevel  = $ctx->req->query_param('covenantLevel')
+      // 'civilization';
     my @specialties =
       map { $ctx->req->query_param("specialty$_") // 'gold' } (1 .. 4);
 
@@ -828,17 +830,19 @@ package Game::EvonyTKR::Controller::Generals {
 
     # Extract filter parameters
     my $ascendingLevel = $ctx->req->query_param('ascendingLevel') // 'red5';
-    my $covenantLevel  = $ctx->req->query_param('covenantLevel')  // 'civilization';
+    my $covenantLevel  = $ctx->req->query_param('covenantLevel')
+      // 'civilization';
     my @specialties =
       map { $ctx->req->query_param("specialty$_") // 'gold' } (1 .. 4);
 
     # Extract basic attribute filter parameters
-    my $generalLevel = $ctx->req->query_param('generalLevel') // 40;
+    my $generalLevel       = $ctx->req->query_param('generalLevel')       // 40;
     my $victoryColumnLevel = $ctx->req->query_param('victoryColumnLevel') // 0;
 
     # Validate ranges
     $generalLevel = 40 unless ($generalLevel >= 25 && $generalLevel <= 50);
-    $victoryColumnLevel = 0 unless ($victoryColumnLevel >= 0 && $victoryColumnLevel <= 11);
+    $victoryColumnLevel = 0
+      unless ($victoryColumnLevel >= 0 && $victoryColumnLevel <= 11);
 
     # Validate filter parameters
     my $data_model = Game::EvonyTKR::Model::Data->new;

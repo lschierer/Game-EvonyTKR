@@ -186,8 +186,8 @@ sub _get_generals_for_type ($self, $all_generals, $type_key, $troop_type) {
     my $general_types = $general->type // [];
     $general_types = [$general_types] unless ref($general_types) eq 'ARRAY';
 
-    # Check if the general's type array contains this type_key
-    # This is the authoritative check - a general's type field determines their category
+# Check if the general's type array contains this type_key
+# This is the authoritative check - a general's type field determines their category
     if (grep { lc($_) eq lc($type_key) } @$general_types) {
       push @matching, $general;
     }

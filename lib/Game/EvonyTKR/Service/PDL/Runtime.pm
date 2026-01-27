@@ -9,8 +9,7 @@ use PDL::NiceSlice;
 use Game::EvonyTKR::Service::PDL::Compiler;
 use Mojo::File qw(path);
 use Mojo::Util qw(dumper);
-use POSIX qw( round );
-
+use POSIX      qw( round );
 
 =head1 NAME
 
@@ -90,7 +89,7 @@ has 'evans_adjustment' => (
 
 has 'default_cultivation' => (
   is      => 'ro',
-  default => sub { 520 },
+  default => sub {520},
 );
 
 has 'basic_aes_adjustment' => (
@@ -98,8 +97,16 @@ has 'basic_aes_adjustment' => (
   default => sub {
     return {
       'none'    => 0,
-      'purple1' => 0, 'purple2' => 0, 'purple3' => 0, 'purple4' => 0, 'purple5' => 0,
-      'red1'    => 10, 'red2' => 20, 'red3' => 30, 'red4' => 40, 'red5' => 50,
+      'purple1' => 0,
+      'purple2' => 0,
+      'purple3' => 0,
+      'purple4' => 0,
+      'purple5' => 0,
+      'red1'    => 10,
+      'red2'    => 20,
+      'red3'    => 30,
+      'red4'    => 40,
+      'red5'    => 50,
     };
   },
 );
@@ -107,7 +114,7 @@ has 'basic_aes_adjustment' => (
 # Generals loader for accessing general data (injected by controller)
 has 'generals_loader' => (
   is      => 'rw',
-  default => sub { undef },
+  default => sub {undef},
 );
 
 =head2 compute_buffs
@@ -283,21 +290,24 @@ Returns buff percentage as decimal (e.g., 0.15 for 15%).
 =cut
 
 sub compute_basic_attribute_buff ($self, %args) {
-  my $base        = $args{base} // 0;
-  my $increment   = $args{increment} // 0;
-  my $level       = $args{generalLevel} // 40;
+  my $base        = $args{base}               // 0;
+  my $increment   = $args{increment}          // 0;
+  my $level       = $args{generalLevel}       // 40;
   my $victory     = $args{victoryColumnLevel} // 0;
   my $cultivation = $self->default_cultivation;
   my $aes_adj     = $args{aesAdjustment} // 0;
 
   my $victory_mult = 1 + ($victory * 0.01);
-  my $total_stat = ($base + $increment * $self->evans_adjustment * $level)
-                   * $victory_mult + $aes_adj + $cultivation;
+  my $total_stat =
+    ($base + $increment * $self->evans_adjustment * $level) * $victory_mult +
+    $aes_adj +
+    $cultivation;
 
   my $buff;
   if ($total_stat <= 900) {
     $buff = $total_stat * 0.001;
-  } else {
+  }
+  else {
     $buff = 0.9 + (($total_stat - 900) * 0.002);
   }
   return $buff;
@@ -365,43 +375,44 @@ sub get_buff_summary ($self, %args) {
   my $buffs = $self->compute_buffs(%args);
 
   # Add basic attribute buffs (computed at runtime, not precompiled)
-  my $general = $self->generals_loader
+  my $general =
+      $self->generals_loader
     ? $self->generals_loader->get_general($args{general})
     : undef;
   if ($general && $general->basicAttributes) {
-    my $asc_level = $args{filters}{ascendingLevel} // 'none';
-    my $aes_adj = $self->basic_aes_adjustment->{$asc_level} // 0;
-    my $gen_level = $args{filters}{generalLevel} // 40;
-    my $victory = $args{filters}{victoryColumnLevel} // 0;
+    my $asc_level = $args{filters}{ascendingLevel}            // 'none';
+    my $aes_adj   = $self->basic_aes_adjustment->{$asc_level} // 0;
+    my $gen_level = $args{filters}{generalLevel}              // 40;
+    my $victory   = $args{filters}{victoryColumnLevel}        // 0;
 
     my $attack_basic = round($self->compute_basic_attribute_buff(
-      base => $general->basicAttributes->attack->base,
-      increment => $general->basicAttributes->attack->increment,
-      generalLevel => $gen_level,
+      base               => $general->basicAttributes->attack->base,
+      increment          => $general->basicAttributes->attack->increment,
+      generalLevel       => $gen_level,
       victoryColumnLevel => $victory,
-      aesAdjustment => $aes_adj,
+      aesAdjustment      => $aes_adj,
     ));
 
     my $defense_basic = round($self->compute_basic_attribute_buff(
-      base => $general->basicAttributes->defense->base,
-      increment => $general->basicAttributes->defense->increment,
-      generalLevel => $gen_level,
+      base               => $general->basicAttributes->defense->base,
+      increment          => $general->basicAttributes->defense->increment,
+      generalLevel       => $gen_level,
       victoryColumnLevel => $victory,
-      aesAdjustment => $aes_adj,
+      aesAdjustment      => $aes_adj,
     ));
 
     my $hp_basic = round($self->compute_basic_attribute_buff(
-      base => $general->basicAttributes->leadership->base,
-      increment => $general->basicAttributes->leadership->increment,
-      generalLevel => $gen_level,
+      base               => $general->basicAttributes->leadership->base,
+      increment          => $general->basicAttributes->leadership->increment,
+      generalLevel       => $gen_level,
       victoryColumnLevel => $victory,
-      aesAdjustment => $aes_adj,
+      aesAdjustment      => $aes_adj,
     ));
 
     # Add to all troop type totals
-    $buffs->{attack_all} += $attack_basic;
+    $buffs->{attack_all}  += $attack_basic;
     $buffs->{defense_all} += $defense_basic;
-    $buffs->{hp_all} += $hp_basic;
+    $buffs->{hp_all}      += $hp_basic;
   }
 
   # Organize buffs by troop type
@@ -514,43 +525,42 @@ sub compute_pair_buffs ($self, %args) {
 
   # Add basic attribute buffs for the primary general
   # basic attributes are not used by the secondary general.
-  my $primary_general = $self->generals_loader
+  my $primary_general =
+      $self->generals_loader
     ? $self->generals_loader->get_general($primary)
     : undef;
 
   # Primary general basic attributes
   if ($primary_general && $primary_general->basicAttributes) {
-    my $asc_level = $primary_filters->{ascendingLevel} // 'none';
-    my $aes_adj = $self->basic_aes_adjustment->{$asc_level} // 0;
-    my $gen_level = $primary_filters->{generalLevel} // 40;
-    my $victory = $primary_filters->{victoryColumnLevel} // 0;
+    my $asc_level = $primary_filters->{ascendingLevel}        // 'none';
+    my $aes_adj   = $self->basic_aes_adjustment->{$asc_level} // 0;
+    my $gen_level = $primary_filters->{generalLevel}          // 40;
+    my $victory   = $primary_filters->{victoryColumnLevel}    // 0;
 
     $combined{attack_all} += round($self->compute_basic_attribute_buff(
-      base => $primary_general->basicAttributes->attack->base,
-      increment => $primary_general->basicAttributes->attack->increment,
+      base         => $primary_general->basicAttributes->attack->base,
+      increment    => $primary_general->basicAttributes->attack->increment,
       generalLevel => $gen_level,
       victoryColumnLevel => $victory,
-      aesAdjustment => $aes_adj,
+      aesAdjustment      => $aes_adj,
     ));
 
     $combined{defense_all} += round($self->compute_basic_attribute_buff(
-      base => $primary_general->basicAttributes->defense->base,
-      increment => $primary_general->basicAttributes->defense->increment,
+      base         => $primary_general->basicAttributes->defense->base,
+      increment    => $primary_general->basicAttributes->defense->increment,
       generalLevel => $gen_level,
       victoryColumnLevel => $victory,
-      aesAdjustment => $aes_adj,
+      aesAdjustment      => $aes_adj,
     ));
 
     $combined{hp_all} += round($self->compute_basic_attribute_buff(
-      base => $primary_general->basicAttributes->leadership->base,
-      increment => $primary_general->basicAttributes->leadership->increment,
+      base         => $primary_general->basicAttributes->leadership->base,
+      increment    => $primary_general->basicAttributes->leadership->increment,
       generalLevel => $gen_level,
       victoryColumnLevel => $victory,
-      aesAdjustment => $aes_adj,
+      aesAdjustment      => $aes_adj,
     ));
   }
-
-
 
   return \%combined;
 }

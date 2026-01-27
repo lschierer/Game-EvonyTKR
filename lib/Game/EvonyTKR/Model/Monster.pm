@@ -3,7 +3,7 @@ use v5.42.0;
 use utf8::all;
 
 use Moo;
-use experimental qw(signatures);
+use experimental    qw(signatures);
 use Types::Standard qw(Str Int Num HashRef ArrayRef Maybe);
 
 has order => (
@@ -21,13 +21,13 @@ has name => (
 has alt_name => (
   is      => 'ro',
   isa     => Maybe [Str],
-  default => sub { undef },
+  default => sub {undef},
 );
 
 has monster_id => (
   is      => 'ro',
   isa     => Maybe [Int],
-  default => sub { undef },
+  default => sub {undef},
 );
 
 has level => (
@@ -39,37 +39,37 @@ has level => (
 has stamina => (
   is      => 'ro',
   isa     => Maybe [Int],
-  default => sub { 6 },
+  default => sub {6},
 );
 
 has troop_count => (
   is      => 'ro',
   isa     => Maybe [Int],
-  default => sub { undef },
+  default => sub {undef},
 );
 
 has attack => (
   is      => 'ro',
   isa     => Maybe [Int],
-  default => sub { 0 },
+  default => sub {0},
 );
 
 has defense => (
   is      => 'ro',
   isa     => Maybe [Int],
-  default => sub { 0 },
+  default => sub {0},
 );
 
 has hp => (
   is      => 'ro',
   isa     => Maybe [Int],
-  default => sub { 0 },
+  default => sub {0},
 );
 
 has spawn_rates => (
   is      => 'ro',
   isa     => ArrayRef [Int],
-  default => sub { [ 0, 0, 0, 0, 0 ] },
+  default => sub { [0, 0, 0, 0, 0] },
 );
 
 has troop_modifiers => (
@@ -88,7 +88,7 @@ has troop_modifiers => (
 has monster_type => (
   is      => 'ro',
   isa     => Str,
-  default => sub { 'common' },
+  default => sub {'common'},
 );
 
 has rewards => (
@@ -106,7 +106,7 @@ sub is_common ($self) {
 }
 
 sub get_troop_modifier ($self, $troop_type) {
-  return $self->troop_modifiers->{lc $troop_type} // 1.0;
+  return $self->troop_modifiers->{ lc $troop_type } // 1.0;
 }
 
 sub display_name ($self) {
@@ -115,39 +115,39 @@ sub display_name ($self) {
 
 sub to_hash ($self) {
   return {
-    order          => $self->order,
-    name           => $self->name,
-    alt_name       => $self->alt_name,
-    monster_id     => $self->monster_id,
-    level          => $self->level,
-    stamina        => $self->stamina,
-    troop_count    => $self->troop_count,
-    attack         => $self->attack,
-    defense        => $self->defense,
-    hp             => $self->hp,
-    spawn_rates    => $self->spawn_rates,
+    order           => $self->order,
+    name            => $self->name,
+    alt_name        => $self->alt_name,
+    monster_id      => $self->monster_id,
+    level           => $self->level,
+    stamina         => $self->stamina,
+    troop_count     => $self->troop_count,
+    attack          => $self->attack,
+    defense         => $self->defense,
+    hp              => $self->hp,
+    spawn_rates     => $self->spawn_rates,
     troop_modifiers => $self->troop_modifiers,
-    monster_type   => $self->monster_type,
-    rewards        => $self->rewards,
+    monster_type    => $self->monster_type,
+    rewards         => $self->rewards,
   };
 }
 
 sub from_hash ($class, $data) {
   return $class->new(
-    order          => $data->{order},
-    name           => $data->{name},
-    alt_name       => $data->{alt_name},
-    monster_id     => $data->{monster_id},
-    level          => $data->{level},
-    stamina        => $data->{stamina},
-    troop_count    => $data->{troop_count},
-    attack         => $data->{attack},
-    defense        => $data->{defense},
-    hp             => $data->{hp},
-    spawn_rates    => $data->{spawn_rates}    // [ 0, 0, 0, 0, 0 ],
+    order           => $data->{order},
+    name            => $data->{name},
+    alt_name        => $data->{alt_name},
+    monster_id      => $data->{monster_id},
+    level           => $data->{level},
+    stamina         => $data->{stamina},
+    troop_count     => $data->{troop_count},
+    attack          => $data->{attack},
+    defense         => $data->{defense},
+    hp              => $data->{hp},
+    spawn_rates     => $data->{spawn_rates}     // [0, 0, 0, 0, 0],
     troop_modifiers => $data->{troop_modifiers} // {},
-    monster_type   => $data->{monster_type}   // 'common',
-    rewards        => $data->{rewards}        // {},
+    monster_type    => $data->{monster_type}    // 'common',
+    rewards         => $data->{rewards}         // {},
   );
 }
 

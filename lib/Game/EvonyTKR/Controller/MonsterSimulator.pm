@@ -16,10 +16,10 @@ Handles the monster combat simulator at /Tools/MonsterSimulator.
 
 =cut
 
-my $base = '/Tools/MonsterSimulator';
+my $base = '/Monsters';
 
 sub controller_name ($self) {
-  return "MonsterSimulator";
+  return "Monsters";
 }
 
 sub getBase ($self) {
@@ -27,18 +27,24 @@ sub getBase ($self) {
 }
 
 sub build ($self) {
-  $self->logger->info("Building MonsterSimulator controller");
+  $self->logger->info("Building Monsters controller");
 
   # Call parent to register common routes
   $self->SUPER::build();
 
   # Add navigation
-  $self->add_navigation_route($base, 'Monster Simulator',
-    { order => 10, parent => '/Tools' });
+  $self->add_navigation_route($base, 'Monsters',
+    { order => 10, parent => '/' });
+
+  $self->add_navigation_route(
+    "${base}/Simulator",
+    'Monster Hunting Simulator',
+    { order => 10, parent => $base }
+  );
 
   # Main simulator page (form)
   $self->router->add(
-    $base,
+    "${base}/Simulator",
     {
       to => sub ($self, $ctx) {
         return $self->index($ctx);
@@ -97,23 +103,23 @@ sub index ($self, $ctx) {
   my $boss_monsters = $monsters_loader->list_boss_monsters();
 
   my $vars = {
-    monster_names    => $monster_names,
-    boss_monsters    => $boss_monsters,
-    tiers            => $self->TierValues,
-    troop_types      => $self->MonsterTroopTypes,
+    monster_names     => $monster_names,
+    boss_monsters     => $boss_monsters,
+    tiers             => $self->TierValues,
+    troop_types       => $self->MonsterTroopTypes,
     troop_type_labels => $self->MonsterTroopTypeLabels,
-    march_types      => $self->MarchTypes,
+    march_types       => $self->MarchTypes,
     march_type_labels => $self->MarchTypeLabels,
-    linkBase         => $base,
-    title            => 'Monster Simulator',
-    current_year     => (localtime)[5] + 1900,
-    sidebar          => 1,
-    navigation       => $self->render_navigation($ctx->req->path),
-    site_logo        => $self->site_logo(),
+    linkBase          => $base,
+    title             => 'Monster Simulator',
+    current_year      => (localtime)[5] + 1900,
+    sidebar           => 1,
+    navigation        => $self->render_navigation($ctx->req->path),
+    site_logo         => $self->site_logo(),
 
     # Default values for form
     defaults => {
-      tier        => 'T15',
+      tier        => 'T14',
       troop_type  => 'mounted',
       march_type  => 'solo',
       troop_count => 500_000,
@@ -137,9 +143,9 @@ sub calculate ($self, $ctx) {
   my $params = $ctx->req->params->to_hash;
 
   my $monster_order = $params->{monster_order};
-  my $tier          = $params->{tier}       // 'T15';
-  my $troop_type    = $params->{troop_type} // 'mounted';
-  my $march_type    = $params->{march_type} // 'solo';
+  my $tier          = $params->{tier}        // 'T15';
+  my $troop_type    = $params->{troop_type}  // 'mounted';
+  my $march_type    = $params->{march_type}  // 'solo';
   my $troop_count   = $params->{troop_count} // 500_000;
 
   # Parse buff percentages (convert from percent input to decimal)
@@ -172,11 +178,11 @@ sub calculate ($self, $ctx) {
 
   # Parse debuffs
   my $debuffs = {
-    monster_attack   => ($params->{monster_attack_debuff}  // 0) / 100,
-    monster_defense  => ($params->{monster_defense_debuff} // 0) / 100,
-    troop_attack     => ($params->{troop_attack_debuff}    // 0) / 100,
-    troop_defense    => ($params->{troop_defense_debuff}   // 0) / 100,
-    troop_hp         => ($params->{troop_hp_debuff}        // 0) / 100,
+    monster_attack  => ($params->{monster_attack_debuff}  // 0) / 100,
+    monster_defense => ($params->{monster_defense_debuff} // 0) / 100,
+    troop_attack    => ($params->{troop_attack_debuff}    // 0) / 100,
+    troop_defense   => ($params->{troop_defense_debuff}   // 0) / 100,
+    troop_hp        => ($params->{troop_hp_debuff}        // 0) / 100,
   };
 
   # Count unknowns (fields marked as unknown)
@@ -217,21 +223,21 @@ sub calculate ($self, $ctx) {
   my $monster_names = $monsters_loader->list_unique_names();
 
   my $vars = {
-    result           => $result,
-    params           => $params,
-    monster_names    => $monster_names,
-    tiers            => $self->TierValues,
-    troop_types      => $self->MonsterTroopTypes,
+    result            => $result,
+    params            => $params,
+    monster_names     => $monster_names,
+    tiers             => $self->TierValues,
+    troop_types       => $self->MonsterTroopTypes,
     troop_type_labels => $self->MonsterTroopTypeLabels,
-    march_types      => $self->MarchTypes,
+    march_types       => $self->MarchTypes,
     march_type_labels => $self->MarchTypeLabels,
-    linkBase         => $base,
-    title            => 'Monster Simulator - Results',
-    current_year     => (localtime)[5] + 1900,
-    sidebar          => 1,
-    navigation       => $self->render_navigation($ctx->req->path),
-    site_logo        => $self->site_logo(),
-    unknowns_count   => $unknowns_count,
+    linkBase          => $base,
+    title             => 'Monster Simulator - Results',
+    current_year      => (localtime)[5] + 1900,
+    sidebar           => 1,
+    navigation        => $self->render_navigation($ctx->req->path),
+    site_logo         => $self->site_logo(),
+    unknowns_count    => $unknowns_count,
   };
 
   return $self->template('monster_simulator/results.tt', $vars);
@@ -279,10 +285,11 @@ sub api_monster_levels ($self, $ctx) {
   for my $level (@$levels) {
     my $monster = $monsters_loader->get_by_name_and_level($name, $level);
     if ($monster) {
-      push @level_data, {
+      push @level_data,
+        {
         level => $level,
         order => $monster->order,
-      };
+        };
     }
   }
 

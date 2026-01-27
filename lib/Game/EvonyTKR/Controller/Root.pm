@@ -161,7 +161,7 @@ async sub single_page ($self, $ctx, $route_path) {
   my $file_path = $route_path;
   $file_path =~ s|^/||;    # Remove leading slash
   my $md_path = Path::Tiny::path('share/pages')->child("$file_path.md");
-  unless ($md_path->exists){
+  unless ($md_path->exists) {
     $md_path = Path::Tiny::path('share/pages')->child("${file_path}/index.md");
   }
 
@@ -174,8 +174,8 @@ async sub single_page ($self, $ctx, $route_path) {
     $md_path->stringify,
     $ctx->req->path,
     {
-      template => 'markdown.tt',
-      sidebar  => 1,
+      template     => 'markdown.tt',
+      sidebar      => 1,
       navigation   => $self->render_navigation($ctx->req->path),
       site_logo    => $self->site_logo(),
       current_year => (localtime)[5] + 1900,
@@ -279,7 +279,9 @@ sub _build_Root_Tree ($self) {
       $route =~ s/\/index$//;
     }
 
-    if (exists $fm->{sidebar} && ref($fm->{sidebar}) eq 'HASH' && exists $fm->{sidebar}->{order}) {
+    if ( exists $fm->{sidebar}
+      && ref($fm->{sidebar}) eq 'HASH'
+      && exists $fm->{sidebar}->{order}) {
       $order = $fm->{sidebar}->{order};
     }
 

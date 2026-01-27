@@ -9,8 +9,7 @@ use Game::EvonyTKR::Loader::Generals;
 # Test that the Generals loader works correctly
 
 my $loader = Game::EvonyTKR::Loader::Generals->new(
-  data_dir => 'share/collections/data/generals',
-);
+  data_dir => 'share/collections/data/generals',);
 
 # Test loading
 my $count = $loader->load_all();
@@ -35,19 +34,24 @@ for my $key (@$general_keys) {
   # Validate structure matches expected schema
   my @problems;
 
-  push @problems, 'not blessed' unless blessed($general);
-  push @problems, 'missing id' unless defined $general->id;
+  push @problems, 'not blessed'  unless blessed($general);
+  push @problems, 'missing id'   unless defined $general->id;
   push @problems, 'missing name' unless defined $general->name;
 
   # Check basicAttributes
   my $attr = $general->basicAttributes;
-  if (!$attr || !blessed($attr) || !$attr->isa('Game::EvonyTKR::Model::BasicAttributes')) {
+  if ( !$attr
+    || !blessed($attr)
+    || !$attr->isa('Game::EvonyTKR::Model::BasicAttributes')) {
     push @problems, 'missing or invalid basicAttributes';
   }
   else {
     for my $field (qw(attack defense leadership politics)) {
       my $val = $attr->$field;
-      unless ($val && blessed($val) && $val->can('base') && $val->can('increment')) {
+      unless ($val
+        && blessed($val)
+        && $val->can('base')
+        && $val->can('increment')) {
         push @problems, "invalid $field attribute";
       }
       elsif ($val->base < 0 || $val->increment < 0) {
@@ -56,16 +60,19 @@ for my $key (@$general_keys) {
     }
   }
 
-  push @problems, 'missing builtInBookName' unless defined $general->builtInBookName;
-  push @problems, 'specialtyNames not an array' unless ref($general->specialtyNames) eq 'ARRAY';
+  push @problems, 'missing builtInBookName'
+    unless defined $general->builtInBookName;
+  push @problems, 'specialtyNames not an array'
+    unless ref($general->specialtyNames) eq 'ARRAY';
   push @problems, 'type not an array' unless ref($general->type) eq 'ARRAY';
 
   if (@problems) {
-    push @structure_errors, {
+    push @structure_errors,
+      {
       key      => $key,
       name     => $general->name // '(unnamed)',
       problems => \@problems,
-    };
+      };
   }
 }
 
@@ -74,18 +81,18 @@ is(scalar(@failed_loads), 0, "All generals loaded successfully")
 
 is(scalar(@structure_errors), 0, "All generals passed structure validation")
   or do {
-    for my $err (@structure_errors) {
-      diag(sprintf("  %s (%s): %s",
-        $err->{name}, $err->{key}, join(', ', @{$err->{problems}})));
-    }
+  for my $err (@structure_errors) {
+    diag(sprintf("  %s (%s): %s",
+      $err->{name}, $err->{key}, join(', ', @{ $err->{problems} })));
+  }
   };
 
 # Test that we can look up generals by normalized name
 my $test_general = $loader->get_general($general_keys->[0]);
 if ($test_general) {
-  my $name = $test_general->name;
+  my $name       = $test_general->name;
   my $normalized = $loader->normalize($name);
-  my $lookup = $loader->get_general($normalized);
+  my $lookup     = $loader->get_general($normalized);
   ok($lookup, "Can look up general by normalized name: $normalized");
   is($lookup->name, $name, "Lookup returns correct general");
 }

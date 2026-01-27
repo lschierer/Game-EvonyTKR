@@ -113,7 +113,8 @@ sub load ($self) {
     $self->logger->error("  File: $file");
     $self->logger->error("  Error: $@");
     $self->logger->error("=" x 60);
-    warn "CONFLICTS LOADER: Failed to parse $file as JSON! Check logs for details.\n";
+    warn
+"CONFLICTS LOADER: Failed to parse $file as JSON! Check logs for details.\n";
     return 0;
   }
 

@@ -42,7 +42,8 @@ sub load_all {
       )->load_string($file->slurp_utf8);
 
       unless ($data->{name}) {
-        push @failed_files, { file => "$file", error => "No 'name' field in YAML" };
+        push @failed_files,
+          { file => "$file", error => "No 'name' field in YAML" };
         $self->logger->error("!!! YAML LOAD FAILED !!! $file - no name field");
         return;
       }
@@ -63,13 +64,17 @@ sub load_all {
   # Report summary of failures prominently
   if (@failed_files) {
     $self->logger->error("=" x 60);
-    $self->logger->error("!!! SPECIALTIES LOADER: " . scalar(@failed_files) . " FILE(S) FAILED TO LOAD !!!");
+    $self->logger->error("!!! SPECIALTIES LOADER: "
+        . scalar(@failed_files)
+        . " FILE(S) FAILED TO LOAD !!!");
     for my $failure (@failed_files) {
       $self->logger->error("  - $failure->{file}");
       $self->logger->error("    Error: $failure->{error}");
     }
     $self->logger->error("=" x 60);
-    warn sprintf("SPECIALTIES LOADER: %d file(s) failed to load! Check logs for details.\n", scalar(@failed_files));
+    warn sprintf(
+"SPECIALTIES LOADER: %d file(s) failed to load! Check logs for details.\n",
+      scalar(@failed_files));
   }
 
   $self->logger->info("Loaded $loaded specialties");

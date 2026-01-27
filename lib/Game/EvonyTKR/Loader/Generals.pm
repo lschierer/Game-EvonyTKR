@@ -58,8 +58,10 @@ sub load_all {
           "Loaded general: $general_name (key: $normalized_key)");
       }
       else {
-        push @failed_files, { file => "$file", error => "Failed to create model from hash" };
-        $self->logger->error("!!! YAML LOAD FAILED !!! Could not create general from $file");
+        push @failed_files,
+          { file => "$file", error => "Failed to create model from hash" };
+        $self->logger->error(
+          "!!! YAML LOAD FAILED !!! Could not create general from $file");
       }
     };
     if ($@) {
@@ -73,13 +75,17 @@ sub load_all {
   # Report summary of failures prominently
   if (@failed_files) {
     $self->logger->error("=" x 60);
-    $self->logger->error("!!! GENERALS LOADER: " . scalar(@failed_files) . " FILE(S) FAILED TO LOAD !!!");
+    $self->logger->error("!!! GENERALS LOADER: "
+        . scalar(@failed_files)
+        . " FILE(S) FAILED TO LOAD !!!");
     for my $failure (@failed_files) {
       $self->logger->error("  - $failure->{file}");
       $self->logger->error("    Error: $failure->{error}");
     }
     $self->logger->error("=" x 60);
-    warn sprintf("GENERALS LOADER: %d file(s) failed to load! Check logs for details.\n", scalar(@failed_files));
+    warn sprintf(
+      "GENERALS LOADER: %d file(s) failed to load! Check logs for details.\n",
+      scalar(@failed_files));
   }
 
   $self->logger->info("Loaded $loaded generals");

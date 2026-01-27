@@ -10,14 +10,14 @@ use overload
   'bool'     => sub { my $self = shift; $self->_isTrue },
   "fallback" => 1;
 
-has 'term'  => ( is => 'lazy' );
-has 'definition'  => ( is => 'lazy' );
-has 'rendered_def'  => ( is => 'lazy' );
-has 'synonyms'      => (is => 'lazy', default =>  sub { [] });
-has 'related_terms' => (is => 'lazy', default =>  sub { [] });
-has 'examples'      => (is => 'lazy', default =>  sub { [] });
-has 'owner'  => ( is => 'lazy', default => '' );
-has 'status'        => ( is => 'lazy', default => 'approved' );
+has 'term'          => (is => 'lazy');
+has 'definition'    => (is => 'lazy');
+has 'rendered_def'  => (is => 'lazy');
+has 'synonyms'      => (is => 'lazy', default => sub { [] });
+has 'related_terms' => (is => 'lazy', default => sub { [] });
+has 'examples'      => (is => 'lazy', default => sub { [] });
+has 'owner'         => (is => 'lazy', default => '');
+has 'status'        => (is => 'lazy', default => 'approved');
 
 # Check if this term matches a search (term or synonym)
 sub matches_search ($self, $search_term) {

@@ -71,13 +71,17 @@ sub load_all {
   # Report summary of failures prominently
   if (@failed_files) {
     $self->logger->error("=" x 60);
-    $self->logger->error("!!! ASCENDING ATTRIBUTES LOADER: " . scalar(@failed_files) . " FILE(S) FAILED TO LOAD !!!");
+    $self->logger->error("!!! ASCENDING ATTRIBUTES LOADER: "
+        . scalar(@failed_files)
+        . " FILE(S) FAILED TO LOAD !!!");
     for my $failure (@failed_files) {
       $self->logger->error("  - $failure->{file}");
       $self->logger->error("    Error: $failure->{error}");
     }
     $self->logger->error("=" x 60);
-    warn sprintf("ASCENDING ATTRIBUTES LOADER: %d file(s) failed to load! Check logs for details.\n", scalar(@failed_files));
+    warn sprintf(
+"ASCENDING ATTRIBUTES LOADER: %d file(s) failed to load! Check logs for details.\n",
+      scalar(@failed_files));
   }
 
   $self->logger->info("Loaded $loaded ascending attributes");

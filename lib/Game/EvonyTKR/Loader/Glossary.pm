@@ -67,7 +67,7 @@ has stats => (
   is      => 'rw',
   default => sub {
     {
-      total_terms => 0,
+      total_terms  => 0,
       files_loaded => 0,
     };
   },
@@ -86,7 +86,8 @@ sub load_all ($self) {
   my @yaml_files = $data_path->children(qr/\.ya?ml$/);
   @yaml_files = grep { $_->basename !~ /schema/ } @yaml_files;
 
-  $self->logger->info(sprintf("Found %d glossary YAML files", scalar(@yaml_files)));
+  $self->logger->info(
+    sprintf("Found %d glossary YAML files", scalar(@yaml_files)));
 
   my $yp = YAML::PP->new();
   my @all_terms;
@@ -113,12 +114,13 @@ sub load_all ($self) {
       # Render the definition as markdown
       my $rendered_def = '';
       if ($term_data->{definition}) {
-        $rendered_def = $self->markdown_string_to_html($term_data->{definition});
+        $rendered_def =
+          $self->markdown_string_to_html($term_data->{definition});
       }
 
       my $term = Game::EvonyTKR::Model::Glossary->new(
         term          => $term_data->{term},
-        definition    => $term_data->{definition}    // '',
+        definition    => $term_data->{definition} // '',
         rendered_def  => $rendered_def,
         synonyms      => $term_data->{synonyms}      // [],
         related_terms => $term_data->{related_terms} // [],
@@ -158,13 +160,17 @@ sub load_all ($self) {
   # Report summary of failures prominently
   if (@failed_files) {
     $self->logger->error("=" x 60);
-    $self->logger->error("!!! GLOSSARY LOADER: " . scalar(@failed_files) . " FILE(S) FAILED TO LOAD !!!");
+    $self->logger->error("!!! GLOSSARY LOADER: "
+        . scalar(@failed_files)
+        . " FILE(S) FAILED TO LOAD !!!");
     for my $failure (@failed_files) {
       $self->logger->error("  - $failure->{file}");
       $self->logger->error("    Error: $failure->{error}");
     }
     $self->logger->error("=" x 60);
-    warn sprintf("GLOSSARY LOADER: %d file(s) failed to load! Check logs for details.\n", scalar(@failed_files));
+    warn sprintf(
+      "GLOSSARY LOADER: %d file(s) failed to load! Check logs for details.\n",
+      scalar(@failed_files));
   }
 
   $self->logger->info(sprintf(
@@ -202,7 +208,7 @@ Returns arrayref of terms starting with the given letter.
 =cut
 
 sub get_terms_for_letter ($self, $letter) {
-  return $self->terms_by_letter->{uc($letter)} // [];
+  return $self->terms_by_letter->{ uc($letter) } // [];
 }
 
 =head2 find_term

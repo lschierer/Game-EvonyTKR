@@ -180,8 +180,7 @@ sub build ($self) {
 
   # Load glossary terms synchronously at startup
   my $glossary_loader = Game::EvonyTKR::Loader::Glossary->new(
-    data_dir => 'share/collections/Glossary',
-  );
+    data_dir => 'share/collections/Glossary',);
 
   $self->logger->info("Loading glossary terms...");
   my $glossary_count = $glossary_loader->load_all();
@@ -200,8 +199,7 @@ sub build ($self) {
 
   # Load monsters synchronously at startup
   my $monsters_loader = Game::EvonyTKR::Loader::Monsters->new(
-    data_file => 'share/collections/data/monsters/monsters.yaml',
-  );
+    data_file => 'share/collections/data/monsters/monsters.yaml',);
 
   $self->logger->info("Loading monsters...");
   my $monsters_count = $monsters_loader->load_all();
@@ -219,9 +217,9 @@ sub build ($self) {
   $self->app->{monsters_loader} = $monsters_loader;
 
   # Load monster simulator reference data
-  my $monster_simulator_data = Game::EvonyTKR::Loader::MonsterSimulatorData->new(
-    data_file => 'share/collections/data/monster_simulator/reference_tables.yaml',
-  );
+  my $monster_simulator_data =
+    Game::EvonyTKR::Loader::MonsterSimulatorData->new(data_file =>
+      'share/collections/data/monster_simulator/reference_tables.yaml',);
 
   $self->logger->info("Loading monster simulator reference data...");
   $monster_simulator_data->load_all();

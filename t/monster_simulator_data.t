@@ -11,8 +11,7 @@ use Game::EvonyTKR::Service::MonsterSimulator;
 # Test Monster Loader
 subtest 'Monster Loader' => sub {
   my $loader = Game::EvonyTKR::Loader::Monsters->new(
-    data_file => 'share/collections/data/monsters/monsters.yaml',
-  );
+    data_file => 'share/collections/data/monsters/monsters.yaml',);
 
   my $count = $loader->load_all();
   ok($count > 0, "Loaded $count monsters");
@@ -20,8 +19,8 @@ subtest 'Monster Loader' => sub {
   # Test getting a monster by order
   my $robber = $loader->get_by_order(1);
   ok($robber, 'Got monster with order 1');
-  is($robber->name, 'Robber', 'Monster name is Robber');
-  is($robber->level, 1, 'Monster level is 1');
+  is($robber->name,  'Robber', 'Monster name is Robber');
+  is($robber->level, 1,        'Monster level is 1');
 
   # Test search
   my $results = $loader->search('Dragon');
@@ -30,19 +29,18 @@ subtest 'Monster Loader' => sub {
   # Test listing unique names
   my $names = $loader->list_unique_names();
   ok(ref($names) eq 'ARRAY', 'list_unique_names returns array ref');
-  ok(scalar(@$names) > 0, 'Has monster names');
+  ok(scalar(@$names) > 0,    'Has monster names');
 
   # Test getting levels for a name
   my $levels = $loader->get_levels_for_name('Robber');
   ok(ref($levels) eq 'ARRAY', 'get_levels_for_name returns array ref');
-  ok(scalar(@$levels) > 0, 'Robber has multiple levels');
+  ok(scalar(@$levels) > 0,    'Robber has multiple levels');
 };
 
 # Test Reference Data Loader
 subtest 'Monster Simulator Reference Data' => sub {
-  my $loader = Game::EvonyTKR::Loader::MonsterSimulatorData->new(
-    data_file => 'share/collections/data/monster_simulator/reference_tables.yaml',
-  );
+  my $loader = Game::EvonyTKR::Loader::MonsterSimulatorData->new(data_file =>
+      'share/collections/data/monster_simulator/reference_tables.yaml',);
 
   ok($loader->load_all(), 'Loaded reference tables');
 
@@ -68,13 +66,11 @@ subtest 'Monster Simulator Reference Data' => sub {
 # Test Simulator Service
 subtest 'Monster Simulator Service' => sub {
   my $monsters_loader = Game::EvonyTKR::Loader::Monsters->new(
-    data_file => 'share/collections/data/monsters/monsters.yaml',
-  );
+    data_file => 'share/collections/data/monsters/monsters.yaml',);
   $monsters_loader->load_all();
 
-  my $ref_data = Game::EvonyTKR::Loader::MonsterSimulatorData->new(
-    data_file => 'share/collections/data/monster_simulator/reference_tables.yaml',
-  );
+  my $ref_data = Game::EvonyTKR::Loader::MonsterSimulatorData->new(data_file =>
+      'share/collections/data/monster_simulator/reference_tables.yaml',);
   $ref_data->load_all();
 
   my $simulator = Game::EvonyTKR::Service::MonsterSimulator->new(
@@ -84,7 +80,7 @@ subtest 'Monster Simulator Service' => sub {
 
   # Run a simple simulation
   my $result = $simulator->simulate({
-    monster_order => 1,    # Robber Lv1
+    monster_order => 1,           # Robber Lv1
     tier          => 'T15',
     troop_type    => 'mounted',
     march_type    => 'solo',
@@ -94,9 +90,9 @@ subtest 'Monster Simulator Service' => sub {
     },
   });
 
-  ok(!$result->{error}, 'Simulation completed without error');
-  ok($result->{player_stats}, 'Has player stats');
-  ok($result->{monster_stats}, 'Has monster stats');
+  ok(!$result->{error},         'Simulation completed without error');
+  ok($result->{player_stats},   'Has player stats');
+  ok($result->{monster_stats},  'Has monster stats');
   ok($result->{troop_modifier}, 'Has troop modifier');
 
   # Verify the calculation makes sense
@@ -108,7 +104,7 @@ subtest 'Monster Simulator Service' => sub {
 
   # Test error case
   my $bad_result = $simulator->simulate({
-    monster_order => 999999,    # Non-existent
+    monster_order => 999999,      # Non-existent
     tier          => 'T15',
     troop_type    => 'mounted',
   });

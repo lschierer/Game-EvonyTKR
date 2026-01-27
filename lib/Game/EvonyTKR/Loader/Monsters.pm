@@ -47,7 +47,7 @@ sub load_all ($self) {
 
   my $data = YAML::PP->new(
     schema       => [qw/ + Perl /],
-    yaml_version => [ '1.2', '1.1' ],
+    yaml_version => ['1.2', '1.1'],
   )->load_string($file->slurp_utf8);
 
   my $monsters_data = $data->{monsters} // [];
@@ -104,40 +104,34 @@ sub search ($self, $query) {
   }
 
   # Sort by level, then name
-  @results = sort {
-    $a->name cmp $b->name || $a->level <=> $b->level
-  } @results;
+  @results = sort { $a->name cmp $b->name || $a->level <=> $b->level } @results;
 
   return \@results;
 }
 
 sub list_all ($self) {
-  return [
-    sort { $a->order <=> $b->order }
-      values $self->monsters->%*
-  ];
+  return [sort { $a->order <=> $b->order } values $self->monsters->%*];
 }
 
 sub list_boss_monsters ($self) {
   return [
     sort { $a->order <=> $b->order }
-    grep { $_->is_boss }
-      values $self->monsters->%*
+    grep { $_->is_boss } values $self->monsters->%*
   ];
 }
 
 sub list_common_monsters ($self) {
   return [
     sort { $a->order <=> $b->order }
-    grep { $_->is_common }
-      values $self->monsters->%*
+    grep { $_->is_common } values $self->monsters->%*
   ];
 }
 
 sub list_unique_names ($self) {
   my %seen;
   my @names;
-  for my $monster (sort { $a->order <=> $b->order } values $self->monsters->%*) {
+  for my $monster (sort { $a->order <=> $b->order } values $self->monsters->%*)
+  {
     unless ($seen{ $monster->name }++) {
       push @names, $monster->name;
     }
@@ -155,7 +149,7 @@ sub get_levels_for_name ($self, $name) {
     }
   }
 
-  return [ sort { $a <=> $b } @levels ];
+  return [sort { $a <=> $b } @levels];
 }
 
 1;
