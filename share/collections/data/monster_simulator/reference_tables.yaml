@@ -1,0 +1,455 @@
+world_boss_modifiers:
+  Lord of Lava:
+    order: 321
+    siege: 1.5
+    archer: 1.25
+    mounted: 1.0
+    ground: 1.5
+  Thunder Scorpion:
+    order: 322
+    siege: 1.25
+    archer: 2.5
+    mounted: 0.75
+    ground: 1.25
+  Behemoth King:
+    order: 323
+    siege: 1.25
+    archer: 0.8
+    mounted: 1.0
+    ground: 1.25
+  Bird of Hurricane:
+    order: 324
+    siege: 1.25
+    archer: 1.25
+    mounted: 0.5
+    ground: 3.1
+tier_modifiers_vs_boss:
+  T1:
+    siege: 1.4
+    archer: 1.2
+    mounted: 0.9
+    ground: 1.1
+  T2:
+    siege: 1.4
+    archer: 1.2
+    mounted: 0.9
+    ground: 1.1
+  T3:
+    siege: 1.4
+    archer: 1.2
+    mounted: 0.9
+    ground: 1.1
+  T4:
+    siege: 1.4
+    archer: 1.2
+    mounted: 0.9
+    ground: 1.1
+  T5:
+    siege: 1.4
+    archer: 1.2
+    mounted: 0.9
+    ground: 1.1
+  T6:
+    siege: 1.4
+    archer: 1.2
+    mounted: 0.9
+    ground: 1.1
+  T7:
+    siege: 1.4
+    archer: 1.2
+    mounted: 0.9
+    ground: 1.1
+  T8:
+    siege: 1.4
+    archer: 1.2
+    mounted: 0.9
+    ground: 1.1
+  T9:
+    siege: 1.4
+    archer: 1.2
+    mounted: 0.9
+    ground: 1.1
+  T10:
+    siege: 1.4
+    archer: 1.2
+    mounted: 0.9
+    ground: 1.1
+  T11:
+    siege: 0.5
+    archer: 1.0
+    mounted: 1.1
+    ground: 1.0
+  T12:
+    siege: 0.5
+    archer: 1.0
+    mounted: 1.1
+    ground: 1.0
+  T13:
+    siege: 0.5
+    archer: 1.0
+    mounted: 1.1
+    ground: 1.0
+  T14:
+    siege: 0.5
+    archer: 1.0
+    mounted: 1.1
+    ground: 1.0
+  T15:
+    siege: 0.5
+    archer: 1.0
+    mounted: 1.1
+    ground: 1.0
+  T16:
+    siege: 0.5
+    archer: 1.0
+    mounted: 1.1
+    ground: 1.0
+  T17:
+    siege: 0.5
+    archer: 1.0
+    mounted: 1.1
+    ground: 1.0
+alliance_boss_modifiers:
+  T1:
+    siege: 0.5
+    archer: 1.69
+    mounted: 1.0
+    ground: 2.2
+  T2:
+    siege: 0.5
+    archer: 1.67
+    mounted: 1.0
+    ground: 2.14
+  T3:
+    siege: 0.5
+    archer: 1.71
+    mounted: 1.0
+    ground: 2.16
+  T4:
+    siege: 0.5
+    archer: 1.72
+    mounted: 1.0
+    ground: 2.12
+  T5:
+    siege: 0.5
+    archer: 1.72
+    mounted: 1.0
+    ground: 2.11
+  T6:
+    siege: 0.5
+    archer: 1.72
+    mounted: 1.0
+    ground: 2.13
+  T7:
+    siege: 0.5
+    archer: 1.73
+    mounted: 1.0
+    ground: 2.14
+  T8:
+    siege: 0.5
+    archer: 1.73
+    mounted: 1.0
+    ground: 2.14
+  T9:
+    siege: 0.5
+    archer: 1.73
+    mounted: 1.0
+    ground: 2.14
+  T10:
+    siege: 0.5
+    archer: 1.73
+    mounted: 1.0
+    ground: 2.14
+  T11:
+    siege: 0.5
+    archer: 1.73
+    mounted: 1.0
+    ground: 2.14
+  T12:
+    siege: 0.5
+    archer: 1.73
+    mounted: 1.0
+    ground: 2.14
+  T13:
+    siege: 0.5
+    archer: 1.68
+    mounted: 1.0
+    ground: 1.99
+  T14:
+    siege: 0.5
+    archer: 1.64
+    mounted: 1.0
+    ground: 1.87
+  T15:
+    siege: 0.5
+    archer: 1.61
+    mounted: 1.0
+    ground: 1.78
+  T16:
+    siege: 0.5
+    archer: 1.61
+    mounted: 1.0
+    ground: 1.78
+  T17:
+    siege: 0.5
+    archer: 1.61
+    mounted: 1.0
+    ground: 1.78
+troop_base_attack:
+  T1:
+    ground: 100
+    archer: 130
+    mounted: 220
+    siege: 100
+  T2:
+    ground: 140
+    archer: 180
+    mounted: 300
+    siege: 140
+  T3:
+    ground: 190
+    archer: 240
+    mounted: 410
+    siege: 190
+  T4:
+    ground: 260
+    archer: 320
+    mounted: 550
+    siege: 260
+  T5:
+    ground: 350
+    archer: 430
+    mounted: 740
+    siege: 350
+  T6:
+    ground: 470
+    archer: 580
+    mounted: 1000
+    siege: 470
+  T7:
+    ground: 630
+    archer: 780
+    mounted: 1350
+    siege: 630
+  T8:
+    ground: 850
+    archer: 1050
+    mounted: 1820
+    siege: 850
+  T9:
+    ground: 1150
+    archer: 1420
+    mounted: 2460
+    siege: 1150
+  T10:
+    ground: 1550
+    archer: 1920
+    mounted: 3320
+    siege: 1550
+  T11:
+    ground: 1940
+    archer: 2400
+    mounted: 4150
+    siege: 1940
+  T12:
+    ground: 2425
+    archer: 3000
+    mounted: 5187
+    siege: 2425
+  T13:
+    ground: 2910
+    archer: 3450
+    mounted: 5800
+    siege: 2780
+  T14:
+    ground: 3570
+    archer: 4070
+    mounted: 6670
+    siege: 3280
+  T15:
+    ground: 4230
+    archer: 4690
+    mounted: 7540
+    siege: 3780
+  T16:
+    ground: 4920
+    archer: 5460
+    mounted: 8780
+    siege: 4400
+  T17:
+    ground: 5660
+    archer: 6280
+    mounted: 10100
+    siege: 5060
+troop_base_defense:
+  T1:
+    ground: 300
+    archer: 100
+    mounted: 150
+    siege: 50
+  T2:
+    ground: 410
+    archer: 140
+    mounted: 200
+    siege: 70
+  T3:
+    ground: 550
+    archer: 190
+    mounted: 270
+    siege: 90
+  T4:
+    ground: 740
+    archer: 260
+    mounted: 360
+    siege: 120
+  T5:
+    ground: 1000
+    archer: 350
+    mounted: 490
+    siege: 160
+  T6:
+    ground: 1350
+    archer: 470
+    mounted: 660
+    siege: 220
+  T7:
+    ground: 1820
+    archer: 630
+    mounted: 890
+    siege: 300
+  T8:
+    ground: 2460
+    archer: 850
+    mounted: 1200
+    siege: 410
+  T9:
+    ground: 3320
+    archer: 1150
+    mounted: 1620
+    siege: 550
+  T10:
+    ground: 4480
+    archer: 1550
+    mounted: 2190
+    siege: 740
+  T11:
+    ground: 5600
+    archer: 1940
+    mounted: 2740
+    siege: 930
+  T12:
+    ground: 7000
+    archer: 2425
+    mounted: 3425
+    siege: 1162
+  T13:
+    ground: 8400
+    archer: 2780
+    mounted: 3830
+    siege: 1330
+  T14:
+    ground: 10330
+    archer: 3280
+    mounted: 4400
+    siege: 1560
+  T15:
+    ground: 11760
+    archer: 3780
+    mounted: 4970
+    siege: 1790
+  T16:
+    ground: 13670
+    archer: 4390
+    mounted: 5780
+    siege: 2080
+  T17:
+    ground: 15720
+    archer: 5050
+    mounted: 6650
+    siege: 2390
+troop_base_hp:
+  T1:
+    ground: 600
+    archer: 250
+    mounted: 400
+    siege: 100
+  T2:
+    ground: 810
+    archer: 340
+    mounted: 540
+    siege: 140
+  T3:
+    ground: 1090
+    archer: 460
+    mounted: 730
+    siege: 190
+  T4:
+    ground: 1470
+    archer: 620
+    mounted: 990
+    siege: 260
+  T5:
+    ground: 1980
+    archer: 840
+    mounted: 1340
+    siege: 350
+  T6:
+    ground: 2670
+    archer: 1130
+    mounted: 1810
+    siege: 470
+  T7:
+    ground: 3600
+    archer: 1530
+    mounted: 2440
+    siege: 630
+  T8:
+    ground: 4860
+    archer: 2070
+    mounted: 3290
+    siege: 850
+  T9:
+    ground: 6560
+    archer: 2790
+    mounted: 4440
+    siege: 1150
+  T10:
+    ground: 8860
+    archer: 3770
+    mounted: 5990
+    siege: 1550
+  T11:
+    ground: 11080
+    archer: 4720
+    mounted: 7490
+    siege: 1940
+  T12:
+    ground: 13850
+    archer: 5900
+    mounted: 9362
+    siege: 2425
+  T13:
+    ground: 16620
+    archer: 6780
+    mounted: 10480
+    siege: 2780
+  T14:
+    ground: 20440
+    archer: 8000
+    mounted: 12050
+    siege: 3280
+  T15:
+    ground: 24260
+    archer: 9220
+    mounted: 13620
+    siege: 3780
+  T16:
+    ground: 28240
+    archer: 10730
+    mounted: 15850
+    siege: 4400
+  T17:
+    ground: 32480
+    archer: 12340
+    mounted: 18230
+    siege: 5060

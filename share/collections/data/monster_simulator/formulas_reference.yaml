@@ -1,0 +1,115 @@
+description: Key formulas extracted from Monster Simulator tab
+player_stats:
+  player_attack_buff_pct:
+    cell: J23
+    formula: =IF(B$27="solo",IFS(D$27="Ground",E$17,D$27="Archer",H$17,D$27="Mounted",K$17,D$27="siege",N$17),IFS(D$27="Ground",E18,D$27="Archer",H18,D$27="Mounted",K$18,D$27="siege",N$18))+if(D31=706,IFS(D36=-20%,0,D36=20%,0,D36="None",0,D36=100%,1,D36=-100%,-1),0)
+  player_attack_buff_flat:
+    cell: K23
+    formula: =IF($B$27="solo",IFS($D$27="Ground",$E$15,$D$27="Archer",$H$15,$D$27="Mounted",$K$15,$D$27="siege",$N$15),IFS($D$27="Ground",$E$15,$D$27="Archer",$H$15,$D$27="Mounted",$K$15,$D$27="siege",$N$15))
+  player_final_attack:
+    cell: L23
+    formula: =INDEX('Reference Table'!C32:F48,MATCH(C27,'Reference Table'!B32:B48,0), MATCH(D27,'Reference Table'!C31:F31,0))*(1+J23)+K23
+  player_defense_buff_pct:
+    cell: J24
+    formula: =IF(B$27="solo",IFS(D$27="Ground",F$17,D$27="Archer",I$17,D$27="Mounted",L$17,D$27="siege",O$17),IFS(D$27="Ground",F18,D$27="Archer",I18,D$27="Mounted",L$18,D$27="siege",O$18))
+  player_defense_buff_flat:
+    cell: K24
+    formula: =IF($B$27="solo",IFS($D$27="Ground",$F$15,$D$27="Archer",$I$15,$D$27="Mounted",$L$15,$D$27="siege",$O$15),IFS($D$27="Ground",$F$15,$D$27="Archer",$I$15,$D$27="Mounted",$L$15,$D$27="siege",$O$15))
+  player_final_defense:
+    cell: L24
+    formula: =INDEX('Reference Table'!C50:F66,MATCH(C27,'Reference Table'!B50:B66,0), MATCH(D27,'Reference Table'!C49:F49,0))*(1+J24)+K24
+  player_hp_buff_pct:
+    cell: J25
+    formula: =IF(B$27="solo",IFS(D$27="Ground",G$17,D$27="Archer",J$17,D$27="Mounted",M$17,D$27="siege",P$17),IFS(D$27="Ground",G18,D$27="Archer",J18,D$27="Mounted",M$18,D$27="siege",P$18))
+  player_hp_buff_flat:
+    cell: K25
+    formula: =IF($B$27="solo",IFS($D$27="Ground",$G$15,$D$27="Archer",$J$15,$D$27="Mounted",$M$15,$D$27="siege",$P$15),IFS($D$27="Ground",$G$15,$D$27="Archer",$J$15,$D$27="Mounted",$M$15,$D$27="siege",$P$15))
+  player_final_hp:
+    cell: L25
+    formula: =INDEX('Reference Table'!C68:F84,MATCH(C27,'Reference Table'!B68:B84,0), MATCH(D27,'Reference Table'!C67:F67,0))*(1+J25)+K25
+monster_stats:
+  monster_final_attack:
+    cell: K28
+    formula: =INDEX(Monsters!$M$3:$O$1133,MATCH($D$31,Monsters!$A$3:$A$1133,0),MATCH($I$28,Monsters!$M$2:$O$2,0))*if(or(D31>317,D31<325),(1-J28),1)-if(and(D31>317,D31<325),(J28*6856000),0)
+  monster_final_defense:
+    cell: K29
+    formula: =INDEX(Monsters!$M$3:$O$1133,MATCH($D$31,Monsters!$A$3:$A$1133,0),MATCH($I$29,Monsters!$M$2:$O$2,0))*if(or(D31>317,D31<325),(1-J29),1)-if(and(D31>317,D31<325),(J29*100000),0)
+  monster_final_hp:
+    cell: K30
+    formula: =INDEX(Monsters!$M$3:$O$1133,MATCH($D$31,Monsters!$A$3:$A$1133,0),MATCH($I$30,Monsters!$M$2:$O$2,0))
+damage_calculations:
+  troop_modifier:
+    cell: E28
+    formula: |
+      =IF(OR(D31=693, D31=694, D31=695),
+          INDEX('Reference Table'!C18:S21,
+              MATCH(D27, 'Reference Table'!B18:B21, 0),
+              MATCH(C27, 'Reference Table'!C17:S17, 0)
+          ) *
+          IFS(
+              D36=-20%, 0.8,
+              D36=20%, 1.2,
+              D36="None", 1,
+              D36=100%, 1,
+              D36=-100%, 1
+          ),
+
+      IF(AND(D31>317, D31<325),
+          INDEX('Reference Table'!C4:F7,
+              MATCH(D27, 'Reference Table'!B4:B7, 0),
+              MATCH(D31, 'Reference Table'!C3:F3, 0)
+          ),
+
+      IF(D33="Pan (Ranged Troop)",
+          VLOOKUP(D27, 'Reference Table'!B24:E27, 4, FALSE),
+
+      IF(D33="Pan (Mounted Troop)",
+          VLOOKUP(D27, 'Reference Table'!B24:E27, 3, FALSE),
+
+      IF(D33="Pan (Ground Troop)",
+          VLOOKUP(D27, 'Reference Table'!B24:E27, 2, FALSE),
+
+      INDEX('Reference Table'!C11:S14,
+          MATCH(D27, 'Reference Table'!B11:B14, 0),
+          MATCH(C27, 'Reference Table'!C10:S10, 0)
+      ) *
+      IF(VLOOKUP(D31, Monsters!A:CQ, 95, 0)=1, 0, 1) +
+
+      IFS(
+          AND(VLOOKUP(D31, Monsters!A:CQ, 95, 0)=1,
+              OR(C27="T1", C27="T2", C27="T3", C27="T4", C27="T5", C27="T6", C27="T7", C27="T8", C27="T9", C27="T10")
+          ), 1,
+
+          AND(VLOOKUP(D31, Monsters!A:CQ, 95, 0)=1,
+              OR(C27="T11", C27="T12", C27="T13", C27="T14", C27="T15", C27="T16",C27="T17"),
+              OR(D27="Archer", D27="Ground")
+          ), 1,
+
+          AND(VLOOKUP(D31, Monsters!A:CQ, 95, 0)=1,
+              OR(C27="T11", C27="T12", C27="T13", C27="T14", C27="T15", C27="T16",C27="T17"),
+              D27="Mounted"
+          ), 1.1,
+
+          AND(VLOOKUP(D31, Monsters!A:CQ, 95, 0)=1,
+              OR(C27="T11", C27="T12", C27="T13", C27="T14", C27="T15", C27="T16",C27="T17"),
+              D27="Siege"
+          ), 0.5,
+
+          VLOOKUP(D31, Monsters!A:CQ, 95, 0)<>1, 0
+      ))))))
+  troop_modifier_lookup:
+    cell: D32
+    formula: =INDEX(Monsters!AN3:AQ1133,MATCH(D31,Monsters!A3:A1133,0), MATCH(D27,Monsters!AN2:AQ2,0))/100
+  minimum_troops_to_kill:
+    cell: M32
+    formula: =$K$30*VLOOKUP($D$31,Monsters!$A$3:$L$1133,12,0)/T5
+  true_attack_buff:
+    cell: M46
+    formula: =(M44-ifs(D27="Ground",E15,D27="Archer",H15,D27="Mounted",K15,D27="Siege",N15))/(INDEX('Reference Table'!C32:F48,MATCH(C27,'Reference
+      Table'!B32:B48,0), MATCH(D27,'Reference Table'!C31:F31,0)))-1-+IFS(D36=-20%,0,D36=20%,0,D36="None",0,D36=100%,1,D36=-100%,-1)
+  true_hp_buff:
+    cell: N54
+    formula: =N52/INDEX('Reference Table'!C68:F84,MATCH(C27,'Reference Table'!B68:B84,0), MATCH(D27,'Reference Table'!C67:F67,0))-1
+  true_defense_buff:
+    cell: N62
+    formula: =N60/INDEX('Reference Table'!C50:F66,MATCH(C27,'Reference Table'!B50:B66,0), MATCH(D27,'Reference Table'!C49:F49,0))-1

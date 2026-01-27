@@ -15,6 +15,8 @@ use Game::EvonyTKR::Loader::Covenants;
 use Game::EvonyTKR::Loader::Conflicts;
 use Game::EvonyTKR::Loader::Pairs;
 use Game::EvonyTKR::Loader::Glossary;
+use Game::EvonyTKR::Loader::Monsters;
+use Game::EvonyTKR::Loader::MonsterSimulatorData;
 
 # Build method runs at app startup
 sub build ($self) {
@@ -195,6 +197,46 @@ sub build ($self) {
 
   # Store in app stash so it's accessible elsewhere
   $self->app->{glossary_loader} = $glossary_loader;
+
+  # Load monsters synchronously at startup
+  my $monsters_loader = Game::EvonyTKR::Loader::Monsters->new(
+    data_file => 'share/collections/data/monsters/monsters.yaml',
+  );
+
+  $self->logger->info("Loading monsters...");
+  my $monsters_count = $monsters_loader->load_all();
+  $self->logger->info("Loaded $monsters_count monsters");
+
+  # Register as helper so controllers can access it
+  # Controllers can call $self->monsters_loader()
+  $self->add_method(
+    controller => monsters_loader => sub ($controller) {
+      return $monsters_loader;
+    }
+  );
+
+  # Store in app stash so it's accessible elsewhere
+  $self->app->{monsters_loader} = $monsters_loader;
+
+  # Load monster simulator reference data
+  my $monster_simulator_data = Game::EvonyTKR::Loader::MonsterSimulatorData->new(
+    data_file => 'share/collections/data/monster_simulator/reference_tables.yaml',
+  );
+
+  $self->logger->info("Loading monster simulator reference data...");
+  $monster_simulator_data->load_all();
+  $self->logger->info("Loaded monster simulator reference tables");
+
+  # Register as helper so controllers can access it
+  # Controllers can call $self->monster_simulator_data()
+  $self->add_method(
+    controller => monster_simulator_data => sub ($controller) {
+      return $monster_simulator_data;
+    }
+  );
+
+  # Store in app stash so it's accessible elsewhere
+  $self->app->{monster_simulator_data} = $monster_simulator_data;
 }
 
 1;
@@ -218,6 +260,8 @@ Currently loaded:
 - Conflicts (ML predictions from conflicts.json)
 - Pairs (generated from generals, filtered by conflicts)
 - Glossary terms
+- Monsters (for monster simulator)
+- Monster Simulator Reference Data (troop stats, modifiers)
 
 Controllers can access loaders via helper methods:
 - $self->specialty_loader()
@@ -228,5 +272,7 @@ Controllers can access loaders via helper methods:
 - $self->conflicts_loader()
 - $self->pairs_loader()
 - $self->glossary_loader()
+- $self->monsters_loader()
+- $self->monster_simulator_data()
 
 =cut

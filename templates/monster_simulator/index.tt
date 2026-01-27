@@ -1,0 +1,329 @@
+[% WRAPPER layouts/default.tt %]
+
+<article class="monster-simulator">
+  <h1 class="spectrum-Heading spectrum-Heading--sizeXL">Monster Simulator</h1>
+
+  <p class="spectrum-Body spectrum-Body--sizeM">
+    Calculate damage output and expected wounds when attacking monsters.
+    Based on the Derrick Defies Monster Simulator spreadsheet.
+  </p>
+
+  <form method="POST" action="[% linkBase %]/calculate" class="simulator-form">
+
+    <!-- Monster Selection -->
+    <section class="form-section">
+      <h2 class="spectrum-Heading spectrum-Heading--sizeL">Monster Selection</h2>
+
+      <div class="spectrum-Form-item">
+        <label for="monster_name" class="spectrum-FieldLabel spectrum-FieldLabel--sizeM">Monster Name</label>
+        <div class="spectrum-Textfield">
+          <select id="monster_name" name="monster_name" class="spectrum-Picker-input" onchange="loadMonsterLevels(this.value)">
+            <option value="">-- Select Monster --</option>
+            [% FOREACH name IN monster_names %]
+              <option value="[% name %]">[% name %]</option>
+            [% END %]
+          </select>
+        </div>
+      </div>
+
+      <div class="spectrum-Form-item">
+        <label for="monster_level" class="spectrum-FieldLabel spectrum-FieldLabel--sizeM">Monster Level</label>
+        <div class="spectrum-Textfield">
+          <select id="monster_level" name="monster_order" class="spectrum-Picker-input">
+            <option value="">-- Select monster first --</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <!-- Troop Configuration -->
+    <section class="form-section">
+      <h2 class="spectrum-Heading spectrum-Heading--sizeL">Troop Configuration</h2>
+
+      <div class="form-row">
+        <div class="spectrum-Form-item">
+          <label for="march_type" class="spectrum-FieldLabel spectrum-FieldLabel--sizeM">March Type</label>
+          <div class="spectrum-Textfield">
+            <select id="march_type" name="march_type" class="spectrum-Picker-input">
+              [% FOREACH mt IN march_types %]
+                <option value="[% mt %]" [% IF defaults.march_type == mt %]selected[% END %]>
+                  [% march_type_labels.$mt %]
+                </option>
+              [% END %]
+            </select>
+          </div>
+        </div>
+
+        <div class="spectrum-Form-item">
+          <label for="tier" class="spectrum-FieldLabel spectrum-FieldLabel--sizeM">Tier</label>
+          <div class="spectrum-Textfield">
+            <select id="tier" name="tier" class="spectrum-Picker-input">
+              [% FOREACH t IN tiers %]
+                <option value="[% t %]" [% IF defaults.tier == t %]selected[% END %]>[% t %]</option>
+              [% END %]
+            </select>
+          </div>
+        </div>
+
+        <div class="spectrum-Form-item">
+          <label for="troop_type" class="spectrum-FieldLabel spectrum-FieldLabel--sizeM">Troop Type</label>
+          <div class="spectrum-Textfield">
+            <select id="troop_type" name="troop_type" class="spectrum-Picker-input">
+              [% FOREACH tt IN troop_types %]
+                <option value="[% tt %]" [% IF defaults.troop_type == tt %]selected[% END %]>
+                  [% troop_type_labels.$tt %]
+                </option>
+              [% END %]
+            </select>
+          </div>
+        </div>
+
+        <div class="spectrum-Form-item">
+          <label for="troop_count" class="spectrum-FieldLabel spectrum-FieldLabel--sizeM">Troop Count</label>
+          <div class="spectrum-Textfield">
+            <input type="number" id="troop_count" name="troop_count"
+                   class="spectrum-Textfield-input"
+                   value="[% defaults.troop_count %]" min="1" max="10000000">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Buffs Section -->
+    <section class="form-section">
+      <h2 class="spectrum-Heading spectrum-Heading--sizeL">Your Buffs (% values)</h2>
+      <p class="spectrum-Body spectrum-Body--sizeS">
+        Enter your total buff percentages from all sources. Check "Unknown" if you haven't calculated a value.
+      </p>
+
+      <table class="spectrum-Table spectrum-Table--sizeM buffs-table">
+        <thead class="spectrum-Table-head">
+          <tr>
+            <th class="spectrum-Table-headCell">Source</th>
+            <th class="spectrum-Table-headCell">Attack %</th>
+            <th class="spectrum-Table-headCell">Defense %</th>
+            <th class="spectrum-Table-headCell">HP %</th>
+          </tr>
+        </thead>
+        <tbody class="spectrum-Table-body">
+          <tr class="spectrum-Table-row">
+            <td class="spectrum-Table-cell">Basic</td>
+            <td class="spectrum-Table-cell">
+              <input type="number" name="attack_basic" class="spectrum-Textfield-input buff-input" value="0" step="0.1">
+              <label><input type="checkbox" name="attack_basic_unknown"> ?</label>
+            </td>
+            <td class="spectrum-Table-cell">
+              <input type="number" name="defense_basic" class="spectrum-Textfield-input buff-input" value="0" step="0.1">
+              <label><input type="checkbox" name="defense_basic_unknown"> ?</label>
+            </td>
+            <td class="spectrum-Table-cell">
+              <input type="number" name="hp_basic" class="spectrum-Textfield-input buff-input" value="0" step="0.1">
+              <label><input type="checkbox" name="hp_basic_unknown"> ?</label>
+            </td>
+          </tr>
+          <tr class="spectrum-Table-row">
+            <td class="spectrum-Table-cell">March</td>
+            <td class="spectrum-Table-cell">
+              <input type="number" name="attack_march" class="spectrum-Textfield-input buff-input" value="0" step="0.1">
+              <label><input type="checkbox" name="attack_march_unknown"> ?</label>
+            </td>
+            <td class="spectrum-Table-cell">
+              <input type="number" name="defense_march" class="spectrum-Textfield-input buff-input" value="0" step="0.1">
+              <label><input type="checkbox" name="defense_march_unknown"> ?</label>
+            </td>
+            <td class="spectrum-Table-cell">
+              <input type="number" name="hp_march" class="spectrum-Textfield-input buff-input" value="0" step="0.1">
+              <label><input type="checkbox" name="hp_march_unknown"> ?</label>
+            </td>
+          </tr>
+          <tr class="spectrum-Table-row">
+            <td class="spectrum-Table-cell">Monster</td>
+            <td class="spectrum-Table-cell">
+              <input type="number" name="attack_monster" class="spectrum-Textfield-input buff-input" value="0" step="0.1">
+              <label><input type="checkbox" name="attack_monster_unknown"> ?</label>
+            </td>
+            <td class="spectrum-Table-cell">
+              <input type="number" name="defense_monster" class="spectrum-Textfield-input buff-input" value="0" step="0.1">
+              <label><input type="checkbox" name="defense_monster_unknown"> ?</label>
+            </td>
+            <td class="spectrum-Table-cell">
+              <input type="number" name="hp_monster" class="spectrum-Textfield-input buff-input" value="0" step="0.1">
+              <label><input type="checkbox" name="hp_monster_unknown"> ?</label>
+            </td>
+          </tr>
+          <tr class="spectrum-Table-row">
+            <td class="spectrum-Table-cell">Misc</td>
+            <td class="spectrum-Table-cell">
+              <input type="number" name="attack_misc" class="spectrum-Textfield-input buff-input" value="0" step="0.1">
+              <label><input type="checkbox" name="attack_misc_unknown"> ?</label>
+            </td>
+            <td class="spectrum-Table-cell">
+              <input type="number" name="defense_misc" class="spectrum-Textfield-input buff-input" value="0" step="0.1">
+              <label><input type="checkbox" name="defense_misc_unknown"> ?</label>
+            </td>
+            <td class="spectrum-Table-cell">
+              <input type="number" name="hp_misc" class="spectrum-Textfield-input buff-input" value="0" step="0.1">
+              <label><input type="checkbox" name="hp_misc_unknown"> ?</label>
+            </td>
+          </tr>
+          <tr class="spectrum-Table-row">
+            <td class="spectrum-Table-cell">Rally (if rallying)</td>
+            <td class="spectrum-Table-cell">
+              <input type="number" name="attack_rally" class="spectrum-Textfield-input buff-input" value="0" step="0.1">
+              <label><input type="checkbox" name="attack_rally_unknown"> ?</label>
+            </td>
+            <td class="spectrum-Table-cell">
+              <input type="number" name="defense_rally" class="spectrum-Textfield-input buff-input" value="0" step="0.1">
+              <label><input type="checkbox" name="defense_rally_unknown"> ?</label>
+            </td>
+            <td class="spectrum-Table-cell">
+              <input type="number" name="hp_rally" class="spectrum-Textfield-input buff-input" value="0" step="0.1">
+              <label><input type="checkbox" name="hp_rally_unknown"> ?</label>
+            </td>
+          </tr>
+          <tr class="spectrum-Table-row">
+            <td class="spectrum-Table-cell">Flat Bonuses</td>
+            <td class="spectrum-Table-cell">
+              <input type="number" name="attack_flat" class="spectrum-Textfield-input buff-input" value="0">
+            </td>
+            <td class="spectrum-Table-cell">
+              <input type="number" name="defense_flat" class="spectrum-Textfield-input buff-input" value="0">
+            </td>
+            <td class="spectrum-Table-cell">
+              <input type="number" name="hp_flat" class="spectrum-Textfield-input buff-input" value="0">
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Debuffs Section -->
+    <section class="form-section">
+      <h2 class="spectrum-Heading spectrum-Heading--sizeL">Debuffs</h2>
+
+      <div class="form-row">
+        <div class="spectrum-Form-item">
+          <label class="spectrum-FieldLabel spectrum-FieldLabel--sizeM">Monster Attack Debuff %</label>
+          <div class="spectrum-Textfield">
+            <input type="number" name="monster_attack_debuff" class="spectrum-Textfield-input" value="0" step="0.1">
+          </div>
+          <p class="spectrum-Body spectrum-Body--sizeXS">Reduces monster's attack</p>
+        </div>
+
+        <div class="spectrum-Form-item">
+          <label class="spectrum-FieldLabel spectrum-FieldLabel--sizeM">Monster Defense Debuff %</label>
+          <div class="spectrum-Textfield">
+            <input type="number" name="monster_defense_debuff" class="spectrum-Textfield-input" value="0" step="0.1">
+          </div>
+          <p class="spectrum-Body spectrum-Body--sizeXS">Reduces monster's defense</p>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="spectrum-Form-item">
+          <label class="spectrum-FieldLabel spectrum-FieldLabel--sizeM">Troop Attack Debuff %</label>
+          <div class="spectrum-Textfield">
+            <input type="number" name="troop_attack_debuff" class="spectrum-Textfield-input" value="0" step="0.1">
+          </div>
+          <p class="spectrum-Body spectrum-Body--sizeXS">Enemy reduces your attack</p>
+        </div>
+
+        <div class="spectrum-Form-item">
+          <label class="spectrum-FieldLabel spectrum-FieldLabel--sizeM">Troop Defense Debuff %</label>
+          <div class="spectrum-Textfield">
+            <input type="number" name="troop_defense_debuff" class="spectrum-Textfield-input" value="0" step="0.1">
+          </div>
+          <p class="spectrum-Body spectrum-Body--sizeXS">Enemy reduces your defense</p>
+        </div>
+
+        <div class="spectrum-Form-item">
+          <label class="spectrum-FieldLabel spectrum-FieldLabel--sizeM">Troop HP Debuff %</label>
+          <div class="spectrum-Textfield">
+            <input type="number" name="troop_hp_debuff" class="spectrum-Textfield-input" value="0" step="0.1">
+          </div>
+          <p class="spectrum-Body spectrum-Body--sizeXS">Enemy reduces your HP</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Submit -->
+    <section class="form-section">
+      <button type="submit" class="spectrum-Button spectrum-Button--fill spectrum-Button--accent spectrum-Button--sizeL">
+        <span class="spectrum-Button-label">Calculate</span>
+      </button>
+    </section>
+
+  </form>
+</article>
+
+<script>
+async function loadMonsterLevels(monsterName) {
+  const levelSelect = document.getElementById('monster_level');
+  levelSelect.innerHTML = '<option value="">Loading...</option>';
+
+  if (!monsterName) {
+    levelSelect.innerHTML = '<option value="">-- Select monster first --</option>';
+    return;
+  }
+
+  try {
+    const response = await fetch(`[% linkBase %]/api/monster-levels/${encodeURIComponent(monsterName)}`);
+    const levels = await response.json();
+
+    levelSelect.innerHTML = '';
+    levels.forEach(item => {
+      const option = document.createElement('option');
+      option.value = item.order;
+      option.textContent = `Level ${item.level}`;
+      levelSelect.appendChild(option);
+    });
+  } catch (err) {
+    levelSelect.innerHTML = '<option value="">Error loading levels</option>';
+  }
+}
+</script>
+
+<style>
+.monster-simulator {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.form-section {
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background: var(--spectrum-gray-50);
+  border-radius: 4px;
+}
+
+.form-row {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.form-row .spectrum-Form-item {
+  flex: 1;
+  min-width: 150px;
+}
+
+.buffs-table {
+  width: 100%;
+}
+
+.buff-input {
+  width: 80px;
+}
+
+.buffs-table td {
+  vertical-align: middle;
+}
+
+.buffs-table label {
+  margin-left: 0.5rem;
+  font-size: 0.8rem;
+}
+</style>
+
+[% END %]

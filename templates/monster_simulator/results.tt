@@ -1,0 +1,223 @@
+[% WRAPPER layouts/default.tt %]
+
+<article class="monster-simulator-results">
+  <h1 class="spectrum-Heading spectrum-Heading--sizeXL">Simulation Results</h1>
+
+  [% IF unknowns_count > 0 %]
+  <div class="spectrum-InLineAlert spectrum-InLineAlert--notice">
+    <div class="spectrum-InLineAlert-header">
+      <span class="spectrum-Heading spectrum-Heading--sizeXS">Uncertainty Warning</span>
+    </div>
+    <div class="spectrum-InLineAlert-content">
+      <p class="spectrum-Body spectrum-Body--sizeM">
+        You have [% unknowns_count %] unknown buff value(s). Results may not be accurate.
+        The more values you fill in, the more accurate your simulation will be.
+      </p>
+    </div>
+  </div>
+  [% END %]
+
+  <!-- Summary -->
+  <section class="result-section">
+    <h2 class="spectrum-Heading spectrum-Heading--sizeL">Configuration</h2>
+    <div class="result-grid">
+      <div class="result-item">
+        <span class="label">Monster:</span>
+        <span class="value">[% result.monster.name %] (Lv[% result.monster.level %])</span>
+      </div>
+      <div class="result-item">
+        <span class="label">Troop Type:</span>
+        <span class="value">[% result.troop_type | ucfirst %]</span>
+      </div>
+      <div class="result-item">
+        <span class="label">Tier:</span>
+        <span class="value">[% result.tier %]</span>
+      </div>
+      <div class="result-item">
+        <span class="label">March Type:</span>
+        <span class="value">[% result.march_type | ucfirst %]</span>
+      </div>
+      <div class="result-item">
+        <span class="label">Troop Count:</span>
+        <span class="value">[% result.troop_count | format_number %]</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Your Stats -->
+  <section class="result-section">
+    <h2 class="spectrum-Heading spectrum-Heading--sizeL">Your Final Stats (Per Troop)</h2>
+    <table class="spectrum-Table spectrum-Table--sizeM">
+      <thead class="spectrum-Table-head">
+        <tr>
+          <th class="spectrum-Table-headCell">Stat</th>
+          <th class="spectrum-Table-headCell">Value</th>
+          <th class="spectrum-Table-headCell">Total Buff</th>
+        </tr>
+      </thead>
+      <tbody class="spectrum-Table-body">
+        <tr class="spectrum-Table-row">
+          <td class="spectrum-Table-cell">Attack</td>
+          <td class="spectrum-Table-cell">[% result.player_stats.attack %]</td>
+          <td class="spectrum-Table-cell">[% result.total_buffs.attack_pct %]</td>
+        </tr>
+        <tr class="spectrum-Table-row">
+          <td class="spectrum-Table-cell">Defense</td>
+          <td class="spectrum-Table-cell">[% result.player_stats.defense %]</td>
+          <td class="spectrum-Table-cell">[% result.total_buffs.defense_pct %]</td>
+        </tr>
+        <tr class="spectrum-Table-row">
+          <td class="spectrum-Table-cell">HP</td>
+          <td class="spectrum-Table-cell">[% result.player_stats.hp %]</td>
+          <td class="spectrum-Table-cell">[% result.total_buffs.hp_pct %]</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- Monster Stats -->
+  <section class="result-section">
+    <h2 class="spectrum-Heading spectrum-Heading--sizeL">Monster Stats (With Debuffs)</h2>
+    <table class="spectrum-Table spectrum-Table--sizeM">
+      <thead class="spectrum-Table-head">
+        <tr>
+          <th class="spectrum-Table-headCell">Stat</th>
+          <th class="spectrum-Table-headCell">Value</th>
+        </tr>
+      </thead>
+      <tbody class="spectrum-Table-body">
+        <tr class="spectrum-Table-row">
+          <td class="spectrum-Table-cell">Attack</td>
+          <td class="spectrum-Table-cell">[% result.monster_stats.attack %]</td>
+        </tr>
+        <tr class="spectrum-Table-row">
+          <td class="spectrum-Table-cell">Defense</td>
+          <td class="spectrum-Table-cell">[% result.monster_stats.defense %]</td>
+        </tr>
+        <tr class="spectrum-Table-row">
+          <td class="spectrum-Table-cell">HP</td>
+          <td class="spectrum-Table-cell">[% result.monster_stats.hp %]</td>
+        </tr>
+        <tr class="spectrum-Table-row">
+          <td class="spectrum-Table-cell">Troop Count</td>
+          <td class="spectrum-Table-cell">[% result.monster.troop_count %]</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- Combat Results -->
+  <section class="result-section highlight">
+    <h2 class="spectrum-Heading spectrum-Heading--sizeL">Combat Results</h2>
+    <div class="result-grid large">
+      <div class="result-item">
+        <span class="label">Troop Modifier:</span>
+        <span class="value">[% result.troop_modifier %]x</span>
+      </div>
+      <div class="result-item">
+        <span class="label">Damage Per Troop:</span>
+        <span class="value">[% result.damage_per_troop %]</span>
+      </div>
+      <div class="result-item">
+        <span class="label">Effective Damage:</span>
+        <span class="value">[% result.effective_damage %]</span>
+      </div>
+      <div class="result-item primary">
+        <span class="label">Minimum Troops to Kill:</span>
+        <span class="value">[% result.min_troops_to_kill | format_number %]</span>
+      </div>
+      <div class="result-item">
+        <span class="label">Expected Wounds:</span>
+        <span class="value">[% result.expected_wounds | format_number %]</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Actions -->
+  <section class="result-section actions">
+    <a href="[% linkBase %]" class="spectrum-Button spectrum-Button--secondary spectrum-Button--sizeM">
+      <span class="spectrum-Button-label">New Simulation</span>
+    </a>
+    <button onclick="window.print()" class="spectrum-Button spectrum-Button--secondary spectrum-Button--sizeM">
+      <span class="spectrum-Button-label">Print Results</span>
+    </button>
+  </section>
+
+</article>
+
+<style>
+.monster-simulator-results {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.result-section {
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background: var(--spectrum-gray-50);
+  border-radius: 4px;
+}
+
+.result-section.highlight {
+  background: var(--spectrum-blue-100);
+  border: 2px solid var(--spectrum-blue-400);
+}
+
+.result-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.result-grid.large {
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
+.result-item {
+  display: flex;
+  flex-direction: column;
+  padding: 0.5rem;
+  background: white;
+  border-radius: 4px;
+}
+
+.result-item.primary {
+  background: var(--spectrum-green-100);
+  border: 2px solid var(--spectrum-green-400);
+}
+
+.result-item .label {
+  font-size: 0.85rem;
+  color: var(--spectrum-gray-700);
+  margin-bottom: 0.25rem;
+}
+
+.result-item .value {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--spectrum-gray-900);
+}
+
+.actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.spectrum-InLineAlert {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: var(--spectrum-yellow-100);
+  border-left: 4px solid var(--spectrum-yellow-400);
+  border-radius: 4px;
+}
+
+@media print {
+  .actions {
+    display: none;
+  }
+}
+</style>
+
+[% END %]
