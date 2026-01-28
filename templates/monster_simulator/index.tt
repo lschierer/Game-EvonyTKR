@@ -1,7 +1,7 @@
 [% WRAPPER layouts/default.tt %]
 
 <article class="monster-simulator">
-  <h1 class="spectrum-Heading spectrum-Heading--sizeXL">Monster Simulator</h1>
+  <h1 class="spectrum-Heading spectrum-Heading--sizeXL">Monster Hunting Simulator</h1>
 
   <p class="spectrum-Body spectrum-Body--sizeM">
     Calculate damage output and expected wounds when attacking monsters.
@@ -93,32 +93,52 @@
     <section class="form-section">
       <h2 class="spectrum-Heading spectrum-Heading--sizeL">Your Buffs</h2>
       <p class="spectrum-Body spectrum-Body--sizeS">
-        Enter your total buff percentages. Click "Calculate" to break down by source, or leave at 0 if unknown.
+        Click "Calculate" to enter buff values from each source. Unknown sources are automatically tracked.
       </p>
 
       <div class="buff-summary">
         <div class="buff-row">
           <label class="buff-label">Attack %</label>
           <input type="number" id="total_attack" name="total_attack" class="spectrum-Textfield-input buff-total" value="0" step="0.1" readonly>
-          <button type="button" class="spectrum-Button spectrum-Button--sizeS" onclick="openBuffCalculator('attack')">
+          <button type="button" class="spectrum-Button spectrum-Button--sizeS spectrum-Button--secondary" onclick="openBuffCalculator('attack')">
             <span class="spectrum-Button-label">Calculate</span>
           </button>
+          <span id="attack_unknown_count" class="unknown-badge"></span>
         </div>
         <div class="buff-row">
           <label class="buff-label">Defense %</label>
           <input type="number" id="total_defense" name="total_defense" class="spectrum-Textfield-input buff-total" value="0" step="0.1" readonly>
-          <button type="button" class="spectrum-Button spectrum-Button--sizeS" onclick="openBuffCalculator('defense')">
+          <button type="button" class="spectrum-Button spectrum-Button--sizeS spectrum-Button--secondary" onclick="openBuffCalculator('defense')">
             <span class="spectrum-Button-label">Calculate</span>
           </button>
+          <span id="defense_unknown_count" class="unknown-badge"></span>
         </div>
         <div class="buff-row">
           <label class="buff-label">HP %</label>
           <input type="number" id="total_hp" name="total_hp" class="spectrum-Textfield-input buff-total" value="0" step="0.1" readonly>
-          <button type="button" class="spectrum-Button spectrum-Button--sizeS" onclick="openBuffCalculator('hp')">
+          <button type="button" class="spectrum-Button spectrum-Button--sizeS spectrum-Button--secondary" onclick="openBuffCalculator('hp')">
             <span class="spectrum-Button-label">Calculate</span>
           </button>
+          <span id="hp_unknown_count" class="unknown-badge"></span>
         </div>
       </div>
+
+      <!-- Hidden fields for buff breakdown by category -->
+      <input type="hidden" name="attack_basic" id="attack_basic" value="0">
+      <input type="hidden" name="attack_march" id="attack_march" value="0">
+      <input type="hidden" name="attack_monster" id="attack_monster" value="0">
+      <input type="hidden" name="attack_misc" id="attack_misc" value="0">
+      <input type="hidden" name="attack_rally" id="attack_rally" value="0">
+      <input type="hidden" name="defense_basic" id="defense_basic" value="0">
+      <input type="hidden" name="defense_march" id="defense_march" value="0">
+      <input type="hidden" name="defense_monster" id="defense_monster" value="0">
+      <input type="hidden" name="defense_misc" id="defense_misc" value="0">
+      <input type="hidden" name="defense_rally" id="defense_rally" value="0">
+      <input type="hidden" name="hp_basic" id="hp_basic" value="0">
+      <input type="hidden" name="hp_march" id="hp_march" value="0">
+      <input type="hidden" name="hp_monster" id="hp_monster" value="0">
+      <input type="hidden" name="hp_misc" id="hp_misc" value="0">
+      <input type="hidden" name="hp_rally" id="hp_rally" value="0">
     </section>
 
     <!-- Debuffs Section -->
@@ -173,7 +193,7 @@
     <!-- Submit -->
     <section class="form-section">
       <button type="submit" class="spectrum-Button spectrum-Button--fill spectrum-Button--accent spectrum-Button--sizeL">
-        <span class="spectrum-Button-label">Calculate</span>
+        <span class="spectrum-Button-label">Run Simulation</span>
       </button>
     </section>
 
@@ -188,66 +208,187 @@
       <button type="button" class="modal-close" onclick="closeBuffCalculator()">&times;</button>
     </div>
     <div class="modal-body">
+      <p class="spectrum-Body spectrum-Body--sizeS" style="margin-bottom: 1rem;">
+        Enter known buff values from each source. Mark sources as "Unknown" if you haven't looked them up yet.
+      </p>
+
       <div class="buff-sources">
-        <div class="source-group">
+        <!-- Research (Academy & Military Academy) -->
+        <div class="source-group" data-source="research">
           <h4>Research</h4>
-          <input type="number" class="buff-source" data-source="research" value="0" step="0.1">
+          <input type="number" class="buff-source" data-source="research" value="0" step="0.1" placeholder="0">
+          <p class="help-text">Academy + Military Academy trees</p>
+          <label class="source-unknown">
+            <input type="checkbox" class="unknown-checkbox" data-source="research">
+            Unknown
+          </label>
         </div>
-        <div class="source-group">
+
+        <!-- Art Treasures -->
+        <div class="source-group" data-source="art_treasures">
           <h4>Art Treasures</h4>
-          <input type="number" class="buff-source" data-source="art_treasures" value="0" step="0.1">
+          <input type="number" class="buff-source" data-source="art_treasures" value="0" step="0.1" placeholder="0">
+          <p class="help-text">16 treasures, levels 0-10 each</p>
+          <label class="source-unknown">
+            <input type="checkbox" class="unknown-checkbox" data-source="art_treasures">
+            Unknown
+          </label>
         </div>
-        <div class="source-group">
+
+        <!-- Civilization Cards -->
+        <div class="source-group" data-source="civ_cards">
           <h4>Civilization Cards</h4>
-          <input type="number" class="buff-source" data-source="civ_cards" value="0" step="0.1">
+          <input type="number" class="buff-source" data-source="civ_cards" value="0" step="0.1" placeholder="0">
+          <p class="help-text">4 card sets, passive buffs</p>
+          <label class="source-unknown">
+            <input type="checkbox" class="unknown-checkbox" data-source="civ_cards">
+            Unknown
+          </label>
         </div>
-        <div class="source-group">
-          <h4>Civilization Equipment</h4>
-          <input type="number" class="buff-source" data-source="civ_equipment" value="0" step="0.1">
+
+        <!-- Civilization Equipment -->
+        <div class="source-group" data-source="civ_equipment">
+          <h4>Civ Equipment</h4>
+          <input type="number" class="buff-source" data-source="civ_equipment" value="0" step="0.1" placeholder="0">
+          <p class="help-text">16 sets, active when equipped</p>
+          <label class="source-unknown">
+            <input type="checkbox" class="unknown-checkbox" data-source="civ_equipment">
+            Unknown
+          </label>
         </div>
-        <div class="source-group">
-          <h4>Civilization Treasure</h4>
-          <input type="number" class="buff-source" data-source="civ_treasure" value="0" step="0.1">
+
+        <!-- Civilization Treasure -->
+        <div class="source-group" data-source="civ_treasure">
+          <h4>Civ Treasure</h4>
+          <input type="number" class="buff-source" data-source="civ_treasure" value="0" step="0.1" placeholder="0">
+          <p class="help-text">Levels 0-15, active/passive buffs</p>
+          <label class="source-unknown">
+            <input type="checkbox" class="unknown-checkbox" data-source="civ_treasure">
+            Unknown
+          </label>
         </div>
-        <div class="source-group">
+
+        <!-- Senate Seats -->
+        <div class="source-group" data-source="senate">
           <h4>Senate Seats</h4>
-          <input type="number" class="buff-source" data-source="senate" value="0" step="0.1">
+          <input type="number" class="buff-source" data-source="senate" value="0" step="0.1" placeholder="0">
+          <p class="help-text">6 titles, passive buffs</p>
+          <label class="source-unknown">
+            <input type="checkbox" class="unknown-checkbox" data-source="senate">
+            Unknown
+          </label>
         </div>
-        <div class="source-group">
-          <h4>Building Buffs</h4>
-          <input type="number" class="buff-source" data-source="buildings" value="0" step="0.1">
+
+        <!-- Building Buffs -->
+        <div class="source-group" data-source="buildings">
+          <h4>Buildings</h4>
+          <input type="number" class="buff-source" data-source="buildings" value="0" step="0.1" placeholder="0">
+          <p class="help-text">Level 36+ buildings + officers</p>
+          <label class="source-unknown">
+            <input type="checkbox" class="unknown-checkbox" data-source="buildings">
+            Unknown
+          </label>
         </div>
-        <div class="source-group">
+
+        <!-- Ideal Land -->
+        <div class="source-group" data-source="ideal_land">
           <h4>Ideal Land</h4>
-          <input type="number" class="buff-source" data-source="ideal_land" value="0" step="0.1">
+          <input type="number" class="buff-source" data-source="ideal_land" value="0" step="0.1" placeholder="0">
+          <p class="help-text">Decorations, passive buffs</p>
+          <label class="source-unknown">
+            <input type="checkbox" class="unknown-checkbox" data-source="ideal_land">
+            Unknown
+          </label>
         </div>
-        <div class="source-group">
+
+        <!-- Coronation Fountain -->
+        <div class="source-group" data-source="fountain">
           <h4>Coronation Fountain</h4>
-          <input type="number" class="buff-source" data-source="fountain" value="0" step="0.1">
+          <input type="number" class="buff-source" data-source="fountain" value="0" step="0.1" placeholder="0">
+          <p class="help-text">6 slots + cumulative bonuses</p>
+          <label class="source-unknown">
+            <input type="checkbox" class="unknown-checkbox" data-source="fountain">
+            Unknown
+          </label>
         </div>
-        <div class="source-group">
+
+        <!-- Wisdom Dome -->
+        <div class="source-group" data-source="wisdom_dome">
           <h4>Wisdom Dome</h4>
-          <input type="number" class="buff-source" data-source="wisdom_dome" value="0" step="0.1">
+          <input type="number" class="buff-source" data-source="wisdom_dome" value="0" step="0.1" placeholder="0">
+          <p class="help-text">Books + Blazons, passive</p>
+          <label class="source-unknown">
+            <input type="checkbox" class="unknown-checkbox" data-source="wisdom_dome">
+            Unknown
+          </label>
         </div>
-        <div class="source-group">
+
+        <!-- Duty Generals -->
+        <div class="source-group" data-source="duty_generals">
           <h4>Duty Generals</h4>
-          <input type="number" class="buff-source" data-source="duty_generals" value="0" step="0.1">
+          <input type="number" class="buff-source" data-source="duty_generals" value="0" step="0.1" placeholder="0">
+          <p class="help-text">Officers assigned to buildings</p>
+          <label class="source-unknown">
+            <input type="checkbox" class="unknown-checkbox" data-source="duty_generals">
+            Unknown
+          </label>
         </div>
-        <div class="source-group">
-          <h4>March Generals</h4>
-          <input type="number" class="buff-source" data-source="march_generals" value="0" step="0.1">
+
+        <!-- March General -->
+        <div class="source-group" data-source="march_general">
+          <h4>March General</h4>
+          <input type="number" class="buff-source" data-source="march_general" value="0" step="0.1" placeholder="0">
+          <p class="help-text">Leading general's active buffs</p>
+          <label class="source-unknown">
+            <input type="checkbox" class="unknown-checkbox" data-source="march_general">
+            Unknown
+          </label>
+        </div>
+
+        <!-- Assistant General -->
+        <div class="source-group" data-source="assistant_general">
+          <h4>Assistant General</h4>
+          <input type="number" class="buff-source" data-source="assistant_general" value="0" step="0.1" placeholder="0">
+          <p class="help-text">Paired general's buffs</p>
+          <label class="source-unknown">
+            <input type="checkbox" class="unknown-checkbox" data-source="assistant_general">
+            Unknown
+          </label>
+        </div>
+
+        <!-- Spiritual Beast -->
+        <div class="source-group" data-source="spiritual_beast">
+          <h4>Spiritual Beast</h4>
+          <input type="number" class="buff-source" data-source="spiritual_beast" value="0" step="0.1" placeholder="0">
+          <p class="help-text">Beast buffs on march</p>
+          <label class="source-unknown">
+            <input type="checkbox" class="unknown-checkbox" data-source="spiritual_beast">
+            Unknown
+          </label>
+        </div>
+
+        <!-- Other/Misc -->
+        <div class="source-group" data-source="other">
+          <h4>Other Sources</h4>
+          <input type="number" class="buff-source" data-source="other" value="0" step="0.1" placeholder="0">
+          <p class="help-text">VIP, Alliance, Events, etc.</p>
+          <label class="source-unknown">
+            <input type="checkbox" class="unknown-checkbox" data-source="other">
+            Unknown
+          </label>
         </div>
       </div>
+
       <div class="buff-total-display">
-        <strong>Total:</strong> <span id="modalTotal">0</span>%
-        <div class="confidence-indicator" id="confidenceIndicator"></div>
+        <strong>Total:</strong> <span id="modal-total" class="modal-total-value">0</span>%
+        <div class="confidence-indicator" id="confidence-indicator"></div>
       </div>
     </div>
     <div class="modal-footer">
-      <button type="button" class="spectrum-Button spectrum-Button--secondary" onclick="closeBuffCalculator()">
+      <button type="button" class="spectrum-Button spectrum-Button--secondary spectrum-Button--sizeM" onclick="closeBuffCalculator()">
         <span class="spectrum-Button-label">Cancel</span>
       </button>
-      <button type="button" class="spectrum-Button spectrum-Button--accent" onclick="applyBuffTotal()">
+      <button type="button" class="spectrum-Button spectrum-Button--accent spectrum-Button--sizeM" onclick="applyBuffTotal()">
         <span class="spectrum-Button-label">Apply</span>
       </button>
     </div>
@@ -256,7 +397,34 @@
 
 <script>
 let currentBuffType = null;
-const buffData = { attack: {}, defense: {}, hp: {} };
+const buffData = {
+  attack: { values: {}, unknowns: {} },
+  defense: { values: {}, unknowns: {} },
+  hp: { values: {}, unknowns: {} }
+};
+
+const sourceCategories = {
+  // Passive (always-on) sources -> basic category
+  research: 'basic',
+  art_treasures: 'basic',
+  civ_cards: 'basic',
+  senate: 'basic',
+  buildings: 'basic',
+  ideal_land: 'basic',
+  fountain: 'basic',
+  wisdom_dome: 'basic',
+  duty_generals: 'basic',
+
+  // Active sources tied to the march -> march category
+  civ_equipment: 'march',
+  civ_treasure: 'march',
+  march_general: 'march',
+  assistant_general: 'march',
+  spiritual_beast: 'march',
+
+  // Other/misc
+  other: 'misc'
+};
 
 async function loadMonsterLevels(monsterName) {
   const levelSelect = document.getElementById('monster_level');
@@ -287,16 +455,27 @@ function openBuffCalculator(buffType) {
   currentBuffType = buffType;
   const modal = document.getElementById('buffCalculatorModal');
   const title = document.getElementById('modalTitle');
-  
+
   title.textContent = `Calculate ${buffType.charAt(0).toUpperCase() + buffType.slice(1)} Buffs`;
-  
-  // Load saved values
+
+  // Load saved values and unknown states
   const sources = document.querySelectorAll('.buff-source');
+  const unknowns = document.querySelectorAll('.unknown-checkbox');
+
   sources.forEach(input => {
     const source = input.dataset.source;
-    input.value = buffData[buffType][source] || 0;
+    input.value = buffData[buffType].values[source] || 0;
+    // Disable input if unknown
+    const isUnknown = buffData[buffType].unknowns[source] || false;
+    input.disabled = isUnknown;
+    input.closest('.source-group').classList.toggle('is-unknown', isUnknown);
   });
-  
+
+  unknowns.forEach(checkbox => {
+    const source = checkbox.dataset.source;
+    checkbox.checked = buffData[buffType].unknowns[source] || false;
+  });
+
   updateModalTotal();
   modal.style.display = 'flex';
 }
@@ -309,61 +488,119 @@ function updateModalTotal() {
   const sources = document.querySelectorAll('.buff-source');
   let total = 0;
   let filledCount = 0;
+  let unknownCount = 0;
   let totalCount = sources.length;
-  
+
   sources.forEach(input => {
+    const source = input.dataset.source;
     const val = parseFloat(input.value) || 0;
-    total += val;
-    if (val > 0) filledCount++;
+    const isUnknown = document.querySelector(`.unknown-checkbox[data-source="${source}"]`).checked;
+
+    if (isUnknown) {
+      unknownCount++;
+    } else {
+      total += val;
+      if (val > 0) filledCount++;
+    }
   });
-  
-  document.getElementById('modalTotal').textContent = total.toFixed(1);
-  
-  // Calculate confidence
-  const fillRatio = filledCount / totalCount;
-  const confidence = document.getElementById('confidenceIndicator');
-  
-  if (fillRatio === 0) {
-    confidence.textContent = '⚠️ Results will be significantly better than shown';
+
+  document.getElementById('modal-total').textContent = total.toFixed(1);
+
+  // Calculate confidence based on known vs unknown sources
+  const knownCount = totalCount - unknownCount;
+  const confidence = document.getElementById('confidence-indicator');
+
+  if (unknownCount === totalCount) {
+    confidence.textContent = 'All sources unknown - results will be minimum estimates';
     confidence.className = 'confidence-indicator confidence-very-low';
-  } else if (fillRatio < 0.3) {
-    confidence.textContent = '⚠️ Results will be a great deal better than shown';
+  } else if (unknownCount > totalCount * 0.7) {
+    confidence.textContent = `${unknownCount} unknown sources - results significantly underestimated`;
     confidence.className = 'confidence-indicator confidence-low';
-  } else if (fillRatio < 0.5) {
-    confidence.textContent = '⚠️ Results will be noticeably better than shown';
+  } else if (unknownCount > totalCount * 0.5) {
+    confidence.textContent = `${unknownCount} unknown sources - results moderately underestimated`;
     confidence.className = 'confidence-indicator confidence-medium-low';
-  } else if (fillRatio < 0.7) {
-    confidence.textContent = '⚠️ Results will be somewhat better than shown';
+  } else if (unknownCount > totalCount * 0.3) {
+    confidence.textContent = `${unknownCount} unknown sources - results somewhat underestimated`;
     confidence.className = 'confidence-indicator confidence-medium';
-  } else if (fillRatio < 0.9) {
-    confidence.textContent = 'ℹ️ Results will be slightly better than shown';
+  } else if (unknownCount > 0) {
+    confidence.textContent = `${unknownCount} unknown source(s) - results slightly underestimated`;
     confidence.className = 'confidence-indicator confidence-high';
   } else {
-    confidence.textContent = '✓ All buff sources accounted for';
+    confidence.textContent = 'All buff sources accounted for';
     confidence.className = 'confidence-indicator confidence-complete';
   }
 }
 
 function applyBuffTotal() {
   const sources = document.querySelectorAll('.buff-source');
-  let total = 0;
-  
-  // Save values and calculate total
+  const unknowns = document.querySelectorAll('.unknown-checkbox');
+
+  // Initialize category totals
+  const categoryTotals = { basic: 0, march: 0, monster: 0, misc: 0, rally: 0 };
+  let unknownCount = 0;
+
+  // Save values and calculate totals by category
   sources.forEach(input => {
     const source = input.dataset.source;
     const val = parseFloat(input.value) || 0;
-    buffData[currentBuffType][source] = val;
-    total += val;
+    const isUnknown = document.querySelector(`.unknown-checkbox[data-source="${source}"]`).checked;
+
+    buffData[currentBuffType].values[source] = val;
+    buffData[currentBuffType].unknowns[source] = isUnknown;
+
+    if (isUnknown) {
+      unknownCount++;
+    } else {
+      const category = sourceCategories[source] || 'misc';
+      categoryTotals[category] += val;
+    }
   });
-  
-  // Update main form
+
+  // Calculate total
+  const total = categoryTotals.basic + categoryTotals.march + categoryTotals.monster + categoryTotals.misc + categoryTotals.rally;
+
+  // Update main form display
   document.getElementById(`total_${currentBuffType}`).value = total.toFixed(1);
-  
+
+  // Update hidden form fields with category breakdowns
+  document.getElementById(`${currentBuffType}_basic`).value = categoryTotals.basic;
+  document.getElementById(`${currentBuffType}_march`).value = categoryTotals.march;
+  document.getElementById(`${currentBuffType}_monster`).value = categoryTotals.monster;
+  document.getElementById(`${currentBuffType}_misc`).value = categoryTotals.misc;
+  document.getElementById(`${currentBuffType}_rally`).value = categoryTotals.rally;
+
+  // Update unknown badge
+  const badge = document.getElementById(`${currentBuffType}_unknown_count`);
+  if (unknownCount > 0) {
+    badge.textContent = `${unknownCount} unknown`;
+    badge.style.display = 'inline-block';
+  } else {
+    badge.style.display = 'none';
+  }
+
   closeBuffCalculator();
 }
 
-// Update total when inputs change
+// Handle unknown checkbox changes
 document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('change', (e) => {
+    if (e.target.classList.contains('unknown-checkbox')) {
+      const source = e.target.dataset.source;
+      const isUnknown = e.target.checked;
+      const input = document.querySelector(`.buff-source[data-source="${source}"]`);
+      const group = e.target.closest('.source-group');
+
+      input.disabled = isUnknown;
+      group.classList.toggle('is-unknown', isUnknown);
+
+      if (isUnknown) {
+        input.value = 0;
+      }
+
+      updateModalTotal();
+    }
+  });
+
   document.addEventListener('input', (e) => {
     if (e.target.classList.contains('buff-source')) {
       updateModalTotal();
@@ -371,148 +608,5 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 </script>
-
-<style>
-.monster-simulator {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 1rem;
-}
-
-.form-section {
-  margin-bottom: 2rem;
-  padding: 1rem;
-  background: var(--spectrum-gray-50);
-  border-radius: 4px;
-}
-
-.form-row {
-  display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
-}
-
-.form-row .spectrum-Form-item {
-  flex: 1;
-  min-width: 150px;
-}
-
-.buff-summary {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.buff-row {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.buff-label {
-  min-width: 100px;
-  font-weight: 600;
-}
-
-.buff-total {
-  width: 120px;
-}
-
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.modal-content {
-  background: white;
-  border-radius: 8px;
-  max-width: 600px;
-  width: 90%;
-  max-height: 90vh;
-  display: flex;
-  flex-direction: column;
-}
-
-.modal-header {
-  padding: 1rem;
-  border-bottom: 1px solid #ddd;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.modal-close {
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-  padding: 0;
-  width: 30px;
-  height: 30px;
-}
-
-.modal-body {
-  padding: 1rem;
-  overflow-y: auto;
-  flex: 1;
-}
-
-.modal-footer {
-  padding: 1rem;
-  border-top: 1px solid #ddd;
-  display: flex;
-  gap: 1rem;
-  justify-content: flex-end;
-}
-
-.buff-sources {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-  margin-bottom: 1rem;
-}
-
-.source-group h4 {
-  margin: 0 0 0.5rem 0;
-  font-size: 0.9rem;
-}
-
-.buff-source {
-  width: 100%;
-  padding: 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-.buff-total-display {
-  padding: 1rem;
-  background: var(--spectrum-gray-100);
-  border-radius: 4px;
-  text-align: center;
-  font-size: 1.2rem;
-}
-
-.confidence-indicator {
-  margin-top: 0.5rem;
-  padding: 0.5rem;
-  border-radius: 4px;
-  font-size: 0.9rem;
-}
-
-.confidence-very-low { background: #ffebee; color: #c62828; }
-.confidence-low { background: #fff3e0; color: #e65100; }
-.confidence-medium-low { background: #fff9c4; color: #f57f17; }
-.confidence-medium { background: #e3f2fd; color: #1565c0; }
-.confidence-high { background: #e8f5e9; color: #2e7d32; }
-.confidence-complete { background: #c8e6c9; color: #1b5e20; }
-</style>
 
 [% END %]

@@ -116,6 +116,7 @@ sub index ($self, $ctx) {
     sidebar           => 1,
     navigation        => $self->render_navigation($ctx->req->path),
     site_logo         => $self->site_logo(),
+    css_files         => ['/css/monsterSimulator.css'],
 
     # Default values for form
     defaults => {
@@ -237,6 +238,7 @@ sub calculate ($self, $ctx) {
     sidebar           => 1,
     navigation        => $self->render_navigation($ctx->req->path),
     site_logo         => $self->site_logo(),
+    css_files         => ['/css/monsterSimulator.css'],
     unknowns_count    => $unknowns_count,
   };
 

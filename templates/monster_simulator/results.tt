@@ -135,7 +135,7 @@
 
   <!-- Actions -->
   <section class="result-section actions">
-    <a href="[% linkBase %]" class="spectrum-Button spectrum-Button--secondary spectrum-Button--sizeM">
+    <a href="[% linkBase %]/Simulator" class="spectrum-Button spectrum-Button--secondary spectrum-Button--sizeM">
       <span class="spectrum-Button-label">New Simulation</span>
     </a>
     <button onclick="window.print()" class="spectrum-Button spectrum-Button--secondary spectrum-Button--sizeM">
@@ -144,80 +144,5 @@
   </section>
 
 </article>
-
-<style>
-.monster-simulator-results {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 1rem;
-}
-
-.result-section {
-  margin-bottom: 2rem;
-  padding: 1rem;
-  background: var(--spectrum-gray-50);
-  border-radius: 4px;
-}
-
-.result-section.highlight {
-  background: var(--spectrum-blue-100);
-  border: 2px solid var(--spectrum-blue-400);
-}
-
-.result-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-}
-
-.result-grid.large {
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-}
-
-.result-item {
-  display: flex;
-  flex-direction: column;
-  padding: 0.5rem;
-  background: white;
-  border-radius: 4px;
-}
-
-.result-item.primary {
-  background: var(--spectrum-green-100);
-  border: 2px solid var(--spectrum-green-400);
-}
-
-.result-item .label {
-  font-size: 0.85rem;
-  color: var(--spectrum-gray-700);
-  margin-bottom: 0.25rem;
-}
-
-.result-item .value {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: var(--spectrum-gray-900);
-}
-
-.actions {
-  display: flex;
-  gap: 1rem;
-  justify-content: center;
-}
-
-.spectrum-InLineAlert {
-  margin-bottom: 1.5rem;
-  padding: 1rem;
-  background: var(--spectrum-yellow-100);
-  border-left: 4px solid var(--spectrum-yellow-400);
-  border-radius: 4px;
-}
-
-@media print {
-  .actions {
-    display: none;
-  }
-}
-</style>
 
 [% END %]

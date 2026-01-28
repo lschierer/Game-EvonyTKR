@@ -16,6 +16,7 @@
     "@spectrum-css/button": "^14.2.0",
     "@spectrum-css/buttongroup": "^9.2.0",
     "@spectrum-css/card": "^11.2.0",
+    "@spectrum-css/dialog": "^12.2.0",
     "@spectrum-css/divider": "^5.2.0",
     "@spectrum-css/fieldgroup": "^7.2.0",
     "@spectrum-css/fieldlabel": "^10.2.0",

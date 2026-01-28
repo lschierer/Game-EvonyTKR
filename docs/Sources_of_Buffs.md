@@ -9,7 +9,7 @@ Even once we understand this distinction, we still need to be careful, as there 
 These are found from the Art Hall in your keep.  These are all passive buffs.
 Activating these items requires meeting certain goals, most of which involve ownership of various generals.  Some, however, include things like placing in specific recurring events.
 
-Art Treasures go from inactive (level 0) to Level 10. Excaliber is included as one example.
+Art Treasures go from inactive (level 0) to Level 10. Excaliber is included as one example (there are 16 Art Treasures)
 
 ### Excaliber
 
@@ -67,6 +67,8 @@ Art Treasures go from inactive (level 0) to Level 10. Excaliber is included as o
 
 Civilization Cards are also accessed through the Art hall. This is one of the more regularly evolving features of the game, with new card sets regularly being added.  Passive buffs are granted as players reach certain goals for collecting cards within each set, and get increased when you complete the set with higher quality cards.  This makes knowing the range of possible values essentially impossible, as I do not know anyone who has tried to carefully add and develop cards in a systematic way.
 
+There are currently 4 card sets. 
+
 Card quality goes Green => Red => Purple.
 
 ### World Civilizations
@@ -80,7 +82,7 @@ Card quality goes Green => Red => Purple.
 - 4/8 Russia cards at Purple
 - 6/8 Arabia cards at Purple
 
-Buffs:
+Buffs (the game lists the buffs for a single card set precisely this way):
 - In-Rally Mounted Troop Attack +12%
 - Ground Troop Defense +24%
 - Ranged Troop and Siege Machine Defense +12%
@@ -100,7 +102,7 @@ Buffs:
 
 ## Civilization Equipment
 
-Civilization Equipment provides both active and passive buffs. There are buffs associated with each piece being in use, and additional active bonuses for using multiple pieces from the same set.  Then there is a passive buff associated with *owning* the full set whether used or not.  The 'Star Atlas' buffs are assumed to be passive as they are active before owning the full set, and not associated with individual pieces.  
+Civilization Equipment provides both active and passive buffs. There are buffs associated with each piece being in use, and additional active bonuses for using multiple pieces from the same set.  Then there is a passive buff associated with *owning* the full set whether used or not.  The 'Star Atlas' buffs are assumed to be passive as they are active before owning the full set, and not associated with individual pieces.  There are currently 16 sets of eqipment.
 
 ### Sasanian Set
 
@@ -139,13 +141,13 @@ Civilization treasure goes from inactive (level 0) to level 15.  It provides bot
 
 ## Senate Seats
 
-The Senate is all passive buffs. There are are 6 'titles' each of which allows for assigning one each of a Ground, Mounted, Ranged and Siege general (once the spot is unlocked).  There are buffs associated with the spot itself that have to do with the general assigned to the spot, the level of the position, the promotion level of the position, and the level of the title, all 4.  Again, I do not know that anyone really knows the possible breakdown of this in great detail. 
+The Senate is all passive buffs. There are are 6 'titles' each of which allows for assigning one each of a Ground, Mounted, Ranged and Siege general (once the spot is unlocked).  There are buffs associated with the spot itself that have to do with the general assigned to the spot, the level of the position, the promotion level of the position, and the level of the title, all 4.  Again, I do not know that anyone really knows the possible breakdown of this in great detail. There are 6 titles total.
 
 ## Building buffs
 
-Once you hit level 36 on a given building, it may offer passive buffs for one or more troop types.  You need to look at the details on each building. 
+Once you hit level 36 on a given building, it may offer passive buffs for one or more troop types.  You need to look at the details on each building. To my knowledge 4 of the buildings provide buffs that we'd include here.
 
-Many buildings also take 'Officers' or Duty Generals.  These buildings grant buffs associated with the power level of the officer assigned independent of the general's buff (discussed below). 
+Many buildings also take 'Officers' or Duty Generals.  These buildings grant buffs associated with the power level of the officer assigned independent of the general's buff (discussed below).  An additional 13 buildings not counting the 4 mentioned above have interesting officers. 
 
 The Triumphal Arch and Victory column give buffs right away, but the Triumphal Arch buffs are for rally capacity and battlefields.
 
@@ -161,11 +163,13 @@ This is somewhat like a smaller more predictable version of the ideal land.  The
 
 ## Wisdom Dome books and Blazons
 
-Both of these give passive buffs that vary based on the specific blazons/books obtained with a random factor thrown in.  The blazons additionally can be cultivated, allowing a player to effectively (up to) double their value.  The books go in slots that can be leveled up, acting as a multiplier for the value of the book in that slot. 
+Both of these give passive buffs that vary based on the specific blazons/books obtained with a random factor thrown in.  The blazons additionally can be cultivated, allowing a player to effectively (up to) double their value.  The books go in slots that can be leveled up, acting as a multiplier for the value of the book in that slot.  There are 5 books active at any given time.  There are 6 blazons active *per troop type* at any given time. 
 
 ## Research
 
 The biggest source of passive buffs is the research options available in the Academy and Military Academy.  Each of these has a number of research 'trees' each of which has a number of research options.  You can progress down the tree only be reaching certain levels of proceeding items.  However, few items require that proceeding items be *fully* researched. Typical values include 1/10, 3/10, 5/10, 5/20, 8/20, 10/20 and 13/20 to progress. 
+
+Each individual research option offers a buff structured similarly to the examples offered here in other categories.  Several dozen of these are interesting for this purpose. 
 
 ## Generals 
 
