@@ -1,0 +1,436 @@
+@import url('@spectrum-css/dialog/index.css');
+@import url('@spectrum-css/divider/index.css');
+
+/* ==========================================================================
+   Base Layout - Both Form and Results pages
+   ========================================================================== */
+
+.monster-simulator,
+.monster-simulator-results {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: var(--spectrum-global-dimension-size-200);
+}
+
+.monster-simulator h1 {
+  margin-bottom: var(--spectrum-global-dimension-size-100);
+}
+
+.monster-simulator > p {
+  margin-bottom: var(--spectrum-global-dimension-size-300);
+  color: var(--spectrum-global-color-gray-700);
+}
+
+/* ==========================================================================
+   Shared Section Styles (used by both form-section and result-section)
+   ========================================================================== */
+
+/* Generic section heading - MUST come before more specific selectors */
+.form-section h2,
+.result-section h2 {
+  margin-top: 0;
+  margin-bottom: var(--spectrum-global-dimension-size-150);
+  padding-bottom: var(--spectrum-global-dimension-size-100);
+  border-bottom: 1px solid var(--spectrum-global-color-gray-200);
+}
+
+/* Generic paragraph in form items - MUST come before more specific selectors */
+.spectrum-Form-item p,
+.spectrum-InLineAlert-content p {
+  margin-top: var(--spectrum-global-dimension-size-50);
+  color: var(--spectrum-global-color-gray-600);
+}
+
+.spectrum-InLineAlert-content p {
+  margin: 0;
+}
+
+/* ==========================================================================
+   Form Page Styles
+   ========================================================================== */
+
+.simulator-form .form-section {
+  margin-bottom: var(--spectrum-global-dimension-size-300);
+  padding: var(--spectrum-global-dimension-size-200);
+  background: var(--spectrum-global-color-gray-75);
+  border-radius: var(--spectrum-global-dimension-size-50);
+  border: 1px solid var(--spectrum-global-color-gray-200);
+}
+
+/* Form Row Layout */
+.form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spectrum-global-dimension-size-200);
+}
+
+.form-row .spectrum-Form-item {
+  flex: 1 1 180px;
+  min-width: 150px;
+}
+
+/* Buff Summary Section */
+.buff-summary {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spectrum-global-dimension-size-150);
+}
+
+.buff-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spectrum-global-dimension-size-150);
+  padding: var(--spectrum-global-dimension-size-100);
+  background: var(--spectrum-global-color-gray-100);
+  border-radius: var(--spectrum-global-dimension-size-50);
+}
+
+.buff-label {
+  min-width: 100px;
+  font-weight: var(--spectrum-global-font-weight-bold);
+  color: var(--spectrum-global-color-gray-800);
+}
+
+.buff-total {
+  width: 100px;
+  text-align: right;
+}
+
+.buff-total:read-only {
+  background: var(--spectrum-global-color-gray-200);
+}
+
+/* ==========================================================================
+   Modal/Dialog Styles
+   ========================================================================== */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgb(0 0 0 / 50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: var(--spectrum-global-color-gray-50, #fff);
+  border-radius: var(--spectrum-global-dimension-size-100);
+  max-width: 700px;
+  width: 95%;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 16px rgb(0 0 0 / 20%);
+}
+
+.modal-header {
+  padding: var(--spectrum-global-dimension-size-200);
+  border-bottom: 1px solid var(--spectrum-global-color-gray-200);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--spectrum-global-color-gray-100, #f5f5f5);
+  border-radius: var(--spectrum-global-dimension-size-100)
+    var(--spectrum-global-dimension-size-100) 0 0;
+}
+
+.modal-header h3 {
+  margin: 0;
+}
+
+.modal-close {
+  background: transparent;
+  border: none;
+  font-size: var(--spectrum-global-dimension-size-300);
+  cursor: pointer;
+  padding: var(--spectrum-global-dimension-size-50);
+  color: var(--spectrum-global-color-gray-700);
+  line-height: 1;
+  border-radius: var(--spectrum-global-dimension-size-50);
+}
+
+.modal-close:hover {
+  background: var(--spectrum-global-color-gray-200);
+  color: var(--spectrum-global-color-gray-900);
+}
+
+.modal-body {
+  padding: var(--spectrum-global-dimension-size-200);
+  overflow-y: auto;
+  flex: 1;
+  background: var(--spectrum-global-color-gray-50, #fff);
+}
+
+.modal-footer {
+  padding: var(--spectrum-global-dimension-size-200);
+  border-top: 1px solid var(--spectrum-global-color-gray-200, #e0e0e0);
+  display: flex;
+  gap: var(--spectrum-global-dimension-size-100);
+  justify-content: flex-end;
+  background: var(--spectrum-global-color-gray-100, #f5f5f5);
+  border-radius: 0 0 var(--spectrum-global-dimension-size-100)
+    var(--spectrum-global-dimension-size-100);
+}
+
+/* ==========================================================================
+   Buff Source Grid (in modal)
+   ========================================================================== */
+.buff-source {
+  width: 100%;
+  padding: var(--spectrum-global-dimension-size-100);
+  border: 1px solid var(--spectrum-global-color-gray-300);
+  border-radius: var(--spectrum-global-dimension-size-50);
+  background: var(--spectrum-global-color-gray-50);
+  font-size: var(--spectrum-global-dimension-font-size-100);
+}
+
+.buff-source:focus {
+  outline: none;
+  border-color: var(--spectrum-global-color-blue-500);
+  box-shadow: 0 0 0 1px var(--spectrum-global-color-blue-500);
+}
+
+.buff-sources {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--spectrum-global-dimension-size-200);
+  margin-bottom: var(--spectrum-global-dimension-size-200);
+}
+
+.source-group {
+  padding: var(--spectrum-global-dimension-size-150);
+  background: var(--spectrum-global-color-gray-100);
+  border-radius: var(--spectrum-global-dimension-size-50);
+  border: 1px solid var(--spectrum-global-color-gray-200);
+}
+
+.source-group h4 {
+  margin: 0 0 var(--spectrum-global-dimension-size-100) 0;
+  font-size: var(--spectrum-global-dimension-font-size-100);
+  color: var(--spectrum-global-color-gray-700);
+  font-weight: var(--spectrum-global-font-weight-medium);
+}
+
+.source-group .help-text {
+  font-size: var(--spectrum-global-dimension-font-size-75);
+  color: var(--spectrum-global-color-gray-600);
+  margin-top: var(--spectrum-global-dimension-size-50);
+}
+
+.source-group.is-unknown {
+  opacity: 0.6;
+  background: var(--spectrum-global-color-gray-200);
+}
+
+.source-group.is-unknown .buff-source {
+  background: var(--spectrum-global-color-gray-200);
+}
+
+/* Unknown Checkbox for Source Groups */
+.source-unknown {
+  display: flex;
+  align-items: center;
+  gap: var(--spectrum-global-dimension-size-75);
+  margin-top: var(--spectrum-global-dimension-size-75);
+  font-size: var(--spectrum-global-dimension-font-size-75);
+  color: var(--spectrum-global-color-gray-600);
+}
+
+.source-unknown input[type='checkbox'] {
+  margin: 0;
+}
+
+/* Total Display */
+.buff-total-display {
+  padding: var(--spectrum-global-dimension-size-200);
+  background: var(--spectrum-global-color-gray-200);
+  border-radius: var(--spectrum-global-dimension-size-50);
+  text-align: center;
+}
+
+.buff-total-display strong {
+  font-size: var(--spectrum-global-dimension-font-size-200);
+}
+
+.buff-total-display .modal-total-value {
+  font-size: var(--spectrum-global-dimension-font-size-300);
+  font-weight: var(--spectrum-global-font-weight-bold);
+  color: var(--spectrum-global-color-blue-600);
+}
+
+/* ==========================================================================
+   Confidence Indicator
+   ========================================================================== */
+
+.confidence-indicator {
+  margin-top: var(--spectrum-global-dimension-size-150);
+  padding: var(--spectrum-global-dimension-size-100)
+    var(--spectrum-global-dimension-size-150);
+  border-radius: var(--spectrum-global-dimension-size-50);
+  font-size: var(--spectrum-global-dimension-font-size-100);
+  font-weight: var(--spectrum-global-font-weight-medium);
+}
+
+.confidence-very-low {
+  background: var(--spectrum-global-color-red-100);
+  color: var(--spectrum-global-color-red-900);
+  border: 1px solid var(--spectrum-global-color-red-400);
+}
+
+.confidence-low {
+  background: var(--spectrum-global-color-orange-100);
+  color: var(--spectrum-global-color-orange-900);
+  border: 1px solid var(--spectrum-global-color-orange-400);
+}
+
+.confidence-medium-low {
+  background: var(--spectrum-global-color-yellow-100);
+  color: var(--spectrum-global-color-yellow-900);
+  border: 1px solid var(--spectrum-global-color-yellow-400);
+}
+
+.confidence-medium {
+  background: var(--spectrum-global-color-blue-100);
+  color: var(--spectrum-global-color-blue-900);
+  border: 1px solid var(--spectrum-global-color-blue-400);
+}
+
+.confidence-high {
+  background: var(--spectrum-global-color-seafoam-100);
+  color: var(--spectrum-global-color-seafoam-900);
+  border: 1px solid var(--spectrum-global-color-seafoam-400);
+}
+
+.confidence-complete {
+  background: var(--spectrum-global-color-green-100);
+  color: var(--spectrum-global-color-green-900);
+  border: 1px solid var(--spectrum-global-color-green-400);
+}
+
+/* Unknown Badge (shown next to buff totals) */
+.unknown-badge {
+  display: none;
+  padding: var(--spectrum-global-dimension-size-50)
+    var(--spectrum-global-dimension-size-100);
+  background: var(--spectrum-global-color-orange-100);
+  color: var(--spectrum-global-color-orange-900);
+  border-radius: var(--spectrum-global-dimension-size-50);
+  font-size: var(--spectrum-global-dimension-font-size-75);
+  font-weight: var(--spectrum-global-font-weight-medium);
+}
+
+/* ==========================================================================
+   Results Page Styles
+   ========================================================================== */
+
+.result-section {
+  margin-bottom: var(--spectrum-global-dimension-size-300);
+  padding: var(--spectrum-global-dimension-size-200);
+  background: var(--spectrum-global-color-gray-75);
+  border-radius: var(--spectrum-global-dimension-size-50);
+  border: 1px solid var(--spectrum-global-color-gray-200);
+}
+
+.result-section.highlight {
+  background: var(--spectrum-global-color-blue-100);
+  border: 2px solid var(--spectrum-global-color-blue-400);
+}
+
+.result-section.actions {
+  display: flex;
+  gap: var(--spectrum-global-dimension-size-150);
+  justify-content: center;
+  background: transparent;
+  border: none;
+}
+
+.result-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--spectrum-global-dimension-size-150);
+}
+
+.result-grid.large {
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
+.result-item {
+  display: flex;
+  flex-direction: column;
+  padding: var(--spectrum-global-dimension-size-100);
+  background: var(--spectrum-global-color-gray-50);
+  border-radius: var(--spectrum-global-dimension-size-50);
+  border: 1px solid var(--spectrum-global-color-gray-200);
+}
+
+.result-item.primary {
+  background: var(--spectrum-global-color-green-100);
+  border: 2px solid var(--spectrum-global-color-green-400);
+}
+
+.result-item .label {
+  font-size: var(--spectrum-global-dimension-font-size-75);
+  color: var(--spectrum-global-color-gray-700);
+  margin-bottom: var(--spectrum-global-dimension-size-50);
+}
+
+.result-item .value {
+  font-size: var(--spectrum-global-dimension-font-size-200);
+  font-weight: var(--spectrum-global-font-weight-bold);
+  color: var(--spectrum-global-color-gray-900);
+}
+
+/* Inline Alert for warnings */
+.spectrum-InLineAlert {
+  margin-bottom: var(--spectrum-global-dimension-size-250);
+  padding: var(--spectrum-global-dimension-size-200);
+  background: var(--spectrum-global-color-yellow-100);
+  border-left: 4px solid var(--spectrum-global-color-yellow-600);
+  border-radius: var(--spectrum-global-dimension-size-50);
+}
+
+.spectrum-InLineAlert-header {
+  margin-bottom: var(--spectrum-global-dimension-size-100);
+}
+
+/* ==========================================================================
+   Print Styles
+   ========================================================================== */
+
+@media print {
+  .result-section.actions {
+    display: none;
+  }
+
+  .monster-simulator-results {
+    padding: 0;
+  }
+}
+
+/* ==========================================================================
+   Responsive Adjustments
+   ========================================================================== */
+
+@media (width <= 600px) {
+  .buff-sources {
+    grid-template-columns: 1fr;
+  }
+
+  .form-row {
+    flex-direction: column;
+  }
+
+  .form-row .spectrum-Form-item {
+    min-width: 100%;
+  }
+
+  .buff-row {
+    flex-wrap: wrap;
+  }
+
+  .buff-label {
+    min-width: 100%;
+  }
+}
