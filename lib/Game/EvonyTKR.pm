@@ -24,6 +24,7 @@ package Game::EvonyTKR {
 
     # Load controllers
     $self->logger->info("Loading controllers...");
+    $self->load_controller('Monsters');
     $self->load_controller('Pairs');
     $self->load_controller('ConflictGroups');
     $self->load_controller('Specialties');

@@ -2,79 +2,80 @@ package Game::EvonyTKR::Model::Monster;
 use v5.42.0;
 use utf8::all;
 
-use Moo;
-use experimental    qw(signatures);
-use Types::Standard qw(Str Int Num HashRef ArrayRef Maybe);
+use Mooish::Base -standard;
+with 'WebFramework::Role::Logger';
+use experimental qw(signatures);
+use Types::Standard ();
 
 has order => (
   is       => 'ro',
-  isa      => Int,
+  isa      => Types::Standard::Int,
   required => 1,
 );
 
 has name => (
   is       => 'ro',
-  isa      => Str,
+  isa      => Types::Standard::Str,
   required => 1,
 );
 
 has alt_name => (
   is      => 'ro',
-  isa     => Maybe [Str],
+  isa     => Types::Standard::Maybe[Types::Standard::Str],
   default => sub {undef},
 );
 
 has monster_id => (
   is      => 'ro',
-  isa     => Maybe [Int],
+  isa     => Types::Standard::Maybe[Types::Standard::Int],
   default => sub {undef},
 );
 
 has level => (
   is       => 'ro',
-  isa      => Int,
+  isa      => Types::Standard::Int,
   required => 1,
 );
 
 has stamina => (
   is      => 'ro',
-  isa     => Maybe [Int],
+  isa     => Types::Standard::Maybe[Types::Standard::Int],
   default => sub {6},
 );
 
 has troop_count => (
   is      => 'ro',
-  isa     => Maybe [Int],
+  isa     => Types::Standard::Maybe[Types::Standard::Int],
   default => sub {undef},
 );
 
 has attack => (
   is      => 'ro',
-  isa     => Maybe [Int],
+  isa     => Types::Standard::Maybe[Types::Standard::Int],
   default => sub {0},
 );
 
 has defense => (
   is      => 'ro',
-  isa     => Maybe [Int],
+  isa     => Types::Standard::Maybe[Types::Standard::Int],
   default => sub {0},
 );
 
 has hp => (
   is      => 'ro',
-  isa     => Maybe [Int],
+  isa     => Types::Standard::Maybe[Types::Standard::Int],
   default => sub {0},
 );
 
 has spawn_rates => (
   is      => 'ro',
-  isa     => ArrayRef [Int],
+  isa     => Types::Standard::ArrayRef[Types::Standard::Int],
   default => sub { [0, 0, 0, 0, 0] },
 );
 
 has troop_modifiers => (
   is      => 'ro',
-  isa     => HashRef [Num],
+  isa     => Types::Standard::HashRef[Types::Standard::Num],
   default => sub {
     {
       ground  => 1.0,
@@ -87,13 +88,13 @@ has troop_modifiers => (
 
 has monster_type => (
   is      => 'ro',
-  isa     => Str,
+  isa     => Types::Standard::Str,
   default => sub {'common'},
 );
 
 has rewards => (
   is      => 'ro',
-  isa     => HashRef,
+  isa     => Types::Standard::HashRef,
   default => sub { {} },
 );
 

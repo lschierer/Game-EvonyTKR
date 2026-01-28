@@ -91,110 +91,34 @@
 
     <!-- Buffs Section -->
     <section class="form-section">
-      <h2 class="spectrum-Heading spectrum-Heading--sizeL">Your Buffs (% values)</h2>
+      <h2 class="spectrum-Heading spectrum-Heading--sizeL">Your Buffs</h2>
       <p class="spectrum-Body spectrum-Body--sizeS">
-        Enter your total buff percentages from all sources. Check "Unknown" if you haven't calculated a value.
+        Enter your total buff percentages. Click "Calculate" to break down by source, or leave at 0 if unknown.
       </p>
 
-      <table class="spectrum-Table spectrum-Table--sizeM buffs-table">
-        <thead class="spectrum-Table-head">
-          <tr>
-            <th class="spectrum-Table-headCell">Source</th>
-            <th class="spectrum-Table-headCell">Attack %</th>
-            <th class="spectrum-Table-headCell">Defense %</th>
-            <th class="spectrum-Table-headCell">HP %</th>
-          </tr>
-        </thead>
-        <tbody class="spectrum-Table-body">
-          <tr class="spectrum-Table-row">
-            <td class="spectrum-Table-cell">Basic</td>
-            <td class="spectrum-Table-cell">
-              <input type="number" name="attack_basic" class="spectrum-Textfield-input buff-input" value="0" step="0.1">
-              <label><input type="checkbox" name="attack_basic_unknown"> ?</label>
-            </td>
-            <td class="spectrum-Table-cell">
-              <input type="number" name="defense_basic" class="spectrum-Textfield-input buff-input" value="0" step="0.1">
-              <label><input type="checkbox" name="defense_basic_unknown"> ?</label>
-            </td>
-            <td class="spectrum-Table-cell">
-              <input type="number" name="hp_basic" class="spectrum-Textfield-input buff-input" value="0" step="0.1">
-              <label><input type="checkbox" name="hp_basic_unknown"> ?</label>
-            </td>
-          </tr>
-          <tr class="spectrum-Table-row">
-            <td class="spectrum-Table-cell">March</td>
-            <td class="spectrum-Table-cell">
-              <input type="number" name="attack_march" class="spectrum-Textfield-input buff-input" value="0" step="0.1">
-              <label><input type="checkbox" name="attack_march_unknown"> ?</label>
-            </td>
-            <td class="spectrum-Table-cell">
-              <input type="number" name="defense_march" class="spectrum-Textfield-input buff-input" value="0" step="0.1">
-              <label><input type="checkbox" name="defense_march_unknown"> ?</label>
-            </td>
-            <td class="spectrum-Table-cell">
-              <input type="number" name="hp_march" class="spectrum-Textfield-input buff-input" value="0" step="0.1">
-              <label><input type="checkbox" name="hp_march_unknown"> ?</label>
-            </td>
-          </tr>
-          <tr class="spectrum-Table-row">
-            <td class="spectrum-Table-cell">Monster</td>
-            <td class="spectrum-Table-cell">
-              <input type="number" name="attack_monster" class="spectrum-Textfield-input buff-input" value="0" step="0.1">
-              <label><input type="checkbox" name="attack_monster_unknown"> ?</label>
-            </td>
-            <td class="spectrum-Table-cell">
-              <input type="number" name="defense_monster" class="spectrum-Textfield-input buff-input" value="0" step="0.1">
-              <label><input type="checkbox" name="defense_monster_unknown"> ?</label>
-            </td>
-            <td class="spectrum-Table-cell">
-              <input type="number" name="hp_monster" class="spectrum-Textfield-input buff-input" value="0" step="0.1">
-              <label><input type="checkbox" name="hp_monster_unknown"> ?</label>
-            </td>
-          </tr>
-          <tr class="spectrum-Table-row">
-            <td class="spectrum-Table-cell">Misc</td>
-            <td class="spectrum-Table-cell">
-              <input type="number" name="attack_misc" class="spectrum-Textfield-input buff-input" value="0" step="0.1">
-              <label><input type="checkbox" name="attack_misc_unknown"> ?</label>
-            </td>
-            <td class="spectrum-Table-cell">
-              <input type="number" name="defense_misc" class="spectrum-Textfield-input buff-input" value="0" step="0.1">
-              <label><input type="checkbox" name="defense_misc_unknown"> ?</label>
-            </td>
-            <td class="spectrum-Table-cell">
-              <input type="number" name="hp_misc" class="spectrum-Textfield-input buff-input" value="0" step="0.1">
-              <label><input type="checkbox" name="hp_misc_unknown"> ?</label>
-            </td>
-          </tr>
-          <tr class="spectrum-Table-row">
-            <td class="spectrum-Table-cell">Rally (if rallying)</td>
-            <td class="spectrum-Table-cell">
-              <input type="number" name="attack_rally" class="spectrum-Textfield-input buff-input" value="0" step="0.1">
-              <label><input type="checkbox" name="attack_rally_unknown"> ?</label>
-            </td>
-            <td class="spectrum-Table-cell">
-              <input type="number" name="defense_rally" class="spectrum-Textfield-input buff-input" value="0" step="0.1">
-              <label><input type="checkbox" name="defense_rally_unknown"> ?</label>
-            </td>
-            <td class="spectrum-Table-cell">
-              <input type="number" name="hp_rally" class="spectrum-Textfield-input buff-input" value="0" step="0.1">
-              <label><input type="checkbox" name="hp_rally_unknown"> ?</label>
-            </td>
-          </tr>
-          <tr class="spectrum-Table-row">
-            <td class="spectrum-Table-cell">Flat Bonuses</td>
-            <td class="spectrum-Table-cell">
-              <input type="number" name="attack_flat" class="spectrum-Textfield-input buff-input" value="0">
-            </td>
-            <td class="spectrum-Table-cell">
-              <input type="number" name="defense_flat" class="spectrum-Textfield-input buff-input" value="0">
-            </td>
-            <td class="spectrum-Table-cell">
-              <input type="number" name="hp_flat" class="spectrum-Textfield-input buff-input" value="0">
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="buff-summary">
+        <div class="buff-row">
+          <label class="buff-label">Attack %</label>
+          <input type="number" id="total_attack" name="total_attack" class="spectrum-Textfield-input buff-total" value="0" step="0.1" readonly>
+          <button type="button" class="spectrum-Button spectrum-Button--sizeS" onclick="openBuffCalculator('attack')">
+            <span class="spectrum-Button-label">Calculate</span>
+          </button>
+        </div>
+        <div class="buff-row">
+          <label class="buff-label">Defense %</label>
+          <input type="number" id="total_defense" name="total_defense" class="spectrum-Textfield-input buff-total" value="0" step="0.1" readonly>
+          <button type="button" class="spectrum-Button spectrum-Button--sizeS" onclick="openBuffCalculator('defense')">
+            <span class="spectrum-Button-label">Calculate</span>
+          </button>
+        </div>
+        <div class="buff-row">
+          <label class="buff-label">HP %</label>
+          <input type="number" id="total_hp" name="total_hp" class="spectrum-Textfield-input buff-total" value="0" step="0.1" readonly>
+          <button type="button" class="spectrum-Button spectrum-Button--sizeS" onclick="openBuffCalculator('hp')">
+            <span class="spectrum-Button-label">Calculate</span>
+          </button>
+        </div>
+      </div>
     </section>
 
     <!-- Debuffs Section -->
@@ -256,7 +180,84 @@
   </form>
 </article>
 
+<!-- Buff Calculator Modal -->
+<div id="buffCalculatorModal" class="modal-overlay" style="display: none;">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 class="spectrum-Heading spectrum-Heading--sizeM" id="modalTitle">Calculate Attack Buffs</h3>
+      <button type="button" class="modal-close" onclick="closeBuffCalculator()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="buff-sources">
+        <div class="source-group">
+          <h4>Research</h4>
+          <input type="number" class="buff-source" data-source="research" value="0" step="0.1">
+        </div>
+        <div class="source-group">
+          <h4>Art Treasures</h4>
+          <input type="number" class="buff-source" data-source="art_treasures" value="0" step="0.1">
+        </div>
+        <div class="source-group">
+          <h4>Civilization Cards</h4>
+          <input type="number" class="buff-source" data-source="civ_cards" value="0" step="0.1">
+        </div>
+        <div class="source-group">
+          <h4>Civilization Equipment</h4>
+          <input type="number" class="buff-source" data-source="civ_equipment" value="0" step="0.1">
+        </div>
+        <div class="source-group">
+          <h4>Civilization Treasure</h4>
+          <input type="number" class="buff-source" data-source="civ_treasure" value="0" step="0.1">
+        </div>
+        <div class="source-group">
+          <h4>Senate Seats</h4>
+          <input type="number" class="buff-source" data-source="senate" value="0" step="0.1">
+        </div>
+        <div class="source-group">
+          <h4>Building Buffs</h4>
+          <input type="number" class="buff-source" data-source="buildings" value="0" step="0.1">
+        </div>
+        <div class="source-group">
+          <h4>Ideal Land</h4>
+          <input type="number" class="buff-source" data-source="ideal_land" value="0" step="0.1">
+        </div>
+        <div class="source-group">
+          <h4>Coronation Fountain</h4>
+          <input type="number" class="buff-source" data-source="fountain" value="0" step="0.1">
+        </div>
+        <div class="source-group">
+          <h4>Wisdom Dome</h4>
+          <input type="number" class="buff-source" data-source="wisdom_dome" value="0" step="0.1">
+        </div>
+        <div class="source-group">
+          <h4>Duty Generals</h4>
+          <input type="number" class="buff-source" data-source="duty_generals" value="0" step="0.1">
+        </div>
+        <div class="source-group">
+          <h4>March Generals</h4>
+          <input type="number" class="buff-source" data-source="march_generals" value="0" step="0.1">
+        </div>
+      </div>
+      <div class="buff-total-display">
+        <strong>Total:</strong> <span id="modalTotal">0</span>%
+        <div class="confidence-indicator" id="confidenceIndicator"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="spectrum-Button spectrum-Button--secondary" onclick="closeBuffCalculator()">
+        <span class="spectrum-Button-label">Cancel</span>
+      </button>
+      <button type="button" class="spectrum-Button spectrum-Button--accent" onclick="applyBuffTotal()">
+        <span class="spectrum-Button-label">Apply</span>
+      </button>
+    </div>
+  </div>
+</div>
+
 <script>
+let currentBuffType = null;
+const buffData = { attack: {}, defense: {}, hp: {} };
+
 async function loadMonsterLevels(monsterName) {
   const levelSelect = document.getElementById('monster_level');
   levelSelect.innerHTML = '<option value="">Loading...</option>';
@@ -281,6 +282,94 @@ async function loadMonsterLevels(monsterName) {
     levelSelect.innerHTML = '<option value="">Error loading levels</option>';
   }
 }
+
+function openBuffCalculator(buffType) {
+  currentBuffType = buffType;
+  const modal = document.getElementById('buffCalculatorModal');
+  const title = document.getElementById('modalTitle');
+  
+  title.textContent = `Calculate ${buffType.charAt(0).toUpperCase() + buffType.slice(1)} Buffs`;
+  
+  // Load saved values
+  const sources = document.querySelectorAll('.buff-source');
+  sources.forEach(input => {
+    const source = input.dataset.source;
+    input.value = buffData[buffType][source] || 0;
+  });
+  
+  updateModalTotal();
+  modal.style.display = 'flex';
+}
+
+function closeBuffCalculator() {
+  document.getElementById('buffCalculatorModal').style.display = 'none';
+}
+
+function updateModalTotal() {
+  const sources = document.querySelectorAll('.buff-source');
+  let total = 0;
+  let filledCount = 0;
+  let totalCount = sources.length;
+  
+  sources.forEach(input => {
+    const val = parseFloat(input.value) || 0;
+    total += val;
+    if (val > 0) filledCount++;
+  });
+  
+  document.getElementById('modalTotal').textContent = total.toFixed(1);
+  
+  // Calculate confidence
+  const fillRatio = filledCount / totalCount;
+  const confidence = document.getElementById('confidenceIndicator');
+  
+  if (fillRatio === 0) {
+    confidence.textContent = '⚠️ Results will be significantly better than shown';
+    confidence.className = 'confidence-indicator confidence-very-low';
+  } else if (fillRatio < 0.3) {
+    confidence.textContent = '⚠️ Results will be a great deal better than shown';
+    confidence.className = 'confidence-indicator confidence-low';
+  } else if (fillRatio < 0.5) {
+    confidence.textContent = '⚠️ Results will be noticeably better than shown';
+    confidence.className = 'confidence-indicator confidence-medium-low';
+  } else if (fillRatio < 0.7) {
+    confidence.textContent = '⚠️ Results will be somewhat better than shown';
+    confidence.className = 'confidence-indicator confidence-medium';
+  } else if (fillRatio < 0.9) {
+    confidence.textContent = 'ℹ️ Results will be slightly better than shown';
+    confidence.className = 'confidence-indicator confidence-high';
+  } else {
+    confidence.textContent = '✓ All buff sources accounted for';
+    confidence.className = 'confidence-indicator confidence-complete';
+  }
+}
+
+function applyBuffTotal() {
+  const sources = document.querySelectorAll('.buff-source');
+  let total = 0;
+  
+  // Save values and calculate total
+  sources.forEach(input => {
+    const source = input.dataset.source;
+    const val = parseFloat(input.value) || 0;
+    buffData[currentBuffType][source] = val;
+    total += val;
+  });
+  
+  // Update main form
+  document.getElementById(`total_${currentBuffType}`).value = total.toFixed(1);
+  
+  closeBuffCalculator();
+}
+
+// Update total when inputs change
+document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('input', (e) => {
+    if (e.target.classList.contains('buff-source')) {
+      updateModalTotal();
+    }
+  });
+});
 </script>
 
 <style>
@@ -308,22 +397,122 @@ async function loadMonsterLevels(monsterName) {
   min-width: 150px;
 }
 
-.buffs-table {
+.buff-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.buff-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.buff-label {
+  min-width: 100px;
+  font-weight: 600;
+}
+
+.buff-total {
+  width: 120px;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 8px;
+  max-width: 600px;
+  width: 90%;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-header {
+  padding: 1rem;
+  border-bottom: 1px solid #ddd;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+}
+
+.modal-body {
+  padding: 1rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.modal-footer {
+  padding: 1rem;
+  border-top: 1px solid #ddd;
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+.buff-sources {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.source-group h4 {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.9rem;
+}
+
+.buff-source {
   width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
 
-.buff-input {
-  width: 80px;
+.buff-total-display {
+  padding: 1rem;
+  background: var(--spectrum-gray-100);
+  border-radius: 4px;
+  text-align: center;
+  font-size: 1.2rem;
 }
 
-.buffs-table td {
-  vertical-align: middle;
+.confidence-indicator {
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
 }
 
-.buffs-table label {
-  margin-left: 0.5rem;
-  font-size: 0.8rem;
-}
+.confidence-very-low { background: #ffebee; color: #c62828; }
+.confidence-low { background: #fff3e0; color: #e65100; }
+.confidence-medium-low { background: #fff9c4; color: #f57f17; }
+.confidence-medium { background: #e3f2fd; color: #1565c0; }
+.confidence-high { background: #e8f5e9; color: #2e7d32; }
+.confidence-complete { background: #c8e6c9; color: #1b5e20; }
 </style>
 
 [% END %]

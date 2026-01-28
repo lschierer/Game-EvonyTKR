@@ -8,15 +8,9 @@ use YAML::PP;
 
 with 'Game::EvonyTKR::Role::Common';
 with 'Game::EvonyTKR::Role::Constants::MonsterConstants';
+with 'WebFramework::Role::Logger';
 
 require Game::EvonyTKR::Model::Monster;
-
-# Simple logging that works standalone or delegates to logger role if available
-sub _log ($self, $level, $msg) {
-  if ($self->can('logger') && $self->logger) {
-    $self->logger->$level($msg);
-  }
-}
 
 has data_file => (
   is       => 'ro',
@@ -75,7 +69,7 @@ sub load_all ($self) {
     }
   }
 
-  $self->_log('info', "Loaded $loaded monsters");
+  $self->logger->info("Loaded $loaded monsters");
   return $loaded;
 }
 

@@ -1,4 +1,4 @@
-package Game::EvonyTKR::Controller::MonsterSimulator;
+package Game::EvonyTKR::Controller::Monsters;
 use v5.42.0;
 use utf8::all;
 use Mooish::Base -standard;

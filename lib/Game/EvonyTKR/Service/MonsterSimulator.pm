@@ -4,10 +4,9 @@ use utf8::all;
 use Mooish::Base -standard;
 with 'WebFramework::Role::Logger';
 with 'Game::EvonyTKR::Role::Common';
+with 'Game::EvonyTKR::Role::Constants::MonsterConstants';
 
 use experimental qw(signatures);
-
-with 'Game::EvonyTKR::Role::Constants::MonsterConstants';
 
 has monsters_loader => (
   is       => 'ro',

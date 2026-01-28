@@ -7,13 +7,7 @@ use Path::Tiny;
 use YAML::PP;
 
 with 'Game::EvonyTKR::Role::Constants::MonsterConstants';
-
-# Simple logging that works standalone or delegates to logger role if available
-sub _log ($self, $level, $msg) {
-  if ($self->can('logger') && $self->logger) {
-    $self->logger->$level($msg);
-  }
-}
+with 'WebFramework::Role::Logger';
 
 has data_file => (
   is       => 'ro',
@@ -70,8 +64,7 @@ sub load_all ($self) {
   $self->troop_base_defense($data->{troop_base_defense}           // {});
   $self->troop_base_hp($data->{troop_base_hp}                     // {});
 
-  $self->_log(
-    'info',
+  $self->logger->info(
     sprintf(
       'Loaded reference tables: %d tiers, %d world bosses',
       scalar(keys $self->troop_base_attack->%*),
