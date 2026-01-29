@@ -249,7 +249,7 @@ sub api_monsters ($self, $ctx) {
   my $monsters_loader = $self->monsters_loader();
 
   unless ($monsters_loader) {
-    $ctx->res->headers->content_type('application/json');
+    $ctx->res->headers(content_type => 'application/json');
     return '{"error": "Monster data not loaded"}';
   }
 
@@ -266,7 +266,7 @@ sub api_monsters ($self, $ctx) {
   use JSON::MaybeXS;
   my $json = JSON::MaybeXS->new(utf8 => 1);
 
-  $ctx->res->headers->content_type('application/json');
+  $ctx->res->headers(content_type => 'application/json');
   return $json->encode($results);
 }
 
@@ -274,7 +274,7 @@ sub api_monster_levels ($self, $ctx) {
   my $monsters_loader = $self->monsters_loader();
 
   unless ($monsters_loader) {
-    $ctx->res->headers->content_type('application/json');
+    $ctx->res->headers(content_type => 'application/json');
     return '{"error": "Monster data not loaded"}';
   }
 
@@ -298,7 +298,7 @@ sub api_monster_levels ($self, $ctx) {
   use JSON::MaybeXS;
   my $json = JSON::MaybeXS->new(utf8 => 1);
 
-  $ctx->res->headers->content_type('application/json');
+  $ctx->res->headers(content_type => 'application/json');
   return $json->encode(\@level_data);
 }
 

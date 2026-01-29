@@ -56,7 +56,7 @@ sub _register_common_routes ($self) {
     {
       to => sub ($self, $ctx) {
         my $xml = $self->generate_sitemap_xml();
-        $ctx->res->headers->content_type('application/xml; charset=utf-8');
+        $ctx->res->headers(content_type => 'application/xml; charset=utf-8');
         return $xml;
       },
       action => 'http.*',
@@ -140,7 +140,7 @@ sub _register_common_routes ($self) {
           %$env_info,
         });
 
-        $ctx->res->headers->content_type('application/json; charset=utf-8');
+        $ctx->res->headers(content_type => 'application/json; charset=utf-8');
         return $response;
       },
       action => 'http.*',
