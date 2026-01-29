@@ -68,7 +68,7 @@ sub _register_common_routes ($self) {
     '/robots.txt',
     {
       to => sub ($self, $ctx) {
-        my $host   = $ctx->req->headers->header('host') // '';
+        my $host   = $ctx->req->headers->{'host'} // '';
         my $is_dev = $host =~ /dev|localhost|127\.0\.0\.1/i;
 
         my $robots =
@@ -78,7 +78,7 @@ sub _register_common_routes ($self) {
           . $ctx->req->base
           . "sitemap.xml\n";
 
-        $ctx->res->headers->content_type('text/plain');
+        $ctx->res->headers(content_type => 'text/plain');
         return $robots;
       },
       action => 'http.*',
