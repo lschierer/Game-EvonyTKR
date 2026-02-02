@@ -1,0 +1,107 @@
+name: Battle of Cowpens (Siege)
+levels:
+  - level: green
+    text: >-
+      Attacking Siege Machine Attack +5%.
+      Attacking Siege Machine Defense +5%.
+      March Size Capacity +1%.
+    buffs:
+      - attribute: Attack
+        troop: Siege Machines
+        conditions:
+          - Attacking
+        value:
+          number: 5
+      - attribute: Defense
+        troop: Siege Machines
+        conditions:
+          - Attacking
+        value:
+          number: 5
+      - attribute: March Size
+        value:
+          number: 1
+  - level: blue
+    text: >-
+      Attacking Siege Machine Attack +6%.
+      Attacking Siege Machine Defense +6%.
+      March Size Capacity +1%.
+    buffs:
+      - attribute: Attack
+        troop: Siege Machines
+        conditions:
+          - Attacking
+        value:
+          number: 6
+      - attribute: Defense
+        troop: Siege Machines
+        conditions:
+          - Attacking
+        value:
+          number: 6
+      - attribute: March Size
+        value:
+          number: 1
+  - level: purple
+    text: >-
+      Attacking Siege Machine Attack +11%.
+      Attacking Siege Machine Defense +11%.
+      March Size Capacity +1%.
+    buffs:
+      - attribute: Attack
+        troop: Siege Machines
+        conditions:
+          - Attacking
+        value:
+          number: 11
+      - attribute: Defense
+        troop: Siege Machines
+        conditions:
+          - Attacking
+        value:
+          number: 11
+      - attribute: March Size
+        value:
+          number: 1
+  - level: orange
+    text: >-
+      Attacking Siege Machine Attack +11%.
+      Attacking Siege Machine Defense +11%.
+      March Size Capacity +2%.
+    buffs:
+      - attribute: Attack
+        troop: Siege Machines
+        conditions:
+          - Attacking
+        value:
+          number: 11
+      - attribute: Defense
+        troop: Siege Machines
+        conditions:
+          - Attacking
+        value:
+          number: 11
+      - attribute: March Size
+        value:
+          number: 2
+  - level: gold
+    text: >-
+      Attacking Siege Machine Attack +22%.
+      Attacking Siege Machine Defense +22%.
+      March Size Capacity +3%.
+    buffs:
+      - attribute: Attack
+        troop: Siege Machines
+        conditions:
+          - Attacking
+        value:
+          number: 22
+      - attribute: Defense
+        troop: Siege Machines
+        conditions:
+          - Attacking
+        value:
+          number: 22
+      - attribute: March Size
+        value:
+          number: 3

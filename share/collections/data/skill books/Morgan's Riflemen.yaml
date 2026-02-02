@@ -1,0 +1,23 @@
+name: >-
+  Morgan's Riflemen
+text: >-
+  Increases siege machines' attack and HP by 60% and siege machines' defense by 45% when General is leading the army.
+buffs:
+  - attribute: Attack
+    troop: Siege Machines
+    conditions:
+      - leading the army
+    value:
+      number: 60
+  - attribute: HP
+    troop: Siege Machines
+    conditions:
+      - leading the army
+    value:
+      number: 60
+  - attribute: Defense
+    troop: Siege Machines
+    conditions:
+      - leading the army
+    value:
+      number: 45
