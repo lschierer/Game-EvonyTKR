@@ -4,7 +4,7 @@ console.log(`DEBUG is set to ${DEBUG} for ${__FILE_PATH__}`);
 
 import { customElement } from 'lit/decorators.js';
 
-import { PairData } from './data';
+import { type PairData } from './data';
 import { LitElement, html, type TemplateResult } from 'lit';
 
 @customElement('state-manager')

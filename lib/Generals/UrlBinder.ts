@@ -25,7 +25,7 @@ export class UrlBinder {
 
     // Stores -> URL (debounced)
     for (const s of storesToWatch) {
-      this.unsub.push(s.subscribe(() => this.queueWrite()));
+      this.unsub.push(s.subscribe(() => { this.queueWrite(); }));
     }
 
     // Back/forward support
@@ -39,7 +39,7 @@ export class UrlBinder {
     if (this.writeTimer) window.clearTimeout(this.writeTimer);
   }
 
-  private onPopstate = () => this.applyFromUrl();
+  private onPopstate = () => { this.applyFromUrl(); };
 
   private applyFromUrl() {
     this.applying = true;
@@ -60,7 +60,7 @@ export class UrlBinder {
     if (this.writing) return; // avoid re-entrancy during replaceState
     if (this.writeTimer) window.clearTimeout(this.writeTimer);
     this.writeTimer = window.setTimeout(
-      () => this.writeToUrl(),
+      () => { this.writeToUrl(); },
       this.debounceMs,
     );
   }

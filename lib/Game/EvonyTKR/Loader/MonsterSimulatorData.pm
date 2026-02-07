@@ -64,13 +64,11 @@ sub load_all ($self) {
   $self->troop_base_defense($data->{troop_base_defense}           // {});
   $self->troop_base_hp($data->{troop_base_hp}                     // {});
 
-  $self->logger->info(
-    sprintf(
-      'Loaded reference tables: %d tiers, %d world bosses',
-      scalar(keys $self->troop_base_attack->%*),
-      scalar(keys $self->world_boss_modifiers->%*)
-    )
-  );
+  $self->logger->info(sprintf(
+    'Loaded reference tables: %d tiers, %d world bosses',
+    scalar(keys $self->troop_base_attack->%*),
+    scalar(keys $self->world_boss_modifiers->%*)
+  ));
 
   return 1;
 }

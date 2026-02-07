@@ -4,7 +4,7 @@ use utf8::all;
 
 use Mooish::Base -standard;
 with 'WebFramework::Role::Logger';
-use experimental qw(signatures);
+use experimental    qw(signatures);
 use Types::Standard ();
 
 has order => (
@@ -21,13 +21,13 @@ has name => (
 
 has alt_name => (
   is      => 'ro',
-  isa     => Types::Standard::Maybe[Types::Standard::Str],
+  isa     => Types::Standard::Maybe [Types::Standard::Str],
   default => sub {undef},
 );
 
 has monster_id => (
   is      => 'ro',
-  isa     => Types::Standard::Maybe[Types::Standard::Int],
+  isa     => Types::Standard::Maybe [Types::Standard::Int],
   default => sub {undef},
 );
 
@@ -39,43 +39,43 @@ has level => (
 
 has stamina => (
   is      => 'ro',
-  isa     => Types::Standard::Maybe[Types::Standard::Int],
+  isa     => Types::Standard::Maybe [Types::Standard::Int],
   default => sub {6},
 );
 
 has troop_count => (
   is      => 'ro',
-  isa     => Types::Standard::Maybe[Types::Standard::Int],
+  isa     => Types::Standard::Maybe [Types::Standard::Int],
   default => sub {undef},
 );
 
 has attack => (
   is      => 'ro',
-  isa     => Types::Standard::Maybe[Types::Standard::Int],
+  isa     => Types::Standard::Maybe [Types::Standard::Int],
   default => sub {0},
 );
 
 has defense => (
   is      => 'ro',
-  isa     => Types::Standard::Maybe[Types::Standard::Int],
+  isa     => Types::Standard::Maybe [Types::Standard::Int],
   default => sub {0},
 );
 
 has hp => (
   is      => 'ro',
-  isa     => Types::Standard::Maybe[Types::Standard::Int],
+  isa     => Types::Standard::Maybe [Types::Standard::Int],
   default => sub {0},
 );
 
 has spawn_rates => (
   is      => 'ro',
-  isa     => Types::Standard::ArrayRef[Types::Standard::Int],
+  isa     => Types::Standard::ArrayRef [Types::Standard::Int],
   default => sub { [0, 0, 0, 0, 0] },
 );
 
 has troop_modifiers => (
   is      => 'ro',
-  isa     => Types::Standard::HashRef[Types::Standard::Num],
+  isa     => Types::Standard::HashRef [Types::Standard::Num],
   default => sub {
     {
       ground  => 1.0,

@@ -11,9 +11,8 @@ import {
   type PropertyValues,
 } from 'lit';
 import { repeat } from 'lit/directives/repeat.js';
-import { Signal, SignalWatcher, signal, computed } from '@lit-labs/signals';
+import { type Signal, SignalWatcher, signal, computed } from '@lit-labs/signals';
 
-import * as z from 'zod';
 import {
   AscendingAttributeLevelNames,
   AscendingAttributeLevelValues,
@@ -253,7 +252,7 @@ export class LevelSettings extends (SignalWatcher(LitElement) as new () => LitEl
                         <li
                           class="spectrum-Menu-item "
                           role="menuitem"
-                          @click=${() => this.selectFiltered(true)}
+                          @click=${() => { this.selectFiltered(true); }}
                           tabindex="0"
                         >
                           <span class="spectrum-Menu-itemLabel"
@@ -263,7 +262,7 @@ export class LevelSettings extends (SignalWatcher(LitElement) as new () => LitEl
                         <li
                           class="spectrum-Menu-item"
                           role="menuitem"
-                          @click=${() => this.selectFiltered(false)}
+                          @click=${() => { this.selectFiltered(false); }}
                           tabindex="0"
                         >
                           <span class="spectrum-Menu-itemLabel"
@@ -293,7 +292,7 @@ export class LevelSettings extends (SignalWatcher(LitElement) as new () => LitEl
                                   ? 'true'
                                   : 'false'}"
                                 tabindex="0"
-                                @click=${() => this.toggleByName(opt.name)}
+                                @click=${() => { this.toggleByName(opt.name); }}
                               >
                                 <iconify-icon
                                   icon="tabler:circle-check"
@@ -526,7 +525,7 @@ export class LevelSettings extends (SignalWatcher(LitElement) as new () => LitEl
               name="specialty${i}"
               class="spectrum-Picker spectrum-Picker--sizeM"
               @change="${(e: Event) =>
-                this.onSpecialtyChange(specialty, i, e.target)}"
+                { this.onSpecialtyChange(specialty, i, e.target); }}"
             >
               ${repeat(
                 SpecialtyLevelValues.values.values(),

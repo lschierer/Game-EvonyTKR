@@ -3,7 +3,7 @@ const DEBUG = debugFunction(__FILE_PATH__);
 console.log(`DEBUG is set to ${DEBUG} for ${__FILE_PATH__}`);
 
 import { Store } from '@tanstack/store';
-import z from 'zod';
+import type z from 'zod';
 
 import { GeneralData, SingleGeneralState } from '../GeneralRowSchemas';
 
@@ -212,7 +212,7 @@ export class GeneralStore {
     if (this.flushTimer) {
       clearTimeout(this.flushTimer);
     }
-    this.flushTimer = window.setTimeout(() => this.flushBuffer(runId), 100);
+    this.flushTimer = window.setTimeout(() => { this.flushBuffer(runId); }, 100);
   }
 
   private flushBuffer(runId: number) {

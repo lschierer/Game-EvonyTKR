@@ -10,7 +10,7 @@ import { Store } from '@tanstack/store';
 import {
   AscendingAttributeLevelValues,
   CovenantCategoryValues,
-  AscendingOptions,
+  type AscendingOptions,
 } from '../../Game/EvonyTKR/Shared/Constants';
 
 import { SpecialtyStore } from '../specialtyStore';
@@ -135,8 +135,8 @@ export class SingleData extends LitElement {
       this.requestUpdate();
     });
 
-    this.generalStore.subscribe(() => this.requestUpdate());
-    this.buffFilter.subscribe(() => this.requestUpdate());
+    this.generalStore.subscribe(() => { this.requestUpdate(); });
+    this.buffFilter.subscribe(() => { this.requestUpdate(); });
   }
 
   public updateFilterParams() {

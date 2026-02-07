@@ -29,7 +29,7 @@ import {
   //AscendingAttributeLevelValues,
   type CovenantCategoryOptions,
   //CovenantCategoryValues,
-  SpecialtyLevelOptions,
+  type SpecialtyLevelOptions,
   SpecialtyLevelValues,
 } from '../../Game/EvonyTKR/Shared/Constants';
 
@@ -102,14 +102,14 @@ export class PairFilter extends LitElement {
       }
 
       if (this.is_primary) {
-        this.data.ascendingLevel.subscribe(() => this.requestUpdate());
-        this.data.primaryCovenantLevel.subscribe(() => this.requestUpdate());
-        this.data.primarySpecialties.subscribe(() => this.requestUpdate());
-        this.data.generalLevel.subscribe(() => this.requestUpdate());
-        this.data.victoryColumnLevel.subscribe(() => this.requestUpdate());
+        this.data.ascendingLevel.subscribe(() => { this.requestUpdate(); });
+        this.data.primaryCovenantLevel.subscribe(() => { this.requestUpdate(); });
+        this.data.primarySpecialties.subscribe(() => { this.requestUpdate(); });
+        this.data.generalLevel.subscribe(() => { this.requestUpdate(); });
+        this.data.victoryColumnLevel.subscribe(() => { this.requestUpdate(); });
       } else {
-        this.data.secondaryCovenantLevel.subscribe(() => this.requestUpdate());
-        this.data.secondarySpecialties.subscribe(() => this.requestUpdate());
+        this.data.secondaryCovenantLevel.subscribe(() => { this.requestUpdate(); });
+        this.data.secondarySpecialties.subscribe(() => { this.requestUpdate(); });
       }
 
       this.requestUpdate();
@@ -407,71 +407,71 @@ export class PairFilter extends LitElement {
           {
             key: 'ascendingLevel',
             get: () => this.data!.ascendingLevel.state,
-            set: (v: string) => this.data!.ascendingLevel.setState(v),
+            set: (v: string) => { this.data!.ascendingLevel.setState(v); },
           },
           {
             key: 'primaryCovenantLevel',
             get: () => this.data!.primaryCovenantLevel.state,
-            set: (v: string) => this.data!.primaryCovenantLevel.setState(v),
+            set: (v: string) => { this.data!.primaryCovenantLevel.setState(v); },
           },
           {
             key: 'generalLevel',
             get: () => String(this.data!.generalLevel.state),
             set: (v: string) =>
-              this.data!.generalLevel.setState(parseInt(v, 10) || 40),
+              { this.data!.generalLevel.setState(parseInt(v, 10) || 40); },
           },
           {
             key: 'victoryColumnLevel',
             get: () => String(this.data!.victoryColumnLevel.state),
             set: (v: string) =>
-              this.data!.victoryColumnLevel.setState(parseInt(v, 10) || 0),
+              { this.data!.victoryColumnLevel.setState(parseInt(v, 10) || 0); },
           },
           {
             key: 'primarySpecialty1',
             get: () => S.get(1),
-            set: (v: string) => S.set(1, v as SpecialtyLevelValues),
+            set: (v: string) => { S.set(1, v as SpecialtyLevelValues); },
           },
           {
             key: 'primarySpecialty2',
             get: () => S.get(2),
-            set: (v: string) => S.set(2, v as SpecialtyLevelValues),
+            set: (v: string) => { S.set(2, v as SpecialtyLevelValues); },
           },
           {
             key: 'primarySpecialty3',
             get: () => S.get(3),
-            set: (v: string) => S.set(3, v as SpecialtyLevelValues),
+            set: (v: string) => { S.set(3, v as SpecialtyLevelValues); },
           },
           {
             key: 'primarySpecialty4',
             get: () => S.get(4),
-            set: (v: string) => S.set(4, v as SpecialtyLevelValues),
+            set: (v: string) => { S.set(4, v as SpecialtyLevelValues); },
           },
         ] as ParamRow[])
       : ([
           {
             key: 'secondaryCovenantLevel',
             get: () => this.data!.secondaryCovenantLevel.state,
-            set: (v: string) => this.data!.secondaryCovenantLevel.setState(v),
+            set: (v: string) => { this.data!.secondaryCovenantLevel.setState(v); },
           },
           {
             key: 'secondarySpecialty1',
             get: () => S.get(1),
-            set: (v: string) => S.set(1, v as SpecialtyLevelValues),
+            set: (v: string) => { S.set(1, v as SpecialtyLevelValues); },
           },
           {
             key: 'secondarySpecialty2',
             get: () => S.get(2),
-            set: (v: string) => S.set(2, v as SpecialtyLevelValues),
+            set: (v: string) => { S.set(2, v as SpecialtyLevelValues); },
           },
           {
             key: 'secondarySpecialty3',
             get: () => S.get(3),
-            set: (v: string) => S.set(3, v as SpecialtyLevelValues),
+            set: (v: string) => { S.set(3, v as SpecialtyLevelValues); },
           },
           {
             key: 'secondarySpecialty4',
             get: () => S.get(4),
-            set: (v: string) => S.set(4, v as SpecialtyLevelValues),
+            set: (v: string) => { S.set(4, v as SpecialtyLevelValues); },
           },
         ] as ParamRow[]);
   };

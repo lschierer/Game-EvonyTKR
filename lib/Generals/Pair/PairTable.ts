@@ -30,7 +30,7 @@ import {
   flexRender,
 } from '@tanstack/lit-table';
 
-import * as data from './data';
+import type * as data from './data';
 import { type RowEntry, pairKey } from './pairStore';
 
 const tableHeaders = new Map<string, string>([
@@ -95,7 +95,7 @@ export class PairTable extends LitElement {
       // this second one *shouldn't* be necessary, the store subscription
       // should be sufficient since the filters changing should change
       // the store.
-      this.data.queryParams.subscribe(() => this.requestUpdate());
+      this.data.queryParams.subscribe(() => { this.requestUpdate(); });
     }
   }
 

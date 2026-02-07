@@ -26,7 +26,7 @@ import SpectrumPopOver from '@spectrum-css/popover/dist/index.css' with { type: 
 import SpectrumTokensCSS from '@spectrum-css/tokens/dist/index.css' with { type: 'css' };
 import SpectrumTextField from '@spectrum-css/textfield/dist/index.css' with { type: 'css' };
 
-import { PairData } from './data';
+import { type PairData } from './data';
 
 @customElement('pair-picker')
 export class PairPicker extends LitElement {
@@ -96,7 +96,7 @@ export class PairPicker extends LitElement {
   protected data?: PairData;
 
   @property({ type: String })
-  public generalFilterLabel: String = 'General';
+  public generalFilterLabel: string = 'General';
 
   @property({ attribute: false })
   protected menuOpen = new Store<boolean>(false);
@@ -106,8 +106,8 @@ export class PairPicker extends LitElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
-    this.menuOpen.subscribe(() => this.requestUpdate());
-    this.filterText.subscribe(() => this.requestUpdate());
+    this.menuOpen.subscribe(() => { this.requestUpdate(); });
+    this.filterText.subscribe(() => { this.requestUpdate(); });
 
     // Look for pair-data as descendant first, then via state-manager ancestor
     const qr = this.querySelector('pair-data') ??
@@ -117,7 +117,7 @@ export class PairPicker extends LitElement {
         console.log('found data');
       }
       this.data = qr as PairData;
-      this.data.primaryFilter.subscribe(() => this.requestUpdate());
+      this.data.primaryFilter.subscribe(() => { this.requestUpdate(); });
     }
     if (this.data) {
       this.data.pairStore.subscribe(() => {
@@ -198,7 +198,7 @@ export class PairPicker extends LitElement {
             role="menuitemcheckbox"
             aria-checked="${itemSelected ? 'true' : 'false'}"
             aria-disabled="false"
-            @click=${() => this.selectFiltered(primary, !itemSelected)}
+            @click=${() => { this.selectFiltered(primary, !itemSelected); }}
             tabindex="0"
           >
             <iconify-icon
@@ -287,7 +287,7 @@ export class PairPicker extends LitElement {
           class="spectrum-Form spectrum-Form--labelsAbove spectrum-Form--sizeM"
           novalidate
           role="group"
-          @submit=${(e: Event) => e.preventDefault()}
+          @submit=${(e: Event) => { e.preventDefault(); }}
         >
           ${this.renderGeneralFilter()}
         </form>
