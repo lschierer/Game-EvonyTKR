@@ -33,6 +33,7 @@
   "include": [
     "./lib/**/*.ts",
     "./scripts/*.ts",
-    "./share/infrastructure/**/*.ts"
+    "./infrastructure/**/*.ts",
+    "./types/**/*.ts"
   ]
 }

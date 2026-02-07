@@ -1,9 +1,10 @@
 /* tslint:disable-next-line */
 import eslint from '@eslint/js';
+import { defineConfig } from 'eslint/config';
 import tseslint from 'typescript-eslint';
 import globals from 'globals';
 
-export default tseslint.config(
+export default defineConfig(
   {
     ignores: ['**/dist/**', '**/public/**', '**/cdk.out/**'],
   },
@@ -37,7 +38,7 @@ export default tseslint.config(
       },
       parserOptions: {
         projectService: {
-          allowDefaultProject: ['eslint.config.mts', 'stylelint.config.js'],
+          allowDefaultProject: ['eslint.config.mts', 'commitlint.config.js', 'stylelint.config.js'],
         },
         tsconfigRootDir: import.meta.dirname,
         projectFolderIgnoreList: ['**/node_modules/**'],
@@ -50,11 +51,10 @@ export default tseslint.config(
     extends: [eslint.configs.recommended, tseslint.configs.disableTypeChecked],
   },
 
-  // Add a new configuration specifically for packages/infrastructure
+  // Add a new configuration specifically for cdk
   {
     files: [
-      'packages/infrastructure/**/*.ts',
-      'packages/infrastructure/**/*.mts',
+      'infrastructure/**/*.ts',
     ],
     rules: {
       '@typescript-eslint/no-unused-vars': 'off',

@@ -1,20 +1,22 @@
 use v5.42.0;
 use utf8::all;
 use Carp;
-use Module::Build;
+use lib qw(lib);
+use Module::Build::Custom;
 
-my $builder = Module::Build->new(
+my $builder = Module::Build::Custom->new(
   module_name   => 'Game::EvonyTKR',
   license       => 'ISC',
   dist_author   => 'Luke Schierer <luke.schierer@gmail.com>',
   dist_abstract =>
 'Display and Evaluate information about Generals, Buffs, and DeBuffs for the Evony TKR Game',
-  create_makefile_pl => 0,    #'traditional',
+  create_makefile_pl => 0,
   script_files       => ['bin/game-evonytkr', 'scripts/create-general',],
   share_dir          => {
-    dist => ['share'], # This tells Module::Build to install the share directory
+    dist => ['share'],
   },
   create_readme => 0,
+  exclude_dirs  => ['infrastructure', 'node_modules', 'share/infrastructure'],
   requires      => {
     'utf8::all'                      => '0',
     'App::Cmd::Simple'               => '0',
@@ -97,6 +99,7 @@ my $builder = Module::Build->new(
     'utf8::all'     => '0',
   },
   build_requires => {
+    'File::Find::Rule'                              => '0',
     'utf8::all'                                     => '0',
     'App::podweaver'                                => '0',
     'File::Spec'                                    => '0',
@@ -132,8 +135,11 @@ my $builder = Module::Build->new(
     'URI'                                                   => '0',
     'Perl::Critic::Policy::Modules::RequireExplicitPackage' => '0',
   },
-  exclude_file_types => ['share/infrastructure', 'node_modules']
-
+  no_index => {
+    directory => ['infrastructure', 'node_modules', 'share/infrastructure'],
+  },
+  recursive_test_files => 1,
+  add_to_cleanup       => ['blib', '_build', 'node_modules'],
 );
 
 $builder->create_build_script();

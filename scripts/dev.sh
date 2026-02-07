@@ -45,6 +45,6 @@ export MOJO_RENDERER_DEBUG=1;
 
 # Start web server with watchexec
 echo "Starting web server with minimal file watching..."
-watchexec --exts css,tt,js,pm -w lib/ -w templates/ -w share/public/ -w share/collections/data/ --restart ./bin/server2.pl --mode development
+watchexec --exts css,tt,js,pm -w lib/ -w templates/ -w share/public/ -w share/collections/data/ --restart ./bin/server.pl --mode development
 #./bin/game-evonytkr daemon -m development
 # This will run cleanup when watchexec exits

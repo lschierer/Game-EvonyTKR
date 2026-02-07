@@ -11,6 +11,15 @@ tidy:
     perltidy -b -pro=.perltidyrc scripts/create-general bin/game-evonytkr scripts/update_git_meta.pl
     find . -name '*.bak' -delete
 
+clean:
+    rm -f MANIFEST
+    rm -rf _build
+    rm -rf blib
+    rm -f Build
+    rm -rf cdk.out 
+    rm -f MYMETA.*
+
+
 prepare:
     mise install
     perl Build.PL
@@ -52,7 +61,7 @@ dev: deps css images build
     truncate -s 0 "${HOME}/var/log/Perl/dist/Game-EvonyTKR/system.log"
     truncate -s 0 "${HOME}/var/log/Perl/dist/WebFramework/system.log"
     truncate -s 0 "${HOME}/var/log/Perl/dist/WebFramework/access.log"
-    ./bin/server2.pl --mode development
+    ./bin/server.pl --mode development
 
 quickdev:
     truncate -s 0 "${HOME}/var/log/Perl/dist/Game-EvonyTKR/system.log"
@@ -60,10 +69,12 @@ quickdev:
     truncate -s 0 "${HOME}/var/log/Perl/dist/WebFramework/access.log"
     ./scripts/dev.sh
 
-deploy-dev: build
-    pnpm cdk --profile personal deploy --context env=dev evonytkrtips-dev-stack2
+[working-directory('infrastructure')]
+deploy-dev: clean
+    pnpm cdk --profile personal acknowledge 34892 
+    MODE='dev' pnpm cdk --profile personal deploy
 
-deploy-prod: build
+deploy-prod: clean build
     pnpm cdk --profile personal deploy --context env=prod evonytkrtips-prod-stack2
 
 [working-directory('share/infrastructure')]
