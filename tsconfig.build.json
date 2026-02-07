@@ -13,5 +13,5 @@
     "experimentalDecorators": true,
     "useDefineForClassFields": false
   },
-  "include": ["./lib/**/*.ts", "./share/infrastructure/lib/**/*.ts"]
+  "include": ["./lib/**/*.ts", "./infrastructure/lib/**/*.ts"]
 }

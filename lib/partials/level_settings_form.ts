@@ -20,6 +20,8 @@ import {
   SpecialtyLevelValues,
 } from '../Game/EvonyTKR/Shared/Constants';
 
+import type * as z from 'zod';
+
 import SpectrumButton from '@spectrum-css/button/dist/index.css' with { type: 'css' };
 import SpectrumDivider from '@spectrum-css/divider/dist/index.css' with { type: 'css' };
 import SpectrumFieldGroup from '@spectrum-css/fieldgroup/dist/index.css' with { type: 'css' };

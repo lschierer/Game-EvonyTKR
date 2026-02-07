@@ -19,8 +19,8 @@
     "forceConsistentCasingInFileNames": true,
     "types": [
       "node",
-      "./share/types/myGlobals.d.ts",
-      "./share/types/postcss-extend.d.ts"
+      "./types/myGlobals.d.ts",
+      "./types/postcss-extend.d.ts"
     ],
     "noEmit": true,
     "composite": true,
