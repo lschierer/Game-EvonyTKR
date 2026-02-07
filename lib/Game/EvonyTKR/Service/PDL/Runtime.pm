@@ -7,9 +7,7 @@ with 'WebFramework::Role::Logger';
 use PDL;
 use PDL::NiceSlice;
 use Game::EvonyTKR::Service::PDL::Compiler;
-use Mojo::File qw(path);
-use Mojo::Util qw(dumper);
-use POSIX      qw( round );
+use POSIX qw( round );
 
 =head1 NAME
 

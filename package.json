@@ -5,8 +5,7 @@
   "type": "module",
   "scripts": {
     "build:css": "rimraf ./share/tmp/css ; mkdir -p ./share/tmp/css/ ; tsx ./scripts/build-css.ts ./share/public/css/",
-    "build:ts": "tsc -p ./tsconfig.build.json && tsx ./scripts/build-ts.ts",
-    "app": "tsx scripts/infra.ts"
+    "build:ts": "tsc -p ./tsconfig.build.json && tsx ./scripts/build-ts.ts"
   },
   "author": "Luke Schierer <luke@schierer.org>",
   "license": "ISC",

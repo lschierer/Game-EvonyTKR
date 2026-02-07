@@ -52,7 +52,7 @@ This document explains how to integrate the PDL (Perl Data Language) vectorized 
 - ⚠️ Debuffs (Enemy condition buffs need special handling)
 
 ### Validation Results
-Running `scripts/validate_pdl_compiler.pl`:
+Running `prove -v t/validate_pdl_compiler.t`:
 - All 8 test cases execute without errors
 - Skill book buffs match exactly (e.g., Marco Polo: Attack=45, Defense=40, HP=40 ✅)
 - Missing values are entirely due to missing generic books
@@ -133,7 +133,7 @@ Then update all controllers to use `BuffService` instead of `Buff::Summarizer`.
 - [ ] Validate against golden dataset (should reach 100% pass)
 
 ### Phase 2: Testing
-- [ ] Run `scripts/validate_pdl_compiler.pl` (should pass all 8 tests)
+- [ ] Run `prove -v t/validate_pdl_compiler.t` (should pass all 8 tests)
 - [ ] Add integration tests that compare PDL vs Buff::Summarizer output
 - [ ] Test with real YAML data for all ~170 generals
 - [ ] Benchmark performance on EC2 instance
@@ -249,25 +249,10 @@ my $pair_buffs = $runtime->compute_pair_buffs(
 
 ## Testing
 
-### Validation Script
+### Validation Test
 ```bash
 # Run validation against golden dataset
-perl -Ilib scripts/validate_pdl_compiler.pl
-
-# With debug output
-DEBUG=1 perl -Ilib scripts/validate_pdl_compiler.pl
-```
-
-### Demo Script
-```bash
-# See runtime service in action with performance benchmark
-perl -Ilib scripts/demo_pdl_runtime.pl
-```
-
-### Expected Output
-```
-✓ PDL runtime successfully computed buffs!
-  Average time per computation: ~0.06 ms
+prove -v t/validate_pdl_compiler.t
 ```
 
 ## Architecture Diagram
