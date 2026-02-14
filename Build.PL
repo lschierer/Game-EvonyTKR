@@ -11,7 +11,7 @@ my $builder = Module::Build::Custom->new(
   dist_abstract =>
 'Display and Evaluate information about Generals, Buffs, and DeBuffs for the Evony TKR Game',
   create_makefile_pl => 0,
-  script_files       => ['bin/game-evonytkr', 'scripts/create-general',],
+  script_files       => ['bin/server.pl', 'scripts/create-general',],
   share_dir          => {
     dist => ['share'],
   },
