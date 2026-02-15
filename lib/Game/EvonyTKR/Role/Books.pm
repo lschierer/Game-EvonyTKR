@@ -1,4 +1,5 @@
 package Game::EvonyTKR::Role::Books;
+# cspell: disable
 use v5.42.0;
 use utf8::all;
 use Moo::Role;
