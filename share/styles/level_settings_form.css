@@ -13,34 +13,12 @@
   );
 }
 
-/* Filter container with responsive layout */
 div.filter-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 2rem;
   width: 100%;
-}
-
-/* Each settings form takes up appropriate space */
-div.settings-form {
-  flex: 1 1 350px; /* Grow, shrink, base width of 350px */
-  min-width: 350px;
-  max-width: 600px;
 }
 
 div.settings-form form#settings-form {
   width: 100%;
-}
-
-/* On smaller screens, stack vertically */
-@media (width <= 768px) {
-  div.filter-container {
-    flex-direction: column;
-  }
-
-  div.settings-form {
-    max-width: 100%;
-  }
 }
 
 #general-options-picker {

@@ -122,6 +122,12 @@ div#main {
   box-sizing: border-box;
 }
 
+/* When main is inside a SplitView pane, the pane handles scrolling */
+div.spectrum-SplitView-pane > main {
+  min-height: unset;
+  overflow-y: visible;
+}
+
 /* 4. Sidebar */
 div#nav {
   grid-area: content;

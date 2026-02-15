@@ -144,8 +144,30 @@ tbody.spectrum-Table-body > tr {
   font-style: italic;
 }
 
+/* Side-by-side pair filters on wider screens */
+.filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  width: 100%;
+}
+
+.filter-row > pair-filter {
+  flex: 1 1 350px;
+  min-width: 300px;
+  max-width: 600px;
+}
+
 /* Responsive adjustments */
 @media (width <= 768px) {
+  .filter-row {
+    flex-direction: column;
+  }
+
+  .filter-row > pair-filter {
+    max-width: 100%;
+  }
+
   .general-pairs-table {
     overflow-x: auto;
   }
