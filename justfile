@@ -79,8 +79,10 @@ deploy-test: clean
     pnpm cdk --profile personal acknowledge 34892 
     MODE='test' pnpm cdk --profile personal deploy
 
-deploy-prod: clean build
-    pnpm cdk --profile personal deploy --context env=prod evonytkrtips-prod-stack2
+[working-directory('infrastructure')]
+deploy-prod: clean
+    pnpm cdk --profile personal acknowledge 34892 
+    MODE='prod' pnpm cdk --profile personal deploy
 
 [working-directory('share/infrastructure')]
 dev-image: build
