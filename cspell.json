@@ -1,0 +1,33 @@
+{
+  "$schema": "https://raw.githubusercontent.com/streetsidesoftware/cspell/main/cspell.schema.json",
+  "version": "0.2",
+  "language": "en-US",
+  "caseSensitive": true,
+  "dictionaries": ["en-us", "project-words", "user-words"],
+  "enabledLanguageIds": ["markdown", "plaintext"],
+  "dictionaryDefinitions": [
+    {
+      "name": "project-words",
+      "path": "./.cspell/project-words.txt",
+      "addWords": true
+    },
+    {
+      "name": "user-words",
+      "path": "~/.cspell/user-words.txt",
+      "addWords": true
+    }
+  ],
+  "ignorePaths": [
+    "node_modules",
+    "blib",
+    "_build",
+    "cdk.out"
+  ],
+  "languageSettings": [
+    {
+      "languageId": "markdown",
+      "locale": "en-GB"
+    }
+  ],
+  "overrides": []
+}
