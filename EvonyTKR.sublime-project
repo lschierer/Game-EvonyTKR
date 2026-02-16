@@ -1,8 +1,66 @@
+/* cspell: disable */
 {
-	"folders":
-	[
-		{
-			"path": "."
-		}
-	]
+    "folders" : [
+        { "path" : "." },
+        { "path" : "./share/pages", "name" : "Pages" },
+        {
+        	"path": "./share/collections/data", "name": "Collections"
+        },
+        { 
+        	"path": "share/training_data", "name": "Training Data",
+        },
+    ],
+
+    "settings" : {
+        "syntax_override": {
+            "\\.md$": {
+                "syntax": "Packages/Markdown/Markdown.sublime-syntax",
+                "settings": {
+                    "tab_size": 2,
+                    "translate_tabs_to_spaces": true,
+                    "draw_white_space": "all"
+                }
+            },
+        },
+        "linters": {
+            "htmltidy": {
+              "selector": "text.html"
+          },
+      },
+      "LSP" : {
+        "LSP-eslint" : {
+            "enabled" : true, "settings" : { "useFlatConfig" : true, }
+        },
+        "LSP-cspell" : {
+            "selector": "text.html.markdown | source.yaml",
+            "settings" : {
+                "cSpell.enabled"      : true,
+                "cSpell.showStatus"   : true,
+                "cSpell.useGitignore" : true,
+                "cSpell.diagnosticLevel" : "Warning",
+            }
+        }
+    },
+},
+"required_packages" : [
+    "BracketHighlighter",
+    "Dictionary",
+    "Dockerfile Syntax Highlighting",
+    "EditorConfig",
+    "FileManager",
+    "Google Dictionary",
+    "LSP",
+    "LSP-eslint",
+    "LSP-json",
+    "LSP-typescript",
+    "LSP-cspell",
+    "Markdown Extended",
+    "MarkdownFootnotes",
+    "MarkdownPreview",
+    "NeoVintageous",
+    "Package Control",
+    "PerlTidy",
+    "Project Specific Syntax Settings",
+    "SideBarEnhancements",
+],
 }
