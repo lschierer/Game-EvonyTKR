@@ -1,0 +1,132 @@
+name: Battle of Marignano
+levels:
+  - level: green
+    text: >-
+      Ground Troop Attack +5%.
+      Ground Troop and Mounted Troop Defense +3%.
+      Ground Troop and Mounted Troop HP +3%.
+    buffs:
+      - attribute: Attack
+        troop: Ground Troops
+        value:
+          number: 5
+      - attribute: Defense
+        troop: Ground Troops
+        value:
+          number: 3
+      - attribute: Defense
+        troop: Mounted Troops
+        value:
+          number: 3          
+      - attribute: HP
+        troop: Ground Troops
+        value:
+          number: 3
+      - attribute: HP
+        troop: Mounted Troops
+        value:
+          number: 3                    
+  - level: blue
+    text: >-
+      Ground Troop Attack +6%.
+      Ground Troop and Mounted Troop Defense +4%.
+      Ground Troop and Mounted Troop HP +4%.
+    buffs:
+      - attribute: Attack
+        troop: Ground Troops
+        value:
+          number: 6
+      - attribute: Defense
+        troop: Ground Troops
+        value:
+          number: 4
+      - attribute: Defense
+        troop: Mounted Troops
+        value:
+          number: 4          
+      - attribute: HP
+        troop: Ground Troops
+        value:
+          number: 4
+      - attribute: HP
+        troop: Mounted Troops
+        value:
+          number: 4                              
+  - level: purple
+    text: >-
+      Ground Troop Attack +11%.
+      Ground Troop and Mounted Troop Defense +7%.
+      Ground Troop and Mounted Troop HP +7%.
+    buffs:
+      - attribute: Attack
+        troop: Ground Troops
+        value:
+          number: 11
+      - attribute: Defense
+        troop: Ground Troops
+        value:
+          number: 7
+      - attribute: Defense
+        troop: Mounted Troops
+        value:
+          number: 7          
+      - attribute: HP
+        troop: Ground Troops
+        value:
+          number: 7
+      - attribute: HP
+        troop: Mounted Troops
+        value:
+          number: 7
+  - level: orange
+    text: >-
+      Ground Troop Attack +11%.
+      Ground Troop and Mounted Troop Defense +7%.
+      Ground Troop and Mounted Troop HP +7%.
+    buffs:
+      - attribute: Attack
+        troop: Ground Troops
+        value:
+          number: 11
+      - attribute: Defense
+        troop: Ground Troops
+        value:
+          number: 7
+      - attribute: Defense
+        troop: Mounted Troops
+        value:
+          number: 7          
+      - attribute: HP
+        troop: Ground Troops
+        value:
+          number: 7
+      - attribute: HP
+        troop: Mounted Troops
+        value:
+          number: 7 
+  - level: gold
+    text: >-
+      Ground Troop Attack +22%.
+      Ground Troop and Mounted Troop Defense +14%.
+      Ground Troop and Mounted Troop HP +14%.
+    buffs:
+      - attribute: Attack
+        troop: Ground Troops
+        value:
+          number: 22
+      - attribute: Defense
+        troop: Ground Troops
+        value:
+          number: 14
+      - attribute: Defense
+        troop: Mounted Troops
+        value:
+          number: 14          
+      - attribute: HP
+        troop: Ground Troops
+        value:
+          number: 14
+      - attribute: HP
+        troop: Mounted Troops
+        value:
+          number: 7                                                            

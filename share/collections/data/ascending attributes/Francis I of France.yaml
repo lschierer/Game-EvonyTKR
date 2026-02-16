@@ -1,0 +1,63 @@
+id: Francis I of France
+general: Francis I of France
+ascending:
+  - level: red1
+    text: Ground Troop Defense and HP +10%
+    buffs:
+      - attribute: Defense
+        troop: Ground Troops
+        value:
+          number: 10
+      - attribute: HP
+        troop: Ground Troops
+        value:
+          number: 10 
+  - level: red2
+    text: Attacking Troop Death into Wounded Rate +8%
+    buffs:
+      - attribute: Death to Wounded
+        conditions:
+          - Attacking
+        value:
+          number: 8
+          unit: percentage
+  - level: red3
+    text: Ground Troop Attack and Defense +15%
+    buffs:
+      - attribute: Attack
+        troop: Ground Troops
+        value:
+          number: 15
+      - attribute: Defense
+        troop: Ground Troops
+        value:
+          number: 15
+  - level: red4
+    text: Ground Troop HP +15%, March Size Capacity +8%
+    buffs:
+      - attribute: HP
+        troop: Ground Troops
+        value:
+          number: 15
+      - attribute: March Size
+        value:
+          number: 8
+  - level: red5
+    text: Mounted Troop and Ground Troop Attack +35%, Ground Troop Defense and HP +35%
+    buffs:
+      - attribute: Attack
+        troop: Mounted Troops
+        value:
+          number: 35
+      - attribute: Attack
+        troop: Ground Troops
+        value:
+          number: 35
+      - attribute: Defense
+        troop: Ground Troops
+        value:
+          number: 35
+      - attribute: HP
+        troop: Ground Troops
+        value:
+          number: 35

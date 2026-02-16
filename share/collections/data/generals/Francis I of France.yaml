@@ -1,0 +1,25 @@
+ascending: true
+basic_attributes:
+  attack:
+    base: 133
+    increment: 9.33
+  defense:
+    base: 122
+    increment: 8.61
+  leadership:
+    base: 128
+    increment: 9.12
+  politics:
+    base: 119
+    increment: 8.15
+book: Knight King
+specialties:
+  - Ground Troop Defense
+  - Formation
+  - Ground Troop Ares
+  - Battle of Marignano
+stars: red5
+type:
+  - ground_specialist
+general: Francis I of France
+name: Francis I of France

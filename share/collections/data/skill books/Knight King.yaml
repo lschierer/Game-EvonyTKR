@@ -1,0 +1,23 @@
+name: Knight King
+text: >-
+  Increases ground troops' attack and defense by 60% and ground troops' HP by 45% when General is leading the army.
+buffs:
+  - attribute: Attack
+    troop: Ground Troops
+    conditions:
+      - leading the army
+    value:
+      number: 60
+  - attribute: Defense
+    troop: Ground Troops
+    conditions:
+      - leading the army
+    value:
+      number: 60
+  - attribute: HP
+    troop: Ground Troops
+    conditions:
+      - leading the army
+    value:
+      number: 45
+  
