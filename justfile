@@ -69,17 +69,14 @@ quickdev:
     truncate -s 0 "${HOME}/var/log/Perl/dist/WebFramework/access.log"
     ./scripts/dev.sh
 
-[working-directory('infrastructure')]
 deploy-dev: clean
     pnpm cdk --profile personal acknowledge 34892 
     MODE='dev' pnpm cdk --profile personal deploy
 
-[working-directory('infrastructure')]
 deploy-test: clean
     pnpm cdk --profile personal acknowledge 34892 
     MODE='test' pnpm cdk --profile personal deploy
 
-[working-directory('infrastructure')]
 deploy-prod: clean
     pnpm cdk --profile personal acknowledge 34892 
     MODE='prod' pnpm cdk --profile personal deploy

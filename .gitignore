@@ -21,7 +21,7 @@ blib
 .sst
 
 node_modules
-share/infrastructure/cdk.out
+cdk.out
 
 *.d.ts.map
 tsconfig.build.tsbuildinfo
@@ -38,3 +38,4 @@ conflicts.json
 
 # Generated config files
 game-evony_t_k_r.production.yml
+EvonyTKR.sublime-workspace

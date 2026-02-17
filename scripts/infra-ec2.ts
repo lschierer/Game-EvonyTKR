@@ -1,8 +1,10 @@
 #!/usr/bin/env node
+// cspell: disable
 import * as cdk from "aws-cdk-lib/core";
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import path from 'path';
 import { fileURLToPath } from 'url';
+
 
 // Import from common framework
 import {
@@ -30,37 +32,33 @@ try {
   process.exit(1);
 }
 
-const environment = app.node.tryGetContext('env') || 'dev';
+const mode = !process.env.MODE?.localeCompare("prod") ? "prod" : "dev";
 const region = process.env.REGION ?? "us-east-2";
 
 type EnvConfig = {
-  CidrRange: string;
   subdomain: string;
   instanceSize: ec2.InstanceSize;
 };
 
 const envConfigs: Record<string, EnvConfig> = {
   dev: {
-    CidrRange: '10.193.0.0/27',
     subdomain: 'dev',
     instanceSize: ec2.InstanceSize.SMALL,
   },
   prod: {
-    CidrRange: '10.199.0.0/27',
     subdomain: 'www',
     instanceSize: ec2.InstanceSize.MEDIUM,
   },
 };
 
-const config = envConfigs[environment];
+const config = envConfigs[mode];
 
 const props: ApplicationStackProps = {
   env: {
     account: process.env.CDK_DEFAULT_ACCOUNT,
     region,
   },
-  mode: environment === 'prod' ? 'prod' : 'dev',
-  CidrRange: config.CidrRange,
+  mode: mode,
   prefix: "EvonyTKR",
   appSubdomain: config.subdomain,
   domainName: "evonytkrtips.net",
@@ -72,18 +70,18 @@ const props: ApplicationStackProps = {
   appCodePath: path.join(__dirname, '..'),
   appCodeExcludes: [
     'node_modules',
-    'share/infrastructure/node_modules',
-    'share/infrastructure/cdk.out',
+    'infrastructure',
+    'cdk.out',
     '.git',
     'dist',
   ],
   crossRegionReferences: true,
   tags: {
-    Environment: environment,
+    Environment: mode,
     Application: 'EvonyTKRTips',
   },
 };
 
-new ApplicationStack(app, `evonytkrtips-${environment}-ec2-stack`, props);
+new ApplicationStack(app, `evonytkrtips-${mode}-ec2-stack`, props);
 
 app.synth();
