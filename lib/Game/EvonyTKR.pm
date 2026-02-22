@@ -44,6 +44,7 @@ package Game::EvonyTKR {
           pass_through => 1,
           _order       => 2
         },
+        GoogleAnalytics => { ga_id => 'G-98HFQWP71B', env => $self->env },
       }
     );
 
