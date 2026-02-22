@@ -136,17 +136,17 @@ export class GeneralPicker extends LitElement {
   readonly onFilterInput = (e: Event) => {
     e.stopPropagation();
     const target = e.target as HTMLInputElement;
-    this.filterText.setState(target.value.toLowerCase());
+    this.filterText.setState(() => target.value.toLowerCase());
   };
 
   private toggleMenu = (e: Event) => {
     e.preventDefault(); // belt & suspenders
     const willOpen = !this.menuOpen.state;
-    this.menuOpen.setState(willOpen);
+    this.menuOpen.setState(() => willOpen);
 
     // Clear filter when closing menu
     if (!willOpen) {
-      this.filterText.setState('');
+      this.filterText.setState(() => '');
       // Also clear the input field
       const input =
         this.renderRoot.querySelector<HTMLInputElement>('#general-filter');

@@ -32,25 +32,13 @@ export class GeneralStore {
   private rowBuffer: Map<string, GeneralData> = new Map();
   private flushTimer?: number;
 
-  readonly store: Store<GeneralState> = new Store<GeneralState>(
-    {
-      catalog: [],
-      catalogRev: 0,
-      rows: {},
-      runId: 0,
-      streaming: 'idle',
-    },
-    {
-      updateFn: (prev) => (updater) => {
-        const next =
-          typeof updater === 'function'
-            ? (updater as (p: GeneralState) => GeneralState)(prev)
-            : updater;
-
-        return next;
-      },
-    },
-  );
+  readonly store: Store<GeneralState> = new Store<GeneralState>({
+    catalog: [],
+    catalogRev: 0,
+    rows: {},
+    runId: 0,
+    streaming: 'idle',
+  });
 
   public get currentES() {
     return this._currentES;
@@ -126,7 +114,7 @@ export class GeneralStore {
       console.error('invalid catalog payload');
       return;
     }
-    this.sessionId.setState(ro.sessionId);
+    this.sessionId.setState(() => ro.sessionId);
     const sp = new Set<string>();
     if (valid.success) {
       valid.data.map((s) => {

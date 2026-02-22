@@ -139,7 +139,7 @@ export class PairFilter extends LitElement {
       }
       return;
     }
-    this.data.ascendingLevel.setState(target.value);
+    this.data.ascendingLevel.setState(() => target.value);
   };
 
   protected renderAscendingCombo = () => {
@@ -195,9 +195,9 @@ export class PairFilter extends LitElement {
       return;
     }
     if (this.is_primary) {
-      this.data.primaryCovenantLevel.setState(target.value);
+      this.data.primaryCovenantLevel.setState(() => target.value);
     } else {
-      this.data.secondaryCovenantLevel.setState(target.value);
+      this.data.secondaryCovenantLevel.setState(() => target.value);
     }
   };
 
@@ -317,7 +317,8 @@ export class PairFilter extends LitElement {
       }
       return;
     }
-    this.data.generalLevel.setState(parseInt(target.value, 10));
+    const v = parseInt(target.value, 10);
+    this.data.generalLevel.setState(() => v);
   };
 
   protected renderGeneralLevelCombo = () => {
@@ -361,7 +362,8 @@ export class PairFilter extends LitElement {
       }
       return;
     }
-    this.data.victoryColumnLevel.setState(parseInt(target.value, 10));
+    const v = parseInt(target.value, 10);
+    this.data.victoryColumnLevel.setState(() => v);
   };
 
   protected renderVictoryColumnCombo = () => {
@@ -407,24 +409,24 @@ export class PairFilter extends LitElement {
           {
             key: 'ascendingLevel',
             get: () => this.data!.ascendingLevel.state,
-            set: (v: string) => { this.data!.ascendingLevel.setState(v); },
+            set: (v: string) => { this.data!.ascendingLevel.setState(() => v); },
           },
           {
             key: 'primaryCovenantLevel',
             get: () => this.data!.primaryCovenantLevel.state,
-            set: (v: string) => { this.data!.primaryCovenantLevel.setState(v); },
+            set: (v: string) => { this.data!.primaryCovenantLevel.setState(() => v); },
           },
           {
             key: 'generalLevel',
             get: () => String(this.data!.generalLevel.state),
             set: (v: string) =>
-              { this.data!.generalLevel.setState(parseInt(v, 10) || 40); },
+              { this.data!.generalLevel.setState(() => parseInt(v, 10) || 40); },
           },
           {
             key: 'victoryColumnLevel',
             get: () => String(this.data!.victoryColumnLevel.state),
             set: (v: string) =>
-              { this.data!.victoryColumnLevel.setState(parseInt(v, 10) || 0); },
+              { this.data!.victoryColumnLevel.setState(() => parseInt(v, 10) || 0); },
           },
           {
             key: 'primarySpecialty1',
@@ -451,7 +453,7 @@ export class PairFilter extends LitElement {
           {
             key: 'secondaryCovenantLevel',
             get: () => this.data!.secondaryCovenantLevel.state,
-            set: (v: string) => { this.data!.secondaryCovenantLevel.setState(v); },
+            set: (v: string) => { this.data!.secondaryCovenantLevel.setState(() => v); },
           },
           {
             key: 'secondarySpecialty1',

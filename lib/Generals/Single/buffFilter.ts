@@ -128,7 +128,7 @@ export class BuffFilter extends LitElement {
       }
       return;
     }
-    this.data.ascendingLevel.setState(target.value);
+    this.data.ascendingLevel.setState(() => target.value);
   };
 
   protected renderAscendingCombo = () => {
@@ -183,7 +183,7 @@ export class BuffFilter extends LitElement {
       }
       return;
     }
-    this.data.covenantLevel.setState(target.value);
+    this.data.covenantLevel.setState(() => target.value);
   };
 
   protected renderCovenantCombo = () => {
@@ -295,7 +295,8 @@ export class BuffFilter extends LitElement {
       }
       return;
     }
-    this.data.generalLevel.setState(parseInt(target.value, 10));
+    const v = parseInt(target.value, 10);
+    this.data.generalLevel.setState(() => v);
   };
 
   protected renderGeneralLevelCombo = () => {
@@ -339,7 +340,8 @@ export class BuffFilter extends LitElement {
       }
       return;
     }
-    this.data.victoryColumnLevel.setState(parseInt(target.value, 10));
+    const v = parseInt(target.value, 10);
+    this.data.victoryColumnLevel.setState(() => v);
   };
 
   protected renderVictoryColumnCombo = () => {
@@ -382,22 +384,22 @@ export class BuffFilter extends LitElement {
       {
         key: 'ascendingLevel',
         get: () => this.data!.ascendingLevel.state,
-        set: (v: string) => { this.data!.ascendingLevel.setState(v); },
+        set: (v: string) => { this.data!.ascendingLevel.setState(() => v); },
       },
       {
         key: 'covenantLevel',
         get: () => this.data!.covenantLevel.state,
-        set: (v: string) => { this.data!.covenantLevel.setState(v); },
+        set: (v: string) => { this.data!.covenantLevel.setState(() => v); },
       },
       {
         key: 'generalLevel',
         get: () => String(this.data!.generalLevel.state),
-        set: (v: string) => { this.data!.generalLevel.setState(parseInt(v, 10) || 40); },
+        set: (v: string) => { this.data!.generalLevel.setState(() => parseInt(v, 10) || 40); },
       },
       {
         key: 'victoryColumnLevel',
         get: () => String(this.data!.victoryColumnLevel.state),
-        set: (v: string) => { this.data!.victoryColumnLevel.setState(parseInt(v, 10) || 0); },
+        set: (v: string) => { this.data!.victoryColumnLevel.setState(() => parseInt(v, 10) || 0); },
       },
       {
         key: 'specialty1',

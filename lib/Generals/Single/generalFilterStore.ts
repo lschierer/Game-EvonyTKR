@@ -7,7 +7,7 @@ interface PrimaryFilterState {
 
 export class PrimaryFilterStore {
   readonly store = new Store<PrimaryFilterState>({
-    selected: new Set(),
+    selected: new Set<string>(),
     available: [],
   });
 

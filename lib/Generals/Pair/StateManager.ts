@@ -49,13 +49,10 @@ export class StateManager extends LitElement {
           }
         }
       });
+      let prevSelected = [...this.data.primaryFilter.store.state.selected].sort();
       this.data.primaryFilter.subscribe(() => {
         if (!this.data) return;
-        const current = [...this.data.primaryFilter.store.state.selected];
-        const previous = [...this.data.primaryFilter.store.prevState.selected];
-
-        current.sort();
-        previous.sort();
+        const current = [...this.data.primaryFilter.store.state.selected].sort();
 
         let refresh: boolean = false;
         // if there are *less* rows, the change to the ignore state will be
@@ -64,11 +61,12 @@ export class StateManager extends LitElement {
         // if the values have changed, there is at least one pair I need new data
         // for, and I need to refresh.
         // if there are *more rows* then there *must be* new data needed.
-        if (current.length > previous.length) {
+        if (current.length > prevSelected.length) {
           refresh = true;
-        } else if (current.length === previous.length) {
-          refresh = !current.every((value, index) => value === previous[index]);
+        } else if (current.length === prevSelected.length) {
+          refresh = !current.every((value, index) => value === prevSelected[index]);
         }
+        prevSelected = current;
         if (refresh && this.data) {
           this.data.pairStore.updateCatalog([...current]);
         }

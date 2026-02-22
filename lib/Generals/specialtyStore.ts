@@ -31,39 +31,9 @@ function enforceSpecialtyConstraints(
   }
 }
 
-// (Optional) common helper to validate a field via Zod
-function validateLevel(
-  next: SpecialtyLevelValues,
-  fallback: SpecialtyLevelValues,
-): SpecialtyLevelValues {
-  const parsed = SpecialtyLevelValues.safeParse(next);
-  return parsed.success ? parsed.data : fallback;
-}
-
 export class SpecialtyStore {
   readonly store: Store<SpecialtiesState> = new Store<SpecialtiesState>(
     { s1: 'gold', s2: 'gold', s3: 'gold', s4: 'green' },
-    {
-      // <- This is the only “weird” part: curry + normalize regardless of how setState is called
-      updateFn: (prev) => (updater) => {
-        // Resolve the candidate (value or function)
-        const candidate =
-          typeof updater === 'function'
-            ? (updater as (p: SpecialtiesState) => SpecialtiesState)(prev)
-            : updater;
-
-        // (Optional) validate fields before enforcing constraints
-        const validated: SpecialtiesState = {
-          s1: validateLevel(candidate.s1, prev.s1),
-          s2: validateLevel(candidate.s2, prev.s2),
-          s3: validateLevel(candidate.s3, prev.s3),
-          s4: validateLevel(candidate.s4, prev.s4),
-        };
-
-        // Enforce invariants pre-commit
-        return enforceSpecialtyConstraints(validated);
-      },
-    },
   );
 
   subscribe(cb: () => void) {

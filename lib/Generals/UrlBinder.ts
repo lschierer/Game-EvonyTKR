@@ -1,6 +1,5 @@
 // urlBinder.ts
-type Readable<T> = { state: T; subscribe(cb: () => void): () => void };
-//type Writable<T> = Readable<T> & { setState(v: T): void };
+type Readable<T> = { state: T; subscribe(cb: () => void): { unsubscribe: () => void } };
 
 export type ParamRow = {
   key: string;
@@ -9,7 +8,7 @@ export type ParamRow = {
 };
 
 export class UrlBinder {
-  private unsub: Array<() => void> = [];
+  private unsub: Array<{ unsubscribe: () => void }> = [];
   private writing = false;
   private applying = false;
   private writeTimer: number | undefined;
@@ -33,7 +32,7 @@ export class UrlBinder {
   }
 
   dispose() {
-    for (const u of this.unsub) u();
+    for (const u of this.unsub) u.unsubscribe();
     this.unsub = [];
     window.removeEventListener('popstate', this.onPopstate);
     if (this.writeTimer) window.clearTimeout(this.writeTimer);
