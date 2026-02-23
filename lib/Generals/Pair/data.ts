@@ -164,7 +164,7 @@ export class PairData extends LitElement {
   }
 
   public updateFilterParams() {
-    const params = this.queryParams.state;
+    const params = new URLSearchParams(this.queryParams.state);
     params.set('ascendingLevel', this.ascendingLevel.state);
     params.set('primaryCovenantLevel', this.primaryCovenantLevel.state);
     params.set('secondaryCovenantLevel', this.primaryCovenantLevel.state);

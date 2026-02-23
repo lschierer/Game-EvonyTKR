@@ -132,7 +132,7 @@ export class SingleData extends LitElement {
   }
 
   public updateFilterParams() {
-    const params = this.queryParams.state;
+    const params = new URLSearchParams(this.queryParams.state);
     params.set('ascendingLevel', this.ascendingLevel.state);
     params.set('covenantLevel', this.covenantLevel.state);
     params.set('generalLevel', String(this.generalLevel.state));
