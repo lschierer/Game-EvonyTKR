@@ -10,7 +10,7 @@ import { GeneralData, SingleGeneralState } from '../GeneralRowSchemas';
 const GSA = SingleGeneralState.array();
 type GSA = z.infer<typeof GSA>;
 
-type GeneralRecord = Record<string, SingleGeneralState>;
+type GeneralRecord = Partial<Record<string, SingleGeneralState>>;
 
 interface GeneralState {
   // Catalog sent first by the server as “stubs”
@@ -67,7 +67,7 @@ export class GeneralStore {
         rows[primary] = {
           ...existing,
           primary,
-          state: existing.state ? existing.state : 'stale',
+          state: existing?.state ?? 'stale',
         };
       }
 
@@ -129,6 +129,7 @@ export class GeneralStore {
   public toggleIgnoreState(primaryName: string) {
     const key = primaryName;
     const row = this.store.state.rows[key];
+    if (!row) return;
     if (row.state === 'ignore') {
       row.state = 'stale';
     } else {
@@ -226,7 +227,7 @@ export class GeneralStore {
         rows[key] = {
           ...old,
           primary: gp.primary.name,
-          state: old.state !== 'ignore' ? 'current' : 'ignore',
+          state: old?.state !== 'ignore' ? 'current' : 'ignore',
           data: gp,
         };
       });
@@ -248,8 +249,9 @@ export class GeneralStore {
     this.store.setState((prev) => {
       const rows = { ...prev.rows };
       for (const k in rows) {
-        if (rows[k].state !== 'ignore')
-          rows[k] = { ...rows[k], state: 'pending' };
+        const row = rows[k];
+        if (row && row.state !== 'ignore')
+          rows[k] = { ...row, state: 'pending' };
       }
       return { ...prev, rows };
     });

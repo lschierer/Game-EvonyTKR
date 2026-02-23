@@ -38,7 +38,7 @@ interface PairsState {
   catalogRev: number; // bump when catalog changes (to signal menus)
 
   // Fast lookup for rows (both stub-only and full data)
-  rows: Record<Key, RowEntry>;
+  rows: Partial<Record<Key, RowEntry>>;
 
   // Streaming run control
   runId: number;
@@ -82,7 +82,7 @@ export class PairStore {
       }));
 
       // Build/refresh rows map from stubs; keep any existing data if keys match
-      const rows: Record<Key, RowEntry> = { ...prev.rows };
+      const rows: Partial<Record<Key, RowEntry>> = { ...prev.rows };
       for (const { primary, secondary } of catalog) {
         const key = pairKey(primary, secondary);
         const existing = rows[key];
@@ -91,7 +91,7 @@ export class PairStore {
           key,
           primary,
           secondary,
-          state: existing.state,
+          state: existing ? existing.state : 'stale',
         };
       }
 
@@ -153,6 +153,7 @@ export class PairStore {
   public togglePairIgnoreState(primaryName: string, secondaryName: string) {
     const key = pairKey(primaryName, secondaryName);
     const pair = this.store.state.rows[key];
+    if (!pair) return;
     if (pair.state === 'ignore') {
       pair.state = 'stale';
     } else {
@@ -252,7 +253,7 @@ export class PairStore {
           key,
           primary: gp.primary.name,
           secondary: gp.secondary.name,
-          state: old.state !== 'ignore' ? 'current' : 'ignore',
+          state: old?.state !== 'ignore' ? 'current' : 'ignore',
           data: gp,
         };
       });
@@ -274,8 +275,9 @@ export class PairStore {
     this.store.setState((prev) => {
       const rows = { ...prev.rows };
       for (const k in rows) {
-        if (rows[k].state !== 'ignore')
-          rows[k] = { ...rows[k], state: 'pending' };
+        const row = rows[k];
+        if (row && row.state !== 'ignore')
+          rows[k] = { ...row, state: 'pending' };
       }
       return { ...prev, rows };
     });
