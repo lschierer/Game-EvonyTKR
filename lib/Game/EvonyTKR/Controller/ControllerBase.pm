@@ -71,11 +71,12 @@ sub _register_common_routes ($self) {
         my $host   = $ctx->req->headers->{'host'} // '';
         my $is_dev = $host =~ /dev|localhost|127\.0\.0\.1/i;
 
+        my $base   = $ctx->req->scheme . '://' . $ctx->req->host . '/';
         my $robots =
           $is_dev
           ? "User-agent: *\nDisallow: /\n"
           : "User-agent: *\nDisallow:\nSitemap: "
-          . $ctx->req->base
+          . $base
           . "sitemap.xml\n";
 
         $ctx->res->headers(content_type => 'text/plain');
