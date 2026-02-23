@@ -10,9 +10,26 @@ import { LitElement, html, type TemplateResult } from 'lit';
 @customElement('state-manager')
 export class StateManager extends LitElement {
   protected data?: PairData;
+  private restartTimer?: number;
 
   protected render(): TemplateResult {
     return html`<slot></slot>`;
+  }
+
+  // Debounce restartStream so synchronous cascades of setState
+  // (from alien-signals in @tanstack/store 0.9.x) only trigger one restart.
+  private scheduleRestart() {
+    if (!this.data) return;
+    const sid = this.data.pairStore.sessionId.state;
+    if (!sid || sid.length <= 1) return;
+
+    if (this.restartTimer) window.clearTimeout(this.restartTimer);
+    this.restartTimer = window.setTimeout(() => {
+      if (DEBUG) {
+        console.log(`debounced restartStream, sid="${sid}"`);
+      }
+      this.data?.pairStore.restartStream(this.data.queryParams.state);
+    }, 50);
   }
 
   connectedCallback(): void {
@@ -26,29 +43,9 @@ export class StateManager extends LitElement {
       this.data = qr as PairData;
     }
     if (this.data) {
-      this.data.queryParams.subscribe(() => {
-        if (this.data && this.data.pairStore.sessionId.state) {
-          const sid = this.data.pairStore.sessionId.state;
-          if (sid.length > 1) {
-            if (DEBUG) {
-              console.log(`sid is "${sid}"`);
-            }
-            this.data.pairStore.restartStream(this.data.queryParams.state);
-          }
-        }
-      });
+      this.data.queryParams.subscribe(() => { this.scheduleRestart(); });
 
-      this.data.pairStore.sessionId.subscribe(() => {
-        if (this.data && this.data.pairStore.sessionId.state) {
-          const sid = this.data.pairStore.sessionId.state;
-          if (sid.length > 1) {
-            if (DEBUG) {
-              console.log(`sid is "${sid}"`);
-            }
-            this.data.pairStore.restartStream(this.data.queryParams.state);
-          }
-        }
-      });
+      this.data.pairStore.sessionId.subscribe(() => { this.scheduleRestart(); });
       let prevSelected = [...this.data.primaryFilter.store.state.selected].sort();
       this.data.primaryFilter.subscribe(() => {
         if (!this.data) return;

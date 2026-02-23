@@ -10,9 +10,26 @@ import { LitElement, html, type TemplateResult } from 'lit';
 @customElement('state-manager')
 export class StateManager extends LitElement {
   protected data?: SingleData;
+  private restartTimer?: number;
 
   protected render(): TemplateResult {
     return html`<slot></slot>`;
+  }
+
+  // Debounce restartStream so synchronous cascades of setState
+  // (from alien-signals in @tanstack/store 0.9.x) only trigger one restart.
+  private scheduleRestart() {
+    if (!this.data) return;
+    const sid = this.data.generalStore.sessionId.state;
+    if (!sid || sid.length <= 1) return;
+
+    if (this.restartTimer) window.clearTimeout(this.restartTimer);
+    this.restartTimer = window.setTimeout(() => {
+      if (DEBUG) {
+        console.log(`debounced restartStream, sid="${sid}"`);
+      }
+      this.data?.generalStore.restartStream(this.data.queryParams.state);
+    }, 50);
   }
 
   connectedCallback(): void {
@@ -24,29 +41,9 @@ export class StateManager extends LitElement {
       this.data = qr as SingleData;
     }
     if (this.data) {
-      this.data.queryParams.subscribe(() => {
-        if (this.data && this.data.generalStore.sessionId.state) {
-          const sid = this.data.generalStore.sessionId.state;
-          if (sid.length > 1) {
-            if (DEBUG) {
-              console.log(`sid is "${sid}"`);
-            }
-            this.data.generalStore.restartStream(this.data.queryParams.state);
-          }
-        }
-      });
+      this.data.queryParams.subscribe(() => { this.scheduleRestart(); });
 
-      this.data.generalStore.sessionId.subscribe(() => {
-        if (this.data && this.data.generalStore.sessionId.state) {
-          const sid = this.data.generalStore.sessionId.state;
-          if (sid.length > 1) {
-            if (DEBUG) {
-              console.log(`sid is "${sid}"`);
-            }
-            this.data.generalStore.restartStream(this.data.queryParams.state);
-          }
-        }
-      });
+      this.data.generalStore.sessionId.subscribe(() => { this.scheduleRestart(); });
       let prevSelected = [...this.data.buffFilter.store.state.selected].sort();
       this.data.buffFilter.subscribe(() => {
         if (!this.data) return;
