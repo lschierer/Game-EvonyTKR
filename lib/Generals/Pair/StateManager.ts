@@ -64,8 +64,8 @@ export class StateManager extends LitElement {
           refresh = !current.every((value, index) => value === prevSelected[index]);
         }
         prevSelected = current;
-        if (refresh && this.data) {
-          this.data.pairStore.updateCatalog([...current]);
+        if (refresh) {
+          void this.data.pairStore.updateCatalog([...current]);
         }
       });
     }

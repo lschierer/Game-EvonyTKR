@@ -50,12 +50,6 @@ export class GeneralStore {
 
   public setCatalog(stubs: GSA) {
     this.store.setState((prev) => {
-      if (!stubs) {
-        if (DEBUG) {
-          console.error('stubs not defined in setCatalog!!');
-        }
-        return prev;
-      }
       if (!Array.isArray(stubs)) {
         if (DEBUG) {
           console.error(`stubs is not an array, ${JSON.stringify(stubs)}`);
@@ -70,9 +64,11 @@ export class GeneralStore {
       const rows: GeneralRecord = { ...prev.rows };
       for (const { primary } of catalog) {
         const existing = rows[primary];
-        rows[primary] = existing
-          ? { ...existing, primary }
-          : { primary, state: 'stale' };
+        rows[primary] = {
+          ...existing,
+          primary,
+          state: existing.state ? existing.state : 'stale',
+        };
       }
 
       return {
@@ -86,8 +82,6 @@ export class GeneralStore {
   }
 
   public updateCatalog = async (selectedPrimaries: string[] = []) => {
-    const isUpdate: boolean = selectedPrimaries.length !== 0;
-
     let path = window.location.pathname;
     path = path.replace('comparison', 'data.json');
     const catalogUrl = new URL(path, window.location.toString());
@@ -116,20 +110,16 @@ export class GeneralStore {
     }
     this.sessionId.setState(() => ro.sessionId);
     const sp = new Set<string>();
-    if (valid.success) {
-      valid.data.map((s) => {
-        sp.add(s.primary);
-      });
-    }
+    valid.data.map((s) => {
+      sp.add(s.primary);
+    });
 
-    if (!isUpdate) {
-      this.setCatalog(valid.data);
-    }
+    this.setCatalog(valid.data);
   };
 
   public getCatalog = () => {
-    if (!this.store.state.catalog || this.store.state.catalog.length === 0) {
-      this.updateCatalog().then(() => {
+    if (this.store.state.catalog.length === 0) {
+      void this.updateCatalog().then(() => {
         return [...this.store.state.catalog];
       });
     }
@@ -139,12 +129,10 @@ export class GeneralStore {
   public toggleIgnoreState(primaryName: string) {
     const key = primaryName;
     const row = this.store.state.rows[key];
-    if (row) {
-      if (row.state === 'ignore') {
-        row.state = 'stale';
-      } else {
-        row.state = 'ignore';
-      }
+    if (row.state === 'ignore') {
+      row.state = 'stale';
+    } else {
+      row.state = 'ignore';
     }
     const rows = {
       ...this.store.state.rows,
@@ -233,19 +221,12 @@ export class GeneralStore {
       // Add/update all buffered rows
       bufferedRows.forEach((gp, key) => {
         const old = rows[key];
-        if (old) {
-          rows[key] = {
-            ...old,
-            state: old.state !== 'ignore' ? 'current' : 'ignore',
-            data: gp,
-          };
-        } else {
-          rows[key] = {
-            primary: gp.primary.name,
-            state: 'current',
-            data: gp,
-          };
-        }
+        rows[key] = {
+          ...old,
+          primary: gp.primary.name,
+          state: old.state !== 'ignore' ? 'current' : 'ignore',
+          data: gp,
+        };
       });
 
       return { ...prev, rows } as GeneralState;
@@ -321,7 +302,7 @@ export class GeneralStore {
 
     es.addEventListener('row', (e: MessageEvent) => {
       // Parse JSON data directly (PAGI::SSE sends plain JSON)
-      const msg = JSON.parse(e.data);
+      const msg = JSON.parse(e.data as string) as { runId: number; data: unknown };
       if (DEBUG) {
         console.log('parsed row message:', msg);
       }
@@ -390,11 +371,11 @@ export class GeneralStore {
     sp = sp.replace('comparison', 'details-stream');
     const streamUrl = new URL(sp, window.location.toString());
 
-    if (!!this._currentES) {
+    if (this._currentES) {
       if (DEBUG) {
         console.log(
           'Closing existing EventSource, state is ',
-          this._currentES?.readyState,
+          this._currentES.readyState,
         );
       }
       this._currentES.close();

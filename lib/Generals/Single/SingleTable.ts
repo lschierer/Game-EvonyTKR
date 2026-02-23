@@ -134,8 +134,7 @@ export class SingleTable extends LitElement {
       })
       .map((key) => {
         const accessorFn = (row: SingleGeneralState) => {
-          if (!row) return null;
-          else if (key === 'primary') return row.primary;
+          if (key === 'primary') return row.primary;
           else {
             if (!row.data) {
               return undefined;

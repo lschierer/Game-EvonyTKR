@@ -112,6 +112,7 @@ export class BuffFilter extends LitElement {
   }
 
   protected override updated(_changedProperties: PropertyValues): void {
+    void _changedProperties;
     if (DEBUG) {
       console.log(
         `${this.is_primary ? 'primary' : 'secondary'} filter updated`,
@@ -378,28 +379,29 @@ export class BuffFilter extends LitElement {
   };
 
   private UrlParamHandler = () => {
-    if (!this.data) return;
-    const S = this.data.specialties;
+    const data = this.data;
+    if (!data) return;
+    const S = data.specialties;
     return [
       {
         key: 'ascendingLevel',
-        get: () => this.data!.ascendingLevel.state,
-        set: (v: string) => { this.data!.ascendingLevel.setState(() => v); },
+        get: () => data.ascendingLevel.state,
+        set: (v: string) => { data.ascendingLevel.setState(() => v); },
       },
       {
         key: 'covenantLevel',
-        get: () => this.data!.covenantLevel.state,
-        set: (v: string) => { this.data!.covenantLevel.setState(() => v); },
+        get: () => data.covenantLevel.state,
+        set: (v: string) => { data.covenantLevel.setState(() => v); },
       },
       {
         key: 'generalLevel',
-        get: () => String(this.data!.generalLevel.state),
-        set: (v: string) => { this.data!.generalLevel.setState(() => parseInt(v, 10) || 40); },
+        get: () => String(data.generalLevel.state),
+        set: (v: string) => { data.generalLevel.setState(() => parseInt(v, 10) || 40); },
       },
       {
         key: 'victoryColumnLevel',
-        get: () => String(this.data!.victoryColumnLevel.state),
-        set: (v: string) => { this.data!.victoryColumnLevel.setState(() => parseInt(v, 10) || 0); },
+        get: () => String(data.victoryColumnLevel.state),
+        set: (v: string) => { data.victoryColumnLevel.setState(() => parseInt(v, 10) || 0); },
       },
       {
         key: 'specialty1',

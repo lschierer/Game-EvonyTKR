@@ -1,3 +1,4 @@
+// cspell: disable
 import debugFunction from '../localDebug';
 const DEBUG = debugFunction(__FILE_PATH__);
 console.log(`DEBUG is set to ${DEBUG} for ${__FILE_PATH__}`);
@@ -112,22 +113,22 @@ export class LevelSettings extends (SignalWatcher(LitElement) as new () => LitEl
   protected willUpdate(_changedProperties: PropertyValues): void {
     if (DEBUG) {
       if (_changedProperties.has('covenantLevel')) {
-        console.log(`covenantLevel: ${this.covenantLevel}`);
+        console.log(`covenantLevel: ${this.covenantLevel.get()}`);
       }
       if (_changedProperties.has('ascendingLevel')) {
-        console.log(`ascendingLevel: ${this.ascendingLevel}`);
+        console.log(`ascendingLevel: ${this.ascendingLevel.get()}`);
       }
       if (_changedProperties.has('specialtyLevel1')) {
-        console.log(`specialtyLevel1: ${this.specialtyLevel1}`);
+        console.log(`specialtyLevel1: ${this.specialtyLevel1.get()}`);
       }
       if (_changedProperties.has('specialtyLevel2')) {
-        console.log(`specialtyLevel1: ${this.specialtyLevel2}`);
+        console.log(`specialtyLevel1: ${this.specialtyLevel2.get()}`);
       }
       if (_changedProperties.has('specialtyLevel3')) {
-        console.log(`specialtyLevel1: ${this.specialtyLevel3}`);
+        console.log(`specialtyLevel1: ${this.specialtyLevel3.get()}`);
       }
       if (_changedProperties.has('specialtyLevel4')) {
-        console.log(`specialtyLevel1: ${this.specialtyLevel4}`);
+        console.log(`specialtyLevel1: ${this.specialtyLevel4.get()}`);
       }
     }
   }
@@ -293,7 +294,7 @@ export class LevelSettings extends (SignalWatcher(LitElement) as new () => LitEl
                                 aria-selected="${opt.selected
                                   ? 'true'
                                   : 'false'}"
-                                tabindex="0"
+                                tabindex=${index}
                                 @click=${() => { this.toggleByName(opt.name); }}
                               >
                                 <iconify-icon
@@ -367,7 +368,8 @@ export class LevelSettings extends (SignalWatcher(LitElement) as new () => LitEl
             ${repeat(
               CovenantCategoryValues.values.values(),
               (value) => value,
-              (value, index) => {
+              (value) => {
+
                 const selected = !this.covenantLevel.get().localeCompare(value);
 
                 return html`
@@ -536,7 +538,7 @@ export class LevelSettings extends (SignalWatcher(LitElement) as new () => LitEl
                   const selected = !specialty.get().localeCompare(value);
                   if (DEBUG) {
                     console.log(
-                      `render for specialty ${i} has value ${specialty.get()} and value ${value} ${selected ? 'is' : 'is not'} selected`,
+                      `render for specialty ${i} (index ${index}) has value ${specialty.get()} and value ${value} ${selected ? 'is' : 'is not'} selected`,
                     );
                   }
                   return html`

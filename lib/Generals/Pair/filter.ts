@@ -123,6 +123,7 @@ export class PairFilter extends LitElement {
   }
 
   protected override updated(_changedProperties: PropertyValues): void {
+    void _changedProperties;
     if (DEBUG) {
       console.log(
         `${this.is_primary ? 'primary' : 'secondary'} filter updated`,
@@ -400,33 +401,34 @@ export class PairFilter extends LitElement {
   };
 
   private UrlParamHandler = () => {
-    if (!this.data) return;
+    const data = this.data;
+    if (!data) return;
     const S = this.is_primary
-      ? this.data.primarySpecialties
-      : this.data.secondarySpecialties;
+      ? data.primarySpecialties
+      : data.secondarySpecialties;
     return this.is_primary
       ? ([
           {
             key: 'ascendingLevel',
-            get: () => this.data!.ascendingLevel.state,
-            set: (v: string) => { this.data!.ascendingLevel.setState(() => v); },
+            get: () => data.ascendingLevel.state,
+            set: (v: string) => { data.ascendingLevel.setState(() => v); },
           },
           {
             key: 'primaryCovenantLevel',
-            get: () => this.data!.primaryCovenantLevel.state,
-            set: (v: string) => { this.data!.primaryCovenantLevel.setState(() => v); },
+            get: () => data.primaryCovenantLevel.state,
+            set: (v: string) => { data.primaryCovenantLevel.setState(() => v); },
           },
           {
             key: 'generalLevel',
-            get: () => String(this.data!.generalLevel.state),
+            get: () => String(data.generalLevel.state),
             set: (v: string) =>
-              { this.data!.generalLevel.setState(() => parseInt(v, 10) || 40); },
+              { data.generalLevel.setState(() => parseInt(v, 10) || 40); },
           },
           {
             key: 'victoryColumnLevel',
-            get: () => String(this.data!.victoryColumnLevel.state),
+            get: () => String(data.victoryColumnLevel.state),
             set: (v: string) =>
-              { this.data!.victoryColumnLevel.setState(() => parseInt(v, 10) || 0); },
+              { data.victoryColumnLevel.setState(() => parseInt(v, 10) || 0); },
           },
           {
             key: 'primarySpecialty1',
@@ -452,8 +454,8 @@ export class PairFilter extends LitElement {
       : ([
           {
             key: 'secondaryCovenantLevel',
-            get: () => this.data!.secondaryCovenantLevel.state,
-            set: (v: string) => { this.data!.secondaryCovenantLevel.setState(() => v); },
+            get: () => data.secondaryCovenantLevel.state,
+            set: (v: string) => { data.secondaryCovenantLevel.setState(() => v); },
           },
           {
             key: 'secondarySpecialty1',

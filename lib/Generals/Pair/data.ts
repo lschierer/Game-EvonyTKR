@@ -176,9 +176,9 @@ export class PairData extends LitElement {
             <dt>Secondary:</dt>
             <dd>${entry.secondary}</dd>
             <dt>State:</dt>
-            <dd>${value ? value.state : 'missing'}</dd>
+            <dd>${value.state}</dd>
             <dt>Data:</dt>
-            <dd>${value ? JSON.stringify(value.data) : 'no data'}</dd>
+            <dd>${JSON.stringify(value.data)}</dd>
           </dl>
         </dd>
       `;

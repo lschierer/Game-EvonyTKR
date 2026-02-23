@@ -70,12 +70,6 @@ export class PairStore {
 
   public setCatalog(stubs: GPSA) {
     this.store.setState((prev) => {
-      if (!stubs) {
-        if (DEBUG) {
-          console.error('stubs not defined in setCatalog!!');
-        }
-        return prev;
-      }
       if (!Array.isArray(stubs)) {
         if (DEBUG) {
           console.error(`stubs is not an array, ${JSON.stringify(stubs)}`);
@@ -92,9 +86,13 @@ export class PairStore {
       for (const { primary, secondary } of catalog) {
         const key = pairKey(primary, secondary);
         const existing = rows[key];
-        rows[key] = existing
-          ? { ...existing, primary, secondary }
-          : { key, primary, secondary, state: 'stale' };
+        rows[key] = {
+          ...existing,
+          key,
+          primary,
+          secondary,
+          state: existing.state,
+        };
       }
 
       return {
@@ -108,7 +106,6 @@ export class PairStore {
   }
 
   public updateCatalog = async (selectedPrimaries: string[] = []) => {
-    const isUpdate: boolean = selectedPrimaries.length !== 0;
 
     let path = window.location.pathname;
     path = path.replace('-comparison', '/data.json');
@@ -138,20 +135,16 @@ export class PairStore {
     }
     this.sessionId.setState(() => ro.sessionId);
     const sp = new Set<string>();
-    if (valid.success) {
-      valid.data.map((s) => {
-        sp.add(s.primary.name);
-      });
-    }
+    valid.data.map((s) => {
+      sp.add(s.primary.name);
+    });
 
-    if (!isUpdate) {
-      this.setCatalog(valid.data);
-    }
+    this.setCatalog(valid.data);
   };
 
   public getCatalog = () => {
-    if (!this.store.state.catalog || this.store.state.catalog.length === 0) {
-      this.updateCatalog().then(() => {
+    if (this.store.state.catalog.length === 0) {
+      void this.updateCatalog().then(() => {
         return [...this.store.state.catalog];
       });
     }
@@ -161,12 +154,10 @@ export class PairStore {
   public togglePairIgnoreState(primaryName: string, secondaryName: string) {
     const key = pairKey(primaryName, secondaryName);
     const pair = this.store.state.rows[key];
-    if (pair) {
-      if (pair.state === 'ignore') {
-        pair.state = 'stale';
-      } else {
-        pair.state = 'ignore';
-      }
+    if (pair.state === 'ignore') {
+      pair.state = 'stale';
+    } else {
+      pair.state = 'ignore';
     }
     const rows = {
       ...this.store.state.rows,
@@ -255,21 +246,14 @@ export class PairStore {
       // Add/update all buffered rows
       bufferedRows.forEach((gp, key) => {
         const old = rows[key];
-        if (old) {
-          rows[key] = {
-            ...old,
-            state: old.state !== 'ignore' ? 'current' : 'ignore',
-            data: gp,
-          };
-        } else {
-          rows[key] = {
-            key,
-            primary: gp.primary.name,
-            secondary: gp.secondary.name,
-            state: 'current',
-            data: gp,
-          };
-        }
+        rows[key] = {
+          ...old,
+          key,
+          primary: gp.primary.name,
+          secondary: gp.secondary.name,
+          state: old.state !== 'ignore' ? 'current' : 'ignore',
+          data: gp,
+        };
       });
 
       return { ...prev, rows } as PairsState;
@@ -345,7 +329,7 @@ export class PairStore {
 
     es.addEventListener('pair', (e: MessageEvent) => {
       // Parse JSON directly (PAGI::SSE sends plain JSON, not base64)
-      const msg = JSON.parse(e.data);
+      const msg = JSON.parse(e.data as string) as { runId: number; data: unknown };
       if (DEBUG) {
         console.log('parsed pair message:', msg);
       }
@@ -427,11 +411,11 @@ export class PairStore {
       }
     }
 
-    if (!!this._currentES) {
+    if (this._currentES) {
       if (DEBUG) {
         console.log(
           'Closing existing EventSource, state is ',
-          this._currentES?.readyState,
+          this._currentES.readyState,
         );
       }
       this._currentES.close();

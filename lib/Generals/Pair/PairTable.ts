@@ -138,8 +138,7 @@ export class PairTable extends LitElement {
       })
       .map((key) => {
         const accessorFn = (row: RowEntry) => {
-          if (!row) return null;
-          else if (key === 'primary') return row.primary;
+          if (key === 'primary') return row.primary;
           else if (key === 'secondary') return row.secondary;
           else {
             if (!row.data) {

@@ -58,7 +58,7 @@ const debugFunction = (myName: string): boolean => {
       console.log(`got path ${myName}`);
     }
   }
-  return !!fileDebug[myName];
+  return fileDebug[myName] ?? false;
 };
 
 export default debugFunction;

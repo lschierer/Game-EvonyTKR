@@ -160,7 +160,7 @@ export class PairPicker extends LitElement {
     if (!this.data) return;
 
     const wasSelected = this.data.primaryFilter.isSelected(primary);
-    const willSelect = newState ?? !wasSelected;
+    const willSelect = newState;
 
     if (willSelect !== wasSelected) {
       if (DEBUG) {

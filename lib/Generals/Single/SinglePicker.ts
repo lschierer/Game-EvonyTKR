@@ -158,7 +158,7 @@ export class GeneralPicker extends LitElement {
     if (!this.data) return;
 
     const wasSelected = this.data.buffFilter.isSelected(primary);
-    const willSelect = newState ?? !wasSelected;
+    const willSelect = newState;
 
     if (willSelect !== wasSelected) {
       if (DEBUG) {
